@@ -2,7 +2,7 @@
   "openapi": "3.1.0",
   "info": {
     "title": "ESSRT Model API",
-    "version": "0.1.0",
+    "version": "0.2.0",
     "description": "HTTP surface over the assembled ESSRT model (@essrt/physics createModel). Deterministic: same model version + same request => byte-identical body, verifiable by ETag. Every response carries the provenance envelope; out-of-domain epochs are refused (RFC 9457 problem+json), never extrapolated. JD inputs are JD(TT).",
     "license": { "name": "AGPL-3.0-or-later" }
   },

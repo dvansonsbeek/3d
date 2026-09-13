@@ -19,7 +19,9 @@ docs/archive/
 docs/scripts/archive/
 tools/explore/archive/
 tools/fit/archive/
+tools/archive/
 scripts/archive/
+tools/results/pipeline.log
 web-bundles/
 tools/cardinal-points-training.json
 data/01-holistic-year-objects-data.xlsx

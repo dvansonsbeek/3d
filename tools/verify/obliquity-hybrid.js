@@ -18,11 +18,20 @@
  * e-story measured); the derived H/8 beat |ψ̇| − |s₃|; α and the H/13 rate.
  * La2004 is a THEORY reference label, never an input.
  *
- * ASSERTIONS UNDER --write:
- *   - the derived rate within 1% of the IAU reference (read from the
- *     shared astro reference — E20, never retyped);
- *   - the H/8 beat inside 40–42.5 kyr;
- *   - the era-slice 13-kyr rms beats the shipped fitted law's.
+ * ASSERTIONS UNDER --write (T5d revision, owner-approved 2026-09-13):
+ *   - the SERIES-INTEGRATED dε/dt(J2000) (data/nbody-secular-series.json →
+ *     verdict.rateJ2000ArcsecPerCy — the full-resolution ζ route) within 1%
+ *     of the IAU reference (read from the shared astro reference — E20,
+ *     never retyped);
+ *   - the H/8 beat inside 40–42.5 kyr (lab);
+ *   - the era-slice 13-kyr rms beats the shipped fitted law's (lab).
+ * The NAFF-tier truncation slopes (era-8 / full-16) are REPORTED, not
+ * gated: the s₃ multiplet (three near-degenerate lines) makes any
+ * truncation's local derivative ill-conditioned — measured old/new:
+ * full-16 always ≈ −38.5-class; era-8 read −46.96 then −48.00 across two
+ * runs whose ε(t) fit IMPROVED (56″ → 50″). The robust local-rate
+ * instrument is the series integration (−46.79, 0.10% from IAU).
+ * ORDER: regenerate data/nbody-secular-series.json BEFORE this artifact.
  */
 
 'use strict';
@@ -41,7 +50,7 @@ if (!WRITE) {
   if (!fs.existsSync(OUT)) { console.log('no artifact yet — run with --write'); process.exit(0); }
   const art = JSON.parse(fs.readFileSync(OUT, 'utf8'));
   console.log('data/obliquity-hybrid-verdict.json — current artifact');
-  console.log(`  derived deps/dt(J2000) ${art.verdict.rateEraArcsecPerCy.toFixed(2)} ″/cy era-tier (IAU ref ${art.verdict.iauRateArcsecPerCy}); H/8 beat ${art.verdict.beatKyr.toFixed(1)} kyr`);
+  console.log(`  gated deps/dt(J2000) ${(art.verdict.rateSeriesArcsecPerCy ?? art.verdict.rateEraArcsecPerCy).toFixed(2)} ″/cy series-integrated (IAU ref ${art.verdict.iauRateArcsecPerCy}); H/8 beat ${art.verdict.beatKyr.toFixed(1)} kyr; NAFF-tier slopes era ${art.verdict.rateEraArcsecPerCy.toFixed(2)} / full ${art.verdict.rateFullArcsecPerCy.toFixed(2)} (reported, ill-conditioned)`);
   console.log(`  era slice 0–13 kyr: ${art.verdict.windowsEra['13'].hybridRmsArcsec.toFixed(0)}″ vs fitted law ${art.verdict.windowsEra['13'].fittedLawRmsArcsec.toFixed(0)}″`);
   console.log('  (generator class — a plain run only prints; --write re-runs the lab)');
   process.exit(0);
@@ -54,12 +63,19 @@ if (!line) { console.error('REFUSING: no @@OBLIQUITY_HYBRID_JSON@@ line in the l
 const lab = JSON.parse(line.slice('@@OBLIQUITY_HYBRID_JSON@@ '.length));
 
 const iauRate = C.ASTRO_REFERENCE.obliquityRate_arcsecPerCentury;   // the one home (E20)
-// The J2000-LOCAL rate is an ERA-tier quantity (the two-tier doctrine): the
-// deep table's extra multiplet terms shift the anchored remainder near t=0
-// (measured: full-table local slope −38.5 vs the era slice's −46.96), so
-// the derivation claim is asserted on the ERA slice.
-if (Math.abs(lab.rateEraArcsecPerCy - iauRate) > Math.abs(iauRate) * 0.01) {
-  console.error(`REFUSING: derived era-tier rate ${lab.rateEraArcsecPerCy.toFixed(2)} not within 1% of the IAU reference ${iauRate}`);
+// T5d: the gated J2000-local rate is the SERIES-INTEGRATED one (the
+// full-resolution ζ route banked by secular-series.js) — the NAFF-tier
+// truncation slopes are ill-conditioned in the s₃ multiplet and are
+// carried as reported diagnostics only (see the header).
+const SERIES = path.join(ROOT, 'data', 'nbody-secular-series.json');
+if (!fs.existsSync(SERIES)) {
+  console.error('REFUSING: data/nbody-secular-series.json missing — regenerate it first (node tools/verify/secular-series.js --write); this artifact gates on its series-integrated rate.');
+  process.exit(1);
+}
+const seriesVerdict = JSON.parse(fs.readFileSync(SERIES, 'utf8')).verdict;
+const seriesRate = seriesVerdict.rateJ2000ArcsecPerCy;
+if (!Number.isFinite(seriesRate) || Math.abs(seriesRate - iauRate) > Math.abs(iauRate) * 0.01) {
+  console.error(`REFUSING: series-integrated rate ${Number(seriesRate).toFixed(2)} not within 1% of the IAU reference ${iauRate}`);
   process.exit(1);
 }
 if (!(lab.beatKyr >= 40 && lab.beatKyr <= 42.5)) {
@@ -77,8 +93,9 @@ const art = {
   verdict: {
     alphaArcsecPerYr: lab.alphaArcsecPerYr,
     psiDotH13ArcsecPerYr: lab.psiDotH13ArcsecPerYr,
-    rateFullArcsecPerCy: lab.rateFullArcsecPerCy,
-    rateEraArcsecPerCy: lab.rateEraArcsecPerCy,
+    rateSeriesArcsecPerCy: seriesRate,   // T5d: the GATED J2000-local rate (series-integrated, full-resolution ζ)
+    rateFullArcsecPerCy: lab.rateFullArcsecPerCy,   // reported only — ill-conditioned truncation slope
+    rateEraArcsecPerCy: lab.rateEraArcsecPerCy,     // reported only — ill-conditioned truncation slope
     iauRateArcsecPerCy: iauRate,
     beatKyr: lab.beatKyr,
     zetaTermsFull: lab.zetaTermsFull,
@@ -90,8 +107,9 @@ const art = {
     'tools/verify/obliquity-hybrid.js',
     'tools/explore/stage-c-obliquity-hybrid.mjs',
     'data/nbody-deep-secular-modes.json',
+    'data/nbody-secular-series.json',
     'data/la2004-earth-51myr-back.asc',
   ]),
 };
 fs.writeFileSync(OUT, JSON.stringify(art, null, 1) + '\n');
-console.log(`✓ wrote data/obliquity-hybrid-verdict.json — era-tier rate ${lab.rateEraArcsecPerCy.toFixed(2)} ″/cy (IAU ${iauRate}), beat ${lab.beatKyr.toFixed(1)} kyr, era 13-kyr ${era13.hybridRmsArcsec.toFixed(0)}″ vs law ${era13.fittedLawRmsArcsec.toFixed(0)}″`);
+console.log(`✓ wrote data/obliquity-hybrid-verdict.json — gated series rate ${seriesRate.toFixed(2)} ″/cy (IAU ${iauRate}), beat ${lab.beatKyr.toFixed(1)} kyr, era 13-kyr ${era13.hybridRmsArcsec.toFixed(0)}″ vs law ${era13.fittedLawRmsArcsec.toFixed(0)}″ (NAFF-tier slopes reported: era ${lab.rateEraArcsecPerCy.toFixed(2)} / full ${lab.rateFullArcsecPerCy.toFixed(2)})`);

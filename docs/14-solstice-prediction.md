@@ -299,8 +299,7 @@ All implementations return exact J2000 anchor values by construction. Legacy `SO
 
 ## Related Documents
 
-- [11 — Day & Year Length Formulas](11-length-day-year-formulas.md) — Mean tropical year harmonics (4-point average)
-- [37 — Planetary Precession Cycles](37-planets-precession-cycles.md) — H/3, H/8, H/16 period derivations
+- [11 — Day & Year Length Formulas](11-length-day-year-formulas.md) — Mean tropical year harmonics (4-point average) and the H/3, H/8, H/16 Earth identities
 - [52 — Analysis Export Tools](52-analysis-export-tools.md) — Solstice & Equinox export (simulation-based detection)
 - [65 — Equation of Center](65-equation-of-center.md) — Variable speed driving the H/16 timing term
-- [35 — Formula Derivation](35-formula-derivation.md) — Predictive formula system overview
+- [13 — Perihelion Precession](13-mercury-precession-breakdown.md) — the predictive Earth-frame system

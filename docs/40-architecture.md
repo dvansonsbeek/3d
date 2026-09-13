@@ -50,7 +50,8 @@ The Interactive 3D Solar System Simulation is a sophisticated WebGL-based astron
   K5 legacy-chain excision; the geometric planet chains described in this
   document survive only as scene scaffolding and for the no-chain bodies,
   and their fitted corrections are deleted — see doc 41's engine-D
-  rendering note and docs 62–64/67/71 for the records)
+  rendering note; the correction-stack records are archived
+  ([retired record](retired-record.md)))
 - Long-term precession cycles (axial, perihelion, inclination)
 - The standard-model reference overlay (K8): VSOP87A ghost bodies for the
   Sun + seven planets with a live per-body Δ readout — one-way reference,
@@ -170,7 +171,7 @@ WebGL Render (60 FPS target)
 │   ├── 01-holistic-year-objects-data.xlsx  # Full H export (perihelion, precession)
 │   ├── 02-solar-measurements.csv          # Cardinal points, year lengths (full H)
 │   ├── reference-data.json                # JPL-enriched verification data
-│   └── balance-presets.json               # 767 balance configurations (≥99.994% inclination balance)
+│   └── balance-presets.json               # 15 deep-analysis balance presets (96 candidates → 15 survivors)
 │
 ├── packages/                   # Published npm workspace (@essrt scope)
 │   ├── physics/                # @essrt/physics — the full analytic model incl. the
@@ -182,14 +183,14 @@ WebGL Render (60 FPS target)
 │
 ├── tools/
 │   ├── fit/                    # Pipeline CLI shims (implementations in packages/fitting)
-│   ├── verify/                 # 26 scripts: 7 gate · 4 liftable · 10 narrative · 5 generator
-│   ├── explore/                # Exploratory analysis scripts (~140 one-offs)
+│   ├── verify/                 # 31 scripts: 6 gate · 3 liftable · 12 narrative · 10 generator
+│   ├── explore/                # Exploratory analysis scripts (~150 tracked one-offs; closed-campaign instruments live in the untracked archive/, git history is the record)
 │   ├── constants/              # generate.mjs — the generated-constants pipeline
 │   ├── docs/                   # Doc machinery (marker renderer, frontmatter stamper)
 │   ├── lib/                    # Shared libraries (constants, scene-graph, orbital-engine, deep-time)
-│   └── results/                # Baseline values and pipeline logs
+│   └── results/                # Baseline records (chain-era comparisons live in data/chain-vs-jpl-rms.json)
 │
-├── docs/                       # Documentation (docs 00-107)
+├── docs/                       # Documentation (47 docs, numbered 00–109 with gaps)
 │
 ├── package.json                # Dependencies and scripts
 ├── .gitignore
@@ -231,8 +232,8 @@ The monolithic script.js (~59,800 lines) is organized into logical sections. Con
 │  CONSTANTS & FORMULAS (top of file)                                 │
 │  A. Model parameters: H, Earth params, Moon, planet configs         │
 │  B. Fitted coefficients: year harmonics, predictive formula (429    │
-│     terms × 7 planets), parallax/gravitation/elongation corrections,│
-│     obliquity & cardinal point harmonics, balance presets           │
+│     terms × 7 planets), obliquity & cardinal point harmonics,       │
+│     balance presets                                                 │
 │  C. Astro references: J2000 elements, body diameters, inclination  │
 │     reference data, ASTRO_REFERENCE object                          │
 │  D. Moon Meeus tables (Ch.47 lunar corrections)                     │
@@ -509,7 +510,26 @@ Critical ordering for dependent calculations:
 | **Orbital Velocity** | Speed at any point in orbit | Vis-viva equation |
 | **Moon Orbital Elements** | Geocentric anomalies, Ω, ϖ, phase | `updateMoonOrbitalElements()` |
 
-### Precession Cycles
+### The One-Source Movement (Stage C/D)
+
+Earth's rendered movement — ε(t), e(t), ϖ(t), the equinox ψ(t), the
+seven planets and the invariable plane — comes from **one source**: the
+model's own N-body secular series (`data/nbody-secular-series.json`,
+±10 Myr; the NAFF mode tail beyond), evaluated through the
+`@essrt/physics` factories (`createDeepOrbitalHistory`,
+`createYearLengths`, `createCardinalStructure`, the λ̇ sidereal channel).
+The displayed/served year lengths and precession beats are ONE family
+from these factories (chart ≡ panel ≡ report ≡ API ≡ Node engine); the
+fitted Fourier laws below remain the **frozen era-certification device**
+and the `?hybridSpin=0` opt-out (doc 11's Status banner; the plan-02
+record in the private repo carries the full decision trail).
+
+### Precession Cycles (kinematic H-lattice identities)
+
+The structural identities of the H-lattice. The *displayed of-date*
+precession periods are the dynamical beats of the one-source year-length
+family (e.g. axial ≈ 25,771 yr at J2000, declining with date); these
+identities remain the kinematic family beside them.
 
 | Cycle | Period | Description |
 |-------|--------|-------------|
@@ -751,7 +771,7 @@ eccentricAnomaly: (M_deg, e) => {
 
 ### True Anomaly (`updatePlanetAnomalies`, line ~26774)
 
-True anomaly is computed geometrically from world-space positions using `atan2`, not from the eccentric anomaly. The function reads each planet's 3D position relative to the Sun and computes the angular position directly. (Planet *mean* anomaly, by contrast, is the textbook `M = M₀ + n·Δt` with a Kepler-equation solve — the position-based alternative was rejected; see the banner on [doc 30](30-anomaly-calculations.md). The Moon keeps the geometric method.)
+True anomaly is computed geometrically from world-space positions using `atan2`, not from the eccentric anomaly. The function reads each planet's 3D position relative to the Sun and computes the angular position directly. (Planet *mean* anomaly, by contrast, is the textbook `M = M₀ + n·Δt` with a Kepler-equation solve — the position-based alternative was rejected; doc 30 (archived — see [the retired record](retired-record.md)) carries that design's record. The Moon keeps the geometric method.)
 
 ### Height Above Invariable Plane (`updatePlanetInvariablePlaneHeights`)
 

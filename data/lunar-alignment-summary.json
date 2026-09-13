@@ -12,10 +12,10 @@
     "unmatchedCanon": 0,
     "typeAgree": 1447,
     "meanAbsResidualMinutes": 8.529,
-    "meanAbsResidualMinutesFull": 8.529191283727513,
-    "rmsResidualMinutes": 9.839,
-    "rmsResidualMinutesFull": 9.83850260887822,
-    "maxAbsResidualMinutes": 19.877
+    "meanAbsResidualMinutesFull": 8.528878030848913,
+    "rmsResidualMinutes": 9.838,
+    "rmsResidualMinutesFull": 9.838280820444469,
+    "maxAbsResidualMinutes": 19.92
   },
   "visibility": {
     "entriesChecked": 14,
@@ -141,11 +141,11 @@
     "found": true,
     "type": "Partial",
     "canonType": "Partial",
-    "magnitudeUmbral": 0.8914,
+    "magnitudeUmbral": 0.8809,
     "canonMagnitudeUmbral": 0.9199,
-    "ttResidualMinutes": 7.03,
+    "ttResidualMinutes": 10.31,
     "visibleFromBabylon": true,
-    "babylonMoonAltitudeDeg": 32.54
+    "babylonMoonAltitudeDeg": 31.86
   },
   "dtBands": {
     "overall": {
@@ -284,19 +284,19 @@
     "bins": {
       "100": {
         "n": 196,
-        "signedMeanMinutes": 0.49
+        "signedMeanMinutes": 0.34
       },
       "500": {
         "n": 201,
-        "signedMeanMinutes": 1.24
+        "signedMeanMinutes": 1.19
       },
       "1000": {
         "n": 191,
-        "signedMeanMinutes": 1.11
+        "signedMeanMinutes": 1.09
       },
       "1500": {
         "n": 180,
-        "signedMeanMinutes": 0.95
+        "signedMeanMinutes": 0.94
       },
       "1800": {
         "n": 202,
@@ -308,172 +308,172 @@
       },
       "-750": {
         "n": 189,
-        "signedMeanMinutes": -2.65
+        "signedMeanMinutes": -2.97
       },
       "-650": {
         "n": 204,
-        "signedMeanMinutes": -1.36
+        "signedMeanMinutes": -1.53
       },
       "-550": {
         "n": 203,
-        "signedMeanMinutes": -1.9
+        "signedMeanMinutes": -2.13
       },
       "-450": {
         "n": 192,
-        "signedMeanMinutes": -1.51
+        "signedMeanMinutes": -1.77
       },
       "-350": {
-        "n": 183,
-        "signedMeanMinutes": -0.35
+        "n": 180,
+        "signedMeanMinutes": -0.14
       },
       "-250": {
         "n": 183,
-        "signedMeanMinutes": -1.16
+        "signedMeanMinutes": -1.28
       },
       "-100": {
         "n": 201,
-        "signedMeanMinutes": 0.12
+        "signedMeanMinutes": -0.02
       }
     },
     "driftVsModernMinutes": {
-      "100": -0.53,
-      "500": 0.22,
-      "1000": 0.09,
-      "1500": -0.07,
+      "100": -0.68,
+      "500": 0.17,
+      "1000": 0.07,
+      "1500": -0.08,
       "1800": -0.03,
       "2000": 0.1,
-      "-750": -3.67,
-      "-650": -2.38,
-      "-550": -2.92,
-      "-450": -2.53,
-      "-350": -1.37,
-      "-250": -2.18,
-      "-100": -0.9
+      "-750": -3.99,
+      "-650": -2.55,
+      "-550": -3.15,
+      "-450": -2.79,
+      "-350": -1.16,
+      "-250": -2.3,
+      "-100": -1.04
     },
-    "effectiveDeltaNdotArcsecPerCy2": 0.3,
+    "effectiveDeltaNdotArcsecPerCy2": 0.32,
     "predictedReducedResidualMinutes": {
-      "-800": 1.9,
-      "-700": -3.6,
-      "-600": -3.1,
-      "-500": -8.9,
-      "-400": -12.4
+      "-800": 2.2,
+      "-700": -3.4,
+      "-600": -2.8,
+      "-500": -8.6,
+      "-400": -12.6
     }
   },
   "phaseC": {
     "window": "S01/S02/S04, years −800..−301, weight>0 (null=1)",
-    "identified": 64,
+    "identified": 61,
     "viaYearStraddle": 4,
-    "ambiguous": 6,
+    "ambiguous": 9,
     "dropped": 1,
     "perCentury": {
       "-700": {
         "n": 5,
-        "medianMinutes": -16.6,
-        "seMinutes": 10.4,
-        "preRegisteredMinutes": -3.6,
-        "z": -1.2
+        "medianMinutes": -14.4,
+        "seMinutes": 11,
+        "preRegisteredMinutes": -3.4,
+        "z": -1
       },
       "-600": {
         "n": 21,
-        "medianMinutes": -6.1,
-        "seMinutes": 5.6,
-        "preRegisteredMinutes": -3.1,
-        "z": -0.5
+        "medianMinutes": -5.8,
+        "seMinutes": 5.4,
+        "preRegisteredMinutes": -2.8,
+        "z": -0.6
       },
       "-500": {
         "n": 12,
-        "medianMinutes": -16.6,
-        "seMinutes": 18,
-        "preRegisteredMinutes": -8.9,
+        "medianMinutes": -15,
+        "seMinutes": 17,
+        "preRegisteredMinutes": -8.6,
         "z": -0.4
       },
       "-400": {
-        "n": 26,
-        "medianMinutes": -6.7,
-        "seMinutes": 3.5,
-        "preRegisteredMinutes": -12.4,
-        "z": 1.6
+        "n": 23,
+        "medianMinutes": -7,
+        "seMinutes": 3.1,
+        "preRegisteredMinutes": -12.6,
+        "z": 1.8
       }
     },
-    "chi2": 4.7,
+    "chi2": 4.8,
     "chi2Centuries": 4
   },
   "denseTargets": {
     "window": "S01/S02/S04/S05/S09, years −800..+1280, weight>0 (null=1); S07 excluded (unmarked lunar/solar mix)",
-    "identified": 236,
+    "identified": 229,
     "viaYearStraddle": 10,
-    "ambiguous": 10,
+    "ambiguous": 17,
     "dropped": 1,
     "weightZeroExcluded": 9,
     "perCentury": {
       "400": {
-        "n": 5,
-        "medianSeconds": -405,
-        "seSeconds": 546
+        "n": 2,
+        "medianSeconds": 468,
+        "seSeconds": 1992
       },
       "500": {
         "n": 11,
-        "medianSeconds": -401,
-        "seSeconds": 146
+        "medianSeconds": -357,
+        "seSeconds": 159
       },
       "800": {
         "n": 5,
-        "medianSeconds": 454,
-        "seSeconds": 248
+        "medianSeconds": 463,
+        "seSeconds": 239
       },
       "900": {
         "n": 17,
-        "medianSeconds": -415,
-        "seSeconds": 258
+        "medianSeconds": -390,
+        "seSeconds": 268
       },
       "1000": {
         "n": 38,
-        "medianSeconds": 66,
-        "seSeconds": 136
+        "medianSeconds": 61,
+        "seSeconds": 140
       },
       "1100": {
         "n": 4,
-        "medianSeconds": 763,
-        "seSeconds": 278
+        "medianSeconds": 757,
+        "seSeconds": 266
       },
       "1200": {
         "n": 17,
-        "medianSeconds": 364,
+        "medianSeconds": 368,
         "seSeconds": 145
       },
       "-700": {
         "n": 5,
-        "medianSeconds": -994,
-        "seSeconds": 625
+        "medianSeconds": -864,
+        "seSeconds": 662
       },
       "-600": {
         "n": 21,
-        "medianSeconds": -366,
-        "seSeconds": 334
+        "medianSeconds": -346,
+        "seSeconds": 321
       },
       "-500": {
         "n": 12,
-        "medianSeconds": -998,
-        "seSeconds": 1079
+        "medianSeconds": -897,
+        "seSeconds": 1023
       },
       "-400": {
-        "n": 26,
-        "medianSeconds": -404,
-        "seSeconds": 210
+        "n": 23,
+        "medianSeconds": -417,
+        "seSeconds": 185
       },
       "-300": {
         "n": 13,
-        "medianSeconds": -1265,
-        "seSeconds": 1030
+        "medianSeconds": -1197,
+        "seSeconds": 1008
       },
       "-200": {
-        "n": 50,
-        "medianSeconds": 161,
-        "seSeconds": 179
+        "n": 49,
+        "medianSeconds": 111,
+        "seSeconds": 187
       },
       "-100": {
         "n": 12,
-        "medianSeconds": -448,
+        "medianSeconds": -461,
         "seSeconds": 342
       }
     },
@@ -485,7 +485,6 @@
       "-300",
       "-200",
       "-100",
-      "400",
       "500",
       "800",
       "900",
@@ -493,13 +492,13 @@
       "1200"
     ],
     "ablationChi2": {
-      "fullStack": 32.9,
-      "minus_bond": 60.9,
-      "minus_hallstatt": 33.6,
-      "minus_jose5": 32.5,
-      "minus_jose4": 31.2,
-      "minus_resonator": 84.1,
-      "noCycles": 78.5
+      "fullStack": 29.9,
+      "minus_bond": 58.4,
+      "minus_hallstatt": 29,
+      "minus_jose5": 29.3,
+      "minus_jose4": 28.1,
+      "minus_resonator": 84.9,
+      "noCycles": 77.4
     }
   },
   "inputs": {
@@ -510,7 +509,7 @@
       "data/rspa20160404supp2/Table-S12.txt": "sha256:f8f24b020db4af857c184cc164212e07d5109efda2a9c6da7551130022f1abc6",
       "data/rspa20160404supp2/Table-S13.txt": "sha256:515a56e47aeec316f35f509ab699187a3ed8f0b220ad131c34133ec34dddc7ce",
       "data/rspa20160404supp2/Table-S14.txt": "sha256:67485e0c349f5c2e7ec3aa4f7952e93832fc1d6728f4bd8f4bfbcd26f7c6a6e6",
-      "packages/api/src/app.js": "sha256:0562bda49e38afc3f9f3083302a06456db48f5c379655806a2ce2c3ca6f9f0d3",
+      "packages/api/src/app.js": "sha256:64cf8dcea478acaba056ba81119c9cbdebc19f2c196542642fdd42817f888215",
       "packages/physics/src/eclipse/finders.cjs": "sha256:168755d5e01397b7f63f2ffa49101afe0da0046e5fbd9e7ef6d04be6d7f5d330",
       "packages/physics/src/moon/apparent.cjs": "sha256:fba578d19fa107d66cb6b655a56b5d81b4b11219ab88296022abd9379f53df37",
       "packages/physics/src/moon/ecc-channel.cjs": "sha256:e986b8ca3dbfdaa8508f49f315bc81718503b91eb56298d9ad4d7c29186fc691",

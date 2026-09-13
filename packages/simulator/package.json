@@ -2,7 +2,7 @@
   "name": "@essrt/simulator",
   "version": "0.0.0",
   "private": true,
-  "description": "The 3D app (THREE + tweakpane). Holds the Tychosium-derived scene-graph scaffold (\u00a72h).",
+  "description": "Reserved end-state slot for the Phase-8 browser-app move (plan 01; not yet populated \u2014 the live app is src/script.js). The 3D app (THREE + tweakpane). Holds the Tychosium-derived scene-graph scaffold (\u00a72h).",
   "type": "module",
   "main": "src/index.js",
   "license": "AGPL-3.0-or-later"

@@ -40,7 +40,7 @@ const SCHEMA_NAMES = [
 
 /** Modules whose provenance is GPL. Never reachable from physics. */
 const GPL_DERIVED = [
-  { match: /elp-mpp02/i,  what: 'ytliu0/ElpMpp02 (GPL-3.0) — reference evaluator, belongs in research' },
+  { match: /elp-mpp02/i,  what: 'ytliu0/ElpMpp02 (GPL-3.0) — reference evaluator, belongs in @essrt/reference (private, unpublished)' },
   { match: /elp2000-82b/i, what: 'ELP-2000/82B evaluator — reference material, not framework physics' },
   { match: /\brebound\b/i, what: 'REBOUND (GPL) — N-body integrator, analysis only' },
 ];

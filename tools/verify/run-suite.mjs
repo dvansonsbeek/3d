@@ -53,7 +53,7 @@ const MANIFEST = [
     note: 'RETIRED AS A GATE (was gate 49/50 with the documented Saturn L-L failure). Kept as the record of Laws 1–6 + the former Config-7 falsification checks 46–50; its `✓ saturn J2000 match` line is the anchor tautology — never a gate.' },
 
   { n: 'dual-balance-optimizer.js', class: 'narrative', ms: 658,
-    note: 'RETIRED AS A GATE with the balance laws — the dual-balance diagnostic; kept as the sensitivity record (doc 19).' },
+    note: 'RETIRED AS A GATE with the balance laws — the dual-balance diagnostic; kept as a frozen diagnostic record.' },
   { n: 'perihelion-projection-closure.js', class: 'gate', ms: 400,
     note: 'Earth-frame perihelion rate ≡ ecliptic advance × dα/dλ + ∂α/∂ε·ε̇ (+κ ≤ 1 ″/cy) for all seven planets at 1900/2000/2100 — the decomposition behind the Mercury-anomaly projection statement (doc 13 §1.8).' },
 

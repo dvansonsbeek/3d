@@ -10,169 +10,121 @@ status: current
 This is the technical documentation for the [3D Solar System Simulation](https://3d.holisticuniverse.com). It covers the theory, calculations, architecture, and tooling behind the model. If you're looking for the scientific background, visit [holisticuniverse.com](https://holisticuniverse.com).
 
 **Who is this for?**
-- **Curious readers** — start with the [Introduction](01-introduction.md) and [Fibonacci Laws](10-fibonacci-laws.md)
+- **Curious readers** — start with the [Introduction](01-introduction.md) and [the Six Relations](10-fibonacci-laws.md)
 - **Users of the simulation** — see the [User Guide](02-user-guide.md)
-- **Contributors & developers** — the [Architecture](40-architecture.md), [Constants Reference](20-constants-reference.md), and [Optimization Tool](60-optimization-tool-overview.md) are your starting points
+- **Contributors & developers** — the [Architecture](40-architecture.md) and [Constants Reference](20-constants-reference.md) are your starting points
+
+Document **numbers are stable identifiers**, not a reading order — the
+archival of retired-machinery docs left gaps in the numbering, and the
+sections below give the intended reading order instead.
+[The retired record](retired-record.md) says what was archived, where,
+and why.
 
 ---
 
-## Document Structure
+## Reading Order
 
-Documents are organized in numbered ranges by category, with gaps for future additions:
-
-| Range | Category |
-|-------|----------|
-| 00–09 | Getting Started & Overview |
-| 10–19 | Theory & Model |
-| 20–29 | Technical Reference |
-| 30–39 | Calculations & Implementations |
-| 40–49 | Architecture & Code Structure |
-| 50–59 | UI, Features & Tools |
-| 60–69 | Optimization Tool |
-| 70–79 | Verification & Investigation |
-| 80–89 | Per-Planet Setup |
-| 90–99 | Climate Analysis |
-| 100–109 | ΔT & Historical Eclipse Validation |
-
----
-
-## Document Index
-
-### 00–09 Getting Started & Overview
+### Start here
 
 | # | Document | Description |
 |---|----------|-------------|
 | 01 | [Introduction](01-introduction.md) | Core concepts, the two forces, the Earth Fundamental Cycle |
 | 02 | [User Guide](02-user-guide.md) | How to use the 3D simulation — controls, panels, features |
 | 03 | [Glossary](03-glossary.md) | Essential terms and definitions |
-| 04 | [Dynamic Elements Overview](04-dynamic-elements-overview.md) | How orbital elements change over time |
-| 05 | [Invariable Plane Overview](05-invariable-plane-overview.md) | The invariable plane extension (Souami & Souchay work) |
 
-### 10–19 Theory & Model
+### The model
 
 | # | Document | Description |
 |---|----------|-------------|
-| 10 | [Fibonacci Laws](10-fibonacci-laws.md) | Six Fibonacci Laws: precession cycles, inclination and eccentricity constants, balance conditions, resonance |
-| 11 | [Day & Year Length Formulas](11-length-day-year-formulas.md) | Tropical year and day length: measurement methods, validation, proposed formulas |
-| 12 | [Perihelion Precession](12-perihelion-precession.md) | Perihelion longitude and precession rate calculations |
-| 13 | [Mercury Precession Breakdown](13-mercury-precession-breakdown.md) | Mercury's perihelion precession by contributing planet |
-| 14 | [Solstice Prediction](14-solstice-prediction.md) | Solstice RA and timing from Fibonacci harmonics (H/3, H/8, H/16) |
-| 15 | [Planet Nine Prediction](15-planet-nine-prediction.md) | Falsifiable test: the Fibonacci 4-pair structure forbids a major 9th planet at ETNO distances (canonical 7.5M-config search) |
-| 19 | [Dual-Balance Sensitivity Analysis](19-balance-sensitivity-analysis.md) | Per-planet decomposition of the 0.14% eccentricity-balance gap (Law 5) + sensitivity table for Δm/m, Δa/a, Δe/e shifts that would close it. Required shifts are 4–6 orders of magnitude larger than DE440 mass and JPL period precision, formally ruling out single-planet observable mis-measurement. Establishes the asteroid/TNO-bodies hypothesis as the natural next analysis (TNOs at right order of magnitude; main belt too light) |
+| 99 | [Expanding Solar System Resonance Theory (ESSRT)](99-expanding-solar-system-resonance-theory.md) | The theory: the Solar System Resonance Cycle (8H) and integer-divisor lattice as structural invariants of the Earth–Moon spin/tide system; H(t) expands with geological time under Earth-Moon tidal evolution (Driver 1) and solar mass loss (Driver 2); the two-tier scaling split (spin periods move with H, the 405-kyr metronome does not) confirmed at 1.4 and 2.46 Ga; the deep-time predictions and the falsification criteria |
+| 10 | [The Six Relations](10-fibonacci-laws.md) | The Fibonacci relations with per-relation measured statuses — precession cycles, inclination and eccentricity constants, balance observations, resonance |
+| 108 | [The derived Earth-orbit vector](108-derived-earth-orbit-vector.md) | Earth's eccentricity and perihelion as one rotating vector: e is frame-invariant, H/16 belongs to ϖ_of-date (13 + 3 = 16), and the model's H/16 and H/3 laws are LOCAL J2000 rates of that vector; a zero-fitted-constant Laplace–Lagrange e(t) on the framework's own planets reproduces La2004 (corr 0.967 over 250 kyr) — standard secular dynamics, not lattice evidence |
+| 109 | [The model's own N-body: audit, engine, frequencies, lattice test](109-model-nbody-engine-and-lattice-test.md) | The re-evaluation record: the Wisdom–Holman engine reproduces every planet's rates from Newton + the measured masses (Mercury's −43″/cy closed by the 1PN term alone); the secular g/s to 0.1–1%; the lattice tested at its own quantity type (divisors retyped as means / present-epoch / window values); the bound experiments (§12) that left H/3 as the epoch-local tangent of Earth's free eccentricity vector |
+| 98 | [The Mechanism Behind the 8H/L1 Lattice](98-lattice-mechanism.md) | Active research doc: why the 8H/L1 lattice is real spectral structure — action-angle closure of obliquity-sector secular dynamics forcing eigenfrequencies onto integer divisors of 8H |
 
-### 20–29 Technical Reference
+### Earth: time & motion
+
+| # | Document | Description |
+|---|----------|-------------|
+| 11 | [Day & Year Length Formulas](11-length-day-year-formulas.md) | Tropical year and day length: measurement methods, validation, the frozen-era laws and the one-source year lengths |
+| 14 | [Solstice Prediction](14-solstice-prediction.md) | Solstice RA and timing from the H/3, H/8, H/16 harmonics — the cardinal-point machinery |
+| 65 | [Equation of Center](65-equation-of-center.md) | The Sun wheel's variable-speed construction: the geometric/analytic split, the derived exact-Kepler corrector (default path), the certified-Sun δ overlay, and the registry-resident legacy harmonic layer |
+| 13 | [Perihelion Precession](13-mercury-precession-breakdown.md) | The two perihelion coordinates and their methods, the Earth-frame projection account (§1.8, gate-pinned for all seven planets), and the Laplace–Lagrange comparison |
+
+### The planets
+
+| # | Document | Description |
+|---|----------|-------------|
+| 04 | [Orbital Elements: the Chain and the Devices](04-dynamic-elements-overview.md) | The three tiers: the Keplerian chain (THE planet path — source-of-truth doctrine, elements of date, secular shapes), the engine-K hierarchy (Earth/Moon/Sun), and the no-chain bodies |
+| 05 | [The Invariable Plane](05-invariable-plane-overview.md) | The plane the model banks from its own chain artifact (K5c s-frame + derived Souami & Souchay origin conversion), heights, nodes, crossings, and the two live self-checks |
+| 31 | [Geometric Orbital Elements — the No-Chain Bodies](31-no-chain-body-elements.md) | The inclination-oscillation and node-regression device for Pluto/Halley/Eros, Earth's engine-K devices, and the probe-pinned reference implementations |
+| 68 | [Orbital Period Calibration](68-orbital-period-calibration.md) | The legacy device-chain period calibration against ancient observations (the rendered planets read the chain) |
+| 72 | [The Closed Loop](72-the-closed-loop.md) | How PSI and K derive the orbital-oscillation amplitudes from Earth alone — the retired law framework's construction record |
+
+### The Moon
+
+| # | Document | Description |
+|---|----------|-------------|
+| 66 | [Moon Meeus Corrections](66-moon-meeus-corrections.md) | The Derived Moon: the framework-native fundamental arguments, the full Ch. 47 series + derived extension tails, the Cassini tilt derivation, and the current accuracy gates |
+| 24 | [The Δa Mass Derivation](24-moon-kepler-derivation.md) | GM_Earth/GM_Moon from the Moon's orbit via Δa; the universal mass-from-moon formula for all moon-bearing planets; the exact symmetric Sun-side Δa identity and the Sun-SSB chart |
+
+### Deep time & validation
+
+| # | Document | Description |
+|---|----------|-------------|
+| 106 | [Deep-Time Validation Dossier](106-deep-time-validation-dossier.md) | The single entry point for "how well does the model match the geological and historical record, and how would we know if it stopped?" Four evidence classes, gate-backed (41 paleo anchors, Phanerozoic MAD <!--v:paleoMadPhanPct-->0.18<!--/v-->%), including **the honesty ledger** — documented deviations asserted as bands so an unexplained improvement fails CI too |
+| 102 | [Pure-tidal + GIA α(t) vs the historical lunar record](102-gia-alpha-lunar-validation.md) | 267 primary-source lunar observations (Stephenson 2016): framework mean \|residual\| **20.2 min** vs NASA's fitted polynomial at 20.0 min — a 2-s excess over Stephenson's own fit, with zero ΔT-polynomial fitting; the α(t) GIA channel from independent satellite gravimetry; the 4-flag 8H-lattice stack; the full hypothesis-testing and residual-decomposition record |
+| 104 | [The Millennial Rotation Swing](104-millennial-rotation-swing.md) | The core–mantle identification of the post-stack residual: one aperiodic swing, independently confirmed against archeomagnetic core-flow ΔLOD (r = +0.91), the lattice closed under difference tones, and the low-Q Magneto-Coriolis eigenmode reading |
+| 105 | [ΔT stack: what each flag buys](105-dt-stack-flag-audit.md) | Audit of the four ΔT correction flags under pre-fixed criteria: the shipped set is optimal in- and out-of-sample (Espenak RMS <!--v:deltaTEspenakRmsSeconds-->12.5<!--/v--> s); the two measurement traps (stage_* metrics rank backwards; Jose5/Jose4 are a coupled pair) |
+| 103 | [-135 Babylonian solar eclipse case study](103-135-babylonian-case-study.md) | The flagship ancient event: BestGap <!--v:babylon135BestGapKm-->366<!--/v--> km (off-peak verdict), documented UT matched to 9 minutes, local magnitude 0.988, the ΔT-free cascade selecting the traditional date uniquely — plus the component decomposition and the α(t) sensitivity proof |
+| 107 | [Ancient-record review — identification adjudication](107-ancient-record-review.md) | Local-circumstance re-testing of the audit's ancient rows: every first-hand record validates at its traditional date; the "geographic" verdicts are identification errors in second-hand chains; the Lu −708 record identified uniquely by the chronology-free ganzhi filter |
+
+### Climate
+
+| # | Document | Description |
+|---|----------|-------------|
+| 90 | [Milankovitch Language of the Holistic Model](90-milankovitch-language.md) | The model's Milankovitch framework: five H-divisor periods closed by beat algebra; all six Berger 1978 climatic-precession peaks matched within 0.7% |
+| 91 | [Milankovitch Evidence & Hypothesis Tests](91-milankovitch-evidence.md) | Empirical tests on LR04 + Cheng 2016 + EPICA + CENOGRID: the 8H Orbital Forcing Formula, per-planet contributions, pre-registered super-cycle nulls, fourteen falsifiable follow-up tests, and the 405-kyr off-lattice characterization |
+| 92 | [Climate Formula — Architecture, Variance Decomposition & Implementation](92-climate-formula.md) | The canonical L1 + L2 + L3 climate formula: per-regime ridge-fit architecture, five-layer variance decomposition, LR04 R² = 0.87 post-MPT (0.93 stitched), EPICA CO₂ cross-proxy R² = 0.84, and the reproducing pipeline |
+| 93 | [L1 Lattice Attribution Reference](93-l1-attribution-reference.md) | Per-L1-integer dual attribution (Berger label vs the model's best Earth–planet beat), scored by physical plausibility, on all 33 components — generator-owned |
+| 94 | [Insolation Extension Test (strong null)](94-insolation-null-test.md) | Adding classical Berger insolation features to the climate formula buys ΔR² ≤ +0.0041 — the 8H lattice already encodes the insolation-relevant variance |
+| 95 | [Climate Summary — Gravitational Coupling, Not Insolation](95-climate-summary.md) | Capstone synthesis of docs 90–94 |
+| 96 | [Related Work — Literature Context](96-related-work.md) | The framework relative to the 2018–2024 revisions of classical Milankovitch theory |
+
+### Reference
 
 | # | Document | Description |
 |---|----------|-------------|
 | 20 | [Constants Reference](20-constants-reference.md) | **Single source of truth** for all constants, parameters, and their sources |
 | 21 | [Orbital Formulas Reference](21-orbital-formulas-reference.md) | Formula implementations and the OrbitalFormulas helper |
 | 22 | [Coordinate Frames](22-coordinate-frames.md) | ICRF, ecliptic, equatorial, and invariable plane transformations |
-| 23 | [Verification Data Reference](23-verification-data-reference.md) | Astronomical verification data: transits, oppositions, conjunctions |
-| 24 | [Moon Kepler Derivation](24-moon-kepler-derivation.md) | The Δa correction for deriving GM_Earth/GM_Moon from the Moon's orbit |
-| 25 | [Universal Mass-from-Moon Formula](25-universal-mass-from-moon-formula.md) | Generalization of doc 24's Δa to all moon-bearing planets — Earth, Mars, Jupiter, Saturn, Uranus, Neptune, Pluto |
-| 26 | [Universal Sun-side Δa Formula](26-universal-sun-side-delta-a.md) | Sun-side mirror of doc 25: exact symmetric Δa for deriving T_planet from heliocentric a — generalizes doc 24's Earth-only Δa = 149.77 km to every planet |
-| 27 | [Law-4 TNO Obliquity Predictions](27-law4-tno-obliquity-predictions.md) | Bidirectional reading of Law 4: `sin(tilt) = e_amp·√m·a^(3/2) / (K·√d)` predicts axial obliquity from the secular eccentricity *amplitude*. Distinguishes proxy `e_obs ≈ e_amp` from the resonance-appropriate `e_obs = e_base + ∆`. For Pluto (integrated `e_amp ≈ 0.025`), actual amplitude decomposes into Law-4 intrinsic (~0.001) + Neptune-resonance external (~0.024) — ratio ≈ 1:24. **Law 4 captures the intrinsic; external forcing adds the rest** — not a failed test. **No named TNO is per-body testable** (all above admissibility curve); comets/asteroids also dominated by external forcing (Jupiter scattering, Yarkovsky/YORP). Clean remaining falsifier: population-statistical claim over sub-200-km low-`e` cold-classical-belt KBOs (~124 km, a=45 AU, e=0.05 → tilt ≈ 36.6°; 100 km → ~26°, LSST 2030–2035). **§7 — scope interpretation**: Law-4 intrinsic dominance ≡ IAU's "cleared neighborhood" — quantitative restatement of planethood |
+| 23 | [Verification Data Reference](23-verification-data-reference.md) | The embedded verification datasets: transits, oppositions, conjunctions, Tycho's Mars observations — and the independent-observation RMS findings |
 
-### 30–39 Calculations & Implementations
+### Architecture & UI
 
 | # | Document | Description |
 |---|----------|-------------|
-| 30 | [Anomaly Calculations](30-anomaly-calculations.md) | Mean, True, and Eccentric Anomaly |
-| 31 | [Ascending Node Calculations](31-ascending-node-calculations.md) | Ascending node precession on ecliptic and invariable plane |
-| 32 | [Inclination Calculations](32-inclination-calculations.md) | Inclination oscillations and ecliptic inclination |
-| 33 | [Invariable Plane Calculations](33-invariable-plane-calculations.md) | Height above/below invariable plane, plane crossings |
-| 34 | [J2000 Calibration](34-j2000-calibration.md) | J2000-verified ascending nodes methodology |
-| 35 | [Formula Derivation](35-formula-derivation.md) | Planetary precession formula derivation: Fibonacci hierarchy, resonance loops, coefficient breakdowns |
-| 36 | [Tilt & Balance Calculations](36-tilt-and-definitive-balance-calculations.md) | Tilt, inclination, and eccentricity: definitive balance calculations across all epochs |
-| 37 | [Planetary Precession & Obliquity Cycles](37-planets-precession-cycles.md) | Each planet's up-to-five distinct precession/oscillation phenomena. Investigates whether the Earth's Fibonacci 1/H rate structure extends to the other planets |
-| 38 | [Eccentricity Balance Scale](38-eccentricity-scale.md) | HISTORICAL — the Law-5 balance construction + its panel (retired law; panel excised with the legacy chains) |
-| 39 | [Eccentricity Structure Exploration](39-eccentricity-structure-exploration.md) | Two-component decomposition, mirror pair conservation, statistical significance, exhaustive negative results |
-
-### 40–49 Architecture & Code Structure
-
-| # | Document | Description |
-|---|----------|-------------|
-| 40 | [Architecture](40-architecture.md) | Code structure, file organization, and module responsibilities |
-| 41 | [Scene Graph Hierarchy](41-scene-graph-hierarchy.md) | Three.js nested rotation layers — how the model builds orbital mechanics |
-
-### 50–59 UI, Features & Tools
-
-| # | Document | Description |
-|---|----------|-------------|
+| 40 | [Architecture](40-architecture.md) | Code structure, file organization, module responsibilities, and the one-source movement |
+| 41 | [Scene Graph Hierarchy](41-scene-graph-hierarchy.md) | Three.js nested rotation layers — the engine-K hierarchy and the chain rendering path |
 | 50 | [UI Panels Reference](50-ui-panels-reference.md) | Tweakpane control panel and sidebar implementations |
 | 51 | [Planet Inspector Reference](51-planet-inspector-reference.md) | Planet hierarchy inspector — calculation logic and display |
 | 52 | [Analysis & Export Tools](52-analysis-export-tools.md) | Report generation, data export, and console validation tests |
-| 53 | [Balance Explorer Reference](53-balance-explorer-reference.md) | HISTORICAL — reference for the Balance Explorer panel (removed at the Fibonacci-law retirement; code excised with the legacy chains) |
-| 54 | [Vector Balance Analysis](54-vector-balance-analysis.md) | HISTORICAL — frozen vector-balance + Config-7 verification record (claims re-evaluated at the retirement; doc 10 Status carries the verdicts) |
-| 55 | [Solar System Resonance Cycle Periods](55-solar-system-resonance-cycle-periods.md) | Period table for the 8H = <!--v:eightH-->2,682,536<!--/v--> yr Solar System Resonance Cycle. Every major planetary cycle divides 8H evenly as an integer; documents the System Reset epoch (~-<!--v:systemResetYearPlain-->2,649,854<!--/v-->) |
-| 56 | [WebGeoCalc Explorer](56-webgeocalc-explorer.md) | Tools-menu modal showing actual observed perihelion-precession history (1900–2026 JPL NAIF WebGeoCalc) for each planet. Grounds the framework's `perihelionEclipticYears` calibration in observation rather than secular theory |
-| 57 | [Formula Verification](57-formula-verification.md) | Tools-menu modal comparing the framework's predictions against published analytical formulas (Meeus, Chapront, Capitaine, Vondrák, Laskar, Berger, Peters, Harkness) across ±12,000 yr for 9 quantities. Analytical twin of the WebGeoCalc Explorer (doc 56) |
-| 58 | [Climate Formula Explorer](58-climate-formula-explorer.md) | Tools-menu modal visualizing the canonical L1+L2+L3 climate formula against LR04 / CENOGRID / EPICA / CenCO2PIP across multiple time windows — the panel that grounds the model's climate claims in observation |
-| 59 | [ESSRT Explorer](59-essrt-explorer.md) | Tools-menu modal for the deep-time evolution of H, LOD, year length and Moon distance under ESSRT ([doc 99](99-expanding-solar-system-resonance-theory.md)) — the 8H lattice integers stay fixed at any epoch; only the literal year-counts rescale |
+| 56 | [WebGeoCalc Explorer](56-webgeocalc-explorer.md) | Tools-menu modal showing observed perihelion-precession history (JPL NAIF WebGeoCalc) per planet — tests the chain's own ϖ(t) against observation |
+| 57 | [Formula Verification](57-formula-verification.md) | Tools-menu modal comparing the model's predictions against published analytical formulas (Meeus, Chapront, Capitaine, Vondrák, Laskar, Berger, Bills & Ray) across the 11 verification categories |
+| 58 | [Climate Formula Explorer](58-climate-formula-explorer.md) | Tools-menu modal visualizing the climate formula against LR04 / CENOGRID / EPICA / CenCO2PIP |
+| 59 | [ESSRT Explorer](59-essrt-explorer.md) | Tools-menu modal for the deep-time evolution of H, LOD, year length and Moon distance under ESSRT |
 
-### 60–69 Optimization Tool
+### The record
 
-| # | Document | Description |
-|---|----------|-------------|
-| 60 | [Overview](60-optimization-tool-overview.md) | Architecture and constraints |
-| 61 | [Execution Plan](61-optimization-execution-plan.md) | Step-by-step execution plan |
-| 62 | [Type I Inner Planets](62-type-i-inner-planets.md) | HISTORICAL — Mercury & Venus legacy-path record (geometric chains deleted in the K5 excision) |
-| 63 | [Type II Earth-Crossers](63-type-ii-earth-crossers.md) | HISTORICAL — Mars legacy-path record (geometric chains deleted in the K5 excision) |
-| 64 | [Type III Outer Planets](64-type-iii-outer-planets.md) | HISTORICAL — outer-planet legacy-path record (geometric chains deleted in the K5 excision) |
-| 65 | [Equation of Center](65-equation-of-center.md) | Variable-speed orbit implementation. The display Sun rides the certified E4/E5 framework-native longitude via the δ overlay (see doc 99 § The framework-native Sun); since FQ-3 the wheel underneath is EXACT-KEPLER by derivation — the split error attributed to ~100% (amplitude = e−base; phase = the realized offset direction) and the fitted Z-B harmonics retired from the display path (§The Exact-Kepler Wheel) |
-| 66 | [Moon Meeus Corrections](66-moon-meeus-corrections.md) | Meeus-based moon corrections |
-| 67 | [Planet Parallax Corrections](67-planet-parallax-corrections.md) | HISTORICAL — record of the fitted parallax layer (deleted in the K5 excision) |
-| 68 | [Orbital Period Calibration](68-orbital-period-calibration.md) | Calibration with ancient observations |
-| 69 | [Baseline Report](69-optimization-baseline.md) | Baseline measurements before optimization |
+| Document | Description |
+|---|-------------|
+| [Retired record](retired-record.md) | What was archived out of this tree, by family — the fitted correction stack, the balance constructions, the withdrawn predictions, the planet lattice-period claims — with the honest-withdrawal statements |
 
-### 70–79 Verification & Investigation
+---
 
-| # | Document | Description |
-|---|----------|-------------|
-| 70 | [Ascending Node Limitations](70-ascending-node-limitations.md) | HISTORICAL — limitation analysis of the legacy geometric node channel (deleted in the K5 excision) |
-| 71 | [Correction Stack Architecture](71-correction-stack-architecture.md) | HISTORICAL — record of the fitted correction stack (deleted in the K5 excision; the Moon Meeus layer lives on) |
-| 72 | [The Closed Loop](72-the-closed-loop.md) | How PSI and K derive all orbital oscillations from Earth alone |
+## Appendices
 
-### 80–89 Per-Planet Setup
-
-| # | Document | Description |
-|---|----------|-------------|
-| 80 | [Mercury Scene Graph Setup](80-mercury-setup.md) | HISTORICAL — why each value in Mercury's legacy 5-layer hierarchy was set (anchor scaffolding only since the K5 excision) |
-
-### 90–99 Climate Analysis
-
-| # | Document | Description |
-|---|----------|-------------|
-| 90 | [Milankovitch Language of the Holistic Model](90-milankovitch-language.md) | Model framework: five H-divisor Milankovitch periods (H/3 inclination, H/5 ecliptic, H/8 obliquity, H/13 axial, H/16 perihelion precession) closed by Fibonacci beat algebra; Berger 1978 climatic-precession spectrum (~23.7/22.4/19.0 kyr peaks) matched <0.4 %; eigenmode convergence at H/3 and H/5 |
-| 91 | [Milankovitch Evidence & Hypothesis Tests](91-milankovitch-evidence.md) | Combined evidence + hypothesis-test document. Empirical tests on LR04 + Cheng 2016 + EPICA + CENOGRID: 25/31-component 8H Orbital Forcing Formula, per-planet contributions (Mars dominance), 100-kyr-band centroid = Mercury–Mars s₁−s₄ nodal beat at n=25, MPT amplitude-growth analysis, pre-registered super-cycle hypothesis NULL on 20 ICS boundaries + spectral nulls on CENOGRID (§§8–11), fourteen falsifiable follow-up tests A–N (§12, 16 positive / 2 partials / 5 nulls), dedicated 405-kyr off-lattice characterization as a Layer-2 carbon-cycle silicate-weathering thermostat resonance (§13), combined interpretation (§14), Exocene naming convention (§15) |
-| 92 | [Climate Formula — Architecture, Variance Decomposition & Implementation](92-climate-formula.md) | The canonical L1 + L2 + L3 climate formula with the modular per-regime ridge-fit architecture, complete LR04 + CENOGRID variance decomposition into five layers (L1 orbital lattice / L2 climate-system periodic / L3 boundary-condition shifts / L4 chronology / L5 stochastic), and the Climate Formula Explorer modal implementation in `src/script.js`. Per-regime LR04 R² = 0.87 post-MPT (vs 0.23 single-regime); EPICA CO₂ cross-proxy R² = 0.84; CenCO2PIP deep-time CO₂ R² = 0.76. Stitched per-regime evaluation lifts Full-LR04 chart R² to 0.93. Sections §10–§14 cover EPICA carbon-amplification ratios, CenCO2PIP synthesis, stitched routing rules, the 8-tab modal reference, and the reproducing pipeline (script chain → JSON → `constants:generate` → the imported `CLIMATE_FORMULA_COEFFS`) |
-| 93 | [L1 Lattice Attribution Reference](93-l1-attribution-reference.md) | Per-L1-integer dual attribution: Berger / secular-theory label **vs** our model's best Earth–planet beat from PLANET_CYCLES, scored by physical plausibility. Three-step status (no Berger / planet ≠ / mech ≠ / agree) on all 32 components. (The former companion baseline doc was folded into the main reference; the pre-tweak run is preserved in the generator's `--baseline` mode.) Generated by `scripts/milankovitch_l1_dual_attribution.py` (`--tweaked` / `--baseline`) |
-| 94 | [Insolation Extension Test (strong null)](94-insolation-null-test.md) | Tests whether adding classical Berger 1978 insolation features (obliquity ε(t), eccentricity e(t), climatic-precession e·sin(ϖ) / e·cos(ϖ)) to the L1+L2+L3 climate formula improves R². **Strong null:** max ΔR² = +0.0041 across LR04 regimes + EPICA. Classical insolation alone explains only R² = 0.049 of post-MPT LR04 (vs L1 alone at 0.870). The 8H gravitational-coupling lattice already encodes all insolation-relevant variance |
-| 95 | [Climate Summary — Gravitational Coupling, Not Insolation](95-climate-summary.md) | Capstone synthesis of docs 90–94. Climate is forced by gravitational coupling among solar-system bodies; solar insolation is one channel, but the rhythm itself (8H lattice, R² = 0.87 post-MPT LR04) is the more complete description |
-| 96 | [Related Work — 2024 Literature Context](96-related-work.md) | Positions the framework relative to active 2018–2024 revisions to classical Milankovitch theory: 405-kyr metronome stability, Mars-Earth 2.4-Myr gravitational coupling, 9-Myr/36-Myr Grand cycles, red-noise/orbital balance, tidal-vs-insolation community gap |
-| 97 | [Paleoclimate ECS Spectrum via 8H Lattice Decomposition](97-paleo-ecs-decomposition.md) | Frequency-resolved decomposition of L1 lattice amplitudes per orbital band → Charney climate sensitivity ECS estimate from paleoclimate δ¹⁸O |
-| 98 | [The Mechanism Behind the 8H/L1 Lattice](98-lattice-mechanism.md) | Active research doc establishing that the 8H/L1 lattice is real spectral structure in solar-system orbital dynamics. Action-angle closure of obliquity-sector secular dynamics forces eigenfrequencies onto integer divisors of 8H |
-| 99 | [Expanding Solar System Resonance Theory (ESSRT)](99-expanding-solar-system-resonance-theory.md) | The Solar System Resonance Cycle (8H) and integer-divisor lattice as structural invariants; H(t) expands monotonically with geological time, driven by Earth-Moon tidal evolution (Driver 1) and solar mass loss (Driver 2). L1 integer LABELS are scale-invariant; LITERAL PERIODS scale with current H. Includes the E4/E5 framework-native Sun — the certified apparent solar longitude assembled with zero fitted solar constants (0.95″ vs JPL). Deep-time predictions: Hadean Moon at the rigid Roche limit at the giant-impact age (~4.498 Ga); Devonian H ≈ <!--v:hAtDevonian-->306,189<!--/v--> yr matching Wells 1963 to −0.01% + Wu et al. 2024 across 650 Myr; future tidal-lock asymptote at ~87 R_⊕ |
-
-### 100–109 ΔT & Historical Eclipse Validation
-
-| # | Document | Description |
-|---|----------|-------------|
-| 102 | [Pure-tidal + GIA L1-orbital-coupled α(t) validates against historical lunar record](102-gia-alpha-lunar-validation.md) | Higher-resolution lunar-timing test on 270 primary-source observations (Stephenson, Morrison & Hohenkerk 2016; Babylonian, Greek, Chinese, Arab). Framework's mean \|residual\| against 267 events is **21.3 min**, with **108/267 events (40.4%) falling closer to observation than NASA Espenak/Meeus's polynomial**. The **L1-orbital-coupled α(t) GIA correction** is derived from independent satellite gravimetry (Cox & Chao 2002 dJ₂/dt with J₂→α conversion factor 2.0 in the Peltier ICE-6G LOD-coupling range) plus the L1 orbital layer of the canonical Climate Formula — zero parameters fitted to eclipse data. Full Munk-MacDonald (~5-6 ms/cy) non-tidal-speedup rejected; α(t) captures the GIA-scale portion. Residual decomposes into the framework-native **4-flag 8H-lattice stack (Bond 8H/1830 = 1466 yr + Hallstatt 8H/1104 = 2430 yr + Jose5 8H/2989 = 897 yr + Jose4 8H/3749 = 716 yr)** plus observation noise. Framework's independent validation is the 26-event solar-eclipse alignment audit ([Solar Eclipse Validation](https://holisticuniverse.com/model/historical-eclipse-validation)) — 3 confirmed, 13 off-peak, 5 regional, 0 ΔT-signal, 5 geographic (the adjudicated second-hand/misdated attributions, see doc 107 — unrelated to physics) |
-| 103 | [-135 Babylonian solar eclipse case study](103-135-babylonian-case-study.md) | Focused case study of the -135 Apr 15 Babylonian eclipse. Under the certified framework-native Sun and the package besselian umbra chain the framework places the umbra *centerline* at **BestGap 194 km**, verdict **off-peak**, agreeing with the documented UT to **9 minutes** (local magnitude 0.986 in the pre-E4 matcher run); the ΔT-free identification cascade selects that date uniquely with the required ΔT inside Stephenson's published totality window. Component-level decomposition documents the remaining along-track dial degeneracy and conventions; the Meeus Ch. 47 Moon polynomial is exonerated (all modern lunar theories converge within 0.001° at year -135) |
-| 104 | [The Millennial Rotation Swing: core–mantle identification and the difference-tone structure](104-millennial-rotation-swing.md) | Research synthesis closing the "~0.5 ms/cy non-tidal residual" investigation. The post-stack residual is one aperiodic swing (Earth fast −720…+600, turnaround ~900 CE, converged by the instrumental era), identified with the Stephenson-Morrison millennial LOD fluctuation whose mechanism is **core–mantle angular momentum exchange** (Dumberry & Bloxham 2006). Independently confirmed against archeomagnetic core-flow ΔLOD (Rivera 2026 SHAWQ flows; stack+swing r = +0.91 vs observed residual) — confirmation, not calibration (~300-yr lead systematic). Holocene phase-lock prediction tested and **failed** (CFF 9-kyr flows; mainstream "no lock" holds). 14.2-yr peak closed as a sampling-window artifact (88-lunation comb). Key structural finding: the lattice is **closed under difference tones** (beat of 8H/n₁, 8H/n₂ = 8H/(n₁−n₂)) and the swing is ~98%-representable as the stack's two dominant difference tones (8H/726 = 3,695 yr + 8H/2645 = 1,014 yr), with the 1,014-yr phase matching the zero-parameter quadratic-mixing prediction within 62 yr, sum tones absent (low-pass rectification), and decaying amplitude matching the **low-Q axisymmetric Magneto-Coriolis eigenmodes of Dumberry, Gerick & Gillet 2025** (gravest ~3,000 yr). Nothing ships — decay-envelope formalism required |
-
-| 105 | [ΔT stack: what each flag buys](105-dt-stack-flag-audit.md) | Audit of the four ΔT correction flags through the authoritative `--joint` fit, under criteria fixed before any refit ran. **No flag removed, taper unchanged**: the shipped four-flag set is optimal in-sample (Espenak RMS **<!--v:deltaTEspenakRmsSeconds-->12.5<!--/v--> s** vs 26–35 s for every reduced set) and out-of-sample (predicting −720…0 CE from post-CE data alone: **85.4 s RMS, R² +0.628** against a 223 s no-correction baseline). Two measurement traps documented with worked examples, each having produced a confidently wrong conclusion first: `fit_metrics.stage_*` in `deltaT-4flag-fit.json` are **legacy cascade diagnostics that rank the flags backwards**, and **Jose5/Jose4 are a coupled pair** that must be judged leave-one-out rather than by cumulative cascade. Also: the ±300/400 kyr taper is observationally inconsequential (stack ΔT bounded at ~±420 s while ΔT grows quadratically), and per-flag archive support is marginal — all four clear EPICA only at R²ₕ ~0.01, Cheng shows nothing, Jose4's Steinhilber hit is circular, and Bond has the weakest deep-time support despite the best ΔT pedigree. Diagnostic hooks `DT_FIT_WINDOW` / `DT_FLAGS` / `DT_FIT_DUMP` (all refuse `--write`) |
-| 106 | [Deep-Time Validation Dossier](106-deep-time-validation-dossier.md) | The single entry point for "how well does the model match the geological and historical record, and how would we know if it stopped?" Evidence organized in four classes — A: rotational/tidal chronology, **gate-backed** by `tools/verify/paleo-anchors.js` over `data/paleo-validation-anchors.json` (41 anchors: Wells 1963, de Winter 2020, Pannella 1972, Williams 2000, Mitchell–Kirscher 2023, Wu 2024, Patterson/Roche, and the mid-Precambrian set — Farhat 2022 proxies, Zhou 2024 paired a+LOD, Xiamaling, Nanfen — matched by the Driver-1½ regime-aware recession history; Phanerozoic MAD <!--v:paleoMadPhanPct-->0.18<!--/v-->%); B: cyclostratigraphy/climate spectra (artifact-backed, incl. the 405-kyr off-lattice caveat and the 2.4σ discrimination limit); C: historical era (Babylonian −135, Stephenson ΔT, the 2024 eclipse canon); D: **the honesty ledger** — the documented deviations (Williams +5.7%, the Wu Pangea interval, the contested thermal-pump mechanism) asserted as BANDS, so an unexplained improvement fails CI too |
-| 107 | [Ancient-record review — identification adjudication](107-ancient-record-review.md) | Local-circumstance re-testing of the ancient rows in the 26-event audit: the audit's centerline-distance metric is the wrong instrument for records that claim a *local circumstance* (totality, "stars came out", a partial phase). Every first-hand record validates at its traditional date (Ibn Yunus Cairo 977/993/1004 as genuine partials; Thales 0.975; Plutarch 1.000; Babylon −135 best-in-window 0.986); the remaining "geographic" verdicts are **identification errors in second-hand chains** (Said's Cairo 978/979 are duplicates of the 977-12-13 event; 985 is misdated ~3 yr to 982-09-20). The Lu −708 record is identified **uniquely** by the chronology-free sexagenary-day (ganzhi) filter — the JD↔ganzhi anchor verified on six Chunqiu records read from the received text (all at K = 50; four uniquely matched in-window), 20 window candidates → 3 renchen days → 1 total: the traditional date, on which the framework computes totality at Qufu. ΔT unaffected throughout |
-| 108 | [The derived Earth-orbit vector](108-derived-earth-orbit-vector.md) | Research record of the FQ-7-Sun option-C campaign — Earth's eccentricity and perihelion as one rotating vector: eccentricity is frame-invariant (e = \|z\|, z = e·e^{iϖ}) and H/16 is the of-date perihelion period (13 + 3 = 16), so it belongs to ϖ, not e; the model's H/16 and H/3 laws are LOCAL J2000 rates of that vector (the derived-Sun/Moon improvement itself is doc 66). First-order Laplace–Lagrange on the framework's own planets plus g5 from the framework's own N-body (4.224″/yr vs Laskar 4.2575) gives a zero-fitted-constant Earth e(t) with Laskar-class amplitude — standard secular dynamics on standard inputs, expected to reproduce Laskar and NOT lattice evidence (the derived g's are off 8H/n): corr 0.967 with La2004 over 250 kyr where the shipped laws read ≈ 0; ϖ_of-date 8° RMS where the model's law reads 103°; both H/16 and H/3 matches are LOCAL J2000 rates of a non-uniformly rotating vector. Not yet a local law (the hybrid's J2000 slope is 11% off — modern gates degrade), so the eclipse chain stays on the H/3 line; step 3 = a self-consistent secular solution |
-| 109 | [The model's own N-body: audit, engine, frequencies, lattice test](109-model-nbody-engine-and-lattice-test.md) | What the model established once it integrated the solar system with its own instruments (Wisdom–Holman engine `nbody-wh.mjs`, frequency analysis `naff-frequencies.mjs`), every comparison labelled theory-vs-theory or theory-vs-observation. Newton + the measured masses reproduce every planet's window rate and every node rate except Mercury's perihelion (−43.0 in both windows; the 1PN term alone closes it; masses cannot — a joint mass set that fits the perihelia breaks the nodes). The engine returns the secular g/s to 0.1–1% and the 1PN term raises Mercury's g₁ by 0.473″/yr. The lattice tested at its own quantity type: Mars's perihelion (8H/36) and Earth's node (−8H/40) divisors are long-term means; Mercury's 8H/11 is the present-epoch Newtonian rate; the Jupiter/Saturn/Uranus perihelion and the other node divisors are window values; the beat correspondences with 8H/N are at chance level (structure-preserving null); a 1-Myr derived Earth-orbit vector fits its window but does not extrapolate (≥ 10–20 Myr needed). §9 proposes the divisor restatement. §12: the bound experiments — work-free steering forces imposing the model's laws on the dynamics, always gated to zero in the observed era — fixed perihelion rates self-destruct in 462 kyr (Mars, via the g₃/g₄ resonance); the comb universe (every shape on the lattice) is stable for 4.3 Myr and exactly 8H-periodic but rings its metronome at 8H/6 = 447 kyr where the Mesozoic record measures 405.6 ± 2.4; the hybrid (Earth on the H/3 law ≡ comb lines N0+N24+N48) reproduces the law's own constants but erases the metronome entirely — leaving H/3 as the epoch-local tangent of Earth's free eccentricity vector, with deep time owned by the free dynamics and the spin-family results untouched |
-
-Superseded methodology docs (35-event RMS test, 19-event visibility test) preserved in `docs/archive/old-documents/` (untracked) as historical baselines: `100-deltat-validation.md`, `101-pure-tidal-eclipses.md`.
-
-### Appendices
-
-**Verification scripts** — standalone Node.js scripts that verify, compute, or analyze model parameters. Run with `node tools/verify/<filename>`.
+**Verification scripts** — standalone Node.js scripts that verify, compute, or analyze model parameters. Run with `node tools/verify/<filename>`. (`npm run test:verify:list` classifies all 31: 6 gate · 3 liftable · 12 narrative · 10 generator.)
 
 | Script | Description |
 |--------|-------------|
@@ -180,11 +132,11 @@ Superseded methodology docs (35-event RMS test, 19-event visibility test) preser
 | [analytical-ascending-nodes.js](../tools/verify/analytical-ascending-nodes.js) | Analytical (closed-form) calculation using spherical trigonometry |
 | [ascending-node-verification.js](../tools/verify/ascending-node-verification.js) | Verifies J2000-verified values produce correct ecliptic inclinations |
 | [ascending-node-souami-souchay.js](../tools/verify/ascending-node-souami-souchay.js) | Compares Souami & Souchay original vs verified ascending node accuracy |
-| [inclination-optimization.js](../tools/verify/inclination-optimization.js) | Computes Fibonacci-derived inclination amplitudes and means with balance verification |
+| [inclination-optimization.js](../tools/verify/inclination-optimization.js) | Computes the derived inclination amplitudes and means with balance verification |
 | [inclination-verification.js](../tools/verify/inclination-verification.js) | Verifies inclination parameters against J2000 and JPL trends |
 | [mercury-precession-centuries.js](../tools/verify/mercury-precession-centuries.js) | Mercury perihelion precession analysis by century |
-| [balance-search.js](../tools/verify/balance-search.js) | Exhaustive search + deep analysis: five-stage pipeline (7.5M → 767 → 96 → 51 → 15 survivors) with per-config optimised anchor, ascending nodes, and base eccentricities (fair ranking); generates data/balance-presets.json |
-| [verify-laws.js](../tools/verify/verify-laws.js) | Comprehensive verification of all six laws + findings |
+| [balance-search.js](../tools/verify/balance-search.js) | Exhaustive search + deep analysis: five-stage pipeline with per-config optimised anchor, ascending nodes, and base eccentricities; generates data/balance-presets.json |
+| [verify-laws.js](../tools/verify/verify-laws.js) | Narrative-class record of the retired law suite's checks and findings |
 | [configuration-analysis.js](../tools/verify/configuration-analysis.js) | Historical: four-filter intersection analysis of 7.56M configs (superseded by the sequential pipeline in balance-search.js) |
 | [eccentricity-balance.js](../tools/verify/eccentricity-balance.js) | Pair decomposition, Law 5 sensitivity analysis |
 | [epoch-independence.js](../tools/verify/epoch-independence.js) | AMD exchange across mirror pairs, balance stability across Saturn's secular cycle |
@@ -224,7 +176,10 @@ The main command-line tool for running optimizations:
 node tools/optimize.js <command> <target>
 ```
 
-See [Optimization Tool Overview](60-optimization-tool-overview.md) for full documentation.
+The planet-facing optimization programme is retired (the planets render
+from the engine-D element chain, which is not fitted per planet); the
+tool remains for Moon-side steps and chain-vs-JPL diagnostics. The full
+programme documentation is archived — see [the retired record](retired-record.md).
 
 ### `tools/pipeline/` — Reference Data Pipeline
 
@@ -238,11 +193,13 @@ Scripts that fetch, enrich, and export reference data from JPL Horizons:
 | `add-jpl-reference-points.js` | Add JPL data points to reference dataset |
 | `export-reference-data.js` | Export reference data to config files |
 | `import-tycho-mars.js` | Import Tycho Brahe Mars observations |
+| `import-vsop87.js` | Import the truncated VSOP87A series for the Standard-Model (K8) reference overlay |
+| `import-elp-mpp02.js` | Import the ELP/MPP02 lunar series (reference overlay + lunar cross-checks) |
 | `patch-planet-test-dates.js` | Patch test dates for planet verification |
 
 ### `tools/explore/` — Investigation Scripts
 
-Ad-hoc analysis and exploration scripts used during development (~30 scripts). See the scripts themselves for descriptions — each has a header comment explaining its purpose.
+Ad-hoc analysis and exploration scripts used during development. See the scripts themselves for descriptions — each has a header comment explaining its purpose.
 
 ### `tools/fit/` — Fitting & Derivation Scripts
 

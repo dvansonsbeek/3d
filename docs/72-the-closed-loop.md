@@ -7,7 +7,9 @@ status: current
 
 # 72 — The Closed Loop
 
-Every orbital oscillation in the model — inclination, eccentricity, and obliquity — derives from two empirical constants and a set of observed J2000 anchor values. Nothing is fitted per planet. The loop is fully closed.
+Every orbital oscillation in the law framework — inclination, eccentricity, and obliquity — derives from two empirical constants and a set of observed J2000 anchor values. Nothing is fitted per planet. The loop is fully closed.
+
+> **Status (the restatement).** This closed loop is the construction of the retired law framework. Since the P5 engine switch and the K5 legacy-chain excision, the rendered planets — orbits, elements, invariable-plane heights — read the model's own N-body chain ([doc 04](04-dynamic-elements-overview.md); [doc 109](109-model-nbody-engine-and-lattice-test.md) is the re-evaluation record). The loop documented here survives in the legacy scene scaffolding (device anchors), the no-chain bodies Pluto/Halley/Eros ([doc 31](31-no-chain-body-elements.md)), and the `o.fib*` diagnostics; [doc 10's Status banner](10-fibonacci-laws.md) carries the per-relation verdicts.
 
 > **Scope note (ESSRT).** The closed-loop derivation chain is structurally scale-invariant: Fibonacci divisors (3, 5, 8, 13, 21, 34), 8H/N lattice integers, balance-law forms (Law 3 vector, Law 5 scalar), and the PSI/K formula structures hold at any epoch. The numerical values of the constants — PSI (<!--v:psiValue-->3.3070 × 10⁻³<!--/v-->), K (<!--v:kValue-->3.4143 × 10⁻⁶<!--/v-->), the mean obliquity (23.4135°), Earth's inclination amplitude (0.6360°) — and the literal year counts (H = <!--v:H-->335,317<!--/v-->; 8H = <!--v:eightH-->2,682,536<!--/v-->; H/13 = <!--v:earthAxialPeriod-->25,794<!--/v-->; H/16 = <!--v:earthPeriPeriod-->20,957<!--/v-->; System Reset year ≈ −<!--v:systemResetYearPlain-->2,649,854<!--/v-->) are J2000-anchored. Under [ESSRT](99-expanding-solar-system-resonance-theory.md), H(t) evolves at deep time via Drivers 1 (LOD growth) and 2 (Kepler), scaling the literal year counts proportionally; PSI and K, being derived from J2000 Earth, would be re-evaluated at any other epoch by the same closed loop using that epoch's Earth values. The architecture of the loop — what derives from what — is permanent; the numerical snapshot is the J2000 instance.
 
@@ -77,7 +79,7 @@ Each planet has up to five distinct periodic motions. Their periods interlock:
 
 ### 1. Inclination cycle (ICRF perihelion precession)
 
-The inclination on the invariable plane oscillates at the ICRF perihelion precession rate. This is the ecliptic perihelion rate corrected for the general precession of the ecliptic: 1/P_ICRF = 1/P_ecliptic − 13/H. The ecliptic perihelion period is set from observations (H/d ratios for Earth, Jupiter, and Saturn — see Laws 1 and 6; 8H/N for the other planets — see [Solar System Resonance Cycle Periods](55-solar-system-resonance-cycle-periods.md)).
+The inclination on the invariable plane oscillates at the ICRF perihelion precession rate. This is the ecliptic perihelion rate corrected for the general precession of the ecliptic: 1/P_ICRF = 1/P_ecliptic − 13/H. The ecliptic perihelion period is set from observations (H/d ratios for Earth, Jupiter, and Saturn — see Laws 1 and 6; 8H/N for the other planets — the per-planet tabulation is archived, [retired record](retired-record.md)).
 
 The inclination amplitude equals the axial tilt amplitude — they are the same oscillation seen from two reference frames.
 
@@ -111,6 +113,25 @@ The Fibonacci divisors and balance groups produce two independent balance condit
 
 Both balances use the same planet configuration — no separate tuning.
 
+Three measured qualifiers from the exploration record (scripts archived —
+git history):
+
+- **The vector balance is not the discriminating test.** In eigenmode
+  space each mode independently satisfies Σⱼ Lⱼ·Tⱼᵢ = 0 by angular-momentum
+  conservation, so ANY frequency set — Laskar eigenmodes or 8H/N integers —
+  gives 100% vector balance. The genuine constraint is the SCALAR balance
+  (Laws 3 + 5). (`eigenmode-decomposition.js`)
+- **The linear-e form of Law 5 is sharply selective.** Sweeping
+  v = √m·a^1.5·e^γ/√d over γ: base eccentricities give the optimum at
+  γ = 1.00004; quadratic e² (the AMD weighting) reaches only 89.6% vs
+  99.999% for linear, and even γ = 1.001 degrades the balance by 0.015%.
+  (`eccentricity-balance-explore.js`)
+- **Why Law 4 predicts amplitudes, not bases.** No power law
+  K₂·sin(tilt)^p·d^q·m^r·a^s produces a universal constant for the BASE
+  eccentricities (best all-8 spread ~74%, vs ~0% for the K amplitude
+  formula) — the negative result that fixed Law 4's scope.
+  (`law4-tilt-search.js`)
+
 The base eccentricities (mean eccentricities around which each planet oscillates) are phase-derived at runtime — not fitted by an optimizer. For each planet, the law of cosines is solved using the K-derived amplitude, the J2000 observed eccentricity, and the eccentricity phase at the System Reset. The balance percentages emerge naturally from the phase-derived values rather than being forced to 100% by construction.
 
 ## System Reset
@@ -118,15 +139,15 @@ The base eccentricities (mean eccentricities around which each planet oscillates
 The System Reset epoch is the year where all 7 non-Earth planets simultaneously reach their inclination extremes. For the default configuration, it falls at anchor n=7 within the Solar System Resonance Cycle (≈ −<!--v:systemResetYearPlain-->2,649,854<!--/v-->). Other viable configurations may have a different optimal anchor (n ∈ {0..7}); the deep analysis in `tools/verify/balance-search.js` determines the best n for each, and `tools/explore/anchor-and-ascnode-audit.js` audits the shipped anchor and ascending-node assignments. **Each candidate's eccentricity balance is computed using its OWN bases** — recomputed with the candidate's d-values, anti-phase assignments, and optimal anchor — not the default config's bases. This makes the ranking a fair physical comparison.
 
 - In-phase planets (Mercury, Venus, Mars, Jupiter, Uranus, Neptune): all at **minimum** inclination
-- Anti-phase planet (Saturn): also at **minimum** inclination in the model's sign convention. The "anti-phase" designation refers to Saturn's *opposite contribution to the angular-momentum-weighted balance sum*, not the opposite inclination extreme. Concretely: the model formula `i(t) = mean + antiPhaseSign × amp × cos(ω̃ − cycleAnchor)` uses `antiPhaseSign = −1` for Saturn so that its oscillation enters the balance sum with reversed sign; at the System Reset all 7 planets land at MIN inclination simultaneously, and Saturn's reversed sign is what makes the weighted sum cancel to ≈ 99.998%.
+- Anti-phase planet (Saturn): also at **minimum** inclination in the model's sign convention. The "anti-phase" designation refers to Saturn's *opposite contribution to the angular-momentum-weighted balance sum*, not the opposite inclination extreme. Concretely: the model formula `i(t) = mean + antiPhaseSign × amp × cos(ω̃ − cycleAnchor)` uses `antiPhaseSign = −1` for Saturn so that its oscillation enters the balance sum with reversed sign; at the System Reset all 7 planets land at MIN inclination simultaneously, and Saturn's reversed sign is what makes the weighted sum cancel to ≈ 99.9974%.
 
 The System Reset also defines the **eccentricity phase alignment**:
 - In-phase planets: at **base** eccentricity, **rising** (phase 90°)
 - Anti-phase (Saturn): at **base** eccentricity, **falling** (phase 270°)
 
-(Verified empirically via `run8HConfigurationVerification` in the model — see also `docs/archive/old-documents/eccentricity-wobble-formula-analysis.md` (untracked archive) for the formula reconciliation that made all 7 planets land at exactly these phases at every 8H.)
+(Verified empirically via `run8HConfigurationVerification` in the model — all 7 planets land at exactly these phases at every 8H.)
 
-This is the physically motivated symmetry: at n=7, every cycle type (inclination, eccentricity) reaches its reference state simultaneously. The direction of eccentricity change (rising vs falling) encodes the balance group — the same grouping that produces the 99.9975% inclination balance.
+This is the physically motivated symmetry: at n=7, every cycle type (inclination, eccentricity) reaches its reference state simultaneously. The direction of eccentricity change (rising vs falling) encodes the balance group — the same grouping that produces the 99.9974% inclination balance.
 
 The inclination cycle anchors are a direct consequence: each planet's cycle anchor equals its ICRF perihelion longitude at the System Reset (minus 180° for in-phase planets). This is not a coincidence — the System Reset defines the phase geometry. The cycle anchors are derived, not fitted.
 
@@ -158,7 +179,7 @@ From these free parameters, the model derives:
 - All eccentricity cycle periods (beat of axial and ICRF inclination)
 
 **From the configuration:**
-- Two independent balance conditions (inclination 99.998%, eccentricity 99.86%)
+- Two independent balance conditions (inclination 99.9974%, eccentricity 99.86%)
 - The System Reset epoch and all inclination cycle anchors
 - All ascending node cycles (integer divisors of 8H)
 
@@ -170,9 +191,7 @@ The J2000 observed values serve as anchors — the model does not predict them, 
 
 | Document | Purpose |
 |----------|---------|
-| [10 - Fibonacci Laws](10-fibonacci-laws.md) | The six laws (PSI in Law 2, balance laws 3 and 5, K in Law 4, gas-giant lock in Law 6) |
-| [36 - Tilt & Balance Calculations](36-tilt-and-definitive-balance-calculations.md) | Per-planet balance computations and weight contributions |
-| [38 - Eccentricity Balance Scale](38-eccentricity-scale.md) | Interactive view of the eccentricity balance |
-| [39 - Eccentricity Structure Exploration](39-eccentricity-structure-exploration.md) | Two-component decomposition + mirror-pair conservation laws |
-| [55 - Solar System Resonance Cycle Periods](55-solar-system-resonance-cycle-periods.md) | Complete 8H/N period table; System Reset structure |
+| [10 - The Six Fibonacci Relations](10-fibonacci-laws.md) | The six relations (PSI in Law 2, balance laws 3 and 5, K in Law 4, gas-giant lock in Law 6) |
+| 36 / 38 / 39 / 55 (archived — [retired record](retired-record.md)) | The balance computations, balance-scale views and 8H/N period table of the retired law framework |
+| [109 - The Model's Own N-body](109-model-nbody-engine-and-lattice-test.md) | The re-evaluation record: measured planetary frequencies vs the lattice |
 | [99 - Expanding Solar System Resonance Theory](99-expanding-solar-system-resonance-theory.md) | Deep-time scaling of H(t); the architecture vs. snapshot distinction |

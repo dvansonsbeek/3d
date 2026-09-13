@@ -47,16 +47,16 @@ This document describes the six Fibonacci relations (published under their histo
 > Earth's spin–orbit–tide interface at the anchor (see
 > [Doc 99, "One solar system"](99-expanding-solar-system-resonance-theory.md)).
 
-The six Fibonacci Laws form a symmetric architecture, organized by structural role rather than by physical domain:
+The six Fibonacci relations form a symmetric architecture, organized by structural role rather than by physical domain:
 
 - **Law 1** — Earth's major precession periods are H divided by Fibonacci numbers — H/3, H/5, H/8, H/13 (an Earth-unique hierarchy).
 - **Laws 2 and 4** (Amplitude Constants) — A universal constant predicts every planet's inclination amplitude (ψ) and eccentricity amplitude (K) from Fibonacci divisors and mass — both derived from Earth, both predict all 8 planets with zero free parameters.
 - **Laws 3 and 5** (Balance Laws) — Angular-momentum-weighted oscillations of seven planets balance against Saturn's alone — same Fibonacci divisors and phase groups in both, distinct weight formulas (`w = √(m·a(1-e²))/d` for inclination, `v = √m × a^(3/2) × e / √d` for eccentricity).
 - **Law 6** (Saturn-Jupiter-Earth Resonance) — Jupiter's ICRF perihelion and Saturn's ecliptic perihelion lock to one period, 8H/65 — the climate-recorded obliquity beat. Earth's own obliquity sits one 8H-lattice step away at the Fibonacci value H/8 (= 8H/64). The gas giants drive Earth's spin-axis dynamics through their mutual resonance lock.
 
-For detailed mathematical derivations and formula coefficient breakdowns, see [Formula Derivation](35-formula-derivation.md).
+The detailed formula-coefficient derivations of the retired framework are archived ([retired record](retired-record.md)).
 
-> **Note — these are J2000 structural identities.** The Fibonacci Laws describe how the lattice is *organized* at the anchor epoch. The framework's deep-time *evolution* of that lattice is governed by a separate family of relations — the **Deep-Time Invariants** (day-count, planetary adiabatic, and lunar precession) — described in [ESSRT (Doc 99)](99-expanding-solar-system-resonance-theory.md). The two layers compose: Laws 1–6 set the structure; the Invariants preserve it as H(t) expands under Driver 1 and Driver 2.
+> **Note — these are J2000 structural identities.** The Fibonacci relations describe how the lattice is *organized* at the anchor epoch. The framework's deep-time *evolution* of that lattice is governed by a separate family of relations — the **Deep-Time Invariants** (day-count, planetary adiabatic, and lunar precession) — described in [ESSRT (Doc 99)](99-expanding-solar-system-resonance-theory.md). The two layers compose: Laws 1–6 set the structure; the Invariants preserve it as H(t) expands under Driver 1 and Driver 2.
 
 The central formula for inclination amplitudes is:
 
@@ -84,11 +84,11 @@ H = see Constants Reference for current value
 Two empirical constants, both derived from Earth's fitted parameters, predict all 8 planets' oscillation amplitudes:
 
 ```
-ψ = d_Earth × inclAmp_Earth × √m_Earth = 3.3069 × 10⁻³   (inclination amplitudes)
+ψ = d_Earth × inclAmp_Earth × √m_Earth = 3.3070 × 10⁻³   (inclination amplitudes)
 K = e_amp_Earth × √m_Earth / (sin(tilt_Earth) × √d_Earth) = 3.4143 × 10⁻⁶   (eccentricity amplitudes)
 ```
 
-**SYSTEM/ALONE mass convention** (intentional asymmetry — see [doc 25 §Sun/System vs Sun/Planet-Alone](25-universal-mass-from-moon-formula.md#sunsystem-vs-sunplanet-alone)):
+**SYSTEM/ALONE mass convention** (intentional asymmetry — see [doc 24 §From System to Planet-Alone](24-moon-kepler-derivation.md#from-system-to-planet-alone)):
 - **Earth** uses **M_Earth_ALONE** (`M_Earth/M_Sun ≈ 3.0027e-6`) in ψ and K calibration — the Moon's contribution to Earth's perturbation budget is empirically absorbed into the fitted `inclAmp_Earth` (and `e_amp_Earth`), calibrated against observations of Earth's secular variation which already implicitly contain the Moon's tug on the Earth-Moon Barycenter.
 - **Other 7 planets** use **M_planet_SYSTEM** (planet + moons) in the amplitude formulas — physically correct for the Laplace-Lagrange secular perturbation source convention (distant bodies see planet+moons as one point mass).
 
@@ -130,7 +130,7 @@ Where a = semi-major axis, e = eccentricity, i J2000 = inclination to the invari
 
 Beat frequency rule: `1/H(n) + 1/H(n+1) = 1/H(n+2)` — an algebraic identity from the Fibonacci recurrence (3+5=8, 5+8=13, 8+13=21, …).
 
-**Earth's H/Fibonacci hierarchy is unique.** Only Earth has all major precession periods at H divided by Fibonacci numbers. The gas giants' perihelions sit on the 8H lattice **one integer off** the nearest Fibonacci anchors: Jupiter's ecliptic perihelion is **8H/39** (Fibonacci anchor H/5 = 8H/40), Jupiter's ICRF perihelion is **8H/65** (anchor H/8 = 8H/64), Saturn's ecliptic perihelion is **−8H/65** (same anchor, retrograde), and Saturn's ICRF perihelion is **8H/169** (anchor H/21 = 8H/168). Jupiter's ICRF perihelion and Saturn's ecliptic perihelion share the same **8H/65** period — the **Law 6 gas-giant lock** that drives Earth's obliquity beat, one 8H-lattice step from Earth's Fibonacci anchor H/8 = 8H/64. The other planets' precession periods divide the Solar System Resonance Cycle (8H) by various integers, mostly non-Fibonacci. See [Solar System Resonance Cycle Periods](55-solar-system-resonance-cycle-periods.md) for the all-planet 8H/N table.
+**Earth's H/Fibonacci hierarchy is unique.** Only Earth has all major precession periods at H divided by Fibonacci numbers. The gas giants' perihelions sit on the 8H lattice **one integer off** the nearest Fibonacci anchors: Jupiter's ecliptic perihelion is **8H/39** (Fibonacci anchor H/5 = 8H/40), Jupiter's ICRF perihelion is **8H/65** (anchor H/8 = 8H/64), Saturn's ecliptic perihelion is **−8H/65** (same anchor, retrograde), and Saturn's ICRF perihelion is **8H/169** (anchor H/21 = 8H/168). Jupiter's ICRF perihelion and Saturn's ecliptic perihelion share the same **8H/65** period — the **Law 6 gas-giant lock** that drives Earth's obliquity beat, one 8H-lattice step from Earth's Fibonacci anchor H/8 = 8H/64. The other planets' precession periods divide the Solar System Resonance Cycle (8H) by various integers, mostly non-Fibonacci (the all-planet 8H/N tabulation is archived — [retired record](retired-record.md); [doc 109](109-model-nbody-engine-and-lattice-test.md) carries the measured planetary frequencies).
 
 ### Law 2: The Inclination Constant ψ
 
@@ -212,9 +212,9 @@ Or equivalently, in terms of orbital period `T_j ∝ a_j^(3/2)`:
 v_j = T_j × e_j × √(m_j / d_j)
 ```
 
-**Result: 99.8636% balance** (phase-derived base eccentricities). See [Eccentricity Balance Derivation](#eccentricity-balance-derivation) for the full treatment and [Eccentricity Balance Scale](38-eccentricity-scale.md) for a physical interpretation as a balance scale.
+**Result: 99.8636% balance** (phase-derived base eccentricities). See [Eccentricity Balance Derivation](#eccentricity-balance-derivation) for the full treatment.
 
-The eccentricity amplitudes used in the balance are predicted by Law 4 (the K constant). See [Eccentricity Balance Scale](38-eccentricity-scale.md) for a physical interpretation of the balance as a scale.
+The eccentricity amplitudes used in the balance are predicted by Law 4 (the K constant).
 
 ### Law 6: Saturn-Jupiter-Earth Resonance
 
@@ -256,7 +256,7 @@ The physical mechanism is the locking of Jupiter's and Saturn's perihelion prece
 
 ### Phase Groups
 
-Each planet has a per-planet cycle anchor for inclination extremes (in-phase at minimum, Saturn at maximum). This occurs once per 8H. Earth is locked to its own n=0 reference for the IAU obliquity constraint. See [Solar System Resonance Cycle Periods](55-solar-system-resonance-cycle-periods.md#system-reset) for details.
+Each planet has a per-planet cycle anchor for inclination extremes (in-phase at minimum, Saturn at maximum). This occurs once per 8H. Earth is locked to its own n=0 reference for the IAU obliquity constraint. See [doc 31 §Per-Planet Cycle Anchors](31-no-chain-body-elements.md#per-planet-cycle-anchors) for details.
 
 | Planet | Cycle Anchor | Group | Balanced Year |
 |--------|-------------|-------|--------|
@@ -271,7 +271,7 @@ Each planet has a per-planet cycle anchor for inclination extremes (in-phase at 
 
 \* Jupiter, Saturn, and Uranus have ICRF perihelion periods that divide H exactly, so their phase value at n=7 coincides numerically with their phase at n=0 (and at any other anchor).
 
-The group assignment is constrained by: (1) each planet's oscillation range must fall within the Laplace-Lagrange secular theory bounds, (2) the inclination structural weights must balance (Law 3), and (3) the eccentricity weights must balance (Law 5). The cycle anchor for each planet is set by the System Reset convention (see [Inclination Calculations](32-inclination-calculations.md#two-frames--be-careful-which-one-you-mean)), with all 7 directions matching JPL.
+The group assignment is constrained by: (1) each planet's oscillation range must fall within the Laplace-Lagrange secular theory bounds, (2) the inclination structural weights must balance (Law 3), and (3) the eccentricity weights must balance (Law 5). The cycle anchor for each planet is set by the System Reset convention (see [Geometric Orbital Elements](31-no-chain-body-elements.md#per-planet-cycle-anchors)), with all 7 directions matching JPL.
 
 ### Ecliptic Perihelion Periods
 
@@ -309,6 +309,8 @@ Earth–Saturn is the only pair with opposite balance groups (in-phase vs anti-p
 
 ### Finding 2: Configuration Uniqueness
 
+*(Status: the uniqueness is **input-dependent survivorship** — re-evaluated with dynamical inputs it is retired as a falsification criterion (see the Status banner; the current criterion is in CLAUDE.md §Verification). The search result below stands as a data fact about the tuned inputs.)*
+
 The exhaustive search evaluates <!--v:configSearchSpace-->7,558,272<!--/v--> candidates (see [Exhaustive Search](#exhaustive-search-and-preset-generation)). Five successive physical filters narrow these to a single mirror-symmetric solution:
 
 | Filter | Surviving |
@@ -323,7 +325,7 @@ Each of the 96 candidates passing both balance thresholds is evaluated at its ow
 
 **Per-config eccentricity balance** (deep analysis refinement): after the optimal *n* is found for each candidate, the base eccentricities are **recomputed using the candidate's own d-values, anti-phase assignments, and that optimal anchor** — not the default config's bases. This is the fair comparison: each config is evaluated against its own physical reference point. Final ranking uses this per-config eccentricity balance. Under this fair ranking, the default configuration places at #4 of 15 survivors; top non-mirror configs reach ~99.999% (at anchors n=0 or n=4 with different anti-phase patterns), while mirror symmetry remains the unique structural property of the default.
 
-The sole mirror-symmetric survivor is the **default configuration** (Me=21, Ve=34, Ea=3, Ma=5, Ju=5, Sa=3, Ur=21, Ne=34), ranking #4 of 15 by eccentricity balance (99.86%). All 15 survivors are available for comparison in the [interactive Balance Explorer](https://3d.holisticuniverse.com).
+The sole mirror-symmetric survivor is the **default configuration** (Me=21, Ve=34, Ea=3, Ma=5, Ju=5, Sa=3, Ur=21, Ne=34), ranking #4 of 15 by eccentricity balance (99.86%). All 15 survivors are recorded in [`data/balance-presets.json`](../data/balance-presets.json) (the interactive Balance Explorer panel was removed at the restatement — [retired record](retired-record.md)).
 
 **Key structural constraints:**
 
@@ -344,7 +346,9 @@ The eccentricity balance (Law 5) is genuinely independent from the inclination b
 
 The two balances also differ structurally. The inclination balance is a **global** property — all mass in the solar system contributes (TNOs provide a 0.0002% correction). The eccentricity balance is a **closed-system** property of the 8 planets — the mirror pairs act as "communicating vessels" exchanging Angular Momentum Deficit (AMD), and TNOs cannot participate because (a) they lack paired counterparts, (b) the a^(3/2) weighting makes them far too heavy for any Fibonacci d-factor, and (c) they are test particles that cannot shape the eigenmode structure. See [eccentricity-balance.js](../tools/verify/eccentricity-balance.js) for the quantitative analysis.
 
-### Finding 4: Saturn Eccentricity Prediction from Law 5
+### Finding 4: Saturn Eccentricity Prediction from Law 5 (retired — see the Status banner)
+
+*(The prediction claim is retired: re-evaluated with dynamical inputs it misses Saturn's long-term mean by 3.6% — the sub-percent match below was a property of the tuned base eccentricities. The derivation is retained as the record.)*
 
 Since Saturn is the sole anti-phase planet in the balance, the eccentricity balance (Law 5) directly predicts its eccentricity from the other seven:
 
@@ -539,7 +543,7 @@ The eccentricity balance (Law 5) operates on linear e rather than e², suggestin
 
 - **Predicted**: all 8 inclination oscillation amplitudes (Law 2, from ψ)
 - **Predicted**: all 8 eccentricity oscillation amplitudes (Law 4, from K)
-- **Predicted**: Saturn's base eccentricity (Law 5, from the other seven, to ~0.2%)
+- **Retired**: Saturn's base eccentricity from Law 5 — the ~0.2% match was a property of the tuned inputs (Finding 4, Status banner)
 - **Not predicted**: the remaining 7 base eccentricities — structural values set at formation, analogous to the 8 mean inclinations
 
 ---
@@ -605,7 +609,7 @@ where A is the amplitude, phase₃ is the H/3 inclination cycle, and phase₈ is
 ```javascript
 // Fundamental constants
 const H = 335317; // See Constants Reference for current value
-const PSI = 3 * earthInclAmp * Math.sqrt(earthMass);  // = 3.3069 × 10⁻³ (from Earth)
+const PSI = 3 * earthInclAmp * Math.sqrt(earthMass);  // = 3.3070 × 10⁻³ (from Earth)
 
 // Fibonacci divisors
 const FIBONACCI_D = {
@@ -620,7 +624,7 @@ const FIBONACCI_D = {
 };
 
 // Per-planet cycle anchors (ICRF perihelion longitude where MAX inclination occurs, evaluated at balanced year n=7 ≈ -2,649,854 BC)
-// Re-fit 2026-04-09 to match JPL ecliptic-inclination trends in the J2000-fixed frame.
+// Fit to match JPL ecliptic-inclination trends in the J2000-fixed frame.
 const CYCLE_ANCHOR = {
   mercury: 234.52, venus: 218.64, earth: 21.77, mars: 236.07,
   jupiter: 287.06, saturn: 116.26, uranus: 21.33, neptune: 174.04
@@ -667,15 +671,17 @@ function computeEccentricityBalance(planets) {
 
 ---
 
-## Validation
+## Validation record (the retired verify-laws suite)
+
+*These checks live in [`verify-laws.js`](../tools/verify/verify-laws.js), now **narrative class** — retired as a gate at the restatement, kept as the record of what was checked. The current claims are the measured verdicts in the Status banner; Tests 5 and 8 verify the retired Saturn-prediction claim (Finding 4).*
 
 ### Test 1: Fibonacci Law Holds
 
 For all 8 planets, verify `d × amplitude × √m = ψ` to machine precision.
 
-### Test 2: All Planets Within LL Bounds
+### Test 2: 7/8 Planets Within LL Bounds (Saturn the documented margin case)
 
-Compute `mean ± amplitude` for each planet and verify the range falls within the Laplace-Lagrange secular theory bounds (from Fitzpatrick Table 10.3, converted from radians).
+Compute `mean ± amplitude` for each planet and verify the range falls within the Laplace-Lagrange secular theory bounds (from Fitzpatrick Table 10.3, converted from radians). Seven of eight fit; Saturn exceeds its upper bound by 0.030° — the documented failure (`verify-laws` checks 44/45).
 
 ### Test 3: Inclination Balance
 
@@ -685,9 +691,9 @@ Verify `Σ(in-phase) w_j = Σ(anti-phase) w_j` to 99.9974% balance.
 
 Verify `Σ(in-phase) v_j = Σ(anti-phase) v_j` to 99.8636% balance.
 
-### Test 5: Saturn Eccentricity Prediction from Law 5
+### Test 5: Saturn Eccentricity Prediction from Law 5 (retired claim — record)
 
-Compute Saturn's eccentricity from the eccentricity balance equation (Law 5). Verify: predicted e_Saturn is within ~0.3% of observed J2000 value (0.053858). This is a single equation in eight unknowns, sufficient to predict Saturn given the other seven.
+Compute Saturn's eccentricity from the eccentricity balance equation (Law 5). The check verified the predicted e_Saturn within ~0.3% of the observed J2000 value (0.053858) — a property of the tuned base eccentricities; the prediction claim is retired (Finding 4, Status banner).
 
 ### Test 6: J2000 Inclination Match
 
@@ -697,9 +703,9 @@ At J2000 epoch, `i(2000) = mean + amplitude × cos(ω̃_J2000 - cycleAnchor)` sh
 
 Verifies that `e_amp = K × sin(tilt) × √d / (√m × a^1.5)` holds for all 8 planets with a single K derived from Earth.
 
-### Test 8: Saturn Eccentricity from Law 5
+### Test 8: Saturn Eccentricity from Law 5 (retired claim — record)
 
-Verifies that Law 5 (eccentricity balance) predicts Saturn's base eccentricity from the other seven planets to ~0.2%.
+Verified that Law 5 (eccentricity balance) reproduces Saturn's base eccentricity from the other seven planets to ~0.2% — at the tuned inputs; retired with Test 5 (Finding 4).
 
 ---
 
@@ -729,7 +735,7 @@ Only configurations with balance ≥ <!--v:balanceThreshold-->99.994%<!--/v--> (
 
 ### Output
 
-The search writes `data/balance-presets.json` containing the deep-analysis survivors (per-config optimised balanced year, ascending nodes, and cycle anchors), sorted by eccentricity balance. The current run yields 42 presets.
+The search writes `data/balance-presets.json` containing the deep-analysis survivors (per-config optimised balanced year, ascending nodes, and cycle anchors), sorted by eccentricity balance. The current run yields 15 presets (96 candidates → 15 survivors).
 
 ### Shared Input Values
 
@@ -796,13 +802,10 @@ The key question — **why Fibonacci numbers work** — was put to measurement: 
 | Document | Purpose |
 |----------|---------|
 | [20 - Constants Reference](20-constants-reference.md) | All constants and values |
-| [32 - Inclination Calculations](32-inclination-calculations.md) | Inclination oscillation implementation |
-| [33 - Invariable Plane Calculations](33-invariable-plane-calculations.md) | Height above/below invariable plane |
-| [05 - Invariable Plane Overview](05-invariable-plane-overview.md) | Conceptual background |
-| [55 - Solar System Resonance Cycle Periods](55-solar-system-resonance-cycle-periods.md) | The 8H/N integer-divisor period table — the broader lattice where the Six Laws' Fibonacci divisors sit |
+| [05 - The Invariable Plane](05-invariable-plane-overview.md) | Concept, heights, nodes, and the live self-checks |
 | [99 - Expanding Solar System Resonance Theory (ESSRT)](99-expanding-solar-system-resonance-theory.md) | Unifying framework — the Fibonacci divisors and L1 integer labels are scale-invariant ESSRT structural constants; literal periods scale with H(t) at deep time |
 | [Inclination Optimization](../tools/verify/inclination-optimization.js) | Optimization script |
-| [Balance Search](../tools/verify/balance-search.js) | Exhaustive search + deep analysis: five-stage pipeline producing 42 survivors with per-config optimised anchor, ascending nodes, and base eccentricities |
+| [Balance Search](../tools/verify/balance-search.js) | Exhaustive search + deep analysis: five-stage pipeline producing 15 survivors with per-config optimised anchor, ascending nodes, and base eccentricities |
 | [Verify Laws](../tools/verify/verify-laws.js) | Comprehensive verification of all six laws, five findings, and predictions |
 | [Configuration Analysis](../tools/verify/configuration-analysis.js) | Historical: four-filter intersection analysis of all 7.56M configurations (superseded by the sequential pipeline in balance-search.js) |
 | [Eccentricity Balance](../tools/verify/eccentricity-balance.js) | Balance decomposition, sensitivity, TNO closed-system argument |
@@ -810,4 +813,3 @@ The key question — **why Fibonacci numbers work** — was put to measurement: 
 
 ---
 
-**Previous**: [70 - Ascending Node Calculations Limitations](70-ascending-node-limitations.md)

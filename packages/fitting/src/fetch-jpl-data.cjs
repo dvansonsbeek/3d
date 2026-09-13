@@ -91,7 +91,7 @@ async function main() {
         const positions = await jpl.getPositions(planet, batch);
         for (const pos of positions) {
           const yr = C.startmodelYear + (pos.jd - C.startmodelJD) / C.meanSolarYearDays;
-          // Era-based tier and weight (Section 4.7 of docs/60)
+          // Era-based tier and weight (Section 4.7 of the retired optimization-programme doc 60 — archived, docs/retired-record.md; the scheme stays as shipped)
           let tier, weight;
           if (yr >= 2000 && yr < 2100) {
             tier = '2A'; weight = 1.0;   // Modern era, highest JPL confidence

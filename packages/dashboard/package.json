@@ -2,7 +2,7 @@
   "name": "@essrt/dashboard",
   "version": "0.0.0",
   "private": true,
-  "description": "Charts UI.",
+  "description": "Reserved end-state slot (plan 01 target layout; not yet populated — the live charts UI is dashboard/ at the repo root). Charts UI.",
   "type": "module",
   "main": "src/index.js",
   "license": "AGPL-3.0-or-later"

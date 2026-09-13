@@ -87,6 +87,8 @@ All numbers from the canonical regression scripts:
 | L1+L2+L3 + Berger insolation (model) | R² = 0.8776 → ΔR² = +0.0041 | R² = 0.9436 → +0.00123 | R² = 0.8494 → +0.0042 |
 | **L1+L2+L3 + Berger insolation (Laskar)** | — | **R² = 0.9424 → +0.00000** | **R² = 0.8452 → +0.00001** |
 
+(The insolation-addition rows are doc 94's measurement at the pre-admission 32-integer stage — its canonical baselines 0.9424 / 0.8452 predate the n=24 admission; the ΔR² ≈ 0 conclusion is unaffected.)
+
 Three lines tell the story:
 
 1. **The 8H lattice (L1) carries the variance.** R² = 0.87 on post-MPT LR04 — the lattice alone, 33 sinusoids at fixed gravitational-rhythm frequencies.
@@ -183,11 +185,11 @@ Each row is a measured quantity with a script that reproduces it:
 
 | Quantity | Value | Source / script |
 |----------|-------|-----------------|
-| 8H Solar System Resonance Cycle | <!--v:eightH-->2,682,536<!--/v--> yr (at J2000) | [doc 55](55-solar-system-resonance-cycle-periods.md), `model-parameters.json` |
+| 8H Solar System Resonance Cycle | <!--v:eightH-->2,682,536<!--/v--> yr (at J2000) | `model-parameters.json` (per-planet tabulation archived — [retired record](retired-record.md)) |
 | L1 lattice integers | 33 | [doc 93](93-l1-attribution-reference.md) |
 | L1 alone, post-MPT LR04 | R² = 0.870 | `scripts/milankovitch_climate_formula.py` |
-| L1+L2+L3, post-MPT LR04 | R² = 0.8735 | `data/milankovitch-climate-formula.json` |
-| L1+L2+L3, EPICA CO₂ | R² = 0.8452 | same |
+| L1+L2+L3, post-MPT LR04 | R² = <!--v:canonR2PostMpt-->0.8743<!--/v--> | `data/milankovitch-climate-formula.json` |
+| L1+L2+L3, EPICA CO₂ | R² = <!--v:canonR2Epica-->0.8453<!--/v--> | same |
 | L1+L2+L3, CenCO2PIP (0–66 Ma) | R² = 0.7626 | same |
 | Berger insolation alone, LR04 0–500 kyr | R² = 0.293 (Laskar e) | `scripts/milankovitch_insolation_laskar_check.py` |
 | Berger insolation added to L1+L2+L3 | ΔR² = 0.00000 (LR04), 0.00001 (EPICA CO₂) | same |
@@ -217,6 +219,6 @@ For how this conclusion relates to recent peer-reviewed work — Zeebe & Lantink
 - [Doc 93 — L1 attribution reference](93-l1-attribution-reference.md) — per-integer Berger vs Holistic top-1 attribution
 - [Doc 94 — Insolation null test](94-insolation-null-test.md) — empirical basis for the conclusion synthesized here
 - [Doc 96 — Related work](96-related-work.md) — position of this framework in the 2024 climate-forcing literature
-- [Doc 55 — Solar System Resonance Cycle periods](55-solar-system-resonance-cycle-periods.md) — what each L1 integer is
+- [Doc 92 — Climate Formula](92-climate-formula.md) §2.3 — what each L1 integer is
 - [Doc 10 — The six Fibonacci relations](10-fibonacci-laws.md) — the structural identities the integer divisors encode
 - [Doc 99 — Expanding Solar System Resonance Theory (ESSRT)](99-expanding-solar-system-resonance-theory.md) — Deep-time scaling of H(t); the structural "gravity not insolation" thesis is epoch-independent

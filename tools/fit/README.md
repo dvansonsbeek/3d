@@ -591,10 +591,10 @@ against the one-source CSV is a CROSS-FAMILY fit, and it was MEASURED
 (2026-09): cardinal interior RMS 8.8-16 min (30-60×), equinox J2000
 anchors ±2 h off IAU, day-scale amplitudes chasing the engine's
 off-lattice secular spectrum (s-modes, g-modes, the 405-kyr g₂−g₅ beat —
-the documented off-lattice case). The retired fitters live in
-tools/fit/archive/ (obliquity-, year-length-, cardinal-point-harmonics —
-the §10 derived form, the 8%/side edge trim and the §10g joint sidebands
-preserved there as the record). At the D4 flip the movement's consumers
+the documented off-lattice case). The retired fitters (obliquity-, year-length-, cardinal-point-harmonics —
+the §10 derived form, the 8%/side edge trim and the §10g joint sidebands)
+are preserved in git history (commit 16d7c87f); the untracked local
+archive tools/fit/archive/ keeps working copies. At the D4 flip the movement's consumers
 read the one-source evaluator directly; the frozen clock stays as the era
 certification record. FROZEN-CLOCK COUPLING: the coefficients are a
 certified artifact of the SHIPPED parameter set — any change to a
@@ -1183,7 +1183,7 @@ managed by a `correction-stack` registry with `prepareForFitting()`. That
 whole stack retired with the K5 legacy-chain excision — the planets render
 from the engine-D Keplerian chain, which has no fitted display corrections.
 The Moon Meeus layer (`MOON_CORRECTION`, Step 5c) is unaffected.
-[docs/71 — Correction Stack Architecture](../../docs/71-correction-stack-architecture.md)
+docs/71 — Correction Stack Architecture (archived — docs/retired-record.md)
 remains as the historical record.
 
 ## ΔT stack diagnostic hooks (dt-corrections-fit.js)
@@ -1232,5 +1232,5 @@ constants) for fitting efficiency. This gives the same RMSE as the full dataset 
 - [Predictive Formula Guide](../lib/python/PREDICTIVE_FORMULA_GUIDE.mdx) — ML architecture, feature matrix (429 terms), how to extend
 - [Solstice Prediction](../../docs/14-solstice-prediction.md) — Cardinal point harmonics, obliquity formula derivation
 - [Equation of Center](../../docs/65-equation-of-center.md) — EoC derivation and constants
-- [Parallax Corrections](../../docs/67-planet-parallax-corrections.md) — Parallax correction formula and tiers
-- [Correction Stack Architecture](../../docs/71-correction-stack-architecture.md) — Layer ordering, prepareForFitting()
+- Parallax Corrections — archived (docs/retired-record.md); the fitted parallax layer was deleted in the K5 excision
+- Correction Stack Architecture — archived (docs/retired-record.md); the layer-ordering + prepareForFitting() record lives in git history

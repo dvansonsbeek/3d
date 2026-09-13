@@ -18,7 +18,7 @@ The Solar System Resonance Cycle (8H ≈ 2.68 Myr today) and its 33-integer L1 l
 
 The panel plots each quantity over the full Hadean → +1 Gyr range or a focused Phanerozoic 650-Myr window, with anchor-point validation against the Wu et al. 2024 cyclostratigraphic compilation.
 
-This is the panel that grounds the model's deep-time claims in *observation*. The structural invariants (the 8H/N integer divisors of [doc 55](55-solar-system-resonance-cycle-periods.md), the Fibonacci hierarchy of [doc 10](10-fibonacci-laws.md), the L1 climate-formula lattice of [doc 92](92-climate-formula.md)) all live on a scaffold whose absolute scale evolves with H(t). The ESSRT Explorer makes that evolution visible.
+This is the panel that grounds the model's deep-time claims in *observation*. The structural invariants (Earth's Fibonacci hierarchy of [doc 10](10-fibonacci-laws.md), the L1 climate-formula lattice of [doc 92](92-climate-formula.md)) all live on a scaffold whose absolute scale evolves with H(t). The ESSRT Explorer makes that evolution visible.
 
 ## Accessing the Explorer
 
@@ -50,7 +50,7 @@ The two-tab-row layout matches the layered look of the Climate Formula Explorer 
 | `full` | −4,498 Ma → +1,000 Ma (5.50 Gyr) | "Full (−4.5 to +1 Gyr)" |
 | `phanero` | −650 Ma → 0 Ma (Phanerozoic eon) | "Phanerozoic (650 Ma)" |
 
-The **Full** range spans from Earth-Moon genesis (~4.54 Ga) to +1 Gyr in the future, covering the entire geological + projected lifespan of the formalism. The **Phanerozoic** range zooms into the past 650 Myr where cyclostratigraphy data (Wu 2024) provides direct validation anchors.
+The **Full** range spans from Earth-Moon genesis (−4,498 Ma, consistent with the Patterson Pb-Pb age constraint) to +1 Gyr in the future, covering the entire geological + projected lifespan of the formalism. The **Phanerozoic** range zooms into the past 650 Myr where cyclostratigraphy data (Wu 2024) provides direct validation anchors.
 
 Some quantities use a tighter Phanerozoic Y-range than the Full range — e.g., year-length-in-days clamps to `[0, 500]` on Phanerozoic (covers ~365 to ~416 days/year cleanly) versus `[0, 2000]` on Full (must accommodate the ~1750 days/year Hadean value).
 
@@ -63,7 +63,7 @@ Some quantities use a tighter Phanerozoic Y-range than the Full range — e.g., 
 │                                            [Export Full] [Export Phanerozoic] │
 ├─────────────────────────────────────────────────────────────┤
 │ [H-Period][Axial Precession][Obliquity][LOD][Year][AU][Moon]│  ← Quantity (gold)
-│ [Full (−4.54 to +1 Gyr)] [Phanerozoic (650 Ma)]             │  ← Range (teal)
+│ [Full (−4.5 to +1 Gyr)] [Phanerozoic (650 Ma)]              │  ← Range (teal)
 ├─────────────────────────────────────────────────────────────┤
 │                                                             │
 │  ┌─── Y axis: quantity in natural units ─────────┐          │
@@ -99,7 +99,7 @@ Era labels render rotated −32° below the chart, with overlap-avoidance heuris
 
 For four quantities (LOD, year, axial precession period, Moon distance — those where Wu 2024 provides direct cyclostratigraphic measurements), the panel overlays the Wu compilation's anchor points with ±2σ error bars:
 
-| Anchor age (Ma) | LOD (hr) | Moon (Earth radii) | Axial period (arcsec/yr) |
+| Anchor age (Ma) | LOD (hr) | Moon (Earth radii) | Axial precession rate (arcsec/yr) |
 |---:|---:|---:|---:|
 | 0 (J2000) | 24.00 | 60.27 | 51.25 |
 | 100 | 23.65 ± 0.15 | 59.50 ± 0.5 | 53.0 ± 1.0 |
@@ -134,7 +134,7 @@ These prevent the common misreading that the modal is showing *the obliquity osc
 
 Two buttons in the header produce publication-grade SVG exports:
 
-- **Export Full** — renders the current quantity over the Full (−4.54 to +1 Gyr) range as a paper-style SVG (white background, sized for figure inclusion).
+- **Export Full** — renders the current quantity over the Full (−4.5 to +1 Gyr) range as a paper-style SVG (white background, sized for figure inclusion).
 - **Export Phanerozoic** — renders the current quantity over the Phanerozoic 650 Ma window as a paper-style SVG.
 
 Both use `essrtRenderPaperChart()` which mirrors the modal renderer's geometry so the export looks identical to the on-screen view minus the interactive UI chrome. Triggered by `essrtExport(rangeKey)`; opens the SVG in a new tab as a data URL; right-click to save or screenshot.
@@ -183,8 +183,8 @@ Full per-anchor agreement table + statistical summary at [doc 99 §"Validation a
 ## Related documentation
 
 - [doc 99 — Expanding Solar System Resonance Theory (ESSRT)](99-expanding-solar-system-resonance-theory.md) — complete theoretical framework, Driver 1 + 2 derivations, per-anchor validation tables, deep-time L1 predictions, falsifiable claims
-- [doc 55 — Solar System Resonance Cycle Periods](55-solar-system-resonance-cycle-periods.md) — the 8H/N integer-divisor lattice that stays invariant under H(t) scaling
-- [doc 10 — Fibonacci Laws](10-fibonacci-laws.md) — the structural Fibonacci identities (H/3, H/5, H/8, H/13, H/16) the modal scales
+- [doc 92 — Climate Formula](92-climate-formula.md) — the L1 integer-divisor lattice that stays invariant under H(t) scaling
+- [doc 10 — The Six Fibonacci Relations](10-fibonacci-laws.md) — the structural Fibonacci identities (H/3, H/5, H/8, H/13, H/16) the modal scales
 - [doc 58 — Climate Formula Explorer](58-climate-formula-explorer.md) — sibling Tools-menu modal (companion to ESSRT Explorer)
 - [doc 57 — Formula Verification](57-formula-verification.md) — sibling Tools-menu modal comparing model vs published celestial-mechanics formulas across ±12 kyr
 - [doc 56 — WebGeoCalc Explorer](56-webgeocalc-explorer.md) — sibling Tools-menu modal showing observed perihelion-precession history (JPL NAIF, 1900–2026)

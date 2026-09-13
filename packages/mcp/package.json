@@ -1,9 +1,0 @@
-{
-  "name": "@essrt/mcp",
-  "version": "0.0.0",
-  "private": true,
-  "description": "MCP server. Thin adapter over physics; contains zero physics.",
-  "type": "module",
-  "main": "src/index.js",
-  "license": "AGPL-3.0-or-later"
-}

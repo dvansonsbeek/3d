@@ -144,7 +144,8 @@ const STEPS = [
   // (Step 6b — the obliquity-harmonics fit — RETIRED with the one-source
   // movement, D1-revised: SOLSTICE_OBLIQUITY_HARMONICS are frozen at their
   // last K-scene fit; re-fitting against a one-source CSV would be a
-  // cross-family fit. Script archived in tools/fit/archive/. The id 6b is
+  // cross-family fit. Script retired — git history 16d7c87f carries it
+  // (the untracked local archive keeps a copy). The id 6b is
   // never reused — README numbering is shared vocabulary.)
   // (Steps 6c/6d — the year-length and cardinal-point harmonic fits —
   // RETIRED with 6b (option A, C-4b adjudication): the shipped coefficients
@@ -153,8 +154,9 @@ const STEPS = [
   // min → 8.8-16 min, equinox J2000 anchors ±2 h off IAU, day-scale
   // amplitudes chasing the engine's off-lattice secular spectrum (s-modes,
   // g-modes, the 405-kyr g2−g5 beat). The movement's consumers read the
-  // one-source evaluator directly at D4. Scripts archived in
-  // tools/fit/archive/. The ids 6c/6d are never reused — README numbering
+  // one-source evaluator directly at D4. Scripts retired — git history
+  // 16d7c87f carries them (the untracked local archive keeps copies).
+  // The ids 6c/6d are never reused — README numbering
   // is shared vocabulary. In docs written before the §10e-bis rename,
   // "6c" = cardinal-point and "6d"/"6e" = year-length.)
   // Step 6f (sun-longitude-harmonics) intentionally OMITTED — see header

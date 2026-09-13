@@ -19,8 +19,6 @@
 //      shift implies the framework needs an additional contribution
 //      (asteroids, TNOs, etc.) rather than that observed values are wrong.
 //
-// See docs/19-balance-sensitivity-analysis.md for the full analysis
-// write-up that uses outputs of this script.
 //
 // Usage:
 //   node tools/verify/dual-balance-optimizer.js

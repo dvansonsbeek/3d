@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Generate the numeric tables of docs/97-paleo-ecs-decomposition.md from their
+Generate the numeric tables of doc 92 (doc 97 is archived — docs/retired-record.md) from their
 artifacts. The doc's prose is hand-written; every table that reports a
 measurement lives between
 
@@ -249,7 +249,7 @@ def blocks92():
     n_ext = len(vb["config"]["extended_integers"]); n_add = n_ext - len(vb["config"]["base_integers"])
     B = {}
     f = vb["lr04_full"]
-    steps = [("Baseline (25 integers)", f["a0_baseline_25"]["r2"], f["a0_baseline_25"]["r2"], "L1", "25 canonical doc-55 + Berger-eigenmode beats"),
+    steps = [("Baseline (25 integers)", f["a0_baseline_25"]["r2"], f["a0_baseline_25"]["r2"], "L1", "25 canonical planet-cycle + Berger-eigenmode beats"),
              (f"+ {n_add} lattice additions → {n_ext} integers", f["a1_extended_31"]["r2"], f["a1_extended_31"]["delta_r2_vs_a0"], "L1+",
               "6 MTM sidebands + n=141 Berger-quintet completion + n=24 Earth H/3 line (regime-admitted)"),
              ("+ 405-kyr (deployed L2)", f["a2_plus_405k"]["r2"], f["a2_plus_405k"]["delta_r2_vs_a1"], "L2", "Silicate-weathering thermostat fundamental"),
@@ -293,7 +293,10 @@ def apply(doc, B, check):
 def main():
     check = "--check" in sys.argv
     stale = []
-    for doc, B in ((DOC, blocks()), (DOC92, blocks92())):
+    # Doc 97 was archived in the 2026-09 doc retirement (docs/retired-record.md;
+    # the file lives frozen in docs/archive/retired/) — only doc 92's generated
+    # blocks remain in the tree.
+    for doc, B in ((DOC92, blocks92()),):
         changed = apply(doc, B, check)
         if check:
             stale += [f"{doc.name}:{c}" for c in changed]

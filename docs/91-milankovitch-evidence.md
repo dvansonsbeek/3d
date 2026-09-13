@@ -17,13 +17,13 @@ status: current
 
 Earth's climate-relevant orbital forcing arises from the gravitational interplay of all eight planets. Their orbital and rotational cycles synchronise over a common **Solar System Resonance Cycle of 8H = <!--v:eightH-->2,682,536<!--/v--> years (at J2000)**, and every climate-relevant cycle on Earth therefore lands at an integer divisor of 8H. Spectral analysis of LR04 confirms this structure empirically and yields an explicit predictive formula.
 
-> **Orbital forcing is not climate.** The formula and analysis in this document capture the **orbital-forcing component** of climate only. Canonical full-LR04 fit explains ~25.5% of the observed variance (R² = 0.2553, L1+L2+L3); the remaining ~74% comes from non-orbital sources — ice-sheet hysteresis, CO₂ and carbon-cycle feedbacks, internal variability (Heinrich events, Dansgaard-Oeschger cycles), and regional asymmetries that distinguish, say, Antarctic from Greenland records. The model takes no position on those components. Orbital cycles are the **clock** that sets the timing of glacial-interglacial transitions; the **magnitude** of the observed climate response is dominated by Earth-system feedbacks, not orbital forcing directly. Within the well-resolved post-MPT window (0–1 Myr), R² reaches **0.8735** — the orbital signal is ~87% of climate variance there, with the conflated full-record number suppressed by regime change. Every prediction in this document — including the forward projection of the next natural glaciation — therefore describes when the orbital clock makes a phase transition possible, not when surface climate necessarily follows.
+> **Orbital forcing is not climate.** The formula and analysis in this document capture the **orbital-forcing component** of climate only. Canonical full-LR04 fit explains ~26% of the observed variance (R² = <!--v:canonR2Full-->0.2584<!--/v-->, L1+L2+L3); the remaining ~74% comes from non-orbital sources — ice-sheet hysteresis, CO₂ and carbon-cycle feedbacks, internal variability (Heinrich events, Dansgaard-Oeschger cycles), and regional asymmetries that distinguish, say, Antarctic from Greenland records. The model takes no position on those components. Orbital cycles are the **clock** that sets the timing of glacial-interglacial transitions; the **magnitude** of the observed climate response is dominated by Earth-system feedbacks, not orbital forcing directly. Within the well-resolved post-MPT window (0–1 Myr), R² reaches **<!--v:canonR2PostMpt-->0.8743<!--/v-->** — the orbital signal is ~87% of climate variance there, with the conflated full-record number suppressed by regime change. Every prediction in this document — including the forward projection of the next natural glaciation — therefore describes when the orbital clock makes a phase transition possible, not when surface climate necessarily follows.
 
 ### 1.1 Approach — bottom-up from observed motion, not top-down from climate
 
 The standard Milankovitch / Laskar framework proceeds **top-down**: start from observed climate spectral peaks (LR04 at ~100, ~41, ~23 kyr), construct beat frequencies (k + g_j, g_i − g_j, …) from Laplace–Lagrange secular eigenmodes, and *select which beat explains which climate peak* by fitting amplitudes against the data. The eigenmodes themselves are mathematically rigorous — they are the diagonalisation of the secular perturbation matrix — but the interpretive overlay that maps a particular beat onto a particular climate signal is climate-data-driven inference. Successive theoretical refinements (Laplace's Great Inequality, mode mixing, post-Newtonian GR corrections, chaotic-diffusion modelling) accumulate to reconcile predicted with observed planetary motion. Open puzzles persist where no clean beat explanation matches: the **100-kyr problem** (eccentricity forcing too weak by orders of magnitude to drive ice ages on its own — [Hays-Imbrie-Shackleton 1976](https://www.science.org/doi/10.1126/science.194.4270.1121) onwards), the **405-kyr absence** in post-MPT LR04 (Berger's theoretically dominant g₂−g₅ eccentricity beat is empirically absent at the predicted amplitude — §7.1), and the **Mid-Pleistocene Transition** (no first-principles mechanism explains the 41-kyr → 100-kyr regime shift).
 
-This framework proceeds **bottom-up** from directly observed orbital motion. Earth's principal precession periods are measured against IAU/JPL/Horizons reference data and anchored observationally (the 1246 AD perihelion-solstice alignment fixes the Earth Fundamental Cycle **H = <!--v:H-->335,317<!--/v--> yr (at J2000)** within recorded astronomical history). All eight planets' principal cycle periods are then measured against [JPL Horizons / WebGeoCalc](56-webgeocalc-explorer.md) data (1800–2100 AD; verified to RMS < 0.09°), and turn out to divide a single longer cycle **8H = <!--v:eightH-->2,682,536<!--/v--> yr (at J2000)** as integer fractions 8H/N — the **Solar System Resonance Cycle** of the title (doc 55). Only after this integer-divisor structure is established from motion alone is the 8H lattice **overlaid onto the climate record**: the L1 orbital-forcing layer of the canonical Climate Formula ([doc 92](92-climate-formula.md)) is the 32 lattice integers, with positions *fixed by orbital geometry* and only the amplitudes (a_n, b_n) fitted to LR04 / CENOGRID / EPICA / CenCO2PIP.
+This framework proceeds **bottom-up** from directly observed orbital motion. Earth's principal precession periods are measured against IAU/JPL/Horizons reference data and anchored observationally (the 1246 AD perihelion-solstice alignment fixes the Earth Fundamental Cycle **H = <!--v:H-->335,317<!--/v--> yr (at J2000)** within recorded astronomical history). All eight planets' principal cycle periods are then measured against [JPL Horizons / WebGeoCalc](56-webgeocalc-explorer.md) data (1800–2100 AD; verified to RMS < 0.09°), and turn out to divide a single longer cycle **8H = <!--v:eightH-->2,682,536<!--/v--> yr (at J2000)** as integer fractions 8H/N — the **Solar System Resonance Cycle** of the title (the per-planet tabulation is archived — [retired record](retired-record.md); the working table is `PLANET_CYCLES`, [doc 93](93-l1-attribution-reference.md)). Only after this integer-divisor structure is established from motion alone is the 8H lattice **overlaid onto the climate record**: the L1 orbital-forcing layer of the canonical Climate Formula ([doc 92](92-climate-formula.md)) is the 32 lattice integers, with positions *fixed by orbital geometry* and only the amplitudes (a_n, b_n) fitted to LR04 / CENOGRID / EPICA / CenCO2PIP.
 
 The structural difference is what makes the model **falsifiable in a way standard theory is not**. In Laskar's framework the set of available beats is large and flexible — almost any climate peak between roughly 10 and 500 kyr can be reached by *some* combination of g_i and s_j eigenmodes with k = Earth's general precession, so the spectral peaks themselves can't disconfirm the framework. In this framework the 8H lattice is a **structural commitment**: climate peaks at frequencies not equal to 8H/N for any integer N would falsify the orbital-forcing layer. The closure test (§7.3) verifies exactly this — fitting all 200 integer divisors of 8H jointly to LR04 leaves zero residual peaks in empty lattice regions (n ≈ 43.5, n ≈ 80, etc.). The framework's commitment to integer-divisor structure survives the test the standard framework does not have to take.
 
@@ -31,11 +31,11 @@ The structural difference is what makes the model **falsifiable in a way standar
 
 $$C(t) \;=\; c_0 \;+\; \sum_{n \in N} \left[\, a_n \cos\!\left(\tfrac{2\pi n t}{8H}\right) + b_n \sin\!\left(\tfrac{2\pi n t}{8H}\right) \,\right]$$
 
-with **N = 33 integer divisors** of 8H (the canonical L1 lattice — see [doc 92 §2.3](92-climate-formula.md#23-the-33-lattice-integers--per-line-identities)), fitted via sequential ridge regression per regime on LR04 (T = 5,320 kyr; full-LR04 R² = 0.2553 L1+L2+L3, post-MPT R² = 0.8735). Each integer corresponds to a specific eigenmode beat or direct planet apsidal/nodal period from the model's doc 55 period table.
+with **N = 33 integer divisors** of 8H (the canonical L1 lattice — see [doc 92 §2.3](92-climate-formula.md#23-the-33-lattice-integers--per-line-identities)), fitted via sequential ridge regression per regime on LR04 (T = 5,320 kyr; full-LR04 R² = <!--v:canonR2Full-->0.2584<!--/v--> L1+L2+L3, post-MPT R² = <!--v:canonR2PostMpt-->0.8743<!--/v-->). Each integer corresponds to a specific eigenmode beat or direct planet apsidal/nodal period from the model's `PLANET_CYCLES` period table ([doc 93](93-l1-attribution-reference.md)).
 
 ### Five headline findings
 
-1. **Every significant LR04 climate peak sits at an integer divisor of 8H.** The canonical formula carries **33 such integers** — 25 framework integers (with 19 above the 3× median significance threshold in full LR04, plus 6 more visible in pre-MPT data) + 6 precession-band sidebands surfaced by MTM enrichment (Test L) + 1 Berger-quintet completion at n=141 (k+g₃ Earth at 19 kyr, 3σ in Cheng monsoon) + 1 regime-admitted line at n=24 (Earth's own H/3 eccentricity line, <!--v:l1N24AmpOverMedianPreInhg-->1.64<!--/v-->× median and cross-validated positive in the pre-iNHG regime, [doc 94 §10](94-insolation-null-test.md); the only divisor attributed to Earth's eccentricity rather than a planetary beat, with no secular-theory counterpart). **Admission rule** (stated so it cannot drift): a divisor joins L1 if it is ≥ 3× median amplitude on full LR04, *or* ≥ 1.5× median **and** split-half cross-validated positive in a named regime (the six pre-MPT-only members and n=24), *or* MTM-significant on the full record (Test L, the six sidebands). All have clean physical interpretations as standard celestial-mechanics beats (k+g_j climatic precession, k+s_j obliquity sub-peaks, g_j−g_k eccentricity beats, s_j−s_k nodal beats) or direct planet apsidal/nodal cycles from doc 55 (Mercury, Mars, Jupiter, Uranus). The exception is n=66 — not a distinct eigenmode beat but the arithmetic-mean cycle length in the obliquity band; it resolves to near-zero amplitude at full LR04 resolution (see §6.6). **Every one of these 32 integers also has an explicit Holistic-model attribution as a multi-planet beat from PLANET_CYCLES** — different from Berger / secular theory's single-planet attribution for every integer; the full dual-attribution table is at [doc 93 — L1 attribution reference](93-l1-attribution-reference.md). Headline example: n=120 (the 22.4 kyr peak Berger labels "k+g₂ Venus") is in the Holistic model the clean 2-term beat **Earth.Axial(104) + Jupiter.Obliq(16)** — Jupiter, not Venus.
+1. **Every significant LR04 climate peak sits at an integer divisor of 8H.** The canonical formula carries **33 such integers** — 25 framework integers (with 19 above the 3× median significance threshold in full LR04, plus 6 more visible in pre-MPT data) + 6 precession-band sidebands surfaced by MTM enrichment (Test L) + 1 Berger-quintet completion at n=141 (k+g₃ Earth at 19 kyr, 3σ in Cheng monsoon) + 1 regime-admitted line at n=24 (Earth's own H/3 eccentricity line, <!--v:l1N24AmpOverMedianPreInhg-->1.64<!--/v-->× median and cross-validated positive in the pre-iNHG regime, [doc 94 §10](94-insolation-null-test.md); the only divisor attributed to Earth's eccentricity rather than a planetary beat, with no secular-theory counterpart). **Admission rule** (stated so it cannot drift): a divisor joins L1 if it is ≥ 3× median amplitude on full LR04, *or* ≥ 1.5× median **and** split-half cross-validated positive in a named regime (the six pre-MPT-only members and n=24), *or* MTM-significant on the full record (Test L, the six sidebands). All have clean physical interpretations as standard celestial-mechanics beats (k+g_j climatic precession, k+s_j obliquity sub-peaks, g_j−g_k eccentricity beats, s_j−s_k nodal beats) or direct planet apsidal/nodal cycles from the `PLANET_CYCLES` table (Mercury, Mars, Jupiter, Uranus). The exception is n=66 — not a distinct eigenmode beat but the arithmetic-mean cycle length in the obliquity band; it resolves to near-zero amplitude at full LR04 resolution (see §6.6). **Every one of these 32 integers also has an explicit Holistic-model attribution as a multi-planet beat from PLANET_CYCLES** — different from Berger / secular theory's single-planet attribution for every integer; the full dual-attribution table is at [doc 93 — L1 attribution reference](93-l1-attribution-reference.md). Headline example: n=120 (the 22.4 kyr peak Berger labels "k+g₂ Venus") is in the Holistic model the clean 2-term beat **Earth.Axial(104) + Jupiter.Obliq(16)** — Jupiter, not Venus.
 
 2. **Mars dominates the per-planet climate fingerprint.** Two exclusive direct matches in LR04 (n=16 Mars Axial = 8H/16, n=21 Mars Obliquity = 8H/21), plus participation in additional LR04 peaks at n=25 (the Mercury–Mars s₁−s₄ nodal beat, the 100-kyr-band centroid), n=53 (the Mars.AscNode(64)−Uranus.AscNode(11) s-beat sitting close to the Mars eccentricity cycle at 8H/52), and n=35 (a 3-term beat close to Mars's perihelion ecliptic at 8H/36 — a period that exactly equals Jupiter's ascending-node period, creating a Mars-Jupiter resonance lock). Mars's strong gravitational coupling to Earth — Earth's nearest outer rocky neighbour, with similar apsidal eigenmode rate (g₃ ≈ 17.4″/yr, g₄ ≈ 17.9″/yr) — produces the cleanest planet-coupling signal of any planet. Neptune contributes nothing directly in LR04 full but appears via pre-MPT eigenmode beats (Venus-Neptune n=14, Neptune-Earth nodal n=38) — visible only when the post-MPT ice-sheet response doesn't dominate.
 
@@ -105,7 +105,7 @@ Both descriptions of the same physics are valid — they measure the same geomet
 
 #### Why 8H still survives the frame transformation
 
-If each planetary apsidal and nodal eigenmode (g_j, s_j) is itself an integer divisor of 8H — the model's deeper claim, established in [doc 55 — Solar System Resonance Cycle Periods](55-solar-system-resonance-cycle-periods.md) — then any sum or difference of two such eigenmodes (`k + g_j`, `g_j − g_k`, …) is also an integer divisor of 8H. The frame transformation moves the climate signal from one 8H-divisor integer to another, but never *off* the integer lattice. That is why every observed climate peak in the canonical L1 lattice ([doc 92 §2.3](92-climate-formula.md#23-the-33-lattice-integers--per-line-identities)) still lands on an integer n, even though the integers are offset from the pure Fibonacci anchors of Earth in isolation. 8H is the synchronisation period of the entire solar system; the climate spectrum inherits that synchronisation, with the specific n determined by which two clocks are beating against each other.
+If each planetary apsidal and nodal eigenmode (g_j, s_j) is itself an integer divisor of 8H — the retired lattice framework's deeper claim (archived, [retired record](retired-record.md); re-evaluated in [doc 109](109-model-nbody-engine-and-lattice-test.md)) — then any sum or difference of two such eigenmodes (`k + g_j`, `g_j − g_k`, …) is also an integer divisor of 8H. The frame transformation moves the climate signal from one 8H-divisor integer to another, but never *off* the integer lattice. That is why every observed climate peak in the canonical L1 lattice ([doc 92 §2.3](92-climate-formula.md#23-the-33-lattice-integers--per-line-identities)) still lands on an integer n, even though the integers are offset from the pure Fibonacci anchors of Earth in isolation. 8H is the synchronisation period of the entire solar system; the climate spectrum inherits that synchronisation, with the specific n determined by which two clocks are beating against each other.
 
 #### The eigenmodes are real; only the attribution differs
 
@@ -117,25 +117,25 @@ What differs between frameworks is **physical attribution**:
 |---|---|---|
 | Eigenmodes (g_j, s_j) | Mathematical objects — accepted | Mathematical objects — accepted |
 | Attribution to planets | g_j labelled by the planet whose contribution dominates that mode (g₅ = "Jupiter", g₂ = "Venus", g₃ = "Earth", …) | **Not endorsed** — the eigenmodes are composite modes of the multi-planet system, not single-planet quantities |
-| Planet-specific cycles | Same as the eigenmode periods (1/g₅ ≈ 305 kyr "is" Jupiter's apsidal period) | Specific 8H-divisor cycles per [doc 55 period table](55-solar-system-resonance-cycle-periods.md) (Jupiter ecliptic perihelion = 8H/39 = 68.78 kyr; Jupiter ICRF perihelion = 8H/65 = 41.27 kyr; Jupiter Axial = 8H/21; … the Fibonacci anchors are H/5 and H/8) |
+| Planet-specific cycles | Same as the eigenmode periods (1/g₅ ≈ 305 kyr "is" Jupiter's apsidal period) | Specific per-planet cycles (Jupiter ecliptic perihelion = 8H/39 = 68.78 kyr; Jupiter ICRF perihelion = 8H/65 = 41.27 kyr; Jupiter Axial = 8H/21; the per-planet tabulation is archived — [retired record](retired-record.md)) |
 
-**Notation in this document.** Throughout this document, references like *"k+g₅ climatic precession sub-peak"* mean **the mathematical eigenmode beat**, *not* "Jupiter modulation of climatic precession". The 23.7-kyr peak at n=113 is real and is correctly described as k+g₅; whether g₅ is "Jupiter" is a separate (Berger) interpretive claim that the model does not accept. When we want the model's planet-specific cycle for Jupiter (or any other planet), we use the doc 55 notation: e.g., **Jupiter ecliptic perihelion = 8H/39** (8H-lattice secular; Fibonacci anchor H/5) and **Jupiter Axial = 8H/21**, two distinct cycles that don't reduce to a single "Jupiter eigenmode".
+**Notation in this document.** Throughout this document, references like *"k+g₅ climatic precession sub-peak"* mean **the mathematical eigenmode beat**, *not* "Jupiter modulation of climatic precession". The 23.7-kyr peak at n=113 is real and is correctly described as k+g₅; whether g₅ is "Jupiter" is a separate (Berger) interpretive claim that the model does not accept. When we want the model's planet-specific cycle for Jupiter (or any other planet), we use the planet-cycle notation: e.g., **Jupiter ecliptic perihelion = 8H/39** (8H-lattice secular; Fibonacci anchor H/5) and **Jupiter Axial = 8H/21**, two distinct cycles that don't reduce to a single "Jupiter eigenmode".
 
 ---
 
 > **Reader's lookup.** Throughout this document, climate-cycle periods are referenced by integer **n** denoting the 8H/n divisor (e.g. n = 25 corresponds to period 8H/25 = 107.3 kyr). The canonical per-line reference lookup for every n used here is **[doc 92 §2.3 — The 32 lattice integers](92-climate-formula.md#23-the-33-lattice-integers--per-line-identities)** — its third column tells you which eigenmode beat or direct planet cycle each integer represents.
 
-> **Canonical climate formula → doc 92.** The canonical climate formula is **doc 92's three-layer architecture**: **33 L1 integers** (25 framework integers + 6 precession-band sidebands surfaced by Test L + n=141 Berger-quintet completion + n=24 Earth's H/3 eccentricity line, regime-admitted per doc 94 §10); L2 carbon-cycle thermostat (3 lines); L3 climate-state Heaviside transitions (6 steps); ridge regression λ=1 on L1; sequential per-regime fitting on LR04/CENOGRID/EPICA/CenCO2PIP. Canonical R²: full LR04 = 0.2553, post-MPT = 0.8735, iNHG-MPT = 0.7289, pre-iNHG = 0.4298, EPICA CO₂ = 0.8452, CenCO2PIP 0–66 Ma = 0.7626. For the canonical architecture and forward projection see [doc 92 §9](92-climate-formula.md#9-the-canonical-climate-formula).
+> **Canonical climate formula → doc 92.** The canonical climate formula is **doc 92's three-layer architecture**: **33 L1 integers** (25 framework integers + 6 precession-band sidebands surfaced by Test L + n=141 Berger-quintet completion + n=24 Earth's H/3 eccentricity line, regime-admitted per doc 94 §10); L2 carbon-cycle thermostat (3 lines); L3 climate-state Heaviside transitions (6 steps); ridge regression λ=1 on L1; sequential per-regime fitting on LR04/CENOGRID/EPICA/CenCO2PIP. Canonical R²: full LR04 = <!--v:canonR2Full-->0.2584<!--/v-->, post-MPT = <!--v:canonR2PostMpt-->0.8743<!--/v-->, iNHG-MPT = <!--v:canonR2InhgMpt-->0.7345<!--/v-->, pre-iNHG = <!--v:canonR2PreInhg-->0.4493<!--/v-->, EPICA CO₂ = <!--v:canonR2Epica-->0.8453<!--/v-->, CenCO2PIP 0–66 Ma = 0.7626. For the canonical architecture and forward projection see [doc 92 §9](92-climate-formula.md#9-the-canonical-climate-formula).
 
 ## 3. Per-Planet Contributions to Earth's Climate
 
-For each climate peak, cross-reference against the full doc 55 8H/n period table (8 planets × 6 cycle types = 48 entries; 46 active after dropping frozen Uranus/Neptune axial precession). Count exact and ±1-near matches per planet.
+For each climate peak, cross-reference against the full `PLANET_CYCLES` 8H/n period table (8 planets × 6 cycle types = 48 entries; 46 active after dropping frozen Uranus/Neptune axial precession). Count exact and ±1-near matches per planet.
 
 ### 3.1 LR04 full (T = 5,320 kyr)
 
 | Planet | Exact direct matches | Near (±1) | Total | Exclusive direct matches |
 |---|---:|---:|---:|---|
-| **Mars** | 2 | 3 | 5 | **n=35 (near Mars Peri_ecl 8H/36), n=53 (near Mars Ecc 8H/52)** — both unique to Mars in doc 55, each one lattice step off the shipped integer |
+| **Mars** | 2 | 3 | 5 | **n=35 (near Mars Peri_ecl 8H/36), n=53 (near Mars Ecc 8H/52)** — both unique to Mars in the planet-cycle table, each one lattice step off the shipped integer |
 | Jupiter | 0 | 5 | 5 | none (shared integers with Mars Obliq, Earth AscNode, Saturn Peri_ecl, Uranus Obliq) |
 | Saturn | 0 | 4 | 4 | none (shared integers) |
 | Mercury | 2 | 1 | 3 | n=9 (Axial = AscNode by Cassini lock) |
@@ -146,7 +146,7 @@ For each climate peak, cross-reference against the full doc 55 8H/n period table
 
 ### 3.2 Mars's exclusive direct matches
 
-Two peaks in LR04 full coincide exactly with doc 55 entries that no other planet shares:
+Two peaks in LR04 full coincide exactly with planet-cycle entries that no other planet shares:
 
 The model's Mars perihelion ecliptic is at 8H/36, Mars eccentricity cycle at 8H/52. The LR04 4σ peaks at n=35 and n=53 (very close to these Mars periods) arise via multi-planet beats in the current model (per [doc 93](93-l1-attribution-reference.md)):
 
@@ -161,7 +161,7 @@ Mars participates in the n=53 beat directly via its ascending node. The n=25 LR0
 
 The pre-MPT window (T = 1,800 kyr, the canonical 41-kyr world) reveals *more* model-direct matches than LR04 full:
 
-| Planet | Exact | Near (±1) | Total | Doc 55 entries hit |
+| Planet | Exact | Near (±1) | Total | Planet-cycle entries hit |
 |---|---:|---:|---:|---|
 | **Mars** | **3** | 1 | 4 | n=16 (Axial), n=21 (Obliq); n=68 ≈ ICRF (Mars ICRF at 8H/68 exactly); n=53 close to Mars Ecc 8H/52 |
 | Jupiter | 2 | 0 | 2 | n=16 (Obliq — shared with Mars Axial); n=21 (Axial — shared with Mars Obliq) |
@@ -172,7 +172,7 @@ The pre-MPT window (T = 1,800 kyr, the canonical 41-kyr world) reveals *more* mo
 | Venus | 0 | 0 | 0 | — (contributes via eigenmode beats, §3.4) |
 | Neptune | 0 | 0 | 0 | — (contributes via eigenmode beats, §3.4) |
 
-Mars has **two exclusive direct matches**: n=16 (Mars Axial = 8H/16) and n=21 (Mars Obliquity = 8H/21). The doc 55 "Mars-Jupiter Axial-Obliquity Swap" identity (both planets share N=16 and N=21 with axial and obliquity exchanged) appears empirically as direct climate peaks. The Mars Eccentricity period sits at 8H/52 (very close to n=53) and the LR04 4σ peak at n=53 is generated by the Mars.AscNode(64) − Uranus.AscNode(11) s-beat ([doc 93](93-l1-attribution-reference.md)).
+Mars has **two exclusive direct matches**: n=16 (Mars Axial = 8H/16) and n=21 (Mars Obliquity = 8H/21). The "Mars-Jupiter Axial-Obliquity Swap" identity (both planets share N=16 and N=21 with axial and obliquity exchanged) appears empirically as direct climate peaks. The Mars Eccentricity period sits at 8H/52 (very close to n=53) and the LR04 4σ peak at n=53 is generated by the Mars.AscNode(64) − Uranus.AscNode(11) s-beat ([doc 93](93-l1-attribution-reference.md)).
 
 ### 3.4 Pre-MPT eigenmode beats reveal Neptune and Uranus
 
@@ -196,7 +196,7 @@ Three pre-MPT-only peaks correspond to **Venus-Neptune, Earth-Uranus, and Neptun
 
 ### 3.6 Cross-planet obliquity validation
 
-The model's obliquity-period claims for the inner solar system (doc 37 § obliquity table) match three independent peer-reviewed references with **zero free parameters**:
+The model's obliquity-period claims for the inner solar system match three independent peer-reviewed references with **zero free parameters** (the per-planet obliquity tabulation is archived — [retired record](retired-record.md)):
 
 | Planet | Published period | Reference | Model H/n | Period (yr) | Deviation |
 |---|---|---|---|---|---|
@@ -212,13 +212,13 @@ For Jupiter, Saturn, Uranus, and Neptune, standard secular theory reports **no r
 
 | Planet | Published literature | Model H/n prediction |
 |---|---|---:|
-| Venus | tidally damped at 177° (Correia & Laskar 2003) | 8H/110 = **<!--v:venusObliqCycle-->24,387<!--/v--> yr** (model: net residual after two opposing precession components nearly cancel — see doc 37) |
+| Venus | tidally damped at 177° (Correia & Laskar 2003) | 8H/110 = **<!--v:venusObliqCycle-->24,387<!--/v--> yr** (model: net residual after two opposing precession components nearly cancel) |
 | Jupiter | "No regular cycle" — Gyr secular trend 3.1° → 6–37° (Saillenfest 2020) | H/2 = **<!--v:hDiv2-->167,659<!--/v--> yr** |
 | Saturn | "No regular cycle" — Gyr trend 26.7° → 65°+ via Neptune resonance (Saillenfest 2021; Wisdom 2022) | H/3 = **<!--v:earthPeriPeriodICRF-->111,772<!--/v--> yr** |
 | Uranus | Frozen — > 100 Myr precession (Saillenfest 2022) | H/2 = **<!--v:hDiv2-->167,659<!--/v--> yr** |
 | Neptune | Frozen (Rogoszinski & Hamilton 2020) | 8H/100 = **<!--v:neptuneObliqCycle-->26,825<!--/v--> yr** |
 
-This is a **falsifiable but currently un-testable set of predictions**: no kiloyear-resolution obliquity observations exist for the outer planets, so neither the "no cycle" standard view nor the model's specific period can be directly verified at present. Future precision astrometry from probes (Juno extended mission for Jupiter; dedicated Saturn-system or ice-giant missions) could discriminate. See [doc 37 — Planetary Precession Cycles](37-planets-precession-cycles.md) §"Reference: Obliquity Oscillation" for the canonical model-vs-standard comparison table.
+This is a **falsifiable but currently un-testable set of predictions**: no kiloyear-resolution obliquity observations exist for the outer planets, so neither the "no cycle" standard view nor the model's specific period can be directly verified at present. Future precision astrometry from probes (Juno extended mission for Jupiter; dedicated Saturn-system or ice-giant missions) could discriminate. (The canonical model-vs-standard obliquity comparison table is archived — [retired record](retired-record.md).)
 
 Reproducer: `scripts/milankovitch_planet_climate_match.py`; results in `data/milankovitch-planet-climate-match.json`.
 
@@ -250,7 +250,7 @@ The candidates 95 kyr (g₄−g₅), 100 kyr (centroid), and 112 kyr (H/3) **lie
 
 Three independent empirical tests bear on the eccentricity-vs-inclination-side question:
 
-- **405-kyr absence.** Standard Milankovitch predicts a g₂−g₅ Venus-Jupiter eccentricity beat (~405 kyr) should dominate the eccentricity-side signal. In post-MPT LR04 it is **essentially absent** — amplitude ratio 0.12 vs the 100-kyr-band peak. In this framework, the empirical 405-kyr cycle is not orbital at all: it does not coincide with any 8H/n integer or any beat between doc-55 cycles, and is modelled as the carbon-cycle silicate-weathering thermostat resonance (climate-internal physics, loosely entrained by long-period orbital forcing). It is filtered out post-MPT by the ice-sheet response that suppresses other slow signals (see §13). **First specific failure mode** of the standard eccentricity attribution. Full methodology in §7.1.
+- **405-kyr absence.** Standard Milankovitch predicts a g₂−g₅ Venus-Jupiter eccentricity beat (~405 kyr) should dominate the eccentricity-side signal. In post-MPT LR04 it is **essentially absent** — amplitude ratio 0.12 vs the 100-kyr-band peak. In this framework, the empirical 405-kyr cycle is not orbital at all: it does not coincide with any 8H/n integer or any beat between the model's planet cycles, and is modelled as the carbon-cycle silicate-weathering thermostat resonance (climate-internal physics, loosely entrained by long-period orbital forcing). It is filtered out post-MPT by the ice-sheet response that suppresses other slow signals (see §13). **First specific failure mode** of the standard eccentricity attribution. Full methodology in §7.1.
 
 - **No bispectral coupling.** Direct bispectral analysis of LR04 in the 100-kyr band fails to detect significant 95k+125k phase coupling — replicating Muller & MacDonald 1997. **Second specific failure mode**. Descriptive: rules out a specific eccentricity-coupling signature; does not positively confirm inclination. Full methodology in §7.2.
 
@@ -310,7 +310,7 @@ The following findings of the model are **independent of which attribution wins 
 - 405-kyr term essentially absent in post-MPT LR04 (ratio 0.12, §4.4)
 - No eccentricity-beat phase coupling in LR04 (§4.4)
 - 31 of 32 canonical formula components have clean eigenmode-beat or direct-planet-cycle interpretations as integer divisors of 8H (the only exception is n=66, the obliquity-band arithmetic-mean cycle length — see §6.6)
-- Seven integers in the formula are direct doc 55 planet-cycle matches: n=9 (Mercury Axial / AscNode), n=12 (Uranus AscNode), n=16 (Mars Axial / Jupiter Obliq / Uranus Obliq), n=21 (Mars Obliq / Jupiter Axial), n=35 (Mars Peri_ecl), n=53 (Mars Ecc), n=110 (Venus Obliq)
+- Seven integers in the formula are direct planet-cycle matches: n=9 (Mercury Axial / AscNode), n=12 (Uranus AscNode), n=16 (Mars Axial / Jupiter Obliq / Uranus Obliq), n=21 (Mars Obliq / Jupiter Axial), n=35 (Mars Peri_ecl), n=53 (Mars Ecc), n=110 (Venus Obliq)
 
 These are the **robust contributions** of the Holistic model to Milankovitch theory. The 100-kyr-cycle attribution is the *specific* claim with the most empirical contention — it is *competitive*, not *decisively confirmed*.
 
@@ -522,7 +522,7 @@ The observed max bicoherence (0.507) is **below** the null 95th percentile (0.55
 
 ### 7.3 The 8H integer-lattice closure test
 
-**Hypothesis tested.** The strongest possible test of the 8H-divisor framework is its closure: do **all** significant spectral peaks in LR04 land on integer divisors of 8H, or are there orphan peaks at positions that cannot be reached by `8H/n` for any integer n? An orphan peak at, say, n = 43.5 (with non-negligible amplitude) would falsify the framework — it would imply forcing structure outside the planetary-eigenmode framework, since every Laskar eigenmode and every doc 55 planet cycle is an integer divisor of 8H. This is the discriminating test: the framework predicts **no peaks off the integer lattice**.
+**Hypothesis tested.** The strongest possible test of the 8H-divisor framework is its closure: do **all** significant spectral peaks in LR04 land on integer divisors of 8H, or are there orphan peaks at positions that cannot be reached by `8H/n` for any integer n? An orphan peak at, say, n = 43.5 (with non-negligible amplitude) would falsify the framework — it would imply forcing structure outside the planetary-eigenmode framework, since every Laskar eigenmode and every planet cycle in the model's table is an integer divisor of 8H. This is the discriminating test: the framework predicts **no peaks off the integer lattice**.
 
 **Method.**
 
@@ -1041,7 +1041,7 @@ Data: [data/milankovitch-8h-xval-phase.json](../data/milankovitch-8h-xval-phase.
 
 ### 12.14 Test N — 405-kyr line position measurement on CENOGRID
 
-A ~405-kyr long-eccentricity cycle is well-documented in pre-Pleistocene climate records. Standard Milankovitch (Laskar 2004) attributes it to a g₂ − g₅ secular eigenbeat at 3.196 arcsec/yr; this framework's planet motions ([doc 55](55-solar-system-resonance-cycle-periods.md)) don't produce this period via any planet-pair beat (see §13 for the dedicated investigation). Test N measures where the empirical peak sits in CENOGRID across Cenozoic intervals where the long-eccentricity signal is strong:
+A ~405-kyr long-eccentricity cycle is well-documented in pre-Pleistocene climate records. Standard Milankovitch (Laskar 2004) attributes it to a g₂ − g₅ secular eigenbeat at 3.196 arcsec/yr; the retired lattice framework's planet motions don't produce this period via any planet-pair beat (see §13 for the dedicated investigation). Test N measures where the empirical peak sits in CENOGRID across Cenozoic intervals where the long-eccentricity signal is strong:
 
 | Interval | Span | Empirical peak | Distance to Laskar 405 |
 |---|---:|---:|---:|
@@ -1109,18 +1109,18 @@ The 405-kyr cycle is a **real, empirically observed climate signal**. Across CEN
 
 **Standard Milankovitch interpretation (Laskar 2004).** Laskar's secular dynamics identifies a g₂ − g₅ eccentricity precession beat at 3.196 arcsec/yr → 405,506 yr, conventionally labelled "Venus-Jupiter". In that framework, Venus's apsidal precession rate g₂ = 7.453 arcsec/yr (period ≈ 174 kyr) and Jupiter's g₅ = 4.257 arcsec/yr (period ≈ 305 kyr) are interpreted as Venus's and Jupiter's actual apsidal motions, and their phase difference modulates Earth's eccentricity envelope at 405 kyr.
 
-**This framework's planet motions ([doc 55](55-solar-system-resonance-cycle-periods.md)) are different.** Venus and Jupiter have different apsidal periods here than Laskar's eigenfrequencies:
+**The retired lattice framework's planet motions were different.** Venus and Jupiter carried different apsidal periods there than Laskar's eigenfrequencies:
 
-| Planet | Laskar (g_i) apsidal period | Framework (doc 55) ecliptic perihelion |
+| Planet | Laskar (g_i) apsidal period | Framework ecliptic perihelion |
 |---|---:|---:|
 | Venus | ~174 kyr (g₂ = 7.453″/yr) | **−<!--v:venusPeriPeriod-->447,089<!--/v--> yr** (= −8H/6, retrograde) |
 | Jupiter | ~305 kyr (g₅ = 4.257″/yr) | **+<!--v:jupiterPeriPeriod-->68,783<!--/v--> yr** (= 8H/39) |
 
-In the framework's planet motions, Venus's and Jupiter's perihelion-precession rates produce a beat at ~58 or ~79 kyr (depending on sign convention), **not 405 kyr**. The §13.3 mathematical proof confirms it: no combination of any cycles in doc 55 reaches the 405-kyr range. The framework simply does not have a Venus-Jupiter beat at 405 kyr.
+In the framework's planet motions, Venus's and Jupiter's perihelion-precession rates produce a beat at ~58 or ~79 kyr (depending on sign convention), **not 405 kyr**. The §13.3 mathematical proof confirms it: no combination of any cycles in the planet-cycle table reaches the 405-kyr range. The framework simply does not have a Venus-Jupiter beat at 405 kyr.
 
 **Two possible resolutions in this framework:**
 
-1. The 405-kyr cycle is a real orbital eigenbeat that doesn't fit the doc-55 motion table — a true "off-lattice" orbital phenomenon that the framework's planet-motion model fails to capture.
+1. The 405-kyr cycle is a real orbital eigenbeat that doesn't fit the model's planet-motion table — a true "off-lattice" orbital phenomenon that the framework's planet-motion model fails to capture.
 2. The 405-kyr cycle is **not orbital at all** in this framework — it exists in climate records as a carbon-cycle internal oscillator (Layer 2), with whatever orbital entrainment happens through long-period eccentricity variations that may not have a clean Venus-Jupiter attribution.
 
 The empirical evidence assembled in §13.5–§13.6 (carbon-cycle amplification confirmed; large phase drift between proxies; the cycle entrains-but-doesn't-rigidly-track orbital phase) favours **resolution 2**: the 405-kyr cycle in climate records is primarily a climate-system internal phenomenon, not a planetary motion beat. This is a cleaner story than Laskar's because it doesn't require attributing the cycle to specific planet pairs whose precession rates are framework-dependent. The carbon-cycle silicate-weathering thermostat resonance at ~400 kyr is a property of Earth's climate physics that is independent of which secular-theory variant one uses for the planets.
@@ -1144,19 +1144,19 @@ Data: [data/milankovitch-8h-405k-spread.json](../data/milankovitch-8h-405k-sprea
 
 ### 13.3 No combination of 8H integer-divisor cycles can reach 405 kyr
 
-A systematic search of all pair and triplet beats among the 46 cycles in [doc 55](55-solar-system-resonance-cycle-periods.md) (8 planets × up to 6 cycle types each) finds **zero combinations** within ±3 % of 405 kyr.
+A systematic search of all pair and triplet beats among the retired lattice's 46 cycles (8 planets × up to 6 cycle types each; archived — [retired record](retired-record.md)) finds **zero combinations** within ±3 % of 405 kyr.
 
 The closest matches cluster at two discrete positions:
 - **383 kyr** (= 8H/7) — 5.4 % below the empirical line
 - **447 kyr** (= 8H/6) — 10.4 % above
 
-This is a **mathematical property of the 8H lattice**. Every cycle in doc 55 has the form 8H/N for integer N. A beat between two such cycles is:
+This is a **mathematical property of the 8H lattice**. Every cycle in the planet-cycle table has the form 8H/N for integer N. A beat between two such cycles is:
 
   beat = 1 / |s₁/(8H/N₁) + s₂/(8H/N₂)| = 8H / |s₁N₁ + s₂N₂|
 
-which is itself a fraction **8H / integer**. The same is true for triplets, quadruplets, *any* combination. **Every possible beat from doc 55 must land on a 8H/integer position.**
+which is itself a fraction **8H / integer**. The same is true for triplets, quadruplets, *any* combination. **Every possible beat from the planet-cycle table must land on a 8H/integer position.**
 
-The integer divisors near 405 kyr are 8H/6 = 447.09 and 8H/7 = 383.22 — separated by 64 kyr with 405 sitting in the middle. The 8H integer-divisor lattice has **a fundamental gap at 405 kyr that no combination of doc 55 cycles can fill.**
+The integer divisors near 405 kyr are 8H/6 = 447.09 and 8H/7 = 383.22 — separated by 64 kyr with 405 sitting in the middle. The 8H integer-divisor lattice has **a fundamental gap at 405 kyr that no combination of planet cycles can fill.**
 
 Even the broader **16H/N lattice** is insufficient: 16H/13 = 412.70 kyr, off by 7.7 kyr from the empirical 404.5 — well outside the line's FWHM.
 
@@ -1216,7 +1216,7 @@ Data: [data/milankovitch-8h-405k-phase-stability.json](../data/milankovitch-8h-4
 
 ### 13.7 The mechanism is selective, not broad-spectrum
 
-A natural follow-up: if the carbon cycle amplifies the 405-kyr signal as a narrow resonance peak, does it also amplify *other* long-period signals? A common candidate in the literature is a ~2.4-Myr cycle — Laskar 2004 places a g₄ − g₃ secular eigenbeat at 0.548 arcsec/yr → 2.365 Myr, conventionally labelled "Mars-Earth eccentricity beat" in that framework. As with the 405-kyr cycle, this label assumes Laskar's eigenfrequencies; the framework's planet motions ([doc 55](55-solar-system-resonance-cycle-periods.md)) have different Mars and Earth apsidal periods, so the attribution doesn't carry over. What we can test directly is whether the climate record shows a 2.4-Myr signal with the same carbon-cycle amplification signature as 405-kyr.
+A natural follow-up: if the carbon cycle amplifies the 405-kyr signal as a narrow resonance peak, does it also amplify *other* long-period signals? A common candidate in the literature is a ~2.4-Myr cycle — Laskar 2004 places a g₄ − g₃ secular eigenbeat at 0.548 arcsec/yr → 2.365 Myr, conventionally labelled "Mars-Earth eccentricity beat" in that framework. As with the 405-kyr cycle, this label assumes Laskar's eigenfrequencies; the retired lattice framework carried different Mars and Earth apsidal periods, so the attribution didn't carry over there. What we can test directly is whether the climate record shows a 2.4-Myr signal with the same carbon-cycle amplification signature as 405-kyr.
 
 If the carbon cycle resonated broadly at long periods (e.g., through organic-carbon burial at 1–10 Myr time constants), 2.4 Myr should show similar δ¹³C/δ¹⁸O amplification.
 
@@ -1263,12 +1263,12 @@ Putting all the 405-kyr findings together produces a two-layer picture of the fr
 │  LAYER 1 — ORBITAL MOTIONS (the 8H integer-divisor lattice)         │
 │    Axial precessions, perihelion advances, ascending-node           │
 │    regressions, obliquity oscillations, eccentricity-cycle          │
-│    wobble periods. All of the form 8H/N for integer N (doc 55).     │
+│    wobble periods. All of the form 8H/N for integer N.              │
 │    These are spinning/precessing rates — actual motions of bodies.  │
-│    The 32 active framework integers explain LR04 R²=0.2553 (full)   │
-│    and R² = 0.8735 (post-MPT regime).                                │
+│    The 33 framework integers explain LR04 R²=0.2584 (full)          │
+│    and R² = 0.8743 (post-MPT regime).                                │
 │    14/15 climate-band peaks across 67-Myr Cenozoic land here.       │
-│    Beats between any doc-55 cycles also land on the 8H lattice      │
+│    Beats between any planet cycles also land on the 8H lattice      │
 │    (mathematical closure), so no off-lattice orbital cycle can      │
 │    emerge from this framework's planet-motion model.                │
 └─────────────────────────────────────────────────────────────────────┘
@@ -1286,9 +1286,9 @@ Putting all the 405-kyr findings together produces a two-layer picture of the fr
 └─────────────────────────────────────────────────────────────────────┘
 ```
 
-The framework's 8H integer-divisor structure is a **Layer-1 statement**: it describes orbital motions and predicts where most climate-spectral peaks land. The 405-kyr cycle is **not** a Layer-1 phenomenon in this framework — no combination of doc-55 cycles produces it. It is therefore a **Layer-2 climate-system phenomenon**: the silicate-weathering thermostat resonates at ~400 kyr (a property of Earth's carbon-cycle physics, not orbital geometry), and that resonance gets loosely entrained by long-period orbital eccentricity forcing — without any specific Venus-Jupiter or other planetary-pair attribution required.
+The framework's 8H integer-divisor structure is a **Layer-1 statement**: it describes orbital motions and predicts where most climate-spectral peaks land. The 405-kyr cycle is **not** a Layer-1 phenomenon in this framework — no combination of the model's planet cycles produces it. It is therefore a **Layer-2 climate-system phenomenon**: the silicate-weathering thermostat resonates at ~400 kyr (a property of Earth's carbon-cycle physics, not orbital geometry), and that resonance gets loosely entrained by long-period orbital eccentricity forcing — without any specific Venus-Jupiter or other planetary-pair attribution required.
 
-Standard Milankovitch theory attributes the 405-kyr signal to a Laskar g₂−g₅ Venus-Jupiter apsidal beat. That attribution uses Laskar's secular-theory eigenfrequencies, which assign Venus and Jupiter different apsidal periods than [doc 55](55-solar-system-resonance-cycle-periods.md). In this framework's planet motions, no such Venus-Jupiter beat at 405 kyr exists — so the framework neither needs nor adopts that attribution. The 405-kyr signal is real climate physics; the standard Milankovitch label "g₂−g₅" is a convention from a different orbital-dynamics framework.
+Standard Milankovitch theory attributes the 405-kyr signal to a Laskar g₂−g₅ Venus-Jupiter apsidal beat. That attribution uses Laskar's secular-theory eigenfrequencies, which assign Venus and Jupiter different apsidal periods than the retired lattice framework did. In that framework's planet motions, no such Venus-Jupiter beat at 405 kyr existed — so it neither needed nor adopted that attribution. The 405-kyr signal is real climate physics; the standard Milankovitch label "g₂−g₅" is a convention from a different orbital-dynamics framework.
 
 This two-layer view clarifies which physical mechanisms operate at which scales:
 
@@ -1306,7 +1306,7 @@ This two-layer view clarifies which physical mechanisms operate at which scales:
 
 The framework's empirically supported claim is:
 
-> **Orbital motions are captured by the 8H integer-divisor lattice (doc 55, Layer 1). Most prominent climate-band cycles concentrate at 8H/n integer positions, and any beats between doc-55 cycles are mathematically constrained to also land on the lattice. Cycles observed in climate records that do *not* coincide with 8H/n positions — the 405-kyr line being the clearest example — are not orbital phenomena in this framework. They arise from climate-system internal physics (Layer 2): primarily the carbon-cycle silicate-weathering thermostat resonance at ~400 kyr, loosely entrained by long-period orbital eccentricity forcing. The 8H integer-divisor lattice is a complete description of orbital geometry in this framework; what the lattice does not predict belongs to Layer 2 climate physics.**
+> **Orbital motions are captured by the 8H integer-divisor lattice (Layer 1). Most prominent climate-band cycles concentrate at 8H/n integer positions, and any beats between the model's planet cycles are mathematically constrained to also land on the lattice. Cycles observed in climate records that do *not* coincide with 8H/n positions — the 405-kyr line being the clearest example — are not orbital phenomena in this framework. They arise from climate-system internal physics (Layer 2): primarily the carbon-cycle silicate-weathering thermostat resonance at ~400 kyr, loosely entrained by long-period orbital eccentricity forcing. The 8H integer-divisor lattice is a complete description of orbital geometry in this framework; what the lattice does not predict belongs to Layer 2 climate physics.**
 
 The 405-kyr cycle is the clearest case of a Layer-2-only signal. The 2.4-Myr cycle (whatever its physical interpretation) is *not* carbon-amplified — δ¹³C/δ¹⁸O ratio 0.20 places it firmly in the insolation-control cluster, consistent with the silicate-weathering response being a *narrow* resonance peak near 400 kyr rather than a broad low-pass amplification (§13.7). The 9-Myr "grand cycle" candidate (Boulila 2018) sits off the 8H lattice and shows a clear carbon-cycle ratio of 2.05 — inside the carbon-amplified cluster between confirmed 405 kyr (1.53) and 4.5 Myr (2.76), and well above any insolation control (≤ 0.94) — but its absolute power is too small for the F-test to confirm individually (F δ¹³C = 1.61, F δ¹⁸O = 0.74, both below the α=0.05 threshold of 4.46). The 9-Myr signature is therefore consistent with a second Layer-2 cycle but is not statistically confirmed at single-cycle significance; further characterisation (longer records, multi-cycle joint fits) is open future work. The framework's 8H integer-divisor structure remains a useful description of orbital motions; climate-internal phenomena are added as Layer 2 where empirically warranted.
 
@@ -1336,7 +1336,7 @@ The combined picture from §4 + §5 is sharp: the 8H framework's claims hold str
 | All-integer F-test: framework integers carry 100% of significant lines (13/13) | ✅ supported (Test L — canonical 33-integer) |
 | Band centroids stable in time-frequency (no off-lattice drift) | ✅ supported (Test K) |
 | Phase prediction generalizes partially across the MPT | ⚠ partial (Test M — 30% within ±10 kyr out-of-sample) |
-| **405-kyr empirical climate line is off the 8H lattice and not reproducible by any doc-55 beat** | ✅ characterised (§13 — explained as Layer-2 carbon-cycle thermostat resonance, not orbital in this framework) |
+| **405-kyr empirical climate line is off the 8H lattice and not reproducible by any planet-cycle beat** | ✅ characterised (§13 — explained as Layer-2 carbon-cycle thermostat resonance, not orbital in this framework) |
 | 8H or H as deep-time geological-event pacer | ❌ rejected (§11.1–§11.4) |
 | H-multiples (1H..8H) as global continuous-record spectral pacers (CENOGRID 67-Myr MTM F-test) | ❌ rejected (§11.5 — 16/16 cells NULL) |
 | H-multiples as Plio-Pleistocene-specific climate amplifiers (windowed CENOGRID MTM + OLS) | ❌ rejected (§11.6 — W1 ranks bottom-half on every nH) |
@@ -1345,7 +1345,7 @@ This is the right shape for a scientific theory: claims inside the scope it was 
 
 ### 14.2 Why the Plio-Pleistocene 8H alignment doesn't generalize
 
-A natural hypothesis to rescue the super-cycle claim would be: "the 8H clock *started* at ~5.3 Ma due to some external factor." But orbital cycles don't start — they're continuous geometric resonances. The 8H synchronisation period is built into the integer-divisor structure of all planetary cycles per [doc 55](55-solar-system-resonance-cycle-periods.md), and that structure has held since the planets formed ~4.5 Ga.
+A natural hypothesis to rescue the super-cycle claim would be: "the 8H clock *started* at ~5.3 Ma due to some external factor." But orbital cycles don't start — they're continuous geometric resonances. The 8H synchronisation period was built into the integer-divisor structure of all planetary cycles in the retired lattice framework ([retired record](retired-record.md)), and orbital resonance structure of any kind has held since the planets formed ~4.5 Ga.
 
 What *did* change in the late Pliocene-Pleistocene:
 
@@ -1522,11 +1522,9 @@ python3 scripts/milankovitch_climate_formula.py
 
 ### 18.2 Related documents
 
-- [doc 10 — Fibonacci Laws](10-fibonacci-laws.md) — derivation of H and the Fibonacci-divisor structure
+- [doc 10 — The Six Fibonacci Relations](10-fibonacci-laws.md) — derivation of H and the Fibonacci-divisor structure
 - [doc 90 — Milankovitch Language](90-milankovitch-language.md) — model's predictions (companion to this document)
-- [doc 32 — Inclination Calculations](32-inclination-calculations.md) — Earth's inclination oscillation
-- [doc 37 — Planetary Precession Cycles](37-planets-precession-cycles.md) — canonical standard-vs-model obliquity comparison
-- [doc 55 — Solar System Resonance Cycle Periods](55-solar-system-resonance-cycle-periods.md) — full 8H/n period table used in §3 cross-referencing
+- [doc 31 — Geometric Orbital Elements](31-no-chain-body-elements.md) — Earth's inclination oscillation (the engine-K device)
 - [doc 99 — Expanding Solar System Resonance Theory (ESSRT)](99-expanding-solar-system-resonance-theory.md) — Deep-time scaling of H(t); per-driver Δ-H formulas relevant for the 67-Myr CENOGRID context and the 13H ≈ 4.36 Myr Boulila comparison
 - Website: `model/supporting-evidence.mdx` §1 (100-kyr problem) and §6 (climate mechanism)
 - Website: `model/eigenfrequencies.mdx` (Berger spectrum match details)

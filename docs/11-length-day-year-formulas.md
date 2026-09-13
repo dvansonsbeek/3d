@@ -7,6 +7,8 @@ status: current
 
 # Year and Day Length Formulas
 
+> **Status — the frozen era clock.** The Fourier-harmonic laws in this document are the **certified, IAU-anchored era device** (see `tools/fit/README.md` §"The frozen era clock"): their coefficients are frozen, their fitters archived, and re-fitting them against a one-source export is a cross-family error (measured: interior RMS blows up 0.23–0.37 min → 8.8–16 min). The **displayed and served of-date values** (tweakpane year rows, Formula Verification model lines, the report's Physics columns, the API) come from the **one-source movement family** — `createYearLengths` in `@essrt/physics` (equinox-rate tropical mean, the λ̇-channel sidereal, the cardinal-structure anomalistic, and their precession beats). The harmonic laws remain the internal kinematic family (the `o.*` chain, `lodKinematic`, the scene frame), the `?hybridSpin=0` opt-out display, and the era-certification record.
+
 > **Scope.** This document describes the **modern-era / within-H Fourier-harmonic picture** — the means derived from `inputmeanlengthsolaryearindays = 365.2422` and Earth Fundamental Cycle `H = 335,317 yr`, with Fourier oscillations fitted across one full H. At deep-time / Phanerozoic / Hadean epochs the **mean values themselves shift** per the [Expanding Solar System Resonance Theory (Doc 99)](99-expanding-solar-system-resonance-theory.md): H(t) grows under Driver 1 (Earth-Moon tidal evolution → LOD grows) while the sidereal year in seconds shifts under Driver 2 (solar mass loss → Kepler `dT/T = −2 dM/M`). For deep-time work use the epoch-dependent helpers (`meanLodSecondsAtAge`, `meanSiderealYearSecondsAtAge`, `meanHAtAge`, `meanTropicalYearSecondsAtAge`) — see [Doc 20 §"ESSRT epoch dependence"](20-constants-reference.md#essrt-epoch-dependence--most-tabulated-values-are-j2000-anchored) for the J2000-constant → helper map.
 
 ## Architecture
@@ -84,7 +86,7 @@ The tropical year is measured at the actual solstices and equinoxes (declination
 
 Two paths compute the tropical year:
 
-- `computeSolarYearDaysDirect(year)` — Step 6c direct year-length Fourier fit (TROPICAL_YEAR_HARMONICS, 12 terms). J2000-anchored to the CSV year-2000 measurement (365.24219037 at J2000). **This is the primary display path — used by the Predictions panel Solar Year (days) row and the modal tropical-year chart.**
+- `computeSolarYearDaysDirect(year)` — Step 6c direct year-length Fourier fit (TROPICAL_YEAR_HARMONICS, 12 terms). J2000-anchored to the CSV year-2000 measurement (365.24219037 at J2000). **Frozen era device**: since the one-source consolidation it serves the internal kinematic chain and the `?hybridSpin=0` opt-out display; the Predictions panel row and the tropical-year chart read the one-source family (`createYearLengths`).
 - `computeSolarYearDaysFromCardinals(year)` — analytical derivative of the cardinal-point harmonic formula (CARDINAL_POINT_HARMONICS, 23 harmonics per type plus the ECC/JOINT/DERIVED term families, averaged over all 4 CPs). Kept for chart consistency in `charts/report` code paths that already display cardinal-point data.
 
 Both paths converge at year 2000 within ~2 μd (the Step 6c year-length fit vs the Step 6d cardinal-point derivative at their shared J2000 anchor).
@@ -349,7 +351,7 @@ The obliquity used follows the family of the sidereal day it is applied to: `OBL
 
 ### JavaScript (`script.js`)
 
-The tropical year primary display path uses the direct year-length Fourier fit (Step 6c, TROPICAL_YEAR_HARMONICS, 12 terms):
+The tropical year's frozen-clock law (the era device and opt-out path; the displayed of-date value is the one-source family — see the Status banner) is the direct year-length Fourier fit (Step 6c, TROPICAL_YEAR_HARMONICS, 12 terms):
 
 ```javascript
 function computeSolarYearDaysDirect(currentYear) {
@@ -397,10 +399,13 @@ function evalYearFourier(currentYear, mean, harmonics) {
 If `H` or `inputmeanlengthsolaryearindays` changes:
 
 1. **Means update automatically** — they are derived formulas, not constants
-2. **Harmonic coefficients must be refitted** from solar measurement data:
-   - Run `export-solar-measurements.js` (step 6a) — full H at 1-year steps
-   - Tropical/sidereal/anomalistic year: run `year-length-harmonics.js` (step 6c)
-   - Cardinal points: run `cardinal-point-harmonics.js` (step 6d)
+2. **The harmonic fitters are FROZEN and retired** (git history commit
+   16d7c87f; README §"The frozen era clock"): the coefficients are the
+   certified era device, and re-fitting them against a one-source export
+   is a cross-family error (measured, the C-4b adjudication). Step 6a
+   (`export-solar-measurements.js`) remains the measurement/reference
+   export. If `H` or the input mean year ever changes, the freeze itself
+   must be re-adjudicated (an owner decision), not silently re-run.
 3. **stepYears must divide H evenly** — current: H=<!--v:H-->335,317<!--/v-->, stepYears=1 (335,318 rows)
 
 Training data: `data/02-solar-measurements.csv`

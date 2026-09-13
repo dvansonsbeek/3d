@@ -231,7 +231,7 @@ LONGITUDE_PERIHELION["Earth"] = _C['ASTRO_REFERENCE']['earthPerihelionLongitudeJ
 PERIHELION_ECLIPTIC_YEARS = {p['name']: p['perihelionEclipticYears'] for p in _C['planets'].values()}
 
 # Obliquity cycle periods (years) — loaded from model-parameters.json via constants.js.
-# See docs/37-planets-precession-cycles.md § Obliquity Cycle Theory.
+# Obliquity cycle theory: obliquity = |inclination − ecliptic|; Venus/Neptune static.
 # Mercury: 8H/3 (Fibonacci decomposition). Mars: 8H/21 (= Jupiter axial, mirror swap).
 # Venus/Neptune: 8H/100 (= ICRF period → two-component formula cancels → constant obliquity).
 OBLIQUITY_CYCLE = {p['name']: p['obliquityCycle'] for p in _C['planets'].values()}

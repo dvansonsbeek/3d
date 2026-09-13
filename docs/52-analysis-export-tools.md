@@ -47,15 +47,13 @@ Reports (observed category)
 
 Tools
 ├── Planet Inspector          [opens Hierarchy Inspector]
-├── Invariable Plane Inspector
-├── Eccentricity Balance Scale
-├── Solar System Resonance Cycle
 ├── WebGeoCalc Explorer
 ├── LOD-Climate Rhythm
 ├── Climate Formula Explorer
 ├── ESSRT Explorer
 ├── Formula Verification
 ├── Data Explorer             [opens data.holisticuniverse.com]
+├── Standard Model (VSOP87 · MPP02)   [ghost-body overlay sub-folder]
 └── Console Tests (F12)
 ```
 
@@ -253,7 +251,7 @@ All functions support JD chaining (`prevJD`) for efficient sequential-year searc
 
 ### Related
 
-For the solstice RA and JD prediction formulas (Fibonacci harmonics, valid across <!--v:H-->335,317<!--/v--> years), see [14 — Solstice Prediction](14-solstice-prediction.md).
+For the solstice RA and JD prediction formulas (H-lattice harmonics, valid across <!--v:H-->335,317<!--/v--> years), see [14 — Solstice Prediction](14-solstice-prediction.md).
 
 ---
 
@@ -596,7 +594,7 @@ Calculates the apparent Right Ascension of `pdB` as seen from `pdA` in Earth's e
 
 **Returns**: Angle in degrees [0, 360)
 
-**Usage**: Used for perihelion longitude calculations. See [12-perihelion-precession.md](12-perihelion-precession.md) for details.
+**Usage**: Used for perihelion longitude calculations. See [13-mercury-precession-breakdown.md](13-mercury-precession-breakdown.md) for details.
 
 ---
 
@@ -702,5 +700,5 @@ Reports compare against these reference sources:
 
 ---
 
-**Previous**: [50 - UI Panels Reference](50-ui-panels-reference.md)
-**Next**: [10 - Fibonacci Laws](10-fibonacci-laws.md)
+**Previous**: [51 - Planet Inspector Reference](51-planet-inspector-reference.md)
+**Next**: [56 - WebGeoCalc Explorer](56-webgeocalc-explorer.md)

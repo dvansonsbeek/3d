@@ -42,7 +42,7 @@ This is the **closest published parallel** to HUM's gravitational-coupling claim
 
 **Where HUM extends further:**
 - Dutkiewicz documents **one cycle** (2.4 Myr = g₄−g₃)
-- HUM's framework documents **32 cycles unified under one fundamental period** — the 2.4-Myr cycle is just one of them (specifically off-lattice, captured by L2 / L_extended depending on regime)
+- HUM's framework documents **33 cycles unified under one fundamental period** — the 2.4-Myr cycle is just one of them (specifically off-lattice, captured by L2 / L_extended depending on regime)
 - HUM also documents the 1.2-Myr obliquity-band Grand cycle (s₄−s₃) and the 13H = 4.36 Myr eigenmode candidate (not promoted to canonical — see R3-4), neither of which Dutkiewicz covers
 
 ---
@@ -122,7 +122,7 @@ Cyclostratigraphy is the established discipline of fitting **multiple orbital si
 
 **Where HUM aligns:** same method class — sinusoidal regression at known orbital frequencies, sequential-fit decomposition.
 
-**Where HUM differs:** cyclostratigraphy fits ~10–15 individual Laskar eigenmode beats as independent oscillators. HUM fits 32 **integer divisors of a single fundamental period (8H)** — a stronger structural claim. The 405-kyr metronome is treated as the universal anchor in cyclostratigraphy; HUM treats it as off-lattice L2.
+**Where HUM differs:** cyclostratigraphy fits ~10–15 individual Laskar eigenmode beats as independent oscillators. HUM fits 33 **integer divisors of a single fundamental period (8H)** — a stronger structural claim. The 405-kyr metronome is treated as the universal anchor in cyclostratigraphy; HUM treats it as off-lattice L2.
 
 ---
 

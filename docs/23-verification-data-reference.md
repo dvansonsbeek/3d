@@ -14,7 +14,7 @@ This document describes the astronomical verification data embedded in the simul
 - [51 - Planet Inspector Reference](51-planet-inspector-reference.md) - Where reports are displayed
 - [20 - Constants Reference](20-constants-reference.md) - Orbital constants and sources
 - [99 - Expanding Solar System Resonance Theory](99-expanding-solar-system-resonance-theory.md) - Deep-time integrator machinery referenced in the "Deep-time integration" subsection
-- [102 - GIA α(t) lunar validation](102-gia-alpha-lunar-validation.md) and [106 - Deep-time validation dossier](106-deep-time-validation-dossier.md) - the live deep-time validation docs (the old doc 100 is archived in `docs/archive/old-documents/100-deltat-validation.md`)
+- [102 - GIA α(t) lunar validation](102-gia-alpha-lunar-validation.md) and [106 - Deep-time validation dossier](106-deep-time-validation-dossier.md) - the deep-time validation docs
 
 ---
 

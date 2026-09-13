@@ -100,7 +100,7 @@ Empirical tests on LR04 + Cheng 2016 + EPICA + CENOGRID paleoclimate records, bu
 
 ### Paleoclimate ECS Decomposition (Doc 97)
 
-Climate sensitivity (Charney ECS) decomposition across paleoclimate eras using the 8H L1 lattice. Cross-proxy validation on LR04, EPICA, Snyder GAST, and multiple boron-isotope CO₂ reconstructions (0–67 Ma). See [doc 97](../docs/97-paleo-ecs-decomposition.md).
+Climate sensitivity (Charney ECS) decomposition across paleoclimate eras using the 8H L1 lattice. Cross-proxy validation on LR04, EPICA, Snyder GAST, and multiple boron-isotope CO₂ reconstructions (0–67 Ma). (Write-up archived — see ../docs/retired-record.md.)
 
 | Script | Description |
 |--------|-------------|
@@ -159,7 +159,7 @@ Plus `l1_vs_laskar_50myr.py` and `l1_vs_laskar_published_50myr.py` for forward-i
 
 | Script | Description |
 |--------|-------------|
-| `planet_nine_analysis.py` | Planet Nine prediction — falsifiable test from the Fibonacci balance laws. Two-tier structure (Law-4 compliance pre-check + full 7.5M-config v-balance search) confirms rejection of a major 9th planet at ETNO distances. See [doc 15](../docs/15-planet-nine-prediction.md). |
+| `planet_nine_analysis.py` | Planet Nine prediction — falsifiable test from the Fibonacci balance laws. Two-tier structure (Law-4 compliance pre-check + full 7.5M-config v-balance search) confirms rejection of a major 9th planet at ETNO distances. (Prediction withdrawn with the Law framework; write-up archived — see ../docs/retired-record.md.) |
 | `tno_balance_test.py` | TNO contribution to Law 5 balance — population-summed and individual approaches. |
 | `tno_obliquity_prediction.py` | Law-4 TNO obliquity predictions — derives expected TNO axial tilts from the K amplitude constant. |
 

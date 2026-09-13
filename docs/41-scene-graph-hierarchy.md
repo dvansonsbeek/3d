@@ -9,10 +9,10 @@ status: current
 
 This document describes the Three.js scene graph hierarchy used in the Holistic Universe Model simulation. Understanding this nested structure is essential because **all astronomical motions are implemented through composed rotations** of parent-child relationships.
 
-**Engine-D rendering (the ONLY planet path since the K5 legacy-chain excision):** the seven planets' rendered positions, orbit rings, traces, perihelion markers, panels and the invariable-plane machinery (heights, mass gauge, Sun-SSB) are computed from the model's own N-body chain (`@essrt/physics/planets/keplerian-chain` + the governed artifact `data/nbody-secular-frequencies.json`); Earth, the Moon and the Sun stay on the hierarchy (the two-engine interface — the Sun's chain hangs from the perihelion-of-Earth construction and every historical gate is calibrated on it). The geometric hierarchy below still exists and rotates, but serves only as anchor scaffolding for the display devices and as the rendering path for the no-chain bodies (Pluto, Halley, Eros); its fitted corrections were deleted with the excision (docs 62–64/67/71 are the records), and the `?keplerChains=0` opt-out is gone. The `Mid-Eccentricity Orbit` node (the one law's base′ reference circle) was removed with the flip.
+**Engine-D rendering (the ONLY planet path since the K5 legacy-chain excision):** the seven planets' rendered positions, orbit rings, traces, perihelion markers, panels and the invariable-plane machinery (heights, mass gauge, Sun-SSB) are computed from the model's own N-body chain (`@essrt/physics/planets/keplerian-chain` + the governed artifact `data/nbody-secular-frequencies.json`); Earth, the Moon and the Sun stay on the hierarchy (the two-engine interface — the Sun's chain hangs from the perihelion-of-Earth construction and every historical gate is calibrated on it). The geometric hierarchy below still exists and rotates, but serves only as anchor scaffolding for the display devices and as the rendering path for the no-chain bodies (Pluto, Halley, Eros); its fitted corrections were deleted with the excision (the records are archived — [retired record](retired-record.md)), and the `?keplerChains=0` opt-out is gone. The `Mid-Eccentricity Orbit` node (the one law's base′ reference circle) was removed with the flip.
 
 **Related Documents:**
-- [12 - Perihelion Precession](12-perihelion-precession.md) - How precession affects apparent measurements
+- [13 - Perihelion Precession](13-mercury-precession-breakdown.md) - How precession affects apparent measurements
 - [40 - Architecture](40-architecture.md) - Overall code structure
 - [04 - Dynamic Elements Overview](04-dynamic-elements-overview.md) - What orbital elements change over time
 
@@ -364,7 +364,7 @@ WorldMatrix = M_earth × M_inclinationPrecession × M_eclipticPrecession
 
 **When measuring from ecliptic frame:** Bypass Earth's precession layers by reading directly from the planet's `precessionLayer.orbitObj.rotation.y`.
 
-This is why Mercury's perihelion precession appears to fluctuate when measured from Earth but is constant in the ecliptic frame (see [12 - Perihelion Precession](12-perihelion-precession.md)).
+This is why Mercury's perihelion precession appears to fluctuate when measured from Earth but is constant in the ecliptic frame (see [13 - Perihelion Precession](13-mercury-precession-breakdown.md)).
 
 ---
 
@@ -475,7 +475,7 @@ Deep-time / Phanerozoic / Hadean simulation. The same scene graph is rendered, b
 | `_dtPlanetIntegrator`, `_dtPlanetAnchor`, `_dtPlanetSign` | TT (`_currentYearSI_TT`) | Planet orbital nodes (Mercury–Neptune, 7 nodes) | `obj._dtPlanetIntegrator(anchor, year)` |
 | `_dtPerihelionDivisor`, `_dtPerihelionAnchor` | UT for Sun, TT for planets | Equation-of-center perihelion-phase term | `cyclesBetweenYears(anchor, year, divisor)` inline |
 
-The asymmetric time-base treatment (Moon-chain stays on UT, planet orbitals go to TT) is principled, not arbitrary: doc 101's eclipse-visibility validation (19/19) was co-developed under the Moon-chain UT convention, while planets have no analogous validation tied to the time-base choice. The full rationale is in `docs/archive/old-documents/IP-planet-deep-time-scene-graph.md` (untracked archive) § "Why the asymmetry... is principled, not arbitrary".
+The asymmetric time-base treatment (Moon-chain stays on UT, planet orbitals go to TT) is principled, not arbitrary: the eclipse-visibility validation was co-developed under the Moon-chain UT convention, while planets have no analogous validation tied to the time-base choice.
 
 ### 15.3 Both modes use the same scene graph
 
@@ -488,20 +488,19 @@ Integrator mode preserves bit-equivalence to snapshot mode at the J2000 anchor (
 
 ### 15.4 Earth's daily spin and the ΔT / LOD layering — three consumers
 
-The three dLOD/dt layers (L1 tidal baseline · L2 + GIA α(t) · L3 + 4-flag ΔT stack) are consumed at three distinct places in `src/script.js`, each deliberately using a different depth:
+The dLOD/dt layers (L1 tidal baseline · L2 + GIA α(t) · L3 + 4-flag ΔT stack · L4 + Core-mantle swing) are consumed at three distinct places in `src/script.js`, each deliberately using a different depth:
 
 | Consumer | Layers applied | Where / why |
 |---|---|---|
-| **Ephemeris & eclipse chain** | **Full Layer 3** | `meanDeltaTSecondsAtAge()` integrates the Layer-2 LOD (tidal + GIA) with the H/5 kinematic term, then adds the 4-flag stack post-integration (each harmonic zero-anchored at J2000). Feeds `_eclDeltaT()` → JD_UT → JD_TT inside every Meeus wrapper (`_eclSunLon`, `_eclMoonLon`, …) and the TT-anchored planet integrators (`_currentYearSI_TT`). All validated rotation claims (26-event solar audit, 267-event lunar test, ΔT charts) run through this path. |
-| **Deep-time epoch anchors** | **Layer 2 only** | `recomputeEpochAnchors()` sets `meanlengthofday` from `meanLodSecondsAtAge()` (tidal + GIA). The stack is a zero-mean ±ms *modulation* around the epoch mean, so folding it into the mean-LOD anchor would inject a phase-dependent offset into every derived day count. Layer 3 (`meanLodSecondsWithCorrectionsAtAge()`) exists for consistency with the corrected ΔT curve and is consumed only by the ESSRT modal display. |
+| **Ephemeris & eclipse chain** | **Full Layer 4** | `meanDeltaTSecondsAtAge()` integrates the Layer-2 LOD (tidal + GIA) with the H/5 kinematic term, then adds the 4-flag stack + the Core-mantle swing post-integration (each component zero-anchored at J2000). Feeds `_eclDeltaT()` → JD_UT → JD_TT inside every Meeus wrapper (`_eclSunLon`, `_eclMoonLon`, …) and the TT-anchored planet integrators (`_currentYearSI_TT`). All validated rotation claims (26-event solar audit, 267-event lunar test, ΔT charts) run through this path. |
+| **Deep-time epoch anchors** | **Layer 2 only** | `recomputeEpochAnchors()` sets `meanlengthofday` from `meanLodSecondsAtAge()` (tidal + GIA). The stack + swing are a zero-mean ±ms *modulation* around the epoch mean, so folding them into the mean-LOD anchor would inject a phase-dependent offset into every derived day count. `meanLodSecondsWithCorrectionsAtAge()` exists for consistency with the corrected ΔT curve and is consumed only by the ESSRT modal display. |
 | **Visible scene-graph spin** | **None over time (J2000-locked)** | `earth.rotationSpeed` is a constant J2000 sidereal rate (`updateEarthForEpoch()`). The scene graph applies spin as `pos × rate` (a multiplier, not `∫dt/LOD(t)`), so an epoch-mutated rate would be retroactively applied to the whole elapsed span (~163° spurious drift — "eclipse over America renders over Turkey at −584"). The lock gives a stable JD ↔ orientation convention; it is explicitly **not** a ΔT claim — physically-correct orientation lives in the ephemeris chain above. |
 
-In short: **Layer 3 governs all validated rotation physics, Layer 2 governs epoch means, and the rendered globe uses a fixed J2000 convention.** Deep-time LOD/H evolution remains visible in the calculator displays and the ESSRT modal, which read `meanLodSecondsAtAge()` / `meanHAtAge()` directly.
+In short: **the full corrected curve (Layer 4) governs all validated rotation physics, Layer 2 governs epoch means, and the rendered globe uses a fixed J2000 convention.** Deep-time LOD/H evolution remains visible in the calculator displays and the ESSRT modal, which read `meanLodSecondsAtAge()` / `meanHAtAge()` directly.
 
 ### 15.5 References
 
-- `docs/archive/old-documents/IP-planet-deep-time-scene-graph.md` (untracked archive) — full implementation history (Phases P-A through P-F) including the math problem, frame-composition risk, per-phase rollout, naming convention summary, and the "Future Phase Z" discussion of Moon-chain TT correctness
-- [Doc 99 — Expanding Solar System Resonance Theory (ESSRT)](99-expanding-solar-system-resonance-theory.md) — canonical 9-step chain from `t_Ma` through LOD, H, AU, M_Sun, Kepler year, Moon distance, planet orbital + synodic periods
+- [Doc 99 — Expanding Solar System Resonance Theory (ESSRT)](99-expanding-solar-system-resonance-theory.md) — canonical chain from `t_Ma` through LOD, H, AU, M_Sun, Kepler year, Moon distance, planet orbital + synodic periods
 - [Doc 20 § "ESSRT epoch dependence"](20-constants-reference.md#essrt-epoch-dependence--most-tabulated-values-are-j2000-anchored) — J2000-constant → `mean*AtAge(t_Ma)` helper map
 
 ---

@@ -10,7 +10,7 @@ status: current
 ## Status
 Active research.
 
-> **Scope note (ESSRT).** This document is one of the foundational ESSRT-mechanism research docs — it asks *why* the 8H/L1 lattice exists as a real spectral structure, and discusses deep-time consequences directly: H(t) evolution under tidal LOD growth, the k-involving vs pure-orbital beat asymmetry, integer-label invariance vs period rescaling, the Snowball-Earth thermal-tide-lock break ~600 Ma as the one regime change between Precambrian and current dynamics. The literal values H = <!--v:H-->335,317<!--/v--> yr and 8H = <!--v:eightH-->2,682,536<!--/v--> yr in this doc are J2000-anchored; the deep-time scaling rule is given by [doc 99 — ESSRT](99-expanding-solar-system-resonance-theory.md) (Farhat 2022 polynomial + angular-momentum conservation), and the empirical 50-Myr test is in [doc 97 §4 Test C-50](97-paleo-ecs-decomposition.md). Findings here that the integer structure is *invariant* under H(t) drift but k-involving period labels *track* LOD evolution are themselves part of the ESSRT framework.
+> **Scope note (ESSRT).** This document is one of the foundational ESSRT-mechanism research docs — it asks *why* the 8H/L1 lattice exists as a real spectral structure, and discusses deep-time consequences directly: H(t) evolution under tidal LOD growth, the k-involving vs pure-orbital beat asymmetry, integer-label invariance vs period rescaling, the Snowball-Earth thermal-tide-lock break ~600 Ma as the one regime change between Precambrian and current dynamics. The literal values H = <!--v:H-->335,317<!--/v--> yr and 8H = <!--v:eightH-->2,682,536<!--/v--> yr in this doc are J2000-anchored; the deep-time scaling rule is given by [doc 99 — ESSRT](99-expanding-solar-system-resonance-theory.md) (Farhat 2022 polynomial + angular-momentum conservation); the empirical 50-Myr Test C-50 record is archived with doc 97 ([retired record](retired-record.md) — superseded by docs 92 and 95). Findings here that the integer structure is *invariant* under H(t) drift but k-involving period labels *track* LOD evolution are themselves part of the ESSRT framework.
 
 ## Why this doc exists
 
@@ -28,9 +28,10 @@ in solar-system orbital dynamics. The strongest individual results:
   indistinguishable from zero (t-test p=0.28) — the lattice IS the
   equilibrium positions Laskar oscillates around.
 
-But doc 97's tests are all "is the lattice real?" type. They don't
-explain **why this specific lattice exists** rather than another. That
-is the mechanism question, and it's the next phase.
+But the Test C series' tests (archived with doc 97 — [retired
+record](retired-record.md)) are all "is the lattice real?" type. They
+don't explain **why this specific lattice exists** rather than another.
+That is the mechanism question, and it's the next phase.
 
 ## What "mechanism" means here
 
@@ -710,7 +711,8 @@ was different.
 ### Three regimes identified
 
 Using paleo-LOD data (Wells 1963, Williams 2000, Zhou 2022, Lantink
-2022, etc., compiled in doc 97 Test C-PaleoLOD):
+2022, etc. — the current gate-backed compilation is
+`data/paleo-validation-anchors.json`, [doc 106](106-deep-time-validation-dossier.md)):
 
 | Regime | Time | LOD | Closure period | Mechanism |
 |:---|:---|:---|:---|:---|
@@ -797,7 +799,7 @@ evolution. Published deep-time cyclostratigraphy confirms the LOD-
 scaled predictions to sub-percent precision.
 
 **Empirical confirmation from Test C-50 re-analysis.** The
-proper-physics-lattice re-analysis of LA2004 ([doc 97 §Test C-50](97-paleo-ecs-decomposition.md))
+proper-physics-lattice re-analysis of LA2004 (Test C-50; archived with doc 97 — [retired record](retired-record.md))
 tested the integer-label-invariance claim directly across the
 -50 Myr Cenozoic. The result splits cleanly along the k-involving / pure
 orbital boundary:
@@ -909,8 +911,8 @@ secular dynamics**:
    commensurability periods, but is not uniquely optimal — the data
    admits other near-optimal periods at higher integer scale.
 
-The 8H lattice is **real structure** (confirmed by multiple tests in
-doc 97 and the action-angle closure test here) and the mechanism is
+The 8H lattice is **real structure** (confirmed by the Test C series —
+archived with doc 97 — and the action-angle closure test here) and the mechanism is
 **action-angle periodicity** in the secular sector dominated by
 obliquity dynamics. The framework's claim is well-supported, with one
 honest qualifier: 8H may be the strongest natural low-integer
@@ -923,10 +925,10 @@ the whole system.
 
 | Document | Purpose |
 |----------|---------|
-| [55 - Solar System Resonance Cycle Periods](55-solar-system-resonance-cycle-periods.md) | The 8H/N integer divisor lattice this doc seeks the mechanism for |
+| The 8H/N period table (archived — [retired record](retired-record.md)) | The integer divisor lattice this doc seeks the mechanism for; [doc 109](109-model-nbody-engine-and-lattice-test.md) is the re-evaluation |
 | [90 - Milankovitch Language](90-milankovitch-language.md) | Framework terminology and Berger/Laskar eigenmode notation |
 | [91 - Milankovitch Evidence](91-milankovitch-evidence.md) | Empirical L1 lattice fit (33 integers); foundational test data |
 | [92 - Climate Formula](92-climate-formula.md) | L1+L2+L3 canonical formula (33 integers + selection criteria for L1) |
 | [93 - L1 Lattice Attribution Reference](93-l1-attribution-reference.md) | Per-integer Berger vs Holistic attribution |
-| [97 - Paleo-ECS Decomposition](97-paleo-ecs-decomposition.md) | Test C-Invariant + Test C-Balance + Test C-Libration referenced in this doc's intro; Test C-50 ESSRT re-analysis |
+| Doc 97 (archived — [retired record](retired-record.md); superseded by [92](92-climate-formula.md)/[95](95-climate-summary.md)) | Test C-Invariant + Test C-Balance + Test C-Libration referenced in this doc's intro; Test C-50 ESSRT re-analysis |
 | [99 - Expanding Solar System Resonance Theory (ESSRT)](99-expanding-solar-system-resonance-theory.md) | Deep-time scaling of H(t); the formalism behind the proper-physics lattice used in Test C-50 re-analysis |

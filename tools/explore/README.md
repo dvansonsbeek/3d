@@ -1,8 +1,11 @@
 # `tools/explore` — frozen research one-offs
 
-**Status: FROZEN.** 88 single-purpose investigation scripts kept as the
+**Status: FROZEN.** ~150 single-purpose investigation scripts kept as the
 provenance behind findings that are written up in `docs/`. They are not
-production code, not a library, and not maintained.
+production code, not a library, and not maintained. Closed-campaign
+scripts whose findings are fully written up move to the untracked
+`archive/` subdirectory (gitignored; git history is the record) — the
+2026-09 sweep moved 63 there.
 
 ## What that means concretely
 
@@ -31,7 +34,7 @@ one stand.
 ## Relocation note
 
 Moving this directory into `packages/research` was trialled and reverted.
-Two things made it costly rather than tidy: 71 of the 88 files reach the
+Two things made it costly rather than tidy: most of the files reach the
 engine through `require('../lib/…')`, and a two-level walk from
 `packages/research/src` lands inside `packages/`, where `packages/data`
 already exists — so a path would silently resolve to the wrong target

@@ -136,7 +136,6 @@ function computeObliquityIntegrals(currentYear) {
  * Anchored to J2000: at year 2000, returns the known axial tilt.
  * Venus and Neptune have no obliquity cycle (returns static value).
  * Source: script.js computePlanetObliquity() (newly added)
- * See docs/37-planets-precession-cycles.md § Obliquity Cycle Theory.
  *
  * @param {string} planetName - e.g. 'mercury', 'mars'
  * @param {number} currentYear - decimal year

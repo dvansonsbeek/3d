@@ -1,6 +1,7 @@
 # Planet Positions — RMS vs JPL Horizons
 
 **Last updated:** 2026-03-25
+**Historical snapshot** — these baselines measured the RETIRED legacy planet path (fitted geometric chains + the parallax/gravitation/elongation correction stack, deleted at the K5 excision). The planets now render from the engine-D element chain; the current published comparison is `data/chain-vs-jpl-rms.json` (generator: `tools/verify/measure-rms-by-epoch.js`). Kept as the before-picture of the engine switch.
 **Reference:** JPL Horizons DE441 + IMCCE INPOP19, precession-corrected (IAU 1976 J2000 -> of-date)
 **Training:** 1800–2200 primary (44k pts) + 41 observed pre-1800 anchors (weight 3–5)
 

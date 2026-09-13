@@ -11,12 +11,11 @@ status: current
 >
 > For the **100-kyr ice age problem**, the model's H/3 = <!--v:earthPeriPeriodICRF-->111,772<!--/v--> yr inclination precession lies in the same Rayleigh-limited band as the empirical centroid (Mercury-Mars s₁−s₄ nodal beat at ~107 kyr) — both sit on the *inclination-side / orbital-plane* family of eigenmode beats that Muller & MacDonald (1997, *PNAS*) argued for spectrally over direct eccentricity.
 >
-> Companion docs: [91 — Milankovitch Evidence & Hypothesis Tests](91-milankovitch-evidence.md) (empirical 32-component 8H Orbital Forcing Formula + 14 hypothesis tests + 405-kyr off-lattice characterization); [92 — Climate Formula: Architecture, Variance & Implementation](92-climate-formula.md) (canonical L1+L2+L3 modular formula + per-regime ridge fits across LR04 / CENOGRID / EPICA / CenCO2PIP + Climate Formula Explorer modal).
+> Companion docs: [91 — Milankovitch Evidence & Hypothesis Tests](91-milankovitch-evidence.md) (empirical 33-component 8H Orbital Forcing Formula + 14 hypothesis tests + 405-kyr off-lattice characterization); [92 — Climate Formula: Architecture, Variance & Implementation](92-climate-formula.md) (canonical L1+L2+L3 modular formula + per-regime ridge fits across LR04 / CENOGRID / EPICA / CenCO2PIP + Climate Formula Explorer modal).
 
 **Related documents:**
-- [10 — Fibonacci Laws](10-fibonacci-laws.md)
-- [32 — Inclination Calculations](32-inclination-calculations.md)
-- [38 — Eccentricity Scale](38-eccentricity-scale.md)
+- [10 — The Six Fibonacci Relations](10-fibonacci-laws.md)
+- [31 — Geometric Orbital Elements](31-no-chain-body-elements.md)
 - [99 — Expanding Solar System Resonance Theory (ESSRT)](99-expanding-solar-system-resonance-theory.md) — Deep-time scaling of H(t); how Milankovitch periods evolve under Drivers 1 and 2
 - Website: [model/eigenfrequencies](https://www.holisticuniverse.com/en/model/eigenfrequencies) — full eigenfrequency / divisor / Berger comparison
 - Website: [model/supporting-evidence](https://www.holisticuniverse.com/en/model/supporting-evidence) §1 (100-kyr problem) and §12 (eigenfrequency convergence)
@@ -45,7 +44,7 @@ The "100-kyr problem" is that standard eccentricity has *split* peaks at 95 & 12
 
 ## 2. The Model's Five Natural Milankovitch Periods
 
-**H = <!--v:H-->335,317<!--/v--> years (at J2000)** is the **Earth Fundamental Cycle** — the model's master timescale, anchored observationally to the verified 1246 AD perihelion-solstice alignment. See [doc 10 — Fibonacci Laws](10-fibonacci-laws.md) and [website fundamental-cycles](https://www.holisticuniverse.com/en/model/fundamental-cycles) for derivation.
+**H = <!--v:H-->335,317<!--/v--> years (at J2000)** is the **Earth Fundamental Cycle** — the model's master timescale, anchored observationally to the verified 1246 AD perihelion-solstice alignment. See [doc 10 — The Six Fibonacci Relations](10-fibonacci-laws.md) and [website fundamental-cycles](https://www.holisticuniverse.com/en/model/fundamental-cycles) for derivation.
 
 | Cycle | Model formula | Years | Source |
 |---|---|---:|---|
@@ -78,7 +77,7 @@ This is structural, not numerical fitting. The same Fibonacci numbers that organ
 
 ## 4. Comparison with Standard Secular Theory — Direct Matches
 
-> **A note on eigenmode labelling.** The secular eigenmodes g_j (apsidal) and s_j (nodal) are **mathematical objects** — eigenvalues of the Laplace-Lagrange perturbation matrix capturing gravitational coupling between all eight planets. Both Berger 1978 and the Holistic model accept the eigenmodes. What differs is **attribution**: Berger labels each g_j / s_j by the planet whose contribution dominates that mode (g₅ = "Jupiter", g₂ = "Venus", …), while the Holistic model treats the eigenmodes as **composite modes of the multi-planet system** and does not equate them to single-planet quantities. The model's planet-specific cycles live in the [doc 55 period table](55-solar-system-resonance-cycle-periods.md) (e.g., Jupiter ecliptic perihelion = 8H/39 = 68.78 kyr, Jupiter ICRF = 8H/65 = 41.27 kyr, Jupiter Axial = 8H/21 — three distinct cycles, none equal to 1/g₅; the Fibonacci anchors are H/5 and H/8). The "(Jupiter)" / "(Mercury)" / etc. labels in the tables that follow are Berger's convention, retained for consistency with the literature.
+> **A note on eigenmode labelling.** The secular eigenmodes g_j (apsidal) and s_j (nodal) are **mathematical objects** — eigenvalues of the Laplace-Lagrange perturbation matrix capturing gravitational coupling between all eight planets. Both Berger 1978 and the Holistic model accept the eigenmodes. What differs is **attribution**: Berger labels each g_j / s_j by the planet whose contribution dominates that mode (g₅ = "Jupiter", g₂ = "Venus", …), while the Holistic model treats the eigenmodes as **composite modes of the multi-planet system** and does not equate them to single-planet quantities. The model's planet-specific cycles are per-planet quantities (e.g., Jupiter ecliptic perihelion = 8H/39 = 68.78 kyr, Jupiter ICRF = 8H/65 = 41.27 kyr, Jupiter Axial = 8H/21 — three distinct cycles, none equal to 1/g₅; the per-planet tabulation is archived, [retired record](retired-record.md), and [doc 109](109-model-nbody-engine-and-lattice-test.md) carries the measured frequencies). The "(Jupiter)" / "(Mercury)" / etc. labels in the tables that follow are Berger's convention, retained for consistency with the literature.
 
 ### 4.1 Standard Milankovitch periods
 
@@ -107,7 +106,7 @@ The Berger climatic-precession spectrum is a **set of six** peaks from `g_j + k`
 | 18,976 | g₄ + k (Mars) | n = 141 → 19,025 | 0.26 % | — (nearest n=141 is attributed to k+g₃; k+g₄ enters via sideband n=152) |
 | 16,469 | g₆ + k (Saturn) | n = 163 → <!--v:saturnEccCycle-->16,457<!--/v--> | 0.07 % | — (not in canonical L1) |
 
-All six peaks match an integer-divisor position. **Berger names each peak after a single planet** (g_j + k convention) while the Holistic model derives the same LR04 lattice peaks via **multi-planet beats from PLANET_CYCLES** — see [doc 93 — L1 attribution reference](93-l1-attribution-reference.md) for all 32 L1 lattice components with full ranked attribution alternatives. The structural decomposition is `n = 104 + δ_j` where 104 = 8 × 13 is Earth's axial precession integer (see website [eigenfrequencies.mdx §"Berger climatic precession peaks"](https://www.holisticuniverse.com/model/eigenfrequencies#berger-climatic-precession-peaks)).
+All six peaks match an integer-divisor position. **Berger names each peak after a single planet** (g_j + k convention) while the Holistic model derives the same LR04 lattice peaks via **multi-planet beats from PLANET_CYCLES** — see [doc 93 — L1 attribution reference](93-l1-attribution-reference.md) for all 33 L1 lattice components with full ranked attribution alternatives. The structural decomposition is `n = 104 + δ_j` where 104 = 8 × 13 is Earth's axial precession integer (see website [eigenfrequencies.mdx §"Berger climatic precession peaks"](https://www.holisticuniverse.com/model/eigenfrequencies#berger-climatic-precession-peaks)).
 
 ### 4.3 Eigenfrequency convergence at H/3 and H/5
 
@@ -194,13 +193,13 @@ The model treats the inclination cycle as a *permanent formation-epoch feature* 
 
 This document is the *framework* — what the model says about Milankovitch.
 
-The empirical evidence lives in [doc 91 — Milankovitch Evidence & Hypothesis Tests](91-milankovitch-evidence.md): spectral analysis of LR04 + Cheng 2016 + EPICA + CENOGRID, the 32-component **8H Orbital Forcing Formula**, per-planet contributions, the MPT amplitude-growth analysis, a pre-registered super-cycle hypothesis test (NULL), fourteen falsifiable follow-up tests (16 positives / 2 partials / 5 nulls), and the 405-kyr off-lattice characterization as a Layer-2 carbon-cycle thermostat resonance.
+The empirical evidence lives in [doc 91 — Milankovitch Evidence & Hypothesis Tests](91-milankovitch-evidence.md): spectral analysis of LR04 + Cheng 2016 + EPICA + CENOGRID, the 33-component **8H Orbital Forcing Formula**, per-planet contributions, the MPT amplitude-growth analysis, a pre-registered super-cycle hypothesis test (NULL), fourteen falsifiable follow-up tests (16 positives / 2 partials / 5 nulls), and the 405-kyr off-lattice characterization as a Layer-2 carbon-cycle thermostat resonance.
 
 The canonical L1 + L2 + L3 modular formula — per-regime ridge fitting across LR04 / CENOGRID / EPICA / CenCO2PIP, stitched per-regime evaluation, and the Climate Formula Explorer modal in `src/script.js` — is documented in [doc 92 — Climate Formula: Architecture, Variance & Implementation](92-climate-formula.md).
 
 **Five headline findings from doc 91 §1**:
 
-1. Every significant LR04 climate peak sits at an integer divisor of 8H (31 of 32 with clean physical interpretations as Berger/Laskar eigenmode beats or direct planet periods; n=66 is the obliquity-band centroid added by this framework — see [doc 92 §2.3](92-climate-formula.md#23-the-33-lattice-integers--per-line-identities)).
+1. Every significant LR04 climate peak sits at an integer divisor of 8H (32 of 33 with clean physical interpretations as Berger/Laskar eigenmode beats or direct planet periods; n=66 is the obliquity-band centroid added by this framework — see [doc 92 §2.3](92-climate-formula.md#23-the-33-lattice-integers--per-line-identities)).
 2. **Mars dominates the per-planet climate fingerprint** (two exclusive direct matches in LR04 full, three more in pre-MPT).
 3. **The 100-kyr glacial cycle is an inclination-side eigenmode beat** (Mercury-Mars s₁−s₄ nodal at 107 kyr), not direct eccentricity forcing — vindicates Muller-MacDonald 1997's framing.
 4. Pre-MPT and post-MPT differ in **climate sensitivity, not orbital forcing**.

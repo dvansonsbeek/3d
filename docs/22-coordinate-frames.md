@@ -12,8 +12,7 @@ This document describes the coordinate reference frames and transformations used
 **Related Documents:**
 - [20 - Constants Reference](20-constants-reference.md) - J2000-anchored constants + epoch helpers
 - [21 - Orbital Formulas Reference](21-orbital-formulas-reference.md) - Calculation functions
-- [33 - Invariable Plane Calculations](33-invariable-plane-calculations.md) - Height calculations
-- [31 - Ascending Node Calculations](31-ascending-node-calculations.md) - Node precession
+- [05 - The Invariable Plane](05-invariable-plane-overview.md) - Height calculations and node conventions
 - [99 - Expanding Solar System Resonance Theory](99-expanding-solar-system-resonance-theory.md) - Deep-time scaling of H(t) and ε
 
 ---
@@ -200,6 +199,7 @@ Where:
 **Implementation (`src/script.js`):**
 - Function: `updatePlanetInvariablePlaneHeights()`
 - Outputs: `o.{planet}HeightAboveInvPlane` (AU), `o.{planet}AboveInvPlane` (boolean)
+- Note: for the chain bodies (the seven planets and Earth) the height is the exact projection `h = r⃗ · ẑ_inv` of the chain's heliocentric vector; the trigonometric construction above serves the no-chain bodies (see [doc 05](05-invariable-plane-overview.md))
 
 ### 2.4 Heliocentric Latitude
 

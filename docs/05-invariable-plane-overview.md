@@ -5,363 +5,177 @@ coefficients: sha256:9e0460662933228f
 status: current
 ---
 
-# Invariable Plane Overview
+# The Invariable Plane
 
-This document provides a conceptual overview of the invariable plane and how the Holistic Universe Model uses it as a fundamental reference frame.
+The invariable plane is the model's fundamental reference plane. This
+document covers the concept, the plane the model actually uses (the
+engine's own banked plane from the chain artifact), how heights, nodes
+and the invariable-plane argument of periapsis are computed, and the two
+live self-checks (angular-momentum validation and the mass-weighted
+balance gauge).
 
-> **Scope note (ESSRT).** The invariable plane itself (perpendicular to total angular momentum) is fixed in space; the angular-momentum conservation argument that defines it is scale-invariant. Period denominators (H/3, H/5, 8H/N) are scale-invariant Fibonacci/lattice divisors that stay constant at any epoch. The literal year values (<!--v:hDiv5-->67,063<!--/v--> yr ≈ −H/5, <!--v:earthPeriPeriodICRF-->111,772<!--/v--> yr ≈ H/3 in §"The Inclination Cycle") and the Year 50000 projection are J2000-evaluated; the J2000 invariable-plane orientation (1.578° inclination, 107.58° ascending node from Souami & Souchay 2012) is the present-epoch snapshot. Under [ESSRT](99-expanding-solar-system-resonance-theory.md), H(t) evolves at deep time via Drivers 1 (LOD growth) and 2 (Kepler), scaling literal year counts proportionally; the structural picture this document describes holds at any epoch.
+> **Scope note (ESSRT).** The invariable plane itself (perpendicular to total angular momentum) is fixed in space; the angular-momentum conservation argument that defines it is scale-invariant. Earth's kinematic identities quoted here (−H/5 node regression ≈ <!--v:hDiv5-->67,063<!--/v--> yr, the H/3 ≈ <!--v:earthPeriPeriodICRF-->111,772<!--/v-->-yr ICRF perihelion cycle) are scale-invariant divisors whose literal year values are J2000-evaluated; under [ESSRT](99-expanding-solar-system-resonance-theory.md), H(t) evolves at deep time via Drivers 1 (LOD growth) and 2 (Kepler), scaling literal year counts proportionally while leaving the structure intact.
 
 ---
 
 ## What is the Invariable Plane?
 
-The **invariable plane** is the plane passing through the solar system's barycenter (center of mass) perpendicular to its total angular momentum vector. It is the most fundamental reference plane for the solar system because:
+The **invariable plane** is the plane passing through the solar system's barycenter perpendicular to its total angular momentum vector. It is the most fundamental reference plane for the solar system because:
 
-1. **It is truly fixed** - Unlike the ecliptic, it doesn't change over time
-2. **Defined by physics** - Perpendicular to the total angular momentum
-3. **Dominated by giant planets** - Jupiter contributes 61.6%, Saturn 24.9%, Neptune 8.0%, Uranus 5.4% (orbital angular momentum ∝ m·√a, computed from the table below)
+1. **It is truly fixed** — unlike the ecliptic, it doesn't change over time (< 0.1 mas variation over 100 years; the model treats it as fixed)
+2. **Defined by physics** — perpendicular to the total angular momentum
+3. **Dominated by the giant planets** — Jupiter contributes 61.6%, Saturn 24.9%, Neptune 8.0%, Uranus 5.4% (orbital angular momentum ∝ m·√a); it lies within 0.32° of Jupiter's orbital plane
 
-The invariable plane is within 0.5° of Jupiter's orbital plane (specifically 0.32°).
-
----
-
-## Why the Invariable Plane Matters
-
-### The Problem with the Ecliptic
-
-The **ecliptic** (Earth's orbital plane) is traditionally used as the reference for planetary positions. However, the ecliptic is not fixed—it tilts over time as Earth's orbital plane precesses around the invariable plane.
-
-This creates a confusing situation:
-- Planetary inclinations measured relative to the ecliptic change over time
-- Even if a planet's orbit relative to the invariable plane is stable, its "ecliptic inclination" varies
-- The H/3-year precession cycle means measurements from different epochs aren't directly comparable
-
-### The Invariable Plane Solution
-
-By measuring positions relative to the invariable plane:
-- Values are truly constant over astronomical timescales
-- All planetary motions can be compared on equal footing
-- The fundamental physics of the solar system becomes clearer
+The **ecliptic** (Earth's orbital plane), by contrast, precesses around the invariable plane, so ecliptic inclinations measured at different epochs aren't directly comparable. Measured against the invariable plane, all planetary motions sit on equal footing.
 
 ---
 
-## Invariable Plane Orientation
+## The Plane the Model Uses
 
-### Source: Souami & Souchay (2012)
+The model's working invariable plane is **the engine's own**: the plane banked in the governed chain artifact (`CHAIN_ARTIFACT.invariablePlane`), computed from the model's own N-body dynamics — not an imported constant. Its working basis is the **s-frame**: ẑ = the banked plane normal, x̂ = ecliptic-X projected into the plane, ŷ = ẑ × x̂. This one basis serves everything downstream: the heights above the plane, the per-planet node fields, the mass-weighted balance gauge, and the Sun-SSB offset ([doc 24](24-moon-kepler-derivation.md) Part III).
 
-The definitive modern reference is [Souami & Souchay (2012)](https://www.aanda.org/articles/aa/full_html/2012/07/aa19011-12/aa19011-12.html), "The solar system's invariable plane", published in Astronomy & Astrophysics.
+### External reference: Souami & Souchay (2012)
 
-**Key findings at J2000.0 epoch:**
+The definitive published orientation is [Souami & Souchay (2012)](https://www.aanda.org/articles/aa/full_html/2012/07/aa19011-12/aa19011-12.html), *"The solar system's invariable plane"*, A&A — at J2000.0: inclination to ecliptic **1°34'43.3" ≈ 1.5787°**, ascending node on ecliptic **<!--v:invPlaneAscNode-->107.582<!--/v-->°**.
 
-| Parameter | Value |
-|-----------|-------|
-| Inclination to ecliptic (J2000) | 1°34'43.3" ≈ **1.578°** |
-| Ascending node on ecliptic | 107°34'56" ≈ **107.58°** |
+For published surfaces (panels, reports), the chain's node longitudes are expressed in the Souami & Souchay origin (the plane's ascending node on the ICRF equator) via a **derived** conversion (`@essrt/physics/planets/inv-plane-frame`: banked plane + J2000 mean obliquity, zero fitted constants). This derivation closed the former ≈3.4° two-convention gap against La2010: the chain node lands on La2010's to 0.0001° at J2000, with a +0.04° mean offset over −500 kyr → 0.
 
-### The Ecliptic-Invariable Relationship
-
-Since the ecliptic IS Earth's orbital plane, we can flip the perspective:
+### Two frames, two node values — don't conflate
 
 | Viewpoint | Value | Meaning |
 |-----------|-------|---------|
-| Invariable plane's ascending node on ecliptic | 107.58° | Where invariable plane crosses *up* through ecliptic |
-| Earth's ascending node on invariable plane | <!--v:earthAscNodeJ2000-->284.51<!--/v-->° | Where Earth's orbit crosses *up* through invariable plane |
+| Invariable plane's ascending node on ecliptic | 107.58° | Where the invariable plane crosses *up* through the ecliptic |
+| Earth's ascending node on the invariable plane | <!--v:earthAscNodeJ2000-->284.51<!--/v-->° | Where Earth's orbit crosses *up* through the invariable plane |
 
-These values differ by ~177° (not exactly 180°) due to measurement precision and the fact that the "mean ecliptic" is a defined plane, not identical to Earth's instantaneous orbit.
-
----
-
-## Planetary Inclinations to the Invariable Plane
-
-Each planet's orbit is tilted relative to the invariable plane. These values are fundamentally more stable than ecliptic inclinations:
-
-For current values, see [Constants Reference](20-constants-reference.md).
-
-| Planet | Inclination to Inv. Plane | Inclination to Ecliptic (J2000) | Notes |
-|--------|---------------------------|------------------------|-------|
-| Mercury | `mercuryInvPlaneInclinationMean` | 7.01° | Highest inclination |
-| Venus | `venusInvPlaneInclinationMean` | 3.39° | |
-| Earth | `earthInvPlaneInclinationMean` | 0° (by definition) | Oscillates mean ± amplitude |
-| Mars | `marsInvPlaneInclinationMean` | 1.85° | |
-| Jupiter | `jupiterInvPlaneInclinationMean` | 1.30° | Closest to invariable plane |
-| Saturn | `saturnInvPlaneInclinationMean` | 2.49° | |
-| Uranus | `uranusInvPlaneInclinationMean` | 0.77° | |
-| Neptune | `neptuneInvPlaneInclinationMean` | 1.77° | |
-| Pluto | `plutoInvPlaneInclinationMean` | 17.14° | Dwarf planet |
-
-**Key observations:**
-
-1. **Giant planets have small inclinations** (0.32°-1.02°) because they collectively define the invariable plane through their dominant angular momentum
-2. **Inner planets have larger inclinations** (means 1.48°-6.70°) because they contribute negligibly to total angular momentum
-3. **For all planets except Earth**, inclination to the invariable plane is smaller than inclination to the ecliptic
+These differ by ~177° (not exactly 180°) because the "mean ecliptic" is a defined plane, not identical to Earth's instantaneous orbit.
 
 ---
 
-## Planetary Crossings
+## Heights, Nodes and Crossings
 
-### Every Planet Crosses the Invariable Plane
+Every planet's orbit is tilted relative to the invariable plane, so every planet spends half of each orbit above it and half below, crossing at the ascending node (below → above) and descending node (above → below).
 
-Every planet's orbit is tilted relative to the invariable plane. This means:
+### How the model computes them
 
-1. **Half of each orbit is ABOVE the invariable plane**
-2. **Half of each orbit is BELOW the invariable plane**
-3. The planet crosses the invariable plane at two points:
-   - **Ascending Node**: Planet goes from below to above
-   - **Descending Node**: Planet goes from above to below
+For the **chain bodies** (the seven planets and Earth), each frame:
 
-### Earth's Crossings
+- **Height** = the exact projection `h = r⃗ · ẑ_inv` of the chain's heliocentric position vector onto the banked plane normal — no trigonometric reconstruction.
+- **Nodes** (`o.<planet>AscendingNodeInvPlane`, and the ecliptic node) come from the chain's element set of date.
+- **Inclination trend coloring** in the UI comes from the chain's own slope (±100 yr), not a phase rule.
+
+Implementation: `updatePlanetInvariablePlaneHeights()` in [src/script.js](../src/script.js), fed by the Keplerian chain (`@essrt/physics/planets/keplerian-chain`).
+
+For the **no-chain bodies** (Pluto, Halley, Eros — legacy scene scaffolding, see [doc 04](04-dynamic-elements-overview.md)), the geometric construction remains:
+
+```
+height = sin(i_inv) × sin(angleFromNode) × distance
+angleFromNode = trueAnomaly + argumentOfPeriapsis − ascendingNodeOnInvPlane
+```
+
+with the node precessing linearly from its J2000 anchor at the body's ecliptic perihelion period.
+
+### Earth's crossings
 
 Earth crosses the invariable plane **twice per year**:
 
-| Crossing | When | Earth's Position |
-|----------|------|------------------|
-| **Ascending** (below → above) | Early July | Heliocentric longitude ~284.5° |
-| **Descending** (above → below) | Early January | Heliocentric longitude ~104.5° |
+| Crossing | When | Heliocentric longitude |
+|----------|------|------------------------|
+| **Ascending** (below → above) | Early July (~July 4) | ~284.5° |
+| **Descending** (above → below) | Early January (~January 4) | ~104.5° |
 
-**Result:**
-- Earth is **ABOVE** the invariable plane from July to January
-- Earth is **BELOW** the invariable plane from January to July
+Earth is **above** the plane July → January and **below** it January → July. Maximum height at the current ~1.57° inclination: sin(1.57°) × 1 AU ≈ 0.027 AU ≈ 4 million km.
 
-### Height Above/Below the Plane
+### Maximum heights by planet
 
-The maximum height a planet reaches above/below the invariable plane depends on:
-1. Its inclination to the invariable plane
-2. Its distance from the Sun
+The maximum height depends on inclination × distance:
 
-| Planet | Max Height | When |
-|--------|------------|------|
-| Mercury | ~0.05 AU | At perihelion, 90° from node |
-| Earth | ~0.03 AU | Near aphelion, 90° from node |
-| Jupiter | ~0.03 AU | Despite tiny inclination, large distance |
+| Planet | Max height (AU) | Notes |
+|--------|-----------------|-------|
+| Mercury | ~0.05 | High inclination × close distance |
+| Venus | ~0.03 | |
+| Earth | ~0.027 | At current ~1.57° inclination |
+| Mars | ~0.05 | Eccentricity varies the distance |
+| Jupiter | ~0.029 | Tiny inclination × large distance |
+| Saturn | ~0.15 | |
+| Uranus | ~0.34 | |
+| Neptune | ~0.39 | Small inclination × huge distance |
 
 ---
 
-## The Inclination Cycle vs. Annual Crossings
+## The Two Angles: Inclination vs Node
 
-A common misconception is that Earth's position relative to the invariable plane follows the H/3-year inclination cycle. In reality:
+Each orbital plane has **two distinct angles** evolving at different rates — a common confusion worth separating:
 
-| Timescale | What Changes | Effect |
-|-----------|-------------|--------|
-| **1 year** | Earth's position in its orbit | Earth crosses plane twice per year |
-| **H/3 years** | Earth's orbital plane tilt | Changes HOW FAR above/below Earth gets |
+- **Inclination** `i(t)` — the "nodding" of the orbital plane. Changes **how far** above/below the plane the planet gets; it does not change the fact of two crossings per orbit.
+- **Ascending node** `Ω(t)` — the "spinning" of the line of nodes. Shifts **where/when** the crossings happen.
+
+For the planets both angles are now **dynamical outputs of the chain** (elements of date; the long-term curves are engine D's own secular modes). For Earth the model's kinematic identities apply: Ω regresses at the ecliptic precession rate **−H/5 ≈ −<!--v:hDiv5-->67,063<!--/v--> yr** (confirmed by La2010), while Earth's inclination to the invariable plane oscillates on the **H/3 ≈ <!--v:earthPeriPeriodICRF-->111,772<!--/v-->-yr** ICRF perihelion cycle — two different angles, two different rates.
+
+Earth's charted model inclination `i_inv(t)` is the **one-source** reading: the engine's own Earth-orbit normal (secular series inside ±10 Myr, mode tail beyond) against the artifact's invariable plane — it matches La2010 at rms 0.003° over −500 kyr.
 
 ```
-Year 2000:
-- Earth's orbit tilted ~1.57° from invariable plane
-- Earth crosses invariable plane in ~January and ~July
-- Maximum height above/below: sin(1.57°) × 1 AU ≈ 0.027 AU ≈ 4 million km
-
-Year 50000 (minimum tilt):
-- Earth's orbit tilted ~0.85° from invariable plane
-- Earth STILL crosses invariable plane twice per year
-- Maximum height: sin(0.85°) × 1 AU ≈ 0.015 AU ≈ 2.2 million km (min ~0.848°)
+Year 2000:  Earth's orbit tilted ~1.57° → max height ≈ 0.027 AU
+Year 50000 (near minimum tilt):  ~0.85° → max height ≈ 0.015 AU
+— Earth still crosses the plane twice per year in both cases.
 ```
 
-The crossing dates shift as Earth's ascending node circulates through 360°. Earth's Ω regresses at the ecliptic precession rate of −H/5 ≈ <!--v:hDiv5-->67,063<!--/v--> years (Earth's *inclination* itself oscillates on the H/3 ≈ <!--v:earthPeriPeriodICRF-->111,772<!--/v-->-year ICRF perihelion cycle — these are two distinct angles evolving at different rates).
+### The invariable-plane argument of periapsis
 
----
-
-## Orbital Plane Precession
-
-All planetary orbital planes **precess around the invariable plane** like spinning tops. Each planet's plane has **two distinct angles** evolving at different rates:
-
-- **Inclination** `i(t)` — oscillates with the planet's *ICRF perihelion period* (e.g., Earth: H/3, Jupiter: 8H/65). This is the "nodding" of the orbital plane.
-- **Ascending node** `Ω(t)` — regresses linearly at `−(8H)/N` years for some planet-specific integer N (Earth: N=40, period −H/5 ≈ −<!--v:hDiv5-->67,063<!--/v--> years). This is the "spinning" of the line of nodes.
-
-Per-planet integer assignments are listed in [Solar System Resonance Cycle Periods](55-solar-system-resonance-cycle-periods.md). The invariable plane itself varies < 0.1 mas over 100 years and is treated as fixed for all model purposes.
-
----
-
-## Visualization in the Simulation
-
-The 3D simulation shows the invariable plane as a translucent disc. Enable it via **Celestial Tools > Earth Inclination to Invariable plane**.
-
-### What You Can See
-
-1. **The plane itself** - A translucent disc centered on the Sun
-2. **Earth's height indicator** - A line showing Earth's current distance above/below the plane
-3. **Crossing markers** - Points where Earth's orbit intersects the plane (ascending and descending nodes)
-4. **High/low markers** - Points where Earth reaches maximum height above/below the plane
-
-### Visual Elements
-
-| Element | Color | Description |
-|---------|-------|-------------|
-| Plane disc | Translucent | The invariable plane surface |
-| Height line | Variable | Earth's current height above/below |
-| Ascending node | Green | Where Earth crosses going north |
-| Descending node | Red | Where Earth crosses going south |
-| High point | Yellow | Maximum height above plane |
-| Low point | Blue | Maximum depth below plane |
-
-### Planet Inspector Values
-
-For each planet, the inspector shows:
-
-| Field | Description |
-|-------|-------------|
-| Ascending Node on Inv. Plane (Ω) | Where the orbit crosses upward through the plane |
-| Height above Inv. Plane | Current distance above (positive) or below (negative) |
-| Above/Below status | Whether currently above or below the plane |
+`ω_inv` — the in-orbit-plane angle from the orbit's ascending node **on the invariable plane** to the perihelion direction — is computed by an exact vector construction (perihelion unit vector and orbit normal in ecliptic-J2000, node direction = ẑ_inv × n̂_orbit; `_kcArgPeriInvPlaneDeg` in [src/script.js](../src/script.js)). No frame-mixed shortcut (such as differencing an equatorial-frame ϖ against an ICRF node) is used. For Earth, ω_inv sits near 180° − i_inv ≈ 178.4°: Earth's perihelion lies very close to its descending node on the invariable plane.
 
 ---
 
 ## Angular Momentum Validation (Option A vs B)
 
-The simulation includes two approaches to verify the invariable plane orientation.
+The simulation verifies the plane's orientation two independent ways.
 
-### Background: What Defines the Invariable Plane?
+**Option A — computed from angular momentum.** `calculateInvariablePlaneFromAngularMomentum()` builds each planet's angular-momentum vector from `h = √(GM☉·a·(1−e²))`, `L = m·h`, and the orbit's `(i, Ω)`, sums them, and reads the tilt and node of the total:
 
-The invariable plane is perpendicular to the **total angular momentum vector** of the solar system. Since angular momentum is conserved in an isolated system, this plane is fixed in space—unlike the ecliptic, which slowly precesses over time.
+| Planet | L (% of total) |
+|--------|----------------|
+| Mercury | 0.003% |
+| Venus | 0.06% |
+| Earth | 0.08% |
+| Mars | 0.01% |
+| **Jupiter** | **61.6%** |
+| **Saturn** | **24.9%** |
+| Uranus | 5.4% |
+| Neptune | 8.0% |
 
-For a planet in an elliptical orbit, the **specific angular momentum** (per unit mass) is:
+**Option B — the published reference** (Souami & Souchay 2012 values above).
 
-```
-h = √(GM☉ × a × (1 - e²))
-```
-
-The **total angular momentum** of a planet is `L = mass × h`.
-
-### Option A: Calculated from Angular Momentum
-
-The function `calculateInvariablePlaneFromAngularMomentum()` computes the invariable plane orientation dynamically:
-
-**Step 1:** Calculate each planet's angular momentum magnitude
-
-**Step 2:** Convert to 3D vector using inclination (i) and ascending node (Ω):
-```
-L_x = L × sin(i) × sin(Ω)
-L_y = L × cos(i)
-L_z = L × (-sin(i) × cos(Ω))
-```
-
-**Step 3:** Sum all vectors: `L_total = Σ L_planet`
-
-**Step 4:** Calculate tilt: `tilt = arccos(L_total_y / |L_total|)`
-
-**Step 5:** Calculate ascending node: `ascending_node = atan2(L_total_x, -L_total_z)`
-
-### Angular Momentum Contributions by Planet
-
-| Planet | Mass (kg) | a (AU) | L (% of total) |
-|--------|-----------|--------|----------------|
-| Mercury | 3.30 × 10²³ | 0.387 | 0.003% |
-| Venus | 4.87 × 10²⁴ | 0.723 | 0.06% |
-| Earth | 5.97 × 10²⁴ | 1.000 | 0.08% |
-| Mars | 6.42 × 10²³ | 1.524 | 0.01% |
-| **Jupiter** | 1.90 × 10²⁷ | 5.203 | **61.6%** |
-| **Saturn** | 5.68 × 10²⁶ | 9.537 | **24.9%** |
-| Uranus | 8.68 × 10²⁵ | 19.19 | 5.4% |
-| Neptune | 1.02 × 10²⁶ | 30.07 | 8.0% |
-
-**Key insight**: Jupiter (62%) and Saturn (25%) contribute ~86% of the total angular momentum. The invariable plane orientation is dominated by these two gas giants.
-
-### Option B: Published Reference Data (Souami & Souchay 2012)
-
-| Parameter | Value |
-|-----------|-------|
-| Inclination to ecliptic (J2000) | 1°34'43.3" = **1.5787°** |
-| Ascending node on ecliptic | 107°34'56" = **<!--v:invPlaneAscNode-->107.582<!--/v-->°** |
-
-### Important: Two Different Reference Frames
-
-> **~107°**: Where the invariable plane crosses the ecliptic (going north)
-> **~284°**: Where Earth's orbit crosses the invariable plane (going north)
-
-These differ by ~177° (not exactly 180° due to 3D geometry). The simulation uses **284°** (Earth's ascending node on the invariable plane) from Souami & Souchay.
-
-### Validation Output
-
-| Field | Description | Expected |
-|-------|-------------|----------|
-| Calculated Tilt | Invariable plane tilt from ecliptic | 1.5787° ± 0.01° |
-| Calculated Asc. Node | Ascending node on ecliptic | ~107° ± 0.5° |
-| Jupiter L (%) | Jupiter's angular momentum contribution | 58-62% |
-| Saturn L (%) | Saturn's angular momentum contribution | 23-26% |
-| A vs B Diff | Difference between methods | < 0.1° |
-
-### Why This Validation Matters
-
-1. **Self-consistency check**: Confirms orbital elements produce correct invariable plane
-2. **Educational**: Shows users how angular momentum defines the plane
-3. **Debugging**: If values diverge, indicates data inconsistency
-4. **Independence**: Two different calculation methods should agree
-
-**Location:** `script.js` (search the function name)
+Expected agreement: tilt 1.5787° ± 0.01°, node ~107° ± 0.5°, A-vs-B difference < 0.1°. The check is a live self-consistency gate: if the two diverge, the orbital-element data is inconsistent.
 
 ---
 
 ## Mass-Weighted Balance Tracking
 
-The simulation tracks whether planets are balanced above and below the invariable plane over time.
+Because the plane is defined by total angular momentum, the mass-weighted average height of all planets should oscillate around zero over long timescales. The simulation tracks this as a live gauge:
 
-### Physics Rationale
+- **Mass Balance (AU)** = `Σ(mass × height) / total_mass`, computed each frame (`updateInvariablePlaneBalance()`), plus counts of planets currently above/below.
+- **Trend analysis** (`startBalanceTracking()` / `updateBalanceTrendAnalysis()`) records yearly samples; over periods exceeding Neptune's ~165-yr orbit the lifetime average should converge toward zero.
 
-Since the invariable plane is defined by total angular momentum, the mass-weighted average height of all planets should oscillate around zero over long timescales. This provides another validation of the model's accuracy.
+---
 
-### Balance Indicators
+## Visualization in the Simulation
 
-| Field | Description |
-|-------|-------------|
-| Mass Balance (AU) | Mass-weighted average height: `Σ(mass × height) / total_mass` |
-| Planets Above | Number of planets currently above the plane |
-| Planets Below | Number of planets currently below the plane |
-
-### Balance Trend Analysis
-
-The simulation can track balance over time to verify convergence to zero:
-
-| Field | Description |
-|-------|-------------|
-| Years Tracked | Duration since tracking started |
-| Sample Count | Number of yearly samples recorded |
-| Lifetime Average | Running average (should converge to ~0) |
-| Min/Max Seen | Range of observed balance values |
-
-**Expected behavior:** Over periods exceeding Neptune's orbital period (~165 years), the lifetime average should approach zero.
-
-### Functions
-
-| Function | Description |
-|----------|-------------|
-| `updateInvariablePlaneBalance()` | Calculates mass-weighted balance each frame |
-| `updateBalanceTrendAnalysis()` | Records yearly samples when tracking is active |
-| `startBalanceTracking()` | Begins new tracking session |
-| `stopBalanceTracking()` | Pauses tracking (preserves data) |
-| `resetBalanceTracking()` | Clears all tracking data |
-
-**Location:** `script.js` (search the function name)
+Enable via **Celestial Tools > Earth Inclination to Invariable plane**: a translucent disc centered on the Sun, Earth's current height line, crossing markers (ascending green, descending red), and high/low markers (yellow/blue). Each planet's inspector shows its ascending node on the invariable plane (ecliptic convention: `o.<planet>AscendingNodeInvPlaneEcliptic`), its current signed height, and above/below status.
 
 ---
 
 ## Summary
 
-The invariable plane provides a fixed reference frame for understanding the solar system's geometry:
-
-- **Fixed in space** - Unlike the precessing ecliptic
-- **Physics-based** - Perpendicular to total angular momentum
-- **Universal reference** - All planetary motions can be measured consistently
-
-Every planet, including Earth, crosses this plane twice per orbit. The H/3-year precession cycle determines how tilted each orbit is, but the crossings happen on orbital timescales (1 year for Earth, 12 years for Jupiter, etc.).
-
-The angular momentum validation (Option A vs B) and mass-weighted balance tracking provide continuous verification that the simulation accurately represents the solar system's physics.
+- The invariable plane is fixed, physics-defined, and giant-planet-dominated; the model banks **its own** plane from the chain artifact and expresses node longitudes in the Souami & Souchay origin via a derived, zero-fitted-constant conversion (0.0001° vs La2010 at J2000).
+- Chain bodies get exact projected heights (`r⃗ · ẑ_inv`) and element-of-date nodes; only the no-chain bodies (Pluto, Halley, Eros) keep the geometric sin(i)·sin(u)·r construction.
+- Inclination and node are two distinct angles at two distinct rates — for Earth: i_inv on the H/3 ICRF-perihelion cycle, Ω at −H/5 — and every planet still crosses the plane twice per orbit regardless of tilt.
+- Two live self-checks (angular-momentum Option A vs B, mass-weighted balance) continuously verify the geometry.
 
 ---
 
-## Further Reading
+## Related Documents
 
-For technical implementation details:
-- [33 - Invariable Plane Calculations](33-invariable-plane-calculations.md) - Height calculation formulas and code
-- [32 - Inclination Calculations](32-inclination-calculations.md) - Dynamic inclination oscillations
-
-For constants and data:
-- [20 - Constants Reference](20-constants-reference.md) - All invariable plane constants
-- [55 - Solar System Resonance Cycle Periods](55-solar-system-resonance-cycle-periods.md) - Complete 8H/N period table for the per-planet Ω regression integers referenced in §"Orbital Plane Precession"
-
-For deep-time scaling:
-- [99 - Expanding Solar System Resonance Theory (ESSRT)](99-expanding-solar-system-resonance-theory.md) - Deep-time scaling of H(t)
-
----
-
-**Previous**: [04 - Dynamic Elements Overview](04-dynamic-elements-overview.md)
-**Next**: [20 - Constants Reference](20-constants-reference.md)
+- [04 - Orbital Elements Overview](04-dynamic-elements-overview.md) — the chain (the only planet path) and the no-chain bodies
+- [20 - Constants Reference](20-constants-reference.md) — all invariable-plane constants
+- [22 - Coordinate Frames](22-coordinate-frames.md) — frame transformations
+- [24 - The Δa Mass Derivation](24-moon-kepler-derivation.md) — Part III: the Sun-SSB chart served from the same s-frame basis
+- [99 - Expanding Solar System Resonance Theory (ESSRT)](99-expanding-solar-system-resonance-theory.md) — deep-time scaling of H(t)

@@ -83,6 +83,27 @@ The shipped stack predicts the Babylonian era from post-CE data at 85 s RMS
 against a 223 s baseline. That is the strongest out-of-sample result the stack
 has.
 
+### The CE-era century arc — the complementary out-of-sample suite
+
+`tools/explore/u2-dt-out-of-sample.mjs` runs the same question from the
+other side (fit window 1650–2017, evaluated against the fifteen CE
+centuries the fit never saw), three tests in one:
+
+- **Residual diagnostic** — the empirical CE-era ΔT (canon century means)
+  minus the pure-tidal backbone shows a ~1,000-s arc (peak +459 s at
+  250 AD, trough −513 s at 1050); the shipped cycles TRACK it in phase
+  and amplitude across all fifteen out-of-window centuries.
+- **Cycle ablation** — removing Bond degrades the out-of-sample RMS
+  78 → 268 s, the resonator → 188 s, Hallstatt → 146 s (each individually
+  validated out-of-sample). The Joses are untestable at century bins
+  (~179-yr period averages out) — their evidence stays the coupled-pair
+  audit above.
+- **Raw-medieval control** (spline-vs-sky) — the same residual against
+  Stephenson's RAW S05–S09 observations: the smooth ~1,000-yr "missing
+  tone" the canon spline suggests does NOT exist coherently in the raw
+  data (sign flips between adjacent centuries = source systematics). This
+  control is what stopped a spurious 5th cycle.
+
 ### Jose5 and Jose4 are a coupled pair
 
 Judged singly, each looks poor — jose5 without jose4 scores 227.4 s on split 2,

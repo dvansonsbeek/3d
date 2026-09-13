@@ -3,84 +3,85 @@
  "verdict": {
   "alphaArcsecPerYr": 54.81121711729492,
   "psiDotH13ArcsecPerYr": 50.288312944790015,
-  "rateFullArcsecPerCy": -38.486046014309494,
-  "rateEraArcsecPerCy": -46.961917250928316,
+  "rateSeriesArcsecPerCy": -46.79440526267342,
+  "rateFullArcsecPerCy": -38.91352679301434,
+  "rateEraArcsecPerCy": -47.998668809029255,
   "iauRateArcsecPerCy": -46.836769,
-  "beatKyr": 41.224797096946105,
+  "beatKyr": 41.22435050256062,
   "zetaTermsFull": 16,
   "zetaTermsEra": 8,
   "windowsFull": {
    "13": {
-    "hybridRmsArcsec": 365.9155741230795,
-    "hybridCorr": 0.9999337214320325,
+    "hybridRmsArcsec": 529.2786378292463,
+    "hybridCorr": 0.9948654228187244,
     "fittedLawRmsArcsec": 711.4541180050388,
     "fittedLawCorr": 0.9505146043962526
    },
    "50": {
-    "hybridRmsArcsec": 269.8385033520162,
-    "hybridCorr": 0.9991240267529287,
+    "hybridRmsArcsec": 388.5273546641974,
+    "hybridCorr": 0.9981284849683949,
     "fittedLawRmsArcsec": 2721.088006639304,
     "fittedLawCorr": 0.6148901434239137
    },
    "130": {
-    "hybridRmsArcsec": 250.7061068286692,
-    "hybridCorr": 0.9986902717589057,
+    "hybridRmsArcsec": 380.0147453193222,
+    "hybridCorr": 0.9961737935915359,
     "fittedLawRmsArcsec": 2243.0300972212854,
     "fittedLawCorr": 0.5848211055646957
    },
    "270": {
-    "hybridRmsArcsec": 217.68671650623799,
-    "hybridCorr": 0.9988234325055503,
+    "hybridRmsArcsec": 429.67879812508374,
+    "hybridCorr": 0.9924332823484033,
     "fittedLawRmsArcsec": 2918.7753068727206,
     "fittedLawCorr": 0.3230912957080654
    },
    "600": {
-    "hybridRmsArcsec": 200.45254796763984,
-    "hybridCorr": 0.9968675387093068,
+    "hybridRmsArcsec": 587.3979788921486,
+    "hybridCorr": 0.9731803831974732,
     "fittedLawRmsArcsec": 3440.6513708534003,
     "fittedLawCorr": -0.08980403349994259
    },
    "1000": {
-    "hybridRmsArcsec": 315.33857696485234,
-    "hybridCorr": 0.9888096914598257,
+    "hybridRmsArcsec": 687.2752920246386,
+    "hybridCorr": 0.9481069610017332,
     "fittedLawRmsArcsec": 3431.364542311616,
     "fittedLawCorr": -0.24902080832936696
    }
   },
   "windowsEra": {
    "13": {
-    "hybridRmsArcsec": 56.40802170687757,
-    "hybridCorr": 0.9995000968441492,
+    "hybridRmsArcsec": 49.975943991602826,
+    "hybridCorr": 0.9998294196246544,
     "fittedLawRmsArcsec": 711.4541180050388,
     "fittedLawCorr": 0.9505146043962526
    },
    "50": {
-    "hybridRmsArcsec": 464.60813266158937,
-    "hybridCorr": 0.9893290988048402,
+    "hybridRmsArcsec": 426.70999968585187,
+    "hybridCorr": 0.9905757209707261,
     "fittedLawRmsArcsec": 2721.088006639304,
     "fittedLawCorr": 0.6148901434239137
    },
    "130": {
-    "hybridRmsArcsec": 463.8503494705606,
-    "hybridCorr": 0.9843392308989934,
+    "hybridRmsArcsec": 488.4098256695647,
+    "hybridCorr": 0.9820420989502253,
     "fittedLawRmsArcsec": 2243.0300972212854,
     "fittedLawCorr": 0.5848211055646957
    },
    "270": {
-    "hybridRmsArcsec": 464.1982712254593,
-    "hybridCorr": 0.9835913862876238,
+    "hybridRmsArcsec": 489.8966394040357,
+    "hybridCorr": 0.9821108046723341,
     "fittedLawRmsArcsec": 2918.7753068727206,
     "fittedLawCorr": 0.3230912957080654
    },
    "600": {
-    "hybridRmsArcsec": 497.51364166511763,
-    "hybridCorr": 0.9765795104427407,
+    "hybridRmsArcsec": 548.2843064360521,
+    "hybridCorr": 0.9724062170963723,
     "fittedLawRmsArcsec": 3440.6513708534003,
     "fittedLawCorr": -0.08980403349994259
    },
    "1000": {
-    "hybridRmsArcsec": 614.6244098084364,
-    "hybridCorr": 0.9531320927518697,
+    "hybridRmsArcsec": 644.4460971299569,
+    "hybridCorr": 0.9495618921089015,
     "fittedLawRmsArcsec": 3431.364542311616,
     "fittedLawCorr": -0.24902080832936696
    }
@@ -90,9 +91,10 @@
   "generator": "node tools/verify/obliquity-hybrid.js --write",
   "files": {
    "data/la2004-earth-51myr-back.asc": "sha256:3f13b9f8e69085baf40bc67a2669e6f6af4148fef9218ed2158772aa91e35f8c",
-   "data/nbody-deep-secular-modes.json": "sha256:b74be2d9b00a34604fc64f2c4c800c29f574cd4e8003ca6b8493db29fd48598f",
+   "data/nbody-deep-secular-modes.json": "sha256:77e0baf779e85de548e532ec52e2ace55a9bdba3bbd2f67002fa9fbdfc3440de",
+   "data/nbody-secular-series.json": "sha256:f62225cfa1952844c16add01f0aa1f6993e2985e65c33c565668af292d53eabc",
    "tools/explore/stage-c-obliquity-hybrid.mjs": "sha256:383891c893099b818dfa1b03053ea1c255e0e6b156cd025efe2e445599f0d44b",
-   "tools/verify/obliquity-hybrid.js": "sha256:f7db653294effe6d7e2ad5008428e1f9c8ae4695e9eb97e34e41a679384a54f6"
+   "tools/verify/obliquity-hybrid.js": "sha256:1cbf8094a4616e4454ff0c657c53244bd8c49431bc03db35c8f16b30b0a47610"
   }
  }
 }

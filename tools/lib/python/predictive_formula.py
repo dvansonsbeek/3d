@@ -447,7 +447,7 @@ def calc_planet_obliquity(planet: str, year: int) -> float:
     Oscillation tied to invariable-plane inclination dynamics.
     Venus and Neptune have no obliquity cycle (returns static value).
 
-    See docs/37-planets-precession-cycles.md § Obliquity Cycle Theory.
+    Obliquity cycle: obliquity = |inclination − ecliptic|; Venus/Neptune static.
 
     Args:
         planet: Planet name (e.g. 'Mercury')

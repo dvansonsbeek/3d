@@ -709,16 +709,6 @@ a:link {
   border-left: 3px solid hsla(48, 90%, 75%, 0.7);
 }
 
-/* Legacy dat.GUI perihelion highlight — kept for compatibility */
-.highlight-perihelion input[type=”text”] {
-  background: none !important;
-  border: none !important;
-  color: grey !important;
-  font-weight: bold !important;
-  text-align: right !important;
-  pointer-events: none !important;
-}
-
 .star-label {
   position: absolute;      /* our CSS2DRenderer will handle top/left */
   transform: translate(-50%, -120%); /* center + lift above */
@@ -1054,12 +1044,6 @@ a:link {
   stroke-linecap:round;
   stroke-linejoin:round;
 }
-.pl-nav-eye-label{
-  font:500 9px/1 var(--pl-body-font);
-  color:rgba(239,192,74,.75);
-  letter-spacing:.04em;
-  text-transform:uppercase;
-}
 .pl-nav-eye.eye-off{
   opacity:.4;
   border-color:rgba(255,255,255,.1);
@@ -1067,9 +1051,6 @@ a:link {
 }
 .pl-nav-eye.eye-off svg{
   stroke:rgba(255,255,255,.4);
-}
-.pl-nav-eye.eye-off .pl-nav-eye-label{
-  color:rgba(255,255,255,.35);
 }
 
 /* ─── Scene watermark ─── */
@@ -1591,50 +1572,6 @@ a:link {
 .pl-info{ margin-right:.25em; text-decoration:none; opacity:.8; cursor:help; }
 .pl-info:hover{ opacity:1; }
 
-/* Historical Solar Eclipses prev/next/jump buttons in the Moon section */
-.pl-ecl-prev, .pl-ecl-next, .pl-ecl-jump{
-  background:rgba(255,255,255,.06);
-  border:1px solid rgba(255,255,255,.18);
-  color:#cfe6ff;
-  border-radius:3px;
-  padding:0 6px;
-  font-size:.9em;
-  font-family:inherit;
-  cursor:pointer;
-  line-height:1.4;
-  vertical-align:middle;
-}
-.pl-ecl-prev:hover, .pl-ecl-next:hover, .pl-ecl-jump:hover{
-  background:rgba(110,229,255,.18);
-  border-color:rgba(110,229,255,.5);
-  color:#fff;
-}
-.pl-ecl-prev:active, .pl-ecl-next:active, .pl-ecl-jump:active{
-  transform:scale(.94);
-}
-.pl-ecl-name{
-  display:inline-block;
-  min-width:8em;
-  padding:0 .35em;
-  font-weight:600;
-  color:#fff;
-}
-.pl-ecl-idx{
-  font-size:.85em;
-  opacity:.65;
-  margin-left:.4em;
-}
-.pl-ecl-jump{
-  font-weight:500;
-  background:rgba(255,206,75,.10);
-  border-color:rgba(255,206,75,.4);
-  color:#ffce4b;
-}
-.pl-ecl-jump:hover{
-  background:rgba(255,206,75,.25);
-  color:#fff;
-}
-
 /* ─── emphasis helpers inside value cells ─── */
 .pl-val strong, .pl-alt strong{ font-weight:600; color:#fff; }
 .pl-val em,     .pl-alt em    { font-style:italic; opacity:.9; }
@@ -1718,7 +1655,6 @@ a:link {
 
 
 /* rare utility if you need it */
-.smallcaps{ font-variant:small-caps; }
 
 /* ===== Planet Hierarchy Inspector Panel ===== */
 #hierarchyInspector {
@@ -2353,9 +2289,6 @@ details.wgc-chart-collapsible > .wgc-chart { margin-top:8px; }
 .cfm-swatch-total { background:#ffffff; height:4px; }
 .cfm-swatch-l1    { background:#ffe066; }
 .cfm-swatch-l2    { background:#66e0a0; }
-.cfm-swatch-l3    {
-  background:linear-gradient(90deg,#ff9b66 0 4px, transparent 4px 7px,#ff9b66 7px 11px, transparent 11px 14px);
-}
 
 .cfm-proxy-toggle {
   display:none; align-items:center; gap:6px;
@@ -2459,13 +2392,6 @@ details.wgc-chart-collapsible > .wgc-chart { margin-top:8px; }
   color:rgba(255,170,170,.85); text-decoration:underline;
 }
 .cfm-future-note a:hover { color:rgba(255,200,200,1); }
-.cfm-caveat {
-  margin-top:14px; padding:11px 14px; border-radius:5px;
-  background:rgba(255,155,102,.05); border-left:2px solid rgba(255,155,102,.45);
-  font:400 11px/1.55 Inter,system-ui,sans-serif; color:rgba(255,255,255,.65);
-}
-.cfm-caveat b { color:rgba(255,155,102,.95); font-weight:600; }
-.cfm-caveat i { color:rgba(255,255,255,.85); font-style:italic; }
 
 /* ══════════════════════════════════════════════════════════════════
    FORMULA VERIFICATION PANEL (.vfp-)
@@ -2808,16 +2734,6 @@ details.wgc-chart-collapsible > .wgc-chart { margin-top:8px; }
 .lcr-swatch-bands {
   background: linear-gradient(90deg, rgba(224, 112, 112, .5) 0 7px, rgba(109, 180, 255, .5) 7px 14px);
   height: 10px;
-}
-.lcr-swatch-cross {
-  background: transparent;
-  border-top: 6px solid transparent;
-  border-bottom: 6px solid transparent;
-  border-left: 8px solid #ff4757;
-  border-radius: 0;
-  height: 0;
-  width: 0;
-  vertical-align: middle;
 }
 .lcr-swatch-proxy {
   background: #ff5978;

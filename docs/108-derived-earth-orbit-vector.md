@@ -151,9 +151,10 @@ reproduce only the local rates.
 **Cardinal-timing scale.** The derived and H/16 laws differ by up to
 δe = 0.030 in the window — 3.5° of equation of centre — which moves the
 cardinal-point instants by up to 3.5 days at deep time. The Step-6d fit
-(0.28–0.37 min over ±270 kyr) measures the runtime closed form against
-the engine's own CSV; it is a self-consistency figure and does not
-express this days-class law uncertainty.
+(0.26–0.29 min over ±270 kyr with the §10g joint sidebands) measures the
+runtime closed form against the engine's own CSV; it is a
+self-consistency figure and does not express this days-class law
+uncertainty.
 
 **The paleo test.** The LR04 insolation check (doc 94 lineage,
 `scripts/milankovitch_insolation_laskar_check.py`, now with `LA2010_PATH`

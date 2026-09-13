@@ -17,8 +17,9 @@
  * whole extracted core had silently escaped the boundary and purity rules
  * (the Phase-2 planted-violation proofs predate the .cjs modules).
  *
- * `packages/research` and `packages/analysis` are exempt by policy (§2e, §2f):
- * frozen one-offs and Python respectively.
+ * `packages/analysis` is exempt by policy (§2f): the declared Python home.
+ * (`packages/research` was deleted — the tools/explore relocation was
+ * trialled and reverted, Phase 10; the freeze holds in place.)
  */
 import js from '@eslint/js';
 import boundaries from 'eslint-plugin-boundaries';
@@ -33,7 +34,7 @@ export default [
       'node_modules/**', 'dist/**', '.parcel-cache/**',
       'src/**', 'tools/**', 'scripts/**', 'dashboard/**', 'public/**',
       'data/**', 'docs/**', 'web-bundles/**',
-      'packages/research/**', 'packages/analysis/**',
+      'packages/analysis/**',
       // Harness workspace — a KEPT git worktree under .claude/worktrees/ is a
       // full duplicate tree; without this ignore it swept 46k phantom lint
       // errors into the chain (measured, P5 K5b session).

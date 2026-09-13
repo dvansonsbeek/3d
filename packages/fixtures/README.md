@@ -6,7 +6,7 @@ strangler-fig migration untrustworthy.
 | tier | what it is | expected state | breaking it means |
 |---|---|---|---|
 | `regression/` | what the tree does **today** | **green, always** | your extraction changed behaviour — stop |
-| `targets/` | what attempt 1 **achieved**, on a tree that no longer exists | **red** | nothing; they go green as Phases 6–7 land |
+| `targets/` | what attempt 1 **achieved**, on a tree that no longer exists | **red / partially measurable** | nothing; they go green as the remaining phases land (`npm run targets` reports the live state — currently 2 of 8 measurable, 6 blocked on out-of-repo sources) |
 
 Encoding targets as regression fixtures would give a suite that is red from day
 one and can therefore never distinguish a broken extraction from unfinished

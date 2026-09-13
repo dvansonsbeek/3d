@@ -22,7 +22,7 @@ const path = require('path');
 // 9-3f: moved from tools/fit (shim remains); REPO now three levels up.
 const REPO = path.join(__dirname, '..', '..', '..');
 // Single source of truth — read from astro-reference.json, never hardcoded
-// (joint-world value is 56.05 s; the JSON is authoritative if they disagree)
+// (current joint-world value is 55.16 s; the JSON is authoritative if they disagree)
 const DELTA_T_START = JSON.parse(fs.readFileSync(
   path.join(REPO, 'public', 'input', 'astro-reference.json'),
   'utf8')).earthOrbital.deltaTStart;

@@ -64,7 +64,7 @@ Mars had by far the largest drift: ~4.7 deg per millennium.
 
 ### After calibration
 
-RMS values below are from the time of calibration (before parallax correction was extended). Current baselines are much lower — see [67-planet-parallax-corrections.md](67-planet-parallax-corrections.md) §5.
+RMS values below are from the time of calibration, under the retired parallax-correction stack (archived — [retired record](retired-record.md)); the rendered planets now come from the engine-D element chain.
 
 | Planet  | solarYearInput | Drift   | RMS before | RMS after | Change  |
 |---------|---------------|---------|------------|-----------|---------|
@@ -74,7 +74,7 @@ RMS values below are from the time of calibration (before parallax correction wa
 | Jupiter | 4330.5        | +1.87   | 0.477      | 0.277     | -41.9%  |
 | Saturn  | 10747.0       | +0.21   | 0.466      | 0.562     | +20.6%  |
 
-**Note:** Since this calibration, several `solarYearInput` values have been further adjusted through pipeline refits: Mercury 87.9686→<!--v:mercuryOrbitalPeriodInputDays-->87.9683<!--/v-->, Mars 686.931→<!--v:marsOrbitalPeriodInputDays-->686.93<!--/v-->, Jupiter 4330.5→<!--v:jupiterOrbitalPeriodInputDays-->4330.53<!--/v-->. The drift values above reflect the state at calibration time. Current orbit counts are in the Quantization table below. For current baselines see [67-planet-parallax-corrections.md](67-planet-parallax-corrections.md) §5.
+**Note:** Since this calibration, several `solarYearInput` values have been further adjusted through pipeline refits: Mercury 87.9686→<!--v:mercuryOrbitalPeriodInputDays-->87.9683<!--/v-->, Mars 686.931→<!--v:marsOrbitalPeriodInputDays-->686.93<!--/v-->, Jupiter 4330.5→<!--v:jupiterOrbitalPeriodInputDays-->4330.53<!--/v-->. The drift values above reflect the state at calibration time. Current orbit counts are in the Quantization table below.
 
 ### Trade-offs
 

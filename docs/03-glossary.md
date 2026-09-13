@@ -20,7 +20,7 @@ A geo-heliocentric framework that models the solar system through two interactin
 The grand cycle (H) where all precession movements complete and realign. Comprises 13 axial precession cycles, 3 inclination precession cycles, and 16 perihelion precession cycles. See [Constants Reference](20-constants-reference.md) for the current value of H. Under [ESSRT](#expanding-solar-system-resonance-theory-essrt), H(t) evolves at deep time — the integer divisors above (13, 3, 16) stay constant; only the literal year count of H scales.
 
 ### Solar System Resonance Cycle (8H)
-Eight Earth Fundamental Cycles. The fundamental super-period of the solar system at which every major planetary cycle (axial precession, perihelion precession, inclination oscillation, ascending node regression, obliquity oscillation, eccentricity oscillation) across all 8 planets divides evenly as an integer. The 32-component **L1 integer-divisor lattice** lives here. At J2000 8H = <!--v:eightH-->2,682,536<!--/v--> years; see [Doc 55 — Solar System Resonance Cycle Periods](55-solar-system-resonance-cycle-periods.md) for the complete 8H/N period table and [Doc 99 — ESSRT](99-expanding-solar-system-resonance-theory.md) for the theoretical framework.
+Eight Earth Fundamental Cycles. The fundamental super-period of the solar system at which every major planetary cycle (axial precession, perihelion precession, inclination oscillation, ascending node regression, obliquity oscillation, eccentricity oscillation) across all 8 planets divides evenly as an integer. The 32-component **L1 integer-divisor lattice** lives here. At J2000 8H = <!--v:eightH-->2,682,536<!--/v--> years; the per-planet 8H/N tabulation is archived ([retired record](retired-record.md) — the planets' periods are now dynamical outputs of the chains, [doc 109](109-model-nbody-engine-and-lattice-test.md)); see [Doc 99 — ESSRT](99-expanding-solar-system-resonance-theory.md) for the theoretical framework.
 
 ### EARTH-WOBBLE-CENTER
 A gravitational control point around which Earth's axis wobbles over approximately H/13 years. This creates the precession of the equinoxes. Visualized as "The Death Star" in the simulation.
@@ -111,10 +111,10 @@ A coordinate system centered on Earth.
 ## Time Measurements
 
 ### Solar Year (Tropical Year)
-The time for the Sun to return to the same position relative to the vernal equinox. Approximately <!--v:inputMeanSolarYear-->365.2422<!--/v--> days (at J2000). This is the year of the seasons. Under ESSRT the value shifts at deep time via Driver 1 (LOD growth).
+The time for the Sun to return to the same position relative to the vernal equinox. Approximately <!--v:inputMeanSolarYear-->365.2422<!--/v--> days (at J2000). This is the year of the seasons. Under ESSRT the day-count shifts at deep time via Driver 1 (LOD growth) and the length in seconds via Driver 2 (solar mass loss).
 
 ### Sidereal Year
-The time for the Sun to return to the same position relative to the fixed stars. Approximately 365.2564 days (at J2000). About 20 minutes longer than the solar year due to precession. Under ESSRT this evolves at deep time via Driver 2 (solar mass loss → Kepler).
+The time for the Sun to return to the same position relative to the fixed stars. Approximately 365.2564 days (at J2000). About 20 minutes longer than the solar year due to precession. Under ESSRT its length in seconds evolves at deep time via Driver 2 (solar mass loss → Kepler) and its day-count via Driver 1.
 
 ### Anomalistic Year
 The time between successive perihelion passages. Approximately 365.2596 days (at J2000).

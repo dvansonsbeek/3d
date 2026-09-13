@@ -1,11 +1,18 @@
 /**
- * The Fibonacci Laws — THE shared implementation (Phase 8.3, layer L2).
- *
- * The scientific heart of the model: the closed derivation loop
- *   ψ → inclination amplitude/mean → wobble period → obliquity mean →
- *   K → eccentricity amplitude → phase → base
- * that turns per-body Fibonacci divisors and mass fractions into every
- * planet's inclination and eccentricity structure (docs/37, doc 99).
+ * The ψ/K amplitude relations + the retired law-loop constructions —
+ * THE shared implementation (Phase 8.3, layer L2). Status per relation
+ * (doc 10 "The Six Fibonacci Relations"; the restatement: the N-body
+ * chain is the planet path):
+ *  - ψ (computePsiConstant/computeInclinationLaw) and K (computeKConstant/
+ *    computeEccentricityLaw's amplitude) are OPEN PREDICTIONS — untested
+ *    empirical amplitude laws, derived from Earth alone, kept as stated.
+ *  - The wobble beat (computeWobblePeriodYears) is kinematic frame
+ *    arithmetic — the permanent class.
+ *  - The obliquity-mean snapshot and the eccentricity base/phase
+ *    (System-Reset construction) belong to the RETIRED law framework —
+ *    today serving the legacy scene scaffolding, the no-chain bodies
+ *    (Pluto/Halley/Eros) and the o.fib* diagnostics (doc 72 — the closed
+ *    loop; docs/37 is archived, see docs/retired-record.md).
  *
  * Extracted VERBATIM in the BROWSER's expression forms from src/script.js
  * (the ψ loop, calcWobblePeriod, the obliquity-cycle aliases,
@@ -16,7 +23,7 @@
  *
  * LOAD-BEARING conventions:
  *  - ψ = 3·A_earth·√(M_EARTH_ALONE/M_SUN): the ALONE/SYSTEM mass asymmetry
- *    is calibration convention (doc 25) — switching Earth to SYSTEM shifts
+ *    is calibration convention (doc 24) — switching Earth to SYSTEM shifts
  *    ψ by 0.612% and would require re-calibrating A_earth.
  *  - Wobble = beat of |axial| and |ICRF| RATES (sign-free — Venus's
  *    prograde-axial/retrograde-ICRF case); |axial| > 8H ⇒ frozen ⇒

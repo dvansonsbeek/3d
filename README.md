@@ -43,7 +43,7 @@ The unifying theory is the **Expanding Solar System Resonance Theory (ESSRT)** (
 - The **literal periods** scale with the current value of H(t): in the Devonian H ≈ <!--v:hAtDevonian-->306,189<!--/v--> yr, today H = <!--v:H-->335,317<!--/v--> yr, in 200 Myr H ≈ <!--v:hAt200MyrFuture-->352,601<!--/v--> yr — but `8H/65` is still the obliquity beat, `8H/104` is still axial precession, etc.
 - Two physically independent drivers expand H(t): **Driver 1** is Earth-Moon tidal evolution (Moon recedes 3.82 cm/yr at J2000, Earth's length-of-day grows); **Driver 2** is solar mass loss (every planet's orbit slowly expands via Kepler's 3rd law). Both act simultaneously; the structural invariant `H × days/year` ≈ <!--v:totalDaysInH-->122,471,920<!--/v--> couples them at the per-planet observational level.
 
-ESSRT therefore unifies the **modern-era 8H climate lattice** (docs 90–92), the **deep-time predictions** (see deep-time section below), and the **future projections** (tidal-lock asymptote at ~<!--v:tidalLockRE-->87.1<!--/v--> R_⊕) into a single coherent framework with the **same 6 free parameters** throughout. The Solar System Resonance Cycle Period Table is in [Doc 55](docs/55-solar-system-resonance-cycle-periods.md).
+ESSRT therefore unifies the **modern-era 8H climate lattice** (docs 90–92), the **deep-time predictions** (see deep-time section below), and the **future projections** (tidal-lock asymptote at ~<!--v:tidalLockRE-->87.1<!--/v--> R_⊕) into a single coherent framework with the **same 6 free parameters** throughout.
 
 ---
 
@@ -190,7 +190,6 @@ Two things worth knowing before you read a red result as breakage:
 - Time controls: play, pause, speed adjustment, and date navigation
 - Click any planet to focus the camera and see its orbital data
 - Planet info sidebar with per-planet data, charts, and precession analysis
-- ~~Eccentricity Balance Scale · Invariable Plane Balance Explorer~~ — removed from the simulator with the Fibonacci-law retirement (the reference docs [38](docs/38-eccentricity-scale.md) and [53](docs/53-balance-explorer-reference.md) remain as the record)
 - **Climate Formula Explorer** — Tools-menu modal plotting the canonical L1+L2+L3 formula over four proxy records across eight time-window tabs (CenCO2PIP 66 Myr → forward projection of the next natural glaciation)
 - Console tests for year length, day length, and calibration verification
 - Export functionality for solstice dates and object positions
@@ -218,9 +217,7 @@ Because the 6 free parameters are fit against modern J2000 data and then project
 
 The model's gravitational parameters (`GM_Sun`, `GM_Earth`, `GM_Moon`, `GM_planet`) are computed from a self-consistent chain rather than copied from a reference table. The chain re-parameterizes classical 19th–20th century perturbation results (Hill 1878, Brown 1908, Brouwer 1959) into compact closed forms and verifies the synthesis against JPL DE440 reference data. The physics is classical; the contribution is **synthesis and presentation**:
 
-- **[Doc 24 — Moon Kepler Derivation](docs/24-moon-kepler-derivation.md)** — Re-parameterizes Hill-Brown's solar perturbation on the lunar orbit as `Δa = a_M·μ·m` (barycentric wobble × phase-fraction). Reproduces the textbook 384,748 km Kepler-effective Moon distance from the geometric LLR value (384,399 km), giving `GM_Earth` to 3.7 ppm vs DE440 — the precision floor of any Kepler-from-Moon-orbit derivation
-- **[Doc 25 — Universal Mass-from-Moon Formula](docs/25-universal-mass-from-moon-formula.md)** — Packages three classical terms (Newton's two-body Kepler + Hill-Brown's solar perturbation + Brouwer's J2 oblateness) as a single closed-form formula and verifies it against 22 moons of 7 planets. Matches DE440 to 3–340 ppm — a synthesis demonstration, not a new physical law
-- **[Doc 26 — Universal Sun-side Δa Formula](docs/26-universal-sun-side-delta-a.md)** — An algebraic identity: the symmetric `Δa = a·(1 − ((μ_S+μ_E−μ_b)/(μ_S+μ_E))^(1/3))` makes the elaborate two-body Kepler form algebraically identical to the simple `T = 2π·√(a³/(μ_S+μ_E))` for every planet. Useful as a conceptual lens; the model uses the simple form
+- **[Doc 24 — The Δa Mass Derivation](docs/24-moon-kepler-derivation.md)** — The full chain in one document. Part I re-parameterizes Hill-Brown's solar perturbation on the lunar orbit as `Δa = a_M·μ·m` (barycentric wobble × phase-fraction), reproducing the textbook 384,748 km Kepler-effective Moon distance from the geometric LLR value and giving `GM_Earth` to 3.7 ppm vs DE440. Part II packages three classical terms (two-body Kepler + Hill-Brown solar perturbation + Brouwer J2 oblateness) as one closed-form mass-from-moon formula, verified against 22 moons of 7 planets to 3–340 ppm. Part III is the exact Sun-side identity: the symmetric `Δa = a·(1 − ((μ_S+μ_E−μ_b)/(μ_S+μ_E))^(1/3))` makes the elaborate two-body Kepler form algebraically identical to the simple `T = 2π·√(a³/(μ_S+μ_E))` for every planet
 
 These are calibration findings, not part of the Fibonacci relations, and not improvements on Newton. The physics is fully classical; the contribution is pedagogical — cleaner notation, a closed-form derivation of a textbook value, and a unified-formula demonstration across all moon-bearing planets in DE440. Suitable for an undergraduate astrodynamics or physics-education context.
 
@@ -237,12 +234,7 @@ Detailed documentation is available in the [`/docs`](docs/00-readme.md) folder, 
 | 00–09 | Getting Started & Overview | [Introduction](docs/01-introduction.md), [User Guide](docs/02-user-guide.md), [Glossary](docs/03-glossary.md) |
 | 10–19 | Theory & Model | [Fibonacci Relations](docs/10-fibonacci-laws.md) |
 | 20–29 | Technical Reference | [Constants Reference](docs/20-constants-reference.md), [Formulas](docs/21-orbital-formulas-reference.md) |
-| 30–39 | Calculations | [Anomaly](docs/30-anomaly-calculations.md), [Ascending Nodes](docs/31-ascending-node-calculations.md), [Inclination](docs/32-inclination-calculations.md) |
 | 40–49 | Architecture & Code | [Architecture](docs/40-architecture.md), [Scene Graph](docs/41-scene-graph-hierarchy.md) |
-| 50–59 | UI & Tools | [UI Panels](docs/50-ui-panels-reference.md), [Resonance Cycle Periods](docs/55-solar-system-resonance-cycle-periods.md) |
-| 60–69 | Optimization & Fitting | [Overview](docs/60-optimization-tool-overview.md), [Fitting Pipeline](tools/fit/README.md), [Moon Implementation (Doc 66)](docs/66-moon-meeus-corrections.md) |
-| 70–79 | Verification | [Ascending Node Limitations](docs/70-ascending-node-limitations.md) |
-| 80–89 | Per-Planet Setup | [Mercury Scene Graph Setup](docs/80-mercury-setup.md) |
 | 90–99 | Climate Analysis | [Climate Formula (Doc 92)](docs/92-climate-formula.md), [Climate Summary (Doc 95)](docs/95-climate-summary.md), [ESSRT (Doc 99)](docs/99-expanding-solar-system-resonance-theory.md) |
 | 100–109 | ΔT, Historical Eclipse & Deep-Time Validation | [GIA α(t) lunar validation (Doc 102)](docs/102-gia-alpha-lunar-validation.md), [-135 Babylonian case study (Doc 103)](docs/103-135-babylonian-case-study.md), [Millennial rotation swing (Doc 104)](docs/104-millennial-rotation-swing.md), [ΔT stack flag audit (Doc 105)](docs/105-dt-stack-flag-audit.md), [Deep-Time Validation Dossier (Doc 106)](docs/106-deep-time-validation-dossier.md) |
 

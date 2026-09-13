@@ -32,9 +32,10 @@
  *     packages — regenerate + republish @essrt/model-values after a refit
  *     (npm run values:package:write). Then re-run
  *     tools/fit/validate-resonator.js.
- *   Shipped state: USNO 86400.0014, deltaTStart 56.05, Espenak 12.60 s,
- *   full-window 31.3 s; episode −1600 → +1600; resonator default-ON runtime-
- *   wide (opt-out DT_RESONATOR_DISABLED=1). Narrative: docs/104.
+ *   Shipped state: USNO 86400.0018 (fit measured-day basis), deltaTStart
+ *   55.16, Espenak 12.5 s, full-window 28.8 s; episode −1600 → +1600;
+ *   resonator default-ON runtime-wide (opt-out DT_RESONATOR_DISABLED=1).
+ *   Narrative: docs/104.
  *
  * ═══ LEGACY single-shot cascade (diagnostic only since the joint flip) ═══
  * The original stage-wise fit below (Bond solo → +Hallstatt → +Jose5 →
@@ -96,8 +97,9 @@
  * where TARGET_LOD_OFFSET = USNO_target − o.lodKinematic − h5Correction(2000),
  * so that at J2000 the sum of the DT-cycle δLOD contributions lands exactly
  * on the USNO Earth Orientation Center's LOD value. In the JOINT world the
- * shipped USNO target is 86400.0014 (target offset ≈ −2.137 ms, resonator
- * included in the sum — see the joint-mode section above); the value in
+ * shipped USNO target is 86400.0018 (fit measured-day basis; target offset
+ * ≈ −2.155 ms, resonator included in the sum — see the joint-mode section
+ * above); the value in
  * CONFIG/`usno_anchor` follows the shipped optimum in data/deltaT-4flag-
  * fit.json. Implemented in the legacy cascade as an extra weighted row in
  * the design matrix; in joint mode as the hard closure row (weight 1e10).
@@ -259,13 +261,19 @@ const CONFIG = {
     // when --fixed-anchors is passed (auto-optimum skipped) or when
     // DT_CORRECTIONS_DISABLED=1 is not set (unsafe to sweep).
     //
-    // This is the SHIPPED joint optimum: 86400.0014 paired with
-    // deltaTStart = 56.049 (Espenak RMS 12.60). It must match
+    // This is the SHIPPED joint optimum: 86400.0018 paired with
+    // deltaTStart = 55.16 (Espenak RMS 12.5). It must match
     // data/deltaT-4flag-fit.json `usno_anchor` and `deltaTStart` in
     // src/script.js — the USNO target and deltaTStart are a PAIR, so never
     // change one without the other.
-    // (Superseded: 86400.0018 with deltaTStart = 57.53, the pre-joint optimum.)
-    usno_target_lod_s: 86400.0014,
+    // BASIS NOTE: 86400.0018 is the closure expressed in the fit's
+    // MEASURED-day basis (post 6d sidereal-anchor move). The physical
+    // EO-class value is ~86400.0015-0.0016 (observed EO ~86400.0016; the
+    // tweakpane Fourier-basis readout 86400.001480) — 0.32 ms below, the
+    // two-J2000-day-bases spread (doc 99). The flip-era pair
+    // 86400.0014 / 56.049 was the PRE-6d basis; feeding it to today's
+    // arithmetic would mis-anchor by ~0.4 ms.
+    usno_target_lod_s: 86400.0018,
     weight: 1e6,                     // multiplier on the anchor row before least-squares
     apply_at_stage: 'D',             // only the final 4-cycle fit is anchored
   },
@@ -274,7 +282,7 @@ const CONFIG = {
 // ── Fit-window override (cross-validation hook) ────────────────────────────
 // DT_FIT_WINDOW="start:end" or "start:end:step" trains the fit on a SUB-WINDOW
 // of the Stephenson residual so the held-out remainder can score it. Purely a
-// diagnostic hook for docs/hidden/IP-dt-stack-flag-audit.md Stage 2 — when the
+// diagnostic hook for doc 105 (the archived stack-flag-audit plan) Stage 2 — when the
 // variable is unset nothing is touched and output is byte-identical.
 //
 // Refuses to combine with --write: a stack fitted on a sub-window must never be
@@ -306,7 +314,7 @@ if (process.env.DT_FIT_WINDOW) {
 
 // ── Flag-subset override (configuration sweep hook) ────────────────────────
 // DT_FLAGS="bond,hallstatt" runs the joint fit with only those flags in the
-// design matrix — Stage 3 of docs/hidden/IP-dt-stack-flag-audit.md, answering
+// design matrix — Stage 3 of doc 105 (the archived stack-flag-audit plan), answering
 // "what is each flag actually buying?". Unset = all four, unchanged.
 //
 // Refuses --write: the ship path writes resonator coefficients by fixed index
@@ -1477,7 +1485,7 @@ function runJointMode() {
   }
 
   // DT_FLAGS="bond,hallstatt" restricts the joint fit to a subset of the four
-  // flags — the configuration sweep of docs/hidden/IP-dt-stack-flag-audit.md
+  // flags — the configuration sweep of doc 105 (the archived stack-flag-audit plan)
   // Stage 3. Unset = all four, and the design matrix is then byte-for-byte the
   // shipped one. Column indices are derived, never hardcoded, so a reduced set
   // stays consistent; --write is refused whenever this is set (see the guard
@@ -1663,7 +1671,7 @@ function runJointMode() {
   // sub-window run can never silently report only its in-sample numbers. Scores
   // THIS solution on the complement of the training window inside the full
   // −720..2017 record — years the fit never saw.
-  // Criteria live in docs/hidden/IP-dt-stack-flag-audit.md Stage 2.
+  // Criteria live in doc 105 (the archived stack-flag-audit plan) Stage 2.
   if (process.env.DT_FIT_WINDOW) {
     const FULL_LO = -720, FULL_HI = 2017, FULL_STEP = 10;
     const segsHo = loadStephenson();
@@ -1705,7 +1713,7 @@ function runJointMode() {
   // DT_FIT_DUMP=<path> writes the joint solution to an arbitrary path so a
   // held-out scorer can evaluate THIS fit on years it never saw. Writes only
   // where told; never touches a shipped artifact. See
-  // docs/hidden/IP-dt-stack-flag-audit.md Stage 2.
+  // doc 105 (the archived stack-flag-audit plan) Stage 2.
   if (process.env.DT_FIT_DUMP) {
     const dump = {
       _meta: {

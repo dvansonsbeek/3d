@@ -104,7 +104,7 @@ export function createApi() {
     perihelionPrecession: { formula: 'H / 16', latticeDivisor: 16, periodYears: model.computeLatticePeriodsYears().perihelionPrecessionPeriodYears, doc: 'docs/10-fibonacci-laws.md', registryKey: 'periPrecYears' },
     eclipticPrecession: { formula: 'H / 5', latticeDivisor: 5, periodYears: null, doc: 'docs/10-fibonacci-laws.md', registryKey: 'eclPrecYears' },
     obliquityCycle: { formula: 'H / 8', latticeDivisor: 8, periodYears: null, doc: 'docs/10-fibonacci-laws.md', registryKey: 'obliqCycleYears' },
-    solarSystemResonanceCycle: { formula: '8 × H', latticeDivisor: null, periodYears: null, doc: 'docs/55-solar-system-resonance-cycle-periods.md', registryKey: 'eightH' },
+    solarSystemResonanceCycle: { formula: '8 × H', latticeDivisor: null, periodYears: null, doc: 'docs/10-fibonacci-laws.md', registryKey: 'eightH' },
     law6Lock: { formula: '8H / 65', latticeDivisor: 65, periodYears: null, doc: 'docs/10-fibonacci-laws.md', registryKey: 'saturnPeriPeriod' },
     bondCycle: { formula: '8H / 1830', latticeDivisor: 1830, periodYears: null, doc: 'docs/104-millennial-rotation-swing.md', registryKey: 'bondYr' },
     hallstattCycle: { formula: '8H / 1104', latticeDivisor: 1104, periodYears: null, doc: 'docs/104-millennial-rotation-swing.md', registryKey: 'hallstattYr' },

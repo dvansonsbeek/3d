@@ -47,7 +47,7 @@ Per the [Expanding Solar System Resonance Theory (Doc 99)](99-expanding-solar-sy
 
 H(t) evolves under two physically independent drivers: **Driver 1** = Earth-Moon tidal evolution (LOD grows, Moon recedes); **Driver 2** = solar mass loss (every planet's orbit slowly expands via Kepler's 3rd law). At Devonian (380 Ma) H ≈ <!--v:hAtDevonian-->306,189<!--/v--> yr; at J2000 H = <!--v:H-->335,317<!--/v--> yr; at +200 Myr H ≈ <!--v:hAt200MyrFuture-->352,601<!--/v--> yr. The integer divisors above are unchanged at every epoch — only the per-cycle period in years (or seconds) scales.
 
-For the canonical 9-step derivation chain from `t_Ma` through LOD, H, AU, M_Sun, Kepler year, Moon distance, Moon period, anomalistic year, stellar/sidereal days, and planet orbital + synodic periods, see [Doc 99 — ESSRT](99-expanding-solar-system-resonance-theory.md) and the canonical reference at `docs/archive/old-documents/IP-deep-time-extension.md` (untracked archive). For the Solar System Resonance Cycle (8H = <!--v:eightH-->2,682,536<!--/v--> yr at J2000) period table covering all major planetary cycles as integer divisors of 8H, see [Doc 55](55-solar-system-resonance-cycle-periods.md).
+For the canonical derivation chain from `t_Ma` through LOD, H, AU, M_Sun, Kepler year, Moon distance, Moon period, anomalistic year, stellar/sidereal days, and planet orbital + synodic periods, see [Doc 99 — ESSRT](99-expanding-solar-system-resonance-theory.md) and the `mean*AtAge` family in `tools/lib/deep-time.js`. (The Solar System Resonance Cycle at J2000: 8H = <!--v:eightH-->2,682,536<!--/v--> yr; the per-planet 8H/N tabulation is archived — [retired record](retired-record.md).)
 
 ---
 
@@ -155,7 +155,7 @@ The Earth Fundamental Cycle is divided by Fibonacci-related integers to produce 
 | Uranus | 21 | In-phase (21.33°) | Mercury | III |
 | Neptune | 34 | In-phase (<!--v:neptuneInclCycleAnchor-->174.04<!--/v-->°) | Venus | III |
 
-Phase angles re-anchored 2026-04-09 to balanced year n=7 (≈ -<!--v:systemResetYearBC-->2,649,854 BC<!--/v-->). See [10-fibonacci-laws.md § Phase Groups](10-fibonacci-laws.md#phase-groups) and [32-inclination-calculations.md § Per-Planet Phase Angles](32-inclination-calculations.md#per-planet-phase-angles).
+Phase angles are anchored to balanced year n=7 (≈ -<!--v:systemResetYearBC-->2,649,854 BC<!--/v-->). See [10-fibonacci-laws.md § Phase Groups](10-fibonacci-laws.md#phase-groups) and [31-no-chain-body-elements.md § Per-Planet Cycle Anchors](31-no-chain-body-elements.md#per-planet-cycle-anchors).
 
 ## Model Start & Alignment
 
@@ -305,7 +305,7 @@ All 8 planets, combining inner planet J2000 values with outer planet pre-dual-ba
 ## Planet Inclination Parameters (from ψ formula)
 
 Amplitudes derived from Fibonacci Laws: `amp = ψ / (d × √m)`. Means from J2000 constraint.
-See [Fibonacci Laws](10-fibonacci-laws.md), verified by [Inclination Optimization](../tools/verify/inclination-optimization.js) and [Inclination Verification](../tools/verify/inclination-verification.js).
+See [The Six Fibonacci Relations](10-fibonacci-laws.md), verified by [Inclination Optimization](../tools/verify/inclination-optimization.js) and [Inclination Verification](../tools/verify/inclination-verification.js).
 
 | Planet | Mean (deg) | Amplitude (deg) | Range (deg) | Phase Angle | ICRF Period |
 |--------|----------|---------------|-----------|-------------|-------------|
@@ -346,8 +346,8 @@ See [Fibonacci Laws](10-fibonacci-laws.md), verified by [Inclination Optimizatio
 | Uranus | H / 3 | ~<!--v:uranusPeriPeriod-->111,772<!--/v--> |
 | Neptune | H × 2 | ~<!--v:neptunePeriPeriod-->670,634<!--/v--> |
 
-These are the model's typed lattice descriptors (doc 55 gives each planet's
-type). Mercury's row is the Newtonian rate; the observed motion adds the
+These are the model's typed lattice descriptors ([doc 109 §9](109-model-nbody-engine-and-lattice-test.md)
+gives each planet's quantity type). Mercury's row is the Newtonian rate; the observed motion adds the
 derived relativistic supplement:
 <!--v:mercuryPeriRateEclipticArcsecCy-->531.44<!--/v--> +
 <!--v:mercuryPeriAnomalyGrArcsecCy-->42.98<!--/v--> =
@@ -396,7 +396,7 @@ Each array entry: `[period_divisor, sin_coeff, cos_coeff]` — period = H / divi
 | `SIDEREAL_YEAR_HARMONICS` | 6 | 0.001 s | H/8 + H/3 |
 | `ANOMALISTIC_YEAR_HARMONICS` | 8 | 0.002 s | H/18 |
 
-Note: The tropical year's **primary display path** is `TROPICAL_YEAR_HARMONICS` via `computeSolarYearDaysDirect` (Step 6c). The `CARDINAL_POINT_HARMONICS` derivative route (23 harmonics per type + ECC/JOINT/DERIVED families) is kept for chart consistency in cardinal-point report paths.
+Note: `TROPICAL_YEAR_HARMONICS` via `computeSolarYearDaysDirect` (Step 6c) is the **frozen era-clock law** — the certified era device, the internal kinematic chain and the `?hybridSpin=0` opt-out display. The displayed/served of-date tropical year is the one-source family (`createYearLengths` in `@essrt/physics`; doc 11's Status banner). The `CARDINAL_POINT_HARMONICS` derivative route (23 harmonics per type + ECC/JOINT/DERIVED families) is kept for chart consistency in cardinal-point report paths.
 
 ## Sun Longitude — the certified chain and the legacy harmonics
 
@@ -546,7 +546,7 @@ The per-day rates are used for EoC phase computation; the per-century rates are 
 
 ### Ecliptic Inclination Trend Rates
 
-JPL publishes these trends in the **J2000-fixed** ecliptic frame ("mean ecliptic and equinox of J2000"). The model error column below is the difference between the model's J2000-fixed-frame trend and JPL's catalog value, after the 2026-04-09 audit re-fit `ascendingNodeCyclesIn8H` and the n=7 phase anchor.
+JPL publishes these trends in the **J2000-fixed** ecliptic frame ("mean ecliptic and equinox of J2000"). The model error column below is the difference between the model's J2000-fixed-frame trend and JPL's catalog value, under the fitted `ascendingNodeCyclesIn8H` integers and the n=7 phase anchor.
 
 | Planet | Rate (deg/century) | Direction | Model Error |
 |--------|------------------|-----------|-------------|
@@ -561,7 +561,7 @@ JPL publishes these trends in the **J2000-fixed** ecliptic frame ("mean ecliptic
 
 **Source**: [JPL Approximate Positions of the Planets](https://ssd.jpl.nasa.gov/planets/approx_pos.html)
 
-**Note**: All 7 fitted planets now match JPL trend direction in the J2000-fixed frame. Total trend error is ~4.3″/century across the 7 planets. See [32-inclination-calculations.md § Two Frames](32-inclination-calculations.md#two-frames--be-careful-which-one-you-mean) for the frame distinction. Model errors verified by [Inclination Verification](../tools/verify/inclination-verification.js).
+**Note**: All 7 fitted planets now match JPL trend direction in the J2000-fixed frame. Total trend error is ~4.3″/century across the 7 planets. See [31-no-chain-body-elements.md § Two Frames](31-no-chain-body-elements.md#two-frames--be-careful-which-one-you-mean) for the frame distinction. Model errors verified by [Inclination Verification](../tools/verify/inclination-verification.js).
 
 ### Mean & True Anomaly at J2000
 
@@ -655,7 +655,7 @@ Theoretical orbital inclination ranges from secular perturbation theory.
 
 ### Inclination Cycle Anchors
 
-Each planet has a per-planet cycle anchor (ICRF perihelion longitude where the planet reaches MAX inclination, evaluated at one of the eight balanced-year anchors). After the 2026-04-09 audit, the seven fitted planets share anchor n=7 (≈ -<!--v:systemResetYearBC-->2,649,854 BC<!--/v-->, the start of the current Solar System Resonance Cycle); Earth is locked to its IAU-derived n=0 reference.
+Each planet has a per-planet cycle anchor (ICRF perihelion longitude where the planet reaches MAX inclination, evaluated at one of the eight balanced-year anchors). The seven fitted planets share anchor n=7 (≈ -<!--v:systemResetYearBC-->2,649,854 BC<!--/v-->, the start of the current Solar System Resonance Cycle); Earth is locked to its IAU-derived n=0 reference.
 
 | Planet | Cycle Anchor | Balanced Year | Notes |
 |--------|-------------|--------|-------|
@@ -738,7 +738,7 @@ f₅ = 0 (invariable plane, no evolution) is excluded — 7 active Laplace-Lagra
 
 # Part 4 — Tuned/Optimized Parameters
 
-These values result from the optimization campaign (2025-2026) and may change in future campaigns. For the optimization process and history, see [Optimization Tool Overview](60-optimization-tool-overview.md) and [Optimization Execution Plan](61-optimization-execution-plan.md).
+These values result from the retired optimization campaign; the campaign write-ups are archived ([retired record](retired-record.md)).
 
 ## Sun / Earth Tuned Parameters
 
@@ -758,7 +758,7 @@ These values result from the optimization campaign (2025-2026) and may change in
 | Uranus | `solarYearInput` | <!--v:uranusOrbitalPeriodInputDays-->30586<!--/v--> |
 | Neptune | `solarYearInput` | <!--v:neptuneOrbitalPeriodInputDays-->59800<!--/v--> |
 
-Values from `astro-reference.json`. These are the official JPL solar year periods.
+Stored in `astro-reference.json`. These start from the JPL solar-year periods and carry small pipeline refinements (see [doc 68](68-orbital-period-calibration.md)).
 
 ## Planet Orbital Eccentricities (Base)
 
@@ -768,7 +768,7 @@ Note: these values are computed at runtime by constants.js — not stored in JSO
 
 ## Planet Eccentricity Amplitudes & Coupling Constant
 
-Eccentricity oscillation amplitudes from the tilt formula: `e_amp = K × sin(tilt) × √d / (√m × a^(3/2))`. See [doc 36 §4-5](36-tilt-and-definitive-balance-calculations.md).
+Eccentricity oscillation amplitudes from the tilt formula: `e_amp = K × sin(tilt) × √d / (√m × a^(3/2))` — the retired Law-4 construction; these constants survive only in the legacy scene scaffolding (device anchors, the no-chain bodies). The derivation doc (36) is archived — see [the retired record](retired-record.md).
 
 | Constant | Formula | Value | Description |
 |----------|---------|-------|-------------|
@@ -825,7 +825,7 @@ Calibrated to reproduce exact J2000 ecliptic inclinations (optimized by [Ascendi
 | Neptune | <!--v:neptuneOmegaJ2000-->192.04<!--/v--> | +2.76 deg |
 | Pluto | <!--v:plutoOmegaJ2000-->101.06<!--/v--> | -6.00 deg |
 
-See [34-j2000-calibration.md](34-j2000-calibration.md) for the methodology.
+The calibration methodology (the closed-form Ω solution against the JPL J2000 ecliptic inclinations) is in [doc 31 §Verified J2000 node anchors](31-no-chain-body-elements.md#verified-j2000-node-anchors).
 **Verification**: [Ascending Node Verification](../tools/verify/ascending-node-verification.js) verifies correct J2000 ecliptic inclinations. [Ascending Node Souami-Souchay](../tools/verify/ascending-node-souami-souchay.js) compares S&S vs Verified values.
 
 ## Planet Perihelion Reference Dates (Phase-Optimized)
@@ -847,22 +847,6 @@ See [34-j2000-calibration.md](34-j2000-calibration.md) for the methodology.
 | Apsidal Start | `moonStartposApsidal` | <!--v:moonStartposApsidalDeg-->347.5476<!--/v--> deg | Apsidal precession start |
 | Nodal Start | `moonStartposNodal` | <!--v:moonStartposNodalDeg-->64.0435<!--/v--> deg | Nodal precession start |
 | Moon Start | `moonStartposMoon` | <!--v:moonStartposMoonDeg-->67.8443<!--/v--> deg | Orbital position start |
-
-## Parallax Correction Tiers
-
-Per-planet empirical parallax correction for geocentric RA and Dec. Coefficients stored in `ASTRO_REFERENCE.raCorrection` and `ASTRO_REFERENCE.decCorrection` in `tools/lib/constants.js`.
-
-| Planet | RA Parameters | Dec Parameters | Total | Selection |
-|--------|-------------|---------------|-------|-----------|
-| Mercury | 42 | 42 | 84 | Full 42p tier |
-| Venus | 42 | 42 | 84 | Full 42p tier |
-| Mars | 30 | 30 | 60 | 30p tier |
-| Jupiter | 42 | 42 | 84 | Full 42p tier |
-| Saturn | 36 | 36 | 72 | 36p tier |
-| Uranus | 24 | 24 | 48 | 24p tier |
-| Neptune | 24 | 24 | 48 | 24p tier |
-
-Tier selection by per-planet LOOCV/k-fold cross-validation. See [Planet Parallax Corrections](67-planet-parallax-corrections.md).
 
 ## Predictive Planet Parameters (`PREDICT_PLANETS`)
 
@@ -932,5 +916,4 @@ Per-planet configuration for the predictive perihelion precession formula:
 
 ---
 
-**Previous**: [19 - Balance Sensitivity Analysis](19-balance-sensitivity-analysis.md)
 **Next**: [Orbital Formulas Reference](21-orbital-formulas-reference.md)

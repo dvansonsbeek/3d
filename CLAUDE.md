@@ -5,12 +5,12 @@ System Resonance Theory (ESSRT). The model is analytic and parametric, valid
 across ±500 Myr. [Preprint](https://doi.org/10.21203/rs.3.rs-8758810/v4) ·
 [Live demo](https://3d.holisticuniverse.com)
 
-**Scale:** `src/script.js` ~60,000 lines · `tools/` ~330 JS scripts across 10
-directories · ~245 Python files · 75 docs · two web UIs (simulator, `dashboard/`).
+**Scale:** `src/script.js` ~60,000 lines · `tools/` ~240 tracked JS scripts
+across 9 directories (~360 on disk with the untracked local archives) · ~245 Python files · 47 docs (24 retired-machinery docs archived out of the tree — `docs/retired-record.md` is the public record; `docs/archive/retired/`, gitignored, holds the files — and the strip-and-restructure pass merged five more into their live homes) · two web UIs (simulator, `dashboard/`).
 **`npm run check` enforces a twenty-two-step gate chain; CI runs it plus a
 headless-browser job and auto-deploys the simulator to GitHub Pages on
 green main.**
-Golden masters live in `packages/fixtures/`. Of the 30 scripts in `tools/verify/`,
+Golden masters live in `packages/fixtures/`. Of the 31 scripts in `tools/verify/`,
 only 6 can actually fail — see the Verification section.
 
 ---
@@ -154,14 +154,16 @@ chain at ±1/±5 Myr; the golden master cannot catch that class).
 round-trip bit-exact) since Phase B** and required in CI; red there is a
 regression of the Phase 6 exit criterion, not a tracked state.
 
-`/gates` runs the standalone model checks. `tools/verify/` holds 30 scripts, and
-**24 of them cannot fail** — no exit path, no assertion, so running them proves
+`/gates` runs the standalone model checks. `tools/verify/` holds 31 scripts, and
+**25 of them cannot fail** — no exit path, no assertion, so running them proves
 nothing. `npm run test:verify:list` gives the classification: 6 gate · 3 liftable
-· 12 narrative · 9 generator (the suite FAILS on any unclassified script). **Never
+· 12 narrative · 10 generator (the suite FAILS on any unclassified script). **Never
 run a generator as a test** — `balance-search.js` rewrites the tracked
 `data/balance-presets.json`, `nbody-secular.js` rewrites
 `data/nbody-secular-frequencies.json`, `deep-secular-modes.js` rewrites
-`data/nbody-deep-secular-modes.json`, `measure-rms-by-epoch.js` rewrites
+`data/nbody-deep-secular-modes.json`, `secular-series.js` rewrites
+`data/nbody-secular-series.json`, `obliquity-hybrid.js` rewrites
+`data/obliquity-hybrid-verdict.json`, `measure-rms-by-epoch.js` rewrites
 `data/chain-vs-jpl-rms.json` under `--write` (a plain run only prints), and
 the four campaign generators (cassini-results / lod-climate-correlation /
 eclipse-audit / lunar-alignment) rewrite their `data/*.json` under
@@ -185,7 +187,7 @@ and the invariable-plane machinery (heights, mass gauge, Sun-SSB) from
 the model's own N-body chain (`@essrt/physics/planets/keplerian-chain` +
 the governed artifact). The fitted correction stack (parallax /
 gravitation / elongation — keys, evaluators, fitters ex-Steps 2/5a-5b)
-is deleted; docs 67/71 are its historical record. The Law-4/Law-5
+is deleted; docs/retired-record.md + git history carry its record. The Law-4/Law-5
 constants (`K = 3.4143e-6`; base eccentricities from the balance
 construction) survive only in the legacy scene scaffolding (device
 anchors, the no-chain bodies Pluto/Halley/Eros, and the o.fib*
@@ -241,7 +243,7 @@ what actually made corrections stick here.
 | `src/script.js` | browser scene + UI + formulas (monolith) |
 | `tools/lib/` | Node engine — `scene-graph`, `orbital-engine`, `deep-time`, `constants` |
 | `tools/fit/` | CLI shims for the fitting pipeline — implementations live in `packages/fitting/src` |
-| `tools/verify/` | 30 scripts: 6 gate · 3 liftable · 12 narrative · 9 generator (`npm run test:verify:list`) |
+| `tools/verify/` | 31 scripts: 6 gate · 3 liftable · 12 narrative · 10 generator (`npm run test:verify:list`) |
 | `packages/physics`, `packages/model-values` | the published npm packages (@essrt scope) — the website and world consume these; refits reach them via `values:package:write` + republish |
 | `tools/explore/` | ~200 research one-offs — findings live in `docs/` |
 | `public/input/fitted-coefficients.json` | single source of truth for fitted values |

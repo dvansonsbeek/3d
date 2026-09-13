@@ -6,7 +6,7 @@ PLANET NINE — FIBONACCI-UNIVERSE MODEL ANALYSIS
 A falsifiable test: can a hypothetical "Planet Nine" (Batygin & Brown 2016,
 Siraj et al. 2025) fit our model's Fibonacci balance structure?
 
-Companion document: docs/15-planet-nine-prediction.md
+Companion document: archived (docs/retired-record.md) — the prediction was withdrawn with the Law framework; this script is its frozen analysis record.
 Canonical reference:  tools/verify/balance-search.js
 
 This script combines:
@@ -558,7 +558,7 @@ def section_6(best_per_cand):
     print("  This is the kind of testable prediction the Fibonacci framework needs")
     print("  to move from descriptive curve-fit to predictive science.")
     print()
-    print("  See docs/15-planet-nine-prediction.md for full analysis and references.")
+    print("  The companion write-up is archived (docs/retired-record.md).")
     print()
 
 

@@ -388,8 +388,9 @@ smoothed representation of the observations, not physical validity.
 The framework's independent validation is the 26-event solar-eclipse
 alignment audit (current certified-chain run): 16/26 with the umbra
 reaching the observation site (3 confirmed at greatest moment + 13
-off-peak alignments — including −135 Babylon at 194 km and −708 Lu
-at 9 km), 5/26 regional (framework umbra in same continental band
+off-peak alignments — including −135 Babylon at BestGap
+<!--v:babylon135BestGapKm-->366<!--/v--> km and −708 Lu at 9 km),
+5/26 regional (framework umbra in same continental band
 but off site), 0/26 with residual ΔT-signal — the framework agrees
 with the documented UT on every event — and 5/26 geographic-class
 events (umbra-*centerline* >1,000 km from the site; the gate measures
@@ -492,20 +493,20 @@ month evolution is chain-integrated on the H-lattice. The `theoryDrift`
 section of the same gate measures the difference directly, on the TT axis
 (framework opposition vs the NASA canon's greatest-eclipse instant, era
 bins ±40 yr, modern definitional baseline subtracted): a smooth secular
-drift reaching <!--v:lunarDrift800Minutes-->−3.7<!--/v--> min at the −750 era
+drift reaching <!--v:lunarDrift800Minutes-->−4.0<!--/v--> min at the −750 era
 and vanishing toward the present — an effective
-Δṅ ≈ <!--v:lunarTheoryDriftDeltaNdot-->0.30<!--/v--> ″/cy² between the two
+Δṅ ≈ <!--v:lunarTheoryDriftDeltaNdot-->0.32<!--/v--> ″/cy² between the two
 theories. A re-reduction of the tablets with the framework's own Moon
 shifts each century's implied ΔT by exactly that drift, which converts
 the one-sided residual column above into sign-mixed, noise-class scatter:
 
 | Century | residual today | **pre-registered** residual after framework re-reduction |
 |---|---:|---:|
-| -800…-701 | <!--v:lunarCentury800ResidualHours-->−0.03<!--/v--> hr | <!--v:lunarPredictedReduced800Minutes-->+1.9<!--/v--> min |
-| -700…-601 | <!--v:lunarCentury700ResidualHours-->−0.10<!--/v--> hr | <!--v:lunarPredictedReduced700Minutes-->−3.6<!--/v--> min |
-| -600…-501 | <!--v:lunarCentury600ResidualHours-->−0.10<!--/v--> hr | <!--v:lunarPredictedReduced600Minutes-->−3.1<!--/v--> min |
-| -500…-401 | <!--v:lunarCentury500ResidualHours-->−0.19<!--/v--> hr | <!--v:lunarPredictedReduced500Minutes-->−8.9<!--/v--> min |
-| -400…-301 | <!--v:lunarCentury400ResidualHours-->−0.23<!--/v--> hr | <!--v:lunarPredictedReduced400Minutes-->−12.4<!--/v--> min |
+| -800…-701 | <!--v:lunarCentury800ResidualHours-->−0.03<!--/v--> hr | <!--v:lunarPredictedReduced800Minutes-->+2.2<!--/v--> min |
+| -700…-601 | <!--v:lunarCentury700ResidualHours-->−0.10<!--/v--> hr | <!--v:lunarPredictedReduced700Minutes-->−3.4<!--/v--> min |
+| -600…-501 | <!--v:lunarCentury600ResidualHours-->−0.10<!--/v--> hr | <!--v:lunarPredictedReduced600Minutes-->−2.8<!--/v--> min |
+| -500…-401 | <!--v:lunarCentury500ResidualHours-->−0.19<!--/v--> hr | <!--v:lunarPredictedReduced500Minutes-->−8.6<!--/v--> min |
+| -400…-301 | <!--v:lunarCentury400ResidualHours-->−0.23<!--/v--> hr | <!--v:lunarPredictedReduced400Minutes-->−12.6<!--/v--> min |
 
 These predictions are recorded in the gate BEFORE the contact-time
 re-reduction machinery exists — first-order only (contacts assumed to
@@ -547,19 +548,18 @@ years), so weights must not concentrate a century into one tablet.
 | -500…-401 | −20.0 ± 13.9 | −9.4 | −0.8 |
 | -400…-301 | −10.5 ± 2.7 | −12.4 | +0.7 |
 
-**χ² = 6.7 over 5 centuries** (median-primary). The re-reduced
+**χ² = 6.7 over 5 centuries** (median-primary; instrument:
+`tools/explore/phase-c-rereduction-hardened.mjs` — Stephenson-weighted
+century means, ±1-yr candidate straddle, per-table split, verdict
+against the RECORDED pre-registered column). The re-reduced
 tablet corpus remains statistically consistent with the pinned
 column: **the framework's dLOD/dt stack survives its pre-registered
 falsification test.** Both the column and the measured medians are
-the conscious E5 re-measurement (the framework-native Sun with the
-derived torque term changed the chain's TT_greatest, so the column
-re-derived per the convention above) — and they land essentially on
-the ORIGINAL pre-E4 values (e.g. −400: −10.5 vs the original −10.4;
-pre-reg −12.4 vs −12.2): the torque term restores Meeus-class BCE
-timing from derived physics. Intermediate states (pre-E4 χ² 5.8/5
-with the 3.7/5 Stephenson-weight variant and the −1.0 ± 2.3 min
-common-offset check; the torqueless E4 state at 7.7/5) live in git
-history. Stated limits: the −800 bin is
+the conscious re-measurement under the certified framework-native
+Sun with the derived torque term (the column re-derives per the
+convention above whenever the lunar arguments change) — and the
+torque term restores Meeus-class BCE timing from derived physics
+(e.g. −400: −10.5 vs the Meeus-basis −10.4). Stated limits: the −800 bin is
 unconstraining (n = 2); the column itself is first-order (the
 bin-offset and moonrise-conversion caveats above); the test's
 discriminating power is minutes-scale — the S05–S09 dense-target
@@ -578,12 +578,10 @@ reaching **122–215 s in the dense centuries** (+1000: ±122 s,
 n = 38; −400: ±164 s, n = 27) — below the cycle contributions
 (200–550 s), so the eclipse record genuinely discriminates the ΔT
 stack, out of sample (the cycle fit window is 1650–2017). The
-per-cycle ablation χ² (13 centuries with n ≥ 5), under the E5
-framework-native Sun (the derived torque term): full stack 46.0 —
-back at the pre-E4 Meeus-basis class (44.5), as it must be, since
-the torque term restores Meeus-class BCE timing; the torqueless E4
-intermediate read 30.9, a transient that partially fit the vetoed
-corpus-systematics structure below; **minus resonator 135.8 and
+per-cycle ablation χ² (13 centuries with n ≥ 5), under the certified
+framework-native Sun with the derived torque term: full stack 46.0
+(the Meeus-basis class, as it must be, since the torque term restores
+Meeus-class BCE timing); **minus resonator 135.8 and
 minus bond 59.3 — the Core-mantle swing and the Bond cycle are
 independently confirmed by the eclipse record**; no cycles 95.4
 (the stack halves the misfit); minus
@@ -599,22 +597,15 @@ the stack stays as shipped.
 
 ### The residual structure is not Earth rotation — the stack stays
 
-The "tune or extend the stack" question the pre-E4 χ²/dof ≈ 3.4 opened
+The "tune or extend the stack" question the χ²/dof ≈ 3.5 residual opens
 has a measured answer (`tools/explore/dense-targets-residual-structure.mjs`,
-same 244-row corpus and machinery as the gate, run on the pre-E4 basis):
-**neither** — no cycle is added, removed, or retuned. The 3b Sun
-campaign then stress-tested the verdict from an unexpected direction:
-the torqueless E4 intermediate dropped the full-stack χ² to 30.9,
-briefly suggesting a third of the structure "was the Sun" — but the
-completed E5 Sun (geometric + derived torque drift, the form the
-SOLAR corpus and phaseC independently select) returns it to 46.0,
-the pre-E4 class. The dip was the torqueless drift partially fitting
-this vetoed structure — corroborating, not contradicting, the
-verdict: the structure fails the LOD-continuity veto, Stephenson's
-own spline misfits it identically, and no admissible Sun form
-absorbs it. The per-century median figures quoted in this section
-are the pre-E4 measurements the campaign analyzed; the conclusion
-stands unchanged on the E5 basis.
+same 244-row corpus and machinery as the gate): **neither** — no cycle
+is added, removed, or retuned. The verdict is triple-locked: the
+structure fails the LOD-continuity veto, Stephenson's own spline
+misfits it identically, and no admissible Sun form absorbs it (a
+torqueless Sun variant that partially fit the structure was itself the
+form the SOLAR corpus and the Phase C test reject — the stress test
+corroborates rather than contradicts the verdict).
 
 **Attribution.** The framework curve and Stephenson's own 2016 spline
 agree to −6..−103 s at every century midpoint, yet *both* miss the
@@ -871,10 +862,7 @@ decomposes into a linear secular drift plus one symmetric bump centred
 in the medieval window — one mechanism each for drift and bump, not
 multiple independent excursions. The bump is captured by the shipped
 4-flag lattice stack; the residual investigation below explores the
-remaining sub-signal. Structural characterisation of the residual (see
-"Residual shape decomposition" below) shows it decomposes into a linear secular
-drift plus one symmetric bump centred in the medieval window — one mechanism
-each for drift and bump, not multiple independent excursions.
+remaining sub-signal.
 
 Eight candidate mechanisms have been tested with appropriate statistical
 methods, plus three follow-up predictive tests of proposed mechanisms (Path A,
@@ -960,35 +948,19 @@ references; those files are not currently in the repository.
 
 Nine literature-cited Earth-rotation forcing mechanisms with periods spanning
 the lunar nodal (18.6 yr) through the Bray-Hallstatt solar/climate cycle
-(2400 yr) were each tested against the L-5b residual via Lomb-Scargle
-periodogram, requiring FAP < 5% AND detection within 20% of the literature-cited
-period:
-
-| Mechanism | Period | Source | L1-α result |
-|---|---|---|---|
-| Lunar nodal cycle | 18.6 yr | Moon's orbital plane oscillation; modulates tidal LOD | ✗ not detected |
-| Hale magnetic cycle | 22 yr | Wilson 2025 J+S forcing of solar dynamo | ✗ not detected |
-| Jupiter-Saturn synodic harmonic | 60 yr | Scafetta climate-solar resonance | ✗ not detected |
-| **Gleissberg solar cycle** | **88 yr** | Long-period solar activity envelope | ✓ **detected at 89.9 yr, FAP 0.35%** |
-| **Jose period (Charvátová)** | **179 yr** | Solar inertial motion patterns | ✓ **detected at 173.9 yr, FAP 1.72%** |
-| **Neptune de Vries (Wilson)** | **182 yr** | Wilson 2025 planetary forcing | ✓ **detected at 173.9 yr, FAP 1.72%** |
-| de Vries solar cycle | 210 yr | Solar activity ¹⁴C / ¹⁰Be record | ✗ not detected |
-| Wilson 2025 trend cycle | 550 yr | Long-period component in LOD+SSN decomposition | ✗ not detected |
-| Bray-Hallstatt cycle | 2400 yr | Solar/climate cycle from cosmogenic isotopes | ✗ not detected |
-
-**Three of nine detected under L1-orbital α(t)** — resolving to two unique
-spectral peaks (~90 yr matching Gleissberg; ~174 yr matching both Jose 179
-and de Vries 182, which fall inside each other's 20% window), all
-solar-activity-related; none of the mass-balance / GIA-adjacent or
-planetary-tidal candidates were detected at any stage.
+(2400 yr) — lunar nodal, Hale 22 yr, J-S synodic 60 yr, Gleissberg 88 yr,
+Jose 179 yr, Neptune de Vries 182 yr, de Vries 210 yr, Wilson trend 550 yr,
+Bray-Hallstatt 2400 yr — are each tested against the L-5b residual via
+Lomb-Scargle periodogram, requiring FAP < 5% AND detection within 20% of
+the literature-cited period.
 
 **Under the shipped joint-world residual the scan reports 0/9 at FAP < 5%**
-(the Gleissberg/Jose-band peaks sit at FAP ≈ 100%; the strongest remaining
-line is the 14.2 yr peak, resolved by H7 as the catalog's sampling-window
-artifact). The L1-α-era detections are retained above as documentation of
-the intermediate stage: the spectral structure they captured was absorbed
-by the joint 4-flag + Core-mantle-swing solve rather than surviving as an
-unexplained signal.
+(the strongest remaining line is the 14.2 yr peak, resolved by H7 as the
+catalog's sampling-window artifact). Intermediate solar-activity-band
+detections that appeared under α(t) alone were absorbed by the joint
+4-flag + Core-mantle-swing solve rather than surviving as an unexplained
+signal; none of the mass-balance / GIA-adjacent or planetary-tidal
+candidates were detected at any stage.
 
 ### H3 per-era analysis: aggregate correlation is drift-tracking, not causal (Hypothesis 3)
 
@@ -1043,12 +1015,6 @@ seals the verdict: a real 0.15-ms decadal LOD line integrates to only
 ~0.12 s of ΔT, four orders of magnitude below the fitted peak amplitude.
 No framework component is warranted (kill recorded in
 `data/deltaT-142yr-window-test.json`).
-
-(History: the earlier |t|-symmetric analysis labelled the peak a window
-artifact for the wrong reason — it tested the 10–30 yr band peak at
-23.7 yr rather than the 14.2 yr target; the L1-α-era focused retest then
-read "partial support" before the spectral-window measurement identified
-the cadence comb.)
 
 ### Two additional predictive tests beyond the eight hypotheses
 
@@ -1134,36 +1100,19 @@ SIM channel does not causally explain the medieval bump on a per-observation
 basis. Framework-native mechanism remains a candidate but the specific
 angular-alignment predictors tested here do not close the residual.
 
-### Periodic content — an L1-α-era finding absorbed by the joint world
+### The solar-activity channel — considered, absorbed
 
-Under the intermediate L1-orbital α(t) residual, Lomb-Scargle detections
-at ~90 yr (Gleissberg) and ~174 yr (Jose / de Vries) suggested
-solar-activity forcing as a candidate channel. Under the shipped
-joint-world residual the scan reports 0/9 literature cycles at FAP < 5%
-and the 14.2-yr line is resolved as the catalog's sampling-window
-artifact (H7) — the periodic content was absorbed by the joint 4-flag +
-Core-mantle-swing solve. The mechanism prose below is retained as
-context for why the solar-activity channel was considered:
-
-The leading physical mechanism is **solar activity → ionospheric–thermospheric
-coupling → LOD**. Solar activity modulates upper-atmospheric density and
-zonal-wind patterns, which couple angular momentum to Earth's solid interior
-via the ionospheric wind system. This channel is measurable at decadal
-timescales in modern satellite records and known to correlate with the ~11-yr
-Schwabe cycle, the ~88-yr Gleissberg cycle, and the ~180-yr de Vries cycle
-(Holme & de Viron 2013 for observations at decadal scales; Duhau &
-de Jager 2010 for the multi-centennial signature). Extrapolated to the
-medieval era, a modest sustained shift in the Sun's activity envelope during
-the Medieval Grand Maxima (Solanki et al. 2004 reconstruct elevated solar
-activity across CE 950–1250) plausibly modulates ΔT on exactly the timescales
-observed in the residual.
-
-The mantle-core coupling null (Hypothesis 1) remains informative in the same
-sense as before: the modern Holme constant rate, extrapolated 2720 years into
-the past, would over-correct the Babylonian-era ΔT by ~2,700 s. So no
-constant-rate non-tidal mechanism explains the residual; the required channel
-must have a time-varying signature — consistent with a solar-activity source
-whose intensity varied across grand maxima and minima.
+The candidate mechanism behind the intermediate solar-activity-band
+detections is **solar activity → ionospheric–thermospheric coupling →
+LOD** (Holme & de Viron 2013 at decadal scales; Duhau & de Jager 2010 for
+the multi-centennial signature; Solanki et al. 2004 for the Medieval
+Grand Maxima). Under the shipped joint world that spectral content is
+absorbed by the 4-flag + Core-mantle-swing solve (0/9 literature cycles
+at FAP < 5%), and the direct HdV-coupling predictive test (Path A above)
+rejects the specific mechanism per-observation. The mantle-core null
+(Hypothesis 1) remains informative: no constant-rate non-tidal mechanism
+explains the residual — the required channel must be time-varying, which
+is exactly what the Core-mantle swing (doc 104) carries.
 
 ### What still needs work
 
@@ -1191,57 +1140,39 @@ tests (Path A, Test 5) and the drift-origin diagnostic sequence
    require ICE-6G_C or equivalent continental-resolution rebound
    modelling.
 
-### Why the rigorous testing section matters
-
-The full analysis (eight hypotheses + Path A + Test 5 + §14–§17 drift
-diagnostics) substantially updates the picture from the earlier
-"eight rejected, medieval residual an open problem" narrative:
+### What the hypothesis testing establishes
 
 1. **All correlation-based hypotheses (H2–H5, Path A, Test 5) reduce to
    drift-tracking artifacts** under per-era analysis. Aggregate
    correlations exist (H3-lunar r = −0.38, Path A r = −0.54, Test 5 J-S
    r = −0.55) but per-era breakdown reveals sign flips or near-zero
-   medieval-window r values. None of them causally explains the
-   medieval bump per-observation. The paper's earlier "H3-lunar passes
-   at 4σ" narrative is DOWNGRADED — the aggregate correlation is real
-   as a statistical fact but not a mechanism claim.
-2. **The residual shape is one drift + one symmetric MWP bump plus
+   medieval-window r values — none causally explains the medieval bump
+   per-observation. The methodological rule generalises: any aggregate
+   correlation involving a smooth predictor and a drift-heavy residual
+   must survive per-era analysis before attribution to a physical
+   mechanism.
+2. **The residual shape is one drift + one symmetric MWP bump plus a
    fractional non-tidal channel** — structural diagnostics (symmetry
    test, reference robustness) confirm the drift+bump superposition;
-   §14–§17 further show the drift carries a fractional non-tidal
-   channel ~0.5 ms/century window-average (§16) — the Core-mantle
-   swing (doc 104). In the joint world both structures are absorbed
-   (numbers in "The complete picture" below).
-3. **H6 spectral detections were an intermediate-stage finding** — the
-   L1-α-era Gleissberg and Jose/de Vries peaks do not survive the shipped
-   joint-world residual (0/9 at FAP < 5%); the structure they captured is
-   absorbed by the joint 4-flag + Core-mantle-swing solve.
-4. **H7 14.2-yr peak is resolved as a sampling-window artifact** — all
-   in-catalog robustness tests pass, but the catalog's own spectral window
-   peaks at 14.30 yr (~7.15-yr eclipse-cadence comb) and the physical
-   ceiling (~0.12 s of ΔT from a real 0.15-ms LOD line) is four orders
-   below the fitted amplitude.
-5. **The medieval BUMP has a framework-native structural interpretation**:
+   §14–§17 show the drift carries a fractional non-tidal channel
+   ~0.5 ms/century window-average (§16) — the Core-mantle swing
+   (doc 104). In the joint world both structures are absorbed (numbers
+   in "The complete picture" below).
+3. **The medieval BUMP has a framework-native structural interpretation**:
    the 8H integer scan identifies a broad peak in the Bond band centered
    near ~1465 yr, with n=1830 = 74 × J-S synodic (gcd=61) shipped as the
    H-lattice-compliant representative (closest to canonical Bond 1470 yr).
    The PERIOD is a zero-fit structural prediction; the AMPLITUDE/PHASE
    are fit-derived (constrained physical priors) with independent
    paleoclimate calibration as the path to fully restore the zero-fit
-   claim. See "Millennial-scale 8H lattice harmonic" section.
-6. **Peak-year and peak-magnitude claims carry reference-polynomial uncertainty**
+   claim.
+4. **Peak-year and peak-magnitude claims carry reference-polynomial uncertainty**
    — ~200 yr / ~400 s across Stephenson 2016 vs NASA-derived references. Robust
    claims: "peak in 840–1020 CE window, ~1000 s peak magnitude"; fragile
    claims: "peak at year 990".
-7. **The methodology is strengthened** by per-era stability checking as a
-   standard filter against drift-tracking artifacts. This is a
-   generalisable methodological improvement — any aggregate correlation
-   involving a smooth predictor and drift-heavy residual must survive
-   per-era analysis before attribution to a physical mechanism.
-8. **The framework's zero-fitting-parameter philosophy is preserved** — no
-   coefficients are fitted to eclipse data in the α(t) machinery itself;
-   the α(t) form uses only the L1 orbital-layer coefficients that fit the
-   LR04 δ¹⁸O record independently (see [doc 99](99-expanding-solar-system-resonance-theory.md)
+5. **No coefficients are fitted to eclipse data in the α(t) machinery
+   itself** — the α(t) form uses only the L1 orbital-layer coefficients
+   that fit the LR04 δ¹⁸O record independently (see [doc 99](99-expanding-solar-system-resonance-theory.md)
    §"Climate-driven α(t) — the L1-orbital coupling").
 
 ---
@@ -1295,25 +1226,12 @@ Fit statistics for the n=1830 harmonic against the Stephenson ΔT residual:
 | Cross-validation: CE-trained → BCE-predicted | R²_test ≈ +0.97 |
 | §14 scan under Bond OFF baseline | ΔR² ≈ +0.073 over polynomial baseline |
 
-**Divisor selection history:** the paper's initial single-term fit chose
-n=1825 (period 1469.88 yr, matching Bond 1997 paleoclimate cycle at
-0.01%). An interim selection moved to n=1851 (period 1449.24 yr, 73×J-S
-synodic to 0.001% — tightest planetary interpretation but not gcd-compliant
-with H). The current shipped choice is n=1830 (period 1465.87 yr, 74×J-S
-synodic to 0.22%, gcd=61 — structurally uniform with Hallstatt and Jose5,
-closest to canonical Bond of the three). All three divisors describe the
-same Fourier-degenerate peak — fit quality differs by less than 0.001 R²
-across n=1817..1863, well within the ~370-yr Fourier window resolution.
-The choice among them prioritizes structural criteria (gcd-compliance
-with H) over marginal empirical differences.
-
-Under Bond OFF baseline, the §14 scan finds n=1920 (period 1397 yr =
-Earth's perihelion cycle H/16 ÷ 15, at 0.00% error) as top divisor with ΔR² ≈
-+0.075 — small relative improvement over n=1830. §17 dual-harmonic test
-confirms **n=1830, n=1851, and n=1920 are all Fourier-degenerate**
-(dual fits differ by <0.001 R²). The current choice n=1830 wins on
-structural grounds (gcd-compliance, closest to canonical Bond) rather
-than empirical distinctness — all three describe the same peak.
+**Divisor degeneracy note:** fit quality is indistinguishable across
+n=1817..1863 (<0.001 R² — well within the ~370-yr Fourier window
+resolution; the §17 dual-harmonic test confirms n=1830, n=1851 and
+n=1920 all describe the same peak). The shipped n=1830 wins on
+structural grounds — gcd-compliance with H and closest to canonical
+Bond — not on empirical distinctness.
 
 ### Structural significance — three convergent physical mechanisms
 
@@ -1399,9 +1317,7 @@ the shipped default-ON toggle is the research-ready configuration
 that's been empirically A/B tested; the OFF state remains one flag-flip
 away for zero-fit baseline measurement.
 
-### What's preserved as research infrastructure
-
-The full investigation is documented for future revisiting:
+### Research infrastructure
 
 Current shipped fit (sole runtime source of truth):
 
@@ -1409,20 +1325,13 @@ Current shipped fit (sole runtime source of truth):
 - The website consumes the ΔT-stack and resonator constants through the published `@essrt/physics` package (`FITTED_COEFFICIENTS.DT_STACK` / `DT_RESONATOR`). `src/script.js` imports the same values from the generated constants module; `tools/lib/deep-time.js` reads the JSON directly.
 - `data/deltaT-4flag-fit.json` — combined 4-cycle fit output; sole authoritative source for the shipped coefficients.
 
-Archived Python exploration (superseded but retained for historical context):
-
-- `data/deltaT-1830-residual-fit.json` — pre-Node n=1830 fit coefficients (Python)
-- `data/deltaT-1851-residual-fit.json` — n=1851 fit coefficients + metrics (archived interim)
-- `data/deltaT-bond-cycle-residual-fit.json` — earlier n=1825 fit (paper original, archived)
-- `data/deltaT-divisor-scan-jse.json` — full 8H integer-divisor scan results
-- `scripts/lod_residual_divisor_scan_jse.py` — full 8H scan with J-S-E interpretation
-- `scripts/lod_residual_1851_refit.py` — refit at n=1851 with structural verification
-- `scripts/lod_residual_lattice_fit.py` — initial scan and greedy selection
-- `scripts/lod_residual_lattice_cv.py` — 4-split cross-validation
-- `scripts/lod_residual_bond_devries_cv.py` — 2-component (Bond + de Vries) test
-- `scripts/export_bond_cycle_residual_fit.py` — artifact generator (n=1825)
-- `scripts/stephenson_observation_density.py` — falsifies the spline-artifact hypothesis (medieval window has 36.9 obs/century)
-- `scripts/climate_formula_mwp_check.py` — rules out our paleoclimate formula as the source (shortest period 14.5 kyr)
+Supporting scan/validation tooling: `scripts/lod_residual_divisor_scan_jse.py`
+(the full 8H scan with J-S-E interpretation, output
+`data/deltaT-divisor-scan-jse.json`), `scripts/lattice_harmonic_scan.py`
+(cross-archive), `scripts/stephenson_observation_density.py` (falsifies the
+spline-artifact hypothesis — the medieval window has 36.9 obs/century),
+`scripts/climate_formula_mwp_check.py` (rules out the paleoclimate formula
+as the source — its shortest period is 14.5 kyr).
 
 Live in the sim (all shipped default-ON):
 
@@ -1443,9 +1352,7 @@ model residual is well-fit by a single harmonic at exactly this period
 (R² = 0.975 in-sample, R²_test = 0.97 cross-validated on CE→BCE
 prediction; random 8H/n integers in the same period range give R²_test
 ≈ 0.48 — no signal). The signal is real, period-specific, and
-lattice-native. (The interim n=1851 = 73 × J-S synodic explored earlier
-in the investigation is Fourier-degenerate with n=1830 within the same
-peak; n=1830 was selected for shipping because gcd(1830, H) > 1.)
+lattice-native.
 
 **The Bond-scale 1450-yr period is well-documented in paleoclimate**
 (Bond et al. 2001 in North Atlantic ice-rafted debris; Schulz 2002 /
@@ -1641,83 +1548,51 @@ signal above what the joint fit actually finds.
 - `JOSE4_DT_CORRECTION_ENABLED` flag in `src/script.js` (default `true`)
 - "Toggle 8H/3749 Jose4 ΔT correction" console-test button
 
-### Rolled-back candidates: Eddy (999 yr), Emp862 (862 yr), Jupiter92 (1090 yr)
+### The stack's boundary — why four flags and not more
 
-Three additional divisors were tested for inclusion in the sub-Milankovitch
-stack and rolled back. Each is documented here with its specific failure
-mode; research artifacts are preserved so future investigations can revisit
-under different conditions. Each candidate had genuine empirical evidence
-in independent proxies — the shared lesson is that empirical coherence in
-paleoclimate records is necessary but not sufficient: the fit must also be
-numerically well-conditioned against the 2.7 kyr Stephenson window and must
-add independent variance, not cannibalize existing stack signal.
+Three further gcd-compliant candidates with genuine cross-archive
+evidence are measured NOT to fit the 2.7-kyr Stephenson window and do
+not ship — the record that the 4-flag stack sits at the empirical limit:
 
-#### Eddy — 8H/2684 = 999 yr
+- **Eddy (8H/2684 = 999 yr, gcd=61; 0.05% match to the Eddy solar-minimum
+  cycle)** — cross-archive coherent (Steinhilber Φ + EPICA CO₂), but the
+  5-cycle joint fit shows significant collinearity (Bond amplitude
+  375 → 646 s) and the L-5b outcome regresses the ancient BCE window
+  (~70–86 s per century) for a late-medieval gain. Empirically real,
+  unfittable against this window.
+- **Emp862 (8H/3111 = 862 yr, gcd=61; no named-cycle mapping)** — the
+  strongest cross-archive evidence of any candidate (three archives),
+  but the 6-cycle joint fit is **rank-deficient** (amplitudes inflate
+  20–700×; the Eddy–Emp862 beat period ~6,255 yr is unresolvable by the
+  window). A different fitting target (multi-archive joint fit) could
+  revisit it.
+- **Jupiter92 (8H/2461 = 1090 yr, gcd=23)** — identified by residual
+  peak-hunting, not cross-archive scan; measured to **cannibalize Bond
+  signal** rather than add independent variance (Bond's own ΔR² halves
+  under it), and neither tested phase improves any L-5b metric.
 
-- **Structural**: 2684 = 4·11·61 (gcd=61, H's 61-family, like Bond and Jose5). Identified by `scripts/lattice_harmonic_scan.py --band 500 1200` as tightest structural anchor of any gcd-compliant 800–1100 yr candidate — **0.05% match** to the Eddy 1000-yr solar-minimum cycle (Eddy 1976).
-- **Empirical**: cross-archive coherence in Steinhilber solar Φ + EPICA CO2 (both p < 5% via permutation test).
-- **Stage E 5-cycle joint fit**: Bond amp 375 s (solo) → 646 s (5-cycle) — significant collinearity. Bond phase shift +12.85° (within 25° tolerance but concerning). Eddy free-fit 432 s (would cap to 50 s prior).
-- **L-5b outcome**: RMS 1629 s (4-flag) → 1641 s (+12 s, regressed). Late medieval 1200–1299 CE improved by ~70 s but ancient BCE (−800 to −300) regressed ~70–86 s per century. Year 990 MWP peak: Eddy at null phase there, contribution only ~0.8 s.
-- **Diagnosis**: cycle is empirically real (cross-archive coherent) but cannot be fit against the 2.7 kyr Stephenson ΔT residual without hurting the ancient window.
-- **Artifacts kept**: `data/lattice-scan-band-500-1200.json`, `data/lattice-scan-custom.json`, `tools/fit/dt-corrections-fit.js` CONFIG rollback note, `src/script.js` rollback comment block.
+Artifacts for all three are preserved (`data/lattice-scan-*.json`,
+`data/deltaT-quad-fit.json`, `data/jupiter92-isolated-refit.json`, the
+CONFIG rollback notes). The shared rule they establish: empirical
+coherence in paleoclimate records is necessary but not sufficient — a
+shipped cycle must also be numerically well-conditioned against the
+Stephenson window and add independent variance.
 
-#### Emp862 — 8H/3111 = 862 yr
+### L-5b verification of the shipped 4-flag stack
 
-- **Structural**: 3111 = 3·17·61 → gcd=61. Does NOT map to any named cycle (between 4×Jose 716 yr and 5×Jose 897 yr, no clean integer multiple).
-- **Empirical**: strongest evidence of any candidate ever tested — **three-archive cross-coherence**: Steinhilber solar Φ (29.7 MV vs 24.7 threshold) + Cheng speleothem δ¹⁸O (0.045 ‰ vs 0.041) + EPICA CO2 (9.1 ppm vs 2.7), all significant.
-- **Stage F 6-cycle joint fit — RANK-DEFICIENT**: Bond amp 375 s → **9,898 s** (inflated 27×). Bond phase shift **−90°** (far exceeds 25° tolerance). Emp862 free-fit **29,961 s** (physically absurd). Hallstatt free-fit 14,742 s; Jose5 45,638 s; all cycles inflated 20–700×.
-- **Root cause**: beat period between Eddy (999 yr) and Emp862 (862 yr) is ~6,255 yr, unresolvable by the 2.7 kyr Stephenson window. Six close-period cycles span too much residual variance for the small dataset — the fit matrix becomes rank-deficient.
-- **Diagnosis**: cycle empirically strong but the ΔT residual with existing data cannot accommodate it. A different fitting target (multi-archive joint fit, not Stephenson) could revisit it.
-- **Artifacts kept**: `data/lattice-scan-band-500-1200.json` (3-archive coherence), CONFIG rollback note, `src/script.js` rollback comment block.
+| Metric | Bond+Hallstatt+Jose5 (3-flag) | Bond+Hallstatt+Jose5+Jose4 (4-flag, shipped) |
+|---|---:|---:|
+| Global \|residual\| | 1625 s | 1629 s |
+| Events closer than NASA | 83 (31.1%) | 83 (31.1%) |
+| Medieval bump peak | −638 s @ 990 | **−580 s @ 1000** |
 
-#### Jupiter92 — 8H/2461 = 1090 yr
-
-- **Structural**: 2461 = 23·107 → gcd=23. Physical readings: 92 × Jupiter orbit (0.02% offset), 55 × J-S synodic (0.03%), or 37 × Saturn orbit (0.05%). Identified by L-5b Section 14 residual peak-hunting, not by cross-archive scan (amp 52 s, ΔR² = 0.0013).
-- **Two phase fits tested**: solo (Bond-contaminated, phase −108°) vs isolated after Bond+Hallstatt+Jose5 subtracted (phase +20°, amp 53 s — matches L-5b's 52 s within 1 s).
-- **L-5b outcome — neither phase improved metrics vs 3-flag baseline**:
-
-  | Configuration | Global \|residual\| | Closer than NASA | Medieval peak |
-  |---|---:|---:|---:|
-  | Bond only | 1636 s | 30.3% | −687 @ 970 |
-  | **Bond+Hallstatt+Jose5 (3-flag)** | **1626 s** | **31.1% (83)** | **−659 @ 990** |
-  | All 4 with Jupiter92 phase −108° | 1627 s | 30.3% (81) | −668 @ 1020 |
-  | All 4 with Jupiter92 phase +20° | 1637 s | 30.7% (82) | −676 @ 1020 |
-
-- **Diagnosis**: Section 14 with all 4 flags ON showed Bond's own ΔR² halved (0.0010 → 0.0005) and Bond's amplitude dropped 44 → 30 s under Jupiter92. **Cannibalizing Bond signal rather than adding independent variance.** The apparent 1090-yr Section 14 peak is Bond-frequency structure aliased through imperfect Bond phase/amplitude, not an independent signal.
-- **Superseded** — the 3-flag stack was subsequently extended by adding Jose4 (8H/3749 = 716 yr = 4×Jose), selected on a different basis: multi-archive spectral coherence in Steinhilber solar Φ + EPICA CO2 (which Jupiter92 lacked). Lesson preserved: a Section 14 residual peak by itself doesn't guarantee independence from Bond signal.
-- **Artifacts kept**: `scripts/lod_residual_quad_fit.py`, `scripts/jupiter92_isolated_refit.py`, `data/deltaT-quad-fit.json`, `data/jupiter92-isolated-refit.json`.
-
-### L-5b verification of shipped 4-flag stack
-
-Empirical validation of the shipped configuration on the L-5b
-267-observation primary source dataset:
-
-| Metric | Bond only (interim n=1851, historical) | Bond+Hallstatt+Jose5 (3-flag, n=1830) | Bond+Hallstatt+Jose5+Jose4 (4-flag, n=1830, shipped) |
-|---|---:|---:|---:|
-| Global \|residual\| | 1636 s | 1625 s | 1629 s |
-| Events closer than NASA | 81 (30.3%) | 83 (31.1%) | 83 (31.1%) |
-| Medieval bump peak | −687 s @ 970 | −638 s @ 990 | **−580 s @ 1000** |
-| Section 14 top peak | 897 yr (ΔR² 0.0026) | 1060 yr (ΔR² 0.0015) | 1079 yr (see Eddy in § Rolled-back candidates above) |
-
-The 4-flag stack extends the 3-flag stack with **~58 s further
-reduction of the medieval bump peak** (year 990 −638 s → year 1000
-−580 s) via Jose4's 4×Jose harmonic. Global RMS is essentially
-unchanged (+4 s neutral), consistent with Jose4 redistributing
-error rather than eliminating it — it moves the medieval bump
-without introducing significant ancient-BCE regression (Eddy did the
-opposite, hence its rollback).
-
-**Collinearity management**: joint fits show progressively worse
-inter-cycle collinearity as more nearby-frequency harmonics are
-added (Hallstatt+Jose5 pair shows +14° Bond phase shift; adding
-Jose4 stays within tolerance at −9°; adding Eddy inflates Bond amp
-375 → 646 s; Jupiter92 blows up all amplitudes 2–3×). The
-**cap-only shipping logic** — never inflate a free-fit above its
-prior — keeps runtime coefficients bounded even when the joint fit
-is showing collinearity signatures. The 4-flag stack sits at the
-empirical limit; Eddy (5-flag) and Emp862 (6-flag) rollbacks
-confirm that further extension on the 2730-yr Stephenson window is
-not viable without a different fitting target.
+Jose4 buys ~58 s further reduction of the medieval bump peak with
+global RMS essentially unchanged (+4 s neutral) — it moves the medieval
+bump without ancient-BCE regression. **Collinearity management**: joint
+fits show progressively worse inter-cycle collinearity as
+nearby-frequency harmonics are added; the **cap-only shipping logic** —
+never inflate a free-fit above its prior — keeps runtime coefficients
+bounded even when the joint fit shows collinearity signatures.
 
 ---
 
@@ -1743,10 +1618,8 @@ results are cached at `window._L5b_lattice_scan`,
 Scans n ∈ [500, 5000] for lattice harmonic content in the current
 residual. Under Bond OFF baseline, identifies a broad peak in the
 Bond-scale band (n ≈ 1817–1863, periods 1440–1476 yr); the shipped
-n=1830 (74 × J-S synodic, gcd=61) sits within this peak with ΔR² ≈ 0.073.
-The former interim n=1851 (73×J-S synodic, gcd=1) is Fourier-degenerate
-with n=1830 within the same peak; §17 dual-harmonic test confirms both
-describe the same lattice feature.
+n=1830 (74 × J-S synodic, gcd=61) sits within this peak with ΔR² ≈ 0.073
+(the whole n ≈ 1817–1863 band is Fourier-degenerate; §17 Part B).
 
 Under Bond ON (after n=1830 correction), the scan finds no divisor with
 ΔR² > 0.02 anywhere in the 500–5000 yr range. Verdict: **the medieval
@@ -1849,12 +1722,11 @@ polynomial fits misattribute this shape as a linear trend. **§15's
 downstream symptoms of this fit-order artifact, not physical
 mechanisms.**
 
-Part B tests whether n=1830 and n=1851 are distinguishable lattice
-divisors or Fourier-degenerate. Dual-harmonic fit adds only <0.001 R²
-over the better single. **Fourier-degenerate — same peak, different
-labels.** The current shipped n=1830 wins on structural criteria
-(gcd-compliance, closest to canonical Bond); the interim n=1851 was
-tightest on the J-S synodic count but not gcd-compliant.
+Part B tests whether nearby lattice divisors in the Bond band (n=1830,
+n=1851, n=1920) are distinguishable or Fourier-degenerate. A
+dual-harmonic fit adds only <0.001 R² over the better single —
+**Fourier-degenerate: same peak, different labels.** The shipped n=1830
+wins on structural criteria (gcd-compliance, closest to canonical Bond).
 
 ### The complete picture
 
@@ -2408,12 +2280,7 @@ URLs / files.
   (Independent confirmation of the Holme mantle-core secular-rate
   range from a separate geomagnetic-secular-variation inversion.)
 
-- Doc 100 (archived): `docs/archive/old-documents/100-deltat-validation.md` (prior 35-eclipse residual
-  comparison)
-- Doc 103: `docs/103-135-babylonian-case-study.md` (-135 Babylonian
-  focused case study. Its original Meeus-era decomposition of the
-  residual — ΔT ~270 km, Meeus β-residual ~440 km, other Meeus terms
-  ~450 km — is superseded: under the certified framework-native chain
-  the umbra centerline lands 194 km from Babylon, verdict off-peak.
-  Still provides the direct empirical sensitivity test of doc 102's
-  GIA α(t) constants under Peltier ICE-6G defaults)
+- Doc 103: `docs/103-135-babylonian-case-study.md` — the -135 Babylonian
+  focused case study (off-peak verdict under the certified
+  framework-native chain), and the direct empirical sensitivity test of
+  this document's GIA α(t) constants under the Peltier ICE-6G defaults.

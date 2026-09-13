@@ -2,7 +2,7 @@
   "name": "@essrt/render",
   "version": "0.0.0",
   "private": true,
-  "description": "Content pipeline. Thin adapter over physics; contains zero physics.",
+  "description": "Reserved end-state slot (plan 01 target layout; not yet populated). Content pipeline. Thin adapter over physics; contains zero physics.",
   "type": "module",
   "main": "src/index.js",
   "license": "AGPL-3.0-or-later"

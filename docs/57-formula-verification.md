@@ -9,7 +9,7 @@ status: current
 
 ## Overview
 
-The **Formula Verification** panel is a modal in the Tools menu that compares the Holistic Universe Model's predictions against published analytical formulas from celestial-mechanics literature — Meeus, Chapront, Capitaine, Vondrák, Laskar, Berger, Peters, Harkness. For ten separate quantities (eccentricity, obliquity, inclination, ascending node, perihelion longitude, tropical year, sidereal year, solar day length, axial precession period, ΔT) it plots the model and every available reference on a common time axis spanning **12,000 BC → 12,000 AD**, shows a residual chart of each reference minus the model, and a J2000 comparison table that reports every formula's value at J2000 and its delta from the model.
+The **Formula Verification** panel is a modal in the Tools menu that compares the Holistic Universe Model's predictions against published analytical formulas from celestial-mechanics literature — Meeus, Chapront, Capitaine, Vondrák, Laskar, Berger, Bills & Ray. For eleven separate quantities (eccentricity, obliquity, inclination, ascending node, perihelion longitude, tropical year, cardinal year lengths, solar day length, sidereal year, axial precession period, ΔT) it plots the model and every available reference on a common time axis spanning **12,000 BC → 12,000 AD** (the Cardinal Year Lengths chart spans ±30,000 yr), shows a residual chart of each reference minus the model, and a J2000 comparison table that reports every formula's value at J2000 and its delta from the model.
 
 This is the analytical twin of the [WebGeoCalc Explorer](56-webgeocalc-explorer.md):
 
@@ -18,26 +18,27 @@ This is the analytical twin of the [WebGeoCalc Explorer](56-webgeocalc-explorer.
 
 Together the two panels let you check the model from two independent directions: does it match what JPL *measures*, and does it match what textbook celestial mechanics *predicts*?
 
-> **Scope note (ESSRT).** The default ±12,000 yr comparison range is modern-era for ESSRT purposes — H(t) drift over this span is sub-ppm and well below the noise floor of the published polynomial and trigonometric formulas being compared. The Export Cycles long-baseline plots (−248,000 BC to +102,000 AD, ~350 kyr) push into the regime where ESSRT scaling becomes marginally non-negligible (~0.04% H drift over 250 kyr per Drivers 1 and 2 — see [doc 99](99-expanding-solar-system-resonance-theory.md)), but Laskar's La2004/La2010 N-body integrations the model is compared against also do not incorporate this drift, so any discrepancy at long range reflects framework differences rather than ESSRT scaling. The Fibonacci structure the model formulas test is intrinsically scale-invariant.
+> **Scope note (ESSRT).** The default ±12,000 yr comparison range is modern-era for ESSRT purposes — H(t) drift over this span is sub-ppm and well below the noise floor of the published polynomial and trigonometric formulas being compared. The Export Cycles long-baseline plots (−248,000 BC to +102,000 AD, ~350 kyr) push into the regime where ESSRT scaling becomes marginally non-negligible (~0.04% H drift over 250 kyr per Drivers 1 and 2 — see [doc 99](99-expanding-solar-system-resonance-theory.md)), but Laskar's La2004/La2010 N-body integrations the model is compared against also do not incorporate this drift, so any discrepancy at long range reflects framework differences rather than ESSRT scaling. The H-lattice structure the model formulas test is intrinsically scale-invariant.
 
-## The ten categories
+## The eleven categories
 
-Each category has: the quantity being plotted, the unit of the y-axis, a primary reference (highlighted on the J2000 table as the comparison baseline), and a list of secondary references. The model's curve is always drawn in amber (`#f0b040`) as the top layer; each reference gets its own colour.
+Each category has: the quantity being plotted, the unit of the y-axis, a primary reference (highlighted on the J2000 table as the comparison baseline), and a list of secondary references — except Cardinal Year Lengths, which is the model's own decomposition and carries no external comparison. The model's curve is always drawn in amber (`#f0b040`) as the top layer; each reference gets its own colour.
 
-| # | Category | Unit | Model formula | References |
+| # | Category | Unit | Model curve | References |
 |---|----------|------|---------------|------------|
-| 1 | Eccentricity | — | `computeEccentricityEarth(year, ...)` | Meeus 1991 (primary), Berger 1978 (Milankovitch), La2004 (Laskar) |
-| 2 | Obliquity | ° | `computeObliquityEarth(year)` | Chapront 2002 (primary), Laskar 1986, Capitaine 2006, Berger 1978, La2004 |
-| 3 | Inclination to Invariable Plane | ° | `computeInclinationEarth(year, ...)` | La2010 (Laskar 2011) |
-| 4 | Ascending Node on Invariable Plane | ° | `ascNodeModel(year)` (= −H/5 retrograde) | La2010 (Laskar 2011) |
-| 5 | Longitude of Perihelion | ° | `calcEarthPerihelionPredictive(year)` | Meeus 1991 (based on Simon 1994), La2004 |
-| 6 | Tropical Year | days | `computeLengthofsolarYear(year)` | Laskar 1986 |
-| 7 | Solar Day Length | s | `meansiderealyearlengthinSeconds / computeLengthofsiderealYear(year)` | Bills & Ray 1999 |
-| 8 | Sidereal Year | days | `computeLengthofsiderealYear(year)` | Chapront 2002 |
-| 9 | Axial Precession Period | yr | `computeAxialPrecessionRealLOD(...)` | Capitaine 2003, Vondrák 2011 |
-| 10 | ΔT (TT − UT1) | s | calibrated ΔT trend (deltaTStart + Layer-2 integral + H/5 LOD + cycle stack) | Espenak & Meeus history (1650–2017) |
+| 1 | Eccentricity | — | one-source scene target (`_sceneEccTargetAt`) | Meeus 1991 (primary), Berger 1978 (Milankovitch), La2004 (Laskar) |
+| 2 | Obliquity | ° | one-source scene target (`_sceneEpsTargetDeg`) | Chapront 2002 (primary), Laskar 1986, Capitaine 2006, Berger 1978, La2004 |
+| 3 | Inclination to Invariable Plane | ° | `inclInvPlaneModel(year)` | La2010 (Laskar 2011) |
+| 4 | Ascending Node on Invariable Plane | ° | `ascNodeInvPlaneModel(year)` (S&S/La2010 node origin, derived) | La2010 (Laskar 2011) |
+| 5 | Longitude of Perihelion | ° | one-source perihelion of date (hybrid-spin aware) | La2004 (primary), Meeus 1991 (based on Simon 1994) |
+| 6 | Tropical Year | days | one-source tropical year of date (`createYearLengths` family) | Laskar 1986 |
+| 7 | Cardinal Year Lengths | min past 365 d 5 h | the model's own four cardinal-point year lengths + their of-date mean | — (own decomposition, no comparison rows) |
+| 8 | Solar Day Length | s | model solar day + dashed long-term-mean line | Bills & Ray 1999 |
+| 9 | Sidereal Year | days | one-source sidereal year of date | Chapront 2002 |
+| 10 | Axial Precession Period | yr | one-source precession period of date | Capitaine 2003, Vondrák 2011 |
+| 11 | ΔT (TT − UT1) | s | calibrated ΔT trend (deltaTStart + Layer-2 integral + H/5 LOD + cycle stack) | Espenak & Meeus history (1650–2017) |
 
-Each category also lists **J2000 observed reference values** separately — NASA/JPL, IAU, or Souami & Souchay (2012) for the invariable-plane quantities — shown in the J2000 table as "extras" (red, `#ef5350`) so the reader can see where observed reality sits relative to model and formulas.
+Most categories also list **J2000 observed reference values** separately — NASA/JPL, IAU, or Souami & Souchay (2012) for the invariable-plane quantities — shown in the J2000 table as "extras" (red, `#ef5350`) so the reader can see where observed reality sits relative to model and formulas.
 
 ## Chart layout
 
@@ -65,9 +66,9 @@ A small table with three columns: **Formula name** (with an arrow-link to the pu
 
 ## Time range and navigation
 
-- Default range: **−12 000 BC to +12 000 AD** (24 000 years). The same range applies to every category.
-- Navigation: prev/next arrows ([`‹`] / [`›`]) to step through the 10 categories, or click the category name to open a dropdown for direct jump.
-- Category order: eccentricity → obliquity → inclination → ascending node → perihelion → tropical year → solar day → sidereal year → axial precession → ΔT.
+- Default range: **−12 000 BC to +12 000 AD** (24 000 years); the Cardinal Year Lengths category widens its chart to ±30 000 yr.
+- Navigation: prev/next arrows ([`‹`] / [`›`]) to step through the 11 categories, or click the category name to open a dropdown for direct jump.
+- Category order: eccentricity → obliquity → inclination → ascending node → perihelion → tropical year → cardinal year lengths → solar day → sidereal year → axial precession → ΔT.
 
 The panel closes on "×" click, Escape, or overlay click.
 
@@ -76,16 +77,16 @@ The panel closes on "×" click, Escape, or overlay click.
 Three buttons in the header produce publication-grade SVG exports:
 
 - **Export for Paper** — renders the current category to a clean SVG with the default `[−12 000, +12 000]` year range and the model + references, without the UI chrome. Uses the category's `paperRange`, `paperTitle`, `paperYRange`, and `paperYTicks` if defined.
-- **Export Cycles** — only visible for categories that have a `paperAlt` block (eccentricity and obliquity). Renders a much longer-baseline plot (e.g. eccentricity: −248 000 BC to +102 000 AD) to show the model's long-term oscillation cycles against La2004. Excludes the polynomial references (Meeus, Chapront) that diverge badly outside the century-scale window, and overlays a mean-value reference line.
+- **Export Cycles** — only visible for categories that have a `paperAlt` block (seven of the eleven: eccentricity, obliquity, tropical year, cardinal year lengths, solar day, sidereal year, axial precession). Renders a much longer-baseline plot (−248 000 BC to +102 000 AD) to show the model's long-term oscillation cycles — against La2004 where an N-body reference exists. Excludes the polynomial references (Meeus, Chapront) that diverge badly outside the century-scale window, and overlays a mean-value reference line. The solar-day cycles view also marks the Marine Isotope Stage peaks (LR04) against the model's LOD extrema.
 - **Export Recent** — only visible for categories that have a `paperRecent` block (currently: ΔT). Renders a zoomed 1650-2050 SVG so short-scale features (e.g. the 1900 ΔT dip) are readable. Same curves as the main chart, plus a dashed reference baseline (ΔT = 0) for visual grounding.
 
 Exports are triggered by `exportVFPPaper()`, `exportVFPPaperAlt()`, and `exportVFPPaperRecent()`. All three call the same `renderVFPPaperChartAlt(category, altConfig)` renderer with different config blocks — the "Recent" and "Cycles" variants pass `paperRecent` / `paperAlt` respectively. They open in a new tab as an SVG data URL; the reader can right-click to save or screenshot.
 
-### Charts consistency (2026-07-18)
+### Charts consistency
 
-- **Tropical year modal** now shows SI 86400-s days (was accidentally displaying epoch-local LOD-days under deep-time, causing the model curve to overshoot Laskar going into the future). The model function was refactored to `evalYearFourier(year, MEAN_SOLAR_YEAR_J2000_DAYS, TROPICAL_YEAR_HARMONICS)` with a frozen J2000 baseline.
-- **Axial precession modal** made cross-consistent with the tropical-year modal: both now source the tropical year length from the same `TROPICAL_YEAR_HARMONICS` fit (previously the axial chart used a Step-6c cardinal-derivative fit that differed by ~1 s at J2000). The sidereal component uses `evalYearFourier(year, IAU_sidereal_J2000, SIDEREAL_YEAR_HARMONICS)`. Neither chart depends on the sim's current epoch.
-- **ΔT modal** — the model curve is the calibrated *trend* (H/5 physics + Bond/Hallstatt/Jose5/Jose4 stack), fit against Espenak history ~12 s RMS across 1650-2017 (2026-07-18 joint optimum). Reads ~57.5 s at J2000 (trend value passing through J2000), distinct from the IERS instantaneous observation of ~63.6 s.
+- **Tropical year modal** shows SI 86400-s days — never epoch-local LOD-days — evaluated of date from the one-source `createYearLengths` family, the same implementation that serves the planet panel, the year-analysis report and the API.
+- **Axial precession modal** is cross-consistent with the tropical-year and sidereal-year modals: all source their year lengths from the same one-source family, so the charts cannot drift apart. None of these charts depends on the sim's current epoch.
+- **ΔT modal** — the model curve is the calibrated *trend* (H/5 physics + Bond/Hallstatt/Jose5/Jose4 stack), fit against Espenak history ~12 s RMS across 1650-2017. Reads ~57.5 s at J2000 (trend value passing through J2000), distinct from the IERS instantaneous observation of ~63.6 s.
 
 ## Reference formula catalogue
 
@@ -95,7 +96,6 @@ The panel implements the following closed-form formulas as JavaScript functions.
 
 | Function | Source | Quantity |
 |----------|--------|----------|
-| `eccHarkness(year)` | Harkness 1891 | Earth eccentricity |
 | `eccMeeus(year)` | Meeus 1991 eq. 25.4 | Earth eccentricity |
 | `obliquityChapront2002(year)` | Chapront 2002 | Earth obliquity |
 | `perihelionMeeus(year)` | Meeus 1991 | Earth perihelion longitude |
@@ -132,17 +132,17 @@ At any point the panel answers: *"Does our model agree with published celestial 
 - **Century-scale (±100 yr)** — the model agrees with Meeus, Chapront, Capitaine polynomials at the J2000-value level to a few arcseconds or sub-second time units; all curves are essentially indistinguishable in the main chart, and the residual chart shows deviations at the noise floor of the polynomial fits.
 - **Millennial-scale (±5 000 yr)** — the model still tracks the polynomial references closely; residuals grow but stay within the polynomials' stated validity.
 - **Ten-kyr-scale (±12 000 yr)** — polynomial references start to diverge (they were fit for a narrow window); the model tracks Laskar's La2004/La2010 N-body integrations instead, which are the only references valid at this range.
-- **100-kyr-scale (Export Cycles)** — the model's Fibonacci eccentricity and obliquity cycles are compared directly against Laskar's full N-body integration over several glacial cycles. This is where Milankovitch features appear.
+- **100-kyr-scale (Export Cycles)** — the model's H-lattice eccentricity and obliquity cycles are compared directly against Laskar's full N-body integration over several glacial cycles. This is where Milankovitch features appear.
 
 ## Why this panel matters for the model's claims
 
-The Holistic Universe Model is a geometric/Fibonacci framework, not a derivation from Newtonian secular theory. A natural skeptical question is: "how does a pure Fibonacci model compare with the polynomial and N-body formulas that the astronomy community already uses?" This panel answers that question visually, quantitatively, and for ten independent quantities at once.
+The Holistic Universe Model is an analytic H-lattice framework with its own N-body chain for the planets — not a restatement of standard secular theory. A natural skeptical question is: "how does such a model compare with the polynomial and N-body formulas that the astronomy community already uses?" This panel answers that question visually, quantitatively, and for eleven independent quantities at once.
 
 Cases where the model *disagrees* with a reference are also documented in the panel — rather than hidden. The residual chart and J2000 table make the gaps numerical and reproducible. Together with WebGeoCalc (the observational comparison), this panel is the second leg of the model's validation.
 
 ## Scope and limitations
 
-1. **Earth only.** All ten categories describe Earth quantities (Earth's orbit + Earth's spin axis + Earth's rotation clock ΔT). Planet-specific perihelion motion lives in the WebGeoCalc Explorer.
+1. **Earth only.** All eleven categories describe Earth quantities (Earth's orbit + Earth's spin axis + Earth's rotation clock ΔT). Planet-specific perihelion motion lives in the WebGeoCalc Explorer.
 2. **No interactive year slider.** The charts are plotted over a fixed range (−12 000 to +12 000). To inspect values at a specific year, read the J2000 table or advance the simulation's date and re-open the panel.
 3. **Reference formulas go stale outside their range.** A polynomial fit to ±2 000 years *will* give nonsense at year −10 000. The panel plots them anyway (with the range note) so the reader can see the divergence — useful for understanding *why* N-body solutions are needed at long range.
 4. **Paper-export is SVG-only.** No PNG / PDF export. Use browser screenshot or an external SVG-to-PDF converter.
@@ -161,10 +161,7 @@ Cases where the model *disagrees* with a reference are also documented in the pa
 ## Related documentation
 
 - [WebGeoCalc Explorer](56-webgeocalc-explorer.md) — the observational complement of this panel (model vs JPL data, 1900–2026).
-- [Solar System Resonance Cycle Periods](55-solar-system-resonance-cycle-periods.md) — the eight-planet cycle table; uses the same model functions.
-- [Planets Precession Cycles](37-planets-precession-cycles.md) — per-planet observed and model rates, with WebGeoCalc and Laskar references.
-- [Perihelion Precession](12-perihelion-precession.md) — the three internal computation methods used by the simulation for ϖ, one of which (`calcEarthPerihelionPredictive`) is what this panel plots for category 5.
-- [Mercury Precession Breakdown](13-mercury-precession-breakdown.md) — reference-frame discussion (ecliptic vs ICRF) that applies to category 4's ascending-node comparison and category 5's perihelion.
+- [Perihelion Precession](13-mercury-precession-breakdown.md) — the internal computation methods used by the simulation for ϖ (the panel's category-5 model line is the one-source perihelion of date), and the reference-frame discussion (ecliptic vs ICRF) that applies to category 4's ascending-node comparison.
 - [Orbital Formulas Reference](21-orbital-formulas-reference.md) — the `OrbitalFormulas` library referenced by the model formulas.
 - [Expanding Solar System Resonance Theory](99-expanding-solar-system-resonance-theory.md) — Deep-time scaling of H(t); becomes marginally relevant at the Export Cycles 350-kyr baseline.
 

@@ -13,9 +13,7 @@ This document provides a complete reference for all orbital calculation function
 
 **Related Documents:**
 - [Dynamic Orbital Elements Overview](04-dynamic-elements-overview.md) - How dynamic systems work together
-- [Inclination Calculations](32-inclination-calculations.md) - Planet inclination oscillation (ICRF perihelion approach)
-- [Ascending Node Calculations](31-ascending-node-calculations.md) - Ascending node shifts with obliquity
-- [Formula Derivation](35-formula-derivation.md) - Theoretical derivation of precession formulas from Fibonacci periods
+- [Geometric Orbital Elements — the No-Chain Bodies](31-no-chain-body-elements.md) - Inclination oscillation (ICRF perihelion approach) and node shifts with obliquity
 
 ---
 
@@ -66,7 +64,7 @@ For current values, see [Constants Reference](20-constants-reference.md).
 |----------|-------------|
 | `speedOfLight` | Speed of light (km/s) |
 
-#### 1.1.5 Derived Constants (Now Implemented ✅)
+#### 1.1.5 Derived Constants
 
 | Constant | Description |
 |----------|-------------|
@@ -137,10 +135,10 @@ For current values, see [Constants Reference](20-constants-reference.md).
 | `o.{planet}ArgumentOfPeriapsis` | `o.mercuryArgumentOfPeriapsis` | Argument of periapsis (ω) | Live |
 | `o.{planet}MeanAnomaly` | `o.mercuryMeanAnomaly` | Mean Anomaly (M) | Live |
 | `o.{planet}TrueAnomaly` | `o.mercuryTrueAnomaly` | True Anomaly (ν) | Live |
-| `o.{planet}EccentricAnomaly` | `o.mercuryEccentricAnomaly` | Eccentric Anomaly (E) ✅ NEW | Live |
+| `o.{planet}EccentricAnomaly` | `o.mercuryEccentricAnomaly` | Eccentric Anomaly (E) | Live |
 | `o.{planet}Elongation` | `o.mercuryElongation` | Elongation from Sun (as seen from Earth) | Live |
 
-#### 1.3.2 Invariable Plane Variables (✅ Already Implemented)
+#### 1.3.2 Invariable Plane Variables
 
 | Variable Pattern | Example | Description | Updates |
 |------------------|---------|-------------|---------|
@@ -152,7 +150,7 @@ For current values, see [Constants Reference](20-constants-reference.md).
 | `o.{planet}EclipticInclinationSouamiSouchayDynamic` | `o.mercuryEclipticInclinationSouamiSouchayDynamic` | Ecliptic inclination using S&S ascending nodes | Live |
 | `o.{planet}InvPlaneInclinationDynamic` | `o.mercuryInvPlaneInclinationDynamic` | Dynamic inclination to invariable plane (oscillates with Ω) | Live |
 
-#### 1.3.3 Distance Variables (✅ Already Implemented)
+#### 1.3.3 Distance Variables
 
 | Variable Pattern | Example | Description | Updates |
 |------------------|---------|-------------|---------|
@@ -251,7 +249,7 @@ Naming taxonomy: `_Kinematic` = framework kinematic day units; `_Real` = physica
 |----------|-------------|
 | `o.axialPrecession` | Current axial precession cycle (years) — framework identity: H/13 |
 | `o.inclinationPrecession` | Current inclination precession cycle (years) — framework identity: H/3 |
-| `o.perihelionPrecession` | Current perihelion precession cycle (years) — framework identity: H/16 |
+| `o.perihelionPrecession` | Internal kinematic perihelion beat (years) — framework identity: H/16. The DISPLAYED of-date value is the one-source family's beat (`predictions.perihelionPrecession`) |
 | `o.obliquityPrecession` | Current obliquity precession cycle (years) — framework identity: H/8 |
 | `o.eclipticPrecession` | Current ecliptic precession cycle (years) — framework identity: H/5 |
 
@@ -463,588 +461,9 @@ The `secularPrecessionContribution` function implements Lagrange-Laplace secular
 
 ---
 
-# Appendix: Historical Implementation Notes
+# Appendix: Extended Formula Documentation
 
-> **Note:** The sections below document the original implementation process of the OrbitalFormulas library (December 2025 - January 2026). They are preserved for historical reference. For the current formula reference, see Part 2 above.
-
----
-
-## A.1 Implementation Status (December 2025)
-
-### A.1.1 ✅ Already Implemented Formulas
-
-These formulas are already calculated and displayed in the simulation:
-
-| Formula | Symbol | Implementation | Location |
-|---------|--------|----------------|----------|
-| Mean Anomaly | M | `o.{planet}MeanAnomaly` | `updatePlanetAnomalies()` |
-| True Anomaly | ν | `o.{planet}TrueAnomaly` | `updatePlanetAnomalies()` |
-| Eccentric Anomaly | E | `o.{planet}EccentricAnomaly` | `updatePlanetAnomalies()` |
-| Equation of Center | ν - M | Displayed in planet labels | planetStats |
-| Argument of Periapsis | ω | `o.{planet}ArgumentOfPeriapsis` | `updateOrbitOrientations()` |
-| Heliocentric Distance | r | `{planet}.sunDistAU` | Real-time 3D position |
-| Height Above Invariable Plane | z | `o.{planet}HeightAboveInvPlane` | `updateInvariablePlaneHeights()` |
-| Mean Max Height Above Inv. Plane | z_max | `sin(i_inv)` | Earth planetStats |
-| Ecliptic Inclination | i_app | `o.{planet}EclipticInclinationDynamic` | `updateDynamicInclinations()` |
-| **Dynamic Inclination to Inv. Plane** | **i_inv(t)** | `o.{planet}InvPlaneInclinationDynamic` | `computePlanetInvPlaneInclinationDynamic()` |
-| Elongation | - | `o.{planet}Elongation` | `updateElongations()` |
-| **Moon Anomalies** | **M, ν, E** | `o.moonMeanAnomaly`, etc. | `updateMoonOrbitalElements()` |
-| **Moon Ascending Node** | **Ω** | `o.moonAscendingNode` | `updateMoonOrbitalElements()` |
-| **Moon Longitude of Perigee** | **ϖ** | `o.moonLongitudeOfPerigee` | `updateMoonOrbitalElements()` |
-| **Moon Phase Angle** | **—** | `o.moonPhaseAngle` | `updateMoonOrbitalElements()` |
-| **Moon Distance** | **r** | `o.moonDistanceFromEarthKm` | `updateMoonOrbitalElements()` |
-| Synodic Period | P_syn | Calculated for Earth-planet pairs | planetStats |
-| **Gravitational Parameter** | **GM** | `GM_SUN` (derived constant) | Sun's planetStats |
-| **Current Orbital Velocity** | **v** | `OrbitalFormulas.orbitalVelocity()` | All planets' planetStats |
-| **Time Since Perihelion** | **t** | `OrbitalFormulas.timeSincePerihelion()` | All planets' planetStats |
-| **Time to Next Perihelion** | **t_next** | `OrbitalFormulas.timeToNextPerihelion()` | All planets' planetStats |
-| **Perihelion Distance** | **q** | `OrbitalFormulas.perihelionDist()` | All planets' planetStats |
-| **Aphelion Distance** | **Q** | `OrbitalFormulas.aphelionDist()` | All planets' planetStats |
-| **Flight Path Angle** | **γ** | `OrbitalFormulas.flightPathAngle()` | All planets' planetStats |
-| **Radial Velocity** | **vᵣ** | `OrbitalFormulas.radialVelocity()` | All planets' planetStats |
-| **Transverse Velocity** | **vₜ** | `OrbitalFormulas.transverseVelocity()` | All planets' planetStats |
-| **Mean Motion** | **n** | `OrbitalFormulas.meanMotion()` | All planets' planetStats |
-| **Perihelion Velocity** | **vₚ** | `OrbitalFormulas.perihelionVelocity()` | All planets' planetStats |
-| **Aphelion Velocity** | **vₐ** | `OrbitalFormulas.aphelionVelocity()` | All planets' planetStats |
-| **True Longitude** | **λ** | `OrbitalFormulas.trueLongitude()` | All planets' planetStats |
-| **Mean Longitude** | **L** | `OrbitalFormulas.meanLongitude()` | All planets' planetStats |
-| **Specific Orbital Energy** | **ε** | `OrbitalFormulas.specificEnergy()` | All planets' planetStats |
-| **Specific Angular Momentum** | **h** | `OrbitalFormulas.specificAngularMomentum()` | All planets' planetStats |
-| **Semi-minor Axis** | **b** | `OrbitalFormulas.semiMinorAxis()` | All planets' planetStats |
-| **Semi-latus Rectum** | **p** | `OrbitalFormulas.semiLatusRectum()` | All planets' planetStats |
-| **Focal Distance** | **c** | `OrbitalFormulas.focalDistance()` | All planets' planetStats |
-| **Argument of Latitude** | **u** | `OrbitalFormulas.argumentOfLatitude()` | All planets' planetStats |
-
-**Helper Object: `OrbitalFormulas`** - Available for all orbital calculations:
-- `eccentricAnomaly(M_deg, e)` - Newton-Raphson solver for Kepler's equation
-- `meanMotion(P_days)` - Mean angular motion (°/day)
-- `semiMinorAxis(a, e)` - Semi-minor axis calculation
-- `perihelionDist(a, e)` / `aphelionDist(a, e)` - Apsidal distances
-- `semiLatusRectum(a, e)` / `focalDistance(a, e)` - Geometric parameters
-- `heliocentricDist(a, e, nu_deg)` - Distance from orbit equation
-- `flightPathAngle(e, nu_deg)` - Flight path angle
-- `meanLongitude(M_deg, lonPeri_deg)` / `trueLongitude(nu_deg, lonPeri_deg)` - Longitude calculations
-- `argumentOfLatitude(omega_deg, nu_deg)` - Argument of latitude
-- `timeSincePerihelion(P_days, M_deg)` / `timeToNextPerihelion(P_days, M_deg)` - Time calculations
-- `orbitalVelocity(r_km, a_km)` - Vis-viva equation
-- `perihelionVelocity(a_km, e)` / `aphelionVelocity(a_km, e)` - Apsidal velocities
-- `radialVelocity(a_km, e, nu_deg)` - Velocity component toward/away from Sun
-- `transverseVelocity(a_km, e, nu_deg)` - Velocity component perpendicular to radius
-- `specificEnergy(a_km)` / `specificAngularMomentum(a_km, e)` - Energy and momentum
-
-### A.1.2 ✅ Recently Implemented (via OrbitalFormulas helper)
-
-All formulas below now have implementations available in the `OrbitalFormulas` object.
-They can be called on-demand or wired into the update loop and planetStats as needed.
-
-| Formula | Symbol | Status | Notes |
-|---------|--------|--------|-------|
-| **Eccentric Anomaly** | **E** | ✅ **DONE** | Calculated in `updatePlanetAnomalies()`, displayed in planetStats |
-| **Orbital Velocity** | **v** | ✅ **DONE** | Displayed in all planets' planetStats (vis-viva equation) |
-| **Perihelion Distance** | **q** | ✅ **DONE** | Displayed in all planets' planetStats |
-| **Aphelion Distance** | **Q** | ✅ **DONE** | Displayed in all planets' planetStats |
-| **Flight Path Angle** | **γ** | ✅ **DONE** | Displayed in all planets' planetStats |
-| **Mean Motion** | **n** | ✅ **DONE** | Displayed in all planets' planetStats |
-| **Semi-minor Axis** | **b** | ✅ **DONE** | Displayed in all planets' planetStats |
-| **Semi-latus Rectum** | **p** | ✅ **DONE** | Displayed in all planets' planetStats |
-| **Focal Distance** | **c** | ✅ **DONE** | Displayed in all planets' planetStats |
-| **Mean Longitude** | **L** | ✅ **DONE** | Displayed in all planets' planetStats |
-| **True Longitude** | **λ** | ✅ **DONE** | Displayed in all planets' planetStats |
-| **Argument of Latitude** | **u** | ✅ **DONE** | Displayed in all planets' planetStats |
-| **Time Since Perihelion** | **t** | ✅ **DONE** | Displayed in all planets' planetStats |
-| **Time to Next Perihelion** | **t_next** | ✅ **DONE** | Displayed in all planets' planetStats |
-| **Perihelion/Aphelion Velocity** | **v_p, v_a** | ✅ **DONE** | Displayed in all planets' planetStats |
-| **Specific Energy** | **ε** | ✅ **DONE** | Displayed in all planets' planetStats |
-| **Specific Angular Momentum** | **h** | ✅ **DONE** | Displayed in all planets' planetStats |
-
-**Note:** `GM_SUN` is now derived from Kepler's 3rd Law using existing constants, making all velocity and energy formulas available.
-
----
-
-## A.2 Proposed New Formulas (Historical Notes)
-
-> **Note:** This section contains the original implementation proposals from when the OrbitalFormulas library was being developed. Most formulas listed here have been implemented and are now documented in Part 2. This section is preserved for historical reference and implementation context.
-
-### A.2.1 #1 PRIORITY - Eccentric Anomaly (E)
-
-**Why this is the most important missing formula:**
-
-1. **Completes the anomaly chain**: You have M (Mean) and ν (True), but E (Eccentric) bridges them mathematically
-2. **Essential for velocity calculations**: The vis-viva equation and velocity decomposition use E
-3. **Verifies the M→ν calculation**: The relationship `M → E → ν` can validate your existing True Anomaly
-4. **No additional data needed**: You already have M and e (eccentricity) for all planets
-
-**Symbol:** E
-
-**Formula:** Solve Kepler's equation: `M = E - e·sin(E)`
-
-**Solution Method:** Newton-Raphson iteration (cannot be solved algebraically):
-```javascript
-function solveEccentricAnomaly(M_rad, e, tolerance = 1e-8) {
-  let E = M_rad; // Initial guess
-  for (let i = 0; i < 30; i++) {
-    const dE = (E - e * Math.sin(E) - M_rad) / (1 - e * Math.cos(E));
-    E -= dE;
-    if (Math.abs(dE) < tolerance) break;
-  }
-  return E;
-}
-```
-
-**Physical Meaning:** The angle at the ellipse center from perihelion, projected onto an auxiliary circle. Bridges Mean Anomaly (uniform motion) to True Anomaly (actual position).
-
-**Dependencies:** M (have), e (have)
-
-**Verification:** Once E is calculated, you can verify: `tan(ν/2) = √((1+e)/(1-e)) · tan(E/2)`
-
----
-
-### A.2.2 HIGH PRIORITY - Geometric (No GM Required)
-
-These formulas use only the orbital elements we already have.
-
-#### 4.2.1 Mean Motion (n)
-
-**Symbol:** n
-**Formula:** `n = 360° / P` (degrees/day) or `n = 2π / P` (radians/day)
-**Physical Meaning:** The constant angular velocity a planet would have if following uniform circular motion.
-**Dependencies:** P (have)
-**Priority:** ★★★★★ Fundamental rate
-
----
-
-#### 4.2.2 Semi-minor Axis (b)
-
-**Symbol:** b
-**Formula:** `b = a · √(1 - e²)`
-**Physical Meaning:** Half-width of the orbital ellipse at its narrowest point.
-**Dependencies:** a (have), e (have)
-**Priority:** ★★★★☆ Completes ellipse geometry
-
----
-
-#### 4.2.3 Perihelion Distance (q)
-
-**Symbol:** q
-**Formula:** `q = a · (1 - e)`
-**Physical Meaning:** Closest approach to the Sun.
-**Dependencies:** a (have), e (have)
-**Priority:** ★★★★★ Key orbital parameter
-**Note:** Partially exists as `{planet}PerihelionDistance` but calculated differently
-
----
-
-#### 4.2.4 Aphelion Distance (Q)
-
-**Symbol:** Q
-**Formula:** `Q = a · (1 + e)`
-**Physical Meaning:** Farthest distance from the Sun.
-**Dependencies:** a (have), e (have)
-**Priority:** ★★★★★ Key orbital parameter
-
----
-
-#### 4.2.5 Current Heliocentric Distance (r) - Formula Verification
-
-**Symbol:** r
-**Formula:** `r = a · (1 - e²) / (1 + e · cos(ν))`
-**Alternative:** `r = a · (1 - e · cos(E))`
-**Physical Meaning:** Current distance from Sun based on position in orbit.
-**Dependencies:** a (have), e (have), ν (have)
-**Priority:** ★★★★★ Essential for position
-**Note:** ✅ Already implemented as `{planet}.sunDistAU` - can be used to verify formula
-
----
-
-#### 4.2.6 Semi-latus Rectum (p or ℓ)
-
-**Symbol:** p or ℓ
-**Formula:** `p = a · (1 - e²)`
-**Physical Meaning:** The orbital radius when ν = 90° (perpendicular to major axis).
-**Dependencies:** a (have), e (have)
-**Priority:** ★★★☆☆ Useful for orbital equations
-
----
-
-#### 4.2.7 Focal Distance (c)
-
-**Symbol:** c
-**Formula:** `c = a · e`
-**Physical Meaning:** Distance from ellipse center to focus (where Sun is located).
-**Dependencies:** a (have), e (have)
-**Priority:** ★★★☆☆ Ellipse geometry
-
----
-
-#### 4.2.8 Flight Path Angle (γ)
-
-**Symbol:** γ (gamma)
-**Formula:** `tan(γ) = e · sin(ν) / (1 + e · cos(ν))`
-**Physical Meaning:** Angle between velocity vector and local horizontal. Zero at perihelion/aphelion, maximum at ν ≈ 90°.
-**Dependencies:** e (have), ν (have)
-**Priority:** ★★★★☆ Shows velocity direction
-
----
-
-#### 4.2.9 Mean Longitude (L)
-
-**Symbol:** L
-**Formula:** `L = M + ϖ` (mod 360°)
-**Physical Meaning:** Angular position from vernal equinox assuming uniform motion.
-**Dependencies:** M (have), ϖ (have)
-**Priority:** ★★★☆☆ Ephemeris calculations
-
----
-
-#### 4.2.10 True Longitude (λ)
-
-**Symbol:** λ
-**Formula:** `λ = ν + ϖ` (mod 360°)
-**Physical Meaning:** Actual angular position from vernal equinox.
-**Dependencies:** ν (have), ϖ (have)
-**Priority:** ★★★★☆ Actual ecliptic longitude
-
----
-
-#### 4.2.11 Argument of Latitude (u)
-
-**Symbol:** u
-**Formula:** `u = ω + ν`
-**Physical Meaning:** Angle in orbital plane from ascending node to planet.
-**Dependencies:** ω (have), ν (have)
-**Priority:** ★★★☆☆ 3D position reference
-**Note:** This is used internally in `updateInvariablePlaneHeights()` but not displayed
-
----
-
-#### 4.2.12 Time Since Perihelion
-
-**Formula:** `t = P · M / 360°`
-**Physical Meaning:** Days elapsed since last perihelion passage.
-**Dependencies:** P (have), M (have)
-**Priority:** ★★★★☆ Temporal context
-
----
-
-#### 4.2.13 Time to Next Perihelion
-
-**Formula:** `t_next = P · (360° - M) / 360°`
-**Physical Meaning:** Days until next perihelion passage.
-**Dependencies:** P (have), M (have)
-**Priority:** ★★★★☆ Prediction
-
----
-
-### A.2.3 MEDIUM PRIORITY - Physics (Requires GM Constant)
-
-These require adding the gravitational parameter: `GM_sun = 1.32712440018 × 10²⁰ m³/s²`
-Or in convenient units: `GM_sun = 1.327124 × 10¹¹ km³/s²`
-
-#### 4.3.1 Orbital Velocity (Vis-viva Equation)
-
-**Symbol:** v
-**Formula:** `v = √(GM · (2/r - 1/a))`
-**Physical Meaning:** Instantaneous orbital speed at any distance r.
-**Dependencies:** GM (need to add), r (have as sunDistAU), a (have)
-**Priority:** ★★★★★ Fundamental dynamics
-
----
-
-#### 4.3.2 Perihelion Velocity (v_p)
-
-**Symbol:** v_p
-**Formula:** `v_p = √(GM · (1 + e) / (a · (1 - e)))`
-**Physical Meaning:** Maximum orbital velocity (at closest approach).
-**Dependencies:** GM (need), a (have), e (have)
-**Priority:** ★★★★☆ Velocity extremum
-
----
-
-#### 4.3.3 Aphelion Velocity (v_a)
-
-**Symbol:** v_a
-**Formula:** `v_a = √(GM · (1 - e) / (a · (1 + e)))`
-**Physical Meaning:** Minimum orbital velocity (at farthest distance).
-**Dependencies:** GM (need), a (have), e (have)
-**Priority:** ★★★★☆ Velocity extremum
-
----
-
-#### 4.3.4 Specific Angular Momentum (h)
-
-**Symbol:** h
-**Formula:** `h = √(GM · a · (1 - e²))`
-**Physical Meaning:** Angular momentum per unit mass. Constant throughout orbit (conserved).
-**Dependencies:** GM (need), a (have), e (have)
-**Priority:** ★★★★☆ Conservation law
-
----
-
-#### 4.3.5 Specific Orbital Energy (ε)
-
-**Symbol:** ε (epsilon)
-**Formula:** `ε = -GM / (2a)`
-**Physical Meaning:** Total mechanical energy per unit mass. Negative for bound orbits.
-**Dependencies:** GM (need), a (have)
-**Priority:** ★★★★★ Conservation law
-
----
-
-#### 4.3.6 Radial Velocity (v_r)
-
-**Symbol:** v_r
-**Formula:** `v_r = √(GM/p) · e · sin(ν)`
-**Physical Meaning:** Velocity component toward/away from Sun.
-**Dependencies:** GM (need), p (calculable), e (have), ν (have)
-**Priority:** ★★★☆☆ Velocity decomposition
-
----
-
-#### 4.3.7 Transverse Velocity (v_θ)
-
-**Symbol:** v_θ
-**Formula:** `v_θ = √(GM/p) · (1 + e · cos(ν))`
-**Physical Meaning:** Velocity component perpendicular to radius (tangential).
-**Dependencies:** GM (need), p (calculable), e (have), ν (have)
-**Priority:** ★★★☆☆ Velocity decomposition
-
----
-
-#### 4.3.8 Escape Velocity (from Sun at distance r)
-
-**Symbol:** v_esc
-**Formula:** `v_esc = √(2GM/r)`
-**Physical Meaning:** Minimum velocity to escape Sun's gravity from current position.
-**Dependencies:** GM (need), r (have as sunDistAU)
-**Priority:** ★★★☆☆ Reference velocity
-
----
-
-### A.2.4 LOWER PRIORITY - Advanced/Specialized
-
-#### 4.4.1 Orbital Period from Kepler's 3rd Law
-
-**Formula:** `P = 2π · √(a³/GM)`
-**Note:** We already have P, but this verifies the relationship.
-
----
-
-#### 4.4.2 Area Sweep Rate (Kepler's 2nd Law)
-
-**Formula:** `dA/dt = h/2 = constant`
-**Physical Meaning:** Equal areas in equal times.
-
----
-
-#### 4.4.3 Synodic Period (between any two planets)
-
-**Formula:** `P_syn = |P₁ · P₂ / (P₁ - P₂)|`
-**Note:** ✅ Already calculated for Earth-planet pairs; could generalize to any planet pair.
-
----
-
-#### 4.4.4 Hill Sphere / Sphere of Influence
-
-**Formula:** `r_Hill ≈ a · (m_planet / (3 · M_sun))^(1/3)`
-**Note:** Requires planetary masses.
-
----
-
-#### 4.4.5 Heliocentric Latitude to Invariable Plane (β)
-
-**Symbol:** β (beta)
-**Formula:** `sin(β) = sin(i_inv) · sin(u)` where `u = ω + ν`
-**Physical Meaning:** Angular distance above/below the invariable plane.
-**Dependencies:** i_inv (have as {planet}Inclination), ω (have), ν (have)
-**Priority:** ★★★★☆ 3D position understanding
-**Note:** ✅ Partially implemented - used internally to calculate `HeightAboveInvPlane`
-
----
-
-### A.2.5 About Mass Calculations
-
-**Cannot directly calculate planetary mass** from orbital elements alone — gravitational parameter `GM` is what orbital mechanics actually constrains. To get mass in kg, divide `GM/G` (limited to ~22 ppm by G's measurement uncertainty).
-
-To derive `GM` from orbits, the model uses:
-- **For the Sun:** Earth's orbit gives `G(M_Sun + M_Earth) = 4π²·a_E³ / P_E²`, then subtract `GM_Earth`
-- **For Earth + Moon system:** Moon's orbit gives `G(M_Earth + M_Moon) = 4π²·(a_M + Δa)³ / T_M²`, with the solar-tidal correction `Δa = a_M·μ·m` — see [24 — Moon Kepler Derivation](24-moon-kepler-derivation.md)
-- **For other planets:** Use the DE440 mass ratios: `GM_planet = GM_Sun / massRatio_DE440[planet]`
-
-**Available for Earth-Moon:**
-- `moonDistance` = <!--v:moonOrbitalRadius-->384,399.07<!--/v--> km (Moon's semi-major axis)
-- `moonSiderealMonth` = <!--v:moonSiderealMonthInput-->27.32166156<!--/v--> days
-- `MASS_RATIO_EARTH_MOON` = <!--v:massRatioEarthMoon-->81.30056816<!--/v--> (DE440 SPICE kernel)
-
-Result: `M_Earth ≈ 5.97219 × 10²⁴ kg` (matches CODATA 2022 to ~3.7 ppm — limited by Brown's lunar theory floor in the 3-body system; see [doc 24](24-moon-kepler-derivation.md) for the precision analysis).
-
----
-
-## A.3 Implementation Approach
-
-### A.3.1 Implemented UI: Inline Formulas in planetStats
-
-Formulas are added inline to each planet's existing `planetStats` entries (not in a separate collapsible section). Each formula entry includes:
-- **label**: Display name with symbol
-- **value**: Calculated value via `OrbitalFormulas` helper with decimal precision
-- **hover**: Tooltip explaining the formula
-
-**Placement within planetStats:**
-
-1. **Geometric Parameters** (b, p, c) - Added after Aphelion distance entry
-2. **Velocities** (v, vₚ, vₐ, vᵣ, vₜ) - Added after Mean orbital speed entry
-3. **Energy & Momentum** (ε, h) - Added after Aphelion velocity entry
-4. **Longitudes** (λ, L) - Added after Argument of Periapsis entry
-5. **Argument of Latitude** (u) - Added after Mean Longitude entry
-6. **Time calculations** - Added after True Anomaly entry
-7. **Mean Motion** (n) - Added after orbital period entry
-
-**Units implemented:**
-- Velocities: km/s (converted from km/h where needed)
-- Distances: AU
-- Angles: degrees (°)
-- Energy: km²/s²
-- Angular Momentum: km²/s
-
-### A.3.2 Implementation Phases (All Complete ✅)
-
-#### Phase 1: Core Infrastructure ✅
-1. ✅ Derived GM_SUN from Kepler's 3rd Law using existing constants
-2. ✅ Created `OrbitalFormulas` helper object with all formula methods
-3. ✅ Used inline entries in existing planetStats (no collapsible UI needed)
-
-#### Phase 2: Geometric Formulas (No GM) ✅
-1. ✅ Eccentric Anomaly solver (Newton-Raphson) - in `updatePlanetAnomalies()`
-2. ✅ Mean Motion (n)
-3. ✅ Geometry: b, q, Q, p, c
-4. ✅ Angles: γ, L, λ, u
-5. ✅ Time calculations (time since/to perihelion)
-
-#### Phase 3: Physics Formulas (With GM) ✅
-1. ✅ Vis-viva velocity
-2. ✅ Perihelion/Aphelion velocities
-3. ✅ Radial/Transverse velocity components
-4. ✅ Specific energy and angular momentum
-
-#### Phase 4: Enhancements ✅
-1. ✅ Added hover tooltips explaining each formula
-
-### A.3.3 Implemented Code Structure
-
-**GM_SUN derived from Kepler's 3rd Law:**
-```javascript
-// Earth's orbit gives G(M_Sun + M_Earth); subtract GM_EARTH_ALONE to recover GM_Sun.
-// GM_EARTH_ALONE comes from the Moon's orbit with the Δa = a_M·μ·m solar-tidal
-// correction. See doc 24 — Moon Kepler Derivation for the full chain.
-const GM_SUN_PLUS_EARTH = (4 * Math.PI * Math.PI * Math.pow(currentAUDistance, 3))
-                         / Math.pow(meansiderealyearlengthinSeconds, 2);
-const GM_SUN = GM_SUN_PLUS_EARTH - GM_EARTH_ALONE;
-// Result: ~1.32712 × 10¹¹ km³/s² (matches JPL DE440 to ~0.07 ppm)
-```
-
-**OrbitalFormulas helper object (lines ~312-380):**
-```javascript
-const OrbitalFormulas = {
-  eccentricAnomaly: (M_deg, e) => { /* Newton-Raphson solver */ },
-  meanMotion: (P_days) => 360 / P_days,
-  semiMinorAxis: (a, e) => a * Math.sqrt(1 - e * e),
-  perihelionDist: (a, e) => a * (1 - e),
-  aphelionDist: (a, e) => a * (1 + e),
-  semiLatusRectum: (a, e) => a * (1 - e * e),
-  focalDistance: (a, e) => a * e,
-  heliocentricDist: (a, e, nu_deg) => { /* orbit equation */ },
-  flightPathAngle: (e, nu_deg) => { /* velocity direction */ },
-  meanLongitude: (M_deg, lonPeri_deg) => (M_deg + lonPeri_deg + 360) % 360,
-  trueLongitude: (nu_deg, lonPeri_deg) => (nu_deg + lonPeri_deg + 360) % 360,
-  argumentOfLatitude: (omega_deg, nu_deg) => (omega_deg + nu_deg + 360) % 360,
-  timeSincePerihelion: (P_days, M_deg) => P_days * M_deg / 360,
-  timeToNextPerihelion: (P_days, M_deg) => P_days * (360 - M_deg) / 360,
-  orbitalVelocity: (r_km, a_km) => Math.sqrt(GM_SUN * (2/r_km - 1/a_km)),
-  perihelionVelocity: (a_km, e) => Math.sqrt(GM_SUN * (1 + e) / (a_km * (1 - e))),
-  aphelionVelocity: (a_km, e) => Math.sqrt(GM_SUN * (1 - e) / (a_km * (1 + e))),
-  radialVelocity: (a_km, e, nu_deg) => { /* radial component */ },
-  transverseVelocity: (a_km, e, nu_deg) => { /* tangential component */ },
-  specificEnergy: (a_km) => -GM_SUN / (2 * a_km),  // Returns km²/s²
-  specificAngularMomentum: (a_km, e) => Math.sqrt(GM_SUN * a_km * (1 - e * e))  // Returns km²/s
-};
-```
-
-**planetStats entry pattern (example for Mercury):**
-```javascript
-{label : () => `Semi-minor axis (b)`,
- value : [ { v: () => OrbitalFormulas.semiMinorAxis(mercuryOrbitDistance, mercuryOrbitalEccentricity), dec:6, sep:',' },{ small: 'AU' }],
- hover : [`Half-width of orbital ellipse: b = a × √(1-e²)`]},
-```
-
-### A.3.4 Files Modified
-
-1. **script.js** (main file):
-   - Added `GM_SUN` derived constant
-   - Added `OrbitalFormulas` helper object
-   - Added Eccentric Anomaly calculation to `updatePlanetAnomalies()` for all planets
-   - Added formula entries to `planetStats` for all 10 planets (Mercury, Venus, Mars, Jupiter, Saturn, Uranus, Neptune, Pluto, Halley's, Eros)
-   - Each planet has: geometric parameters (b, p, c), velocities (v, vₚ, vₐ, vᵣ, vₜ), energy/momentum (ε, h), longitudes (λ, L, u), time calculations, and mean motion
-
----
-
-## A.4 Priority Summary
-
-### Must Have (Phase 1-2)
-| Formula | Symbol | Why Essential | Status |
-|---------|--------|---------------|--------|
-| Eccentric Anomaly | E | Completes M → E → ν chain | ✅ **DONE** |
-| Mean Motion | n | Fundamental orbital rate | ✅ Available |
-| Heliocentric Distance | r | Current position from Sun | ✅ Implemented |
-| Perihelion/Aphelion Distance | q, Q | Orbital extrema | ✅ **DONE** |
-| Semi-minor Axis | b | Ellipse geometry | ✅ Available |
-
-### Should Have (Phase 3)
-| Formula | Symbol | Why Important | Status |
-|---------|--------|---------------|--------|
-| Orbital Velocity (vis-viva) | v | Dynamics understanding | ✅ **DONE** |
-| Flight Path Angle | γ | Velocity direction | ✅ **DONE** |
-| Time since/to Perihelion | t | Temporal context | ✅ **DONE** |
-| True/Mean Longitude | λ, L | Ecliptic position | ✅ Available |
-
-### Nice to Have (Phase 4)
-| Formula | Symbol | Why Useful | Status |
-|---------|--------|------------|--------|
-| Specific Energy | ε | Conservation law | ✅ Available |
-| Angular Momentum | h | Conservation law | ✅ Available |
-| Radial/Transverse Velocity | vᵣ, vₜ | Velocity decomposition | ✅ **DONE** |
-| Escape Velocity | v_esc | Reference | ✅ Available |
-
-### Already Implemented ✅
-| Formula | Symbol | Location |
-|---------|--------|----------|
-| Mean Anomaly | M | `o.{planet}MeanAnomaly` |
-| True Anomaly | ν | `o.{planet}TrueAnomaly` |
-| Eccentric Anomaly | E | `o.{planet}EccentricAnomaly` |
-| Equation of Center | ν - M | planetStats display |
-| Height Above Inv. Plane | z | `o.{planet}HeightAboveInvPlane` |
-| Ecliptic Inclination | i_app | `o.{planet}EclipticInclinationDynamic` |
-| Ascending Node (Inv. Plane) | Ω_inv | `o.{planet}AscendingNodeInvPlane` |
-| Heliocentric Distance | r | `{planet}.sunDistAU` |
-| Elongation | - | `o.{planet}Elongation` |
-| Gravitational Parameter | GM | `GM_SUN` (derived constant) |
-| Current Orbital Velocity | v | `OrbitalFormulas.orbitalVelocity()` |
-| Perihelion Distance | q | `OrbitalFormulas.perihelionDist()` |
-| Aphelion Distance | Q | `OrbitalFormulas.aphelionDist()` |
-| Flight Path Angle | γ | `OrbitalFormulas.flightPathAngle()` |
-| Time Since Perihelion | t | `OrbitalFormulas.timeSincePerihelion()` |
-| Time to Next Perihelion | t_next | `OrbitalFormulas.timeToNextPerihelion()` |
-| Radial Velocity | vᵣ | `OrbitalFormulas.radialVelocity()` |
-| Transverse Velocity | vₜ | `OrbitalFormulas.transverseVelocity()` |
-| Mean Motion | n | `OrbitalFormulas.meanMotion()` |
-| Perihelion Velocity | vₚ | `OrbitalFormulas.perihelionVelocity()` |
-| Aphelion Velocity | vₐ | `OrbitalFormulas.aphelionVelocity()` |
-| True Longitude | λ | `OrbitalFormulas.trueLongitude()` |
-| Mean Longitude | L | `OrbitalFormulas.meanLongitude()` |
-| Specific Orbital Energy | ε | `OrbitalFormulas.specificEnergy()` |
-| Specific Angular Momentum | h | `OrbitalFormulas.specificAngularMomentum()` |
-| Semi-minor Axis | b | `OrbitalFormulas.semiMinorAxis()` |
-| Semi-latus Rectum | p | `OrbitalFormulas.semiLatusRectum()` |
-| Focal Distance | c | `OrbitalFormulas.focalDistance()` |
-| Argument of Latitude | u | `OrbitalFormulas.argumentOfLatitude()` |
+> **Note:** The sections below expand Part 2's one-line entries with full derivations, worked values, and physical interpretation. Section labels (A.5, A.6, A.8) are stable identifiers referenced from other documents.
 
 ---
 
@@ -1056,7 +475,6 @@ const OrbitalFormulas = {
 
 **Formula:** `M_SUN = GM_SUN / G`
 
-**Implementation:** ✅ Complete
 ```javascript
 // Gravitational constant
 const G = 6.6743e-20;  // km³/(kg·s²)
@@ -1161,7 +579,6 @@ const M_MOON_ALONE = GM_MOON_ALONE / G_CONSTANT;
 
 **Physical Meaning:** The minimum velocity needed to escape the Sun's gravitational influence from the planet's current position.
 
-**Implementation:** ✅ Complete
 ```javascript
 // Escape velocity from Sun at distance r (km/s)
 escapeVelocity: (r_km) => Math.sqrt(2 * GM_SUN / r_km)
@@ -1175,7 +592,6 @@ escapeVelocity: (r_km) => Math.sqrt(2 * GM_SUN / r_km)
 
 **Physical Meaning:** The velocity needed for a circular orbit at the current distance.
 
-**Implementation:** ✅ Complete
 ```javascript
 // Circular orbit velocity at distance r (km/s)
 circularVelocity: (r_km) => Math.sqrt(GM_SUN / r_km)
@@ -1203,7 +619,7 @@ circularVelocity: (r_km) => Math.sqrt(GM_SUN / r_km)
 
 **Purpose:** Verify that our input orbital periods match what Kepler's 3rd Law predicts.
 
-**Implementation:** ✅ Complete as `keplerPeriod(a_km)`
+**Implementation:** `keplerPeriod(a_km)`
 
 #### 7.3.2 Area Sweep Rate (Kepler's 2nd Law)
 
@@ -1213,7 +629,6 @@ circularVelocity: (r_km) => Math.sqrt(GM_SUN / r_km)
 
 **Physical Meaning:** The rate at which the radius vector sweeps out area. Constant for each planet (equal areas in equal times).
 
-**Implementation:** ✅ Complete
 ```javascript
 // Area sweep rate (km²/s)
 areaSweepRate: (a_km, e) => OrbitalFormulas.specificAngularMomentum(a_km, e) / 2
@@ -1229,7 +644,7 @@ areaSweepRate: (a_km, e) => OrbitalFormulas.specificAngularMomentum(a_km, e) / 2
 
 **Physical Meaning:** Angular distance above or below the invariable plane.
 
-**Implementation:** ✅ Complete (updated 2026-01-03 to use dynamic inclination)
+**Implementation:** (uses dynamic inclination)
 
 **Usage:** All planets now use dynamic inclination (`o.<planet>InvPlaneInclinationDynamic`) instead of fixed J2000 values. This ensures heliocentric latitude reflects the oscillating inclination over secular timescales.
 
@@ -1252,7 +667,6 @@ OrbitalFormulas.heliocentricLatitude(o.mercuryInvPlaneInclinationDynamic, o.merc
 
 **Formula:** `P_syn = |P₁ × P₂ / (P₁ - P₂)|`
 
-**Implementation:** ✅ Complete
 ```javascript
 // Synodic period between any two planets (days)
 synodicPeriod: (P1_days, P2_days) => {
@@ -1277,7 +691,6 @@ synodicPeriod: (P1_days, P2_days) => {
 
 **Physical Meaning:** Angular separation between two planets as seen from the Sun.
 
-**Implementation:** ✅ Complete
 ```javascript
 // Phase angle between two planets (degrees, 0-180)
 phaseAngle: (lambda1_deg, lambda2_deg) => {
@@ -1302,7 +715,6 @@ phaseAngle: (lambda1_deg, lambda2_deg) => {
 
 **Physical Meaning:** How fast the true anomaly changes. NOT constant - fastest at perihelion, slowest at aphelion.
 
-**Implementation:** ✅ Complete
 ```javascript
 // True anomaly rate (degrees/day)
 trueAnomalyRate: (n_deg_day, e, nu_deg) => {
@@ -1320,7 +732,6 @@ trueAnomalyRate: (n_deg_day, e, nu_deg) => {
 
 **Physical Meaning:** Rate of change of eccentric anomaly.
 
-**Implementation:** ✅ Complete
 ```javascript
 // Eccentric anomaly rate (degrees/day)
 eccentricAnomalyRate: (n_deg_day, e, E_deg) => {
@@ -1337,7 +748,6 @@ eccentricAnomalyRate: (n_deg_day, e, E_deg) => {
 
 **Physical Meaning:** The radius of the osculating circle (the circle that best fits the orbit at the current point). Largest at aphelion, smallest at perihelion.
 
-**Implementation:** ✅ Complete
 ```javascript
 // Radius of curvature (km)
 radiusOfCurvature: (a_km, e, nu_deg) => {
@@ -1360,7 +770,6 @@ radiusOfCurvature: (a_km, e, nu_deg) => {
 
 **Physical Meaning:** How much faster a planet moves at perihelion vs aphelion.
 
-**Implementation:** ✅ Complete
 ```javascript
 // Velocity ratio at perihelion vs aphelion
 // v_p/v_a = (1 + e) / (1 - e)
@@ -1383,7 +792,6 @@ velocityRatioPeriApo: (e) => (1 + e) / (1 - e)
 
 **Physical Meaning:** The ratio of aphelion distance to perihelion distance. Same formula as velocity ratio (conservation of angular momentum).
 
-**Implementation:** ✅ Complete
 ```javascript
 // Distance ratio aphelion vs perihelion
 // Q/q = (1 + e) / (1 - e)
@@ -1401,7 +809,6 @@ distanceRatioApoPerip: (e) => (1 + e) / (1 - e)
 - `= 1`: At semi-major axis distance
 - `> 1`: Farther than semi-major axis (between semi-major axis point and aphelion)
 
-**Implementation:** ✅ Complete
 ```javascript
 // Orbital Energy Ratio (dimensionless)
 orbitalEnergyRatio: (r_km, a_km) => r_km / a_km
@@ -1417,7 +824,6 @@ orbitalEnergyRatio: (r_km, a_km) => r_km / a_km
 
 **Physical Meaning:** Given an orbital period, calculate the required semi-major axis. Inverse of Kepler's 3rd Law.
 
-**Implementation:** ✅ Complete
 ```javascript
 // Semi-major Axis from Period (km)
 // a = (GM × P² / 4π²)^(1/3)
@@ -1435,7 +841,6 @@ semiMajorAxisFromPeriod: (P_seconds, GM) => {
 
 **Physical Meaning:** Angular velocity in radians per second, derived directly from GM rather than orbital period.
 
-**Implementation:** ✅ Complete
 ```javascript
 // Mean Motion from GM (rad/s)
 // n = √(GM / a³)
@@ -1453,7 +858,6 @@ meanMotionFromGM: (GM, a_km) => Math.sqrt(GM / Math.pow(a_km, 3))
 
 **Physical Meaning:** The differential gravitational acceleration across an extended body. This causes tidal stretching - the near side experiences stronger gravity than the far side.
 
-**Implementation:** ✅ Complete
 ```javascript
 // Tidal Acceleration (m/s²)
 // a_tidal = 2 × GM × Δr / r³
@@ -1514,7 +918,6 @@ For the derivation of `GM_Earth`, `GM_Moon`, and `GM_Sun` from the Moon's and Ea
 
 **Physical Meaning:** The region around a body where its gravity dominates over the primary's gravity. Satellites must orbit within this radius to remain bound.
 
-**Implementation:** ✅ Complete
 ```javascript
 hillSphereRadius: (a_km, m_body, M_primary) => {
   return a_km * Math.pow(m_body / (3 * M_primary), 1/3);
@@ -1537,7 +940,6 @@ hillSphereRadius: (a_km, m_body, M_primary) => {
 
 **Physical Meaning:** The region where the body's gravitational influence is stronger than the perturbation from the primary. Used in patched conic approximation for spacecraft trajectories.
 
-**Implementation:** ✅ Complete
 ```javascript
 sphereOfInfluence: (a_km, m_body, M_primary) => {
   return a_km * Math.pow(m_body / M_primary, 2/5);
@@ -1550,7 +952,7 @@ sphereOfInfluence: (a_km, m_body, M_primary) => {
 
 Same formula as Hill sphere radius.
 
-**Implementation:** ✅ Complete as `lagrangeL1L2Distance()`
+**Implementation:** `lagrangeL1L2Distance()`
 
 ### A.6.3 Surface & Physical Properties
 
@@ -1562,7 +964,7 @@ Same formula as Hill sphere radius.
 
 **Physical Meaning:** Gravitational acceleration at the surface.
 
-**Implementation:** ✅ Complete (using diameters object for radii)
+**Implementation:** (using diameters object for radii)
 ```javascript
 surfaceGravity: (GM_km3_s2, R_km) => {
   return GM_km3_s2 / (R_km * R_km) * 1000;  // Convert km/s² to m/s²
@@ -1584,7 +986,6 @@ surfaceGravity: (GM_km3_s2, R_km) => {
 
 **Formula:** `v_esc = √(2GM/R)`
 
-**Implementation:** ✅ Complete
 ```javascript
 surfaceEscapeVelocity: (GM, R_km) => Math.sqrt(2 * GM / R_km)
 ```
@@ -1604,7 +1005,6 @@ surfaceEscapeVelocity: (GM, R_km) => Math.sqrt(2 * GM / R_km)
 
 **Formula:** `ρ = M / V = 3M / (4πR³)`
 
-**Implementation:** ✅ Complete
 ```javascript
 meanDensity: (M_kg, R_km) => {
   const R_m = R_km * 1000;
@@ -1621,7 +1021,6 @@ meanDensity: (M_kg, R_km) => {
 
 **Formula:** `Φ = -GM/r`
 
-**Implementation:** ✅ Complete
 ```javascript
 gravitationalPotential: (GM, r_km) => -GM / r_km
 ```
@@ -1630,7 +1029,6 @@ gravitationalPotential: (GM, r_km) => -GM / r_km
 
 **Formula:** `ε/ε_circ = r/a`
 
-**Implementation:** ✅ Complete
 ```javascript
 orbitalEnergyRatio: (r_km, a_km) => r_km / a_km
 ```
@@ -1647,7 +1045,6 @@ orbitalEnergyRatio: (r_km, a_km) => r_km / a_km
 
 **Result:** ~4,670 km (inside Earth, which has radius ~6,371 km)
 
-**Implementation:** ✅ Complete
 ```javascript
 barycenterDistance: () => moonDistance / (1 + MASS_RATIO_EARTH_MOON)
 ```
@@ -1658,8 +1055,6 @@ barycenterDistance: () => moonDistance / (1 + MASS_RATIO_EARTH_MOON)
 
 **Expected Result:** ~0.46 (Sun's tidal force is about 46% of Moon's)
 
-**Implementation:** ✅ Complete
-
 ### A.6.6 Schwarzschild Radius (Theoretical)
 
 **Symbol:** r_s
@@ -1668,7 +1063,6 @@ barycenterDistance: () => moonDistance / (1 + MASS_RATIO_EARTH_MOON)
 
 **Physical Meaning:** The radius at which escape velocity equals speed of light. If all mass were compressed within this radius, it would form a black hole.
 
-**Implementation:** ✅ Complete
 ```javascript
 schwarzschildRadius: (GM) => {
   const c = 299792.458;  // km/s
@@ -1686,84 +1080,26 @@ schwarzschildRadius: (GM) => {
 
 ---
 
-## A.7 Phase 4 Polish - Hover Tooltips & Info Links
-
-### A.7.1 Implementation Status
-
-**Phase 4 (Polish):** ✅ **COMPLETED** - December 2025
-
-All planetStats entries now include:
-- **Hover tooltips** explaining formulas and physical meaning
-- **Wikipedia info links** for key astronomical concepts
-
-### A.7.2 Hover Tooltip Pattern
-
-Each formula entry follows this pattern:
-```javascript
-{label : () => `Longitude of perihelion (ϖ)`,
- value : [ { v: () => o.planetPerihelion, dec:8, sep:',' },{ small: 'degrees (°)' }],
- hover : [`Sum of longitude of ascending node (Ω) and argument of periapsis (ω): ϖ = Ω + ω`],
- info  : 'https://en.wikipedia.org/wiki/Longitude_of_the_periapsis'},
-```
-
-### A.7.3 Implemented Info Links
-
-The following Wikipedia links are added across all planets:
-
-#### Orbital Orientation
-- [Longitude of the periapsis](https://en.wikipedia.org/wiki/Longitude_of_the_periapsis)
-- [Argument of periapsis](https://en.wikipedia.org/wiki/Argument_of_periapsis)
-- [Longitude of the ascending node](https://en.wikipedia.org/wiki/Longitude_of_the_ascending_node)
-- [Invariable plane](https://en.wikipedia.org/wiki/Invariable_plane)
-
-#### Position & Anomalies
-- [Mean anomaly](https://en.wikipedia.org/wiki/Mean_anomaly)
-- [Eccentric anomaly](https://en.wikipedia.org/wiki/Eccentric_anomaly)
-- [True anomaly](https://en.wikipedia.org/wiki/True_anomaly)
-- [Equation of the center](https://en.wikipedia.org/wiki/Equation_of_the_center)
-- [Mean longitude](https://en.wikipedia.org/wiki/Mean_longitude)
-- [True longitude](https://en.wikipedia.org/wiki/True_longitude)
-- [Argument of latitude](https://en.wikipedia.org/wiki/Argument_of_latitude)
-- [Flight path angle](https://en.wikipedia.org/wiki/Flight_path_angle)
-- [Phase angle (astronomy)](https://en.wikipedia.org/wiki/Phase_angle_(astronomy))
-
-### A.7.4 Bodies Updated
-
-All celestial bodies have been updated with hover tooltips and info links:
-- ✅ Earth
-- ✅ Mercury
-- ✅ Venus
-- ✅ Mars
-- ✅ Jupiter
-- ✅ Saturn
-- ✅ Uranus
-- ✅ Neptune
-- ✅ Pluto
-- ✅ Halley's Comet
-- ✅ 433 Eros
-
----
-
 ## A.8 Precession & Newtonian Dynamics
 
 This section documents the perihelion precession formulas - purely Newtonian mechanics derived from observed precession rates.
 
-### Implementation Status
+### Method overview
 
-| Section | Method | In OrbitalFormulas | Used in UI |
-|---------|--------|:------------------:|:----------:|
-| 9.1.1 | `precessionRateFromPeriod` | ✅ | ✅ |
-| 9.1.2 | `precessionPeriodFromRate` | ✅ | ❌ |
-| 9.2.1 | `precessionEclipticToICRF` | ✅ | ✅ |
-| 9.2.2 | `precessionICRFToEcliptic` | ✅ | ❌ |
-| 9.3.1 | `holisticPrecessionRatio` | ✅ | ✅ |
-| 9.3.2 | `precessionFromHolisticRatio` | ✅ | ❌ |
-| 9.4.1 | `precessionAngularVelocity` | ✅ | ✅ |
-| 9.4.2 | `perturbationStrength` | ✅ | ❌ |
-| 9.5.1 | `precessionDecomposition` | ✅ | ❌ |
-| 9.5.2 | `precessionRatio` | ✅ | ❌ |
+| Method | Used in UI |
+|--------|:----------:|
+| `precessionRateFromPeriod` | ✅ |
+| `precessionPeriodFromRate` | — |
+| `precessionEclipticToICRF` | ✅ |
+| `precessionICRFToEcliptic` | — |
+| `holisticPrecessionRatio` | ✅ |
+| `precessionFromHolisticRatio` | — |
+| `precessionAngularVelocity` | ✅ |
+| `perturbationStrength` | — |
+| `precessionDecomposition` | — |
+| `precessionRatio` | — |
 
-**Note:** Methods marked ❌ in "Used in UI" are utility/inverse functions available for calculations but not displayed in planetStats.
+**Note:** Methods marked — are utility/inverse functions available for calculations but not displayed in planetStats.
 
 ### 10.1 Precession Rate Fundamentals
 
@@ -2124,9 +1460,18 @@ For current values, see [Constants Reference](20-constants-reference.md).
 
 **How values are sourced:**
 - **Eccentricity**: Derived at runtime from balanced-year phase (`planets.{name}.orbitalEccentricityBase`)
-- **Inclination (inv)**: Derived from the Fibonacci ψ formula (see [Fibonacci Laws](10-fibonacci-laws.md))
+- **Inclination (inv)**: Derived from the Fibonacci ψ formula (see [The Six Fibonacci Relations](10-fibonacci-laws.md))
 - **Semi-major axis**: Derived from period via Kepler's 3rd Law: `a = (H / solarYearCount)^(2/3)` where `solarYearCount = round(H × meanSolarYearDays / solarYearInput)` — the integer number of orbits in one H (doc 20 § Quantization)
 - **Period**: Input constant per planet (`planets.{name}.solarYearInput`)
+
+> **Display note (post-K5).** These device constants remain the scene-scaffold
+> and no-chain-body parameters. The planetStats "Orbital Period & Motion" rows
+> for the seven chain planets no longer display them: they read the chain's
+> measured window mean motion (governed artifact `windowElementRates`,
+> deg per Julian year, window 1800–2100) — P = 360°/n, synodic =
+> 360°/|n_planet − n_Earth|, orbits-per-H a derived non-integer. The integer
+> orbit counts survive only for Pluto/Halley/Eros, where the geometric device
+> is the model path (doc 31).
 
 ### Live Variables Summary
 

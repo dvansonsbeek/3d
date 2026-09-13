@@ -89,9 +89,9 @@ The L1 integer-divisor lattice (8H/n) against the Cenozoic isotope record:
 ## C. Historical era — gate- and artifact-backed
 
 - **Babylonian eclipse case study (−135)** — the framework places the
-  totality path <!--v:babylon135BestGapKm-->311<!--/v--> km from Babylon at
-  ΔUT <!--v:babylon135BestDeltaUT-->-0h58<!--/v--> (framework
-  <!--v:babylon135FrameworkUT-->06:02<!--/v--> vs documented
+  totality path <!--v:babylon135BestGapKm-->366<!--/v--> km from Babylon at
+  ΔUT <!--v:babylon135BestDeltaUT-->-0h60<!--/v--> (framework
+  <!--v:babylon135FrameworkUT-->06:01<!--/v--> vs documented
   <!--v:babylon135DocumentedUT-->06:14<!--/v-->):
   [doc 103](103-135-babylonian-case-study.md), eclipse-audit artifacts under
   freshness guard.
@@ -111,9 +111,9 @@ The L1 integer-divisor lattice (8H/n) against the Cenozoic isotope record:
   documented visibility regions vs the api observer tier
   (<!--v:lunarVisibilityInsideAgree-->14<!--/v-->/<!--v:lunarVisibilityChecked-->14<!--/v-->
   both directions); the −746 Feb 6 Babylonian partial (magnitude
-  <!--v:lunarBabylon746MagnitudeUmbral-->0.891<!--/v--> vs canon
+  <!--v:lunarBabylon746MagnitudeUmbral-->0.881<!--/v--> vs canon
   <!--v:lunarBabylon746CanonMagnitudeUmbral-->0.920<!--/v-->, visible from
-  Babylon at <!--v:lunarBabylon746AltitudeDeg-->32.5<!--/v-->°); the
+  Babylon at <!--v:lunarBabylon746AltitudeDeg-->31.9<!--/v-->°); the
   <!--v:lunarDtBandsN-->267<!--/v--> raw Stephenson-2016 timing reductions
   (framework ΔT mean abs <!--v:lunarDtBandsFrameworkMeanAbsSeconds-->1,213<!--/v--> s —
   statistically identical to Stephenson's own fitted spline at
@@ -125,7 +125,7 @@ The L1 integer-divisor lattice (8H/n) against the Cenozoic isotope record:
   <!--v:lunarDtBoundsBabylon135HighSeconds-->12,140<!--/v-->] s contains the
   framework's <!--v:lunarDtBoundsBabylon135FrameworkSeconds-->12,007<!--/v--> s);
   and the measured framework-vs-ELP lunar-theory drift
-  (Δṅ ≈ <!--v:lunarTheoryDriftDeltaNdot-->0.30<!--/v--> ″/cy²) with the
+  (Δṅ ≈ <!--v:lunarTheoryDriftDeltaNdot-->0.32<!--/v--> ″/cy²) with the
   PRE-REGISTERED re-reduction prediction pinned before the contact-time
   machinery existed — and now MEASURED against it: the Phase C
   differential re-reduction (69/75 Babylonian observations identified)
@@ -155,7 +155,7 @@ The L1 integer-divisor lattice (8H/n) against the Cenozoic isotope record:
 | LOD–climate correlation | fails every null test → open correspondence, not validation | [doc 95](95-climate-summary.md) |
 | Lattice vs H(t) discrimination | 2.4σ — the 66-Ma record cannot decide | [doc 98](98-lattice-mechanism.md) |
 | Uniform secular solar drift | bounded at r = −0.13 ± 0.09 ms/cy; a uniform −0.5 is disfavoured ~4σ | fit-anchor documentation |
-| The falsification criterion | the shipped configuration must remain the *unique* mirror-symmetric deep-analysis candidate among 7,558,272; checks 46–50 of verify-laws | CLAUDE.md §falsification |
+| The former Config-#7 falsification criterion | RETIRED with the Fibonacci-law restatement (checks 46–50 of verify-laws are narrative class — the record, no longer a gate). The current criterion stands on three legs: the deep-time scaling split, historical-era exactness, and two-expansions μ-consistency | CLAUDE.md §falsification, [doc 109](109-model-nbody-engine-and-lattice-test.md) |
 
 ## Re-running everything
 

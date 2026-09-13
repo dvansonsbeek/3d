@@ -41,6 +41,22 @@ The amplitude excludes climate as the bulk driver. Moving ~3 ms of LOD by mass r
 
 The two are inseparable inside a 2.7-kyr window (nominal beat ~26 kyr), and §5 shows they do **not** share a Holocene clock.
 
+### The Moon cross-check: the same critical arguments, different gain
+
+A census of every ELP/MPP02 planetary-perturbation term with period > 50 yr
+(`tools/explore/u2-lunar-longperiod-census.mjs`, run on the in-repo series —
+11,314 longitude T0 terms) shows the Moon carries the SAME planetary
+critical arguments the stack's structural annotations claim: +2J−5S (the
+Jupiter–Saturn great inequality) at 872.5 yr / 0.151″ in the Jose window;
+l−15V+9T+4Ma at 2,480 yr / 0.032″ in the Hallstatt window; the Mars-family
+4T−8Ma+3J at 2,103 yr / 0.876″ (the Moon's 2nd-largest long-period term).
+The Bond window itself holds only mas-level terms — consistent with §5's
+no-lock result: the Bond clock is not lunar. Amplitude hierarchy: the Moon
+feels these arguments as direct gravity (arcsec class); ΔT feels them
+enlarged ~10⁴–10⁵ through resonant amplifiers — same source, different
+gain. (Meeus's truncation keeps only A1 at 273 yr / 14.25″ because the
+next long-period term is 0.88″, below the series' ~1″ floor.)
+
 ---
 
 ## 2. What the literature knows: periods and amplitudes
@@ -207,11 +223,11 @@ Two implementation routes tested:
 The production episode, as shipped by `tools/fit/dt-corrections-fit.js --joint --write` (constants in `data/core-mantle-resonator-stage1.json` — read directly by `tools/lib/deep-time.js` and, via the generated constants module, `src/script.js`; the website consumes the same block through the published `@essrt/physics` package (`FITTED_COEFFICIENTS.DT_RESONATOR`) since the Phase-14 split):
 
 - **Eigenperiod** T₀ = 8H/685 = 3,916.1 yr (lattice-labeled by convention: the shipped resonator is the combined effect of the lattice cycles, so under H(t) evolution the episode scales with its drivers; the bare axiMC eigenmode is core-material physics — recorded caveat), **Q = 1.8**.
-- **Impulse-consistent 2-kick episode**: kicks are sin-only (displacement-continuous — ΔT is accumulated angle and must not step; the impulses live in the slope). Excitation at **−1600** (sin 760.35 s, just below the 773.3-s cap), termination at **+1600** (sin −75.19 s). The kick epochs are CONVENTION, not data-dated: the record starts at −720 with the swing already at full amplitude (so excitation genuinely predates −720), and the stability box t₁ ∈ [−2350, −750] is flat. The excitation kick steps δLOD by +3.878 ms/day — inside the SMH ±3–4 ms envelope — and Dumberry & Finlay-class core-flow reorganizations of that size within <100 yr are documented physics.
+- **Impulse-consistent 2-kick episode**: kicks are sin-only (displacement-continuous — ΔT is accumulated angle and must not step; the impulses live in the slope). Excitation at **−1600**, termination at **+1600**. At the 2026-07 joint-world flip the amplitudes were sin 760.35 s / sin −75.19 s (excitation just below the 773.3-s cap); the IAU-2006 refit moved them with the anchors to the shipped **sin 698.10 s / sin −52.02 s** (`DT_RESONATOR.kick_coefficients_s`). The kick epochs are CONVENTION, not data-dated: the record starts at −720 with the swing already at full amplitude (so excitation genuinely predates −720), and the stability box t₁ ∈ [−2350, −750] is flat. The excitation kick steps δLOD by ≈ +3.6 ms/day (the flip-era 760.35-s kick stepped +3.878; the step scales with the kick amplitude at fixed T₀/Q) — inside the SMH ±3–4 ms envelope — and Dumberry & Finlay-class core-flow reorganizations of that size within <100 yr are documented physics.
 - **Drive tone** at the bond−hallstatt difference frequency 8H/726 = 3,695 yr, phase LOCKED to the quadratic-mixing prediction φ_bond − φ_hallstatt, amplitude +186.14 s (at cap), **switch-on compensated** (its displacement at the excitation epoch is cancelled by an eigenmode transient).
 - **Joint fit design**: 4 flags + resonator in ONE equality-constrained solve; the USNO J2000 solar-day closure is a hard anchor row; amplitude caps are FIXED convention constants (never derived from the mutable fit JSON — the cap-creep lesson); resonator phases enter as locked unit shapes (free phases balloon under the cap cascade); composite selection = best Espenak RMS subject to full-window Stephenson RMS ≤ 40 s.
 - **Shipped anchors** (move atomically with the coefficients): at the 2026-07 joint-world flip these were USNO 86,400.0014 s (interior optimum, within 0.2 ms of the observed EO value 86,400.0016 that no H-recalibration could reach — the resonator was the missing piece), deltaTStart 56.049 s, Espenak RMS 12.60 s, full-window Stephenson RMS 31.3 s (best ever at the time). The IAU-2006 refit later moved the pair to USNO <!--v:usnoLodJ2000-->86,400.0018<!--/v--> s / deltaTStart <!--v:deltaTStart-->55.16<!--/v--> s (the target tracked the 6d sidereal-anchor move — a day-basis shift, not a physics change; doc 99 § "The two J2000 day bases").
-- **Termination-kick interpretation**: in the joint world the explicit counter-kick is small (−75 s vs the 760-s excitation) — the medieval shutdown is largely carried by damping plus flag interference, with the counter-kick as a residual trim. The excitation inversion's push–pull structure survives as the physical reading; the counter-kick's smallness is the joint-fit's restatement of it.
+- **Termination-kick interpretation**: in the joint world the explicit counter-kick is small (−52 s vs the 698-s excitation) — the medieval shutdown is largely carried by damping plus flag interference, with the counter-kick as a residual trim. The excitation inversion's push–pull structure survives as the physical reading; the counter-kick's smallness is the joint-fit's restatement of it.
 - **Post-ship validation**: `tools/fit/validate-resonator.js` ALL PASS (ΔT(J2000) = 0, pure LOD untouched, deep time bit-identical ±200 Myr); the L-5b §12–§17 diagnostics in the joint world confirm closure on every axis — anchor drift 6.7 μs/day (was ~730–750), rate-equivalent 0.010 ms/cy (was the ~0.5 ms/cy channel), bump-symmetry structure gone, residual at the Stephenson-fit noise floor (2 s excess).
 
 ### Tested and rejected external drivers

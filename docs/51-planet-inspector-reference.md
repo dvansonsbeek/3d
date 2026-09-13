@@ -12,7 +12,7 @@ status: current
 The Planet Hierarchy Inspector displays orbital plane information for Step 4 objects (`[Planet]RealPerihelionAtSun`). This document describes how the calculations work, including the **dynamic ascending node** feature that updates orbital plane visualizations in real-time as Earth's obliquity changes.
 
 **Related Documentation:**
-- [Ascending Node Calculations](31-ascending-node-calculations.md) - Full details on the ascending node calculation algorithm
+- [Geometric Orbital Elements — the No-Chain Bodies](31-no-chain-body-elements.md) - The node/inclination device for the no-chain bodies (chain planets read the element chain)
 
 ---
 
@@ -43,8 +43,9 @@ Therefore:
 
 ### Example: Venus
 ```javascript
-const venusEclipticInclinationJ2000 = 3.39467605;  // i = 3.39°
-const venusAscendingNode = 76.67877109;      // Ω = 76.68°
+// From public/input/astro-reference.json (planets.venus):
+//   eclipticInclinationJ2000 = 3.39467605   // i = 3.39°
+//   ascendingNode            = 76.67877109  // Ω = 76.68°
 
 // Calculated values:
 // orbitTilta = sin(76.68°) * 3.39 ≈ 3.30°
@@ -117,7 +118,7 @@ orbitContainer (rotation.x = orbitTilta, rotation.z = orbitTiltb)
 
 ### Dynamic Updates
 
-The `orbitContainer.rotation` is updated each frame by `updateOrbitalPlaneRotations()` to reflect the current dynamic ascending node. See [Ascending Node Calculations](31-ascending-node-calculations.md) for details.
+The `orbitContainer.rotation` is updated each frame by `updateOrbitalPlaneRotations()` to reflect the current dynamic ascending node. See [Geometric Orbital Elements](31-no-chain-body-elements.md) for details.
 
 ---
 
@@ -222,7 +223,7 @@ The geometry uses LOCAL positions (flat at y=0), but the coloring decision uses 
 
 | Component | File | Description |
 |-----------|------|-------------|
-| Venus constants | `src/script.js` constants block | Orbital parameters |
+| Venus constants | `public/input/astro-reference.json` (`planets.venus`) | Orbital parameters |
 | hierarchyInspector state | `src/script.js` (`hierarchyInspector`) | Inspector state with all marker references |
 | PLANET_HIERARCHIES registry | `src/script.js` (`PLANET_HIERARCHIES`) | Per-planet 5-step hierarchy definitions |
 | createVisualHelpers() | `src/script.js` | Node detection and half-plane rendering |

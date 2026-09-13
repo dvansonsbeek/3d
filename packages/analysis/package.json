@@ -2,7 +2,7 @@
   "name": "@essrt/analysis",
   "version": "0.0.0",
   "private": true,
-  "description": "Python analysis. Reads fitted-coefficients.json; never defines physics.",
+  "description": "Reserved end-state slot (plan 01 §2f, decided; not yet populated). Python analysis. Reads fitted-coefficients.json; never defines physics.",
   "type": "module",
   "main": "src/index.js",
   "license": "AGPL-3.0-or-later"

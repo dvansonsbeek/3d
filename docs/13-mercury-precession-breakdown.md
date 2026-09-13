@@ -5,42 +5,89 @@ coefficients: sha256:9e0460662933228f
 status: current
 ---
 
-# Precession Breakdown Implementation
+# Perihelion Precession: Quantities, Frames, and Breakdown
 
-## Overview
+This document is the perihelion-precession reference: the distinct
+quantities the model computes and displays (ecliptic longitude of date vs
+Earth-frame right ascension), the Earth-frame fluctuation pattern and why
+it averages out, the first-order Laplace–Lagrange physics and its
+measured limitations, and §1.8 — the equatorial-projection account of the
+Earth-frame rate, gate-pinned for all seven planets.
 
-This document outlines the implementation of a **Perihelion Precession Breakdown** feature that calculates and displays how each planet contributes to another planet's total precession rate.
+The planet panels show the **chain's** secular-shape attribution (base
+mode / largest companion / remainder with % shares, plus the rate of
+date — read live from the governed element chain via `_kcSecularShape`).
+The first-order Laplace–Lagrange breakdown in this document is the
+educational reference for the underlying physics, not a shipped display.
 
-## The Goal
+---
 
-For any planet (e.g., Mars with ~1,739 arcsec/century), show:
-- Individual contributions from **all 8 major planets** (all prograde in first-order diagonal theory)
-- Whether the perturber is inner (α weighting) or outer (α² weighting)
-- The sum total compared to the observed value
-- Percentage contribution from each planet
-- **Detailed view** (7+ lines per planet)
-- **Dynamic calculation** (recalculated as orbital positions change)
+## The Two Coordinates, and the Methods That Compute Them
 
-## Design Decisions
+One perihelion motion appears in two coordinates, and keeping them apart
+is load-bearing for everything below (§1.8 "The two coordinates, kept
+apart"):
 
-1. **Theory**: First-order Laplace-Lagrange secular theory (see limitations in Section 1.5)
-2. **Display**: Detailed breakdown (7+ lines per planet)
-3. **Calibration**: Show raw calculated values (no artificial correction factors)
-4. **Scope**: All 8 major planets (Mercury through Neptune)
-5. **Calculation**: Dynamic - uses current orbital parameters
+**(a) Ecliptic longitude of date** — what every published perihelion rate
+is (Le Verrier, Newcomb, Clemence, WebGeoCalc). In the model this is the
+stable analytic quantity: the scene's `perihelionLongitudeEcliptic()`
+reads the pure precession angle directly from the precession layer's
+rotation (bypassing all Earth-frame effects), and the perihelion markers
+carry the model's own N-body longitude of perihelion of date from the
+governed element chain.
 
-## Available Data
+**(b) Right ascension in the scene's equatorial frame** — the RA of the
+perihelion direction in `earth.rotationAxis`, measured from the
+perihelion-of-Earth point. No observer publishes this quantity. It
+fluctuates because the projection slope dα/dλ and the obliquity move with
+Earth's precession cycles; over a full H its average returns to the
+ecliptic value. Two implementations exist:
 
-### Static Values (per planet)
-- Semi-major axis (a) - from `*OrbitDistance` constants
-- Eccentricity (e) - from `*OrbitalEccentricity` constants
-- Inclination to invariable plane (i) - from `*Inclination` constants
-- Mass (M) - from `M_*` constants
+- **Scene measurement** (`apparentRaFromPdA`): transforms the perihelion
+  markers' world positions into Earth's equatorial frame and reads the
+  apparent angle. The projection carries each body's declination
+  (ρ = r·sin φ with φ the polar angle from the rotation axis) — this term
+  is load-bearing: projecting with the full distance instead of ρ was
+  measured to generate 96 % of Venus's exported "precession fluctuation"
+  (std 513 → 20 ″/cy with the term; Mercury 96 → 35 ″/cy), as harmonics
+  8–15 of the H/13 equatorial rotation with H/3 and H/8 sidebands — a
+  property of the projection, not of the orbits.
+- **The predict basis** (`predictGeocentricPrecession`): the trained
+  physical-beat basis evaluates the same Earth-frame RA rate analytically
+  at any simulation year, for all seven planets — no need to sample the
+  scene over centuries. Mercury: <!--v:mercuryEarthFrameRa1900-->579.84<!--/v--> ″/cy
+  at 1900, <!--v:mercuryEarthFrameRa2000-->579.83<!--/v--> ″/cy at 2000.
 
-### Dynamic Values (from `o` object)
-- Ecliptic inclination: `o.<planet>EclipticInclinationDynamic` (e.g., `o.marsEclipticInclinationDynamic`)
-- Current distance: `<planet>.sunDistAU`
-- True anomaly, mean anomaly, etc.
+| Metric | Mercury |
+|--------|-----------------|
+| Rate at J2000 (Earth-frame RA) | <!--v:mercuryPeriRateEarthFrameMeasuredJ2000-->579.83<!--/v--> ″/cy = <!--v:mercuryPeriRateEclipticArcsecCy-->531.44<!--/v--> × dα/dλ + <!--v:mercuryPeriObliquityRateTermJ2000-->4.31<!--/v--> (+κ) |
+| Lattice (ecliptic) rate | <!--v:mercuryPeriRateEclipticArcsecCy-->531.44<!--/v--> ″/cy |
+| Earth-frame range over H | <!--v:mercuryFluctuationMin-->-47<!--/v--> to <!--v:mercuryFluctuationMax-->+48<!--/v--> ″/cy about the lattice rate |
+| Dominant Earth-frame period | ~<!--v:mercuryOscillationPeriod-->7,451<!--/v--> years (H/45) |
+
+### The Earth-frame fluctuation pattern
+
+The dominant ~7,451-yr period is `H/45` — the 6th harmonic of the beat
+between Earth's inclination precession (H/3) and ecliptic precession
+(H/5): `1/(1/3 − 1/5) = 7.5`, so the fundamental beat is H/7.5 ≈ 44,709 yr
+and its 6th harmonic is H/45. The fluctuation arises because a planet's
+perihelion marker inherits Earth's precession-layer transformations in
+the scene graph; measured in Earth's equatorial frame these compound into
+the apparent rate. Over a complete Earth Fundamental Cycle H the
+oscillations cancel — sometimes Earth's orientation adds to the apparent
+rate, sometimes it subtracts — so the long-term Earth-frame average
+equals the ecliptic value. (`tools/verify/mercury-precession-centuries.js`
+tabulates the rates by century, 1800–2100.)
+
+### When to use which
+
+- **Ecliptic-frame**: comparing to published orbital elements, verifying
+  the model's precession rates, any scientific calculation.
+- **Earth-frame**: understanding what an equatorial measurement does to
+  the rate, and studying the interaction of Earth's precession cycles.
+- GUI: each planet's perihelion folder shows both — `(Geocentric)` the
+  Earth-frame value (fluctuates), `(Heliocentric)` the ecliptic value
+  (stable).
 
 ---
 
@@ -64,42 +111,13 @@ Where:
        1 if j is inner of i (so α × ᾱ = **α**)
 - `b₃/₂⁽¹⁾(α)` = Laplace coefficient (computed via numerical integration)
 
-**Key point:** The same Laplace coefficient `b₃/₂⁽¹⁾(α)` is used for both inner and outer perturbers. The distinction comes from the `α·ᾱ` prefactor, **not** from swapping in `b₃/₂⁽²⁾`. The `b₃/₂⁽²⁾` coefficient appears only in the off-diagonal A_ij terms (secular eigenvector mixing), which are not used for the per-planet precession breakdown display.
+**Key point:** The same Laplace coefficient `b₃/₂⁽¹⁾(α)` is used for both inner and outer perturbers. The distinction comes from the `α·ᾱ` prefactor, **not** from swapping in `b₃/₂⁽²⁾`. The `b₃/₂⁽²⁾` coefficient appears only in the off-diagonal A_ij terms (secular eigenvector mixing).
 
-The Laplace coefficient is computed using the integral definition:
+The Laplace coefficient is computed using the integral definition (numerical integration, 1000 steps — series expansion is inaccurate for larger α such as Venus's 0.54):
+
 ```
 b_s^j(α) = (1/π) × ∫₀^(2π) cos(jψ) / (1 - 2α cos(ψ) + α²)^s dψ
 ```
-
-**Reference:** Murray & Dermott (1999), Park et al. (2017), PERIHELION_PRECESSION_CORRECTED.md
-
-### 1.2 Eccentricity and Inclination Corrections (Negligible)
-
-For first-order secular theory, eccentricity and inclination corrections are **negligible**:
-
-- Eccentricity correction contributes ~2% for Mercury (e = 0.206)
-- Inclination correction contributes ~1% for typical mutual inclinations
-
-These corrections are within the expected ~4% overestimate of first-order theory compared to Park et al. (2017) values, so they are **not included** in the implementation.
-
-**If higher accuracy is needed**, these corrections would be:
-```
-f(e) ≈ 1 + (1/2)e²     (eccentricity)
-g(I) = cos(I_mutual)   (inclination)
-```
-
-But for ≤1% accuracy, numerical integration of the full equations of motion is required (like JPL ephemerides).
-
-### 1.3 Laplace Coefficients
-
-The Laplace coefficients are computed using **numerical integration**:
-```
-b_s^(j)(α) = (1/π) × ∫₀^(2π) cos(jψ) / (1 - 2α cos(ψ) + α²)^s dψ
-```
-
-We use numerical integration (1000 steps) rather than series expansion because:
-- Series expansion is inaccurate for larger α values (e.g., Venus α = 0.54)
-- Numerical integration matches hypergeometric function results to <0.1%
 
 **Numerical values for Mercury's perturbers:**
 
@@ -111,19 +129,19 @@ We use numerical integration (1000 steps) rather than series expansion because:
 | Jupiter   | 0.0744 | 0.226      |
 | Saturn    | 0.0406 | 0.122      |
 
-### 1.4 Sign Convention
+**Reference:** Murray & Dermott (1999), Park et al. (2017)
 
-**All diagonal A_ii contributions are prograde (+).** The self-precession rate receives a positive contribution from every perturber, whether inner or outer — this follows directly from `α > 0`, `ᾱ > 0`, and `b₃/₂⁽¹⁾(α) > 0`.
+### 1.2 Eccentricity and Inclination Corrections (Negligible)
 
-The "inner perturbers contribute retrograde" rule that appeared in an earlier version of this doc was a confusion with the off-diagonal A_ij term, which has the form `−(n_i/4)·ε·α·ᾱ·b₃/₂⁽²⁾(α)` and does carry a negative sign but describes eigenvector mixing between planets, not the self-precession rate.
+For first-order secular theory, eccentricity and inclination corrections are **negligible**: the eccentricity correction contributes ~2% for Mercury (e = 0.206) and the inclination correction ~1% for typical mutual inclinations — within the expected ~4% overestimate of first-order theory vs Park et al. (2017), so they are not included. If higher accuracy were needed: `f(e) ≈ 1 + (1/2)e²`, `g(I) = cos(I_mutual)`; for ≤1% accuracy, full numerical integration of the equations of motion is required (like JPL ephemerides).
+
+### 1.3 Sign Convention
+
+**All diagonal A_ii contributions are prograde (+).** The self-precession rate receives a positive contribution from every perturber, whether inner or outer — this follows directly from `α > 0`, `ᾱ > 0`, and `b₃/₂⁽¹⁾(α) > 0`. (The off-diagonal A_ij term, `−(n_i/4)·ε·α·ᾱ·b₃/₂⁽²⁾(α)`, does carry a negative sign, but it describes eigenvector mixing between planets, not the self-precession rate.)
 
 ### 1.5 IMPORTANT: Fundamental Limitations of These Calculations
 
-**The precession breakdown values shown are APPROXIMATIONS, not precise predictions.**
-
-First-order Laplace-Lagrange secular theory is an **educational simplification** developed in the 18th-19th century. Modern astronomers use **full numerical integration** (like JPL Development Ephemerides) for accurate values.
-
-#### Why the Calculations Are Inaccurate
+**First-order Laplace-Lagrange values are APPROXIMATIONS, not precise predictions** — an educational simplification from the 18th-19th century; modern astronomy uses full numerical integration (JPL Development Ephemerides).
 
 | Limitation | Impact | Example |
 |------------|--------|---------|
@@ -134,8 +152,6 @@ First-order Laplace-Lagrange secular theory is an **educational simplification**
 | **No indirect effects** | Venus→Earth→Mercury chains ignored | Park includes cross-terms |
 | **No resonances** | Jupiter-Saturn 5:2 resonance not captured | Saturn accuracy ~78% |
 | **Low eccentricity failure** | Theory breaks for near-circular orbits | Venus completely wrong |
-
-#### Observed vs. Theoretical Accuracy (from academic sources)
 
 From [University of Texas celestial mechanics](https://farside.ph.utexas.edu/teaching/336k/Newtonhtml/node115.html):
 
@@ -148,23 +164,9 @@ From [University of Texas celestial mechanics](https://farside.ph.utexas.edu/tea
 | Jupiter | 6.55 | 7.42 | Reasonable |
 | Saturn | 19.50 | 18.36 | Good |
 
-**Venus is a known failure case** - its low eccentricity makes the perihelion direction extremely sensitive to tiny perturbations, causing first-order theory to give nonsense results.
+**Venus is a known failure case** — its low eccentricity makes the perihelion direction extremely sensitive to tiny perturbations, causing first-order theory to give nonsense results.
 
-#### What This Means for Our Display
-
-The precession breakdown values should be interpreted as:
-- **Illustrative** - showing which planets have the largest gravitational influence
-- **Qualitative** - correct about relative magnitudes and signs (prograde/retrograde)
-- **Educational** - demonstrating the physics of orbital perturbations
-- **NOT precise** - may differ from reality by 5-50% depending on the planet
-
-#### For Accurate Values
-
-Accurate perihelion precession requires:
-1. **Full numerical integration** of equations of motion
-2. **JPL Development Ephemerides** (DE440, DE441)
-3. **Second-order mass corrections** (Brouwer-van Woerkom 1950)
-4. **Higher-degree secular theories** (4th-7th degree in e and i)
+The L-L values should therefore be read as **illustrative and qualitative** — showing which planets have the largest gravitational influence — not as precise predictions (they may differ from reality by 5-50% depending on the planet). Accurate values need full numerical integration (DE440/DE441), second-order mass corrections (Brouwer-van Woerkom 1950), and higher-degree secular theories.
 
 **References:**
 - [Secular evolution of planetary orbits - UT Austin](https://farside.ph.utexas.edu/teaching/celestial/Celestial/node91.html)
@@ -261,7 +263,7 @@ The model value uses the predictive formula at year 1900 (the epoch of Le Verrie
 
 ### 1.7 Historical Context
 
-First-order secular theory **overestimates by ~4%** compared to Park et al. (2017) for Mercury (553 vs 532 ″/cy — see §1.2 and §1.5); the model's own value sits within ~0.1%:
+Urbain Le Verrier (1859) discovered that Mercury's observed perihelion precession (~575 ″/cy) exceeded Newtonian predictions (~532 ″/cy) by about 43 ″/cy; General Relativity (1915) explained the difference as spacetime curvature near the Sun — one of GR's first experimental confirmations. First-order secular theory **overestimates the Newtonian rate by ~4%** compared to Park et al. (2017) for Mercury (553 vs 532 ″/cy — see §1.2 and §1.5); the model's own value sits within ~0.1%:
 
 | Source | Mercury Total |
 |--------|---------------|
@@ -269,20 +271,13 @@ First-order secular theory **overestimates by ~4%** compared to Park et al. (201
 | Park et al. (2017) | 532"/cy |
 | Difference | ~0.1% |
 
-The small overestimate reflects the limitations of first-order theory, which doesn't include:
-- **Indirect effects** - Venus perturbing Earth which then perturbs Mercury (Park includes cross-terms like "Venus+Earth/Moon = -0.0209"/cy")
-- **Higher-order terms** in the disturbing function expansion
-- **Eccentricity/inclination corrections** - contribute ~2-3% for Mercury
-- **Short-period terms** that don't average exactly to zero
-
-**No calibration factors are used** - values are calculated from first principles, with all their inherent limitations.
+**No calibration factors are used** — values are calculated from first principles, with all their inherent limitations (no indirect Venus→Earth→Mercury chains, no higher-order terms, no eccentricity/inclination corrections, short-period terms assumed to average to zero).
 
 ### 1.8 The Earth-frame rate is the equatorial projection of the ecliptic advance
 
 The Earth-frame perihelion rate the model measures (the right ascension of
 the perihelion direction in the scene's equatorial frame — the Step-3 export's
-`<Planet> Perihelion RA` column, named `… Perihelion ICRF` before the K5
-excision's honest-name pass, and at J2000 the shipped predict basis) is
+`<Planet> Perihelion RA` column, and at J2000 the shipped predict basis) is
 not a new quantity: it is the ecliptic advance projected into that frame,
 plus the term the changing obliquity adds to any right ascension:
 
@@ -349,12 +344,8 @@ with the opposite sign, mixes the two coordinates and is not a decomposition.
 The derivation uses the IAU longitude (λ = 77.457°). The scene's perihelion
 marker shows the model's own N-body longitude of perihelion of date
 (ϖ(2000) = 77.455° from the governed element chain — the same value the
-perihelion panels display). The legacy two-vector construction placed the
-marker 0.97° further (λ + `angleCorrection` = 78.43°, the retired pipeline
-Step 2's RA-equals-catalogue convention with marker vector M plus a
-node-perpendicular vector E, |E| = |M|/2 for Type I); that convention was
-**deleted with the K5 legacy-chain excision** (the opt-out is gone), and
-the `…Marker…` registry keys record it as the historical convention — they
+perihelion panels display). The `…Marker…` registry keys record the retired
+two-vector marker convention (λ + 0.97°) as historical bookkeeping — they
 are not a reading of the anomaly.
 
 **All planets.** The same projection, same constants:
@@ -460,656 +451,50 @@ long-term g₁ by 0.473 ″/yr — the same physics at the quantity-A level.
 
 ---
 
-> **Status of Parts 2–6 (K5b/K5 — historical implementation record).** The
-> planetStats "Theorized Precession Breakdown" display these parts specify
-> was REMOVED in the K5b UI pass together with its Laskar-style
-> calculation machinery: the panels now show the CHAIN's secular-shape
-> attribution instead (base mode / largest companion / remainder with %
-> shares, plus the rate of date — read live from the governed element
-> chain via `_kcSecularShape`). Part 1 (the physics, the limitations, and
-> the §1.8 Earth-frame projection device — which ships in the WebGeoCalc
-> explorer) remains the live reference.
-
-## Part 2: Implementation
-
-### 2.1 New OrbitalFormulas Methods
-
-```javascript
-// Laplace coefficient b_{3/2}^{(1)}(α) - NUMERICAL INTEGRATION
-// More accurate than series expansion for large α (e.g., Venus α = 0.54)
-laplaceCoefficient_3_2_1: (alpha) => {
-  const steps = 1000;
-  const dPsi = (2 * Math.PI) / steps;
-  let sum = 0;
-
-  for (let i = 0; i < steps; i++) {
-    const psi = i * dPsi;
-    const cosPsi = Math.cos(psi);
-    const denom = Math.pow(1 - 2 * alpha * cosPsi + alpha * alpha, 1.5);
-    sum += cosPsi / denom;
-  }
-
-  return sum * dPsi / Math.PI;
-},
-
-// Laplace coefficient b_{3/2}^{(2)}(α) - for inner perturber on outer planet
-laplaceCoefficient_3_2_2: (alpha) => {
-  const steps = 1000;
-  const dPsi = (2 * Math.PI) / steps;
-  let sum = 0;
-
-  for (let i = 0; i < steps; i++) {
-    const psi = i * dPsi;
-    const cosPsi = Math.cos(psi);
-    const cos2Psi = Math.cos(2 * psi);
-    const denom = Math.pow(1 - 2 * alpha * cosPsi + alpha * alpha, 1.5);
-    sum += cos2Psi / denom;
-  }
-
-  return sum * dPsi / Math.PI;
-},
-
-// Mean motion in rad/year from orbital period in days
-meanMotionRadPerYear: (period_days) => {
-  const period_years = period_days / 365.25;
-  return (2 * Math.PI) / period_years;
-},
-
-// MAIN FUNCTION: Secular precession contribution from ONE perturber (arcsec/century)
-// First-order Laplace-Lagrange secular theory, diagonal A_ii term.
-// Uses b₃/₂⁽¹⁾(α) for BOTH inner and outer perturbers — the distinction
-// comes from the α·ᾱ prefactor, not from switching Laplace orders.
-// All contributions are positive (prograde).
-secularPrecessionContribution: (
-  n_rad_per_year,       // Mean motion of perturbed planet (rad/year)
-  m_perturber,          // Mass of perturbing planet (kg)
-  M_sun,                // Mass of Sun (kg)
-  a_planet_km,          // Semi-major axis of perturbed planet (km)
-  a_perturber_km        // Semi-major axis of perturbing planet (km)
-) => {
-  const isOuter = a_perturber_km > a_planet_km;
-  const alpha = isOuter
-    ? a_planet_km / a_perturber_km
-    : a_perturber_km / a_planet_km;
-
-  // ᾱ = α if outer, 1 if inner → α·ᾱ = α² (outer) or α (inner)
-  const alpha_bar = isOuter ? alpha : 1;
-
-  // Diagonal A_ii always uses b₃/₂⁽¹⁾(α). b₃/₂⁽²⁾ is for off-diagonal A_ij.
-  const laplace = OrbitalFormulas.laplaceCoefficient_3_2_1(alpha);
-
-  // Mass ratio ε = m_perturber / M_sun
-  const massRatio = m_perturber / M_sun;
-
-  // dω/dt = (n/4) × ε × α × ᾱ × b₃/₂⁽¹⁾(α), always positive
-  const rate_rad_per_year = 0.25 * n_rad_per_year * massRatio * alpha * alpha_bar * laplace;
-
-  // Convert rad/year to arcsec/century
-  return rate_rad_per_year * 206264.806 * 100;
-},
-
-// Calculate ALL contributions to a planet's precession
-// Returns detailed breakdown for display
-precessionBreakdown: (
-  planetName,           // Name of the planet to analyze
-  planetData,           // Object with {a_km, e, i_deg, n_rad_per_year, omega_deg}
-  allPlanetsData,       // Array of {name, a_km, e, i_deg, omega_deg, mass}
-  M_sun                 // Sun's mass
-) => {
-  const contributions = [];
-  let total = 0;
-
-  for (const perturber of allPlanetsData) {
-    if (perturber.name === planetName) continue; // Skip self
-
-    // Calculate delta Omega (difference in ascending nodes)
-    const deltaOmega = planetData.omega_deg - perturber.omega_deg;
-
-    const contrib = OrbitalFormulas.secularPrecessionContribution(
-      planetData.n_rad_per_year,
-      perturber.mass,
-      M_sun,
-      planetData.a_km,
-      perturber.a_km,
-      planetData.e,
-      perturber.e,
-      planetData.i_deg,
-      perturber.i_deg,
-      deltaOmega
-    );
-
-    // Calculate mutual inclination for display
-    const i_mutual = OrbitalFormulas.mutualInclination(
-      planetData.i_deg, perturber.i_deg, deltaOmega
-    );
-
-    contributions.push({
-      perturber: perturber.name,
-      contribution: contrib,
-      isOuter: perturber.a_km > planetData.a_km,
-      mutualInclination: i_mutual,
-      alpha: perturber.a_km > planetData.a_km
-        ? planetData.a_km / perturber.a_km
-        : perturber.a_km / planetData.a_km
-    });
-
-    total += contrib;
-  }
-
-  // Sort by absolute contribution (largest first)
-  contributions.sort((a, b) => Math.abs(b.contribution) - Math.abs(a.contribution));
-
-  // Add percentages
-  for (const c of contributions) {
-    c.percentage = total !== 0 ? (c.contribution / total) * 100 : 0;
-  }
-
-  return {
-    planet: planetName,
-    contributions: contributions,
-    calculatedTotal: total,
-    observedTotal: null,  // To be filled from planetStats
-    accuracy: null        // Calculated as calculatedTotal / observedTotal
-  };
-}
-```
-
-### 2.2 Dynamic Data Collection Function
-
-This function gathers current orbital parameters for all planets:
-
-```javascript
-// Collect current orbital data for all planets (called each frame or on demand)
-// Uses dynamic values from 'o' object for inclinations
-getPlanetPerturbationData: (o) => {
-  return {
-    mercury: {
-      name: 'Mercury',
-      a_km: mercuryOrbitDistance * o.lengthofAU,
-      e: mercuryOrbitalEccentricity,
-      i_deg: o.mercuryEclipticInclinationDynamic,  // DYNAMIC
-      omega_deg: o.mercuryAscendingNode,
-      mass: M_MERCURY_SYSTEM,
-      n_rad_year: OrbitalFormulas.meanMotionRadPerYear(mercurySolarYearInput),
-      observedPrecession: OrbitalFormulas.precessionRateFromPeriod(mercuryPerihelionEclipticYears)
-    },
-    venus: {
-      name: 'Venus',
-      a_km: venusOrbitDistance * o.lengthofAU,
-      e: venusOrbitalEccentricity,
-      i_deg: o.venusEclipticInclinationDynamic,    // DYNAMIC
-      omega_deg: o.venusAscendingNode,
-      mass: M_VENUS_SYSTEM,
-      n_rad_year: OrbitalFormulas.meanMotionRadPerYear(venusSolarYearInput),
-      observedPrecession: OrbitalFormulas.precessionRateFromPeriod(venusPerihelionEclipticYears)
-    },
-    earth: {
-      name: 'Earth',
-      a_km: earthOrbitDistance * o.lengthofAU,
-      e: earthOrbitalEccentricity,
-      i_deg: o.earthEclipticInclinationDynamic,    // DYNAMIC
-      omega_deg: o.earthAscendingNode,
-      mass: M_EARTH_ALONE,
-      n_rad_year: OrbitalFormulas.meanMotionRadPerYear(earthSolarYearInput),
-      observedPrecession: OrbitalFormulas.precessionRateFromPeriod(earthPerihelionICRFYears)
-    },
-    mars: {
-      name: 'Mars',
-      a_km: marsOrbitDistance * o.lengthofAU,
-      e: marsOrbitalEccentricity,
-      i_deg: o.marsEclipticInclinationDynamic,     // DYNAMIC
-      omega_deg: o.marsAscendingNode,
-      mass: M_MARS_SYSTEM,
-      n_rad_year: OrbitalFormulas.meanMotionRadPerYear(marsSolarYearInput),
-      observedPrecession: OrbitalFormulas.precessionRateFromPeriod(marsPerihelionEclipticYears)
-    },
-    jupiter: {
-      name: 'Jupiter',
-      a_km: jupiterOrbitDistance * o.lengthofAU,
-      e: jupiterOrbitalEccentricity,
-      i_deg: o.jupiterEclipticInclinationDynamic,  // DYNAMIC
-      omega_deg: o.jupiterAscendingNode,
-      mass: M_JUPITER_SYSTEM,
-      n_rad_year: OrbitalFormulas.meanMotionRadPerYear(jupiterSolarYearInput),
-      observedPrecession: OrbitalFormulas.precessionRateFromPeriod(jupiterPerihelionEclipticYears)
-    },
-    saturn: {
-      name: 'Saturn',
-      a_km: saturnOrbitDistance * o.lengthofAU,
-      e: saturnOrbitalEccentricity,
-      i_deg: o.saturnEclipticInclinationDynamic,   // DYNAMIC
-      omega_deg: o.saturnAscendingNode,
-      mass: M_SATURN_SYSTEM,
-      n_rad_year: OrbitalFormulas.meanMotionRadPerYear(saturnSolarYearInput),
-      observedPrecession: OrbitalFormulas.precessionRateFromPeriod(saturnPerihelionEclipticYears)
-    },
-    uranus: {
-      name: 'Uranus',
-      a_km: uranusOrbitDistance * o.lengthofAU,
-      e: uranusOrbitalEccentricity,
-      i_deg: o.uranusEclipticInclinationDynamic,   // DYNAMIC
-      omega_deg: o.uranusAscendingNode,
-      mass: M_URANUS_SYSTEM,
-      n_rad_year: OrbitalFormulas.meanMotionRadPerYear(uranusSolarYearInput),
-      observedPrecession: OrbitalFormulas.precessionRateFromPeriod(uranusPerihelionEclipticYears)
-    },
-    neptune: {
-      name: 'Neptune',
-      a_km: neptuneOrbitDistance * o.lengthofAU,
-      e: neptuneOrbitalEccentricity,
-      i_deg: o.neptuneEclipticInclinationDynamic,  // DYNAMIC
-      omega_deg: o.neptuneAscendingNode,
-      mass: M_NEPTUNE_SYSTEM,
-      n_rad_year: OrbitalFormulas.meanMotionRadPerYear(neptuneSolarYearInput),
-      observedPrecession: OrbitalFormulas.precessionRateFromPeriod(neptunePerihelionEclipticYears)
-    }
-  };
-}
-```
-
-### 2.3 Helper Function to Get Breakdown for Display
-
-```javascript
-// Get precession breakdown for a specific planet
-// Called from planetStats value functions
-getMarsPrecessionBreakdown: (o) => {
-  const allPlanets = OrbitalFormulas.getPlanetPerturbationData(o);
-  const planetArray = Object.values(allPlanets);
-  const marsData = allPlanets.mars;
-
-  const breakdown = OrbitalFormulas.precessionBreakdown(
-    'Mars',
-    marsData,
-    planetArray,
-    M_SUN
-  );
-
-  breakdown.observedTotal = marsData.observedPrecession;
-  breakdown.accuracy = (breakdown.calculatedTotal / breakdown.observedTotal) * 100;
-
-  return breakdown;
-}
-
-// Similar functions for each planet:
-// getMercuryPrecessionBreakdown(o)
-// getVenusPrecessionBreakdown(o)
-// getEarthPrecessionBreakdown(o)
-// getJupiterPrecessionBreakdown(o)
-// getSaturnPrecessionBreakdown(o)
-// getUranusPrecessionBreakdown(o)
-// getNeptunePrecessionBreakdown(o)
-```
-
----
-
-## Part 3: Expected Results
-
-With the full formula including eccentricity and inclination corrections, we expect better accuracy than the simplified model.
-
-**Scope note:** The numeric ″/century values shown below for Fibonacci rates expressed as `8H/N` (e.g. `8H/39 = 1,884 ″/cy`, `−8H/65 = −3,140 ″/cy`) are evaluated at the J2000 epoch. The divisor itself (39, 65, …) is the scale-invariant structural quantity; the literal arcsec/century figure scales with `H(t)` at deep time under [ESSRT](99-expanding-solar-system-resonance-theory.md).
-
-### 3.1 Mars Precession Breakdown
-
-| Perturber | Position | α ratio | Contribution | Percentage |
-|-----------|----------|---------|--------------|------------|
-| Jupiter | Outer | 0.293 | +1,470 | ~83% |
-| Earth | Inner | 0.656 | +195 | ~11% |
-| Saturn | Outer | 0.160 | +63 | ~4% |
-| Venus | Inner | 0.475 | +46 | ~3% |
-| Uranus | Outer | 0.080 | +1.2 | <1% |
-| Mercury | Inner | 0.254 | +0.6 | <1% |
-| Neptune | Outer | 0.051 | +0.4 | <1% |
-| **First-order L-L total (A_ii)** | | | **~1,776** | |
-| **WebGeoCalc observed (1900–2100)** | | | **~<!--v:marsObservedRate-->1,600<!--/v-->** | |
-| **Model Fibonacci long-term mean (8H/36)** | | | **1,739** | |
-
-**Insight:** Jupiter dominates (~83%) because:
-- Largest mass (1/1047 of Sun)
-- Closest giant planet to Mars (α = 0.293)
-- Inner planets (Earth, Venus, Mercury) also contribute prograde — the second-biggest contribution is Earth, not Saturn.
-
-The first-order L-L estimate (~1,776) overshoots both the WebGeoCalc short-baseline observation (~<!--v:marsObservedRate-->1,600<!--/v-->) and the model's Fibonacci long-term mean (1,739) by ~2–11 %. That's consistent with the known first-order theory accuracy.
-
-### 3.2 Mercury Precession Breakdown
-
-| Perturber | Position | α ratio | Contribution | Percentage |
-|-----------|----------|---------|--------------|------------|
-| Venus | Outer | 0.535 | +286 | ~52% |
-| Jupiter | Outer | 0.074 | +161 | ~29% |
-| Earth | Outer | 0.387 | +95 | ~17% |
-| Saturn | Outer | 0.041 | +8 | ~1% |
-| Mars | Outer | 0.254 | +2 | <1% |
-| Uranus | Outer | 0.020 | +0.1 | <1% |
-| Neptune | Outer | 0.013 | <0.1 | <1% |
-| **First-order L-L total (A_ii)** | | | **~553** | |
-| **WebGeoCalc observed (1900–2100)** | | | **~570** | |
-| **Model Fibonacci — present-epoch rate (H×8/11)** | | | **531** | |
-
-**Insight:** All planets are outer to Mercury, so all contributions are positive.
-Venus dominates despite lower mass because of highest α ratio (0.535).
-
-The first-order L-L total (~553) is the Newton-only bare rate; the observed ~570 additionally carries the ~43 ″/cy relativistic term. The 531 ″/cy Fibonacci value (H × 8/11) is a **present-epoch rate** descriptor (quantity type per doc 109 §9): it sits within 0.5 % of Mercury's present-epoch Newtonian secular rate (~529). Mercury's **long-term mean** is a different quantity — g₁ ≈ 512 ″/cy Newton-only, ≈ 560 with relativity.
-
-**Historical note:** Urbain Le Verrier's original 19th-century calculation of Mercury's Newtonian perihelion advance gave ~532 ″/cy — differing from the full observed ~575 ″/cy by ~43 ″/cy, which Einstein 's General Relativity (1915) then explained as the effect of spacetime curvature near the Sun. The modern first-order L-L calculation (this doc, ~553 ″/cy) reproduces Le Verrier's result with small numerical refinements.
-
-### 3.3 Jupiter Precession Breakdown
-
-| Perturber | Position | α ratio | Contribution | Percentage |
-|-----------|----------|---------|--------------|------------|
-| Saturn | Outer | 0.546 | +742 | ~98% |
-| Uranus | Outer | 0.272 | +8 | ~1% |
-| Neptune | Outer | 0.174 | +2 | <1% |
-| Earth | Inner | 0.192 | +1 | <1% |
-| Venus | Inner | 0.139 | +0.4 | <1% |
-| Mars | Inner | 0.293 | +0.3 | <1% |
-| Mercury | Inner | 0.074 | <0.1 | <1% |
-| **First-order L-L total (A_ii)** | | | **~754** | |
-| **WebGeoCalc observed (1900–2100)** | | | **~<!--v:jupiterObservedRate-->1,800<!--/v-->** | |
-| **Model window-epoch value (8H/39)** | | | **1,884** | |
-
-**Insight:** Saturn dominates Jupiter's diagonal A_ii rate almost entirely. First-order L-L gives ~754 ″/cy, but the WebGeoCalc observed rate is ~<!--v:jupiterObservedRate-->1,800<!--/v--> ″/cy. The 2.4× gap reflects strong Jupiter–Saturn off-diagonal coupling and the 5:2 near-resonance ("Great Inequality") — effects that first-order diagonal theory cannot capture. The model's 8H/39 = 1,884 ″/cy is a **window-epoch descriptor** (doc 109 §9): it tracks the observed 1800–2100 trend. Jupiter's **long-term mean** is a different quantity again — g₅ ≈ 426 ″/cy — which neither the window trend nor the first-order diagonal shows.
-
-### 3.4 Saturn Precession Breakdown
-
-| Perturber | Position | α ratio | Contribution | Percentage |
-|-----------|----------|---------|--------------|------------|
-| Jupiter | Inner | 0.546 | +1,829 | ~98% |
-| Uranus | Outer | 0.498 | +31 | ~2% |
-| Neptune | Outer | 0.318 | +7 | <1% |
-| Earth | Inner | 0.105 | +0.1 | <1% |
-| Mars | Inner | 0.160 | <0.1 | <1% |
-| Venus | Inner | 0.076 | <0.1 | <1% |
-| Mercury | Inner | 0.041 | <0.1 | <1% |
-| **First-order L-L total (A_ii)** | | | **+1,867** | |
-| **WebGeoCalc observed (1900–2100)** | | | **retrograde, magnitude window-dependent (~−1,800 to −3,600)** | |
-| **Model window-epoch value (−8H/65)** | | | **−3,140** | |
-
-**Insight:** Jupiter's gravitational perturbation dominates Saturn's diagonal rate. First-order L-L predicts +1,867 ″/cy **prograde**, but WebGeoCalc shows Saturn moving **retrograde** across the 1800–2100 window — the direction is *opposite* to first-order prediction. The retrograde *direction* is robust across plausible 126-year sub-windows; the *magnitude*, however, varies by ~2× depending on which window you measure (sliding-window OLS gives anywhere from −<!--v:jupiterObservedRate-->1,800<!--/v--> to −3,600 ″/cy, with non-linear midpoint residuals of 0.4° suggesting longer-period structure underneath). The WebGeoCalc Explorer therefore flags Saturn as un-determined and lets the user read the trend visually. This is one of the largest known failures of first-order secular theory.
-
-The retrograde signal that first-order L-L misses is dominated by the Jupiter–Saturn 5:2 "Great Inequality" near-resonance, which secular theory treats as slowly averaging out but which in practice produces a large retrograde signal during the current epoch. The model's −8H/65 = −3,140 ″/cy is a **window-epoch descriptor** (doc 109 §1/§9) sitting within the observed century-window spread; Saturn's **long-term mean** is prograde (g₆ ≈ +2,824 ″/cy), and first-order L-L misses the window's retrograde sign entirely.
-
-See docs/10-fibonacci-laws.md §"Law 6: Saturn-Jupiter-Earth Resonance" for more on this discrepancy.
-
----
-
-## Part 4: Display in planetStats
-
-### 4.1 Detailed Display Format (7+ lines per planet)
-
-For Mars, the display will show all 7 planetary contributions plus totals:
-
-```javascript
-{header : '—  Precession Breakdown —' },
-  {label : () => `Observed Precession Rate`,
-   value : [ { v: () => OrbitalFormulas.precessionRateFromPeriod(marsPerihelionEclipticYears), dec:1, sep:',' },{ small: 'arcsec/century' }],
-   hover : [`Total observed perihelion precession rate from astronomical observations`],
-   static: true},
-null,
-  {label : () => `┌ Jupiter`,
-   value : [ { v: () => OrbitalFormulas.getMarsPrecessionBreakdown(o).contributions.find(c => c.perturber === 'Jupiter')?.contribution, dec:1, sep:',' },{ small: 'arcsec/century' }],
-   hover : [`Jupiter (outer): Largest contributor due to mass and proximity. α = 0.293`]},
-  {label : () => `├ Saturn`,
-   value : [ { v: () => OrbitalFormulas.getMarsPrecessionBreakdown(o).contributions.find(c => c.perturber === 'Saturn')?.contribution, dec:1, sep:',' },{ small: 'arcsec/century' }],
-   hover : [`Saturn (outer): Third-largest contributor. α = 0.159`]},
-  {label : () => `├ Earth`,
-   value : [ { v: () => OrbitalFormulas.getMarsPrecessionBreakdown(o).contributions.find(c => c.perturber === 'Earth')?.contribution, dec:1, sep:',' },{ small: 'arcsec/century' }],
-   hover : [`Earth (inner): Second-largest contributor. Inner perturbers contribute prograde via the α·ᾱ = α weighting. α = 0.656`]},
-  {label : () => `├ Venus`,
-   value : [ { v: () => OrbitalFormulas.getMarsPrecessionBreakdown(o).contributions.find(c => c.perturber === 'Venus')?.contribution, dec:1, sep:',' },{ small: 'arcsec/century' }],
-   hover : [`Venus (inner): Prograde contribution scaled by α = 0.475`]},
-  {label : () => `├ Uranus`,
-   value : [ { v: () => OrbitalFormulas.getMarsPrecessionBreakdown(o).contributions.find(c => c.perturber === 'Uranus')?.contribution, dec:1, sep:',' },{ small: 'arcsec/century' }],
-   hover : [`Uranus (outer): Small prograde contribution. α = 0.079`]},
-  {label : () => `├ Neptune`,
-   value : [ { v: () => OrbitalFormulas.getMarsPrecessionBreakdown(o).contributions.find(c => c.perturber === 'Neptune')?.contribution, dec:1, sep:',' },{ small: 'arcsec/century' }],
-   hover : [`Neptune (outer): Smallest prograde contribution due to distance. α = 0.050`]},
-  {label : () => `└ Mercury`,
-   value : [ { v: () => OrbitalFormulas.getMarsPrecessionBreakdown(o).contributions.find(c => c.perturber === 'Mercury')?.contribution, dec:1, sep:',' },{ small: 'arcsec/century' }],
-   hover : [`Mercury (inner): Negligible prograde contribution. α = 0.254`]},
-null,
-  {label : () => `Σ Calculated Total`,
-   value : [ { v: () => OrbitalFormulas.getMarsPrecessionBreakdown(o).calculatedTotal, dec:1, sep:',' },{ small: 'arcsec/century' }],
-   hover : [`Sum of all planetary contributions from Lagrange-Laplace secular theory`]},
-  {label : () => `Model Accuracy`,
-   value : [ { v: () => OrbitalFormulas.getMarsPrecessionBreakdown(o).accuracy, dec:1, sep:',' },{ small: '%' }],
-   hover : [`Calculated ÷ Observed × 100. Differences due to resonances and higher-order effects`]},
-```
-
-### 4.2 Optimized Implementation with Caching
-
-To avoid recalculating the breakdown for each field, we can cache the result:
-
-```javascript
-// In the animation loop or update function:
-let marsPrecessionCache = null;
-let marsPrecessionCacheTime = 0;
-
-function getMarsPrecessionCached(o) {
-  // Recalculate every 1000ms (or when orbital data changes significantly)
-  const now = Date.now();
-  if (!marsPrecessionCache || now - marsPrecessionCacheTime > 1000) {
-    marsPrecessionCache = OrbitalFormulas.getMarsPrecessionBreakdown(o);
-    marsPrecessionCacheTime = now;
-  }
-  return marsPrecessionCache;
-}
-
-// Then in planetStats:
-{label : () => `┌ Jupiter`,
- value : [ { v: () => {
-   const breakdown = getMarsPrecessionCached(o);
-   return breakdown.contributions.find(c => c.perturber === 'Jupiter')?.contribution;
- }, dec:1, sep:',' },{ small: 'arcsec/century' }],
- hover : [`Jupiter (outer): Largest contributor`]},
-```
-
-### 4.3 Display for All Planets
-
-Each planet gets its own breakdown section. Here's the pattern for Mercury (where all contributions are positive):
-
-```javascript
-// MERCURY - All outer perturbers
-{header : '—  Precession Breakdown —' },
-  {label : () => `Observed Precession Rate`,
-   value : [ { v: () => OrbitalFormulas.precessionRateFromPeriod(mercuryPerihelionEclipticYears), dec:1, sep:',' },{ small: 'arcsec/century' }],
-   hover : [`Famous for the 43 arcsec/century relativistic anomaly discovered by Le Verrier`],
-   static: true},
-null,
-  {label : () => `┌ Venus`,
-   value : [ { v: () => getMercuryPrecessionCached(o).contributions.find(c => c.perturber === 'Venus')?.contribution, dec:1, sep:',' },{ small: 'arcsec/century' }],
-   hover : [`Venus (outer): Dominant due to proximity despite lower mass. α = 0.534`]},
-  {label : () => `├ Jupiter`,
-   value : [ { v: () => getMercuryPrecessionCached(o).contributions.find(c => c.perturber === 'Jupiter')?.contribution, dec:1, sep:',' },{ small: 'arcsec/century' }],
-   hover : [`Jupiter (outer): Second largest due to enormous mass. α = 0.074`]},
-  {label : () => `├ Earth`,
-   value : [ { v: () => getMercuryPrecessionCached(o).contributions.find(c => c.perturber === 'Earth')?.contribution, dec:1, sep:',' },{ small: 'arcsec/century' }],
-   hover : [`Earth (outer): Third contributor. α = 0.387`]},
-  {label : () => `├ Saturn`,
-   value : [ { v: () => getMercuryPrecessionCached(o).contributions.find(c => c.perturber === 'Saturn')?.contribution, dec:1, sep:',' },{ small: 'arcsec/century' }],
-   hover : [`Saturn (outer): Small contribution due to distance. α = 0.040`]},
-  {label : () => `├ Mars`,
-   value : [ { v: () => getMercuryPrecessionCached(o).contributions.find(c => c.perturber === 'Mars')?.contribution, dec:1, sep:',' },{ small: 'arcsec/century' }],
-   hover : [`Mars (outer): Small due to low mass. α = 0.254`]},
-  {label : () => `├ Uranus`,
-   value : [ { v: () => getMercuryPrecessionCached(o).contributions.find(c => c.perturber === 'Uranus')?.contribution, dec:2, sep:',' },{ small: 'arcsec/century' }],
-   hover : [`Uranus (outer): Negligible. α = 0.020`]},
-  {label : () => `└ Neptune`,
-   value : [ { v: () => getMercuryPrecessionCached(o).contributions.find(c => c.perturber === 'Neptune')?.contribution, dec:2, sep:',' },{ small: 'arcsec/century' }],
-   hover : [`Neptune (outer): Negligible. α = 0.013`]},
-null,
-  {label : () => `Σ Calculated Total`,
-   value : [ { v: () => getMercuryPrecessionCached(o).calculatedTotal, dec:1, sep:',' },{ small: 'arcsec/century' }],
-   hover : [`Newtonian sum: ~530. Missing ~43 arcsec/century is Einstein's relativistic correction!`]},
-  {label : () => `Model Accuracy`,
-   value : [ { v: () => getMercuryPrecessionCached(o).accuracy, dec:1, sep:',' },{ small: '%' }],
-   hover : [`Without relativity, Newtonian mechanics accounts for ~92% of Mercury's precession`]},
-```
-
----
-
-## Part 5: Why No Calibration Factors
-
-**Decision:** Show raw calculated values without artificial correction factors.
-
-### 5.1 Rationale
-
-1. **Scientific Integrity**: The raw output of the Lagrange-Laplace secular theory is more honest
-2. **Educational Value**: Showing the discrepancy teaches about:
-   - Limitations of first-order secular theory
-   - Mean motion resonances (Jupiter-Saturn 5:2)
-   - Higher-order perturbation effects
-   - Relativistic effects (for Mercury)
-3. **Transparency**: Users can see exactly what the physics predicts
-
-### 5.2 Expected Accuracy Range (first-order A_ii vs WebGeoCalc observed)
-
-| Planet | L-L Accuracy | Comment |
-|--------|--------------|---------|
-| Mercury | ~97 % | L-L works well; missing ~3 % is the GR 43 ″/cy anomaly + higher-order terms |
-| Venus | ~0 % | Catastrophic failure: L-L gives ~1,199 ″/cy, observed ~0 ″/cy (low-e singularity) |
-| Earth | ~21 % | L-L gives inertial-frame rate; WebGeoCalc measures wrt equinox (different frame) |
-| Mars | ~90 % | L-L overshoots by ~11 % due to neglected cross-terms and higher-order effects |
-| Jupiter | ~42 % | Jupiter-Saturn 5:2 coupling not captured in first-order theory |
-| Saturn | wrong sign | L-L predicts +1,867 prograde; WebGeoCalc shows retrograde, magnitude window-dependent (~−1,800 to −3,600 ″/cy) |
-| Uranus | ~25 % | Missing off-diagonal coupling with Saturn/Neptune |
-| Neptune | ~34 % | Missing off-diagonal coupling |
-
-The Holistic Universe Model's Fibonacci rates match six of the eight planets to 3–10 % (Venus's observed rate is indeterminate — it flips sign across windows — and Saturn's observed magnitude is window-sensitive), as
-documented in §7.1 and [docs/37-planets-precession-cycles.md](37-planets-precession-cycles.md).
-
-### 5.3 Notable Discrepancies
-
-**Saturn (wrong sign in first-order L-L — the Great Inequality case):** First-order secular theory says Saturn's perihelion precesses prograde at ~+1,867 ″/cy (this doc's calculation) or +19.5 ″/yr = +1,950 ″/cy (long-term secular theory, Park g_6). **WebGeoCalc, however, shows Saturn retrograde across the 1800–2100 baseline, with magnitude window-dependent (sliding 126-year OLS: anywhere from −1,800 to −3,600 ″/cy).** The direction is wrong in L-L, not just the magnitude — and the retrograde is robust across windows even though its precise value is not.
-
-Standard astronomy explains this via the **Great Inequality**: the Jupiter-Saturn 5:2 near-resonance drives a ~900-year oscillation in Saturn's perihelion rate. The long-term secular average is prograde (standard theory's answer), but the current epoch happens to be in the retrograde phase of that cycle. Under this view, Saturn's rate should reverse within ~450 years.
-
-**The Holistic Universe Model's interpretation is different.** The model treats Saturn's observed retrograde direction as structural, not transient: `ω_peri = −8H/65 = −3,140 ″/cy` permanently, because ICRF (not the ecliptic) is the stable foundation and the Fibonacci structure is anchored there. The model's value sits within the observed window-spread (which itself runs from −1,800 to −3,600 ″/cy across plausible 126-year baselines); standard secular theory has the wrong sign entirely. This is the clearest concrete disagreement between the model and L-L secular theory, and it's a **testable prediction** — long-baseline integration (DE441) can tell whether Saturn's rate stays retrograde or reverses within ~450 yr.
-
-See §1.5a for the reference-frame explanation of why L-L cannot produce the date-frame retrograde signal even when its long-term eigenvalue is "right".
-
-**Venus (L-L singularity):** Venus's nearly circular orbit (e = 0.0068) makes the perihelion direction extremely sensitive to small perturbations, and first-order theory diverges. The WebGeoCalc observed rate (~0 ″/cy) reflects destructive interference between modes that first-order theory cannot resolve.
-
-**Mercury (relativity):** Mercury's observed ~570 ″/cy matches first-order L-L (~553 ″/cy) to within ~3 %. The remaining gap is partly higher-order Newtonian terms and partly Einstein's 43 ″/cy GR contribution — historically the most famous mismatch between theory and observation in celestial mechanics.
-
----
-
-## Part 6: Implementation Steps
-
-### Phase 1: Add OrbitalFormulas Methods
-1. `laplaceCoefficient_3_2_1(alpha)` - Laplace coefficient b₃/₂⁽¹⁾(α) — used for the diagonal A_ii (self-precession) of both inner and outer perturbers.
-2. `laplaceCoefficient_3_2_2(alpha)` - Laplace coefficient b₃/₂⁽²⁾(α) — helper for off-diagonal A_ij (eigenvector-mixing) terms. Not used by the current precession-breakdown display.
-3. `eccentricityCorrectionFactor(e, e')` - Eccentricity correction
-4. `mutualInclination(i1, i2, deltaOmega)` - Calculate mutual inclination
-5. `inclinationCorrectionFactor(i_mutual)` - Inclination correction
-6. `meanMotionRadPerYear(period_days)` - Convert period to mean motion
-7. `secularPrecessionContribution(...)` - Main calculation for one perturber
-8. `precessionBreakdown(...)` - Calculate all contributions
-
-### Phase 2: Add Data Collection
-1. `getPlanetPerturbationData(o)` - Collect dynamic orbital data
-2. Individual getter functions: `getMarsPrecessionBreakdown(o)`, etc.
-
-### Phase 3: Add Caching (Optional)
-1. Implement time-based cache for each planet's breakdown
-2. Invalidate cache when simulation time changes significantly
-
-### Phase 4: Update planetStats
-1. Add `{header : '—  Precession Breakdown —' }` section to each planet
-2. Add 7 contributor rows (one per perturbing planet)
-3. Add calculated total and accuracy fields
-
-### Phase 5: Documentation
-1. Update orbital-formulas.md with Part 10: Precession Breakdown
-2. Document all new OrbitalFormulas methods
-3. Add validation data and expected results
-
----
-
-## Part 7: Validation
-
-### 7.1 Three-way comparison (arcsec/century)
-
-The table below compares, for each planet:
-- **WebGeoCalc observed** — JPL/NAIF's short-baseline (1900–2100) measurement, the actual observed perihelion precession rate.
-- **First-order L-L A_ii** — what this breakdown computes from Laplace-Lagrange secular theory (diagonal only).
-- **Model Fibonacci** — the Holistic Universe Model's H-fraction value; its quantity TYPE differs per planet (doc 109 §9): Mars = long-term mean, Mercury = present-epoch rate, Jupiter/Saturn/Uranus = window-epoch values.
-
-| Planet | WebGeoCalc observed | First-order A_ii | Model Fibonacci | Notes |
+## The Three-Way Comparison
+
+For each planet: **WebGeoCalc observed** (JPL/NAIF short-baseline
+1900–2100, the actual observed rate), **first-order L-L A_ii** (the
+diagonal sum from §1.1), and the **model's value** (whose quantity TYPE
+differs per planet — doc 109 §9: Mars = long-term mean, Mercury =
+present-epoch rate, Jupiter/Saturn/Uranus = window-epoch values). All in
+″/century; the 8H/N figures are J2000-evaluated (the divisor is the
+scale-invariant quantity; the literal rate scales with H(t) at deep time
+under [ESSRT](99-expanding-solar-system-resonance-theory.md)).
+
+| Planet | WebGeoCalc observed | First-order A_ii | Model | Notes |
 |--------|--------------------|-----------------|-----------------|-------|
 | Mercury | ~570 | ~553 | 531 (H × 8/11) | L-L matches obs to ~3 % |
 | Venus | ~0 | ~1,199 | −290 (−8H/6) | L-L fails catastrophically (low-e singularity) |
-| Earth | ~<!--v:earthObservedRate-->6,186<!--/v--> | ~1,280 | 6,187 (H/16) | Fibonacci matches obs exactly; L-L gives inertial rate (different frame) |
-| Mars | ~<!--v:marsObservedRate-->1,600<!--/v--> | ~1,776 | 1,739 (8H/36) | L-L over by ~11 %; Fibonacci matches obs to ~9 % |
-| Jupiter | ~<!--v:jupiterObservedRate-->1,800<!--/v--> | ~754 | 1,884 (8H/39) | L-L under by ~58 %; dynamical secular matches obs to ~5 % |
-| Saturn | retrograde, magnitude window-sensitive (~−1,800 to −3,600) | +1,867 | −3,140 (−8H/65) | L-L has wrong sign; dynamical secular sits within the observed window-spread |
-| Uranus | ~<!--v:uranusObservedRate-->1,100<!--/v--> | ~278 | 1,160 (H/3) | L-L under by ~75 %; Fibonacci matches obs to ~5 % |
-| Neptune | ~200 | ~68 | 193 (2H) | L-L under by ~66 %; Fibonacci matches obs to ~4 % |
+| Earth | ~<!--v:earthObservedRate-->6,186<!--/v--> | ~1,280 | 6,187 (H/16) | Model matches obs exactly; L-L gives inertial rate (different frame) |
+| Mars | ~<!--v:marsObservedRate-->1,600<!--/v--> | ~1,776 | 1,739 (8H/36) | L-L over by ~11 %; model matches obs to ~9 % |
+| Jupiter | ~<!--v:jupiterObservedRate-->1,800<!--/v--> | ~754 | 1,884 (8H/39) | L-L under by ~58 % (Jupiter–Saturn 5:2 coupling missing); model matches obs to ~5 % |
+| Saturn | retrograde, magnitude window-sensitive (~−1,800 to −3,600) | +1,867 | −3,140 (−8H/65) | L-L has wrong sign; model sits within the observed window-spread |
+| Uranus | ~<!--v:uranusObservedRate-->1,100<!--/v--> | ~278 | 1,160 (H/3) | L-L under by ~75 %; model matches obs to ~5 % |
+| Neptune | ~200 | ~68 | 193 (2H) | L-L under by ~66 %; model matches obs to ~4 % |
 
-**Key observation:** First-order L-L is a reasonable approximation for Mercury and
-Mars but fails significantly for every other planet. The Holistic Universe Model's
-Fibonacci rates, which are calibrated to WebGeoCalc, match observations to 3–10 %
-across the six determinable planets (Venus and Saturn's observed rates are
-window-indeterminate), including the cases where L-L fails by factors of 2–10 or
-gives the wrong sign. L-L is a theoretical simplification; the Fibonacci framework
-is observationally grounded.
+First-order L-L is a reasonable approximation for Mercury and Mars but
+fails significantly for every other planet — structural failures of
+first-order theory (missing off-diagonal coupling, resonances, the frame
+collapse of §1.5a), not implementation bugs. The model's rates match the
+six determinable planets to 3–10 % (Venus's observed rate flips sign
+across windows; Saturn's observed magnitude is window-sensitive); the
+per-planet dominances follow the α·ᾱ weighting (Jupiter ~83 % of Mars's
+rate; Venus ~52 % of Mercury's; Jupiter↔Saturn ~98 % of each other's
+diagonal rate — and inner perturbers carry one less power of α, which is
+why Earth out-contributes Saturn for Mars).
 
-### 7.2 Sanity Checks
-
-1. **First-order L-L matches WebGeoCalc only for Mercury (~3 % agreement).** Mars is off by ~11 %, Venus by 100 %, Jupiter by ~58 %, Saturn has the wrong sign. These are structural failures of first-order theory, not implementation bugs.
-2. **Jupiter dominates for Mars** (~83 %).
-3. **Venus dominates for Mercury** (~52 %).
-4. **Saturn dominates for Jupiter** (~98 % of the diagonal rate).
-5. **Jupiter dominates for Saturn** (~98 % of the diagonal rate).
-6. **All perturbers contribute prograde (+)** — no negative contributions in the diagonal A_ii.
-7. **Outer-perturber contributions scale roughly with mass × α²**.
-8. **Inner-perturber contributions scale roughly with mass × α** (one less power of α, so inner planets often contribute more than you'd expect from mass alone — e.g. Earth contributes more than Saturn to Mars's rate).
-9. **The model's Fibonacci rates are not first-order L-L values.** They are calibrated to WebGeoCalc observations directly, and match all planets to 3–10 %. Comparing the L-L column to the Fibonacci column shows where classical theory diverges from observed reality.
-
-### 7.3 Dynamic Validation
-
-Since we use dynamic inclinations (`o.<planet>EclipticInclinationDynamic`), the values will vary slightly over time. Expected variation:
-- Inclination correction: ±0.1% to ±2%
-- Total variation: ±1-5 arcsec/century
-
-This dynamic behavior demonstrates the real-time nature of gravitational perturbations.
-
----
-
-## Part 8: Summary
-
-### What We Built
-
-A **Precession Breakdown** feature that:
-- Shows how each of the 8 major planets contributes to another planet's perihelion precession
-- Uses Lagrange-Laplace secular perturbation theory
-- Calculates dynamically using current orbital parameters
-- Displays raw physics results without artificial calibration
-- Provides educational insight into orbital mechanics
-
-### Key Features
-
-1. **All 8 planets** as perturbers (Mercury through Neptune)
-2. **Detailed display** (10+ lines per planet including header and totals)
-3. **Dynamic calculation** using `o.<planet>EclipticInclinationDynamic`
-4. **No calibration** - shows true physics predictions
-5. **Accuracy display** comparing calculated to observed values
-
-### Historical Significance
-
-For Mercury, this breakdown historically demonstrated:
-- Newtonian mechanics predicts ~532 arcsec/century
-- Observed value is ~570 arcsec/century
-- The ~43 arcsec/century discrepancy was unexplained until Einstein's General Relativity (1915)
-
-This feature brings that same analysis to all planets!
+Mercury's Newtonian shortfall is the famous case: the L-L sum (~553) plus
+higher-order Newtonian terms leaves the ~43 ″/cy that GR supplies —
+historically the most celebrated mismatch in celestial mechanics, and the
+subject of §1.8's projection analysis and transit test.
 
 ---
 
 ## Related Documents
 
-- [10-fibonacci-laws.md](10-fibonacci-laws.md) — Six Fibonacci Laws (Saturn's ecliptic-retrograde perihelion is covered under Law 6)
-- [12-perihelion-precession.md](12-perihelion-precession.md) — Earth-frame vs ecliptic-frame perihelion methods
+- [10-fibonacci-laws.md](10-fibonacci-laws.md) — the six relations (Saturn's ecliptic-retrograde perihelion is covered under Law 6)
 - [109-model-nbody-engine-and-lattice-test.md](109-model-nbody-engine-and-lattice-test.md) — the model's own N-body: audit, engine, frequencies, the lattice at its own quantity type, divisor restatement
-- [37-planets-precession-cycles.md](37-planets-precession-cycles.md) — Per-planet precession-cycle tabulation
-- [55-solar-system-resonance-cycle-periods.md](55-solar-system-resonance-cycle-periods.md) — Complete 8H/N period table (32-component L1 lattice)
+- [56-webgeocalc-explorer.md](56-webgeocalc-explorer.md) — the observed-rate explorer this document's comparisons cite
+- [41-scene-graph-hierarchy.md](41-scene-graph-hierarchy.md) — why Earth-frame measurements inherit the precession layers
 - [99-expanding-solar-system-resonance-theory.md](99-expanding-solar-system-resonance-theory.md) — ESSRT: deep-time scaling of H(t)

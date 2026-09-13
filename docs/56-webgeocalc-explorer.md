@@ -11,9 +11,9 @@ status: current
 
 The **WebGeoCalc Explorer** is a modal panel in the Tools menu that shows the actual observed perihelion-precession history of each planet, based on JPL NAIF WebGeoCalc ephemeris queries over the 1900–2026 observational baseline. For each planet it plots the three angles that describe the orientation of the orbit in the ecliptic frame — ascending node `Ω`, argument of periapsis `ω`, and longitude of perihelion `ϖ = Ω + ω` — and overlays the model's prediction so the observed data and the model can be compared directly, in the same frame the data live in.
 
-This is the panel that grounds the Holistic Universe Model's perihelion rates in *observation*, not theory. The model's Fibonacci ecliptic periods (`perihelionEclipticYears` per planet) are chosen to match what WebGeoCalc reports, not what any secular-theory textbook predicts. The Explorer makes that calibration visible.
+This is the panel that tests the Holistic Universe Model's perihelion rates against *observation*, not another theory. The model line is the N-body chain's own `ϖ(t)` — nothing in it is calibrated to WebGeoCalc; the 8H/N divisor values (`perihelionEclipticYears` per planet) remain as window-epoch descriptor labels ([doc 109 §9](109-model-nbody-engine-and-lattice-test.md)). The Explorer makes that comparison visible.
 
-> **Scope note (ESSRT).** The Explorer is inherently a present-epoch observational tool — the 1900–2026 baseline is the densest, most accurate stretch of JPL/NAIF ephemerides (DE440/DE441). The Fibonacci ecliptic-period divisors shown in the comparison column (H × 8/11, 8H/39, −8H/65, H/13, …) are scale-invariant structural quantities, but their literal rate values in ″/century are J2000-evaluated. Under [ESSRT](99-expanding-solar-system-resonance-theory.md), H(t) evolves at deep time via Drivers 1 (LOD growth) and 2 (Kepler), scaling literal rates proportionally; the structural match against WebGeoCalc is a present-epoch calibration of an underlying scale-invariant framework.
+> **Scope note (ESSRT).** The Explorer is inherently a present-epoch observational tool — the 1900–2026 baseline is the densest, most accurate stretch of JPL/NAIF ephemerides (DE440/DE441). The 8H/N ecliptic-period divisors shown in the comparison column (H × 8/11, 8H/39, −8H/65, H/13, …) are scale-invariant structural labels, but their literal rate values in ″/century are J2000-evaluated. Under [ESSRT](99-expanding-solar-system-resonance-theory.md), H(t) evolves at deep time via Drivers 1 (LOD growth) and 2 (Kepler), scaling literal rates proportionally; the comparison against WebGeoCalc is a present-epoch test of an underlying scale-invariant framework.
 
 ## Why the 1900–2026 baseline matters
 
@@ -31,13 +31,13 @@ The main result. `ϖ = Ω + ω` is the angle between the vernal equinox and the 
 
 The chart plots the unwrapped `ϖ(t)` values directly (so a monotonic precession shows as a straight line even though `ϖ` wraps every 360°). A linear regression is fit through the data and the slope is reported in `″/cy`. For planets with resolvable trends, both a raw-OLS rate and a sin+lin rate (linear + sinusoid model, removes the dominant oscillation) are reported; they should agree closely.
 
-**Overlaid in yellow**: the model's predicted `ϖ(t)` computed by integrating `predictGeocentricPrecession(year, planet)` from J2000, which combines the Fibonacci long-term-mean baseline rate and the fitted missing-advance fluctuation. When the yellow and blue curves overlap, the model reproduces the observation.
+**Overlaid in red**: the model's own `ϖ(t)` — the N-body chain's longitude of perihelion of date in the plotted ECLIPJ2000 frame (`wgcModelCurves` → `_kcPerihelionEclLonDeg`), unwrapped and branch-aligned to the observed series' start. When the red and blue curves overlap, the model reproduces the observation.
 
 ### 2. Ascending Node — `Ω` (collapsible)
 
 Longitude of the ascending node on the ecliptic, measured from the vernal equinox. Its time derivative `dΩ/dt` is the ascending-node regression rate. For most planets this is westward (retrograde) at roughly the general-precession rate; planets with strong mutual perturbations show additional drift.
 
-Collapsed by default so the primary `ϖ` chart gets full attention. The model's prediction is not overlaid here — the integrated-rate machinery is perihelion-specific.
+Collapsed by default so the primary `ϖ` chart gets full attention. The model's curve is not overlaid here — the panel plots the chain only on the primary `ϖ` chart.
 
 ### 3. Argument of Periapsis — `ω` (collapsible)
 
@@ -45,10 +45,10 @@ The angle from the ascending node to the perihelion, measured within the orbital
 
 ## Observed rates at a glance
 
-The WebGeoCalc trends extracted by the Explorer for the 1900–2026 window are summarized here (full discussion in [docs/37-planets-precession-cycles.md § Perihelion longitude advance](37-planets-precession-cycles.md)):
+The WebGeoCalc trends extracted by the Explorer for the 1900–2026 window are summarized here (the per-planet lattice-period discussion is archived — [retired record](retired-record.md); the chains + doc 109 carry the current planetary rates):
 
-| Planet | WebGeoCalc observed (ϖ̇) | Trend resolvability | Model Fibonacci (H-fraction) |
-|--------|-------------------------|---------------------|------------------------------|
+| Planet | WebGeoCalc observed (ϖ̇) | Trend resolvability | 8H/N descriptor label (″/cy at J2000) |
+|--------|-------------------------|---------------------|---------------------------------------|
 | Mercury | ~570 ″/cy prograde | ✓ resolvable | 531 (H × 8/11) |
 | Venus | ~0 ″/cy (flips sign across windows) | ✗ un-determined | −290 (−8H/6) |
 | Earth | ~<!--v:earthObservedRate-->6,186<!--/v--> ″/cy prograde (wrt equinox) | ✓ resolvable | 6,187 (H/16) |
@@ -109,7 +109,7 @@ Re-running `node tools/explore/wgc-perihelion-rates.js` regenerates the JSON fro
 │  │          ▗▘▗▘                              │         │
 │  │     ▗▘▗▘                                   │         │
 │  │ ▗▘▗▘            (blue = observed,          │         │
-│  │                  yellow = model)           │         │
+│  │                  red = model)              │         │
 │  └──────────────────────────────────────────── ┘         │
 │  Frame note: ecliptic-of-date, ≠ ICRF by H/13.          │
 │  ▶ Ascending node Ω (click to expand)                   │
@@ -126,25 +126,18 @@ Re-running `node tools/explore/wgc-perihelion-rates.js` regenerates the JSON fro
 ## Color coding
 
 - **Blue (`#268bd2`)** — observed `ϖ` data
-- **Yellow (`#ffe066`)** — model `ϖ` prediction (baseline + missing advance)
+- **Red (`#ff5252`)** — model `ϖ` (the chain's own N-body longitude of perihelion)
 - **Teal (`#2aa198`)** — observed `Ω`
 - **Olive (`#859900`)** — observed `ω`
 - **Orange (`#cb4b16`)** — un-determined-trend warning label
 
 ## Model comparison logic
 
-For the model overlay, the Explorer calls `predictGeocentricPrecession(year, planet)` at each sampled year and integrates the instantaneous rate trapezoidally from J2000 forward and backward, anchored at the JPL J2000 longitude of perihelion (`planet.longitudePerihelion`). The model's predicted `ϖ(t)` can thus be compared pointwise to the observed curve, not just through a single slope number.
+For the model overlay, the Explorer samples the chain's longitude of perihelion of date at each observed timestamp (`wgcModelCurves` → `_kcPerihelionEclLonDeg`, ECLIPJ2000 — the plotted frame), unwraps the series, and aligns its 360° branch to the observed series' start. The model's `ϖ(t)` can thus be compared pointwise to the observed curve, not just through a single slope number.
 
-The model's instantaneous rate at year Y is:
+The summary block above the chart reports the chain's 1800–2100 window rate split as **Newtonian + relativistic (1PN)** — the relativistic share is derived from the model's constants, not fitted. Nothing on the model side is calibrated to the observations; the 8H/N divisor values remain as window-epoch descriptor labels ([doc 109 §9](109-model-nbody-engine-and-lattice-test.md)).
 
-```
-ω_model(Y) = perihelionEclipticBaseline[planet]  +  missingAdvance[planet](Y)
-```
-
-- **Baseline rate**: constant, equal to `360°·3600 / H·fraction = Fibonacci long-term mean`.
-- **Missing advance**: year-dependent, fitted via the unified `PREDICT_COEFFS` predictive formula (~2,400 coefficients per planet) to reproduce observed behaviour.
-
-The yellow and blue curves tracking each other over 1900–2026 is the visual validation that the Fibonacci + missing-advance combination matches the 1900–2026 reality.
+The red and blue curves tracking each other over 1900–2026 is the visual validation that the chain matches the 1900–2026 reality.
 
 ## Scope and limitations
 
@@ -156,10 +149,8 @@ The yellow and blue curves tracking each other over 1900–2026 is the visual va
 
 ## Related documentation
 
-- [Mercury Precession Breakdown](13-mercury-precession-breakdown.md) — First-order Laplace-Lagrange analysis, reference-frame discussion, why the model's Fibonacci framework matches WebGeoCalc where L-L fails.
-- [Planets Precession Cycles](37-planets-precession-cycles.md) — Full per-planet tables (axial, perihelion ecliptic, ICRF, ascending node, obliquity, eccentricity) with Fibonacci fractions and WebGeoCalc / Laskar references.
-- [Solar System Resonance Cycle Periods](55-solar-system-resonance-cycle-periods.md) — The period table modal; shows each WebGeoCalc-observed rate next to the model's Fibonacci fraction.
-- [Perihelion Precession](12-perihelion-precession.md) — The three methods used inside the simulation for computing perihelion longitude and precession (scene-graph, ICRF analytical, predictive formula).
+- [Mercury Precession Breakdown](13-mercury-precession-breakdown.md) — First-order Laplace-Lagrange analysis, reference-frame discussion, why the model's two-frame treatment matches WebGeoCalc where ecliptic-only L-L fails; also the quantities and methods used inside the simulation for computing perihelion longitude and precession.
+- [109 - The Model's Own N-body](109-model-nbody-engine-and-lattice-test.md) — the measured planetary frequencies and the per-planet quantity types the Explorer's comparisons rest on (the per-planet cycle tabulations are archived — [retired record](retired-record.md)).
 - [Constants Reference § Observed trend rates](20-constants-reference.md) — The constants block that feeds the display.
 - [Expanding Solar System Resonance Theory](99-expanding-solar-system-resonance-theory.md) — Deep-time scaling of H(t) for the literal rates the Explorer compares.
 
