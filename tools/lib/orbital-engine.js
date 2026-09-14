@@ -683,12 +683,12 @@ function computePerihelionPrecession(anomalisticYearSec, solarYearSec) {
 }
 
 /**
- * Compute inclination precession period (in years).
+ * Compute the apsidal precession period vs the fixed stars (in years) — historically "inclination precession"; the identifier keeps the old name.
  * For Earth: H/3 = 111,772 yr. For planets: perihelionEclipticYears.
  * Source: constants — this is a fixed period per planet.
  *
  * @param {string} planetName - planet key or 'earth'
- * @returns {number} inclination precession period in years
+ * @returns {number} apsidal precession period in years
  */
 function computeInclinationPrecessionPeriod(planetName) {
   if (planetName === 'earth') return C.H / 3;

@@ -42,7 +42,7 @@ with **N = 33 integer divisors** of 8H (the canonical L1 lattice — see [doc 92
 3. **The 100-kyr glacial cycle is an inclination-side eigenmode beat, not direct eccentricity forcing.**
    - The dominant 100-kyr-band centroid sits at **n = 25 = 107.3 kyr**, corresponding to the **s₁−s₄ Mercury-Mars nodal beat** — a planet-pair orbital-plane coupling, not an eccentricity beat.
    - Standard direct-eccentricity attribution fails two specific tests: the 405-kyr term (g₂−g₅ in standard labeling) is essentially absent in post-MPT LR04 (amplitude ratio 0.12), and bispectral analysis finds no significant 95k + 125k phase coupling. In this framework the 405-kyr cycle is modelled as climate-internal carbon-cycle resonance, not as a Venus-Jupiter beat (see §13).
-   - This vindicates Muller & MacDonald 1997's broader "inclination, not eccentricity" framing — though the empirical signal is a *planet-pair* nodal beat, not Earth's intrinsic inclination precession period.
+   - This vindicates Muller & MacDonald 1997's broader "inclination, not eccentricity" framing — though the empirical signal is a *planet-pair* nodal beat, not Earth's intrinsic H/3 (apsidal-precession) period.
    - At T ≈ 1.2 Myr the Rayleigh resolution at P = 110 kyr is ΔP ≈ 10 kyr, so 95k / 100k / 112k are spectrally collinear — but the structural failure modes of eccentricity attribution discriminate cleanly.
 
 4. **Pre-MPT and post-MPT differ in climate sensitivity, not orbital forcing.** Orbital forcing is essentially stationary over 5.3 Myr (planetary eigenmodes don't change). LR04's volatility growth from left to right reflects climate-system response changing: Northern Hemisphere ice-sheet establishment around the late Pliocene cooling onset (~2.7 Ma BC), and the Mid-Pleistocene Transition (~1 Ma BC) where ice-sheet hysteresis crossed a threshold and shifted dominance from 41-kyr-band to 100-kyr-band response. The 8H formula captures the orbital forcing alone, with stationary amplitudes throughout.
@@ -99,7 +99,7 @@ The Fibonacci H/n anchors remain real in Earth's intrinsic frame, but in the hel
 |---|---|---|
 | H/8 = 41.91 kyr (obliquity) | k+s₃ = 41.27 kyr (n=65) | 0.6 kyr |
 | H/16 = 20.96 kyr (perihelion precession) | k+g₂ = 22.4, k+g₅ = 23.7 kyr (n=120, 113) — climatic precession peaks | 1.4–2.7 kyr |
-| H/3 = 111.77 kyr (inclination precession) | s₁−s₄ = 107.3 kyr (n=25) | 4.5 kyr |
+| H/3 = 111.77 kyr (apsidal precession) | s₁−s₄ = 107.3 kyr (n=25) | 4.5 kyr |
 
 Both descriptions of the same physics are valid — they measure the same geometry in different reference frames. The intrinsic H/n positions in the climate spectrum therefore appear **near zero amplitude**: the energy has been carried into the offset positions by the frame transformation.
 
@@ -236,7 +236,7 @@ LR04's 100-kyr band is a **broad single peak spanning ~80–125 kyr** — not th
 
 The dominant 100-kyr-band integer n = 25 corresponds to the **s₁ − s₄ Mercury-Mars nodal beat** in eigenmode terms (predicted 25.11 in 8H units, error 0.11). This is a *nodal* (orbital-plane) beat between two inner rocky planets, not an eccentricity beat.
 
-Consistent in spirit with Muller & MacDonald 1997's "inclination, not eccentricity" framing, with a specific eigenmode identification not previously stated. The model's H/3 = 111.77 kyr inclination precession claim sits in the same Rayleigh-limited band as this centroid.
+Consistent in spirit with Muller & MacDonald 1997's "inclination, not eccentricity" framing, with a specific eigenmode identification not previously stated. The model's H/3 = 111.77 kyr apsidal-precession-period claim sits in the same Rayleigh-limited band as this centroid.
 
 ### 4.3 The Rayleigh resolution limit
 
@@ -278,7 +278,7 @@ The Holistic model's broader claim — that the 100-kyr cycle is in the **inclin
 - **Consistent** with Muller & MacDonald 1997's "inclination, not eccentricity" framing
 - **Distinguished from eccentricity attribution** by the asymmetry table above (405-kyr absence, no bispectral coupling, wrong-family centroid identification)
 
-The model's specific theoretical mechanism — Earth's intrinsic H/3 = 111.77 kyr inclination precession producing a second obliquity component (§4.9) — is *one* candidate inclination-related contribution within this framework. The empirically dominant signal is the Mercury-Mars planet-pair nodal beat, not Earth's intrinsic precession period (which has near-zero amplitude at n=24 in the climate spectrum — the Fibonacci H/n positions are empty). At Rayleigh resolution the two cannot be individually distinguished, but both sit on the inclination/orbital-plane side rather than the eccentricity side.
+The model's specific theoretical mechanism — Earth's intrinsic H/3 = 111.77 kyr period (the apsidal precession) producing a second obliquity component (§4.9) — is *one* candidate inclination-related contribution within this framework. The empirically dominant signal is the Mercury-Mars planet-pair nodal beat, not Earth's intrinsic precession period (which has near-zero amplitude at n=24 in the climate spectrum — the Fibonacci H/n positions are empty). At Rayleigh resolution the two cannot be individually distinguished, but both sit on the inclination/orbital-plane side rather than the eccentricity side.
 
 ### 4.7 What the data cannot determine, and what would settle it
 
@@ -322,7 +322,7 @@ The Holistic model also proposes a candidate **dust-free climate-coupling mechan
 
 > Inclination-related orbital-plane oscillations (model: H/3 second obliquity component; data: Mercury-Mars nodal beat at ~107 kyr) → modulated obliquity → standard Milankovitch insolation forcing → ice sheets
 
-Every step after "modulated obliquity" is standard Milankovitch physics; the mechanism needs no new forcing. The model's specific proposal that Earth's intrinsic H/3 inclination precession produces a second obliquity component at the same period is one theoretical pathway *within* this broader inclination-side family; the empirical signal is consistent with this family but does not single out H/3 specifically. See [supporting-evidence §6](https://www.holisticuniverse.com/en/model/supporting-evidence) for the model's full mechanism statement.
+Every step after "modulated obliquity" is standard Milankovitch physics; the mechanism needs no new forcing. The model's specific proposal that Earth's intrinsic H/3 (apsidal-precession) period produces a second obliquity component at the same period is one theoretical pathway *within* this broader inclination-side family; the empirical signal is consistent with this family but does not single out H/3 specifically. See [supporting-evidence §6](https://www.holisticuniverse.com/en/model/supporting-evidence) for the model's full mechanism statement.
 
 Reproducer: `scripts/milankovitch_spectral_tests.py` and `scripts/milankovitch_candidate_amplitudes.py`; results in `data/milankovitch-spectral-results.json` and `data/milankovitch-candidate-amplitudes.json`.
 

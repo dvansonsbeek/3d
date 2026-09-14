@@ -73,7 +73,7 @@ Note: The tropical year mean is quantized at H/8 resolution (the obliquity cycle
 The ratios `H/(H−13)` and `H/(H−16)` come from the coin rotation paradox:
 - In one axial precession cycle (H/13), there is exactly **1 fewer sidereal year than tropical years** — the precessing equinox "absorbs" one full orbit
 - In one perihelion precession cycle (H/16), there is exactly **1 fewer anomalistic year than tropical years** — the precessing perihelion "absorbs" one full orbit
-- In one inclination precession cycle (H/3), there is exactly **1 fewer anomalistic year than sidereal years**
+- In one apsidal precession cycle (H/3), there is exactly **1 fewer anomalistic year than sidereal years**
 
 
 ## Fourier Harmonic Variations
@@ -236,7 +236,7 @@ The H/5 correction represents Earth's need to rotate slightly MORE per solar day
 δ_LOD = LOD_mean × δ_rev = LOD_mean / ((H/5) × mSY)      ≈ 3.527 ms per solar day
 ```
 
-**Why H/5 (not H/3):** the correction's reference frame must be the Sun's apparent motion (which follows the ecliptic, precesses at H/5). The H/3 inclination precession applies to the invariable-plane frame, which is not the reference used for the solar-day counting.
+**Why H/5 (not H/3):** the correction's reference frame must be the Sun's apparent motion (which follows the ecliptic, precesses at H/5). The H/3 apsidal precession is a fixed-frame (ICRF) construction, not the ecliptic-of-date reference used for the solar-day counting.
 
 **Where each is used:**
 

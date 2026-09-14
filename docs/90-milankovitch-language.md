@@ -7,9 +7,9 @@ status: current
 
 # Milankovitch Language of the Holistic Model
 
-> **TL;DR.** The Holistic model has **five** natural Milankovitch-band periods, all integer divisors of H, structured into a closed Fibonacci algebra: **H/3 inclination precession (<!--v:earthPeriPeriodICRF-->111,772<!--/v--> yr), H/5 ecliptic precession (<!--v:hDiv5-->67,063<!--/v--> yr), H/8 obliquity oscillation (<!--v:hDiv8-->41,915<!--/v--> yr), H/13 axial precession (<!--v:earthAxialPeriod-->25,794<!--/v--> yr), and H/16 perihelion precession (<!--v:earthPeriPeriod-->20,957<!--/v--> yr)**. These satisfy four beat-frequency identities (13−5=8, 13+3=16, 8−5=3, 13−8=5) that close *only because* the divisors are Fibonacci. Standard secular theory recovers the same periods to within 0.06–2.8 % — including all six Berger 1978 climatic-precession peaks (at ~19–24 kyr) within 0.7 % when expressed as 8H/n integer divisors. *Note: in this framework H/16 = <!--v:earthPeriPeriod-->20,957<!--/v--> yr is **perihelion precession** (the rotation of Earth's apsidal line in the ecliptic frame), distinct from **climatic precession** (~23.7 kyr dominant, the parameter e·sin ϖ that drives seasonal insolation — captured in the 8H lattice at n=113 and n=120).*
+> **TL;DR.** The Holistic model has **five** natural Milankovitch-band periods, all integer divisors of H, structured into a closed Fibonacci algebra: **H/3 apsidal precession (<!--v:earthPeriPeriodICRF-->111,772<!--/v--> yr; historically "inclination precession" in this framework), H/5 ecliptic precession (<!--v:hDiv5-->67,063<!--/v--> yr), H/8 obliquity oscillation (<!--v:hDiv8-->41,915<!--/v--> yr), H/13 axial precession (<!--v:earthAxialPeriod-->25,794<!--/v--> yr), and H/16 perihelion precession (<!--v:earthPeriPeriod-->20,957<!--/v--> yr)**. These satisfy four beat-frequency identities (13−5=8, 13+3=16, 8−5=3, 13−8=5) that close *only because* the divisors are Fibonacci. Standard secular theory recovers the same periods to within 0.06–2.8 % — including all six Berger 1978 climatic-precession peaks (at ~19–24 kyr) within 0.7 % when expressed as 8H/n integer divisors. *Note: in this framework H/16 = <!--v:earthPeriPeriod-->20,957<!--/v--> yr is **perihelion precession** (the rotation of Earth's apsidal line in the ecliptic frame), distinct from **climatic precession** (~23.7 kyr dominant, the parameter e·sin ϖ that drives seasonal insolation — captured in the 8H lattice at n=113 and n=120).*
 >
-> For the **100-kyr ice age problem**, the model's H/3 = <!--v:earthPeriPeriodICRF-->111,772<!--/v--> yr inclination precession lies in the same Rayleigh-limited band as the empirical centroid (Mercury-Mars s₁−s₄ nodal beat at ~107 kyr) — both sit on the *inclination-side / orbital-plane* family of eigenmode beats that Muller & MacDonald (1997, *PNAS*) argued for spectrally over direct eccentricity.
+> For the **100-kyr ice age problem**, the model's H/3 = <!--v:earthPeriPeriodICRF-->111,772<!--/v--> yr apsidal-precession period lies in the same Rayleigh-limited band as the empirical centroid (Mercury-Mars s₁−s₄ nodal beat at ~107 kyr) — both sit on the *inclination-side / orbital-plane* family of eigenmode beats that Muller & MacDonald (1997, *PNAS*) argued for spectrally over direct eccentricity.
 >
 > Companion docs: [91 — Milankovitch Evidence & Hypothesis Tests](91-milankovitch-evidence.md) (empirical 33-component 8H Orbital Forcing Formula + 14 hypothesis tests + 405-kyr off-lattice characterization); [92 — Climate Formula: Architecture, Variance & Implementation](92-climate-formula.md) (canonical L1+L2+L3 modular formula + per-regime ridge fits across LR04 / CENOGRID / EPICA / CenCO2PIP + Climate Formula Explorer modal).
 
@@ -48,7 +48,7 @@ The "100-kyr problem" is that standard eccentricity has *split* peaks at 95 & 12
 
 | Cycle | Model formula | Years | Source |
 |---|---|---:|---|
-| **Inclination precession** | H/3 | **<!--v:earthPeriPeriodICRF-->111,772<!--/v-->** | Earth's orbital plane → invariable plane oscillation |
+| **Apsidal precession** | H/3 | **<!--v:earthPeriPeriodICRF-->111,772<!--/v-->** | Earth's apsidal line vs the fixed stars (ICRF perihelion); §4.9 proposes an orbital-plane component at this period |
 | **Ecliptic precession** | H/5 | **<!--v:hDiv5-->67,063<!--/v-->** | Earth's orbital plane regression around the invariable plane = **nodal regression** (`f_nodal` in §3); coincides with Jupiter's *Fibonacci-anchor* perihelion (Jupiter's 8H-lattice secular ecliptic perihelion is 8H/39 = <!--v:jupiterPeriPeriod-->68,783<!--/v--> yr) |
 | **Obliquity oscillation** | H/8 | **<!--v:hDiv8-->41,915<!--/v-->** | Beat: f_axial − f_nodal (13 − 5 = 8 in H/n indices) |
 | **Axial precession** | H/13 | **<!--v:earthAxialPeriod-->25,794<!--/v-->** | Earth's spin-axis equinox precession |
@@ -172,7 +172,7 @@ The model's broader claim — that the 100-kyr cycle sits in the **inclination-s
 
 Within that inclination-side family, the model **proposes** a specific dust-free mechanism:
 
-$$\text{Inclination precession (H/3)} \;\rightarrow\; \text{second obliquity component at H/3} \;\rightarrow\; \text{standard Milankovitch insolation forcing} \;\rightarrow\; \text{ice sheets}$$
+$$\text{Apsidal precession period (H/3)} \;\rightarrow\; \text{second obliquity component at H/3} \;\rightarrow\; \text{standard Milankovitch insolation forcing} \;\rightarrow\; \text{ice sheets}$$
 
 Earth's actual obliquity would then have **two** components — one at H/8 ≈ 41 kyr (the well-known Berger 1978 obliquity cycle) and a second at H/3 ≈ 112 kyr. Standard secular theory distributes the H/3 component across smaller spectral terms rather than recognising it as one peak. Every step after "second obliquity component" is standard Milankovitch physics; the mechanism needs no new forcing.
 

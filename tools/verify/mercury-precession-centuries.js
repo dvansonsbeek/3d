@@ -68,7 +68,7 @@ console.log('│                                                                
 console.log('│ Earth Precession Cycles:                                                    │');
 console.log(`│   Axial precession:                ${earthAxialPrecessionPeriod.toFixed(0).padStart(12)} years                │`);
 console.log(`│   Obliquity cycle:                 ${earthObliquityPeriod.toFixed(0).padStart(12)} years                │`);
-console.log(`│   Inclination precession:          ${earthInclinationPrecessionPeriod.toFixed(0).padStart(12)} years                │`);
+console.log(`│   Apsidal precession:              ${earthInclinationPrecessionPeriod.toFixed(0).padStart(12)} years                │`);
 console.log(`│   Ecliptic precession:             ${earthEclipticPrecessionPeriod.toFixed(0).padStart(12)} years                │`);
 console.log('│                                                                             │');
 console.log(`│ Dominant Fluctuation Period:       ${dominantFluctuationPeriod.toFixed(0).padStart(12)} years                │`);
@@ -117,7 +117,7 @@ console.log('══════════════════════�
 console.log('');
 console.log('The ~7,400 year period arises from beat frequencies between:');
 console.log('');
-console.log('  Earth\'s inclination precession:    1/3 of Earth Fundamental Cycle   (111,772 years)');
+console.log('  Earth\'s apsidal precession:        1/3 of Earth Fundamental Cycle   (111,772 years)');
 console.log('  Earth\'s ecliptic precession:       1/5 of Earth Fundamental Cycle   (67,063 years)');
 console.log('');
 console.log('  Beat frequency: 1/(1/3 - 1/5) = 15/2 → ~44,518 years fundamental');

@@ -386,7 +386,7 @@ export const VALUES = {
     get: () => C.H,
     render: (v) => `8 × ${thousands(v)}`,
   },
-  ...hDivisor('inclPrec', 3, 'inclination precession'),
+  ...hDivisor('inclPrec', 3, 'apsidal precession (key keeps the historical inclPrec name)'),
   ...hDivisor('eclPrec', 5, 'ecliptic precession'),
   ...hDivisor('obliqCycle', 8, 'obliquity cycle'),
   ...hDivisor('axialPrec', 13, 'axial precession', 2),

@@ -68,7 +68,7 @@ ecliptic value. Two implementations exist:
 ### The Earth-frame fluctuation pattern
 
 The dominant ~7,451-yr period is `H/45` — the 6th harmonic of the beat
-between Earth's inclination precession (H/3) and ecliptic precession
+between Earth's apsidal precession (H/3) and ecliptic precession
 (H/5): `1/(1/3 − 1/5) = 7.5`, so the fundamental beat is H/7.5 ≈ 44,709 yr
 and its 6th harmonic is H/45. The fluctuation arises because a planet's
 perihelion marker inherits Earth's precession-layer transformations in

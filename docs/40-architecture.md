@@ -535,7 +535,7 @@ identities remain the kinematic family beside them.
 |-------|--------|-------------|
 | **Axial Precession** | H/13 | Earth's rotational axis wobble |
 | **Perihelion Precession** | H/16 | Closest approach point shifts (climatic precession) |
-| **Inclination Precession** | H/3 | Orbital plane tilt variation |
+| **Apsidal Precession** | H/3 | Perihelion revolution vs the fixed stars |
 | **Obliquity Cycle** | H/8 | Axial tilt oscillation (~22.2° - ~24.7°) |
 | **Eccentricity Cycle** | H/16 (+ derived H/3 coupling) | Orbital shape variation |
 

@@ -238,7 +238,7 @@ See the [Python Scripts README](../scripts/README.md) and [Predictive Formula Gu
 |---------|-------|-------------|
 | Earth Fundamental Cycle (H) | <!--v:H-->335,317<!--/v--> years | Complete cycle unifying all precession movements |
 | Axial Precession | H/13 (<!--v:axialPrecRound-->~25,794<!--/v--> yr) | Earth's wobble around the EARTH-WOBBLE-CENTER |
-| Inclination Precession | H/3 (<!--v:inclPrecYears-->~111,772<!--/v--> yr) | PERIHELION-OF-EARTH orbit period |
+| Apsidal Precession | H/3 (<!--v:inclPrecYears-->~111,772<!--/v--> yr) | PERIHELION-OF-EARTH orbit period |
 | Perihelion Precession | H/16 (<!--v:periPrecYears-->~20,957<!--/v--> yr) | Combined cycle where axial meets inclination |
 | Obliquity Range | ~22.1° – ~24.5° | Earth's axial tilt oscillation |
 

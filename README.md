@@ -25,7 +25,7 @@ The model starts from a single observation: two of Earth's precession motions ro
 | Motion | Direction | Cycle |
 |--------|-----------|-------|
 | Axial Precession | Clockwise | <!--v:axialPrecRound-->~25,794<!--/v--> years |
-| Inclination Precession | Counter-clockwise | <!--v:inclPrecYears-->~111,772<!--/v--> years |
+| Apsidal Precession | Counter-clockwise | <!--v:inclPrecYears-->~111,772<!--/v--> years |
 
 These two counter-rotating motions interact in a **Fibonacci ratio of 3:13** — the measured J2000 configuration (the restated relations below carry the honest typing). From this starting point, the model derives what is normally calculated separately: precession of the equinoxes, obliquity oscillation, eccentricity cycles, Milankovitch beat frequencies, the length of days and years, and the orbital-forcing component of climate (the timing of glacial-interglacial cycles).
 
@@ -69,7 +69,7 @@ See the [Fibonacci relations documentation](docs/10-fibonacci-laws.md) for the f
 The Sun is still the center of our solar system. The model uses a geo-heliocentric frame — viewing from Earth's perspective — to make the two counter-rotating precession motions visible:
 
 - **Earth's wobble center** (the EARTH-WOBBLE-CENTER marker) circles Earth clockwise in <!--v:axialPrecRound-->~25,794<!--/v--> years — this is axial precession
-- **Earth's perihelion point** wobbles counter-clockwise around the Sun in <!--v:inclPrecYears-->~111,772<!--/v--> years — this is inclination precession
+- **Earth's perihelion point** wobbles counter-clockwise around the Sun in <!--v:inclPrecYears-->~111,772<!--/v--> years — this is apsidal precession
 - These two motions **meet every <!--v:periPrecYears-->~20,957<!--/v--> years** — producing perihelion precession
 - Earth orbits its perihelion point (close to the Sun) in 1 solar year; the seven planets follow their own N-body element chains (Kepler ellipses of date)
 
@@ -271,7 +271,7 @@ The cardinal points (solstices/equinoxes) are **derived, not independently fitte
 
 - **Master cycle**: <!--v:H-->335,317<!--/v--> years at J2000 (the Earth Fundamental Cycle, H; slowly evolves under deep-time tidal evolution)
 - **Axial precession**: <!--v:axialPrecRound-->~25,794<!--/v--> years (H/13)
-- **Inclination precession**: <!--v:inclPrecYears-->~111,772<!--/v--> years (H/3)
+- **Apsidal precession**: <!--v:inclPrecYears-->~111,772<!--/v--> years (H/3)
 - **Perihelion precession**: <!--v:periPrecYears-->~20,957<!--/v--> years (H/16)
 - **Model parameters**: only **6 free parameters** for the entire model; everything else is derived or anchored to astronomical observations (the full accounting is in the [Constants Reference](docs/20-constants-reference.md))
 

@@ -147,6 +147,11 @@ The Earth object itself represents **Axial Precession**:
 
 ### 5.2 Inclination Precession
 
+> **Naming note:** physically this is the **apsidal precession** wheel — the
+> ICRF-perihelion revolution (H/3). The scene node and this document keep the
+> historical name "Inclination Precession" because they document the code's
+> own identifiers (doc 03 glossary carries the rename).
+
 | Property | Value | Meaning |
 |----------|-------|---------|
 | speed | +2π / (H/3) | Counter-clockwise |

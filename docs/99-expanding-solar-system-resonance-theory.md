@@ -91,7 +91,7 @@ thing. The seam between them is not a modelling choice; nature put it there.
 
 | | **Engine K — rotation & tides** | **Engine D — orbits** |
 |---|---|---|
-| Headline clock | axial precession (H/13) | perihelion / inclination precession (the g/s modes) |
+| Headline clock | axial precession (H/13) | apsidal / nodal precession (the g/s modes) |
 | Full family | day length (LOD), the obliquity band, lunar recession, H(t), the eclipse/ΔT timing chain | *all* orbital-element motions of *all* planets: apsidal, nodal, eccentricity and inclination oscillations, the 405-kyr beat |
 | Interaction | Earth–Moon (tidal, dissipative) | planet–planet (gravitational, conservative) |
 | Its expansion tier | **the tidal expansion**: the Moon recedes, the day lengthens, H(t) grows | **the solar-mass expansion**: every orbit swells as 1/M_Sun as the Sun loses mass |
@@ -169,7 +169,7 @@ The asymmetry inside 13:3 is real and is now the model's structure:
   the axial-precession period, tied to LOD and the tidal chain. That clock
   genuinely scales with H(t) into deep time, and the rock confirms it (the
   falsification criterion's first leg).
-- **The 3 is observational.** "Inclination precession = H/3" is the J2000
+- **The 3 is observational.** "Apsidal precession = H/3" is the J2000
   reading of a wandering dynamical quantity that sits on the Fibonacci
   anchor now. The snap-epoch search (doc 109) made this sharp: J2000 *is*
   the epoch where the free dynamics and the lattice line touch.
@@ -642,7 +642,7 @@ Earth must spin this additional fraction to catch the Sun on the meridian, addin
 
 **The H/13 axial precession is already implicit** in the framework's baseline. The H/13 identity is `sidereal_year_days_kinematic = mSY × H / (H − 13)` — the −13 in the denominator IS the axial precession contribution (over H tropical years, the sidereal frame counts H−13 years because Earth's spin axis has completed 13 full precession cycles). Adding an explicit H/13 correction to LOD_mean would double-count.
 
-**H/3 inclination precession is an invariable-plane-frame effect** — it rotates Earth's orbital *plane* relative to ICRF, but the Sun's apparent longitude is measured in the ecliptic-of-date, so the inclination cycle does not enter the day-length count directly.
+**H/3 apsidal precession is a fixed-frame (ICRF) construction** — the PERIHELION-OF-EARTH wheel rotates relative to ICRF, but the Sun's apparent longitude is measured in the ecliptic-of-date, so the H/3 cycle does not enter the day-length count directly.
 
 **H/8 obliquity is an oscillation**, not a monotonic precession — time-averaged contribution to LOD is zero.
 

@@ -97,7 +97,7 @@ function createYearLengths({ sampleAt, massLossSiderealSecondsAtYearFn, apsidalS
     axialPrecessionYearsAtYear: (y) => { const s = sid(y), t = trop(y); return s / (s - t); },
     /** Perihelion (apsidal-vs-equinox) precession period of date, years. @param {number} y */
     perihelionPrecessionYearsAtYear: (y) => { const a = anom(y), t = trop(y); return a / (a - t); },
-    /** Inclination precession period of date, years (hypersensitive: ±1 s ↔ ≈400 yr). @param {number} y */
+    /** Apsidal precession period of date vs the fixed stars, years (hypersensitive: ±1 s ↔ ≈400 yr; the identifier keeps the historical "inclination" name). @param {number} y */
     inclinationPrecessionYearsAtYear: (y) => { const a = anom(y), s = sid(y); return a / (a - s); },
     /** The per-cardinal layer (D6 rules: year lengths λ̇-corrected; offsets/spreads raw — μs-class/second-order there). */
     cardinal: Object.freeze({

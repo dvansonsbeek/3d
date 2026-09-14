@@ -14,10 +14,10 @@ This glossary defines the key terms used throughout the documentation. For a com
 ## Core Model Concepts
 
 ### Holistic Universe Model
-A geo-heliocentric framework that models the solar system through two interacting forces: axial precession (clockwise) and inclination precession (counter-clockwise). These opposing movements generate all observable precession phenomena.
+A geo-heliocentric framework that models the solar system through two interacting forces: axial precession (clockwise) and apsidal precession (counter-clockwise). These opposing movements generate all observable precession phenomena.
 
 ### Earth Fundamental Cycle
-The grand cycle (H) where all precession movements complete and realign. Comprises 13 axial precession cycles, 3 inclination precession cycles, and 16 perihelion precession cycles. See [Constants Reference](20-constants-reference.md) for the current value of H. Under [ESSRT](#expanding-solar-system-resonance-theory-essrt), H(t) evolves at deep time — the integer divisors above (13, 3, 16) stay constant; only the literal year count of H scales.
+The grand cycle (H) where all precession movements complete and realign. Comprises 13 axial precession cycles, 3 apsidal precession cycles, and 16 perihelion precession cycles. See [Constants Reference](20-constants-reference.md) for the current value of H. Under [ESSRT](#expanding-solar-system-resonance-theory-essrt), H(t) evolves at deep time — the integer divisors above (13, 3, 16) stay constant; only the literal year count of H scales.
 
 ### Solar System Resonance Cycle (8H)
 Eight Earth Fundamental Cycles. The fundamental super-period of the solar system at which every major planetary cycle (axial precession, perihelion precession, inclination oscillation, ascending node regression, obliquity oscillation, eccentricity oscillation) across all 8 planets divides evenly as an integer. The 32-component **L1 integer-divisor lattice** lives here. At J2000 8H = <!--v:eightH-->2,682,536<!--/v--> years; the per-planet 8H/N tabulation is archived ([retired record](retired-record.md) — the planets' periods are now dynamical outputs of the chains, [doc 109](109-model-nbody-engine-and-lattice-test.md)); see [Doc 99 — ESSRT](99-expanding-solar-system-resonance-theory.md) for the theoretical framework.
@@ -38,11 +38,11 @@ A reference frame that is heliocentric (Earth orbits the Sun) but viewed from Ea
 ### Axial Precession
 The slow wobble of Earth's rotational axis, causing the celestial poles to trace circles against the stars. Period: H/13 years in the Holistic Model.
 
-### Inclination Precession
-The slow rotation of PERIHELION-OF-EARTH around the EARTH-WOBBLE-CENTER. Period: H/3 years. Causes Earth's orbital plane to tilt relative to the invariable plane.
+### Apsidal Precession
+The slow rotation of PERIHELION-OF-EARTH around the EARTH-WOBBLE-CENTER — the perihelion's revolution against the fixed stars. Period: H/3 years. (Historically called "inclination precession" in this framework, after the retired assumption tying the inclination cycle to this period; the orbital plane's motion is the separate nodal story. Scene nodes and code identifiers keep the historical name.)
 
 ### Perihelion Precession
-The advancement of the perihelion point (closest approach to Sun) through the zodiac. Period: H/16 years. Results from the interaction of axial and inclination precession.
+The advancement of the perihelion point (closest approach to Sun) through the zodiac. Period: H/16 years. Results from the interaction of axial and apsidal precession.
 
 ### Nodal Precession
 The westward drift of orbital nodes (where an orbit crosses a reference plane). For the Moon, this takes approximately 18.6 years.

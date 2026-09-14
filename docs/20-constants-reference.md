@@ -199,7 +199,7 @@ These are computed from foundational constants. The formula is the definition; t
 
 | Cycle | Formula | Period (years) | Direction |
 |-------|---------|----------------|-----------|
-| Inclination Precession | H / 3 | <!--v:inclPrecYears-->~111,772<!--/v--> | Counter-clockwise |
+| Apsidal Precession | H / 3 | <!--v:inclPrecYears-->~111,772<!--/v--> | Counter-clockwise |
 | Ecliptic Precession | H / 5 | <!--v:eclPrecYears-->~67,063<!--/v--> | Counter-clockwise |
 | Obliquity Cycle | H / 8 | <!--v:obliqCycleYears-->~41,915<!--/v--> | Clockwise (negative) |
 | Axial Precession | H / 13 | <!--v:axialPrecRound-->~25,794<!--/v--> | Clockwise (negative) |

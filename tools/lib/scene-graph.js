@@ -904,7 +904,7 @@ function buildSceneGraph() {
     tilt: 0,
     startPos: (C.balancedYear - startModelYearWithCorrection) / (H / 3) * 360,
     speed: Math.PI * 2 / (H / 3),
-    _dtCycleN: 3, _dtCycleSign: +1,   // Phase 9.12: H/3 inclination precession, prograde
+    _dtCycleN: 3, _dtCycleSign: +1,   // Phase 9.12: H/3 apsidal precession (historical name: inclination), prograde
   });
   earthNodes.pivot.addChild(earthInclPrec.container);
 

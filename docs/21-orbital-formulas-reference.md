@@ -248,7 +248,7 @@ Naming taxonomy: `_Kinematic` = framework kinematic day units; `_Real` = physica
 | Variable | Description |
 |----------|-------------|
 | `o.axialPrecession` | Current axial precession cycle (years) — framework identity: H/13 |
-| `o.inclinationPrecession` | Current inclination precession cycle (years) — framework identity: H/3 |
+| `o.inclinationPrecession` | Apsidal precession beat of date (years) — framework identity: H/3 (the identifier keeps the historical name) |
 | `o.perihelionPrecession` | Internal kinematic perihelion beat (years) — framework identity: H/16. The DISPLAYED of-date value is the one-source family's beat (`predictions.perihelionPrecession`) |
 | `o.obliquityPrecession` | Current obliquity precession cycle (years) — framework identity: H/8 |
 | `o.eclipticPrecession` | Current ecliptic precession cycle (years) — framework identity: H/5 |

@@ -15,7 +15,7 @@ The Holistic Universe Model is a geo-heliocentric framework that describes plane
 
 The solar system is remarkably complex, yet its primary movements can be modeled by simulating just two counter-rotating forces:
 - **Axial precession** moves clockwise
-- **Inclination precession** moves counter-clockwise
+- **Apsidal precession** moves counter-clockwise
 
 These opposing movements generate all the observable dynamics of Earth, the Moon, planets, and the Sun.
 
@@ -41,7 +41,7 @@ In the 3D simulation, this point is visualized as "The Death Star."
 This point determines Earth's varying distance to the Sun throughout the year (perihelion around January 3rd, aphelion around July 4th).
 
 - It orbits **counter-clockwise** around the EARTH-WOBBLE-CENTER
-- One complete orbit takes approximately **H/3 years** (<!--v:inclPrecYears-->~111,772<!--/v--> years, inclination precession; see [Constants Reference](20-constants-reference.md))
+- One complete orbit takes approximately **H/3 years** (<!--v:inclPrecYears-->~111,772<!--/v--> years, apsidal precession; see [Constants Reference](20-constants-reference.md))
 - This slowly changes Earth's argument of periapsis relative to the fixed stars
 
 In the 3D simulation, this appears as a white dot.
@@ -64,13 +64,13 @@ The Earth Fundamental Cycle is the grand unified cycle where all celestial movem
 | Cycle | Formula | Count per Earth Fundamental Cycle |
 |-------|---------|------------------------|
 | Axial Precession | H / 13 | 13 cycles |
-| Inclination Precession | H / 3 | 3 cycles |
+| Apsidal Precession | H / 3 | 3 cycles |
 | Perihelion Precession | H / 16 | 16 cycles |
 
 ### The Fibonacci Connection
 
-The ratio between axial and inclination precession cycles follows a Fibonacci pattern:
-- **3:13** - inclination to axial cycles
+The ratio between axial and apsidal precession cycles follows a Fibonacci pattern:
+- **3:13** - apsidal to axial cycles
 - This suggests the solar system naturally tends toward balanced, harmonious relationships
 
 ### The Six Determining Factors
