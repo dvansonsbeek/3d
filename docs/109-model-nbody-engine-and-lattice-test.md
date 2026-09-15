@@ -825,6 +825,68 @@ never from this paragraph.** The gate is
 fail-proven (a silent frame swap trips the pole-class gate; a
 pole-sign bug trips the origin-RA gate).
 
+## 21. The planets' mean motions of date — and the model measuring its own resonances (C1/C2)
+
+The panel period rows for the seven chain planets ride a per-planet λ̇
+channel banked from the ±10 Myr run — the Earth D6 sidereal-year
+recipe mirrored verbatim (wrap-counted mean-longitude rate, 2-kyr
+boxcar, banked as a ratio ≡ 1 at the J2000 node;
+`bodies.<planet>.lamDotRel` in `data/nbody-secular-series.json`). The
+displayed composition is three named tiers, each ≡ 1 at J2000:
+
+    n_p(y) = λ̇₀ · lamDotRel_p(y) / massLossRatio(y)
+
+λ̇₀ is the run's secular J2000 rate; `lamDotRel` the planet's own
+constant-GM drift (clamped beyond the span — never extrapolated);
+`massLossRatio` the ONE Driver-2 solar-mass law shared by every
+heliocentric orbit — planet-independence of the μ-response is exact at
+the two-body level, and the browser probe reproduces the adiabatic
+μ⁻² response to the physical mass-loss rate numerically (1−1.9e-7 at
+±1 Myr). The retired device's H·mSY scaling is gone: it mixed the
+recession driver (an Earth-spin quantity) into an orbital one — the
+driver-separation rule now in the project doctrine.
+
+Two window findings came out of the construction, both measured:
+
+- **A fitted window rate is not a secular rate.** The chain's 300-yr
+  `windowElementRates` fit absorbs the local phase slope of any
+  inequality longer than the window into its mean-motion term. Like
+  for like (unwrapped-longitude mean over the same 1800–2100 window)
+  the dump and the chain agree at ≤0.2 ppm for Mercury/Venus/Mars and
+  2.8 ppm for Jupiter; Saturn splits 37 ppm (the great inequality at
+  ~⅓ cycle per window) and Neptune −497 ppm (the U–N near-2:1 at ~7%
+  of a cycle per window). The split is banked per planet
+  (`verdict.planetLamDot.rows[].vsChainWinNPpm`), and the panel
+  periods anchor on the channel — Neptune's displayed period moved
+  164.71 → 164.79 yr, into the JPL class. A wrap-sanity gate guards
+  the construction; the split itself is a measurement, not an error.
+- **The beats are banked as predictions and measured as oscillations.**
+  From the banked J2000 rates: the Jupiter–Saturn great inequality
+  360/(5n_S−2n_J) and the Uranus–Neptune near-2:1 360/(n_U−2n_N) —
+  read the live values from `verdict.planetLamDot`
+  (`greatInequalityYr`, `uranusNeptuneBeatYr`), never from prose. The
+  instrument `tools/explore/planet-lamdot-instruments.mjs` then
+  measures the oscillations actually present in the raw per-planet λ̇
+  (±50 kyr slice, autocorrelation): the GI dominant period reads the
+  ~910–940 yr class on both Jupiter and Saturn (literature ~880–900),
+  with Saturn's amplitude ~7× Jupiter's (the mass asymmetry), and the
+  U–N oscillation reads the ~4,050 yr class on Neptune at
+  autocorrelation 0.99 — the same oscillation whose 100-yr-aliased
+  osculating scatter is visible around the secular curves on the
+  Formula-Verification eccentricity panel, now with the model's own
+  measured name and period. The instrument also reports a per-planet
+  Kepler-III closure n²a³ (max drift 2e-6 Mercury … 4e-3 Uranus over
+  ±10 Myr at 2-kyr smoothing): at constant GM the residual **is** the
+  real inequality energy exchange between planets, sitting beside the
+  run's banked global conservation (dE ~1e-8).
+
+The era leg stays validated where a reference exists: Earth's channel
+reproduces the Chapront sidereal-year slope to ~0.1 s over ±12 kyr
+(the generator's banked refuse-gate). For the other planets no
+published deep-time λ̇ series exists — the banked channels are the
+reference the model itself provides, with the JPL-era cross-checks
+(window splits above) as the external anchor.
+
 ## Related documents
 
 - [13-mercury-precession-breakdown.md](13-mercury-precession-breakdown.md) — §1.8: the projection identity, the transit test, the candidate slot

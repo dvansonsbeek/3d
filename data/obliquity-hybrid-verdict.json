@@ -92,7 +92,7 @@
   "files": {
    "data/la2004-earth-51myr-back.asc": "sha256:3f13b9f8e69085baf40bc67a2669e6f6af4148fef9218ed2158772aa91e35f8c",
    "data/nbody-deep-secular-modes.json": "sha256:77e0baf779e85de548e532ec52e2ace55a9bdba3bbd2f67002fa9fbdfc3440de",
-   "data/nbody-secular-series.json": "sha256:f62225cfa1952844c16add01f0aa1f6993e2985e65c33c565668af292d53eabc",
+   "data/nbody-secular-series.json": "sha256:db55417b2a0f11311dcfc568310bb3101ccaaba60a50600534d1b0c965dcc337",
    "tools/explore/stage-c-obliquity-hybrid.mjs": "sha256:383891c893099b818dfa1b03053ea1c255e0e6b156cd025efe2e445599f0d44b",
    "tools/verify/obliquity-hybrid.js": "sha256:1cbf8094a4616e4454ff0c657c53244bd8c49431bc03db35c8f16b30b0a47610"
   }

@@ -180,8 +180,8 @@ Rows are distributed across tabs to reduce scrolling. The tab bar appears betwee
 
 | Tab 0: GENERAL | Tab 1: ORBIT | Tab 2: POSITION | Tab 3: CYCLES |
 |----------------|--------------|------------------|-------------------|
-| General Characteristics | Orbital Period & Motion | Orbital Orientation to Ecliptic | Perihelion Precession |
-| Gravitational Influence Zones | Orbital Shape & Geometry | Orbital Orientation to Invariable Plane | |
+| General Characteristics | Orbital Period & Motion | Orbital Orientation to Ecliptic | Perihelion Precession (apsidal · g) |
+| Gravitational Influence Zones | Orbital Shape & Geometry | Orbital Orientation to Invariable Plane | Long-Period Cycles |
 | Surface & Physical Properties | Velocities | Position & Anomalies | |
 | | Energy & Momentum | Time Calculations | |
 
@@ -190,17 +190,31 @@ mode / largest companion / remainder with amplitude shares, plus the
 perihelion rate of date — all computed live from the governed artifact.
 The former "Theorized Precession Breakdown" section and its Laplace-style
 first-order machinery were removed with the P5/K5b panel pass. The
-"Orbital Period & Motion" rows for the seven chain planets likewise read
-the chain's measured window mean motion (governed artifact
-`windowElementRates`) rather than the retired device orbit counts — the
-integer counts survive only on the no-chain bodies Pluto/Halley/Eros,
-where the geometric device is the model path. The precession-cycles rows
-follow the same rule: the ecliptic duration and angular velocity read the
-chain's measured window ϖ̇ (`windowRatesArcsecCy`, doc 109 §9 typing),
-the inertial row is the dominant secular mode's period, the Eccentricity
-Cycle is the beat of the two largest modes, Mercury's axial period reads
-the chain's node rate (Cassini state), and the Obliquity Cycle survives
-only as an *observed* row (Mercury ~895 kyr Bills 2005; Mars ~125 kyr).
+"Orbital Period & Motion" rows for the seven chain planets read the
+banked per-planet λ̇ channel OF DATE (the C1 mirror of Earth's shipped
+sidereal-year channel): n_p(y) = λ̇₀ (the ±10-Myr run's secular J2000
+rate, 2-kyr window — it matches JPL-class periods; the era evaluator's
+fitted `windowElementRates` keeps its own decomposition, split banked in
+`verdict.planetLamDot`) × the planet's own constant-GM N-body drift
+(±10 Myr, clamped beyond) ÷ the Driver-2 mass-loss stretch (the model's
+falsifiable μ-leg; every factor ≡ 1 at J2000). The retired device orbit
+counts survive only on the no-chain bodies Pluto/Halley/Eros, where the
+geometric device is the model path. The ORBIT tab's remaining
+device rows followed with the §11 batch: the semi-major-axis, Shape &
+Geometry, Velocities and Energy & Momentum rows for the seven chain
+planets read the chain's OSCULATING ELEMENTS OF DATE (`_kcOrbEl`, a
+per-refresh memo over `_kcElementsOfDate`), and the Length-of-Day rows
+compose with the chain period; the one deliberate exception is "Period
+(Kepler verification)", which stays on the device inputs because its
+purpose is the model's GM↔AU closure (doc 24), not the ephemeris. The
+precession-cycles rows follow the same one-family rule: the apsidal
+Duration and angular-velocity rows read the chain's OF-DATE TANGENT
+(`computeApsidalSecularDegPerYr` — the same evaluator as the Prec. cell,
+one home), with the dominant secular g-mode in hover; the Long-Period
+Cycles section carries the axial row, the Eccentricity Cycle (the beat
+of the two largest modes), and the Obliquity Cycle, which survives only
+as an *observed* row (Mercury ~895 kyr Bills 2005; Mars ~125 kyr) —
+Mercury's axial period reads the chain's node rate (Cassini state).
 The "Orbital Plane Precession Cycle" chart draws the chain's own
 inclination history — elements of date, series-governed at deep time —
 over one period of each planet's dominant nodal secular mode, replacing
@@ -231,24 +245,25 @@ Within each tab, rows are organized under section headers (e.g., "Perihelion Pre
 
 ### Inline SVG Charts
 
-Two chart types are embedded as inline SVG within planetStats rows:
+One chart type is embedded as inline SVG within planetStats rows. (A
+second — the H/8 obliquity-cycle chart — was retired from display with
+the Earth-CYCLES dynamical pass; `buildObliquityChart` survives as
+machinery only, attached to no row.)
 
-#### Perihelion Precession Chart
+#### Orbital Plane Precession Cycle Chart
 
-Shows one full precession cycle with:
-- **Blue curve**: geocentric precession rate over time (from predictive formula)
-- **Green dashed line**: heliocentric baseline rate
-- **Yellow marker**: current simulation year position
-- **Red marker**: fixed reference position (year 2000)
-- **Cycle windowing**: markers only render when within the current cycle window (no modulo wrapping)
-
-#### Obliquity Chart (Earth only)
-
-Shows one full obliquity cycle (H/8) with:
-- **Curve**: obliquity variation over the cycle
-- **Markers**: current year and reference positions
-- **Same cycle windowing** logic as perihelion chart
-- **Phase group peaks**: Hover text on phase angle peak markers includes Glacial Maximum information (no separate LGM marker)
+Drawn under CYCLES for Earth and each chain planet
+(`buildPerihelionChart`, kept under its historical name):
+- **Curve**: the chain's own inclination history — elements of date,
+  series-governed at deep time via the chart-only zero-boundary
+  evaluator (`_kcChartElementsOfDate`; no handover steps)
+- **Window**: one period of the body's dominant nodal secular mode
+  (Earth: s₃)
+- **Red dot**: the current year, with the inv-plane ascending node
+  (S&S origin) and the standard ecliptic ϖ in the label and tooltips —
+  each readout naming its frame and its osculating-vs-secular class
+- **Cycle windowing**: markers render only inside the current window
+  (no modulo wrapping)
 
 ### Predictive Formula Rows
 
@@ -584,7 +599,7 @@ The physics and validation methodology live in [doc 102 — GIA α(t) lunar vali
 
 ### Purpose
 
-Compares the model's predictions against published closed-form formulas from celestial-mechanics literature (Meeus, Chapront, Capitaine, Vondrák, Laskar, Berger, Bills & Ray) across eleven Earth quantities over a ±12,000-year window. This is the **analytical twin** of the WebGeoCalc Explorer — where WebGeoCalc compares the model against *observed JPL data*, Formula Verification compares it against *published analytical formulas*. Together they validate the model from two independent directions.
+Compares the model's predictions against published closed-form formulas from celestial-mechanics literature (Meeus, Chapront, Capitaine, Vondrák, Laskar, Berger, Bills & Ray) across eleven Earth quantities over a ±12,000-year window, plus two all-planet chart panels ("Inclination of all planets", "Eccentricity of all planets") witnessed by JPL Horizons and La2010. This is the **analytical twin** of the WebGeoCalc Explorer — where WebGeoCalc compares the model against *observed JPL data*, Formula Verification compares it against *published analytical formulas*. Together they validate the model from two independent directions.
 
 ### Accessing the Panel
 
@@ -596,12 +611,14 @@ Compares the model's predictions against published closed-form formulas from cel
 
 | Feature | Description |
 |---------|-------------|
-| **Eleven categories** | Eccentricity, obliquity, inclination (inv. plane), ascending node (inv. plane), perihelion longitude, tropical year, cardinal year lengths, solar day, sidereal year, axial precession, ΔT (TT − UT1) |
+| **Thirteen categories** | Eccentricity, obliquity, inclination (inv. plane), ascending node (inv. plane), perihelion longitude, tropical year, cardinal year lengths, solar day, sidereal year, axial precession, ΔT (TT − UT1), plus the two all-planet panels below |
 | **Main chart** | Model curve (amber) + all reference formulas on a −12,000 BC to +12,000 AD axis, with J2000 gridline |
 | **Residual chart** | `reference − model` in arcseconds, seconds, milliseconds, degrees, or AU depending on the category |
 | **J2000 comparison table** | Every reference formula's value at J2000 + Δ vs Model, with source links |
 | **Export buttons** | "Export for Paper" (±12 k yr), "Export Cycles" (±~250 k yr, seven categories) and "Export Recent" (ΔT, 1650–2050) produce publication-grade SVG |
-| **Earth-only** | All eleven quantities describe Earth's orbit + spin axis (+ ΔT); per-planet observational validation lives in the WebGeoCalc Explorer |
+| **All-planet panels** | "Inclination of all planets" (two tabs: J2000 ecliptic / the model's invariable plane) and "Eccentricity of all planets" (one frame-free view): static 250,000 BC → 100,000 AD charts of the chain's elements of date for all eight planets, per-planet toggles with all/none, hover readout of every enabled planet at the pointed year, and their own paper/cycles exports (cycles span ±1,000,000 yr, one editable constant) |
+| **Independent witnesses** | The all-planet panels overlay JPL Horizons DE441 osculating elements (−9998…+9999, the shaded band) with live per-planet Δrms, and La2010 (Laskar et al. 2011) for Earth from the repo's elements table — inclination rms 0.0007°, eccentricity rms 2.5e-5 over the overlap |
+| **Earth-only elsewhere** | The eleven formula categories describe Earth's orbit + spin axis (+ ΔT); per-planet observational validation lives in the WebGeoCalc Explorer and the two all-planet panels |
 
 ### Full Reference
 

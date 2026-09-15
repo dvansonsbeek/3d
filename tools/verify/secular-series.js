@@ -266,6 +266,79 @@ for (const pl of PLANETS7) {
   planetBodies[pl] = chosen;
 }
 
+// ── C1: the seven planets' λ̇ channels (plan 02 §11, owner-approved
+// mirror of D6, 2026-09-15) — the SAME recipe per planet: per-step
+// wrap-counted λ̇ from the dump's L (wrap prior = the chain's own
+// era-window mean motion, giving two independent routes to the J2000
+// rate — banked as a cross-gate), the 2-kyr boxcar, banked as a ratio
+// to the J2000 node at the 2-kyr cadence. The Driver-2 mass-loss tier
+// is deliberately NOT here (the run's GM is constant): consumers
+// compose P_p(y) = P_win · massLossLaw(y) / lamDotRel_p(y), exactly
+// like Earth's shipped sidereal-year channel.
+const CHAIN_FREQ = JSON.parse(fs.readFileSync(path.join(ROOT, 'data', 'nbody-secular-frequencies.json'), 'utf8'));
+const planetLamDotRows = [];
+for (const pl of PLANETS7) {
+  const winN = CHAIN_FREQ.windowElementRates[pl].meanMotionDegPerYr;   // deg per Julian year
+  const EP = D.elements[pl];
+  const raw = new Float64Array(NR - 1);
+  const expRev = rDt * winN / 360;   // ≈ revolutions per raw step (wrap prior; Mercury ~227, margin ~50×)
+  for (let i = 1; i < NR; i++) {
+    let f = (EP.L[i] - EP.L[i - 1]) / 360;
+    f -= Math.floor(f);                         // fractional revolutions [0,1)
+    const k = Math.round(expRev - f);           // integer revolutions
+    raw[i - 1] = ((k + f) * 360) / rDt;         // deg per Julian year, step midpoint
+  }
+  const rawS = smooth(raw, LAMDOT_WINDOW_YR);
+  const l0 = liMid(rawS, 0);
+  const rel = Array.from({ length: nLam }, (_, i) =>
+    Number((liMid(rawS, t0Yr + i * LAMDOT_STEP_YR) / l0).toFixed(12)));
+  const relMin = Math.min(...rel), relMax = Math.max(...rel);
+  let eraMin = Infinity, eraMax = -Infinity;
+  for (let i = 0; i < nLam; i++) {
+    const t = t0Yr + i * LAMDOT_STEP_YR;
+    if (t < -12000 || t > 12000) continue;
+    if (rel[i] < eraMin) eraMin = rel[i];
+    if (rel[i] > eraMax) eraMax = rel[i];
+  }
+  // Cross-gate, LIKE FOR LIKE: the chain's winN is the 1800–2100 window
+  // mean, and Jupiter/Saturn's λ̇ genuinely oscillates with the ~900-yr
+  // great inequality — so the comparison must use the SAME window (the
+  // first cut compared the 2-kyr boxcar at J2000 and read 52 ppm of pure
+  // GI phase, not disagreement; a displayed rate must name its window).
+  // Exact windowed mean from unwrapped end-to-end longitude — no
+  // sampling noise: cumulative revolutions from the same wrap counts.
+  const cumDeg = new Float64Array(NR);
+  for (let i = 1; i < NR; i++) cumDeg[i] = cumDeg[i - 1] + raw[i - 1] * rDt;
+  const cumAt = (/** @type {number} */ tt) => {
+    const x = (tt - tR[0]) / rDt, i = Math.max(0, Math.min(NR - 2, Math.floor(x))), f = x - i;
+    return cumDeg[i] * (1 - f) + cumDeg[i + 1] * f;
+  };
+  const eraWinMean = (cumAt(100) - cumAt(-200)) / 300;   // 1800–2100, the chain's window
+  const crossRel = eraWinMean / winN - 1;
+  console.log(`${pl} λ̇ channel: λ̇(J2000, 2-kyr boxcar) ${l0.toFixed(6)} °/yr · era-window mean vs chain winN ${(crossRel * 1e6).toFixed(2)} ppm · rel range ±10 Myr [${relMin.toFixed(9)}, ${relMax.toFixed(9)}] · ±12 kyr [${eraMin.toFixed(9)}, ${eraMax.toFixed(9)}]`);
+  if (Math.abs(rel[Math.round((0 - t0Yr) / LAMDOT_STEP_YR)] - 1) > 1e-12) { console.error(`${pl}: REFUSING — λ̇ channel is not 1 at the J2000 node — anchor construction broken`); process.exit(1); }
+  // The crossRel is a banked MEASUREMENT, not a refuse-gate: the two
+  // routes decompose one λ(t) differently — a 300-yr window fit can
+  // absorb the local phase slope of a long inequality into its mean-
+  // motion term (measured: Me/Ve/Ma ≤0.2 ppm · Ju 2.8 · Sa 37 (GI,
+  // ~1/3 cycle in window) · Ne −497 (U–N near-2:1, 7% of a cycle in
+  // window — the dump's era mean matches the JPL 164.79-yr period;
+  // the chain's fitted winN carries the slope)). Breakage is guarded
+  // by the wrap-sanity gate below: one missed wrap reads O(1) relative.
+  let maxRawDev = 0;
+  for (let i = 0; i < NR - 1; i++) maxRawDev = Math.max(maxRawDev, Math.abs(raw[i] / l0 - 1));
+  if (maxRawDev > 5e-2) { console.error(`${pl}: REFUSING — raw λ̇ deviates ${(maxRawDev * 100).toFixed(2)}% from the J2000 rate — wrap-count breakage class`); process.exit(1); }
+  Object.assign(planetBodies[pl], { lamDotRel: rel, lamDotStepYr: LAMDOT_STEP_YR, lamDotWindowYr: LAMDOT_WINDOW_YR });
+  planetLamDotRows.push({ body: pl, lamDotJ2000DegPerYr: Number(l0.toFixed(9)), eraWindowMeanDegPerYr: Number(eraWinMean.toFixed(9)), vsChainWinNPpm: Number((crossRel * 1e6).toFixed(3)), relRange10Myr: [Number(relMin.toFixed(12)), Number(relMax.toFixed(12))], relRange12Kyr: [Number(eraMin.toFixed(12)), Number(eraMax.toFixed(12))] });
+}
+// The two celebrated near-commensurabilities as BEAT PREDICTIONS from the
+// banked J2000 rates (doc-reproducible headline numbers; the C2 instrument
+// measures the oscillations themselves in the raw λ̇).
+const lam0ByBody = Object.fromEntries(planetLamDotRows.map((r) => [r.body, r.lamDotJ2000DegPerYr]));
+const greatInequalityYr = 360 / Math.abs(5 * lam0ByBody.saturn - 2 * lam0ByBody.jupiter);
+const uranusNeptuneBeatYr = 360 / Math.abs(lam0ByBody.uranus - 2 * lam0ByBody.neptune);
+console.log(`beat predictions from λ̇(J2000): Jupiter–Saturn great inequality ${greatInequalityYr.toFixed(1)} yr · Uranus–Neptune near-2:1 ${uranusNeptuneBeatYr.toFixed(1)} yr`);
+
 // ── quality gate: the hybrid ON THIS SERIES through the one-home factory ──
 // The anchors come from the MODEL exactly as the Stage-C lab injects them
 // (the measured year-length identity via model.epoch, ε₀ via model
@@ -492,7 +565,7 @@ if (Math.abs(rateJ2000 - iauRate) > Math.abs(iauRate) * 0.01) { console.error(`R
 if (d200.rms > 0.05) { console.error('REFUSING: −200..0 kyr ε rms vs La2004 exceeds 0.05°'); process.exit(1); }
 
 const artifact = {
-  _description: 'Earth ζ = sin(i/2)·e^{iΩ} (zetaQ/zetaP) AND z = e·e^{iϖ} (zQ/zP) series (ecliptic-J2000), resampled at 500-yr cadence from the model\'s own ±10-Myr Wisdom–Holman run (1PN, DE440 masses, Horizons J2000 seed) — the ONE-SOURCE orbit-plane and eccentricity-vector histories for the Stage-C movement (deep-orbital-history.cjs zetaSeries/zSeries options; C-2 banked ζ, C-4a added z). D6 adds earth.lamDotRel — the mean-longitude-rate ratio to J2000 (planetary-only λ̇ drift; the run\'s GM is constant), the sidereal-year-of-date channel: T_sid(y) = massLossLaw(y)/lamDotRel(y). No mode extraction: the C-1 verdict (plan 02) measured that no flat mode table serves both the certified era and deep time; the series itself does. The deep mode tables (nbody-deep-secular-modes.json) remain the TAIL beyond the ±10-Myr span. Verdict block = the banked quality gate. Times are years from J2000: t_i = t0Yr + i·stepYr.',
+  _description: 'Earth ζ = sin(i/2)·e^{iΩ} (zetaQ/zetaP) AND z = e·e^{iϖ} (zQ/zP) series (ecliptic-J2000), resampled at 500-yr cadence from the model\'s own ±10-Myr Wisdom–Holman run (1PN, DE440 masses, Horizons J2000 seed) — the ONE-SOURCE orbit-plane and eccentricity-vector histories for the Stage-C movement (deep-orbital-history.cjs zetaSeries/zSeries options; C-2 banked ζ, C-4a added z). D6 adds earth.lamDotRel — the mean-longitude-rate ratio to J2000 (planetary-only λ̇ drift; the run\'s GM is constant), the sidereal-year-of-date channel: T_sid(y) = massLossLaw(y)/lamDotRel(y). C1 mirrors the same recipe onto the seven planets (bodies.<planet>.lamDotRel, 2-kyr cadence): the ORBIT-tab period tier P_p(y) = P_win · massLossLaw(y)/lamDotRel_p(y), with the dump-vs-chain J2000 cross-gate banked in verdict.planetLamDot. No mode extraction: the C-1 verdict (plan 02) measured that no flat mode table serves both the certified era and deep time; the series itself does. The deep mode tables (nbody-deep-secular-modes.json) remain the TAIL beyond the ±10-Myr span. Verdict block = the banked quality gate. Times are years from J2000: t_i = t0Yr + i·stepYr.',
   meta: {
     dumpFile: path.relative(ROOT, DUMP),
     dumpSha256,
@@ -535,6 +608,12 @@ const artifact = {
       rows: sidChk.map((r) => ({ tYr: r.t, channelDriftS: Number(r.chanS.toFixed(4)), chaprontDriftS: Number(r.chapS.toFixed(4)) })),
       maxAbsDiffS: Number(sidMaxDiff.toFixed(4)),
       note: 'D6: the banked λ̇ channel (lamDotRel) vs the Chapront/Capitaine sidereal-year polynomial — planetary-only drift (the dump\'s GM is constant); consumers multiply their own mass-loss law by 1/lamDotRel. THE one cross-validation home for the sidereal-year drift.',
+    },
+    planetLamDot: {
+      rows: planetLamDotRows,
+      greatInequalityYr: Number(greatInequalityYr.toFixed(2)),
+      uranusNeptuneBeatYr: Number(uranusNeptuneBeatYr.toFixed(2)),
+      note: 'C1 (plan 02 §11): per-planet λ̇ channels — the D6 recipe mirrored (2-kyr boxcar, ratio ≡ 1 at the J2000 node; the dump\'s GM is constant, so the Driver-2 mass-loss tier lives with the consumer: P_p(y) = P_win · massLossLaw(y)/lamDotRel_p(y)). vsChainWinNPpm is a banked MEASUREMENT of the two routes\' decomposition split in the SAME 1800–2100 window (dump unwrapped-longitude mean vs the chain\'s fitted winN): a short-window fit absorbs the local phase slope of a long inequality into its mean-motion term — Ju 2.8 / Sa 37 ppm (GI, ~1/3 cycle in window), Ne −497 ppm (U–N near-2:1, 7% of a cycle; the dump\'s mean matches the JPL 164.79-yr period, so lamDotJ2000DegPerYr is the period-row anchor). Breakage is guarded by the wrap-sanity gate, not by this split. The beat entries are predictions from the J2000 rates; the C2 instrument measures the oscillations themselves.',
     },
     planetHandover: {
       rows: planetHandover,

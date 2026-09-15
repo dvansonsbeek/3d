@@ -114,7 +114,21 @@ would silently churn a structural claim for a rounding-level gain.
   tail); two panel surfaces showing different windows of the same rate split
   111,491 vs 111,570 yr. Surfaces quoting one physical rate ride ONE family —
   the anomalistic takes the chain tangent the Prec. cell shows
-  (`computeApsidalSecularDegPerYr`, one home).
+  (`computeApsidalSecularDegPerYr`, one home). Second measured instance
+  (C1): a mean motion FITTED over a window shorter than a resonant
+  inequality absorbs the inequality's local phase slope into the mean
+  term — the chain's 300-yr `windowElementRates` gave Neptune 164.71 yr
+  where the secular (2-kyr-boxcar) λ̇ matches JPL's 164.79; the period
+  rows ride the banked λ̇ channel, the split is banked as measurement
+  (`verdict.planetLamDot`).
+- **Orbital quantities ride the μ-tier, spin quantities the H-tier.** The
+  retired device scaled planet periods by H(t)·mSY — mixing the recession
+  driver (Earth spin: precession, LOD) into an orbital quantity. The
+  proper deep-time stretch for ANY heliocentric period is the ONE Driver-2
+  solar-mass law (planet-independence is exact at the two-body level),
+  composed with the body's own constant-GM N-body drift — Earth's D6
+  sidereal-year channel is the pattern (`T(y) = massLossLaw(y)/lamDotRel(y)`,
+  every factor ≡ 1 at J2000).
 - **A fit-window edge phase-locked to the lattice masquerades as physics.**
   The "e(t)-minimum residual peak" was window-edge divergence — both bracket
   ends sit at H/16 phase ≈ 0°. Check the edge/interior split before believing
