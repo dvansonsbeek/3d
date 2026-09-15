@@ -6317,6 +6317,53 @@ if (typeof window !== 'undefined') {
     updateVerificationPanel: (id) => updateVerificationPanel(id),
     // C1 period-of-date probe surface: the two-tier composition, per factor
     kcNOfDate: (k, y) => ({ n: _kcNOfDate(k, y), lamDot0: _kcLamDot0(k), lamRel: _kcLamRel(k, y), massRatio: _kcMassLossPeriodRatio(y) }),
+    // C-VIS smoke surface: exercise both Visualization toggles headlessly
+    visInvPlaneProbe: () => {
+      invariablePlaneGroup.visible = true;
+      inclinationPathGroup.visible = true;
+      updateInvariablePlanePosition();
+      updateInclinationPathMarker();
+      const ud = inclinationPathGroup.userData;
+      const cyc = _kcEarthInclCycle(o.currentYear);
+      const pos = ud.pathLine.geometry.getAttribute('position');
+      return {
+        nextMax: cyc.nextMax, nextMin: cyc.nextMin, mid: cyc.mid, samples: cyc.samples.length,
+        highLabel: ud.nextMaxLabelDiv.innerHTML, lowLabel: ud.nextMinLabelDiv.innerHTML,
+        pathPoints: pos ? pos.count : 0,
+        markerLabel: ud.labelDiv.textContent,
+      };
+    },
+    visNodeMarkersProbe: (name) => {
+      o.lookAtObj = { name };
+      sunCenteredInvPlane.visible = true;
+      updateSunCenteredInvPlane();
+      return { asc: sunCenteredNodeMarkers.userData.ascLabelDiv.innerHTML, desc: sunCenteredNodeMarkers.userData.descLabelDiv.innerHTML };
+    },
+    inclInvAt: (y) => inclInvPlaneModel(y),
+    // empirical frame mapping: world azimuth of a test local azimuth in
+    // the path group (derives the local→world constant, sign included)
+    visPathFrameProbe: (localDeg) => {
+      const mk = inclinationPathGroup.userData.marker;
+      const save = mk.position.clone();
+      mk.position.set(Math.cos(localDeg * Math.PI / 180) * 250, 0, Math.sin(localDeg * Math.PI / 180) * 250);
+      const w = new THREE.Vector3();
+      mk.getWorldPosition(w);
+      mk.position.copy(save);
+      return Math.atan2(w.z, w.x) * 180 / Math.PI;
+    },
+    // world azimuths of the three node-flavored markers (frame-alignment probe)
+    visWorldProbe: () => {
+      const w = new THREE.Vector3();
+      const az = (v) => Math.atan2(v.z, v.x) * 180 / Math.PI;
+      const out = {};
+      sunCenteredNodeMarkers.userData.ascMarker.getWorldPosition(w); out.sunAscAz = az(w);
+      inclinationPathGroup.userData.nextMaxMarker.getWorldPosition(w); out.nextMaxAz = az(w);
+      inclinationPathGroup.userData.marker.getWorldPosition(w); out.pathMarkerAz = az(w);
+      out.pathGroupRotY = inclinationPathGroup.rotation.y * 180 / Math.PI;
+      out.earthPivotRotY = earth.pivotObj.rotation.y * 180 / Math.PI;
+      out.nodeSFrame = o.earthAscendingNodeInvPlane;
+      return out;
+    },
   };
 }
 
@@ -10494,159 +10541,17 @@ function createInvariablePlaneVisualization(size = 500, divisions = 20) {
   group.add(ring);
 
   // ===== FIXED MARKERS GROUP =====
-  // HIGH/LOW/MEAN markers are FIXED in ICRF coordinates based on earthInclinationCycleAnchor (21.77°)
+  // NEXT-MAX/NEXT-MIN markers ride the engine cycle (C-VIS; positions set dynamically)
   // They do NOT precess with the ascending node
   // These are added to a SEPARATE group that doesn't rotate with the plane
   // Position is calculated by applying the plane's quaternion manually (like Sun-centered max incl marker)
-  const markersGroup = new THREE.Group();
-  markersGroup.name = 'InvPlaneMarkersGroup';
-
-  const halfSize = size / 2;
-  const markerDist = halfSize * 0.95;
-  const tubeLength = size * 0.9;
-  const phaseAngleRad = earthInclinationCycleAnchor * Math.PI / 180;
-
-  // HIGH marker angle: at the phase angle (where inclination is maximum)
-  const highAngle = -phaseAngleRad;  // Negate for correct ICRF orientation (like Sun-centered)
-  // LOW marker angle: 180° opposite (where inclination is minimum)
-  const lowAngle = highAngle + Math.PI;
-
-  // Calculate inclination range values
-  const maxInclination = earthInvPlaneInclinationMean + earthInvPlaneInclinationAmplitude;
-  const minInclination = earthInvPlaneInclinationMean - earthInvPlaneInclinationAmplitude;
-
-  // ===== HIGH-LOW AXIS TUBE (yellow) =====
-  // This tube connects HIGH to LOW markers - shows the axis of maximum/minimum inclination
-  const highLowTubeGeom = new THREE.CylinderGeometry(3, 3, tubeLength, 8);
-  const highLowTubeMat = new THREE.MeshBasicMaterial({ color: 0xffff00, transparent: true, opacity: 0.6 });
-  const highLowTube = new THREE.Mesh(highLowTubeGeom, highLowTubeMat);
-  // Cylinder is along Y by default, rotate to lie flat then orient toward HIGH angle
-  highLowTube.rotation.z = Math.PI / 2;  // Lay flat (along X)
-  markersGroup.add(highLowTube);
-
-  // ===== MEAN AXIS TUBE (magenta) =====
-  // This tube is perpendicular to HIGH-LOW - shows where inclination equals the mean
-  const meanTubeGeom = new THREE.CylinderGeometry(3, 3, tubeLength, 8);
-  const meanTubeMat = new THREE.MeshBasicMaterial({ color: 0xff88ff, transparent: true, opacity: 0.6 });
-  const meanTube = new THREE.Mesh(meanTubeGeom, meanTubeMat);
-  meanTube.rotation.z = Math.PI / 2;  // Lay flat (along X)
-  markersGroup.add(meanTube);
-
-  // High point marker (yellow) - where Earth reaches MAXIMUM inclination
-  const markerGeom = new THREE.SphereGeometry(12, 12, 12);
-  const highMarkerMat = new THREE.MeshBasicMaterial({ color: 0xffff00 });
-  const highMarker = new THREE.Mesh(markerGeom, highMarkerMat);
-  markersGroup.add(highMarker);
-
-  // Low point marker (cyan) - where Earth reaches MINIMUM inclination
-  const lowMarkerMat = new THREE.MeshBasicMaterial({ color: 0x00ffff });
-  const lowMarker = new THREE.Mesh(markerGeom, lowMarkerMat);
-  markersGroup.add(lowMarker);
-
-  // Add labels for high/low points with inclination values
-  const highLabelDiv = document.createElement('div');
-  highLabelDiv.innerHTML = '<span style="font-size:16px;font-weight:bold;">HIGH</span><br>' + maxInclination.toFixed(4) + '°<br><span style="font-size:10px;color:#ffff88;">' + earthInclinationCycleAnchor + '°</span>';
-  highLabelDiv.style.color = '#ffff00';
-  highLabelDiv.style.fontSize = '14px';
-  highLabelDiv.style.fontFamily = 'Arial, sans-serif';
-  highLabelDiv.style.textShadow = '2px 2px 4px black, -1px -1px 2px black';
-  highLabelDiv.style.pointerEvents = 'none';
-  highLabelDiv.style.textAlign = 'center';
-  highLabelDiv.style.lineHeight = '1.3';
-  highLabelDiv.style.display = 'none'; // Hidden by default
-  const highLabelObj = new CSS2DObject(highLabelDiv);
-  highMarker.add(highLabelObj);  // Add to marker so it moves with it
-  highLabelObj.position.set(0, 20, 0);
-
-  const lowLabelDiv = document.createElement('div');
-  lowLabelDiv.innerHTML = '<span style="font-size:16px;font-weight:bold;">LOW</span><br>' + minInclination.toFixed(4) + '°<br><span style="font-size:10px;color:#88ffff;">' + ((earthInclinationCycleAnchor + 180) % 360) + '°</span>';
-  lowLabelDiv.style.color = '#00ffff';
-  lowLabelDiv.style.fontSize = '14px';
-  lowLabelDiv.style.fontFamily = 'Arial, sans-serif';
-  lowLabelDiv.style.textShadow = '2px 2px 4px black, -1px -1px 2px black';
-  lowLabelDiv.style.pointerEvents = 'none';
-  lowLabelDiv.style.textAlign = 'center';
-  lowLabelDiv.style.lineHeight = '1.3';
-  lowLabelDiv.style.display = 'none'; // Hidden by default
-  const lowLabelObj = new CSS2DObject(lowLabelDiv);
-  lowMarker.add(lowLabelObj);  // Add to marker so it moves with it
-  lowLabelObj.position.set(0, 20, 0);
-
-  // Mean markers at 90° offset from phase angle (where inclination = mean value)
-  // These are FIXED in ICRF coordinates, not at the precessing ascending/descending nodes
-  const meanMarkerGeom = new THREE.SphereGeometry(10, 12, 12);
-  const meanMarkerMat = new THREE.MeshBasicMaterial({ color: 0xff88ff }); // Magenta
-
-  // Mean markers at 90° before and after the HIGH point
-  const mean1Angle = highAngle + Math.PI / 2;  // 90° after HIGH
-  const mean2Angle = highAngle - Math.PI / 2;  // 90° before HIGH
-
-  // Mean marker 1 (90° after HIGH)
-  const meanMarker1 = new THREE.Mesh(meanMarkerGeom, meanMarkerMat);
-  markersGroup.add(meanMarker1);
-
-  // Mean marker 2 (90° before HIGH)
-  const meanMarker2 = new THREE.Mesh(meanMarkerGeom, meanMarkerMat);
-  markersGroup.add(meanMarker2);
-
-  // Mean labels - attach to markers so they move with them
-  const meanLabel1Div = document.createElement('div');
-  meanLabel1Div.innerHTML = '<span style="font-size:14px;font-weight:bold;">MEAN</span><br>' + earthInvPlaneInclinationMean.toFixed(4) + '°';
-  meanLabel1Div.style.color = '#ff88ff';
-  meanLabel1Div.style.fontSize = '12px';
-  meanLabel1Div.style.fontFamily = 'Arial, sans-serif';
-  meanLabel1Div.style.textShadow = '2px 2px 4px black, -1px -1px 2px black';
-  meanLabel1Div.style.pointerEvents = 'none';
-  meanLabel1Div.style.textAlign = 'center';
-  meanLabel1Div.style.lineHeight = '1.3';
-  meanLabel1Div.style.display = 'none'; // Hidden by default
-  const meanLabel1Obj = new CSS2DObject(meanLabel1Div);
-  meanMarker1.add(meanLabel1Obj);  // Add to marker so it moves with it
-  meanLabel1Obj.position.set(0, 15, 0);
-
-  const meanLabel2Div = document.createElement('div');
-  meanLabel2Div.innerHTML = '<span style="font-size:14px;font-weight:bold;">MEAN</span><br>' + earthInvPlaneInclinationMean.toFixed(4) + '°';
-  meanLabel2Div.style.color = '#ff88ff';
-  meanLabel2Div.style.fontSize = '12px';
-  meanLabel2Div.style.fontFamily = 'Arial, sans-serif';
-  meanLabel2Div.style.textShadow = '2px 2px 4px black, -1px -1px 2px black';
-  meanLabel2Div.style.pointerEvents = 'none';
-  meanLabel2Div.style.textAlign = 'center';
-  meanLabel2Div.style.lineHeight = '1.3';
-  meanLabel2Div.style.display = 'none'; // Hidden by default
-  const meanLabel2Obj = new CSS2DObject(meanLabel2Div);
-  meanMarker2.add(meanLabel2Obj);  // Add to marker so it moves with it
-  meanLabel2Obj.position.set(0, 15, 0);
-
-  // Store references to markers and labels for dynamic updates
-  // Store markersGroup and angle data for position updates in updateInvariablePlanePosition()
-  group.userData.markersGroup = markersGroup;
-  group.userData.highMarker = highMarker;
-  group.userData.lowMarker = lowMarker;
-  group.userData.meanMarker1 = meanMarker1;
-  group.userData.meanMarker2 = meanMarker2;
-  group.userData.highLowTube = highLowTube;
-  group.userData.meanTube = meanTube;
-  group.userData.highLabelDiv = highLabelDiv;
-  group.userData.lowLabelDiv = lowLabelDiv;
-  group.userData.meanLabel1Div = meanLabel1Div;
-  group.userData.meanLabel2Div = meanLabel2Div;
-  group.userData.highLabelObj = highLabelObj;
-  group.userData.lowLabelObj = lowLabelObj;
-  group.userData.meanLabel1Obj = meanLabel1Obj;
-  group.userData.meanLabel2Obj = meanLabel2Obj;
-  group.userData.markerDist = markerDist;
-  group.userData.tubeLength = tubeLength;
-  group.userData.highAngle = highAngle;
-  group.userData.lowAngle = lowAngle;
-  group.userData.mean1Angle = mean1Angle;
-  group.userData.mean2Angle = mean2Angle;
-
-  // Set all CSS2DObjects to not visible initially (this is what the patched renderer checks)
-  highLabelObj.visible = false;
-  lowLabelObj.visible = false;
-  meanLabel1Obj.visible = false;
-  meanLabel2Obj.visible = false;
+  // C-VIS (owner-ruled): the H/3 device's fixed HIGH/LOW axis, MEAN
+  // tubes and mean±amplitude values are RETIRED — under the N-body
+  // chain there is no fixed mean, amplitude or extremum axis. The
+  // coming-extreme markers (NEXT MAX / NEXT MIN) moved from this
+  // plane's far rim (unreadable at star-sphere distance) ONTO the
+  // inclination-path loop itself, where they sit exactly on the drawn
+  // line at its turning points — see createInclinationPath.
 
   // ===== EARTH HEIGHT INDICATOR (Annual Crossing) =====
   // Shows Earth's current position above/below the invariable plane
@@ -10715,52 +10620,159 @@ function createInvariablePlaneVisualization(size = 500, divisions = 20) {
 
 // Helper function to create the inclination path (wobble curve)
 // The path should align with zodiac so mean crossings are at Cancer/Capricorn (solstice axis)
+// ── C-VIS (owner-ruled, 2026-09-15): the Earth inclination-path visual
+// leaves the H/3 device (fixed mean/amplitude/axis on the balancedYear
+// clock) for the engine. ONE scanner serves the path, the marker and
+// the coming-extreme labels: the coming ONE NODE REVOLUTION of
+// i_inv(y) with the chain node of date as the angle, the LOCAL window
+// mid as the baseline (no structural-mean claim), and the next
+// max/min refined to ~15-yr. inclInvPlaneModel + ascNodeInvPlaneModel
+// (the one-source pair; series inside ±10 Myr, mode-tail beyond);
+// memoized, rebuilt when the epoch moves ≥ 500 yr AND the wall-clock
+// throttle below allows. LAZY ONLY — never called at module init
+// (the chain reads later-declared consts: the C1 hover-TDZ lesson).
+let _earthInclCycleCache = null;
+let _earthInclCycleBuiltMs = 0;
+function _kcEarthInclCycle(yearNow) {
+  if (_earthInclCycleCache && Math.abs(yearNow - _earthInclCycleCache.year) < 500) return _earthInclCycleCache;
+  // Wall-clock throttle (owner-measured perf catch): at deep-time travel
+  // speeds every frame moves > 500 yr, which made this full rescan + the
+  // geometry rebuild run EVERY FRAME. Serve the stale cycle between
+  // rebuilds — the loop's shape drifts over kyr, four rebuilds a second
+  // is plenty.
+  const nowMs = performance.now();
+  if (_earthInclCycleCache && nowMs - _earthInclCycleBuiltMs < 250) return _earthInclCycleCache;
+  _earthInclCycleBuiltMs = nowMs;
+  // The node rides the SAME one-source series construction as the
+  // inclination (ascNodeInvPlaneModel — series interp, cheap), NOT the
+  // era-chain element evaluator (its full periodic layer made each
+  // rebuild ~130 expensive calls; the second half of the perf catch).
+  const nodeAt = (y) => ascNodeInvPlaneModel(y);
+  const STEP = 500, CAP = 200000;
+  const yCap = yearNow + CAP;
+  let prevNode = nodeAt(yearNow), swept = 0;
+  const samples = [{ y: yearNow, node: prevNode, incl: inclInvPlaneModel(yearNow) }];
+  for (let y = yearNow + STEP; y <= yCap; y += STEP) {
+    const nd = nodeAt(y);
+    let d = nd - prevNode;
+    while (d > 180) d -= 360;
+    while (d < -180) d += 360;
+    swept += d;
+    prevNode = nd;
+    samples.push({ y, node: nd, incl: inclInvPlaneModel(y) });
+    if (Math.abs(swept) >= 360) break;
+  }
+  let lo = Infinity, hi = -Infinity;
+  for (const s of samples) { if (s.incl < lo) lo = s.incl; if (s.incl > hi) hi = s.incl; }
+  const refine = (yc, isMax) => {
+    let a = yc - STEP, b = yc + STEP;
+    for (let r = 0; r < 6; r++) {
+      const m1 = a + (b - a) / 3, m2 = b - (b - a) / 3;
+      const sgn = isMax ? 1 : -1;
+      if (sgn * inclInvPlaneModel(m1) < sgn * inclInvPlaneModel(m2)) a = m1; else b = m2;
+    }
+    const y = (a + b) / 2;
+    return { year: y, incl: inclInvPlaneModel(y), node: nodeAt(y) };
+  };
+  // The COMING extremes are decoupled from the path window: a node
+  // revolution (~65 kyr) can be monotone in i (measured: i falling
+  // 1.58 → 1.09 across the 2026 window), so the scan continues past it
+  // — the ζ-beat oscillation (~70–100 kyr) guarantees both inside the
+  // 500-kyr cap, which stays far inside the ±10-Myr series span.
+  let nextMax = null, nextMin = null;
+  {
+    const EXT_CAP = yearNow + 500000;
+    let iPrev = samples[0].incl, iCur = samples[1] ? samples[1].incl : inclInvPlaneModel(yearNow + STEP);
+    for (let y = yearNow + 2 * STEP; y <= EXT_CAP && (!nextMax || !nextMin); y += STEP) {
+      const iNext = inclInvPlaneModel(y);
+      if (!nextMax && iCur >= iPrev && iCur >= iNext) nextMax = refine(y - STEP, true);
+      if (!nextMin && iCur <= iPrev && iCur <= iNext) nextMin = refine(y - STEP, false);
+      iPrev = iCur; iCur = iNext;
+    }
+  }
+  _earthInclCycleCache = { year: yearNow, samples, lo, hi, mid: (lo + hi) / 2, nextMax, nextMin };
+  return _earthInclCycleCache;
+}
+const _fmtSceneYear = (y) => (y < 0 ? Math.abs(Math.round(y)).toLocaleString('en-US') + ' BC' : Math.round(y).toLocaleString('en-US') + ' AD');
+// Rebuild the path line from the engine cycle (lazy; called from the
+// marker updater once the panel is visible and when the cache refreshes).
+function _rebuildInclinationPathGeometry() {
+  const cyc = _kcEarthInclCycle(o.currentYear);
+  if (inclinationPathGroup.userData.builtCache === cyc) return cyc;
+  inclinationPathGroup.userData.builtCache = cyc;
+  const radius = inclinationPathGroup.userData.radius;
+  const yScale = inclinationPathGroup.userData.yScale;
+  const PHASE_OFFSET = inclinationPathGroup.userData.phaseOffset;
+  const points = [], colors = [];
+  for (const s of cyc.samples) {
+    const angle = -(s.node * Math.PI / 180) + PHASE_OFFSET;
+    points.push(new THREE.Vector3(Math.cos(angle) * radius, (s.incl - cyc.mid) * yScale, Math.sin(angle) * radius));
+    const norm = cyc.hi > cyc.lo ? (s.incl - cyc.lo) / (cyc.hi - cyc.lo) : 0.5;
+    colors.push(norm, norm * 0.8, 1 - norm * 0.5);
+  }
+  const pathLine = inclinationPathGroup.userData.pathLine;
+  pathLine.geometry.dispose();
+  pathLine.geometry = new THREE.BufferGeometry().setFromPoints(points);
+  pathLine.geometry.setAttribute('color', new THREE.Float32BufferAttribute(colors, 3));
+  // the coming extremes, ON the loop at their own (node, incl) points
+  const ud = inclinationPathGroup.userData;
+  const placeExtreme = (ext, mk, div, lbl, name, subColor) => {
+    if (!ext) { mk.visible = false; lbl.visible = false; return; }
+    mk.visible = true;
+    lbl.visible = inclinationPathGroup.visible;
+    const ang = -(ext.node * Math.PI / 180) + PHASE_OFFSET;
+    mk.position.set(Math.cos(ang) * radius, (ext.incl - cyc.mid) * yScale, Math.sin(ang) * radius);
+    div.innerHTML = '<span style="font-size:13px;font-weight:bold;">' + name + '</span><br>' + ext.incl.toFixed(4) + '°<br><span style="font-size:10px;color:' + subColor + ';">' + _fmtSceneYear(ext.year) + '</span>';
+  };
+  placeExtreme(cyc.nextMax, ud.nextMaxMarker, ud.nextMaxLabelDiv, ud.nextMaxLabelObj, 'NEXT MAX', '#ffff88');
+  placeExtreme(cyc.nextMin, ud.nextMinMarker, ud.nextMinLabelDiv, ud.nextMinLabelObj, 'NEXT MIN', '#88ffff');
+  return cyc;
+}
 function createInclinationPath(radius = 250, numPoints = 120, yScale = 50) {
   const group = new THREE.Group();
   group.name = 'InclinationPath';
 
-  const points = [];
-  const colors = [];
-  const CYCLE_LENGTH = holisticyearLength / 3; // Apsidal precession cycle (H/3)
-
-  // Phase offset to align the path with the zodiac
-  // The path is now a child of zodiac, so it's in zodiac's local coordinate system.
-  // Uses global inclinationPathZodiacOffsetDeg constant
-  const PHASE_OFFSET = inclinationPathZodiacOffsetDeg * Math.PI / 180;
-
-  for (let i = 0; i <= numPoints; i++) {
-    const t = i / numPoints;
-    const year = balancedYear + t * CYCLE_LENGTH;
-
-    const incl = computeInclinationEarth(
-      year, balancedYear, holisticyearLength,
-      earthInvPlaneInclinationMean, earthInvPlaneInclinationAmplitude
-    );
-
-    // Calculate angle with phase offset
-    // Negate to make marker move counterclockwise (same direction as Earth's orbit)
-    const angle = -(t * Math.PI * 2) + PHASE_OFFSET;
-    const x = Math.cos(angle) * radius;
-    const z = Math.sin(angle) * radius;
-    const deviationFromMean = incl - earthInvPlaneInclinationMean;
-    // Higher inclination (further from invariable plane) = HIGHER in visualization (positive Y)
-    const y = deviationFromMean * yScale;
-
-    points.push(new THREE.Vector3(x, y, z));
-
-    // Color: yellow at max incl, blue at min incl
-    const minIncl = earthInvPlaneInclinationMean - earthInvPlaneInclinationAmplitude;
-    const maxIncl = earthInvPlaneInclinationMean + earthInvPlaneInclinationAmplitude;
-    const norm = (incl - minIncl) / (maxIncl - minIncl);
-    colors.push(norm, norm * 0.8, 1 - norm * 0.5);
-  }
-
-  const geometry = new THREE.BufferGeometry().setFromPoints(points);
-  geometry.setAttribute('color', new THREE.Float32BufferAttribute(colors, 3));
-
+  // The line starts EMPTY: the engine-sampled loop is built lazily by
+  // _rebuildInclinationPathGeometry on first visible update (module-init
+  // chain calls are a TDZ trap — the C1 lesson).
+  const geometry = new THREE.BufferGeometry();
   const material = new THREE.LineBasicMaterial({ vertexColors: true, linewidth: 2 });
   const pathLine = new THREE.Line(geometry, material);
   group.add(pathLine);
+  group.userData.pathLine = pathLine;
+  group.userData.builtCache = null;
+
+  // NEXT MAX / NEXT MIN — the coming extremes of the engine cycle, ON
+  // the loop at its turning points (C-VIS; previously at the giant
+  // plane's rim, unreadable at star-sphere distance). Positions +
+  // label content filled in _rebuildInclinationPathGeometry.
+  const mkExtreme = (color, cssColor, name) => {
+    const mk = new THREE.Mesh(new THREE.SphereGeometry(6, 10, 10), new THREE.MeshBasicMaterial({ color }));
+    mk.visible = false;
+    group.add(mk);
+    const div = document.createElement('div');
+    div.innerHTML = '<span style="font-size:13px;font-weight:bold;">' + name + '</span>';
+    div.style.color = cssColor;
+    div.style.fontSize = '12px';
+    div.style.fontFamily = 'Arial, sans-serif';
+    div.style.textShadow = '2px 2px 4px black, -1px -1px 2px black';
+    div.style.pointerEvents = 'none';
+    div.style.textAlign = 'center';
+    div.style.lineHeight = '1.25';
+    const lbl = new CSS2DObject(div);
+    lbl.position.set(0, 14, 0);
+    lbl.visible = false;
+    mk.add(lbl);
+    return { mk, div, lbl };
+  };
+  const nextMaxM = mkExtreme(0xffff00, '#ffff00', 'NEXT MAX');
+  const nextMinM = mkExtreme(0x00ffff, '#00ffff', 'NEXT MIN');
+  group.userData.nextMaxMarker = nextMaxM.mk;
+  group.userData.nextMaxLabelDiv = nextMaxM.div;
+  group.userData.nextMaxLabelObj = nextMaxM.lbl;
+  group.userData.nextMinMarker = nextMinM.mk;
+  group.userData.nextMinLabelDiv = nextMinM.div;
+  group.userData.nextMinLabelObj = nextMinM.lbl;
 
   // Current position marker group (contains sphere, arrow, and label)
   const markerGroup = new THREE.Group();
@@ -10812,7 +10824,15 @@ function createInclinationPath(radius = 250, numPoints = 120, yScale = 50) {
   group.userData.labelDiv = labelDiv;
   group.userData.radius = radius;
   group.userData.yScale = yScale;
-  group.userData.phaseOffset = PHASE_OFFSET;
+  // C-VIS frame note: this group rides the zodiac's own time-varying
+  // rotation (−startAngleModel° − θ), so it can never be statically
+  // aligned with the scene-frame node markers — path, marker and arrow
+  // are kept mutually consistent in GROUP-LOCAL angles (the marker
+  // always rides the drawn line), and the historical zodiac offset is
+  // kept for visual continuity. The loop is an inclination-phase
+  // visual, not a longitude dial; the longitude-true node markers live
+  // on the Invariable-plane toggle.
+  group.userData.phaseOffset = inclinationPathZodiacOffsetDeg * Math.PI / 180;
 
   return group;
 }
@@ -10850,15 +10870,22 @@ function updateInclinationPathMarker() {
   const yScale = inclinationPathGroup.userData.yScale;
   const phaseOffset = inclinationPathGroup.userData.phaseOffset || 0;
 
-  const CYCLE_LENGTH = holisticyearLength / 3;
-  let progress = ((o.currentYear - balancedYear) % CYCLE_LENGTH) / CYCLE_LENGTH;
-  if (progress < 0) progress += 1;
+  // ── C-VIS: the engine parameterization — angle = the chain node of
+  // date (the marker physically tracks the node), Y = deviation from
+  // the LOCAL window mid (no structural-mean claim); the path line is
+  // (re)built lazily from the same cycle cache.
+  const cyc = _rebuildInclinationPathGeometry();
+  // same one-source node as the path samples — the marker stays ON the
+  // curve by construction (and the call is series-cheap)
+  const nodeNowDeg = ascNodeInvPlaneModel(o.currentYear);
+  const angle = -(nodeNowDeg * Math.PI / 180) + phaseOffset;
+  // the marker rides the SAME evaluator as the path samples (the chain
+  // series route) — o.earthInvPlaneInclinationDynamic is the engine-K
+  // H/3 machinery value and splits from the chain at deep time
+  // (owner-measured: 0.853 vs 1.597 at +257 kyr)
+  const inclNow = inclInvPlaneModel(o.currentYear);
+  const deviation = inclNow - cyc.mid;
 
-  // Apply same angle calculation as the path (negated for counterclockwise motion)
-  const angle = -(progress * Math.PI * 2) + phaseOffset;
-  const deviation = o.earthInvPlaneInclinationDynamic - earthInvPlaneInclinationMean;
-
-  // Higher inclination = higher Y (positive deviation = above mean line)
   const x = Math.cos(angle) * radius;
   const y = deviation * yScale;
   const z = Math.sin(angle) * radius;
@@ -10871,28 +10898,21 @@ function updateInclinationPathMarker() {
     marker.visible = true;
   }
 
-  // Calculate direction of motion (tangent to path, pointing counterclockwise)
-  // Derivative of position with respect to angle (negated because angle decreases with time)
-  // dx/dangle = -sin(angle) * radius, dz/dangle = cos(angle) * radius
-  // But since angle = -progress*2π, motion is in direction of increasing angle visually
-  // The tangent pointing in direction of motion (counterclockwise):
-  const tangentX = Math.sin(angle) * radius;  // -d(cos)/dangle = sin
-  const tangentZ = -Math.cos(angle) * radius; // d(sin)/dangle = cos, negated for CCW
+  // Direction of motion: a small forward step along the engine cycle
+  // (one-source evaluators only — no era-chain calls in this hot path)
+  {
+    const yFwd = o.currentYear + 200;
+    const angleFwd = -(ascNodeInvPlaneModel(yFwd) * Math.PI / 180) + phaseOffset;
+    const devFwd = inclInvPlaneModel(yFwd) - cyc.mid;
+    _inclinationArrowDir.set(
+      Math.cos(angleFwd) * radius - x,
+      devFwd * yScale - y,
+      Math.sin(angleFwd) * radius - z).normalize();
+    arrowHelper.setDirection(_inclinationArrowDir);
+  }
 
-  // Also include Y component based on rate of change of inclination
-  // At progress p, inclination uses cos, so derivative is sin (positive when rising)
-  const progressNext = progress + 0.001;
-  const angleNext = -(progressNext * Math.PI * 2) + phaseOffset;
-  const yearNext = balancedYear + progressNext * CYCLE_LENGTH;
-  const inclNext = computeInclinationEarth(yearNext, balancedYear, holisticyearLength, earthInvPlaneInclinationMean, earthInvPlaneInclinationAmplitude);
-  const deviationNext = inclNext - earthInvPlaneInclinationMean;
-  const tangentY = (deviationNext - deviation) * yScale * 1000; // Scale for visibility
-
-  _inclinationArrowDir.set(tangentX, tangentY, tangentZ).normalize();
-  arrowHelper.setDirection(_inclinationArrowDir);
-
-  // Update inclination label with current value
-  labelDiv.textContent = o.earthInvPlaneInclinationDynamic.toFixed(3) + '°';
+  // Update inclination label with current value (chain route, as above)
+  labelDiv.textContent = inclNow.toFixed(3) + '°';
 
   // Show label after all updates are complete (if this was a fresh show)
   // This happens after position, arrow direction, and text are all set
@@ -10931,7 +10951,8 @@ function updateInvariablePlanePosition() {
 
   // Update plane orientation to match dynamic ascending node (same as Sun-centered plane)
   // Apply quaternion directly to invariablePlaneGroup (same structure as Sun-centered)
-  const earthI = (o.earthInvPlaneInclinationDynamic || earthInvPlaneInclinationMean) * Math.PI / 180;
+  // Tilt = the CHAIN inclination of date (the K H/3 o-key splits from it at deep time)
+  const earthI = inclInvPlaneModel(o.currentYear) * Math.PI / 180;
   const earthOmega = (o.earthAscendingNodeInvPlane || earthAscendingNodeInvPlaneVerified) * Math.PI / 180;
 
   // Calculate tilt axis (line of nodes - points toward ascending node)
@@ -10958,61 +10979,8 @@ function updateInvariablePlanePosition() {
     // Don't update timer here - let Sun-centered update it so both log together
   }
 
-  // ===== UPDATE FIXED MARKERS AND TUBES (HIGH/LOW/MEAN) =====
-  // These are in a SEPARATE group (markersGroup) that doesn't rotate with the plane
-  // Position is calculated by applying the plane's quaternion manually (like Sun-centered max incl marker)
-  const markersGroup = invariablePlaneGroup.userData.markersGroup;
-  if (markersGroup) {
-    const markerDist = invariablePlaneGroup.userData.markerDist;
-    const highAngle = invariablePlaneGroup.userData.highAngle;
-    const lowAngle = invariablePlaneGroup.userData.lowAngle;
-    const mean1Angle = invariablePlaneGroup.userData.mean1Angle;
-    const mean2Angle = invariablePlaneGroup.userData.mean2Angle;
-
-    // HIGH marker - calculate local position then apply quaternion (reuse cached vector)
-    _invPlane_localPos.set(Math.cos(highAngle) * markerDist, 0, Math.sin(highAngle) * markerDist);
-    _invPlane_localPos.applyQuaternion(_invPlane_quaternion);
-    invariablePlaneGroup.userData.highMarker.position.copy(_invPlane_localPos);
-
-    // LOW marker
-    _invPlane_localPos.set(Math.cos(lowAngle) * markerDist, 0, Math.sin(lowAngle) * markerDist);
-    _invPlane_localPos.applyQuaternion(_invPlane_quaternion);
-    invariablePlaneGroup.userData.lowMarker.position.copy(_invPlane_localPos);
-
-    // MEAN marker 1 (90° after HIGH)
-    _invPlane_localPos.set(Math.cos(mean1Angle) * markerDist, 0, Math.sin(mean1Angle) * markerDist);
-    _invPlane_localPos.applyQuaternion(_invPlane_quaternion);
-    invariablePlaneGroup.userData.meanMarker1.position.copy(_invPlane_localPos);
-
-    // MEAN marker 2 (90° before HIGH)
-    _invPlane_localPos.set(Math.cos(mean2Angle) * markerDist, 0, Math.sin(mean2Angle) * markerDist);
-    _invPlane_localPos.applyQuaternion(_invPlane_quaternion);
-    invariablePlaneGroup.userData.meanMarker2.position.copy(_invPlane_localPos);
-
-    // HIGH-LOW tube - oriented along the HIGH-LOW axis on the tilted plane
-    const highLowTube = invariablePlaneGroup.userData.highLowTube;
-    if (highLowTube) {
-      // Tube direction in local space (points from LOW to HIGH)
-      _invPlane_tubeDir.set(Math.cos(highAngle), 0, Math.sin(highAngle));
-      _invPlane_tubeDir.applyQuaternion(_invPlane_quaternion);
-      // Create quaternion that rotates Y-axis to tube direction
-      _invPlane_tubeQuat.setFromUnitVectors(_invPlane_yAxis, _invPlane_tubeDir);
-      highLowTube.quaternion.copy(_invPlane_tubeQuat);
-      // Position at center (origin) - tube extends equally in both directions
-      highLowTube.position.set(0, 0, 0);
-    }
-
-    // MEAN tube - oriented perpendicular to HIGH-LOW axis
-    const meanTube = invariablePlaneGroup.userData.meanTube;
-    if (meanTube) {
-      // Mean tube direction in local space (perpendicular to HIGH-LOW)
-      _invPlane_tubeDir.set(Math.cos(mean1Angle), 0, Math.sin(mean1Angle));
-      _invPlane_tubeDir.applyQuaternion(_invPlane_quaternion);
-      _invPlane_tubeQuat.setFromUnitVectors(_invPlane_yAxis, _invPlane_tubeDir);
-      meanTube.quaternion.copy(_invPlane_tubeQuat);
-      meanTube.position.set(0, 0, 0);
-    }
-  }
+  // (The coming-extreme markers live on the inclination-path loop —
+  // positioned in _rebuildInclinationPathGeometry, C-VIS.)
 
   // Get Earth's current height above the invariable plane (in AU)
   const heightAU = o.earthHeightAboveInvPlane || 0;
@@ -11029,10 +10997,6 @@ function updateInvariablePlanePosition() {
   // This makes the plane appear to pass through Earth as the year progresses
   invariablePlaneGroup.position.y = -visualHeight;
 
-  // Sync markersGroup Y position with the plane (markers are in separate group but should move together)
-  if (markersGroup) {
-    markersGroup.position.y = -visualHeight;
-  }
 
   // Update the Earth height indicator (line + label)
   const heightLine = invariablePlaneGroup.userData.earthHeightLine;
@@ -11080,13 +11044,6 @@ const invariablePlaneGroup = createInvariablePlaneVisualization(o.starDistance *
 scene.add(invariablePlaneGroup);
 invariablePlaneGroup.visible = false; // Off by default (labels also hidden by default)
 
-// Add the markers group to the scene (separate from tilted plane group)
-// Markers are positioned in world space using quaternion transform (like Sun-centered max incl marker)
-const invPlaneMarkersGroup = invariablePlaneGroup.userData.markersGroup;
-if (invPlaneMarkersGroup) {
-  scene.add(invPlaneMarkersGroup);
-  invPlaneMarkersGroup.visible = false; // Sync visibility with main plane
-}
 
 //*************************************************************
 // SUN-CENTERED INVARIABLE PLANE (works for all planets)
@@ -11097,7 +11054,7 @@ if (invPlaneMarkersGroup) {
 // ascNode: ICRF-rate value (holisticyearLength/3) for marker POSITIONING (physical position in space)
 // ascNodeEcliptic: Ecliptic-rate value (holisticyearLength/16) for marker LABELS (what user sees when planet crosses)
 const PLANET_INV_PLANE_DATA = {
-  earth:   { obj: earth,   key: 'earth',   inclination: () => o.earthInvPlaneInclinationDynamic,   ascNode: () => o.earthAscendingNodeInvPlane,   ascNodeEcliptic: () => o.earthAscendingNodeInvPlaneEcliptic,   height: () => o.earthHeightAboveInvPlane,   orbitRadiusAU: 1.0 },
+  earth:   { obj: earth,   key: 'earth',   inclination: () => inclInvPlaneModel(o.currentYear),   ascNode: () => o.earthAscendingNodeInvPlane,   ascNodeEcliptic: () => o.earthAscendingNodeInvPlaneEcliptic,   height: () => o.earthHeightAboveInvPlane,   orbitRadiusAU: 1.0 },
   mercury: { obj: mercury, key: 'mercury', inclination: () => o.mercuryInvPlaneInclinationDynamic, ascNode: () => o.mercuryAscendingNodeInvPlane, ascNodeEcliptic: () => o.mercuryAscendingNodeInvPlaneEcliptic, height: () => o.mercuryHeightAboveInvPlane, orbitRadiusAU: mercuryOrbitDistance },
   venus:   { obj: venus,   key: 'venus',   inclination: () => o.venusInvPlaneInclinationDynamic,   ascNode: () => o.venusAscendingNodeInvPlane,   ascNodeEcliptic: () => o.venusAscendingNodeInvPlaneEcliptic,   height: () => o.venusHeightAboveInvPlane,   orbitRadiusAU: venusOrbitDistance },
   mars:    { obj: mars,    key: 'mars',    inclination: () => o.marsInvPlaneInclinationDynamic,    ascNode: () => o.marsAscendingNodeInvPlane,    ascNodeEcliptic: () => o.marsAscendingNodeInvPlaneEcliptic,    height: () => o.marsHeightAboveInvPlane,    orbitRadiusAU: marsOrbitDistance },
@@ -11115,7 +11072,6 @@ const _sunCenteredPlane_planeNormal = new THREE.Vector3();
 const _sunCenteredPlane_planetRelToSun = new THREE.Vector3();
 const _sunCenteredPlane_ascLocalPos = new THREE.Vector3();
 const _sunCenteredPlane_descLocalPos = new THREE.Vector3();
-const _sunCenteredPlane_maxInclLocalPos = new THREE.Vector3();
 const _sunCenteredPlane_orbitCenter = new THREE.Vector3();
 const _sunCenteredPlane_quaternion = new THREE.Quaternion();
 
@@ -11220,27 +11176,9 @@ function createPlanetNodeMarkersGroup() {
   descLabelObj.visible = false;
   descMarker.add(descLabelObj); // Add to marker, not group
 
-  // Max Inclination marker (yellow ▲) - FIXED position where inclination reaches maximum
-  // This is the phaseOffset constant - it doesn't move as the ascending node precesses
-  const maxInclMarkerGeom = new THREE.SphereGeometry(4, 12, 12);
-  const maxInclMarkerMat = new THREE.MeshBasicMaterial({ color: 0xffff00 });
-  const maxInclMarker = new THREE.Mesh(maxInclMarkerGeom, maxInclMarkerMat);
-  maxInclMarker.name = 'MaxInclinationMarker';
-  group.add(maxInclMarker);
-
-  // Max Inclination label - ADD TO MARKER so it follows automatically
-  const maxInclLabelDiv = document.createElement('div');
-  maxInclLabelDiv.innerHTML = '<span style="font-size:14px;">▲</span><br><span style="font-size:10px;">MAX i</span>';
-  maxInclLabelDiv.style.color = '#ffff00';
-  maxInclLabelDiv.style.fontSize = '12px';
-  maxInclLabelDiv.style.fontFamily = 'Arial, sans-serif';
-  maxInclLabelDiv.style.textShadow = '2px 2px 4px black, -1px -1px 2px black';
-  maxInclLabelDiv.style.pointerEvents = 'none';
-  maxInclLabelDiv.style.textAlign = 'center';
-  const maxInclLabelObj = new CSS2DObject(maxInclLabelDiv);
-  maxInclLabelObj.position.set(0, 15, 0); // Offset above marker in local coords
-  maxInclLabelObj.visible = false;
-  maxInclMarker.add(maxInclLabelObj); // Add to marker, not group
+  // (The "Max i" marker is retired — owner-ruled 2026-09-15: it sat at
+  // the inclination-cycle device's fixed maximum-longitude anchor; no
+  // fixed max-i direction exists under the N-body chain.)
 
   // Store references
   group.userData.ascMarker = ascMarker;
@@ -11249,9 +11187,6 @@ function createPlanetNodeMarkersGroup() {
   group.userData.descMarker = descMarker;
   group.userData.descLabel = descLabelObj;
   group.userData.descLabelDiv = descLabelDiv;
-  group.userData.maxInclMarker = maxInclMarker;
-  group.userData.maxInclLabel = maxInclLabelObj;
-  group.userData.maxInclLabelDiv = maxInclLabelDiv;
 
   return group;
 }
@@ -11334,7 +11269,8 @@ function updateSunCenteredInvPlane() {
   // The plane should be tilted DOWN on the side 90° after ascending node (where HIGH point is)
   // and UP on the side 90° before ascending node (where LOW point is)
 
-  const earthI = (o.earthInvPlaneInclinationDynamic || earthInvPlaneInclinationMean) * Math.PI / 180;
+  // Tilt = the CHAIN inclination of date (the K H/3 o-key splits from it at deep time)
+  const earthI = inclInvPlaneModel(o.currentYear) * Math.PI / 180;
   const earthOmega = (o.earthAscendingNodeInvPlane || earthAscendingNodeInvPlaneVerified) * Math.PI / 180;
 
   // The tilt axis is along the line of nodes, pointing toward ascending node
@@ -11482,56 +11418,26 @@ function updateSunCenteredInvPlane() {
   const ascLabelDiv = sunCenteredNodeMarkers.userData.ascLabelDiv;
   const descLabelDiv = sunCenteredNodeMarkers.userData.descLabelDiv;
 
-  // Update ascending node label (show ICRF value - fixed position in space)
-  ascLabelDiv.innerHTML = `<span style="font-size:18px;">☊</span><br><span style="font-size:11px;">ASC NODE</span><br><span style="font-size:10px;color:#88ddff;">Ω: ${ascNodeDeg.toFixed(1)}°</span>`;
+  // Update node labels in the PUBLISHED convention (K5c: the Souami &
+  // Souchay / La2010 longitude origin — the value every panel and chart
+  // speaks; Earth 284.04° at J2000). The marker POSITION keeps the
+  // s-frame angle (its origin is the equinox projected into the plane —
+  // exactly the scene's angular reference), so this is label-only. This
+  // surface had been missed by the K5c published-surface sweep and
+  // showed the internal s-frame number (Earth 287.6°). The no-chain
+  // trio labels its legacy S&S-dynamic variant.
+  const ascSSDeg = _KC_IP_BODY_KEYS.has(planetData.key)
+    ? _kcAscNodeInvPlaneSSDeg(planetData.key, o.julianDay)
+    : ((o[planetData.key + 'AscendingNodeInvPlaneSouamiSouchay'] ?? ascNodeDeg) % 360 + 360) % 360;
+  ascLabelDiv.innerHTML = `<span style="font-size:18px;">☊</span><br><span style="font-size:11px;">ASC NODE</span><br><span style="font-size:10px;color:#88ddff;">Ω: ${ascSSDeg.toFixed(2)}°</span>`;
 
-  // Update descending node label (show ICRF value)
-  const descNodeDeg = (ascNodeDeg + 180) % 360;
-  descLabelDiv.innerHTML = `<span style="font-size:18px;">☋</span><br><span style="font-size:11px;">DESC NODE</span><br><span style="font-size:10px;color:#88ddff;">Ω: ${descNodeDeg.toFixed(1)}°</span>`;
+  // Descending node = ascending + 180°, same convention
+  const descSSDeg = (ascSSDeg + 180) % 360;
+  descLabelDiv.innerHTML = `<span style="font-size:18px;">☋</span><br><span style="font-size:11px;">DESC NODE</span><br><span style="font-size:10px;color:#88ddff;">Ω: ${descSSDeg.toFixed(2)}°</span>`;
 
-  // Get the phase offset for this planet (Ω_J2000 - φ₀)
-  const phaseOffsetLookup = {
-    mercury: planets.mercury.inclinationCycleAnchor,
-    venus: planets.venus.inclinationCycleAnchor,
-    mars: planets.mars.inclinationCycleAnchor,
-    jupiter: planets.jupiter.inclinationCycleAnchor,
-    saturn: planets.saturn.inclinationCycleAnchor,
-    uranus: planets.uranus.inclinationCycleAnchor,
-    neptune: planets.neptune.inclinationCycleAnchor,
-    pluto: planets.pluto.inclinationCycleAnchor,
-    earth: earthInclinationCycleAnchor  // ω̃=102.947°, ICRF perihelion at balanced year → 21.77°
-  };
-  const phaseOffset = phaseOffsetLookup[planetData.key] ?? 0;
-
-  // Get marker references
-  const maxInclMarker = sunCenteredNodeMarkers.userData.maxInclMarker;
-  const maxInclLabel = sunCenteredNodeMarkers.userData.maxInclLabel;
-  const maxInclLabelDiv = sunCenteredNodeMarkers.userData.maxInclLabelDiv;
-
-  if (phaseOffset !== 0) {
-    // === MAX INCLINATION MARKER (FIXED) ===
-    // Position at the fixed phaseOffset longitude - this is where inclination reaches maximum
-    // This marker does NOT move as the ascending node precesses
-    maxInclMarker.visible = true;
-    maxInclLabel.visible = true;
-
-    const maxInclRad = -phaseOffset * Math.PI / 180; // Negate for CW rotation like other markers
-    const maxInclLocalX = Math.cos(maxInclRad) * orbitRadius;
-    const maxInclLocalZ = Math.sin(maxInclRad) * orbitRadius;
-    _sunCenteredPlane_maxInclLocalPos.set(maxInclLocalX, 0, maxInclLocalZ);
-
-    // Apply plane's quaternion to transform to world orientation
-    _sunCenteredPlane_maxInclLocalPos.applyQuaternion(sunCenteredInvPlane.quaternion);
-    _sunCenteredPlane_maxInclLocalPos.add(_sunCenteredPlane_orbitCenter);
-    maxInclMarker.position.copy(_sunCenteredPlane_maxInclLocalPos);
-
-    // Update label with fixed ICRF phase offset value
-    maxInclLabelDiv.innerHTML = `<span style="font-size:14px;">▲</span><br><span style="font-size:9px;">MAX i</span><br><span style="font-size:10px;color:#ffff88;">${phaseOffset.toFixed(0)}°</span>`;
-  } else {
-    // Hide marker for Earth or planets without phase offset data
-    maxInclMarker.visible = false;
-    maxInclLabel.visible = false;
-  }
+  // (The former "Max i" marker is RETIRED, owner-ruled 2026-09-15: it sat
+  // at the inclination-cycle device's fixed maximum-longitude anchor —
+  // under the N-body chain there is no fixed max-i direction.)
 
   // Update height indicator label
   sunCenteredHeightLabel.visible = true;
@@ -25768,11 +25674,8 @@ function setupGUI() {
     'Disc on the invariable plane, perpendicular to the solar system\u2019s angular momentum.');
   addTooltip(refFolder.addBinding(invariablePlaneGroup, 'visible', { label: 'Earth Inclination Path' })
     .on('change', ({ value }) => {
-      if (invariablePlaneGroup.userData.markersGroup) invariablePlaneGroup.userData.markersGroup.visible = value;
-      if (invariablePlaneGroup.userData.highLabelObj) invariablePlaneGroup.userData.highLabelObj.visible = value;
-      if (invariablePlaneGroup.userData.lowLabelObj) invariablePlaneGroup.userData.lowLabelObj.visible = value;
-      if (invariablePlaneGroup.userData.meanLabel1Obj) invariablePlaneGroup.userData.meanLabel1Obj.visible = value;
-      if (invariablePlaneGroup.userData.meanLabel2Obj) invariablePlaneGroup.userData.meanLabel2Obj.visible = value;
+      if (inclinationPathGroup.userData.nextMaxLabelObj) inclinationPathGroup.userData.nextMaxLabelObj.visible = value;
+      if (inclinationPathGroup.userData.nextMinLabelObj) inclinationPathGroup.userData.nextMinLabelObj.visible = value;
       if (invariablePlaneGroup.userData.earthHeightLabelObj) invariablePlaneGroup.userData.earthHeightLabelObj.visible = value;
       if (value) updateInvariablePlanePosition();
       inclinationPathGroup.visible = value;
@@ -45344,7 +45247,7 @@ async function runRATest() {
         periRows.push([jd, date, time, modelYear,
           mercuryPer.toFixed(6), mercuryAsc.toFixed(6), mercuryArg.toFixed(6), mercuryAppIncl.toFixed(6), mercuryEl.inclInvPlaneDeg.toFixed(6), convertNodeSFrameToEquatorOriginDeg(mercuryEl.ascNodeInvPlaneDeg, _kcNodeOriginSSDeg()).toFixed(6), mercuryPerEcl.toFixed(6),
           venusPer.toFixed(6), venusAsc.toFixed(6), venusArg.toFixed(6), venusAppIncl.toFixed(6), venusEl.inclInvPlaneDeg.toFixed(6), convertNodeSFrameToEquatorOriginDeg(venusEl.ascNodeInvPlaneDeg, _kcNodeOriginSSDeg()).toFixed(6), venusPerEcl.toFixed(6),
-          earthPerEcl.toFixed(6), earthPerRA.toFixed(6), earthEl.inclInvPlaneDeg.toFixed(6), convertNodeSFrameToEquatorOriginDeg(earthEl.ascNodeInvPlaneDeg, _kcNodeOriginSSDeg()).toFixed(6),
+          earthPerEcl.toFixed(6), earthPerRA.toFixed(6), inclInvPlaneModel(o.currentYear).toFixed(6), convertNodeSFrameToEquatorOriginDeg(earthEl.ascNodeInvPlaneDeg, _kcNodeOriginSSDeg()).toFixed(6),
           marsPer.toFixed(6), marsAsc.toFixed(6), marsArg.toFixed(6), marsAppIncl.toFixed(6), marsEl.inclInvPlaneDeg.toFixed(6), convertNodeSFrameToEquatorOriginDeg(marsEl.ascNodeInvPlaneDeg, _kcNodeOriginSSDeg()).toFixed(6), marsPerEcl.toFixed(6),
           jupiterPer.toFixed(6), jupiterAsc.toFixed(6), jupiterArg.toFixed(6), jupiterAppIncl.toFixed(6), jupiterEl.inclInvPlaneDeg.toFixed(6), convertNodeSFrameToEquatorOriginDeg(jupiterEl.ascNodeInvPlaneDeg, _kcNodeOriginSSDeg()).toFixed(6), jupiterPerEcl.toFixed(6),
           saturnPer.toFixed(6), saturnAsc.toFixed(6), saturnArg.toFixed(6), saturnAppIncl.toFixed(6), saturnEl.inclInvPlaneDeg.toFixed(6), convertNodeSFrameToEquatorOriginDeg(saturnEl.ascNodeInvPlaneDeg, _kcNodeOriginSSDeg()).toFixed(6), saturnPerEcl.toFixed(6),
@@ -47069,8 +46972,8 @@ const planetStats = {
        hover : [`0 by DEFINITION: the ecliptic of date IS Earth's mean orbital plane, so Earth's inclination to it is identically zero at every epoch (the CYCLES-tab chart draws its Ecliptic-Inclination curve at 0 for the same reason). Other element tables (JPL, Laskar) quote Earth's inclination against the FIXED J2000 ecliptic instead — a frozen snapshot the of-date plane slowly drifts from (~0.0036° by 2026, ~1.7° at −10,000) — a convention this panel does not use. Earth's physical tilt content lives in the Inclination to Inv. plane row below (~1.578°).`],
        constant: true},
       {label : () => `Inclination to Inv. plane (I)`,
-       value : [ { v: () => _kcElementsOfDate('earth', o.julianDay).inclInvPlaneDeg, dec:6, sep:',' },{ small: 'degrees (°)' }],
-       hover : [`The chain's inclination of date to the engine's own invariable plane (the system's total-angular-momentum plane) — from the N-body element set. Currently ~1.578° and on the descending arc of the multi-mode secular swing (chain minimum ≈0.84° near +20 kyr)`]},
+       value : [ { v: () => inclInvPlaneModel(o.currentYear), dec:6, sep:',' },{ small: 'degrees (°)' }],
+       hover : [`Earth's inclination of date to the engine's own invariable plane (the system's total-angular-momentum plane) — the ONE-SOURCE series route (engine orbit normal; La2010-validated at 0.0007° rms; the element-evaluator route is the 8-mode skeleton and splits from it at deep time). Currently ~1.579° on the descending arc of the multi-mode secular swing (next minimum ≈0.72° near +25 kyr, next maximum ≈2.10° near +80 kyr — the Earth Inclination Path visual shows both)`]},
 
     {header : '—  Gravitational Influence Zones —' },
       {label : () => `Hill Sphere (r_Hill)`,
@@ -47268,11 +47171,11 @@ const planetStats = {
        hover : [`Whether planet is currently north (above) or south (below) of the invariable plane`]},
     null,
        {label : () => `Max height above Inv. Plane`,
-       value : [ { v: () => Math.sin(_kcElementsOfDate('earth', o.julianDay).inclInvPlaneDeg * Math.PI / 180), dec:6, sep:',' },{ small: 'AU' }],
-       hover : [`Mean maximum height above/below the invariable plane: ±sin(i) × 1 AU. Actual values vary slightly with orbital position due to eccentricity.`]},
+       value : [ { v: () => Math.sin(inclInvPlaneModel(o.currentYear) * Math.PI / 180), dec:6, sep:',' },{ small: 'AU' }],
+       hover : [`Mean maximum height above/below the invariable plane: ±sin(i) × 1 AU, i the one-source inclination of date. Actual values vary slightly with orbital position due to eccentricity.`]},
       {label : () => `Max height above Inv. Plane`,
-       value : [ { v: () => Math.sin(_kcElementsOfDate('earth', o.julianDay).inclInvPlaneDeg * Math.PI / 180) * currentAUDistance, dec:0, sep:',' },{ small: 'km' }],
-       hover : [`Mean maximum height in km: ±sin(i) × 149,597,870.7 km. Actual values vary slightly with orbital position due to eccentricity.`]},
+       value : [ { v: () => Math.sin(inclInvPlaneModel(o.currentYear) * Math.PI / 180) * currentAUDistance, dec:0, sep:',' },{ small: 'km' }],
+       hover : [`Mean maximum height in km: ±sin(i) × the AU, i the one-source inclination of date. Actual values vary slightly with orbital position due to eccentricity.`]},
 
     {header : '—  Position & Anomalies —' },
       {label : () => `Mean Anomaly (M)`,
@@ -47312,7 +47215,7 @@ const planetStats = {
        hover : [`Angle between velocity vector and local horizontal: tan(γ) = e·sin(ν) / (1 + e·cos(ν))`],
        info  : 'https://en.wikipedia.org/wiki/Flight_path_angle'},
       {label : () => `Heliocentric Latitude (β)`,
-       value : [ { v: () => OrbitalFormulas.heliocentricLatitude(_kcElementsOfDate('earth', o.julianDay).inclInvPlaneDeg, _kcArgPeriInvPlaneDeg('earth', o.julianDay), o.earthTrueAnomaly), dec:4, sep:',' },{ small: 'degrees (°)' }],
+       value : [ { v: () => OrbitalFormulas.heliocentricLatitude(inclInvPlaneModel(o.currentYear), _kcArgPeriInvPlaneDeg('earth', o.julianDay), o.earthTrueAnomaly), dec:4, sep:',' },{ small: 'degrees (°)' }],
        hover : [`sin(β) = sin(i) × sin(ω + ν), where i = inclination to inv. plane, ω = argument of periapsis measured from the ascending node ON the invariable plane (the K5c vector construction — matching the latitude's reference plane), ν = true anomaly. Oscillates ±i`]},
     null,
       {label : () => `True Anomaly Rate (dν/dt)`,
@@ -47380,8 +47283,8 @@ const planetStats = {
        value : [ { small: eccentricityDerivedMean },{ v: () => o.eccentricityEarth, dec:13, sep:',' }],
        hover : [`Left = mean eccentricity base′ (the one law's mean, derived from e(J2000) and the System-Reset anchor). Right = current value e(t) = base′·(1 + cos θ/2) on the H/3 cycle (the apsidal-period phase): ${fmtNum(holisticyearLength / 3, 0, ',')} years (at J2000); range ${(eccentricityDerivedMean * 0.5).toFixed(6)}–${(eccentricityDerivedMean * 1.5).toFixed(6)}.`]},
       {label : () => `Inclination to Invariable plane (degrees)`,
-       value : [ { v: () => _kcElementsOfDate('earth', o.julianDay).inclInvPlaneDeg, dec:13, sep:',' }],
-       hover : [`The chain's inclination of date to the engine's own invariable plane — the N-body element set`]},
+       value : [ { v: () => inclInvPlaneModel(o.currentYear), dec:13, sep:',' }],
+       hover : [`Earth's inclination of date to the engine's own invariable plane — the one-source series route (La2010-validated)`]},
      null,
       {label : () => `Length of AU (km)`,
        value : [ { small:{ v: () => AU_J2000_KM, dec:6, sep:',' }},{ v: () => currentAUDistance, dec:5, sep:',' }],
@@ -55687,13 +55590,16 @@ function updatePlanetInvariablePlaneHeights() {
         // Asc Node Inv — the chain node in the Souami & Souchay longitude
         // origin (the published-surface convention; Earth 284.04° at J2000).
         dt2.nodeEl.textContent = _kcAscNodeInvPlaneSSDeg(key, o.julianDay).toFixed(2) + '°';
-        // Incl. — the chain's inclination of date to the model's own
-        // invariable plane, for EVERY row incl. Earth (display only; the
-        // engine-K o.earthInvPlaneInclinationDynamic machinery is untouched).
-        dt2.inclEl.textContent = el.inclInvPlaneDeg.toFixed(4) + '°';
-        // increasing/decreasing from the chain's own slope (±100 yr), not
-        // the retired legacy phase rule
-        const di = _kcElementsOfDate(key, o.julianDay + 36525).inclInvPlaneDeg - el.inclInvPlaneDeg;
+        // Incl. — the inclination of date to the model's own invariable
+        // plane (display only; the engine-K machinery is untouched).
+        // Earth rides its ONE-SOURCE series route (inclInvPlaneModel —
+        // the element evaluator gives Earth the 8-mode skeleton, which
+        // splits from the validated route at deep time); planets ride
+        // the chain element set.
+        const iNow = key === 'earth' ? inclInvPlaneModel(o.currentYear) : el.inclInvPlaneDeg;
+        dt2.inclEl.textContent = iNow.toFixed(4) + '°';
+        // increasing/decreasing from the same route's slope (±100 yr)
+        const di = (key === 'earth' ? inclInvPlaneModel(o.currentYear + 100) : _kcElementsOfDate(key, o.julianDay + 36525).inclInvPlaneDeg) - iNow;
         dt2.inclEl.style.color = di >= 0
           ? 'hsla(140, 65%, 55%, 1)'  // green = increasing
           : 'hsla(0, 70%, 60%, 1)';   // red = decreasing
