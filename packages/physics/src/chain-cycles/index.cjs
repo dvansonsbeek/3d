@@ -73,6 +73,29 @@ function createChainCycleIntegrator({
   /** @type {Map<PeriodSecondsAtAge, Float64Array | null>} */
   const tables = new Map();
 
+  // Exact-argument memo for the year-length integrand of the out-of-range
+  // Simpson fallback. Within one animation frame every integrator node
+  // (the six-plus Moon chains + the seven planets) integrates the SAME
+  // (anchor, currentYear) pair, so the Simpson sample lattice — and with
+  // it every tropicalYearSecondsAtAge(tMa) — repeats across chains, up to
+  // 13× per sample. Exact-key reuse returns the bit-identical value: pure
+  // dedupe, not a resolution change (the sampler-purity trap class is
+  // about grids serving NEARBY arguments; this serves only the same one).
+  // Bounded by wholesale clear — one frame's lattice is ≤ ~1025 entries.
+  /** @type {Map<number, number | null>} */
+  const yearSecondsMemo = new Map();
+  const YEAR_SECONDS_MEMO_CAP = 4096;
+  /** @param {number} tMa @returns {number | null} */
+  function tropicalYearSecondsMemo(tMa) {
+    let v = yearSecondsMemo.get(tMa);
+    if (v === undefined) {
+      v = tropicalYearSecondsAtAge(tMa);
+      if (yearSecondsMemo.size >= YEAR_SECONDS_MEMO_CAP) yearSecondsMemo.clear();
+      yearSecondsMemo.set(tMa, v);
+    }
+    return v;
+  }
+
   /** Lazy cumulative table for one chain; null when the chain is undefined
    *  anywhere in range (→ Simpson fallback).
    *  @param {PeriodSecondsAtAge} periodFnSeconds
@@ -167,7 +190,7 @@ function createChainCycleIntegrator({
       const tMa = (ageAnchorYear - y) / 1e6;
       const tPeriodS = periodFnSeconds(tMa);
       if (tPeriodS === null) return null;
-      const tYrS = tropicalYearSecondsAtAge(tMa);
+      const tYrS = tropicalYearSecondsMemo(tMa);
       if (tYrS === null) return null;
       const integrand = tYrS / tPeriodS;  // cycles per SI year
       const w = (i === 0 || i === n) ? 1 : (i % 2 === 1 ? 4 : 2);

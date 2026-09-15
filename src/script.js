@@ -2487,8 +2487,19 @@ function _withLatticeAlpha(build) {
   try { build(); } finally { _latticeAlphaRef = prev; }
 }
 
+// Exact-argument memo: beyond the ±250 kyr chain-cycle table every moving
+// frame runs ~13 Simpson integrations whose Moon-chain integrands all call
+// α(t) at the SAME tMa sample lattice — the profiler measured 35% of
+// deep-time frame cost here. Same argument → bit-identical value (pure
+// dedupe, not a grid); bounded by wholesale clear. The lattice-α reference
+// and the TDZ crash guard below bypass the memo entirely, so a table build
+// can never poison it with the pinned anchor value.
+const _earthMoiMemo = new Map();
+const _EARTH_MOI_MEMO_CAP = 8192;
 function earthMoiFactorAtAge(t_Ma) {
   if (_latticeAlphaRef) return EARTH_MOI_FACTOR;
+  const memoHit = _earthMoiMemo.get(t_Ma);
+  if (memoHit !== undefined) return memoHit;
   // CLIMATE_FORMULA_COEFFS is a `const` defined ~16k lines later, so a caller
   // firing during module init hits its TDZ (reading a TDZ const throws).
   // This is now ONLY a crash guard — the lattice reference above carries the
@@ -2511,7 +2522,10 @@ function earthMoiFactorAtAge(t_Ma) {
   }
   const year = 2000 - t_Ma * 1e6;
   const L1_at = _evalClimateL1Orbital(year);
-  return EARTH_MOI_FACTOR - ALPHA_CLIMATE_SCALE * (L1_at - _alphaClimateL1_J2000);
+  const alpha = EARTH_MOI_FACTOR - ALPHA_CLIMATE_SCALE * (L1_at - _alphaClimateL1_J2000);
+  if (_earthMoiMemo.size >= _EARTH_MOI_MEMO_CAP) _earthMoiMemo.clear();
+  _earthMoiMemo.set(t_Ma, alpha);
+  return alpha;
 }
 
 // ─── Mantle-core electromagnetic coupling: NOT included as a constant LOD term ───
@@ -6332,6 +6346,46 @@ if (typeof window !== 'undefined') {
         pathPoints: pos ? pos.count : 0,
         markerLabel: ud.labelDiv.textContent,
       };
+    },
+    // Trace-sampling probe (the round-7 stairs hunt): runs the EXACT
+    // tracePlanet sampling loop for one traced object over an arbitrary
+    // pos lattice and returns the raw polyline — separates sampling
+    // jaggedness from buffer/rendering artifacts. offsetYears is relative
+    // to the current pos; the model is restored afterwards.
+    visTraceSampleProbe: (name, offsetYears, stepPos, count) => {
+      const obj = tracePlanets.find((p) => p.name === name);
+      if (!obj) return null;
+      const p0 = o.pos;
+      const base = o.pos + offsetYears;
+      const pts = [];
+      const _pe = new THREE.Vector3(), _pa = new THREE.Vector3();
+      const sJD = o.julianDay, sYr = o.currentYear;
+      for (let i = 0; i < count; i++) {
+        const px = base + i * stepPos;
+        // one clock per sample — mirrors the tracePlanet fill loop
+        o.julianDay = jdFromPos(px);
+        o.currentYear = julianDateToDecimalYear(o.julianDay);
+        moveModel(px);
+        earth.containerObj.updateMatrixWorld();
+        if (!_kcChainWorldPos(obj, o.julianDay, _tracePos)) {
+          obj.planetObj.getWorldPosition(_tracePos);
+        }
+        // component split for the smoothness attribution: Earth's world
+        // position, the device anchor, and the chain perihelion longitude
+        earth.rotationAxis.getWorldPosition(_pe);
+        obj.containerObj.parent.getWorldPosition(_pa);
+        pts.push({
+          p: [_tracePos.x, _tracePos.y, _tracePos.z],
+          e: [_pe.x, _pe.y, _pe.z],
+          a: [_pa.x, _pa.y, _pa.z],
+          lp: _kcPerihelionEclLonDeg('earth', jdFromPos(px)),
+        });
+      }
+      o.julianDay = sJD;
+      o.currentYear = sYr;
+      moveModel(p0);
+      earth.containerObj.updateMatrixWorld();
+      return pts;
     },
     visNodeMarkersProbe: (name) => {
       o.lookAtObj = { name };
@@ -35783,6 +35837,14 @@ function render(now) {
 
   const forceAllUpdates = positionChanged;
   positionChanged = false;
+  // A forced scene update moves objects (epoch steps, GUI jumps, toggles) —
+  // the CSS2D layer must re-project with them. Without this, a paused
+  // ±1000-yr step moved the perihelion marker while its label stayed at
+  // the old screen position until the camera moved (needsLabelUpdate only
+  // had camera/zoom triggers) — the owner-reported "label reconnects only
+  // when I move the scene" class. Same-frame: labels render at the end of
+  // this loop pass, after the scene has moved.
+  if (forceAllUpdates) needsLabelUpdate = true;
 
   // 4) FPS smoothing + adaptive pixel ratio
   const fps = 1000 / deltaMs;
@@ -44968,13 +45030,24 @@ function _osCardinalSolve(cp, seedJD) {
 }
 let _osCardinalAnchorDelta = null;      // per-type: registry J2000 anchor − scene year-2000 event
 let _osCardinalCacheYear = null, _osCardinalCacheVals = null, _osCardinalLastMs = 0;
+// Adaptive hold (the D4b deep-time regression, owner-bisected 2026-09-16:
+// D4a 48 ms → D4b 1343 ms per full update at +300 kyr). The fixed 300 ms
+// guard is SELF-DEFEATING once one solve costs more than 300 ms — every
+// full update re-solved, and each of the ~50 solver probes jumps + rebuilds
+// the scene, so beyond the ±250 kyr integrator table the whole frame
+// collapsed. The hold now scales with the measured solve cost (10×, floor
+// 300 ms): near J2000 nothing changes; at deep travel the cardinal rows
+// refresh every few seconds instead of freezing the frame. Display cadence
+// only — the solved VALUES are untouched, and a paused epoch serves the
+// exact per-year cache immediately.
+let _osCardinalHoldMs = 300;
 function _osCardinalAt(cpYear) {
   if (_osCardinalCacheYear === cpYear && _osCardinalCacheVals) return _osCardinalCacheVals;
   // Fast time-lapse guard: crossing a year boundary every frame must not
   // re-run the ~50-probe solve per frame — during rapid scrubbing the panel
-  // holds the previous year's values for up to 300 ms, then settles.
+  // holds the previous year's values, then settles.
   const nowMs = performance.now();
-  if (_osCardinalCacheVals && nowMs - _osCardinalLastMs < 300) return _osCardinalCacheVals;
+  if (_osCardinalCacheVals && nowMs - _osCardinalLastMs < _osCardinalHoldMs) return _osCardinalCacheVals;
   _osCardinalLastMs = nowMs;
   const _saveJD = o.julianDay;
   try {
@@ -44997,6 +45070,7 @@ function _osCardinalAt(cpYear) {
     }
     _osCardinalCacheYear = cpYear;
     _osCardinalCacheVals = vals;
+    _osCardinalHoldMs = Math.max(300, 10 * (performance.now() - nowMs));
     return vals;
   } finally {
     jumpToJulianDay(_saveJD);
@@ -51158,11 +51232,25 @@ function computeSunSSBOffset(year) {
   };
 }
 
+// Sun-SSB chart sampling cache (perf; the trajectory VALUES are untouched —
+// computeSunSSBOffset stays the one source). The chart rebuilt 201 samples
+// × 8 chain evaluations on EVERY 5-Hz panel render (measured 24 ms each —
+// more than a whole 60-fps frame). The sample grid is anchored to ABSOLUTE
+// quarter-year steps (the chart's own native step: 50 yr / 200), so a
+// sliding window reuses its overlap through the exact-argument memo and a
+// normal-speed render recomputes at most the newly-entered samples; the
+// 250 ms wall-clock floor bounds deep-time travel (the same convention as
+// the C-VIS scanner and the orbit rings). The series-identity guard clears
+// everything when the async artifact lands — a pre-series curve can never
+// outlive the load.
+let _ssbChartMemoSeries = null;
+const _ssbChartMemo = new Map();     // quantized sample year → SSB point
+const _SSB_CHART_MEMO_CAP = 1024;
+let _ssbChartLast = null;            // { y0, points, builtMs }
 function buildSunSSBChart(currentYear) {
   const R_SUN_KM = diameters.sunDiameter / 2;
   const halfRange = 25;
   const samples = 200;
-  const points = [];
 
   // Fixed chart scale — physically maximum possible SSB excursion (all planets
   // aligned). Computed once from the model's mass ratios and inv-plane data so
@@ -51186,10 +51274,30 @@ function buildSunSSBChart(currentYear) {
   // Padding so trajectory never touches chart edge; ensure Sun is always visible
   const scale = Math.max(maxR * 1.1, R_SUN_KM * 1.4);
 
-  for (let i = 0; i <= samples; i++) {
-    const year = currentYear - halfRange + (2 * halfRange) * (i / samples);
-    const ssb = computeSunSSBOffset(year);
-    points.push({ year, x: ssb.x, y: ssb.y, z: ssb.z, mag: ssb.magnitude });
+  const step = (2 * halfRange) / samples;   // 0.25 yr — the chart's native step
+  const y0 = Math.round((currentYear - halfRange) / step) * step;
+  const nowMs = performance.now();
+  if (_ssbChartMemoSeries !== _planetSeriesData) {
+    _ssbChartMemo.clear();
+    _ssbChartMemoSeries = _planetSeriesData;
+    _ssbChartLast = null;
+  }
+  let points;
+  if (_ssbChartLast && (_ssbChartLast.y0 === y0 || nowMs - _ssbChartLast.builtMs < 250)) {
+    points = _ssbChartLast.points;
+  } else {
+    points = [];
+    for (let i = 0; i <= samples; i++) {
+      const year = y0 + i * step;
+      let ssb = _ssbChartMemo.get(year);
+      if (ssb === undefined) {
+        ssb = computeSunSSBOffset(year);
+        if (_ssbChartMemo.size >= _SSB_CHART_MEMO_CAP) _ssbChartMemo.clear();
+        _ssbChartMemo.set(year, ssb);
+      }
+      points.push({ year, x: ssb.x, y: ssb.y, z: ssb.z, mag: ssb.magnitude });
+    }
+    _ssbChartLast = { y0, points, builtMs: nowMs };
   }
 
   // SVG dimensions (380 — larger than before)
@@ -51566,8 +51674,13 @@ function buildPerihelionChart(planetKey, currentYear) {
   const anchor = 2000 - T / 2;
   const kCycle = Math.floor(((currentYear || startmodelYear) - anchor) / T);
   const y0 = anchor + kCycle * T;
+  // Series-identity guard (the owner-seen "jump came back"): the samples
+  // below ride _kcChartElementsOfDate, whose smoothing needs the async
+  // series artifact — a window sampled BEFORE the artifact landed cached
+  // the raw era-chain curve (the old handover step) and, with Mercury's
+  // 232-kyr window, kept it for the session. A series flip invalidates.
   let C = _periChartCache[planetKey];
-  if (!C || C.k !== kCycle) {
+  if (!C || C.k !== kCycle || C.series !== _planetSeriesData) {
     const yrs = new Array(N), incl = new Array(N), ecl = new Array(N);
     let iMin = 0, iMax = 0;
     for (let i = 0; i < N; i++) {
@@ -51581,7 +51694,7 @@ function buildPerihelionChart(planetKey, currentYear) {
       if (incl[i] < incl[iMin]) iMin = i;
       if (incl[i] > incl[iMax]) iMax = i;
     }
-    C = _periChartCache[planetKey] = { k: kCycle, yrs, incl, ecl, iMin, iMax };
+    C = _periChartCache[planetKey] = { k: kCycle, series: _planetSeriesData, yrs, incl, ecl, iMin, iMax };
   }
   const { yrs, incl, ecl, iMin, iMax } = C;
   const yMinData = Math.min(Math.min(...incl), Math.min(...ecl));
@@ -52787,12 +52900,11 @@ const _moonVisualMatrix = new THREE.Matrix4();
 let _kcChains = null, _kcR = null;
 const _KC_PLANET_NAMES = new Set(['Mercury', 'Venus', 'Mars', 'Jupiter', 'Saturn', 'Uranus', 'Neptune']);
 function _kcHelioAU(nameLower, jd) {
-  if (!_kcChains) _kcChains = buildPlanetChainsFromArtifactData(CHAIN_ARTIFACT);
-  const year = KC_ANCHOR_EPOCH_YEAR + (jd - KC_ANCHOR_EPOCH_JD) / 365.25;
-  let el = kcComputePlanetElementsAtYear(year, _kcChains[nameLower], _kcChains);
   // D5: positions and rings share the SAME override (DEFAULT-ON, the early
   // flip) — the planet stays on its ring by construction at every epoch.
-  if (_planetSeriesData) el = _kcSeriesSecularEl(nameLower, year, el);
+  // One home + the exact-key memo: this was an inline copy of
+  // _kcElementsOfDate (same chain call, same override, same order).
+  const el = _kcElementsOfDate(nameLower, jd);
   const p = kcComputeHeliocentricEclipticFromElements(el);
   // D5b: the relative-plane correction (engine-Earth plane → the scene's
   // sun plane) — one rotation, applied to the helio vector so positions,
@@ -52920,13 +53032,29 @@ function _kcUpdatePlaneCorr(year) {
 // P5/K5 — elements-of-date from the chain (the multi-mode secular skeleton
 // + derived terms): ϖ(t), Ω(t), e(t), i(t) — the true element wander, not
 // fixed divisor rates.
+// Exact-key memo (perf): a frame evaluates the same (planet, o.julianDay)
+// from many surfaces — positions, tangents, ~40 panel rows, the gauge, the
+// report — each a full mode summation. Same key → the identical object
+// (pure in (name, jd) given the loaded series; the series-identity guard
+// clears the memo when the async artifact arrives). Callers treat the
+// elements as read-only. Bounded by wholesale clear.
+let _kcElMemoSeries = null;
+const _kcElMemo = new Map();
+const _KC_EL_MEMO_CAP = 2048;   // > one Sun-SSB chart burst (201×8 keys) so a chart rebuild cannot evict the frame's panel entries
 function _kcElementsOfDate(nameLower, jd) {
+  if (_planetSeriesData !== _kcElMemoSeries) { _kcElMemo.clear(); _kcElMemoSeries = _planetSeriesData; }
+  const memoKey = nameLower + '|' + jd;
+  const hit = _kcElMemo.get(memoKey);
+  if (hit !== undefined) return hit;
   if (!_kcChains) _kcChains = buildPlanetChainsFromArtifactData(CHAIN_ARTIFACT);
   const year = KC_ANCHOR_EPOCH_YEAR + (jd - KC_ANCHOR_EPOCH_JD) / 365.25;
   const el = kcComputePlanetElementsAtYear(year, _kcChains[nameLower], _kcChains);
   // Planet override DEFAULT-ON once the series is loaded (the early flip);
   // inside each planet's measured boundary this is a no-op (chain serves).
-  return _planetSeriesData ? _kcSeriesSecularEl(nameLower, year, el) : el;
+  const out = _planetSeriesData ? _kcSeriesSecularEl(nameLower, year, el) : el;
+  if (_kcElMemo.size >= _KC_EL_MEMO_CAP) _kcElMemo.clear();
+  _kcElMemo.set(memoKey, out);
+  return out;
 }
 function _kcPerihelionEclLonDeg(nameLower, jd) {
   return _kcElementsOfDate(nameLower, jd).lonPeriEclipticDeg;
@@ -53236,7 +53364,17 @@ function _kcUpdateOrbitLine(obj, nm, jd) {
     obj.orbitLineObj = line;
     obj._kcOrbitLine = line;
   }
-  if (line._kcSampleJD === undefined || Math.abs(jd - line._kcSampleJD) > _KC_ORBIT_RESAMPLE_DAYS) {
+  // Wall-clock floor on the epoch-driven resample (the deep-time perf
+  // catch): at travel speeds above ~10 yr/frame the JD condition fires
+  // EVERY frame — 7 planets × 257 vertices of element evaluation + Kepler
+  // solve per frame, the measured in-table baseline cost of the chain
+  // rings. Between resamples the ring holds its last shape (it already
+  // holds it for ~10 yr at normal speeds); positions and panels are
+  // untouched. Four resamples a second is visually indistinguishable.
+  const _resampleNowMs = performance.now();
+  if (line._kcSampleJD === undefined || (Math.abs(jd - line._kcSampleJD) > _KC_ORBIT_RESAMPLE_DAYS
+      && _resampleNowMs - (line._kcSampleMs ?? 0) >= 250)) {
+    line._kcSampleMs = _resampleNowMs;
     const pDays = 365.25 * Math.pow(_kcElementsOfDate(nm, jd).aAU, 1.5);   // Kepler III, solar-mass unit
     const arr = line.geometry.attributes.position.array;
     for (let i = 0; i <= _KC_ORBIT_SEGS; i++) {
@@ -53755,7 +53893,7 @@ function updatePositionDisplayStrings() {
 function trace(pos) {
     tracePlanets.forEach(obj => {
       tracePlanet(obj, pos)
-    });        
+    });
 }
 
 function resetAllTraces() {
@@ -53864,13 +54002,52 @@ function tracePlanet(obj, pos) {
     nextPos = pos - windowPos;
     obj.traceArrIndex = 0;
   }
-  const effectiveStep = obj.traceStep;
-
   const MAX_ITERATIONS = 100;
+  // Step scaling — the A/B-verified form (owner bisect, 2026-09-15:
+  // 4a8be93e "works perfectly", the 2b815e39 true-step resume refill is
+  // where the lag came in). This RESTORES 4a8be93e's semantics: the
+  // whole gap is covered EVERY frame, the multiplier sized for
+  // TARGET_ITERATIONS samples, and there is NO wall-clock budget — the
+  // budgeted variants lagged the head behind the marker and made the
+  // step size churn (the measured (cap/affordable)×advance steady-state
+  // lag). One upgrade over 4a8be93e, for the year-step secular traces
+  // (perihelion / wobble-center): the scaled step is k TROPICAL years
+  // (1.0 pos — the integrated pos↔JD conversion's unit) instead of
+  // k·sYear (365 d). Measured with the sun-dec probe: 200 scaled steps
+  // slip the annual phase 0.014° on the tropical unit vs 17.5° on the
+  // 365-day unit — so every scaled vertex keeps the SAME annual phase at
+  // ANY k, which also removes the C-4 jump-scribble (arbitrary-phase
+  // sampling) that motivated the 2b815e39 rework. Sub-year-step traces
+  // (planet bodies, the Moon: fast orbital phase, ≤16-yr windows) are
+  // never step-scaled — they refill at the true step over a few frames.
+  // At normal speeds the gap is ≤ one step and k = 1: bit-identical.
+  const TARGET_ITERATIONS = 50;
+  let effectiveStep = obj.traceStep;
+  if (obj.traceStep >= sYear) {
+    const k = Math.max(1, Math.ceil((pos - nextPos) / (TARGET_ITERATIONS * obj.traceStep)));
+    if (k > 1) effectiveStep = k;
+  }
   let iterations = 0;
 
+  // ONE CLOCK PER SAMPLE (the round-7 stairs root cause, measured with the
+  // visTraceSampleProbe): moveModel's deep-time branches read FRAME state —
+  // _eccYearFrame and _currentYearSI derive from o.julianDay, not from the
+  // pos being sampled — so every fill batch stamped ~50 vertices with ONE
+  // frame-date eccentricity/wobble while ϖ varied per sample (probe: D
+  // frozen at 1.67022 across 35 kyr of samples). One radial step per frame
+  // batch = the owner's staircase; slower playback = smaller steps =
+  // smoother, exactly as observed. The D4a flip introduced the frame-state
+  // read into the sampled geometry (pre-D4a the e-offset was a pos-driven
+  // wheel, smooth in the sampled pos). Fix per the R4 rule: the sampled
+  // moment's JD/year go into o.* for the duration of the sample, restored
+  // after the loop — every frame-state reader inside moveModel then sees
+  // the SAME coherent clock as the chain evaluation below.
+  const _savedJD = o.julianDay, _savedYear = o.currentYear;
   while (nextPos < pos && iterations < MAX_ITERATIONS) {
     iterations++;
+    const _sampleJD = jdFromPos(nextPos);
+    o.julianDay = _sampleJD;
+    o.currentYear = julianDateToDecimalYear(_sampleJD);
     moveModel(nextPos);
     earth.containerObj.updateMatrixWorld();
     // P5/K5b — chain-driven objects (the seven planets + the perihelion
@@ -53879,7 +54056,7 @@ function tracePlanet(obj, pos) {
     // carries the CURRENT date's chain position, so reading it under past
     // pivot rotations traced circles around the device anchor (owner-found:
     // "drawn from the Sun").
-    if (!_kcChainWorldPos(obj, jdFromPos(nextPos), _tracePos)) {
+    if (!_kcChainWorldPos(obj, _sampleJD, _tracePos)) {
       obj.planetObj.getWorldPosition(_tracePos);
     }
 
@@ -53891,9 +54068,15 @@ function tracePlanet(obj, pos) {
     obj.traceArrIndex++;
     nextPos += effectiveStep;
   }
+  o.julianDay = _savedJD;
+  o.currentYear = _savedYear;
 
-  positionAttr.needsUpdate = true;
-  obj.traceCurrPos = nextPos - effectiveStep;
+  if (iterations > 0) {
+    positionAttr.needsUpdate = true;
+    // resume marker = the last WRITTEN sample (4a8be93e semantics); the
+    // guard keeps a no-work pass from walking the marker backward.
+    obj.traceCurrPos = nextPos - effectiveStep;
+  }
   obj.traceLine.visible = true;
 }
 

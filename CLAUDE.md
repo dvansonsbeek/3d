@@ -178,7 +178,11 @@ local run is only needed when the change touches what the heavy steps verify:
 `npm run test:browser` runs the `src/script.js` golden masters in headless
 Chromium — the only tier that guards Phase 8, which dissolves that file —
 plus the epoch-consistency gate (pure f(Y) evaluators ≡ the epoch-anchor
-chain at ±1/±5 Myr; the golden master cannot catch that class).
+chain at ±1/±5 Myr; the golden master cannot catch that class), plus
+`test:perf` — the deep-time performance gate (RATIO thresholds, deep vs
+in-table cost, runner-speed independent; born from four ungated ratio
+regressions, one owner-bisected at 28×; fail-proven via
+`ESSRT_PERF_TIGHTEN=0.01`).
 `npm run test:transparency` is the Phase 6 acceptance gate — **green (84/84,
 round-trip bit-exact) since Phase B** and required in CI; red there is a
 regression of the Phase 6 exit criterion, not a tracked state.

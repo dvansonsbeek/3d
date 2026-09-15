@@ -188,6 +188,12 @@ jobs:
       - name: Regression (script.js golden masters, headless)
         run: npm run test:snapshot
 
+      # Deep-time performance gate (plan 02 §11 rounds 4-8: four ratio
+      # regressions shipped ungated). RATIO thresholds — runner-speed
+      # independent; fail-proven via ESSRT_PERF_TIGHTEN.
+      - name: Performance regression (deep-time ratios, headless)
+        run: npm run test:perf
+
       # THE Phase 6 acceptance gate — GREEN since B.3b and REQUIRED from here on.
       # It was red by design (21/84) while recomputeEpochAnchors mutated the
       # sidereal Fourier baseline; the baseline is a frozen const now and reset
