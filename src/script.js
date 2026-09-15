@@ -6239,6 +6239,20 @@ if (typeof window !== 'undefined') {
     // deliberately uses fixed C.H (the fitted J2000 convention) — identical
     // at fresh load, an S-item under epoch shift.
     sunLonCorrectionAt: (jd) => sunLongitudeCorrection(jd),
+    // ── VFP "Inclination of all planets" smoke surface ───────────────────────
+    // The wgcRenderChart precedent: the hermetic harness aborts external
+    // fetches, so the injector lets a headless probe supply the two tracked
+    // reference datasets and then exercise the screen render, the hover
+    // wiring, and both paper exports. Test surface, not an API.
+    vfpPISetRefData: (la, jpl) => { if (la) _la2010InclData = la; if (jpl) _jplInclData = jpl; },
+    vfpPISeriesLoaded: () => _planetSeriesData !== null,
+    vfpPIState: () => _vfpPIState,
+    vfpPIRender: () => renderVFPPlanetInclinations(),
+    vfpPIAfterRender: (el) => _vfpPIAfterRender(el),
+    vfpPIPaperSvg: (range) => _vfpPIPaperSvg(range || _VFPPI_SCREEN_RANGE),
+    vfpPICyclesRange: () => _VFPPI_CYCLES_RANGE,
+    openVerificationPanel: () => openVerificationPanel(),
+    updateVerificationPanel: (id) => updateVerificationPanel(id),
   };
 }
 
@@ -20818,11 +20832,456 @@ const VFP_CATEGORIES = [
     ],
     modelNote: `Both curves show <strong>absolute ΔT (TT − UT1)</strong> in seconds. Our model is the calibrated long-term trend: <code>deltaTStart</code> (~55.2&nbsp;s J2000 anchor, joint world) + Simpson integral of Layer 2 + H/5 LOD + Bond/Hallstatt/Jose5/Jose4 + Core-mantle swing stack (jointly fit against Espenak history 1650-2017, RMS ≈ 12.5&nbsp;s). The J2000 anchor sits below the IERS instantaneous observation (63.6&nbsp;s) by design — the ~8.4&nbsp;s gap is the industrial-era Earth-rotation acceleration (mass redistribution, ice loss, groundwater pumping) that no cyclic model can capture. <strong>Espenak &amp; Meeus</strong> is the NASA Five Millennium Canon piecewise polynomial fit to observed eclipse timings; divergence from our model (~15&nbsp;s at the 1900 dip, near-zero at 1870 and 2010) shows what our cyclic stack cannot resolve — short-scale (~50-year) wiggles need shorter-period corrections than our H-lattice cycle stack (all ≥ 700&nbsp;yr) allows. Both curves match to ~1&nbsp;s at J2000+50&nbsp;yr and again near 2050.`,
   },
+  {
+    // ── Inclination of all planets (owner spec 2026-09-15) — the LAST
+    // panel: a STATIC multi-planet chart over the cycles convention
+    // [−248,000, +102,000] on the smooth series-tier chart evaluator
+    // (_kcChartElementsOfDate — no handover steps). Ecliptic inclinations
+    // (J2000 frame) per-planet toggleable (defaults: 7 planets ON, Earth
+    // OFF — owner E1: Earth's J2000-frame curve included but default-off,
+    // its of-date convention being 0 elsewhere); one global toggle adds
+    // the inv-plane curves for all eight. Reference: La2010 Earth
+    // inv-plane overlay (data/la2010a-earth-inclination-248kyr.json, the
+    // tracked 1-kyr extract; Laskar et al. 2011, A&A 532 A89). The
+    // planets have NO published deep-time series to compare (searched
+    // 2026-09-15: IMCCE La2010 is Earth-only; the planets stay engine-D,
+    // era-validated against JPL by the chain-vs-JPL gate).
+    id: 'planet-inclinations', label: 'Inclination of all planets',
+    customRender: () => renderVFPPlanetInclinations(),
+    afterRender: (el) => _vfpPIAfterRender(el),
+    // Paper forms (owner items 3–4, 2026-09-15): the same information as
+    // the screen chart, printable on white — "Export for Paper" prints
+    // the screen range, "Export Cycles" the wider _VFPPI_CYCLES_RANGE.
+    customPaper: () => _vfpPIPaperSvg(_VFPPI_SCREEN_RANGE),
+    customPaperAlt: () => _vfpPIPaperSvg(_VFPPI_CYCLES_RANGE),
+  },
 ];
 
+// ── VFP: Inclination of all planets — custom static chart ────────
+// (config above; owner spec items 1–8 with decisions E1–E3.)
+let _la2010InclData = null;   // the tracked La2010a Earth extract, once fetched
+let _jplInclData = null;      // the tracked JPL Horizons osculating IN/OM extract
+{
+  const _fetchRef = async (name, ok, set) => {
+    for (const url of ['data/' + name, '../data/' + name, name,
+      'https://raw.githubusercontent.com/dvansonsbeek/3d/master/data/' + name]) {
+      try {
+        const res = await fetch(url);
+        if (!res.ok) continue;
+        const a = await res.json();
+        if (ok(a)) { set(a); return; }
+      } catch (e) { /* try the next candidate */ }
+    }
+  };
+  _fetchRef('la2010a-earth-inclination-248kyr.json',
+    (a) => Array.isArray(a.inclInvDeg) && Number.isFinite(a.t0Kyr), (a) => { _la2010InclData = a; });
+  _fetchRef('jpl-horizons-planet-inclinations.json',
+    (a) => a.bodies && a.bodies.earth && Array.isArray(a.bodies.earth.inDeg), (a) => { _jplInclData = a; });
+}
+const _vfpPI_PLANETS = ['mercury', 'venus', 'earth', 'mars', 'jupiter', 'saturn', 'uranus', 'neptune'];
+// TWO TABS (owner 2026-09-15): (a) Incl. to Ecliptic · (b) Incl. to Inv.
+// Plane — per-planet checkboxes apply to the ACTIVE tab; Earth's ecliptic
+// curve stays default-off (E1), its inv-plane curve default-on (the
+// La2010-validated one).
+const _vfpPIState = {
+  tab: 'ecl',
+  on: {
+    ecl: { mercury: true, venus: true, earth: false, mars: true, jupiter: true, saturn: true, uranus: true, neptune: true },
+    inv: { mercury: true, venus: true, earth: true, mars: true, jupiter: true, saturn: true, uranus: true, neptune: true },
+  },
+};
+// Screen range: the round calendar span 250,000 BC → 100,000 AD (owner
+// 2026-09-15 — the raw J2000±250k/100k cycles convention displayed as the
+// odd 248,000 BC → 102,000 AD). The Export-Cycles range is a SEPARATE
+// constant on purpose (owner: "easy changeable in the code which period
+// we like to show") — change the two numbers below and nothing else;
+// sampling stays 1-kyr steps whatever the span.
+const _VFPPI_SCREEN_RANGE = [-250000, 100000];
+const _VFPPI_CYCLES_RANGE = [-1000000, 1000000];
+const _vfpPICacheByRange = {};   // static samples — once per session per range
+function _vfpPISamples(range) {
+  const y0 = (range || _VFPPI_SCREEN_RANGE)[0], y1 = (range || _VFPPI_SCREEN_RANGE)[1];
+  // The series artifact lands ASYNC after page load; a render before it
+  // arrives must not lock seriesless (skeleton-class) samples in for the
+  // session — the key carries the loaded flag (the mutable-cache trap).
+  const key = y0 + ':' + y1 + ':' + (_planetSeriesData ? 's' : 'k');
+  if (_vfpPICacheByRange[key]) return _vfpPICacheByRange[key];
+  const N = Math.round((y1 - y0) / 1000) + 1;   // 1-kyr steps
+  const yrToJd = (y) => KC_ANCHOR_EPOCH_JD + (y - KC_ANCHOR_EPOCH_YEAR) * 365.25;
+  const yrs = new Array(N);
+  const data = {};
+  for (const p of _vfpPI_PLANETS) data[p] = { ecl: new Array(N), inv: new Array(N) };
+  for (let i = 0; i < N; i++) {
+    const y = y0 + ((y1 - y0) * i) / (N - 1);
+    yrs[i] = y;
+    for (const p of _vfpPI_PLANETS) {
+      if (p === 'earth') {
+        // Earth rides its OWN series movement, not the planet-series
+        // override (which skips Earth by design): the chart-evaluator route
+        // would give the 8-mode ζ skeleton (rms 0.134° vs La2010 over this
+        // span — "our compression"); the engine orbit normal is the
+        // validated route (the panel's inclInvPlaneModel headline).
+        const nE = _kcEarthEngineOrbitNormalJ2000(y);
+        data.earth.ecl[i] = Math.acos(Math.min(1, Math.max(-1, nE[2]))) * 180 / Math.PI;
+        data.earth.inv[i] = inclInvPlaneModel(y);
+      } else {
+        const el = _kcChartElementsOfDate(p, yrToJd(y));
+        data[p].ecl[i] = el.inclEclipticDeg;
+        data[p].inv[i] = el.inclInvPlaneDeg;
+      }
+    }
+  }
+  return (_vfpPICacheByRange[key] = { y0, y1, yrs, data });
+}
+// Chart-only shade overrides (owner-approved): the scene palette holds two
+// near-identical pairs — Venus/Saturn golds and Earth/Neptune blues — that
+// are indistinguishable as 1.6-px curves. PER STYLE: the dark screen needs
+// LIGHT separations (pale straw / periwinkle), the white paper needs DARK
+// twins (olive / medium blue) — the screen shades wash out on white. Hue
+// families kept so each planet still reads as its scene body; the scene's
+// own colors are untouched.
+const _vfpPIColorOverride = {
+  screen: { saturn: '#efe3a5', neptune: '#7ea6f5' },
+  paper:  { saturn: '#8a7420', neptune: '#4a7de0' },
+};
+function _vfpPICss(p, style) {
+  return _vfpPIColorOverride[style === 'paper' ? 'paper' : 'screen'][p] ||
+    ('#' + planetColorHex[p].toString(16).padStart(6, '0'));
+}
+// JPL osculating IN/OM (ecliptic J2000) → inclination to the model's own
+// invariable plane (the artifact's banked plane; the conversion is ours
+// and labelled — the stored dataset stays pure JPL output).
+function _vfpPIJplInvDeg(inDeg, omDeg) {
+  const D2R = Math.PI / 180;
+  const ip = CHAIN_ARTIFACT.invariablePlane;
+  const si = Math.sin(ip.inclEclipticDeg * D2R), ci = Math.cos(ip.inclEclipticDeg * D2R);
+  const nInv = [si * Math.sin(ip.ascNodeEclipticDeg * D2R), -si * Math.cos(ip.ascNodeEclipticDeg * D2R), ci];
+  const oi = inDeg * D2R, oO = omDeg * D2R;
+  const n = [Math.sin(oi) * Math.sin(oO), -Math.sin(oi) * Math.cos(oO), Math.cos(oi)];
+  return Math.acos(Math.min(1, Math.max(-1, n[0] * nInv[0] + n[1] * nInv[1] + n[2] * nInv[2]))) / D2R;
+}
+// Shared chart core for the screen panel and both paper exports: grid,
+// axes, model curves, JPL/La2010 overlays and the walking legend for one
+// (range, tab, on-set), in the dark 'screen' style or the white 'paper'
+// style. Geometry comes back with the markup so callers (the hover
+// wiring, the paper framing) never re-derive it.
+function _vfpPIChartCore(range, tab, on, style) {
+  const S = _vfpPISamples(range);
+  const paper = style === 'paper';
+  const W = 800, H = 380, PAD = { l: 60, r: 24, t: 16, b: 34 };
+  const pw = W - PAD.l - PAD.r, ph = H - PAD.t - PAD.b;
+  const cGrid = paper ? '#ddd' : '#2a2f3a', cTick = paper ? '#555' : '#888';
+  const fYT = paper ? 11 : 9, fXT = paper ? 10 : 9;   // house paper tick sizes
+  const cLa = paper ? '#c026d3' : '#e879f9';   // La2010 dash, per background
+  let yMax = 0.5;
+  for (const p of _vfpPI_PLANETS) if (on[p]) for (const v of S.data[p][tab]) if (v > yMax) yMax = v;
+  yMax = Math.ceil(yMax * 1.08 * 2) / 2;
+  const toX = (y) => PAD.l + ((y - S.y0) / (S.y1 - S.y0)) * pw;
+  const toY = (v) => PAD.t + (1 - v / yMax) * ph;
+  const path = (arr) => arr.map((v, i) => (i ? 'L' : 'M') + toX(S.yrs[i]).toFixed(1) + ',' + toY(v).toFixed(1)).join('');
+  const cap = (p) => p.charAt(0).toUpperCase() + p.slice(1);
+  const entries = [];   // legend rows — HTML above the chart on screen, in-SVG on paper
+  let curves = '';
+  for (const p of _vfpPI_PLANETS) {
+    if (!on[p]) continue;
+    curves += '<path d="' + path(S.data[p][tab]) + '" fill="none" stroke="' + _vfpPICss(p, style) + '" stroke-width="1.6"/>';
+    entries.push({ name: cap(p), color: _vfpPICss(p, style), dash: '' });
+  }
+  // ── JPL Horizons overlay (both tabs): dotted curves plus a faint band
+  // marking the independent ephemeris span (so the reader sees WHERE the
+  // external check lives — a sliver on the cycles export), clipped to
+  // the sampled range ──
+  let jplRmsParts = [], band = '';
+  if (_jplInclData) {
+    let drew = false;
+    for (const p of _vfpPI_PLANETS) {
+      if (!on[p]) continue;
+      const B = _jplInclData.bodies[p];
+      if (!B) continue;
+      let d = '', s2 = 0, n = 0, started = false;
+      for (let i = 0; i < B.yr.length; i++) {
+        const y = B.yr[i];
+        if (y < S.y0 || y > S.y1) continue;
+        const v = tab === 'ecl' ? B.inDeg[i] : _vfpPIJplInvDeg(B.inDeg[i], B.omDeg[i]);
+        d += (started ? 'L' : 'M') + toX(y).toFixed(1) + ',' + toY(v).toFixed(1);
+        started = true;
+        const j = Math.round((y - S.y0) / 1000);
+        if (j >= 0 && j < S.yrs.length) { const dd = S.data[p][tab][j] - v; s2 += dd * dd; n++; }
+      }
+      curves += '<path d="' + d + '" fill="none" stroke="' + _vfpPICss(p, style) + '" stroke-width="2.4" stroke-dasharray="1,3" opacity="0.9"/>';
+      if (n) jplRmsParts.push(cap(p).slice(0, 2) + ' ' + Math.sqrt(s2 / n).toFixed(3) + '°');
+      drew = true;
+    }
+    if (drew) {
+      const bx1 = toX(Math.max(S.y0, -9998)), bx2 = toX(Math.min(S.y1, 9999));
+      band = '<rect x="' + bx1.toFixed(1) + '" y="' + PAD.t + '" width="' + (bx2 - bx1).toFixed(1) + '" height="' + ph + '" fill="#4fc3f7" opacity="' + (paper ? '0.08' : '0.06') + '"/>';
+      entries.push({ name: 'JPL Horizons DE441 (dotted; shaded span −9998…+9999)', color: paper ? '#555' : '#fff', dash: '1,3' });
+    }
+  }
+  // ── La2010 Earth overlay (inv tab only) — magenta, away from the
+  // Uranus cyan its old #4fc3f7 shadowed ──
+  let la2010Note = '';
+  if (tab === 'inv' && on.earth && _la2010InclData) {
+    const L = _la2010InclData;
+    let d = '', s2 = 0, n = 0, started = false;
+    for (let i = 0; i < L.inclInvDeg.length; i++) {
+      // La2010 time is kyr FROM J2000, the chart axis calendar years —
+      // the raw t·1000 mapping sat 2 kyr off (~0.05°/kyr near J2000 →
+      // the note read 0.0837° where the aligned rms is 0.0007°).
+      const y = 2000 + (L.t0Kyr + i * L.stepKyr) * 1000;
+      if (y < S.y0 || y > S.y1) continue;
+      d += (started ? 'L' : 'M') + toX(y).toFixed(1) + ',' + toY(L.inclInvDeg[i]).toFixed(1);
+      started = true;
+      const j = Math.round((y - S.y0) / 1000);
+      if (j >= 0 && j < S.yrs.length) { const dd = S.data.earth.inv[j] - L.inclInvDeg[i]; s2 += dd * dd; n++; }
+    }
+    curves += '<path d="' + d + '" fill="none" stroke="' + cLa + '" stroke-width="1.4" stroke-dasharray="4,3"/>';
+    entries.push({ name: 'La2010 (Laskar) — Earth', color: cLa, dash: '4,3' });
+    if (n) la2010Note = ' Earth vs La2010 over −248…−0 kyr: rms ' + Math.sqrt(s2 / n).toFixed(4) + '°.';
+  }
+  // grid + axes — x ticks in the panels' BC/AD convention, step picked
+  // from the span (the cycles range differs); edge ticks anchor inward
+  // so no label can leave the viewBox
+  let grid = '';
+  const yTickStep = yMax > 6 ? 2 : yMax > 3 ? 1 : 0.5;
+  for (let v = 0; v <= yMax + 1e-9; v += yTickStep) {
+    grid += '<line x1="' + PAD.l + '" y1="' + toY(v).toFixed(1) + '" x2="' + (W - PAD.r) + '" y2="' + toY(v).toFixed(1) + '" stroke="' + cGrid + '" stroke-width="0.5"/>' +
+      '<text x="' + (PAD.l - 6) + '" y="' + toY(v).toFixed(1) + '" fill="' + cTick + '" font-size="' + fYT + '" text-anchor="end" dominant-baseline="middle">' + v.toFixed(yTickStep < 1 ? 1 : 0) + '°</text>';
+  }
+  let xStep = 1000000;
+  for (const c of [50000, 100000, 200000, 250000, 500000, 1000000]) { xStep = c; if ((S.y1 - S.y0) / c <= 6) break; }
+  for (let xt = Math.ceil(S.y0 / xStep) * xStep; xt <= S.y1 + 1e-9; xt += xStep) {
+    const xp = toX(xt);
+    const ta = xp > W - PAD.r - 40 ? 'end' : xp < PAD.l + 40 ? 'start' : 'middle';
+    const lbl = xt === 0 ? '0' : Math.abs(xt).toLocaleString('en-US') + (xt < 0 ? ' BC' : ' AD');
+    grid += '<line x1="' + xp.toFixed(1) + '" y1="' + PAD.t + '" x2="' + xp.toFixed(1) + '" y2="' + (H - PAD.b) + '" stroke="' + cGrid + '" stroke-width="0.5"/>' +
+      '<text x="' + xp.toFixed(1) + '" y="' + (H - PAD.b + 12) + '" fill="' + cTick + '" font-size="' + fXT + '" text-anchor="' + ta + '">' + lbl + '</text>';
+  }
+  if (paper) grid += '<rect x="' + PAD.l + '" y="' + PAD.t + '" width="' + pw + '" height="' + ph + '" fill="none" stroke="#ccc" stroke-width="0.5"/>';
+  // the legend never lives in the core body: the screen shows the HTML
+  // .vfp-legend strip above the chart, the paper form draws entries as a
+  // walking legend at the TOP of the export (owner ruling)
+  return { W, H, PAD, S, body: band + grid + curves, entries, jplRmsParts, la2010Note };
+}
+function renderVFPPlanetInclinations() {
+  const tab = _vfpPIState.tab;               // 'ecl' | 'inv'
+  const on = _vfpPIState.on[tab];
+  const core = _vfpPIChartCore(null, tab, on, 'screen');
+  const W = core.W, H = core.H, PAD = core.PAD, S = core.S;
+  const la2010Note = core.la2010Note;
+  // the hover wiring (afterRender) maps pointer x back to a sample via this
+  _vfpPIState._screenGeom = { W, H, PAD, y0: S.y0, y1: S.y1 };
+  const cap = (p) => p.charAt(0).toUpperCase() + p.slice(1);
+  // ── tab strip (50/50, owner-worded labels) + per-planet checkboxes
+  // (dimmed when off) with all/none quick toggles ──
+  const tabBtn = (id, label) => {
+    const active = tab === id;
+    return '<button data-vfppi-tab="' + id + '" style="flex:1 1 50%;padding:6px 0;border-radius:6px 6px 0 0;border:1px solid ' + (active ? '#4a5568' : '#2a2f3a') + ';border-bottom:none;background:' + (active ? '#232a36' : '#171c26') + ';color:' + (active ? '#e8ecf4' : '#8a93a5') + ';font-size:12px;cursor:pointer;">' + label + '</button>';
+  };
+  let controls = '<div style="display:flex;gap:6px;padding:4px 4px 0;">' +
+    tabBtn('ecl', 'Inclination to Ecliptic (all planets)') +
+    tabBtn('inv', 'Inclination to Invariable plane (all planets)') +
+    '</div><div style="padding:8px 6px;border:1px solid #2a2f3a;border-radius:0 0 0 0;background:#171c26;line-height:2;">';
+  for (const p of _vfpPI_PLANETS) {
+    controls += '<label style="margin-right:10px;font-size:11px;color:' + _vfpPICss(p) + ';opacity:' + (on[p] ? '1' : '0.45') + ';cursor:pointer;white-space:nowrap;">' +
+      '<input type="checkbox" data-vfppi="' + p + '"' + (on[p] ? ' checked' : '') + ' style="vertical-align:-2px;margin-right:3px;">' + cap(p) + '</label>';
+  }
+  const allBtn = (v, label) => '<button data-vfppi-all="' + v + '" style="margin-left:6px;padding:1px 9px;border-radius:4px;border:1px solid #2a2f3a;background:#232a36;color:#8a93a5;font-size:10px;cursor:pointer;">' + label + '</button>';
+  controls += '<span style="float:right;">' + allBtn('1', 'all') + allBtn('0', 'none') + '</span></div>';
+  // ── legend: the panels' HTML strip above the chart (dash entries get a
+  // striped swatch); the paper exports keep their in-SVG twin ──
+  const swatchCss = (en) => en.dash
+    ? 'background:repeating-linear-gradient(90deg,' + en.color + ' 0 ' + (en.dash === '1,3' ? '2px,transparent 2px 5px' : '6px,transparent 6px 9px') + ');'
+    : 'background:' + en.color + ';';
+  let legendHtml = '<div class="vfp-legend">';
+  for (const en of core.entries) legendHtml += '<div class="vfp-legend-item"><span class="vfp-legend-swatch" style="' + swatchCss(en) + '"></span>' + en.name + '</div>';
+  legendHtml += '</div>';
+  // the caption sentences come from the ONE shared, toggle-gated builder
+  // (the paper notes use the same one) — no Earth text unless Earth is
+  // drawn, no reference text unless the overlay is drawn
+  const P = _vfpPINoteParts(tab, on, core);
+  const jplNote = P.jpl ? ' ' + P.jpl.replace('JPL Horizons', '<strong>JPL Horizons</strong>') : ' —';
+  const la2010Legend = P.la2010
+    ? ' Dashed: <a href="https://doi.org/10.1051/0004-6361/201116836" target="_blank" style="color:#e879f9;">La2010 (Laskar et al. 2011)</a>, the tracked 1-kyr Earth extract.' + la2010Note
+    : '';
+  const fmtY = (y) => y === 0 ? '0' : Math.abs(y).toLocaleString('en-US') + (y < 0 ? ' BC' : ' AD');
+  return '<div class="vfp-chart-block">' +
+    controls +
+    legendHtml +
+    '<div style="position:relative;">' +
+    '<svg data-vfppi-svg viewBox="0 0 ' + W + ' ' + H + '" width="100%" style="display:block;background:#151a22;border-radius:0 0 6px 6px;">' +
+    core.body +
+    // short label only — the frame sentence lives in the wrapping HTML
+    // subtitle below (a single SVG <text> line overran the 800-wide
+    // viewBox and clipped; owner observation 1, 2026-09-15)
+    '<text x="' + PAD.l + '" y="' + (PAD.t - 4) + '" fill="#aaa" font-size="9">inclination (degrees)</text>' +
+    '<line data-vfppi-cursor x1="-10" x2="-10" y1="' + PAD.t + '" y2="' + (H - PAD.b) + '" stroke="#8a93a5" stroke-width="0.8" visibility="hidden"/>' +
+    '</svg>' +
+    '<div data-vfppi-tip style="position:absolute;display:none;pointer-events:none;background:rgba(13,17,23,0.95);border:1px solid #3a4356;border-radius:6px;padding:6px 10px;font-size:11px;line-height:1.55;color:#e8ecf4;white-space:nowrap;z-index:5;"></div>' +
+    '</div>' +
+    '<div style="padding:8px 4px 2px;color:#8a93a5;font-size:11px;line-height:1.5;"><strong>Frame:</strong> ' + P.frame + ' ' + P.model + ' Static chart, ' + fmtY(S.y0) + ' → ' + fmtY(S.y1) + '; hover the chart for every enabled planet’s value at a year.</div>' +
+    '<div style="padding:2px 4px 8px;color:#8a93a5;font-size:11px;line-height:1.5;"><strong>References:</strong>' + (jplNote || ' —') + la2010Legend + ' The planets have no published deep-time series beyond the Horizons span (IMCCE’s La2010 is Earth-only).</div>' +
+    '</div>';
+}
+// ONE HOME for the chart's caption sentences — the screen subtitle and
+// the paper notes drifted apart until an Earth sentence showed with
+// Earth toggled off (owner catch). Every sentence is gated on what the
+// chart actually draws: Earth mentions on the Earth toggle, the JPL line
+// on drawn overlays, the La2010 line on a drawn overlay.
+function _vfpPINoteParts(tab, on, core) {
+  const frame = tab === 'ecl'
+    ? 'Orbital inclination of date to the FIXED J2000 ecliptic.' + (on.earth ? ' Earth is drawn in this fixed frame; its of-date ecliptic inclination is 0 by definition.' : '')
+    : 'Orbital inclination of date to the model’s own invariable plane.';
+  const model = 'Solid curves: the model’s own N-body chain elements of date, series-governed' + (on.earth ? ' (Earth rides its own engine series).' : '.');
+  const jpl = core.jplRmsParts.length
+    ? 'Dotted (inside the shaded band): JPL Horizons DE441 osculating elements, −9998…+9999 in 100-yr steps' + (tab === 'inv' ? ', converted to the inv-plane with the model’s banked plane' : '') + ' — Δrms over the overlap: ' + core.jplRmsParts.join(' · ') + ' (Δrms includes the osculating short-period wiggle the secular curves average out).'
+    : '';
+  const la2010 = core.la2010Note
+    ? 'Dashed: La2010 (Laskar et al. 2011, A&A 532 A89, doi:10.1051/0004-6361/201116836), the tracked 1-kyr Earth extract.' + core.la2010Note
+    : '';
+  return { frame, model, jpl, la2010 };
+}
+// One paper form serves both header buttons — "Export for Paper" prints
+// the screen range, "Export Cycles" prints _VFPPI_CYCLES_RANGE — in the
+// house paper style (renderVFPPaperChart: 16px title, centered 11px
+// legend rows, rotated 12px y-axis label, 11/10px #555 ticks, plot
+// border), the toggle-gated notes wrapped below.
+function _vfpPIPaperSvg(range) {
+  const tab = _vfpPIState.tab;
+  const on = _vfpPIState.on[tab];
+  const core = _vfpPIChartCore(range, tab, on, 'paper');
+  const W = core.W, H = core.H, PAD = core.PAD, S = core.S;
+  const ph = H - PAD.t - PAD.b;
+  const fmtY = (y) => y === 0 ? '0' : Math.abs(y).toLocaleString('en-US') + (y < 0 ? ' BC' : ' AD');
+  const title = 'Inclination of all planets — ' + (tab === 'ecl' ? 'to the J2000 ecliptic' : 'to the invariable plane') + ', ' + fmtY(S.y0) + ' → ' + fmtY(S.y1);
+  const P = _vfpPINoteParts(tab, on, core);
+  const notes = [P.frame, P.model, P.jpl, P.la2010].filter((t) => t);
+  const wrapText = (t) => {
+    const out = [];
+    let line = '';
+    for (const w of t.split(' ')) {
+      if (line && (line + ' ' + w).length > 130) { out.push(line); line = w; } else { line = line ? line + ' ' + w : w; }
+    }
+    if (line) out.push(line);
+    return out;
+  };
+  const lines = [];
+  for (const nt of notes) for (const l of wrapText(nt)) lines.push(l);
+  // centered legend rows between title and plot (the renderVFPPaperChart
+  // convention: 22px swatches, 11px text); standalone SVG is strict XML,
+  // so every text line — legend names, title, notes — goes through
+  // escapeXml (the La2010 "A&A 532 A89" citation was an EntityRef error;
+  // the Bills & Ray lesson, again)
+  const lw = core.entries.map((en) => 28 + en.name.length * 6.2 + 24);
+  const legendRows = [];
+  {
+    let row = [], wsum = 0;
+    core.entries.forEach((en, i) => {
+      if (row.length && wsum + lw[i] > W - 40) { legendRows.push({ row, wsum }); row = []; wsum = 0; }
+      row.push(i); wsum += lw[i];
+    });
+    if (row.length) legendRows.push({ row, wsum });
+  }
+  let legendSvg = '';
+  legendRows.forEach((r, ri) => {
+    let lx = (W - r.wsum) / 2;
+    const ly = 34 + ri * 16;
+    for (const i of r.row) {
+      const en = core.entries[i];
+      legendSvg += '<line x1="' + lx.toFixed(1) + '" y1="' + ly + '" x2="' + (lx + 22).toFixed(1) + '" y2="' + ly + '" stroke="' + en.color + '" stroke-width="1.8"' + (en.dash ? ' stroke-dasharray="' + en.dash + '"' : '') + '/>' +
+        '<text x="' + (lx + 28).toFixed(1) + '" y="' + (ly + 4) + '" fill="#333" font-size="11">' + escapeXml(en.name) + '</text>';
+      lx += lw[i];
+    }
+  });
+  const TOP = 34 + legendRows.length * 16 + 4;
+  const XAXIS = 16;   // the 'Years (BC / AD)' row under the chart
+  const Hp = TOP + H + XAXIS + lines.length * 15 + 8;
+  let noteText = '';
+  lines.forEach((l, i) => {
+    noteText += '<text x="' + PAD.l + '" y="' + (TOP + H + XAXIS + (i + 1) * 15 - 4) + '" fill="#444" font-size="11">' + escapeXml(l) + '</text>';
+  });
+  return '<?xml version="1.0" encoding="UTF-8"?>\n' +
+    '<svg viewBox="0 0 ' + W + ' ' + Hp + '" width="' + W + '" height="' + Hp + '" xmlns="http://www.w3.org/2000/svg" font-family="Inter,Helvetica,Arial,sans-serif">' +
+    '<rect width="' + W + '" height="' + Hp + '" fill="white"/>' +
+    '<text x="' + (W / 2) + '" y="18" text-anchor="middle" fill="#222" font-size="16" font-weight="600">' + escapeXml(title) + '</text>' +
+    legendSvg +
+    '<g transform="translate(0,' + TOP + ')">' + core.body +
+    '<text x="16" y="' + (PAD.t + ph / 2) + '" text-anchor="middle" dominant-baseline="middle" transform="rotate(-90,16,' + (PAD.t + ph / 2) + ')" fill="#444" font-size="12" font-weight="500">Inclination (degrees)</text>' +
+    '<text x="' + (PAD.l + (W - PAD.l - PAD.r) / 2) + '" y="' + (H + 8) + '" text-anchor="middle" fill="#444" font-size="12" font-weight="500">Years (BC / AD)</text></g>' +
+    noteText +
+    '</svg>';
+}
+function _vfpPIAfterRender(bodyEl) {
+  bodyEl.querySelectorAll('button[data-vfppi-tab]').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      _vfpPIState.tab = btn.dataset.vfppiTab;
+      updateVerificationPanel('planet-inclinations');
+    });
+  });
+  bodyEl.querySelectorAll('input[data-vfppi]').forEach((cbEl) => {
+    cbEl.addEventListener('change', () => {
+      _vfpPIState.on[_vfpPIState.tab][cbEl.dataset.vfppi] = cbEl.checked;
+      updateVerificationPanel('planet-inclinations');
+    });
+  });
+  bodyEl.querySelectorAll('button[data-vfppi-all]').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const onAll = btn.dataset.vfppiAll === '1';
+      const set = _vfpPIState.on[_vfpPIState.tab];
+      for (const p of _vfpPI_PLANETS) set[p] = onAll;
+      updateVerificationPanel('planet-inclinations');
+    });
+  });
+  // ── hover: every enabled planet's value at the pointed year (owner
+  // item 2, 2026-09-15) — nearest 1-kyr sample, a cursor line in the SVG
+  // and an HTML tooltip beside the pointer. Re-wired on every render (tab
+  // and toggle changes rebuild the body), reading the geometry the
+  // renderer stamped on the state.
+  const svg = bodyEl.querySelector('svg[data-vfppi-svg]');
+  const tip = bodyEl.querySelector('div[data-vfppi-tip]');
+  const cursor = svg ? svg.querySelector('line[data-vfppi-cursor]') : null;
+  const G = _vfpPIState._screenGeom;
+  if (!svg || !tip || !cursor || !G) return;
+  const S = _vfpPISamples();
+  const tab = _vfpPIState.tab;
+  const on = _vfpPIState.on[tab];
+  const hide = () => { tip.style.display = 'none'; cursor.setAttribute('visibility', 'hidden'); };
+  svg.addEventListener('mouseleave', hide);
+  svg.addEventListener('mousemove', (e) => {
+    const r = svg.getBoundingClientRect();
+    if (!r.width) return;
+    const px = ((e.clientX - r.left) / r.width) * G.W;
+    if (px < G.PAD.l || px > G.W - G.PAD.r) { hide(); return; }
+    const pw = G.W - G.PAD.l - G.PAD.r;
+    const i = Math.round(((px - G.PAD.l) / pw) * (S.yrs.length - 1));
+    const y = S.yrs[i];
+    const cx = (G.PAD.l + ((y - G.y0) / (G.y1 - G.y0)) * pw).toFixed(1);
+    cursor.setAttribute('x1', cx);
+    cursor.setAttribute('x2', cx);
+    cursor.setAttribute('visibility', 'visible');
+    let rows = '<div style="color:#8a93a5;margin-bottom:2px;">Year ' + (y < 0 ? '−' : '+') + Math.abs(y).toLocaleString('en-US') + '</div>';
+    for (const p of _vfpPI_PLANETS) {
+      if (!on[p]) continue;
+      rows += '<div style="display:flex;justify-content:space-between;gap:16px;"><span style="color:' + _vfpPICss(p) + ';">' + p.charAt(0).toUpperCase() + p.slice(1) + '</span><span>' + S.data[p][tab][i].toFixed(4) + '°</span></div>';
+    }
+    tip.innerHTML = rows;
+    tip.style.display = 'block';
+    const wr = svg.parentElement.getBoundingClientRect();
+    let tx = e.clientX - wr.left + 14;
+    if (tx + tip.offsetWidth > wr.width - 4) tx = e.clientX - wr.left - tip.offsetWidth - 14;
+    let ty = e.clientY - wr.top + 12;
+    if (ty + tip.offsetHeight > wr.height - 4) ty = wr.height - tip.offsetHeight - 4;
+    tip.style.left = Math.max(0, tx) + 'px';
+    tip.style.top = Math.max(0, ty) + 'px';
+  });
+}
 // ── SVG Chart Renderer ───────────────────────────────────────────
 
 function renderVFPChart(category, currentYear) {
+  // Custom-rendered categories (the all-planets inclination chart) own
+  // their whole body — sampling, toggles, legend — and skip the generic
+  // model/references machinery entirely.
+  if (category.customRender) return category.customRender();
   const W = 800, H_MAIN = 300, H_RES = 140, PAD = { l: 72, r: 20, t: 22, b: 30 };
   const plotW = W - PAD.l - PAD.r;
   const plotH_main = H_MAIN - PAD.t - PAD.b;
@@ -21492,7 +21951,8 @@ function exportVFPPaper() {
   const idx = VFP_CATEGORIES.findIndex(c => c.id === verificationPanel._currentCategory);
   if (idx < 0) return;
   const cat = VFP_CATEGORIES[idx];
-  const svg = renderVFPPaperChart(cat);
+  // Custom-rendered categories supply their own paper form (customPaper).
+  const svg = cat.customPaper ? cat.customPaper() : renderVFPPaperChart(cat);
   const blob = new Blob([svg], { type: 'image/svg+xml' });
   const url = URL.createObjectURL(blob);
   const win = window.open(url, '_blank');
@@ -21504,12 +21964,15 @@ function exportVFPPaperAlt() {
   const idx = VFP_CATEGORIES.findIndex(c => c.id === verificationPanel._currentCategory);
   if (idx < 0) return;
   const cat = VFP_CATEGORIES[idx];
-  if (!cat.paperAlt) return;
-  const svg = renderVFPPaperChartAlt(cat, cat.paperAlt);
+  // Custom cycles form (the all-planets inclination chart's wider range)
+  // takes precedence; the generic path needs a paperAlt config.
+  const svg = cat.customPaperAlt ? cat.customPaperAlt()
+    : (cat.paperAlt ? renderVFPPaperChartAlt(cat, cat.paperAlt) : null);
+  if (!svg) return;
   const blob = new Blob([svg], { type: 'image/svg+xml' });
   const url = URL.createObjectURL(blob);
   const win = window.open(url, '_blank');
-  if (win) win.document.title = cat.paperAlt.title;
+  if (win) win.document.title = cat.paperAlt ? cat.paperAlt.title : cat.label;
 }
 
 function exportVFPPaperRecent() {
@@ -21621,6 +22084,7 @@ function createVerificationPanel() {
   panel._dropdown = dropdown;
   panel._exportAltBtn = exportAltBtn;
   panel._exportRecentBtn = exportRecentBtn;
+  panel._exportBtn = exportBtn;
   panel._currentCategory = VFP_CATEGORIES[0].id;
 
   document.body.appendChild(panel);
@@ -21637,9 +22101,13 @@ function updateVerificationPanel(categoryId) {
   verificationPanel._navPrev.disabled = idx === 0;
   verificationPanel._navNext.disabled = idx === VFP_CATEGORIES.length - 1;
   verificationPanel._dropdown.style.display = 'none';
-  verificationPanel._exportAltBtn.style.display = cat.paperAlt ? '' : 'none';
+  verificationPanel._exportAltBtn.style.display = (cat.paperAlt || cat.customPaperAlt) ? '' : 'none';
   verificationPanel._exportRecentBtn.style.display = cat.paperRecent ? '' : 'none';
+  // Custom-rendered categories export their own paper form when they
+  // declare one (customPaper); only those without one hide the button.
+  if (verificationPanel._exportBtn) verificationPanel._exportBtn.style.display = (cat.customRender && !cat.customPaper) ? 'none' : '';
   verificationPanel._body.innerHTML = renderVFPChart(cat, o.currentYear || 2000);
+  if (cat.afterRender) cat.afterRender(verificationPanel._body);
 }
 
 function openVerificationPanel() {

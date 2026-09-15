@@ -20,7 +20,11 @@ import { extname, join, normalize } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const ROOT = fileURLToPath(new URL('../../', import.meta.url));
-const DIST = join(ROOT, 'dist');
+// ESSRT_DIST_DIR: serve a build from elsewhere — the default dist/ is
+// ALSO the dev server's output dir, and a running `npm start` overwrites
+// production builds there mid-test (measured: dev HMR bundle, /-rooted
+// asset paths, a 1-ULP golden flap from the dev bundle layout).
+const DIST = process.env.ESSRT_DIST_DIR || join(ROOT, 'dist');
 
 const TYPES = {
   '.html': 'text/html', '.js': 'text/javascript', '.css': 'text/css',

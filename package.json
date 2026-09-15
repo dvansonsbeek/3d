@@ -5,11 +5,11 @@
     "packages/*"
   ],
   "scripts": {
-    "start": "parcel src/index.html",
-    "dev": "parcel src/index.html",
+    "start": "parcel src/index.html --dist-dir dist-dev",
+    "dev": "parcel src/index.html --dist-dir dist-dev",
     "dashboard": "npx serve dashboard -l 5050",
     "dashboard:export": "node tools/export-dashboard-data.js",
-    "build": "parcel build src/index.html --dist-dir dist --public-url ./ && mkdir -p dist/data && cp data/nbody-secular-series.json dist/data/",
+    "build": "parcel build src/index.html --dist-dir dist --public-url ./ --cache-dir .parcel-cache-build && mkdir -p dist/data && cp data/nbody-secular-series.json data/la2010a-earth-inclination-248kyr.json data/jpl-horizons-planet-inclinations.json dist/data/",
     "lint": "eslint .",
     "typecheck": "tsc --noEmit -p jsconfig.json",
     "check:boundaries": "node tools/check-boundaries.mjs",

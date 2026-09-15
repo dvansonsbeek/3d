@@ -97,6 +97,7 @@ rather than glossed over.
 | file | source | basis for retention |
 |---|---|---|
 | `la2004-earth-51myr-back.asc` | Laskar et al. (2004), IMCCE. Nominal solution, −51 Myr to 0; columns match `INSOLN.LA2004.BTL.ASC` (time in kyr from J2000, eccentricity, obliquity in rad, longitude of perihelion in rad) | The IMCCE README for the LA2004 files states **no terms of use, licence or citation requirement** of any kind. IMCCE publishes them for open download and they are universally redistributed in the paleoclimate literature. Astronomical solution data is factual output rather than creative expression. |
+| `la2010a-earth-inclination-248kyr.json` | Laskar et al. (2011), A&A 532 A89 (doi:10.1051/0004-6361/201116836), IMCCE. A 249-row extract of `La2010a_alkhqp3L.dat` (nominal solution, invariant frame, 1-kyr steps): Earth's inclination to the invariant plane, i = 2·asin(hypot(q,p)) in degrees, t = −248…0 kyr. Reference overlay for the Formula Verification "Inclination of all planets" chart. Source: https://ssp.imcce.fr/insola/earth/online/earth/La2010/ | Same position as the LA2004 files above: the La2010 README carries a citation line but **no terms of use or licence**; IMCCE publishes the files for open download and they are universally redistributed in the paleoclimate literature. This is a small factual extract (249 derived values), not the file itself. |
 
 **"No stated licence" is not the same as "public domain",** and writing down which
 one is being relied on is the point of this section. If it ever needs to be

@@ -4,8 +4,13 @@ node_modules/
 # build output
 dist/
 
-# parcel cache
+# parcel caches and outputs — the dev server (npm start) and the
+# production build (npm run build) each keep their OWN cache AND dist:
+# sharing them let the dev server's HMR bundles overwrite production
+# builds in dist/ (and the two racing corrupted the shared cache)
 .parcel-cache/
+.parcel-cache-build/
+dist-dev/
 __pycache__/
 
 # excluded folders
