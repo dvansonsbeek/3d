@@ -32,6 +32,11 @@ export default [
     // Everything outside packages/ is pre-migration; see SCOPE above.
     ignores: [
       'node_modules/**', 'dist/**', '.parcel-cache/**',
+      // The dev server's own output + the production build's own cache
+      // (the dev/build separation, 2026-09-15) — the dev server writes
+      // bundled JS here continuously; unignored it swept 4.5k phantom
+      // lint errors into the chain the moment npm start was restarted.
+      'dist-dev/**', '.parcel-cache-build/**',
       'src/**', 'tools/**', 'scripts/**', 'dashboard/**', 'public/**',
       'data/**', 'docs/**', 'web-bundles/**',
       'packages/analysis/**',

@@ -5,11 +5,14 @@
     "packages/*"
   ],
   "scripts": {
+    "copy:refdata:dev": "mkdir -p dist-dev/data dist-dev/input && cp data/nbody-secular-series.json dist-dev/data/ && cp public/input/la2010-orbital-elements.json public/input/jpl-horizons-planet-elements.json dist-dev/input/",
+    "prestart": "npm run copy:refdata:dev",
+    "predev": "npm run copy:refdata:dev",
     "start": "parcel src/index.html --dist-dir dist-dev",
     "dev": "parcel src/index.html --dist-dir dist-dev",
     "dashboard": "npx serve dashboard -l 5050",
     "dashboard:export": "node tools/export-dashboard-data.js",
-    "build": "parcel build src/index.html --dist-dir dist --public-url ./ --cache-dir .parcel-cache-build && mkdir -p dist/data && cp data/nbody-secular-series.json data/la2010a-earth-inclination-248kyr.json data/jpl-horizons-planet-inclinations.json dist/data/",
+    "build": "parcel build src/index.html --dist-dir dist --public-url ./ --cache-dir .parcel-cache-build && mkdir -p dist/data dist/input && cp data/nbody-secular-series.json dist/data/ && cp public/input/la2010-orbital-elements.json public/input/jpl-horizons-planet-elements.json dist/input/",
     "lint": "eslint .",
     "typecheck": "tsc --noEmit -p jsconfig.json",
     "check:boundaries": "node tools/check-boundaries.mjs",

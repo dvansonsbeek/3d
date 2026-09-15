@@ -6244,13 +6244,18 @@ if (typeof window !== 'undefined') {
     // fetches, so the injector lets a headless probe supply the two tracked
     // reference datasets and then exercise the screen render, the hover
     // wiring, and both paper exports. Test surface, not an API.
-    vfpPISetRefData: (la, jpl) => { if (la) _la2010InclData = la; if (jpl) _jplInclData = jpl; },
+    vfpPISetRefData: (la, jpl) => { if (la) _la2010ElementsData = la; if (jpl) _jplInclData = jpl; },
     vfpPISeriesLoaded: () => _planetSeriesData !== null,
     vfpPIState: () => _vfpPIState,
     vfpPIRender: () => renderVFPPlanetInclinations(),
     vfpPIAfterRender: (el) => _vfpPIAfterRender(el),
     vfpPIPaperSvg: (range) => _vfpPIPaperSvg(range || _VFPPI_SCREEN_RANGE),
     vfpPICyclesRange: () => _VFPPI_CYCLES_RANGE,
+    // the eccentricity twin's smoke surface (references shared with PI)
+    vfpPEState: () => _vfpPEState,
+    vfpPERender: () => renderVFPPlanetEccentricities(),
+    vfpPEAfterRender: (el) => _vfpPEAfterRender(el),
+    vfpPEPaperSvg: (range) => _vfpPEPaperSvg(range || _VFPPI_SCREEN_RANGE),
     openVerificationPanel: () => openVerificationPanel(),
     updateVerificationPanel: (id) => updateVerificationPanel(id),
   };
@@ -20841,7 +20846,7 @@ const VFP_CATEGORIES = [
     // OFF — owner E1: Earth's J2000-frame curve included but default-off,
     // its of-date convention being 0 elsewhere); one global toggle adds
     // the inv-plane curves for all eight. Reference: La2010 Earth
-    // inv-plane overlay (data/la2010a-earth-inclination-248kyr.json, the
+    // inv-plane overlay (public/input/la2010-orbital-elements.json, the
     // tracked 1-kyr extract; Laskar et al. 2011, A&A 532 A89). The
     // planets have NO published deep-time series to compare (searched
     // 2026-09-15: IMCCE La2010 is Earth-only; the planets stay engine-D,
@@ -20855,16 +20860,37 @@ const VFP_CATEGORIES = [
     customPaper: () => _vfpPIPaperSvg(_VFPPI_SCREEN_RANGE),
     customPaperAlt: () => _vfpPIPaperSvg(_VFPPI_CYCLES_RANGE),
   },
+  {
+    // ── Eccentricity of all planets (owner-requested companion,
+    // 2026-09-15): the inclination panel's twin — ONE view (eccentricity
+    // is frame-free), otherwise the same setup: per-planet checkboxes
+    // with all/none, hover readout, JPL Horizons EC overlay + shaded
+    // span, La2010 Earth overlay (e = hypot(k,h); measured z-series rms
+    // 2.5e-5 over −248…0 kyr), both paper exports over the shared
+    // _VFPPI_* ranges.
+    id: 'planet-eccentricities', label: 'Eccentricity of all planets',
+    customRender: () => renderVFPPlanetEccentricities(),
+    afterRender: (el) => _vfpPEAfterRender(el),
+    customPaper: () => _vfpPEPaperSvg(_VFPPI_SCREEN_RANGE),
+    customPaperAlt: () => _vfpPEPaperSvg(_VFPPI_CYCLES_RANGE),
+  },
 ];
 
 // ── VFP: Inclination of all planets — custom static chart ────────
 // (config above; owner spec items 1–8 with decisions E1–E3.)
-let _la2010InclData = null;   // the tracked La2010a Earth extract, once fetched
-let _jplInclData = null;      // the tracked JPL Horizons osculating IN/OM extract
+// ONE home for the La2010 Earth reference: the repo's existing elements
+// table public/input/la2010-orbital-elements.json (e + i_inv, 1-kyr,
+// −500 kyr → 0, year = years FROM J2000). The two data/la2010a-* chart
+// extracts duplicated it and were deleted (owner consolidation
+// 2026-09-15); public/input is the browser-fetched reference home
+// (la2004 precedent), NOT hashed into CONSTANTS_HASH (the generator
+// reads named files only).
+let _la2010ElementsData = null;   // La2010 Earth elements table, once fetched
+let _jplInclData = null;          // JPL Horizons osculating IN/OM/EC extract, once fetched
 {
   const _fetchRef = async (name, ok, set) => {
-    for (const url of ['data/' + name, '../data/' + name, name,
-      'https://raw.githubusercontent.com/dvansonsbeek/3d/master/data/' + name]) {
+    for (const url of ['input/' + name, './input/' + name,
+      'https://raw.githubusercontent.com/dvansonsbeek/3d/master/public/input/' + name]) {
       try {
         const res = await fetch(url);
         if (!res.ok) continue;
@@ -20873,9 +20899,9 @@ let _jplInclData = null;      // the tracked JPL Horizons osculating IN/OM extra
       } catch (e) { /* try the next candidate */ }
     }
   };
-  _fetchRef('la2010a-earth-inclination-248kyr.json',
-    (a) => Array.isArray(a.inclInvDeg) && Number.isFinite(a.t0Kyr), (a) => { _la2010InclData = a; });
-  _fetchRef('jpl-horizons-planet-inclinations.json',
+  _fetchRef('la2010-orbital-elements.json',
+    (a) => Array.isArray(a.data) && a.data.length > 400 && Number.isFinite(a.data[0].eccentricity) && Number.isFinite(a.data[0].inclination), (a) => { _la2010ElementsData = a; });
+  _fetchRef('jpl-horizons-planet-elements.json',
     (a) => a.bodies && a.bodies.earth && Array.isArray(a.bodies.earth.inDeg), (a) => { _jplInclData = a; });
 }
 const _vfpPI_PLANETS = ['mercury', 'venus', 'earth', 'mars', 'jupiter', 'saturn', 'uranus', 'neptune'];
@@ -21008,7 +21034,10 @@ function _vfpPIChartCore(range, tab, on, style) {
         const j = Math.round((y - S.y0) / 1000);
         if (j >= 0 && j < S.yrs.length) { const dd = S.data[p][tab][j] - v; s2 += dd * dd; n++; }
       }
-      curves += '<path d="' + d + '" fill="none" stroke="' + _vfpPICss(p, style) + '" stroke-width="2.4" stroke-dasharray="1,3" opacity="0.9"/>';
+      // thin + translucent (owner 2026-09-15): the osculating short-period
+      // wiggle aliases at 100-yr steps into a scatter cloud around the
+      // secular curve — soften it so it reads as a faint reference cloud
+      curves += '<path d="' + d + '" fill="none" stroke="' + _vfpPICss(p, style) + '" stroke-width="1.6" stroke-dasharray="1,3" opacity="0.6"/>';
       if (n) jplRmsParts.push(cap(p).slice(0, 2) + ' ' + Math.sqrt(s2 / n).toFixed(3) + '°');
       drew = true;
     }
@@ -21019,25 +21048,26 @@ function _vfpPIChartCore(range, tab, on, style) {
     }
   }
   // ── La2010 Earth overlay (inv tab only) — magenta, away from the
-  // Uranus cyan its old #4fc3f7 shadowed ──
+  // Uranus cyan its old #4fc3f7 shadowed. Source: the ONE-home elements
+  // table (rows carry years FROM J2000 — the chart axis is calendar
+  // years; the raw mapping once sat 2 kyr off, 0.0837° where aligned
+  // reads 0.0007°). Covers −500 kyr → 0, clipped to the sampled range. ──
   let la2010Note = '';
-  if (tab === 'inv' && on.earth && _la2010InclData) {
-    const L = _la2010InclData;
+  if (tab === 'inv' && on.earth && _la2010ElementsData) {
     let d = '', s2 = 0, n = 0, started = false;
-    for (let i = 0; i < L.inclInvDeg.length; i++) {
-      // La2010 time is kyr FROM J2000, the chart axis calendar years —
-      // the raw t·1000 mapping sat 2 kyr off (~0.05°/kyr near J2000 →
-      // the note read 0.0837° where the aligned rms is 0.0007°).
-      const y = 2000 + (L.t0Kyr + i * L.stepKyr) * 1000;
+    for (const row of _la2010ElementsData.data) {
+      const y = 2000 + row.year;
       if (y < S.y0 || y > S.y1) continue;
-      d += (started ? 'L' : 'M') + toX(y).toFixed(1) + ',' + toY(L.inclInvDeg[i]).toFixed(1);
+      d += (started ? 'L' : 'M') + toX(y).toFixed(1) + ',' + toY(row.inclination).toFixed(1);
       started = true;
       const j = Math.round((y - S.y0) / 1000);
-      if (j >= 0 && j < S.yrs.length) { const dd = S.data.earth.inv[j] - L.inclInvDeg[i]; s2 += dd * dd; n++; }
+      if (j >= 0 && j < S.yrs.length) { const dd = S.data.earth.inv[j] - row.inclination; s2 += dd * dd; n++; }
     }
-    curves += '<path d="' + d + '" fill="none" stroke="' + cLa + '" stroke-width="1.4" stroke-dasharray="4,3"/>';
-    entries.push({ name: 'La2010 (Laskar) — Earth', color: cLa, dash: '4,3' });
-    if (n) la2010Note = ' Earth vs La2010 over −248…−0 kyr: rms ' + Math.sqrt(s2 / n).toFixed(4) + '°.';
+    if (started) {
+      curves += '<path d="' + d + '" fill="none" stroke="' + cLa + '" stroke-width="1.4" stroke-dasharray="4,3"/>';
+      entries.push({ name: 'La2010 (Laskar) — Earth', color: cLa, dash: '4,3' });
+      if (n) la2010Note = ' Earth vs La2010 over the overlap: rms ' + Math.sqrt(s2 / n).toFixed(4) + '°.';
+    }
   }
   // grid + axes — x ticks in the panels' BC/AD convention, step picked
   // from the span (the cycles range differs); edge ticks anchor inward
@@ -21102,7 +21132,7 @@ function renderVFPPlanetInclinations() {
   const P = _vfpPINoteParts(tab, on, core);
   const jplNote = P.jpl ? ' ' + P.jpl.replace('JPL Horizons', '<strong>JPL Horizons</strong>') : ' —';
   const la2010Legend = P.la2010
-    ? ' Dashed: <a href="https://doi.org/10.1051/0004-6361/201116836" target="_blank" style="color:#e879f9;">La2010 (Laskar et al. 2011)</a>, the tracked 1-kyr Earth extract.' + la2010Note
+    ? ' Dashed: <a href="https://doi.org/10.1051/0004-6361/201116836" target="_blank" style="color:#e879f9;">La2010 (Laskar et al. 2011)</a>, the repo’s La2010 Earth elements table (1-kyr, to 500,000 BC).' + la2010Note
     : '';
   const fmtY = (y) => y === 0 ? '0' : Math.abs(y).toLocaleString('en-US') + (y < 0 ? ' BC' : ' AD');
   return '<div class="vfp-chart-block">' +
@@ -21137,7 +21167,7 @@ function _vfpPINoteParts(tab, on, core) {
     ? 'Dotted (inside the shaded band): JPL Horizons DE441 osculating elements, −9998…+9999 in 100-yr steps' + (tab === 'inv' ? ', converted to the inv-plane with the model’s banked plane' : '') + ' — Δrms over the overlap: ' + core.jplRmsParts.join(' · ') + ' (Δrms includes the osculating short-period wiggle the secular curves average out).'
     : '';
   const la2010 = core.la2010Note
-    ? 'Dashed: La2010 (Laskar et al. 2011, A&A 532 A89, doi:10.1051/0004-6361/201116836), the tracked 1-kyr Earth extract.' + core.la2010Note
+    ? 'Dashed: La2010 (Laskar et al. 2011, A&A 532 A89, doi:10.1051/0004-6361/201116836), the repo’s La2010 Earth elements table (1-kyr, to 500,000 BC).' + core.la2010Note
     : '';
   return { frame, model, jpl, la2010 };
 }
@@ -21263,6 +21293,313 @@ function _vfpPIAfterRender(bodyEl) {
     for (const p of _vfpPI_PLANETS) {
       if (!on[p]) continue;
       rows += '<div style="display:flex;justify-content:space-between;gap:16px;"><span style="color:' + _vfpPICss(p) + ';">' + p.charAt(0).toUpperCase() + p.slice(1) + '</span><span>' + S.data[p][tab][i].toFixed(4) + '°</span></div>';
+    }
+    tip.innerHTML = rows;
+    tip.style.display = 'block';
+    const wr = svg.parentElement.getBoundingClientRect();
+    let tx = e.clientX - wr.left + 14;
+    if (tx + tip.offsetWidth > wr.width - 4) tx = e.clientX - wr.left - tip.offsetWidth - 14;
+    let ty = e.clientY - wr.top + 12;
+    if (ty + tip.offsetHeight > wr.height - 4) ty = wr.height - tip.offsetHeight - 4;
+    tip.style.left = Math.max(0, tx) + 'px';
+    tip.style.top = Math.max(0, ty) + 'px';
+  });
+}
+// ── VFP: Eccentricity of all planets — the inclination panel's twin ──
+// (owner-requested companion, 2026-09-15.) ONE view — eccentricity is
+// frame-free — otherwise the twin's setup. Mirrored, not generalized:
+// the axis (dimensionless), the tab-lessness and the witnesses differ;
+// each panel keeps its own ONE-home caption builder.
+const _vfpPEState = {
+  on: { mercury: true, venus: true, earth: true, mars: true, jupiter: true, saturn: true, uranus: true, neptune: true },
+};
+const _vfpPECacheByRange = {};   // static samples — once per session per range
+// Earth's e of date for the chart: the banked z series read directly
+// (e = |z|) — Earth's OWN series movement, mirroring the inclination
+// chart's Earth route (never the planet-series override, never the
+// ?hybridSpin gate); the K H/3 law is the pre-series fallback and the
+// cache key's series flag keeps it from sticking (measured vs La2010
+// over −248…0 kyr: rms 2.5e-5, max 6.7e-5).
+function _vfpPEEarthEcc(year) {
+  const S = _zSeriesData;
+  if (S) {
+    const t = year - 2000;
+    if (t >= S.t0Yr && t <= S.t0Yr + (S.q.length - 1) * S.stepYr) {
+      const li = (arr, tt) => { const x = (tt - S.t0Yr) / S.stepYr, i = Math.max(0, Math.min(arr.length - 2, Math.floor(x))), f = x - i; return arr[i] * (1 - f) + arr[i + 1] * f; };
+      return Math.hypot(li(S.q, t), li(S.p, t));
+    }
+  }
+  return computeEccentricityEarthAtYear(year);
+}
+function _vfpPESamples(range) {
+  const y0 = (range || _VFPPI_SCREEN_RANGE)[0], y1 = (range || _VFPPI_SCREEN_RANGE)[1];
+  const key = y0 + ':' + y1 + ':' + (_planetSeriesData ? 's' : 'k');
+  if (_vfpPECacheByRange[key]) return _vfpPECacheByRange[key];
+  const N = Math.round((y1 - y0) / 1000) + 1;   // 1-kyr steps
+  const yrToJd = (y) => KC_ANCHOR_EPOCH_JD + (y - KC_ANCHOR_EPOCH_YEAR) * 365.25;
+  const yrs = new Array(N);
+  const data = {};
+  for (const p of _vfpPI_PLANETS) data[p] = new Array(N);
+  for (let i = 0; i < N; i++) {
+    const y = y0 + ((y1 - y0) * i) / (N - 1);
+    yrs[i] = y;
+    for (const p of _vfpPI_PLANETS) {
+      data[p][i] = p === 'earth' ? _vfpPEEarthEcc(y) : _kcChartElementsOfDate(p, yrToJd(y)).e;
+    }
+  }
+  return (_vfpPECacheByRange[key] = { y0, y1, yrs, data });
+}
+function _vfpPEChartCore(range, on, style) {
+  const S = _vfpPESamples(range);
+  const paper = style === 'paper';
+  const W = 800, H = 380, PAD = { l: 60, r: 24, t: 16, b: 34 };
+  const pw = W - PAD.l - PAD.r, ph = H - PAD.t - PAD.b;
+  const cGrid = paper ? '#ddd' : '#2a2f3a', cTick = paper ? '#555' : '#888';
+  const fYT = paper ? 11 : 9, fXT = paper ? 10 : 9;
+  let yMax = 0.05;
+  for (const p of _vfpPI_PLANETS) if (on[p]) for (const v of S.data[p]) if (v > yMax) yMax = v;
+  yMax = Math.ceil(yMax * 1.08 * 20) / 20;   // 0.05 grid
+  const toX = (y) => PAD.l + ((y - S.y0) / (S.y1 - S.y0)) * pw;
+  const toY = (v) => PAD.t + (1 - v / yMax) * ph;
+  const path = (arr) => arr.map((v, i) => (i ? 'L' : 'M') + toX(S.yrs[i]).toFixed(1) + ',' + toY(v).toFixed(1)).join('');
+  const cap = (p) => p.charAt(0).toUpperCase() + p.slice(1);
+  const entries = [];
+  let curves = '';
+  for (const p of _vfpPI_PLANETS) {
+    if (!on[p]) continue;
+    curves += '<path d="' + path(S.data[p]) + '" fill="none" stroke="' + _vfpPICss(p, style) + '" stroke-width="1.6"/>';
+    entries.push({ name: cap(p), color: _vfpPICss(p, style), dash: '' });
+  }
+  // ── JPL Horizons EC overlay + shaded span (guard B.ec: a cached
+  // pre-EC copy of the dataset carries none) ──
+  let jplRmsParts = [], band = '';
+  if (_jplInclData) {
+    let drew = false;
+    for (const p of _vfpPI_PLANETS) {
+      if (!on[p]) continue;
+      const B = _jplInclData.bodies[p];
+      if (!B || !B.ec) continue;
+      let d = '', s2 = 0, n = 0, started = false;
+      for (let i = 0; i < B.yr.length; i++) {
+        const y = B.yr[i];
+        if (y < S.y0 || y > S.y1) continue;
+        const v = B.ec[i];
+        d += (started ? 'L' : 'M') + toX(y).toFixed(1) + ',' + toY(v).toFixed(1);
+        started = true;
+        const j = Math.round((y - S.y0) / 1000);
+        if (j >= 0 && j < S.yrs.length) { const dd = S.data[p][j] - v; s2 += dd * dd; n++; }
+      }
+      // thin + translucent (owner 2026-09-15): the osculating short-period
+      // wiggle aliases at 100-yr steps into a scatter cloud around the
+      // secular curve — soften it so it reads as a faint reference cloud
+      curves += '<path d="' + d + '" fill="none" stroke="' + _vfpPICss(p, style) + '" stroke-width="1.6" stroke-dasharray="1,3" opacity="0.6"/>';
+      if (n) jplRmsParts.push(cap(p).slice(0, 2) + ' ' + Math.sqrt(s2 / n).toFixed(4));
+      drew = true;
+    }
+    if (drew) {
+      const bx1 = toX(Math.max(S.y0, -9998)), bx2 = toX(Math.min(S.y1, 9999));
+      band = '<rect x="' + bx1.toFixed(1) + '" y="' + PAD.t + '" width="' + (bx2 - bx1).toFixed(1) + '" height="' + ph + '" fill="#4fc3f7" opacity="' + (paper ? '0.08' : '0.06') + '"/>';
+      entries.push({ name: 'JPL Horizons DE441 (dotted; shaded span −9998…+9999)', color: paper ? '#555' : '#fff', dash: '1,3' });
+    }
+  }
+  // ── La2010 Earth eccentricity overlay — the ONE-home elements table
+  // (rows carry years FROM J2000; the twin's hard-won mapping lesson),
+  // −500 kyr → 0, clipped to the sampled range ──
+  let la2010Note = '';
+  const cLa = paper ? '#c026d3' : '#e879f9';
+  if (on.earth && _la2010ElementsData) {
+    let d = '', s2 = 0, n = 0, started = false;
+    for (const row of _la2010ElementsData.data) {
+      const y = 2000 + row.year;
+      if (y < S.y0 || y > S.y1) continue;
+      d += (started ? 'L' : 'M') + toX(y).toFixed(1) + ',' + toY(row.eccentricity).toFixed(1);
+      started = true;
+      const j = Math.round((y - S.y0) / 1000);
+      if (j >= 0 && j < S.yrs.length) { const dd = S.data.earth[j] - row.eccentricity; s2 += dd * dd; n++; }
+    }
+    if (started) {
+      curves += '<path d="' + d + '" fill="none" stroke="' + cLa + '" stroke-width="1.4" stroke-dasharray="4,3"/>';
+      entries.push({ name: 'La2010 (Laskar) — Earth', color: cLa, dash: '4,3' });
+      if (n) la2010Note = ' Earth vs La2010 over the overlap: rms ' + Math.sqrt(s2 / n).toFixed(6) + '.';
+    }
+  }
+  // grid + axes — the twin's BC/AD conventions, dimensionless y
+  let grid = '';
+  const yTickStep = yMax > 0.24 ? 0.05 : yMax > 0.12 ? 0.02 : 0.01;
+  for (let v = 0; v <= yMax + 1e-9; v += yTickStep) {
+    grid += '<line x1="' + PAD.l + '" y1="' + toY(v).toFixed(1) + '" x2="' + (W - PAD.r) + '" y2="' + toY(v).toFixed(1) + '" stroke="' + cGrid + '" stroke-width="0.5"/>' +
+      '<text x="' + (PAD.l - 6) + '" y="' + toY(v).toFixed(1) + '" fill="' + cTick + '" font-size="' + fYT + '" text-anchor="end" dominant-baseline="middle">' + v.toFixed(2) + '</text>';
+  }
+  let xStep = 1000000;
+  for (const c of [50000, 100000, 200000, 250000, 500000, 1000000]) { xStep = c; if ((S.y1 - S.y0) / c <= 6) break; }
+  for (let xt = Math.ceil(S.y0 / xStep) * xStep; xt <= S.y1 + 1e-9; xt += xStep) {
+    const xp = toX(xt);
+    const ta = xp > W - PAD.r - 40 ? 'end' : xp < PAD.l + 40 ? 'start' : 'middle';
+    const lbl = xt === 0 ? '0' : Math.abs(xt).toLocaleString('en-US') + (xt < 0 ? ' BC' : ' AD');
+    grid += '<line x1="' + xp.toFixed(1) + '" y1="' + PAD.t + '" x2="' + xp.toFixed(1) + '" y2="' + (H - PAD.b) + '" stroke="' + cGrid + '" stroke-width="0.5"/>' +
+      '<text x="' + xp.toFixed(1) + '" y="' + (H - PAD.b + 12) + '" fill="' + cTick + '" font-size="' + fXT + '" text-anchor="' + ta + '">' + lbl + '</text>';
+  }
+  if (paper) grid += '<rect x="' + PAD.l + '" y="' + PAD.t + '" width="' + pw + '" height="' + ph + '" fill="none" stroke="#ccc" stroke-width="0.5"/>';
+  return { W, H, PAD, S, body: band + grid + curves, entries, jplRmsParts, la2010Note };
+}
+// ONE home for the eccentricity chart's caption sentences (the twin's
+// doctrine): every sentence gates on what is actually drawn.
+function _vfpPENoteParts(on, core) {
+  const frame = 'Orbital eccentricity of date (dimensionless — frame-free, so one view).';
+  const model = 'Solid curves: the model’s own N-body chain elements of date, series-governed' + (on.earth ? ' (Earth rides its own engine series, e = |z|).' : '.');
+  const jpl = core.jplRmsParts.length
+    ? 'Dotted (inside the shaded band): JPL Horizons DE441 osculating elements, −9998…+9999 in 100-yr steps — Δrms over the overlap: ' + core.jplRmsParts.join(' · ') + ' (Δrms includes the osculating short-period wiggle the secular curves average out).'
+    : '';
+  const la2010 = core.la2010Note
+    ? 'Dashed: La2010 (Laskar et al. 2011, A&A 532 A89, doi:10.1051/0004-6361/201116836), the repo’s La2010 Earth elements table (1-kyr, to 500,000 BC).' + core.la2010Note
+    : '';
+  return { frame, model, jpl, la2010 };
+}
+function renderVFPPlanetEccentricities() {
+  const on = _vfpPEState.on;
+  const core = _vfpPEChartCore(null, on, 'screen');
+  const W = core.W, H = core.H, PAD = core.PAD, S = core.S;
+  // the hover wiring (afterRender) maps pointer x back to a sample via this
+  _vfpPEState._screenGeom = { W, H, PAD, y0: S.y0, y1: S.y1 };
+  const cap = (p) => p.charAt(0).toUpperCase() + p.slice(1);
+  // ── per-planet checkboxes (dimmed when off) + all/none — no tab
+  // strip: eccentricity has one frame-free view ──
+  let controls = '<div style="padding:8px 6px;border:1px solid #2a2f3a;border-radius:6px 6px 0 0;background:#171c26;line-height:2;">';
+  for (const p of _vfpPI_PLANETS) {
+    controls += '<label style="margin-right:10px;font-size:11px;color:' + _vfpPICss(p) + ';opacity:' + (on[p] ? '1' : '0.45') + ';cursor:pointer;white-space:nowrap;">' +
+      '<input type="checkbox" data-vfppe="' + p + '"' + (on[p] ? ' checked' : '') + ' style="vertical-align:-2px;margin-right:3px;">' + cap(p) + '</label>';
+  }
+  const allBtn = (v, label) => '<button data-vfppe-all="' + v + '" style="margin-left:6px;padding:1px 9px;border-radius:4px;border:1px solid #2a2f3a;background:#232a36;color:#8a93a5;font-size:10px;cursor:pointer;">' + label + '</button>';
+  controls += '<span style="float:right;">' + allBtn('1', 'all') + allBtn('0', 'none') + '</span></div>';
+  const swatchCss = (en) => en.dash
+    ? 'background:repeating-linear-gradient(90deg,' + en.color + ' 0 ' + (en.dash === '1,3' ? '2px,transparent 2px 5px' : '6px,transparent 6px 9px') + ');'
+    : 'background:' + en.color + ';';
+  let legendHtml = '<div class="vfp-legend">';
+  for (const en of core.entries) legendHtml += '<div class="vfp-legend-item"><span class="vfp-legend-swatch" style="' + swatchCss(en) + '"></span>' + en.name + '</div>';
+  legendHtml += '</div>';
+  const P = _vfpPENoteParts(on, core);
+  const jplNote = P.jpl ? ' ' + P.jpl.replace('JPL Horizons', '<strong>JPL Horizons</strong>') : ' —';
+  const la2010Legend = P.la2010
+    ? ' Dashed: <a href="https://doi.org/10.1051/0004-6361/201116836" target="_blank" style="color:#e879f9;">La2010 (Laskar et al. 2011)</a>, the repo’s La2010 Earth elements table (1-kyr, to 500,000 BC).' + core.la2010Note
+    : '';
+  const fmtY = (y) => y === 0 ? '0' : Math.abs(y).toLocaleString('en-US') + (y < 0 ? ' BC' : ' AD');
+  return '<div class="vfp-chart-block">' +
+    controls +
+    legendHtml +
+    '<div style="position:relative;">' +
+    '<svg data-vfppe-svg viewBox="0 0 ' + W + ' ' + H + '" width="100%" style="display:block;background:#151a22;border-radius:0 0 6px 6px;">' +
+    core.body +
+    '<text x="' + PAD.l + '" y="' + (PAD.t - 4) + '" fill="#aaa" font-size="9">eccentricity (dimensionless)</text>' +
+    '<line data-vfppe-cursor x1="-10" x2="-10" y1="' + PAD.t + '" y2="' + (H - PAD.b) + '" stroke="#8a93a5" stroke-width="0.8" visibility="hidden"/>' +
+    '</svg>' +
+    '<div data-vfppe-tip style="position:absolute;display:none;pointer-events:none;background:rgba(13,17,23,0.95);border:1px solid #3a4356;border-radius:6px;padding:6px 10px;font-size:11px;line-height:1.55;color:#e8ecf4;white-space:nowrap;z-index:5;"></div>' +
+    '</div>' +
+    '<div style="padding:8px 4px 2px;color:#8a93a5;font-size:11px;line-height:1.5;"><strong>Frame:</strong> ' + P.frame + ' ' + P.model + ' Static chart, ' + fmtY(S.y0) + ' → ' + fmtY(S.y1) + '; hover the chart for every enabled planet’s value at a year.</div>' +
+    '<div style="padding:2px 4px 8px;color:#8a93a5;font-size:11px;line-height:1.5;"><strong>References:</strong>' + jplNote + la2010Legend + ' The planets have no published deep-time series beyond the Horizons span (IMCCE’s La2010 is Earth-only).</div>' +
+    '</div>';
+}
+// One paper form serves both header buttons for the eccentricity twin —
+// the house paper style, the toggle-gated notes wrapped below.
+function _vfpPEPaperSvg(range) {
+  const on = _vfpPEState.on;
+  const core = _vfpPEChartCore(range, on, 'paper');
+  const W = core.W, H = core.H, PAD = core.PAD, S = core.S;
+  const ph = H - PAD.t - PAD.b;
+  const fmtY = (y) => y === 0 ? '0' : Math.abs(y).toLocaleString('en-US') + (y < 0 ? ' BC' : ' AD');
+  const title = 'Eccentricity of all planets — ' + fmtY(S.y0) + ' → ' + fmtY(S.y1);
+  const P = _vfpPENoteParts(on, core);
+  const notes = [P.frame, P.model, P.jpl, P.la2010].filter((t) => t);
+  const wrapText = (t) => {
+    const out = [];
+    let line = '';
+    for (const w of t.split(' ')) {
+      if (line && (line + ' ' + w).length > 130) { out.push(line); line = w; } else { line = line ? line + ' ' + w : w; }
+    }
+    if (line) out.push(line);
+    return out;
+  };
+  const lines = [];
+  for (const nt of notes) for (const l of wrapText(nt)) lines.push(l);
+  const lw = core.entries.map((en) => 28 + en.name.length * 6.2 + 24);
+  const legendRows = [];
+  {
+    let row = [], wsum = 0;
+    core.entries.forEach((en, i) => {
+      if (row.length && wsum + lw[i] > W - 40) { legendRows.push({ row, wsum }); row = []; wsum = 0; }
+      row.push(i); wsum += lw[i];
+    });
+    if (row.length) legendRows.push({ row, wsum });
+  }
+  let legendSvg = '';
+  legendRows.forEach((r, ri) => {
+    let lx = (W - r.wsum) / 2;
+    const ly = 34 + ri * 16;
+    for (const i of r.row) {
+      const en = core.entries[i];
+      legendSvg += '<line x1="' + lx.toFixed(1) + '" y1="' + ly + '" x2="' + (lx + 22).toFixed(1) + '" y2="' + ly + '" stroke="' + en.color + '" stroke-width="1.8"' + (en.dash ? ' stroke-dasharray="' + en.dash + '"' : '') + '/>' +
+        '<text x="' + (lx + 28).toFixed(1) + '" y="' + (ly + 4) + '" fill="#333" font-size="11">' + escapeXml(en.name) + '</text>';
+      lx += lw[i];
+    }
+  });
+  const TOP = 34 + legendRows.length * 16 + 4;
+  const XAXIS = 16;   // the 'Years (BC / AD)' row under the chart
+  const Hp = TOP + H + XAXIS + lines.length * 15 + 8;
+  let noteText = '';
+  lines.forEach((l, i) => {
+    noteText += '<text x="' + PAD.l + '" y="' + (TOP + H + XAXIS + (i + 1) * 15 - 4) + '" fill="#444" font-size="11">' + escapeXml(l) + '</text>';
+  });
+  return '<?xml version="1.0" encoding="UTF-8"?>\n' +
+    '<svg viewBox="0 0 ' + W + ' ' + Hp + '" width="' + W + '" height="' + Hp + '" xmlns="http://www.w3.org/2000/svg" font-family="Inter,Helvetica,Arial,sans-serif">' +
+    '<rect width="' + W + '" height="' + Hp + '" fill="white"/>' +
+    '<text x="' + (W / 2) + '" y="18" text-anchor="middle" fill="#222" font-size="16" font-weight="600">' + escapeXml(title) + '</text>' +
+    legendSvg +
+    '<g transform="translate(0,' + TOP + ')">' + core.body +
+    '<text x="16" y="' + (PAD.t + ph / 2) + '" text-anchor="middle" dominant-baseline="middle" transform="rotate(-90,16,' + (PAD.t + ph / 2) + ')" fill="#444" font-size="12" font-weight="500">Eccentricity (dimensionless)</text>' +
+    '<text x="' + (PAD.l + (W - PAD.l - PAD.r) / 2) + '" y="' + (H + 8) + '" text-anchor="middle" fill="#444" font-size="12" font-weight="500">Years (BC / AD)</text></g>' +
+    noteText +
+    '</svg>';
+}
+function _vfpPEAfterRender(bodyEl) {
+  bodyEl.querySelectorAll('input[data-vfppe]').forEach((cbEl) => {
+    cbEl.addEventListener('change', () => {
+      _vfpPEState.on[cbEl.dataset.vfppe] = cbEl.checked;
+      updateVerificationPanel('planet-eccentricities');
+    });
+  });
+  bodyEl.querySelectorAll('button[data-vfppe-all]').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const onAll = btn.dataset.vfppeAll === '1';
+      for (const p of _vfpPI_PLANETS) _vfpPEState.on[p] = onAll;
+      updateVerificationPanel('planet-eccentricities');
+    });
+  });
+  // ── hover: every enabled planet's e at the pointed year — the twin's
+  // wiring, re-attached on every render ──
+  const svg = bodyEl.querySelector('svg[data-vfppe-svg]');
+  const tip = bodyEl.querySelector('div[data-vfppe-tip]');
+  const cursor = svg ? svg.querySelector('line[data-vfppe-cursor]') : null;
+  const G = _vfpPEState._screenGeom;
+  if (!svg || !tip || !cursor || !G) return;
+  const S = _vfpPESamples();
+  const on = _vfpPEState.on;
+  const hide = () => { tip.style.display = 'none'; cursor.setAttribute('visibility', 'hidden'); };
+  svg.addEventListener('mouseleave', hide);
+  svg.addEventListener('mousemove', (e) => {
+    const r = svg.getBoundingClientRect();
+    if (!r.width) return;
+    const px = ((e.clientX - r.left) / r.width) * G.W;
+    if (px < G.PAD.l || px > G.W - G.PAD.r) { hide(); return; }
+    const pw = G.W - G.PAD.l - G.PAD.r;
+    const i = Math.round(((px - G.PAD.l) / pw) * (S.yrs.length - 1));
+    const y = S.yrs[i];
+    const cx = (G.PAD.l + ((y - G.y0) / (G.y1 - G.y0)) * pw).toFixed(1);
+    cursor.setAttribute('x1', cx);
+    cursor.setAttribute('x2', cx);
+    cursor.setAttribute('visibility', 'visible');
+    let rows = '<div style="color:#8a93a5;margin-bottom:2px;">Year ' + (y < 0 ? '−' : '+') + Math.abs(y).toLocaleString('en-US') + '</div>';
+    for (const p of _vfpPI_PLANETS) {
+      if (!on[p]) continue;
+      rows += '<div style="display:flex;justify-content:space-between;gap:16px;"><span style="color:' + _vfpPICss(p) + ';">' + p.charAt(0).toUpperCase() + p.slice(1) + '</span><span>' + S.data[p][i].toFixed(5) + '</span></div>';
     }
     tip.innerHTML = rows;
     tip.style.display = 'block';

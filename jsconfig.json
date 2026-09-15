@@ -43,5 +43,5 @@
     }
   },
   "include": ["packages/*/src/**/*.js", "packages/*/test/**/*.mjs"],
-  "exclude": ["node_modules", "dist", "packages/analysis"]
+  "exclude": ["node_modules", "dist", "dist-dev", ".parcel-cache-build", "packages/analysis"]
 }
