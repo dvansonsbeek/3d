@@ -174,9 +174,16 @@ function _kcLamRel(k, year) {
   return B.lamDotRel[i] * (1 - f) + B.lamDotRel[i + 1] * f;
 }
 function _kcLamDot0(k) {
+  if (k === 'earth') {
+    // Earth's λ̇₀ DERIVES from the certified IAU anchor, never the dump
+    // absolute: the run's absolute λ̇ carries a ~1e-7 seed-class offset
+    // vs the anchor (~3 s on the sidereal year) — D6 banks a RATIO for
+    // exactly this reason. Zero literals: 360°·(Julian yr in s)/anchor.
+    _kcMassLossPeriodRatio(2000);   // primes the J2000-seconds memo
+    return 360 * 365.25 * 86400 / _kcMassLossJ2000S;
+  }
   const A = _planetSeriesData;
   if (A && A.verdict) {
-    if (k === 'earth' && A.verdict.siderealYear) return A.verdict.siderealYear.lamDotJ2000DegPerYr;
     const v = A.verdict.planetLamDot;
     if (v) { const r = v.rows.find((row) => row.body === k); if (r) return r.lamDotJ2000DegPerYr; }
   }
@@ -47121,16 +47128,16 @@ const planetStats = {
        value : [ { v: () => o.solarYearDays/meansolaryearlengthinDays, dec:6, sep:',' },{ small : 'years' }],
        hover : [`Ratio of current solar year to mean solar year. P = 1.0 when year length equals mean of ~365.2422 days`]},
       {label : () => `Orbital period (solar)`,
-       value : [ { v: () => o.solarYearDays, dec:8, sep:',' },{ small : 'days' }],
-       hover : [`Tropical year: equinox-to-equinox interval. Varies ±minutes due to gravitational perturbations. Mean ≈ ~365.2422 days. Days are scene-measured in the declared scene day basis (the measured mean solar day, doc 11 §Day bases) — not IAU SI days.`],
+       value : [ { v: () => { const s = _cardinalYearSeconds(o.currentYear, 'MEAN'); return Number.isFinite(s) ? s / 86400 : computeSolarYearDaysDirect(o.currentYear); }, dec:8, sep:',' },{ small : 'days' }],
+       hover : () => [`Earth's mean tropical year OF DATE in SI days — the one-source evaluator, the SAME family the Predictions panel rides (so the two surfaces read one value by construction). The equinox-to-equinox interval of a single year wobbles ±minutes about this mean. Scene-measured this year: ${fmtNum(o.solarYearDays,8,',')} d in the scene day basis (the measured mean solar day, doc 11 §Day bases) — the ~0.5-s split is of-date drift + measurement route + day basis, kept visible here.`],
        tpLink: true},
       {label : () => `Orbital period (sidereal)`,
-       value : [ { v: () => o.siderealYearDays, dec:8, sep:',' },{ small : 'days' }],
-       hover : [`Full orbit relative to fixed stars. Mean = solar year × (H/13)/((H/13)−1) ≈ 365.25641 days. ~20 min longer than solar year due to axial precession. Days are scene-measured in the declared scene day basis (the measured mean solar day, doc 11 §Day bases) — not IAU SI days.`],
+       value : [ { v: () => { const os = _hybridSpinActive() ? _siderealYearOneSourceSeconds(o.currentYear) : null; return os !== null && Number.isFinite(os) ? os / 86400 : meanSiderealYearSecondsAtAge((startmodelYear - o.currentYear) / 1e6) / 86400; }, dec:8, sep:',' },{ small : 'days' }],
+       hover : () => [`Earth's sidereal year OF DATE in SI days — the one-source D6 channel (the IAU-anchored mass-loss law ÷ the banked λ̇ ratio; J2000 anchor ${fmtNum(meansiderealyearlengthinSeconds/86400,8,',')} d = ${fmtNum(meansiderealyearlengthinSeconds,4,',')} s). ~20 min longer than the tropical year (axial precession). The kinematic H/13 identity composes to ${fmtNum(meansiderealyearlengthinDays_kinematic,8,',')} d — the certified structural second route, kept visible. Scene-measured this year: ${fmtNum(o.siderealYearDays,8,',')} d in the scene day basis (doc 11 §Day bases).`],
        tpLink: true},
       {label : () => `Mean Motion (n)`,
-       value : [ { v: () => OrbitalFormulas.meanMotion(o.solarYearDays), dec:6, sep:',' },{ small: '°/day' }],
-       hover : [`Mean angular motion: n = 360°/P. Rate at which mean anomaly increases`]},
+       value : [ { v: () => { const os = _hybridSpinActive() ? _siderealYearOneSourceSeconds(o.currentYear) : null; const d = os !== null && Number.isFinite(os) ? os / 86400 : meanSiderealYearSecondsAtAge((startmodelYear - o.currentYear) / 1e6) / 86400; return 360 / d; }, dec:6, sep:',' },{ small: '°/day' }],
+       hover : [`Mean angular motion relative to the fixed stars: n = 360°/P_sidereal (SI days), of date via the one-source channel. (360°/P_tropical would be the equinox-referenced rate — a different frame; the frame is named because the two split by ~20 min/yr of axial precession.)`]},
       {label : () => `Period (Kepler verification)`,
        value : [ { v: () => OrbitalFormulas.keplerPeriod(currentAUDistance, GM_SUN_PLUS_EARTH), dec:6, sep:',' },{ small: 'days' }],
        hover : [`Kepler's 3rd Law: P = 2π√(a³/(GM_Sun + GM_Earth)) × (meanSolar/meanSidereal). Same formula every planet uses; result is the mean solar year (~365.2422 days). The bare sidereal year (~365.25636) is shown above. Algebraically identical to the elaborate two-body form P = 2π√((a−Δa)³/GM_Sun) with Earth's Δa = 149.77 km (see doc 24) — both forms collapse to the same number because μ_body = μ_Earth cancels in the denominator.`]},
