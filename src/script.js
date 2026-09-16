@@ -6437,6 +6437,41 @@ if (typeof window !== 'undefined') {
       updateSunCenteredInvPlane();
       return { asc: sunCenteredNodeMarkers.userData.ascLabelDiv.innerHTML, desc: sunCenteredNodeMarkers.userData.descLabelDiv.innerHTML };
     },
+    // debug/verify aid: frame the camera square onto the eccentricity
+    // overlay (down the path plane's normal, target = Earth) so a
+    // headless screenshot can check what actually renders
+    visEccOverlayFrame: (dist, focusDot) => {
+      eccentricityPathGroup.updateMatrixWorld(true);
+      const n = new THREE.Vector3(0, 0, 1)
+        .applyQuaternion(eccentricityPathGroup.quaternion).normalize();
+      const c = focusDot
+        ? eccentricityPathGroup.userData.g5Dot.getWorldPosition(new THREE.Vector3())
+        : eccentricityPathGroup.position.clone();
+      camera.position.copy(c).addScaledVector(n, dist || 12);
+      controls.target.copy(c);
+      controls.update();
+      camera.updateMatrixWorld();
+      const ud = eccentricityPathGroup.userData;
+      const px = (w) => {
+        const v = w.clone().project(camera);
+        return [Math.round((v.x + 1) / 2 * window.innerWidth), Math.round((1 - v.y) / 2 * window.innerHeight)];
+      };
+      const wp = (obj) => obj.getWorldPosition(new THREE.Vector3());
+      const armEnd = (arm, i) => {
+        const p = arm.geometry.getAttribute('position');
+        return arm.localToWorld(new THREE.Vector3(p.getX(i), p.getY(i), p.getZ(i)));
+      };
+      return {
+        cam: camera.position.toArray(), target: c.toArray(),
+        screen: {
+          earth: px(eccentricityPathGroup.position.clone()),
+          dot: px(wp(ud.g5Dot)), marker: px(wp(ud.marker)),
+          eMaxTick: px(wp(ud.eMaxTick)), eMinTick: px(wp(ud.eMinTick)),
+          g5Arm0: px(armEnd(ud.g5Arm, 0)), g5Arm1: px(armEnd(ud.g5Arm, 1)),
+          g2Arm0: px(armEnd(ud.g2Arm, 0)), g2Arm1: px(armEnd(ud.g2Arm, 1)),
+        },
+      };
+    },
     // K8b-1 second exhibit: the Earth Eccentricity Path smoke surface
     visEccPathProbe: () => {
       eccentricityPathGroup.visible = true;
@@ -6446,6 +6481,7 @@ if (typeof window !== 'undefined') {
       const ud = eccentricityPathGroup.userData;
       const cyc = _kcEarthEccCycle(o.currentYear);
       const pos = ud.pathLine.geometry.getAttribute('position');
+      const anat = _eccAnatomy();
       return {
         nextMax: cyc.nextMax, nextMin: cyc.nextMin, lo: cyc.lo, hi: cyc.hi,
         samples: cyc.samples.length,
@@ -6453,6 +6489,58 @@ if (typeof window !== 'undefined') {
         highLabel: ud.nextMaxLabelDiv.innerHTML, lowLabel: ud.nextMinLabelDiv.innerHTML,
         markerLabel: ud.labelDiv.textContent,
         eNow: _sceneEccTargetAt(o.currentYear),
+        // anatomy overlay: carrier/epicycle rates (″/yr), the ring radius,
+        // and the marker-to-dot distance (should sit NEAR the ring — the
+        // 16 minor terms are the residual)
+        anatomy: {
+          carrierArcsecPerYr: anat.carrier.omegaRadPerYr * 180 / Math.PI * 3600,
+          epicycleArcsecPerYr: anat.epicycle.omegaRadPerYr * 180 / Math.PI * 3600,
+          ringRadius: ECC_PATH_SCALE * anat.epicycleAmp,
+          markerToDot: ud.marker.position.distanceTo(ud.g5Dot.position),
+          dotVisible: ud.g5Dot.visible, ringVisible: ud.g2Ring.visible,
+          // beat-readout ticks (local to the dot; Earth = group origin, so
+          // the dot's position IS the Earth→dot vector)
+          eMaxTickLen: ud.eMaxTick.position.length(),
+          eMinTickLen: ud.eMinTick.position.length(),
+          // +1 = far side (along Earth→dot), −1 = near side
+          eMaxTickDot: Math.sign(ud.eMaxTick.position.dot(ud.g5Dot.position)),
+          eMinTickDot: Math.sign(ud.eMinTick.position.dot(ud.g5Dot.position)),
+          eMaxTickCross: Math.abs(ud.eMaxTick.position.x * ud.g5Dot.position.y
+            - ud.eMaxTick.position.y * ud.g5Dot.position.x),
+          ticksVisible: ud.eMaxTick.visible && ud.eMinTick.visible,
+          g5LabelHTML: (ud.g5LabelObj && ud.g5LabelObj.element) ? ud.g5LabelObj.element.innerHTML : '',
+          eMaxTickLabelHTML: (ud.eMaxTickLabelObj && ud.eMaxTickLabelObj.element) ? ud.eMaxTickLabelObj.element.innerHTML : '',
+          // wheels-and-arms: the dot must sit ON the carrier circle, the
+          // g₂ arm tip ON the ring, the beat arc anchored at the e-max
+          // tick with a plausible swept fraction
+          g5CircleR: ud.g5CircleR,
+          dotToCircleCenter: Math.hypot(
+            ud.g5Dot.position.x - ECC_PATH_SCALE * anat.deltaRe,
+            ud.g5Dot.position.y - ECC_PATH_SCALE * anat.deltaIm),
+          g2ArmTipLen: (() => { const p = ud.g2Arm.geometry.getAttribute('position');
+            return Math.hypot(p.getX(1), p.getY(1)); })(),
+          beatArc: (() => {
+            const p = ud.beatArc.geometry.getAttribute('position');
+            const a0 = Math.atan2(p.getY(0), p.getX(0));
+            const a1 = Math.atan2(p.getY(64), p.getX(64));
+            const tick = Math.atan2(ud.eMaxTick.position.y, ud.eMaxTick.position.x);
+            const arm = (() => { const q = ud.g2Arm.geometry.getAttribute('position');
+              return Math.atan2(q.getY(1), q.getX(1)); })();
+            const wrap = (x) => x - 2 * Math.PI * Math.floor(x / (2 * Math.PI));
+            return { startsAtTickDeg: wrap(a0 - tick) * 180 / Math.PI,
+                     endsAtArmDeg: wrap(a1 - arm) * 180 / Math.PI,
+                     sweptDeg: wrap(a1 - a0) * 180 / Math.PI,
+                     r0: Math.hypot(p.getX(0), p.getY(0)) };
+          })(),
+          wheelsVisible: ud.g5Circle.visible && ud.g5Arm.visible
+            && ud.g2Arm.visible && ud.g2Tip.visible && ud.beatArc.visible
+            && ud.g2LabelObj.visible && ud.beatLabelObj.visible,
+          // the slow hand must start AT EARTH (the group origin)
+          g5ArmStartLen: (() => { const p = ud.g5Arm.geometry.getAttribute('position');
+            return Math.hypot(p.getX(0), p.getY(0)); })(),
+          g2LabelHTML: (ud.g2LabelObj && ud.g2LabelObj.element) ? ud.g2LabelObj.element.innerHTML : '',
+          beatLabel: ud.beatDiv ? ud.beatDiv.textContent : '',
+        },
       };
     },
     inclInvAt: (y) => inclInvPlaneModel(y),
@@ -11089,6 +11177,42 @@ function _kcEarthEccCycle(yearNow) {
 }
 
 const ECC_PATH_SCALE = 100;   // e×100 — the scene's eccentric-offset convention
+// ── K8b-1 phase 2 (owner-approved): the g₅-dot + g₂-ring ANATOMY overlay.
+// The two leading banked earthZ terms (by amplitude): the SLOWER one is the
+// carrier (g₅, A≈0.0190, one revolution ≈ 304 kyr), the other the epicycle
+// (g₂, A≈0.0164, ≈174 kyr). dot = Δ + g₅(t) (Δ = the J2000 anchor z-vector
+// minus the full 18-term sum at t=0 — the same constant re-anchoring the
+// runtime evaluators apply, so the sketch lines up with the marker);
+// ring = the g₂ track around the dot (radius constant = |A₂|). The marker
+// rides NEAR the ring, not on it — the 16 minor terms are the residual;
+// the PATH is the truth, the overlay is the explanation sketch (drawn
+// faint for that reason). Marker far-side of the ring from Earth = the
+// arms add = e max; near-side = they cancel = e min; one marker lap
+// around the ring as seen from Earth = the 405.7-kyr metronome.
+let _eccAnatomyM = null;
+function _eccAnatomy() {
+  if (_eccAnatomyM) return _eccAnatomyM;
+  const sorted = DEEP_MODES_ARTIFACT.earthZ.slice()
+    .sort((a, b) => Math.hypot(b.re, b.im) - Math.hypot(a.re, a.im));
+  const [t1, t2] = [sorted[0], sorted[1]];
+  const carrier = Math.abs(t1.omegaRadPerYr) <= Math.abs(t2.omegaRadPerYr) ? t1 : t2;
+  const epicycle = carrier === t1 ? t2 : t1;
+  // Δ = anchor z(J2000) − Σ all modes at t=0 (the runtime re-anchoring)
+  let s0re = 0, s0im = 0;
+  for (const m of DEEP_MODES_ARTIFACT.earthZ) { s0re += m.re; s0im += m.im; }
+  const aRad = DEEP_MODES_ARTIFACT.anchorPeriEclipticDeg * Math.PI / 180;
+  _eccAnatomyM = {
+    carrier, epicycle,
+    epicycleAmp: Math.hypot(epicycle.re, epicycle.im),
+    deltaRe: DEEP_MODES_ARTIFACT.anchorE * Math.cos(aRad) - s0re,
+    deltaIm: DEEP_MODES_ARTIFACT.anchorE * Math.sin(aRad) - s0im,
+  };
+  return _eccAnatomyM;
+}
+function _eccTermAt(m, t) {
+  const c = Math.cos(m.omegaRadPerYr * t), s = Math.sin(m.omegaRadPerYr * t);
+  return [m.re * c - m.im * s, m.re * s + m.im * c];
+}
 function createEccentricityPath() {
   const group = new THREE.Group();
   group.name = 'EarthEccentricityPath';
@@ -11141,10 +11265,184 @@ function createEccentricityPath() {
   labelObject.visible = false;
   marker.add(labelObject);
 
+  // ── the anatomy overlay: g₅ carrier dot + g₂ epicycle ring (faint —
+  // the sketch, not the truth; see the _eccAnatomy comment) ──
+  const anat = _eccAnatomy();
+  const g5Dot = new THREE.Mesh(new THREE.SphereGeometry(0.05, 8, 8),
+    new THREE.MeshBasicMaterial({ color: 0xff8800 }));
+  g5Dot.visible = false;
+  group.add(g5Dot);
+  const g5Div = document.createElement('div');
+  g5Div.innerHTML = 'g₅';
+  g5Div.style.color = '#ff8800';
+  g5Div.style.fontSize = '11px';
+  g5Div.style.fontFamily = 'Arial, sans-serif';
+  g5Div.style.fontWeight = 'bold';
+  g5Div.style.textShadow = '1px 1px 2px black, -1px -1px 2px black';
+  g5Div.style.pointerEvents = 'none';
+  const g5LabelObj = new CSS2DObject(g5Div);
+  g5LabelObj.position.set(0, 0.18, 0);
+  g5LabelObj.visible = false;
+  g5Dot.add(g5LabelObj);
+  const ringR = ECC_PATH_SCALE * anat.epicycleAmp;
+  const ringPts = new Float32Array(65 * 3);
+  for (let i = 0; i <= 64; i++) {
+    const a = (i / 64) * 2 * Math.PI;
+    ringPts[i * 3] = ringR * Math.cos(a);
+    ringPts[i * 3 + 1] = ringR * Math.sin(a);
+    ringPts[i * 3 + 2] = 0;
+  }
+  const ringGeom = new THREE.BufferGeometry();
+  ringGeom.setAttribute('position', new THREE.BufferAttribute(ringPts, 3));
+  const g2Ring = new THREE.Line(ringGeom,
+    new THREE.LineBasicMaterial({ color: 0xff8800, transparent: true, opacity: 0.35 }));
+  g2Ring.frustumCulled = false;
+  g2Ring.visible = false;
+  g5Dot.add(g2Ring);   // the ring is centered on the carrier dot by parenting
+
+  // ── the 405-kyr READOUT (owner: "the dot moves in ~300 kyr — how do we
+  // show the 405 kyr?"): the metronome is the RELATIVE motion — the marker's
+  // lap around the ring measured against the Earth→dot line (g₂−g₅). Two
+  // reference ticks ride the ring on that line: far side = arms add = the
+  // e-max point (yellow, matching NEXT MAX), near side = arms cancel = the
+  // e-min point (cyan, matching NEXT MIN). Marker meets the yellow tick
+  // once per beat — the beat period lives on the "beat %" counter (the
+  // one element cycling at that rate); every number computed, no literals.
+  const _beatYrLbl = Math.round(DEEP_MODES_ARTIFACT.verdict.strongestBeatPeriodKyr * 1000).toLocaleString('en-US');
+  const _g5PeriodLbl = Math.round(2 * Math.PI / Math.abs(anat.carrier.omegaRadPerYr)).toLocaleString('en-US');
+  g5Div.innerHTML = 'g₅<br><span style="font-size:9px;font-weight:normal;opacity:0.8;">mean rev = ' + _g5PeriodLbl + ' yr</span>';
+  const mkTick = (color, cssColor, title, sub) => {
+    const mk = new THREE.Mesh(new THREE.SphereGeometry(0.035, 8, 8), new THREE.MeshBasicMaterial({ color }));
+    mk.visible = false;
+    g5Dot.add(mk);   // rides the carrier dot; local offset set per frame along the Earth→dot line
+    const div = document.createElement('div');
+    div.innerHTML = '<span style="font-size:11px;font-weight:bold;">' + title + '</span>'
+      + (sub ? '<br><span style="font-size:9px;opacity:0.8;">' + sub + '</span>' : '');
+    div.style.color = cssColor;
+    div.style.fontFamily = 'Arial, sans-serif';
+    div.style.textShadow = '1px 1px 2px black, -1px -1px 2px black';
+    div.style.pointerEvents = 'none';
+    div.style.textAlign = 'center';
+    div.style.lineHeight = '1.2';
+    const lbl = new CSS2DObject(div);
+    lbl.position.set(0, 0.14, 0);
+    lbl.visible = false;
+    mk.add(lbl);
+    return { mk, lbl };
+  };
+  const eMaxTick = mkTick(0xffff00, '#ffff00', 'e max', null);
+  const eMinTick = mkTick(0x00ffff, '#00ffff', 'e min', null);
+  // the e-min label hangs BELOW its tick: at J2000 that tick sits near
+  // Earth where NEXT MIN + Precession Center labels already crowd above
+  eMinTick.lbl.position.set(0, -0.14, 0);
+
+  // ── the wheels-and-arms sketch (owner: nothing visible turns in
+  // 405 kyr — make the two "clock hands" visible): the g₅ carrier circle
+  // the dot rides (centered on the fixed Δ point), the g₅ arm (Earth→dot,
+  // the slow hand) and the g₂ arm (dot→ring, the fast hand). The hands
+  // realign once per g₂−g₅ beat — the 405.7-kyr metronome is their
+  // SYNODIC period, like planetary conjunctions; the yellow beat arc
+  // along the ring (e-max tick → g₂ arm, CCW) fills 0→360° from one
+  // e max to the next — the one element whose full cycle IS the beat.
+  const g5CircleR = ECC_PATH_SCALE * Math.hypot(anat.carrier.re, anat.carrier.im);
+  const g5Cx = ECC_PATH_SCALE * anat.deltaRe, g5Cy = ECC_PATH_SCALE * anat.deltaIm;
+  const circPts = new Float32Array(65 * 3);
+  for (let i = 0; i <= 64; i++) {
+    const a = (i / 64) * 2 * Math.PI;
+    circPts[i * 3] = g5Cx + g5CircleR * Math.cos(a);
+    circPts[i * 3 + 1] = g5Cy + g5CircleR * Math.sin(a);
+    circPts[i * 3 + 2] = 0;
+  }
+  const circGeom = new THREE.BufferGeometry();
+  circGeom.setAttribute('position', new THREE.BufferAttribute(circPts, 3));
+  const g5Circle = new THREE.Line(circGeom,
+    new THREE.LineBasicMaterial({ color: 0xff8800, transparent: true, opacity: 0.25 }));
+  g5Circle.frustumCulled = false;
+  g5Circle.visible = false;
+  group.add(g5Circle);
+  const mkArm = (parent, opacity, color) => {
+    const g = new THREE.BufferGeometry();
+    g.setAttribute('position', new THREE.BufferAttribute(new Float32Array(6), 3));
+    const ln = new THREE.Line(g,
+      new THREE.LineBasicMaterial({ color, transparent: true, opacity }));
+    ln.frustumCulled = false;
+    ln.visible = false;
+    parent.add(ln);
+    return ln;
+  };
+  // the slow hand runs EARTH → dot (Earth = the group origin, vertex 0
+  // stays there) — the same line the ticks and the metronome are defined
+  // against, and what the eye expects (an owner correction: the earlier
+  // Δ→dot phasor arm "did not point to Earth" and matched nothing else)
+  const g5Arm = mkArm(group, 0.85, 0xff8800);
+  // the fast hand: dot → the exact g₂ point on the ring — YELLOW, pairing
+  // it with the beat arc and the e-max tick (the yellow system is the
+  // 405-kyr story; the orange system is the 304-kyr carrier)
+  const g2Arm = mkArm(g5Dot, 0.9, 0xffff00);
+  // a small labeled tip dot where the g₂ hand meets the ring — 1-px lines
+  // at low opacity vanish at scene zoom, and the g₂ point needs its NAME
+  const g2Tip = new THREE.Mesh(new THREE.SphereGeometry(0.03, 8, 8),
+    new THREE.MeshBasicMaterial({ color: 0xffff00 }));
+  g2Tip.visible = false;
+  g5Dot.add(g2Tip);
+  const _g2PeriodLbl = Math.round(2 * Math.PI / Math.abs(anat.epicycle.omegaRadPerYr)).toLocaleString('en-US');
+  const g2Div = document.createElement('div');
+  g2Div.innerHTML = 'g₂<br><span style="font-size:9px;font-weight:normal;opacity:0.8;">mean rev = ' + _g2PeriodLbl + ' yr</span>';
+  g2Div.style.color = '#ffff00';
+  g2Div.style.fontSize = '11px';
+  g2Div.style.fontFamily = 'Arial, sans-serif';
+  g2Div.style.fontWeight = 'bold';
+  g2Div.style.textShadow = '1px 1px 2px black, -1px -1px 2px black';
+  g2Div.style.pointerEvents = 'none';
+  g2Div.style.textAlign = 'center';
+  g2Div.style.lineHeight = '1.2';
+  const g2LabelObj = new CSS2DObject(g2Div);
+  g2LabelObj.position.set(0, 0.14, 0);
+  g2LabelObj.visible = false;
+  g2Tip.add(g2LabelObj);
+  // live beat-progress readout riding the arc midpoint: the one number
+  // that counts 0→100% over exactly one 405.7-kyr metronome cycle
+  const beatDiv = document.createElement('div');
+  beatDiv.style.color = '#ffff00';
+  beatDiv.style.fontSize = '10px';
+  beatDiv.style.fontFamily = 'Arial, sans-serif';
+  beatDiv.style.fontWeight = 'bold';
+  beatDiv.style.textShadow = '1px 1px 2px black, -1px -1px 2px black';
+  beatDiv.style.pointerEvents = 'none';
+  beatDiv.style.whiteSpace = 'nowrap';
+  const beatLabelObj = new CSS2DObject(beatDiv);
+  beatLabelObj.visible = false;
+  g5Dot.add(beatLabelObj);
+  const beatArcGeom = new THREE.BufferGeometry();
+  beatArcGeom.setAttribute('position', new THREE.BufferAttribute(new Float32Array(65 * 3), 3));
+  const beatArc = new THREE.Line(beatArcGeom,
+    new THREE.LineBasicMaterial({ color: 0xffff00, transparent: true, opacity: 0.75 }));
+  beatArc.frustumCulled = false;
+  beatArc.visible = false;
+  g5Dot.add(beatArc);
+
   group.userData.pathLine = pathLine;
   group.userData.marker = marker;
   group.userData.labelDiv = labelDiv;
   group.userData.labelObject = labelObject;
+  group.userData.g5Dot = g5Dot;
+  group.userData.g5LabelObj = g5LabelObj;
+  group.userData.g2Ring = g2Ring;
+  group.userData.ringRadius = ringR;
+  group.userData.eMaxTick = eMaxTick.mk;
+  group.userData.eMaxTickLabelObj = eMaxTick.lbl;
+  group.userData.eMinTick = eMinTick.mk;
+  group.userData.eMinTickLabelObj = eMinTick.lbl;
+  group.userData.g5Circle = g5Circle;
+  group.userData.g5CircleR = g5CircleR;
+  group.userData.g5Arm = g5Arm;
+  group.userData.g2Arm = g2Arm;
+  group.userData.g2Tip = g2Tip;
+  group.userData.g2LabelObj = g2LabelObj;
+  group.userData.beatArc = beatArc;
+  group.userData.beatDiv = beatDiv;
+  group.userData.beatLabelObj = beatLabelObj;
+  group.userData.beatYrLbl = _beatYrLbl;
   group.userData.builtCache = null;
   group.visible = false;
   return group;
@@ -11190,7 +11488,15 @@ const _ECCP_V = new THREE.Vector3();
 function updateEccentricityPathMarker() {
   const ud = eccentricityPathGroup.userData;
   if (!eccentricityPathGroup.visible) {
-    if (ud.marker.visible) { ud.marker.visible = false; ud.labelObject.visible = false; }
+    if (ud.marker.visible) {
+      ud.marker.visible = false; ud.labelObject.visible = false;
+      ud.g5Dot.visible = false; ud.g2Ring.visible = false; ud.g5LabelObj.visible = false;
+      ud.eMaxTick.visible = false; ud.eMaxTickLabelObj.visible = false;
+      ud.eMinTick.visible = false; ud.eMinTickLabelObj.visible = false;
+      ud.g5Circle.visible = false; ud.g5Arm.visible = false;
+      ud.g2Arm.visible = false; ud.g2Tip.visible = false; ud.beatArc.visible = false;
+      ud.g2LabelObj.visible = false; ud.beatLabelObj.visible = false;
+    }
     return;
   }
   if (!_kcR) return;   // chain frame not derived yet (first frames)
@@ -11212,7 +11518,70 @@ function updateEccentricityPathMarker() {
   const eNow = _sceneEccTargetAt(o.currentYear);
   const pomNow = _kcPerihelionEclLonDeg('earth', o.julianDay) * Math.PI / 180;
   ud.marker.position.set(ECC_PATH_SCALE * eNow * Math.cos(pomNow), ECC_PATH_SCALE * eNow * Math.sin(pomNow), 0);
-  if (needsImmediateUpdate) ud.marker.visible = true;
+  // the anatomy overlay: carrier dot at Δ + g₅(t); the g₂ ring rides it
+  // by parenting (its radius is the constant epicycle amplitude)
+  {
+    const anat = _eccAnatomy();
+    const [cr, ci] = _eccTermAt(anat.carrier, o.currentYear - 2000);
+    ud.g5Dot.position.set(ECC_PATH_SCALE * (anat.deltaRe + cr), ECC_PATH_SCALE * (anat.deltaIm + ci), 0);
+    // the beat-readout ticks ride the ring on the Earth→dot line (Earth =
+    // the group origin): far side = e max, near side = e min
+    const dLen = ud.g5Dot.position.length();
+    if (dLen > 1e-9) {
+      const ux = ud.g5Dot.position.x / dLen, uy = ud.g5Dot.position.y / dLen;
+      ud.eMaxTick.position.set(ud.ringRadius * ux, ud.ringRadius * uy, 0);
+      ud.eMinTick.position.set(-ud.ringRadius * ux, -ud.ringRadius * uy, 0);
+    }
+    // the two clock hands + the beat arc: g₅ arm tip = the dot; g₂ arm
+    // tip = the exact epicycle point on the ring; the arc sweeps the ring
+    // from the e-max tick CCW to the g₂ arm — it fills once per beat
+    {
+      const p = ud.g5Arm.geometry.getAttribute('position');
+      p.setXYZ(1, ud.g5Dot.position.x, ud.g5Dot.position.y, 0);
+      p.needsUpdate = true;
+    }
+    const [er, ei] = _eccTermAt(anat.epicycle, o.currentYear - 2000);
+    {
+      const p = ud.g2Arm.geometry.getAttribute('position');
+      p.setXYZ(1, ECC_PATH_SCALE * er, ECC_PATH_SCALE * ei, 0);
+      p.needsUpdate = true;
+    }
+    ud.g2Tip.position.set(ECC_PATH_SCALE * er, ECC_PATH_SCALE * ei, 0);
+    if (dLen > 1e-9) {
+      const phiTick = Math.atan2(ud.g5Dot.position.y, ud.g5Dot.position.x);
+      const phi2 = Math.atan2(ei, er);
+      let dphi = phi2 - phiTick;
+      dphi -= 2 * Math.PI * Math.floor(dphi / (2 * Math.PI));   // → [0, 2π)
+      const p = ud.beatArc.geometry.getAttribute('position');
+      for (let i = 0; i <= 64; i++) {
+        const a = phiTick + (i / 64) * dphi;
+        p.setXYZ(i, ud.ringRadius * Math.cos(a), ud.ringRadius * Math.sin(a), 0);
+      }
+      p.needsUpdate = true;
+      // the live 405.7-kyr counter: elapsed fraction of the beat, at the
+      // arc midpoint just outside the ring
+      const mid = phiTick + dphi / 2;
+      ud.beatLabelObj.position.set(1.25 * ud.ringRadius * Math.cos(mid), 1.25 * ud.ringRadius * Math.sin(mid), 0);
+      ud.beatDiv.textContent = 'beat ' + Math.round(dphi / (2 * Math.PI) * 100) + '% of mean ' + ud.beatYrLbl + ' yr';
+    }
+  }
+  if (needsImmediateUpdate) {
+    ud.marker.visible = true;
+    ud.g5Dot.visible = true;
+    ud.g2Ring.visible = true;
+    ud.g5LabelObj.visible = true;
+    ud.eMaxTick.visible = true;
+    ud.eMaxTickLabelObj.visible = true;
+    ud.eMinTick.visible = true;
+    ud.eMinTickLabelObj.visible = true;
+    ud.g5Circle.visible = true;
+    ud.g5Arm.visible = true;
+    ud.g2Arm.visible = true;
+    ud.g2Tip.visible = true;
+    ud.g2LabelObj.visible = true;
+    ud.beatArc.visible = true;
+    ud.beatLabelObj.visible = true;
+  }
   ud.labelDiv.textContent = 'e = ' + eNow.toFixed(5);
   if (needsImmediateUpdate) ud.labelObject.visible = true;
   void cyc;
@@ -25997,10 +26366,15 @@ function setupGUI() {
         if (ud.nextMinLabelObj) ud.nextMinLabelObj.visible = false;
         if (ud.nextMaxMarker) ud.nextMaxMarker.visible = false;
         if (ud.nextMinMarker) ud.nextMinMarker.visible = false;
+        if (ud.g5LabelObj) ud.g5LabelObj.visible = false;
+        if (ud.eMaxTickLabelObj) ud.eMaxTickLabelObj.visible = false;
+        if (ud.eMinTickLabelObj) ud.eMinTickLabelObj.visible = false;
+        if (ud.g2LabelObj) ud.g2LabelObj.visible = false;
+        if (ud.beatLabelObj) ud.beatLabelObj.visible = false;
       }
       needsLabelUpdate = true;
     }),
-    'Earth\u2019s eccentricity vector e\u00b7e^{i\u03d6} over one 405.7-kyr g\u2082\u2212g\u2085 beat cycle (the eccentricity metronome) \u2014 radius = e\u00d7100, the scene\u2019s eccentric-offset convention; labels mark the coming e maximum and minimum.');
+    'Earth\u2019s eccentricity vector e\u00b7e^{i\u03d6} over one 405.7-kyr g\u2082\u2212g\u2085 beat cycle (the eccentricity metronome) \u2014 radius = e\u00d7100, the scene\u2019s eccentric-offset convention; labels mark the coming e maximum and minimum. The faint orange overlay is the anatomy sketch: the g\u2085 carrier dot and the g\u2082 epicycle ring the marker rides \u2014 far side of the ring = arms add = e max, near side = they cancel = e min. The two arms are clock hands — Earth→g₅ dot (slow) and g₅ dot→g₂ point (fast); their realignment is the beat — a SYNODIC period, like planetary conjunctions (labeled periods are the modes’ MEAN rates) — and the yellow arc with its "beat %" counter fills 0→100% from one e max to the next: its full cycle IS the 405.7-kyr metronome.');
 
   // ── Distance (root level) ──
   addTooltip(visFolder.addBinding(o, 'starDistanceScaleFact', { label: 'Distance', min: 0.1, max: 2, step: 0.1 })
