@@ -6400,6 +6400,35 @@ if (typeof window !== 'undefined') {
     calPerihelionAt: (jd) => dayToPerihelionCalendarDate(jd),
     calPerihelionJD: (dateStr, timeStr) => dateToPerihelionJulianDay(dateStr, timeStr),
     calPerihelionEpochJD: () => perihelionalignmentJD,
+    // K8b-1 wobble-center probe: world azimuths (around Earth) of the sun,
+    // the marker, and the axis's in-plane lean, plus the dec-invariant
+    // inputs — the baseline instrument for the solstice-direction fix and
+    // the acceptance gate afterwards.
+    wobbleCenterProbe: (jd) => {
+      const savedJD = o.julianDay;
+      jumpToJulianDay(jd);
+      forceSceneUpdate();
+      const w = new THREE.Vector3(), e = new THREE.Vector3(), s = new THREE.Vector3(), q = new THREE.Quaternion();
+      earthWobbleCenter.planetObj.getWorldPosition(w);
+      earth.rotationAxis.getWorldPosition(e);
+      sun.planetObj.getWorldPosition(s);
+      const az = (v) => Math.atan2(v.z - e.z, v.x - e.x) * 180 / Math.PI;
+      const a = new THREE.Vector3(0, 1, 0).applyQuaternion(earth.rotationAxis.getWorldQuaternion(q)).normalize();
+      const n = new THREE.Vector3(0, 1, 0).applyQuaternion(barycenterEarthAndSun.pivotObj.getWorldQuaternion(q)).normalize();
+      const lean = a.clone().addScaledVector(n, -a.dot(n)).normalize();
+      const r = {
+        sunAzDeg: az(s),
+        markerAzDeg: az(w),
+        leanAzDeg: Math.atan2(lean.z, lean.x) * 180 / Math.PI,
+        markerDistE: w.distanceTo(e),
+        sunDecDeg: radiansToDecDecimal(sun.dec),
+        obliquityEarthDeg: o.obliquityEarth,
+        markerDecDeg: earthWobbleCenter.dec * 180 / Math.PI,
+      };
+      jumpToJulianDay(savedJD);
+      forceSceneUpdate();
+      return r;
+    },
     visNodeMarkersProbe: (name) => {
       o.lookAtObj = { name };
       sunCenteredInvPlane.visible = true;
@@ -11789,6 +11818,8 @@ const _invMat     = new THREE.Matrix4();
 const _camDir     = new THREE.Vector3();          // Camera direction (reusable in render loop)
 
 const EARTH_POS    = new THREE.Vector3();         // Earth centre (world)
+// K8b-1 wobble-center scratch (the solstice-direction geometry)
+const _WCB_A = new THREE.Vector3(), _WCB_N = new THREE.Vector3(), _WCB_Q = new THREE.Quaternion();
 const SUN_POS      = new THREE.Vector3();         // Sun   centre (world)
 const WOBBLE_POS  = new THREE.Vector3();          // WOBBLE   centre (world)
 const PERIHELION_OF_EARTH_POS  = new THREE.Vector3();   // PERIHELION-OF-EARTH   centre (world)
@@ -45213,6 +45244,10 @@ async function runRATest() {
     const date = o.Date
     const time = o.Time
 
+    // K8b-1: the wobble columns now read the SOLSTICE-DIRECTION marker
+    // (geometry, not the H/13 clock) — Earth Wobble Dec ≡ the rendered
+    // obliquity at every epoch (the dec invariant the wobble-center gate
+    // pins), and Earth Wobble RA is the solstice direction of date.
     const earthWobbRA    = (earthWobbleCenter.ra * 180 / Math.PI + 360) % 360;
     const earthWobbDec   = 90-(earthWobbleCenter.dec * 180 / Math.PI);
     const earthWobbDistE = earthWobbleCenter.distAU;
@@ -53750,6 +53785,35 @@ function updatePositions() {
       obj.planetObj.parent.worldToLocal(_KC_V);
       obj.planetObj.position.copy(_KC_V);
       obj.planetObj.updateMatrixWorld(true);
+    }
+
+    // K8b-1 slice 1 — the wobble center points at the solstice by GEOMETRY
+    // (owner deep-time catch: the H/13-clock marker sat 58° off the
+    // solstice sun at +1.1 Myr while the axis lean sat 0.03° off — the
+    // recorded baseline). Direction = the RENDERED axis (the same
+    // orientation the polar line inherits by parenting — the owner's
+    // "polar line already points correctly" observation) projected into
+    // the RENDERED sun plane: the sun stands at its instantaneous max
+    // declination exactly when its azimuth equals the marker's, at every
+    // epoch, under the hybrid OR the K fallback — no clock, no period
+    // constant. dec(marker from Earth) ≡ the rendered obliquity at ANY
+    // radius (the marker is Earth-anchored with an IN-PLANE offset, so
+    // direction and distance decouple identically) — the distance carries
+    // no physics and stays at the historical Law-4 display radius.
+    if (obj === earthWobbleCenter) {
+      const _a = _WCB_A.set(0, 1, 0).applyQuaternion(earth.rotationAxis.getWorldQuaternion(_WCB_Q)).normalize();
+      const _n = _WCB_N.set(0, 1, 0).applyQuaternion(barycenterEarthAndSun.pivotObj.getWorldQuaternion(_WCB_Q)).normalize();
+      _a.addScaledVector(_n, -_a.dot(_n));
+      if (_a.lengthSq() > 1e-12) {
+        _a.normalize();
+        PLANET_POS.set(EARTH_POS.x + earthWobbleCenter.orbitRadius * _a.x,
+                       EARTH_POS.y + earthWobbleCenter.orbitRadius * _a.y,
+                       EARTH_POS.z + earthWobbleCenter.orbitRadius * _a.z);
+        _KC_V.copy(PLANET_POS);
+        obj.planetObj.parent.worldToLocal(_KC_V);
+        obj.planetObj.position.copy(_KC_V);
+        obj.planetObj.updateMatrixWorld(true);
+      }
     }
 
     /*  EARTH → PLANET  (distance)  */
