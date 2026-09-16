@@ -80,12 +80,20 @@ would silently churn a structural claim for a rounding-level gain.
 - **Capture a baseline before touching shared machinery.** Two minutes; it has
   caught a 583.7″ regression.
 - `data/02-solar-measurements.csv` is 160 MB and gitignored — no git recovery.
-  Back it up before regenerating (2 h 24 m).
-- **The deep-time alignment campaign is COMPLETE** — engine ≡ CSV bit-exact,
-  all sixteen R-items closed, the cardinal-point fit (now Step 6d; "6c" in
+  Back it up before regenerating (2 h 24 m). It is the C-4b-era campaign
+  record and KNOWN STALE vs the post-C-4b movement arcs (D4c/D4d-rev;
+  measured SS@−997 off 2.9 h) — the LIVING check is Step 6a2
+  (`npm run fit:6a2` → the ~48k-row window CSV) + `npm run check:csv-smoke`
+  (bit-exact window compare, fail-proven; tools/fit/README Step 6a2).
+- **The deep-time alignment campaign is COMPLETE** — engine ≡ CSV bit-exact
+  AS OF ITS ERA (the claim is historically scoped: the CSV is the C-4b-era
+  record and the post-C-4b movement arcs moved the engine — see the CSV
+  bullet below; Step 6a2 + check:csv-smoke are the living check), all
+  sixteen R-items closed, the cardinal-point fit (now Step 6d; "6c" in
   campaign-era docs) at 0.26–0.29 min over ±270 kyr (Earth-frame) via the §10
   derived form + edge-trim + the §10g quadrature-locked joint sidebands. Do
-  not regenerate the CSV: 2 h 24 m for an identical file. Coefficients and
+  not regenerate the full CSV outside a conscious campaign step (2 h 24 m,
+  and it would NOT be an identical file anymore). Coefficients and
   runtime evaluation form are a MATCHED PAIR — never ship one without the
   other (~1162-minute-class error), and the pair includes the NUMERICS: the
   ∫1/H convention is the 10-kyr trapezoid table, built under the pinned

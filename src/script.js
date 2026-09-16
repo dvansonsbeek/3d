@@ -9670,14 +9670,6 @@ let o = {
   erosAscendingNodeInvPlane: 0,
 
   // ICRF perihelion longitude (J2000 epoch coordinates, linear precession at ICRF rate)
-  mercuryPerihelionLongICRF: 0,
-  venusPerihelionLongICRF: 0,
-  earthPerihelionLongICRF: 0,
-  marsPerihelionLongICRF: 0,
-  jupiterPerihelionLongICRF: 0,
-  saturnPerihelionLongICRF: 0,
-  uranusPerihelionLongICRF: 0,
-  neptunePerihelionLongICRF: 0,
 
   // Dynamic ascending nodes on invariable plane - Souami & Souchay (2012) values (for comparison, precess over time)
   mercuryAscendingNodeInvPlaneSouamiSouchay: 0,
@@ -9732,8 +9724,6 @@ let o = {
   erosEclipticInclinationSouamiSouchayDynamic: 0,
 
   // Fibonacci Balance (dynamic, updated each frame)
-  fibInclinationBalance: 100,       // Law 3: w = √(m·a(1-e²)) / d — % balance Saturn vs rest
-  fibEccentricityBalance: 100,      // Law 5: v = √m × a^1.5 × e / √d — % balance Saturn vs rest
 
   // Invariable Plane Positions Panel - mass-weighted balance
   massWeightedBalance: 0,           // Mass-weighted height balance (AU)
@@ -9857,13 +9847,6 @@ let predictions = {
   obliquityPrecession: 0,
   eclipticPrecession: 0,
   eccentricityEarth: 0,
-  eccentricityMercury: 0,
-  eccentricityVenus: 0,
-  eccentricityMars: 0,
-  eccentricityJupiter: 0,
-  eccentricitySaturn: 0,
-  eccentricityUranus: 0,
-  eccentricityNeptune: 0,
   obliquityEarth: 0,
   earthInvPlaneInclinationDynamic: 0,
   longitudePerihelion: 0,
@@ -22727,9 +22710,17 @@ function updateHierarchyLiveData() {
     }
   }
 
-  // Calculate angle from ascending node (ecliptic longitude based)
-  // sun.ra gives the Sun's ecliptic longitude directly (in radians)
-  // At June 21 (model start), sun.ra ≈ 90° (summer solstice)
+  // Calculate angle from ascending node.
+  // READOUT-CONVENTION NOTE (the no-decision cleanup batch — the audited
+  // "wrong 'sun.ra is ecliptic' comment"): sun.ra is NOT an ecliptic
+  // longitude — the readout loop measures every body's ra/dec in the
+  // EARTH-EQUATORIAL local frame (obj.ra = SPHERICAL.theta there, the
+  // scene's own zero convention). Using it as a λ proxy carries the
+  // RA-vs-λ projection difference (±2.4°-class through the year). This
+  // hierarchy-inspector angle is a debug display calibrated on the scene
+  // convention, so the VALUE is deliberately left as-is; only the false
+  // claim in the old comment is corrected. A convention-pure rewrite
+  // would need the scene frame's zero offset audited first.
   const sunEclipticLongitude = (sun.ra * 180 / Math.PI + 360) % 360;
   // Angle from ascending node = current ecliptic longitude - ascending node longitude
   let angleFromAscNode = sunEclipticLongitude - ascNodeAngleDeg;
@@ -23732,33 +23723,15 @@ const invPlaneMaxes = {};
 const invPlaneTooltipEls = {};
 const fibGaugeEls = {};
 
-// Dynamic Fibonacci balance computation (called each frame)
-function computeDynamicFibonacciBalance() {
-  const planetConfigs = [
-    { key: 'mercury', mass: M_MERCURY_SYSTEM / M_SUN, sma: mercuryOrbitDistance, ecc: o.eccentricityMercury, d: 21, antiPhase: planets.mercury.antiPhase },
-    { key: 'venus',   mass: M_VENUS_SYSTEM / M_SUN,   sma: venusOrbitDistance,   ecc: o.eccentricityVenus,   d: 34, antiPhase: planets.venus.antiPhase },
-    { key: 'earth',   mass: M_EARTH_ALONE / M_SUN,   sma: 1.0,                 ecc: o.eccentricityEarth,   d: 3,  antiPhase: false },
-    { key: 'mars',    mass: M_MARS_SYSTEM / M_SUN,    sma: marsOrbitDistance,    ecc: o.eccentricityMars,    d: 5,  antiPhase: planets.mars.antiPhase },
-    { key: 'jupiter', mass: M_JUPITER_SYSTEM / M_SUN, sma: jupiterOrbitDistance, ecc: o.eccentricityJupiter, d: 5,  antiPhase: planets.jupiter.antiPhase },
-    { key: 'saturn',  mass: M_SATURN_SYSTEM / M_SUN,  sma: saturnOrbitDistance,  ecc: o.eccentricitySaturn,  d: 3,  antiPhase: planets.saturn.antiPhase },
-    { key: 'uranus',  mass: M_URANUS_SYSTEM / M_SUN,  sma: uranusOrbitDistance,  ecc: o.eccentricityUranus,  d: 21, antiPhase: planets.uranus.antiPhase },
-    { key: 'neptune', mass: M_NEPTUNE_SYSTEM / M_SUN, sma: neptuneOrbitDistance, ecc: o.eccentricityNeptune, d: 34, antiPhase: planets.neptune.antiPhase },
-  ];
-  // Inclination balance: w = √(m·a(1-e²)) / d
-  let inclSum203 = 0, inclSum23 = 0;
-  // Eccentricity balance: v = √m × a^1.5 × e / √d
-  let eccSum203 = 0, eccSum23 = 0;
-  for (const p of planetConfigs) {
-    const w = Math.sqrt(p.mass * p.sma * (1 - p.ecc * p.ecc)) / p.d;
-    const v = Math.sqrt(p.mass) * Math.pow(p.sma, 1.5) * p.ecc / Math.sqrt(p.d);
-    if (!p.antiPhase) { inclSum203 += w; eccSum203 += v; }
-    else              { inclSum23 += w;  eccSum23 += v; }
-  }
-  const inclTotal = inclSum203 + inclSum23;
-  const eccTotal = eccSum203 + eccSum23;
-  o.fibInclinationBalance = inclTotal > 0 ? 100 - (Math.abs(inclSum203 - inclSum23) / inclTotal) * 100 : 0;
-  o.fibEccentricityBalance = eccTotal > 0 ? 100 - (Math.abs(eccSum203 - eccSum23) / eccTotal) * 100 : 0;
-}
+// computeDynamicFibonacciBalance — REMOVED (the no-decision cleanup batch,
+// plan 02 post-K8 queue item 3): it wrote o.fibInclinationBalance /
+// o.fibEccentricityBalance, both WRITE-ONLY since the Fibonacci Balance
+// gauge folder retired with the model restatement (audited 2026-09-08: no
+// consumer in script.js, tools/lib or dashboard). The Law-3/Law-5 record
+// lives in doc 10 Status + the retired-laws probe surface (planetLaws
+// goldens, fed by @essrt/physics/planets/fibonacci-laws — untouched).
+// fibGaugeEls above KEEPS its historical name: it now serves only the
+// Invariable Plane mass-height gauge.
 
 const aboveColor = 'hsla(35, 70%, 50%, 0.30)';
 const belowColor = 'hsla(210, 60%, 45%, 0.30)';
@@ -24669,8 +24642,8 @@ function setupGUI() {
   // model restatement): the Law-3/Law-5 gauge folder was an exactness-claim
   // surface (doc 10 Status carries the measured verdicts; the ~98 %
   // observation is documented there). The dead if-false block was excised
-  // with the legacy chains (K5); the o.fib* fields are still computed each
-  // frame for exports/diagnostics.
+  // with the legacy chains (K5); the write-only o.fib* fields and their
+  // per-frame computation left with the no-decision cleanup batch.
 
   // ── Invariable Plane — the mass-height check (kept when the Fibonacci
   // Balance folder retired: this gauge is invariable-plane geometry, not a
@@ -55552,6 +55525,7 @@ function updateOrbitalPlaneRotations() {
  *
  * Called each frame after updateAscendingNodes() and before updateHierarchyLiveData().
  */
+const _ANOM_CHAIN_KEYS = new Set(['mercury', 'venus', 'mars', 'jupiter', 'saturn', 'uranus', 'neptune']);
 function updatePlanetAnomalies() {
   // Get Sun position (common for all planets) - using pooled vector
   sun.pivotObj.getWorldPosition(_anomalySunPos);
@@ -55573,6 +55547,30 @@ function updatePlanetAnomalies() {
   for (const { planet, fixedPerihelion, key, e, solarYearCount } of planetConfigs) {
     // Skip if objects don't exist
     if (!planet?.pivotObj || !fixedPerihelion?.pivotObj || !fixedPerihelion?.planetObj) {
+      continue;
+    }
+
+    // READOUT-CONVENTION FIX (the no-decision cleanup batch — the audited
+    // planet-anomaly item): the SEVEN chain planets' anomalies are now
+    // CHAIN-PURE — M from the element set of date (λ̄ − ϖ), E via the same
+    // Kepler solve, ν from E — the identical construction that PLACES the
+    // rendered planet (kcComputeHeliocentricEclipticFromElements). The old
+    // path measured ν from the LEGACY DEVICE pivot position (the visible
+    // mesh has been chain-placed since the K5 flip — the measurement read
+    // the wrong body) and M from the kinematic device period. The panels'
+    // velocity / latitude / flight-path rows already mix chain e/i/ω into
+    // the same formulas; ν/M/E now speak the same element set. The
+    // no-chain trio (Pluto, Halley, Eros) keeps the geometric path below.
+    if (_ANOM_CHAIN_KEYS.has(key)) {
+      const el = _kcElementsOfDate(key, o.julianDay);
+      const Mdeg = ((el.meanLonEclipticDeg - el.lonPeriEclipticDeg) % 360 + 360) % 360;
+      const Edeg = OrbitalFormulas.eccentricAnomaly(Mdeg, el.e);
+      const Erad = Edeg * Math.PI / 180;
+      const nuRad = 2 * Math.atan2(Math.sqrt(1 + el.e) * Math.sin(Erad / 2),
+                                   Math.sqrt(1 - el.e) * Math.cos(Erad / 2));
+      o[key + 'TrueAnomaly'] = ((nuRad * 180 / Math.PI) % 360 + 360) % 360;
+      o[key + 'MeanAnomaly'] = Mdeg;
+      o[key + 'EccentricAnomaly'] = Edeg;
       continue;
     }
 
@@ -56287,21 +56285,17 @@ function updateDynamicInclinations() {
   o.uranusObliquity = computePlanetObliquity('uranus', o.currentYear);
   o.neptuneObliquity = computePlanetObliquity('neptune', o.currentYear);
 
-  // ICRF perihelion longitude: J2000 epoch coordinates, linear precession
-  // Earth: harmonic formula minus general precession
-  const _gprRate = 360 / (holisticyearLength / 13);  // general precession rate (°/yr)
-  const earthEclPeri = calcEarthPerihelionPredictive(o.currentYear);
-  o.earthPerihelionEcliptic = earthEclPeri;   // ecliptic longitude of date (the perihelion gauge)
-  o.earthPerihelionLongICRF = ((earthEclPeri - _gprRate * (o.currentYear - 2000)) % 360 + 360) % 360;
   // P5/K5b option A (owner-ruled) — Earth's perihelion DISPLAY rides the
-  // chain like every planet: the chain ϖ is the J2000-frame longitude
-  // (→ the ICRF row directly), the of-date gauge adds the same general-
-  // precession term the legacy line uses. The engine-K law above stays
-  // the load-bearing machinery (the Sun's chain rides
-  // barycenterEarthAndSun, untouched).
+  // chain like every planet: the chain ϖ is the J2000-frame longitude,
+  // the of-date gauge adds the general-precession term. The engine-K law
+  // stays the load-bearing machinery (the Sun's chain rides
+  // barycenterEarthAndSun, untouched). The o.*PerihelionLongICRF fields
+  // (all eight) left with the no-decision cleanup batch: WRITE-ONLY since
+  // the invariable-plane panel rework moved its detail rows to the
+  // chain's inv-plane geometry of date (their only consumer).
   {
+    const _gprRate = 360 / (holisticyearLength / 13);  // general precession rate (°/yr)
     const _wE = _kcPerihelionEclLonDeg('earth', o.julianDay);
-    o.earthPerihelionLongICRF = ((_wE % 360) + 360) % 360;
     o.earthPerihelionEcliptic = ((_wE + _gprRate * (o.currentYear - 2000)) % 360 + 360) % 360;
   }
   // (The planets' linear-device "Peri (ICRF)" values — the retired
@@ -56922,20 +56916,13 @@ function updatePredictions() {
     }
   }
 
-  // Planet eccentricities: each planet's J2000 anchor + J2000 wobble period are
-  // precomputed in _planetEccAnchors_J2000 / _planetWobblePeriodJ2000 (in the
-  // deep-time block). At Devonian etc., the integrated phase gives the actual
-  // physical eccentricity instead of the snapshot J2000-frame value.
-  predictions.eccentricityMercury = o.eccentricityMercury = computeEccentricityEarth(yearForFormula, _planetEccAnchors_J2000.mercury, _planetWobblePeriodJ2000.mercury, planets.mercury.orbitalEccentricityBase, planets.mercury.orbitalEccentricityAmplitude);
-  predictions.eccentricityVenus   = o.eccentricityVenus   = computeEccentricityEarth(yearForFormula, _planetEccAnchors_J2000.venus,   _planetWobblePeriodJ2000.venus,   planets.venus.orbitalEccentricityBase,   planets.venus.orbitalEccentricityAmplitude);
-  predictions.eccentricityMars    = o.eccentricityMars    = computeEccentricityEarth(yearForFormula, _planetEccAnchors_J2000.mars,    _planetWobblePeriodJ2000.mars,    planets.mars.orbitalEccentricityBase,    planets.mars.orbitalEccentricityAmplitude);
-  predictions.eccentricityJupiter = o.eccentricityJupiter = computeEccentricityEarth(yearForFormula, _planetEccAnchors_J2000.jupiter, _planetWobblePeriodJ2000.jupiter, planets.jupiter.orbitalEccentricityBase, planets.jupiter.orbitalEccentricityAmplitude);
-  predictions.eccentricitySaturn  = o.eccentricitySaturn  = computeEccentricityEarth(yearForFormula, _planetEccAnchors_J2000.saturn,  _planetWobblePeriodJ2000.saturn,  planets.saturn.orbitalEccentricityBase,  planets.saturn.orbitalEccentricityAmplitude);
-  predictions.eccentricityUranus  = o.eccentricityUranus  = computeEccentricityEarth(yearForFormula, _planetEccAnchors_J2000.uranus,  _planetWobblePeriodJ2000.uranus,  planets.uranus.orbitalEccentricityBase,  planets.uranus.orbitalEccentricityAmplitude);
-  predictions.eccentricityNeptune = o.eccentricityNeptune = computeEccentricityEarth(yearForFormula, _planetEccAnchors_J2000.neptune, _planetWobblePeriodJ2000.neptune, planets.neptune.orbitalEccentricityBase, planets.neptune.orbitalEccentricityAmplitude);
-
-  // Dynamic Fibonacci balance (uses eccentricities computed above)
-  computeDynamicFibonacciBalance();
+  // The seven per-planet o.eccentricity<P>/predictions.eccentricity<P>
+  // writes + the computeDynamicFibonacciBalance() call — REMOVED (the
+  // no-decision cleanup batch): WRITE-ONLY since the ORBIT-tab device rows
+  // moved to the chain and the export columns left (audited 2026-09-08).
+  // The wobble LAW itself stays live where it is load-bearing:
+  // _eccentricityInline (the Sun EoC + the no-chain trio + the probe)
+  // computes it directly from the year — it never read these fields.
 
   // Year lengths from Fourier harmonics (fitted over ±25,000 years).
   // Use yearForFormula (SI-tropical under DT-ON) so cycle phases match the scene renderer

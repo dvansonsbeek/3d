@@ -31,6 +31,7 @@ web-bundles/
 tools/cardinal-points-training.json
 data/01-holistic-year-objects-data.xlsx
 data/02-solar-measurements.csv
+data/02-solar-measurements-window.csv
 data/.cache/
 tools/tuning/01-holistic-year-planets-data.xlsx
 

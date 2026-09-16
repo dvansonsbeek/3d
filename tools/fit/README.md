@@ -559,6 +559,25 @@ Step 5c: moon-eclipse-optimizer.js            → moonMeeusLpCorrection + MOON_C
 ── Phase 5: Solar measurements & harmonic fits ─────────────────────
 
 Step 6a: export-solar-measurements.js         → data/02-solar-measurements.csv
+
+Step 6a2 (owner, 2026-09-16): `npm run fit:6a2`
+         → data/02-solar-measurements-window.csv (gitignored)
+         The SAME exporter over −4000..+4000 (8,001 years × 6 events =
+         48,006 rows, ~5 min) instead of the full-H run (335,318 years
+         × 6 events = 2,011,908 rows, 2 h 24 m) — the LIVING check
+         artifact ("do not generate 335,318 calculations — only
+         ~50,000, or 10,000"); pass --start/--end for a smaller window.
+         The full 6a CSV stays as the C-4b-era campaign record — it is
+         KNOWN STALE vs the post-C-4b movement arcs (D4c/D4d-rev;
+         measured SS@−997 off by 2.9 h) and is only regenerated as a
+         conscious campaign step.
+         CHECK: `npm run check:csv-smoke` regenerates the FULL 6a2
+         range into a scratch file and compares EVERY row against the
+         6a2 artifact BIT-EXACTLY (~5 min) —
+         compare-only (never writes the artifact), local-only (CI
+         SKIPs), fail-proven via ESSRT_CSV_SMOKE_PLANT=1. A mismatch =
+         the movement changed: bug, or an intended change → re-base
+         with fit:6a2 and say so in the commit.
          Single-pass scene-graph simulation (~2 h measured — see "Observed
          timings" below; it is the pipeline bottleneck) measuring:
          - Cardinal points: SS (max dec), WS (min dec), VE (dec=0↑), AE (dec=0↓)
