@@ -6437,6 +6437,24 @@ if (typeof window !== 'undefined') {
       updateSunCenteredInvPlane();
       return { asc: sunCenteredNodeMarkers.userData.ascLabelDiv.innerHTML, desc: sunCenteredNodeMarkers.userData.descLabelDiv.innerHTML };
     },
+    // K8b-1 second exhibit: the Earth Eccentricity Path smoke surface
+    visEccPathProbe: () => {
+      eccentricityPathGroup.visible = true;
+      eccentricityPathGroup.userData.builtCache = null;
+      _lastEccPathUpdateYear = null;
+      updateEccentricityPathMarker();
+      const ud = eccentricityPathGroup.userData;
+      const cyc = _kcEarthEccCycle(o.currentYear);
+      const pos = ud.pathLine.geometry.getAttribute('position');
+      return {
+        nextMax: cyc.nextMax, nextMin: cyc.nextMin, lo: cyc.lo, hi: cyc.hi,
+        samples: cyc.samples.length,
+        pathPoints: pos ? pos.count : 0,
+        highLabel: ud.nextMaxLabelDiv.innerHTML, lowLabel: ud.nextMinLabelDiv.innerHTML,
+        markerLabel: ud.labelDiv.textContent,
+        eNow: _sceneEccTargetAt(o.currentYear),
+      };
+    },
     inclInvAt: (y) => inclInvPlaneModel(y),
     // empirical frame mapping: world azimuth of a test local azimuth in
     // the path group (derives the local→world constant, sign included)
@@ -11008,6 +11026,198 @@ function updateInclinationPathMarker() {
   }
 }
 
+// ── K8b-1 second exhibit (owner-approved 2026-09-16): the EARTH
+// ECCENTRICITY PATH — the e-vector z(t) = e·e^{iϖ} drawn over ONE
+// g₂−g₅ beat cycle (the 405.7-kyr metronome; window length from the
+// banked verdict — one home, no literal). Twin of the Earth
+// Inclination Path: ONE scanner serves the path, the marker and the
+// coming-extreme labels, with the same memo (±500-yr epoch tolerance
+// + 250 ms wall-clock floor) and the same LAZY-ONLY rule (the C1
+// hover-TDZ lesson). Evaluators = the pair the scene itself renders:
+// e from _sceneEccTargetAt (one-source series; K law when the flag is
+// off) and ϖ from _kcPerihelionEclLonDeg (chain of date) — so the
+// marker agrees with the perihelion marker's direction and the
+// eccentric-center offset by construction. The path's radius is
+// e×100 — the scene's own eccentric-offset display convention (the
+// radius IS the offset length of that epoch; no arbitrary scale).
+// The loop's in-and-out breathing IS the metronome: the g₂ arm
+// swinging against the g₅ carrier.
+let _earthEccCycleCache = null;
+let _earthEccCycleBuiltMs = 0;
+function _kcEarthEccCycle(yearNow) {
+  if (_earthEccCycleCache && Math.abs(yearNow - _earthEccCycleCache.year) < 500) return _earthEccCycleCache;
+  const nowMs = performance.now();
+  if (_earthEccCycleCache && nowMs - _earthEccCycleBuiltMs < 250) return _earthEccCycleCache;
+  _earthEccCycleBuiltMs = nowMs;
+  const jdOf = (y) => KC_ANCHOR_EPOCH_JD + (y - KC_ANCHOR_EPOCH_YEAR) * 365.25;
+  const pomAt = (y) => _kcPerihelionEclLonDeg('earth', jdOf(y));
+  const BEAT_YR = DEEP_MODES_ARTIFACT.verdict.strongestBeatPeriodKyr * 1000;   // ≈ 405,626 yr
+  const N = 240;   // ~1.7-kyr steps: ≥ 56 samples per shortest e-component (~95 kyr)
+  const samples = [];
+  for (let i = 0; i <= N; i++) {
+    const y = yearNow + (BEAT_YR * i) / N;
+    samples.push({ y, e: _sceneEccTargetAt(y), pom: pomAt(y) });
+  }
+  let lo = Infinity, hi = -Infinity;
+  for (const s of samples) { if (s.e < lo) lo = s.e; if (s.e > hi) hi = s.e; }
+  const STEP = 500;
+  const refine = (yc, isMax) => {
+    let a = yc - STEP, b = yc + STEP;
+    for (let r = 0; r < 6; r++) {
+      const m1 = a + (b - a) / 3, m2 = b - (b - a) / 3;
+      const sgn = isMax ? 1 : -1;
+      if (sgn * _sceneEccTargetAt(m1) < sgn * _sceneEccTargetAt(m2)) a = m1; else b = m2;
+    }
+    const y = (a + b) / 2;
+    return { year: y, e: _sceneEccTargetAt(y), pom: pomAt(y) };
+  };
+  // coming extremes: the short e-cycle (~95–130 kyr) guarantees both
+  // inside the 250-kyr cap — far inside the ±10-Myr series span
+  let nextMax = null, nextMin = null;
+  {
+    const EXT_CAP = yearNow + 250000;
+    let ePrev = _sceneEccTargetAt(yearNow), eCur = _sceneEccTargetAt(yearNow + STEP);
+    for (let y = yearNow + 2 * STEP; y <= EXT_CAP && (!nextMax || !nextMin); y += STEP) {
+      const eNext = _sceneEccTargetAt(y);
+      if (!nextMax && eCur >= ePrev && eCur >= eNext) nextMax = refine(y - STEP, true);
+      if (!nextMin && eCur <= ePrev && eCur <= eNext) nextMin = refine(y - STEP, false);
+      ePrev = eCur; eCur = eNext;
+    }
+  }
+  _earthEccCycleCache = { year: yearNow, samples, lo, hi, nextMax, nextMin };
+  return _earthEccCycleCache;
+}
+
+const ECC_PATH_SCALE = 100;   // e×100 — the scene's eccentric-offset convention
+function createEccentricityPath() {
+  const group = new THREE.Group();
+  group.name = 'EarthEccentricityPath';
+  const pathLine = new THREE.Line(
+    new THREE.BufferGeometry(),   // filled lazily on first show
+    new THREE.LineBasicMaterial({ color: 0xBF40BF, transparent: true, opacity: 0.85 }));
+  pathLine.frustumCulled = false;
+  group.add(pathLine);
+  const mkExtreme = (color, cssColor, name) => {
+    const mk = new THREE.Mesh(new THREE.SphereGeometry(0.08, 8, 8), new THREE.MeshBasicMaterial({ color }));
+    mk.visible = false;
+    group.add(mk);
+    const div = document.createElement('div');
+    div.innerHTML = '<span style="font-size:13px;font-weight:bold;">' + name + '</span>';
+    div.style.color = cssColor;
+    div.style.fontSize = '12px';
+    div.style.fontFamily = 'Arial, sans-serif';
+    div.style.textShadow = '2px 2px 4px black, -1px -1px 2px black';
+    div.style.pointerEvents = 'none';
+    div.style.textAlign = 'center';
+    div.style.lineHeight = '1.25';
+    const lbl = new CSS2DObject(div);
+    lbl.position.set(0, 0.25, 0);
+    lbl.visible = false;
+    mk.add(lbl);
+    return { mk, div, lbl };
+  };
+  const nextMaxM = mkExtreme(0xffff00, '#ffff00', 'NEXT MAX');
+  const nextMinM = mkExtreme(0x00ffff, '#00ffff', 'NEXT MIN');
+  group.userData.nextMaxMarker = nextMaxM.mk;
+  group.userData.nextMaxLabelDiv = nextMaxM.div;
+  group.userData.nextMaxLabelObj = nextMaxM.lbl;
+  group.userData.nextMinMarker = nextMinM.mk;
+  group.userData.nextMinLabelDiv = nextMinM.div;
+  group.userData.nextMinLabelObj = nextMinM.lbl;
+
+  const marker = new THREE.Mesh(new THREE.SphereGeometry(0.05, 8, 8), new THREE.MeshBasicMaterial({ color: 0xffff00 }));
+  marker.visible = false;
+  group.add(marker);
+  const labelDiv = document.createElement('div');
+  labelDiv.style.color = '#ffff00';
+  labelDiv.style.fontSize = '14px';
+  labelDiv.style.fontFamily = 'Arial, sans-serif';
+  labelDiv.style.fontWeight = 'bold';
+  labelDiv.style.textShadow = '1px 1px 2px black, -1px -1px 2px black, 1px -1px 2px black, -1px 1px 2px black';
+  labelDiv.style.pointerEvents = 'none';
+  labelDiv.style.whiteSpace = 'nowrap';
+  const labelObject = new CSS2DObject(labelDiv);
+  labelObject.position.set(0, 0.2, 0);
+  labelObject.visible = false;
+  marker.add(labelObject);
+
+  group.userData.pathLine = pathLine;
+  group.userData.marker = marker;
+  group.userData.labelDiv = labelDiv;
+  group.userData.labelObject = labelObject;
+  group.userData.builtCache = null;
+  group.visible = false;
+  return group;
+}
+
+function _rebuildEccentricityPathGeometry() {
+  const cyc = _kcEarthEccCycle(o.currentYear);
+  const ud = eccentricityPathGroup.userData;
+  if (ud.builtCache === cyc) return cyc;
+  ud.builtCache = cyc;
+  const n = cyc.samples.length;
+  const arr = new Float32Array(n * 3);
+  for (let i = 0; i < n; i++) {
+    const s = cyc.samples[i];
+    const a = s.pom * Math.PI / 180;
+    arr[i * 3]     = ECC_PATH_SCALE * s.e * Math.cos(a);
+    arr[i * 3 + 1] = ECC_PATH_SCALE * s.e * Math.sin(a);
+    arr[i * 3 + 2] = 0;
+  }
+  ud.pathLine.geometry.dispose();
+  ud.pathLine.geometry = new THREE.BufferGeometry();
+  ud.pathLine.geometry.setAttribute('position', new THREE.BufferAttribute(arr, 3));
+  const place = (ext, mk, div, name) => {
+    if (!ext) { mk.visible = false; return; }
+    const a = ext.pom * Math.PI / 180;
+    mk.position.set(ECC_PATH_SCALE * ext.e * Math.cos(a), ECC_PATH_SCALE * ext.e * Math.sin(a), 0);
+    div.innerHTML = '<span style="font-size:13px;font-weight:bold;">' + name + '</span><br>'
+      + 'e = ' + ext.e.toFixed(5) + '<br>' + _fmtSceneYear(ext.year);
+    mk.visible = eccentricityPathGroup.visible;
+  };
+  place(cyc.nextMax, ud.nextMaxMarker, ud.nextMaxLabelDiv, 'NEXT MAX');
+  place(cyc.nextMin, ud.nextMinMarker, ud.nextMinLabelDiv, 'NEXT MIN');
+  ud.nextMaxLabelObj.visible = eccentricityPathGroup.visible && !!cyc.nextMax;
+  ud.nextMinLabelObj.visible = eccentricityPathGroup.visible && !!cyc.nextMin;
+  return cyc;
+}
+
+// Update function for the eccentricity path (render loop, throttled —
+// mirrors updateInclinationPathMarker)
+let _lastEccPathUpdateYear = null;
+const _ECCP_M4 = new THREE.Matrix4();
+const _ECCP_V = new THREE.Vector3();
+function updateEccentricityPathMarker() {
+  const ud = eccentricityPathGroup.userData;
+  if (!eccentricityPathGroup.visible) {
+    if (ud.marker.visible) { ud.marker.visible = false; ud.labelObject.visible = false; }
+    return;
+  }
+  if (!_kcR) return;   // chain frame not derived yet (first frames)
+  const needsImmediateUpdate = !ud.marker.visible;
+  if (!needsImmediateUpdate && _lastEccPathUpdateYear !== null
+      && Math.abs(o.currentYear - _lastEccPathUpdateYear) < 0.1) return;
+  _lastEccPathUpdateYear = o.currentYear;
+  const cyc = _rebuildEccentricityPathGeometry();
+  // the group rides the CHAIN frame anchored at Earth — the same
+  // construction as the perihelion marker (K5b): world = Earth + R·local
+  const R = _kcR;
+  _ECCP_M4.set(R[0][0], R[0][1], R[0][2], 0,
+               R[1][0], R[1][1], R[1][2], 0,
+               R[2][0], R[2][1], R[2][2], 0,
+               0, 0, 0, 1);
+  eccentricityPathGroup.setRotationFromMatrix(_ECCP_M4);
+  earth.rotationAxis.getWorldPosition(_ECCP_V);
+  eccentricityPathGroup.position.copy(_ECCP_V);
+  const eNow = _sceneEccTargetAt(o.currentYear);
+  const pomNow = _kcPerihelionEclLonDeg('earth', o.julianDay) * Math.PI / 180;
+  ud.marker.position.set(ECC_PATH_SCALE * eNow * Math.cos(pomNow), ECC_PATH_SCALE * eNow * Math.sin(pomNow), 0);
+  if (needsImmediateUpdate) ud.marker.visible = true;
+  ud.labelDiv.textContent = 'e = ' + eNow.toFixed(5);
+  if (needsImmediateUpdate) ud.labelObject.visible = true;
+  void cyc;
+}
+
 // Update invariable plane visualization - MOVES PLANE THROUGH EARTH
 //
 // VISUAL BEHAVIOR (Dec 2024):
@@ -11559,6 +11769,12 @@ function setCSS2DVisibility(group, visible) {
 const inclinationPathGroup = createInclinationPath(250, 360, 50);
 earth.pivotObj.add(inclinationPathGroup);
 inclinationPathGroup.visible = false; // Off by default
+
+// K8b-1 second exhibit — the Earth Eccentricity Path (scene-root: its
+// world placement — chain frame anchored at Earth — is set per frame by
+// updateEccentricityPathMarker, the K5b worldToLocal-free form)
+const eccentricityPathGroup = createEccentricityPath();
+scene.add(eccentricityPathGroup);
 
 //*************************************************************
 // CREATE MILKYWAY SKYDOME
@@ -25768,6 +25984,23 @@ function setupGUI() {
       needsLabelUpdate = true;
     }),
     'Path of Earth\u2019s orbital plane inclination as it precesses around the invariable plane.');
+  addTooltip(refFolder.addBinding(eccentricityPathGroup, 'visible', { label: 'Earth Eccentricity Path' })
+    .on('change', ({ value }) => {
+      if (value) {
+        _lastEccPathUpdateYear = null;
+        eccentricityPathGroup.userData.builtCache = null;   // re-place extremes (their visibility rides the rebuild)
+        updateEccentricityPathMarker();
+      } else {
+        const ud = eccentricityPathGroup.userData;
+        if (ud.labelObject) ud.labelObject.visible = false;
+        if (ud.nextMaxLabelObj) ud.nextMaxLabelObj.visible = false;
+        if (ud.nextMinLabelObj) ud.nextMinLabelObj.visible = false;
+        if (ud.nextMaxMarker) ud.nextMaxMarker.visible = false;
+        if (ud.nextMinMarker) ud.nextMinMarker.visible = false;
+      }
+      needsLabelUpdate = true;
+    }),
+    'Earth\u2019s eccentricity vector e\u00b7e^{i\u03d6} over one 405.7-kyr g\u2082\u2212g\u2085 beat cycle (the eccentricity metronome) \u2014 radius = e\u00d7100, the scene\u2019s eccentric-offset convention; labels mark the coming e maximum and minimum.');
 
   // ── Distance (root level) ──
   addTooltip(visFolder.addBinding(o, 'starDistanceScaleFact', { label: 'Distance', min: 0.1, max: 2, step: 0.1 })
@@ -36012,6 +36245,7 @@ function render(now) {
     calculateInvariablePlaneFromAngularMomentum();
     updateHierarchyLiveData();
     updateInclinationPathMarker();
+    updateEccentricityPathMarker();
     updateInvariablePlanePosition();
     updateSunCenteredInvPlane();
   }
