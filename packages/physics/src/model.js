@@ -1239,6 +1239,20 @@ export function assembleModel(C, F, laws = {}, secularSeriesArtifact = /** @type
     }),
     eclipse: Object.freeze({
       sunLonDegAtJD: /** @param {number} jd @returns {number} */ (jd) => eclipseFinders.sunLonDegAt(jd),
+      // The COMPLETED tier Sun (K8b follow-up, owner-approved injection):
+      // the bare finder Sun minus the DERIVED planetary-completion table —
+      // 70 framework-carrier terms plus the 6.44″ Earth-around-EMB wobble
+      // (the "lunar equation"; eclipse/sun-planetary-completion.cjs, zero
+      // fitted constants). The finders themselves deliberately stay bare
+      // (their certified canon statistics were produced on the bare form;
+      // besselian.cjs applies the same subtraction internally). This
+      // surface exists for the SCENE tier's E5 wheel-Sun bridge, so the
+      // rendered Sun carries the model's own derived apparent-class terms.
+      // Clock: the completion argument rides TT centuries from the same
+      // framework ΔT the besselian composition uses.
+      sunLonCompletedDegAtJD: /** @param {number} jd @returns {number} */ (jd) =>
+        eclipseFinders.sunLonDegAt(jd)
+        - sunPlanetaryCompletionDeg((jdTTFromUT(jd) - j2000JD) / julianCenturyDays),
       findLunarInRange: /** @param {number} jdStart @param {number} jdEnd */ (jdStart, jdEnd) => eclipseFinders.findLunarEclipsesInRange(jdStart, jdEnd),
       findSolarInRange: /** @param {number} jdStart @param {number} jdEnd */ (jdStart, jdEnd) => eclipseFinders.findSolarEclipsesInRange(jdStart, jdEnd),
       deltaTSecondsAtJD: frameworkDeltaTSecondsAtJD,

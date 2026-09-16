@@ -1616,7 +1616,12 @@ function moveModel(graph, pos) {
         : _ayE5 >= 20000 ? 0
         : Math.cos((_ayE5 - 3000) / (20000 - 3000) * Math.PI / 2) ** 2;
       if (_wE5 > 0) {
-        const _dE5 = _e5Tier().eclipse.sunLonDegAtJD(_jdE5) - _frameworkSunLon(_jdE5);
+        // K8b follow-up (mirrors src/script.js): the wheel Sun rides the
+        // COMPLETED certified Sun — finder Sun minus the derived
+        // planetary-completion table (70 framework-carrier terms + the
+        // 6.44″ Earth-around-EMB "lunar equation"). Finders stay bare;
+        // the besselian keeps its own subtraction — no double count.
+        const _dE5 = _e5Tier().eclipse.sunLonCompletedDegAtJD(_jdE5) - _frameworkSunLon(_jdE5);
         θ += _wE5 * (((((_dE5 + 540) % 360) + 360) % 360) - 180) * d2r;
       }
     }

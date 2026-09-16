@@ -54442,7 +54442,18 @@ function moveModel(pos) {
         : Math.cos((_ayE5 - 3000) / (20000 - 3000) * Math.PI / 2) ** 2;
       if (_wE5 > 0) {
         if (_tierUmbraModel === null) _tierUmbraModel = createModel();
-        const _dE5 = _tierUmbraModel.eclipse.sunLonDegAtJD(o.julianDay) - _frameworkSunLon(o.julianDay);
+        // K8b follow-up (owner-approved FULL INJECTION): the wheel Sun now
+        // rides the COMPLETED certified Sun — the finder Sun minus the
+        // derived planetary-completion table (70 framework-carrier terms +
+        // the 6.44″ Earth-around-EMB "lunar equation"). The rendered Sun,
+        // the panels and the cardinal EVENT instants (the solver reads the
+        // rendered Sun) thereby become apparent-class: individual
+        // equinox/solstice times gain their REAL ±2.6-min monthly
+        // variation. MEAN quantities (year-length family, λ̇ channels, the
+        // movement sampler) stay mean — untouched. The eclipse tier keeps
+        // its own internal subtraction (no double count: the finders stay
+        // bare by certified design). Mirrors tools/lib/scene-graph.js.
+        const _dE5 = _tierUmbraModel.eclipse.sunLonCompletedDegAtJD(o.julianDay) - _frameworkSunLon(o.julianDay);
         θ += _wE5 * (((((_dE5 + 540) % 360) + 360) % 360) - 180) * (Math.PI / 180);
       }
     }
