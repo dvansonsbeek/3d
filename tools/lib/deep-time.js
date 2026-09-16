@@ -171,14 +171,31 @@ function _withLatticeAlpha(build) {
   try { build(); } finally { _latticeAlphaRef = prev; }
 }
 
+// Exact-argument memo (mirrors src/script.js earthMoiFactorAtAge, the
+// round-5 perf campaign — the browser measured this function at 35% of
+// deep-time frame cost before its memo; the Node engine's deep-epoch
+// consumers, e.g. the Step-6a exporter and the chain-cycle Simpson
+// fallback, pay the same 33-term L1 sum per call). Same argument →
+// bit-identical value: pure dedupe, not a grid (the sampler-purity trap
+// class is about NEARBY arguments). The lattice-α pin above bypasses the
+// memo entirely, so a table build can never poison it with the pinned
+// anchor value. Bounded by wholesale clear.
+/** @type {Map<number, number>} */
+const _earthMoiMemo = new Map();
+const _EARTH_MOI_MEMO_CAP = 8192;
 function earthMoiFactorAtAge(t_Ma) {
   if (_latticeAlphaRef) return EARTH_MOI_FACTOR;
+  const memoHit = _earthMoiMemo.get(t_Ma);
+  if (memoHit !== undefined) return memoHit;
   if (_alphaClimateL1_J2000 === null) {
     _alphaClimateL1_J2000 = _evalClimateL1Orbital(2000);
   }
   const year  = 2000 - t_Ma * 1e6;
   const L1_at = _evalClimateL1Orbital(year);
-  return EARTH_MOI_FACTOR - ALPHA_CLIMATE_SCALE * (L1_at - _alphaClimateL1_J2000);
+  const alpha = EARTH_MOI_FACTOR - ALPHA_CLIMATE_SCALE * (L1_at - _alphaClimateL1_J2000);
+  if (_earthMoiMemo.size >= _EARTH_MOI_MEMO_CAP) _earthMoiMemo.clear();
+  _earthMoiMemo.set(t_Ma, alpha);
+  return alpha;
 }
 
 function iEarthAtAge(t_Ma) {

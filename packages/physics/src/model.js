@@ -147,12 +147,23 @@ export function assembleModel(C, F, laws = {}, secularSeriesArtifact = /** @type
   let latticeAlphaPin = false;
   /** @type {number|null} */
   let alphaL1J2000 = null;
+  // Exact-argument memo (mirrors src/script.js + tools/lib/deep-time.js —
+  // the round-5 perf campaign): same tMa → bit-identical value; the pin
+  // branch bypasses the memo; bounded by wholesale clear.
+  /** @type {Map<number, number>} */
+  const alphaMemo = new Map();
   /** @param {number} tMa @returns {number} */
   const earthMoiFactorAtAge = (tMa) => {
     if (latticeAlphaPin) return earthMoiFactorJ2000;
-    if (alphaL1J2000 === null) alphaL1J2000 = evalClimateL1(2000);
-    const L1at = evalClimateL1(2000 - tMa * 1e6);
-    return earthMoiFactorJ2000 - alphaClimateScale * (L1at - alphaL1J2000);
+    let v = alphaMemo.get(tMa);
+    if (v === undefined) {
+      if (alphaL1J2000 === null) alphaL1J2000 = evalClimateL1(2000);
+      const L1at = evalClimateL1(2000 - tMa * 1e6);
+      v = earthMoiFactorJ2000 - alphaClimateScale * (L1at - alphaL1J2000);
+      if (alphaMemo.size >= 8192) alphaMemo.clear();
+      alphaMemo.set(tMa, v);
+    }
+    return v;
   };
 
   // ── Layer 0 + deep-time core ──────────────────────────────────────────────
