@@ -1033,6 +1033,11 @@ let   balancedYear = perihelionalignmentYear-(temperatureGraphMostLikely*(holist
 const BALANCED_YEAR_J2000_FIXED = perihelionalignmentYear - 14.5 * (holisticyearLength / 16);
 const balancedJD = startmodelJD-(meansolaryearlengthinDays*(startmodelyearwithCorrection-balancedYear));
 const perihelionalignmentJD = Math.round(startmodelJD - (meansolaryearlengthinDays * (startmodelyearwithCorrection - perihelionalignmentYear)));
+// Perihelion-calendar walk-start hint (shared by dayToPerihelionCalendarDate
+// and dateToPerihelionJulianDay — see the docstring there). Declared HERE
+// because module-init code calls the converters long before their own
+// declarations run (the C1 hover-TDZ class).
+let _periCalHintYear = 0, _periCalHintDays = 0;
 const yearsFromBalancedToJ2000 = (startmodelJD - balancedJD) / meansolaryearlengthinDays;
 // Sidereal year in days at J2000 — IAU anchor (365.256363004). Used as the
 // Fourier baseline for SIDEREAL_YEAR_HARMONICS. The framework's own H-lattice
@@ -6387,6 +6392,14 @@ if (typeof window !== 'undefined') {
       earth.containerObj.updateMatrixWorld();
       return pts;
     },
+    // Perihelion-calendar conversion surface (the O(|epoch|) year-walk
+    // hint-cache work): the two walkers + the epoch anchor, so the
+    // calendar-conversion test can pin round-trip identity, boundary
+    // behavior and ORDER-INDEPENDENCE (a stale hint would break the
+    // order test) against goldens recorded before the change.
+    calPerihelionAt: (jd) => dayToPerihelionCalendarDate(jd),
+    calPerihelionJD: (dateStr, timeStr) => dateToPerihelionJulianDay(dateStr, timeStr),
+    calPerihelionEpochJD: () => perihelionalignmentJD,
     visNodeMarkersProbe: (name) => {
       o.lookAtObj = { name };
       sunCenteredInvPlane.visible = true;
@@ -59683,16 +59696,30 @@ function isRevisedJulianLeapYear(y) {
 
 /**
  * JD → Perihelion calendar date/time (astronomical years, fractional days).
+ *
+ * WALK-START HINT (plan 02 §11 round 10): the year walk below is a pure
+ * prefix sum, so starting from any previously CORRECT (year, daysPassed)
+ * pair yields the IDENTICAL result — the hint moves the walk's start
+ * point, never its answer (pinned by the order-independence check in
+ * test/browser/calendar-conversion.test.mjs, goldens recorded pre-change).
+ * Cost falls from O(|epoch distance|) per call (2.46 ms at ±1.5 Myr — the
+ * last unbounded-growth term in deep-time updates) to amortized O(Δ)
+ * (measured 0.04 µs during playback); a fresh long jump pays one cold
+ * walk. Integers throughout stay far below 2^53 — the arithmetic is exact.
+ * (_periCalHintYear/_periCalHintDays are declared next to
+ * perihelionalignmentJD — module-init callers reach this function before
+ * this line runs: the C1 hover-TDZ class.)
  */
 function dayToPerihelionCalendarDate(jd) {
   // 1) offset so that P=0 at perihelion epoch, integer days at midnight
   const P = jd - perihelionalignmentJD + 0.5;
-  let   Z = Math.floor(P);
-  const F = P - Z;
+  const Zabs = Math.floor(P);
+  const F = P - Zabs;
+  let   Z = Zabs - _periCalHintDays;   // rebased onto the hinted start
 
-  // 2) peel off whole years forward or backward
-  let year       = 0;
-  let daysPassed = 0;    // days from epoch to start of 'year'
+  // 2) peel off whole years forward or backward (from the hinted start)
+  let year       = _periCalHintYear;
+  let daysPassed = _periCalHintDays;   // days from epoch to start of 'year'
   let daysInYear;
 
   if (Z >= 0) {
@@ -59728,6 +59755,8 @@ function dayToPerihelionCalendarDate(jd) {
       year--;
     }
   }
+  _periCalHintYear = year;
+  _periCalHintDays = daysPassed;
 
   // 3) now Z is day-of-year in [0 .. daysInYear-1]; F is time-fraction
   //    determine leap-flag for THIS year:
@@ -59848,26 +59877,31 @@ function dateToPerihelionJulianDay(dateStr, timeStr) {
   }
 
   // 1) days since perihelion‐epoch to the START of year Y
-  let daysAcc = 0, year = 0;
-  if (Y >= 0) {
-    for (; year < Y; year++) {
-      const startJD    = perihelionalignmentJD + daysAcc;
-      const useRevised = startJD >= REVISION_START_JD;
-      const isLeap     = useRevised
-                        ? isRevisedJulianLeapYear(year)
-                        : isJulianLeapYear(year);
-      daysAcc += (isLeap ? 366 : 365);
-    }
-  } else {
-    for (year = 0; year > Y; year--) {
-      const startJD    = perihelionalignmentJD + daysAcc;
-      const useRevised = startJD >= REVISION_START_JD;
-      const isLeap     = useRevised
-                        ? isRevisedJulianLeapYear(year-1)
-                        : isJulianLeapYear(year-1);
-      daysAcc -= (isLeap ? 366 : 365);
-    }
+  // SAME prefix sum as dayToPerihelionCalendarDate (daysAcc at the start
+  // of `year` ≡ its daysPassed), so the two converters SHARE the walk
+  // hint: forward steps add days(year), backward steps subtract
+  // days(year−1) — from any correct (year, daysAcc) pair the result is
+  // identical to the cold walk from zero, in either direction and across
+  // zero (gated by the calendar-conversion round-trip + order checks).
+  let daysAcc = _periCalHintDays, year = _periCalHintYear;
+  for (; year < Y; year++) {
+    const startJD    = perihelionalignmentJD + daysAcc;
+    const useRevised = startJD >= REVISION_START_JD;
+    const isLeap     = useRevised
+                      ? isRevisedJulianLeapYear(year)
+                      : isJulianLeapYear(year);
+    daysAcc += (isLeap ? 366 : 365);
   }
+  for (; year > Y; year--) {
+    const startJD    = perihelionalignmentJD + daysAcc;
+    const useRevised = startJD >= REVISION_START_JD;
+    const isLeap     = useRevised
+                      ? isRevisedJulianLeapYear(year-1)
+                      : isJulianLeapYear(year-1);
+    daysAcc -= (isLeap ? 366 : 365);
+  }
+  _periCalHintYear = year;
+  _periCalHintDays = daysAcc;
 
   // 2) add days for the months BEFORE M in year Y
   //    figure out if year Y is leap
