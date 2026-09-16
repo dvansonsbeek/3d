@@ -605,10 +605,8 @@ The GUI is built with Tweakpane v4, using `addBinding()` for data-bound controls
 Tweakpane Root ("Expanding Solar System Resonance Theory")
 │
 ├─▼ About                          (collapsed)
-│  ├─▼ The Six Relations          (custom DOM, full-width)
-│  ├─▼ Free Parameters (6 DOF)    (0 DOF items dimmed)
+│  ├─▼ Parameter Accounting       (custom DOM: two engines, three ledgers)
 │  ├─▼ Calibration Inputs (75)    (from astro-reference.json: Earth & Time 26, Moon 14, Planets 5×7)
-│  ├─▼ Model Parameters (70)      (from model-parameters.json: Earth 11, Moon 3, Planets 8×7)
 │  └─ Website link                (holisticuniverse.com)
 │
 ├─ Date                          [binding: text input]

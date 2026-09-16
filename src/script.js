@@ -38,15 +38,17 @@ import { vsop87AstrometricGeoEclipticAU, vsop87HelioEclipticAU, mpp02Astrometric
   <https://www.gnu.org/licenses/>
 
   Interactive 3D simulation of the solar system modelled from a geo-heliocentric
-  frame of reference. Six Fibonacci relations and only 6 free parameters describe the
-  precession, eccentricity, inclination, obliquity and perihelion movements of
-  all planets. The Earth Fundamental Cycle (H = 335,317 yr at J2000) unifies
-  axial precession (H/13), apsidal precession (H/3; historical name: inclination precession) and perihelion precession
-  (H/16) through Fibonacci number ratios; under deep-time mode H slowly evolves
-  via Earth-Moon tidal evolution, and the scene renders the integrated state
-  via cumulative ∫1/H(t)dt cycle math. Only 6 parameters are free; every other
-  number is derived or anchored to astronomical observations — the canonical
-  parameter accounting is docs/20-constants-reference.md § Parameter Summary.
+  frame of reference. Two engines: the planets ride an N-body Keplerian chain
+  derived from one cited J2000 state + DE440 masses (zero free parameters);
+  Earth's spin-and-time hierarchy rides the H-lattice — the Earth Fundamental
+  Cycle (H = 335,317 yr at J2000) divided by small integers: axial precession
+  (H/13), apsidal precession (H/3; historical name: inclination precession) and
+  perihelion precession (H/16). The integer lattice is a structural assumption
+  under pre-registered falsification tests, not a parameter count. Under
+  deep-time mode H slowly evolves via Earth-Moon tidal evolution, and the
+  scene renders the integrated state via cumulative ∫1/H(t)dt cycle math.
+  The canonical parameter accounting (two engines, three ledgers) is
+  docs/20-constants-reference.md § Parameter Accounting.
 
   Preprint: https://doi.org/10.21203/rs.3.rs-8758810/v4
   Website:  https://holisticuniverse.com
@@ -16045,183 +16047,18 @@ function closeHierarchyInspector() {
   }
 }
 
-// ─── Fibonacci-balance REMNANT (K5 excision) ─────────────────────────────
+// ─── Fibonacci-balance machinery FULLY RETIRED (K5 excision + K8b-2) ─────
 // The interactive Balance Explorer, Eccentricity Balance Scale and Solar
-// System Resonance Cycle panels were removed with the Fibonacci-law
-// retirement and excised with the legacy chains (doc 10 Status + doc 109
-// carry the measured record). What remains — BALANCE_PRESETS,
-// fbeMatchDefaultPreset and BALANCE_CONFIG — serves only the
-// About → Free Parameters Config-# row.
-
-// 742 preset configurations with >= 99.994% vector balance (TNO margin) —
-// see tools/verify/balance-search.js (the generator) for the format.
-const BALANCE_PRESETS = FIT.BALANCE_PRESETS;
-
-// Find which preset number matches the default BALANCE_CONFIG settings
-function fbeMatchDefaultPreset() {
-  const SCENARIOS = { '5,3': 'A', '8,5': 'B', '13,8': 'C', '21,13': 'D' };
-  const scenario = SCENARIOS[BALANCE_CONFIG.jupiter.defaultD + ',' + BALANCE_CONFIG.saturn.defaultD];
-  if (!scenario) return null;
-  // Group index: 0 = in-phase, 1 = anti-phase (Saturn only in default config)
-  const groupIdx = (key) => BALANCE_CONFIG[key].defaultAntiPhase ? 1 : 0;
-  const defaults = [
-    scenario, 0,
-    BALANCE_CONFIG.mercury.defaultD, groupIdx('mercury'),
-    BALANCE_CONFIG.venus.defaultD,   groupIdx('venus'),
-    BALANCE_CONFIG.mars.defaultD,    groupIdx('mars'),
-    BALANCE_CONFIG.jupiter.defaultD, groupIdx('jupiter'),
-    BALANCE_CONFIG.saturn.defaultD,  groupIdx('saturn'),
-    BALANCE_CONFIG.uranus.defaultD,  groupIdx('uranus'),
-    BALANCE_CONFIG.neptune.defaultD, groupIdx('neptune'),
-  ];
-  for (let i = 0; i < BALANCE_PRESETS.length; i++) {
-    const row = BALANCE_PRESETS[i];
-    if (row[0] !== defaults[0]) continue;
-    let match = true;
-    for (let j = 2; j < 16; j++) { if (row[j] !== defaults[j]) { match = false; break; } }
-    if (match) return i + 1;
-  }
-  return null;
-}
+// System Resonance Cycle panels left with the Fibonacci-law retirement;
+// the last consumers — BALANCE_PRESETS, fbeMatchDefaultPreset and
+// BALANCE_CONFIG, which served only the retired About → Free Parameters
+// Config-# row — left with the K8b-2 three-ledger restatement. The search
+// record stays in data/balance-presets.json + docs 10/109 + git history.
 
 // Earth J2000 inclination (not stored as a named constant — computed here)
 const earthInvPlaneInclJ2000 = earthInvPlaneInclinationMean +
   earthInvPlaneInclinationAmplitude *
   Math.cos((ASTRO_REFERENCE.perihelionLongitudeJ2000_deg - earthInclinationCycleAnchor) * Math.PI / 180);
-
-// ICRF perihelion periods (inclination oscillation uses ICRF, not ecliptic)
-const _balGP = 1 / (holisticyearLength / 13);
-const _balICRF = (k) => 1 / (1 / planets[k].perihelionEclipticYears - _balGP);
-const BALANCE_CONFIG = {
-  mercury: {
-    name: 'Mercury',
-    mass: M_MERCURY_SYSTEM / M_SUN,
-    sma: mercuryOrbitDistance,
-    ecc: planets.mercury.orbitalEccentricityBase,
-    defaultD: 21,
-    inclJ2000: planets.mercury.invPlaneInclinationJ2000,
-    omegaJ2000: planets.mercury.ascendingNodeInvPlane,
-    periLongJ2000: planets.mercury.longitudePerihelion,
-    period: _balICRF('mercury'),
-    trendJPL: mercuryEclipticInclinationTrendJPL,
-    llBounds: { min: mercuryLLBoundsMin, max: mercuryLLBoundsMax },
-    defaultPhaseAngle: planets.mercury.inclinationCycleAnchor,
-    defaultAntiPhase: planets.mercury.antiPhase,
-    locked: false
-  },
-  venus: {
-    name: 'Venus',
-    mass: M_VENUS_SYSTEM / M_SUN,
-    sma: venusOrbitDistance,
-    ecc: planets.venus.orbitalEccentricityBase,
-    defaultD: 34,
-    inclJ2000: planets.venus.invPlaneInclinationJ2000,
-    omegaJ2000: planets.venus.ascendingNodeInvPlane,
-    periLongJ2000: planets.venus.longitudePerihelion,
-    period: _balICRF('venus'),
-    trendJPL: venusEclipticInclinationTrendJPL,
-    llBounds: { min: venusLLBoundsMin, max: venusLLBoundsMax },
-    defaultPhaseAngle: planets.venus.inclinationCycleAnchor,
-    defaultAntiPhase: planets.venus.antiPhase,
-    locked: false
-  },
-  earth: {
-    name: 'Earth',
-    mass: M_EARTH_ALONE / M_SUN,
-    sma: 1.0,
-    ecc: eccentricityBase,
-    defaultD: 3,
-    inclJ2000: earthInvPlaneInclJ2000,
-    omegaJ2000: earthAscendingNodeInvPlaneVerified,
-    periLongJ2000: ASTRO_REFERENCE.perihelionLongitudeJ2000_deg,
-    period: earthPerihelionICRFYears,
-    trendJPL: 0,  // Earth defines the ecliptic — no self-trend
-    llBounds: { min: earthLLBoundsMin, max: earthLLBoundsMax },
-    defaultPhaseAngle: earthInclinationCycleAnchor,
-    defaultAntiPhase: false,
-    locked: true
-  },
-  mars: {
-    name: 'Mars',
-    mass: M_MARS_SYSTEM / M_SUN,
-    sma: marsOrbitDistance,
-    ecc: planets.mars.orbitalEccentricityBase,
-    defaultD: 5,
-    inclJ2000: planets.mars.invPlaneInclinationJ2000,
-    omegaJ2000: planets.mars.ascendingNodeInvPlane,
-    periLongJ2000: planets.mars.longitudePerihelion,
-    period: _balICRF('mars'),
-    trendJPL: marsEclipticInclinationTrendJPL,
-    llBounds: { min: marsLLBoundsMin, max: marsLLBoundsMax },
-    defaultPhaseAngle: planets.mars.inclinationCycleAnchor,
-    defaultAntiPhase: planets.mars.antiPhase,
-    locked: false
-  },
-  jupiter: {
-    name: 'Jupiter',
-    mass: M_JUPITER_SYSTEM / M_SUN,
-    sma: jupiterOrbitDistance,
-    ecc: planets.jupiter.orbitalEccentricityBase,
-    defaultD: 5,
-    inclJ2000: planets.jupiter.invPlaneInclinationJ2000,
-    omegaJ2000: planets.jupiter.ascendingNodeInvPlane,
-    periLongJ2000: planets.jupiter.longitudePerihelion,
-    period: _balICRF('jupiter'),
-    trendJPL: jupiterEclipticInclinationTrendJPL,
-    llBounds: { min: jupiterLLBoundsMin, max: jupiterLLBoundsMax },
-    defaultPhaseAngle: planets.jupiter.inclinationCycleAnchor,
-    defaultAntiPhase: planets.jupiter.antiPhase,
-    locked: false
-  },
-  saturn: {
-    name: 'Saturn',
-    mass: M_SATURN_SYSTEM / M_SUN,
-    sma: saturnOrbitDistance,
-    ecc: planets.saturn.orbitalEccentricityBase,
-    defaultD: 3,
-    inclJ2000: planets.saturn.invPlaneInclinationJ2000,
-    omegaJ2000: planets.saturn.ascendingNodeInvPlane,
-    periLongJ2000: planets.saturn.longitudePerihelion,
-    period: _balICRF('saturn'),
-    trendJPL: saturnEclipticInclinationTrendJPL,
-    llBounds: { min: saturnLLBoundsMin, max: saturnLLBoundsMax },
-    defaultPhaseAngle: planets.saturn.inclinationCycleAnchor,
-    defaultAntiPhase: planets.saturn.antiPhase,
-    locked: false
-  },
-  uranus: {
-    name: 'Uranus',
-    mass: M_URANUS_SYSTEM / M_SUN,
-    sma: uranusOrbitDistance,
-    ecc: planets.uranus.orbitalEccentricityBase,
-    defaultD: 21,
-    inclJ2000: planets.uranus.invPlaneInclinationJ2000,
-    omegaJ2000: planets.uranus.ascendingNodeInvPlane,
-    periLongJ2000: planets.uranus.longitudePerihelion,
-    period: _balICRF('uranus'),
-    trendJPL: uranusEclipticInclinationTrendJPL,
-    llBounds: { min: uranusLLBoundsMin, max: uranusLLBoundsMax },
-    defaultPhaseAngle: planets.uranus.inclinationCycleAnchor,
-    defaultAntiPhase: planets.uranus.antiPhase,
-    locked: false
-  },
-  neptune: {
-    name: 'Neptune',
-    mass: M_NEPTUNE_SYSTEM / M_SUN,
-    sma: neptuneOrbitDistance,
-    ecc: planets.neptune.orbitalEccentricityBase,
-    defaultD: 34,
-    inclJ2000: planets.neptune.invPlaneInclinationJ2000,
-    omegaJ2000: planets.neptune.ascendingNodeInvPlane,
-    periLongJ2000: planets.neptune.longitudePerihelion,
-    period: _balICRF('neptune'),
-    trendJPL: neptuneEclipticInclinationTrendJPL,
-    llBounds: { min: neptuneLLBoundsMin, max: neptuneLLBoundsMax },
-    defaultPhaseAngle: planets.neptune.inclinationCycleAnchor,
-    defaultAntiPhase: planets.neptune.antiPhase,
-    locked: false
-  }
-};
 
 // (K5 excision) The Fibonacci Balance Explorer, the Eccentricity Balance
 // Scale and the Solar System Resonance Cycle period table lived here —
@@ -24563,9 +24400,9 @@ function setupGUI() {
     if (ctrl) ctrl.hidden = !show;
   }
 
-  // ── About ── (Laws, Free Parameters, Calibration Inputs, Model Parameters)
+  // ── About ── (Model Identity, Licence, Parameter Accounting, Calibration Inputs)
   const aboutFolder = gui.addFolder({ title: 'About', expanded: false });
-  addFolderTooltip(aboutFolder, 'Six Fibonacci relations, 6 free parameters, and all calibration and model parameters that define the solar system.');
+  addFolderTooltip(aboutFolder, 'Two engines — dynamics for the planets, the H-lattice for Earth’s spin and time — with the parameter accounting, calibration inputs and model parameters that define the model.');
 
   // --- Model Identity (§10 two-axis provenance: cite as "model vX.Y") ---
   {
@@ -24617,71 +24454,50 @@ function setupGUI() {
     line('Full attribution: ' + a('https://github.com/dvansonsbeek/3d/blob/master/NOTICE', 'NOTICE'), true);
   }
 
-  // --- The Six Relations (custom DOM for full-width readability) ---
+  // --- Parameter Accounting (two engines, three ledgers \u2014 canonical:
+  // docs/20-constants-reference.md \u00A7 Parameter Accounting; the retired
+  // 6-DOF/Config-7 framing lives in git + docs 10/109) ---
   {
-    const lawsFolder = aboutFolder.addFolder({ title: 'The Six Relations', expanded: false });
-    const laws = [
-      { n: 1, title: 'Fibonacci Cycle Hierarchy',
-        desc: 'Earth\u2019s major precession periods divide the Earth Fundamental Cycle (H) by Fibonacci numbers \u2014 H/3, H/5, H/8, H/13. Unique to Earth.' },
-      { n: 2, title: 'Inclination Amplitude Constant',
-        desc: 'A single constant \u03C8 predicts all eight inclination amplitudes from Fibonacci divisors and mass alone (an open, untested empirical prediction).' },
-      { n: 3, title: 'The Inclination Balance',
-        desc: 'Seven planets\u2019 angular-momentum-weighted inclination oscillations balance Saturn alone (99.9975% \u2014 a mass-geometry identity given the divisors).' },
-      { n: 4, title: 'Eccentricity Amplitude Constant',
-        desc: 'A single constant K predicts all eight eccentricity amplitudes from Fibonacci divisors, mass, distance, and axial tilt (an open, untested empirical prediction).' },
-      { n: 5, title: 'The Eccentricity Balance',
-        desc: 'Seven planets\u2019 eccentricities balance Saturn alone \u2014 same Fibonacci divisors and phase groups as Relation 3. 99.8632% with the model\u2019s tuned base eccentricities, ~98% with dynamical long-term means: an approximate observation, no longer an exactness claim (the Saturn e-prediction is retired).' },
-      { n: 6, title: 'Saturn-Jupiter-Earth Resonance',
-        desc: 'Jupiter\u2019s ICRF perihelion and Saturn\u2019s ecliptic perihelion lock to one period, 8H/65 (~41,000 yr) \u2014 an Earth-frame beat identity at J2000, and the obliquity beat in Earth\u2019s climate record. It\u2019s Earth\u2019s axial precession (H/13) beating against the gas giants\u2019 ecliptic period (8H/39); against Relation 1\u2019s anchor H/5 the same beat gives H/8 (= 8H/64), one lattice step away.' },
-    ];
-    // Inject after all Tweakpane children are set up
-    const lawsContainer = lawsFolder.element.querySelector('.tp-fldv_c');
-    laws.forEach(l => {
-      const item = document.createElement('div');
-      item.style.cssText = 'padding: 4px 8px; font-size: 11px; line-height: 1.45; color: hsla(210,15%,75%,1); cursor: default;';
-      item.title = l.desc;
-      const num = document.createElement('span');
-      num.style.cssText = 'color: hsla(210,60%,65%,1); font-weight: 600; margin-right: 6px;';
-      num.textContent = 'Relation ' + l.n;
-      const title = document.createElement('span');
-      title.style.fontWeight = '500';
-      title.textContent = l.title;
-      const desc = document.createElement('div');
-      desc.style.cssText = 'font-size: 10px; color: hsla(210,10%,55%,1); margin-top: 2px;';
-      desc.textContent = l.desc;
-      item.appendChild(num);
-      item.appendChild(title);
-      item.appendChild(desc);
-      lawsContainer.appendChild(item);
-    });
-  }
-
-  // --- Free Parameters (6 DOF, matching holisticuniverse.com/model/foundations) ---
-  {
-    const freeFolder = aboutFolder.addFolder({ title: 'Free Parameters (6 DOF)', expanded: false });
-    addFolderTooltip(freeFolder, 'The six true degrees of freedom that define the model. Everything else is derived or taken from observations.');
-    const freeParams = {
-      fpHolisticYear: String(holisticyearLength) + ' years',
-      fpBalancedYear: Math.round(balancedYear).toLocaleString('en-US') + ' (derived)',
-      fpFibDivisors: '3, 5, 8, 13, 21, 34',
-      fpMeanObliquity: earthtiltMean + '\u00B0',
-      fpAmplitude: earthInvPlaneInclinationAmplitude + '\u00B0',
-      fpConfig: 'Config #' + (fbeMatchDefaultPreset() || '?') + ' (mirror-symmetric)',
+    const paFolder = aboutFolder.addFolder({ title: 'Parameter Accounting', expanded: false });
+    addFolderTooltip(paFolder, 'Two engines, three ledgers \u2014 zero free parameters where the dynamics live; four named constants where the lattice lives; every fitted coefficient gated and hashed. No single headline count: the ledgers are the accounting.');
+    const c = paFolder.element.querySelector('.tp-fldv_c');
+    const head = (t) => {
+      const d = document.createElement('div');
+      d.style.cssText = 'padding: 5px 8px 2px; font-size: 10px; font-weight: 600; letter-spacing: 0.4px; color: hsla(210,60%,65%,1); text-transform: uppercase;';
+      d.textContent = t;
+      c.appendChild(d);
     };
-    addTooltip(freeFolder.addBinding(freeParams, 'fpHolisticYear', { label: 'Earth Fundamental Cycle', readonly: true }),
-      '1 DOF \u2014 Fitted to match 1246 AD alignment + J2000 longitude of perihelion.');
-    const balancedBlade = addTooltip(freeFolder.addBinding(freeParams, 'fpBalancedYear', { label: 'Balanced year', readonly: true }),
-      '0 DOF \u2014 Calculated from Earth Fundamental Cycle and 1246 AD. Not independently free.');
-    balancedBlade.element.style.opacity = '0.65';
-    addTooltip(freeFolder.addBinding(freeParams, 'fpFibDivisors', { label: 'Fibonacci divisors', readonly: true }),
-      '3 DOF \u2014 Assumed; not independently derived. Used to divide the Earth Fundamental Cycle into precession periods (H/3, H/5, H/8, H/13, etc.).');
-    addTooltip(freeFolder.addBinding(freeParams, 'fpMeanObliquity', { label: 'Mean obliquity', readonly: true }),
-      '1 DOF \u2014 Fitted to observed obliquity range (~22.1\u00B0 to ~24.5\u00B0).');
-    addTooltip(freeFolder.addBinding(freeParams, 'fpAmplitude', { label: 'Amplitude', readonly: true }),
-      '1 DOF \u2014 Earth inclination amplitude on the invariable plane. Fibonacci predicts 0.6329789\u00B0.');
-    const configBlade = addTooltip(freeFolder.addBinding(freeParams, 'fpConfig', { label: 'Planet config', readonly: true }),
-      '0 DOF \u2014 Found by an exhaustive search of 7,558,272 configurations (mirror symmetry selected it). The uniqueness claim is retired: re-evaluated with dynamical inputs it is input-dependent \u2014 kept as the record of how the divisors were found (doc 10 Status).');
-    configBlade.element.style.opacity = '0.65';
+    const row = (title, desc) => {
+      const item = document.createElement('div');
+      item.style.cssText = 'padding: 3px 8px; font-size: 11px; line-height: 1.45; color: hsla(210,15%,75%,1); cursor: default;';
+      item.title = desc;
+      const t = document.createElement('span');
+      t.style.fontWeight = '500';
+      t.textContent = title;
+      const d = document.createElement('div');
+      d.style.cssText = 'font-size: 10px; color: hsla(210,10%,55%,1); margin-top: 1px;';
+      d.textContent = desc;
+      item.appendChild(t);
+      item.appendChild(d);
+      c.appendChild(item);
+    };
+    head('Ledger 1 \u00B7 Engine D \u2014 the planets (dynamics)');
+    row('Free parameters: none',
+      'Inputs, cited not fitted: one J2000 heliocentric state (JPL Horizons vectors, one epoch) \u00B7 DE440 mass ratios \u00B7 1PN. Everything planetary \u2014 element chains, secular modes, the 405.6-kyr metronome \u2014 derives from that seed. Integrator order/step are reproducibility conventions.');
+    head('Ledger 2 \u00B7 Engine K \u2014 Earth\u2019s spin & time (the H-lattice)');
+    row('Earth Fundamental Cycle \u00B7 H = ' + String(holisticyearLength) + ' yr',
+      'Fitted to the 1246 AD perihelion\u2013solstice alignment + the J2000 longitude of perihelion.');
+    row('Mean obliquity \u00B7 ' + earthtiltMean + '\u00B0',
+      'Fitted to the observed obliquity range (~22.1\u00B0 to ~24.5\u00B0).');
+    row('Inclination amplitude \u00B7 ' + earthInvPlaneInclinationAmplitude + '\u00B0',
+      'Earth\u2019s inclination amplitude on the invariable plane, fitted to the observed obliquity range.');
+    row('Inclination-cycle anchor \u00B7 ' + earthInclinationCycleAnchor + '\u00B0',
+      'The System-Reset convention \u2014 the one free assumption in its chain; the anchor arithmetic itself is exact. Shared between the inclination cycle and the eccentricity phase.');
+    row('Lattice divisors \u00B7 3 \u00B7 5 \u00B7 8 \u00B7 13 \u00B7 16 \u00B7 8H/N',
+      'A discrete structural assumption \u2014 the thing the three pre-registered falsification legs test \u2014 not a parameter count. The balanced year is derived (H + 1246 AD); Earth\u2019s e(J2000) is an observed calibration input, and the H/3 law\u2019s mean derives from it.');
+    head('Ledger 3 \u00B7 The fitted correction stack (gated)');
+    row('Cardinal-point harmonics \u00B7 \u0394T/LOD stack \u00B7 GIA \u03B1(t) \u00B7 lunar corrections',
+      'Fitter-owned coefficient arrays, provenance-tracked, stamped by the coefficients hash (Model Identity above). Every gate is fail-proven, and the paleo-anchors gate fails on an unexplained improvement too. None of them touch the planetary dynamics.');
   }
 
   // --- Calibration Inputs (from astro-reference.json — external observations) ---
@@ -24841,142 +24657,10 @@ function setupGUI() {
     calibInputFolder.title = 'Calibration Inputs (' + totalCalib + ')';
   }
 
-  // --- Model Parameters (all parameters from the top of script.js) ---
-  {
-    const constFolder = aboutFolder.addFolder({ title: 'Model Parameters', expanded: false });
-    let totalModelParams = 0;
-
-    // Helper: add a read-only string binding
-    const addConst = (folder, obj, key, label, tip) => {
-      addTooltip(folder.addBinding(obj, key, { label, readonly: true }), tip);
-    };
-    // Helper: format a number with unit
-    const fmtD = (v) => v + ' days';
-    const fmtDeg = (v) => v + '\u00B0';
-    const fmtYr = (v) => v.toLocaleString('en-US') + ' yr';
-
-    // -- Earth (model-parameters.json values only) --
-    const fundVals = {
-      holisticYear: fmtYr(holisticyearLength),
-      fibD: '3',
-      balanceGroup: 'In-phase',
-      ascNodePeriod: '-H/5 = -8H/40 = ' + fmtYr(-(holisticyearLength / 5)),
-      tropicalYear: fmtD(inputmeanlengthsolaryearindays),
-      startJD: String(startmodelJD),
-      correctionDays: String(correctionDays),
-      correctionSun: fmtDeg(correctionSun),
-      tempGraphPos: String(temperatureGraphMostLikely),
-      startAngle: fmtDeg(startAngleModel),
-      earthTiltMean: fmtDeg(earthtiltMean),
-      inclAmp: fmtDeg(earthInvPlaneInclinationAmplitude),
-      eccBase: String(eccentricityBase),
-      eccAmp: String(eccentricityAmplitude),
-    };
-    const fundCount = Object.keys(fundVals).length;
-    totalModelParams += fundCount;
-    // Derived values shown but not counted
-    const fundDerived = {
-      earthRAAngle: earthRAAngle.toFixed(7) + '\u00B0 (derived)',
-      inclMean: earthInvPlaneInclinationMean.toFixed(6) + '\u00B0 (derived)',
-    };
-    const fundFolder = constFolder.addFolder({ title: 'Earth (' + fundCount + ')', expanded: false });
-    addFolderTooltip(fundFolder, fundCount + ' model parameters define all Earth orbital behaviours. Source: model-parameters.json.');
-    addConst(fundFolder, fundVals, 'holisticYear', 'Earth Fundamental Cycle', 'The fundamental cycle unifying all precession movements.');
-    addConst(fundFolder, fundVals, 'fibD', 'Fibonacci d', 'Fibonacci divisor for Earth (Laws 2 + 4). d=3 = F\u2084.');
-    addConst(fundFolder, fundVals, 'balanceGroup', 'Balance group', 'In-phase (MIN inclination at balanced year). Saturn is the sole anti-phase planet.');
-    addConst(fundFolder, fundVals, 'ascNodePeriod', 'Asc. node period', 'Earth ascending node = ecliptic precession rate -H/5 (special: defines the ecliptic frame).');
-    addConst(fundFolder, fundVals, 'tropicalYear', 'Input tropical year', 'Input value used by the model. The actual mean tropical year is calculated from this and the Earth Fundamental Cycle length.');
-    addConst(fundFolder, fundVals, 'startJD', 'Start model JD', 'Julian Day of the model start date (June Solstice 2000).');
-    addConst(fundFolder, fundVals, 'correctionDays', 'Correction days', 'Small correction because 21 June 00:00 UTC is not exactly at solstice.');
-    addConst(fundFolder, fundVals, 'correctionSun', 'Correction Sun', 'Degree correction for solstice alignment at ~01:47 UTC.');
-    addConst(fundFolder, fundVals, 'tempGraphPos', 'Obliquity cycle pos.', 'Position (0\u201316) in the obliquity cycle for temperature graph.');
-    addConst(fundFolder, fundVals, 'startAngle', 'Start angle', 'Sun ecliptic longitude at model start (just before 90\u00B0).');
-    addConst(fundFolder, fundVals, 'earthTiltMean', 'Mean obliquity', 'Mean obliquity of the ecliptic (optimized for IAU 2006).');
-    addConst(fundFolder, fundVals, 'inclAmp', 'Incl. amplitude', 'Earth inclination oscillation amplitude on invariable plane.');
-    addConst(fundFolder, fundVals, 'eccBase', 'Eccentricity base', 'Base eccentricity for the long-term oscillation.');
-    addConst(fundFolder, fundVals, 'eccAmp', 'Eccentricity ampl.', 'Amplitude of the eccentricity oscillation.');
-    fundFolder.addBlade({ view: 'separator' });
-    const raB = addConst(fundFolder, fundDerived, 'earthRAAngle', 'RA angle', 'Derived: 2A \u2212 A\u00B2/\u03B5 where A = inclination amplitude.');
-    const imB = addConst(fundFolder, fundDerived, 'inclMean', 'Incl. mean', 'Derived from J2000 inclination, amplitude, and phase angle.');
-    if (raB && raB.element) raB.element.style.opacity = '0.65';
-    if (imB && imB.element) imB.element.style.opacity = '0.65';
-
-    // -- Moon (model-parameters.json values only: 3 startpos) --
-    const moonVals = {
-      startApsidal: fmtDeg(moonStartposApsidal),
-      startNodal: fmtDeg(moonStartposNodal),
-      startMoon: fmtDeg(moonStartposMoon),
-    };
-    const moonCount = Object.keys(moonVals).length;
-    totalModelParams += moonCount;
-    const moonFolder = constFolder.addFolder({ title: 'Moon (' + moonCount + ')', expanded: false });
-    addFolderTooltip(moonFolder, moonCount + ' model parameters define the Moon start positions. Orbital periods and references are in Calibration Inputs.');
-    addConst(moonFolder, moonVals, 'startApsidal', 'Start pos. apsidal', 'Initial apsidal precession angle.');
-    addConst(moonFolder, moonVals, 'startNodal', 'Start pos. nodal', 'Initial nodal precession angle.');
-    addConst(moonFolder, moonVals, 'startMoon', 'Start pos. Moon', 'Initial Moon position angle.');
-
-    // -- Per-planet data (Mercury through Neptune) — model-parameters.json only --
-    // Numeric values always source from planets.X.perihelionEclipticYears
-    // (single source of truth). Formula strings are human-readable labels.
-    const planetPeriLabels = {
-      mercury: 'H/(1+3/8) \u2248 ' + Math.round(planets.mercury.perihelionEclipticYears).toLocaleString('en-US') + ' yr',
-      venus:   '\u20138H/6 = '     + Math.round(planets.venus.perihelionEclipticYears).toLocaleString('en-US')   + ' yr',
-      mars:    'H/(4+3/8) \u2248 ' + Math.round(planets.mars.perihelionEclipticYears).toLocaleString('en-US')    + ' yr',
-      jupiter: 'H/5 = '            + Math.round(planets.jupiter.perihelionEclipticYears).toLocaleString('en-US') + ' yr',
-      saturn:  '\u2013H/8 = '      + Math.round(planets.saturn.perihelionEclipticYears).toLocaleString('en-US')  + ' yr',
-      uranus:  'H/3 = '            + Math.round(planets.uranus.perihelionEclipticYears).toLocaleString('en-US')  + ' yr',
-      neptune: 'H\u00D72 = '       + Math.round(planets.neptune.perihelionEclipticYears).toLocaleString('en-US') + ' yr',
-    };
-    const planetModelKeys = ['mercury', 'venus', 'mars', 'jupiter', 'saturn', 'uranus', 'neptune'];
-    const planetModelNames = { mercury: 'Mercury', venus: 'Venus', mars: 'Mars', jupiter: 'Jupiter', saturn: 'Saturn', uranus: 'Uranus', neptune: 'Neptune' };
-    planetModelKeys.forEach(key => {
-      const p = planets[key];
-      const ascNodeN = p.ascendingNodeCyclesIn8H;
-      const v = {
-        fibD: String(_fibD[key] || '\u2014'),
-        balanceGroup: p.antiPhase ? 'Anti-phase' : 'In-phase',
-        ascNodeCycles: ascNodeN ? '-8H/' + ascNodeN + ' = ' + fmtYr(-(8 * holisticyearLength) / ascNodeN) : '\u2014',
-        ecc: String(p.orbitalEccentricityBase),
-        eccAmp: String(p.orbitalEccentricityAmplitude),
-        ascNodeInv: fmtDeg(p.ascendingNodeInvPlane),
-        phaseAngle: fmtDeg(p.inclinationCycleAnchor),
-        periYears: planetPeriLabels[key],
-        startpos: fmtDeg(p.startpos),
-        eocFrac: String(p.eocFraction),
-        periRefJD: String(p.perihelionRef_JD),
-      };
-      const pCount = Object.keys(v).length;
-      totalModelParams += pCount;
-      // Derived values (not counted)
-      const vDerived = {
-        angleCorr: fmtDeg(p.angleCorrection) + ' (derived)',
-        inclMean: (p.invPlaneInclinationMean != null ? p.invPlaneInclinationMean.toFixed(6) : '\u2014') + '\u00B0 (derived)',
-        inclAmp: (p.invPlaneInclinationAmplitude != null ? p.invPlaneInclinationAmplitude.toFixed(6) : '\u2014') + '\u00B0 (derived)',
-      };
-      const pf = constFolder.addFolder({ title: planetModelNames[key] + ' (' + pCount + ')', expanded: false });
-      addFolderTooltip(pf, pCount + ' model parameters for ' + planetModelNames[key] + '. J2000 references are in Calibration Inputs.');
-      addConst(pf, v, 'fibD', 'Fibonacci d', 'Fibonacci divisor for inclination/eccentricity amplitude (Laws 2 + 4).');
-      addConst(pf, v, 'balanceGroup', 'Balance group', 'In-phase (MIN at balanced year) or anti-phase (MAX at balanced year). Saturn is the sole anti-phase planet.');
-      addConst(pf, v, 'ascNodeCycles', 'Asc. node period', 'Ascending node regression period as integer divisor of 8H (Solar System Resonance Cycle).');
-      addConst(pf, v, 'ecc', 'Eccentricity base', 'Base orbital eccentricity (balance-derived mean).');
-      addConst(pf, v, 'eccAmp', 'Eccentricity amplitude', 'Oscillation amplitude of orbital eccentricity.');
-      addConst(pf, v, 'ascNodeInv', 'Asc. node inv. plane', 'Ascending node on the invariable plane (model-adjusted).');
-      addConst(pf, v, 'phaseAngle', 'Incl. phase angle', 'ICRF perihelion phase angle at balanced year (in-phase or anti-phase).');
-      addConst(pf, v, 'periYears', 'Perihelion prec.', 'Duration of perihelion precession cycle (from H-fraction).');
-      addConst(pf, v, 'startpos', 'Start position', 'Initial angular position at model start.');
-      addConst(pf, v, 'eocFrac', 'EoC fraction', 'Equation of Center fraction: variable-speed vs geometric offset.');
-      addConst(pf, v, 'periRefJD', 'Perihelion ref. JD', 'Julian Day reference for EoC phase alignment.');
-      pf.addBlade({ view: 'separator' });
-      const acB = addConst(pf, vDerived, 'angleCorr', 'Angle correction', 'Derived by optimizer bisection to align perihelion at J2000.');
-      const imB = addConst(pf, vDerived, 'inclMean', 'Incl. inv. mean', 'Derived from J2000 inclination + Fibonacci amplitude + phase.');
-      const iaB = addConst(pf, vDerived, 'inclAmp', 'Incl. inv. amplitude', 'Derived from Fibonacci law: \u03C8/(d\u00D7\u221Am).');
-      if (acB && acB.element) acB.element.style.opacity = '0.65';
-      if (imB && imB.element) imB.element.style.opacity = '0.65';
-      if (iaB && iaB.element) iaB.element.style.opacity = '0.65';
-    });
-    constFolder.title = 'Model Parameters (' + totalModelParams + ')';
-    addFolderTooltip(constFolder, 'All ' + totalModelParams + ' input constants used by the 3D model, grouped by body.');
-  }
+  // (K8b-2 follow-up, owner: the Model Parameters folder is deleted - the
+  // per-planet rows were the retired law framing's scaffolding view, the
+  // live accounting is the Parameter Accounting folder above, and the raw
+  // input constants live in the tracked model-parameters.json + docs/20.)
 
   // --- Website reference ---
   {

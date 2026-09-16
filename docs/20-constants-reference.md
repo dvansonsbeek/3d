@@ -22,7 +22,7 @@ The shared tools module `tools/lib/constants.js` mirrors these with its own 14-s
 ### How other documents should reference constants
 
 - **Rule A — Formulas stay, computed numbers go.** Write "H/13" not a specific year count.
-- **Rule B — Theory-intrinsic integers stay inline.** Fibonacci numbers, cycle counts (13, 3, 16), and ratios are part of the theory.
+- **Rule B — Theory-intrinsic integers stay inline.** Lattice divisors, cycle counts (13, 3, 16), and ratios are part of the theory.
 - **Rule C — Approximate values for readability.** Use "H/13 (<!--v:axialPrecRound-->~25,794<!--/v--> years; see [Constants Reference](20-constants-reference.md))" when a number aids understanding.
 - **Rule D — Tables reference this document.** If a doc repeats planet parameters, add: "For current values see [Constants Reference](20-constants-reference.md)."
 
@@ -32,7 +32,7 @@ The shared tools module `tools/lib/constants.js` mirrors these with its own 14-s
 
 Per the [Expanding Solar System Resonance Theory (Doc 99)](99-expanding-solar-system-resonance-theory.md), the model has two distinct categories of "constants":
 
-- **Scale-invariant integers** — Fibonacci divisors (3, 5, 8, 13, 16, 21, 34), L1 integer labels (n = 9, 12, ..., 65, 66, 68, ..., 185 — 32 components total), integer divisors of 8H. These are **the same at every epoch** — structural constants of the solar system.
+- **Scale-invariant integers** — lattice divisors (3, 5, 8, 13, 16, 21, 34), L1 integer labels (n = 9, 12, ..., 65, 66, 68, ..., 185 — 32 components total), integer divisors of 8H. These are **the same at every epoch** — structural constants of the solar system.
 - **Epoch-dependent literal periods, lengths, and seconds-values** — these scale with the current value of H(t). **Most numeric values tabulated below** (H = <!--v:H-->335,317<!--/v--> yr; sidereal year = 365.25636 days; LOD = 86,400 s; Moon distance = 384,399 km; planet orbital periods in years; etc.) are **J2000-epoch values** — the model's primary calibration anchor. They apply to the modern era; for deep-time / future-projection work, use the epoch-dependent helpers in `src/script.js`:
 
 | J2000-anchored constant in this doc | Epoch-dependent helper (accepts `t_Ma` argument) |
@@ -51,27 +51,62 @@ For the canonical derivation chain from `t_Ma` through LOD, H, AU, M_Sun, Kepler
 
 ---
 
-## Parameter Summary
+## Parameter Accounting
 
-**This section is the canonical parameter accounting.** The model has only
-**6 free parameters**; every other number is either derived or anchored to
-astronomical observations. Other documents (and the simulator's About panel)
-should reference this section rather than carrying their own counts.
+**This section is the canonical parameter accounting.** The model is two
+engines, and its numbers fall into three ledgers. No single "N free
+parameters" headline is published — the ledgers are the accounting. Other
+documents (and the simulator's About panel) should reference this section
+rather than carrying their own counts. (The former "6 DOF / Config #7"
+accounting is retired; the search record lives in
+[doc 10](10-fibonacci-laws.md) and [doc 109](109-model-nbody-engine-and-lattice-test.md),
+and git history carries the old section.)
 
-### Free Parameters (6 DOF)
+### Ledger 1 — Engine D inputs (the planets: dynamics — cited, not fitted)
 
-The six true degrees of freedom that define the model. Everything else is derived or taken from observations.
+Free parameters: **none**. The planetary side is derived from published
+measurements taken as-is:
 
-| # | Parameter | Variable | Value | DOF | Section |
-|---|-----------|----------|-------|-----|---------|
-| 1 | Earth Fundamental Cycle | `holisticyearLength` | <!--v:H-->335,317<!--/v--> years | 1 | [Part 1 — Earth Fundamental Cycle](#the-earth-fundamental-cycle-h) |
-| 2 | Balanced year | `balancedYear` | −<!--v:anchorYearOffset-->302,635<!--/v--> (derived) | 0 | [Part 2 — Time Constants](#time-constants) |
-| 3 | Fibonacci divisors | — | 3, 5, 8, 13, 21, 34 | 3 | [Part 1 — Fibonacci Divisors](#fibonacci-divisor-assignments) |
-| 4 | Mean obliquity | `earthtiltMean` | <!--v:meanObliquity-->23.41353<!--/v-->° | 1 | [Part 1 — Earth Parameters](#earth-parameters) |
-| 5 | Inclination amplitude | `earthInvPlaneInclinationAmplitude` | <!--v:earthInclAmp-->0.63607<!--/v-->° | 1 | [Part 1 — Earth Parameters](#earth-parameters) |
-| 6 | Planet config | the default configuration | Unique mirror-symmetric solution | 0 | [Part 1 — Fibonacci Divisors](#fibonacci-divisor-assignments) |
+| Input | Source |
+|---|---|
+| One J2000 heliocentric state (positions + velocities, all eight planets) | JPL Horizons vectors, one epoch |
+| Mass ratios | JPL DE440 |
+| Relativistic correction | 1PN, standard form |
 
-Total: **6 DOF** (items 2 and 6 are derived/constrained, not independently free).
+Everything downstream — the element chains, the secular g/s mode tables,
+the 405.6-kyr eccentricity metronome, the obliquity hybrid — is derived
+from that seed. Integrator order and step are reproducibility conventions,
+not parameters.
+
+### Ledger 2 — Engine K structural parameters (Earth's spin & time: the H-lattice)
+
+The continuous parameters, each named with its anchor:
+
+| # | Parameter | Variable | Value | Anchored by |
+|---|-----------|----------|-------|-------------|
+| 1 | Earth Fundamental Cycle | `holisticyearLength` | <!--v:H-->335,317<!--/v--> years | 1246 AD perihelion–solstice alignment + J2000 longitude of perihelion |
+| 2 | Mean obliquity | `earthtiltMean` | <!--v:meanObliquity-->23.41353<!--/v-->° | observed obliquity range |
+| 3 | Inclination amplitude | `earthInvPlaneInclinationAmplitude` | <!--v:earthInclAmp-->0.63607<!--/v-->° | observed obliquity range |
+| 4 | Inclination-cycle anchor | `earthInclinationCycleAnchor` | 21.77° | the System-Reset convention — the one free assumption in its chain; the anchor arithmetic itself is exact. Shared between the inclination cycle and the eccentricity phase |
+
+The lattice itself — the integer divisors of H and 8H (13 axial, 8
+obliquity, 5 ecliptic, 3 inclination/eccentricity, 16 e-beat, the 8H/N
+correction family) — is a **discrete structural assumption**, the thing the
+three pre-registered falsification legs test. It is presented as an
+assumption under test, not counted as degrees of freedom. The balanced year
+(−<!--v:anchorYearOffset-->302,635<!--/v-->) stays derived from H + 1246 AD.
+Earth's eccentricity is not a parameter: e(J2000) is an observed calibration
+input, and the H/3 law's mean is derived from it and the shared anchor.
+
+### Ledger 3 — the fitted correction stack (named, gated, hashed)
+
+The fitted-coefficient arrays — cardinal-point harmonics, the ΔT/LOD stack,
+GIA α(t), lunar corrections — under the coefficients hash (shown in the
+simulator's About → Model Identity). Every array is fitter-owned,
+provenance-tracked, and behind fail-proven gates; the paleo-anchors gate
+fails on an unexplained *improvement* too. These correct the certified
+time-domain machinery; none of them touch the planetary dynamics
+(Ledger 1).
 
 ### Core Calibration Inputs (28 — Earth, Sun & Moon)
 
@@ -127,7 +162,7 @@ These constants define the model. Changing any of them changes the theory.
 | Perihelion alignment year | `perihelionalignmentYear` | <!--v:periAlignYear-->1246.03125<!--/v--> AD |
 | Obliquity cycle position | `temperatureGraphMostLikely` | 14.5 (of 16) |
 
-The Earth Fundamental Cycle is divided by Fibonacci-related integers to produce all Earth precession cycles (see [Part 2 — Derived Constants](#part-2--derived-constants)).
+The Earth Fundamental Cycle is divided by small integers to produce all Earth precession cycles (see [Part 2 — Derived Constants](#part-2--derived-constants)). Some of the divisors happen to be Fibonacci numbers; the model treats that as coincidence, not law — the lattice is the structural assumption, tested by the falsification legs.
 
 ## Earth Parameters
 
@@ -142,9 +177,14 @@ The Earth Fundamental Cycle is divided by Fibonacci-related integers to produce 
 | Inclination Cycle Anchor | `earthInclinationCycleAnchor` | 21.77 deg | ICRF perihelion longitude where Earth reaches MAX inclination (anchor for the oscillation) |
 | Perihelion Ref JD | `perihelionRefJD` | <!--v:perihelionPassageJD-->2451547.042<!--/v--> | JD of Earth perihelion 2000 (Jan 3.542) |
 
-## Fibonacci Divisor Assignments
+## Legacy Divisor Assignments (retired framing — no-chain scaffolding record)
 
-| Planet | Fibonacci Divisor (d) | Phase Group | Mirror Pair | EoC Type |
+The per-planet *d*-assignments below belong to the retired Fibonacci-law
+framing (the planet chains moved to engine D; doc 10 Status + doc 109 carry
+the re-evaluation). They are kept because the constants still exist in the
+legacy scene scaffolding (device anchors, no-chain bodies).
+
+| Planet | Divisor (d) | Phase Group | Mirror Pair | EoC Type |
 |--------|----------------------|-------------|-------------|----------|
 | Mercury | 21 | In-phase (<!--v:mercuryInclCycleAnchor-->234.52<!--/v-->°) | Uranus | I |
 | Venus | 34 | In-phase (<!--v:venusInclCycleAnchor-->218.64<!--/v-->°) | Neptune | I |
@@ -302,10 +342,14 @@ All 8 planets, combining inner planet J2000 values with outer planet pre-dual-ba
 | Uranus | <!--v:uranusEccJ2000Full-->0.04725744<!--/v--> | J2000 (base derived from phase) |
 | Neptune | <!--v:neptuneEccJ2000Full-->0.00859048<!--/v--> | J2000 (base derived from phase) |
 
-## Planet Inclination Parameters (from ψ formula)
+## Planet Inclination Parameters (legacy ψ formula — retired framing)
 
-Amplitudes derived from Fibonacci Laws: `amp = ψ / (d × √m)`. Means from J2000 constraint.
-See [The Six Fibonacci Relations](10-fibonacci-laws.md), verified by [Inclination Optimization](../tools/verify/inclination-optimization.js) and [Inclination Verification](../tools/verify/inclination-verification.js).
+Amplitudes from the retired law framing: `amp = ψ / (d × √m)`. Means from
+the J2000 constraint. These values survive in the legacy scene scaffolding
+only (the planet chains ride engine D); the historical record is
+[doc 10](10-fibonacci-laws.md), verified at the time by
+[Inclination Optimization](../tools/verify/inclination-optimization.js) and
+[Inclination Verification](../tools/verify/inclination-verification.js).
 
 | Planet | Mean (deg) | Amplitude (deg) | Range (deg) | Phase Angle | ICRF Period |
 |--------|----------|---------------|-----------|-------------|-------------|

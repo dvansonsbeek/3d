@@ -14,7 +14,7 @@
 
 What if the orbits of all eight planets, the wobble of Earth's axis, and the rhythm of ice ages are all governed by the same mathematical structure?
 
-This interactive 3D simulation implements the **Expanding Solar System Resonance Theory (ESSRT)** — a geocentric model built on a single timescale, with six Fibonacci relations — restated below with their honest, measured status — describing the system's tilts, shapes, and precessions. Built with just **6 free parameters**, the simulation accurately reproduces the geocentric positions of the Sun, Moon, and all seven planets — verified against JPL Horizons ephemeris data (~1800–2200 AD) and over 700 historical astronomical observations (~2000 BC to ~4000 AD). From the same geometric framework, it simultaneously produces obliquity, eccentricity, perihelion precession, and inclination oscillation for all planets.
+This interactive 3D simulation implements the **Expanding Solar System Resonance Theory (ESSRT)** — a geocentric model built on a single timescale, running on two engines: an N-body Keplerian chain for the planets (derived from one cited J2000 state, zero free parameters) and an integer lattice on the Earth Fundamental Cycle for Earth's spin and time. The simulation accurately reproduces the geocentric positions of the Sun, Moon, and all seven planets — verified against JPL Horizons ephemeris data (~1800–2200 AD) and over 700 historical astronomical observations (~2000 BC to ~4000 AD). From the same geometric framework, it simultaneously produces obliquity, eccentricity, perihelion precession, and inclination oscillation for all planets.
 
 ---
 
@@ -27,9 +27,9 @@ The model starts from a single observation: two of Earth's precession motions ro
 | Axial Precession | Clockwise | <!--v:axialPrecRound-->~25,794<!--/v--> years |
 | Apsidal Precession | Counter-clockwise | <!--v:inclPrecYears-->~111,772<!--/v--> years |
 
-These two counter-rotating motions interact in a **Fibonacci ratio of 3:13** — the measured J2000 configuration (the restated relations below carry the honest typing). From this starting point, the model derives what is normally calculated separately: precession of the equinoxes, obliquity oscillation, eccentricity cycles, Milankovitch beat frequencies, the length of days and years, and the orbital-forcing component of climate (the timing of glacial-interglacial cycles).
+These two counter-rotating motions interact in a **3:13 integer ratio** — the measured J2000 configuration (the divisors happen to be Fibonacci numbers; the model treats that as coincidence, not law). From this starting point, the model derives what is normally calculated separately: precession of the equinoxes, obliquity oscillation, eccentricity cycles, Milankovitch beat frequencies, the length of days and years, and the orbital-forcing component of climate (the timing of glacial-interglacial cycles).
 
-Everything comes together in the **Earth Fundamental Cycle (H)**: a <!--v:H-->335,317<!--/v-->-year master cycle at J2000 (H slowly evolves on geological timescales via Earth-Moon tidal evolution — see the deep-time section below) from which Earth's major precession periods emerge as Fibonacci divisions (H/3, H/5, H/8, H/13) — and this simulation visualizes it all in one interactive view.
+Everything comes together in the **Earth Fundamental Cycle (H)**: a <!--v:H-->335,317<!--/v-->-year master cycle at J2000 (H slowly evolves on geological timescales via Earth-Moon tidal evolution — see the deep-time section below) from which Earth's major precession periods emerge as small-integer divisions (H/3, H/5, H/8, H/13, H/16) — and this simulation visualizes it all in one interactive view.
 
 ---
 
@@ -43,24 +43,20 @@ The unifying theory is the **Expanding Solar System Resonance Theory (ESSRT)** (
 - The **literal periods** scale with the current value of H(t): in the Devonian H ≈ <!--v:hAtDevonian-->306,189<!--/v--> yr, today H = <!--v:H-->335,317<!--/v--> yr, in 200 Myr H ≈ <!--v:hAt200MyrFuture-->352,601<!--/v--> yr — but `8H/65` is still the obliquity beat, `8H/104` is still axial precession, etc.
 - Two physically independent drivers expand H(t): **Driver 1** is Earth-Moon tidal evolution (Moon recedes 3.82 cm/yr at J2000, Earth's length-of-day grows); **Driver 2** is solar mass loss (every planet's orbit slowly expands via Kepler's 3rd law). Both act simultaneously; the structural invariant `H × days/year` ≈ <!--v:totalDaysInH-->122,471,920<!--/v--> couples them at the per-planet observational level.
 
-ESSRT therefore unifies the **modern-era 8H climate lattice** (docs 90–92), the **deep-time predictions** (see deep-time section below), and the **future projections** (tidal-lock asymptote at ~<!--v:tidalLockRE-->87.1<!--/v--> R_⊕) into a single coherent framework with the **same 6 free parameters** throughout.
+ESSRT therefore unifies the **modern-era 8H climate lattice** (docs 90–92), the **deep-time predictions** (see deep-time section below), and the **future projections** (tidal-lock asymptote at ~<!--v:tidalLockRE-->87.1<!--/v--> R_⊕) into a single coherent framework with the **same parameter accounting** throughout (two engines, three ledgers — [Constants Reference](docs/20-constants-reference.md)).
 
 ---
 
-## The Six Fibonacci Relations — restated
+## Two engines — and the retired "Fibonacci laws"
 
-The model's six laws are kept with their honest, measured status (the model's own N-body engine re-evaluated the structural claims — [Doc 109](docs/109-model-nbody-engine-and-lattice-test.md) is the evidence record):
+The model runs on two engines with one clean division of labor:
 
-1. **Fibonacci Cycle Hierarchy** — Earth's major precession periods divide H by Fibonacci numbers (H/3, H/5, H/8, H/13). A hierarchy unique to Earth; the spin-family members scale with H(t) and are confirmed against the rock to 2.46 Ga.
-2. **Inclination Amplitude Constant** — A single constant ψ predicts all eight inclination amplitudes from Fibonacci divisors and mass alone (an empirical amplitude law; untested by the N-body campaign, kept as an open prediction)
-3. **The Inclination Balance** — Seven planets' angular-momentum-weighted contributions balance against Saturn alone (anti-phase) to <!--v:balanceInclPct-->99.9974%<!--/v--> (a mass-geometry identity given the divisors; dynamics-insensitive by construction)
-4. **Eccentricity Amplitude Constant** — A single constant K predicts all eight eccentricity amplitudes from Fibonacci divisors, mass, distance, and axial tilt (empirical amplitude law, kept as an open prediction)
-5. **The Eccentricity Balance** — Seven planets' eccentricities balance against Saturn alone using the same Fibonacci divisors and phase groups as Law 3: <!--v:balanceEccPct-->99.8636%<!--/v--> with the model's tuned base eccentricities, **~98% with the engine's dynamical long-term means** — an approximate, honestly-typed observation, no longer an exactness claim (the former Saturn e-prediction missed the dynamical mean by 3.6% and is retired)
-6. **Saturn-Jupiter-Earth Resonance** — an **Earth-frame beat identity at J2000**: Jupiter's ICRF perihelion and Saturn's ecliptic perihelion read one period, 8H/65, in the model's frames at the present epoch — the obliquity beat in Earth's climate record (k + s₃), one 8H-lattice step from Earth's Fibonacci obliquity H/8 (= 8H/64). Exact where stated; the quantities matched are Earth-frame beats, not the giants' own secular frequencies
+- **Engine D (dynamics) — the planets.** An N-body Keplerian chain derived from one cited J2000 heliocentric state (JPL Horizons vectors) + DE440 mass ratios + 1PN. **Zero free parameters**: every planetary element chain, secular mode table, and the 405.6-kyr eccentricity metronome derives from that seed.
+- **Engine K (kinematic) — Earth's spin and time.** The Earth Fundamental Cycle H divided by small integers — H/13 axial precession, H/8 obliquity, H/5 ecliptic, H/3 inclination/eccentricity, H/16 e-beat, the 8H/N climate lattice — with four named continuous constants (H, mean obliquity, inclination amplitude, the 21.77° anchor). The full accounting is the three-ledger section of the [Constants Reference](docs/20-constants-reference.md).
 
-The mirror-symmetric configuration search (Mercury↔Uranus, Venus↔Neptune, Earth↔Saturn, Mars↔Jupiter; <!--v:configSearchSpace-->7,558,272<!--/v--> candidates narrowed to <!--v:deepSurvivorCount-->15<!--/v--> survivors, mirror symmetry selecting Config #7) is kept as the record of how the divisors were found; its uniqueness claim did not survive dynamical inputs (it is input-dependent survivorship) and is retired as a falsification criterion. **The model's falsifiability now rests on three pre-registered legs** — the deep-time scaling split (spin-family periods scale with H(t), the 405-kyr band does not; confirmed at 1.4 and 2.46 Ga, tested afresh by every newly dated Precambrian section), the fail-proven historical-era gate suite (eclipses, LOD/ΔT, cardinal points, 41 paleo anchors), and the two-expansions solar-mass consistency (μ(2.48 Ga) = 1.00 ± 0.07 measured from rock) — see `CLAUDE.md` §Verification.
+Earlier versions presented the divisors as "Fibonacci laws". That framing is **retired**: the divisors are small integers anchored at J2000, and the fact that several of them are Fibonacci numbers is treated as coincidence, not law (H/16 never was one). The integer lattice itself is a **discrete structural assumption under test** — the mirror-symmetric configuration search that once selected them is kept only as the record of how the divisors were found (its uniqueness claim did not survive dynamical inputs — [Doc 109](docs/109-model-nbody-engine-and-lattice-test.md) is the evidence record; [docs/10](docs/10-fibonacci-laws.md) the historical derivation; [verify-laws.js](tools/verify/verify-laws.js) narrative class since the restatement).
 
-See the [Fibonacci relations documentation](docs/10-fibonacci-laws.md) for the full derivation, and [verify-laws.js](tools/verify/verify-laws.js), kept as the record of the law checks (narrative class since the restatement).
+**The model's falsifiability rests on three pre-registered legs** — the deep-time scaling split (spin-family periods scale with H(t), the 405-kyr band does not; confirmed at 1.4 and 2.46 Ga, tested afresh by every newly dated Precambrian section), the fail-proven historical-era gate suite (eclipses, LOD/ΔT, cardinal points, 41 paleo anchors), and the two-expansions solar-mass consistency (μ(2.48 Ga) = 1.00 ± 0.07 measured from rock) — see `CLAUDE.md` §Verification.
 
 ---
 
@@ -199,7 +195,7 @@ Two things worth knowing before you read a red result as breakage:
 
 ## Deep-Time Implementation — Hadean to +200 Myr
 
-The simulation is not limited to the modern era. The model's 6 free parameters apply at **all epochs from the Hadean (4.5 Gyr ago, Moon at the rigid Roche limit) through J2000 and into the future tidal-lock asymptote at ~87 R_⊕**. Deep-time mode is the shipped default: the time slider can be scrubbed across geological timescales and the entire 3D scene — Earth, Moon, all seven planets, plus the perihelion-ecliptic frames — updates in real time to the physically correct positions for the target epoch.
+The simulation is not limited to the modern era. The model's parameters (two engines, three ledgers — [Constants Reference](docs/20-constants-reference.md)) apply at **all epochs from the Hadean (4.5 Gyr ago, Moon at the rigid Roche limit) through J2000 and into the future tidal-lock asymptote at ~87 R_⊕**. Deep-time mode is the shipped default: the time slider can be scrubbed across geological timescales and the entire 3D scene — Earth, Moon, all seven planets, plus the perihelion-ecliptic frames — updates in real time to the physically correct positions for the target epoch.
 
 The framework is documented in [Doc 99 — Expanding Solar System Resonance Theory (ESSRT)](docs/99-expanding-solar-system-resonance-theory.md): a canonical 9-step chain from `t_Ma` through length-of-day (LOD), the Earth Fundamental Cycle H(t), AU, solar mass loss, Kepler year, Moon distance, Moon synodic month, anomalistic year, stellar/sidereal days, and planet orbital + synodic periods. The chain is anchored to modern Lunar Laser Ranging and the [Farhat 2022](https://www.aanda.org/articles/aa/full_html/2022/09/aa44329-22/aa44329-22.html) lunar-distance evolution polynomial; deep-time outputs are then independently validated against three external anchors that the model was **not** fit against:
 
@@ -209,7 +205,7 @@ The framework is documented in [Doc 99 — Expanding Solar System Resonance Theo
 
 The full evidence — 41 published anchors, per-anchor tolerances, the documented deviations, and the gate that re-checks all of it on every CI run — is assembled in the [Deep-Time Validation Dossier (Doc 106)](docs/106-deep-time-validation-dossier.md). Since 2026-08 the deep-time layer carries the **regime-aware lunar-recession history** (Driver 1½): the calibrated curve is bit-identical through the gated 0–1000 Ma era, and beyond it a fitted staircase (following Farhat 2022's resonant-crossing result) plus two explicit solar angular-momentum channels — the ocean solar-tide leak and the insolation-driven thermal-tide pump — match eleven published mid-Precambrian anchors within 1.3σ.
 
-Because the 6 free parameters are fit against modern J2000 data and then projected backward and forward via the proper-physics chain, the deep-time match is a **falsifiable prediction, not a fit**. The same 6 free parameters that reproduce the modern solar system to JPL Horizons precision (~1800–2200 AD) also reproduce paleontological day-counts at Devonian, cyclostratigraphic precession at 650 Ma, and the Hadean Moon-distance constraint at Earth formation — internally consistent across **the full 4.5-Gyr lifetime of the solar system**.
+Because the model's parameters are fit against modern J2000 data and then projected backward and forward via the proper-physics chain, the deep-time match is a **falsifiable prediction, not a fit**. The same parameters that reproduce the modern solar system to JPL Horizons precision (~1800–2200 AD) also reproduce paleontological day-counts at Devonian, cyclostratigraphic precession at 650 Ma, and the Hadean Moon-distance constraint at Earth formation — internally consistent across **the full 4.5-Gyr lifetime of the solar system**.
 
 ---
 
@@ -219,7 +215,7 @@ The model's gravitational parameters (`GM_Sun`, `GM_Earth`, `GM_Moon`, `GM_plane
 
 - **[Doc 24 — The Δa Mass Derivation](docs/24-moon-kepler-derivation.md)** — The full chain in one document. Part I re-parameterizes Hill-Brown's solar perturbation on the lunar orbit as `Δa = a_M·μ·m` (barycentric wobble × phase-fraction), reproducing the textbook 384,748 km Kepler-effective Moon distance from the geometric LLR value and giving `GM_Earth` to 3.7 ppm vs DE440. Part II packages three classical terms (two-body Kepler + Hill-Brown solar perturbation + Brouwer J2 oblateness) as one closed-form mass-from-moon formula, verified against 22 moons of 7 planets to 3–340 ppm. Part III is the exact Sun-side identity: the symmetric `Δa = a·(1 − ((μ_S+μ_E−μ_b)/(μ_S+μ_E))^(1/3))` makes the elaborate two-body Kepler form algebraically identical to the simple `T = 2π·√(a³/(μ_S+μ_E))` for every planet
 
-These are calibration findings, not part of the Fibonacci relations, and not improvements on Newton. The physics is fully classical; the contribution is pedagogical — cleaner notation, a closed-form derivation of a textbook value, and a unified-formula demonstration across all moon-bearing planets in DE440. Suitable for an undergraduate astrodynamics or physics-education context.
+These are calibration findings, not part of the model's structural claims, and not improvements on Newton. The physics is fully classical; the contribution is pedagogical — cleaner notation, a closed-form derivation of a textbook value, and a unified-formula demonstration across all moon-bearing planets in DE440. Suitable for an undergraduate astrodynamics or physics-education context.
 
 **Headline numbers:** The model derives `GM_Earth` and `GM_Moon` to ~4 ppm and `GM_Sun` to 0.07 ppm against JPL DE440. These residuals sit at the precision floor of Kepler-from-Moon-orbit derivations (Hill-Brown m⁴-and-beyond terms), and fall inside the ~22 ppm uncertainty in `G` that bounds any mass-in-kg statement.
 
@@ -232,7 +228,7 @@ Detailed documentation is available in the [`/docs`](docs/00-readme.md) folder, 
 | Range | Category | Start here |
 |-------|----------|------------|
 | 00–09 | Getting Started & Overview | [Introduction](docs/01-introduction.md), [User Guide](docs/02-user-guide.md), [Glossary](docs/03-glossary.md) |
-| 10–19 | Theory & Model | [Fibonacci Relations](docs/10-fibonacci-laws.md) |
+| 10–19 | Theory & Model | [Fibonacci Relations (historical record)](docs/10-fibonacci-laws.md) |
 | 20–29 | Technical Reference | [Constants Reference](docs/20-constants-reference.md), [Formulas](docs/21-orbital-formulas-reference.md) |
 | 40–49 | Architecture & Code | [Architecture](docs/40-architecture.md), [Scene Graph](docs/41-scene-graph-hierarchy.md) |
 | 90–99 | Climate Analysis | [Climate Formula (Doc 92)](docs/92-climate-formula.md), [Climate Summary (Doc 95)](docs/95-climate-summary.md), [ESSRT (Doc 99)](docs/99-expanding-solar-system-resonance-theory.md) |
@@ -273,7 +269,7 @@ The cardinal points (solstices/equinoxes) are **derived, not independently fitte
 - **Axial precession**: <!--v:axialPrecRound-->~25,794<!--/v--> years (H/13)
 - **Apsidal precession**: <!--v:inclPrecYears-->~111,772<!--/v--> years (H/3)
 - **Perihelion precession**: <!--v:periPrecYears-->~20,957<!--/v--> years (H/16)
-- **Model parameters**: only **6 free parameters** for the entire model; everything else is derived or anchored to astronomical observations (the full accounting is in the [Constants Reference](docs/20-constants-reference.md))
+- **Model parameters**: two engines, three ledgers — zero free parameters on the planetary side, four named constants on the H-lattice side, and a gated fitted-correction stack; everything else is derived or anchored to astronomical observations (the canonical accounting is in the [Constants Reference](docs/20-constants-reference.md))
 
 ---
 
