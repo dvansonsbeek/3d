@@ -6424,6 +6424,8 @@ if (typeof window !== 'undefined') {
         sunDecDeg: radiansToDecDecimal(sun.dec),
         obliquityEarthDeg: o.obliquityEarth,
         markerDecDeg: earthWobbleCenter.dec * 180 / Math.PI,
+        labelHTML: earthWobbleCenter._labelDiv ? earthWobbleCenter._labelDiv.innerHTML : '',
+        markerSize: earthWobbleCenter.size,
       };
       jumpToJulianDay(savedJD);
       forceSceneUpdate();
@@ -6762,8 +6764,8 @@ const earthWobbleCenter = {
   orbitCenterc: 0,
   orbitTilta: 0,
   orbitTiltb: 0,
-  
-  size: 0.011,
+
+  size: 0.002,   // K8b-1 owner call: below Earth's rendered radius (0.00426) — the old 0.011 read as ~4× Earth
   color: 0x333333,
   textureUrl: 'https://raw.githubusercontent.com/dvansonsbeek/3d/master/public/deathstar.png',
   visible: true,
@@ -10292,6 +10294,12 @@ wobbleLabelDiv.style.cssText = helperLabelStyle;
 wobbleLabelDiv.innerHTML =
   '<div style="font:600 10px/1.2 Inter,system-ui,sans-serif;color:rgba(255,255,255,.9);letter-spacing:.03em;">Precession Center</div>' +
   '<div style="font:400 8.5px/1.2 Inter,system-ui,sans-serif;color:rgba(255,255,255,.45);margin-top:2px;">axis of Earth\'s wobble</div>' +
+  // K8b-1 owner-worded physics line: the one physically real wobble
+  // distance is the Earth–Moon barycenter — a_moon × M_M/(M_E+M_M),
+  // computed from the model's own constants (J2000 value; grows with the
+  // lunar recession). The marker's own radius stays display-only: its
+  // direction carries the physics (dec ≡ obliquity at any radius).
+  `<div style="font:400 8.5px/1.2 Inter,system-ui,sans-serif;color:rgba(255,255,255,.45);margin-top:2px;">real distance at Earth–Moon barycenter (~${Math.round(A_MOON_NOW_M * (M_MOON_ALONE / (M_EARTH_ALONE + M_MOON_ALONE)) / 1000).toLocaleString('en-US')} km from Earth center)</div>` +
   helperPointer;
 const wobbleLabelObj = new CSS2DObject(wobbleLabelDiv);
 wobbleLabelObj.position.set(0, 0.04, 0);
