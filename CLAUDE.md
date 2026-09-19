@@ -7,7 +7,7 @@ across ±500 Myr. [Preprint](https://doi.org/10.21203/rs.3.rs-8758810/v4) ·
 
 **Scale:** `src/script.js` ~60,000 lines · `tools/` ~240 tracked JS scripts
 across 9 directories (~360 on disk with the untracked local archives) · ~245 Python files · 47 docs (24 retired-machinery docs archived out of the tree — `docs/retired-record.md` is the public record; `docs/archive/retired/`, gitignored, holds the files — and the strip-and-restructure pass merged five more into their live homes) · two web UIs (simulator, `dashboard/`).
-**`npm run check` enforces a twenty-three-step gate chain; CI runs it plus a
+**`npm run check` enforces a twenty-four-step gate chain; CI runs it plus a
 headless-browser job and auto-deploys the simulator to GitHub Pages on
 green main.**
 Golden masters live in `packages/fixtures/`. Of the 31 scripts in `tools/verify/`,
@@ -161,7 +161,12 @@ would silently churn a structural claim for a rounding-level gain.
 
 `npm run check` is the enforced chain — lint (§4 boundaries), typecheck (JSDoc +
 `checkJs`), `check:boundaries` (the §2h licensing invariant), purity,
-`test:fixtures` (the `tools/lib` golden masters), `check:artifacts` (generated
+`test:fixtures` (the `tools/lib` golden masters + the plan-06 baseline —
+the H-carrying quantities on the ±26-kyr wander window and the deep-time
+anchors, bit-exact across the lunisolar-clock restatement),
+`test:vocabulary` (the retired-vocabulary RATCHET — plan 06 §7 D3 terms may
+only leave presentation surfaces, never re-enter; `--report` prints the
+sweep worklist, `--root DIR` adds the website's EN pages), `check:artifacts` (generated
 campaign artifacts vs their recorded input hashes — fails naming the exact
 regeneration command), `check:data` (every tracked dataset manifest-covered
 in PROVENANCE.md), `values:package` (the published @essrt/model-values ≡
