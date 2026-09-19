@@ -53,10 +53,27 @@ function measure() {
 
   /** @param {string} tag @param {number} year */
   const row = (tag, year) => {
-    // the spin clock and its unit
+    // Every SERIES-backed evaluator (the one-source movement, the
+    // one-family year lengths) grows the hybrid's sampler grid outward from
+    // J2000 — a deep-age read hangs — so those are read only inside the
+    // wander window; the deep anchors use the closed-form surfaces.
+    const inWindow = Math.abs(year - 2000) <= 50000;
+    // the spin clock and its unit — BOTH of-date precession evaluators
+    // (the K-comb Fourier pair in `epoch`, the one-family hybrid route in
+    // `yearLengths`; they agree at J2000 only — calculation map chain 2.2)
     const Tp = num(m.epoch.axialPrecessionYearsAtYear(year));
     const H = num(m.epoch.hAtYear(year));
     v[`${tag}.precessionPeriodOfDateYr`] = Tp;
+    v[`${tag}.precessionPeriodOneFamilyYr`] = inWindow ? num(m.yearLengths.axialPrecessionYearsAtYear(year)) : null;
+    v[`${tag}.siderealYearOneFamilyS`] = inWindow ? num(m.yearLengths.siderealYearSecondsAtYear(year)) : null;
+    v[`${tag}.tropicalYearOneFamilyS`] = inWindow ? num(m.yearLengths.tropicalYearSecondsAtYear(year)) : null;
+    v[`${tag}.anomalisticYearOneFamilyS`] = inWindow ? num(m.yearLengths.anomalisticYearSecondsAtYear(year)) : null;
+    v[`${tag}.siderealYearFourierD`] = num(m.lengths.siderealYearDays(year));
+    v[`${tag}.tropicalYearFourierD`] = num(m.lengths.tropicalYearDirectDays(year));
+    v[`${tag}.tropicalYearCardinalD`] = num(m.lengths.tropicalYearDays(year));
+    v[`${tag}.anomalisticYearFourierD`] = num(m.lengths.anomalisticYearDays(year));
+    v[`${tag}.dayLengthKinematicS`] = num(m.lengths.dayLengthSeconds(year));
+    v[`${tag}.measuredSolarDayS`] = num(m.lengths.measuredSolarDaySeconds(year));
     v[`${tag}.H`] = H;
     v[`${tag}.meanPrecessionPeriodYr`] = H === null ? null : H / 13;   // the identity the plan retires as a claim
     // the orbital side, engine D
@@ -67,11 +84,7 @@ function measure() {
     v[`${tag}.nApsPerH`] = H !== null && Taps ? H / Taps : null;
     v[`${tag}.perihelionOfDatePeriodYr`] = Tp && Taps ? 1 / (1 / Tp + 1 / Taps) : null;
     v[`${tag}.nPeriPerH`] = H !== null && Taps ? 13 + H / Taps : null;
-    // eccentricity — all three evaluators, named. The one-source SERIES
-    // sampler grows a cached grid from J2000 outward (the browser pattern),
-    // so it is read only inside the wander window; the deep anchors use the
-    // closed-form surfaces (mode tables, laws, the tidal chain).
-    const inWindow = Math.abs(year - 2000) <= 50000;
+    // eccentricity — all three evaluators, named (series inside the window)
     v[`${tag}.eDeepModes`] = num(deep.eccAt(year - 2000));
     v[`${tag}.eLawH3`] = num(m.earth.eccentricity(year));
     v[`${tag}.eOneSource`] = oneSource && inWindow ? num(oneSource.e(year)) : null;
