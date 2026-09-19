@@ -38,6 +38,7 @@ const IN = join(ROOT, 'public/input');
 const OUT_JS = join(ROOT, 'packages/physics/src/constants/generated.js');
 const OUT_DTS = join(ROOT, 'packages/physics/src/constants/generated.d.ts');
 const OUT_COEFFS = join(ROOT, 'packages/physics/src/constants/coefficients.js');
+const OUT_COEFFS_DTS = join(ROOT, 'packages/physics/src/constants/coefficients.d.ts');
 
 /**
  * Fitted coefficients emitted VERBATIM from fitted-coefficients.json (§2j).
@@ -360,18 +361,42 @@ ${blocks.map((b) => `  ${b}: ${JSON.stringify(included[b], null, 2).split('\n').
 ${refSection}`;
 }
 
-function emitDts({ included, reference, hash }) {
-  const t = (v, ind = '  ') => {
-    if (Array.isArray(v)) return v.length && typeof v[0] === 'number' ? 'number[]' : 'unknown[]';
-    if (v === null) return 'null';
-    if (typeof v === 'object') {
-      const inner = Object.entries(v)
-        .map(([k, x]) => `${ind}  ${JSON.stringify(k)}: ${t(x, `${ind}  `)};`)
-        .join('\n');
-      return `{\n${inner}\n${ind}}`;
+/**
+ * The TypeScript type of a JSON value, rendered structurally (object shapes
+ * recurse; homogeneous arrays by element type; a nested/object array takes
+ * its first element's shape — the JSON here is homogeneous by construction).
+ * Shared by the constants and the coefficients declarations so both
+ * boundaries carry the same precision.
+ * @param {unknown} v @param {string} [ind] @returns {string}
+ */
+function tsTypeOf(v, ind = '  ') {
+  if (Array.isArray(v)) {
+    if (!v.length) return 'unknown[]';
+    const prims = v.every((x) => x === null || typeof x !== 'object');
+    if (prims) {
+      const kinds = [...new Set(v.map((x) => (x === null ? 'null' : typeof x)))].sort();
+      // a short numeric array is a TUPLE in this codebase's conventions
+      // ([div, sin, cos] harmonics rows, [lo, hi] pairs) — the factories'
+      // JSDoc types them so; a tuple is assignable to number[] regardless
+      if (kinds.length === 1 && kinds[0] === 'number' && v.length >= 2 && v.length <= 4) {
+        return `[${v.map(() => 'number').join(', ')}]`;
+      }
+      return kinds.length === 1 ? `${kinds[0]}[]` : `Array<${kinds.join(' | ')}>`;
     }
-    return typeof v;
-  };
+    return `Array<${tsTypeOf(v[0], ind)}>`;
+  }
+  if (v === null) return 'null';
+  if (typeof v === 'object') {
+    const inner = Object.entries(v)
+      .map(([k, x]) => `${ind}  ${JSON.stringify(k)}: ${tsTypeOf(x, `${ind}  `)};`)
+      .join('\n');
+    return `{\n${inner}\n${ind}}`;
+  }
+  return typeof v;
+}
+
+function emitDts({ included, reference, hash }) {
+  const t = tsTypeOf;
   const body = Object.keys(included).sort()
     .map((b) => `  readonly ${b}: ${t(included[b])};`)
     .join('\n');
@@ -630,6 +655,27 @@ ${keys.map((k) => `  ${k}: ${JSON.stringify(out[k])},`).join('\n')}
 `;
 }
 
+/**
+ * The coefficients' declaration file — the same structural precision the
+ * constants get in generated.d.ts (a `Record<string, unknown>` at this
+ * boundary forced every TypeScript consumer to re-declare the shapes by
+ * hand; the website carried such a shim through four minor versions).
+ * Sits beside coefficients.js, so TypeScript reads it for every importer.
+ */
+function emitCoefficientsDts({ out, hash }) {
+  const keys = Object.keys(out).sort();
+  return `// GENERATED — do not edit. Regenerate: node tools/constants/generate.mjs --write
+// The fitted coefficients' shapes for TypeScript consumers (§2g); values live
+// in coefficients.js, emitted VERBATIM from fitted-coefficients.json.
+
+export declare const COEFFICIENTS_HASH: ${JSON.stringify(hash)};
+
+export declare const FITTED_COEFFICIENTS: {
+${keys.map((k) => `  readonly ${k}: ${tsTypeOf(out[k])};`).join('\n')}
+};
+`;
+}
+
 // ── run ──────────────────────────────────────────────────────────────────────
 const result = build();
 const coeffs = buildCoefficients();
@@ -650,6 +696,7 @@ const dts = emitDts(result);
 const write = process.argv.includes('--write');
 
 const coeffJs = emitCoefficients(coeffs);
+const coeffDts = emitCoefficientsDts(coeffs);
 const chainArt = buildChainArtifact();
 const chainJs = emitChainArtifact(chainArt);
 const deepModes = buildDeepModes(chainArt);
@@ -662,6 +709,7 @@ if (write) {
   writeFileSync(OUT_JS, js);
   writeFileSync(OUT_DTS, dts);
   writeFileSync(OUT_COEFFS, coeffJs);
+  writeFileSync(OUT_COEFFS_DTS, coeffDts);
   writeFileSync(OUT_CHAIN, chainJs);
   writeFileSync(OUT_DEEP_MODES, deepJs);
   writeFileSync(OUT_SIDEREAL, siderealJs);
@@ -672,13 +720,14 @@ if (write) {
   console.log(`  deep-modes embed  ${deepModes.hash}  (deep-time Earth-z table, verbatim + joined anchor)`);
   console.log(`  sidereal embed    ${siderealChan.hash}  (D6 λ̇ channel, ${siderealChan.payload.lamDotRel.length} samples @ ${siderealChan.payload.stepYr} yr)`);
   console.log(`  excluded: ${Object.entries(result.excluded).map(([b, c]) => `${b} (${c})`).join(', ')}`);
-  console.log('  -> packages/physics/src/constants/{generated.js,generated.d.ts,coefficients.js} + planets/chain-artifact.js + moon/deep-modes-artifact.cjs + earth/sidereal-channel-artifact.cjs');
+  console.log('  -> packages/physics/src/constants/{generated.js,generated.d.ts,coefficients.js,coefficients.d.ts} + planets/chain-artifact.js + moon/deep-modes-artifact.cjs + earth/sidereal-channel-artifact.cjs');
   process.exit(0);
 }
 
 let current = null;
 let currentDts = null;
 let currentCoeffs = null;
+let currentCoeffsDts = null;
 let currentChain = null;
 let currentDeep = null;
 let currentSidereal = null;
@@ -686,6 +735,7 @@ try {
   current = readFileSync(OUT_JS, 'utf8');
   currentDts = readFileSync(OUT_DTS, 'utf8');
   currentCoeffs = readFileSync(OUT_COEFFS, 'utf8');
+  currentCoeffsDts = readFileSync(OUT_COEFFS_DTS, 'utf8');
   currentChain = readFileSync(OUT_CHAIN, 'utf8');
   currentDeep = readFileSync(OUT_DEEP_MODES, 'utf8');
   currentSidereal = readFileSync(OUT_SIDEREAL, 'utf8');
@@ -697,11 +747,11 @@ console.log(`  ${countLeaves(result.included)} values · ${Object.keys(result.in
 console.log(`  excluded (never injectable): ${Object.keys(result.excluded).join(', ')}`);
 console.log(`  coefficients: ${Object.keys(coeffs.out).length} arrays · hash ${coeffs.hash}`);
 
-if (current === null || currentCoeffs === null || currentChain === null || currentDeep === null || currentSidereal === null) {
+if (current === null || currentCoeffs === null || currentCoeffsDts === null || currentChain === null || currentDeep === null || currentSidereal === null) {
   console.log('\nFAIL — a generated module is missing. Run with --write.');
   process.exit(1);
 }
-if (current !== js || currentDts !== dts || currentCoeffs !== coeffJs || currentChain !== chainJs || currentDeep !== deepJs || currentSidereal !== siderealJs) {
+if (current !== js || currentDts !== dts || currentCoeffs !== coeffJs || currentCoeffsDts !== coeffDts || currentChain !== chainJs || currentDeep !== deepJs || currentSidereal !== siderealJs) {
   console.log('\nFAIL — a generated module is STALE relative to the JSON source of truth.');
   console.log('Run: node tools/constants/generate.mjs --write');
   process.exit(1);

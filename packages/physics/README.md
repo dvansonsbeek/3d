@@ -34,6 +34,10 @@ const { createEclipseFinders } = require('@essrt/physics/eclipse/finders');
 const { createPredictivePrecession } = require('@essrt/physics/planets/predict');
 ```
 
+**TypeScript**: the package ships declaration files (`types/`, one per
+subpath export) generated from the sources' JSDoc — `import` from
+`@essrt/physics` or any subpath is fully typed; no ambient shim needed.
+
 See the `exports` map in `package.json` for the full surface: moon
 (arguments/series/apparent/ecc-channel/month-chain), planets (geometry,
 corrections, predict, model, fibonacci-laws, …), deltat (cycles, deep-time,
