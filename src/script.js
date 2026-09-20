@@ -24467,7 +24467,7 @@ function setupGUI() {
 
   // ── About ── (Model Identity, Licence, Parameter Accounting, Calibration Inputs)
   const aboutFolder = gui.addFolder({ title: 'About', expanded: false });
-  addFolderTooltip(aboutFolder, 'Two engines — the orbital dynamics engine for the planets, the lunisolar precession channel for Earth’s spin and time — with the parameter accounting, calibration inputs and model parameters that define the model.');
+  addFolderTooltip(aboutFolder, 'Two engines — the orbital dynamics engine for the planets, the lunisolar precession channel for Earth’s spin and time — with the parameter accounting and the calibration inputs that define the model.');
 
   // --- Model Identity (§10 two-axis provenance: cite as "model vX.Y") ---
   {
@@ -24524,7 +24524,7 @@ function setupGUI() {
   // 6-DOF/Config-7 framing lives in git + docs 10/109) ---
   {
     const paFolder = aboutFolder.addFolder({ title: 'Parameter Accounting', expanded: false });
-    addFolderTooltip(paFolder, 'Two engines, three ledgers \u2014 zero free parameters where the dynamics live; four named constants where the lattice lives; every fitted coefficient gated and hashed. No single headline count: the ledgers are the accounting.');
+    addFolderTooltip(paFolder, 'Two engines, three ledgers \u2014 zero free parameters where the dynamics live; the lunisolar channel\u2019s constants are derived or cited, with two measured histories behind fail-proven gates; the frozen era clock\u2019s four constants and the correction bases are identifiers of the certified time machinery; every fitted coefficient gated and hashed. No single headline count: the ledgers are the accounting.');
     const c = paFolder.element.querySelector('.tp-fldv_c');
     const head = (t) => {
       const d = document.createElement('div');
@@ -24546,23 +24546,34 @@ function setupGUI() {
       item.appendChild(d);
       c.appendChild(item);
     };
-    head('Ledger 1 \u00B7 The orbital dynamics engine \u2014 the planets');
+    head('Ledger 1 \u00B7 The orbital dynamics engine \u2014 the planets and Earth\u2019s orbit');
     row('Free parameters: none',
       'Inputs, cited not fitted: one J2000 heliocentric state (JPL Horizons vectors, one epoch) \u00B7 DE440 mass ratios \u00B7 1PN. Everything planetary \u2014 element chains, secular modes, the 405.6-kyr metronome \u2014 derives from that seed. Integrator order/step are reproducibility conventions.');
+    row('Earth\u2019s published orbit rides this ledger',
+      'e(t), the inclination and node, \u03D6 of date and the obliquity hybrid derive from the same N-body seed, the IAU 2006 J2000 obliquity and the certified precession anchor. None of the frozen era clock\u2019s constants below enter them.');
     head('Ledger 2 \u00B7 The lunisolar precession channel \u2014 Earth\u2019s spin & time');
+    row('Precession anchor p\u2080 \u00B7 derived \u00B7 ' + _certifiedAxialPrecessionJ2000Years().toLocaleString('en-US', { maximumFractionDigits: 1 }) + ' yr',
+      'Not a parameter: the certified J2000 year laws\u2019 beat, sidereal / (sidereal \u2212 tropical). The deep-time rate composes \u03C9(t)/\u03C9\u2080 \u00B7 p\u2080 \u00B7 [f_S + (1 \u2212 f_S)(a\u2080/a_M)\u00B3]; f_S, the solar share of the J2000 torque, is derived from GM\u2609, the lunar constants and the J2000 obliquity.');
+    row('Lunar recession history \u00B7 LLR-anchored, paleo-gated',
+      'The linear term is the LLR rate 3.82 cm/yr (cited); the deep-time terms are the Farhat 2022 fit and the regime knots fitted to 11 published anchors (Lantink, Zhou, Xiamaling, Moodies \u2026), all within 1.3\u03C3. The 41-anchor paleo gate fails on an unexplained improvement too.');
+    row('GIA channel \u00B7 k derived, \u03C4 = ' + ALPHA_GIA_RELAXATION_KYR + ' kyr measured',
+      'The polar moment\u2019s lagged response to the climate formula\u2019s ice proxy: the coupling k is derived at runtime from the Cox & Chao 2002 dJ\u2082/dt; the relaxation time is measured against the historical \u0394T record.');
+    row('Solar mass loss \u00B7 cited',
+      'Luminosity/c\u00B2 plus wind, from published constants \u2014 the Driver-2 stretch of every heliocentric period, and the \u03BC(t) the two-expansions consistency leg tests.');
+    head('The frozen era clock \u2014 the certified time machinery (4 constants + the bases)');
     row('Fitted timing anchor \u00B7 holisticyearLength = ' + String(holisticyearLength) + ' yr',
-      'Fitted to the 1246 AD perihelion\u2013solstice alignment + the J2000 longitude of perihelion. The unit of the correction bases and the frozen era clock; it scales with the precession period at deep time (anchor/T_p = 13.011, a fit constant \u2014 not a period).');
+      'Fitted to the 1246 AD perihelion\u2013solstice alignment + the J2000 longitude of perihelion. The unit of the correction bases and the era clock \u2014 the cardinal-point and year-length harmonics, the \u0394T stack\u2019s flags and the deep calendar all ride it; it scales with the precession period at deep time (anchor/T_p = 13.011, a fit constant \u2014 not a period).');
     row('Mean obliquity \u00B7 ' + earthtiltMean + '\u00B0',
-      'Fitted to the observed obliquity range (~22.1\u00B0 to ~24.5\u00B0).');
+      'The K comb\u2019s mean, fitted to the observed obliquity range. A device constant: the published obliquity is the hybrid (Ledger 1); the comb still carries the cardinal-point model, the kinematic-day stack\u2019s RA projection, the lunar arguments\u2019 obliquity carrier and the scene\u2019s K geometry.');
     row('Inclination amplitude \u00B7 ' + earthInvPlaneInclinationAmplitude + '\u00B0',
-      'Earth\u2019s inclination amplitude on the invariable plane, fitted to the observed obliquity range.');
+      'The K inclination law\u2019s amplitude, fitted to the observed obliquity range. A device constant: the published inclination is the chain\u2019s (Ledger 1).');
     row('Inclination-cycle anchor \u00B7 ' + earthInclinationCycleAnchor + '\u00B0',
-      'The System-Reset convention \u2014 the one free assumption in its chain; the anchor arithmetic itself is exact. Shared between the inclination cycle and the eccentricity phase.');
+      'The System-Reset convention \u2014 the one free assumption in its chain; the anchor arithmetic itself is exact. Phases the Sun\u2019s eccentricity law and the Moon eccentricity channel\u2019s anchor form.');
     row('Correction-basis divisors \u00B7 device tier',
-      'The correction combs\u2019 divisors and the frozen clock\u2019s counters are identifiers of the fitted machinery \u2014 bounded harmonic bases on the anchor\u2019s unit \u2014 not parameters and not laws; the three pre-registered falsification legs test the physics (the composed precession clock, the obliquity beat, the two-expansions \u03BC-consistency). The balanced year is derived (anchor + 1246 AD); Earth\u2019s e(J2000) is an observed calibration input, and the eccentricity law\u2019s mean derives from it.');
-    head('Ledger 3 \u00B7 The fitted correction stack (gated)');
-    row('Cardinal-point harmonics \u00B7 \u0394T/LOD stack \u00B7 GIA \u03B1(t) \u00B7 lunar corrections',
-      'Fitter-owned coefficient arrays, provenance-tracked, stamped by the coefficients hash (Model Identity above). Every gate is fail-proven, and the paleo-anchors gate fails on an unexplained improvement too. None of them touch the planetary dynamics.');
+      'The correction combs\u2019 divisors and the era clock\u2019s counters are identifiers of the fitted machinery \u2014 bounded harmonic bases on the anchor\u2019s unit \u2014 not parameters and not laws; the three pre-registered falsification legs test the physics (the composed precession clock, the obliquity beat, the two-expansions \u03BC-consistency). The balanced year is derived (anchor + 1246 AD); Earth\u2019s e(J2000) is an observed calibration input, and the eccentricity law\u2019s mean derives from it.');
+    head('Ledger 3 \u00B7 The fitted correction stack (gated, hashed)');
+    row('Year-length, perihelion and solstice-obliquity harmonics \u00B7 cardinal-point families \u00B7 Sun-longitude harmonics \u00B7 Moon corrections \u00B7 per-planet geocentric-precession projections',
+      'Fitter-owned coefficient arrays under the coefficients hash (Model Identity above); the \u0394T/LOD stack, the recession knots and the GIA \u03C4 sit under the constants hash. Every gate is fail-proven. The year-length and cardinal-point families are the frozen era clock\u2019s basis, not the published year lengths, which ride the one-family route. None of these touch the planetary dynamics.');
   }
 
   // --- Calibration Inputs (from astro-reference.json — external observations) ---
@@ -24617,7 +24628,7 @@ function setupGUI() {
     addCalib(earthCalibFolder, earthCalib, 'ciEarthIncl', 'Earth incl. (J2000)', 'Earth orbital inclination to the invariable plane at J2000 (Astronomical Almanac).');
     addCalib(earthCalibFolder, earthCalib, 'ciEccentricity', 'Eccentricity (J2000)', 'Earth orbital eccentricity at J2000 (JPL Horizons).');
     addCalib(earthCalibFolder, earthCalib, 'ciAscNode', 'Asc. node inv. plane', 'Ascending node on the invariable plane at J2000 (Souami & Souchay 2012).');
-    addCalib(earthCalibFolder, earthCalib, 'ciPhaseAngle', 'Incl. phase angle', 'Inclination phase group angle from s8 eigenmode (Laplace-Lagrange).');
+    addCalib(earthCalibFolder, earthCalib, 'ciPhaseAngle', 'Incl. phase angle', 'The inclination-cycle anchor: the System-Reset phase convention (Parameter Accounting, the frozen era clock) — a model convention, not an observation.');
     earthCalibFolder.addBlade({ view: 'separator' });
     addCalib(earthCalibFolder, earthCalib, 'ciSiderealYearSec', 'Sidereal year (s)', 'Mean sidereal year length in seconds (IAU).');
     addCalib(earthCalibFolder, earthCalib, 'ciSiderealYear', 'Sidereal year (days)', 'Sidereal year length in days (JPL Horizons).');
@@ -24634,8 +24645,8 @@ function setupGUI() {
     addCalib(earthCalibFolder, earthCalib, 'ciSiderealDay', 'Sidereal day (J2000)', 'Rotation period relative to the vernal equinox (~23h 56m 4.0905s).');
     addCalib(earthCalibFolder, earthCalib, 'ciStellarDay', 'Stellar day (J2000)', 'Rotation period relative to fixed stars (~23h 56m 4.0989s).');
     addCalib(earthCalibFolder, earthCalib, 'ciPeriPassage', 'Perihelion passage JD', 'Julian Day of Earth perihelion passage at J2000 (2000 Jan 3 13:00 UTC).');
-    addCalib(earthCalibFolder, earthCalib, 'ciAuDist', 'AU distance', '1 AU in km (IAU 2012).');
-    addCalib(earthCalibFolder, earthCalib, 'ciDeltaT', 'Delta-T start', 'Initial Delta-T value in seconds.');
+    addCalib(earthCalibFolder, earthCalib, 'ciAuDist', 'AU distance', 'The model’s AU in km; the IAU 2012 definition is 149,597,870.700 km.');
+    addCalib(earthCalibFolder, earthCalib, 'ciDeltaT', 'Delta-T start', 'ΔT(J2000) trend anchor — FITTED (the joint ΔT-stack optimum, Parameter Accounting Ledger 3); shown for reference, not an observation.');
 
     // -- Moon orbital references --
     const moonCalib = {
@@ -24658,8 +24669,8 @@ function setupGUI() {
     totalCalib += moonCalibCount;
     const moonCalibFolder = calibInputFolder.addFolder({ title: 'Moon (' + moonCalibCount + ')', expanded: false });
     addCalib(moonCalibFolder, moonCalib, 'ciSidereal', 'Sidereal month', 'Sidereal orbital period of the Moon.');
-    addCalib(moonCalibFolder, moonCalib, 'ciAnomalistic', 'Anomalistic month', 'Anomalistic orbital period (perigee to perigee).');
-    addCalib(moonCalibFolder, moonCalib, 'ciNodal', 'Nodal month', 'Nodal orbital period (node to node).');
+    addCalib(moonCalibFolder, moonCalib, 'ciAnomalistic', 'Anomalistic month', 'Anomalistic orbital period (perigee to perigee) — derived from the sidereal month and the apsidal-precession input (kinematic), not an independent observation.');
+    addCalib(moonCalibFolder, moonCalib, 'ciNodal', 'Nodal month', 'Nodal orbital period (node to node) — derived from the sidereal month and the nodal-precession input (kinematic), not an independent observation.');
     addCalib(moonCalibFolder, moonCalib, 'ciDistance', 'Mean distance', 'Mean Earth\u2013Moon distance.');
     addCalib(moonCalibFolder, moonCalib, 'ciEclInc', 'Incl. ecliptic (J2000)', 'Inclination to the ecliptic at J2000.');
     addCalib(moonCalibFolder, moonCalib, 'ciEcc', 'Eccentricity', 'Orbital eccentricity.');
@@ -24711,7 +24722,7 @@ function setupGUI() {
       addCalib(pf, v, 'massRatio', 'Mass (M\u2609)', 'Mass as fraction of solar mass (DE440).');
       addCalib(pf, v, 'period', 'Orbital period', 'Orbital period in days (JPL).');
       addCalib(pf, v, 'eccJ2000', 'Eccentricity (J2000)', 'Orbital eccentricity at J2000 (JPL).');
-      addCalib(pf, v, 'tilt', 'Axial tilt', 'Mean axial tilt (obliquity). Used by Law 4 (K formula).');
+      addCalib(pf, v, 'tilt', 'Axial tilt', 'Mean axial tilt (obliquity) — an input to the legacy scene scaffolding only, not the chain.');
       addCalib(pf, v, 'incEcl', 'Incl. ecliptic (J2000)', 'Inclination to the ecliptic at J2000 (JPL).');
       addCalib(pf, v, 'incInv', 'Incl. inv. plane (J2000)', 'Inclination to the invariable plane at J2000 (Souami & Souchay 2012).');
       addCalib(pf, v, 'jplTrend', 'JPL incl. trend', 'JPL ecliptic inclination rate in J2000-fixed frame (\u00B0/century). Target for asc-node verification.');

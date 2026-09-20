@@ -78,18 +78,44 @@ the 405.6-kyr eccentricity metronome, the obliquity hybrid — is derived
 from that seed. Integrator order and step are reproducibility conventions,
 not parameters.
 
-### Ledger 2 — the lunisolar precession channel's constants (Earth's spin & time)
+**Earth's published orbit rides this ledger.** e(t), the inclination and
+node, ϖ of date and the obliquity hybrid derive from the same N-body seed,
+the IAU 2006 J2000 obliquity (the hybrid's initial condition, plan 06 S3b)
+and the certified precession anchor (Ledger 2). None of the frozen era
+clock's constants enter them.
 
-The continuous parameters, each named with its anchor:
+### Ledger 2 — the lunisolar precession channel (Earth's spin & time)
 
-| # | Parameter | Variable | Value | Anchored by |
+The channel's constants are derived or cited; two measured histories sit
+behind fail-proven gates. None is a free parameter:
+
+| Constant | Status | Value | Source |
+|---|---|---|---|
+| Precession anchor p₀ | derived | <!--v:axialPrecExact-->25,771.40<!--/v--> yr | the certified J2000 year laws' beat, sidereal/(sidereal − tropical) (plan 06 S5). The deep-time rate composes ψ̇(t) = [ω(t)/ω₀]·p₀·[f_S + (1 − f_S)(a₀/a_M(t))³] |
+| Solar torque share f_S | derived at runtime | <!--v:earthPrecSolarShareJ2000Pct-->31.6<!--/v--> % | GM☉, the lunar constants and the J2000 obliquity (`precession-composed` `computeSolarTorqueShare`) |
+| Lunar recession history | LLR-anchored + paleo-gated | `alpha1PerMa`, `alpha3PerMa3`, `alpha4PerMa4`, `recessionRegime` | the linear term is the LLR rate <!--v:modernLLRRecessionCmYr-->3.82<!--/v--> cm/yr (Dickey 1994 / Chapront 2002, cited); the deep-time terms are the Farhat 2022 LSQ fit and the regime knots fitted to 11 published anchors, all within 1.3σ (`tools/explore/fit-regime-recession.js`); the 41-anchor paleo gate fails on an unexplained improvement too |
+| GIA channel | k derived, τ measured | τ = <!--v:alphaGiaRelaxationKyr-->6<!--/v--> kyr | the polar moment's lagged response to the climate formula's L1 ice proxy: k derived at runtime from the Cox & Chao 2002 dJ₂/dt; τ measured against the historical ΔT record through the joint fitter (plan 06 D7) |
+| Solar mass loss | cited | luminosity/c² + wind | published constants (`deriveEpochParams`) — the Driver-2 stretch of every heliocentric period; the μ(t) the two-expansions consistency leg tests |
+
+#### The frozen era clock — the certified time machinery (4 constants + the bases)
+
+These are the constants of the FROZEN ERA DEVICE (plan 06 D8), still
+load-bearing for the certified time-domain machinery the gate suite is
+calibrated on — the cardinal-point and year-length harmonics, the ΔT
+stack's flags, the deep JD↔year calendar, the kinematic-day stack, the
+Sun's eccentricity law, the lunar arguments' obliquity carrier and the
+scene's K geometry — and NOT the constants of the published Earth orbit
+or clock (Ledgers 1–2). Retiring them is the Phase 6 question; D2 decided
+relabel, not re-base.
+
+| # | Constant | Variable | Value | Anchored by |
 |---|-----------|----------|-------|-------------|
-| 1 | The fitted timing anchor — the unit of the correction bases and the frozen era clock; it scales with the precession period at deep time (anchor/T_p = 13.011, a fit constant — not a period, plan 06 S5) | `holisticyearLength` | <!--v:H-->335,317<!--/v--> years | 1246 AD perihelion–solstice alignment + J2000 longitude of perihelion |
-| 2 | Mean obliquity | `earthtiltMean` | <!--v:meanObliquity-->23.41353<!--/v-->° | observed obliquity range |
-| 3 | Inclination amplitude | `earthInvPlaneInclinationAmplitude` | <!--v:earthInclAmp-->0.63607<!--/v-->° | observed obliquity range |
-| 4 | Inclination-cycle anchor | `earthInclinationCycleAnchor` | 21.77° | the System-Reset convention — the one free assumption in its chain; the anchor arithmetic itself is exact. Shared between the inclination cycle and the eccentricity phase |
+| 1 | The fitted timing anchor — the unit of the correction bases and the era clock; it scales with the precession period at deep time (anchor/T_p = 13.011, a fit constant — not a period, plan 06 S5) | `holisticyearLength` | <!--v:H-->335,317<!--/v--> years | 1246 AD perihelion–solstice alignment + J2000 longitude of perihelion |
+| 2 | Mean obliquity — the K comb's mean; the published obliquity is the hybrid (Ledger 1) | `earthtiltMean` | <!--v:meanObliquity-->23.41353<!--/v-->° | observed obliquity range |
+| 3 | Inclination amplitude — the K inclination law's; the published inclination is the chain's (Ledger 1) | `earthInvPlaneInclinationAmplitude` | <!--v:earthInclAmp-->0.63607<!--/v-->° | observed obliquity range |
+| 4 | Inclination-cycle anchor — phases the Sun's eccentricity law and the Moon eccentricity channel's anchor form | `earthInclinationCycleAnchor` | 21.77° | the System-Reset convention — the one free assumption in its chain; the anchor arithmetic itself is exact |
 
-The correction combs' divisors and the frozen clock's counters are devices
+The correction combs' divisors and the era clock's counters are devices
 of the fitted machinery — bounded harmonic bases on the anchor's unit (plan
 06 P3) — not degrees of freedom and not laws; what the three pre-registered
 falsification legs test is the physics: the composed precession clock, the
@@ -101,13 +127,19 @@ the shared anchor.
 
 ### Ledger 3 — the fitted correction stack (named, gated, hashed)
 
-The fitted-coefficient arrays — cardinal-point harmonics, the ΔT/LOD stack,
-GIA α(t), lunar corrections — under the coefficients hash (shown in the
-simulator's About → Model Identity). Every array is fitter-owned,
-provenance-tracked, and behind fail-proven gates; the paleo-anchors gate
-fails on an unexplained *improvement* too. These correct the certified
-time-domain machinery; none of them touch the planetary dynamics
-(Ledger 1). The year-length harmonics and the cardinal-point family are
+The fitted-coefficient arrays under the coefficients hash (shown in the
+simulator's About → Model Identity): the year-length harmonics (tropical,
+sidereal, anomalistic), the perihelion harmonics, the solstice-obliquity
+mean and harmonics (the K comb), the five cardinal-point families
+(harmonics, anchors, eccentricity, joint and derived terms), the
+Sun-longitude harmonics, the Moon corrections, and the per-planet
+geocentric-precession projection coefficients (a chart-layer readout). The
+ΔT/LOD stack's fitted constants, the recession knots and the GIA τ sit in
+`model-parameters.json` under the constants hash. Every array is
+fitter-owned, provenance-tracked, and behind fail-proven gates; the
+paleo-anchors gate fails on an unexplained *improvement* too. These correct
+the certified time-domain machinery; none of them touch the planetary
+dynamics (Ledger 1). The year-length harmonics and the cardinal-point family are
 the FROZEN era clock's basis — a device, not the published year lengths
 (plan 06 Phase 3 S2): the published tropical, sidereal and anomalistic
 years of date and the precession periods ride the one-family route
