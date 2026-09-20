@@ -261,7 +261,7 @@ These are computed from foundational constants. The formula is the definition; t
 | Mean Anomalistic Year | `meanAnomalisticYearDays` | meanSolarYearDays / (H/16 - 1) + meanSolarYearDays | <!--v:anomalisticYearDaysFull-->365.259632390<!--/v--> days |
 | Mean Length of Day | `meanLengthOfDay` | meanSiderealYearSeconds / meanSiderealYearDays | ~86,400.0 s |
 | Mean Sidereal Day | `meanSiderealDay` | (meanSolarYearDays/(meanSolarYearDays+1)) × meanLengthOfDay | <!--v:meanSiderealDaySeconds-->86,164.0902182<!--/v--> s |
-| Mean Stellar Day | `meanStellarDay` | (meanSiderealDay/(H/13)) / (meanSolarYearDays+1) + meanSiderealDay | <!--v:meanStellarDaySeconds-->86,164.0985857<!--/v--> s |
+| Mean Stellar Day | `meanStellarDay` | (meanSiderealDay/T_p) / (meanSolarYearDays+1) · cos ε + meanSiderealDay — T_p the certified J2000 precession period, not the counter H/13 | <!--v:meanStellarDaySeconds-->86,164.0985929<!--/v--> s |
 | Balanced Year | `balancedYear` | perihelionalignmentYear - (14.5 × H/16) | <!--v:balancedYear-->-302,635<!--/v--> |
 | Perihelion Alignment JD | `perihelionalignmentJD` | startmodelJD - meanSolarYearDays × (startModelYearWithCorrection - perihelionalignmentYear) | ~<!--v:periAlignJD-->2,176,153<!--/v--> |
 | Perihelion Cycle Length | `perihelionCycleLength` | H / 16 | <!--v:periPrecYears-->~20,936<!--/v--> years |

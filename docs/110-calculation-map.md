@@ -376,7 +376,7 @@ Comb divisors (the H-divisor harmonics each (A) family adds to its tidal-chain b
 | LOD kinematic of date | T_sid,mass-loss(t) / sidereal-year-days(A)(y) — the tidal-tier year in seconds over the comb-family year in days | C + P | `model.js` 433 |
 | measured solar day | LOD kinematic + RA-day-offset(y)/1000; RA offset = −14.194 − 5.64·cos(phase₁₆) − 1.684·cos(phase₈) ms (fitted; phases on the H/16 and H/8 counters) | **C + L** | `model.js` 434–437, 577 |
 | sidereal day | solar-year-seconds / (tropical-year-days(A′) + 1) | (inherits A′) | `model.js` 561–564 |
-| stellar day | sidereal day + the RA-projection term (solar-year/(days+1)/(H(t)/13)/(days+1))·cos ε — one extra rotation per precession | **U/P** (the 13, H(t)) | `model.js` 566–575 |
+| stellar day | sidereal day + the RA-projection term (solar-year/(days+1)/T_p(t)/(days+1))·cos ε — one extra rotation per precession turn, T_p(t) the composed lunisolar period (S5: its certified J2000 anchor past the chain's domain), not the counter H(t)/13 (7 µs slow) | **P** (rides T_p, none) | `model.js` `stellarDaySeconds` |
 | LOD tidal mean | 2πI(t)/(L_EM − L_M) (chain 2.1 step 3) | — | `deltat/deep-time.cjs` 80–86 |
 | LOD actual | mean(t) × kinematic-sidereal-days(J2000) / sidereal-year-days(A)(y) — the comb ripple on the tidal mean | C | `deltat/deep-time.cjs` 198–205 |
 | LOD with cycle corrections | tidal mean + the ΔT-stack cycle sum (Bond, Hallstatt, Jose5, Jose4 — cycles labeled as integer divisors of the eightfold unit, amplitudes fitted) | **C** | `deltat/deep-time.cjs` 187–193; `deltat/cycles.cjs` |
@@ -388,7 +388,7 @@ Comb divisors (the H-divisor harmonics each (A) family adds to its tidal-chain b
 | -2584 | 86399.92002 | 86399.90722 | -12.796 | 86164.0111 | 86164.0194 | 86399.91964 | 86399.92034 |
 | -584 | 86399.95515 | 86399.94531 | -9.838 | 86164.0460 | 86164.0543 | 86399.95473 | 86399.95547 |
 | 0 | 86399.96525 | 86399.95599 | -9.256 | 86164.0560 | 86164.0644 | 86399.96482 | 86399.96557 |
-| 1246 | 86399.98686 | 86399.97831 | -8.554 | 86164.0775 | 86164.0858 | 86399.98643 | 86399.98718 |
+| 1246 | 86399.98686 | 86399.97831 | -8.554 | 86164.0775 | 86164.0859 | 86399.98643 | 86399.98718 |
 | 2000 | 86400.00011 | 86399.99160 | -8.508 | 86164.0906 | 86164.0990 | 86399.99968 | 86400.00043 |
 | 5000 | 86400.05536 | 86400.04449 | -10.866 | 86164.1455 | 86164.1539 | 86400.05497 | 86400.05568 |
 | 10000 | 86400.15827 | 86400.14080 | -17.469 | 86164.2478 | 86164.2562 | 86400.15807 | 86400.15859 |

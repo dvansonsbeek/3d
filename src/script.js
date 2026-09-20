@@ -1092,7 +1092,7 @@ const _EPOCH_SEEDS_J2000 = Object.freeze({
 });
 
 let   meanSiderealday = (meansolaryearlengthinDays/(meansolaryearlengthinDays+1))*meanlengthofday;  // Phase 6: mutable (Tier 2)
-let   meanStellarday = (meanSiderealday/(holisticyearLength/13))/(meansolaryearlengthinDays+1)*STELLAR_DAY_RA_PROJECTION+meanSiderealday;  // Phase 6: mutable (Tier 2)
+let   meanStellarday = NaN;  // Phase 6: mutable (Tier 2) — set by recomputeDerivedAnchorsForEpoch on the certified precession period (the Direct laws are not initialised at this line; no consumer reads it before that call)
 // --- Coin rotation offsets (derived from day/year lengths and precession cycles) ---
 // Perihelion coin rotation: 1 extra solar day over H/16 cycle
 let   perihelionCoinRotationMs = (meanlengthofday / (holisticyearLength / 16)) / meansolaryearlengthinDays * 1000;  // Phase 6: mutable (Tier 2)
@@ -2832,10 +2832,7 @@ function _deepLod() {
       // of-date year laws' beat at 2000 (25,771.4 yr; the SAME anchor the
       // hybrid self-anchors on), read lazily on the first rate use. Never
       // H/13 (25,793.6, the fit anchor's reading — not a period).
-      precessionPeriodJ2000YearsFn: () => {
-        const sid = computeSiderealYearDaysDirect(2000), sol = computeSolarYearDaysDirect(2000);
-        return sid / (sid - sol);
-      },
+      precessionPeriodJ2000YearsFn: _certifiedAxialPrecessionJ2000Years,
       // Plan 06 T2 item: the solar day's ecliptic missing-motion term rides
       // the nodal period 1,296,000/|s₃| (orbital), not the spin unit's H/5.
       nodalPeriodYearsFn: () => 1296000 / _s3ArcsecPerYr(),
@@ -2953,6 +2950,27 @@ function meanLodSecondsAtAgeActual(t_Ma) {
  * @param {number} year — calendar year (SI-tropical decimal)
  * @returns {number} correction in seconds to add to LOD_mean
  */
+// S5 (plan 06): the model's ONE J2000 axial-precession reading — the certified
+// of-date year laws' beat at 2000 (25,771.4 yr). Twin of tools/lib/deep-time.js
+// certifiedAxialPrecessionJ2000Years (identical ops). Never H/13 (25,793.6 is
+// the frozen clock's counter — the fit anchor's reading, 0.086 % slow, not a
+// period). Lazy + memoized: the Direct laws read the factory's bases.
+let _certifiedAxial0Memo = null;
+function _certifiedAxialPrecessionJ2000Years() {
+  if (_certifiedAxial0Memo === null) {
+    const sid = computeSiderealYearDaysDirect(2000), sol = computeSolarYearDaysDirect(2000);
+    _certifiedAxial0Memo = sid / (sid - sol);
+  }
+  return _certifiedAxial0Memo;
+}
+/** Axial-precession period at age t_Ma, years: the composed lunisolar clock
+ *  (ONE home, @essrt/physics precession-composed via the factory); its J2000
+ *  anchor past the tidal chain's domain. The stellar-day family reads this —
+ *  the equinox regresses one turn per T_p(t), not per the counter H(t)/13. */
+function _axialPrecessionPeriodYearsAtAge(t_Ma) {
+  return _deepLod().lunisolarPrecessionPeriodYearsAtAge(t_Ma) ?? _certifiedAxialPrecessionJ2000Years();
+}
+
 function h5Correction(year) {
   // Plan 06 T2 item: ONE home in the shared factory — the divisor is the
   // nodal period 1,296,000/|s₃| (orbital, constant at every epoch), formerly
@@ -4680,7 +4698,9 @@ function recomputeDerivedAnchorsForEpoch(t_Ma) {
   meanearthRotationsinDays  = meansolaryearlengthinDays + 1;
   earthPerihelionICRFYears  = holisticyearLength / 3;
   meanSiderealday           = (meansolaryearlengthinDays / (meansolaryearlengthinDays + 1)) * meanlengthofday;
-  meanStellarday            = (meanSiderealday / (holisticyearLength / 13)) / (meansolaryearlengthinDays + 1) * STELLAR_DAY_RA_PROJECTION + meanSiderealday;
+  // S5: the equinox regresses one turn per T_p(t) — the composed lunisolar period
+  // (its J2000 anchor 25,771.4 yr), NOT the counter H/13 (0.086 % slow; 7 µs here).
+  meanStellarday            = (meanSiderealday / _axialPrecessionPeriodYearsAtAge(t_Ma)) / (meansolaryearlengthinDays + 1) * STELLAR_DAY_RA_PROJECTION + meanSiderealday;
   perihelionCoinRotationMs  = (meanlengthofday / (holisticyearLength / 16)) / meansolaryearlengthinDays * 1000;
   perihelionCoinRotationYearlySeconds = perihelionCoinRotationMs * meansolaryearlengthinDays / 1000;
   // NOT projected by STELLAR_DAY_RA_PROJECTION, unlike meanStellarday above:
@@ -20999,7 +21019,7 @@ const VFP_CATEGORIES = [
     model: { name: 'This model (one-source)', color: '#f0b040',
       fn: year => _hybridSpinActive()
         ? _hybridSeriesSampleAt(year).periOfDateDeg
-        : (((_kcPerihelionEclLonDeg('earth', yearToJDApprox(year)) + (360 / (holisticyearLength / 13)) * (year - 2000)) % 360) + 360) % 360 },
+        : (((_kcPerihelionEclLonDeg('earth', yearToJDApprox(year)) + (360 / _certifiedAxialPrecessionJ2000Years()) * (year - 2000)) % 360) + 360) % 360 },
     references: [
       { name: 'Meeus (1991)', color: '#81c784', fn: perihelionMeeusEarth, sourceUrl: 'https://ui.adsabs.harvard.edu/abs/1994A%26A...282..663S' },
       { name: 'La2004 (Laskar)', color: '#e53935', fn: perihelionLa2004, sourceUrl: 'https://doi.org/10.1051/0004-6361:20041335' },
@@ -37910,7 +37930,7 @@ async function runYearAnalysisExport(years) {
     ['ΔT stack. Each value is the mean of its sheet-2 column.'],
     ['  solar day    = LOD real (the production value; tweakpane Solar Day = REAL)'],
     ['  sidereal day = solarYearDays × LOD_kinematic / (solarYearDays + 1)'],
-    ['  stellar day  = sidereal day / T_prec / (solarYearDays + 1) × cos(ε) + sidereal day'],
+    ['  stellar day  = sidereal day / T_p(t) / (solarYearDays + 1) × cos(ε) + sidereal day   (T_p = the composed precession period)'],
     ['Sidereal and stellar use the KINEMATIC LOD, not LOD real — the kinematic'],
     ['base is the one that reproduces the IAU sidereal day at J2000.'],
     ['Mean Solar Day (LOD real, s)', ''],     // filled after the sheet-2 loop
@@ -38125,7 +38145,7 @@ async function runYearAnalysisExport(years) {
     const siderealDayRow = (solarYearDaysRow * derivedDayLength) / (solarYearDaysRow + 1);
     // CURRENT family: siderealDayRow is built from this row's own kinematic LOD,
     // so the projection must use this row's own obliquity, not OBLIQUITY_MEAN.
-    const stellarDayRow = (siderealDayRow / (holisticyearLength / 13)) / (solarYearDaysRow + 1)
+    const stellarDayRow = (siderealDayRow / _axialPrecessionPeriodYearsAtAge((2000 - year) / 1e6)) / (solarYearDaysRow + 1)
       * stellarDayRaProjection(computeObliquityEarth(year)) + siderealDayRow;
     // Feed section 1a — accumulated HERE, inside the per-year epoch, so the
     // Summary means are the means of these exact columns.
@@ -51809,8 +51829,13 @@ function buildPerihelionChart(planetKey, currentYear) {
   // the same physical direction either way). Computed from the CHART's
   // own element set so the dot readouts ride the curves.
   const invNodeOf = (el) => convertNodeSFrameToEquatorOriginDeg(el.ascNodeInvPlaneDeg, _kcNodeOriginSSDeg());
+  // Earth's ϖ of date: the series the chart curve itself draws (its own year
+  // convention), else the certified J2000 general-precession rate — never
+  // the H/13 counter (4.3″/cy off the curve, measured).
   const periOf = (el, yr) => planetKey === 'earth'
-    ? ((el.lonPeriEclipticDeg + (360 / (holisticyearLength / 13)) * (yr - 2000)) % 360 + 360) % 360
+    ? (_hybridSpinActive()
+        ? _hybridSeriesSampleAt(yr).periOfDateDeg
+        : ((el.lonPeriEclipticDeg + (360 / _certifiedAxialPrecessionJ2000Years()) * (yr - 2000)) % 360 + 360) % 360)
     : el.lonPeriEclipticDeg;
   const tipFor = (who, yr, el) => `${who}: ${fmtYr(yr)}\n` +
     `Incl. to Inv. Plane: ${el.inclInvPlaneDeg.toFixed(4)}°\n` +
@@ -53126,6 +53151,24 @@ function _kcElementsOfDate(nameLower, jd) {
 }
 function _kcPerihelionEclLonDeg(nameLower, jd) {
   return _kcElementsOfDate(nameLower, jd).lonPeriEclipticDeg;
+}
+/** Earth's ecliptic ϖ OF DATE (equinox-referenced), degrees — ONE home for the
+ *  Earth panel's ϖ/ω rows, the perihelion gauge and the mean/true-longitude
+ *  rows: the one-source series' periOfDateDeg (the chain's J2000-frame ϖ
+ *  carried on the composed equinox motion, wobble included — the SAME field
+ *  the D4c apsidal wheel renders; ≡ the chain at J2000 to 0.00″, measured)
+ *  while the movement is live, sampled in the wheel's own year convention;
+ *  otherwise the chain's J2000-frame ϖ advanced at the certified J2000
+ *  general-precession rate (S5). Never the H/13 counter: 0.043″/yr slow —
+ *  the panel read 4.3″/century off the chart (measured), and both linear
+ *  gauges part from the series by 37″ at 3000 AD (the wobble). */
+function earthPerihelionEclipticOfDateDeg(jd, year) {
+  if (_hybridSpinActive()) {
+    const ySample = DEEP_TIME_MODE_ENABLED ? _jdToSIyear(jd) : year;
+    return _hybridSeriesSampleAt(ySample).periOfDateDeg;
+  }
+  const w = _kcPerihelionEclLonDeg('earth', jd) + (360 / _certifiedAxialPrecessionJ2000Years()) * (year - 2000);
+  return ((w % 360) + 360) % 360;
 }
 // D5 CHART SMOOTHING (owner: the chain→series handover drew visible jumps
 // in the cycle charts — Mercury, Neptune): the CHART samples the SERIES
@@ -55691,8 +55734,7 @@ function updatePlanetAnomalies() {
     // K predictive law stranded here had diverged 1.3° from the chain).
     // earthLonPeri above is the scene-equator RA channel and stays the
     // true-anomaly reference because sun.ra lives in the same channel.
-    o.earthArgumentOfPeriapsis = ((_kcPerihelionEclLonDeg('earth', o.julianDay)
-      + (360 / (holisticyearLength / 13)) * (o.currentYear - 2000)) % 360 + 360) % 360;
+    o.earthArgumentOfPeriapsis = earthPerihelionEclipticOfDateDeg(o.julianDay, o.currentYear);
 
     // Get current eccentricity (dynamic)
     const earthE = o.eccentricityEarth || eccentricityBase;
@@ -56332,11 +56374,7 @@ function updateDynamicInclinations() {
   // (all eight) left with the no-decision cleanup batch: WRITE-ONLY since
   // the invariable-plane panel rework moved its detail rows to the
   // chain's inv-plane geometry of date (their only consumer).
-  {
-    const _gprRate = 360 / (holisticyearLength / 13);  // general precession rate (°/yr)
-    const _wE = _kcPerihelionEclLonDeg('earth', o.julianDay);
-    o.earthPerihelionEcliptic = ((_wE + _gprRate * (o.currentYear - 2000)) % 360 + 360) % 360;
-  }
+  o.earthPerihelionEcliptic = earthPerihelionEclipticOfDateDeg(o.julianDay, o.currentYear);
   // (The planets' linear-device "Peri (ICRF)" values — the retired
   // pre-K5 construction — were removed with the invariable-plane panel
   // rework: the panel's detail rows now speak the chain's inv-plane
@@ -57119,7 +57157,8 @@ function updatePredictions() {
   predictions.siderealDayReal = o.siderealDayReal = (o.solarYearDays*o.lodKinematic)/(o.solarYearDays+1);
   // CURRENT family: o.siderealDayReal uses this epoch's kinematic LOD, so the
   // projection tracks this epoch's obliquity (OBLIQUITY_MEAN is the MEAN form).
-  predictions.stellarDayReal = o.stellarDayReal = (o.siderealDayReal/(holisticyearLength/13))/(o.solarYearDays+1)*stellarDayRaProjection(computeObliquityEarth(yearForFormula))+o.siderealDayReal;
+  // S5: one turn of the equinox per T_p(t) (the composed clock), not per the counter H/13.
+  predictions.stellarDayReal = o.stellarDayReal = (o.siderealDayReal/_axialPrecessionPeriodYearsAtAge((2000 - yearForFormula) / 1e6))/(o.solarYearDays+1)*stellarDayRaProjection(computeObliquityEarth(yearForFormula))+o.siderealDayReal;
 
   //predictions.predictedDeltat = getDeltaT();
   predictions.predictedDeltatPerYear = o.predictedDeltatPerYear = getDeltaTChangePerYear();
@@ -57185,8 +57224,7 @@ function updatePredictions() {
   // the same expression as the Earth panel's ϖ/ω rows and the perihelion
   // gauge, so every displayed ϖ reads one value (the K law had shown
   // 102.9556 where the chain read 102.9260 at the same date).
-  predictions.longitudePerihelion = ((_kcPerihelionEclLonDeg('earth', o.julianDay)
-    + (360 / (holisticyearLength / 13)) * (o.currentYear - 2000)) % 360 + 360) % 360;
+  predictions.longitudePerihelion = earthPerihelionEclipticOfDateDeg(o.julianDay, o.currentYear);
   
   predictions.longitudePerihelionDatePer = o.longitudePerihelionDatePer = longitudeToDateTime((((earthPerihelionFromEarth.ra * 180 / Math.PI + 360) % 360)-earthRAAngle-180), o.currentYear)
   predictions.longitudePerihelionDateAp = o.longitudePerihelionDateAp = longitudeToDateTime(((earthPerihelionFromEarth.ra * 180 / Math.PI + 360)-earthRAAngle % 360), o.currentYear)

@@ -1294,10 +1294,12 @@ export const VALUES = {
   ...(() => {
     const meanSiderealDaySeconds = () =>
       (C.meanSolarYearDays / (C.meanSolarYearDays + 1)) * C.meanLengthOfDay;
+    // S5: the stellar-day offset counts one equinox turn per T_p (the certified
+    // J2000 precession, 25,771.4 yr), never the counter H/13 (7 µs slow).
     const meanStellarDaySeconds = () => {
       const raProjMean = Math.cos((C.SOLSTICE_OBLIQUITY_MEAN * Math.PI) / 180);
       const d = meanSiderealDaySeconds();
-      return (d / (C.H / 13)) / (C.meanSolarYearDays + 1) * raProjMean + d;
+      return (d / dtl().certifiedAxialPrecessionJ2000Years()) / (C.meanSolarYearDays + 1) * raProjMean + d;
     };
     const siderealDayJ2000Seconds = () => {
       const sol = dtl().computeSolarYearDaysDirect(2000);
@@ -1344,7 +1346,7 @@ export const VALUES = {
         get: () => (meanSiderealDaySeconds() / (C.H / 13)) / (C.meanSolarYearDays + 1) * 1000,
         render: (v) => thousands(v, 2),
         unit: 'ms',
-        note: 'UNPROJECTED ecliptic-lattice count (one extra sidereal day per axial cycle) — deliberately not the 8.37 ms projected offset',
+        note: 'UNPROJECTED count on the frozen clock\'s counter (one extra sidereal day per anchor-interval thirteenth) — deliberately not the 8.37 ms projected offset, which rides T_p',
       },
       siderealDayJ2000: { get: siderealDayJ2000Seconds, render: (v) => thousands(v, 6), unit: 's' },
       stellarDayJ2000: {
@@ -1353,7 +1355,7 @@ export const VALUES = {
           const d = siderealDayJ2000Seconds();
           const oe = require(join(ROOT, 'tools', 'lib', 'orbital-engine.js'));
           const raProj = Math.cos((oe.computeObliquityEarth(2000) * Math.PI) / 180);
-          return (d / (C.H / 13)) / (sol + 1) * raProj + d;
+          return (d / dtl().certifiedAxialPrecessionJ2000Years()) / (sol + 1) * raProj + d;
         },
         render: (v) => thousands(v, 6),
         unit: 's',
@@ -1573,7 +1575,7 @@ export const VALUES = {
       stellarDay: {
         get: () => {
           const d = (C.meanSolarYearDays / (C.meanSolarYearDays + 1)) * C.meanLengthOfDay;
-          return (d / (C.H / 13)) / (C.meanSolarYearDays + 1) * Math.cos((C.SOLSTICE_OBLIQUITY_MEAN * Math.PI) / 180) + d;
+          return (d / dtl().certifiedAxialPrecessionJ2000Years()) / (C.meanSolarYearDays + 1) * Math.cos((C.SOLSTICE_OBLIQUITY_MEAN * Math.PI) / 180) + d;
         },
         render: (v) => '~' + thousands(v, 2),
         unit: 's',

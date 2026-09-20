@@ -1052,13 +1052,23 @@ function meanAnomalisticYearSecondsAtAge(t_Ma) {
 // H/13 is precession in LONGITUDE (along the ecliptic); the sidereal→stellar offset
 // depends on precession in RIGHT ASCENSION (along the equator), m = p·cos(ε).
 // MEAN family, so OBLIQUITY_MEAN. Mirrors STELLAR_DAY_RA_PROJECTION in src/script.js.
+//
+// S5 (plan 06): the precession turn in the OFFSET is one per T_p(t) — the
+// composed lunisolar period (J2000 anchor 25,771.4 yr; certified past the
+// chain's domain), not the unit's counter H(t)/13 (0.086 % slow — 7 µs on
+// the 8.37 ms offset; the IAU offset is 8.373 ms). The sidereal day itself
+// keeps its calendar-tier form (the browser's tropical-year twin), so the
+// offset is taken between the star-referenced day and the T_p-referenced
+// equinox day, then added to the shipped sidereal day.
 function meanStellarDayAtAge(t_Ma) {
   const T_sid_s = meanSiderealYearSecondsAtAge(t_Ma);
   const LOD_s   = meanLodSecondsAtAge(t_Ma);
   if (LOD_s === null) return null;
   const sid       = meanSiderealDayAtAge(t_Ma);
+  const Tp        = meanLunisolarPrecessionPeriodYearsAtAge(t_Ma) ?? certifiedAxialPrecessionJ2000Years();
   const unproj    = T_sid_s / (T_sid_s / LOD_s + 1);
-  return sid + (unproj - sid) * C.STELLAR_DAY_RA_PROJECTION;
+  const sidTp     = T_sid_s / (T_sid_s / LOD_s + 1 + 1 / Tp);
+  return sid + (unproj - sidTp) * C.STELLAR_DAY_RA_PROJECTION;
 }
 
 function meanSiderealDayAtAge(t_Ma) {

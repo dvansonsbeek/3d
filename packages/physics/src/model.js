@@ -643,13 +643,16 @@ export function assembleModel(C, F, laws = {}, secularSeriesArtifact = /** @type
   /** @param {number} year @returns {number} */
   const stellarDaySeconds = (year) => {
     const tMa = yearToTMa(year);
-    const HtRaw = deepLod.hAtAge(tMa);
-    const Ht = HtRaw === null ? H : HtRaw;
+    // S5 (plan 06): one equinox turn per T_p(t) — the composed lunisolar
+    // period (its certified J2000 anchor past the chain's domain), NOT the
+    // unit's counter H(t)/13 (0.086 % slow; 7 µs on the 8.37 ms offset).
+    const TpRaw = deepLod.lunisolarPrecessionPeriodYearsAtAge(tMa);
+    const Tp = TpRaw === null ? certifiedAxialPrecessionJ2000Years() : TpRaw;
     const syS = solarYearSeconds(year);
     const syD = tropicalYearDays(year);
     const sidDay = siderealDaySeconds(year);
     const raProjection = Math.cos((obliquityDeg(year) * Math.PI) / 180);
-    return (syS / (syD + 1) / (Ht / 13) / (syD + 1)) * raProjection + sidDay;
+    return (syS / (syD + 1) / Tp / (syD + 1)) * raProjection + sidDay;
   };
   /** @param {number} year @returns {number} */
   const measuredSolarDaySeconds = (year) => dayLengthSeconds(year) + raDayOffsetMs(year) / 1000;

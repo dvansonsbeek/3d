@@ -196,7 +196,7 @@ siderealDay = solarYearSec / (solarYearSec / 86400 + 1)
 
 **Stellar day** — the time for Earth to rotate 360° relative to fixed stars (ICRF). Slightly *longer* than the sidereal day because the vernal equinox precesses westward, so Earth needs less rotation to "catch" the moving equinox than to return to the same fixed star. The precession correction adds ~8.37 ms to the sidereal day.
 
-The rate that matters here is precession in **right ascension** (along the equator, m ≈ 4612″/cy), not precession in **longitude** (along the ecliptic, p ≈ 5029″/cy, which is what H/13 represents). The two are related by m = p·cos ε, so the H/13 rate carries `STELLAR_DAY_RA_PROJECTION = cos ε`. Without it the offset comes out ~9.12 ms, overshooting the IAU value of 8.373 ms by 1/cos ε. See § "Stellar−Sidereal Offset" below.
+The rate that matters here is precession in **right ascension** (along the equator, m ≈ 4612″/cy), not precession in **longitude** (along the ecliptic, p ≈ 5029″/cy — the axial precession, one turn per T_p(t), the composed lunisolar period whose J2000 anchor is <!--v:axialPrecRound-->~25,771<!--/v--> yr). The two are related by m = p·cos ε, so the precession rate carries `STELLAR_DAY_RA_PROJECTION = cos ε`. Without it the offset comes out ~9.12 ms, overshooting the IAU value of 8.373 ms by 1/cos ε. See § "Stellar−Sidereal Offset" below.
 
 ### J2000 Day-Length Values
 
@@ -338,12 +338,14 @@ These are **two different quantities** that happen to share a formula. Before th
 
 This is a device count on the anchor's divisors and is deliberately **not** projected. `axialCoinRotationMs` uses the unprojected rate. Substituting 8.37 ms into the identity gives 0.917 days, not 1.000.
 
-**Stellar−sidereal day offset — 8.37 ms, on the equator.** The physical difference between the two day lengths depends on how fast the equinox moves *along the equator* (precession in right ascension, m), not along the ecliptic (precession in longitude, p, which is what H/13 represents). Since m = p·cos ε, the stellar day carries `STELLAR_DAY_RA_PROJECTION = cos ε`:
+**Stellar−sidereal day offset — 8.37 ms, on the equator.** The physical difference between the two day lengths depends on how fast the equinox moves *along the equator* (precession in right ascension, m), not along the ecliptic (precession in longitude, p — one turn per T_p(t), the composed precession period, <!--v:axialPrecRound-->~25,771<!--/v--> yr at J2000). Since m = p·cos ε, the stellar day carries `STELLAR_DAY_RA_PROJECTION = cos ε`:
 
 ```
-stellarDay = siderealDay × (1 + cos(ε) / (H/13 × rotationsPerYear))
+stellarDay = siderealDay × (1 + cos(ε) / (T_p(t) × rotationsPerYear))
            → 8.37 ms above the sidereal day, vs the IAU value of 8.373 ms
 ```
+
+T_p is the physical period here, not the frozen clock's counter (the anchor interval's thirteenth, 0.086 % longer): on the counter the offset reads 7 µs low. The axial coin rotation above stays on the counter by definition — it is a count, not a rate.
 
 **This was confirmed by measurement, not asserted.** The "Analyze Stellar Day" tool's Method D tracks Earth's rotation about its own spin axis against ICRF — using no precession period at all, since the spin axis precesses on the H/13 cone and the projection plane tilts with it — and reproduces the IAU stellar day to ~0.02 ms. Methods A and B, which reference the ecliptic normal instead of the spin axis, overshoot by ~0.79 and ~0.47 ms respectively; that ~23.44° of axis difference *is* the cos ε.
 
