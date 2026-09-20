@@ -229,7 +229,7 @@ where:
                             swing (≈ −2.14 ms at J2000)
 ```
 
-The H/5 correction represents Earth's need to rotate slightly MORE per solar day to catch the Sun on the meridian, because the Sun's apparent motion follows the ecliptic — which precesses at H/5 (the ecliptic precession cycle, <!--v:eclPrecYears-->~67,063<!--/v--> yr). Over one solar day (= 1/mSY of one year), the ecliptic advances by 1/((H/5)·mSY) revolutions — requiring that many extra revolutions of Earth rotation:
+The H/5 correction represents Earth's need to rotate slightly MORE per solar day to catch the Sun on the meridian, because the Sun's apparent motion follows the ecliptic — which precesses at H/5 (the ecliptic precession cycle, <!--v:eclPrecYears-->~68,751<!--/v--> yr). Over one solar day (= 1/mSY of one year), the ecliptic advances by 1/((H/5)·mSY) revolutions — requiring that many extra revolutions of Earth rotation:
 
 ```
 δ_rev = 1 / ((H/5) × mSY)                                ≈ 4.083 × 10⁻⁸ rev/day

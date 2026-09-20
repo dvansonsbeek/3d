@@ -28,7 +28,7 @@ and why.
 
 | # | Document | Description |
 |---|----------|-------------|
-| 01 | [Introduction](01-introduction.md) | Core concepts, the two forces, the Earth Fundamental Cycle |
+| 01 | [Introduction](01-introduction.md) | Core concepts, the two counter-rotating precessions, the lunisolar precession clock |
 | 02 | [User Guide](02-user-guide.md) | How to use the 3D simulation — controls, panels, features |
 | 03 | [Glossary](03-glossary.md) | Essential terms and definitions |
 
@@ -36,19 +36,19 @@ and why.
 
 | # | Document | Description |
 |---|----------|-------------|
-| 99 | [Expanding Solar System Resonance Theory (ESSRT)](99-expanding-solar-system-resonance-theory.md) | The theory: the Solar System Resonance Cycle (8H) and integer-divisor lattice as structural invariants of the Earth–Moon spin/tide system; H(t) expands with geological time under Earth-Moon tidal evolution (Driver 1) and solar mass loss (Driver 2); the two-tier scaling split (spin periods move with H, the 405-kyr metronome does not) confirmed at 1.4 and 2.46 Ga; the deep-time predictions and the falsification criteria |
-| 10 | [The Six Relations](10-fibonacci-laws.md) | The Fibonacci relations with per-relation measured statuses — precession cycles, inclination and eccentricity constants, balance observations, resonance |
+| 99 | [Expanding Solar System Resonance Theory (ESSRT)](99-expanding-solar-system-resonance-theory.md) | The theory: the two expansions — Earth's spin tier on the tidal history (the composed lunisolar precession clock: the day lengthens, the Moon recedes, the precession period grows), every orbit on the solar-mass history; the two-tier scaling split (the precession band moves with the clock, the 405-kyr metronome does not) confirmed at 1.4 and 2.46 Ga; the deep-time predictions and the falsification criteria |
+| 10 | [The Six Relations](10-fibonacci-laws.md) | The six historical relations (retired framing, kept as the record) with per-relation measured statuses — precession cycles, inclination and eccentricity constants, balance observations, resonance |
 | 108 | [The derived Earth-orbit vector](108-derived-earth-orbit-vector.md) | Earth's eccentricity and perihelion as one rotating vector: e is frame-invariant, H/16 belongs to ϖ_of-date (13 + 3 = 16), and the model's H/16 and H/3 laws are LOCAL J2000 rates of that vector; a zero-fitted-constant Laplace–Lagrange e(t) on the framework's own planets reproduces La2004 (corr 0.967 over 250 kyr) — standard secular dynamics, not lattice evidence |
 | 109 | [The model's own N-body: audit, engine, frequencies, lattice test](109-model-nbody-engine-and-lattice-test.md) | The re-evaluation record: the Wisdom–Holman engine reproduces every planet's rates from Newton + the measured masses (Mercury's −43″/cy closed by the 1PN term alone); the secular g/s to 0.1–1%; the lattice tested at its own quantity type (divisors retyped as means / present-epoch / window values); the bound experiments (§12) that left H/3 as the epoch-local tangent of Earth's free eccentricity vector |
 | 110 | [The calculation map](110-calculation-map.md) | The audit's instrument: every published quantity traced to its inputs, formula, engine/type, code location and LIVE value (script-written, freshness-gated) with an H-role column (unit / physics-by-proxy / comb basis / lattice claim) — the spreadsheet-checkable statement of what the model computes; chain 1 = Earth's eccentricity into the lunar chain |
-| 98 | [The Mechanism Behind the 8H/L1 Lattice](98-lattice-mechanism.md) | Active research doc: why the 8H/L1 lattice is real spectral structure — action-angle closure of obliquity-sector secular dynamics forcing eigenfrequencies onto integer divisors of 8H |
+| 98 | [The lattice mechanism (historical framing)](98-lattice-mechanism.md) | Research doc written in the retired integer-label framing, kept as the record: the action-angle-closure argument for the climate formula's lines; the labels themselves were retired by plan 06 T1/T5 |
 
 ### Earth: time & motion
 
 | # | Document | Description |
 |---|----------|-------------|
 | 11 | [Day & Year Length Formulas](11-length-day-year-formulas.md) | Tropical year and day length: measurement methods, validation, the frozen-era laws and the one-source year lengths |
-| 14 | [Solstice Prediction](14-solstice-prediction.md) | Solstice RA and timing from the H/3, H/8, H/16 harmonics — the cardinal-point machinery |
+| 14 | [Solstice Prediction](14-solstice-prediction.md) | Solstice RA and timing from the cardinal-point harmonic combs — the cardinal-point machinery |
 | 65 | [Equation of Center](65-equation-of-center.md) | The Sun wheel's variable-speed construction: the geometric/analytic split, the derived exact-Kepler corrector (default path), the certified-Sun δ overlay, and the registry-resident legacy harmonic layer |
 | 13 | [Perihelion Precession](13-mercury-precession-breakdown.md) | The two perihelion coordinates and their methods, the Earth-frame projection account (§1.8, gate-pinned for all seven planets), and the Laplace–Lagrange comparison |
 
@@ -85,10 +85,10 @@ and why.
 | # | Document | Description |
 |---|----------|-------------|
 | 90 | [Milankovitch Language of the Holistic Model](90-milankovitch-language.md) | The model's Milankovitch framework: five H-divisor periods closed by beat algebra; all six Berger 1978 climatic-precession peaks matched within 0.7% |
-| 91 | [Milankovitch Evidence & Hypothesis Tests](91-milankovitch-evidence.md) | Empirical tests on LR04 + Cheng 2016 + EPICA + CENOGRID: the 8H Orbital Forcing Formula, per-planet contributions, pre-registered super-cycle nulls, fourteen falsifiable follow-up tests, and the 405-kyr off-lattice characterization |
+| 91 | [Milankovitch Evidence & Hypothesis Tests](91-milankovitch-evidence.md) | Empirical tests on LR04 + Cheng 2016 + EPICA + CENOGRID: the climate formula, per-planet contributions, pre-registered super-cycle nulls, fourteen falsifiable follow-up tests, and the 405-kyr off-lattice characterization |
 | 92 | [Climate Formula — Architecture, Variance Decomposition & Implementation](92-climate-formula.md) | The canonical L1 + L2 + L3 climate formula: per-regime ridge-fit architecture, five-layer variance decomposition, LR04 R² = 0.87 post-MPT (0.93 stitched), EPICA CO₂ cross-proxy R² = 0.84, and the reproducing pipeline |
 | 93 | [L1 Lattice Attribution Reference](93-l1-attribution-reference.md) | Per-L1-integer dual attribution (Berger label vs the model's best Earth–planet beat), scored by physical plausibility, on all 33 components — generator-owned |
-| 94 | [Insolation Extension Test (strong null)](94-insolation-null-test.md) | Adding classical Berger insolation features to the climate formula buys ΔR² ≤ +0.0041 — the 8H lattice already encodes the insolation-relevant variance |
+| 94 | [Insolation Extension Test (strong null)](94-insolation-null-test.md) | Adding classical Berger insolation features to the climate formula buys ΔR² ≤ +0.0041 — the climate formula already encodes the insolation-relevant variance |
 | 95 | [Climate Summary — Gravitational Coupling, Not Insolation](95-climate-summary.md) | Capstone synthesis of docs 90–94 |
 | 96 | [Related Work — Literature Context](96-related-work.md) | The framework relative to the 2018–2024 revisions of classical Milankovitch theory |
 
@@ -148,7 +148,7 @@ and why.
 
 | File | Description |
 |------|-------------|
-| [Earth Fundamental Cycle Objects Data](../data/01-holistic-year-objects-data.xlsx) | Planetary positions and orbital elements spanning one complete Earth Fundamental Cycle |
+| [Deep-time objects data](../data/01-holistic-year-objects-data.xlsx) | Planetary positions and orbital elements spanning a 335-kyr window |
 
 ---
 
@@ -221,8 +221,8 @@ Statistical analysis and verification scripts. Install dependencies with `pip in
 
 | File | Description |
 |------|-------------|
-| `fibonacci_significance.py` | Monte Carlo + permutation significance analysis for the Fibonacci structure (11 tests across 3 null distributions, Stouffer's Z combining with correlation correction) |
-| `fibonacci_exoplanet_test.py` | TRAPPIST-1 exoplanet system Fibonacci test |
+| `fibonacci_significance.py` | Monte Carlo + permutation significance analysis for the historical integer-ratio structure (retired framing; 11 tests across 3 null distributions, Stouffer's Z combining with correlation correction) |
+| `fibonacci_exoplanet_test.py` | TRAPPIST-1 exoplanet integer-ratio test (historical) |
 | `fibonacci_eccentricity_scale.py` | Eccentricity balance scale: weight formula, per-planet breakdowns, offset ratios |
 | `fibonacci_eccentricity_structure.py` | Structural decomposition, mirror pair conservation, 10-direction exploration, statistical tests |
 | `predict_tilt_from_eccentricity.py` | K amplitude constant (Law 4) investigation |
@@ -237,10 +237,10 @@ See the [Python Scripts README](../scripts/README.md) and [Predictive Formula Gu
 
 | Concept | Value | Description |
 |---------|-------|-------------|
-| Earth Fundamental Cycle (H) | <!--v:H-->335,317<!--/v--> years | Complete cycle unifying all precession movements |
+| The clock | <!--v:lunisolarPeriodJ2000Yr-->25,771.4<!--/v--> years | The mean lunisolar precession period at J2000 — Earth's spin clock; the other cycles are read against it as ratios |
 | Axial Precession | <!--v:axialPrecRound-->~25,771<!--/v--> yr | Earth's wobble around the EARTH-WOBBLE-CENTER |
-| Apsidal Precession | H/3 (<!--v:inclPrecYears-->~111,772<!--/v--> yr) | PERIHELION-OF-EARTH orbit period |
-| Perihelion Precession | H/16 (<!--v:periPrecYears-->~20,957<!--/v--> yr) | Combined cycle where axial meets inclination |
+| Apsidal Precession | <!--v:inclPrecYears-->~111,570<!--/v--> yr | PERIHELION-OF-EARTH orbit period against the stars (<!--v:lunisolarApsidalPerPrecessionJ2000-->4.329<!--/v--> precession periods today) |
+| Perihelion Precession | <!--v:periPrecYears-->~20,936<!--/v--> yr | The perihelion-of-date cycle: the axial and apsidal rates add |
 | Obliquity Range | ~22.1° – ~24.5° | Earth's axial tilt oscillation |
 
 For all constants and their sources, see the [Constants Reference](20-constants-reference.md).

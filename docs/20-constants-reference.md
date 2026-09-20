@@ -32,8 +32,8 @@ The shared tools module `tools/lib/constants.js` mirrors these with its own 14-s
 
 Per the [Expanding Solar System Resonance Theory (Doc 99)](99-expanding-solar-system-resonance-theory.md), the model has two distinct categories of "constants":
 
-- **Scale-invariant integers** — lattice divisors (3, 5, 8, 13, 16, 21, 34), L1 integer labels (n = 9, 12, ..., 65, 66, 68, ..., 185 — 32 components total), integer divisors of 8H. These are **the same at every epoch** — structural constants of the solar system.
-- **Epoch-dependent literal periods, lengths, and seconds-values** — these scale with the current value of H(t). **Most numeric values tabulated below** (H = <!--v:H-->335,317<!--/v--> yr; sidereal year = 365.25636 days; LOD = 86,400 s; Moon distance = 384,399 km; planet orbital periods in years; etc.) are **J2000-epoch values** — the model's primary calibration anchor. They apply to the modern era; for deep-time / future-projection work, use the epoch-dependent helpers in `src/script.js`:
+- **Device integers** — the correction combs' divisors and the frozen clock's counters: identifiers of the fitted machinery (bounded harmonic bases on the fitted anchor's unit, plan 06 P3/P4). They are not periods and not laws — the physical periods below are dynamical values, and the climate formula rides the engine's own orbital lines (plan 06 T1).
+- **Epoch-dependent periods, lengths, and seconds-values** — these evolve at deep time: the spin-tier periods with the composed lunisolar precession clock, the orbital periods with the solar-mass history. **Most numeric values tabulated below** (the fitted timing anchor `holisticyearLength` = <!--v:H-->335,317<!--/v--> yr; sidereal year = 365.25636 days; LOD = 86,400 s; Moon distance = 384,399 km; planet orbital periods in years; etc.) are **J2000-epoch values** — the model's primary calibration anchor. They apply to the modern era; for deep-time / future-projection work, use the epoch-dependent helpers in `src/script.js`:
 
 | J2000-anchored constant in this doc | Epoch-dependent helper (accepts `t_Ma` argument) |
 |---|---|
@@ -47,7 +47,7 @@ Per the [Expanding Solar System Resonance Theory (Doc 99)](99-expanding-solar-sy
 
 H(t) evolves under two physically independent drivers: **Driver 1** = Earth-Moon tidal evolution (LOD grows, Moon recedes); **Driver 2** = solar mass loss (every planet's orbit slowly expands via Kepler's 3rd law). At Devonian (380 Ma) H ≈ <!--v:hAtDevonian-->282,329<!--/v--> yr; at J2000 H = <!--v:H-->335,317<!--/v--> yr; at +200 Myr H ≈ <!--v:hAt200MyrFuture-->367,019<!--/v--> yr. The integer divisors above are unchanged at every epoch — only the per-cycle period in years (or seconds) scales.
 
-For the canonical derivation chain from `t_Ma` through LOD, H, AU, M_Sun, Kepler year, Moon distance, Moon period, anomalistic year, stellar/sidereal days, and planet orbital + synodic periods, see [Doc 99 — ESSRT](99-expanding-solar-system-resonance-theory.md) and the `mean*AtAge` family in `tools/lib/deep-time.js`. (The Solar System Resonance Cycle at J2000: 8H = <!--v:eightH-->2,682,536<!--/v--> yr; the per-planet 8H/N tabulation is archived — [retired record](retired-record.md).)
+For the canonical derivation chain from `t_Ma` through LOD, the composed precession period, AU, M_Sun, Kepler year, Moon distance, Moon period, anomalistic year, stellar/sidereal days, and planet orbital + synodic periods, see [Doc 99 — ESSRT](99-expanding-solar-system-resonance-theory.md) and the `mean*AtAge` family in `tools/lib/deep-time.js`. (The Solar System Resonance Cycle at J2000: 8H = <!--v:eightH-->2,682,536<!--/v--> yr; the per-planet 8H/N tabulation is archived — [retired record](retired-record.md).)
 
 ---
 
@@ -62,7 +62,7 @@ accounting is retired; the search record lives in
 [doc 10](10-fibonacci-laws.md) and [doc 109](109-model-nbody-engine-and-lattice-test.md),
 and git history carries the old section.)
 
-### Ledger 1 — Engine D inputs (the planets: dynamics — cited, not fitted)
+### Ledger 1 — the orbital dynamics engine's inputs (the planets — cited, not fitted)
 
 Free parameters: **none**. The planetary side is derived from published
 measurements taken as-is:
@@ -78,25 +78,26 @@ the 405.6-kyr eccentricity metronome, the obliquity hybrid — is derived
 from that seed. Integrator order and step are reproducibility conventions,
 not parameters.
 
-### Ledger 2 — Engine K structural parameters (Earth's spin & time: the H-lattice)
+### Ledger 2 — the lunisolar precession channel's constants (Earth's spin & time)
 
 The continuous parameters, each named with its anchor:
 
 | # | Parameter | Variable | Value | Anchored by |
 |---|-----------|----------|-------|-------------|
-| 1 | Earth Fundamental Cycle | `holisticyearLength` | <!--v:H-->335,317<!--/v--> years | 1246 AD perihelion–solstice alignment + J2000 longitude of perihelion |
+| 1 | The fitted timing anchor — the unit of the correction bases and the frozen era clock; it scales with the precession period at deep time (anchor/T_p = 13.011, a fit constant — not a period, plan 06 S5) | `holisticyearLength` | <!--v:H-->335,317<!--/v--> years | 1246 AD perihelion–solstice alignment + J2000 longitude of perihelion |
 | 2 | Mean obliquity | `earthtiltMean` | <!--v:meanObliquity-->23.41353<!--/v-->° | observed obliquity range |
 | 3 | Inclination amplitude | `earthInvPlaneInclinationAmplitude` | <!--v:earthInclAmp-->0.63607<!--/v-->° | observed obliquity range |
 | 4 | Inclination-cycle anchor | `earthInclinationCycleAnchor` | 21.77° | the System-Reset convention — the one free assumption in its chain; the anchor arithmetic itself is exact. Shared between the inclination cycle and the eccentricity phase |
 
-The lattice itself — the integer divisors of H and 8H (13 axial, 8
-obliquity, 5 ecliptic, 3 inclination/eccentricity, 16 e-beat, the 8H/N
-correction family) — is a **discrete structural assumption**, the thing the
-three pre-registered falsification legs test. It is presented as an
-assumption under test, not counted as degrees of freedom. The balanced year
-(−<!--v:anchorYearOffset-->302,635<!--/v-->) stays derived from H + 1246 AD.
-Earth's eccentricity is not a parameter: e(J2000) is an observed calibration
-input, and the H/3 law's mean is derived from it and the shared anchor.
+The correction combs' divisors and the frozen clock's counters are devices
+of the fitted machinery — bounded harmonic bases on the anchor's unit (plan
+06 P3) — not degrees of freedom and not laws; what the three pre-registered
+falsification legs test is the physics: the composed precession clock, the
+obliquity beat, the two-expansions μ-consistency. The balanced year
+(−<!--v:anchorYearOffset-->302,635<!--/v-->) stays derived from the anchor
++ 1246 AD. Earth's eccentricity is not a parameter: e(J2000) is an observed
+calibration input, and the eccentricity law's mean is derived from it and
+the shared anchor.
 
 ### Ledger 3 — the fitted correction stack (named, gated, hashed)
 
@@ -160,15 +161,15 @@ they anchor per-planet geometry but carry no model freedom.
 
 These constants define the model. Changing any of them changes the theory.
 
-## The Earth Fundamental Cycle (H)
+## The fitted timing anchor
 
 | Constant | Variable | Value |
 |----------|----------|-------|
-| Earth Fundamental Cycle | `holisticyearLength` (H) | **<!--v:H-->335,317<!--/v-->** years |
+| The fitted timing anchor | `holisticyearLength` | **<!--v:H-->335,317<!--/v-->** years |
 | Perihelion alignment year | `perihelionalignmentYear` | <!--v:periAlignYear-->1246.03125<!--/v--> AD |
 | Obliquity cycle position | `temperatureGraphMostLikely` | 14.5 (of 16) |
 
-The Earth Fundamental Cycle is divided by small integers to produce all Earth precession cycles (see [Part 2 — Derived Constants](#part-2--derived-constants)). Some of the divisors happen to be Fibonacci numbers; the model treats that as coincidence, not law — the lattice is the structural assumption, tested by the falsification legs.
+The anchor is the unit of the correction bases and of the frozen era clock; it was fitted on the 1246 AD perihelion–solstice alignment (the perihelion-of-date beat). It is not a period: Earth's precession periods are the dynamical values of [Part 2 — Derived Constants](#part-2--derived-constants) — the axial precession period is <!--v:axialPrecExact-->25,771.40<!--/v--> years, of which the anchor is 13.011, a fit constant (plan 06 S5). The former presentation of the anchor as a "master cycle divided by small integers" is retired ([retired record](retired-record.md)).
 
 ## Earth Parameters
 
@@ -245,11 +246,11 @@ These are computed from foundational constants. The formula is the definition; t
 
 | Cycle | Formula | Period (years) | Direction |
 |-------|---------|----------------|-----------|
-| Apsidal Precession | H / 3 | <!--v:inclPrecYears-->~111,772<!--/v--> | Counter-clockwise |
-| Ecliptic Precession | H / 5 | <!--v:eclPrecYears-->~67,063<!--/v--> | Counter-clockwise |
-| Obliquity Cycle | H / 8 | <!--v:obliqCycleYears-->~41,915<!--/v--> | Clockwise (negative) |
+| Apsidal Precession | H / 3 | <!--v:inclPrecYears-->~111,570<!--/v--> | Counter-clockwise |
+| Ecliptic Precession | H / 5 | <!--v:eclPrecYears-->~68,751<!--/v--> | Counter-clockwise |
+| Obliquity Cycle | H / 8 | <!--v:obliqCycleYears-->~41,224<!--/v--> | Clockwise (negative) |
 | Axial Precession | the of-date year laws' beat at J2000 (route B; the fit-era label H/13 read 25,794, retired as a period — plan 06 S5) | <!--v:axialPrecRound-->~25,771<!--/v--> | Clockwise (negative) |
-| Perihelion Precession | H / 16 | <!--v:periPrecYears-->~20,957<!--/v--> | Both directions |
+| Perihelion Precession | H / 16 | <!--v:periPrecYears-->~20,936<!--/v--> | Both directions |
 
 ## Time Constants
 
@@ -263,7 +264,7 @@ These are computed from foundational constants. The formula is the definition; t
 | Mean Stellar Day | `meanStellarDay` | (meanSiderealDay/(H/13)) / (meanSolarYearDays+1) + meanSiderealDay | <!--v:meanStellarDaySeconds-->86,164.0985857<!--/v--> s |
 | Balanced Year | `balancedYear` | perihelionalignmentYear - (14.5 × H/16) | <!--v:balancedYear-->-302,635<!--/v--> |
 | Perihelion Alignment JD | `perihelionalignmentJD` | startmodelJD - meanSolarYearDays × (startModelYearWithCorrection - perihelionalignmentYear) | ~<!--v:periAlignJD-->2,176,153<!--/v--> |
-| Perihelion Cycle Length | `perihelionCycleLength` | H / 16 | <!--v:periPrecYears-->~20,957<!--/v--> years |
+| Perihelion Cycle Length | `perihelionCycleLength` | H / 16 | <!--v:periPrecYears-->~20,936<!--/v--> years |
 | Total Days in H | `totalDaysInH` | H × meanSolarYearDays | ~<!--v:totalDaysInH-->122,471,920<!--/v--> days |
 | J2000.0 epoch JD | `j2000JD` | startmodelJD - (startmodelYear - 2000) × meanSolarYearDays | ~2451545.0 |
 | Julian century | `julianCenturyDays` | 36525 (100 × 365.25) | 36,525 days (IAU Julian century) |
@@ -389,7 +390,7 @@ only (the planet chains ride engine D); the historical record is
 |--------|---------|----------------|
 | Mercury | H / (1 + 3/8) | ~<!--v:mercuryPeriPeriod-->243,867<!--/v--> |
 | Venus | -8H / 6 | ~-<!--v:venusPeriPeriod-->447,089<!--/v--> (retrograde) |
-| Earth | H / 16 | <!--v:periPrecYears-->~20,957<!--/v--> |
+| Earth | H / 16 | <!--v:periPrecYears-->~20,936<!--/v--> |
 | Mars | H × 8/36 | ~<!--v:marsPeriPeriod-->74,515<!--/v--> |
 | Jupiter | 8H / 39 | ~<!--v:jupiterPeriPeriod-->68,783<!--/v--> |
 | Saturn | -8H / 65 | ~-<!--v:saturnPeriPeriod-->41,270<!--/v--> (retrograde) |

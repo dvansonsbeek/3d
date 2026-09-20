@@ -25,7 +25,7 @@ The model starts from a single observation: two of Earth's precession motions ro
 | Motion | Direction | Cycle |
 |--------|-----------|-------|
 | Axial Precession | Clockwise | <!--v:axialPrecRound-->~25,771<!--/v--> years |
-| Apsidal Precession | Counter-clockwise | <!--v:inclPrecYears-->~111,772<!--/v--> years |
+| Apsidal Precession | Counter-clockwise | <!--v:inclPrecYears-->~111,570<!--/v--> years |
 
 These two counter-rotating motions combine into the climatic precession — the perihelion-of-date cycle, <!--v:lunisolarPeriOfDatePerPrecessionJ2000-->0.8124<!--/v--> of the axial precession period at J2000, because the two rates add. The apsidal period itself is <!--v:lunisolarApsidalPerPrecessionJ2000-->4.329<!--/v--> precession periods today and wanders between <!--v:lunisolarApsidalPerPrecessionWanderMin-->0.83<!--/v--> and <!--v:lunisolarApsidalPerPrecessionWanderMax-->9.89<!--/v--> across ±26 kyr — the simulator's Lunisolar Clock panel shows the live ratios. From this starting point, the model derives what is normally calculated separately: precession of the equinoxes, obliquity oscillation, eccentricity cycles, Milankovitch beat frequencies, the length of days and years, and the orbital-forcing component of climate (the timing of glacial-interglacial cycles).
 
@@ -40,10 +40,10 @@ The clock is not fixed. **Earth's spin tier expands with the tidal evolution of 
 The unifying theory is the **Expanding Solar System Resonance Theory (ESSRT)** ([Doc 99](docs/99-expanding-solar-system-resonance-theory.md)):
 
 - The **L1 integer labels** (n = 9, 12, …, 65, 66, 68, …, 185 — 33 components in total) are **scale-invariant** structural constants of the solar system. Same integers at every epoch.
-- The **literal periods** scale with the current value of H(t): in the Devonian H ≈ <!--v:hAtDevonian-->282,329<!--/v--> yr, today H = <!--v:H-->335,317<!--/v--> yr, in 200 Myr H ≈ <!--v:hAt200MyrFuture-->367,019<!--/v--> yr — but `8H/65` is still the obliquity beat, `8H/104` is still axial precession, etc.
-- Two physically independent drivers expand H(t): **Driver 1** is Earth-Moon tidal evolution (Moon recedes 3.82 cm/yr at J2000, Earth's length-of-day grows); **Driver 2** is solar mass loss (every planet's orbit slowly expands via Kepler's 3rd law). Both act simultaneously; the structural invariant `H × days/year` ≈ <!--v:totalDaysInH-->122,471,920<!--/v--> couples them at the per-planet observational level.
+- The **periods** evolve with the tidal history: the axial precession period was <!--v:axialPrecAtDevonian-->21,699<!--/v--> yr in the Devonian, is <!--v:axialPrecRound-->~25,771<!--/v--> yr today and reaches <!--v:axialPrecAt200MyrFuture-->28,208<!--/v--> yr in 200 Myr; the obliquity band follows the beat of that precession against the orbit's inclination mode, and the long-eccentricity band stays at its modern class, scaled only by the solar-mass history.
+- Two physically independent drivers stretch the clocks: **Driver 1** is Earth-Moon tidal evolution (Moon recedes 3.82 cm/yr at J2000, Earth's length-of-day grows, the precession period lengthens); **Driver 2** is solar mass loss (every planet's orbit slowly expands via Kepler's 3rd law). Both act simultaneously; the model's day-count near-invariant couples them at the per-planet observational level.
 
-ESSRT therefore unifies the **modern-era 8H climate lattice** (docs 90–92), the **deep-time predictions** (see deep-time section below), and the **future projections** (tidal-lock asymptote at ~<!--v:tidalLockRE-->87.1<!--/v--> R_⊕) into a single coherent framework with the **same parameter accounting** throughout (two engines, three ledgers — [Constants Reference](docs/20-constants-reference.md)).
+ESSRT therefore unifies the **modern-era climate formula** (docs 90–92), the **deep-time predictions** (see deep-time section below), and the **future projections** (tidal-lock asymptote at ~<!--v:tidalLockRE-->87.1<!--/v--> R_⊕) into a single coherent framework with the **same parameter accounting** throughout (two engines, three ledgers — [Constants Reference](docs/20-constants-reference.md)).
 
 ---
 
@@ -65,8 +65,8 @@ Earlier versions presented Earth's cycles as small-integer divisions of one mast
 The Sun is still the center of our solar system. The model uses a geo-heliocentric frame — viewing from Earth's perspective — to make the two counter-rotating precession motions visible:
 
 - **Earth's wobble center** (the EARTH-WOBBLE-CENTER marker) circles Earth clockwise in <!--v:axialPrecRound-->~25,771<!--/v--> years — this is axial precession
-- **Earth's perihelion point** wobbles counter-clockwise around the Sun in <!--v:inclPrecYears-->~111,772<!--/v--> years — this is apsidal precession
-- These two motions **meet every <!--v:periPrecYears-->~20,957<!--/v--> years** — producing perihelion precession
+- **Earth's perihelion point** wobbles counter-clockwise around the Sun in <!--v:inclPrecYears-->~111,570<!--/v--> years — this is apsidal precession
+- These two motions **meet every <!--v:periPrecYears-->~20,936<!--/v--> years** — producing perihelion precession
 - Earth orbits its perihelion point (close to the Sun) in 1 solar year; the seven planets follow their own N-body element chains (Kepler ellipses of date)
 
 The result: obliquity, eccentricity, inclination, and all precession movements emerge from just two opposing forces in a 3:13 ratio.
@@ -200,7 +200,7 @@ The simulation is not limited to the modern era. The model's parameters (two eng
 The framework is documented in [Doc 99 — Expanding Solar System Resonance Theory (ESSRT)](docs/99-expanding-solar-system-resonance-theory.md): a canonical 9-step chain from `t_Ma` through length-of-day (LOD), the mean lunisolar precession period T_p(t), AU, solar mass loss, Kepler year, Moon distance, Moon synodic month, anomalistic year, stellar/sidereal days, and planet orbital + synodic periods. The chain is anchored to modern Lunar Laser Ranging and the [Farhat 2022](https://www.aanda.org/articles/aa/full_html/2022/09/aa44329-22/aa44329-22.html) lunar-distance evolution polynomial; deep-time outputs are then independently validated against three external anchors that the model was **not** fit against:
 
 - **Wells 1963** (Devonian coral growth bands at 380 Ma): the predicted <!--v:anchorWellsFlagship380Pred-->399.96<!--/v--> days per year matches Wells's paleontological day-count of 400 essentially exactly (<!--v:anchorWellsFlagship380DeltaPct-->−0.01<!--/v--> %)
-- **Wu et al. 2024** (650-Myr cyclostratigraphy from sedimentary records): predicted H(t) matches Wu's reconstruction across the entire Phanerozoic to within ~1 %
+- **Wu et al. 2024** (650-Myr cyclostratigraphy from sedimentary records): the predicted day length and precession rate match Wu's reconstruction across the entire Phanerozoic to within ~1 %
 - **The Earth-Moon genesis epoch**: the model places the Moon at the rigid Roche limit at 4.498 Gyr ago — between Patterson's 1956 Pb-Pb Earth age (4.55 Gyr) and the Hf-W giant-impact date (4.42 Gyr) — with **no Hadean constraint used in the fit**; the result emerges from the same proper-physics chain that produces the modern Moon distance
 
 The full evidence — 41 published anchors, per-anchor tolerances, the documented deviations, and the gate that re-checks all of it on every CI run — is assembled in the [Deep-Time Validation Dossier (Doc 106)](docs/106-deep-time-validation-dossier.md). Since 2026-08 the deep-time layer carries the **regime-aware lunar-recession history** (Driver 1½): the calibrated curve is bit-identical through the gated 0–1000 Ma era, and beyond it a fitted staircase (following Farhat 2022's resonant-crossing result) plus two explicit solar angular-momentum channels — the ocean solar-tide leak and the insolation-driven thermal-tide pump — match eleven published mid-Precambrian anchors within 1.3σ.
@@ -265,11 +265,11 @@ The cardinal points (solstices/equinoxes) are **derived, not independently fitte
 
 ## Quick Facts
 
-- **Master cycle**: <!--v:H-->335,317<!--/v--> years at J2000 (the Earth Fundamental Cycle, H; slowly evolves under deep-time tidal evolution)
-- **Axial precession**: <!--v:axialPrecRound-->~25,771<!--/v--> years (H/13)
-- **Apsidal precession**: <!--v:inclPrecYears-->~111,772<!--/v--> years (H/3)
-- **Perihelion precession**: <!--v:periPrecYears-->~20,957<!--/v--> years (H/16)
-- **Model parameters**: two engines, three ledgers — zero free parameters on the planetary side, four named constants on the H-lattice side, and a gated fitted-correction stack; everything else is derived or anchored to astronomical observations (the canonical accounting is in the [Constants Reference](docs/20-constants-reference.md))
+- **The clock**: the mean lunisolar precession period, <!--v:lunisolarPeriodJ2000Yr-->25,771.4<!--/v--> years at J2000 (evolves under deep-time tidal evolution)
+- **Axial precession**: <!--v:axialPrecRound-->~25,771<!--/v--> years
+- **Apsidal precession**: <!--v:inclPrecYears-->~111,570<!--/v--> years (H/3)
+- **Perihelion precession**: <!--v:periPrecYears-->~20,936<!--/v--> years (H/16)
+- **Model parameters**: two engines, three ledgers — zero free parameters on the planetary side, four named constants on the spin-and-tides side, and a gated fitted-correction stack; everything else is derived or anchored to astronomical observations (the canonical accounting is in the [Constants Reference](docs/20-constants-reference.md))
 
 ---
 

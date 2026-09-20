@@ -34,6 +34,20 @@ import { createRequire } from 'node:module';
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..', '..');
 const require = createRequire(import.meta.url);
 const rd = (p) => JSON.parse(readFileSync(join(ROOT, p), 'utf8'));
+// |s₃|, ″/yr — the dominant nodal mode of Earth's orbit on the invariable plane (the engine's deep
+// secular modes; the obliquity beat's partner). Lazy + memoized; ONE reader for every key that needs it.
+const s3ArcsecPerYr = (() => {
+  let v;
+  return () => {
+    if (v === undefined) {
+      const z = rd('data/nbody-deep-secular-modes.json').modes.earth.zeta
+        .filter((m) => Math.abs(m.omegaRadPerYr) > 1e-9)
+        .sort((a, b) => Math.hypot(b.re, b.im) - Math.hypot(a.re, a.im))[0];
+      v = Math.abs(z.omegaRadPerYr * 180 / Math.PI) * 3600;
+    }
+    return v;
+  };
+})();
 
 const C = require(join(ROOT, 'tools', 'lib', 'constants.js'));
 /** Lazy deep-time engine (loads the ΔT/LOD chain on first key that needs it). */
@@ -191,18 +205,8 @@ const thousands = (n, dp = 0) => {
 /** One named cycle of the H lattice: `<name>Years` = H/divisor and
  *  `<name>Formula` = "335,317 / divisor". `dp` undefined means the website
  *  rounds to whole years and prefixes `~`. */
-const hDivisor = (name, divisor, note, dp) => ({
-  [`${name}Years`]: {
-    get: () => C.H / divisor,
-    render: (v) => (dp === undefined ? `~${thousands(Math.round(v))}` : thousands(v, dp)),
-    unit: 'yr',
-    note: `${note} — H/${divisor}`,
-  },
-  [`${name}Formula`]: {
-    get: () => C.H,
-    render: (v) => `${thousands(v)} / ${divisor}`,
-  },
-});
+// (The former hDivisor helper — "H/n" period keys — is gone: plan 06 S5/S6 re-pointed every
+// Earth-cycle period key to the model's own J2000 dynamical value; see the keys themselves.)
 
 /** The website's scientific-notation convention: mantissa × 10 with unicode
  *  superscript exponent (e.g. -3.93 × 10⁻⁷). Replicates its fmtSci exactly. */
@@ -405,9 +409,31 @@ export const VALUES = {
     get: () => C.H,
     render: (v) => `8 × ${thousands(v)}`,
   },
-  ...hDivisor('inclPrec', 3, 'apsidal precession (key keeps the historical inclPrec name)'),
-  ...hDivisor('eclPrec', 5, 'ecliptic precession'),
-  ...hDivisor('obliqCycle', 8, 'obliquity cycle'),
+  // S6 (plan 06): Earth's cycle periods are the model's OWN J2000 dynamical values, never fractions
+  // of the fitted anchor — H/3, H/5, H/8, H/16 read +0.18 %, −2.5 %, +1.7 %, +0.10 % off them (the
+  // same class as the H/13 case of S5). Key names kept (P4); the *Formula keys (consumed by the
+  // website appendix) now render the derivation, not "H / n".
+  inclPrecYears: {
+    get: () => oneYL().inclinationPrecessionYearsAtYear(2000),
+    render: (v) => `~${thousands(Math.round(v))}`,
+    unit: 'yr',
+    note: 'apsidal precession period at J2000 — the perihelion against the stars, the engine-D chain’s secular tangent (the Prec. cell’s rate; the key keeps the historical inclPrec name). S6: was H/3 = 111,772',
+  },
+  inclPrecFormula: { get: () => oneYL().inclinationPrecessionYearsAtYear(2000), render: () => 'the N-body chain’s secular apsidal tangent at J2000' },
+  eclPrecYears: {
+    get: () => 1296000 / s3ArcsecPerYr(),
+    render: (v) => `~${thousands(Math.round(v))}`,
+    unit: 'yr',
+    note: 'ecliptic (nodal) precession period — the dominant nodal mode s₃ of Earth’s orbit on the invariable plane, from the engine’s deep secular modes (the obliquity beat’s partner; the of-date tangent wanders far from it). S6: was H/5 = 67,063',
+  },
+  eclPrecFormula: { get: () => 1296000 / s3ArcsecPerYr(), render: () => 'the N-body chain’s dominant nodal mode s₃, 1,296,000/|s₃|' },
+  obliqCycleYears: {
+    get: () => 1296000 / (1296000 / oneYL().axialPrecessionYearsAtYear(2000) - s3ArcsecPerYr()),
+    render: (v) => `~${thousands(Math.round(v))}`,
+    unit: 'yr',
+    note: 'obliquity cycle at J2000 — the beat 2π/(ψ̇ − |s₃|) of the axial precession against the nodal mode (≡ obliqBeatJ2000Kyr; falsification leg 1). S6: was H/8 = 41,915',
+  },
+  obliqCycleFormula: { get: () => 1296000 / (1296000 / oneYL().axialPrecessionYearsAtYear(2000) - s3ArcsecPerYr()), render: () => 'the beat of the axial precession against the nodal mode s₃, 1,296,000/(ψ̇ − |s₃|)' },
   // S5 (plan 06): the axial precession period is the model's ONE J2000 reading — the certified
   // year laws' beat at 2000 (route B, 25,771.4 yr ≈ IAU 25,771.6) — never H/13 (25,793.6, the fit
   // anchor's reading; H₀ was fitted on the perihelion-of-date beat). Key names kept (P4).
@@ -417,7 +443,14 @@ export const VALUES = {
     unit: 'yr',
     note: 'axial precession period at J2000 — the of-date year laws’ beat (one-family route), the model’s one J2000 precession reading (S5)',
   },
-  ...hDivisor('periPrec', 16, 'perihelion precession'),
+  axialPrecFormula: { get: () => oneYL().axialPrecessionYearsAtYear(2000), render: () => 'the of-date year laws’ beat at J2000, T_sid/(T_sid − T_trop)', note: 'consumed by the website appendix; S5 retired the former "H / 13" rendering' },
+  periPrecYears: {
+    get: () => oneYL().perihelionPrecessionYearsAtYear(2000),
+    render: (v) => `~${thousands(Math.round(v))}`,
+    unit: 'yr',
+    note: 'perihelion-of-date period at J2000 — the axial and apsidal rates add (the one-family route’s beat). S6: was H/16 = 20,957',
+  },
+  periPrecFormula: { get: () => oneYL().perihelionPrecessionYearsAtYear(2000), render: () => 'the perihelion-of-date beat of the one-family route at J2000: 1/T_peri = 1/T_p + 1/T_aps' },
   // Two cycles the website also surfaces at the other rounding.
   axialPrecRound: {
     get: () => oneYL().axialPrecessionYearsAtYear(2000),

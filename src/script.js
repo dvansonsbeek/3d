@@ -24510,20 +24510,20 @@ function setupGUI() {
       item.appendChild(d);
       c.appendChild(item);
     };
-    head('Ledger 1 \u00B7 Engine D \u2014 the planets (dynamics)');
+    head('Ledger 1 \u00B7 The orbital dynamics engine \u2014 the planets');
     row('Free parameters: none',
       'Inputs, cited not fitted: one J2000 heliocentric state (JPL Horizons vectors, one epoch) \u00B7 DE440 mass ratios \u00B7 1PN. Everything planetary \u2014 element chains, secular modes, the 405.6-kyr metronome \u2014 derives from that seed. Integrator order/step are reproducibility conventions.');
-    head('Ledger 2 \u00B7 Engine K \u2014 Earth\u2019s spin & time (the H-lattice)');
-    row('Earth Fundamental Cycle \u00B7 H = ' + String(holisticyearLength) + ' yr',
-      'Fitted to the 1246 AD perihelion\u2013solstice alignment + the J2000 longitude of perihelion.');
+    head('Ledger 2 \u00B7 The lunisolar precession channel \u2014 Earth\u2019s spin & time');
+    row('Fitted timing anchor \u00B7 holisticyearLength = ' + String(holisticyearLength) + ' yr',
+      'Fitted to the 1246 AD perihelion\u2013solstice alignment + the J2000 longitude of perihelion. The unit of the correction bases and the frozen era clock; it scales with the precession period at deep time (anchor/T_p = 13.011, a fit constant \u2014 not a period).');
     row('Mean obliquity \u00B7 ' + earthtiltMean + '\u00B0',
       'Fitted to the observed obliquity range (~22.1\u00B0 to ~24.5\u00B0).');
     row('Inclination amplitude \u00B7 ' + earthInvPlaneInclinationAmplitude + '\u00B0',
       'Earth\u2019s inclination amplitude on the invariable plane, fitted to the observed obliquity range.');
     row('Inclination-cycle anchor \u00B7 ' + earthInclinationCycleAnchor + '\u00B0',
       'The System-Reset convention \u2014 the one free assumption in its chain; the anchor arithmetic itself is exact. Shared between the inclination cycle and the eccentricity phase.');
-    row('Lattice divisors \u00B7 3 \u00B7 5 \u00B7 8 \u00B7 13 \u00B7 16 \u00B7 8H/N',
-      'A discrete structural assumption \u2014 the thing the three pre-registered falsification legs test \u2014 not a parameter count. The balanced year is derived (H + 1246 AD); Earth\u2019s e(J2000) is an observed calibration input, and the H/3 law\u2019s mean derives from it.');
+    row('Correction-basis divisors \u00B7 device tier',
+      'The correction combs\u2019 divisors and the frozen clock\u2019s counters are identifiers of the fitted machinery \u2014 bounded harmonic bases on the anchor\u2019s unit \u2014 not parameters and not laws; the three pre-registered falsification legs test the physics (the composed precession clock, the obliquity beat, the two-expansions \u03BC-consistency). The balanced year is derived (anchor + 1246 AD); Earth\u2019s e(J2000) is an observed calibration input, and the eccentricity law\u2019s mean derives from it.');
     head('Ledger 3 \u00B7 The fitted correction stack (gated)');
     row('Cardinal-point harmonics \u00B7 \u0394T/LOD stack \u00B7 GIA \u03B1(t) \u00B7 lunar corrections',
       'Fitter-owned coefficient arrays, provenance-tracked, stamped by the coefficients hash (Model Identity above). Every gate is fail-proven, and the paleo-anchors gate fails on an unexplained improvement too. None of them touch the planetary dynamics.');

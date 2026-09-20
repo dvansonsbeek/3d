@@ -8,7 +8,7 @@ status: current
 # Doc 99 — The Expanding Solar System Resonance Theory (ESSRT)
 
 ## Status
-Active theory draft — Expanding Solar System Resonance Theory (ESSRT). Full scope: lattice expansion driven by Earth-Moon tidal evolution AND solar mass loss across all 8 planets, not just the 8H cycle. Builds on docs 91-92 (L1 lattice), 98 (mechanism — action-angle closure), 102 (historical lunar eclipse timing test + α(t) GIA derivation), and 103 (-135 Babylonian case study).
+Active theory draft — Expanding Solar System Resonance Theory (ESSRT). Full scope: the two expansions — Earth's spin tier on the tidal history (the composed lunisolar precession clock), every orbit on the solar-mass history across all 8 planets. Builds on docs 91-92 (the climate formula), 98 (mechanism — action-angle closure, written in the retired integer-label framing), 102 (historical lunar eclipse timing test + α(t) GIA derivation), and 103 (-135 Babylonian case study).
 
 ---
 
@@ -16,24 +16,26 @@ Active theory draft — Expanding Solar System Resonance Theory (ESSRT). Full sc
 
 **The two-engine + two-expansions reading — the measured form (doc 109 is
 the evidence record).** The solar system expands on TWO measured tiers, and
-ESSRT's lattice is the structure of the FIRST:
+ESSRT's clock is the structure of the FIRST:
 
-- **The tidal tier (Earth–Moon — where the lattice lives).** H(t), the
-  Solar System Resonance Cycle 8H, and the H-carrying L1 families (the
-  precession and obliquity bands) are structural to the Earth–Moon
-  spin/tide system and expand as the Moon recedes — the axial precession
-  on the COMPOSED lunisolar rate (spin × [solar + lunar torque on the
-  recession history], plan 06 D6), confirmed against the rock to 2.46 Ga
+- **The tidal tier (Earth–Moon — where the clock lives).** The mean
+  lunisolar precession period and the bands of the climate record that
+  ride it (the precession and obliquity bands) are structural to the
+  Earth–Moon spin/tide system and evolve as the Moon recedes — the axial
+  precession on the COMPOSED lunisolar rate (spin × [solar + lunar torque
+  on the recession history], plan 06 D6), anchored on the model's own J2000
+  period (<!--v:axialPrecExact-->25,771.40<!--/v--> yr, plan 06 S5) and
+  confirmed against the rock to 2.46 Ga
   (<!--v:anchorLantinkPrec2460Pred-->104.60<!--/v--> vs Lantink 2022's
   108.6 ± 8.5 ″/yr at Joffre; <!--v:anchorXiamalingPrec1400Pred-->86.60<!--/v-->
   vs Meyers & Malinverno 2018's 85.79 ± 2.72 ″/yr at Xiamaling — gate
-  rows), and H(t) is the UNIT of that motion: 13 composed precession
-  periods at every epoch (the spin-only clock H₀·LOD/LOD₀ the model
-  carried before is retired — `docs/retired-record.md` — and survives only
-  as the frozen era clock's named phase convention). Earth's
-  orbital laws (H/3, H/16 = 13+3) are exact
-  **epoch-local** laws of the present era (5 % era −2,634…+2,847 yr,
-  bit-exact in the observation window — doc 109 §12).
+  rows). The spin-only clock the model carried before is retired
+  (`docs/retired-record.md`) and survives only as the frozen era clock's
+  named phase convention; the model's internal unit scales with the
+  composed period and is not 13 of them. Earth's apsidal and
+  perihelion-of-date laws are exact **epoch-local** laws of the present
+  era (5 % era −2,634…+2,847 yr, bit-exact in the observation window —
+  doc 109 §12).
 - **The mass-loss tier (the whole planetary system).** Solar mass loss
   expands every orbit adiabatically (a ∝ 1/M_Sun); the first rock-based
   measurement of the ancient Sun's mass reads μ(2.48 Ga) = M/M₀ =
@@ -49,19 +51,20 @@ ESSRT's lattice is the structure of the FIRST:
   eigenfrequencies are incommensurate with EVERY base period (doc 109-class
   null, `tools/explore/lattice-base-scan.mjs`).
 
-The Earth-family L1 integer LABELS are scale-invariant constants (the
-k-involving members); their LITERAL PERIODS scale with the current H. The
-eccentricity-band L1 members are planetary g-beats and do NOT scale — the
-405-kyr family is measured stable while the precession band moves, and
-that split IS the two-tier structure, confirmed at 1.4 and 2.46 Ga.
+The climate formula's precession-band lines scale with the composed
+precession clock; its eccentricity-band lines are planetary g-beats and do
+NOT scale — the 405-kyr family is measured stable while the precession band
+moves, and that split IS the two-tier structure, confirmed at 1.4 and
+2.46 Ga. (The former integer LABELS of those lines were retired by the
+pre-registered tests T1/T5 of plan 06 — `docs/retired-record.md`.)
 
-> **In the past, H was smaller (~<!--v:hAtDevonian-->282,329<!--/v--> yr at 380 Ma vs <!--v:H-->335,317<!--/v--> yr today).**
-> **In the future, H will be larger (~<!--v:hAt200MyrFuture-->367,019<!--/v--> yr in 200 Myr, growing asymptotically toward the tidal-lock limit).**
-> **The Earth-family integer structure (n=65 for obliquity main, n=141-class precession sidebands, H/13, H/8) remains fixed across all epochs; the planetary divisors are era-typed descriptors, not eternal integers.**
+> **In the past, the precession period was shorter (~<!--v:axialPrecAtDevonian-->21,699<!--/v--> yr at 380 Ma vs <!--v:axialPrecRound-->~25,771<!--/v--> yr today).**
+> **In the future, it will be longer (~<!--v:axialPrecAt200MyrFuture-->28,208<!--/v--> yr in 200 Myr, growing asymptotically toward the tidal-lock limit).**
+> **The climate formula's lines ride the engine's own orbital modes and the composed clock at every epoch; the planetary divisors of the old framing were era-typed descriptors, not eternal integers, and are retired.**
 
 > 📐 **Mean values vs actual values** — All quantities tabulated in this document
-> (H, LOD, T_sidereal, Moon distance, etc.) are **MEAN values for the corresponding
-> H(t) period**. Within each H cycle, actual instantaneous values oscillate around
+> (the precession period, LOD, T_sidereal, Moon distance, etc.) are **MEAN values
+> at the corresponding epoch**. Actual instantaneous values oscillate around
 > these means via Fourier harmonics (24 cardinal point terms for solstices/equinoxes,
 > 5 sidereal, 8 anomalistic). The 3D model measures these oscillations at runtime
 > on top of the means provided by the canonical chain — the mean-value functions
@@ -69,13 +72,14 @@ that split IS the two-tier structure, confirmed at 1.4 and 2.46 Ga.
 > twins); the harmonic runtime layer sits on top.
 
 > 🎯 **For precise implementation values**, evaluate the deterministic chain from
-> `t_Ma` through `LOD(t)`, `H(t)`, AU(t), `T_sidereal(t)`, Moon distance, Moon
-> period, anomalistic year, and stellar/sidereal day (`tools/lib/deep-time.js`;
-> the J2000-constant → epoch-helper map is in
+> `t_Ma` through `LOD(t)`, the composed precession period, AU(t), `T_sidereal(t)`,
+> Moon distance, Moon period, anomalistic year, and stellar/sidereal day
+> (`tools/lib/deep-time.js`; the J2000-constant → epoch-helper map is in
 > [doc 20 §"ESSRT epoch dependence"](20-constants-reference.md)). The tables in
 > this doc use rounded LOD inputs for narrative clarity; the engine provides the
-> full-precision values (e.g., `H_dev = 306,189.42 yr` under the proper-physics
-> two-layer formula — see § "Proper-physics LOD formula" below).
+> full-precision values (e.g., the Devonian precession period
+> <!--v:axialPrecAtDevonian-->21,699<!--/v--> yr — see § "Proper-physics LOD
+> formula" below).
 
 ---
 
@@ -90,19 +94,19 @@ KINDS of degrees of freedom, and they have fundamentally different physics:
    Nothing here carries an arrow of time over millions of years.
 2. **How bodies spin and deform — rotation and tides.** Dissipative.
    Earth's tidal bulge drags, energy becomes heat, the day lengthens, the
-   Moon recedes — irreversibly. This is why H(t) *evolves*: dissipation
+   Moon recedes — irreversibly. This is why the clock *evolves*: dissipation
    gives this half of the physics an arrow of time the orbital half does
    not have.
 
 The model's two engines are these two halves — not two theories of the same
 thing. The seam between them is not a modelling choice; nature put it there.
 
-| | **Engine K — rotation & tides** | **Engine D — orbits** |
+| | **The lunisolar precession channel — rotation & tides** | **The orbital dynamics engine — orbits** |
 |---|---|---|
-| Headline clock | axial precession (H/13) | apsidal / nodal precession (the g/s modes) |
-| Full family | day length (LOD), the obliquity band, lunar recession, H(t), the eclipse/ΔT timing chain | *all* orbital-element motions of *all* planets: apsidal, nodal, eccentricity and inclination oscillations, the 405-kyr beat |
+| Headline clock | axial precession (the composed lunisolar period) | apsidal / nodal precession (the g/s modes) |
+| Full family | day length (LOD), the obliquity band, lunar recession, the eclipse/ΔT timing chain | *all* orbital-element motions of *all* planets: apsidal, nodal, eccentricity and inclination oscillations, the 405-kyr beat |
 | Interaction | Earth–Moon (tidal, dissipative) | planet–planet (gravitational, conservative) |
-| Its expansion tier | **the tidal expansion**: the Moon recedes, the day lengthens, H(t) grows | **the solar-mass expansion**: every orbit swells as 1/M_Sun as the Sun loses mass |
+| Its expansion tier | **the tidal expansion**: the Moon recedes, the day lengthens, the precession period grows | **the solar-mass expansion**: every orbit swells as 1/M_Sun as the Sun loses mass |
 
 **The coupling across the seam is one-way.** The orbits force the spin
 system — the planets set Earth's eccentricity and inclination, the Sun and
@@ -115,14 +119,17 @@ orbital-side quantity (and the M⁴ cross-coupling under mass loss,
 follows the degree of freedom even where one engine's number appears
 inside the other's formula.
 
-**Earth is the interface — and the Fibonacci structure is the interface's
+**Earth is the interface — and the J2000 ratios are the interface's
 signature.** Earth is the one body where both halves meet at full strength:
 a massive moon (strong dissipation), a fast spin, and a climate record that
-writes both halves into rock. The Fibonacci relations were never properties
-of the planets' orbits (the retirement above); they are the J2000 signature
-of Earth's spin–orbit–tide interface — H/13 and H/8 on the spin side, H/3
-and H/16 as the epoch-local tangents of the orbital side, meeting in one
-hierarchy at the anchor.
+writes both halves into rock. The small-integer ratios of the old framing
+were never properties of the planets' orbits (the retirement above); they
+are J2000 readings at Earth's spin–orbit–tide interface — the axial
+precession and the obliquity beat on the spin side, the apsidal and
+perihelion-of-date periods as the epoch-local tangents of the orbital side
+— readings that wander (the apsidal-to-axial ratio runs
+<!--v:lunisolarApsidalPerPrecessionWanderMin-->0.83<!--/v-->–<!--v:lunisolarApsidalPerPrecessionWanderMax-->9.89<!--/v-->
+across ±26 kyr), not laws.
 
 ### The composition is what nature measures
 

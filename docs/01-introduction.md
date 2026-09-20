@@ -41,7 +41,7 @@ In the 3D simulation, this point is visualized as "The Death Star."
 This point determines Earth's varying distance to the Sun throughout the year (perihelion around January 3rd, aphelion around July 4th).
 
 - It orbits **counter-clockwise** around the EARTH-WOBBLE-CENTER
-- One complete orbit takes approximately **H/3 years** (<!--v:inclPrecYears-->~111,772<!--/v--> years, apsidal precession; see [Constants Reference](20-constants-reference.md))
+- One complete orbit takes approximately **<!--v:inclPrecYears-->~111,570<!--/v--> years** (apsidal precession; see [Constants Reference](20-constants-reference.md))
 - This slowly changes Earth's argument of periapsis relative to the fixed stars
 
 In the 3D simulation, this appears as a white dot.
@@ -49,40 +49,25 @@ In the 3D simulation, this appears as a white dot.
 ### Opposing Rotations Create Balance
 
 The two movements interact:
-- Earth moves clockwise around EARTH-WOBBLE-CENTER (H/13 years)
-- PERIHELION-OF-EARTH moves counter-clockwise (H/3 years)
-- They meet and realign every **H/16 years** (perihelion precession cycle)
+- Earth moves clockwise around EARTH-WOBBLE-CENTER (one axial precession period, <!--v:axialPrecRound-->~25,771<!--/v--> years)
+- PERIHELION-OF-EARTH moves counter-clockwise (one apsidal period, <!--v:inclPrecYears-->~111,570<!--/v--> years)
+- They meet and realign every **<!--v:periPrecYears-->~20,936<!--/v--> years** — the perihelion-of-date cycle, because the two rates add
 
-This creates 16 meeting points per Earth Fundamental Cycle as the solstice and perihelion alignment moves around the zodiac.
+The solstice–perihelion alignment moves around the zodiac on that cycle. The simulator's Lunisolar Clock panel shows the live ratio of the two periods: <!--v:lunisolarApsidalPerPrecessionJ2000-->4.329<!--/v--> today, wandering between <!--v:lunisolarApsidalPerPrecessionWanderMin-->0.83<!--/v--> and <!--v:lunisolarApsidalPerPrecessionWanderMax-->9.89<!--/v--> across ±26 kyr.
 
 ---
 
-## The Earth Fundamental Cycle (H)
+## The lunisolar precession clock
 
-The Earth Fundamental Cycle is the grand unified cycle where all celestial movements converge. At exactly **H years** (see [Constants Reference](20-constants-reference.md) for the current value), this cycle integrates:
+Earth's spin tier runs on one clock: the mean lunisolar precession period, <!--v:lunisolarPeriodJ2000Yr-->25,771.4<!--/v--> years at J2000 — the period of the composed torque rate, Earth's spin carrying the solar and lunar torques on its equatorial bulge. Earth's other long cycles are read against it as ratios of periods:
 
-| Cycle | Formula | Count per Earth Fundamental Cycle |
-|-------|---------|------------------------|
-| Axial Precession | H / 13 | 13 cycles |
-| Apsidal Precession | H / 3 | 3 cycles |
-| Perihelion Precession | H / 16 | 16 cycles |
+| Cycle | Period at J2000 | In precession periods |
+|-------|-----------------|-----------------------|
+| Axial precession | <!--v:axialPrecRound-->~25,771<!--/v--> yr | 1 |
+| Apsidal precession | <!--v:inclPrecYears-->~111,570<!--/v--> yr | <!--v:lunisolarApsidalPerPrecessionJ2000-->4.329<!--/v--> |
+| Perihelion-of-date | <!--v:periPrecYears-->~20,936<!--/v--> yr | <!--v:lunisolarPeriOfDatePerPrecessionJ2000-->0.8124<!--/v--> |
 
-### The Fibonacci Connection
-
-The ratio between axial and apsidal precession cycles follows a Fibonacci pattern:
-- **3:13** - apsidal to axial cycles
-- This suggests the solar system naturally tends toward balanced, harmonious relationships
-
-### The Six Determining Factors
-
-The Earth Fundamental Cycle duration is uniquely determined by six constraints:
-
-1. **Planetary Alignment**: All major planetary orbits must realign within one cycle
-2. **1246 AD Calibration**: Perihelion alignment epoch (perihelion near the December solstice)
-3. **Climate Cycle Correlation**: Matches observed ~300,000-year patterns in ice core data
-4. **Earth-Wobble-Center Dynamics**: Required by the ratio between sidereal and solar year differences
-5. **Eccentricity Compliance**: Maintains eccentricity within observed ranges
-6. **Mercury's Perihelion Precession**: Aligns with observed planetary precession rates
+The ratios are J2000 readings, not laws — the apsidal ratio wanders across ±26 kyr as the table above the panel shows. The model's earlier presentation, one "master cycle" divided by the small integers 13, 3 and 16, is retired ([retired record](retired-record.md)); the fitted timing anchor that presentation was built on remains a Ledger-2 constant of the [Constants Reference](20-constants-reference.md), and [doc 10](10-fibonacci-laws.md) keeps the historical derivation.
 
 ### Reference Point: JD 2176153.5 (1245-12-26) / early 1246 AD
 
@@ -99,7 +84,7 @@ Several Earth parameters oscillate over long timescales:
 
 ### Obliquity (Axial Tilt)
 
-Earth's axial tilt is not constant but oscillates over approximately H/8 years (<!--v:obliqCycleYears-->~41,915<!--/v--> years). The orbital eccentricity and inclination to the invariable plane also oscillate over the Earth Fundamental Cycle. See [Constants Reference](20-constants-reference.md) for all current values (mean, amplitude, and range for each parameter).
+Earth's axial tilt is not constant but oscillates over approximately <!--v:obliqCycleYears-->~41,224<!--/v--> years — the beat of the axial precession against the orbit's inclination mode. The orbital eccentricity and inclination to the invariable plane also oscillate, on the orbit's own apsidal and nodal periods. See [Constants Reference](20-constants-reference.md) for all current values (mean, amplitude, and range for each parameter).
 
 ---
 
@@ -135,7 +120,7 @@ The model is **heliocentric** (Earth orbits the Sun) but viewed from a **geocent
 
 ### 5. Deep-Time Extension (ESSRT)
 
-The model also extends across geological time through the **Expanding Solar System Resonance Theory (ESSRT)**. The Fibonacci divisor structure (H/3, H/5, H/8, H/13, H/16, 8H/N) is scale-invariant; the literal year counts shown throughout this documentation are J2000 snapshots that evolve at deep time through two physically independent drivers — Earth-Moon tidal evolution (Driver 1, lengthens the day) and solar mass loss (Driver 2, expands every orbit via Kepler's third law). See [Doc 99 — ESSRT](99-expanding-solar-system-resonance-theory.md) for the full framework.
+The model also extends across geological time through the **Expanding Solar System Resonance Theory (ESSRT)**. The periods shown throughout this documentation are J2000 values; at deep time they evolve through two physically independent drivers — Earth-Moon tidal evolution (Driver 1, lengthens the day) and solar mass loss (Driver 2, expands every orbit via Kepler's third law). See [Doc 99 — ESSRT](99-expanding-solar-system-resonance-theory.md) for the full framework.
 
 ---
 
