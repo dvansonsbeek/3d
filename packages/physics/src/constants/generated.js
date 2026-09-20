@@ -36,7 +36,7 @@
 export const CONSTANTS_HASH = "d94a9f41b4a85cb6";
 
 /** Model version label — single source: public/input/model-version.json (§10 two-axis scheme). */
-export const MODEL_VERSION = "v13.0";
+export const MODEL_VERSION = "v14.0";
 
 /** Canonical preprint DOI — single source: public/input/model-version.json. */
 export const PREPRINT_DOI = "10.21203/rs.3.rs-8758810/v4";

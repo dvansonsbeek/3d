@@ -1,9 +1,9 @@
 {
   "name": "@essrt/physics",
-  "version": "4.9.0",
+  "version": "5.0.0",
   "description": "ESSRT (Expanding Solar System Resonance Theory) physics core — pure, injectable-constants, no I/O, no globals, no DOM. The complete model incl. fitted coefficients; every published version immutably ships one recorded model identity.",
   "essrt": {
-    "modelVersion": "v13.0",
+    "modelVersion": "v14.0",
     "_note": "The model identity this package version ships (IP-unified-architecture §10: package semver tracks the API axis; the model version + CONSTANTS_HASH/COEFFICIENTS_HASH in src/constants/ carry the scientific identity). The version-pinning gate enforces this pairing against public/input/model-version.json."
   },
   "type": "module",
@@ -40,6 +40,7 @@
     "./earth/deep-orbital-history": { "types": "./types/earth/deep-orbital-history.d.cts", "default": "./src/earth/deep-orbital-history.cjs" },
     "./earth/sidereal-year-channel": { "types": "./types/earth/sidereal-year-channel.d.cts", "default": "./src/earth/sidereal-year-channel.cjs" },
     "./earth/year-lengths": { "types": "./types/earth/year-lengths.d.cts", "default": "./src/earth/year-lengths.cjs" },
+    "./earth/precession-composed": { "types": "./types/earth/precession-composed.d.cts", "default": "./src/earth/precession-composed.cjs" },
     "./moon/month-chain": { "types": "./types/moon/month-chain.d.cts", "default": "./src/moon/month-chain.cjs" },
     "./chain-cycles": { "types": "./types/chain-cycles/index.d.cts", "default": "./src/chain-cycles/index.cjs" },
     "./moon/arguments": { "types": "./types/moon/arguments.d.cts", "default": "./src/moon/arguments.cjs" },
