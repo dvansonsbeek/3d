@@ -27,7 +27,7 @@ For current values, see [Constants Reference](20-constants-reference.md).
 
 | Variable | Description |
 |----------|-------------|
-| `holisticyearLength` | Length of Earth Fundamental Cycle (H) in Earth solar years |
+| `holisticyearLength` | The fitted timing anchor (the correction bases' unit; not a period), Earth solar years |
 | `meansolaryearlengthinDays` | Mean solar year in days (rounded to H/8 precision) |
 | `meansiderealyearlengthinSeconds` | Mean sidereal year in seconds (derived: `siderealYearJ2000 × 86400`) |
 | `meanlengthofday` | Mean solar day in SI seconds |
@@ -113,7 +113,7 @@ For current values, see [Constants Reference](20-constants-reference.md).
 | `{planet}OrbitDistance` | Semi-major axis (a) in AU (derived) |
 | `{planet}PerihelionDistance` | Distance at perihelion |
 | `{planet}Speed` | Mean orbital velocity (km/h) |
-| `{planet}SolarYearCount` | Number of orbits in Earth Fundamental Cycle (derived) |
+| `{planet}SolarYearCount` | Number of orbits in one anchor interval (derived; a device count) |
 | `{planet}PerihelionEcliptic` | Perihelion precession period |
 | `{planet}PerihelionEclipticYears` | Perihelion precession cycle length against ecliptic |
 | `{planet}AngleCorrection` | Alignment correction angle |
@@ -431,7 +431,7 @@ These formulas handle precession calculations and secular perturbation theory.
 | `perturbationStrength(a_p, a_pert, m_pert, M_sun)` | strength = (m/M) × (a_ratio)² | Relative influence of perturbing planet |
 | `precessionRatio(rate1_arcsec, rate2_arcsec)` | ratio = rate₁ / rate₂ | Ratio between two precession rates |
 | `precessionDecomposition(total, ecliptic)` | {total, ecliptic, perturbations} | Decompose precession into components |
-| `holisticRatioDescription(ratio)` | string | Format ratio as readable fraction (e.g., "Earth Fundamental Cycle / 4") |
+| `holisticRatioDescription(ratio)` | string | Format ratio as readable fraction (e.g., "anchor interval / 4") |
 
 ---
 
@@ -1339,12 +1339,12 @@ For current computed values, see [Constants Reference](20-constants-reference.md
 
 | Planet | Ecliptic Period | ICRF Period | Holistic Ratio |
 |--------|-----------------|-------------|----------------|
-| **Mercury** | `mercuryPerihelionEcliptic` | derived | 8H / 11 |
-| **Venus** | `venusPerihelionEcliptic` | derived | −8H / 6 (retrograde) |
+| **Mercury** | `mercuryPerihelionEcliptic` | derived | 8Y / 11 (Y = the anchor interval; device) |
+| **Venus** | `venusPerihelionEcliptic` | derived | −8Y / 6 (retrograde) |
 | **Earth** | H/16 | derived | 16 |
-| **Mars** | `marsPerihelionEcliptic` | derived | 8H / 36 |
-| **Jupiter** | `jupiterPerihelionEcliptic` | derived | 8H / 39 |
-| **Saturn** | `saturnPerihelionEcliptic` | derived | −8H / 65 (retrograde) |
+| **Mars** | `marsPerihelionEcliptic` | derived | 8Y / 36 |
+| **Jupiter** | `jupiterPerihelionEcliptic` | derived | 8Y / 39 |
+| **Saturn** | `saturnPerihelionEcliptic` | derived | −8Y / 65 (retrograde) |
 | **Uranus** | `uranusPerihelionEcliptic` | derived | H / 3 |
 | **Neptune** | `neptunePerihelionEcliptic` | derived | H × 2 |
 
@@ -1460,7 +1460,7 @@ For current values, see [Constants Reference](20-constants-reference.md).
 
 **How values are sourced:**
 - **Eccentricity**: Derived at runtime from balanced-year phase (`planets.{name}.orbitalEccentricityBase`)
-- **Inclination (inv)**: Derived from the Fibonacci ψ formula (see [The Six Fibonacci Relations](10-fibonacci-laws.md))
+- **Inclination (inv)**: Derived from the retired ψ formula (see [doc 10, the six relations — historical record](10-fibonacci-laws.md))
 - **Semi-major axis**: Derived from period via Kepler's 3rd Law: `a = (H / solarYearCount)^(2/3)` where `solarYearCount = round(H × meanSolarYearDays / solarYearInput)` — the integer number of orbits in one H (doc 20 § Quantization)
 - **Period**: Input constant per planet (`planets.{name}.solarYearInput`)
 

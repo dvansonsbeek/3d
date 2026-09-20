@@ -50,13 +50,13 @@ All other calculations are relative to:
 
 ---
 
-## Part 2: The Earth Fundamental Cycle Structure
+## Part 2: The anchor-interval structure of the scene's counters
 
-All Earth precession cycles derive from the **Earth Fundamental Cycle** (H) divided by integers. See [Constants Reference](20-constants-reference.md) for the current value of H and all derived periods:
+The scene's Earth precession counters are device identities on the **fitted timing anchor** (`holisticyearLength`, the frozen era clock's unit) divided by integers; the published periods are the dynamical values of doc 20 Part 2 (plan 06 S5/S6). See [Constants Reference](20-constants-reference.md) for the current value of H and all derived periods:
 
 | Cycle | Divisor | Formula | Direction |
 |-------|---------|---------|-----------|
-| **Earth Fundamental Cycle** | 1 | H | - |
+| **The anchor interval** | 1 | H (the unit) | - |
 | **Inclination Precession** | 3 | H / 3 | Counter-clockwise |
 | **Ecliptic Precession** | 5 | H / 5 | Counter-clockwise |
 | **Obliquity Cycle** | 8 | H / 8 | Clockwise (negative) |
@@ -340,10 +340,10 @@ For current computed values, see [Constants Reference](20-constants-reference.md
 | Planet | H Formula | Direction |
 |--------|-----------|-----------|
 | Mercury | H / (1+3/8) | Prograde |
-| Venus | −8H / 6 | **Retrograde** |
-| Mars | 8H / 36 | Prograde |
-| Jupiter | 8H / 39 | Prograde |
-| Saturn | −8H / 65 | **Retrograde** |
+| Venus | −8Y / 6 | **Retrograde** |
+| Mars | 8Y / 36 | Prograde |
+| Jupiter | 8Y / 39 | Prograde |
+| Saturn | −8Y / 65 | **Retrograde** |
 | Uranus | H / 3 | Prograde |
 | Neptune | H × 2 | Prograde |
 

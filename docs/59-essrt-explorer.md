@@ -9,16 +9,16 @@ status: current
 
 ## Overview
 
-The **ESSRT Explorer** is a modal panel in the Tools menu that visualizes the **Expanding Solar System Resonance Theory** (see [doc 99](99-expanding-solar-system-resonance-theory.md)) — how the Earth Fundamental Cycle H, length-of-day, sidereal/tropical year length, Moon distance, and Earth-Sun distance evolve across deep time.
+The **ESSRT Explorer** is a modal panel in the Tools menu that visualizes the **Expanding Solar System Resonance Theory** (see [doc 99](99-expanding-solar-system-resonance-theory.md)) — how the mean lunisolar precession period, the obliquity beat, length-of-day, sidereal/tropical year length, Moon distance, and Earth-Sun distance evolve across deep time.
 
-The Solar System Resonance Cycle (8H ≈ 2.68 Myr today) and its 33-integer L1 lattice are **structural invariants** — the integers stay fixed at any epoch. What changes is the literal time unit: H itself expands monotonically across geological time via two physically independent drivers:
+The clock — the mean lunisolar precession period — lengthens monotonically across geological time via two physically independent drivers (the climate formula's precession-band lines ride it; its eccentricity-band lines, planetary beats, do not):
 
 - **Driver 1 — Earth-Moon tidal evolution**: lunar tidal friction slows Earth's spin, lengthening LOD; H ∝ LOD via the structural identity `H = 13 × axial precession period` (where axial precession scales with LOD).
 - **Driver 2 — Solar mass loss**: the Sun loses ~10⁹ kg/s in solar wind; by angular-momentum conservation `a × M = const`, each planet's semi-major axis slowly expands; Kepler's third law `T² ∝ a³ / M` then sets each planet's orbital period.
 
 The panel plots each quantity over the full Hadean → +1 Gyr range or a focused Phanerozoic 650-Myr window, with anchor-point validation against the Wu et al. 2024 cyclostratigraphic compilation.
 
-This is the panel that grounds the model's deep-time claims in *observation*. The structural invariants (Earth's Fibonacci hierarchy of [doc 10](10-fibonacci-laws.md), the L1 climate-formula lattice of [doc 92](92-climate-formula.md)) all live on a scaffold whose absolute scale evolves with H(t). The ESSRT Explorer makes that evolution visible.
+This is the panel that grounds the model's deep-time claims in *observation*. The model's deep-time claims (the composed precession clock of [doc 99](99-expanding-solar-system-resonance-theory.md), the climate formula's precession-band lines of [doc 92](92-climate-formula.md)) all live on a scaffold whose absolute scale evolves with the tidal history. The ESSRT Explorer makes that evolution visible.
 
 ## Accessing the Explorer
 
@@ -33,7 +33,6 @@ The two-tab-row layout matches the layered look of the Climate Formula Explorer 
 
 | Tab key | Tab label | Plotted quantity | Driver | Source helper |
 |---|---|---|---|---|
-| `h` | **H-Period** | Earth Fundamental Cycle H(t) in years | 1 only (∝ LOD) | `meanHAtAge(t_Ma)` |
 | `axial` | **Axial Precession** | Earth's polar-axis precession period = H/13 | 1 only | `meanHAtAge(t_Ma) / 13` |
 | `obliqCycle` | **Obliquity period** | H/8 obliquity oscillation period | 1 only | `meanHAtAge(t_Ma) / 8` |
 | `lod` | **Length of Day** | Earth's mean solar day length (hours) | 1 only | `meanLodSecondsAtAge(t_Ma) / 3600` |
@@ -59,10 +58,10 @@ Some quantities use a tighter Phanerozoic Y-range than the Full range — e.g., 
 ```
 ┌─────────────────────────────────────────────────────────────┐
 │ Expanding Solar System Resonance Theory (ESSRT)       [×]   │
-│ The Solar System Resonance Cycle expands monotonically...   │
+│ The lunisolar precession clock lengthens monotonically...   │
 │                                            [Export Full] [Export Phanerozoic] │
 ├─────────────────────────────────────────────────────────────┤
-│ [H-Period][Axial Precession][Obliquity][LOD][Year][AU][Moon]│  ← Quantity (gold)
+│ [Axial Precession][Obliquity][LOD][Year][AU][Moon]          │  ← Quantity (gold)
 │ [Full (−4.5 to +1 Gyr)] [Phanerozoic (650 Ma)]              │  ← Range (teal)
 ├─────────────────────────────────────────────────────────────┤
 │                                                             │
@@ -174,7 +173,7 @@ Full per-anchor agreement table + statistical summary at [doc 99 §"Validation a
 
 ## Scope and limitations
 
-1. **Earth-centric quantities only.** The 7 plotted quantities all describe Earth (H, axial precession, obliquity, LOD, year, AU, Moon). Per-planet deep-time evolution (e.g. Jupiter's perihelion period at deep time) is implicit — every planet's 8H/N period rescales with H(t) — but the modal doesn't plot per-planet curves directly. The structural argument is in [doc 99 §"Predicted planetary perihelion precession periods through time"](99-expanding-solar-system-resonance-theory.md).
+1. **Earth-centric quantities only.** The 6 plotted quantities all describe Earth (axial precession, obliquity, LOD, year, AU, Moon). Per-planet deep-time evolution (e.g. Jupiter's perihelion period at deep time) is implicit — every planet's 8H/N period rescales with H(t) — but the modal doesn't plot per-planet curves directly. The structural argument is in [doc 99 §"Predicted planetary perihelion precession periods through time"](99-expanding-solar-system-resonance-theory.md).
 2. **Two-driver framework only.** The proper-physics formulas combine Driver 1 (Farhat polynomial + angular-momentum conservation) and Driver 2 (Kepler scaling under solar mass loss). Other long-term effects — late-stage giant-planet migration, dust accretion, GR perturbations beyond Kepler — are not in the formulas. Forward validity is bounded by the proper-physics formula's horizon (~+2 Gyr per [doc 99 §"The proper-physics formula's predictive horizon"](99-expanding-solar-system-resonance-theory.md)).
 3. **Hadean uncertainty is real.** Backward to Earth-Moon genesis, the formulas extrapolate well beyond the Wu 2024 anchor range (max 650 Ma). The Hadean predictions (e.g., LOD ~5 hr, H ~73,000 yr) are model output, not observation — see [doc 99 §"Interpretation 2: Proper-physics formula at the Hadean"](99-expanding-solar-system-resonance-theory.md) for the discussion.
 4. **No discrimination between Wu and Williams 2000.** The Williams 2000 620-Ma tidal-rhythmite LOD estimate (21.9 hr) disagrees mildly with the proper-physics curve (~21.0 hr) and with Wu 2024's nearby 650-Ma anchor (20.94 hr). [Doc 99 §"The Williams 2000 (620 Ma) discrepancy"](99-expanding-solar-system-resonance-theory.md) discusses both views; the modal plots only the model curve + Wu anchors.
@@ -184,7 +183,7 @@ Full per-anchor agreement table + statistical summary at [doc 99 §"Validation a
 
 - [doc 99 — Expanding Solar System Resonance Theory (ESSRT)](99-expanding-solar-system-resonance-theory.md) — complete theoretical framework, Driver 1 + 2 derivations, per-anchor validation tables, deep-time L1 predictions, falsifiable claims
 - [doc 92 — Climate Formula](92-climate-formula.md) — the L1 integer-divisor lattice that stays invariant under H(t) scaling
-- [doc 10 — The Six Fibonacci Relations](10-fibonacci-laws.md) — the structural Fibonacci identities (H/3, H/5, H/8, H/13, H/16) the modal scales
+- [doc 10 — the six relations (historical record)](10-fibonacci-laws.md) — the retired integer identities; the modal scales the dynamical periods (the composed precession period and the obliquity beat)
 - [doc 58 — Climate Formula Explorer](58-climate-formula-explorer.md) — sibling Tools-menu modal (companion to ESSRT Explorer)
 - [doc 57 — Formula Verification](57-formula-verification.md) — sibling Tools-menu modal comparing model vs published celestial-mechanics formulas across ±12 kyr
 - [doc 56 — WebGeoCalc Explorer](56-webgeocalc-explorer.md) — sibling Tools-menu modal showing observed perihelion-precession history (JPL NAIF, 1900–2026)

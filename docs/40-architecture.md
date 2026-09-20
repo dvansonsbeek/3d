@@ -10,7 +10,7 @@ status: current
 **Version:** 2.1
 **Status:** Current Implementation Documentation
 
-> **Scope note (ESSRT).** This document describes the simulation's code architecture and rendering pipeline. The orbital-mechanics implementations (Keplerian solvers, precession cycles, predictive formula system, invariable plane calculations) are scale-invariant by construction. The current architecture additionally supports **deep-time mode** (`DEEP_TIME_MODE_ENABLED` in `src/script.js`, on by default): when the user scrubs the date by millions of years, per-frame integrators update length-of-day, the Earth Fundamental Cycle H, planet orbital periods, Moon distance, and ΔT according to the [Expanding Solar System Resonance Theory (ESSRT)](99-expanding-solar-system-resonance-theory.md). The deep-time integrators are tagged in the scene graph (`_dtCycleN`, `_dtMoonIntegrator`, `_dtPlanetIntegrator`, `_dtPerihelionDivisor`) — see [doc 41 §Part 15 — Deep-Time Mode](41-scene-graph-hierarchy.md) for the per-tag specifications.
+> **Scope note (ESSRT).** This document describes the simulation's code architecture and rendering pipeline. The orbital-mechanics implementations (Keplerian solvers, precession cycles, predictive formula system, invariable plane calculations) are scale-invariant by construction. The current architecture additionally supports **deep-time mode** (`DEEP_TIME_MODE_ENABLED` in `src/script.js`, on by default): when the user scrubs the date by millions of years, per-frame integrators update length-of-day, the internal unit (the composed precession clock), planet orbital periods, Moon distance, and ΔT according to the [Expanding Solar System Resonance Theory (ESSRT)](99-expanding-solar-system-resonance-theory.md). The deep-time integrators are tagged in the scene graph (`_dtCycleN`, `_dtMoonIntegrator`, `_dtPlanetIntegrator`, `_dtPerihelionDivisor`) — see [doc 41 §Part 15 — Deep-Time Mode](41-scene-graph-hierarchy.md) for the per-tag specifications.
 
 ---
 
@@ -238,7 +238,7 @@ The monolithic script.js (~59,800 lines) is organized into logical sections. Con
 │     reference data, ASTRO_REFERENCE object                          │
 │  D. Moon Meeus tables (Ch.47 lunar corrections)                     │
 │  E. Derived constants: year lengths, precession periods, mass       │
-│     fractions, planet inclinations (Fibonacci Laws)                 │
+│     fractions, planet inclinations (retired integer laws)           │
 │  E3. OrbitalFormulas library (50+ methods: Kepler solver, anomaly   │
 │     conversions, frame transforms, Laplace coefficients)            │
 │  F. Display-only constants                                          │
@@ -526,9 +526,9 @@ and the automatic pre-load fallback (doc 11's Status banner; the former
 not a published alternative; the plan-02 record in the private repo
 carries the full decision trail).
 
-### Precession Cycles (kinematic H-lattice identities)
+### Precession Cycles (kinematic device identities on the anchor)
 
-The structural identities of the H-lattice. The *displayed of-date*
+The device identities on the fitted anchor's divisors (not the published periods — those are dynamical, plan 06 S5/S6). The *displayed of-date*
 precession periods are the dynamical beats of the one-source year-length
 family (e.g. axial ≈ 25,771 yr at J2000, declining with date); these
 identities remain the kinematic family beside them.

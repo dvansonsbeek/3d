@@ -21,9 +21,9 @@ The simulation includes several interactive panels for inspecting planetary data
 | **PlanetStats Panel** | Per-planet data display with collapsible groups, charts, and dynamic rows |
 | **Invariable Plane Analysis** | View planet heights above/below the invariable plane |
 | **Balance Trend Analysis** | Track mass-weighted balance over time |
-| ~~Invariable Plane Balance Explorer~~ | REMOVED (Fibonacci-law retirement; code excised with the legacy chains) — doc 53 (archived — [retired record](retired-record.md)) is the record |
-| ~~Eccentricity Balance Scale~~ | REMOVED (Fibonacci-law retirement; code excised with the legacy chains) — doc 38 (archived — [retired record](retired-record.md)) is the record |
-| ~~Solar System Resonance Cycle~~ | REMOVED (Fibonacci-law retirement; code excised with the legacy chains) — the period table is archived ([retired record](retired-record.md)) |
+| ~~Invariable Plane Balance Explorer~~ | REMOVED (integer-law retirement; code excised with the legacy chains) — doc 53 (archived — [retired record](retired-record.md)) is the record |
+| ~~Eccentricity Balance Scale~~ | REMOVED (integer-law retirement; code excised with the legacy chains) — doc 38 (archived — [retired record](retired-record.md)) is the record |
+| ~~Solar System Resonance Cycle~~ | REMOVED (integer-law retirement; code excised with the legacy chains) — the period table is archived ([retired record](retired-record.md)) |
 | **Standard Model (VSOP87 · MPP02)** | K8 reference overlay: pale-blue ghost bodies (Sun, Moon + seven planets) at the standard theory's positions + live per-body Δ readout (″, astrometric both sides). Planets/Sun: truncated VSOP87A, measured 0.3–3.6″ RMS vs JPL 1600–2400; Moon: ELP/MPP02, measured 0.22″ RMS over the observed-ΔT era. One-way reference — nothing in the model consumes it |
 | **WebGeoCalc Explorer** | Observed perihelion-precession history from JPL WebGeoCalc (1900–2026) per planet — see [doc 56](56-webgeocalc-explorer.md) |
 | **Climate Formula Explorer** | L1+L2+L3 climate formula visualized across LR04 / CENOGRID / EPICA / CenCO2PIP, multiple time windows — see [doc 58](58-climate-formula-explorer.md) |
@@ -439,18 +439,18 @@ o.balanceMaxSeen = 0;                // Maximum observed
 
 ---
 
-## Removed panels (Fibonacci-law retirement → K5 excision)
+## Removed panels (integer-law retirement → K5 excision)
 
 Three interactive panels were REMOVED from the Tools menu with the
-Fibonacci-law retirement (the model restatement — doc 10 Status carries
+integer-law retirement (the model restatement — doc 10 Status carries
 the measured verdicts) and their code was excised wholesale in the K5
 legacy-chain excision:
 
 | Removed panel | What it did | Record |
 |---|---|---|
-| **Invariable Plane Balance Explorer** | Interactive testing of planetary group assignments and Fibonacci divisors against the balance relations | doc 53 (archived) |
+| **Invariable Plane Balance Explorer** | Interactive testing of planetary group assignments and integer divisors against the balance relations | doc 53 (archived) |
 | **Eccentricity Balance Scale** | Waterfall chart + buildup table of the Law-5 balance per target planet | doc 38 (archived) |
-| **Solar System Resonance Cycle** | 8 planets × 6 cycle types as integer divisors of 8H, with Years / 8H/N toggle and paper-SVG export | archived ([retired record](retired-record.md)) |
+| **The planetary integer-label period table** | 8 planets × 6 cycle types as integer divisors of the anchor's eight-unit interval, with Years / divisor toggle and paper-SVG export | archived ([retired record](retired-record.md)) |
 
 ---
 
@@ -470,7 +470,7 @@ Shows the actual observed perihelion-precession history of each planet from JPL 
 
 | Feature | Description |
 |---------|-------------|
-| **Primary chart (ϖ vs time)** | Blue = observed, red = the model line — the chain's own ϖ(t) in the plotted ECLIPJ2000 frame (`wgcModelCurves`, Engine D) — with linear OLS trend overlay |
+| **Primary chart (ϖ vs time)** | Blue = observed, red = the model line — the chain's own ϖ(t) in the plotted ECLIPJ2000 frame (`wgcModelCurves`, the orbital dynamics engine) — with linear OLS trend overlay |
 | **Two trend estimates** | Raw OLS (affected by oscillations) and sin+lin (bias-corrected) for each planet |
 | **Collapsible charts** | Ascending node Ω and argument of periapsis ω for detailed inspection |
 | **Resolvability flag** | Venus, Jupiter, Saturn, Uranus, Neptune are flagged as un-determined: Venus/Jupiter/Uranus/Neptune because their oscillation period exceeds the 126-year baseline (apparent slope flips sign across sub-windows); Saturn because its magnitude varies by ~2× across plausible windows even though direction stays retrograde |
@@ -501,7 +501,7 @@ Modal that visualizes the canonical **L1+L2+L3 climate formula** (see [doc 92](9
 | Feature | Description |
 |---------|-------------|
 | **Eight time-window tabs** | CenCO2PIP 66M, CENOGRID 67M, LR04 5.3M, LR04 1.2M, EPICA 800k, LR04 700k, LR04 200k, forward projection |
-| **Layer toggles (3 checkboxes)** | Total (baseline + L1 + L2 + L3), L1 only (orbital lattice — 33 integer divisors of 8H at J2000), L2 (carbon-cycle thermostat 405/202/135 kyr family); the L3 Heaviside steps (PETM/EOT/Mi-1/MMCT/iNHG/MPT) are folded into every curve |
+| **Layer toggles (3 checkboxes)** | Total (baseline + L1 + L2 + L3), L1 only (the orbital lines — the 28 physical lines of doc 92 §2), L2 (carbon-cycle thermostat 405/202/135 kyr family); the L3 Heaviside steps (PETM/EOT/Mi-1/MMCT/iNHG/MPT) are folded into every curve |
 | **Proxy chart** | Observed proxy data + the formula evaluated at the same timestamps |
 | **CENOGRID proxy sub-toggle** | δ¹⁸O vs δ¹³C |
 | **Forward projection tab** | Predicts climate forcing forward — Holocene correctly identified as interglacial; next natural glaciation predicted ~58 kyr ahead |
@@ -517,20 +517,20 @@ See [doc 58 — Climate Formula Explorer](58-climate-formula-explorer.md) for th
 
 ### Purpose
 
-Modal that visualizes the **Expanding Solar System Resonance Theory (ESSRT)** — how the Earth Fundamental Cycle H, axial precession, obliquity period, length-of-day, year length, AU distance, and Moon distance evolve across deep time. The Solar System Resonance Cycle (8H ≈ 2.68 Myr today) and its integer-divisor lattice are structural invariants, but H itself expands monotonically across geological time via two physically independent drivers: **Earth-Moon tidal evolution (Driver 1)** lengthens LOD; **solar mass loss (Driver 2)** expands every orbit via Kepler's third law. The integers in the lattice stay fixed; only the literal time unit scales.
+Modal that visualizes the **Expanding Solar System Resonance Theory (ESSRT)** — how the mean lunisolar precession period, the obliquity beat, length-of-day, year length, AU distance, and Moon distance evolve across deep time. The clock lengthens monotonically across geological time via two physically independent drivers: **Earth-Moon tidal evolution (Driver 1)** lengthens LOD and weakens the lunar torque; **solar mass loss (Driver 2)** expands every orbit via Kepler's third law. The climate formula's precession-band lines ride the clock; its eccentricity-band lines (planetary beats) do not.
 
 ### Accessing the Explorer
 
 1. Open the Tweakpane Tools folder
 2. Click "ESSRT Explorer"
-3. Use the **Quantity** tabs (top row, 7 tabs) to select what to plot: H-Period, Axial Precession, Obliquity period, Length of Day, Length of Year, AU Distance, Moon Distance
+3. Use the **Quantity** tabs (top row, 6 tabs) to select what to plot: Axial Precession, Obliquity period, Length of Day, Length of Year, AU Distance, Moon Distance
 4. Use the **Range** tabs (second row, teal accent) to select the time range: Full (−4.5 Gyr genesis → +1 Gyr) or Phanerozoic (650 Ma)
 
 ### Key Features
 
 | Feature | Description |
 |---------|-------------|
-| **Quantity tabs (gold, 7)** | H-Period, Axial Precession, Obliquity period, Length of Day, Length of Year, AU Distance, Moon Distance — all derived from the regime-aware recession history + angular-momentum conservation + Driver 2 solar mass loss |
+| **Quantity tabs (gold, 6)** | Axial Precession (the composed lunisolar period), Obliquity period (the beat), Length of Day, Length of Year, AU Distance, Moon Distance — all derived from the regime-aware recession history + angular-momentum conservation + Driver 2 solar mass loss |
 | **Range tabs (teal, 2)** | Full deep-time (genesis −4.498 Gyr → +1 Gyr) and Phanerozoic 650 Ma |
 | **Hover tooltip** | Year and value at any point on the chart, with snap-to-nearest-sample |
 | **Export buttons** | "Export Full" and "Export Phanerozoic" — produce paper-style SVG (white background) for the selected quantity over those ranges |
@@ -573,7 +573,7 @@ It is the interactive home of the **Σ_stack ↔ Bond 2001 IRD comparison** — 
 
 - **Chart overlay** = GISP2 (Alley 2000) — smoothest signal across the Holocene window
 - **Chart overlay (deep)** = LR04 benthic stack (Lisiecki & Raymo 2005) — derived at load from `public/input/lr04-data.json` (the Climate Formula Explorer's dataset) as inverted δ¹⁸O anomaly vs core-top (positive = warm, same sign convention as Bond IRD); 1-kyr resolution, covers the full 200,000 BC tab where GISP2 ends (~27,950 BC)
-- **Correlation target** = Bond 2001 IRD stack — Bond's *own* dataset, the most direct out-of-sample validation of the framework's Bond harmonic (the IRD drift-ice signal is the same physical mass-redistribution signal the 8H/1830 harmonic models, which is why it correlates at +0.36 where GISP2 gives only +0.24, joint world)
+- **Correlation target** = Bond 2001 IRD stack — Bond's *own* dataset, the most direct out-of-sample validation of the framework's Bond harmonic (the IRD drift-ice signal is the same physical mass-redistribution signal the Bond harmonic (n = 1830, 1466 yr) models, which is why it correlates at +0.36 where GISP2 gives only +0.24, joint world)
 
 GISP2 + Bond live in `public/input/climate-proxy.json`; all are loaded/derived by `lcrLoadProxyData()` with GitHub raw-URL fallback.
 
@@ -674,7 +674,7 @@ This 99.994% agreement validates that our orbital elements are consistent with p
 | [05 - The Invariable Plane](05-invariable-plane-overview.md) | Height calculation formulas |
 | [20 - Constants Reference](20-constants-reference.md) | Planet masses and orbital elements |
 | 38 - Eccentricity Balance Scale (archived — [retired record](retired-record.md)) | Law 5 balance math; Saturn eccentricity prediction |
-| 55 - Solar System Resonance Cycle (archived — [retired record](retired-record.md)) | 8H period table for all planets × cycles |
+| 55 - the planetary integer-label period table (archived — [retired record](retired-record.md)) | the retired per-planet integer tabulation |
 | [56 - WebGeoCalc Explorer](56-webgeocalc-explorer.md) | Observed perihelion-precession (JPL NAIF, 1900–2026) |
 | [57 - Formula Verification](57-formula-verification.md) | Model vs published celestial-mechanics formulas (±12 k yr) |
 | [58 - Climate Formula Explorer](58-climate-formula-explorer.md) | Dedicated panel reference for the Climate Formula Explorer modal |

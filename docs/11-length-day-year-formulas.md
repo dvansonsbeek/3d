@@ -9,7 +9,7 @@ status: current
 
 > **Status — the frozen era clock.** The Fourier-harmonic laws in this document are the **certified, IAU-anchored era device** (see `tools/fit/README.md` §"The frozen era clock"): their coefficients are frozen, their fitters archived, and re-fitting them against a one-source export is a cross-family error (measured: interior RMS blows up 0.23–0.37 min → 8.8–16 min). The **displayed and served of-date values** (tweakpane year rows, Formula Verification model lines, the report's Physics columns, the API) come from the **one-source movement family** — `createYearLengths` in `@essrt/physics` (equinox-rate tropical mean, the λ̇-channel sidereal, the cardinal-structure anomalistic, and their precession beats). The harmonic laws remain the internal kinematic family (the `o.*` chain, `lodKinematic`, the scene frame), the `?hybridSpin=0` opt-out display, and the era-certification record.
 
-> **Scope.** This document describes the **modern-era / within-H Fourier-harmonic picture** — the means derived from `inputmeanlengthsolaryearindays = 365.2422` and Earth Fundamental Cycle `H = 335,317 yr`, with Fourier oscillations fitted across one full H. At deep-time / Phanerozoic / Hadean epochs the **mean values themselves shift** per the [Expanding Solar System Resonance Theory (Doc 99)](99-expanding-solar-system-resonance-theory.md): H(t) grows under Driver 1 (Earth-Moon tidal evolution → LOD grows) while the sidereal year in seconds shifts under Driver 2 (solar mass loss → Kepler `dT/T = −2 dM/M`). For deep-time work use the epoch-dependent helpers (`meanLodSecondsAtAge`, `meanSiderealYearSecondsAtAge`, `meanHAtAge`, `meanTropicalYearSecondsAtAge`) — see [Doc 20 §"ESSRT epoch dependence"](20-constants-reference.md#essrt-epoch-dependence--most-tabulated-values-are-j2000-anchored) for the J2000-constant → helper map.
+> **Scope.** This document describes the **modern-era / within-H Fourier-harmonic picture** — the means derived from `inputmeanlengthsolaryearindays = 365.2422` and the fitted timing anchor `H = 335,317 yr` (the frozen era clock's unit), with Fourier oscillations fitted across one full anchor interval. At deep-time / Phanerozoic / Hadean epochs the **mean values themselves shift** per the [Expanding Solar System Resonance Theory (Doc 99)](99-expanding-solar-system-resonance-theory.md): H(t) grows under Driver 1 (Earth-Moon tidal evolution → LOD grows) while the sidereal year in seconds shifts under Driver 2 (solar mass loss → Kepler `dT/T = −2 dM/M`). For deep-time work use the epoch-dependent helpers (`meanLodSecondsAtAge`, `meanSiderealYearSecondsAtAge`, `meanHAtAge`, `meanTropicalYearSecondsAtAge`) — see [Doc 20 §"ESSRT epoch dependence"](20-constants-reference.md#essrt-epoch-dependence--most-tabulated-values-are-j2000-anchored) for the J2000-constant → helper map.
 
 ## Architecture
 
@@ -60,7 +60,7 @@ where `siderealYearJ2000 = 365.25636301` days (from `astro-reference.json`). As 
 
 ## Mean Year Lengths (Derived)
 
-All three mean year lengths derive from `inputmeanlengthsolaryearindays` and the Earth Fundamental Cycle `H = 335,317`:
+All three mean year lengths derive from `inputmeanlengthsolaryearindays` and the fitted timing anchor `H = 335,317` (the frozen era clock's unit — device identities, plan 06 D8):
 
 | Year type | Formula | Mean (days) |
 |-----------|---------|-------------|
@@ -333,7 +333,7 @@ These are **two different quantities** that happen to share a formula. Before th
 9.12 ms/day × 366.24 sidereal days/year × H/13 years = 1.0000 sidereal days
 ```
 
-This is a structural count on the H-lattice and is deliberately **not** projected. `axialCoinRotationMs` uses the unprojected rate. Substituting 8.37 ms into the identity gives 0.917 days, not 1.000.
+This is a device count on the anchor's divisors and is deliberately **not** projected. `axialCoinRotationMs` uses the unprojected rate. Substituting 8.37 ms into the identity gives 0.917 days, not 1.000.
 
 **Stellar−sidereal day offset — 8.37 ms, on the equator.** The physical difference between the two day lengths depends on how fast the equinox moves *along the equator* (precession in right ascension, m), not along the ecliptic (precession in longitude, p, which is what H/13 represents). Since m = p·cos ε, the stellar day carries `STELLAR_DAY_RA_PROJECTION = cos ε`:
 

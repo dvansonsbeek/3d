@@ -83,7 +83,7 @@ day lengths), `cardinal` (solstice/equinox JD, RA, year length), `moon`
 JD(UT) axis — ecliptic longitude, latitude and distance from the shared
 Meeus series over framework-native arguments), `eclipse` (geocentric
 solar/lunar eclipse search over a JD window, greatest-eclipse convention),
-`climate` (the L1 orbital-forcing formula) and `planets` (the Fibonacci-law
+`climate` (the L1 orbital-forcing formula) and `planets` (the retired integer-law
 records and orientation at epoch). Validation targets are refused as
 inputs — a counterfactual cannot move the goalposts it is judged by.
 

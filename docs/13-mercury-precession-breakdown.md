@@ -73,7 +73,7 @@ between Earth's apsidal precession (H/3) and ecliptic precession
 and its 6th harmonic is H/45. The fluctuation arises because a planet's
 perihelion marker inherits Earth's precession-layer transformations in
 the scene graph; measured in Earth's equatorial frame these compound into
-the apparent rate. Over a complete Earth Fundamental Cycle H the
+the apparent rate. Over a complete anchor interval the
 oscillations cancel — sometimes Earth's orientation adds to the apparent
 rate, sometimes it subtracts — so the long-term Earth-frame average
 equals the ecliptic value. (`tools/verify/mercury-precession-centuries.js`
@@ -232,7 +232,7 @@ applied as a formula; inside the scene the equatorial frame and the star
 field share the H/13 rotation, so a scene measurement cannot separate
 "relative to the equinox" from "relative to the stars" — see §1.8, "Frames,
 measured". **The model treats the
-ICRF as the stable foundation** — it's the frame in which the Fibonacci
+ICRF as the stable foundation** — it's the frame in which the retired integer
 structure (H/3, H/5, H/8, H/13, H/16) is anchored — and derives the
 ecliptic rate from it via this relation. That's why the model's ecliptic
 rates match WebGeoCalc directly (both measure the date-frame) while L-L's
@@ -243,7 +243,7 @@ conventions).
 says Saturn's ecliptic retrograde rate is a transient phase of the
 Great-Inequality oscillation (~900-yr period) and will reverse within
 ~450 yr. The Holistic Universe Model says Saturn's ecliptic rate is
-permanently retrograde at `−8H/65 = −3,140 ″/cy` because that's the correct
+permanently retrograde at `−3,140 ″/cy` (the device's ecliptic-period value) because that's the correct
 date-frame expression of the stable ICRF structure. Long-baseline JPL
 DE441 integrations (13 000 BC → 17 000 AD) can in principle distinguish
 these. See [docs/10-fibonacci-laws.md §Law 6](10-fibonacci-laws.md#law-6-saturn-jupiter-earth-resonance) for the full discussion.
@@ -294,7 +294,7 @@ obliquity law and κ a small of-date coupling (≤ 0.7 ″/cy, measured). The ga
 planets at 1900/2000/2100 to 1 ″/cy.
 
 **Mercury.** The ecliptic advance is the lattice divisor,
-<!--v:mercuryPeriRateEclipticArcsecCy-->531.44<!--/v--> ″/cy (8H/11). At the
+<!--v:mercuryPeriRateEclipticArcsecCy-->531.44<!--/v--> ″/cy (the device's ecliptic-period value). At the
 IAU J2000 perihelion longitude (77.457°) and the IAU 2006 obliquity the slope
 is <!--v:mercuryPeriRaSlopeJ2000-->1.08036<!--/v-->, the projected rate
 <!--v:mercuryPeriRateRaProjectedJ2000-->574.14<!--/v--> ″/cy, and the excess
@@ -420,7 +420,7 @@ cannot be that motion.
 **Pre-registered slot for a lattice-native cause.** Since the excess is a
 property of the orbit, any explanation must be a rule that acts at the
 body — one formula for every body from lattice/orbital quantities only (H,
-8H/N, a, e, period, masses), with no obliquity and no longitude measured
+the device's ecliptic periods, a, e, period, masses), with no obliquity and no longitude measured
 from the equinox, and no parameter fitted to the targets (or fitted on
 Mercury alone and then predicting the rest). The harness
 `tools/explore/perihelion-excess-candidates.mjs` scores such rules against
@@ -435,7 +435,7 @@ Mercury and Icarus (a second ~5 % coincidence: at ϖ = 119° the RA stretch
 is ~4 %, and so is GR/Newtonian for Icarus) and fails Mars by 34σ, because
 in ecliptic longitude the projection is identically zero while the Mars
 data want ≈ 0 and the rule gives −101; a constant fraction of the
-Newtonian rate, k/a, and the nearest 8H/N slot fail. The lattice-native
+Newtonian rate, k/a, and the nearest device-period slot fail. The device-native
 slot is empty; a proposal is scored by defining its function there.
 
 **The model's own N-body.** The audit of every planet's perihelion and node
@@ -458,19 +458,19 @@ For each planet: **WebGeoCalc observed** (JPL/NAIF short-baseline
 diagonal sum from §1.1), and the **model's value** (whose quantity TYPE
 differs per planet — doc 109 §9: Mars = long-term mean, Mercury =
 present-epoch rate, Jupiter/Saturn/Uranus = window-epoch values). All in
-″/century; the 8H/N figures are J2000-evaluated (the divisor is the
+″/century; the device-period figures are J2000-evaluated (the divisor is the
 scale-invariant quantity; the literal rate scales with H(t) at deep time
 under [ESSRT](99-expanding-solar-system-resonance-theory.md)).
 
 | Planet | WebGeoCalc observed | First-order A_ii | Model | Notes |
 |--------|--------------------|-----------------|-----------------|-------|
-| Mercury | ~570 | ~553 | 531 (H × 8/11) | L-L matches obs to ~3 % |
-| Venus | ~0 | ~1,199 | −290 (−8H/6) | L-L fails catastrophically (low-e singularity) |
-| Earth | ~<!--v:earthObservedRate-->6,186<!--/v--> | ~1,280 | 6,187 (H/16) | Model matches obs exactly; L-L gives inertial rate (different frame) |
-| Mars | ~<!--v:marsObservedRate-->1,600<!--/v--> | ~1,776 | 1,739 (8H/36) | L-L over by ~11 %; model matches obs to ~9 % |
-| Jupiter | ~<!--v:jupiterObservedRate-->1,800<!--/v--> | ~754 | 1,884 (8H/39) | L-L under by ~58 % (Jupiter–Saturn 5:2 coupling missing); model matches obs to ~5 % |
-| Saturn | retrograde, magnitude window-sensitive (~−1,800 to −3,600) | +1,867 | −3,140 (−8H/65) | L-L has wrong sign; model sits within the observed window-spread |
-| Uranus | ~<!--v:uranusObservedRate-->1,100<!--/v--> | ~278 | 1,160 (H/3) | L-L under by ~75 %; model matches obs to ~5 % |
+| Mercury | ~570 | ~553 | 531 (device ecliptic period) | L-L matches obs to ~3 % |
+| Venus | ~0 | ~1,199 | −290 (device) | L-L fails catastrophically (low-e singularity) |
+| Earth | ~<!--v:earthObservedRate-->6,186<!--/v--> | ~1,280 | 6,187 (the perihelion-of-date rate) | Model matches obs exactly; L-L gives inertial rate (different frame) |
+| Mars | ~<!--v:marsObservedRate-->1,600<!--/v--> | ~1,776 | 1,739 (device) | L-L over by ~11 %; model matches obs to ~9 % |
+| Jupiter | ~<!--v:jupiterObservedRate-->1,800<!--/v--> | ~754 | 1,884 (device) | L-L under by ~58 % (Jupiter–Saturn 5:2 coupling missing); model matches obs to ~5 % |
+| Saturn | retrograde, magnitude window-sensitive (~−1,800 to −3,600) | +1,867 | −3,140 (device) | L-L has wrong sign; model sits within the observed window-spread |
+| Uranus | ~<!--v:uranusObservedRate-->1,100<!--/v--> | ~278 | 1,160 (device) | L-L under by ~75 %; model matches obs to ~5 % |
 | Neptune | ~200 | ~68 | 193 (2H) | L-L under by ~66 %; model matches obs to ~4 % |
 
 First-order L-L is a reasonable approximation for Mercury and Mars but

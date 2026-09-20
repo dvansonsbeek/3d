@@ -66,7 +66,7 @@ function computePlanetInvPlaneInclinationDynamic(planet, currentYear) {
 
 All seven fitted planets share the same balanced-year anchor — **n=7,
 year ≈ -<!--v:systemResetYearPlain-->2,649,854<!--/v-->**, the oldest of
-the eight anchors in the current 8H octave:
+the eight anchors in the current eight-unit interval:
 
 | Planet | Cycle Anchor | Balance Group | n | Balanced Year | ICRF Direction | Incl. Trend at J2000 |
 |--------|-------------|---------------|----------|-------------|----------------|----------------------|
@@ -80,7 +80,7 @@ the eight anchors in the current 8H octave:
 | Neptune | <!--v:neptuneInclCycleAnchor-->174.04<!--/v-->° | In-phase | n=7 | -<!--v:systemResetYearPlain-->2,649,854<!--/v--> | Retrograde | Decreasing |
 | Pluto | <!--v:plutoInclCycleAnchor-->203.32<!--/v-->° | — | — | — | Retrograde | — |
 
-\* Uranus's ICRF perihelion period (H/10) divides H exactly, so its n=7 phase coincides with n=0; Jupiter (8H/65) and Saturn (8H/169) carry non-integer cycles per H, so their per-anchor phases differ.
+\* Uranus's ICRF perihelion period (H/10) divides H exactly, so its n=7 phase coincides with n=0; Jupiter and Saturn carry non-integer cycles per anchor interval, so their per-anchor phases differ.
 
 Key facts:
 - Earth's anchor is set independently from the IAU obliquity model and
@@ -98,17 +98,17 @@ ecliptic rate − general precession H/13). Literal values J2000-evaluated:
 
 | Planet | Ecliptic Period | ICRF Period | ICRF Direction |
 |--------|----------------|-------------|----------------|
-| Mercury | `H × 8/11` | `8H/93` ≈ <!--v:mercuryPeriPeriodICRF-->28,844<!--/v--> yr | Retrograde |
-| Venus | `−8H/6` | `8H/110` ≈ <!--v:venusPeriPeriodICRF-->24,387<!--/v--> yr | Retrograde |
+| Mercury | `Y × 8/11` | <!--v:mercuryPeriPeriodICRF-->28,844<!--/v--> yr | Retrograde |
+| Venus | `−8Y/6` | <!--v:venusPeriPeriodICRF-->24,387<!--/v--> yr | Retrograde |
 | Earth | `H / 16` | `H/3` ≈ <!--v:earthPeriPeriodICRF-->111,570<!--/v--> yr | Prograde (sole) |
-| Mars | `H × 8/36` | `8H/68` ≈ <!--v:marsPeriPeriodICRF-->39,449<!--/v--> yr | Retrograde |
-| Jupiter | `8H/39` | `8H/65` ≈ <!--v:jupiterPeriPeriodICRF-->41,270<!--/v--> yr | Retrograde |
-| Saturn | `−8H/65` | `8H/169` ≈ <!--v:saturnPeriPeriodICRF-->15,873<!--/v--> yr | Retrograde |
+| Mars | `Y × 8/36` | <!--v:marsPeriPeriodICRF-->39,449<!--/v--> yr | Retrograde |
+| Jupiter | `8Y/39` | <!--v:jupiterPeriPeriodICRF-->41,270<!--/v--> yr | Retrograde |
+| Saturn | `−8Y/65` | <!--v:saturnPeriPeriodICRF-->15,873<!--/v--> yr | Retrograde |
 | Uranus | `H / 3` | `H/10` ≈ <!--v:uranusPeriPeriodICRF-->33,532<!--/v--> yr | Retrograde |
 | Neptune | `H × 2` | `2H/25` ≈ <!--v:neptunePeriPeriodICRF-->26,825<!--/v--> yr | Retrograde |
 | Pluto | `H` | `H/12` ≈ <!--v:plutoPeriPeriodICRF-->27,943<!--/v--> yr | Retrograde |
 
-All ICRF perihelion periods divide evenly into 8H = <!--v:eightH-->2,682,536<!--/v--> years
+All ICRF perihelion periods divide evenly into the anchor's eight-unit interval, Y₈ = <!--v:eightH-->2,682,536<!--/v--> years (a device construction of the no-chain scaffolding)
 at J2000, so all bodies return simultaneously to their balanced-year
 configuration.
 
@@ -162,7 +162,7 @@ planets, ~4.3″/century total error.
 ### Ascending node on the invariable plane (linear regression)
 
 Each body's Ω on the invariable plane regresses linearly from its J2000
-anchor. For the fitted planets the period is `−(8H)/N` with N stored as
+anchor. For the fitted planets the period is `−(8Y)/N` (Y the anchor interval) with N stored as
 `ascendingNodeCyclesIn8H` (integers fit to JPL J2000-frame ecliptic-
 inclination trends; Jupiter and Saturn share N=36 — the gas-giant pair's
 nodes regress in lockstep); Earth regresses at `−H/5` (the ecliptic

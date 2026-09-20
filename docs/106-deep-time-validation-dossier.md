@@ -67,10 +67,10 @@ never to the fossil data it is tested against.
 
 ## B. Cyclostratigraphy and climate spectra — artifact-backed
 
-The L1 integer-divisor lattice (8H/n) against the Cenozoic isotope record:
+The climate formula's orbital lines against the Cenozoic isotope record (the comb-era measurements below used the integer-label comb; the shipped lines are the physical set, doc 92 §2):
 
 - **Cenogrid spectral evidence** — MTM F-tests and windowed spectra of the
-  Westerhold 2020 CENOGRID stack against the 8H lattice:
+  Westerhold 2020 CENOGRID stack against the comb-era line set:
   [doc 91](91-milankovitch-evidence.md) with generated artifacts
   (`data/milankovitch-8h-cenogrid-*.json`, `data/cenogrid-mtm-ftest.json`)
   under `check:artifacts` freshness.
@@ -82,7 +82,7 @@ The L1 integer-divisor lattice (8H/n) against the Cenozoic isotope record:
   history. The former "matches 36–38 kyr (Meyers 2008, Boulila 2018)" was a
   mis-citation of Cretaceous and Eocene records, withdrawn: [doc 99 §Predicted climate lines](99-expanding-solar-system-resonance-theory.md#predicted-climate-lines-at-each-age--obliquity-band).
 - **The 405-kyr caveat, stated plainly** — the Laskar g₂−g₅ eccentricity
-  eigenbeat is *off* the 8H lattice; the record's 405-kyr power is
+  eigenbeat was *off* the comb-era grid (it is a line of the shipped physical set); the record's 405-kyr power is
   carbon-cycle amplified and is not claimed for the lattice:
   [doc 93](93-l1-attribution-reference.md).
 - **Discriminating power, stated plainly** — the 66-Ma record cannot
@@ -160,7 +160,7 @@ The L1 integer-divisor lattice (8H/n) against the Cenozoic isotope record:
 | LOD–climate correlation | fails every null test → open correspondence, not validation | [doc 95](95-climate-summary.md) |
 | Lattice vs H(t) discrimination | 2.4σ — the 66-Ma record cannot decide | [doc 98](98-lattice-mechanism.md) |
 | Uniform secular solar drift | bounded at r = −0.13 ± 0.09 ms/cy; a uniform −0.5 is disfavoured ~4σ | fit-anchor documentation |
-| The former Config-#7 falsification criterion | RETIRED with the Fibonacci-law restatement (checks 46–50 of verify-laws are narrative class — the record, no longer a gate). The current criterion stands on three legs: the deep-time scaling split, historical-era exactness, and two-expansions μ-consistency | CLAUDE.md §falsification, [doc 109](109-model-nbody-engine-and-lattice-test.md) |
+| The former Config-#7 falsification criterion | RETIRED with the integer-law restatement (checks 46–50 of verify-laws are narrative class — the record, no longer a gate). The current criterion stands on three legs: the deep-time scaling split, historical-era exactness, and two-expansions μ-consistency | CLAUDE.md §falsification, [doc 109](109-model-nbody-engine-and-lattice-test.md) |
 
 ## Re-running everything
 

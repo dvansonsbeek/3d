@@ -5238,7 +5238,7 @@ for (const k of PLANET_KEYS) {
   const recovered = sign * (8 * HOLISTIC_YEAR_J2000) / N;
   const relErr    = Math.abs(recovered - periEclipticYears) / Math.abs(periEclipticYears);
   if (relErr > 1e-6) {
-    console.error(`Phase P-C0: planet ${k} perihelion ecliptic period ${periEclipticYears} not on 8H/N lattice (sign=${sign}, N=${N}, recovered=${recovered}, relErr=${relErr})`);
+    console.error(`Phase P-C0: planet ${k} perihelion ecliptic period ${periEclipticYears} not on the eight-unit divisor grid (sign=${sign}, N=${N}, recovered=${recovered}, relErr=${relErr})`);
   }
   _planetPerihelionDivisors[k] = N;
   _planetPerihelionSigns[k]    = sign;
@@ -17373,7 +17373,7 @@ function cfmRenderChart(tabKey) {
         <table class="cfm-r2-table">
           <thead><tr><th>Layer</th><th>R² (cumulative)</th><th>ΔR² (unique)</th><th>Notes</th></tr></thead>
           <tbody>
-            <tr><td>L1 orbital (31 lattice integers)</td><td>${r2.l1_only.toFixed(4)}</td><td>${r2.l1_only.toFixed(4)}</td><td>Σ cos(2πn·t/8H)</td></tr>
+            <tr><td>L1 orbital (${regime.L1.length} engine beat lines)</td><td>${r2.l1_only.toFixed(4)}</td><td>${r2.l1_only.toFixed(4)}</td><td>Σ aᵢ cos(2πt/Tᵢ) + bᵢ sin(2πt/Tᵢ)</td></tr>
             <tr><td>+ L2 carbon thermostat (3 lines: 405k, 202k, 135k)</td><td>${r2.l1_l2.toFixed(4)}</td><td>${(r2.delta_l2 >= 0 ? '+' : '')}${r2.delta_l2.toFixed(4)}</td><td>silicate-weathering family</td></tr>
             <tr><td>+ L3 boundary steps (${nL3} transition${nL3 === 1 ? '' : 's'} in window)</td><td>${r2.l1_l2_l3.toFixed(4)}</td><td>${(r2.delta_l3 >= 0 ? '+' : '')}${r2.delta_l3.toFixed(4)}</td><td>Heaviside steps at named events</td></tr>
           </tbody>
@@ -17912,27 +17912,24 @@ async function createClimateFormulaPanel() {
       <label class="cfm-layer-check" title="L1 only — Orbital forcing applied to the baseline.
 Displayed curve = baseline + L1 contributions (the formula's prediction with ONLY L1 enabled).
 
-Structural claim: every L1 line is an EXACT integer divisor of 8H = 2,682,536 yr (the Solar System Resonance Cycle). The framework FIXES the 33 frequencies — only the amplitudes (a, b) are fitted. If the data demanded peaks at non-integer-divisor frequencies, the framework would be falsified.
+Structural claim: every L1 line is one of the engine's OWN secular beats — the periods are computed from the model's N-body secular modes (gᵢ apsidal, sᵢ nodal) and its composed precession rate p, never fitted. Only the amplitudes (a, b) are fitted. If the data demanded peaks the engine's beats cannot supply, the formula would be falsified.
 
-Three classic Berger peaks anchor the lattice:
- • 95.8 kyr  n=28  g₄−g₅ Mars-Jupiter eccentricity
- • 41.3 kyr  n=65  k+s₃ Earth obliquity
- • 23.7 kyr  n=113 k+g₅ Jupiter climatic precession
+Three classic Berger peaks fall out of the beats:
+ • 94.9 kyr  g₄−g₅ Mars-Jupiter eccentricity
+ • 41.2 kyr  p+s₃ Earth obliquity
+ • 23.8 kyr  p+g₅ Jupiter climatic precession
 
-Composition (gᵢ = planet i's apsidal rate, sᵢ = nodal rate, k = Earth axial precession constant, from Laskar 2004 secular planetary theory):
- • 7 direct planetary periods (Mercury / Mars axial-obliquity-apsidal-ecc, Jupiter axial)
- • 8 g-beats (eccentricity band: g₂−g₈ Venus-Neptune, g₃−g₂ Earth-Venus, g₄−g₂ Mars-Venus, g₄−g₅ Mars-Jupiter, g₃−g₇ Earth-Uranus, g₄−g₇ Mars-Uranus, g₆−g₅ Saturn-Jupiter, g₄−s₃ Mars-Earth)
- • 8 s-beats (nodal / obliquity band: s₅−s₁, s₄−s₆, s₁−s₄, s₈−s₃, s₅−s₃, s₇−s₆, k+s₃ Earth obliquity, k+s₄ Mars obliquity)
- • 2 canonical climatic precession lines (k+g₅ Jupiter 23.7 kyr, k+g₂ Venus 22.4 kyr)
- • 6 precession-band sidebands added per doc 92 Round 1 (MTM-significant): k+g₆ Saturn (27.9 kyr), k+g₇ Uranus (25.1 kyr), k+g₃ Earth (24.4 kyr), k+g₅ Jupiter sub (20.0 kyr), k+g₄ Mars (17.6 kyr), k+g₂ Venus sub (14.5 kyr)
- • 1 Berger-quintet completion: k+g₃ Earth climatic precession (19.0 kyr, n=141)
- • 1 regime-admitted line: Earth's own H/3 eccentricity line (111.8 kyr, n=24 — no secular-theory counterpart; doc 94 §10)
+Composition (28 lines, doc 92 §2 — the engine-written list):
+ • 5 climatic-precession lines p+gᵢ (19.0–23.8 kyr) — ride the composed precession rate at deep time
+ • 10 obliquity lines p+sᵢ (27.4–54.1 kyr) — ride the composed precession rate at deep time
+ • 10 eccentricity lines gᵢ−gⱼ (94.9–134.5 kyr) — planetary beats, fixed at every epoch
+ • the 405.6-kyr g₂−g₅ long-eccentricity metronome and its 202.8 / 135.2-kyr carbon-thermostat harmonics (doc 92 §3)
 
 Fitted via sequential ridge regression — see doc 92 §9."><input type="checkbox" data-layer="l1" ${cfmLayerVisibility.l1 ? 'checked' : ''}/><span class="cfm-swatch cfm-swatch-l1"></span>L1 alone</label>
       <label class="cfm-layer-check" title="L2 alone — formula evaluated with ONLY the carbon thermostat enabled.
 Displayed curve = baseline + L2 contributions.
 
-L2 family: 405-kyr fundamental (g₂−g₅ eccentricity beat, off-lattice) + 202-kyr 2nd harmonic + 135-kyr 3rd harmonic. The natural silicate-weathering carbon-cycle response to eccentricity forcing. The 405-kyr beat appears as a slow modulation on top of the baseline.
+L2 family: 405-kyr fundamental (the g₂−g₅ eccentricity beat) + 202-kyr 2nd harmonic + 135-kyr 3rd harmonic. The natural silicate-weathering carbon-cycle response to eccentricity forcing. In the shipped coefficient file this family rides INSIDE L1 (doc 92 §2 lines 26–28) and the separate L2 layer is empty, so this curve coincides with the baseline.
 
 Note: L1, L2, and Total each carry the baseline once — they do NOT visually sum to Total. Read per-layer variance contributions from the R² panel below."><input type="checkbox" data-layer="l2" ${cfmLayerVisibility.l2 ? 'checked' : ''}/><span class="cfm-swatch cfm-swatch-l2"></span>L2 alone</label>
     </div>
@@ -18817,7 +18814,7 @@ async function createEssrtPanel() {
       <div class="cfm-header">
         <div style="display:flex; flex-direction:column; align-items:flex-start; flex:1; min-width:0">
           <div class="cfm-title">Expanding Solar System Resonance Theory (ESSRT)</div>
-          <div class="cfm-subtitle" style="margin:2px 0 0 0; font-size:11px; color:#9b9b9b; line-height:1.4">The Solar System Resonance Cycle (8H ≈ 2.68 Myr today) and its integer-divisor lattice are structural invariants — but the cycle <strong>expands monotonically in time</strong>: H was smaller in the past, will be larger in the future. The integers stay fixed; only the time unit scales.</div>
+          <div class="cfm-subtitle" style="margin:2px 0 0 0; font-size:11px; color:#9b9b9b; line-height:1.4">Earth's clock is the mean lunisolar precession period — and it <strong>lengthens monotonically in time</strong>: shorter in the past, longer in the future, as tidal friction slows the spin and the receding Moon weakens its torque. The precession-band climate lines ride it; the planetary eccentricity beats do not.</div>
         </div>
         <button class="cfm-export-btn" data-essrt-export="full"    title="Export this chart over the FULL (−4.54 to +1 Gyr) time range as a paper-style SVG (white background)">Export Full</button>
         <button class="cfm-export-btn" data-essrt-export="phanero" title="Export this chart over the Phanerozoic 650 Ma window as a paper-style SVG (white background)">Export Phanerozoic</button>
@@ -29443,7 +29440,7 @@ function setupGUI() {
   addTestButton('All cycles (4-flag stack) ↔ climate transitions', () => {
     console.log('\n════════════════════════════════════════════════════════════════════════════════════');
     console.log('  All-cycles 4-flag stack (flags only, swing excluded) — zero-crossing timings vs named climate transitions');
-    console.log('  Bond 8H/1830 (1466 yr) + Hallstatt 8H/1104 (2430 yr) + Jose5 8H/2989 (897 yr) + Jose4 8H/3749 (716 yr)');
+    console.log('  Bond (n=1830, 1466 yr) + Hallstatt (n=1104, 2430 yr) + Jose5 (n=2989, 897 yr) + Jose4 (n=3749, 716 yr)');
     console.log('  (The Core-mantle swing is core-supplied, not climate — excluded here so crossings match');
     console.log('   the LOD-Climate Rhythm modal\'s ▲/▼ markers, which gate on the flags-only L3 curve.)');
     console.log('════════════════════════════════════════════════════════════════════════════════════');
@@ -33958,9 +33955,9 @@ function setupGUI() {
     // Use console.warn for critical spine markers so Chrome DevTools throttling
     // doesn't drop them after long log bursts from §1-§13 (same fix pattern used
     // earlier for §5-§11 in this button).
-    console.warn('▶ Starting SECTION 14: 8H integer-divisor scan against residual (find next lattice harmonics)...');
+    console.warn('▶ Starting SECTION 14: harmonic-divisor scan against residual (find next candidate harmonics)...');
     console.log('\n══════════════════════════════════════════════════════════════════════════════');
-    console.log('  SECTION 14: 8H integer-divisor scan against residual');
+    console.log('  SECTION 14: harmonic-divisor scan against residual');
     console.log('══════════════════════════════════════════════════════════════════════════════');
     try {
       if (!window._L5b_missing_signal || !Array.isArray(window._L5b_missing_signal.samples)) {
@@ -33972,11 +33969,11 @@ function setupGUI() {
       const rs = samples.map(s => s.diff);   // Stephenson − our model
       const nPts = ys.length;
 
-      console.log('  Scans 8H integer divisors for lattice-harmonic structure in the current');
+      console.log('  Scans the divisors of the anchor’s eight-unit interval for harmonic structure in the current');
       console.log('  Stephenson − model residual, ranking by ΔR² gain over polynomial-only baseline.');
       console.log('  ');
       console.log('  The scanned residual REFLECTS the current toggle state:');
-      console.log('    • Toggle ON  → residual after 8H/1830 correction (this is what\'s LEFT to explain)');
+      console.log('    • Toggle ON  → residual after the Bond (n=1830) correction (this is what\'s LEFT to explain)');
       console.log('    • Toggle OFF → raw residual (bare framework vs Stephenson)');
       console.log('  ');
 
@@ -34187,7 +34184,7 @@ function setupGUI() {
         tableLines.push('    not observations (per-event noise ~1,200 s). With the residual at the ~30-s noise');
         tableLines.push('    floor, a "STRONG" verdict can be spline structure + a degenerate divisor ridge');
         tableLines.push('    (the 2.7-kyr window cannot resolve n at these periods — note the flat top-10).');
-        tableLines.push('    Research note, not a shipping candidate — see TODO (8H/2024 item) + doc 104 §8.');
+        tableLines.push('    Research note, not a shipping candidate — see TODO (the n=2024 item) + doc 104 §8.');
         if (interpTop) tableLines.push(`           Structural interpretation: ${interpTop.mult}${interpTop.op}${interpTop.label} (${interpTop.err.toFixed(2)}% error)`);
         if (distinctSecondary) {
           const interp2 = interpretPeriod(distinctSecondary.P);
@@ -34199,7 +34196,7 @@ function setupGUI() {
         if (interpTop) tableLines.push(`           Structural interpretation: ${interpTop.mult}${interpTop.op}${interpTop.label} (${interpTop.err.toFixed(2)}% error)`);
       } else {
         tableLines.push('  VERDICT: NO further lattice signal above ΔR² > 0.02.');
-        tableLines.push('           Remaining residual doesn\'t decompose further on the 8H lattice.');
+        tableLines.push('           Remaining residual doesn\'t decompose further on the divisor grid.');
         tableLines.push('           It\'s either observation noise + drift or off-lattice structure.');
       }
       tableLines.push('══════════════════════════════════════════════════════════════════════════════════');
@@ -35546,7 +35543,7 @@ function setupGUI() {
   // ────────────────────────────────────────────────────────────────────────
   addTestButton('Verify Perihelion Ecliptic Frame Pairs', () => {
     console.log('\n══════════════════════════════════════════════════════════════════════════════════');
-    console.log('  Phase P-C(any) verification — perihelion ecliptic frames (Law-6 8H/N)');
+    console.log('  Phase P-C(any) verification — perihelion ecliptic frames (the device’s ecliptic-period descriptors)');
     console.log('  Each tagged planet: tag integrity + pair cancellation + bit-equivalence');
     console.log('══════════════════════════════════════════════════════════════════════════════════\n');
 
@@ -38624,26 +38621,26 @@ async function runBalancedYearNavigationTest() {
   console.log(`H period (calendar yr)               = ${H_period.toFixed(2)}`);
   console.log(`Δ vs H_J2000                         = ${(H_period - HOLISTIC_YEAR_J2000).toFixed(2)} yr (${((H_period - HOLISTIC_YEAR_J2000) / HOLISTIC_YEAR_J2000 * 1e6).toFixed(1)} ppm)`);
   console.log('');
-  console.log(`8H_J2000 (= 8 × H_J2000)             = ${8 * HOLISTIC_YEAR_J2000} yr`);
-  console.log(`Last 8H year (cycle −7)              = ${last8H_yr.toFixed(2)}`);
-  console.log(`Next 8H year (cycle 1)               = ${next8H_yr.toFixed(2)}`);
-  console.log(`8H period (calendar yr)              = ${H8_period.toFixed(2)}`);
+  console.log(`eight-unit interval at J2000 (8 × anchor) = ${8 * HOLISTIC_YEAR_J2000} yr`);
+  console.log(`Last eight-unit year (cycle −7)      = ${last8H_yr.toFixed(2)}`);
+  console.log(`Next eight-unit year (cycle 1)       = ${next8H_yr.toFixed(2)}`);
+  console.log(`eight-unit period (calendar yr)      = ${H8_period.toFixed(2)}`);
   console.log(`Δ vs 8 × H_J2000                     = ${(H8_period - 8 * HOLISTIC_YEAR_J2000).toFixed(2)} yr (${((H8_period - 8 * HOLISTIC_YEAR_J2000) / (8 * HOLISTIC_YEAR_J2000) * 1e6).toFixed(1)} ppm)`);
   console.log('');
   console.log('Interpretation: the displayed periods are time-averaged harmonic-mean H over');
   console.log('the displayed cycle interval. Both intervals span deep into the past where');
   console.log('H was smaller (LOD shorter, Moon closer), so H_avg < H_J2000 → period shorter.');
-  console.log('The 8H interval is ~99% in the past → larger deviation than H interval.');
+  console.log('The eight-unit interval is ~99% in the past → larger deviation than the unit interval.');
   console.log('');
 
-  // ─── TEST 6: Sanity check — at J2000, Next H ≡ Next 8H ───
+  // ─── TEST 6: Sanity check — at J2000, next unit event ≡ next eight-unit event ───
   console.log('═══════════════════════════════════════════════════════════════════════════');
-  console.log('TEST 6: At J2000, Next H and Next 8H should match exactly (cycle +1 in both)');
+  console.log('TEST 6: At J2000, the next unit and next eight-unit events should match exactly (cycle +1 in both)');
   console.log('═══════════════════════════════════════════════════════════════════════════');
   const nextH_jd  = yearToJD(nextH_yr);
   const next8H_jd = yearToJD(next8H_yr);
   console.log(`Next H JD                            = ${nextH_jd.toFixed(2)}`);
-  console.log(`Next 8H JD                           = ${next8H_jd.toFixed(2)}`);
+  console.log(`Next eight-unit JD                   = ${next8H_jd.toFixed(2)}`);
   console.log(`Match: ${Math.abs(nextH_jd - next8H_jd) < 1 ? 'PASS ✓' : 'FAIL ✗'}`);
   console.log('');
 
@@ -57728,8 +57725,8 @@ function computePlanetObliquity(planetName, currentYear) {
 }
 
 /* -----------------------------------------------------------------
-   SOLSTICE PREDICTION — Fibonacci harmonics (H/3, H/8, H/16)
-   Derived from 2,889 simulation solstice observations spanning full H.
+   SOLSTICE PREDICTION — anchor-divisor harmonics (divisors 3, 8, 16 of the anchor unit)
+   Derived from 2,889 simulation solstice observations spanning one full anchor interval.
    See docs/14-solstice-prediction.md
 ------------------------------------------------------------------ */
 

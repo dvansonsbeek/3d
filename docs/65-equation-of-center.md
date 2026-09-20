@@ -193,7 +193,7 @@ with the deliberately-UT deep-time scene) steers the world-frame Sun onto
 the certified framework-native Sun of the eclipse chain
 ([doc 103](103-135-babylonian-case-study.md) describes that basis). The
 displayed Sun's accuracy is owned by the certified chain; the wheel layers
-underneath keep the scene's cyclic, H-lattice character.
+underneath keep the scene's cyclic, bounded-harmonic character.
 
 Note for A/B tests: the δ is defined against the legacy stack INCLUDING
 Z-B, so a clean A/B of the display requires toggling the δ overlay too,
@@ -259,7 +259,7 @@ it.
 > completion's PAIRED hash fingerprints them; `computeSunPositionFast` —
 > the declared Step-6a instrument — and the legacy A/B path apply them).
 
-What it is: an H-lattice harmonic absorber of the geometric-split wheel's
+What it is: an anchor-divisor harmonic absorber of the geometric-split wheel's
 annual imperfection, fit against the Meeus Ch. 25 residual across ±100 yr
 around J2000 (smart J2000-anchored):
 
@@ -268,7 +268,7 @@ around J2000 (smart J2000-anchored):
 Δλ(t) = SUN_LONGITUDE_MEAN + Σₙ [Aₙ·sin(φₙ) + Bₙ·cos(φₙ)],   φₙ = 2π·(year − balancedYear)/(H/nₙ)
 ```
 
-Active terms after the runtime H-lattice filter (year-multiple divisors,
+Active terms after the runtime divisor-whitelist filter (year-multiple divisors,
 small precession divisors 1–20, lunar-precession divisors only; anything
 else silently skipped as a design-rule safeguard):
 

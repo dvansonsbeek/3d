@@ -11,9 +11,9 @@ status: current
 
 The **WebGeoCalc Explorer** is a modal panel in the Tools menu that shows the actual observed perihelion-precession history of each planet, based on JPL NAIF WebGeoCalc ephemeris queries over the 1900–2026 observational baseline. For each planet it plots the three angles that describe the orientation of the orbit in the ecliptic frame — ascending node `Ω`, argument of periapsis `ω`, and longitude of perihelion `ϖ = Ω + ω` — and overlays the model's prediction so the observed data and the model can be compared directly, in the same frame the data live in.
 
-This is the panel that tests the Holistic Universe Model's perihelion rates against *observation*, not another theory. The model line is the N-body chain's own `ϖ(t)` — nothing in it is calibrated to WebGeoCalc; the 8H/N divisor values (`perihelionEclipticYears` per planet) remain as window-epoch descriptor labels ([doc 109 §9](109-model-nbody-engine-and-lattice-test.md)). The Explorer makes that comparison visible.
+This is the panel that tests the Holistic Universe Model's perihelion rates against *observation*, not another theory. The model line is the N-body chain's own `ϖ(t)` — nothing in it is calibrated to WebGeoCalc; the device's ecliptic-period values (`perihelionEclipticYears` per planet) remain as window-epoch descriptors ([doc 109 §9](109-model-nbody-engine-and-lattice-test.md)). The Explorer makes that comparison visible.
 
-> **Scope note (ESSRT).** The Explorer is inherently a present-epoch observational tool — the 1900–2026 baseline is the densest, most accurate stretch of JPL/NAIF ephemerides (DE440/DE441). The 8H/N ecliptic-period divisors shown in the comparison column (H × 8/11, 8H/39, −8H/65, H/13, …) are scale-invariant structural labels, but their literal rate values in ″/century are J2000-evaluated. Under [ESSRT](99-expanding-solar-system-resonance-theory.md), H(t) evolves at deep time via Drivers 1 (LOD growth) and 2 (Kepler), scaling literal rates proportionally; the comparison against WebGeoCalc is a present-epoch test of an underlying scale-invariant framework.
+> **Scope note (ESSRT).** The Explorer is inherently a present-epoch observational tool — the 1900–2026 baseline is the densest, most accurate stretch of JPL/NAIF ephemerides (DE440/DE441). The device ecliptic periods shown in the comparison column are the no-chain scaffolding's J2000 conventions (the former integer labels are retired); their literal rate values in ″/century are J2000-evaluated. Under [ESSRT](99-expanding-solar-system-resonance-theory.md), H(t) evolves at deep time via Drivers 1 (LOD growth) and 2 (Kepler), scaling literal rates proportionally; the comparison against WebGeoCalc is a present-epoch test of an underlying scale-invariant framework.
 
 ## Why the 1900–2026 baseline matters
 
@@ -47,14 +47,14 @@ The angle from the ascending node to the perihelion, measured within the orbital
 
 The WebGeoCalc trends extracted by the Explorer for the 1900–2026 window are summarized here (the per-planet lattice-period discussion is archived — [retired record](retired-record.md); the chains + doc 109 carry the current planetary rates):
 
-| Planet | WebGeoCalc observed (ϖ̇) | Trend resolvability | 8H/N descriptor label (″/cy at J2000) |
+| Planet | WebGeoCalc observed (ϖ̇) | Trend resolvability | device ecliptic-period descriptor (″/cy at J2000; the former integer label) |
 |--------|-------------------------|---------------------|---------------------------------------|
 | Mercury | ~570 ″/cy prograde | ✓ resolvable | 531 (H × 8/11) |
-| Venus | ~0 ″/cy (flips sign across windows) | ✗ un-determined | −290 (−8H/6) |
+| Venus | ~0 ″/cy (flips sign across windows) | ✗ un-determined | −290 |
 | Earth | ~<!--v:earthObservedRate-->6,186<!--/v--> ″/cy prograde (wrt equinox) | ✓ resolvable | 6,187 (H/16) |
-| Mars | ~<!--v:marsObservedRate-->1,600<!--/v--> ″/cy prograde | ✓ resolvable | 1,739 (8H/36) |
-| Jupiter | ~<!--v:jupiterObservedRate-->1,800<!--/v--> ″/cy prograde (current epoch) | ✗ un-determined | 1,884 (8H/39) |
-| Saturn | retrograde, ~−1,800 to −3,600 ″/cy depending on window | ✗ un-determined (magnitude window-sensitive) | −3,140 (−8H/65) |
+| Mars | ~<!--v:marsObservedRate-->1,600<!--/v--> ″/cy prograde | ✓ resolvable | 1,739 |
+| Jupiter | ~<!--v:jupiterObservedRate-->1,800<!--/v--> ″/cy prograde (current epoch) | ✗ un-determined | 1,884 |
+| Saturn | retrograde, ~−1,800 to −3,600 ″/cy depending on window | ✗ un-determined (magnitude window-sensitive) | −3,140 |
 | Uranus | ~<!--v:uranusObservedRate-->1,100<!--/v--> ″/cy (current epoch) | ✗ un-determined | 1,160 (H/3) |
 | Neptune | ~200 ″/cy (current epoch) | ✗ un-determined | 193 (2H) |
 

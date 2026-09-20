@@ -109,7 +109,7 @@ Each orbital plane has **two distinct angles** evolving at different rates — a
 - **Inclination** `i(t)` — the "nodding" of the orbital plane. Changes **how far** above/below the plane the planet gets; it does not change the fact of two crossings per orbit.
 - **Ascending node** `Ω(t)` — the "spinning" of the line of nodes. Shifts **where/when** the crossings happen.
 
-For the planets both angles are now **dynamical outputs of the chain** (elements of date; the long-term curves are engine D's own secular modes). For Earth the model's kinematic identities apply: Ω regresses at the ecliptic precession rate **−H/5 ≈ −<!--v:hDiv5-->67,063<!--/v--> yr** (confirmed by La2010), while Earth's inclination to the invariable plane oscillates on the **H/3 ≈ <!--v:earthPeriPeriodICRF-->111,570<!--/v-->-yr** ICRF perihelion cycle — two different angles, two different rates.
+For the planets both angles are now **dynamical outputs of the chain** (elements of date; the long-term curves are the orbital dynamics engine's own secular modes). For Earth the model's kinematic identities apply: Ω regresses at the ecliptic precession rate **−H/5 ≈ −<!--v:hDiv5-->67,063<!--/v--> yr** (confirmed by La2010), while Earth's inclination to the invariable plane oscillates on the **H/3 ≈ <!--v:earthPeriPeriodICRF-->111,570<!--/v-->-yr** ICRF perihelion cycle — two different angles, two different rates.
 
 Earth's charted model inclination `i_inv(t)` is the **one-source** reading: the engine's own Earth-orbit normal (secular series inside ±10 Myr, mode tail beyond) against the artifact's invariable plane — it matches La2010 at rms 0.003° over −500 kyr.
 

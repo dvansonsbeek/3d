@@ -216,7 +216,7 @@ classical constant:
   the lunar mean motion at year ≈ 1,989,000 and reverses it beyond. The
   secular-ë completion carrier saturates at its taper edge (±28 kyr) to a
   frozen Lp offset of −17.5° (past) / +7.0° (future) — bounded by
-  construction, so no polynomial reaches deep time and the H-lattice
+  construction, so no polynomial reaches deep time and the bounded-harmonic
   claim is untouched. The rate completion is likewise bounded: the pFix
   table freezes beyond ±1 Myr, the five rate anchors freeze at the H/12
   taper edge (≤ ~0.9°), and Mp/F inherit Lp's bounded pFix oscillation
@@ -617,7 +617,7 @@ eclipse RMS (0.8086° — that metric is Meeus-override-framed).
 | moonStartposNodal | <!--v:moonStartposNodalDeg-->64.0435<!--/v--> |
 | moonStartposMoon | <!--v:moonStartposMoonDeg-->67.8443<!--/v--> (in-plane anchor via the unmask meter, mean Δlon ≈ 0; the anchoring meter's L row reads the Meeus-overridden *true* Moon, so its ~3° Δ against the mean-longitude target is the equation-of-center reading, not an anchor error) |
 
-The apsidal/nodal values carry a micro-recalibration for the 8H-count layer
+The apsidal/nodal values carry a micro-recalibration for the eight-interval count layer (a device of the lunar chain)
 rates. The anchoring meter's node-rate row reads the **world frame**: the
 nodal layer spins at the of-date period (6798.33 d, −19.3411°/yr) in its
 local frame, and Earth's axial-precession parent adds the equinox precession
@@ -752,7 +752,7 @@ Meeus 10.06″).
 
 **One eccentricity law for Sun and Moon.** Eccentricity is FRAME-INVARIANT
 (e = |z|, z = e·e^{iϖ}) and may carry only fixed-frame lattice content
-(H/3, 8H-class beats); H/16 is the OF-DATE perihelion period — the H/3
+(the apsidal period, the eccentricity-band beats); the perihelion-of-date period is the OF-DATE perihelion period — the apsidal
 apsidal rotation seen from the H/13 equinox (13 + 3 = 16) — and belongs to
 ϖ_of-date, not to e. Accordingly the eclipse Sun's eccentricity is the
 J2000-anchored H/3 line (the H/16 law's J2000 value + the H/3 variable

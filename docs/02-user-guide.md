@@ -90,7 +90,7 @@ The display shows:
 
 **Date range**: The simulation supports dates from ancient history to far future, enabling observation of long-term precession cycles.
 
-**Deep-time scrubbing (ESSRT).** When you scrub the date by millions of years, the simulation automatically applies **Expanding Solar System Resonance Theory** scaling — length-of-day, the Earth Fundamental Cycle H, planet orbital periods, and the Moon's distance all evolve smoothly according to the two physical drivers (Earth-Moon tidal evolution + solar mass loss). This mode is on by default; the scene-graph stays consistent at any epoch from Hadean (~−4 Gyr) to +200 Myr in the future. See [Doc 99 — ESSRT](99-expanding-solar-system-resonance-theory.md) for the full framework.
+**Deep-time scrubbing (ESSRT).** When you scrub the date by millions of years, the simulation automatically applies **Expanding Solar System Resonance Theory** scaling — length-of-day, the precession period, planet orbital periods, and the Moon's distance all evolve smoothly according to the two physical drivers (Earth-Moon tidal evolution + solar mass loss). This mode is on by default; the scene-graph stays consistent at any epoch from Hadean (~−4 Gyr) to +200 Myr in the future. See [Doc 99 — ESSRT](99-expanding-solar-system-resonance-theory.md) for the full framework.
 
 ### Playback Controls
 
@@ -107,13 +107,13 @@ The display shows:
 
 ### EARTH-WOBBLE-CENTER ("The Death Star")
 
-This gray sphere represents the gravitational center around which Earth's axis wobbles over H/13 years. It's the pivot point for axial precession.
+This gray sphere represents the gravitational center around which Earth's axis wobbles over one precession period (<!--v:axialPrecRound-->~25,771<!--/v--> years at J2000). It's the pivot point for axial precession.
 
 **To observe**: Speed up time to 1,000+ years and watch Earth orbit this point.
 
 ### PERIHELION-OF-EARTH (White Dot)
 
-This white dot marks the point closest to the Sun in Earth's orbit. It moves at the model's measured apsidal rate — in the current era one revolution per ≈ H/3 years (the epoch-local law); the displayed direction follows the model's own N-body dynamics.
+This white dot marks the point closest to the Sun in Earth's orbit. It moves at the model's measured apsidal rate — in the current era one revolution per <!--v:inclPrecYears-->~111,570<!--/v--> years; the displayed direction follows the model's own N-body dynamics.
 
 **To observe**: Speed up time to 10,000+ years and watch it drift through the zodiac.
 
@@ -239,7 +239,7 @@ When the Hierarchy Inspector panel is open:
 
 ## Common Exploration Tasks
 
-### Watch Axial Precession (H/13 years)
+### Watch Axial Precession (≈ <!--v:axialPrecRound-->~25,771<!--/v--> years)
 
 1. Set time speed to **10,000 years per second**
 2. Enable the **Polar Line**

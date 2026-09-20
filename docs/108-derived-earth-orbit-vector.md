@@ -67,7 +67,7 @@ lattice:
 
 - **e = |z| is frame-invariant.** Rotating the reference frame changes
   ϖ but cannot change |z|. So e may carry only fixed-frame lattice
-  content — H/3 and the 8H-class beats — never an of-date period.
+  content — the apsidal period and the eccentricity-band beats — never an of-date period.
 - **H/16 is a frame period.** The of-date perihelion cycle is
   1/(1/(H/13) + 1/(H/3)) = H/16 exactly, because 13 + 3 = 16: the H/3
   apsidal rotation seen from the H/13-precessing equinox. H/16 belongs

@@ -269,7 +269,7 @@ i_app = arccos(n_ecl · n_planet)
 
 ### 3.3 Earth Inclination to the Invariable Plane
 
-Earth's orbital inclination to the invariable plane oscillates with the Earth Fundamental Cycle. (Axial tilt — obliquity — is a separate quantity; see `computeObliquityEarth()`.)
+Earth's orbital inclination to the invariable plane oscillates on the orbit's own apsidal period (the device law). (Axial tilt — obliquity — is a separate quantity; see `computeObliquityEarth()`.)
 
 **Formula:**
 ```
@@ -345,7 +345,7 @@ For current values, see [Constants Reference](20-constants-reference.md).
 | Constant | Value | Description |
 |----------|-------|-------------|
 | General precession | H/13 | holisticyearLength/13 |
-| Earth Fundamental Cycle | H (see [Constants Reference](20-constants-reference.md)) | Complete precession cycle |
+| The fitted timing anchor | `holisticyearLength` (see [Constants Reference](20-constants-reference.md)) | the correction bases' unit — not a period |
 
 ---
 

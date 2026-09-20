@@ -58,7 +58,7 @@ The framework's mean solar motion is linear-rate by design — no T² polynomial
 
 The **certified eclipse chain carries this drift natively** — the f(Y) year harmonics plus the derived torque term supply the secular shape without a fitted polynomial. What remains linear-rate are the scene's raw wheel laws underneath the δ term; in the scan-window metric any residual λ-drift acts along-track and is largely dial-degenerate with ΔT (absorbed by BestΔUT); the ΔT-free matcher measures the pair jointly and lands inside Stephenson's window.
 
-The design position: sampling the framework Sun against Meeus Ch. 25 across -800 to +3000 AD shows the residual is dominated by Meeus reference degradation past ±2000 yr — reference-limited, not fit-limited. Fitting H-lattice harmonics to the T² shape would regress modern residuals (a single lattice sinusoid cannot approximate T²), so the linear-rate philosophy at antiquity stands as a design consequence, with the derived drift terms carrying the physical part.
+The design position: sampling the framework Sun against Meeus Ch. 25 across -800 to +3000 AD shows the residual is dominated by Meeus reference degradation past ±2000 yr — reference-limited, not fit-limited. Fitting anchor-divisor harmonics to the T² shape would regress modern residuals (a single lattice sinusoid cannot approximate T²), so the linear-rate philosophy at antiquity stands as a design consequence, with the derived drift terms carrying the physical part.
 
 ---
 

@@ -32,7 +32,7 @@ historical record of how the episode was found, not a shipped mechanism.
 
 ## 1. The phenomenon
 
-After the framework's kinematic trend and the shipped 4-flag ΔT stack (Bond 8H/1830, Hallstatt 8H/1104, Jose5 8H/2989, Jose4 8H/3749) are removed from the Stephenson eclipse record, one aperiodic structure remains — the **millennial rotation swing**:
+After the framework's kinematic trend and the shipped 4-flag ΔT stack (Bond 1466 yr, Hallstatt 2430 yr, Jose5 897 yr, Jose4 716 yr — n = 1830 / 1104 / 2989 / 3749 as identifiers) are removed from the Stephenson eclipse record, one aperiodic structure remains — the **millennial rotation swing**:
 
 | Era | Behavior |
 |---|---|
@@ -133,7 +133,7 @@ Evidence: `data/lod-swing-archeomag-calibration.json`.
 
 Evidence: `data/bond-coreflow-phase-lock-test.json`.
 
-Hypothesis (formulated as a falsifiable prediction, tested before publication): if the climatic Bond cycle and the core swing both ride the 8H/1830 = 1,465.9-yr clock, Bond IRD events and archeomagnetic core-flow episodes must be phase-locked across the Holocene. Data: Bond et al. 2001 stacked %HSG (*Science* 294:2130, NOAA archive; local `data/bond2001-raw.txt`) and CAM ΔLOD derived from the CFF joint field+flow models (Nilsson, Suttie, Troyano, Gillet, Aubert & Irbäck, *jSEDI*, doi:10.46298/jsedi.17320; EarthRef ERDA 2776; derived series `data/cff-coreflow-lod-derived.json`, LOD = 1.138(t₁⁰ + 12⁄7 t₃⁰) per Jault et al. 1988 / Jackson et al. 1993).
+Hypothesis (formulated as a falsifiable prediction, tested before publication): if the climatic Bond cycle and the core swing both ride the 1,465.9-yr clock, Bond IRD events and archeomagnetic core-flow episodes must be phase-locked across the Holocene. Data: Bond et al. 2001 stacked %HSG (*Science* 294:2130, NOAA archive; local `data/bond2001-raw.txt`) and CAM ΔLOD derived from the CFF joint field+flow models (Nilsson, Suttie, Troyano, Gillet, Aubert & Irbäck, *jSEDI*, doi:10.46298/jsedi.17320; EarthRef ERDA 2776; derived series `data/cff-coreflow-lod-derived.json`, LOD = 1.138(t₁⁰ + 12⁄7 t₃⁰) per Jault et al. 1988 / Jackson et al. 1993).
 
 **Result: no lock, at every level.**
 
@@ -142,7 +142,7 @@ Hypothesis (formulated as a falsifiable prediction, tested before publication): 
 - CFF core-flow episodes: Rayleigh p ≈ 0.9; CFF spectral power at <!--v:bondYr-->1,466<!--/v--> yr ≈ 0.004 (its peaks: ~3,000–3,300 yr);
 - cross-coherence (millennial band, ±1,000-yr lags): max r = 0.34, below the phase-randomized null p95 = 0.49.
 
-The 8H/1830 flag is what the eclipse window shows it to be — the periodic part of the millennial fluctuation over the last 2.7 kyr — **not** a Holocene-wide shared clock. Caveat: CFF posterior σ (~2 ms) limits statistical power before ~2000 BCE.
+The Bond flag is what the eclipse window shows it to be — the periodic part of the millennial fluctuation over the last 2.7 kyr — **not** a Holocene-wide shared clock. Caveat: CFF posterior σ (~2 ms) limits statistical power before ~2000 BCE.
 
 ---
 
@@ -152,7 +152,7 @@ Evidence: `data/deltaT-swing-difference-tones.json`.
 
 ### Lattice closure under beats
 
-The beat of two lattice tones is itself a lattice tone: **beat(8H/n₁, 8H/n₂) = 8H/(n₁−n₂)**. Nonlinear intermodulation of shipped cycles can therefore only generate lattice periods — a falsifiable structural statement. The shipped pairs give:
+The beat of two lattice tones is itself a lattice tone: **beat(Y₈/n₁, Y₈/n₂) = Y₈/(n₁−n₂)** (Y₈ the anchor's eight-unit interval — the divisor grid the stack is built on). Nonlinear intermodulation of shipped cycles can therefore only generate lattice periods — a falsifiable structural statement. The shipped pairs give:
 
 | Pair | Δn | Period |
 |---|---|---|
@@ -237,9 +237,9 @@ Two implementation routes tested:
 
 The production episode, as shipped by `tools/fit/dt-corrections-fit.js --joint --write` (constants in `data/core-mantle-resonator-stage1.json` — read directly by `tools/lib/deep-time.js` and, via the generated constants module, `src/script.js`; the website consumes the same block through the published `@essrt/physics` package (`FITTED_COEFFICIENTS.DT_RESONATOR`) since the Phase-14 split):
 
-- **Eigenperiod** T₀ = 8H/685 = 3,916.1 yr (lattice-labeled by convention: the shipped resonator is the combined effect of the lattice cycles, so under H(t) evolution the episode scales with its drivers; the bare axiMC eigenmode is core-material physics — recorded caveat), **Q = 1.8**.
+- **Eigenperiod** T₀ = 3,916.1 yr (= Y₈/685, divisor-labeled by convention: the shipped resonator is the combined effect of the lattice cycles, so under H(t) evolution the episode scales with its drivers; the bare axiMC eigenmode is core-material physics — recorded caveat), **Q = 1.8**.
 - **Impulse-consistent 2-kick episode**: kicks are sin-only (displacement-continuous — ΔT is accumulated angle and must not step; the impulses live in the slope). Excitation at **−1600**, termination at **+1600**. At the 2026-07 joint-world flip the amplitudes were sin 760.35 s / sin −75.19 s (excitation just below the 773.3-s cap); the IAU-2006 refit moved them with the anchors to the shipped **sin 698.10 s / sin −52.02 s** (`DT_RESONATOR.kick_coefficients_s`). The kick epochs are CONVENTION, not data-dated: the record starts at −720 with the swing already at full amplitude (so excitation genuinely predates −720), and the stability box t₁ ∈ [−2350, −750] is flat. The excitation kick steps δLOD by ≈ +3.6 ms/day (the flip-era 760.35-s kick stepped +3.878; the step scales with the kick amplitude at fixed T₀/Q) — inside the SMH ±3–4 ms envelope — and Dumberry & Finlay-class core-flow reorganizations of that size within <100 yr are documented physics.
-- **Drive tone** at the bond−hallstatt difference frequency 8H/726 = 3,695 yr, phase LOCKED to the quadratic-mixing prediction φ_bond − φ_hallstatt, amplitude +186.14 s (at cap), **switch-on compensated** (its displacement at the excitation epoch is cancelled by an eigenmode transient).
+- **Drive tone** at the bond−hallstatt difference frequency 3,695 yr (n = 726), phase LOCKED to the quadratic-mixing prediction φ_bond − φ_hallstatt, amplitude +186.14 s (at cap), **switch-on compensated** (its displacement at the excitation epoch is cancelled by an eigenmode transient).
 - **Joint fit design**: 4 flags + resonator in ONE equality-constrained solve; the USNO J2000 solar-day closure is a hard anchor row; amplitude caps are FIXED convention constants (never derived from the mutable fit JSON — the cap-creep lesson); resonator phases enter as locked unit shapes (free phases balloon under the cap cascade); composite selection = best Espenak RMS subject to full-window Stephenson RMS ≤ 40 s.
 - **Shipped anchors** (move atomically with the coefficients): at the 2026-07 joint-world flip these were USNO 86,400.0014 s (interior optimum, within 0.2 ms of the observed EO value 86,400.0016 that no H-recalibration could reach — the resonator was the missing piece), deltaTStart 56.049 s, Espenak RMS 12.60 s, full-window Stephenson RMS 31.3 s (best ever at the time). The IAU-2006 refit later moved the pair to USNO <!--v:usnoLodJ2000-->86,400.0019<!--/v--> s / deltaTStart <!--v:deltaTStart-->53.83<!--/v--> s (the target tracked the 6d sidereal-anchor move — a day-basis shift, not a physics change; doc 99 § "The two J2000 day bases").
 - **Termination-kick interpretation**: in the joint world the explicit counter-kick is small (−52 s vs the 698-s excitation) — the medieval shutdown is largely carried by damping plus flag interference, with the counter-kick as a residual trim. The excitation inversion's push–pull structure survives as the physical reading; the counter-kick's smallness is the joint-fit's restatement of it.
@@ -273,7 +273,7 @@ Four constraints originally kept the swing out of the runtime model. Each is now
 
 Forward path (unchanged in kind, updated in role — these now refine rather than gate): (i) an archeomagnetic flow model without the ~300-yr lead systematic would enable external amplitude/phase calibration (ArchKalmag14k-based flow/LOD series is the watch item); (ii) confirmation of the difference-tone phases in independent climate archives; (iii) more forcing extrema than two — only a longer clean record can firm up the drive attribution beyond "as-if."
 
-Remaining open questions: the ~12-s irreducible 8H/2024 content (Stage-E floor of `tools/fit/dt-corrections-fit.js`; the joint-world L-5b §14 scan's degenerate ~990-yr ridge in the hallstatt−jose4 difference-tone band is the same family, fitted against the Stephenson spline rather than observations — research note, not a shipping candidate); the 3,695-yr tone's phase (window-degenerate — only a longer record or external data can pin it).
+Remaining open questions: the ~12-s irreducible n = 2024 (1,325-yr) content (Stage-E floor of `tools/fit/dt-corrections-fit.js`; the joint-world L-5b §14 scan's degenerate ~990-yr ridge in the hallstatt−jose4 difference-tone band is the same family, fitted against the Stephenson spline rather than observations — research note, not a shipping candidate); the 3,695-yr tone's phase (window-degenerate — only a longer record or external data can pin it).
 
 ---
 

@@ -251,7 +251,7 @@ All functions support JD chaining (`prevJD`) for efficient sequential-year searc
 
 ### Related
 
-For the solstice RA and JD prediction formulas (H-lattice harmonics, valid across <!--v:H-->335,317<!--/v--> years), see [14 — Solstice Prediction](14-solstice-prediction.md).
+For the solstice RA and JD prediction formulas (the cardinal-point harmonic combs, valid across the <!--v:H-->335,317<!--/v-->-year anchor interval), see [14 — Solstice Prediction](14-solstice-prediction.md).
 
 ---
 

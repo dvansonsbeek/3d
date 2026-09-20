@@ -31,8 +31,9 @@ it contains tracked files only, so the gitignored 160 MB CSV and `docs/archive/`
 are **absent** inside one.
 
 **No polynomial corrections.** Motion-model corrections stay harmonic on
-H-lattice divisors. No T/T²/T³ — they compound at deep time and destroy the
-lattice claim. A fitted linear slope fixes the fit window and is 41 min wrong at
+the correction bases' fixed divisors of the anchor unit (bounded Fourier
+bases, plan 06 P3). No T/T²/T³ — they compound at deep time and destroy the
+bounded-basis property. A fitted linear slope fixes the fit window and is 41 min wrong at
 −400 Ma.
 
 **Rate vs point value.** A quantity valid AT A POINT is not valid ACROSS A SPAN.
@@ -216,14 +217,14 @@ eclipse-audit / lunar-alignment) rewrite their `data/*.json` under
 `--write` (the latter two REFUSE on divergence; `--rebaseline` is the
 conscious re-measurement path).
 
-**The Fibonacci-law retirement.** `verify-laws`, `dual-balance-optimizer` and
+**The integer-law retirement.** `verify-laws`, `dual-balance-optimizer` and
 `config1-proof` are narrative class (kept as the record, no longer gates): the
 structural claims they gated — exact eccentricity balance, the Saturn
 e-prediction, Config #7 mirror uniqueness, the node integers — were
 re-evaluated with the engine's own dynamical inputs
 (`tools/explore/balance-with-dynamical-nodes.mjs`; doc 109 is the evidence
 record) and retired. What survives as a documented observation: under the
-Fibonacci weights the 8-planet eccentricity balance holds to ~98 % with the
+retired integer weights the 8-planet eccentricity balance holds to ~98 % with the
 engine's long-term mean eccentricities (99.8636 % was the tuned-inputs
 figure). **The planet chains moved to engine-D elements (the P5 flip,
 9aa91a6), and the legacy geometric planet path was EXCISED (K5,

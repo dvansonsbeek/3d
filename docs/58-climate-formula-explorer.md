@@ -11,9 +11,9 @@ status: current
 
 The **Climate Formula Explorer** is a modal panel in the Tools menu that visualizes the canonical **L1+L2+L3 climate formula** (the orbital-forcing + carbon-cycle-thermostat + boundary-condition-step decomposition; see [doc 92](92-climate-formula.md)) overlaid on each of the four climate proxy records — **CenCO2PIP** (deep-time atmospheric CO₂, 0–66 Ma), **CENOGRID** (Cenozoic benthic δ¹⁸O / δ¹³C, 0–67 Ma), **LR04** (Pliocene-Pleistocene benthic δ¹⁸O, 0–5.3 Ma), and **EPICA Dome C** (atmospheric CO₂, 0–800 kyr). The modal exposes the same formula evaluated across 8 time windows from the deep-time 67-Myr CENOGRID record down to a forward projection of the next 250 kyr.
 
-This is the panel that grounds the Holistic Universe Model's climate claims in *observation*. The 33-integer L1 lattice (orbital integer divisors of 8H = <!--v:eightH-->2,682,536<!--/v--> yr at J2000), the 3-line L2 carbon thermostat family (405 / 202 / 135 kyr), and the 6-step L3 Heaviside boundary-condition transitions (PETM, EOT, Mi-1, MMCT, iNHG, MPT) are all fitted with sequential ridge regression per regime — see [doc 92 §9](92-climate-formula.md#9-the-canonical-climate-formula) for the canonical architecture.
+This is the panel that grounds the Holistic Universe Model's climate claims in *observation*. The climate formula's orbital lines (the 28 physical lines of [doc 92 §2](92-climate-formula.md) — the engine's own secular beats plus the 405 / 202 / 135 kyr carbon-thermostat family; the comb era labelled them as 33 integer divisors) and the 6-step L3 Heaviside boundary-condition transitions (PETM, EOT, Mi-1, MMCT, iNHG, MPT) are fitted with sequential ridge regression per regime — see [doc 92 §9](92-climate-formula.md#9-the-canonical-climate-formula) for the canonical architecture.
 
-> **Scope note (ESSRT).** The L1 lattice integer-divisor structure (n where T = 8H/n) is scale-invariant — the integers stay fixed at any epoch. The 8H = <!--v:eightH-->2,682,536<!--/v--> yr literal value and the per-line periods (8H/n in kyr) are J2000-evaluated. Under [ESSRT](99-expanding-solar-system-resonance-theory.md), H(t) evolves at deep time via Drivers 1 (LOD growth) and 2 (Kepler) — sub-percent drift over the LR04 5.3-Myr window, ~0.04% over the 67-Myr CENOGRID window, and starts to matter for the 13H ≈ 4.36 Myr Boulila libration comparison covered in doc 92.
+> **Scope note (ESSRT).** The lines are the engine's own secular beats: the eccentricity lines are fixed at every epoch (planetary g-modes), the obliquity and climatic-precession lines ride the composed precession rate at deep time — sub-percent drift over the LR04 5.3-Myr window ([doc 99](99-expanding-solar-system-resonance-theory.md)'s generated tables give the lines at each age). The panel evaluates the J2000 line periods.
 
 ## Accessing the Explorer
 
@@ -143,7 +143,7 @@ Re-running scripts only needed after dataset updates or refit changes — see [d
 - [doc 93 — L1 attribution reference](93-l1-attribution-reference.md) — per-integer Berger vs Holistic top-1 attribution
 - [doc 94 — Insolation null test](94-insolation-null-test.md) — empirical anchor for the "lattice subsumes Berger insolation" claim (ΔR² ≈ 0)
 - [doc 95 — Climate summary](95-climate-summary.md) — the synthesis statement the modal visualizes
-- [doc 99 — Expanding Solar System Resonance Theory (ESSRT)](99-expanding-solar-system-resonance-theory.md) — deep-time scaling of H(t) for the literal 8H value
+- [doc 99 — Expanding Solar System Resonance Theory (ESSRT)](99-expanding-solar-system-resonance-theory.md) — deep-time scaling of the precession-band lines on the composed clock
 - [doc 59 — ESSRT Explorer](59-essrt-explorer.md) — sibling Tools-menu modal for deep-time H/LOD/year evolution
 - [doc 57 — Formula Verification](57-formula-verification.md) — sibling Tools-menu modal comparing model vs published celestial-mechanics formulas
 - [doc 56 — WebGeoCalc Explorer](56-webgeocalc-explorer.md) — sibling Tools-menu modal showing observed perihelion-precession history

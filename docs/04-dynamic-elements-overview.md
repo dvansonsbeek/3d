@@ -32,7 +32,7 @@ The shared implementation is `@essrt/physics/planets/keplerian-chain`
 (one home; consumed by `tools/lib/keplerian-chain.js` in Node and by the
 browser scene through the embedded chain artifact).
 
-**Source-of-truth doctrine** (plan 02 §P5): engine D is the truth because
+**Source-of-truth doctrine** (plan 02 §P5): the orbital dynamics engine (the N-body chain) is the truth because
 it is causally ours. The only inputs are:
 
 1. the **J2000 Horizons state vectors** — the anchor, the numbers left to

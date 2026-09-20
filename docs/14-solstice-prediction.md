@@ -5,17 +5,17 @@ coefficients: sha256:b8b18424a3435e20
 status: current
 ---
 
-# 14 — Cardinal Point Prediction from Fibonacci Harmonics
+# 14 — Cardinal Point Prediction from the Harmonic Combs
 
 ## Overview
 
 The Holistic Universe Model predicts the timing and position of all four cardinal
 points (VE, SS, AE, WS) using **23 harmonics + the ecc-braid/joint/derived term families** per cardinal point:
-4 Fibonacci fundamentals (H/3, H/5, H/8, H/13 — H/16 is NOT in the divisor set; its content lives in the ECC_TERMS braid) plus 19 overtones from
+4 fundamentals on the anchor's divisors (Y/3, Y/5, Y/8, Y/13 — Y/16 is NOT in the divisor set; its content lives in the ECC_TERMS braid; Y = the frozen era clock's unit, a device) plus 19 overtones from
 nonlinear interactions between the precession cycles.
 
 These harmonics replace the conventional Meeus polynomial approach, extending
-the valid prediction range from ±2,000 years to the full **<!--v:H-->335,317<!--/v-->-year** Earth Fundamental Cycle (at J2000).
+the valid prediction range from ±2,000 years to the full **<!--v:H-->335,317<!--/v-->-year** anchor interval (the frozen era clock's unit; fitted and gated over ±270 kyr).
 
 Three formulas are provided for each cardinal point:
 
@@ -25,7 +25,7 @@ Three formulas are provided for each cardinal point:
 
 **Key result:** With one astronomical observation per cardinal point (the J2000 date)
 and the model's existing constants, all cardinal point dates across the full
-<!--v:H-->335,317<!--/v-->-year Earth Fundamental Cycle (at J2000) can be predicted to **0.05–1.0 minutes** accuracy.
+<!--v:H-->335,317<!--/v-->-year anchor interval can be predicted to **0.05–1.0 minutes** accuracy.
 The RA position requires **zero observations** — it is fully derived from model parameters.
 
 | Cardinal Point | Detection | RMSE (JD) | J2000 Anchor |
@@ -35,7 +35,7 @@ The RA position requires **zero observations** — it is fully derived from mode
 | **AE** (Autumnal Equinox) | Dec crosses 0° descending | **0.6 min** | 2451810.304 (Sep 22, 19:18 UTC) |
 | **WS** (Winter Solstice) | Min declination | **1.0 min** | 2451900.067 (Dec 21, 13:37 UTC) |
 
-> **Scope note (ESSRT).** This document describes cardinal-point prediction within a single Earth Fundamental Cycle evaluated at J2000. The Fibonacci divisors (H/3, H/5, H/8, H/13, H/16, …) are scale-invariant L1 lattice structure — they remain integer divisors at any epoch. The literal year counts (<!--v:H-->335,317<!--/v-->; <!--v:earthPeriPeriod-->20,936<!--/v-->; mean year length `meanSolarYearDays`) and the full-cycle harmonic fits (335,318 rows per type, 1-year steps) are J2000-anchored: under [ESSRT](99-expanding-solar-system-resonance-theory.md), H(t) and `meanSolarYearSeconds` evolve via Driver 1 (Earth-Moon tidal LOD growth) and Driver 2 (solar mass loss → Kepler), so the absolute timings would shift at deep time even though the harmonic structure does not. See [doc 20](20-constants-reference.md) for the J2000 → `meanSiderealYearSecondsAtAge` / `meanHAtAge` helper map.
+> **Scope note (ESSRT).** This document describes cardinal-point prediction within a single anchor interval evaluated at J2000. The combs' divisors (3, 5, 8, 13 of the anchor, …) are the frozen era clock's device basis — bounded Fourier bases (plan 06 P3), not periods and not laws. The literal year counts (<!--v:H-->335,317<!--/v-->; <!--v:earthPeriPeriod-->20,936<!--/v-->; mean year length `meanSolarYearDays`) and the full-cycle harmonic fits (335,318 rows per type, 1-year steps) are J2000-anchored: under [ESSRT](99-expanding-solar-system-resonance-theory.md), H(t) and `meanSolarYearSeconds` evolve via Driver 1 (Earth-Moon tidal LOD growth) and Driver 2 (solar mass loss → Kepler), so the absolute timings would shift at deep time even though the harmonic structure does not. See [doc 20](20-constants-reference.md) for the J2000 → `meanSiderealYearSecondsAtAge` / `meanHAtAge` helper map.
 
 ---
 
@@ -55,14 +55,14 @@ and `baseRA` = 90° (SS), 270° (WS), 0° (VE), 180° (AE).
 |-----------|-------|--------|
 | Mean RA offset | 1.25478°/sin(23.414°) = 3.155° | earthRAAngle / sin(ε) |
 | Amplitude | 0.636°/sin(23.414°) = 1.600° | A / sin(ε) |
-| Periods | H/3 and H/8 | Fibonacci precession hierarchy |
+| Periods | Y/3 and Y/8 | the frozen clock's device divisors |
 
 ### Key properties
 
 - **Same formula for all 4 cardinal points** — only baseRA changes (0°, 90°, 180°, 270°)
 - **Mean SS RA ≈ 86.85° = 5h 47m 22s** (at balanced year when all precession phases = 0)
 - **At J2000: SS ≈ 90°, WS ≈ 270°, VE ≈ 0°, AE ≈ 180°** (near current obliquity maximum)
-- **Range: 6.32°** (25.3 minutes of RA) oscillation over the full Earth Fundamental Cycle
+- **Range: 6.32°** (25.3 minutes of RA) oscillation over the full anchor interval
 - **RMSE: 0.089°** (0.36 minutes of RA) — validated against the full-cycle simulation data (335,318 rows per type)
 - **Zero fitted constants** — everything derived from earthRAAngle, A, and ε
 
@@ -119,7 +119,7 @@ harmonic set above.
 
 ### RMSE by cardinal point
 
-| Type | 5 Fibonacci | Full shipped model | Improvement |
+| Type | 5 fundamentals | Full shipped model | Improvement |
 |------|-------------|-------------|-------------|
 | SS | 107 min | **1.0 min** | 107× |
 | VE | 154 min | **0.05 min** | 3,080× |
@@ -151,7 +151,7 @@ Mean of 4: 365.24218 days (≈ meanSolarYearDays = 365.24219).
 The JD coefficients were extracted from the full-cycle simulation data (335,318 rows per type, 1-year steps) by:
 1. Fitting a linear trend: slope = `meanSolarYearDays` (fixed, not fitted)
 2. Computing residuals: δJD = JD_actual − JD_linear
-3. Greedy forward selection: starting with 5 Fibonacci fundamentals, then adding overtones
+3. Greedy forward selection: starting with the 5 fundamentals, then adding overtones
 4. Each round: test all H/div candidates, select the one that reduces RMSE most
 5. The 19 overtones capture increasingly fine corrections beyond the 5 fundamentals
 6. Adding obliquity/eccentricity cross-terms was tested but provides no additional
@@ -178,7 +178,7 @@ event-time offset accumulated over the <!--v:earthPeriPeriod-->20,936<!--/v-->-y
 
 ## Comparison to Meeus
 
-| Property | Meeus `solarLongitudeDeg()` | Fibonacci harmonics |
+| Property | Meeus `solarLongitudeDeg()` | the harmonic combs |
 |----------|---------------------------|---------------------|
 | Valid range | ±2,000 years (safely) | ±167,500 years (full H) |
 | Method | Polynomial (T, T², T³) | Fourier (23 harmonics + term families) |
@@ -190,7 +190,7 @@ event-time offset accumulated over the <!--v:earthPeriPeriod-->20,936<!--/v-->-y
 | Extrapolation | Diverges (polynomial) | Periodic — never diverges |
 
 **The two approaches are complementary**: Meeus for precision calendrics within ±2,000 years,
-Fibonacci harmonics for understanding the deep structure of cardinal point drift.
+the harmonic combs for understanding the deep structure of cardinal point drift.
 
 ---
 
@@ -203,9 +203,9 @@ geometric projection of three model parameters through `1/sin(ε)`. The 0.089° 
 against simulation output is a measure of the approximation quality (from ignoring the
 small H/16 and higher-order terms in RA), not of free-parameter tuning.
 
-### 2. Fibonacci fundamentals dominate
+### 2. The fundamentals dominate
 
-The 4 Fibonacci fundamental periods in the divisor set (H/3, H/5, H/8, H/13) carry the largest
+The 4 fundamental periods in the divisor set (Y/3, Y/5, Y/8, Y/13) carry the largest
 amplitudes; the H/16 perihelion content enters via the ECC_TERMS braid. The 19 additional overtones provide progressively finer corrections,
 with many being sums or multiples of the fundamentals (e.g., 6=3+3, 11=3+8, 24=8+16).
 
@@ -247,11 +247,11 @@ value), then adds 16 fitted harmonics for the oscillation.
 
 Many of the same overtone harmonics appear as in the cardinal point JD fits (H/5, H/6, H/11,
 H/13, H/19, H/24), confirming these are universal interaction terms
-of the Fibonacci precession hierarchy.
+of the frozen clock's divisor hierarchy (a device).
 
 ### 5. Long-term calendar implications
 
-Over the full Earth Fundamental Cycle, the solstice RA drifts by 6.3° (25 minutes of RA).
+Over the full anchor interval, the solstice RA drifts by 6.3° (25 minutes of RA).
 The "summer solstice at 6h RA" is a temporary coincidence of our epoch.
 At the balanced year, the solstice occurs at 5h 47m RA. In ~80,000 years (at J2000-evaluated H), it will
 be at 5h 35m RA (the minimum).
@@ -263,7 +263,7 @@ be at 5h 35m RA (the minimum).
 Cardinal point observations generated from the headless scene-graph (no browser needed):
 - Script: `tools/fit/export-solar-measurements.js` (single-pass, configurable step size)
 - File: [../data/02-solar-measurements.csv](../data/02-solar-measurements.csv)
-- 2,011,908 data points (6 types × 335,318 rows) spanning one full Earth Fundamental Cycle
+- 2,011,908 data points (6 types × 335,318 rows) spanning one full anchor interval
 - Step: 1 year (single-pass export)
 - Columns: Type, Model Year, JD, RA (°), Obliquity (°), World Angle (°), Distance (AU)
 - Detection: SS/WS by max/min declination (parabolic interpolation), VE/AE by declination

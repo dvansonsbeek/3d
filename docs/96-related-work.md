@@ -23,7 +23,9 @@ status: current
 
 **Related synthesis:** [Doc 95 — Climate summary](95-climate-summary.md) — the conclusion this doc situates.
 
-> **Scope note (ESSRT).** This document positions the framework against external literature; the comparative claims (integer-divisor unification, dual attribution, ΔR² = 0 with Laskar substitution) are structural and scale-invariant. The literal 8H = <!--v:eightH-->2,682,536<!--/v--> yr value and the 13H = 4.36 Myr reference are J2000-evaluated. Under [ESSRT](99-expanding-solar-system-resonance-theory.md), H(t) evolves at deep time via Drivers 1 (LOD growth) and 2 (Kepler); the external papers cited here (Boulila 2019 9-Myr cycle, Dutkiewicz 2024 2.4-Myr cycle, Zeebe-Lantink 2024 g₂−g₅ disruption) all operate in present-epoch comparison space, so the positioning is epoch-consistent without further adjustment.
+> **Status (plan 06 T1 — comb-era positioning).** This document positions the framework against external literature as it stood in the integer-label era: "33 integer divisors of a single fundamental period" was the comb's claim. T1 retired the labels — the shipped climate formula's orbital layer is the engine's own beat lines ([doc 92 §2](92-climate-formula.md)), which is exactly what cyclostratigraphy fits — so the surviving points of difference are the dual attribution, the ΔR² = 0 result against Berger insolation features, and the two-tier deep-time scaling; the "single fundamental period" claim is withdrawn. The text below is the comb-era record.
+>
+> **Scope note (ESSRT).** The comparative claims (dual attribution, ΔR² = 0 with Laskar substitution) are structural. The literal eight-unit value and the 13H = 4.36 Myr reference quoted below are J2000-evaluated comb-era numbers. Under [ESSRT](99-expanding-solar-system-resonance-theory.md), H(t) evolves at deep time via Drivers 1 (LOD growth) and 2 (Kepler); the external papers cited here (Boulila 2019 9-Myr cycle, Dutkiewicz 2024 2.4-Myr cycle, Zeebe-Lantink 2024 g₂−g₅ disruption) all operate in present-epoch comparison space, so the positioning is epoch-consistent without further adjustment.
 
 ---
 
