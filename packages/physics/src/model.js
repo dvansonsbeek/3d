@@ -24,6 +24,7 @@ import { createPhaseMachinery } from './phase/index.cjs';
 import { createCardinalModel } from './cardinal/index.cjs';
 import { createYearLengths } from './earth/year-lengths.cjs';
 import { createDeepOrbitalHistory } from './earth/deep-orbital-history.cjs';
+import { computeSolarTorqueShare, createComposedPrecession } from './earth/precession-composed.cjs';
 import { CHAIN_ARTIFACT } from './planets/chain-artifact.js';
 import { buildPlanetChainsFromArtifactData, computeApsidalSecularDegPerYr } from './planets/keplerian-chain.cjs';
 import { createDeltaTCycles } from './deltat/cycles.cjs';
@@ -478,9 +479,10 @@ export function assembleModel(C, F, laws = {}, secularSeriesArtifact = /** @type
   // package's embedded deep-modes artifact; the banked-series tier is the
   // repo-data-bound instrument). Absolute dates deliberately absent — see
   // cardinal/one-source-structure.cjs. The mean year is SI SECONDS: the
-  // sidereal year of date reduced by the SECULAR α(H(t)) equinox precession
-  // (axial0·H(t)/H0 — the movement's leg-1 convention, NOT the H/13
-  // kinematic identity; the two are a recorded 0.09% relation tension).
+  // sidereal year of date reduced by the SECULAR equinox precession
+  // (axial0 / [ψ̇(t)/ψ̇₀] on the COMPOSED lunisolar rate — plan 06 D6, the
+  // movement's leg-1 convention, NOT the H/13 kinematic identity; the two
+  // are a recorded 0.09% relation tension at J2000).
   // THE ONE of-date year-length family (owner: "move to 1 implementation")
   // — createYearLengths owns tropical (equinox-rate mean, wobble included),
   // sidereal (the D6 λ̇ channel), anomalistic (the cardinal structure on
@@ -505,7 +507,26 @@ export function assembleModel(C, F, laws = {}, secularSeriesArtifact = /** @type
     const sidLaw2000 = evalYearFourier(2000, siderealYearDaysBase(2000), F.SIDEREAL_YEAR_HARMONICS);
     const solLaw2000 = evalYearFourier(2000, tropicalYearDaysBase(2000), F.TROPICAL_YEAR_HARMONICS);
     const axial0 = sidLaw2000 / (sidLaw2000 - solLaw2000);
-    const H0 = /** @type {number} */ (deepLod.hAtAge(0));
+    // D6 (plan 06): the deep-time ψ̇(t) the hybrid precesses on is the
+    // COMPOSED lunisolar rate — [ω(t)/ω₀]·p₀·[f_S + (1 − f_S)(a₀/a_M(t))³],
+    // spin from the tidal chain, lunar torque on the recession history —
+    // not the structural H(t)/H₀ scaling (which misses the lunar 1/a³
+    // growth: 70.9 vs Lantink 2022's 108.6 ± 8.5 ″/yr at 2.46 Ga; the
+    // composed rate reads 104.5). ONE home: earth/precession-composed.
+    const composedPrec = createComposedPrecession({
+      p0ArcsecPerYr: 1296000 / (H / 13),
+      solarShare: computeSolarTorqueShare({
+        gmSunKm3S2: GM_SUN, auKm: currentAUDistance, earthEccentricity: C.earthOrbital.earthEccentricityJ2000,
+        gmMoonKm3S2: GM_MOON_ALONE, moonDistanceKm, moonEccentricity: C.moonReference.moonOrbitalEccentricityBase,
+        moonInclinationDeg: C.moonReference.moonEclipticInclinationJ2000,
+      }),
+      lodSecondsAtAge: /** @param {number} tMa */ (tMa) => deepLod.lodSecondsAtAge(tMa),
+      lodJ2000Seconds: EPOCH_PARAMS.lodNowH13Seconds,
+      moonDistanceMetresAtAge,
+      moonDistanceJ2000Metres: EPOCH_PARAMS.moonDistanceNowM,
+      hAtAge: /** @param {number} tMa */ (tMa) => deepLod.hAtAge(tMa),
+      yearToTMa: /** @param {number} yr */ (yr) => (startmodelYear - yr) / 1e6,
+    });
     const seriesArt = /** @type {any} */ (secularSeriesArtifact);
     const sb = seriesArt && seriesArt.bodies && seriesArt.bodies.earth;
     const hist = createDeepOrbitalHistory({
@@ -522,8 +543,8 @@ export function assembleModel(C, F, laws = {}, secularSeriesArtifact = /** @type
       axialPrecessionYearsJ2000: axial0,
       obliquityJ2000Deg: obliquityDeg(2000),
       axialPrecessionYearsAtYearFn: (yr) => {
-        const h = deepLod.hAtAge((startmodelYear - yr) / 1e6);
-        return axial0 * (h === null ? 1 : h / H0);
+        const r = composedPrec.composedRateRatioAtAge((startmodelYear - yr) / 1e6);
+        return axial0 / (r === null ? 1 : r);
       },
     });
     // PER-TIER ROUTING (the anomalistic-contamination fix): one sampler PER

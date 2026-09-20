@@ -243,17 +243,23 @@ calibrated on it.
 
 **The falsification criterion.** The model stands falsifiable on three named,
 pre-registered legs: (1) **the deep-time scaling split** — the axial
-precession must scale with H(t) per the recession history, **the obliquity
-band must follow the beat 2π/(ψ̇(t) − |s₃|)** (p H-scaled; s₃ at its
-dynamical value under the measured solar-mass history — the two readings
-are degenerate today and split ~19% at 2.46 Ga, registry keys
-`obliqBeat*Kyr`/`obliqH8Scaled*Kyr`, doc 109 §18), while the
-long-eccentricity band stays at its modern class (scaled only by the
-measured solar-mass history); every newly dated Precambrian
-cyclostratigraphic section tests these halves (the precession/LOD side
-confirmed so far at 1.4 and 2.46 Ga; the deep obliquity PERIOD is the
-pre-registered, not-yet-discriminated prediction), and a section violating
-any half falsifies the corresponding tier. (2) **Historical-era exactness** — the fail-proven gate
+precession must follow the COMPOSED lunisolar rate
+ψ̇(t) = [ω(t)/ω₀]·p₀·[f_S + (1 − f_S)(a₀/a_M(t))³] (spin from the recession
+history, the lunar torque growing on the Moon's distance; ONE home
+`@essrt/physics/earth/precession-composed`, plan 06 D6 — the structural
+H(t)/13 clock is its named diagnostic and reads ~35 % low at 2.46 Ga),
+**the obliquity band must follow the beat 2π/(ψ̇(t) − |s₃|)** (ψ̇ the
+composed rate; s₃ at its dynamical value under the measured solar-mass
+history — the beat and the pure H/8 reading are degenerate today and split
+to roughly half the H/8 value at 2.46 Ga, registry keys
+`obliqBeat*Kyr`/`obliqBeatStructural*Kyr`/`obliqH8Scaled*Kyr`, doc 109
+§18), while the long-eccentricity band stays at its modern class (scaled
+only by the measured solar-mass history); every newly dated Precambrian
+cyclostratigraphic section tests these halves (the precession side is
+GATED at 1.4 and 2.46 Ga — paleo-anchors rows `xiamaling-prec-1400` /
+`lantink-prec-2460`, which the structural clock fails; the deep obliquity
+PERIOD is the pre-registered, not-yet-discriminated prediction), and a
+section violating any half falsifies the corresponding tier. (2) **Historical-era exactness** — the fail-proven gate
 suite: eclipses (`eclipse-audit`), the LOD/ΔT stack, cardinal points, the
 41-anchor paleo bands (`paleo-anchors`, where an unexplained *improvement*
 fails too). (3) **Two-expansions μ-consistency** — the rock-measured

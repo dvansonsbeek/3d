@@ -1820,33 +1820,22 @@ export const VALUES = {
   // rate at age t is the two engines composed — engine K's spin ω(t) and
   // recession history a_m(t) carrying the lunar torque, engine D's side the
   // solar torque: ψ̇(t) = [ω(t)/ω₀]·(p_S + p_L·(a_m0/a_m(t))³) at μ = 1.
-  // The STRUCTURAL clock is H(t)/13 (exact at J2000). All inputs from the
-  // shared homes (E20); the instrument twin is
-  // tools/explore/w3-precession-crosscoupling.mjs.
+  // The STRUCTURAL clock is H(t)/13 (exact at J2000). Plan 06 D6: the
+  // composed rate IS the shipped leg-1 ψ̇(t) — ONE home
+  // @essrt/physics/earth/precession-composed, read here through the Node
+  // engine's instance (tools/lib/deep-time.js), the same evaluator the
+  // hybrid precesses on and the paleo-anchors gate's precArcsecPerYr rows
+  // check. The instrument twin is tools/explore/w3-precession-crosscoupling.mjs.
   ...(() => {
-    const D2R = Math.PI / 180;
-    const split = () => {
-      const eE = astro.earthOrbital.earthEccentricityJ2000;
-      const sol = (C.GM_SUN / C.currentAUDistance ** 3) * Math.pow(1 - eE * eE, -1.5);
-      const lun = (C.GM_MOON_ALONE / C.moonDistance ** 3) * Math.pow(1 - C.moonOrbitalEccentricity ** 2, -1.5)
-        * (1 - 1.5 * Math.sin(C.moonEclipticInclinationJ2000 * D2R) ** 2);
-      return sol / (sol + lun);
-    };
-    const p0 = () => 1296000 / (C.H / 13);
-    const composedAt = (ageMa) => {
-      const d = dtl();
-      const fS = split();
-      return (d.LOD_NOW_H13_S / d.meanLodSecondsAtAge(ageMa))
-        * (p0() * fS + p0() * (1 - fS) * Math.pow(d.A_MOON_NOW_M / d.meanMoonDistanceMetresAtAge(ageMa), 3));
-    };
-    const structuralAt = (ageMa) => 1296000 / (dtl().meanHAtAge(ageMa) / 13);
+    const composedAt = (ageMa) => dtl().composedPrecessionRateArcsecPerYrAtAge(ageMa);
+    const structuralAt = (ageMa) => dtl().structuralPrecessionRateArcsecPerYrAtAge(ageMa);
     const out = {
-      earthPrecSolarShareJ2000Pct: { get: () => 100 * split(), render: (v) => Number(v).toFixed(1), unit: '%', note: 'solar fraction of Earth’s J2000 precession torque, derived from the shared constants (the W3 split; the lunar part is the rest)' },
-      earthPrecRateJ2000ArcsecPerYr: { get: p0, render: (v) => Number(v).toFixed(1), unit: '″/yr', note: 'the model’s J2000 axial-precession rate, 1,296,000 / (H/13)' },
+      earthPrecSolarShareJ2000Pct: { get: () => 100 * dtl().PRECESSION_SOLAR_SHARE_J2000, render: (v) => Number(v).toFixed(1), unit: '%', note: 'solar fraction of Earth’s J2000 precession torque, derived from the shared constants (the W3 split; the lunar part is the rest)' },
+      earthPrecRateJ2000ArcsecPerYr: { get: () => dtl().PRECESSION_RATE_J2000_ARCSEC_PER_YR, render: (v) => Number(v).toFixed(1), unit: '″/yr', note: 'the model’s J2000 axial-precession rate, 1,296,000 / (H/13)' },
     };
     for (const age of [650, 1400, 2460]) {
-      out[`earthPrecComposed${age}MaArcsecPerYr`] = { get: () => composedAt(age), render: (v) => Number(v).toFixed(1), unit: '″/yr', note: `the two engines composed at ${age} Ma: ω(t) × (solar torque + lunar torque on the recession history), μ = 1` };
-      out[`earthPrecStructural${age}MaArcsecPerYr`] = { get: () => structuralAt(age), render: (v) => Number(v).toFixed(1), unit: '″/yr', note: `the structural clock H(${age} Ma)/13 alone — exact at J2000, diverges at depth by the lunar 1/a³ term` };
+      out[`earthPrecComposed${age}MaArcsecPerYr`] = { get: () => composedAt(age), render: (v) => Number(v).toFixed(1), unit: '″/yr', note: `the two engines composed at ${age} Ma: ω(t) × (solar torque + lunar torque on the recession history), μ = 1 — the shipped leg-1 rate (plan 06 D6)` };
+      out[`earthPrecStructural${age}MaArcsecPerYr`] = { get: () => structuralAt(age), render: (v) => Number(v).toFixed(1), unit: '″/yr', note: `the structural clock H(${age} Ma)/13 alone — exact at J2000, diverges at depth by the lunar 1/a³ term (the named diagnostic, not the shipped rate)` };
     }
     return out;
   })(),
@@ -2128,10 +2117,14 @@ export const VALUES = {
 
   // ── The sharpened leg-1 obliquity statement (owner-adopted) ─────────────
   // The obliquity band follows the BEAT 2π/(ψ̇(t) − |s₃|): the spin
-  // precession p H-scaled per the recession history (engine K), s₃ at its
-  // dynamical value under the measured μ ≈ 1 (engine D). Degenerate with
-  // pure H/8-scaling today (p ≫ s₃); discriminable at Precambrian ages —
-  // the pre-registered fork (plan 02 §8; doc 109 §18).
+  // precession ψ̇(t) the COMPOSED lunisolar rate (plan 06 D6 — the certified
+  // J2000 of-date beat scaled by ψ̇(t)/ψ̇₀ from the composed evaluator, the
+  // SAME scaling the shipped hybrid precesses on), s₃ at its dynamical value
+  // under the measured μ ≈ 1 (engine D). Degenerate with pure H/8-scaling
+  // today (p ≫ s₃); discriminable at Precambrian ages — the pre-registered
+  // fork (plan 02 §8; doc 109 §18). The `obliqBeatStructural*Kyr` twins keep
+  // the pre-D6 reading (ψ̇ on the structural H(t)/13 clock) as the named
+  // diagnostic the D6 record compares against.
   ...(() => {
     const DT = () => require(join(ROOT, 'tools', 'lib', 'deep-time.js'));
     const s3 = () => {
@@ -2145,10 +2138,15 @@ export const VALUES = {
       const sid = dt.meanSiderealYearSecondsAtAge(tMa), trop = dt.meanTropicalYearSecondsAtAge(tMa);
       return sid / (sid - trop);
     };
-    const beatKyr = (tMa) => 1296000 / (1296000 / axialYr(tMa) - s3()) / 1000;
+    const J2000_MA = 0.000001;
+    // ψ̇(t) on the composed rate: the certified J2000 anchor × the composed ratio (≡ the hybrid's injection)
+    const psiDotComposed = (tMa) => (1296000 / axialYr(J2000_MA)) * DT().composedPrecessionRateRatioAtAge(tMa);
+    const beatKyr = (tMa) => 1296000 / (psiDotComposed(tMa) - s3()) / 1000;
+    const beatStructuralKyr = (tMa) => 1296000 / (1296000 / axialYr(tMa) - s3()) / 1000;
     const h8Kyr = (tMa) => axialYr(tMa) * 13 / 8 / 1000;
     const mk = (name, tMa, label) => ({
-      [`obliqBeat${name}Kyr`]: { get: () => beatKyr(tMa), render: (v) => Number(v).toFixed(1), unit: 'kyr', note: `the obliquity band as the BEAT 2π/(ψ̇ − |s₃|) at ${label} — p H-scaled, s₃ dynamical under measured μ (the adopted leg-1 form)` },
+      [`obliqBeat${name}Kyr`]: { get: () => beatKyr(tMa), render: (v) => Number(v).toFixed(1), unit: 'kyr', note: `the obliquity band as the BEAT 2π/(ψ̇ − |s₃|) at ${label} — ψ̇ the composed lunisolar rate (plan 06 D6), s₃ dynamical under measured μ (the adopted leg-1 form)` },
+      [`obliqBeatStructural${name}Kyr`]: { get: () => beatStructuralKyr(tMa), render: (v) => Number(v).toFixed(1), unit: 'kyr', note: `the same beat with ψ̇ on the structural H(t)/13 clock at ${label} — the pre-D6 reading, kept as the named diagnostic` },
       [`obliqH8Scaled${name}Kyr`]: { get: () => h8Kyr(tMa), render: (v) => Number(v).toFixed(1), unit: 'kyr', note: `the pure H/8-scaling reading (axial × 13/8) at ${label} — degenerate with the beat today, the discriminated alternative at depth` },
     });
     return {
@@ -3076,8 +3074,9 @@ export const VALUES = {
       lodHr: (t) => dtl().meanLodSecondsAtAge(t) / 3600,
       moonDistanceRE: (t) => dtl().meanMoonDistanceCorrectedAtAge(t) / RE(),
       moonDistanceRawRE: (t) => dtl().meanMoonDistanceAtAge(t) / RE(),
+      precArcsecPerYr: (t) => dtl().composedPrecessionRateArcsecPerYrAtAge(t),
     };
-    const unitOf = { daysPerYear: 'd/yr', lodHr: 'hr', moonDistanceRE: 'R_E', moonDistanceRawRE: 'R_E' };
+    const unitOf = { daysPerYear: 'd/yr', lodHr: 'hr', moonDistanceRE: 'R_E', moonDistanceRawRE: 'R_E', precArcsecPerYr: '″/yr' };
     const camel = (id) => id.split('-').map((s, i) => (i === 0 ? s : s.charAt(0).toUpperCase() + s.slice(1))).join('').replace(/[^A-Za-z0-9]/g, '');
     /** @type {Record<string, any>} */
     const out = {};

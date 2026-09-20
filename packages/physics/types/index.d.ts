@@ -72,6 +72,7 @@ export { buildPlanetChainsFromArtifactData, computePlanetElementsAtYear, compute
 export { computeEquatorNodeOriginSFrameDeg, convertNodeSFrameToEquatorOriginDeg } from "./planets/inv-plane-frame.cjs";
 export { CHAIN_ARTIFACT, CHAIN_ARTIFACT_HASH } from "./planets/chain-artifact.js";
 export { DEEP_MODES_ARTIFACT, DEEP_MODES_ARTIFACT_HASH } from "./moon/deep-modes-artifact.cjs";
+export { computeSolarTorqueShare, createComposedPrecession } from "./earth/precession-composed.cjs";
 export { createPredictivePrecession, calcPlanetPerihelionLongDeg } from "./planets/predict.cjs";
 export { createMoonRecessionHistory, createSolarChannelBudget } from "./deltat/recession-history.cjs";
 export { evalClimateL1OrbitalPermil, laggedL1Terms, createAlphaGiaChannel } from "./climate/l1-orbital.cjs";

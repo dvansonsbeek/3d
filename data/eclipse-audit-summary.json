@@ -426,7 +426,7 @@
       "packages/physics/src/eclipse/besselian.cjs": "sha256:5928f789205ecebd42678701e0615d4f2c2f12256e7db66ff77de51710637d04",
       "packages/physics/src/eclipse/finders.cjs": "sha256:168755d5e01397b7f63f2ffa49101afe0da0046e5fbd9e7ef6d04be6d7f5d330",
       "packages/physics/src/eclipse/sun-planetary-completion.cjs": "sha256:b24ce3ac114af60a9f1b2a9b32e6df45b0b00118d69262880ede8a6b8deb5766",
-      "packages/physics/src/model.js": "sha256:9dff8fe06e9f19f54e9cb5df3a4069c1b6df7bf8de7fbdc110867986253fd3a9",
+      "packages/physics/src/model.js": "sha256:6f292c396f8f36bc8c35c0044e5bcb8e334d92da794aa4b7addff65f8c9d5b86",
       "packages/physics/src/moon/apparent.cjs": "sha256:fba578d19fa107d66cb6b655a56b5d81b4b11219ab88296022abd9379f53df37",
       "packages/physics/src/moon/ecc-channel.cjs": "sha256:e986b8ca3dbfdaa8508f49f315bc81718503b91eb56298d9ad4d7c29186fc691",
       "packages/physics/src/moon/series-extension.cjs": "sha256:88c2e2ef973f15c7441a0854160b5f5f4a6bd9e28c318d85570d6d67ca42ba55",

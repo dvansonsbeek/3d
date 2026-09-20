@@ -350,6 +350,40 @@ function meanLodSecondsAtAgeActual(t_Ma) { return _deepLod().lodSecondsActualAtA
 // ─── STEP 2 — H(t) ────────────────────────────────────────────────────────
 function meanHAtAge(t_Ma) { return _deepLod().hAtAge(t_Ma); }
 
+// ─── The composed lunisolar precession rate (plan 06 D6) ──────────────────
+// ψ̇(t) = [ω(t)/ω₀]·p₀·[f_S + (1 − f_S)(a₀/a_M(t))³] — the tidal chain's spin
+// carrying both torques, the lunar torque growing on the recession history.
+// ONE home: @essrt/physics/earth/precession-composed; this is the Node
+// engine's instance on its own chain (the registry's composed/beat keys and
+// the paleo-anchors gate's precArcsecPerYr rows read it). The structural
+// clock 13·1,296,000/H(t) stays a named diagnostic.
+const PRECESSION_SOLAR_SHARE_J2000 = _req('@essrt/physics/earth/precession-composed').computeSolarTorqueShare({
+  gmSunKm3S2: C.GM_SUN, auKm: C.currentAUDistance, earthEccentricity: C.ASTRO_REFERENCE.earthEccentricityJ2000,
+  gmMoonKm3S2: C.GM_MOON_ALONE, moonDistanceKm: C.moonDistance, moonEccentricity: C.moonOrbitalEccentricity,
+  moonInclinationDeg: C.moonEclipticInclinationJ2000,
+});
+const PRECESSION_RATE_J2000_ARCSEC_PER_YR = 1296000 / (C.H / 13);
+let _composedPrecM = null;
+function _composedPrec() {
+  if (!_composedPrecM) {
+    _composedPrecM = _req('@essrt/physics/earth/precession-composed').createComposedPrecession({
+      p0ArcsecPerYr: PRECESSION_RATE_J2000_ARCSEC_PER_YR,
+      solarShare: PRECESSION_SOLAR_SHARE_J2000,
+      lodSecondsAtAge: meanLodSecondsAtAge,
+      lodJ2000Seconds: LOD_NOW_H13_S,
+      moonDistanceMetresAtAge: meanMoonDistanceMetresAtAge,
+      moonDistanceJ2000Metres: A_MOON_NOW_M,
+      hAtAge: meanHAtAge,
+      yearToTMa: (year) => (2000 - year) / 1e6,
+    });
+  }
+  return _composedPrecM;
+}
+function composedPrecessionRateArcsecPerYrAtAge(t_Ma) { return _composedPrec().composedRateArcsecPerYrAtAge(t_Ma); }
+function composedPrecessionRateRatioAtAge(t_Ma) { return _composedPrec().composedRateRatioAtAge(t_Ma); }
+function composedPrecessionPeriodYearsAtAge(t_Ma) { return _composedPrec().composedPeriodYearsAtAge(t_Ma); }
+function structuralPrecessionRateArcsecPerYrAtAge(t_Ma) { return _composedPrec().structuralRateArcsecPerYrAtAge(t_Ma); }
+
 // ─── Driver 2 — AU and year_s ─────────────────────────────────────────────
 function meanAuAtAge(t_Ma) {
   // Phase 8.3 L6: the linear mass-loss law lives in @essrt/physics.
@@ -1441,6 +1475,10 @@ module.exports = {
   meanLodSecondsAtAge, meanLodSecondsAtAgeActual, meanLodHoursAtAge,
   // Step 2
   meanHAtAge,
+  // The composed lunisolar precession rate (plan 06 D6) + its structural diagnostic twin
+  composedPrecessionRateArcsecPerYrAtAge, composedPrecessionRateRatioAtAge, composedPrecessionPeriodYearsAtAge,
+  structuralPrecessionRateArcsecPerYrAtAge,
+  PRECESSION_SOLAR_SHARE_J2000, PRECESSION_RATE_J2000_ARCSEC_PER_YR,
   // Driver 2
   meanAuAtAge, meanSiderealYearSecondsAtAge, meanTropicalYearSecondsAtAge,
   meanTropicalYearDaysAtAge, meanYearInDaysAtAge,

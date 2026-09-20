@@ -139,6 +139,10 @@ export { createDeepOrbitalHistory } from './earth/deep-orbital-history.cjs';
 export { createSiderealYearChannel } from './earth/sidereal-year-channel.cjs';
 // S2: THE ONE of-date year-length family (years + precession beats, SI seconds)
 export { createYearLengths } from './earth/year-lengths.cjs';
+// Plan 06 D6: THE ONE home of the composed lunisolar precession rate ψ̇(t)
+// (spin ω(t) × [solar torque + lunar torque on the recession history]) —
+// leg-1's physical rate; the structural H(t)/13 clock is its named diagnostic.
+export { computeSolarTorqueShare, createComposedPrecession } from './earth/precession-composed.cjs';
 export { createPredictivePrecession, calcPlanetPerihelionLongDeg } from './planets/predict.cjs';
 // L10 — the composition front door: one law set, N body records. Thin by
 // design; engines keep their direct call sites (see planets/model.cjs).

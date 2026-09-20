@@ -52,9 +52,11 @@ function createDeepOrbitalHistory() {
  * plan 02 Stage C / C-4b): ε(t) and e(t) from the SAME construction the
  * browser's ?hybridSpin runs — the banked engine series inside ±10 Myr
  * (data/nbody-secular-series.json), the deep mode tables as the tail, and
- * α(t) = ψ̇(t)/cos ε₀ with the SECULAR H(t) scaling only
- * (period₀·H(t)/H₀ — the leg-1 claim; the instantaneous year-length beat
- * double-counts the equinox wobble, the measured C-4b catch).
+ * α(t) = ψ̇(t)/cos ε₀ with the SECULAR scaling only — on the COMPOSED
+ * lunisolar rate, period₀ / [ψ̇(t)/ψ̇₀] (plan 06 D6, the leg-1 claim; the
+ * pre-D6 form was the structural period₀·H(t)/H₀; the instantaneous
+ * year-length beat double-counts the equinox wobble, the measured C-4b
+ * catch).
  *
  * Returns { epsDeg(year), e(year) } over a grown cached grid (the browser
  * sampler pattern, 250-aligned tiers per the factory's stepping contract),
@@ -77,7 +79,6 @@ function createOneSourceMovement() {
   const sidDays = DT.computeSiderealYearDaysDirect(2000);
   const solDays = DT.computeSolarYearDaysDirect(2000);
   const axial0 = sidDays / (sidDays - solDays);
-  const H0 = DT.meanHAtAge(0);
   const eb = seriesArt.bodies.earth;
 
   const tier = factory({
@@ -91,7 +92,13 @@ function createOneSourceMovement() {
     anchorAscNodeEclipticDeg: AE.ascNodeEclipticDeg,
     axialPrecessionYearsJ2000: axial0,
     obliquityJ2000Deg: C.ASTRO_REFERENCE.obliquityJ2000_deg,
-    axialPrecessionYearsAtYearFn: (yr) => axial0 * DT.meanHAtAge((2000 - yr) / 1e6) / H0,
+    // D6 (plan 06): the COMPOSED lunisolar rate — spin × [solar + lunar
+    // torque on the recession history] — not the structural H(t)/H₀ scaling.
+    // Twins: packages/physics model.js and src/script.js _deepHistSeries.
+    axialPrecessionYearsAtYearFn: (yr) => {
+      const r = DT.composedPrecessionRateRatioAtAge((2000 - yr) / 1e6);
+      return axial0 / (r === null ? 1 : r);
+    },
   });
 
   // grown-grid sampler (the browser's tiers: 250-aligned beyond ±50 kyr).

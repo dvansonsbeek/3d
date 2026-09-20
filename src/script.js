@@ -11,7 +11,7 @@ import { Pane } from 'tweakpane';
 //
 // Generated at build time, not fetched at runtime — `holisticyearLength` is read
 // at module scope below, and Phase 15 requires offline === hosted.
-import { DEFAULT_CONSTANTS as K, REFERENCE_DATA as R, FITTED_COEFFICIENTS as FIT, CONSTANTS_HASH, COEFFICIENTS_HASH, MODEL_VERSION, PREPRINT_DOI, createEpochPrimitives, createPhaseMachinery, createCardinalModel, createMoonEccChannel, createDeepEccChannel, DEEP_MODES_ARTIFACT, createDeepOrbitalHistory, createYearLengths, createMoonMonthChain, createChainCycleIntegrator, createMoonArguments, createMoonSeries, createMoonApparent, derivePlanetGeometry, planetFibonacciLaws as _FL, computeEccentricityIntegrated, planetOrientation as _PO, planetOrbitChain as _POC, createPredictivePrecession, calcPlanetPerihelionLongDeg, integrateAscendingNode, createDeltaTCycles, createDeepTimeLod, createMoonRecessionHistory, createSolarChannelBudget, deltaTEspenakMeeusCanonSeconds, evalClimateL1OrbitalPermil, createAlphaGiaChannel, createEclipseFinders, createSunLongitudeCorrection, createModel, buildPlanetChainsFromArtifactData, computePlanetElementsAtYear as kcComputePlanetElementsAtYear, computeApsidalSecularDegPerYr as kcApsidalSecularDegPerYr, computeHeliocentricEclipticFromElements as kcComputeHeliocentricEclipticFromElements, computeEquatorNodeOriginSFrameDeg, convertNodeSFrameToEquatorOriginDeg, createSecularSeriesOverride, CHAIN_ARTIFACT, ANCHOR_EPOCH_YEAR as KC_ANCHOR_EPOCH_YEAR, ANCHOR_EPOCH_JD as KC_ANCHOR_EPOCH_JD } from '@essrt/physics';
+import { DEFAULT_CONSTANTS as K, REFERENCE_DATA as R, FITTED_COEFFICIENTS as FIT, CONSTANTS_HASH, COEFFICIENTS_HASH, MODEL_VERSION, PREPRINT_DOI, createEpochPrimitives, createPhaseMachinery, createCardinalModel, createMoonEccChannel, createDeepEccChannel, DEEP_MODES_ARTIFACT, createDeepOrbitalHistory, createYearLengths, createMoonMonthChain, createChainCycleIntegrator, createMoonArguments, createMoonSeries, createMoonApparent, derivePlanetGeometry, planetFibonacciLaws as _FL, computeEccentricityIntegrated, planetOrientation as _PO, planetOrbitChain as _POC, createPredictivePrecession, calcPlanetPerihelionLongDeg, integrateAscendingNode, createDeltaTCycles, createDeepTimeLod, createMoonRecessionHistory, createSolarChannelBudget, deltaTEspenakMeeusCanonSeconds, evalClimateL1OrbitalPermil, createAlphaGiaChannel, computeSolarTorqueShare, createComposedPrecession, createEclipseFinders, createSunLongitudeCorrection, createModel, buildPlanetChainsFromArtifactData, computePlanetElementsAtYear as kcComputePlanetElementsAtYear, computeApsidalSecularDegPerYr as kcApsidalSecularDegPerYr, computeHeliocentricEclipticFromElements as kcComputeHeliocentricEclipticFromElements, computeEquatorNodeOriginSFrameDeg, convertNodeSFrameToEquatorOriginDeg, createSecularSeriesOverride, CHAIN_ARTIFACT, ANCHOR_EPOCH_YEAR as KC_ANCHOR_EPOCH_YEAR, ANCHOR_EPOCH_JD as KC_ANCHOR_EPOCH_JD } from '@essrt/physics';
 // K8 — the reference package: ONE-WAY imports (comparison only;
 // @essrt/reference is private-by-construction and nothing in the model
 // chain depends on it). publishedCurves migrated here from
@@ -20630,6 +20630,32 @@ function _cardinalYearExcessMinutes(year, type) {
   return (_cardinalYearSeconds(year, type) - _CARDINAL_YEAR_BASE_S) / 60;
 }
 
+// The composed lunisolar precession rate (plan 06 D6) — ONE home
+// @essrt/physics/earth/precession-composed, the browser's instance on its own
+// tidal chain: ψ̇(t) = [ω(t)/ω₀]·p₀·[f_S + (1 − f_S)(a₀/a_M(t))³]. Twins:
+// packages/physics model.js and tools/lib/deep-time.js. The torque share is
+// built from the J2000 constants (K.*), never the deep-time-mutable lets.
+let _composedPrecM = null;
+function _composedPrec() {
+  if (!_composedPrecM) {
+    _composedPrecM = createComposedPrecession({
+      p0ArcsecPerYr: 1296000 / (K.foundational.holisticyearLength / 13),
+      solarShare: computeSolarTorqueShare({
+        gmSunKm3S2: GM_SUN, auKm: K.physicalConstants.currentAUDistance, earthEccentricity: K.earthOrbital.earthEccentricityJ2000,
+        gmMoonKm3S2: GM_MOON_ALONE, moonDistanceKm: K.moonReference.moonDistance, moonEccentricity: moonOrbitalEccentricityBase,
+        moonInclinationDeg: moonEclipticInclinationJ2000,
+      }),
+      lodSecondsAtAge: meanLodSecondsAtAge,
+      lodJ2000Seconds: LOD_NOW_H13_S,
+      moonDistanceMetresAtAge: meanMoonDistanceMetresAtAge,
+      moonDistanceJ2000Metres: A_MOON_NOW_M,
+      hAtAge: meanHAtAge,
+      yearToTMa: (year) => (2000 - year) / 1e6,
+    });
+  }
+  return _composedPrecM;
+}
+
 // The series-driven hybrid (the ONE evaluator): factory built lazily AFTER
 // the series arrives; deep ζ modes remain only the beyond-span tail.
 let _deepHistSeriesM = null;
@@ -20647,14 +20673,20 @@ function _deepHistSeries() {
       anchorAscNodeEclipticDeg: DEEP_MODES_ARTIFACT.anchorAscNodeEclipticDeg,
       axialPrecessionYearsJ2000: sid / (sid - sol),
       obliquityJ2000Deg: ASTRO_REFERENCE.obliquityJ2000_deg,
-      // D1-revised: the SECULAR H(t) coupling — period(t) = period₀·H(t)/H₀
-      // (leg 1's scaling; the model's own recession history via meanHAtAge).
-      // NOT the instantaneous year-length beat: that carries the equinox
-      // wobble the hybrid's n̂(t) already generates (double-count — the
-      // generator's refuse-gate measured 0.14°/1.05° distortions).
-      axialPrecessionYearsAtYearFn: ((axial0, H0) =>
-        (yr) => axial0 * meanHAtAge((2000 - yr) / 1e6) / H0
-      )(sid / (sid - sol), meanHAtAge(0)),
+      // D6 (plan 06): the SECULAR coupling on the COMPOSED lunisolar rate —
+      // period(t) = period₀ / [ψ̇(t)/ψ̇₀], spin from the tidal chain, lunar
+      // torque on the recession history (replaces the structural
+      // period₀·H(t)/H₀, which misses the lunar 1/a³ growth: 70.9 vs
+      // Lantink 2022's 108.6 ± 8.5 ″/yr at 2.46 Ga). NOT the instantaneous
+      // year-length beat: that carries the equinox wobble the hybrid's n̂(t)
+      // already generates (double-count — the generator's refuse-gate
+      // measured 0.14°/1.05° distortions).
+      axialPrecessionYearsAtYearFn: ((axial0) =>
+        (yr) => {
+          const r = _composedPrec().composedRateRatioAtAge((2000 - yr) / 1e6);
+          return axial0 / (r === null ? 1 : r);
+        }
+      )(sid / (sid - sol)),
     });
   }
   return _deepHistSeriesM;
@@ -21008,12 +21040,15 @@ const VFP_CATEGORIES = [
           if (_hybridSpinActive()) return _yearLengthsM().tropicalYearSecondsAtYear(year) / 86400;
           if (!a) {
             const sid = computeSiderealYearDaysDirect(2000), sol = computeSolarYearDaysDirect(2000);
-            a = { axial0: sid / (sid - sol), H0: meanHAtAge(0) };
+            a = { axial0: sid / (sid - sol) };
           }
+          // D6 (plan 06): the secular precession period on the COMPOSED
+          // lunisolar rate (axial0 / [ψ̇(t)/ψ̇₀]), the same scaling the hybrid
+          // precesses on — not the structural axial0·H(t)/H₀.
           const tMa = (2000 - year) / 1e6;
-          const h = meanHAtAge(tMa);
+          const r = _composedPrec().composedRateRatioAtAge(tMa);
           return meanSiderealYearSecondsAtAge(tMa) / 86400
-            * (1 - 1 / (a.axial0 * (h === null ? 1 : h / a.H0)));
+            * (1 - 1 / (a.axial0 / (r === null ? 1 : r)));
         };
       })() },
     references: [

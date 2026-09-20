@@ -1,6 +1,6 @@
 ---
 docVersion: 1.0
-modelVersion: v13.0
+modelVersion: v14.0
 coefficients: sha256:b8b18424a3435e20
 status: current
 ---
@@ -21,9 +21,16 @@ ESSRT's lattice is the structure of the FIRST:
 - **The tidal tier (Earth–Moon — where the lattice lives).** H(t), the
   Solar System Resonance Cycle 8H, and the H-carrying L1 families (the
   precession and obliquity bands) are structural to the Earth–Moon
-  spin/tide system and expand with H as the Moon recedes — confirmed
-  against the rock to 2.46 Ga (precession ~12 kyr at Joffre, ~17 kyr at
-  Xiamaling). Earth's orbital laws (H/3, H/16 = 13+3) are exact
+  spin/tide system and expand as the Moon recedes — the axial precession
+  on the COMPOSED lunisolar rate (spin × [solar + lunar torque on the
+  recession history], plan 06 D6), confirmed against the rock to 2.46 Ga
+  (<!--v:anchorLantinkPrec2460Pred-->104.51<!--/v--> vs Lantink 2022's
+  108.6 ± 8.5 ″/yr at Joffre; <!--v:anchorXiamalingPrec1400Pred-->86.52<!--/v-->
+  vs Meyers & Malinverno 2018's 85.79 ± 2.72 ″/yr at Xiamaling — gate
+  rows; the bare H(t)/13 clock would read
+  <!--v:earthPrecStructural2460MaArcsecPerYr-->70.9<!--/v--> and
+  <!--v:earthPrecStructural1400MaArcsecPerYr-->65.2<!--/v-->). Earth's
+  orbital laws (H/3, H/16 = 13+3) are exact
   **epoch-local** laws of the present era (5 % era −2,634…+2,847 yr,
   bit-exact in the observation window — doc 109 §12).
 - **The mass-loss tier (the whole planetary system).** Solar mass loss
@@ -129,14 +136,19 @@ engine K supplying ω(t) and a_moon(t), engine D's side the solar term
 |---|---|---|---|
 | J2000 | <!--v:earthPrecRateJ2000ArcsecPerYr-->50.2<!--/v--> | <!--v:earthPrecRateJ2000ArcsecPerYr-->50.2<!--/v--> | IAU: 50.29 (measured) |
 | 650 Ma | **<!--v:earthPrecComposed650MaArcsecPerYr-->67.8<!--/v-->** | <!--v:earthPrecStructural650MaArcsecPerYr-->58.6<!--/v--> | **Wu et al. 2024: 67.64** (cyclostratigraphic inference) |
-| 1400 Ma | <!--v:earthPrecComposed1400MaArcsecPerYr-->86.5<!--/v--> | <!--v:earthPrecStructural1400MaArcsecPerYr-->65.2<!--/v--> | — |
-| 2460 Ma | <!--v:earthPrecComposed2460MaArcsecPerYr-->104.5<!--/v--> | <!--v:earthPrecStructural2460MaArcsecPerYr-->70.9<!--/v--> | — |
+| 1400 Ma | **<!--v:earthPrecComposed1400MaArcsecPerYr-->86.5<!--/v-->** | <!--v:earthPrecStructural1400MaArcsecPerYr-->65.2<!--/v--> | **Meyers & Malinverno 2018: 85.79 ± 2.72** (Xiamaling; gate row `xiamaling-prec-1400`, <!--v:anchorXiamalingPrec1400DeltaPct-->+0.85<!--/v--> %) |
+| 2460 Ma | **<!--v:earthPrecComposed2460MaArcsecPerYr-->104.5<!--/v-->** | <!--v:earthPrecStructural2460MaArcsecPerYr-->70.9<!--/v--> | **Lantink et al. 2022: 108.6 ± 8.5** (Joffre; gate row `lantink-prec-2460`, <!--v:anchorLantinkPrec2460DeltaPct-->−3.76<!--/v--> %) |
 
 At J2000 the two columns coincide — that is where the lattice is exact. At
 650 Ma they split by 14 %, and the rock-derived inference sides with the
 COMPOSITION to 0.2 % — a number engine D cannot produce (it knows nothing
 of Earth's day length) and engine K's bare structural clock misses by
-9 ″/yr. Labels: both model columns are theory; Wu's rate is inferred from
+9 ″/yr; at 1.4 and 2.46 Ga the composed rate sits inside the published 1σ
+of both Precambrian precession constants where the structural clock is
+24 % and 35 % low. **The composed rate is the model's shipped deep-time
+ψ̇(t)** (plan 06 D6): one home, `@essrt/physics/earth/precession-composed`,
+the evaluator the obliquity hybrid precesses on and the paleo-anchors gate
+checks; the structural column is kept as the named diagnostic. Labels: both model columns are theory; Wu's rate is inferred from
 cyclostratigraphy through an assumed astronomical model (see "Structural vs
 physical axial precession" below); the IAU J2000 rate is the measured
 anchor.
@@ -2232,7 +2244,7 @@ In 200 Myr, Earth's ~41-kyr obliquity cycle should be ~43.40 kyr (+5.2 %).
 The former prediction (the Law-6 identity holds in all epochs) is RETIRED with view 2: the planetary g-modes do not scale with H, so the identity is an exact Earth-frame statement at J2000, not an eternal lock (see the Law 6 restatement above).
 **Replacement prediction (the two-tier split itself, already twice confirmed and forward-testable)**: every newly dated Precambrian cyclostratigraphic section must show the precession band at the H(t)-predicted period (spin tier scales) while the long-eccentricity band stays at its modern class scaled only by 1/μ (mass tier) — the Kuruman count-bracket already reads μ(2.48 Ga) = 1.00 ± 0.07. A section violating either half falsifies the corresponding tier.
 
-**The obliquity band, sharpened (the two tiers meeting in one observable)**: the obliquity band is the beat of the two tiers — **2π/(ψ̇(t) − |s₃|)**, with the spin precession ψ̇ H-scaled per the recession history and s₃ at its dynamical value under the measured μ (doc 109 §18: the hybrid derives exactly this structure). Today the beat and pure H/8-scaling are degenerate (ψ̇ ≫ |s₃| — <!--v:obliqBeatJ2000Kyr-->41.3<!--/v--> vs <!--v:obliqH8ScaledJ2000Kyr-->41.9<!--/v--> kyr, which is why "H/8" has always fit); at 2.46 Ga they split to <!--v:obliqBeat2460MaKyr-->24.9<!--/v--> vs <!--v:obliqH8Scaled2460MaKyr-->29.7<!--/v--> kyr (~19%) — a level cyclostratigraphy can discriminate. The existing confirmations are precession-band/LOD anchors; the deep-time obliquity PERIOD itself is undiscriminated, so this beat form is the pre-registered prediction, stated before any such measurement is compared. A precisely dated Precambrian obliquity band tests it head-on.
+**The obliquity band, sharpened (the two tiers meeting in one observable)**: the obliquity band is the beat of the two tiers — **2π/(ψ̇(t) − |s₃|)**, with the spin precession ψ̇ the composed lunisolar rate of the table above (plan 06 D6) and s₃ at its dynamical value under the measured μ (doc 109 §18: the hybrid derives exactly this structure). Today the beat and pure H/8-scaling are degenerate (ψ̇ ≫ |s₃| — <!--v:obliqBeatJ2000Kyr-->41.3<!--/v--> vs <!--v:obliqH8ScaledJ2000Kyr-->41.9<!--/v--> kyr, which is why "H/8" has always fit); at 2.46 Ga they split to <!--v:obliqBeat2460MaKyr-->15.1<!--/v--> vs <!--v:obliqH8Scaled2460MaKyr-->29.7<!--/v--> kyr (the beat on the pre-D6 structural clock, kept as a diagnostic key, reads <!--v:obliqBeatStructural2460MaKyr-->24.9<!--/v-->) — a level cyclostratigraphy can discriminate. The existing confirmations are precession-band/LOD anchors; the deep-time obliquity PERIOD itself is undiscriminated, so this beat form is the pre-registered prediction, stated before any such measurement is compared. A precisely dated Precambrian obliquity band tests it head-on.
 
 ### 6. Earth-Moon genesis at the rigid Roche limit at the giant-impact age
 The proper-physics formula, run backwards, crosses the rigid Roche limit at **<!--v:moonDistanceAtHadean-->9,471<!--/v--> km ≈ 1.49 R_E** at ~4.498 Ga — the canonical giant-impact Moon-formation age (~4.5 Ga, isotope-dated), ~40 Myr after Patterson's Pb-Pb Earth age of 4.54 Gyr. The fluid Roche zone (~2.9 R_E) is crossed at ~4.44 Ga. No Hadean constraint was used in the fit.

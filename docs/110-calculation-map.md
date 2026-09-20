@@ -1,6 +1,6 @@
 ---
 docVersion: 1.0
-modelVersion: v13.0
+modelVersion: v14.0
 coefficients: sha256:b8b18424a3435e20
 status: current
 ---
@@ -218,7 +218,7 @@ The mean tidal clock and the composition, by age:
 | 1400 | 337532 | 18.482 | 1.29853 | 0.330695 | 258228 | 19863.7 | 65.24 | 1.4771 | 86.52 |
 | 2460 | 322504 | 17.007 | 1.41122 | 0.330695 | 237607 | 18277.5 | 70.91 | 1.6933 | 104.51 |
 
-External readings for the last column: IAU J2000 50.288 ″/yr (measured); Wu et al. 2024 at 650 Ma 67.64 ″/yr (cyclostratigraphic inference through an assumed astronomical model — theory-vs-inference, doc 99).
+The last column is the SHIPPED leg-1 rate (plan 06 D6; `@essrt/physics/earth/precession-composed`, one home — the hybrid precesses on it, the paleo-anchors gate checks it). External readings: IAU J2000 50.288 ″/yr (measured); Wu et al. 2024 at 650 Ma 67.64 ″/yr; Meyers & Malinverno 2018 at 1400 Ma 85.79 ± 2.72 ″/yr; Lantink et al. 2022 at 2460 Ma 108.6 ± 8.5 ″/yr (all three cyclostratigraphic inferences through an assumed astronomical model — theory-vs-inference, doc 99; the last two are gate rows `xiamaling-prec-1400` / `lantink-prec-2460`).
 <!-- /generated:calcmap-tidal-clock -->
 
 The of-date precession, by year (the hybrid's ε alongside, from the
@@ -227,14 +227,14 @@ one-source movement):
 <!-- generated:calcmap-ofdate-precession -->
 | year | T_p (A) comb pair (yr) | p (A) (″/yr) | T_p (B) one-family (yr) | p (B) (″/yr) | (A) − (B) (yr) | H(t)/13 (yr) | ε, hybrid (°) |
 |---|---|---|---|---|---|---|---|
-| -10000 | 26293.30 | 49.2901 | 26274.82 | 49.3248 | 18.48 | 25793.5 | 24.15915 |
-| -2584 | 26069.06 | 49.7141 | 26154.98 | 49.5508 | -85.92 | 25793.6 | 23.98231 |
-| -584 | 25946.80 | 49.9484 | 26003.51 | 49.8394 | -56.71 | 25793.6 | 23.76559 |
-| 0 | 25908.26 | 50.0227 | 25953.50 | 49.9355 | -45.24 | 25793.6 | 23.69483 |
+| -10000 | 26293.30 | 49.2901 | 26274.75 | 49.3249 | 18.55 | 25793.5 | 24.15915 |
+| -2584 | 26069.06 | 49.7141 | 26154.96 | 49.5508 | -85.90 | 25793.6 | 23.98231 |
+| -584 | 25946.80 | 49.9484 | 26003.49 | 49.8395 | -56.69 | 25793.6 | 23.76559 |
+| 0 | 25908.26 | 50.0227 | 25953.49 | 49.9355 | -45.23 | 25793.6 | 23.69483 |
 | 1246 | 25823.50 | 50.1868 | 25841.35 | 50.1522 | -17.85 | 25793.6 | 23.53707 |
 | 2000 | 25771.40 | 50.2883 | 25771.40 | 50.2883 | 0.00 | 25793.6 | 23.43928 |
-| 5000 | 25571.19 | 50.6820 | 25498.16 | 50.8272 | 73.03 | 25793.6 | 23.06398 |
-| 10000 | 25342.65 | 51.1391 | 25167.92 | 51.4941 | 174.73 | 25793.7 | 22.65355 |
+| 5000 | 25571.19 | 50.6820 | 25498.17 | 50.8272 | 73.01 | 25793.6 | 23.06398 |
+| 10000 | 25342.65 | 51.1391 | 25167.96 | 51.4940 | 174.69 | 25793.7 | 22.65355 |
 <!-- /generated:calcmap-ofdate-precession -->
 
 ### 2.5 Findings from this chain (to act on)
@@ -434,7 +434,7 @@ wheels still turn underneath but no longer set the axis.
 | K_LUNI | the self-anchor: a ±0.5-yr probe of the integrated equinox rate at J2000 is corrected onto the target 360°/T_p(J2000); a ratio ≈ 1 with no new constant | — | 243–271 |
 | ŝ(0) | built FROM n̂(0): tilt ε₀ (IAU 23.4392794°) about the equinox direction projected into the orbit plane — ε(J2000) ≡ ε₀ by construction, frame-invariant | — | 234–242 |
 | ε(t) | acos(ŝ·n̂) | — | 298–316 (`sampleAt`); `tools/lib/deep-orbital-history.js` 161 (`epsDeg`) |
-| surfaces | banked series inside ±10 Myr, α(H(t))-coupled integration on the ζ tail beyond; the scene's `_epsHybridSeriesAt`; the Node one-source movement (`createOneSourceMovement`) | — | `script.js` 20771; `tools/lib/deep-orbital-history.js` 59–161 |
+| surfaces | banked series inside ±10 Myr, α(t)-coupled integration on the ζ tail beyond (α on the composed ψ̇(t), plan 06 D6); the scene's `_epsHybridSeriesAt`; the Node one-source movement (`createOneSourceMovement`) | — | `script.js` 20771; `tools/lib/deep-orbital-history.js` 59–161 |
 
 Inputs: ε₀ and T_p(J2000) only. The two α readings in circulation
 (54.764 and 54.811 ″/yr) are the two J2000 precession readings of chain 2 —
@@ -444,11 +444,16 @@ H/13 (50.245) versus the of-date beat (50.288) — divided by cos ε₀.
 
 The pre-registered form is the beat **2π/(ψ̇(t) − |s₃|)** with s₃ the
 dominant Earth ζ mode (the orbital side, dynamical under the measured solar
-mass) and ψ̇(t) the spin precession. The registry keys `obliqBeat*Kyr`
-evaluate ψ̇(t) as 1,296,000/T_p(t) with T_p(t) from the **tidal-mean year
-pair** (`deep-time.cjs`), and that T_p(t) is **identically H(t)/13** — the
-structural clock of chain 2.1 (ω-scaling of p₀), not the composed torque
-rate of chain 2.3 (which adds the lunar 1/a³ growth). The pure-scaling
+mass) and ψ̇(t) the spin precession. Plan 06 D6 (decided from finding 3
+below) fixed WHICH ψ̇(t): the registry keys `obliqBeat*Kyr` evaluate it as
+the **composed torque rate** of chain 2.3 — the certified J2000 anchor
+scaled by ψ̇(t)/ψ̇₀ from `@essrt/physics/earth/precession-composed`, the
+one home the hybrid's injected evaluator, the tidal-clock table of 2.4 and
+the paleo-anchors gate rows `xiamaling-prec-1400` / `lantink-prec-2460`
+all read. The pre-D6 reading — ψ̇(t) = 1,296,000/T_p(t) with T_p(t) from
+the tidal-mean year pair, **identically H(t)/13**, the structural clock of
+chain 2.1 (ω-scaling of p₀, missing the lunar 1/a³ growth) — is kept under
+`obliqBeatStructural*Kyr` as the named diagnostic. The pure-scaling
 alternative `obliqH8Scaled*Kyr` = T_p·13/8 is the "obliquity cycle = H/8"
 reading carried for the discrimination.
 
@@ -460,8 +465,8 @@ hybrid and the K law at the exact years):
 <!-- generated:calcmap-obliquity-values -->
 | year | ε hybrid (°) | ε K law (°) | ε La2004 (°) | hybrid − K law (″) | hybrid − La2004 (″) | K law − La2004 (″) |
 |---|---|---|---|---|---|---|
-| -48000 | 24.41103 | 24.14159 | 24.41134 | 970 | -1 | -971 |
-| -28000 | 22.23033 | 23.47788 | 22.22990 | -4491 | 2 | 4493 |
+| -48000 | 24.41100 | 24.14159 | 24.41134 | 970 | -1 | -971 |
+| -28000 | 22.23035 | 23.47788 | 22.22990 | -4491 | 2 | 4493 |
 | -20000 | 22.80567 | 24.07349 | 22.80525 | -4564 | 2 | 4566 |
 | -10000 | 24.15915 | 24.52945 | 24.15921 | -1333 | -0 | 1333 |
 | -2584 | 23.98231 | 24.01380 | — | -113 | — | — |
@@ -471,9 +476,9 @@ hybrid and the K law at the exact years):
 | 2000 | 23.43928 | 23.43934 | 23.43929 | -0 | -0 | 0 |
 | 5000 | 23.06398 | 23.06503 | 23.06390 | -4 | 0 | 4 |
 | 10000 | 22.65355 | 22.61823 | 22.65342 | 127 | 0 | -127 |
-| 20000 | 23.06312 | 22.76933 | 23.06303 | 1058 | 0 | -1057 |
+| 20000 | 23.06311 | 22.76933 | 23.06303 | 1058 | 0 | -1057 |
 | 30000 | 23.90883 | 23.41005 | 23.90927 | 1796 | -2 | -1797 |
-| 50000 | 22.60678 | 22.55623 | 22.60721 | 182 | -2 | -184 |
+| 50000 | 22.60679 | 22.55623 | 22.60721 | 182 | -2 | -184 |
 
 dε/dt at J2000 (″/cy): hybrid series -46.80 · K law -46.82 · IAU 2006 -46.84 · banked verdict integrations: era-tier ζ -48.00, full-tier ζ -38.91 (data/obliquity-hybrid-verdict.json).
 α at J2000 (″/yr): p₀/cos ε₀ = 54.764 with p₀ = 1,296,000/(H/13) (the form the registry and the shipped hybrid use) · 54.811 in the verdict artifact (ψ̇ = the of-date beat 50.288 ″/yr) — the two J2000 precession readings of chain 2, finding 2.
@@ -483,15 +488,15 @@ Banked window rms vs La2004 (″), hybrid / fitted K law: ±13 kyr 50 / 711 · �
 The beat at the deep anchors, both ψ̇ readings:
 
 <!-- generated:calcmap-obliquity-beat -->
-| age (Ma) | T_p(t) from the tidal-mean year pair (yr) | H(t)/13 (yr) | ψ̇ structural = 1,296,000/T_p (″/yr) | ψ̇ composed, chain 2.3 (″/yr) | beat on structural ψ̇ (kyr) — the `obliqBeat*Kyr` form | beat on composed ψ̇ (kyr) | T_p·13/8 (kyr) — `obliqH8Scaled*Kyr` |
-|---|---|---|---|---|---|---|---|
-| 0 | 25793.615 | 25793.615 | 50.245 | 50.245 | 41.28 | 41.28 | 41.91 |
-| 380 | 23553.014 | 23553.014 | 55.025 | 59.675 | 35.83 | 31.75 | 38.27 |
-| 650 | 22106.459 | 22106.459 | 58.625 | 67.788 | 32.58 | 26.48 | 35.92 |
-| 1400 | 19863.695 | 19863.695 | 65.245 | 86.521 | 27.93 | 19.15 | 32.28 |
-| 2460 | 18277.481 | 18277.481 | 70.907 | 104.511 | 24.90 | 15.13 | 29.70 |
+| age (Ma) | T_p(t) from the tidal-mean year pair (yr) | H(t)/13 (yr) | ψ̇ structural = 1,296,000/T_p (″/yr) | ψ̇ composed, chain 2.3 (″/yr) | ψ̇(t)/ψ̇₀ composed | beat on structural ψ̇ (kyr) — `obliqBeatStructural*Kyr`, the pre-D6 reading | beat on composed ψ̇ (kyr) — the SHIPPED `obliqBeat*Kyr` form | T_p·13/8 (kyr) — `obliqH8Scaled*Kyr` |
+|---|---|---|---|---|---|---|---|---|
+| 0 | 25793.615 | 25793.615 | 50.245 | 50.245 | 1.00000 | 41.28 | 41.28 | 41.91 |
+| 380 | 23553.014 | 23553.014 | 55.025 | 59.675 | 1.18768 | 35.83 | 31.75 | 38.27 |
+| 650 | 22106.459 | 22106.459 | 58.625 | 67.788 | 1.34914 | 32.58 | 26.48 | 35.92 |
+| 1400 | 19863.695 | 19863.695 | 65.245 | 86.521 | 1.72198 | 27.93 | 19.15 | 32.28 |
+| 2460 | 18277.481 | 18277.481 | 70.907 | 104.511 | 2.08003 | 24.90 | 15.13 | 29.70 |
 
-s₃ = the dominant Earth ζ mode of data/nbody-deep-secular-modes.json = -18.8506 ″/yr (amplitude 0.00832); beat = 1,296,000/(ψ̇ − |s₃|) yr. Registry keys `obliqBeatJ2000Kyr`/`obliqBeat1400MaKyr`/`obliqBeat2460MaKyr` are the sixth column (tools/docs/model-values.mjs 2137–2150).
+s₃ = the dominant Earth ζ mode of data/nbody-deep-secular-modes.json = -18.8506 ″/yr (amplitude 0.00832); beat = 1,296,000/(ψ̇ − |s₃|) yr. Plan 06 D6: the SHIPPED leg-1 ψ̇(t) is the composed rate — registry keys `obliqBeatJ2000Kyr`/`obliqBeat1400MaKyr`/`obliqBeat2460MaKyr` are the eighth column (the certified J2000 anchor 50.2450 ″/yr × the composed ratio — the same scaling the hybrid precesses on); the `obliqBeatStructural*Kyr` twins are the seventh (the pre-D6 reading, kept as the named diagnostic). Both in tools/docs/model-values.mjs, "the obliquity band as the beat".
 <!-- /generated:calcmap-obliquity-beat -->
 
 ### 4.6 Findings from this chain (to act on)
@@ -510,13 +515,20 @@ s₃ = the dominant Earth ζ mode of data/nbody-deep-secular-modes.json = -18.85
    In-era the difference is ≤ 15″ at year 0 (≈ 0.5 km of sub-solar
    latitude) and 113″ at −2584 (≈ 3.5 km); at deep time it is degrees. Phase
    3 routes them through `_sceneEpsTargetDeg`.
-3. **The published beat rides the structural ψ̇ (H(t)/13), the tidal-clock
-   table of chain 2.4 publishes the composed ψ̇, and they split at depth**:
-   at 2.46 Ga the beat reads 24.9 kyr on the structural rate and 15.1 kyr on
-   the composed rate (4.5). The hybrid's α(t) also rides the structural
-   route (4.3). One model, two deep-time ψ̇(t) — a decision for plan 06
-   (which ψ̇(t) is the leg-1 prediction), recorded there as a D-item, not a
-   bug: the two agree wherever (a₀/a_M)³ ≈ 1.
+3. **The model carried two deep-time ψ̇(t) — RESOLVED by plan 06 D6.** As
+   found, the published beat rode the structural ψ̇ (H(t)/13) while the
+   tidal-clock table of chain 2.4 published the composed ψ̇, and they split
+   at depth (at 2.46 Ga the beat read 24.9 kyr structural vs 15.1 kyr
+   composed; the hybrid's α(t) also rode the structural route). Decided:
+   the composed rate is the leg-1 ψ̇(t) — it is the textbook torque physics
+   AND the rock's reading (Wu 2024 at 650 Ma; Meyers & Malinverno 2018 and
+   Lantink 2022 now gate rows the structural clock fails by 24 % and 35 %).
+   One home (`earth/precession-composed`), the hybrid's three injections
+   (package model, Node shim, browser) switched to it, `obliqBeat*Kyr`
+   re-derived on it with `obliqBeatStructural*Kyr` kept as the diagnostic
+   (4.4, 4.5). The two agree wherever (a₀/a_M)³ ≈ 1, so in-era values are
+   untouched (the hybrid's period factor moves 0.02 % at ±1 Myr, 0.1 % at
+   ±5 Myr).
 4. **The J2000 obliquity rate depends on the ζ representation**: banked
    series −46.79, era-tier integration −48.00, full-tier −38.91, K law
    −46.82, IAU −46.84 ″/cy. The shipped series matches IAU to 0.04 ″/cy; the
@@ -665,7 +677,7 @@ The four events and the year lengths:
 |---|---|---|---|---|---|---|---|---|---|
 | -10000 | -10000 03-26 04:41 | -10000 06-22 14:47 | -10000 09-19 23:16 | -10000 12-23 04:45 | 365.243182 | 365.244183 | 365.243472 | 31556948.61 | 0.02124 |
 | -2584 | -2584 03-22 17:13 | -2584 06-24 22:11 | -2584 09-23 03:24 | -2584 12-20 14:25 | 365.242045 | 365.242385 | 365.242689 | 31556943.15 | 0.01863 |
-| -584 | -584 03-21 11:34 | -584 06-23 15:59 | -584 09-23 15:32 | -584 12-21 03:06 | 365.241726 | 365.241918 | 365.242475 | 31556936.14 | 0.01781 |
+| -584 | -584 03-21 11:34 | -584 06-23 15:59 | -584 09-23 15:32 | -584 12-21 03:06 | 365.241726 | 365.241918 | 365.242475 | 31556936.13 | 0.01781 |
 | 0 | 0 03-20 20:09 | 0 06-22 19:36 | 0 09-23 06:31 | 0 12-20 22:45 | 365.241670 | 365.241819 | 365.242412 | 31556933.80 | 0.01756 |
 | 1246 | 1246 03-20 14:27 | 1246 06-21 21:29 | 1246 09-23 04:30 | 1246 12-21 12:21 | 365.241616 | 365.241673 | 365.242274 | 31556928.53 | 0.01703 |
 | 2000 | 2000 03-20 07:36 | 2000 06-21 01:48 | 2000 09-22 17:23 | 2000 12-21 13:35 | 365.241625 | 365.241627 | 365.242190 | 31556925.22 | 0.01671 |

@@ -191,11 +191,12 @@ function createDeepOrbitalHistory({
   const ALPHA = psiDot / Math.cos(EPS0);
   // D1-revised (plan 02, owner 2026-09-13): when the injecting engine
   // supplies its epoch-aware axial-precession evaluator, α follows the
-  // model's own H(t) recession history — α(t) = ψ̇(t)/cos ε₀ — and the
-  // integrated deep-time obliquity IS the sharpened falsification-leg-1
-  // form (the beat 2π/(ψ̇(t) − |s₃|), p H-scaled, s₃ dynamical). No new
-  // constants: ψ̇(t) comes from the same certified year-length machinery
-  // as the J2000 anchor. Absent the option, α stays constant (the
+  // model's own deep-time rate — α(t) = ψ̇(t)/cos ε₀ — and the integrated
+  // deep-time obliquity IS the sharpened falsification-leg-1 form (the
+  // beat 2π/(ψ̇(t) − |s₃|), ψ̇ the COMPOSED lunisolar rate the injecting
+  // engines build from earth/precession-composed (plan 06 D6), s₃
+  // dynamical). No new constants: ψ̇(t)'s J2000 anchor is the same
+  // certified year-length machinery; only its deep-time scaling is injected. Absent the option, α stays constant (the
   // pre-D1 ±Myr-class behavior, bit-identical).
   const alphaAtGeneral = axialPrecessionYearsAtYearFn
     ? (/** @type {number} */ t) =>

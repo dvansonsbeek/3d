@@ -41,6 +41,10 @@ const PREDICT = {
   lodHr: (ageMa) => dt.meanLodSecondsAtAge(ageMa) / 3600,
   moonDistanceRE: (ageMa) => dt.meanMoonDistanceCorrectedAtAge(ageMa) / RE_KM,
   moonDistanceRawRE: (ageMa) => dt.meanMoonDistanceAtAge(ageMa) / RE_KM,
+  // Leg 1 (plan 06 D6): Earth's axial-precession rate is the COMPOSED
+  // lunisolar rate; the structural H(t)/13 clock fails these rows (~35 % low
+  // at 2.46 Ga) — that is the fail-proof.
+  precArcsecPerYr: (ageMa) => dt.composedPrecessionRateArcsecPerYrAtAge(ageMa),
 };
 
 const failures = [];
@@ -86,7 +90,7 @@ for (const a of spec.anchors) {
   }
 }
 
-console.log(`paleo-anchors gate — ${checks} anchors (Wells 1963 · Winter 2020 · Pannella 1972 · Williams 2000 · Mitchell-Kirscher 2023 · Wu 2024 · Patterson/Roche):`);
+console.log(`paleo-anchors gate — ${checks} anchors (Wells 1963 · Winter 2020 · Pannella 1972 · Williams 2000 · Mitchell-Kirscher 2023 · Wu 2024 · Patterson/Roche · Zhou 2024 · Meyers–Malinverno 2018 · Lantink 2022):`);
 for (const l of lines) console.log(l);
 
 if (failures.length) {

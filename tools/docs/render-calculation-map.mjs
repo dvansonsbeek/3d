@@ -104,8 +104,12 @@ function torqueSplit() {
   const sol = (C.GM_SUN / C.currentAUDistance ** 3) * Math.pow(1 - eE * eE, -1.5);
   const lun = (C.GM_MOON_ALONE / C.moonDistance ** 3) * Math.pow(1 - C.moonOrbitalEccentricity ** 2, -1.5)
     * (1 - 1.5 * Math.sin(C.moonEclipticInclinationJ2000 * D2R) ** 2);
-  const fS = sol / (sol + lun);
-  const p0 = 1296000 / (C.H / 13);
+  // The share and p₀ are READ from the ONE home (the engine's composed-
+  // precession instance, plan 06 D6); the local sol/lun terms stay only to
+  // show the derivation in the table. Divergence would be a stale twin.
+  const fS = DT.PRECESSION_SOLAR_SHARE_J2000;
+  if (Math.abs(fS - sol / (sol + lun)) > 1e-12) throw new Error(`torque share twin diverged: ${fS} vs ${sol / (sol + lun)}`);
+  const p0 = DT.PRECESSION_RATE_J2000_ARCSEC_PER_YR;
   const eps0 = K.earthOrbital.obliquityJ2000_deg;
   return { eE, sol, lun, fS, p0, eps0, alpha: p0 / Math.cos(eps0 * D2R) };
 }
@@ -132,10 +136,12 @@ function blockTidalClock() {
   for (const t of [0, 0.01, 0.1, 1, 10, 100, 380, 650, 1400, 2460]) {
     const a = DT.meanMoonDistanceMetresAtAge(t), lod = DT.meanLodSecondsAtAge(t), al = DT.earthMoiFactorAtAge(t), H = DT.meanHAtAge(t);
     const w = DT.LOD_NOW_H13_S / lod, lf = Math.pow(DT.A_MOON_NOW_M / a, 3);
-    rows.push(`| ${t} | ${f(a / 1000, 0)} | ${f(lod / 3600, 3)} | ${f(w, 5)} | ${f(al, 6)} | ${f(H, 0)} | ${f(H / 13, 1)} | ${f(s.p0 * w, 2)} | ${f(lf, 4)} | ${f(w * s.p0 * (s.fS + (1 - s.fS) * lf), 2)} |`);
+    const pc = DT.composedPrecessionRateArcsecPerYrAtAge(t);   // the ONE home's value (plan 06 D6)
+    if (Math.abs(pc - w * s.p0 * (s.fS + (1 - s.fS) * lf)) > 1e-9) throw new Error(`composed ψ̇ twin diverged at ${t} Ma`);
+    rows.push(`| ${t} | ${f(a / 1000, 0)} | ${f(lod / 3600, 3)} | ${f(w, 5)} | ${f(al, 6)} | ${f(H, 0)} | ${f(H / 13, 1)} | ${f(s.p0 * w, 2)} | ${f(lf, 4)} | ${f(pc, 2)} |`);
   }
   rows.push('');
-  rows.push('External readings for the last column: IAU J2000 50.288 ″/yr (measured); Wu et al. 2024 at 650 Ma 67.64 ″/yr (cyclostratigraphic inference through an assumed astronomical model — theory-vs-inference, doc 99).');
+  rows.push('The last column is the SHIPPED leg-1 rate (plan 06 D6; `@essrt/physics/earth/precession-composed`, one home — the hybrid precesses on it, the paleo-anchors gate checks it). External readings: IAU J2000 50.288 ″/yr (measured); Wu et al. 2024 at 650 Ma 67.64 ″/yr; Meyers & Malinverno 2018 at 1400 Ma 85.79 ± 2.72 ″/yr; Lantink et al. 2022 at 2460 Ma 108.6 ± 8.5 ″/yr (all three cyclostratigraphic inferences through an assumed astronomical model — theory-vs-inference, doc 99; the last two are gate rows `xiamaling-prec-1400` / `lantink-prec-2460`).');
   return rows.join('\n');
 }
 
@@ -235,19 +241,22 @@ function blockObliquityBeat() {
   const z = require(join(ROOT, 'data/nbody-deep-secular-modes.json')).modes.earth.zeta
     .filter((x) => Math.abs(x.omegaRadPerYr) > 1e-9).sort((a, b) => Math.hypot(b.re, b.im) - Math.hypot(a.re, a.im))[0];
   const s3 = Math.abs(z.omegaRadPerYr * 180 / Math.PI) * 3600;
+  const sid0 = DT.meanSiderealYearSecondsAtAge(0.000001), trop0 = DT.meanTropicalYearSecondsAtAge(0.000001);
+  const pCert0 = 1296000 / (sid0 / (sid0 - trop0));   // the certified J2000 of-date beat — the hybrid's anchor
   const rows = [
-    '| age (Ma) | T_p(t) from the tidal-mean year pair (yr) | H(t)/13 (yr) | ψ̇ structural = 1,296,000/T_p (″/yr) | ψ̇ composed, chain 2.3 (″/yr) | beat on structural ψ̇ (kyr) — the `obliqBeat*Kyr` form | beat on composed ψ̇ (kyr) | T_p·13/8 (kyr) — `obliqH8Scaled*Kyr` |',
-    '|---|---|---|---|---|---|---|---|',
+    '| age (Ma) | T_p(t) from the tidal-mean year pair (yr) | H(t)/13 (yr) | ψ̇ structural = 1,296,000/T_p (″/yr) | ψ̇ composed, chain 2.3 (″/yr) | ψ̇(t)/ψ̇₀ composed | beat on structural ψ̇ (kyr) — `obliqBeatStructural*Kyr`, the pre-D6 reading | beat on composed ψ̇ (kyr) — the SHIPPED `obliqBeat*Kyr` form | T_p·13/8 (kyr) — `obliqH8Scaled*Kyr` |',
+    '|---|---|---|---|---|---|---|---|---|',
   ];
   for (const t of [0, 380, 650, 1400, 2460]) {
     const sid = DT.meanSiderealYearSecondsAtAge(t), trop = DT.meanTropicalYearSecondsAtAge(t);
     const Tp = sid / (sid - trop), ps = 1296000 / Tp;
-    const w = DT.LOD_NOW_H13_S / DT.meanLodSecondsAtAge(t), lf = Math.pow(DT.A_MOON_NOW_M / DT.meanMoonDistanceMetresAtAge(t), 3);
-    const pc = w * s.p0 * (s.fS + (1 - s.fS) * lf);
-    rows.push(`| ${t} | ${f(Tp, 3)} | ${f(DT.meanHAtAge(t) / 13, 3)} | ${f(ps, 3)} | ${f(pc, 3)} | ${f(1296000 / (ps - s3) / 1000, 2)} | ${f(1296000 / (pc - s3) / 1000, 2)} | ${f(Tp * 13 / 8 / 1000, 2)} |`);
+    const pc = DT.composedPrecessionRateArcsecPerYrAtAge(t), ratio = DT.composedPrecessionRateRatioAtAge(t);
+    if (Math.abs(ratio - pc / s.p0) > 1e-12) throw new Error(`composed ratio twin diverged at ${t} Ma`);
+    // the shipped beat: the certified J2000 anchor scaled by the composed ratio — exactly the hybrid's injection
+    rows.push(`| ${t} | ${f(Tp, 3)} | ${f(DT.meanHAtAge(t) / 13, 3)} | ${f(ps, 3)} | ${f(pc, 3)} | ${f(ratio, 5)} | ${f(1296000 / (ps - s3) / 1000, 2)} | ${f(1296000 / (pCert0 * ratio - s3) / 1000, 2)} | ${f(Tp * 13 / 8 / 1000, 2)} |`);
   }
   rows.push('');
-  rows.push(`s₃ = the dominant Earth ζ mode of data/nbody-deep-secular-modes.json = ${f(-s3, 4)} ″/yr (amplitude ${f(Math.hypot(z.re, z.im), 5)}); beat = 1,296,000/(ψ̇ − |s₃|) yr. Registry keys \`obliqBeatJ2000Kyr\`/\`obliqBeat1400MaKyr\`/\`obliqBeat2460MaKyr\` are the sixth column (tools/docs/model-values.mjs 2137–2150).`);
+  rows.push(`s₃ = the dominant Earth ζ mode of data/nbody-deep-secular-modes.json = ${f(-s3, 4)} ″/yr (amplitude ${f(Math.hypot(z.re, z.im), 5)}); beat = 1,296,000/(ψ̇ − |s₃|) yr. Plan 06 D6: the SHIPPED leg-1 ψ̇(t) is the composed rate — registry keys \`obliqBeatJ2000Kyr\`/\`obliqBeat1400MaKyr\`/\`obliqBeat2460MaKyr\` are the eighth column (the certified J2000 anchor ${f(pCert0, 4)} ″/yr × the composed ratio — the same scaling the hybrid precesses on); the \`obliqBeatStructural*Kyr\` twins are the seventh (the pre-D6 reading, kept as the named diagnostic). Both in tools/docs/model-values.mjs, "the obliquity band as the beat".`);
   return rows.join('\n');
 }
 

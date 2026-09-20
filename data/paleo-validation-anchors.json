@@ -5,6 +5,7 @@
       "daysPerYear": "tools/lib/deep-time.js meanYearInDaysAtAge(ageMa)",
       "lodHr": "meanLodSecondsAtAge(ageMa) / 3600",
       "moonDistanceRE": "meanMoonDistanceCorrectedAtAge(ageMa) / earthParallaxRadiusKm (raw meanMoonDistanceAtAge for the Hadean row — the solar-Δa correction is a modern-orbit construct)",
+      "precArcsecPerYr": "composedPrecessionRateArcsecPerYrAtAge(ageMa) — the COMPOSED lunisolar rate [ω(t)/ω₀]·p₀·[f_S + (1 − f_S)(a₀/a_M(t))³] (@essrt/physics/earth/precession-composed; falsification leg 1, plan 06 D6). The structural H(t)/13 clock is NOT the recipe: it reads ~35 % low at 2.46 Ga and fails these rows.",
       "expectationTypes": {
         "relativePct": "|predicted/observed - 1| * 100 <= tolerancePct",
         "range": "predicted inside [lo, hi], allowing outsideToleranceAbs beyond either edge",
@@ -24,6 +25,7 @@
       "farhat2022": "Farhat, Auclair-Desrotour, Boué & Laskar 2022. The resonant tidal evolution of the Earth-Moon distance. A&A 665, L1 (arXiv 2207.00438). Proxy anchors from their Tables 2-3: Joffre cyclostratigraphy, Weeli Wolli tidal rhythmites, Moodies Group tidal bundles",
       "zhou2024": "Zhou et al. 2024. Earth-Moon dynamics from cyclostratigraphy reveals possible ocean tide resonance in the Mesoproterozoic era. Science Advances, doi:10.1126/sciadv.adn7674 (Table S3: paired a+LOD at Chuanlinggou/Wumishan/Yemahe)",
       "meyersMalinverno2018": "Meyers & Malinverno 2018. Proterozoic Milankovitch cycles and the history of the solar system. PNAS, doi:10.1073/pnas.1717689115 (Xiamaling Formation)",
+      "lantink2022": "Lantink, Davies, Ovtcharova & Hilgen 2022. Milankovitch cycles in banded iron formations constrain the Earth–Moon system 2.46 billion years ago. PNAS 119, e2117146119, doi:10.1073/pnas.2117146119 (Joffre Member; precession constant 108.6 ± 8.5 ″/yr)",
       "nanfen2023": "Length of day at c. 1.1 Ga based on cyclostratigraphic analyses of the Nanfen Formation. J. Geol. Soc. 180, doi:10.1144/jgs2022-022"
     },
     "rights": "Observed values are published scientific measurements (facts, not creative works) reproduced with citation for validation purposes."
@@ -75,6 +77,8 @@
     { "id": "nanfen-lod-1100", "ageMa": 1100, "quantity": "lodHr", "observed": 18.94, "source": "nanfen2023", "method": "Nanfen magnetic-susceptibility cyclostratigraphy (±0.39 h)", "expectation": { "type": "relativePct", "tolerancePct": 4.1 } },
     { "id": "zhou-chuanlinggou-a-1634", "ageMa": 1634, "quantity": "moonDistanceRawRE", "observed": 51.784, "source": "zhou2024", "method": "paired Earth-Moon distance (±1,640 km)", "expectation": { "type": "relativePct", "tolerancePct": 1 } },
     { "id": "zhou-wumishan-a-1480", "ageMa": 1480, "quantity": "moonDistanceRawRE", "observed": 52.297, "source": "zhou2024", "method": "paired Earth-Moon distance (±2,100 km)", "expectation": { "type": "relativePct", "tolerancePct": 1.3 } },
-    { "id": "zhou-yemahe-a-1215", "ageMa": 1215, "quantity": "moonDistanceRawRE", "observed": 53.522, "source": "zhou2024", "method": "paired Earth-Moon distance (±1,700 km)", "expectation": { "type": "relativePct", "tolerancePct": 1 } }
+    { "id": "zhou-yemahe-a-1215", "ageMa": 1215, "quantity": "moonDistanceRawRE", "observed": 53.522, "source": "zhou2024", "method": "paired Earth-Moon distance (±1,700 km)", "expectation": { "type": "relativePct", "tolerancePct": 1 } },
+    { "id": "xiamaling-prec-1400", "ageMa": 1400, "quantity": "precArcsecPerYr", "observed": 85.79, "source": "meyersMalinverno2018", "method": "Xiamaling TimeOptMCMC precession constant (±2.72 ″/yr, 1σ = 3.2 %)", "expectation": { "type": "relativePct", "tolerancePct": 3.2 }, "note": "Falsification leg 1, the precession side at 1.4 Ga (plan 06 D6): the composed lunisolar rate. An inference through an assumed astronomical model (theory-vs-inference label in docs/99)." },
+    { "id": "lantink-prec-2460", "ageMa": 2460, "quantity": "precArcsecPerYr", "observed": 108.6, "source": "lantink2022", "method": "Joffre BIF TimeOptMCMC precession constant (±8.5 ″/yr, 1σ = 7.8 %)", "expectation": { "type": "relativePct", "tolerancePct": 7.8 }, "note": "Falsification leg 1, the precession side at 2.46 Ga (plan 06 D6): the composed lunisolar rate. Same inference label as the Xiamaling row." }
   ]
 }

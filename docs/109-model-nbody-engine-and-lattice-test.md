@@ -1,6 +1,6 @@
 ---
 docVersion: 1.0
-modelVersion: v13.0
+modelVersion: v14.0
 coefficients: sha256:b8b18424a3435e20
 status: current
 ---
@@ -716,22 +716,40 @@ the plan; until it lands, the fitted law remains the certified basis
 and this section is evidence content.
 
 **The deep-time statement — the sharpened falsification leg 1
-(owner-adopted).** At deep time the hybrid's two sides scale on the
-two measured tiers: the spin precession p(t) rides H(t) per the
-recession history (engine K — the confirmed tier), while s₃ is a
+(owner-adopted; plan 06 D6 fixed WHICH ψ̇(t)).** At deep time the
+hybrid's two sides scale on the two measured tiers: the spin precession
+ψ̇(t) is the COMPOSED lunisolar rate — [ω(t)/ω₀]·p₀·[f_S + (1 − f_S)
+(a₀/a_M(t))³], the spin from the recession history carrying both
+torques and the lunar torque growing with the Moon's approach (engine
+K's chain, ONE home `@essrt/physics/earth/precession-composed`; the
+hybrid precesses on exactly this evaluator) — while s₃ is a
 DYNAMICAL-tier frequency, scaled only by the measured solar-mass
 history (μ(2.48 Ga) = 1.00 ± 0.07 — effectively fixed). The obliquity
 band therefore follows the BEAT, **2π/(ψ̇(t) − |s₃|)** — never pure
-H-scaling. The registry keys `obliqBeatJ2000Kyr` /
-`obliqH8ScaledJ2000Kyr` (and the `…1400Ma…` / `…2460Ma…` pairs) carry
-the fork: today the two readings are degenerate (p ≫ s₃ — which is
-why "H/8" has always fit), while at 2.46 Ga they split by ~19% — a
-level cyclostratigraphy can discriminate. The existing 1.4/2.46-Ga
-confirmations are precession-band/LOD anchors; the deep-time
-obliquity PERIOD itself is undiscriminated, so this is a
-pre-registered prediction awaiting a precisely dated Precambrian
-obliquity band, stated before any such measurement is compared.
-**Read the live fork values from the keys, never this paragraph.**
+H-scaling. The model carried a second deep-time ψ̇(t) before D6, the
+STRUCTURAL clock 13·1,296,000/H(t) (pure ω-scaling of p₀); the two agree
+wherever (a₀/a_M)³ ≈ 1 and split at depth, and the rock decides between
+them: the composed rate matches the Precambrian precession constants
+(<!--v:anchorXiamalingPrec1400Pred-->86.52<!--/v--> vs Meyers &
+Malinverno 2018's 85.79 ± 2.72 ″/yr at 1.4 Ga,
+<!--v:anchorLantinkPrec2460Pred-->104.51<!--/v--> vs Lantink et al.
+2022's 108.6 ± 8.5 ″/yr at 2.46 Ga — both paleo-anchors gate rows) where
+the structural clock reads <!--v:earthPrecStructural1400MaArcsecPerYr-->65.2<!--/v-->
+and <!--v:earthPrecStructural2460MaArcsecPerYr-->70.9<!--/v--> ″/yr and
+fails both rows. The registry keys `obliqBeat*Kyr` (composed — the
+shipped form) / `obliqBeatStructural*Kyr` (the pre-D6 reading, kept as
+the diagnostic) / `obliqH8Scaled*Kyr` (pure H/8 scaling) carry the fork
+at J2000, 1.4 and 2.46 Ga: today the readings are degenerate (ψ̇ ≫ s₃ —
+which is why "H/8" has always fit), while at 2.46 Ga the shipped beat
+reads <!--v:obliqBeat2460MaKyr-->15.1<!--/v--> kyr against
+<!--v:obliqBeatStructural2460MaKyr-->24.9<!--/v--> structural and
+<!--v:obliqH8Scaled2460MaKyr-->29.7<!--/v--> H/8-scaled — a level
+cyclostratigraphy can discriminate. The existing 1.4/2.46-Ga
+confirmations are precession-rate/LOD anchors; the deep-time obliquity
+PERIOD itself is undiscriminated, so this is a pre-registered prediction
+awaiting a precisely dated Precambrian obliquity band, stated before any
+such measurement is compared. **Read the live fork values from the keys,
+never this paragraph.**
 
 ## 19. The solar-system spin landscape on the engine's own node lines (C-4)
 
