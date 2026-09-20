@@ -141,7 +141,7 @@ siderealYearSeconds = siderealYearJ2000 × 86400
   ┌─────────────────────────────────────────────────────┐
   │ siderealDay = solarYearSec / (solarYearSec/86400+1) │
   │ stellarDay  = siderealDay + precession·cos(ε)       │
-  │   (cos ε projects the H/13 ecliptic rate onto the   │
+  │   (cos ε projects the T_p ecliptic rate onto the    │
   │    equator — see § "Stellar−Sidereal Offset")       │
   └─────────────────────────────────────────────────────┘
 
@@ -257,7 +257,7 @@ All precession periods emerge from ratios of year lengths:
 
 | Precession | Formula | Mean period |
 |------------|---------|-------------|
-| Axial | `Y_sid / (Y_sid − Y_trop)` | H/13 ≈ <!--v:earthAxialPeriod-->25,771<!--/v--> yr |
+| Axial | `Y_sid / (Y_sid − Y_trop)` | T_p = <!--v:earthAxialPeriod-->25,771<!--/v--> yr |
 | Perihelion | `Y_anom(s) / (Y_anom(s) − Y_trop(s))` | H/16 ≈ <!--v:earthPeriPeriod-->20,936<!--/v--> yr |
 | Inclination | `Y_anom(s) / (Y_anom(s) − Y_sid(s))` | H/3 ≈ <!--v:earthPeriPeriodICRF-->111,570<!--/v--> yr |
 | Obliquity | the beat of the clock against the nodal mode: 1/(1/T_p − 1/T_s₃) (the retired label H/8 read <!--v:hDiv8-->41,915<!--/v--> yr) | <!--v:obliqCycleYears-->~41,224<!--/v--> yr |
@@ -272,7 +272,7 @@ The coin rotation paradox manifests at every timescale:
 | Years | Axial (H/13) | 1 fewer sidereal year than tropical years | ~20 min/year |
 | Years | Perihelion (H/16) | 1 fewer anomalistic year than tropical years | ~15 min/year |
 | Days | Orbital (1 year) | 1 fewer solar day than sidereal days | ~3m 56s/day |
-| Days | Axial (H/13) | 1 fewer sidereal day than stellar days | ~9.1 ms/day |
+| Days | Axial (T_p) | 1 fewer sidereal day than stellar days | ~9.1 ms/day |
 
 
 ## J2000 Reference Values
@@ -326,17 +326,17 @@ holds at every epoch — it is algebraically tautological. **Within the modern e
 
 **At deep time**, both terms on the right-hand side scale: Driver 1 (Earth-Moon tidal evolution) changes `dayLength`; Driver 2 (solar mass loss) changes the sidereal year in seconds via Kepler's 3rd law (`dT/T = −2 dM/M`). The identity is preserved at every epoch, but neither factor is constant. See [Doc 99 — ESSRT](99-expanding-solar-system-resonance-theory.md) for the two-driver derivation and [Doc 20 §"ESSRT epoch dependence"](20-constants-reference.md#essrt-epoch-dependence--most-tabulated-values-are-j2000-anchored) for the epoch-dependent helpers (`meanSiderealYearSecondsAtAge`, `meanLodSecondsAtAge`).
 
-### Stellar−Sidereal Offset, and the 9.12 ms Axial Coin Rotation
+### Stellar−Sidereal Offset, and the Axial Coin Rotation
 
 These are **two different quantities** that happen to share a formula. Before the equator projection was applied they read the same number, which is why earlier revisions of this document treated them as one.
 
-**Axial coin rotation — 9.12 ms, on the ecliptic.** Axial precession (H/13) accumulates exactly one extra sidereal day per precession cycle:
+**Axial coin rotation — <!--v:axialCoinRotationMs-->9.13<!--/v--> ms, on the ecliptic.** Axial precession accumulates exactly one extra sidereal day per precession period T_p (<!--v:axialPrecExact-->25,771.40<!--/v--> yr at J2000, the certified year laws' beat):
 
 ```
-9.12 ms/day × 366.24 sidereal days/year × H/13 years = 1.0000 sidereal days
+axialCoinRotationMs × 366.24 sidereal days/year × T_p years = 1.0000 sidereal days
 ```
 
-This is a device count on the anchor's divisors and is deliberately **not** projected. `axialCoinRotationMs` uses the unprojected rate. Substituting 8.37 ms into the identity gives 0.917 days, not 1.000.
+This is a count on the ecliptic and is deliberately **not** projected. `axialCoinRotationMs` uses the unprojected rate. Substituting 8.37 ms into the identity gives 0.917 days, not 1.000.
 
 **Stellar−sidereal day offset — 8.37 ms, on the equator.** The physical difference between the two day lengths depends on how fast the equinox moves *along the equator* (precession in right ascension, m), not along the ecliptic (precession in longitude, p — one turn per T_p(t), the composed precession period, <!--v:axialPrecRound-->~25,771<!--/v--> yr at J2000). Since m = p·cos ε, the stellar day carries `STELLAR_DAY_RA_PROJECTION = cos ε`:
 
@@ -345,9 +345,9 @@ stellarDay = siderealDay × (1 + cos(ε) / (T_p(t) × rotationsPerYear))
            → 8.37 ms above the sidereal day, vs the IAU value of 8.373 ms
 ```
 
-T_p is the physical period here, not the frozen clock's counter (the anchor interval's thirteenth, 0.086 % longer): on the counter the offset reads 7 µs low. The axial coin rotation above stays on the counter by definition — it is a count, not a rate.
+T_p is the physical period in both identities, not the frozen clock's counter (the anchor interval's thirteenth, 0.086 % longer): on the counter the offset read 7 µs low and the coin rotation 8 µs low, and the counting identity closed only against the counter's own period.
 
-**This was confirmed by measurement, not asserted.** The "Analyze Stellar Day" tool's Method D tracks Earth's rotation about its own spin axis against ICRF — using no precession period at all, since the spin axis precesses on the H/13 cone and the projection plane tilts with it — and reproduces the IAU stellar day to ~0.02 ms. Methods A and B, which reference the ecliptic normal instead of the spin axis, overshoot by ~0.79 and ~0.47 ms respectively; that ~23.44° of axis difference *is* the cos ε.
+**This was confirmed by measurement, not asserted.** The "Analyze Stellar Day" tool's Method D tracks Earth's rotation about its own spin axis against ICRF — using no precession period at all, since the spin axis precesses on the precession cone and the projection plane tilts with it — and reproduces the IAU stellar day to ~0.02 ms. Methods A and B, which reference the ecliptic normal instead of the spin axis, overshoot by ~0.79 and ~0.47 ms respectively; that ~23.44° of axis difference *is* the cos ε.
 
 The obliquity used follows the family of the sidereal day it is applied to: `OBLIQUITY_MEAN` for the H-cycle mean values, `computeObliquityEarth(year)` for epoch-specific ones. At J2000 the choice is worth 0.0008 ms, but across the deep-time obliquity range (~22.0°–24.5°) the offset runs 8.46 → 8.30 ms.
 

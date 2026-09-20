@@ -531,7 +531,7 @@ These offsets arise from the coin rotation paradox — precessing reference fram
 |----------|----------|---------|-------|
 | Perihelion Coin Rotation | `perihelionCoinRotationMs` | meanlengthofday / (H/16) / meansolaryearlengthinDays × 1000 | ~11.29 ms/day |
 | Yearly accumulation | `perihelionCoinRotationYearlySeconds` | offset × meansolaryearlengthinDays | ~4.12 s/year |
-| Axial Coin Rotation | `axialCoinRotationMs` | meanSiderealday / (H/13) / (meansolaryearlengthinDays + 1) × 1000 | ~9.12 ms/sidereal day |
+| Axial Coin Rotation | `axialCoinRotationMs` | meanSiderealday / T_p / (meansolaryearlengthinDays + 1) × 1000 — T_p the certified J2000 precession period | ~<!--v:axialCoinRotationMs-->9.13<!--/v--> ms/sidereal day |
 | Yearly accumulation | `axialCoinRotationYearlySeconds` | offset × (meansolaryearlengthinDays + 1) | ~3.34 s/year |
 
 **Perihelion Coin Rotation**: Theoretical value derived from 1 extra solar day per H/16 cycle.

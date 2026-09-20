@@ -1097,9 +1097,11 @@ let   meanStellarday = NaN;  // Phase 6: mutable (Tier 2) — set by recomputeDe
 // Perihelion coin rotation: 1 extra solar day over H/16 cycle
 let   perihelionCoinRotationMs = (meanlengthofday / (holisticyearLength / 16)) / meansolaryearlengthinDays * 1000;  // Phase 6: mutable (Tier 2)
 let   perihelionCoinRotationYearlySeconds = perihelionCoinRotationMs * meansolaryearlengthinDays / 1000;  // Phase 6: mutable (Tier 2)
-// Axial coin rotation: 1 extra sidereal day over H/13 cycle
-let   axialCoinRotationMs = (meanSiderealday / (holisticyearLength / 13)) / (meansolaryearlengthinDays + 1) * 1000;  // Phase 6: mutable (Tier 2)
-let   axialCoinRotationYearlySeconds = axialCoinRotationMs * (meansolaryearlengthinDays + 1) / 1000;  // Phase 6: mutable (Tier 2)
+// Axial coin rotation: 1 extra sidereal day per precession period T_p (S5: the
+// composed clock, not the counter H/13). Set by recomputeDerivedAnchorsForEpoch —
+// the Direct laws are not initialised at this line; no consumer reads it before.
+let   axialCoinRotationMs = NaN;  // Phase 6: mutable (Tier 2)
+let   axialCoinRotationYearlySeconds = NaN;  // Phase 6: mutable (Tier 2)
 
 let   meanAnomalisticYearinDays = ((meansolaryearlengthinDays)/(perihelionCycleLength-1))+meansolaryearlengthinDays;  // Phase 6: mutable (Tier 2)
 
@@ -4706,7 +4708,7 @@ function recomputeDerivedAnchorsForEpoch(t_Ma) {
   // NOT projected by STELLAR_DAY_RA_PROJECTION, unlike meanStellarday above:
   // this counts one extra sidereal day per axial precession cycle, a structural
   // count on the ecliptic lattice, so the H/13 longitude rate is the right one.
-  axialCoinRotationMs       = (meanSiderealday / (holisticyearLength / 13)) / (meansolaryearlengthinDays + 1) * 1000;
+  axialCoinRotationMs       = (meanSiderealday / _axialPrecessionPeriodYearsAtAge(t_Ma)) / (meansolaryearlengthinDays + 1) * 1000;
   axialCoinRotationYearlySeconds = axialCoinRotationMs * (meansolaryearlengthinDays + 1) / 1000;
   meanAnomalisticYearinDays = (meansolaryearlengthinDays / (perihelionCycleLength - 1)) + meansolaryearlengthinDays;
   return true;
@@ -37974,12 +37976,12 @@ async function runYearAnalysisExport(years) {
     ['Axial Coin Rotation'],
     ['  1 extra sidereal day over axial precession cycle'],
     ['  Formula: (meanSiderealDay / axialCycle) / siderealDaysPerYear'],
-    ['  Uses the frozen clock\'s precession counter — a device constant:', (holisticyearLength / 13).toFixed(3), 'yr'],
+    ['  Uses the composed precession period T_p (the certified J2000 reading):', _certifiedAxialPrecessionJ2000Years().toFixed(3), 'yr'],
     ['  Section 6 axial, for contrast — a MEASURED beat:', ''],   // filled after the loop
     ['  Both are correct; they are different quantities, so the two need not agree.'],
     ['  Daily offset', axialCoinRotationMs.toFixed(2), 'ms/sidereal day'],
     ['  Yearly accumulation', axialCoinRotationYearlySeconds.toFixed(2), 's/year'],
-    [`  ^ ${axialCoinRotationMs.toFixed(2)} ms is the ECLIPTIC-lattice count, NOT the stellar−sidereal day`],
+    [`  ^ ${axialCoinRotationMs.toFixed(2)} ms is the ECLIPTIC-frame count, NOT the stellar−sidereal day`],
     [`    offset. That offset is measured along the EQUATOR and is smaller by cos(ε)`],
     [`    (${(axialCoinRotationMs * STELLAR_DAY_RA_PROJECTION).toFixed(2)} ms — see sections 4 and 5). Substituting it here would give`],
     [`    ${(1 * STELLAR_DAY_RA_PROJECTION).toFixed(3)} sidereal days per precession cycle instead of exactly 1.`],

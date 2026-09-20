@@ -1343,10 +1343,10 @@ export const VALUES = {
         note: 'the RA-projected (m = p·cos ε) offset — compare IAU 8.373 ms',
       },
       axialCoinRotationMs: {
-        get: () => (meanSiderealDaySeconds() / (C.H / 13)) / (C.meanSolarYearDays + 1) * 1000,
+        get: () => (meanSiderealDaySeconds() / dtl().certifiedAxialPrecessionJ2000Years()) / (C.meanSolarYearDays + 1) * 1000,
         render: (v) => thousands(v, 2),
         unit: 'ms',
-        note: 'UNPROJECTED count on the frozen clock\'s counter (one extra sidereal day per anchor-interval thirteenth) — deliberately not the 8.37 ms projected offset, which rides T_p',
+        note: 'UNPROJECTED ecliptic-frame count — one extra sidereal day per precession period T_p (S5: the certified J2000 reading, not the counter H/13) — deliberately not the 8.37 ms projected offset',
       },
       siderealDayJ2000: { get: siderealDayJ2000Seconds, render: (v) => thousands(v, 6), unit: 's' },
       stellarDayJ2000: {
@@ -1400,7 +1400,7 @@ export const VALUES = {
           const sol = dtl().computeSolarYearDaysDirect(2000);
           const sidDay = (sol * dtl().computeLodKinematicSecondsAtEpoch(2000)) / (sol + 1);
           const meanSidDay = (C.meanSolarYearDays / (C.meanSolarYearDays + 1)) * C.meanLengthOfDay;
-          const axialCoinMs = (meanSidDay / (C.H / 13)) / (C.meanSolarYearDays + 1) * 1000;
+          const axialCoinMs = (meanSidDay / dtl().certifiedAxialPrecessionJ2000Years()) / (C.meanSolarYearDays + 1) * 1000;
           return sidDay + axialCoinMs / 1000;
         },
         render: (v) => thousands(v, 6),
