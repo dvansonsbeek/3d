@@ -29,7 +29,10 @@ const {
 } = await import('@essrt/physics');
 const DT = require(join(ROOT, 'tools/lib/deep-time.js'));
 
-const m = createModel();
+// The package model on the SERIES tier — the governed secular-series artifact
+// injected as the API does (S3 tier unification), so the map's hybrid columns
+// are the shipped tier and match the Node one-source movement bit for bit.
+const m = createModel(undefined, { secularSeriesArtifact: require(join(ROOT, 'data', 'nbody-secular-series.json')) });
 const deep = createDeepEccChannel(DEEP_MODES_ARTIFACT);
 
 // The Meeus Ch. 47 J2000 anchors the lunar argument bundle carries verbatim
@@ -229,13 +232,16 @@ function blockObliquityValues() {
     '|---|---|---|---|---|---|---|',
   ];
   for (const y of [-48000, -28000, -20000, -10000, -2584, -584, 0, 1246, 2000, 5000, 10000, 20000, 30000, 50000]) {
-    const h = one ? one.epsDeg(y) : null, k = m.earth.obliquityDeg(y), l = la.has(y - 2000) ? la.get(y - 2000) : null;
+    const h = one ? one.epsDeg(y) : null, k = m.earth.obliquityCombDeg(y), l = la.has(y - 2000) ? la.get(y - 2000) : null;
+    // the package hybrid and the Node one-source hybrid share the IAU J2000 anchor (S3b); their
+    // time anchors differ (2000.5 vs 2000 in the H(t) scaling) — measured residual 1.5e-10°, tolerance 1e-6°
+    if (h !== null && Math.abs(m.earth.obliquityDeg(y) - h) > 1e-6) throw new Error(`published ε ≠ the hybrid at ${y}: ${m.earth.obliquityDeg(y)} vs ${h}`);
     rows.push(`| ${y} | ${f(h, 5)} | ${f(k, 5)} | ${f(l, 5)} | ${f(d(h, k), 0)} | ${f(d(h, l), 0)} | ${f(d(k, l), 0)} |`);
   }
   /** @param {(y: number) => number} fn */
   const rate = (fn) => (fn(2000.5) - fn(1999.5)) * 3600 * 100;
   rows.push('');
-  rows.push(`dε/dt at J2000 (″/cy): hybrid series ${f(one ? rate(one.epsDeg) : null, 2)} · K law ${f(rate(m.earth.obliquityDeg), 2)} · IAU 2006 ${f(K.earthOrbital.obliquityRate_arcsecPerCentury, 2)} · banked verdict integrations: era-tier ζ ${f(V.rateEraArcsecPerCy, 2)}, full-tier ζ ${f(V.rateFullArcsecPerCy, 2)} (data/obliquity-hybrid-verdict.json).`);
+  rows.push(`dε/dt at J2000 (″/cy): hybrid series ${f(one ? rate(one.epsDeg) : null, 2)} (the published ε, S3b) · K law ${f(rate(m.earth.obliquityCombDeg), 2)} (the device) · IAU 2006 ${f(K.earthOrbital.obliquityRate_arcsecPerCentury, 2)} · banked verdict integrations: era-tier ζ ${f(V.rateEraArcsecPerCy, 2)}, full-tier ζ ${f(V.rateFullArcsecPerCy, 2)} (data/obliquity-hybrid-verdict.json).`);
   rows.push(`α at J2000 (″/yr): p₀/cos ε₀ = ${f(torqueSplit().alpha, 3)} with p₀ = 1,296,000/(H/13) (the form the registry and the shipped hybrid use) · ${f(V.alphaArcsecPerYr, 3)} in the verdict artifact (ψ̇ = the of-date beat ${f(V.psiDotH13ArcsecPerYr, 3)} ″/yr) — the two J2000 precession readings of chain 2, finding 2.`);
   rows.push(`Banked window rms vs La2004 (″), hybrid / fitted K law: ${['13', '50', '130', '270'].map((w) => `±${w} kyr ${f(V.windowsEra[w].hybridRmsArcsec, 0)} / ${f(V.windowsEra[w].fittedLawRmsArcsec, 0)}`).join(' · ')} (era-tier ζ). La2004 is a THEORY reference, not an observation.`);
   return rows.join('\n');

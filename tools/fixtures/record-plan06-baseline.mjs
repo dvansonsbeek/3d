@@ -90,7 +90,7 @@ function measure() {
     v[`${tag}.eOneSource`] = oneSource && inWindow ? num(oneSource.e(year)) : null;
     // obliquity — the one-source hybrid and the K law, named
     v[`${tag}.epsOneSourceDeg`] = oneSource && inWindow ? num(oneSource.epsDeg(year)) : null;
-    v[`${tag}.epsLawDeg`] = num(m.earth.obliquityDeg(year));
+    v[`${tag}.epsLawDeg`] = num(m.earth.obliquityCombDeg(year));   // the K comb (device) — the published ε is the hybrid since S3b
     v[`${tag}.perihelionLongitudeDeg`] = num(m.earth.perihelionLongitudeDeg(year));
   };
 

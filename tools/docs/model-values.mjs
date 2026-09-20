@@ -44,15 +44,19 @@ const dtl = () => require(join(ROOT, 'tools', 'lib', 'deep-time.js'));
 // the same construction as model.js and the browser). The comb family (A)
 // and the cardinal 4-mean (A′) are the frozen era clock's device: they feed
 // the kinematic-day keys below and nothing else here.
-let _oneYearLengthsM = null;
-const oneYL = () => {
-  if (!_oneYearLengthsM) {
-    const one = require(join(ROOT, 'tools', 'lib', 'deep-orbital-history.js')).createOneSourceMovement();
-    if (!one) throw new Error('model-values: the one-source movement needs data/nbody-secular-series.json');
-    _oneYearLengthsM = one.yearLengths;
+let _oneMovementM = null;
+const oneMovement = () => {
+  if (!_oneMovementM) {
+    _oneMovementM = require(join(ROOT, 'tools', 'lib', 'deep-orbital-history.js')).createOneSourceMovement();
+    if (!_oneMovementM) throw new Error('model-values: the one-source movement needs data/nbody-secular-series.json');
   }
-  return _oneYearLengthsM;
+  return _oneMovementM;
 };
+const oneYL = () => oneMovement().yearLengths;
+// Plan 06 Phase 3 S3b: THE published obliquity is the hybrid (the one-source
+// movement's ε); the K comb (orbital-engine computeObliquityEarth) is the
+// frozen era clock's device and feeds only the kinematic-day keys.
+const oneEps = (y) => oneMovement().epsDeg(y);
 
 /** The SHIPPED predictive-precession basis, browser-true: the shared
  *  @essrt/physics predict module (snapshot planet-side phases — the basis the
@@ -446,13 +450,10 @@ export const VALUES = {
     note: `lattice rate, 1,296,000·${d}/H`,
   }])),
   obliquityRateJ2000: {
-    get: () => {
-      const oe = require(join(ROOT, 'tools', 'lib', 'orbital-engine.js'));
-      return ((oe.computeObliquityEarth(2001) - oe.computeObliquityEarth(1999)) / 2) * 3600;
-    },
+    get: () => ((oneEps(2001) - oneEps(1999)) / 2) * 3600,
     render: (v) => Number(v).toFixed(4),
     unit: '″/yr',
-    note: 'central difference of the fitted obliquity formula at J2000 — engine matches the website exactly',
+    note: 'central difference of the published obliquity (the hybrid, plan 06 Phase 3 S3b) at J2000 — IAU 2006: −0.46840 ″/yr',
   },
   // J2000-instantaneous precession rates. UNITS LESSON (measured, 2026-08):
   // the engine's computeLengthOfSiderealYear counts the year in LOD-days
@@ -992,7 +993,7 @@ export const VALUES = {
     let obliqScan, inclScan;
     const nextObliqMin = () => {
       if (!obliqScan) {
-        const f = oe().computeObliquityEarth;
+        const f = oneEps;   // the published obliquity (the hybrid), plan 06 Phase 3 S3b
         let mn = Infinity, mnYr = 0;
         for (let y = 2000; y <= 35000; y++) {
           const o = f(y);
@@ -1110,7 +1111,7 @@ export const VALUES = {
       }
       return rows.get(lo) + ((t - lo) / 1000) * (rows.get(hi) - rows.get(lo));
     };
-    const oeOb = (y) => require(join(ROOT, 'tools', 'lib', 'orbital-engine.js')).computeObliquityEarth(y);
+    const oeOb = (y) => oneEps(y);   // the published obliquity (the hybrid), plan 06 Phase 3 S3b
     const refs = [
       { year: -10000, key: '10000BC', chapront: 'deg10000BC' },
       { year: -9233,  key: '9233BC' },
@@ -2669,7 +2670,7 @@ export const VALUES = {
     const epsJ2000 = () => astro.earthOrbital.obliquityJ2000_deg;
     const raSlope = (lamDeg, epsDeg) => { const l = lamDeg * D2R, e = epsDeg * D2R; return Math.cos(e) / (Math.cos(l) ** 2 + Math.sin(l) ** 2 * Math.cos(e) ** 2); };
     const dAlphaDeps = (lamDeg, epsDeg) => { const l = lamDeg * D2R, e = epsDeg * D2R; return -Math.sin(l) * Math.cos(l) * Math.sin(e) / (Math.cos(l) ** 2 + Math.sin(l) ** 2 * Math.cos(e) ** 2); };
-    const epsRateArcsecCy = () => { const f = require(join(ROOT, 'tools', 'lib', 'orbital-engine.js')).computeObliquityEarth; return (f(2050) - f(1950)) * 3600; };
+    const epsRateArcsecCy = () => (oneEps(2050) - oneEps(1950)) * 3600;   // the published obliquity (the hybrid)
     const eclRate = (p) => 1296000 / C.planets[p].perihelionEclipticYears * 100;
     const grAdvance = (p) => {   // ″/cy, 6π GM_sun / (c² a (1 − e²)) per orbit × orbits per century
       const P = C.planets[p];

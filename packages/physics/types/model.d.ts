@@ -65,6 +65,7 @@ export function assembleModel(C: Readonly<Record<string, any>>, F: Readonly<Reco
     earth: Readonly<{
         perihelionLongitudeDeg: (year: number) => number;
         obliquityDeg: (year: number) => number;
+        obliquityCombDeg: (year: number) => number;
         eccentricity: (year: number) => number;
         inclinationDeg: (year: number) => number;
         ascendingNodeDeg: (year: number) => number;

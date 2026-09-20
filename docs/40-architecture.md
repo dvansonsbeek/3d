@@ -521,8 +521,10 @@ model's own N-body secular series (`data/nbody-secular-series.json`,
 The displayed/served year lengths and precession beats are ONE family
 from these factories (chart ≡ panel ≡ report ≡ API ≡ Node engine); the
 fitted Fourier laws below remain the **frozen era-certification device**
-and the `?hybridSpin=0` opt-out (doc 11's Status banner; the plan-02
-record in the private repo carries the full decision trail).
+and the automatic pre-load fallback (doc 11's Status banner; the former
+`?hybridSpin=0` user opt-out was removed at plan 06 D5 — the K device is
+not a published alternative; the plan-02 record in the private repo
+carries the full decision trail).
 
 ### Precession Cycles (kinematic H-lattice identities)
 

@@ -230,14 +230,14 @@ one-source movement):
 <!-- generated:calcmap-ofdate-precession -->
 | year | T_p (A) comb pair (yr) — the frozen device | p (A) (″/yr) | **T_p (B) one-family (yr) — PUBLISHED** (`epoch.axialPrecessionYearsAtYear`, API/MCP) | p (B) (″/yr) | (A) − (B) (yr) | H(t)/13 (yr), the unit’s mean | ε, hybrid (°) |
 |---|---|---|---|---|---|---|---|
-| -10000 | 26293.30 | 49.2901 | **26274.75** | 49.3249 | 18.55 | 25793.5 | 24.15915 |
-| -2584 | 26069.06 | 49.7141 | **26154.96** | 49.5508 | -85.90 | 25793.6 | 23.98231 |
-| -584 | 25946.80 | 49.9484 | **26003.49** | 49.8395 | -56.69 | 25793.6 | 23.76559 |
-| 0 | 25908.26 | 50.0227 | **25953.49** | 49.9355 | -45.23 | 25793.6 | 23.69483 |
-| 1246 | 25823.50 | 50.1868 | **25841.35** | 50.1522 | -17.85 | 25793.6 | 23.53707 |
-| 2000 | 25771.40 | 50.2883 | **25771.40** | 50.2883 | 0.00 | 25793.6 | 23.43928 |
-| 5000 | 25571.19 | 50.6820 | **25498.17** | 50.8272 | 73.01 | 25793.6 | 23.06398 |
-| 10000 | 25342.65 | 51.1391 | **25167.96** | 51.4940 | 174.69 | 25793.7 | 22.65355 |
+| -10000 | 26293.30 | 49.2901 | **26462.34** | 48.9753 | -169.04 | 25793.5 | 24.15915 |
+| -2584 | 26069.06 | 49.7141 | **26258.00** | 49.3564 | -188.94 | 25793.6 | 23.98231 |
+| -584 | 25946.80 | 49.9484 | **26061.40** | 49.7287 | -114.60 | 25793.6 | 23.76559 |
+| 0 | 25908.26 | 50.0227 | **25997.94** | 49.8501 | -89.68 | 25793.6 | 23.69483 |
+| 1246 | 25823.50 | 50.1868 | **25857.85** | 50.1202 | -34.35 | 25793.6 | 23.53707 |
+| 2000 | 25771.40 | 50.2883 | **25771.40** | 50.2883 | -0.00 | 25793.6 | 23.43928 |
+| 5000 | 25571.19 | 50.6820 | **25446.49** | 50.9304 | 124.70 | 25793.6 | 23.06398 |
+| 10000 | 25342.65 | 51.1391 | **25103.91** | 51.6254 | 238.74 | 25793.7 | 22.65355 |
 <!-- /generated:calcmap-ofdate-precession -->
 
 ### 2.5 Findings from this chain (to act on)
@@ -335,14 +335,14 @@ a property of the basis chosen, not a finding.
 <!-- generated:calcmap-year-lengths-of-date -->
 | year | sid (A) comb (d) — device | **sid (B) one-family (d) — published** | trop (A) comb (d) — device | trop (A′) cardinal (d) — device | **trop (B) one-family (d) — published** | anom (A) comb (d) — device | **anom (B) one-family (d) — published** |
 |---|---|---|---|---|---|---|---|
-| -10000 | 365.257363 | 365.256351 | 365.243472 | 365.243472 | 365.242450 | 365.260631 | 365.259119 |
-| -2584 | 365.256701 | 365.256357 | 365.242690 | 365.242689 | 365.242392 | 365.259970 | 365.259444 |
-| -584 | 365.256552 | 365.256360 | 365.242475 | 365.242475 | 365.242314 | 365.259822 | 365.259527 |
-| 0 | 365.256510 | 365.256361 | 365.242412 | 365.242412 | 365.242288 | 365.259780 | 365.259551 |
-| 1246 | 365.256418 | 365.256362 | 365.242274 | 365.242274 | 365.242228 | 365.259689 | 365.259604 |
+| -10000 | 365.257363 | 365.256351 | 365.243472 | 365.243472 | 365.242548 | 365.260631 | 365.259119 |
+| -2584 | 365.256701 | 365.256357 | 365.242690 | 365.242689 | 365.242447 | 365.259970 | 365.259444 |
+| -584 | 365.256552 | 365.256360 | 365.242475 | 365.242475 | 365.242345 | 365.259822 | 365.259527 |
+| 0 | 365.256510 | 365.256361 | 365.242412 | 365.242412 | 365.242312 | 365.259780 | 365.259551 |
+| 1246 | 365.256418 | 365.256362 | 365.242274 | 365.242274 | 365.242237 | 365.259689 | 365.259604 |
 | 2000 | 365.256363 | 365.256363 | 365.242190 | 365.242190 | 365.242190 | 365.259633 | 365.259637 |
-| 5000 | 365.256129 | 365.256365 | 365.241845 | 365.241845 | 365.242040 | 365.259399 | 365.259781 |
-| 10000 | 365.255694 | 365.256373 | 365.241282 | 365.241282 | 365.241860 | 365.258963 | 365.260136 |
+| 5000 | 365.256129 | 365.256365 | 365.241845 | 365.241845 | 365.242011 | 365.259399 | 365.259781 |
+| 10000 | 365.255694 | 365.256373 | 365.241282 | 365.241282 | 365.241823 | 365.258963 | 365.260136 |
 
 Comb divisors (the H-divisor harmonics each (A) family adds to its tidal-chain base): tropical 3, 5, 6, 8, 11, 13, 14, 16, 19, 22, 24, 27 · sidereal 3, 5, 8, 9, 16, 32 · anomalistic 3, 8, 9, 17, 18, 19, 20, 24 (phase = div × cycles since the balanced year).
 <!-- /generated:calcmap-year-lengths-of-date -->
@@ -412,11 +412,20 @@ that the K comb was fitted to.
 | divisors | 2, 3, 5, 6, 8, 9, 11, 13, 14, 16, 17, 19, 22, 24, 27, 32 (`SOLSTICE_OBLIQUITY_HARMONICS`, rows [div, sin, cos]) | **L** | `fitted-coefficients.json` — Ledger 3 |
 | what it was fitted to | the scene's own solstice Sun declination (4.2), RMSE 0.005″ — a fit of a comb to the scene's wheel geometry, not to an external record | — | `script.js` 57962 (header comment) |
 
-Direct callers that read the K law **regardless of the hybrid flag**: the
-eclipse sub-solar point (`script.js` 27890), the conjunction tier (28160),
-the stellar-day RA projection (38191) and the formula panels (38782,
-38903, 38920). Everything else reads `_sceneEpsTargetDeg` (20771–20779),
-which returns the hybrid series when the flag is on and the K law when off.
+Phase 3 S3b routed the geometry callers that bypassed the scene target —
+the eclipse sub-solar point, the conjunction tier, the shadow machinery's
+RA/Dec conversions, the apparent Moon's RA/Dec, the RA-projection panel
+and the cardinal panel's solstice-obliquity row — through
+`_sceneEpsTargetDeg`, which returns the hybrid whenever the series has
+loaded and the K comb only as the pre-load fallback (plan 06 D5: the
+`?hybridSpin=0` opt-out is gone). What still reads the comb by design is
+the DEVICE tier: the kinematic-day stack (the stellar day's RA projection,
+chain 3.3), the lunar ARGUMENTS' obliquity-rate term (a device-anchored
+matched triple), the hybrid's own J2000 anchor ε₀, and the console
+diagnostics that name the formula. In the package the same split is
+`model.earth.obliquityDeg` (the hybrid — the API's earth route and
+cross-validation curves, the registry's obliquity keys, the dashboard)
+versus `model.earth.obliquityCombDeg` (the device).
 
 ### 4.2 The scene's tilt geometry — the device the comb was fitted to
 
@@ -498,7 +507,7 @@ hybrid and the K law at the exact years):
 | 30000 | 23.90883 | 23.41005 | 23.90927 | 1796 | -2 | -1797 |
 | 50000 | 22.60679 | 22.55623 | 22.60721 | 182 | -2 | -184 |
 
-dε/dt at J2000 (″/cy): hybrid series -46.80 · K law -46.82 · IAU 2006 -46.84 · banked verdict integrations: era-tier ζ -48.00, full-tier ζ -38.91 (data/obliquity-hybrid-verdict.json).
+dε/dt at J2000 (″/cy): hybrid series -46.80 (the published ε, S3b) · K law -46.82 (the device) · IAU 2006 -46.84 · banked verdict integrations: era-tier ζ -48.00, full-tier ζ -38.91 (data/obliquity-hybrid-verdict.json).
 α at J2000 (″/yr): p₀/cos ε₀ = 54.764 with p₀ = 1,296,000/(H/13) (the form the registry and the shipped hybrid use) · 54.811 in the verdict artifact (ψ̇ = the of-date beat 50.288 ″/yr) — the two J2000 precession readings of chain 2, finding 2.
 Banked window rms vs La2004 (″), hybrid / fitted K law: ±13 kyr 50 / 711 · ±50 kyr 427 / 2721 · ±130 kyr 488 / 2243 · ±270 kyr 490 / 2919 (era-tier ζ). La2004 is a THEORY reference, not an observation.
 <!-- /generated:calcmap-obliquity-values -->
@@ -528,11 +537,17 @@ s₃ = the dominant Earth ζ mode of data/nbody-deep-secular-modes.json = -18.85
    geometry (4.2), and "on the lattice" describes the basis, not the sky.
    (La2004 is another theory; the agreement proves the calculation, not the
    physics — the falsifiable content is 4.4.)
-2. **Four caller sites bypass the hybrid flag** (4.1): eclipse sub-solar
-   point, conjunction tier, stellar-day RA projection, formula panels.
-   In-era the difference is ≤ 15″ at year 0 (≈ 0.5 km of sub-solar
-   latitude) and 113″ at −2584 (≈ 3.5 km); at deep time it is degrees. Phase
-   3 routes them through `_sceneEpsTargetDeg`.
+2. **Four caller sites bypass the hybrid flag — RESOLVED (Phase 3 S3b).**
+   The geometry callers (eclipse sub-solar point, conjunction tier, the
+   shadow machinery, the apparent Moon's RA/Dec, the RA-projection panel,
+   the solstice-obliquity row) now read `_sceneEpsTargetDeg`; the
+   stellar-day RA projection stays on the comb as part of the kinematic-day
+   device. In-era the change is ≤ 15″ at year 0 (≈ 0.5 km of sub-solar
+   latitude), 33″ across the eclipse era (measured over the audit's 14,579
+   obliquity calls) and 113″ at −2584; at deep time it is degrees. Measured
+   before switching: the eclipse audit's recorded values do not depend on
+   the obliquity source (every value reproduced with the hybrid substituted
+   in the Node twin) — the residuals live in ecliptic longitude and time.
 3. **The model carried two deep-time ψ̇(t) — RESOLVED by plan 06 D6.** As
    found, the published beat rode the structural ψ̇ (H(t)/13) while the
    tidal-clock table of chain 2.4 published the composed ψ̇, and they split
@@ -643,7 +658,7 @@ closed form does not carry). **No H enters this device anywhere.**
 | condition | dates and RA | year length | code |
 |---|---|---|---|
 | default (one-source movement on) | SOLVED from the rendered scene: Newton on the scene Sun's declination (equinoxes) / parabolic-vertex passes (solstices), SEEDED by the frozen device's JD, then shifted by a per-type constant = adjusted anchor − the scene's own year-2000 event (so 2000 reads the registry anchor) | difference of two solved JDs (the anchor shift cancels) | `script.js` 45320–45386, 57436–57457 |
-| `?hybridSpin=0` | the frozen device (5.2) directly | `computeSolsticeYearLength` | 57458–57468 |
+| before the series has loaded (the former `?hybridSpin=0` opt-out is gone — plan 06 D5) | the frozen device (5.2) directly | `computeSolsticeYearLength` | 57458–57468 |
 | the fit instrument | `solsticeForYear` — the Step 6a measurement the coefficients were fitted to | — | 36431 |
 
 ### 5.5 Live values — the spreadsheet check
@@ -695,14 +710,14 @@ The four events and the year lengths:
 <!-- generated:calcmap-cardinal-events -->
 | year | VE | SS | AE | WS | SS→SS interval (d) | `yearLengthDays(SS)` derivative form (d) | mean of four (d) | one-family mean tropical year (s) | e |
 |---|---|---|---|---|---|---|---|---|---|
-| -10000 | -10000 03-26 04:41 | -10000 06-22 14:47 | -10000 09-19 23:16 | -10000 12-23 04:45 | 365.243182 | 365.244183 | 365.243472 | 31556948.61 | 0.02124 |
-| -2584 | -2584 03-22 17:13 | -2584 06-24 22:11 | -2584 09-23 03:24 | -2584 12-20 14:25 | 365.242045 | 365.242385 | 365.242689 | 31556943.15 | 0.01863 |
-| -584 | -584 03-21 11:34 | -584 06-23 15:59 | -584 09-23 15:32 | -584 12-21 03:06 | 365.241726 | 365.241918 | 365.242475 | 31556936.13 | 0.01781 |
-| 0 | 0 03-20 20:09 | 0 06-22 19:36 | 0 09-23 06:31 | 0 12-20 22:45 | 365.241670 | 365.241819 | 365.242412 | 31556933.80 | 0.01756 |
-| 1246 | 1246 03-20 14:27 | 1246 06-21 21:29 | 1246 09-23 04:30 | 1246 12-21 12:21 | 365.241616 | 365.241673 | 365.242274 | 31556928.53 | 0.01703 |
+| -10000 | -10000 03-26 04:41 | -10000 06-22 14:47 | -10000 09-19 23:16 | -10000 12-23 04:45 | 365.243182 | 365.244183 | 365.243472 | 31556957.13 | 0.02124 |
+| -2584 | -2584 03-22 17:13 | -2584 06-24 22:11 | -2584 09-23 03:24 | -2584 12-20 14:25 | 365.242045 | 365.242385 | 365.242689 | 31556947.89 | 0.01863 |
+| -584 | -584 03-21 11:34 | -584 06-23 15:59 | -584 09-23 15:32 | -584 12-21 03:06 | 365.241726 | 365.241918 | 365.242475 | 31556938.83 | 0.01781 |
+| 0 | 0 03-20 20:09 | 0 06-22 19:36 | 0 09-23 06:31 | 0 12-20 22:45 | 365.241670 | 365.241819 | 365.242412 | 31556935.88 | 0.01756 |
+| 1246 | 1246 03-20 14:27 | 1246 06-21 21:29 | 1246 09-23 04:30 | 1246 12-21 12:21 | 365.241616 | 365.241673 | 365.242274 | 31556929.31 | 0.01703 |
 | 2000 | 2000 03-20 07:36 | 2000 06-21 01:48 | 2000 09-22 17:23 | 2000 12-21 13:35 | 365.241625 | 365.241627 | 365.242190 | 31556925.22 | 0.01671 |
-| 5000 | 5000 03-20 20:11 | 5000 06-19 06:55 | 5000 09-20 23:57 | 5000 12-22 03:20 | 365.241899 | 365.241666 | 365.241845 | 31556912.12 | 0.01541 |
-| 10000 | 10000 03-19 19:40 | 10000 06-17 05:21 | 10000 09-16 01:06 | 10000 12-18 06:42 | 365.242381 | 365.241713 | 365.241282 | 31556895.91 | 0.01326 |
+| 5000 | 5000 03-20 20:11 | 5000 06-19 06:55 | 5000 09-20 23:57 | 5000 12-22 03:20 | 365.241899 | 365.241666 | 365.241845 | 31556909.60 | 0.01541 |
+| 10000 | 10000 03-19 19:40 | 10000 06-17 05:21 | 10000 09-16 01:06 | 10000 12-18 06:42 | 365.242381 | 365.241713 | 365.241282 | 31556892.71 | 0.01326 |
 
 Dates are TT on the proleptic Gregorian calendar, from the JD the device returns; the `year` argument is the calendar year of the event.
 <!-- /generated:calcmap-cardinal-events -->
@@ -712,12 +727,12 @@ The e(t)-spread by both devices, the anomalistic year, the RA:
 <!-- generated:calcmap-cardinal-spread -->
 | year | frozen device: T_X − mean (s) VE · SS · AE · WS | one-source structure: T_X − mean (s) VE · SS · AE · WS | structure anomalistic year (s) | RA of VE (°), frozen device | e |
 |---|---|---|---|---|---|
-| -10000 | 10.2 · 61.5 · -8.5 · -63.2 | 8.5 · 57.3 · -6.8 · -59.0 | 31558387.90 | 357.7403 | 0.02124 |
-| -2584 | -49.4 · -26.3 · 48.7 · 27.1 | -48.7 · -25.7 · 47.8 · 26.6 | 31558415.97 | 359.6531 | 0.01863 |
-| 0 | -14.7 · -51.2 · 15.7 · 50.2 | -14.8 · -50.9 · 15.9 · 49.8 | 31558425.22 | 359.9592 | 0.01756 |
-| 2000 | 16.2 · -48.6 · -15.2 · 47.6 | 16.3 · -48.6 · -15.2 · 47.5 | 31558432.62 | 0.0143 | 0.01671 |
-| 5000 | 43.2 · -15.5 · -43.8 · 16.1 | 44.1 · -14.7 · -44.9 · 15.5 | 31558445.07 | 359.7965 | 0.01541 |
-| 10000 | 10.9 · 37.2 · -10.4 · -37.7 | 12.5 · 37.4 · -11.9 · -37.9 | 31558475.72 | 358.7825 | 0.01326 |
+| -10000 | 10.2 · 61.5 · -8.5 · -63.2 | 7.9 · 55.0 · -6.3 · -56.6 | 31558387.90 | 357.7403 | 0.02124 |
+| -2584 | -49.4 · -26.3 · 48.7 · 27.1 | -48.1 · -25.1 · 47.2 · 26.0 | 31558415.97 | 359.6531 | 0.01863 |
+| 0 | -14.7 · -51.2 · 15.7 · 50.2 | -15.0 · -50.5 · 16.1 · 49.5 | 31558425.22 | 359.9592 | 0.01756 |
+| 2000 | 16.2 · -48.6 · -15.2 · 47.6 | 16.0 · -48.6 · -14.9 · 47.5 | 31558432.62 | 0.0143 | 0.01671 |
+| 5000 | 43.2 · -15.5 · -43.8 · 16.1 | 44.2 · -15.1 · -45.0 · 15.8 | 31558445.07 | 359.7965 | 0.01541 |
+| 10000 | 10.9 · 37.2 · -10.4 · -37.7 | 12.7 · 37.8 · -12.2 · -38.3 | 31558475.72 | 358.7825 | 0.01326 |
 
 RA formula constants: raMean = base − earthRAAngle/sin ε̄ = base − 3.157955°, amplitude A/sin ε̄ = 1.600721° on −sin(2π·3·c) + sin(2π·8·c) (base 0/90/180/270° for VE/SS/AE/WS). Balanced year used by both devices: -302635.00000.
 <!-- /generated:calcmap-cardinal-spread -->

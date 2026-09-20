@@ -10369,15 +10369,13 @@ earth.containerObj.rotation.y = (Math.PI/2)*whichSolsticeOrEquinox;
 // to the one-source ε while leaving the precession phase untouched (a
 // rotation about the node line preserves the node line). Earth sits at the
 // scene origin (orbitRadius 0), so the wrapper pivot coincides with the
-// Earth centre. D4 FLIP: the one-source drive is the DEFAULT — ?hybridSpin=0
-// is the opt-out (A/B comparison and escape hatch; the K device remains the
-// automatic fallback when the series artifact fails to load). The flag is
-// declared HERE (the earliest consumer) — the loader, factory and sampler
-// live with the other hybrid machinery further down.
-const HYBRID_SPIN_REQUESTED = (() => {
-  try { return new URLSearchParams(window.location.search).get('hybridSpin') !== '0'; }
-  catch (e) { return true; }
-})();
+// Earth centre. D4 FLIP: the one-source drive is THE path. Plan 06 D5
+// (owner, Phase 3 S3b): the former ?hybridSpin=0 URL opt-out is REMOVED as a
+// user-facing option — the K device is not a published alternative any
+// more; it remains only the automatic fallback while the series artifact
+// has not loaded (or failed to). The constant keeps its name (P4); the
+// loader, factory and sampler live with the other hybrid machinery below.
+const HYBRID_SPIN_REQUESTED = true;
 let _hybridTiltCorr = null;
 const _HTC_A = new THREE.Vector3(), _HTC_N = new THREE.Vector3(), _HTC_U = new THREE.Vector3();
 const _HTC_Q1 = new THREE.Quaternion(), _HTC_Q2 = new THREE.Quaternion(),
@@ -20556,9 +20554,10 @@ function _hybridTierSpan(need) {
 // hybrid on the BANKED ζ-series artifact (the C-1/C-2 verdict: the series
 // beats both mode tiers, 0.16″/0.18″ vs IAU-2006 in-era and 0.0396° vs
 // La2004 over −200 kyr), at EVERY epoch (series inside ±10 Myr, the α(H(t))
-// mode-tail beyond — D1-revised). ?hybridSpin=0 opts out to the pre-C-3 K
-// scene, bit-identical (no wrapper node is inserted, no override runs);
-// the same K fallback engages automatically if the artifact fails to load.
+// mode-tail beyond — D1-revised). Plan 06 D5: the former ?hybridSpin=0
+// opt-out is gone; the pre-C-3 K scene (no wrapper node inserted, no
+// override running) remains only the automatic fallback while the series
+// artifact has not loaded, or if it fails to load.
 // The frozen harmonic era clock (tools/fit/README.md "The frozen era
 // clock") remains the certified era device beside this.
 // (HYBRID_SPIN_REQUESTED is declared at the tilt-correction wrapper — the
@@ -20601,7 +20600,7 @@ let _zetaSeriesEndYr = 0;
         // MEASURED handover boundaries, series-inside-span, mode-tail
         // beyond (the ring-blowup fix).
         _planetSeriesData = a;
-        console.log(`secular series loaded from ${url} (earth + ${Object.keys(a.bodies).length - 1} planets) — planet deep-time elements + Earth ε/e one-source ${HYBRID_SPIN_REQUESTED ? 'DEFAULT-ON (D4; ?hybridSpin=0 opts out)' : 'planets on; Earth OPTED OUT (?hybridSpin=0 — the K device drives ε/e)'}`);
+        console.log(`secular series loaded from ${url} (earth + ${Object.keys(a.bodies).length - 1} planets) — planet deep-time elements + Earth ε/e one-source ${HYBRID_SPIN_REQUESTED ? 'ON (D4; the K device is only the pre-load fallback — plan 06 D5)' : 'planets on; Earth on the K device (fallback)'}`);
         return;
       } catch (e) { /* try the next candidate */ }
     }
@@ -20645,7 +20644,7 @@ function _siderealYearOneSourceSeconds(year) {
 // One-source year seconds by type: MEAN (tropical of date), ANOM
 // (anomalistic), or a cardinal VE/SS/AE/WS year. NaN when opted out.
 function _cardinalYearSeconds(year, type) {
-  if (!_hybridSpinActive()) return NaN;   // one-source display; ?hybridSpin=0 opts out
+  if (!_hybridSpinActive()) return NaN;   // one-source display; NaN only before the series has loaded (D5: no opt-out)
   const yl = _yearLengthsM();
   return type === 'MEAN' ? yl.tropicalYearSecondsAtYear(year)
     : type === 'ANOM' ? yl.anomalisticYearSecondsAtYear(year)
@@ -25762,26 +25761,26 @@ function setupGUI() {
   const fmt2sec = v => v.toFixed(2);
   addTooltip(yearsFolder.addBinding(predictions, 'solarYearSeconds', {
     label: 'Model (sec)', readonly: true, format: fmt2sec
-  }), 'Mean tropical (solar) year OF DATE in SI seconds — the one-source movement’s analytic mean (equinox rate + λ̇ correction; the Tropical Year chart’s line). ONE FAMILY with the sidereal/anomalistic rows, so the precession beats recompute exactly. The scene-MEASURED cardinal mean lives in the Days & Years report (agrees to sub-0.5 s). Opt-out (?hybridSpin=0): frozen-clock days × o.lodKinematic.');
+  }), 'Mean tropical (solar) year OF DATE in SI seconds — the one-source movement’s analytic mean (equinox rate + λ̇ correction; the Tropical Year chart’s line). ONE FAMILY with the sidereal/anomalistic rows, so the precession beats recompute exactly. The scene-MEASURED cardinal mean lives in the Days & Years report (agrees to sub-0.5 s). Before the series has loaded: frozen-clock days × o.lodKinematic (the fallback; the ?hybridSpin=0 opt-out is gone — plan 06 D5).');
   addTooltip(yearsFolder.addBinding(predictions, 'solarYearDays', {
     label: 'Model (days)', readonly: true, format: fmt8
-  }), 'Mean tropical (solar) year OF DATE in SI days (seconds / 86400). Opt-out: the frozen Step 6d Fourier law.');
+  }), 'Mean tropical (solar) year OF DATE in SI days (seconds / 86400). Before the series has loaded: the frozen Step 6d Fourier law (the fallback; the ?hybridSpin=0 opt-out is gone — plan 06 D5).');
 
   const siderealYrFolder = astroFolder.addFolder({ title: 'Sidereal Year' });
   addTooltip(siderealYrFolder.addBinding(predictions, 'siderealYearSeconds', {
     label: 'Model (sec)', readonly: true, format: fmt2sec
-  }), 'Sidereal year OF DATE in SI seconds — the one-source λ̇ channel over the mass-loss law (the same evaluator the Sidereal Year chart and the API serve; = the IAU 31,558,149.7635 s at J2000 by anchor). Opt-out (?hybridSpin=0): frozen-clock days × o.lodKinematic.');
+  }), 'Sidereal year OF DATE in SI seconds — the one-source λ̇ channel over the mass-loss law (the same evaluator the Sidereal Year chart and the API serve; = the IAU 31,558,149.7635 s at J2000 by anchor). Before the series has loaded: frozen-clock days × o.lodKinematic (the fallback; the ?hybridSpin=0 opt-out is gone — plan 06 D5).');
   addTooltip(siderealYrFolder.addBinding(predictions, 'siderealYearDays', {
     label: 'Model (days)', readonly: true, format: fmt8
-  }), 'Sidereal year OF DATE in SI days (seconds / 86400). Opt-out: the frozen Step 6d Fourier law.');
+  }), 'Sidereal year OF DATE in SI days (seconds / 86400). Before the series has loaded: the frozen Step 6d Fourier law (the fallback; the ?hybridSpin=0 opt-out is gone — plan 06 D5).');
 
   const anomalisticFolder = astroFolder.addFolder({ title: 'Anomalistic Year' });
   addTooltip(anomalisticFolder.addBinding(predictions, 'anomalisticYearSeconds', {
     label: 'Model (sec)', readonly: true, format: fmt2sec
-  }), 'Anomalistic year OF DATE in SI seconds (perihelion to perihelion) — the one-source cardinal structure the API serves: the engine’s own apsidal rate ϖ̇ + the λ̇ correction. Opt-out (?hybridSpin=0): the frozen Fourier fit × o.lodKinematic.');
+  }), 'Anomalistic year OF DATE in SI seconds (perihelion to perihelion) — the one-source cardinal structure the API serves: the engine’s own apsidal rate ϖ̇ + the λ̇ correction. Before the series has loaded: the frozen Fourier fit × o.lodKinematic (the fallback; the ?hybridSpin=0 opt-out is gone — plan 06 D5).');
   addTooltip(anomalisticFolder.addBinding(predictions, 'anomalisticYearDays', {
     label: 'Model (days)', readonly: true, format: v => v.toFixed(9)
-  }), 'Anomalistic year OF DATE in SI days (seconds / 86400). Opt-out: the frozen Step 6d Fourier law.');
+  }), 'Anomalistic year OF DATE in SI days (seconds / 86400). Before the series has loaded: the frozen Step 6d Fourier law (the fallback; the ?hybridSpin=0 opt-out is gone — plan 06 D5).');
 
   const cpFolder = astroFolder.addFolder({ title: 'Cardinal Points', expanded: false });
   addFolderTooltip(cpFolder, 'Predicted dates of solstices and equinoxes from 24-harmonic Fibonacci formula. Valid across the full 335,317-year Earth Fundamental Cycle. See doc 14.');
@@ -27935,7 +27934,7 @@ function setupGUI() {
       const sunL = sunLon(jd);
       // Framework obliquity for THIS jd (jd may differ from o.julianDay in sweeps).
       // Was hardcoded 23.44 — drifted 0.28° at year -135 giving 40 km sub-solar error.
-      const epsDeg = computeObliquityEarth(_formulaYearFromJD(jd));
+      const epsDeg = _sceneEpsTargetDeg(_formulaYearFromJD(jd));   // Phase 3 S3b: the published ε (the hybrid), not the K comb
       const lat = Math.asin(Math.sin(epsDeg * _d2r) * Math.sin(sunL * _d2r)) / _d2r;
       return { lat, lon };
     }
@@ -28205,7 +28204,7 @@ function setupGUI() {
       const sunL = sunLon(jd_conj);
       // Framework obliquity for THIS jd_conj (may differ from o.julianDay in sweeps).
       // Was hardcoded 23.44 — drifted 0.28° at year -135 giving 40 km sub-solar error.
-      const epsDeg = computeObliquityEarth(_formulaYearFromJD(jd_conj));
+      const epsDeg = _sceneEpsTargetDeg(_formulaYearFromJD(jd_conj));   // Phase 3 S3b: the published ε
       const lat = Math.asin(Math.sin(epsDeg * _d2r) * Math.sin(sunL * _d2r)) / _d2r;
       return { lat, lon };
     }
@@ -45205,7 +45204,7 @@ function _applySolarAberration(sunGeoVec, jd, moonGeoVec) {
     // the raw-curve clock; bridging the sun degraded the modern
     // centerlines 8.9″ → 10.3″ (clock consistency beats tier mimicry).
     const lamS = _eclSunLon(jd) * Math.PI / 180;
-    const eps = computeObliquityEarth(2000 + (jd - 2451545.0) / 365.25) * Math.PI / 180;
+    const eps = _sceneEpsTargetDeg(2000 + (jd - 2451545.0) / 365.25) * Math.PI / 180;   // Phase 3 S3b: the published ε
     const decS = Math.asin(Math.sin(eps) * Math.sin(lamS));
     const raS = Math.atan2(Math.cos(eps) * Math.sin(lamS), Math.cos(lamS));
     const rS = sunGeoVec.length();
@@ -47334,8 +47333,8 @@ function perihelionFrameBreakdown(planetKey, year) {
   const p = planets[planetKey];
   const D2R = Math.PI / 180;
   const lattice = 1296000 / p.perihelionEclipticYears * 100;                                    // (a) ″/cy
-  const eps = computeObliquityEarth(year) * D2R;
-  const epsRate = (computeObliquityEarth(year + 50) - computeObliquityEarth(year - 50)) * 3600;  // ″/cy
+  const eps = _sceneEpsTargetDeg(year) * D2R;   // Phase 3 S3b: the published ε (the hybrid)
+  const epsRate = (_sceneEpsTargetDeg(year + 50) - _sceneEpsTargetDeg(year - 50)) * 3600;  // ″/cy
   // projection excess and obliquity-rate term for a direction at ecliptic longitude lamDeg
   const terms = (lamDeg) => {
     const lam = lamDeg * D2R;
@@ -47358,7 +47357,7 @@ function perihelionFrameBreakdown(planetKey, year) {
 // Right ascension of an ecliptic-of-date direction (β = 0) in the equatorial frame of the same date.
 function eclipticLongitudeToRaDeg(lamDeg, year) {
   const D2R = Math.PI / 180;
-  const l = lamDeg * D2R, e = computeObliquityEarth(year) * D2R;
+  const l = lamDeg * D2R, e = _sceneEpsTargetDeg(year) * D2R;
   return ((Math.atan2(Math.sin(l) * Math.cos(e), Math.cos(l)) / D2R) % 360 + 360) % 360;
 }
 // The general-relativistic perihelion advance from the model's own constants:
@@ -47404,7 +47403,7 @@ const planetStats = {
     null,
       {label : () => `Axial tilt`,
        value : [ { v: () => o.obliquityEarth, dec:6, sep:',' },{ small: 'degrees (°)' }],
-       hover : [`Obliquity of the ecliptic — the SCENE's rendered tilt (this value IS the Sun's maximum declination at every epoch, by construction). It rides the model's own N-body series inside ±10 Myr, the mode-tail beyond (ONE SOURCE — measured 0.16″ rms vs IAU-2006 in-era, 0.04° vs La2004 at −200 kyr; doc 109 §18); ?hybridSpin=0 opts out to the framework's device law. The obliquity oscillates with the DERIVED beat 2π/(|ψ̇| − |s₃|) ≈ 40.6 kyr — the "Obliquity cycle (derived beat)" row in the CYCLES tab.`],
+       hover : [`Obliquity of the ecliptic — the SCENE's rendered tilt (this value IS the Sun's maximum declination at every epoch, by construction). It rides the model's own N-body series inside ±10 Myr, the mode-tail beyond (ONE SOURCE — measured 0.16″ rms vs IAU-2006 in-era, 0.04° vs La2004 at −200 kyr; doc 109 §18); before the series has loaded, the framework's device law is the fallback (the ?hybridSpin=0 opt-out is gone — plan 06 D5). The obliquity oscillates with the DERIVED beat 2π/(|ψ̇| − |s₃|) ≈ 40.6 kyr — the "Obliquity cycle (derived beat)" row in the CYCLES tab.`],
        tpLink: true},
       {label : () => `Orbital Eccentricity (e)`,
        value : [ { v: () => _hybridSpinActive() ? o.eccentricityEarth : _kcElementsOfDate('earth', o.julianDay).e, dec:8, sep:',' },{ small: '' }],
@@ -52913,7 +52912,7 @@ function updateSunlightForPlanet(planetMesh, pad = 1.1) {
   if (planetMesh === earth.planetObj && Number.isFinite(o.julianDay)) {
     const _jdL = o.julianDay;
     const lamS = _eclSunLon(_jdL) * Math.PI / 180;
-    const eps  = computeObliquityEarth(2000 + (_jdL - 2451545.0) / 365.25) * Math.PI / 180;
+    const eps  = _sceneEpsTargetDeg(2000 + (_jdL - 2451545.0) / 365.25) * Math.PI / 180;   // Phase 3 S3b: the published ε
     const decS = Math.asin(Math.sin(eps) * Math.sin(lamS));
     const raS  = Math.atan2(Math.cos(eps) * Math.sin(lamS), Math.cos(lamS));
     const rS   = _sunWS.distanceTo(_planetWS);
@@ -53234,7 +53233,9 @@ const _moonApparent = (() => {
           speedOfLight,
         },
         fns: {
-          computeObliquityEarth,
+          // Phase 3 S3b: the apparent Moon's RA/Dec turn on the published ε (the hybrid); the
+          // Moon's ARGUMENTS (the other factory) keep the comb — a device-anchored matched triple.
+          computeObliquityEarth: (y) => _sceneEpsTargetDeg(y),
           getAuDistanceKm: () => currentAUDistance,
           isFrameworkNative: () => MOON_ARGS_FRAMEWORK_NATIVE,
           getCorrectionResidual: () => MOON_CORRECTION_RESIDUAL,
@@ -57278,7 +57279,7 @@ function updatePredictions() {
   // scene-measured mean of the four cardinal intervals (the D4b panel's own
   // event solves; Σδ_X cancels the EoC spread in the mean) — the panel, the
   // chart and the rendered movement now agree. The frozen 6c device serves
-  // the ?hybridSpin=0 opt-out.
+  // only the pre-load fallback (the ?hybridSpin=0 opt-out is gone — plan 06 D5).
   // o.solarYearDays = the scene-MEASURED cardinal 4-mean (the measurement
   // instrument; feeds the internal kinematic chain). The DISPLAYED days
   // row is assigned after solarYearSeconds below — one analytic family.
@@ -57437,7 +57438,7 @@ function updatePredictions() {
     // structure evaluator the API and the Cardinal Year Lengths panel use
     // (engine ϖ̇ + D6 λ̇ correction, SI seconds). The frozen Fourier fit
     // (fitted to the pre-one-source movement) stays the o.* internal value
-    // and the ?hybridSpin=0 display.
+    // and the pre-load fallback display (the ?hybridSpin=0 opt-out is gone — D5).
     predictions.anomalisticYearSeconds = _hybridSpinActive()
       ? _cardinalYearSeconds(yearForFormula, 'ANOM')
       : o.anomalisticYearSeconds;
@@ -57519,7 +57520,7 @@ function updatePredictions() {
   // D4b: under the one-source movement (the default) the values come from
   // the ONE calculation for every era — the scene-solved events with the
   // runtime J2000 anchor offsets (see _osCardinalAt; cached per year).
-  // ?hybridSpin=0 shows the frozen-device values, as before.
+  // Before the series has loaded the frozen-device values show (the ?hybridSpin=0 opt-out is gone — D5).
   const cpYear = Math.floor(o.currentYear);
   if (_hybridSpinActive()) {
     const cv = _osCardinalAt(cpYear);
@@ -57542,7 +57543,7 @@ function updatePredictions() {
       predictions['cp' + cp + 'RA'] = ra;
       predictions['cp' + cp + 'YearLen'] = yr;
     }
-    predictions.cpSolsticeObliquity = computeObliquityEarth(cpYear);
+    predictions.cpSolsticeObliquity = _sceneEpsTargetDeg(cpYear);   // Phase 3 S3b: the published ε at the solstice year
   }
 
   // IAU comparison differences (Model − IAU reference)
@@ -58779,7 +58780,7 @@ function makeRealisticEarth(pd){
           const _jdU = o.julianDay;
           if (Number.isFinite(_jdU)) {
             const lamS = _eclSunLon(_jdU) * Math.PI / 180;
-            const eps  = computeObliquityEarth(2000 + (_jdU - 2451545.0) / 365.25) * Math.PI / 180;
+            const eps  = _sceneEpsTargetDeg(2000 + (_jdU - 2451545.0) / 365.25) * Math.PI / 180;   // Phase 3 S3b: the published ε
             const decS = Math.asin(Math.sin(eps) * Math.sin(lamS));
             const raS  = Math.atan2(Math.cos(eps) * Math.sin(lamS), Math.cos(lamS));
             const rS   = _udcSunGeo.length();

@@ -176,7 +176,7 @@ function exportEarth(years) {
     aeJD.push(+OE.computeSolsticeJD(year, 'AE').toFixed(4));
     aeRA.push(+OE.computeSolsticeRA(year, 'AE').toFixed(4));
     aeYearLength.push(+OE.computeSolsticeYearLength(year, 'AE').toFixed(8));
-    solsticeObliquity.push(+OE.computeObliquityEarth(year).toFixed(6));
+    solsticeObliquity.push(+ONE_SOURCE.epsDeg(year).toFixed(6));   // Phase 3 S3b: the published ε (the hybrid)
 
     // Perihelion/aphelion distance (Earth semi-major axis = 1 AU)
     const earthDist = OE.computePerihelionAphelionDistance(el.eccentricity, 1.0);

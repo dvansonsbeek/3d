@@ -512,7 +512,10 @@ export function assembleModel(C, F, laws = {}, secularSeriesArtifact = /** @type
   // The engine-D planet chains (ONE build; the one-family route's apsidal
   // tangent and the lunisolar surface's n_aps read the same instance).
   const kcChainsM = buildPlanetChainsFromArtifactData(CHAIN_ARTIFACT);
-  const yearLengthsM = (() => {
+  // The ONE-SOURCE movement: the hybrid's ε(t) (plan 06 Phase 3 S3b — THE
+  // published obliquity) and the one-family year lengths, on the same
+  // per-tier sampler.
+  const oneSourceM = (() => {
     const AEarth = /** @type {any} */ (CHAIN_ARTIFACT).j2000AnchorElements.earth;
     // The ψ̇ anchor: the CERTIFIED of-date laws at 2000 — identical to the
     // engine/browser (computeSiderealYearDaysDirect / computeSolarYearDays
@@ -545,7 +548,13 @@ export function assembleModel(C, F, laws = {}, secularSeriesArtifact = /** @type
       anchorInclEclipticDeg: AEarth.inclEclipticDeg,
       anchorAscNodeEclipticDeg: AEarth.ascNodeEclipticDeg,
       axialPrecessionYearsJ2000: axial0,
-      obliquityJ2000Deg: obliquityDeg(2000),
+      // Phase 3 S3b: the hybrid's initial condition is the OBSERVED J2000
+      // mean obliquity — the IAU 2006 input constant (84381.406″), the same
+      // anchor the browser's _deepHistSeries and the Node one-source movement
+      // use. It was the K comb's own J2000 value, 0.233″ above IAU: a
+      // rendering-device residual imported as the initial condition of the
+      // physics (found when the package began publishing the hybrid).
+      obliquityJ2000Deg: C.earthOrbital.obliquityJ2000_deg,
       axialPrecessionYearsAtYearFn: (yr) => {
         const h = deepLod.hAtAge((startmodelYear - yr) / 1e6);
         return axial0 * (h === null ? 1 : h / H0);
@@ -575,12 +584,18 @@ export function assembleModel(C, F, laws = {}, secularSeriesArtifact = /** @type
     // The anomalistic rides the chain's SECULAR apsidal tangent (the same
     // rate family the panel's Prec. cell shows) — ONE helper, keplerian-chain.
     const kcChains = kcChainsM;
-    return createYearLengths({
+    const yearLengths = createYearLengths({
       sampleAt,
       massLossSiderealSecondsAtYearFn: (year) => deepLod.siderealYearSecondsAtAge(yearToTMa(year)),
       apsidalSecularDegPerYrFn: (year) => computeApsidalSecularDegPerYr(year, kcChains.earth, kcChains),
     });
+    return {
+      yearLengths,
+      /** The hybrid's obliquity at a decimal year, degrees — the banked series inside its span, the α(t)-coupled ζ-tail integration beyond (the deep sampler grows ~0.1 s/Myr). @param {number} year @returns {number} */
+      epsAt: (year) => sampleAt(year).epsDeg,
+    };
   })();
+  const yearLengthsM = oneSourceM.yearLengths;
 
   /** Tropical year: mean of the four cardinal intervals. @param {number} year @returns {number} */
   const tropicalYearDays = (year) => cardinalM.computeTropicalYearLength(year);
@@ -1302,7 +1317,15 @@ export function assembleModel(C, F, laws = {}, secularSeriesArtifact = /** @type
     }),
     earth: Object.freeze({
       perihelionLongitudeDeg: earthPerihelionDeg,
-      obliquityDeg,
+      // Plan 06 Phase 3 S3b: THE published obliquity is the hybrid — one
+      // torque law integrated on the dynamical orbit plane of the N-body
+      // chain, zero fitted constants (≡ La2004 to ≤ 4″ over ±50 kyr). The
+      // fitted 16-harmonic K comb, a device fitted to the scene's own
+      // wheel geometry (0.005″ to it, 1.27° off La2004 at −20 kyr), keeps
+      // its name below as the frozen era clock's device: it anchors the
+      // hybrid at J2000, the kinematic-day stack and the lunar arguments.
+      obliquityDeg: /** @param {number} year @returns {number} */ (year) => oneSourceM.epsAt(year),
+      obliquityCombDeg: obliquityDeg,
       eccentricity: eccentricityAt,
       inclinationDeg,
       ascendingNodeDeg,

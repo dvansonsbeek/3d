@@ -306,7 +306,10 @@ function _moonApparentM() {
         speedOfLight: C.speedOfLight,
       },
       fns: {
-        computeObliquityEarth: OE.computeObliquityEarth,
+        // Phase 3 S3b: the apparent Moon's RA/Dec turn on the published ε — the one-source
+        // hybrid when the movement is on (SG_ONE_SOURCE=1), the comb otherwise (the Node
+        // default). Twin of the browser's _sceneEpsTargetDeg routing.
+        computeObliquityEarth: (y) => { const M = _oneSourceM(); return M ? M.epsDeg(y) : OE.computeObliquityEarth(y); },
         getAuDistanceKm: () => C.currentAUDistance,
         isFrameworkNative: () => MOON_ARGS_FRAMEWORK_NATIVE,
         getCorrectionResidual: () => C.MOON_CORRECTION_RESIDUAL,
@@ -1963,7 +1966,7 @@ function computePlanetPosition(target, jd) {
       lonDeg: graph.moonNodes._meeusLonDeg,
       betRad: graph.moonNodes._meeusLatDeg * d2r,
       meeusT: graph.moonNodes._meeusT,
-      obliquityDeg: OE.computeObliquityEarth(currentYear),
+      obliquityDeg: (() => { const M = _oneSourceM(); return M ? M.epsDeg(currentYear) : OE.computeObliquityEarth(currentYear); })(),   // Phase 3 S3b: the published ε
     });
 
     // (Stage C note: a rigid ring-frame placement mirror was implemented and
