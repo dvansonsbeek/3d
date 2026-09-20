@@ -257,8 +257,11 @@ one-source movement):
    (D6/Phase 3).** The composition (2.3) lives in
    `earth/precession-composed`, built inside the deep-time factory; the
    unit `hAtAge` and `lunisolarPrecessionRateArcsecPerYrAtAge` are its
-   surface. Phase 3's `lunisolar` surface on `createModel()` is the
-   remaining presentation item.
+   surface, and Phase 3 S3 published it as `model.lunisolar` — in periods
+   and ratios, no unit and no integer: the mean period T_p and its rate,
+   the composition's terms, the of-date beat, the apsidal period T_aps and
+   the ratios T_aps/T_p and T_peri/T_p — with the panel's "Lunisolar Clock"
+   folder and the registry's `lunisolar*` keys.
 3. **H(t)'s deep-time content was ω(t) and nothing else — RESOLVED
    (Phase 3).** The former clock scaled with the day length only; the
    composition adds the lunar 1/a³ term, and at 650 Ma that is the

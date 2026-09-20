@@ -332,6 +332,9 @@ function createDeepTimeLod(deps) {
   return {
     lodSecondsAtAge, lodSecondsAtAgeWithAlpha, lodHoursAtAge, hAtAge,
     lunisolarPrecessionRateArcsecPerYrAtAge,
+    // the composition's terms (plan 06 Phase 3 S3, the lunisolar surface): (a₀/a_M)³ and f_S + (1 − f_S)(a₀/a_M)³
+    lunarTorqueFactorAtAge: composed.lunarTorqueFactorAtAge,
+    precessionTorqueTermAtAge: composed.torqueTermAtAge,
     siderealYearSecondsAtAge, tropicalYearSecondsAtAge, tropicalYearDaysAtAge,
     yearInDaysAtAge, deltaTRawSecondsAtAge, lodSecondsWithCorrectionsAtAge,
     lodSecondsActualAtAge, dLodDtDecompositionAtAge,

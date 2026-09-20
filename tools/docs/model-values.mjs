@@ -1837,6 +1837,48 @@ export const VALUES = {
     return out;
   })(),
 
+  // ── The lunisolar clock's ratios (plan 06 Phase 3 S3) ───────────────────
+  // Spoken in periods and ratios — no unit, no integer: T_aps/T_p (the
+  // apsidal period, from the engine-D chain's secular tangent — the SAME
+  // helper the Prec. cell and the one-family anomalistic use — in mean
+  // lunisolar precession periods) and T_peri/T_p with T_peri = 1/(1/T_p +
+  // 1/T_aps) the perihelion-of-date period (frame arithmetic at every
+  // epoch). That they read 13/3 and 13/16 today is the J2000 reading. The
+  // wander keys are the owner's by-hand finding, measured: over ±26 kyr the
+  // ratio is nowhere pinned.
+  ...(() => {
+    let chainsM = null;
+    const chains = () => {
+      if (!chainsM) {
+        const KC = require(join(ROOT, 'packages', 'physics', 'src', 'planets', 'keplerian-chain.cjs'));
+        const ART = require(join(ROOT, 'packages', 'physics', 'src', 'planets', 'chain-artifact.js')).CHAIN_ARTIFACT;
+        chainsM = { KC, ch: KC.buildPlanetChainsFromArtifactData(ART) };
+      }
+      return chainsM;
+    };
+    const tApsYr = (y) => { const c = chains(); return 360 / c.KC.computeApsidalSecularDegPerYr(y, c.ch.earth, c.ch); };
+    const tPYr = (y) => dtl().meanLunisolarPrecessionPeriodYearsAtAge((2000 - y) / 1e6);
+    const apsPerPrec = (y) => tApsYr(y) / tPYr(y);
+    const periPerPrec = (y) => { const tp = tPYr(y), ta = tApsYr(y); return (1 / (1 / tp + 1 / ta)) / tp; };
+    let wander = null;
+    const wanderScan = () => {
+      if (!wander) {
+        let mn = Infinity, mx = -Infinity, mnYr = 0, mxYr = 0;
+        for (let y = -26000; y <= 26000; y += 500) { const r = apsPerPrec(y); if (r < mn) { mn = r; mnYr = y; } if (r > mx) { mx = r; mxYr = y; } }
+        wander = { mn, mx, mnYr, mxYr };
+      }
+      return wander;
+    };
+    return {
+      lunisolarPeriodJ2000Yr: { get: () => tPYr(2000), render: (v) => thousands(v, 1), unit: 'yr', note: 'the mean lunisolar precession period T_p at J2000 — the composed torque rate’s period, the model’s spin clock' },
+      lunisolarApsidalPerPrecessionJ2000: { get: () => apsPerPrec(2000), render: (v) => Number(v).toFixed(3), note: 'T_aps/T_p at J2000 — the perihelion’s period against the stars (the chain’s secular apsidal tangent) in mean precession periods; a fitted J2000 reading, not a law' },
+      lunisolarPeriOfDatePerPrecessionJ2000: { get: () => periPerPrec(2000), render: (v) => Number(v).toFixed(4), note: 'T_peri/T_p at J2000, T_peri = 1/(1/T_p + 1/T_aps) the perihelion-of-date period (equinox precession + inertial perihelion motion — frame arithmetic at every epoch)' },
+      lunisolarApsidalPerPrecessionWanderMin: { get: () => wanderScan().mn, render: (v) => Number(v).toFixed(2), note: 'minimum of T_aps/T_p over ±26 kyr (500-yr scan) — the ratio is not pinned' },
+      lunisolarApsidalPerPrecessionWanderMax: { get: () => wanderScan().mx, render: (v) => Number(v).toFixed(2), note: 'maximum of T_aps/T_p over ±26 kyr (500-yr scan)' },
+      lunisolarTorqueConstantJ2000ArcsecPerYr: { get: () => (1296000 / (C.H / 13)) / Math.cos((astro.earthOrbital.obliquityJ2000_deg * Math.PI) / 180), render: (v) => Number(v).toFixed(3), unit: '″/yr', note: 'the hybrid’s precession constant α = p₀ / cos ε₀ (p₀ = 1,296,000/(H/13)); literature ≈ 54.9' },
+    };
+  })(),
+
   // ── Engine-D secular frequencies (Batch D: P1b of the restatement) ──────
   // The A/B-typed keys read data/nbody-secular-frequencies.json — the
   // governed artifact written by tools/verify/nbody-secular.js (--write)

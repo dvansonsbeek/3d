@@ -9973,6 +9973,14 @@ let predictions = {
   anomalisticYearSeconds: 0,
   perihelionPrecession: 0,
   axialPrecession: 0,
+  // Plan 06 Phase 3 S3 — the lunisolar clock rows, in periods and ratios:
+  // T_p(t) the mean lunisolar precession period, T_aps(t) the apsidal
+  // period, and the live ratios T_aps/T_p and T_peri/T_p (the owner's
+  // by-hand wander, on the panel; no unit, no integer).
+  lunisolarMeanPeriod: 0,
+  lunisolarApsidalPeriod: 0,
+  lunisolarApsidalPerPrecession: 0,
+  lunisolarPeriOfDatePerPrecession: 0,
   inclinationPrecession: 0,
   obliquityPrecession: 0,
   eclipticPrecession: 0,
@@ -25818,6 +25826,21 @@ function setupGUI() {
   addTooltip(precessionFolder.addBinding(predictions, 'eclipticPrecession', {
     label: 'Ecliptic Cycle (yrs)', readonly: true, format: fmt2
   }), 'NODAL precession \u2014 the engine\u2019s of-date tangent of Earth\u2019s orbital-plane node ON the invariable plane (\u00b1150-yr central difference of the chain\u2019s node of date; the same evaluator as the Positions-panel Period cell). Negative = retrograde regression. Stable deep-time base: the dominant nodal mode s\u2083, ' + Math.round(1296000 / CHAIN_ARTIFACT.s.earth.arcsecPerYr).toLocaleString('en-US') + ' yr (nearest-Laskar label, never an input). The framework\u2019s structural identity H/5 (' + Math.round(holisticyearLength / 5).toLocaleString('en-US') + ' yr, the ecliptic-precession lattice value) is the second route.');
+
+  // Plan 06 Phase 3 S3 — the lunisolar clock as a first-class panel surface.
+  const lunisolarFolder = astroFolder.addFolder({ title: 'Lunisolar Clock', expanded: false });
+  addTooltip(lunisolarFolder.addBinding(predictions, 'lunisolarMeanPeriod', {
+    label: 'T_p, mean (yrs)', readonly: true, format: fmt2
+  }), 'The mean lunisolar precession period of date, T_p(t) — the period of the composed torque rate [ω/ω₀]·p₀·[f_S + (1 − f_S)(a₀/a_M)³]: Earth’s spin from the tidal chain carrying both torques, the lunar torque growing as the Moon was closer. This is the model’s deep-time spin clock (falsification leg 1; matched by the Precambrian precession constants at 1.4 and 2.46 Ga). The Axial (yrs) row above is the of-date beat around it.');
+  addTooltip(lunisolarFolder.addBinding(predictions, 'lunisolarApsidalPeriod', {
+    label: 'T_aps, apsidal (yrs)', readonly: true, format: fmt2
+  }), 'The perihelion’s period against the fixed stars from the N-body chain’s secular tangent (the Prec. cell’s rate) — the orbital side of the clock, on the solar-mass tier. Read inside ±2 Myr of J2000 (the banked series); NaN beyond.');
+  addTooltip(lunisolarFolder.addBinding(predictions, 'lunisolarApsidalPerPrecession', {
+    label: 'T_aps / T_p', readonly: true, format: (v) => v.toFixed(3)
+  }), 'The apsidal period in mean precession periods — how many turns of the spin axis per turn of the perihelion against the stars. Reads 4.33 at J2000 (a fitted reading) and wanders across ±26 kyr; the panel shows the wander live. No unit, no integer: a ratio of two measured periods.');
+  addTooltip(lunisolarFolder.addBinding(predictions, 'lunisolarPeriOfDatePerPrecession', {
+    label: 'T_peri / T_p', readonly: true, format: (v) => v.toFixed(4)
+  }), 'The perihelion-of-date period in mean precession periods, with T_peri = 1/(1/T_p + 1/T_aps): equinox precession and inertial perihelion motion add as rates — frame arithmetic at every epoch. Reads 0.812 at J2000, the J2000 reading.');
 
   const orbitalFolder = astroFolder.addFolder({ title: 'Orbital Elements' });
   addTooltip(orbitalFolder.addBinding(predictions, 'eccentricityEarth', {
@@ -57358,6 +57381,34 @@ function updatePredictions() {
   predictions.axialPrecession = _hybridSpinActive()
     ? predictions.siderealYearSeconds / (predictions.siderealYearSeconds - predictions.solarYearSeconds)
     : o.axialPrecession;
+  // The lunisolar clock (plan 06 Phase 3 S3), in periods and ratios: T_p(t)
+  // the composed lunisolar precession period (the model's spin clock; the
+  // internal identifier holisticyearLength is 13·T_p by definition and is
+  // not a face here), T_aps(t) from the engine-D chain's apsidal tangent
+  // (the SAME helper the Prec. cell shows), and the ratios T_aps/T_p and
+  // T_peri/T_p. Twin: the package's model.lunisolar; the registry's
+  // lunisolar* keys.
+  {
+    const _Hls = meanHAtAge((2000 - yearForFormula) / 1e6);
+    if (_Hls !== null) {
+      const _Tp = _Hls / 13;
+      predictions.lunisolarMeanPeriod = _Tp;
+      // the apsidal tangent is read inside the published window (±2 Myr,
+      // ONE_FAMILY_WINDOW_YEARS) only; beyond it the tangent is an
+      // extrapolation of the banked series (negative by −5 Myr).
+      if (Math.abs(yearForFormula - 2000) <= 2000000) {
+        if (!_kcChains) _kcChains = buildPlanetChainsFromArtifactData(CHAIN_ARTIFACT);
+        const _Taps = 360 / kcApsidalSecularDegPerYr(yearForFormula, _kcChains.earth, _kcChains);
+        predictions.lunisolarApsidalPeriod = _Taps;
+        predictions.lunisolarApsidalPerPrecession = _Taps / _Tp;
+        predictions.lunisolarPeriOfDatePerPrecession = (1 / (1 / _Tp + 1 / _Taps)) / _Tp;
+      } else {
+        predictions.lunisolarApsidalPeriod = NaN;
+        predictions.lunisolarApsidalPerPrecession = NaN;
+        predictions.lunisolarPeriOfDatePerPrecession = NaN;
+      }
+    }
+  }
   // perihelionPrecession is computed after anomalistic year (depends on it)
 
   // Sidereal/stellar day in REAL epoch LOD — was hard-coded to 86,400 s

@@ -509,6 +509,9 @@ export function assembleModel(C, F, laws = {}, secularSeriesArtifact = /** @type
   // path; the npm package alone has no 8 MB series), the movement runs the
   // SERIES tier exactly like the browser — killing the mode-vs-series
   // value split (measured: 6 s on the anomalistic year at J2000).
+  // The engine-D planet chains (ONE build; the one-family route's apsidal
+  // tangent and the lunisolar surface's n_aps read the same instance).
+  const kcChainsM = buildPlanetChainsFromArtifactData(CHAIN_ARTIFACT);
   const yearLengthsM = (() => {
     const AEarth = /** @type {any} */ (CHAIN_ARTIFACT).j2000AnchorElements.earth;
     // The ψ̇ anchor: the CERTIFIED of-date laws at 2000 — identical to the
@@ -571,7 +574,7 @@ export function assembleModel(C, F, laws = {}, secularSeriesArtifact = /** @type
     };
     // The anomalistic rides the chain's SECULAR apsidal tangent (the same
     // rate family the panel's Prec. cell shows) — ONE helper, keplerian-chain.
-    const kcChains = buildPlanetChainsFromArtifactData(CHAIN_ARTIFACT);
+    const kcChains = kcChainsM;
     return createYearLengths({
       sampleAt,
       massLossSiderealSecondsAtYearFn: (year) => deepLod.siderealYearSecondsAtAge(yearToTMa(year)),
@@ -1196,6 +1199,22 @@ export function assembleModel(C, F, laws = {}, secularSeriesArtifact = /** @type
   });
 
   // ── The assembled surface ─────────────────────────────────────────────────
+  // Plan 06 Phase 3 S2 — THE published of-date precession period and mean
+  // tropical year: the one-family route (B) inside the banked tiers
+  // (|Δyear| ≤ ONE_FAMILY_WINDOW_YEARS), the unit's secular mean beyond
+  // (H(t)/13; the tidal-chain year). Shared by `epoch` and `lunisolar`.
+  /** @param {number} year @returns {number} */
+  const publishedAxialPrecessionYearsAtYear = (year) => {
+    if (Math.abs(year - 2000) <= ONE_FAMILY_WINDOW_YEARS) return yearLengthsM.axialPrecessionYearsAtYear(year);
+    const h = deepLod.hAtAge(yearToTMa(year));
+    return (h === null ? H : h) / 13;
+  };
+  /** @param {number} year @returns {number} */
+  const publishedTropicalYearSecondsAtYear = (year) => {
+    if (Math.abs(year - 2000) <= ONE_FAMILY_WINDOW_YEARS) return yearLengthsM.tropicalYearSecondsAtYear(year);
+    return deepLod.tropicalYearSecondsAtAge(yearToTMa(year));
+  };
+
   return Object.freeze({
     time: Object.freeze({
       yearFromJD,
@@ -1224,17 +1243,62 @@ export function assembleModel(C, F, laws = {}, secularSeriesArtifact = /** @type
       // anchors the lunar chain's (d′) rate completion (pDynDegPerYearAt,
       // a MATCHED TRIPLE with the eclipse gates: M0(a) measured a 3–15 min
       // lunar-timing shift if it moved).
-      axialPrecessionYearsAtYear: /** @param {number} year @returns {number} */ (year) => {
-        if (Math.abs(year - 2000) <= ONE_FAMILY_WINDOW_YEARS) return yearLengthsM.axialPrecessionYearsAtYear(year);
-        const h = deepLod.hAtAge(yearToTMa(year));
-        return (h === null ? H : h) / 13;
-      },
+      axialPrecessionYearsAtYear: publishedAxialPrecessionYearsAtYear,
       // The same publication rule for the mean tropical year of date (SI s):
       // one-family inside the window, the tidal-chain mean beyond.
-      tropicalYearSecondsAtYear: /** @param {number} year @returns {number} */ (year) => {
-        if (Math.abs(year - 2000) <= ONE_FAMILY_WINDOW_YEARS) return yearLengthsM.tropicalYearSecondsAtYear(year);
-        return deepLod.tropicalYearSecondsAtAge(yearToTMa(year));
+      tropicalYearSecondsAtYear: publishedTropicalYearSecondsAtYear,
+    }),
+    // Plan 06 Phase 3 S3 — the lunisolar precession clock as a first-class
+    // surface: Earth's spin clock, ONE home for its published faces, spoken
+    // in PERIODS and their RATIOS — no unit, no integer. T_p(t) is the
+    // composed lunisolar period (calculation map 2.1 step 6; the internal
+    // identifier H is 13·T_p by definition and is not a face here); the
+    // composition's terms; the of-date beat (the published family, seamed
+    // at ±2 Myr); the apsidal period from the engine-D chain's secular
+    // tangent and the two ratios the owner found wandering by hand —
+    // T_aps/T_p (4.33 at J2000, 0.84 … 9.5 across ±26 kyr) and T_peri/T_p
+    // with T_peri = 1/(1/T_p + 1/T_aps) the perihelion-of-date period
+    // (0.812 at J2000). That these read close to 13/3 and 13/16 today is
+    // the J2000 reading, stated nowhere as structure.
+    lunisolar: Object.freeze({
+      /** The mean lunisolar precession period T_p(t), years — the composed torque rate's period. @param {number} year @returns {number} */
+      meanPeriodYearsAtYear: (year) => { const h = deepLod.hAtAge(yearToTMa(year)); return (h === null ? H : h) / 13; },
+      /** The composed rate ψ̇(t) = [ω/ω₀]·p₀·[f_S + (1 − f_S)(a₀/a_M)³], ″/yr. @param {number} year @returns {number} */
+      meanRateArcsecPerYrAtYear: (year) => { const r = deepLod.lunisolarPrecessionRateArcsecPerYrAtAge(yearToTMa(year)); return r === null ? 1296000 / (H / 13) : r; },
+      /** The of-date period — the one-family beat inside ±2 Myr, the mean beyond. @param {number} year @returns {number} */
+      ofDatePeriodYearsAtYear: publishedAxialPrecessionYearsAtYear,
+      /** f_S, the solar fraction of the J2000 precession torque. */
+      solarShareJ2000: EPOCH_PARAMS.precessionSolarShareJ2000,
+      /** (a₀/a_M(t))³ — the lunar torque's growth on the recession history. @param {number} year @returns {number} */
+      lunarTorqueFactorAtYear: (year) => { const f = deepLod.lunarTorqueFactorAtAge(yearToTMa(year)); return f === null ? 1 : f; },
+      /** f_S + (1 − f_S)(a₀/a_M)³ — the torque term the unit divides H_era by. @param {number} year @returns {number} */
+      torqueTermAtYear: (year) => { const t = deepLod.precessionTorqueTermAtAge(yearToTMa(year)); return t === null ? 1 : t; },
+      /** The hybrid's precession constant α = p₀ / cos ε₀, ″/yr (ε₀ the J2000 obliquity input). */
+      torqueConstantJ2000ArcsecPerYr: (1296000 / (H / 13)) / Math.cos((C.earthOrbital.obliquityJ2000_deg * Math.PI) / 180),
+      /** The apsidal (perihelion vs the stars) period from the engine-D chain's secular tangent, years — inside the published window only (the tangent is an extrapolation beyond the banked series: it turns negative at −5 Myr); null beyond. @param {number} year @returns {number|null} */
+      apsidalPeriodYearsAtYear: (year) => (Math.abs(year - 2000) <= ONE_FAMILY_WINDOW_YEARS ? 360 / computeApsidalSecularDegPerYr(year, kcChainsM.earth, kcChainsM) : null),
+      /** T_aps(t) / T_p(t) — the apsidal period in mean precession periods (4.33 at J2000, a fitted reading; 0.84 … 9.5 across ±26 kyr, measured); null beyond the published window. @param {number} year @returns {number|null} */
+      apsidalPerPrecessionAtYear: (year) => {
+        if (Math.abs(year - 2000) > ONE_FAMILY_WINDOW_YEARS) return null;
+        const h = deepLod.hAtAge(yearToTMa(year));
+        return (360 / computeApsidalSecularDegPerYr(year, kcChainsM.earth, kcChainsM)) / ((h === null ? H : h) / 13);
       },
+      /** T_peri(t) = 1/(1/T_p + 1/T_aps) — the perihelion-of-date period (equinox precession + inertial perihelion motion, frame arithmetic at every epoch), years; null beyond the published window. @param {number} year @returns {number|null} */
+      periOfDatePeriodYearsAtYear: (year) => {
+        if (Math.abs(year - 2000) > ONE_FAMILY_WINDOW_YEARS) return null;
+        const h = deepLod.hAtAge(yearToTMa(year));
+        const tp = (h === null ? H : h) / 13, taps = 360 / computeApsidalSecularDegPerYr(year, kcChainsM.earth, kcChainsM);
+        return 1 / (1 / tp + 1 / taps);
+      },
+      /** T_peri(t) / T_p(t) (0.812 at J2000 — the J2000 reading); null beyond the published window. @param {number} year @returns {number|null} */
+      periOfDatePerPrecessionAtYear: (year) => {
+        if (Math.abs(year - 2000) > ONE_FAMILY_WINDOW_YEARS) return null;
+        const h = deepLod.hAtAge(yearToTMa(year));
+        const tp = (h === null ? H : h) / 13, taps = 360 / computeApsidalSecularDegPerYr(year, kcChainsM.earth, kcChainsM);
+        return (1 / (1 / tp + 1 / taps)) / tp;
+      },
+      /** The published of-date window, years from 2000. */
+      publishedWindowYears: ONE_FAMILY_WINDOW_YEARS,
     }),
     earth: Object.freeze({
       perihelionLongitudeDeg: earthPerihelionDeg,

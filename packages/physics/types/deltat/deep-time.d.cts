@@ -111,6 +111,8 @@ export function createDeepTimeLod(deps: DeepTimeLodDeps): {
     lodHoursAtAge: (t_Ma: number) => number | null;
     hAtAge: (t_Ma: number) => number | null;
     lunisolarPrecessionRateArcsecPerYrAtAge: (t_Ma: number) => number | null;
+    lunarTorqueFactorAtAge: (tMa: number) => (number | null);
+    precessionTorqueTermAtAge: (tMa: number) => (number | null);
     siderealYearSecondsAtAge: (t_Ma: number) => number;
     tropicalYearSecondsAtAge: (t_Ma: number) => number;
     tropicalYearDaysAtAge: (t_Ma: number) => number | null;
