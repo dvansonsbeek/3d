@@ -138,7 +138,7 @@ export { createDeepOrbitalHistory } from './earth/deep-orbital-history.cjs';
 // D6: the sidereal-year-of-date channel (banked λ̇ ratio × the caller's mass-loss law)
 export { createSiderealYearChannel } from './earth/sidereal-year-channel.cjs';
 // S2: THE ONE of-date year-length family (years + precession beats, SI seconds)
-export { createYearLengths } from './earth/year-lengths.cjs';
+export { createYearLengths, ONE_FAMILY_WINDOW_YEARS } from './earth/year-lengths.cjs';
 // Plan 06 D6: THE ONE home of the composed lunisolar precession rate ψ̇(t)
 // (spin ω(t) × [solar torque + lunar torque on the recession history]) —
 // leg-1's physical rate; the structural H(t)/13 clock is its named diagnostic.

@@ -47,6 +47,7 @@
  * @property {number} lodNowH13Seconds
  * @property {number} siderealYearJ2000Seconds
  * @property {number} solarMassLossFracPerYear
+ * @property {number} precessionSolarShareJ2000  f_S, the solar fraction of the J2000 precession torque
  */
 
 /**
@@ -54,10 +55,12 @@
  * @property {(year: number) => number} tMa
  * @property {(year: number) => number} moonDistanceMetres
  * @property {(year: number) => number|null} lodSeconds
- * @property {(year: number) => number|null} holisticH
+ * @property {(year: number) => number|null} holisticH               the UNIT: 13 × the composed lunisolar precession period
  * @property {(year: number) => number} siderealYearSeconds
  * @property {(year: number) => number} tropicalYearSeconds
  * @property {(year: number) => number|null} anomalisticYearSeconds
+ * @property {(year: number) => number|null} eraClockH               the frozen era clock's phase convention H₀·LOD/LOD₀ (device tier)
+ * @property {(year: number) => number} eraClockTropicalYearSeconds  T_sid·(1 − 13/H_era) — the frozen comb family's base
  */
 
 /**
@@ -98,14 +101,33 @@ export const createEpochPrimitives = ({ params: p, alphaAtAgeMa }) => {
   };
 
   /**
-   * The Earth Fundamental Cycle. H scales with LOD — the lattice is defined by
-   * the rotation rate, so a longer day is a longer H.
+   * The frozen era clock's phase convention: H_era(t) = H₀·LOD(t)/LOD₀ —
+   * pure spin scaling. This is the counter the FROZEN devices (the cardinal
+   * era clock, the year-length comb family) were fitted against; it ships
+   * with their coefficients as a named device constant (plan 06 Phase 3,
+   * D8), never as "H(t)".
+   * @param {number} t age in Ma
+   * @returns {number|null} years
+   */
+  const eraClockHCore = (t) => {
+    const lod = lodSecondsCore(t);
+    return lod === null ? null : p.holisticYearJ2000 * lod / p.lodNowH13Seconds;
+  };
+
+  /**
+   * The unit H(t) ≡ 13 × the composed lunisolar precession period:
+   * H_era(t) / [f_S + (1 − f_S)·(a₀/a_M(t))³] — the spin scaling AND the
+   * lunar torque growing on the recession history (plan 06 D6/Phase 3; the
+   * formula's home is earth/precession-composed, this is its Layer-0 twin,
+   * held bit-identical to deltat/deep-time.cjs by the layer0 gate).
    * @param {number} t age in Ma
    * @returns {number|null} years
    */
   const holisticHCore = (t) => {
-    const lod = lodSecondsCore(t);
-    return lod === null ? null : p.holisticYearJ2000 * lod / p.lodNowH13Seconds;
+    const hEra = eraClockHCore(t);
+    if (hEra === null) return null;
+    const lf = Math.pow(p.moonDistanceNowM / moonDistanceMetresCore(t), 3);
+    return hEra / (p.precessionSolarShareJ2000 + (1 - p.precessionSolarShareJ2000) * lf);
   };
 
   /**
@@ -159,6 +181,13 @@ export const createEpochPrimitives = ({ params: p, alphaAtAgeMa }) => {
     return sid * (H - 13) / H * H / (H - 16);
   };
 
+  /** The frozen comb family's tropical base: T_sid·(1 − 13/H_era). @param {number} t */
+  const eraClockTropicalYearSecondsCore = (t) => {
+    const sid = siderealYearSecondsCore(t);
+    const H = eraClockHCore(t);
+    return H === null ? sid * (1 - 13 / p.holisticYearJ2000) : sid * (1 - 13 / H);
+  };
+
   return Object.freeze({
     tMa,
     moonDistanceMetres: (year) => moonDistanceMetresCore(tMa(year)),
@@ -167,5 +196,7 @@ export const createEpochPrimitives = ({ params: p, alphaAtAgeMa }) => {
     siderealYearSeconds: (year) => siderealYearSecondsCore(tMa(year)),
     tropicalYearSeconds: (year) => tropicalYearSecondsCore(tMa(year)),
     anomalisticYearSeconds: (year) => anomalisticYearSecondsCore(tMa(year)),
+    eraClockH: (year) => eraClockHCore(tMa(year)),
+    eraClockTropicalYearSeconds: (year) => eraClockTropicalYearSecondsCore(tMa(year)),
   });
 };

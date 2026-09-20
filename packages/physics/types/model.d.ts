@@ -34,6 +34,7 @@ export function assembleModel(C: Readonly<Record<string, any>>, F: Readonly<Reco
         deltaTSecondsAtYear: (year: number) => number;
         cyclesBetween: (yearA: number, yearB: number, divisorN: number) => number;
         axialPrecessionYearsAtYear: (year: number) => number;
+        tropicalYearSecondsAtYear: (year: number) => number;
     }>;
     earth: Readonly<{
         perihelionLongitudeDeg: (year: number) => number;

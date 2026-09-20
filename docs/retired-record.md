@@ -58,6 +58,29 @@ frequencies OFF the 8H lattice (docs 108/109); the planets' periods are
 now dynamical outputs of the chains. Earth's kinematic identities
 (H/13, H/3, H/16, H/8) remain documented in docs 10, 11 and 40.
 
+**The spin-only deep-time clock** ("H ∝ LOD", "H(t) = H₀·LOD(t)/LOD₀",
+"the structural H(t)/13 precession period"): the statement that Earth's
+axial-precession period at deep time scales with the day length alone.
+Retired at plan 06 D6/Phase 3. The physical rate is the composed
+lunisolar rate ψ̇(t) = [ω(t)/ω₀]·p₀·[f_S + (1 − f_S)(a₀/a_M(t))³] — the
+lunar torque grows as the Moon was closer — and H(t) is now defined as
+13 of those periods at every epoch (`deltat/deep-time.cjs hAtAge`, one
+formula home `earth/precession-composed`). The record that decided it:
+against the Precambrian precession constants the spin-only clock read
+65.2 ″/yr where Meyers & Malinverno 2018 (Xiamaling, 1.4 Ga) measured
+85.79 ± 2.72, and 70.9 where Lantink et al. 2022 (Joffre, 2.46 Ga)
+measured 108.6 ± 8.5 — 24 % and 35 % low, outside 1σ in both — while the
+composed rate reads 86.5 and 104.5 (both inside 1σ; paleo-anchors gate
+rows `xiamaling-prec-1400` / `lantink-prec-2460`, which the spin-only
+recipe fails). At 650 Ma Wu et al. 2024 infer 67.64: composed 67.8,
+spin-only 58.6. The obliquity-beat keys that rode it read 24.9 kyr at
+2.46 Ga where the composed beat reads 15.1. The formula survives in one
+place, under its own name: `eraClockHAtAge` = H₀·LOD/LOD₀ is the FROZEN
+era clock's phase convention — the ∫dt/H phase table, the cardinal era
+clock and the year-length comb family were fitted against it and ship
+with it as a device constant (plan 06 D8: two named counters), a
+convention of those coefficients, not a claim about the sky.
+
 **Superseded analyses** (docs 39, 97): the pre-unification eccentricity
 exploration (superseded by the one H/3 law and doc 108) and the
 first-pass paleo-ECS decomposition (superseded by docs 92 and 95).

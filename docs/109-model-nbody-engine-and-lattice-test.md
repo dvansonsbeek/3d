@@ -725,25 +725,25 @@ K's chain, ONE home `@essrt/physics/earth/precession-composed`; the
 hybrid precesses on exactly this evaluator) — while s₃ is a
 DYNAMICAL-tier frequency, scaled only by the measured solar-mass
 history (μ(2.48 Ga) = 1.00 ± 0.07 — effectively fixed). The obliquity
-band therefore follows the BEAT, **2π/(ψ̇(t) − |s₃|)** — never pure
-H-scaling. The model carried a second deep-time ψ̇(t) before D6, the
-STRUCTURAL clock 13·1,296,000/H(t) (pure ω-scaling of p₀); the two agree
-wherever (a₀/a_M)³ ≈ 1 and split at depth, and the rock decides between
-them: the composed rate matches the Precambrian precession constants
+band therefore follows the BEAT, **2π/(ψ̇(t) − |s₃|)**. Since Phase 3
+the unit H(t) IS 13 composed precession periods at every epoch, so the
+tidal-mean year pair's beat, H(t)/13 and the composed period are one
+quantity, and the rock reads it directly: the composed rate matches the
+Precambrian precession constants
 (<!--v:anchorXiamalingPrec1400Pred-->86.52<!--/v--> vs Meyers &
 Malinverno 2018's 85.79 ± 2.72 ″/yr at 1.4 Ga,
 <!--v:anchorLantinkPrec2460Pred-->104.51<!--/v--> vs Lantink et al.
-2022's 108.6 ± 8.5 ″/yr at 2.46 Ga — both paleo-anchors gate rows) where
-the structural clock reads <!--v:earthPrecStructural1400MaArcsecPerYr-->65.2<!--/v-->
-and <!--v:earthPrecStructural2460MaArcsecPerYr-->70.9<!--/v--> ″/yr and
-fails both rows. The registry keys `obliqBeat*Kyr` (composed — the
-shipped form) / `obliqBeatStructural*Kyr` (the pre-D6 reading, kept as
-the diagnostic) / `obliqH8Scaled*Kyr` (pure H/8 scaling) carry the fork
-at J2000, 1.4 and 2.46 Ga: today the readings are degenerate (ψ̇ ≫ s₃ —
-which is why "H/8" has always fit), while at 2.46 Ga the shipped beat
-reads <!--v:obliqBeat2460MaKyr-->15.1<!--/v--> kyr against
-<!--v:obliqBeatStructural2460MaKyr-->24.9<!--/v--> structural and
-<!--v:obliqH8Scaled2460MaKyr-->29.7<!--/v--> H/8-scaled — a level
+2022's 108.6 ± 8.5 ″/yr at 2.46 Ga — both paleo-anchors gate rows). The
+model's earlier deep-time reading, the spin-only clock
+13·1,296,000/(H₀·LOD/LOD₀), fails both rows (24 % and 35 % low) and is
+retired to `docs/retired-record.md`; it survives only as the frozen era
+clock's named phase convention. The registry keys `obliqBeat*Kyr` (the
+beat) / `obliqH8Scaled*Kyr` (name kept: the pure precession-scaling
+reading "obliquity period ∝ T_p", T_p·13/8) carry the fork at J2000, 1.4
+and 2.46 Ga: today the readings are degenerate (ψ̇ ≫ s₃ — which is why
+"H/8" has always fit), while at 2.46 Ga the beat reads
+<!--v:obliqBeat2460MaKyr-->15.1<!--/v--> kyr against
+<!--v:obliqH8Scaled2460MaKyr-->20.2<!--/v--> for period ∝ T_p — a level
 cyclostratigraphy can discriminate. The existing 1.4/2.46-Ga
 confirmations are precession-rate/LOD anchors; the deep-time obliquity
 PERIOD itself is undiscriminated, so this is a pre-registered prediction

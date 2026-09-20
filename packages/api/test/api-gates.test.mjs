@@ -118,7 +118,14 @@ for (const url of SAMPLE_REQUESTS) {
   const ep = dataOf('/v1/epoch?year=2000').epochs[0];
   if (Math.abs(ep.h - 335317) > 1e-6) failures.push(`epoch H@2000: ${ep.h}`);
   const dev = dataOf('/v1/epoch?year=-379998000').epochs[0];
-  if (Math.round(dev.h) !== 306189) failures.push(`epoch H@Devonian: ${dev.h}`);
+  // plan 06 Phase 3: H(t) is the UNIT = 13 composed lunisolar precession periods (282,329 at −380 Ma);
+  // the pre-Phase-3 spin-only clock H₀·LOD/LOD₀ read 306,189 there (now the frozen era clock's counter).
+  if (Math.round(dev.h) !== 282329) failures.push(`epoch H@Devonian: ${dev.h}`);
+  // plan 06 Phase 3 S2: the published of-date family is the one-family route inside ±2 Myr
+  // (≈ IAU 25,771 yr at J2000), the unit's secular mean H/13 beyond (the Devonian record).
+  if (Math.abs(ep.axialPrecessionYears - 25771.4) > 0.5) failures.push(`epoch axialPrecessionYears@2000: ${ep.axialPrecessionYears}`);
+  if (Math.abs(ep.tropicalYearSeconds - 31556925.2) > 1) failures.push(`epoch tropicalYearSeconds@2000: ${ep.tropicalYearSeconds}`);
+  if (Math.abs(dev.axialPrecessionYears - dev.h / 13) > 1e-9) failures.push(`epoch axialPrecessionYears@Devonian must be the secular mean H/13: ${dev.axialPrecessionYears} vs ${dev.h / 13}`);
   const earth = dataOf('/v1/earth?year=2000').years[0];
   if (Math.abs(earth.obliquityDeg - 23.4393) > 0.0002) failures.push(`earth obliquity@2000: ${earth.obliquityDeg}`);
   const ss = dataOf('/v1/cardinal-points?year=2000&types=SS').years[0].points.SS;

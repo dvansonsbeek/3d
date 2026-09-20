@@ -46,6 +46,8 @@ const PROBES = [
   { name: 'moonDistanceMetres', mine: L0.moonDistanceMetres, theirs: DT.meanMoonDistanceMetresAtAge },
   { name: 'lodSeconds', mine: L0.lodSeconds, theirs: DT.meanLodSecondsAtAge },
   { name: 'holisticH', mine: L0.holisticH, theirs: DT.meanHAtAge },
+  { name: 'eraClockH', mine: L0.eraClockH, theirs: DT.eraClockHAtAge },
+  { name: 'eraClockTropicalYearSeconds', mine: L0.eraClockTropicalYearSeconds, theirs: DT.eraClockTropicalYearSecondsAtAge },
   { name: 'siderealYearSeconds', mine: L0.siderealYearSeconds, theirs: DT.meanSiderealYearSecondsAtAge },
   { name: 'tropicalYearSeconds', mine: L0.tropicalYearSeconds, theirs: DT.meanTropicalYearSecondsAtAge },
   { name: 'anomalisticYearSeconds', mine: L0.anomalisticYearSeconds, theirs: DT.meanAnomalisticYearSecondsAtAge },
@@ -118,6 +120,10 @@ const derivedParams = deriveEpochParams({
   moonDistanceKm: C.moonDistance,
   moonOrbitalEccentricity: C.moonOrbitalEccentricity,
   gmEarthMoonSystemKm3S2: C.GM_EARTH_MOON_SYSTEM,
+  gmSunKm3S2: C.GM_SUN,
+  astronomicalUnitKm: C.currentAUDistance,
+  earthOrbitalEccentricityJ2000: C.ASTRO_REFERENCE.earthEccentricityJ2000,
+  moonEclipticInclinationJ2000Deg: C.moonEclipticInclinationJ2000,
 });
 /** @type {string[]} */
 const paramDrift = [];

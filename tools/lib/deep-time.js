@@ -105,6 +105,16 @@ const SI_TROPICAL_YEAR_DAYS      = MEAN_TROPICAL_YEAR_J2000_S / 86400;
 
 const SOLAR_MASS_LOSS_FRAC_PER_YR = DM_DT_TOTAL_KG_S * MEAN_SIDEREAL_YEAR_J2000_S / C.M_SUN;
 
+// The solar fraction of the J2000 precession torque and the model's J2000
+// rate p₀ (plan 06 Phase 3): the unit H(t) ≡ 13·T_p,composed needs f_S in
+// Layer 0 and the deep-time factory. ONE derivation: earth/precession-composed.
+const PRECESSION_SOLAR_SHARE_J2000 = _req('@essrt/physics/earth/precession-composed').computeSolarTorqueShare({
+  gmSunKm3S2: C.GM_SUN, auKm: C.currentAUDistance, earthEccentricity: C.ASTRO_REFERENCE.earthEccentricityJ2000,
+  gmMoonKm3S2: C.GM_MOON_ALONE, moonDistanceKm: C.moonDistance, moonEccentricity: C.moonOrbitalEccentricity,
+  moonInclinationDeg: C.moonEclipticInclinationJ2000,
+});
+const PRECESSION_RATE_J2000_ARCSEC_PER_YR = 1296000 / (C.H / 13);
+
 // Earth mass, moments
 const M_EARTH_ALONE = C.GM_EARTH_ALONE / C.G_CONSTANT;
 const M_MOON_ALONE  = C.GM_MOON_ALONE  / C.G_CONSTANT;
@@ -302,6 +312,7 @@ function _deepLod() {
         meanSiderealYearJ2000Seconds: MEAN_SIDEREAL_YEAR_J2000_S,
         solarMassLossFracPerYear: SOLAR_MASS_LOSS_FRAC_PER_YR,
         siderealYearDaysKinematicJ2000: C.meanSiderealYearDaysKinematic,
+        precessionSolarShareJ2000: PRECESSION_SOLAR_SHARE_J2000,
       },
       moonDistanceMetresAtAge: meanMoonDistanceMetresAtAge,
       moiFactorAtAge: earthMoiFactorAtAge,
@@ -350,39 +361,20 @@ function meanLodSecondsAtAgeActual(t_Ma) { return _deepLod().lodSecondsActualAtA
 // ─── STEP 2 — H(t) ────────────────────────────────────────────────────────
 function meanHAtAge(t_Ma) { return _deepLod().hAtAge(t_Ma); }
 
-// ─── The composed lunisolar precession rate (plan 06 D6) ──────────────────
-// ψ̇(t) = [ω(t)/ω₀]·p₀·[f_S + (1 − f_S)(a₀/a_M(t))³] — the tidal chain's spin
-// carrying both torques, the lunar torque growing on the recession history.
-// ONE home: @essrt/physics/earth/precession-composed; this is the Node
-// engine's instance on its own chain (the registry's composed/beat keys and
-// the paleo-anchors gate's precArcsecPerYr rows read it). The structural
-// clock 13·1,296,000/H(t) stays a named diagnostic.
-const PRECESSION_SOLAR_SHARE_J2000 = _req('@essrt/physics/earth/precession-composed').computeSolarTorqueShare({
-  gmSunKm3S2: C.GM_SUN, auKm: C.currentAUDistance, earthEccentricity: C.ASTRO_REFERENCE.earthEccentricityJ2000,
-  gmMoonKm3S2: C.GM_MOON_ALONE, moonDistanceKm: C.moonDistance, moonEccentricity: C.moonOrbitalEccentricity,
-  moonInclinationDeg: C.moonEclipticInclinationJ2000,
-});
-const PRECESSION_RATE_J2000_ARCSEC_PER_YR = 1296000 / (C.H / 13);
-let _composedPrecM = null;
-function _composedPrec() {
-  if (!_composedPrecM) {
-    _composedPrecM = _req('@essrt/physics/earth/precession-composed').createComposedPrecession({
-      p0ArcsecPerYr: PRECESSION_RATE_J2000_ARCSEC_PER_YR,
-      solarShare: PRECESSION_SOLAR_SHARE_J2000,
-      lodSecondsAtAge: meanLodSecondsAtAge,
-      lodJ2000Seconds: LOD_NOW_H13_S,
-      moonDistanceMetresAtAge: meanMoonDistanceMetresAtAge,
-      moonDistanceJ2000Metres: A_MOON_NOW_M,
-      hAtAge: meanHAtAge,
-      yearToTMa: (year) => (2000 - year) / 1e6,
-    });
-  }
-  return _composedPrecM;
-}
-function composedPrecessionRateArcsecPerYrAtAge(t_Ma) { return _composedPrec().composedRateArcsecPerYrAtAge(t_Ma); }
-function composedPrecessionRateRatioAtAge(t_Ma) { return _composedPrec().composedRateRatioAtAge(t_Ma); }
-function composedPrecessionPeriodYearsAtAge(t_Ma) { return _composedPrec().composedPeriodYearsAtAge(t_Ma); }
-function structuralPrecessionRateArcsecPerYrAtAge(t_Ma) { return _composedPrec().structuralRateArcsecPerYrAtAge(t_Ma); }
+// ─── The lunisolar precession clock (plan 06 D6 → Phase 3) ────────────────
+// H(t) is the UNIT: 13 × the composed lunisolar precession period
+// ψ̇(t) = [ω(t)/ω₀]·p₀·[f_S + (1 − f_S)(a₀/a_M(t))³] (ONE formula home:
+// @essrt/physics/earth/precession-composed, built inside the deep-time
+// factory), so meanHAtAge(t)/13 IS the precession period at every epoch.
+// The frozen era clock's counter H_era = H₀·LOD/LOD₀ (pure spin scaling —
+// the pre-Phase-3 reading) is exported under its own name for the devices
+// fitted against it (the ∫dt/H phase table, the cardinal era clock, the
+// year-length comb family): two named counters (D8), never one name.
+function meanLunisolarPrecessionRateArcsecPerYrAtAge(t_Ma) { return _deepLod().lunisolarPrecessionRateArcsecPerYrAtAge(t_Ma); }
+function meanLunisolarPrecessionPeriodYearsAtAge(t_Ma) { const H = meanHAtAge(t_Ma); return H === null ? null : H / 13; }
+function eraClockHAtAge(t_Ma) { return _deepLod().eraClockHAtAge(t_Ma); }
+function eraClockTropicalYearSecondsAtAge(t_Ma) { return _deepLod().eraClockTropicalYearSecondsAtAge(t_Ma); }
+function eraClockYearInDaysAtAge(t_Ma) { return _deepLod().eraClockYearInDaysAtAge(t_Ma); }
 
 // ─── Driver 2 — AU and year_s ─────────────────────────────────────────────
 function meanAuAtAge(t_Ma) {
@@ -686,9 +678,11 @@ function _l0() {
  *  epoch-aware Fourier baseline for a year kind, or null past the tidal-lock
  *  asymptote (caller falls back to the J2000 constant). */
 function _epochYearDaysBaseKind(kind, year) {
-  const H_t = _l0().holisticH(year);
+  // The comb family's bases ride the FROZEN era clock's counter H_era (plan 06
+  // D8) — the combs were fitted on them; the browser twin spells the same.
+  const H_t = _l0().eraClockH(year);
   const LOD_s = _l0().lodSeconds(year);
-  const T_trop_s = _l0().tropicalYearSeconds(year);
+  const T_trop_s = _l0().eraClockTropicalYearSeconds(year);
   if (H_t === null || LOD_s === null || T_trop_s === null) return null;
   const tropDays = T_trop_s / LOD_s;
   if (kind === 'tropical')    return tropDays;
@@ -756,6 +750,8 @@ function computeYearDaysDirectAll(year) {
     anomB = C.meanAnomalisticYearDays;
   } else {
     const t = _l0().tMa(year);
+    // the comb family's bases ride the FROZEN era clock's counter H_era = H₀·LOD/LOD₀
+    // (plan 06 D8) — inline for the one α evaluation; ≡ eraClockHAtAge
     const H_t = EPOCH_PARAMS.holisticYearJ2000 * LOD_s / EPOCH_PARAMS.lodNowH13Seconds;
     const dm = EPOCH_PARAMS.solarMassLossFracPerYear * t * 1e6;
     const sidSec = EPOCH_PARAMS.siderealYearJ2000Seconds * (1 - dm) * (1 - dm);
@@ -1085,7 +1081,9 @@ let _phaseM = null;
 function _phase() {
   if (_phaseM !== null) return _phaseM;
   _phaseM = createPhaseMachinery({
-    holisticHAtAgeMa: (t_Ma) => meanHAtAge(t_Ma),
+    // the FROZEN era clock's own counter H_era = H₀·LOD/LOD₀ (plan 06 D8: two
+    // named counters) — the combs were fitted against it; NOT the unit H(t)
+    holisticHAtAgeMa: (t_Ma) => eraClockHAtAge(t_Ma),
     tableAnchorYear: C.startmodelYear,
     driftRefYear: C.startModelYearWithCorrection,
     hJ2000: HOLISTIC_YEAR_J2000,
@@ -1150,6 +1148,7 @@ const EPOCH_PARAMS = Object.freeze({
   lodNowH13Seconds: LOD_NOW_H13_S,
   siderealYearJ2000Seconds: MEAN_SIDEREAL_YEAR_J2000_S,
   solarMassLossFracPerYear: SOLAR_MASS_LOSS_FRAC_PER_YR,
+  precessionSolarShareJ2000: PRECESSION_SOLAR_SHARE_J2000,
 });
 
 // The α channel is injected into Layer 0 as `earthMoiFactorAtAge` directly —
@@ -1475,9 +1474,10 @@ module.exports = {
   meanLodSecondsAtAge, meanLodSecondsAtAgeActual, meanLodHoursAtAge,
   // Step 2
   meanHAtAge,
-  // The composed lunisolar precession rate (plan 06 D6) + its structural diagnostic twin
-  composedPrecessionRateArcsecPerYrAtAge, composedPrecessionRateRatioAtAge, composedPrecessionPeriodYearsAtAge,
-  structuralPrecessionRateArcsecPerYrAtAge,
+  // The lunisolar precession clock (plan 06 Phase 3): the unit's rate/period, and the
+  // frozen era clock's named counter + bases (device tier, D8)
+  meanLunisolarPrecessionRateArcsecPerYrAtAge, meanLunisolarPrecessionPeriodYearsAtAge,
+  eraClockHAtAge, eraClockTropicalYearSecondsAtAge, eraClockYearInDaysAtAge,
   PRECESSION_SOLAR_SHARE_J2000, PRECESSION_RATE_J2000_ARCSEC_PER_YR,
   // Driver 2
   meanAuAtAge, meanSiderealYearSecondsAtAge, meanTropicalYearSecondsAtAge,

@@ -33,4 +33,14 @@ export type RawEpochConstants = {
     moonDistanceKm: number;
     moonOrbitalEccentricity: number;
     gmEarthMoonSystemKm3S2: number;
+    /**
+     * GM☉ (km³/s²) — the solar precession torque
+     */
+    gmSunKm3S2: number;
+    /**
+     * 1 AU (km)
+     */
+    astronomicalUnitKm: number;
+    earthOrbitalEccentricityJ2000: number;
+    moonEclipticInclinationJ2000Deg: number;
 };

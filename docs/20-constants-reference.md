@@ -45,7 +45,7 @@ Per the [Expanding Solar System Resonance Theory (Doc 99)](99-expanding-solar-sy
 | Planet orbital periods (Part 4 `solarYearInput`) | `meanPlanetOrbitalPeriodAtAge(t_Ma, T_p_J2000_s)` |
 | α(t) GIA correction → ΔT | `meanDeltaTSecondsAtAge(t_Ma)` |
 
-H(t) evolves under two physically independent drivers: **Driver 1** = Earth-Moon tidal evolution (LOD grows, Moon recedes); **Driver 2** = solar mass loss (every planet's orbit slowly expands via Kepler's 3rd law). At Devonian (380 Ma) H ≈ <!--v:hAtDevonian-->306,189<!--/v--> yr; at J2000 H = <!--v:H-->335,317<!--/v--> yr; at +200 Myr H ≈ <!--v:hAt200MyrFuture-->352,600<!--/v--> yr. The integer divisors above are unchanged at every epoch — only the per-cycle period in years (or seconds) scales.
+H(t) evolves under two physically independent drivers: **Driver 1** = Earth-Moon tidal evolution (LOD grows, Moon recedes); **Driver 2** = solar mass loss (every planet's orbit slowly expands via Kepler's 3rd law). At Devonian (380 Ma) H ≈ <!--v:hAtDevonian-->282,329<!--/v--> yr; at J2000 H = <!--v:H-->335,317<!--/v--> yr; at +200 Myr H ≈ <!--v:hAt200MyrFuture-->367,019<!--/v--> yr. The integer divisors above are unchanged at every epoch — only the per-cycle period in years (or seconds) scales.
 
 For the canonical derivation chain from `t_Ma` through LOD, H, AU, M_Sun, Kepler year, Moon distance, Moon period, anomalistic year, stellar/sidereal days, and planet orbital + synodic periods, see [Doc 99 — ESSRT](99-expanding-solar-system-resonance-theory.md) and the `mean*AtAge` family in `tools/lib/deep-time.js`. (The Solar System Resonance Cycle at J2000: 8H = <!--v:eightH-->2,682,536<!--/v--> yr; the per-planet 8H/N tabulation is archived — [retired record](retired-record.md).)
 
@@ -106,7 +106,13 @@ simulator's About → Model Identity). Every array is fitter-owned,
 provenance-tracked, and behind fail-proven gates; the paleo-anchors gate
 fails on an unexplained *improvement* too. These correct the certified
 time-domain machinery; none of them touch the planetary dynamics
-(Ledger 1).
+(Ledger 1). The year-length harmonics and the cardinal-point family are
+the FROZEN era clock's basis — a device, not the published year lengths
+(plan 06 Phase 3 S2): the published tropical, sidereal and anomalistic
+years of date and the precession periods ride the one-family route
+(`model.yearLengths`, doc 110 chain 3.2 route B); the combs feed the
+kinematic-day stack (doc 110 chain 3.3) and the era clock only, on their
+own counter `eraClockHAtAge`.
 
 ### Core Calibration Inputs (28 — Earth, Sun & Moon)
 

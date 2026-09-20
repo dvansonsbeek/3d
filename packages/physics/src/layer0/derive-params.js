@@ -9,11 +9,15 @@
  * If the two ever disagree, one of them changed and the other did not — which
  * is the exact drift mode that produced five diverging implementations.
  *
- * Pure function, imports nothing. Lives in physics so the browser and the Node
- * engine can both build Layer 0 from ONE derivation (deep-time.js keeps its
- * own inline copy only until Phase C rewrites it; until then the test is the
- * enforcement).
+ * Pure function; its only import is the torque-share derivation (plan 06
+ * Phase 3: the unit H(t) = 13·T_p,composed needs the solar fraction of the
+ * J2000 precession torque, derived ONCE here from the shared constants).
+ * Lives in physics so the browser and the Node engine can both build Layer 0
+ * from ONE derivation (deep-time.js keeps its own inline copy only until
+ * Phase C rewrites it; until then the test is the enforcement).
  */
+
+import { computeSolarTorqueShare } from '../earth/precession-composed.cjs';
 
 /**
  * @typedef {Object} RawEpochConstants
@@ -35,6 +39,10 @@
  * @property {number} moonDistanceKm
  * @property {number} moonOrbitalEccentricity
  * @property {number} gmEarthMoonSystemKm3S2
+ * @property {number} gmSunKm3S2                 GM☉ (km³/s²) — the solar precession torque
+ * @property {number} astronomicalUnitKm         1 AU (km)
+ * @property {number} earthOrbitalEccentricityJ2000
+ * @property {number} moonEclipticInclinationJ2000Deg
  */
 
 /**
@@ -64,6 +72,14 @@ export const deriveEpochParams = (raw) => {
     + (moonMassKg * Math.sqrt(gmEarthMoonM3S2 * moonDistanceNowM) * moonEccentricityFactor);
   const moonLockDistanceM = (totalAngularMomentumKgM2S / (moonMassKg * Math.sqrt(gmEarthMoonM3S2) * moonEccentricityFactor)) ** 2;
 
+  // The solar fraction of the J2000 precession torque (plan 06 Phase 3): the
+  // unit H(t) ≡ 13·T_p,composed = H_era(t) / [f_S + (1 − f_S)(a₀/a_M(t))³].
+  const precessionSolarShareJ2000 = computeSolarTorqueShare({
+    gmSunKm3S2: raw.gmSunKm3S2, auKm: raw.astronomicalUnitKm, earthEccentricity: raw.earthOrbitalEccentricityJ2000,
+    gmMoonKm3S2: raw.gmMoonAloneKm3S2, moonDistanceKm: raw.moonDistanceKm, moonEccentricity: raw.moonOrbitalEccentricity,
+    moonInclinationDeg: raw.moonEclipticInclinationJ2000Deg,
+  });
+
   return Object.freeze({
     epochYear: 2000,
     alpha1PerMa: raw.alpha1PerMa,
@@ -81,5 +97,6 @@ export const deriveEpochParams = (raw) => {
     lodNowH13Seconds,
     siderealYearJ2000Seconds: raw.meanSiderealYearSeconds,
     solarMassLossFracPerYear,
+    precessionSolarShareJ2000,
   });
 };

@@ -52,7 +52,7 @@ const TOOLS = Object.freeze({
   },
   essrt_epoch: {
     description: 'Deep-time epoch quantities at year(s)/JD(s): Earth Fundamental Cycle H, length of day, alpha, deltaT, sidereal-year seconds, Moon distance. Valid ±500 Myr; refused outside, never extrapolated.',
-    inputSchema: { type: 'object', properties: { ...TIME_PROPS, sections: { type: 'string', description: 'comma-list of h,lod,alpha,deltaT,siderealYearSeconds,moonDistanceKm,axialPrecessionYears (axialPrecessionYears = the DYNAMICAL epoch value; the lattice H/13 mean lives in essrt_derivations)' } } },
+    inputSchema: { type: 'object', properties: { ...TIME_PROPS, sections: { type: 'string', description: 'comma-list of h,lod,alpha,deltaT,siderealYearSeconds,tropicalYearSeconds,moonDistanceKm,axialPrecessionYears (axialPrecessionYears and tropicalYearSeconds = the one-family OF-DATE values inside ±2 Myr of J2000, the secular mean H(t)/13 and the tidal-chain mean year beyond; the J2000 identity lives in essrt_derivations)' } } },
     request: (/** @type {any} */ a) => ({ method: 'GET', path: `/${API_VERSION}/epoch`, query: queryOf(a) }),
     covers: ['/v1/epoch'],
   },

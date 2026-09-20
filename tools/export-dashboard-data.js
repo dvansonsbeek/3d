@@ -13,6 +13,14 @@ const fs = require('fs');
 const C = require('./lib/constants');
 const OE = require('./lib/orbital-engine');
 const DT = require('./lib/deep-time');
+// Plan 06 Phase 3 S2: the dashboard's year-length and precession traces are
+// the ONE published family — the one-family route (B), the Node engine's
+// instance of the package factory (SI days). The comb family stays the
+// device behind the day-length series (lodKinematic and its derivatives).
+const DOH = require('./lib/deep-orbital-history');
+const ONE_SOURCE = DOH.createOneSourceMovement();
+if (!ONE_SOURCE) throw new Error('export-dashboard-data: the one-source movement needs data/nbody-secular-series.json');
+const YL = ONE_SOURCE.yearLengths;
 
 const OUTPUT_DIR = path.join(__dirname, '..', 'dashboard', 'data');
 
@@ -96,9 +104,10 @@ function exportEarth(years) {
     // Relative deviations from mean (same amplitude, directly comparable)
     inclinationTiltRel.push(+integrals.component3.toFixed(6));
     axialTiltRel.push(+integrals.component8.toFixed(6));
-    tropicalYearDays.push(+el.solarYearDays.toFixed(10));
-    siderealYearDays.push(+el.siderealYearDays.toFixed(10));
-    precessionPeriod.push(+el.precession.toFixed(2));
+    // The published family (B), SI days / years; el.* (the comb family) stays the device behind the day series below.
+    tropicalYearDays.push(+(YL.tropicalYearSecondsAtYear(year) / 86400).toFixed(10));
+    siderealYearDays.push(+(YL.siderealYearSecondsAtYear(year) / 86400).toFixed(10));
+    precessionPeriod.push(+YL.axialPrecessionYearsAtYear(year).toFixed(2));
     erd.push(+el.erd.toFixed(8));
 
     // Day lengths — mirror the tweakpane's Layer 3 formulas exactly.
@@ -146,15 +155,12 @@ function exportEarth(years) {
     // still need to scale by the ratio of corrected LOD to raw tidal LOD.
     const lodRatio = (lodReal !== null && el.lengthOfDay > 0) ? lodReal / el.lengthOfDay : 1;
 
-    // Anomalistic year
-    anomalisticYearDays.push(+OE.computeLengthOfAnomalisticYearDays(year).toFixed(10));
-
-    // Precession variants (derived from axial precession).
-    // Year-in-seconds scales with LOD (a longer day → longer year in seconds).
-    const solarYearSec = el.solarYearDays * el.lengthOfDay * lodRatio;
-    const anomYearSec = OE.computeLengthOfAnomalisticYearDays(year) * el.lengthOfDay * lodRatio;
-    perihelionPrecession.push(+OE.computePerihelionPrecession(anomYearSec, solarYearSec).toFixed(2));
-    inclinationPrecession.push(+(el.precession * 13 / 3).toFixed(2));
+    // Anomalistic year and the precession beats — the published family (B).
+    anomalisticYearDays.push(+(YL.anomalisticYearSecondsAtYear(year) / 86400).toFixed(10));
+    perihelionPrecession.push(+YL.perihelionPrecessionYearsAtYear(year).toFixed(2));
+    inclinationPrecession.push(+YL.inclinationPrecessionYearsAtYear(year).toFixed(2));
+    // The ecliptic (nodal) precession has no of-date evaluator in the family:
+    // the H/5 identity on the device beat, as before.
     eclipticPrecession.push(+(el.precession * 13 / 5).toFixed(2));
 
     // Cardinal points (SS, WS, VE, AE)

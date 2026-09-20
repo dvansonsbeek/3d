@@ -12,11 +12,15 @@
  * derived from the shared constants (two-body point-mass torques with the
  * (1 − e²)^(−3/2) eccentricity factors and the lunar-inclination factor
  * 1 − 3/2·sin² i_M; ≈ 0.316, the textbook value). At J2000 every factor is 1.
- * The STRUCTURAL clock 13·1,296,000/H(t) (pure ω-scaling) is the pre-D6
- * reading kept as a named diagnostic: the two agree wherever (a₀/a_M)³ ≈ 1
- * and split at depth (Wu et al. 2024 at 650 Ma: 67.64 ″/yr inferred —
- * composed 67.8, structural 58.6; Lantink et al. 2022 at 2.46 Ga:
- * 108.6 ± 8.5 ″/yr — composed 104.5, structural 70.9).
+ * Plan 06 Phase 3: the unit H(t) IS 13 of these periods at every epoch
+ * (deltat/deep-time.cjs hAtAge builds on this factory), so H(t)/13 and the
+ * composed period are one quantity. The pre-Phase-3 structural clock
+ * 13·1,296,000/H_era(t) (pure ω-scaling, H_era = H₀·LOD/LOD₀) survives only
+ * as the FROZEN ERA CLOCK's named phase convention (eraClockHAtAge) and in
+ * docs/retired-record.md, with its record: it read 70.9 ″/yr against
+ * Lantink et al. 2022's 108.6 ± 8.5 at 2.46 Ga and 65.2 against Meyers &
+ * Malinverno 2018's 85.79 ± 2.72 at 1.4 Ga, where the composed rate reads
+ * 104.5 and 86.5.
  *
  * Pure factory: the tidal chain is injected (each runtime's own LOD and
  * moon-distance evaluators), no artifact reads, no globals.
@@ -49,18 +53,16 @@ function computeSolarTorqueShare(c) {
  *   lodJ2000Seconds: number,
  *   moonDistanceMetresAtAge: (tMa: number) => (number | null),
  *   moonDistanceJ2000Metres: number,
- *   hAtAge: (tMa: number) => (number | null),
  *   yearToTMa: (year: number) => number,
  * }} deps - p0 = 1,296,000/(H/13) (the model's J2000 rate); lodJ2000Seconds
- *   the SAME day basis lodSecondsAtAge(0) returns; hAtAge only for the
- *   structural diagnostic.
+ *   the SAME day basis lodSecondsAtAge(0) returns.
  * @returns {{
  *   composedRateArcsecPerYrAtAge: (tMa: number) => (number | null),
  *   composedPeriodYearsAtAge: (tMa: number) => (number | null),
  *   composedRateArcsecPerYrAtYear: (year: number) => (number | null),
  *   composedPeriodYearsAtYear: (year: number) => (number | null),
  *   composedRateRatioAtAge: (tMa: number) => (number | null),
- *   structuralRateArcsecPerYrAtAge: (tMa: number) => (number | null),
+ *   torqueTermAtAge: (tMa: number) => (number | null),
  *   lunarTorqueFactorAtAge: (tMa: number) => (number | null),
  *   solarShare: number,
  *   p0ArcsecPerYr: number,
@@ -73,12 +75,20 @@ function createComposedPrecession(deps) {
     const a = deps.moonDistanceMetresAtAge(tMa);
     return a === null || !(a > 0) ? null : Math.pow(deps.moonDistanceJ2000Metres / a, 3);
   };
+  /** The torque term f_S + (1 − f_S)·(a₀/a_M)³ — the factor the unit H(t)
+   * divides the spin-scaled H_era by (deltat/deep-time.cjs; layer0 spells the
+   * SAME operations, the layer0 gate holds them bit-identical).
+   * @param {number} tMa */
+  const torqueTermAtAge = (tMa) => {
+    const lf = lunarTorqueFactorAtAge(tMa);
+    return lf === null ? null : fS + (1 - fS) * lf;
+  };
   /** @param {number} tMa */
   const composedRateArcsecPerYrAtAge = (tMa) => {
     const lod = deps.lodSecondsAtAge(tMa);
-    const lf = lunarTorqueFactorAtAge(tMa);
-    if (lod === null || !(lod > 0) || lf === null) return null;
-    return (deps.lodJ2000Seconds / lod) * p0 * (fS + (1 - fS) * lf);
+    const term = torqueTermAtAge(tMa);
+    if (lod === null || !(lod > 0) || term === null) return null;
+    return (deps.lodJ2000Seconds / lod) * p0 * term;
   };
   /** @param {number} tMa */
   const composedPeriodYearsAtAge = (tMa) => {
@@ -94,18 +104,13 @@ function createComposedPrecession(deps) {
     const r = composedRateArcsecPerYrAtAge(tMa);
     return r === null ? null : r / p0;
   };
-  /** @param {number} tMa */
-  const structuralRateArcsecPerYrAtAge = (tMa) => {
-    const H = deps.hAtAge(tMa);
-    return H === null || !(H > 0) ? null : 1296000 / (H / 13);
-  };
   return {
     composedRateArcsecPerYrAtAge,
     composedPeriodYearsAtAge,
     composedRateArcsecPerYrAtYear: (year) => composedRateArcsecPerYrAtAge(deps.yearToTMa(year)),
     composedPeriodYearsAtYear: (year) => composedPeriodYearsAtAge(deps.yearToTMa(year)),
     composedRateRatioAtAge,
-    structuralRateArcsecPerYrAtAge,
+    torqueTermAtAge,
     lunarTorqueFactorAtAge,
     solarShare: fS,
     p0ArcsecPerYr: p0,

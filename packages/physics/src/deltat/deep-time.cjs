@@ -36,6 +36,8 @@
 
 'use strict';
 
+const { createComposedPrecession } = require('../earth/precession-composed.cjs');
+
 /**
  * @typedef {Object} DeepTimeLodConstants
  * @property {number} lTotalEmKgm2S - Earth–Moon total angular momentum
@@ -53,6 +55,8 @@
  * @property {number} meanSiderealYearJ2000Seconds
  * @property {number} solarMassLossFracPerYear
  * @property {number} siderealYearDaysKinematicJ2000 - Actual-LOD numerator
+ * @property {number} precessionSolarShareJ2000 - f_S, the solar fraction of the J2000
+ *   precession torque (derive-params) — the unit H(t) = 13·T_p,composed needs it
  */
 
 /**
@@ -100,12 +104,49 @@ function createDeepTimeLod(deps) {
     return (s === null) ? null : s / 3600;
   }
 
-  /** H(t) via the H/13 identity: H(t) = H_J2000 · LOD(t)/LOD_J2000.
+  /** The FROZEN ERA CLOCK's phase convention: H_era(t) = H_J2000 · LOD(t)/LOD_J2000
+   * (pure spin scaling — the pre-Phase-3 "H/13 identity"). The frozen devices
+   * (the cardinal era clock, the year-length comb family, the ∫dt/H phase
+   * table) were fitted against THIS counter; it ships with their coefficients
+   * as a named device constant (plan 06 D8: two named counters). It is NOT
+   * the unit H(t) below.
    * @param {number} t_Ma @returns {number|null} */
-  function hAtAge(t_Ma) {
+  function eraClockHAtAge(t_Ma) {
     const LOD_s = lodSecondsAtAge(t_Ma);
     if (LOD_s === null) return null;
     return K.holisticYearJ2000 * LOD_s / K.lodNowH13Seconds;
+  }
+
+  // The unit H(t) ≡ 13 × the composed lunisolar precession period (plan 06
+  // D6 → Phase 3): ψ̇(t) = [ω(t)/ω₀]·p₀·[f_S + (1 − f_S)(a₀/a_M(t))³], p₀ =
+  // 1,296,000/(H₀/13). ONE formula home: earth/precession-composed, built
+  // here on this factory's own LOD and recession history.
+  const composed = createComposedPrecession({
+    p0ArcsecPerYr: 1296000 / (K.holisticYearJ2000 / 13),
+    solarShare: K.precessionSolarShareJ2000,
+    lodSecondsAtAge,
+    lodJ2000Seconds: K.lodNowH13Seconds,
+    moonDistanceMetresAtAge: deps.moonDistanceMetresAtAge,
+    moonDistanceJ2000Metres: K.aMoonNowMetres,
+    yearToTMa: /** @param {number} year */ (year) => (2000 - year) / 1e6,
+  });
+
+  /** The unit H(t) = 13·T_p,composed(t) — H is 13 lunisolar precession periods
+   * at every epoch (plan 06: H is a UNIT). Written as H_era / [f_S + (1 − f_S)
+   * (a₀/a_M)³] — algebraically 13·1,296,000/ψ̇_composed, spelled in the SAME
+   * operations as layer0's holisticHCore so the layer0 gate holds the twins
+   * bit-identical (13·T_p differs by one ULP). ≡ H_era wherever (a₀/a_M)³ ≈ 1.
+   * @param {number} t_Ma @returns {number|null} */
+  function hAtAge(t_Ma) {
+    const hEra = eraClockHAtAge(t_Ma);
+    const term = composed.torqueTermAtAge(t_Ma);
+    return hEra === null || term === null ? null : hEra / term;
+  }
+
+  /** The composed lunisolar precession rate, ″/yr (= 1,296,000·13/H(t)).
+   * @param {number} t_Ma @returns {number|null} */
+  function lunisolarPrecessionRateArcsecPerYrAtAge(t_Ma) {
+    return composed.composedRateArcsecPerYrAtAge(t_Ma);
   }
 
   /** Sidereal year seconds (Kepler under linear mass loss, dT/T = −2 dM/M).
@@ -143,6 +184,26 @@ function createDeepTimeLod(deps) {
     const LOD_s = lodSecondsAtAge(t_Ma);
     if (LOD_s === null) return null;
     return tropicalYearSecondsAtAge(t_Ma) / LOD_s;
+  }
+
+  // ── The frozen era clock's twins (device tier) ──────────────────────────
+  // The same forms on H_era — the bases the frozen cardinal clock (its drift
+  // integrand and real-LOD convention) and the year-length comb family were
+  // fitted against. Bit-identical to the pre-Phase-3 tropicalYearSecondsAtAge /
+  // yearInDaysAtAge; the physical (unit) forms above are what the model
+  // publishes.
+  /** @param {number} t_Ma @returns {number} */
+  function eraClockTropicalYearSecondsAtAge(t_Ma) {
+    const sidSec = siderealYearSecondsAtAge(t_Ma);
+    const Ht = eraClockHAtAge(t_Ma);
+    if (Ht === null) return sidSec * (1 - 13 / K.holisticYearJ2000);
+    return sidSec * (1 - 13 / Ht);
+  }
+  /** @param {number} t_Ma @returns {number|null} */
+  function eraClockYearInDaysAtAge(t_Ma) {
+    const LOD_s = lodSecondsAtAge(t_Ma);
+    if (LOD_s === null) return null;
+    return eraClockTropicalYearSecondsAtAge(t_Ma) / LOD_s;
   }
 
   /**
@@ -270,9 +331,12 @@ function createDeepTimeLod(deps) {
 
   return {
     lodSecondsAtAge, lodSecondsAtAgeWithAlpha, lodHoursAtAge, hAtAge,
+    lunisolarPrecessionRateArcsecPerYrAtAge,
     siderealYearSecondsAtAge, tropicalYearSecondsAtAge, tropicalYearDaysAtAge,
     yearInDaysAtAge, deltaTRawSecondsAtAge, lodSecondsWithCorrectionsAtAge,
     lodSecondsActualAtAge, dLodDtDecompositionAtAge,
+    // the frozen era clock's named counter and bases (device tier, plan 06 D8)
+    eraClockHAtAge, eraClockTropicalYearSecondsAtAge, eraClockYearInDaysAtAge,
   };
 }
 

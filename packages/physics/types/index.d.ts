@@ -19,7 +19,6 @@ export { createSecularSeriesOverride } from "./planets/secular-series.cjs";
 export { createDeepEccChannel } from "./moon/deep-ecc-channel.cjs";
 export { createDeepOrbitalHistory } from "./earth/deep-orbital-history.cjs";
 export { createSiderealYearChannel } from "./earth/sidereal-year-channel.cjs";
-export { createYearLengths } from "./earth/year-lengths.cjs";
 export { createPlanetModel } from "./planets/model.cjs";
 export { createDeltaTCycles } from "./deltat/cycles.cjs";
 export { createDeepTimeLod } from "./deltat/deep-time.cjs";
@@ -72,6 +71,7 @@ export { buildPlanetChainsFromArtifactData, computePlanetElementsAtYear, compute
 export { computeEquatorNodeOriginSFrameDeg, convertNodeSFrameToEquatorOriginDeg } from "./planets/inv-plane-frame.cjs";
 export { CHAIN_ARTIFACT, CHAIN_ARTIFACT_HASH } from "./planets/chain-artifact.js";
 export { DEEP_MODES_ARTIFACT, DEEP_MODES_ARTIFACT_HASH } from "./moon/deep-modes-artifact.cjs";
+export { createYearLengths, ONE_FAMILY_WINDOW_YEARS } from "./earth/year-lengths.cjs";
 export { computeSolarTorqueShare, createComposedPrecession } from "./earth/precession-composed.cjs";
 export { createPredictivePrecession, calcPlanetPerihelionLongDeg } from "./planets/predict.cjs";
 export { createMoonRecessionHistory, createSolarChannelBudget } from "./deltat/recession-history.cjs";

@@ -757,9 +757,11 @@ const deepTimeOn = () => process.env.SG_DEEP_TIME !== '0';
 // with 13 + 3 = 16: the climatic precession H/16 is their SUM, which is why the
 // cardinal points braid on H/16.
 function analyticYearDaysAt(kind, year) {
+  // The comb family's analytic bases ride the FROZEN era clock's counter
+  // H_era (plan 06 D8) — the combs were fitted on them; not the unit H(t).
   const t_Ma = (C.startmodelYear - year) / 1e6;
   const sidSec = dtm().meanSiderealYearSecondsAtAge(t_Ma);
-  const Ht = dtm().meanHAtAge(t_Ma);
+  const Ht = dtm().eraClockHAtAge(t_Ma);
   if (sidSec === null || Ht === null) return null;
   const sid = sidSec / 86400;
   if (kind === 'sidereal')    return sid;
@@ -1023,9 +1025,10 @@ function _cardinal() {
     },
     fns: {
       cyclesBetween: (a, b, n) => dtm().cyclesBetweenYears(a, b, n),
+      // the frozen era clock's deps ride ITS counter H_era (plan 06 D8)
       analyticTropicalDays: (year) => analyticYearDaysAt('tropical', year),
-      meanHAtAgeMa: (t_Ma) => dtm().meanHAtAge(t_Ma),
-      meanYearRealLodDays: (t_Ma) => dtm().meanYearInDaysAtAge(t_Ma),
+      meanHAtAgeMa: (t_Ma) => dtm().eraClockHAtAge(t_Ma),
+      meanYearRealLodDays: (t_Ma) => dtm().eraClockYearInDaysAtAge(t_Ma),
       eccentricityAt: computeEccentricityEarth,
       // One eccentricity law (unification): the EoC derivative comes from the
       // same channel as the value — no separate H/16 derivative anywhere.

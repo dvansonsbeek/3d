@@ -56,7 +56,8 @@ const toolCall = (name, args) => {
   /** @type {Array<[string, object|undefined, (data: any) => string|null]>} */
   const QUERIES = [
     ['essrt_versions', undefined, (d) => (d.current ? null : 'no current version')],
-    ['essrt_epoch', { year: -379998000 }, (d) => (Math.round(d.epochs[0].h) === 306189 ? null : `Devonian H: ${d.epochs[0].h}`)],
+    // plan 06 Phase 3: H(t) is the UNIT = 13·T_p,composed (282,329 at −380 Ma; the spin-only clock read 306,189)
+    ['essrt_epoch', { year: -379998000 }, (d) => (Math.round(d.epochs[0].h) === 282329 ? null : `Devonian H: ${d.epochs[0].h}`)],
     ['essrt_epoch', { jd: 2451545 }, (d) => (Math.abs(d.epochs[0].h - 335317) < 1e-3 ? null : `H via jd: ${d.epochs[0].h}`)],
     ['essrt_cardinal_points', { year: 2000, types: 'SS' }, (d) => (Math.abs(d.years[0].points.SS.jd - 2451716.575) < 0.1 ? null : `SS JD: ${d.years[0].points.SS.jd}`)],
     ['essrt_earth', { year: 2000 }, (d) => (Math.abs(d.years[0].obliquityDeg - 23.4393) < 0.0002 ? null : `obliquity: ${d.years[0].obliquityDeg}`)],

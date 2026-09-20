@@ -45,7 +45,7 @@ epochs, Meyers–Malinverno 2018 and Nanfen 2023 — see
 
 Flagship: Wells's Devonian 400 days/yr vs the model's
 <!--v:daysPerYearAtDevonian-->399.96<!--/v--> (H at 380 Ma =
-<!--v:hAtDevonian-->306,189<!--/v--> yr, vs <!--v:H-->335,317<!--/v--> at
+<!--v:hAtDevonian-->282,329<!--/v--> yr, vs <!--v:H-->335,317<!--/v--> at
 J2000) — with **zero free parameters** in the H/13 coupling: the deep-time
 trajectory is calibrated to Farhat 2022 and the modern LLR recession rate,
 never to the fossil data it is tested against.

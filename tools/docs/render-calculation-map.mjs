@@ -130,30 +130,35 @@ function blockTorqueSplit() {
 function blockTidalClock() {
   const s = torqueSplit();
   const rows = [
-    '| age (Ma) | a_M (km) | LOD (h) | ω/ω₀ = LOD₀/LOD | α (I/MR²) | H(t) (yr) | H(t)/13 (yr) | structural ψ̇ = p₀·ω/ω₀ (″/yr) | (a₀/a)³ | composed ψ̇ (″/yr) |',
+    '| age (Ma) | a_M (km) | LOD (h) | ω/ω₀ = LOD₀/LOD | α (I/MR²) | H_era(t) = H₀·LOD/LOD₀ (yr) — the frozen era clock’s counter | (a₀/a)³ | **H(t) = 13·T_p, the unit (yr)** | T_p = H(t)/13 (yr) | ψ̇ = 1,296,000/T_p (″/yr) |',
     '|---|---|---|---|---|---|---|---|---|---|',
   ];
   for (const t of [0, 0.01, 0.1, 1, 10, 100, 380, 650, 1400, 2460]) {
-    const a = DT.meanMoonDistanceMetresAtAge(t), lod = DT.meanLodSecondsAtAge(t), al = DT.earthMoiFactorAtAge(t), H = DT.meanHAtAge(t);
+    const a = DT.meanMoonDistanceMetresAtAge(t), lod = DT.meanLodSecondsAtAge(t), al = DT.earthMoiFactorAtAge(t);
+    const H = DT.meanHAtAge(t), Hera = DT.eraClockHAtAge(t);
     const w = DT.LOD_NOW_H13_S / lod, lf = Math.pow(DT.A_MOON_NOW_M / a, 3);
-    const pc = DT.composedPrecessionRateArcsecPerYrAtAge(t);   // the ONE home's value (plan 06 D6)
+    const pc = DT.meanLunisolarPrecessionRateArcsecPerYrAtAge(t);   // the ONE home's value
     if (Math.abs(pc - w * s.p0 * (s.fS + (1 - s.fS) * lf)) > 1e-9) throw new Error(`composed ψ̇ twin diverged at ${t} Ma`);
-    rows.push(`| ${t} | ${f(a / 1000, 0)} | ${f(lod / 3600, 3)} | ${f(w, 5)} | ${f(al, 6)} | ${f(H, 0)} | ${f(H / 13, 1)} | ${f(s.p0 * w, 2)} | ${f(lf, 4)} | ${f(pc, 2)} |`);
+    if (Math.abs(H - 13 * 1296000 / pc) > 1e-6) throw new Error(`the unit H(t) ≠ 13·T_p at ${t} Ma`);
+    rows.push(`| ${t} | ${f(a / 1000, 0)} | ${f(lod / 3600, 3)} | ${f(w, 5)} | ${f(al, 6)} | ${f(Hera, 0)} | ${f(lf, 4)} | **${f(H, 0)}** | ${f(H / 13, 1)} | ${f(pc, 2)} |`);
   }
   rows.push('');
-  rows.push('The last column is the SHIPPED leg-1 rate (plan 06 D6; `@essrt/physics/earth/precession-composed`, one home — the hybrid precesses on it, the paleo-anchors gate checks it). External readings: IAU J2000 50.288 ″/yr (measured); Wu et al. 2024 at 650 Ma 67.64 ″/yr; Meyers & Malinverno 2018 at 1400 Ma 85.79 ± 2.72 ″/yr; Lantink et al. 2022 at 2460 Ma 108.6 ± 8.5 ″/yr (all three cyclostratigraphic inferences through an assumed astronomical model — theory-vs-inference, doc 99; the last two are gate rows `xiamaling-prec-1400` / `lantink-prec-2460`).');
+  rows.push('H(t) is the UNIT — 13 composed lunisolar precession periods at every epoch (plan 06 D6 → Phase 3; `@essrt/physics/earth/precession-composed` built inside `deltat/deep-time.cjs`, one home — the hybrid precesses on it, the paleo-anchors gate checks the last column). H_era is the FROZEN era clock’s own phase convention (pure spin scaling, the pre-Phase-3 "H/13 identity"), shipped with the frozen coefficients as a named device constant (D8: two named counters), not a physical claim. External readings for the last column: IAU J2000 50.288 ″/yr (measured); Wu et al. 2024 at 650 Ma 67.64 ″/yr; Meyers & Malinverno 2018 at 1400 Ma 85.79 ± 2.72 ″/yr; Lantink et al. 2022 at 2460 Ma 108.6 ± 8.5 ″/yr (all three cyclostratigraphic inferences through an assumed astronomical model — theory-vs-inference, doc 99; the last two are gate rows `xiamaling-prec-1400` / `lantink-prec-2460`).');
   return rows.join('\n');
 }
 
 function blockOfDatePrecession() {
   const one = DOH.createOneSourceMovement();
   const rows = [
-    '| year | T_p (A) comb pair (yr) | p (A) (″/yr) | T_p (B) one-family (yr) | p (B) (″/yr) | (A) − (B) (yr) | H(t)/13 (yr) | ε, hybrid (°) |',
+    '| year | T_p (A) comb pair (yr) — the frozen device | p (A) (″/yr) | **T_p (B) one-family (yr) — PUBLISHED** (`epoch.axialPrecessionYearsAtYear`, API/MCP) | p (B) (″/yr) | (A) − (B) (yr) | H(t)/13 (yr), the unit’s mean | ε, hybrid (°) |',
     '|---|---|---|---|---|---|---|---|',
   ];
   for (const y of [-10000, -2584, -584, 0, 1246, 2000, 5000, 10000]) {
-    const a = m.epoch.axialPrecessionYearsAtYear(y), b = m.yearLengths.axialPrecessionYearsAtYear(y);
-    rows.push(`| ${y} | ${f(a, 2)} | ${f(1296000 / a, 4)} | ${f(b, 2)} | ${f(1296000 / b, 4)} | ${f(a - b, 2)} | ${f(m.epoch.hAtYear(y) / 13, 1)} | ${f(one ? one.epsDeg(y) : null, 5)} |`);
+    // (A) computed from the device family explicitly — the epoch surface publishes (B) since Phase 3 S2
+    const sidA = m.lengths.siderealYearDays(y), a = sidA / (sidA - m.lengths.tropicalYearDirectDays(y));
+    const b = m.yearLengths.axialPrecessionYearsAtYear(y);
+    if (b !== m.epoch.axialPrecessionYearsAtYear(y)) throw new Error(`epoch.axialPrecessionYearsAtYear ≠ the one-family beat inside the window at ${y}`);
+    rows.push(`| ${y} | ${f(a, 2)} | ${f(1296000 / a, 4)} | **${f(b, 2)}** | ${f(1296000 / b, 4)} | ${f(a - b, 2)} | ${f(m.epoch.hAtYear(y) / 13, 1)} | ${f(one ? one.epsDeg(y) : null, 5)} |`);
   }
   return rows.join('\n');
 }
@@ -182,7 +187,7 @@ function blockJ2000Identities() {
 
 function blockYearLengthsOfDate() {
   const rows = [
-    '| year | sid (A) comb (d) | sid (B) one-family (d) | trop (A) comb (d) | trop (A′) cardinal (d) | trop (B) one-family (d) | anom (A) comb (d) | anom (B) one-family (d) |',
+    '| year | sid (A) comb (d) — device | **sid (B) one-family (d) — published** | trop (A) comb (d) — device | trop (A′) cardinal (d) — device | **trop (B) one-family (d) — published** | anom (A) comb (d) — device | **anom (B) one-family (d) — published** |',
     '|---|---|---|---|---|---|---|---|',
   ];
   for (const y of [-10000, -2584, -584, 0, 1246, 2000, 5000, 10000]) {
@@ -241,22 +246,18 @@ function blockObliquityBeat() {
   const z = require(join(ROOT, 'data/nbody-deep-secular-modes.json')).modes.earth.zeta
     .filter((x) => Math.abs(x.omegaRadPerYr) > 1e-9).sort((a, b) => Math.hypot(b.re, b.im) - Math.hypot(a.re, a.im))[0];
   const s3 = Math.abs(z.omegaRadPerYr * 180 / Math.PI) * 3600;
-  const sid0 = DT.meanSiderealYearSecondsAtAge(0.000001), trop0 = DT.meanTropicalYearSecondsAtAge(0.000001);
-  const pCert0 = 1296000 / (sid0 / (sid0 - trop0));   // the certified J2000 of-date beat — the hybrid's anchor
   const rows = [
-    '| age (Ma) | T_p(t) from the tidal-mean year pair (yr) | H(t)/13 (yr) | ψ̇ structural = 1,296,000/T_p (″/yr) | ψ̇ composed, chain 2.3 (″/yr) | ψ̇(t)/ψ̇₀ composed | beat on structural ψ̇ (kyr) — `obliqBeatStructural*Kyr`, the pre-D6 reading | beat on composed ψ̇ (kyr) — the SHIPPED `obliqBeat*Kyr` form | T_p·13/8 (kyr) — `obliqH8Scaled*Kyr` |',
-    '|---|---|---|---|---|---|---|---|---|',
+    '| age (Ma) | T_p(t) = H(t)/13, the unit’s period (yr) | T_p from the tidal-mean year pair (yr) | ψ̇ = 1,296,000/T_p (″/yr) | H_era(t)/13 (yr) — the frozen clock’s counter, for the record | beat 2π/(ψ̇ − \\|s₃\\|) (kyr) — the SHIPPED `obliqBeat*Kyr` form | T_p·13/8 (kyr) — "obliquity period ∝ T_p", `obliqH8Scaled*Kyr` |',
+    '|---|---|---|---|---|---|---|',
   ];
   for (const t of [0, 380, 650, 1400, 2460]) {
     const sid = DT.meanSiderealYearSecondsAtAge(t), trop = DT.meanTropicalYearSecondsAtAge(t);
-    const Tp = sid / (sid - trop), ps = 1296000 / Tp;
-    const pc = DT.composedPrecessionRateArcsecPerYrAtAge(t), ratio = DT.composedPrecessionRateRatioAtAge(t);
-    if (Math.abs(ratio - pc / s.p0) > 1e-12) throw new Error(`composed ratio twin diverged at ${t} Ma`);
-    // the shipped beat: the certified J2000 anchor scaled by the composed ratio — exactly the hybrid's injection
-    rows.push(`| ${t} | ${f(Tp, 3)} | ${f(DT.meanHAtAge(t) / 13, 3)} | ${f(ps, 3)} | ${f(pc, 3)} | ${f(ratio, 5)} | ${f(1296000 / (ps - s3) / 1000, 2)} | ${f(1296000 / (pCert0 * ratio - s3) / 1000, 2)} | ${f(Tp * 13 / 8 / 1000, 2)} |`);
+    const TpPair = sid / (sid - trop), Tp = DT.meanHAtAge(t) / 13, pc = DT.meanLunisolarPrecessionRateArcsecPerYrAtAge(t);
+    if (Math.abs(TpPair - Tp) > 1e-6 || Math.abs(pc - 1296000 / Tp) > 1e-9) throw new Error(`T_p twins diverged at ${t} Ma`);
+    rows.push(`| ${t} | ${f(Tp, 3)} | ${f(TpPair, 3)} | ${f(pc, 3)} | ${f(DT.eraClockHAtAge(t) / 13, 3)} | ${f(1296000 / (pc - s3) / 1000, 2)} | ${f(Tp * 13 / 8 / 1000, 2)} |`);
   }
   rows.push('');
-  rows.push(`s₃ = the dominant Earth ζ mode of data/nbody-deep-secular-modes.json = ${f(-s3, 4)} ″/yr (amplitude ${f(Math.hypot(z.re, z.im), 5)}); beat = 1,296,000/(ψ̇ − |s₃|) yr. Plan 06 D6: the SHIPPED leg-1 ψ̇(t) is the composed rate — registry keys \`obliqBeatJ2000Kyr\`/\`obliqBeat1400MaKyr\`/\`obliqBeat2460MaKyr\` are the eighth column (the certified J2000 anchor ${f(pCert0, 4)} ″/yr × the composed ratio — the same scaling the hybrid precesses on); the \`obliqBeatStructural*Kyr\` twins are the seventh (the pre-D6 reading, kept as the named diagnostic). Both in tools/docs/model-values.mjs, "the obliquity band as the beat".`);
+  rows.push(`s₃ = the dominant Earth ζ mode of data/nbody-deep-secular-modes.json = ${f(-s3, 4)} ″/yr (amplitude ${f(Math.hypot(z.re, z.im), 5)}); beat = 1,296,000/(ψ̇ − |s₃|) yr. Plan 06 D6 → Phase 3: ψ̇(t) is the composed lunisolar rate and the unit H(t) is 13 of its periods, so the tidal-mean year pair's beat, H(t)/13 and the composed period are ONE quantity (asserted per row). Registry keys \`obliqBeatJ2000Kyr\`/\`obliqBeat1400MaKyr\`/\`obliqBeat2460MaKyr\` are the sixth column; \`obliqH8Scaled*Kyr\` (name kept) is the seventh, the pure precession-scaling alternative "obliquity period ∝ T_p" the beat is discriminated against (D8 iii). The pre-Phase-3 "structural" beat on H_era/13 is recorded in docs/retired-record.md.`);
   return rows.join('\n');
 }
 
@@ -311,11 +312,12 @@ function cardinalRebuilds() {
     },
     fns: {
       cyclesBetween: (/** @type {number} */ a, /** @type {number} */ b, /** @type {number} */ n) => m.epoch.cyclesBetween(a, b, n),
+      // the frozen era clock's deps ride ITS counter H_era (plan 06 D8) — as model.js injects them
       analyticTropicalDays: (/** @type {number} */ year) => {
-        const tMa = (2000.5 - year) / 1e6, Ht = DT.meanHAtAge(tMa);
+        const tMa = (2000.5 - year) / 1e6, Ht = DT.eraClockHAtAge(tMa);
         return Number.isFinite(Ht) ? (DT.meanSiderealYearSecondsAtAge(tMa) / 86400) * (1 - 13 / Ht) : null;
       },
-      meanHAtAgeMa: (/** @type {number} */ tMa) => DT.meanHAtAge(tMa),
+      meanHAtAgeMa: (/** @type {number} */ tMa) => DT.eraClockHAtAge(tMa),
       meanYearRealLodDays: () => null,
       eccentricityAt: (/** @type {number} */ y) => m.earth.eccentricity(y),
       eccentricityRateAt: () => 0,

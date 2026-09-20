@@ -788,7 +788,7 @@ The framework's invariants are:
 3. The closure of the 8H lattice (with appropriate paleo-correction)
 
 The framework's epoch-dependent quantities:
-1. The specific value of H (<!--v:H-->335,317<!--/v--> yr now, ≈ <!--v:hAtDevonian-->306,189<!--/v--> yr in Devonian — see doc 99 § "Proper-physics LOD formula")
+1. The specific value of H (<!--v:H-->335,317<!--/v--> yr now, ≈ <!--v:hAtDevonian-->282,329<!--/v--> yr in Devonian — see doc 99 § "Proper-physics LOD formula")
 2. The specific value of 8H (2.68 Myr now, ≈ 2.450 Myr in Devonian)
 3. The specific L1 integer labels (n=65 for obliquity main now, n=68
    in Devonian — i.e., the obliquity period shifts to a different lattice integer at deep time)

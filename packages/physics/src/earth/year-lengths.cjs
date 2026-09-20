@@ -113,4 +113,15 @@ function createYearLengths({ sampleAt, massLossSiderealSecondsAtYearFn, apsidalS
   });
 }
 
-module.exports = { createYearLengths };
+/**
+ * The published of-date window (plan 06 Phase 3 S2): inside |year − 2000| ≤
+ * this span the one-family route is THE published year-length / precession
+ * family (the banked tiers — 100-yr and 1000-yr grids, no unbounded sampler
+ * growth); beyond it the published surfaces return the unit's SECULAR mean
+ * (H(t)/13 for the precession period, the tidal-chain mean year), because the
+ * of-date wobble is unresolved there and the deep sampler grows ~0.1 s per Myr
+ * of span. A displayed rate must name its window — this is the window.
+ */
+const ONE_FAMILY_WINDOW_YEARS = 2000000;
+
+module.exports = { createYearLengths, ONE_FAMILY_WINDOW_YEARS };

@@ -246,14 +246,20 @@ pre-registered legs: (1) **the deep-time scaling split** — the axial
 precession must follow the COMPOSED lunisolar rate
 ψ̇(t) = [ω(t)/ω₀]·p₀·[f_S + (1 − f_S)(a₀/a_M(t))³] (spin from the recession
 history, the lunar torque growing on the Moon's distance; ONE home
-`@essrt/physics/earth/precession-composed`, plan 06 D6 — the structural
-H(t)/13 clock is its named diagnostic and reads ~35 % low at 2.46 Ga),
-**the obliquity band must follow the beat 2π/(ψ̇(t) − |s₃|)** (ψ̇ the
-composed rate; s₃ at its dynamical value under the measured solar-mass
-history — the beat and the pure H/8 reading are degenerate today and split
-to roughly half the H/8 value at 2.46 Ga, registry keys
-`obliqBeat*Kyr`/`obliqBeatStructural*Kyr`/`obliqH8Scaled*Kyr`, doc 109
-§18), while the long-eccentricity band stays at its modern class (scaled
+`@essrt/physics/earth/precession-composed`, and **H(t) is the UNIT: 13 of
+these periods at every epoch** — `hAtAge` in `deltat/deep-time.cjs`, plan
+06 D6/Phase 3), **the obliquity band must follow the beat
+2π/(ψ̇(t) − |s₃|)** (s₃ at its dynamical value under the measured
+solar-mass history — degenerate today with the pure precession-scaling
+reading "obliquity period ∝ T_p", roughly a factor two apart at 2.46 Ga;
+registry keys `obliqBeat*Kyr` / `obliqH8Scaled*Kyr` (name kept), doc 109
+§18). **Two named counters** (plan 06 D8): the FROZEN era clock, the
+year-length comb family and the ∫dt/H phase table ride their own fitted
+convention `eraClockHAtAge` = H₀·LOD/LOD₀ (pure spin scaling, the
+pre-Phase-3 "H/13 identity", shipped with their coefficients as a device
+constant — `docs/retired-record.md` carries the retired claim: it read
+~35 % low against Lantink 2022 at 2.46 Ga); never call it H(t). The
+long-eccentricity band stays at its modern class (scaled
 only by the measured solar-mass history); every newly dated Precambrian
 cyclostratigraphic section tests these halves (the precession side is
 GATED at 1.4 and 2.46 Ga — paleo-anchors rows `xiamaling-prec-1400` /

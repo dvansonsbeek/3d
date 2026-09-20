@@ -22,9 +22,8 @@ import * as FL from './planets/fibonacci-laws.cjs';
 import * as planetOrientation from './planets/orientation.cjs';
 import { createPhaseMachinery } from './phase/index.cjs';
 import { createCardinalModel } from './cardinal/index.cjs';
-import { createYearLengths } from './earth/year-lengths.cjs';
+import { createYearLengths, ONE_FAMILY_WINDOW_YEARS } from './earth/year-lengths.cjs';
 import { createDeepOrbitalHistory } from './earth/deep-orbital-history.cjs';
-import { computeSolarTorqueShare, createComposedPrecession } from './earth/precession-composed.cjs';
 import { CHAIN_ARTIFACT } from './planets/chain-artifact.js';
 import { buildPlanetChainsFromArtifactData, computeApsidalSecularDegPerYr } from './planets/keplerian-chain.cjs';
 import { createDeltaTCycles } from './deltat/cycles.cjs';
@@ -191,6 +190,11 @@ export function assembleModel(C, F, laws = {}, secularSeriesArtifact = /** @type
     moonDistanceKm,
     moonOrbitalEccentricity: C.moonReference.moonOrbitalEccentricityBase,
     gmEarthMoonSystemKm3S2: GM_EARTH_MOON_SYSTEM,
+    // the solar precession torque's inputs (plan 06 Phase 3: the unit H(t) = 13·T_p,composed)
+    gmSunKm3S2: GM_SUN,
+    astronomicalUnitKm: currentAUDistance,
+    earthOrbitalEccentricityJ2000: C.earthOrbital.earthEccentricityJ2000,
+    moonEclipticInclinationJ2000Deg: C.moonReference.moonEclipticInclinationJ2000,
   });
 
   // ── Driver 1½: regime-aware recession history + the solar channels ────────
@@ -277,6 +281,7 @@ export function assembleModel(C, F, laws = {}, secularSeriesArtifact = /** @type
       meanSiderealYearJ2000Seconds: meanSiderealYearSeconds,
       solarMassLossFracPerYear: EPOCH_PARAMS.solarMassLossFracPerYear,
       siderealYearDaysKinematicJ2000: meanSiderealYearDaysKinematic,
+      precessionSolarShareJ2000: EPOCH_PARAMS.precessionSolarShareJ2000,
     },
     moonDistanceMetresAtAge,
     moiFactorAtAge: earthMoiFactorAtAge,
@@ -288,8 +293,12 @@ export function assembleModel(C, F, laws = {}, secularSeriesArtifact = /** @type
   });
 
   // ── Integrated ∫1/H(t)dt phase (R2 α-pin honoured while building) ─────────
+  // The phase counter every FROZEN comb reads rides the frozen era clock's
+  // own convention H_era = H₀·LOD/LOD₀ (plan 06 D8: two named counters — the
+  // coefficients were fitted against this counter and ship with it), NOT the
+  // unit H(t) = 13·T_p,composed that the physics publishes.
   const phaseM = createPhaseMachinery({
-    holisticHAtAgeMa: (tMa) => deepLod.hAtAge(tMa),
+    holisticHAtAgeMa: (tMa) => deepLod.eraClockHAtAge(tMa),
     tableAnchorYear: startmodelYear,
     driftRefYear: startModelYearWithCorrection,
     hJ2000: H,
@@ -418,16 +427,19 @@ export function assembleModel(C, F, laws = {}, secularSeriesArtifact = /** @type
     if (lod === null) return meanSiderealYearDays;
     return deepLod.siderealYearSecondsAtAge(tMa) / lod;
   };
+  // The comb family's bases are the FROZEN era clock's forms (H_era; plan 06
+  // D8) — the combs were fitted on them. The physical year lengths ride the
+  // unit through yearLengths (family B) and the tidal-chain mean.
   /** @param {number} year @returns {number} */
   const tropicalYearDaysBase = (year) => {
-    const days = deepLod.yearInDaysAtAge(yearToTMa(year));
+    const days = deepLod.eraClockYearInDaysAtAge(yearToTMa(year));
     return days === null ? meanSolarYearDays : days;
   };
   /** @param {number} year @returns {number} */
   const anomalisticYearDaysBase = (year) => {
     const tMa = yearToTMa(year);
-    const Ht = deepLod.hAtAge(tMa);
-    const tropD = deepLod.yearInDaysAtAge(tMa);
+    const Ht = deepLod.eraClockHAtAge(tMa);
+    const tropD = deepLod.eraClockYearInDaysAtAge(tMa);
     if (Ht === null || tropD === null) return meanAnomalisticYearDays;
     return (tropD * (Ht / 16)) / (Ht / 16 - 1);
   };
@@ -461,14 +473,16 @@ export function assembleModel(C, F, laws = {}, secularSeriesArtifact = /** @type
     },
     fns: {
       cyclesBetween: (a, b, n) => phase().cyclesBetween(a, b, n),
+      // The frozen era clock's deps ride ITS convention H_era (plan 06 D8):
+      // drift integrand, dc/dY and the real-LOD convention were fitted on it.
       analyticTropicalDays: (year) => {
         const tMa = (startmodelYear - year) / 1e6;
-        const Ht = deepLod.hAtAge(tMa);
+        const Ht = deepLod.eraClockHAtAge(tMa);
         if (Ht === null) return null;
         return (deepLod.siderealYearSecondsAtAge(tMa) / 86400) * (1 - 13 / Ht);
       },
-      meanHAtAgeMa: (tMa) => deepLod.hAtAge(tMa),
-      meanYearRealLodDays: (tMa) => deepLod.yearInDaysAtAge(tMa),
+      meanHAtAgeMa: (tMa) => deepLod.eraClockHAtAge(tMa),
+      meanYearRealLodDays: (tMa) => deepLod.eraClockYearInDaysAtAge(tMa),
       eccentricityAt,
       eccentricityRateAt,
     },
@@ -480,9 +494,9 @@ export function assembleModel(C, F, laws = {}, secularSeriesArtifact = /** @type
   // repo-data-bound instrument). Absolute dates deliberately absent — see
   // cardinal/one-source-structure.cjs. The mean year is SI SECONDS: the
   // sidereal year of date reduced by the SECULAR equinox precession
-  // (axial0 / [ψ̇(t)/ψ̇₀] on the COMPOSED lunisolar rate — plan 06 D6, the
-  // movement's leg-1 convention, NOT the H/13 kinematic identity; the two
-  // are a recorded 0.09% relation tension at J2000).
+  // (axial0·H(t)/H₀ with H(t) the UNIT = 13·T_p,composed — plan 06 D6/Phase
+  // 3, the movement's leg-1 convention, NOT the H/13 kinematic identity at
+  // J2000; the two are a recorded 0.09% relation tension there).
   // THE ONE of-date year-length family (owner: "move to 1 implementation")
   // — createYearLengths owns tropical (equinox-rate mean, wobble included),
   // sidereal (the D6 λ̇ channel), anomalistic (the cardinal structure on
@@ -507,26 +521,13 @@ export function assembleModel(C, F, laws = {}, secularSeriesArtifact = /** @type
     const sidLaw2000 = evalYearFourier(2000, siderealYearDaysBase(2000), F.SIDEREAL_YEAR_HARMONICS);
     const solLaw2000 = evalYearFourier(2000, tropicalYearDaysBase(2000), F.TROPICAL_YEAR_HARMONICS);
     const axial0 = sidLaw2000 / (sidLaw2000 - solLaw2000);
-    // D6 (plan 06): the deep-time ψ̇(t) the hybrid precesses on is the
-    // COMPOSED lunisolar rate — [ω(t)/ω₀]·p₀·[f_S + (1 − f_S)(a₀/a_M(t))³],
-    // spin from the tidal chain, lunar torque on the recession history —
-    // not the structural H(t)/H₀ scaling (which misses the lunar 1/a³
-    // growth: 70.9 vs Lantink 2022's 108.6 ± 8.5 ″/yr at 2.46 Ga; the
-    // composed rate reads 104.5). ONE home: earth/precession-composed.
-    const composedPrec = createComposedPrecession({
-      p0ArcsecPerYr: 1296000 / (H / 13),
-      solarShare: computeSolarTorqueShare({
-        gmSunKm3S2: GM_SUN, auKm: currentAUDistance, earthEccentricity: C.earthOrbital.earthEccentricityJ2000,
-        gmMoonKm3S2: GM_MOON_ALONE, moonDistanceKm, moonEccentricity: C.moonReference.moonOrbitalEccentricityBase,
-        moonInclinationDeg: C.moonReference.moonEclipticInclinationJ2000,
-      }),
-      lodSecondsAtAge: /** @param {number} tMa */ (tMa) => deepLod.lodSecondsAtAge(tMa),
-      lodJ2000Seconds: EPOCH_PARAMS.lodNowH13Seconds,
-      moonDistanceMetresAtAge,
-      moonDistanceJ2000Metres: EPOCH_PARAMS.moonDistanceNowM,
-      hAtAge: /** @param {number} tMa */ (tMa) => deepLod.hAtAge(tMa),
-      yearToTMa: /** @param {number} yr */ (yr) => (startmodelYear - yr) / 1e6,
-    });
+    // D6 → Phase 3 (plan 06): the deep-time ψ̇(t) the hybrid precesses on is
+    // the COMPOSED lunisolar rate, and since Phase 3 the unit H(t) IS
+    // 13 × that period (deltat/deep-time.cjs hAtAge), so the injection is
+    // the plain period₀·H(t)/H₀ again — on the unit, not on the frozen
+    // era clock's H_era (which misses the lunar 1/a³ growth: 70.9 vs
+    // Lantink 2022's 108.6 ± 8.5 ″/yr at 2.46 Ga; the unit reads 104.5).
+    const H0 = /** @type {number} */ (deepLod.hAtAge(0));
     const seriesArt = /** @type {any} */ (secularSeriesArtifact);
     const sb = seriesArt && seriesArt.bodies && seriesArt.bodies.earth;
     const hist = createDeepOrbitalHistory({
@@ -543,8 +544,8 @@ export function assembleModel(C, F, laws = {}, secularSeriesArtifact = /** @type
       axialPrecessionYearsJ2000: axial0,
       obliquityJ2000Deg: obliquityDeg(2000),
       axialPrecessionYearsAtYearFn: (yr) => {
-        const r = composedPrec.composedRateRatioAtAge((startmodelYear - yr) / 1e6);
-        return axial0 / (r === null ? 1 : r);
+        const h = deepLod.hAtAge((startmodelYear - yr) / 1e6);
+        return axial0 * (h === null ? 1 : h / H0);
       },
     });
     // PER-TIER ROUTING (the anomalistic-contamination fix): one sampler PER
@@ -1212,13 +1213,27 @@ export function assembleModel(C, F, laws = {}, secularSeriesArtifact = /** @type
       siderealYearSecondsAtYear: /** @param {number} year @returns {number} */ (year) => yearLengthsM.siderealYearSecondsAtYear(year),
       deltaTSecondsAtYear: deltaTSeconds,
       cyclesBetween,
-      // The DYNAMICAL axial precession period (the tweakpane identity):
-      // day-form beat of the sidereal and solar year evaluators — real at
-      // J2000 (~25,771 yr ≈ IAU), epoch-valid at any age. The same value
-      // the (d′) of-date rate completion integrates.
+      // Plan 06 Phase 3 S2 — THE published of-date precession period is the
+      // one-family route (B): the hybrid's own equinox regression against
+      // the λ̇-corrected sidereal year (~25,771 yr at J2000 ≈ IAU), inside
+      // the banked tiers (|Δyear| ≤ ONE_FAMILY_WINDOW_YEARS); beyond, the
+      // unit's SECULAR mean H(t)/13 = the composed lunisolar period (the
+      // of-date wobble is unresolved there). The comb family's beat
+      // sid/(sid − tropicalYearDirectDays) — the frozen era clock's
+      // kinematic-day device — is no longer published here; it still
+      // anchors the lunar chain's (d′) rate completion (pDynDegPerYearAt,
+      // a MATCHED TRIPLE with the eclipse gates: M0(a) measured a 3–15 min
+      // lunar-timing shift if it moved).
       axialPrecessionYearsAtYear: /** @param {number} year @returns {number} */ (year) => {
-        const sid = siderealYearDays(year);
-        return sid / (sid - tropicalYearDirectDays(year));
+        if (Math.abs(year - 2000) <= ONE_FAMILY_WINDOW_YEARS) return yearLengthsM.axialPrecessionYearsAtYear(year);
+        const h = deepLod.hAtAge(yearToTMa(year));
+        return (h === null ? H : h) / 13;
+      },
+      // The same publication rule for the mean tropical year of date (SI s):
+      // one-family inside the window, the tidal-chain mean beyond.
+      tropicalYearSecondsAtYear: /** @param {number} year @returns {number} */ (year) => {
+        if (Math.abs(year - 2000) <= ONE_FAMILY_WINDOW_YEARS) return yearLengthsM.tropicalYearSecondsAtYear(year);
+        return deepLod.tropicalYearSecondsAtAge(yearToTMa(year));
       },
     }),
     earth: Object.freeze({
@@ -1228,6 +1243,11 @@ export function assembleModel(C, F, laws = {}, secularSeriesArtifact = /** @type
       inclinationDeg,
       ascendingNodeDeg,
     }),
+    // The DEVICE family (plan 06 Phase 3 S2): the frozen era clock's comb
+    // year lengths (A), its cardinal 4-mean (A′) and the kinematic-day stack
+    // built on them (the ΔT stack's Layer 3/4 basis, USNO-anchored). NOT the
+    // published year lengths — those are `yearLengths` (the one-family
+    // route) and the seamed `epoch.*AtYear` surfaces above.
     lengths: Object.freeze({
       tropicalYearDays,
       tropicalYearDirectDays,

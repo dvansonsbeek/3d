@@ -36,6 +36,11 @@ export type DeepTimeLodConstants = {
      * - Actual-LOD numerator
      */
     siderealYearDaysKinematicJ2000: number;
+    /**
+     * - f_S, the solar fraction of the J2000
+     * precession torque (derive-params) — the unit H(t) = 13·T_p,composed needs it
+     */
+    precessionSolarShareJ2000: number;
 };
 export type DeepTimeLodDeps = {
     constants: DeepTimeLodConstants;
@@ -82,6 +87,8 @@ export type DeepTimeLodDeps = {
  * @property {number} meanSiderealYearJ2000Seconds
  * @property {number} solarMassLossFracPerYear
  * @property {number} siderealYearDaysKinematicJ2000 - Actual-LOD numerator
+ * @property {number} precessionSolarShareJ2000 - f_S, the solar fraction of the J2000
+ *   precession torque (derive-params) — the unit H(t) = 13·T_p,composed needs it
  */
 /**
  * @typedef {Object} DeepTimeLodDeps
@@ -103,6 +110,7 @@ export function createDeepTimeLod(deps: DeepTimeLodDeps): {
     lodSecondsAtAgeWithAlpha: (t_Ma: number, alpha: number) => number | null;
     lodHoursAtAge: (t_Ma: number) => number | null;
     hAtAge: (t_Ma: number) => number | null;
+    lunisolarPrecessionRateArcsecPerYrAtAge: (t_Ma: number) => number | null;
     siderealYearSecondsAtAge: (t_Ma: number) => number;
     tropicalYearSecondsAtAge: (t_Ma: number) => number;
     tropicalYearDaysAtAge: (t_Ma: number) => number | null;
@@ -119,4 +127,7 @@ export function createDeepTimeLod(deps: DeepTimeLodDeps): {
         net_L3: number | null;
         net_L4: number | null;
     };
+    eraClockHAtAge: (t_Ma: number) => number | null;
+    eraClockTropicalYearSecondsAtAge: (t_Ma: number) => number;
+    eraClockYearInDaysAtAge: (t_Ma: number) => number | null;
 };

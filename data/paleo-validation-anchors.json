@@ -5,7 +5,7 @@
       "daysPerYear": "tools/lib/deep-time.js meanYearInDaysAtAge(ageMa)",
       "lodHr": "meanLodSecondsAtAge(ageMa) / 3600",
       "moonDistanceRE": "meanMoonDistanceCorrectedAtAge(ageMa) / earthParallaxRadiusKm (raw meanMoonDistanceAtAge for the Hadean row — the solar-Δa correction is a modern-orbit construct)",
-      "precArcsecPerYr": "composedPrecessionRateArcsecPerYrAtAge(ageMa) — the COMPOSED lunisolar rate [ω(t)/ω₀]·p₀·[f_S + (1 − f_S)(a₀/a_M(t))³] (@essrt/physics/earth/precession-composed; falsification leg 1, plan 06 D6). The structural H(t)/13 clock is NOT the recipe: it reads ~35 % low at 2.46 Ga and fails these rows.",
+      "precArcsecPerYr": "meanLunisolarPrecessionRateArcsecPerYrAtAge(ageMa) = 1,296,000·13/H(t) — the COMPOSED lunisolar rate [ω(t)/ω₀]·p₀·[f_S + (1 − f_S)(a₀/a_M(t))³] on the unit H(t) = 13·T_p (@essrt/physics/earth/precession-composed; falsification leg 1, plan 06 D6/Phase 3). The frozen era clock's counter H_era = H₀·LOD/LOD₀ (pure spin scaling) is NOT the recipe: it reads ~35 % low at 2.46 Ga and fails these rows.",
       "expectationTypes": {
         "relativePct": "|predicted/observed - 1| * 100 <= tolerancePct",
         "range": "predicted inside [lo, hi], allowing outsideToleranceAbs beyond either edge",

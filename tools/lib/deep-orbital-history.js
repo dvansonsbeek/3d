@@ -79,6 +79,7 @@ function createOneSourceMovement() {
   const sidDays = DT.computeSiderealYearDaysDirect(2000);
   const solDays = DT.computeSolarYearDaysDirect(2000);
   const axial0 = sidDays / (sidDays - solDays);
+  const H0 = DT.meanHAtAge(0);
   const eb = seriesArt.bodies.earth;
 
   const tier = factory({
@@ -92,13 +93,11 @@ function createOneSourceMovement() {
     anchorAscNodeEclipticDeg: AE.ascNodeEclipticDeg,
     axialPrecessionYearsJ2000: axial0,
     obliquityJ2000Deg: C.ASTRO_REFERENCE.obliquityJ2000_deg,
-    // D6 (plan 06): the COMPOSED lunisolar rate — spin × [solar + lunar
-    // torque on the recession history] — not the structural H(t)/H₀ scaling.
-    // Twins: packages/physics model.js and src/script.js _deepHistSeries.
-    axialPrecessionYearsAtYearFn: (yr) => {
-      const r = DT.composedPrecessionRateRatioAtAge((2000 - yr) / 1e6);
-      return axial0 / (r === null ? 1 : r);
-    },
+    // D6 → Phase 3 (plan 06): period₀·H(t)/H₀ on the UNIT H(t) = 13·T_p,
+    // composed (spin × [solar + lunar torque on the recession history]) —
+    // NOT the frozen era clock's H_era. Twins: packages/physics model.js and
+    // src/script.js _deepHistSeries.
+    axialPrecessionYearsAtYearFn: (yr) => axial0 * DT.meanHAtAge((2000 - yr) / 1e6) / H0,
   });
 
   // grown-grid sampler (the browser's tiers: 250-aligned beyond ±50 kyr).

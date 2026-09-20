@@ -38,6 +38,21 @@ const rd = (p) => JSON.parse(readFileSync(join(ROOT, p), 'utf8'));
 const C = require(join(ROOT, 'tools', 'lib', 'constants.js'));
 /** Lazy deep-time engine (loads the ΔT/LOD chain on first key that needs it). */
 const dtl = () => require(join(ROOT, 'tools', 'lib', 'deep-time.js'));
+// Plan 06 Phase 3 S2: THE published of-date year-length / precession family is
+// the one-family route (B) — the Node engine's instance of the package
+// factory (deep-orbital-history.js createOneSourceMovement().yearLengths,
+// the same construction as model.js and the browser). The comb family (A)
+// and the cardinal 4-mean (A′) are the frozen era clock's device: they feed
+// the kinematic-day keys below and nothing else here.
+let _oneYearLengthsM = null;
+const oneYL = () => {
+  if (!_oneYearLengthsM) {
+    const one = require(join(ROOT, 'tools', 'lib', 'deep-orbital-history.js')).createOneSourceMovement();
+    if (!one) throw new Error('model-values: the one-source movement needs data/nbody-secular-series.json');
+    _oneYearLengthsM = one.yearLengths;
+  }
+  return _oneYearLengthsM;
+};
 
 /** The SHIPPED predictive-precession basis, browser-true: the shared
  *  @essrt/physics predict module (snapshot planet-side phases — the basis the
@@ -447,33 +462,20 @@ export const VALUES = {
   // the IAU-confirmed 50.289 (period 25,771 yr). The ratio needs ONE day
   // unit, so the sidereal term is re-based onto the IAU SI-day mean here.
   // SI days ≠ LOD days — the first naming rule, as arithmetic.
+  // Plan 06 Phase 3 S2: both J2000 rates are the one-family route's beats
+  // (one family, SI seconds throughout — the mixed-unit re-basing the comb
+  // pair needed is gone with it).
   axialRateJ2000: {
-    get: () => {
-      const oe = require(join(ROOT, 'tools', 'lib', 'orbital-engine.js'));
-      const dt = require(join(ROOT, 'tools', 'lib', 'deep-time.js'));
-      const sidSI = oe.computeLengthOfSiderealYear(2000)
-        - dt.meanSiderealYearSecondsAtAge(0) / dt.meanLodSecondsAtAge(0)
-        + C.meanSiderealYearDays;
-      const sol = oe.computeLengthOfSolarYear(2000);
-      return (1296000 * (sidSI - sol)) / sidSI;
-    },
+    get: () => 1296000 / oneYL().axialPrecessionYearsAtYear(2000),
     render: (v) => Number(v).toFixed(3),
     unit: '″/yr',
-    note: 'axial precession rate at J2000 from the Fourier year lengths, consistent SI-day basis',
+    note: 'axial precession rate at J2000 — the one-family route (B): 1,296,000 / its sidereal–tropical beat',
   },
-  // The website pins this as a literal '61.889' "to avoid a visible number
-  // shift" — measured here: the current formula REPRODUCES the pin at 3dp,
-  // so it can derive on both sides. anom/(anom−sol), same day unit each.
   periRateJ2000: {
-    get: () => {
-      const oe = require(join(ROOT, 'tools', 'lib', 'orbital-engine.js'));
-      const anom = oe.computeLengthOfAnomalisticYearDays(2000);
-      const sol = oe.computeLengthOfSolarYear(2000);
-      return (1296000 * (anom - sol)) / anom;
-    },
+    get: () => 1296000 / oneYL().perihelionPrecessionYearsAtYear(2000),
     render: (v) => Number(v).toFixed(3),
     unit: '″/yr',
-    note: 'perihelion (climatic) precession rate at J2000 — replaces the website\'s stability pin',
+    note: 'perihelion (climatic) precession rate at J2000 — the one-family route (B): 1,296,000 / its anomalistic–tropical beat',
   },
   // ── Earth figure (display) ──────────────────────────────────────────────
   // Derived from the PARALLAX radius, not the IAU nominal equatorial radius:
@@ -1023,24 +1025,22 @@ export const VALUES = {
     };
   })(),
   // ── Precession family (11-2m) — the formerly deferred scan keys ─────────
-  // Browser-route ratios (script.js :56309/:56339/:56340): seconds = direct
-  // Fourier days × o.lodKinematic, so lodKinematic cancels and the DAYS
-  // routes decide the values — the direct Step 6d fits on the integrated
-  // axis (deep-time.js compute*DaysDirect, bit-proven against the live
-  // page). Porting these surfaced the fourth WEBSITE defect: its forecast
+  // Plan 06 Phase 3 S2: the scans ride the ONE published family (the
+  // one-family route B — the beats of its own years, SI seconds), no longer
+  // the comb family's direct Fourier days (the frozen era clock's device,
+  // now confined to the kinematic-day keys). The history below is kept as
+  // the record. Porting these surfaced the fourth WEBSITE defect: its forecast
   // scan used the cardinal-mean solar year + snapshot-phase sidereal Fourier
   // and read 25,314 @ 12,411 where the simulator computes 25,312 @ 12,440
   // (site routes corrected in dayYear.ts/precession.ts, snapshot
   // regenerated). The full-cycle envelope and J2000 rates were robust to the
   // route difference; only the ±35 kyr forecast extrema moved.
   ...(() => {
+    // Plan 06 Phase 3 S2: the published family is the one-family route (B) —
+    // the beats of ITS years (the scans stay inside ±2 Myr, the published window).
     const precAt = (y) => {
-      const d = dtl().computeYearDaysDirectAll(y);
-      const lodKin = C.meanSiderealYearSeconds / d.sidereal;
-      const sidS = d.sidereal * lodKin;
-      const solS = d.tropical * lodKin;
-      const anomS = d.anomalistic * lodKin;
-      return { a: sidS / (sidS - solS), p: anomS / (anomS - solS), i: anomS / (anomS - sidS) };
+      const Y = oneYL();
+      return { a: Y.axialPrecessionYearsAtYear(y), p: Y.perihelionPrecessionYearsAtYear(y), i: Y.inclinationPrecessionYearsAtYear(y) };
     };
     let forecast = null, cycle = null;
     const axialForecast = () => {
@@ -1083,7 +1083,7 @@ export const VALUES = {
       periPrecCycleMax:   { get: () => cycleScan().pMx, render: wholeYears, unit: 'yr' },
       inclPrecCycleMin:   { get: () => cycleScan().iMn, render: wholeYears, unit: 'yr' },
       inclPrecCycleMax:   { get: () => cycleScan().iMx, render: wholeYears, unit: 'yr' },
-      axialPrecJ2000:     { get: () => precAt(2000).a, render: wholeYears, unit: 'yr', note: 'instantaneous J2000 axial precession period (direct-route ratio)' },
+      axialPrecJ2000:     { get: () => precAt(2000).a, render: wholeYears, unit: 'yr', note: 'instantaneous J2000 axial precession period — the one-family route (B), the published family (plan 06 Phase 3 S2)' },
       periPrecJ2000:      { get: () => precAt(2000).p, render: wholeYears, unit: 'yr' },
       inclPrecJ2000:      { get: () => precAt(2000).i, render: wholeYears, unit: 'yr' },
     };
@@ -1266,26 +1266,23 @@ export const VALUES = {
       meanSolarYearDaysFull: { get: () => C.meanSolarYearDays, render: (v) => thousands(v, 12), unit: 'd', note: 'full-precision form for derivation contexts' },
       inputSolarYearDays:    { get: () => model.foundational.inputmeanlengthsolaryearindays, render: (v) => String(v), unit: 'd', note: 'the mean-tropical-year INPUT parameter' },
       daysPerPeriPrec:       { get: () => Math.round((C.H / 16) * C.meanSolarYearDays), render: (v) => thousands(v), note: 'days per perihelion-precession cycle, (H/16)·mSY' },
-      solarYearJ2000Days:    { get: () => dtl().computeSolarYearDaysDirect(2000), render: (v) => thousands(v, 7), unit: 'd' },
-      solarYearJ2000Seconds: { get: () => dtl().computeSolarYearDaysDirect(2000) * dtl().computeLodKinematicSecondsAtEpoch(2000), render: (v) => thousands(v, 2), unit: 's', note: 'tweakpane predictions.solarYearSeconds = days × lodKinematic' },
+      // Plan 06 Phase 3 S2: the J2000 year lengths of date are the one-family route (B) — SI seconds, SI days.
+      solarYearJ2000Days:    { get: () => oneYL().tropicalYearSecondsAtYear(2000) / 86400, render: (v) => thousands(v, 7), unit: 'd', note: 'the one-family tropical year of date at J2000, SI days (tweakpane predictions.solarYearDays)' },
+      solarYearJ2000Seconds: { get: () => oneYL().tropicalYearSecondsAtYear(2000), render: (v) => thousands(v, 2), unit: 's', note: 'tweakpane predictions.solarYearSeconds — the one-family tropical year of date at J2000' },
       meanSiderealYearDays:  { get: () => C.meanSiderealYearDaysKinematic, render: (v) => thousands(v, 7), unit: 'd', note: 'framework H/13-kinematic mean — NOT the IAU 365.256363004 Fourier baseline' },
       meanSiderealYearDaysFull: { get: () => C.meanSiderealYearDaysKinematic, render: (v) => v.toFixed(9), unit: 'd', note: '9-dp render of meanSiderealYearDays' },
       siderealYearSeconds:   { get: () => C.meanSiderealYearSeconds, render: (v) => thousands(v, 2), unit: 's', note: 'IAU sidereal year in SI seconds (31,558,149.7635)' },
-      siderealYearJ2000Days: { get: () => dtl().computeSiderealYearDaysDirect(2000), render: (v) => thousands(v, 8), unit: 'd' },
+      siderealYearJ2000Days: { get: () => oneYL().siderealYearSecondsAtYear(2000) / 86400, render: (v) => thousands(v, 8), unit: 'd', note: 'the one-family sidereal year of date at J2000 (the λ̇ channel), SI days' },
       anomalisticYearDays:   { get: () => C.meanAnomalisticYearDays, render: (v) => thousands(v, 7), unit: 'd' },
       anomalisticYearDaysFull: { get: () => C.meanAnomalisticYearDays, render: (v) => v.toFixed(9), unit: 'd', note: '9-dp render of anomalisticYearDays' },
       anomalisticYearSeconds: { get: () => C.meanAnomalisticYearDays * C.meanLengthOfDay, render: (v) => thousands(v, 2), unit: 's' },
-      anomalisticYearJ2000Days: { get: () => dtl().computeAnomalisticYearDaysDirect(2000), render: (v) => thousands(v, 7), unit: 'd' },
-      anomalisticYearJ2000Seconds: { get: () => dtl().computeAnomalisticYearDaysDirect(2000) * dtl().computeLodKinematicSecondsAtEpoch(2000), render: (v) => thousands(v, 2), unit: 's' },
+      anomalisticYearJ2000Days: { get: () => oneYL().anomalisticYearSecondsAtYear(2000) / 86400, render: (v) => thousands(v, 7), unit: 'd', note: 'the one-family anomalistic year of date at J2000 (the chain’s apsidal tangent), SI days' },
+      anomalisticYearJ2000Seconds: { get: () => oneYL().anomalisticYearSecondsAtYear(2000), render: (v) => thousands(v, 2), unit: 's' },
       siderealSolarDiffSeconds: {
-        get: () => {
-          const lodKin = dtl().computeLodKinematicSecondsAtEpoch(2000);
-          return dtl().computeSiderealYearDaysDirect(2000) * lodKin
-               - dtl().computeSolarYearDaysDirect(2000) * lodKin;
-        },
+        get: () => oneYL().siderealYearSecondsAtYear(2000) - oneYL().tropicalYearSecondsAtYear(2000),
         render: (v) => thousands(v, 1),
         unit: 's',
-        note: 'sidereal − tropical year at J2000, both in lodKinematic seconds',
+        note: 'sidereal − tropical year at J2000, the one-family route, SI seconds',
       },
       siderealSolarMeanDiffSeconds: {
         get: () => (C.meanSiderealYearDaysKinematic - C.meanSolarYearDays) * C.meanLengthOfDay,
@@ -1820,22 +1817,22 @@ export const VALUES = {
   // rate at age t is the two engines composed — engine K's spin ω(t) and
   // recession history a_m(t) carrying the lunar torque, engine D's side the
   // solar torque: ψ̇(t) = [ω(t)/ω₀]·(p_S + p_L·(a_m0/a_m(t))³) at μ = 1.
-  // The STRUCTURAL clock is H(t)/13 (exact at J2000). Plan 06 D6: the
-  // composed rate IS the shipped leg-1 ψ̇(t) — ONE home
-  // @essrt/physics/earth/precession-composed, read here through the Node
-  // engine's instance (tools/lib/deep-time.js), the same evaluator the
-  // hybrid precesses on and the paleo-anchors gate's precArcsecPerYr rows
-  // check. The instrument twin is tools/explore/w3-precession-crosscoupling.mjs.
+  // Plan 06 D6/Phase 3: the composed rate IS the model's ψ̇(t), and the unit
+  // H(t) is 13 of its periods — ONE home @essrt/physics/earth/precession-
+  // composed inside the deep-time factory, read here through the Node
+  // engine (tools/lib/deep-time.js), the same evaluator the hybrid precesses
+  // on and the paleo-anchors gate's precArcsecPerYr rows check. The former
+  // "structural H(t)/13" reading is the frozen era clock's counter and lives
+  // in docs/retired-record.md, not here. Instrument twin:
+  // tools/explore/w3-precession-crosscoupling.mjs.
   ...(() => {
-    const composedAt = (ageMa) => dtl().composedPrecessionRateArcsecPerYrAtAge(ageMa);
-    const structuralAt = (ageMa) => dtl().structuralPrecessionRateArcsecPerYrAtAge(ageMa);
+    const composedAt = (ageMa) => dtl().meanLunisolarPrecessionRateArcsecPerYrAtAge(ageMa);
     const out = {
       earthPrecSolarShareJ2000Pct: { get: () => 100 * dtl().PRECESSION_SOLAR_SHARE_J2000, render: (v) => Number(v).toFixed(1), unit: '%', note: 'solar fraction of Earth’s J2000 precession torque, derived from the shared constants (the W3 split; the lunar part is the rest)' },
       earthPrecRateJ2000ArcsecPerYr: { get: () => dtl().PRECESSION_RATE_J2000_ARCSEC_PER_YR, render: (v) => Number(v).toFixed(1), unit: '″/yr', note: 'the model’s J2000 axial-precession rate, 1,296,000 / (H/13)' },
     };
     for (const age of [650, 1400, 2460]) {
-      out[`earthPrecComposed${age}MaArcsecPerYr`] = { get: () => composedAt(age), render: (v) => Number(v).toFixed(1), unit: '″/yr', note: `the two engines composed at ${age} Ma: ω(t) × (solar torque + lunar torque on the recession history), μ = 1 — the shipped leg-1 rate (plan 06 D6)` };
-      out[`earthPrecStructural${age}MaArcsecPerYr`] = { get: () => structuralAt(age), render: (v) => Number(v).toFixed(1), unit: '″/yr', note: `the structural clock H(${age} Ma)/13 alone — exact at J2000, diverges at depth by the lunar 1/a³ term (the named diagnostic, not the shipped rate)` };
+      out[`earthPrecComposed${age}MaArcsecPerYr`] = { get: () => composedAt(age), render: (v) => Number(v).toFixed(1), unit: '″/yr', note: `the two engines composed at ${age} Ma: ω(t) × (solar torque + lunar torque on the recession history), μ = 1 — the model’s ψ̇(t), = 1,296,000·13/H(t) on the unit (plan 06 D6/Phase 3)` };
     }
     return out;
   })(),
@@ -2117,14 +2114,14 @@ export const VALUES = {
 
   // ── The sharpened leg-1 obliquity statement (owner-adopted) ─────────────
   // The obliquity band follows the BEAT 2π/(ψ̇(t) − |s₃|): the spin
-  // precession ψ̇(t) the COMPOSED lunisolar rate (plan 06 D6 — the certified
-  // J2000 of-date beat scaled by ψ̇(t)/ψ̇₀ from the composed evaluator, the
-  // SAME scaling the shipped hybrid precesses on), s₃ at its dynamical value
-  // under the measured μ ≈ 1 (engine D). Degenerate with pure H/8-scaling
-  // today (p ≫ s₃); discriminable at Precambrian ages — the pre-registered
-  // fork (plan 02 §8; doc 109 §18). The `obliqBeatStructural*Kyr` twins keep
-  // the pre-D6 reading (ψ̇ on the structural H(t)/13 clock) as the named
-  // diagnostic the D6 record compares against.
+  // precession ψ̇(t) the COMPOSED lunisolar rate (plan 06 D6/Phase 3 — the
+  // tidal-mean year pair's beat, which on the unit H(t) = 13·T_p IS the
+  // composed period, the SAME scaling the shipped hybrid precesses on), s₃
+  // at its dynamical value under the measured μ ≈ 1 (engine D). Degenerate
+  // today with the pure precession-scaling reading "obliquity period ∝ T_p"
+  // (T_p·13/8 — the `obliqH8Scaled*Kyr` keys, name kept, D8 (iii)); the two
+  // split at Precambrian ages — the pre-registered fork (plan 02 §8; doc 109
+  // §18).
   ...(() => {
     const DT = () => require(join(ROOT, 'tools', 'lib', 'deep-time.js'));
     const s3 = () => {
@@ -2138,16 +2135,12 @@ export const VALUES = {
       const sid = dt.meanSiderealYearSecondsAtAge(tMa), trop = dt.meanTropicalYearSecondsAtAge(tMa);
       return sid / (sid - trop);
     };
-    const J2000_MA = 0.000001;
-    // ψ̇(t) on the composed rate: the certified J2000 anchor × the composed ratio (≡ the hybrid's injection)
-    const psiDotComposed = (tMa) => (1296000 / axialYr(J2000_MA)) * DT().composedPrecessionRateRatioAtAge(tMa);
-    const beatKyr = (tMa) => 1296000 / (psiDotComposed(tMa) - s3()) / 1000;
-    const beatStructuralKyr = (tMa) => 1296000 / (1296000 / axialYr(tMa) - s3()) / 1000;
+    // ψ̇(t) = 1,296,000/T_p(t) with T_p the tidal-mean year pair's beat ≡ H(t)/13 ≡ the composed period (Phase 3)
+    const beatKyr = (tMa) => 1296000 / (1296000 / axialYr(tMa) - s3()) / 1000;
     const h8Kyr = (tMa) => axialYr(tMa) * 13 / 8 / 1000;
     const mk = (name, tMa, label) => ({
-      [`obliqBeat${name}Kyr`]: { get: () => beatKyr(tMa), render: (v) => Number(v).toFixed(1), unit: 'kyr', note: `the obliquity band as the BEAT 2π/(ψ̇ − |s₃|) at ${label} — ψ̇ the composed lunisolar rate (plan 06 D6), s₃ dynamical under measured μ (the adopted leg-1 form)` },
-      [`obliqBeatStructural${name}Kyr`]: { get: () => beatStructuralKyr(tMa), render: (v) => Number(v).toFixed(1), unit: 'kyr', note: `the same beat with ψ̇ on the structural H(t)/13 clock at ${label} — the pre-D6 reading, kept as the named diagnostic` },
-      [`obliqH8Scaled${name}Kyr`]: { get: () => h8Kyr(tMa), render: (v) => Number(v).toFixed(1), unit: 'kyr', note: `the pure H/8-scaling reading (axial × 13/8) at ${label} — degenerate with the beat today, the discriminated alternative at depth` },
+      [`obliqBeat${name}Kyr`]: { get: () => beatKyr(tMa), render: (v) => Number(v).toFixed(1), unit: 'kyr', note: `the obliquity band as the BEAT 2π/(ψ̇ − |s₃|) at ${label} — ψ̇ the composed lunisolar rate (plan 06 D6/Phase 3), s₃ dynamical under measured μ (the adopted leg-1 form)` },
+      [`obliqH8Scaled${name}Kyr`]: { get: () => h8Kyr(tMa), render: (v) => Number(v).toFixed(1), unit: 'kyr', note: `the pure precession-scaling reading "obliquity period ∝ T_p" (T_p·13/8, the J2000 ratio held) at ${label} — degenerate with the beat today, the discriminated alternative at depth (identifier keeps its historical H/8 name)` },
     });
     return {
       ...mk('J2000', 0.000001, 'J2000'),
@@ -3074,7 +3067,7 @@ export const VALUES = {
       lodHr: (t) => dtl().meanLodSecondsAtAge(t) / 3600,
       moonDistanceRE: (t) => dtl().meanMoonDistanceCorrectedAtAge(t) / RE(),
       moonDistanceRawRE: (t) => dtl().meanMoonDistanceAtAge(t) / RE(),
-      precArcsecPerYr: (t) => dtl().composedPrecessionRateArcsecPerYrAtAge(t),
+      precArcsecPerYr: (t) => dtl().meanLunisolarPrecessionRateArcsecPerYrAtAge(t),
     };
     const unitOf = { daysPerYear: 'd/yr', lodHr: 'hr', moonDistanceRE: 'R_E', moonDistanceRawRE: 'R_E', precArcsecPerYr: '″/yr' };
     const camel = (id) => id.split('-').map((s, i) => (i === 0 ? s : s.charAt(0).toUpperCase() + s.slice(1))).join('').replace(/[^A-Za-z0-9]/g, '');

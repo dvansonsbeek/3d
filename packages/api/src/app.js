@@ -68,7 +68,7 @@ const PLANET_ACCURACY = Object.freeze({
   reference: 'JPL Horizons, 1800–2200 AD',
 });
 
-const EPOCH_SECTIONS = Object.freeze(['h', 'lod', 'alpha', 'deltaT', 'siderealYearSeconds', 'moonDistanceKm', 'axialPrecessionYears']);
+const EPOCH_SECTIONS = Object.freeze(['h', 'lod', 'alpha', 'deltaT', 'siderealYearSeconds', 'tropicalYearSeconds', 'moonDistanceKm', 'axialPrecessionYears']);
 const CARDINAL_TYPES = Object.freeze(['SS', 'WS', 'VE', 'AE']);
 
 /** Eclipse search: kinds and the per-request window cap (the finder scans
@@ -131,10 +131,13 @@ export function createApi() {
     if (sections.includes('alpha')) rec.alpha = model.epoch.alphaAtYear(year);
     if (sections.includes('deltaT')) rec.deltaTSeconds = model.epoch.deltaTSecondsAtYear(year);
     if (sections.includes('siderealYearSeconds')) rec.siderealYearSeconds = model.epoch.siderealYearSecondsAtYear(year);
+    // Plan 06 Phase 3 S2: the one-family mean tropical year of date (SI s)
+    // inside ±2 Myr, the tidal-chain mean beyond.
+    if (sections.includes('tropicalYearSeconds')) rec.tropicalYearSeconds = model.epoch.tropicalYearSecondsAtYear(year);
     if (sections.includes('moonDistanceKm')) rec.moonDistanceKm = model.epoch.moonDistanceKmAtYear(year);
-    // The DYNAMICAL axial precession period (day-form sidereal/solar-year
-    // beat — real at J2000, epoch-valid); the LATTICE identity H/13 lives
-    // in /v1/derivations as the structural mean.
+    // The of-date axial precession period: the one-family beat (the hybrid's
+    // equinox regression) inside ±2 Myr, the unit's secular mean H(t)/13
+    // beyond; /v1/derivations carries the J2000 identity.
     if (sections.includes('axialPrecessionYears')) rec.axialPrecessionYears = model.epoch.axialPrecessionYearsAtYear(year);
     return rec;
   };
