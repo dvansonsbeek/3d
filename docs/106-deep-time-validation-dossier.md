@@ -1,7 +1,7 @@
 ---
 docVersion: 1.0
 modelVersion: v13.0
-coefficients: sha256:9e0460662933228f
+coefficients: sha256:b8b18424a3435e20
 status: current
 ---
 
@@ -89,7 +89,7 @@ The L1 integer-divisor lattice (8H/n) against the Cenozoic isotope record:
 ## C. Historical era — gate- and artifact-backed
 
 - **Babylonian eclipse case study (−135)** — the framework places the
-  totality path <!--v:babylon135BestGapKm-->366<!--/v--> km from Babylon at
+  totality path <!--v:babylon135BestGapKm-->364<!--/v--> km from Babylon at
   ΔUT <!--v:babylon135BestDeltaUT-->-0h60<!--/v--> (framework
   <!--v:babylon135FrameworkUT-->06:01<!--/v--> vs documented
   <!--v:babylon135DocumentedUT-->06:14<!--/v-->):
@@ -113,17 +113,17 @@ The L1 integer-divisor lattice (8H/n) against the Cenozoic isotope record:
   both directions); the −746 Feb 6 Babylonian partial (magnitude
   <!--v:lunarBabylon746MagnitudeUmbral-->0.881<!--/v--> vs canon
   <!--v:lunarBabylon746CanonMagnitudeUmbral-->0.920<!--/v-->, visible from
-  Babylon at <!--v:lunarBabylon746AltitudeDeg-->31.9<!--/v-->°); the
+  Babylon at <!--v:lunarBabylon746AltitudeDeg-->32.1<!--/v-->°); the
   <!--v:lunarDtBandsN-->267<!--/v--> raw Stephenson-2016 timing reductions
   (framework ΔT mean abs <!--v:lunarDtBandsFrameworkMeanAbsSeconds-->1,213<!--/v--> s —
   statistically identical to Stephenson's own fitted spline at
   <!--v:lunarDtBandsSplineMeanAbsSeconds-->1,211<!--/v--> s, with zero eclipse
   input); the untimed tablets S10–S14 as published ΔT intervals (lunar
-  rise/set <!--v:lunarS13FrameworkInside-->7<!--/v-->/<!--v:lunarS13N-->7<!--/v-->
+  rise/set <!--v:lunarS13FrameworkInside-->6<!--/v-->/<!--v:lunarS13N-->7<!--/v-->
   contained; the −135 Babylon totality window
   [<!--v:lunarDtBoundsBabylon135LowSeconds-->11,220<!--/v-->,
   <!--v:lunarDtBoundsBabylon135HighSeconds-->12,140<!--/v-->] s contains the
-  framework's <!--v:lunarDtBoundsBabylon135FrameworkSeconds-->12,007<!--/v--> s);
+  framework's <!--v:lunarDtBoundsBabylon135FrameworkSeconds-->12,002<!--/v--> s);
   and the measured framework-vs-ELP lunar-theory drift
   (Δṅ ≈ <!--v:lunarTheoryDriftDeltaNdot-->0.32<!--/v--> ″/cy²) with the
   PRE-REGISTERED re-reduction prediction pinned before the contact-time

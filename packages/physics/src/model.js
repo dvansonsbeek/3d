@@ -29,7 +29,7 @@ import { buildPlanetChainsFromArtifactData, computeApsidalSecularDegPerYr } from
 import { createDeltaTCycles } from './deltat/cycles.cjs';
 import { createDeepTimeLod } from './deltat/deep-time.cjs';
 import { createMoonRecessionHistory, createSolarChannelBudget } from './deltat/recession-history.cjs';
-import { evalClimateL1OrbitalPermil } from './climate/l1-orbital.cjs';
+import { evalClimateL1OrbitalPermil, createAlphaGiaChannel } from './climate/l1-orbital.cjs';
 import { createMoonEccChannel } from './moon/ecc-channel.cjs';
 import { createDeepEccChannel } from './moon/deep-ecc-channel.cjs';
 import { DEEP_MODES_ARTIFACT } from './moon/deep-modes-artifact.cjs';
@@ -132,21 +132,27 @@ export function assembleModel(C, F, laws = {}, secularSeriesArtifact = /** @type
   const GM_SUN = GM_SUN_PLUS_EARTH - GM_EARTH_ALONE;
   const M_SUN = GM_SUN / G_CONSTANT;
 
-  // ── α(t): climate-driven GIA channel with the R2 lattice pin ──────────────
+  // ── α(t): the GIA channel — the LAGGED response to the L1 ice history, with the R2 lattice pin ──
   const CLIMATE = F.CLIMATE_FORMULA_COEFFS;
   const CLIMATE_REGIME = CLIMATE.regimes['lr04-post-mpt'];
-  const alphaClimateScale = C.deepTime.alphaClimateScalePerMille;
 
-  /** @param {number} year @returns {number} */
+  /** The climate formula's L1 (unlagged) — the orbital δ¹⁸O layer itself. @param {number} year @returns {number} */
   const evalClimateL1 = (year) => evalClimateL1OrbitalPermil(year, {
     l1Terms: CLIMATE_REGIME.L1,
     yStdDenormalization: CLIMATE_REGIME.denormalization.y_std,
-    eightHKyr: CLIMATE.config.eight_H_kyr,
+  });
+  // ONE home (climate/l1-orbital.cjs): k derived from the Cox–Chao rate, τ the
+  // record-measured relaxation time (plan 06 D7). Same construction in
+  // src/script.js, tools/lib/deep-time.js and the website's essrt.ts.
+  const alphaGia = createAlphaGiaChannel({
+    l1Terms: CLIMATE_REGIME.L1,
+    yStdDenormalization: CLIMATE_REGIME.denormalization.y_std,
+    relaxationKyr: C.deepTime.alphaGiaRelaxationKyr,
+    alphaGiaRateJ2000PerYr: C.deepTime.alphaGiaRateJ2000PerYr,
+    alphaJ2000: earthMoiFactorJ2000,
   });
 
   let latticeAlphaPin = false;
-  /** @type {number|null} */
-  let alphaL1J2000 = null;
   // Exact-argument memo (mirrors src/script.js + tools/lib/deep-time.js —
   // the round-5 perf campaign): same tMa → bit-identical value; the pin
   // branch bypasses the memo; bounded by wholesale clear.
@@ -157,9 +163,7 @@ export function assembleModel(C, F, laws = {}, secularSeriesArtifact = /** @type
     if (latticeAlphaPin) return earthMoiFactorJ2000;
     let v = alphaMemo.get(tMa);
     if (v === undefined) {
-      if (alphaL1J2000 === null) alphaL1J2000 = evalClimateL1(2000);
-      const L1at = evalClimateL1(2000 - tMa * 1e6);
-      v = earthMoiFactorJ2000 - alphaClimateScale * (L1at - alphaL1J2000);
+      v = alphaGia.alphaAt(2000 - tMa * 1e6);
       if (alphaMemo.size >= 8192) alphaMemo.clear();
       alphaMemo.set(tMa, v);
     }

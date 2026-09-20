@@ -55,7 +55,8 @@ INPUT_FILES = [FREQ_REL, 'data/lr04-stack.txt', 'data/westerhold2020-cenogrid.ta
                'scripts/milankovitch_climate_formula.py', SELF_REL]
 
 FREQ = json.loads((ROOT / FREQ_REL).read_text())
-SHIPPED = list(mcf.L1_LATTICE_INTEGERS)
+SHIPPED = list(mcf.LEGACY_L1_LATTICE_INTEGERS)   # the comb under test — the L1 shipped BEFORE this test's disposition
+ORIGINAL_PERIODS = list(mcf.L1_PERIODS_KYR)       # the fitter's live L1, restored after the runs
 N_LINES = len(SHIPPED)
 BAND_KYR = (min(mcf.EIGHT_H / n for n in SHIPPED), max(mcf.EIGHT_H / n for n in SHIPPED))
 N_NULL = 300
@@ -147,17 +148,18 @@ T_ALL, Y_ALL = mcf.preprocess(ages, vals, window=(0, 5320))
 
 
 def set_lines(kind, spec):
-    # the fitter reads its L1 frequencies from the module global; a fractional
-    # "n" gives period 8H/n exactly, so the SAME matrix builder serves both models
-    mcf.L1_LATTICE_INTEGERS = list(spec) if kind == 'int' else [mcf.EIGHT_H / P for P in spec]
+    # the fitter reads its L1 periods (kyr) from the module global L1_PERIODS_KYR;
+    # the legacy comb is expressed as periods 8·H/n, so the SAME matrix builder
+    # serves both models
+    mcf.L1_PERIODS_KYR = [mcf.EIGHT_H / n for n in spec] if kind == 'int' else list(spec)
 
 
 def r2_oos(f, t_test, y_test):
     yn = (y_test - f._fit_y_mean) / f._fit_y_std
     yhat = np.full_like(t_test, f._intercept, dtype=float)
-    for n in mcf.L1_LATTICE_INTEGERS:
-        w = 2 * np.pi * n / mcf.EIGHT_H
-        yhat += f._l1_a[n] * np.cos(w * t_test) + f._l1_b[n] * np.sin(w * t_test)
+    for P in mcf.L1_PERIODS_KYR:
+        w = 2 * np.pi / P
+        yhat += f._l1_a[P] * np.cos(w * t_test) + f._l1_b[P] * np.sin(w * t_test)
     return 1.0 - float(np.sum((yn - yhat) ** 2)) / float(np.sum((yn - yn.mean()) ** 2))
 
 
@@ -166,16 +168,16 @@ def run(kind, spec):
     res = {}
     for rg in REGIMES_LR04:
         t, y = mcf.preprocess(ages, vals, window=mcf.REGIME_WINDOWS[rg])
-        s = mcf.ClimateFormula().fit(t, y, regime=rg)
+        s = mcf.ClimateFormula().fit(t, y, regime=rg, include_l2=True)   # the pre-registered protocol: L2 on for every model
         res[rg] = dict(r2_l1=s.r2_l1_only, r2_l1_l2=s.r2_l1_l2, r2_all=s.r2_l1_l2_l3, cond=s.condition_number)
     for rg in REGIMES_CGD:
         t, y = mcf.preprocess(ages_c, d18o, window=mcf.REGIME_WINDOWS[rg], dt_kyr=5.0)
-        s = mcf.ClimateFormula().fit(t, y, regime=rg)
+        s = mcf.ClimateFormula().fit(t, y, regime=rg, include_l2=True)
         res['cgd-' + rg] = dict(r2_l1=s.r2_l1_only, r2_l1_l2=s.r2_l1_l2, r2_all=s.r2_l1_l2_l3, cond=s.condition_number)
     for key, lo, hi in (('oos-lr04-2nd-half', 0, 2660), ('oos-lr04-1st-half', 2660, 5320)):
         fit_mask = (T_ALL >= lo) & (T_ALL <= hi)
         f = mcf.ClimateFormula()
-        s = f.fit(T_ALL[fit_mask], Y_ALL[fit_mask], (lo, hi))
+        s = f.fit(T_ALL[fit_mask], Y_ALL[fit_mask], (lo, hi), include_l2=True)
         res[key] = dict(r2_fit_l1=s.r2_l1_only, r2_all=r2_oos(f, T_ALL[~fit_mask], Y_ALL[~fit_mask]))
     return res
 
@@ -191,7 +193,7 @@ def main():
             null[k].append(r[k]['r2_all'])
     null_summary = {k: dict(mean=float(np.mean(v)), sd=float(np.std(v)), p95=float(np.percentile(v, 95)), max=float(np.max(v))) for k, v in null.items()}
     p_values = {mname: {k: float(np.mean(np.array(null[k]) >= results[mname][k]['r2_all'])) for k in KEYS} for mname in results}
-    mcf.L1_LATTICE_INTEGERS = SHIPPED
+    mcf.L1_PERIODS_KYR = ORIGINAL_PERIODS
 
     def delta(k):
         return results['beat-A-top33'][k]['r2_all'] - results['shipped-comb'][k]['r2_all']

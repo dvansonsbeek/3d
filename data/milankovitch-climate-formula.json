@@ -1,42 +1,202 @@
 {
   "config": {
-    "H_kyr": 335.317,
-    "eight_H_kyr": 2682.536,
-    "L1_integers": [
-      9,
-      12,
-      14,
-      16,
-      18,
-      20,
-      21,
-      22,
-      24,
-      25,
-      28,
-      30,
-      31,
-      35,
-      38,
-      39,
-      48,
-      50,
-      53,
-      65,
-      66,
-      68,
-      73,
-      76,
-      96,
-      107,
-      110,
-      113,
-      120,
-      134,
-      141,
-      152,
-      185
+    "L1_lines": [
+      {
+        "family": "climatic precession",
+        "label": "p+g2",
+        "arcsecPerYr": 68.20533085217915,
+        "periodKyr": 19.001447303419877,
+        "relAmp": 0.6717512938116206
+      },
+      {
+        "family": "climatic precession",
+        "label": "p+g3",
+        "arcsecPerYr": 67.65725935066226,
+        "periodKyr": 19.155372423274404,
+        "relAmp": 0.4607842722501143
+      },
+      {
+        "family": "climatic precession",
+        "label": "p+g1",
+        "arcsecPerYr": 57.74073678329907,
+        "periodKyr": 22.445158690369446,
+        "relAmp": 0.8620468725902352
+      },
+      {
+        "family": "climatic precession",
+        "label": "p+g4",
+        "arcsecPerYr": 55.87857963778711,
+        "periodKyr": 23.19314500119466,
+        "relAmp": 0.19922380139666943
+      },
+      {
+        "family": "climatic precession",
+        "label": "p+g0",
+        "arcsecPerYr": 54.54567191581978,
+        "periodKyr": 23.75990531384624,
+        "relAmp": 1.0
+      },
+      {
+        "family": "obliquity",
+        "label": "p+s12",
+        "arcsecPerYr": 47.29590619355313,
+        "periodKyr": 27.40194880073271,
+        "relAmp": 0.10427591691403815
+      },
+      {
+        "family": "obliquity",
+        "label": "p+s1",
+        "arcsecPerYr": 44.70306999762271,
+        "periodKyr": 28.991297467241527,
+        "relAmp": 0.5416346168208136
+      },
+      {
+        "family": "obliquity",
+        "label": "p+s14",
+        "arcsecPerYr": 44.45151946482077,
+        "periodKyr": 29.15535881795139,
+        "relAmp": 0.1423622336951359
+      },
+      {
+        "family": "obliquity",
+        "label": "p+s9",
+        "arcsecPerYr": 43.52756580857083,
+        "periodKyr": 29.7742356119719,
+        "relAmp": 0.10094037508523732
+      },
+      {
+        "family": "obliquity",
+        "label": "p+s3",
+        "arcsecPerYr": 43.24580236542744,
+        "periodKyr": 29.968226489331563,
+        "relAmp": 0.47895531494942417
+      },
+      {
+        "family": "obliquity",
+        "label": "p+s2",
+        "arcsecPerYr": 32.53285971289672,
+        "periodKyr": 39.836645515864,
+        "relAmp": 0.48491909690353013
+      },
+      {
+        "family": "obliquity",
+        "label": "p+s4",
+        "arcsecPerYr": 31.98458119107587,
+        "periodKyr": 40.51952383736704,
+        "relAmp": 0.32380140712519323
+      },
+      {
+        "family": "obliquity",
+        "label": "p+s0",
+        "arcsecPerYr": 31.43772998726808,
+        "periodKyr": 41.22435050256062,
+        "relAmp": 1.0
+      },
+      {
+        "family": "obliquity",
+        "label": "p+s7",
+        "arcsecPerYr": 30.88973745178278,
+        "periodKyr": 41.95568194851078,
+        "relAmp": 0.1787778028028384
+      },
+      {
+        "family": "obliquity",
+        "label": "p+s10",
+        "arcsecPerYr": 23.940447211803555,
+        "periodKyr": 54.13432708813487,
+        "relAmp": 0.16050220301405962
+      },
+      {
+        "family": "eccentricity",
+        "label": "g0\u2212g2",
+        "arcsecPerYr": 13.659658936359374,
+        "periodKyr": 94.87791796545507,
+        "relAmp": 0.7792514713186953
+      },
+      {
+        "family": "eccentricity",
+        "label": "g0\u2212g6",
+        "arcsecPerYr": 13.38165248714171,
+        "periodKyr": 96.84902527885197,
+        "relAmp": 0.10994906379552646
+      },
+      {
+        "family": "eccentricity",
+        "label": "g0\u2212g3",
+        "arcsecPerYr": 13.111587434842484,
+        "periodKyr": 98.8438666515722,
+        "relAmp": 0.5345234544678213
+      },
+      {
+        "family": "eccentricity",
+        "label": "g0\u2212g5",
+        "arcsecPerYr": 12.831040820044286,
+        "periodKyr": 101.00505626756528,
+        "relAmp": 0.15474417022576337
+      },
+      {
+        "family": "eccentricity",
+        "label": "g0\u2212g7",
+        "arcsecPerYr": 12.567419541379522,
+        "periodKyr": 103.12379528134528,
+        "relAmp": 0.10461813237212561
+      },
+      {
+        "family": "eccentricity",
+        "label": "g2\u2212g4",
+        "arcsecPerYr": 12.326751214392043,
+        "periodKyr": 105.13719125659492,
+        "relAmp": 0.1552454403600582
+      },
+      {
+        "family": "eccentricity",
+        "label": "g3\u2212g4",
+        "arcsecPerYr": 11.778679712875153,
+        "periodKyr": 110.02930987106778,
+        "relAmp": 0.1064897945347589
+      },
+      {
+        "family": "eccentricity",
+        "label": "g1\u2212g2",
+        "arcsecPerYr": 10.46459406888008,
+        "periodKyr": 123.84617993487996,
+        "relAmp": 0.6717512938116206
+      },
+      {
+        "family": "eccentricity",
+        "label": "g1\u2212g3",
+        "arcsecPerYr": 9.91652256736319,
+        "periodKyr": 130.6909747037068,
+        "relAmp": 0.46078427225011426
+      },
+      {
+        "family": "eccentricity",
+        "label": "g1\u2212g5",
+        "arcsecPerYr": 9.635975952564992,
+        "periodKyr": 134.49597699079135,
+        "relAmp": 0.1333967279946903
+      },
+      {
+        "family": "eccentricity fundamental",
+        "label": "g\u2082\u2212g\u2085",
+        "periodKyr": 405.6255674779031,
+        "arcsecPerYr": 3.195064867479294,
+        "note": "the engine\u2019s 20-Myr mean beat; the long-eccentricity metronome"
+      },
+      {
+        "family": "climate-internal harmonic",
+        "label": "(g\u2082\u2212g\u2085)/2",
+        "periodKyr": 202.81278373895154,
+        "note": "carbon-thermostat 2nd harmonic (doc 92 \u00a73), not orbital forcing"
+      },
+      {
+        "family": "climate-internal harmonic",
+        "label": "(g\u2082\u2212g\u2085)/3",
+        "periodKyr": 135.20852249263436,
+        "note": "carbon-thermostat 3rd harmonic (doc 92 \u00a73), not orbital forcing"
+      }
     ],
+    "L1_source": "data/l1-physical-lines.json",
     "L2_periods_kyr": {
       "405-kyr (fundamental)": 404.5,
       "202-kyr (2nd harmonic)": 202.25,
@@ -58,15 +218,15 @@
         1000
       ],
       "n_samples": 1001,
-      "n_l1_components": 33,
-      "n_l2_components": 3,
+      "n_l1_components": 28,
+      "n_l2_components": 0,
       "n_l3_steps": 0,
-      "r2_l1_only": 0.8710805066839413,
-      "r2_l1_l2": 0.8742691351103009,
-      "r2_l1_l2_l3": 0.8742691351103009,
-      "delta_r2_l2": 0.0031886284263595854,
+      "r2_l1_only": 0.7788098702351365,
+      "r2_l1_l2": 0.7788098702351365,
+      "r2_l1_l2_l3": 0.7788098702351365,
+      "delta_r2_l2": 0.0,
       "delta_r2_l3": 0.0,
-      "condition_number": 9013.781769034966,
+      "condition_number": 1785864.5226677873,
       "l3_step_betas": {}
     },
     "inhg-mpt": {
@@ -75,15 +235,15 @@
         2700
       ],
       "n_samples": 1701,
-      "n_l1_components": 33,
-      "n_l2_components": 3,
+      "n_l1_components": 28,
+      "n_l2_components": 0,
       "n_l3_steps": 0,
-      "r2_l1_only": 0.7270235663016057,
-      "r2_l1_l2": 0.7344500987322313,
-      "r2_l1_l2_l3": 0.7344500987322313,
-      "delta_r2_l2": 0.007426532430625632,
+      "r2_l1_only": 0.5910872803070126,
+      "r2_l1_l2": 0.5910872803070126,
+      "r2_l1_l2_l3": 0.5910872803070126,
+      "delta_r2_l2": 0.0,
       "delta_r2_l3": 0.0,
-      "condition_number": 3.360736210475284,
+      "condition_number": 3212.7288057110245,
       "l3_step_betas": {}
     },
     "pre-inhg": {
@@ -92,15 +252,15 @@
         5320
       ],
       "n_samples": 2621,
-      "n_l1_components": 33,
-      "n_l2_components": 3,
+      "n_l1_components": 28,
+      "n_l2_components": 0,
       "n_l3_steps": 0,
-      "r2_l1_only": 0.4008284879789611,
-      "r2_l1_l2": 0.44934717636584065,
-      "r2_l1_l2_l3": 0.44934717636584065,
-      "delta_r2_l2": 0.04851868838687956,
+      "r2_l1_only": 0.3735851560574397,
+      "r2_l1_l2": 0.3735851560574397,
+      "r2_l1_l2_l3": 0.3735851560574397,
+      "delta_r2_l2": 0.0,
       "delta_r2_l3": 0.0,
-      "condition_number": 1.2620434905014262,
+      "condition_number": 58.97971975707519,
       "l3_step_betas": {}
     },
     "lr04-full": {
@@ -109,60 +269,220 @@
         5320
       ],
       "n_samples": 5321,
-      "n_l1_components": 33,
-      "n_l2_components": 3,
+      "n_l1_components": 28,
+      "n_l2_components": 0,
       "n_l3_steps": 2,
-      "r2_l1_only": 0.24169730524864963,
-      "r2_l1_l2": 0.25054608447045157,
-      "r2_l1_l2_l3": 0.258386510331412,
-      "delta_r2_l2": 0.008848779221801939,
-      "delta_r2_l3": 0.007840425860960454,
-      "condition_number": 1.098629769694125,
+      "r2_l1_only": 0.19279705612357656,
+      "r2_l1_l2": 0.19279705612357656,
+      "r2_l1_l2_l3": 0.20028113870158393,
+      "delta_r2_l2": 0.0,
+      "delta_r2_l3": 0.007484082578007367,
+      "condition_number": 5.590087652229601,
       "l3_step_betas": {
-        "iNHG": -0.19121285518390707,
-        "MPT": 0.08549521196897293
+        "iNHG": -0.1833907014369948,
+        "MPT": 0.07674259224537812
       }
     }
   },
   "post_mpt_formula": {
     "config": {
-      "H_kyr": 335.317,
-      "eight_H_kyr": 2682.536,
-      "L1_integers": [
-        9,
-        12,
-        14,
-        16,
-        18,
-        20,
-        21,
-        22,
-        24,
-        25,
-        28,
-        30,
-        31,
-        35,
-        38,
-        39,
-        48,
-        50,
-        53,
-        65,
-        66,
-        68,
-        73,
-        76,
-        96,
-        107,
-        110,
-        113,
-        120,
-        134,
-        141,
-        152,
-        185
+      "L1_lines": [
+        {
+          "family": "climatic precession",
+          "label": "p+g2",
+          "arcsecPerYr": 68.20533085217915,
+          "periodKyr": 19.001447303419877,
+          "relAmp": 0.6717512938116206
+        },
+        {
+          "family": "climatic precession",
+          "label": "p+g3",
+          "arcsecPerYr": 67.65725935066226,
+          "periodKyr": 19.155372423274404,
+          "relAmp": 0.4607842722501143
+        },
+        {
+          "family": "climatic precession",
+          "label": "p+g1",
+          "arcsecPerYr": 57.74073678329907,
+          "periodKyr": 22.445158690369446,
+          "relAmp": 0.8620468725902352
+        },
+        {
+          "family": "climatic precession",
+          "label": "p+g4",
+          "arcsecPerYr": 55.87857963778711,
+          "periodKyr": 23.19314500119466,
+          "relAmp": 0.19922380139666943
+        },
+        {
+          "family": "climatic precession",
+          "label": "p+g0",
+          "arcsecPerYr": 54.54567191581978,
+          "periodKyr": 23.75990531384624,
+          "relAmp": 1.0
+        },
+        {
+          "family": "obliquity",
+          "label": "p+s12",
+          "arcsecPerYr": 47.29590619355313,
+          "periodKyr": 27.40194880073271,
+          "relAmp": 0.10427591691403815
+        },
+        {
+          "family": "obliquity",
+          "label": "p+s1",
+          "arcsecPerYr": 44.70306999762271,
+          "periodKyr": 28.991297467241527,
+          "relAmp": 0.5416346168208136
+        },
+        {
+          "family": "obliquity",
+          "label": "p+s14",
+          "arcsecPerYr": 44.45151946482077,
+          "periodKyr": 29.15535881795139,
+          "relAmp": 0.1423622336951359
+        },
+        {
+          "family": "obliquity",
+          "label": "p+s9",
+          "arcsecPerYr": 43.52756580857083,
+          "periodKyr": 29.7742356119719,
+          "relAmp": 0.10094037508523732
+        },
+        {
+          "family": "obliquity",
+          "label": "p+s3",
+          "arcsecPerYr": 43.24580236542744,
+          "periodKyr": 29.968226489331563,
+          "relAmp": 0.47895531494942417
+        },
+        {
+          "family": "obliquity",
+          "label": "p+s2",
+          "arcsecPerYr": 32.53285971289672,
+          "periodKyr": 39.836645515864,
+          "relAmp": 0.48491909690353013
+        },
+        {
+          "family": "obliquity",
+          "label": "p+s4",
+          "arcsecPerYr": 31.98458119107587,
+          "periodKyr": 40.51952383736704,
+          "relAmp": 0.32380140712519323
+        },
+        {
+          "family": "obliquity",
+          "label": "p+s0",
+          "arcsecPerYr": 31.43772998726808,
+          "periodKyr": 41.22435050256062,
+          "relAmp": 1.0
+        },
+        {
+          "family": "obliquity",
+          "label": "p+s7",
+          "arcsecPerYr": 30.88973745178278,
+          "periodKyr": 41.95568194851078,
+          "relAmp": 0.1787778028028384
+        },
+        {
+          "family": "obliquity",
+          "label": "p+s10",
+          "arcsecPerYr": 23.940447211803555,
+          "periodKyr": 54.13432708813487,
+          "relAmp": 0.16050220301405962
+        },
+        {
+          "family": "eccentricity",
+          "label": "g0\u2212g2",
+          "arcsecPerYr": 13.659658936359374,
+          "periodKyr": 94.87791796545507,
+          "relAmp": 0.7792514713186953
+        },
+        {
+          "family": "eccentricity",
+          "label": "g0\u2212g6",
+          "arcsecPerYr": 13.38165248714171,
+          "periodKyr": 96.84902527885197,
+          "relAmp": 0.10994906379552646
+        },
+        {
+          "family": "eccentricity",
+          "label": "g0\u2212g3",
+          "arcsecPerYr": 13.111587434842484,
+          "periodKyr": 98.8438666515722,
+          "relAmp": 0.5345234544678213
+        },
+        {
+          "family": "eccentricity",
+          "label": "g0\u2212g5",
+          "arcsecPerYr": 12.831040820044286,
+          "periodKyr": 101.00505626756528,
+          "relAmp": 0.15474417022576337
+        },
+        {
+          "family": "eccentricity",
+          "label": "g0\u2212g7",
+          "arcsecPerYr": 12.567419541379522,
+          "periodKyr": 103.12379528134528,
+          "relAmp": 0.10461813237212561
+        },
+        {
+          "family": "eccentricity",
+          "label": "g2\u2212g4",
+          "arcsecPerYr": 12.326751214392043,
+          "periodKyr": 105.13719125659492,
+          "relAmp": 0.1552454403600582
+        },
+        {
+          "family": "eccentricity",
+          "label": "g3\u2212g4",
+          "arcsecPerYr": 11.778679712875153,
+          "periodKyr": 110.02930987106778,
+          "relAmp": 0.1064897945347589
+        },
+        {
+          "family": "eccentricity",
+          "label": "g1\u2212g2",
+          "arcsecPerYr": 10.46459406888008,
+          "periodKyr": 123.84617993487996,
+          "relAmp": 0.6717512938116206
+        },
+        {
+          "family": "eccentricity",
+          "label": "g1\u2212g3",
+          "arcsecPerYr": 9.91652256736319,
+          "periodKyr": 130.6909747037068,
+          "relAmp": 0.46078427225011426
+        },
+        {
+          "family": "eccentricity",
+          "label": "g1\u2212g5",
+          "arcsecPerYr": 9.635975952564992,
+          "periodKyr": 134.49597699079135,
+          "relAmp": 0.1333967279946903
+        },
+        {
+          "family": "eccentricity fundamental",
+          "label": "g\u2082\u2212g\u2085",
+          "periodKyr": 405.6255674779031,
+          "arcsecPerYr": 3.195064867479294,
+          "note": "the engine\u2019s 20-Myr mean beat; the long-eccentricity metronome"
+        },
+        {
+          "family": "climate-internal harmonic",
+          "label": "(g\u2082\u2212g\u2085)/2",
+          "periodKyr": 202.81278373895154,
+          "note": "carbon-thermostat 2nd harmonic (doc 92 \u00a73), not orbital forcing"
+        },
+        {
+          "family": "climate-internal harmonic",
+          "label": "(g\u2082\u2212g\u2085)/3",
+          "periodKyr": 135.20852249263436,
+          "note": "carbon-thermostat 3rd harmonic (doc 92 \u00a73), not orbital forcing"
+        }
       ],
+      "L1_source": "data/l1-physical-lines.json",
       "L2_periods_kyr": {
         "405-kyr (fundamental)": 404.5,
         "202-kyr (2nd harmonic)": 202.25,
@@ -182,224 +502,222 @@
       0,
       1000
     ],
-    "intercept": 0.0020287669071571515,
+    "intercept": -0.006859079927041652,
     "L1_coefficients": {
-      "9": {
-        "a_cos": -0.09870192665615818,
-        "b_sin": 0.07802436118773162,
-        "amp": 0.12581681630207955,
-        "label": "g\u2082\u2212g\u2087 Venus-Uranus ecc / Mercury Axial = 8H/9"
+      "19.0014": {
+        "period_kyr": 19.001447303419877,
+        "a_cos": 0.08294736630173627,
+        "b_sin": -0.13452690569653236,
+        "amp": 0.15804351911001643,
+        "label": "climatic precession p+g2"
       },
-      "12": {
-        "a_cos": 0.18869059966860155,
-        "b_sin": -0.0643358398300442,
-        "amp": 0.19935707333810246,
-        "label": "s\u2085\u2212s\u2081 Jupiter-Mercury nodal"
+      "19.1554": {
+        "period_kyr": 19.155372423274404,
+        "a_cos": 0.05601123559973187,
+        "b_sin": 0.03632505583875134,
+        "amp": 0.06675903081304486,
+        "label": "climatic precession p+g3"
       },
-      "14": {
-        "a_cos": -0.051072482287657206,
-        "b_sin": -0.030466257958678904,
-        "amp": 0.05946924685102229,
-        "label": "g\u2082\u2212g\u2088 Venus-Neptune ecc"
+      "22.4452": {
+        "period_kyr": 22.445158690369446,
+        "a_cos": 0.1357807829852623,
+        "b_sin": 0.10205201192382218,
+        "amp": 0.1698559217860562,
+        "label": "climatic precession p+g1"
       },
-      "16": {
-        "a_cos": 0.05533250946050117,
-        "b_sin": -0.17737671619500606,
-        "amp": 0.18580685146495587,
-        "label": "Mars Axial = 8H/16"
+      "23.1931": {
+        "period_kyr": 23.19314500119466,
+        "a_cos": 0.004012144643884552,
+        "b_sin": -0.12042207609609362,
+        "amp": 0.1204888945751301,
+        "label": "climatic precession p+g4"
       },
-      "18": {
-        "a_cos": 0.03810489098926612,
-        "b_sin": -0.02504691930173711,
-        "amp": 0.04559968074243048,
-        "label": "s\u2084\u2212s\u2086 Mars-Saturn nodal"
+      "23.7599": {
+        "period_kyr": 23.75990531384624,
+        "a_cos": -0.17434339162278492,
+        "b_sin": -0.08984125908351653,
+        "amp": 0.19613023743484148,
+        "label": "climatic precession p+g0"
       },
-      "20": {
-        "a_cos": -0.25547415923820804,
-        "b_sin": -0.22459457088349233,
-        "amp": 0.3401613842116846,
-        "label": "g\u2083\u2212g\u2082 Earth-Venus ecc"
+      "27.4019": {
+        "period_kyr": 27.40194880073271,
+        "a_cos": 0.03370440119909067,
+        "b_sin": 0.02188499378049008,
+        "amp": 0.04018631126343091,
+        "label": "obliquity p+s12"
       },
-      "21": {
-        "a_cos": -0.16174191741332947,
-        "b_sin": 0.10502649460878993,
-        "amp": 0.192849714592349,
-        "label": "Mars Obliq / Jupiter Axial = 8H/21"
+      "28.9913": {
+        "period_kyr": 28.991297467241527,
+        "a_cos": -0.4165736555806434,
+        "b_sin": -0.18956384958264927,
+        "amp": 0.45767681128981597,
+        "label": "obliquity p+s1"
       },
-      "22": {
-        "a_cos": -0.30447758939794756,
-        "b_sin": 0.2596064638779869,
-        "amp": 0.40012762780495137,
-        "label": "s\u2082\u2212s\u2084 Venus-Mars nodal / g\u2084\u2212g\u2082 (Round 1 C8: highest L2 ratio at 12.84)"
+      "29.1554": {
+        "period_kyr": 29.15535881795139,
+        "a_cos": 0.4054650904732014,
+        "b_sin": -0.14264298630219982,
+        "amp": 0.429824337530637,
+        "label": "obliquity p+s14"
       },
-      "24": {
-        "a_cos": -0.46706242506744755,
-        "b_sin": -0.04498334451252531,
-        "amp": 0.4692236249310318,
-        "label": "Earth's own H/3 eccentricity line (the one-law e(t); no secular-theory counterpart \u2014 pre-iNHG regime admission, doc 94 \u00a710)"
+      "29.7742": {
+        "period_kyr": 29.7742356119719,
+        "a_cos": -0.16202192173332058,
+        "b_sin": 0.34226183681951605,
+        "amp": 0.3786743562287091,
+        "label": "obliquity p+s9"
       },
-      "25": {
-        "a_cos": -0.0708803248998442,
-        "b_sin": 0.7753564840942426,
-        "amp": 0.7785895567530385,
-        "label": "s\u2081\u2212s\u2084 Mercury-Mars nodal (100-kyr centroid)"
+      "29.9682": {
+        "period_kyr": 29.968226489331563,
+        "a_cos": -0.008447772534511233,
+        "b_sin": -0.3959078605080296,
+        "amp": 0.395997978369638,
+        "label": "obliquity p+s3"
       },
-      "28": {
-        "a_cos": -0.3632337575516864,
-        "b_sin": -0.5298147269256784,
-        "amp": 0.6423724834490099,
-        "label": "g\u2084\u2212g\u2085 Mars-Jupiter ecc (Berger 95k)"
+      "39.8366": {
+        "period_kyr": 39.836645515864,
+        "a_cos": -0.023522869769341537,
+        "b_sin": 0.13158148794243887,
+        "amp": 0.13366754793640673,
+        "label": "obliquity p+s2"
       },
-      "30": {
-        "a_cos": 0.025091170699769613,
-        "b_sin": 0.11999659270351754,
-        "amp": 0.1225917986960745,
-        "label": "g\u2083\u2212g\u2087 Earth-Uranus ecc"
+      "40.5195": {
+        "period_kyr": 40.51952383736704,
+        "a_cos": -0.647605261240209,
+        "b_sin": 0.046228926395920134,
+        "amp": 0.6492531771364071,
+        "label": "obliquity p+s4"
       },
-      "31": {
-        "a_cos": 0.021183426618336516,
-        "b_sin": 0.3115155755982491,
-        "amp": 0.3122349938805753,
-        "label": "g\u2084\u2212g\u2087 Mars-Uranus"
+      "41.2244": {
+        "period_kyr": 41.22435050256062,
+        "a_cos": -0.5685408883095209,
+        "b_sin": -0.4877001890722499,
+        "amp": 0.7490595544420265,
+        "label": "obliquity p+s0"
       },
-      "35": {
-        "a_cos": -0.16477189838679798,
-        "b_sin": -0.12684680347802993,
-        "amp": 0.20794203531413083,
-        "label": "s\u2084\u2212s\u2088 Mars-Neptune nodal (75.98 kyr, 0.9%) \u2014 lattice-exact: Mars.Peri_ecl(36) \u2212 Venus.AscNode(1), the 8H-modulation sideband of the Mars perihelion line"
+      "41.9557": {
+        "period_kyr": 41.95568194851078,
+        "a_cos": 0.48473593773317614,
+        "b_sin": -0.09510323517350419,
+        "amp": 0.49397728153279324,
+        "label": "obliquity p+s7"
       },
-      "38": {
-        "a_cos": -0.33861108976571586,
-        "b_sin": 0.41702716178847143,
-        "amp": 0.5371863026750344,
-        "label": "s\u2088\u2212s\u2083 Neptune-Earth nodal"
+      "54.1343": {
+        "period_kyr": 54.13432708813487,
+        "a_cos": 0.06985780268943448,
+        "b_sin": -0.049863804948489666,
+        "amp": 0.08582838481840947,
+        "label": "obliquity p+s10"
       },
-      "39": {
-        "a_cos": 0.2722988241456647,
-        "b_sin": 0.2349520810007341,
-        "amp": 0.3596514006613726,
-        "label": "s\u2085\u2212s\u2083 Earth nodal"
+      "94.8779": {
+        "period_kyr": 94.87791796545507,
+        "a_cos": -0.02864004938419458,
+        "b_sin": -2.207843407944215,
+        "amp": 2.2080291588725576,
+        "label": "eccentricity g0\u2212g2"
       },
-      "48": {
-        "a_cos": -0.19500283074610147,
-        "b_sin": -0.056424164493483295,
-        "amp": 0.20300194663544574,
-        "label": "s\u2087\u2212s\u2086 Uranus-Saturn nodal"
+      "96.8490": {
+        "period_kyr": 96.84902527885197,
+        "a_cos": 0.6146976466234312,
+        "b_sin": 1.1518449329460076,
+        "amp": 1.3056032882609394,
+        "label": "eccentricity g0\u2212g6"
       },
-      "50": {
-        "a_cos": -0.021682565454357525,
-        "b_sin": 0.11103909541050011,
-        "amp": 0.11313626454088294,
-        "label": "g\u2086\u2212g\u2085 Saturn-Jupiter ecc"
+      "98.8439": {
+        "period_kyr": 98.8438666515722,
+        "a_cos": 1.199788044646043,
+        "b_sin": 0.30928999316306677,
+        "amp": 1.2390123695695636,
+        "label": "eccentricity g0\u2212g3"
       },
-      "53": {
-        "a_cos": -0.03050371261624335,
-        "b_sin": -0.04667671942299639,
-        "amp": 0.0557601346794239,
-        "label": "s\u2086\u2212s\u2088 Saturn-Neptune nodal (50.52 kyr, 0.2%) \u2014 lattice-exact: Mars.AscNode(64) \u2212 Uranus.AscNode(11) (= Mars.Ecc(52) + Venus.AscNode(1), the 8H sideband of the Mars eccentricity line)"
+      "101.0051": {
+        "period_kyr": 101.00505626756528,
+        "a_cos": -0.2113674875472471,
+        "b_sin": -0.1286859519009373,
+        "amp": 0.24745967147938672,
+        "label": "eccentricity g0\u2212g5"
       },
-      "65": {
-        "a_cos": -0.23076007048705077,
-        "b_sin": 0.29076180226738396,
-        "amp": 0.37120430464767773,
-        "label": "k+s\u2083 Earth obliquity (Berger 41k)"
+      "103.1238": {
+        "period_kyr": 103.12379528134528,
+        "a_cos": -0.678518796289539,
+        "b_sin": 0.8331502346241362,
+        "amp": 1.0744892137068935,
+        "label": "eccentricity g0\u2212g7"
       },
-      "66": {
-        "a_cos": -0.19066037264103197,
-        "b_sin": -0.20422550842593382,
-        "amp": 0.27939118809913877,
-        "label": "obliquity-band arithmetic-mean (Round 2 C10: EPICA CO\u2082 ratio 15.79)"
+      "105.1372": {
+        "period_kyr": 105.13719125659492,
+        "a_cos": 0.03372165993311459,
+        "b_sin": 1.003599607352206,
+        "amp": 1.0041659834042111,
+        "label": "eccentricity g2\u2212g4"
       },
-      "68": {
-        "a_cos": -0.05158581972511658,
-        "b_sin": -0.09302254600265852,
-        "amp": 0.10636865544665378,
-        "label": "k+s\u2084 Berger Mars obliquity sub-peak"
+      "110.0293": {
+        "period_kyr": 110.02930987106778,
+        "a_cos": -1.0160216069441002,
+        "b_sin": -0.20297198804660166,
+        "amp": 1.0360972607380357,
+        "label": "eccentricity g3\u2212g4"
       },
-      "73": {
-        "a_cos": 0.011447700477341227,
-        "b_sin": -0.06262312727184677,
-        "amp": 0.06366086643712005,
-        "label": "2|s\u2084| Mars nodal harmonic"
+      "123.8462": {
+        "period_kyr": 123.84617993487996,
+        "a_cos": -0.3991277729049695,
+        "b_sin": -0.14115064424818774,
+        "amp": 0.42335148928019534,
+        "label": "eccentricity g1\u2212g2"
       },
-      "76": {
-        "a_cos": -0.06286238116103433,
-        "b_sin": -0.01833280143968108,
-        "amp": 0.06548107034755875,
-        "label": "g\u2084\u2212s\u2083 Mars-Earth beat"
+      "130.6910": {
+        "period_kyr": 130.6909747037068,
+        "a_cos": 0.9842532594258973,
+        "b_sin": 0.3715490010962593,
+        "amp": 1.052047118196771,
+        "label": "eccentricity g1\u2212g3"
       },
-      "96": {
-        "a_cos": 0.011706902418024301,
-        "b_sin": 0.017233673356874646,
-        "amp": 0.020833892137490637,
-        "label": "k+g\u2086 Saturn climatic precession sub-peak (Round 1 A1 sideband)"
+      "134.4960": {
+        "period_kyr": 134.49597699079135,
+        "a_cos": -0.25194431952193724,
+        "b_sin": -0.06656891455416303,
+        "amp": 0.2605904075830334,
+        "label": "eccentricity g1\u2212g5"
       },
-      "107": {
-        "a_cos": -0.027372993164496706,
-        "b_sin": -0.042496069145263216,
-        "amp": 0.05054895298206062,
-        "label": "k+g\u2087 Uranus climatic precession sub-peak (Round 1 A1)"
+      "405.6256": {
+        "period_kyr": 405.6255674779031,
+        "a_cos": -0.07976853087661281,
+        "b_sin": -0.04784706745757593,
+        "amp": 0.09301806481809302,
+        "label": "eccentricity fundamental g\u2082\u2212g\u2085"
       },
-      "110": {
-        "a_cos": -0.02443602372603941,
-        "b_sin": -0.051869220555656737,
-        "amp": 0.0573370325059723,
-        "label": "k+g\u2083 Earth secondary precession sideband (Round 1 A1)"
+      "202.8128": {
+        "period_kyr": 202.81278373895154,
+        "a_cos": -0.025102426889482554,
+        "b_sin": 0.17981430072435628,
+        "amp": 0.18155801987444964,
+        "label": "climate-internal harmonic (g\u2082\u2212g\u2085)/2"
       },
-      "113": {
-        "a_cos": -0.16470082771645034,
-        "b_sin": -0.0914239704753495,
-        "amp": 0.18837384379993266,
-        "label": "k+g\u2085 Jupiter climatic precession (Berger 23.7k)"
-      },
-      "120": {
-        "a_cos": 0.0954204324478758,
-        "b_sin": 0.1726034043430364,
-        "amp": 0.1972232088759975,
-        "label": "k+g\u2082 Venus climatic precession = H/15"
-      },
-      "134": {
-        "a_cos": 0.015169363123242047,
-        "b_sin": 0.03879408277513209,
-        "amp": 0.04165441676375479,
-        "label": "k+g\u2085 Jupiter precession sub-peak (Round 1 A1)"
-      },
-      "141": {
-        "a_cos": 0.06375149901569599,
-        "b_sin": -0.08995863732472312,
-        "amp": 0.11025792513950802,
-        "label": "k+g\u2083 Earth climatic precession \u2014 Berger quintet 19-kyr peak (subthreshold LR04, 3\u03c3 in Cheng monsoon; beats with n=113 to form n=28 per Wigley 1976)"
-      },
-      "152": {
-        "a_cos": 0.010424411120804972,
-        "b_sin": 0.027898943807245655,
-        "amp": 0.02978287113049064,
-        "label": "k+g\u2084 Mars climatic precession sub-peak (Round 1 A1)"
-      },
-      "185": {
-        "a_cos": 0.008698894153377046,
-        "b_sin": 0.04045697708859301,
-        "amp": 0.041381611310322336,
-        "label": "k+g\u2082 Venus precession sub-peak (Round 1 A1)"
+      "135.2085": {
+        "period_kyr": 135.20852249263436,
+        "a_cos": -0.6787936348859741,
+        "b_sin": 0.18775953213553198,
+        "amp": 0.7042829265781381,
+        "label": "climate-internal harmonic (g\u2082\u2212g\u2085)/3"
       }
     },
     "L2_coefficients": {
       "405-kyr (fundamental)": {
-        "a_cos": -0.06869358566966062,
-        "b_sin": -0.04256726105410261,
-        "amp": 0.08081324412373955,
+        "a_cos": 0,
+        "b_sin": 0,
+        "amp": 0.0,
         "period_kyr": 404.5
       },
       "202-kyr (2nd harmonic)": {
-        "a_cos": -0.0008916241337003899,
-        "b_sin": 0.01078541683931139,
-        "amp": 0.010822209108749408,
+        "a_cos": 0,
+        "b_sin": 0,
+        "amp": 0.0,
         "period_kyr": 202.25
       },
       "135-kyr (3rd harmonic)": {
-        "a_cos": -0.0007023248379485958,
-        "b_sin": -1.0063484632143486e-05,
-        "amp": 0.0007023969331670396,
+        "a_cos": 0,
+        "b_sin": 0,
+        "amp": 0.0,
         "period_kyr": 134.83
       }
     },
@@ -414,46 +732,46 @@
     "scope_note": "Forward projection assumes post-MPT physics. R\u00b2 \u2248 0.90 within regime; not predictive across regime boundaries.",
     "glacial_maxima_kyr_from_now": [
       [
-        58.5,
-        2.7888673047855432
+        11.0,
+        -0.3357780126509609
       ],
       [
-        103.5,
-        -0.7265747515275532
+        62.0,
+        1.775073110655506
       ],
       [
-        132.5,
-        -0.5790778413957969
+        97.0,
+        3.057709484620694
       ],
       [
-        154.5,
-        -0.03274690335503647
+        133.5,
+        -1.3720490425704097
       ],
       [
-        194.5,
-        2.770089620183802
+        180.5,
+        4.3647497706214
       ]
     ],
     "interglacial_peaks_kyr_from_now": [
       [
-        94.0,
-        -1.109788737122207
+        31.0,
+        -2.373645048498988
       ],
       [
-        119.5,
-        -1.6251647659697266
+        77.0,
+        0.9189577568682996
       ],
       [
-        143.0,
-        -1.1713798193244909
+        121.0,
+        -2.546103279473566
       ],
       [
-        163.5,
-        -0.889683893567179
+        143.5,
+        -2.087107187713963
       ],
       [
-        235.5,
-        -1.2000485848952995
+        205.0,
+        0.16748079311306538
       ]
     ]
   },
@@ -466,16 +784,16 @@
         23000
       ],
       "n_samples": 4601,
-      "r2_l1_only": 0.014329969331748016,
-      "r2_l1_l2": 0.023539239343213003,
-      "r2_l1_l2_l3": 0.07700356885458026,
-      "delta_r2_l2": 0.009209270011464987,
-      "delta_r2_l3": 0.05346432951136726,
+      "r2_l1_only": 0.033351528464600655,
+      "r2_l1_l2": 0.033351528464600655,
+      "r2_l1_l2_l3": 0.08642465753950879,
+      "delta_r2_l2": 0.0,
+      "delta_r2_l3": 0.05307312907490813,
       "n_l3_steps": 3,
       "l3_step_betas": {
-        "MMCT": 0.05239373996362825,
-        "iNHG": -0.8530394078578475,
-        "MPT": 0.6870674983455196
+        "MMCT": 0.05337934908342658,
+        "iNHG": -0.8484937122552672,
+        "MPT": 0.6814900132397482
       }
     },
     {
@@ -486,17 +804,17 @@
         34000
       ],
       "n_samples": 6801,
-      "r2_l1_only": 0.004833486780927099,
-      "r2_l1_l2": 0.011730506785252892,
-      "r2_l1_l2_l3": 0.45466183011242955,
-      "delta_r2_l2": 0.006897020004325793,
-      "delta_r2_l3": 0.44293132332717666,
+      "r2_l1_only": 0.019681189829388823,
+      "r2_l1_l2": 0.019681189829388823,
+      "r2_l1_l2_l3": 0.46234845979602746,
+      "delta_r2_l2": 0.0,
+      "delta_r2_l3": 0.44266726996663863,
       "n_l3_steps": 4,
       "l3_step_betas": {
-        "Mi-1": 1.510435861795196,
-        "MMCT": -0.9781791014887096,
-        "iNHG": -1.3677643901459362,
-        "MPT": 1.3160780269573769
+        "Mi-1": 1.5108311250307729,
+        "MMCT": -0.9779096300181478,
+        "iNHG": -1.3647103954371187,
+        "MPT": 1.3124601873832527
       }
     },
     {
@@ -507,19 +825,19 @@
         67000
       ],
       "n_samples": 13401,
-      "r2_l1_only": 0.001172681062485692,
-      "r2_l1_l2": 0.004732711889519514,
-      "r2_l1_l2_l3": 0.6177145644223336,
-      "delta_r2_l2": 0.003560030827033822,
-      "delta_r2_l3": 0.6129818525328141,
+      "r2_l1_only": 0.003876009157199989,
+      "r2_l1_l2": 0.003876009157199989,
+      "r2_l1_l2_l3": 0.6165047079611101,
+      "delta_r2_l2": 0.0,
+      "delta_r2_l3": 0.6126286988039101,
       "n_l3_steps": 6,
       "l3_step_betas": {
-        "PETM": 1.9406916368508667,
-        "EOT": -1.6915259100317868,
-        "Mi-1": 1.3784808295015167,
-        "MMCT": -0.5721366479905157,
-        "iNHG": -0.9478456525060606,
-        "MPT": 0.9599033265974033
+        "PETM": 1.9400158200841966,
+        "EOT": -1.6915477975800792,
+        "Mi-1": 1.3790909076086466,
+        "MMCT": -0.5726330472497275,
+        "iNHG": -0.9437582187200781,
+        "MPT": 0.9558616582445898
       }
     },
     {
@@ -530,16 +848,16 @@
         23000
       ],
       "n_samples": 4601,
-      "r2_l1_only": 0.009749780478137682,
-      "r2_l1_l2": 0.022854079209577383,
-      "r2_l1_l2_l3": 0.0733960548810223,
-      "delta_r2_l2": 0.0131042987314397,
-      "delta_r2_l3": 0.050541975671444916,
+      "r2_l1_only": 0.022738919798780843,
+      "r2_l1_l2": 0.022738919798780843,
+      "r2_l1_l2_l3": 0.0735386644122702,
+      "delta_r2_l2": 0.0,
+      "delta_r2_l3": 0.05079974461348935,
       "n_l3_steps": 3,
       "l3_step_betas": {
-        "MMCT": -0.27463919194372727,
-        "iNHG": 0.8185535927440617,
-        "MPT": -0.6104645505688324
+        "MMCT": -0.27507518956538807,
+        "iNHG": 0.8214335973373532,
+        "MPT": -0.6137626466444083
       }
     },
     {
@@ -550,17 +868,17 @@
         34000
       ],
       "n_samples": 6801,
-      "r2_l1_only": 0.0041982933849030735,
-      "r2_l1_l2": 0.014834685227630762,
-      "r2_l1_l2_l3": 0.32601146644224666,
-      "delta_r2_l2": 0.010636391842727688,
-      "delta_r2_l3": 0.3111767812146159,
+      "r2_l1_only": 0.017956464119968207,
+      "r2_l1_l2": 0.017956464119968207,
+      "r2_l1_l2_l3": 0.32891773792887313,
+      "delta_r2_l2": 0.0,
+      "delta_r2_l3": 0.3109612738089049,
       "n_l3_steps": 4,
       "l3_step_betas": {
-        "Mi-1": -1.2712878695192886,
-        "MMCT": 0.6374454930176534,
-        "iNHG": 1.2841330045876247,
-        "MPT": -1.1397964814951238
+        "Mi-1": -1.2701037484958368,
+        "MMCT": 0.6373152043218372,
+        "iNHG": 1.2859930791413996,
+        "MPT": -1.1421663514635714
       }
     },
     {
@@ -571,19 +889,19 @@
         67000
       ],
       "n_samples": 13401,
-      "r2_l1_only": 0.0012632800611531714,
-      "r2_l1_l2": 0.009338056667266725,
-      "r2_l1_l2_l3": 0.3514392019321605,
-      "delta_r2_l2": 0.008074776606113554,
-      "delta_r2_l3": 0.34210114526489377,
+      "r2_l1_only": 0.006168654587274669,
+      "r2_l1_l2": 0.006168654587274669,
+      "r2_l1_l2_l3": 0.3483764440324215,
+      "delta_r2_l2": 0.0,
+      "delta_r2_l3": 0.34220778944514685,
       "n_l3_steps": 6,
       "l3_step_betas": {
-        "PETM": 1.2947357840683698,
-        "EOT": -0.6511835044398144,
-        "Mi-1": -0.7994815152924635,
-        "MMCT": 0.8760948570766207,
-        "iNHG": 1.32609596859927,
-        "MPT": -1.3290964618020789
+        "PETM": 1.2940359538531367,
+        "EOT": -0.6519376180638043,
+        "Mi-1": -0.7981261235096029,
+        "MMCT": 0.8752124431571833,
+        "iNHG": 1.332293209794654,
+        "MPT": -1.3351323776348467
       }
     }
   ],
@@ -594,246 +912,211 @@
       800
     ],
     "n_samples": 801,
-    "r2_l1_only": 0.8338043250765752,
-    "r2_l1_l2": 0.8453484545481055,
-    "r2_l1_l2_l3": 0.8453484545481055,
-    "delta_r2_l2": 0.011544129471530273,
+    "r2_l1_only": 0.7301216245357616,
+    "r2_l1_l2": 0.7301216245357616,
+    "r2_l1_l2_l3": 0.7301216245357616,
+    "delta_r2_l2": 0.0,
     "delta_r2_l3": 0.0,
     "co2_range_ppm": [
       173.71,
       313.66
     ],
     "carbon_amplification_ratios": {
-      "9": {
-        "lr04_post_mpt_amp": 0.12581681630207955,
-        "epica_amp": 0.15646855932876327,
-        "ratio": 1.243621988916732,
-        "period_kyr": 298.05955555555556,
-        "label": "g\u2082\u2212g\u2087 Venus-Uranus ecc / Mercury Axial = 8H/9"
+      "19.0014": {
+        "lr04_post_mpt_amp": 0.15804351911001643,
+        "epica_amp": 0.10393413248565443,
+        "ratio": 0.6576298292453507,
+        "period_kyr": 19.001447303419877,
+        "label": "climatic precession p+g2"
       },
-      "12": {
-        "lr04_post_mpt_amp": 0.19935707333810246,
-        "epica_amp": 0.7207838025909189,
-        "ratio": 3.6155416535860523,
-        "period_kyr": 223.54466666666667,
-        "label": "s\u2085\u2212s\u2081 Jupiter-Mercury nodal"
+      "19.1554": {
+        "lr04_post_mpt_amp": 0.06675903081304486,
+        "epica_amp": 0.09745806154018824,
+        "ratio": 1.459848358390858,
+        "period_kyr": 19.155372423274404,
+        "label": "climatic precession p+g3"
       },
-      "14": {
-        "lr04_post_mpt_amp": 0.05946924685102229,
-        "epica_amp": 1.1921801564103598,
-        "ratio": 20.047002770977013,
-        "period_kyr": 191.6097142857143,
-        "label": "g\u2082\u2212g\u2088 Venus-Neptune ecc"
+      "22.4452": {
+        "lr04_post_mpt_amp": 0.1698559217860562,
+        "epica_amp": 0.07768952921123948,
+        "ratio": 0.4573848729813149,
+        "period_kyr": 22.445158690369446,
+        "label": "climatic precession p+g1"
       },
-      "16": {
-        "lr04_post_mpt_amp": 0.18580685146495587,
-        "epica_amp": 0.9888482372918813,
-        "ratio": 5.321914824429298,
-        "period_kyr": 167.6585,
-        "label": "Mars Axial = 8H/16"
+      "23.1931": {
+        "lr04_post_mpt_amp": 0.1204888945751301,
+        "epica_amp": 0.15933848639175022,
+        "ratio": 1.3224329674001258,
+        "period_kyr": 23.19314500119466,
+        "label": "climatic precession p+g4"
       },
-      "18": {
-        "lr04_post_mpt_amp": 0.04559968074243048,
-        "epica_amp": 0.6048066028708838,
-        "ratio": 13.263395555050709,
-        "period_kyr": 149.02977777777778,
-        "label": "s\u2084\u2212s\u2086 Mars-Saturn nodal"
+      "23.7599": {
+        "lr04_post_mpt_amp": 0.19613023743484148,
+        "epica_amp": 0.11856515358264805,
+        "ratio": 0.6045225618106838,
+        "period_kyr": 23.75990531384624,
+        "label": "climatic precession p+g0"
       },
-      "20": {
-        "lr04_post_mpt_amp": 0.3401613842116846,
-        "epica_amp": 0.588639468027801,
-        "ratio": 1.7304711685365404,
-        "period_kyr": 134.1268,
-        "label": "g\u2083\u2212g\u2082 Earth-Venus ecc"
+      "27.4019": {
+        "lr04_post_mpt_amp": 0.04018631126343091,
+        "epica_amp": 0.09399281979530304,
+        "ratio": 2.3389262870920784,
+        "period_kyr": 27.40194880073271,
+        "label": "obliquity p+s12"
       },
-      "21": {
-        "lr04_post_mpt_amp": 0.192849714592349,
-        "epica_amp": 0.2934088481462535,
-        "ratio": 1.521437813721784,
-        "period_kyr": 127.73980952380953,
-        "label": "Mars Obliq / Jupiter Axial = 8H/21"
+      "28.9913": {
+        "lr04_post_mpt_amp": 0.45767681128981597,
+        "epica_amp": 0.2771498235575972,
+        "ratio": 0.6055579324120418,
+        "period_kyr": 28.991297467241527,
+        "label": "obliquity p+s1"
       },
-      "22": {
-        "lr04_post_mpt_amp": 0.40012762780495137,
-        "epica_amp": 0.7785061577691936,
-        "ratio": 1.945644598549663,
-        "period_kyr": 121.93345454545455,
-        "label": "s\u2082\u2212s\u2084 Venus-Mars nodal / g\u2084\u2212g\u2082 (Round 1 C8: highest L2 ratio at 12.84)"
+      "29.1554": {
+        "lr04_post_mpt_amp": 0.429824337530637,
+        "epica_amp": 0.3586296845347401,
+        "ratio": 0.8343633741055384,
+        "period_kyr": 29.15535881795139,
+        "label": "obliquity p+s14"
       },
-      "24": {
-        "lr04_post_mpt_amp": 0.4692236249310318,
-        "epica_amp": 0.18472089291597554,
-        "ratio": 0.39367347060397156,
-        "period_kyr": 111.77233333333334,
-        "label": "Earth's own H/3 eccentricity line (the one-law e(t); no secular-theory counterpart \u2014 pre-iNHG regime admission, doc 94 \u00a710)"
+      "29.7742": {
+        "lr04_post_mpt_amp": 0.3786743562287091,
+        "epica_amp": 0.16885498120005069,
+        "ratio": 0.44591078963389547,
+        "period_kyr": 29.7742356119719,
+        "label": "obliquity p+s9"
       },
-      "25": {
-        "lr04_post_mpt_amp": 0.7785895567530385,
-        "epica_amp": 0.6562737031628936,
-        "ratio": 0.8429007266675393,
-        "period_kyr": 107.30144,
-        "label": "s\u2081\u2212s\u2084 Mercury-Mars nodal (100-kyr centroid)"
+      "29.9682": {
+        "lr04_post_mpt_amp": 0.395997978369638,
+        "epica_amp": 0.03608856783917576,
+        "ratio": 0.09113321231526454,
+        "period_kyr": 29.968226489331563,
+        "label": "obliquity p+s3"
       },
-      "28": {
-        "lr04_post_mpt_amp": 0.6423724834490099,
-        "epica_amp": 0.2759501018631481,
-        "ratio": 0.42957958034180405,
-        "period_kyr": 95.80485714285714,
-        "label": "g\u2084\u2212g\u2085 Mars-Jupiter ecc (Berger 95k)"
+      "39.8366": {
+        "lr04_post_mpt_amp": 0.13366754793640673,
+        "epica_amp": 0.3886822581117688,
+        "ratio": 2.907828146115818,
+        "period_kyr": 39.836645515864,
+        "label": "obliquity p+s2"
       },
-      "30": {
-        "lr04_post_mpt_amp": 0.1225917986960745,
-        "epica_amp": 0.4146362964050657,
-        "ratio": 3.382251511237046,
-        "period_kyr": 89.41786666666667,
-        "label": "g\u2083\u2212g\u2087 Earth-Uranus ecc"
+      "40.5195": {
+        "lr04_post_mpt_amp": 0.6492531771364071,
+        "epica_amp": 0.6494364459526638,
+        "ratio": 1.0002822763487504,
+        "period_kyr": 40.51952383736704,
+        "label": "obliquity p+s4"
       },
-      "31": {
-        "lr04_post_mpt_amp": 0.3122349938805753,
-        "epica_amp": 0.17280740108132672,
-        "ratio": 0.5534530224610976,
-        "period_kyr": 86.53341935483871,
-        "label": "g\u2084\u2212g\u2087 Mars-Uranus"
+      "41.2244": {
+        "lr04_post_mpt_amp": 0.7490595544420265,
+        "epica_amp": 0.13689852565368915,
+        "ratio": 0.18276053598390407,
+        "period_kyr": 41.22435050256062,
+        "label": "obliquity p+s0"
       },
-      "35": {
-        "lr04_post_mpt_amp": 0.20794203531413083,
-        "epica_amp": 0.20080851919634116,
-        "ratio": 0.9656946893541111,
-        "period_kyr": 76.64388571428572,
-        "label": "s\u2084\u2212s\u2088 Mars-Neptune nodal (75.98 kyr, 0.9%) \u2014 lattice-exact: Mars.Peri_ecl(36) \u2212 Venus.AscNode(1), the 8H-modulation sideband of the Mars perihelion line"
+      "41.9557": {
+        "lr04_post_mpt_amp": 0.49397728153279324,
+        "epica_amp": 0.2130641666473494,
+        "ratio": 0.43132381713227613,
+        "period_kyr": 41.95568194851078,
+        "label": "obliquity p+s7"
       },
-      "38": {
-        "lr04_post_mpt_amp": 0.5371863026750344,
-        "epica_amp": 0.8858519450909329,
-        "ratio": 1.6490590707165151,
-        "period_kyr": 70.59305263157894,
-        "label": "s\u2088\u2212s\u2083 Neptune-Earth nodal"
+      "54.1343": {
+        "lr04_post_mpt_amp": 0.08582838481840947,
+        "epica_amp": 0.16660361759115808,
+        "ratio": 1.9411249313807777,
+        "period_kyr": 54.13432708813487,
+        "label": "obliquity p+s10"
       },
-      "39": {
-        "lr04_post_mpt_amp": 0.3596514006613726,
-        "epica_amp": 0.5692127279470799,
-        "ratio": 1.5826790244674132,
-        "period_kyr": 68.78297435897436,
-        "label": "s\u2085\u2212s\u2083 Earth nodal"
+      "94.8779": {
+        "lr04_post_mpt_amp": 2.2080291588725576,
+        "epica_amp": 1.2772872144483263,
+        "ratio": 0.5784738889501452,
+        "period_kyr": 94.87791796545507,
+        "label": "eccentricity g0\u2212g2"
       },
-      "48": {
-        "lr04_post_mpt_amp": 0.20300194663544574,
-        "epica_amp": 0.1302146178336506,
-        "ratio": 0.6414451683435931,
-        "period_kyr": 55.88616666666667,
-        "label": "s\u2087\u2212s\u2086 Uranus-Saturn nodal"
+      "96.8490": {
+        "lr04_post_mpt_amp": 1.3056032882609394,
+        "epica_amp": 0.209621050250936,
+        "ratio": 0.16055493436306426,
+        "period_kyr": 96.84902527885197,
+        "label": "eccentricity g0\u2212g6"
       },
-      "50": {
-        "lr04_post_mpt_amp": 0.11313626454088294,
-        "epica_amp": 0.10223785365140721,
-        "ratio": 0.9036700483819008,
-        "period_kyr": 53.65072,
-        "label": "g\u2086\u2212g\u2085 Saturn-Jupiter ecc"
+      "98.8439": {
+        "lr04_post_mpt_amp": 1.2390123695695636,
+        "epica_amp": 0.4956631520238584,
+        "ratio": 0.4000469762832579,
+        "period_kyr": 98.8438666515722,
+        "label": "eccentricity g0\u2212g3"
       },
-      "53": {
-        "lr04_post_mpt_amp": 0.0557601346794239,
-        "epica_amp": 0.11321255664177242,
-        "ratio": 2.0303494116837038,
-        "period_kyr": 50.61388679245283,
-        "label": "s\u2086\u2212s\u2088 Saturn-Neptune nodal (50.52 kyr, 0.2%) \u2014 lattice-exact: Mars.AscNode(64) \u2212 Uranus.AscNode(11) (= Mars.Ecc(52) + Venus.AscNode(1), the 8H sideband of the Mars eccentricity line)"
+      "101.0051": {
+        "lr04_post_mpt_amp": 0.24745967147938672,
+        "epica_amp": 0.45384435595113093,
+        "ratio": 1.8340134100959395,
+        "period_kyr": 101.00505626756528,
+        "label": "eccentricity g0\u2212g5"
       },
-      "65": {
-        "lr04_post_mpt_amp": 0.37120430464767773,
-        "epica_amp": 0.1532225808042929,
-        "ratio": 0.4127715624141846,
-        "period_kyr": 41.269784615384616,
-        "label": "k+s\u2083 Earth obliquity (Berger 41k)"
+      "103.1238": {
+        "lr04_post_mpt_amp": 1.0744892137068935,
+        "epica_amp": 0.30988180003803606,
+        "ratio": 0.28839917244861957,
+        "period_kyr": 103.12379528134528,
+        "label": "eccentricity g0\u2212g7"
       },
-      "66": {
-        "lr04_post_mpt_amp": 0.27939118809913877,
-        "epica_amp": 0.5087649473499134,
-        "ratio": 1.8209770709353366,
-        "period_kyr": 40.64448484848485,
-        "label": "obliquity-band arithmetic-mean (Round 2 C10: EPICA CO\u2082 ratio 15.79)"
+      "105.1372": {
+        "lr04_post_mpt_amp": 1.0041659834042111,
+        "epica_amp": 0.43512865614952034,
+        "ratio": 0.43332343789857913,
+        "period_kyr": 105.13719125659492,
+        "label": "eccentricity g2\u2212g4"
       },
-      "68": {
-        "lr04_post_mpt_amp": 0.10636865544665378,
-        "epica_amp": 0.18241692578188345,
-        "ratio": 1.7149500011624155,
-        "period_kyr": 39.44905882352941,
-        "label": "k+s\u2084 Berger Mars obliquity sub-peak"
+      "110.0293": {
+        "lr04_post_mpt_amp": 1.0360972607380357,
+        "epica_amp": 0.8543474703903094,
+        "ratio": 0.8245823078247869,
+        "period_kyr": 110.02930987106778,
+        "label": "eccentricity g3\u2212g4"
       },
-      "73": {
-        "lr04_post_mpt_amp": 0.06366086643712005,
-        "epica_amp": 0.08570279135398456,
-        "ratio": 1.3462397882792887,
-        "period_kyr": 36.747068493150685,
-        "label": "2|s\u2084| Mars nodal harmonic"
+      "123.8462": {
+        "lr04_post_mpt_amp": 0.42335148928019534,
+        "epica_amp": 0.9068542041448425,
+        "ratio": 2.142083415572068,
+        "period_kyr": 123.84617993487996,
+        "label": "eccentricity g1\u2212g2"
       },
-      "76": {
-        "lr04_post_mpt_amp": 0.06548107034755875,
-        "epica_amp": 0.05859661603798019,
-        "ratio": 0.8948634426249078,
-        "period_kyr": 35.29652631578947,
-        "label": "g\u2084\u2212s\u2083 Mars-Earth beat"
+      "130.6910": {
+        "lr04_post_mpt_amp": 1.052047118196771,
+        "epica_amp": 0.41888776301927205,
+        "ratio": 0.39816445078738844,
+        "period_kyr": 130.6909747037068,
+        "label": "eccentricity g1\u2212g3"
       },
-      "96": {
-        "lr04_post_mpt_amp": 0.020833892137490637,
-        "epica_amp": 0.07119943450900414,
-        "ratio": 3.4174811907027487,
-        "period_kyr": 27.943083333333334,
-        "label": "k+g\u2086 Saturn climatic precession sub-peak (Round 1 A1 sideband)"
+      "134.4960": {
+        "lr04_post_mpt_amp": 0.2605904075830334,
+        "epica_amp": 0.36154018089821754,
+        "ratio": 1.387388677317364,
+        "period_kyr": 134.49597699079135,
+        "label": "eccentricity g1\u2212g5"
       },
-      "107": {
-        "lr04_post_mpt_amp": 0.05054895298206062,
-        "epica_amp": 0.07232327800188741,
-        "ratio": 1.4307571915001742,
-        "period_kyr": 25.070429906542056,
-        "label": "k+g\u2087 Uranus climatic precession sub-peak (Round 1 A1)"
+      "405.6256": {
+        "lr04_post_mpt_amp": 0.09301806481809302,
+        "epica_amp": 0.28851946224798175,
+        "ratio": 3.1017573071662268,
+        "period_kyr": 405.6255674779031,
+        "label": "eccentricity fundamental g\u2082\u2212g\u2085"
       },
-      "110": {
-        "lr04_post_mpt_amp": 0.0573370325059723,
-        "epica_amp": 0.046620466784710705,
-        "ratio": 0.8130952152058908,
-        "period_kyr": 24.38669090909091,
-        "label": "k+g\u2083 Earth secondary precession sideband (Round 1 A1)"
+      "202.8128": {
+        "lr04_post_mpt_amp": 0.18155801987444964,
+        "epica_amp": 0.26588874530954343,
+        "ratio": 1.4644836151738705,
+        "period_kyr": 202.81278373895154,
+        "label": "climate-internal harmonic (g\u2082\u2212g\u2085)/2"
       },
-      "113": {
-        "lr04_post_mpt_amp": 0.18837384379993266,
-        "epica_amp": 0.16574623394118845,
-        "ratio": 0.8798792369349513,
-        "period_kyr": 23.739256637168143,
-        "label": "k+g\u2085 Jupiter climatic precession (Berger 23.7k)"
-      },
-      "120": {
-        "lr04_post_mpt_amp": 0.1972232088759975,
-        "epica_amp": 0.06026360911495766,
-        "ratio": 0.3055604330667184,
-        "period_kyr": 22.354466666666667,
-        "label": "k+g\u2082 Venus climatic precession = H/15"
-      },
-      "134": {
-        "lr04_post_mpt_amp": 0.04165441676375479,
-        "epica_amp": 0.025783806206851907,
-        "ratio": 0.6189933315615993,
-        "period_kyr": 20.01892537313433,
-        "label": "k+g\u2085 Jupiter precession sub-peak (Round 1 A1)"
-      },
-      "141": {
-        "lr04_post_mpt_amp": 0.11025792513950802,
-        "epica_amp": 0.03786803880167991,
-        "ratio": 0.3434495865378016,
-        "period_kyr": 19.0250780141844,
-        "label": "k+g\u2083 Earth climatic precession \u2014 Berger quintet 19-kyr peak (subthreshold LR04, 3\u03c3 in Cheng monsoon; beats with n=113 to form n=28 per Wigley 1976)"
-      },
-      "152": {
-        "lr04_post_mpt_amp": 0.02978287113049064,
-        "epica_amp": 0.019986679758722595,
-        "ratio": 0.6710796843982226,
-        "period_kyr": 17.648263157894736,
-        "label": "k+g\u2084 Mars climatic precession sub-peak (Round 1 A1)"
-      },
-      "185": {
-        "lr04_post_mpt_amp": 0.041381611310322336,
-        "epica_amp": 0.06881405950900017,
-        "ratio": 1.6629139690323034,
-        "period_kyr": 14.500194594594594,
-        "label": "k+g\u2082 Venus precession sub-peak (Round 1 A1)"
+      "135.2085": {
+        "lr04_post_mpt_amp": 0.7042829265781381,
+        "epica_amp": 0.48504248680164397,
+        "ratio": 0.6887040257504098,
+        "period_kyr": 135.20852249263436,
+        "label": "climate-internal harmonic (g\u2082\u2212g\u2085)/3"
       }
     }
   },
@@ -844,27 +1127,38 @@
       66000
     ],
     "n_samples": 661,
-    "r2_l1_only": 0.16132267341782003,
-    "r2_l1_l2": 0.1613268149856384,
-    "r2_l1_l2_l3": 0.7630361480571576,
-    "delta_r2_l2": 4.141567818360947e-06,
-    "delta_r2_l3": 0.6017093330715192,
+    "r2_l1_only": 0.04732358217840127,
+    "r2_l1_l2": 0.04732358217840127,
+    "r2_l1_l2_l3": 0.6918703763922934,
+    "delta_r2_l2": 0.0,
+    "delta_r2_l3": 0.6445467942138922,
     "co2_range_ppm": [
       227.18457243322626,
       1675.0630034884284
     ],
     "l3_step_betas": {
-      "PETM": -1.8804000415571456,
-      "EOT": 1.8726000793971256,
-      "Mi-1": -0.9160535969955064,
-      "MMCT": 0.3802408709595292,
-      "iNHG": -0.7396325194236633,
-      "MPT": 0.3835985690656021
+      "PETM": -2.250365472832633,
+      "EOT": 1.5689300314238666,
+      "Mi-1": -0.21252474161309465,
+      "MMCT": -0.3699791032908537,
+      "iNHG": -0.2429065330446769,
+      "MPT": 0.250611592480696
     }
   },
   "meta": {
     "script": "milankovitch_climate_formula.py",
     "doc": "docs/92-climate-formula.md",
-    "runtime_sec": 0.7268433570861816
+    "runtime_sec": 0.44091320037841797
+  },
+  "inputs": {
+    "generator": "python3 scripts/milankovitch_climate_formula.py",
+    "files": {
+      "data/cenco2pip-100kyr-bayesian.csv": "sha256:24d8ae22e0d4165595029adc32e37f9af691edfbab4e94f0173f59cd44dd257f",
+      "data/epica-co2-bereiter2015.txt": "sha256:de57b3967758725b9650717a71bd665ebc87e23d41d3d3ad05c9095a6e7e393f",
+      "data/l1-physical-lines.json": "sha256:778a2ebd1c7deefcb54921b5c82761fd0edc747fe50ca014c7eb931989d1306c",
+      "data/lr04-stack.txt": "sha256:7d1a6ca7ffc033e45e20fb76a7f39c8d99df87baa1094260f9dbdc09f0bb8945",
+      "data/westerhold2020-cenogrid.tab": "sha256:c149bacb6b0f14b0dc3c7c5204306350df177c8b30221d7f4efa55d35324d2a3",
+      "scripts/milankovitch_climate_formula.py": "sha256:bfb5b1436169ee44301f24cddd8cf74d55818e3fd9fbe0a4e062bf7f7e610d75"
+    }
   }
 }

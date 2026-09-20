@@ -1,7 +1,7 @@
 ---
 docVersion: 1.0
 modelVersion: v13.0
-coefficients: sha256:9e0460662933228f
+coefficients: sha256:b8b18424a3435e20
 status: current
 ---
 
@@ -115,14 +115,15 @@ resolution cannot.
 ### The load-bearing addition: α(t) as a time-varying quantity
 
 Earth's polar moment coefficient α (= C / (M · R²)) is no longer
-treated as a strict constant. It evolves via the L1-orbital coupling
-of the canonical Climate Formula — the same L1 signal that fits LR04
-δ¹⁸O also drives α (Milankovitch orbital forcing → ice sheet dynamics
-→ GIA J₂/α → LOD). The single calibration coefficient
-(`ALPHA_CLIMATE_SCALE`) is set from independent satellite gravimetry:
-Cox & Chao 2002 dJ₂/dt = -2.7e-11/yr with J₂→α conversion factor 2.0
-(Peltier ICE-6G LOD-coupling range), giving dα/dt at J2000 = -1.35e-11/yr.
-No parameters are fitted to the eclipse data. Detailed in
+treated as a strict constant. It evolves as the LAGGED response of the
+solid Earth to the ice history the climate formula's L1 layer proxies
+(Milankovitch orbital forcing → ice sheets → mantle relaxation → J₂/α →
+LOD): α(t) = α₀ − k·[L1(t) − ⟨L1⟩_τ(t)], with the coupling k DERIVED at
+runtime from independent satellite gravimetry (Cox & Chao 2002 dJ₂/dt =
+−2.7e-11/yr, J₂→α factor 2.0, so dα/dt at J2000 = −1.35e-11/yr) and the
+relaxation time τ = <!--v:alphaGiaRelaxationKyr-->6<!--/v--> kyr measured
+against the historical ΔT record (plan 06 D7; the rheology estimate below
+gives 4–6 kyr). No parameters are fitted to the eclipse data. Detailed in
 [§ The α(t) physics](#the-αt-physics) below.
 
 ---
@@ -186,24 +187,29 @@ timescale, with a single coupling coefficient set from independent
 satellite measurement:
 
 ```javascript
-const EARTH_MOI_FACTOR      = 0.3306947;     // α at J2000 (IERS Conventions 2010)
-const ALPHA_CLIMATE_SCALE   = -3.93e-7;      // per ‰; calibrated to dα/dt(J2000) = -1.35e-11/yr
-let _alphaClimateL1_J2000   = null;
-
-function earthMoiFactorAtAge(t_Ma) {
-  if (_alphaClimateL1_J2000 === null) _alphaClimateL1_J2000 = _evalClimateL1Orbital(2000);
-  const year  = 2000 - t_Ma * 1e6;
-  const L1_at = _evalClimateL1Orbital(year);   // δ¹⁸O L1 orbital layer, in ‰
-  return EARTH_MOI_FACTOR - ALPHA_CLIMATE_SCALE * (L1_at - _alphaClimateL1_J2000);
-}
+// @essrt/physics/climate/l1-orbital — ONE home for the three runtimes + tools/lib
+const alphaGia = createAlphaGiaChannel({
+  l1Terms: CLIMATE_REGIME.L1,                                  // the physical L1 lines (periods in kyr)
+  yStdDenormalization: CLIMATE_REGIME.denormalization.y_std,
+  relaxationKyr: C.deepTime.alphaGiaRelaxationKyr,             // τ — measured against the ΔT record
+  alphaGiaRateJ2000PerYr: C.deepTime.alphaGiaRateJ2000PerYr,   // Cox & Chao ÷ Peltier factor
+  alphaJ2000: EARTH_MOI_FACTOR,                                 // IERS Conventions 2010
+});
+// α(t) = α₀ − k·[L1(t) − ⟨L1⟩_τ(t)]; each L1 line passes the causal exponential
+// filter as a line (Ĉ' = Ĉ·iωτ/(1 + iωτ)); k derived so dα/dt(J2000) = the rate above
+const earthMoiFactorAtAge = (t_Ma) => alphaGia.alphaAt(2000 - t_Ma * 1e6);
 ```
 
-Sign convention: warmer (lower δ¹⁸O, interglacial) ↔ less continental ice
-↔ mantle rebounds poleward under the vanished ice sheets ↔ smaller α
-(Peltier & Wu 1984). NOTE the direction comes from the mantle-rebound
-channel, not the surface-water redistribution channel, which taken alone
-gives the OPPOSITE sign — doc 99 § "the single easiest way to get this
-subject backwards".
+Sign convention (D7): an uncompensated ice load LOWERS α (k > 0, the
+direct-load term); the mantle's viscoelastic compensation and, after the
+ice is gone, its rebound carry the opposite sign with lag τ. Both are the
+two terms of one response function, so the deglacial sequence is spin-down
+while the ice melts (Cheng, Tapley & Ries 2013: melting raises J₂) and
+spin-up for ~τ afterwards — today's −0.35 ms/cy is that tail, α peaks
+~7–9 kyr after a deglaciation, and the LGM sits slightly below today. The
+pre-D7 listing applied the rebound sign instantaneously and placed the α
+maxima at the glacial maxima; its in-era slope was carried by fitted comb
+lines the T1 test retired.
 
 **Anchored physical constants** (all from independent literature, none
 fitted to eclipses):
@@ -230,11 +236,13 @@ fitted to eclipses):
    independently to LR04 δ¹⁸O record via ridge regression; no eclipse
    data enters the L1 fit.
 
-The `ALPHA_CLIMATE_SCALE` = −3.93 × 10⁻⁷ per ‰ is the single calibration
-coefficient chosen so `dα/dt` at J2000 equals the −1.35 × 10⁻¹¹/yr Cox &
-Chao/Peltier target. All other structure in α(t) — the specific glacial-cycle
-oscillations, the coupling to Milankovitch orbital forcing, the smooth C∞
-continuity at J2000 — is *emergent* from the L1 orbital signal, not fitted.
+The coupling k (registry `alphaClimateScale`, derived at runtime) is fixed
+by the −1.35 × 10⁻¹¹/yr Cox & Chao/Peltier target; τ is the one measured
+quantity (plan 06 D7: the joint fitter's optimum 5–6 kyr, with 3 kyr and
+≥ 10 kyr rejected). All other structure in α(t) — the glacial-cycle
+excursions, their timing relative to the deglaciations, the smooth C∞
+continuity at J2000 — is *emergent* from the physical L1 lines through the
+response function, not fitted.
 
 ### Required properties of the form
 
@@ -409,7 +417,7 @@ The framework's independent validation is the 26-event solar-eclipse
 alignment audit (current certified-chain run): 16/26 with the umbra
 reaching the observation site (3 confirmed at greatest moment + 13
 off-peak alignments — including −135 Babylon at BestGap
-<!--v:babylon135BestGapKm-->366<!--/v--> km and −708 Lu at 9 km),
+<!--v:babylon135BestGapKm-->364<!--/v--> km and −708 Lu at 9 km),
 5/26 regional (framework umbra in same continental band
 but off site), 0/26 with residual ΔT-signal — the framework agrees
 with the documented UT on every event — and 5/26 geographic-class
@@ -478,7 +486,7 @@ property of the framework, not regional observational bias.
 
 The deepest, hardest-to-fit observations — the cuneiform tablets
 from Babylon, -800 to -300 BCE — are reproduced per century to within
-<!--v:lunarCenturyResidualMinMinutes-->2<!--/v-->–<!--v:lunarCenturyResidualMaxMinutes-->14<!--/v--> minutes
+<!--v:lunarCenturyResidualMinMinutes-->1<!--/v-->–<!--v:lunarCenturyResidualMaxMinutes-->14<!--/v--> minutes
 of an observed ΔT signal of 4–6 **hours** (0.5–5% relative). The table
 is CI-pinned by the `lunar-alignment` gate
 (`data/lunar-alignment-summary.json` §dtBandsByCentury) — a silent
@@ -486,9 +494,9 @@ drift in either direction fails the chain:
 
 | Century | n | obs ΔT (hr) | model ΔT (hr) | residual |
 |---|---:|---:|---:|---:|
-| -800…-701 | <!--v:lunarCentury800N-->2<!--/v--> | <!--v:lunarCentury800ObsHours-->5.69<!--/v--> | <!--v:lunarCentury800FrameworkHours-->5.65<!--/v--> | <!--v:lunarCentury800ResidualHours-->−0.03<!--/v--> hr |
-| -700…-601 | <!--v:lunarCentury700N-->8<!--/v--> | <!--v:lunarCentury700ObsHours-->5.42<!--/v--> | <!--v:lunarCentury700FrameworkHours-->5.32<!--/v--> | <!--v:lunarCentury700ResidualHours-->−0.10<!--/v--> hr |
-| -600…-501 | <!--v:lunarCentury600N-->21<!--/v--> | <!--v:lunarCentury600ObsHours-->5.03<!--/v--> | <!--v:lunarCentury600FrameworkHours-->4.92<!--/v--> | <!--v:lunarCentury600ResidualHours-->−0.10<!--/v--> hr |
+| -800…-701 | <!--v:lunarCentury800N-->2<!--/v--> | <!--v:lunarCentury800ObsHours-->5.69<!--/v--> | <!--v:lunarCentury800FrameworkHours-->5.67<!--/v--> | <!--v:lunarCentury800ResidualHours-->−0.02<!--/v--> hr |
+| -700…-601 | <!--v:lunarCentury700N-->8<!--/v--> | <!--v:lunarCentury700ObsHours-->5.42<!--/v--> | <!--v:lunarCentury700FrameworkHours-->5.33<!--/v--> | <!--v:lunarCentury700ResidualHours-->−0.10<!--/v--> hr |
+| -600…-501 | <!--v:lunarCentury600N-->21<!--/v--> | <!--v:lunarCentury600ObsHours-->5.03<!--/v--> | <!--v:lunarCentury600FrameworkHours-->4.93<!--/v--> | <!--v:lunarCentury600ResidualHours-->−0.10<!--/v--> hr |
 | -500…-401 | <!--v:lunarCentury500N-->17<!--/v--> | <!--v:lunarCentury500ObsHours-->4.55<!--/v--> | <!--v:lunarCentury500FrameworkHours-->4.36<!--/v--> | <!--v:lunarCentury500ResidualHours-->−0.19<!--/v--> hr |
 | -400…-301 | <!--v:lunarCentury400N-->27<!--/v--> | <!--v:lunarCentury400ObsHours-->4.33<!--/v--> | <!--v:lunarCentury400FrameworkHours-->4.10<!--/v--> | <!--v:lunarCentury400ResidualHours-->−0.23<!--/v--> hr |
 
@@ -500,7 +508,7 @@ the tablet reductions there) is recorded and gated rather than tuned
 away; the reductions carry the Stephenson team's conversion assumptions,
 and the assumption-light cross-check agrees with the framework — the
 untimed-bounds section of the same gate places the framework ΔT at −135
-(<!--v:lunarDtBoundsBabylon135FrameworkSeconds-->12,007<!--/v--> s) inside the
+(<!--v:lunarDtBoundsBabylon135FrameworkSeconds-->12,002<!--/v--> s) inside the
 tablet's published totality window
 [<!--v:lunarDtBoundsBabylon135LowSeconds-->11,220<!--/v-->, <!--v:lunarDtBoundsBabylon135HighSeconds-->12,140<!--/v-->] s.
 
@@ -522,9 +530,9 @@ the one-sided residual column above into sign-mixed, noise-class scatter:
 
 | Century | residual today | **pre-registered** residual after framework re-reduction |
 |---|---:|---:|
-| -800…-701 | <!--v:lunarCentury800ResidualHours-->−0.03<!--/v--> hr | <!--v:lunarPredictedReduced800Minutes-->+2.2<!--/v--> min |
-| -700…-601 | <!--v:lunarCentury700ResidualHours-->−0.10<!--/v--> hr | <!--v:lunarPredictedReduced700Minutes-->−3.4<!--/v--> min |
-| -600…-501 | <!--v:lunarCentury600ResidualHours-->−0.10<!--/v--> hr | <!--v:lunarPredictedReduced600Minutes-->−2.8<!--/v--> min |
+| -800…-701 | <!--v:lunarCentury800ResidualHours-->−0.02<!--/v--> hr | <!--v:lunarPredictedReduced800Minutes-->+2.8<!--/v--> min |
+| -700…-601 | <!--v:lunarCentury700ResidualHours-->−0.10<!--/v--> hr | <!--v:lunarPredictedReduced700Minutes-->−3.5<!--/v--> min |
+| -600…-501 | <!--v:lunarCentury600ResidualHours-->−0.10<!--/v--> hr | <!--v:lunarPredictedReduced600Minutes-->−2.9<!--/v--> min |
 | -500…-401 | <!--v:lunarCentury500ResidualHours-->−0.19<!--/v--> hr | <!--v:lunarPredictedReduced500Minutes-->−8.6<!--/v--> min |
 | -400…-301 | <!--v:lunarCentury400ResidualHours-->−0.23<!--/v--> hr | <!--v:lunarPredictedReduced400Minutes-->−12.6<!--/v--> min |
 

@@ -1,7 +1,7 @@
 ---
 docVersion: 1.0
 modelVersion: v13.0
-coefficients: sha256:9e0460662933228f
+coefficients: sha256:b8b18424a3435e20
 status: current
 ---
 
@@ -17,7 +17,7 @@ status: current
 
 Earth's climate-relevant orbital forcing arises from the gravitational interplay of all eight planets. Their orbital and rotational cycles synchronise over a common **Solar System Resonance Cycle of 8H = <!--v:eightH-->2,682,536<!--/v--> years (at J2000)**, and every climate-relevant cycle on Earth therefore lands at an integer divisor of 8H. Spectral analysis of LR04 confirms this structure empirically and yields an explicit predictive formula.
 
-> **Orbital forcing is not climate.** The formula and analysis in this document capture the **orbital-forcing component** of climate only. Canonical full-LR04 fit explains ~26% of the observed variance (R² = <!--v:canonR2Full-->0.2584<!--/v-->, L1+L2+L3); the remaining ~74% comes from non-orbital sources — ice-sheet hysteresis, CO₂ and carbon-cycle feedbacks, internal variability (Heinrich events, Dansgaard-Oeschger cycles), and regional asymmetries that distinguish, say, Antarctic from Greenland records. The model takes no position on those components. Orbital cycles are the **clock** that sets the timing of glacial-interglacial transitions; the **magnitude** of the observed climate response is dominated by Earth-system feedbacks, not orbital forcing directly. Within the well-resolved post-MPT window (0–1 Myr), R² reaches **<!--v:canonR2PostMpt-->0.8743<!--/v-->** — the orbital signal is ~87% of climate variance there, with the conflated full-record number suppressed by regime change. Every prediction in this document — including the forward projection of the next natural glaciation — therefore describes when the orbital clock makes a phase transition possible, not when surface climate necessarily follows.
+> **Orbital forcing is not climate.** The formula and analysis in this document capture the **orbital-forcing component** of climate only. Canonical full-LR04 fit explains ~26% of the observed variance (R² = <!--v:canonR2Full-->0.2003<!--/v-->, L1+L2+L3); the remaining ~74% comes from non-orbital sources — ice-sheet hysteresis, CO₂ and carbon-cycle feedbacks, internal variability (Heinrich events, Dansgaard-Oeschger cycles), and regional asymmetries that distinguish, say, Antarctic from Greenland records. The model takes no position on those components. Orbital cycles are the **clock** that sets the timing of glacial-interglacial transitions; the **magnitude** of the observed climate response is dominated by Earth-system feedbacks, not orbital forcing directly. Within the well-resolved post-MPT window (0–1 Myr), R² reaches **<!--v:canonR2PostMpt-->0.7788<!--/v-->** — the orbital signal is ~87% of climate variance there, with the conflated full-record number suppressed by regime change. Every prediction in this document — including the forward projection of the next natural glaciation — therefore describes when the orbital clock makes a phase transition possible, not when surface climate necessarily follows.
 
 ### 1.1 Approach — bottom-up from observed motion, not top-down from climate
 
@@ -31,7 +31,7 @@ The structural difference is what makes the model **falsifiable in a way standar
 
 $$C(t) \;=\; c_0 \;+\; \sum_{n \in N} \left[\, a_n \cos\!\left(\tfrac{2\pi n t}{8H}\right) + b_n \sin\!\left(\tfrac{2\pi n t}{8H}\right) \,\right]$$
 
-with **N = 33 integer divisors** of 8H (the canonical L1 lattice — see [doc 92 §2.3](92-climate-formula.md#23-the-33-lattice-integers--per-line-identities)), fitted via sequential ridge regression per regime on LR04 (T = 5,320 kyr; full-LR04 R² = <!--v:canonR2Full-->0.2584<!--/v--> L1+L2+L3, post-MPT R² = <!--v:canonR2PostMpt-->0.8743<!--/v-->). Each integer corresponds to a specific eigenmode beat or direct planet apsidal/nodal period from the model's `PLANET_CYCLES` period table ([doc 93](93-l1-attribution-reference.md)).
+with **N = 33 integer divisors** of 8H (the canonical L1 lattice — see [doc 92 §2.3](92-climate-formula.md#23-the-33-lattice-integers--per-line-identities)), fitted via sequential ridge regression per regime on LR04 (T = 5,320 kyr; full-LR04 R² = <!--v:canonR2Full-->0.2003<!--/v--> L1+L2+L3, post-MPT R² = <!--v:canonR2PostMpt-->0.7788<!--/v-->). Each integer corresponds to a specific eigenmode beat or direct planet apsidal/nodal period from the model's `PLANET_CYCLES` period table ([doc 93](93-l1-attribution-reference.md)).
 
 ### Five headline findings
 
@@ -125,7 +125,7 @@ What differs between frameworks is **physical attribution**:
 
 > **Reader's lookup.** Throughout this document, climate-cycle periods are referenced by integer **n** denoting the 8H/n divisor (e.g. n = 25 corresponds to period 8H/25 = 107.3 kyr). The canonical per-line reference lookup for every n used here is **[doc 92 §2.3 — The 32 lattice integers](92-climate-formula.md#23-the-33-lattice-integers--per-line-identities)** — its third column tells you which eigenmode beat or direct planet cycle each integer represents.
 
-> **Canonical climate formula → doc 92.** The canonical climate formula is **doc 92's three-layer architecture**: **33 L1 integers** (25 framework integers + 6 precession-band sidebands surfaced by Test L + n=141 Berger-quintet completion + n=24 Earth's H/3 eccentricity line, regime-admitted per doc 94 §10); L2 carbon-cycle thermostat (3 lines); L3 climate-state Heaviside transitions (6 steps); ridge regression λ=1 on L1; sequential per-regime fitting on LR04/CENOGRID/EPICA/CenCO2PIP. Canonical R²: full LR04 = <!--v:canonR2Full-->0.2584<!--/v-->, post-MPT = <!--v:canonR2PostMpt-->0.8743<!--/v-->, iNHG-MPT = <!--v:canonR2InhgMpt-->0.7345<!--/v-->, pre-iNHG = <!--v:canonR2PreInhg-->0.4493<!--/v-->, EPICA CO₂ = <!--v:canonR2Epica-->0.8453<!--/v-->, CenCO2PIP 0–66 Ma = 0.7626. For the canonical architecture and forward projection see [doc 92 §9](92-climate-formula.md#9-the-canonical-climate-formula).
+> **Canonical climate formula → doc 92.** The canonical climate formula is **doc 92's three-layer architecture**: **33 L1 integers** (25 framework integers + 6 precession-band sidebands surfaced by Test L + n=141 Berger-quintet completion + n=24 Earth's H/3 eccentricity line, regime-admitted per doc 94 §10); L2 carbon-cycle thermostat (3 lines); L3 climate-state Heaviside transitions (6 steps); ridge regression λ=1 on L1; sequential per-regime fitting on LR04/CENOGRID/EPICA/CenCO2PIP. Canonical R²: full LR04 = <!--v:canonR2Full-->0.2003<!--/v-->, post-MPT = <!--v:canonR2PostMpt-->0.7788<!--/v-->, iNHG-MPT = <!--v:canonR2InhgMpt-->0.5911<!--/v-->, pre-iNHG = <!--v:canonR2PreInhg-->0.3736<!--/v-->, EPICA CO₂ = <!--v:canonR2Epica-->0.7301<!--/v-->, CenCO2PIP 0–66 Ma = 0.7626. For the canonical architecture and forward projection see [doc 92 §9](92-climate-formula.md#9-the-canonical-climate-formula).
 
 ## 3. Per-Planet Contributions to Earth's Climate
 

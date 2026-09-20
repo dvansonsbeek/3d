@@ -19,7 +19,8 @@
  *   • hard USNO closure row (weight 1e10): Σ δLOD_j(2000)·x_j = targetOffset
  *     — the anchor is met EXACTLY by construction, resonator included
  *   • amplitude caps (cascade): Hallstatt 80 / Jose5 50 / Jose4 50 /
- *     resonator kick1 773.335 / kick2 179.324 / tone 186.140 — FIXED
+ *     resonator kick1 773.335 / kick2 179.324 / tone 186.140 (the tone is
+ *     RETIRED since the D7 follow-up — ships at 0, diagnostic column only) — FIXED
  *     convention constants (never derived from the mutable JSON: cap creep)
  *   • sweep over USNO; TRUE Espenak scoring with free per-USNO deltaTStart;
  *     COMPOSITE selection (best Espenak subject to full-window RMS ≤ 40 s —
@@ -348,6 +349,37 @@ if (process.env.DT_FLAGS) {
     process.exit(1);
   }
   console.log(`  [DT_FLAGS] joint fit restricted to: ${ACTIVE_FLAGS.join(', ')}`
+            + ` (diagnostic; --write disabled)\n`);
+}
+
+// ── Resonator-component override (diagnostic) ─────────────────────────────
+// DT_RESONATOR_COMPONENTS="kick1,kick2" runs the joint fit with only those
+// Core-mantle swing columns in the design matrix (kick1 · kick2 · tone; the
+// empty string = no swing at all) — "what is each component actually buying?"
+// (plan 06 D7 follow-up: the lagged GIA channel took most of the drive tone).
+// Refuses --write, like DT_FLAGS: the ship path writes all three by index.
+const _ALL_RES = ['kick1', 'kick2', 'tone'];
+// SHIPPED design since the D7 follow-up (plan 06, 2026-09): the two impulse
+// kicks only. The drive tone at the bond−hallstatt difference frequency was
+// measured to buy nothing once the GIA channel became the lagged response
+// (kicks-only 11.89 / 21.04 s vs all three 12.04 / 21.34 s, Espenak /
+// full-window; tone-only 23.9 / 43.8) and ships at amplitude 0. It remains
+// available as a DIAGNOSTIC column via DT_RESONATOR_COMPONENTS="kick1,kick2,tone".
+let ACTIVE_RES = ['kick1', 'kick2'];
+if (process.env.DT_RESONATOR_COMPONENTS !== undefined) {
+  const want = process.env.DT_RESONATOR_COMPONENTS.split(',').map(s => s.trim()).filter(Boolean);
+  const bad = want.filter(f => !_ALL_RES.includes(f));
+  if (bad.length) {
+    console.error(`DT_RESONATOR_COMPONENTS: unknown component(s) ${bad.join(', ')}. Valid: ${_ALL_RES.join(', ')}`);
+    process.exit(1);
+  }
+  ACTIVE_RES = _ALL_RES.filter(f => want.includes(f));
+  if (process.argv.includes('--write') || process.argv.includes('--sync-code')) {
+    console.error('DT_RESONATOR_COMPONENTS cannot be combined with --write/--sync-code: the ship');
+    console.error('path writes all three swing components by index. Reduced fits are diagnostic.');
+    process.exit(1);
+  }
+  console.log(`  [DT_RESONATOR_COMPONENTS] swing columns: ${ACTIVE_RES.join(', ') || 'none'}`
             + ` (diagnostic; --write disabled)\n`);
 }
 
@@ -1511,9 +1543,9 @@ function runJointMode() {
     colFns.push(y => Math.cos(om * y)); names.push(nm + '_cos');
     colFns.push(y => Math.sin(om * y)); names.push(nm + '_sin');
   }
-  COMP.res_kick1 = [colFns.length]; colFns.push(y => kickUnit(0, y)); names.push('res_kick1');
-  COMP.res_kick2 = [colFns.length]; colFns.push(y => kickUnit(1, y)); names.push('res_kick2');
-  COMP.res_tone  = [colFns.length]; colFns.push(y => toneUnit(y));    names.push('res_tone');
+  if (ACTIVE_RES.includes('kick1')) { COMP.res_kick1 = [colFns.length]; colFns.push(y => kickUnit(0, y)); names.push('res_kick1'); }
+  if (ACTIVE_RES.includes('kick2')) { COMP.res_kick2 = [colFns.length]; colFns.push(y => kickUnit(1, y)); names.push('res_kick2'); }
+  if (ACTIVE_RES.includes('tone'))  { COMP.res_tone  = [colFns.length]; colFns.push(y => toneUnit(y));    names.push('res_tone'); }
   const N = colFns.length + 1;                       // + intercept
   const INTERCEPT = N - 1;
   // Caps are the FIXED Stage-1 convention amplitudes. NEVER derive them from
@@ -1650,8 +1682,8 @@ function runJointMode() {
     rows.push(row);
     console.log(`   ${usno.toFixed(4)}   ${dts.toFixed(2).padStart(8)}   `
               + `${rmsEsp.toFixed(2).padStart(8)}  ${rmsFull.toFixed(2).padStart(7)}  `
-              + `${bondAmp.toFixed(1).padStart(6)}  ${Math.abs(x[COMP.res_kick2[0]]).toFixed(1).padStart(6)} `
-              + `${Math.abs(x[COMP.res_tone[0]]).toFixed(1).padStart(6)}`);
+              + `${bondAmp.toFixed(1).padStart(6)}  ${(COMP.res_kick2 ? Math.abs(x[COMP.res_kick2[0]]) : 0).toFixed(1).padStart(6)} `
+              + `${(COMP.res_tone ? Math.abs(x[COMP.res_tone[0]]) : 0).toFixed(1).padStart(6)}`);
     // Composite selection: best Espenak SUBJECT TO ancient-window quality.
     // Espenak-only selection degenerates (prototype lesson: it accepts
     // solutions whose ancient window collapses to ~400 s).
@@ -1806,28 +1838,34 @@ function runJointMode() {
   const resJson = JSON.parse(fs.readFileSync(resJsonPath, 'utf8'));
   const rb = resJson.proposed_shipped_coefficients.resonator;
   // Impulse-consistent: sin-only kicks (cos ≡ 0 — displacement continuity).
+  // Indices from COMP (the ship path runs on the default design: kicks only).
+  const k1 = x[COMP.res_kick1[0]], k2 = x[COMP.res_kick2[0]];
+  const toneAmp = COMP.res_tone ? x[COMP.res_tone[0]] : 0;
   rb.kick_coefficients_s = [
-    { cos: 0, sin: x[8] },
-    { cos: 0, sin: x[9] },
+    { cos: 0, sin: k1 },
+    { cos: 0, sin: k2 },
   ];
   rb.impulse_consistent = true;
-  rb.drive_tones[0].amp_s = x[10];
+  rb.drive_tones[0].amp_s = toneAmp;
+  rb.drive_tones[0].retired = COMP.res_tone ? undefined
+    : ('RETIRED (plan 06 D7 follow-up, 2026-09): shipped at amplitude 0 — measured to buy nothing once the GIA '
+       + 'channel became the lagged response (kicks-only 11.89 / 21.04 s vs all three 12.04 / 21.34 s); dn/phase '
+       + 'kept as the convention for the diagnostic column (DT_RESONATOR_COMPONENTS).');
   // Raw (unanchored) resonator value + implied δLOD at J2000 — the closure
   // bookkeeping fields consumed by resonatorLodAtJ2000() and the runtime.
   rb.raw_at_j2000_s =
-    x[8] * kickUnit(0, 2000) + x[9] * kickUnit(1, 2000) + x[10] * toneUnit(2000);
+    k1 * kickUnit(0, 2000) + k2 * kickUnit(1, 2000) + toneAmp * toneUnit(2000);
   // dC/dy from a 1-yr central difference (2000.5 − 1999.5 spans exactly 1 yr),
   // then δLOD (s/day) = 86400 · dC/dy / T_trop_s.
   const resDCdy =
-    x[8] * (kickUnit(0, 2000.5) - kickUnit(0, 1999.5))
-    + x[9] * (kickUnit(1, 2000.5) - kickUnit(1, 1999.5))
-    + x[10] * (toneUnit(2000.5) - toneUnit(1999.5));
+    k1 * (kickUnit(0, 2000.5) - kickUnit(0, 1999.5))
+    + k2 * (kickUnit(1, 2000.5) - kickUnit(1, 1999.5))
+    + toneAmp * (toneUnit(2000.5) - toneUnit(1999.5));
   rb.lod_raw_at_j2000_s_per_day = 86400 * resDCdy / MEAN_TROPICAL_YEAR_J2000_S;
   rb.rms_s = best.rmsFull;
-  rb.status = ('JOINT WORLD SHIPPED (--joint --write): amplitudes from the joint '
-    + 'equality-constrained fit (kick2 ~0 — the termination is carried by flag '
-    + 'interference in the joint world); phases/epochs/T0/Q remain the Stage-1/3 '
-    + 'convention. Default-ON.');
+  rb.status = ('JOINT WORLD SHIPPED (--joint --write): the two impulse kicks from the joint '
+    + 'equality-constrained fit, the drive tone retired at amplitude 0 (plan 06 D7 follow-up); '
+    + 'phases/epochs/T0/Q remain the Stage-1/3 convention. Default-ON.');
   fs.writeFileSync(resJsonPath, JSON.stringify(resJson, null, 2) + '\n');
   console.log(`  ✓ wrote ${resJsonPath}`);
 

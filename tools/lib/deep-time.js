@@ -40,12 +40,26 @@ const EARTH_MOI_FACTOR = C.EARTH_MOI_FACTOR;
 // Holistic mirror src/lib/orbital/deepTime.ts. Loads coefficients from the
 // shared JSON source to eliminate manual dual-copy sync.
 const ALPHA_CLIMATE_REGIME_KEY = 'lr04-post-mpt';
-// per ‰; calibrated so dα/dt at J2000 = -1.35e-11/yr (Cox & Chao 2002 dJ₂/dt
-// = -2.7e-11/yr ÷ conversion factor 2.0, Peltier ICE-6G LOD-coupling range).
-// Single source: model-parameters.json deepTime.alphaClimateScalePerMille.
-const ALPHA_CLIMATE_SCALE      = C.ALPHA_CLIMATE_SCALE;
 const _CLIMATE_JSON_PATH       = path.join(__dirname, '..', '..', 'public', 'input', 'climate-formula-coefficients.json');
 const CLIMATE_FORMULA_COEFFS   = JSON.parse(fs.readFileSync(_CLIMATE_JSON_PATH, 'utf8'));
+// The GIA channel — the LAGGED response of the polar moment to the L1 ice
+// history: ONE home in @essrt/physics/climate/l1-orbital (createAlphaGiaChannel).
+// k is DERIVED from the Cox–Chao rate (model-parameters deepTime
+// alphaGiaRateJ2000PerYr), τ is the relaxation time measured against the
+// historical ΔT record (alphaGiaRelaxationKyr; plan 06 D7). Same construction
+// in model.js, src/script.js and the website's essrt.ts.
+const _alphaGia = (() => {
+  const r = CLIMATE_FORMULA_COEFFS.regimes[ALPHA_CLIMATE_REGIME_KEY];
+  return _req('@essrt/physics/climate/l1-orbital').createAlphaGiaChannel({
+    l1Terms: r.L1,
+    yStdDenormalization: r.denormalization.y_std,
+    relaxationKyr: C.ALPHA_GIA_RELAXATION_KYR,
+    alphaGiaRateJ2000PerYr: C.ALPHA_GIA_RATE_J2000_PER_YR,
+    alphaJ2000: C.EARTH_MOI_FACTOR,
+  });
+})();
+// the derived coupling, per ‰ — kept under its historical export name for the registry
+const ALPHA_CLIMATE_SCALE      = _alphaGia.kPerPermille;
 
 // ΔT correction stack — read from JSON, the same way constants.js and the
 // climate coefficients above already are. These used to be literals kept in step
@@ -143,18 +157,7 @@ for (const k of ['mercury','venus','earth','mars','jupiter','saturn','uranus','n
 // 2002 dJ₂/dt = -2.7e-11/yr via J₂→α conversion factor 2.0 (Peltier ICE-6G range).
 // Kept in lock-step with src/script.js earthMoiFactorAtAge and Holistic
 // mirror src/lib/orbital/deepTime.ts. See doc 99 §prediction-7.
-let _alphaClimateL1_J2000 = null;
-
-function _evalClimateL1Orbital(year) {
-  // 8.4-4: the L1 harmonic loop lives in @essrt/physics/climate/l1-orbital;
-  // the regime selection stays here.
-  const r = CLIMATE_FORMULA_COEFFS.regimes[ALPHA_CLIMATE_REGIME_KEY];
-  return _req('@essrt/physics/climate/l1-orbital').evalClimateL1OrbitalPermil(year, {
-    l1Terms: r.L1,
-    yStdDenormalization: r.denormalization.y_std,
-    eightHKyr: CLIMATE_FORMULA_COEFFS.config.eight_H_kyr,
-  });
-}
+// (the α evaluation lives in the package channel `_alphaGia` above)
 
 // R2 — the α lattice reference. When BUILDING an H-lattice table α must be
 // held at its J2000 reference (EARTH_MOI_FACTOR), or the lattice defines
@@ -187,12 +190,7 @@ function earthMoiFactorAtAge(t_Ma) {
   if (_latticeAlphaRef) return EARTH_MOI_FACTOR;
   const memoHit = _earthMoiMemo.get(t_Ma);
   if (memoHit !== undefined) return memoHit;
-  if (_alphaClimateL1_J2000 === null) {
-    _alphaClimateL1_J2000 = _evalClimateL1Orbital(2000);
-  }
-  const year  = 2000 - t_Ma * 1e6;
-  const L1_at = _evalClimateL1Orbital(year);
-  const alpha = EARTH_MOI_FACTOR - ALPHA_CLIMATE_SCALE * (L1_at - _alphaClimateL1_J2000);
+  const alpha = _alphaGia.alphaAt(2000 - t_Ma * 1e6);
   if (_earthMoiMemo.size >= _EARTH_MOI_MEMO_CAP) _earthMoiMemo.clear();
   _earthMoiMemo.set(t_Ma, alpha);
   return alpha;

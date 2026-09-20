@@ -24,7 +24,6 @@ export { createPlanetModel } from "./planets/model.cjs";
 export { createDeltaTCycles } from "./deltat/cycles.cjs";
 export { createDeepTimeLod } from "./deltat/deep-time.cjs";
 export { deltaTEspenakMeeusCanonSeconds } from "./deltat/historical.cjs";
-export { evalClimateL1OrbitalPermil } from "./climate/l1-orbital.cjs";
 export { createEclipseFinders } from "./eclipse/finders.cjs";
 export { createSunLongitudeCorrection } from "./sun/longitude-correction.cjs";
 export function createModel(constants?: Constants, opts?: {
@@ -75,3 +74,4 @@ export { CHAIN_ARTIFACT, CHAIN_ARTIFACT_HASH } from "./planets/chain-artifact.js
 export { DEEP_MODES_ARTIFACT, DEEP_MODES_ARTIFACT_HASH } from "./moon/deep-modes-artifact.cjs";
 export { createPredictivePrecession, calcPlanetPerihelionLongDeg } from "./planets/predict.cjs";
 export { createMoonRecessionHistory, createSolarChannelBudget } from "./deltat/recession-history.cjs";
+export { evalClimateL1OrbitalPermil, laggedL1Terms, createAlphaGiaChannel } from "./climate/l1-orbital.cjs";

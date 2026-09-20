@@ -2,7 +2,7 @@
 // The fitted coefficients' shapes for TypeScript consumers (§2g); values live
 // in coefficients.js, emitted VERBATIM from fitted-coefficients.json.
 
-export declare const COEFFICIENTS_HASH: "9e0460662933228f";
+export declare const COEFFICIENTS_HASH: "b8b18424a3435e20";
 
 export declare const FITTED_COEFFICIENTS: {
   readonly ANOMALISTIC_YEAR_HARMONICS: Array<[number, number, number]>;
@@ -71,9 +71,14 @@ export declare const FITTED_COEFFICIENTS: {
   };
   readonly CLIMATE_FORMULA_COEFFS: {
     "config": {
-      "H_kyr": number;
-      "eight_H_kyr": number;
-      "L1_integers": number[];
+      "L1_lines": Array<{
+        "family": string;
+        "label": string;
+        "arcsecPerYr": number;
+        "periodKyr": number;
+        "relAmp": number;
+      }>;
+      "L1_source": string;
       "L2_periods_kyr": {
         "405-kyr (fundamental)": number;
         "202-kyr (2nd harmonic)": number;
@@ -97,16 +102,12 @@ export declare const FITTED_COEFFICIENTS: {
         "n_samples": number;
         "intercept": number;
         "L1": Array<{
-          "n": number;
-          "a": number;
-          "b": number;
-        }>;
-        "L2": Array<{
-          "p_kyr": number;
+          "period_kyr": number;
           "label": string;
           "a": number;
           "b": number;
         }>;
+        "L2": unknown[];
         "L3": unknown[];
         "denormalization": {
           "y_mean": number;
@@ -129,16 +130,12 @@ export declare const FITTED_COEFFICIENTS: {
         "n_samples": number;
         "intercept": number;
         "L1": Array<{
-          "n": number;
-          "a": number;
-          "b": number;
-        }>;
-        "L2": Array<{
-          "p_kyr": number;
+          "period_kyr": number;
           "label": string;
           "a": number;
           "b": number;
         }>;
+        "L2": unknown[];
         "L3": unknown[];
         "denormalization": {
           "y_mean": number;
@@ -161,16 +158,12 @@ export declare const FITTED_COEFFICIENTS: {
         "n_samples": number;
         "intercept": number;
         "L1": Array<{
-          "n": number;
-          "a": number;
-          "b": number;
-        }>;
-        "L2": Array<{
-          "p_kyr": number;
+          "period_kyr": number;
           "label": string;
           "a": number;
           "b": number;
         }>;
+        "L2": unknown[];
         "L3": unknown[];
         "denormalization": {
           "y_mean": number;
@@ -193,16 +186,12 @@ export declare const FITTED_COEFFICIENTS: {
         "n_samples": number;
         "intercept": number;
         "L1": Array<{
-          "n": number;
-          "a": number;
-          "b": number;
-        }>;
-        "L2": Array<{
-          "p_kyr": number;
+          "period_kyr": number;
           "label": string;
           "a": number;
           "b": number;
         }>;
+        "L2": unknown[];
         "L3": Array<{
           "label": string;
           "t_kyr": number;
@@ -229,16 +218,12 @@ export declare const FITTED_COEFFICIENTS: {
         "n_samples": number;
         "intercept": number;
         "L1": Array<{
-          "n": number;
-          "a": number;
-          "b": number;
-        }>;
-        "L2": Array<{
-          "p_kyr": number;
+          "period_kyr": number;
           "label": string;
           "a": number;
           "b": number;
         }>;
+        "L2": unknown[];
         "L3": Array<{
           "label": string;
           "t_kyr": number;
@@ -265,16 +250,12 @@ export declare const FITTED_COEFFICIENTS: {
         "n_samples": number;
         "intercept": number;
         "L1": Array<{
-          "n": number;
-          "a": number;
-          "b": number;
-        }>;
-        "L2": Array<{
-          "p_kyr": number;
+          "period_kyr": number;
           "label": string;
           "a": number;
           "b": number;
         }>;
+        "L2": unknown[];
         "L3": Array<{
           "label": string;
           "t_kyr": number;
@@ -301,16 +282,12 @@ export declare const FITTED_COEFFICIENTS: {
         "n_samples": number;
         "intercept": number;
         "L1": Array<{
-          "n": number;
-          "a": number;
-          "b": number;
-        }>;
-        "L2": Array<{
-          "p_kyr": number;
+          "period_kyr": number;
           "label": string;
           "a": number;
           "b": number;
         }>;
+        "L2": unknown[];
         "L3": unknown[];
         "denormalization": {
           "y_mean": number;
@@ -326,264 +303,196 @@ export declare const FITTED_COEFFICIENTS: {
           "delta_l3": number;
         };
         "carbon_amplification_ratios": {
-          "9": {
-            "n": number;
+          "19.0014": {
             "period_kyr": number;
             "lr04_post_mpt_amp": number;
             "epica_amp": number;
             "ratio": number;
             "label": string;
           };
-          "12": {
-            "n": number;
+          "19.1554": {
             "period_kyr": number;
             "lr04_post_mpt_amp": number;
             "epica_amp": number;
             "ratio": number;
             "label": string;
           };
-          "14": {
-            "n": number;
+          "22.4452": {
             "period_kyr": number;
             "lr04_post_mpt_amp": number;
             "epica_amp": number;
             "ratio": number;
             "label": string;
           };
-          "16": {
-            "n": number;
+          "23.1931": {
             "period_kyr": number;
             "lr04_post_mpt_amp": number;
             "epica_amp": number;
             "ratio": number;
             "label": string;
           };
-          "18": {
-            "n": number;
+          "23.7599": {
             "period_kyr": number;
             "lr04_post_mpt_amp": number;
             "epica_amp": number;
             "ratio": number;
             "label": string;
           };
-          "20": {
-            "n": number;
+          "27.4019": {
             "period_kyr": number;
             "lr04_post_mpt_amp": number;
             "epica_amp": number;
             "ratio": number;
             "label": string;
           };
-          "21": {
-            "n": number;
+          "28.9913": {
             "period_kyr": number;
             "lr04_post_mpt_amp": number;
             "epica_amp": number;
             "ratio": number;
             "label": string;
           };
-          "22": {
-            "n": number;
+          "29.1554": {
             "period_kyr": number;
             "lr04_post_mpt_amp": number;
             "epica_amp": number;
             "ratio": number;
             "label": string;
           };
-          "24": {
-            "n": number;
+          "29.7742": {
             "period_kyr": number;
             "lr04_post_mpt_amp": number;
             "epica_amp": number;
             "ratio": number;
             "label": string;
           };
-          "25": {
-            "n": number;
+          "29.9682": {
             "period_kyr": number;
             "lr04_post_mpt_amp": number;
             "epica_amp": number;
             "ratio": number;
             "label": string;
           };
-          "28": {
-            "n": number;
+          "39.8366": {
             "period_kyr": number;
             "lr04_post_mpt_amp": number;
             "epica_amp": number;
             "ratio": number;
             "label": string;
           };
-          "30": {
-            "n": number;
+          "40.5195": {
             "period_kyr": number;
             "lr04_post_mpt_amp": number;
             "epica_amp": number;
             "ratio": number;
             "label": string;
           };
-          "31": {
-            "n": number;
+          "41.2244": {
             "period_kyr": number;
             "lr04_post_mpt_amp": number;
             "epica_amp": number;
             "ratio": number;
             "label": string;
           };
-          "35": {
-            "n": number;
+          "41.9557": {
             "period_kyr": number;
             "lr04_post_mpt_amp": number;
             "epica_amp": number;
             "ratio": number;
             "label": string;
           };
-          "38": {
-            "n": number;
+          "54.1343": {
             "period_kyr": number;
             "lr04_post_mpt_amp": number;
             "epica_amp": number;
             "ratio": number;
             "label": string;
           };
-          "39": {
-            "n": number;
+          "94.8779": {
             "period_kyr": number;
             "lr04_post_mpt_amp": number;
             "epica_amp": number;
             "ratio": number;
             "label": string;
           };
-          "48": {
-            "n": number;
+          "96.8490": {
             "period_kyr": number;
             "lr04_post_mpt_amp": number;
             "epica_amp": number;
             "ratio": number;
             "label": string;
           };
-          "50": {
-            "n": number;
+          "98.8439": {
             "period_kyr": number;
             "lr04_post_mpt_amp": number;
             "epica_amp": number;
             "ratio": number;
             "label": string;
           };
-          "53": {
-            "n": number;
+          "101.0051": {
             "period_kyr": number;
             "lr04_post_mpt_amp": number;
             "epica_amp": number;
             "ratio": number;
             "label": string;
           };
-          "65": {
-            "n": number;
+          "103.1238": {
             "period_kyr": number;
             "lr04_post_mpt_amp": number;
             "epica_amp": number;
             "ratio": number;
             "label": string;
           };
-          "66": {
-            "n": number;
+          "105.1372": {
             "period_kyr": number;
             "lr04_post_mpt_amp": number;
             "epica_amp": number;
             "ratio": number;
             "label": string;
           };
-          "68": {
-            "n": number;
+          "110.0293": {
             "period_kyr": number;
             "lr04_post_mpt_amp": number;
             "epica_amp": number;
             "ratio": number;
             "label": string;
           };
-          "73": {
-            "n": number;
+          "123.8462": {
             "period_kyr": number;
             "lr04_post_mpt_amp": number;
             "epica_amp": number;
             "ratio": number;
             "label": string;
           };
-          "76": {
-            "n": number;
+          "130.6910": {
             "period_kyr": number;
             "lr04_post_mpt_amp": number;
             "epica_amp": number;
             "ratio": number;
             "label": string;
           };
-          "96": {
-            "n": number;
+          "134.4960": {
             "period_kyr": number;
             "lr04_post_mpt_amp": number;
             "epica_amp": number;
             "ratio": number;
             "label": string;
           };
-          "107": {
-            "n": number;
+          "405.6256": {
             "period_kyr": number;
             "lr04_post_mpt_amp": number;
             "epica_amp": number;
             "ratio": number;
             "label": string;
           };
-          "110": {
-            "n": number;
+          "202.8128": {
             "period_kyr": number;
             "lr04_post_mpt_amp": number;
             "epica_amp": number;
             "ratio": number;
             "label": string;
           };
-          "113": {
-            "n": number;
-            "period_kyr": number;
-            "lr04_post_mpt_amp": number;
-            "epica_amp": number;
-            "ratio": number;
-            "label": string;
-          };
-          "120": {
-            "n": number;
-            "period_kyr": number;
-            "lr04_post_mpt_amp": number;
-            "epica_amp": number;
-            "ratio": number;
-            "label": string;
-          };
-          "134": {
-            "n": number;
-            "period_kyr": number;
-            "lr04_post_mpt_amp": number;
-            "epica_amp": number;
-            "ratio": number;
-            "label": string;
-          };
-          "141": {
-            "n": number;
-            "period_kyr": number;
-            "lr04_post_mpt_amp": number;
-            "epica_amp": number;
-            "ratio": number;
-            "label": string;
-          };
-          "152": {
-            "n": number;
-            "period_kyr": number;
-            "lr04_post_mpt_amp": number;
-            "epica_amp": number;
-            "ratio": number;
-            "label": string;
-          };
-          "185": {
-            "n": number;
+          "135.2085": {
             "period_kyr": number;
             "lr04_post_mpt_amp": number;
             "epica_amp": number;
@@ -599,16 +508,12 @@ export declare const FITTED_COEFFICIENTS: {
         "n_samples": number;
         "intercept": number;
         "L1": Array<{
-          "n": number;
-          "a": number;
-          "b": number;
-        }>;
-        "L2": Array<{
-          "p_kyr": number;
+          "period_kyr": number;
           "label": string;
           "a": number;
           "b": number;
         }>;
+        "L2": unknown[];
         "L3": Array<{
           "label": string;
           "t_kyr": number;
@@ -655,6 +560,7 @@ export declare const FITTED_COEFFICIENTS: {
       "phi_locked_rad": number;
       "amp_s": number;
       "phase_convention": string;
+      "retired": string;
     }>;
     "rms_s": number;
     "raw_at_j2000_s": number;

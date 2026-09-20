@@ -1436,7 +1436,9 @@ export const VALUES = {
     const scanReach = () => alignment() + a26.regional + a26.dtRegional;
     return {
       alphaJ2000:         { get: () => astro.physicalConstants.earthMoiFactorJ2000, render: (v) => String(v), note: 'IERS Conventions 2010 Earth moment-of-inertia factor' },
-      alphaClimateScale:  { get: () => dtl().ALPHA_CLIMATE_SCALE, render: (v) => fmtSci(v, 2), unit: 'per ‰', note: 'calibrated so dα/dt(J2000) matches Cox & Chao — live from the engine' },
+      alphaClimateScale:  { get: () => dtl().ALPHA_CLIMATE_SCALE, render: (v) => fmtSci(v, 2), unit: 'per ‰', note: 'the GIA channel coupling k — DERIVED at runtime so dα/dt(J2000) matches Cox & Chao on the lagged L1 (plan 06 D7); live from the engine' },
+      alphaGiaRelaxationKyr: { get: () => model.deepTime.alphaGiaRelaxationKyr, render: (v) => String(v), unit: 'kyr', note: 'the mantle relaxation time τ of the GIA channel — MEASURED against the historical ΔT record through the joint fitter (optimum 5–6 kyr; the degree-2 Maxwell estimate 4–6 kyr)' },
+      alphaGiaRateJ2000:  { get: () => model.deepTime.alphaGiaRateJ2000PerYr, render: (v) => fmtSci(v, 2), unit: '/yr', note: 'the dα/dt(J2000) the channel is anchored on — Cox & Chao dJ₂/dt ÷ the Peltier factor (model-parameters deepTime)' },
       dAlphaDtJ2000:      { get: () => astro.giaCoxChaoPeltier.dJ2DtPerYr / astro.giaCoxChaoPeltier.j2ToAlphaFactor, render: (v) => fmtSci(v, 2), unit: '/yr', note: 'DERIVED: dJ₂/dt ÷ Peltier factor, so the identity auto-holds' },
       coxChaoDJ2Dt:       { get: () => astro.giaCoxChaoPeltier.dJ2DtPerYr, render: (v) => fmtSci(v, 1), unit: '/yr', note: 'Cox & Chao 2002 satellite gravimetry — citation' },
       giaJ2ToAlphaFactor: { get: () => astro.giaCoxChaoPeltier.j2ToAlphaFactor, render: (v) => Number(v).toFixed(1), note: 'Peltier ICE-6G LOD-coupling axisymmetric-GIA factor — citation' },

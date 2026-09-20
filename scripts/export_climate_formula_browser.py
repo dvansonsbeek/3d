@@ -49,12 +49,12 @@ from milankovitch_climate_formula import (  # noqa: E402
     load_cenogrid,
     load_epica_co2,
     load_cenco2pip,
-    L1_LATTICE_INTEGERS,
+    L1_PERIODS_KYR,
+    L1_LINES,
+    L1_LINES_PATH,
     L1_LABELS,
     L2_THERMOSTAT_FAMILY,
     L3_TRANSITIONS_MA,
-    EIGHT_H,
-    H as H_KYR,
 )
 
 SCRIPT_DIR = Path(__file__).resolve().parent
@@ -96,13 +96,15 @@ def pack_block(f, summary, slope_raw, intercept_raw, label):
         "n_samples": summary.n_samples,
         "intercept": f._intercept,
         "L1": [
-            {"n": int(n), "a": f._l1_a[n], "b": f._l1_b[n]}
-            for n in L1_LATTICE_INTEGERS
+            {"period_kyr": P, "label": L1_LABELS.get(P, ""), "a": f._l1_a[P], "b": f._l1_b[P]}
+            for P in L1_PERIODS_KYR
         ],
         "L2": [
+            # empty since the T1 disposition folded the 405-kyr family into L1
+            # (fit() runs L2 only as a diagnostic, include_l2=True)
             {"p_kyr": L2_THERMOSTAT_FAMILY[lab], "label": lab,
              "a": f._l2_a[lab], "b": f._l2_b[lab]}
-            for lab in f.l2_labels
+            for lab in f.l2_labels if lab in f._l2_a
         ],
         "L3": [
             {"label": lab,
@@ -199,16 +201,15 @@ def main():
     # Carbon-amplification ratios: EPICA L1 amp / LR04-post-MPT L1 amp per line.
     # Higher = the line manifests primarily through carbon-cycle dynamics.
     amp_ratios = {}
-    for n in L1_LATTICE_INTEGERS:
-        lr_amp = float(np.sqrt(f1._l1_a.get(n, 0)**2 + f1._l1_b.get(n, 0)**2))
-        ep_amp = float(np.sqrt(f5._l1_a.get(n, 0)**2 + f5._l1_b.get(n, 0)**2))
-        amp_ratios[str(n)] = {
-            "n": n,
-            "period_kyr": EIGHT_H / n,
+    for P in L1_PERIODS_KYR:
+        lr_amp = float(np.sqrt(f1._l1_a.get(P, 0)**2 + f1._l1_b.get(P, 0)**2))
+        ep_amp = float(np.sqrt(f5._l1_a.get(P, 0)**2 + f5._l1_b.get(P, 0)**2))
+        amp_ratios[f"{P:.4f}"] = {
+            "period_kyr": P,
             "lr04_post_mpt_amp": lr_amp,
             "epica_amp": ep_amp,
             "ratio": ep_amp / max(lr_amp, 1e-12),
-            "label": L1_LABELS.get(n, ""),
+            "label": L1_LABELS.get(P, ""),
         }
     block_epica["carbon_amplification_ratios"] = amp_ratios
 
@@ -244,9 +245,8 @@ def main():
     # ─── Assemble ───
     out = {
         "config": {
-            "H_kyr": H_KYR,
-            "eight_H_kyr": EIGHT_H,
-            "L1_integers": L1_LATTICE_INTEGERS,
+            "L1_lines": L1_LINES,
+            "L1_source": str(L1_LINES_PATH.relative_to(SCRIPT_DIR.parent)),
             "L2_periods_kyr": dict(L2_THERMOSTAT_FAMILY),
             "L3_transitions_ma": dict(L3_TRANSITIONS_MA),
             "description": (

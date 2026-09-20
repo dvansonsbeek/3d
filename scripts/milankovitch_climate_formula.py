@@ -80,6 +80,7 @@ Run:    python3 scripts/milankovitch_climate_formula.py
 """
 
 import json
+import sys
 import time
 from dataclasses import dataclass, field
 from pathlib import Path
@@ -96,8 +97,27 @@ EPICA_PATH = DATA_DIR / "epica-co2-bereiter2015.txt"
 CENCO2PIP_PATH = DATA_DIR / "cenco2pip-100kyr-bayesian.csv"
 OUT_PATH = DATA_DIR / "milankovitch-climate-formula.json"
 
+# ── THE L1 LINE LIST — ONE HOME ──────────────────────────────────────────
+# The orbital lines are DERIVED from the engine's own spectrum by
+# scripts/l1_physical_lines.py (plan 06, T1 disposition) and read here from
+# its artifact: 25 lines at relative mode amplitude ≥ 0.1 (eccentricity
+# |g_i − g_j|, obliquity p + s_i, climatic precession p + g_i) plus the
+# g₂ − g₅ fundamental (405.6 kyr) and its 2nd / 3rd harmonics (the former
+# L2 carbon-thermostat family, folded in). Periods in kyr; no integer base.
+L1_LINES_PATH = DATA_DIR / "l1-physical-lines.json"
+_L1_ART = json.loads(L1_LINES_PATH.read_text())
+L1_LINES = _L1_ART["lines"]                                   # [{periodKyr, family, label, ...}]
+L1_PERIODS_KYR = [float(x["periodKyr"]) for x in L1_LINES]    # the keys of every L1 coefficient
+L1_LABELS = {float(x["periodKyr"]): f"{x['family']} {x['label']}" for x in L1_LINES}
+
+sys.path.insert(0, str(SCRIPT_DIR.parent / "tools" / "fit" / "python"))
+from artifact_inputs import build_inputs_block  # noqa: E402
+
+# ── LEGACY (retired 2026-09, T1) — the 33-integer comb on 8·H/n ──────────
+# Kept ONLY as the historical record the T1 test and the doc 90–94 research
+# scripts reproduce. The fitter does not read it.
 H = 335.317
-EIGHT_H = 8 * H              # 2682.536 kyr
+EIGHT_H = 8 * H              # 2682.536 kyr — the legacy comb's period base
 
 # L1 ridge regularization. Acts only where the lattice is under-determined
 # (post-MPT 1000-kyr window: cond ≈ 632, max VIF ≈ 7×10⁴). No-op in regimes
@@ -108,7 +128,7 @@ L1_RIDGE_LAMBDA = 1.0
 # Three-layer specification (the formula's structural commitment)
 # ─────────────────────────────────────────────────────────────────────────
 
-L1_LATTICE_INTEGERS = sorted([
+LEGACY_L1_LATTICE_INTEGERS = sorted([
     # Canonical 25 (doc 91 §2.2 + pre-MPT additions from §3.3)
     9, 12, 14, 16, 18, 20, 21, 22, 25, 28, 30, 31, 35,
     38, 39, 48, 50, 53, 65, 66, 68, 73, 76, 113, 120,
@@ -128,6 +148,7 @@ L1_LATTICE_INTEGERS = sorted([
     # eccentricity rather than a planetary beat; no secular-theory counterpart.
     24,
 ])
+L1_LATTICE_INTEGERS = LEGACY_L1_LATTICE_INTEGERS   # historical alias — NOT the shipped L1
 
 L2_THERMOSTAT_FAMILY = {
     "405-kyr (fundamental)":  404.5,
@@ -144,8 +165,8 @@ L3_TRANSITIONS_MA = {
     "MPT":    1.0,
 }
 
-# Per-integer label (mirrored from v1 for backward compatibility + 6 new sidebands)
-L1_LABELS = {
+# LEGACY per-integer labels of the retired comb (historical record only)
+LEGACY_L1_LABELS = {
     9:   "g₂−g₇ Venus-Uranus ecc / Mercury Axial = 8H/9",
     12:  "s₅−s₁ Jupiter-Mercury nodal",
     14:  "g₂−g₈ Venus-Neptune ecc",
@@ -230,8 +251,8 @@ class ClimateFormula:
     """
 
     def __init__(self):
-        self.l1_periods = [EIGHT_H / n for n in L1_LATTICE_INTEGERS]
-        self.l1_integers = L1_LATTICE_INTEGERS
+        self.l1_periods = list(L1_PERIODS_KYR)
+        self.l1_lines = L1_LINES
         self.l2_periods = list(L2_THERMOSTAT_FAMILY.values())
         self.l2_labels  = list(L2_THERMOSTAT_FAMILY.keys())
         # Fitted coefficients (populated by fit())
@@ -255,7 +276,7 @@ class ClimateFormula:
             y: np.ndarray,
             regime: Union[str, tuple] = "post-mpt",
             include_l1: bool = True,
-            include_l2: bool = True,
+            include_l2: bool = False,   # the 405-kyr family lives in L1 since the T1 disposition; L2 is a diagnostic layer
             include_l3: bool = True,
             normalize: bool = True,
             ) -> FitSummary:
@@ -359,9 +380,9 @@ class ClimateFormula:
                              if len(svals_l1) > 1 and svals_l1[-1] > 0 else 1.0)
             # Unpack L1 coefficients: beta_l1[0] = intercept, then pairs
             self._intercept = float(beta_l1[0])
-            for i, n in enumerate(L1_LATTICE_INTEGERS):
-                self._l1_a[n] = float(beta_l1[1 + 2 * i])
-                self._l1_b[n] = float(beta_l1[2 + 2 * i])
+            for i, P in enumerate(L1_PERIODS_KYR):
+                self._l1_a[P] = float(beta_l1[1 + 2 * i])
+                self._l1_b[P] = float(beta_l1[2 + 2 * i])
         else:
             self._intercept = float(y_sub.mean())
             r2_l1_only = 0.0
@@ -397,8 +418,8 @@ class ClimateFormula:
         self._l3_transitions_kyr = dict(step_dict)
 
         # Per-component amplitudes
-        l1_amps = {n: float(np.sqrt(self._l1_a.get(n, 0)**2 + self._l1_b.get(n, 0)**2))
-                   for n in L1_LATTICE_INTEGERS}
+        l1_amps = {P: float(np.sqrt(self._l1_a.get(P, 0)**2 + self._l1_b.get(P, 0)**2))
+                   for P in L1_PERIODS_KYR}
         l2_amps = {label: float(np.sqrt(self._l2_a.get(label, 0)**2 + self._l2_b.get(label, 0)**2))
                    for label in self.l2_labels}
 
@@ -406,7 +427,7 @@ class ClimateFormula:
             regime=regime_name,
             window_kyr=tuple(window),
             n_samples=int(len(t)),
-            n_l1_components=len(L1_LATTICE_INTEGERS) if include_l1 else 0,
+            n_l1_components=len(L1_PERIODS_KYR) if include_l1 else 0,
             n_l2_components=len(L2_THERMOSTAT_FAMILY) if include_l2 else 0,
             n_l3_steps=len(step_labels),
             intercept=float(self._intercept),
@@ -433,10 +454,10 @@ class ClimateFormula:
         if layer in ("intercept", "all"):
             out = out + self._intercept
         if layer in ("l1", "all"):
-            for n in L1_LATTICE_INTEGERS:
-                omega = 2 * np.pi * n / EIGHT_H
-                a = self._l1_a.get(n, 0.0)
-                b = self._l1_b.get(n, 0.0)
+            for P in L1_PERIODS_KYR:
+                omega = 2 * np.pi / P
+                a = self._l1_a.get(P, 0.0)
+                b = self._l1_b.get(P, 0.0)
                 out = out + a * np.cos(omega * t) + b * np.sin(omega * t)
         if layer in ("l2", "all"):
             for label, p in L2_THERMOSTAT_FAMILY.items():
@@ -465,9 +486,8 @@ class ClimateFormula:
     def to_dict(self) -> dict:
         return {
             "config": {
-                "H_kyr": H,
-                "eight_H_kyr": EIGHT_H,
-                "L1_integers": L1_LATTICE_INTEGERS,
+                "L1_lines": L1_LINES,
+                "L1_source": str(L1_LINES_PATH.relative_to(SCRIPT_DIR.parent)),
                 "L2_periods_kyr": L2_THERMOSTAT_FAMILY,
                 "L3_transitions_ma": L3_TRANSITIONS_MA,
             },
@@ -475,10 +495,10 @@ class ClimateFormula:
             "fitted_window_kyr": list(self._fitted_window) if self._fitted_window else None,
             "intercept": self._intercept,
             "L1_coefficients": {
-                str(n): {"a_cos": self._l1_a.get(n, 0), "b_sin": self._l1_b.get(n, 0),
-                          "amp": float(np.sqrt(self._l1_a.get(n, 0)**2 + self._l1_b.get(n, 0)**2)),
-                          "label": L1_LABELS.get(n, "")}
-                for n in L1_LATTICE_INTEGERS
+                f"{P:.4f}": {"period_kyr": P, "a_cos": self._l1_a.get(P, 0), "b_sin": self._l1_b.get(P, 0),
+                             "amp": float(np.sqrt(self._l1_a.get(P, 0)**2 + self._l1_b.get(P, 0)**2)),
+                             "label": L1_LABELS.get(P, "")}
+                for P in L1_PERIODS_KYR
             },
             "L2_coefficients": {
                 label: {"a_cos": self._l2_a.get(label, 0), "b_sin": self._l2_b.get(label, 0),
@@ -496,11 +516,11 @@ class ClimateFormula:
     # ─── internal helpers ─────────────────────────────────────────────
 
     def _build_l1_matrix(self, t):
-        """L1 design matrix: intercept + 31 cos/sin pairs (lattice sinusoids)."""
+        """L1 design matrix: intercept + one cos/sin pair per physical line (periods in kyr)."""
         n_obs = len(t)
         cols = [np.ones(n_obs)]
-        for n in L1_LATTICE_INTEGERS:
-            omega = 2 * np.pi * n / EIGHT_H
+        for P in L1_PERIODS_KYR:
+            omega = 2 * np.pi / P
             cols.append(np.cos(omega * t))
             cols.append(np.sin(omega * t))
         return np.column_stack(cols)
@@ -651,15 +671,15 @@ def main():
     print("=" * 78)
     print("MILANKOVITCH 8H CLIMATE FORMULA v2 — modular L1/L2/L3")
     print("=" * 78)
-    print(f"L1: {len(L1_LATTICE_INTEGERS)} integer divisors of 8H = {EIGHT_H:.1f} kyr")
+    print(f"L1: {len(L1_PERIODS_KYR)} physical lines from {L1_LINES_PATH.name} (periods {min(L1_PERIODS_KYR):.1f}–{max(L1_PERIODS_KYR):.1f} kyr)")
     print(f"L2: {len(L2_THERMOSTAT_FAMILY)} carbon-thermostat lines ({list(L2_THERMOSTAT_FAMILY.keys())})")
     print(f"L3: {len(L3_TRANSITIONS_MA)} Cenozoic transitions ({list(L3_TRANSITIONS_MA.keys())})")
 
     ages, vals = load_lr04()
     print(f"\nLR04: {len(ages)} samples, {ages.max():.0f} kyr coverage")
 
-    out = {"config": {"H_kyr": H, "eight_H_kyr": EIGHT_H,
-                       "L1_integers": L1_LATTICE_INTEGERS,
+    out = {"config": {"L1_lines": L1_LINES,
+                       "L1_source": str(L1_LINES_PATH.relative_to(SCRIPT_DIR.parent)),
                        "L2_periods_kyr": L2_THERMOSTAT_FAMILY,
                        "L3_transitions_ma": L3_TRANSITIONS_MA},
            "regime_fits": {}}
@@ -836,18 +856,17 @@ def main():
     f_lr_pm = formulas["post-mpt"]
     print(f"\n  Carbon-amplification ratio per L1 line (EPICA amp / LR04 post-MPT amp, normalized):")
     print(f"  Higher = the line manifests more in atmospheric CO2 than in ice volume.")
-    print(f"  {'n':>3s} {'period (kyr)':>12s} {'LR04 amp':>10s} {'EPICA amp':>10s} {'ratio':>8s}  label")
+    print(f"  {'period (kyr)':>12s} {'LR04 amp':>10s} {'EPICA amp':>10s} {'ratio':>8s}  label")
     amp_ratios = {}
-    for n in L1_LATTICE_INTEGERS:
-        lr_amp = float(np.sqrt(f_lr_pm._l1_a.get(n, 0)**2 + f_lr_pm._l1_b.get(n, 0)**2))
-        ep_amp = float(np.sqrt(f_epi._l1_a.get(n, 0)**2 + f_epi._l1_b.get(n, 0)**2))
+    for P in L1_PERIODS_KYR:
+        lr_amp = float(np.sqrt(f_lr_pm._l1_a.get(P, 0)**2 + f_lr_pm._l1_b.get(P, 0)**2))
+        ep_amp = float(np.sqrt(f_epi._l1_a.get(P, 0)**2 + f_epi._l1_b.get(P, 0)**2))
         ratio  = ep_amp / max(lr_amp, 1e-12)
-        amp_ratios[n] = {"lr04": lr_amp, "epica": ep_amp, "ratio": ratio}
-    # Sort by ratio descending — top L2-driven lines bubble up
-    for n, info in sorted(amp_ratios.items(), key=lambda kv: -kv[1]["ratio"])[:10]:
-        period = EIGHT_H / n
-        print(f"  {n:>3d} {period:>12.1f} {info['lr04']:>10.4f} {info['epica']:>10.4f} "
-              f"{info['ratio']:>8.3f}  {L1_LABELS.get(n, '')}")
+        amp_ratios[P] = {"lr04": lr_amp, "epica": ep_amp, "ratio": ratio}
+    # Sort by ratio descending — top carbon-driven lines bubble up
+    for P, info in sorted(amp_ratios.items(), key=lambda kv: -kv[1]["ratio"])[:10]:
+        print(f"  {P:>12.1f} {info['lr04']:>10.4f} {info['epica']:>10.4f} "
+              f"{info['ratio']:>8.3f}  {L1_LABELS.get(P, '')}")
 
     out["epica_evaluation"] = {
         "regime": "epica-co2",
@@ -860,14 +879,14 @@ def main():
         "delta_r2_l3": sum_epi.delta_r2_l3,
         "co2_range_ppm": [float(co2_epi.min()), float(co2_epi.max())],
         "carbon_amplification_ratios": {
-            str(n): {
-                "lr04_post_mpt_amp": amp_ratios[n]["lr04"],
-                "epica_amp": amp_ratios[n]["epica"],
-                "ratio": amp_ratios[n]["ratio"],
-                "period_kyr": EIGHT_H / n,
-                "label": L1_LABELS.get(n, ""),
+            f"{P:.4f}": {
+                "lr04_post_mpt_amp": amp_ratios[P]["lr04"],
+                "epica_amp": amp_ratios[P]["epica"],
+                "ratio": amp_ratios[P]["ratio"],
+                "period_kyr": P,
+                "label": L1_LABELS.get(P, ""),
             }
-            for n in L1_LATTICE_INTEGERS
+            for P in L1_PERIODS_KYR
         },
     }
 
@@ -906,6 +925,12 @@ def main():
         "doc": "docs/92-climate-formula.md",
         "runtime_sec": time.time() - t0,
     }
+    # inputs-stamped (tools/verify/artifact-freshness.js): the line list is an input
+    out["inputs"] = build_inputs_block(
+        "python3 scripts/milankovitch_climate_formula.py",
+        ["data/l1-physical-lines.json", "data/lr04-stack.txt", "data/westerhold2020-cenogrid.tab",
+         "data/epica-co2-bereiter2015.txt", "data/cenco2pip-100kyr-bayesian.csv",
+         "scripts/milankovitch_climate_formula.py"])
 
     OUT_PATH.parent.mkdir(parents=True, exist_ok=True)
     with OUT_PATH.open("w") as f:

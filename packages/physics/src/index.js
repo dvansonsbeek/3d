@@ -148,7 +148,7 @@ export { createDeltaTCycles } from './deltat/cycles.cjs';
 export { createDeepTimeLod } from './deltat/deep-time.cjs';
 export { createMoonRecessionHistory, createSolarChannelBudget } from './deltat/recession-history.cjs';
 export { deltaTEspenakMeeusCanonSeconds } from './deltat/historical.cjs';
-export { evalClimateL1OrbitalPermil } from './climate/l1-orbital.cjs';
+export { evalClimateL1OrbitalPermil, laggedL1Terms, createAlphaGiaChannel } from './climate/l1-orbital.cjs';
 // Phase 8.5 — eclipse geometry (single-copy: the browser had no Node twin).
 export { createEclipseFinders } from './eclipse/finders.cjs';
 // Phase 8.6 — the published reference curves (external comparison formulas

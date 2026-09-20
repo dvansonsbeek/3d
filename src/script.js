@@ -11,7 +11,7 @@ import { Pane } from 'tweakpane';
 //
 // Generated at build time, not fetched at runtime — `holisticyearLength` is read
 // at module scope below, and Phase 15 requires offline === hosted.
-import { DEFAULT_CONSTANTS as K, REFERENCE_DATA as R, FITTED_COEFFICIENTS as FIT, CONSTANTS_HASH, COEFFICIENTS_HASH, MODEL_VERSION, PREPRINT_DOI, createEpochPrimitives, createPhaseMachinery, createCardinalModel, createMoonEccChannel, createDeepEccChannel, DEEP_MODES_ARTIFACT, createDeepOrbitalHistory, createYearLengths, createMoonMonthChain, createChainCycleIntegrator, createMoonArguments, createMoonSeries, createMoonApparent, derivePlanetGeometry, planetFibonacciLaws as _FL, computeEccentricityIntegrated, planetOrientation as _PO, planetOrbitChain as _POC, createPredictivePrecession, calcPlanetPerihelionLongDeg, integrateAscendingNode, createDeltaTCycles, createDeepTimeLod, createMoonRecessionHistory, createSolarChannelBudget, deltaTEspenakMeeusCanonSeconds, evalClimateL1OrbitalPermil, createEclipseFinders, createSunLongitudeCorrection, createModel, buildPlanetChainsFromArtifactData, computePlanetElementsAtYear as kcComputePlanetElementsAtYear, computeApsidalSecularDegPerYr as kcApsidalSecularDegPerYr, computeHeliocentricEclipticFromElements as kcComputeHeliocentricEclipticFromElements, computeEquatorNodeOriginSFrameDeg, convertNodeSFrameToEquatorOriginDeg, createSecularSeriesOverride, CHAIN_ARTIFACT, ANCHOR_EPOCH_YEAR as KC_ANCHOR_EPOCH_YEAR, ANCHOR_EPOCH_JD as KC_ANCHOR_EPOCH_JD } from '@essrt/physics';
+import { DEFAULT_CONSTANTS as K, REFERENCE_DATA as R, FITTED_COEFFICIENTS as FIT, CONSTANTS_HASH, COEFFICIENTS_HASH, MODEL_VERSION, PREPRINT_DOI, createEpochPrimitives, createPhaseMachinery, createCardinalModel, createMoonEccChannel, createDeepEccChannel, DEEP_MODES_ARTIFACT, createDeepOrbitalHistory, createYearLengths, createMoonMonthChain, createChainCycleIntegrator, createMoonArguments, createMoonSeries, createMoonApparent, derivePlanetGeometry, planetFibonacciLaws as _FL, computeEccentricityIntegrated, planetOrientation as _PO, planetOrbitChain as _POC, createPredictivePrecession, calcPlanetPerihelionLongDeg, integrateAscendingNode, createDeltaTCycles, createDeepTimeLod, createMoonRecessionHistory, createSolarChannelBudget, deltaTEspenakMeeusCanonSeconds, evalClimateL1OrbitalPermil, createAlphaGiaChannel, createEclipseFinders, createSunLongitudeCorrection, createModel, buildPlanetChainsFromArtifactData, computePlanetElementsAtYear as kcComputePlanetElementsAtYear, computeApsidalSecularDegPerYr as kcApsidalSecularDegPerYr, computeHeliocentricEclipticFromElements as kcComputeHeliocentricEclipticFromElements, computeEquatorNodeOriginSFrameDeg, convertNodeSFrameToEquatorOriginDeg, createSecularSeriesOverride, CHAIN_ARTIFACT, ANCHOR_EPOCH_YEAR as KC_ANCHOR_EPOCH_YEAR, ANCHOR_EPOCH_JD as KC_ANCHOR_EPOCH_JD } from '@essrt/physics';
 // K8 — the reference package: ONE-WAY imports (comparison only;
 // @essrt/reference is private-by-construction and nothing in the model
 // chain depends on it). publishedCurves migrated here from
@@ -268,7 +268,8 @@ const SOLAR_WIND_KG_PER_S = K.physicalConstants.solarWindMassLossKgPerS;  // Uly
 const ALPHA_1 = K.deepTime.alpha1PerMa;           // /Ma  — Moon recession, LLR-anchored (3.82 cm/yr)
 const ALPHA_3 = K.deepTime.alpha3PerMa3;          // /Ma³ — Farhat 2022 LSQ deep-time fit
 const ALPHA_4 = K.deepTime.alpha4PerMa4;          // /Ma⁴ — Farhat 2022 LSQ deep-time fit
-const ALPHA_CLIMATE_SCALE = K.deepTime.alphaClimateScalePerMille;  // per ‰ — dα/dt(J2000) = Cox-Chao/2.0
+const ALPHA_GIA_RATE_J2000_PER_YR = K.deepTime.alphaGiaRateJ2000PerYr;  // Cox-Chao/2.0 — the rate the channel's k is derived from
+const ALPHA_GIA_RELAXATION_KYR   = K.deepTime.alphaGiaRelaxationKyr;    // τ, measured against the historical ΔT record (plan 06 D7)
 const BOND_TAPER_FULL_HALFWIDTH_YR  = K.deepTime.dtStackTaperFullHalfwidthYr;   // 4-flag ΔT stack taper: full strength
 const BOND_TAPER_TOTAL_HALFWIDTH_YR = K.deepTime.dtStackTaperTotalHalfwidthYr;  // 4-flag ΔT stack taper: zero beyond
 
@@ -2394,19 +2395,20 @@ const I_EARTH          = EARTH_MOI_FACTOR * M_EARTH_ALONE * R_EARTH_M * R_EARTH_
 // orbital layer that drives the Climate Formula (itself fit against LR04
 // δ¹⁸O):
 //
-//     α(t) = α_J2000 − ALPHA_CLIMATE_SCALE · (L1(year) − L1(2000))
+//     α(t) = α_J2000 − k · [ L1(t) − ⟨L1⟩_τ(t) ]
 //
-// One physical mechanism, two observables — the same L1 orbital signal
-// drives both the ice-volume proxy in the sediment record AND the α-driven
-// LOD oscillation. ALPHA_CLIMATE_SCALE is the single calibration constant,
-// chosen so dα/dt at J2000 exactly matches the Cox & Chao 2002 rate above.
-// See the earthMoiFactorAtAge() function docstring below for the physical
-// chain (planetary eigenmodes → Milankovitch forcing → ice → GIA → LOD),
-// the citation trail, and the sign convention.
+// One ice history, one response function: the L1 layer is the ice-volume
+// proxy, and the solid Earth answers it through the mantle's viscoelastic
+// relaxation (⟨L1⟩_τ = the causal exponential average over the past).
+// An uncompensated ice load lowers α (k > 0); after a rapid deglaciation
+// α sits ABOVE equilibrium and relaxes for ~τ — today's −0.35 ms/cy is
+// that tail. Home: @essrt/physics/climate/l1-orbital createAlphaGiaChannel
+// (plan 06 D7 — measured against the historical ΔT record).
 //
-// Two named physical constants — no fitting to eclipse data:
-//   • EARTH_MOI_FACTOR      — IERS Conventions 2010 anchor at J2000
-//   • ALPHA_CLIMATE_SCALE   — calibrated so dα/dt(J2000) matches Cox-Chao
+// Named physical constants — no fitting to eclipse data:
+//   • EARTH_MOI_FACTOR            — IERS Conventions 2010 anchor at J2000
+//   • ALPHA_GIA_RATE_J2000_PER_YR — Cox & Chao 2002 ÷ Peltier factor; k is DERIVED from it at runtime
+//   • ALPHA_GIA_RELAXATION_KYR    — τ, measured by the ΔT joint fitter (optimum 5–6 kyr; Maxwell degree-2 estimate 4–6 kyr)
 //
 // CRITICAL: α(t) is purely an Earth-INTERNAL mass redistribution. It does
 // NOT transfer angular momentum to the Moon, so the Moon distance evolution
@@ -2448,7 +2450,8 @@ const I_EARTH          = EARTH_MOI_FACTOR * M_EARTH_ALONE * R_EARTH_M * R_EARTH_
  *  mass shifts equatorward → smaller α. Peltier & Wu 1984.
  *
  *  Regime: uses lr04-post-mpt L1 coefficients throughout. The formula is
- *  a periodic H-lattice-divisor sum, so it stays bounded at deep time.
+ *  a periodic sum over the engine's own orbital lines (periods in kyr,
+ *  data/l1-physical-lines.json), so it stays bounded at deep time.
  *  Beyond ±1 Myr the extrapolation is a smooth continuation of the fitted
  *  periodic pattern, not a physics prediction. */
 const ALPHA_CLIMATE_REGIME_KEY = 'lr04-post-mpt';
@@ -2458,20 +2461,26 @@ const ALPHA_CLIMATE_REGIME_KEY = 'lr04-post-mpt';
 // Cheng-Tapley-Ries 2013). Empirical L-5b|R| optimum with LLR α₁ landed at this
 // GIA coupling — physically defensible via the model-dependent J₂→α conversion
 // uncertainty. Prior value: -5.24e-7 (dα/dt = -1.8e-11/yr, factor 1.5).
-let _alphaClimateL1_J2000 = null;
-
-function _evalClimateL1Orbital(year) {
-  // δ¹⁸O contribution from L1 (orbital) layer only, in ‰ — the orbital
-  // fluctuation around J2000, not the secular baseline. 8.4-4: the
-  // harmonic loop lives in @essrt/physics/climate/l1-orbital; the regime
-  // selection (and the TDZ-sensitive CLIMATE_FORMULA_COEFFS read) stays
-  // here.
-  const r = CLIMATE_FORMULA_COEFFS.regimes[ALPHA_CLIMATE_REGIME_KEY];
-  return evalClimateL1OrbitalPermil(year, {
-    l1Terms: r.L1,
-    yStdDenormalization: r.denormalization.y_std,
-    eightHKyr: CLIMATE_FORMULA_COEFFS.config.eight_H_kyr,
-  });
+// The GIA channel — the LAGGED response of the polar moment to the L1 ice
+// history: ONE home in @essrt/physics/climate/l1-orbital
+// (createAlphaGiaChannel — k derived from the Cox–Chao rate, τ measured
+// against the historical ΔT record; plan 06 D7). Built lazily because the
+// TDZ-sensitive CLIMATE_FORMULA_COEFFS read stays here (see the guard in
+// earthMoiFactorAtAge); the same construction in model.js, tools/lib/
+// deep-time.js and the website's essrt.ts.
+let _alphaGiaChannel = null;
+function _alphaGia() {
+  if (_alphaGiaChannel === null) {
+    const r = CLIMATE_FORMULA_COEFFS.regimes[ALPHA_CLIMATE_REGIME_KEY];
+    _alphaGiaChannel = createAlphaGiaChannel({
+      l1Terms: r.L1,
+      yStdDenormalization: r.denormalization.y_std,
+      relaxationKyr: ALPHA_GIA_RELAXATION_KYR,
+      alphaGiaRateJ2000PerYr: ALPHA_GIA_RATE_J2000_PER_YR,
+      alphaJ2000: EARTH_MOI_FACTOR,
+    });
+  }
+  return _alphaGiaChannel;
 }
 
 // R2 — the α lattice reference. When BUILDING an H-lattice table (the ∫1/H
@@ -2524,12 +2533,7 @@ function earthMoiFactorAtAge(t_Ma) {
     return EARTH_MOI_FACTOR;
   }
   if (!coeffs) return EARTH_MOI_FACTOR;
-  if (_alphaClimateL1_J2000 === null) {
-    _alphaClimateL1_J2000 = _evalClimateL1Orbital(2000);
-  }
-  const year = 2000 - t_Ma * 1e6;
-  const L1_at = _evalClimateL1Orbital(year);
-  const alpha = EARTH_MOI_FACTOR - ALPHA_CLIMATE_SCALE * (L1_at - _alphaClimateL1_J2000);
+  const alpha = _alphaGia().alphaAt(2000 - t_Ma * 1e6);
   if (_earthMoiMemo.size >= _EARTH_MOI_MEMO_CAP) _earthMoiMemo.clear();
   _earthMoiMemo.set(t_Ma, alpha);
   return alpha;
@@ -2835,19 +2839,17 @@ function _deepLod() {
 function meanLodSecondsAtAge(t_Ma) { return _deepLod().lodSecondsAtAge(t_Ma); }
 
 /** Same as meanLodSecondsAtAge but with α held at its LONG-TERM (climate) MEAN
- *  value. Since ⟨L1⟩ over orbital cycles → 0 (harmonic average), the mean α is
- *      ⟨α⟩ = EARTH_MOI_FACTOR + ALPHA_CLIMATE_SCALE × L1(2000)
- *  offset from the J2000 snapshot by −ALPHA_CLIMATE_SCALE × ⟨L1⟩ = 0, so the
- *  net offset from EARTH_MOI_FACTOR is +ALPHA_CLIMATE_SCALE × L1(2000).
- *  This curve traces the "climate-detrended" LOD trajectory — the wavy full
- *  model curve oscillates around this line instead of around the J2000-snapshot
- *  line. Used by the Solar Day chart's "α at climate mean" reference curve. */
+ *  value. The lagged L1 term L′ = L1 − ⟨L1⟩_τ averages to zero over orbital
+ *  cycles, so the mean α is
+ *      ⟨α⟩ = EARTH_MOI_FACTOR + k × L′(2000)
+ *  (the J2000 snapshot sits k·L′(2000) below the climate mean). This curve
+ *  traces the "climate-detrended" LOD trajectory — the wavy full model curve
+ *  oscillates around this line instead of around the J2000-snapshot line.
+ *  Used by the Solar Day chart's "α at climate mean" reference curve. */
 function meanLodSecondsAtAgeMeanAlpha(t_Ma) {
   // 8.4-3: α computed here (engine climate machinery), the LOD shape shared.
-  if (_alphaClimateL1_J2000 === null) {
-    _alphaClimateL1_J2000 = _evalClimateL1Orbital(2000);
-  }
-  const alpha_mean = EARTH_MOI_FACTOR + ALPHA_CLIMATE_SCALE * _alphaClimateL1_J2000;
+  const g = _alphaGia();
+  const alpha_mean = EARTH_MOI_FACTOR + g.kPerPermille * g.laggedL1PermilAt(2000);
   return _deepLod().lodSecondsAtAgeWithAlpha(t_Ma, alpha_mean);
 }
 
@@ -16867,11 +16869,10 @@ async function loadCenco2pipData() {
 function cfmEvalRaw(t_kyr_BP, regimeKey, layer) {
   const r = CLIMATE_FORMULA_COEFFS.regimes[regimeKey];
   if (!r) return NaN;
-  const EIGHT_H = CLIMATE_FORMULA_COEFFS.config.eight_H_kyr;
   let C = r.intercept;
   if (layer === 'l1' || layer === 'all') {
     for (const c of r.L1) {
-      const omega = 2 * Math.PI * c.n / EIGHT_H;
+      const omega = 2 * Math.PI / c.period_kyr;
       C += c.a * Math.cos(omega * t_kyr_BP) + c.b * Math.sin(omega * t_kyr_BP);
     }
   }
@@ -17374,7 +17375,7 @@ function cfmRenderChart(tabKey) {
       .map(e => ({ ...e, period_kyr: Number(e.period_kyr) }))
       .sort((a, b) => b.ratio - a.ratio);
     const ampRows = entries.map(e => {
-      return `<tr><td>${e.n}</td><td>${e.period_kyr.toFixed(1)}</td>` +
+      return `<tr><td>${e.period_kyr.toFixed(1)}</td>` +
              `<td>${e.lr04_post_mpt_amp.toFixed(4)}</td>` +
              `<td>${e.epica_amp.toFixed(4)}</td>` +
              `<td><b>${e.ratio.toFixed(2)}×</b></td>` +
@@ -17384,7 +17385,7 @@ function cfmRenderChart(tabKey) {
       <details class="cfm-r2-panel">
         <summary class="cfm-r2-summary">L1 carbon-amplification ratio (EPICA CO₂ amp / LR04 post-MPT amp) — sorted high → low</summary>
         <table class="cfm-r2-table">
-          <thead><tr><th>n</th><th>Period (kyr)</th><th>LR04 amp</th><th>EPICA amp</th><th>Ratio</th><th>Identity</th></tr></thead>
+          <thead><tr><th>Period (kyr)</th><th>LR04 amp</th><th>EPICA amp</th><th>Ratio</th><th>Identity</th></tr></thead>
           <tbody>${ampRows}</tbody>
         </table>
       </details>
@@ -27160,14 +27161,12 @@ function setupGUI() {
 
     const t_Ma = (J2000_CALENDAR_YEAR - julianDateToDecimalYear(JD_135)) / 1e6;
 
-    // L1-α with scaled ALPHA_CLIMATE_SCALE (mirrors earthMoiFactorAtAge + integrator chain)
-    if (_alphaClimateL1_J2000 === null) {
-      _alphaClimateL1_J2000 = _evalClimateL1Orbital(2000);
-    }
+    // GIA channel with a scaled coupling k (mirrors earthMoiFactorAtAge + integrator chain)
+    const _g = _alphaGia();
+    const _L2000 = _g.laggedL1PermilAt(2000);
     function _alphaScaledL1(t_Ma_arg, scale) {
       const year = 2000 - t_Ma_arg * 1e6;
-      const L1_at = _evalClimateL1Orbital(year);
-      return EARTH_MOI_FACTOR - (ALPHA_CLIMATE_SCALE * scale) * (L1_at - _alphaClimateL1_J2000);
+      return EARTH_MOI_FACTOR - (_g.kPerPermille * scale) * (_g.laggedL1PermilAt(year) - _L2000);
     }
     function _lodScaledL1(t_Ma_arg, scale) {
       const a = meanMoonDistanceMetresAtAge(t_Ma_arg);

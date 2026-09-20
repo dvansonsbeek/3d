@@ -186,11 +186,11 @@
       "kick_coefficients_s": [
         {
           "cos": 0,
-          "sin": 698.0966899646435
+          "sin": 493.0347425795158
         },
         {
           "cos": 0,
-          "sin": -52.017769641351094
+          "sin": 179.324
         }
       ],
       "T0_lattice_n": 685,
@@ -202,13 +202,14 @@
           "dn": 726,
           "period_yr": 3694.9531680440773,
           "phi_locked_rad": -0.4616152283022974,
-          "amp_s": 186.14,
-          "phase_convention": "cos(2π·dn/8H·y − φ_locked), kick-1-envelope-shared"
+          "amp_s": 0,
+          "phase_convention": "cos(2π·dn/8H·y − φ_locked), kick-1-envelope-shared",
+          "retired": "RETIRED (plan 06 D7 follow-up, 2026-09): shipped at amplitude 0 — measured to buy nothing once the GIA channel became the lagged response (kicks-only 11.89 / 21.04 s vs all three 12.04 / 21.34 s); dn/phase kept as the convention for the diagnostic column (DT_RESONATOR_COMPONENTS)."
         }
       ],
-      "rms_s": 28.75879228410743,
-      "raw_at_j2000_s": -129.67287800952082,
-      "lod_raw_at_j2000_s_per_day": 0.0006300500673560481,
+      "rms_s": 21.04259829068953,
+      "raw_at_j2000_s": 20.336554860847798,
+      "lod_raw_at_j2000_s_per_day": 0.0008021623611181848,
       "deep_time_checks_s": {
         "900": -245.8439379884609,
         "2000": -82.32559425279462,
@@ -219,7 +220,7 @@
         "-801": 0
       },
       "regeneration_rule": "drive-tone menu = Δn difference tones of the ACTIVE flag set (any count); refit this script after any stack change (3rd/5th cycle)",
-      "status": "JOINT WORLD SHIPPED (--joint --write): amplitudes from the joint equality-constrained fit (kick2 ~0 — the termination is carried by flag interference in the joint world); phases/epochs/T0/Q remain the Stage-1/3 convention. Default-ON.",
+      "status": "JOINT WORLD SHIPPED (--joint --write): the two impulse kicks from the joint equality-constrained fit, the drive tone retired at amplitude 0 (plan 06 D7 follow-up); phases/epochs/T0/Q remain the Stage-1/3 convention. Default-ON.",
       "impulse_consistent": true
     },
     "resonator_free_reference": {

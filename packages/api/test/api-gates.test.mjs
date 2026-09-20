@@ -124,7 +124,7 @@ for (const url of SAMPLE_REQUESTS) {
   const ss = dataOf('/v1/cardinal-points?year=2000&types=SS').years[0].points.SS;
   if (Math.abs(ss.jd - 2451716.575) > 0.1) failures.push(`SS 2000 JD: ${ss.jd}`);
   const val = dataOf('/v1/values/usnoLodJ2000');
-  if (val.value !== '86,400.0018') failures.push(`values/usnoLodJ2000: ${val.value}`);   // ecc-unification 7c re-close: USNO optimum moved with the 6c Earth-frame anchor
+  if (val.value !== '86,400.0019') failures.push(`values/usnoLodJ2000: ${val.value}`);   // plan 06 D7 + kicks-only swing: the joint optimum moved with the lagged GIA channel (86,400.0018 after the ecc-unification 7c re-close → 0020 → 0019)
   const deriv = dataOf('/v1/derivations/axialPrecession');
   if (deriv.latticeDivisor !== 13) failures.push(`derivations/axialPrecession divisor: ${deriv.latticeDivisor}`);
   const merc = dataOf('/v1/bodies/mercury');
