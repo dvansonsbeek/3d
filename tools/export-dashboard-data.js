@@ -233,8 +233,6 @@ function exportEarth(years) {
       perihelionCycleLength: C.perihelionCycleLength,
       holisticYear: H,
       balancedYear: C.balancedYear,
-      fibonacciD: 3,
-      type: 'II',
     },
   };
 }
@@ -360,9 +358,8 @@ function exportPlanet(planetName, years) {
       semiMajorAxis: p.orbitDistance,
       orbitalPeriodDays: p.solarYearInput,
       perihelionEclipticYears: p.perihelionEclipticYears,
-      fibonacciD: p.fibonacciD,
-      type: p.type,
-      mirrorPair: p.mirrorPair,
+      // plan 06: the retired per-planet configuration fields (the integer
+      // slot d, the balance-group type, the mirror pair) are no longer exported
       holisticYear: H,
       balancedYear: planetBalancedYear,
     },
@@ -388,15 +385,10 @@ function exportMetadata() {
       displayName: name.charAt(0).toUpperCase() + name.slice(1),
     };
     if (name === 'earth') {
-      meta.planets[name].fibonacciD = 3;
-      meta.planets[name].type = 'II';
       meta.planets[name].semiMajorAxis = 1.0;
     } else {
       const p = C.planets[name];
-      meta.planets[name].fibonacciD = p.fibonacciD;
-      meta.planets[name].type = p.type;
       meta.planets[name].semiMajorAxis = p.orbitDistance;
-      meta.planets[name].mirrorPair = p.mirrorPair;
     }
   }
   return meta;

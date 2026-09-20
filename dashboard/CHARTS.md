@@ -10,7 +10,7 @@ Status: [x] = implemented, [ ] = needs new computation
 - [x] Eccentricity cycles (base + amplitude oscillation)
 
 ### Obliquity
-- [x] Earth obliquity (H/3 + H/8 combined)
+- [x] Earth obliquity (the apsidal-period and obliquity-beat components combined)
 - [ ] Inclination tilt Absolute cycles
 - [ ] Inclination tilt Relative cycles
 - [ ] Axial tilt cycles

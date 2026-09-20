@@ -8,16 +8,21 @@ import { applyPlotlyTheme } from './theme.js';
 let isLightMode = localStorage.getItem('dashboard-theme') !== 'dark';
 let earthData = null;
 
-const H = 335008;
-const BALANCED = -302355;
-const RANGE_PRESETS = {
-  full:  [BALANCED, BALANCED + H],
-  h3:   [2000 - H / 6, 2000 + H / 6],
-  h5:   [2000 - H / 10, 2000 + H / 10],
-  h8:   [2000 - H / 16, 2000 + H / 16],
-  h13:  [2000 - H / 26, 2000 + H / 26],
-  h16:  [2000 - H / 32, 2000 + H / 32],
-};
+// Range presets — windows on the fitted anchor interval, read from the
+// exported Earth data (never hard-coded model numbers; plan 06). The keys
+// keep their historical names; the windows are ±H/(2n) around 2000.
+function rangePresets() {
+  const H = earthData.constants.holisticYear;
+  const BALANCED = earthData.constants.balancedYear;
+  return {
+    full: [BALANCED, BALANCED + H],
+    h3:   [2000 - H / 6, 2000 + H / 6],
+    h5:   [2000 - H / 10, 2000 + H / 10],
+    h8:   [2000 - H / 16, 2000 + H / 16],
+    h13:  [2000 - H / 26, 2000 + H / 26],
+    h16:  [2000 - H / 32, 2000 + H / 32],
+  };
+}
 
 // ── Data loading ──────────────────────────────────────────────────────────
 
@@ -50,7 +55,8 @@ async function refreshCharts() {
 function applyRange() {
   const activeBtn = document.querySelector('#range-toggle .range-btn.active');
   if (!activeBtn) return;
-  const preset = RANGE_PRESETS[activeBtn.dataset.range];
+  if (!earthData) return;
+  const preset = rangePresets()[activeBtn.dataset.range];
   if (!preset) return;
 
   for (const id of EARTH_CHART_IDS) {

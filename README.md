@@ -115,7 +115,7 @@ npm run dashboard:export   # generate JSON data from the orbital engine
 npm run dashboard          # start dashboard at http://localhost:5050
 ```
 
-Features: multi-planet overlay, synchronized zoom/pan, light/dark mode, CSV export, range presets (Full H, H/3, H/5, H/8, H/13, H/16), and obliquity decomposition for Earth.
+Features: multi-planet overlay, synchronized zoom/pan, light/dark mode, CSV export, range presets (the whole anchor interval and ±56 / ±34 / ±21 / ±13 / ±10 kyr windows around 2000), and obliquity decomposition for Earth.
 
 ### Python Analysis Scripts (Optional)
 

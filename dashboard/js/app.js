@@ -2,7 +2,7 @@
 // APP — Dashboard entry point (multi-planet toggle)
 // ═══════════════════════════════════════════════════════════════════════════
 
-import { loadPlanetData } from './data-loader.js';
+import { loadPlanetData, loadMetadata } from './data-loader.js';
 import { renderAllCharts, ALL_CHART_IDS } from './charts.js';
 import { capitalize, fmtSci, fmtDeg } from './utils.js';
 
@@ -29,7 +29,6 @@ function renderInfoPanel() {
     addItem(`${capitalize(name)} — Eccentricity (J2000)`, fmtSci(c.eccentricityJ2000, 8), 'info-j2000');
     addItem(`${capitalize(name)} — Obliquity (mean)`, fmtDeg(c.obliquityMean, 5));
     addItem(`${capitalize(name)} — Obliquity (J2000)`, fmtDeg(c.obliquityJ2000, 5), 'info-j2000');
-    addItem(`${capitalize(name)} — Fibonacci d`, c.fibonacciD);
   }
 
   grid.innerHTML = items.join('');
@@ -239,9 +238,11 @@ document.addEventListener('DOMContentLoaded', async () => {
     await refreshCharts();
   });
 
-  // Range toggle
-  const H = 335008;
-  const BALANCED = -302355;
+  // Range toggle — windows on the fitted anchor interval, read from the
+  // exported metadata (never hard-coded model numbers; plan 06).
+  const meta = await loadMetadata();
+  const H = meta.holisticYear;
+  const BALANCED = meta.balancedYear;
   const RANGE_PRESETS = {
     full: [BALANCED, BALANCED + H],
     h3:   [2000 - H / 6,  2000 + H / 6],

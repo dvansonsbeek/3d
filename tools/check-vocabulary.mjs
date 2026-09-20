@@ -71,6 +71,10 @@ function walk(dir, pick) {
 function surfaces() {
   const files = [
     join(ROOT, 'README.md'), join(ROOT, 'CLAUDE.md'),
+    join(ROOT, 'src', 'index.html'),   // the simulator's shell: title, meta description, keywords (a public surface)
+    // the dashboard web UI (button labels, page titles, the chart inventory)
+    join(ROOT, 'dashboard', 'index.html'), join(ROOT, 'dashboard', 'earth.html'),
+    join(ROOT, 'dashboard', 'positions.html'), join(ROOT, 'dashboard', 'CHARTS.md'),
     join(ROOT, 'packages/physics/README.md'), join(ROOT, 'packages/model-values/README.md'),
     join(ROOT, 'tools/fit/README.md'),
     ...readdirSync(join(ROOT, 'docs')).filter((f) => /\.md$/.test(f)).map((f) => join(ROOT, 'docs', f)),

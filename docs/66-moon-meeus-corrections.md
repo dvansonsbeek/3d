@@ -309,8 +309,11 @@ plus the derived cos-ε torque term, is the certified eclipse chain's Sun
 in all three runtimes — zero fitted sun constants
 ([doc 103](103-135-babylonian-case-study.md)). Since the FQ-7-Sun
 one-eccentricity-law landing (below), the eclipse Sun's eccentricity is
-the J2000-anchored H/3 line alone. The lunar channel is the same H/3
-movement — one line feeds both consumers.
+the J2000-anchored H/3 line alone. The lunar chain rides the DEEP e
+channel end to end (moon/deep-ecc-channel.cjs — the model's own secular
+modes, decision (ii)); the H/3 line is its epoch-local tangent, and the
+two agree within 4.2e-5 wherever the domains overlap — a certification
+split, not a physics one.
 
 Open research item — the 1.2° azimuthal family: three independent ~1.2°
 tensions live in the node/phase sector while all magnitudes are stiff:
