@@ -1201,7 +1201,16 @@ function computeDynamicEclipticInclination(key, yearsSinceBalanced) {
 // certified exporters and every fixture run the K device byte-identical.
 // Enable via setOneSourceMovement(true) or env SG_ONE_SOURCE=1.
 // ═══════════════════════════════════════════════════════════════════════════
-let _osmRequested = process.env.SG_ONE_SOURCE === '1';
+// Plan 06 Phase 3 S3c — DEFAULT ON: the Node scene renders the one-source
+// movement whenever the series artifact is present (ONE scene in every
+// runtime, the browser's D4 default). The K device is the automatic fallback
+// when the artifact is absent; env SG_ONE_SOURCE=0 is a developer DIAGNOSTIC
+// that forces the K scene (the pre-S3c comparison), never a published
+// alternative; =1 stays accepted (explicit, and it makes an absent artifact
+// an error). Measured at the flip: eclipse audit and lunar alignment
+// identical; the tools-lib fixture moved 1e-7 in-era and up to 46 % at the
+// ±100 Myr probes — the Node deep-time scene joining the simulator's.
+let _osmRequested = process.env.SG_ONE_SOURCE !== '0';
 let _osmInstance;   // undefined = unresolved · null = series artifact absent · else {epsDeg, e}
 function setOneSourceMovement(on) {
   _osmRequested = !!on;
@@ -1211,9 +1220,10 @@ function _oneSourceM() {
   if (!_osmRequested) return null;
   if (_osmInstance === undefined) {
     _osmInstance = require('./deep-orbital-history.js').createOneSourceMovement();
-    if (!_osmInstance) throw new Error('one-source movement requested but data/nbody-secular-series.json is absent');
+    // explicit SG_ONE_SOURCE=1 (the certified regeneration mode) must not fall back silently
+    if (!_osmInstance && process.env.SG_ONE_SOURCE === '1') throw new Error('one-source movement requested but data/nbody-secular-series.json is absent');
   }
-  return _osmInstance;
+  return _osmInstance;   // null → the K device fallback (artifact absent)
 }
 // The sampling year: the browser's _yearForObliquity convention exactly —
 // SI-year mapping in deep-time mode, the linear tropical count otherwise.

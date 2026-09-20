@@ -586,10 +586,12 @@ Step 6a2 (owner, 2026-09-16): `npm run fit:6a2`
          1-year steps over full H. All 6 event types use computeSunPositionFast().
          Output columns: Type, Model Year, JD, RA, Obliquity, World Angle, Distance
          Test range: --start -25000 --end 25000
-         ONE-SOURCE MODE (Stage C-4b onward): regeneration runs under
-         `SG_ONE_SOURCE=1` — the scene's ε(t)/e(t) come from the banked
-         engine series (tools/lib/scene-graph.js setOneSourceMovement),
-         so the CSV measures the one-source movement. A plain run (option
+         ONE-SOURCE MODE (Stage C-4b onward; the Node DEFAULT since plan 06
+         Phase 3 S3c): the scene's ε(t)/e(t) come from the banked engine
+         series (tools/lib/scene-graph.js setOneSourceMovement), so the CSV
+         measures the one-source movement; `SG_ONE_SOURCE=1` stays accepted
+         as the explicit certified mode, `SG_ONE_SOURCE=0` forces the K scene
+         (a diagnostic). A plain run (option
          off) reproduces the legacy K-movement CSV and is only for
          baseline-capture comparisons. BEFORE any regeneration: back up
          the current CSV outside the repo (159 MB, gitignored — no git

@@ -277,13 +277,14 @@ const DT = require(path.join(TOOLS_LIB, 'deep-time.js'));
   // One-source movement (Stage C-4b): the standing regeneration mode. A run
   // WITHOUT it produces the legacy K-movement CSV — valid only for
   // baseline-capture comparisons, never for a shipped 6c/6d fit basis.
-  const osmOn = process.env.SG_ONE_SOURCE === '1';
-  console.error(`One-source movement: ${osmOn ? 'ON (SG_ONE_SOURCE=1)' : 'OFF'}`);
+  // Plan 06 Phase 3 S3c: the one-source movement is the Node DEFAULT; SG_ONE_SOURCE=0 forces the K scene (diagnostic)
+  const osmOn = process.env.SG_ONE_SOURCE !== '0';
+  console.error(`One-source movement: ${osmOn ? 'ON (the default; SG_ONE_SOURCE=0 forces the K scene)' : 'OFF (SG_ONE_SOURCE=0 — K-scene diagnostic)'}`);
   if (!osmOn) {
     console.error('');
     console.error('  ⚠  K-MOVEMENT CSV. Since Stage C-4b the shipped fit basis is the');
-    console.error('     one-source movement (SG_ONE_SOURCE=1). Only run without it to');
-    console.error('     capture a legacy-baseline comparison window.');
+    console.error('     one-source movement (the default since plan 06 Phase 3 S3c). Only run');
+    console.error('     with SG_ONE_SOURCE=0 to capture a legacy-baseline comparison window.');
     console.error('');
   }
   console.error(`Chaining year: ${chainYear.toFixed(9)} d`);

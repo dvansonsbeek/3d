@@ -202,12 +202,22 @@ console.log('═══ Step 9: Earth geometry validation ═══');
 
 const sg = require(path.join(TOOLS_LIB, 'scene-graph.js'));
 
-// Obliquity at J2000 (from scene-graph at June solstice 2000)
+// Obliquity at the June 2000 solstice (from the scene-graph's Sun declination).
+// Plan 06 Phase 3 S3c: the reference is the IAU 2006 mean obliquity OF DATE at
+// the solstice instant — ε₀ + ε̇·T (T in Julian centuries from J2000.0; the T²
+// term is 4e-9″ here) — NOT the J2000.0 value: the obliquity falls 0.22″ between
+// January 1 and the solstice, and the one-source scene shows exactly that. The
+// former check compared the solstice declination with the J2000.0 value; it
+// passed only because the K device had been calibrated to hit the J2000.0
+// number at the solstice instant (a 0.22″ convention, not physics). Measured
+// residual under the one-source scene: 0.012″; tolerance 0.05″.
 const solsticeJ2000JD = C.ASTRO_REFERENCE.juneSolstice2000_JD;
 const obliqScene = sg.phiToDecDeg(sg.computePlanetPosition('sun', solsticeJ2000JD).dec);
-const obliqError = Math.abs(obliqScene - C.ASTRO_REFERENCE.obliquityJ2000_deg) * 3600;
-check('Obliquity at J2000 (scene)', obliqError, 0, 0.01); // within 0.01"
-console.log(`  Obliquity at J2000: ${obliqScene.toFixed(6)}° (IAU: ${C.ASTRO_REFERENCE.obliquityJ2000_deg}°, error: ${obliqError.toFixed(4)}")`);
+const solsticeT = (solsticeJ2000JD - 2451545.0) / 36525;
+const obliqIauOfDate = C.ASTRO_REFERENCE.obliquityJ2000_deg + (C.ASTRO_REFERENCE.obliquityRate_arcsecPerCentury / 3600) * solsticeT;
+const obliqError = Math.abs(obliqScene - obliqIauOfDate) * 3600;
+check('Obliquity at the June 2000 solstice (scene vs IAU of date)', obliqError, 0, 0.05); // within 0.05"
+console.log(`  Obliquity at the June 2000 solstice: scene ${obliqScene.toFixed(6)}° vs IAU 2006 of date ${obliqIauOfDate.toFixed(6)}° (J2000.0 ${C.ASTRO_REFERENCE.obliquityJ2000_deg}°; error: ${obliqError.toFixed(4)}")`);
 
 // Obliquity rate (scene-graph: solstice 2000 vs 2000 + tropicalCentury)
 const obliq2100 = sg.phiToDecDeg(sg.computePlanetPosition('sun', solsticeJ2000JD + C.tropicalCenturyDays).dec);

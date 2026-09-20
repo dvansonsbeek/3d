@@ -2,7 +2,8 @@
   "_description": "Stored baseline values for regression checking. Updated by verify-pipeline.js --write.",
   "_updated": "2026-09-06",
   "earth": {
-    "obliquityJ2000_error_arcsec": 0,
+    "_obliquityJ2000Note": "plan 06 Phase 3 S3c: the scene is the one-source movement; the metric is the June-2000-solstice declination vs the IAU 2006 mean obliquity OF DATE at that instant (the former 0 was the K device's calibration to the J2000.0 value at the solstice, a 0.22 arcsec convention). Measured residual 0.0131 arcsec.",
+    "obliquityJ2000_error_arcsec": 0.0131,
     "obliquityRate_error_arcsec": 0.0005,
     "perihelionLonJ2000_error_deg": 0.0002,
     "erdJ2000_degPerYr": 0.000002,
