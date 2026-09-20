@@ -25571,109 +25571,13 @@ function setupGUI() {
   astroFolder.element.dataset.category = 'calculated';
   addFolderTooltip(astroFolder, 'Analytical predictions from the ESSRT model.');
 
-  // ── Phase 9.11: Balanced-Year Julian Dates (top of Predictions for Earth) ──
-  const balancedJdFolder = astroFolder.addFolder({ title: 'Balanced Year Julian Dates', expanded: false });
-  addFolderTooltip(balancedJdFolder,
-    'Past and next balanced-state events of the frozen clock’s unit interval and ' +
-    'of its eight-unit interval (the device behind the retired System-Reset claim, kept as a diagnostic). Periods and JDs ' +
-    'evolve correctly under deep-time scrubbing. Copy/paste a JD into the ' +
-    'Julian Day input above (or use the navigation buttons) to jump to that ' +
-    'event and visually confirm the configuration.');
-
-  // Phase 9.11: format helper that shows "—" for NaN values (out-of-range)
-  const fmtJdOrDash = v => Number.isFinite(v) ? v.toFixed(0) : '—';
-  const fmtYrOrDash = v => Number.isFinite(v) ? v.toFixed(2) : '—';
-
-  addTooltip(balancedJdFolder.addBinding(predictions, 'balancedPeriod_H_years', {
-    label: 'H period (yr)', readonly: true, format: fmtYrOrDash
-  }), 'True-calendar-year span between THIS pair of consecutive Earth-balanced events, ' +
-     'computed as the integral ∫_{lastH}^{nextH} 1/H(t) dt = 1 cycle — i.e. the harmonic ' +
-     'mean of H(t) over the bracket interval. NOT the instantaneous H_J2000 = 335,317. ' +
-     'In deep past where H(t) was smaller (LOD shorter, Moon closer), the displayed period ' +
-     'is < 335,317. As you scrub deep-time, the value evolves toward the live H at that epoch. ' +
-     'Note: this is decoupled from the JD-interval of the displayed Last/Next H JDs ' +
-     '(which use the calibrated cycle math so the scene lands exactly on e_min). For the ' +
-     'instantaneous H at the current epoch, see `holisticyearLength`.');
-
-  addTooltip(balancedJdFolder.addBinding(predictions, 'lastBalancedJD_H', {
-    label: 'Last H JD', readonly: true, format: fmtJdOrDash
-  }), 'Julian Date of the most recent Earth-balanced event. Copy and paste into Julian Day input to navigate. Shows "—" if outside the deep-time table range (±500 Myr).');
-
-  const bHnext = addTooltip(balancedJdFolder.addBinding(predictions, 'nextBalancedJD_H', {
-    label: 'Next H JD', readonly: true, format: fmtJdOrDash
-  }), 'Julian Date of the next upcoming Earth-balanced event. Copy and paste into Julian Day input to navigate. Shows "—" if outside the deep-time table range.');
-
-  // Phase 9.11: Navigate scene to a balanced-event JD. Replicates the JD-change
-  // handler body (line ~30450) because programmatic `o.julianDay = X` does not
-  // fire the .on('change') event in this Tweakpane version.
-  function navigateToBalancedJD(targetJD) {
-    if (!Number.isFinite(targetJD)) return;
-    if (_rootUpdating || o._renderLoopRefreshing) return;
-    _rootUpdating = true;
-    try {
-      const newJD = Number(targetJD);
-      const converted = dayToDate(newJD);
-      o.Date = converted.date;
-      o.Time = converted.time;
-      // R4: integrated pos↔JD map, not the linear rectangle (see jdCtrl).
-      o.pos = posFromJD(newJD);
-      o.Day = posToDays(o.pos);
-      o.julianDay = newJD;
-      const p = dayToDateNew(newJD, 'julianday', 'perihelion-calendar');
-      o.perihelionDate = `${p.date}`;
-      positionChanged = true;
-      jdCtrl.refresh();
-      dateCtrl.refresh();
-      timeCtrl.refresh();
-      periCtrl.refresh();
-    } finally {
-      _rootUpdating = false;
-    }
-  }
-
-  // Phase 9.12.2: defer navigation by one event-loop tick. If the user has the
-  // JD input focused (typing) and clicks a button, the input's blur+change handler
-  // runs synchronously during the click and sets `_rootUpdating = true` mid-event.
-  // Deferring via setTimeout(0) lets that handler complete (and reset
-  // _rootUpdating to false) before the navigation runs — preventing the stall.
-  //
-  // Phase 9.12.10: render H/8H navigation buttons side-by-side via raw DOM
-  // <button> in a flex toolbar (same pattern as the playback Back/Fwd/Reset/Now
-  // buttons at line ~30601). Tweakpane v4.0.5 doesn't include the `buttongrid`
-  // blade, so we use the existing .tp-nav-toolbar / .tp-nav-btn CSS classes.
-  //
-  // Positioning: appendChild() to `.tp-fldv_c` empirically clusters both rows
-  // at the bottom (Tweakpane's rack appears to keep bindings grouped). To pin
-  // each row immediately after a specific binding, use Element.after() on the
-  // binding's blade element — this places the row as the next sibling in the
-  // exact DOM parent that holds the bindings, regardless of internal wrapping.
-  const _dt_makeBalancedJdButtonRow = (afterEl, pairs) => {
-    if (!afterEl) return;
-    const row = document.createElement('div');
-    row.className = 'tp-nav-toolbar';
-    pairs.forEach(({ label, tip, getTarget }) => {
-      const btn = document.createElement('button');
-      btn.className = 'tp-nav-btn';
-      btn.innerHTML = `<span class="tp-nav-label" style="font-size:11px;">${label}</span>`;
-      btn.title = tip;
-      btn.setAttribute('aria-label', tip);
-      btn.addEventListener('click', () => setTimeout(() => navigateToBalancedJD(getTarget()), 0));
-      row.appendChild(btn);
-    });
-    afterEl.after(row);
-  };
-
-  // Plan 06 Phase 4d (owner, 2026-09-20): the eight-interval ("8H") balanced-
-  // event rows, jump buttons and the "Verify 8H Configuration" test are
-  // REMOVED — they implemented the retired Config-#7 / System-Reset claim
-  // (docs/retired-record.md, doc 109). The state fields (predictions.*_8H)
-  // stay computed for the balanced-year navigation diagnostic only.
-
-  // Insert button rows in the final DOM positions (after all bindings exist).
-  _dt_makeBalancedJdButtonRow(bHnext.element, [
-    { label: '← Jump to Last H JD',  tip: 'Jump the scene to the Last H balanced event (Earth-balanced).',  getTarget: () => o.lastBalancedJD_H },
-    { label: 'Jump to Next H JD →',  tip: 'Jump the scene to the Next H balanced event (Earth-balanced).',  getTarget: () => o.nextBalancedJD_H },
-  ]);
+  // Plan 06 Phase 4d (owner, 2026-09-20): the "Balanced Year Julian Dates"
+  // folder (the frozen clock's unit- and eight-unit-interval balanced events,
+  // their periods and jump buttons) is REMOVED from Predictions for Earth — it
+  // showed the device's phase counter as if it were a prediction, and the
+  // eight-unit rows implemented the retired Config-#7 / System-Reset claim
+  // (docs/retired-record.md, doc 109). The state fields (predictions.*_H,
+  // *_8H) stay computed for the balanced-year navigation diagnostics.
 
   const daysFolder = astroFolder.addFolder({ title: 'Day Lengths' });
   const fmt6 = v => v.toFixed(6);
@@ -26400,7 +26304,7 @@ function setupGUI() {
   addTestButton('Diagnose Balanced-Year State', runBalancedYearStateDiagnostic,
     'Diagnose the current scene state vs balanced-year math: integer-cycle distance, ' +
     'cyclesBetweenYears with correction, drift(BALANCED), formula vs scene eccentricity, ' +
-    'and obliquity. Run AT a balanced JD (after clicking Last/Next H) to see whether ' +
+    'and obliquity. Run AT a balanced JD (enter the JD in the Julian Day input) to see whether ' +
     'the navigation landed correctly and whether formula/scene values match expectation.');
   // ────────────────────────────────────────────────────────────────────────
   // NASA Five Millennium Catalog cross-check. For canonical solar eclipses
