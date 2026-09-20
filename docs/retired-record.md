@@ -18,10 +18,11 @@ The through-line: the codebase was originally built around the
 Fibonacci-law balance constructions, and lattice-divisor period claims
 for the planets. The model has since moved to its **own N-body
 dynamics** for everything planetary (the engine-D element chains, the
-banked secular series, the one-source Earth movement), with the
-H-lattice retained where it is measured to hold: **H(t) as the clock**
-— Earth's rotation, tides, ΔT, the deep-time scaling laws, and the
-kinematic identities. The re-evaluation records are doc 108 (the
+banked secular series, the one-source Earth movement), and Earth's spin
+and time on **one clock — the mean lunisolar precession period** (the
+composed torque rate on the tidal chain: Earth's rotation, tides, ΔT, the
+deep-time scaling laws), with the fitted anchor and its divisors kept as
+the frozen devices' named conventions. The re-evaluation records are doc 108 (the
 derived Earth-orbit vector), doc 109 (the model's own N-body vs the
 lattice), and doc 10 (the six relations with per-relation statuses).
 
@@ -109,11 +110,27 @@ convention of those coefficients, not a claim about the sky.
 exploration (superseded by the one H/3 law and doc 108) and the
 first-pass paleo-ECS decomposition (superseded by docs 92 and 95).
 
+**The integer-label framing of the climate lines and the ΔT stack**
+(plan 06 T1/T5, 2026-09): the claim that the climate formula's orbital
+lines and the ΔT stack's cycles are integer divisors of an "8H" base
+(the "8H/n lattice", "Solar System Resonance Cycle"). T1 fitted the
+33-integer comb and the engine's own Berger/Laskar-style beat lines
+(|g_i − g_j|, p + s_i, p + g_i) on the same data, regimes, solver and
+line count: the physical set matches or beats the comb in every LR04
+regime up to ~25 lines and beats a same-size random null, while the
+comb's short-window edge was carried entirely by its 16 lines with no
+Earth-forcing counterpart. T5 found the ΔT stack's lattice labels carry
+zero information (chance level; the ~1.5-kyr oscillation is real, its
+period from the record). The shipped climate formula's L1 is the physical
+line set (`data/l1-physical-lines.json`, one home; doc 92 §2); the ΔT
+stack keeps its four periods with the divisors as identifiers. Docs 91,
+93, 94, 98 stand as the comb-era record with status banners.
+
 ## What this does NOT retire
 
-H(t) as the clock — the recession history, the LOD/tide/ΔT stack, the
-deep-time scaling of precession and the falsification legs (docs 99,
-102–106); the certified era devices (doc 14's cardinal points, doc 11's
+The lunisolar precession clock — the recession history, the LOD/tide/ΔT
+stack, the deep-time scaling of precession and the falsification legs
+(docs 99, 102–106); the certified era devices (doc 14's cardinal points, doc 11's
 frozen year-length laws); the one-source movement and its verification
 (docs 40, 57, 108, 109); the climate programme (docs 90–96, 98); the
 Moon (doc 66), the legacy-device calibration record (doc 68) and the

@@ -7,9 +7,9 @@ status: current
 
 # Climate Formula — Architecture, Variance Decomposition & Implementation
 
-> **TL;DR.** The canonical 8H climate formula is **33 integer divisors of 8H = <!--v:eightH-->2,682,536<!--/v--> yr (at J2000)** (L1 lattice: 25 framework integers from Berger 1978 + Laskar 2004 eigenmode beats + the model's direct planet cycles, plus 6 precession-band sidebands surfaced by doc 91 §12.12 Test L, plus n=141 Berger-quintet completion) **+ a 3-line 405-kyr carbon thermostat family** (L2) **+ up to 6 Heaviside step terms** (L3), fitted per regime with sequential ridge regression. Per-regime fits reach **R² = <!--v:canonR2PostMpt-->0.7788<!--/v--> post-MPT**, **R² = <!--v:canonR2Epica-->0.7301<!--/v--> EPICA CO₂**, **R² = 0.7626 CenCO2PIP 0–66 Ma**; the full-LR04 fit is **R² = <!--v:canonR2Full-->0.2003<!--/v-->** (L1+L2+L3). This doc decomposes the residual into a layered taxonomy — **(L1) orbital lattice**, **(L2) climate-system internal periodic** (canonical: 405-kyr silicate-weathering thermostat + its 202 / 135 kyr harmonics; investigated but not deployed: 13H Boulila libration, 9-Myr long-period carbon resonance), **(L3) boundary-condition shifts** (MPT regime change, iNHG, Cenozoic secular trend, tectonic gateways), **(L4) chronology**, **(L5) stochastic residual** — and reports measured ΔR² for each addition.
+> **TL;DR.** The canonical climate formula's orbital layer (L1) is **the engine's own physical line set** — 25 Berger/Laskar-style beats of Earth's secular modes (|g_i − g_j| eccentricity, p + s_i obliquity, p + g_i climatic precession, at relative mode amplitude ≥ 0.1) **plus the 405.6-kyr g₂ − g₅ fundamental and its 2nd/3rd harmonics** (the former L2 carbon-thermostat family, folded in) — read from `data/l1-physical-lines.json`, one home (plan 06 T1; §2's generated table), **+ up to 6 Heaviside step terms** (L3), fitted per regime with sequential ridge regression. The **33-integer comb (periods as integer fractions of an eight-unit base) that §§1–8 analyse is the variance-decomposition RECORD** that led there; the pre-registered test T1 measured the comb against the physical lines and retired the labels ([retired record](retired-record.md)). Per-regime fits reach **R² = <!--v:canonR2PostMpt-->0.7788<!--/v--> post-MPT**, **R² = <!--v:canonR2Epica-->0.7301<!--/v--> EPICA CO₂**, **R² = 0.7626 CenCO2PIP 0–66 Ma**; the full-LR04 fit is **R² = <!--v:canonR2Full-->0.2003<!--/v-->** (L1+L2+L3). This doc decomposes the residual into a layered taxonomy — **(L1) orbital lattice**, **(L2) climate-system internal periodic** (canonical: 405-kyr silicate-weathering thermostat + its 202 / 135 kyr harmonics; investigated but not deployed: 13H Boulila libration, 9-Myr long-period carbon resonance), **(L3) boundary-condition shifts** (MPT regime change, iNHG, Cenozoic secular trend, tectonic gateways), **(L4) chronology**, **(L5) stochastic residual** — and reports measured ΔR² for each addition.
 
-> **Scope note (ESSRT).** The L1 lattice integer-divisor structure (33 integers, n = 9, 12, ..., 185) and the layered taxonomy (L1 orbital lattice / L2 carbon / L3 boundary shifts) are scale-invariant — they hold at any epoch. The literal year counts (8H = <!--v:eightH-->2,682,536<!--/v--> yr; the per-line periods 8H/n in the L1 catalogues at §2.3; 13H = <!--v:thirteenH-->4,359,121<!--/v--> yr; the 405-kyr / 202-kyr / 135-kyr L2 lines) are J2000-evaluated. Under [ESSRT](99-expanding-solar-system-resonance-theory.md), H(t) evolves at deep time via Drivers 1 (LOD growth) and 2 (Kepler) — sub-percent over the LR04 5.3-Myr window covered by the post-MPT / iNHG-MPT / pre-iNHG ridge fits, modest over the 67-Myr CENOGRID window, and starting to matter for the 13H ≈ 4.36 Myr Boulila comparison. See doc 99 for the per-driver Δ-H formulas.
+> **Scope note (ESSRT).** The L1 lines are the engine's own secular beats, and the layered taxonomy (L1 orbital lines / L2 carbon / L3 boundary shifts) holds at any epoch. The eccentricity lines |g_i − g_j| are fixed at every epoch (planetary g-modes, ∝ 1/μ under the solar-mass history only); the obliquity and climatic-precession lines p + s_i and p + g_i ride the composed precession rate ψ̇(t) at deep time — sub-percent over the LR04 5.3-Myr window covered by the post-MPT / iNHG-MPT / pre-iNHG ridge fits, modest over the 67-Myr CENOGRID window ([doc 99](99-expanding-solar-system-resonance-theory.md)'s generated tables give the lines at each age). The comb-era literal counts quoted in §§1–8 (8H = <!--v:eightH-->2,682,536<!--/v--> yr; 13H = <!--v:thirteenH-->4,359,121<!--/v--> yr) are the record's own numbers.
 >
 > **Canonical formula measurements** (`scripts/milankovitch_climate_formula.py`, 33-integer L1 + 3-line L2 + 6-step L3, sequential ridge λ=1):
 > - **LR04 regime split is the biggest single jump**: pre-iNHG (2.7–5.32 Ma) R² = **<!--v:canonR2PreInhg-->0.3736<!--/v-->**, iNHG-MPT (1.0–2.7 Ma) R² = **<!--v:canonR2InhgMpt-->0.5911<!--/v-->**, post-MPT (0–1.0 Ma) R² = **<!--v:canonR2PostMpt-->0.7788<!--/v-->** — the 8H lattice explains ~87% of post-MPT LR04 variance once the MPT regime change is removed.
@@ -92,9 +92,48 @@ Decomposition strategy: add components in this order — L1 (lattice fit) → L2
 
 ---
 
-## 2. Layer 1 — Orbital Lattice (Current State)
+## 2. Layer 1 — the orbital lines
 
-### 2.1 Sub-dominant precession sidebands (Tier A1)
+**Current state (plan 06 T1).** The shipped L1 is the engine's own physical line set, written here from the one home so this document cannot describe a different formula than the one that ships:
+
+<!-- generated:doc92-l1-physical-lines -->
+| # | Family | Line | Period (kyr) | rel. amplitude | Note |
+|---:|:---|:---|---:|---:|:---|
+| 1 | climatic precession | p+g2 | 19.00 | 0.672 | rides the composed precession rate ψ̇(t) at deep time (doc 99) |
+| 2 | climatic precession | p+g3 | 19.16 | 0.461 | rides the composed precession rate ψ̇(t) at deep time (doc 99) |
+| 3 | climatic precession | p+g1 | 22.45 | 0.862 | rides the composed precession rate ψ̇(t) at deep time (doc 99) |
+| 4 | climatic precession | p+g4 | 23.19 | 0.199 | rides the composed precession rate ψ̇(t) at deep time (doc 99) |
+| 5 | climatic precession | p+g0 | 23.76 | 1.000 | rides the composed precession rate ψ̇(t) at deep time (doc 99) |
+| 6 | obliquity | p+s12 | 27.40 | 0.104 | rides the composed precession rate ψ̇(t) at deep time (doc 99) |
+| 7 | obliquity | p+s1 | 28.99 | 0.542 | rides the composed precession rate ψ̇(t) at deep time (doc 99) |
+| 8 | obliquity | p+s14 | 29.16 | 0.142 | rides the composed precession rate ψ̇(t) at deep time (doc 99) |
+| 9 | obliquity | p+s9 | 29.77 | 0.101 | rides the composed precession rate ψ̇(t) at deep time (doc 99) |
+| 10 | obliquity | p+s3 | 29.97 | 0.479 | rides the composed precession rate ψ̇(t) at deep time (doc 99) |
+| 11 | obliquity | p+s2 | 39.84 | 0.485 | rides the composed precession rate ψ̇(t) at deep time (doc 99) |
+| 12 | obliquity | p+s4 | 40.52 | 0.324 | rides the composed precession rate ψ̇(t) at deep time (doc 99) |
+| 13 | obliquity | p+s0 | 41.22 | 1.000 | rides the composed precession rate ψ̇(t) at deep time (doc 99) |
+| 14 | obliquity | p+s7 | 41.96 | 0.179 | rides the composed precession rate ψ̇(t) at deep time (doc 99) |
+| 15 | obliquity | p+s10 | 54.13 | 0.161 | rides the composed precession rate ψ̇(t) at deep time (doc 99) |
+| 16 | eccentricity | g0−g2 | 94.88 | 0.779 | planetary g-beat — does not scale with Earth's spin |
+| 17 | eccentricity | g0−g6 | 96.85 | 0.110 | planetary g-beat — does not scale with Earth's spin |
+| 18 | eccentricity | g0−g3 | 98.84 | 0.535 | planetary g-beat — does not scale with Earth's spin |
+| 19 | eccentricity | g0−g5 | 101.01 | 0.155 | planetary g-beat — does not scale with Earth's spin |
+| 20 | eccentricity | g0−g7 | 103.12 | 0.105 | planetary g-beat — does not scale with Earth's spin |
+| 21 | eccentricity | g2−g4 | 105.14 | 0.155 | planetary g-beat — does not scale with Earth's spin |
+| 22 | eccentricity | g3−g4 | 110.03 | 0.106 | planetary g-beat — does not scale with Earth's spin |
+| 23 | eccentricity | g1−g2 | 123.85 | 0.672 | planetary g-beat — does not scale with Earth's spin |
+| 24 | eccentricity | g1−g3 | 130.69 | 0.461 | planetary g-beat — does not scale with Earth's spin |
+| 25 | eccentricity | g1−g5 | 134.50 | 0.133 | planetary g-beat — does not scale with Earth's spin |
+| 26 | eccentricity fundamental | g₂−g₅ | 405.63 | — | the engine’s 20-Myr mean beat; the long-eccentricity metronome |
+| 27 | climate-internal harmonic | (g₂−g₅)/2 | 202.81 | — | carbon-thermostat 2nd harmonic (doc 92 §3), not orbital forcing |
+| 28 | climate-internal harmonic | (g₂−g₅)/3 | 135.21 | — | carbon-thermostat 3rd harmonic (doc 92 §3), not orbital forcing |
+
+25 orbital lines (5 climatic precession, 10 obliquity, 10 eccentricity) at relative mode amplitude ≥ 0.1 within the family, inside 14–300 kyr, lines closer than 0.5 % merged; plus the 3-line 405-kyr family. Built on the engine's own spectrum (`data/t1-engine-frequencies.json`: Earth's z and ζ secular modes from the 20-Myr deep mode table; p = 50.2883 ″/yr the of-date precession rate at J2000). The shipped coefficient file (`public/input/climate-formula-coefficients.json`) carries exactly these 28 periods in every regime — asserted by this renderer. No integer base, no lattice label.
+<!-- /generated:doc92-l1-physical-lines -->
+
+The pre-registered test T1 (`scripts/t1_beat_model_vs_comb.py`, `data/t1-beat-model-vs-comb.json`) fitted this beat model and the 33-integer comb below on the same data, preprocessing, regimes, solver and line count: the physical set matches or beats the comb in every LR04 regime up to ~25 lines and beats a same-size random null, and the comb's short-window edge was carried entirely by its 16 lines without an Earth-forcing counterpart. The labels were retired on that measurement; the per-regime R² of the shipped formula (§9) is the honest price of the split. **§§2.1–2.3 below are the comb-era record.**
+
+### 2.1 Sub-dominant precession sidebands (Tier A1) — comb-era record
 
 [Doc 91 §12.12 (Test L — all-integer MTM scan)](91-milankovitch-evidence.md#1212-test-l--all-integer-mtm-f-test-scan--positive) identified 6 non-formula integers with MTM significance (passing F-test above the noise floor but not included in the 25-active set):
 
@@ -117,7 +156,7 @@ Five of six sit in the precession band [17–28 kyr], consistent with sub-domina
 
 `milankovitch_8h_all_integer_mtm.py` already scanned all 200 integer divisors of 8H. The full-200 joint fit hits R² = 0.443 — but with high collinearity (many integers within 1 Rayleigh element of each other → spurious gains). The gap from the canonical 33-integer fit (R² ≈ 0.25) to the full-200 fit (0.443) is dominated by collinear redundancy, not real new orbital signal. Honest Layer-1 ceiling on full LR04 stays close to **R² ≈ 0.24–0.26** with the canonical 33-integer set.
 
-### 2.3 The 33 lattice integers — per-line identities
+### 2.3 The 33 lattice integers of the retired comb — per-line identities (record)
 
 Reference table of all 33 L1 lattice members in ascending n order with their periods and physical interpretation. Notation: `g_i` = planet *i*'s apsidal-precession rate, `s_i` = planet *i*'s nodal-precession rate (Laskar 2004 secular eigenfrequencies); `k` = Earth's general precession in longitude (~50.4″/yr). "Direct" = planet's own axial / obliquity / apsidal / eccentricity period; "Eigenmode beat" = difference between two planets' secular rates; "Climatic precession" = `k + g_i` (Earth axial precession × planet *i*'s apsidal motion).
 
@@ -846,13 +885,13 @@ into a canonical, deployable formula at
 
 ### Inclusion / exclusion summary
 
-The canonical formula is **33 + 3 + 6 = 42 structural components**. The variance-budget research investigated more — some were absorbed into L1 by collinearity, some failed cross-window stability, some were captured implicitly via existing components, some failed promotion criteria. The full inventory:
+The canonical formula is **28 physical lines + up to 6 step terms** (in the comb era: 33 + 3 + 6 = 42 structural components; the table below is that era's inclusion record). The variance-budget research investigated more — some were absorbed into L1 by collinearity, some failed cross-window stability, some were captured implicitly via existing components, some failed promotion criteria. The full inventory:
 
-**Deployed in canonical formula (41 components):**
+**Deployed in canonical formula (comb-era record — the shipped L1 is now the 28 physical lines of §2):**
 
 | Layer | Count | What | Investigation trail |
 |---|---:|---|---|
-| **L1** lattice | 33 integers | 25 canonical (Berger 1978 eigenmode beats + the model's direct planet cycles) + 6 precession-band sidebands (96, 107, 110, 134, 152, 185) + 1 Berger-quintet completion (141) + 1 regime-admitted Earth H/3 eccentricity line (24, doc 94 §10) | Doc 91 §12.12 Test L MTM enrichment; doc 92 §2.1 Tier A1 sideband ΔR²; doc 92 §2.3 (n=141 closure) |
+| **L1** lattice (comb era) | 33 integers | 25 canonical (Berger 1978 eigenmode beats + the model's direct planet cycles) + 6 precession-band sidebands (96, 107, 110, 134, 152, 185) + 1 Berger-quintet completion (141) + 1 regime-admitted Earth H/3 eccentricity line (24, doc 94 §10) | Doc 91 §12.12 Test L MTM enrichment; doc 92 §2.1 Tier A1 sideband ΔR²; doc 92 §2.3 (n=141 closure) |
 | **L2** thermostat | 3 lines | 405-kyr fundamental + 202-kyr 2nd harmonic + 135-kyr 3rd harmonic | Doc 91 §13 405-kyr investigation; doc 92 §3.1 Tier A2; doc 92 §3.4 Tier B1 nonlinear-silicate-weathering |
 | **L3** steps | 6 Heaviside | PETM (56 Ma), EOT (34 Ma), Mi-1 (23 Ma), MMCT (14 Ma), iNHG (2.7 Ma), MPT (1 Ma) | Doc 92 §4.1 Tier A5 regime split; doc 92 §8.3 B5 step components; doc 92 §11.3 CenCO2PIP cross-validation |
 
@@ -883,13 +922,13 @@ The formula decomposes into three layers with explicit physical meaning:
 
 ```
 C(t) = c₀
-     + Σ_n [a_n cos(2π·n·t/8H) + b_n sin(2π·n·t/8H)]      ← L1: 32 lattice integers (orbital forcing)
-     + Σ_p [α_p cos(2π·t/p)   + β_p sin(2π·t/p)]          ← L2: 3 thermostat lines (carbon cycle)
+     + Σ_i [a_i cos(2π·t/P_i) + b_i sin(2π·t/P_i)]        ← L1: the physical orbital lines, periods P_i in kyr (orbital forcing)
+     + Σ_p [α_p cos(2π·t/p)   + β_p sin(2π·t/p)]          ← L2: the 405-kyr thermostat family (carbon cycle; folded into the line list)
      + Σ_i γ_i · H(t − t_i)                                ← L3: step components (boundary conditions)
 ```
 
 Where:
-- **L1 integers** (33 of 200 possible 8H/N divisors) = the canonical 25 (Berger eigenmode beats + Mars/Jupiter direct planet cycles) plus 6 MTM-significant precession-band sidebands (96, 107, 110, 134, 152, 185) from Round 1 A1 plus 1 Berger-quintet-completion sideband (141 = k+g₃ Earth at ~19 kyr; subthreshold in LR04 at amp/median 2.03×, 3σ in Cheng monsoon at 3.60×; closes the Wigley 1976 combination tone `1/95 ≈ 1/141 − 1/113`)
+- **L1 lines** = the engine's own beats (§2, generated table from `data/l1-physical-lines.json`): 25 orbital lines + the 405-kyr family. The comb-era description that stood here — 33 of 200 possible divisors: the canonical 25 (Berger eigenmode beats + Mars/Jupiter direct planet cycles) plus 6 MTM-significant precession-band sidebands (96, 107, 110, 134, 152, 185) from Round 1 A1 plus 1 Berger-quintet-completion sideband (141 = k+g₃ Earth at ~19 kyr; subthreshold in LR04 at amp/median 2.03×, 3σ in Cheng monsoon at 3.60×; closes the Wigley 1976 combination tone `1/95 ≈ 1/141 − 1/113`)
 - **L2 periods** (3 lines, the silicate-weathering thermostat family) = 405-kyr fundamental + 202.25-kyr 2nd harmonic + 134.83-kyr 3rd harmonic — confirmed carbon-amplified across LR04, CENOGRID, and EPICA
 - **L3 transitions** (up to 6, applied only when inside the fit window) = PETM (56 Ma), EOT (34 Ma), Mi-1 (23 Ma), MMCT (14 Ma), iNHG (2.7 Ma), MPT (1 Ma)
 

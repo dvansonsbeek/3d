@@ -9,17 +9,21 @@ status: current
 
 > **The capstone synthesis.** Climate is forced by **gravitational coupling among
 > solar-system bodies**. Solar insolation is one channel through which that
-> coupling reaches Earth — but the *rhythm itself*, captured by the 8H lattice,
-> is the more complete description.
+> coupling reaches Earth — but the *rhythm itself*, captured by the engine's
+> own secular beat lines, is the more complete description.
 >
 > This document synthesizes the empirical case made in docs 90–94.
-> The 8H integer-divisor lattice (L1) explains **R² = 0.87** of post-MPT LR04
-> ice-volume variance; the classical Berger 1978 insolation parameterization
-> alone explains only **R² = 0.05** of the same record (17× less). When L1 is
-> already in the model, adding *any* insolation parameterization — including
-> Laskar 2010's wide-range eccentricity — yields **ΔR² ≈ 0**. The two are not
-> independent forcings; they are different projections of the same physics, and
-> the lattice is strictly more expressive.
+> The orbital line set (L1) explained **R² = 0.87** of post-MPT LR04
+> ice-volume variance in the comb-era measurement (docs 91/92; the shipped
+> physical-line formula reads **R² = <!--v:canonR2PostMpt-->0.7788<!--/v-->**
+> post-MPT with ridge, sequential fitting — plan 06 T1, the honest price of
+> the split); the classical Berger 1978 insolation parameterization alone
+> explains only **R² = 0.05** of the same record. When L1 is already in the
+> model, adding *any* insolation parameterization — including Laskar 2010's
+> wide-range eccentricity — yields **ΔR² ≈ 0**. The two are not independent
+> forcings; they are different projections of the same physics, and the line
+> set is strictly more expressive. (The comb-era label "8H lattice" used
+> below is the record's vocabulary; the shipped lines carry no integer label.)
 
 **Status:** synthesis of the doc 90–94 cluster.
 No new measurements in this document — all R² values are computed in the cited scripts and reproduced from `data/milankovitch-climate-formula.json`, `data/insolation-extension-results.json`, and `data/insolation-laskar-check-results.json`.
@@ -42,9 +46,9 @@ Climate is driven by **changes in solar insolation** received at high northern l
 
 These three are themselves derived from the gravitational coupling among the planets — Laskar 2004 publishes them as sums of fundamental-frequency beats `g_j ± g_k`, `k ± s_j`, etc. But in the classical paradigm, the *climate-relevant* quantity is the insolation those orbital elements produce.
 
-### 1.2 The 8H-lattice paradigm (this framework)
+### 1.2 The beat-line paradigm (this framework)
 
-Climate is driven by the **gravitational rhythm of the entire solar system**, parameterized as integer divisors of the 8H = <!--v:eightH-->2,682,536<!--/v-->-yr (at J2000) Solar System Resonance Cycle. Each integer corresponds to a specific planet–planet beat or a direct planet-cycle harmonic. The full L1 set is 33 integers (see [doc 93](93-l1-attribution-reference.md) for per-integer attribution).
+Climate is driven by the **gravitational rhythm of the entire solar system**, parameterized as the engine's own secular beat lines — |g_i − g_j|, p + s_i, p + g_i — the physical L1 set of [doc 92 §2](92-climate-formula.md) (the comb era parameterized them as integer divisors of an 8H = <!--v:eightH-->2,682,536<!--/v-->-yr base; retired by T1). Each integer corresponds to a specific planet–planet beat or a direct planet-cycle harmonic. The full L1 set is 33 integers (see [doc 93](93-l1-attribution-reference.md) for per-integer attribution).
 
 The two paradigms are **not contradictory** — they describe the same gravitational physics. They differ in:
 

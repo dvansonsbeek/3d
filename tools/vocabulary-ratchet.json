@@ -2,12 +2,7 @@
   "_comment": "Retired-vocabulary RATCHET (plan 06 D3). Counts may only go DOWN. Regenerate: node tools/check-vocabulary.mjs --write",
   "files": {
     "README.md": {
-      "Earth Fundamental Cycle": 8,
-      "Solar System Resonance Cycle": 2,
-      "8H as a cycle name": 12,
-      "H-lattice": 1,
-      "Fibonacci": 10,
-      "engine K/D as a public name": 2
+      "Fibonacci": 3
     },
     "CLAUDE.md": {
       "H-lattice": 1,
@@ -17,31 +12,23 @@
       "Fibonacci": 2
     },
     "tools/fit/README.md": {
-      "Solar System Resonance Cycle": 1,
-      "8H as a cycle name": 18,
-      "H-lattice": 11,
-      "Fibonacci": 8,
-      "engine K/D as a public name": 1
+      "8H as a cycle name": 2,
+      "Fibonacci": 5
     },
     "docs/00-readme.md": {
-      "Earth Fundamental Cycle": 4,
-      "Solar System Resonance Cycle": 1,
-      "8H as a cycle name": 7,
-      "Fibonacci": 9
+      "8H as a cycle name": 1,
+      "Fibonacci": 6
     },
     "docs/01-introduction.md": {
-      "Earth Fundamental Cycle": 6,
-      "8H as a cycle name": 1,
-      "Fibonacci": 3
+      "Fibonacci": 1
     },
     "docs/02-user-guide.md": {
       "Earth Fundamental Cycle": 1
     },
     "docs/03-glossary.md": {
-      "Earth Fundamental Cycle": 2,
-      "Solar System Resonance Cycle": 2,
-      "8H as a cycle name": 5,
-      "Fibonacci": 1
+      "Earth Fundamental Cycle": 1,
+      "Solar System Resonance Cycle": 1,
+      "8H as a cycle name": 1
     },
     "docs/04-dynamic-elements-overview.md": {
       "engine K/D as a public name": 1
@@ -56,7 +43,7 @@
       "8H as a cycle name": 14
     },
     "docs/105-dt-stack-flag-audit.md": {
-      "8H as a cycle name": 8
+      "8H as a cycle name": 4
     },
     "docs/106-deep-time-validation-dossier.md": {
       "8H as a cycle name": 3,
@@ -79,12 +66,7 @@
       "Fibonacci": 11
     },
     "docs/20-constants-reference.md": {
-      "Earth Fundamental Cycle": 5,
-      "Solar System Resonance Cycle": 2,
-      "8H as a cycle name": 17,
-      "H-lattice": 1,
-      "Fibonacci": 8,
-      "engine K/D as a public name": 4
+      "Fibonacci": 6
     },
     "docs/21-orbital-formulas-reference.md": {
       "Earth Fundamental Cycle": 8,
@@ -148,10 +130,7 @@
       "Fibonacci": 16
     },
     "docs/90-milankovitch-language.md": {
-      "Earth Fundamental Cycle": 2,
-      "Solar System Resonance Cycle": 1,
-      "8H as a cycle name": 16,
-      "Fibonacci": 19
+      "Fibonacci": 2
     },
     "docs/91-milankovitch-evidence.md": {
       "Earth Fundamental Cycle": 2,
@@ -160,7 +139,7 @@
       "Fibonacci": 13
     },
     "docs/92-climate-formula.md": {
-      "8H as a cycle name": 105,
+      "8H as a cycle name": 101,
       "Fibonacci": 2
     },
     "docs/93-l1-attribution-reference.md": {
@@ -170,8 +149,8 @@
       "8H as a cycle name": 22
     },
     "docs/95-climate-summary.md": {
-      "Solar System Resonance Cycle": 2,
-      "8H as a cycle name": 17,
+      "Solar System Resonance Cycle": 1,
+      "8H as a cycle name": 15,
       "Fibonacci": 2
     },
     "docs/96-related-work.md": {
@@ -182,21 +161,13 @@
       "8H as a cycle name": 147,
       "Fibonacci": 8
     },
-    "docs/99-expanding-solar-system-resonance-theory.md": {
-      "Earth Fundamental Cycle": 2,
-      "Solar System Resonance Cycle": 4,
-      "8H as a cycle name": 68,
-      "H-lattice": 2,
-      "Fibonacci": 11,
-      "engine K/D as a public name": 13
-    },
     "src/script.js (user-facing strings)": {
-      "Earth Fundamental Cycle": 20,
-      "Solar System Resonance Cycle": 9,
-      "8H as a cycle name": 92,
-      "H-lattice": 10,
-      "Fibonacci": 19,
-      "engine K/D as a public name": 4
+      "Earth Fundamental Cycle": 4,
+      "Solar System Resonance Cycle": 2,
+      "8H as a cycle name": 32,
+      "H-lattice": 6,
+      "Fibonacci": 11,
+      "engine K/D as a public name": 2
     }
   }
 }

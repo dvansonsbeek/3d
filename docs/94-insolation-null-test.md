@@ -7,6 +7,8 @@ status: current
 
 # Insolation Extension Test — Does Classical Berger Insolation Add Anything to L1+L2+L3?
 
+> **Status (plan 06 T1 — historical record).** This test was run with the integer-label comb (periods as integer fractions of an eight-unit base) as L1. T1 retired the labels; the shipped L1 is the engine's own physical line set ([doc 92 §2](92-climate-formula.md)). The null result — classical insolation features add no cross-window-stable variance once the orbital lines are in — does not depend on how the lines were labelled. Kept as the record.
+
 > **TL;DR.** We tested whether adding the classical Berger 1978 insolation features
 > — obliquity ε(t), eccentricity e(t), and the climatic-precession products
 > e·sin(ϖ) and e·cos(ϖ) — to the canonical climate formula (L1+L2+L3) improves

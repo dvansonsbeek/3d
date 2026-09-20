@@ -14,7 +14,7 @@ and the invariable-plane argument of periapsis are computed, and the two
 live self-checks (angular-momentum validation and the mass-weighted
 balance gauge).
 
-> **Scope note (ESSRT).** The invariable plane itself (perpendicular to total angular momentum) is fixed in space; the angular-momentum conservation argument that defines it is scale-invariant. Earth's kinematic identities quoted here (−H/5 node regression ≈ <!--v:hDiv5-->67,063<!--/v--> yr, the H/3 ≈ <!--v:earthPeriPeriodICRF-->111,772<!--/v-->-yr ICRF perihelion cycle) are scale-invariant divisors whose literal year values are J2000-evaluated; under [ESSRT](99-expanding-solar-system-resonance-theory.md), H(t) evolves at deep time via Drivers 1 (LOD growth) and 2 (Kepler), scaling literal year counts proportionally while leaving the structure intact.
+> **Scope note (ESSRT).** The invariable plane itself (perpendicular to total angular momentum) is fixed in space; the angular-momentum conservation argument that defines it is scale-invariant. Earth's kinematic identities quoted here (−H/5 node regression ≈ <!--v:hDiv5-->67,063<!--/v--> yr, the H/3 ≈ <!--v:earthPeriPeriodICRF-->111,570<!--/v-->-yr ICRF perihelion cycle) are scale-invariant divisors whose literal year values are J2000-evaluated; under [ESSRT](99-expanding-solar-system-resonance-theory.md), H(t) evolves at deep time via Drivers 1 (LOD growth) and 2 (Kepler), scaling literal year counts proportionally while leaving the structure intact.
 
 ---
 
@@ -109,7 +109,7 @@ Each orbital plane has **two distinct angles** evolving at different rates — a
 - **Inclination** `i(t)` — the "nodding" of the orbital plane. Changes **how far** above/below the plane the planet gets; it does not change the fact of two crossings per orbit.
 - **Ascending node** `Ω(t)` — the "spinning" of the line of nodes. Shifts **where/when** the crossings happen.
 
-For the planets both angles are now **dynamical outputs of the chain** (elements of date; the long-term curves are engine D's own secular modes). For Earth the model's kinematic identities apply: Ω regresses at the ecliptic precession rate **−H/5 ≈ −<!--v:hDiv5-->67,063<!--/v--> yr** (confirmed by La2010), while Earth's inclination to the invariable plane oscillates on the **H/3 ≈ <!--v:earthPeriPeriodICRF-->111,772<!--/v-->-yr** ICRF perihelion cycle — two different angles, two different rates.
+For the planets both angles are now **dynamical outputs of the chain** (elements of date; the long-term curves are engine D's own secular modes). For Earth the model's kinematic identities apply: Ω regresses at the ecliptic precession rate **−H/5 ≈ −<!--v:hDiv5-->67,063<!--/v--> yr** (confirmed by La2010), while Earth's inclination to the invariable plane oscillates on the **H/3 ≈ <!--v:earthPeriPeriodICRF-->111,570<!--/v-->-yr** ICRF perihelion cycle — two different angles, two different rates.
 
 Earth's charted model inclination `i_inv(t)` is the **one-source** reading: the engine's own Earth-orbit normal (secular series inside ±10 Myr, mode tail beyond) against the artifact's invariable plane — it matches La2010 at rms 0.003° over −500 kyr.
 

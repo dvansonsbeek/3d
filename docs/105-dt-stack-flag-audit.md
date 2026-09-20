@@ -7,9 +7,12 @@ status: current
 
 # 105 — ΔT stack: what each flag buys
 
-Audit of the four ΔT correction flags (Bond 8H/1830, Hallstatt 8H/1104,
-Jose5 8H/2989, Jose4 8H/3749) and the Core-mantle swing, measured through the
-authoritative `--joint` fit with pre-registered pass criteria.
+Audit of the four ΔT correction flags (Bond 1466 yr, Hallstatt 2430 yr,
+Jose5 897 yr, Jose4 716 yr — identified in the coefficient file by their
+divisor n of the anchor's eight-unit interval, an identifier: plan 06 T5
+measured the labels carry zero information, the periods are what the stack
+carries) and the Core-mantle swing, measured through the authoritative
+`--joint` fit with pre-registered pass criteria.
 
 **Outcome: no flag is removed.** The shipped four-flag configuration is the best
 of every configuration tested, in-sample and out-of-sample, and the ±300/400 kyr

@@ -7,6 +7,8 @@ status: current
 
 # L1 Lattice Attribution Reference — Berger vs Our Model
 
+> **Status (plan 06 T1 — historical record).** This attribution was made for the integer-label comb (periods as integer fractions of an eight-unit base). T1 retired the labels: the shipped climate formula's orbital layer is the engine's own physical line set (`data/l1-physical-lines.json`; [doc 92 §2](92-climate-formula.md)), whose lines carry their Berger/Laskar attribution by construction (|g_i − g_j|, p + s_i, p + g_i). Kept as the record of the comb-era attribution work.
+
 > **One entry per L1 lattice integer.** For each integer this doc lists (a) the standard Berger / secular-theory attribution, (b) all solar-system family matches (planet-planet beats), and (c) the top-5 Earth-planet beat candidates ranked by physical plausibility (Jupiter > smaller planets; Axial/Obliq > other elements; 2-term > 3-term; Earth-bearing required). The complete ranked list (often 20+ combos for some n) is preserved in the companion JSON.
 
 > **Scope note (ESSRT).** The L1 lattice integer-divisor structure (each row labelled by n where T = 8H/n) is scale-invariant — the integer n stays constant at any epoch. The T (kyr) column values in the tables below and the per-component periods of every beat-candidate (Earth.Axial(104) = 8H/104, Jupiter.Peri_ecl(39) = 8H/39, etc.) are J2000-evaluated; under [ESSRT](99-expanding-solar-system-resonance-theory.md), H(t) evolves at deep time via Drivers 1 (LOD growth) and 2 (Kepler), scaling every literal period proportionally. Attribution structure (which n corresponds to which beat) is permanent; the numerical periods are the J2000 snapshot.

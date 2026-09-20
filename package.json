@@ -52,9 +52,10 @@
     "check:engine": "npm run check:docs && npm run test:purity && npm run test:layer0 && npm run test:layer1 && npm run test:constants && npm run test:counterfactual && npm run test:planet-model && npm run test:sampler-purity && npm run test:verify && npm run test:fixtures",
     "docs:values": "node tools/docs/render-doc-values.mjs",
     "docs:values:write": "node tools/docs/render-doc-values.mjs --write",
-    "docs:tables": "python3 scripts/generate_doc97_tables.py --check && node tools/docs/render-calculation-map.mjs --check && node tools/docs/render-doc99-tables.mjs --check",
+    "docs:tables": "python3 scripts/generate_doc97_tables.py --check && node tools/docs/render-calculation-map.mjs --check && node tools/docs/render-doc99-tables.mjs --check && node tools/docs/render-doc92-tables.mjs --check",
     "docs:calcmap:write": "node tools/docs/render-calculation-map.mjs --write",
     "docs:doc99:write": "node tools/docs/render-doc99-tables.mjs --write",
+    "docs:doc92:write": "node tools/docs/render-doc92-tables.mjs --write",
     "docs:tables:write": "python3 scripts/generate_doc97_tables.py",
     "values:package": "node tools/docs/export-model-values-package.mjs",
     "values:package:write": "node tools/docs/export-model-values-package.mjs --write"

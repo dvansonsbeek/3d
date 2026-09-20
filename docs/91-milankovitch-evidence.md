@@ -7,6 +7,8 @@ status: current
 
 # Milankovitch Evidence — Empirical Tests and Hypothesis Tests
 
+> **Status (plan 06 T1/T5 — historical record).** The tests below were run on the integer-label comb (periods as integer fractions of an eight-unit base). The pre-registered test T1 measured that comb against the engine's own Berger/Laskar-style beat lines and retired the labels: **the shipped climate formula's orbital layer is the physical line set** (`data/l1-physical-lines.json`, one home; [doc 92 §2](92-climate-formula.md)). The measurements here stand as the record of how the lines were found and tested; their vocabulary is the campaign's. Nothing in the shipped model carries an integer label.
+
 > **Scope.** Empirical tests of the Holistic Universe Model's climate claims against the LR04 benthic δ¹⁸O stack (Lisiecki & Raymo 2005), the Cheng 2016 U-Th-dated Asian speleothem composite, the EPICA Dome C CO₂ record (Bereiter 2015), and the CENOGRID benthic record (Westerhold 2020). Sections 1–7 report the spectral fit and per-planet contributions. Sections 8–11 then report a pre-registered **super-cycle hypothesis test** that returned NULL, **fourteen follow-up hypothesis tests** (A–N) on independent framework predictions (16 positives / 2 partials / 5 nulls), the **405-kyr off-lattice characterization** (climate-internal carbon-cycle thermostat), and the combined interpretation. Companion to [doc 90 — Milankovitch Language](90-milankovitch-language.md), which states the framework's structural predictions; this document reports what the data show — both confirmations and limits.
 
 > **Scope note (ESSRT).** Every spectral test in this document is anchored at J2000. The 33 L1 integer-divisor positions of the 8H lattice and the Fibonacci structure used to derive them are scale-invariant. The literal year counts (H = <!--v:H-->335,317<!--/v-->; 8H = <!--v:eightH-->2,682,536<!--/v-->; 1H..8H = 335.3..2682.5 kyr in the §11.5 super-cycle table; 13H = 4.359 Myr in Test A) are J2000-evaluated. Under [ESSRT](99-expanding-solar-system-resonance-theory.md), H(t) evolves at deep time via Drivers 1 (LOD growth) and 2 (Kepler) — sub-percent over the post-MPT (0–1 Myr) and full-LR04 (0–5.3 Myr) windows covered here. For the deep-time projections in Test C (13H ≈ 4.36 Myr vs Boulila ~4.5 Myr) and the full 66-Myr CENOGRID context, the cumulative drift begins to matter; see [doc 99](99-expanding-solar-system-resonance-theory.md) for the per-driver Δ-H formulas.
@@ -214,7 +216,7 @@ For Jupiter, Saturn, Uranus, and Neptune, standard secular theory reports **no r
 |---|---|---:|
 | Venus | tidally damped at 177° (Correia & Laskar 2003) | 8H/110 = **<!--v:venusObliqCycle-->24,387<!--/v--> yr** (model: net residual after two opposing precession components nearly cancel) |
 | Jupiter | "No regular cycle" — Gyr secular trend 3.1° → 6–37° (Saillenfest 2020) | H/2 = **<!--v:hDiv2-->167,659<!--/v--> yr** |
-| Saturn | "No regular cycle" — Gyr trend 26.7° → 65°+ via Neptune resonance (Saillenfest 2021; Wisdom 2022) | H/3 = **<!--v:earthPeriPeriodICRF-->111,772<!--/v--> yr** |
+| Saturn | "No regular cycle" — Gyr trend 26.7° → 65°+ via Neptune resonance (Saillenfest 2021; Wisdom 2022) | H/3 = **<!--v:earthPeriPeriodICRF-->111,570<!--/v--> yr** |
 | Uranus | Frozen — > 100 Myr precession (Saillenfest 2022) | H/2 = **<!--v:hDiv2-->167,659<!--/v--> yr** |
 | Neptune | Frozen (Rogoszinski & Hamilton 2020) | 8H/100 = **<!--v:neptuneObliqCycle-->26,825<!--/v--> yr** |
 

@@ -47,7 +47,7 @@ Per the [Expanding Solar System Resonance Theory (Doc 99)](99-expanding-solar-sy
 
 H(t) evolves under two physically independent drivers: **Driver 1** = Earth-Moon tidal evolution (LOD grows, Moon recedes); **Driver 2** = solar mass loss (every planet's orbit slowly expands via Kepler's 3rd law). At Devonian (380 Ma) H ≈ <!--v:hAtDevonian-->282,329<!--/v--> yr; at J2000 H = <!--v:H-->335,317<!--/v--> yr; at +200 Myr H ≈ <!--v:hAt200MyrFuture-->367,019<!--/v--> yr. The integer divisors above are unchanged at every epoch — only the per-cycle period in years (or seconds) scales.
 
-For the canonical derivation chain from `t_Ma` through LOD, the composed precession period, AU, M_Sun, Kepler year, Moon distance, Moon period, anomalistic year, stellar/sidereal days, and planet orbital + synodic periods, see [Doc 99 — ESSRT](99-expanding-solar-system-resonance-theory.md) and the `mean*AtAge` family in `tools/lib/deep-time.js`. (The Solar System Resonance Cycle at J2000: 8H = <!--v:eightH-->2,682,536<!--/v--> yr; the per-planet 8H/N tabulation is archived — [retired record](retired-record.md).)
+For the canonical derivation chain from `t_Ma` through LOD, the composed precession period, AU, M_Sun, Kepler year, Moon distance, Moon period, anomalistic year, stellar/sidereal days, and planet orbital + synodic periods, see [Doc 99 — ESSRT](99-expanding-solar-system-resonance-theory.md) and the `mean*AtAge` family in `tools/lib/deep-time.js`. (The per-planet integer-label tabulation on the anchor's eight-unit interval is archived — [retired record](retired-record.md).)
 
 ---
 
@@ -186,8 +186,8 @@ The anchor is the unit of the correction bases and of the frozen era clock; it w
 
 ## Legacy Divisor Assignments (retired framing — no-chain scaffolding record)
 
-The per-planet *d*-assignments below belong to the retired Fibonacci-law
-framing (the planet chains moved to engine D; doc 10 Status + doc 109 carry
+The per-planet *d*-assignments below belong to the retired integer-law
+framing (the planet chains moved to the orbital dynamics engine; doc 10 Status + doc 109 carry
 the re-evaluation). They are kept because the constants still exist in the
 legacy scene scaffolding (device anchors, no-chain bodies).
 
@@ -353,19 +353,19 @@ All 8 planets, combining inner planet J2000 values with outer planet pre-dual-ba
 
 Amplitudes from the retired law framing: `amp = ψ / (d × √m)`. Means from
 the J2000 constraint. These values survive in the legacy scene scaffolding
-only (the planet chains ride engine D); the historical record is
+only (the planet chains ride the orbital dynamics engine); the historical record is
 [doc 10](10-fibonacci-laws.md), verified at the time by
 [Inclination Optimization](../tools/verify/inclination-optimization.js) and
 [Inclination Verification](../tools/verify/inclination-verification.js).
 
 | Planet | Mean (deg) | Amplitude (deg) | Range (deg) | Phase Angle | ICRF Period |
 |--------|----------|---------------|-----------|-------------|-------------|
-| Mercury | <!--v:mercuryInclMean-->6.703228<!--/v--> | <!--v:mercuryInclAmp-->0.386501<!--/v--> | 6.32 - 7.09 | <!--v:mercuryInclCycleAnchor-->234.52<!--/v-->° | 8H/93 ≈ <!--v:mercuryPeriPeriodICRF-->28,844<!--/v--> yr |
-| Venus | <!--v:venusInclMean-->2.151359<!--/v--> | 0.062165 | 2.09 - 2.21 | <!--v:venusInclCycleAnchor-->218.64<!--/v-->° | 8H/110 ≈ <!--v:venusPeriPeriodICRF-->24,387<!--/v--> yr |
-| Earth | <!--v:earthInclMean-->1.48113<!--/v--> | <!--v:earthInclAmp-->0.63607<!--/v--> | 0.85 - 2.12 | <!--v:earthInclCycleAnchor-->21.77<!--/v-->° | H/3 ≈ <!--v:earthPeriPeriodICRF-->111,772<!--/v--> yr |
-| Mars | <!--v:marsInclMean-->1.833263<!--/v--> | <!--v:marsInclAmp-->1.164287<!--/v--> | 0.67 - 3.00 | <!--v:marsInclCycleAnchor-->236.07<!--/v-->° | 8H/68 ≈ <!--v:marsPeriPeriodICRF-->39,449<!--/v--> yr |
-| Jupiter | <!--v:jupiterInclMean-->0.321086<!--/v--> | <!--v:jupiterInclAmp-->0.021405<!--/v--> | 0.30 - 0.34 | <!--v:jupiterInclCycleAnchor-->287.06<!--/v-->° | 8H/65 ≈ <!--v:jupiterPeriPeriodICRF-->41,270<!--/v--> yr |
-| Saturn | <!--v:saturnInclMean-->0.984969<!--/v--> | <!--v:saturnInclAmp-->0.065196<!--/v--> | 0.92 - 1.05 | <!--v:saturnInclCycleAnchor-->116.26<!--/v-->° (anti-phase) | 8H/169 ≈ <!--v:saturnPeriPeriodICRF-->15,873<!--/v--> yr |
+| Mercury | <!--v:mercuryInclMean-->6.703228<!--/v--> | <!--v:mercuryInclAmp-->0.386501<!--/v--> | 6.32 - 7.09 | <!--v:mercuryInclCycleAnchor-->234.52<!--/v-->° | <!--v:mercuryPeriPeriodICRF-->28,844<!--/v--> yr |
+| Venus | <!--v:venusInclMean-->2.151359<!--/v--> | 0.062165 | 2.09 - 2.21 | <!--v:venusInclCycleAnchor-->218.64<!--/v-->° | <!--v:venusPeriPeriodICRF-->24,387<!--/v--> yr |
+| Earth | <!--v:earthInclMean-->1.48113<!--/v--> | <!--v:earthInclAmp-->0.63607<!--/v--> | 0.85 - 2.12 | <!--v:earthInclCycleAnchor-->21.77<!--/v-->° | H/3 ≈ <!--v:earthPeriPeriodICRF-->111,570<!--/v--> yr |
+| Mars | <!--v:marsInclMean-->1.833263<!--/v--> | <!--v:marsInclAmp-->1.164287<!--/v--> | 0.67 - 3.00 | <!--v:marsInclCycleAnchor-->236.07<!--/v-->° | <!--v:marsPeriPeriodICRF-->39,449<!--/v--> yr |
+| Jupiter | <!--v:jupiterInclMean-->0.321086<!--/v--> | <!--v:jupiterInclAmp-->0.021405<!--/v--> | 0.30 - 0.34 | <!--v:jupiterInclCycleAnchor-->287.06<!--/v-->° | <!--v:jupiterPeriPeriodICRF-->41,270<!--/v--> yr |
+| Saturn | <!--v:saturnInclMean-->0.984969<!--/v--> | <!--v:saturnInclAmp-->0.065196<!--/v--> | 0.92 - 1.05 | <!--v:saturnInclCycleAnchor-->116.26<!--/v-->° (anti-phase) | <!--v:saturnPeriPeriodICRF-->15,873<!--/v--> yr |
 | Uranus | <!--v:uranusInclMean-->1.015183<!--/v--> | <!--v:uranusInclAmp-->0.023832<!--/v--> | 0.99 - 1.04 | 21.33° | H/10 ≈ <!--v:uranusPeriPeriodICRF-->33,532<!--/v--> yr |
 | Neptune | <!--v:neptuneInclMean-->0.743803<!--/v--> | <!--v:neptuneInclAmp-->0.013552<!--/v--> | 0.73 - 0.76 | <!--v:neptuneInclCycleAnchor-->174.04<!--/v-->° | 2H/25 ≈ <!--v:neptunePeriPeriodICRF-->26,825<!--/v--> yr |
 | Pluto | <!--v:plutoInclMean-->15.716200<!--/v--> | <!--v:plutoInclAmp-->0.717024<!--/v--> | 15.00 - 16.43 | <!--v:plutoInclCycleAnchor-->203.32<!--/v-->° | H/12 ≈ <!--v:plutoPeriPeriodICRF-->27,943<!--/v--> yr |
@@ -386,16 +386,16 @@ only (the planet chains ride engine D); the historical record is
 
 ## Perihelion Precession Periods (Ecliptic)
 
-| Planet | Formula | Period (years) |
+| Planet | Device construction (Y = the anchor interval `holisticyearLength`; retired framing) | Period (years) |
 |--------|---------|----------------|
-| Mercury | H / (1 + 3/8) | ~<!--v:mercuryPeriPeriod-->243,867<!--/v--> |
-| Venus | -8H / 6 | ~-<!--v:venusPeriPeriod-->447,089<!--/v--> (retrograde) |
-| Earth | H / 16 | <!--v:periPrecYears-->~20,936<!--/v--> |
-| Mars | H × 8/36 | ~<!--v:marsPeriPeriod-->74,515<!--/v--> |
-| Jupiter | 8H / 39 | ~<!--v:jupiterPeriPeriod-->68,783<!--/v--> |
-| Saturn | -8H / 65 | ~-<!--v:saturnPeriPeriod-->41,270<!--/v--> (retrograde) |
-| Uranus | H / 3 | ~<!--v:uranusPeriPeriod-->111,772<!--/v--> |
-| Neptune | H × 2 | ~<!--v:neptunePeriPeriod-->670,634<!--/v--> |
+| Mercury | Y / (1 + 3/8) | ~<!--v:mercuryPeriPeriod-->243,867<!--/v--> |
+| Venus | −8Y / 6 | ~-<!--v:venusPeriPeriod-->447,089<!--/v--> (retrograde) |
+| Earth | the perihelion-of-date beat (the of-date year laws; the device's Y/16 read 20,957) | <!--v:periPrecYears-->~20,936<!--/v--> |
+| Mars | Y × 8/36 | ~<!--v:marsPeriPeriod-->74,515<!--/v--> |
+| Jupiter | 8Y / 39 | ~<!--v:jupiterPeriPeriod-->68,783<!--/v--> |
+| Saturn | −8Y / 65 | ~-<!--v:saturnPeriPeriod-->41,270<!--/v--> (retrograde) |
+| Uranus | Y / 3 | ~<!--v:uranusPeriPeriod-->111,772<!--/v--> |
+| Neptune | Y × 2 | ~<!--v:neptunePeriPeriod-->670,634<!--/v--> |
 
 These are the model's typed lattice descriptors ([doc 109 §9](109-model-nbody-engine-and-lattice-test.md)
 gives each planet's quantity type). Mercury's row is the Newtonian rate; the observed motion adds the
@@ -408,7 +408,7 @@ derived relativistic supplement:
 
 ## Moon Derived Cycles
 
-All Moon cycles are derived from the 3 input months (sidereal, anomalistic, nodal) and H. Integer rounding to `totalDaysInH = H × meanSolarYearDays` ensures exact cycle closure over the Earth Fundamental Cycle.
+All Moon cycles are derived from the 3 input months (sidereal, anomalistic, nodal) and the anchor interval (`holisticyearLength`). Integer rounding to `totalDaysInH` = anchor × meanSolarYearDays ensures exact cycle closure over the anchor interval — a device convention of the lunar chain, not an observed period.
 
 | Cycle | Variable | Formula | Value (days) |
 |-------|----------|---------|-------------|
@@ -706,7 +706,7 @@ Theoretical orbital inclination ranges from secular perturbation theory.
 
 ### Inclination Cycle Anchors
 
-Each planet has a per-planet cycle anchor (ICRF perihelion longitude where the planet reaches MAX inclination, evaluated at one of the eight balanced-year anchors). The seven fitted planets share anchor n=7 (≈ -<!--v:systemResetYearBC-->2,649,854 BC<!--/v-->, the start of the current Solar System Resonance Cycle); Earth is locked to its IAU-derived n=0 reference.
+Each planet has a per-planet cycle anchor (ICRF perihelion longitude where the planet reaches MAX inclination, evaluated at one of the eight balanced-year anchors). The seven fitted planets share anchor n=7 (≈ -<!--v:systemResetYearBC-->2,649,854 BC<!--/v-->, the start of the current eight-unit interval of the anchor — the retired System-Reset convention); Earth is locked to its IAU-derived n=0 reference.
 
 | Planet | Cycle Anchor | Balanced Year | Notes |
 |--------|-------------|--------|-------|
@@ -903,15 +903,15 @@ The calibration methodology (the closed-form Ω solution against the JPL J2000 e
 
 Per-planet configuration for the predictive perihelion precession formula:
 
-| Planet | Period Formula | Theta0 (deg) | Baseline (arcsec/cy) |
+| Planet | Device period (Y = the anchor interval; retired framing) | Theta0 (deg) | Baseline (arcsec/cy) |
 |--------|---------------|---------------|---------------------|
-| Mercury | H × 8/11 | <!--v:mercuryPeriLongJ2000Full-->77.4569131<!--/v--> | <!--v:arcsecInCircle-->1,296,000<!--/v-->/period×100 |
-| Venus | -8H / 6 | <!--v:venusPeriLongJ2000Full-->131.5765919<!--/v--> | -<!--v:arcsecInCircle-->1,296,000<!--/v-->/period×100 (retrograde) |
-| Mars | 8H / 36 | <!--v:marsPeriLongJ2000Full-->336.0650681<!--/v--> | <!--v:arcsecInCircle-->1,296,000<!--/v-->/period×100 |
-| Jupiter | 8H / 39 | <!--v:jupiterPeriLongJ2000Full-->14.70659401<!--/v--> | <!--v:arcsecInCircle-->1,296,000<!--/v-->/period×100 |
-| Saturn | -8H / 65 | <!--v:saturnPeriLongJ2000Full-->92.12794343<!--/v--> | -<!--v:arcsecInCircle-->1,296,000<!--/v-->/period×100 (retrograde) |
-| Uranus | H / 3 | <!--v:uranusPeriLongJ2000Full-->170.7308251<!--/v--> | <!--v:arcsecInCircle-->1,296,000<!--/v-->/period×100 |
-| Neptune | H × 2 | <!--v:neptunePeriLongJ2000Full-->45.80124471<!--/v--> | <!--v:arcsecInCircle-->1,296,000<!--/v-->/period×100 |
+| Mercury | Y × 8/11 | <!--v:mercuryPeriLongJ2000Full-->77.4569131<!--/v--> | <!--v:arcsecInCircle-->1,296,000<!--/v-->/period×100 |
+| Venus | −8Y / 6 | <!--v:venusPeriLongJ2000Full-->131.5765919<!--/v--> | -<!--v:arcsecInCircle-->1,296,000<!--/v-->/period×100 (retrograde) |
+| Mars | 8Y / 36 | <!--v:marsPeriLongJ2000Full-->336.0650681<!--/v--> | <!--v:arcsecInCircle-->1,296,000<!--/v-->/period×100 |
+| Jupiter | 8Y / 39 | <!--v:jupiterPeriLongJ2000Full-->14.70659401<!--/v--> | <!--v:arcsecInCircle-->1,296,000<!--/v-->/period×100 |
+| Saturn | −8Y / 65 | <!--v:saturnPeriLongJ2000Full-->92.12794343<!--/v--> | -<!--v:arcsecInCircle-->1,296,000<!--/v-->/period×100 (retrograde) |
+| Uranus | Y / 3 | <!--v:uranusPeriLongJ2000Full-->170.7308251<!--/v--> | <!--v:arcsecInCircle-->1,296,000<!--/v-->/period×100 |
+| Neptune | Y × 2 | <!--v:neptunePeriLongJ2000Full-->45.80124471<!--/v--> | <!--v:arcsecInCircle-->1,296,000<!--/v-->/period×100 |
 
 ### Predictive Normalization Constants
 

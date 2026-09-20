@@ -255,8 +255,8 @@ All precession periods emerge from ratios of year lengths:
 | Precession | Formula | Mean period |
 |------------|---------|-------------|
 | Axial | `Y_sid / (Y_sid − Y_trop)` | H/13 ≈ <!--v:earthAxialPeriod-->25,771<!--/v--> yr |
-| Perihelion | `Y_anom(s) / (Y_anom(s) − Y_trop(s))` | H/16 ≈ <!--v:earthPeriPeriod-->20,957<!--/v--> yr |
-| Inclination | `Y_anom(s) / (Y_anom(s) − Y_sid(s))` | H/3 ≈ <!--v:earthPeriPeriodICRF-->111,772<!--/v--> yr |
+| Perihelion | `Y_anom(s) / (Y_anom(s) − Y_trop(s))` | H/16 ≈ <!--v:earthPeriPeriod-->20,936<!--/v--> yr |
+| Inclination | `Y_anom(s) / (Y_anom(s) − Y_sid(s))` | H/3 ≈ <!--v:earthPeriPeriodICRF-->111,570<!--/v--> yr |
 | Obliquity | axial × 13/8 | H/8 ≈ <!--v:hDiv8-->41,915<!--/v--> yr |
 | Ecliptic | axial × 13/5 | H/5 ≈ <!--v:hDiv5-->67,063<!--/v--> yr |
 

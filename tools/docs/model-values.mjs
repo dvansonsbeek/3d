@@ -1835,9 +1835,9 @@ export const VALUES = {
         };
       }
     }
-    // Earth's rate uses the H/16 effective period, not a peri divisor above.
-    out.earthPeriRate = { get: () => 360 / (C.H / 16), render: (v) => thousands(v, 6), unit: '°/yr', note: 'H/16 effective period' };
-    out.earthPeriPeriod = { get: () => C.H / 16, render: (v) => thousands(Math.round(v)), unit: 'yr', note: 'H/16 effective period' };
+    // Earth's perihelion-of-date period is the one-family route's beat (S6: was the device's H/16).
+    out.earthPeriRate = { get: () => 360 / oneYL().perihelionPrecessionYearsAtYear(2000), render: (v) => thousands(v, 6), unit: '°/yr', note: 'perihelion-of-date rate at J2000 — the of-date year laws’ beat (S6; was 360/(H/16))' };
+    out.earthPeriPeriod = { get: () => oneYL().perihelionPrecessionYearsAtYear(2000), render: (v) => thousands(Math.round(v)), unit: 'yr', note: 'perihelion-of-date period at J2000 (S6; was H/16 = 20,957)' };
     const eccSources = {
       mercury: () => C.planets.mercury.orbitalEccentricityJ2000,
       venus:   () => C.planets.venus.orbitalEccentricityJ2000,
@@ -2345,10 +2345,12 @@ export const VALUES = {
     const out = {};
     for (const planet of ['mercury', 'venus', 'earth', 'mars', 'jupiter', 'saturn', 'uranus', 'neptune']) {
       out[`${planet}PeriPeriodICRF`] = {
-        get: () => (8 * C.H) / Math.abs(n8Ecliptic(planet) - 104),
+        // S6: Earth's apsidal period against the stars is the N-body chain's secular tangent (the
+        // one-family route's value), not the device identity 8H/(128 − 104) = H/3 = 111,772.
+        get: () => (planet === 'earth' ? oneYL().inclinationPrecessionYearsAtYear(2000) : (8 * C.H) / Math.abs(n8Ecliptic(planet) - 104)),
         render: (v) => thousands(Math.round(v)),
         unit: 'yr',
-        note: 'ecliptic lattice rate − H/13 frame term',
+        note: planet === 'earth' ? 'Earth’s apsidal period vs the stars — the chain’s secular tangent (S6; was H/3 = 111,772)' : 'device: ecliptic lattice rate − the frame term (the no-chain scaffolding’s convention)',
       };
     }
     // Minor bodies ride the same identity over their stored fractions. All

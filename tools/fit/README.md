@@ -11,7 +11,7 @@
 All scripts that produce fitted coefficients or derived constants live here.
 Output values are stored in `public/input/fitted-coefficients.json`.
 
-> **P5 note (post-excision):** the seven planets render from engine D's
+> **P5 note (post-excision):** the seven planets render from the orbital dynamics engine's
 > governed artifact (`tools/verify/nbody-secular.js --write` is that path's
 > regeneration). The parallax / gravitation / elongation correction fitters
 > (former Steps 5a–5b) and their `PARALLAX_*`/`GRAVITATION_`/`ELONGATION_
@@ -24,7 +24,7 @@ Output values are stored in `public/input/fitted-coefficients.json`.
 ## Design rule for scene-graph corrections
 
 **Any correction added to the framework's motion model (scene-graph rotations
-in `moveModel` or `tools/lib/scene-graph.js`) MUST be harmonic on H-lattice
+in `moveModel` or `tools/lib/scene-graph.js`) MUST be harmonic on the correction bases' fixed divisors of the anchor unit (bounded Fourier bases, plan 06 P3)
 divisors. NO polynomial-in-T terms.**
 
 Concrete form: a correction must be expressible as
@@ -40,7 +40,7 @@ are NOT allowed.
 
 **Why:** the framework is fundamentally cyclic — every period is H, a
 multiple of H, or H/N for integer N. The deep-time claim is that the *same
-lattice* describes motion across the full Solar System Resonance Cycle
+lattice* describes motion across the full eight-unit interval of the anchor (the former "8H")
 (2.68 Myr). Polynomial-in-T corrections (T, T², T³, …) are not cyclic:
 they grow without bound, compound across epochs, and silently destroy
 the framework's structural claims.
@@ -54,7 +54,7 @@ the correction was applied only to the Sun, not to planets — disabled in
 The accompanying `SUN_LONGITUDE_HARMONICS` 4th term (divisor=168, period
 1996 yr) had `gcd(168, H) = 1` — also a violation of this rule. **Status
 2026-06 (Phase Z-B):** The Sun harmonic correction has been RE-ENABLED with
-the H-lattice filter applied at runtime — the [168] term is automatically
+the divisor-whitelist filter applied at runtime — the [168] term is automatically
 skipped, only the 3 year-multiple terms (1 yr, ½ yr, ⅓ yr) and any future
 lunar-precession or small-precession-divisor terms are applied. Sun-only
 application (NOT barycenter) keeps planet baselines pristine. See Step 0.
@@ -219,7 +219,7 @@ then `npm run constants:generate` (Step 9).
 |--------|----------|-------------|
 | `derive-eccentricity-amplitudes.js` | Verification only (no output) | Verifies K-derived amplitudes match runtime |
 | `export-solar-measurements.js` | `data/02-solar-measurements.csv` | Scene-graph simulation (1-year steps, single pass) |
-| `sun-longitude-harmonics.js` | `SUN_LONGITUDE_MEAN`, `SUN_LONGITUDE_HARMONICS` (H-lattice terms; **see design rule above** — only divisors n where H/n maps to a known physical cycle are allowed) | Scene-graph Sun vs Meeus Ch.25 (computed in-script, no CSV). **Status 2026-06 (Phase Z-B): ENABLED** — Sun-only application with runtime H-lattice filter (skips legacy [168] term automatically). Closes ~96% of the framework's 200" Sun-vs-Meeus residual. **2026-08 (FQ-3): retired from the moveModel display path** (exact-Kepler corrector, doc 65); still consumed by the Step-6a instrument + the legacy A/B path, and still fitter-owned here. |
+| `sun-longitude-harmonics.js` | `SUN_LONGITUDE_MEAN`, `SUN_LONGITUDE_HARMONICS` (anchor-divisor harmonic terms; **see design rule above** — only divisors n where anchor/n maps to a known physical cycle are allowed) | Scene-graph Sun vs Meeus Ch.25 (computed in-script, no CSV). **Status 2026-06 (Phase Z-B): ENABLED** — Sun-only application with runtime divisor-whitelist filter (skips legacy [168] term automatically). Closes ~96% of the framework's 200" Sun-vs-Meeus residual. **2026-08 (FQ-3): retired from the moveModel display path** (exact-Kepler corrector, doc 65); still consumed by the Step-6a instrument + the legacy A/B path, and still fitter-owned here. |
 | `sun-planetary-completion-fit.js` | NOTHING (read-only, the Step-0 companion — 20.3h, SUPERSEDED by Stage D2) | JPL Horizons live (960 all-phase + 179 syzygy epochs, network required — so it can never be a gate). Was the dev record behind the v1 fitted 10-term table; the shipped table is now the DERIVED 70-term extraction on FRAMEWORK-native carriers (FQ-5 N3: `tools/explore/d2-derived-sun.mjs` → `n2-sun-framework-carriers.mjs` → `n3-carrier-swap-preview.mjs`; the carrier rates are injected live from the planet records by `model.js`), so its coefficient-drift part no longer applies — its syzygy + NASA-centerline scoreboards remain valid verification. After ANY Step-0 refit OR planet-record period change, re-run the N3 extraction chain and re-embed the table + its `PAIRED_SUN_HARMONICS_SHA256` by hand — the test:model fingerprint gate enforces the pairing. |
 | `eoc-fractions.js` | Per-planet `eocFraction` | `data/reference-data.json` |
 | `ascnode-correction.js` | `ascNodeTiltCorrection`, `startpos` | `data/reference-data.json` |
@@ -231,9 +231,9 @@ then `npm run constants:generate` (Step 9).
 | `python/greedy_features_physical.py` | Candidate features for ML (physical-beat basis) | `data/01-holistic-year-objects-data.xlsx` |
 | `python/planet_eccentricity_jpl.py` | Planet `orbitalEccentricityBase` values | JPL Horizons (cached in `data/`) |
 | `../../scripts/fibonacci_significance.py` | `data/significance-results.json` (combined p + sigma via Stouffer's Z with correlation correction; Fisher's reported for transparency; 11 tests × 3 null distributions) | `tools/lib/python/constants_scripts.py` |
-| `dt-corrections-fit.js` | `data/deltaT-4flag-fit.json` — cascaded LSQ fit of the 4-flag ΔT correction stack (Bond 8H/1830, Hallstatt 8H/1104, Jose5 8H/2989, Jose4 8H/3749) against the Stephenson 2016 residual. Sole authoritative source of the shipped `BOND_/HALLSTATT_/JOSE5_/JOSE4_ COS_/SIN_COEFF_S` constants. See "Phase 8" below. **JOINT WORLD (since 2026-07-23): `--joint` is the AUTHORITATIVE fit** — 4 flags + Core-mantle swing in one equality-constrained solve (hard USNO closure row, amplitude caps, resonator phases locked as unit shapes, free intercept = trend anchor). `--joint --write` ships the coefficients + anchors atomically (current joint optimum: USNO 86,400.0017, deltaTStart 55.85, Espenak fit-target RMS 12.60 s, full-window 31.27 s — read the live values from `data/deltaT-4flag-fit.json → optimum` and the stage-3 validation artifact, never from this sentence). The legacy single-shot cascade remains as a stage-wise diagnostic — **its `fit_metrics.stage_*` entries in `deltaT-4flag-fit.json` rank the flags differently from the shipped fit and must not be used to judge whether a flag earns its place** (worked example and the correct method in [doc 105](../../docs/105-dt-stack-flag-audit.md)); the resonator is default-ON runtime-wide (opt-out `DT_RESONATOR_DISABLED=1`; `DT_CORRECTIONS_DISABLED=1` alone still yields the fully-raw fitting residual via the integrator master-gate). | Stephenson 2016 spline (`public/input/stephenson-2016-deltaT-polynomial.json`) − pure-tidal framework model (`tools/lib/deep-time.js`, bypassed via `DT_CORRECTIONS_DISABLED=1`) |
-| `../../scripts/lattice_harmonic_scan.py` | `data/lattice-scan-<tag>.json` — universal 8H-lattice harmonic scan across multiple paleoclimate archives (Steinhilber solar Φ, Stephenson ΔT, Cheng speleothem δ18O, EPICA CO2, LR04 δ18O). Enumerates gcd-compliant divisors in a period band, fits each candidate against each dataset, ranks by cross-dataset consistency. Used to identify Jose4 (4×Jose 715 yr) as the 4th flag with cross-archive coherence. | Multiple paleoclimate proxies in `data/` and `public/input/` |
-| `data/core-mantle-resonator-stage1.json` (artifact — no shipped generator) | the **Core-mantle swing (Resonator driver)** shipped block: a 2-kick EPISODE (windowed damped oscillation, T₀ = 8H/`RES_T0_LATTICE_N` lattice-labeled, Q, kick epochs/coefficients, phase-locked drive tone). Selection rule: pinned-lattice-T₀ guard-passers first (guard-aware solver — modern-window δLOD penalty rows). **Regeneration in the joint world: amplitudes refit automatically via `--joint --write` (tone menu derives from the active flags — generic over flag count). The episode CONVENTION (T₀ = 8H/685, Q = 1.8, epochs −1600/+1600, impulse-consistent shapes) is a DOCUMENTED CONVENTION, not a build-time derivation — it is not re-derivable from anything in this repo. Its evidence is the tracked result JSONs (`data/core-mantle-resonator-*.json`) plus the docs/104 narrative; the stage-1/stage-3/impulse scripts that originally established it ran against the pre-joint world, cannot reproduce today's numbers, and are deliberately not shipped.** Kick epochs are a documented CONVENTION, not data-pinned — see the stage-3 stability artifact before moving them. | Stephenson residual after the shipped stack (node bridge to `tools/lib/deep-time.js`) + `data/deltaT-4flag-fit.json` (parents' phases for the locked tones) |
+| `dt-corrections-fit.js` | `data/deltaT-4flag-fit.json` — cascaded LSQ fit of the 4-flag ΔT correction stack (Bond n=1830 · 1466 yr, Hallstatt n=1104 · 2430 yr, Jose5 n=2989 · 897 yr, Jose4 n=3749 · 716 yr — n the divisor of the anchor's eight-unit interval, an identifier: the periods are what the stack carries) against the Stephenson 2016 residual. Sole authoritative source of the shipped `BOND_/HALLSTATT_/JOSE5_/JOSE4_ COS_/SIN_COEFF_S` constants. See "Phase 8" below. **JOINT WORLD (since 2026-07-23): `--joint` is the AUTHORITATIVE fit** — 4 flags + Core-mantle swing in one equality-constrained solve (hard USNO closure row, amplitude caps, resonator phases locked as unit shapes, free intercept = trend anchor). `--joint --write` ships the coefficients + anchors atomically (current joint optimum: USNO 86,400.0017, deltaTStart 55.85, Espenak fit-target RMS 12.60 s, full-window 31.27 s — read the live values from `data/deltaT-4flag-fit.json → optimum` and the stage-3 validation artifact, never from this sentence). The legacy single-shot cascade remains as a stage-wise diagnostic — **its `fit_metrics.stage_*` entries in `deltaT-4flag-fit.json` rank the flags differently from the shipped fit and must not be used to judge whether a flag earns its place** (worked example and the correct method in [doc 105](../../docs/105-dt-stack-flag-audit.md)); the resonator is default-ON runtime-wide (opt-out `DT_RESONATOR_DISABLED=1`; `DT_CORRECTIONS_DISABLED=1` alone still yields the fully-raw fitting residual via the integrator master-gate). | Stephenson 2016 spline (`public/input/stephenson-2016-deltaT-polynomial.json`) − pure-tidal framework model (`tools/lib/deep-time.js`, bypassed via `DT_CORRECTIONS_DISABLED=1`) |
+| `../../scripts/lattice_harmonic_scan.py` | `data/lattice-scan-<tag>.json` — universal harmonic-divisor scan across multiple paleoclimate archives (Steinhilber solar Φ, Stephenson ΔT, Cheng speleothem δ18O, EPICA CO2, LR04 δ18O). Enumerates gcd-compliant divisors in a period band, fits each candidate against each dataset, ranks by cross-dataset consistency. Used to identify Jose4 (4×Jose 715 yr) as the 4th flag with cross-archive coherence. | Multiple paleoclimate proxies in `data/` and `public/input/` |
+| `data/core-mantle-resonator-stage1.json` (artifact — no shipped generator) | the **Core-mantle swing (Resonator driver)** shipped block: a 2-kick EPISODE (windowed damped oscillation, T₀ = (eight-unit interval)/`RES_T0_LATTICE_N` ≈ 3,916 yr, divisor-labeled, Q, kick epochs/coefficients, phase-locked drive tone). Selection rule: pinned-lattice-T₀ guard-passers first (guard-aware solver — modern-window δLOD penalty rows). **Regeneration in the joint world: amplitudes refit automatically via `--joint --write` (tone menu derives from the active flags — generic over flag count). The episode CONVENTION (T₀ ≈ 3,916 yr = the eight-unit interval/685, Q = 1.8, epochs −1600/+1600, impulse-consistent shapes) is a DOCUMENTED CONVENTION, not a build-time derivation — it is not re-derivable from anything in this repo. Its evidence is the tracked result JSONs (`data/core-mantle-resonator-*.json`) plus the docs/104 narrative; the stage-1/stage-3/impulse scripts that originally established it ran against the pre-joint world, cannot reproduce today's numbers, and are deliberately not shipped.** Kick epochs are a documented CONVENTION, not data-pinned — see the stage-3 stability artifact before moving them. | Stephenson residual after the shipped stack (node bridge to `tools/lib/deep-time.js`) + `data/deltaT-4flag-fit.json` (parents' phases for the locked tones) |
 | `data/core-mantle-resonator-stage3-stability.json` (artifact — no shipped generator) | kick-epoch stability: coordinate refinement, ridge map + 2% stability box, era jackknife. Verdict 2026-07: epochs NOT data-pinnable (broad t_exc/T₀ ridge, era-dependent jackknife) → shipped epochs stand as convention. | same residual |
 | `validate-resonator.js` | `data/core-mantle-resonator-stage3-validation.json` — runtime OFF/ON validation sweep of the CURRENT world (pipeline step: run after every `--joint --write` + sync): J2000 invariants, Layer-3 USNO anchor, Stephenson/Espenak-window RMS, deep-time bit-identity ±200 Myr. Joint-world reference values: ON Stephenson RMS ≈ 31.3 s, Espenak window ≈ 12.1 s. | production chain (`tools/lib/deep-time.js`) |
 | `../constants/generate.mjs` | Generates the constants module `src/script.js` imports, from `public/input/*.json` plus `data/{balance-presets,deltaT-4flag-fit,core-mantle-resonator-stage1}.json`. Emits values verbatim — no formatting, no rounding | the JSON source files |
@@ -313,7 +313,7 @@ When model parameters change, refit in this order. The logic:
    ~1.5" effect) is closed.
 9. The Sun T² polynomial correction (Meeus Ch.25 +0.0003032°/T²) that
    formerly paired with the Sun harmonics has been **REMOVED 2026-06**
-   per the H-lattice design rule (polynomial-in-T terms grow without
+   per the bounded-basis design rule (polynomial-in-T terms grow without
    bound at deep time and destroy the lattice claim). See the design
    rule near the top of this README.
 
@@ -339,7 +339,7 @@ Step 0:  SUN_HARMONICS_DISABLED=1 node tools/fit/sun-longitude-harmonics.js --wr
          Why this is "Step 0" rather than a regular fitting step:
          - Coefficients are stable across normal refits — re-run only
            when one of these foundational inputs changes:
-             · `holisticyearLength` (H) — the H-lattice whitelist and
+             · `holisticyearLength` (the anchor) — the divisor whitelist and
                the year-multiple seed harmonics all shift with H.
              · `perihelionalignmentYear` or `balancedYear` — the phase
                anchor for every harmonic term moves.
@@ -380,7 +380,7 @@ Step 0:  SUN_HARMONICS_DISABLED=1 node tools/fit/sun-longitude-harmonics.js --wr
            residual's MEAN component, not the amplitude coefficients).
 
          Output: ~7" RMS scene-graph Sun vs Meeus Ch.25 in the modern
-         window (1900-2100; down from 198" raw). Three H-lattice-compliant
+         window (1900-2100; down from 198" raw). Three whitelist-compliant
          terms survive the runtime filter (1 yr, ½ yr, ⅓ yr); legacy
          [168] term is silently filtered. See "Step 6f legacy reference"
          further below for the full Phase Z-B technical detail (active
@@ -455,7 +455,7 @@ Step 3:  Export from browser GUI              → data/01-holistic-year-objects-
          data; deep-time evolution is layered at runtime via the
          `mean*AtAge` helpers AFTER ML output. Exporting with deep-time
          on would bake the evolution into the coefficients, causing
-         double-counting at runtime and distorting the Fibonacci balance
+         double-counting at runtime and distorting the (retired) balance construction
          laws (Step 7c). See gating audit and `disableDeepTimeMode()`
          implementation in `src/script.js`.
 
@@ -523,7 +523,7 @@ Step 4c: python/train_precession_physical.py  → tools/lib/python/coefficients/
            python3 tools/fit/python/greedy_features_physical.py --planet venus
          Ranks candidate features by |correlation| with residuals. Used to
          identify missing physical-beat structure (e.g. the GROUP K/L terms
-         capturing 8H/N sidebands were discovered this way).
+         capturing the joint sidebands were discovered this way).
 
          The legacy 429-term trainer and its greedy feature-ranker were
          superseded by the `*_physical.py` pair above and are not shipped.
@@ -630,7 +630,7 @@ Step 6f legacy reference — see Step 0 above. The sun-longitude-harmonics
          the pipeline position has changed.
 
          sun-longitude-harmonics.js                 → SUN_LONGITUDE_MEAN + SUN_LONGITUDE_HARMONICS
-         Fits an H-lattice harmonic correction Δλ(t) to the residual
+         Fits a bounded harmonic correction Δλ(t) (anchor-divisor terms) to the residual
          between the scene-graph Sun and the Meeus Ch.25 reference Sun.
          Captures EoC residuals the analytical 2e·sin(M) + 1.25e²·sin(2M)
          misses — most importantly the year-period oscillation that comes
@@ -644,7 +644,7 @@ Step 6f legacy reference — see Step 0 above. The sun-longitude-harmonics
          divisors only:
            - Year-multiple: divisor ≥ round(H) AND divisor % round(H) === 0
              (covers 1 yr, 0.5 yr, 0.333 yr, ... up to 1/20 yr)
-           - Small precession: divisor 1..20 (Earth's Fibonacci named cycles
+           - Small precession: divisor 1..20 (Earth's named cycles
              — H/3, H/5, H/8, H/13, H/16, etc. — structurally on-lattice
              by fiat even though gcd(d, H) = 1)
            - Lunar precession: divisor ∈ {18015, 37900} (nodal/apsidal ICRF)
@@ -665,7 +665,7 @@ Step 6f legacy reference — see Step 0 above. The sun-longitude-harmonics
          planet-orbit center by up to ±25" (down from ±300" with the bad
          [168] term included) — typically invisible at normal zoom levels.
 
-         Coefficients (active under H-lattice filter):
+         Coefficients (active under the divisor whitelist):
            [335317, sin= 0.076405, cos= 0.013550]  →  1 yr period, ~280" amp
            [670634, sin= 0.002478, cos= 0.000226]  →  ½ yr period, ~9" amp
            [1005951, sin= 0.000033, cos= 0.000009] →  ⅓ yr period, ~0.1" amp
@@ -773,7 +773,7 @@ Step 7d: verify-laws.js                       → pass/fail
          gaps, see tools/verify/dual-balance-optimizer.js and doc 19.
 
 Step 7e: fibonacci_significance.py            → data/significance-results.json
-         Monte Carlo + permutation significance test for the Fibonacci structure.
+         Monte Carlo + permutation significance test for the historical integer-ratio structure (retired framing; kept as the record).
          11 tests across 3 null distributions (permutation, log-uniform MC,
          uniform MC); 100,000 trials per MC null. Of the 11 tests, 7 are
          structural (5 multiset-invariant under permutation + 2 tautological —
@@ -866,12 +866,13 @@ Step 11 (= pipeline step 7c — the runner executes it in a normal pass;
          → data/deltaT-4flag-fit.json + resonator JSON + deltaTStart
          (JOINT WORLD — authoritative; the cascade description below is the
          legacy diagnostic path, retained for its stage-wise instrumentation)
-         Cascaded LSQ fit of the sub-Milankovitch 8H-lattice ΔT correction stack
+         Cascaded LSQ fit of the sub-Milankovitch harmonic ΔT correction stack
+         (lines labelled by their divisor n of the anchor's eight-unit interval)
          against the Stephenson 2016 residual over years -720 → 2016:
-           Stage A: Bond 8H/1830 solo (unconstrained; the primary anchor)
-           Stage B: Bond + Hallstatt 8H/1104 joint; Hallstatt cap-only to 80 s
-           Stage C: Bond + Hallstatt + Jose5 8H/2989 joint; Jose5 cap-only to 50 s
-           Stage D: + Jose4 8H/3749 (4×Jose 715 yr); free-fit 35 s (below 50 s prior — no cap)
+           Stage A: Bond (n=1830, 1466 yr) solo (unconstrained; the primary anchor)
+           Stage B: Bond + Hallstatt (n=1104, 2430 yr) joint; Hallstatt cap-only to 80 s
+           Stage C: Bond + Hallstatt + Jose5 (n=2989, 897 yr) joint; Jose5 cap-only to 50 s
+           Stage D: + Jose4 (n=3749; 4×Jose 715 yr); free-fit 35 s (below 50 s prior — no cap)
          The DT_CORRECTIONS_DISABLED=1 env var makes tools/lib/deep-time.js
          return the pure-tidal framework ΔT, so the sampled residual is the
          absolute fit target — without it the residual would be a DELTA on
@@ -891,13 +892,13 @@ Step 11 (= pipeline step 7c — the runner executes it in a normal pass;
          dashboard's model-values snapshot.
 
          Candidate identification: `scripts/lattice_harmonic_scan.py` cross-
-         validates 8H-lattice divisors against multiple paleoclimate archives
+         validates harmonic divisors against multiple paleoclimate archives
          (Steinhilber solar Φ, Stephenson ΔT, Cheng speleothem, EPICA CO2,
          LR04). Jose4 was selected as the tightest structural anchor
          (0.083% to 4×Jose) with cross-archive coherence in Steinhilber + EPICA.
 
-         Rollback history (research trail): Eddy (8H/2684, 999 yr) and Emp862
-         (8H/3111, 862 yr) were tested as 5th/6th flags and rolled back —
+         Rollback history (research trail): Eddy (n=2684, 999 yr) and Emp862
+         (n=3111, 862 yr) were tested as 5th/6th flags and rolled back —
          Eddy caused L-5b regression via Bond-amp inflation; Emp862 made the
          6-cycle fit rank-deficient. Both are documented in the fit tool's
          CONFIG.cycles rollback comments and preserved as research artifacts
@@ -952,7 +953,7 @@ authoritative runtime version.
 | `earthInvPlaneInclinationAmplitude` | 1, 3→4d, 6a (record CSV) + ⚠ FROZEN-CLOCK COUPLED (see "The frozen era clock") |
 | `earthInvPlaneInclinationMean` | 3, 6a (record CSV) + ⚠ FROZEN-CLOCK COUPLED (see "The frozen era clock") |
 | `correctionSun` | 1, 6a (record CSV) + ⚠ FROZEN-CLOCK COUPLED (see "The frozen era clock") |
-| `SUN_LONGITUDE_HARMONICS` / `SUN_LONGITUDE_MEAN` | **Step 0 is the source.** Re-run Step 0 (`SUN_HARMONICS_DISABLED=1 node tools/fit/sun-longitude-harmonics.js --write`) when any of these change: (a) `holisticyearLength` — the H-lattice divisor whitelist and the year-multiple seed harmonics all shift; (b) `perihelionalignmentYear` or `balancedYear` — the phase anchor moves; (c) `eccentricityBase` / `eccentricityAmplitude` — the ~8% Meeus vs framework eccentricity gap shifts, changing the ~280" annual harmonic amplitude; (d) `moonApsidalPrecessionDaysInputICRF` / `moonNodalPrecessionDaysInputICRF` — the auto-derived N_apsidal / N_nodal divisors on the whitelist shift; (e) `_eclSunLon` (Meeus Ch.25) or `_meeusMoonLon` change; (f) `SUN_HARMONICS_ENABLED` toggles between framework-native and Meeus-parity mode. After Step 0 --write, re-run the full pipeline (1 → 2 → … → 9) so all downstream steps re-calibrate against the new Sun frame. The harmonics are NOT re-fit as part of ordinary refits. Runtime H-lattice filter automatically skips design-rule-violating divisors. |
+| `SUN_LONGITUDE_HARMONICS` / `SUN_LONGITUDE_MEAN` | **Step 0 is the source.** Re-run Step 0 (`SUN_HARMONICS_DISABLED=1 node tools/fit/sun-longitude-harmonics.js --write`) when any of these change: (a) `holisticyearLength` — the anchor-divisor whitelist and the year-multiple seed harmonics all shift; (b) `perihelionalignmentYear` or `balancedYear` — the phase anchor moves; (c) `eccentricityBase` / `eccentricityAmplitude` — the ~8% Meeus vs framework eccentricity gap shifts, changing the ~280" annual harmonic amplitude; (d) `moonApsidalPrecessionDaysInputICRF` / `moonNodalPrecessionDaysInputICRF` — the auto-derived N_apsidal / N_nodal divisors on the whitelist shift; (e) `_eclSunLon` (Meeus Ch.25) or `_meeusMoonLon` change; (f) `SUN_HARMONICS_ENABLED` toggles between framework-native and Meeus-parity mode. After Step 0 --write, re-run the full pipeline (1 → 2 → … → 9) so all downstream steps re-calibrate against the new Sun frame. The harmonics are NOT re-fit as part of ordinary refits. The runtime divisor-whitelist filter automatically skips design-rule-violating divisors. |
 | ~~Sun T² polynomial (inline in `moveModel`)~~ | **REMOVED 2026-06** — violates design rule (polynomial-in-T not cyclic). Do not re-introduce. |
 | `eccentricityBase` / `eccentricityAmplitude` | **0, 1, 3→4a, 6a (record CSV) + ⚠ FROZEN-CLOCK COUPLED (see "The frozen era clock")** (re-fit Step 0 because eccentricity gap definition changed; then re-run pipeline) |
 | `correctionDays` | 3, 6a (record CSV) + ⚠ FROZEN-CLOCK COUPLED (see "The frozen era clock") |
@@ -964,7 +965,7 @@ authoritative runtime version.
 | `perihelionalignmentYear` | 1, 3→4a, 6a (record CSV) + ⚠ FROZEN-CLOCK COUPLED (see "The frozen era clock") |
 | `stepYears` | Must divide H evenly. Affects 4a→4d, 6a (record CSV) + ⚠ FROZEN-CLOCK COUPLED (see "The frozen era clock") (downsampling) |
 | `siderealYearJ2000` (in yearLengthRef) | Derived: `meansiderealyearlengthinSeconds = siderealYearJ2000 × 86400` |
-| Bond / Hallstatt / Jose5 / Jose4 `_LATTICE_N` (divisor of 8H) | Step 11 (= 7c; independent of the orbital steps). The 4-flag ΔT stack has no upstream dependency on Steps 1–10; the fit re-runs against the Stephenson residual, reaches `src/script.js` and `tools/lib/deep-time.js` through the JSON (Step 9 / direct read), and the website via the republished `@essrt/physics` (see "Publishing to the website"). |
+| Bond / Hallstatt / Jose5 / Jose4 `_LATTICE_N` (divisor of the anchor's eight-unit interval) | Step 11 (= 7c; independent of the orbital steps). The 4-flag ΔT stack has no upstream dependency on Steps 1–10; the fit re-runs against the Stephenson residual, reaches `src/script.js` and `tools/lib/deep-time.js` through the JSON (Step 9 / direct read), and the website via the republished `@essrt/physics` (see "Publishing to the website"). |
 | `_TAPER_FULL_HALFWIDTH_YR` / `_TAPER_TOTAL_HALFWIDTH_YR` (Holocene taper) | None — the taper is applied at runtime and does not affect the shipped cos/sin coefficients. Verify L-5b after change. |
 | Stephenson polynomial (`public/input/stephenson-2016-deltaT-polynomial.json`) | Step 11 (= 7c). Fit target changed → all four cycles re-fit. |
 
