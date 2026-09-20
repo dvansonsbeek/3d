@@ -63,9 +63,9 @@ now dynamical outputs of the chains. Earth's kinematic identities
 axial-precession period at deep time scales with the day length alone.
 Retired at plan 06 D6/Phase 3. The physical rate is the composed
 lunisolar rate ψ̇(t) = [ω(t)/ω₀]·p₀·[f_S + (1 − f_S)(a₀/a_M(t))³] — the
-lunar torque grows as the Moon was closer — and H(t) is now defined as
-13 of those periods at every epoch (`deltat/deep-time.cjs hAtAge`, one
-formula home `earth/precession-composed`). The record that decided it:
+lunar torque grows as the Moon was closer — and the internal unit H(t)
+scales with that period (`deltat/deep-time.cjs hAtAge`, one formula home
+`earth/precession-composed`). The record that decided it:
 against the Precambrian precession constants the spin-only clock read
 65.2 ″/yr where Meyers & Malinverno 2018 (Xiamaling, 1.4 Ga) measured
 85.79 ± 2.72, and 70.9 where Lantink et al. 2022 (Joffre, 2.46 Ga)
@@ -74,7 +74,31 @@ composed rate reads 86.5 and 104.5 (both inside 1σ; paleo-anchors gate
 rows `xiamaling-prec-1400` / `lantink-prec-2460`, which the spin-only
 recipe fails). At 650 Ma Wu et al. 2024 infer 67.64: composed 67.8,
 spin-only 58.6. The obliquity-beat keys that rode it read 24.9 kyr at
-2.46 Ga where the composed beat reads 15.1. The formula survives in one
+2.46 Ga where the composed beat reads 15.1.
+
+**"H = 13 × the axial precession period"** (the H/13 identity stated as a
+J2000 fact, "T_p = H/13 = 25,793.6 yr"): retired at plan 06 S5 — one J2000
+precession reading. H₀ = 335,317 was fitted on the 1246 AD
+perihelion–solstice alignment plus the J2000 longitude of perihelion, the
+perihelion-of-date beat, not on the axial rate; H₀/13 = 25,793.6 yr is
+therefore the fit anchor's reading, 0.086 % slower than the model's own
+J2000 period, 25,771.4 yr (the certified of-date year laws' beat, IAU
+50.2879 ″/yr to 8×10⁻⁶), and is not a period of anything the model
+computes — nor a window mean (the published period averages 25,598 yr
+over ±26 kyr, 25,641 over one unit around the balanced year). The composed
+clock's anchor p₀, the hybrid's self-anchor and every published face (the
+`lunisolar` surface, the registry's `axialPrec*`/`lunisolar*`/`obliqBeat*`
+keys, the panels, the API) now read the derived value; the unit and the
+clock scale together and their ratio H(t)/T_p(t) = 13.011 is a fit
+constant, not structure. The 13 survives only as the unit's calendar
+convention — the kinematic day/year identities on H/(H − 13) and the deep
+JD↔year calendar (`tropicalYearSecondsAtAge`), device tier, the plan-06
+Phase 6 / D2 decision. Measured on the change: the composed rate rose
+0.086 % everywhere (Xiamaling +0.94 %, Lantink −3.68 %, both inside 1σ),
+the J2000 obliquity beat moved 41.3 → 41.2 kyr, nothing certified moved
+(eclipse audit and lunar alignment reproduced bit-for-bit).
+
+The spin-only formula survives in one
 place, under its own name: `eraClockHAtAge` = H₀·LOD/LOD₀ is the FROZEN
 era clock's phase convention — the ∫dt/H phase table, the cardinal era
 clock and the year-length comb family were fitted against it and ship

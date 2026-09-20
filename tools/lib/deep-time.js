@@ -113,7 +113,23 @@ const PRECESSION_SOLAR_SHARE_J2000 = _req('@essrt/physics/earth/precession-compo
   gmMoonKm3S2: C.GM_MOON_ALONE, moonDistanceKm: C.moonDistance, moonEccentricity: C.moonOrbitalEccentricity,
   moonInclinationDeg: C.moonEclipticInclinationJ2000,
 });
-const PRECESSION_RATE_J2000_ARCSEC_PER_YR = 1296000 / (C.H / 13);
+// THE J2000 precession anchor (plan 06 S5 — one J2000 precession reading):
+// the certified of-date year laws at 2000, sid/(sid − trop) = 25,771.4 yr =
+// 50.2883 ″/yr (IAU 50.2879 to 8×10⁻⁶) — the browser's Direct twins. ONE
+// home here: the composed clock's p₀ (deep-time factory dep below) and the
+// registry read it. The former constant 1,296,000/(H/13) = 50.245 was the
+// fit anchor's reading (H₀ fitted on the perihelion-of-date beat), not a
+// period. Lazy + memoized: the Direct laws read the factory's bases.
+let _certifiedAxial0 = null;
+function certifiedAxialPrecessionJ2000Years() {
+  if (_certifiedAxial0 === null) {
+    const sid = computeSiderealYearDaysDirect(2000), sol = computeSolarYearDaysDirect(2000);
+    _certifiedAxial0 = sid / (sid - sol);
+  }
+  return _certifiedAxial0;
+}
+/** The model's J2000 axial-precession rate, ″/yr (1,296,000/axial0; S5). */
+function precessionRateJ2000ArcsecPerYr() { return 1296000 / certifiedAxialPrecessionJ2000Years(); }
 
 // Earth mass, moments
 const M_EARTH_ALONE = C.GM_EARTH_ALONE / C.G_CONSTANT;
@@ -316,6 +332,8 @@ function _deepLod() {
       },
       moonDistanceMetresAtAge: meanMoonDistanceMetresAtAge,
       moiFactorAtAge: earthMoiFactorAtAge,
+      // S5: the composed clock's J2000 anchor — the certified year laws' beat at 2000 (lazy)
+      precessionPeriodJ2000YearsFn: certifiedAxialPrecessionJ2000Years,
       siderealYearDaysFourierAt: _evalSiderealYearFourierIAU,
       cycleLodSumAt: dtCycleLodCorrectionSum,
       swingLodAt: resonatorSwingLodCorrection,
@@ -365,13 +383,14 @@ function meanHAtAge(t_Ma) { return _deepLod().hAtAge(t_Ma); }
 // H(t) is the UNIT: 13 × the composed lunisolar precession period
 // ψ̇(t) = [ω(t)/ω₀]·p₀·[f_S + (1 − f_S)(a₀/a_M(t))³] (ONE formula home:
 // @essrt/physics/earth/precession-composed, built inside the deep-time
-// factory), so meanHAtAge(t)/13 IS the precession period at every epoch.
+// factory), p₀ the derived J2000 rate (S5: 25,771.4 yr, NOT H₀/13 —
+// the unit scales with the period, H(t)/T_p(t) = 13.011, a fit constant).
 // The frozen era clock's counter H_era = H₀·LOD/LOD₀ (pure spin scaling —
 // the pre-Phase-3 reading) is exported under its own name for the devices
 // fitted against it (the ∫dt/H phase table, the cardinal era clock, the
 // year-length comb family): two named counters (D8), never one name.
 function meanLunisolarPrecessionRateArcsecPerYrAtAge(t_Ma) { return _deepLod().lunisolarPrecessionRateArcsecPerYrAtAge(t_Ma); }
-function meanLunisolarPrecessionPeriodYearsAtAge(t_Ma) { const H = meanHAtAge(t_Ma); return H === null ? null : H / 13; }
+function meanLunisolarPrecessionPeriodYearsAtAge(t_Ma) { return _deepLod().lunisolarPrecessionPeriodYearsAtAge(t_Ma); }
 function eraClockHAtAge(t_Ma) { return _deepLod().eraClockHAtAge(t_Ma); }
 function eraClockTropicalYearSecondsAtAge(t_Ma) { return _deepLod().eraClockTropicalYearSecondsAtAge(t_Ma); }
 function eraClockYearInDaysAtAge(t_Ma) { return _deepLod().eraClockYearInDaysAtAge(t_Ma); }
@@ -1478,7 +1497,7 @@ module.exports = {
   // frozen era clock's named counter + bases (device tier, D8)
   meanLunisolarPrecessionRateArcsecPerYrAtAge, meanLunisolarPrecessionPeriodYearsAtAge,
   eraClockHAtAge, eraClockTropicalYearSecondsAtAge, eraClockYearInDaysAtAge,
-  PRECESSION_SOLAR_SHARE_J2000, PRECESSION_RATE_J2000_ARCSEC_PER_YR,
+  PRECESSION_SOLAR_SHARE_J2000, precessionRateJ2000ArcsecPerYr, certifiedAxialPrecessionJ2000Years,
   // Driver 2
   meanAuAtAge, meanSiderealYearSecondsAtAge, meanTropicalYearSecondsAtAge,
   meanTropicalYearDaysAtAge, meanYearInDaysAtAge,

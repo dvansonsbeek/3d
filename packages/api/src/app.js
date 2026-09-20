@@ -99,7 +99,9 @@ export function createApi() {
 
   /** Derivations metadata: structural explanation per quantity (§7 "derivations"). */
   const DERIVATIONS = Object.freeze({
-    axialPrecession: { formula: 'H / 13', latticeDivisor: 13, periodYears: model.computeLatticePeriodsYears().axialPrecessionPeriodYears, doc: 'docs/10-fibonacci-laws.md', registryKey: 'axialPrecYears' },
+    // S5 (plan 06): the PERIOD is the model's one J2000 precession reading — the certified year laws' beat
+    // at 2000 (25,771.4 yr ≈ IAU); the H/13 lattice reading (25,793.6) is the fit anchor's, retired as a period.
+    axialPrecession: { formula: 'T_p(J2000) = sid/(sid − trop), the of-date year laws at 2000 (lattice label H/13 retired as a period)', latticeDivisor: 13, periodYears: model.epoch.axialPrecessionYearsAtYear(2000), doc: 'docs/110-calculation-map.md', registryKey: 'axialPrecYears' },
     inclinationPrecession: { formula: 'H / 3', latticeDivisor: 3, periodYears: model.computeLatticePeriodsYears().inclinationPrecessionPeriodYears, doc: 'docs/10-fibonacci-laws.md', registryKey: 'inclPrecYears' },
     perihelionPrecession: { formula: 'H / 16', latticeDivisor: 16, periodYears: model.computeLatticePeriodsYears().perihelionPrecessionPeriodYears, doc: 'docs/10-fibonacci-laws.md', registryKey: 'periPrecYears' },
     eclipticPrecession: { formula: 'H / 5', latticeDivisor: 5, periodYears: null, doc: 'docs/10-fibonacci-laws.md', registryKey: 'eclPrecYears' },

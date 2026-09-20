@@ -63,6 +63,15 @@ export type DeepTimeLodDeps = {
      */
     swingLodRateAt: (year: number) => number;
     /**
+     * - the model's DERIVED
+     * J2000 axial precession period: the certified year-length laws' beat at
+     * 2000, sid/(sid − trop) ≈ 25,771.4 yr (plan 06 S5 — one J2000 precession
+     * reading; the same anchor the hybrid obliquity self-anchors on). Read
+     * LAZILY on the first composed-rate use, never at construction: every
+     * runtime's year laws read THIS factory's bases.
+     */
+    precessionPeriodJ2000YearsFn: () => number;
+    /**
      * - OPTIONAL time-dependent
      * Earth-Moon angular momentum (the Driver-1½ solar channels,
      * recession-history.cjs). Absent → the J2000 constant, which the budget
@@ -99,6 +108,12 @@ export type DeepTimeLodDeps = {
  * @property {(year: number) => number} cycleLodSumAt - gated δLOD sum (incl. swing)
  * @property {(year: number) => number} swingLodAt - gated swing δLOD alone
  * @property {(year: number) => number} swingLodRateAt - gated analytic swing rate
+ * @property {() => number} precessionPeriodJ2000YearsFn - the model's DERIVED
+ *   J2000 axial precession period: the certified year-length laws' beat at
+ *   2000, sid/(sid − trop) ≈ 25,771.4 yr (plan 06 S5 — one J2000 precession
+ *   reading; the same anchor the hybrid obliquity self-anchors on). Read
+ *   LAZILY on the first composed-rate use, never at construction: every
+ *   runtime's year laws read THIS factory's bases.
  * @property {(tMa: number) => number} [lEmAtAgeKgm2S] - OPTIONAL time-dependent
  *   Earth-Moon angular momentum (the Driver-1½ solar channels,
  *   recession-history.cjs). Absent → the J2000 constant, which the budget
@@ -111,6 +126,7 @@ export function createDeepTimeLod(deps: DeepTimeLodDeps): {
     lodHoursAtAge: (t_Ma: number) => number | null;
     hAtAge: (t_Ma: number) => number | null;
     lunisolarPrecessionRateArcsecPerYrAtAge: (t_Ma: number) => number | null;
+    lunisolarPrecessionPeriodYearsAtAge: (t_Ma: number) => number | null;
     lunarTorqueFactorAtAge: (tMa: number) => (number | null);
     precessionTorqueTermAtAge: (tMa: number) => (number | null);
     siderealYearSecondsAtAge: (t_Ma: number) => number;

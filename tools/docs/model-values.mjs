@@ -408,14 +408,22 @@ export const VALUES = {
   ...hDivisor('inclPrec', 3, 'apsidal precession (key keeps the historical inclPrec name)'),
   ...hDivisor('eclPrec', 5, 'ecliptic precession'),
   ...hDivisor('obliqCycle', 8, 'obliquity cycle'),
-  ...hDivisor('axialPrec', 13, 'axial precession', 2),
+  // S5 (plan 06): the axial precession period is the model's ONE J2000 reading — the certified
+  // year laws' beat at 2000 (route B, 25,771.4 yr ≈ IAU 25,771.6) — never H/13 (25,793.6, the fit
+  // anchor's reading; H₀ was fitted on the perihelion-of-date beat). Key names kept (P4).
+  axialPrecYears: {
+    get: () => oneYL().axialPrecessionYearsAtYear(2000),
+    render: (v) => thousands(v, 2),
+    unit: 'yr',
+    note: 'axial precession period at J2000 — the of-date year laws’ beat (one-family route), the model’s one J2000 precession reading (S5)',
+  },
   ...hDivisor('periPrec', 16, 'perihelion precession'),
   // Two cycles the website also surfaces at the other rounding.
   axialPrecRound: {
-    get: () => C.H / 13,
+    get: () => oneYL().axialPrecessionYearsAtYear(2000),
     render: (v) => `~${thousands(Math.round(v))}`,
     unit: 'yr',
-    note: 'axial precession, whole years (axialPrecYears carries 2dp)',
+    note: 'axial precession at J2000, whole years (axialPrecYears carries 2dp) — the of-date reading, not H/13 (S5)',
   },
   periPrecYearsExact: {
     get: () => C.H / 16,
@@ -1693,8 +1701,8 @@ export const VALUES = {
       apoRadius:        { get: apoRadius, render: (v) => thousands(v, 2), unit: 'km' },
       apoDiameter:      { get: () => 2 * apoRadius(), render: (v) => thousands(v, 2), unit: 'km' },
       apoCircumference: { get: () => 2 * Math.PI * apoRadius(), render: (v) => thousands(v, 2), unit: 'km' },
-      apoSpeed:         { get: () => (2 * Math.PI * apoRadius()) / ((C.H / 13) * 24 * 365.25), render: (v) => thousands(v, 10), unit: 'km/h', note: 'wobble-circle speed over the H/13 cycle (Julian-year hours)' },
-      apoSpeedKmYear:   { get: () => (2 * Math.PI * apoRadius()) / (C.H / 13), render: (v) => thousands(v, 0), unit: 'km/yr' },
+      apoSpeed:         { get: () => (2 * Math.PI * apoRadius()) / (oneYL().axialPrecessionYearsAtYear(2000) * 24 * 365.25), render: (v) => thousands(v, 10), unit: 'km/h', note: 'wobble-circle speed over one axial precession period at J2000 (Julian-year hours; S5: the of-date period, not H/13)' },
+      apoSpeedKmYear:   { get: () => (2 * Math.PI * apoRadius()) / oneYL().axialPrecessionYearsAtYear(2000), render: (v) => thousands(v, 0), unit: 'km/yr' },
     };
   })(),
 
@@ -1830,7 +1838,9 @@ export const VALUES = {
     const composedAt = (ageMa) => dtl().meanLunisolarPrecessionRateArcsecPerYrAtAge(ageMa);
     const out = {
       earthPrecSolarShareJ2000Pct: { get: () => 100 * dtl().PRECESSION_SOLAR_SHARE_J2000, render: (v) => Number(v).toFixed(1), unit: '%', note: 'solar fraction of Earth’s J2000 precession torque, derived from the shared constants (the W3 split; the lunar part is the rest)' },
-      earthPrecRateJ2000ArcsecPerYr: { get: () => dtl().PRECESSION_RATE_J2000_ARCSEC_PER_YR, render: (v) => Number(v).toFixed(1), unit: '″/yr', note: 'the model’s J2000 axial-precession rate, 1,296,000 / (H/13)' },
+      earthPrecRateJ2000ArcsecPerYr: { get: () => dtl().precessionRateJ2000ArcsecPerYr(), render: (v) => Number(v).toFixed(1), unit: '″/yr', note: 'the model’s J2000 axial-precession rate — 1,296,000/T_p(J2000), the certified year laws’ beat at 2000 (S5; IAU 50.2879)' },
+      earthPrecSolarJ2000ArcsecPerYr: { get: () => dtl().precessionRateJ2000ArcsecPerYr() * dtl().PRECESSION_SOLAR_SHARE_J2000, render: (v) => Number(v).toFixed(1), unit: '″/yr', note: 'the solar torque’s share of the J2000 rate, f_S · ψ̇₀ (S5 — replaces the hand split 16.8/33.4 of doc 99)' },
+      earthPrecLunarJ2000ArcsecPerYr: { get: () => dtl().precessionRateJ2000ArcsecPerYr() * (1 - dtl().PRECESSION_SOLAR_SHARE_J2000), render: (v) => Number(v).toFixed(1), unit: '″/yr', note: 'the lunar torque’s share of the J2000 rate, (1 − f_S) · ψ̇₀' },
     };
     for (const age of [650, 1400, 2460]) {
       out[`earthPrecComposed${age}MaArcsecPerYr`] = { get: () => composedAt(age), render: (v) => Number(v).toFixed(1), unit: '″/yr', note: `the two engines composed at ${age} Ma: ω(t) × (solar torque + lunar torque on the recession history), μ = 1 — the model’s ψ̇(t), = 1,296,000·13/H(t) on the unit (plan 06 D6/Phase 3)` };
@@ -1838,15 +1848,17 @@ export const VALUES = {
     return out;
   })(),
 
-  // ── The lunisolar clock's ratios (plan 06 Phase 3 S3) ───────────────────
-  // Spoken in periods and ratios — no unit, no integer: T_aps/T_p (the
-  // apsidal period, from the engine-D chain's secular tangent — the SAME
-  // helper the Prec. cell and the one-family anomalistic use — in mean
-  // lunisolar precession periods) and T_peri/T_p with T_peri = 1/(1/T_p +
-  // 1/T_aps) the perihelion-of-date period (frame arithmetic at every
-  // epoch). That they read 13/3 and 13/16 today is the J2000 reading. The
-  // wander keys are the owner's by-hand finding, measured: over ±26 kyr the
-  // ratio is nowhere pinned.
+  // ── The lunisolar clock's ratios (plan 06 Phase 3 S3 → S5) ─────────────
+  // Spoken in periods and ratios — no unit, no integer. T_p is the
+  // PUBLISHED of-date precession period (the one-family route, 25,771.4 at
+  // J2000 — the model's one J2000 reading; S5 retired the H/13 value
+  // 25,793.6 here: it was the fit anchor's reading, not a period). T_aps/T_p
+  // (the apsidal period, from the engine-D chain's secular tangent — the
+  // SAME helper the Prec. cell and the one-family anomalistic use) and
+  // T_peri/T_p with T_peri = 1/(1/T_p + 1/T_aps) the perihelion-of-date
+  // period (frame arithmetic at every epoch). The wander keys are the
+  // owner's by-hand finding, measured: over ±26 kyr the ratio is nowhere
+  // pinned.
   ...(() => {
     let chainsM = null;
     const chains = () => {
@@ -1858,7 +1870,7 @@ export const VALUES = {
       return chainsM;
     };
     const tApsYr = (y) => { const c = chains(); return 360 / c.KC.computeApsidalSecularDegPerYr(y, c.ch.earth, c.ch); };
-    const tPYr = (y) => dtl().meanLunisolarPrecessionPeriodYearsAtAge((2000 - y) / 1e6);
+    const tPYr = (y) => oneYL().axialPrecessionYearsAtYear(y);   // the published of-date T_p (S5)
     const apsPerPrec = (y) => tApsYr(y) / tPYr(y);
     const periPerPrec = (y) => { const tp = tPYr(y), ta = tApsYr(y); return (1 / (1 / tp + 1 / ta)) / tp; };
     let wander = null;
@@ -1871,12 +1883,12 @@ export const VALUES = {
       return wander;
     };
     return {
-      lunisolarPeriodJ2000Yr: { get: () => tPYr(2000), render: (v) => thousands(v, 1), unit: 'yr', note: 'the mean lunisolar precession period T_p at J2000 — the composed torque rate’s period, the model’s spin clock' },
-      lunisolarApsidalPerPrecessionJ2000: { get: () => apsPerPrec(2000), render: (v) => Number(v).toFixed(3), note: 'T_aps/T_p at J2000 — the perihelion’s period against the stars (the chain’s secular apsidal tangent) in mean precession periods; a fitted J2000 reading, not a law' },
+      lunisolarPeriodJ2000Yr: { get: () => tPYr(2000), render: (v) => thousands(v, 1), unit: 'yr', note: 'the lunisolar precession period T_p at J2000 — the model’s ONE J2000 precession reading (the of-date year laws’ beat, ≡ the composed clock’s anchor; IAU 25,771.6). S5: the former 25,793.6 was H/13, the fit anchor’s reading' },
+      lunisolarApsidalPerPrecessionJ2000: { get: () => apsPerPrec(2000), render: (v) => Number(v).toFixed(3), note: 'T_aps/T_p at J2000 — the perihelion’s period against the stars (the chain’s secular apsidal tangent) in of-date precession periods; a J2000 reading, not a law' },
       lunisolarPeriOfDatePerPrecessionJ2000: { get: () => periPerPrec(2000), render: (v) => Number(v).toFixed(4), note: 'T_peri/T_p at J2000, T_peri = 1/(1/T_p + 1/T_aps) the perihelion-of-date period (equinox precession + inertial perihelion motion — frame arithmetic at every epoch)' },
       lunisolarApsidalPerPrecessionWanderMin: { get: () => wanderScan().mn, render: (v) => Number(v).toFixed(2), note: 'minimum of T_aps/T_p over ±26 kyr (500-yr scan) — the ratio is not pinned' },
       lunisolarApsidalPerPrecessionWanderMax: { get: () => wanderScan().mx, render: (v) => Number(v).toFixed(2), note: 'maximum of T_aps/T_p over ±26 kyr (500-yr scan)' },
-      lunisolarTorqueConstantJ2000ArcsecPerYr: { get: () => (1296000 / (C.H / 13)) / Math.cos((astro.earthOrbital.obliquityJ2000_deg * Math.PI) / 180), render: (v) => Number(v).toFixed(3), unit: '″/yr', note: 'the hybrid’s precession constant α = p₀ / cos ε₀ (p₀ = 1,296,000/(H/13)); literature ≈ 54.9' },
+      lunisolarTorqueConstantJ2000ArcsecPerYr: { get: () => (1296000 / tPYr(2000)) / Math.cos((astro.earthOrbital.obliquityJ2000_deg * Math.PI) / 180), render: (v) => Number(v).toFixed(3), unit: '″/yr', note: 'the hybrid’s precession constant α = p₀ / cos ε₀ (p₀ = 1,296,000/T_p(J2000), the derived rate — S5); literature ≈ 54.9' },
     };
   })(),
 
@@ -2157,14 +2169,14 @@ export const VALUES = {
 
   // ── The sharpened leg-1 obliquity statement (owner-adopted) ─────────────
   // The obliquity band follows the BEAT 2π/(ψ̇(t) − |s₃|): the spin
-  // precession ψ̇(t) the COMPOSED lunisolar rate (plan 06 D6/Phase 3 — the
-  // tidal-mean year pair's beat, which on the unit H(t) = 13·T_p IS the
-  // composed period, the SAME scaling the shipped hybrid precesses on), s₃
-  // at its dynamical value under the measured μ ≈ 1 (engine D). Degenerate
-  // today with the pure precession-scaling reading "obliquity period ∝ T_p"
-  // (T_p·13/8 — the `obliqH8Scaled*Kyr` keys, name kept, D8 (iii)); the two
-  // split at Precambrian ages — the pre-registered fork (plan 02 §8; doc 109
-  // §18).
+  // precession ψ̇(t) the COMPOSED lunisolar rate (plan 06 D6/Phase 3 → S5:
+  // on the derived J2000 anchor, 50.2883 ″/yr — the SAME scaling the
+  // shipped hybrid precesses on), s₃ at its dynamical value under the
+  // measured μ ≈ 1 (engine D). The pre-registered alternative "obliquity
+  // period ∝ T_p" (the `obliqH8Scaled*Kyr` keys, name kept, D8 (iii)) holds
+  // the J2000 beat proportional to T_p(t) — identical to the beat at J2000
+  // by construction, the two split at Precambrian ages (plan 02 §8; doc 109
+  // §18). S5 retired the former T_p·13/8 (= H/8) reading of that fork.
   ...(() => {
     const DT = () => require(join(ROOT, 'tools', 'lib', 'deep-time.js'));
     const s3 = () => {
@@ -2173,17 +2185,14 @@ export const VALUES = {
         .sort((a, b) => Math.hypot(b.re, b.im) - Math.hypot(a.re, a.im))[0];
       return Math.abs(z.omegaRadPerYr * 180 / Math.PI) * 3600;   // ″/yr
     };
-    const axialYr = (tMa) => {
-      const dt = DT();
-      const sid = dt.meanSiderealYearSecondsAtAge(tMa), trop = dt.meanTropicalYearSecondsAtAge(tMa);
-      return sid / (sid - trop);
-    };
-    // ψ̇(t) = 1,296,000/T_p(t) with T_p the tidal-mean year pair's beat ≡ H(t)/13 ≡ the composed period (Phase 3)
+    // T_p(t) = the composed lunisolar period on the derived J2000 anchor (S5) — ONE home
+    const axialYr = (tMa) => DT().meanLunisolarPrecessionPeriodYearsAtAge(tMa);
     const beatKyr = (tMa) => 1296000 / (1296000 / axialYr(tMa) - s3()) / 1000;
-    const h8Kyr = (tMa) => axialYr(tMa) * 13 / 8 / 1000;
+    // "obliquity period ∝ T_p": the J2000 beat held proportional to T_p(t) (≡ the beat at J2000)
+    const h8Kyr = (tMa) => beatKyr(0.000001) * axialYr(tMa) / axialYr(0.000001);
     const mk = (name, tMa, label) => ({
-      [`obliqBeat${name}Kyr`]: { get: () => beatKyr(tMa), render: (v) => Number(v).toFixed(1), unit: 'kyr', note: `the obliquity band as the BEAT 2π/(ψ̇ − |s₃|) at ${label} — ψ̇ the composed lunisolar rate (plan 06 D6/Phase 3), s₃ dynamical under measured μ (the adopted leg-1 form)` },
-      [`obliqH8Scaled${name}Kyr`]: { get: () => h8Kyr(tMa), render: (v) => Number(v).toFixed(1), unit: 'kyr', note: `the pure precession-scaling reading "obliquity period ∝ T_p" (T_p·13/8, the J2000 ratio held) at ${label} — degenerate with the beat today, the discriminated alternative at depth (identifier keeps its historical H/8 name)` },
+      [`obliqBeat${name}Kyr`]: { get: () => beatKyr(tMa), render: (v) => Number(v).toFixed(1), unit: 'kyr', note: `the obliquity band as the BEAT 2π/(ψ̇ − |s₃|) at ${label} — ψ̇ the composed lunisolar rate on the derived J2000 anchor (plan 06 D6/Phase 3/S5), s₃ dynamical under measured μ (the adopted leg-1 form)` },
+      [`obliqH8Scaled${name}Kyr`]: { get: () => h8Kyr(tMa), render: (v) => Number(v).toFixed(1), unit: 'kyr', note: `the pure precession-scaling reading "obliquity period ∝ T_p" (the J2000 beat × T_p(t)/T_p(J2000)) at ${label} — identical to the beat at J2000, the discriminated alternative at depth (identifier keeps its historical H/8 name; S5 retired the T_p·13/8 form)` },
     });
     return {
       ...mk('J2000', 0.000001, 'J2000'),
@@ -2437,8 +2446,8 @@ export const VALUES = {
       return Math.sign(n8(planet)) * 1296000 / T * 100;
     };
     const out = {
-      axialPrecExact: { get: () => C.H / 13, render: (v) => thousands(v, 2), unit: 'yr' },
-      siderealYearsPerAxialPrec: { get: () => Math.round(C.H / 13) - 1, render: (v) => thousands(v), note: 'one fewer sidereal year than tropical years per cycle (coin rotation)' },
+      axialPrecExact: { get: () => oneYL().axialPrecessionYearsAtYear(2000), render: (v) => thousands(v, 2), unit: 'yr', note: 'the J2000 of-date axial precession period (S5; was H/13)' },
+      siderealYearsPerAxialPrec: { get: () => Math.round(oneYL().axialPrecessionYearsAtYear(2000)) - 1, render: (v) => thousands(v), note: 'one fewer sidereal year than tropical years per axial precession period (coin rotation) — on the J2000 of-date period (S5; was round(H/13) − 1)' },
       saturnEclipticRateArcsec: { get: () => Math.sign(n8('saturn')) * 1296000 / ((8 * C.H) / Math.abs(n8('saturn'))), render: (v) => thousands(v, 1), unit: '″/yr' },
       saturnICRFRateArcsec: { get: () => -1296000 / ((8 * C.H) / Math.abs(n8('saturn') - 104)), render: (v) => thousands(v, 1), unit: '″/yr', note: 'ICRF divisor via the n8 − 104 frame identity' },
     };
@@ -2935,7 +2944,7 @@ export const VALUES = {
     };
     const planets7 = ['mercury', 'venus', 'mars', 'jupiter', 'saturn', 'uranus', 'neptune'];
     const out = {
-      earthAxialPeriod: { get: () => C.H / 13, render: (v) => thousands(Math.round(v)), unit: 'yr' },
+      earthAxialPeriod: { get: () => oneYL().axialPrecessionYearsAtYear(2000), render: (v) => thousands(Math.round(v)), unit: 'yr', note: 'the J2000 of-date axial precession period (S5; was H/13)' },
       earthIcrfPeriod: { get: () => (8 * C.H) / Math.abs(n8('earth') - 104), render: (v) => thousands(Math.round(v)), unit: 'yr', note: 'prograde — the only positive sign in the family' },
     };
     for (const p of planets7) {
@@ -3085,7 +3094,7 @@ export const VALUES = {
       out[`lodAt${key}Hr`] = { get: () => dtl().meanLodSecondsAtAge(tOf()) / 3600, render: (v) => Number(v).toFixed(2), unit: 'hr' };
       out[`eightHAt${key}`] = { get: () => 8 * dtl().meanHAtAge(tOf()) / 1e6, render: (v) => Number(v).toFixed(3), unit: 'Myr' };
       out[`moonDistanceAt${key}`] = { get: () => rawMoonKm(tOf()), render: (v) => thousands(Math.round(v)), unit: 'km' };
-      out[`axialPrecAt${key}`] = { get: () => dtl().meanHAtAge(tOf()) / 13, render: (v) => thousands(Math.round(v)), unit: 'yr' };
+      out[`axialPrecAt${key}`] = { get: () => dtl().meanLunisolarPrecessionPeriodYearsAtAge(tOf()), render: (v) => thousands(Math.round(v)), unit: 'yr', note: 'the composed lunisolar precession period at this epoch (S5; was H(t)/13, 0.086 % slow)' };
       if (key !== '200MyrFuture') {
         out[`driftAt${key}Ppm`] = { get: () => driftPpm(tOf()), render: (v) => `−${Math.abs(Math.round(v))}`, unit: 'ppm' };
       }

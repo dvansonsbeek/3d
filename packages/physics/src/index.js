@@ -227,19 +227,22 @@ export const createModel = (constants = GENERATED, opts = {}) => {
     hash,
 
     /**
-     * H-lattice periods — the structural identities, in years.
+     * The fit-era lattice identities H/13, H/3, H/16, in years — DEVICE tier.
      *
-     * PURE ALGEBRA OVER THE CONTEXT. No epoch, no formula, no fit. These are
-     * the divisor relationships H/13, H/3, H/16 that define the lattice, and
-     * they exist here in Phase 5 for one reason: a hash-only counterfactual
-     * test would still pass if `createModel` ignored its argument entirely.
-     * Something has to READ the context and return a number for injection to be
-     * demonstrated end to end.
+     * PURE ALGEBRA OVER THE CONTEXT. No epoch, no formula, no fit. They exist
+     * here for one reason: a hash-only counterfactual test would still pass if
+     * `createModel` ignored its argument entirely. Something has to READ the
+     * context and return a number for injection to be demonstrated end to end.
      *
-     * The motion model is Phase 6. This is not it.
+     * These are NOT the published periods (plan 06 S5): the axial precession
+     * period is `epoch.axialPrecessionYearsAtYear` (25,771.4 yr at J2000, the
+     * of-date year laws' beat); H/13 = 25,793.6 is the fit anchor's reading,
+     * 0.086 % slow — H₀ was fitted on the perihelion-of-date beat. Likewise
+     * H/3 and H/16 against the chain's apsidal and perihelion-of-date periods.
+     * The property names keep their historical form (plan 06 P4).
      *
      * `divisor` and `period` are never interchangeable (CLAUDE.md): 13 is the
-     * divisor, H/13 years is the period. The names say which.
+     * divisor, H/13 years is the identity's value. The names say which.
      *
      * @returns {{axialPrecessionPeriodYears: number, inclinationPrecessionPeriodYears: number, perihelionPrecessionPeriodYears: number}}
      */

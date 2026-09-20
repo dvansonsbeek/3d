@@ -121,11 +121,16 @@ for (const url of SAMPLE_REQUESTS) {
   // plan 06 Phase 3: H(t) is the UNIT = 13 composed lunisolar precession periods (282,329 at −380 Ma);
   // the pre-Phase-3 spin-only clock H₀·LOD/LOD₀ read 306,189 there (now the frozen era clock's counter).
   if (Math.round(dev.h) !== 282329) failures.push(`epoch H@Devonian: ${dev.h}`);
-  // plan 06 Phase 3 S2: the published of-date family is the one-family route inside ±2 Myr
-  // (≈ IAU 25,771 yr at J2000), the unit's secular mean H/13 beyond (the Devonian record).
+  // plan 06 Phase 3 S2 → S5: the published of-date family is the one-family route inside ±2 Myr
+  // (≈ IAU 25,771 yr at J2000), the composed lunisolar period on the SAME derived anchor beyond
+  // (the Devonian record). S5 retired "axial ≡ H/13": the unit and the clock scale together, so the
+  // invariant is the RATIO — T_p(Dev)/T_p(2000) ≡ H(Dev)/H(2000) — while T_p(Dev) ≠ H(Dev)/13 (0.086 %).
+  // Tolerance 1e-6: the J2000 value is route B's REALIZED beat, 3e-8 from the anchor (the hybrid
+  // self-anchor's one fixed-point step); the retired H/13 reading would miss by 8.6e-4.
   if (Math.abs(ep.axialPrecessionYears - 25771.4) > 0.5) failures.push(`epoch axialPrecessionYears@2000: ${ep.axialPrecessionYears}`);
   if (Math.abs(ep.tropicalYearSeconds - 31556925.2) > 1) failures.push(`epoch tropicalYearSeconds@2000: ${ep.tropicalYearSeconds}`);
-  if (Math.abs(dev.axialPrecessionYears - dev.h / 13) > 1e-9) failures.push(`epoch axialPrecessionYears@Devonian must be the secular mean H/13: ${dev.axialPrecessionYears} vs ${dev.h / 13}`);
+  if (Math.abs(dev.axialPrecessionYears / ep.axialPrecessionYears - dev.h / ep.h) > 1e-6) failures.push(`epoch axialPrecessionYears@Devonian must scale with the unit: ${dev.axialPrecessionYears / ep.axialPrecessionYears} vs ${dev.h / ep.h}`);
+  if (Math.abs(dev.axialPrecessionYears - dev.h / 13) < 1) failures.push(`epoch axialPrecessionYears@Devonian still reads the retired H/13: ${dev.axialPrecessionYears}`);
   const earth = dataOf('/v1/earth?year=2000').years[0];
   if (Math.abs(earth.obliquityDeg - 23.4393) > 0.0002) failures.push(`earth obliquity@2000: ${earth.obliquityDeg}`);
   const ss = dataOf('/v1/cardinal-points?year=2000&types=SS').years[0].points.SS;

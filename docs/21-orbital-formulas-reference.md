@@ -1168,7 +1168,7 @@ precessionEclipticToICRF: (ecliptic_years, reference_years) => {
 
 **Example for Mercury:**
 - Ecliptic period: ~<!--v:mercuryPeriPeriod-->243,867<!--/v--> years
-- Reference (H/13): <!--v:axialPrecRound-->~25,794<!--/v--> years
+- Reference (the J2000 axial precession period): <!--v:axialPrecRound-->~25,771<!--/v--> years
 - ICRF period: ~<!--v:mercuryPeriPeriodICRF-->28,844<!--/v--> years
 
 #### 10.2.2 ICRF to Ecliptic Transformation

@@ -17,15 +17,18 @@ export function computeSolarTorqueShare(c: {
 }): number;
 /**
  * @param {{
- *   p0ArcsecPerYr: number,
+ *   p0ArcsecPerYr: number | (() => number),
  *   solarShare: number,
  *   lodSecondsAtAge: (tMa: number) => (number | null),
  *   lodJ2000Seconds: number,
  *   moonDistanceMetresAtAge: (tMa: number) => (number | null),
  *   moonDistanceJ2000Metres: number,
  *   yearToTMa: (year: number) => number,
- * }} deps - p0 = 1,296,000/(H/13) (the model's J2000 rate); lodJ2000Seconds
- *   the SAME day basis lodSecondsAtAge(0) returns.
+ * }} deps - p0 = the model's derived J2000 rate, 1,296,000/axial0 (S5; a
+ *   number or a LAZY getter — the callers' certified year laws read the
+ *   deep-time factory this is built inside, so the anchor is resolved on
+ *   the first RATE use, never at construction; the torque term needs no
+ *   anchor); lodJ2000Seconds the SAME day basis lodSecondsAtAge(0) returns.
  * @returns {{
  *   composedRateArcsecPerYrAtAge: (tMa: number) => (number | null),
  *   composedPeriodYearsAtAge: (tMa: number) => (number | null),
@@ -39,7 +42,7 @@ export function computeSolarTorqueShare(c: {
  * }}
  */
 export function createComposedPrecession(deps: {
-    p0ArcsecPerYr: number;
+    p0ArcsecPerYr: number | (() => number);
     solarShare: number;
     lodSecondsAtAge: (tMa: number) => (number | null);
     lodJ2000Seconds: number;

@@ -37,11 +37,11 @@ export function assembleModel(C: Readonly<Record<string, any>>, F: Readonly<Reco
         tropicalYearSecondsAtYear: (year: number) => number;
     }>;
     lunisolar: Readonly<{
-        /** The mean lunisolar precession period T_p(t), years — the composed torque rate's period. @param {number} year @returns {number} */
+        /** The mean lunisolar precession period T_p(t), years — the composed torque rate's period on the derived J2000 anchor (25,771.4 at J2000). @param {number} year @returns {number} */
         meanPeriodYearsAtYear: (year: number) => number;
-        /** The composed rate ψ̇(t) = [ω/ω₀]·p₀·[f_S + (1 − f_S)(a₀/a_M)³], ″/yr. @param {number} year @returns {number} */
+        /** The composed rate ψ̇(t) = [ω/ω₀]·p₀·[f_S + (1 − f_S)(a₀/a_M)³], ″/yr (p₀ = 50.2883, derived). @param {number} year @returns {number} */
         meanRateArcsecPerYrAtYear: (year: number) => number;
-        /** The of-date period — the one-family beat inside ±2 Myr, the mean beyond. @param {number} year @returns {number} */
+        /** The of-date period — the one-family beat inside ±2 Myr, the composed mean beyond. @param {number} year @returns {number} */
         ofDatePeriodYearsAtYear: (year: number) => number;
         /** f_S, the solar fraction of the J2000 precession torque. */
         solarShareJ2000: number;
@@ -49,13 +49,13 @@ export function assembleModel(C: Readonly<Record<string, any>>, F: Readonly<Reco
         lunarTorqueFactorAtYear: (year: number) => number;
         /** f_S + (1 − f_S)(a₀/a_M)³ — the torque term the unit divides H_era by. @param {number} year @returns {number} */
         torqueTermAtYear: (year: number) => number;
-        /** The hybrid's precession constant α = p₀ / cos ε₀, ″/yr (ε₀ the J2000 obliquity input). */
+        /** The hybrid's precession constant α = p₀ / cos ε₀, ″/yr (p₀ the derived J2000 rate, ε₀ the J2000 obliquity input; 54.81). */
         torqueConstantJ2000ArcsecPerYr: number;
         /** The apsidal (perihelion vs the stars) period from the engine-D chain's secular tangent, years — inside the published window only (the tangent is an extrapolation beyond the banked series: it turns negative at −5 Myr); null beyond. @param {number} year @returns {number|null} */
         apsidalPeriodYearsAtYear: (year: number) => number | null;
-        /** T_aps(t) / T_p(t) — the apsidal period in mean precession periods (4.33 at J2000, a fitted reading; 0.84 … 9.5 across ±26 kyr, measured); null beyond the published window. @param {number} year @returns {number|null} */
+        /** T_aps(t) / T_p(t) — the apsidal period in of-date precession periods (4.33 at J2000, a reading; 0.84 … 9.9 across ±26 kyr, measured); null beyond the published window. @param {number} year @returns {number|null} */
         apsidalPerPrecessionAtYear: (year: number) => number | null;
-        /** T_peri(t) = 1/(1/T_p + 1/T_aps) — the perihelion-of-date period (equinox precession + inertial perihelion motion, frame arithmetic at every epoch), years; null beyond the published window. @param {number} year @returns {number|null} */
+        /** T_peri(t) = 1/(1/T_p + 1/T_aps) — the perihelion-of-date period (equinox precession + inertial perihelion motion, frame arithmetic at every epoch), years, on the of-date T_p; null beyond the published window. @param {number} year @returns {number|null} */
         periOfDatePeriodYearsAtYear: (year: number) => number | null;
         /** T_peri(t) / T_p(t) (0.812 at J2000 — the J2000 reading); null beyond the published window. @param {number} year @returns {number|null} */
         periOfDatePerPrecessionAtYear: (year: number) => number | null;

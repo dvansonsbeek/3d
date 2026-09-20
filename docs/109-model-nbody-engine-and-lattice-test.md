@@ -730,20 +730,21 @@ the unit H(t) IS 13 composed precession periods at every epoch, so the
 tidal-mean year pair's beat, H(t)/13 and the composed period are one
 quantity, and the rock reads it directly: the composed rate matches the
 Precambrian precession constants
-(<!--v:anchorXiamalingPrec1400Pred-->86.52<!--/v--> vs Meyers &
+(<!--v:anchorXiamalingPrec1400Pred-->86.60<!--/v--> vs Meyers &
 Malinverno 2018's 85.79 ± 2.72 ″/yr at 1.4 Ga,
-<!--v:anchorLantinkPrec2460Pred-->104.51<!--/v--> vs Lantink et al.
+<!--v:anchorLantinkPrec2460Pred-->104.60<!--/v--> vs Lantink et al.
 2022's 108.6 ± 8.5 ″/yr at 2.46 Ga — both paleo-anchors gate rows). The
 model's earlier deep-time reading, the spin-only clock
 13·1,296,000/(H₀·LOD/LOD₀), fails both rows (24 % and 35 % low) and is
 retired to `docs/retired-record.md`; it survives only as the frozen era
 clock's named phase convention. The registry keys `obliqBeat*Kyr` (the
 beat) / `obliqH8Scaled*Kyr` (name kept: the pure precession-scaling
-reading "obliquity period ∝ T_p", T_p·13/8) carry the fork at J2000, 1.4
+reading "obliquity period ∝ T_p" — the J2000 beat held proportional to
+T_p(t); plan 06 S5 retired its former T_p·13/8 form) carry the fork at J2000, 1.4
 and 2.46 Ga: today the readings are degenerate (ψ̇ ≫ s₃ — which is why
 "H/8" has always fit), while at 2.46 Ga the beat reads
 <!--v:obliqBeat2460MaKyr-->15.1<!--/v--> kyr against
-<!--v:obliqH8Scaled2460MaKyr-->20.2<!--/v--> for period ∝ T_p — a level
+<!--v:obliqH8Scaled2460MaKyr-->19.8<!--/v--> for period ∝ T_p — a level
 cyclostratigraphy can discriminate. The existing 1.4/2.46-Ga
 confirmations are precession-rate/LOD anchors; the deep-time obliquity
 PERIOD itself is undiscriminated, so this is a pre-registered prediction

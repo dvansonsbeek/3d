@@ -24,8 +24,8 @@ ESSRT's lattice is the structure of the FIRST:
   spin/tide system and expand as the Moon recedes — the axial precession
   on the COMPOSED lunisolar rate (spin × [solar + lunar torque on the
   recession history], plan 06 D6), confirmed against the rock to 2.46 Ga
-  (<!--v:anchorLantinkPrec2460Pred-->104.51<!--/v--> vs Lantink 2022's
-  108.6 ± 8.5 ″/yr at Joffre; <!--v:anchorXiamalingPrec1400Pred-->86.52<!--/v-->
+  (<!--v:anchorLantinkPrec2460Pred-->104.60<!--/v--> vs Lantink 2022's
+  108.6 ± 8.5 ″/yr at Joffre; <!--v:anchorXiamalingPrec1400Pred-->86.60<!--/v-->
   vs Meyers & Malinverno 2018's 85.79 ± 2.72 ″/yr at Xiamaling — gate
   rows), and H(t) is the UNIT of that motion: 13 composed precession
   periods at every epoch (the spin-only clock H₀·LOD/LOD₀ the model
@@ -135,10 +135,10 @@ engine K supplying ω(t) and a_moon(t), engine D's side the solar term
 
 | age | the two engines composed, ψ̇(t) = 1,296,000·13/H(t) (″/yr) | external reading |
 |---|---|---|
-| J2000 | <!--v:earthPrecRateJ2000ArcsecPerYr-->50.2<!--/v--> | IAU: 50.29 (measured) |
+| J2000 | <!--v:earthPrecRateJ2000ArcsecPerYr-->50.3<!--/v--> | IAU: 50.29 (measured) |
 | 650 Ma | **<!--v:earthPrecComposed650MaArcsecPerYr-->67.8<!--/v-->** | **Wu et al. 2024: 67.64** (cyclostratigraphic inference) |
-| 1400 Ma | **<!--v:earthPrecComposed1400MaArcsecPerYr-->86.5<!--/v-->** | **Meyers & Malinverno 2018: 85.79 ± 2.72** (Xiamaling; gate row `xiamaling-prec-1400`, <!--v:anchorXiamalingPrec1400DeltaPct-->+0.85<!--/v--> %) |
-| 2460 Ma | **<!--v:earthPrecComposed2460MaArcsecPerYr-->104.5<!--/v-->** | **Lantink et al. 2022: 108.6 ± 8.5** (Joffre; gate row `lantink-prec-2460`, <!--v:anchorLantinkPrec2460DeltaPct-->−3.76<!--/v--> %) |
+| 1400 Ma | **<!--v:earthPrecComposed1400MaArcsecPerYr-->86.6<!--/v-->** | **Meyers & Malinverno 2018: 85.79 ± 2.72** (Xiamaling; gate row `xiamaling-prec-1400`, <!--v:anchorXiamalingPrec1400DeltaPct-->+0.94<!--/v--> %) |
+| 2460 Ma | **<!--v:earthPrecComposed2460MaArcsecPerYr-->104.6<!--/v-->** | **Lantink et al. 2022: 108.6 ± 8.5** (Joffre; gate row `lantink-prec-2460`, <!--v:anchorLantinkPrec2460DeltaPct-->−3.68<!--/v--> %) |
 
 The rock-derived inferences side with the COMPOSITION: 0.2 % at 650 Ma —
 a number engine D cannot produce (it knows nothing of Earth's day length)
@@ -293,7 +293,7 @@ The same epoch-dependent scaling applies to multiple system parameters. All valu
 | Obliquity main beat (n=65) | 41.27 kyr | **37.68 kyr** | **43.40 kyr** | 8H/65 scales with H |
 | Jupiter perihelion ecliptic (8H/39) | <!--v:jupiterPeriPeriod-->68,783<!--/v--> yr | **62,808 yr** | **72,328 yr** | 8H/39 scales with H |
 | Saturn perihelion ecliptic (8H/65) | <!--v:saturnPeriPeriod-->41,270<!--/v--> yr | **37,685 yr** | **43,397 yr** | 8H/65 scales with H |
-| Earth axial precession (H/13) | <!--v:earthAxialPeriod-->25,794<!--/v--> yr | **<!--v:axialPrecAtDevonian-->21,718<!--/v--> yr** | **<!--v:axialPrecAt200MyrFuture-->28,232<!--/v--> yr** | H/13 scales with H |
+| Earth axial precession (the composed lunisolar period) | <!--v:earthAxialPeriod-->25,771<!--/v--> yr | **<!--v:axialPrecAtDevonian-->21,699<!--/v--> yr** | **<!--v:axialPrecAt200MyrFuture-->28,208<!--/v--> yr** | scales with the composed clock (spin × torque term); the unit H scales with it, H/T_p = 13.011 — not H/13 (S5) |
 | Earth obliquity cycle (H/8) | <!--v:hDiv8-->41,915<!--/v--> yr | **38,274 yr** | **44,075 yr** | H/8 scales with H |
 
 ---
@@ -991,6 +991,8 @@ For the framework: this is an honest limitation of using a single smooth polynom
 
 ### Structural vs physical axial precession at deep time
 
+> **Status (plan 06 D6 → S5).** The "structural" reading below — H(t)/13 as the axial precession period — is retired, on both counts: its deep-time scaling (spin-only; D6, `docs/retired-record.md`) and its J2000 value (H₀/13 = 25,793.6 yr was the fit anchor's reading, 0.086 % slow; the model's one J2000 precession reading is the of-date year laws' beat, <!--v:axialPrecExact-->25,771.40<!--/v--> yr — S5). The **physical** rate below is the shipped clock, with its J2000 anchor on that derived value and its modern split derived from the constants (solar share <!--v:earthPrecSolarShareJ2000Pct-->31.6<!--/v--> %). The reconciliation that follows is kept as the record of why.
+
 Wu et al. 2024 also report axial precession frequencies inferred from cyclostratigraphy: **51.25 ″/yr (present) → 67.64 ″/yr at 650 Ma** — a +32 % increase.
 
 Our framework's structural identity **H/13 = axial precession period** gives, at 650 Ma: H(650) / 13 = 22,106 yr, corresponding to <!--v:arcsecInCircle-->1,296,000<!--/v--> / 22,106 = **58.6 ″/yr** — only +14 % over modern. There is a ~9 ″/yr gap between Wu et al.'s inferred rate and our H/13-derived rate.
@@ -1005,13 +1007,13 @@ Our framework's structural identity **H/13 = axial precession period** gives, at
 
 Quantitative reconciliation at 650 Ma using the physical formula:
 
-| Contribution | Modern | 650 Ma scaling | 650 Ma value |
-|:---|---:|:---|---:|
-| Solar (constant n_S, scales with ω) | 16.8 ″/yr | × 24/20.57 = 1.167 | 19.6 ″/yr |
-| Lunar (n_M² ∝ a_moon⁻³, scales with ω × a_moon⁻³) | 33.4 ″/yr | × 1.167 × 1.230 = 1.435 | 47.9 ″/yr |
-| Total | 50.2 ″/yr | | **67.5 ″/yr** |
+| Contribution | Modern (J2000, derived from the constants) | 650 Ma scaling |
+|:---|---:|:---|
+| Solar (constant n_S, scales with ω) | <!--v:earthPrecSolarJ2000ArcsecPerYr-->15.9<!--/v--> ″/yr | × ω(t)/ω₀ |
+| Lunar (n_M² ∝ a_moon⁻³, scales with ω × a_moon⁻³) | <!--v:earthPrecLunarJ2000ArcsecPerYr-->34.4<!--/v--> ″/yr | × ω(t)/ω₀ × (a₀/a_M(t))³ |
+| Total | <!--v:earthPrecRateJ2000ArcsecPerYr-->50.3<!--/v--> ″/yr | **<!--v:earthPrecComposed650MaArcsecPerYr-->67.8<!--/v--> ″/yr** at 650 Ma (the shipped composed clock, `earth/precession-composed`) |
 
-This matches Wu et al.'s **67.64 ″/yr** within 0.2 % — the lunar 1/a_moon³ coupling closes the gap quantitatively.
+This lands on Wu et al.'s **67.64 ″/yr** to a few tenths of a percent — the lunar 1/a_moon³ coupling closes the gap quantitatively. (The earlier hand split 16.8/33.4 on a 50.2 total was the H/13-anchored reading; the values above are the registry's, one home.)
 
 **Both views are correct, depending on the question:**
 
@@ -2237,7 +2239,7 @@ Devonian short-eccentricity peaks would have been at **87.5, 98.0, 111.3 kyr** u
 **Status**: RESOLVED AGAINST view 2. The deeper record decided it: at 1.4 and 2.46 Ga the precession band moves with H while the eccentricity bands stay at their modern classes (Meyers & Malinverno 2018; Lantink et al. 2022), and the model's own N-body derives the eccentricity beats from the fixed planetary g-modes (doc 109). The Devonian datum (Da Silva 98 kyr) never discriminated — it fits the unscaled band at 2 %. The e-band's only true drift is the mass-loss tier's ∝ 1/M_Sun.
 
 ### 3. Earth axial precession period expands with H
-Devonian axial precession (H/13) should be at **<!--v:axialPrecAtDevonian-->21,718<!--/v--> yr** (vs modern <!--v:earthAxialPeriod-->25,794<!--/v--> yr).
+Devonian axial precession (H/13) should be at **<!--v:axialPrecAtDevonian-->21,699<!--/v--> yr** (vs modern <!--v:earthAxialPeriod-->25,771<!--/v--> yr).
 **Status**: Consistent with Devonian precession-band values (17.37 kyr for n=141 ≈ Meyers's 17.7 kyr within 2 %).
 
 ### 4. Future climate cycles will be slightly longer than modern
@@ -2248,7 +2250,7 @@ In 200 Myr, Earth's ~41-kyr obliquity cycle should be ~43.40 kyr (+5.2 %).
 The former prediction (the Law-6 identity holds in all epochs) is RETIRED with view 2: the planetary g-modes do not scale with H, so the identity is an exact Earth-frame statement at J2000, not an eternal lock (see the Law 6 restatement above).
 **Replacement prediction (the two-tier split itself, already twice confirmed and forward-testable)**: every newly dated Precambrian cyclostratigraphic section must show the precession band at the H(t)-predicted period (spin tier scales) while the long-eccentricity band stays at its modern class scaled only by 1/μ (mass tier) — the Kuruman count-bracket already reads μ(2.48 Ga) = 1.00 ± 0.07. A section violating either half falsifies the corresponding tier.
 
-**The obliquity band, sharpened (the two tiers meeting in one observable)**: the obliquity band is the beat of the two tiers — **2π/(ψ̇(t) − |s₃|)**, with the spin precession ψ̇ the composed lunisolar rate of the table above (plan 06 D6) and s₃ at its dynamical value under the measured μ (doc 109 §18: the hybrid derives exactly this structure). Today the beat and pure H/8-scaling are degenerate (ψ̇ ≫ |s₃| — <!--v:obliqBeatJ2000Kyr-->41.3<!--/v--> vs <!--v:obliqH8ScaledJ2000Kyr-->41.9<!--/v--> kyr, which is why "H/8" has always fit); at 2.46 Ga they split to <!--v:obliqBeat2460MaKyr-->15.1<!--/v--> vs <!--v:obliqH8Scaled2460MaKyr-->20.2<!--/v--> kyr (the latter now read as "obliquity period ∝ T_p", the pure precession-scaling alternative; H(t) being the unit, 13·T_p) — a level cyclostratigraphy can discriminate. The existing confirmations are precession-band/LOD anchors; the deep-time obliquity PERIOD itself is undiscriminated, so this beat form is the pre-registered prediction, stated before any such measurement is compared. A precisely dated Precambrian obliquity band tests it head-on.
+**The obliquity band, sharpened (the two tiers meeting in one observable)**: the obliquity band is the beat of the two tiers — **2π/(ψ̇(t) − |s₃|)**, with the spin precession ψ̇ the composed lunisolar rate of the table above (plan 06 D6) and s₃ at its dynamical value under the measured μ (doc 109 §18: the hybrid derives exactly this structure). Today the beat and pure H/8-scaling are degenerate (ψ̇ ≫ |s₃| — <!--v:obliqBeatJ2000Kyr-->41.2<!--/v--> vs <!--v:obliqH8ScaledJ2000Kyr-->41.2<!--/v--> kyr, which is why "H/8" has always fit); at 2.46 Ga they split to <!--v:obliqBeat2460MaKyr-->15.1<!--/v--> vs <!--v:obliqH8Scaled2460MaKyr-->19.8<!--/v--> kyr (the latter now read as "obliquity period ∝ T_p", the pure precession-scaling alternative; H(t) being the unit, 13·T_p) — a level cyclostratigraphy can discriminate. The existing confirmations are precession-band/LOD anchors; the deep-time obliquity PERIOD itself is undiscriminated, so this beat form is the pre-registered prediction, stated before any such measurement is compared. A precisely dated Precambrian obliquity band tests it head-on.
 
 ### 6. Earth-Moon genesis at the rigid Roche limit at the giant-impact age
 The proper-physics formula, run backwards, crosses the rigid Roche limit at **<!--v:moonDistanceAtHadean-->9,471<!--/v--> km ≈ 1.49 R_E** at ~4.498 Ga — the canonical giant-impact Moon-formation age (~4.5 Ga, isotope-dated), ~40 Myr after Patterson's Pb-Pb Earth age of 4.54 Gyr. The fluid Roche zone (~2.9 R_E) is crossed at ~4.44 Ga. No Hadean constraint was used in the fit.
@@ -2303,7 +2305,7 @@ All values from the proper-physics two-layer formula. The `H × days/yr` near-in
 | Obliquity main (n=65, kyr) | 41.27 | 39.51 | 37.68 | 43.40 |
 | Short ecc dominant (n=28, kyr) | 95.80 | 91.72 | 87.48 | 100.7 |
 | Long ecc 405 (L2, NOT scaled, kyr) | 405 | 405 | 405 | 405 |
-| Axial precession (H/13, yr) | <!--v:earthAxialPeriod-->25,794<!--/v--> | 24,695 | <!--v:axialPrecAtDevonian-->21,718<!--/v--> | <!--v:axialPrecAt200MyrFuture-->28,232<!--/v--> |
+| Axial precession (H/13, yr) | <!--v:earthAxialPeriod-->25,771<!--/v--> | 24,695 | <!--v:axialPrecAtDevonian-->21,699<!--/v--> | <!--v:axialPrecAt200MyrFuture-->28,208<!--/v--> |
 | Jupiter perihelion ecliptic (8H/39, yr — window-epoch descriptor) | <!--v:jupiterPeriPeriod-->68,783<!--/v--> | does not scale | does not scale | does not scale |
 | Saturn perihelion ecliptic (8H/65, yr — window-epoch descriptor) | <!--v:saturnPeriPeriod-->41,270<!--/v--> | does not scale | does not scale | does not scale |
 

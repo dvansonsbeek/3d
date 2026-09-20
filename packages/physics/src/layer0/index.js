@@ -149,7 +149,9 @@ export const createEpochPrimitives = ({ params: p, alphaAtAgeMa }) => {
   };
 
   /**
-   * Tropical year — sidereal less one axial-precession turn, H/13.
+   * Tropical year — sidereal less one calendar turn of the unit, 13/H(t): the
+   * unit's CALENDAR convention (plan 06 S5 — a device identity, 0.086 % from
+   * one turn per the published precession period; restating it is Phase 6/D2).
    * Falls back to the J2000 H past the asymptote, matching the shipped chain.
    * @param {number} t age in Ma
    * @returns {number} seconds

@@ -30,7 +30,7 @@ The model introduces two key gravitational centers that govern all observed prec
 This point simulates **axial precession** - Earth's historical "precession of the equinoxes."
 
 - Earth orbits this center in a **clockwise** direction
-- One complete orbit takes approximately **H/13 years** (<!--v:axialPrecRound-->~25,794<!--/v--> years; see [Constants Reference](20-constants-reference.md))
+- One complete orbit takes approximately **<!--v:axialPrecRound-->~25,771<!--/v--> years** — the axial precession period at J2000 (see [Constants Reference](20-constants-reference.md))
 - This is what causes the equinox to move westward through the zodiac
 - The mechanism involves tidal forces from the Sun and Moon acting on Earth's equatorial bulge
 

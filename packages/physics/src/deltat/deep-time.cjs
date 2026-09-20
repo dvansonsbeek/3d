@@ -68,6 +68,12 @@ const { createComposedPrecession } = require('../earth/precession-composed.cjs')
  * @property {(year: number) => number} cycleLodSumAt - gated δLOD sum (incl. swing)
  * @property {(year: number) => number} swingLodAt - gated swing δLOD alone
  * @property {(year: number) => number} swingLodRateAt - gated analytic swing rate
+ * @property {() => number} precessionPeriodJ2000YearsFn - the model's DERIVED
+ *   J2000 axial precession period: the certified year-length laws' beat at
+ *   2000, sid/(sid − trop) ≈ 25,771.4 yr (plan 06 S5 — one J2000 precession
+ *   reading; the same anchor the hybrid obliquity self-anchors on). Read
+ *   LAZILY on the first composed-rate use, never at construction: every
+ *   runtime's year laws read THIS factory's bases.
  * @property {(tMa: number) => number} [lEmAtAgeKgm2S] - OPTIONAL time-dependent
  *   Earth-Moon angular momentum (the Driver-1½ solar channels,
  *   recession-history.cjs). Absent → the J2000 constant, which the budget
@@ -117,12 +123,15 @@ function createDeepTimeLod(deps) {
     return K.holisticYearJ2000 * LOD_s / K.lodNowH13Seconds;
   }
 
-  // The unit H(t) ≡ 13 × the composed lunisolar precession period (plan 06
-  // D6 → Phase 3): ψ̇(t) = [ω(t)/ω₀]·p₀·[f_S + (1 − f_S)(a₀/a_M(t))³], p₀ =
-  // 1,296,000/(H₀/13). ONE formula home: earth/precession-composed, built
-  // here on this factory's own LOD and recession history.
+  // The composed lunisolar precession rate (plan 06 D6 → Phase 3 → S5):
+  // ψ̇(t) = [ω(t)/ω₀]·p₀·[f_S + (1 − f_S)(a₀/a_M(t))³], p₀ the model's
+  // DERIVED J2000 rate 1,296,000/axial0 (the certified year-length laws'
+  // beat at 2000 ≈ 25,771.4 yr — NOT 1,296,000/(H₀/13) = 50.245 ″/yr, the
+  // fit anchor's reading, 0.086 % slow; S5). ONE formula home:
+  // earth/precession-composed, built here on this factory's own LOD and
+  // recession history; the anchor resolves lazily on the first rate use.
   const composed = createComposedPrecession({
-    p0ArcsecPerYr: 1296000 / (K.holisticYearJ2000 / 13),
+    p0ArcsecPerYr: () => 1296000 / deps.precessionPeriodJ2000YearsFn(),
     solarShare: K.precessionSolarShareJ2000,
     lodSecondsAtAge,
     lodJ2000Seconds: K.lodNowH13Seconds,
@@ -131,11 +140,13 @@ function createDeepTimeLod(deps) {
     yearToTMa: /** @param {number} year */ (year) => (2000 - year) / 1e6,
   });
 
-  /** The unit H(t) = 13·T_p,composed(t) — H is 13 lunisolar precession periods
-   * at every epoch (plan 06: H is a UNIT). Written as H_era / [f_S + (1 − f_S)
-   * (a₀/a_M)³] — algebraically 13·1,296,000/ψ̇_composed, spelled in the SAME
-   * operations as layer0's holisticHCore so the layer0 gate holds the twins
-   * bit-identical (13·T_p differs by one ULP). ≡ H_era wherever (a₀/a_M)³ ≈ 1.
+  /** The unit H(t) = H_era / [f_S + (1 − f_S)(a₀/a_M)³] — the internal unit
+   * scales WITH the composed lunisolar precession period (H(t)/T_p(t) =
+   * H₀/axial0 = 13.011 at every epoch) but is NOT 13 of them: H₀ was fitted
+   * on the perihelion-of-date beat, and the "H = 13·T_p" claim is retired
+   * (plan 06 S5; docs/retired-record.md). Spelled in the SAME operations as
+   * layer0's holisticHCore so the layer0 gate holds the twins bit-identical.
+   * ≡ H_era wherever (a₀/a_M)³ ≈ 1. Identifier kept (plan 06 P4).
    * @param {number} t_Ma @returns {number|null} */
   function hAtAge(t_Ma) {
     const hEra = eraClockHAtAge(t_Ma);
@@ -143,10 +154,18 @@ function createDeepTimeLod(deps) {
     return hEra === null || term === null ? null : hEra / term;
   }
 
-  /** The composed lunisolar precession rate, ″/yr (= 1,296,000·13/H(t)).
+  /** The composed lunisolar precession rate, ″/yr — p₀·[ω/ω₀]·[f_S + (1 − f_S)
+   * (a₀/a_M)³] on the derived J2000 anchor (S5). ≡ 1,296,000·(H₀/axial0)/H(t).
    * @param {number} t_Ma @returns {number|null} */
   function lunisolarPrecessionRateArcsecPerYrAtAge(t_Ma) {
     return composed.composedRateArcsecPerYrAtAge(t_Ma);
+  }
+
+  /** The mean lunisolar precession period T_p(t), years — 1,296,000/ψ̇(t);
+   * 25,771.4 at J2000 (the model's one J2000 precession reading, S5).
+   * @param {number} t_Ma @returns {number|null} */
+  function lunisolarPrecessionPeriodYearsAtAge(t_Ma) {
+    return composed.composedPeriodYearsAtAge(t_Ma);
   }
 
   /** Sidereal year seconds (Kepler under linear mass loss, dT/T = −2 dM/M).
@@ -165,7 +184,13 @@ function createDeepTimeLod(deps) {
     return K.meanSiderealYearJ2000Seconds * (1 - mass_loss_fraction) * (1 - mass_loss_fraction);
   }
 
-  /** @param {number} t_Ma @returns {number} tropical = sidereal · (1 − 13/H(t)) */
+  /** @param {number} t_Ma @returns {number} tropical = sidereal · (1 − 13/H(t)).
+   * The 13/H(t) here is the unit's CALENDAR convention (one turn per H₀/13
+   * of the unit — the kinematic day/year identities on H/(H − 13) and the
+   * deep JD↔year calendar ride it), NOT a precession claim: the published
+   * precession period is the composed T_p (S5), 0.086 % apart. Kept
+   * unchanged in S5 so nothing certified moves (calendar, goldens, CSV);
+   * restating this tier on T_p is the plan-06 Phase 6 / D2 decision. */
   function tropicalYearSecondsAtAge(t_Ma) {
     const sidSec = siderealYearSecondsAtAge(t_Ma);
     const Ht = hAtAge(t_Ma);
@@ -331,7 +356,7 @@ function createDeepTimeLod(deps) {
 
   return {
     lodSecondsAtAge, lodSecondsAtAgeWithAlpha, lodHoursAtAge, hAtAge,
-    lunisolarPrecessionRateArcsecPerYrAtAge,
+    lunisolarPrecessionRateArcsecPerYrAtAge, lunisolarPrecessionPeriodYearsAtAge,
     // the composition's terms (plan 06 Phase 3 S3, the lunisolar surface): (a₀/a_M)³ and f_S + (1 − f_S)(a₀/a_M)³
     lunarTorqueFactorAtAge: composed.lunarTorqueFactorAtAge,
     precessionTorqueTermAtAge: composed.torqueTermAtAge,

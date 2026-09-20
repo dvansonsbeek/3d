@@ -2827,6 +2827,14 @@ function _deepLod() {
       },
       moonDistanceMetresAtAge: (t_Ma) => meanMoonDistanceMetresAtAge(t_Ma),
       moiFactorAtAge: (t_Ma) => earthMoiFactorAtAge(t_Ma),
+      // S5 (plan 06): the composed clock's J2000 anchor — the certified
+      // of-date year laws' beat at 2000 (25,771.4 yr; the SAME anchor the
+      // hybrid self-anchors on), read lazily on the first rate use. Never
+      // H/13 (25,793.6, the fit anchor's reading — not a period).
+      precessionPeriodJ2000YearsFn: () => {
+        const sid = computeSiderealYearDaysDirect(2000), sol = computeSolarYearDaysDirect(2000);
+        return sid / (sid - sol);
+      },
       lEmAtAgeKgm2S: _solarBudget().lEmAtAgeKgm2S,
       // The IAU-base integrated-phase Fourier ripple (mirrors the Node
       // engine's _evalSiderealYearFourierIAU — the Phase D matched pair).
@@ -18097,7 +18105,7 @@ const ESSRT_QTY_SPECS = {
   },
   h: {
     title:    'Earth Fundamental Cycle H(t)',
-    subtitle: 'Structural master cycle = 13 × axial precession period. H ∝ LOD (Driver 1 only).',
+    subtitle: 'The internal unit H(t) — scales with the mean lunisolar precession period (H/T_p = 13.011 at every epoch, the fit anchor’s convention; not 13 periods).',
     yLabel:   'H (years)',
     compute:  (t_Ma) => meanHAtAge(t_Ma),
     yFmt:     (v) => Math.round(v).toLocaleString('en-US') + ' yr',
@@ -18106,28 +18114,15 @@ const ESSRT_QTY_SPECS = {
     hasWu:    false,
   },
   axial: {
-    title:    'Axial Precession Period (H/13)',
-    subtitle: 'Earth\'s polar axis precession cycle = H/13 (Fibonacci structural identity).',
+    title:    'Mean Lunisolar Precession Period T_p(t)',
+    subtitle: 'The period of the composed torque rate [ω/ω₀]·p₀·[f_S + (1 − f_S)(a₀/a_M)³] — Earth’s spin carrying both torques, the lunar torque growing on the Moon’s distance; 25,771 yr at J2000.',
     yLabel:   'Period (years)',
-    compute:  (t_Ma) => { const H = meanHAtAge(t_Ma); return H === null ? null : H / 13; },
-    // Physical axial precession (doc 99 §"Structural vs physical axial
-    // precession at deep time") — the definition the cyclostratigraphic
-    // inversions measure. The structural H/13 scales with spin alone; the
-    // PHYSICAL torque rate adds the lunar 1/a³ term (the closer Moon drove
-    // faster physical precession). J2000 anchor = the model's own modern
-    // rate; solar/lunar split 16.8/33.4 ″/yr as fractions (doc 99's
-    // reconciliation, landing on Wu 2024's 67.64 ″/yr at 650 Ma to 0.2%).
-    compute2: (t_Ma) => {
-      const H0 = meanHAtAge(0), H = meanHAtAge(t_Ma);
-      const lod0 = meanLodSecondsAtAge(0), lod = meanLodSecondsAtAge(t_Ma);
-      const a0 = meanMoonDistanceMetresAtAge(0), a = meanMoonDistanceMetresAtAge(t_Ma);
-      if (H === null || H0 === null || lod === null || lod0 === null || a <= 0) return null;
-      const psi0 = 1296000 / (H0 / 13);                    // ″/yr — modern total, model-anchored
-      const F_SOLAR = 16.8 / 50.2, F_LUNAR = 33.4 / 50.2;  // doc 99 J2000 torque split
-      const rate = psi0 * (lod0 / lod) * (F_SOLAR + F_LUNAR * Math.pow(a0 / a, 3));
-      return 1296000 / rate;
-    },
-    label2:   'physical (solar + lunar torque)',
+    // Plan 06 S5: ONE curve, ONE home — the composed lunisolar period from
+    // the deep-time factory (earth/precession-composed), on the derived
+    // J2000 anchor. The former solid "H/13" line (the fit anchor's reading,
+    // 0.086 % slow, spin-only) and the dashed duplicate with the stale
+    // doc-99 split 16.8/33.4 are retired.
+    compute:  (t_Ma) => _deepLod().lunisolarPrecessionPeriodYearsAtAge(t_Ma),
     yFmt:     (v) => Math.round(v).toLocaleString('en-US') + ' yr',
     yMin: 0, yMax: 40000,
     hasWu:    true,
@@ -25829,8 +25824,8 @@ function setupGUI() {
   // Plan 06 Phase 3 S3 — the lunisolar clock as a first-class panel surface.
   const lunisolarFolder = astroFolder.addFolder({ title: 'Lunisolar Clock', expanded: false });
   addTooltip(lunisolarFolder.addBinding(predictions, 'lunisolarMeanPeriod', {
-    label: 'T_p, mean (yrs)', readonly: true, format: fmt2
-  }), 'The mean lunisolar precession period of date, T_p(t) — the period of the composed torque rate [ω/ω₀]·p₀·[f_S + (1 − f_S)(a₀/a_M)³]: Earth’s spin from the tidal chain carrying both torques, the lunar torque growing as the Moon was closer. This is the model’s deep-time spin clock (falsification leg 1; matched by the Precambrian precession constants at 1.4 and 2.46 Ga). The Axial (yrs) row above is the of-date beat around it.');
+    label: 'T_p (yrs)', readonly: true, format: fmt2
+  }), 'The lunisolar precession period of date, T_p(t) — the clock the ratios below are read against. Inside ±2 Myr it is the published of-date period (the Axial (yrs) row: 25,771.4 yr at J2000, IAU 25,771.6); beyond, the composed torque rate’s period [ω/ω₀]·p₀·[f_S + (1 − f_S)(a₀/a_M)³] on the same J2000 anchor: Earth’s spin from the tidal chain carrying both torques, the lunar torque growing as the Moon was closer — the model’s deep-time spin clock (falsification leg 1; matched by the Precambrian precession constants at 1.4 and 2.46 Ga).');
   addTooltip(lunisolarFolder.addBinding(predictions, 'lunisolarApsidalPeriod', {
     label: 'T_aps, apsidal (yrs)', readonly: true, format: fmt2
   }), 'The perihelion’s period against the fixed stars from the N-body chain’s secular tangent (the Prec. cell’s rate) — the orbital side of the clock, on the solar-mass tier. Read inside ±2 Myr of J2000 (the banked series); NaN beyond.');
@@ -57382,17 +57377,20 @@ function updatePredictions() {
   predictions.axialPrecession = _hybridSpinActive()
     ? predictions.siderealYearSeconds / (predictions.siderealYearSeconds - predictions.solarYearSeconds)
     : o.axialPrecession;
-  // The lunisolar clock (plan 06 Phase 3 S3), in periods and ratios: T_p(t)
-  // the composed lunisolar precession period (the model's spin clock; the
-  // internal identifier holisticyearLength is 13·T_p by definition and is
-  // not a face here), T_aps(t) from the engine-D chain's apsidal tangent
-  // (the SAME helper the Prec. cell shows), and the ratios T_aps/T_p and
-  // T_peri/T_p. Twin: the package's model.lunisolar; the registry's
-  // lunisolar* keys.
+  // The lunisolar clock (plan 06 Phase 3 S3 → S5), in periods and ratios:
+  // T_p(t) the PUBLISHED precession period of date — the Axial row's value
+  // inside ±2 Myr (the one-family beat), the composed lunisolar period on
+  // the same derived J2000 anchor beyond (both 25,771.4 at J2000: the
+  // model's one J2000 reading; S5 retired the H/13 face 25,793.6 here) —
+  // T_aps(t) from the engine-D chain's apsidal tangent (the SAME helper the
+  // Prec. cell shows), and the ratios T_aps/T_p and T_peri/T_p. Twin: the
+  // package's model.lunisolar; the registry's lunisolar* keys.
   {
-    const _Hls = meanHAtAge((2000 - yearForFormula) / 1e6);
-    if (_Hls !== null) {
-      const _Tp = _Hls / 13;
+    const _tMaLs = (2000 - yearForFormula) / 1e6;
+    const _Tp = Math.abs(yearForFormula - 2000) <= 2000000
+      ? predictions.axialPrecession
+      : _deepLod().lunisolarPrecessionPeriodYearsAtAge(_tMaLs);
+    if (_Tp !== null && Number.isFinite(_Tp)) {
       predictions.lunisolarMeanPeriod = _Tp;
       // the apsidal tangent is read inside the published window (±2 Myr,
       // ONE_FAMILY_WINDOW_YEARS) only; beyond it the tangent is an

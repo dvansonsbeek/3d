@@ -188,7 +188,7 @@ frame. The theory assumes this frame is a stable inertial reference.
 **But the ecliptic is not a stable inertial frame.** Two things move relative
 to the ICRF (true inertial):
 
-1. **General precession (H/13 ≈ <!--v:earthAxialPeriod-->25,794<!--/v--> yr)** — Earth's axial precession
+1. **General precession (H/13 ≈ <!--v:earthAxialPeriod-->25,771<!--/v--> yr)** — Earth's axial precession
    carries the equinox westward through the inertial sky at ~50 ″/yr. The
    "ecliptic-of-date" frame rotates at this rate relative to the ICRF.
 2. **Ecliptic precession (H/5 ≈ <!--v:hDiv5-->67,063<!--/v--> yr)** — Earth's orbital plane itself

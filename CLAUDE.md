@@ -246,9 +246,13 @@ pre-registered legs: (1) **the deep-time scaling split** — the axial
 precession must follow the COMPOSED lunisolar rate
 ψ̇(t) = [ω(t)/ω₀]·p₀·[f_S + (1 − f_S)(a₀/a_M(t))³] (spin from the recession
 history, the lunar torque growing on the Moon's distance; ONE home
-`@essrt/physics/earth/precession-composed`, and **H(t) is the UNIT: 13 of
-these periods at every epoch** — `hAtAge` in `deltat/deep-time.cjs`, plan
-06 D6/Phase 3), **the obliquity band must follow the beat
+`@essrt/physics/earth/precession-composed`; its J2000 anchor p₀ is the
+model's ONE J2000 precession reading, the certified year laws' beat at 2000
+= 25,771.4 yr ≈ IAU — plan 06 S5; **H(t) is the internal UNIT that scales
+WITH this period but is NOT 13 of them** (H₀/T_p = 13.011: H₀ was fitted on
+the perihelion-of-date beat, so H/13 = 25,793.6 was the fit anchor's
+reading, 0.086 % slow, never a period; `hAtAge` in `deltat/deep-time.cjs`,
+plan 06 D6/Phase 3/S5), **the obliquity band must follow the beat
 2π/(ψ̇(t) − |s₃|)** (s₃ at its dynamical value under the measured
 solar-mass history — degenerate today with the pure precession-scaling
 reading "obliquity period ∝ T_p", roughly a factor two apart at 2.46 Ga;

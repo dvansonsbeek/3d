@@ -21,9 +21,9 @@ The shared tools module `tools/lib/constants.js` mirrors these with its own 14-s
 
 ### How other documents should reference constants
 
-- **Rule A — Formulas stay, computed numbers go.** Write "H/13" not a specific year count.
-- **Rule B — Theory-intrinsic integers stay inline.** Lattice divisors, cycle counts (13, 3, 16), and ratios are part of the theory.
-- **Rule C — Approximate values for readability.** Use "H/13 (<!--v:axialPrecRound-->~25,794<!--/v--> years; see [Constants Reference](20-constants-reference.md))" when a number aids understanding.
+- **Rule A — Registry keys stay, hand-computed numbers go.** Write a registry value tag (the `v:` marker with the key name) or the named quantity, never a hand-derived year count. (Plan 06 S5: "H/13" is no longer a period — the axial precession period is the of-date year laws' beat, registry `axialPrecYears`.)
+- **Rule B — Device integers stay inline where they are devices.** The correction combs' divisors and the frozen clock's counters are identifiers of the fitted machinery; they are not stated as periods or laws on presentation surfaces (plan 06 D3/P6).
+- **Rule C — Approximate values for readability.** Use "the axial precession period (<!--v:axialPrecRound-->~25,771<!--/v--> years; see [Constants Reference](20-constants-reference.md))" when a number aids understanding.
 - **Rule D — Tables reference this document.** If a doc repeats planet parameters, add: "For current values see [Constants Reference](20-constants-reference.md)."
 
 ---
@@ -248,7 +248,7 @@ These are computed from foundational constants. The formula is the definition; t
 | Apsidal Precession | H / 3 | <!--v:inclPrecYears-->~111,772<!--/v--> | Counter-clockwise |
 | Ecliptic Precession | H / 5 | <!--v:eclPrecYears-->~67,063<!--/v--> | Counter-clockwise |
 | Obliquity Cycle | H / 8 | <!--v:obliqCycleYears-->~41,915<!--/v--> | Clockwise (negative) |
-| Axial Precession | H / 13 | <!--v:axialPrecRound-->~25,794<!--/v--> | Clockwise (negative) |
+| Axial Precession | the of-date year laws' beat at J2000 (route B; the fit-era label H/13 read 25,794, retired as a period — plan 06 S5) | <!--v:axialPrecRound-->~25,771<!--/v--> | Clockwise (negative) |
 | Perihelion Precession | H / 16 | <!--v:periPrecYears-->~20,957<!--/v--> | Both directions |
 
 ## Time Constants
