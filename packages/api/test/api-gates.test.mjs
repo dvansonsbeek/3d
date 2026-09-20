@@ -139,6 +139,14 @@ for (const url of SAMPLE_REQUESTS) {
   if (val.value !== '86,400.0019') failures.push(`values/usnoLodJ2000: ${val.value}`);   // plan 06 D7 + kicks-only swing: the joint optimum moved with the lagged GIA channel (86,400.0018 after the ecc-unification 7c re-close → 0020 → 0019)
   const deriv = dataOf('/v1/derivations/axialPrecession');
   if (deriv.latticeDivisor !== 13) failures.push(`derivations/axialPrecession divisor: ${deriv.latticeDivisor}`);
+  if (Math.abs(deriv.periodYears - 25771.4) > 0.5) failures.push(`derivations/axialPrecession period: ${deriv.periodYears}`);
+  // S6: the Earth-cycle rows carry the DYNAMICAL periods (the registry's values), never the device H/n.
+  for (const [q, expect] of /** @type {Array<[string, number]>} */ ([['inclinationPrecession', 111570], ['perihelionPrecession', 20936], ['eclipticPrecession', 68751], ['obliquityCycle', 41224]])) {
+    const d = dataOf(`/v1/derivations/${q}`);
+    if (typeof d.periodYears !== 'number' || Math.abs(d.periodYears - expect) > 5) failures.push(`derivations/${q} period: ${d.periodYears} (expected ≈ ${expect})`);
+    if (d.status !== 'current') failures.push(`derivations/${q} status: ${d.status}`);
+  }
+  if (dataOf('/v1/derivations/solarSystemResonanceCycle').status !== 'retired') failures.push('derivations/solarSystemResonanceCycle must be marked retired');
   const merc = dataOf('/v1/bodies/mercury');
   if (Math.round(merc.record.perihelionEclipticYears) !== 243867) failures.push(`mercury ecl period: ${merc.record.perihelionEclipticYears}`);
   if (!merc.accuracy || !merc.accuracy.statement) failures.push('bodies/mercury: missing accuracy statement');

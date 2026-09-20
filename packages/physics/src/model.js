@@ -1250,6 +1250,16 @@ export function assembleModel(C, F, laws = {}, secularSeriesArtifact = /** @type
     if (Math.abs(year - 2000) <= ONE_FAMILY_WINDOW_YEARS) return yearLengthsM.tropicalYearSecondsAtYear(year);
     return deepLod.tropicalYearSecondsAtAge(yearToTMa(year));
   };
+  // Plan 06 S6 — |s₃|, the dominant nodal mode of Earth's orbit: the
+  // largest-amplitude ζ mode of the banked deep secular modes (the recipe
+  // the registry's `eclPrecYears`/`obliqCycleYears` and the browser's
+  // obliquity-beat helper use). ONE home here; the API reads it.
+  const s3ArcsecPerYr = (() => {
+    const z = DEEP_MODES_ARTIFACT.earthZeta
+      .filter((m) => Math.abs(m.omegaRadPerYr) > 1e-9)
+      .sort((a, b) => Math.hypot(b.re, b.im) - Math.hypot(a.re, a.im))[0];
+    return Math.abs((z.omegaRadPerYr * 180) / Math.PI) * 3600;
+  })();
 
   return Object.freeze({
     time: Object.freeze({
@@ -1310,6 +1320,16 @@ export function assembleModel(C, F, laws = {}, secularSeriesArtifact = /** @type
       torqueTermAtYear: (year) => { const t = deepLod.precessionTorqueTermAtAge(yearToTMa(year)); return t === null ? 1 : t; },
       /** The hybrid's precession constant α = p₀ / cos ε₀, ″/yr (p₀ the derived J2000 rate, ε₀ the J2000 obliquity input; 54.81). */
       torqueConstantJ2000ArcsecPerYr: (1296000 / certifiedAxialPrecessionJ2000Years()) / Math.cos((C.earthOrbital.obliquityJ2000_deg * Math.PI) / 180),
+      /** |s₃|, the dominant nodal mode of Earth's orbit — the largest-amplitude ζ mode of the banked deep secular modes, ″/yr (18.85; the obliquity beat's partner). ONE home for the registry, the browser and the API. */
+      nodalModeS3ArcsecPerYr: s3ArcsecPerYr,
+      /** The ecliptic (nodal) precession period 1,296,000/|s₃|, years (68,751) — an orbital quantity, fixed at every epoch at the two-body level. */
+      nodalPeriodYears: 1296000 / s3ArcsecPerYr,
+      /** The obliquity beat 2π/(ψ̇(t) − |s₃|), years — the SHIPPED deep-time obliquity period (falsification leg 1; 41,224 at J2000, on the composed rate). @param {number} year @returns {number} */
+      obliquityBeatYearsAtYear: (year) => {
+        const r = deepLod.lunisolarPrecessionRateArcsecPerYrAtAge(yearToTMa(year));
+        const psiDot = r === null ? 1296000 / certifiedAxialPrecessionJ2000Years() : r;
+        return 1296000 / (psiDot - s3ArcsecPerYr);
+      },
       /** The apsidal (perihelion vs the stars) period from the engine-D chain's secular tangent, years — inside the published window only (the tangent is an extrapolation beyond the banked series: it turns negative at −5 Myr); null beyond. @param {number} year @returns {number|null} */
       apsidalPeriodYearsAtYear: (year) => (Math.abs(year - 2000) <= ONE_FAMILY_WINDOW_YEARS ? 360 / computeApsidalSecularDegPerYr(year, kcChainsM.earth, kcChainsM) : null),
       /** T_aps(t) / T_p(t) — the apsidal period in of-date precession periods (4.33 at J2000, a reading; 0.84 … 9.9 across ±26 kyr, measured); null beyond the published window. @param {number} year @returns {number|null} */

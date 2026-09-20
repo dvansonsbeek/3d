@@ -101,15 +101,19 @@ export function createApi() {
   const DERIVATIONS = Object.freeze({
     // S5 (plan 06): the PERIOD is the model's one J2000 precession reading — the certified year laws' beat
     // at 2000 (25,771.4 yr ≈ IAU); the H/13 lattice reading (25,793.6) is the fit anchor's, retired as a period.
-    axialPrecession: { formula: 'T_p(J2000) = sid/(sid − trop), the of-date year laws at 2000 (lattice label H/13 retired as a period)', latticeDivisor: 13, periodYears: model.epoch.axialPrecessionYearsAtYear(2000), doc: 'docs/110-calculation-map.md', registryKey: 'axialPrecYears' },
-    inclinationPrecession: { formula: 'H / 3', latticeDivisor: 3, periodYears: model.computeLatticePeriodsYears().inclinationPrecessionPeriodYears, doc: 'docs/10-fibonacci-laws.md', registryKey: 'inclPrecYears' },
-    perihelionPrecession: { formula: 'H / 16', latticeDivisor: 16, periodYears: model.computeLatticePeriodsYears().perihelionPrecessionPeriodYears, doc: 'docs/10-fibonacci-laws.md', registryKey: 'periPrecYears' },
-    eclipticPrecession: { formula: 'H / 5', latticeDivisor: 5, periodYears: null, doc: 'docs/10-fibonacci-laws.md', registryKey: 'eclPrecYears' },
-    obliquityCycle: { formula: 'H / 8', latticeDivisor: 8, periodYears: null, doc: 'docs/10-fibonacci-laws.md', registryKey: 'obliqCycleYears' },
-    solarSystemResonanceCycle: { formula: '8 × H', latticeDivisor: null, periodYears: null, doc: 'docs/10-fibonacci-laws.md', registryKey: 'eightH' },
-    law6Lock: { formula: '8H / 65', latticeDivisor: 65, periodYears: null, doc: 'docs/10-fibonacci-laws.md', registryKey: 'saturnPeriPeriod' },
-    bondCycle: { formula: '8H / 1830', latticeDivisor: 1830, periodYears: null, doc: 'docs/104-millennial-rotation-swing.md', registryKey: 'bondYr' },
-    hallstattCycle: { formula: '8H / 1104', latticeDivisor: 1104, periodYears: null, doc: 'docs/104-millennial-rotation-swing.md', registryKey: 'hallstattYr' },
+    // S6: the Earth-cycle rows read the DYNAMICAL periods from the lunisolar surface (the same values the
+    // registry keys carry); `latticeDivisor` is kept as the retired device label, for the record only.
+    // `status`: current = a published period · device = a correction-basis line of the frozen era clock
+    // (plan 06 P3) · retired = a claim of the integer-law era, kept as the record (docs/retired-record.md).
+    axialPrecession: { formula: 'T_p(J2000) = sid/(sid − trop), the of-date year laws at 2000 (lattice label H/13 retired as a period)', latticeDivisor: 13, periodYears: model.epoch.axialPrecessionYearsAtYear(2000), doc: 'docs/110-calculation-map.md', registryKey: 'axialPrecYears', status: 'current' },
+    inclinationPrecession: { formula: 'T_aps(J2000) = 360°/ϖ̇_secular — the N-body chain’s secular apsidal tangent at 2000, the perihelion against the stars (device label H/3 retired as a period)', latticeDivisor: 3, periodYears: model.lunisolar.apsidalPeriodYearsAtYear(2000), doc: 'docs/110-calculation-map.md', registryKey: 'inclPrecYears', status: 'current' },
+    perihelionPrecession: { formula: 'T_peri(J2000) = 1/(1/T_p + 1/T_aps) — the perihelion-of-date beat of the one-family route at 2000 (device label H/16 retired as a period)', latticeDivisor: 16, periodYears: model.lunisolar.periOfDatePeriodYearsAtYear(2000), doc: 'docs/110-calculation-map.md', registryKey: 'periPrecYears', status: 'current' },
+    eclipticPrecession: { formula: 'T_s₃ = 1,296,000/|s₃| — the dominant nodal mode of Earth’s orbit from the banked deep secular modes (device label H/5 retired as a period)', latticeDivisor: 5, periodYears: model.lunisolar.nodalPeriodYears, doc: 'docs/110-calculation-map.md', registryKey: 'eclPrecYears', status: 'current' },
+    obliquityCycle: { formula: 'T_obl(J2000) = 2π/(ψ̇ − |s₃|) — the obliquity beat of the composed precession rate against the nodal mode (falsification leg 1; device label H/8 retired as a period)', latticeDivisor: 8, periodYears: model.lunisolar.obliquityBeatYearsAtYear(2000), doc: 'docs/110-calculation-map.md', registryKey: 'obliqCycleYears', status: 'current' },
+    solarSystemResonanceCycle: { formula: 'RETIRED (plan 06 D3): the eight-unit interval of the fitted anchor — a device interval of the correction combs, never a cycle', latticeDivisor: null, periodYears: null, doc: 'docs/retired-record.md', registryKey: 'eightH', status: 'retired' },
+    law6Lock: { formula: 'RETIRED (doc 109): the Jupiter–Saturn–Earth “lock” read at Saturn’s device ecliptic-perihelion period, a window-epoch descriptor', latticeDivisor: 65, periodYears: null, doc: 'docs/109-model-nbody-engine-and-lattice-test.md', registryKey: 'saturnPeriPeriod', status: 'retired' },
+    bondCycle: { formula: 'ΔT-stack component, period 8·H₀/1830 = 1,466 yr — a bounded-basis line of the anchor’s divisor grid; the integer label carries no information (plan 06 T5), the ~1.5-kyr oscillation is real', latticeDivisor: 1830, periodYears: (8 * DEFAULT_CONSTANTS.foundational.holisticyearLength) / 1830, doc: 'docs/104-millennial-rotation-swing.md', registryKey: 'bondYr', status: 'device' },
+    hallstattCycle: { formula: 'ΔT-stack component, period 8·H₀/1104 = 2,430 yr — a bounded-basis line of the anchor’s divisor grid; the integer label carries no information (plan 06 T5)', latticeDivisor: 1104, periodYears: (8 * DEFAULT_CONSTANTS.foundational.holisticyearLength) / 1104, doc: 'docs/104-millennial-rotation-swing.md', registryKey: 'hallstattYr', status: 'device' },
   });
 
   const versionRecord = Object.freeze({

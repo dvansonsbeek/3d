@@ -51,6 +51,12 @@ export function assembleModel(C: Readonly<Record<string, any>>, F: Readonly<Reco
         torqueTermAtYear: (year: number) => number;
         /** The hybrid's precession constant α = p₀ / cos ε₀, ″/yr (p₀ the derived J2000 rate, ε₀ the J2000 obliquity input; 54.81). */
         torqueConstantJ2000ArcsecPerYr: number;
+        /** |s₃|, the dominant nodal mode of Earth's orbit — the largest-amplitude ζ mode of the banked deep secular modes, ″/yr (18.85; the obliquity beat's partner). ONE home for the registry, the browser and the API. */
+        nodalModeS3ArcsecPerYr: number;
+        /** The ecliptic (nodal) precession period 1,296,000/|s₃|, years (68,751) — an orbital quantity, fixed at every epoch at the two-body level. */
+        nodalPeriodYears: number;
+        /** The obliquity beat 2π/(ψ̇(t) − |s₃|), years — the SHIPPED deep-time obliquity period (falsification leg 1; 41,224 at J2000, on the composed rate). @param {number} year @returns {number} */
+        obliquityBeatYearsAtYear: (year: number) => number;
         /** The apsidal (perihelion vs the stars) period from the engine-D chain's secular tangent, years — inside the published window only (the tangent is an extrapolation beyond the banked series: it turns negative at −5 Myr); null beyond. @param {number} year @returns {number|null} */
         apsidalPeriodYearsAtYear: (year: number) => number | null;
         /** T_aps(t) / T_p(t) — the apsidal period in of-date precession periods (4.33 at J2000, a reading; 0.84 … 9.9 across ±26 kyr, measured); null beyond the published window. @param {number} year @returns {number|null} */

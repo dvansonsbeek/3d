@@ -64,7 +64,8 @@ const toolCall = (name, args) => {
     ['essrt_moon', { year: 2000 }, (d) => (Math.abs(d.years[0].distanceKm - 384400) < 1000 ? null : `moon distance: ${d.years[0].distanceKm}`)],
     ['essrt_bodies', { body: 'mercury' }, (d) => (Math.round(d.record.perihelionEclipticYears) === 243867 ? null : `mercury: ${d.record.perihelionEclipticYears}`)],
     ['essrt_values', { key: 'usnoLodJ2000' }, (d) => (d.value === '86,400.0019' ? null : `usnoLodJ2000: ${d.value}`)],   // plan 06 D7 + kicks-only swing: joint optimum moved with the lagged GIA channel
-    ['essrt_derivations', { quantity: 'axialPrecession' }, (d) => (d.latticeDivisor === 13 ? null : `divisor: ${d.latticeDivisor}`)],
+    ['essrt_derivations', { quantity: 'axialPrecession' }, (d) => (Math.abs(d.periodYears - 25771.4) < 0.5 ? null : `period: ${d.periodYears}`)],
+    ['essrt_derivations', { quantity: 'inclinationPrecession' }, (d) => (Math.abs(d.periodYears - 111570) < 5 && d.status === 'current' ? null : `apsidal: ${d.periodYears} ${d.status}`)],
     ['essrt_climate', { year: 2000 }, (d) => (typeof d.years[0].l1OrbitalPermil === 'number' ? null : 'no L1 value')],
     ['essrt_cross_validation', { curve: 'obliquity-berger1978', year: 2000 }, (d) => (Math.abs(d.years[0].model - d.years[0].published) < 0.05 ? null : `Berger delta: ${d.years[0].delta}`)],
     ['essrt_eclipses', { kind: 'solar', startYear: 2024, stopYear: 2025 }, (d) => (d.count === 2 && d.events[0].type === 'Total' && Math.abs(d.events[0].jd - 2460409.263) < 0.01 ? null : `2024 solar: ${JSON.stringify(d.events?.map((/** @type {any} */ e) => e.type))}`)],
