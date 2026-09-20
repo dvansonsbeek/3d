@@ -147,6 +147,22 @@ the spin-and-tides channel supplying ω(t) and a_moon(t), the orbital engine's s
 | 1400 Ma | **<!--v:earthPrecComposed1400MaArcsecPerYr-->86.6<!--/v-->** | **Meyers & Malinverno 2018: 85.79 ± 2.72** (Xiamaling; gate row `xiamaling-prec-1400`, <!--v:anchorXiamalingPrec1400DeltaPct-->+0.94<!--/v--> %) |
 | 2460 Ma | **<!--v:earthPrecComposed2460MaArcsecPerYr-->104.6<!--/v-->** | **Lantink et al. 2022: 108.6 ± 8.5** (Joffre; gate row `lantink-prec-2460`, <!--v:anchorLantinkPrec2460DeltaPct-->−3.68<!--/v--> %) |
 
+The Phanerozoic window, both clocks against the published inferences (written by the engine; theory vs inference throughout — Wu's constants are TimeOptB inversions through an assumed astronomical model, Berger 1992 is a competing theory's tidal solution):
+
+<!-- generated:doc99-phanerozoic-comparison -->
+| Age (Ma) | ψ̇ composed (″/yr) | ψ̇ spin-only, retired (″/yr) | published inference (″/yr) | Δ composed | Δ spin-only | obliquity beat composed (kyr) | beat implied by the inference (kyr) |
+|---:|---:|---:|---:|---:|---:|---:|---:|
+| 100 | **52.60** | 51.53 | Wu 2024: 53.00 ± 1.0 | -0.8 % | -2.8 % | 38.40 | 37.95 |
+| 200 | **55.02** | 52.78 | Wu 2024: 54.36 ± 1.0 | 1.2 % | -2.9 % | 35.83 | 36.50 |
+| 300 | **57.58** | 54.04 | Wu 2024: 59.50 ± 0.5 | -3.2 % | -9.2 % | 33.47 | 31.88 |
+| 400 | **60.28** | 55.33 | Wu 2024: 61.50 ± 0.5 | -2.0 % | -10.0 % | 31.28 | 30.39 |
+| 500 | **63.16** | 56.65 | Wu 2024: 64.50 ± 0.5 | -2.1 % | -12.2 % | 29.25 | 28.39 |
+| 650 | **67.85** | 58.68 | Wu 2024: 67.64 ± 0.3 | 0.3 % | -13.3 % | 26.45 | 26.56 |
+| 500 | **63.16** | 56.65 | Berger, Loutre & Laskar 1992: 61 (theory) | 3.5 % | -7.1 % | 29.25 | 29 (their obliquity main period) |
+
+The composed clock sits within 3 % of every published Phanerozoic precession constant and reads 2–3 % LOW across 300–500 Ma (the Pangea window, where Wu's Moon-distance anchors are closer than the shipped recession polynomial — the documented Pangea offset); the retired spin-only clock reads 9–13 % low there. Beats via 1,296,000/(ψ̇ − |s₃|), |s₃| = 18.85 ″/yr. Wu's constants carry the astronomical model of their inversion; Berger 1992 is theory — neither is a measurement, and the table is labelled accordingly.
+<!-- /generated:doc99-phanerozoic-comparison -->
+
 The rock-derived inferences side with the COMPOSITION: 0.2 % at 650 Ma —
 a number the orbital engine cannot produce (it knows nothing of Earth's day length)
 — and inside the published 1σ of both Precambrian precession constants.
@@ -1105,7 +1121,7 @@ Periods in **kyr**, written by the engine. The lines are the climate formula's P
 Obliquity band: each line's period is 1,296,000/(ψ̇(t) + f_i) kyr with f_i the line's orbital frequency (fixed, μ = 1) and ψ̇(t) the composed precession rate — the 10 lines are the physical L1 set of plan 06 T1 (`data/l1-physical-lines.json`, relative amplitude ≥ 0.1 within the family), not integer labels.
 <!-- /generated:doc99-l1-obliquity-lines -->
 
-**Key prediction — and an open tension**: the Devonian (380 Ma) obliquity beat p + s₀ reads **31.7 kyr** (modern 41.2 kyr; generated table above — the lunar torque adds to the spin scaling). Published Devonian obliquity readings of ~36–38 kyr (Meyers 2008, Boulila 2018) sit ~15 % above this, while Wu et al. 2024's own precession constant at 400 Ma (61.5 ″/yr) implies a ~30-kyr beat and sides with the composed clock. Two rock-based inferences disagree; the model states its prediction and waits for a Devonian obliquity period with a stated 1σ to bank as a gate row. (The retired spin-only clock read 37.7 kyr here and "matched" — that match is withdrawn with the clock, an honest cost of plan 06 D6.)
+**Key prediction**: the Devonian (380 Ma) obliquity beat p + s₀ reads **31.7 kyr** (modern 41.2 kyr; generated table above — the lunar torque adds to the spin scaling). This is what the deep-time astronomical literature has long said: Berger, Loutre & Laskar 1992 shorten the obliquity main period from 41 to 29 kyr over 500 Myr while the precession constant rises from 50 to 61 ″/yr (the composed clock reads 29.25 kyr and 63.2 ″/yr at 500 Ma), and the Devonian cyclostratigraphic work of the De Vleeschouwer / Da Silva / Zeeden line uses obliquity near 29.5 kyr and precession of 16.1–19.4 kyr at ~372 Ma. Wu et al. 2024's inferred precession constants at 300–500 Ma (59.5–64.5 ″/yr) sit 2–3 % above the composed clock (Phanerozoic comparison block, § "The composition is what nature measures"); the residual has a named candidate — the Moon-distance history in the Pangea window, where Wu's anchors put the Moon closer than the smooth recession polynomial (reproducing a 29.5-kyr beat at 372 Ma needs the Moon at 56.7 R_E where the chain has 58.1). **The old text's "36–38 kyr observed (Meyers 2008, Boulila 2018)" was a mis-citation**: Meyers, Sageman & Pagani 2008 is the Cenomanian (~94 Ma) Bridge Creek record and Boulila et al. 2018 the middle Eocene (~40 Ma) timescale — epochs whose obliquity periods ARE 37–40 kyr — and the retired spin-only clock (37.7 kyr here) "matched" them by that error.
 
 ---
 
@@ -2276,7 +2292,7 @@ If ESSRT is correct, the following predictions should hold. All values from the 
 
 ### 1. Deep-time obliquity periods lengthen with the clock
 Devonian (380 Ma) obliquity beat 2π/(ψ̇ − |s₃|) at **31.7 kyr** (vs modern 41.2 kyr; generated tables above).
-**Status**: OPEN. Published Devonian obliquity readings (Meyers 2008, Boulila 2018) are ~36–38 kyr — ~15 % above; Wu et al. 2024's precession constant at 400 Ma (61.5 ″/yr) implies ~30 kyr and sides with the composed clock. Two rock-based inferences disagree; a gate row waits for a Devonian obliquity period with a stated 1σ. The retired spin-only clock read 37.7 kyr and "confirmed" — that confirmation is withdrawn with the clock (plan 06 D6).
+**Status**: Consistent. Berger, Loutre & Laskar 1992's deep-time solution (29 kyr and 61 ″/yr at 500 Ma; theory) and Wu et al. 2024's inferred precession constants (59.5–64.5 ″/yr across 300–500 Ma; cyclostratigraphic inference) both sit within 2–8 % of the composed clock, which reads 2–3 % low in the Pangea window — the residual attributed to the recession history there (Wu's Moon-distance anchors are closer than the smooth polynomial; doc 99 § "Pangea interval"), not to the composition law. A Devonian obliquity gate row waits for a period with a stated 1σ verified from the primary paper (the Zeeden et al. 2023 class). The former "confirmed against 36–38 kyr (Meyers 2008, Boulila 2018)" was a mis-citation of Cretaceous and Eocene records, and the retired spin-only clock (37.7 kyr) matched them by that error — withdrawn (plan 06 D6/Phase 4b).
 
 ### 2. Deep-time short-eccentricity periods expand with H (view 2) — RESOLVED AGAINST
 Devonian short-eccentricity peaks would have been at **87.5, 98.0, 111.3 kyr** under view 2 (vs modern 95.8, 107.3, 121.9 kyr).

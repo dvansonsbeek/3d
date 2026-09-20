@@ -55,9 +55,10 @@ never to the fossil data it is tested against.
 - The single-equation cross-check binding the two proxy classes: the exact
   day-count invariant `H × (sidYear_s/LOD) × (AU₀/AU)² = TOTAL_DAYS_IN_H × H₀/(H₀−13)`
   ([doc 99 §near-invariant](99-expanding-solar-system-resonance-theory.md))
-  requires a day-count and a lattice period measured at the *same* epoch to
-  agree — the Devonian passes it (Wells's ~400 days/yr against the observed
-  ~37 kyr obliquity beat, Meyers 2008 / Boulila 2018).
+  requires a day-count and a precession period measured at the *same* epoch
+  to agree — the Devonian passes it (Wells's ~400 days/yr against the
+  Devonian-window precession constants of Wu et al. 2024, 59.5–61.5 ″/yr,
+  which the composed clock reads to 2–3 %).
 - Full tables and the per-anchor discussion: [doc 99 §Validation](99-expanding-solar-system-resonance-theory.md#validation-against-published-paleontological-measurements)
 - The Hadean endpoint: the Farhat polynomial extrapolated to the Patterson
   1956 Pb–Pb age places the Moon at
@@ -73,9 +74,13 @@ The L1 integer-divisor lattice (8H/n) against the Cenozoic isotope record:
   [doc 91](91-milankovitch-evidence.md) with generated artifacts
   (`data/milankovitch-8h-cenogrid-*.json`, `data/cenogrid-mtm-ftest.json`)
   under `check:artifacts` freshness.
-- **Devonian obliquity beat** — the n=65 band predicted at 37.68 kyr at the
-  Devonian (8.7% shorter than modern) matches published 36–38 kyr
-  observations (Meyers 2008, Boulila 2018): [doc 99 §Predicted L1 periods](99-expanding-solar-system-resonance-theory.md#predicted-l1-periods-at-each-age--obliquity-band).
+- **Devonian obliquity beat** — the composed clock's beat 2π/(ψ̇ − |s₃|)
+  reads 31.7 kyr at 380 Ma (vs 41.2 today), consistent with Berger, Loutre &
+  Laskar 1992's deep-time solution (29 kyr at 500 Ma) and with the Devonian
+  cyclostratigraphic values near 29.5 kyr, and 2–8 % off the Wu 2024
+  inferences — the residual attributed to the Pangea-window recession
+  history. The former "matches 36–38 kyr (Meyers 2008, Boulila 2018)" was a
+  mis-citation of Cretaceous and Eocene records, withdrawn: [doc 99 §Predicted climate lines](99-expanding-solar-system-resonance-theory.md#predicted-climate-lines-at-each-age--obliquity-band).
 - **The 405-kyr caveat, stated plainly** — the Laskar g₂−g₅ eccentricity
   eigenbeat is *off* the 8H lattice; the record's 405-kyr power is
   carbon-cycle amplified and is not claimed for the lattice:

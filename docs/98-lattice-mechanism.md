@@ -851,8 +851,8 @@ Output: `data/eight-h-history.json`, `data/paleo-l1-renumbering.json`.
 - [Bartlett & Stevenson 2016 — Precambrian resonance-stabilized day length, GRL](https://agupubs.onlinelibrary.wiley.com/doi/full/10.1002/2016GL068912)
 - [Mitchell & Kirscher 2023 — Mid-Proterozoic day length stalled by tidal resonance, Nat Geosci](https://www.nature.com/articles/s41561-023-01202-6)
 - Olsen & Kent 1999 — Newark Basin Triassic cyclostratigraphy
-- Boulila et al. 2018 — Cretaceous obliquity cycles
-- Meyers 2008 — Devonian cyclostratigraphic estimates
+- Boulila et al. 2018 — middle Eocene astronomical timescale (obliquity ~40 kyr at ~40 Ma; NOT Devonian)
+- Meyers, Sageman & Pagani 2008 — Cenomanian Bridge Creek obliquity (~38 kyr at ~94 Ma; NOT Devonian — the earlier "Devonian" attribution here was an error, corrected in plan 06 Phase 4b)
 
 ### Net implication for the doc 98 mechanism phase
 
