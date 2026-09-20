@@ -1,0 +1,149 @@
+{
+ "_description": "T1 inputs — the engine’s own p (of-date precession beat at J2000, createModel().epoch.axialPrecessionYearsAtYear) and Earth’s z / ζ secular modes (deep mode table). Consumed by scripts/t1_beat_model_vs_comb.py, which builds the Berger/Laskar-style beat lines |g_i − g_j|, p + s_i, p + g_i from them.",
+ "pArcsecPerYr": 50.288312944790015,
+ "precessionPeriodYr": 25771.395461662003,
+ "z": [
+  {
+   "arcsecPerYr": 4.257358971029763,
+   "amp": 0.01903452796021857
+  },
+  {
+   "arcsecPerYr": 7.452423838509057,
+   "amp": 0.016408655299337806
+  },
+  {
+   "arcsecPerYr": 17.917017907389138,
+   "amp": 0.012786468784370291
+  },
+  {
+   "arcsecPerYr": 17.368946405872247,
+   "amp": 0.008770811113773766
+  },
+  {
+   "arcsecPerYr": 5.590266692997095,
+   "amp": 0.0037921310180259356
+  },
+  {
+   "arcsecPerYr": 17.08839979107405,
+   "amp": 0.0025391437488166036
+  },
+  {
+   "arcsecPerYr": 17.639011458171474,
+   "amp": 0.0018041162883056959
+  },
+  {
+   "arcsecPerYr": 16.824778512409285,
+   "amp": 0.0017166428721547028
+  },
+  {
+   "arcsecPerYr": 6.900819635346702,
+   "amp": 0.0015521027900363086
+  },
+  {
+   "arcsecPerYr": 28.245130723754997,
+   "amp": 0.0015087422873848548
+  },
+  {
+   "arcsecPerYr": 18.020249087199527,
+   "amp": 0.0016280451507616424
+  },
+  {
+   "arcsecPerYr": 17.80205537803657,
+   "amp": 0.0010646981399685543
+  },
+  {
+   "arcsecPerYr": 5.456453418688424,
+   "amp": 0.0018393974640279684
+  },
+  {
+   "arcsecPerYr": 7.043113727244795,
+   "amp": 0.0012554932671733547
+  },
+  {
+   "arcsecPerYr": 7.318451630540627,
+   "amp": 0.0013682752909899285
+  },
+  {
+   "arcsecPerYr": 18.463025626632575,
+   "amp": 0.0010559509036647309
+  },
+  {
+   "arcsecPerYr": 18.18176803192997,
+   "amp": 0.001310823906538636
+  },
+  {
+   "arcsecPerYr": 5.712000353943262,
+   "amp": 0.0013882163374880627
+  }
+ ],
+ "zeta": [
+  {
+   "arcsecPerYr": -18.850582957521933,
+   "amp": 0.00831718456904696
+  },
+  {
+   "arcsecPerYr": -5.585242947167304,
+   "amp": 0.0045048750770837346
+  },
+  {
+   "arcsecPerYr": -17.755453231893288,
+   "amp": 0.004033161630002229
+  },
+  {
+   "arcsecPerYr": -7.0425105793625775,
+   "amp": 0.003983559754760378
+  },
+  {
+   "arcsecPerYr": -18.303731753714146,
+   "amp": 0.00269311606677735
+  },
+  {
+   "arcsecPerYr": -6.876657002741013,
+   "amp": 0.001045399943248651
+  },
+  {
+   "arcsecPerYr": -7.158946903949916,
+   "amp": 0.0014859791974299013
+  },
+  {
+   "arcsecPerYr": -19.398575493007236,
+   "amp": 0.0014869279827598879
+  },
+  {
+   "arcsecPerYr": -5.460229290381381,
+   "amp": 0.0017121207774555064
+  },
+  {
+   "arcsecPerYr": -6.760747136219188,
+   "amp": 0.0008395397300527481
+  },
+  {
+   "arcsecPerYr": -26.34786573298646,
+   "amp": 0.0013349264462065792
+  },
+  {
+   "arcsecPerYr": -19.120658254937005,
+   "amp": 0.0008052155511875233
+  },
+  {
+   "arcsecPerYr": -2.992406751236887,
+   "amp": 0.000867282047080661
+  },
+  {
+   "arcsecPerYr": -6.963891099702974,
+   "amp": 0.0013483301749005032
+  },
+  {
+   "arcsecPerYr": -5.836793479969246,
+   "amp": 0.0011840529733042416
+  }
+ ],
+ "inputs": {
+  "generator": "node tools/explore/t1-export-engine-frequencies.mjs --write",
+  "files": {
+   "data/nbody-deep-secular-modes.json": "sha256:77e0baf779e85de548e532ec52e2ace55a9bdba3bbd2f67002fa9fbdfc3440de",
+   "public/input/model-parameters.json": "sha256:e4add264813ec19a2ad50281b7da5eace84e13c6c2dc9bec82952cdc71bddd72",
+   "tools/explore/t1-export-engine-frequencies.mjs": "sha256:58b0bfc170e664d54a66b2787200ed8c323cf898385bab756378410fa0a600bf"
+  }
+ }
+}

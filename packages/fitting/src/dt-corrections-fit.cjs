@@ -178,6 +178,14 @@ const DT = require(path.join(TOOLS_LIB, 'deep-time.js'));
 const C = require(path.join(TOOLS_LIB, 'constants.js'));
 
 // ─── Config: divisors, target amplitudes, taper, fit window ───
+// The `structural` notes below are the HISTORICAL selection record, not
+// predictions (T5 verdict, data/t5-dt-stack-lattice-null.json): every period
+// in the millennial band lies within 0.03 % of some 8·H/n, a gcd-compliant n
+// sits inside every fitted plateau by density alone, and non-compliant
+// neighbours fit identically. The periods are fitted millennial periods at
+// the canonical Bond / Hallstatt / Jose values and are STATED IN YEARS in
+// every presentation surface; `lattice_n` (period = eightHYears / n) is an
+// implementation detail that keeps its name.
 const CONFIG = {
   cycles: [
     { name: 'bond',      lattice_n: 1830,

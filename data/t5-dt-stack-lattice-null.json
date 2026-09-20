@@ -1,0 +1,273 @@
+{
+ "_description": "T5 \u2014 the \u0394T-stack \"structural\" cycles against a random-comb null of the same\ndensity (holisticuniverse plan 06 \u00a74, pre-registered).\n\n    python3 scripts/t5_dt_stack_lattice_null.py            print the verdict\n    python3 scripts/t5_dt_stack_lattice_null.py --write    write data/t5-dt-stack-lattice-null.json (inputs-stamped)\n\nThe shipped \u0394T correction stack carries four millennial cycles labeled as\n8H/n lattice harmonics (Bond 8H/1830, Hallstatt 8H/1104, Jose5 8H/2989,\nJose4 8H/3749) with a \"zero-fit structural prediction\" wording resting on\ntwo arguments: the period is an integer divisor of 8H, and the divisor\nshares a prime factor with H (gcd(n, H) \u2208 {23, 61}). This script measures\nwhat those two arguments are worth:\n\n  A. DENSITY \u2014 how far ANY period in the millennial band can be from the\n     nearest 8H/n (the lattice spacing 8H/n\u00b2 is < 0.2 % of the period), and\n     what fraction of integers n in the band satisfy the gcd rule (H =\n     23 \u00b7 61 \u00b7 239, so \u2248 1/23 + 1/61 + 1/239 of them). The Rayleigh\n     resolution of the fit window in n units (\u0394n = 8H / T_window) says how\n     many integers the data cannot tell apart.\n  B. PLATEAUS \u2014 the banked divisor scans (Bond: data/deltaT-divisor-scan-jse\n     .json; h253: data/deltaT-h253-fifth-cycle-scan.json) record flat R\u00b2\n     plateaus; the chance that a plateau of the measured width contains at\n     least one gcd-compliant integer.\n  C. DATA NULL \u2014 the Stephenson \u2212 model residual (data/deltaT-bond-cycle-\n     residual-fit.json, 10-yr grid, \u2212720\u20262010) fitted by intercept +\n     quadratic trend + k cos/sin pairs: the shipped 4 periods vs N random\n     4-period combs log-uniform in the band (same solver), and the Bond\n     line alone vs random single lines.\n  D. NEIGHBOURS \u2014 the shipped n against its non-compliant neighbours n \u00b1 1,\n     n \u00b1 2 in the same fit: the R\u00b2 information the gcd rule carries.\n\nPre-registered expectation: chance-level \u2014 the periods are FITTED periods\nwith a comb label; the wording is dropped, the numerics untouched (P3).",
+ "config": {
+  "H": 335317,
+  "eight_H": 2682536,
+  "band_yr": [
+   500.0,
+   5000.0
+  ],
+  "n_null": 2000,
+  "rng_seed": 20260920,
+  "shipped": [
+   [
+    "bond",
+    1830
+   ],
+   [
+    "hallstatt",
+    1104
+   ],
+   [
+    "jose5",
+    2989
+   ],
+   [
+    "jose4",
+    3749
+   ]
+  ]
+ },
+ "density": {
+  "rows": [
+   {
+    "name": "bond",
+    "n": 1830,
+    "period_yr": 1465.8666666666666,
+    "gcd_H": 61,
+    "factors": [
+     2,
+     3,
+     5,
+     61
+    ],
+    "lattice_spacing_yr": 0.8005825596212617,
+    "max_distance_to_lattice_pct": 0.027307482250133994,
+    "rayleigh_period_halfwidth_yr": 393.5467187627187
+   },
+   {
+    "name": "hallstatt",
+    "n": 1104,
+    "period_yr": 2429.8333333333335,
+    "gcd_H": 23,
+    "factors": [
+     2,
+     2,
+     2,
+     2,
+     3,
+     23
+    ],
+    "lattice_spacing_yr": 2.198944193061834,
+    "max_distance_to_lattice_pct": 0.04524886877828042,
+    "rayleigh_period_halfwidth_yr": 1081.33516992267
+   },
+   {
+    "name": "jose5",
+    "n": 2989,
+    "period_yr": 897.469387755102,
+    "gcd_H": 61,
+    "factors": [
+     7,
+     7,
+     61
+    ],
+    "lattice_spacing_yr": 0.30015698587124007,
+    "max_distance_to_lattice_pct": 0.016722408026754097,
+    "rayleigh_period_halfwidth_yr": 147.51855347207285
+   },
+   {
+    "name": "jose4",
+    "n": 3749,
+    "period_yr": 715.5337423312883,
+    "gcd_H": 23,
+    "factors": [
+     23,
+     163
+    ],
+    "lattice_spacing_yr": 0.19080899795494588,
+    "max_distance_to_lattice_pct": 0.013333333333328838,
+    "rayleigh_period_halfwidth_yr": 93.77079421513159
+   }
+  ],
+  "compliant_fraction": 0.06336715676123421,
+  "mean_spacing_compliant": 15.770491803278688,
+  "rayleigh_delta_n": 982.6139194139195,
+  "n_range": [
+   537,
+   5365
+  ]
+ },
+ "plateaus": {
+  "bond_top20": {
+   "n_range": [
+    1840,
+    1859
+   ],
+   "width": 20,
+   "delta_r2_range": [
+    0.498583397148453,
+    0.4987367640453363
+   ],
+   "compliant_inside": [
+    1840
+   ],
+   "shipped_rank_in_scan": 50,
+   "p_at_least_one_compliant": 0.7299851517328924
+  },
+  "bond_doc102_flat_band": {
+   "n_range": [
+    1817,
+    1863
+   ],
+   "width": 47,
+   "note": "doc 102: \"fit quality essentially indistinguishable across n=1817..1863\"",
+   "compliant_inside": [
+    1817,
+    1830,
+    1840,
+    1863
+   ],
+   "p_at_least_one_compliant": 0.953893625847974
+  },
+  "h253_scan": {
+   "n_range": [
+    2013,
+    2030
+   ],
+   "width": 18,
+   "delta_r2_range": [
+    0.03169071233006904,
+    0.03278686968575528
+   ],
+   "compliant_inside": [
+    2013,
+    2024
+   ],
+   "chosen": 2024,
+   "best_delta_r2_n": 2013,
+   "p_at_least_one_compliant": 0.6922139853586856
+  },
+  "rayleigh_window": {
+   "T_window_yr": 2730.0,
+   "delta_n_unresolved": 982.6139194139195,
+   "p_at_least_one_compliant": 1.0
+  }
+ },
+ "data_null": {
+  "n_points": 274,
+  "window": [
+   -720.0,
+   2010.0
+  ],
+  "trend": "intercept + linear + quadratic in (year \u2212 mean)/1000",
+  "r2_trend_only": 0.4763726610441372,
+  "r2_shipped_4": 0.9984695904521098,
+  "r2_canonical_external_4": 0.9984911592650721,
+  "r2_bond_alone": 0.9745035656179932,
+  "null4": {
+   "n": 2000,
+   "band_yr": [
+    500.0,
+    5000.0
+   ],
+   "mean": 0.9848340020552665,
+   "sd": 0.05105176684139281,
+   "p95": 0.9988157698132442,
+   "max": 0.9994039996751883,
+   "p_value_shipped": 0.356,
+   "p_value_canonical": 0.3475
+  },
+  "null1": {
+   "n": 2000,
+   "mean": 0.6819666581337774,
+   "sd": 0.16040325741075281,
+   "p95": 0.9571172135871161,
+   "max": 0.9751089499047679,
+   "p_value_bond": 0.0095
+  }
+ },
+ "neighbours": [
+  {
+   "name": "bond",
+   "n": 1830,
+   "r2_shipped_n": 0.9984695904521098,
+   "r2_n-2": 0.9984725771724433,
+   "gcd_n-2": 1,
+   "r2_n-1": 0.9984710852512854,
+   "gcd_n-1": 1,
+   "r2_n+1": 0.9984680927702997,
+   "gcd_n+1": 1,
+   "r2_n+2": 0.998466592201231,
+   "gcd_n+2": 1
+  },
+  {
+   "name": "hallstatt",
+   "n": 1104,
+   "r2_shipped_n": 0.9984695904521098,
+   "r2_n-2": 0.9984694888161149,
+   "gcd_n-2": 1,
+   "r2_n-1": 0.9984695396070173,
+   "gcd_n-1": 1,
+   "r2_n+1": 0.9984696413514161,
+   "gcd_n+1": 1,
+   "r2_n+2": 0.9984696923049604,
+   "gcd_n+2": 1
+  },
+  {
+   "name": "jose5",
+   "n": 2989,
+   "r2_shipped_n": 0.9984695904521098,
+   "r2_n-2": 0.9984673607296066,
+   "gcd_n-2": 1,
+   "r2_n-1": 0.9984684754287537,
+   "gcd_n-1": 1,
+   "r2_n+1": 0.9984707057988328,
+   "gcd_n+1": 23,
+   "r2_n+2": 0.9984718214680773,
+   "gcd_n+2": 1
+  },
+  {
+   "name": "jose4",
+   "n": 3749,
+   "r2_shipped_n": 0.9984695904521098,
+   "r2_n-2": 0.9984705112903508,
+   "gcd_n-2": 1,
+   "r2_n-1": 0.9984700512644809,
+   "gcd_n-1": 1,
+   "r2_n+1": 0.9984691288525619,
+   "gcd_n+1": 1,
+   "r2_n+2": 0.9984686664651644,
+   "gcd_n+2": 1
+  }
+ ],
+ "verdict": {
+  "density": "Any period in 500\u20135000 yr lies within 0.045 % of an 8H/n; 6.3 % of the integers in the band satisfy gcd(n, H) > 1 (H = 23\u00b761\u00b7239), mean spacing 15.8; the 2730-yr window cannot resolve \u0394n < 983.",
+  "plateaus": "The Bond scan's flat band n = 1817\u20261863 holds 4 compliant integers (P \u2265 1 = 95 %); the h253 plateau n = 2013\u20262030 holds 2 (its best \u0394R\u00b2 sits at n = 2013, also compliant; n = 2024 was chosen). A gcd-compliant n is available inside every fitted plateau by density alone.",
+  "data_null": "Shipped 4 periods R\u00b2 = 0.9985; random 4-period combs mean 0.9848, p95 0.9988, p(shipped) = 0.356; the canonical external periods (1470/2400/5\u00d7178.7/4\u00d7178.7, no lattice) give 0.9985.",
+  "neighbours": "Moving any shipped n to a non-compliant neighbour (n \u00b1 1, \u00b1 2) changes R\u00b2 by at most 3.00e-06 \u2014 the gcd rule carries no fit information.",
+  "bond_alone": "A SINGLE line at the Bond period does beat random single lines (R\u00b2 0.9745 vs null p95 0.9571, p = 0.009): the residual carries a real ~1.5-kyr oscillation. Its period comes from the record and the canonical Bond value, not from the lattice \u2014 the same line at any non-lattice period within the Rayleigh width fits the same.",
+  "statement": "The 8H/n label is satisfied by every period in the band; the gcd rule is satisfied inside every fitted plateau; the shipped 4-period stack does not beat random 4-period millennial combs beyond the null spread (the statistic is near saturation for 11 parameters on 274 smooth points), and non-compliant neighbours fit identically. The periods are FITTED periods (selected on external canonical values plus the gcd rule inside unresolved plateaus), stated in years; the divisor is an implementation detail of the fitter. The \"zero-fit structural prediction\" wording is not earned; the numerics stand as the certified fit, and the Bond-scale oscillation itself is real.",
+  "caveat": "The residual series is the banked export of data/deltaT-bond-cycle-residual-fit.json (Stephenson 2016 \u2212 the framework model of that export, 10-yr grid); the shipped stack was fitted against the current model residual with the Holocene taper and the USNO closure. The null compares PERIODS on one series, so the comparison is internally consistent; the absolute R\u00b2 values are those of this series."
+ },
+ "meta": {
+  "script": "scripts/t5_dt_stack_lattice_null.py",
+  "doc": "docs/102-gia-alpha-lunar-validation.md / docs/104 (T5, plan 06)",
+  "runtime_sec": 0.0009241104125976562,
+  "environment": {
+   "python": "3.12.3",
+   "numpy": "2.4.1"
+  }
+ },
+ "inputs": {
+  "generator": "python3 scripts/t5_dt_stack_lattice_null.py --write",
+  "files": {
+   "data/deltaT-4flag-fit.json": "sha256:4aee8bf8b65ecb29eb70dfb591ff3b42e1522463327550cb9c1b5ea685f08626",
+   "data/deltaT-bond-cycle-residual-fit.json": "sha256:a8e767f4efaaa25cfa0670938b37567fb913cd1dbdab99bfe63df7c6bbbbbdb2",
+   "data/deltaT-divisor-scan-jse.json": "sha256:7c3208b8d6e59e5492eeed191321a4d45edc4e411214fe06ed8306ebb1021b3a",
+   "data/deltaT-h253-fifth-cycle-scan.json": "sha256:359b57265a098ffb54f522b1782d1d2c1f5f3130b2db97ceba9e306776cb1de7",
+   "public/input/model-parameters.json": "sha256:e4add264813ec19a2ad50281b7da5eace84e13c6c2dc9bec82952cdc71bddd72",
+   "scripts/t5_dt_stack_lattice_null.py": "sha256:da989aa05293f80c289d2b0ad7c90cededa7f46aa69566fbaa292d33b7c0c43c"
+  }
+ }
+}

@@ -22,14 +22,13 @@ at J2000, Dickey 1994 / Chapront 2002) PLUS the L1-orbital-coupled α(t) GIA
 viscoelastic correction (Cox & Chao 2002 dJ₂/dt = -2.7e-11/yr with J₂→α
 conversion factor 2.0 in the Peltier ICE-6G LOD-coupling range, giving
 dα/dt = -1.35e-11/yr at J2000), together with a jointly-calibrated trend
-anchor + 4-flag lattice stack + Core-mantle swing against the Espenak 2006
+anchor + 4-flag millennial stack + Core-mantle swing against the Espenak 2006
 ΔT polynomial 1650-2017, produces a mean |residual| of 20.2 min against 267
 primary-source lunar observations spanning 2,000 years. The residual after α(t) is
-decomposed below into four framework-native sub-Milankovitch lattice
-harmonics (Bond 8H/1830 = 1466 yr, Hallstatt 8H/1104 = 2430 yr, Jose5
-8H/2989 = 897 yr, Jose4 8H/3749 = 716 yr — shipped default-ON as the
-4-flag stack with cap-only fit-derived amplitudes) plus observation
-noise.**
+decomposed below into four fitted millennial cycles at the canonical
+Bond, Hallstatt and Jose periods (1466, 2430, 897 and 716 yr; shipped
+default-ON as the 4-flag stack with cap-only fit-derived amplitudes) plus
+observation noise.**
 
 **Every physical constant in the live model comes from independent literature
 sources — IERS α at J2000, LLR-observed da/dt, Cox & Chao satellite dJ₂/dt,
@@ -42,11 +41,32 @@ non-tidal contribution IS detectable in the record and its dominant
 component is well-matched by the GIA viscoelastic relaxation measured by
 GRACE/LAGEOS satellite gravimetry — about ten times smaller than the
 Munk-MacDonald estimate, and included in the framework via α(t). Additional
-structure in the residual after GIA correction is captured by the
-framework-native 4-flag 8H-lattice stack — a millennial-scale
-lattice-harmonic decomposition (Bond 8H/1830 = 1466 yr = 74 × J-S synodic,
-gcd=61, dominant) whose periods are zero-fit structural predictions of the
-Earth Fundamental Cycle H = <!--v:H-->335,317<!--/v--> yr framework.
+structure in the residual after GIA correction is captured by the 4-flag
+stack — four fitted millennial cycles (Bond 1466 yr dominant) whose periods
+come from the record and the canonical paleoclimate values.
+
+**Status of the period claims (T5, plan 06).** The four periods were
+long described here as "zero-fit structural predictions" of a comb of
+integer divisions of eight times H (period = 8·H/n), resting on two
+arguments: each period is such a division, and each divisor shares a
+prime factor with H (gcd 23 or 61). The pre-registered test
+`scripts/t5_dt_stack_lattice_null.py` (artifact
+`data/t5-dt-stack-lattice-null.json`) measured both arguments at chance
+level: every period in the 500–5000 yr band lies within 0.03 % of some
+comb member; H = 23·61·239, so 6 % of the integers in the band share a
+factor with it and a compliant integer sits inside every fitted plateau
+by density alone (the Bond band n = 1817…1863 holds four); the shipped
+four periods fit the residual no better than random four-period
+millennial combs (p = 0.36), the canonical external periods fit
+identically, and moving any divisor to a non-compliant neighbour changes
+R² by less than 1e-5. What is real: a single ~1.5-kyr line beats random
+single lines (p = 0.009) — the Bond-scale oscillation is in the record.
+The periods are therefore stated in years throughout: Bond 1466,
+Hallstatt 2430, Jose5 897, Jose4 716 — fitted millennial periods at the
+canonical values. The divisor integers (1830, 1104, 2989, 3749) survive
+only as the fitter's implementation detail and, below, as the historical
+account of how they were selected; every "structural" or
+"framework-native" period claim is retired. The numerics are untouched.
 
 ---
 
@@ -223,7 +243,7 @@ continuity at J2000 — is *emergent* from the L1 orbital signal, not fitted.
    both).
 
 2. **Bounded at deep paleo**: the L1 orbital signal is a bounded
-   periodic sum over H-lattice divisors — α(t) stays within a bounded
+   periodic sum over fixed harmonics — α(t) stays within a bounded
    glacial-cycle range at any epoch. No blow-up in Cambrian/Devonian calls.
 
 3. **C∞ continuous at t_Ma = 0**: the L1 orbital form is smooth
@@ -410,7 +430,7 @@ in the loop.
 | Linear α(t) @ −1.35×10⁻¹¹/yr (factor-2.0 J₂→α, Peltier ICE-6G) | 23.6 min | — | — |
 | Single-mode viscoelastic α(t), τ = 5 ka | 24.3 min | 0.096 | −0.79 |
 | Multi-mode viscoelastic α(t), τ ∈ {1.5, 5, 14} ka (\|t\|-symmetric) | 24.4 min | 0.090 | −0.77 |
-| L1-orbital-coupled α(t) + 4-flag lattice stack (pre-joint) | 21.3 min | — | — |
+| L1-orbital-coupled α(t) + 4-flag millennial stack (pre-joint) | 21.3 min | — | — |
 | **L1-orbital-coupled α(t) + 4-flag stack + Core-mantle swing (shipped, joint world)** | **20.2 min** | — | — |
 
 Each row is a single physically-motivated literature value swapped
@@ -418,10 +438,10 @@ into the model. The R²(linear) collapse from 0.53 → 0.090 under the
 viscoelastic α(t) is the *first-order organised-structure absorption* —
 most of the pure-tidal offset from Stephenson is captured by the GIA
 correction alone. The final row (L1-orbital + 4-flag stack) closes the
-remaining millennial-scale residual structure using framework arithmetic
-on the H-lattice (Bond 8H/1830, Hallstatt 8H/1104, Jose5 8H/2989, Jose4
-8H/3749) with no additional physical constants beyond α, dα/dt, and the
-H fundamental cycle itself.
+remaining millennial-scale residual structure with four fitted millennial
+cycles (Bond 1466, Hallstatt 2430, Jose5 897, Jose4 716 yr): their
+amplitudes and phases are fitted, their periods are the canonical values
+(T5).
 
 The L1-orbital refinement replaces the `|t_Ma|`-symmetric viscoelastic
 form with direct coupling of α(t) to the L1 orbital layer of the
@@ -489,7 +509,7 @@ tablet's published totality window
 Every `dt_observed_sec` in the corpus was produced by converting the raw
 tablet timing through the Stephenson team's ELP-class lunar ephemeris with
 its constant-ṅ convention. The framework's Moon is not that Moon: its
-month evolution is chain-integrated on the H-lattice. The `theoryDrift`
+month evolution is chain-integrated on the model's own recession history. The `theoryDrift`
 section of the same gate measures the difference directly, on the TT axis
 (framework opposition vs the NASA canon's greatest-eclipse instant, era
 bins ±40 yr, modern definitional baseline subtracted): a smooth secular
@@ -620,8 +640,8 @@ swing −1,198 → −627 → −1,222 s across −500/−400/−300. A real ΔT
 do that — it would require ~16 ms/day LOD excursions flipping sign
 century to century. The same test that adjudicates individual tablets
 kills the ensemble structure. (2) *The LOD-amplitude bound*: the
-weighted lattice periodogram's best tone (a broad band around
-8H/2300 ≈ 1,165 yr, amplitude 430 s, Δχ² 22) implies a **6.4 ms** LOD
+weighted periodogram's best tone (a broad band around 1,165 yr,
+amplitude 430 s, Δχ² 22) implies a **6.4 ms** LOD
 amplitude — above the ~4 ms millennial bound that already excluded
 mid-period closing cycles. The best candidate "new cycle" is
 disqualified by the model's own standing bound.
@@ -650,10 +670,9 @@ under the "Eight hypotheses tested" and "Complete residual
 decomposition" sections below. In brief preview, the decomposition has
 three parts:
 
-- **A millennial-scale lattice-harmonic oscillation** at 8H/1830 =
-  1466 yr = 74 × Jupiter-Saturn synodic (gcd(1830, H) = 61, shares H's
-  61 prime factor) — a structural prediction from
-  framework arithmetic that captures the dominant "bump" shape of the
+- **A millennial-scale Bond oscillation** at 1466 yr (74 × Jupiter-Saturn
+  synodic to 0.22 % is one of several period coincidences at this
+  resolution) that captures the dominant "bump" shape of the
   medieval feature; shipped default-ON as the Bond component of the
   4-flag stack (Bond + Hallstatt + Jose5 + Jose4).
 - **A fractional non-tidal channel** ~0.5 ms/century window-average
@@ -861,16 +880,15 @@ the residual (see "Residual shape decomposition" below) shows it
 decomposes into a linear secular drift plus one symmetric bump centred
 in the medieval window — one mechanism each for drift and bump, not
 multiple independent excursions. The bump is captured by the shipped
-4-flag lattice stack; the residual investigation below explores the
+4-flag millennial stack; the residual investigation below explores the
 remaining sub-signal.
 
 Eight candidate mechanisms have been tested with appropriate statistical
 methods, plus three follow-up predictive tests of proposed mechanisms (Path A,
 Test 5, and the drift-origin diagnostic sequence §14-§17). **Under per-era
 analysis all correlation-based hypotheses collapse to drift-tracking artifacts
-rather than causal per-observation links.** The mechanisms that survive are all
-STRUCTURAL — lattice-native
-(single 8H integer divisor at n=1830 = 74×J-S synodic, gcd=61, captures the
+rather than causal per-observation links.** The mechanisms that survive are
+a single millennial harmonic (the 1466-yr Bond period captures the
 ~1466 yr bump) and residual-rate-based (§16's fractional non-tidal channel ~0.5 ms/century
 window-average, roughly 10% of the full Munk-MacDonald postulate — carried
 by the Core-mantle swing, doc 104); the L1-α-era spectral detections (H6) do
@@ -1121,16 +1139,14 @@ tests (Path A, Test 5) and the drift-origin diagnostic sequence
 (§14–§17), leaves the following open:
 
 1. **Independent amplitude/phase calibration for the four shipped
-   sub-Milankovitch 8H harmonics** — the framework predicts each PERIOD
-   (Bond 1466 yr = 74 × J-S synodic gcd=61; Hallstatt 2430 yr = H/138
-   gcd=23; Jose5 897 yr = 5×Jose gcd=61; Jose4 716 yr = 4×Jose, the
-   Jose5-coupled companion — all zero-fit structural
-   predictions), but amplitudes and phases are currently fit-derived
+   millennial cycles** — each PERIOD is the canonical value (Bond
+   1466 yr; Hallstatt 2430 yr; Jose5 897 yr = 5×Jose; Jose4 716 yr =
+   4×Jose, the Jose5-coupled companion — fitted-band periods, T5), and
+   amplitudes and phases are fit-derived
    against the Stephenson ΔT residual and would need to be calibrated
    against independent paleoclimate proxies (Bond 1997 IRD for Bond,
    Steinhilber ¹⁰Be for Hallstatt) to fully restore the zero-eclipse-fit
-   claim. See "Millennial-scale 8H lattice harmonic" and "Companion 8H
-   lattice harmonics" sections above.
+   claim. See the Bond and companion-harmonic sections above.
 2. ~~Identify the physical channel for the fractional non-tidal
    rate~~ **Identified: the Core-mantle swing** (see the
    three-component decomposition above; full identification chain,
@@ -1158,14 +1174,13 @@ tests (Path A, Test 5) and the drift-origin diagnostic sequence
    ~0.5 ms/century window-average (§16) — the Core-mantle swing
    (doc 104). In the joint world both structures are absorbed (numbers
    in "The complete picture" below).
-3. **The medieval BUMP has a framework-native structural interpretation**:
-   the 8H integer scan identifies a broad peak in the Bond band centered
-   near ~1465 yr, with n=1830 = 74 × J-S synodic (gcd=61) shipped as the
-   H-lattice-compliant representative (closest to canonical Bond 1470 yr).
-   The PERIOD is a zero-fit structural prediction; the AMPLITUDE/PHASE
-   are fit-derived (constrained physical priors) with independent
-   paleoclimate calibration as the path to fully restore the zero-fit
-   claim.
+3. **The medieval BUMP is a Bond-scale oscillation**: the divisor scan
+   identifies a broad peak in the Bond band centered near ~1465 yr,
+   with n=1830 shipped as the representative closest to canonical Bond
+   1470 yr. The PERIOD is the record's (the divisor carries no
+   information — T5); the AMPLITUDE/PHASE are fit-derived (constrained
+   physical priors), with independent paleoclimate calibration as the
+   path to amplitude and phase from independent physics.
 4. **Peak-year and peak-magnitude claims carry reference-polynomial uncertainty**
    — ~200 yr / ~400 s across Stephenson 2016 vs NASA-derived references. Robust
    claims: "peak in 840–1020 CE window, ~1000 s peak magnitude"; fragile
@@ -1177,28 +1192,28 @@ tests (Path A, Test 5) and the drift-origin diagnostic sequence
 
 ---
 
-## Millennial-scale 8H lattice harmonic at ~1466 years (74 × Jupiter-Saturn synodic, gcd=61) — shipped default-ON as part of 4-flag stack
+## Millennial-scale Bond harmonic at ~1466 years — shipped default-ON as part of the 4-flag stack
 
 After the eight hypothesis tests left the medieval residual characterized
 but not causally explained by any per-observation mechanism, a follow-up
 investigation tested whether the residual could be absorbed by **a single
-millennial-scale 8H/n lattice harmonic** — i.e. a period given by 8H
-divided by some integer n, on the scale of hundreds to thousands of years.
-Unlike the Lomb-Scargle test (hypothesis 6) which scanned literature
-periods at arbitrary frequencies, this test restricted candidates to
-*integer divisors of 8H* — periods that are commensurate with the
-framework's fundamental cycle.
+millennial-scale harmonic** drawn from the comb of integer divisions of
+eight times H (period = 8·H/n), on the scale of hundreds to thousands of
+years. Unlike the Lomb-Scargle test (hypothesis 6) which scanned literature
+periods at arbitrary frequencies, this test restricted candidates to that
+comb — a restriction T5 later measured as empty (any period in the band
+is within 0.03 % of a comb member).
 
-### Finding — n=1830 is framework-native (74 × Jupiter-Saturn synodic, gcd=61)
+### Finding — a broad Bond-band peak; n=1830 selected
 
-A full 8H integer-divisor scan across the sub-Milankovitch band (n ∈
+A full divisor scan (period = 8·H/n) across the sub-Milankovitch band (n ∈
 [500, 5000], periods ~500 to ~5000 yr) — implemented as §14 of the L-5b
 console diagnostic and as `scripts/lod_residual_divisor_scan_jse.py` —
 identifies a **broad peak in the ~1400–1500 yr range** with fit quality
 essentially indistinguishable across n=1817..1863 (all R² 0.974–0.975,
 well within the ~370-yr Fourier resolution of the training window).
-Among the gcd-compliant candidates in this band, **n=1830** — with
-`gcd(1830, H) = 61` sharing H's 61 prime factor — is closest to the
+Among the candidates in this band, **n=1830** — `gcd(1830, H) = 61`, the
+selection filter of the time — is closest to the
 canonical Bond period from paleoclimate (~1470 yr, only 4 yr off):
 
 | Interpretation | Value | Error |
@@ -1210,11 +1225,13 @@ canonical Bond period from paleoclimate (~1470 yr, only 4 yr off):
 
 All three planetary interpretations converge on the Bond-scale period; the
 J-S synodic count of 74 anchors it in Charvátová's Solar Inertial Motion
-theory. The divisor 1830 = 2·3·5·61 shares H's 61-factor via the framework's
-own arithmetic — matching Jose5 (gcd=61 via 2989 = 7²·61) on the same
-H-prime factor. This is a **structural prediction** — the period 1466 yr
-drops out of the 8H lattice arithmetic with zero fitting, and its
-gcd-compliance is uniform with Hallstatt (gcd=23) and Jose5 (gcd=61).
+theory. The divisor 1830 = 2·3·5·61 shares H's 61-factor, as Jose5 does
+(2989 = 7²·61). **This sharing is a label, not a prediction** (T5): H =
+23·61·239, so 6 % of the integers in the band share a factor with it,
+and the flat band n = 1817…1863 holds four such integers (1817, 1830,
+1840, 1863) — n = 1830 was selected as the compliant one nearest the
+canonical Bond value. The period is the record's and the canonical
+value's; the lattice arithmetic did not predict it.
 
 ### Empirical confirmation and Fourier resolution
 
@@ -1229,9 +1246,9 @@ Fit statistics for the n=1830 harmonic against the Stephenson ΔT residual:
 **Divisor degeneracy note:** fit quality is indistinguishable across
 n=1817..1863 (<0.001 R² — well within the ~370-yr Fourier window
 resolution; the §17 dual-harmonic test confirms n=1830, n=1851 and
-n=1920 all describe the same peak). The shipped n=1830 wins on
-structural grounds — gcd-compliance with H and closest to canonical
-Bond — not on empirical distinctness.
+n=1920 all describe the same peak). The shipped n=1830 was chosen as
+closest to canonical Bond among the degenerate band — not on empirical
+distinctness, and the gcd criterion carries no information (T5).
 
 ### Structural significance — three convergent physical mechanisms
 
@@ -1242,10 +1259,8 @@ mutually exclusive:
 74 × Jupiter-Saturn synodic aligns with SIM patterns in the Sun's
 barycentric motion. J-S conjunctions modulate the Sun's motion around
 the barycenter, driving solar-activity envelope modulation on
-multi-centennial timescales. The 74× count drops out of the 8H integer
-arithmetic on the framework's 61-factor lattice (1830 = 2·3·5·61), the
-same lattice that anchors Jose5. This ties Bond-scale climate
-variability to Jupiter-Saturn dynamics in a lattice-native way.
+multi-centennial timescales. The 74× count is a period coincidence at
+the record's resolution (0.22 %), not an arithmetic derivation (T5).
 
 **Reading 2 — Bond cycle / Braun et al. 2005 thermohaline mechanism**:
 the shipped period 1466 yr sits within Bond's published 1470±100 yr
@@ -1259,12 +1274,11 @@ within the same Fourier-resolved band. These readings tie the observed
 feature to Earth-external planetary orbital mechanics rather than
 Earth-perihelion sub-harmonics.
 
-**H-lattice-uniformity note**: n=1830 shares 61 with H via 1830 = 2·3·5·61,
-the same prime factor that anchors Jose5 (2989 = 7²·61). Hallstatt
-uses H's 23 factor (138 = 6·23; 1104 = 2⁴·3·23). All three shipped
-divisors satisfy the gcd rule that the framework's Sun-longitude
-harmonic runtime filter enforces (commit 6d87173), giving a uniform
-"each cycle on H's own primes" story across the 4-flag stack (Bond gcd=61, Hallstatt gcd=23, Jose5 gcd=61, Jose4 gcd=23).
+**Selection-rule note (T5)**: n=1830, 1104, 2989 and 3749 were selected
+under the gcd rule the Sun-longitude harmonic runtime filter enforces
+(commit 6d87173) — each shares a prime factor with H (61, 23, 61, 23).
+The T5 null shows a compliant integer sits inside every fitted plateau by
+density alone: the rule selected divisors, it did not predict periods.
 
 ### Live integration: shipped default-ON as part of the 4-flag stack
 
@@ -1278,8 +1292,8 @@ Bond alone halves the medieval bump peak (−1067 s → −543 s at year 990)
 while leaving the aggregate mean |residual| roughly neutral — its
 ancient trough near year −480 adds to the already-positive ancient BCE
 residuals, cancelling the medieval win at the aggregate level. This
-motivated the companion 8H harmonics (Hallstatt 8H/1104 and Jose5
-8H/2989) that absorb signal bands where Bond is off-cycle. With the
+motivated the companion harmonics (Hallstatt 2430 yr and Jose5 897 yr)
+that absorb signal bands where Bond is off-cycle. With the
 full stack shipped default-ON (4 flags + Core-mantle swing, joint
 world), the L-5b headline reaches 20.2 min mean |residual| with
 117/267 events (43.8%) beating NASA's
@@ -1298,11 +1312,10 @@ for the runtime constants. Enabling this in the live
 model **VIOLATES the paper's original "no coefficients fitted to
 eclipse data at any stage" claim**. This is a deliberate design
 decision reflected in the code. The
-framework arithmetic **predicts the PERIOD 1466 yr** (74 × J-S
-synodic on the 8H lattice at n=1830, gcd(1830, H) = 61, zero-fit);
-the amplitude/phase remain fit-derived.
+PERIOD 1466 yr is the canonical Bond value as the record resolves it
+(T5); the amplitude/phase remain fit-derived.
 
-Two remaining paths to fully restore the zero-fit claim:
+Two paths to amplitude and phase from independent physics:
 
 1. **Independent paleoclimate calibration**: fit amplitude and phase
    to Bond 1997 IRD record, Braun 2005 thermohaline reconstruction,
@@ -1315,7 +1328,7 @@ Two remaining paths to fully restore the zero-fit claim:
 Until either path yields amplitude/phase from independent physics,
 the shipped default-ON toggle is the research-ready configuration
 that's been empirically A/B tested; the OFF state remains one flag-flip
-away for zero-fit baseline measurement.
+away for baseline measurement without the stack.
 
 ### Research infrastructure
 
@@ -1326,7 +1339,7 @@ Current shipped fit (sole runtime source of truth):
 - `data/deltaT-4flag-fit.json` — combined 4-cycle fit output; sole authoritative source for the shipped coefficients.
 
 Supporting scan/validation tooling: `scripts/lod_residual_divisor_scan_jse.py`
-(the full 8H scan with J-S-E interpretation, output
+(the full divisor scan with J-S-E interpretation, output
 `data/deltaT-divisor-scan-jse.json`), `scripts/lattice_harmonic_scan.py`
 (cross-archive), `scripts/stephenson_observation_density.py` (falsifies the
 spline-artifact hypothesis — the medieval window has 36.9 obs/century),
@@ -1336,23 +1349,22 @@ as the source — its shortest period is 14.5 kyr).
 Live in the sim (all shipped default-ON):
 
 - `BOND_DT_CORRECTION_ENABLED` flag in `src/script.js` (default `true`)
-- "Toggle 8H/1830 ΔT correction" console-test button for A/B measurement
+- the Bond ΔT-correction toggle console-test button for A/B measurement
 - §14 (`_L5b_lattice_scan`), §15 (`_L5b_anchor_sensitivity`), §16
   (`_L5b_rate_sensitivity`), §17 (`_L5b_higher_order`) diagnostic sections
   in Merged L-5b button
 
 ### Scientific status
 
-**The 1466-yr period drops out of framework arithmetic** as 74 × J-S
-synodic on the 8H lattice (divisor n=1830 = 2·3·5·61, gcd(1830, H) = 61
-sharing H's 61 prime factor). This is a zero-fit structural prediction,
-independent of the observed eclipse residual. Empirical confirmation
-against the historical eclipse record is decisive: the Stephenson −
-model residual is well-fit by a single harmonic at exactly this period
-(R² = 0.975 in-sample, R²_test = 0.97 cross-validated on CE→BCE
-prediction; random 8H/n integers in the same period range give R²_test
-≈ 0.48 — no signal). The signal is real, period-specific, and
-lattice-native.
+**The 1466-yr period is the canonical Bond period** (divisor 1830 in the
+fitter; 74 × J-S synodic to 0.22 % is a coincidence at this resolution —
+T5). Empirical confirmation of the oscillation against the historical
+eclipse record is decisive: the Stephenson − model residual is well-fit
+by a single harmonic at this period (R² = 0.975 in-sample, R²_test =
+0.97 cross-validated on CE→BCE prediction; random single lines score
+lower — T5: mean 0.68, 95th percentile 0.957 for log-uniform periods in
+the band; the older uniform-integer control gave 0.48). The signal is
+real and period-specific.
 
 **The Bond-scale 1450-yr period is well-documented in paleoclimate**
 (Bond et al. 2001 in North Atlantic ice-rafted debris; Schulz 2002 /
@@ -1364,45 +1376,40 @@ is unresolved** in mainstream literature (solar amplification, thermohaline
 oscillation, stochastic resonance, and astronomical/orbital forcing all
 have proponents).
 
-Our finding adds a specifically-framework-native reading: the observed
-1466-yr signal in historical Earth rotation matches the H-lattice-compliant
-divisor at n=1830 = 74 × J-S synodic (0.22% error, gcd(1830, H) = 61
-sharing H's 61 prime factor). This is the first identification (to our
-knowledge) of the Bond-scale cycle in the Earth-rotation observational
-record as a gcd-compliant arithmetic consequence of Jupiter-Saturn
-synodic dynamics on the framework's 8H lattice — a **structural
-prediction from framework physics**, empirically confirmed in the
-ΔT residual.
+Our finding: the Bond-scale cycle is present in the historical
+Earth-rotation record — a single ~1.5-kyr line beats random single lines
+in the ΔT residual at p = 0.009 (T5). This is the first identification
+(to our knowledge) of the Bond-scale cycle in the Earth-rotation
+observational record. The 74 × Jupiter-Saturn synodic reading (0.22 %)
+is a period coincidence at this resolution, not a derivation.
 
-The **live integration** ships alongside three companion H-lattice
+The **live integration** ships alongside three companion millennial
 harmonics (Hallstatt, Jose5, Jose4) — see next section for the
 empirical validation that motivated the full 4-flag stack.
 
 ---
 
-## Companion 8H lattice harmonics: Hallstatt (2430 yr), Jose5 (897 yr), and Jose4 (716 yr)
+## Companion millennial harmonics: Hallstatt (2430 yr), Jose5 (897 yr), and Jose4 (716 yr)
 
-After Bond's structural identification, three further sub-Milankovitch
-divisors were investigated as companion ΔT corrections. All four
-shipped divisors are **H-lattice-compliant via the gcd rule** (they
-share prime factors with H = 23·61·239): Bond n=1830 shares 61,
-Hallstatt n=1104 shares 23, Jose5 n=2989 shares 61, Jose4 n=3749
-shares 23. Each corresponds to established sub-Milankovitch cycles in
+After Bond, three further millennial periods were investigated as
+companion ΔT corrections. All four shipped divisors were selected under
+the gcd rule (they share prime factors with H = 23·61·239: 1830 → 61,
+1104 → 23, 2989 → 61, 3749 → 23) — a selection filter, not a prediction
+(T5). Each corresponds to established sub-Milankovitch cycles in
 independent paleoclimate proxies.
 
 The four-cycle stack (Bond + Hallstatt + Jose5 + Jose4) is shipped
 default-ON in `src/script.js`, with each individually toggleable. The
 gcd rule (`gcd(divisor, H) > 1`) enforced in the Sun-longitude runtime
-filter (commit `6d87173`) provides the structural principle that
-separates on-lattice from off-lattice divisor candidates.
+filter (commit `6d87173`) was the selection filter; T5 measured it as
+carrying no information about the periods.
 
-### Hallstatt-scale 8H/1104 harmonic (~2430 yr, H/138 via 23-factor) — solar-activity coupling
+### Hallstatt harmonic (~2430 yr) — solar-activity coupling
 
-**Period 8H/1104 = 2429.83 yr = H/138**. The 8H-form divisor 1104 =
-2⁴·3·23 shares H's 23 prime factor (`gcd(1104, H) = 23`); equivalently
-the H-form divisor 138 = 6·23 places the harmonic at the sixth
-sub-harmonic of the framework's ~14.6-kyr period H/23 = 14,579 yr
-(since H/138 = H/(6·23) = (H/23)/6). H-lattice-compliant by the gcd rule.
+**Period 2429.83 yr** (divisor 1104 in the fitter, = H/138). The divisor
+1104 = 2⁴·3·23 shares H's 23 prime factor — the selection filter (T5);
+equivalently 138 = 6·23 places the harmonic at the sixth sub-harmonic of
+the ~14.6-kyr period H/23 = 14,579 yr.
 
 **Physical interpretation**: matches the well-established **Hallstatt
 cycle** (~2200–2500 yr) in cosmogenic isotope records
@@ -1415,14 +1422,14 @@ variability.
 
 **Empirical validation across three independent paleoclimate proxies**:
 
-| Proxy | Duration | Empirical peak | Peak R² | Framework 8H/1104 R² |
+| Proxy | Duration | Empirical peak | Peak R² | Shipped 2430-yr R² |
 |---|---:|---:|---:|---:|
 | Steinhilber 2012 ¹⁰Be solar Φ | 9.4 kyr | 2293 yr | 0.077 | 0.058 (75% of peak) |
 | Bereiter 2015 EPICA CO₂ | 800 kyr | 2404 yr | 0.043 | 0.037 (86% of peak) |
 | Cheng 2016 speleothem δ¹⁸O | 640 kyr | (no peak) | <0.001 | <0.001 (null) |
 
-**Two of three proxies show consistent Hallstatt-band signal near
-framework's structural divisor 8H/1104.** The Cheng speleothem null
+**Two of three proxies show consistent Hallstatt-band signal near the
+shipped 2430-yr period.** The Cheng speleothem null
 result is attributed to monsoon δ¹⁸O being dominated by orbital-scale
 forcing at 640 kyr, obscuring the weaker solar-activity signal.
 
@@ -1442,13 +1449,12 @@ proportionally.
 - `data/hallstatt-{steinhilber,cheng,epica}-fit.json` — proxy tests
 - `data/deltaT-bond-plus-hallstatt-fit.json` — pair fit output
 - `HALLSTATT_DT_CORRECTION_ENABLED` flag in `src/script.js` (default `true`)
-- "Toggle 8H/1104 Hallstatt ΔT correction" console-test button
+- the Hallstatt ΔT-correction toggle console-test button
 
-### Jose5 8H/2989 harmonic (~897 yr, 5×Jose via 61-factor) — planetary resonance
+### Jose5 harmonic (~897 yr, 5×Jose) — planetary resonance
 
-**Period 8H/2989 = 897.47 yr**. Divisor 2989 = 7²·61 shares H's 61
-prime factor (`gcd(2989, H) = 61` — same value as `gcd(2989, 8H)` since
-2989 is odd). H-lattice-compliant by the gcd rule.
+**Period 897.47 yr** (divisor 2989 in the fitter). Divisor 2989 = 7²·61
+shares H's 61 prime factor — the selection filter (T5).
 
 **Physical interpretation**: closest match to **5 × Jose period**
 (5 × 179 yr = 895 yr, offset 0.28%). The Jose cycle (Charvátová 2000)
@@ -1461,18 +1467,18 @@ before Hallstatt or Jose5 were shipped):
 
 | Divisor range | Period range | Amp | ΔR² |
 |---:|---:|---:|---:|
-| **8H/2991..3000** | **894–897 yr** | **~70 s** | **0.0026** (top of scan) |
+| **divisors 2991..3000** | **894–897 yr** | **~70 s** | **0.0026** (top of scan) |
 
-This was the strongest remaining 8H lattice signal in the lunar
+This was the strongest remaining signal in the divisor scan of the lunar
 eclipse residual after Bond correction. All top-10 divisors in
-Section 14 fell in the 894–897 yr band; the H-lattice-compliant
-choice n=2989 (gcd=61) is essentially at the empirical peak.
+Section 14 fell in the 894–897 yr band; the choice n=2989 is
+essentially at the empirical peak.
 
 **Verification — Jose5 absorbs its designed signal**: after Jose5
 was activated in the 3-flag stack, the L-5b Section 14 top peak
 migrated from 897 yr (Jose5's target) to 1090 yr — confirming Jose5
 successfully absorbed the 897 yr band. This is the empirical
-signature we would expect from a correctly-tuned lattice harmonic.
+signature we would expect from a correctly-tuned harmonic.
 
 **Amplitude — 50 s constrained**: triple joint fit (Bond + Hallstatt
 + Jose5) gave Jose5 free-fit amplitude 74 s. L-5b empirical was
@@ -1484,17 +1490,17 @@ are simultaneously enabled); phase preserved from triple fit.
 - `scripts/lod_residual_triple_bond_hallstatt_jose5.py` — triple joint fit
 - `data/deltaT-triple-bond-hallstatt-jose5-fit.json` — triple fit output
 - `JOSE5_DT_CORRECTION_ENABLED` flag in `src/script.js` (default `true`)
-- "Toggle 8H/2989 Jose5 ΔT correction" console-test button
+- the Jose5 ΔT-correction toggle console-test button
 
-### Jose4 8H/3749 harmonic (~716 yr, 4×Jose via 23-factor) — cross-archive coherent
+### Jose4 harmonic (~716 yr, 4×Jose) — cross-archive coherent
 
-**Period 8H/3749 = 715.53 yr**. Divisor 3749 = 23 × 163 shares H's 23
-prime factor (`gcd(3749, H) = 23` — same family as Hallstatt).
-H-lattice-compliant by the gcd rule.
+**Period 715.53 yr** (divisor 3749 in the fitter). Divisor 3749 = 23 × 163
+shares H's 23 prime factor — the selection filter (T5), same family as
+Hallstatt.
 
 **Physical interpretation**: closest match to **4 × Jose period**
-(4 × 178.735 yr = 714.94 yr, offset **0.083%** — the tightest structural
-anchor of any gcd-compliant 600–800 yr candidate, tighter than Bond's
+(4 × 178.735 yr = 714.94 yr, offset **0.083%** — the tightest period
+match of any candidate in the 600–800 yr band, tighter than Bond's
 0.22% match to 74×J-S synodic). Same SIM/Jose family as Jose5 (5×Jose,
 897 yr).
 Structurally degenerate with Bond/2 ≈ 733 yr at ~2.5% level, but the
@@ -1546,27 +1552,27 @@ signal above what the joint fit actually finds.
 - `data/lattice-scan-{mwp-band,jose-family,bond-harmonics}.json` — scan outputs
 - `data/deltaT-4flag-fit.json` — 4-cycle joint fit output
 - `JOSE4_DT_CORRECTION_ENABLED` flag in `src/script.js` (default `true`)
-- "Toggle 8H/3749 Jose4 ΔT correction" console-test button
+- the Jose4 ΔT-correction toggle console-test button
 
 ### The stack's boundary — why four flags and not more
 
-Three further gcd-compliant candidates with genuine cross-archive
+Three further candidates (same selection filter) with genuine cross-archive
 evidence are measured NOT to fit the 2.7-kyr Stephenson window and do
 not ship — the record that the 4-flag stack sits at the empirical limit:
 
-- **Eddy (8H/2684 = 999 yr, gcd=61; 0.05% match to the Eddy solar-minimum
+- **Eddy (999 yr; 0.05% match to the Eddy solar-minimum
   cycle)** — cross-archive coherent (Steinhilber Φ + EPICA CO₂), but the
   5-cycle joint fit shows significant collinearity (Bond amplitude
   375 → 646 s) and the L-5b outcome regresses the ancient BCE window
   (~70–86 s per century) for a late-medieval gain. Empirically real,
   unfittable against this window.
-- **Emp862 (8H/3111 = 862 yr, gcd=61; no named-cycle mapping)** — the
+- **Emp862 (862 yr; no named-cycle mapping)** — the
   strongest cross-archive evidence of any candidate (three archives),
   but the 6-cycle joint fit is **rank-deficient** (amplitudes inflate
   20–700×; the Eddy–Emp862 beat period ~6,255 yr is unresolvable by the
   window). A different fitting target (multi-archive joint fit) could
   revisit it.
-- **Jupiter92 (8H/2461 = 1090 yr, gcd=23)** — identified by residual
+- **Jupiter92 (1090 yr)** — identified by residual
   peak-hunting, not cross-archive scan; measured to **cannibalize Bond
   signal** rather than add independent variance (Bond's own ΔR² halves
   under it), and neither tested phase improves any L-5b metric.
@@ -1598,7 +1604,7 @@ bounded even when the joint fit shows collinearity signatures.
 
 ## Complete residual decomposition — what makes up the residual DRIFT?
 
-After the 8H/1830 harmonic accounts for the ~1466 yr oscillation
+After the 1466-yr Bond harmonic accounts for the ~1466 yr oscillation
 feature, a natural question follows: what accounts for the residual
 DRIFT — the slope in the Stephenson − model curve of ~ −0.966 s/yr with
 the correction applied, or −1.878 s/yr without it?
@@ -1613,18 +1619,18 @@ results are cached at `window._L5b_lattice_scan`,
 `window._L5b_anchor_sensitivity`, `window._L5b_rate_sensitivity`, and
 `window._L5b_higher_order` respectively for downstream inspection.
 
-### Diagnostic 1 (§14): 8H integer-divisor scan against the residual
+### Diagnostic 1 (§14): divisor scan against the residual
 
-Scans n ∈ [500, 5000] for lattice harmonic content in the current
-residual. Under Bond OFF baseline, identifies a broad peak in the
+Scans n ∈ [500, 5000] (period = 8·H/n) for harmonic content in the
+current residual. Under Bond OFF baseline, identifies a broad peak in the
 Bond-scale band (n ≈ 1817–1863, periods 1440–1476 yr); the shipped
-n=1830 (74 × J-S synodic, gcd=61) sits within this peak with ΔR² ≈ 0.073
+n=1830 sits within this peak with ΔR² ≈ 0.073
 (the whole n ≈ 1817–1863 band is Fourier-degenerate; §17 Part B).
 
 Under Bond ON (after n=1830 correction), the scan finds no divisor with
 ΔR² > 0.02 anywhere in the 500–5000 yr range. Verdict: **the medieval
-bump is a single lattice feature at Bond scale, not multi-divisor.** No
-further L1-extension via additional 8H harmonics would meaningfully
+bump is a single feature at Bond scale, not multi-divisor.** No
+further extension via additional harmonics would meaningfully
 close the residual.
 
 ### Diagnostic 2 (§15): does the J2000 LOD anchor value explain the drift?
@@ -1722,11 +1728,12 @@ polynomial fits misattribute this shape as a linear trend. **§15's
 downstream symptoms of this fit-order artifact, not physical
 mechanisms.**
 
-Part B tests whether nearby lattice divisors in the Bond band (n=1830,
+Part B tests whether nearby divisors in the Bond band (n=1830,
 n=1851, n=1920) are distinguishable or Fourier-degenerate. A
 dual-harmonic fit adds only <0.001 R² over the better single —
 **Fourier-degenerate: same peak, different labels.** The shipped n=1830
-wins on structural criteria (gcd-compliance, closest to canonical Bond).
+was selected as closest to canonical Bond (the gcd criterion carries no
+information — T5).
 
 ### The complete picture
 
@@ -1734,7 +1741,7 @@ Combining §14–§17 findings, the residual decomposes cleanly:
 
 | Component | Contribution | Nature |
 |---|---:|---|
-| **Bond-scale oscillation at ~1466 yr** | ~7 pp R², ~175 s RMS | **Real, framework-native** (n=1830 = 74 × J-S synodic, gcd=61) |
+| **Bond-scale oscillation at ~1466 yr** | ~7 pp R², ~175 s RMS | **Real** — the canonical Bond period (T5) |
 | **Higher-order polynomial shape (order 3+)** | ~4.5 pp R², ~100 s RMS | **Not physical** — Bond fit imperfection at ancient BCE tail; artifact |
 | **Fractional non-tidal channel** | ~0.5 ms/century window-average | **Real — carried by the Core-mantle swing** (time-varying mantle-core coupling, Resonator driver; doc 104). 2× Cox-Chao, ~10% of full Munk-MacDonald |
 | **Observation noise + unexplained** | ~62 s RMS post-fit | Irreducible floor (Stephenson dataset noise averaged into sampled Δ) |
@@ -1780,10 +1787,9 @@ What this validation establishes:
    floor.
    NASA's polynomial uses ~10+ coefficients fitted to this exact
    dataset; our α(t) independently predicts it from satellite/geodesy
-   literature. The four sub-Milankovitch harmonics (Bond n=1830,
-   Hallstatt n=1104, Jose5 n=2989, Jose4 n=3749) are STRUCTURAL
-   PREDICTIONS from framework arithmetic — their PERIODS drop out of
-   the 8H lattice with zero fitting. Their AMPLITUDES and PHASES are
+   literature. The four millennial harmonics (Bond 1466, Hallstatt
+   2430, Jose5 897, Jose4 716 yr) have FITTED periods at the canonical
+   values (T5). Their AMPLITUDES and PHASES are
    fit-derived (constrained physical priors, cap-only shipping)
    against the Stephenson ΔT residual; shipping the 4-flag stack
    therefore breaks the paper's original zero-eclipse-fit claim at
@@ -1929,7 +1935,7 @@ What this validation establishes:
    **What this means for the claim.** The correspondence between the
    4-flag stack and the Holocene climate rhythm is an **open
    correspondence, not a validation**, and must not be cited as
-   confirmation that the 8H-lattice periods are the climate periods.
+   confirmation that the stack's periods are the climate periods.
    The flags remain well-motivated as **ΔT corrections** — that is what
    they were fitted to, and what they demonstrably close — but the
    further step to "these are the climate cycles" is not supported by
@@ -1977,16 +1983,15 @@ What we are NOT claiming:
    are not currently coupled into α(t). For the historical eclipse
    window (~2.7 kyr) the L1 layer carries essentially all the
    glacial-cycle amplitude relevant to α; the higher-frequency
-   climate structure is captured separately by the 4-flag lattice
+   climate structure is captured separately by the 4-flag millennial
    stack rather than by additional α(t) coupling.
 
 3. **Medieval residual** (years 800-1300, framework overshoots by
    ~20 min under α(t) alone) is a residual signal that the framework's
    α(t) does not fully capture. This has been decomposed in detail
-   (see "Complete residual decomposition" and "Companion 8H lattice
-   harmonics") into four sub-Milankovitch 8H harmonics (Bond 8H/1830
-   = 1466 yr, Hallstatt 8H/1104 = 2430 yr, Jose5 8H/2989 = 897 yr,
-   Jose4 8H/3749 = 716 yr), plus the Core-mantle swing (the fractional
+   (see "Complete residual decomposition" and "Companion millennial
+   harmonics") into four millennial harmonics (Bond 1466 yr, Hallstatt
+   2430 yr, Jose5 897 yr, Jose4 716 yr), plus the Core-mantle swing (the fractional
    non-tidal channel, ~0.5 ms/century window-average — doc 104), plus
    observation noise. The stack + swing are shipped default-ON,
    calibrated in one joint equality-constrained solve with capped
@@ -2017,10 +2022,9 @@ The natural extensions, in order from most to least defensible:
 
 1. **Independent amplitude/phase calibration of the 4-flag stack —
    all four channels still open.**
-   The framework arithmetic predicts each PERIOD (Bond 74 × J-S
-   synodic = 1466 yr, Hallstatt H/138 = 2430 yr, Jose5 5 × Jose =
-   897 yr, Jose4 4 × Jose = 716 yr — all zero-fit structural periods
-   on H's prime-factor lattice); the Option B ΔT-only correction
+   Each PERIOD is the canonical value (Bond 1466 yr, Hallstatt
+   2430 yr, Jose5 5 × Jose = 897 yr, Jose4 4 × Jose = 716 yr —
+   fitted-band periods, T5); the Option B ΔT-only correction
    architecture is implemented, shipped default-ON, and preserves the
    J2000 LOD anchor. The Bond channel's comparison against Bond's own
    drift-ice record (r = +0.36 under the shipped joint world,
@@ -2036,8 +2040,8 @@ The natural extensions, in order from most to least defensible:
    against Steinhilber ¹⁰Be, Jose5/Jose4 against SIM-driven solar
    activity) is still open. Once every amplitude/phase is anchored to
    an independent proxy, the paper's original zero-eclipse-fitting
-   claim is fully restored. See § "Millennial-scale 8H lattice
-   harmonic" and § "Companion 8H lattice harmonics" for the fit +
+   claim is fully restored. See § "Millennial-scale Bond harmonic" and
+   § "Companion millennial harmonics" for the fit +
    cross-validation details.
 
 2. **Time-variable mantle-core coupling**. The MC null result above
@@ -2143,9 +2147,8 @@ The headline numbers in this doc come from L-5b main + L-5b regression
 + L-7 main. The residual-investigation buttons are the hypothesis-testing
 diagnostics documented in the "Eight hypotheses tested" section above
 plus the follow-up diagnostics (§10 Path A + Test 5; §14–§17 drift
-decomposition). The millennial-scale 8H lattice harmonic
-(§ "Millennial-scale 8H lattice harmonic at ~1466 years (74 × Jupiter-Saturn
-synodic, gcd=61) — shipped default-ON as part of 4-flag stack") is the
+decomposition). The millennial-scale Bond harmonic
+(§ "Millennial-scale Bond harmonic at ~1466 years") is the
 Bond component of the shipped 4-flag stack (Bond + Hallstatt + Jose5 +
 Jose4); the fit + cross-validation details are documented in the Python
 scripts and JSON artifacts.
@@ -2228,8 +2231,8 @@ URLs / files.
   *Persistent Solar Influence on North Atlantic Climate During the
   Holocene.* Science 294(5549), 2130–2136. doi:10.1126/science.1065680
   (Source of the 1,470-yr Bond cycle in North Atlantic ice-rafted
-  debris — the climate signature that our shipped 8H/1830 = 1466 yr =
-  74 × J-S synodic (gcd=61) lattice harmonic matches to 4 yr.)
+  debris — the climate signature our shipped 1466-yr Bond harmonic
+  matches to 4 yr.)
 
 - Braun, H., Christl, M., Rahmstorf, S., Ganopolski, A., Mangini, A.,
   Kubatzki, C., Roth, K., & Kromer, B. (2005). *Possible solar origin of
@@ -2237,7 +2240,7 @@ URLs / files.
   Nature 438(7065), 208–211. doi:10.1038/nature04121. (Mechanism for
   Bond-cycle amplification of the 210-yr de Vries solar cycle via
   non-linear thermohaline ocean response — a candidate physical
-  reading for our shipped 8H/1830 Bond harmonic alongside the primary
+  reading for our shipped Bond harmonic alongside the
   74 × J-S synodic SIM interpretation.)
 
 - Charvátová, I. (1990–2007). Series of papers on Solar Inertial Motion
@@ -2246,8 +2249,8 @@ URLs / files.
   18(4), 399–405. doi:10.1007/s00585-000-0399-x. (Charvátová's SIM theory
   attributes multi-centennial climate/solar variability to Jupiter-Saturn
   configurations relative to the barycenter — the mechanism behind our
-  74 × J-S synodic reading of 8H/1830, and also cited as the 2400-yr
-  Hallstatt cycle physical anchor for our 8H/1104 Hallstatt harmonic.)
+  74 × J-S synodic reading of the Bond period, and also cited as the
+  2400-yr Hallstatt cycle physical anchor for our Hallstatt harmonic.)
 
 - Landscheidt, T. (1998). *Solar Activity, Barometric Vortex, and
   Deep-Ocean Circulation.* Sol. Phys. 181(1), 87–98.
@@ -2264,8 +2267,7 @@ URLs / files.
 - Wilson, I.R.G. (2013). *The Venus–Earth–Jupiter spin–orbit coupling
   model.* Pattern Recogn. Phys. 1, 147–158. doi:10.5194/prp-1-147-2013.
   (J-S alignment modulation of solar magnetic cycle — the 179 yr Jose
-  period appears in our residual (H6) and matches the 8H lattice at
-  n=15013.)
+  period appears in our residual (H6).)
 
 - Holme, R. (1998). *Electromagnetic core-mantle coupling — I. Explaining
   decadal changes in the length of day.* Geophys. J. Int. 132(1),
