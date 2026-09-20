@@ -186,7 +186,7 @@
       "kick_coefficients_s": [
         {
           "cos": 0,
-          "sin": 493.0347425795158
+          "sin": 419.9875882265957
         },
         {
           "cos": 0,
@@ -207,9 +207,9 @@
           "retired": "RETIRED (plan 06 D7 follow-up, 2026-09): shipped at amplitude 0 — measured to buy nothing once the GIA channel became the lagged response (kicks-only 11.89 / 21.04 s vs all three 12.04 / 21.34 s); dn/phase kept as the convention for the diagnostic column (DT_RESONATOR_COMPONENTS)."
         }
       ],
-      "rms_s": 21.04259829068953,
-      "raw_at_j2000_s": 20.336554860847798,
-      "lod_raw_at_j2000_s_per_day": 0.0008021623611181848,
+      "rms_s": 28.75307216677656,
+      "raw_at_j2000_s": 30.176987637132378,
+      "lod_raw_at_j2000_s_per_day": 0.0007441702761267647,
       "deep_time_checks_s": {
         "900": -245.8439379884609,
         "2000": -82.32559425279462,

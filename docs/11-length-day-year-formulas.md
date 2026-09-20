@@ -1,7 +1,7 @@
 ---
 docVersion: 1.0
 modelVersion: v14.0
-coefficients: sha256:b8b18424a3435e20
+coefficients: sha256:3f803b0a4e2b0b3c
 status: current
 ---
 
@@ -147,7 +147,7 @@ siderealYearSeconds = siderealYearJ2000 × 86400
 
 Separately (physical/USNO branch — does NOT feed the derivation chain above):
   ┌──────────────────────────────────────────────────────────┐
-  │ LOD_real = lod_kinematic × (1 + 1/((H/5)·mSY))           │
+  │ LOD_real = lod_kinematic × (1 + 1/(T_s₃·mSY))            │
   │            + Σ DT cycles + swing                         │
   │          = 86400.001380 s at J2000 (display basis)       │
   │  ← closes on the USNO target 86,400.0017 in the fit's    │
@@ -156,8 +156,9 @@ Separately (physical/USNO branch — does NOT feed the derivation chain above):
   │    spread is the measured-vs-Fourier sidereal-days       │
   │    difference at 2000 — doc 99 § "The two J2000 day      │
   │    bases")                                               │
-  │    (used in Predictions panel LOD readout, pure-H/5 ΔT   │
-  │     V-curve, physical display — see § "The H/5 LOD       │
+  │    (used in Predictions panel LOD readout, pure-physics  │
+  │     ΔT V-curve, physical display — see § "The ecliptic   │
+  │     missing-motion LOD                                   │
   │     Correction")                                         │
   └──────────────────────────────────────────────────────────┘
 ```
@@ -167,9 +168,9 @@ Separately (physical/USNO branch — does NOT feed the derivation chain above):
 **Solar day** — the time for the Sun to return to the same local meridian (noon to noon). The solar day varies throughout the year due to orbital eccentricity and obliquity (equation of time). The framework maintains **two mean-LOD values**:
 
 - **LOD_mean** = `siderealYearSeconds / siderealYear(days_kinematic)` ≈ <!--v:meanSolarDaySeconds-->86,399.999676<!--/v--> s at J2000 — the kinematic baseline used inside all sidereal↔tropical conversions and the calibrated ΔT correction stack.
-- **LOD_real** = lod_kinematic + lod_kinematic/((H/5) × mSY) + DT cycle sum = <!--v:lodRealPhysical-->86,400.001580<!--/v--> s at J2000 — Layer 4: adds the H/5 ecliptic missing-motion correction (~3.5 ms) + the Bond/Hallstatt/Jose5/Jose4 cyclic δLOD (Layer 3) + the Core-mantle swing. Closes on the USNO target <!--v:usnoLodJ2000-->86,400.0019<!--/v--> s in the fit's measured-day basis (doc 99 § "The two J2000 day bases"). Used in the user-facing physical LOD display. NOTE the baseline is `o.lodKinematic` (Fourier-direct), NOT LOD_mean — the two differ by the day-basis spread (<!--v:dayBasisSpreadMs-->0.32<!--/v--> ms at J2000; see the declared scene day basis below).
+- **LOD_real** = lod_kinematic + lod_kinematic/(T_s₃ × mSY) + DT cycle sum = <!--v:lodRealPhysical-->86,400.001780<!--/v--> s at J2000 — Layer 4: adds the ecliptic missing-motion correction on the nodal period (~<!--v:h5LodCorrectionMs-->3.441<!--/v--> ms) + the Bond/Hallstatt/Jose5/Jose4 cyclic δLOD (Layer 3) + the Core-mantle swing. Closes on the USNO target <!--v:usnoLodJ2000-->86,400.0021<!--/v--> s in the fit's measured-day basis (doc 99 § "The two J2000 day bases"). Used in the user-facing physical LOD display. NOTE the baseline is `o.lodKinematic` (Fourier-direct), NOT LOD_mean — the two differ by the day-basis spread (<!--v:dayBasisSpreadMs-->0.32<!--/v--> ms at J2000; see the declared scene day basis below).
 
-Both fluctuate over millennia as the sidereal year in days changes. See § "The H/5 LOD Correction" below.
+Both fluctuate over millennia as the sidereal year in days changes. See § "The ecliptic missing-motion LOD Correction" below.
 
 **The declared scene day basis.** The scene's measured year lengths — the Step-6c/6d fits, the tweakpane *days* rows — are counted in the **measured mean solar day**, sidereal-pinned at J2000:
 
@@ -183,7 +184,7 @@ It is derived in place from the 6c anchor (no stored copy — it cannot detach f
 | LOD_mean (H/13 identity) | <!--v:meanSolarDaySeconds-->86,399.999676<!--/v--> s | kinematic baseline (kinematic sidereal days) |
 | Fourier-kinematic day (`o.lodKinematic`) | <!--v:lodKinematicFourierJ2000Seconds-->86,400.000107<!--/v--> s | the panel *seconds* column — pins the sidereal year to IAU seconds by construction |
 | **measured mean solar day — the DECLARED scene basis** | <!--v:measuredMeanSolarDayJ2000Seconds-->86,400.000427<!--/v--> s | the day the scene's measured year lengths are counted in |
-| LOD_real (physical observable) | <!--v:lodRealPhysical-->86,400.001580<!--/v--> s | Layer-4 display (adds H/5 + ΔT cycles + swing) |
+| LOD_real (physical observable) | <!--v:lodRealPhysical-->86,400.001780<!--/v--> s | Layer-4 display (adds the ecliptic term + ΔT cycles + swing) |
 
 One day basis cannot close all three year types: pinning sidereal leaves tropical <!--v:yearResidualTropicalSecPerYr-->+0.027<!--/v--> s/yr and anomalistic <!--v:yearResidualAnomalisticSecPerYr-->+0.065<!--/v--> s/yr against IAU (per-type closing days <!--v:closingDayTropicalSeconds-->86,400.000353<!--/v--> / <!--v:closingDaySiderealSeconds-->86,400.000427<!--/v--> / <!--v:closingDayAnomalisticSeconds-->86,400.000250<!--/v--> s) — recorded model-vs-IAU structure, not a unit artifact.
 
@@ -202,15 +203,15 @@ The rate that matters here is precession in **right ascension** (along the equat
 | Quantity | Model value | Reference |
 |----------|-------------|-----------|
 | Mean solar day — **LOD_mean** (H/13 identity) | <!--v:meanSolarDaySeconds-->86,399.999676<!--/v--> s | — (kinematic) |
-| Mean solar day — **LOD_real** (Layer 4: +H/5 + DT cycles + swing, physical) | <!--v:lodRealPhysical-->86,400.001580<!--/v--> s | USNO joint-optimum target <!--v:usnoLodJ2000-->86,400.0019<!--/v--> s (fit's measured-day basis — the declared scene day; <!--v:dayBasisSpreadMs-->0.32<!--/v--> ms basis spread) |
+| Mean solar day — **LOD_real** (Layer 4: + the ecliptic term + DT cycles + swing, physical) | <!--v:lodRealPhysical-->86,400.001780<!--/v--> s | USNO joint-optimum target <!--v:usnoLodJ2000-->86,400.0021<!--/v--> s (fit's measured-day basis — the declared scene day; <!--v:dayBasisSpreadMs-->0.32<!--/v--> ms basis spread) |
 | Sidereal day | 86164.091 s | 86164.091 s (IAU) |
 | Stellar day | 86164.099 s | 86164.099 s (IAU) |
 
-See § "The H/5 LOD Correction" below for the distinction between the two mean solar day values.
+See § "The ecliptic missing-motion LOD Correction" below for the distinction between the two mean solar day values.
 
-### The H/5 LOD Correction (Kinematic vs Physical)
+### The ecliptic missing-motion LOD Correction (Kinematic vs Physical)
 
-The framework maintains two distinct LOD values that differ by a small H/5-derived correction:
+The framework maintains two distinct LOD values that differ by a small correction on the nodal period of Earth's orbit plane (formerly written on the anchor's H/5 — plan 06 T2 item, see below):
 
 **LOD_mean** — the kinematic baseline from the H/13 identity:
 ```
@@ -224,28 +225,30 @@ LOD_real = o.lodKinematic + h5Correction(year) + dtCycleLodCorrectionSum(year)
 
 where:
   o.lodKinematic     = IAU_sid_sec / Fourier_sid_days ≈ 86399.999995 s at J2000
-  h5Correction(year) = LOD_mean / ((H/5) × mSY)       ≈ 3.527 ms
+  h5Correction(year) = LOD_mean / (T_s₃ × mSY)        ≈ <!--v:h5LodCorrectionMs-->3.441<!--/v--> ms
+                       (T_s₃ = the nodal period 1,296,000/|s₃| = <!--v:eclPrecYears-->~68,751<!--/v--> yr;
+                        the identifier keeps its historical H/5 name)
   dtCycleLodCorrectionSum = Bond/Hallstatt/Jose5/Jose4 cyclic δLOD + Core-mantle
-                            swing (≈ −2.14 ms at J2000)
+                            swing (≈ −1.85 ms at J2000)
 ```
 
-The H/5 correction represents Earth's need to rotate slightly MORE per solar day to catch the Sun on the meridian, because the Sun's apparent motion follows the ecliptic — which precesses at H/5 (the ecliptic precession cycle, <!--v:eclPrecYears-->~68,751<!--/v--> yr). Over one solar day (= 1/mSY of one year), the ecliptic advances by 1/((H/5)·mSY) revolutions — requiring that many extra revolutions of Earth rotation:
+The correction represents Earth's need to rotate slightly MORE per solar day to catch the Sun on the meridian, because the Sun's apparent motion follows the ecliptic — whose plane turns on the invariable plane once per nodal period T_s₃ (the dominant nodal mode s₃ of Earth's orbit from the model's own N-body secular modes, <!--v:eclPrecYears-->~68,751<!--/v--> yr). Over one solar day (= 1/mSY of one year), the ecliptic advances by 1/(T_s₃·mSY) revolutions — requiring that many extra revolutions of Earth rotation:
 
 ```
-δ_rev = 1 / ((H/5) × mSY)                                ≈ 4.083 × 10⁻⁸ rev/day
-δ_LOD = LOD_mean × δ_rev = LOD_mean / ((H/5) × mSY)      ≈ 3.527 ms per solar day
+δ_rev = 1 / (T_s₃ × mSY)                                 ≈ 3.98 × 10⁻⁸ rev/day
+δ_LOD = LOD_mean × δ_rev = LOD_mean / (T_s₃ × mSY)       ≈ <!--v:h5LodCorrectionMs-->3.441<!--/v--> ms per solar day
 ```
 
-**Why H/5 (not H/3):** the correction's reference frame must be the Sun's apparent motion (which follows the ecliptic, precesses at H/5). The H/3 apsidal precession is a fixed-frame (ICRF) construction, not the ecliptic-of-date reference used for the solar-day counting.
+**Why the nodal period (not the apsidal one, and not the anchor's H/5):** the correction's reference frame must be the Sun's apparent motion, which follows the ecliptic; the ecliptic's turn on the invariable plane is the nodal mode s₃ — an ORBITAL quantity, constant at every epoch (μ-tier). The apsidal precession is a fixed-frame (ICRF) construction, not the ecliptic-of-date reference used for the solar-day counting. Until the plan 06 T2 restatement the divisor was the anchor's H(t)/5 (67,063 yr at J2000, 2.5 % short of the nodal period) and it scaled with Earth's SPIN at deep time — the wrong tier for an orbital reference. Measured on the change (plan 06 record): the term moved 3.527 → 3.441 ms, the joint ΔT-stack re-closed at USNO 86400.0021 (measured-day basis; the display-basis LOD_real moved from 86400.001580 to 86400.001693 s, toward the observed 86400.0017), the eclipse record stayed flat (lunar mean residual 1213 → 1211 s, events beating NASA 119 → 121; solar 665 → 669 s), while the closeness to the Espenak/Stephenson polynomials — theory references, not observations — loosened (Espenak-window RMS 11.9 → 13.4 s, full window 21.0 → 27.0 s).
 
 **Where each is used:**
 
 | LOD used | Purpose | Code path |
 |----------|---------|-----------|
 | **LOD_mean** | sidereal↔tropical conversions (day-count identity), calibrated ΔT correction integrand (Bond/Hallstatt/Jose4/5 stack expects this baseline), Meeus JD_UT → JD_TT, eclipse code, live accumulator | `meanDeltaTSecondsAtAge`, `updateDeltaT` |
-| **LOD_real** (Layer 4) | User-facing "physical" LOD display, pure-H/5 physics ΔT V-curve | `pureH5DeltaTAtAge`, Predictions panel LOD binding |
+| **LOD_real** (Layer 4) | User-facing "physical" LOD display, pure-physics ΔT V-curve | `pureH5DeltaTAtAge`, Predictions panel LOD binding |
 
-**Why other H/N cycles don't appear as explicit corrections:** the H/13 axial precession is ALREADY implicit in LOD_mean via the `H/(H−13)` denominator (over H tropical years the sidereal frame counts H−13 years — the missing 13 IS the axial precession). Adding an explicit H/13 correction would double-count. H/8 obliquity is oscillatory (mean zero). H/16 perihelion motion contributes to the anomalistic year, not to the tropical-day counting relative to the Sun. Only H/5 (ecliptic precession) gives the correct reference for the Sun's apparent motion.
+**Why no other explicit corrections appear:** the axial precession is ALREADY implicit in LOD_mean via the device's `H/(H−13)` calendar denominator (over H tropical years the sidereal frame counts H−13 years — the missing 13 IS the axial precession). Adding an explicit H/13 correction would double-count. H/8 obliquity is oscillatory (mean zero). H/16 perihelion motion contributes to the anomalistic year, not to the tropical-day counting relative to the Sun. Only H/5 (ecliptic precession) gives the correct reference for the Sun's apparent motion.
 
 
 ## Precession Periods (Coin Rotation Paradox)
@@ -257,8 +260,8 @@ All precession periods emerge from ratios of year lengths:
 | Axial | `Y_sid / (Y_sid − Y_trop)` | H/13 ≈ <!--v:earthAxialPeriod-->25,771<!--/v--> yr |
 | Perihelion | `Y_anom(s) / (Y_anom(s) − Y_trop(s))` | H/16 ≈ <!--v:earthPeriPeriod-->20,936<!--/v--> yr |
 | Inclination | `Y_anom(s) / (Y_anom(s) − Y_sid(s))` | H/3 ≈ <!--v:earthPeriPeriodICRF-->111,570<!--/v--> yr |
-| Obliquity | axial × 13/8 | H/8 ≈ <!--v:hDiv8-->41,915<!--/v--> yr |
-| Ecliptic | axial × 13/5 | H/5 ≈ <!--v:hDiv5-->67,063<!--/v--> yr |
+| Obliquity | the beat of the clock against the nodal mode: 1/(1/T_p − 1/T_s₃) (the retired label H/8 read <!--v:hDiv8-->41,915<!--/v--> yr) | <!--v:obliqCycleYears-->~41,224<!--/v--> yr |
+| Ecliptic (nodal) | the N-body chain's dominant nodal mode s₃: 1,296,000/\|s₃\| (the retired label H/5 read <!--v:hDiv5-->67,063<!--/v--> yr) | <!--v:eclPrecYears-->~68,751<!--/v--> yr |
 
 These are time-varying — each uses the instantaneous year lengths at the given epoch, so precession periods themselves oscillate slightly.
 
@@ -280,7 +283,7 @@ The coin rotation paradox manifests at every timescale:
 | Sidereal year | 365.256363 days | 365.256363 days (IAU) |
 | Anomalistic year | 365.259633 days | <!--v:anomalisticYearInputDays-->365.259636<!--/v--> days (IAU) |
 | LOD_mean (kinematic, H/13 identity) | <!--v:meanSolarDaySeconds-->86,399.999676<!--/v--> s | — |
-| LOD_real (Layer 4: physical, +H/5 correction + DT cycles + swing) | <!--v:lodRealPhysical-->86,400.001580<!--/v--> s | USNO joint-optimum target <!--v:usnoLodJ2000-->86,400.0019<!--/v--> s (fit's measured-day basis) |
+| LOD_real (Layer 4: physical, + the ecliptic term + DT cycles + swing) | <!--v:lodRealPhysical-->86,400.001780<!--/v--> s | USNO joint-optimum target <!--v:usnoLodJ2000-->86,400.0021<!--/v--> s (fit's measured-day basis) |
 | Sidereal day | 86164.091 s | 86164.091 s (IAU) |
 | Stellar day | 86164.099 s | 86164.099 s (IAU) |
 | Axial precession | <!--v:axialPrecJ2000-->25,771<!--/v--> yr | <!--v:axialPrecJ2000-->25,771<!--/v--> yr (instantaneous J2000 rate) |

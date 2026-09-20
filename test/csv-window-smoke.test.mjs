@@ -4,7 +4,7 @@
  *
  * THE 6a2 ARTIFACT. `npm run fit:6a2` generates
  * data/02-solar-measurements-window.csv — the SAME Step-6a exporter
- * (SG_ONE_SOURCE=1, the certified regeneration mode) over −4000..+4000
+ * (the one-source movement — the only Node scene since plan 06 item 3) over −4000..+4000
  * (8,001 years × 6 events = 48,006 rows, ~5 min) instead of the full-H
  * run (335,318 years × 6 events = 2,011,908 rows, 2 h 24 m). The full 6a
  * CSV stays as the C-4b-era campaign record; 6a2 is the LIVING check
@@ -57,11 +57,11 @@ if (!existsSync(TRACKED)) {
 const dir = mkdtempSync(join(tmpdir(), 'csv-smoke-'));
 const scratch = join(dir, 'window.csv');
 try {
-  console.log(`regenerating window ${START}..${END} with the real Step-6a exporter (SG_ONE_SOURCE=1)…`);
+  console.log(`regenerating window ${START}..${END} with the real Step-6a exporter…`);
   const r = spawnSync(process.execPath, [
     join(ROOT, 'tools', 'fit', 'export-solar-measurements.js'),
     '--start', String(START), '--end', String(END), '--output', scratch,
-  ], { env: { ...process.env, SG_ONE_SOURCE: '1' }, stdio: ['ignore', 'pipe', 'pipe'], timeout: 900000 });
+  ], { env: { ...process.env }, stdio: ['ignore', 'pipe', 'pipe'], timeout: 900000 });
   if (r.status !== 0) {
     console.log('FAIL — exporter exited ' + r.status + '\n' + String(r.stderr).slice(0, 800));
     process.exit(1);

@@ -2836,6 +2836,9 @@ function _deepLod() {
         const sid = computeSiderealYearDaysDirect(2000), sol = computeSolarYearDaysDirect(2000);
         return sid / (sid - sol);
       },
+      // Plan 06 T2 item: the solar day's ecliptic missing-motion term rides
+      // the nodal period 1,296,000/|s₃| (orbital), not the spin unit's H/5.
+      nodalPeriodYearsFn: () => 1296000 / _s3ArcsecPerYr(),
       lEmAtAgeKgm2S: _solarBudget().lEmAtAgeKgm2S,
       // The IAU-base integrated-phase Fourier ripple (mirrors the Node
       // engine's _evalSiderealYearFourierIAU — the Phase D matched pair).
@@ -2950,13 +2953,11 @@ function meanLodSecondsAtAgeActual(t_Ma) {
  * @returns {number} correction in seconds to add to LOD_mean
  */
 function h5Correction(year) {
+  // Plan 06 T2 item: ONE home in the shared factory — the divisor is the
+  // nodal period 1,296,000/|s₃| (orbital, constant at every epoch), formerly
+  // the spin unit's H/5. The identifier keeps its historical name.
   const t_Ma = (J2000_CALENDAR_YEAR - year) / 1e6;
-  const lodMean = meanLodSecondsAtAge(t_Ma);
-  if (lodMean === null) return 0;
-  const H_local = meanHAtAge(t_Ma);
-  if (H_local === null) return 0;
-  const mSY_days = meanTropicalYearDaysAtAge(t_Ma);
-  return lodMean / ((H_local / 5) * mSY_days);
+  return _deepLod().eclipticLodCorrectionSecondsAtAge(t_Ma) ?? 0;
 }
 
 /** Pure epoch-aware sidereal-year seconds: Layer-0 (Driver-2 aware, ≡ the IAU

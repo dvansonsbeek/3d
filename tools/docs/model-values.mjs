@@ -335,7 +335,7 @@ export const VALUES = {
     get: () => dtl().computeLodKinematicSecondsAtEpoch(2000) + dtl().h5Correction(2000),
     render: (v) => thousands(v, 6),
     unit: 's',
-    note: 'raw H/5 kinematic solar day at J2000 (no ΔT cycles) — intermediate, not the physical readout',
+    note: 'kinematic solar day + the ecliptic missing-motion term at J2000 (no ΔT cycles) — intermediate, not the physical readout (key name kept; the term rides the nodal period since the plan 06 T2 restatement)',
   },
   stackNetLodJ2000Ms: {
     get: () => dtl().dtCycleLodCorrectionSum(2000) * 1000,
@@ -347,7 +347,7 @@ export const VALUES = {
     get: () => dtl().h5Correction(2000) * 1000,
     render: (v) => Number(v).toFixed(3),
     unit: 'ms',
-    note: 'H/5 ecliptic missing-motion LOD correction at J2000',
+    note: 'the solar day’s ecliptic missing-motion LOD correction at J2000 — LOD_mean/(T_s₃·mSY) on the nodal period 1,296,000/|s₃| (orbital; plan 06 T2 item — was H/5 = 3.527 ms; key name kept)',
   },
   // Ours-only: doc 99 quotes the Layer-2-vs-Layer-4 display gap.
   layer2MinusLayer4GapMs: {
@@ -358,7 +358,7 @@ export const VALUES = {
     },
     render: (v) => Number(v).toFixed(2),
     unit: 'ms',
-    note: 'Layer 2 (tidal+GIA physics baseline + H/5) minus Layer 4 (shipped observable) at J2000',
+    note: 'Layer 2 (tidal+GIA physics baseline + the ecliptic term) minus Layer 4 (shipped observable) at J2000',
   },
   // Ours-only: doc 99's solar-day layer table. Layer 1 (climate-MEAN α) stays
   // manual — its α-mean chain (meanLodSecondsAtAgeMeanAlpha) is browser-only.
@@ -369,14 +369,14 @@ export const VALUES = {
     },
     render: (v) => thousands(v, 6),
     unit: 's',
-    note: 'Layer 2 solar day at J2000: tidal + GIA physics baseline + H/5 (browser solarDayLayer2 at year 2000)',
+    note: 'Layer 2 solar day at J2000: tidal + GIA physics baseline + the ecliptic term (browser solarDayLayer2 at year 2000)',
   },
   solarDayLayer3J2000: {
     get: () => dtl().computeLodKinematicSecondsAtEpoch(2000) + dtl().h5Correction(2000)
              + (dtl().dtCycleLodCorrectionSum(2000) - dtl().resonatorSwingLodCorrection(2000)),
     render: (v) => thousands(v, 6),
     unit: 's',
-    note: 'Layer 3 solar day at J2000: kinematic + H/5 + 4-flag cycles WITHOUT the Core-mantle swing (browser solarDayLayer3 at year 2000)',
+    note: 'Layer 3 solar day at J2000: kinematic + the ecliptic term + 4-flag cycles WITHOUT the Core-mantle swing (browser solarDayLayer3 at year 2000)',
   },
   meanObliquity: {
     get: () => model.earth.earthtiltMean,

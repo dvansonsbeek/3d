@@ -12,10 +12,10 @@
     "unmatchedCanon": 0,
     "typeAgree": 1447,
     "meanAbsResidualMinutes": 8.529,
-    "meanAbsResidualMinutesFull": 8.528852838431966,
+    "meanAbsResidualMinutesFull": 8.528738818651643,
     "rmsResidualMinutes": 9.838,
-    "rmsResidualMinutesFull": 9.838239036423186,
-    "maxAbsResidualMinutes": 19.919
+    "rmsResidualMinutesFull": 9.838187327108985,
+    "maxAbsResidualMinutes": 19.916
   },
   "visibility": {
     "entriesChecked": 14,
@@ -26,7 +26,7 @@
       {
         "label": "2025 Sep 7 Total",
         "bestInsideCity": "Delhi",
-        "bestInsideAltitudeDeg": 54.11,
+        "bestInsideAltitudeDeg": 54.1,
         "insideVisible": true,
         "outsideCity": "Kansas City",
         "outsideVisible": false
@@ -50,7 +50,7 @@
       {
         "label": "2024 Mar 25 Penumbral",
         "bestInsideCity": "Kansas City",
-        "bestInsideAltitudeDeg": 48.86,
+        "bestInsideAltitudeDeg": 48.87,
         "insideVisible": true,
         "outsideCity": "Delhi",
         "outsideVisible": false
@@ -98,7 +98,7 @@
       {
         "label": "2021 May 26 Total",
         "bestInsideCity": "Sydney",
-        "bestInsideAltitudeDeg": 53.02,
+        "bestInsideAltitudeDeg": 53.01,
         "insideVisible": true,
         "outsideCity": "Berlin",
         "outsideVisible": false
@@ -106,7 +106,7 @@
       {
         "label": "2020 Nov 30 Penumbral",
         "bestInsideCity": "Kansas City",
-        "bestInsideAltitudeDeg": 42.84,
+        "bestInsideAltitudeDeg": 42.85,
         "insideVisible": true,
         "outsideCity": "Berlin",
         "outsideVisible": false
@@ -114,7 +114,7 @@
       {
         "label": "2020 Jul 5 Penumbral",
         "bestInsideCity": "Kansas City",
-        "bestInsideAltitudeDeg": 22.87,
+        "bestInsideAltitudeDeg": 22.86,
         "insideVisible": true,
         "outsideCity": "Berlin",
         "outsideVisible": false
@@ -130,7 +130,7 @@
       {
         "label": "2020 Jan 10 Penumbral",
         "bestInsideCity": "Delhi",
-        "bestInsideAltitudeDeg": 82.24,
+        "bestInsideAltitudeDeg": 82.25,
         "insideVisible": true,
         "outsideCity": "Kansas City",
         "outsideVisible": false
@@ -145,55 +145,55 @@
     "canonMagnitudeUmbral": 0.9199,
     "ttResidualMinutes": 10.31,
     "visibleFromBabylon": true,
-    "babylonMoonAltitudeDeg": 32.08
+    "babylonMoonAltitudeDeg": 32.23
   },
   "dtBands": {
     "overall": {
       "n": 267,
-      "frameworkMeanAbsSeconds": 1213,
-      "frameworkRmsSeconds": 1774,
+      "frameworkMeanAbsSeconds": 1211,
+      "frameworkRmsSeconds": 1772,
       "stephensonSplineMeanAbsSeconds": 1211,
       "stephensonSplineRmsSeconds": 1770
     },
     "S01": {
       "n": 125,
-      "frameworkMeanAbsSeconds": 1660,
-      "frameworkRmsSeconds": 2293,
+      "frameworkMeanAbsSeconds": 1656,
+      "frameworkRmsSeconds": 2289,
       "stephensonSplineMeanAbsSeconds": 1652,
       "stephensonSplineRmsSeconds": 2284
     },
     "S02": {
       "n": 21,
-      "frameworkMeanAbsSeconds": 967,
-      "frameworkRmsSeconds": 1269,
+      "frameworkMeanAbsSeconds": 968,
+      "frameworkRmsSeconds": 1272,
       "stephensonSplineMeanAbsSeconds": 967,
       "stephensonSplineRmsSeconds": 1272
     },
     "S04": {
       "n": 9,
-      "frameworkMeanAbsSeconds": 1781,
-      "frameworkRmsSeconds": 1902,
+      "frameworkMeanAbsSeconds": 1771,
+      "frameworkRmsSeconds": 1891,
       "stephensonSplineMeanAbsSeconds": 1759,
       "stephensonSplineRmsSeconds": 1880
     },
     "S05": {
       "n": 69,
-      "frameworkMeanAbsSeconds": 709,
-      "frameworkRmsSeconds": 1054,
+      "frameworkMeanAbsSeconds": 711,
+      "frameworkRmsSeconds": 1055,
       "stephensonSplineMeanAbsSeconds": 716,
       "stephensonSplineRmsSeconds": 1063
     },
     "S07": {
       "n": 11,
-      "frameworkMeanAbsSeconds": 1054,
-      "frameworkRmsSeconds": 1394,
+      "frameworkMeanAbsSeconds": 1070,
+      "frameworkRmsSeconds": 1406,
       "stephensonSplineMeanAbsSeconds": 1090,
       "stephensonSplineRmsSeconds": 1417
     },
     "S09": {
       "n": 32,
-      "frameworkMeanAbsSeconds": 611,
-      "frameworkRmsSeconds": 766,
+      "frameworkMeanAbsSeconds": 600,
+      "frameworkRmsSeconds": 760,
       "stephensonSplineMeanAbsSeconds": 600,
       "stephensonSplineRmsSeconds": 760
     }
@@ -234,15 +234,15 @@
     "S14": {
       "label": "lunar obscuration estimates",
       "n": 5,
-      "frameworkMeanAbsSeconds": 611,
-      "frameworkRmsSeconds": 717,
+      "frameworkMeanAbsSeconds": 601,
+      "frameworkRmsSeconds": 698,
       "stephensonSplineMeanAbsSeconds": 605,
       "stephensonSplineRmsSeconds": 698
     },
     "babylon135": {
       "boundsLowSeconds": 11220,
       "boundsHighSeconds": 12140,
-      "frameworkSeconds": 12002,
+      "frameworkSeconds": 12028,
       "frameworkInside": true
     }
   },
@@ -250,32 +250,32 @@
     "-800": {
       "n": 2,
       "meanObservedHours": 5.69,
-      "meanFrameworkHours": 5.67,
-      "residualHours": -0.02
+      "meanFrameworkHours": 5.68,
+      "residualHours": -0.01
     },
     "-700": {
       "n": 8,
       "meanObservedHours": 5.42,
-      "meanFrameworkHours": 5.33,
-      "residualHours": -0.1
+      "meanFrameworkHours": 5.34,
+      "residualHours": -0.08
     },
     "-600": {
       "n": 21,
       "meanObservedHours": 5.03,
-      "meanFrameworkHours": 4.93,
-      "residualHours": -0.1
+      "meanFrameworkHours": 4.94,
+      "residualHours": -0.09
     },
     "-500": {
       "n": 17,
       "meanObservedHours": 4.55,
-      "meanFrameworkHours": 4.36,
-      "residualHours": -0.19
+      "meanFrameworkHours": 4.37,
+      "residualHours": -0.18
     },
     "-400": {
       "n": 27,
       "meanObservedHours": 4.33,
-      "meanFrameworkHours": 4.1,
-      "residualHours": -0.23
+      "meanFrameworkHours": 4.11,
+      "residualHours": -0.22
     }
   },
   "theoryDrift": {
@@ -352,11 +352,11 @@
     },
     "effectiveDeltaNdotArcsecPerCy2": 0.32,
     "predictedReducedResidualMinutes": {
-      "-800": 2.8,
-      "-700": -3.4,
-      "-600": -2.8,
-      "-500": -8.6,
-      "-400": -12.6
+      "-800": 3.4,
+      "-700": -2.2,
+      "-600": -2.2,
+      "-500": -8,
+      "-400": -12
     }
   },
   "phaseC": {
@@ -368,34 +368,34 @@
     "perCentury": {
       "-700": {
         "n": 5,
-        "medianMinutes": -14.1,
+        "medianMinutes": -13.4,
         "seMinutes": 10.8,
-        "preRegisteredMinutes": -3.4,
+        "preRegisteredMinutes": -2.2,
         "z": -1
       },
       "-600": {
         "n": 21,
-        "medianMinutes": -5.7,
+        "medianMinutes": -5,
         "seMinutes": 5.4,
-        "preRegisteredMinutes": -2.8,
+        "preRegisteredMinutes": -2.2,
         "z": -0.5
       },
       "-500": {
         "n": 12,
-        "medianMinutes": -14.9,
+        "medianMinutes": -14.4,
         "seMinutes": 17.1,
-        "preRegisteredMinutes": -8.6,
+        "preRegisteredMinutes": -8,
         "z": -0.4
       },
       "-400": {
         "n": 23,
-        "medianMinutes": -6.9,
+        "medianMinutes": -6.4,
         "seMinutes": 3.1,
-        "preRegisteredMinutes": -12.6,
+        "preRegisteredMinutes": -12,
         "z": 1.8
       }
     },
-    "chi2": 4.8,
+    "chi2": 4.7,
     "chi2Centuries": 4
   },
   "denseTargets": {
@@ -408,72 +408,72 @@
     "perCentury": {
       "400": {
         "n": 2,
-        "medianSeconds": 475,
+        "medianSeconds": 509,
         "seSeconds": 1992
       },
       "500": {
         "n": 11,
-        "medianSeconds": -353,
+        "medianSeconds": -302,
         "seSeconds": 158
       },
       "800": {
         "n": 5,
-        "medianSeconds": 459,
-        "seSeconds": 239
+        "medianSeconds": 522,
+        "seSeconds": 237
       },
       "900": {
         "n": 17,
-        "medianSeconds": -394,
+        "medianSeconds": -346,
         "seSeconds": 268
       },
       "1000": {
         "n": 38,
-        "medianSeconds": 60,
-        "seSeconds": 139
+        "medianSeconds": 104,
+        "seSeconds": 141
       },
       "1100": {
         "n": 4,
-        "medianSeconds": 765,
-        "seSeconds": 269
+        "medianSeconds": 796,
+        "seSeconds": 267
       },
       "1200": {
         "n": 17,
-        "medianSeconds": 385,
+        "medianSeconds": 415,
         "seSeconds": 144
       },
       "-700": {
         "n": 5,
-        "medianSeconds": -848,
+        "medianSeconds": -801,
         "seSeconds": 648
       },
       "-600": {
         "n": 21,
-        "medianSeconds": -340,
-        "seSeconds": 323
+        "medianSeconds": -298,
+        "seSeconds": 324
       },
       "-500": {
         "n": 12,
-        "medianSeconds": -897,
-        "seSeconds": 1024
+        "medianSeconds": -864,
+        "seSeconds": 1027
       },
       "-400": {
         "n": 23,
-        "medianSeconds": -417,
+        "medianSeconds": -387,
         "seSeconds": 185
       },
       "-300": {
         "n": 13,
-        "medianSeconds": -1199,
+        "medianSeconds": -1174,
         "seSeconds": 1008
       },
       "-200": {
         "n": 49,
-        "medianSeconds": 107,
+        "medianSeconds": 133,
         "seSeconds": 187
       },
       "-100": {
         "n": 12,
-        "medianSeconds": -466,
+        "medianSeconds": -438,
         "seSeconds": 342
       }
     },
@@ -492,13 +492,13 @@
       "1200"
     ],
     "ablationChi2": {
-      "fullStack": 30.3,
-      "minus_bond": 56.1,
-      "minus_hallstatt": 30.2,
+      "fullStack": 29.9,
+      "minus_bond": 61.6,
+      "minus_hallstatt": 27.7,
       "minus_jose5": 30.4,
-      "minus_jose4": 28.6,
-      "minus_resonator": 52.4,
-      "noCycles": 67.5
+      "minus_jose4": 28.7,
+      "minus_resonator": 48.5,
+      "noCycles": 70.3
     }
   },
   "inputs": {

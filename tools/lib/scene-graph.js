@@ -307,9 +307,9 @@ function _moonApparentM() {
       },
       fns: {
         // Phase 3 S3b: the apparent Moon's RA/Dec turn on the published ε — the one-source
-        // hybrid when the movement is on (SG_ONE_SOURCE=1), the comb otherwise (the Node
-        // default). Twin of the browser's _sceneEpsTargetDeg routing.
-        computeObliquityEarth: (y) => { const M = _oneSourceM(); return M ? M.epsDeg(y) : OE.computeObliquityEarth(y); },
+        // hybrid (the only Node scene since plan 06 item 3). Twin of the browser's
+        // _sceneEpsTargetDeg routing.
+        computeObliquityEarth: (y) => _oneSourceM().epsDeg(y),
         getAuDistanceKm: () => C.currentAUDistance,
         isFrameworkNative: () => MOON_ARGS_FRAMEWORK_NATIVE,
         getCorrectionResidual: () => C.MOON_CORRECTION_RESIDUAL,
@@ -1197,33 +1197,29 @@ function computeDynamicEclipticInclination(key, yearsSinceBalanced) {
 // geometrically by the extraMatrix twin of the browser's tilt-correction
 // wrapper (rotation about the node line û = a×n by ε_geom − ε_target,
 // pulled into the rotAxis parent frame; Earth sits at the origin —
-// orbitRadius 0 — so the pure rotation IS the wrapper). DEFAULT OFF: the
-// certified exporters and every fixture run the K device byte-identical.
-// Enable via setOneSourceMovement(true) or env SG_ONE_SOURCE=1.
+// orbitRadius 0 — so the pure rotation IS the wrapper). Historically an
+// option (default off, the K device byte-identical); since plan 06 S3c the
+// default and since item 3 the ONLY Node scene — see the block below.
 // ═══════════════════════════════════════════════════════════════════════════
-// Plan 06 Phase 3 S3c — DEFAULT ON: the Node scene renders the one-source
-// movement whenever the series artifact is present (ONE scene in every
-// runtime, the browser's D4 default). The K device is the automatic fallback
-// when the artifact is absent; env SG_ONE_SOURCE=0 is a developer DIAGNOSTIC
-// that forces the K scene (the pre-S3c comparison), never a published
-// alternative; =1 stays accepted (explicit, and it makes an absent artifact
-// an error). Measured at the flip: eclipse audit and lunar alignment
-// identical; the tools-lib fixture moved 1e-7 in-era and up to 46 % at the
-// ±100 Myr probes — the Node deep-time scene joining the simulator's.
-let _osmRequested = process.env.SG_ONE_SOURCE !== '0';
-let _osmInstance;   // undefined = unresolved · null = series artifact absent · else {epsDeg, e}
-function setOneSourceMovement(on) {
-  _osmRequested = !!on;
-  if (!on) _osmInstance = undefined;   // re-resolve on the next enable
-}
+// Plan 06 Phase 3 S3c — the Node scene renders the one-source movement (ONE
+// scene in every runtime, the browser's D4 default). Measured at the flip:
+// eclipse audit and lunar alignment identical; the tools-lib fixture moved
+// 1e-7 in-era and up to 46 % at the ±100 Myr probes — the Node deep-time
+// scene joining the simulator's.
+// Plan 06 item 3 (the deferred K-device roles): the series artifact is a
+// TRACKED file, so its absence is a broken checkout, not a mode — an absent
+// artifact is a loud error, never a silently different (K-device) scene. The
+// SG_ONE_SOURCE switch and the setOneSourceMovement setter are gone with the
+// K branches they selected; the browser's K device remains only its pre-load
+// fallback (until the async artifact arrives), a path Node never has.
+let _osmInstance;   // undefined = unresolved · else {epsDeg, e, periOfDateDeg, …}
 function _oneSourceM() {
-  if (!_osmRequested) return null;
   if (_osmInstance === undefined) {
-    _osmInstance = require('./deep-orbital-history.js').createOneSourceMovement();
-    // explicit SG_ONE_SOURCE=1 (the certified regeneration mode) must not fall back silently
-    if (!_osmInstance && process.env.SG_ONE_SOURCE === '1') throw new Error('one-source movement requested but data/nbody-secular-series.json is absent');
+    const M = require('./deep-orbital-history.js').createOneSourceMovement();
+    if (!M) throw new Error('scene-graph: data/nbody-secular-series.json is absent — the one-source movement is the only Node scene (plan 06 item 3); restore the tracked artifact');
+    _osmInstance = M;
   }
-  return _osmInstance;   // null → the K device fallback (artifact absent)
+  return _osmInstance;
 }
 // The sampling year: the browser's _yearForObliquity convention exactly —
 // SI-year mapping in deep-time mode, the linear tropical count otherwise.
@@ -1255,8 +1251,8 @@ function _osmYearForJD(jd, linearYear) {
 // only trigonometrically (S¹), so 360° branch jumps are invisible.
 let _osmPeriAnchor = null;   // {engDeg, cyc} at J2000, captured once
 function _osmPeriDeltaRad(jd, currentYear) {
+  if (!DEEP_TIME_ENABLED) return 0;
   const M = _oneSourceM();
-  if (!M || !DEEP_TIME_ENABLED) return 0;
   if (!_osmPeriAnchor) {
     const y2000 = C.startModelYearWithCorrection + _posFromJDTools(2451545.0);
     _osmPeriAnchor = {
@@ -1306,8 +1302,8 @@ function _osmNodeAzimuthRad(ax, ay, az, nx, ny, nz) {
   return Math.atan2(ux * yx + uy * yy + uz * yz, ux * xx + uy * xy + uz * xz);
 }
 function _osmEqxPrep(jd, currentYear) {
+  if (!DEEP_TIME_ENABLED || _osmCapturing) { _osmEqxFrameHybRad = null; return; }
   const M = _oneSourceM();
-  if (!M || !DEEP_TIME_ENABLED || _osmCapturing) { _osmEqxFrameHybRad = null; return; }
   if (!_osmEqxGeoAnchor) {
     _osmCapturing = true;
     try {
@@ -1331,10 +1327,6 @@ function _applyOneSourceTiltCorr(graph, year) {
   if (_osmCapturing) return;   // the J2000 anchor capture reads PURE-K geometry
   const ra = graph.earthNodes.rotAxis;
   const M = _oneSourceM();
-  if (!M) {
-    if (ra.extraMatrix) { ra.extraMatrix = null; ra.updateWorldMatrix(); }
-    return;
-  }
   if (ra.extraMatrix) {
     // Defensive: a caller that did not pre-clear — restore the K geometry
     // for the read below (leaf-only; parent matrices are current).
@@ -1433,16 +1425,14 @@ function moveModel(graph, pos) {
   // from the banked engine series (the browser _sceneEccTargetAt twin) — the
   // PeriPrec2 geometric offset and the Sun's EoC inherit it below.
   const _osmM = _oneSourceM();
-  const dynEcc = { earth: _osmM
-    ? _osmM.e(_osmYearForJD(_jdFromPosTools(pos), currentYear))
-    : OE.computeEccentricityEarth(currentYear) };
-  // D4c: the apsidal-wheel correction (0 when the option is off) — applied
-  // to the wheel pair after the layers animate, and to the Sun's EoC phase.
-  const _periDelta = _osmM ? _osmPeriDeltaRad(_jdFromPosTools(pos), currentYear) : 0;
+  const dynEcc = { earth: _osmM.e(_osmYearForJD(_jdFromPosTools(pos), currentYear)) };
+  // D4c: the apsidal-wheel correction — applied to the wheel pair after the
+  // layers animate, and to the Sun's EoC phase.
+  const _periDelta = _osmPeriDeltaRad(_jdFromPosTools(pos), currentYear);
   // D4d-rev: the equinox prep (hybrid advance + the one-time J2000 K-anchor
   // capture) runs BEFORE this call's own animation, so the capture's nested
   // evaluation leaves no stale state behind.
-  if (_osmM) _osmEqxPrep(_jdFromPosTools(pos), currentYear); else _osmEqxFrameHybRad = null;
+  _osmEqxPrep(_jdFromPosTools(pos), currentYear);
   // Unification: the geometric eccentricity offset (the PeriPrec2 centre)
   // carries the one law's e(t) EVERY FRAME. The planet chains replicate the
   // Sun geometrically (centre offset + circle, no equation of centre), so
@@ -1976,7 +1966,7 @@ function computePlanetPosition(target, jd) {
       lonDeg: graph.moonNodes._meeusLonDeg,
       betRad: graph.moonNodes._meeusLatDeg * d2r,
       meeusT: graph.moonNodes._meeusT,
-      obliquityDeg: (() => { const M = _oneSourceM(); return M ? M.epsDeg(currentYear) : OE.computeObliquityEarth(currentYear); })(),   // Phase 3 S3b: the published ε
+      obliquityDeg: _oneSourceM().epsDeg(currentYear),   // Phase 3 S3b: the published ε
     });
 
     // (Stage C note: a rigid ring-frame placement mirror was implemented and
@@ -2083,13 +2073,11 @@ function computeSunPositionFast(jd) {
   // One-source movement (C-4b): under the option e(t) substitutes from the
   // banked engine series (mirrors the moveModel site; the EoC below inherits).
   const _osmM = _oneSourceM();
-  const earthEcc = _osmM
-    ? _osmM.e(_osmYearForJD(jd, currentYear))
-    : OE.computeEccentricityEarth(currentYear);   // the ONE law (unification)
+  const earthEcc = _osmM.e(_osmYearForJD(jd, currentYear));   // the banked engine series (the ONE movement)
   // D4c: the apsidal-wheel correction (mirrors moveModel).
-  const _periDelta = _osmM ? _osmPeriDeltaRad(jd, currentYear) : 0;
+  const _periDelta = _osmPeriDeltaRad(jd, currentYear);
   // D4d-rev: equinox prep before this call's own animation (mirrors moveModel).
-  if (_osmM) _osmEqxPrep(jd, currentYear); else _osmEqxFrameHybRad = null;
+  _osmEqxPrep(jd, currentYear);
   graph.earthPeriPrec2.container.px = -earthEcc * 100;   // geometric offset = full e(t) (mirrors moveModel)
 
   // Animate a single node: orbit.ry = θ (with EoC if applicable)
@@ -2181,7 +2169,6 @@ module.exports = {
   thetaToRaHours,
   buildSceneGraph,
   moveModel,
-  setOneSourceMovement,   // C-4b: the CSV re-base mode (series ε/e drive the scene; default off)
   _invalidateGraph,
   // Expose internals for testing
   Mat4,

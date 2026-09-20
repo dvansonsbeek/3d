@@ -263,6 +263,18 @@ export function assembleModel(C, F, laws = {}, secularSeriesArtifact = /** @type
     + dtCycles.cycleLodSecondsAt('jose4', year)
     + dtCycles.swingLodSecondsAt(year);
 
+  // Plan 06 S6 — |s₃|, the dominant nodal mode of Earth's orbit: the
+  // largest-amplitude ζ mode of the banked deep secular modes (the recipe
+  // the registry's `eclPrecYears`/`obliqCycleYears` and the browser's
+  // obliquity-beat helper use). ONE home here; the deep-time factory's
+  // ecliptic missing-motion term, the lunisolar surface and the API read it.
+  const s3ArcsecPerYr = (() => {
+    const z = DEEP_MODES_ARTIFACT.earthZeta
+      .filter((m) => Math.abs(m.omegaRadPerYr) > 1e-9)
+      .sort((a, b) => Math.hypot(b.re, b.im) - Math.hypot(a.re, a.im))[0];
+    return Math.abs((z.omegaRadPerYr * 180) / Math.PI) * 3600;
+  })();
+
   const deepLod = createDeepTimeLod({
     constants: {
       lTotalEmKgm2S: EPOCH_PARAMS.totalAngularMomentumKgM2S,
@@ -288,6 +300,9 @@ export function assembleModel(C, F, laws = {}, secularSeriesArtifact = /** @type
     // S5: the composed clock's J2000 anchor — the certified year laws' beat
     // at 2000 (ONE home below, shared with the hybrid's self-anchor); lazy.
     precessionPeriodJ2000YearsFn: () => certifiedAxialPrecessionJ2000Years(),
+    // Plan 06 T2 item: the solar day's ecliptic missing-motion term rides the
+    // nodal period 1,296,000/|s₃| (orbital), not the spin unit's H/5.
+    nodalPeriodYearsFn: () => 1296000 / s3ArcsecPerYr,
     siderealYearDaysFourierAt: (year) => evalSiderealYearFourierIAU(year),
     cycleLodSumAt: dtCycleLodCorrectionSum,
     swingLodAt: (year) => dtCycles.swingLodSecondsAt(year),
@@ -1250,17 +1265,6 @@ export function assembleModel(C, F, laws = {}, secularSeriesArtifact = /** @type
     if (Math.abs(year - 2000) <= ONE_FAMILY_WINDOW_YEARS) return yearLengthsM.tropicalYearSecondsAtYear(year);
     return deepLod.tropicalYearSecondsAtAge(yearToTMa(year));
   };
-  // Plan 06 S6 — |s₃|, the dominant nodal mode of Earth's orbit: the
-  // largest-amplitude ζ mode of the banked deep secular modes (the recipe
-  // the registry's `eclPrecYears`/`obliqCycleYears` and the browser's
-  // obliquity-beat helper use). ONE home here; the API reads it.
-  const s3ArcsecPerYr = (() => {
-    const z = DEEP_MODES_ARTIFACT.earthZeta
-      .filter((m) => Math.abs(m.omegaRadPerYr) > 1e-9)
-      .sort((a, b) => Math.hypot(b.re, b.im) - Math.hypot(a.re, a.im))[0];
-    return Math.abs((z.omegaRadPerYr * 180) / Math.PI) * 3600;
-  })();
-
   return Object.freeze({
     time: Object.freeze({
       yearFromJD,

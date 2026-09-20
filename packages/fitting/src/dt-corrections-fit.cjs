@@ -33,8 +33,9 @@
  *     packages — regenerate + republish @essrt/model-values after a refit
  *     (npm run values:package:write). Then re-run
  *     tools/fit/validate-resonator.js.
- *   Shipped state: USNO 86400.0018 (fit measured-day basis), deltaTStart
- *   55.16, Espenak 12.5 s, full-window 28.8 s; episode −1600 → +1600;
+ *   Shipped state (plan 06 T2 item — the ecliptic term on the nodal period):
+ *   USNO 86400.0021 (fit measured-day basis), deltaTStart 54.55, Espenak
+ *   13.4 s, full-window 28.8 s; episode −1600 → +1600;
  *   resonator default-ON runtime-wide (opt-out DT_RESONATOR_DISABLED=1).
  *   Narrative: docs/104.
  *
@@ -98,7 +99,7 @@
  * where TARGET_LOD_OFFSET = USNO_target − o.lodKinematic − h5Correction(2000),
  * so that at J2000 the sum of the DT-cycle δLOD contributions lands exactly
  * on the USNO Earth Orientation Center's LOD value. In the JOINT world the
- * shipped USNO target is 86400.0018 (fit measured-day basis; target offset
+ * shipped USNO target is 86400.0021 (fit measured-day basis; target offset
  * ≈ −2.155 ms, resonator included in the sum — see the joint-mode section
  * above); the value in
  * CONFIG/`usno_anchor` follows the shipped optimum in data/deltaT-4flag-
@@ -271,7 +272,7 @@ const CONFIG = {
     // DT_CORRECTIONS_DISABLED=1 is not set (unsafe to sweep).
     //
     // This is the SHIPPED joint optimum: 86400.0018 paired with
-    // deltaTStart = 55.16 (Espenak RMS 12.5). It must match
+    // deltaTStart = 54.55 (Espenak RMS 13.4; the nodal-period term). It must match
     // data/deltaT-4flag-fit.json `usno_anchor` and `deltaTStart` in
     // src/script.js — the USNO target and deltaTStart are a PAIR, so never
     // change one without the other.
@@ -423,10 +424,13 @@ function computeUsnoTargetOffset(usnoTargetLodS) {
   const iauSiderealSec = C.meanSiderealYearDays * 86400;
   const lodKinematic = iauSiderealSec / sidDays2000;
 
-  // h5Correction(year) = LOD_mean / ((H/5) × mSY_days) — LOD_mean approximated as
-  // 86400 s (runtime value ≈ 86399.99968; diff ~4 ns in h5, negligible for the fit).
-  const LOD_MEAN_APPROX = 86400;
-  const h5At2000 = LOD_MEAN_APPROX / ((C.H / 5) * C.meanSolarYearDays);
+  // The solar day's ecliptic missing-motion term at 2000 — read from the ONE
+  // runtime home (tools/lib deep-time → the shared factory), so the closure
+  // target and the runtime composite can never desync (plan 06 T2 item: the
+  // term rides the nodal period 1,296,000/|s₃|, formerly the anchor's H/5 —
+  // this fitter carried its own H/5 copy, caught by the registry's
+  // lodRealPhysical basis-consistency gate at exactly the 0.087-ms difference).
+  const h5At2000 = DT.h5Correction(2000);
 
   const targetOffset = usnoTargetLodS - lodKinematic - h5At2000;
   return { targetOffset, lodKinematic, h5At2000, sidDays2000 };
@@ -1090,7 +1094,7 @@ function main() {
     console.log('── USNO LOD anchor active for Stage D ──');
     console.log(`  USNO target (${FIXED_ANCHORS ? 'CONFIG override' : 'auto-optimum'}): lodReal(2000) = ${effectiveUsnoTarget} s`);
     console.log(`  o.lodKinematic(2000)  = ${usnoDerivation.lodKinematic.toFixed(9)} s   (IAU_sid_sec / fitted sid_days@2000 = ${usnoDerivation.sidDays2000})`);
-    console.log(`  h5Correction(2000)    = ${(usnoDerivation.h5At2000 * 1000).toFixed(6)} ms   (86400 / ((H/5)·mSY))`);
+    console.log(`  h5Correction(2000)    = ${(usnoDerivation.h5At2000 * 1000).toFixed(6)} ms   (LOD_mean / (T_s₃·mSY), the runtime's own value)`);
     console.log(`  → derived target: Σ cycleLodCorrection(2000) = ${(usnoDerivation.targetOffset * 1000).toFixed(4)} ms`);
     console.log(`  Soft-constraint weight: ${CONFIG.usno_anchor.weight.toExponential(0)}\n`);
   }

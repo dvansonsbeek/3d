@@ -63,7 +63,7 @@ const toolCall = (name, args) => {
     ['essrt_earth', { year: 2000 }, (d) => (Math.abs(d.years[0].obliquityDeg - 23.4393) < 0.0002 ? null : `obliquity: ${d.years[0].obliquityDeg}`)],
     ['essrt_moon', { year: 2000 }, (d) => (Math.abs(d.years[0].distanceKm - 384400) < 1000 ? null : `moon distance: ${d.years[0].distanceKm}`)],
     ['essrt_bodies', { body: 'mercury' }, (d) => (Math.round(d.record.perihelionEclipticYears) === 243867 ? null : `mercury: ${d.record.perihelionEclipticYears}`)],
-    ['essrt_values', { key: 'usnoLodJ2000' }, (d) => (d.value === '86,400.0019' ? null : `usnoLodJ2000: ${d.value}`)],   // plan 06 D7 + kicks-only swing: joint optimum moved with the lagged GIA channel
+    ['essrt_values', { key: 'usnoLodJ2000' }, (d) => (d.value === '86,400.0021' ? null : `usnoLodJ2000: ${d.value}`)],   // plan 06 T2 item: the ecliptic term on the nodal period re-closed the joint optimum at 0021
     ['essrt_derivations', { quantity: 'axialPrecession' }, (d) => (Math.abs(d.periodYears - 25771.4) < 0.5 ? null : `period: ${d.periodYears}`)],
     ['essrt_derivations', { quantity: 'inclinationPrecession' }, (d) => (Math.abs(d.periodYears - 111570) < 5 && d.status === 'current' ? null : `apsidal: ${d.periodYears} ${d.status}`)],
     ['essrt_climate', { year: 2000 }, (d) => (typeof d.years[0].l1OrbitalPermil === 'number' ? null : 'no L1 value')],

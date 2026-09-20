@@ -136,7 +136,7 @@ for (const url of SAMPLE_REQUESTS) {
   const ss = dataOf('/v1/cardinal-points?year=2000&types=SS').years[0].points.SS;
   if (Math.abs(ss.jd - 2451716.575) > 0.1) failures.push(`SS 2000 JD: ${ss.jd}`);
   const val = dataOf('/v1/values/usnoLodJ2000');
-  if (val.value !== '86,400.0019') failures.push(`values/usnoLodJ2000: ${val.value}`);   // plan 06 D7 + kicks-only swing: the joint optimum moved with the lagged GIA channel (86,400.0018 after the ecc-unification 7c re-close → 0020 → 0019)
+  if (val.value !== '86,400.0021') failures.push(`values/usnoLodJ2000: ${val.value}`);   // plan 06 T2 item: the ecliptic missing-motion term on the nodal period (3.527 → 3.441 ms) re-closed the joint optimum at 0021 (history: 0018 after the ecc-unification 7c re-close → 0020 → 0019 with the lagged GIA channel)
   const deriv = dataOf('/v1/derivations/axialPrecession');
   if (deriv.latticeDivisor !== 13) failures.push(`derivations/axialPrecession divisor: ${deriv.latticeDivisor}`);
   if (Math.abs(deriv.periodYears - 25771.4) > 0.5) failures.push(`derivations/axialPrecession period: ${deriv.periodYears}`);

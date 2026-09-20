@@ -40,7 +40,7 @@
     "test:snapshot": "node test/browser/snapshot.test.mjs && node test/browser/epoch-consistency.test.mjs && node test/browser/calendar-conversion.test.mjs && node test/browser/wobble-center.test.mjs && node test/cross-engine.test.mjs",
     "test:perf": "node test/browser/perf-regression.test.mjs",
     "check:csv-smoke": "node test/csv-window-smoke.test.mjs",
-    "fit:6a2": "SG_ONE_SOURCE=1 node tools/fit/export-solar-measurements.js --start -4000 --end 4000 --output data/02-solar-measurements-window.csv",
+    "fit:6a2": "node tools/fit/export-solar-measurements.js --start -4000 --end 4000 --output data/02-solar-measurements-window.csv",
     "test:transparency": "node test/browser/transparency.test.mjs",
     "test:package": "node test/package-install.test.mjs",
     "test:browser": "npm run build && npm run test:snapshot && npm run test:perf",

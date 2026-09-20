@@ -586,14 +586,13 @@ Step 6a2 (owner, 2026-09-16): `npm run fit:6a2`
          1-year steps over full H. All 6 event types use computeSunPositionFast().
          Output columns: Type, Model Year, JD, RA, Obliquity, World Angle, Distance
          Test range: --start -25000 --end 25000
-         ONE-SOURCE MODE (Stage C-4b onward; the Node DEFAULT since plan 06
-         Phase 3 S3c): the scene's ε(t)/e(t) come from the banked engine
-         series (tools/lib/scene-graph.js setOneSourceMovement), so the CSV
-         measures the one-source movement; `SG_ONE_SOURCE=1` stays accepted
-         as the explicit certified mode, `SG_ONE_SOURCE=0` forces the K scene
-         (a diagnostic). A plain run (option
-         off) reproduces the legacy K-movement CSV and is only for
-         baseline-capture comparisons. BEFORE any regeneration: back up
+         ONE-SOURCE MOVEMENT (Stage C-4b onward; the ONLY Node scene since
+         plan 06 Phase 3 S3c / item 3): the scene's ε(t)/e(t) come from the
+         banked engine series (tools/lib/scene-graph.js), so the CSV measures
+         the one-source movement. There is no switch any more — the former
+         `SG_ONE_SOURCE` env and `setOneSourceMovement` setter are gone with
+         the K-device branches they selected; an absent series artifact is a
+         loud error. BEFORE any regeneration: back up
          the current CSV outside the repo (159 MB, gitignored — no git
          recovery). The CSV is the banked RECORD of the one-source
          movement (validation/research consumers); no fitting step reads
@@ -926,7 +925,7 @@ Step 11 (= pipeline step 7c — the runner executes it in a normal pass;
 > sets (R10), and the §10 derived cardinal form (R5/R7/R8/R9) with its
 > runtime mirrors (R11). That was THE LAST FIT — see "The frozen era
 > clock" above. `data/02-solar-measurements.csv` now carries the
-> one-source movement (the Stage C-4b regeneration, `SG_ONE_SOURCE=1`);
+> one-source movement (the Stage C-4b regeneration; the only Node scene since plan 06 item 3);
 > the K-movement fit basis lives in the off-repo backup.
 >
 > Coefficients and runtime evaluation form are a MATCHED PAIR. Any future
@@ -1092,7 +1091,7 @@ node tools/fit/moon-eclipse-optimizer.js --write                             # S
 # Phase 5: Solar measurements & harmonic fits
 # FIRST: back up the CSV outside the repo — 159 MB, gitignored, NO git recovery.
 cp data/02-solar-measurements.csv ~/holistic-archive/02-solar-measurements.$(date +%Y%m%d).csv
-SG_ONE_SOURCE=1 node tools/fit/export-solar-measurements.js                  # Step 6a (~2 h; one-source movement — see Step 6a notes)
+node tools/fit/export-solar-measurements.js                                  # Step 6a (~2 h; the one-source movement, the only Node scene — see Step 6a notes)
 # (The obliquity / year-length / cardinal harmonic fits are retired —
 # coefficients frozen; see "The frozen era clock". Nothing runs after 6a.)
 # (Sun longitude harmonics moved to Phase 0 — see top of this block.

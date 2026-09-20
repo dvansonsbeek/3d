@@ -72,6 +72,16 @@ export type DeepTimeLodDeps = {
      */
     precessionPeriodJ2000YearsFn: () => number;
     /**
+     * - the period of Earth's orbit
+     * plane's nodal regression on the invariable plane, 1,296,000/|s₃| with s₃
+     * the dominant ζ mode of the banked deep secular modes (≈ 68,751 yr). An
+     * ORBITAL quantity (μ-tier: it does not follow Earth's spin), the reference
+     * the solar day's "ecliptic missing motion" term rides (plan 06 T2 item —
+     * formerly the spin unit's H/5, 67,063 yr, 2.5 % off and scaling with the
+     * spin at deep time). Lazy, like the precession anchor.
+     */
+    nodalPeriodYearsFn: () => number;
+    /**
      * - OPTIONAL time-dependent
      * Earth-Moon angular momentum (the Driver-1½ solar channels,
      * recession-history.cjs). Absent → the J2000 constant, which the budget
@@ -114,6 +124,13 @@ export type DeepTimeLodDeps = {
  *   reading; the same anchor the hybrid obliquity self-anchors on). Read
  *   LAZILY on the first composed-rate use, never at construction: every
  *   runtime's year laws read THIS factory's bases.
+ * @property {() => number} nodalPeriodYearsFn - the period of Earth's orbit
+ *   plane's nodal regression on the invariable plane, 1,296,000/|s₃| with s₃
+ *   the dominant ζ mode of the banked deep secular modes (≈ 68,751 yr). An
+ *   ORBITAL quantity (μ-tier: it does not follow Earth's spin), the reference
+ *   the solar day's "ecliptic missing motion" term rides (plan 06 T2 item —
+ *   formerly the spin unit's H/5, 67,063 yr, 2.5 % off and scaling with the
+ *   spin at deep time). Lazy, like the precession anchor.
  * @property {(tMa: number) => number} [lEmAtAgeKgm2S] - OPTIONAL time-dependent
  *   Earth-Moon angular momentum (the Driver-1½ solar channels,
  *   recession-history.cjs). Absent → the J2000 constant, which the budget
@@ -132,6 +149,7 @@ export function createDeepTimeLod(deps: DeepTimeLodDeps): {
     siderealYearSecondsAtAge: (t_Ma: number) => number;
     tropicalYearSecondsAtAge: (t_Ma: number) => number;
     tropicalYearDaysAtAge: (t_Ma: number) => number | null;
+    eclipticLodCorrectionSecondsAtAge: (t_Ma: number) => number | null;
     yearInDaysAtAge: (t_Ma: number) => number | null;
     deltaTRawSecondsAtAge: (t_Ma: number) => number;
     lodSecondsWithCorrectionsAtAge: (t_Ma: number) => number | null;

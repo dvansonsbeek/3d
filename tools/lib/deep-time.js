@@ -334,6 +334,8 @@ function _deepLod() {
       moiFactorAtAge: earthMoiFactorAtAge,
       // S5: the composed clock's J2000 anchor — the certified year laws' beat at 2000 (lazy)
       precessionPeriodJ2000YearsFn: certifiedAxialPrecessionJ2000Years,
+      // Plan 06 T2 item: the ecliptic missing-motion term rides the nodal period (orbital), lazy
+      nodalPeriodYearsFn: () => 1296000 / _s3ArcsecPerYr(),
       siderealYearDaysFourierAt: _evalSiderealYearFourierIAU,
       cycleLodSumAt: dtCycleLodCorrectionSum,
       swingLodAt: resonatorSwingLodCorrection,
@@ -787,16 +789,28 @@ function computeYearDaysDirectAll(year) {
   };
 }
 
-/** Browser twin of script.js h5Correction: H/5 ecliptic "missing motion" LOD
- *  correction (~3.527 ms at J2000) on the deep-time mean-LOD chain. */
+/** Twin of script.js h5Correction: the solar day's ecliptic "missing motion"
+ *  LOD correction (~3.44 ms at J2000) on the deep-time mean-LOD chain. The
+ *  identifier keeps its historical name; since the plan 06 T2 restatement the
+ *  divisor is the nodal period 1,296,000/|s₃| (orbital, constant at every
+ *  epoch), not the spin unit's H/5 — ONE home in the shared factory. */
 function h5Correction(year) {
   const t_Ma = (C.startmodelYear - year) / 1e6;  // browser J2000_CALENDAR_YEAR = startmodelYear = 2000.5
-  const lodMean = meanLodSecondsAtAge(t_Ma);
-  if (lodMean === null) return 0;
-  const H_local = meanHAtAge(t_Ma);
-  if (H_local === null) return 0;
-  const mSY_days = meanTropicalYearDaysAtAge(t_Ma);
-  return lodMean / ((H_local / 5) * mSY_days);
+  return _deepLod().eclipticLodCorrectionSecondsAtAge(t_Ma) ?? 0;
+}
+
+/** |s₃|, ″/yr — the dominant nodal mode of Earth's orbit (the largest-amplitude
+ *  ζ mode of the banked deep secular modes; the recipe the physics model, the
+ *  registry and the browser share). Lazy + memoized. */
+let _s3ArcsecPerYrMemo = null;
+function _s3ArcsecPerYr() {
+  if (_s3ArcsecPerYrMemo === null) {
+    const z = DEEP_MODES_ARTIFACT.earthZeta
+      .filter((m) => Math.abs(m.omegaRadPerYr) > 1e-9)
+      .sort((a, b) => Math.hypot(b.re, b.im) - Math.hypot(a.re, a.im))[0];
+    _s3ArcsecPerYrMemo = Math.abs((z.omegaRadPerYr * 180) / Math.PI) * 3600;
+  }
+  return _s3ArcsecPerYrMemo;
 }
 
 /** Epoch-specific kinematic LOD — script.js `o.lodKinematic`: pure Layer-0

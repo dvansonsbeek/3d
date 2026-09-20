@@ -74,6 +74,13 @@ const { createComposedPrecession } = require('../earth/precession-composed.cjs')
  *   reading; the same anchor the hybrid obliquity self-anchors on). Read
  *   LAZILY on the first composed-rate use, never at construction: every
  *   runtime's year laws read THIS factory's bases.
+ * @property {() => number} nodalPeriodYearsFn - the period of Earth's orbit
+ *   plane's nodal regression on the invariable plane, 1,296,000/|s₃| with s₃
+ *   the dominant ζ mode of the banked deep secular modes (≈ 68,751 yr). An
+ *   ORBITAL quantity (μ-tier: it does not follow Earth's spin), the reference
+ *   the solar day's "ecliptic missing motion" term rides (plan 06 T2 item —
+ *   formerly the spin unit's H/5, 67,063 yr, 2.5 % off and scaling with the
+ *   spin at deep time). Lazy, like the precession anchor.
  * @property {(tMa: number) => number} [lEmAtAgeKgm2S] - OPTIONAL time-dependent
  *   Earth-Moon angular momentum (the Driver-1½ solar channels,
  *   recession-history.cjs). Absent → the J2000 constant, which the budget
@@ -235,10 +242,30 @@ function createDeepTimeLod(deps) {
   }
 
   /**
+   * The solar day's "ecliptic missing motion" correction, seconds: the mean
+   * solar day is counted against the Sun on the ECLIPTIC, whose plane turns
+   * on the invariable plane once per nodal period T_s₃, so Earth rotates
+   * 1/(T_s₃·mSY) of a turn more per solar day — δLOD = LOD_mean/(T_s₃·mSY)
+   * (≈ 3.44 ms at J2000). T_s₃ is an orbital quantity: constant at every
+   * epoch (μ-tier), so the term rides only LOD_mean and the year length at
+   * deep time. ONE home for the three runtimes' `h5Correction` twins (the
+   * identifier keeps its name; the divisor is the nodal period since the
+   * plan 06 T2 restatement, formerly the spin unit's H/5).
+   * @param {number} t_Ma @returns {number|null} seconds (null past tidal lock)
+   */
+  function eclipticLodCorrectionSecondsAtAge(t_Ma) {
+    const lodMean = lodSecondsAtAge(t_Ma);
+    if (lodMean === null) return null;
+    const mSY_days = tropicalYearDaysAtAge(t_Ma);
+    if (mSY_days === null) return null;
+    return lodMean / (deps.nodalPeriodYearsFn() * mSY_days);
+  }
+
+  /**
    * RAW ΔT integral relative to J2000 (0 at t=0 by convention) — Simpson
-   * over the H/5-raw kinematic LOD, WITHOUT the cycle corrections and
-   * WITHOUT a cache. The engines wrap this: flag-keyed cache + their exact
-   * sequential post-integration adds (see the module header).
+   * over the kinematic LOD plus the ecliptic missing-motion term, WITHOUT the
+   * cycle corrections and WITHOUT a cache. The engines wrap this: flag-keyed
+   * cache + their exact sequential post-integration adds (see the module header).
    * @param {number} t_Ma @returns {number} seconds (NaN past tidal lock)
    */
   function deltaTRawSecondsAtAge(t_Ma) {
@@ -255,15 +282,14 @@ function createDeepTimeLod(deps) {
       const lodMean = lodSecondsAtAge(tau);
       if (lodMean === null) return NaN;
       const yearS = tropicalYearSecondsAtAge(tau);
-      // H/5 ecliptic "missing motion" — the solar day is measured against
-      // the Sun on the ECLIPTIC (precesses at H/5), not the inclination
-      // frame (H/3). Adds ~3.5 ms at J2000 (raw kinematic 86400.003 s); the
-      // fitted cycle stack closes Layer-4 LOD_real onto the USNO anchor.
-      // Non-null: both can only be null when lodSecondsAtAge(tau) is null,
-      // which already returned NaN above — the checker can't see the chain.
-      const H_local = /** @type {number} */ (hAtAge(tau));
-      const mSY_days = /** @type {number} */ (tropicalYearDaysAtAge(tau));
-      const lodH5Raw = lodMean + lodMean / ((H_local / 5) * mSY_days);
+      // Ecliptic "missing motion" — the solar day is measured against the
+      // Sun on the ECLIPTIC, whose plane turns on the invariable plane at the
+      // nodal rate s₃ (period ≈ 68,751 yr, an orbital quantity), not in the
+      // inclination frame. Adds ~3.4 ms at J2000; the fitted cycle stack
+      // closes Layer-4 LOD_real onto the USNO anchor. Non-null: the helper
+      // can only be null when lodSecondsAtAge(tau) is null, which already
+      // returned NaN above — the checker can't see the chain.
+      const lodH5Raw = lodMean + /** @type {number} */ (eclipticLodCorrectionSecondsAtAge(tau));
       const integrand = (86400 - lodH5Raw) * yearS * 1e6 / 86400;
       const w = (i === 0 || i === n) ? 1 : (i % 2 === 1 ? 4 : 2);
       sum += w * integrand;
@@ -364,6 +390,8 @@ function createDeepTimeLod(deps) {
     lunarTorqueFactorAtAge: composed.lunarTorqueFactorAtAge,
     precessionTorqueTermAtAge: composed.torqueTermAtAge,
     siderealYearSecondsAtAge, tropicalYearSecondsAtAge, tropicalYearDaysAtAge,
+    // the solar day's ecliptic missing-motion term on the nodal period (plan 06 T2 item; one home)
+    eclipticLodCorrectionSecondsAtAge,
     yearInDaysAtAge, deltaTRawSecondsAtAge, lodSecondsWithCorrectionsAtAge,
     lodSecondsActualAtAge, dLodDtDecompositionAtAge,
     // the frozen era clock's named counter and bases (device tier, plan 06 D8)

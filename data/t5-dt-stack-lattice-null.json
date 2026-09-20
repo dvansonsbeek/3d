@@ -253,7 +253,7 @@
  "meta": {
   "script": "scripts/t5_dt_stack_lattice_null.py",
   "doc": "docs/102-gia-alpha-lunar-validation.md / docs/104 (T5, plan 06)",
-  "runtime_sec": 0.0003733634948730469,
+  "runtime_sec": 0.00032806396484375,
   "environment": {
    "python": "3.12.3",
    "numpy": "2.4.1"
@@ -262,7 +262,7 @@
  "inputs": {
   "generator": "python3 scripts/t5_dt_stack_lattice_null.py --write",
   "files": {
-   "data/deltaT-4flag-fit.json": "sha256:9a97f48d93900e91ceea9412ae46aee6f8fec4d87f759a0c72e72ec60efdaa3c",
+   "data/deltaT-4flag-fit.json": "sha256:3f86b8b5d52f4a71b15a37ce03d8a4a299b643335b316a0c7a1ded840aeb3104",
    "data/deltaT-bond-cycle-residual-fit.json": "sha256:a8e767f4efaaa25cfa0670938b37567fb913cd1dbdab99bfe63df7c6bbbbbdb2",
    "data/deltaT-divisor-scan-jse.json": "sha256:7c3208b8d6e59e5492eeed191321a4d45edc4e411214fe06ed8306ebb1021b3a",
    "data/deltaT-h253-fifth-cycle-scan.json": "sha256:359b57265a098ffb54f522b1782d1d2c1f5f3130b2db97ceba9e306776cb1de7",

@@ -60,9 +60,10 @@ function createDeepOrbitalHistory() {
  *
  * Returns { epsDeg(year), e(year) } over a grown cached grid (the browser
  * sampler pattern, 250-aligned tiers per the factory's stepping contract),
- * or null when the series artifact is absent. Consumers: the scene-graph
- * one-source option (setOneSourceMovement — the CSV exporter's re-base
- * mode) and the cross-engine parity probes.
+ * or null when the series artifact is absent (the scene graph turns that
+ * null into a loud error — plan 06 item 3: the one-source movement is the
+ * only Node scene). Consumers: the scene graph and the cross-engine parity
+ * probes.
  */
 function createOneSourceMovement() {
   let seriesArt;
