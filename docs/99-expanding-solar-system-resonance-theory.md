@@ -467,7 +467,7 @@ This sets the **scaling form**; it does not by itself fix the magnitude. Brown m
 
 **Aligning, not replacing.** The Lunar Precession Invariant does not compete with Brown's lunar theory but sharpens it: the m²-leading-order scaling is adopted as a structural law, with the J2000 magnitude anchored from observation and propagated to deep time without polynomial corrections. Where Brown's expansion derives the absolute period from the underlying m-series, ESSRT treats the period as one anchored input and the (H/H₀)² evolution as the structural claim — the two views agree on the scaling form by construction.
 
-Under Driver 1, the Moon recedes; angular-momentum conservation simultaneously slows Earth's spin (LOD grows), which propagates into a proportional growth of H via the H/13 axial-precession coupling. T_sm and H thus co-evolve, and in the cycles-per-H formulation `N_apsidal(t) = N₀ × (H/H₀)²` (of-date-anchored; see the frame-convention note above) the product T_apsidal × H is held exact by construction.
+Under Driver 1, the Moon recedes; angular-momentum conservation simultaneously slows Earth's spin (LOD grows), which propagates into a proportional growth of the frozen era clock's counter H_era = H₀·LOD/LOD₀ (the lunar chain rides that device counter, plan 06 D8). T_sm and H thus co-evolve, and in the cycles-per-H formulation `N_apsidal(t) = N₀ × (H/H₀)²` (of-date-anchored; see the frame-convention note above) the product T_apsidal × H is held exact by construction.
 
 ### Why it is structurally **exact** under Driver 1 (in year-units)
 

@@ -190,7 +190,10 @@ function createDeepTimeLod(deps) {
    * deep JD↔year calendar ride it), NOT a precession claim: the published
    * precession period is the composed T_p (S5), 0.086 % apart. Kept
    * unchanged in S5 so nothing certified moves (calendar, goldens, CSV);
-   * restating this tier on T_p is the plan-06 Phase 6 / D2 decision. */
+   * plan-06 D2 DECIDED: relabel, not re-base — the 0.086 % is the fit
+   * anchor's convention (H₀/T_p = 13.011, constant at every epoch beyond
+   * ±2 Myr, measured), and re-basing would move every comb coefficient
+   * for a rounding-level gain. This tier stays a named device. */
   function tropicalYearSecondsAtAge(t_Ma) {
     const sidSec = siderealYearSecondsAtAge(t_Ma);
     const Ht = hAtAge(t_Ma);

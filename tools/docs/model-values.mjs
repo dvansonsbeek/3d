@@ -2229,6 +2229,8 @@ export const VALUES = {
     });
     return {
       ...mk('J2000', 0.000001, 'J2000'),
+      ...mk('Devonian', 380, '380 Ma'),
+      ...mk('200MyrFuture', -200, '+200 Myr'),
       ...mk('1400Ma', 1400, '1.4 Ga'),
       ...mk('2460Ma', 2460, '2.46 Ga'),
     };
@@ -3134,6 +3136,11 @@ export const VALUES = {
         out[`driftAt${key}Ppm`] = { get: () => driftPpm(tOf()), render: (v) => `−${Math.abs(Math.round(v))}`, unit: 'ppm' };
       }
     }
+    // The clock at ±1 Gyr (the website's deep-time phase table; the composed period, S5 — the
+    // old table quoted H/13 there). Forward: the recession polynomial's extrapolation region.
+    out.axialPrecAt1GyrAgo = { get: () => dtl().meanLunisolarPrecessionPeriodYearsAtAge(1000), render: (v) => thousands(Math.round(v)), unit: 'yr', note: 'the composed lunisolar precession period at −1 Gyr' };
+    out.axialPrecAt1GyrFuture = { get: () => dtl().meanLunisolarPrecessionPeriodYearsAtAge(-1000), render: (v) => thousands(Math.round(v)), unit: 'yr', note: 'the composed lunisolar precession period at +1 Gyr (forward-extrapolation region; upper-bound reading)' };
+    out.axialPrecOneGyrAgoPct = { get: () => 100 * dtl().meanLunisolarPrecessionPeriodYearsAtAge(1000) / dtl().meanLunisolarPrecessionPeriodYearsAtAge(0.000001), render: (v) => `~${Math.round(v)}`, unit: '%', note: 'the clock one billion years ago as a share of today’s (replaces hOneGyrAgoPct on the website)' };
     return out;
   })(),
 

@@ -272,8 +272,9 @@ one-source movement):
    third reading is gone from every surface; "H = 13·T_p" is retired
    (H/T_p = 13.011, a fit constant — `docs/retired-record.md`). H/13
    survives only as the unit's calendar convention (2.1 step 7) and in the
-   kinematic day/year identities (chain 3) — device tier, the Phase 6 / D2
-   decision.
+   kinematic day/year identities (chain 3) — device tier; plan-06 D2
+   decided it stays a named device (relabel, not re-base: the 0.086 % is
+   the anchor ratio, constant at every epoch beyond ±2 Myr).
 2. **The physical rate has no home in the physics package — RESOLVED
    (D6/Phase 3).** The composition (2.3) lives in
    `earth/precession-composed`, built inside the deep-time factory; the
@@ -549,7 +550,7 @@ The beat at the deep anchors, both ψ̇ readings:
 | 1400 | **14966.114** | 14979.018 | 86.596 | 19863.695 | 19.13 | 23.94 |
 | 2460 | **12389.891** | 12400.573 | 104.601 | 18277.481 | 15.11 | 19.82 |
 
-s₃ = the dominant Earth ζ mode of data/nbody-deep-secular-modes.json = -18.8506 ″/yr (amplitude 0.00832); beat = 1,296,000/(ψ̇ − |s₃|) yr. Plan 06 D6 → Phase 3 → S5: ψ̇(t) is the composed lunisolar rate on the model’s one J2000 reading (T_p(J2000) = 25771.4 yr, the certified year laws’ beat). The unit’s tidal-mean year pair still beats at H(t)/13 (third column) — that 13/H is the unit’s CALENDAR convention (the kinematic day/year identities, the deep JD↔year calendar), kept unchanged in S5 so nothing certified moves; it is not a precession claim (restating that tier on T_p is the Phase 6 / D2 decision). Registry keys `obliqBeatJ2000Kyr`/`obliqBeat1400MaKyr`/`obliqBeat2460MaKyr` are the sixth column; `obliqH8Scaled*Kyr` (name kept) is the seventh, the pure precession-scaling alternative "obliquity period ∝ T_p" — the J2000 beat held proportional to T_p(t), identical to the beat today and the discriminated alternative at depth (D8 iii; S5 retired its former T_p·13/8 = H/8 form). The pre-Phase-3 "structural" beat on H_era/13 is recorded in docs/retired-record.md.
+s₃ = the dominant Earth ζ mode of data/nbody-deep-secular-modes.json = -18.8506 ″/yr (amplitude 0.00832); beat = 1,296,000/(ψ̇ − |s₃|) yr. Plan 06 D6 → Phase 3 → S5: ψ̇(t) is the composed lunisolar rate on the model’s one J2000 reading (T_p(J2000) = 25771.4 yr, the certified year laws’ beat). The unit’s tidal-mean year pair still beats at H(t)/13 (third column) — that 13/H is the unit’s CALENDAR convention (the kinematic day/year identities, the deep JD↔year calendar), kept unchanged in S5 so nothing certified moves; it is not a precession claim (plan-06 D2 decided: that tier stays a named device — beyond ±2 Myr the calendar beat sits a constant 0.086 % above the composed period, the anchor ratio, so a re-base would buy nothing physical). Registry keys `obliqBeatJ2000Kyr`/`obliqBeat1400MaKyr`/`obliqBeat2460MaKyr` are the sixth column; `obliqH8Scaled*Kyr` (name kept) is the seventh, the pure precession-scaling alternative "obliquity period ∝ T_p" — the J2000 beat held proportional to T_p(t), identical to the beat today and the discriminated alternative at depth (D8 iii; S5 retired its former T_p·13/8 = H/8 form). The pre-Phase-3 "structural" beat on H_era/13 is recorded in docs/retired-record.md.
 <!-- /generated:calcmap-obliquity-beat -->
 
 ### 4.6 Findings from this chain (to act on)

@@ -93,8 +93,12 @@ keys, the panels, the API) now read the derived value; the unit and the
 clock scale together and their ratio H(t)/T_p(t) = 13.011 is a fit
 constant, not structure. The 13 survives only as the unit's calendar
 convention — the kinematic day/year identities on H/(H − 13) and the deep
-JD↔year calendar (`tropicalYearSecondsAtAge`), device tier, the plan-06
-Phase 6 / D2 decision. Measured on the change: the composed rate rose
+JD↔year calendar (`tropicalYearSecondsAtAge`), device tier. Plan-06 D2
+decided it stays a named device rather than being re-based on the period:
+beyond ±2 Myr the calendar beat sits a constant 0.086 % above the composed
+period at every epoch (the anchor ratio 13.011/13 — a convention, not
+physics), and a re-base would move every comb coefficient with its CSV
+window and goldens for a rounding-level gain. Measured on the change: the composed rate rose
 0.086 % everywhere (Xiamaling +0.94 %, Lantink −3.68 %, both inside 1σ),
 the J2000 obliquity beat moved 41.3 → 41.2 kyr, nothing certified moved
 (eclipse audit and lunar alignment reproduced bit-for-bit).
