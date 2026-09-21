@@ -1627,8 +1627,45 @@ function moveModel(graph, pos) {
         // planetary-completion table (70 framework-carrier terms + the
         // 6.44″ Earth-around-EMB "lunar equation"). Finders stay bare;
         // the besselian keeps its own subtraction — no double count.
-        const _dE5 = _e5Tier().eclipse.sunLonCompletedDegAtJD(_jdE5) - _frameworkSunLon(_jdE5);
-        θ += _wE5 * (((((_dE5 + 540) % 360) + 360) % 360) - 180) * d2r;
+        // Plan 06 layer B (measured): δ = λ_cert − λ_REALIZED — the wheel's
+        // own longitude of date read from the scene in the frame every
+        // validated surface uses: the Sun's RA/Dec in the CORRECTED axis
+        // frame (the tilt correction applied here first, so the axis is this
+        // frame's, not the previous one's), converted with the scene ε. The
+        // former analytic twin (_frameworkSunLon: K e law, H/16 ϖ, its own
+        // mean-longitude clock) parted from the wheel by 84″ around 500 AD,
+        // 250″ at −500 and 810″ at −2500 — a leak the rendered Sun carried
+        // 1:1 — while matching only near 1500–2500 where it was measured.
+        // NOT the sun-plane node line: that construction moved the Sun and
+        // the frame bridge's planets ~55″ at J2000 and tripled the planets'
+        // JPL RMS (the node of the K sun-plane on the equator is not the
+        // equinox the RA frame realizes; the two part by 1,400″ at −3000).
+        // The twin remains only where the one-source prep is unavailable.
+        const _lamCertDeg = _e5Tier().eclipse.sunLonCompletedDegAtJD(_jdE5);
+        let _dE5;
+        if (_osmEqxFrameHybRad !== null && _osmEqxGeoAnchor && !nodes.isEllipse) {
+          const _yE5 = _osmYearForJD(_jdE5, currentYear);
+          const epsR = _oneSourceM().epsDeg(_yE5) * d2r;
+          // The node angle θ and the geocentric longitude differ by the
+          // offset-ellipse Jacobian (dλ/dθ = 1 ± e·…), so a large δ applied
+          // to θ lands λ short by ~e·δ (58″ at −3000): two Newton passes —
+          // read λ, step θ, re-read, step the remainder.
+          for (let pass = 0; pass < 2; pass++) {
+            nodes.orbit.ry = θ;
+            graph.root.updateWorldMatrix();
+            _applyOneSourceTiltCorr(graph, _yE5);
+            const sWP = nodes.pivot.getWorldPosition();
+            const loc = graph.earthNodes.rotAxis.worldToLocal(sWP[0], sWP[1], sWP[2]);
+            const sph = cartesianToSpherical(loc[0], loc[1], loc[2]);
+            const raR = thetaToRaDeg(sph.theta) * d2r, decR = phiToDecDeg(sph.phi) * d2r;
+            const lamRealizedDeg = Math.atan2(Math.sin(raR) * Math.cos(epsR) + Math.tan(decR) * Math.sin(epsR), Math.cos(raR)) / d2r;
+            _dE5 = _lamCertDeg - lamRealizedDeg;
+            θ += _wE5 * (((((_dE5 + 540) % 360) + 360) % 360) - 180) * d2r;
+          }
+        } else {
+          _dE5 = _lamCertDeg - _frameworkSunLon(_jdE5);
+          θ += _wE5 * (((((_dE5 + 540) % 360) + 360) % 360) - 180) * d2r;
+        }
       }
     }
     // Full Meeus Ch. 47 lunar perturbations (longitude + latitude, 60+60 terms)
@@ -2178,6 +2215,7 @@ module.exports = {
   Node,
   cartesianToSpherical,
   _getGraphForProbe: () => getGraph(),   // research probes: the internal graph AFTER a computePlanetPosition call
+  _frameworkSunLonProbe: (jd) => _frameworkSunLon(jd),   // research probes: the E5 twin (wheel-versus-twin decomposition)
   _injectKeplerChains: (chains) => { _kcChains = chains; },   // research probes (K4.5 acceptance): override the flag path's chains (null → reload from the artifact)
   _kcDebugR: () => _kcR,   // research probes (K4b parity): the derived frame bridge
   _moonSeriesForProbe: () => _moonSeriesM(),   // research probes: the shared Meeus series (incl. the truncated eclipse-finder forms)

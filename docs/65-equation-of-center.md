@@ -184,13 +184,18 @@ not absorbed. The certified eclipse chain is untouched by construction
 θ_kinematic    = base scene-graph rotation (constant rate × pos − startPos)
 θ_with_EoC     = θ_kinematic + 2·e·sin(M) + 1.25·e²·sin(2M)        ← EoC + exact-Kepler corrector (default path)
 θ_with_harms   = θ_with_EoC − Δλ_harmonics(t)                       ← Z-B (legacy path only; skipped when FQ3 is on)
-θ_displayed    = θ_with_harms + w(t)·(λ_certified − λ_twin)         ← the δ overlay (owns accuracy)
+θ_displayed    = θ_with_harms + w(t)·(λ_certified − λ_realized)     ← the δ overlay (owns accuracy)
 ```
 
 The δ overlay (`E5_WHEEL_SUN_ENABLED`; weight w(t) = 1 in the corpus era,
 tapering off at the clock-convention boundary — a TT-clock Sun would clash
 with the deliberately-UT deep-time scene) steers the world-frame Sun onto
-the certified framework-native Sun of the eclipse chain
+the certified framework-native Sun of the eclipse chain. λ_realized is the
+wheel's own longitude of date read from the scene each frame — the Sun's
+RA/Dec in the corrected axis frame converted with the scene ε, in two Newton
+passes — so the cancellation is exact in the frame the panels, the frame
+bridge and the JPL comparisons use; the former analytic twin parted from the
+wheel by up to 810″ inside the window (doc 41)
 ([doc 103](103-135-babylonian-case-study.md) describes that basis). The
 displayed Sun's accuracy is owned by the certified chain; the wheel layers
 underneath keep the scene's cyclic, bounded-harmonic character.

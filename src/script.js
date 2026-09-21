@@ -85,7 +85,7 @@ const useVariableSpeed           = K.foundational.useVariableSpeed;   // Equatio
 const debugOn                    = false;  // Debug button flag (developer only)
 let   DEEP_TIME_MODE_ENABLED     = true;   // H/LOD/mSY evolve with age — see setEpochByAge
 let   SUN_HARMONICS_ENABLED      = true;   // Sun-only ~200″→~7″ RMS correction — rationale at the "Phase Z-B" doc block
-let   E5_WHEEL_SUN_ENABLED       = true;   // SW-1: wheel Sun rides the certified E5 tier Sun via δ = λ_cert − λ_twin (see moveModel sun block)
+let   E5_WHEEL_SUN_ENABLED       = true;   // SW-1: wheel Sun rides the certified E5 tier Sun via δ = λ_cert − λ_realized (the wheel's own longitude read from the scene geometry; see the moveModel sun block)
 let   FQ3_EXACT_SUN_ENABLED      = true;   // FQ-3 W1: exact-Kepler wheel Sun — the derived Δ corrector replaces the fitted SUN_LONGITUDE_HARMONICS on the display path (see moveModel sun block; mirrors tools/lib/scene-graph.js FQ3_EXACT_SUN)
 let   BOND_DT_CORRECTION_ENABLED = true;  // Bond 1,466-yr ΔT correction (Option B research toggle) — rationale + constants at the BOND_PERIOD_YR block
 let   HALLSTATT_DT_CORRECTION_ENABLED = true;  // Hallstatt 2,430-yr ΔT correction (research toggle) — rationale + constants at the HALLSTATT_PERIOD_YR block
@@ -6347,6 +6347,19 @@ if (typeof window !== 'undefined') {
     // scene (jumpToJulianDay + forceSceneUpdate) — call them LAST in any
     // recording order so earlier probes see the fresh-load scene state.
     eclSunLonAt: (jd) => _eclSunLon(jd),
+    // ── Plan 06 layer B research surface: the RENDERED wheel Sun vs the
+    // certified Sun (the δ overlay's acceptance). sceneSunRaDecAt jumps the
+    // scene to jd and reads the Sun object's scene RA/Dec (of date) plus the
+    // scene ε; fwSunLonAt is the former analytic twin; certSunLonAt the
+    // certified completed Sun; setE5WheelSun toggles the overlay (A/B).
+    sceneSunRaDecAt: (jd) => {
+      jumpToJulianDay(jd);
+      forceSceneUpdate('light');
+      return { raDeg: sun.ra * 180 / Math.PI, decDeg: 90 - sun.dec * 180 / Math.PI, epsDeg: o.obliquityEarth };
+    },
+    fwSunLonAt: (jd) => _frameworkSunLon(jd),
+    certSunLonAt: (jd) => { if (_tierUmbraModel === null) _tierUmbraModel = createModel(); return _tierUmbraModel.eclipse.sunLonCompletedDegAtJD(jd); },
+    setE5WheelSun: (on) => { E5_WHEEL_SUN_ENABLED = !!on; return E5_WHEEL_SUN_ENABLED; },
     eclFindLunar: (jdStart, jdEnd) => findLunarEclipsesInRange(jdStart, jdEnd),
     eclFindSolar: (jdStart, jdEnd) => findSolarEclipsesInRange(jdStart, jdEnd),
     eclUmbraSceneAt: (jd) => umbraFromSceneAtJd(jd),
@@ -10415,6 +10428,8 @@ earth.containerObj.rotation.y = (Math.PI/2)*whichSolsticeOrEquinox;
 // loader, factory and sampler live with the other hybrid machinery below.
 const HYBRID_SPIN_REQUESTED = true;
 let _hybridTiltCorr = null;
+// E5 exact-cancellation scratch (the wheel Sun's realized RA/Dec read per frame)
+const _E5_S = new THREE.Vector3(), _E5_SPH = new THREE.Spherical();
 const _HTC_A = new THREE.Vector3(), _HTC_N = new THREE.Vector3(), _HTC_U = new THREE.Vector3();
 const _HTC_Q1 = new THREE.Quaternion(), _HTC_Q2 = new THREE.Quaternion(),
       _HTC_Q3 = new THREE.Quaternion(), _HTC_Q4 = new THREE.Quaternion(),
@@ -53691,6 +53706,53 @@ function _k8UpdateStandardOverlayInner() {
   }
 }
 
+/** C-3 / D4d: drive the VISIBLE tilt (the _hybridTiltCorr wrapper) to the
+ *  one-source ε target and the hybrid equinox azimuth. Reset the wrapper,
+ *  read the K geometry (axis vs sun-plane normal), rotate about the node
+ *  line by (ε_geom − ε_target) — a rotation of the axis about
+ *  û = normalize(a×n) by +θ reduces the axis-plane angle by exactly θ and
+ *  preserves the node line — after the D4d azimuth correction about n.
+ *  IDEMPOTENT (the wrapper is reset before the read), so it may run more
+ *  than once per frame: updatePositions calls it with o.obliquityEarth, and
+ *  the E5 Sun block calls it BEFORE placing the Sun so the axis frame it
+ *  reads the Sun's RA/Dec in is this frame's, not the previous one's.
+ *  Mirrors tools/lib/scene-graph.js _applyOneSourceTiltCorr. */
+function _applyHybridTiltCorrB(epsTargetDeg) {
+  if (!(_hybridTiltCorr && _hybridSpinActive() && !_osmEqxCapturingB)) return;
+  _osmEqxEnsureAnchorB();   // one-time J2000 pure-K anchor capture (jump-probe; guarded)
+  _hybridTiltCorr.quaternion.set(0, 0, 0, 1);
+  _hybridTiltCorr.updateMatrixWorld(true);
+  const a = _HTC_A.set(0, 1, 0).applyQuaternion(earth.rotationAxis.getWorldQuaternion(_HTC_Q1)).normalize();
+  const n = _HTC_N.set(0, 1, 0).applyQuaternion(barycenterEarthAndSun.pivotObj.getWorldQuaternion(_HTC_Q2)).normalize();
+  const epsGeom = Math.acos(Math.min(1, Math.max(-1, a.dot(n))));
+  const epsTarget = epsTargetDeg * Math.PI / 180;
+  // D4d-rev: the azimuth correction FIRST — Δψ = (hybrid equinox advance)
+  // − (K scene's FULL geometric equinox advance), both J2000-anchored;
+  // λ_K read from the uncorrected a×n THIS frame. The angle to n is
+  // invariant under the azimuth, so εGeom needs no recompute.
+  let dpsi = 0;
+  const dHyb = _osmEqxHybAdvanceRad();
+  if (dHyb !== null) {
+    let dK = _osmNodeAzimuthRadB(a, n) - _osmEqxGeoAnchorB.lamK2000Rad;
+    dK = Math.atan2(Math.sin(dK), Math.cos(dK));
+    const d = dHyb - dK;
+    dpsi = Math.atan2(Math.sin(d), Math.cos(d));
+  }
+  if (dpsi !== 0) {
+    const qAz = _HTC_QAZ.setFromAxisAngle(n, dpsi);
+    a.applyQuaternion(qAz);
+  }
+  const u = _HTC_U.crossVectors(a, n);
+  if (u.lengthSq() > 1e-12) {
+    u.normalize();
+    const qParent = _hybridTiltCorr.parent.getWorldQuaternion(_HTC_Q3);
+    const qw = _HTC_Q4.setFromAxisAngle(u, epsGeom - epsTarget);
+    if (dpsi !== 0) qw.multiply(_HTC_QAZ);   // tilt ∘ azimuth (world)
+    _hybridTiltCorr.quaternion.copy(_HTC_Q5.copy(qParent).invert().multiply(qw).multiply(qParent));
+    _hybridTiltCorr.updateMatrixWorld(true);
+  }
+}
+
 function updatePositions() {
   // Derive the frame rotation BEFORE the anchor reads (the triad
   // probe re-animates the graph to its own epochs, then restores).
@@ -53755,40 +53817,7 @@ function updatePositions() {
   // (engine-Earth plane → the scene's sun plane; null when the flag is off).
   _kcUpdatePlaneCorr(_yearForObliquity);
 
-  if (_hybridTiltCorr && _hybridSpinActive() && !_osmEqxCapturingB) {
-    _osmEqxEnsureAnchorB();   // one-time J2000 pure-K anchor capture (jump-probe; guarded)
-    _hybridTiltCorr.quaternion.set(0, 0, 0, 1);
-    _hybridTiltCorr.updateMatrixWorld(true);
-    const a = _HTC_A.set(0, 1, 0).applyQuaternion(earth.rotationAxis.getWorldQuaternion(_HTC_Q1)).normalize();
-    const n = _HTC_N.set(0, 1, 0).applyQuaternion(barycenterEarthAndSun.pivotObj.getWorldQuaternion(_HTC_Q2)).normalize();
-    const epsGeom = Math.acos(Math.min(1, Math.max(-1, a.dot(n))));
-    const epsTarget = o.obliquityEarth * Math.PI / 180;
-    // D4d-rev: the azimuth correction FIRST — Δψ = (hybrid equinox advance)
-    // − (K scene's FULL geometric equinox advance), both J2000-anchored;
-    // λ_K read from the uncorrected a×n THIS frame. The angle to n is
-    // invariant under the azimuth, so εGeom needs no recompute.
-    let dpsi = 0;
-    const dHyb = _osmEqxHybAdvanceRad();
-    if (dHyb !== null) {
-      let dK = _osmNodeAzimuthRadB(a, n) - _osmEqxGeoAnchorB.lamK2000Rad;
-      dK = Math.atan2(Math.sin(dK), Math.cos(dK));
-      const d = dHyb - dK;
-      dpsi = Math.atan2(Math.sin(d), Math.cos(d));
-    }
-    if (dpsi !== 0) {
-      const qAz = _HTC_QAZ.setFromAxisAngle(n, dpsi);
-      a.applyQuaternion(qAz);
-    }
-    const u = _HTC_U.crossVectors(a, n);
-    if (u.lengthSq() > 1e-12) {
-      u.normalize();
-      const qParent = _hybridTiltCorr.parent.getWorldQuaternion(_HTC_Q3);
-      const qw = _HTC_Q4.setFromAxisAngle(u, epsGeom - epsTarget);
-      if (dpsi !== 0) qw.multiply(_HTC_QAZ);   // tilt ∘ azimuth (world)
-      _hybridTiltCorr.quaternion.copy(_HTC_Q5.copy(qParent).invert().multiply(qw).multiply(qParent));
-      _hybridTiltCorr.updateMatrixWorld(true);
-    }
-  }
+  _applyHybridTiltCorrB(o.obliquityEarth);
 
   // ───────────────────────── each planet ───────────────────────────
   for (let i = 0, L = tracePlanets.length; i < L; i++) {
@@ -54526,8 +54555,47 @@ function moveModel(pos) {
         // movement sampler) stay mean — untouched. The eclipse tier keeps
         // its own internal subtraction (no double count: the finders stay
         // bare by certified design). Mirrors tools/lib/scene-graph.js.
-        const _dE5 = _tierUmbraModel.eclipse.sunLonCompletedDegAtJD(o.julianDay) - _frameworkSunLon(o.julianDay);
-        θ += _wE5 * (((((_dE5 + 540) % 360) + 360) % 360) - 180) * (Math.PI / 180);
+        // Plan 06 layer B (measured): δ = λ_cert − λ_REALIZED — the wheel's
+        // own longitude of date read from the scene in the frame every
+        // validated surface uses: the Sun's RA/Dec in the CORRECTED axis
+        // frame (the tilt correction applied here first, so the axis is
+        // this frame's), converted with the scene ε. The former analytic
+        // twin (_frameworkSunLon: K e law, H/16 ϖ, its own mean-longitude
+        // clock) parted from the wheel by 96″ around 0–500 AD, 245″ at −1000
+        // and 710″ at −3000 (browser, measured through the research hooks)
+        // — carried 1:1 into the rendered Sun, while matching only in
+        // 1000–2500 where it had been checked. NOT the sun-plane node line:
+        // that construction moved the Sun and the frame bridge's planets
+        // ~55″ at J2000 and tripled the planets' JPL RMS. The node angle θ
+        // and the geocentric longitude differ by the offset-ellipse
+        // Jacobian, so two Newton passes (read λ, step θ, re-read, step the
+        // remainder). The twin remains only while the anchor is unavailable
+        // (first frames, flag off).
+        const _lamCertDeg = _tierUmbraModel.eclipse.sunLonCompletedDegAtJD(o.julianDay);
+        const _dHybE5 = _osmEqxHybAdvanceRad();
+        let _dE5;
+        if (_dHybE5 !== null && _osmEqxGeoAnchorB && (obj.a ?? obj.orbitRadius) === (obj.b ?? obj.orbitRadius)) {
+          const _yE5 = DEEP_TIME_MODE_ENABLED
+            ? _jdToSIyear(o.julianDay)
+            : (o.julianDay - startmodelJD) / meansolaryearlengthinDays + startmodelyearwithCorrection;
+          const _epsE5Deg = _sceneEpsTargetDeg(_yE5), _epsE5 = _epsE5Deg * (Math.PI / 180);
+          for (let _pass = 0; _pass < 2; _pass++) {
+            obj.orbitObj.rotation.y = θ;
+            startingPoint.pivotObj.updateMatrixWorld(true);
+            _applyHybridTiltCorrB(_epsE5Deg);
+            earth.rotationAxis.updateWorldMatrix(true, false);
+            obj.pivotObj.getWorldPosition(_E5_S);
+            earth.rotationAxis.worldToLocal(_E5_S);
+            _E5_SPH.setFromVector3(_E5_S);
+            const _raE5 = _E5_SPH.theta, _decE5 = Math.PI / 2 - _E5_SPH.phi;
+            const _lamRealizedDeg = Math.atan2(Math.sin(_raE5) * Math.cos(_epsE5) + Math.tan(_decE5) * Math.sin(_epsE5), Math.cos(_raE5)) * (180 / Math.PI);
+            _dE5 = _lamCertDeg - _lamRealizedDeg;
+            θ += _wE5 * (((((_dE5 + 540) % 360) + 360) % 360) - 180) * (Math.PI / 180);
+          }
+        } else {
+          _dE5 = _lamCertDeg - _frameworkSunLon(o.julianDay);
+          θ += _wE5 * (((((_dE5 + 540) % 360) + 360) % 360) - 180) * (Math.PI / 180);
+        }
       }
     }
 

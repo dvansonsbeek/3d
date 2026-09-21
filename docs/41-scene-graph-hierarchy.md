@@ -264,13 +264,32 @@ This 14.5-cycle offset positions the obliquity fluctuation to correctly explain 
 (linear tropical rate + full Kepler EoC — exact by derivation since FQ-3, which
 retired the fitted `sunLongitudeCorrection` harmonics from this path via the
 split-completion corrector, doc 65 §The Exact-Kepler Wheel),
-`moveModel` adds one term δ = λ_certified − λ_twin — the difference between the
-certified E4/E5 framework-native Sun and the wheel's own twin evaluation —
+`moveModel` adds one term δ = λ_certified − λ_realized — the certified E4/E5
+framework-native Sun minus the wheel's own realized longitude of date, read
+from the scene itself in the frame every validated surface uses (the Sun's
+RA/Dec in the corrected axis frame, the tilt correction applied first so the
+axis is this frame's, converted with the scene ε; two Newton passes because
+the node angle and the geocentric longitude differ by the offset-ellipse
+Jacobian) —
 applied inside the clock-convention window (full weight ≤ 3,000 yr from J2000,
 cos² taper to 20,000 yr where the TT-clock Sun would clash with the
 deliberately-UT deep-time scene). Both runtimes carry the identical block
 (`src/script.js` flag `E5_WHEEL_SUN_ENABLED`, engine env `E5_WHEEL_SUN`,
-default ON). The eclipse umbra never reads the wheel: since U1 the package
+default ON). Plan 06 layer B replaced the former analytic twin
+(`_frameworkSunLon`: the K eccentricity law, the H/16 perihelion law and its
+own mean-longitude clock): measured against the wheel it parted by 84″ around
+500 AD, 250″ at −500 and 810″ at −2500 — an error the rendered Sun carried
+1:1, invisible to the near-J2000 window it had been checked in (the umbra
+goldens cannot see it: the ground point is Moon-dominated, a Sun shift enters
+scaled by the Moon/Sun distance ratio). With the realized read the rendered
+Sun reads the certified longitude to ≤ 0.4″ across the full-weight window in
+both runtimes (−0.8″ at −3000, the fade weight); the `sceneSun.*` browser
+goldens pin it. Measured and REJECTED on the way: reading λ_realized against
+the sun-plane's node on the equator instead of the RA frame moved the Sun and,
+through the frame bridge, all seven planets by ~55″ at J2000 and tripled the
+planets' JPL RMS — that node is not the equinox the RA frame realizes (the
+two part by ~1,400″ at −3000; a finding about the K sun-plane, recorded in
+plan 06). The eclipse umbra never reads the wheel: since U1 the package
 besselian in `@essrt/physics` is the **single umbra implementation** end to
 end — the scene consumes its output.
 

@@ -606,12 +606,16 @@ reference itself sits at <!--v:meeusCh25SunVsJplRms-->1.22<!--/v-->″). At anti
 edge.
 
 **The scene-wheel overlay (SW)**: the visible wheel Sun adds one term on top
-of its untouched legacy stack, δ = λ_certified − λ_twin, applied inside the
+of its untouched legacy stack, δ = λ_certified − λ_realized (the wheel's own
+longitude of date read from the scene each frame as the Sun's RA/Dec in the
+corrected axis frame, converted with the scene ε), applied inside the
 clock-convention window (full weight where eclipse truth lives, ≤ 3,000 yr
 from J2000; cos² taper to 20,000 yr where the TT-clock Sun would clash with
 the deliberately-UT deep-time scene — both endpoints derived, only the cos²
-easing shape is a convention). Measured: in-window −2..+7″; −135:
-1,138″ → 10″; −3000: 5,953″ → 164″. Replacing the legacy stack outright was
+easing shape is a convention). Measured (rendered − certified, both
+runtimes): ≤ 0.4″ across the full-weight window, −0.8″ at −3000 (the fade
+weight); the former analytic twin had left 96″ around 0–500 AD, 245″ at
+−1000 and 710″ at −3000. Replacing the legacy stack outright was
 measured and rejected — it double-counts the wheel's geometric-split ellipse
 (~1° error).
 

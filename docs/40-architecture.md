@@ -580,7 +580,7 @@ Ported from Python (`tools/lib/python/predictive_formula.py`). Reuses existing `
 
 | Body | Type | Orbital Elements | Special Features |
 |------|------|------------------|------------------|
-| Sun | Star | Wheel longitude = legacy stack + δ overlay (λ_certified − λ_twin, clock-convention window) | Lens flare, glow; certified E4/E5 longitude |
+| Sun | Star | Wheel longitude = legacy stack + δ overlay (λ_certified − λ_realized, the wheel's own longitude read from the scene geometry; clock-convention window) | Lens flare, glow; certified E4/E5 longitude |
 | Mercury | Planet | Full Keplerian | Perihelion precession demo |
 | Venus | Planet | Full Keplerian | Retrograde rotation |
 | Earth | Planet | Full Keplerian | Clouds, atmosphere shader, axial tilt |

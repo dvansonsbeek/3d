@@ -492,7 +492,8 @@ derived mean-element offset (`data/earth-osculating-mean-offset.json`,
 plan 06 layer B — formerly the H/16 + derived-H/3 laws). It carries
 **zero fitted solar constants**; accuracy <!--v:frameworkSunVsJplRms-->0.80<!--/v-->″ RMS vs JPL (modern window; the Meeus Ch. 25 reference: <!--v:meeusCh25SunVsJplRms-->1.22<!--/v-->″).
 The scene wheel displays the same longitude via the δ overlay
-(δ = λ_certified − λ_twin, clock-convention window). See
+(δ = λ_certified − λ_realized, the wheel's own longitude read from the scene
+geometry; clock-convention window). See
 [doc 99 § The framework-native Sun](99-expanding-solar-system-resonance-theory.md#the-framework-native-sun-e4e5--the-certified-apparent-solar-longitude).
 
 The **legacy fitted family** remains in the coefficients file and is still

@@ -290,6 +290,19 @@ const measured = await s.page.evaluate(({ YEARS, EPOCHS_MA, MOON_JDS, MOON_DEEP_
     v[`ecl.umbraNASA@${jd}.gamma`] = un.gamma;
   }
 
+  // ── Plan 06 layer B: the RENDERED wheel Sun (scene RA/Dec of date) ────────
+  // Pins the δ overlay's output itself. The umbra goldens above cannot: the
+  // ground point is Moon-dominated (a Sun shift enters scaled by the
+  // Moon/Sun distance ratio ≈ 1/390 — a 345″ Sun move reads 1e-7°), so the
+  // twin-versus-wheel leak (84″ around 500 AD, 810″ at −2500) was invisible
+  // to every golden. Same JDs as the Node engine's sunPos family.
+  for (const jd of [1355795.0, 2415020.5, 2451545.0, 2460409.262836, 2634166.0]) {
+    const r = T.sceneSunRaDecAt(jd);
+    v[`sceneSun.raDeg@${jd}`] = r.raDeg;
+    v[`sceneSun.decDeg@${jd}`] = r.decDeg;
+  }
+  T.resetEpochToJ2000();
+
   // ── Phase 8.6-0: the published reference curves (browser-only family) ─────
   // NaN-valued cells (outside a curve's validity window) record as null via
   // JSON round-trip — that is itself pinned behaviour.
