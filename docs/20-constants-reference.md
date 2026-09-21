@@ -1,7 +1,7 @@
 ---
 docVersion: 1.0
 modelVersion: v14.0
-coefficients: sha256:3f803b0a4e2b0b3c
+coefficients: sha256:78f99d98186e50d9
 status: current
 ---
 
@@ -487,7 +487,9 @@ The certified apparent solar longitude is **assembled, not fitted** (E4/E5
 framework-native Sun, `packages/physics/src/model.js`, exported as
 `eclipse.frameworkSunDeps`): mean tropical rate + the closed-form f(Y)
 year-harmonic drift (scaled by the derived obliquity-torque factors 1.306 /
-1.815) + equation of centre with the H/16 + derived-H/3 e(t). It carries
+1.815) + equation of centre on the banked series' e(t) and ϖ(t) plus the
+derived mean-element offset (`data/earth-osculating-mean-offset.json`,
+plan 06 layer B — formerly the H/16 + derived-H/3 laws). It carries
 **zero fitted solar constants**; accuracy <!--v:frameworkSunVsJplRms-->0.80<!--/v-->″ RMS vs JPL (modern window; the Meeus Ch. 25 reference: <!--v:meeusCh25SunVsJplRms-->1.22<!--/v-->″).
 The scene wheel displays the same longitude via the δ overlay
 (δ = λ_certified − λ_twin, clock-convention window). See
@@ -504,7 +506,7 @@ the δ overlay):
 
 ## Earth Perihelion Harmonics
 
-The `PERI_HARMONICS` array models Earth's perihelion longitude with 25 Fourier terms (RMSE 0.0006°, J2000 exact).
+The `PERI_HARMONICS` array models Earth's perihelion longitude with 25 Fourier terms (RMSE 0.0006°, J2000 exact). Since plan 06 layer B it serves the browser's SCENE Sun only (`calcEarthPerihelionPredictive`); the physics package's eclipse Sun and the published Earth ϖ of date ride the banked series (doc 110 chain 1.1).
 
 | Constant | Value | Description |
 |----------|-------|-------------|

@@ -24553,7 +24553,7 @@ function setupGUI() {
     row('Free parameters: none',
       'Inputs, cited not fitted: one J2000 heliocentric state (JPL Horizons vectors, one epoch) \u00B7 DE440 mass ratios \u00B7 1PN. Everything planetary \u2014 element chains, secular modes, the 405.6-kyr metronome \u2014 derives from that seed. Integrator order/step are reproducibility conventions.');
     row('Earth\u2019s published orbit rides this ledger',
-      'e(t), the inclination and node, \u03D6 of date and the obliquity hybrid derive from the same N-body seed, the IAU 2006 J2000 obliquity and the certified precession anchor. None of the frozen era clock\u2019s constants below enter them.');
+      'e(t), the inclination and node, \u03D6 of date and the obliquity hybrid derive from the same N-body seed, the IAU 2006 J2000 obliquity and the certified precession anchor \u2014 and so does the eclipse Sun\u2019s equation of centre (the series plus the derived mean-element offset of the era, from the same seed integrated as a nine-body system). None of the frozen era clock\u2019s constants below enter them.');
     head('Ledger 2 \u00B7 The lunisolar precession channel \u2014 Earth\u2019s spin & time');
     row('Precession anchor p\u2080 \u00B7 derived \u00B7 ' + _certifiedAxialPrecessionJ2000Years().toLocaleString('en-US', { maximumFractionDigits: 1 }) + ' yr',
       'Not a parameter: the certified J2000 year laws\u2019 beat, sidereal / (sidereal \u2212 tropical). The deep-time rate composes \u03C9(t)/\u03C9\u2080 \u00B7 p\u2080 \u00B7 [f_S + (1 \u2212 f_S)(a\u2080/a_M)\u00B3]; f_S, the solar share of the J2000 torque, is derived from GM\u2609, the lunar constants and the J2000 obliquity.');
@@ -24571,7 +24571,7 @@ function setupGUI() {
     row('Inclination amplitude \u00B7 ' + earthInvPlaneInclinationAmplitude + '\u00B0',
       'The K inclination law\u2019s amplitude, fitted to the observed obliquity range. A device constant: the published inclination is the chain\u2019s (Ledger 1).');
     row('Inclination-cycle anchor \u00B7 ' + earthInclinationCycleAnchor + '\u00B0',
-      'The System-Reset convention \u2014 the one free assumption in its chain; the anchor arithmetic itself is exact. Phases the Sun\u2019s eccentricity law and the Moon eccentricity channel\u2019s anchor form.');
+      'The System-Reset convention \u2014 the one free assumption in its chain; the anchor arithmetic itself is exact. Phases the browser scene Sun\u2019s eccentricity law (the physics package\u2019s eclipse Sun no longer reads it) and the Moon eccentricity channel\u2019s anchor form.');
     row('Correction-basis divisors \u00B7 device tier',
       'The correction combs\u2019 divisors and the era clock\u2019s counters are identifiers of the fitted machinery \u2014 bounded harmonic bases on the anchor\u2019s unit \u2014 not parameters and not laws; the three pre-registered falsification legs test the physics (the composed precession clock, the obliquity beat, the two-expansions \u03BC-consistency). The balanced year is derived (anchor + 1246 AD); Earth\u2019s e(J2000) is an observed calibration input, and the eccentricity law\u2019s mean derives from it.');
     head('Ledger 3 \u00B7 The fitted correction stack (gated, hashed)');

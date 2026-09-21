@@ -1428,7 +1428,14 @@ export const VALUES = {
     const ecl = rd('data/eclipse-audit-summary.json');
     const clim = rd('data/lod-climate-correlation-summary.json');
     const L = ecl.lunar, S = ecl.solar;
+    // The eclipse Sun's mean-element offset (plan 06 layer B): the window
+    // mean of (osculating − secular) EMB ϖ and e from the Horizons J2000 seed
+    // integrated as a nine-body system — the generator is
+    // tools/verify/earth-osculating-offset.js (derived; no JPL fit).
+    const osc = rd('data/earth-osculating-mean-offset.json');
     return {
+      sunMeanOffsetPomArcsec:    { get: () => osc.dPomArcsec, render: (v) => (v >= 0 ? '+' : '') + Number(v).toFixed(2), unit: '″', note: 'mean-element ϖ offset of the eclipse Sun over the derivation window (osculating − secular)' },
+      sunMeanOffsetE:            { get: () => osc.dE, render: (v) => (v >= 0 ? '+' : '') + Number(v).toExponential(2), note: 'mean-element e offset of the eclipse Sun over the derivation window (osculating − secular)' },
       lunarResidualRmsSeconds:   { get: () => L.frameworkMeanAbsResidualSeconds, render: (v) => thousands(v), unit: 's' },
       lunarResidualMinutes:      { get: () => L.frameworkMeanAbsResidualSeconds / 60, render: (v) => Number(v).toFixed(1), unit: 'min' },
       solarResidualSecondsModel: { get: () => S.frameworkMeanAbsResidualSeconds, render: (v) => thousands(v), unit: 's' },

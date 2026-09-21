@@ -143,6 +143,13 @@ const EXTRA_COEFFICIENT_SOURCES = [
   // 145.595 actually shipped.
   { dir: 'data', file: 'deltaT-4flag-fit.json', as: 'DT_STACK', pick: (j) => j.shipped_coefficients },
 
+  // Plan 06 layer B — the eclipse Sun's DERIVED mean-element offset over the
+  // secular series (the 1890–2110 mean of osculating − secular e and ϖ of the
+  // EMB from the Horizons-seeded nine-body run; tools/verify/earth-osculating-
+  // offset.js). Consumed by model.js for the Sun laws only (finders, besselian,
+  // the cardinal braid); the published Earth surface stays the secular series.
+  { dir: 'data', file: 'earth-osculating-mean-offset.json', as: 'EARTH_OSCULATING_MEAN_OFFSET', pick: (j) => ({ dPomArcsec: j.dPomArcsec, dE: j.dE }) },
+
   // The fourth ΔT driver, fitted separately (core-mantle swing, 2-kick damped
   // oscillation). Its own file, its own fitter — hence its own entry.
   {

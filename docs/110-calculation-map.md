@@ -1,7 +1,7 @@
 ---
 docVersion: 1.0
 modelVersion: v14.0
-coefficients: sha256:3f803b0a4e2b0b3c
+coefficients: sha256:78f99d98186e50d9
 status: current
 ---
 
@@ -48,7 +48,8 @@ series term that carries the solar anomaly M.
 | evaluator | formula | anchor | engine · type | H-role | consumers | code |
 |---|---|---|---|---|---|---|
 | **deep-mode channel** | z(t) = Σₖ (reₖ + i·imₖ)·e^{iωₖt} + R, e = \|z\|; R = z_J2000 − Σₖ(reₖ + i·imₖ) so e(J2000) is exact by construction; 18 modes (ω, re, im) from the ±10-Myr NAFF table | e₀ = 0.0167024357, ϖ₀ = 102.918° (the JPL J2000 seed, `CHAIN_ARTIFACT.j2000AnchorElements.earth`) | D · A (beyond ~5 Myr the table is spectrum-class: the attractor, not a pointwise ephemeris) | — | **the entire lunar chain** (this chain) | `packages/physics/src/moon/deep-ecc-channel.cjs` 60–120 |
-| **H/3 line** | e(t) = base′·(1 + cos θ(t)/2), θ = θ₀ + 2π·cycles(2000→t, divisor 3), base′ = e₀/(1 + cos θ₀/2), θ₀ = ϖ_ICRF(J2000) − 21.77° | e₀ = 0.01671022 (IAU, astro-reference), ϖ_ICRF(J2000) = 102.94719°, anchor 21.77° | K · L (the epoch-local tangent, 5 % era ≈ −2,600…+2,850) | **L** (H/3 phase counter — the "3" is a J2000 reading; plan 06 restates) | eclipse Sun equation of centre, Besselian Sun distance, cardinal braid — the certified CLOCK side only | `packages/physics/src/moon/ecc-channel.cjs` 60–90 |
+| **H/3 line** | e(t) = base′·(1 + cos θ(t)/2), θ = θ₀ + 2π·cycles(2000→t, divisor 3), base′ = e₀/(1 + cos θ₀/2), θ₀ = ϖ_ICRF(J2000) − 21.77° | e₀ = 0.01671022 (IAU, astro-reference), ϖ_ICRF(J2000) = 102.94719°, anchor 21.77° | K · L (the epoch-local tangent, 5 % era ≈ −2,600…+2,850) | **L** (H/3 phase counter — the "3" is a J2000 reading; plan 06 restates) | RETIRED from the physics package (plan 06 layer B): the eclipse Sun's equation of centre, the Besselian Sun distance and the cardinal braid now ride the banked series plus the derived mean-element offset (next row); the browser's SCENE Sun still reads the law (`src/script.js` `_moonEcc`) until the cardinal points move | `packages/physics/src/moon/ecc-channel.cjs` 60–90 (the browser's twin) |
+| **mean-element offset** | Δϖ = <!--v:sunMeanOffsetPomArcsec-->+70.08<!--/v-->″, Δe = <!--v:sunMeanOffsetE-->+5.81e-6<!--/v--> added to the series for the SUN only — the 1890–2110 mean of (osculating − secular) EMB e and ϖ from the Horizons J2000 seed integrated as a nine-body system (the lab RK4, daily samples), the chain as the secular reference | the seed vectors, the chain, the lab derivative | P (fully derived; the JPL Sun sample is a validation only: all-phase sd 3.23″ → 1.59″, the former K law 1.58″) | — | eclipse Sun equation of centre, Besselian Sun distance, cardinal braid — the mean elements of the era (Simon 1994's 102.937°, 0.0167086 reproduced to 0.2″); the published Earth surface stays the secular series | `tools/verify/earth-osculating-offset.js` → `data/earth-osculating-mean-offset.json`; `model.js` `sunPerihelionDegAt` / `sunEccentricityAt` |
 | **banked series** | e = \|z(t)\| sampled from the same N-body run (`data/nbody-secular-series.json`, 2-kyr grid inside ±10 Myr; the mode table beyond) | the run itself | D · A | — | the scene's readouts, the Eccentricity Path exhibit, the FV charts | `src/script.js` `_sceneEccTargetAt`, `tools/lib/deep-orbital-history.js` |
 
 The deep-mode channel and the H/3 line agree within ~8×10⁻⁵ across the

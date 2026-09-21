@@ -102,7 +102,7 @@ const laws = (() => {
   const e = base.eccentricityAt;
   const ddotH3 = (e(2100) - 2 * e(2000) + e(1900));           // per cy²
   const dd = parseFloat(m[1]) - ddotH3;
-  console.log(`RESEARCH OVERRIDE: eccentricity = H/3 line + ½·(${parseFloat(m[1]).toExponential(2)} − ${ddotH3.toExponential(2)})·t²  (Δddot ${dd.toExponential(2)}/cy²) — probe only, --write refused`);
+  console.log(`RESEARCH OVERRIDE: eccentricity = the Sun's e(t) (series + derived mean offset) + ½·(${parseFloat(m[1]).toExponential(2)} − ${ddotH3.toExponential(2)})·t²  (Δddot ${dd.toExponential(2)}/cy²) — probe only, --write refused`);
   return {
     eccentricityAt: (year) => { const t = (year - 2000) / 100; return e(year) + 0.5 * dd * t * t; },
     eccentricityRateAt: (year) => { const t = (year - 2000) / 100; return base.eccentricityRateAt ? base.eccentricityRateAt(year) + dd * t / 100 : (e(year + 0.5) - e(year - 0.5)) + dd * t / 100; },

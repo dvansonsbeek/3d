@@ -2,7 +2,7 @@
 // The fitted coefficients' shapes for TypeScript consumers (§2g); values live
 // in coefficients.js, emitted VERBATIM from fitted-coefficients.json.
 
-export declare const COEFFICIENTS_HASH: "3f803b0a4e2b0b3c";
+export declare const COEFFICIENTS_HASH: "78f99d98186e50d9";
 
 export declare const FITTED_COEFFICIENTS: {
   readonly ANOMALISTIC_YEAR_HARMONICS: Array<[number, number, number]>;
@@ -623,6 +623,10 @@ export declare const FITTED_COEFFICIENTS: {
       "target_amp_source": string;
       "joint_mode": boolean;
     };
+  };
+  readonly EARTH_OSCULATING_MEAN_OFFSET: {
+    "dPomArcsec": number;
+    "dE": number;
   };
   readonly MEEUS_DISTANCE_TERMS: {
     "meanKm": number;

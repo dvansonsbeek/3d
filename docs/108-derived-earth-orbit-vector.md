@@ -1,7 +1,7 @@
 ---
 docVersion: 1.0
 modelVersion: v14.0
-coefficients: sha256:3f803b0a4e2b0b3c
+coefficients: sha256:78f99d98186e50d9
 status: current
 ---
 
@@ -48,7 +48,7 @@ Earth's orbit, in two places:
 | law | where (at the time of this record) | period | e range |
 |---|---|---:|---:|
 | H/16 beat law (`earth.eccentricity`) | cardinal points / deep time | 21 kyr | 0.0140–0.0167 |
-| H/3 line (`moon/ecc-channel.cjs`, e = base·(1 + cos θ/2)) | the Moon's E-factor and the eclipse Sun (doc 66) | 112 kyr | 0.0077–0.023 |
+| H/3 line (`moon/ecc-channel.cjs`, e = base·(1 + cos θ/2)) | the Moon's E-factor and the browser scene Sun (the eclipse Sun left it for the series plus the derived mean-element offset — plan 06 layer B, doc 66) | 112 kyr | 0.0077–0.023 |
 
 Both were correct *local* laws — their J2000 rates matched the observed
 ones (the H/3 line's ė to 1.7%). The question this record answers is
@@ -125,7 +125,7 @@ g's converge on H/n?") and the answer it gives is **no** for g5 at the
 |---|---:|---:|
 | H/16 law (cardinal path) | −0.01 | 0.021 |
 | Sun H/16 + H/3 (pre-C-small) | −0.29 | 0.022 |
-| H/3 line (Moon; eclipse Sun now) | −0.28 | 0.021 |
+| H/3 line (Moon; formerly the eclipse Sun) | −0.28 | 0.021 |
 | **derived \|z\| (LL eigenvectors + N-body g5)** | **0.967** | **0.0047** |
 
 Over 500 kyr the derived vector reads corr 0.93, over 1 Myr 0.90, over

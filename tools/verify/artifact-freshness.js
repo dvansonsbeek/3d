@@ -60,6 +60,8 @@ const REQUIRED = [
   'data/eclipse-audit-summary.json',
   // stamped at Batch D of the restatement (engine-D secular frequencies):
   'data/nbody-secular-frequencies.json',
+  // plan 06 layer B — the eclipse Sun's derived mean-element offset:
+  'data/earth-osculating-mean-offset.json',
 ];
 
 const DATA = path.join(ROOT, 'data');

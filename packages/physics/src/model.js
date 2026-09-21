@@ -30,7 +30,6 @@ import { createDeltaTCycles } from './deltat/cycles.cjs';
 import { createDeepTimeLod } from './deltat/deep-time.cjs';
 import { createMoonRecessionHistory, createSolarChannelBudget } from './deltat/recession-history.cjs';
 import { evalClimateL1OrbitalPermil, createAlphaGiaChannel } from './climate/l1-orbital.cjs';
-import { createMoonEccChannel } from './moon/ecc-channel.cjs';
 import { createDeepEccChannel } from './moon/deep-ecc-channel.cjs';
 import { DEEP_MODES_ARTIFACT } from './moon/deep-modes-artifact.cjs';
 import { createMoonMonthChain } from './moon/month-chain.cjs';
@@ -349,14 +348,21 @@ export function assembleModel(C, F, laws = {}, secularSeriesArtifact = /** @type
 
   // ── Earth scalars (integrated-phase display semantics) ────────────────────
   /** @param {number} year @returns {number} */
-  const earthPerihelionDeg = laws.perihelionLongitudeDegAt ?? ((year) => {
-    let longitude = 270.0 + 360.0 * cyclesBetween(balancedYear, year, 16);
-    for (const [div, sinC, cosC] of F.PERI_HARMONICS_RAW) {
-      const ph = phaseRadians(balancedYear, year, div);
-      longitude += sinC * Math.sin(ph) + cosC * Math.cos(ph);
-    }
-    return (((longitude + F.PERI_OFFSET) % 360) + 360) % 360;
-  });
+  // Plan 06 layer B — the eclipse Sun onto the series. The PUBLISHED Earth
+  // ϖ of date is the one-source series (the secular orbit; its J2000 element
+  // ≡ La2004's — the same field the D4c apsidal wheel renders). The SUN's
+  // equation of centre needs the MEAN elements of the era: the series plus the
+  // derived mean offset of the osculating channel (F.EARTH_OSCULATING_MEAN_
+  // OFFSET, tools/verify/earth-osculating-offset.js — the 1890–2110 mean of
+  // osculating − secular from the Horizons-seeded nine-body run). Measured:
+  // the fast osculating wobble is carried by the completion's direct terms and
+  // double-counts if added; the window mean is what the Sun residual holds
+  // (all-phase JPL sd 3.23″ → 1.59″; the former K law's Standish anchor
+  // 1.58″). The former K perihelion Fourier law (H divisors) is retired here.
+  const earthPerihelionDeg = (year) => oneSourceM.periOfDateDegAt(year);
+  const SUN_OFF = F.EARTH_OSCULATING_MEAN_OFFSET;
+  /** The eclipse Sun's ϖ of date (mean elements). @param {number} year @returns {number} */
+  const sunPerihelionDegAt = laws.perihelionLongitudeDegAt ?? ((year) => oneSourceM.periOfDateDegAt(year) + SUN_OFF.dPomArcsec / 3600);
   /** @param {number} year @returns {number} */
   const obliquityDeg = (year) => {
     let obliq = solsticeObliquityMean;
@@ -398,13 +404,10 @@ export function assembleModel(C, F, laws = {}, secularSeriesArtifact = /** @type
   // (θ₀ = ϖ_ICRF(J2000) − 21.77° = 81.178°, the System-Reset anchor in
   // anchor form — doc 66 §1); base' is derived inside from the observed
   // J2000 eccentricity.
-  const moonEcc = createMoonEccChannel({
-    cyclesBetween,
-    eccentricityBase: C.earth.eccentricityBase,
-    perihelionLongitudeJ2000Deg: C.earthOrbital.earthPerihelionLongitudeJ2000,
-    inclinationCycleAnchorDeg: C.earthOrbital.earthInclinationCycleAnchor,
-    eccentricityJ2000: C.earthOrbital.earthEccentricityJ2000,
-  });
+  // (The H/3 eccentricity-law channel — createMoonEccChannel — left this
+  // package with plan 06 layer B: the Sun's e is the one-source series plus
+  // the derived mean offset above; the browser's scene Sun still reads the
+  // law through its own _moonEcc until the cardinal points move.)
   // Engine-switch decision (ii) (plan 02 §8): the ONE deep e — the engine's
   // own ±10-Myr mode table, anchored form — feeds the ENTIRE lunar chain
   // (modulation, cycle counts, arguments eccAt/channelIntegral, E-factor).
@@ -414,10 +417,16 @@ export function assembleModel(C, F, laws = {}, secularSeriesArtifact = /** @type
   // laws hook deliberately does NOT reach this channel.
   const deepEcc = createDeepEccChannel(DEEP_MODES_ARTIFACT);
   /** @param {number} year @returns {number} */
-  const eccentricityAt = laws.eccentricityAt ?? ((year) => moonEcc.eccAt(year - 2000));
-  /** de/dyear of the one law — the cardinal braid's equation-of-centre
-   *  derivative rides it. @param {number} year @returns {number} */
-  const eccentricityRateAt = laws.eccentricityRateAt ?? ((year) => moonEcc.eccRateAt(year - 2000));
+  // Plan 06 layer B: the PUBLISHED Earth eccentricity is the one-source series
+  // (|z|, the secular orbit); the SUN's e adds the derived mean offset (see
+  // sunPerihelionDegAt). The former H/3 eccentricity law is retired here.
+  const eccentricityAt = (year) => oneSourceM.eAt(year);
+  /** The eclipse Sun's e (mean elements). @param {number} year @returns {number} */
+  const sunEccentricityAt = laws.eccentricityAt ?? ((year) => oneSourceM.eAt(year) + SUN_OFF.dE);
+  /** de/dyear of the Sun's e — the cardinal braid's equation-of-centre
+   *  derivative rides it (±0.5-yr central difference; the constant offset
+   *  cancels). @param {number} year @returns {number} */
+  const sunEccentricityRateAt = laws.eccentricityRateAt ?? ((year) => oneSourceM.eAt(year + 0.5) - oneSourceM.eAt(year - 0.5));
   /** @param {number} year @returns {number} */
   const inclinationDeg = (year) => earthInclMean
     - earthInclAmplitude * Math.cos(phaseRadians(balancedYear, year, 3));
@@ -522,8 +531,8 @@ export function assembleModel(C, F, laws = {}, secularSeriesArtifact = /** @type
       },
       meanHAtAgeMa: (tMa) => deepLod.eraClockHAtAge(tMa),
       meanYearRealLodDays: (tMa) => deepLod.eraClockYearInDaysAtAge(tMa),
-      eccentricityAt,
-      eccentricityRateAt,
+      eccentricityAt: sunEccentricityAt,
+      eccentricityRateAt: sunEccentricityRateAt,
     },
   });
   // ── One-source cardinal structure (D4b) ───────────────────────────────────
@@ -628,6 +637,10 @@ export function assembleModel(C, F, laws = {}, secularSeriesArtifact = /** @type
     });
     return {
       yearLengths,
+      /** EXPERIMENT accessors: the series' e and equinox-referenced ϖ of date. @param {number} year @returns {number} */
+      eAt: (year) => sampleAt(year).e,
+      /** @param {number} year @returns {number} */
+      periOfDateDegAt: (year) => sampleAt(year).periOfDateDeg,
       /** The hybrid's obliquity at a decimal year, degrees — the banked series inside its span, the α(t)-coupled ζ-tail integration beyond (the deep sampler grows ~0.1 s/Myr). @param {number} year @returns {number} */
       epsAt: (year) => sampleAt(year).epsDeg,
     };
@@ -1176,8 +1189,8 @@ export function assembleModel(C, F, laws = {}, secularSeriesArtifact = /** @type
     frameworkSun: {
       sunMeanLongitudeJ2000Deg: sunL0Deg,
       tropicalRateDegPerCy: sunTropicalRateDegPerCy,
-      eccentricityAt,
-      perihelionLongitudeDegAt: earthPerihelionDeg,
+      eccentricityAt: sunEccentricityAt,
+      perihelionLongitudeDegAt: sunPerihelionDegAt,
       meanLongitudeDegAt: sunMeanLongitudeDegAt,
     },
     constants: {
@@ -1228,8 +1241,8 @@ export function assembleModel(C, F, laws = {}, secularSeriesArtifact = /** @type
     moonExtensionAt: moonSeriesExtensionDeg,
     deltaTSecondsAt: /** @param {number} jd */ (jd) => (jdTTFromUT(jd) - jd) * 86400,
     obliquityDegAt: obliquityDeg,
-    eccentricityAt,
-    perihelionLongitudeDegAt: earthPerihelionDeg,
+    eccentricityAt: sunEccentricityAt,
+    perihelionLongitudeDegAt: sunPerihelionDegAt,
     yearFromJD,
     constants: {
       j2000JD,
@@ -1447,8 +1460,8 @@ export function assembleModel(C, F, laws = {}, secularSeriesArtifact = /** @type
       frameworkSunDeps: Object.freeze({
         sunMeanLongitudeJ2000Deg: sunL0Deg,
         tropicalRateDegPerCy: sunTropicalRateDegPerCy,
-        eccentricityAt,
-        perihelionLongitudeDegAt: earthPerihelionDeg,
+        eccentricityAt: sunEccentricityAt,
+        perihelionLongitudeDegAt: sunPerihelionDegAt,
         meanLongitudeDegAt: sunMeanLongitudeDegAt,
       }),
       // 20.3g location tier (see eclipse/besselian.cjs):

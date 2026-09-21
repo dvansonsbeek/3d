@@ -1,7 +1,7 @@
 ---
 docVersion: 1.0
 modelVersion: v14.0
-coefficients: sha256:3f803b0a4e2b0b3c
+coefficients: sha256:78f99d98186e50d9
 status: current
 ---
 
@@ -94,9 +94,9 @@ The climate formula's orbital lines against the Cenozoic isotope record (the com
 ## C. Historical era — gate- and artifact-backed
 
 - **Babylonian eclipse case study (−135)** — the framework places the
-  totality path <!--v:babylon135BestGapKm-->370<!--/v--> km from Babylon at
+  totality path <!--v:babylon135BestGapKm-->376<!--/v--> km from Babylon at
   ΔUT <!--v:babylon135BestDeltaUT-->-1h00<!--/v--> (framework
-  <!--v:babylon135FrameworkUT-->06:01<!--/v--> vs documented
+  <!--v:babylon135FrameworkUT-->06:00<!--/v--> vs documented
   <!--v:babylon135DocumentedUT-->06:14<!--/v-->):
   [doc 103](103-135-babylonian-case-study.md), eclipse-audit artifacts under
   freshness guard.
@@ -116,9 +116,9 @@ The climate formula's orbital lines against the Cenozoic isotope record (the com
   documented visibility regions vs the api observer tier
   (<!--v:lunarVisibilityInsideAgree-->14<!--/v-->/<!--v:lunarVisibilityChecked-->14<!--/v-->
   both directions); the −746 Feb 6 Babylonian partial (magnitude
-  <!--v:lunarBabylon746MagnitudeUmbral-->0.881<!--/v--> vs canon
+  <!--v:lunarBabylon746MagnitudeUmbral-->0.878<!--/v--> vs canon
   <!--v:lunarBabylon746CanonMagnitudeUmbral-->0.920<!--/v-->, visible from
-  Babylon at <!--v:lunarBabylon746AltitudeDeg-->32.2<!--/v-->°); the
+  Babylon at <!--v:lunarBabylon746AltitudeDeg-->32.6<!--/v-->°); the
   <!--v:lunarDtBandsN-->267<!--/v--> raw Stephenson-2016 timing reductions
   (framework ΔT mean abs <!--v:lunarDtBandsFrameworkMeanAbsSeconds-->1,211<!--/v--> s —
   statistically identical to Stephenson's own fitted spline at
