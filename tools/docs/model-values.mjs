@@ -551,7 +551,35 @@ export const VALUES = {
   j2000Eccentricity: {
     get: () => astro.earthOrbital.earthEccentricityJ2000,
     render: (v) => Number(v).toFixed(8),
-    note: 'JPL DE440 observed reference — a calibration input, not a fit product',
+    note: 'the IAU/Standish MEAN element (JPL Keplerian-elements table) — a calibration input, not a fit product; the series\' secular element is earthSeriesEccJ2000',
+  },
+  // ── The two J2000 conventions, labelled (plan 06 layer B finding) ────────
+  // The published Earth surface reads the SECULAR element of the one-source
+  // N-body series (≡ JPL's osculating J2000 seed state and La2004); the
+  // Calibration Inputs carry the IAU/Standish MEAN element (the 1800–2050
+  // fit, carrying the average of the short-period planetary terms). The gap
+  // is a convention, never reconciled — every surface names which it shows.
+  earthSeriesEccJ2000: {
+    get: () => oneMovement().e(2000),
+    render: (v) => Number(v).toFixed(8),
+    note: 'the one-source series\' e at J2000 — the SECULAR element the Earth panel and scene read',
+  },
+  earthSeriesPeriLongJ2000: {
+    get: () => oneMovement().periOfDateDeg(2000),
+    render: (v) => Number(v).toFixed(3),
+    unit: '°',
+    note: 'the one-source series\' equinox-referenced ϖ of date at J2000 — the SECULAR element the Earth panel reads',
+  },
+  earthConventionGapEcc: {
+    get: () => astro.earthOrbital.earthEccentricityJ2000 - oneMovement().e(2000),
+    render: (v) => Number(v).toExponential(1),
+    note: 'IAU mean element − series secular element at J2000 (a convention gap, labelled not reconciled)',
+  },
+  earthConventionGapPeriArcsec: {
+    get: () => (astro.earthOrbital.earthPerihelionLongitudeJ2000 - oneMovement().periOfDateDeg(2000)) * 3600,
+    render: (v) => Number(v).toFixed(0),
+    unit: '″',
+    note: 'IAU mean element − series secular element at J2000 (a convention gap, labelled not reconciled)',
   },
   // ── The one eccentricity law: |e| rides the H/3 line
   //    e(t) = base′·(1 + cos θ₃/2) on the System-Reset anchor. Extremes are
@@ -2958,7 +2986,7 @@ export const VALUES = {
         note: 'derived: 2A − A²/ε',
       },
       speedOfLight: { get: () => astro.physicalConstants.speedOfLight, render: (v) => thousands(v, 3), unit: 'km/s' },
-      periLongJ2000: { get: () => astro.earthOrbital.earthPerihelionLongitudeJ2000, render: (v) => Number(v).toFixed(3), unit: '°' },
+      periLongJ2000: { get: () => astro.earthOrbital.earthPerihelionLongitudeJ2000, render: (v) => Number(v).toFixed(3), unit: '°', note: 'the IAU/Standish MEAN element (JPL Keplerian-elements table, 1800–2050 fit); the series\' secular element is earthSeriesPeriLongJ2000' },
       periLongShift1246to2000: { get: () => astro.earthOrbital.earthPerihelionLongitudeJ2000 - 90, render: (v) => Number(v).toFixed(3), unit: '°', note: 'derived: J2000 longitude − the 90° alignment value' },
     };
     for (const [year, key] of [[1000, '1000AD'], [1246, '1246AD'], [2000, '2000AD'], [2500, '2500AD'], [3000, '3000AD']]) {

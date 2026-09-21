@@ -24624,12 +24624,12 @@ function setupGUI() {
     totalCalib += earthCalibCount;
     const earthCalibFolder = calibInputFolder.addFolder({ title: 'Earth & Time (' + earthCalibCount + ')', expanded: false });
     addCalib(earthCalibFolder, earthCalib, 'ciAlignment', 'Perihelion-solstice', 'Year when perihelion aligned with the December solstice (Meeus).');
-    addCalib(earthCalibFolder, earthCalib, 'ciLongPeri', 'Long. perihelion (J2000)', 'Longitude of perihelion at J2000 epoch.');
+    addCalib(earthCalibFolder, earthCalib, 'ciLongPeri', 'Long. perihelion (J2000)', 'Longitude of perihelion at J2000 — the IAU/Standish MEAN element (JPL Keplerian-elements table, a 1800–2050 fit carrying the average of the short-period planetary terms). The Earth panel’s ϖ of date reads the SECULAR element of the model’s N-body series (≈102.918° at J2000, ≡ JPL’s osculating seed state and La2004), 105″ lower; the eclipse Sun rides the series plus a derived mean-element offset (≈102.937°, the classical mean perihelion of the era). Three conventions for one direction — labelled, not reconciled.');
     addCalib(earthCalibFolder, earthCalib, 'ciObliquity', 'Obliquity (J2000)', 'Obliquity of the ecliptic at J2000 (IAU 2006, Capitaine et al. 2003).');
     addCalib(earthCalibFolder, earthCalib, 'ciObliquityRate', 'Obliquity rate (J2000)', 'Rate of change of obliquity in arcseconds per century (IAU 2006).');
     addCalib(earthCalibFolder, earthCalib, 'ciObliquityRange', 'Obliquity range', 'Observed range of obliquity oscillation over the precession cycle (Laskar 1993).');
     addCalib(earthCalibFolder, earthCalib, 'ciEarthIncl', 'Earth incl. (J2000)', 'Earth orbital inclination to the invariable plane at J2000 (Astronomical Almanac).');
-    addCalib(earthCalibFolder, earthCalib, 'ciEccentricity', 'Eccentricity (J2000)', 'Earth orbital eccentricity at J2000 (JPL Horizons).');
+    addCalib(earthCalibFolder, earthCalib, 'ciEccentricity', 'Eccentricity (J2000)', 'Earth orbital eccentricity at J2000 — the IAU/Standish MEAN element (JPL Keplerian-elements table). The Earth panel’s e of date reads the SECULAR element of the model’s N-body series (≈0.016702 at J2000, ≡ JPL’s osculating seed state and La2004), 7.8e-6 lower; the eclipse Sun rides the series plus a derived mean-element offset (≈0.016708). Conventions, not a discrepancy.');
     addCalib(earthCalibFolder, earthCalib, 'ciAscNode', 'Asc. node inv. plane', 'Ascending node on the invariable plane at J2000 (Souami & Souchay 2012).');
     addCalib(earthCalibFolder, earthCalib, 'ciPhaseAngle', 'Incl. phase angle', 'The inclination-cycle anchor: the System-Reset phase convention (Parameter Accounting, the frozen era clock) — a model convention, not an observation.');
     earthCalibFolder.addBlade({ view: 'separator' });
@@ -47143,7 +47143,7 @@ const planetStats = {
        tpLink: true},
       {label : () => `Orbital Eccentricity (e)`,
        value : [ { v: () => _hybridSpinActive() ? o.eccentricityEarth : _kcElementsOfDate('earth', o.julianDay).e, dec:8, sep:',' },{ small: '' }],
-       hover : [`The model's own N-body eccentricity of date — the published Earth element (J2000: 0.016702, matching JPL's osculating seed state and La2004; the IAU mean-elements value is 0.016710). This row IS the scene's rendered e (the banked engine series inside ±10 Myr, the mode-tail beyond — ONE SOURCE: the geometric offset, the equation of center and this readout share one value; series-vs-chain 1e-5 in 1600–2400). Under ?hybridSpin=0: the era chain of date, while the scene's orbit machinery rides the framework's eccentricity law e(t) = base′·(1 + cos θ/2) — mean base′ = ${eccentricityDerivedMean.toFixed(6)}, cycle ${fmtNum(holisticyearLength / 3, 0, ',')} years — its epoch-local tangent, within 6e-5 of the chain across the historical era.`],
+       hover : [`The model's own N-body eccentricity of date — the published Earth element, the SECULAR convention (J2000: 0.016702, ≡ JPL's osculating seed state and La2004). The IAU/Standish mean-elements value is 0.016710 (the Calibration Inputs row) and the eclipse Sun's derived mean element 0.016708 — conventions, not discrepancies. This row IS the scene's rendered e (the banked engine series inside ±10 Myr, the mode-tail beyond — ONE SOURCE: the geometric offset, the equation of center and this readout share one value; series-vs-chain 1e-5 in 1600–2400). Under ?hybridSpin=0: the era chain of date, while the scene's orbit machinery rides the framework's eccentricity law e(t) = base′·(1 + cos θ/2) — mean base′ = ${eccentricityDerivedMean.toFixed(6)}, cycle ${fmtNum(holisticyearLength / 3, 0, ',')} years — its epoch-local tangent, within 6e-5 of the chain across the historical era.`],
        tpLink: true, observed: true},
       {label : () => `Ecliptic Inclination (i)`,
        value : [ { v: () => 0, dec:6, sep:',' },{ small: 'degrees (°)' }],
@@ -47310,7 +47310,7 @@ const planetStats = {
     {header : '—  Orbital Orientation to Ecliptic —' },
       {label : () => `Longitude of perihelion (ϖ), ecliptic`,
        value : [ { v: () => o.earthPerihelionEcliptic, dec:8, sep:',' },{ small: 'degrees (°)' }],
-       hover : [`The model's own N-body chain: ecliptic longitude of perihelion of date. J2000: 102.9179° — the osculating/secular convention (JPL's own J2000 state vector and La2004 both give ~102.918°; the IAU mean-elements table gives 102.947°). The framework's perihelion law remains the clock's epoch-local machinery underneath.`],
+       hover : [`The model's own N-body series: ecliptic longitude of perihelion of date — the SECULAR element (J2000: 102.918°, ≡ JPL's osculating J2000 state vector and La2004). Two other J2000 conventions are NOT this quantity: the IAU/Standish mean-elements table gives 102.947° (the Calibration Inputs row, a 1800–2050 fit), and the eclipse Sun's derived mean element is 102.937° (the series plus the mean of the short-period planetary channel — the classical mean perihelion of the era). One direction, three conventions — labelled, not reconciled.`],
        info  : 'https://en.wikipedia.org/wiki/Longitude_of_the_periapsis',
        observed: true},
       {label : () => `Argument of periapsis (ω)`,

@@ -159,12 +159,12 @@ they anchor per-planet geometry but carry no model freedom.
 | Parameter | Variable | Value |
 |-----------|----------|-------|
 | Perihelion-solstice alignment | `perihelionalignmentYear` | <!--v:periAlignYear-->1246.03125<!--/v--> AD |
-| Long. perihelion (J2000) | `perihelionLongitudeJ2000_deg` | <!--v:earthPerihelionLongitudeJ2000-->102.947<!--/v-->° |
+| Long. perihelion (J2000) | `perihelionLongitudeJ2000_deg` | <!--v:earthPerihelionLongitudeJ2000-->102.947<!--/v-->° — the IAU/Standish MEAN element; the series' secular element at J2000 is <!--v:earthSeriesPeriLongJ2000-->102.918<!--/v-->°, <!--v:earthConventionGapPeriArcsec-->105<!--/v-->″ lower (two conventions, labelled not reconciled) |
 | Obliquity (J2000) | `obliquityJ2000_arcsec` | <!--v:obliquityJ2000Arcsec-->84381.406<!--/v-->" (<!--v:obliquityJ2000Deg-->23.439279<!--/v-->°) |
 | Obliquity rate (J2000) | `obliquityRate_arcsecPerCentury` | −46.836769"/cy |
 | Obliquity range | — | <!--v:mainstreamObliqRange-->~22.1° to ~24.5°<!--/v--> |
 | Earth incl. (J2000) | `earthInclinationJ2000_deg` | <!--v:earthInclJ2000-->1.57869<!--/v-->° |
-| Eccentricity (J2000) | `eccentricityJ2000` | <!--v:j2000Eccentricity-->0.01671022<!--/v--> |
+| Eccentricity (J2000) | `eccentricityJ2000` | <!--v:j2000Eccentricity-->0.01671022<!--/v--> — the IAU/Standish MEAN element; the series' secular element at J2000 is <!--v:earthSeriesEccJ2000-->0.01670244<!--/v-->, <!--v:earthConventionGapEcc-->7.8e-6<!--/v--> lower (two conventions) |
 | Sidereal year (J2000) | `siderealYearJ2000` | <!--v:siderealYearInputDays-->365.256363004<!--/v--> days |
 | Tropical year mean (J2000) | `tropicalYearMeanJ2000` | <!--v:tropicalYearMeanJ2000Days-->365.2421897<!--/v--> days |
 | Tropical year VE (J2000) | `tropicalYearVEJ2000` | <!--v:tropicalYearVEJ2000Days-->365.242374<!--/v--> days |
@@ -534,8 +534,8 @@ These come from external astronomical sources and do not change with the model.
 | Obliquity range | - | ~22.1 deg to ~24.5 deg | Laskar 1993 |
 | Earth inclination | `earthInclinationJ2000_deg` | <!--v:earthInclJ2000-->1.57869<!--/v--> deg | Astronomical Almanac |
 | Earth inclination rate | `earthInclinationRate_arcsecPerCentury` | -18"/cy | Astronomical Almanac |
-| Eccentricity | `earthEccentricityJ2000` | <!--v:j2000Eccentricity-->0.01671022<!--/v--> | JPL Horizons |
-| Long. of perihelion | `earthPerihelionLongitudeJ2000` | <!--v:earthPerihelionLongitudeJ2000-->102.947<!--/v--> deg | JPL Horizons |
+| Eccentricity | `earthEccentricityJ2000` | <!--v:j2000Eccentricity-->0.01671022<!--/v--> | JPL Keplerian-elements table (Standish & Williams) — the IAU MEAN element; the N-body series' secular element is <!--v:earthSeriesEccJ2000-->0.01670244<!--/v--> (≡ JPL's osculating seed state, La2004) |
+| Long. of perihelion | `earthPerihelionLongitudeJ2000` | <!--v:earthPerihelionLongitudeJ2000-->102.947<!--/v--> deg | JPL Keplerian-elements table (Standish & Williams) — the IAU MEAN element, a 1800–2050 fit; the series' secular element is <!--v:earthSeriesPeriLongJ2000-->102.918<!--/v--> deg; the eclipse Sun's derived mean element 102.937 deg (Sun-side table above) |
 | Perihelion passage J2000 | `perihelionRefJD` | <!--v:perihelionPassageJD-->2451547.042<!--/v--> | USNO (2000 Jan 3 13:00 UTC) |
 | IAU precession period | `iauPrecessionJ2000` | <!--v:iauPrecessionInputYears-->25,770.73<!--/v--> years | IAU 2006 rate re-expressed on the model day basis (published exact: 25,771.57634 yr) |
 | June Solstice 2000 JD | `juneSolstice2000_JD` | <!--v:juneSolstice2000JD-->2451716.575<!--/v--> | USNO (June 21, 2000 01:48 UTC) |
