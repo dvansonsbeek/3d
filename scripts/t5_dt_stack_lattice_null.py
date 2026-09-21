@@ -85,7 +85,10 @@ comp_mask = np.array([compliant(int(n)) for n in ns])
 q_compliant = float(comp_mask.mean())
 mean_spacing_compliant = float(np.mean(np.diff(ns[comp_mask])))
 stack = json.loads((ROOT / STACK_REL).read_text())
-shipped = [(c['name'], c['lattice_n']) for c in stack['config']['cycles']]
+# The fit file states periods in years since layer B item 3 (plan 06); the
+# lattice integer this test is ABOUT is recovered as round(8·H / period).
+shipped = [(c['name'], c['lattice_n'] if 'lattice_n' in c else int(round(EIGHT_H / c['period_yr'])))
+           for c in stack['config']['cycles']]
 series_art = json.loads((ROOT / SERIES_REL).read_text())
 ts = series_art['timeseries_residual_10yr_grid']
 years = np.array([r['year'] for r in ts], dtype=float)

@@ -87,11 +87,11 @@ let   DEEP_TIME_MODE_ENABLED     = true;   // H/LOD/mSY evolve with age — see 
 let   SUN_HARMONICS_ENABLED      = true;   // Sun-only ~200″→~7″ RMS correction — rationale at the "Phase Z-B" doc block
 let   E5_WHEEL_SUN_ENABLED       = true;   // SW-1: wheel Sun rides the certified E5 tier Sun via δ = λ_cert − λ_twin (see moveModel sun block)
 let   FQ3_EXACT_SUN_ENABLED      = true;   // FQ-3 W1: exact-Kepler wheel Sun — the derived Δ corrector replaces the fitted SUN_LONGITUDE_HARMONICS on the display path (see moveModel sun block; mirrors tools/lib/scene-graph.js FQ3_EXACT_SUN)
-let   BOND_DT_CORRECTION_ENABLED = true;  // Bond 8H/1830 ΔT correction (Option B research toggle) — rationale + constants at the BOND_LATTICE_N block
-let   HALLSTATT_DT_CORRECTION_ENABLED = true;  // Hallstatt 8H/1104 = H/138 = 2430 yr ΔT correction (research toggle) — rationale + constants at the HALLSTATT_LATTICE_N block
-let   JOSE5_DT_CORRECTION_ENABLED = true;  // Jose5 8H/2989 ≈ 897 yr ΔT correction (5×Jose period, structural gcd=61) — rationale + constants at the JOSE5_LATTICE_N block
-let   JOSE4_DT_CORRECTION_ENABLED = true;  // Jose4 8H/3749 ≈ 715.5 yr ΔT correction (4×Jose period, structural gcd=23) — cross-archive coherent in Steinhilber Φ + EPICA CO2; rationale + constants at the JOSE4_LATTICE_N block
-let   RESONATOR_DT_CORRECTION_ENABLED = true;  // Core-mantle swing (Resonator driver) — episode of the core eigenmode (T₀ = 8H/685 ≈ 3,916 yr, Q=1.8) + locked bond−hallstatt drive tone. DEFAULT ON since the JOINT-world flip (2026-07-23): fitted JOINTLY with the 4 flags (dt-corrections-fit.js --joint; the anchors move with the coefficients — 2026-07: USNO 86400.0014 / deltaTStart 56.05; current after the IAU-2006 refit: 86400.0018 / 55.16, Espenak RMS 12.5 s). doc 104 §6/§8; constants + rationale near the Jose4 block
+let   BOND_DT_CORRECTION_ENABLED = true;  // Bond 1,466-yr ΔT correction (Option B research toggle) — rationale + constants at the BOND_PERIOD_YR block
+let   HALLSTATT_DT_CORRECTION_ENABLED = true;  // Hallstatt 2,430-yr ΔT correction (research toggle) — rationale + constants at the HALLSTATT_PERIOD_YR block
+let   JOSE5_DT_CORRECTION_ENABLED = true;  // Jose5 897-yr ΔT correction (5×Jose period) — rationale + constants at the JOSE5_PERIOD_YR block
+let   JOSE4_DT_CORRECTION_ENABLED = true;  // Jose4 715.5-yr ΔT correction (4×Jose period) — cross-archive coherent in Steinhilber Φ + EPICA CO2; rationale + constants at the JOSE4_LATTICE_N block
+let   RESONATOR_DT_CORRECTION_ENABLED = true;  // Core-mantle swing (Resonator driver) — episode of the core eigenmode (T₀ = 3,916 yr, Q=1.8) + locked bond−hallstatt drive tone. DEFAULT ON since the JOINT-world flip (2026-07-23): fitted JOINTLY with the 4 flags (dt-corrections-fit.js --joint; the anchors move with the coefficients — 2026-07: USNO 86400.0014 / deltaTStart 56.05; current after the IAU-2006 refit: 86400.0018 / 55.16, Espenak RMS 12.5 s). doc 104 §6/§8; constants + rationale near the Jose4 block
 let   MOON_ARGS_FRAMEWORK_NATIVE = true;       // Framework-native lunar argument skeleton (_fwMoonArgs via _moonArgsAt) feeding the _eclMoon* dispatchers: frame-decomposed rates + solar-eccentricity-channel T²/T³ (derivation record: docs/66 §1). OFF = pure Meeus Ch. 47 argument polynomials (A/B reference; flip via console for comparison runs)
 
 // ─── A2. Earth parameters ────────────────────────────────────────────────
@@ -3092,8 +3092,10 @@ function meanTropicalYearSecondsAtAge(t_Ma) { return _deepLod().tropicalYearSeco
 //         data/deltaT-bond-cycle-residual-fit.json (n=1825 paper original, archived)
 // ═════════════════════════════════════════════════════════════════════════════
 // BOND_DT_CORRECTION_ENABLED (feature flag) declared in A5 Research toggles at top of file
-const BOND_LATTICE_N              = FIT.DT_STACK.bond.lattice_n;  // integer n in 8H/n — 74 × J-S synodic; gcd(1830, H) = 61 shares H's 61 prime
-const BOND_PERIOD_YR              = (8 * HOLISTIC_YEAR_J2000) / BOND_LATTICE_N;  // 1465.867 yr
+// Fitted period STATED IN YEARS (the fit file's period_yr): plan 06 T5 measured
+// the former 8H/n divisor label chance-level; layer B item 3 removed the divisor
+// from every runtime — the period is the number (1,465.87 yr).
+const BOND_PERIOD_YR              = FIT.DT_STACK.bond.period_yr;
 const BOND_OMEGA                  = 2 * Math.PI / BOND_PERIOD_YR;
 // These cite the 4-flag fit, NOT the 3-flag one the comment used to name — the
 // 3-flag file gave bond.cos_coeff_s = 165.927 against the 145.595 shipped here,
@@ -3138,23 +3140,22 @@ var _dtCyclesM = null;
 function _dtCycles() {
   if (!_dtCyclesM) {
     _dtCyclesM = createDeltaTCycles({
-      eightHYears: 8 * HOLISTIC_YEAR_J2000,
       taperFullHalfwidthYears: BOND_TAPER_FULL_HALFWIDTH_YR,
       taperTotalHalfwidthYears: BOND_TAPER_TOTAL_HALFWIDTH_YR,
       tropicalYearSecondsJ2000: MEAN_TROPICAL_YEAR_J2000_S,
       cycles: {
-        bond:      { latticeN: BOND_LATTICE_N,      cosCoeffSeconds: BOND_COS_COEFF_S,      sinCoeffSeconds: BOND_SIN_COEFF_S },
-        hallstatt: { latticeN: HALLSTATT_LATTICE_N, cosCoeffSeconds: HALLSTATT_COS_COEFF_S, sinCoeffSeconds: HALLSTATT_SIN_COEFF_S },
-        jose5:     { latticeN: JOSE5_LATTICE_N,     cosCoeffSeconds: JOSE5_COS_COEFF_S,     sinCoeffSeconds: JOSE5_SIN_COEFF_S },
-        jose4:     { latticeN: JOSE4_LATTICE_N,     cosCoeffSeconds: JOSE4_COS_COEFF_S,     sinCoeffSeconds: JOSE4_SIN_COEFF_S },
+        bond:      { periodYears: BOND_PERIOD_YR,      cosCoeffSeconds: BOND_COS_COEFF_S,      sinCoeffSeconds: BOND_SIN_COEFF_S },
+        hallstatt: { periodYears: HALLSTATT_PERIOD_YR, cosCoeffSeconds: HALLSTATT_COS_COEFF_S, sinCoeffSeconds: HALLSTATT_SIN_COEFF_S },
+        jose5:     { periodYears: JOSE5_PERIOD_YR,     cosCoeffSeconds: JOSE5_COS_COEFF_S,     sinCoeffSeconds: JOSE5_SIN_COEFF_S },
+        jose4:     { periodYears: JOSE4_PERIOD_YR,     cosCoeffSeconds: JOSE4_COS_COEFF_S,     sinCoeffSeconds: JOSE4_SIN_COEFF_S },
       },
       resonator: {
-        t0LatticeN: RES_T0_LATTICE_N, q: RES_Q,
+        t0Years: RES_T0_YR, q: RES_Q,
         kicks: [
           { tYear: RES_KICK1_T_YR, cosSeconds: RES_KICK1_COS_S, sinSeconds: RES_KICK1_SIN_S },
           { tYear: RES_KICK2_T_YR, cosSeconds: RES_KICK2_COS_S, sinSeconds: RES_KICK2_SIN_S },
         ],
-        tones: [{ dn: RES_TONE1_DN, phiLockedRad: RES_TONE1_PHI_RAD, ampSeconds: RES_TONE1_AMP_S }],
+        tones: [{ periodYears: RES_TONE1_PERIOD_YR, phiLockedRad: RES_TONE1_PHI_RAD, ampSeconds: RES_TONE1_AMP_S }],
       },
     });
   }
@@ -3220,8 +3221,7 @@ function bondCycleDeltaTCorrection(year) {
 //   data/hallstatt-epica-fit.json               (CO₂ validation)
 // ═════════════════════════════════════════════════════════════════════════════
 // HALLSTATT_DT_CORRECTION_ENABLED (feature flag) declared in A5 Research toggles at top of file
-const HALLSTATT_LATTICE_N              = FIT.DT_STACK.hallstatt.lattice_n;  // 8H/1104 = H/138 = 2·H/(6·23)
-const HALLSTATT_PERIOD_YR              = (8 * HOLISTIC_YEAR_J2000) / HALLSTATT_LATTICE_N;  // 2429.833 yr
+const HALLSTATT_PERIOD_YR              = FIT.DT_STACK.hallstatt.period_yr;  // 2,429.83 yr, stated in years (T5)
 const HALLSTATT_OMEGA                  = 2 * Math.PI / HALLSTATT_PERIOD_YR;
 const HALLSTATT_COS_COEFF_S            = FIT.DT_STACK.hallstatt.cos_coeff_s;  // pair-fit free amp 272 s (phase 96.6°) scaled to 80-sec target
 const HALLSTATT_SIN_COEFF_S            = FIT.DT_STACK.hallstatt.sin_coeff_s;  // pair-fit free amp 272 s (phase 96.6°) scaled to 80-sec target
@@ -3284,8 +3284,7 @@ function hallstattCycleDeltaTCorrection(year) {
 //   L-5b Section 14 output                            (browser-side scan)
 // ═════════════════════════════════════════════════════════════════════════════
 // JOSE5_DT_CORRECTION_ENABLED (feature flag) declared in A5 Research toggles at top of file
-const JOSE5_LATTICE_N              = FIT.DT_STACK.jose5.lattice_n;  // 8H/(7²·61); gcd(2989, H) = 61
-const JOSE5_PERIOD_YR              = (8 * HOLISTIC_YEAR_J2000) / JOSE5_LATTICE_N;  // 897.47 yr
+const JOSE5_PERIOD_YR              = FIT.DT_STACK.jose5.period_yr;  // 897.47 yr, stated in years (T5)
 const JOSE5_OMEGA                  = 2 * Math.PI / JOSE5_PERIOD_YR;
 const JOSE5_COS_COEFF_S            = FIT.DT_STACK.jose5.cos_coeff_s;  // triple-fit free amp 75.9 s (phase −165.8°) scaled to 50-sec target
 const JOSE5_SIN_COEFF_S            = FIT.DT_STACK.jose5.sin_coeff_s;  // triple-fit free amp 75.9 s (phase −165.8°) scaled to 50-sec target
@@ -3318,8 +3317,7 @@ function jose5CycleDeltaTCorrection(year) {
 // (Stage C) to 13.9 s (Stage D) in the fit — a 28% reduction. See docs/102
 // § "Companion 8H lattice harmonics" (§ Jose4) for the empirical trail.
 // JOSE4_DT_CORRECTION_ENABLED (feature flag) declared in A5 Research toggles at top of file
-const JOSE4_LATTICE_N              = FIT.DT_STACK.jose4.lattice_n;  // 3749 = 23 × 163; gcd(3749, H) = 23 shares H's 23 prime
-const JOSE4_PERIOD_YR              = (8 * HOLISTIC_YEAR_J2000) / JOSE4_LATTICE_N;  // 715.53 yr
+const JOSE4_PERIOD_YR              = FIT.DT_STACK.jose4.period_yr;  // 715.53 yr, stated in years (T5)
 const JOSE4_OMEGA                  = 2 * Math.PI / JOSE4_PERIOD_YR;
 const JOSE4_COS_COEFF_S            = FIT.DT_STACK.jose4.cos_coeff_s;  // quad-fit free amp 35.3 s (phase −46.2°); below 50-s prior so kept at free-fit
 const JOSE4_SIN_COEFF_S            = FIT.DT_STACK.jose4.sin_coeff_s;  // quad-fit free amp 35.3 s (phase −46.2°); below 50-s prior so kept at free-fit
@@ -3338,7 +3336,7 @@ function jose4CycleDeltaTCorrection(year) {
 // CORE-MANTLE SWING (Resonator driver) — 5th ΔT component, DEFAULT ON (joint world)
 // ═════════════════════════════════════════════════════════════════════════════
 // NEW functional class: a 2-kick EPISODE — windowed damped oscillation of the
-// core's eigenmode (T₀ = 8H/685 ≈ 3,916 yr, Q = 1.80, inside the published axiMC
+// core's eigenmode (T₀ = 3,916 yr, Q = 1.80, inside the published axiMC
 // eigenmode range, Dumberry, Gerick & Gillet 2025) plus one drive tone at the
 // bond−hallstatt difference frequency (8H/726 = 3,695 yr) with phase LOCKED
 // to the quadratic-mixing prediction φ_bond − φ_hallstatt. Exactly zero
@@ -3365,16 +3363,15 @@ function jose4CycleDeltaTCorrection(year) {
 // Scalar constants — imported from the generated constants module, sourced
 // from data/core-mantle-resonator-stage1.json (the website reads the same
 // values through the published @essrt/physics package).
-// The eigenperiod is LATTICE-LABELED (T₀ = 8H/685 ≈ 3,916 yr): the shipped
-// resonator is the combined effect of the lattice cycles, so under H(t)
-// evolution the episode scales WITH its drivers (clock coherence). Physical
-// caveat, recorded once: the bare axiMC eigenmode is core-material physics;
-// the lattice label is the framework's clock-coherence convention for the
-// shipped component (numeric difference ~1e-6 over the episode's life).
+// The eigenperiod T₀ = 3,916 yr is read in years (FIT.DT_RESONATOR.T0_yr; the former 8H/685 label left with layer B item 3): the shipped
+// resonator is the combined effect of the millennial cycles (the tone is the
+// bond−hallstatt beat). Physical caveat, recorded once: the bare axiMC
+// eigenmode is core-material physics; the fitted T₀ is the shipped
+// component's convention.
 // The fourth ΔT driver, from data/core-mantle-resonator-stage1.json via the
 // generated module. Its own file and its own fitter, so its own export —
 // FIT.DT_RESONATOR rather than a fifth channel under DT_STACK.
-const RES_T0_LATTICE_N = FIT.DT_RESONATOR.T0_lattice_n;
+const RES_T0_YR       = FIT.DT_RESONATOR.T0_yr;   // the eigenperiod in years (3,916 yr; the former 8H/685 label is gone from the runtime)
 const RES_Q           = FIT.DT_RESONATOR.Q;
 const RES_KICK1_T_YR  = FIT.DT_RESONATOR.kick_epochs_year[0];
 const RES_KICK1_COS_S = FIT.DT_RESONATOR.kick_coefficients_s[0].cos;
@@ -3382,7 +3379,7 @@ const RES_KICK1_SIN_S = FIT.DT_RESONATOR.kick_coefficients_s[0].sin;
 const RES_KICK2_T_YR  = FIT.DT_RESONATOR.kick_epochs_year[1];
 const RES_KICK2_COS_S = FIT.DT_RESONATOR.kick_coefficients_s[1].cos;
 const RES_KICK2_SIN_S = FIT.DT_RESONATOR.kick_coefficients_s[1].sin;
-const RES_TONE1_DN    = FIT.DT_RESONATOR.drive_tones[0].dn;
+const RES_TONE1_PERIOD_YR = FIT.DT_RESONATOR.drive_tones[0].period_yr;   // the bond−hallstatt beat, in years
 const RES_TONE1_PHI_RAD = FIT.DT_RESONATOR.drive_tones[0].phi_locked_rad;
 const RES_TONE1_AMP_S = FIT.DT_RESONATOR.drive_tones[0].amp_s;
 
@@ -3857,7 +3854,13 @@ const _moonArgsM = (() => {
         fns: {
           eccAt: (tYr) => _deepEcc().eccAt(tYr),
           channelIntegral: _fwChannelIntegral,
-          computeObliquityEarth,
+          // Layer A / item 3c (plan 06): the arguments' obliquity carrier
+          // C·∫(ε − ε₀) reads the PUBLISHED ε (the one-source hybrid via
+          // _sceneEpsTargetDeg; K comb only as its flag-off fallback) — one
+          // ε everywhere. Twins: model.js (oneSourceM.epsAt), scene-graph.js
+          // (_oneSourceM().epsDeg). Measured before the move: carrier −13″ at
+          // −700, −111″ at −3000; the gates re-baselined with the commit.
+          computeObliquityEarth: (y) => _sceneEpsTargetDeg(y),
           jdToSIyear: (jd) => _jdToSIyear(jd),
           tropicalOrbitsBetween: meanMoonOrbitsBetweenYears,
           apsidalOfDateCyclesBetween: meanMoonApsidalOfDateCyclesBetween,
@@ -29896,9 +29899,11 @@ function setupGUI() {
     }
     function fmtDt(dtMin) {
       const sign = dtMin >= 0 ? '+' : '−';
-      const absDt = Math.abs(dtMin);
-      const h = Math.floor(absDt / 60);
-      const m = Math.round(absDt - h * 60);
+      // Round the TOTAL minutes first (twin of tools/verify/eclipse-audit.js
+      // fmtDt) — rounding the remainder alone printed "0h60" for 59.6 min.
+      const total = Math.round(Math.abs(dtMin));
+      const h = Math.floor(total / 60);
+      const m = total - h * 60;
       return `${sign}${h}h${String(m).padStart(2, '0')}`;
     }
 
@@ -38159,7 +38164,7 @@ async function runYearAnalysisExport(years) {
     // CURRENT family: siderealDayRow is built from this row's own kinematic LOD,
     // so the projection must use this row's own obliquity, not OBLIQUITY_MEAN.
     const stellarDayRow = (siderealDayRow / _axialPrecessionPeriodYearsAtAge((2000 - year) / 1e6)) / (solarYearDaysRow + 1)
-      * stellarDayRaProjection(computeObliquityEarth(year)) + siderealDayRow;
+      * stellarDayRaProjection(_sceneEpsTargetDeg(year)) + siderealDayRow;   // layer A: the published ε (hybrid), K comb only as its flag-off fallback
     // Feed section 1a — accumulated HERE, inside the per-year epoch, so the
     // Summary means are the means of these exact columns.
     _daySum.real += lodRealRow; _daySum.sid += siderealDayRow;
@@ -57171,7 +57176,9 @@ function updatePredictions() {
   // CURRENT family: o.siderealDayReal uses this epoch's kinematic LOD, so the
   // projection tracks this epoch's obliquity (OBLIQUITY_MEAN is the MEAN form).
   // S5: one turn of the equinox per T_p(t) (the composed clock), not per the counter H/13.
-  predictions.stellarDayReal = o.stellarDayReal = (o.siderealDayReal/_axialPrecessionPeriodYearsAtAge((2000 - yearForFormula) / 1e6))/(o.solarYearDays+1)*stellarDayRaProjection(computeObliquityEarth(yearForFormula))+o.siderealDayReal;
+  // Layer A (plan 06): the RA projection reads the published ε (the hybrid via
+  // _sceneEpsTargetDeg; K comb only as its flag-off fallback) — measured 1e-8 s.
+  predictions.stellarDayReal = o.stellarDayReal = (o.siderealDayReal/_axialPrecessionPeriodYearsAtAge((2000 - yearForFormula) / 1e6))/(o.solarYearDays+1)*stellarDayRaProjection(_sceneEpsTargetDeg(yearForFormula))+o.siderealDayReal;
 
   //predictions.predictedDeltat = getDeltaT();
   predictions.predictedDeltatPerYear = o.predictedDeltatPerYear = getDeltaTChangePerYear();

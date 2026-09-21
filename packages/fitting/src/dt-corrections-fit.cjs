@@ -186,27 +186,30 @@ const C = require(path.join(TOOLS_LIB, 'constants.js'));
 // sits inside every fitted plateau by density alone, and non-compliant
 // neighbours fit identically. The periods are fitted millennial periods at
 // the canonical Bond / Hallstatt / Jose values and are STATED IN YEARS in
-// every presentation surface; `lattice_n` (period = eightHYears / n) is an
-// implementation detail that keeps its name.
+// every presentation surface. Layer B item 3 (plan 06): the periods are the
+// numbers — `period_yr` below, the SAME doubles the former 8·H/n divisors
+// evaluated to (the runtimes read the fit file's `period_yr`; nothing
+// derives a period from H any more). `structural` keeps the historical
+// selection record only.
 const CONFIG = {
   cycles: [
-    { name: 'bond',      lattice_n: 1830,
-      structural: '74 × J-S synodic; gcd(1830, H) = 61',
+    { name: 'bond',      period_yr: 1465.8666666666666,
+      structural: 'historical selection record: 74 × J-S synodic; the former divisor 1830 (gcd 61)',
       fit_stage:  'solo',
       target_amp_s: null /* unconstrained */ },
-    { name: 'hallstatt', lattice_n: 1104,
-      structural: 'H/138 = H/(6·23); gcd(1104, H) = 23',
+    { name: 'hallstatt', period_yr: 2429.8333333333335,
+      structural: 'historical selection record: the former divisor 1104 (gcd 23)',
       fit_stage:  'with_bond',
       target_amp_s: 80 },
-    { name: 'jose5',     lattice_n: 2989,
-      structural: '5×Jose 179 yr; gcd(2989, H) = 61',
+    { name: 'jose5',     period_yr: 897.469387755102,
+      structural: '5×Jose 179 yr; historical selection record: the former divisor 2989 (gcd 61)',
       fit_stage:  'with_bond_hallstatt',
       target_amp_s: 50 },
-    { name: 'jose4',    lattice_n: 3749,
+    { name: 'jose4',    period_yr: 715.5337423312883,
       structural: '4×Jose 179 yr = 715.5 yr; gcd(3749, H) = 23. Cross-archive coherent in Steinhilber solar Φ + EPICA CO2 (see scripts/lattice_harmonic_scan.py --preset jose-family). Also degenerate with Bond/2 at ~733 yr; 4×Jose is the tighter anchor (0.083% vs 2.5%).',
       fit_stage:  'with_bond_hallstatt_jose5',
       target_amp_s: 50 },
-    { name: 'h253',     lattice_n: 2024,
+    { name: 'h253',     period_yr: 1325.3636363636363,
       structural: 'H/253 = H/(11·23) = 1,325.4 yr; gcd(2024, H) = 23; 184th harmonic of 8H/11 (Earth ecliptic-perihelion family). Identified 2026-07-22 by L-5b §14 post-4-flag residual scan (flat ΔR²=0.031 peak n=2015-2024, gcd-compliant flank chosen) — see data/deltaT-h253-fifth-cycle-scan.json (GO verdict: medieval 990-bump window 98→17 s, no ancient regression). EPICA CO2 significant (amp 5.9 ppm vs p95 2.9, lattice_harmonic_scan); Steinhilber marginal (~95% threshold); cap-only ship keeps the amplitude below the free fit.',
       fit_stage:  'frozen_residual_after_D',
       target_amp_s: 75 },
@@ -436,8 +439,7 @@ function computeUsnoTargetOffset(usnoTargetLodS) {
   return { targetOffset, lodKinematic, h5At2000, sidDays2000 };
 }
 
-const H = C.H;
-const EIGHT_H = 8 * H;
+const H = C.H;   // provenance stamp only (H_yr in _meta); no period derives from it here
 
 // ─── Stephenson polynomial evaluator (cubic spline over 54 segments) ───
 function loadStephenson() {
@@ -479,17 +481,22 @@ function sampleResidual(segments) {
   return { years, stephenson, model, residual };
 }
 
-// Compute the LOD-anchor row coefficients for a set of cycle divisors.
+// ONE home for the periods (years) by cycle name — every stage, the sweep and
+// the joint design read CONFIG through this map (three hard-coded divisor
+// tables used to live in the sweep and the joint mode).
+const PERIOD_YR = Object.fromEntries(CONFIG.cycles.map((c) => [c.name, c.period_yr]));
+
+// Compute the LOD-anchor row coefficients for a set of cycle periods (years).
 // Mirrors runtime `_cycleLodCorrection(2000, cos, sin, ω, raw@J2000)` at year=2000
 // with taper=1, taper_prime=0 (well inside the 300-kyr Holocene taper window):
 //   cycle_LOD(2000) = 86400 × ω × (sin·cos(ω·2000) − cos·sin(ω·2000)) / T_yr
 // where T_yr = MEAN_TROPICAL_YEAR_J2000_S. Returns weights indexed to match the
 // harmonic block (cols 3..) in the design matrix — polynomial cols get 0.
-function computeAnchorRow(cycleDivisors, targetLodOffsetS) {
-  const nCol = 3 + 2 * cycleDivisors.length;
+function computeAnchorRow(cyclePeriodsYr, targetLodOffsetS) {
+  const nCol = 3 + 2 * cyclePeriodsYr.length;
   const row = new Array(nCol).fill(0);   // cols 0..2 (poly detrend) = 0
-  for (let k = 0; k < cycleDivisors.length; k++) {
-    const omega = 2 * Math.PI * cycleDivisors[k] / EIGHT_H;
+  for (let k = 0; k < cyclePeriodsYr.length; k++) {
+    const omega = 2 * Math.PI / cyclePeriodsYr[k];
     const sinW = -86400 * omega * Math.sin(omega * 2000) / MEAN_TROPICAL_YEAR_J2000_S;
     const cosW = +86400 * omega * Math.cos(omega * 2000) / MEAN_TROPICAL_YEAR_J2000_S;
     row[3 + 2 * k]     = sinW;   // weight on beta_cos_k
@@ -507,11 +514,11 @@ function computeAnchorRow(cycleDivisors, targetLodOffsetS) {
 // the design matrix and residual is scaled by sqrt(w_i) for standard WLS. Useful for
 // biasing the fit toward the well-observed modern era.
 // Returns per-cycle {cos, sin} plus fit statistics.
-function fitCycles(years, residual, cycleDivisors, anchor = null, sampleWeights = null) {
+function fitCycles(years, residual, cyclePeriodsYr, anchor = null, sampleWeights = null) {
   const n = years.length;
   const y0 = years.reduce((a, b) => a + b, 0) / n;
   const t = years.map(y => (y - y0) / 1000); // in kyr for polynomial stability
-  const nCol = 3 + 2 * cycleDivisors.length;  // [1, t, t², cos+sin per cycle]
+  const nCol = 3 + 2 * cyclePeriodsYr.length;  // [1, t, t², cos+sin per cycle]
 
   // Weighted-mean subtraction — matches the weighted-LS objective. Falls back
   // to plain mean when weights are unit.
@@ -529,8 +536,8 @@ function fitCycles(years, residual, cycleDivisors, anchor = null, sampleWeights 
     row[0] = sw * 1;
     row[1] = sw * t[i];
     row[2] = sw * t[i] * t[i];
-    for (let k = 0; k < cycleDivisors.length; k++) {
-      const omega = 2 * Math.PI * cycleDivisors[k] / EIGHT_H;
+    for (let k = 0; k < cyclePeriodsYr.length; k++) {
+      const omega = 2 * Math.PI / cyclePeriodsYr[k];
       row[3 + 2 * k]     = sw * Math.cos(omega * years[i]);
       row[3 + 2 * k + 1] = sw * Math.sin(omega * years[i]);
     }
@@ -572,8 +579,8 @@ function fitCycles(years, residual, cycleDivisors, anchor = null, sampleWeights 
   const y_hat = new Array(n).fill(0);
   for (let i = 0; i < n; i++) {
     let s = beta[0] + beta[1] * t[i] + beta[2] * t[i] * t[i];
-    for (let k = 0; k < cycleDivisors.length; k++) {
-      const omega = 2 * Math.PI * cycleDivisors[k] / EIGHT_H;
+    for (let k = 0; k < cyclePeriodsYr.length; k++) {
+      const omega = 2 * Math.PI / cyclePeriodsYr[k];
       s += beta[3 + 2 * k]     * Math.cos(omega * years[i])
          + beta[3 + 2 * k + 1] * Math.sin(omega * years[i]);
     }
@@ -600,12 +607,12 @@ function fitCycles(years, residual, cycleDivisors, anchor = null, sampleWeights 
 
   // Extract per-cycle coefficients
   const cycles = [];
-  for (let k = 0; k < cycleDivisors.length; k++) {
+  for (let k = 0; k < cyclePeriodsYr.length; k++) {
     const cos_c = beta[3 + 2 * k];
     const sin_c = beta[3 + 2 * k + 1];
     const amplitude = Math.hypot(cos_c, sin_c);
     const phase_deg = Math.atan2(sin_c, cos_c) * 180 / Math.PI;
-    cycles.push({ n: cycleDivisors[k], cos: cos_c, sin: sin_c, amplitude, phase_deg });
+    cycles.push({ period_yr: cyclePeriodsYr[k], cos: cos_c, sin: sin_c, amplitude, phase_deg });
   }
 
   // Anchor achievement (only meaningful if anchor was applied).
@@ -689,7 +696,7 @@ function runFitQuiet(usnoTargetLodS, years, residual) {
     const useAsIs = target === null || free.amplitude <= target;
     const scale = useAsIs ? 1 : target / free.amplitude;
     return {
-      n: cycle.lattice_n, cos: free.cos * scale, sin: free.sin * scale,
+      period_yr: cycle.period_yr, cos: free.cos * scale, sin: free.sin * scale,
       amplitude: useAsIs ? free.amplitude : target, phase_deg: free.phase_deg,
       constrained: !useAsIs,
     };
@@ -697,7 +704,7 @@ function runFitQuiet(usnoTargetLodS, years, residual) {
 
   // Cycle LOD contribution at year 2000 with taper=1.
   function cycleLodAtJ2000(c) {
-    const omega = 2 * Math.PI * c.n / EIGHT_H;
+    const omega = 2 * Math.PI / c.period_yr;
     return 86400 * omega * (c.sin * Math.cos(omega * 2000) - c.cos * Math.sin(omega * 2000)) / MEAN_TROPICAL_YEAR_J2000_S;
   }
 
@@ -708,11 +715,11 @@ function runFitQuiet(usnoTargetLodS, years, residual) {
   // the block; dry-run output proven byte-identical after removal.)
 
   // Stage D with USNO anchor
-  const stageDDivisors = [bondCycle.lattice_n, hallCycle.lattice_n, joseCycle.lattice_n, jose4Cycle.lattice_n];
+  const stageDPeriodsYr = [bondCycle.period_yr, hallCycle.period_yr, joseCycle.period_yr, jose4Cycle.period_yr];
   const derivation = computeUsnoTargetOffset(usnoTargetLodS);
-  const anchorRow = computeAnchorRow(stageDDivisors, derivation.targetOffset);
+  const anchorRow = computeAnchorRow(stageDPeriodsYr, derivation.targetOffset);
   const anchorArg = { ...anchorRow, weight: CONFIG.usno_anchor.weight };
-  const fitD = fitCycles(years, residual, stageDDivisors, anchorArg, sampleWeights);
+  const fitD = fitCycles(years, residual, stageDPeriodsYr, anchorArg, sampleWeights);
   const bondD = fitD.cycles[0], hallD = fitD.cycles[1], joseD = fitD.cycles[2], jose4Free = fitD.cycles[3];
 
   // Shipping (all four from Stage D) + caps
@@ -728,12 +735,12 @@ function runFitQuiet(usnoTargetLodS, years, residual) {
   const residualE = years.map((y, i) => {
     let s = residual[i];
     for (const c of frozenFour) {
-      const om = 2 * Math.PI * c.n / EIGHT_H;
+      const om = 2 * Math.PI / c.period_yr;
       s -= c.cos * Math.cos(om * y) + c.sin * Math.sin(om * y);
     }
     return s;
   });
-  const fitE = fitCycles(years, residualE, [h253Cycle.lattice_n], null, sampleWeights);
+  const fitE = fitCycles(years, residualE, [h253Cycle.period_yr], null, sampleWeights);
   const h253Fit = ship(h253Cycle, fitE.cycles[0]);
 
   // Bond-only min-norm closure (retained — see main() closure notes), with
@@ -743,12 +750,12 @@ function runFitQuiet(usnoTargetLodS, years, residual) {
                + cycleLodAtJ2000(h253Fit)
                + resonatorLodAtJ2000();   // 0 unless DT_RESONATOR_ENABLED=1
   const deltaLod = derivation.targetOffset - preSum;
-  const omB = 2 * Math.PI * bondCycle.lattice_n / EIGHT_H;
+  const omB = 2 * Math.PI / bondCycle.period_yr;
   const wCos = -86400 * omB * Math.sin(omB * 2000) / MEAN_TROPICAL_YEAR_J2000_S;
   const wSin = +86400 * omB * Math.cos(omB * 2000) / MEAN_TROPICAL_YEAR_J2000_S;
   const denom = wCos * wCos + wSin * wSin;
   const bondForShip = {
-    n: bondCycle.lattice_n,
+    period_yr: bondCycle.period_yr,
     cos: bondForShipRaw.cos + wCos * deltaLod / denom,
     sin: bondForShipRaw.sin + wSin * deltaLod / denom,
   };
@@ -779,12 +786,12 @@ function findJointOptimum(years, residual, { sweepMin = 86400.0014, sweepMax = 8
   let best = null;
   for (const usno of sweep) {
     const shipped = runFitQuiet(usno, years, residual);
-    const div = { bond: 1830, hall: 1104, jose5: 2989, jose4: 3749, h253: 2024 };
+    const div = { bond: PERIOD_YR.bond, hall: PERIOD_YR.hallstatt, jose5: PERIOD_YR.jose5, jose4: PERIOD_YR.jose4, h253: PERIOD_YR.h253 };   // periods, years
     function cyclesAt(year) {
       let s = 0;
       for (const [name, d] of Object.entries(div)) {
         const c = shipped[name];
-        const om = 2 * Math.PI * d / EIGHT_H;
+        const om = 2 * Math.PI / d;
         const raw    = c.cos * Math.cos(om * year) + c.sin * Math.sin(om * year);
         const rawJ2K = c.cos * Math.cos(om * 2000) + c.sin * Math.sin(om * 2000);
         s += raw - rawJ2K;
@@ -872,7 +879,7 @@ function runSweepEpoch() {
       const residFinal = years.map((y, i) => {
         let s = residual[i];
         for (const c of five) {
-          const om = 2 * Math.PI * c.n / EIGHT_H;
+          const om = 2 * Math.PI / c.period_yr;
           s -= c.cos * Math.cos(om * y) + c.sin * Math.sin(om * y);
         }
         return s;
@@ -883,7 +890,7 @@ function runSweepEpoch() {
       function cyclesAt(y2) {
         let s = 0;
         for (const c of five) {
-          const om = 2 * Math.PI * c.n / EIGHT_H;
+          const om = 2 * Math.PI / c.period_yr;
           s += c.cos * Math.cos(om * y2) + c.sin * Math.sin(om * y2)
              - (c.cos * Math.cos(om * 2000) + c.sin * Math.sin(om * 2000));
         }
@@ -975,8 +982,7 @@ function main() {
 
   console.log('  Config:');
   for (const c of CONFIG.cycles) {
-    const period = EIGHT_H / c.lattice_n;
-    console.log(`    ${c.name.padEnd(9)} 8H/${c.lattice_n}  period=${period.toFixed(2)} yr  ` +
+    console.log(`    ${c.name.padEnd(9)} period=${c.period_yr.toFixed(2)} yr  ` +
                 `target_amp=${c.target_amp_s === null ? 'free' : c.target_amp_s + ' s'}  ` +
                 `structural: ${c.structural}`);
   }
@@ -1036,7 +1042,7 @@ function main() {
     const useFreeAsIs = target === null || free.amplitude <= target;
     const scale = useFreeAsIs ? 1 : target / free.amplitude;
     return {
-      n:         cycle.lattice_n,
+      period_yr: cycle.period_yr,
       cos:       free.cos * scale,
       sin:       free.sin * scale,
       amplitude: useFreeAsIs ? free.amplitude : target,
@@ -1047,7 +1053,7 @@ function main() {
 
   // ─── Stage A: Bond solo ─────────────────────────────────────
   const bondCycle = CONFIG.cycles.find(c => c.name === 'bond');
-  const fitA = fitCycles(years, residual, [bondCycle.lattice_n], null, sampleWeights);
+  const fitA = fitCycles(years, residual, [bondCycle.period_yr], null, sampleWeights);
   const bondSolo = fitA.cycles[0];
   console.log('── Stage A: Bond solo (unconstrained; the primary anchor) ──');
   console.log(`  R² = ${fitA.r2.toFixed(4)}, RMS post = ${fitA.rms_post.toFixed(1)} s (all)  ${fitA.rms_post_modern ? fitA.rms_post_modern.toFixed(1) + ' s (≥1600)' : ''}`);
@@ -1056,7 +1062,7 @@ function main() {
 
   // ─── Stage B: Bond + Hallstatt joint; scale Hallstatt to target ─────
   const hallCycle = CONFIG.cycles.find(c => c.name === 'hallstatt');
-  const fitB = fitCycles(years, residual, [bondCycle.lattice_n, hallCycle.lattice_n], null, sampleWeights);
+  const fitB = fitCycles(years, residual, [bondCycle.period_yr, hallCycle.period_yr], null, sampleWeights);
   const bondB = fitB.cycles[0], hallFree = fitB.cycles[1];
   const hallShipped = shipCycle(hallCycle, hallFree);
   const bondPhaseShiftB = bondB.phase_deg - bondSolo.phase_deg;
@@ -1069,7 +1075,7 @@ function main() {
 
   // ─── Stage C: Bond + Hallstatt + Jose5 joint; scale Jose5 to target ─────
   const joseCycle = CONFIG.cycles.find(c => c.name === 'jose5');
-  const fitC = fitCycles(years, residual, [bondCycle.lattice_n, hallCycle.lattice_n, joseCycle.lattice_n], null, sampleWeights);
+  const fitC = fitCycles(years, residual, [bondCycle.period_yr, hallCycle.period_yr, joseCycle.period_yr], null, sampleWeights);
   const bondC = fitC.cycles[0], hallC = fitC.cycles[1], joseFree = fitC.cycles[2];
   const joseShipped = shipCycle(joseCycle, joseFree);
   const bondPhaseShiftC = bondC.phase_deg - bondSolo.phase_deg;
@@ -1082,14 +1088,14 @@ function main() {
 
   // ─── Stage D: Bond + Hallstatt + Jose5 + Jose4 joint (with USNO LOD anchor) ─────
   const jose4Cycle = CONFIG.cycles.find(c => c.name === 'jose4');
-  const stageDDivisors = [bondCycle.lattice_n, hallCycle.lattice_n, joseCycle.lattice_n, jose4Cycle.lattice_n];
+  const stageDPeriodsYr = [bondCycle.period_yr, hallCycle.period_yr, joseCycle.period_yr, jose4Cycle.period_yr];
   // Apply USNO LOD anchor at Stage D only (if enabled). Forces
   // Σ cycleLodCorrection_i(2000) = usnoTargetOffset (derived from usno_target_lod_s).
   let anchorArg = null;
   let usnoDerivation = null;
   if (CONFIG.usno_anchor.enabled && CONFIG.usno_anchor.apply_at_stage === 'D') {
     usnoDerivation = computeUsnoTargetOffset(effectiveUsnoTarget);
-    const anchorRow = computeAnchorRow(stageDDivisors, usnoDerivation.targetOffset);
+    const anchorRow = computeAnchorRow(stageDPeriodsYr, usnoDerivation.targetOffset);
     anchorArg = { ...anchorRow, weight: CONFIG.usno_anchor.weight };
     console.log('── USNO LOD anchor active for Stage D ──');
     console.log(`  USNO target (${FIXED_ANCHORS ? 'CONFIG override' : 'auto-optimum'}): lodReal(2000) = ${effectiveUsnoTarget} s`);
@@ -1098,7 +1104,7 @@ function main() {
     console.log(`  → derived target: Σ cycleLodCorrection(2000) = ${(usnoDerivation.targetOffset * 1000).toFixed(4)} ms`);
     console.log(`  Soft-constraint weight: ${CONFIG.usno_anchor.weight.toExponential(0)}\n`);
   }
-  const fitD = fitCycles(years, residual, stageDDivisors, anchorArg, sampleWeights);
+  const fitD = fitCycles(years, residual, stageDPeriodsYr, anchorArg, sampleWeights);
   const bondD = fitD.cycles[0], hallD = fitD.cycles[1], joseD = fitD.cycles[2], jose4Free = fitD.cycles[3];
   const jose4Shipped = shipCycle(jose4Cycle, jose4Free);
   const bondPhaseShiftD = bondD.phase_deg - bondSolo.phase_deg;
@@ -1134,7 +1140,7 @@ function main() {
 
   // ─── Compute raw@J2000 anchor values ───
   function rawAtJ2000(c) {
-    const omega = 2 * Math.PI * c.n / EIGHT_H;
+    const omega = 2 * Math.PI / c.period_yr;
     return c.cos * Math.cos(omega * 2000) + c.sin * Math.sin(omega * 2000);
   }
 
@@ -1174,12 +1180,12 @@ function main() {
   const residualE = years.map((y, i) => {
     let s = residual[i];
     for (const c of frozenFour) {
-      const om = 2 * Math.PI * c.n / EIGHT_H;
+      const om = 2 * Math.PI / c.period_yr;
       s -= c.cos * Math.cos(om * y) + c.sin * Math.sin(om * y);
     }
     return s;
   });
-  const fitE = fitCycles(years, residualE, [h253Cycle.lattice_n], null, sampleWeights);
+  const fitE = fitCycles(years, residualE, [h253Cycle.period_yr], null, sampleWeights);
   const h253Free = fitE.cycles[0];
   const h253ForShip = shipCycle(h253Cycle, h253Free);
   console.log('── Stage E: h253 (frozen-residual fit after the four Stage-D cycles) ──');
@@ -1195,7 +1201,7 @@ function main() {
   // cycleLOD-at-J2000 helper (identity with runtime _cycleLodCorrection at
   // year=2000 with taper=1, taper_prime=0).
   function cycleLodAtJ2000(c) {
-    const omega = 2 * Math.PI * c.n / EIGHT_H;
+    const omega = 2 * Math.PI / c.period_yr;
     return 86400 * omega * (c.sin * Math.cos(omega * 2000) - c.cos * Math.sin(omega * 2000)) / MEAN_TROPICAL_YEAR_J2000_S;
   }
 
@@ -1235,7 +1241,7 @@ function main() {
                     + resonatorLodAtJ2000();   // 0 unless DT_RESONATOR_ENABLED=1
     const deltaLod = anchorTarget - preAdjSum;
 
-    const omB = 2 * Math.PI * bondCycle.lattice_n / EIGHT_H;
+    const omB = 2 * Math.PI / bondCycle.period_yr;
     const wCos = -86400 * omB * Math.sin(omB * 2000) / MEAN_TROPICAL_YEAR_J2000_S;
     const wSin = +86400 * omB * Math.cos(omB * 2000) / MEAN_TROPICAL_YEAR_J2000_S;
     const denom = wCos * wCos + wSin * wSin;
@@ -1244,7 +1250,7 @@ function main() {
     const cosAdj = bondForShipRaw.cos + dCos;
     const sinAdj = bondForShipRaw.sin + dSin;
     bondForShip = {
-      n: bondForShipRaw.n,
+      period_yr: bondForShipRaw.period_yr,
       cos: cosAdj,
       sin: sinAdj,
       amplitude: Math.hypot(cosAdj, sinAdj),
@@ -1271,7 +1277,7 @@ function main() {
     const residualFinal = years.map((y, i) => {
       let s = residual[i];
       for (const c of finalFive) {
-        const om = 2 * Math.PI * c.n / EIGHT_H;
+        const om = 2 * Math.PI / c.period_yr;
         s -= c.cos * Math.cos(om * y) + c.sin * Math.sin(om * y);
       }
       return s;
@@ -1334,11 +1340,10 @@ function main() {
   // ─── Write JSON artifact ───
   const output = {
     _meta: {
-      description: 'Sub-Milankovitch H-lattice ΔT correction stack fit against Stephenson 2016 residual. Four cascaded stages (Bond solo → +Hallstatt → +Jose5 → +Jose4). Bond uses solo-fit phase (unconstrained amplitude, physical anchor). All other cycles use cap-only shipping (free-fit if below prior amplitude; scaled down to prior only if free > prior). Jose4 identified by cross-archive scans (Steinhilber+EPICA). Eddy (8H/2684 = 999 yr) and Emp862 (8H/3111 = 862 yr) were tested as 5th/6th flags but both rolled back — see rollback notes in CONFIG.cycles. See docs/102 § "Companion 8H lattice harmonics" and scripts/lattice_harmonic_scan.py.',
+      description: 'Sub-Milankovitch millennial ΔT correction stack (periods stated in years) fit against Stephenson 2016 residual. Four cascaded stages (Bond solo → +Hallstatt → +Jose5 → +Jose4). Bond uses solo-fit phase (unconstrained amplitude, physical anchor). All other cycles use cap-only shipping (free-fit if below prior amplitude; scaled down to prior only if free > prior). Jose4 identified by cross-archive scans (Steinhilber+EPICA). Eddy (8H/2684 = 999 yr) and Emp862 (8H/3111 = 862 yr) were tested as 5th/6th flags but both rolled back — see rollback notes in CONFIG.cycles. See docs/102 § "Companion 8H lattice harmonics" and scripts/lattice_harmonic_scan.py.',
       generator: 'tools/fit/dt-corrections-fit.js',
       dt_corrections_disabled: process.env.DT_CORRECTIONS_DISABLED === '1',
       H_yr: H,
-      eight_H_yr: EIGHT_H,
     },
     config: CONFIG,
     fit_metrics: {
@@ -1391,8 +1396,7 @@ function main() {
     } : { enabled: false },
     shipped_coefficients: {
       bond: {
-        lattice_n: bondCycle.lattice_n,
-        period_yr: EIGHT_H / bondCycle.lattice_n,
+        period_yr: bondCycle.period_yr,
         cos_coeff_s: bondForShip.cos,
         sin_coeff_s: bondForShip.sin,
         raw_at_j2000_s: bondJ2000,
@@ -1401,8 +1405,7 @@ function main() {
         source: anchorActive ? 'Stage D anchored fit (USNO LOD constraint active)' : 'Stage A solo fit',
       },
       hallstatt: {
-        lattice_n: hallCycle.lattice_n,
-        period_yr: EIGHT_H / hallCycle.lattice_n,
+        period_yr: hallCycle.period_yr,
         cos_coeff_s: hallForShip.cos,
         sin_coeff_s: hallForShip.sin,
         raw_at_j2000_s: hallJ2000,
@@ -1413,8 +1416,7 @@ function main() {
           : `unconstrained: ${anchorActive ? 'anchored quad' : 'pair'}-fit free amp ${(anchorActive ? hallD.amplitude : hallFree.amplitude).toFixed(2)} s (below ${hallCycle.target_amp_s} s prior — no cap applied)`,
       },
       jose5: {
-        lattice_n: joseCycle.lattice_n,
-        period_yr: EIGHT_H / joseCycle.lattice_n,
+        period_yr: joseCycle.period_yr,
         cos_coeff_s: joseForShip.cos,
         sin_coeff_s: joseForShip.sin,
         raw_at_j2000_s: joseJ2000,
@@ -1425,8 +1427,7 @@ function main() {
           : `unconstrained: ${anchorActive ? 'anchored quad' : 'triple'}-fit free amp ${(anchorActive ? joseD.amplitude : joseFree.amplitude).toFixed(2)} s (below ${joseCycle.target_amp_s} s prior — no cap applied)`,
       },
       jose4: {
-        lattice_n: jose4Cycle.lattice_n,
-        period_yr: EIGHT_H / jose4Cycle.lattice_n,
+        period_yr: jose4Cycle.period_yr,
         cos_coeff_s: jose4ForShip.cos,
         sin_coeff_s: jose4ForShip.sin,
         raw_at_j2000_s: jose4J2000,
@@ -1437,8 +1438,7 @@ function main() {
           : `unconstrained: quad-fit free amp ${jose4Free.amplitude.toFixed(2)} s (below ${jose4Cycle.target_amp_s} s prior — no cap applied)`,
       },
       h253: {
-        lattice_n: h253Cycle.lattice_n,
-        period_yr: EIGHT_H / h253Cycle.lattice_n,
+        period_yr: h253Cycle.period_yr,
         cos_coeff_s: h253ForShip.cos,
         sin_coeff_s: h253ForShip.sin,
         raw_at_j2000_s: h253J2000,
@@ -1500,7 +1500,7 @@ function main() {
 function runJointMode() {
   const resPath = path.join(ROOT, 'data', 'core-mantle-resonator-stage1.json');
   const res = JSON.parse(fs.readFileSync(resPath, 'utf8')).proposed_shipped_coefficients.resonator;
-  const T0 = EIGHT_H / res.T0_lattice_n;
+  const T0 = res.T0_yr;   // the eigenperiod in years (layer B item 3: no divisor)
   const w0 = 2 * Math.PI / T0;
   const lam = w0 / (2 * res.Q);
   const wd = w0 * Math.sqrt(1 - 1 / (4 * res.Q * res.Q));
@@ -1508,7 +1508,7 @@ function runJointMode() {
   // (kick_coefficients_s unused here since the impulse-consistent re-ship:
   // kicks are sin-only unit shapes — binding deleted at 9-3f.)
   const tone = res.drive_tones[0];
-  const wTone = 2 * Math.PI * tone.dn / EIGHT_H;
+  const wTone = 2 * Math.PI / tone.period_yr;
 
   // IMPULSE-CONSISTENT forms (2026-07-23): kicks are SIN-ONLY unit shapes
   // (displacement-continuous — the true impulse response; the earlier cos
@@ -1534,15 +1534,15 @@ function runJointMode() {
   // shipped one. Column indices are derived, never hardcoded, so a reduced set
   // stays consistent; --write is refused whenever this is set (see the guard
   // near the top of the file), because the ship path assumes all four.
-  const ALL_FLAG_DIVS = { bond: 1830, hallstatt: 1104, jose5: 2989, jose4: 3749 };
-  const FLAG_DIVS = Object.fromEntries(
-    Object.entries(ALL_FLAG_DIVS).filter(([nm]) => ACTIVE_FLAGS.includes(nm)));
+  const ALL_FLAG_PERIODS_YR = { bond: PERIOD_YR.bond, hallstatt: PERIOD_YR.hallstatt, jose5: PERIOD_YR.jose5, jose4: PERIOD_YR.jose4 };   // periods, years
+  const FLAG_PERIODS_YR = Object.fromEntries(
+    Object.entries(ALL_FLAG_PERIODS_YR).filter(([nm]) => ACTIVE_FLAGS.includes(nm)));
 
   const colFns = [];
   const names = [];
   const COMP = {};
-  for (const [nm, d] of Object.entries(FLAG_DIVS)) {
-    const om = 2 * Math.PI * d / EIGHT_H;
+  for (const [nm, d] of Object.entries(FLAG_PERIODS_YR)) {
+    const om = 2 * Math.PI / d;
     COMP[nm] = [colFns.length, colFns.length + 1];
     colFns.push(y => Math.cos(om * y)); names.push(nm + '_cos');
     colFns.push(y => Math.sin(om * y)); names.push(nm + '_sin');
@@ -1661,7 +1661,7 @@ function runJointMode() {
   // U+2212 minus preserved so the unset-override output stays byte-identical.
   const _fw = (y) => String(y).replace('-', '−');
   console.log(`  fit window ${_fw(CONFIG.fit_window.year_start)}..${_fw(CONFIG.fit_window.year_end)} step ${CONFIG.fit_window.step_yr}; `
-            + `resonator convention: T₀ = 8H/${res.T0_lattice_n}, Q = ${res.Q}, `
+            + `resonator convention: T₀ = ${res.T0_yr.toFixed(1)} yr, Q = ${res.Q}, `
             + `kicks ${kicks[0]}/${kicks[1]}`);
 
   const espenakYears = Object.keys(ESPENAK_REFERENCE).map(Number).sort((a, b) => a - b);
@@ -1799,8 +1799,8 @@ function runJointMode() {
   const fitJson = JSON.parse(fs.readFileSync(fitPath, 'utf8'));
   flagNames.forEach((nm, k) => {
     const cos = x[2 * k], sin = x[2 * k + 1];
-    const d = FLAG_DIVS[nm];
-    const om = 2 * Math.PI * d / EIGHT_H;
+    const d = FLAG_PERIODS_YR[nm];
+    const om = 2 * Math.PI / d;
     const c = fitJson.shipped_coefficients[nm];
     c.cos_coeff_s = cos;
     c.sin_coeff_s = sin;

@@ -232,26 +232,29 @@ export function assembleModel(C, F, laws = {}, secularSeriesArtifact = /** @type
 
   const DT = F.DT_STACK;
   const RES = F.DT_RESONATOR;
+  // Periods STATED IN YEARS (the fit files' period_yr / T0_yr): plan 06 T5
+  // measured the former 8H/n labels chance-level; layer B item 3 removed the
+  // divisor from every runtime. Twins: tools/lib/deep-time.js, src/script.js,
+  // the website's essrt.ts.
   const dtCycles = createDeltaTCycles({
-    eightHYears: 8 * H,
     taperFullHalfwidthYears: C.deepTime.dtStackTaperFullHalfwidthYr,
     taperTotalHalfwidthYears: C.deepTime.dtStackTaperTotalHalfwidthYr,
     tropicalYearSecondsJ2000: meanTropicalYearJ2000Seconds,
     cycles: {
-      bond: { latticeN: DT.bond.lattice_n, cosCoeffSeconds: DT.bond.cos_coeff_s, sinCoeffSeconds: DT.bond.sin_coeff_s },
-      hallstatt: { latticeN: DT.hallstatt.lattice_n, cosCoeffSeconds: DT.hallstatt.cos_coeff_s, sinCoeffSeconds: DT.hallstatt.sin_coeff_s },
-      jose5: { latticeN: DT.jose5.lattice_n, cosCoeffSeconds: DT.jose5.cos_coeff_s, sinCoeffSeconds: DT.jose5.sin_coeff_s },
-      jose4: { latticeN: DT.jose4.lattice_n, cosCoeffSeconds: DT.jose4.cos_coeff_s, sinCoeffSeconds: DT.jose4.sin_coeff_s },
+      bond: { periodYears: DT.bond.period_yr, cosCoeffSeconds: DT.bond.cos_coeff_s, sinCoeffSeconds: DT.bond.sin_coeff_s },
+      hallstatt: { periodYears: DT.hallstatt.period_yr, cosCoeffSeconds: DT.hallstatt.cos_coeff_s, sinCoeffSeconds: DT.hallstatt.sin_coeff_s },
+      jose5: { periodYears: DT.jose5.period_yr, cosCoeffSeconds: DT.jose5.cos_coeff_s, sinCoeffSeconds: DT.jose5.sin_coeff_s },
+      jose4: { periodYears: DT.jose4.period_yr, cosCoeffSeconds: DT.jose4.cos_coeff_s, sinCoeffSeconds: DT.jose4.sin_coeff_s },
     },
     resonator: {
-      t0LatticeN: RES.T0_lattice_n,
+      t0Years: RES.T0_yr,
       q: RES.Q,
       kicks: RES.kick_epochs_year.map(/** @param {number} t @param {number} i */ (t, i) => ({
         tYear: t,
         cosSeconds: RES.kick_coefficients_s[i].cos,
         sinSeconds: RES.kick_coefficients_s[i].sin,
       })),
-      tones: RES.drive_tones.map(/** @param {{dn: number, phi_locked_rad: number, amp_s: number}} t */ (t) => ({ dn: t.dn, phiLockedRad: t.phi_locked_rad, ampSeconds: t.amp_s })),
+      tones: RES.drive_tones.map(/** @param {{period_yr: number, phi_locked_rad: number, amp_s: number}} t */ (t) => ({ periodYears: t.period_yr, phiLockedRad: t.phi_locked_rad, ampSeconds: t.amp_s })),
     },
   });
 
@@ -651,7 +654,9 @@ export function assembleModel(C, F, laws = {}, secularSeriesArtifact = /** @type
     const syS = solarYearSeconds(year);
     const syD = tropicalYearDays(year);
     const sidDay = siderealDaySeconds(year);
-    const raProjection = Math.cos((obliquityDeg(year) * Math.PI) / 180);
+    // Layer A (plan 06): the RA projection reads the published ε (the one-source
+    // hybrid), not the K comb — the browser's _sceneEpsTargetDeg twin; 1e-8 s.
+    const raProjection = Math.cos((oneSourceM.epsAt(year) * Math.PI) / 180);
     return (syS / (syD + 1) / Tp / (syD + 1)) * raProjection + sidDay;
   };
   /** @param {number} year @returns {number} */
@@ -926,20 +931,8 @@ export function assembleModel(C, F, laws = {}, secularSeriesArtifact = /** @type
     return (dr === null || t === null) ? null : dr - t;
   };
 
-  // Snapshot-phase obliquity — the engine's computeObliquityEarth convention
-  // for the lunar chain (linear H-lattice phase; orbital-engine.js). NOT the
-  // integrated-phase display obliquity above — the chain was certified
-  // against this form.
-  /** @param {number} year @returns {number} */
-  const obliquitySnapshotDeg = (year) => {
-    const t = year - balancedYear;
-    let obliq = solsticeObliquityMean;
-    for (const [div, sinC, cosC] of F.SOLSTICE_OBLIQUITY_HARMONICS) {
-      const ph = (2 * Math.PI * t) / (H / div);
-      obliq += sinC * Math.sin(ph) + cosC * Math.cos(ph);
-    }
-    return obliq;
-  };
+  // (The K snapshot-phase obliquity the lunar chain was certified against left
+  // with layer A / item 3c: the arguments' carrier reads the published ε.)
 
   // The argument skeleton (the _FW_MOON bundle; Sun secular deviations on
   // the CALENDAR year coordinate — S3)
@@ -964,7 +957,10 @@ export function assembleModel(C, F, laws = {}, secularSeriesArtifact = /** @type
     fns: {
       eccAt: /** @param {number} tYr */ (tYr) => deepEcc.eccAt(tYr),
       channelIntegral: /** @param {number} T @param {number} s */ (T, s) => deepEcc.channelIntegral(T, s),
-      computeObliquityEarth: obliquitySnapshotDeg,
+      // Layer A / item 3c (plan 06): the arguments' obliquity carrier reads the
+      // PUBLISHED ε (the one-source hybrid), not the K snapshot comb — one ε
+      // everywhere. Twins: script.js (_sceneEpsTargetDeg), scene-graph.js.
+      computeObliquityEarth: /** @param {number} year @returns {number} */ (year) => oneSourceM.epsAt(year),
       jdToSIyear: yearFromJD,
       tropicalOrbitsBetween: mcTropical,
       apsidalOfDateCyclesBetween: mcApsidalOfDate,

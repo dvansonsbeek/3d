@@ -17,8 +17,14 @@ import { createModel, createSiderealYearChannel } from '../src/index.js';
 const require = createRequire(import.meta.url);
 const ROOT = fileURLToPath(new URL('../../..', import.meta.url));
 const dt = require(join(ROOT, 'tools', 'lib', 'deep-time.js'));
+// The SHIPPED configuration: the governed secular-series artifact, as the API
+// and both scene engines load it. The Node engine's lunar chain reads the
+// one-source ε (layer A / 3c), which rides the banked series inside ±10 Myr;
+// a model built without the artifact runs the ζ-mode tail there and is a
+// different Moon (measured: 1.8e-11 rel at 2024, 1.8e-3 at −1273).
+const secularSeriesArtifact = require(join(ROOT, 'data', 'nbody-secular-series.json'));
 
-const model = createModel();
+const model = createModel(undefined, { secularSeriesArtifact });
 const engineSiderealChannel = createSiderealYearChannel({
   massLossSiderealSecondsAtYearFn: (year) => dt.meanSiderealYearSecondsAtAge((2000 - year) / 1e6),
 });
@@ -71,7 +77,7 @@ if (model.identity.counterfactual !== false) failures.push('identity: default as
   const { DEFAULT_CONSTANTS, CONSTANTS_HASH } = await import('../src/index.js');
   const altered = JSON.parse(JSON.stringify(DEFAULT_CONSTANTS));
   altered.foundational.holisticyearLength = DEFAULT_CONSTANTS.foundational.holisticyearLength + 1000;
-  const cf = createModel(altered);
+  const cf = createModel(altered, { secularSeriesArtifact });
   if (cf.identity.counterfactual !== true) failures.push('counterfactual: not flagged');
   if (!cf.identity.constantsHash || cf.identity.constantsHash === CONSTANTS_HASH) {
     failures.push(`counterfactual: hash not distinct (${cf.identity.constantsHash})`);

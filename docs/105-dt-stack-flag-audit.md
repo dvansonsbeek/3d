@@ -168,10 +168,10 @@ refit and a reship. **The taper width is a safety choice, not a derived value.**
 
 | flag | Steinhilber 9.4 kyr | EPICA 803 kyr | Cheng 639 kyr | LR04 | Stephenson ΔT |
 |---|---|---|---|---|---|
-| Hallstatt 8H/1104 | ✓ 48.5 vs 23.1 | ✓ 6.85 vs 2.77 | · | · | · |
-| Jose4 8H/3749 | ✓ 38.9 vs 26.7 | ✓ 6.34 vs 2.99 | · | · | · |
-| Jose5 8H/2989 | · 17.5 vs 26.3 | ✓ 4.65 vs 2.94 | · | · | · |
-| Bond 8H/1830 | · 8.5 vs 23.4 | ✓ 4.97 vs 2.90 | · | · | · |
+| Hallstatt (2,430 yr) | ✓ 48.5 vs 23.1 | ✓ 6.85 vs 2.77 | · | · | · |
+| Jose4 (716 yr) | ✓ 38.9 vs 26.7 | ✓ 6.34 vs 2.99 | · | · | · |
+| Jose5 (897 yr) | · 17.5 vs 26.3 | ✓ 4.65 vs 2.94 | · | · | · |
+| Bond (1,466 yr) | · 8.5 vs 23.4 | ✓ 4.97 vs 2.90 | · | · | · |
 
 - **All four clear the threshold in EPICA** at 803 kyr — four of four is not a
   chance pattern, and it is the only positive support for a wide taper. But every

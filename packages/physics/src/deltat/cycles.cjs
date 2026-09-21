@@ -1,12 +1,13 @@
 /**
  * ΔT cycle-correction stack — THE shared implementation (Phase 8.4, slice 2).
  *
- * The four anchored lattice-cycle ΔT corrections (Bond 8H/1830, Hallstatt
- * 8H/1104, Jose5 8H/2989, Jose4 8H/3749 — Jose5/Jose4 are a COUPLED PAIR,
- * fitted jointly), their implied δLOD twins (the d/dy of each correction:
- * physical consistency between the corrected ΔT curve and the LOD curve),
- * and the Core-mantle swing episode (Resonator driver: 2-kick damped
- * eigenmode T₀ = 8H/685, Q = 1.8, plus one switch-on-compensated drive
+ * The four anchored millennial ΔT corrections (Bond 1,466 yr, Hallstatt
+ * 2,430 yr, Jose5 897 yr, Jose4 716 yr — fitted periods STATED IN YEARS,
+ * plan 06 T5: the former 8H/n labels carry no information; Jose5/Jose4 are
+ * a COUPLED PAIR, fitted jointly), their implied δLOD twins (the d/dy of
+ * each correction: physical consistency between the corrected ΔT curve and
+ * the LOD curve), and the Core-mantle swing episode (Resonator driver:
+ * 2-kick damped eigenmode T₀ = 3,916 yr, Q = 1.8, plus one switch-on-compensated drive
  * tone at the bond−hallstatt difference frequency — the §10g-adjacent
  * phase-locked construction; docs/104 §6/§8).
  *
@@ -32,20 +33,21 @@
 'use strict';
 
 /**
- * @typedef {{ latticeN: number, cosCoeffSeconds: number, sinCoeffSeconds: number }} CycleSpec
+ * @typedef {{ periodYears: number, cosCoeffSeconds: number, sinCoeffSeconds: number }} CycleSpec
  * @typedef {{ tYear: number, cosSeconds: number, sinSeconds: number }} ResonatorKick
- * @typedef {{ dn: number, phiLockedRad: number, ampSeconds: number }} ResonatorTone
+ * @typedef {{ periodYears: number, phiLockedRad: number, ampSeconds: number }} ResonatorTone
  */
 
 /**
  * @typedef {Object} DeltaTCyclesDeps
- * @property {number} eightHYears - 8 × the holistic year (J2000)
  * @property {number} taperFullHalfwidthYears - full strength within |y−2000| ≤ this
  * @property {number} taperTotalHalfwidthYears - zero beyond
  * @property {number} tropicalYearSecondsJ2000 - δLOD denominator (variation ≤1e-8 in-window)
- * @property {Record<string, CycleSpec>} cycles - keyed bond/hallstatt/jose5/jose4
- * @property {{ t0LatticeN: number, q: number, kicks: ResonatorKick[],
- *   tones: ResonatorTone[] }} resonator
+ * @property {Record<string, CycleSpec>} cycles - keyed bond/hallstatt/jose5/jose4; each
+ *   period in YEARS (the fit file's `period_yr` — the former 8H/n divisor is
+ *   gone from the runtime, plan 06 T5 / layer B item 3)
+ * @property {{ t0Years: number, q: number, kicks: ResonatorKick[],
+ *   tones: ResonatorTone[] }} resonator - T₀ and the tones' periods in years
  */
 
 /**
@@ -86,8 +88,7 @@ function createDeltaTCycles(deps) {
   /** @type {Record<string, {omega: number, cosC: number, sinC: number, rawAtJ2000: number}>} */
   const cyc = {};
   for (const [key, c] of Object.entries(deps.cycles)) {
-    const periodYears = deps.eightHYears / c.latticeN;
-    const omega = 2 * Math.PI / periodYears;
+    const omega = 2 * Math.PI / c.periodYears;
     cyc[key] = {
       omega, cosC: c.cosCoeffSeconds, sinC: c.sinCoeffSeconds,
       rawAtJ2000: c.cosCoeffSeconds * Math.cos(omega * 2000) + c.sinCoeffSeconds * Math.sin(omega * 2000),
@@ -120,13 +121,13 @@ function createDeltaTCycles(deps) {
 
   // ── Core-mantle swing (Resonator driver) ─────────────────────────────────
   const R = deps.resonator;
-  const RES_T0_YR = deps.eightHYears / R.t0LatticeN;
+  const RES_T0_YR = R.t0Years;
   const RES_W0 = 2 * Math.PI / RES_T0_YR;
   const RES_LAMBDA = RES_W0 / (2 * R.q);
   const RES_WD = RES_W0 * Math.sqrt(1 - 1 / (4 * R.q * R.q));
   const RES_KICKS = R.kicks.map((k) => ({ t: k.tYear, cos_s: k.cosSeconds, sin_s: k.sinSeconds }));
   const RES_TONES = R.tones.map((t) => ({
-    omega: 2 * Math.PI * t.dn / deps.eightHYears, phi_locked: t.phiLockedRad, amp_s: t.ampSeconds,
+    omega: 2 * Math.PI / t.periodYears, phi_locked: t.phiLockedRad, amp_s: t.ampSeconds,
   }));
 
   // IMPULSE-CONSISTENT episode: kicks are sin-only (displacement-continuous —

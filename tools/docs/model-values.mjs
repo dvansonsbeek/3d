@@ -1353,13 +1353,13 @@ export const VALUES = {
         get: () => {
           const sol = dtl().computeSolarYearDaysDirect(2000);
           const d = siderealDayJ2000Seconds();
-          const oe = require(join(ROOT, 'tools', 'lib', 'orbital-engine.js'));
-          const raProj = Math.cos((oe.computeObliquityEarth(2000) * Math.PI) / 180);
+          // Layer A (plan 06): the published ε (the one-source hybrid), not the K comb.
+          const raProj = Math.cos((oneEps(2000) * Math.PI) / 180);
           return (d / dtl().certifiedAxialPrecessionJ2000Years()) / (sol + 1) * raProj + d;
         },
         render: (v) => thousands(v, 6),
         unit: 's',
-        note: 'OF-DATE obliquity projection at 2000 — the simulator readout (script.js:56318)',
+        note: 'OF-DATE obliquity projection at 2000 (the published hybrid ε) — the simulator readout',
       },
     };
   })(),
@@ -1453,10 +1453,12 @@ export const VALUES = {
       signConventionTotalWindow:     { get: () => clim.signConventionTotal, render: (v) => String(v) },
       validatedWindowStartBC:        { get: () => -clim.validatedWindowStartYear, render: (v) => thousands(v), note: 'rendered as the BC year number' },
       validatedWindowEndAD:          { get: () => clim.validatedWindowEndYear, render: (v) => thousands(v) },
-      bondYr:      { get: () => Math.round(C.H * 8 / 1830), render: (v) => thousands(v), unit: 'yr', note: '8H/1830 — Bond 2001 ~1470 yr N-Atlantic IRD (gcd 61)' },
-      hallstattYr: { get: () => Math.round(C.H * 8 / 1104), render: (v) => thousands(v), unit: 'yr', note: '8H/1104 = H/138 — Hallstatt solar-activity cycle (gcd 23)' },
-      joseFiveYr:  { get: () => Math.round(C.H * 8 / 2989), render: (v) => thousands(v), unit: 'yr', note: '8H/2989 — 5 × Charvátová Jose 179 (gcd 61)' },
-      joseFourYr:  { get: () => Math.round(C.H * 8 / 3749), render: (v) => thousands(v), unit: 'yr', note: '8H/3749 — 4 × Charvátová Jose 179 (gcd 23)' },
+      // The ΔT stack's fitted periods, STATED IN YEARS from the fit file (plan 06
+      // T5: the former 8H/n labels carry no information; layer B item 3).
+      bondYr:      { get: () => Math.round(dtFit.shipped_coefficients.bond.period_yr), render: (v) => thousands(v), unit: 'yr', note: 'the fitted Bond period — Bond 2001 ~1470 yr N-Atlantic IRD' },
+      hallstattYr: { get: () => Math.round(dtFit.shipped_coefficients.hallstatt.period_yr), render: (v) => thousands(v), unit: 'yr', note: 'the fitted Hallstatt period — the solar-activity Hallstatt cycle' },
+      joseFiveYr:  { get: () => Math.round(dtFit.shipped_coefficients.jose5.period_yr), render: (v) => thousands(v), unit: 'yr', note: 'the fitted period — 5 × Charvátová Jose 179' },
+      joseFourYr:  { get: () => Math.round(dtFit.shipped_coefficients.jose4.period_yr), render: (v) => thousands(v), unit: 'yr', note: 'the fitted period — 4 × Charvátová Jose 179' },
     };
   })(),
 

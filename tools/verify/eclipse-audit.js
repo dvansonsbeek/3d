@@ -81,6 +81,11 @@ const SG = require('../lib/scene-graph.js');
 // empirically pinned ground-mapping constants stay out of the certified
 // numbers. require(esm): Node ≥22.12 (local 22.19, CI node 22).
 const { createModel } = require('@essrt/physics');
+// The SHIPPED configuration: the governed secular-series artifact, as the API
+// and both scene engines load it — without it the package's hybrid ε (which
+// the lunar arguments' obliquity carrier reads since layer A / 3c) runs on
+// the ζ-mode tail alone and the audit measures a different Moon.
+const SECULAR_SERIES_ARTIFACT = JSON.parse(fs.readFileSync(path.join(ROOT, 'data', 'nbody-secular-series.json'), 'utf8'));
 // RESEARCH PROBE (doc 109 §7): ECLIPSE_AUDIT_LAWS=curvature:<ddot per cy²> replaces
 // Earth's eccentricity law by the shipped H/3 line plus a curvature correction
 //   Δe(t) = ½ (ddot − ddot_H3) t²   (t in centuries from J2000; ddot_H3 measured
@@ -93,7 +98,7 @@ const laws = (() => {
   if (!LAWS_SPEC) return {};
   const m = LAWS_SPEC.match(/^curvature:(-?[\d.eE+-]+)$/);
   if (!m) throw new Error(`ECLIPSE_AUDIT_LAWS: unknown spec "${LAWS_SPEC}" (expected curvature:<ddot>)`);
-  const base = createModel().eclipse.frameworkSunDeps;
+  const base = createModel(undefined, { secularSeriesArtifact: SECULAR_SERIES_ARTIFACT }).eclipse.frameworkSunDeps;
   const e = base.eccentricityAt;
   const ddotH3 = (e(2100) - 2 * e(2000) + e(1900));           // per cy²
   const dd = parseFloat(m[1]) - ddotH3;
@@ -103,7 +108,7 @@ const laws = (() => {
     eccentricityRateAt: (year) => { const t = (year - 2000) / 100; return base.eccentricityRateAt ? base.eccentricityRateAt(year) + dd * t / 100 : (e(year + 0.5) - e(year - 0.5)) + dd * t / 100; },
   };
 })();
-const TIER = createModel(undefined, { laws });
+const TIER = createModel(undefined, { laws, secularSeriesArtifact: SECULAR_SERIES_ARTIFACT });
 /** Tier umbra in the audit's {lat, lon} shape. @param {number} jd @returns {{lat:number,lon:number}|null} */
 function umbraTierAtJd(jd) {
   const u = TIER.eclipse.umbraGroundAtJD(jd);
@@ -311,9 +316,11 @@ function jdToHMM(jd) {
 }
 function fmtDt(dtMin) {   // ASCII '-' where the browser prints U+2212
   const sign = dtMin >= 0 ? '+' : '-';
-  const absDt = Math.abs(dtMin);
-  const h = Math.floor(absDt / 60);
-  const m = Math.round(absDt - h * 60);
+  // Round the TOTAL minutes first — rounding the remainder alone printed
+  // "-0h60" for −59.6 min (measured on the Babylon −135 re-baseline).
+  const total = Math.round(Math.abs(dtMin));
+  const h = Math.floor(total / 60);
+  const m = total - h * 60;
   return `${sign}${h}h${String(m).padStart(2, '0')}`;
 }
 

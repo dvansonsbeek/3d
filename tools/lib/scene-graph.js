@@ -179,7 +179,10 @@ function _moonArgsM() {
       fns: {
         eccAt: (tYr) => DTmod._deepEcc().eccAt(tYr),
         channelIntegral: (T, s) => DTmod._deepEcc().channelIntegral(T, s),
-        computeObliquityEarth: OE.computeObliquityEarth,
+        // Layer A / item 3c (plan 06): the arguments' obliquity carrier reads the
+        // PUBLISHED ε (the one-source movement), not the K comb — the browser's
+        // _sceneEpsTargetDeg / model.js oneSourceM.epsAt twin.
+        computeObliquityEarth: (y) => _oneSourceM().epsDeg(y),
         jdToSIyear: _jdToSIyearTools,
         tropicalOrbitsBetween: _mcTropical,
         apsidalOfDateCyclesBetween: _mcApsidalOfDate,

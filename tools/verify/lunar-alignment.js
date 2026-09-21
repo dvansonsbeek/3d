@@ -136,7 +136,11 @@ function flatten(obj, prefix, out) {
 async function main() {
   const { createModel } = await import('@essrt/physics');
   const { createApi } = await import(pathToFileURL(path.join(ROOT, 'packages/api/src/app.js')).href);
-  const model = createModel();
+  // The SHIPPED configuration: the governed secular-series artifact, as the
+  // API and both scene engines load it — without it the package's hybrid ε
+  // (which the lunar arguments' obliquity carrier reads since layer A / 3c)
+  // runs on the ζ-mode tail alone and the audit measures a different Moon.
+  const model = createModel(undefined, { secularSeriesArtifact: rd('data/nbody-secular-series.json') });
   const { handle } = createApi();
   /** @param {Record<string,string>} query */
   const apiLunar = (query) => JSON.parse(handle({ method: 'GET', path: '/v1/eclipses/lunar', query }).body);

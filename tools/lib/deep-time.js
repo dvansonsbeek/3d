@@ -424,32 +424,29 @@ function meanYearInDaysAtAge(t_Ma) { return _deepLod().yearInDaysAtAge(t_Ma); }
 // full, ±6000 zero) prevents unbounded extrapolation. Details in
 // docs/102-gia-alpha-lunar-validation.md.
 //
-//   Bond      8H/1830 = 1466 yr — 74 × Jupiter-Saturn synodic; gcd=61
-//   Hallstatt 8H/1104 = H/138 = 2430 yr — H's 23-factor
-//   Jose5     8H/2989 ≈ 897 yr — H's 61-factor, 5×Jose 179
+//   Bond      1,466 yr — the millennial Bond rhythm (Bond 2001 ~1470 yr)
+//   Hallstatt 2,430 yr — the solar-activity Hallstatt cycle
+//   Jose5       897 yr — 5 × the 179-yr Jose period
+// Fitted periods STATED IN YEARS (the fit file's `period_yr`): plan 06 T5
+// measured the former 8H/n divisor labels chance-level, and layer B item 3
+// removed the divisor from every runtime — the period is the number.
 
-const EIGHT_H = 8 * HOLISTIC_YEAR_J2000;
-
-const BOND_LATTICE_N = _DT.bond.lattice_n;
-const BOND_PERIOD_YR = EIGHT_H / BOND_LATTICE_N;
+const BOND_PERIOD_YR = _DT.bond.period_yr;
 const BOND_OMEGA = 2 * Math.PI / BOND_PERIOD_YR;
 const BOND_COS_COEFF_S = _DT.bond.cos_coeff_s;
 const BOND_SIN_COEFF_S = _DT.bond.sin_coeff_s;
 
-const HALLSTATT_LATTICE_N = _DT.hallstatt.lattice_n;
-const HALLSTATT_PERIOD_YR = EIGHT_H / HALLSTATT_LATTICE_N;
+const HALLSTATT_PERIOD_YR = _DT.hallstatt.period_yr;
 const HALLSTATT_OMEGA = 2 * Math.PI / HALLSTATT_PERIOD_YR;
 const HALLSTATT_COS_COEFF_S = _DT.hallstatt.cos_coeff_s;
 const HALLSTATT_SIN_COEFF_S = _DT.hallstatt.sin_coeff_s;
 
-const JOSE5_LATTICE_N = _DT.jose5.lattice_n;
-const JOSE5_PERIOD_YR = EIGHT_H / JOSE5_LATTICE_N;
+const JOSE5_PERIOD_YR = _DT.jose5.period_yr;
 const JOSE5_OMEGA = 2 * Math.PI / JOSE5_PERIOD_YR;
 const JOSE5_COS_COEFF_S = _DT.jose5.cos_coeff_s;
 const JOSE5_SIN_COEFF_S = _DT.jose5.sin_coeff_s;
 
-const JOSE4_LATTICE_N = _DT.jose4.lattice_n;
-const JOSE4_PERIOD_YR = EIGHT_H / JOSE4_LATTICE_N;
+const JOSE4_PERIOD_YR = _DT.jose4.period_yr;
 const JOSE4_OMEGA = 2 * Math.PI / JOSE4_PERIOD_YR;
 const JOSE4_COS_COEFF_S = _DT.jose4.cos_coeff_s;
 const JOSE4_SIN_COEFF_S = _DT.jose4.sin_coeff_s;
@@ -496,23 +493,22 @@ let _dtCyclesM = null;
 function _dtCycles() {
   if (!_dtCyclesM) {
     _dtCyclesM = createDeltaTCycles({
-      eightHYears: EIGHT_H,
       taperFullHalfwidthYears: HOLOCENE_TAPER_FULL_HALFWIDTH_YR,
       taperTotalHalfwidthYears: HOLOCENE_TAPER_TOTAL_HALFWIDTH_YR,
       tropicalYearSecondsJ2000: MEAN_TROPICAL_YEAR_J2000_S,
       cycles: {
-        bond:      { latticeN: BOND_LATTICE_N,      cosCoeffSeconds: BOND_COS_COEFF_S,      sinCoeffSeconds: BOND_SIN_COEFF_S },
-        hallstatt: { latticeN: HALLSTATT_LATTICE_N, cosCoeffSeconds: HALLSTATT_COS_COEFF_S, sinCoeffSeconds: HALLSTATT_SIN_COEFF_S },
-        jose5:     { latticeN: JOSE5_LATTICE_N,     cosCoeffSeconds: JOSE5_COS_COEFF_S,     sinCoeffSeconds: JOSE5_SIN_COEFF_S },
-        jose4:     { latticeN: JOSE4_LATTICE_N,     cosCoeffSeconds: JOSE4_COS_COEFF_S,     sinCoeffSeconds: JOSE4_SIN_COEFF_S },
+        bond:      { periodYears: BOND_PERIOD_YR,      cosCoeffSeconds: BOND_COS_COEFF_S,      sinCoeffSeconds: BOND_SIN_COEFF_S },
+        hallstatt: { periodYears: HALLSTATT_PERIOD_YR, cosCoeffSeconds: HALLSTATT_COS_COEFF_S, sinCoeffSeconds: HALLSTATT_SIN_COEFF_S },
+        jose5:     { periodYears: JOSE5_PERIOD_YR,     cosCoeffSeconds: JOSE5_COS_COEFF_S,     sinCoeffSeconds: JOSE5_SIN_COEFF_S },
+        jose4:     { periodYears: JOSE4_PERIOD_YR,     cosCoeffSeconds: JOSE4_COS_COEFF_S,     sinCoeffSeconds: JOSE4_SIN_COEFF_S },
       },
       resonator: {
-        t0LatticeN: RES_T0_LATTICE_N, q: RES_Q,
+        t0Years: RES_T0_YR, q: RES_Q,
         kicks: [
           { tYear: RES_KICK1_T_YR, cosSeconds: RES_KICK1_COS_S, sinSeconds: RES_KICK1_SIN_S },
           { tYear: RES_KICK2_T_YR, cosSeconds: RES_KICK2_COS_S, sinSeconds: RES_KICK2_SIN_S },
         ],
-        tones: [{ dn: RES_TONE1_DN, phiLockedRad: RES_TONE1_PHI_RAD, ampSeconds: RES_TONE1_AMP_S }],
+        tones: [{ periodYears: RES_TONE1_PERIOD_YR, phiLockedRad: RES_TONE1_PHI_RAD, ampSeconds: RES_TONE1_AMP_S }],
       },
     });
   }
@@ -561,7 +557,7 @@ function jose4CycleLodCorrection(year) { return _dtCycles().cycleLodSecondsAt('j
 
 // ─── Core-mantle swing (Resonator driver) — DEFAULT ON (joint world) ────────
 // Fifth ΔT component in a NEW functional class: a 2-kick EPISODE — windowed
-// damped oscillation of the core's eigenmode (T₀ = 8H/685 ≈ 3,916 yr, Q = 1.80, in the
+// damped oscillation of the core's eigenmode (T₀ = 3,916 yr, Q = 1.80, in the
 // published axiMC range) plus one drive tone at the bond−hallstatt difference
 // frequency (8H/726) with phase LOCKED to the quadratic-mixing prediction
 // φ_bond − φ_hallstatt. Exactly zero before the excitation kick (−800);
@@ -589,13 +585,13 @@ const DT_RESONATOR_ENABLED = process.env.DT_RESONATOR_DISABLED !== '1';
 // Scalar constants — read from data/core-mantle-resonator-stage1.json (_RES
 // above), which reaches the website through the published packages
 // (DT_RESONATOR in @essrt/physics; rendered values in @essrt/model-values).
-// The eigenperiod is LATTICE-LABELED (T₀ = 8H/685 ≈ 3,916 yr): the shipped
-// resonator is the combined effect of the lattice cycles, so under H(t)
-// evolution the episode scales WITH its drivers (clock coherence). Physical
-// caveat, recorded once: the bare axiMC eigenmode is core-material physics;
-// the lattice label is the framework's clock-coherence convention for the
-// shipped component (numeric difference ~1e-6 over the episode's life).
-const RES_T0_LATTICE_N = _RES.T0_lattice_n;
+// The eigenperiod T₀ = 3,916 yr and the drive tone's period are STATED IN
+// YEARS from the file (T0_yr, drive_tones[].period_yr) — the former 8H/685
+// label left the runtime with layer B item 3 (plan 06 T5: the divisor
+// labels carry no information). Physical caveat, recorded once: the bare
+// axiMC eigenmode is core-material physics; the fitted T₀ is the shipped
+// component's convention.
+const RES_T0_YR       = _RES.T0_yr;
 const RES_Q           = _RES.Q;
 const RES_KICK1_T_YR  = _RES.kick_epochs_year[0];
 const RES_KICK1_COS_S = _RES.kick_coefficients_s[0].cos;
@@ -603,7 +599,7 @@ const RES_KICK1_SIN_S = _RES.kick_coefficients_s[0].sin;
 const RES_KICK2_T_YR  = _RES.kick_epochs_year[1];
 const RES_KICK2_COS_S = _RES.kick_coefficients_s[1].cos;
 const RES_KICK2_SIN_S = _RES.kick_coefficients_s[1].sin;
-const RES_TONE1_DN    = _RES.drive_tones[0].dn;
+const RES_TONE1_PERIOD_YR = _RES.drive_tones[0].period_yr;   // the bond−hallstatt beat, in years
 const RES_TONE1_PHI_RAD = _RES.drive_tones[0].phi_locked_rad;
 const RES_TONE1_AMP_S = _RES.drive_tones[0].amp_s;
 
