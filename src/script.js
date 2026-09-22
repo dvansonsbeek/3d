@@ -16,7 +16,7 @@ import { DEFAULT_CONSTANTS as K, REFERENCE_DATA as R, FITTED_COEFFICIENTS as FIT
 // @essrt/reference is private-by-construction and nothing in the model
 // chain depends on it). publishedCurves migrated here from
 // @essrt/physics at its 4.0.0 major.
-import { vsop87AstrometricGeoEclipticAU, vsop87HelioEclipticAU, mpp02AstrometricGeoEclipticJ2000Km, publishedCurves as _PC } from '@essrt/reference';
+import { vsop87AstrometricGeoEclipticAU, vsop87GeoEclipticAU, vsop87HelioEclipticAU, mpp02GeoEclipticJ2000Km, publishedCurves as _PC } from '@essrt/reference';
 
 
 /*
@@ -20639,6 +20639,10 @@ let _zetaSeriesEndYr = 0;
         // 75″ at 0 AD and 377″ at −2500 (the recorded 3c trap, third
         // instance). Rebuild the tier model on the shipped configuration.
         _tierUmbraModel = null;
+        // Plan 06 R3: the chain frame bridge was derived on the first frame,
+        // before this artifact — re-derive it once on the corrected axis
+        // (_kcDeriveFrameR; the frames-only form, no body position).
+        _kcR = null;
         console.log(`secular series loaded from ${url} (earth + ${Object.keys(a.bodies).length - 1} planets) — planet deep-time elements + Earth ε/e one-source ${HYBRID_SPIN_REQUESTED ? 'ON (D4; the K device is only the pre-load fallback — plan 06 D5)' : 'planets on; Earth on the K device (fallback)'}`);
         return;
       } catch (e) { /* try the next candidate */ }
@@ -26277,7 +26281,7 @@ function setupGUI() {
     ];
     for (const [key, label] of stdRows) {
       addTooltip(stdFolder.addBinding(o, key, { label, ...stdFmt }),
-        'Geocentric angular separation between the model’s rendered body and the VSOP87 standard position (astrometric, same light-time convention both sides). Updates only while the overlay is on.');
+        'Geocentric angular separation between the model’s rendered body and the standard theory’s position (VSOP87A / MPP02) at the same TT instant — the standard side on the Stephenson ΔT, so the Δ includes the model’s own ΔT deviation (~5″ for the Moon at J2000, <1″ today). Sun and Moon compared geometric (the orrery’s place); planets astrometric (the chain’s light-time construction). Updates only while the overlay is on.');
     }
   }
 
@@ -53354,46 +53358,88 @@ function _kcSecularShape(nameLower) {
   const rest = { count: modes.length - 2, amp: restAmp, sharePct: restAmp / ampSumAll * 100 };
   return (_kcShapeCache[nameLower] = { dom, sub, rest });
 }
-function _kcTriad(p, q) {
-  const u = p;
-  const w0 = [p[1] * q[2] - p[2] * q[1], p[2] * q[0] - p[0] * q[2], p[0] * q[1] - p[1] * q[0]];
-  const wn = Math.hypot(w0[0], w0[1], w0[2]), w = [w0[0] / wn, w0[1] / wn, w0[2] / wn];
-  const v = [w[1] * u[2] - w[2] * u[1], w[2] * u[0] - w[0] * u[2], w[0] * u[1] - w[1] * u[0]];
-  return [u, v, w];
-}
 // The ecliptic-J2000 → scene-world rotation R, DERIVED at runtime from the
-// scene's own Earth triad (never a pasted matrix — any scene convention
-// change propagates automatically; tools/explore/k3-frame-probe.mjs measured
-// the frame inertial with ≤9″ derivation spread through the seasons). The
-// probe re-animates the model to two epochs near J2000 and restores o.pos —
-// the same moveModel(pos) idempotence jumpToJulianDay relies on.
+// scene's own FRAMES at the chain anchor epoch (never a pasted matrix — any
+// scene convention change propagates automatically):
+//   ẑ = the sun-plane normal (the plane the chain's ecliptic maps onto),
+//   x̂ = the CORRECTED axis frame's RA = 0 direction projected onto that
+//       plane (the longitude origin the wheel Sun's δ block realizes and
+//       every RA/Dec instrument reads through),
+//   ŷ = ẑ × x̂.
+// Plan 06 R3 (measured): the former TRIAD form matched the chain Earth's
+// heliocentric direction to the scene's Earth–Sun direction at two instants
+// — a BODY match. It absorbed the chain Earth's +3.5″ offset from the
+// certified Sun at J2000 (the chain carries no lunar equation) into every
+// planet's placement and every Standard-Model ghost — and, because this
+// function runs on the FIRST FRAME, also whatever Sun that frame rendered:
+// the analytic twin, +11.6″ from the certified Sun before the series
+// artifact arrives (the overlay's Sun read 8.2″ with the certified Sun 0.8″
+// from VSOP; the Node twin, artifact loaded synchronously, read 2.2″).
+// Frames carry no body position; the series load site clears _kcR so the
+// derivation re-runs once on the corrected axis. NOT the sun-plane's node
+// on the equator as the origin: it is 51.6″ from the RA frame's equinox at
+// J2000 (the recorded K sun-plane finding — docs/41). The probe re-animates
+// the model to the anchor and restores o.pos — the same moveModel(pos)
+// idempotence jumpToJulianDay relies on; the mixed-state trap (a bare
+// moveModel while o.julianDay points elsewhere twisted R by 5.84° —
+// k4b-browser-parity) is why it jumps. Mirror: tools/lib/scene-graph.js
+// _kcFrameR — identical ops.
+let _kcDeriving = false;
+// The second bridge, for bodies the scene places in the RA FRAME: the Moon
+// mesh is set from its ecliptic (λ, β) through the scene ε into RA/Dec in
+// earth.rotationAxis — its ecliptic is the axis frame's ε-tilted plane, NOT
+// the sun plane. The two planes part by 20.5″ at J2000 (the K sun-plane
+// finding seen from the pole; docs/41), so a Moon ghost placed through the
+// sun-plane bridge read 14.5″ where the Moon models agree to ~5″ (the ΔT
+// difference). Same x̂ (RA 0), pole = the axis tilted by the scene ε toward
+// RA 270°: ẑ = cos ε·Ŷ − sin ε·X̂ (X̂ = local +X = RA 90°).
+let _kcREps = null;
+function _kcFrameFromScene() {
+  // reads the CURRENT matrices: the sun-plane normal and the axis frame's
+  // RA = 0 direction (local +Z — theta = atan2(x, z)) projected onto the plane
+  const n = _KC_TA.set(0, 1, 0).applyQuaternion(barycenterEarthAndSun.pivotObj.getWorldQuaternion(_HTC_Q1)).normalize();
+  const qAxis = earth.rotationAxis.getWorldQuaternion(_HTC_Q2);
+  const x = _KC_TE.set(0, 0, 1).applyQuaternion(qAxis);
+  // the ε-frame bridge first (needs the unprojected RA 0 and the axis)
+  const a = _KC_V.set(0, 1, 0).applyQuaternion(qAxis).normalize();
+  const eps = Math.acos(Math.min(1, Math.max(-1, a.dot(n))));   // the scene ε (≡ the ε target once corrected)
+  const xe = _HTC_A.copy(x).normalize();
+  const ze = _HTC_N.set(1, 0, 0).applyQuaternion(qAxis).multiplyScalar(-Math.sin(eps)).addScaledVector(a, Math.cos(eps)).normalize();
+  const ye = _HTC_U.crossVectors(ze, xe);
+  _kcREps = [[xe.x, ye.x, ze.x], [xe.y, ye.y, ze.y], [xe.z, ye.z, ze.z]];
+  // the sun-plane bridge (the chain planets' and the Sun's plane)
+  x.addScaledVector(n, -x.dot(n)).normalize();
+  const y = _KC_TS.crossVectors(n, x);   // ŷ = ẑ × x̂
+  return [[x.x, y.x, n.x], [x.y, y.y, n.y], [x.z, y.z, n.z]];
+}
 function _kcDeriveFrameR() {
-  const chainHat = (jd) => { const p = _kcHelioAU('earth', jd); const n = Math.hypot(p[0], p[1], p[2]); return [p[0] / n, p[1] / n, p[2] / n]; };
-  // The scene probe must run in the REAL pipeline state: a bare
-  // moveModel(posFromJD(jd)) while o.julianDay points elsewhere is a MIXED
-  // state (moveModel reads JD-driven globals) and twisted R by 5.84° when
-  // the flag was first enabled at a year-1600 epoch — measured,
-  // k4b-browser-parity. jumpToJulianDay + the 'minimal' tier (moveModel +
-  // matrix updates only — it cannot recurse into updatePositions, whose top
-  // is this function's caller) is the moonSceneState save/restore pattern.
+  if (_kcDeriving) return;   // the anchor capture inside the tilt correction re-enters updatePositions
+  _kcDeriving = true;
   const savedJD = o.julianDay;
-  const sceneHat = (jd) => {
-    jumpToJulianDay(jd);
+  try {
+    jumpToJulianDay(KC_ANCHOR_EPOCH_JD);
     forceSceneUpdate('minimal');
-    sun.planetObj.getWorldPosition(SUN_POS);
-    earth.rotationAxis.getWorldPosition(EARTH_POS);
-    const v = [EARTH_POS.x - SUN_POS.x, EARTH_POS.y - SUN_POS.y, EARTH_POS.z - SUN_POS.z];
-    const n = Math.hypot(v[0], v[1], v[2]); return [v[0] / n, v[1] / n, v[2] / n];
-  };
-  const jd1 = KC_ANCHOR_EPOCH_JD, jd2 = jd1 + 91.3;   // quarter orbit
-  const A = _kcTriad(chainHat(jd1), chainHat(jd2));
-  const B = _kcTriad(sceneHat(jd1), sceneHat(jd2));
-  jumpToJulianDay(savedJD);                            // restore the live frame
-  forceSceneUpdate('minimal');
-  const R = [[0, 0, 0], [0, 0, 0], [0, 0, 0]];
-  for (let i = 0; i < 3; i++) for (let j = 0; j < 3; j++)
-    for (let k = 0; k < 3; k++) R[i][j] += B[k][i] * A[k][j];
-  _kcR = R;
+    // PROVISIONAL bridge from the uncorrected axis first: the tilt
+    // correction below may run the one-time J2000 anchor capture, whose
+    // nested full update reads _kcR through the chain override branches —
+    // it must never see null. At J2000 the correction moves RA 0 by a
+    // negligible amount (Δψ is anchored to zero there; the ε rotation is
+    // about the node line, 51.6″ from RA 0), so the provisional form is
+    // already the bridge to <0.01″; the final read below is the exact one.
+    _kcR = _kcFrameFromScene();
+    // the CORRECTED axis at the anchor (the δ block's own year convention;
+    // a no-op before the series artifact arrives / with the option off)
+    const yK = DEEP_TIME_MODE_ENABLED
+      ? _jdToSIyear(KC_ANCHOR_EPOCH_JD)
+      : (KC_ANCHOR_EPOCH_JD - startmodelJD) / meansolaryearlengthinDays + startmodelyearwithCorrection;
+    _applyHybridTiltCorrB(_sceneEpsTargetDeg(yK));
+    earth.rotationAxis.updateWorldMatrix(true, false);
+    _kcR = _kcFrameFromScene();
+  } finally {
+    jumpToJulianDay(savedJD);                            // restore the live frame
+    forceSceneUpdate('minimal');
+    _kcDeriving = false;
+  }
 }
 const _KC_V = new THREE.Vector3();   // scratch for the visual override
 // P5/K5b — the chain position AT AN ARBITRARY MOMENT, for consumers that
@@ -53506,9 +53552,40 @@ function _kcUpdateOrbitLine(obj, nm, jd) {
 // JPL-cache-measured 0.3–3.6″ RMS over 1600–2400 — the k8-vsop-probe
 // record), rendered as ghost bodies next to the model's own, with a live
 // per-body Δ readout (geocentric angular separation, model vs standard).
-// BOTH sides share one convention: astrometric (body retarded by
-// light-time, Earth at reception time), the same construction the chain
-// flip uses. ONE-WAY BOUNDARY (the K2 doctrine): the reference evaluator
+// CONVENTIONS, per body (plan 06 R3 scene conventions — the comparison
+// names both its place convention and its clock, or it measures nothing):
+//   • clock: BOTH sides at the same instant on TT — the scene at its own
+//     true TT (deltaTStart + curve), the standard side at the standard ΔT
+//     (Stephenson 2016 spline; before −720 the paper's long-term parabola;
+//     after 2016 the spline's end value held — the parabola reads −200 s
+//     there and had put every present-day ghost 10″ (Sun) / 140″ (Moon)
+//     off, measured). The Δ therefore carries the model's ΔT deviation
+//     (×0.55″/s for the Moon: ~5″ at J2000, <1″ today) — a model claim,
+//     shown, never tuned away.
+//   • frame: ghosts and chain planets ride the bridge R, derived from the
+//     scene's FRAMES at J2000 (_kcDeriveFrameR) — never from a body
+//     position. The former Earth-direction triad had folded the chain
+//     Earth's +3.5″ and the first frame's analytic-twin Sun (+11.6″) into
+//     every ghost: the overlay Sun read 8.2″ where the certified Sun is
+//     0.8″ from VSOP. With the frames form the Sun's Δ IS cert − VSOP.
+//     The Moon ghost rides the second bridge _kcREps (the RA frame's
+//     ε-tilted ecliptic — the plane the scene Moon is placed in), because
+//     the scene's sun plane and that plane part by 20.5″ at J2000 (docs/41):
+//     through R the Moon read 14.5″ where the two Moon models agree to ~5″.
+//   • Sun and Moon: GEOMETRIC both sides (VSOP87A / MPP02 geometric) — the
+//     scene is an orrery of where the bodies ARE; Earth's shadow is cast by
+//     the geometric Sun and the Moon enters it at its geometric place.
+//     The ASTROMETRIC place (light-time + no observer aberration, the
+//     Horizons quantity-1 convention) is a star-chart convention 20″·cos D
+//     from the geometric Moon; comparing it with a geometric scene Moon read
+//     18–26″ (measured) — the retired D5 layer had made the rendered Moon
+//     astrometric to match that reference.
+//   • Planets: ASTROMETRIC both sides — the chain flip renders the seven
+//     planets light-time retarded (K4.6), the one place convention the
+//     scene has not yet unified with the Sun and Moon (an R4 decision:
+//     geometric planets with the instrument bridging the astrometric
+//     references, as the pipeline verifier already does for the Moon).
+// ONE-WAY BOUNDARY (the K2 doctrine): the reference evaluator
 // renders and compares only — nothing in the model chain consumes it.
 // The comparison is published either way it falls; nothing is tuned to it.
 // Beyond ±4 kyr the overlay is a stated extrapolation of the standard
@@ -53627,30 +53704,45 @@ function _k8UpdateStandardOverlay() {
 function _k8UpdateStandardOverlayInner() {
   _k8EnsureGhosts();
   const R = _kcR;
+  if (!R) {
+    // no bridge this frame (the frame derivation is in progress — its anchor
+    // capture re-enters updatePositions — or the series artifact just
+    // cleared it): hide the ghosts, never touch a null R (the fail-soft
+    // wrapper would otherwise switch the overlay OFF for good).
+    for (const g of Object.values(_k8Ghosts)) { g.visible = false; if (g._k8Orbit) g._k8Orbit.visible = false; }
+    return;
+  }
   const lightDaysPerAU = auToKm(1) / speedOfLight / 86400;   // from the model's own c/AU homes
   for (const [name] of _K8_BODIES) {
     const body = _k8BodyObj(name);
     const ghost = _k8Ghosts[name];
-    // the standard side: VSOP87A (planets/Sun) or ELP/MPP02 (Moon)
-    // astrometric geocentric, ecliptic J2000 → scene world through the
-    // SAME frame bridge and Earth anchor the chain rendering uses. The
-    // MOON's standard side runs on TT via the STANDARD ΔT (Stephenson
-    // 2016 spline; the published long-term parabola outside its window —
-    // the model's own ΔT stack stays out of the reference side). Until
-    // the async poly loads, the Moon ghost stays hidden.
+    // the standard side: VSOP87A (planets/Sun) or ELP/MPP02 (Moon),
+    // geocentric ecliptic J2000 → scene world through the SAME frame bridge
+    // and Earth anchor the chain rendering uses. EVERY body's standard side
+    // runs on TT via the STANDARD ΔT (Stephenson 2016 spline; the published
+    // long-term parabola outside its window — the model's own ΔT stack stays
+    // out of the reference side; formerly the Sun and planets were evaluated
+    // at UT, 2.7″ of the Sun's Δ). Until the async poly loads, the ghosts
+    // stay hidden. Place conventions per body: see the header.
+    if (!_stephensonDtPoly) { loadStephensonDtPolynomial(); ghost.visible = false; if (ghost._k8Orbit) ghost._k8Orbit.visible = false; continue; }
+    const jdTT = o.julianDay + _PC.stephensonDeltaTExtended(o.currentYear, _stephensonDtPoly) / 86400;
     let g;
     if (name === 'moon') {
-      if (!_stephensonDtPoly) { loadStephensonDtPolynomial(); ghost.visible = false; continue; }
-      const dT = _PC.stephensonDeltaTExtended(o.currentYear, _stephensonDtPoly);
-      const gKm = mpp02AstrometricGeoEclipticJ2000Km(o.julianDay + dT / 86400, lightDaysPerAU, auToKm(1));
+      const gKm = mpp02GeoEclipticJ2000Km(jdTT);                       // geometric — the orrery's place
       g = [gKm[0] / auToKm(1), gKm[1] / auToKm(1), gKm[2] / auToKm(1)];
+    } else if (name === 'sun') {
+      g = vsop87GeoEclipticAU('sun', jdTT);                            // geometric (≡ astrometric for the Sun)
     } else {
-      g = vsop87AstrometricGeoEclipticAU(name, o.julianDay, lightDaysPerAU);
+      g = vsop87AstrometricGeoEclipticAU(name, jdTT, lightDaysPerAU);  // astrometric — the chain's K4.6 construction (interim, header)
     }
+    // the bridge of the plane the SCENE places this body in: the Moon mesh
+    // is set through the RA frame with the scene ε (_kcREps); the Sun and
+    // the chain planets ride the sun plane (R) — see _kcFrameFromScene
+    const RB = name === 'moon' && _kcREps ? _kcREps : R;
     _K8_V.set(
-      EARTH_POS.x + 100 * (R[0][0] * g[0] + R[0][1] * g[1] + R[0][2] * g[2]),
-      EARTH_POS.y + 100 * (R[1][0] * g[0] + R[1][1] * g[1] + R[1][2] * g[2]),
-      EARTH_POS.z + 100 * (R[2][0] * g[0] + R[2][1] * g[1] + R[2][2] * g[2]));
+      EARTH_POS.x + 100 * (RB[0][0] * g[0] + RB[0][1] * g[1] + RB[0][2] * g[2]),
+      EARTH_POS.y + 100 * (RB[1][0] * g[0] + RB[1][1] * g[1] + RB[1][2] * g[2]),
+      EARTH_POS.z + 100 * (RB[2][0] * g[0] + RB[2][1] * g[1] + RB[2][2] * g[2]));
     ghost.position.copy(_K8_V);
     body.planetObj.getWorldScale(_K8_S);
     ghost.scale.copy(_K8_S);
@@ -53824,7 +53916,7 @@ function updatePositions() {
     // P5/K5b — the perihelion MARKERS onto the chain: chain ϖ(t) direction
     // at the LEGACY anchor + display radius (see _KC_PERI_MARKERS above).
     const _kcPeri = _KC_PERI_MARKERS[obj.name];
-    if (_kcPeri) {
+    if (_kcPeri && _kcR) {   // R may be absent for one frame (derivation in progress / artifact just cleared it)
       const _R = _kcR;
       const _lpRad = _kcPerihelionEclLonDeg(_kcPeri, o.julianDay) * (Math.PI / 180);
       // GEOCENTRIC DEVICE CONVENTIONS (owner-verified against the legacy

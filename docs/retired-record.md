@@ -159,11 +159,15 @@ layer applied to the rendered Moon's direction. Measured against JPL
 Horizons' apparent Moon over 1970–2049: the bare series with its derived
 extension reads −1.0″ ± 1.5″, flat in elongation — the Moon needs no
 anchor — while the rendered Moon read +32.5″ + 20″·cos D. The layer had
-been validated against Horizons' ASTROMETRIC Moon, a bookkeeping
-intermediate that sits ~20″·cos D from both the geometric and the apparent
-place (for a body co-moving with the observer the stellar aberration cancels
-against its barycentric light-time, leaving the 0.7″ relative term); the
-patches were fitted around it at syzygies, and the anchor absorbed the
+been validated against Horizons' ASTROMETRIC Moon — the star-chart
+convention (the body at emission time, the observer's aberration not
+applied), a valid place ~20″·cos D from both the geometric and the apparent
+one — and applied that reference's convention to the rendered Moon, on the
+wrong side of the boundary: the scene is an orrery of where the bodies are
+(geometric; Earth's shadow is cast by the geometric Sun), and the
+conversion belongs to the comparison instrument (the pipeline verifier
+bridges it). The patches were fitted around the layer at syzygies, and the
+anchor absorbed the
 eclipse tier's mean Sun — its aberration κ, the long inequality the Sun
 lacked before I2, and the trend-ΔT offset. The location tier now rides
 apparent places for each body on its own physics (the Sun's κ, the Moon's

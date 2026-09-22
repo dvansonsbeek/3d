@@ -192,17 +192,30 @@ function stephensonDeltaT(year, poly) {
   return null;
 }
 
-/** Stephenson, Morrison & Hohenkerk (2016) ΔT with their published
- * LONG-TERM PARABOLA outside the spline window: ΔT = −320 + 32.5·t²
- * seconds, t = (year − 1825)/100 (the paper's eq. 4.1 fit). Used by the
- * K8 standard-model overlay so the standard side has a ΔT at any epoch;
- * inside [−720, 2016] the spline is authoritative.
+/** Stephenson, Morrison & Hohenkerk (2016) ΔT extended outside the spline
+ * window. Inside [−720, 2016] the spline is authoritative. BEFORE the window
+ * the paper's own long-term parabola ΔT = −320 + 32.5·t² s, t = (year −
+ * 1825)/100 (eq. 4.1) is the published extrapolation. AFTER the window the
+ * spline's END VALUE is held: the parabola is a fit to the whole record and
+ * reads −200.8 s at 2016.5 against the spline's +68.0 s at 2015.9 — a 269-s
+ * step that put the K8 overlay's standard-side Sun 10″ and Moon 140″ off at
+ * every present-day date (plan 06 R3, measured); the observed ΔT (IERS) ran
+ * 68.1 → 69.2 s over 2016–2026, i.e. flat within 1.4 s of the held value.
+ * Used by the K8 standard-model overlay so the standard side has a ΔT at any
+ * epoch.
  * @param {number} year - calendar year
  * @param {{segments: Array<{y0:number,y1:number,a:number[]}>}|null} poly - the app-loaded spline JSON (null → parabola only)
  * @returns {number} ΔT in seconds */
 function stephensonDeltaTExtended(year, poly) {
   const spline = poly ? stephensonDeltaT(year, poly) : null;
   if (spline !== null) return spline;
+  if (poly && poly.segments.length) {
+    const last = poly.segments[poly.segments.length - 1];
+    if (year > last.y1) {
+      const end = stephensonDeltaT(last.y1, poly);
+      if (end !== null) return end;   // hold the spline's end value (see above)
+    }
+  }
   const t = (year - 1825) / 100;
   return -320 + 32.5 * t * t;
 }

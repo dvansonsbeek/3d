@@ -460,9 +460,16 @@ co-moving with the observer those two effects are equal and opposite up to
 the relative light-time (≈0.7″), so the astrometric Moon sits ~20″·cos D
 from BOTH the geometric and the apparent Moon. Measured against the
 apparent Moon, the rendered Moon read +32.5″ + 20″·cos D (52″ at new moon,
-12″ at full moon) while the bare series read −1.0″ flat — the layer was
-the wrong physics and the patches were fitted around it at syzygies. All
-three left: the override is the frame conversion alone. The instruments
+12″ at full moon) while the bare series read −1.0″ flat. The astrometric
+place is a valid convention — the star-chart one — applied on the wrong
+side of the boundary: the scene is an orrery of where the bodies are
+(geometric; Earth's shadow is cast by the geometric Sun and the Moon enters
+it at its geometric place), and the conversion to a reference's convention
+belongs to the comparison instrument (the pipeline verifier bridges its
+astrometric JPL reference, `tools/lib/optimizer.js`; the Standard-Model
+overlay compares the Moon geometric against MPP02 geometric). The patches
+were fitted around the layer at syzygies. All three left: the override is
+the frame conversion alone. The instruments
 of the former decomposition (`derive-moon-correction-content.js`,
 `residual-attribution-{elp,mpp02}.js`, `tools/lib/elp-mpp02.js`) stay as
 its record; the "+4.05″ JPL − MPP02 gap" they measured at raCosMp was

@@ -512,7 +512,7 @@
       "data/rspa20160404supp2/Table-S14.txt": "sha256:67485e0c349f5c2e7ec3aa4f7952e93832fc1d6728f4bd8f4bfbcd26f7c6a6e6",
       "packages/api/src/app.js": "sha256:b182c6c3c5128cd4ecf5cda7d7af5fcb847b1f200ee2399a696e563552984cd3",
       "packages/physics/src/eclipse/finders.cjs": "sha256:168755d5e01397b7f63f2ffa49101afe0da0046e5fbd9e7ef6d04be6d7f5d330",
-      "packages/physics/src/moon/apparent.cjs": "sha256:a3f345c82389245293ae80bd50856099b6231f01857638dcefeb0aaca5155d45",
+      "packages/physics/src/moon/apparent.cjs": "sha256:5a63a95cf8d26c4d44e7b7acd4308cbd7240aa2bcee70d04c70b273413090335",
       "packages/physics/src/moon/ecc-channel.cjs": "sha256:e986b8ca3dbfdaa8508f49f315bc81718503b91eb56298d9ad4d7c29186fc691",
       "packages/physics/src/moon/series.cjs": "sha256:044185825129b0a37619882c2eaa7ded446d35b8994c5a2b6a5d0cd56d13ee4d",
       "public/input/fitted-coefficients.json": "sha256:876a779e985879f1a3824a7a40d2b07a266c3b451bedb7da98e477d7f30b4802",

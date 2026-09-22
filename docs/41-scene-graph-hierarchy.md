@@ -293,6 +293,32 @@ plan 06). The eclipse umbra never reads the wheel: since U1 the package
 besselian in `@essrt/physics` is the **single umbra implementation** end to
 end — the scene consumes its output.
 
+**The chain frame bridge** (ecliptic-J2000 → scene world, the one rotation
+every chain planet, orbit ring, perihelion marker and Standard-Model ghost is
+placed through; `_kcDeriveFrameR` / `_kcFrameR`, identical ops) is derived at
+runtime from the scene's **frames** at the chain anchor epoch: the sun-plane
+normal as the pole, the corrected axis frame's RA = 0 direction projected onto
+that plane as the longitude origin — the origin the wheel Sun's δ block
+realizes and the RA/Dec instruments read through. Plan 06 R3 replaced the
+former **Earth-direction triad** (the chain Earth's heliocentric direction
+matched to the scene's Earth–Sun direction at two instants), a body match that
+had folded the chain Earth's +3.5″ offset from the certified Sun at J2000 (the
+chain carries no lunar equation) into every planet's placement — and, in the
+browser, the first frame's analytic-twin Sun (+11.6″ before the series artifact
+arrives) into every Standard-Model ghost: the overlay's Sun read 8.2″ where the
+certified Sun is 0.8″ from VSOP87 (the Node twin, artifact loaded
+synchronously, read 2.2″). The frames form moves the Node bridge by 2.96″ about
+the pole and 0.39″ in tilt; the browser re-derives once when the artifact
+lands. Two findings recorded with it: the scene's sun plane and the RA frame's
+ecliptic are 20.5″ apart at J2000 (the node line 51.6″ from RA = 0, the
+sun-plane finding above seen from the pole), so the rendered Sun's declination
+parts from a body on the RA-frame ecliptic by up to ±20″ near the equinoxes
+(0.3–0.5″ against JPL at the solstices, measured; no gate reads the Sun's
+declination at the equinoxes); and the Node fast Sun path
+(`computeSunPositionFast`, the Step 6a campaign instrument) carries no δ block —
+it is the K wheel Sun, 8–18″ from the certified Sun in 2000, and is not the
+scene Sun.
+
 ---
 
 ## Part 8: Moon Hierarchy

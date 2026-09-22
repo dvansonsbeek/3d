@@ -1848,7 +1848,7 @@ function _invalidateGraph() {
 // engine raw — no observation-fitted correction rides it (the
 // source-of-truth doctrine); the legacy geometric planet chains and their
 // fitted stack were EXCISED with K5.
-let _kcModule = null, _kcChains = null, _kcR = null;
+let _kcModule = null, _kcChains = null, _kcR = null, _kcREps = null;
 function _kc() { if (!_kcModule) _kcModule = require('./keplerian-chain.js'); return _kcModule; }
 function _kcHelioAU(target, jd) {
   const KCm = _kc();
@@ -1867,33 +1867,64 @@ function _kcHelioAU(target, jd) {
   const p = KCm.computeHeliocentricEclipticFromElements(el);
   return [p.xAU, p.yAU, p.zAU];
 }
-function _kcTriad(p, q) {
-  const u = p;
-  const w0 = [p[1] * q[2] - p[2] * q[1], p[2] * q[0] - p[0] * q[2], p[0] * q[1] - p[1] * q[0]];
-  const wn = Math.hypot(...w0), w = [w0[0] / wn, w0[1] / wn, w0[2] / wn];
-  const v = [w[1] * u[2] - w[2] * u[1], w[2] * u[0] - w[0] * u[2], w[0] * u[1] - w[1] * u[0]];
-  return [u, v, w];
-}
+// The ecliptic-J2000 → scene-world rotation R, derived at runtime from the
+// scene's own FRAMES at the chain anchor epoch (never a pasted matrix):
+//   ẑ = the sun-plane normal (the plane the chain's ecliptic maps onto),
+//   x̂ = the CORRECTED axis frame's RA = 0 direction projected onto that
+//       plane (the longitude origin the wheel Sun's δ block realizes and
+//       every RA/Dec instrument reads through),
+//   ŷ = ẑ × x̂.
+// Plan 06 R3 (measured): the former TRIAD form matched the chain Earth's
+// heliocentric direction to the scene's Earth–Sun direction at two instants
+// — a BODY match. It absorbed the chain Earth's +3.5″ offset from the
+// certified Sun at J2000 (the chain carries no lunar equation) into every
+// planet's placement, and in the browser also whatever Sun the FIRST FRAME
+// rendered (the analytic twin, +11.6″ from the certified Sun before the
+// series artifact arrives) — the Standard-Model overlay's Sun read 8.2″
+// there with the certified Sun 0.8″ from VSOP. Frames carry no body
+// position: R moves 2.96″ about the pole and 0.39″ in tilt against the
+// triad form here. NOT the sun-plane's node on the equator as the origin:
+// that is 51.6″ from the RA frame's equinox at J2000 (the recorded K
+// sun-plane finding — docs/41). Mirror: src/script.js _kcDeriveFrameR —
+// identical ops.
 function _kcFrameR(graph) {
   if (_kcR) return _kcR;
   const KCm = _kc();
-  const sceneEarthHat = (jd) => {
-    _syncEpochForJD(jd);
-    moveModel(graph, _posFromJDTools(jd));
-    const sun = graph.sunNodes.pivot.getWorldPosition();
-    const earth = graph.earthNodes.rotAxis.getWorldPosition();
-    const v = [earth[0] - sun[0], earth[1] - sun[1], earth[2] - sun[2]];
-    const n = Math.hypot(...v); return [v[0] / n, v[1] / n, v[2] / n];
-  };
-  const evalEarthHat = (jd) => { const p = _kcHelioAU('earth', jd); const n = Math.hypot(...p); return [p[0] / n, p[1] / n, p[2] / n]; };
-  const jd1 = KCm.ANCHOR_EPOCH_JD, jd2 = KCm.ANCHOR_EPOCH_JD + 91.3;   // quarter orbit
-  const A = _kcTriad(evalEarthHat(jd1), evalEarthHat(jd2));
-  const B = _kcTriad(sceneEarthHat(jd1), sceneEarthHat(jd2));
-  const R = [[0, 0, 0], [0, 0, 0], [0, 0, 0]];
-  for (let i = 0; i < 3; i++) for (let j = 0; j < 3; j++)
-    for (let k = 0; k < 3; k++) R[i][j] += B[k][i] * A[k][j];
-  _kcR = R;
-  return R;
+  const jd1 = KCm.ANCHOR_EPOCH_JD;
+  _syncEpochForJD(jd1);
+  const pos = _posFromJDTools(jd1);
+  moveModel(graph, pos);
+  // the CORRECTED axis at the anchor (the frame every validated RA/Dec
+  // surface reads through; self-clearing, a no-op when the option is off)
+  _applyOneSourceTiltCorr(graph, _osmYearForJD(jd1, C.startModelYearWithCorrection + pos));
+  const ne = graph.barycenter.pivot.worldMatrix.e, ae = graph.earthNodes.rotAxis.worldMatrix.e;
+  let nx = ne[4], ny = ne[5], nz = ne[6];
+  { const s = Math.hypot(nx, ny, nz); nx /= s; ny /= s; nz /= s; }
+  let xx = ae[8], xy = ae[9], xz = ae[10];                 // rotAxis local +Z = RA 0 (theta = atan2(x, z))
+  { const s = Math.hypot(xx, xy, xz); xx /= s; xy /= s; xz /= s; }
+  // The second bridge (browser twin _kcREps): the RA frame's ε-tilted
+  // ecliptic — the plane the scene Moon is placed in (its (λ, β) go through
+  // the scene ε into RA/Dec in rotAxis). Same x̂ (RA 0, unprojected); pole =
+  // the axis tilted by the scene ε toward RA 270°: ẑ = cos ε·Ŷ − sin ε·X̂.
+  // The sun plane and this plane part by 20.5″ at J2000 (docs/41).
+  {
+    let ax = ae[4], ay = ae[5], az = ae[6];
+    { const s = Math.hypot(ax, ay, az); ax /= s; ay /= s; az /= s; }
+    let bx = ae[0], by = ae[1], bz = ae[2];                // local +X = RA 90°
+    { const s = Math.hypot(bx, by, bz); bx /= s; by /= s; bz /= s; }
+    const eps = Math.acos(Math.min(1, Math.max(-1, ax * nx + ay * ny + az * nz)));
+    let zx = Math.cos(eps) * ax - Math.sin(eps) * bx, zy = Math.cos(eps) * ay - Math.sin(eps) * by, zz = Math.cos(eps) * az - Math.sin(eps) * bz;
+    { const s = Math.hypot(zx, zy, zz); zx /= s; zy /= s; zz /= s; }
+    const yex = zy * xz - zz * xy, yey = zz * xx - zx * xz, yez = zx * xy - zy * xx;   // ŷ = ẑ × x̂
+    _kcREps = [[xx, yex, zx], [xy, yey, zy], [xz, yez, zz]];
+  }
+  // the sun-plane bridge: RA 0 projected onto the plane
+  const d = xx * nx + xy * ny + xz * nz;
+  xx -= d * nx; xy -= d * ny; xz -= d * nz;
+  { const s = Math.hypot(xx, xy, xz); xx /= s; xy /= s; xz /= s; }
+  const yx = ny * xz - nz * xy, yy = nz * xx - nx * xz, yz = nx * xy - ny * xx;   // ŷ = ẑ × x̂
+  _kcR = [[xx, yx, nx], [xy, yy, ny], [xz, yz, nz]];
+  return _kcR;
 }
 
 function computePlanetPosition(target, jd) {
@@ -2212,6 +2243,7 @@ module.exports = {
   _getGraphForProbe: () => getGraph(),   // research probes: the internal graph AFTER a computePlanetPosition call
   _frameworkSunLonProbe: (jd) => _frameworkSunLon(jd),   // research probes: the E5 twin (wheel-versus-twin decomposition)
   _injectKeplerChains: (chains) => { _kcChains = chains; },   // research probes (K4.5 acceptance): override the flag path's chains (null → reload from the artifact)
-  _kcDebugR: () => _kcR,   // research probes (K4b parity): the derived frame bridge
+  _kcDebugR: () => _kcR,   // research probes (K4b parity): the derived frame bridge (sun plane)
+  _kcDebugREps: () => _kcREps,   // research probes: the RA-frame ε-ecliptic bridge (the scene Moon's plane)
   _moonSeriesForProbe: () => _moonSeriesM(),   // research probes: the shared Meeus series (incl. the truncated eclipse-finder forms)
 };

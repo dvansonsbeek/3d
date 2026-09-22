@@ -8,18 +8,22 @@
  * WHAT LEFT, and the measurement that retired it (record; the values stay in
  * git history and docs/retired-record.md):
  *  - the "D5 derived optics" — the annual aberration v_E/c applied to the
- *    Moon's direction ("moonAberrationRaDec"). Physics: for a body co-moving
- *    with the observer the stellar aberration cancels against its
- *    barycentric light-time displacement, leaving only the relative
- *    light-time (≈0.7″); Horizons' apparent Moon coincides with the geometric
- *    Moon to that 0.7″. D5 had validated against Horizons' ASTROMETRIC Moon
- *    (QUANTITIES=1 — light-time without the observer's aberration, a
- *    bookkeeping intermediate 20″ from BOTH the geometric and the apparent
- *    place), read the 20.5″·cos D it saw as "apparent-Sun content in the
- *    frames", and built the subtraction. Measured against Horizons'
- *    apparent Moon over 1970–2049: the rendered Moon read +32.5″ + 20″·cos D
- *    (52″ at new moon, 12″ at full moon); the bare series + extension read
- *    −1.0″ ± 1.5″, flat in elongation.
+ *    Moon's direction ("moonAberrationRaDec"). That operation turns the
+ *    geometric Moon into its ASTROMETRIC place (the body at emission time,
+ *    the observer's aberration not applied — Horizons quantity 1, a
+ *    star-chart convention 20″·cos D from both the geometric and the
+ *    apparent Moon). D5 had validated against exactly that reference and
+ *    so applied the REFERENCE'S convention to the RENDERED Moon. The scene
+ *    is an orrery of where the bodies are — geometric: Earth's shadow is
+ *    cast by the geometric Sun and the Moon enters it at its geometric
+ *    place — so the conversion belongs to the comparison instrument (the
+ *    pipeline verifier bridges it, tools/lib/optimizer.js), not to the
+ *    scene. Measured over 1970–2049: the bare series + extension against
+ *    Horizons' APPARENT Moon (≡ geometric − 0.7″ for a co-moving body)
+ *    −1.0″ ± 1.5″ flat in elongation; the D5-shifted rendered Moon +32.5″ +
+ *    20″·cos D against the same. (Plan 06 R3 scene conventions — the
+ *    earlier wording "wrong physics" over-reached: astrometric is a valid
+ *    convention, applied on the wrong side of the boundary.)
  *  - the fitted RA/Dec patches MOON_CORRECTION (pure-Meeus A/B) and
  *    MOON_CORRECTION_RESIDUAL (the post-D5 remainder, dominated by a −5.1″
  *    raCosMp term): fitted around the layer above at syzygies; the series +
