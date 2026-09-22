@@ -1,7 +1,7 @@
 ---
 docVersion: 1.0
 modelVersion: v14.0
-coefficients: sha256:78f99d98186e50d9
+coefficients: sha256:8c6f14edf5f84905
 status: current
 ---
 
@@ -492,7 +492,7 @@ the torque factors, measured 12 min off in the medieval era) + equation of
 centre on the banked series' e(t) and ϖ(t) plus the derived mean-element
 offset (`data/earth-osculating-mean-offset.json`, plan 06 layer B —
 formerly the H/16 + derived-H/3 laws). It carries **zero fitted solar
-constants**; accuracy <!--v:frameworkSunVsJplRms-->1.29<!--/v-->″ RMS vs JPL (modern window 1970–2049; the Meeus Ch. 25 basis on the same completion: <!--v:meeusCh25SunVsJplRms-->1.30<!--/v-->″). The former era-clock Sun read 0.80″ in that window — the modern-window cost of the physical year, accepted for its behaviour over millennia (plan 06 R1).
+constants**; accuracy <!--v:frameworkSunVsJplRms-->1.03<!--/v-->″ RMS vs JPL (modern window 1970–2049; the Meeus Ch. 25 basis on the same completion: <!--v:meeusCh25SunVsJplRms-->1.02<!--/v-->″). The former era-clock Sun read 0.80″ in that window — the modern-window cost of the physical year, accepted for its behaviour over millennia (plan 06 R1).
 The scene wheel displays the same longitude via the δ overlay
 (δ = λ_certified − λ_realized, the wheel's own longitude read from the scene
 geometry; clock-convention window). See

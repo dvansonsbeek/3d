@@ -274,55 +274,18 @@ const _mcNodalOfDate   = (a, b) => {
 // browser uses meanApsidalMeetsNodalAtAge; net-neutral here by construction)
 const _mcApsidalMeetsNodal = _mcApsidalOfDate;
 
-// D5 derived optics (mirrors src/script.js _sunGeoVecEqD5/_moonAberrationRaDec):
-// annual aberration of the Moon direction from the framework speedOfLight +
-// the Sun's velocity. FRAMEWORK-NATIVE Sun vector: e(T) from the anchored
-// observed eccentricity + drift (ASTRO_REFERENCE), equation-of-center
-// coefficients DERIVED from e via the Kepler series (2e − e³/4, (5/4)e²,
-// (13/12)e³ — the same identity the D1 laboratory proved at 2 ppm), mean
-// longitude rate = framework tropical year, mean anomaly rate = that minus
-// the H/16 perihelion rate, R from currentAUDistance, ε from the framework
-// obliquity (bounded at deep time). One J2000 anchor: the Sun's mean
-// longitude (sunMeanLongitudeJ2000_deg, astro-reference.json).
-// 8.2-7 note: this mirror carried micro-op differences from the browser
-// (x/d2r vs x·180/π, x·d2r vs x·π/180 — different associativity, different
-// last bits). The shared module uses the browser's forms; any tools drift
-// is measured by the fixtures.
-function _sunGeoVecEqD5Tools(jd) { return _moonApparentM().sunGeoVecEqD5(jd); }
-// Phase 8.2-7: the D5 optics + RA/Dec override live ONCE in
-// @essrt/physics/moon/apparent (S8: obliquity stays engine-injected — this
-// engine recomputes it for the scene year).
+// The Moon's scene RA/Dec: ecliptic → equatorial only (plan 06 R3 item 1 —
+// the "D5 derived optics" aberration layer and the fitted RA/Dec patches
+// left; mirror of src/script.js _moonApparent, record in
+// @essrt/physics moon/apparent.cjs). Phase 8.2-7: the conversion lives ONCE
+// in the package (S8: obliquity stays engine-injected — this engine
+// recomputes it for the scene year at the call site).
 const { createMoonApparent } = _req('@essrt/physics/moon/apparent');
 let _moonApparentMTools = null;
 function _moonApparentM() {
-  if (_moonApparentMTools === null) {
-    const AR = C.ASTRO_REFERENCE;
-    _moonApparentMTools = createMoonApparent({
-      constants: {
-        j2000JD: C.j2000JD, julianCenturyDays: 36525,
-        sunMeanLongitudeJ2000Deg: AR.sunMeanLongitudeJ2000_deg,
-        perihelionLongitudeJ2000Deg: AR.earthPerihelionLongitudeJ2000,
-        eccentricityJ2000: AR.earthEccentricityJ2000,
-        eccentricityDotJ2000: AR.earthEccentricityDotJ2000,
-        d5RateLDegPerDay: 360 / C.meanSolarYearDays,
-        d5RatePeriDegPerDay: 360 / ((C.H / 16) * C.meanSolarYearDays),
-        speedOfLight: C.speedOfLight,
-      },
-      fns: {
-        // Phase 3 S3b: the apparent Moon's RA/Dec turn on the published ε — the one-source
-        // hybrid (the only Node scene since plan 06 item 3). Twin of the browser's
-        // _sceneEpsTargetDeg routing.
-        computeObliquityEarth: (y) => _oneSourceM().epsDeg(y),
-        getAuDistanceKm: () => C.currentAUDistance,
-        isFrameworkNative: () => MOON_ARGS_FRAMEWORK_NATIVE,
-        getCorrectionResidual: () => C.MOON_CORRECTION_RESIDUAL,
-        getCorrectionLegacy: () => C.MOON_CORRECTION,
-      },
-    });
-  }
+  if (_moonApparentMTools === null) _moonApparentMTools = createMoonApparent();
   return _moonApparentMTools;
 }
-function _moonAberrationRaDecTools(jd, ra, dec) { return _moonApparentM().moonAberrationRaDec(jd, ra, dec); }
 
 // UT→TT (mirror of src/script.js Phase 9.16): TT = UT + ΔT from the
 // framework chain. Both the Meeus/args side AND the Moon-chain layers run on
@@ -334,9 +297,28 @@ function _jdTTToolsFromUT(jd) {
   // This mirror carried a linear 365.2425 approximation — ~5-6 s of ΔT and
   // ~1e-3° of Moon longitude adrift at the Babylonian epochs (measured
   // against the browser via the -135 decomposition probe; modern was fine).
+  // Plan 06 R3 item 2 — THE SCENE CLOCK IS TRUE TT: the model's absolute ΔT
+  // is deltaTStart + curve (the published ΔT surface; the besselian and the
+  // registry instruments add the same bridge). The curve alone is the
+  // eclipse FINDERS' certified axis, which had leaked into the scene: at true
+  // UT the scene Moon sat 30″ west (0.549″/s × 54.55 s), the Sun 2.2″, and
+  // the retired moonMeeusLpCorrection (+32.75″) had compensated it here.
   const t_Ma = (C.startmodelYear - jdToDecimalYear(jd)) / 1e6;
   const dT = DT.meanDeltaTSecondsAtAge(t_Ma);
-  return Number.isFinite(dT) ? jd + dT / 86400 : jd;
+  return Number.isFinite(dT) ? jd + _TT_BRIDGE_SECONDS / 86400 + dT / 86400 : jd;
+}
+/** deltaTStart — the ΔT trend anchor at J2000 (astro-reference earthOrbital),
+ *  read from the package constants (the one home every runtime shares). */
+const _TT_BRIDGE_SECONDS = _req('@essrt/physics').DEFAULT_CONSTANTS.earthOrbital.deltaTStart;
+/** The finder-axis JD for a true-UT JD (the package's finder-axis APIs add the
+ *  curve themselves; the bridge is the caller's — mirror of the besselian's jb). */
+function _finderAxisJdTools(jdUT) { return jdUT + _TT_BRIDGE_SECONDS / 86400; }
+/** The FINDERS' curve-only ΔT (seconds) at a JD — the certified eclipse-finder
+ *  convention (mirror of the browser's _eclDeltaT); no bridge. */
+function _finderCurveDeltaTTools(jd) {
+  if (!DEEP_TIME_ENABLED) return 0;
+  const dT = DT.meanDeltaTSecondsAtAge((C.startmodelYear - jdToDecimalYear(jd)) / 1e6);
+  return Number.isFinite(dT) ? dT : 0;
 }
 
 // Bounded planetary Lp carrier mirror (src/script.js _fwLpPlanetaryCarrier):
@@ -408,7 +390,11 @@ function _moonSeriesM() {
           return d === null ? C.moonDistance : d / 1000;
         },
         getEccentricityBase: () => C.moonOrbitalEccentricity,
-        deltaTSeconds: (jd) => (_jdTTToolsFromUT(jd) - jd) * 86400,
+        // The TRUNCATED finder forms keep the FINDERS' certified curve-only axis
+        // (mirror of the browser's _eclDeltaT; the package finders read the same
+        // convention) — the true-TT bridge of R3 item 2 belongs to the SCENE walk
+        // (_jdTTToolsFromUT at the sceneEvalAt call site), never here.
+        deltaTSeconds: (jd) => _finderCurveDeltaTTools(jd),
         jdToSIyear: _jdToSIyearTools,
         tropicalOrbitsBetween: _mcTropical,
         apsidalOfDateCyclesBetween: _mcApsidalOfDate,
@@ -1650,7 +1636,7 @@ function moveModel(graph, pos) {
         // JPL RMS (the node of the K sun-plane on the equator is not the
         // equinox the RA frame realizes; the two part by 1,400″ at −3000).
         // The twin remains only where the one-source prep is unavailable.
-        const _lamCertDeg = _e5Tier().eclipse.sunLonCompletedDegAtJD(_jdE5);
+        const _lamCertDeg = _e5Tier().eclipse.sunLonCompletedDegAtJD(_finderAxisJdTools(_jdE5));   // R3 item 2: true TT (the bridge is the caller's)
         let _dE5;
         if (_osmEqxFrameHybRad !== null && _osmEqxGeoAnchor && !nodes.isEllipse) {
           const _yE5 = _osmYearForJD(_jdE5, currentYear);
@@ -1828,8 +1814,8 @@ function _invalidateGraph() {
   // closure-only (the Meeus term arrays are module-level, not rebuilt).
   //
   // ONLY the series is dropped, deliberately. The other singletons capture no
-  // fit-mutated values — MOON_CORRECTION reaches moonApparent through LIVE
-  // getters already — and _chainCyclesM memoizes Float64Array integral
+  // fit-mutated values (the Moon's RA/Dec conversion has none since R3 item 1)
+  // and _chainCyclesM memoizes Float64Array integral
   // tables: a blanket reset here was measured to turn the ~1-min optimizer
   // step into a >10-min run by rebuilding those tables every iteration.
   _moonSeriesMTools = null;

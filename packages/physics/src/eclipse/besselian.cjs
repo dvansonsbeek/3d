@@ -30,19 +30,36 @@
  *     the observed 63.8/64.2 s — mean 6.3″ vs 7.3″). ~34″ of the raw
  *     offset.
  *
- *  2. Full series, not the truncated finder forms. truncatedLonDeg omits
- *     the fitted moonMeeusLpCorrection anchor (+33.8″) and truncatedBetaDeg
- *     omits the −2235·sin(Lp) latitude family (~8″) — both deliberate for
- *     the certified finder statistics (knife-edge canon events), both
- *     required here. The injected moonFullAtDaysTT is the series'
- *     sceneEvalAt — the same evaluation the browser scene ships. Measured:
- *     ~27″ of the raw offset.
+ *  2. Full series, not the truncated finder forms. truncatedBetaDeg omits
+ *     the −2235·sin(Lp) latitude family (~8″) and both truncated forms omit
+ *     the derived series-extension tail — deliberate for the certified
+ *     finder statistics (knife-edge canon events), required here. The
+ *     injected moonFullAtDaysTT is the series' sceneEvalAt — the same
+ *     evaluation the browser scene ships (the extension inside it since
+ *     plan 06 R3 item 1: one scene Moon).
  *
- * Annual aberration is deliberately ABSENT: for ground location a
- * common-mode rotation of both bodies moves the ground point by the raw
- * angle (~0.6 km), and the elongation content cancels at syzygy (the
- * round-3 result). Both bodies here are geometric mean-of-date, matching
- * the MEAN sidereal time used for the Earth-fixed mapping.
+ * APPARENT PLACES (plan 06 R3 item 1 — measured, the cancellation the I2
+ * Sun exposed): both bodies are evaluated mean-of-date (nutation is a common
+ * rotation of Sun and Moon and cancels in the elongation) but with their
+ * PLANETARY ABERRATION: the Sun's derived κ = 2π a/(c T_sid √(1−e²))
+ * (≈20.5″, the light-time of a source at rest in the barycentric frame) and
+ * the Moon's RELATIVE light-time (its geocentric motion during dist/c,
+ * ≈0.7″). For a body co-moving with the observer the stellar aberration
+ * cancels against its barycentric light-time displacement — Horizons'
+ * apparent Moon coincides with the geometric Moon to that 0.7″ (the
+ * truncated series + extension read −1.0″ ± 1.5″ against it over
+ * 1970–2049, flat in elongation) — so "aberrate both bodies, it cancels at
+ * syzygy" (the former round-3 reasoning) was the wrong physics: it held the
+ * Moon 20.5″ from its apparent place, and the fitted moonMeeusLpCorrection
+ * (+32.75″ = κ + the Sun's then-missing long inequality + the trend-ΔT
+ * offset) absorbed it. That anchor is retired (0) with the Sun's κ applied
+ * here. The mean sidereal time of the Earth-fixed mapping pairs with the
+ * mean equinox of the body longitudes as before.
+ *
+ * The remaining centerline residual on NASA's UT instants (2–5″ in
+ * 1999–2026) is the model's TREND ΔT against the observed one (9.5 s below
+ * IERS at 2000, 2.9 s at 2024, × the Moon's 0.55″/s) — a ΔT-convention
+ * floor, never to be fitted here.
  *
  * The scene-umbra conventions (THREE scaffold navigation) never enter this
  * package (§2h) — this is an independent construction on the shared
@@ -58,7 +75,7 @@
  *   full-series Moon: ecliptic-of-date longitude/latitude (deg) + distance (km), TT axis (days since J2000)
  * @property {(jdUT: number) => number} sunLonDegAt - geometric mean sun longitude (deg), JD(UT) axis with the finder's internal ΔT
  * @property {(T: number) => number} sunCompletionDeg - planetary completion (deg) at T centuries TT, SUBTRACTED from the finder sun (see eclipse/sun-planetary-completion.cjs; the finders deliberately stay without it — their fitted anchors and certified canon statistics were produced on the bare form, and elongation-class timing absorbs the omission into the fitted phases)
- * @property {(T: number) => {dLonDeg: number, dLatDeg: number}} moonExtensionAt - derived series-extension tail (deg) at T centuries TT, ADDED to the full-series Moon longitude/latitude (see moon/series-extension.cjs; same finder-scoping rationale as sunCompletionDeg — the finders stay on the bare series)
+ * @property {(year: number) => number} sunAberrationDegAt - the Sun's derived planetary aberration κ (deg) at calendar year, SUBTRACTED from the geometric Sun longitude (the apparent Sun; see the header)
  * @property {(jd: number) => number} deltaTSecondsAt - framework ΔT (J2000-zeroed convention)
  * @property {(year: number) => number} obliquityDegAt - framework obliquity (deg) at calendar year
  * @property {(year: number) => number} eccentricityAt - framework Earth-orbit eccentricity at calendar year
@@ -68,7 +85,7 @@
  *   moonDiameterKm: number, sunDiameterKm: number, sunDistanceKm: number,
  *   earthFlatteningInverse: number, ttBridgeSeconds: number,
  *   gmstMeanSiderealT0Deg: number, gmstMeanSiderealRateDegPerDay: number,
- *   gmstMeanSiderealT2Deg: number }} constants
+ *   gmstMeanSiderealT2Deg: number, speedOfLightKmS: number }} constants
  */
 
 /** @param {BesselianDeps} deps */
@@ -125,12 +142,19 @@ function createBesselian(deps) {
     const year = deps.yearFromJD(jb);
     const eps = deps.obliquityDegAt(year) * D2R;
     const dTT = (jb - K.j2000JD) + deps.deltaTSecondsAt(jb) / 86400;
-    const sunLon = deps.sunLonDegAt(jb) - deps.sunCompletionDeg(dTT / K.julianCenturyDays);
+    // the APPARENT Sun: geometric completed longitude minus its derived aberration κ
+    const sunLon = deps.sunLonDegAt(jb) - deps.sunCompletionDeg(dTT / K.julianCenturyDays) - deps.sunAberrationDegAt(year);
+    // the APPARENT Moon: the geometric series displaced by its RELATIVE light-time —
+    // the Moon's own geocentric motion (central difference, a point rate at this
+    // instant, never a mean rate × span) during τ = dist/c
     const moon = deps.moonFullAtDaysTT(dTT);
-    const ext = deps.moonExtensionAt(dTT / K.julianCenturyDays);
+    const H_DAYS = 0.02;
+    const dLon = deps.moonFullAtDaysTT(dTT + H_DAYS).lonDeg - deps.moonFullAtDaysTT(dTT - H_DAYS).lonDeg;
+    const moonRateDegPerDay = (((dLon + 540) % 360) - 180) / (2 * H_DAYS);
+    const tauDays = moon.distKm / K.speedOfLightKmS / 86400;
     return {
       S: eclToEq(sunLon, 0, sunDistanceKm(year, sunLon), eps),
-      M: eclToEq(moon.lonDeg + ext.dLonDeg, moon.latDeg + ext.dLatDeg, moon.distKm, eps),
+      M: eclToEq(moon.lonDeg - moonRateDegPerDay * tauDays, moon.latDeg, moon.distKm, eps),
     };
   }
 

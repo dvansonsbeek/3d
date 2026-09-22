@@ -36,7 +36,6 @@ import { createChainCycleIntegrator } from './chain-cycles/index.cjs';
 import { createMoonArguments, jdToDecimalYear } from './moon/arguments.cjs';
 import { createMoonSeries } from './moon/series.cjs';
 import { createSunPlanetaryCompletion } from './eclipse/sun-planetary-completion.cjs';
-import { moonSeriesExtensionDeg } from './moon/series-extension.cjs';
 import { createEclipseFinders } from './eclipse/finders.cjs';
 import { createBesselian } from './eclipse/besselian.cjs';
 import { driver2PeriodSecondsAtAge } from './planets/orbit-chain.cjs';
@@ -1107,11 +1106,14 @@ export function assembleModel(C, F, laws = {}, secularSeriesArtifact = /** @type
     // integral — outside every eclipse and JPL gate. MODERN-WINDOW COST,
     // stated (plan 06 I1 corrected an earlier misreading of the cache's
     // clock): against the JPL Sun cache (UT instants, verified; the registry
-    // instrument's bridge) the one-source Sun reads 1.29″ sd in 1970–2049
-    // where the era-clock Sun read 0.80″ — both carry ~0.02–0.03″/yr trends
-    // of opposite sign against JPL over 1900–2100, the physical year's
-    // slightly larger; accepted because over millennia the era-clock Sun is
-    // minutes off.
+    // instrument's bridge) the one-source Sun read 1.29″ sd in 1970–2049
+    // where the era-clock Sun read 0.80″ — both carried ~0.02–0.03″/yr
+    // trends against JPL over 1900–2100; accepted because over millennia
+    // the era-clock Sun is minutes off. Plan 06 I2 located the trend: the
+    // Earth–Mars–Jupiter long inequality (1783 yr, 6.3″) the smooth year
+    // cannot carry — derived on the model's own N-body and shipped in the
+    // planetary completion, the instrument reads 1.03″ (Horizons ±3000 yr:
+    // modern-window mean +8.4 → +0.8″, per-millennium sd roughly halved).
     // NUMERICS (rate vs point value): a cumulative trapezoid table of
     // cycles, yearly inside ±20,000 yr and per century beyond, grown on
     // demand from 2000 in both directions and interpolated inside a cell —
@@ -1190,20 +1192,34 @@ export function assembleModel(C, F, laws = {}, secularSeriesArtifact = /** @type
   // μ = 1/(1+M_E/M_M) — 6.4399″ at current constants, tracks them live.
   const embWobbleArcsec = (moonDistanceKm / (MASS_RATIO_EARTH_MOON + 1) / currentAUDistance)
     * (648000 / Math.PI);
-  // FQ-5 N3 — the completion's carriers are FRAMEWORK-derived: one
-  // revolution per the model's own tropical period records (Earth from
-  // the framework mean solar year; the Moon-elongation rate from the
-  // sidereal month/year identity). The v3 table's amplitudes were
-  // re-extracted on exactly these rates (the carrier↔table matched pair).
+  // FQ-5 N3 — the completion's carriers are FRAMEWORK-derived from the
+  // model's own planet period records (the Moon-elongation rate from the
+  // sidereal month/year identity). Plan 06 I2 — the carriers are SIDEREAL
+  // (measured): the records' solarYearInput are OF-DATE periods (their
+  // rates sit +1.39..1.62°/cy above the VSOP sidereal mean motions — the
+  // framework precession plus input rounding), and a perturbation argument
+  // is inertial (D'Alembert: only Σk = 0 arguments are frame-free), so on
+  // of-date carriers every Σk ≠ 0 argument drifted by Σk·ψ(t) — 42..52° at
+  // −3000 for the table's Σk = −1 terms (their ancient scatter against
+  // Horizons 6.4 → 4.4″ on sidereal carriers), and 6 % of frequency for the
+  // 1783-yr long inequality (1683 yr on the of-date carriers). Constant-free:
+  // the record rate minus the model's own J2000 precession p₀ =
+  // 360·36525·(1/T_trop − 1/T_sid) for the planets, the framework sidereal
+  // year for Earth; identical to the N3 carriers at J2000 (same phase
+  // anchors), ≤ 1.4°·|Σk| apart at the 200-yr extraction window's edges
+  // (the composed table reproduces the N3 one there: JPL 1900–2100
+  // all-phase sd unchanged to 0.01″). The parity gate's fingerprint mirrors
+  // this arithmetic (test/create-model-parity.test.mjs).
   const degPerCyOf = /** @param {number} cyclesPerDay */ (cyclesPerDay) => 360 * 36525 * cyclesPerDay;
+  const carrierPrecessionDegPerCy = degPerCyOf(1 / meanSolarYearDays) - degPerCyOf(1 / meanSiderealYearDays);
   const carrierRatesDegPerCy = {
     planets: [
-      degPerCyOf(1 / C.planetOrbitalElements.mercury.solarYearInput),
-      degPerCyOf(1 / C.planetOrbitalElements.venus.solarYearInput),
-      degPerCyOf(1 / meanSolarYearDays),
-      degPerCyOf(1 / C.planetOrbitalElements.mars.solarYearInput),
-      degPerCyOf(1 / C.planetOrbitalElements.jupiter.solarYearInput),
-      degPerCyOf(1 / C.planetOrbitalElements.saturn.solarYearInput),
+      degPerCyOf(1 / C.planetOrbitalElements.mercury.solarYearInput) - carrierPrecessionDegPerCy,
+      degPerCyOf(1 / C.planetOrbitalElements.venus.solarYearInput) - carrierPrecessionDegPerCy,
+      degPerCyOf(1 / meanSiderealYearDays),
+      degPerCyOf(1 / C.planetOrbitalElements.mars.solarYearInput) - carrierPrecessionDegPerCy,
+      degPerCyOf(1 / C.planetOrbitalElements.jupiter.solarYearInput) - carrierPrecessionDegPerCy,
+      degPerCyOf(1 / C.planetOrbitalElements.saturn.solarYearInput) - carrierPrecessionDegPerCy,
     ],
     moonElongation: degPerCyOf(1 / moonSiderealMonthInput - 1 / meanSiderealYearDays),
   };
@@ -1215,7 +1231,10 @@ export function assembleModel(C, F, laws = {}, secularSeriesArtifact = /** @type
     },
     sunLonDegAt: /** @param {number} jdUT */ (jdUT) => eclipseFinders.sunLonDegAt(jdUT),
     sunCompletionDeg: sunPlanetaryCompletionDeg,
-    moonExtensionAt: moonSeriesExtensionDeg,
+    // plan 06 R3 item 1: the location tier on APPARENT places — the Sun's derived κ
+    // (the same helper the cardinal instants use), the Moon's relative light-time
+    // inside the besselian; the series-extension tail now lives in sceneEvalAt.
+    sunAberrationDegAt: /** @param {number} year */ (year) => sunAberrationArcsecAt(year) / 3600,
     deltaTSecondsAt: /** @param {number} jd */ (jd) => (jdTTFromUT(jd) - jd) * 86400,
     obliquityDegAt: obliquityDeg,
     eccentricityAt: sunEccentricityAt,
@@ -1233,6 +1252,7 @@ export function assembleModel(C, F, laws = {}, secularSeriesArtifact = /** @type
       gmstMeanSiderealT0Deg: C.physicalConstants.gmstMeanSiderealT0Deg,
       gmstMeanSiderealRateDegPerDay: C.physicalConstants.gmstMeanSiderealRateDegPerDay,
       gmstMeanSiderealT2Deg: C.physicalConstants.gmstMeanSiderealT2Deg,
+      speedOfLightKmS: C.physicalConstants.speedOfLight,
     },
   });
 
@@ -1270,13 +1290,21 @@ export function assembleModel(C, F, laws = {}, secularSeriesArtifact = /** @type
    *  terms on the model's OWN lunar node, mean Sun and mean Moon (the
    *  framework arguments), the same family the registry's JPL Sun
    *  instrument bridges with. @param {number} jdUT @returns {number} */
+  /** The Sun's derived aberration constant of date, arcsec — κ = 2π·a/(c·T_sid·√(1−e²))
+   *  from the AU, c, the one-family sidereal year and the Sun's e (20.50″ at
+   *  J2000); ONE home for the cardinal instants and the eclipse location tier.
+   *  @param {number} year @returns {number} */
+  const sunAberrationArcsecAt = (year) => {
+    const e = sunEccentricityAt(year);
+    return (2 * Math.PI * currentAUDistance
+      / (C.physicalConstants.speedOfLight * yearLengthsM.siderealYearSecondsAtYear(year) * Math.sqrt(1 - e * e)))
+      * (648000 / Math.PI);
+  };
+  /** @param {number} jdUT @returns {number} */
   const sunApparentLonDegAtJdUT = (jdUT) => {
     const jdTT = jdTTFromUT(jdUT);
     const year = 2000 + (jdTT - j2000JD) / 365.25;
-    const e = sunEccentricityAt(year);
-    const kappaArcsec = (2 * Math.PI * currentAUDistance
-      / (C.physicalConstants.speedOfLight * yearLengthsM.siderealYearSecondsAtYear(year) * Math.sqrt(1 - e * e)))
-      * (648000 / Math.PI);
+    const kappaArcsec = sunAberrationArcsecAt(year);
     const a = moonArgs.argsAt(jdTT);
     const d2r = Math.PI / 180;
     const Om = (a.Lp - a.F) * d2r, Ls = (a.Lp - a.D) * d2r, Lm = a.Lp * d2r;
@@ -1291,12 +1319,17 @@ export function assembleModel(C, F, laws = {}, secularSeriesArtifact = /** @type
     if (t === undefined) throw new RangeError(`cardinal type must be VE|SS|AE|WS, got ${type}`);
     return t;
   };
-  /** The UT model-JD at which the APPARENT Sun's longitude of date equals
+  /** The TRUE-UT JD at which the APPARENT Sun's longitude of date equals
    *  the cardinal target in the given year — Newton on the crossing (the
    *  Sun's rate 360°/tropical year; a handful of steps from the tropical-year
-   *  seed). Replaces the fitted cardinal model's instants (R1); the
-   *  remaining constant against USNO/Meeus (≈2–3 min) is the mean-longitude
-   *  anchor convention L0, labelled, not tuned. @param {number} year @param {string} type @returns {number} */
+   *  seed). Replaces the fitted cardinal model's instants (R1). Plan 06 R3
+   *  item 2: the Newton root lives on the FINDER axis (the curve-only ΔT the
+   *  eclipse finders certify), and the returned instant is that root minus the
+   *  deltaTStart bridge — true UT = TT − (deltaTStart + curve), the same
+   *  bridge the besselian and the registry instruments apply. Before this the
+   *  published instants were 54.55 s (0.9 min) late. Against Horizons over
+   *  ±3000 yr the remaining offset is the Sun's (plan 06 I2 measured).
+   *  @param {number} year @param {string} type @returns {number} */
   const cardinalCrossingJdUT = (year, type) => {
     const target = cardinalTargetDeg(type);
     const SI_YEAR_D = 365.2422, RATE = 360 / SI_YEAR_D;
@@ -1308,7 +1341,7 @@ export function assembleModel(C, F, laws = {}, secularSeriesArtifact = /** @type
       jd -= d / RATE;
       if (Math.abs(d) < 1e-10) break;
     }
-    return jd;
+    return jd - C.earthOrbital.deltaTStart / 86400;
   };
 
   return Object.freeze({

@@ -19,7 +19,13 @@ Output values are stored in `public/input/fitted-coefficients.json`.
 > corrected geometric RA/Dec path they fitted no longer exists.
 > `PREDICT_COEFFS_PHYSICAL` remains: it powers the Earth-frame RA rate
 > device (doc 13 §1.8). Earth, Moon and Sun fitting is unaffected; it
-> remains the shipped path.
+> remains the shipped path. **Checked at plan 06 R3 item 1:** the arrays
+> were trained on the Step-3 workbook exported 2026-08-28 — BEFORE the P5
+> flip and the K5 excision — so they and `data/planet-prediction-fit-stats.json`
+> describe the retired geometric planet path (stale-by-construction in
+> `tools/verify/artifact-freshness.js`, with the reason). Before any retrain:
+> re-export Step 3 from the current simulator; whether the device is kept at
+> all is an R4 retirement question.
 
 ## Design rule for scene-graph corrections
 
@@ -223,7 +229,7 @@ then `npm run constants:generate` (Step 9).
 | `sun-planetary-completion-fit.js` | NOTHING (read-only, the Step-0 companion — 20.3h, SUPERSEDED by Stage D2) | JPL Horizons live (960 all-phase + 179 syzygy epochs, network required — so it can never be a gate). Was the dev record behind the v1 fitted 10-term table; the shipped table is now the DERIVED 70-term extraction on FRAMEWORK-native carriers (FQ-5 N3: `tools/explore/d2-derived-sun.mjs` → `n2-sun-framework-carriers.mjs` → `n3-carrier-swap-preview.mjs`; the carrier rates are injected live from the planet records by `model.js`), so its coefficient-drift part no longer applies — its syzygy + NASA-centerline scoreboards remain valid verification. After ANY Step-0 refit OR planet-record period change, re-run the N3 extraction chain and re-embed the table + its `PAIRED_SUN_HARMONICS_SHA256` by hand — the test:model fingerprint gate enforces the pairing. |
 | `eoc-fractions.js` | Per-planet `eocFraction` | `data/reference-data.json` |
 | `ascnode-correction.js` | `ascNodeTiltCorrection`, `startpos` | `data/reference-data.json` |
-| `moon-eclipse-optimizer.js` | `moonMeeusLpCorrection`, `MOON_CORRECTION` | 58 solar eclipses (2000–2025) + JPL baseline — run separately, not part of standard pipeline. `moonStartpos*` values are J2000-element anchored via the in-sim meters (docs/66 §4) and are NO LONGER fitted |
+| `moon-eclipse-optimizer.js` | NOTHING (RETIRED at plan 06 R3 item 1 — kept as the record) | Formerly `moonMeeusLpCorrection` + `MOON_CORRECTION` against 58 solar eclipses (2000–2025) + a JPL baseline. Both are retired: measured against Horizons' apparent Moon the series needs no anchor (−1.0″ ± 1.5″, 1970–2049), the +32.75″ was the eclipse tier's mean Sun compensated (κ + the I2 long inequality + the trend-ΔT offset), and the RA/Dec patches were fitted around the retired D5 aberration layer (docs/66 §1.4). `moonStartpos*` values are J2000-element anchored via the in-sim meters (docs/66 §4) and are NO LONGER fitted |
 | `python/fit_perihelion_harmonics.py` | `PERI_HARMONICS_RAW`, `PERI_OFFSET` | `data/01-holistic-year-objects-data.xlsx` |
 | `python/verify_perihelion_erd.py` | pass/fail verification (exits 0=pass, 1=fail) | `data/01-holistic-year-objects-data.xlsx` |
 | `python/train_precession_physical.py` | `PREDICT_COEFFS_PHYSICAL` (~2421 terms × 7 planets) | `data/01-holistic-year-objects-data.xlsx` |
@@ -546,10 +552,13 @@ numbering is shared vocabulary.)
          • ascnode-correction.js — scans ascNodeTiltCorrection. No --write.
            Step 2 already optimizes startpos/angleCorrection.
 
-Step 5c: moon-eclipse-optimizer.js            → moonMeeusLpCorrection + MOON_CORRECTION
-         Fits the Lp bias and 3-term RA/Dec correction vs JPL at the
-         J2000-anchored startpos; verifies Moon-Sun angular separation
-         at 58 solar eclipses (2000–2025) — should be ~0°.
+Step 5c: moon-eclipse-optimizer.js            → (RETIRED, plan 06 R3 item 1)
+         Formerly fitted the Lp bias and the 3-term RA/Dec correction vs
+         JPL. Both constants are gone: the Moon's series needs no anchor
+         against Horizons' apparent Moon, and the eclipse location tier now
+         rides apparent places (the Sun's κ, the Moon's relative
+         light-time) instead of a fitted Moon offset. The id 5c is kept —
+         this numbering is shared vocabulary; the script stays as the record.
          moonStartpos* values are J2000-element anchored via the in-sim
          meters (docs/66 §4) — NO LONGER fitted; the startPos scan in
          the tool is a flat-gradient diagnostic only, never written.
@@ -954,7 +963,7 @@ authoritative runtime version.
 |-------------------|----------------|
 | `H` (holisticyearLength) | ALL (1→10) — and Phase 8 (Step 11 = 7c) because `BOND_PERIOD_YR = 8·H / BOND_LATTICE_N`, so `ω = 2π/period` re-derives for all four cycles. |
 | `longitudePerihelion` (any planet) | 2 (that planet only) |
-| `solarYearInput` (any planet) / `inputmeanlengthsolaryearindays` / `moonSiderealMonthInput` / `yearLengthRef.siderealYear` | **The v3 Sun-completion carriers ride these** (FQ-5 N3: `model.js` computes the carrier rates live). Re-run the N3 extraction chain (`tools/explore/n2-sun-framework-carriers.mjs` → `n3-carrier-swap-preview.mjs`), re-embed the TERMS + `PAIRED_CARRIER_RATES_SHA256` in `eclipse/sun-planetary-completion.cjs` — the test:model fingerprint gate FAILS until you do (fail-proven). Plus the planet's own step 2 where applicable. |
+| `solarYearInput` (any planet) / `inputmeanlengthsolaryearindays` / `moonSiderealMonthInput` / `yearLengthRef.siderealYear` | **The Sun-completion carriers ride these** (FQ-5 N3: `model.js` computes the carrier rates live; plan 06 I2: SIDEREAL — record rate minus the model's J2000 precession, Earth the sidereal year). Re-run the extraction chain (`tools/explore/n2-sun-framework-carriers.mjs` → `i2-sidereal-carrier-table.mjs` for the 70 short-period rows, `i2-long-inequality.mjs` for the two long-period rows on the model's own WH engine), re-embed the TERMS + `PAIRED_CARRIER_RATES_SHA256` in `eclipse/sun-planetary-completion.cjs` — the test:model fingerprint gate FAILS until you do (fail-proven). Plus the planet's own step 2 where applicable. |
 | `earthtiltMean` | 1, 3→4d, 6a (record CSV) + ⚠ FROZEN-CLOCK COUPLED (see "The frozen era clock") |
 | `earthInvPlaneInclinationAmplitude` | 1, 3→4d, 6a (record CSV) + ⚠ FROZEN-CLOCK COUPLED (see "The frozen era clock") |
 | `earthInvPlaneInclinationMean` | 3, 6a (record CSV) + ⚠ FROZEN-CLOCK COUPLED (see "The frozen era clock") |

@@ -26,6 +26,13 @@
 
 'use strict';
 
+// Plan 06 R3 item 1: the DERIVED series-extension tail (the D2 planetary and
+// node terms, moon/series-extension.cjs) is part of the ONE scene Moon —
+// formerly added by the besselian tier alone, so the rendered Moon and the
+// eclipse-location Moon were two different Moons. The truncated finder forms
+// below stay bare by certified design.
+const { moonSeriesExtensionDeg } = require('./series-extension.cjs');
+
 /**
  * @typedef {Array<[number, number, number, number, number]>} MeeusTermTable
  */
@@ -164,10 +171,17 @@ function createMoonSeries({ constants, fns }) {
    *  owns the UT→TT conversion — engine timing conventions differ).
    *  Returns everything the scene blocks write:
    *  thetaAddRad — the hierarchy θ increment (EoC-half-subtracted Σl);
-   *  lonDeg — full ecliptic longitude incl. moonMeeusLpCorrection;
-   *  latRad/latDeg — Σb with all six corrections (BOTH computed from Σb
-   *  directly: the browser stores radians, the Node engine degrees, and
-   *  (x·D2R)/D2R is not bit-exactly x); distKm — two-term ellipse; T.
+   *  lonDeg — full ecliptic longitude (GEOMETRIC, mean equinox of date)
+   *  incl. the derived series-extension tail and moonMeeusLpCorrection
+   *  (retired to 0 at plan 06 R3 item 1: measured against Horizons' apparent
+   *  Moon over 1970–2049 the series needs no anchor, −1.0″ ± 1.5″ flat in
+   *  elongation; the former +32.75″ was the eclipse tier's mean Sun
+   *  compensated — its aberration κ, the I2 long inequality and the trend-ΔT
+   *  offset — not a property of the Moon);
+   *  latRad/latDeg — Σb with all six corrections plus the extension (BOTH
+   *  computed from Σb directly: the browser stores radians, the Node engine
+   *  degrees, and (x·D2R)/D2R is not bit-exactly x); distKm — two-term
+   *  ellipse; T.
    *  @param {number} dDaysTT
    *  @returns {{thetaAddRad: number, lonDeg: number, latRad: number, latDeg: number, distKm: number, T: number}} */
   function sceneEvalAt(dDaysTT) {
@@ -180,9 +194,11 @@ function createMoonSeries({ constants, fns }) {
     const E = eFactorForD(d, T, T2);
     const E2 = E * E;
     const { A1, A2, A3 } = additionalArgs(T, d);
+    const ext = moonSeriesExtensionDeg(T);   // derived tail, degrees → the tables' 1e-6° units
 
     let Sl = sumTable(moonL, Dr, Mr, Mpr, Fr, E, E2);
     Sl += 3958 * Math.sin(A1) + 1962 * Math.sin(Lp - Fr) + 318 * Math.sin(A2);
+    Sl += ext.dLonDeg * 1e6;
     // Subtract the EoC portion the off-centre orbit geometry already provides.
     const eocHalf = getEccentricityBase() / 2;
     Sl -= (2 * eocHalf / D2R * 1e6) * Math.sin(Mpr);
@@ -193,6 +209,7 @@ function createMoonSeries({ constants, fns }) {
     Sb += -2235 * Math.sin(Lp) + 382 * Math.sin(A3);
     Sb += 175 * Math.sin(A1 - Fr) + 175 * Math.sin(A1 + Fr);
     Sb += 127 * Math.sin(Lp - Mpr) - 115 * Math.sin(Lp + Mpr);
+    Sb += ext.dLatDeg * 1e6;
     const latRad = Sb * 1e-6 * D2R;
     const latDeg = Sb * 1e-6;
 

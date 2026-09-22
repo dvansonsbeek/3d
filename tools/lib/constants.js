@@ -387,9 +387,8 @@ const moonDraconicYearEarth = totalDaysInH / ((totalDaysInH / moonDraconicYearIC
 // Model-derived value (not an astronomical reference, but consumed via ASTRO_REFERENCE)
 ASTRO_REFERENCE.earthInvPlanePrecessionYears = H / 3;
 
-// Moon post-Meeus RA/Dec correction (fitted to JPL DE440 residuals)
-const MOON_CORRECTION = fitted.MOON_CORRECTION || null;
-const MOON_CORRECTION_RESIDUAL = fitted.MOON_CORRECTION_RESIDUAL || null;   // D5: residual after analytic-aberration subtraction
+// (The Moon post-Meeus RA/Dec patches MOON_CORRECTION / MOON_CORRECTION_RESIDUAL
+// were retired at plan 06 R3 item 1 — @essrt/physics moon/apparent.cjs.)
 
 // Planet perihelion passage references (model-tuned, from model-parameters.json)
 for (const [key, jd] of Object.entries(modelParams.perihelionPassageRef)) {
@@ -686,8 +685,6 @@ module.exports = {
   moonDistance,
   moonEclipticInclinationJ2000,
   moonMeeusLpCorrection,
-  MOON_CORRECTION,
-  MOON_CORRECTION_RESIDUAL,
   moonOrbitalEccentricity,
   moonObliquityEclipticJ2000,
   moonTilt,

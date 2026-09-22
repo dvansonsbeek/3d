@@ -1,7 +1,7 @@
 ---
 docVersion: 1.0
 modelVersion: v14.0
-coefficients: sha256:78f99d98186e50d9
+coefficients: sha256:8c6f14edf5f84905
 status: current
 ---
 
@@ -393,13 +393,15 @@ is gravity, not a discrepancy.
 
 ### 1.4 Post-hoc RA+Dec Override
 
-The full Meeus ecliptic longitude (L' + Sigma_l) and latitude (Sigma_b) are
-stored in moveModel. In updatePositions, both RA and Dec are overridden with
-the Meeus-derived equatorial coordinates using ecliptic-to-equatorial
-conversion. This bypasses the hierarchy's RA entirely (the 5-layer
-precession approximation alone would carry ~1.2° RA errors). The orbit ring
-still shows the hierarchy path, while the Moon mesh shows the correct
-position.
+The full ecliptic longitude (L' + Sigma_l, the derived series-extension tail
+inside since plan 06 R3 item 1) and latitude (Sigma_b) are stored in
+moveModel. In updatePositions, both RA and Dec are overridden with the
+equatorial coordinates from the ecliptic-to-equatorial conversion — since R3
+item 1 the override is ONLY that conversion: the rendered Moon is the
+GEOMETRIC series Moon, on the same convention as the rendered Sun and
+planets. This bypasses the hierarchy's RA entirely (the 5-layer precession
+approximation alone would carry ~1.2° RA errors). The orbit ring still
+shows the hierarchy path, while the Moon mesh shows the correct position.
 
 ---
 
@@ -438,47 +440,33 @@ it needs the world matrices to be current.
 4. Override both obj.ra and obj.dec
 ```
 
-Current baseline: RMS 0.0009° RA / 0.0008° Dec over 6,088 JPL reference
-points, 2000–2050.
+Measured against JPL Horizons' APPARENT Moon (ecliptic longitude,
+1970–2049, 10-day grid, TT; the model bridged by nutation and the 0.7″
+relative light-time): the series with the derived extension reads
+−1.0″ ± 1.5″, flat in elongation (every 30° bin −0.7..−1.3″; cos D
+coefficient 0.00; a ~1.3″ cos M′ structure remains and no fitted value
+replaces it).
 
-**Derived optics — the aberration decomposition.** The post-Meeus correction
-content was decomposed (`tools/explore/derive-moon-correction-content.js`):
-98–102% of the former fitted `MOON_CORRECTION` is ANNUAL ABERRATION — the
-model frames carry apparent-Sun content while the JPL reference is
-astrometric (Horizons QUANTITIES='1'). The framework-native default
-subtracts the aberration ANALYTICALLY (`_moonAberrationRaDec` + tools
-mirror: u′ = normalize(u − v_E/c), with the Sun vector itself
-framework-native) plus the small residual `MOON_CORRECTION_RESIDUAL`
-(source of truth fitted-coefficients.json; dominated by raCosMp
-−0.001421° = 5.1″ — the ONE genuinely fitted value left; everything
-aberration-shaped ≤ 0.13″). A weighted refit against the full 6,088-point
-baseline reproduces the shipped residual to 0.12″ — already optimal.
-J2000 witness reference: RA 222.45959 / Dec −10.90333.
-
-**The 5.1″ term — attributed by decomposition.** Measured in ONE
-convention (X − Meeus at raCosMp, same 6,088 reference points, same basis,
-J2000 frame; `tools/explore/residual-attribution-elp.js` on the full
-ELP-2000/82B series, `residual-attribution-mpp02.js` on MPP02):
-
-| quantity | raCosMp |
-|---|---:|
-| JPL (DE441) − Meeus-60 | **+5.15″** |
-| ELP-2000/82B − Meeus-60 (named truncation) | +1.13″ |
-| ELP/MPP02 − Meeus-60 | +1.10″ |
-| **JPL − MPP02 (the real gap)** | **+4.05″** |
-
-The shipped patch is `Meeus − JPL`, reproducing the measured −5.15″ to
-0.03″. Its content is **−1.13″ named truncation** (almost entirely the
-planetary family — Meeus compresses ELP's ~14,000-term planetary series
-into 3 additive terms; the main-problem 60-term cut itself contributes
-only −0.04″) **− 4.05″ analytic-theory vs JPL numerical ephemeris**.
-MPP02 and ELP82B agree to 0.03″ on this term and 0.30″ RMS in longitude
-over 2000–2050 — both analytic theories sit together, and JPL sits ~4″
-from both, time-flat (3.81–4.21″ across 2000–2051): a fixed
-representational difference between the analytic theories and DE441, with
-no series-term decomposition in any analytic theory. Classification:
-attributed by CAUSE (both halves measured), not by term. Not free
-physics. All other basis coefficients are dust (≤ 0.13″).
+**The retired "derived optics" (plan 06 R3 item 1 — the record).** The
+former apparent-place stack — an annual-aberration layer u′ =
+normalize(u − v_E/c) on the Moon's direction plus the fitted RA/Dec patches
+`MOON_CORRECTION` (pure-Meeus A/B) and `MOON_CORRECTION_RESIDUAL` (its
+post-layer remainder, dominated by raCosMp −0.001421° = 5.1″) — had been
+validated against Horizons' ASTROMETRIC Moon (QUANTITIES='1'), and 98–102 %
+of the original patch was read as "annual aberration the model frames
+carry". The astrometric place is a bookkeeping intermediate: light-time in
+the barycentric frame WITHOUT the observer's aberration, and for a body
+co-moving with the observer those two effects are equal and opposite up to
+the relative light-time (≈0.7″), so the astrometric Moon sits ~20″·cos D
+from BOTH the geometric and the apparent Moon. Measured against the
+apparent Moon, the rendered Moon read +32.5″ + 20″·cos D (52″ at new moon,
+12″ at full moon) while the bare series read −1.0″ flat — the layer was
+the wrong physics and the patches were fitted around it at syzygies. All
+three left: the override is the frame conversion alone. The instruments
+of the former decomposition (`derive-moon-correction-content.js`,
+`residual-attribution-{elp,mpp02}.js`, `tools/lib/elp-mpp02.js`) stay as
+its record; the "+4.05″ JPL − MPP02 gap" they measured at raCosMp was
+measured in the astrometric convention and is not a property of the Moon.
 
 **The inclination convention.** The input `moonEclipticInclinationJ2000`
 is the Moon's DYNAMICAL mean osculating inclination **<!--v:moonEclipticInclination-->5.1573<!--/v-->°** (measured
@@ -657,15 +645,22 @@ the scene-relative NASA-convention γ diagnostic
 **The scene-side apparent-place stack** (the corrections that make the
 scene chain match the tier):
 
-1. **Annual aberration, BOTH bodies** —
-   `Δλ = −(κ/r)·cos(λ_body − λ_sun)/cos β` about the ecliptic pole
-   (κ = 20.4955″, `astro-reference.json`); for the Sun this reduces to the
-   κ/r term. The observer-velocity (v/c) shift is DISTANCE-INDEPENDENT and
-   hits the Moon at the same ~20.5″; at syzygy Sun and Moon share a
-   direction, so the shift is common-mode and CANCELS in the elongation —
-   aberrating only the Sun breaks the relative geometry by exactly κ.
-   Moon light-time (~0.7″) stays unmodeled; the Δβ component vanishes at
-   syzygy.
+1. **Planetary aberration, each body its own** (plan 06 R3 item 1;
+   formerly "annual aberration, both bodies — cancels at syzygy", the
+   wrong physics): the Sun's derived κ = 2π a/(c T_sid √(1−e²)) (≈20.5″,
+   the light-time of a source at rest in the barycentric frame) and the
+   Moon's RELATIVE light-time (its geocentric motion during dist/c,
+   ≈0.7″). For a body co-moving with the observer the stellar aberration
+   cancels against its barycentric light-time displacement, so Horizons'
+   apparent Moon is the geometric Moon to 0.7″ — aberrating the Moon by
+   κ had held it 20.5″ from its apparent place, and the fitted
+   `moonMeeusLpCorrection` (+32.75″ = κ + the Sun's then-missing long
+   inequality + the trend-ΔT offset) absorbed it. The anchor is retired
+   (0); the package besselian applies κ to the Sun and the light-time to
+   the Moon (`eclipse/besselian.cjs`). The remaining centerline residual
+   on NASA's UT instants (2–5″ in 1999–2026) is the model's trend ΔT
+   against the observed one (9.5 s below IERS at 2000, 2.9 s at 2024, ×
+   the Moon's 0.55″/s) — a ΔT-convention floor, never fitted here.
 2. **The sidereal-phase anchor** — `earth.rotationPhase =
    −π/tropical-year-days` (118.3 s of rotation): the startmodelJD midnight
    anchor carries a noon-convention initial orientation (EoT-independent;
@@ -680,9 +675,13 @@ scene chain match the tier):
    tier rides) in the rotationAxis equatorial frame, placed exactly like
    the Moon override (dec = asin(sin ε sin λ), ra = atan2(cos ε sin λ,
    cos λ); distance keeps the scaffold value — the shadow DIRECTION is
-   the accuracy carrier; NOT bridged by deltaTStart: the scene rides the
-   raw-curve clock). The scene ground track matches the scaffold-free
-   Besselian tier to ~20 km at the −135 instant.
+   the accuracy carrier). Since plan 06 R3 item 2 the scene clock IS true
+   TT — UT + deltaTStart + curve, the published ΔT surface, the same bridge
+   the Besselian tier and the registry instruments apply; the curve-only
+   axis is the eclipse FINDERS' certified convention and had leaked into the
+   scene (the scene Moon 30″ west at true UT, the Sun 2.2″, the retired
+   moonMeeusLpCorrection compensating it). The scene ground track matches
+   the scaffold-free Besselian tier to ~20 km at the −135 instant.
 
 The centerline scoreboard is machine-owned, not prose: the `centerlines`
 section of `data/eclipse-audit-summary.json` (generated by
@@ -691,11 +690,16 @@ section of `data/eclipse-audit-summary.json` (generated by
 the NASA limit-column trap) records all
 <!--v:centerlinesPoints-->42<!--/v--> fixed-UT points
 (<!--v:centerlinesEvents-->14<!--/v--> events) under the exact-reproduction
-convention — current mean **<!--v:centerlinesMeanArcsec-->2.4<!--/v-->″** /
-max **<!--v:centerlinesMaxArcsec-->5.8<!--/v-->″** shadow-plane (the VECTOR
+convention — current mean **<!--v:centerlinesMeanArcsec-->6.5<!--/v-->″** /
+max **<!--v:centerlinesMaxArcsec-->11.1<!--/v-->″** shadow-plane (the VECTOR
 projection of the surface chord onto the plane perpendicular to the sun
 direction — exact for oblique geometry where `ground × sin alt` is not),
-with the ≤8″ api gate holding per point. The in-sim test button
+with the ≤12″ api gate holding per point (restated from 8″ at plan 06 R3
+item 1: the former 1.3–2″ class of the modern events was the retired Moon
+anchor compensating the tier's mean Sun and the trend-ΔT offset; the
+physical floor on NASA's UT instants is that ΔT convention plus the
+series' syzygy scatter — 2001 Jun 21 reads 11.1″, the 9.5-s ΔT gap of
+that era). The in-sim test button
 "Centerlines: shadow-plane vs NASA path tables" prints the same table from
 the live scene. The 2021 Antarctica crossing stays in the set as the
 extreme-geometry stressor (highest latitude, lowest sun); the largest
@@ -727,14 +731,29 @@ belongs to the framework's own ϖ(t)/e(t) laws), read analytically as a
 70-term table: main synodic tones plus eccentricity-modulation sidebands
 (main ± modulator anomaly, main ± M_E — the largest single terms ARE
 sidebands: 2(E−J)−M_E 8.3″, E−M−M_Ma 7.5″, invisible to
-constant-amplitude fitting). The planetary mean-longitude RATES and the
-Moon-elongation rate are framework-native carriers injected by
-`model.js` — computed live from the framework's own planet records (one
-revolution per the record's tropical period; Earth from the framework
-mean solar year; the elongation from the sidereal month/year identity) —
-and the table is extracted on those carriers (0.61″ table-vs-signal
-fidelity; the J2000 phase anchors ARG_L0/PERI/D0 remain declared epoch
-constants). The Earth-around-EMB wobble amplitude is the DERIVED
+constant-amplitude fitting), plus two LONG-PERIOD rows (plan 06 I2): the
+Earth–Mars–Jupiter long inequality 4λ_E − 8λ_Ma + 3λ_J (≈1783 yr, 6.3″)
+and the Venus–Earth term 8λ_V − 13λ_E (≈238 yr, 1.8″), derived on the
+model's own Wisdom–Holman engine over −5100..+1100 yr (the same Horizons
+J2000 seed and DE440 masses as the chain artifact; the integration
+reproduces DE441's Earth longitude to 0.7″ over six millennia) — terms a
+200-yr extraction window folds into its secular basis, and the reason the
+certified Sun carried a 6″ ripple against Horizons over ±3000 yr. The
+planetary mean-longitude RATES and the Moon-elongation rate are
+framework-native carriers injected by `model.js` — computed live from
+the framework's own planet records, SIDEREAL since I2 (the record's
+of-date rate minus the model's own J2000 precession; Earth the framework
+sidereal year; the elongation from the sidereal month/year identity): a
+perturbation argument is inertial, and on of-date carriers every
+argument whose multipliers do not sum to zero drifted with precession —
+42..52° at −3000 for the table's Σk = −1 rows, the dominant ancient
+scatter of the Sun against Horizons (6.4 → 4.4″ at −3000). The 70 N3
+literals are extracted on the of-date carriers and kept: the two carrier
+sets share the J2000 anchors and part by ≤1.4°·|Σk| at the window's
+edges, where the re-extraction reproduces the composed function (0.61″
+table-vs-signal fidelity either way; the J2000 phase anchors
+ARG_L0/PERI/D0 remain declared epoch constants). The Earth-around-EMB
+wobble amplitude is the DERIVED
 parallactic a_M·μ/AU (6.4399″, computed live from package constants). The
 table ships **without a constant term** (the all-phase fit attributes the
 constant to the tier's existing anchors — at new moon the EMB argument
@@ -752,8 +771,8 @@ phases.
 Registry Sun metric (instrument-owned, `fq7s-sun-registry-metric.mjs`:
 modern window 1970–2049, full nutation bridge on the cache's UT instants
 (verified by re-query, plan 06 I1), mean removed): certified
-<!--v:frameworkSunVsJplRms-->1.29<!--/v-->″ vs the Meeus Ch. 25 basis with
-the same completion <!--v:meeusCh25SunVsJplRms-->1.30<!--/v-->″ (bare
+<!--v:frameworkSunVsJplRms-->1.03<!--/v-->″ vs the Meeus Ch. 25 basis with
+the same completion <!--v:meeusCh25SunVsJplRms-->1.02<!--/v-->″ (bare
 Meeus 10.07″). The former era-clock Sun read 0.80″ here — the modern-window
 cost of the physical year (plan 06 R1).
 
@@ -826,9 +845,9 @@ all-phase JPL λ **<!--v:moonSeriesLonVsJplRms-->2.84<!--/v-->″** /
 β **<!--v:moonSeriesLatVsJplRms-->0.35<!--/v-->″** — the β endpoint AT
 the measured MPP02-vs-JPL comparison floor (~0.33″); dense 2-day JPL
 arbiter λ 2.22″ / β 0.38″; the 179-syzygy fleet Δ-instrument improving;
-NASA centerlines mean <!--v:centerlinesMeanArcsec-->2.4<!--/v-->″ / max
-<!--v:centerlinesMaxArcsec-->5.8<!--/v-->″; audit verdicts 3/13/5/0/5;
-Babylon −135 BestGap <!--v:babylon135BestGapKm-->392<!--/v--> km
+NASA centerlines mean <!--v:centerlinesMeanArcsec-->6.5<!--/v-->″ / max
+<!--v:centerlinesMaxArcsec-->11.1<!--/v-->″; audit verdicts 3/13/5/0/5;
+Babylon −135 BestGap <!--v:babylon135BestGapKm-->385<!--/v--> km
 (doc 103). What remains is genuinely floor: the ~0.8″ λ post-census
 residual (sub-0.04″ deep dust + beyond-3-body), the doctrine-blocked
 ~5e-5 parameter class (the three biggest Meeus head amplitudes off by
@@ -954,7 +973,7 @@ tested this directly: Meeus Ch. 47, ELP-2000/82 (truncated and full), and
 ELP/MPP02 (DE-fit and LLR-fit) all converge to β ≈ 0.706° at the -135
 conjunction — within 0.001°, consistent with NASA's γ = 0.7119. **The Moon
 series is not the source of the -135 residual** — the audited BestGap
-(<!--v:babylon135BestGapKm-->392<!--/v--> km, off-peak verdict, UT within
+(<!--v:babylon135BestGapKm-->385<!--/v--> km, off-peak verdict, UT within
 9 minutes; see
 [Historical Solar Eclipse Validation](https://holisticuniverse.com/model/historical-eclipse-validation)
 and [doc 103](103-135-babylonian-case-study.md)) is a *where* residual

@@ -25,7 +25,8 @@
     "moonStartposApsidal": 347.5476,
     "moonStartposNodal": 64.0435,
     "moonStartposMoon": 67.8443,
-    "moonMeeusLpCorrection": 0.009097354859355077
+    "_moonMeeusLpCorrectionNote": "RETIRED at plan 06 R3 item 1 (was 0.009097354859355077 deg = +32.75 arcsec, Step 5c moon-eclipse-optimizer). Measured against JPL Horizons' apparent Moon over 1970-2049 the series needs no anchor (-1.0 +/- 1.5 arcsec, flat in elongation); the value was the eclipse location tier's mean Sun compensated (its aberration kappa + the I2 long inequality + the trend-deltaT offset). Kept at 0 until the plumbing leaves (R4).",
+    "moonMeeusLpCorrection": 0
   },
   "planets": {
     "mercury": {

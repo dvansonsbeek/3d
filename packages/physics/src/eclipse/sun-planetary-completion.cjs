@@ -22,9 +22,23 @@
  * THE CARRIERS (FQ-5 N3, the doctrine's final mile for the Sun side):
  * the six planetary mean-longitude RATES are no longer instrument
  * literals — they are INJECTED by the model wiring, computed live from
- * the framework's own planet records (one revolution per the record's
- * tropical period; Earth from the framework mean solar year), as is the
- * Moon-elongation rate for the EMB-wobble carrier. The J2000 phase
+ * the framework's own planet records, as is the Moon-elongation rate for
+ * the EMB-wobble carrier. PLAN 06 I2 — the injected rates are SIDEREAL
+ * (the record's of-date rate minus the model's own J2000 precession;
+ * Earth the framework sidereal year; model.js): a perturbation argument
+ * is inertial (D'Alembert — only Σk = 0 arguments are frame-free), and
+ * on the N3 of-date carriers every Σk ≠ 0 row (3V−4E, E−2J, 2V−3E,
+ * 2E−3J, 2E−3M, 2M−E, 2(2M−E) …) drifted by Σk·ψ(t): 42..52° at −3000,
+ * measured against JPL Horizons over ±3000 yr as the dominant ancient
+ * scatter of the certified Sun (6.4″ → 4.4″ at −3000, 6.0 → 4.6″ at
+ * −2000, 3.6 → 3.0″ at 0 AD on sidereal carriers; 1900–2100 unchanged).
+ * The 70 N3 literals are KEPT: the two carrier sets share the J2000
+ * anchors and part by ≤ 1.4°·|Σk| at the 200-yr window's edges, and the
+ * re-extraction on sidereal carriers (tools/explore/i2-sidereal-carrier-
+ * table.mjs) reproduces the composed function (fidelity 0.612 vs 0.614″,
+ * JPL 1900–2100 all-phase sd identical to 0.01″) while redistributing
+ * the near-degenerate ±M sideband pairs — only the composed function
+ * ships, so the literals stay as extracted. The J2000 phase
  * anchors (ARG_L0, PERI, D0) remain declared epoch constants — the
  * "anchored by design" class; any constant phase offset is absorbed into
  * the fitted cos/sin split exactly. N3 gates measured before the swap:
@@ -80,7 +94,7 @@
  * check`) recomputes it from live constants and fails on mismatch. The
  * carrier↔table pairing is enforced by both living in this one module
  * with the rates injected from the same constants the records read. The
- * api centerline gate (≤8″ shadow-plane) backstops gross staleness
+ * api centerline gate (≤12″ shadow-plane) backstops gross staleness
  * independently.
  *
  * FQ-5 N2 RECORD (the carrier attribution): 8/10 carriers measured
@@ -115,6 +129,26 @@ const ARG_D0 = 297.8501921;
  * composed difference vs the previous table ≤1.5″ at the ancient presets,
  * detrended 0.033 min). Individual coefficients redistribute between the
  * near-degenerate ±M sideband families; only the composed function ships.
+ *
+ * PLAN 06 I2 — the LONG-PERIOD rows (the last two): the Earth–Mars–
+ * Jupiter long inequality 4λ_E − 8λ_Ma + 3λ_J (carrier period 1801 yr;
+ * the classical ~1783-yr term of the solar theory) and the Venus–Earth
+ * term 8λ_V − 13λ_E (238 yr), DERIVED on the model's own Wisdom–Holman
+ * engine (tools/explore/nbody-wh.mjs, the chain artifact's integrator) on
+ * the campaign's ONE Horizons J2000 seed, Sun + eight planets, DE440
+ * masses, 1PN, order 2, dt 2 d, −5100..+1100 yr: the EMB's osculating
+ * mean longitude Ω+ω+M in yearly means, LSQ on [1, T, T²] + cos/sin of
+ * the arguments on THESE carriers (tools/explore/i2-long-inequality.mjs).
+ * Measured: 6.27″ / 1.84″; step-converged (dt 1 d: 6.272 / 1.869); the
+ * integration reproduces DE441's Earth longitude to 0.68″ sd over 6000
+ * yr with 0.03″ left at the 1783-yr argument. Neither could come from the
+ * 200-yr D2 window (the term's in-window ramp went to the projected-out
+ * secular basis; the 240-yr term folded into it). WHY they were missing:
+ * the certified Sun integrates a smooth tropical year for its mean
+ * longitude; against Horizons its residual carried exactly this 6″ ripple
+ * (plan 06 I1 analysis) — with the same phase in the sidereal residual, a
+ * perturbation of Earth's mean motion, not a frame effect. Sub-0.2″
+ * candidates left out (2J−5S 0.17″, 5V−8E 0.17″: window-dependent phase).
  * @type {Array<[number[], number[], number, number]>}
  */
 const TERMS = [
@@ -188,6 +222,9 @@ const TERMS = [
   [[0, 0, 1, -1, 0, 0], [0, 0, 1, 0, 0, 0], 0.0188, 0.0523],
   [[0, 2, -2, 0, 0, 0], [0, 0, 1, 0, 0, 0], -0.0421, -0.0340],
   [[0, 0, 1, -1, 0, 0], [0, 0, -1, 0, 0, 0], -0.0353, -0.0379],
+  // plan 06 I2 — the long-period rows (see the doc comment above)
+  [[0, 0, 4, -8, 3, 0], [0, 0, 0, 0, 0, 0], 6.2314, -0.7168],
+  [[0, 8, -13, 0, 0, 0], [0, 0, 0, 0, 0, 0], 1.8389, 0.1419],
 ];
 
 const D2R = Math.PI / 180;
@@ -247,15 +284,19 @@ function createSunPlanetaryCompletion({ embWobbleArcsec, carrierRatesDegPerCy })
 const PAIRED_SUN_HARMONICS_SHA256 = 'cbc189cea1c20292';   // eccentricity unification: Step-0 refit → N2/N3 re-derived (fidelity 0.616″, 70 terms)
 
 /** sha256/16 of JSON.stringify([...planets, moonElongation]) — the seven
- *  full-precision carrier rates (deg/cy TT) the TERMS table was extracted
- *  under at N3. The model wiring recomputes the rates live from the planet
- *  records, so a planet-period / year / month input change moves the
- *  carriers automatically while the table stays frozen — a silent few-
- *  arcsec stale below the api gate's ≤8″ backstop. test:model recomputes
- *  this fingerprint from live constants (identical arithmetic to model.js)
- *  and fails on mismatch: re-run the N3 extraction chain
- *  (tools/explore/n2-sun-framework-carriers.mjs →
- *  n3-carrier-swap-preview.mjs), re-embed TERMS, and update this value. */
-const PAIRED_CARRIER_RATES_SHA256 = '893e055ee12343bd';
+ *  full-precision carrier rates (deg/cy TT) the TERMS table pairs with:
+ *  the SIDEREAL carriers of plan 06 I2 (record rate − the model's J2000
+ *  precession; Earth the framework sidereal year; the N3 literals kept,
+ *  the two long-period rows derived on these rates). The model wiring
+ *  recomputes the rates live from the planet records, so a planet-period /
+ *  year / month input change moves the carriers automatically while the
+ *  table stays frozen — a silent few-arcsec stale below the api gate's
+ *  ≤12″ backstop. test:model recomputes this fingerprint from live
+ *  constants (identical arithmetic to model.js) and fails on mismatch:
+ *  re-run the extraction chain (tools/explore/n2-sun-framework-carriers.mjs
+ *  → i2-sidereal-carrier-table.mjs for the short-period rows,
+ *  i2-long-inequality.mjs for the long-period rows), re-embed TERMS, and
+ *  update this value. */
+const PAIRED_CARRIER_RATES_SHA256 = '2d066e92bae955e4';
 
 module.exports = { createSunPlanetaryCompletion, PAIRED_SUN_HARMONICS_SHA256, PAIRED_CARRIER_RATES_SHA256 };

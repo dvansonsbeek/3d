@@ -52,7 +52,8 @@
  * A1-class correlated-subsample effect (the tracked events sit −1.6″
  * below the +1.4″ fleet mean and sample the near-annual arguments at
  * correlated phases; the era-split refutes anchor double-counting and
- * the modern era improves most, 3.57 → 3.34). The ≤8″ api gate holds
+ * the modern era improves most, 3.57 → 3.34). The api gate (8″ then; 12″
+ * since plan 06 R3 item 1 — the physical ΔT-convention floor) holds
  * (max 6.2″). Coefficients are stored with the run→real argument
  * mapping already applied (the extraction's heliocentric-planet vs
  * geocentric-sun π-offset is folded into the signs).

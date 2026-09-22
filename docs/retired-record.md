@@ -1,7 +1,7 @@
 ---
 docVersion: 1.0
 modelVersion: v14.0
-coefficients: sha256:78f99d98186e50d9
+coefficients: sha256:8c6f14edf5f84905
 status: current
 ---
 
@@ -146,10 +146,31 @@ family matches the IAU/Laskar expression to 0.1 s over four millennia).
 Both now ride the one Sun whose mean longitude integrates the one-source
 tropical year; the cardinal instants are its apparent crossings — against
 JPL Horizons' own crossings over ±3000 yr (the observation-class reference
-that replaced Meeus here, plan 06 I1) they sit <!--v:cardinalVsHorizonsMeanMin-->−3.70<!--/v--> min on average,
+that replaced Meeus here, plan 06 I1) they sit <!--v:cardinalVsHorizonsMeanMin-->−3.84<!--/v--> min on average,
 within a minute in 1000–3000, where the retired device sat hours (doc 110
 §5.3). The coefficients stay in the file as the record until the cleanup
 phase.
+
+**The fitted Moon anchor and the "D5 derived optics"** (doc 66 §1.4 is the
+record; plan 06 R3 item 1): the mean-longitude anchor
+`moonMeeusLpCorrection` (+32.75″, Step 5c), the RA/Dec patches
+`MOON_CORRECTION` / `MOON_CORRECTION_RESIDUAL`, and the annual-aberration
+layer applied to the rendered Moon's direction. Measured against JPL
+Horizons' apparent Moon over 1970–2049: the bare series with its derived
+extension reads −1.0″ ± 1.5″, flat in elongation — the Moon needs no
+anchor — while the rendered Moon read +32.5″ + 20″·cos D. The layer had
+been validated against Horizons' ASTROMETRIC Moon, a bookkeeping
+intermediate that sits ~20″·cos D from both the geometric and the apparent
+place (for a body co-moving with the observer the stellar aberration cancels
+against its barycentric light-time, leaving the 0.7″ relative term); the
+patches were fitted around it at syzygies, and the anchor absorbed the
+eclipse tier's mean Sun — its aberration κ, the long inequality the Sun
+lacked before I2, and the trend-ΔT offset. The location tier now rides
+apparent places for each body on its own physics (the Sun's κ, the Moon's
+relative light-time), the scene Moon is the geometric series Moon like the
+Sun and planets, and the NASA centerlines' physical floor in 1999–2026 is
+2–5″ — the model's trend ΔT against the observed one — where the retired
+anchor had produced 1.3″ by compensation.
 
 ## What this does NOT retire
 

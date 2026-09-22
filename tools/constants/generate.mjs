@@ -72,10 +72,8 @@ const COEFFICIENT_KEYS = [
   'SOLSTICE_OBLIQUITY_HARMONICS',
   'SUN_LONGITUDE_HARMONICS',
 
-  // Moon RA/Dec patches. MOON_CORRECTION_RESIDUAL carries a `_comment` the
-  // embedded copy does not — stripped like every other documentation key.
-  'MOON_CORRECTION',
-  'MOON_CORRECTION_RESIDUAL',
+  // (The Moon RA/Dec patches MOON_CORRECTION / MOON_CORRECTION_RESIDUAL were
+  // retired at plan 06 R3 item 1 — moon/apparent.cjs carries the record.)
 
   // script.js's CARDINAL_POINT_ANCHORS is the ADJUSTED set, not the base one.
   // Both are emitted under their JSON names; the consumer picks.
@@ -439,7 +437,7 @@ function buildCoefficients() {
   for (const k of COEFFICIENT_KEYS) {
     if (!(k in fc)) { missing.push(k); continue; }
     // `strip` drops `_`-prefixed documentation keys, which the embedded copies
-    // never carried (MOON_CORRECTION_RESIDUAL has a `_comment`).
+    // never carried.
     out[k] = strip(fc[k]);
   }
   for (const { dir, file, as, pick } of EXTRA_COEFFICIENT_SOURCES) {

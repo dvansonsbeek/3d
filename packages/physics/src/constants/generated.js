@@ -33,7 +33,7 @@
  * carry it so a counterfactual is reproducible (§2d).
  * @type {string}
  */
-export const CONSTANTS_HASH = "7940c564f7b5f0a6";
+export const CONSTANTS_HASH = "17eb0d90c231976b";
 
 /** Model version label — single source: public/input/model-version.json (§10 two-axis scheme). */
 export const MODEL_VERSION = "v14.0";
@@ -43,7 +43,7 @@ export const PREPRINT_DOI = "10.21203/rs.3.rs-8758810/v4";
 
 /** @type {Readonly<Record<string, unknown>>} */
 export const DEFAULT_CONSTANTS = Object.freeze({
-  hash: "7940c564f7b5f0a6",
+  hash: "17eb0d90c231976b",
   additionalBodies: {
     "pluto": {
       "name": "Pluto",
@@ -250,7 +250,7 @@ export const DEFAULT_CONSTANTS = Object.freeze({
     "moonStartposApsidal": 347.5476,
     "moonStartposNodal": 64.0435,
     "moonStartposMoon": 67.8443,
-    "moonMeeusLpCorrection": 0.009097354859355077
+    "moonMeeusLpCorrection": 0
   },
   moonMeeus: {
     "elpW1T2Decomposition_arcsecPerCy2": {
@@ -766,8 +766,8 @@ export const REFERENCE_DATA = Object.freeze({
     "sunModelTrueErrorDeg": 0.003,
     "sunTropicalYearDiffSeconds": 0.1,
     "sunSiderealYearDiffSeconds": 0.02,
-    "frameworkSunVsJplRmsArcsec": 1.29,
-    "meeusCh25SunVsJplRmsArcsec": 1.3,
+    "frameworkSunVsJplRmsArcsec": 1.03,
+    "meeusCh25SunVsJplRmsArcsec": 1.02,
     "moonSeriesLonVsJplRmsArcsec": 2.84,
     "moonSeriesLatVsJplRmsArcsec": 0.35,
     "mercuryNewtonianArcsecCy": 532,

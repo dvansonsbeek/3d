@@ -2,7 +2,7 @@
 // The fitted coefficients' shapes for TypeScript consumers (§2g); values live
 // in coefficients.js, emitted VERBATIM from fitted-coefficients.json.
 
-export declare const COEFFICIENTS_HASH: "78f99d98186e50d9";
+export declare const COEFFICIENTS_HASH: "8c6f14edf5f84905";
 
 export declare const FITTED_COEFFICIENTS: {
   readonly ANOMALISTIC_YEAR_HARMONICS: Array<[number, number, number]>;
@@ -634,34 +634,6 @@ export declare const FITTED_COEFFICIENTS: {
   };
   readonly MEEUS_LATITUDE_TERMS: Array<number[]>;
   readonly MEEUS_LONGITUDE_TERMS: Array<number[]>;
-  readonly MOON_CORRECTION: {
-    "raSinD": number;
-    "raCosD": number;
-    "raSinMp": number;
-    "raCosMp": number;
-    "raSinMs": number;
-    "raCosMs": number;
-    "decSinD": number;
-    "decCosD": number;
-    "decSinMp": number;
-    "decCosMp": number;
-    "decSinMs": number;
-    "decCosMs": number;
-  };
-  readonly MOON_CORRECTION_RESIDUAL: {
-    "raSinD": number;
-    "raCosD": number;
-    "raSinMp": number;
-    "raCosMp": number;
-    "raSinMs": number;
-    "raCosMs": number;
-    "decSinD": number;
-    "decCosD": number;
-    "decSinMp": number;
-    "decCosMp": number;
-    "decSinMs": number;
-    "decCosMs": number;
-  };
   readonly PERI_HARMONICS_RAW: Array<[number, number, number]>;
   readonly PERI_OFFSET: number;
   readonly PREDICT_COEFFS_PHYSICAL: {

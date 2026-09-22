@@ -18,6 +18,17 @@
  *     hand-mirrors (per-div phaseAdvance vs 2π·div·c), not the twins; the
  *     shared @essrt/physics/cardinal implementation dissolved it.
  *   - RA: bit-exact since the integrated-phase migration (same reason).
+ *   - DEEP solstice JDs (|year| > 50 kyr): within 1e-6 d (0.1 s), NOT
+ *     bit-exact — plan 06 R3 item 2, measured: headless Chromium's V8 and
+ *     Node's V8 differ at the last bit on 5–15 % of arguments for pow, exp,
+ *     log, sin, cos, tan, atan2, cbrt, asin, acos, sinh, cosh (4,552 of
+ *     64,000 randomized evaluations; hypot and sqrt identical —
+ *     tools/explore/runtime-math-fingerprint.mjs). The one-source hybrid's
+ *     2-Myr, 400k-step RK4 chain amplifies those bits to ~2 ULP of the JD
+ *     (3e-8 d) at −302,635, where the shared code was bit-exact under the
+ *     previous climate coefficients by luck. Identical code, identical data,
+ *     different runtime arithmetic — a tolerance is the honest statement,
+ *     and the certified window (≤ 50 kyr) stays bit-exact.
  */
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
@@ -33,6 +44,8 @@ const fixture = JSON.parse(readFileSync(
   join(ROOT, 'packages/fixtures/regression/script-js.json'), 'utf8')).values;
 
 const YL_TOL_DAYS = 0;      // bit-exact — achieved at Phase 7.2 (shared code)
+const DEEP_YEARS = 50000;   // beyond the certified fine zone the runtimes' Math differs at the last bit (header)
+const DEEP_JD_TOL_DAYS = 1e-6;
 let exact = 0, withinTol = 0, failures = 0;
 
 for (const [key, browserVal] of Object.entries(fixture)) {
@@ -41,6 +54,14 @@ for (const [key, browserVal] of Object.entries(fixture)) {
   if ((m = key.match(/^solsticeJD_(SS|WS|VE|AE)@(-?\d+)$/))) {
     nodeVal = OE.computeSolsticeJD(Number(m[2]), m[1]);
     klass = 'exact';
+    if (Math.abs(Number(m[2])) > DEEP_YEARS) {
+      if (Object.is(browserVal, nodeVal)) { exact++; continue; }
+      const d = Math.abs(browserVal - nodeVal);
+      if (d <= DEEP_JD_TOL_DAYS) { withinTol++; continue; }
+      console.log(`  DIVERGED (deep, >${DEEP_JD_TOL_DAYS} d) ${key}  Δ=${d.toExponential(3)} d`);
+      failures++;
+      continue;
+    }
   } else if ((m = key.match(/^solstice(SS|WS|VE|AE)@(-?\d+)$/))) {
     nodeVal = OE.computeSolsticeYearLength(Number(m[2]), m[1]);
     klass = 'tol';

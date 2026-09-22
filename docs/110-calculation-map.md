@@ -1,7 +1,7 @@
 ---
 docVersion: 1.0
 modelVersion: v14.0
-coefficients: sha256:78f99d98186e50d9
+coefficients: sha256:8c6f14edf5f84905
 status: current
 ---
 
@@ -619,9 +619,9 @@ record), returned event JDs from fitted coefficients frozen at the last
 spin-and-tides-side fit (the fitters are retired, git 16d7c87f). THE
 OBSERVATION-CLASS VERDICT (plan 06 I1, `tools/verify/sun-vs-horizons.js`
 against JPL Horizons' own crossings over ±3000 yr, TT): the shipped instants
-sit <!--v:cardinalVsHorizonsMeanMin-->−3.70<!--/v--> min from Horizons on average (sd <!--v:cardinalVsHorizonsSdMin-->3.61<!--/v--> min), within
-a minute in 1000–3000 (<!--v:cardinalVsHorizonsMeanP1000Min-->−0.15<!--/v--> / <!--v:cardinalVsHorizonsMeanP2000Min-->−0.66<!--/v--> min) and 3–8 min early in the
-ancient era (<!--v:cardinalVsHorizonsMeanM1000Min-->−3.34<!--/v--> min at −1000..0, <!--v:cardinalVsHorizonsMeanM2000Min-->−7.81<!--/v--> min at −2000..−1000) — the
+sit <!--v:cardinalVsHorizonsMeanMin-->−3.84<!--/v--> min from Horizons on average (sd <!--v:cardinalVsHorizonsSdMin-->3.08<!--/v--> min), within
+a minute in 1000–3000 (<!--v:cardinalVsHorizonsMeanP1000Min-->−0.58<!--/v--> / <!--v:cardinalVsHorizonsMeanP2000Min-->−0.68<!--/v--> min) and 3–8 min early in the
+ancient era (<!--v:cardinalVsHorizonsMeanM1000Min-->−4.59<!--/v--> min at −1000..0, <!--v:cardinalVsHorizonsMeanM2000Min-->−6.38<!--/v--> min at −2000..−1000) — the
 Sun's own slowly varying bias against Horizons (+17–19″ there, §1.1). The
 retired device sat hours from the same reference (the gap table in §5.3:
 4.5 h at 0 AD, 6.5 d at −10000). The **one-source cardinal structure** (`createCardinalStructure`)
@@ -732,26 +732,26 @@ device first):
 <!-- generated:calcmap-cardinal-decomposition -->
 | year | lincoef·(Y−2000) (d) | drift Simpson (d) | Ih (d) | Σ sinusoids − δ(2000) (d) | equation-of-centre orders (d) | joint sidebands (d) | JD_SS − anchor (d) | cycles since the balanced year, integrated | linear (Y − bY)/H |
 |---|---|---|---|---|---|---|---|---|---|
-| -10000 | -4382906.2754 | 0.02155 | -2.17476 | -0.15117 | 0.14925 | 0.00306 | -4382914.79768 | 0.8727114 | 0.8727115 |
-| -2584 | -1674270.1972 | 0.00702 | -0.38503 | -0.06334 | 2.45811 | -0.00072 | -1674269.15839 | 0.8948279 | 0.8948279 |
-| -584 | -943785.8180 | 0.00378 | -0.12539 | -0.01218 | 1.53599 | 0.00051 | -943784.71910 | 0.9007924 | 0.9007924 |
-| 0 | -730484.3792 | 0.00288 | -0.07549 | -0.00315 | 1.19344 | 0.00055 | -730483.44928 | 0.9025340 | 0.9025340 |
-| 1246 | -275392.6110 | 0.00105 | -0.01081 | 0.00396 | 0.43630 | 0.00027 | -275392.20843 | 0.9062499 | 0.9062499 |
-| 2000 | 0.0000 | 0.00000 | 0.00000 | -0.00000 | -0.00000 | 0.00000 | -0.00137 | 0.9084985 | 0.9084985 |
-| 5000 | 1095726.5688 | -0.00379 | -0.16868 | -0.05919 | -1.11594 | -0.00006 | 1095724.72260 | 0.9174453 | 0.9174453 |
-| 10000 | 2921937.5169 | -0.00868 | -1.08615 | -0.13416 | -0.10744 | 0.00041 | 2921932.90248 | 0.9323565 | 0.9323565 |
+| -10000 | -4382906.2754 | 0.02155 | -2.17476 | -0.15117 | 0.14925 | 0.00306 | -4382914.79908 | 0.8727114 | 0.8727115 |
+| -2584 | -1674270.1972 | 0.00702 | -0.38503 | -0.06334 | 2.45811 | -0.00072 | -1674269.16023 | 0.8948279 | 0.8948279 |
+| -584 | -943785.8180 | 0.00378 | -0.12539 | -0.01218 | 1.53599 | 0.00051 | -943784.72115 | 0.9007924 | 0.9007924 |
+| 0 | -730484.3792 | 0.00288 | -0.07549 | -0.00315 | 1.19344 | 0.00055 | -730483.45012 | 0.9025340 | 0.9025340 |
+| 1246 | -275392.6110 | 0.00105 | -0.01081 | 0.00396 | 0.43630 | 0.00027 | -275392.21104 | 0.9062499 | 0.9062499 |
+| 2000 | 0.0000 | 0.00000 | 0.00000 | -0.00000 | -0.00000 | 0.00000 | 0.00025 | 0.9084985 | 0.9084985 |
+| 5000 | 1095726.5688 | -0.00379 | -0.16868 | -0.05919 | -1.11594 | -0.00006 | 1095724.72035 | 0.9174453 | 0.9174453 |
+| 10000 | 2921937.5169 | -0.00868 | -1.08615 | -0.13416 | -0.10744 | 0.00041 | 2921932.90185 | 0.9323565 | 0.9323565 |
 
 
 | year | retired device − shipped crossing (min): VE · SS · AE · WS |
 |---|---|
-| -10000 | 9337.0 · 9173.1 · 9410.1 · 9581.9 |
-| -2584 | 1417.0 · 1407.2 · 1373.4 · 1378.7 |
-| -584 | 418.2 · 437.5 · 437.6 · 417.5 |
-| 0 | 266.9 · 271.1 · 272.8 · 264.2 |
-| 1246 | 32.4 · 40.6 · 43.7 · 45.1 |
-| 2000 | 2.9 · 2.0 · -2.9 · -0.4 |
-| 5000 | 691.9 · 718.0 · 718.4 · 694.0 |
-| 10000 | 4507.8 · 4720.9 · 5022.0 · 4789.2 |
+| -10000 | 9340.3 · 9175.1 · 9411.9 · 9586.0 |
+| -2584 | 1421.5 · 1409.9 · 1377.1 · 1383.2 |
+| -584 | 421.4 · 440.5 · 440.9 · 420.4 |
+| 0 | 268.1 · 272.3 · 274.8 · 266.2 |
+| 1246 | 36.0 · 44.4 · 47.7 · 49.1 |
+| 2000 | 0.7 · -0.4 · -5.2 · -2.5 |
+| 5000 | 693.7 · 721.2 · 722.3 · 698.0 |
+| 10000 | 4510.0 · 4721.8 · 5023.1 · 4794.1 |
 
 Plan 06 R1: this decomposition is the RETIRED device's (the record — its coefficients stay in the file); the shipped `cardinal.jd` is the apparent crossing of the one Sun, and the second table is the measured gap between the two (the 2000 row is the anchor convention: the device was pinned to the USNO instants, the crossing carries the mean-longitude anchor L0 and aberration/nutation derived). The six component columns sum to the eighth exactly. Every term is zero at 2000 by construction — the self-correction δ_X(2000) pins the anchor.
 <!-- /generated:calcmap-cardinal-decomposition -->
@@ -761,16 +761,16 @@ The four events and the year lengths:
 <!-- generated:calcmap-cardinal-events -->
 | year | VE | SS | AE | WS | SS→SS interval (d) | `yearLengthDays(SS)` (d, the crossing interval — the same quantity since R1) | mean of four (d) | one-family mean tropical year (s) | e |
 |---|---|---|---|---|---|---|---|---|---|
-| -10000 | -10000 03-19 12:35 | -10000 06-16 06:39 | -10000 09-13 14:58 | -10000 12-16 12:15 | 365.248334 | 365.248334 | 365.243549 | 31556957.13 | 0.01963 |
-| -2584 | -2584 03-21 17:58 | -2584 06-23 22:00 | -2584 09-22 04:10 | -2584 12-19 16:09 | 365.243714 | 365.243714 | 365.242785 | 31556947.89 | 0.01834 |
-| -584 | -584 03-21 04:50 | -584 06-23 08:33 | -584 09-23 08:00 | -584 12-20 20:17 | 365.242055 | 365.242055 | 365.242535 | 31556938.83 | 0.01770 |
-| 0 | 0 03-20 15:52 | 0 06-22 15:01 | 0 09-23 01:48 | 0 12-20 18:24 | 365.243210 | 365.243210 | 365.242458 | 31556935.88 | 0.01750 |
-| 1246 | 1246 03-20 13:57 | 1246 06-21 20:48 | 1246 09-23 03:44 | 1246 12-21 11:36 | 365.240330 | 365.240330 | 365.242292 | 31556929.31 | 0.01701 |
-| 2000 | 2000 03-20 07:33 | 2000 06-21 01:46 | 2000 09-22 17:26 | 2000 12-21 13:35 | 365.242494 | 365.242494 | 365.242190 | 31556925.22 | 0.01670 |
-| 5000 | 5000 03-20 08:43 | 5000 06-18 19:09 | 5000 09-20 11:55 | 5000 12-21 15:35 | 365.247051 | 365.247051 | 365.241777 | 31556909.60 | 0.01533 |
-| 10000 | 10000 03-16 14:53 | 10000 06-13 23:28 | 10000 09-12 15:05 | 10000 12-14 22:04 | 365.239678 | 365.239678 | 365.241154 | 31556892.71 | 0.01261 |
+| -10000 | -10000 03-19 12:32 | -10000 06-16 06:37 | -10000 09-13 14:57 | -10000 12-16 12:11 | 365.245514 | 365.245514 | 365.243549 | 31556957.13 | 0.01963 |
+| -2584 | -2584 03-21 17:53 | -2584 06-23 21:57 | -2584 09-22 04:06 | -2584 12-19 16:05 | 365.243767 | 365.243767 | 365.242785 | 31556947.89 | 0.01834 |
+| -584 | -584 03-21 04:47 | -584 06-23 08:30 | -584 09-23 07:57 | -584 12-20 20:15 | 365.241729 | 365.241729 | 365.242535 | 31556938.83 | 0.01770 |
+| 0 | 0 03-20 15:50 | 0 06-22 15:00 | 0 09-23 01:46 | 0 12-20 18:23 | 365.243961 | 365.243961 | 365.242458 | 31556935.88 | 0.01750 |
+| 1246 | 1246 03-20 13:53 | 1246 06-21 20:44 | 1246 09-23 03:40 | 1246 12-21 11:32 | 365.240246 | 365.240246 | 365.242292 | 31556929.31 | 0.01701 |
+| 2000 | 2000 03-20 07:35 | 2000 06-21 01:48 | 2000 09-22 17:28 | 2000 12-21 13:37 | 365.242501 | 365.242501 | 365.242190 | 31556925.22 | 0.01670 |
+| 5000 | 5000 03-20 08:41 | 5000 06-18 19:05 | 5000 09-20 11:51 | 5000 12-21 15:31 | 365.246932 | 365.246932 | 365.241777 | 31556909.60 | 0.01533 |
+| 10000 | 10000 03-16 14:51 | 10000 06-13 23:27 | 10000 09-12 15:04 | 10000 12-14 21:59 | 365.237188 | 365.237188 | 365.241154 | 31556892.71 | 0.01261 |
 
-Dates on the proleptic Gregorian calendar from the UT model-JD of the APPARENT crossing of the one Sun (plan 06 R1 — formerly the retired device's JD); the `year` argument is the calendar year of the event. The single-year intervals carry nutation and the short-period terms (they match Meeus ch. 27's successive instants to seconds); the mean tropical year is the one-family column.
+Dates on the proleptic Gregorian calendar from the TRUE-UT JD of the APPARENT crossing of the one Sun (since plan 06 R3 item 2 the finder-axis root minus the deltaTStart bridge — before it the published instants were 0.9 min late) (plan 06 R1 — formerly the retired device's JD); the `year` argument is the calendar year of the event. The single-year intervals carry nutation and the short-period terms (they match Meeus ch. 27's successive instants to seconds); the mean tropical year is the one-family column.
 <!-- /generated:calcmap-cardinal-events -->
 
 The e(t)-spread by both devices, the anomalistic year, the RA:
@@ -778,12 +778,12 @@ The e(t)-spread by both devices, the anomalistic year, the RA:
 <!-- generated:calcmap-cardinal-spread -->
 | year | crossing intervals: T_X − mean (s) VE · SS · AE · WS | one-source structure: T_X − mean (s) VE · SS · AE · WS | structure anomalistic year (s) | RA of VE (°) — the target by construction since R1 | e |
 |---|---|---|---|---|---|
-| -10000 | 608.8 · 413.4 · -265.1 · -456.9 | 7.9 · 55.0 · -6.3 · -56.6 | 31558387.90 | 0.0000 | 0.01963 |
-| -2584 | 375.6 · 80.3 · 298.9 · -46.0 | -48.1 · -25.1 · 47.2 · 26.0 | 31558415.97 | 0.0000 | 0.01834 |
-| 0 | 49.0 · 64.9 · -62.5 · 62.9 | -15.0 · -50.5 · 16.1 · 49.5 | 31558425.22 | 0.0000 | 0.01750 |
-| 2000 | 399.5 · 26.3 · -736.0 · -275.8 | 16.0 · -48.6 · -14.9 · 47.5 | 31558432.62 | 0.0000 | 0.01670 |
-| 5000 | 297.9 · 455.7 · -191.2 · -75.8 | 44.2 · -15.1 · -45.0 · 15.8 | 31558445.07 | 0.0000 | 0.01533 |
-| 10000 | 390.6 · -127.5 · -684.0 · -274.5 | 12.7 · 37.8 · -12.2 · -38.3 | 31558475.72 | 0.0000 | 0.01261 |
+| -10000 | 359.1 · 169.7 · -392.3 · -343.5 | 7.9 · 55.0 · -6.3 · -56.6 | 31558387.90 | 0.0000 | 0.01963 |
+| -2584 | 383.8 · 84.8 · 397.3 · -26.8 | -48.1 · -25.1 · 47.2 · 26.0 | 31558415.97 | 0.0000 | 0.01834 |
+| 0 | 51.3 · 129.8 · 39.5 · 153.0 | -15.0 · -50.5 · 16.1 · 49.5 | 31558425.22 | 0.0000 | 0.01750 |
+| 2000 | 400.1 · 26.9 · -735.3 · -275.1 | 16.0 · -48.6 · -14.9 · 47.5 | 31558432.62 | 0.0000 | 0.01670 |
+| 5000 | 227.4 · 445.4 · -208.7 · -117.2 | 44.2 · -15.1 · -45.0 · 15.8 | 31558445.07 | 0.0000 | 0.01533 |
+| 10000 | 186.8 · -342.7 · -747.9 · -175.1 | 12.7 · 37.8 · -12.2 · -38.3 | 31558475.72 | 0.0000 | 0.01261 |
 
 Retired device's RA formula constants (the record; since R1 the shipped RA is the target longitude by construction): raMean = base − earthRAAngle/sin ε̄ = base − 3.157955°, amplitude A/sin ε̄ = 1.600721° on −sin(2π·3·c) + sin(2π·8·c) (base 0/90/180/270° for VE/SS/AE/WS). Balanced year used by both devices: -302635.00000.
 <!-- /generated:calcmap-cardinal-spread -->

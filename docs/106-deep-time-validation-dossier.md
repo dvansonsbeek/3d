@@ -1,7 +1,7 @@
 ---
 docVersion: 1.0
 modelVersion: v14.0
-coefficients: sha256:78f99d98186e50d9
+coefficients: sha256:8c6f14edf5f84905
 status: current
 ---
 
@@ -94,7 +94,7 @@ The climate formula's orbital lines against the Cenozoic isotope record (the com
 ## C. Historical era — gate- and artifact-backed
 
 - **Babylonian eclipse case study (−135)** — the framework places the
-  totality path <!--v:babylon135BestGapKm-->392<!--/v--> km from Babylon at
+  totality path <!--v:babylon135BestGapKm-->385<!--/v--> km from Babylon at
   ΔUT <!--v:babylon135BestDeltaUT-->-1h01<!--/v--> (framework
   <!--v:babylon135FrameworkUT-->06:00<!--/v--> vs documented
   <!--v:babylon135DocumentedUT-->06:14<!--/v-->):

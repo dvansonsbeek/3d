@@ -52,7 +52,6 @@ function isGitIgnored(relPath) {
 // the eclipse-audit campaigns, the AMD α-scan once its method is recovered).
 const REQUIRED = [
   // stamped in Phase 1:
-  'data/planet-prediction-fit-stats.json',
   'data/cassini-moontilt-results.json',
   // stamped in Phase 2:
   'data/lod-climate-correlation-summary.json',
@@ -66,8 +65,26 @@ const REQUIRED = [
   'data/sun-vs-horizons-summary.json',
 ];
 
+// Artifacts STALE BY CONSTRUCTION (plan 06 R3 item 1 cleanup, owner-checked):
+// their inputs block is kept as the record, but a freshness re-stamp would
+// certify a claim the model no longer makes, so the gate reports them as
+// NOTES and does not ask for regeneration. Each entry names the reason; the
+// way out is a re-derivation on current inputs or a retirement (R4), never a
+// re-stamp.
+const STALE_BY_CONSTRUCTION = {
+  'data/planet-prediction-fit-stats.json':
+    'scores the shipped PREDICT_COEFFS_PHYSICAL arrays against the Step-3 workbook '
+    + 'data/01-holistic-year-objects-data.xlsx, a 2026-08-28 browser export of the '
+    + 'RETIRED geometric planet path (the chains flipped to engine D at P5, 2026-09-06; '
+    + 'the legacy path was excised at K5, 2026-09-08). Its planet columns and the arrays '
+    + 'trained on them (the Earth-frame RA-rate device, doc 13 §1.8; the website\'s '
+    + '*PredR2/*PredRmse claims) predate the shipped planets — re-export Step 3 from the '
+    + 'current simulator and retrain, or retire the device (R4); do not re-stamp.',
+};
+
 const DATA = path.join(ROOT, 'data');
 let checked = 0;
+let notes = [];
 let failures = [];
 let skipped = [];
 
@@ -94,6 +111,10 @@ for (const rel of [...governed].sort()) {
   const abs = path.join(ROOT, rel);
   if (!fs.existsSync(abs)) {
     failures.push(`${rel}: governed artifact is MISSING`);
+    continue;
+  }
+  if (STALE_BY_CONSTRUCTION[rel]) {
+    notes.push(`${rel}: STALE BY CONSTRUCTION — ${STALE_BY_CONSTRUCTION[rel]}`);
     continue;
   }
   const doc = JSON.parse(fs.readFileSync(abs, 'utf8'));
@@ -127,6 +148,7 @@ console.log('  ARTIFACT FRESHNESS  (campaign artifacts vs their recorded inputs)
 console.log(line);
 console.log(`  ${governed.size} governed artifact(s) · ${checked} input hash(es) verified`);
 for (const s of skipped) console.log(`  SKIP   ${s}`);
+for (const n of notes) console.log(`  NOTE   ${n}`);
 if (failures.length) {
   console.log('');
   for (const f of failures) console.log(`  STALE  ${f}`);

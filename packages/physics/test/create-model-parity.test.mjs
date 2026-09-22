@@ -185,13 +185,17 @@ if (model.identity.counterfactual !== false) failures.push('identity: default as
   const H = C.foundational.holisticyearLength;
   const mSY = Math.round(C.foundational.inputmeanlengthsolaryearindays * (H / 8)) / (H / 8);
   const dpc = (/** @type {number} */ f) => 360 * 36525 * f;
+  // plan 06 I2 — SIDEREAL carriers: the record's of-date rate minus the
+  // model's own J2000 precession (mean solar year vs sidereal year), Earth
+  // the framework sidereal year — identical arithmetic to model.js.
+  const p0 = dpc(1 / mSY) - dpc(1 / C.yearLengthRef.siderealYear);
   const liveRates = [
-    dpc(1 / C.planetOrbitalElements.mercury.solarYearInput),
-    dpc(1 / C.planetOrbitalElements.venus.solarYearInput),
-    dpc(1 / mSY),
-    dpc(1 / C.planetOrbitalElements.mars.solarYearInput),
-    dpc(1 / C.planetOrbitalElements.jupiter.solarYearInput),
-    dpc(1 / C.planetOrbitalElements.saturn.solarYearInput),
+    dpc(1 / C.planetOrbitalElements.mercury.solarYearInput) - p0,
+    dpc(1 / C.planetOrbitalElements.venus.solarYearInput) - p0,
+    dpc(1 / C.yearLengthRef.siderealYear),
+    dpc(1 / C.planetOrbitalElements.mars.solarYearInput) - p0,
+    dpc(1 / C.planetOrbitalElements.jupiter.solarYearInput) - p0,
+    dpc(1 / C.planetOrbitalElements.saturn.solarYearInput) - p0,
     dpc(1 / C.moonReference.moonSiderealMonthInput - 1 / C.yearLengthRef.siderealYear),
   ];
   const liveFp = createHash('sha256').update(JSON.stringify(liveRates)).digest('hex').slice(0, 16);

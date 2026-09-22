@@ -373,10 +373,20 @@ for (const url of SAMPLE_REQUESTS) {
   // at 5.2″; highest latitude + lowest sun in the sample, the class where
   // the sphere bug hid). The A2 landing trades the correlated 13-event
   // subsample −0.5″ for fleet-wide JPL gains — the owner-accepted tension
-  // recorded in moon/series-extension.cjs. The 8″ gate catches any
-  // regression of the convention-offset class (~35″) with margin; the
-  // coarse 60 km ground bound stays as a wild-miss backstop at any sun
-  // altitude.
+  // recorded in moon/series-extension.cjs.
+  // PLAN 06 R3 ITEM 1 (measured): the recorded 1.3–2″ class of the modern
+  // events was the fitted moonMeeusLpCorrection (+32.75″) compensating the
+  // besselian's mean Sun — its aberration κ, the long inequality the Sun
+  // lacked before I2, AND the model's trend ΔT against the observed one
+  // (9.5 s below IERS at 2000, 2.9 s at 2024; × the Moon's 0.55″/s). With
+  // the tier on apparent places and the anchor retired, the PHYSICAL floor
+  // on NASA's UT instants is that ΔT convention plus the series' syzygy
+  // scatter: mean 6.5″ / max 11.1″ (2001 Jun 21) across the 42 points
+  // (2024: 4.4″, 2026: 3.2″, 2023: 1.6″). The gate is restated at 12″ —
+  // above that floor, still far below the convention-offset class (~35″)
+  // it exists to catch; never re-tighten it by fitting the Moon or ΔT to
+  // eclipses. The coarse 60 km ground bound stays as a wild-miss backstop
+  // at any sun altitude.
   {
     const { readFileSync } = await import('node:fs');
     const { DEFAULT_CONSTANTS } = await import('@essrt/physics');
@@ -419,7 +429,7 @@ for (const url of SAMPLE_REQUESTS) {
         const gv = [(b[0] - a[0]) * R_E_KM, (b[1] - a[1]) * R_E_KM, (b[2] - a[2]) * R_E_KM];
         const dot = gv[0] * s[0] + gv[1] * s[1] + gv[2] * s[2];
         const shadowArcsec = Math.hypot(gv[0] - dot * s[0], gv[1] - dot * s[1], gv[2] - dot * s[2]) / 1.86;
-        if (shadowArcsec > 8) failures.push(`centerline acceptance: ${ev.label} ${p.utc} shadow-plane ${shadowArcsec.toFixed(1)}″ > 8″`);
+        if (shadowArcsec > 12) failures.push(`centerline acceptance: ${ev.label} ${p.utc} shadow-plane ${shadowArcsec.toFixed(1)}″ > 12″`);
         if (groundKm > 60) failures.push(`centerline acceptance: ${ev.label} ${p.utc} ground gap ${groundKm.toFixed(1)} km > 60 km`);
       }
     }

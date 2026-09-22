@@ -220,7 +220,7 @@ const moonStartposMoon = K.moon.moonStartposMoon;         // in-plane anchor via
 // | none"; IP-bounded-moon-derivation "bit-identical (0.8086/0.010524/0.0015),
 // FULL GATES PASSED"), which is what tools/lib has always used. Importing it
 // makes browser and Node agree on lunar longitude to 1e-6 deg.
-const moonMeeusLpCorrection = K.moon.moonMeeusLpCorrection;  // Meeus Lp longitude correction (DE200→DE440 offset)
+const moonMeeusLpCorrection = K.moon.moonMeeusLpCorrection;  // RETIRED to 0 (plan 06 R3 item 1) — the series needs no anchor; plumbing leaves at R4
 
 // ─── C2. Sun & Moon astro references ─────────────────────────────────────
 const sunTilt = K.earthOrbital.sunTilt;                   // Solar obliquity to ecliptic
@@ -644,27 +644,12 @@ const PREDICT_COEFFS = FIT.PREDICT_COEFFS_PHYSICAL;
 // ─── B3. (The fitted planet-path corrections — parallax, gravitation,
 // elongation — were EXCISED with the legacy planet chains, K5.) ──────────
 
-// ─── B3b. Moon post-Meeus correction (fitted to JPL DE440 residuals) ─────
-// 3-term correction: D (mean elongation), M' (Moon mean anomaly), M (Sun mean anomaly)
-// Source: public/input/fitted-coefficients.json
-// @AUTO:MOON_CORRECTION
-const MOON_CORRECTION = FIT.MOON_CORRECTION;
-// D5 derived optics: the framework-native runtime subtracts the ANALYTIC
-// annual aberration (speedOfLight + Sun velocity — the fitted patch above was
-// 98–102% aberration-shaped); this residual is what genuinely remains
-// (dominated by the 5.1″ raCosMp term. Measured decomposition, every part in
-// one convention: the patch = Meeus − JPL = −5.15″ (shipped −5.12″, agrees to
-// 0.03″) = −1.13″ named planetary-series truncation − 4.05″ analytic-theory
-// vs JPL DE441 numerical ephemeris. The second half is NOT an ELP82B→MPP02
-// step — those two agree to 0.03″ here — so it has no series-term
-// decomposition in any analytic theory; it is a flat ~4″ offset across
-// 2000–2050. tools/explore/residual-attribution-{elp,mpp02}.js, docs/66 §1.
-// Do NOT "improve" this by swapping the Meeus override for MPP02: that would
-// remove only the 1.13″ truncation for ~154× the evaluation cost and would
-// leave the 4.05″ still fitted.) KEEP IN
-// SYNC with fitted-coefficients.json MOON_CORRECTION_RESIDUAL (derivation:
-// tools/explore/derive-moon-correction-content.js).
-const MOON_CORRECTION_RESIDUAL = FIT.MOON_CORRECTION_RESIDUAL;
+// ─── B3b. (RETIRED, plan 06 R3 item 1) Moon post-Meeus RA/Dec patches ─────
+// MOON_CORRECTION and MOON_CORRECTION_RESIDUAL (the "D5 derived optics"
+// remainder) left fitted-coefficients.json: the rendered Moon is the geometric
+// series Moon with the derived extension, measured −1.0″ ± 1.5″ against
+// Horizons' apparent Moon over 1970–2049 with no patch — the record is in
+// @essrt/physics moon/apparent.cjs and docs/retired-record.md.
 
 // ─── B4. Obliquity harmonics (fitted) ────────────────────────────────────
 // Source: public/input/fitted-coefficients.json
@@ -6358,7 +6343,7 @@ if (typeof window !== 'undefined') {
       return { raDeg: sun.ra * 180 / Math.PI, decDeg: 90 - sun.dec * 180 / Math.PI, epsDeg: o.obliquityEarth };
     },
     fwSunLonAt: (jd) => _frameworkSunLon(jd),
-    certSunLonAt: (jd) => _tierModelB().eclipse.sunLonCompletedDegAtJD(jd),
+    certSunLonAt: (jd) => _tierModelB().eclipse.sunLonCompletedDegAtJD(jd + deltaTStart / 86400),   // true-UT jd in; the bridge is the caller's (R3 item 2)
     setE5WheelSun: (on) => { E5_WHEEL_SUN_ENABLED = !!on; return E5_WHEEL_SUN_ENABLED; },
     eclFindLunar: (jdStart, jdEnd) => findLunarEclipsesInRange(jdStart, jdEnd),
     eclFindSolar: (jdStart, jdEnd) => findSolarEclipsesInRange(jdStart, jdEnd),
@@ -52964,61 +52949,24 @@ function calculateRAFromEarthPerihelion(obj) {
 
 const _moonVisualCorrection = new THREE.Vector3();
 
-// ═══ D5 derived optics: annual aberration of the Moon direction ═══
-// The model's frames carry apparent-Sun (aberration) content — the Phase D5
-// analysis showed the fitted MOON_CORRECTION was 98–102% the aberration
-// projection (raCosD −0.005654° ≈ κ = 20.4955″), against an ASTROMETRIC
-// (aberration-free) JPL reference. The framework-native runtime therefore
-// subtracts the aberration ANALYTICALLY — exact (all harmonics, not just the
-// 3-argument projection), epoch-aware (velocity from the Sun geometry), and
-// derived from the framework speedOfLight — leaving only the small fitted
-// residual (MOON_CORRECTION_RESIDUAL). Earth velocity = −d/dt of the
-// geocentric Sun vector (compact Meeus Ch. 25 form; framework obliquity for
-// the frame so it stays bounded at deep time).
-// FRAMEWORK-NATIVE Sun vector: e(T) from the anchored observed eccentricity
-// + drift (ASTRO_REFERENCE), equation-of-center coefficients DERIVED from e
-// via the Kepler series (2e − e³/4, (5/4)e², (13/12)e³ — the identity the D1
-// laboratory proved at 2 ppm), mean longitude rate = framework tropical
-// year, mean anomaly rate = that minus the H/16 perihelion rate, R from
-// currentAUDistance, ε from the framework obliquity. One J2000 anchor:
-// sunMeanLongitudeJ2000_deg. Rates frozen at load (J2000 values — the year
-// globals are deep-time-mutable; same pattern as FW_A2_RATE).
-const _D5_RATE_L    = 360 / meansolaryearlengthinDays;                          // deg/day, tropical
-const _D5_RATE_PERI = 360 / ((holisticyearLength / 16) * meansolaryearlengthinDays);  // deg/day, H/16
-// Phase 8.2-7: the D5 optics + RA/Dec override live ONCE in
-// @essrt/physics/moon/apparent. S8: the override's obliquity stays
-// ENGINE-INJECTED per call (this engine passes the live scene value).
+// ═══ The Moon's scene RA/Dec: ecliptic → equatorial only (plan 06 R3 item 1) ═══
+// The "D5 derived optics" (annual aberration v_E/c applied to the Moon's
+// direction) and the fitted RA/Dec patches left: for a body co-moving with the
+// observer the stellar aberration cancels against its barycentric light-time,
+// so the apparent Moon IS the geometric Moon to 0.7″ — D5 had validated against
+// Horizons' ASTROMETRIC Moon, a bookkeeping intermediate 20″ from both places.
+// Measured over 1970–2049 against Horizons' apparent Moon: the former rendered
+// Moon +32.5″ + 20″·cos D; the geometric series + derived extension −1.0″ ±
+// 1.5″, flat in elongation. Phase 8.2-7: the conversion lives ONCE in
+// @essrt/physics/moon/apparent; the obliquity stays ENGINE-INJECTED per call
+// (this engine passes the live scene value).
 const _moonApparent = (() => {
   let m = null;
   return () => {
-    if (!m) {
-      m = createMoonApparent({
-        constants: {
-          j2000JD, julianCenturyDays,
-          sunMeanLongitudeJ2000Deg: ASTRO_REFERENCE.sunMeanLongitudeJ2000_deg,
-          perihelionLongitudeJ2000Deg: ASTRO_REFERENCE.perihelionLongitudeJ2000_deg,
-          eccentricityJ2000: ASTRO_REFERENCE.eccentricityJ2000,
-          eccentricityDotJ2000: ASTRO_REFERENCE.eccentricityDotJ2000,
-          d5RateLDegPerDay: _D5_RATE_L,
-          d5RatePeriDegPerDay: _D5_RATE_PERI,
-          speedOfLight,
-        },
-        fns: {
-          // Phase 3 S3b: the apparent Moon's RA/Dec turn on the published ε (the hybrid); the
-          // Moon's ARGUMENTS (the other factory) keep the comb — a device-anchored matched triple.
-          computeObliquityEarth: (y) => _sceneEpsTargetDeg(y),
-          getAuDistanceKm: () => currentAUDistance,
-          isFrameworkNative: () => MOON_ARGS_FRAMEWORK_NATIVE,
-          getCorrectionResidual: () => MOON_CORRECTION_RESIDUAL,
-          getCorrectionLegacy: () => MOON_CORRECTION,
-        },
-      });
-    }
+    if (!m) m = createMoonApparent();
     return m;
   };
 })();
-function _sunGeoVecEqD5(jd) { return _moonApparent().sunGeoVecEqD5(jd); }
-function _moonAberrationRaDec(jd, ra, dec) { return _moonApparent().moonAberrationRaDec(jd, ra, dec); }
 
 // (Stage C ring lock REVERTED: the deep-time ring-vs-Moon misalignment
 // (~155° at +200 kyr) was root-caused to the Moon-chain layers running on
@@ -54561,7 +54509,7 @@ function moveModel(pos) {
         _tierModelB();
         // K8b follow-up (owner-approved FULL INJECTION): the wheel Sun now
         // rides the COMPLETED certified Sun — the finder Sun minus the
-        // derived planetary-completion table (70 framework-carrier terms +
+        // derived planetary-completion table (70 sidereal-carrier terms + the two I2 long-period rows +
         // the 6.44″ Earth-around-EMB "lunar equation"). The rendered Sun,
         // the panels and the cardinal EVENT instants (the solver reads the
         // rendered Sun) thereby become apparent-class: individual
@@ -54586,7 +54534,9 @@ function moveModel(pos) {
         // Jacobian, so two Newton passes (read λ, step θ, re-read, step the
         // remainder). The twin remains only while the anchor is unavailable
         // (first frames, flag off).
-        const _lamCertDeg = _tierUmbraModel.eclipse.sunLonCompletedDegAtJD(o.julianDay);
+        // R3 item 2: the package's finder-axis API adds the curve itself; the
+        // deltaTStart bridge is the caller's (true TT — mirror of the besselian's jb).
+        const _lamCertDeg = _tierUmbraModel.eclipse.sunLonCompletedDegAtJD(o.julianDay + deltaTStart / 86400);
         const _dHybE5 = _osmEqxHybAdvanceRad();
         let _dE5;
         if (_dHybE5 !== null && _osmEqxGeoAnchorB && (obj.a ?? obj.orbitRadius) === (obj.b ?? obj.orbitRadius)) {
@@ -54643,7 +54593,15 @@ function moveModel(pos) {
         const t_Ma_d = (J2000_CALENDAR_YEAR - decYear_d) / 1e6;
         const deltaT_sec_d = meanDeltaTSecondsAtAge(t_Ma_d);
         if (Number.isFinite(deltaT_sec_d)) {
-          d += deltaT_sec_d / 86400;   // JD_UT → JD_TT
+          // Plan 06 R3 item 2 — THE SCENE CLOCK IS TRUE TT: the model's absolute
+          // ΔT is deltaTStart + curve (the published ΔT surface; the besselian
+          // and the registry instruments add the same bridge). The curve alone
+          // is the eclipse FINDERS' certified axis (_eclDeltaT), which had leaked
+          // into the scene: at true UT the scene Moon sat 30″ west (0.549″/s ×
+          // 54.55 s), the Sun 2.2″, and the retired moonMeeusLpCorrection
+          // (+32.75″) had compensated it here. Mirror: tools/lib/scene-graph.js
+          // _jdTTToolsFromUT.
+          d += (deltaTStart + deltaT_sec_d) / 86400;   // JD_UT → JD_TT (absolute)
         }
       }
       // Phase 8.2-6: the full production evaluation lives in
@@ -54654,7 +54612,7 @@ function moveModel(pos) {
       const _sr = _moonSeries().sceneEvalAt(d);
       θ += _sr.thetaAddRad;
       obj._meeusLatRad = _sr.latRad;
-      obj._meeusLonDeg = _sr.lonDeg;   // ecliptic longitude in degrees (incl. moonMeeusLpCorrection)
+      obj._meeusLonDeg = _sr.lonDeg;   // ecliptic longitude in degrees (geometric; the derived extension inside, the retired Lp anchor reads 0)
       obj._meeusT = _sr.T;             // store T for obliquity computation
       obj._meeusDistKm = _sr.distKm;   // matches _meeusMoonDistance / eclipse dispatchers
     }

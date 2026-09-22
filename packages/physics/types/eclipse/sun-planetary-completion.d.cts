@@ -27,13 +27,17 @@ export function createSunPlanetaryCompletion({ embWobbleArcsec, carrierRatesDegP
  *  landings. */
 export const PAIRED_SUN_HARMONICS_SHA256: "cbc189cea1c20292";
 /** sha256/16 of JSON.stringify([...planets, moonElongation]) — the seven
- *  full-precision carrier rates (deg/cy TT) the TERMS table was extracted
- *  under at N3. The model wiring recomputes the rates live from the planet
- *  records, so a planet-period / year / month input change moves the
- *  carriers automatically while the table stays frozen — a silent few-
- *  arcsec stale below the api gate's ≤8″ backstop. test:model recomputes
- *  this fingerprint from live constants (identical arithmetic to model.js)
- *  and fails on mismatch: re-run the N3 extraction chain
- *  (tools/explore/n2-sun-framework-carriers.mjs →
- *  n3-carrier-swap-preview.mjs), re-embed TERMS, and update this value. */
-export const PAIRED_CARRIER_RATES_SHA256: "893e055ee12343bd";
+ *  full-precision carrier rates (deg/cy TT) the TERMS table pairs with:
+ *  the SIDEREAL carriers of plan 06 I2 (record rate − the model's J2000
+ *  precession; Earth the framework sidereal year; the N3 literals kept,
+ *  the two long-period rows derived on these rates). The model wiring
+ *  recomputes the rates live from the planet records, so a planet-period /
+ *  year / month input change moves the carriers automatically while the
+ *  table stays frozen — a silent few-arcsec stale below the api gate's
+ *  ≤12″ backstop. test:model recomputes this fingerprint from live
+ *  constants (identical arithmetic to model.js) and fails on mismatch:
+ *  re-run the extraction chain (tools/explore/n2-sun-framework-carriers.mjs
+ *  → i2-sidereal-carrier-table.mjs for the short-period rows,
+ *  i2-long-inequality.mjs for the long-period rows), re-embed TERMS, and
+ *  update this value. */
+export const PAIRED_CARRIER_RATES_SHA256: "2d066e92bae955e4";

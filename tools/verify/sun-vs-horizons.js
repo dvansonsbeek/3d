@@ -58,6 +58,7 @@ const model = createModel(undefined, { secularSeriesArtifact: series });
 const J2000 = 2451545.0, AS = 3600;
 const wrap180 = (d) => ((((d + 540) % 360) + 360) % 360) - 180;
 const dTs = (jd) => model.eclipse.deltaTSecondsAtJD(jd);
+const BRIDGE_DAYS = model.constants.earthOrbital.deltaTStart / 86400;   // the finder axis = true UT + this bridge
 /** the UT model-JD whose model-TT equals jdTT (fixed point; ΔT varies slowly) */
 const utForTT = (jdTT) => { let ut = jdTT - dTs(jdTT) / 86400; ut = jdTT - dTs(ut) / 86400; return jdTT - dTs(ut) / 86400; };
 const modelApparentAtTT = (jdTT) => model.eclipse.sunApparentLonDegAtJD(utForTT(jdTT));
@@ -114,11 +115,13 @@ for (let i = 1; i < rows.length - 2; i++) {
     const yH = yearOf(jdH);
     // the model's instant for the calendar year of the Horizons instant
     const year = Math.round(yH - 0.5 + (target / 360));               // VE ≈ .22, SS ≈ .47, AE ≈ .72, WS ≈ .97 of the year
+    // cardinal.jd is TRUE UT (plan 06 R3 item 2): TT = UT + deltaTStart + curve (the finder axis is UT + bridge)
+    const ttOf = (jdUT) => { const jb = jdUT + BRIDGE_DAYS; return jb + dTs(jb) / 86400; };
     const jdM_UT = model.cardinal.jd(year, type);
-    const jdM_TT = jdM_UT + dTs(jdM_UT) / 86400;
+    const jdM_TT = ttOf(jdM_UT);
     // guard: the model instant must be the same event (within 60 d), else the year label is off by one
     let dMin = (jdM_TT - jdH) * 1440;
-    if (Math.abs(dMin) > 60 * 1440) { const alt = model.cardinal.jd(year + (dMin < 0 ? 1 : -1), type); dMin = (alt + dTs(alt) / 86400 - jdH) * 1440; }
+    if (Math.abs(dMin) > 60 * 1440) { const alt = model.cardinal.jd(year + (dMin < 0 ? 1 : -1), type); dMin = (ttOf(alt) - jdH) * 1440; }
     cardAll.push(dMin);
     const c = Math.floor(yH / 100) * 100;
     if (!cardByCentury.has(c)) cardByCentury.set(c, []);

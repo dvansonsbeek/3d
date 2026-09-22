@@ -415,7 +415,7 @@ function blockCardinalEvents() {
     rows.push(`| ${y} | ${jd.map((v) => jdToDateString(v)).join(' | ')} | ${f(m.cardinal.jd(y + 1, 'SS') - m.cardinal.jd(y, 'SS'), 6)} | ${f(m.cardinal.yearLengthDays(y, 'SS'), 6)} | ${f(m.lengths.tropicalYearDays(y), 6)} | ${f(m.cardinalStructure.spreadSeconds(y).meanSeconds, 2)} | ${f(m.earth.eccentricity(y), 5)} |`);
   }
   rows.push('');
-  rows.push('Dates on the proleptic Gregorian calendar from the UT model-JD of the APPARENT crossing of the one Sun (plan 06 R1 — formerly the retired device\'s JD); the `year` argument is the calendar year of the event. The single-year intervals carry nutation and the short-period terms (they match Meeus ch. 27\'s successive instants to seconds); the mean tropical year is the one-family column.');
+  rows.push('Dates on the proleptic Gregorian calendar from the TRUE-UT JD of the APPARENT crossing of the one Sun (since plan 06 R3 item 2 the finder-axis root minus the deltaTStart bridge — before it the published instants were 0.9 min late) (plan 06 R1 — formerly the retired device\'s JD); the `year` argument is the calendar year of the event. The single-year intervals carry nutation and the short-period terms (they match Meeus ch. 27\'s successive instants to seconds); the mean tropical year is the one-family column.');
   return rows.join('\n');
 }
 

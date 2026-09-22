@@ -27,10 +27,15 @@ const COEF = JSON.parse(readFileSync(join(ROOT, 'public/input/climate-formula-co
 
 const f = (v, d) => (v === null || v === undefined || !Number.isFinite(v)) ? '—' : Number(v).toFixed(d);
 
-// The shipped coefficient file must carry exactly these lines (the one-home check).
-const shipped = COEF.regimes['lr04-post-mpt'].L1.map((c) => c.period_kyr).sort((a, b) => a - b);
-const listed = L1.lines.map((l) => l.periodKyr).sort((a, b) => a - b);
-if (shipped.length !== listed.length || shipped.some((p, i) => Math.abs(p - listed[i]) > 1e-9)) {
+// The shipped coefficient file must carry exactly these lines (the one-home
+// check): the same SET, matched by line label, with the periods agreeing to
+// 1e-6 kyr (a year). Plan 06 R3 cleanup: the former 1e-9-kyr equality was
+// tighter than the engine's own floating-point reproducibility (the J2000
+// precession rate moves ~5e-11 relative between regenerations) and demanded a
+// rounding-level re-solve of the climate formula on an unchanged line set.
+const shipped = COEF.regimes['lr04-post-mpt'].L1.map((c) => ({ label: c.label, p: c.period_kyr })).sort((a, b) => a.p - b.p);
+const listed = L1.lines.map((l) => ({ label: l.label, p: l.periodKyr })).sort((a, b) => a.p - b.p);
+if (shipped.length !== listed.length || shipped.some((s, i) => !s.label.endsWith(listed[i].label) || Math.abs(s.p - listed[i].p) > 1e-6)) {
   throw new Error(`the shipped climate coefficients carry ${shipped.length} L1 lines, data/l1-physical-lines.json lists ${listed.length} — not the same set; re-run scripts/milankovitch_climate_formula.py`);
 }
 

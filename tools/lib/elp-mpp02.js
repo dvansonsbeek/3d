@@ -8,7 +8,8 @@
 // WHY THIS EXISTS: ELP/MPP02 is the lineage modern DE-class ephemerides were
 // fitted to, while ELP-2000/82B is the lineage Meeus Ch. 47 was abridged from.
 // Differencing the two isolates the "ephemeris-generation gap" — the −6.27″
-// half of the shipped MOON_CORRECTION_RESIDUAL decomposition (docs/66 §1).
+// half of the former MOON_CORRECTION_RESIDUAL decomposition (docs/66 §1; the
+// patch was retired at plan 06 R3 item 1 — this instrument stays as the record).
 //
 // The series files alone are NOT sufficient to evaluate MPP02: the theory's
 // re-fitted fundamental arguments and its two Δ-parameter sets live in the

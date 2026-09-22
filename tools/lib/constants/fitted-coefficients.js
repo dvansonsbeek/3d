@@ -37,8 +37,6 @@ const CARDINAL_POINT_DERIVED = data.CARDINAL_POINT_DERIVED || null;
 // load-bearing — see the fitter). {quadratureDeg, terms:[{order,div,sin,cos}]}.
 const CARDINAL_POINT_JOINT_TERMS = data.CARDINAL_POINT_JOINT_TERMS || null;
 const SOLSTICE_JD_HARMONICS = CARDINAL_POINT_HARMONICS.SS;  // Legacy alias
-const MOON_CORRECTION = data.MOON_CORRECTION || null;
-const MOON_CORRECTION_RESIDUAL = data.MOON_CORRECTION_RESIDUAL || null;   // D5: residual after analytic-aberration subtraction
 
 
 // ─── Dynamic fitted values ───────────────────────────────────────────────
@@ -99,8 +97,6 @@ module.exports = {
   // day's cos(ε) equator projection) can reach it before buildFittedCoefficients
   // runs. Same value that comes back as SOLSTICE_OBLIQUITY_MEAN.
   SOLSTICE_OBLIQUITY_MEAN_FITTED: data.SOLSTICE_OBLIQUITY_MEAN_FITTED,
-  MOON_CORRECTION,
-  MOON_CORRECTION_RESIDUAL,
 
   // Static fitted arrays
   TROPICAL_YEAR_HARMONICS,

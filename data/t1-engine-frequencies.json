@@ -1,7 +1,7 @@
 {
  "_description": "T1 inputs — the engine’s own p (of-date precession beat at J2000, createModel().epoch.axialPrecessionYearsAtYear) and Earth’s z / ζ secular modes (deep mode table). Consumed by scripts/t1_beat_model_vs_comb.py, which builds the Berger/Laskar-style beat lines |g_i − g_j|, p + s_i, p + g_i from them.",
- "pArcsecPerYr": 50.288312944790015,
- "precessionPeriodYr": 25771.395461662003,
+ "pArcsecPerYr": 50.288312947219346,
+ "precessionPeriodYr": 25771.39546041704,
  "z": [
   {
    "arcsecPerYr": 4.257358971029763,
@@ -142,7 +142,7 @@
   "generator": "node tools/explore/t1-export-engine-frequencies.mjs --write",
   "files": {
    "data/nbody-deep-secular-modes.json": "sha256:77e0baf779e85de548e532ec52e2ace55a9bdba3bbd2f67002fa9fbdfc3440de",
-   "public/input/model-parameters.json": "sha256:1b627670b9a67df3bb3e62e3805b7ada963c7e8e6ee7570ac5e90312da61a4d7",
+   "public/input/model-parameters.json": "sha256:c90f564c593e45c4e36974927227bdcf40ea010f23284b1e5e16cef488dc2d3a",
    "tools/explore/t1-export-engine-frequencies.mjs": "sha256:58b0bfc170e664d54a66b2787200ed8c323cf898385bab756378410fa0a600bf"
   }
  }

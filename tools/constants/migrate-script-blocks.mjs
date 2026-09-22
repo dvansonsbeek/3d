@@ -40,17 +40,8 @@ const SCRIPT = join(ROOT, 'src/script.js');
  * value-identical to `expected` — the tool proves that before writing.
  */
 const BLOCKS = [
-  {
-    name: 'MOON_CORRECTION',
-    expected: (fit) => fit.MOON_CORRECTION,
-    expr: 'FIT.MOON_CORRECTION',
-  },
-  {
-    name: 'MOON_CORRECTION_RESIDUAL',
-    expected: (fit) => fit.MOON_CORRECTION_RESIDUAL,
-    expr: 'FIT.MOON_CORRECTION_RESIDUAL',
-    note: 'JSON carries a _comment key; the generator strips documentation keys',
-  },
+  // (MOON_CORRECTION / MOON_CORRECTION_RESIDUAL: migrated here, then retired
+  // at plan 06 R3 item 1 — no block remains in script.js.)
   {
     name: 'CARDINAL_POINT_ANCHORS',
     expected: (fit) => fit.CARDINAL_POINT_ANCHORS_ADJUSTED,

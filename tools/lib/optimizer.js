@@ -848,8 +848,40 @@ function baseline(target, overrides, refDates) {
 
     for (const ref of valid) {
       const result = sg.computePlanetPosition(target, ref.jd);
-      const modelRA = sg.thetaToRaDeg(result.ra);
-      const modelDec = sg.phiToDecDeg(result.dec);
+      let modelRA = sg.thetaToRaDeg(result.ra);
+      let modelDec = sg.phiToDecDeg(result.dec);
+      if (target === 'moon') {
+        // INSTRUMENT-SIDE CONVENTION BRIDGE (plan 06 R3 item 2). The scene Moon
+        // is GEOMETRIC (like the scene Sun and planets); the reference is
+        // Horizons' ASTROMETRIC place (enrich-with-jpl QUANTITIES=1): the Moon's
+        // barycentric position at emission t−τ seen from Earth at t, without
+        // the observer's aberration. For a body co-moving with the observer
+        // that place sits κ·cos D (~20″) from both the geometric and the
+        // apparent Moon, so the comparison must bring the scene Moon to it:
+        //   ρ_astro = ρ_geo(t − τ) − v_E·τ,   τ = |ρ|/c
+        // (ρ_geo(t−τ) carries the 0.7″ relative light-time; −v_E·τ is the
+        // Earth's own displacement during it, v_E from the scene Sun's
+        // geocentric velocity). This is exactly the operation the retired D5
+        // layer applied to the RENDERED Moon — wrong there (the sky shows the
+        // apparent place), right here (the reference IS astrometric).
+        const AU_KM = C.currentAUDistance, C_KM_S = C.speedOfLight, D2R = Math.PI / 180;
+        const vecOf = (p, rKm) => {
+          const ra = sg.thetaToRaDeg(p.ra) * D2R, dec = sg.phiToDecDeg(p.dec) * D2R;
+          return [rKm * Math.cos(dec) * Math.cos(ra), rKm * Math.cos(dec) * Math.sin(ra), rKm * Math.sin(dec)];
+        };
+        const moonKm = result.meeusDistKm ?? result.distAU * AU_KM;
+        const tauDays = moonKm / C_KM_S / 86400;
+        const em = sg.computePlanetPosition('moon', ref.jd - tauDays);
+        const rhoEm = vecOf(em, em.meeusDistKm ?? em.distAU * AU_KM);
+        const H_DAYS = 0.02;
+        const sA = sg.computePlanetPosition('sun', ref.jd - H_DAYS), sB = sg.computePlanetPosition('sun', ref.jd + H_DAYS);
+        const rA = vecOf(sA, sA.distAU * AU_KM), rB = vecOf(sB, sB.distAU * AU_KM);   // the Sun result's distAU IS the geocentric Sun distance
+        const tauSec = tauDays * 86400, dtSec = 2 * H_DAYS * 86400;
+        // geocentric Sun velocity = −v_E  →  −v_E·τ = +(Δr_sun/Δt)·τ
+        const astro = [0, 1, 2].map((k) => rhoEm[k] + (rB[k] - rA[k]) / dtSec * tauSec);
+        modelRA = ((Math.atan2(astro[1], astro[0]) / D2R) % 360 + 360) % 360;
+        modelDec = Math.asin(astro[2] / Math.hypot(astro[0], astro[1], astro[2])) / D2R;
+      }
 
       // Reference RA: may be in hours (number) or degrees with °
       let refRA;

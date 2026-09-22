@@ -16,12 +16,9 @@ export type BesselianDeps = {
      */
     sunCompletionDeg: (T: number) => number;
     /**
-     * - derived series-extension tail (deg) at T centuries TT, ADDED to the full-series Moon longitude/latitude (see moon/series-extension.cjs; same finder-scoping rationale as sunCompletionDeg — the finders stay on the bare series)
+     * - the Sun's derived planetary aberration κ (deg) at calendar year, SUBTRACTED from the geometric Sun longitude (the apparent Sun; see the header)
      */
-    moonExtensionAt: (T: number) => {
-        dLonDeg: number;
-        dLatDeg: number;
-    };
+    sunAberrationDegAt: (year: number) => number;
     /**
      * - framework ΔT (J2000-zeroed convention)
      */
@@ -54,6 +51,7 @@ export type BesselianDeps = {
         gmstMeanSiderealT0Deg: number;
         gmstMeanSiderealRateDegPerDay: number;
         gmstMeanSiderealT2Deg: number;
+        speedOfLightKmS: number;
     };
 };
 /**
@@ -62,7 +60,7 @@ export type BesselianDeps = {
  *   full-series Moon: ecliptic-of-date longitude/latitude (deg) + distance (km), TT axis (days since J2000)
  * @property {(jdUT: number) => number} sunLonDegAt - geometric mean sun longitude (deg), JD(UT) axis with the finder's internal ΔT
  * @property {(T: number) => number} sunCompletionDeg - planetary completion (deg) at T centuries TT, SUBTRACTED from the finder sun (see eclipse/sun-planetary-completion.cjs; the finders deliberately stay without it — their fitted anchors and certified canon statistics were produced on the bare form, and elongation-class timing absorbs the omission into the fitted phases)
- * @property {(T: number) => {dLonDeg: number, dLatDeg: number}} moonExtensionAt - derived series-extension tail (deg) at T centuries TT, ADDED to the full-series Moon longitude/latitude (see moon/series-extension.cjs; same finder-scoping rationale as sunCompletionDeg — the finders stay on the bare series)
+ * @property {(year: number) => number} sunAberrationDegAt - the Sun's derived planetary aberration κ (deg) at calendar year, SUBTRACTED from the geometric Sun longitude (the apparent Sun; see the header)
  * @property {(jd: number) => number} deltaTSecondsAt - framework ΔT (J2000-zeroed convention)
  * @property {(year: number) => number} obliquityDegAt - framework obliquity (deg) at calendar year
  * @property {(year: number) => number} eccentricityAt - framework Earth-orbit eccentricity at calendar year
@@ -72,7 +70,7 @@ export type BesselianDeps = {
  *   moonDiameterKm: number, sunDiameterKm: number, sunDistanceKm: number,
  *   earthFlatteningInverse: number, ttBridgeSeconds: number,
  *   gmstMeanSiderealT0Deg: number, gmstMeanSiderealRateDegPerDay: number,
- *   gmstMeanSiderealT2Deg: number }} constants
+ *   gmstMeanSiderealT2Deg: number, speedOfLightKmS: number }} constants
  */
 /** @param {BesselianDeps} deps */
 export function createBesselian(deps: BesselianDeps): {
