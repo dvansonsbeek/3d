@@ -581,29 +581,33 @@ L(t) = L₀ + mean tropical rate · t + D(t)          (mean longitude)
    drift harmonics by 1 + p₀·tan²ε·H/(2π·div) = **1.306 (H/8)** and
    **1.815 (H/3)**. Both mechanisms lengthen the year at obliquity maximum —
    they add.
-3. **Closed form on the integrated lattice phase (SW Phase B)** — D(t) is
-   evaluated analytically: each harmonic contributes its antiderivative
-   (H/2πk)·[sin/−cos] on the integrated phase plus a sin-saturated rebase ramp
-   (H/2πk)·sin(Δφₖ) — extending the ramp linearly would be the fitted-linear-
-   slope trap. Drift and slope vanish at year 2000 by construction. No lookup
-   table, no domain window in the certified chain.
+3. **The mean longitude is the integral of the one-source tropical year
+   (plan 06 R1)** — L(t) = L0 + 360·∫dt/T_trop(t), T_trop the route-B
+   tropical year of date in SI seconds (the ONE year-length family), a
+   cumulative trapezoid grown from J2000 in both directions, never a rate
+   multiplied by a span. This replaced the former closed form on the
+   frozen era clock (the comb ripple, the torque scaling above and a
+   sin-saturated rebase), which was MEASURED against Meeus ch. 27 and
+   against the one-source integral: its year carried no secular drift
+   (+1.09 s flat where the physical year drifts −0.53 s/cy), so the
+   longitude wandered +12 min around 500 AD and diverged −3.3 min/cy after
+   2100 — outside every eclipse and JPL gate. The route-B year equals the
+   IAU/Laskar drift expression to 0.1 s over −1000..+3000.
 
-**e(t)** is the framework's H/3 eccentricity line —
-e(t) = base′·(1 + cos θ₃/2) on the integrated phase, base′ derived from
-the observed e(J2000) and the shared System-Reset anchor —
-**the same law the Moon's E-factor rides** (doc 66 §1). The reason it
-carries no H/16 term is structural: eccentricity is frame-invariant and
-may carry only fixed-frame lattice periods; H/16 is the H/3 rotation
-seen from the H/13-precessing equinox (13 + 3 = 16) and belongs to the
-perihelion longitude. The cardinal-point chain rides the same one law: the scene
-offset carries e(t)·û(ϖ) every frame, the cardinal fit (Step 6d) is
-Earth-frame, and H/16 enters only as the perihelion-direction period and
-the Law-4 A construction (doc 108; docs/10 §Law 4).
+**e(t) and ϖ(t)** are the banked N-body series' Earth elements plus the
+derived mean-element offset of the era (doc 110 chain 1.1; plan 06 layer B)
+— the eclipse Sun's mean elements; the Moon's E-factor keeps its own
+J2000-anchored line (doc 66 §1). Eccentricity is frame-invariant and
+carries no equinox-referenced period; the perihelion longitude does. The
+cardinal instants are the APPARENT crossings of this Sun (aberration and
+the leading nutation terms applied, both derived) — the former fitted
+cardinal-point model left with R1 (doc 110 chain 5).
 
-**Accuracy**: <!--v:frameworkSunVsJplRms-->0.80<!--/v-->″ RMS vs JPL over the modern window (the Meeus Ch. 25
-reference itself sits at <!--v:meeusCh25SunVsJplRms-->1.22<!--/v-->″). At antiquity the closed form tracks a
-±3000-yr trapezoid integration to −0.3″ at −135 and −6.8″ at the ±3000
-edge.
+**Accuracy**: <!--v:frameworkSunVsJplRms-->0.95<!--/v-->″ RMS vs JPL over the modern window with the cache
+instants taken as TT (the Meeus Ch. 25 basis on the same completion:
+<!--v:meeusCh25SunVsJplRms-->0.93<!--/v-->″). The former 0.80″ was a cancellation between the flat era-clock
+year and the instrument's ΔT bridge (R1 record). Over 1900–2100 the
+one-source Sun reads 1.28″ where the former read 2.18″.
 
 **The scene-wheel overlay (SW)**: the visible wheel Sun adds one term on top
 of its untouched legacy stack, δ = λ_certified − λ_realized (the wheel's own

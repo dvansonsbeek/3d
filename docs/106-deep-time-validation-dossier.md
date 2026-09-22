@@ -94,8 +94,8 @@ The climate formula's orbital lines against the Cenozoic isotope record (the com
 ## C. Historical era — gate- and artifact-backed
 
 - **Babylonian eclipse case study (−135)** — the framework places the
-  totality path <!--v:babylon135BestGapKm-->376<!--/v--> km from Babylon at
-  ΔUT <!--v:babylon135BestDeltaUT-->-1h00<!--/v--> (framework
+  totality path <!--v:babylon135BestGapKm-->392<!--/v--> km from Babylon at
+  ΔUT <!--v:babylon135BestDeltaUT-->-1h01<!--/v--> (framework
   <!--v:babylon135FrameworkUT-->06:00<!--/v--> vs documented
   <!--v:babylon135DocumentedUT-->06:14<!--/v-->):
   [doc 103](103-135-babylonian-case-study.md), eclipse-audit artifacts under
@@ -130,7 +130,7 @@ The climate formula's orbital lines against the Cenozoic isotope record (the com
   <!--v:lunarDtBoundsBabylon135HighSeconds-->12,140<!--/v-->] s contains the
   framework's <!--v:lunarDtBoundsBabylon135FrameworkSeconds-->12,028<!--/v--> s);
   and the measured framework-vs-ELP lunar-theory drift
-  (Δṅ ≈ <!--v:lunarTheoryDriftDeltaNdot-->0.30<!--/v--> ″/cy²) with the
+  (Δṅ ≈ <!--v:lunarTheoryDriftDeltaNdot-->0.28<!--/v--> ″/cy²) with the
   PRE-REGISTERED re-reduction prediction pinned before the contact-time
   machinery existed — and now MEASURED against it: the Phase C
   differential re-reduction (69/75 Babylonian observations identified)

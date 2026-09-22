@@ -60,7 +60,7 @@ const model = createModel();
 model.identity.modelVersion;          // the shipped model identity (e.g. 'v11.0') + both content hashes
 model.epoch.hAtYear(2000 - 380e6);    // 306189 — Devonian H (the Wells 1963 match)
 model.earth.obliquityDeg(2000);       // 23.4393
-model.cardinal.jd(2000, 'SS');        // 2451716.575 — June solstice 2000 (USNO)
+model.cardinal.jd(2000, 'SS');        // 2451716.5736 — June solstice 2000, the apparent Sun's crossing (USNO 2451716.575: the 2-min gap is the mean-longitude anchor convention, labelled)
 model.lengths.tropicalYearDays(2000); // 365.24219
 
 // Counterfactual (§2d): inject different constants, get a different solar

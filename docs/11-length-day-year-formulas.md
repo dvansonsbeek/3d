@@ -87,9 +87,9 @@ The tropical year is measured at the actual solstices and equinoxes (declination
 Two paths compute the tropical year:
 
 - `computeSolarYearDaysDirect(year)` — Step 6c direct year-length Fourier fit (TROPICAL_YEAR_HARMONICS, 12 terms). J2000-anchored to the CSV year-2000 measurement (365.24219037 at J2000). **Frozen era device**: since the one-source consolidation it serves the internal kinematic chain and the `?hybridSpin=0` opt-out display; the Predictions panel row and the tropical-year chart read the one-source family (`createYearLengths`).
-- `computeSolarYearDaysFromCardinals(year)` — analytical derivative of the cardinal-point harmonic formula (CARDINAL_POINT_HARMONICS, 23 harmonics per type plus the ECC/JOINT/DERIVED term families, averaged over all 4 CPs). Kept for chart consistency in `charts/report` code paths that already display cardinal-point data.
+- `computeSolarYearDaysFromCardinals(year)` — the mean of the four per-type cardinal intervals. **Plan 06 R1:** the intervals are between successive APPARENT crossings of the one certified Sun (`createModel().cardinal.yearLengthDays`, whose mean longitude integrates the one-source tropical year); the fitted cardinal-point harmonic formula (CARDINAL_POINT_* — 23 harmonics per type plus the ECC/JOINT/DERIVED families) left the runtime, doc 14 is its record. Kept for chart consistency in `charts/report` code paths that already display cardinal-point data.
 
-Both paths converge at year 2000 within ~2 μd (the Step 6c year-length fit vs the Step 6d cardinal-point derivative at their shared J2000 anchor).
+The frozen direct law and the one-source family converge at year 2000 (the certified J2000 anchor); away from it the direct law carries no secular drift (measured: +1.09 s at J2000 and flat, where the physical year drifts −0.53 s/cy — the R1 record), which is why the cardinal instants and the Sun's mean longitude moved to the one-source family.
 
 ### Sidereal Year (6 harmonics)
 

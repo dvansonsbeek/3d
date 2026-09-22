@@ -1003,39 +1003,20 @@ function computeStellarSiderealOffset(stellarDay, siderealDay) {
 // self-correction (R11), the drift Simpson, the Ih closed form, the joint
 // sidebands, the exact derivative — and every load-bearing comment that
 // used to sit here — moved into the package.
-const { createCardinalModel } = _req('@essrt/physics/cardinal');
-let _cardinalM = null;
-function _cardinal() {
-  if (_cardinalM !== null) return _cardinalM;
-  _cardinalM = createCardinalModel({
-    isDeepTime: deepTimeOn,
-    constants: {
-      anchors: C.CARDINAL_POINT_ANCHORS,
-      harmonics: C.CARDINAL_POINT_HARMONICS,
-      eccTerms: C.CARDINAL_POINT_ECC_TERMS,
-      jointTerms: C.CARDINAL_POINT_JOINT_TERMS,
-      derived: C.CARDINAL_POINT_DERIVED,
-      tropicalHarmonics: C.TROPICAL_YEAR_HARMONICS,
-      balancedYear: C.balancedYear,
-      meanSolarYearDays: C.meanSolarYearDays,
-      hJ2000: C.H,
-      tiltMeanDeg: C.earthtiltMean,
-      raAngleDeg: C.earthRAAngle,
-      inclAmplitudeDeg: C.earthInvPlaneInclinationAmplitude,
-    },
-    fns: {
-      cyclesBetween: (a, b, n) => dtm().cyclesBetweenYears(a, b, n),
-      // the frozen era clock's deps ride ITS counter H_era (plan 06 D8)
-      analyticTropicalDays: (year) => analyticYearDaysAt('tropical', year),
-      meanHAtAgeMa: (t_Ma) => dtm().eraClockHAtAge(t_Ma),
-      meanYearRealLodDays: (t_Ma) => dtm().eraClockYearInDaysAtAge(t_Ma),
-      eccentricityAt: computeEccentricityEarth,
-      // One eccentricity law (unification): the EoC derivative comes from the
-      // same channel as the value — no separate H/16 derivative anywhere.
-      eccentricityRateAt: (year) => dtm()._fwEarthEccRate(year - 2000),
-    },
-  });
-  return _cardinalM;
+// Plan 06 R1: the fitted cardinal-point model (CARDINAL_POINT_* on the frozen
+// era clock) left the engines. The cardinal instants are the APPARENT
+// crossings of the one Sun the package certifies and the scene renders —
+// ONE home, `createModel().cardinal` (packages/physics/src/model.js); this
+// engine's three public functions are one-line delegates. The package model
+// is built on the shipped secular-series artifact (the API's configuration —
+// createModel() WITHOUT it is a different hybrid, the recorded 3c trap).
+let _cardinalPkgM = null;
+function _cardinalPkg() {
+  if (_cardinalPkgM !== null) return _cardinalPkgM;
+  let artifact;
+  try { artifact = require('../../data/nbody-secular-series.json'); } catch { artifact = undefined; }
+  _cardinalPkgM = _req('@essrt/physics').createModel(undefined, artifact ? { secularSeriesArtifact: artifact } : undefined);
+  return _cardinalPkgM;
 }
 
 /**
@@ -1051,7 +1032,7 @@ function _cardinal() {
  * @param {'SS'|'WS'|'VE'|'AE'} [type='SS'] - cardinal point type
  * @returns {number} RA in degrees
  */
-function computeSolsticeRA(year, type) { return _cardinal().computeSolsticeRA(year, type); }
+function computeSolsticeRA(year, type) { return _cardinalPkg().cardinal.raDeg(year, type); }
 
 /**
  * Compute the Julian Day when a cardinal point occurs.
@@ -1071,7 +1052,7 @@ function computeSolsticeRA(year, type) { return _cardinal().computeSolsticeRA(ye
 // (Phase 7.2 — the implementation, with its measured-cost table and every
 // R5/R7/R8/R9 comment, moved into the package verbatim.)
 
-function computeSolsticeJD(year, type) { return _cardinal().computeSolsticeJD(year, type); }
+function computeSolsticeJD(year, type) { return _cardinalPkg().cardinal.jd(year, type); }
 
 /**
  * Compute the cardinal-point tropical year length (time between consecutive events).
@@ -1084,7 +1065,7 @@ function computeSolsticeJD(year, type) { return _cardinal().computeSolsticeJD(ye
  * @param {'SS'|'WS'|'VE'|'AE'} [type='SS'] - cardinal point type
  * @returns {number} year length in days
  */
-function computeSolsticeYearLength(year, type) { return _cardinal().computeSolsticeYearLength(year, type); }
+function computeSolsticeYearLength(year, type) { return _cardinalPkg().cardinal.yearLengthDays(year, type); }
 
 // ═══════════════════════════════════════════════════════════════════════════
 // PRECESSION PREDICTION (429-term ML system)

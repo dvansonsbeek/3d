@@ -21,7 +21,6 @@ import { deriveEpochParams } from './layer0/derive-params.js';
 import * as FL from './planets/fibonacci-laws.cjs';
 import * as planetOrientation from './planets/orientation.cjs';
 import { createPhaseMachinery } from './phase/index.cjs';
-import { createCardinalModel } from './cardinal/index.cjs';
 import { createYearLengths, ONE_FAMILY_WINDOW_YEARS } from './earth/year-lengths.cjs';
 import { createDeepOrbitalHistory } from './earth/deep-orbital-history.cjs';
 import { CHAIN_ARTIFACT } from './planets/chain-artifact.js';
@@ -102,7 +101,6 @@ export function assembleModel(C, F, laws = {}, secularSeriesArtifact = /** @type
   // wobble-marker distance). It is the K calibration input ONLY — Earth's
   // eccentricity law does not use it; see eccentricityAt (base' derived) below.
   const eccentricityAmplitude = C.earth.eccentricityAmplitude;
-  const earthRAAngle = 2 * earthInclAmplitude - (earthInclAmplitude * earthInclAmplitude) / earthtiltMean;
   const earthInclMean = C.earthOrbital.earthInclinationJ2000_deg
     - earthInclAmplitude * Math.cos(((C.earthOrbital.earthPerihelionLongitudeJ2000
       - C.earthOrbital.earthInclinationCycleAnchor) * Math.PI) / 180);
@@ -426,7 +424,6 @@ export function assembleModel(C, F, laws = {}, secularSeriesArtifact = /** @type
   /** de/dyear of the Sun's e — the cardinal braid's equation-of-centre
    *  derivative rides it (±0.5-yr central difference; the constant offset
    *  cancels). @param {number} year @returns {number} */
-  const sunEccentricityRateAt = laws.eccentricityRateAt ?? ((year) => oneSourceM.eAt(year + 0.5) - oneSourceM.eAt(year - 0.5));
   /** @param {number} year @returns {number} */
   const inclinationDeg = (year) => earthInclMean
     - earthInclAmplitude * Math.cos(phaseRadians(balancedYear, year, 3));
@@ -502,39 +499,13 @@ export function assembleModel(C, F, laws = {}, secularSeriesArtifact = /** @type
     + RA_DAY_OFFSET_ECC_MS * Math.cos(phaseRadians(balancedYear, year, 16))
     + RA_DAY_OFFSET_OBLIQ_MS * Math.cos(phaseRadians(balancedYear, year, 8));
 
-  // ── Cardinal-point model ──────────────────────────────────────────────────
-  const cardinalM = createCardinalModel({
-    isDeepTime: () => true,
-    constants: {
-      anchors: F.CARDINAL_POINT_ANCHORS_ADJUSTED,
-      harmonics: F.CARDINAL_POINT_HARMONICS,
-      eccTerms: F.CARDINAL_POINT_ECC_TERMS,
-      jointTerms: F.CARDINAL_POINT_JOINT_TERMS,
-      derived: F.CARDINAL_POINT_DERIVED,
-      tropicalHarmonics: F.TROPICAL_YEAR_HARMONICS,
-      balancedYear,
-      meanSolarYearDays,
-      hJ2000: H,
-      tiltMeanDeg: earthtiltMean,
-      raAngleDeg: earthRAAngle,
-      inclAmplitudeDeg: earthInclAmplitude,
-    },
-    fns: {
-      cyclesBetween: (a, b, n) => phase().cyclesBetween(a, b, n),
-      // The frozen era clock's deps ride ITS convention H_era (plan 06 D8):
-      // drift integrand, dc/dY and the real-LOD convention were fitted on it.
-      analyticTropicalDays: (year) => {
-        const tMa = (startmodelYear - year) / 1e6;
-        const Ht = deepLod.eraClockHAtAge(tMa);
-        if (Ht === null) return null;
-        return (deepLod.siderealYearSecondsAtAge(tMa) / 86400) * (1 - 13 / Ht);
-      },
-      meanHAtAgeMa: (tMa) => deepLod.eraClockHAtAge(tMa),
-      meanYearRealLodDays: (tMa) => deepLod.eraClockYearInDaysAtAge(tMa),
-      eccentricityAt: sunEccentricityAt,
-      eccentricityRateAt: sunEccentricityRateAt,
-    },
-  });
+  // ── Cardinal points (the fitted model retired, R1)──────────────────────────────────────────────────
+  // Plan 06 R1: the fitted cardinal-point model (CARDINAL_POINT_* — the §10
+  // derived form on the frozen era clock, fitted to the retired K scene's
+  // events; measured 60–140 min from Meeus ch. 27 at 0..−1000 and 6–25 min
+  // in 1500–2900) left this package. The instants are the CROSSINGS of the
+  // one Sun the scene renders and the eclipse chain certifies — see
+  // `cardinalCrossingJdUT` below the finders.
   // ── One-source cardinal structure (D4b) ───────────────────────────────────
   // The EoC layer (year lengths, crossing offsets, the e(t)-proportional
   // spread) on the one-source movement's own e(t)/ϖ(t) — the MODE tier (the
@@ -646,9 +617,19 @@ export function assembleModel(C, F, laws = {}, secularSeriesArtifact = /** @type
     };
   })();
   const yearLengthsM = oneSourceM.yearLengths;
+  /** THE one-family tropical year of date in SI seconds: route B inside the
+   *  one-family window, the tidal-chain year beyond (plan 06 R1 — the Sun's
+   *  mean longitude, the cardinal instants and the published year lengths
+   *  all ride this one function). @param {number} year @returns {number} */
+  const oneFamilyTropicalYearSeconds = (year) => (Math.abs(year - 2000) <= ONE_FAMILY_WINDOW_YEARS
+    ? yearLengthsM.tropicalYearSecondsAtYear(year)
+    : (deepLod.tropicalYearSecondsAtAge(yearToTMa(year)) ?? meanSolarYearDays * 86400));
 
-  /** Tropical year: mean of the four cardinal intervals. @param {number} year @returns {number} */
-  const tropicalYearDays = (year) => cardinalM.computeTropicalYearLength(year);
+  /** Tropical year of date in DAYS OF THE EPOCH (the kinematic day below) —
+   *  the one-family SI year over the epoch's day length, so solarYearSeconds
+   *  ≡ the one-family year. Plan 06 R1: formerly the fitted cardinal model's
+   *  4-mean. @param {number} year @returns {number} */
+  const tropicalYearDays = (year) => oneFamilyTropicalYearSeconds(year) / dayLengthSeconds(year);
   /** @param {number} year @returns {number} */
   const tropicalYearDirectDays = (year) => evalYearFourier(year, tropicalYearDaysBase(year), F.TROPICAL_YEAR_HARMONICS);
 
@@ -1113,65 +1094,57 @@ export function assembleModel(C, F, laws = {}, secularSeriesArtifact = /** @type
   // same movement and is retired by the unification (measured identical on
   // every modern gate).
   const sunMeanLongitudeDegAt = (() => {
-    // SW PHASE B — the CLOSED FORM on the integrated lattice phase
-    // (supersedes the E5 ±3,000-yr trapezoid table; valid at EVERY epoch,
-    // no table, no domain window). drift = D_smooth + Σₖ D_k + D_torque:
-    //  · D_smooth — the deep chain's smooth SI tropical-year physics
-    //    (tropicalYearDaysBase × LOD), two-point trapezoid: the same
-    //    structure the scene twin uses, so the scene δ stays bounded.
-    //  · Each oscillatory term integrates ANALYTICALLY: the antiderivative
-    //    of cos/sin on the integrated phase is (H/2πk)·[sin/−cos] — the H
-    //    drift lives in the phase itself; the amplitude factor uses H_J2000
-    //    (ppm-class difference, negligible).
-    //  · THE REBASE (E5's corpus-preferred J2000 rate anchor) is applied
-    //    PER HARMONIC as a SIN-SATURATED ramp, (H/2πk)·sin(Δφₖ): equal to
-    //    the linear rebase for |Δφₖ| ≪ 1 (the corpus era) and bounded by
-    //    the harmonic's own period beyond — extending a linearized local
-    //    slope to deep time would be the fitted-linear-slope trap. Every
-    //    quantity is derived; zero new constants; each component and its
-    //    slope vanish at year 2000 by construction (the drift-only
-    //    property is exact, not tabulated).
-    const RATE_LIN = sunTropicalRateDegPerCy / 100;              // deg / SI yr
-    const precessionP0DegPerYr = 13 * 360 / H;
-    const tanEps = Math.tan(earthtiltMean * Math.PI / 180);
-    const A_RAD = earthInclAmplitude * Math.PI / 180;
-    /** @param {number} year @returns {number} */
-    const rateSmooth = (year) => 360 * (365.25 * 86400)
-      / (tropicalYearDaysBase(year)
-        * (deepLod.lodSecondsAtAge(yearToTMa(year)) ?? meanLengthOfDay));
-    /** @type {{rateSm0: number, ph0: Map<number, number>}|null} */
-    let anchor = null;
-    return /** @param {number} year @returns {number} */ (year) => {
-      if (anchor === null) {
-        const ph0 = new Map();
-        for (const [k] of F.TROPICAL_YEAR_HARMONICS) ph0.set(k, phaseRadians(balancedYear, 2000, k));
-        for (const k of [3, 8]) if (!ph0.has(k)) ph0.set(k, phaseRadians(balancedYear, 2000, k));
-        anchor = { rateSm0: rateSmooth(2000), ph0 };
-      }
+    // Plan 06 R1 — the Sun's mean longitude of date is the INTEGRAL of the
+    // one-source tropical year: L(t) = L0 + 360·∫_{2000}^{t} dt′/T_trop(t′),
+    // T_trop the route-B tropical year of date in SI seconds (the ONE
+    // year-length family; the frozen era clock's tropicalYearDaysBase × LOD
+    // and its comb ripple + torque term left here). MEASURED before the
+    // move (tools/explore r1 probes, plan 06 record): the route-B tropical
+    // year equals the IAU/Laskar drift expression to 0.1 s over −1000..+3000
+    // while the era-clock year carried NO secular drift (+1.09 s flat), so
+    // the former mean longitude wandered +12 min around 500 AD and diverged
+    // −3.3 min/cy after 2100 against both Meeus ch. 27 and the one-source
+    // integral — outside every eclipse and JPL gate; against the JPL Sun
+    // cache taken as TT the one-source Sun reads 1.28″ sd over 1900–2100
+    // where the former read 2.18″ (its 0.79″ registry figure was a
+    // cancellation between the flat year and the instrument's ΔT bridge).
+    // NUMERICS (rate vs point value): a cumulative trapezoid table of
+    // cycles, yearly inside ±20,000 yr and per century beyond, grown on
+    // demand from 2000 in both directions and interpolated inside a cell —
+    // never a rate multiplied by a span. Beyond the one-family window the
+    // tidal-chain year continues the integrand (the scene overlay ends at
+    // 20,000 yr; the finders refuse out-of-domain epochs upstream).
+    const JULIAN_YEAR_S = 365.25 * 86400;
+    const tropSec = oneFamilyTropicalYearSeconds;
+    const FINE_SPAN = 20000, COARSE_STEP = 100;
+    /** cycles from 2000 to 2000 ± i·step (fwd/bwd tiers) */
+    /** @type {number[]} */ const fwdFine = [0];
+    /** @type {number[]} */ const bwdFine = [0];
+    /** @type {number[]} */ const fwdCoarse = [];
+    /** @type {number[]} */ const bwdCoarse = [];
+    /** UNSIGNED trapezoid cycles over the span between two years (Julian
+     *  years → SI seconds over the one-family year); the caller applies the
+     *  direction sign. @param {number} ya @param {number} yb @returns {number} */
+    const segAbs = (ya, yb) => 0.5 * (Math.abs(yb - ya) * JULIAN_YEAR_S) * (1 / tropSec(ya) + 1 / tropSec(yb));
+    /** signed cycles from 2000 to `year` @param {number} year @returns {number} */
+    const cyclesTo = (year) => {
       const dy = year - 2000;
-      // smooth deep physics (two-point trapezoid; exact 0 at 2000)
-      let drift = 0.5 * (rateSmooth(year) - anchor.rateSm0) * dy;
-      // year-harmonic ripple: rate ≈ −(RATE_LIN/T̄)·h(y); antiderivative +
-      // sin-saturated per-harmonic rebase
-      const HK = H / (2 * Math.PI);
-      for (const [k, sK, cK] of F.TROPICAL_YEAR_HARMONICS) {
-        const ph = phaseRadians(balancedYear, year, k);
-        const ph0 = /** @type {number} */ (anchor.ph0.get(k));
-        const scale = -(RATE_LIN / meanSolarYearDays) * (HK / k);
-        const anti = (-sK) * (Math.cos(ph) - Math.cos(ph0)) + cK * (Math.sin(ph) - Math.sin(ph0));
-        const h0 = sK * Math.sin(ph0) + cK * Math.cos(ph0);
-        drift += scale * (anti - h0 * Math.sin(ph - ph0));
+      const s = dy >= 0 ? 1 : -1, a = Math.abs(dy);
+      const fine = s > 0 ? fwdFine : bwdFine;
+      const growFine = (/** @type {number} */ upto) => { while (fine.length <= upto) { const k = fine.length; fine.push(fine[k - 1] + s * segAbs(2000 + s * (k - 1), 2000 + s * k)); } };
+      if (a <= FINE_SPAN) {
+        const i = Math.floor(a), f = a - i;
+        growFine(i + 1);
+        return fine[i] + f * (fine[i + 1] - fine[i]);
       }
-      // torque (E5): rate = −p₀·tanε·δε, δε = A(−cos φ₃ + cos φ₈); same
-      // antiderivative + per-component sin-saturated rebase
-      for (const [k, sgn] of [[3, -1], [8, 1]]) {
-        const ph = phaseRadians(balancedYear, year, k);
-        const ph0 = /** @type {number} */ (anchor.ph0.get(k));
-        const scale = -precessionP0DegPerYr * tanEps * A_RAD * sgn * (HK / k);
-        drift += scale * ((Math.sin(ph) - Math.sin(ph0)) - Math.cos(ph0) * Math.sin(ph - ph0));
-      }
-      return sunL0Deg + sunTropicalRateDegPerCy * dy / 100 + drift;
+      growFine(FINE_SPAN);
+      const coarse = s > 0 ? fwdCoarse : bwdCoarse;
+      if (coarse.length === 0) coarse.push(fine[FINE_SPAN]);
+      const c = (a - FINE_SPAN) / COARSE_STEP, ci = Math.floor(c), cf = c - ci;
+      while (coarse.length <= ci + 1) { const k = coarse.length; const y0 = 2000 + s * (FINE_SPAN + (k - 1) * COARSE_STEP); coarse.push(coarse[k - 1] + s * segAbs(y0, y0 + s * COARSE_STEP)); }
+      return coarse[ci] + cf * (coarse[ci + 1] - coarse[ci]);
     };
+    return /** @param {number} year @returns {number} */ (year) => sunL0Deg + 360 * cyclesTo(year);
   })();
 
   // Eclipse finders — wired like the engine probe (tools/verify/
@@ -1277,6 +1250,63 @@ export function assembleModel(C, F, laws = {}, secularSeriesArtifact = /** @type
     if (Math.abs(year - 2000) <= ONE_FAMILY_WINDOW_YEARS) return yearLengthsM.tropicalYearSecondsAtYear(year);
     return deepLod.tropicalYearSecondsAtAge(yearToTMa(year));
   };
+  // ── Cardinal instants (plan 06 R1) ─────────────────────────────────────
+  /** The completed certified Sun (finder Sun − the derived planetary
+   *  completion) at a UT model-JD — the same longitude the scene renders
+   *  inside the overlay window; MEAN GEOMETRIC, mean equinox of date.
+   *  @param {number} jdUT @returns {number} */
+  const sunLonCompletedDegAtJdUT = (jdUT) => eclipseFinders.sunLonDegAt(jdUT)
+    - sunPlanetaryCompletionDeg((jdTTFromUT(jdUT) - j2000JD) / julianCenturyDays);
+  /** The APPARENT Sun the cardinal instants are defined on (an equinox is
+   *  the apparent Sun crossing the equator — the USNO/Meeus instants are
+   *  apparent): the completed geometric Sun minus the aberration constant,
+   *  plus the nutation in longitude. Both derived, zero new constants —
+   *  κ = 2π·a/(c·T_sid·√(1−e²)) from the AU, c, the one-family sidereal year
+   *  and the Sun's e (20.50″ at J2000); Δψ from the four IAU 1980 leading
+   *  terms on the model's OWN lunar node, mean Sun and mean Moon (the
+   *  framework arguments), the same family the registry's JPL Sun
+   *  instrument bridges with. @param {number} jdUT @returns {number} */
+  const sunApparentLonDegAtJdUT = (jdUT) => {
+    const jdTT = jdTTFromUT(jdUT);
+    const year = 2000 + (jdTT - j2000JD) / 365.25;
+    const e = sunEccentricityAt(year);
+    const kappaArcsec = (2 * Math.PI * currentAUDistance
+      / (C.physicalConstants.speedOfLight * yearLengthsM.siderealYearSecondsAtYear(year) * Math.sqrt(1 - e * e)))
+      * (648000 / Math.PI);
+    const a = moonArgs.argsAt(jdTT);
+    const d2r = Math.PI / 180;
+    const Om = (a.Lp - a.F) * d2r, Ls = (a.Lp - a.D) * d2r, Lm = a.Lp * d2r;
+    const NU = C.physicalConstants.nutationLeadingTermsArcsec;
+    const dPsiArcsec = NU.psiOmega * Math.sin(Om) + NU.psi2Ls * Math.sin(2 * Ls)
+      + NU.psi2Lm * Math.sin(2 * Lm) + NU.psi2Omega * Math.sin(2 * Om);
+    return sunLonCompletedDegAtJdUT(jdUT) + (dPsiArcsec - kappaArcsec) / 3600;
+  };
+  /** @param {string} type @returns {number} */
+  const cardinalTargetDeg = (type) => {
+    const t = { VE: 0, SS: 90, AE: 180, WS: 270 }[type];
+    if (t === undefined) throw new RangeError(`cardinal type must be VE|SS|AE|WS, got ${type}`);
+    return t;
+  };
+  /** The UT model-JD at which the APPARENT Sun's longitude of date equals
+   *  the cardinal target in the given year — Newton on the crossing (the
+   *  Sun's rate 360°/tropical year; a handful of steps from the tropical-year
+   *  seed). Replaces the fitted cardinal model's instants (R1); the
+   *  remaining constant against USNO/Meeus (≈2–3 min) is the mean-longitude
+   *  anchor convention L0, labelled, not tuned. @param {number} year @param {string} type @returns {number} */
+  const cardinalCrossingJdUT = (year, type) => {
+    const target = cardinalTargetDeg(type);
+    const SI_YEAR_D = 365.2422, RATE = 360 / SI_YEAR_D;
+    // seed: Jan 1.5 of the year (J2000 = 2000 Jan 1.5) + the mean date of the
+    // March equinox (day 79.3) + the quarter-turns to the target
+    let jd = j2000JD + (year - 2000) * SI_YEAR_D + 79.3 + (target / 360) * SI_YEAR_D;
+    for (let i = 0; i < 20; i++) {
+      const d = ((((sunApparentLonDegAtJdUT(jd) - target) + 540) % 360 + 360) % 360) - 180;
+      jd -= d / RATE;
+      if (Math.abs(d) < 1e-10) break;
+    }
+    return jd;
+  };
+
   return Object.freeze({
     time: Object.freeze({
       yearFromJD,
@@ -1399,13 +1429,15 @@ export function assembleModel(C, F, laws = {}, secularSeriesArtifact = /** @type
       measuredSolarDaySeconds,
       raDayOffsetMs,
     }),
+    // Plan 06 R1: the instants are the crossings of the ONE Sun (the
+    // certified completed Sun the scene renders), UT model-JD; the RA at a
+    // crossing is the target longitude by construction (λ = 0/90/180/270 ⇒
+    // RA = 0/90/180/270, any obliquity); the per-type year length is the
+    // interval between successive crossings (SI days).
     cardinal: Object.freeze({
-      jd: /** @param {number} year @param {string} type @returns {number} */ (year, type) => cardinalM.computeSolsticeJD(year, type),
-      raDeg: /** @param {number} year @param {string} type @returns {number} */ (year, type) => {
-        const ra = cardinalM.computeSolsticeRA(year, type);
-        return ((ra % 360) + 360) % 360;
-      },
-      yearLengthDays: /** @param {number} year @param {string} type @returns {number} */ (year, type) => cardinalM.computeSolsticeYearLength(year, type),
+      jd: /** @param {number} year @param {string} type @returns {number} */ (year, type) => cardinalCrossingJdUT(year, type),
+      raDeg: /** @param {number} year @param {string} type @returns {number} */ (year, type) => { void year; return cardinalTargetDeg(type); },
+      yearLengthDays: /** @param {number} year @param {string} type @returns {number} */ (year, type) => cardinalCrossingJdUT(year + 1, type) - cardinalCrossingJdUT(year, type),
     }),
     // D4b: the one-source cardinal STRUCTURE — the EoC layer on the
     // movement's own e(t)/ϖ(t), valid at every epoch (mode tier). Absolute

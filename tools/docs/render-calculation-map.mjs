@@ -336,12 +336,18 @@ function cardinalRebuilds() {
     },
   });
   const full = build();
-  for (const y of [-10000, -2584, 0, 2000, 5000, 10000]) for (const t of CP_TYPES) {
-    if (full.computeSolsticeJD(y, t) !== m.cardinal.jd(y, t)) throw new Error(`cardinal rebuild differs from m.cardinal.jd at ${y} ${t}`);
+  // Plan 06 R1: the rebuild is the RETIRED device (the record); the shipped
+  // instants are the apparent crossings of the one Sun. The gap between the
+  // two is measured here and written into the tables, never asserted away.
+  /** @type {Record<string, Record<string, number>>} retired device − shipped crossing, minutes */
+  const vsShipping = {};
+  for (const y of [-10000, -2584, -584, 0, 1246, 2000, 5000, 10000]) {
+    vsShipping[y] = {};
+    for (const t of CP_TYPES) vsShipping[y][t] = (full.computeSolsticeJD(y, t) - m.cardinal.jd(y, t)) * 1440;
   }
   return {
     balancedYear, mSY,
-    full,
+    full, vsShipping,
     noDelta: build({ harmonics: EMPTY, eccTerms: null, jointTerms: null }),
     noDeltaNoIh: build({ harmonics: EMPTY, eccTerms: null, jointTerms: null, tropicalHarmonics: [] }),
     harmOnly: build({ eccTerms: null, jointTerms: null }),
@@ -372,7 +378,7 @@ function blockCardinalAnchors() {
     rows.push(`| ${t} | ${f(b, 6)} (${jdToDateString(b)}) | ${f(a, 6)} (${jdToDateString(a)}) | ${f((b - a) * 24, 3)} |`);
   }
   rows.push('');
-  rows.push('USNO 2000 instants for comparison (UTC): VE Mar 20 07:35 · SS Jun 21 01:48 (`juneSolstice2000_JD`, astro-reference) · AE Sep 22 17:27 · WS Dec 21 13:37. The shipped set is the one every runtime reads (model.js, script.js, tools/lib); the legacy key is exported by the constants generator but consumed only by the archived fitter.');
+  rows.push('USNO 2000 instants for comparison (UTC): VE Mar 20 07:35 · SS Jun 21 01:48 (`juneSolstice2000_JD`, astro-reference) · AE Sep 22 17:27 · WS Dec 21 13:37. Plan 06 R1: NO runtime reads either anchor set any more — the shipped instants are the apparent crossings of the one Sun (`createModel().cardinal`, delegated to by script.js and tools/lib); both keys stay in the coefficients file as the retired device\'s record until the cleanup phase.');
   return rows.join('\n');
 }
 
@@ -390,13 +396,18 @@ function blockCardinalDecomposition() {
     rows.push(`| ${y} | ${f(lin, 4)} | ${f(base2 - lin, 5)} | ${f(base - base2, 5)} | ${f(R.harmOnly.computeSolsticeJD(y, 'SS') - nd, 5)} | ${f(R.eccOnly.computeSolsticeJD(y, 'SS') - nd, 5)} | ${f(R.jointOnly.computeSolsticeJD(y, 'SS') - nd, 5)} | ${f(m.cardinal.jd(y, 'SS') - a, 5)} | ${f(m.epoch.cyclesBetween(R.balancedYear, y, 1), 7)} | ${f((y - R.balancedYear) / K.foundational.holisticyearLength, 7)} |`);
   }
   rows.push('');
-  rows.push('The six component columns sum to the eighth exactly (the rebuild is asserted bit-identical to the shipped `cardinal.jd` before this table is written). Every term is zero at 2000 by construction — the self-correction δ_X(2000) pins the anchor.');
+  rows.push('');
+  rows.push('| year | retired device − shipped crossing (min): VE · SS · AE · WS |');
+  rows.push('|---|---|');
+  for (const y of [-10000, -2584, -584, 0, 1246, 2000, 5000, 10000]) rows.push(`| ${y} | ${CP_TYPES.map((t) => f(R.vsShipping[y][t], 1)).join(' · ')} |`);
+  rows.push('');
+  rows.push('Plan 06 R1: this decomposition is the RETIRED device\'s (the record — its coefficients stay in the file); the shipped `cardinal.jd` is the apparent crossing of the one Sun, and the second table is the measured gap between the two (the 2000 row is the anchor convention: the device was pinned to the USNO instants, the crossing carries the mean-longitude anchor L0 and aberration/nutation derived). The six component columns sum to the eighth exactly. Every term is zero at 2000 by construction — the self-correction δ_X(2000) pins the anchor.');
   return rows.join('\n');
 }
 
 function blockCardinalEvents() {
   const rows = [
-    '| year | VE | SS | AE | WS | SS→SS interval (d) | `yearLengthDays(SS)` derivative form (d) | mean of four (d) | one-family mean tropical year (s) | e |',
+    '| year | VE | SS | AE | WS | SS→SS interval (d) | `yearLengthDays(SS)` (d, the crossing interval — the same quantity since R1) | mean of four (d) | one-family mean tropical year (s) | e |',
     '|---|---|---|---|---|---|---|---|---|---|',
   ];
   for (const y of [-10000, -2584, -584, 0, 1246, 2000, 5000, 10000]) {
@@ -404,14 +415,14 @@ function blockCardinalEvents() {
     rows.push(`| ${y} | ${jd.map((v) => jdToDateString(v)).join(' | ')} | ${f(m.cardinal.jd(y + 1, 'SS') - m.cardinal.jd(y, 'SS'), 6)} | ${f(m.cardinal.yearLengthDays(y, 'SS'), 6)} | ${f(m.lengths.tropicalYearDays(y), 6)} | ${f(m.cardinalStructure.spreadSeconds(y).meanSeconds, 2)} | ${f(m.earth.eccentricity(y), 5)} |`);
   }
   rows.push('');
-  rows.push('Dates are TT on the proleptic Gregorian calendar, from the JD the device returns; the `year` argument is the calendar year of the event.');
+  rows.push('Dates on the proleptic Gregorian calendar from the UT model-JD of the APPARENT crossing of the one Sun (plan 06 R1 — formerly the retired device\'s JD); the `year` argument is the calendar year of the event. The single-year intervals carry nutation and the short-period terms (they match Meeus ch. 27\'s successive instants to seconds); the mean tropical year is the one-family column.');
   return rows.join('\n');
 }
 
 function blockCardinalSpread() {
   const R = cardinalRebuilds();
   const rows = [
-    '| year | frozen device: T_X − mean (s) VE · SS · AE · WS | one-source structure: T_X − mean (s) VE · SS · AE · WS | structure anomalistic year (s) | RA of VE (°), frozen device | e |',
+    '| year | crossing intervals: T_X − mean (s) VE · SS · AE · WS | one-source structure: T_X − mean (s) VE · SS · AE · WS | structure anomalistic year (s) | RA of VE (°) — the target by construction since R1 | e |',
     '|---|---|---|---|---|---|',
   ];
   for (const y of [-10000, -2584, 0, 2000, 5000, 10000]) {
@@ -422,7 +433,7 @@ function blockCardinalSpread() {
   }
   const sinE = Math.sin(K.earth.earthtiltMean * Math.PI / 180), A = K.earth.earthInvPlaneInclinationAmplitude;
   rows.push('');
-  rows.push(`RA formula constants: raMean = base − earthRAAngle/sin ε̄ = base − ${f((2 * A - A * A / K.earth.earthtiltMean) / sinE, 6)}°, amplitude A/sin ε̄ = ${f(A / sinE, 6)}° on −sin(2π·3·c) + sin(2π·8·c) (base 0/90/180/270° for VE/SS/AE/WS). Balanced year used by both devices: ${f(R.balancedYear, 5)}.`);
+  rows.push(`Retired device's RA formula constants (the record; since R1 the shipped RA is the target longitude by construction): raMean = base − earthRAAngle/sin ε̄ = base − ${f((2 * A - A * A / K.earth.earthtiltMean) / sinE, 6)}°, amplitude A/sin ε̄ = ${f(A / sinE, 6)}° on −sin(2π·3·c) + sin(2π·8·c) (base 0/90/180/270° for VE/SS/AE/WS). Balanced year used by both devices: ${f(R.balancedYear, 5)}.`);
   return rows.join('\n');
 }
 

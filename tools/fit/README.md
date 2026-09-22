@@ -605,8 +605,13 @@ The shipped harmonic-clock coefficients — SOLSTICE_OBLIQUITY_HARMONICS,
 TROPICAL/SIDEREAL/ANOMALISTIC_YEAR_HARMONICS, YEAR_LENGTH_J2000_ANCHOR and
 the CARDINAL_POINT_* family — are FROZEN at their last K-movement fit
 (cardinal interior RMSE 0.23-0.37 min, tropical 0.002 s class): THE
-CERTIFIED ERA CLOCK, valid in the historical era where the one-source
-movement agrees to seconds-class. They NEVER re-fit. A harmonic re-fit
+CERTIFIED ERA CLOCK. They NEVER re-fit. Plan 06 R1 (measured): the
+CARDINAL_POINT_* family and the comb-based Sun drift left the runtime —
+the cardinal instants are the apparent crossings of the one certified Sun
+whose mean longitude integrates the one-source tropical year (the fitted
+instants were 60–140 min from Meeus ch. 27 at 0..−1000 and 6–25 min in
+1500–2900; the era-clock year carried no secular drift). The constants stay
+in the coefficients file as the record until the cleanup phase. A harmonic re-fit
 against the one-source CSV is a CROSS-FAMILY fit, and it was MEASURED
 (2026-09): cardinal interior RMS 8.8-16 min (30-60×), equinox J2000
 anchors ±2 h off IAU, day-scale amplitudes chasing the engine's

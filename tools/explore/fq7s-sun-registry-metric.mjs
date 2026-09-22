@@ -31,7 +31,6 @@ const { createModel, DEFAULT_CONSTANTS: C } = require('@essrt/physics');
 
 const model = createModel();
 const D2R = Math.PI / 180, AS = 3600, J2000 = 2451545.0;
-const BRIDGE = C.earthOrbital.deltaTStart / 86400;
 const NU = C.physicalConstants.nutationLeadingTermsArcsec;
 const wrap = (d) => ((((d + 540) % 360) + 360) % 360) - 180;
 
@@ -69,10 +68,19 @@ const { sunPlanetaryCompletionDeg } = createSunPlanetaryCompletion({ embWobbleAr
 const cache = JSON.parse(readFileSync(HERE + 'd2-sun-jpl-cache.local.json', 'utf8'));
 const JD_LO = J2000 + (1970 - 2000) * 365.25, JD_HI = J2000 + (2049 - 2000) * 365.25;
 const rC = [], rM = [], rMc = [];
+// Plan 06 R1 — THE CLOCK: the cache instants are TT (Horizons ephemeris
+// time). The former bridge added ΔT_start and let the finders apply the
+// model ΔT again, so the comparison drifted with the model's ΔT extrapolation
+// across the window; a Sun whose year carried NO secular drift (the era
+// clock's) happened to cancel most of that trend and read 0.79″ where the
+// physical year read 1.29″ — a cancellation, not a fit quality. Evaluate
+// both Suns at the UT whose model-TT is the cache instant (fixed point on the
+// model's ΔT), so the model ΔT drops out of the comparison.
+const utForTT = (jdTT) => { let ut = jdTT - model.eclipse.deltaTSecondsAtJD(jdTT) / 86400; ut = jdTT - model.eclipse.deltaTSecondsAtJD(ut) / 86400; return jdTT - model.eclipse.deltaTSecondsAtJD(ut) / 86400; };
 for (const [jd, jplLon] of cache.rows) {
   if (jd < JD_LO || jd > JD_HI) continue;
-  const jb = jd + BRIDGE;
-  const T = (jb - J2000) / 36525;
+  const jb = utForTT(jd);
+  const T = (jd - J2000) / 36525;
   const om = (NU.omegaNodeJ2000Deg - 360 * (jb - J2000) / C.moonReference.moonNodalPrecessionDaysInputICRF) * D2R;
   const Dm = (297.8501921 + 445267.1114034 * T) * D2R;
   const F = (93.2720950 + 483202.0175233 * T) * D2R;
@@ -83,7 +91,7 @@ for (const [jd, jplLon] of cache.rows) {
   rMc.push(wrap(meeus.sunLonDegAt(jb) - sunPlanetaryCompletionDeg(T) - truth) * AS);   // the Meeus BASIS, same derived completion (the registry's reference meaning)
 }
 const sd = (v) => { const m = v.reduce((a, q) => a + q, 0) / v.length; return Math.sqrt(v.reduce((a, q) => a + (q - m) ** 2, 0) / v.length); };
-console.log(`modern window 1970–2049, n ${rC.length}, full-nutation bridge, mean removed:`);
+console.log(`modern window 1970–2049, n ${rC.length}, full-nutation bridge, cache instants as TT (R1 clock fix), mean removed:`);
 console.log(`  frameworkSunVsJplRmsArcsec  ${sd(rC).toFixed(2)}″   (certified chain: framework Sun + completion)`);
 console.log(`  meeusCh25SunVsJplRmsArcsec  ${sd(rMc).toFixed(2)}″   (Meeus Ch. 25 basis + the same derived completion — the registry's reference meaning)`);
 console.log(`  (bare Meeus Ch. 25, no completion: ${sd(rM).toFixed(2)}″)`);

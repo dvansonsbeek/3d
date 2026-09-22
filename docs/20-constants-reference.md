@@ -485,12 +485,14 @@ Note: `TROPICAL_YEAR_HARMONICS` via `computeSolarYearDaysDirect` (Step 6c) is th
 
 The certified apparent solar longitude is **assembled, not fitted** (E4/E5
 framework-native Sun, `packages/physics/src/model.js`, exported as
-`eclipse.frameworkSunDeps`): mean tropical rate + the closed-form f(Y)
-year-harmonic drift (scaled by the derived obliquity-torque factors 1.306 /
-1.815) + equation of centre on the banked series' e(t) and ϖ(t) plus the
-derived mean-element offset (`data/earth-osculating-mean-offset.json`,
-plan 06 layer B — formerly the H/16 + derived-H/3 laws). It carries
-**zero fitted solar constants**; accuracy <!--v:frameworkSunVsJplRms-->0.80<!--/v-->″ RMS vs JPL (modern window; the Meeus Ch. 25 reference: <!--v:meeusCh25SunVsJplRms-->1.22<!--/v-->″).
+`eclipse.frameworkSunDeps`): the mean longitude as the INTEGRAL of the
+one-source tropical year of date (route B, SI seconds — plan 06 R1;
+formerly the frozen era clock's closed-form drift with the comb ripple and
+the torque factors, measured 12 min off in the medieval era) + equation of
+centre on the banked series' e(t) and ϖ(t) plus the derived mean-element
+offset (`data/earth-osculating-mean-offset.json`, plan 06 layer B —
+formerly the H/16 + derived-H/3 laws). It carries **zero fitted solar
+constants**; accuracy <!--v:frameworkSunVsJplRms-->0.95<!--/v-->″ RMS vs JPL (modern window, cache instants as TT; the Meeus Ch. 25 basis on the same completion: <!--v:meeusCh25SunVsJplRms-->0.93<!--/v-->″).
 The scene wheel displays the same longitude via the δ overlay
 (δ = λ_certified − λ_realized, the wheel's own longitude read from the scene
 geometry; clock-convention window). See

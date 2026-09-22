@@ -325,13 +325,23 @@ const tropWS = cardinalYearLength(2000, 'WS');
 const tropVE = cardinalYearLength(2000, 'VE');
 const tropAE = cardinalYearLength(2000, 'AE');
 const tropJ2000 = (tropSS + tropWS + tropVE + tropAE) / 4;
-const tropDiffSec = (tropJ2000 - ylRef.tropicalYearMean) * 86400;
-// Tolerance: 10s. Under H=335,317 the framework's H/8-snapped mean_solar_year
-// matches IAU 365.2422 d to 10 decimals, but the cardinal-point-Fourier fit
-// at J2000 sits ~5s below the mean (a legitimate framework Fourier ripple, not
-// a regression). Anything > 10s would indicate a real fit degradation.
+// Plan 06 R1: the cardinal intervals are now the APPARENT crossings of the
+// one Sun (nutation and the short-period terms included), so their single-
+// year 4-mean is NOT the mean tropical year — it scatters ±150 s around it,
+// as Meeus's own successive instants do. The mean-year check reads the ONE
+// year-length family (route B, SI seconds) against the IAU value; the
+// per-type intervals below stay informational.
+const oneFamilyTropDays = (() => {
+  const { createModel } = require('@essrt/physics');
+  let artifact;
+  try { artifact = JSON.parse(fs.readFileSync(path.join(ROOT, 'data', 'nbody-secular-series.json'), 'utf8')); } catch { artifact = undefined; }
+  const model = createModel(undefined, artifact ? { secularSeriesArtifact: artifact } : undefined);
+  return model.epoch.tropicalYearSecondsAtYear(2000) / 86400;
+})();
+const tropDiffSec = (oneFamilyTropDays - ylRef.tropicalYearMean) * 86400;
+// Tolerance: 10 s (the one-family year sits +0.03 s from IAU at J2000).
 check('Tropical year at J2000', Math.abs(tropDiffSec), 0, 10.0);
-console.log(`  Tropical year at J2000: ${tropJ2000.toFixed(9)} d (IAU: ${ylRef.tropicalYearMean} d, diff: ${tropDiffSec >= 0 ? '+' : ''}${tropDiffSec.toFixed(3)}s)`);
+console.log(`  Tropical year at J2000 (one-family): ${oneFamilyTropDays.toFixed(9)} d (IAU: ${ylRef.tropicalYearMean} d, diff: ${tropDiffSec >= 0 ? '+' : ''}${tropDiffSec.toFixed(3)}s); 4-mean of the 2000→2001 crossing intervals: ${tropJ2000.toFixed(6)} d (informational)`);
 console.log(`    RA=0°  (VE): ${tropVE.toFixed(9)} d (IAU: ${ylRef.tropicalYearVE} d, diff: ${((tropVE - ylRef.tropicalYearVE)*86400).toFixed(2)}s)`);
 console.log(`    RA=90° (SS): ${tropSS.toFixed(9)} d (IAU: ${ylRef.tropicalYearSS} d, diff: ${((tropSS - ylRef.tropicalYearSS)*86400).toFixed(2)}s)`);
 console.log(`    RA=180°(AE): ${tropAE.toFixed(9)} d (IAU: ${ylRef.tropicalYearAE} d, diff: ${((tropAE - ylRef.tropicalYearAE)*86400).toFixed(2)}s)`);

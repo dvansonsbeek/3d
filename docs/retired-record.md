@@ -130,12 +130,31 @@ line set (`data/l1-physical-lines.json`, one home; doc 92 §2); the ΔT
 stack keeps its four periods with the divisors as identifiers. Docs 91,
 93, 94, 98 stand as the comb-era record with status banners.
 
+**The fitted cardinal-point model and the comb-based Sun drift** (doc 14
+is the record; plan 06 R1): the §10 derived form — 23 sinusoids per
+point on the anchor's divisors, the equation-of-centre braid, the joint
+sidebands and the drift integral on the frozen era clock — returned the
+cardinal instants from coefficients fitted to the retired K scene's
+events, and the certified Sun's mean longitude carried the same clock's
+year-length comb as a closed-form drift. Measured against Meeus ch. 27
+(a theory reference, ~1 min): the fitted instants sat 60–140 min off at
+0..−1000 and 6–25 min off in 1500–2900; the Sun's drift wandered 12 min
+in the medieval era and diverged 3.3 min/cy after 2100, because the era
+clock's tropical year carries no secular drift (+1.09 s at J2000 and
+flat, where the physical year drifts −0.53 s/cy and the one-source
+family matches the IAU/Laskar expression to 0.1 s over four millennia).
+Both now ride the one Sun whose mean longitude integrates the one-source
+tropical year; the cardinal instants are its apparent crossings. The
+coefficients stay in the file as the record until the cleanup phase.
+
 ## What this does NOT retire
 
 The lunisolar precession clock — the recession history, the LOD/tide/ΔT
 stack, the deep-time scaling of precession and the falsification legs
-(docs 99, 102–106); the certified era devices (doc 14's cardinal points, doc 11's
-frozen year-length laws); the one-source movement and its verification
+(docs 99, 102–106); the certified era devices that still define the
+kinematic day (doc 11's frozen year-length laws — the day-length
+taxonomy is the open doctrine item; doc 14's cardinal model is retired
+above); the one-source movement and its verification
 (docs 40, 57, 108, 109); the climate programme (docs 90–96, 98); the
 Moon (doc 66), the legacy-device calibration record (doc 68) and the
 Δa mass-derivation chain (doc 24, which now

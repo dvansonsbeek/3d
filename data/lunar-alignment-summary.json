@@ -11,11 +11,11 @@
     "unmatchedModel": 6,
     "unmatchedCanon": 0,
     "typeAgree": 1447,
-    "meanAbsResidualMinutes": 8.529,
-    "meanAbsResidualMinutesFull": 8.528933744029752,
-    "rmsResidualMinutes": 9.838,
-    "rmsResidualMinutesFull": 9.837872800797268,
-    "maxAbsResidualMinutes": 19.995
+    "meanAbsResidualMinutes": 8.516,
+    "meanAbsResidualMinutesFull": 8.51627872488622,
+    "rmsResidualMinutes": 9.822,
+    "rmsResidualMinutesFull": 9.821502232953248,
+    "maxAbsResidualMinutes": 19.483
   },
   "visibility": {
     "entriesChecked": 14,
@@ -26,7 +26,7 @@
       {
         "label": "2025 Sep 7 Total",
         "bestInsideCity": "Delhi",
-        "bestInsideAltitudeDeg": 54.1,
+        "bestInsideAltitudeDeg": 54.11,
         "insideVisible": true,
         "outsideCity": "Kansas City",
         "outsideVisible": false
@@ -42,7 +42,7 @@
       {
         "label": "2024 Sep 18 Partial",
         "bestInsideCity": "Kansas City",
-        "bestInsideAltitudeDeg": 24.98,
+        "bestInsideAltitudeDeg": 24.99,
         "insideVisible": true,
         "outsideCity": "Delhi",
         "outsideVisible": false
@@ -50,7 +50,7 @@
       {
         "label": "2024 Mar 25 Penumbral",
         "bestInsideCity": "Kansas City",
-        "bestInsideAltitudeDeg": 48.87,
+        "bestInsideAltitudeDeg": 48.86,
         "insideVisible": true,
         "outsideCity": "Delhi",
         "outsideVisible": false
@@ -58,7 +58,7 @@
       {
         "label": "2023 Oct 28 Partial",
         "bestInsideCity": "Nairobi",
-        "bestInsideAltitudeDeg": 70.31,
+        "bestInsideAltitudeDeg": 70.32,
         "insideVisible": true,
         "outsideCity": "Kansas City",
         "outsideVisible": false
@@ -90,7 +90,7 @@
       {
         "label": "2021 Nov 19 Partial",
         "bestInsideCity": "Kansas City",
-        "bestInsideAltitudeDeg": 47.34,
+        "bestInsideAltitudeDeg": 47.33,
         "insideVisible": true,
         "outsideCity": "Nairobi",
         "outsideVisible": false
@@ -106,7 +106,7 @@
       {
         "label": "2020 Nov 30 Penumbral",
         "bestInsideCity": "Kansas City",
-        "bestInsideAltitudeDeg": 42.84,
+        "bestInsideAltitudeDeg": 42.83,
         "insideVisible": true,
         "outsideCity": "Berlin",
         "outsideVisible": false
@@ -122,7 +122,7 @@
       {
         "label": "2020 Jun 5 Penumbral",
         "bestInsideCity": "Nairobi",
-        "bestInsideAltitudeDeg": 50.83,
+        "bestInsideAltitudeDeg": 50.84,
         "insideVisible": true,
         "outsideCity": "Kansas City",
         "outsideVisible": false
@@ -141,11 +141,11 @@
     "found": true,
     "type": "Partial",
     "canonType": "Partial",
-    "magnitudeUmbral": 0.8779,
+    "magnitudeUmbral": 0.8777,
     "canonMagnitudeUmbral": 0.9199,
-    "ttResidualMinutes": 8.55,
+    "ttResidualMinutes": 8.44,
     "visibleFromBabylon": true,
-    "babylonMoonAltitudeDeg": 32.6
+    "babylonMoonAltitudeDeg": 32.62
   },
   "dtBands": {
     "overall": {
@@ -280,27 +280,27 @@
   },
   "theoryDrift": {
     "binHalfWidthYears": 40,
-    "modernBaselineMinutes": 1.02,
+    "modernBaselineMinutes": 0.71,
     "bins": {
       "100": {
         "n": 196,
-        "signedMeanMinutes": 0.4
+        "signedMeanMinutes": -0.47
       },
       "500": {
         "n": 201,
-        "signedMeanMinutes": 1.22
+        "signedMeanMinutes": 0.2
       },
       "1000": {
         "n": 191,
-        "signedMeanMinutes": 1.1
+        "signedMeanMinutes": 0.14
       },
       "1500": {
         "n": 180,
-        "signedMeanMinutes": 0.94
+        "signedMeanMinutes": 0.32
       },
       "1800": {
         "n": 202,
-        "signedMeanMinutes": 0.99
+        "signedMeanMinutes": 0.7
       },
       "2000": {
         "n": 183,
@@ -308,55 +308,55 @@
       },
       "-750": {
         "n": 189,
-        "signedMeanMinutes": -2.72
+        "signedMeanMinutes": -2.81
       },
       "-650": {
         "n": 204,
-        "signedMeanMinutes": -1.36
+        "signedMeanMinutes": -1.57
       },
       "-550": {
         "n": 203,
-        "signedMeanMinutes": -2.01
+        "signedMeanMinutes": -2.34
       },
       "-450": {
         "n": 192,
-        "signedMeanMinutes": -1.62
+        "signedMeanMinutes": -2.06
       },
       "-350": {
         "n": 180,
-        "signedMeanMinutes": 0.02
+        "signedMeanMinutes": -0.52
       },
       "-250": {
         "n": 183,
-        "signedMeanMinutes": -1.14
+        "signedMeanMinutes": -1.78
       },
       "-100": {
         "n": 201,
-        "signedMeanMinutes": 0.07
+        "signedMeanMinutes": -0.69
       }
     },
     "driftVsModernMinutes": {
-      "100": -0.62,
-      "500": 0.2,
-      "1000": 0.08,
-      "1500": -0.08,
-      "1800": -0.03,
-      "2000": 0.1,
-      "-750": -3.74,
-      "-650": -2.38,
-      "-550": -3.03,
-      "-450": -2.64,
-      "-350": -1,
-      "-250": -2.16,
-      "-100": -0.95
+      "100": -1.18,
+      "500": -0.51,
+      "1000": -0.57,
+      "1500": -0.39,
+      "1800": -0.01,
+      "2000": 0.41,
+      "-750": -3.52,
+      "-650": -2.28,
+      "-550": -3.05,
+      "-450": -2.77,
+      "-350": -1.23,
+      "-250": -2.49,
+      "-100": -1.4
     },
-    "effectiveDeltaNdotArcsecPerCy2": 0.3,
+    "effectiveDeltaNdotArcsecPerCy2": 0.28,
     "predictedReducedResidualMinutes": {
-      "-800": 3.1,
-      "-700": -2.4,
-      "-600": -2.4,
-      "-500": -8.2,
-      "-400": -12.2
+      "-800": 2.9,
+      "-700": -2.5,
+      "-600": -2.3,
+      "-500": -8,
+      "-400": -12
     }
   },
   "phaseC": {
@@ -368,34 +368,34 @@
     "perCentury": {
       "-700": {
         "n": 5,
-        "medianMinutes": -13.4,
-        "seMinutes": 11,
-        "preRegisteredMinutes": -2.4,
+        "medianMinutes": -13.1,
+        "seMinutes": 11.1,
+        "preRegisteredMinutes": -2.5,
         "z": -1
       },
       "-600": {
         "n": 20,
-        "medianMinutes": -4.1,
+        "medianMinutes": -3.9,
         "seMinutes": 7.5,
-        "preRegisteredMinutes": -2.4,
+        "preRegisteredMinutes": -2.3,
         "z": -0.2
       },
       "-500": {
         "n": 12,
-        "medianMinutes": -14.4,
+        "medianMinutes": -13.9,
         "seMinutes": 17.2,
-        "preRegisteredMinutes": -8.2,
-        "z": -0.4
+        "preRegisteredMinutes": -8,
+        "z": -0.3
       },
       "-400": {
         "n": 26,
-        "medianMinutes": -6.6,
+        "medianMinutes": -6.1,
         "seMinutes": 3.5,
-        "preRegisteredMinutes": -12.2,
-        "z": 1.6
+        "preRegisteredMinutes": -12,
+        "z": 1.7
       }
     },
-    "chi2": 3.8,
+    "chi2": 4,
     "chi2Centuries": 4
   },
   "denseTargets": {
@@ -408,72 +408,72 @@
     "perCentury": {
       "400": {
         "n": 5,
-        "medianSeconds": -358,
-        "seSeconds": 564
+        "medianSeconds": -296,
+        "seSeconds": 563
       },
       "500": {
         "n": 11,
-        "medianSeconds": -293,
-        "seSeconds": 158
+        "medianSeconds": -227,
+        "seSeconds": 156
       },
       "800": {
         "n": 5,
-        "medianSeconds": 511,
-        "seSeconds": 245
+        "medianSeconds": 568,
+        "seSeconds": 249
       },
       "900": {
         "n": 17,
-        "medianSeconds": -358,
-        "seSeconds": 263
+        "medianSeconds": -306,
+        "seSeconds": 261
       },
       "1000": {
         "n": 38,
-        "medianSeconds": 101,
+        "medianSeconds": 159,
         "seSeconds": 141
       },
       "1100": {
         "n": 4,
-        "medianSeconds": 809,
-        "seSeconds": 270
+        "medianSeconds": 865,
+        "seSeconds": 272
       },
       "1200": {
         "n": 17,
-        "medianSeconds": 415,
+        "medianSeconds": 462,
         "seSeconds": 144
       },
       "-700": {
         "n": 5,
-        "medianSeconds": -802,
-        "seSeconds": 659
+        "medianSeconds": -787,
+        "seSeconds": 663
       },
       "-600": {
         "n": 20,
-        "medianSeconds": -248,
-        "seSeconds": 449
+        "medianSeconds": -233,
+        "seSeconds": 451
       },
       "-500": {
         "n": 12,
-        "medianSeconds": -862,
+        "medianSeconds": -836,
         "seSeconds": 1035
       },
       "-400": {
         "n": 26,
-        "medianSeconds": -398,
-        "seSeconds": 208
+        "medianSeconds": -367,
+        "seSeconds": 207
       },
       "-300": {
         "n": 13,
-        "medianSeconds": -1123,
-        "seSeconds": 1058
+        "medianSeconds": -1085,
+        "seSeconds": 1060
       },
       "-200": {
         "n": 43,
-        "medianSeconds": 156,
+        "medianSeconds": 204,
         "seSeconds": 190
       },
       "-100": {
         "n": 12,
-        "medianSeconds": -448,
+        "medianSeconds": -400,
         "seSeconds": 342
       }
     },
@@ -493,13 +493,13 @@
       "1200"
     ],
     "ablationChi2": {
-      "fullStack": 28.5,
-      "minus_bond": 60.7,
-      "minus_hallstatt": 26.6,
-      "minus_jose5": 29.3,
-      "minus_jose4": 27.3,
-      "minus_resonator": 44.8,
-      "noCycles": 69.3
+      "fullStack": 29.5,
+      "minus_bond": 68.2,
+      "minus_hallstatt": 25.4,
+      "minus_jose5": 30.6,
+      "minus_jose4": 29.1,
+      "minus_resonator": 47.2,
+      "noCycles": 76.9
     }
   },
   "inputs": {

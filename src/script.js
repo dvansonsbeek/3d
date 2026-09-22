@@ -11,7 +11,7 @@ import { Pane } from 'tweakpane';
 //
 // Generated at build time, not fetched at runtime — `holisticyearLength` is read
 // at module scope below, and Phase 15 requires offline === hosted.
-import { DEFAULT_CONSTANTS as K, REFERENCE_DATA as R, FITTED_COEFFICIENTS as FIT, CONSTANTS_HASH, COEFFICIENTS_HASH, MODEL_VERSION, PREPRINT_DOI, createEpochPrimitives, createPhaseMachinery, createCardinalModel, createMoonEccChannel, createDeepEccChannel, DEEP_MODES_ARTIFACT, createDeepOrbitalHistory, createYearLengths, createMoonMonthChain, createChainCycleIntegrator, createMoonArguments, createMoonSeries, createMoonApparent, derivePlanetGeometry, planetFibonacciLaws as _FL, computeEccentricityIntegrated, planetOrientation as _PO, planetOrbitChain as _POC, createPredictivePrecession, calcPlanetPerihelionLongDeg, integrateAscendingNode, createDeltaTCycles, createDeepTimeLod, createMoonRecessionHistory, createSolarChannelBudget, deltaTEspenakMeeusCanonSeconds, evalClimateL1OrbitalPermil, createAlphaGiaChannel, computeSolarTorqueShare, createEclipseFinders, createSunLongitudeCorrection, createModel, buildPlanetChainsFromArtifactData, computePlanetElementsAtYear as kcComputePlanetElementsAtYear, computeApsidalSecularDegPerYr as kcApsidalSecularDegPerYr, computeHeliocentricEclipticFromElements as kcComputeHeliocentricEclipticFromElements, computeEquatorNodeOriginSFrameDeg, convertNodeSFrameToEquatorOriginDeg, createSecularSeriesOverride, CHAIN_ARTIFACT, ANCHOR_EPOCH_YEAR as KC_ANCHOR_EPOCH_YEAR, ANCHOR_EPOCH_JD as KC_ANCHOR_EPOCH_JD } from '@essrt/physics';
+import { DEFAULT_CONSTANTS as K, REFERENCE_DATA as R, FITTED_COEFFICIENTS as FIT, CONSTANTS_HASH, COEFFICIENTS_HASH, MODEL_VERSION, PREPRINT_DOI, createEpochPrimitives, createPhaseMachinery, createMoonEccChannel, createDeepEccChannel, DEEP_MODES_ARTIFACT, createDeepOrbitalHistory, createYearLengths, createMoonMonthChain, createChainCycleIntegrator, createMoonArguments, createMoonSeries, createMoonApparent, derivePlanetGeometry, planetFibonacciLaws as _FL, computeEccentricityIntegrated, planetOrientation as _PO, planetOrbitChain as _POC, createPredictivePrecession, calcPlanetPerihelionLongDeg, integrateAscendingNode, createDeltaTCycles, createDeepTimeLod, createMoonRecessionHistory, createSolarChannelBudget, deltaTEspenakMeeusCanonSeconds, evalClimateL1OrbitalPermil, createAlphaGiaChannel, computeSolarTorqueShare, createEclipseFinders, createSunLongitudeCorrection, createModel, buildPlanetChainsFromArtifactData, computePlanetElementsAtYear as kcComputePlanetElementsAtYear, computeApsidalSecularDegPerYr as kcApsidalSecularDegPerYr, computeHeliocentricEclipticFromElements as kcComputeHeliocentricEclipticFromElements, computeEquatorNodeOriginSFrameDeg, convertNodeSFrameToEquatorOriginDeg, createSecularSeriesOverride, CHAIN_ARTIFACT, ANCHOR_EPOCH_YEAR as KC_ANCHOR_EPOCH_YEAR, ANCHOR_EPOCH_JD as KC_ANCHOR_EPOCH_JD } from '@essrt/physics';
 // K8 — the reference package: ONE-WAY imports (comparison only;
 // @essrt/reference is private-by-construction and nothing in the model
 // chain depends on it). publishedCurves migrated here from
@@ -3698,7 +3698,7 @@ function _eclipse() {
     // tier's finders and umbra chain (model.js frameworkSunDeps), so the
     // browser finder UT and the delegated umbra ground track stay a
     // matched pair (three-runtimes rule; cf. tools/verify/eclipse-audit.js).
-    if (_tierUmbraModel === null) _tierUmbraModel = createModel();
+    _tierModelB();
     _eclipseM = createEclipseFinders({
       moonLonDegAt: (jd) => _eclMoonLon(jd),
       moonBetaDegAt: (jd) => _eclMoonBeta(jd),
@@ -6358,7 +6358,7 @@ if (typeof window !== 'undefined') {
       return { raDeg: sun.ra * 180 / Math.PI, decDeg: 90 - sun.dec * 180 / Math.PI, epsDeg: o.obliquityEarth };
     },
     fwSunLonAt: (jd) => _frameworkSunLon(jd),
-    certSunLonAt: (jd) => { if (_tierUmbraModel === null) _tierUmbraModel = createModel(); return _tierUmbraModel.eclipse.sunLonCompletedDegAtJD(jd); },
+    certSunLonAt: (jd) => _tierModelB().eclipse.sunLonCompletedDegAtJD(jd),
     setE5WheelSun: (on) => { E5_WHEEL_SUN_ENABLED = !!on; return E5_WHEEL_SUN_ENABLED; },
     eclFindLunar: (jdStart, jdEnd) => findLunarEclipsesInRange(jdStart, jdEnd),
     eclFindSolar: (jdStart, jdEnd) => findSolarEclipsesInRange(jdStart, jdEnd),
@@ -20649,6 +20649,11 @@ let _zetaSeriesEndYr = 0;
         // MEASURED handover boundaries, series-inside-span, mode-tail
         // beyond (the ring-blowup fix).
         _planetSeriesData = a;
+        // Plan 06 R1 (measured): the package model built WITHOUT this artifact
+        // is a different hybrid — its certified Sun parts from the API's by
+        // 75″ at 0 AD and 377″ at −2500 (the recorded 3c trap, third
+        // instance). Rebuild the tier model on the shipped configuration.
+        _tierUmbraModel = null;
         console.log(`secular series loaded from ${url} (earth + ${Object.keys(a.bodies).length - 1} planets) — planet deep-time elements + Earth ε/e one-source ${HYBRID_SPIN_REQUESTED ? 'ON (D4; the K device is only the pre-load fallback — plan 06 D5)' : 'planets on; Earth on the K device (fallback)'}`);
         return;
       } catch (e) { /* try the next candidate */ }
@@ -44995,6 +45000,16 @@ function _applySolarAberration(sunGeoVec, jd, moonGeoVec) {
 }
 
 let _tierUmbraModel = null;
+/** The package tier model — built on the SHIPPED secular-series artifact once
+ *  it has arrived (plan 06 R1: an artifact-less createModel() is a different
+ *  hybrid — its certified Sun parts from the API's by 75″ at 0 AD and 377″ at
+ *  −2500; the fetch resets the memo so the model is rebuilt on arrival). */
+function _tierModelB() {
+  if (_tierUmbraModel === null) {
+    _tierUmbraModel = createModel(undefined, _planetSeriesData ? { secularSeriesArtifact: _planetSeriesData } : undefined);
+  }
+  return _tierUmbraModel;
+}
 const _umbraTierMemo = { jd: NaN, out: null };
 function umbraFromSceneAtJd(jd) {
   // U2 (the umbra strangler): DELEGATED to the package besselian tier — the
@@ -45005,7 +45020,7 @@ function umbraFromSceneAtJd(jd) {
   // is NO LONGER navigated here, so callers' save/restore wrappers now guard
   // only their own other scene reads. Historical "FromScene" name kept until
   // the U3 rename. The one-JD memo serves the per-frame umbra-disc caller.
-  if (_tierUmbraModel === null) _tierUmbraModel = createModel();
+  _tierModelB();
   if (jd === _umbraTierMemo.jd) return _umbraTierMemo.out;
   const u = _tierUmbraModel.eclipse.umbraGroundAtJD(jd);
   _umbraTierMemo.jd = jd;
@@ -54543,7 +54558,7 @@ function moveModel(pos) {
         : _ayE5 >= 20000 ? 0
         : Math.cos((_ayE5 - 3000) / (20000 - 3000) * Math.PI / 2) ** 2;
       if (_wE5 > 0) {
-        if (_tierUmbraModel === null) _tierUmbraModel = createModel();
+        _tierModelB();
         // K8b follow-up (owner-approved FULL INJECTION): the wheel Sun now
         // rides the COMPLETED certified Sun — the finder Sun minus the
         // derived planetary-completion table (70 framework-carrier terms +
@@ -57886,43 +57901,17 @@ function computeObliquityEarth(currentYear) {
 // delegates. The R11 self-correction, drift Simpson, Ih closed form, joint
 // sidebands and the exact derivative — with every load-bearing comment —
 // live in the package.
-let _cardinalM = null;
-function _cardinal() {
-  if (_cardinalM !== null) return _cardinalM;
-  _cardinalM = createCardinalModel({
-    isDeepTime: () => DEEP_TIME_MODE_ENABLED,
-    constants: {
-      anchors: CARDINAL_POINT_ANCHORS,
-      harmonics: CARDINAL_POINT_HARMONICS,
-      eccTerms: (typeof CARDINAL_POINT_ECC_TERMS !== 'undefined') ? CARDINAL_POINT_ECC_TERMS : null,
-      jointTerms: CARDINAL_POINT_JOINT_TERMS,
-      derived: CARDINAL_POINT_DERIVED,
-      tropicalHarmonics: TROPICAL_YEAR_HARMONICS,
-      balancedYear: BALANCED_YEAR_J2000_FIXED,
-      meanSolarYearDays: MEAN_SOLAR_YEAR_J2000_DAYS,
-      hJ2000: HOLISTIC_YEAR_J2000,
-      tiltMeanDeg: earthtiltMean,
-      raAngleDeg: earthRAAngle,
-      inclAmplitudeDeg: earthInvPlaneInclinationAmplitude,
-    },
-    fns: {
-      cyclesBetween: cyclesBetweenYears,
-      // the frozen era clock's deps ride ITS counter H_era (plan 06 D8)
-      analyticTropicalDays: _cpAnalyticTropDays,
-      meanHAtAgeMa: (t_Ma) => eraClockHAtAge(t_Ma),
-      meanYearRealLodDays: (t_Ma) => eraClockYearInDaysAtAge(t_Ma),
-      eccentricityAt: (y) => computeEccentricityEarthAtYear(y),
-      // One eccentricity law (unification): EoC derivative from the same channel.
-      eccentricityRateAt: (y) => _moonEcc().eccRateAt(y - 2000),
-    },
-  });
-  return _cardinalM;
-}
+// Plan 06 R1: the fitted cardinal-point model (CARDINAL_POINT_* on the frozen
+// era clock, fitted to the retired K scene's events) left the engines. The
+// cardinal instants are the APPARENT crossings of the one Sun the package
+// certifies and this scene renders — ONE home, `createModel().cardinal`
+// (packages/physics/src/model.js); the three functions below are one-line
+// delegates onto the tier model (built on the shipped series artifact).
 
 /** Compute RA (degrees) where a cardinal point occurs. Fully derived, zero fitted constants.
  *  RA(t) = (baseRA − earthRAAngle/sin(ε)) + (A/sin(ε)) × [−sin(H/3) + sin(H/8)]
  *  RMSE: 0.089° (0.36 min RA) over full H. */
-function computeSolsticeRA(currentYear, type) { return _cardinal().computeSolsticeRA(currentYear, type); }
+function computeSolsticeRA(currentYear, type) { return _tierModelB().cardinal.raDeg(currentYear, type); }
 
 // ═══ §10 — ΣT_trop: cardinal points DERIVED from the year-length model ══════
 //
@@ -57945,13 +57934,8 @@ function computeSolsticeRA(currentYear, type) { return _cardinal().computeSolsti
 // 16d7c87f — coefficients frozen.)
 
 /** Analytic deep-time tropical year, days. T_sid·(1 − 13/H) — axial precession. */
-function _cpAnalyticTropDays(year) {
-  const t_Ma = (J2000_CALENDAR_YEAR - year) / 1e6;
-  const sidSec = meanSiderealYearSecondsAtAge(t_Ma);
-  const Ht = eraClockHAtAge(t_Ma);   // the frozen clock's drift integrand rides H_era (plan 06 D8)
-  if (sidSec === null || Ht === null) return null;
-  return (sidSec / 86400) * (1 - 13 / Ht);
-}
+// (_cpAnalyticTropDays — the retired cardinal model's injected integrand base
+// on H_era — left with the model, plan 06 R1.)
 
 // Phase 7.2 — drift Simpson, Ih closed form, σ_tropical: see
 // @essrt/physics/cardinal (the implementation, with its measured-cost
@@ -57977,7 +57961,10 @@ function computeSolsticeJD(currentYear, type) {
   //
   // Snapshot mode keeps the pre-§10 linear form (no deep-time drift, no
   // integration) — ΣT_trop is a deep-time construct.
-  return _cardinal().computeSolsticeJD(currentYear, type);
+  // Plan 06 R1: the §10 derived form above is the RETIRED fitted model's
+  // record; the instant is the Newton root of the APPARENT certified Sun on
+  // its target longitude, in the package (ONE home, createModel().cardinal).
+  return _tierModelB().cardinal.jd(currentYear, type);
 }
 
 /** Compute cardinal point year length — time between consecutive events (days). */
@@ -57999,7 +57986,9 @@ function computeSolsticeYearLength(currentYear, type) {
   // consumers that need the SI-day form subtract the drift term (see the
   // tropical-year and axial-precession chart configs). Neglected: the drift
   // Euler–Maclaurin half-sample term's own derivative (f′/2, sub-µs).
-  return _cardinal().computeSolsticeYearLength(currentYear, type);
+  // Plan 06 R1: the interval between successive apparent crossings (SI days),
+  // from the package — the derivative form above is the retired model's record.
+  return _tierModelB().cardinal.yearLengthDays(currentYear, type);
 }
 
 /**

@@ -7,6 +7,18 @@ status: current
 
 # 14 — Cardinal Point Prediction from the Harmonic Combs
 
+> **Status (plan 06 R1): the fitted cardinal-point model this document
+> describes has left the runtime.** The cardinal instants are now the
+> apparent crossings of the one certified Sun (the Newton root of
+> λ_apparent = 0/90/180/270 in `createModel().cardinal`; aberration and the
+> leading nutation terms derived), whose mean longitude integrates the
+> one-source tropical year. Measured against Meeus ch. 27 (a theory
+> reference, ~1 min): the fitted model below sat 60–140 min off at
+> 0..−1000 and 6–25 min off in 1500–2900; the crossings of the one-source
+> Sun track Meeus flat to a few minutes over the whole span. The
+> `CARDINAL_POINT_*` coefficients stay in the coefficients file as the
+> record until the cleanup phase; this document is that record.
+
 ## Overview
 
 The Holistic Universe Model predicts the timing and position of all four cardinal

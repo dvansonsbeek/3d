@@ -755,7 +755,16 @@ const _E5_WHEEL_SUN = process.env.E5_WHEEL_SUN !== '0';   // default ON (mirrors
 const _FQ3_EXACT_SUN = process.env.FQ3_EXACT_SUN !== '0'; // default ON; FQ3_EXACT_SUN=0 restores the fitted-correction path
 let _e5TierM = null;
 function _e5Tier() {
-  if (!_e5TierM) _e5TierM = _req('@essrt/physics').createModel();
+  if (!_e5TierM) {
+    // Plan 06 R1 (measured): createModel() WITHOUT the shipped secular-series
+    // artifact builds the hybrid on the ζ-mode tail — a DIFFERENT certified
+    // Sun from the API's and the audit's (75″ at 0 AD, 168″ at −1000, 377″ at
+    // −2500 in λ; the recorded 3c trap, third instance). The overlay's target
+    // Sun is the shipped configuration.
+    let artifact;
+    try { artifact = require('../../data/nbody-secular-series.json'); } catch { artifact = undefined; }
+    _e5TierM = _req('@essrt/physics').createModel(undefined, artifact ? { secularSeriesArtifact: artifact } : undefined);
+  }
   return _e5TierM;
 }
 let _sunLonCorrM = null;
