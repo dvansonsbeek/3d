@@ -51,6 +51,7 @@ retains its original NOAA header giving the full citation.
 
 | file | note |
 |---|---|
+| `jpl-sun-ecliptic-longitude-tt.json` | JPL Horizons (NASA/JPL, DE441): the Sun's apparent geocentric ecliptic longitude and latitude on a 10-day grid, −3000..+3000, **TT** (TIME_TYPE=TT on every request; the model's observation-class Sun reference over the era, plan 06 I1). Fetched by `tools/explore/fetch-jpl-sun-longitude-tt.mjs`. A US government work, public domain; Horizons asks for acknowledgement of JPL's Solar System Dynamics group. |
 | `tycho-mars-raw.csv` | Tycho Brahe's Mars observations, 1582–1600. The observations are long out of copyright; the `Volume`/`Page` columns record the printed edition transcribed from. |
 
 ### Generated here, not third-party

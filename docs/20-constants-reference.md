@@ -492,7 +492,7 @@ the torque factors, measured 12 min off in the medieval era) + equation of
 centre on the banked series' e(t) and ϖ(t) plus the derived mean-element
 offset (`data/earth-osculating-mean-offset.json`, plan 06 layer B —
 formerly the H/16 + derived-H/3 laws). It carries **zero fitted solar
-constants**; accuracy <!--v:frameworkSunVsJplRms-->0.95<!--/v-->″ RMS vs JPL (modern window, cache instants as TT; the Meeus Ch. 25 basis on the same completion: <!--v:meeusCh25SunVsJplRms-->0.93<!--/v-->″).
+constants**; accuracy <!--v:frameworkSunVsJplRms-->1.29<!--/v-->″ RMS vs JPL (modern window 1970–2049; the Meeus Ch. 25 basis on the same completion: <!--v:meeusCh25SunVsJplRms-->1.30<!--/v-->″). The former era-clock Sun read 0.80″ in that window — the modern-window cost of the physical year, accepted for its behaviour over millennia (plan 06 R1).
 The scene wheel displays the same longitude via the δ overlay
 (δ = λ_certified − λ_realized, the wheel's own longitude read from the scene
 geometry; clock-convention window). See

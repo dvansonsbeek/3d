@@ -135,6 +135,8 @@ export function assembleModel(C: Readonly<Record<string, any>>, F: Readonly<Reco
     eclipse: Readonly<{
         sunLonDegAtJD: (jd: number) => number;
         sunLonCompletedDegAtJD: (jd: number) => number;
+        /** The APPARENT Sun (completed geometric − the derived aberration constant + the leading nutation terms on the model's own arguments) — the quantity Horizons' observer ecliptic longitude is; the cardinal instants are its crossings (plan 06 R1/I1). @param {number} jdUT @returns {number} */
+        sunApparentLonDegAtJD: (jdUT: number) => number;
         findLunarInRange: (jdStart: number, jdEnd: number) => {
             jd: number;
             beta: number;

@@ -1104,10 +1104,14 @@ export function assembleModel(C, F, laws = {}, secularSeriesArtifact = /** @type
     // while the era-clock year carried NO secular drift (+1.09 s flat), so
     // the former mean longitude wandered +12 min around 500 AD and diverged
     // −3.3 min/cy after 2100 against both Meeus ch. 27 and the one-source
-    // integral — outside every eclipse and JPL gate; against the JPL Sun
-    // cache taken as TT the one-source Sun reads 1.28″ sd over 1900–2100
-    // where the former read 2.18″ (its 0.79″ registry figure was a
-    // cancellation between the flat year and the instrument's ΔT bridge).
+    // integral — outside every eclipse and JPL gate. MODERN-WINDOW COST,
+    // stated (plan 06 I1 corrected an earlier misreading of the cache's
+    // clock): against the JPL Sun cache (UT instants, verified; the registry
+    // instrument's bridge) the one-source Sun reads 1.29″ sd in 1970–2049
+    // where the era-clock Sun read 0.80″ — both carry ~0.02–0.03″/yr trends
+    // of opposite sign against JPL over 1900–2100, the physical year's
+    // slightly larger; accepted because over millennia the era-clock Sun is
+    // minutes off.
     // NUMERICS (rate vs point value): a cumulative trapezoid table of
     // cycles, yearly inside ±20,000 yr and per century beyond, grown on
     // demand from 2000 in both directions and interpolated inside a cell —
@@ -1481,6 +1485,8 @@ export function assembleModel(C, F, laws = {}, secularSeriesArtifact = /** @type
       sunLonCompletedDegAtJD: /** @param {number} jd @returns {number} */ (jd) =>
         eclipseFinders.sunLonDegAt(jd)
         - sunPlanetaryCompletionDeg((jdTTFromUT(jd) - j2000JD) / julianCenturyDays),
+      /** The APPARENT Sun (completed geometric − the derived aberration constant + the leading nutation terms on the model's own arguments) — the quantity Horizons' observer ecliptic longitude is; the cardinal instants are its crossings (plan 06 R1/I1). @param {number} jdUT @returns {number} */
+      sunApparentLonDegAtJD: /** @param {number} jdUT @returns {number} */ (jdUT) => sunApparentLonDegAtJdUT(jdUT),
       findLunarInRange: /** @param {number} jdStart @param {number} jdEnd */ (jdStart, jdEnd) => eclipseFinders.findLunarEclipsesInRange(jdStart, jdEnd),
       findSolarInRange: /** @param {number} jdStart @param {number} jdEnd */ (jdStart, jdEnd) => eclipseFinders.findSolarEclipsesInRange(jdStart, jdEnd),
       deltaTSecondsAtJD: frameworkDeltaTSecondsAtJD,

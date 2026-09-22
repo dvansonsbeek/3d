@@ -1462,6 +1462,30 @@ export const VALUES = {
     // tools/verify/earth-osculating-offset.js (derived; no JPL fit).
     const osc = rd('data/earth-osculating-mean-offset.json');
     return {
+      // Plan 06 I1 — the model's apparent Sun and its cardinal instants against
+      // JPL Horizons over ±3000 yr (TT cache; tools/verify/sun-vs-horizons.js).
+      ...(() => {
+        const svh = rd('data/sun-vs-horizons-summary.json');
+        const mil = (from) => svh.sun.perMillennium.find((m) => m.from === from);
+        const cmil = (from) => svh.cardinal.perMillennium.find((m) => m.from === from);
+        const f1 = (v) => Number(v).toFixed(1).replace('-', '−'), f2 = (v) => Number(v).toFixed(2).replace('-', '−');
+        const out = {
+          sunVsHorizonsSdArcsec:        { get: () => svh.sun.all.sd, render: f2, unit: '″', note: 'model apparent Sun − Horizons, sd over −3000..+3000 (TT, 219k instants)' },
+          sunVsHorizonsMeanArcsec:      { get: () => svh.sun.all.mean, render: f2, unit: '″', note: 'model apparent Sun − Horizons, mean over −3000..+3000' },
+          sunVsHorizonsModernSdArcsec:  { get: () => svh.sun.window1970to2049.sd, render: f2, unit: '″', note: '1970–2049 sd on the TT-cache definition (the registry instrument\'s UT-cache figure is frameworkSunVsJplRms)' },
+          sunVsHorizonsModernMeanArcsec:{ get: () => svh.sun.window1970to2049.mean, render: f2, unit: '″', note: '1970–2049 mean offset (the L0 anchor + aberration conventions)' },
+          cardinalVsHorizonsMeanMin:    { get: () => svh.cardinal.all.mean, render: f2, unit: 'min', note: 'model cardinal instants − Horizons\' own crossings, mean over −3000..+3000 (24k events)' },
+          cardinalVsHorizonsSdMin:      { get: () => svh.cardinal.all.sd, render: f2, unit: 'min', note: 'model cardinal instants − Horizons, sd over −3000..+3000' },
+          sunVsHorizonsN:               { get: () => svh.sun.all.n, render: (v) => thousands(v), note: 'Horizons TT instants compared (10-day grid, ±3000 yr)' },
+        };
+        for (const from of [-3000, -2000, -1000, 0, 1000, 2000]) {
+          const tag = from < 0 ? `M${-from}` : `P${from}`;
+          out[`sunVsHorizonsMean${tag}Arcsec`] = { get: () => mil(from).mean, render: f1, unit: '″', note: `model apparent Sun − Horizons, mean over the millennium ${from}..${from + 1000}` };
+          out[`sunVsHorizonsSd${tag}Arcsec`] = { get: () => mil(from).sd, render: f1, unit: '″', note: `sd over the millennium ${from}..${from + 1000}` };
+          out[`cardinalVsHorizonsMean${tag}Min`] = { get: () => cmil(from).mean, render: f2, unit: 'min', note: `model cardinal instants − Horizons, mean over ${from}..${from + 1000}` };
+        }
+        return out;
+      })(),
       sunMeanOffsetPomArcsec:    { get: () => osc.dPomArcsec, render: (v) => (v >= 0 ? '+' : '') + Number(v).toFixed(2), unit: '″', note: 'mean-element ϖ offset of the eclipse Sun over the derivation window (osculating − secular)' },
       sunMeanOffsetE:            { get: () => osc.dE, render: (v) => (v >= 0 ? '+' : '') + Number(v).toExponential(2), note: 'mean-element e offset of the eclipse Sun over the derivation window (osculating − secular)' },
       lunarResidualRmsSeconds:   { get: () => L.frameworkMeanAbsResidualSeconds, render: (v) => thousands(v), unit: 's' },

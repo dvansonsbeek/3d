@@ -616,10 +616,15 @@ terms derived; the Sun's mean longitude integrates the one-source tropical
 year, chain 1.1). The former device, the **frozen era clock**
 (`createCardinalModel`, the §10 derived form in §5.2 below, kept as the
 record), returned event JDs from fitted coefficients frozen at the last
-spin-and-tides-side fit (the fitters are retired, git 16d7c87f); measured
-against Meeus ch. 27 it sat 60–140 min off at 0..−1000 and 6–25 min off in
-1500–2900, where the crossings of the one-source Sun track Meeus flat to a
-few minutes (the constant being aberration/nutation/the L0 convention). The **one-source cardinal structure** (`createCardinalStructure`)
+spin-and-tides-side fit (the fitters are retired, git 16d7c87f). THE
+OBSERVATION-CLASS VERDICT (plan 06 I1, `tools/verify/sun-vs-horizons.js`
+against JPL Horizons' own crossings over ±3000 yr, TT): the shipped instants
+sit <!--v:cardinalVsHorizonsMeanMin-->−3.70<!--/v--> min from Horizons on average (sd <!--v:cardinalVsHorizonsSdMin-->3.61<!--/v--> min), within
+a minute in 1000–3000 (<!--v:cardinalVsHorizonsMeanP1000Min-->−0.15<!--/v--> / <!--v:cardinalVsHorizonsMeanP2000Min-->−0.66<!--/v--> min) and 3–8 min early in the
+ancient era (<!--v:cardinalVsHorizonsMeanM1000Min-->−3.34<!--/v--> min at −1000..0, <!--v:cardinalVsHorizonsMeanM2000Min-->−7.81<!--/v--> min at −2000..−1000) — the
+Sun's own slowly varying bias against Horizons (+17–19″ there, §1.1). The
+retired device sat hours from the same reference (the gap table in §5.3:
+4.5 h at 0 AD, 6.5 d at −10000). The **one-source cardinal structure** (`createCardinalStructure`)
 returns the equation-of-centre layer — per-point year lengths, crossing
 offsets, the e(t)-spread, the anomalistic year — from the N-body movement's
 own e(t) and ϖ(t) with zero fitted constants; it deliberately carries no

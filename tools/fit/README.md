@@ -608,10 +608,12 @@ the CARDINAL_POINT_* family — are FROZEN at their last K-movement fit
 CERTIFIED ERA CLOCK. They NEVER re-fit. Plan 06 R1 (measured): the
 CARDINAL_POINT_* family and the comb-based Sun drift left the runtime —
 the cardinal instants are the apparent crossings of the one certified Sun
-whose mean longitude integrates the one-source tropical year (the fitted
-instants were 60–140 min from Meeus ch. 27 at 0..−1000 and 6–25 min in
-1500–2900; the era-clock year carried no secular drift). The constants stay
-in the coefficients file as the record until the cleanup phase. A harmonic re-fit
+whose mean longitude integrates the one-source tropical year (against JPL
+Horizons' own crossings over ±3000 yr the shipped instants are within a
+minute in 1000–3000 and 3–8 min in the ancient era, where the fitted device
+sat hours — `tools/verify/sun-vs-horizons.js`; the era-clock year carried
+no secular drift). The constants stay in the coefficients file as the
+record until the cleanup phase. A harmonic re-fit
 against the one-source CSV is a CROSS-FAMILY fit, and it was MEASURED
 (2026-09): cardinal interior RMS 8.8-16 min (30-60×), equinox J2000
 anchors ±2 h off IAU, day-scale amplitudes chasing the engine's

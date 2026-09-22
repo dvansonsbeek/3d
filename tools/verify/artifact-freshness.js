@@ -62,6 +62,8 @@ const REQUIRED = [
   'data/nbody-secular-frequencies.json',
   // plan 06 layer B — the eclipse Sun's derived mean-element offset:
   'data/earth-osculating-mean-offset.json',
+  // plan 06 I1 — the Sun and the cardinal instants against the ±3000-yr Horizons TT cache:
+  'data/sun-vs-horizons-summary.json',
 ];
 
 const DATA = path.join(ROOT, 'data');

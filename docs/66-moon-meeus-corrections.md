@@ -750,12 +750,12 @@ on it, and elongation-class timing absorbs the omission into the fitted
 phases.
 
 Registry Sun metric (instrument-owned, `fq7s-sun-registry-metric.mjs`:
-modern window 1970–2049, full nutation bridge, the cache instants taken as
-TT — plan 06 R1 fixed the bridge, which had let the model ΔT into the
-comparison — mean removed): certified
-<!--v:frameworkSunVsJplRms-->0.95<!--/v-->″ vs the Meeus Ch. 25 basis with
-the same completion <!--v:meeusCh25SunVsJplRms-->0.93<!--/v-->″ (bare
-Meeus 10.02″).
+modern window 1970–2049, full nutation bridge on the cache's UT instants
+(verified by re-query, plan 06 I1), mean removed): certified
+<!--v:frameworkSunVsJplRms-->1.29<!--/v-->″ vs the Meeus Ch. 25 basis with
+the same completion <!--v:meeusCh25SunVsJplRms-->1.30<!--/v-->″ (bare
+Meeus 10.07″). The former era-clock Sun read 0.80″ here — the modern-window
+cost of the physical year (plan 06 R1).
 
 **One eccentricity law for Sun and Moon.** Eccentricity is FRAME-INVARIANT
 (e = |z|, z = e·e^{iϖ}) and may carry only fixed-frame lattice content

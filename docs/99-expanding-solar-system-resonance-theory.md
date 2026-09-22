@@ -587,12 +587,17 @@ L(t) = L₀ + mean tropical rate · t + D(t)          (mean longitude)
    cumulative trapezoid grown from J2000 in both directions, never a rate
    multiplied by a span. This replaced the former closed form on the
    frozen era clock (the comb ripple, the torque scaling above and a
-   sin-saturated rebase), which was MEASURED against Meeus ch. 27 and
-   against the one-source integral: its year carried no secular drift
-   (+1.09 s flat where the physical year drifts −0.53 s/cy), so the
-   longitude wandered +12 min around 500 AD and diverged −3.3 min/cy after
-   2100 — outside every eclipse and JPL gate. The route-B year equals the
-   IAU/Laskar drift expression to 0.1 s over −1000..+3000.
+   sin-saturated rebase), whose year carried no secular drift (+1.09 s
+   flat where the physical year drifts −0.53 s/cy), so its longitude
+   wandered +12 min around 500 AD and diverged −3.3 min/cy after 2100 —
+   outside every eclipse and JPL gate at the time. The route-B year equals
+   the IAU/Laskar drift expression to 0.1 s over −1000..+3000. THE
+   OBSERVATION-CLASS CHECK (plan 06 I1, JPL Horizons' apparent Sun on a
+   10-day TT grid over ±3000 yr, <!--v:sunVsHorizonsN-->219,152<!--/v--> instants): the model's apparent
+   Sun sits <!--v:sunVsHorizonsMeanArcsec-->9.12<!--/v-->″ from Horizons on average with sd <!--v:sunVsHorizonsSdArcsec-->8.89<!--/v-->″ over the whole
+   span — near zero in 1000–3000 (<!--v:sunVsHorizonsMeanP1000Arcsec-->0.4<!--/v--> / <!--v:sunVsHorizonsMeanP2000Arcsec-->1.6<!--/v-->″), a slowly
+   varying bias of <!--v:sunVsHorizonsMeanM2000Arcsec-->19.2<!--/v-->″ at −2000..−1000 — and <!--v:sunVsHorizonsModernSdArcsec-->1.23<!--/v-->″ scatter in
+   1970–2049 (mean offset <!--v:sunVsHorizonsModernMeanArcsec-->8.40<!--/v-->″, the L0 anchor and aberration conventions).
 
 **e(t) and ϖ(t)** are the banked N-body series' Earth elements plus the
 derived mean-element offset of the era (doc 110 chain 1.1; plan 06 layer B)
@@ -601,13 +606,17 @@ J2000-anchored line (doc 66 §1). Eccentricity is frame-invariant and
 carries no equinox-referenced period; the perihelion longitude does. The
 cardinal instants are the APPARENT crossings of this Sun (aberration and
 the leading nutation terms applied, both derived) — the former fitted
-cardinal-point model left with R1 (doc 110 chain 5).
+cardinal-point model left with R1 (doc 110 chain 5); against Horizons' own
+crossings the instants are <!--v:cardinalVsHorizonsMeanMin-->−3.70<!--/v--> min on average over ±3000 yr, within a
+minute in 1000–3000.
 
-**Accuracy**: <!--v:frameworkSunVsJplRms-->0.95<!--/v-->″ RMS vs JPL over the modern window with the cache
-instants taken as TT (the Meeus Ch. 25 basis on the same completion:
-<!--v:meeusCh25SunVsJplRms-->0.93<!--/v-->″). The former 0.80″ was a cancellation between the flat era-clock
-year and the instrument's ΔT bridge (R1 record). Over 1900–2100 the
-one-source Sun reads 1.28″ where the former read 2.18″.
+**Accuracy**: <!--v:frameworkSunVsJplRms-->1.29<!--/v-->″ RMS vs JPL over the modern window 1970–2049
+(the Meeus Ch. 25 basis on the same completion: <!--v:meeusCh25SunVsJplRms-->1.30<!--/v-->″). Stated
+plainly: the former era-clock Sun read 0.80″ in that window — the physical
+year costs half an arcsecond of modern scatter (both Suns carry ~0.02–0.03″/yr
+trends of opposite sign against JPL over 1900–2100) and buys the era: the
+era-clock Sun was 12 minutes off in the medieval era and diverging after
+2100 (R1 record).
 
 **The scene-wheel overlay (SW)**: the visible wheel Sun adds one term on top
 of its untouched legacy stack, δ = λ_certified − λ_realized (the wheel's own

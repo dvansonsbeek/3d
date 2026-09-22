@@ -144,8 +144,12 @@ clock's tropical year carries no secular drift (+1.09 s at J2000 and
 flat, where the physical year drifts −0.53 s/cy and the one-source
 family matches the IAU/Laskar expression to 0.1 s over four millennia).
 Both now ride the one Sun whose mean longitude integrates the one-source
-tropical year; the cardinal instants are its apparent crossings. The
-coefficients stay in the file as the record until the cleanup phase.
+tropical year; the cardinal instants are its apparent crossings — against
+JPL Horizons' own crossings over ±3000 yr (the observation-class reference
+that replaced Meeus here, plan 06 I1) they sit <!--v:cardinalVsHorizonsMeanMin-->−3.70<!--/v--> min on average,
+within a minute in 1000–3000, where the retired device sat hours (doc 110
+§5.3). The coefficients stay in the file as the record until the cleanup
+phase.
 
 ## What this does NOT retire
 
