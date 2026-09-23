@@ -5,7 +5,8 @@
  * THE 6a2 ARTIFACT. `npm run fit:6a2` generates
  * data/02-solar-measurements-window.csv — the SAME Step-6a exporter
  * (the one-source movement — the only Node scene since plan 06 item 3) over −4000..+4000
- * (8,001 years × 6 events = 48,006 rows, ~5 min) instead of the full-H
+ * (8,001 years × 6 events = 48,006 rows, ~25 min since R4 — the exporter
+ * evaluates the certified Sun per probe, measured 36 s per 200 yr) instead of the full-H
  * run (335,318 years × 6 events = 2,011,908 rows, 2 h 24 m). The full 6a
  * CSV stays as the C-4b-era campaign record; 6a2 is the LIVING check
  * artifact, cheap to re-base whenever the movement changes deliberately
@@ -63,7 +64,7 @@ try {
   const r = spawnSync(process.execPath, [
     join(ROOT, 'tools', 'fit', 'export-solar-measurements.js'),
     '--start', String(START), '--end', String(END), '--output', scratch,
-  ], { env: { ...process.env }, stdio: ['ignore', 'pipe', 'pipe'], timeout: 900000 });
+  ], { env: { ...process.env }, stdio: ['ignore', 'pipe', 'pipe'], timeout: 3600000 });   // R4: the exporter evaluates the certified Sun per probe — measured 36 s per 200 yr, ~25 min for the window
   if (r.status !== 0) {
     console.log('FAIL — exporter exited ' + r.status + '\n' + String(r.stderr).slice(0, 800));
     process.exit(1);

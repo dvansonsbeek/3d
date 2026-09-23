@@ -591,7 +591,11 @@ Step 6a2 (owner, 2026-09-16): `npm run fit:6a2`
          conscious campaign step.
          CHECK: `npm run check:csv-smoke` regenerates the FULL 6a2
          range into a scratch file and compares EVERY row against the
-         6a2 artifact BIT-EXACTLY (~5 min) —
+         6a2 artifact BIT-EXACTLY (~25 min since plan 06 R4: the
+         exporter's fast Sun rides the engine Earth frame and evaluates
+         the certified longitude per probe, measured 36 s per 200 yr; the
+         pre-R4 window's instants were the K wheel Sun's — 20 min off in
+         1500–2500, 27 h at −4000 — the re-base is the intended move) —
          compare-only (never writes the artifact), local-only (CI
          SKIPs), fail-proven via ESSRT_CSV_SMOKE_PLANT=1. A mismatch =
          the movement changed: bug, or an intended change → re-base
