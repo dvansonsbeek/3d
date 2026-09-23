@@ -89,9 +89,17 @@ mesh or the planet mesh) instead of the "Look at" body.
 
 ## 5. Readouts
 
-**Chain elements of date:** a, e, i and Ω (J2000 ecliptic), ϖ, ω = ϖ − Ω,
-λ̄, the Kepler-III period a^3/2 in years, the perihelion and aphelion
-distances.
+**Chain elements of date:** a, e, i and Ω (J2000 ecliptic), the inclination
+to the invariable plane and the ascending node on it (Souami & Souchay
+origin — the planet panel's rows), ϖ, ω = ϖ − Ω, λ̄, the Kepler-III period
+a^3/2 in years, the perihelion and aphelion distances. Two inclinations are
+deliberately shown: Mercury's 7.005° is to the ecliptic (JPL 7.00498°), its
+6.345° is to the invariable plane; they are different planes, not a
+discrepancy.
+
+Against the Horizons osculating elements (`public/input/jpl-horizons-planet-elements.json`)
+the chain's i, Ω and e at 2003 agree to ≤0.0014°, ≤0.03° and ≤2e-4 for all
+seven planets, and at −2997 to ≤0.024°, ≤0.23° and ≤3e-3 (Uranus e).
 
 **Orbit geometry (live):** the Sun→planet distance of the rendered planet, ν
 at the Sun, the chain's M, ν − M, the inclination to the ecliptic of date, the

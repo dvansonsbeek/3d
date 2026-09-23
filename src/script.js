@@ -14398,8 +14398,10 @@ function focusInspectorCamera(mode) {
 const _HI_ROWS_ELEMENTS = [
   ['aAU', 'Semi-major axis (a)', 'AU', 'The chain’s a of date (engine-D element chain + the banked secular-series override).'],
   ['e', 'Eccentricity (e)', '', ''],
-  ['inclJ2000', 'Inclination (i, J2000 ecliptic)', '°', 'The chain element: the orbit plane against the FIXED J2000 ecliptic. The of-date value against the rendered ecliptic is in the geometry section.'],
+  ['inclJ2000', 'Inclination (i, J2000 ecliptic)', '°', 'The chain element: the orbit plane against the FIXED J2000 ecliptic (Mercury ≈ 7.005°, JPL 7.00498°). The of-date value against the rendered ecliptic is in the geometry section; the inclination to the INVARIABLE plane (Mercury ≈ 6.345°) is the separate row below.'],
   ['ascNodeJ2000', 'Ascending node (Ω, J2000 ecliptic)', '°', ''],
+  ['inclInv', 'Inclination to the invariable plane (i_inv)', '°', 'The chain element against the model’s own invariable plane (the system’s total-angular-momentum plane) — the planet panel’s "Inclination to Inv. plane" row.'],
+  ['ascNodeInv', 'Ascending node on the invariable plane (Ω_inv, S&S origin)', '°', 'The chain’s node of date on the invariable plane in the Souami & Souchay (2012) longitude origin — the planet panel’s row and the Orbital Plane Precession chart’s Ω.'],
   ['lonPeri', 'Longitude of perihelion (ϖ, J2000 ecliptic)', '°', 'The element every reference table publishes; the same channel as the planet panel’s ϖ row.'],
   ['argPeri', 'Argument of perihelion (ω = ϖ − Ω)', '°', ''],
   ['meanLon', 'Mean longitude (λ̄)', '°', ''],
@@ -14448,6 +14450,9 @@ function _hiWriteReadouts(f) {
   e.e.textContent = fx(el.e, 6);
   e.inclJ2000.textContent = fx(el.inclEclipticDeg, 4, '°');
   e.ascNodeJ2000.textContent = fx(_hiWrap360(el.ascNodeEclipticDeg), 4, '°');
+  e.inclInv.textContent = fx(el.inclInvPlaneDeg, 4, '°');
+  e.ascNodeInv.textContent = Number.isFinite(el.ascNodeInvPlaneDeg)
+    ? fx(_hiWrap360(convertNodeSFrameToEquatorOriginDeg(el.ascNodeInvPlaneDeg, _kcNodeOriginSSDeg())), 4, '°') : '—';
   e.lonPeri.textContent = fx(_hiWrap360(el.lonPeriEclipticDeg), 4, '°');
   e.argPeri.textContent = fx(_hiWrap360(el.lonPeriEclipticDeg - el.ascNodeEclipticDeg), 4, '°');
   e.meanLon.textContent = fx(_hiWrap360(el.meanLonEclipticDeg), 4, '°');
