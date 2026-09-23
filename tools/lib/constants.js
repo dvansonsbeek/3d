@@ -297,6 +297,7 @@ const iauObliquityAtGrid = ASTRO_REFERENCE.obliquityJ2000_deg
   + (ASTRO_REFERENCE.obliquityRate_arcsecPerCentury / 3600 / 100) * gridYearDeltaFromJ2000;
 const cardinalPointAnchorsAtGrid = {};
 for (const [type, jd2000] of Object.entries(ASTRO_REFERENCE.cardinalPointAnchors)) {
+  if (typeof jd2000 !== 'number') continue;   // the key carries its provenance `_comment` (R4d)
   cardinalPointAnchorsAtGrid[type] = jd2000 + meanSolarYearDays * gridYearDeltaFromJ2000;
 }
 

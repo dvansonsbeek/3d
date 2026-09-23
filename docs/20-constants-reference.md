@@ -175,6 +175,7 @@ they anchor per-planet geometry but carry no model freedom.
 | Tropical year rate | `tropicalYearRateSecPerCentury` | −0.53 s/cy |
 | Axial precession (J2000) | `iauPrecessionJ2000` | <!--v:iauPrecessionInputYears-->25,770.73<!--/v--> years (input, model day basis; published IAU exact 25,771.57634) |
 | June Solstice 2000 JD | `juneSolstice2000_JD` | <!--v:juneSolstice2000JD-->2451716.575<!--/v--> |
+| Cardinal instants 2000 (VE / SS / AE / WS, UTC) | `cardinalPointAnchors` | <!--v:cardinalAnchorVE2000JD-->2451623.816<!--/v--> / <!--v:cardinalAnchorSS2000JD-->2451716.575<!--/v--> / <!--v:cardinalAnchorAE2000JD-->2451810.2271<!--/v--> / <!--v:cardinalAnchorWS2000JD-->2451900.0674<!--/v--> |
 | Solar day (J2000) | `solarDayJ2000` | 86400.0 s |
 | Sidereal day (J2000) | `siderealDayJ2000` | <!--v:siderealDayInputSeconds-->86,164.090531<!--/v--> s |
 | Stellar day (J2000) | `stellarDayJ2000` | <!--v:stellarDayInputSeconds-->86,164.098904<!--/v--> s |
@@ -542,6 +543,7 @@ These come from external astronomical sources and do not change with the model.
 | Perihelion passage J2000 | `perihelionRefJD` | <!--v:perihelionPassageJD-->2451547.042<!--/v--> | USNO (2000 Jan 3 13:00 UTC) |
 | IAU precession period | `iauPrecessionJ2000` | <!--v:iauPrecessionInputYears-->25,770.73<!--/v--> years | IAU 2006 rate re-expressed on the model day basis (published exact: 25,771.57634 yr) |
 | June Solstice 2000 JD | `juneSolstice2000_JD` | <!--v:juneSolstice2000JD-->2451716.575<!--/v--> | USNO (June 21, 2000 01:48 UTC) |
+| Cardinal instants 2000 (VE / SS / AE / WS) | `cardinalPointAnchors` | <!--v:cardinalAnchorVE2000JD-->2451623.816<!--/v--> / <!--v:cardinalAnchorSS2000JD-->2451716.575<!--/v--> / <!--v:cardinalAnchorAE2000JD-->2451810.2271<!--/v--> / <!--v:cardinalAnchorWS2000JD-->2451900.0674<!--/v--> | USNO "Earth's Seasons" 2000 (Mar 20 07:35 · Jun 21 01:48 · Sep 22 17:27 · Dec 21 13:37 UTC, minute precision); reference data, no runtime reader — the cardinal instants are `createModel().cardinal` (plan 06 R4d: the VE/AE entries had been retired-device anchors 112 min off) |
 
 ## Year & Day Lengths (J2000)
 

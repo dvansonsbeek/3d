@@ -280,6 +280,7 @@ const BLOCKS_CHAIN4 = {
 
 // ── Chain 5 — the cardinal points and the clock ──────────────────────────────
 const FC = require(join(ROOT, 'packages/physics/src/constants/coefficients.js')).FITTED_COEFFICIENTS;
+const AR_CARDINAL_2000 = require(join(ROOT, 'public/input/astro-reference.json')).cardinalPointAnchors;   // the USNO 2000 instants (R4d)
 const CP_TYPES = /** @type {const} */ (['VE', 'SS', 'AE', 'WS']);
 
 /** Julian Day → 'YYYY-MM-DD hh:mm' — PROLEPTIC Gregorian at every epoch (Meeus
@@ -378,7 +379,7 @@ function blockCardinalAnchors() {
     rows.push(`| ${t} | ${f(b, 6)} (${jdToDateString(b)}) | ${f(a, 6)} (${jdToDateString(a)}) | ${f((b - a) * 24, 3)} |`);
   }
   rows.push('');
-  rows.push('USNO 2000 instants for comparison (UTC): VE Mar 20 07:35 · SS Jun 21 01:48 (`juneSolstice2000_JD`, astro-reference) · AE Sep 22 17:27 · WS Dec 21 13:37. Plan 06 R1: NO runtime reads either anchor set any more — the shipped instants are the apparent crossings of the one Sun (`createModel().cardinal`, delegated to by script.js and tools/lib); both keys stay in the coefficients file as the retired device\'s record until the cleanup phase. (R4c closed the last reader: the simulator\'s cardinal panel had re-solved the events on the rendered scene and bridged them to the ADJUSTED set with a J2000 offset; it now reads `cardinal.jdNearUT` seeded at the displayed calendar year\'s midpoint — the model year and the calendar year part by 0.0078 d/yr, 114 yr at −5.34 Myr. The registry `cardinalPointAnchors` VE/AE values are 112 min off the USNO instants — retired-device anchors, not observations.)');
+  rows.push(`USNO 2000 instants for comparison (UTC, minute precision — the registry \`cardinalPointAnchors\`, astro-reference, ONE home since R4d): ${CP_TYPES.map((t) => `${t} ${f(AR_CARDINAL_2000[t], 4)} (${jdToDateString(AR_CARDINAL_2000[t])})`).join(' · ')}. Plan 06 R1: NO runtime reads either fitted anchor set any more — the shipped instants are the apparent crossings of the one Sun (\`createModel().cardinal\`, delegated to by script.js and tools/lib); both fitted keys stay in the coefficients file as the retired device's record until the cleanup phase. (R4c closed the last reader: the simulator's cardinal panel had re-solved the events on the rendered scene and bridged them to the ADJUSTED set with a J2000 offset; it now reads \`cardinal.jdNearUT\` seeded at the displayed calendar year's midpoint — the model year and the calendar year part by 0.0078 d/yr, 114 yr at −5.34 Myr. R4d: the registry's VE/AE entries had been retired-device anchors 112 min off the USNO instants; corrected.)`);
   return rows.join('\n');
 }
 

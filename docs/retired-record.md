@@ -173,8 +173,11 @@ offset and the `CARDINAL_POINT_ANCHORS` read left `src/script.js`; the
 internal tropical year (`o.solarYearDays`) rides the one year-length family
 instead of the scene-measured 4-mean (they agreed to sub-0.5 s: one
 evaluator read two ways). The registry `cardinalPointAnchors` VE/AE values
-(05:43 / 19:19 UT on 2000-03-20 / 09-22) are retired-device anchors 112 min
-off the real equinoxes — not observations; no runtime reads them.
+(05:43 / 19:19 UT on 2000-03-20 / 09-22) were retired-device anchors 112 min
+off the real equinoxes — not observations; R4d replaced the four entries
+with the USNO 2000 instants (minute precision, the key's stated purpose;
+doc 20 carries them), which the pipeline verifier's informational rows and
+doc 110 now quote from that one home. No runtime reads them.
 
 **The fitted Moon anchor and the "D5 derived optics"** (doc 66 §1.4 is the
 record; plan 06 R3 item 1): the mean-longitude anchor

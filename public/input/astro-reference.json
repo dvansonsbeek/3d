@@ -95,10 +95,11 @@
     "eros": 16.84
   },
   "cardinalPointAnchors": {
-    "SS": 2451716.5748,
-    "WS": 2451900.06782,
-    "VE": 2451623.738137,
-    "AE": 2451810.304796
+    "_comment": "The observed 2000 cardinal instants, UTC — USNO Astronomical Applications Department, 'Earth's Seasons: Equinoxes, Solstices, Perihelion, and Aphelion' (minute precision: VE Mar 20 07:35, SS Jun 21 01:48, AE Sep 22 17:27, WS Dec 21 13:37; SS = juneSolstice2000_JD). Reference data only — no runtime reads them (the cardinal instants are createModel().cardinal, the apparent crossings of the one Sun); the pipeline verifier's informational rows, doc 110 and the model-values registry quote them. Before plan 06 R4d the VE/AE entries were retired-device anchors (05:43 / 19:19 UT), 112 min off these instants.",
+    "SS": 2451716.575,
+    "WS": 2451900.0674,
+    "VE": 2451623.816,
+    "AE": 2451810.2271
   },
   "moonReference": {
     "_comment": "Option C+ (2026-06): sidereal month + apsidal/nodal precession periods are the J2000 anchors. FRAME NOTE: the *ICRF key names are legacy — the VALUES are the EQUINOX-OF-DATE periods (Meeus/IERS observables); the star-referenced periods are the N-/+13 partners (apsidal 3232.60 d, nodal 6793.48 d). Anomalistic and nodal months are derived kinematically. Deep-time evolution: N_apsidal,N_nodal scale as H(t)^2 (T_apsidal*H = const law). I-CONVENTION (v4 E3c): moonEclipticInclinationJ2000 = 5.1573 is the Moon's DYNAMICAL mean osculating inclination (measured from the Meeus series via the h-vector over 2 node cycles) — the physically-correct orbital-plane tilt and D1-lab calibration target; moonInclinationConstantBrownELP = 5.1453964 is the Brown/ELP THEORY CONSTANT (latitude sinF-coefficient normalization: 5.128122/0.99665), kept as the documented partner. Pure gravity maps between the two at 0.01% (lab compression 0.9944).",

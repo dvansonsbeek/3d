@@ -2386,6 +2386,12 @@ export const VALUES = {
     out.periPhaseOffsetDeg = { get: () => C.perihelionPhaseOffset, render: (v) => v.toFixed(4), unit: 'deg', note: 'derived (constants.js)' };
     out.perihelionPassageJD = { get: () => astro.earthOrbital.perihelionPassageJ2000_JD, render: (v) => String(v), unit: 'JD', note: 'USNO (2000 Jan 3)' };
     out.juneSolstice2000JD = { get: () => astro.earthOrbital.juneSolstice2000_JD, render: (v) => String(v), unit: 'JD', note: 'USNO (June 21, 2000)' };
+    // R4d: the four observed 2000 cardinal instants (USNO "Earth's Seasons",
+    // UTC, minute precision) — reference data, one home (astro-reference
+    // cardinalPointAnchors); no runtime reads them.
+    for (const [cp, label] of [['VE', 'March equinox'], ['SS', 'June solstice'], ['AE', 'September equinox'], ['WS', 'December solstice']]) {
+      out[`cardinalAnchor${cp}2000JD`] = { get: () => astro.cardinalPointAnchors[cp], render: (v) => String(v), unit: 'JD', note: `USNO 2000 ${label} (UTC, minute precision)` };
+    }
     out.iauPrecessionInputYears = { get: () => astro.yearLengthRef.iauPrecessionJ2000, render: (v) => thousands(v, 2), unit: 'yr', note: 'stored iauPrecessionJ2000 input — IAU 2006 rate on the model day basis' };
     out.earthEccCycle = { get: () => C.H / 3, render: (v) => thousands(Math.round(v)), unit: 'yr', note: 'the period of Earth\'s |e| oscillation — the one H/3 eccentricity law (doc 108). The H/16 = 13+3 wobble beat is the perihelion-DIRECTION cycle (periPrecYears), not the eccentricity cycle' };
     for (const p of ['mercury', 'venus', 'mars', 'jupiter', 'saturn', 'uranus', 'neptune']) {
