@@ -1136,6 +1136,15 @@ export function assembleModel(C, F, laws = {}, secularSeriesArtifact = /** @type
     const cyclesTo = (year) => {
       const dy = year - 2000;
       const s = dy >= 0 ? 1 : -1, a = Math.abs(dy);
+      // WARM THE SAMPLER TO THE TARGET FIRST (plan 06 R4, measured): the
+      // table below grows outward in 1-yr / 100-yr steps, and every step
+      // beyond ~1.6 Myr enlarged the one-family sampler's >2-Myr tier just
+      // past its span, rebuilding the whole deep integration about every 32
+      // steps — ~125 rebuilds and 22 s for the first deep-epoch call (the
+      // scene's first jump to −5 Myr), 0.4 ms once built. One read at the
+      // clamped target builds the tier at its final span; the grid stores
+      // are endpoint-independent, so every value is bit-identical.
+      tropSec(2000 + s * Math.min(a, ONE_FAMILY_WINDOW_YEARS));
       const fine = s > 0 ? fwdFine : bwdFine;
       const growFine = (/** @type {number} */ upto) => { while (fine.length <= upto) { const k = fine.length; fine.push(fine[k - 1] + s * segAbs(2000 + s * (k - 1), 2000 + s * k)); } };
       if (a <= FINE_SPAN) {
