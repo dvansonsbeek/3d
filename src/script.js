@@ -5789,6 +5789,25 @@ const J2000_CALENDAR_YEAR = startmodelYear;   // 2000.5
 // aligns all year coordinates consistently and eliminates that shift.
 const _jdToSIyear = (jd) => startmodelyearwithCorrection + (jd - startmodelJD) / SI_TROPICAL_YEAR_DAYS;
 const STARTMODEL_YEAR_SI = _jdToSIyear(startmodelJD);
+// R4b (plan 06, owner): THE ENGINE'S YEAR at a true-UT instant — the one
+// argument every read of the one-source sample (ε, e, ϖ, the frame of date)
+// takes in both twins. Dynamical time (the Moon block's true TT: bridge +
+// curve in deep-time mode) in JULIAN years from J2000 — the sampler's own
+// coordinate (t = 0 at JD 2451545.0 TT; the chain planets use the same
+// mapping). NOT the SI-year counter _jdToSIyear (startmodel origin,
+// 365.2422-d unit — the K device counters' coordinate: 10.3 d off at J2000,
+// 0.0078 d/yr drift) and NOT the UT year: at −5.34 Myr ΔT is 3,505 yr, and
+// the Predictions obliquity row (UT) read 22.5347° where the rendered frame
+// (TT) read 22.6944° — measured by the owner; the Moon's ecl→eq conversion
+// rode the UT value. Mirror: tools/lib/scene-graph.js _osmYearForJD.
+function _engineYearTT(jdUT) {
+  let jdTT = jdUT;
+  if (DEEP_TIME_MODE_ENABLED) {
+    const dT = meanDeltaTSecondsAtAge((J2000_CALENDAR_YEAR - julianDateToDecimalYear(jdUT)) / 1e6);
+    if (Number.isFinite(dT)) jdTT = jdUT + (deltaTStart + dT) / 86400;
+  }
+  return 2000 + (jdTT - j2000JD) / 365.25;
+}
 // = startmodelyearwithCorrection by construction (≈ 2000.4977 at the
 // canonical startmodelJD = 2451716.5). All cyclesBetweenYears callers that
 // reference STARTMODEL_YEAR_SI as anchor are automatically consistent with
@@ -27747,7 +27766,7 @@ function setupGUI() {
       const sunL = sunLon(jd);
       // Framework obliquity for THIS jd (jd may differ from o.julianDay in sweeps).
       // Was hardcoded 23.44 — drifted 0.28° at year -135 giving 40 km sub-solar error.
-      const epsDeg = _sceneEpsTargetDeg(_formulaYearFromJD(jd));   // Phase 3 S3b: the published ε (the hybrid), not the K comb
+      const epsDeg = _sceneEpsTargetDeg(_engineYearTT(jd));   // Phase 3 S3b: the published ε (the hybrid) at the engine year (R4b), not the K comb
       const lat = Math.asin(Math.sin(epsDeg * _d2r) * Math.sin(sunL * _d2r)) / _d2r;
       return { lat, lon };
     }
@@ -28017,7 +28036,7 @@ function setupGUI() {
       const sunL = sunLon(jd_conj);
       // Framework obliquity for THIS jd_conj (may differ from o.julianDay in sweeps).
       // Was hardcoded 23.44 — drifted 0.28° at year -135 giving 40 km sub-solar error.
-      const epsDeg = _sceneEpsTargetDeg(_formulaYearFromJD(jd_conj));   // Phase 3 S3b: the published ε
+      const epsDeg = _sceneEpsTargetDeg(_engineYearTT(jd_conj));   // Phase 3 S3b: the published ε at the engine year (R4b)
       const lat = Math.asin(Math.sin(epsDeg * _d2r) * Math.sin(sunL * _d2r)) / _d2r;
       return { lat, lon };
     }
@@ -44824,7 +44843,7 @@ function _applySolarAberration(sunGeoVec, jd, moonGeoVec) {
     // the raw-curve clock; bridging the sun degraded the modern
     // centerlines 8.9″ → 10.3″ (clock consistency beats tier mimicry).
     const lamS = _eclSunLon(jd) * Math.PI / 180;
-    const eps = _sceneEpsTargetDeg(2000 + (jd - 2451545.0) / 365.25) * Math.PI / 180;   // Phase 3 S3b: the published ε
+    const eps = _sceneEpsTargetDeg(_engineYearTT(jd)) * Math.PI / 180;   // Phase 3 S3b: the published ε — at the engine year, the rendered axis's own ε (R4b)
     const decS = Math.asin(Math.sin(eps) * Math.sin(lamS));
     const raS = Math.atan2(Math.cos(eps) * Math.sin(lamS), Math.cos(lamS));
     const rS = sunGeoVec.length();
@@ -52549,7 +52568,7 @@ function updateSunlightForPlanet(planetMesh, pad = 1.1) {
   if (planetMesh === earth.planetObj && Number.isFinite(o.julianDay)) {
     const _jdL = o.julianDay;
     const lamS = _eclSunLon(_jdL) * Math.PI / 180;
-    const eps  = _sceneEpsTargetDeg(2000 + (_jdL - 2451545.0) / 365.25) * Math.PI / 180;   // Phase 3 S3b: the published ε
+    const eps  = _sceneEpsTargetDeg(_engineYearTT(_jdL)) * Math.PI / 180;   // Phase 3 S3b: the published ε — at the engine year (R4b)
     const decS = Math.asin(Math.sin(eps) * Math.sin(lamS));
     const raS  = Math.atan2(Math.cos(eps) * Math.sin(lamS), Math.cos(lamS));
     const rS   = _sunWS.distanceTo(_planetWS);
@@ -52989,17 +53008,16 @@ function _kcPerihelionEclLonDeg(nameLower, jd) {
  *  Earth panel's ϖ/ω rows, the perihelion gauge and the mean/true-longitude
  *  rows: the one-source series' periOfDateDeg (the chain's J2000-frame ϖ
  *  carried on the composed equinox motion, wobble included — the SAME field
- *  the D4c apsidal wheel renders; ≡ the chain at J2000 to 0.00″, measured)
- *  while the movement is live, sampled in the wheel's own year convention;
+ *  the engine frame's apsidal arm renders; ≡ the chain at J2000 to 0.00″,
+ *  measured) while the movement is live, sampled at the ENGINE YEAR
+ *  (_engineYearTT — the frame's own argument, R4b; the SI/UT year had put
+ *  the row and the rendered arm on different instants at deep time);
  *  otherwise the chain's J2000-frame ϖ advanced at the certified J2000
  *  general-precession rate (S5). Never the H/13 counter: 0.043″/yr slow —
  *  the panel read 4.3″/century off the chart (measured), and both linear
  *  gauges part from the series by 37″ at 3000 AD (the wobble). */
 function earthPerihelionEclipticOfDateDeg(jd, year) {
-  if (_hybridSpinActive()) {
-    const ySample = DEEP_TIME_MODE_ENABLED ? _jdToSIyear(jd) : year;
-    return _hybridSeriesSampleAt(ySample).periOfDateDeg;
-  }
+  if (_hybridSpinActive()) return _hybridSeriesSampleAt(_engineYearTT(jd)).periOfDateDeg;
   const w = _kcPerihelionEclLonDeg('earth', jd) + (360 / _certifiedAxialPrecessionJ2000Years()) * (year - 2000);
   return ((w % 360) + 360) % 360;
 }
@@ -53266,16 +53284,8 @@ function _applyEngineEarthFrame(jdUT) {
   if (!_kcR) _kcDeriveFrameR();
   if (!_kcR) return;
   const R = _kcR;
-  // one clock: the Moon block's true TT (bridge + curve)
-  let jdTT = jdUT;
-  if (DEEP_TIME_MODE_ENABLED) {
-    const dT = meanDeltaTSecondsAtAge((J2000_CALENDAR_YEAR - julianDateToDecimalYear(jdUT)) / 1e6);
-    if (Number.isFinite(dT)) jdTT = jdUT + (deltaTStart + dT) / 86400;
-  }
-  // the sampler's coordinate is JULIAN years from J2000 TT (the chain's mapping),
-  // not the scene's SI-year counter — 10.3 d off at J2000, measured as a 1.417″
-  // rotation of the frame of date when fed to the absolute equinox longitude
-  const smp = _hybridSeriesSampleAt(2000 + (jdTT - j2000JD) / 365.25);
+  // one clock, one argument: the engine year (true TT, Julian — _engineYearTT)
+  const smp = _hybridSeriesSampleAt(_engineYearTT(jdUT));
   const F = computeEarthFrameOfDate(smp);
   const toW = (v, out) => out.set(
     R[0][0] * v[0] + R[0][1] * v[1] + R[0][2] * v[2],
@@ -53662,15 +53672,13 @@ function updatePositions() {
   barycenterEarthAndSun.planetObj.getWorldPosition(PERIHELION_OF_EARTH_POS);         // PERIHELION-OF-EARTH   centre
 
   // Keep o.obliquityEarth fresh in ALL modes (light + full). updatePredictions
-  // only runs in full mode, but the Sun/Moon Meeus overlays and other consumers
-  // need the current-epoch obliquity in 'light' mode too (audit-26, umbra scans).
-  // Uses the SAME yearForFormula formula as updatePredictions so all callers
-  // get identical values framework-wide.
-  const _yearForObliquity = DEEP_TIME_MODE_ENABLED
-    ? _jdToSIyear(o.julianDay)
-    : (o.julianDay - startmodelJD) / meansolaryearlengthinDays + startmodelyearwithCorrection;
-  // C-3 one source: under ?hybridSpin this is the series-hybrid ε (the same
-  // value the visual tilt correction drives to); otherwise the K device.
+  // only runs in full mode, but the Moon's ecl→eq conversion and other
+  // consumers need the current-epoch obliquity in 'light' mode too (audit-26,
+  // umbra scans). R4b: the ENGINE year (true TT, Julian) — the same argument
+  // the rendered frame samples ε at, so the Moon is converted with the ε of
+  // the axis it is placed in (the UT year had parted from it by 0.16° at
+  // −5.34 Myr, measured).
+  const _yearForObliquity = _engineYearTT(o.julianDay);
   o.obliquityEarth = _sceneEpsTargetDeg(_yearForObliquity);
   // (R4: the visible tilt/azimuth correction and the D5b plane refresh that
   // ran here are retired — the frame is placed at the end of moveModel)
@@ -54142,12 +54150,9 @@ function moveModel(pos) {
   // it exactly on this same realized offset. Mirrors tools/lib/scene-graph.js
   // moveModel; the year is derived exactly as the EoC block's `_eccYear`.
   {
-    const _eccYearFrame = DEEP_TIME_MODE_ENABLED
-      ? _jdToSIyear(o.julianDay)
-      : (o.julianDay - startmodelJD) / meansolaryearlengthinDays + startmodelyearwithCorrection;
-    // C-4a one source: under ?hybridSpin the geometric e offset (the sun-orbit
-    // eccentric displacement, e×100 scene units) rides the banked z series
-    // inside its span — same one-source function as the scalar.
+    // R4b: the engine year (true TT, Julian) — the frame placement below
+    // re-sets this offset from the same sample; one argument everywhere.
+    const _eccYearFrame = _engineYearTT(o.julianDay);
     earthPerihelionPrecession2.containerObj.position.x = -_sceneEccTargetAt(_eccYearFrame) * 100;
   }
 
@@ -56664,10 +56669,13 @@ function updatePredictions() {
     ? _jdToSIyear(o.julianDay)
     : (o.julianDay - startmodelJD) / meansolaryearlengthinDays + startmodelyearwithCorrection;
 
-  // Compute obliquity and eccentricity first - needed for year calculations
-  predictions.obliquityEarth = o.obliquityEarth = _sceneEpsTargetDeg(yearForFormula);
-  // Phase 8: use J2000-FIXED anchor + cycle length for frame-independent integrated phase
-  predictions.eccentricityEarth = o.eccentricityEarth = _sceneEccTargetAt(yearForFormula);
+  // Compute obliquity and eccentricity first - needed for year calculations.
+  // R4b: the engine's ε and e are read at the ENGINE year (true TT, Julian —
+  // _engineYearTT), the same argument the rendered frame samples; the
+  // device-tier rows below keep yearForFormula (their own counters).
+  const engineYear = _engineYearTT(o.julianDay);
+  predictions.obliquityEarth = o.obliquityEarth = _sceneEpsTargetDeg(engineYear);
+  predictions.eccentricityEarth = o.eccentricityEarth = _sceneEccTargetAt(engineYear);
 
   // Phase 9.11: Balanced-year navigation — past/future H and 8H balanced events.
   // H lattice cycles 0, ±1, ±2, ... anchored at BALANCED_YEAR_J2000_FIXED.
@@ -56969,7 +56977,7 @@ function updatePredictions() {
   // S5: one turn of the equinox per T_p(t) (the composed clock), not per the counter H/13.
   // Layer A (plan 06): the RA projection reads the published ε (the hybrid via
   // _sceneEpsTargetDeg; K comb only as its flag-off fallback) — measured 1e-8 s.
-  predictions.stellarDayReal = o.stellarDayReal = (o.siderealDayReal/_axialPrecessionPeriodYearsAtAge((2000 - yearForFormula) / 1e6))/(o.solarYearDays+1)*stellarDayRaProjection(_sceneEpsTargetDeg(yearForFormula))+o.siderealDayReal;
+  predictions.stellarDayReal = o.stellarDayReal = (o.siderealDayReal/_axialPrecessionPeriodYearsAtAge((2000 - yearForFormula) / 1e6))/(o.solarYearDays+1)*stellarDayRaProjection(_sceneEpsTargetDeg(engineYear))+o.siderealDayReal;   // ε at the engine year (R4b)
 
   //predictions.predictedDeltat = getDeltaT();
   predictions.predictedDeltatPerYear = o.predictedDeltatPerYear = getDeltaTChangePerYear();
@@ -57030,7 +57038,7 @@ function updatePredictions() {
   // snapshot consume it (11-harmonic Fourier formula from
   // predictive_formula.py — SI-tropical convention matches scene at
   // balanced clicks).
-  o.longitudePerihelion = calcEarthPerihelionPredictive(yearForFormula);
+  o.longitudePerihelion = calcEarthPerihelionPredictive(yearForFormula);   // K device (H/16 counter) — its own coordinate, deliberately not the engine year
   // DISPLAY (owner-ruled 2026-09-15): the chain's ecliptic ϖ OF DATE —
   // the same expression as the Earth panel's ϖ/ω rows and the perihelion
   // gauge, so every displayed ϖ reads one value (the K law had shown
@@ -57081,7 +57089,7 @@ function updatePredictions() {
       predictions['cp' + cp + 'RA'] = cv[cp].raDeg;
       predictions['cp' + cp + 'YearLen'] = cv[cp].yearLenDays;
     }
-    predictions.cpSolsticeObliquity = _sceneEpsTargetDeg(cpYear);
+    predictions.cpSolsticeObliquity = _sceneEpsTargetDeg(_engineYearTT(cv.SS.jd));   // the published ε at the solstice instant (engine year — R4b)
   } else {
     for (const cp of ['SS', 'WS', 'VE', 'AE']) {
       const jd = computeSolsticeJD(cpYear, cp);
@@ -57093,7 +57101,7 @@ function updatePredictions() {
       predictions['cp' + cp + 'RA'] = ra;
       predictions['cp' + cp + 'YearLen'] = yr;
     }
-    predictions.cpSolsticeObliquity = _sceneEpsTargetDeg(cpYear);   // Phase 3 S3b: the published ε at the solstice year
+    predictions.cpSolsticeObliquity = _sceneEpsTargetDeg(_engineYearTT(computeSolsticeJD(cpYear, 'SS')));   // Phase 3 S3b: the published ε at the solstice instant (engine year — R4b)
   }
 
   // IAU comparison differences (Model − IAU reference)

@@ -1135,10 +1135,18 @@ function _oneSourceM() {
   }
   return _osmInstance;
 }
-// The sampling year: the browser's _yearForObliquity convention exactly —
-// SI-year mapping in deep-time mode, the linear tropical count otherwise.
-function _osmYearForJD(jd, linearYear) {
-  return DEEP_TIME_ENABLED ? _jdToSIyearTools(jd) : linearYear;
+// R4b (plan 06, owner): THE ENGINE'S YEAR at a true-UT JD — the one argument
+// every read of the one-source sample (ε, e, ϖ, the frame of date) takes in
+// both twins: dynamical time (the scene's true TT — bridge + curve in
+// deep-time mode, _jdTTToolsFromUT) in JULIAN years from J2000, the sampler's
+// own coordinate (t = 0 at JD 2451545.0 TT; the chain planets use the same
+// mapping). NOT the SI-year counter (_jdToSIyearTools: startmodel origin,
+// 365.2422-d unit — the K device counters' coordinate, 10.3 d off at J2000,
+// 0.0078 d/yr drift) and NOT the UT year: at −5.34 Myr ΔT is 3,505 yr and
+// the UT-sampled ε read 22.5347° where the TT frame read 22.6944° (the
+// owner's measurement). Mirror of src/script.js _engineYearTT — identical ops.
+function _osmYearForJD(jdUT) {
+  return 2000 + (_jdTTToolsFromUT(jdUT) - C.j2000JD) / 365.25;
 }
 // R4 (plan 06 "one Earth frame"): the four RELATIVE corrections that used to
 // sit here on top of the K device — the tilt correction (ε_geom → ε_target
@@ -1165,7 +1173,7 @@ function moveModel(graph, pos) {
   // from the banked engine series (the browser _sceneEccTargetAt twin) — the
   // PeriPrec2 geometric offset and the Sun's EoC inherit it below.
   const _osmM = _oneSourceM();
-  const dynEcc = { earth: _osmM.e(_osmYearForJD(_jdFromPosTools(pos), currentYear)) };
+  const dynEcc = { earth: _osmM.e(_osmYearForJD(_jdFromPosTools(pos))) };   // the engine year (true TT, Julian)
   // Unification: the geometric eccentricity offset (the PeriPrec2 centre)
   // carries the one law's e(t) EVERY FRAME. The planet chains replicate the
   // Sun geometrically (centre offset + circle, no equation of centre), so
@@ -1523,8 +1531,8 @@ function _applyEngineEarthFrame(graph, jdUT) {
   // 0.0078 d/yr — fed to an ABSOLUTE equinox longitude it rotated the whole
   // frame of date by 1.417″ against the J2000 pose (measured; it had only
   // ever entered the retired corrections as differences, where it cancelled).
-  const jdTT = _jdTTToolsFromUT(jdUT);
-  const smp = _oneSourceM().sampleAt(2000 + (jdTT - C.j2000JD) / 365.25);
+  // One clock, one argument: the engine year (_osmYearForJD — R4b).
+  const smp = _oneSourceM().sampleAt(_osmYearForJD(jdUT));
   const F = _FRAME.computeEarthFrameOfDate(smp);
   const toW = (v) => [
     R[0][0] * v[0] + R[0][1] * v[1] + R[0][2] * v[2],
@@ -1648,15 +1656,17 @@ function computePlanetPosition(target, jd) {
     // Phase 9.13 _dtMoonIntegrator mirror branch (added; planes now ≤1.0°),
     // and the residual phase misalignment was resolved by the TT clock
     // alignment (Moon-chain layers + args on one clock).
-    const currentYear = C.balancedYear + (jd - C.balancedJD) / _epochCache.mSY;
     // Phase 8.2-7: ecl→eq + aberration + the fitted MOON_CORRECTION patch
     // live in @essrt/physics/moon/apparent. S8: this engine RECOMPUTES the
-    // obliquity for the scene year (the browser passes its live scene value).
+    // obliquity for the scene epoch (the browser passes its live scene value,
+    // o.obliquityEarth — the same engine-year read, R4b: the Moon's ecl→eq
+    // conversion had ridden the UT-year ε, 0.16° from the rendered axis at
+    // −5.34 Myr).
     const _ov = _moonApparentM().overrideRaDec({
       lonDeg: graph.moonNodes._meeusLonDeg,
       betRad: graph.moonNodes._meeusLatDeg * d2r,
       meeusT: graph.moonNodes._meeusT,
-      obliquityDeg: _oneSourceM().epsDeg(currentYear),   // Phase 3 S3b: the published ε
+      obliquityDeg: _oneSourceM().epsDeg(_osmYearForJD(jd)),   // Phase 3 S3b: the published ε, at the engine year
     });
 
     // (Stage C note: a rigid ring-frame placement mirror was implemented and
@@ -1760,7 +1770,7 @@ function computeSunPositionFast(jd) {
   // One-source movement (C-4b): under the option e(t) substitutes from the
   // banked engine series (mirrors the moveModel site; the EoC below inherits).
   const _osmM = _oneSourceM();
-  const earthEcc = _osmM.e(_osmYearForJD(jd, currentYear));   // the banked engine series (the ONE movement)
+  const earthEcc = _osmM.e(_osmYearForJD(jd));   // the banked engine series (the ONE movement), at the engine year
   graph.earthPeriPrec2.container.px = -earthEcc * 100;   // geometric offset = full e(t) (mirrors moveModel)
 
   // Animate a single node: orbit.ry = θ (with EoC if applicable)

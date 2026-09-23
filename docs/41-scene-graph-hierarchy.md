@@ -155,6 +155,29 @@ Each nesting layer applies its rotation to all children, creating composite prec
 > is Julian years from J2000 TT — not the scene's SI-year counter, which sits
 > 10.3 d off at J2000 and drifts 0.0078 d/yr (measured as a 1.417″ frame
 > rotation when fed to the absolute equinox longitude).
+>
+> **The engine year — one argument (R4b).** Every read of the one-source
+> sample — the frame above, `o.obliquityEarth`, the Predictions ε/e rows, the
+> Earth ϖ-of-date rows, the solstice ε of the cardinal panel, the offset arm's
+> e(t), the Moon's ecliptic→equatorial ε, the shadow-direction and sun-light ε
+> — takes ONE argument, `_engineYearTT(jdUT)` in the browser and
+> `_osmYearForJD(jdUT)` in the Node twin (identical ops): the scene's true TT
+> (UT + the bridge + the ΔT curve in deep-time mode) in Julian years from J2000.
+> Before R4b the panel rows and the Moon conversion sampled the SI-year counter
+> at UT while the frame sampled TT: in-era the two coordinates differ by 0.013″
+> of ε, but ΔT on the model's LOD history is 3,505 yr at −5.34 Myr, and the
+> owner saw the Positions panel's solstice declination 22.6944° (the rendered
+> axis) against a Predictions obliquity of 22.5347° at the same instant — the
+> rendered Moon converted with an ε 0.16° from the axis it was placed in. After:
+> the two surfaces agree to 0.0000″ at that epoch, browser ≡ Node for the
+> planets to ≤0.004″ at every probed epoch out to −5.34 Myr. The K device
+> counters (`cyclesBetweenYears`, the predictive ϖ device, the balanced-year
+> formulas) keep their own SI coordinate — they are not engine reads. The
+> Moon-argument obliquity CARRIER (C·∫(ε−ε₀) inside the lunar chain,
+> `computeObliquityEarth(jdToSIyear(·))`) is a matched triple with the package
+> and rides the SI coordinate deliberately; and a pre-existing browser-vs-Node
+> Moon split at deep time (0.3″ at year 0, 7″ at ±100 kyr, 100″ at −5.34 Myr,
+> identical before and after R4b) is the Moon LONGITUDE twin, not the frame.
 
 ### 5.1 Earth Layer (Core)
 
