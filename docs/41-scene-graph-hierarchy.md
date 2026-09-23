@@ -321,7 +321,20 @@ superseded: the K wheel animates, the engine places. Both runtimes carry the
 identical placement (`_applyEngineEarthFrame`). Since the certified Sun is
 defined over the whole ±500 Myr domain, the former 3,000–20,000-yr taper
 between "the TT-clock Sun" and "the UT scene" is gone: every body of date —
-Sun, axis, sun plane, Moon, planets — rides one clock, true TT. Measured
+Sun, axis, sun plane, Moon, planets — rides one clock, true TT. (The planets
+caught up in R9: until then `_kcElementsOfDate` and the Node `_kcHelioAU`
+turned the scene's UT JD straight into the chain year, so the chain — a
+dynamical-time construct anchored at J2000.0 TT — lagged the Sun by ΔT of
+mean motion: Mercury 9″ at J2000, 0.8° at −500, 3.5° at −3000, an arbitrary
+phase at deep time; invisible to the cross-engine gate because both twins
+shared the convention, and to the browser golden because no row pinned a
+planet. Both twins now take the one engine year; the browser golden carries
+105 planet rows and the cross-engine gate compares them, parity ≤2e-6″.
+Against the UT-keyed JPL cache the 2000–2099 RMS moved Mercury 20.1 → 16.2″,
+Venus 38.3 → 32.4″; the 1650–1900 buckets slipped 1–5″ because the scene
+clock's ΔT is the model's MEAN curve — 80 s at 1650 and 38 s at 1700 where
+the historical ΔT is 50 and 9 s — not the historical stack; a Phase-5-class
+question for the clock, noted in plan 06.) Measured
 history worth keeping: the analytic twin `_frameworkSunLon` that the δ block
 fell back on parted from the wheel by 84″ around 500 AD, 250″ at −500 and
 810″ at −2500 (an error the rendered Sun carried 1:1 before layer B); reading

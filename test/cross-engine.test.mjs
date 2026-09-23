@@ -58,15 +58,36 @@ const DEEP_JD_TOL_DAYS = 1e-6;
 // 0.02″ at deep time (both measured ≥10× above the post-fix residual).
 const MOON_LON_TOL_ARCSEC = 0.002, MOON_LON_TOL_DEEP_ARCSEC = 0.02;
 const MOON_DIST_TOL_KM = 0.01;
+// Plan 06 R9 — the rendered PLANETS (the N-body element chain, the only
+// planet path since K5, read at the engine year in both twins): browser
+// scenePlanet theta/phi/dist vs the Node engine's computePlanetPosition at
+// the same UT JD. Measured parity ≤0.004″ (the K4b record,
+// tools/explore/k4b-browser-parity.mjs); 0.01″ / 1e-9 AU leave room for the
+// runtimes' last-bit Math (header) through the chain and the frame walk.
+const PLANET_TOL_ARCSEC = 0.01, PLANET_DIST_TOL_AU = 1e-9;
 let exact = 0, withinTol = 0, failures = 0;
 
 const moonNode = new Map();
 const moonSeriesNode = (jd) => { if (!moonNode.has(jd)) moonNode.set(jd, SG.moonSeriesInputsAt(jd)); return moonNode.get(jd); };
+const planetNode = new Map();
+const planetPosNode = (name, jd) => { const k = name + '|' + jd; if (!planetNode.has(k)) planetNode.set(k, SG.computePlanetPosition(name, jd)); return planetNode.get(k); };
 const wrapDeg = (d) => ((d + 540) % 360 + 360) % 360 - 180;
 
 for (const [key, browserVal] of Object.entries(fixture)) {
   let m;
   let nodeVal, klass;
+  if ((m = key.match(/^scenePlanet\.([a-z]+)\.(thetaRad|phiRad|distAU)@(-?\d+(?:\.\d+)?)$/))) {
+    const n = planetPosNode(m[1], Number(m[3]));
+    let d, tol, unit;
+    if (m[2] === 'thetaRad') { d = Math.abs(wrapDeg(SG.thetaToRaDeg(browserVal) - SG.thetaToRaDeg(n.ra))) * 3600; tol = PLANET_TOL_ARCSEC; unit = '″'; }
+    else if (m[2] === 'phiRad') { d = Math.abs(SG.phiToDecDeg(browserVal) - SG.phiToDecDeg(n.dec)) * 3600; tol = PLANET_TOL_ARCSEC; unit = '″'; }
+    else { d = Math.abs(browserVal - n.distAU); tol = PLANET_DIST_TOL_AU; unit = ' AU'; }
+    if (d === 0) { exact++; continue; }
+    if (d <= tol) { withinTol++; continue; }
+    console.log(`  DIVERGED (planet chain, >${tol}${unit}) ${key}  Δ=${d.toExponential(3)}${unit}`);
+    failures++;
+    continue;
+  }
   if ((m = key.match(/^moonScene\.(lonDeg|latRad|distKm)@(-?\d+(?:\.\d+)?)$/))) {
     const jd = Number(m[2]), n = moonSeriesNode(jd);
     const deep = Math.abs(2000 + (jd - 2451545) / 365.25 - 2000) > DEEP_YEARS;

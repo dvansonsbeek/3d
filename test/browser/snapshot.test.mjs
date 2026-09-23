@@ -299,6 +299,20 @@ const measured = await s.page.evaluate(({ YEARS, EPOCHS_MA, MOON_JDS, MOON_DEEP_
     v[`sceneSun.raDeg@${jd}`] = r.raDeg;
     v[`sceneSun.decDeg@${jd}`] = r.decDeg;
   }
+  // ── Plan 06 R9: the RENDERED planets (scene theta/phi of date + distance) ──
+  // The chain has been the ONLY planet path since K5, yet no golden pinned
+  // its output: R9 moved every planet (the chain had been read at the UT JD
+  // while the Sun rode TT — Mercury 9″ at J2000, 0.8° at −500) and this file
+  // did not notice. Same JDs as the sceneSun family; the cross-engine gate
+  // compares these rows with the Node engine's computePlanetPosition.
+  for (const jd of [1355795.0, 2415020.5, 2451545.0, 2460409.262836, 2634166.0]) {
+    for (const [name, s] of Object.entries(T.planetsSceneStateAt(jd))) {
+      const k = name.toLowerCase();
+      v[`scenePlanet.${k}.thetaRad@${jd}`] = s.ra;
+      v[`scenePlanet.${k}.phiRad@${jd}`] = s.dec;
+      v[`scenePlanet.${k}.distAU@${jd}`] = s.distAU;
+    }
+  }
   T.resetEpochToJ2000();
 
   // ── Phase 8.6-0: the published reference curves (browser-only family) ─────

@@ -5806,6 +5806,19 @@ function _engineYearTT(jdUT) {
   }
   return 2000 + (jdTT - j2000JD) / 365.25;
 }
+/** The engine year for a SCENE calendar year (o.currentYear's axis):
+ *  julianDateToDecimalYear's exact inverse (Jan 1 of that year + the
+ *  fraction × that year's length, both from dateToJulianDay), then the
+ *  UT→TT bridge above. The calendar-year readers of the engine series
+ *  (inclInvPlaneModel / ascNodeInvPlaneModel — drawer, chart, path marker
+ *  and curve, mass gauge) take THIS, so one axis serves all of them
+ *  (R9; the calendar year had parted from the engine year by 0.21° of
+ *  i_inv near −5 Myr, measured — the R4b class). */
+function _engineYearOfSceneYear(sceneYear) {
+  const y = Math.floor(sceneYear);
+  const jd0 = dateToJulianDay(y, 1, 1), jd1 = dateToJulianDay(y + 1, 1, 1);
+  return _engineYearTT(jd0 + (sceneYear - y) * (jd1 - jd0));
+}
 // = startmodelyearwithCorrection by construction (≈ 2000.4977 at the
 // canonical startmodelJD = 2451716.5). All cyclesBetweenYears callers that
 // reference STARTMODEL_YEAR_SI as anchor are automatically consistent with
@@ -11110,9 +11123,9 @@ function updateInclinationPathMarker() {
   const nodeNowDeg = ascNodeInvPlaneModel(o.currentYear);
   const angle = -(nodeNowDeg * Math.PI / 180) + phaseOffset;
   // the marker rides the SAME evaluator as the path samples (the chain
-  // series route) — o.earthInvPlaneInclinationDynamic is the engine-K
-  // H/3 machinery value and splits from the chain at deep time
-  // (owner-measured: 0.853 vs 1.597 at +257 kyr)
+  // series route) — since R9 o.earthInvPlaneInclinationDynamic rides it
+  // too (the K H/3 machinery value it carried split from the chain at deep
+  // time: owner-measured 0.853 vs 1.597 at +257 kyr)
   const inclNow = inclInvPlaneModel(o.currentYear);
   const deviation = inclNow - cyc.mid;
 
@@ -20791,7 +20804,7 @@ function inclInvPlaneModel(year) {
   const ip = CHAIN_ARTIFACT.invariablePlane;
   const si = Math.sin(ip.inclEclipticDeg * D2R), ci = Math.cos(ip.inclEclipticDeg * D2R);
   const nInv = [si * Math.sin(ip.ascNodeEclipticDeg * D2R), -si * Math.cos(ip.ascNodeEclipticDeg * D2R), ci];
-  const nE = _kcEarthEngineOrbitNormalJ2000(year);
+  const nE = _kcEarthEngineOrbitNormalJ2000(_engineYearOfSceneYear(year));   // R9: `year` is the SCENE calendar year; the series samples at the engine year
   const d = nE[0] * nInv[0] + nE[1] * nInv[1] + nE[2] * nInv[2];
   return Math.acos(Math.min(1, Math.max(-1, d))) / D2R;
 }
@@ -20809,7 +20822,7 @@ function ascNodeInvPlaneModel(year) {
   const nInv = [si * Math.sin(ip.ascNodeEclipticDeg * D2R), -si * Math.cos(ip.ascNodeEclipticDeg * D2R), ci];
   const xIp = [Math.cos(ip.ascNodeEclipticDeg * D2R), Math.sin(ip.ascNodeEclipticDeg * D2R), 0];
   const yIp = [nInv[1] * xIp[2] - nInv[2] * xIp[1], nInv[2] * xIp[0] - nInv[0] * xIp[2], nInv[0] * xIp[1] - nInv[1] * xIp[0]];
-  const nE = _kcEarthEngineOrbitNormalJ2000(year);
+  const nE = _kcEarthEngineOrbitNormalJ2000(_engineYearOfSceneYear(year));   // R9: scene calendar year in, engine year to the series
   let N = [nInv[1] * nE[2] - nInv[2] * nE[1], nInv[2] * nE[0] - nInv[0] * nE[2], nInv[0] * nE[1] - nInv[1] * nE[0]];
   const L = Math.hypot(N[0], N[1], N[2]);
   N = [N[0] / L, N[1] / L, N[2] / L];
@@ -25693,7 +25706,7 @@ function setupGUI() {
   }), 'Axial tilt relative to the ecliptic. Drives the seasons.');
   addTooltip(orbitalFolder.addBinding(predictions, 'earthInvPlaneInclinationDynamic', {
     label: 'Inclination (\u00B0)', readonly: true, format: v => v.toFixed(6)
-  }), 'Tilt of Earth\u2019s orbital plane relative to the invariable plane. Legacy scene-law value on the fixed apsidal carrier (epoch-local machinery); the published chain element is on the Earth panel.');
+  }), 'Tilt of Earth\u2019s orbital plane of date relative to the model\u2019s invariable plane \u2014 the one-source engine route (engine orbit normal against the invariable plane, sampled at the engine year), the same evaluator the Earth panel, the Inclination chart and the inclination path show.');
   addTooltip(orbitalFolder.addBinding(predictions, 'longitudePerihelion', {
     label: 'Long. Perihelion (\u00B0)', readonly: true, format: v => v.toFixed(6)
   }), 'Ecliptic longitude of perihelion OF DATE (\u03D6) \u2014 the chain\'s value, identical to the Earth panel\'s \u03D6/\u03C9 rows and the perihelion gauge (J2000: 102.9179\u00B0, the osculating/secular convention). The framework\'s perihelion law remains the epoch-local machinery underneath (it drives the Sun\'s longitude chain).');
@@ -52888,7 +52901,12 @@ function _kcElementsOfDate(nameLower, jd) {
   const hit = _kcElMemo.get(memoKey);
   if (hit !== undefined) return hit;
   if (!_kcChains) _kcChains = buildPlanetChainsFromArtifactData(CHAIN_ARTIFACT);
-  const year = KC_ANCHOR_EPOCH_YEAR + (jd - KC_ANCHOR_EPOCH_JD) / 365.25;
+  // R9: the chain's argument is DYNAMICAL time — the ONE engine year (true
+  // TT, Julian from J2000.0 TT = the KC anchor), the axis the Sun, Moon and
+  // Earth frame already ride (R4/R4b/R5). Read at UT the planets lagged the
+  // Sun by ΔT of mean motion: Mercury 9″ at 2000, 0.8° at −500, 3.5° at
+  // −3000, an arbitrary phase at deep time (measured; Node twin identical).
+  const year = _engineYearTT(jd);
   const el = kcComputePlanetElementsAtYear(year, _kcChains[nameLower], _kcChains);
   // Planet override DEFAULT-ON once the series is loaded (the early flip);
   // inside each planet's measured boundary this is a no-op (chain serves).
@@ -52928,7 +52946,7 @@ function earthPerihelionEclipticOfDateDeg(jd, year) {
 let _kcChartSeriesM = null;
 function _kcChartElementsOfDate(nameLower, jd) {
   if (!_kcChains) _kcChains = buildPlanetChainsFromArtifactData(CHAIN_ARTIFACT);
-  const year = KC_ANCHOR_EPOCH_YEAR + (jd - KC_ANCHOR_EPOCH_JD) / 365.25;
+  const year = _engineYearTT(jd);   // R9: the engine year (true TT), as _kcElementsOfDate
   const el = kcComputePlanetElementsAtYear(year, _kcChains[nameLower], _kcChains);
   if (!_planetSeriesData) return el;
   if (!_kcChartSeriesM) {
@@ -53052,7 +53070,7 @@ const _KC_ANCHOR = new THREE.Vector3();   // scratch for the device origin
 // means the apse is near-stationary at that date (physical, not an error).
 function _kcApsidalPeriodYears(nameLower, jd) {
   if (!_kcChains) _kcChains = buildPlanetChainsFromArtifactData(CHAIN_ARTIFACT);
-  const year = KC_ANCHOR_EPOCH_YEAR + (jd - KC_ANCHOR_EPOCH_JD) / 365.25;
+  const year = _engineYearTT(jd);   // R9: the engine year (true TT), as _kcElementsOfDate
   const D = 150;
   const w1 = kcComputePlanetElementsAtYear(year - D, _kcChains[nameLower], _kcChains).lonPeriEclipticDeg;
   const w2 = kcComputePlanetElementsAtYear(year + D, _kcChains[nameLower], _kcChains).lonPeriEclipticDeg;
@@ -56929,9 +56947,15 @@ function updatePredictions() {
   predictions.eclipticPrecession = _kcNodeInvPlanePeriodYears('earth', o.julianDay);
   
   // Note: obliquityEarth and eccentricityEarth are computed earlier (before solarYearDays/siderealYearDays) as they're needed for year length calculations.
-  // Inclination uses yearForFormula (same SI-tropical convention as obliquity/eccentricity) so the H/3 cycle phase matches
-  // the scene renderer at balanced clicks — otherwise leaks ~1e-6°/cycle back in time (commit 27db4cc pattern).
-  predictions.earthInvPlaneInclinationDynamic = o.earthInvPlaneInclinationDynamic = computeInclinationEarth(yearForFormula, balancedYear, holisticyearLength, earthInvPlaneInclinationMean, earthInvPlaneInclinationAmplitude);
+  // R9: ONE published i_inv everywhere (the S3b pattern for ε) — the panel
+  // row, the IAU diff and the scene scaffolding (invariable-plane tilt, mass
+  // gauge) ride the one-source engine route the Earth drawer, the chart and
+  // the inclination path already showed (inclInvPlaneModel: engine orbit
+  // normal vs the artifact's invariable plane, sampled at the engine year).
+  // The K device law (computeInclinationEarth, the H/3 cosine on the fixed
+  // apsidal carrier) read 1.578677 vs 1.578422 here at J2000, 1.24 vs 1.91
+  // at −100 kyr; it stays device machinery for the H/3 crossing finders.
+  predictions.earthInvPlaneInclinationDynamic = o.earthInvPlaneInclinationDynamic = inclInvPlaneModel(o.currentYear);
   // MACHINERY: the K perihelion law stays on o.longitudePerihelion — the
   // true-solar-longitude routine (solarLongitudeDegLong) and the debug
   // snapshot consume it (11-harmonic Fourier formula from

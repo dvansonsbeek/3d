@@ -1435,7 +1435,11 @@ function _kc() { if (!_kcModule) _kcModule = require('./keplerian-chain.js'); re
 function _kcHelioAU(target, jd) {
   const KCm = _kc();
   if (!_kcChains) _kcChains = KCm.buildPlanetChainsFromArtifact();
-  const year = KCm.ANCHOR_EPOCH_YEAR + (jd - KCm.ANCHOR_EPOCH_JD) / 365.25;
+  // R9: the chain's argument is dynamical time — the ONE engine year (true
+  // TT, Julian from J2000.0 TT = the KC anchor; browser twin
+  // _kcElementsOfDate identical). At UT the planets lagged the Sun by ΔT of
+  // mean motion (Mercury 9″ at 2000, 0.8° at −500).
+  const year = _osmYearForJD(jd);
   let el = KCm.computePlanetElementsAtYear(year, _kcChains[target], _kcChains);
   // D5/one-source: beyond a planet's measured handover boundary the secular
   // elements substitute from the banked engine series (the SAME
