@@ -1,7 +1,7 @@
 ---
 docVersion: 1.0
 modelVersion: v14.0
-coefficients: sha256:8c6f14edf5f84905
+coefficients: sha256:bb6a03c877eedab8
 status: current
 ---
 
@@ -227,9 +227,9 @@ Statistical analysis and verification scripts. Install dependencies with `pip in
 | `fibonacci_eccentricity_structure.py` | Structural decomposition, mirror pair conservation, 10-direction exploration, statistical tests |
 | `predict_tilt_from_eccentricity.py` | K amplitude constant (Law 4) investigation |
 
-> The shared Python library (`constants_scripts.py`, `predictive_formula.py`, `observed_formula.py`, `coefficients/`) lives in [`tools/lib/python/`](../tools/lib/python/README.md).
+> The shared Python library (`constants_scripts.py`, `predictive_formula.py` — Earth's perihelion/ERD/obliquity helpers — and `planet_beats.py`) lives in [`tools/lib/python/`](../tools/lib/python/README.md).
 
-See the [Python Scripts README](../scripts/README.md) and [Predictive Formula Guide](../tools/lib/python/PREDICTIVE_FORMULA_GUIDE.mdx) for details.
+See the [Python Scripts README](../scripts/README.md) for details.
 
 ---
 

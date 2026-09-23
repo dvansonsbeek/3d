@@ -10,8 +10,8 @@ across 9 directories (~360 on disk with the untracked local archives) · ~245 Py
 **`npm run check` enforces a twenty-four-step gate chain; CI runs it plus a
 headless-browser job and auto-deploys the simulator to GitHub Pages on
 green main.**
-Golden masters live in `packages/fixtures/`. Of the 31 scripts in `tools/verify/`,
-only 6 can actually fail — see the Verification section.
+Golden masters live in `packages/fixtures/`. Of the 29 scripts in `tools/verify/`,
+only 4 can actually fail — see the Verification section.
 
 ---
 
@@ -201,9 +201,9 @@ regressions, one owner-bisected at 28×; fail-proven via
 round-trip bit-exact) since Phase B** and required in CI; red there is a
 regression of the Phase 6 exit criterion, not a tracked state.
 
-`/gates` runs the standalone model checks. `tools/verify/` holds 31 scripts, and
+`/gates` runs the standalone model checks. `tools/verify/` holds 29 scripts, and
 **25 of them cannot fail** — no exit path, no assertion, so running them proves
-nothing. `npm run test:verify:list` gives the classification: 6 gate · 3 liftable
+nothing. `npm run test:verify:list` gives the classification: 4 gate · 3 liftable
 · 12 narrative · 10 generator (the suite FAILS on any unclassified script). **Never
 run a generator as a test** — `balance-search.js` rewrites the tracked
 `data/balance-presets.json`, `nbody-secular.js` rewrites
@@ -306,7 +306,7 @@ what actually made corrections stick here.
 | `src/script.js` | browser scene + UI + formulas (monolith) |
 | `tools/lib/` | Node engine — `scene-graph`, `orbital-engine`, `deep-time`, `constants` |
 | `tools/fit/` | CLI shims for the fitting pipeline — implementations live in `packages/fitting/src` |
-| `tools/verify/` | 31 scripts: 6 gate · 3 liftable · 12 narrative · 10 generator (`npm run test:verify:list`) |
+| `tools/verify/` | 29 scripts: 4 gate · 3 liftable · 12 narrative · 10 generator (`npm run test:verify:list`) |
 | `packages/physics`, `packages/model-values` | the published npm packages (@essrt scope) — the website and world consume these; refits reach them via `values:package:write` + republish |
 | `tools/explore/` | ~200 research one-offs — findings live in `docs/` |
 | `public/input/fitted-coefficients.json` | single source of truth for fitted values |

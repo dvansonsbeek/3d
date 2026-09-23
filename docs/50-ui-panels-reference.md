@@ -1,7 +1,7 @@
 ---
 docVersion: 1.0
 modelVersion: v14.0
-coefficients: sha256:8c6f14edf5f84905
+coefficients: sha256:bb6a03c877eedab8
 status: current
 ---
 
@@ -265,25 +265,22 @@ Drawn under CYCLES for Earth and each chain planet
 - **Cycle windowing**: markers render only inside the current window
   (no modulo wrapping)
 
-### Predictive Formula Rows
+### Perihelion-rate rows (Cycles tab)
 
-For Mercury through Neptune, the "Perihelion Precession" group includes dynamically computed rows:
-
-| Row | Source | Description |
-|-----|--------|-------------|
-| **Missing advance of perihelion** | `predictGeocentricPrecession()` − baseline | Fluctuation above/below heliocentric rate at current year |
-| **Perihelion precession (Geocentric)** | `predictGeocentricPrecession()` | Total geocentric rate at current year (baseline + fluctuation) |
-
-These use the unified predictive formula system (ported from Python; ~2,400 coefficients per planet in `PREDICT_COEFFS_PHYSICAL`).
-
-#### Mercury-Specific Rows
-
-Mercury has additional grouped rows comparing the model to General Relativity:
-
-| Row | Value | Color |
-|-----|-------|-------|
-| `┌ Missing advance around 1900 AD (Model)` | `predictGeocentricPrecession(1900, 'mercury') − baseline` | Amber (dynamic) |
-| `└ Missing advance (GR)` | 42.98″/century (fixed) | White (static) |
+For Mercury through Neptune the perihelion rate is shown in two coordinates
+(doc 13 §1.8), every term computed live by `perihelionFrameBreakdown()`:
+the lattice ecliptic rate (1,296,000/`perihelionEclipticYears` × 100 ″/cy),
+the equatorial projection excess and obliquity-rate term at the IAU J2000
+perihelion longitude, and — plan 06 R8 — the Earth-frame right-ascension rate
+as their sum (a kinematic identity; the chain's dynamical rate of date is a
+window rate and lives on the planet panel's chain rows). Mercury adds the
+general-relativistic advance derived from the model constants
+(`relativisticPerihelionAdvanceArcsecCy`). The former "Missing advance of
+perihelion" / "Perihelion precession (Geocentric)" rows and the "Missing
+advance around 1900 AD" pair read the retired predictive formula
+(`predictGeocentricPrecession`, ~2,400 fitted coefficients per planet
+reproducing the retired geometric scene's exported rate) — see the
+[retired record](retired-record.md).
 
 ### Code Locations
 
@@ -294,7 +291,7 @@ Mercury has additional grouped rows comparing the model to General Relativity:
 | `updateDomLabel()` | `src/script.js` (renders rows, tab filtering, color classes) |
 | `buildObliquityChart()` | `src/script.js` |
 | `buildPerihelionChart()` | `src/script.js` |
-| `predictGeocentricPrecession()` | `src/script.js` |
+| `perihelionFrameBreakdown()` | `src/script.js` |
 | Collapsible sidebar CSS | style.css (`.pl-handle`, `.pl-collapsed`, `@keyframes pl-pulse`) |
 | Tab bar + color coding CSS | style.css (`.pl-tab-bar`, `.pl-static`, `.pl-dynamic`) |
 

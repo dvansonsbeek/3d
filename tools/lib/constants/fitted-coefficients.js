@@ -46,7 +46,7 @@ const SOLSTICE_JD_HARMONICS = CARDINAL_POINT_HARMONICS.SS;  // Legacy alias
  * Build fitted coefficients that depend on model parameters.
  * @param {object} params - { earthtiltMean, earthInvPlaneInclinationAmplitude,
  *                            earthRAAngle, earthInvPlaneInclinationMean, planets, H }
- * @returns {{ SOLSTICE_OBLIQUITY_MEAN: number, PREDICT_PLANETS: object, PREDICT_COEFFS: object, PERI_HARMONICS: Array }}
+ * @returns {{ SOLSTICE_OBLIQUITY_MEAN: number, PERI_HARMONICS: Array }}
  */
 function buildFittedCoefficients(params) {
   // Pythagorean obliquity mean — derived from 3D geometry (zero fitting)
@@ -69,26 +69,13 @@ function buildFittedCoefficients(params) {
     ? SOLSTICE_OBLIQUITY_MEAN_FITTED
     : sum / N;
 
-  // Per-planet prediction configs (period, theta0, baseline rate)
-  const PREDICT_PLANETS = {};
-  for (const [key, p] of Object.entries(params.planets)) {
-    if (!p.perihelionEclipticYears || !p.longitudePerihelion) continue;
-    const absPeriod = Math.abs(p.perihelionEclipticYears);
-    const sign = p.perihelionEclipticYears < 0 ? -1 : 1;
-    PREDICT_PLANETS[key] = {
-      period: absPeriod,
-      theta0: p.longitudePerihelion,
-      baseline: sign * 1296000 / absPeriod * 100,
-    };
-  }
-
-  // 2421-term physical-beat coefficients per planet (from fitted-coefficients.json)
-  const PREDICT_COEFFS = data.PREDICT_COEFFS_PHYSICAL || data.PREDICT_COEFFS_UNIFIED || {};
+  // (The per-planet prediction configs and the PREDICT_COEFFS_* arrays —
+  // the planet predict device — were retired at plan 06 R8.)
 
   // Perihelion harmonics — expand divisors to actual periods using H
   const PERI_HARMONICS = PERI_HARMONICS_RAW.map(([div, s, c]) => [params.H / div, s, c]);
 
-  return { SOLSTICE_OBLIQUITY_MEAN, PREDICT_PLANETS, PREDICT_COEFFS, PERI_HARMONICS };
+  return { SOLSTICE_OBLIQUITY_MEAN, PERI_HARMONICS };
 }
 
 

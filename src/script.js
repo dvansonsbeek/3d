@@ -11,7 +11,7 @@ import { Pane } from 'tweakpane';
 //
 // Generated at build time, not fetched at runtime — `holisticyearLength` is read
 // at module scope below, and Phase 15 requires offline === hosted.
-import { DEFAULT_CONSTANTS as K, REFERENCE_DATA as R, FITTED_COEFFICIENTS as FIT, CONSTANTS_HASH, COEFFICIENTS_HASH, MODEL_VERSION, PREPRINT_DOI, createEpochPrimitives, createPhaseMachinery, createMoonEccChannel, createDeepEccChannel, DEEP_MODES_ARTIFACT, createDeepOrbitalHistory, createYearLengths, createMoonMonthChain, createChainCycleIntegrator, createMoonArguments, createMoonSeries, createMoonApparent, derivePlanetGeometry, planetFibonacciLaws as _FL, computeEccentricityIntegrated, planetOrientation as _PO, planetOrbitChain as _POC, createPredictivePrecession, calcPlanetPerihelionLongDeg, integrateAscendingNode, createDeltaTCycles, createDeepTimeLod, createMoonRecessionHistory, createSolarChannelBudget, deltaTEspenakMeeusCanonSeconds, evalClimateL1OrbitalPermil, createAlphaGiaChannel, computeSolarTorqueShare, createEclipseFinders, createSunLongitudeCorrection, createModel, buildPlanetChainsFromArtifactData, computePlanetElementsAtYear as kcComputePlanetElementsAtYear, computeApsidalSecularDegPerYr as kcApsidalSecularDegPerYr, computeHeliocentricEclipticFromElements as kcComputeHeliocentricEclipticFromElements, computeEquatorNodeOriginSFrameDeg, convertNodeSFrameToEquatorOriginDeg, createSecularSeriesOverride, CHAIN_ARTIFACT, ANCHOR_EPOCH_YEAR as KC_ANCHOR_EPOCH_YEAR, ANCHOR_EPOCH_JD as KC_ANCHOR_EPOCH_JD, computeEarthFrameOfDate, solveWheelAngleForLongitude } from '@essrt/physics';
+import { DEFAULT_CONSTANTS as K, REFERENCE_DATA as R, FITTED_COEFFICIENTS as FIT, CONSTANTS_HASH, COEFFICIENTS_HASH, MODEL_VERSION, PREPRINT_DOI, createEpochPrimitives, createPhaseMachinery, createMoonEccChannel, createDeepEccChannel, DEEP_MODES_ARTIFACT, createDeepOrbitalHistory, createYearLengths, createMoonMonthChain, createChainCycleIntegrator, createMoonArguments, createMoonSeries, createMoonApparent, derivePlanetGeometry, planetFibonacciLaws as _FL, computeEccentricityIntegrated, planetOrientation as _PO, planetOrbitChain as _POC, integrateAscendingNode, createDeltaTCycles, createDeepTimeLod, createMoonRecessionHistory, createSolarChannelBudget, deltaTEspenakMeeusCanonSeconds, evalClimateL1OrbitalPermil, createAlphaGiaChannel, computeSolarTorqueShare, createEclipseFinders, createSunLongitudeCorrection, createModel, buildPlanetChainsFromArtifactData, computePlanetElementsAtYear as kcComputePlanetElementsAtYear, computeApsidalSecularDegPerYr as kcApsidalSecularDegPerYr, computeHeliocentricEclipticFromElements as kcComputeHeliocentricEclipticFromElements, computeEquatorNodeOriginSFrameDeg, convertNodeSFrameToEquatorOriginDeg, createSecularSeriesOverride, CHAIN_ARTIFACT, ANCHOR_EPOCH_YEAR as KC_ANCHOR_EPOCH_YEAR, ANCHOR_EPOCH_JD as KC_ANCHOR_EPOCH_JD, computeEarthFrameOfDate, solveWheelAngleForLongitude } from '@essrt/physics';
 // K8 — the reference package: ONE-WAY imports (comparison only;
 // @essrt/reference is private-by-construction and nothing in the model
 // chain depends on it). publishedCurves migrated here from
@@ -605,10 +605,14 @@ const TROPICAL_YEAR_HARMONICS = FIT.TROPICAL_YEAR_HARMONICS;
 const SIDEREAL_YEAR_HARMONICS = FIT.SIDEREAL_YEAR_HARMONICS;
 const ANOMALISTIC_YEAR_HARMONICS = FIT.ANOMALISTIC_YEAR_HARMONICS;
 
-// ─── B2. Predictive formula system ───────────────────────────────────────
-// PERI_HARMONICS (perihelion longitude Fourier terms), PREDICT_PLANETS
-// (precession periods), and PREDICT_COEFFS (per-planet correction arrays).
-// Ported from tools/lib/python/predictive_formula.py
+// ─── B2. Earth's perihelion device (PERI_HARMONICS) ──────────────────────
+// PERI_HARMONICS (perihelion longitude Fourier terms) + PERI_OFFSET — the
+// K predictive device for Earth's perihelion (calcEarthPerihelionPredictive,
+// calcERD). The planet "predictive formula system" that used to sit here
+// (PREDICT_PLANETS / PREDICT_COEFFS_PHYSICAL, ~2,421 fitted terms per planet
+// reproducing the RETIRED geometric scene's Earth-frame perihelion-RA rate)
+// left at plan 06 R8 — docs/retired-record.md; the Earth-frame rate is now
+// the equatorial projection of the lattice motion (perihelionFrameBreakdown).
 // ─────────────────────────────────────────────────────────────────────────
 let   H = holisticyearLength;  // Phase 6.5: mutable alias; kept in sync inside recomputeEpochAnchors
 // PRECISION FIX. This was a 6-decimal copy: -0.13181204608039468 was written as
@@ -624,22 +628,6 @@ const PERI_HARMONICS = FIT.PERI_HARMONICS_RAW.map(([n, c, s]) => [H / n, c, s]);
 // longitude is offset + sum(harmonics). Sourced together, or a refit could move
 // one and leave the other behind.
 const PERI_OFFSET = FIT.PERI_OFFSET;
-// PREDICT_OBLIQ_MEAN: uses OBLIQUITY_MEAN (computed later) — referenced directly at usage site
-// Eccentricity unification: the mean of the ONE law is base′ (matched with
-// tools/lib/orbital-engine.js createPredictModel).
-const PREDICT_ECC_MEAN = eccentricityBaseDerived;
-
-const PREDICT_PLANETS = {
-  mercury: { period: planets.mercury.perihelionEclipticYears,  theta0: planets.mercury.longitudePerihelion,  baseline: 1296000/planets.mercury.perihelionEclipticYears*100 },
-  venus:   { period: planets.venus.perihelionEclipticYears,    theta0: planets.venus.longitudePerihelion,    baseline: 1296000/planets.venus.perihelionEclipticYears*100 },
-  mars:    { period: planets.mars.perihelionEclipticYears,     theta0: planets.mars.longitudePerihelion,     baseline: 1296000/planets.mars.perihelionEclipticYears*100 },
-  jupiter: { period: planets.jupiter.perihelionEclipticYears,  theta0: planets.jupiter.longitudePerihelion,  baseline: 1296000/planets.jupiter.perihelionEclipticYears*100 },
-  saturn:  { period: Math.abs(planets.saturn.perihelionEclipticYears),  theta0: planets.saturn.longitudePerihelion,   baseline: 1296000/planets.saturn.perihelionEclipticYears*100 },
-  uranus:  { period: planets.uranus.perihelionEclipticYears,   theta0: planets.uranus.longitudePerihelion,   baseline: 1296000/planets.uranus.perihelionEclipticYears*100 },
-  neptune: { period: planets.neptune.perihelionEclipticYears,  theta0: planets.neptune.longitudePerihelion,  baseline: 1296000/planets.neptune.perihelionEclipticYears*100 },
-};
-
-const PREDICT_COEFFS = FIT.PREDICT_COEFFS_PHYSICAL;
 
 // ─── B3. (The fitted planet-path corrections — parallax, gravitation,
 // elongation — were EXCISED with the legacy planet chains, K5.) ──────────
@@ -5484,15 +5472,8 @@ function recomputePlanetCyclesForEpoch(t_Ma) {
   uranusObliquityMean  = calcObliquityMean('uranus',  uranusObliquityCycle);
   neptuneObliquityMean = calcObliquityMean('neptune', neptuneObliquityCycle);
 
-  // Invalidate the predictive-formula feature-template cache (held by the
-  // @essrt/physics predict factory since 8.3 L9). Templates are built from
-  // planets.X.perihelionEclipticYears / axialPrecessionYears /
-  // obliquityCycle + mercuryWobblePeriod etc. — all of which we just mutated
-  // above. Without this reset, the factory returns the template frozen at
-  // first touch (order-dependent staleness across setEpoch calls).
-  if (typeof _predictM !== 'undefined' && _predictM) {
-    _predictM.resetTemplateCache();
-  }
+  // (The predictive-formula feature-template cache that was invalidated here
+  // left with the planet predict device — plan 06 R8.)
 
   return true;
 }
@@ -6274,7 +6255,6 @@ if (typeof window !== 'undefined') {
       neptune: meanNeptuneOrbitalCyclesBetween,
     })[k](yearA, yearB),
     // 8.3 L9: the predictive-precession path through the shared feature basis.
-    planetPredictAt: (k, year) => predictGeocentricPrecession(year, k),
     // 8.3 S-P5: the browser 6-arg dynamic ascending node, with the scene's
     // live tilt objects — pins the sampling+bisection critical-point path.
     planetAscNodeDynAt: (k, year) => {
@@ -16480,9 +16460,9 @@ function wgcRenderPlanet(planetKey) {
 // Mercury 531.44 + 42.71 = 574.14, the model's account of the relativistic
 // advance (42.98 from the same constants). Owner decision; the derivation,
 // the all-planet table and the caveats are doc 13 §1.8. Drawn for every
-// planet by the same rule. The Earth-frame RA rate (predictGeocentricPrecession,
-// the export/predict quantity) is a different coordinate and stays on the
-// Cycles tab, not here.
+// planet by the same rule. The Earth-frame RA rate (the equatorial projection
+// of the lattice motion, perihelionFrameBreakdown) is a different coordinate
+// and stays on the Cycles tab, not here.
 // Period label for a planet's ecliptic-frame perihelion motion, for the explorer
 // text (plan 06 Phase 4d: the former "8H/N" lattice label is retired; the period
 // is the device's own value, stated in years).
@@ -16516,7 +16496,7 @@ function _obliqBeatYearsAtAge(t_Ma) {
 function wgcModelCurves(planetKey, d) {
   const modelPlanetKey = planetKey.toLowerCase();
   const modelPlanet = planets[modelPlanetKey];
-  if (!modelPlanet || typeof perihelionFrameBreakdown !== 'function' || !PREDICT_PLANETS || !PREDICT_PLANETS[modelPlanetKey]) return null;
+  if (!modelPlanet || !modelPlanet.perihelionEclipticYears || typeof perihelionFrameBreakdown !== 'function') return null;
   const fb = perihelionFrameBreakdown(modelPlanetKey, 2000);
   const latticeCy = 1296000 / modelPlanet.perihelionEclipticYears * 100;   // ″/cy, lattice in ecliptic longitude
   const projectedCy = fb.projectedRa;                                     // ″/cy, lattice + equatorial projection
@@ -16540,7 +16520,7 @@ function wgcModelCurves(planetKey, d) {
     if (shift !== 0) for (let i = 0; i < values.length; i++) values[i] += shift;
   }
   const grCy = (typeof relativisticPerihelionAdvanceArcsecCy === 'function') ? relativisticPerihelionAdvanceArcsecCy(modelPlanetKey) : null;
-  return { values, latticeCy, projectedCy, excessCy: fb.projection, grCy, earthFrameCy: fb.earthFrame };
+  return { values, latticeCy, projectedCy, excessCy: fb.projection, grCy };
 }
 
 // Paper-styled single chart panel for the export SVG.
@@ -46893,35 +46873,33 @@ function loadTexture( url, onLoad ) {
 // (a) ecliptic longitude — what observers publish: the lattice rate 360°/perihelionEclipticYears.
 // (b) right ascension in the scene's equator (which co-moves with its stars) — what the
 //     Earth-frame export and the predict basis produce; no observer publishes it:
-//        rate_RA = rate_ecl · dα/dλ(λ, ε) + ∂α/∂ε(λ, ε) · ε̇ + κ
+//        rate_RA = rate_ecl · dα/dλ(λ, ε) + ∂α/∂ε(λ, ε) · ε̇
 //     dα/dλ = cos ε / (cos²λ + sin²λ cos²ε),  ∂α/∂ε = −sin λ cos λ sin ε / (cos²λ + sin²λ cos²ε),
 //     λ the IAU J2000 perihelion longitude advanced at the lattice rate, ε the shipped obliquity
-//     law, ε̇ its ±50-yr central difference; κ = the scene's own conventions (the marker sits at
-//     λ + angleCorrection, and the chain's of-date coupling) — |κ| ≤ ~1.4″/cy, measured.
+//     law, ε̇ its ±50-yr central difference.
+// Plan 06 R8: the Earth-frame RA rate itself (`earthFrame`) IS that projection — lattice ×
+// dα/dλ + ∂α/∂ε·ε̇, the kinematic identity in the lattice's own family (one formula, zero fitted
+// constants; twin: tools/docs/model-values.mjs predictiveMachinery, identical ops). The retired
+// device (PREDICT_COEFFS_PHYSICAL, ~2,421 fitted terms per planet reproducing the RETIRED
+// geometric scene's exported RA rate) and its residual rows (κ ≤ 1.4″/cy, the angleCorrection
+// marker offset) are gone — docs/retired-record.md. The chain's DYNAMICAL rate of date is a
+// different quantity (a window rate; the outer planets' are great-inequality-dominated and
+// Neptune's ϖ swings ~16°/cy on its near-zero e) and lives on the planet panel's chain rows,
+// never under a lattice label.
 function perihelionFrameBreakdown(planetKey, year) {
   const p = planets[planetKey];
   const D2R = Math.PI / 180;
   const lattice = 1296000 / p.perihelionEclipticYears * 100;                                    // (a) ″/cy
   const eps = _sceneEpsTargetDeg(year) * D2R;   // Phase 3 S3b: the published ε (the hybrid)
   const epsRate = (_sceneEpsTargetDeg(year + 50) - _sceneEpsTargetDeg(year - 50)) * 3600;  // ″/cy
-  // projection excess and obliquity-rate term for a direction at ecliptic longitude lamDeg
-  const terms = (lamDeg) => {
-    const lam = lamDeg * D2R;
-    const den = Math.cos(lam) ** 2 + Math.sin(lam) ** 2 * Math.cos(eps) ** 2;
-    return { proj: lattice * (Math.cos(eps) / den - 1),
-             obl: (-Math.sin(lam) * Math.cos(lam) * Math.sin(eps) / den) * epsRate };
-  };
-  const lamIAU = p.longitudePerihelion + (360 / p.perihelionEclipticYears) * (year - 2000);
-  const atIAU = terms(lamIAU);
-  const atMarker = terms(lamIAU + p.angleCorrection);          // where the scene's marker actually sits (Step 2)
-  const projection = atIAU.proj;
-  const obliquityTerm = atIAU.obl;
+  // projection excess and obliquity-rate term for the lattice motion at ecliptic longitude lamDeg
+  const lam = (p.longitudePerihelion + (360 / p.perihelionEclipticYears) * (year - 2000)) * D2R;
+  const den = Math.cos(lam) ** 2 + Math.sin(lam) ** 2 * Math.cos(eps) ** 2;
+  const projection = lattice * (Math.cos(eps) / den - 1);
+  const obliquityTerm = (-Math.sin(lam) * Math.cos(lam) * Math.sin(eps) / den) * epsRate;
   const projectedRa = lattice + projection;                                                       // lattice × dα/dλ
-  const earthFrame = predictGeocentricPrecession(year, planetKey);                              // (b) ″/cy
-  const markerOffset = (atMarker.proj + atMarker.obl) - (atIAU.proj + atIAU.obl);              // the angleCorrection effect
-  const kappa = earthFrame - lattice - projection - obliquityTerm - markerOffset;               // the chain's of-date coupling
-  const coupling = markerOffset + kappa;
-  return { lattice, projection, obliquityTerm, projectedRa, markerOffset, kappa, coupling, earthFrame };
+  const earthFrame = projectedRa + obliquityTerm;                                                  // (b) ″/cy
+  return { lattice, projection, obliquityTerm, projectedRa, earthFrame };
 }
 // Right ascension of an ecliptic-of-date direction (β = 0) in the equatorial frame of the same date.
 function eclipticLongitudeToRaDeg(lamDeg, year) {
@@ -57731,76 +57709,11 @@ function calcERD(year) {
   return erd;
 }
 
-function calcPlanetPerihelionLong(theta0, period, year) {
-  // 8.3 L9: the linear form lives in @essrt/physics/planets/predict.
-  return calcPlanetPerihelionLongDeg(theta0, period, year);
-}
-
-// ─────────────────────────────────────────────────────────────────────────
-// Predictive-precession feature basis — @essrt/physics/planets/predict (8.3 L9).
-// ONE implementation for both engines. This browser injects its deep-time
-// epoch-aware Earth scalar forms (calcEarthPerihelionPredictive / calcERD
-// evaluate H_at_year via phaseAdvanceRadians; the Node engine injects its
-// J2000-anchored forms) and LIVE planet state: setEpoch mutates
-// holisticyearLength, planets.X fields, and the obliquity-cycle /
-// wobble-period globals, and invalidates the module's template cache via
-// _predictM.resetTemplateCache() at that site.
-// Groups G+H (ERD×period) removed after 0.00% impact diagnostic.
-// ─────────────────────────────────────────────────────────────────────────
-
-// var (not let/const): the setEpoch cache-invalidation site sits much
-// earlier in the file — var hoists, so its typeof guard is safe before this
-// line has evaluated.
-var _predictM = null;
-function _predict() {
-  if (!_predictM) {
-    _predictM = createPredictivePrecession({
-      getHYears: () => holisticyearLength,
-      getBalancedYear: () => balancedYear,
-      getPlanetFields: (planetKey) => {
-        const p = planets[planetKey];
-        const obliqMap = {
-          mercury: mercuryObliquityCycle, venus: venusObliquityCycle, mars: marsObliquityCycle,
-          jupiter: jupiterObliquityCycle, saturn: saturnObliquityCycle,
-          uranus: uranusObliquityCycle, neptune: neptuneObliquityCycle,
-        };
-        const wobbleMap = {
-          mercury: mercuryWobblePeriod, venus: venusWobblePeriod, mars: marsWobblePeriod,
-          jupiter: jupiterWobblePeriod, saturn: saturnWobblePeriod,
-          uranus: uranusWobblePeriod, neptune: neptuneWobblePeriod,
-        };
-        return {
-          perihelionEclipticYears: p.perihelionEclipticYears,
-          longitudePerihelion: p.longitudePerihelion,
-          ascendingNodeCyclesIn8H: p.ascendingNodeCyclesIn8H,
-          axialPrecessionYears: p.axialPrecessionYears,
-          obliquityCycle: obliqMap[planetKey],
-          wobblePeriod: wobbleMap[planetKey],
-        };
-      },
-      calcEarthPerihelionDeg: (year) => calcEarthPerihelionPredictive(year),
-      calcErdRate: (year) => calcERD(year),
-      computeObliquityEarthDeg: (year) => computeObliquityEarth(year),
-      computeEccentricityEarth: (year) => computeEccentricityEarthAtYear(year),
-      obliquityMeanDeg: OBLIQUITY_MEAN,
-      eccentricityMean: PREDICT_ECC_MEAN,
-    });
-  }
-  return _predictM;
-}
-
-function buildPredictiveFeatures(year, planetKey) {
-  return _predict().buildPredictiveFeatures(year, planetKey);
-}
-
-function predictGeocentricPrecession(year, planetKey) {
-  const planet = PREDICT_PLANETS[planetKey];
-  const coeffs = PREDICT_COEFFS[planetKey];
-  const features = buildPredictiveFeatures(year, planetKey);
-  let dot = 0;
-  for (let i = 0; i < coeffs.length; i++) dot += coeffs[i] * features[i];
-  return planet.baseline + dot;
-}
+// (The planet predictive-precession device — the @essrt/physics/planets/
+// predict feature basis, PREDICT_COEFFS_PHYSICAL and predictGeocentricPrecession
+// — left this engine at plan 06 R8: it reproduced the RETIRED geometric
+// scene's exported Earth-frame RA rate; the rate is now the equatorial
+// projection of the lattice motion, perihelionFrameBreakdown. docs/retired-record.md.)
 
 
 /**

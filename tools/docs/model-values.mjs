@@ -118,55 +118,21 @@ function predictiveMachinery() {
     }
     return erd;
   };
-  let predictM = null;
-  const predict = () => {
-    if (!predictM) {
-      const { createPredictivePrecession } = require(join(ROOT, 'packages', 'physics', 'src', 'planets', 'predict.cjs'));
-      const oe = require(join(ROOT, 'tools', 'lib', 'orbital-engine.js'));
-      predictM = createPredictivePrecession({
-        getHYears: () => C.H,
-        getBalancedYear: () => C.balancedYear,
-        getPlanetFields: (k) => C.planets[k],
-        calcEarthPerihelionDeg: (year) => {
-          const mc = dtl().cyclesBetweenYears(C.balancedYear, year, 16);
-          if (mc === null) return 270.0;
-          let L = 270.0 + 360.0 * mc;
-          for (const [period, sinC, cosC] of C.PERI_HARMONICS) {
-            const ph = phaseAt(year, C.H / period);
-            if (ph === null) continue;
-            L += sinC * Math.sin(ph) + cosC * Math.cos(ph);
-          }
-          return ((L + C.PERI_OFFSET) % 360 + 360) % 360;
-        },
-        calcErdRate: erdBrowserForm,
-        computeObliquityEarthDeg: (year) => {
-          let o = C.SOLSTICE_OBLIQUITY_MEAN;
-          for (const [div, sinC, cosC] of C.SOLSTICE_OBLIQUITY_HARMONICS) {
-            const ph = phaseAt(year, div);
-            if (ph === null) continue;
-            o += sinC * Math.sin(ph) + cosC * Math.cos(ph);
-          }
-          return o;
-        },
-        computeEccentricityEarth: (year) => oe.computeEccentricityEarth(year),
-        obliquityMeanDeg: C.SOLSTICE_OBLIQUITY_MEAN,
-        eccentricityMean: C.eccentricityBaseDerived,   // the ONE law's mean — mirrors orbital-engine _predict (unification)
-      });
-    }
-    return predictM;
-  };
-  let coeffsM = null;
-  const coeffs = (p) => {
-    if (!coeffsM) coeffsM = rd('public/input/fitted-coefficients.json').PREDICT_COEFFS_PHYSICAL;
-    return coeffsM[p];
-  };
-  const fluct = (y, p) => {
-    const f = predict().buildPredictiveFeatures(y, p);
-    const c = coeffs(p);
-    let s = 0;
-    for (let i = 0; i < c.length; i++) s += f[i] * c[i];
-    return s;
-  };
+  // Plan 06 R8 — the Earth-frame RA rate of a planet's perihelion motion IS the
+  // equatorial projection of the lattice motion (doc 13 §1.8, the kinematic
+  // identity in the lattice's own family; twin: src/script.js
+  // perihelionFrameBreakdown, identical ops):
+  //   α̇ = rate_ecl · dα/dλ(λ, ε) + ∂α/∂ε(λ, ε) · ε̇
+  // λ the IAU J2000 perihelion longitude advanced at the lattice rate, ε the
+  // published one-source ε and ε̇ its ±50-yr central difference. The retired
+  // device that stood here — createPredictivePrecession × PREDICT_COEFFS_PHYSICAL,
+  // ~2,421 fitted terms per planet reproducing the RETIRED geometric scene's
+  // exported RA rate (which the identity closed to a κ ≤ 1.4″/cy residual) — is
+  // recorded in docs/retired-record.md; the function keeps its name for its
+  // callers. The chain's DYNAMICAL rate of date is a different quantity (a
+  // window rate; the outer planets' are great-inequality-dominated, Neptune's
+  // ϖ swings ~16°/cy on its near-zero e) and never rides a lattice key.
+  const D2R = Math.PI / 180;
   const periFraction8 = (planet) => {
     const [num, den] = model.planets[planet].perihelionEclipticFraction;
     return (8 * den / Math.abs(num)) * Math.sign(num);
@@ -176,7 +142,23 @@ function predictiveMachinery() {
     const n8 = periFraction8(planet);
     return Math.sign(n8) * 1296000 / ((8 * C.H) / Math.abs(n8)) * 100;
   };
-  const totalPrecession = (y, p) => latticeBaseline(p) + fluct(y, p);
+  // The projection terms of the lattice motion at year y (the IAU J2000 ϖ
+  // advanced at the lattice rate; doc 13 §1.8 "projection excess + obliquity-
+  // rate term"): the Earth-frame rate minus the lattice rate. Its extremes
+  // over one perihelion cycle (the `<p>FluctuationMin/Max` keys) are a
+  // property of the projection — λ against the equinox — which is what the
+  // retired device's "fluctuation" was measuring in the retired scene.
+  const latticeFluct = (y, p) => {
+    const P = C.planets[p];
+    const eps = oneEps(y) * D2R;
+    const epsRate = (oneEps(y + 50) - oneEps(y - 50)) * 3600;
+    const lam = (P.longitudePerihelion + (360 / P.perihelionEclipticYears) * (y - 2000)) * D2R;
+    const den = Math.cos(lam) ** 2 + Math.sin(lam) ** 2 * Math.cos(eps) ** 2;
+    const rate = latticeBaseline(p);
+    return rate * (Math.cos(eps) / den - 1) + (-Math.sin(lam) * Math.cos(lam) * Math.sin(eps) / den) * epsRate;
+  };
+  const fluct = latticeFluct;
+  const totalPrecession = (y, p) => latticeBaseline(p) + latticeFluct(y, p);   // the Earth-frame RA rate, frame (b)
   const calcEarthPerihelionDeg = (year) => {
     const mc = dtl().cyclesBetweenYears(C.balancedYear, year, 16);
     if (mc === null) return 270.0;
@@ -188,7 +170,7 @@ function predictiveMachinery() {
     }
     return ((L + C.PERI_OFFSET) % 360 + 360) % 360;
   };
-  _predictHelpersM = { fluct, erdBrowserForm, totalPrecession, latticeBaseline, calcEarthPerihelionDeg };
+  _predictHelpersM = { fluct, latticeFluct, erdBrowserForm, totalPrecession, latticeBaseline, calcEarthPerihelionDeg };
   return _predictHelpersM;
 }
 const model = rd('public/input/model-parameters.json');
@@ -2529,16 +2511,12 @@ export const VALUES = {
     return out;
   })(),
 
-  // ── Axial-precession identities + perihelion baselines + term counts (11-2ad)
+  // ── Axial-precession identities + perihelion baselines (11-2ad) ─────────
   // Baselines are the lattice periods as ″/cy (1,296,000/T × 100, signed from
-  // the stored fractions — Earth on its ICRF H/3 apsidal rate); the
-  // prediction term counts derive LIVE from the shipped
-  // PREDICT_COEFFS_PHYSICAL array lengths (which caught the site's stale
-  // Jupiter/Saturn 2,407s — website defect #8, both predated the J/S
-  // reframe). The R²/RMSE stats stay in the queue until the evaluation
-  // generator lands (plan follow-up item 6) — never record suspect numbers.
+  // the stored fractions — Earth on its ICRF H/3 apsidal rate). (The
+  // `<p>PredTerms` counts that lived here read the PREDICT_COEFFS_PHYSICAL
+  // array lengths — retired with the planet predict device, plan 06 R8.)
   ...(() => {
-    const fc = () => rd('public/input/fitted-coefficients.json');
     const n8 = (planet) => {
       const [num, den] = model.planets[planet].perihelionEclipticFraction;
       return (8 * den / Math.abs(num)) * Math.sign(num);
@@ -2565,49 +2543,21 @@ export const VALUES = {
         note: planet === 'earth' ? 'ICRF apsidal rate (H/3)' : 'lattice perihelion rate',
       };
     }
-    for (const planet of ['mercury', 'venus', 'mars', 'jupiter', 'saturn', 'uranus', 'neptune']) {
-      out[`${planet}PredTerms`] = {
-        get: () => fc().PREDICT_COEFFS_PHYSICAL[planet].length,
-        render: (v) => thousands(v),
-        note: 'live length of the shipped physical-beat coefficient array',
-      };
-    }
     return out;
   })(),
 
-  // ── Term aggregates + Mercury anomaly + observed-rate citations (11-2ae) ─
-  // The aggregates derive live from the shipped coefficient arrays; the
-  // Mercury J2000 anomaly derives by evaluating the engine's OWN predictive
-  // feature basis against the shipped physical coefficients (the same
-  // features·coeffs product the browser and site compute — reproduced 38.03″
-  // before porting); baseline diff = |textbook Newtonian − lattice baseline|.
-  // The observed-rate family are WebGeocalc/literature citations in
-  // knownValues (see its _perihelionRatesNote).
+  // ── Mercury anomaly + observed-rate citations (11-2ae) ──────────────────
+  // The Mercury J2000 "anomaly" keys are the Earth-frame RA rate minus the
+  // lattice rate — the projection terms (predictiveMachinery, plan 06 R8; the
+  // former features·coeffs product of the retired device read 38.03″); baseline
+  // diff = |textbook Newtonian − lattice baseline|. The observed-rate family
+  // are WebGeocalc/literature citations in knownValues (see its
+  // _perihelionRatesNote). (`predTermsApprox` / `predTermsRange` — the
+  // retired device's term counts — are gone.)
   ...(() => {
-    const termLengths = () => {
-      const P = rd('public/input/fitted-coefficients.json').PREDICT_COEFFS_PHYSICAL;
-      return Object.values(P).map((a) => a.length);
-    };
-    const mercuryFluctuation2000 = () => {
-      const oe = require(join(ROOT, 'tools', 'lib', 'orbital-engine.js'));
-      const f = oe.buildPredictiveFeatures(2000, 'mercury');
-      const c = rd('public/input/fitted-coefficients.json').PREDICT_COEFFS_PHYSICAL.mercury;
-      let s = 0;
-      for (let i = 0; i < c.length; i++) s += f[i] * c[i];
-      return s;
-    };
+    const mercuryFluctuation2000 = () => predictiveMachinery().fluct(2000, 'mercury');
     const kv = () => astro.knownValues;
     return {
-      predTermsApprox: {
-        get: () => Math.round(termLengths().reduce((a, b) => a + b, 0) / termLengths().length / 100) * 100,
-        render: (v) => `~${thousands(v)}`,
-        note: 'mean of the shipped per-planet term counts, to the nearest hundred',
-      },
-      predTermsRange: {
-        get: () => Math.min(...termLengths()),
-        render: (v) => `${thousands(v)}–${thousands(Math.max(...termLengths()))}`,
-        note: 'min–max of the shipped array lengths',
-      },
       ascNodeJointRms: { get: () => kv().ascNodeJointRmsArcsec, render: (v) => String(v), unit: '″', note: 'asc-node fit run RMS — recorded snapshot, fitter prints it live' },
       mercuryNewtonian:    { get: () => kv().mercuryNewtonianArcsecCy, render: (v) => thousands(v), unit: '″/cy', note: 'textbook Newtonian rate — citation' },
       mercuryObservedICRF: { get: () => kv().mercuryObservedICRFArcsecCy, render: (v) => thousands(v), unit: '″/cy', note: 'textbook 532 + 43 chain' },
@@ -2623,7 +2573,7 @@ export const VALUES = {
         unit: '″/cy',
         note: 'textbook Newtonian vs the lattice baseline',
       },
-      mercuryAnomalyJ2000:    { get: mercuryFluctuation2000, render: (v) => thousands(v, 0), unit: '″/cy', note: 'derived: engine feature basis · shipped physical coefficients at 2000' },
+      mercuryAnomalyJ2000:    { get: mercuryFluctuation2000, render: (v) => thousands(v, 0), unit: '″/cy', note: 'LEGACY name — the Earth-frame RA rate minus the lattice rate at J2000 (the equatorial projection terms, R8); not the relativistic anomaly (that is mercuryPeriAnomalyGrArcsecCy)ficients at 2000' },
       mercuryEpoch2000Offset: { get: mercuryFluctuation2000, render: (v) => thousands(v, 1), unit: '″/cy' },
       mercuryObservedRate: { get: () => kv().mercuryObservedRateArcsecCy, render: (v) => thousands(v), unit: '″/cy', note: 'WebGeocalc 1900–2000 heliocentric trend' },
       venusObservedRate:   { get: () => kv().venusObservedRateArcsecCy, render: (v) => thousands(v), unit: '″/cy', note: '~0 — flips sign across sub-windows' },
@@ -2638,39 +2588,42 @@ export const VALUES = {
     };
   })(),
 
-  // ── Fluctuation scans + geocentric chain (11-2af) ───────────────────────
-  // The scans evaluate the SHIPPED predictive basis: the shared
-  // @essrt/physics/planets/predict module (snapshot planet-side phases — the
-  // basis the physical coefficients were fitted against) wired with the
-  // BROWSER's deep-time Earth scalars (integrated-phase perihelion/ERD/
-  // obliquity, epoch-H ERD ω) — the exact hybrid the simulator ships.
-  // Porting this surfaced website defect #9: the site's buildFeatures had
-  // over-integrated the planet-side phases too, so its venus extrema
-  // diverged from the simulator at deep years (fixed site-side; every scan
-  // value re-verified 22/22). Scan: −350k..+50k step 100, mercury refined
-  // to the year. Geocentric chain = ICRF citations + the general-precession
-  // equinox drift (knownValues).
+  // ── Fluctuation ranges + geocentric chain (11-2af) ──────────────────────
+  // Plan 06 R8: the per-planet "fluctuation" range is the range of the
+  // PROJECTION TERMS of the lattice motion (predictiveMachinery.latticeFluct:
+  // projection excess + obliquity-rate term, doc 13 §1.8) over one perihelion
+  // cycle centred on J2000 — a property of the perihelion's longitude against
+  // the equinox, ε from the published one-source movement. It replaces the
+  // retired device's scan (−350k..+50k of the fitted RA-rate surrogate; the
+  // retired scene's exported "fluctuation" was 96 % the projection's own
+  // artefact for Venus, measured — doc 13). Mercury's extremes are refined
+  // to the year. Earth's row stays the ERD device (×360,000, browser form).
+  // Geocentric chain = ICRF citations + the general-precession equinox drift
+  // (knownValues).
   ...(() => {
-    const { fluct, erdBrowserForm } = predictiveMachinery();
+    const { latticeFluct, erdBrowserForm } = predictiveMachinery();
     let scans = null;
     const scan = () => {
       if (!scans) {
         scans = {};
+        const cycleOf = (p) => Math.abs(C.planets[p].perihelionEclipticYears);
         {
+          const T = cycleOf('mercury');
           let mn = Infinity, mx = -Infinity, mnY = 0, mxY = 0;
-          for (let y = -350000; y <= 50000; y += 100) {
-            const f = fluct(y, 'mercury');
+          for (let y = Math.round(2000 - T / 2); y <= 2000 + T / 2; y += 100) {
+            const f = latticeFluct(y, 'mercury');
             if (f < mn) { mn = f; mnY = y; }
             if (f > mx) { mx = f; mxY = y; }
           }
-          for (let y = mnY - 100; y <= mnY + 100; y++) { const f = fluct(y, 'mercury'); if (f < mn) { mn = f; mnY = y; } }
-          for (let y = mxY - 100; y <= mxY + 100; y++) { const f = fluct(y, 'mercury'); if (f > mx) { mx = f; mxY = y; } }
+          for (let y = mnY - 100; y <= mnY + 100; y++) { const f = latticeFluct(y, 'mercury'); if (f < mn) { mn = f; mnY = y; } }
+          for (let y = mxY - 100; y <= mxY + 100; y++) { const f = latticeFluct(y, 'mercury'); if (f > mx) { mx = f; mxY = y; } }
           scans.mercury = { mn, mx, mnY, mxY };
         }
         for (const p of ['venus', 'mars', 'jupiter', 'saturn', 'uranus', 'neptune']) {
+          const T = cycleOf(p);
           let mn = Infinity, mx = -Infinity;
-          for (let y = -350000; y <= 50000; y += 100) {
-            const f = fluct(y, p);
+          for (let y = Math.round(2000 - T / 2); y <= 2000 + T / 2; y += Math.max(100, Math.round(T / 4000))) {
+            const f = latticeFluct(y, p);
             if (f < mn) mn = f;
             if (f > mx) mx = f;
           }
@@ -3431,45 +3384,21 @@ export const VALUES = {
     return out;
   })(),
 
-  // ── The final two follow-ups (11-2aq): solarOrbitalSpeed decided +
-  // prediction fit stats generated ───────────────────────────────────────
-  // solarOrbitalSpeed: DERIVED as 2π·AU/T_sid in km/h (follow-up item 5
-  // decided — the site's former 9-dp hardcode sat 0.59 m/h below its own
-  // derivation; both trees now derive from one source). The R²/RMSE stats
-  // come from data/planet-prediction-fit-stats.json, generated by
-  // tools/fit/python/eval_precession_physical.py --write scoring the
-  // SHIPPED coefficient arrays (evaluation, not refit — follow-up item 6).
-  ...(() => {
-    let statsM = null;
-    const stats = () => { if (!statsM) statsM = rd('data/planet-prediction-fit-stats.json'); return statsM; };
-    const out = {
-      solarOrbitalSpeed: {
-        get: () => 2 * Math.PI * C.currentAUDistance / C.meanSiderealYearSeconds * 3600,
-        render: (v) => thousands(v, 9),
-        unit: 'km/h',
-        note: 'derived: 2π·AU / sidereal year — one source (item 5 decision)',
-      },
-    };
-    // The OBSERVED formula (Step 4d, tools/lib/python/observed_formula.py — a
-    // Python-only validation formula, no runtime consumer) has no JSON
-    // artifact; its fit quality is what train_observed.py writes into the
-    // coefficient-file header ("RMSE: x arcsec/century", "R²: y", "(N-term
-    // system)"). Read THAT, never re-derive (the doc-35 literals had drifted).
-    const obsHeader = (p) => {
-      const src = readFileSync(join(ROOT, 'tools', 'lib', 'python', 'coefficients', `${p}_coeffs.py`), 'utf8');
-      const num = (re) => { const m = src.match(re); if (!m) throw new Error(`${p}_coeffs.py header: ${re} not found`); return Number(m[1]); };
-      return { rmse: num(/^RMSE:\s*([0-9.]+)\s*arcsec\/century/m), r2: num(/^R²:\s*([0-9.]+)/m), terms: num(/\((\d+)-term system\)/) };
-    };
-    for (const p of ['mercury', 'venus', 'mars', 'jupiter', 'saturn', 'uranus', 'neptune']) {
-      out[`${p}ObsR2`] = { get: () => obsHeader(p).r2, render: (v) => Number(v).toFixed(6), note: 'Step 4d observed formula — from the coefficient-file header the trainer wrote' };
-      out[`${p}ObsRmse`] = { get: () => obsHeader(p).rmse, render: (v) => Number(v).toFixed(2), unit: '″/cy' };
-      out[`${p}ObsTerms`] = { get: () => obsHeader(p).terms, render: (v) => String(v) };
-      out[`${p}PredTerms`] = { get: () => stats().planets[p].terms, render: (v) => String(v), note: 'Step 4c physical-beat basis size' };
-      out[`${p}PredR2`] = { get: () => stats().planets[p].r2, render: (v) => Number(v).toFixed(6), note: 'shipped arrays scored against the training data (generated artifact)' };
-      out[`${p}PredRmse`] = { get: () => stats().planets[p].rmse_arcsec_cy, render: (v) => Number(v).toFixed(4), unit: '″/cy' };
-    }
-    return out;
-  })(),
+  // ── solarOrbitalSpeed (11-2aq) ──────────────────────────────────────────
+  // DERIVED as 2π·AU/T_sid in km/h (follow-up item 5 decided — the site's
+  // former 9-dp hardcode sat 0.59 m/h below its own derivation; both trees
+  // now derive from one source). (The `<p>PredR2/PredRmse/PredTerms` and
+  // `<p>ObsR2/ObsRmse/ObsTerms` keys that shared this block — the retired
+  // planet predict device's self-fit statistics against the RETIRED scene's
+  // export — are gone with the device, plan 06 R8; docs/retired-record.md.)
+  ...(() => ({
+    solarOrbitalSpeed: {
+      get: () => 2 * Math.PI * C.currentAUDistance / C.meanSiderealYearSeconds * 3600,
+      render: (v) => thousands(v, 9),
+      unit: 'km/h',
+      note: 'derived: 2π·AU / sidereal year — one source (item 5 decision)',
+    },
+  }))(),
 
   // Ours-only: the docs need a comma-free H for code contexts, and the IAU
   // 2006 obliquity anchor which the website does not surface as a key.

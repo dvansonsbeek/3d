@@ -20,29 +20,17 @@ All constants originate from `tools/lib/constants.js` (the single source of trut
 
 | File | Description |
 |------|-------------|
-| `predictive_formula_physical.py` | **Primary** feature matrix builder (~2421-term) for planetary precession prediction. All feature frequencies derive from `model-parameters.json` via `planet_beats.py` — no hardcoded H_DIV_X constants. See [PREDICTIVE_FORMULA_GUIDE.mdx](PREDICTIVE_FORMULA_GUIDE.mdx) for full documentation. |
-| `planet_beats.py` | Derives the six fundamental periods per planet (ecl, icrf, obliq, asc, axial, wobble) plus all pairwise internal and Earth-cross beat frequencies. Single source for all physical-beat feature frequencies. |
-| `predictive_formula.py` | Legacy 429-term feature builder + shared helpers (`calc_earth_perihelion`, `calc_erd`, `calc_obliquity`, `calc_eccentricity`). The 429-term `build_features` is deprecated but the helper functions are still imported by `predictive_formula_physical.py` and `verify_perihelion_erd.py`. |
-| `observed_formula.py` | Feature matrix builder using observed orbital parameters (perihelion, ERD, obliquity, eccentricity) as inputs. Used to fit against observed data. |
+| `predictive_formula.py` | Earth's perihelion / ERD / obliquity / eccentricity helpers (`calc_earth_perihelion`, `calc_erd`, `calc_obliquity`, `calc_eccentricity`) used by `verify_perihelion_erd.py` (Step 4b) and the doc-14 cardinal helpers. Its 429-term `build_features` is a legacy of the retired planet predict device and has no consumer. |
+| `planet_beats.py` | Derives the six fundamental periods per planet (ecl, icrf, obliq, asc, axial, wobble) plus all pairwise internal and Earth-cross beat frequencies. |
 
-### Fitted coefficients
-
-| Directory | Description |
-|-----------|-------------|
-| `coefficients/` | Per-planet coefficient modules. `*_coeffs_physical.py` (7 files, 2421 terms) are the **active** predictive coefficients consumed by `predict_precession.py`, `validate_precession.py`, and the sync pipeline. `*_coeffs.py` are for `observed_formula.py`. Legacy `*_coeffs_unified.py` (429-term) were superseded and are not shipped. |
-
-### Usage scripts
-
-| File | Description |
-|------|-------------|
-| `predict_precession.py` | Prediction API — run or import to compute planetary precession values from year input. |
-| `validate_precession.py` | Validates trained coefficients against observed Excel data. |
-
-### Documentation
-
-| File | Description |
-|------|-------------|
-| `PREDICTIVE_FORMULA_GUIDE.mdx` | Full guide to the physical-beat predictive formula: 2421-term ML architecture, feature groups A/B/C+D+E/F/I/J/K/L, training procedure, and how to extend. |
+> The planet **predictive-precession device** that lived here —
+> `predictive_formula_physical.py` (the ~2,421-term feature matrix),
+> `observed_formula.py`, `predict_precession.py`, `validate_precession.py`,
+> the per-planet `coefficients/` modules and `PREDICTIVE_FORMULA_GUIDE.mdx`
+> — was **retired at plan 06 R8**: it fitted the RETIRED geometric scene's
+> exported Earth-frame perihelion-RA rate against the simulator's own export.
+> The record is `docs/retired-record.md`; the Earth-frame rate is now the
+> equatorial projection of the lattice motion (doc 13 §1.8).
 
 ---
 

@@ -1067,79 +1067,13 @@ function computeSolsticeJD(year, type) { return _cardinalPkg().cardinal.jd(year,
  */
 function computeSolsticeYearLength(year, type) { return _cardinalPkg().cardinal.yearLengthDays(year, type); }
 
-// ═══════════════════════════════════════════════════════════════════════════
-// PRECESSION PREDICTION (429-term ML system)
-// ═══════════════════════════════════════════════════════════════════════════
-
-/**
- * Build the physical-beat feature vector for precession prediction.
- * Ported from tools/lib/python/predictive_formula_physical.py.
- * GROUPS: A (Earth ref), B (planet angle), C+D+E (periods+beats × 7 harmonics),
- *         F (period×angle), I (period×2δ), J (fund×Earth sidebands n=1),
- *         L (fund×Earth sidebands n=6..16), K (ecl±icrf carriers × Earth).
- *
- * @param {number} year - calendar year
- * @param {string} planetKey - e.g. 'venus'
- * @returns {number[]} feature array (~2421 elements for Venus)
- */
-// 8.3 L9: the feature basis, period algebra, beats, and template cache live
-// in @essrt/physics/planets/predict — ONE implementation for both engines.
-// This engine injects its J2000-anchored Earth scalar forms (the browser
-// injects its deep-time epoch-aware ones); the PREDICT_* dot products and
-// their guard semantics stay engine-side below.
-const { createPredictivePrecession } = _req('@essrt/physics/planets/predict');
-
-let _predictM = null;
-function _predict() {
-  if (!_predictM) {
-    _predictM = createPredictivePrecession({
-      getHYears: () => C.H,
-      getBalancedYear: () => C.balancedYear,
-      getPlanetFields: (planetKey) => C.planets[planetKey],
-      calcEarthPerihelionDeg: calcEarthPerihelionPredictive,
-      calcErdRate: calcERD,
-      computeObliquityEarthDeg: computeObliquityEarth,
-      computeEccentricityEarth: (year) => computeEccentricityEarth(year),
-      obliquityMeanDeg: C.SOLSTICE_OBLIQUITY_MEAN,
-      eccentricityMean: C.eccentricityBaseDerived,   // the ONE law's mean (unification)
-    });
-  }
-  return _predictM;
-}
-
-function buildPredictiveFeatures(year, planetKey) {
-  return _predict().buildPredictiveFeatures(year, planetKey);
-}
-
-/**
- * Predict the total geocentric precession rate for a planet (arcsec/century).
- * Uses the 429-term feature matrix × trained ridge-regression coefficients.
- *
- * @param {number} year - calendar year
- * @param {string} planetKey - e.g. 'mercury', 'mars'
- * @returns {number} total precession rate in arcsec/century (baseline + fluctuation)
- */
-function predictGeocentricPrecession(year, planetKey) {
-  const planet = C.PREDICT_PLANETS[planetKey];
-  const coeffs = C.PREDICT_COEFFS[planetKey];
-  if (!planet || !coeffs) return 0;
-  const features = buildPredictiveFeatures(year, planetKey);
-  let dot = 0;
-  for (let i = 0; i < coeffs.length; i++) dot += coeffs[i] * features[i];
-  return planet.baseline + dot;
-}
-
-/**
- * Predict the precession fluctuation (deviation from baseline) for a planet.
- * @param {number} year - calendar year
- * @param {string} planetKey - e.g. 'mercury', 'mars'
- * @returns {number} fluctuation in arcsec/century
- */
-function predictPrecessionFluctuation(year, planetKey) {
-  const planet = C.PREDICT_PLANETS[planetKey];
-  if (!planet) return 0;
-  return predictGeocentricPrecession(year, planetKey) - planet.baseline;
-}
+// (The planet PRECESSION PREDICTION block — the @essrt/physics/planets/predict
+// feature basis, PREDICT_COEFFS × features, predictGeocentricPrecession /
+// predictPrecessionFluctuation — left this engine at plan 06 R8: it
+// reproduced the RETIRED geometric scene's exported Earth-frame RA rate. The
+// rate is now the equatorial projection of the lattice motion —
+// tools/docs/model-values.mjs predictiveMachinery and the browser's
+// perihelionFrameBreakdown, identical ops. docs/retired-record.md.)
 
 // ═══════════════════════════════════════════════════════════════════════════
 // COMPOSITE: Compute all orbital elements for a given year
@@ -1264,7 +1198,4 @@ module.exports = {
 
   // Composite
   computeEarthOrbitalElements,
-  buildPredictiveFeatures,
-  predictGeocentricPrecession,
-  predictPrecessionFluctuation,
 };

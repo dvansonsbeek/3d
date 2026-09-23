@@ -146,7 +146,8 @@ export { createYearLengths, ONE_FAMILY_WINDOW_YEARS } from './earth/year-lengths
 // (spin ω(t) × [solar torque + lunar torque on the recession history]) —
 // leg-1's physical rate; the structural H(t)/13 clock is its named diagnostic.
 export { computeSolarTorqueShare, createComposedPrecession } from './earth/precession-composed.cjs';
-export { createPredictivePrecession, calcPlanetPerihelionLongDeg } from './planets/predict.cjs';
+// (planets/predict.cjs — the planet predictive-precession feature basis — was
+// retired at plan 06 R8 with PREDICT_COEFFS_PHYSICAL; docs/retired-record.md.)
 // L10 — the composition front door: one law set, N body records. Thin by
 // design; engines keep their direct call sites (see planets/model.cjs).
 export { createPlanetModel } from './planets/model.cjs';

@@ -46,7 +46,7 @@ python devonian_cross_check.py
 
 ## Script Overview
 
-> **Shared library** (`constants_scripts.py`, `predictive_formula.py`, `observed_formula.py`, `coefficients/`) lives in [`tools/lib/python/`](../tools/lib/python/README.md). All scripts here load it via `sys.path` at startup.
+> **Shared library** (`constants_scripts.py`, `predictive_formula.py` — Earth's perihelion/ERD/obliquity helpers — and `planet_beats.py`) lives in [`tools/lib/python/`](../tools/lib/python/README.md). All scripts here load it via `sys.path` at startup.
 
 ### Statistical Significance
 

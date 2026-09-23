@@ -17,15 +17,16 @@ Output values are stored in `public/input/fitted-coefficients.json`.
 > (former Steps 5a–5b) and their `PARALLAX_*`/`GRAVITATION_`/`ELONGATION_
 > CORRECTION` keys were **retired with the K5 legacy-chain excision** — the
 > corrected geometric RA/Dec path they fitted no longer exists.
-> `PREDICT_COEFFS_PHYSICAL` remains: it powers the Earth-frame RA rate
-> device (doc 13 §1.8). Earth, Moon and Sun fitting is unaffected; it
-> remains the shipped path. **Checked at plan 06 R3 item 1:** the arrays
-> were trained on the Step-3 workbook exported 2026-08-28 — BEFORE the P5
-> flip and the K5 excision — so they and `data/planet-prediction-fit-stats.json`
-> describe the retired geometric planet path (stale-by-construction in
-> `tools/verify/artifact-freshness.js`, with the reason). Before any retrain:
-> re-export Step 3 from the current simulator; whether the device is kept at
-> all is an R4 retirement question.
+> The planet **predictive-precession device** (`PREDICT_COEFFS_PHYSICAL` /
+> `_UNIFIED` / `_OBSERVED`, the Step 4c/4d trainers, the 7g evaluator and
+> `data/planet-prediction-fit-stats.json`) was **retired at plan 06 R8**:
+> the arrays were trained on the Step-3 workbook exported 2026-08-28 —
+> BEFORE the P5 flip and the K5 excision — and reproduced the retired
+> geometric scene's exported Earth-frame RA rate, a self-fit of the
+> simulator (`docs/retired-record.md`). The Earth-frame rate is now the
+> equatorial projection of the lattice motion (doc 13 §1.8, zero fitted
+> constants). Earth, Moon and Sun fitting is unaffected; it remains the
+> shipped path.
 
 ## Design rule for scene-graph corrections
 
@@ -241,9 +242,7 @@ then `npm run constants:generate` (Step 9).
 | `moon-eclipse-optimizer.js` | NOTHING (RETIRED at plan 06 R3 item 1 — kept as the record) | Formerly `moonMeeusLpCorrection` + `MOON_CORRECTION` against 58 solar eclipses (2000–2025) + a JPL baseline. Both are retired: measured against Horizons' apparent Moon the series needs no anchor (−1.0″ ± 1.5″, 1970–2049), the +32.75″ was the eclipse tier's mean Sun compensated (κ + the I2 long inequality + the trend-ΔT offset), and the RA/Dec patches were fitted around the retired D5 aberration layer (docs/66 §1.4). `moonStartpos*` values are J2000-element anchored via the in-sim meters (docs/66 §4) and are NO LONGER fitted |
 | `python/fit_perihelion_harmonics.py` | `PERI_HARMONICS_RAW`, `PERI_OFFSET` | `data/01-holistic-year-objects-data.xlsx` |
 | `python/verify_perihelion_erd.py` | pass/fail verification (exits 0=pass, 1=fail) | `data/01-holistic-year-objects-data.xlsx` |
-| `python/train_precession_physical.py` | `PREDICT_COEFFS_PHYSICAL` (~2421 terms × 7 planets) | `data/01-holistic-year-objects-data.xlsx` |
-| `python/train_observed.py` | Observed coefficients (225/328 terms × 7 planets) | `data/01-holistic-year-objects-data.xlsx` |
-| `python/greedy_features_physical.py` | Candidate features for ML (physical-beat basis) | `data/01-holistic-year-objects-data.xlsx` |
+| (`python/train_precession_physical.py`, `train_observed.py`, `greedy_features_physical.py` — the planet predict device's trainers — RETIRED at plan 06 R8) | nothing | — |
 | `python/planet_eccentricity_jpl.py` | Planet `orbitalEccentricityBase` values | JPL Horizons (cached in `data/`) |
 | `../../scripts/fibonacci_significance.py` | `data/significance-results.json` (combined p + sigma via Stouffer's Z with correlation correction; Fisher's reported for transparency; 11 tests × 3 null distributions) | `tools/lib/python/constants_scripts.py` |
 | `dt-corrections-fit.js` | `data/deltaT-4flag-fit.json` — cascaded LSQ fit of the 4-flag ΔT correction stack (Bond n=1830 · 1466 yr, Hallstatt n=1104 · 2430 yr, Jose5 n=2989 · 897 yr, Jose4 n=3749 · 716 yr — n the divisor of the anchor's eight-unit interval, an identifier: the periods are what the stack carries) against the Stephenson 2016 residual. Sole authoritative source of the shipped `BOND_/HALLSTATT_/JOSE5_/JOSE4_ COS_/SIN_COEFF_S` constants. See "Phase 8" below. **JOINT WORLD (since 2026-07-23): `--joint` is the AUTHORITATIVE fit** — 4 flags + Core-mantle swing in one equality-constrained solve (hard USNO closure row, amplitude caps, resonator phases locked as unit shapes, free intercept = trend anchor). `--joint --write` ships the coefficients + anchors atomically (current joint optimum: USNO 86,400.0017, deltaTStart 55.85, Espenak fit-target RMS 12.60 s, full-window 31.27 s — read the live values from `data/deltaT-4flag-fit.json → optimum` and the stage-3 validation artifact, never from this sentence). The legacy single-shot cascade remains as a stage-wise diagnostic — **its `fit_metrics.stage_*` entries in `deltaT-4flag-fit.json` rank the flags differently from the shipped fit and must not be used to judge whether a flag earns its place** (worked example and the correct method in [doc 105](../../docs/105-dt-stack-flag-audit.md)); the resonator is default-ON runtime-wide (opt-out `DT_RESONATOR_DISABLED=1`; `DT_CORRECTIONS_DISABLED=1` alone still yields the fully-raw fitting residual via the integrator master-gate). | Stephenson 2016 spline (`public/input/stephenson-2016-deltaT-polynomial.json`) − pure-tidal framework model (`tools/lib/deep-time.js`, bypassed via `DT_CORRECTIONS_DISABLED=1`) |
@@ -519,33 +518,13 @@ Step 4b: python/verify_perihelion_erd.py      → pass/fail verification
 Note: eocEccentricity and perihelionPhaseOffset are derived analytically in constants.js
       from correctionSun and the eccentricity constants — no pipeline step needed.
 
-Step 4c: python/train_precession_physical.py  → tools/lib/python/coefficients/*_coeffs_physical.py
-         (~2421-term physical-beat ML coefficients, all feature frequencies
-          derived from model-parameters.json — no hardcoded H_DIV_X constants)
-         Downsampled by stepYears for efficiency.
-         Updates: coefficients/*_coeffs_physical.py + fitted-coefficients.json
-                  (PREDICT_COEFFS_PHYSICAL key, auto-written by script).
-         Auto-updates when JSON periods change — but coefficients need retraining.
-
-         Standalone per-planet mode (useful for iteration — ~7× faster):
-           python3 tools/fit/python/train_precession_physical.py --planet venus
-           python3 tools/fit/python/train_precession_physical.py --planet venus --write
-         Valid planets: mercury, venus, mars, jupiter, saturn, uranus, neptune.
-         When --planet is used with --write, only that planet's entry is replaced
-         in fitted-coefficients.json (other planets' coefficients are preserved).
-
-         Residual-analysis tool:
-           python3 tools/fit/python/greedy_features_physical.py --planet venus
-         Ranks candidate features by |correlation| with residuals. Used to
-         identify missing physical-beat structure (e.g. the GROUP K/L terms
-         capturing the joint sidebands were discovered this way).
-
-         The legacy 429-term trainer and its greedy feature-ranker were
-         superseded by the `*_physical.py` pair above and are not shipped.
-
-Step 4d: python/train_observed.py             → tools/lib/python/coefficients/*_coeffs.py
-         (225-term observed coefficients)
-         Updates: coefficients/*_coeffs.py + fitted-coefficients.json (auto-written by script)
+(Steps 4c–4d — the planet predictive-precession trainers
+`train_precession_physical.py` (~2,421 physical-beat terms per planet) and
+`train_observed.py`, with the residual ranker `greedy_features_physical.py`
+— were RETIRED at plan 06 R8 together with their `PREDICT_COEFFS_*` keys and
+`tools/lib/python/coefficients/`: they fitted the RETIRED geometric scene's
+exported Earth-frame RA rate against the simulator's own export. The ids are
+kept as shared vocabulary; `docs/retired-record.md` carries the record.)
 
 ── Phase 4: Moon ───────────────────────────────────────────────────
 
@@ -829,9 +808,8 @@ Steps 7f-7i: campaign-artifact generators     → data/*.json (inputs-stamped)
          7f: node tools/verify/cassini-results.js --write
              → data/cassini-moontilt-results.json (runs both Cassini labs
              live via their --json result lines; fast)
-         7g: python3 tools/fit/python/eval_precession_physical.py --write
-             → data/planet-prediction-fit-stats.json (~7 min; reads the
-             319 MB appendix xlsx)
+         (7g — the prediction-fit evaluator → planet-prediction-fit-stats.json —
+             RETIRED with the planet predict device at plan 06 R8)
          7h: node tools/verify/lod-climate-correlation.js --write
              → data/lod-climate-correlation-summary.json (Pearson r of the
              ΔT-stack ΣLOD vs the tracked climate proxies; seconds)
@@ -1067,7 +1045,7 @@ Step 3 (browser export) is always manual — the runner checks the data file exi
 - Step 5c (Moon): **~1 min** (5a-5b retired — K5 excision)
 - **Step 6a (CSV export): ~2 hours** — this is the pipeline bottleneck. Default step timeout raised to 3 h.
 - Steps 7a-7c, 8-10 (balance, ΔT joint fit, verify, constants, dashboard): ~5-10 min combined
-- Steps 7f-7i (campaign-artifact generators): ~10-15 min combined, dominated by 7g (prediction-fit evaluation, ~7 min) and 7i (eclipse audit, ~2-4 min)
+- Steps 7f-7i (campaign-artifact generators): ~5 min combined, dominated by 7i (eclipse audit, ~2-4 min; 7g retired at plan 06 R8)
 - **TOTAL Phase 2: ~2.5-3 hours** dominated by Step 6a.
 
 ### Manual step-by-step
@@ -1109,8 +1087,7 @@ npm run constants:generate && npm run build                                  # S
 # Phase 3: Earth perihelion & ML training
 python3 tools/fit/python/fit_perihelion_harmonics.py --write                 # Step 4a
 python3 tools/fit/python/verify_perihelion_erd.py                            # Step 4b (must pass)
-python3 tools/fit/python/train_precession_physical.py --write                # Step 4c
-python3 tools/fit/python/train_observed.py --write                           # Step 4d
+# (Steps 4c–4d — the planet predict trainers — retired at plan 06 R8)
 
 # Phase 4: Moon (Steps 5a-5b retired — K5 excision)
 # node tools/fit/eoc-fractions.js              # optional diagnostic
@@ -1208,8 +1185,7 @@ public/input/ (single source of truth)
          │         ↓ import
          │    tools/lib/python/constants_scripts.py    ← Python constants (dicts, derived values)
          │         ↓ import
-         │    tools/lib/python/predictive_formula.py   ← 429-term ML feature matrix
-         │    tools/lib/python/observed_formula.py     ← 225-term observed feature matrix
+         │    tools/lib/python/predictive_formula.py   ← Earth perihelion / ERD / obliquity helpers
          │
          └──→ npm run constants:generate
               src/script.js   ← Browser simulation (imports the generated module;
@@ -1217,8 +1193,6 @@ public/input/ (single source of truth)
 
 Fitting scripts write to JSON, then `constants:generate` (Step 9) regenerates the module:
     fit_perihelion_harmonics.py  → fitted-coefficients.json  (Step 4a)
-    train_precession_physical.py → fitted-coefficients.json  (Step 4c)
-    train_observed.py            → fitted-coefficients.json  (Step 4d)
     moon-eclipse-optimizer.js    → model-parameters.json     (Step 5c)
     optimize.js                  → model-parameters.json       (Steps 1, 2)
     balance-search.js            → data/balance-presets.json    (Step 7b)
@@ -1279,7 +1253,6 @@ constants) for fitting efficiency. This gives the same RMSE as the full dataset 
 
 ## Related documentation
 
-- [Predictive Formula Guide](../lib/python/PREDICTIVE_FORMULA_GUIDE.mdx) — ML architecture, feature matrix (429 terms), how to extend
 - [Solstice Prediction](../../docs/14-solstice-prediction.md) — Cardinal point harmonics, obliquity formula derivation
 - [Equation of Center](../../docs/65-equation-of-center.md) — EoC derivation and constants
 - Parallax Corrections — archived (docs/retired-record.md); the fitted parallax layer was deleted in the K5 excision

@@ -1,7 +1,7 @@
 ---
 docVersion: 1.0
 modelVersion: v14.0
-coefficients: sha256:8c6f14edf5f84905
+coefficients: sha256:bb6a03c877eedab8
 status: current
 ---
 
@@ -938,30 +938,20 @@ The calibration methodology (the closed-form Ω solution against the JPL J2000 e
 | Nodal Start | `moonStartposNodal` | <!--v:moonStartposNodalDeg-->64.0435<!--/v--> deg | Nodal precession start |
 | Moon Start | `moonStartposMoon` | <!--v:moonStartposMoonDeg-->67.8443<!--/v--> deg | Orbital position start |
 
-## Predictive Planet Parameters (`PREDICT_PLANETS`)
+## Planet perihelion parameters (the retired predictive formula)
 
-Per-planet configuration for the predictive perihelion precession formula:
-
-| Planet | Device period (Y = the anchor interval; retired framing) | Theta0 (deg) | Baseline (arcsec/cy) |
-|--------|---------------|---------------|---------------------|
-| Mercury | Y × 8/11 | <!--v:mercuryPeriLongJ2000Full-->77.4569131<!--/v--> | <!--v:arcsecInCircle-->1,296,000<!--/v-->/period×100 |
-| Venus | −8Y / 6 | <!--v:venusPeriLongJ2000Full-->131.5765919<!--/v--> | -<!--v:arcsecInCircle-->1,296,000<!--/v-->/period×100 (retrograde) |
-| Mars | 8Y / 36 | <!--v:marsPeriLongJ2000Full-->336.0650681<!--/v--> | <!--v:arcsecInCircle-->1,296,000<!--/v-->/period×100 |
-| Jupiter | 8Y / 39 | <!--v:jupiterPeriLongJ2000Full-->14.70659401<!--/v--> | <!--v:arcsecInCircle-->1,296,000<!--/v-->/period×100 |
-| Saturn | −8Y / 65 | <!--v:saturnPeriLongJ2000Full-->92.12794343<!--/v--> | -<!--v:arcsecInCircle-->1,296,000<!--/v-->/period×100 (retrograde) |
-| Uranus | Y / 3 | <!--v:uranusPeriLongJ2000Full-->170.7308251<!--/v--> | <!--v:arcsecInCircle-->1,296,000<!--/v-->/period×100 |
-| Neptune | Y × 2 | <!--v:neptunePeriLongJ2000Full-->45.80124471<!--/v--> | <!--v:arcsecInCircle-->1,296,000<!--/v-->/period×100 |
-
-### Predictive Normalization Constants
-
-| Constant | Variable | Value | Description |
-|----------|----------|-------|-------------|
-| Obliquity mean | `OBLIQUITY_MEAN` | 23.414 deg | Normalization center for obliquity features (referenced directly at the usage site) |
-| Eccentricity mean | `PREDICT_ECC_MEAN` | = `eccentricityBaseDerived` ≈ <!--v:earthEccBase-->0.01539<!--/v--> | Normalization center — the ONE eccentricity law's base′ (the frozen training-time `PREDICT_ECC_BASE`/`PREDICT_ECC_AMP` pair was retired at the eccentricity unification) |
-
-### Predictive Coefficients (`PREDICT_COEFFS`)
-
-7 arrays of 429 trained coefficients each, one per planet. These are the regression weights from the Python training pipeline (`tools/lib/python/coefficients/*_coeffs_unified.py`). The dot product of the 429-term feature vector with the coefficient array gives the geocentric precession fluctuation above/below the heliocentric baseline.
+The per-planet **predictive formula system** — `PREDICT_PLANETS` (device
+period, θ₀, lattice baseline per planet), the normalization constants and the
+`PREDICT_COEFFS_*` arrays (~2,421 fitted terms per planet) — was **retired at
+plan 06 R8** ([retired record](retired-record.md)): the arrays reproduced the
+right-ascension rate of the perihelion marker in the retired geometric scene,
+a regression of the simulator against itself, and the planets now render from
+the N-body chain. What remains of the same quantities: the planets' J2000
+perihelion longitudes (`longitudePerihelion`, §4) and their ecliptic perihelion
+periods (`perihelionEclipticYears`, §4) give the lattice rate
+1,296,000/period × 100 ″/cy per planet (`<p>ModelBaseline` in the registry);
+the Earth-frame right-ascension rate of that motion is its equatorial
+projection (doc 13 §1.8 — one formula, no fitted constants).
 
 ---
 

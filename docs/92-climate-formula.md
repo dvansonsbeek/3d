@@ -1,7 +1,7 @@
 ---
 docVersion: 1.0
 modelVersion: v14.0
-coefficients: sha256:8c6f14edf5f84905
+coefficients: sha256:bb6a03c877eedab8
 status: current
 ---
 
@@ -1334,7 +1334,7 @@ npm run constants:generate
 # → refreshes CLIMATE_FORMULA_COEFFS in packages/physics/src/constants/coefficients.js
 ```
 
-`constants:generate` regenerates every fitted block at once (PREDICT_COEFFS, BALANCE_PRESETS, the ΔT stack, …); the climate formula is one of them.
+`constants:generate` regenerates every fitted block at once (BALANCE_PRESETS, the ΔT stack, the harmonic combs, …); the climate formula is one of them.
 
 To push the modal to GitHub raw (where the browser fetches at runtime):
 

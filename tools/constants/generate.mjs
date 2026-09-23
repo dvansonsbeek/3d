@@ -92,10 +92,8 @@ const COEFFICIENT_KEYS = [
   'CARDINAL_POINT_JOINT_TERMS',
   'CARDINAL_POINT_DERIVED',
 
-  // 16,919 values. fmtSci kept 12 significant digits, so 16,909 of them differ
-  // from the JSON — but only at ~5e-13 relative, far below anything physical.
-  // Emitted verbatim anyway: there is no reason to ship a lossy copy.
-  'PREDICT_COEFFS_PHYSICAL',
+  // (PREDICT_COEFFS_PHYSICAL — 16,919 values of the planet predict device —
+  // was emitted here until plan 06 R8 retired the device and its arrays.)
 
   // The mean/offset SCALARS that pair with the harmonic arrays above — each
   // series is `mean + sum(harmonics)`, so shipping one from the JSON and the

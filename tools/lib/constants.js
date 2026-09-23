@@ -616,7 +616,7 @@ for (const key of Object.keys(additionalBodies)) {
 const { jdToYear, yearToJD } = utils.createDateUtils({ startmodelYear, startmodelJD, meanSolarYearDays });
 
 // Fitted coefficients that depend on model parameters
-const { SOLSTICE_OBLIQUITY_MEAN, PREDICT_PLANETS, PREDICT_COEFFS, PERI_HARMONICS } = fitted.buildFittedCoefficients({
+const { SOLSTICE_OBLIQUITY_MEAN, PERI_HARMONICS } = fitted.buildFittedCoefficients({
   earthtiltMean, earthInvPlaneInclinationAmplitude, earthRAAngle,
   earthInvPlaneInclinationMean, planets, H,
 });
@@ -796,8 +796,7 @@ module.exports = {
   CARDINAL_POINT_JOINT_TERMS: fitted.CARDINAL_POINT_JOINT_TERMS,
   CARDINAL_POINT_ANCHORS: fitted.CARDINAL_POINT_ANCHORS_ADJUSTED || ASTRO_REFERENCE.cardinalPointAnchors,
   PERI_OFFSET: fitted.PERI_OFFSET,
-  PREDICT_PLANETS,
-  PREDICT_COEFFS,
+  // (PREDICT_PLANETS / PREDICT_COEFFS — the planet predict device — retired at plan 06 R8)
 
   // Date utilities
   jdToCalendar: utils.jdToCalendar,

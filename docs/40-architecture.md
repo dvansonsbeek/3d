@@ -1,7 +1,7 @@
 ---
 docVersion: 1.0
 modelVersion: v14.0
-coefficients: sha256:8c6f14edf5f84905
+coefficients: sha256:bb6a03c877eedab8
 status: current
 ---
 
@@ -557,24 +557,23 @@ Features:
 └── Angular momentum contribution display (Jupiter ~60%, Saturn ~25%)
 ```
 
-### Predictive Formula System
-
-A 429-term feature matrix system for computing dynamic geocentric perihelion precession rates:
+### Earth's perihelion device and the planets' Earth-frame rate
 
 ```
-Architecture:
-├── PERI_HARMONICS (25 terms) → Earth perihelion longitude model
-├── calcEarthPerihelionPredictive(year) → Earth perihelion at any year
+├── PERI_HARMONICS (25 terms) + PERI_OFFSET → Earth perihelion longitude device
+├── calcEarthPerihelionPredictive(year) → Earth perihelion at any year (K device)
 ├── calcERD(year) → Earth Rate Deviation (derivative)
-├── buildPredictiveFeatures(year, period, theta0) → 429-term feature vector
-│   └── 25 groups: angle terms, obliquity, eccentricity, ERD, periodic,
-│       cross-terms, beat frequencies, Venus-specific, higher harmonics
-├── PREDICT_COEFFS (7 × 429 trained arrays) → per-planet coefficients
-└── predictGeocentricPrecession(year, planetKey) → total rate (″/century)
-    └── baseline + dot(features, coefficients)
+└── perihelionFrameBreakdown(planetKey, year) → the planet's perihelion rate in two
+    coordinates: the lattice ecliptic rate, its equatorial projection at the IAU
+    J2000 longitude, and the Earth-frame RA rate as their sum
+    (lattice × dα/dλ + ∂α/∂ε·ε̇ — doc 13 §1.8, a kinematic identity)
 ```
 
-Ported from Python (`tools/lib/python/predictive_formula.py`). Reuses existing `computeObliquityEarth()` and `computeEccentricityEarth()`.
+The former **predictive formula system** (`buildPredictiveFeatures` /
+`PREDICT_COEFFS` / `predictGeocentricPrecession`, ~2,421 fitted terms per
+planet ported from Python) was retired at plan 06 R8: it reproduced the
+right-ascension rate of the perihelion marker in the retired geometric scene
+([retired record](retired-record.md)).
 
 ### Celestial Bodies
 

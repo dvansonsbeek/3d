@@ -50,12 +50,8 @@ const BLOCKS = [
     expr: 'FIT.CARDINAL_POINT_HARMONICS',
     note: 'EXPECT REFUSAL — embedded copy is 6-decimal rounded (RSS 0.0149, worst 0.1360)',
   },
-  {
-    name: 'PREDICT_COEFFS',
-    expected: (fit) => fit.PREDICT_COEFFS_PHYSICAL,
-    expr: 'FIT.PREDICT_COEFFS_PHYSICAL',
-    note: 'EXPECT REFUSAL — fmtSci kept 12 sig digits, so 16,909 of 16,919 differ at ~5e-13',
-  },
+  // (PREDICT_COEFFS: migrated here, then retired with the planet predict device
+  // at plan 06 R8 — no block remains in script.js.)
   {
     name: 'MOON_L',
     expected: (fit) => fit.MEEUS_LONGITUDE_TERMS,

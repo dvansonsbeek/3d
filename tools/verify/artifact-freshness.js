@@ -72,14 +72,9 @@ const REQUIRED = [
 // way out is a re-derivation on current inputs or a retirement (R4), never a
 // re-stamp.
 const STALE_BY_CONSTRUCTION = {
-  'data/planet-prediction-fit-stats.json':
-    'scores the shipped PREDICT_COEFFS_PHYSICAL arrays against the Step-3 workbook '
-    + 'data/01-holistic-year-objects-data.xlsx, a 2026-08-28 browser export of the '
-    + 'RETIRED geometric planet path (the chains flipped to engine D at P5, 2026-09-06; '
-    + 'the legacy path was excised at K5, 2026-09-08). Its planet columns and the arrays '
-    + 'trained on them (the Earth-frame RA-rate device, doc 13 §1.8; the website\'s '
-    + '*PredR2/*PredRmse claims) predate the shipped planets — re-export Step 3 from the '
-    + 'current simulator and retrain, or retire the device (R4); do not re-stamp.',
+  // (data/planet-prediction-fit-stats.json sat here from plan 06 R3 — it scored
+  // the PREDICT_COEFFS_PHYSICAL arrays against a Step-3 export of the RETIRED
+  // geometric planet path — until R8 retired the device and deleted the artifact.)
 };
 
 const DATA = path.join(ROOT, 'data');

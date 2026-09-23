@@ -1,7 +1,7 @@
 ---
 docVersion: 1.0
 modelVersion: v14.0
-coefficients: sha256:8c6f14edf5f84905
+coefficients: sha256:bb6a03c877eedab8
 status: current
 ---
 
@@ -129,6 +129,37 @@ period from the record). The shipped climate formula's L1 is the physical
 line set (`data/l1-physical-lines.json`, one home; doc 92 §2); the ΔT
 stack keeps its four periods with the divisors as identifiers. Docs 91,
 93, 94, 98 stand as the comb-era record with status banners.
+
+**The planet predictive-precession device** (`PREDICT_COEFFS_PHYSICAL` /
+`_UNIFIED` / `_OBSERVED`, `@essrt/physics/planets/predict`, the browser's
+`predictGeocentricPrecession`, the Python trainers `train_precession_physical.py`
+/ `train_observed.py` with their `coefficients/` modules, the evaluator
+`eval_precession_physical.py` → `data/planet-prediction-fit-stats.json`, the
+gates `predict-form-pinning.js` and `perihelion-projection-closure.js`, the
+registry keys `<p>PredR2/PredRmse/PredTerms`, `<p>ObsR2/ObsRmse/ObsTerms`,
+`predTermsApprox/Range`; plan 06 R8): about 2,400 fitted coefficients per
+planet — 17,000 numbers — regressing the simulator's own Step-3 export of the
+perihelion marker's right-ascension rate onto a year-only feature basis. Its
+R² of 0.99999 and RMSE of 0.1″/cy measured how well the fit reproduced the
+retired geometric scene's rendering, not anything in the sky; the export it
+was trained on (2026-08-28) predates the planets' flip to the N-body chain
+(P5) and the excision of the geometric path (K5), so the device described a
+scene that no longer existed (stale by construction in the freshness gate
+since R3). Retired rather than retrained because the quantity it fitted is
+an identity: the Earth-frame RA rate of a planet's perihelion motion is the
+equatorial projection of that motion (doc 13 §1.8: α̇ = rate·dα/dλ +
+∂α/∂ε·ε̇ — `perihelionFrameBreakdown` in the browser, `predictiveMachinery`
+in the registry, identical ops, zero fitted constants; the device closed on
+it to a κ ≤ 1.4″/cy residual), so the Cycles-tab rows and the
+`<p>EarthFrameRa*` / `<p>PeriRateEarthFrameMeasuredJ2000` keys ride that
+projection of the lattice motion — never the chain's dynamical rate of date,
+a window rate (Neptune's ϖ swings ~16°/cy on its near-zero e) that stays on
+the planet panel's chain rows; the per-planet
+"fluctuation" ranges are the projection's own extremes over one perihelion
+cycle (the retired scene's exported "fluctuation" was 96 % the projection's
+artefact for Venus, measured). The website's "predictive formulas for all
+planets, R² ≥ 0.99998" claim and its per-planet table are withdrawn with the
+device — they would read to anyone as a claim about nature.
 
 **The fitted cardinal-point model and the comb-based Sun drift** (doc 14
 is the record; plan 06 R1): the §10 derived form — 23 sinusoids per

@@ -54,8 +54,10 @@ const MANIFEST = [
 
   { n: 'dual-balance-optimizer.js', class: 'narrative', ms: 658,
     note: 'RETIRED AS A GATE with the balance laws — the dual-balance diagnostic; kept as a frozen diagnostic record.' },
-  { n: 'perihelion-projection-closure.js', class: 'gate', ms: 400,
-    note: 'Earth-frame perihelion rate ≡ ecliptic advance × dα/dλ + ∂α/∂ε·ε̇ (+κ ≤ 1 ″/cy) for all seven planets at 1900/2000/2100 — the decomposition behind the Mercury-anomaly projection statement (doc 13 §1.8).' },
+  // (perihelion-projection-closure.js and predict-form-pinning.js — the two
+  // gates on the planet predict device — were deleted with it at plan 06 R8:
+  // the Earth-frame rate is now the projection formula applied to the chain's
+  // own apsidal motion, so there is no fitted surrogate left to close or pin.)
 
   { n: 'ascending-node-verification.js', class: 'liftable', ms: 49, markers: 8 },
   { n: 'inclination-verification.js', class: 'liftable', ms: 61, markers: 20 },
@@ -92,8 +94,6 @@ const MANIFEST = [
     note: 'Phase 13: @essrt/physics semver + the essrt.modelVersion pairing vs model-version.json — a refit can never ship without a version bump recording it' },
   { n: 'data-provenance.js', class: 'gate', ms: 1500,
     note: 'Phase 12: every tracked file under data/ must be manifest-covered (PROVENANCE.md row, directory, or self-describing/ledgered generated JSON); no dangling rows; ledger scripts exist' },
-  { n: 'predict-form-pinning.js', class: 'gate', ms: 4000,
-    note: '§12g-3: PREDICT_COEFFS and their trained (Node J2000-anchored) scalar form are a matched pair — pins 35 fluctuation values to a fixture and bounds the browser-form dual divergence; --write re-records ONLY after a conscious retrain' },
   { n: 'paleo-anchors.js', class: 'gate', ms: 2000,
     note: 'Phase 19 + Driver 1½: 41 deep-time anchors (Wells 1963 · Winter 2020 · Pannella 1972 · Williams 2000 · Mitchell-Kirscher 2023 · Wu 2024 · Patterson/Roche · the mid-Precambrian set: Farhat 2022 proxies + Zhou 2024 paired a+LOD + Xiamaling + Nanfen, matched by the regime-aware recession history) recomputed LIVE from the engine vs data/paleo-validation-anchors.json; documented deviations (Williams 620 Ma, the Wu Pangea interval) are BANDS — an unexplained improvement fails too (the verify-laws precedent)' },
 

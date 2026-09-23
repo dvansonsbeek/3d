@@ -57,7 +57,6 @@
     "./planets/keplerian-chain": { "types": "./types/planets/keplerian-chain.d.cts", "default": "./src/planets/keplerian-chain.cjs" },
     "./planets/inv-plane-frame": { "types": "./types/planets/inv-plane-frame.d.cts", "default": "./src/planets/inv-plane-frame.cjs" },
     "./planets/secular-series": { "types": "./types/planets/secular-series.d.cts", "default": "./src/planets/secular-series.cjs" },
-    "./planets/predict": { "types": "./types/planets/predict.d.cts", "default": "./src/planets/predict.cjs" },
     "./planets/model": { "types": "./types/planets/model.d.cts", "default": "./src/planets/model.cjs" },
     "./deltat/cycles": { "types": "./types/deltat/cycles.d.cts", "default": "./src/deltat/cycles.cjs" },
     "./deltat/deep-time": { "types": "./types/deltat/deep-time.d.cts", "default": "./src/deltat/deep-time.cjs" },

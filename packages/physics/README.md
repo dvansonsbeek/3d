@@ -31,7 +31,7 @@ runs are first-class):
 
 ```js
 const { createEclipseFinders } = require('@essrt/physics/eclipse/finders');
-const { createPredictivePrecession } = require('@essrt/physics/planets/predict');
+const { createMoonSeries } = require('@essrt/physics/moon/series');
 ```
 
 **TypeScript**: the package ships declaration files (`types/`, one per

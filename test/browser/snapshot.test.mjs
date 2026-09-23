@@ -98,19 +98,17 @@ const measured = await s.page.evaluate(({ YEARS, EPOCHS_MA, MOON_JDS, MOON_DEEP_
   for (const [k, n] of Object.entries(a)) v[`anchor.${k}`] = n;
 
   // Cycles-tab perihelion breakdown (doc 13 §1.8): the lattice (ecliptic) rate,
-  // the equatorial projection excess, the obliquity-rate term, the scene
-  // coupling and the Earth-frame RA rate at J2000 for all seven planets, plus
-  // Mercury's relativistic advance from the model constants. The registry keys
-  // and tools/verify/perihelion-projection-closure.js carry the same numbers;
+  // the equatorial projection excess, the obliquity-rate term and the
+  // Earth-frame RA rate (= their sum since plan 06 R8 retired the fitted
+  // surrogate) at J2000 for all seven planets, plus Mercury's relativistic
+  // advance from the model constants. The registry keys
+  // (tools/docs/model-values.mjs predictiveMachinery) carry the same numbers;
   // this pins the browser's own evaluation of them.
   for (const p of ['mercury', 'venus', 'mars', 'jupiter', 'saturn', 'uranus', 'neptune']) {
     const b = T.perihelionFrameBreakdown(p, 2000);
     v[`periFrames.${p}.lattice@2000`] = b.lattice;
     v[`periFrames.${p}.projection@2000`] = b.projection;
     v[`periFrames.${p}.obliquityTerm@2000`] = b.obliquityTerm;
-    v[`periFrames.${p}.coupling@2000`] = b.coupling;
-    v[`periFrames.${p}.markerOffset@2000`] = b.markerOffset;
-    v[`periFrames.${p}.kappa@2000`] = b.kappa;
     v[`periFrames.${p}.projectedRa@2000`] = b.projectedRa;
     v[`periFrames.${p}.earthFrame@2000`] = b.earthFrame;
   }

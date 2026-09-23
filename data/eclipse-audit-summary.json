@@ -432,7 +432,7 @@
       "packages/physics/src/moon/series-extension.cjs": "sha256:d295a78eaedb0246ff142ed726c57ec2353d183c0ccbd3d767157f19623c6461",
       "packages/physics/src/moon/series.cjs": "sha256:044185825129b0a37619882c2eaa7ded446d35b8994c5a2b6a5d0cd56d13ee4d",
       "public/input/astro-reference.json": "sha256:0eaf28f93a87f92f5749c0e8aa918202b0aafcf8fdc67044a94c50accba37c57",
-      "public/input/fitted-coefficients.json": "sha256:876a779e985879f1a3824a7a40d2b07a266c3b451bedb7da98e477d7f30b4802",
+      "public/input/fitted-coefficients.json": "sha256:64b475ba9ee5d08101165f981e07f059ebe86f22a9a98deefa6450338525eba1",
       "public/input/lunar-eclipses-nasa.json": "sha256:2b0f6d1b4dab2d1e8a432a812b027631cfecde9714ce0600f030da5e2a2a792e",
       "public/input/lunar-eclipses-stephenson-2016.json": "sha256:ed8040ef4d688023ca38c1c8eac83b40bc36f75edb0894ba46dd04f2aed32fe6",
       "public/input/model-parameters.json": "sha256:c90f564c593e45c4e36974927227bdcf40ea010f23284b1e5e16cef488dc2d3a",
