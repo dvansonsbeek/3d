@@ -14500,7 +14500,7 @@ function createInspectorPanel() {
       </div>
       <div class="hi-section hi-live-section">
         <div class="hi-section-title">Orbit geometry <span style="color:#4caf50; font-size:10px;">(live)</span></div>
-        <div class="hi-live-content" style="font-family: var(--pl-mono-font);"></div>
+        <div class="hi-live-content"></div>
       </div>
       <div class="hi-section hi-legend-section">
         <div class="hi-section-title">Visual Legend</div>

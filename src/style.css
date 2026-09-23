@@ -1812,14 +1812,15 @@ a:link {
 /* Property grid */
 .hi-props {
   display: grid;
-  grid-template-columns: 140px 1fr;
+  grid-template-columns: minmax(0, 1fr) max-content;   /* R10: labels wrap in their column, values never overlap them */
   gap: 4px 12px;
   font-size: 12px;
+  align-items: baseline;
 }
 
 .hi-props .hi-key {
   color: rgba(255, 255, 255, 0.6);
-  white-space: nowrap;
+  white-space: normal;
 }
 
 .hi-props .hi-val {
