@@ -47155,8 +47155,8 @@ const planetStats = {
 
     {header : '—  Orbital Orientation to Invariable Plane —' },
       {label : () => `Ascending Node on Inv. Plane (Ω)`,
-       value : [ { v: () => _kcAscNodeInvPlaneSSDeg('earth', o.julianDay), dec:4, sep:',' },{ small: 'degrees (°)' }],
-       hover : [`The chain's node of date on the engine's own invariable plane, in the Souami & Souchay (2012) longitude origin (the plane's ascending node on the ICRF equator) — derived conversion, zero fitted constants; the remaining offset vs S&S is element class (of-date vs their mean elements)`],
+       value : [ { v: () => ascNodeInvPlaneModel(o.currentYear), dec:4, sep:',' },{ small: 'degrees (°)' }],
+       hover : [`Earth's node of date on the engine's own invariable plane — the ONE-SOURCE series route (engine orbit normal; ≡ the inclination path and the Orbital Plane Precession chart; the chain's 8-mode skeleton read here before R9 matched it at J2000 to 0.007° and wandered 4.3° rms at deep time), in the Souami & Souchay (2012) longitude origin (the plane's ascending node on the ICRF equator) — derived conversion, zero fitted constants; the remaining offset vs S&S is element class (of-date vs their mean elements)`],
        info  : 'https://en.wikipedia.org/wiki/Invariable_plane'},
       {label : () => `Descending Node on Inv. Plane`,
        value : [ { v: () => (_kcAscNodeInvPlaneSSDeg('earth', o.julianDay) + 180) % 360, dec:4, sep:',' },{ small: 'degrees (°)' }],
@@ -51602,6 +51602,15 @@ function buildPerihelionChart(planetKey, currentYear) {
   const anchor = 2000 - T / 2;
   const kCycle = Math.floor(((currentYear || startmodelYear) - anchor) / T);
   const y0 = anchor + kCycle * T;
+  // R9 (owner: "the Long-Period Cycles visual too"): EARTH's inclination and
+  // node ride the ONE-SOURCE engine route (inclInvPlaneModel /
+  // ascNodeInvPlaneModel — the engine orbit normal vs the artifact's
+  // invariable plane, the evaluator every Earth surface now shows). The
+  // chain element set gives Earth the 8-mode ζ SKELETON (the series
+  // override skips Earth by design; ~0.2° rms vs La2010 — our compression),
+  // so this chart's curve and dots sat off the rows above it. Planets keep
+  // the chain element set (their series override serves them).
+  const inclOf = (el, yr) => planetKey === 'earth' ? inclInvPlaneModel(yr) : el.inclInvPlaneDeg;
   // Series-identity guard (the owner-seen "jump came back"): the samples
   // below ride _kcChartElementsOfDate, whose smoothing needs the async
   // series artifact — a window sampled BEFORE the artifact landed cached
@@ -51618,7 +51627,7 @@ function buildPerihelionChart(planetKey, currentYear) {
       // (the ecliptic of date IS Earth's mean orbital plane — the panel
       // row's convention, owner-ruled). The J2000-frame drift the element
       // carries is a fixed-snapshot convention this display does not use.
-      yrs[i] = y; incl[i] = el.inclInvPlaneDeg; ecl[i] = planetKey === 'earth' ? 0 : el.inclEclipticDeg;
+      yrs[i] = y; incl[i] = inclOf(el, y); ecl[i] = planetKey === 'earth' ? 0 : el.inclEclipticDeg;
       if (incl[i] < incl[iMin]) iMin = i;
       if (incl[i] > incl[iMax]) iMax = i;
     }
@@ -51651,8 +51660,8 @@ function buildPerihelionChart(planetKey, currentYear) {
   const refYear = Math.round(startmodelYear);
   const elFix = _kcChartElementsOfDate(planetKey, yrToJd(refYear));
   const fixedInWindow = refYear >= y0 && refYear <= y0 + T;
-  const cx = toX(curYear).toFixed(1), cy = toY(elNow.inclInvPlaneDeg).toFixed(1);
-  const fxX = toX(refYear).toFixed(1), fxY = toY(elFix.inclInvPlaneDeg).toFixed(1);
+  const cx = toX(curYear).toFixed(1), cy = toY(inclOf(elNow, curYear)).toFixed(1);
+  const fxX = toX(refYear).toFixed(1), fxY = toY(inclOf(elFix, refYear)).toFixed(1);
   const maxX = toX(yrs[iMax]).toFixed(1), maxY = toY(incl[iMax]).toFixed(1);
   const minX = toX(yrs[iMin]).toFixed(1), minY = toY(incl[iMin]).toFixed(1);
 
@@ -51670,34 +51679,36 @@ function buildPerihelionChart(planetKey, currentYear) {
   // the two ϖ forms is the dog-leg reference-plane + origin difference,
   // the same physical direction either way). Computed from the CHART's
   // own element set so the dot readouts ride the curves.
-  const invNodeOf = (el) => convertNodeSFrameToEquatorOriginDeg(el.ascNodeInvPlaneDeg, _kcNodeOriginSSDeg());
-  // Earth's ϖ of date: the series the chart curve itself draws (its own year
-  // convention), else the certified J2000 general-precession rate — never
-  // the H/13 counter (4.3″/cy off the curve, measured).
+  const invNodeOf = (el, yr) => planetKey === 'earth'
+    ? ascNodeInvPlaneModel(yr)   // R9: the one-source node (≡ the drawer row and the inclination path)
+    : convertNodeSFrameToEquatorOriginDeg(el.ascNodeInvPlaneDeg, _kcNodeOriginSSDeg());
+  // Earth's ϖ of date: the series the chart curve itself draws (sampled at
+  // the engine year — R4b), else the certified J2000 general-precession
+  // rate — never the H/13 counter (4.3″/cy off the curve, measured).
   const periOf = (el, yr) => planetKey === 'earth'
     ? (_hybridSpinActive()
-        ? _hybridSeriesSampleAt(yr).periOfDateDeg
+        ? _hybridSeriesSampleAt(_engineYearOfSceneYear(yr)).periOfDateDeg
         : ((el.lonPeriEclipticDeg + (360 / _certifiedAxialPrecessionJ2000Years()) * (yr - 2000)) % 360 + 360) % 360)
     : el.lonPeriEclipticDeg;
   const tipFor = (who, yr, el) => `${who}: ${fmtYr(yr)}\n` +
-    `Incl. to Inv. Plane: ${el.inclInvPlaneDeg.toFixed(4)}°\n` +
+    `Incl. to Inv. Plane: ${inclOf(el, yr).toFixed(4)}°\n` +
     (planetKey === 'earth'
       ? `Ecliptic Inclination: 0° (by definition, of date)\n`
       : `Ecliptic Inclination (J2000 frame): ${el.inclEclipticDeg.toFixed(4)}°\n`) +
-    `Asc. node on Inv. Plane (Ω, S&S origin): ${invNodeOf(el).toFixed(2)}°\n` +
+    `Asc. node on Inv. Plane (Ω, S&S origin): ${invNodeOf(el, yr).toFixed(2)}°\n` +
     `Longitude of perihelion (ϖ, ${planetKey === 'earth' ? 'ecliptic of date' : 'J2000 ecliptic'}): ${periOf(el, yr).toFixed(2)}°\n` +
     `SECULAR values (the chart's smooth curves — short-period terms averaged out; each readout in its own conventional frame). The ORBIT/POSITION panel rows are the OSCULATING elements of date instead — periodic terms included — and can differ by the wiggle amplitude (Jupiter ~1° in ϖ: the Jupiter–Saturn great-inequality class).`;
   const simTip = tipFor('Simulation year', curYear, elNow);
   const fixedTip = tipFor('Reference year', refYear, elFix);
   // The red dot's visible label — the same pair.
-  const dotLabel = `Ω=${invNodeOf(elNow).toFixed(1)}° ϖ=${periOf(elNow, curYear).toFixed(1)}°`;
+  const dotLabel = `Ω=${invNodeOf(elNow, curYear).toFixed(1)}° ϖ=${periOf(elNow, curYear).toFixed(1)}°`;
   const maxTip = `Sampled maximum: ${incl[iMax].toFixed(3)}° at ${fmtYr(Math.round(yrs[iMax]))}`;
   const minTip = `Sampled minimum: ${incl[iMin].toFixed(3)}° at ${fmtYr(Math.round(yrs[iMin]))}`;
 
   return `<div class="pl-prec-viz" style="grid-column:1/-1; padding:4px 2px 2px;">
     <svg viewBox="0 0 ${W} ${Ht}" width="100%" style="display:block;overflow:visible;">
       <!-- title -->
-      <g style="cursor:help"><title>The model's own N-body chain: inclination of date (invariable-plane and ecliptic), series-governed at deep time.\nWindow = one period of the planet's dominant nodal secular mode (${modeLbl}-class, governed artifact — the Laskar name is a label, never an input).\nThe retired device drew a single cosine at the ICRF-perihelion period — that construction survives only on the no-chain bodies (doc 31).</title>
+      <g style="cursor:help"><title>The model's own N-body chain: inclination of date (invariable-plane and ecliptic), series-governed at deep time${planetKey === 'earth' ? ' — Earth on the one-source engine route (engine orbit normal vs the invariable plane), the same evaluator as the rows above and the inclination path' : ''}.\nWindow = one period of the planet's dominant nodal secular mode (${modeLbl}-class, governed artifact — the Laskar name is a label, never an input).\nThe retired device drew a single cosine at the ICRF-perihelion period — that construction survives only on the no-chain bodies (doc 31).</title>
         <text x="${W/2}" y="8" fill="#8FBC8F" font-size="7.5" font-weight="600" text-anchor="middle">Orbital Plane Precession Cycle</text>
       </g>
       <!-- legend -->
