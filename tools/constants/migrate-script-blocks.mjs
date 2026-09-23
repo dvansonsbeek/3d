@@ -41,13 +41,9 @@ const SCRIPT = join(ROOT, 'src/script.js');
  */
 const BLOCKS = [
   // (MOON_CORRECTION / MOON_CORRECTION_RESIDUAL: migrated here, then retired
-  // at plan 06 R3 item 1 — no block remains in script.js.)
-  {
-    name: 'CARDINAL_POINT_ANCHORS',
-    expected: (fit) => fit.CARDINAL_POINT_ANCHORS_ADJUSTED,
-    expr: 'FIT.CARDINAL_POINT_ANCHORS_ADJUSTED',
-    note: 'script.js uses the ADJUSTED set under the base name — renamed at the import',
-  },
+  // at plan 06 R3 item 1 — no block remains in script.js. CARDINAL_POINT_ANCHORS
+  // — the ADJUSTED set under the base name — likewise: migrated, then retired at
+  // plan 06 R4c with the D4b panel solver, its last reader.)
   {
     name: 'CARDINAL_POINT_HARMONICS',
     expected: (fit) => fit.CARDINAL_POINT_HARMONICS,

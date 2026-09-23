@@ -89,6 +89,7 @@ export function assembleModel(C: Readonly<Record<string, any>>, F: Readonly<Reco
     }>;
     cardinal: Readonly<{
         jd: (year: number, type: string) => number;
+        jdNearUT: (jdUT: number, type: string) => number;
         raDeg: (year: number, type: string) => number;
         yearLengthDays: (year: number, type: string) => number;
     }>;

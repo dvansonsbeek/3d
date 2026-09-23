@@ -755,7 +755,9 @@ function sunLongitudeCorrection(jd) { return _sunLonCorr().correctionDegAt(jd); 
 
 // ─── B5. Cardinal point harmonics (fitted) ───────────────────────────────
 // Source: public/input/fitted-coefficients.json
-const CARDINAL_POINT_ANCHORS = FIT.CARDINAL_POINT_ANCHORS_ADJUSTED;
+// (CARDINAL_POINT_ANCHORS — the ADJUSTED J2000 anchor set — left this file at
+// plan 06 R4c with the D4b panel solver, its last reader; both anchor keys
+// stay in the coefficients file as the retired device's record.)
 const CARDINAL_POINT_HARMONICS = FIT.CARDINAL_POINT_HARMONICS;
 // §10 — equation-of-centre braiding terms ({order, sin, cos}, deliberately NOT
 // the [div, sin, cos] harmonic shape: these are e(t)^n·sin(nM) with e(t) the
@@ -6133,14 +6135,16 @@ if (typeof window !== 'undefined') {
     // sun-plane normal, the same vectors the wrapper drives), and the sun's
     // readout declination. Flag-off: active=false, scalar = K device,
     // epsGeom = the K geometry — the pre-C-3 scene.
-    // D4b acceptance probe: the one-source cardinal panel at a target JD —
-    // the panel-written predictions (date/JD/RA/year-length per point) plus
-    // the runtime anchor offsets, read after a FULL update at jd.
+    // Cardinal panel probe (D4b, kept through R4c): the panel-written
+    // predictions (date/JD/RA/year-length per point) read after a FULL update
+    // at jd — since R4c the package crossings seeded at the displayed
+    // calendar year's midpoint (no runtime anchor offsets any more).
     cardinalPanelProbe: (jd) => {
       const savedJD = o.julianDay;
       jumpToJulianDay(jd);
+      _cpPanelCache.lastMs = -Infinity;   // the probe wants THIS year's rows, not the display hold
       forceSceneUpdate();
-      const r = { active: _hybridSpinActive(), cpYear: Math.floor(o.currentYear), anchorDelta: _osCardinalAnchorDelta && { ..._osCardinalAnchorDelta } };
+      const r = { active: _hybridSpinActive(), cpYear: Math.floor(o.currentYear) };
       for (const cp of ['SS', 'WS', 'VE', 'AE']) {
         r[cp] = { jd: predictions['cp' + cp + 'JD'], ra: predictions['cp' + cp + 'RA'], yearLen: predictions['cp' + cp + 'YearLen'] };
       }
@@ -44971,125 +44975,18 @@ function subSolarFromSceneAtJd(jd) {
   return { lat, lon };
 }
 
-// ─── D4b — ONE-SOURCE CARDINAL POINTS (one calculation for every era) ──────
-// The panel's cardinal dates/RA/year-lengths under the one-source movement:
-// a LOCAL inversion at the requested year — the frozen-device value seeds a
-// dec-based solve on the RENDERED scene (equinox = dec zero-crossing via
-// Newton, solstice = dec extremum via the exporter's parabolic vertex), so
-// no global chain is integrated (the rate-vs-point accumulation trap) and
-// the result follows the movement at EVERY epoch. The per-type J2000 ANCHOR
-// OFFSET (CARDINAL_POINT_ANCHORS_ADJUSTED − the scene's own year-2000
-// event, computed at runtime — no pasted numbers) absorbs the measured
-// convention split between the K-calibrated sun-longitude chain and the
-// engine e (±76 s equinoxes / ±18 s solstices, the 2Δe signature), so at
-// J2000 the panel equals the certified IAU-anchored values EXACTLY and
-// drifts only as the movement itself does. Fidelity vs the banked
-// one-source CSV (335,318 measured events): the analytic layer closes to
-// bias ~1 s / rms ~100 s; the scene polish makes the displayed values
-// exact against the rendered movement. Cached per integer year — the
-// probes (a few dozen 'light' scene updates, the umbra-meter pattern) run
-// once per year change, not per frame.
-const _OSC_SUNV = new THREE.Vector3(), _OSC_EARTHV = new THREE.Vector3(),
-      _OSC_GEO = new THREE.Vector3(), _OSC_Q = new THREE.Quaternion(), _OSC_QI = new THREE.Quaternion();
-function _osSunEqAtJd(jd) {
-  jumpToJulianDay(jd);
-  forceSceneUpdate('light');
-  sun.planetObj.getWorldPosition(_OSC_SUNV);
-  earth.planetObj.getWorldPosition(_OSC_EARTHV);
-  _OSC_GEO.copy(_OSC_SUNV).sub(_OSC_EARTHV);
-  earth.rotationAxis.getWorldQuaternion(_OSC_Q);
-  _OSC_QI.copy(_OSC_Q).invert();
-  _OSC_GEO.applyQuaternion(_OSC_QI);
-  const r = _OSC_GEO.length();
-  const decDeg = 90 - Math.acos(Math.min(1, Math.max(-1, _OSC_GEO.y / r))) * 180 / Math.PI;
-  let raDeg = Math.atan2(_OSC_GEO.x, _OSC_GEO.z) * 180 / Math.PI;   // the 6a/CSV convention
-  raDeg = ((raDeg % 360) + 360) % 360;
-  return { raDeg, decDeg };
-}
-// dec rate scale for the equinox Newton step (deg/day): n·sin ε·(1+2e·cos M).
-function _osDecRateDegPerDay(jd, sign) {
-  const yr = DEEP_TIME_MODE_ENABLED ? _jdToSIyear(jd) : (jd - startmodelJD) / meansolaryearlengthinDays + startmodelyearwithCorrection;
-  const s = _hybridSeriesSampleAt(yr);
-  const eps = s.epsDeg * Math.PI / 180;
-  return sign * (360 / 365.2422) * Math.sin(eps);   // convergence-grade; Newton polishes
-}
-function _osCardinalSolve(cp, seedJD) {
-  if (cp === 'VE' || cp === 'AE') {
-    // dec zero-crossing: ascending at VE, descending at AE
-    const sign = cp === 'VE' ? 1 : -1;
-    let jd = seedJD;
-    let probe = null;
-    for (let i = 0; i < 4; i++) {
-      probe = _osSunEqAtJd(jd);
-      const step = -probe.decDeg / _osDecRateDegPerDay(jd, sign);
-      jd += step;
-      if (Math.abs(step) < 1e-6) break;    // < 0.1 s
-    }
-    probe = _osSunEqAtJd(jd);
-    return { jd, raDeg: probe.raDeg };
-  }
-  // solstice: dec extremum — parabolic-vertex passes (the 6a method). The
-  // first stencil is WIDE: the frozen-device seed can be ~5 days off at
-  // deep time (its measured worst case), and a narrow parabola far from a
-  // cosine's vertex extrapolates poorly.
-  let jd = seedJD;
-  for (const h of [4, 0.5, 0.02]) {
-    const ym = _osSunEqAtJd(jd - h).decDeg, y0 = _osSunEqAtJd(jd).decDeg, yp = _osSunEqAtJd(jd + h).decDeg;
-    const denom = ym - 2 * y0 + yp;
-    if (Math.abs(denom) > 1e-12) jd += (h / 2) * (ym - yp) / denom;
-  }
-  const probe = _osSunEqAtJd(jd);
-  return { jd, raDeg: probe.raDeg };
-}
-let _osCardinalAnchorDelta = null;      // per-type: registry J2000 anchor − scene year-2000 event
-let _osCardinalCacheYear = null, _osCardinalCacheVals = null, _osCardinalLastMs = 0;
-// Adaptive hold (the D4b deep-time regression, owner-bisected 2026-09-16:
-// D4a 48 ms → D4b 1343 ms per full update at +300 kyr). The fixed 300 ms
-// guard is SELF-DEFEATING once one solve costs more than 300 ms — every
-// full update re-solved, and each of the ~50 solver probes jumps + rebuilds
-// the scene, so beyond the ±250 kyr integrator table the whole frame
-// collapsed. The hold now scales with the measured solve cost (10×, floor
-// 300 ms): near J2000 nothing changes; at deep travel the cardinal rows
-// refresh every few seconds instead of freezing the frame. Display cadence
-// only — the solved VALUES are untouched, and a paused epoch serves the
-// exact per-year cache immediately.
-let _osCardinalHoldMs = 300;
-function _osCardinalAt(cpYear) {
-  if (_osCardinalCacheYear === cpYear && _osCardinalCacheVals) return _osCardinalCacheVals;
-  // Fast time-lapse guard: crossing a year boundary every frame must not
-  // re-run the ~50-probe solve per frame — during rapid scrubbing the panel
-  // holds the previous year's values, then settles.
-  const nowMs = performance.now();
-  if (_osCardinalCacheVals && nowMs - _osCardinalLastMs < _osCardinalHoldMs) return _osCardinalCacheVals;
-  _osCardinalLastMs = nowMs;
-  const _saveJD = o.julianDay;
-  try {
-    if (!_osCardinalAnchorDelta) {
-      _osCardinalAnchorDelta = {};
-      for (const cp of ['SS', 'WS', 'VE', 'AE']) {
-        const raw2000 = _osCardinalSolve(cp, computeSolsticeJD(2000, cp));
-        _osCardinalAnchorDelta[cp] = CARDINAL_POINT_ANCHORS[cp] - raw2000.jd;
-      }
-    }
-    const vals = {};
-    for (const cp of ['SS', 'WS', 'VE', 'AE']) {
-      const a = _osCardinalSolve(cp, computeSolsticeJD(cpYear, cp));
-      const b = _osCardinalSolve(cp, computeSolsticeJD(cpYear + 1, cp));
-      vals[cp] = {
-        jd: a.jd + _osCardinalAnchorDelta[cp],
-        raDeg: a.raDeg,
-        yearLenDays: b.jd - a.jd,          // anchor offset cancels in the difference
-      };
-    }
-    _osCardinalCacheYear = cpYear;
-    _osCardinalCacheVals = vals;
-    _osCardinalHoldMs = Math.max(300, 10 * (performance.now() - nowMs));
-    return vals;
-  } finally {
-    jumpToJulianDay(_saveJD);
-    forceSceneUpdate('light');
-  }
-}
+// ─── Cardinal points on the panel (plan 06 R4c) ─────────────────────────────
+// The D4b ONE-SOURCE CARDINAL solver that lived here — a dec-based re-solve of
+// the four events on the RENDERED scene (Newton on the equinox zero-crossing,
+// parabolic vertex on the solstice extremum, ~50 light scene updates per
+// year) plus a per-type J2000 anchor offset against the ADJUSTED anchor set —
+// is RETIRED (docs/retired-record.md). After R4 the rendered Sun IS the
+// certified Sun, so the solve measured the package's own GEOMETRIC crossing
+// and the frozen offset carried the 2000 nutation phase into every other
+// year. The panel rows now read the ONE home (`createModel().cardinal.jdNearUT`
+// seeded at the displayed calendar year's midpoint — updatePredictions) and
+// cache per calendar year here.
+const _cpPanelCache = { year: null, vals: null, lastMs: -Infinity, holdMs: 300 };
 
 /** Great-circle distance in km between two (lat, lon) points. Uses
  * diameters.earthDiameter/2 for consistency with the rest of the
@@ -56833,12 +56730,15 @@ function updatePredictions() {
   // event solves; Σδ_X cancels the EoC spread in the mean) — the panel, the
   // chart and the rendered movement now agree. The frozen 6c device serves
   // only the pre-load fallback (the ?hybridSpin=0 opt-out is gone — plan 06 D5).
-  // o.solarYearDays = the scene-MEASURED cardinal 4-mean (the measurement
-  // instrument; feeds the internal kinematic chain). The DISPLAYED days
-  // row is assigned after solarYearSeconds below — one analytic family.
-  o.solarYearDays = (_hybridSpinActive() && _osCardinalCacheVals)
-    ? (_osCardinalCacheVals.SS.yearLenDays + _osCardinalCacheVals.WS.yearLenDays
-       + _osCardinalCacheVals.VE.yearLenDays + _osCardinalCacheVals.AE.yearLenDays) / 4
+  // o.solarYearDays (feeds the internal kinematic chain) = the ONE year-length
+  // family's tropical year of date in SI days — the same value the displayed
+  // row carries. Plan 06 R4c: it was the D4b panel's scene-MEASURED cardinal
+  // 4-mean; after R4 the rendered Sun IS the certified Sun whose mean
+  // longitude integrates this family, so "measured" and "analytic" were one
+  // evaluator read two ways (they agreed to sub-0.5 s) — the measurement
+  // instrument is retired with the D4b solver (docs/retired-record.md).
+  o.solarYearDays = _hybridSpinActive()
+    ? _cardinalYearSeconds(yearForFormula, 'MEAN') / 86400
     : computeSolarYearDaysDirect(yearForFormula);
   predictions.solarYearDays = o.solarYearDays;   // provisional; refined to the one-source family below
   o.siderealYearDays = computeSiderealYearDaysDirect(yearForFormula);
@@ -57073,36 +56973,57 @@ function updatePredictions() {
     predictions.alphaMoiFactor = o.alphaMoiFactor = earthMoiFactorAtAge(t_Ma_now);
   }
 
-  // Cardinal point predictions (solstices & equinoxes)
-  // Use integer year so values stay fixed for the entire calendar year.
-  // D4b: under the one-source movement (the default) the values come from
-  // the ONE calculation for every era — the scene-solved events with the
-  // runtime J2000 anchor offsets (see _osCardinalAt; cached per year).
-  // Before the series has loaded the frozen-device values show (the ?hybridSpin=0 opt-out is gone — D5).
+  // Cardinal point predictions (solstices & equinoxes) — the four events of
+  // the DISPLAYED calendar year, from the ONE home: the apparent crossings of
+  // the certified Sun at true UT (`createModel().cardinal`, plan 06 R1).
+  // Plan 06 R4c: (1) the YEAR COORDINATE — the panel's year is the calendar
+  // year of the displayed date (the Julian calendar before 1582: 365.25-d
+  // years), the package's `year` is the MODEL year (the SI axis, a 365.2422-d
+  // count from J2000); they part by 0.0078 d/yr, 114 yr at −5.34 Myr, where
+  // the panel showed the events of −5341772 for a date in −5341886 (owner).
+  // The rows are therefore seeded by a JD — the calendar year's midpoint —
+  // and each is the crossing nearest it (unique within ±½ tropical year), so
+  // the displayed year's own events show at every epoch. (2) The D4b scene
+  // re-solve with its frozen J2000 anchor offset is RETIRED
+  // (docs/retired-record.md): after R4 the rendered Sun IS the certified Sun,
+  // so the scene solve measured the package's own GEOMETRIC crossing (14 min
+  // before the apparent instant) and bridged it to the retired-device anchors
+  // with the 2000 nutation phase frozen in — against USNO 2000 the panel read
+  // +0.7/+0.3/−5.1/−2.7 min (VE/SS/AE/WS) where the package reads
+  // +0.04/+0.65/+0.07/−0.13 min. Cached per calendar year (8 Newton solves).
+  // Adaptive hold (carried over from the D4b solver — the deep-time regression
+  // owner-bisected 2026-09-16, and measured again here: without it the perf
+  // gate's far/in-table full-update ratio read 16.9× against the 15× limit —
+  // eight Newton solves on the deep-tier Sun per year change): a year change
+  // re-solves at most once per 10× the last solve's cost (floor 300 ms); in
+  // between the previous year's rows show. Display cadence only — the
+  // VALUES are untouched, and a paused epoch serves its exact rows.
   const cpYear = Math.floor(o.currentYear);
-  if (_hybridSpinActive()) {
-    const cv = _osCardinalAt(cpYear);
-    for (const cp of ['SS', 'WS', 'VE', 'AE']) {
-      const dt = jdToDateString(cv[cp].jd);
-      predictions['cp' + cp + 'Date'] = dt.date + ' ' + dt.time;
-      predictions['cp' + cp + 'JD'] = cv[cp].jd;
-      predictions['cp' + cp + 'RA'] = cv[cp].raDeg;
-      predictions['cp' + cp + 'YearLen'] = cv[cp].yearLenDays;
+  if (_cpPanelCache.year !== cpYear) {
+    const nowMs = performance.now();
+    if (!_cpPanelCache.vals || nowMs - _cpPanelCache.lastMs >= _cpPanelCache.holdMs) {
+      _cpPanelCache.lastMs = nowMs;
+      const cpMidJD = dateToJulianDay(cpYear, 7, 2) + 0.5;
+      const cpM = _tierModelB().cardinal;
+      const vals = {};
+      for (const cp of ['SS', 'WS', 'VE', 'AE']) {
+        const jd = cpM.jdNearUT(cpMidJD, cp);
+        vals[cp] = { jd, raDeg: cpM.raDeg(cpYear, cp), yearLenDays: cpM.jdNearUT(cpMidJD + SI_TROPICAL_YEAR_DAYS, cp) - jd };
+      }
+      _cpPanelCache.year = cpYear;
+      _cpPanelCache.vals = vals;
+      _cpPanelCache.holdMs = Math.max(300, 10 * (performance.now() - nowMs));
     }
-    predictions.cpSolsticeObliquity = _sceneEpsTargetDeg(_engineYearTT(cv.SS.jd));   // the published ε at the solstice instant (engine year — R4b)
-  } else {
-    for (const cp of ['SS', 'WS', 'VE', 'AE']) {
-      const jd = computeSolsticeJD(cpYear, cp);
-      const dt = jdToDateString(jd);
-      const ra = computeSolsticeRA(cpYear, cp);
-      const yr = computeSolsticeYearLength(cpYear, cp);
-      predictions['cp' + cp + 'Date'] = dt.date + ' ' + dt.time;
-      predictions['cp' + cp + 'JD'] = jd;
-      predictions['cp' + cp + 'RA'] = ra;
-      predictions['cp' + cp + 'YearLen'] = yr;
-    }
-    predictions.cpSolsticeObliquity = _sceneEpsTargetDeg(_engineYearTT(computeSolsticeJD(cpYear, 'SS')));   // Phase 3 S3b: the published ε at the solstice instant (engine year — R4b)
   }
+  for (const cp of ['SS', 'WS', 'VE', 'AE']) {
+    const cv = _cpPanelCache.vals[cp];
+    const dt = jdToDateString(cv.jd);
+    predictions['cp' + cp + 'Date'] = dt.date + ' ' + dt.time;
+    predictions['cp' + cp + 'JD'] = cv.jd;
+    predictions['cp' + cp + 'RA'] = cv.raDeg;
+    predictions['cp' + cp + 'YearLen'] = cv.yearLenDays;
+  }
+  predictions.cpSolsticeObliquity = _sceneEpsTargetDeg(_engineYearTT(_cpPanelCache.vals.SS.jd));   // the published ε at the solstice instant (engine year — R4b)
 
   // IAU comparison differences (Model − IAU reference)
   predictions.diffSolarDay = (predictions.lodReal - ASTRO_REFERENCE.solarDayJ2000) * 1000;

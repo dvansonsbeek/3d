@@ -151,6 +151,31 @@ within a minute in 1000–3000, where the retired device sat hours (doc 110
 §5.3). The coefficients stay in the file as the record until the cleanup
 phase.
 
+**The simulator's scene-solved cardinal panel and its J2000 anchor offset**
+(the D4b one-source cardinal panel; plan 06 R4c): the Predictions panel
+re-solved the four events on the rendered scene — the Sun's declination
+zero-crossing (equinoxes) and extremum (solstices) — and added a per-type
+offset frozen at J2000 against the ADJUSTED anchor set, so that the panel
+matched those anchors exactly in 2000. After R4 the rendered Sun IS the
+certified Sun, so the solve measured the package's own GEOMETRIC crossing
+(14 min before the apparent instant that defines an equinox) and the offset
+carried the 2000 nutation phase into every other year (±7 min); the anchors
+themselves sat +0.7/+0.3/−5.1/−2.7 min (VE/SS/AE/WS) from the USNO 2000
+instants, where the package's apparent crossings sit +0.04/+0.65/+0.07/
+−0.13 min. A second defect rode the same block: the panel asked the package
+for "year Y" with the CALENDAR year of the displayed date (the Julian
+calendar before 1582, 365.25-d years) while the package's year is the model
+year (the SI axis, a 365.2422-d count from J2000) — 0.0078 d/yr apart, 114
+yr at −5.34 Myr, where the panel showed the events of −5341772 for a date in
+−5341886 (owner). The panel now reads the ONE home seeded by a JD
+(`cardinal.jdNearUT` at the calendar year's midpoint); the scene solver, its
+offset and the `CARDINAL_POINT_ANCHORS` read left `src/script.js`; the
+internal tropical year (`o.solarYearDays`) rides the one year-length family
+instead of the scene-measured 4-mean (they agreed to sub-0.5 s: one
+evaluator read two ways). The registry `cardinalPointAnchors` VE/AE values
+(05:43 / 19:19 UT on 2000-03-20 / 09-22) are retired-device anchors 112 min
+off the real equinoxes — not observations; no runtime reads them.
+
 **The fitted Moon anchor and the "D5 derived optics"** (doc 66 §1.4 is the
 record; plan 06 R3 item 1): the mean-longitude anchor
 `moonMeeusLpCorrection` (+32.75″, Step 5c), the RA/Dec patches

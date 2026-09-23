@@ -361,13 +361,18 @@ const anomDiffSec = (anomJ2000 - ylRef.anomalisticYear) * 86400;
 check('Anomalistic year at J2000', Math.abs(anomDiffSec), 0, 5.0);
 console.log(`  Anomalistic year at J2000: ${anomJ2000.toFixed(9)} d (IAU: ${ylRef.anomalisticYear} d, diff: ${anomDiffSec >= 0 ? '+' : ''}${anomDiffSec.toFixed(3)}s)`);
 
-// ── Cardinal point JDs at J2000 (from formula, same as browser) ──
-const iauCP = { SS: 2451716.575, WS: 2451900.068, VE: 2451623.738, AE: 2451810.305 };
-console.log('  Cardinal point JDs at J2000:');
+// ── Cardinal point JDs at J2000 (informational) ──
+// Reference: the USNO "Earth's Seasons" 2000 instants (UTC, minute precision):
+// VE Mar 20 07:35 · SS Jun 21 01:48 · AE Sep 22 17:27 · WS Dec 21 13:37.
+// Plan 06 R4c: these rows used to quote the registry `cardinalPointAnchors`,
+// whose VE/AE values (05:43 / 19:19 UT) are retired-device anchors 112 min
+// off the real equinoxes — not observations; SS/WS were right.
+const usnoCP2000 = { SS: 2451716.5750, WS: 2451900.0674, VE: 2451623.8160, AE: 2451810.2271 };
+console.log('  Cardinal point JDs at J2000 (vs USNO 2000, minute precision):');
 for (const type of ['SS', 'WS', 'VE', 'AE']) {
   const jd = cardinalJD(2000, type);
-  const diffMin = (jd - iauCP[type]) * 1440;
-  console.log(`    ${type}: JD ${jd.toFixed(6)} (${jdToDate(jd)})  IAU: ${iauCP[type].toFixed(3)}  diff: ${diffMin >= 0 ? '+' : ''}${diffMin.toFixed(2)} min`);
+  const diffMin = (jd - usnoCP2000[type]) * 1440;
+  console.log(`    ${type}: JD ${jd.toFixed(6)} (${jdToDate(jd)})  USNO: ${usnoCP2000[type].toFixed(4)}  diff: ${diffMin >= 0 ? '+' : ''}${diffMin.toFixed(2)} min`);
 }
 
 // Harmonic term counts

@@ -293,7 +293,8 @@ const NOT_IN_SCRIPT = {
     + 'never quotes them',
   'astro.knownValues': 'validation targets, consumed by tools/explore/moon-cycles.js only',
   'astro.moonMeeus.elpW1T2Decomposition_arcsecPerCy2': 'ELP W1 T^2 budget — analysis only, tools/explore/v4-kpl-budget.js',
-  'astro.cardinalPointAnchors': 'Node-side anchors; script.js derives cardinal points from the scene',
+  'astro.cardinalPointAnchors': 'retired-device J2000 anchors (record only — no runtime reader since plan 06 R1/R4c; '
+    + 'the VE/AE values are 112 min off the USNO 2000 instants; the cardinal instants are createModel().cardinal)',
   'astro.yearLengthRef.iauPrecessionJ2000':
     'script.js DERIVES this at :3457 from the ratio identity '
     + 'siderealYear / (siderealYear - tropicalYear) instead of carrying the IAU catalog '

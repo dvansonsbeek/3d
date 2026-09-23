@@ -104,6 +104,13 @@ if (model.identity.counterfactual !== false) failures.push('identity: default as
   if (!(Math.abs(trop - 365.2422) < 0.001)) failures.push(`cardinal tropical year @2000: ${trop}`);
   const jdSS = model.cardinal.jd(2000, 'SS');
   if (!(Math.abs(jdSS - 2451716.575) < 0.1)) failures.push(`SS 2000 JD: ${jdSS}`);
+  // R4c: the JD-seeded form is the same Newton from a given seed — from the
+  // year form's own seed it is BIT-EXACT; from any seed within ±½ year it
+  // returns the same root to the 1e-10° residual (≤ 1e-6 d).
+  const seedSS = 2451545.0 + 79.3 + 0.25 * 365.2422;
+  if (model.cardinal.jdNearUT(seedSS, 'SS') !== jdSS) failures.push(`jdNearUT(seed) ≠ jd(2000,'SS'): ${model.cardinal.jdNearUT(seedSS, 'SS')} vs ${jdSS}`);
+  const nearMid = model.cardinal.jdNearUT(2451545.0 + 182.6, 'SS');
+  if (!(Math.abs(nearMid - jdSS) < 1e-6)) failures.push(`jdNearUT(mid-year 2000,'SS') off: ${nearMid - jdSS} d`);
 }
 
 // Lunar chain (slice-2b): the package assembly vs the engine's series probe

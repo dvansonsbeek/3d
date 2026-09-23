@@ -1328,6 +1328,28 @@ export function assembleModel(C, F, laws = {}, secularSeriesArtifact = /** @type
     if (t === undefined) throw new RangeError(`cardinal type must be VE|SS|AE|WS, got ${type}`);
     return t;
   };
+  const CARDINAL_SI_YEAR_D = 365.2422;
+  /** The crossing NEAREST a seed instant — the unique root within ±½ tropical
+   *  year of the seed (the wrapped longitude difference is the Newton residual).
+   *  Plan 06 R4c: the seed is a JD because the caller's year may live on a
+   *  different axis than the model year — the simulator's cardinal panel
+   *  labels its year with the displayed CALENDAR date (the Julian calendar
+   *  before 1582, 365.25-d years) while `year` below is the model year (the SI
+   *  axis, 365.2422-d count from J2000); the two part by 0.0078 d/yr, 114 yr at
+   *  −5.34 Myr, where the panel showed the events of −5341772 for a date in
+   *  −5341886 (owner). Seeding at the calendar year's midpoint returns that
+   *  year's own events at every epoch. @param {number} jdSeedUT @param {string} type @returns {number} */
+  const cardinalCrossingNearJdUT = (jdSeedUT, type) => {
+    const target = cardinalTargetDeg(type);
+    const RATE = 360 / CARDINAL_SI_YEAR_D;
+    let jd = jdSeedUT;
+    for (let i = 0; i < 20; i++) {
+      const d = ((((sunApparentLonDegAtJdUT(jd) - target) + 540) % 360 + 360) % 360) - 180;
+      jd -= d / RATE;
+      if (Math.abs(d) < 1e-10) break;
+    }
+    return jd - C.earthOrbital.deltaTStart / 86400;
+  };
   /** The TRUE-UT JD at which the APPARENT Sun's longitude of date equals
    *  the cardinal target in the given year — Newton on the crossing (the
    *  Sun's rate 360°/tropical year; a handful of steps from the tropical-year
@@ -1338,19 +1360,14 @@ export function assembleModel(C, F, laws = {}, secularSeriesArtifact = /** @type
    *  bridge the besselian and the registry instruments apply. Before this the
    *  published instants were 54.55 s (0.9 min) late. Against Horizons over
    *  ±3000 yr the remaining offset is the Sun's (plan 06 I2 measured).
+   *  `year` is the MODEL year (the SI axis) — see cardinalCrossingNearJdUT.
    *  @param {number} year @param {string} type @returns {number} */
   const cardinalCrossingJdUT = (year, type) => {
     const target = cardinalTargetDeg(type);
-    const SI_YEAR_D = 365.2422, RATE = 360 / SI_YEAR_D;
     // seed: Jan 1.5 of the year (J2000 = 2000 Jan 1.5) + the mean date of the
     // March equinox (day 79.3) + the quarter-turns to the target
-    let jd = j2000JD + (year - 2000) * SI_YEAR_D + 79.3 + (target / 360) * SI_YEAR_D;
-    for (let i = 0; i < 20; i++) {
-      const d = ((((sunApparentLonDegAtJdUT(jd) - target) + 540) % 360 + 360) % 360) - 180;
-      jd -= d / RATE;
-      if (Math.abs(d) < 1e-10) break;
-    }
-    return jd - C.earthOrbital.deltaTStart / 86400;
+    const seed = j2000JD + (year - 2000) * CARDINAL_SI_YEAR_D + 79.3 + (target / 360) * CARDINAL_SI_YEAR_D;
+    return cardinalCrossingNearJdUT(seed, type);
   };
 
   return Object.freeze({
@@ -1482,6 +1499,9 @@ export function assembleModel(C, F, laws = {}, secularSeriesArtifact = /** @type
     // interval between successive crossings (SI days).
     cardinal: Object.freeze({
       jd: /** @param {number} year @param {string} type @returns {number} */ (year, type) => cardinalCrossingJdUT(year, type),
+      // R4c: the crossing nearest a UT instant (a JD seed — for callers whose
+      // year coordinate is not the model year, e.g. a calendar year's midpoint).
+      jdNearUT: /** @param {number} jdUT @param {string} type @returns {number} */ (jdUT, type) => cardinalCrossingNearJdUT(jdUT, type),
       raDeg: /** @param {number} year @param {string} type @returns {number} */ (year, type) => { void year; return cardinalTargetDeg(type); },
       yearLengthDays: /** @param {number} year @param {string} type @returns {number} */ (year, type) => cardinalCrossingJdUT(year + 1, type) - cardinalCrossingJdUT(year, type),
     }),

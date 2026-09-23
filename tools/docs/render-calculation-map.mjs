@@ -378,7 +378,7 @@ function blockCardinalAnchors() {
     rows.push(`| ${t} | ${f(b, 6)} (${jdToDateString(b)}) | ${f(a, 6)} (${jdToDateString(a)}) | ${f((b - a) * 24, 3)} |`);
   }
   rows.push('');
-  rows.push('USNO 2000 instants for comparison (UTC): VE Mar 20 07:35 · SS Jun 21 01:48 (`juneSolstice2000_JD`, astro-reference) · AE Sep 22 17:27 · WS Dec 21 13:37. Plan 06 R1: NO runtime reads either anchor set any more — the shipped instants are the apparent crossings of the one Sun (`createModel().cardinal`, delegated to by script.js and tools/lib); both keys stay in the coefficients file as the retired device\'s record until the cleanup phase.');
+  rows.push('USNO 2000 instants for comparison (UTC): VE Mar 20 07:35 · SS Jun 21 01:48 (`juneSolstice2000_JD`, astro-reference) · AE Sep 22 17:27 · WS Dec 21 13:37. Plan 06 R1: NO runtime reads either anchor set any more — the shipped instants are the apparent crossings of the one Sun (`createModel().cardinal`, delegated to by script.js and tools/lib); both keys stay in the coefficients file as the retired device\'s record until the cleanup phase. (R4c closed the last reader: the simulator\'s cardinal panel had re-solved the events on the rendered scene and bridged them to the ADJUSTED set with a J2000 offset; it now reads `cardinal.jdNearUT` seeded at the displayed calendar year\'s midpoint — the model year and the calendar year part by 0.0078 d/yr, 114 yr at −5.34 Myr. The registry `cardinalPointAnchors` VE/AE values are 112 min off the USNO instants — retired-device anchors, not observations.)');
   return rows.join('\n');
 }
 
