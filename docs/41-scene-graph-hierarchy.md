@@ -173,11 +173,16 @@ Each nesting layer applies its rotation to all children, creating composite prec
 > planets to ≤0.004″ at every probed epoch out to −5.34 Myr. The K device
 > counters (`cyclesBetweenYears`, the predictive ϖ device, the balanced-year
 > formulas) keep their own SI coordinate — they are not engine reads. The
-> Moon-argument obliquity CARRIER (C·∫(ε−ε₀) inside the lunar chain,
-> `computeObliquityEarth(jdToSIyear(·))`) is a matched triple with the package
-> and rides the SI coordinate deliberately; and a pre-existing browser-vs-Node
-> Moon split at deep time (0.3″ at year 0, 7″ at ±100 kyr, 100″ at −5.34 Myr,
-> identical before and after R4b) is the Moon LONGITUDE twin, not the frame.
+> Moon-argument obliquity CARRIER (C·∫(ε−ε₀) inside the lunar chain) samples
+> ε at `2000 + t·100` with t in Julian centuries of TT from J2000 — the
+> engine-year axis already (verified R5 follow-up; an earlier note here
+> called it an SI-coordinate read, which it never was). The SI-year
+> coordinate (`jdToSIyear(jdTT)`) enters the lunar arguments only where
+> cycles are COUNTED — the chain integrals, the rate-completion table and the
+> anchors' timeline conversion — a coordinate proportional to TT, the right
+> axis for counting. The browser-vs-Node Moon split at deep time that this
+> paragraph once recorded as open was the first-frame race in the argument
+> factory (Part 8, R5), not a coordinate.
 
 ### 5.1 Earth Layer (Core)
 
