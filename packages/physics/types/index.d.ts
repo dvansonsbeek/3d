@@ -66,6 +66,7 @@ import { REFERENCE_DATA } from './constants/index.js';
 import { assembleModel } from './model.js';
 export { GENERATED as DEFAULT_CONSTANTS, CONSTANTS_HASH, MODEL_VERSION, PREPRINT_DOI, REFERENCE_DATA };
 export { FITTED_COEFFICIENTS, COEFFICIENTS_HASH } from "./constants/index.js";
+export { computeEarthFrameOfDate, solveWheelAngleForLongitude } from "./earth/frame-of-date.cjs";
 export { eccentricityFromCycles, computeEccentricityIntegrated } from "./planets/ecc-channel.cjs";
 export { buildPlanetChainsFromArtifactData, computePlanetElementsAtYear, computeHeliocentricEclipticFromElements, computePoissonArgRad, computeOsculatingElements, solveKeplerRad, computeApsidalSecularDegPerYr, ANCHOR_EPOCH_YEAR, ANCHOR_EPOCH_JD } from "./planets/keplerian-chain.cjs";
 export { computeEquatorNodeOriginSFrameDeg, convertNodeSFrameToEquatorOriginDeg } from "./planets/inv-plane-frame.cjs";

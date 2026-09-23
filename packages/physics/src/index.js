@@ -114,6 +114,9 @@ export { createChainCycleIntegrator } from './chain-cycles/index.cjs';
 export { createMoonArguments } from './moon/arguments.cjs';
 export { createMoonSeries } from './moon/series.cjs';
 export { createMoonApparent } from './moon/apparent.cjs';
+// R4 — the Earth frame of date (sun plane, equinox, spin axis from the one-source
+// sample) and the offset-circle wheel-angle solver: the scene twins' one placement.
+export { computeEarthFrameOfDate, solveWheelAngleForLongitude } from './earth/frame-of-date.cjs';
 // Phase 8.3 — the planet machinery, extracted by LAW over body records
 // (survey order: geometry → Fibonacci laws → channels → chains).
 export { derivePlanetGeometry } from './planets/geometry.cjs';

@@ -109,6 +109,14 @@ const art = {
     'data/nbody-deep-secular-modes.json',
     'data/nbody-secular-series.json',
     'data/la2004-earth-51myr-back.asc',
+    // R4 (measured): the verdict runs the hybrid on these evaluators; they
+    // were not inputs, so the banked verdict had gone stale unseen (the
+    // fitted-law rows 711″ → 529″, the deep fork rows) until an unrelated
+    // input change forced a regeneration.
+    'packages/physics/src/earth/deep-orbital-history.cjs',
+    'packages/physics/src/deltat/deep-time.cjs',
+    'packages/physics/src/earth/precession-composed.cjs',
+    'tools/lib/deep-time.js',
   ]),
 };
 fs.writeFileSync(OUT, JSON.stringify(art, null, 1) + '\n');

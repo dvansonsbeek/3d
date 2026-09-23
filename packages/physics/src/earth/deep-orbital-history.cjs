@@ -320,6 +320,14 @@ function createDeepOrbitalHistory({
       eSinPeri: e * Math.sin(periOfDateDeg * D2R),
       eCosPeri: e * Math.cos(periOfDateDeg * D2R),
       inclEclDeg: i * R2D,
+      // The orbit normal's in-plane components in the J2000 ecliptic frame
+      // (n̂ = (sin i sin Ω, −sin i cos Ω, cos i); the third component follows).
+      // With epsDeg and equinoxLonJ2000Deg these reconstruct the FULL Earth
+      // frame of date — n̂, the equinox ĝ and the spin axis ŝ — for the scene
+      // (earth/frame-of-date.cjs). Smooth and small (47″/cy): linear
+      // interpolation on the grid is exact to the ζ series' own resolution.
+      orbitNormalX: n[0],
+      orbitNormalY: n[1],
       // The equinox node (ŝ×n̂) longitude in the J2000 ecliptic frame —
       // its year-over-year retrograde advance IS the general precession of
       // date, wobble included (the n̂(t) geometry generates the equinox
@@ -420,6 +428,8 @@ function createDeepOrbitalHistory({
           eSinPeri: lerp(a.eSinPeri, b.eSinPeri),
           eCosPeri: lerp(a.eCosPeri, b.eCosPeri),
           inclEclDeg: lerp(a.inclEclDeg, b.inclEclDeg),
+          orbitNormalX: lerp(a.orbitNormalX, b.orbitNormalX),
+          orbitNormalY: lerp(a.orbitNormalY, b.orbitNormalY),
           // C1 (cubic Hermite) — linear interpolation here made the
           // realized equinox RATE piecewise-constant per grid cell (the
           // measured per-year precession staircase). Node rates come from

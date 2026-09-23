@@ -41,6 +41,7 @@
     "./earth/sidereal-year-channel": { "types": "./types/earth/sidereal-year-channel.d.cts", "default": "./src/earth/sidereal-year-channel.cjs" },
     "./earth/year-lengths": { "types": "./types/earth/year-lengths.d.cts", "default": "./src/earth/year-lengths.cjs" },
     "./earth/precession-composed": { "types": "./types/earth/precession-composed.d.cts", "default": "./src/earth/precession-composed.cjs" },
+    "./earth/frame-of-date": { "types": "./types/earth/frame-of-date.d.cts", "default": "./src/earth/frame-of-date.cjs" },
     "./moon/month-chain": { "types": "./types/moon/month-chain.d.cts", "default": "./src/moon/month-chain.cjs" },
     "./chain-cycles": { "types": "./types/chain-cycles/index.d.cts", "default": "./src/chain-cycles/index.cjs" },
     "./moon/arguments": { "types": "./types/moon/arguments.d.cts", "default": "./src/moon/arguments.cjs" },

@@ -71,6 +71,15 @@ the geometry level (twin−wheel 279″ → 0.8″). They stay registry constant
 Step 0 remains their fitter, the D2 completion's PAIRED hash fingerprints
 them, and `computeSunPositionFast` (the Step-6a instrument) plus the
 legacy A/B path (`FQ3_EXACT_SUN=0`) still apply them.
+**Status (plan 06 R4, "one Earth frame"):** the harmonics touch NO scene path
+any more, in either runtime — the Sun is placed at the certified longitude on
+the wheel from the engine's frame of date (`_applyEngineEarthFrame`), and
+`computeSunPositionFast` rides the same frame (it had been the bare K wheel
+Sun, 8–18″ from the scene Sun in 2000). The `FQ3_EXACT_SUN` / `E5_WHEEL_SUN`
+/ `SUN_HARMONICS_ENABLED` toggles are gone with the corrections they gated;
+the registry constants and this fitter remain as the record
+(`docs/retired-record.md`). Re-running Step 0 against the fast Sun would fit
+the certified Sun's own residual against its target and is not meaningful.
 
 **Status 2026-07-15:** Sun harmonic whitelist further tightened. Previously
 clause (d) `sharesFactorWithH` (gcd(d, H) > 1) admitted mid-range divisors

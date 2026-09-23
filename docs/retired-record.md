@@ -176,6 +176,32 @@ Sun and planets, and the NASA centerlines' physical floor in 1999–2026 is
 2–5″ — the model's trend ΔT against the observed one — where the retired
 anchor had produced 1.3″ by compensation.
 
+**The K Earth frame's correction stack** (doc 41 Parts 5 and 7 are the
+record; plan 06 R4 "one Earth frame"): the scene's axis, equinox, sun plane
+and Sun had been the K device wheels plus four relative corrections layered
+on them — the C-3 tilt correction (ε_geom → ε_target about the node line),
+the D4d/D4d-rev equinox-azimuth flip with its one-time J2000 pure-K anchor
+capture, the D4c apsidal-wheel delta, and the layer-B δ Newton read of the
+wheel Sun — plus the D5b plane mount of the chain planets, the FQ-3
+exact-Kepler wheel corrector, the fitted `SUN_LONGITUDE_HARMONICS` on the
+display Sun and the analytic twin `_frameworkSunLon`. Measured against JPL
+Horizons at the 2000 equinoxes the rendered Sun read −19″ (March) and +19″
+(September) in declination with the solstices exact: the K sun plane and the
+RA frame's ecliptic parted by 20.5″ at J2000, 58″ at year 0, 10′ at −3000 —
+the rendered Sun and Moon on ecliptics 10′ apart in the Babylonian era. The
+frame is now PLACED from the engine's one-source sample every frame
+(`computeEarthFrameOfDate`: the ecliptic pole of date, the equinox ĝ ∝ ŝ×n̂,
+the spin axis; the Sun at the certified longitude on the offset circle;
+`_applyEngineEarthFrame`, both twins, identical ops), the device wheels stay
+as the animation they always were, and the fast Sun path rides the same
+frame (it had been the bare K wheel Sun, 8–18″ from the scene Sun in 2000).
+After the change: ΔDec against Horizons −0.28″ / +0.19″ at the equinoxes,
+browser ≡ Node to 0.000″; the planets' JPL RMS improved on every target
+(Jupiter 19.2 → 9.5″, Neptune 20.3 → 11.5″, Venus 44.1 → 38.3″ in the
+2000–2099 window — the same plane defect had sat in their declinations).
+The registry constants of the retired harmonics and the Step-0 fitter remain
+as the record.
+
 ## What this does NOT retire
 
 The lunisolar precession clock — the recession history, the LOD/tide/ΔT

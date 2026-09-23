@@ -134,6 +134,28 @@ Each nesting layer applies its rotation to all children, creating composite prec
 
 ## Part 5: Earth Precession Layers
 
+> **Plan 06 R4 — one Earth frame.** The layers below are the model's
+> animation of Earth's cycles; they are no longer where the physics frame
+> comes from. Every frame, after the layers have animated, the engine's
+> one-source sample at the true-TT instant is turned into the Earth frame of
+> date (`@essrt/physics/earth/frame-of-date`: the ecliptic pole n̂ of date,
+> the equinox ĝ ∝ ŝ×n̂, the spin axis ŝ) and PLACED — the perihelion wheel's
+> container takes [X = ĝ, Y = n̂, Z = ĝ×n̂] (the sun plane), the apsidal wheel
+> pair turns ±ϖ_Sun(t) (the offset arm −e(t)·û toward the Sun's aphelion), the
+> Sun sits on the wheel at the angle that realizes the certified longitude on
+> the offset circle, and `earth.rotationAxis` takes [X = ŝ×ĝ, Y = ŝ, Z = ĝ]
+> (RA 0 IS the equinox of date). `_applyEngineEarthFrame` in both twins,
+> identical ops; the J2000 pose of the K device is the bridge everything is
+> placed relative to. Four relative corrections that used to sit on the K
+> geometry (tilt, equinox azimuth, apsidal delta, the δ Newton read) are gone
+> — `docs/retired-record.md` carries the record and the measured reasons: the
+> K sun plane and the RA frame's ecliptic parted by 20.5″ at J2000 and 10′ at
+> −3000, the rendered Sun −19″/+19″ in declination against Horizons at the
+> 2000 equinoxes (−0.28″/+0.19″ after). The engine sampler's time coordinate
+> is Julian years from J2000 TT — not the scene's SI-year counter, which sits
+> 10.3 d off at J2000 and drifts 0.0078 d/yr (measured as a 1.417″ frame
+> rotation when fed to the absolute equinox longitude).
+
 ### 5.1 Earth Layer (Core)
 
 The Earth object itself represents **Axial Precession**:
@@ -260,64 +282,58 @@ This 14.5-cycle offset positions the obliquity fluctuation to correctly explain 
 | startPos | `correctionSun` | June 21, 2000 alignment correction |
 | rotation tilt | -7.155° | Solar axis inclination |
 
-**The δ overlay (SW campaign).** On top of the wheel's own longitude stack
-(linear tropical rate + full Kepler EoC — exact by derivation since FQ-3, which
-retired the fitted `sunLongitudeCorrection` harmonics from this path via the
-split-completion corrector, doc 65 §The Exact-Kepler Wheel),
-`moveModel` adds one term δ = λ_certified − λ_realized — the certified E4/E5
-framework-native Sun minus the wheel's own realized longitude of date, read
-from the scene itself in the frame every validated surface uses (the Sun's
-RA/Dec in the corrected axis frame, the tilt correction applied first so the
-axis is this frame's, converted with the scene ε; two Newton passes because
-the node angle and the geocentric longitude differ by the offset-ellipse
-Jacobian) —
-applied inside the clock-convention window (full weight ≤ 3,000 yr from J2000,
-cos² taper to 20,000 yr where the TT-clock Sun would clash with the
-deliberately-UT deep-time scene). Both runtimes carry the identical block
-(`src/script.js` flag `E5_WHEEL_SUN_ENABLED`, engine env `E5_WHEEL_SUN`,
-default ON). Plan 06 layer B replaced the former analytic twin
-(`_frameworkSunLon`: the K eccentricity law, the H/16 perihelion law and its
-own mean-longitude clock): measured against the wheel it parted by 84″ around
-500 AD, 250″ at −500 and 810″ at −2500 — an error the rendered Sun carried
-1:1, invisible to the near-J2000 window it had been checked in (the umbra
-goldens cannot see it: the ground point is Moon-dominated, a Sun shift enters
-scaled by the Moon/Sun distance ratio). With the realized read the rendered
-Sun reads the certified longitude to ≤ 0.4″ across the full-weight window in
-both runtimes (−0.8″ at −3000, the fade weight); the `sceneSun.*` browser
-goldens pin it. Measured and REJECTED on the way: reading λ_realized against
-the sun-plane's node on the equator instead of the RA frame moved the Sun and,
-through the frame bridge, all seven planets by ~55″ at J2000 and tripled the
-planets' JPL RMS — that node is not the equinox the RA frame realizes (the
-two part by ~1,400″ at −3000; a finding about the K sun-plane, recorded in
-plan 06). The eclipse umbra never reads the wheel: since U1 the package
-besselian in `@essrt/physics` is the **single umbra implementation** end to
-end — the scene consumes its output.
+**The Sun on the wheel (plan 06 R4).** The Sun's wheel angle is SET, every
+frame, to the value that realizes the certified completed longitude
+`sunLonCompletedDegAtJD` (true TT: the finder-axis API plus the bridge) on the
+offset circle — two Newton steps in plain geometry
+(`solveWheelAngleForLongitude`), no scene read. The wheel's own longitude
+stack (linear tropical rate, EoC, the retired fitted harmonics and FQ-3
+corrector, the layer-B δ Newton read with its clock-convention taper) is
+superseded: the K wheel animates, the engine places. Both runtimes carry the
+identical placement (`_applyEngineEarthFrame`). Since the certified Sun is
+defined over the whole ±500 Myr domain, the former 3,000–20,000-yr taper
+between "the TT-clock Sun" and "the UT scene" is gone: every body of date —
+Sun, axis, sun plane, Moon, planets — rides one clock, true TT. Measured
+history worth keeping: the analytic twin `_frameworkSunLon` that the δ block
+fell back on parted from the wheel by 84″ around 500 AD, 250″ at −500 and
+810″ at −2500 (an error the rendered Sun carried 1:1 before layer B); reading
+the longitude against the K sun-plane's node instead of the RA frame moved the
+Sun and the chain planets ~55″ at J2000 — the two frames parted by 51.6″ at
+J2000 and ~1,470″ at −3000, which R4 resolved by placing BOTH from the engine
+(the equinox IS the sun plane's node on the equator, by construction). The
+eclipse umbra never reads the wheel: since U1 the package besselian in
+`@essrt/physics` is the **single umbra implementation** end to end — the scene
+consumes its output.
 
 **The chain frame bridge** (ecliptic-J2000 → scene world, the one rotation
 every chain planet, orbit ring, perihelion marker and Standard-Model ghost is
-placed through; `_kcDeriveFrameR` / `_kcFrameR`, identical ops) is derived at
-runtime from the scene's **frames** at the chain anchor epoch: the sun-plane
-normal as the pole, the corrected axis frame's RA = 0 direction projected onto
-that plane as the longitude origin — the origin the wheel Sun's δ block
-realizes and the RA/Dec instruments read through. Plan 06 R3 replaced the
-former **Earth-direction triad** (the chain Earth's heliocentric direction
-matched to the scene's Earth–Sun direction at two instants), a body match that
-had folded the chain Earth's +3.5″ offset from the certified Sun at J2000 (the
-chain carries no lunar equation) into every planet's placement — and, in the
-browser, the first frame's analytic-twin Sun (+11.6″ before the series artifact
-arrives) into every Standard-Model ghost: the overlay's Sun read 8.2″ where the
-certified Sun is 0.8″ from VSOP87 (the Node twin, artifact loaded
-synchronously, read 2.2″). The frames form moves the Node bridge by 2.96″ about
-the pole and 0.39″ in tilt; the browser re-derives once when the artifact
-lands. Two findings recorded with it: the scene's sun plane and the RA frame's
-ecliptic are 20.5″ apart at J2000 (the node line 51.6″ from RA = 0, the
-sun-plane finding above seen from the pole), so the rendered Sun's declination
-parts from a body on the RA-frame ecliptic by up to ±20″ near the equinoxes
-(0.3–0.5″ against JPL at the solstices, measured; no gate reads the Sun's
-declination at the equinoxes); and the Node fast Sun path
-(`computeSunPositionFast`, the Step 6a campaign instrument) carries no δ block —
-it is the K wheel Sun, 8–18″ from the certified Sun in 2000, and is not the
-scene Sun.
+placed through, and the pose the engine Earth frame is placed RELATIVE to;
+`_kcDeriveFrameR` / `_kcFrameR`, identical ops) is the scene's **J2000 pose**:
+the K device geometry at the chain anchor epoch — the sun-plane normal as the
+pole, the axis frame's RA = 0 direction projected onto that plane as the
+longitude origin — read once, with no correction. The device is deterministic
+there, so the bridge is too: nothing derived from a first frame's Sun, nothing
+to re-derive when the series artifact lands. History (plan 06 R3): the former
+**Earth-direction triad** (the chain Earth's heliocentric direction matched to
+the scene's Earth–Sun direction at two instants) was a body match that folded
+the chain Earth's +3.5″ offset from the certified Sun at J2000 (the chain
+carries no lunar equation) into every planet's placement — and, in the browser,
+the first frame's analytic-twin Sun (+11.6″ before the series artifact arrives)
+into every Standard-Model ghost: the overlay's Sun read 8.2″ where the certified
+Sun is 0.8″ from VSOP87. R3's frames form fixed that and exposed the next
+defect: the K sun plane and the RA frame's ecliptic were 20.5″ apart at J2000
+(the node line 51.6″ from RA = 0), 58″ at year 0 and 10′ at −3000 — the
+rendered Sun −19″/+19″ in declination against Horizons at the 2000 equinoxes
+(0.3–0.5″ at the solstices), the rendered Sun and Moon on ecliptics 10′ apart in
+the Babylonian era, and the planets' JPL declinations carrying the same tilt.
+R4 placed the whole Earth frame from the engine (Part 5), so the two planes are
+one and a second Moon bridge is no longer needed. After R4, against Horizons:
+ΔDec −0.28″ (March) / +0.19″ (September) at the 2000 equinoxes, browser ≡ Node
+to 0.000″; the planets' 2000–2099 JPL RMS improved on every target (Jupiter
+19.2 → 9.5″, Neptune 20.3 → 11.5″, Venus 44.1 → 38.3″, Mercury 25.2 → 20.1″).
+The Node fast Sun path (`computeSunPositionFast`, the Step 6a instrument) rides
+the same frame — before R4 it was the bare K wheel Sun, 8–18″ from the scene
+Sun in 2000; the 6a2 window CSV is re-based on it.
 
 ---
 

@@ -537,7 +537,7 @@ hybrid and the K law at the exact years):
 
 dε/dt at J2000 (″/cy): hybrid series -46.80 (the published ε, S3b) · K law -46.82 (the device) · IAU 2006 -46.84 · banked verdict integrations: era-tier ζ -48.00, full-tier ζ -38.91 (data/obliquity-hybrid-verdict.json).
 α at J2000 (″/yr): p₀/cos ε₀ = 54.811 with p₀ = 1,296,000/(H/13) (the form the registry and the shipped hybrid use) · 54.811 in the verdict artifact (ψ̇ = the of-date beat 50.288 ″/yr) — the two J2000 precession readings of chain 2, finding 2.
-Banked window rms vs La2004 (″), hybrid / fitted K law: ±13 kyr 50 / 711 · ±50 kyr 427 / 2721 · ±130 kyr 488 / 2243 · ±270 kyr 490 / 2919 (era-tier ζ). La2004 is a THEORY reference, not an observation.
+Banked window rms vs La2004 (″), hybrid / fitted K law: ±13 kyr 50 / 529 · ±50 kyr 427 / 389 · ±130 kyr 488 / 380 · ±270 kyr 490 / 433 (era-tier ζ). La2004 is a THEORY reference, not an observation.
 <!-- /generated:calcmap-obliquity-values -->
 
 The beat at the deep anchors, both ψ̇ readings:

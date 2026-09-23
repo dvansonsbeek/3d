@@ -165,6 +165,7 @@ function createOneSourceMovement() {
   };
 
   return {
+    sampleAt,                        // the full bundle at a year (R4 Earth frame: ε, e, ϖ, equinox, orbit normal)
     epsDeg: (year) => sampleAt(year).epsDeg,
     e: (year) => sampleAt(year).e,
     periOfDateDeg: (year) => sampleAt(year).periOfDateDeg,   // equinox-referenced ϖ of date (D4c wheel flip)

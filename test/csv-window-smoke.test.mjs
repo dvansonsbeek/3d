@@ -23,10 +23,12 @@
  * full-CSV compare caught the tracked 6a CSV stale against the
  * post-C-4b movement arcs (D4c/D4d-rev; SS@−997 off by 2.9 h).
  *
- * SCOPE NOTE. The 6a instrument is computeSunPositionFast — it does NOT
- * carry the E5 wheel-Sun δ (that lives only in moveModel), so
- * scene-display work (e.g. the lunar-equation injection) does not move
- * this measurement; only the movement itself does.
+ * SCOPE NOTE. The 6a instrument is computeSunPositionFast. Since plan 06 R4
+ * it rides the SAME engine Earth frame as the full scene (sun plane, apsidal
+ * wheel, the Sun at the certified longitude, the axis —
+ * _applyEngineEarthFrame), so it IS the scene Sun: before R4 it was the bare
+ * K wheel Sun, 8–18″ from the scene Sun in 2000 (measured), and no δ block
+ * ever ran here. The R4 re-base of the 6a2 window is that change.
  *
  * WINDOW + WARM-UP. The exporter chains each year's event search off the
  * previous year's JD; a windowed run starts cold, so the first

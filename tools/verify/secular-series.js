@@ -631,6 +631,15 @@ const artifact = {
     'tools/explore/lattice-long-window-test.mjs',
     'tools/verify/secular-series.js',
     'packages/physics/src/earth/deep-orbital-history.cjs',
+    // R4 (measured): the VERDICT block runs the hybrid on the deep-time
+    // evaluators — the composed lunisolar rate and the unit H(t) — and the K
+    // device fork rows on tools/lib/deep-time.js. They were not inputs, so the
+    // banked verdict had gone stale unseen (deep200KyrRmsDeg 0.0051 → 0.0048,
+    // the −100 Ma fork rows moved by ~1° of ε) until an unrelated input
+    // change forced this regeneration. The series VALUES were bit-identical.
+    'packages/physics/src/deltat/deep-time.cjs',
+    'packages/physics/src/earth/precession-composed.cjs',
+    'tools/lib/deep-time.js',
     'data/nbody-deep-secular-modes.json',
   ]),
 };

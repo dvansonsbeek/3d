@@ -44,75 +44,9 @@ function _phaseCycles(year, divisor_N) {
   return (year - C.balancedYear) * divisor_N / C.H;
 }
 
-// ─── Framework-native Sun ecliptic longitude (Kepler + framework harmonics) ─
-// Returns Sun's ecliptic longitude in framework's ICRF (J2000-fixed) frame,
-// in degrees [0, 360). Uses:
-//   - Framework's tropical year (snapshot: fixed; integrated: mid-point of H(t) evolution)
-//   - Framework's eccentricity harmonic (varies at H/16 perihelion cycle)
-//   - Framework's perihelion precession (H/16)
-//   - Kepler higher-order Equation of Center (to e⁴)
-// NO Meeus polynomial. NO T²/T³ secular artifacts.
-// Deep-time-safe: bounded at all epochs. Mode-aware via _phaseCycles.
-function _frameworkSunLon(jd_ut) {
-  const _d2r = Math.PI / 180;
-  // Scene consistency: use jd_UT directly, no TT shift. Framework's scene Sun
-  // advances linearly in UT time (2π per T_trop UT days). Applying ΔT would
-  // put us at TT which mismatches scene by rate × ΔT (~12° drift at year 20000
-  // where framework ΔT ≈ 1M seconds). Empirically verified: scene at Y=+20000
-  // Jun 15 = 235.30°, no-ΔT formula = 235.22° (0.08° gap); with-ΔT was 246.65°.
-  // Meeus's own _eclSunLon still applies ΔT internally (canonical for eclipse
-  // detection where Sun-Moon geometry needs both bodies on the same TT clock).
-  const year = C.jdToYear(jd_ut);
-
-  // ── Mean longitude (linear rate; framework's tropical year) ────────────
-  const days_from_j2000 = jd_ut - C.j2000JD;
-  let T_tropical_days;
-  if (DEEP_TIME_ENABLED) {
-    // Midpoint approximation: (T_j2000 + T_now) / 2
-    // At Devonian ~71 ppm drift → sub-arcsec Sun position error over span
-    const t_Ma = (2000 - year) / 1e6;
-    const T_now = DT.meanTropicalYearDaysAtAge(t_Ma);
-    T_tropical_days = 0.5 * (C.meanSolarYearDays + (T_now || C.meanSolarYearDays));
-  } else {
-    T_tropical_days = C.meanSolarYearDays;
-  }
-  const L0_j2000_deg = C.ASTRO_REFERENCE.sunMeanLongitudeJ2000_deg;   // Sun mean lon at J2000 (astro-reference.json — was a duplicated 280.46646 literal, value-identical)
-  const L_deg = L0_j2000_deg + 360 * days_from_j2000 / T_tropical_days;
-
-  // ── Perihelion longitude (H/16 cycle; framework's precession) ──────────
-  // Sun's geocentric perihelion = Earth's heliocentric perihelion + 180°
-  const perihelion_j2000_deg =
-    (C.ASTRO_REFERENCE.earthPerihelionLongitudeJ2000 + 180) % 360;
-  const cyclesNow_16   = _phaseCycles(year, 16);
-  const cyclesJ2000_16 = _phaseCycles(2000, 16);
-  const perihelion_deg = perihelion_j2000_deg
-                       + 360 * (cyclesNow_16 - cyclesJ2000_16);
-
-  // ── Mean anomaly ───────────────────────────────────────────────────────
-  const M_rad = (L_deg - perihelion_deg) * _d2r;
-
-  // ── Eccentricity: the model's ONE law (unification) — the H/3 line with
-  // base' derived from e(J2000); twin of src/script.js _eclSunLon and of
-  // packages/physics model.js eccentricityAt. (The H/16 law-of-cosines form
-  // that used to sit here belongs to ϖ, not e — doc 108.)
-  const e = OE.computeEccentricityEarth(year);
-
-  // ── Equation of Center (Kepler higher-order, to e⁴) ────────────────────
-  const e2 = e * e, e3 = e2 * e, e4 = e3 * e;
-  const _rad2deg = 180 / Math.PI;
-  const C_eq_deg = ((2 * e - e3 / 4) * Math.sin(M_rad)
-                 + (1.25 * e2 - 11 / 24 * e4) * Math.sin(2 * M_rad)
-                 + (13 / 12 * e3) * Math.sin(3 * M_rad)
-                 + (103 / 96 * e4) * Math.sin(4 * M_rad)) * _rad2deg;
-
-  // ── Sun ecliptic longitude ─────────────────────────────────────────────
-  // Result is in the same frame as framework's kinematic Sun (RA/Dec output
-  // of computeSunPositionFast converted via IAU obliquity). No extra H/5
-  // precession offset — framework's kinematic Sun's inertial position does
-  // not accumulate H/5 in its RA/Dec output at the precision this replaces.
-  const lambda = L_deg + C_eq_deg;
-  return ((lambda % 360) + 360) % 360;
-}
+// (R4: the analytic twin _frameworkSunLon — the K-law Sun the E5 δ block fell
+// back on — is retired with the δ block; the scene Sun is the certified
+// longitude placed on the wheel, _applyEngineEarthFrame.)
 
 // ═══════════════════════════════════════════════════════════════════════════
 // Framework-native lunar fundamental arguments — mirror of src/script.js
@@ -591,7 +525,7 @@ class Node {
     this.worldMatrix = new Mat4();
     this.children = [];
     this.parent = null;
-    this.extraMatrix = null;               // one-source tilt hook (see updateWorldMatrix)
+    this.worldRotOverride = null;          // R4 Earth frame: [X, Y, Z] world-frame unit columns (see updateWorldMatrix)
   }
 
   addChild(child) {
@@ -602,12 +536,27 @@ class Node {
 
   updateWorldMatrix() {
     this.localMatrix.compose(this.px, this.py, this.pz, this.rx, this.ry, this.rz);
-    // One-source tilt correction hook (C-4b): an optional PRE-multiplied
-    // local matrix — the exact Node twin of the browser's wrapper Group
-    // (a parent-frame rotation about this node's origin). null when the
-    // one-source option is off; nothing else ever sets it.
-    if (this.extraMatrix) {
-      this.localMatrix.multiplyMatrices(this.extraMatrix, this.localMatrix);
+    // R4 — THE ENGINE EARTH FRAME (mirror of the browser's quaternion write):
+    // a node carrying `worldRotOverride` takes that WORLD rotation exactly,
+    // position kept — its local rotation becomes Rpᵀ·W with Rp the parent's
+    // world rotation. The K rotation composed above is superseded (the
+    // device layers keep animating for their visuals; the physics frame is
+    // placed from the engine). Nothing else sets it.
+    if (this.worldRotOverride) {
+      const W = this.worldRotOverride;
+      const e = this.localMatrix.e;
+      if (this.parent) {
+        const p = this.parent.worldMatrix.e;
+        // local column j = Rpᵀ · W[j]   (Rp rows are p[0],p[4],p[8] / p[1],p[5],p[9] / p[2],p[6],p[10])
+        for (let j = 0; j < 3; j++) {
+          const w = W[j];
+          e[4 * j]     = p[0] * w[0] + p[1] * w[1] + p[2] * w[2];
+          e[4 * j + 1] = p[4] * w[0] + p[5] * w[1] + p[6] * w[2];
+          e[4 * j + 2] = p[8] * w[0] + p[9] * w[1] + p[10] * w[2];
+        }
+      } else {
+        for (let j = 0; j < 3; j++) { e[4 * j] = W[j][0]; e[4 * j + 1] = W[j][1]; e[4 * j + 2] = W[j][2]; }
+      }
     }
     if (this.parent) {
       this.worldMatrix.multiplyMatrices(this.parent.worldMatrix, this.localMatrix);
@@ -716,57 +665,24 @@ function _jdFromPosTools(pos) {
   return j === null ? C.startmodelJD + pos * _epochCache.mSY : j;
 }
 
-// 9-1 S-P8: the fitted sun-longitude harmonic stack lives ONCE in
-// @essrt/physics/sun/longitude-correction (J2000-fixed deps — the fitted
-// convention). This engine's TWO former inline copies (moveModel + the
-// fast animator) both delegate through this lazy factory.
-const { createSunLongitudeCorrection } = _req('@essrt/physics/sun/longitude-correction');
-// SW-1 EXPERIMENT (scene-wheel Sun unification): E5_WHEEL_SUN=1 makes the
-// moveModel Sun node ride the CERTIFIED tier Sun via one δ term (see the
-// moveModel sun block); computeSunPositionFast is deliberately untouched
-// (the Step-6a fit instrument — SW-0 measured the fits invariant anyway).
-const _E5_WHEEL_SUN = process.env.E5_WHEEL_SUN !== '0';   // default ON (mirrors the browser flag); E5_WHEEL_SUN=0 restores legacy
-// FQ-3 W1 (plan §12i FQ-3): exact-Kepler wheel Sun. The raw wheel realizes
-// the split composition (parent center-offset + half-EoC at e−base/2),
-// which sits 279.0″ annual + 8.96″ semi from full Kepler — the content the
-// fitted SUN_LONGITUDE_HARMONICS were absorbing (W0 attribution: the match
-// is exact to 0.1″, incl. the 61.8″ quadrature from the realized offset
-// direction). With this flag ON the sun node applies the DERIVED corrector
-// Δ = EoC_full(e) − EoC_half(e−base/2) − geoTerm(offset vector, live parent
-// phases) in θ-space with the first-order Jacobian, and the fitted
-// harmonics are retired from this display path (registry constants stay;
-// computeSunPositionFast is the declared Step-6a instrument and keeps the
-// legacy geometric wheel). Zero fitted constants; every input is the
-// branch's own live value, so the form holds in both epoch modes.
-const _FQ3_EXACT_SUN = process.env.FQ3_EXACT_SUN !== '0'; // default ON; FQ3_EXACT_SUN=0 restores the fitted-correction path
+// R4: the Sun's display path is the certified longitude placed on the wheel
+// (_applyEngineEarthFrame). The E5 δ experiment flag, the FQ-3 exact-Kepler
+// corrector flag and the fitted SUN_LONGITUDE_HARMONICS on the Sun node are
+// retired from this engine (docs/retired-record.md); the registry constants
+// and the Step-0 fitter remain as the record. The certified tier model:
 let _e5TierM = null;
 function _e5Tier() {
   if (!_e5TierM) {
     // Plan 06 R1 (measured): createModel() WITHOUT the shipped secular-series
     // artifact builds the hybrid on the ζ-mode tail — a DIFFERENT certified
     // Sun from the API's and the audit's (75″ at 0 AD, 168″ at −1000, 377″ at
-    // −2500 in λ; the recorded 3c trap, third instance). The overlay's target
+    // −2500 in λ; the recorded 3c trap, third instance). The scene's target
     // Sun is the shipped configuration.
     let artifact;
     try { artifact = require('../../data/nbody-secular-series.json'); } catch { artifact = undefined; }
     _e5TierM = _req('@essrt/physics').createModel(undefined, artifact ? { secularSeriesArtifact: artifact } : undefined);
   }
   return _e5TierM;
-}
-let _sunLonCorrM = null;
-function _sunLonCorr() {
-  if (!_sunLonCorrM) {
-    _sunLonCorrM = createSunLongitudeCorrection({
-      hYears: C.H,
-      balancedYear: C.balancedYear,
-      j2000JD: C.j2000JD,
-      meanDeg: C.SUN_LONGITUDE_MEAN || 0,
-      harmonics: C.SUN_LONGITUDE_HARMONICS,
-      nNodalJ2000: C.N_nodalI,
-      nApsidalJ2000: C.N_apsidalI,
-    });
-  }
-  return _sunLonCorrM;
 }
 
 function _syncEpochForJD(jd) {
@@ -1224,189 +1140,15 @@ function _oneSourceM() {
 function _osmYearForJD(jd, linearYear) {
   return DEEP_TIME_ENABLED ? _jdToSIyearTools(jd) : linearYear;
 }
-// The tilt correction (mirror of src/script.js updatePredictions' wrapper
-// block): read the K geometry (rotAxis world Y vs barycenter-pivot world Y —
-// no scale anywhere, so the matrix Y columns ARE the rotated unit vectors),
-// rotate about û = a×n by (ε_geom − ε_target) in world, expressed in the
-// parent frame as Rpᵀ·K·Rp. COST CONTRACT (the Step-6a exporter runs this
-// per probe): the caller clears extraMatrix BEFORE its own full
-// updateWorldMatrix (that pass IS the reset — see the clears at the top of
-// moveModel / computeSunPositionFast), and the final recompute touches only
-// the rotAxis LEAF — the Sun and barycenter are NOT under rotAxis (measured;
-// rotAxis has no children), so nothing else changes. Self-clears when off.
-// D4c — THE APSIDAL-WHEEL FLIP: the last scene-K element. The wheel pair
-// (earthPeriPrec1/2, the constant-rate H/16 device) keeps its K animation,
-// and under the one-source option a RELATIVE correction rotates it onto the
-// engine's ϖ(t): Δrel = Δϖ_engine − Δphase_K, both measured from J2000 —
-// zero at J2000 by construction (era continuity; the anchor is captured at
-// runtime, no pasted numbers). Applied to θ_p1 (+) and θ_p2 (−, the exact
-// mirror — preserving the barycenter frame's net-zero rotation) AND to the
-// Sun's EoC mean-anomaly phase (the offset direction and the EoC phase must
-// never disagree — the 6c anomalistic blowup was that disagreement,
-// measured). Deep-time-ON only: the K phase term uses the integrated ∫1/H
-// wheel form; under SG_DEEP_TIME=0 the wheel stays K (the documented
-// snapshot-mode caveat class). Wrapped ϖ is safe — the wheel angle enters
-// only trigonometrically (S¹), so 360° branch jumps are invisible.
-let _osmPeriAnchor = null;   // {engDeg, cyc} at J2000, captured once
-function _osmPeriDeltaRad(jd, currentYear) {
-  if (!DEEP_TIME_ENABLED) return 0;
-  const M = _oneSourceM();
-  if (!_osmPeriAnchor) {
-    const y2000 = C.startModelYearWithCorrection + _posFromJDTools(2451545.0);
-    _osmPeriAnchor = {
-      engDeg: M.periOfDateDeg(_osmYearForJD(2451545.0, y2000)),
-      cyc: DT.cyclesBetweenYears(C.balancedYear, y2000, 16) ?? 0,
-    };
-  }
-  const dEng = (M.periOfDateDeg(_osmYearForJD(jd, currentYear)) - _osmPeriAnchor.engDeg) * d2r;
-  const cycNow = DT.cyclesBetweenYears(C.balancedYear, currentYear, 16);
-  const dK = ((cycNow ?? 0) - _osmPeriAnchor.cyc) * 2 * Math.PI;   // PeriPrec1 sign +1
-  return dEng - dK;
-}
-
-// D4d — THE EQUINOX-PHASE FLIP (the actual last scene-K element, found by
-// the tropical-year-vs-CSV comparison: the C-3 wrapper preserved the node
-// line BY DESIGN, so the scene's axial-precession phase stayed on the K
-// H/13 wheel — measured as ±45-60 s of mean-tropical-year structure in the
-// deep bands vs the hybrid's own equinox). Same relative construction as
-// the D4c apsidal flip: Δψ = Δλ_eq,hybrid − Δphase_K(H/13), both measured
-// from J2000 (runtime anchor, zero at J2000 by construction; the K wheel
-// is RETROGRADE, sign −1, exactly the earth _dtCycleN=13 device). Applied
-// as an azimuth rotation about the sun-plane normal BEFORE the ε
-// correction about the resulting node line. Deep-time-ON only.
-// D4d-rev (the K-reference correction, measured): the K term must be the K
-// scene's FULL geometric equinox motion — the analytic H/13 wheel alone
-// under-subtracts the K plane-wheels' node contribution (the K-analog
-// planetary term, measured 0.057″/yr = the residual −1.2 s of tropical
-// year). So the K reference is now READ FROM THE GEOMETRY: the azimuth of
-// the uncorrected node line û = a×n against the fixed world-x reference
-// projected into the plane, J2000-anchored by a one-time guarded capture
-// (a nested pure-K evaluation at J2000 — corrections are off while
-// capturing, and the capture runs BEFORE the caller's own animation so the
-// graph state is naturally restored by it).
-let _osmEqxGeoAnchor = null;    // {lamK2000Rad, hyb2000Deg}
-let _osmEqxFrameHybRad = null;  // per-frame wrapped hybrid equinox advance since J2000 (rad)
-let _osmCapturing = false;
-function _osmNodeAzimuthRad(ax, ay, az, nx, ny, nz) {
-  let ux = ay * nz - az * ny, uy = az * nx - ax * nz, uz = ax * ny - ay * nx;
-  const ul = Math.hypot(ux, uy, uz);
-  if (ul < 1e-12) return 0;
-  ux /= ul; uy /= ul; uz /= ul;
-  // world-x projected into the plane as the azimuth origin
-  let xx = 1 - nx * nx, xy = -nx * ny, xz = -nx * nz;
-  const xl = Math.hypot(xx, xy, xz);
-  xx /= xl; xy /= xl; xz /= xl;
-  const yx = ny * xz - nz * xy, yy = nz * xx - nx * xz, yz = nx * xy - ny * xx;
-  return Math.atan2(ux * yx + uy * yy + uz * yz, ux * xx + uy * xy + uz * xz);
-}
-function _osmEqxPrep(jd, currentYear) {
-  if (!DEEP_TIME_ENABLED || _osmCapturing) { _osmEqxFrameHybRad = null; return; }
-  const M = _oneSourceM();
-  if (!_osmEqxGeoAnchor) {
-    _osmCapturing = true;
-    try {
-      computeSunPositionFast(2451545.0);   // pure-K J2000 state (all one-source corrections guarded off)
-      const g = getGraph();
-      const ae = g.earthNodes.rotAxis.worldMatrix.e, ne = g.barycenter.pivot.worldMatrix.e;
-      const lamK2000 = _osmNodeAzimuthRad(ae[4], ae[5], ae[6], ne[4], ne[5], ne[6]);
-      const y2000 = C.startModelYearWithCorrection + _posFromJDTools(2451545.0);
-      _osmEqxGeoAnchor = {
-        lamK2000Rad: lamK2000,
-        hyb2000Deg: M.equinoxLonJ2000Deg(_osmYearForJD(2451545.0, y2000)),
-      };
-    } finally { _osmCapturing = false; }
-  }
-  const dHybDeg = ((M.equinoxLonJ2000Deg(_osmYearForJD(jd, currentYear)) - _osmEqxGeoAnchor.hyb2000Deg + 540) % 360) - 180;
-  _osmEqxFrameHybRad = dHybDeg * d2r;
-}
-
-const _OSM_MAT = new Mat4();   // reused scratch — all 9 rotation entries rewritten per call
-function _applyOneSourceTiltCorr(graph, year) {
-  if (_osmCapturing) return;   // the J2000 anchor capture reads PURE-K geometry
-  const ra = graph.earthNodes.rotAxis;
-  const M = _oneSourceM();
-  if (ra.extraMatrix) {
-    // Defensive: a caller that did not pre-clear — restore the K geometry
-    // for the read below (leaf-only; parent matrices are current).
-    ra.extraMatrix = null; ra.updateWorldMatrix();
-  }
-  const ae = ra.worldMatrix.e, ne = graph.barycenter.pivot.worldMatrix.e;
-  let ax = ae[4], ay = ae[5], az = ae[6];
-  { const s = Math.hypot(ax, ay, az); ax /= s; ay /= s; az /= s; }
-  let nx = ne[4], ny = ne[5], nz = ne[6];
-  { const s = Math.hypot(nx, ny, nz); nx /= s; ny /= s; nz /= s; }
-  const epsGeom = Math.acos(Math.min(1, Math.max(-1, ax * nx + ay * ny + az * nz)));
-  const epsTarget = M.epsDeg(year) * Math.PI / 180;
-  // D4d: the azimuth correction FIRST — rotate the axis about the sun-plane
-  // normal n by Δψ (the hybrid-vs-K equinox phase). The angle to n is
-  // invariant under this rotation, so εGeom needs no recompute; only the
-  // node line moves. R_total = R_tilt(û′) · R_azimuth(n).
-  const rod = (/** @type {number} */ x, /** @type {number} */ y, /** @type {number} */ z, /** @type {number} */ th) => {
-    const c = Math.cos(th), s = Math.sin(th), t = 1 - c;
-    return [
-      [t * x * x + c,     t * x * y - s * z, t * x * z + s * y],
-      [t * x * y + s * z, t * y * y + c,     t * y * z - s * x],
-      [t * x * z - s * y, t * y * z + s * x, t * z * z + c],
-    ];
-  };
-  // D4d-rev: Δψ assembled HERE — the hybrid advance (from prep) minus the
-  // K scene's FULL geometric equinox advance, both J2000-anchored. λ_K is
-  // read from the PRE-correction axis (ax,ay,az are still uncorrected).
-  let azRad = 0;
-  if (_osmEqxFrameHybRad !== null && _osmEqxGeoAnchor) {
-    let dK = _osmNodeAzimuthRad(ax, ay, az, nx, ny, nz) - _osmEqxGeoAnchor.lamK2000Rad;
-    dK = Math.atan2(Math.sin(dK), Math.cos(dK));
-    const d = _osmEqxFrameHybRad - dK;
-    azRad = Math.atan2(Math.sin(d), Math.cos(d));
-  }
-  let A = null;
-  if (azRad !== 0) {
-    A = rod(nx, ny, nz, azRad);
-    const ax2 = A[0][0] * ax + A[0][1] * ay + A[0][2] * az;
-    const ay2 = A[1][0] * ax + A[1][1] * ay + A[1][2] * az;
-    const az2 = A[2][0] * ax + A[2][1] * ay + A[2][2] * az;
-    ax = ax2; ay = ay2; az = az2;
-  }
-  let ux = ay * nz - az * ny, uy = az * nx - ax * nz, uz = ax * ny - ay * nx;
-  const ul = Math.hypot(ux, uy, uz);
-  if (ul * ul <= 1e-12) return;
-  ux /= ul; uy /= ul; uz /= ul;
-  const th = epsGeom - epsTarget;
-  let K = rod(ux, uy, uz, th);
-  if (A) {
-    // K_total = K_tilt · K_azimuth
-    const KT = [[0, 0, 0], [0, 0, 0], [0, 0, 0]];
-    for (let i = 0; i < 3; i++) for (let j = 0; j < 3; j++)
-      for (let k = 0; k < 3; k++) KT[i][j] += K[i][k] * A[k][j];
-    K = KT;
-  }
-  // Parent world rotation Rp (row-major from the column-major Mat4)
-  const pe = ra.parent.worldMatrix.e;
-  const Rp = [
-    [pe[0], pe[4], pe[8]],
-    [pe[1], pe[5], pe[9]],
-    [pe[2], pe[6], pe[10]],
-  ];
-  // X = Rpᵀ · K · Rp
-  const KR = [[0, 0, 0], [0, 0, 0], [0, 0, 0]];
-  for (let i = 0; i < 3; i++) for (let j = 0; j < 3; j++)
-    for (let k = 0; k < 3; k++) KR[i][j] += K[i][k] * Rp[k][j];
-  const X = [[0, 0, 0], [0, 0, 0], [0, 0, 0]];
-  for (let i = 0; i < 3; i++) for (let j = 0; j < 3; j++)
-    for (let k = 0; k < 3; k++) X[i][j] += Rp[k][i] * KR[k][j];
-  const e = _OSM_MAT.e;
-  e[0] = X[0][0]; e[1] = X[1][0]; e[2] = X[2][0];
-  e[4] = X[0][1]; e[5] = X[1][1]; e[6] = X[2][1];
-  e[8] = X[0][2]; e[9] = X[1][2]; e[10] = X[2][2];
-  ra.extraMatrix = _OSM_MAT;
-  ra.updateWorldMatrix();   // leaf-only: nothing else is under rotAxis
-}
+// R4 (plan 06 "one Earth frame"): the four RELATIVE corrections that used to
+// sit here on top of the K device — the tilt correction (ε_geom → ε_target
+// about the node line, C-4b), the D4d/D4d-rev equinox-azimuth flip with its
+// J2000 pure-K anchor capture, the D4c apsidal-wheel delta and the E5 δ
+// Newton read of the wheel Sun — are RETIRED. The frame is placed from the
+// engine instead (_applyEngineEarthFrame); docs/41 and docs/retired-record.md
+// carry the record and the measured reasons.
 
 function moveModel(graph, pos) {
-  // One-source cost contract: clear the tilt correction BEFORE the animation
-  // pass so the full updateWorldMatrix at the end of this function doubles as
-  // the correction's reset read (see _applyOneSourceTiltCorr). No-op when off.
-  if (graph.earthNodes.rotAxis.extraMatrix) graph.earthNodes.rotAxis.extraMatrix = null;
   // Compute dynamic eccentricities for all planets (oscillate at H/16)
   // Uses _epochCache.mSY so the pos→JD→year round-trip is consistent with
   // the caller's pos = _epochCache.sDay × (jd - C.startmodelJD).
@@ -1424,13 +1166,6 @@ function moveModel(graph, pos) {
   // PeriPrec2 geometric offset and the Sun's EoC inherit it below.
   const _osmM = _oneSourceM();
   const dynEcc = { earth: _osmM.e(_osmYearForJD(_jdFromPosTools(pos), currentYear)) };
-  // D4c: the apsidal-wheel correction — applied to the wheel pair after the
-  // layers animate, and to the Sun's EoC phase.
-  const _periDelta = _osmPeriDeltaRad(_jdFromPosTools(pos), currentYear);
-  // D4d-rev: the equinox prep (hybrid advance + the one-time J2000 K-anchor
-  // capture) runs BEFORE this call's own animation, so the capture's nested
-  // evaluation leaves no stale state behind.
-  _osmEqxPrep(_jdFromPosTools(pos), currentYear);
   // Unification: the geometric eccentricity offset (the PeriPrec2 centre)
   // carries the one law's e(t) EVERY FRAME. The planet chains replicate the
   // Sun geometrically (centre offset + circle, no equation of centre), so
@@ -1485,17 +1220,6 @@ function moveModel(graph, pos) {
     } else {
       θ = def.speed * pos - def.startPos * d2r;
     }
-    // SW-1 EXPERIMENT (E5_WHEEL_SUN=1): the wheel Sun rides the CERTIFIED
-    // tier Sun via ONE δ term ADDED ON TOP of the untouched legacy stack:
-    //   δ(jd) = λ_certified(jd) − λ_twin(jd)
-    // where λ_twin = _frameworkSunLon, the validated analytic reproduction
-    // of this scene's own Sun (UT clock, deep-time midpoint mSY, full
-    // Kepler EoC — 0.08° fidelity at Y+20000). The legacy geometry (split
-    // ellipse: parent center-offset + partial EoC − fitted correction)
-    // stays byte-identical, so δ shifts the WORLD longitude by exactly the
-    // certified-vs-twin difference — a full-EoC replacement was measured
-    // to double-count the parents' geometric ellipse share (~e·sin M, 1°).
-    const _e5SunNode = _E5_WHEEL_SUN && nodes === graph.sunNodes;
     if (C.useVariableSpeed && def.eccentricity && def.perihelionPhaseJ2000 !== undefined) {
       let e;
       if (def._eccentricityKey && dynEcc[def._eccentricityKey] !== undefined) {
@@ -1505,164 +1229,18 @@ function moveModel(graph, pos) {
       } else {
         e = def.eccentricity;                                        // Moon, Pluto, etc: static
       }
-      // D4c: the Sun's mean-anomaly phase rides the SAME engine ϖ(t) as the
-      // wheel (the _eocDerived guard keeps the planets on their own phases).
-      const perihelionPhase = def.perihelionPhaseJ2000 + (def.perihelionPrecessionRate || 0) * pos
-        + (def._eocDerived ? _periDelta : 0);
+      const perihelionPhase = def.perihelionPhaseJ2000 + (def.perihelionPrecessionRate || 0) * pos;
       const M = θ - perihelionPhase;
       θ += 2 * e * Math.sin(M) + 1.25 * e * e * Math.sin(2 * M);
       nodes._meanAnomaly = M; // Store for parallax correction use
-      if (_FQ3_EXACT_SUN && nodes === graph.sunNodes && def._eocDerived) {
-        // FQ-3 W1 — exact-Kepler wheel Sun (see the flag comment above).
-        // Δλ = EoC_full(e) − EoC_half(e−base/2) − geoTerm: the mean
-        // longitude cancels in this difference, so no anchor or frame
-        // constant enters. The offset vector is the wheel's own realized
-        // geometry, −base·û(θ_p1) + amp·û(θ_p1+θ_p2), read from the
-        // already-animated parent phases (integrated-phase correct in
-        // deep-time mode by construction); common-ancestor rotations
-        // cancel in the relative angle. Node-ry angles are λ-handed
-        // (the E5 δ block adds λ-space deltas to θ directly), so the
-        // relative angle needs NO handedness flip — only the raw
-        // world-frame atan2(z,x) extraction runs opposite λ.
-        const eF = dynEcc.earth;   // the full e(t) of the one law (node e is its half)
-        const e2F = eF * eF, e3F = e2F * eF, e4F = e3F * eF;
-        const eocFull = (2 * eF - e3F / 4) * Math.sin(M)
-          + (1.25 * e2F - (11 / 24) * e4F) * Math.sin(2 * M)
-          + ((13 / 12) * e3F) * Math.sin(3 * M)
-          + ((103 / 96) * e4F) * Math.sin(4 * M);
-        const eocHalf = 2 * e * Math.sin(M) + 1.25 * e * e * Math.sin(2 * M);
-        const th1 = graph.earthPeriPrec1.orbit.ry;
-        const th2 = th1 + graph.earthPeriPrec2.orbit.ry;
-        // Unification: the realized offset is the single arm −e(t)·û(θ_p1)
-        // (the A arm is retired; th2 stays the barycenter frame the Sun's
-        // annual angle is measured in).
-        const ox = -dynEcc.earth * Math.cos(th1);
-        const oy = -dynEcc.earth * Math.sin(th1);
-        const dOff = Math.hypot(ox, oy);
-        const dphi = Math.atan2(oy, ox) - (th2 + θ);
-        const geo = Math.atan2(dOff * Math.sin(dphi), 1 + dOff * Math.cos(dphi));
-        const Jac = 1 - (dOff * Math.cos(dphi) + dOff * dOff)
-          / (1 + 2 * dOff * Math.cos(dphi) + dOff * dOff);
-        θ += (eocFull - eocHalf - geo) / Jac;
-        nodes._fq3Applied = true;
-      } else if (nodes === graph.sunNodes) {
-        nodes._fq3Applied = false;
-      }
+      // (the FQ-3 exact-Kepler corrector and the Sun's D4c phase delta are
+      // retired with R4: the Sun's wheel angle is set from the certified
+      // longitude in _applyEngineEarthFrame — this EoC branch now serves the
+      // Moon, Pluto and the no-chain bodies only)
     }
-    // Phase Z-B (2026-06): Sun longitude harmonics applied to SUN NODE only.
-    // ────────────────────────────────────────────────────────────────────
-    // The annual correction (~280" amplitude) closes the framework's
-    // 200" Sun-vs-Meeus residual to ~7" (96% reduction). It is derived
-    // from Earth-Sun geometry (framework eccentricityDerivedMean = 0.01545
-    // vs Meeus IAU J2000 = 0.01671) and is NOT physically applicable to
-    // planets — applying at the barycenter level rotates planets too,
-    // degrading their baselines by 30-180" each.
-    //
-    // For Node-side scene-graph (this file), Sun-only is the correct fix:
-    //   - No visualization concerns (the "black spot" visual bug only
-    //     manifests in the browser scene)
-    //   - Planet baselines stay pristine
-    //   - Sun gets the full 96% Meeus improvement
-    //
-    // For src/script.js (browser scene), a different mechanism will be
-    // needed to preserve visual integrity (e.g., barycenter-level + per-
-    // planet inverse corrections, or accept the visual artifact in deep
-    // zoom views). Mirror to script.js is deferred until that's resolved.
-    //
-    // Filter: only H-lattice-compliant terms.
-    //   (a) year-multiples (integer year period),
-    //   (b) small precession divisors 1..20 (Earth's Fibonacci named cycles
-    //       H/3, H/5, H/8, H/13, H/16, etc.),
-    //   (c) lunar precession divisors (auto-tracked from Meeus anchors via
-    //       C.N_apsidalI, C.N_nodalI),
-    //   (d) mid-range divisors that share a non-trivial prime factor with H
-    //       (H = 3²·5·7451, so multiples of 3, 5, or 7451 qualify).
-    // Everything else (gcd(d,H)=1 mid-range) is design-rule violating and
-    // silently skipped.
-    const SUN_HARM_ENABLED = process.env.SUN_HARMONICS_DISABLED !== '1';
-    if (SUN_HARM_ENABLED && nodes === graph.sunNodes && C.SUN_LONGITUDE_HARMONICS
-        && !nodes._fq3Applied) {
-      // 9-1 S-P8: the filtered harmonic stack lives ONCE in @essrt/physics/
-      // sun/longitude-correction (J2000-fixed deps — the fitted convention).
-      // Recover JD via epoch-consistent mSY so pos→jd round-trip is exact.
-      // FQ-3 W1: superseded on this path when the exact-Kepler corrector
-      // applied above (the fitted terms absorbed exactly the split error
-      // the corrector now removes at the geometry level).
-      θ -= _sunLonCorr().correctionDegAt(_jdFromPosTools(pos)) * d2r;
-    }
-    if (_e5SunNode) {
-      // SW-1 (adopted form): δ = λ_certified − λ_twin, added on top of the
-      // untouched legacy stack. MEASURED: in-window wheel−certified drops
-      // to ~2.6″ annual sd; deep time collapses from 1,000–6,000″ to a
-      // ≤~100″ annual residue (the fitted correction's 365.25-day axis
-      // dephasing vs the true year — bounded, visually invisible against
-      // the Sun's 32′ disc; the exact-cancellation variant traded it for
-      // an in-window error and was reverted — see the SW campaign record).
-      // CLOCK-CONVENTION WINDOW (both endpoints DERIVED, not fitted —
-      // measured in the SW Phase-B analysis): the certified Sun lives on
-      // the TT clock (the corpus-validated E4/E5 convention); this scene's
-      // wheels are deliberately UT (see _frameworkSunLon's header). The
-      // window is the transition between the two clock regimes:
-      //   3,000 yr  = the certification boundary — where eclipse truth
-      //               (the ancient corpus) ends;
-      //   20,000 yr = where a TT-clock Sun becomes ~10°+ inconsistent
-      //               with the UT scene (rate·ΔT — the twin's own
-      //               documented 12° at Y+20000).
-      // Alternatives measured and rejected: a UT-assembled δ loses the
-      // corpus-era accuracy (0.19° at −135); no window loses the deep
-      // display consistency. The cos² shape only avoids a visible jump.
-      const _jdE5 = _jdFromPosTools(pos);
-      const _ayE5 = Math.abs(2000 + (_jdE5 - C.j2000JD) / 365.25 - 2000);
-      const _wE5 = _ayE5 <= 3000 ? 1
-        : _ayE5 >= 20000 ? 0
-        : Math.cos((_ayE5 - 3000) / (20000 - 3000) * Math.PI / 2) ** 2;
-      if (_wE5 > 0) {
-        // K8b follow-up (mirrors src/script.js): the wheel Sun rides the
-        // COMPLETED certified Sun — finder Sun minus the derived
-        // planetary-completion table (70 framework-carrier terms + the
-        // 6.44″ Earth-around-EMB "lunar equation"). Finders stay bare;
-        // the besselian keeps its own subtraction — no double count.
-        // Plan 06 layer B (measured): δ = λ_cert − λ_REALIZED — the wheel's
-        // own longitude of date read from the scene in the frame every
-        // validated surface uses: the Sun's RA/Dec in the CORRECTED axis
-        // frame (the tilt correction applied here first, so the axis is this
-        // frame's, not the previous one's), converted with the scene ε. The
-        // former analytic twin (_frameworkSunLon: K e law, H/16 ϖ, its own
-        // mean-longitude clock) parted from the wheel by 84″ around 500 AD,
-        // 250″ at −500 and 810″ at −2500 — a leak the rendered Sun carried
-        // 1:1 — while matching only near 1500–2500 where it was measured.
-        // NOT the sun-plane node line: that construction moved the Sun and
-        // the frame bridge's planets ~55″ at J2000 and tripled the planets'
-        // JPL RMS (the node of the K sun-plane on the equator is not the
-        // equinox the RA frame realizes; the two part by 1,400″ at −3000).
-        // The twin remains only where the one-source prep is unavailable.
-        const _lamCertDeg = _e5Tier().eclipse.sunLonCompletedDegAtJD(_finderAxisJdTools(_jdE5));   // R3 item 2: true TT (the bridge is the caller's)
-        let _dE5;
-        if (_osmEqxFrameHybRad !== null && _osmEqxGeoAnchor && !nodes.isEllipse) {
-          const _yE5 = _osmYearForJD(_jdE5, currentYear);
-          const epsR = _oneSourceM().epsDeg(_yE5) * d2r;
-          // The node angle θ and the geocentric longitude differ by the
-          // offset-ellipse Jacobian (dλ/dθ = 1 ± e·…), so a large δ applied
-          // to θ lands λ short by ~e·δ (58″ at −3000): two Newton passes —
-          // read λ, step θ, re-read, step the remainder.
-          for (let pass = 0; pass < 2; pass++) {
-            nodes.orbit.ry = θ;
-            graph.root.updateWorldMatrix();
-            _applyOneSourceTiltCorr(graph, _yE5);
-            const sWP = nodes.pivot.getWorldPosition();
-            const loc = graph.earthNodes.rotAxis.worldToLocal(sWP[0], sWP[1], sWP[2]);
-            const sph = cartesianToSpherical(loc[0], loc[1], loc[2]);
-            const raR = thetaToRaDeg(sph.theta) * d2r, decR = phiToDecDeg(sph.phi) * d2r;
-            const lamRealizedDeg = Math.atan2(Math.sin(raR) * Math.cos(epsR) + Math.tan(decR) * Math.sin(epsR), Math.cos(raR)) / d2r;
-            _dE5 = _lamCertDeg - lamRealizedDeg;
-            θ += _wE5 * (((((_dE5 + 540) % 360) + 360) % 360) - 180) * d2r;
-          }
-        } else {
-          _dE5 = _lamCertDeg - _frameworkSunLon(_jdE5);
-          θ += _wE5 * (((((_dE5 + 540) % 360) + 360) % 360) - 180) * d2r;
-        }
-      }
-    }
+    // (the fitted Sun longitude harmonics and the E5 δ block that followed the
+    // EoC here are retired with R4 — the Sun's angle comes from the certified
+    // longitude in _applyEngineEarthFrame)
     // Full Meeus Ch. 47 lunar perturbations (longitude + latitude, 60+60 terms)
     // Meeus formulas require T from standard J2000.0 (JD 2451545.0) in Julian centuries (36525 days)
     if (C.useVariableSpeed && def.lunarPerturbations) {
@@ -1711,17 +1289,8 @@ function moveModel(graph, pos) {
   ];
   for (const [nodes, def] of precLayers) animateObject(nodes, def);
 
-  // D4c: rotate the apsidal wheel pair onto the engine ϖ(t) (Δrel is 0 at
-  // J2000 and when the option is off). θ_p2 mirrors θ_p1 exactly, keeping
-  // the barycenter frame's net rotation zero — every consumer downstream
-  // (the geometric offset direction, FQ-3, earthPeriEcl, the Type II/III
-  // planet corrections, the perihelion markers) inherits the flip.
-  if (_periDelta !== 0) {
-    graph.earthPeriPrec1.orbit.ry += _periDelta;
-    graph.earthPeriPrec2.orbit.ry -= _periDelta;
-  }
-
-  // Sun
+  // Sun (the K wheel; its angle is replaced by the certified longitude in
+  // _applyEngineEarthFrame — the device animates, the engine places)
   animateObject(graph.sunNodes, graph.sunNodes.def);
 
   // Moon chain
@@ -1786,10 +1355,9 @@ function moveModel(graph, pos) {
   // Update all world matrices from root
   graph.root.updateWorldMatrix();
 
-  // One-source movement (C-4b + D4d): drive the visible tilt to the series
-  // ε AND the axis azimuth to the hybrid equinox phase (assembled inside
-  // the correction from the prep at the top of this function). No-op when off.
-  _applyOneSourceTiltCorr(graph, _osmYearForJD(currentJD, currentYear));
+  // R4: the Earth frame — sun plane, apsidal wheel, Sun and axis — placed
+  // from the engine on top of the animated device (see _applyEngineEarthFrame).
+  _applyEngineEarthFrame(graph, currentJD);
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
@@ -1799,7 +1367,13 @@ function moveModel(graph, pos) {
 // Cache the scene graph (built once, reused)
 let _graph = null;
 function getGraph() {
-  if (!_graph) _graph = buildSceneGraph();
+  if (!_graph) {
+    _graph = buildSceneGraph();
+    // R4: the J2000 pose bridge is read eagerly from the fresh device — every
+    // consumer (moveModel, the fast Sun path) then places the engine frame
+    // through it; nothing is derived on a consumer's first call.
+    _kcFrameR(_graph);
+  }
   return _graph;
 }
 
@@ -1848,7 +1422,7 @@ function _invalidateGraph() {
 // engine raw — no observation-fitted correction rides it (the
 // source-of-truth doctrine); the legacy geometric planet chains and their
 // fitted stack were EXCISED with K5.
-let _kcModule = null, _kcChains = null, _kcR = null, _kcREps = null;
+let _kcModule = null, _kcChains = null, _kcR = null, _kcDeriving = false;
 function _kc() { if (!_kcModule) _kcModule = require('./keplerian-chain.js'); return _kcModule; }
 function _kcHelioAU(target, jd) {
   const KCm = _kc();
@@ -1887,44 +1461,94 @@ function _kcHelioAU(target, jd) {
 // that is 51.6″ from the RA frame's equinox at J2000 (the recorded K
 // sun-plane finding — docs/41). Mirror: src/script.js _kcDeriveFrameR —
 // identical ops.
+// R4 "one Earth frame": R is the J2000 pose of the scene — the K device
+// geometry at the chain anchor epoch, read ONCE, no correction applied (the
+// device is deterministic there, so the bridge is too: nothing derived on a
+// first frame, nothing to re-derive). Everything of date is then placed from
+// the engine RELATIVE to this pose by _applyEngineEarthFrame, so the two
+// bridges of R3 (sun plane vs the RA frame's ecliptic) collapse into one: the
+// engine's ecliptic of date IS the sun plane and the Moon's plane.
 function _kcFrameR(graph) {
   if (_kcR) return _kcR;
   const KCm = _kc();
   const jd1 = KCm.ANCHOR_EPOCH_JD;
-  _syncEpochForJD(jd1);
-  const pos = _posFromJDTools(jd1);
-  moveModel(graph, pos);
-  // the CORRECTED axis at the anchor (the frame every validated RA/Dec
-  // surface reads through; self-clearing, a no-op when the option is off)
-  _applyOneSourceTiltCorr(graph, _osmYearForJD(jd1, C.startModelYearWithCorrection + pos));
+  _kcDeriving = true;   // the K pose: moveModel must not place the engine frame during this read
+  try {
+    _syncEpochForJD(jd1);
+    moveModel(graph, _posFromJDTools(jd1));
+  } finally { _kcDeriving = false; }
   const ne = graph.barycenter.pivot.worldMatrix.e, ae = graph.earthNodes.rotAxis.worldMatrix.e;
   let nx = ne[4], ny = ne[5], nz = ne[6];
   { const s = Math.hypot(nx, ny, nz); nx /= s; ny /= s; nz /= s; }
   let xx = ae[8], xy = ae[9], xz = ae[10];                 // rotAxis local +Z = RA 0 (theta = atan2(x, z))
-  { const s = Math.hypot(xx, xy, xz); xx /= s; xy /= s; xz /= s; }
-  // The second bridge (browser twin _kcREps): the RA frame's ε-tilted
-  // ecliptic — the plane the scene Moon is placed in (its (λ, β) go through
-  // the scene ε into RA/Dec in rotAxis). Same x̂ (RA 0, unprojected); pole =
-  // the axis tilted by the scene ε toward RA 270°: ẑ = cos ε·Ŷ − sin ε·X̂.
-  // The sun plane and this plane part by 20.5″ at J2000 (docs/41).
-  {
-    let ax = ae[4], ay = ae[5], az = ae[6];
-    { const s = Math.hypot(ax, ay, az); ax /= s; ay /= s; az /= s; }
-    let bx = ae[0], by = ae[1], bz = ae[2];                // local +X = RA 90°
-    { const s = Math.hypot(bx, by, bz); bx /= s; by /= s; bz /= s; }
-    const eps = Math.acos(Math.min(1, Math.max(-1, ax * nx + ay * ny + az * nz)));
-    let zx = Math.cos(eps) * ax - Math.sin(eps) * bx, zy = Math.cos(eps) * ay - Math.sin(eps) * by, zz = Math.cos(eps) * az - Math.sin(eps) * bz;
-    { const s = Math.hypot(zx, zy, zz); zx /= s; zy /= s; zz /= s; }
-    const yex = zy * xz - zz * xy, yey = zz * xx - zx * xz, yez = zx * xy - zy * xx;   // ŷ = ẑ × x̂
-    _kcREps = [[xx, yex, zx], [xy, yey, zy], [xz, yez, zz]];
-  }
-  // the sun-plane bridge: RA 0 projected onto the plane
+  // the longitude origin: RA 0 projected onto the K sun plane
   const d = xx * nx + xy * ny + xz * nz;
   xx -= d * nx; xy -= d * ny; xz -= d * nz;
   { const s = Math.hypot(xx, xy, xz); xx /= s; xy /= s; xz /= s; }
   const yx = ny * xz - nz * xy, yy = nz * xx - nx * xz, yz = nx * xy - ny * xx;   // ŷ = ẑ × x̂
   _kcR = [[xx, yx, nx], [xy, yy, ny], [xz, yz, nz]];
   return _kcR;
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// R4 — THE EARTH FRAME FROM THE ENGINE (plan 06; mirror of src/script.js
+// _applyEngineEarthFrame — identical ops). After the K device layers have
+// animated, the physics frame is PLACED, not corrected:
+//   • the sun plane — the perihelion wheel's container takes the world
+//     rotation [X = ĝ, Y = n̂, Z = ĝ × n̂] (equinox, ecliptic pole of date):
+//     its own tilt and every parent wheel above it are superseded; the
+//     outer/inner apsidal wheels turn ±ϖ(t) so the offset arm −e(t)·û(ϖ)
+//     points where the engine says and the barycenter frame keeps its net
+//     zero rotation; the Sun rides the wheel at the angle that realizes the
+//     CERTIFIED longitude on the offset circle (exact, no scene read);
+//   • the axis — rotAxis takes [X = ŝ × ĝ, Y = ŝ, Z = ĝ]: RA 0 IS the equinox
+//     of date, the pole IS the engine's spin axis; ε and the equinox phase
+//     need no correction because they are the frame.
+// One clock: true TT for the year the engine is sampled at (the Moon block's
+// convention) and for the certified longitude (the finder-axis API plus the
+// bridge). Measured before this (plan 06 R3): the K sun plane and the RA
+// frame's ecliptic parted by 20.5″ at J2000 and 10′ at −3000, the rendered
+// Sun −19″/+19″ in declination against Horizons at the 2000 equinoxes; the
+// retired stack was four relative corrections (tilt, azimuth, apsidal delta,
+// the δ Newton read) plus the D5b plane mount — docs/41.
+// ═══════════════════════════════════════════════════════════════════════════
+const _FRAME = _req('@essrt/physics/earth/frame-of-date');
+function _applyEngineEarthFrame(graph, jdUT) {
+  if (_kcDeriving) return;                     // the bridge read wants the pure K pose
+  const R = _kcFrameR(graph);
+  // The sampler's time coordinate is JULIAN years from J2000 TT (t = 0 at JD
+  // 2451545.0 — the anchor elements; the chain planets use the same mapping).
+  // NOT the scene's SI-year counter (_jdToSIyearTools: startmodel origin,
+  // 365.2422-d unit): that coordinate sits 10.3 d off at J2000 and drifts
+  // 0.0078 d/yr — fed to an ABSOLUTE equinox longitude it rotated the whole
+  // frame of date by 1.417″ against the J2000 pose (measured; it had only
+  // ever entered the retired corrections as differences, where it cancelled).
+  const jdTT = _jdTTToolsFromUT(jdUT);
+  const smp = _oneSourceM().sampleAt(2000 + (jdTT - C.j2000JD) / 365.25);
+  const F = _FRAME.computeEarthFrameOfDate(smp);
+  const toW = (v) => [
+    R[0][0] * v[0] + R[0][1] * v[1] + R[0][2] * v[2],
+    R[1][0] * v[0] + R[1][1] * v[1] + R[1][2] * v[2],
+    R[2][0] * v[0] + R[2][1] * v[1] + R[2][2] * v[2],
+  ];
+  const cross = (a, b) => [a[1] * b[2] - a[2] * b[1], a[2] * b[0] - a[0] * b[2], a[0] * b[1] - a[1] * b[0]];
+  const n = toW(F.n), g = toW(F.g), s = toW(F.s);
+  // the sun plane and the apsidal wheel. periOfDateDeg is EARTH's heliocentric
+  // perihelion; the geocentric Sun's perihelion is +180°, and the wheel's arm
+  // −e·û(θ_p1) must put the orbit centre toward the Sun's APHELION (measured:
+  // the other sign leaves the Sun's direction exact but swaps its distance —
+  // the planets, placed about that Sun, then read ~1° off).
+  graph.earthPeriPrec1.container.worldRotOverride = [g, n, cross(g, n)];
+  const peri = (smp.periOfDateDeg + 180) * d2r;
+  graph.earthPeriPrec1.orbit.ry = peri;
+  graph.earthPeriPrec2.orbit.ry = -peri;
+  graph.earthPeriPrec2.container.px = -smp.e * 100;
+  // the Sun at the certified longitude (true TT: the finder-axis API adds the curve, the bridge is ours)
+  const lam = _e5Tier().eclipse.sunLonCompletedDegAtJD(_finderAxisJdTools(jdUT)) * d2r;
+  graph.sunNodes.orbit.ry = _FRAME.solveWheelAngleForLongitude(lam, smp.e, peri);
+  // the axis
+  graph.earthNodes.rotAxis.worldRotOverride = [cross(s, g), s, g];
+  graph.root.updateWorldMatrix();
 }
 
 function computePlanetPosition(target, jd) {
@@ -2126,9 +1750,6 @@ function getWobbleSunDistAU(jd) {
 
 function computeSunPositionFast(jd) {
   const graph = getGraph();
-  // One-source cost contract: clear the tilt correction BEFORE the animation
-  // pass (the full updateWorldMatrix below doubles as its reset read).
-  if (graph.earthNodes.rotAxis.extraMatrix) graph.earthNodes.rotAxis.extraMatrix = null;
   _syncEpochForJD(jd);
   const pos = _posFromJDTools(jd);
 
@@ -2140,10 +1761,6 @@ function computeSunPositionFast(jd) {
   // banked engine series (mirrors the moveModel site; the EoC below inherits).
   const _osmM = _oneSourceM();
   const earthEcc = _osmM.e(_osmYearForJD(jd, currentYear));   // the banked engine series (the ONE movement)
-  // D4c: the apsidal-wheel correction (mirrors moveModel).
-  const _periDelta = _osmPeriDeltaRad(jd, currentYear);
-  // D4d-rev: equinox prep before this call's own animation (mirrors moveModel).
-  _osmEqxPrep(jd, currentYear);
   graph.earthPeriPrec2.container.px = -earthEcc * 100;   // geometric offset = full e(t) (mirrors moveModel)
 
   // Animate a single node: orbit.ry = θ (with EoC if applicable)
@@ -2162,17 +1779,9 @@ function computeSunPositionFast(jd) {
       const e = def._eocDerived
         ? earthEcc / 2   // Sun: eoc = e(t)/2 (the geometric offset supplies the other half; unification)
         : def.eccentricity;
-      const perihelionPhase = def.perihelionPhaseJ2000 + (def.perihelionPrecessionRate || 0) * pos
-        + (def._eocDerived ? _periDelta : 0);   // D4c: the engine-ϖ phase (mirrors moveModel)
+      const perihelionPhase = def.perihelionPhaseJ2000 + (def.perihelionPrecessionRate || 0) * pos;
       const M = θ - perihelionPhase;
       θ += 2 * e * Math.sin(M) + 1.25 * e * e * Math.sin(2 * M);
-    }
-    // Phase Z-B (2026-06): Sun longitude harmonics applied to SUN NODE only.
-    // Mirror of the moveModel() Sun-only block above. 9-1 S-P8: both blocks
-    // delegate to @essrt/physics/sun/longitude-correction.
-    const SUN_HARM_ENABLED = process.env.SUN_HARMONICS_DISABLED !== '1';
-    if (SUN_HARM_ENABLED && nodes === graph.sunNodes && C.SUN_LONGITUDE_HARMONICS) {
-      θ -= _sunLonCorr().correctionDegAt(jd) * d2r;
     }
     nodes.orbit.ry = θ;
   }
@@ -2188,22 +1797,16 @@ function computeSunPositionFast(jd) {
     [graph.barycenter, graph.barycenter.def],
   ];
   for (const [nodes, def] of precLayers) animateFast(nodes, def);
-  // D4c: the apsidal wheel pair onto the engine ϖ(t) (mirrors moveModel).
-  if (_periDelta !== 0) {
-    graph.earthPeriPrec1.orbit.ry += _periDelta;
-    graph.earthPeriPrec2.orbit.ry -= _periDelta;
-  }
   animateFast(graph.sunNodes, graph.sunNodes.def);
 
   // Update world matrices from root
   graph.root.updateWorldMatrix();
 
-  // One-source movement (C-4b + D4d): the tilt + azimuth correction goes on
-  // BEFORE the extraction — sun ra/dec here are read from the graph
-  // geometry via rotAxis.worldToLocal, so the axis must already carry the
-  // series ε and the hybrid equinox phase (assembled inside the correction
-  // from the prep at the top of this function).
-  _applyOneSourceTiltCorr(graph, _osmYearForJD(jd, currentYear));
+  // R4 (plan 06 finding 2): the fast path rides the SAME engine Earth frame as
+  // the full scene — sun plane, apsidal wheel, the Sun at the certified
+  // longitude, the axis. Before this it was the bare K wheel Sun, 8–18″ from
+  // the scene Sun in 2000 (measured), and no δ block ever ran here.
+  _applyEngineEarthFrame(graph, jd);
 
   // Extract Sun position in Earth's equatorial frame
   const earthRotAxisWP = graph.earthNodes.rotAxis.getWorldPosition();
@@ -2241,9 +1844,7 @@ module.exports = {
   Node,
   cartesianToSpherical,
   _getGraphForProbe: () => getGraph(),   // research probes: the internal graph AFTER a computePlanetPosition call
-  _frameworkSunLonProbe: (jd) => _frameworkSunLon(jd),   // research probes: the E5 twin (wheel-versus-twin decomposition)
   _injectKeplerChains: (chains) => { _kcChains = chains; },   // research probes (K4.5 acceptance): override the flag path's chains (null → reload from the artifact)
-  _kcDebugR: () => _kcR,   // research probes (K4b parity): the derived frame bridge (sun plane)
-  _kcDebugREps: () => _kcREps,   // research probes: the RA-frame ε-ecliptic bridge (the scene Moon's plane)
+  _kcDebugR: () => _kcR,   // research probes (K4b parity): the J2000 pose bridge (R4: the one frame)
   _moonSeriesForProbe: () => _moonSeriesM(),   // research probes: the shared Meeus series (incl. the truncated eclipse-finder forms)
 };
