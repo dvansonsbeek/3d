@@ -26,6 +26,15 @@
  *   full update   +100k 8 ms · +300k 11 ms (ratio 1.4) · +1.5M 22 ms (2.7)
  *   light update  +100k 2 ms · +300k  5 ms (ratio 2.5) · +1.5M 15 ms (7)
  *   C-VIS frame   0.03 ms   ·  trace sample ratio ~3
+ *
+ * THE COLD-JUMP ROW (plan 06 R4 follow-up, a class the steady-state rows
+ * cannot see): the FIRST evaluation at a deep epoch on a fresh page builds
+ * the one-family sampler's deep tier and the certified Sun's mean-longitude
+ * table. Measured: that first jump to −5.34 Myr cost 22 s where the first
+ * jump to −100 kyr cost ~0.5 s (the table walked outward in 1-yr/100-yr
+ * steps and rebuilt the deep tier ~125 times); after the fix 1.7 s. The
+ * row is the ratio first(−5.34 Myr) / first(−100 kyr): healthy 3.0–3.1
+ * (three fresh pages), the regression class ~40; limit 8.
  */
 /* global performance -- the timing calls live inside page.evaluate callbacks, which execute in the browser */
 import { openSimulator } from './harness.mjs';
@@ -50,6 +59,17 @@ const median3 = async (fn, arg) => {
 
 try {
   await sim.page.waitForFunction(() => window.__test__ && window.__test__.vfpPISeriesLoaded(), null, { timeout: 60000 });
+
+  // ── 0. COLD JUMP (the R4 class): the first evaluation at a deep epoch on
+  // this fresh page — BEFORE any warmup, since the warmup is what it measures.
+  const cold = await sim.page.evaluate(({ near, deep }) => {
+    const T = window.__test__;
+    const t0 = performance.now(); T.sceneSunRaDecAt(near); const t1 = performance.now();
+    T.sceneSunRaDecAt(deep); const t2 = performance.now();
+    return { nearMs: t1 - t0, deepMs: t2 - t1 };
+  }, { near: jdOf(-100000), deep: jdOf(-5340000) });
+  console.log(`      cold jump ms (first eval on a fresh page): −100k ${cold.nearMs.toFixed(0)} · −5.34M ${cold.deepMs.toFixed(0)}`);
+  gate('cold jump: first(−5.34M) / first(−100k) ratio', cold.deepMs / cold.nearMs, 8, 'x');
 
   // ── warmup: one-time lazy builds (cycle tables, samplers, chains) ──
   await sim.page.evaluate((jds) => jds.forEach((jd) => {

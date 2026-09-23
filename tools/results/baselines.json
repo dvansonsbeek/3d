@@ -3,7 +3,7 @@
   "_updated": "2026-09-23",
   "earth": {
     "obliquityJ2000_error_arcsec": 0.0011,
-    "obliquityRate_error_arcsec": 0.0161,
+    "obliquityRate_error_arcsec": 0.0426,
     "perihelionLonJ2000_error_deg": 0.0002,
     "erdJ2000_degPerYr": 0.000002,
     "meanPrecessionRate_degPerYr": 0.017178,

@@ -201,6 +201,16 @@ console.log(`  ✓ All derived planet values verified\n`);
 console.log('═══ Step 9: Earth geometry validation ═══');
 
 const sg = require(path.join(TOOLS_LIB, 'scene-graph.js'));
+// The package model on the shipped series artifact (the API's / audit's
+// configuration — plan 06 R1 measured that a model built WITHOUT the
+// artifact is a different hybrid): one instance for the cardinal instants
+// below and the one-family year lengths in Step 10.
+const pipelineModel = (() => {
+  const { createModel } = require('@essrt/physics');
+  let artifact;
+  try { artifact = JSON.parse(fs.readFileSync(path.join(ROOT, 'data', 'nbody-secular-series.json'), 'utf8')); } catch { artifact = undefined; }
+  return createModel(undefined, artifact ? { secularSeriesArtifact: artifact } : undefined);
+})();
 
 // Obliquity at the June 2000 solstice (from the scene-graph's Sun declination).
 // Plan 06 Phase 3 S3c: the reference is the IAU 2006 mean obliquity OF DATE at
@@ -219,8 +229,16 @@ const obliqError = Math.abs(obliqScene - obliqIauOfDate) * 3600;
 check('Obliquity at the June 2000 solstice (scene vs IAU of date)', obliqError, 0, 0.05); // within 0.05"
 console.log(`  Obliquity at the June 2000 solstice: scene ${obliqScene.toFixed(6)}° vs IAU 2006 of date ${obliqIauOfDate.toFixed(6)}° (J2000.0 ${C.ASTRO_REFERENCE.obliquityJ2000_deg}°; error: ${obliqError.toFixed(4)}")`);
 
-// Obliquity rate (scene-graph: solstice 2000 vs 2000 + tropicalCentury)
-const obliq2100 = sg.phiToDecDeg(sg.computePlanetPosition('sun', solsticeJ2000JD + C.tropicalCenturyDays).dec);
+// Obliquity rate: the scene's solstice declination in 2100 minus 2000. The
+// 2100 instant is the model's OWN June-solstice crossing (createModel()
+// .cardinal, the apparent Sun at true UT) — plan 06 R4 follow-up: the former
+// "2000 solstice + one mean tropical century" sat ~1.6 h from the true 2100
+// solstice, and the declination's curvature there read as a 0.06″ dip in
+// the rate (the K plane's node offset had compensated it by coincidence, so
+// the old 0.0005″ metric was luck); at the solstice itself the declination is
+// stationary, so the instant's minute-level precision is invisible.
+const solstice2100JD = pipelineModel.cardinal.jd(2100, 'SS');
+const obliq2100 = sg.phiToDecDeg(sg.computePlanetPosition('sun', solstice2100JD).dec);
 const rateModel = (obliq2100 - obliqScene) * 3600;
 const rateError = Math.abs(rateModel - C.ASTRO_REFERENCE.obliquityRate_arcsecPerCentury);
 check('Obliquity rate', rateError, 0, 0.1); // within 0.1"/cy
@@ -331,13 +349,7 @@ const tropJ2000 = (tropSS + tropWS + tropVE + tropAE) / 4;
 // as Meeus's own successive instants do. The mean-year check reads the ONE
 // year-length family (route B, SI seconds) against the IAU value; the
 // per-type intervals below stay informational.
-const oneFamilyTropDays = (() => {
-  const { createModel } = require('@essrt/physics');
-  let artifact;
-  try { artifact = JSON.parse(fs.readFileSync(path.join(ROOT, 'data', 'nbody-secular-series.json'), 'utf8')); } catch { artifact = undefined; }
-  const model = createModel(undefined, artifact ? { secularSeriesArtifact: artifact } : undefined);
-  return model.epoch.tropicalYearSecondsAtYear(2000) / 86400;
-})();
+const oneFamilyTropDays = pipelineModel.epoch.tropicalYearSecondsAtYear(2000) / 86400;
 const tropDiffSec = (oneFamilyTropDays - ylRef.tropicalYearMean) * 86400;
 // Tolerance: 10 s (the one-family year sits +0.03 s from IAU at J2000).
 check('Tropical year at J2000', Math.abs(tropDiffSec), 0, 10.0);
