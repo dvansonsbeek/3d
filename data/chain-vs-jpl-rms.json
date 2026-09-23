@@ -342,7 +342,7 @@
       "packages/physics/src/moon/ecc-channel.cjs": "sha256:e986b8ca3dbfdaa8508f49f315bc81718503b91eb56298d9ad4d7c29186fc691",
       "packages/physics/src/planets/chain-artifact.js": "sha256:2eaf9134022e03928759f1dc9eac6f27a770e40999c41dfeb029e0bad20aebf1",
       "packages/physics/src/planets/keplerian-chain.cjs": "sha256:c4a5e7d74e672ed22a21dc25961385a870411e9c67173007d8da29694f2286fd",
-      "tools/lib/scene-graph.js": "sha256:24f646803e5ee11ef412064950344e222e2f9d4572c2447f8428fdac59f941cb",
+      "tools/lib/scene-graph.js": "sha256:2d64e067a0fc573e7f224eb8208167b537f6c1577c2d0ed8a846dbd0e049bd96",
       "tools/verify/measure-rms-by-epoch.js": "sha256:b19c35ca9ce42b0a69cc3226062e8184c1679016995386e5005dc9053803fa59"
     }
   }

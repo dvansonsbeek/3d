@@ -438,7 +438,7 @@
       "public/input/model-parameters.json": "sha256:c90f564c593e45c4e36974927227bdcf40ea010f23284b1e5e16cef488dc2d3a",
       "public/input/solar-eclipse-centerlines-nasa.json": "sha256:995d1b38879e6bd1983a1f2895c1269b9f8f4fa917ccb047bfc7b0be3da5985c",
       "public/input/solar-eclipses-stephenson-2016.json": "sha256:5356d24641c27b456fb27ac2c3b6dfab1538dd9fa8e609d7abb5bb9132f18794",
-      "tools/lib/scene-graph.js": "sha256:24f646803e5ee11ef412064950344e222e2f9d4572c2447f8428fdac59f941cb",
+      "tools/lib/scene-graph.js": "sha256:2d64e067a0fc573e7f224eb8208167b537f6c1577c2d0ed8a846dbd0e049bd96",
       "tools/verify/eclipse-audit.js": "sha256:4fec634dc343ff521093b89a3f3263a9d94d6e4eee1e5c08a81058b2dd9ad359"
     }
   }

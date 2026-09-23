@@ -1857,4 +1857,9 @@ module.exports = {
   _injectKeplerChains: (chains) => { _kcChains = chains; },   // research probes (K4.5 acceptance): override the flag path's chains (null → reload from the artifact)
   _kcDebugR: () => _kcR,   // research probes (K4b parity): the J2000 pose bridge (R4: the one frame)
   _moonSeriesForProbe: () => _moonSeriesM(),   // research probes: the shared Meeus series (incl. the truncated eclipse-finder forms)
+  _moonArgsForProbe: () => _moonArgsM(),   // research probes (plan 06 R5, the Moon twin split): this engine's argument factory
+  _moonChainForProbe: () => ({ tropical: _mcTropical, apsidalOfDate: _mcApsidalOfDate, nodalOfDate: _mcNodalOfDate, epsDeg: (y) => _oneSourceM().epsDeg(y) }),   // research probes: the injected chain wrappers
+  // The Moon SERIES inputs at a UT JD (lon/lat deg, dist km) — the cross-engine
+  // gate's Moon rows (plan 06 R5: the browser's first-frame race lived here).
+  moonSeriesInputsAt: (jd) => { computePlanetPosition('moon', jd); const n = getGraph().moonNodes; return { lonDeg: n._meeusLonDeg, latDeg: n._meeusLatDeg, distKm: n._meeusDistKm }; },
 };

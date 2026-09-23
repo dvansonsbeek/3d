@@ -39,6 +39,7 @@ const ROOT = fileURLToPath(new URL('../', import.meta.url));
 const require = createRequire(join(ROOT, 'package.json'));
 const OE = require(join(ROOT, 'tools/lib/orbital-engine.js'));
 const DT = require(join(ROOT, 'tools/lib/deep-time.js'));
+const SG = require(join(ROOT, 'tools/lib/scene-graph.js'));
 
 const fixture = JSON.parse(readFileSync(
   join(ROOT, 'packages/fixtures/regression/script-js.json'), 'utf8')).values;
@@ -46,11 +47,39 @@ const fixture = JSON.parse(readFileSync(
 const YL_TOL_DAYS = 0;      // bit-exact — achieved at Phase 7.2 (shared code)
 const DEEP_YEARS = 50000;   // beyond the certified fine zone the runtimes' Math differs at the last bit (header)
 const DEEP_JD_TOL_DAYS = 1e-6;
+// Plan 06 R5 — the Moon SERIES inputs (the shared Meeus series on the
+// framework-native arguments, at the scene's true TT): browser moonScene
+// lon/lat/dist vs the Node engine at the same UT JD. Measured before the fix:
+// the browser's argument factory froze its obliquity-carrier normalisation on
+// the first frame from the K-comb fallback ε — 0.27″ at year 0, 6.7″ at
+// ±100 kyr, 100″ at −5.34 Myr, invisible to every gate. Tolerance: the
+// twins are the same code on the same data; only the runtimes' last-bit Math
+// (header) separates them through the chain integrals — 0.002″ in-era,
+// 0.02″ at deep time (both measured ≥10× above the post-fix residual).
+const MOON_LON_TOL_ARCSEC = 0.002, MOON_LON_TOL_DEEP_ARCSEC = 0.02;
+const MOON_DIST_TOL_KM = 0.01;
 let exact = 0, withinTol = 0, failures = 0;
+
+const moonNode = new Map();
+const moonSeriesNode = (jd) => { if (!moonNode.has(jd)) moonNode.set(jd, SG.moonSeriesInputsAt(jd)); return moonNode.get(jd); };
+const wrapDeg = (d) => ((d + 540) % 360 + 360) % 360 - 180;
 
 for (const [key, browserVal] of Object.entries(fixture)) {
   let m;
   let nodeVal, klass;
+  if ((m = key.match(/^moonScene\.(lonDeg|latRad|distKm)@(-?\d+(?:\.\d+)?)$/))) {
+    const jd = Number(m[2]), n = moonSeriesNode(jd);
+    const deep = Math.abs(2000 + (jd - 2451545) / 365.25 - 2000) > DEEP_YEARS;
+    let d, tol, unit;
+    if (m[1] === 'lonDeg') { d = Math.abs(wrapDeg(browserVal - n.lonDeg)) * 3600; tol = deep ? MOON_LON_TOL_DEEP_ARCSEC : MOON_LON_TOL_ARCSEC; unit = '″'; }
+    else if (m[1] === 'latRad') { d = Math.abs(browserVal * 180 / Math.PI - n.latDeg) * 3600; tol = deep ? MOON_LON_TOL_DEEP_ARCSEC : MOON_LON_TOL_ARCSEC; unit = '″'; }
+    else { d = Math.abs(browserVal - n.distKm); tol = MOON_DIST_TOL_KM; unit = ' km'; }
+    if (d === 0) { exact++; continue; }
+    if (d <= tol) { withinTol++; continue; }
+    console.log(`  DIVERGED (Moon series, >${tol}${unit}) ${key}  Δ=${d.toExponential(3)}${unit}`);
+    failures++;
+    continue;
+  }
   if ((m = key.match(/^solsticeJD_(SS|WS|VE|AE)@(-?\d+)$/))) {
     nodeVal = OE.computeSolsticeJD(Number(m[2]), m[1]);
     klass = 'exact';
@@ -94,7 +123,7 @@ for (const [key, browserVal] of Object.entries(fixture)) {
 const total = exact + withinTol + failures;
 console.log(`CROSS-ENGINE — ${total} shared probes: ${exact} bit-exact, ${withinTol} within mirror tolerance, ${failures} diverged`);
 if (failures) {
-  console.log('FAIL — the two engines no longer compute the same cardinal model.');
+  console.log('FAIL — the two engines no longer compute the same cardinal model / Moon series.');
   process.exit(1);
 }
 console.log('PASS — browser fixture ≡ Node engine on every shared probe.');

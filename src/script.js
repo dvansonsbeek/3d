@@ -3776,7 +3776,7 @@ function _fwSunMeanElements(jd_ut) {
 // wrappers so the deep/snapshot and framework/Meeus toggles ride along.
 const _moonArgsM = (() => {
   let m = null;
-  return () => {
+  const get = () => {
     if (!m) {
       m = createMoonArguments({
         constants: {
@@ -3830,6 +3830,21 @@ const _moonArgsM = (() => {
     }
     return m;
   };
+  // Plan 06 R5 (measured): the factory's lazy normalisations — the obliquity
+  // carrier's (ε₀, C) from computeObliquityEarth(2000/1950/2050) and the
+  // self-measured rate anchors at ±25 yr — are initialised on the FIRST
+  // Moon evaluation, i.e. the first frame, BEFORE the async series artifact
+  // lands, so they read the flag-off K-comb ε (0.233″ from the one-source ε
+  // at 2000) while every later call reads the hybrid. The rendered Moon then
+  // parted from the Node twin (which loads the series synchronously) by
+  // 0.27″ at year 0, 6.2″ at ±100 kyr and 99.6″ at −5.34 Myr — Lp, D, Mp, F
+  // shifted together, M untouched — and a Node emulation of the race
+  // reproduced all five numbers to 0.001″. The artifact-landing block calls
+  // this reset; the next Moon evaluation rebuilds on the hybrid. Second
+  // instance of the class "derived on the first frame, never re-derived
+  // when the artifact lands" (the first: the chain frame bridge, R3).
+  get.reset = () => { m = null; };
+  return get;
 })();
 
 function _fwSunSecularDeviations(jd_tt) { return _moonArgsM().sunSecularDeviations(jd_tt); }
@@ -20613,6 +20628,12 @@ let _zetaSeriesEndYr = 0;
         // 75″ at 0 AD and 377″ at −2500 (the recorded 3c trap, third
         // instance). Rebuild the tier model on the shipped configuration.
         _tierUmbraModel = null;
+        // Plan 06 R5: the Moon-argument factory froze its obliquity-carrier
+        // normalisation and rate anchors on the first frame from the K-comb
+        // fallback ε — rebuild it on the hybrid now that the series is here
+        // (browser ≡ Node Moon after this: the 0.27″ / 6″ / 100″ split at
+        // 0 / ±100 kyr / −5.34 Myr was exactly this; see _moonArgsM.reset).
+        _moonArgsM.reset();
         // (R4: the J2000 pose bridge _kcR is read from the deterministic K
         // device — nothing to re-derive when the artifact lands)
         console.log(`secular series loaded from ${url} (earth + ${Object.keys(a.bodies).length - 1} planets) — planet deep-time elements + Earth ε/e one-source ${HYBRID_SPIN_REQUESTED ? 'ON (D4; the K device is only the pre-load fallback — plan 06 D5)' : 'planets on; Earth on the K device (fallback)'}`);

@@ -375,6 +375,27 @@ earth.pivotObj
                         └── moon.orbitObj    ← draconitic (nodal-month) clock, 27.2122 d
 ```
 
+**The rendered Moon is the shared series on the framework-native arguments,
+and the two runtimes must agree (plan 06 R5).** The browser and the Node
+engine build the same `@essrt/physics` Moon-argument factory with the same
+injected chains and the same one-source ε, at the same true-TT instant — yet
+the rendered Moon parted from the Node twin by 0.27″ at year 0, 6.7″ at
+±100 kyr and 100″ at −5.34 Myr (Lp, D, Mp, F shifted together, M untouched;
+latitude and distance moved in the Moon's own rate proportion, the signature
+of a phase error in the mean longitude). Measured cause: the factory's lazy
+normalisations — the obliquity carrier's (ε₀, C) and the self-measured rate
+anchors — initialise on the first Moon evaluation, the first frame, before
+the secular-series artifact has landed, so in the browser they read the
+flag-off K-comb ε (0.233″ from the one-source ε at 2000) while every later
+call reads the hybrid; the Node engine loads the artifact synchronously. A
+Node emulation of that race reproduced all five numbers to 0.001″. The
+artifact-landing block now resets the factory (`_moonArgsM.reset()`), and the
+cross-engine gate carries Moon-series rows (browser fixture lon/lat/dist vs
+the engine at the same JD, 0.002″ in-era / 0.02″ deep) so the class cannot
+return. Rule: anything a lazy normalisation derives from a flag-dependent
+evaluator before the flag settles must be re-derived when it does — the
+chain frame bridge (R3) was the first instance, this the second.
+
 **Tilt/spin composition rule.** `createPlanet` applies orbit tilts STATICALLY
 on `containerObj`; the animated Y-spin runs inside it. A layer's own spin can
 therefore never rotate its own tilt — an orbit PLANE follows only its PARENT
