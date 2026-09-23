@@ -6148,6 +6148,23 @@ if (typeof window !== 'undefined') {
     // predictions (date/JD/RA/year-length per point) read after a FULL update
     // at jd — since R4c the package crossings seeded at the displayed
     // calendar year's midpoint (no runtime anchor offsets any more).
+    // R10 — Planet Inspector probe: the helper group's size, the orbit frame's
+    // key angles and where the orbit view puts the equinox ĝ on screen (the
+    // former inspector started 90° rotated; the fix is a defined screen-up).
+    jumpJD: (jd) => { jumpToJulianDay(jd); forceSceneUpdate(); },   // scene jump for probes (setEpoch* only move the f(Y) epoch)
+    inspectorProbe: () => {
+      const H = hierarchyInspector;
+      const f = computeInspectorOrbitFrame(H.currentPlanet);
+      if (!f) return null;
+      const ndc = (v) => { const p = v.clone().project(camera); return { x: p.x, y: p.y }; };
+      const s0 = ndc(f.S), sg = ndc(f.S.clone().addScaledVector(f.g, f.aScene * 0.5)), sn = ndc(f.S.clone().addScaledVector(f.u2, f.aScene * 0.5));
+      return {
+        planet: H.currentPlanet, children: H.group ? H.group.children.length : 0, helpersOn: H.highlightActive,
+        trueAnomalyDeg: f.trueAnomalyDeg, meanAnomalyDeg: f.meanAnomalyDeg, inclDateDeg: f.inclDateDeg, nodeLonDateDeg: f.nodeLonDateDeg,
+        heightAU: f.heightAU, rAU: f.rAU,
+        equinoxScreen: { dx: sg.x - s0.x, dy: sg.y - s0.y }, lon90Screen: { dx: sn.x - s0.x, dy: sn.y - s0.y },
+      };
+    },
     cardinalPanelProbe: (jd) => {
       const savedJD = o.julianDay;
       jumpToJulianDay(jd);
@@ -12578,127 +12595,27 @@ const labelContent = label.querySelector('.labelContent');
 //*************************************************************
 
 // Planet registry - maps planet names to their hierarchy chain
+// ────────────────────────────────────────────────────────────────────
+// PLANET INSPECTOR targets (plan 06 R10). The inspector used to walk the
+// K device's five nested wheels per planet (PerihelionDurationEcliptic1 →
+// PerihelionFromEarth → PerihelionDurationEcliptic2 → RealPerihelionAtSun →
+// planet); since the K5 excision those wheels are scene scaffolding — the
+// meshes, rings and perihelion markers are placed from the N-body chain
+// every frame — so the inspector reads ONE thing per planet: the chain's
+// orbit of date (docs/51). `chain: false` bodies have no engine-D chain and
+// keep their labels for the position reports only.
+// ────────────────────────────────────────────────────────────────────
 const PLANET_HIERARCHIES = {
-  mercury: {
-    label: 'Mercury',
-    fixedPerihelion: () => mercuryFixedPerihelionAtSun,
-    perihelionOf: () => mercuryPerihelionFromEarth,
-    steps: () => [
-      { obj: mercuryPerihelionDurationEcliptic1, name: 'mercuryPerihelionDurationEcliptic1', parentName: 'startingPoint' },
-      { obj: mercuryPerihelionFromEarth, name: 'mercuryPerihelionFromEarth', parentName: 'mercuryPerihelionDurationEcliptic1' },
-      { obj: mercuryPerihelionDurationEcliptic2, name: 'mercuryPerihelionDurationEcliptic2', parentName: 'mercuryPerihelionFromEarth' },
-      { obj: mercuryRealPerihelionAtSun, name: 'mercuryRealPerihelionAtSun', parentName: 'mercuryPerihelionDurationEcliptic2' },
-      { obj: mercury, name: 'mercury', parentName: 'mercuryRealPerihelionAtSun' }
-    ]
-  },
-  venus: {
-    label: 'Venus',
-    fixedPerihelion: () => venusFixedPerihelionAtSun,
-    perihelionOf: () => venusPerihelionFromEarth,
-    steps: () => [
-      { obj: venusPerihelionDurationEcliptic1, name: 'venusPerihelionDurationEcliptic1', parentName: 'startingPoint' },
-      { obj: venusPerihelionFromEarth, name: 'venusPerihelionFromEarth', parentName: 'venusPerihelionDurationEcliptic1' },
-      { obj: venusPerihelionDurationEcliptic2, name: 'venusPerihelionDurationEcliptic2', parentName: 'venusPerihelionFromEarth' },
-      { obj: venusRealPerihelionAtSun, name: 'venusRealPerihelionAtSun', parentName: 'venusPerihelionDurationEcliptic2' },
-      { obj: venus, name: 'venus', parentName: 'venusRealPerihelionAtSun' }
-    ]
-  },
-  mars: {
-    label: 'Mars',
-    fixedPerihelion: () => marsFixedPerihelionAtSun,
-    perihelionOf: () => marsPerihelionFromEarth,
-    steps: () => [
-      { obj: marsPerihelionDurationEcliptic1, name: 'marsPerihelionDurationEcliptic1', parentName: 'startingPoint' },
-      { obj: marsPerihelionFromEarth, name: 'marsPerihelionFromEarth', parentName: 'marsPerihelionDurationEcliptic1' },
-      { obj: marsPerihelionDurationEcliptic2, name: 'marsPerihelionDurationEcliptic2', parentName: 'marsPerihelionFromEarth' },
-      { obj: marsRealPerihelionAtSun, name: 'marsRealPerihelionAtSun', parentName: 'marsPerihelionDurationEcliptic2' },
-      { obj: mars, name: 'mars', parentName: 'marsRealPerihelionAtSun' }
-    ]
-  },
-  jupiter: {
-    label: 'Jupiter',
-    fixedPerihelion: () => jupiterFixedPerihelionAtSun,
-    perihelionOf: () => jupiterPerihelionFromEarth,
-    steps: () => [
-      { obj: jupiterPerihelionDurationEcliptic1, name: 'jupiterPerihelionDurationEcliptic1', parentName: 'startingPoint' },
-      { obj: jupiterPerihelionFromEarth, name: 'jupiterPerihelionFromEarth', parentName: 'jupiterPerihelionDurationEcliptic1' },
-      { obj: jupiterPerihelionDurationEcliptic2, name: 'jupiterPerihelionDurationEcliptic2', parentName: 'jupiterPerihelionFromEarth' },
-      { obj: jupiterRealPerihelionAtSun, name: 'jupiterRealPerihelionAtSun', parentName: 'jupiterPerihelionDurationEcliptic2' },
-      { obj: jupiter, name: 'jupiter', parentName: 'jupiterRealPerihelionAtSun' }
-    ]
-  },
-  saturn: {
-    label: 'Saturn',
-    fixedPerihelion: () => saturnFixedPerihelionAtSun,
-    perihelionOf: () => saturnPerihelionFromEarth,
-    steps: () => [
-      { obj: saturnPerihelionDurationEcliptic1, name: 'saturnPerihelionDurationEcliptic1', parentName: 'startingPoint' },
-      { obj: saturnPerihelionFromEarth, name: 'saturnPerihelionFromEarth', parentName: 'saturnPerihelionDurationEcliptic1' },
-      { obj: saturnPerihelionDurationEcliptic2, name: 'saturnPerihelionDurationEcliptic2', parentName: 'saturnPerihelionFromEarth' },
-      { obj: saturnRealPerihelionAtSun, name: 'saturnRealPerihelionAtSun', parentName: 'saturnPerihelionDurationEcliptic2' },
-      { obj: saturn, name: 'saturn', parentName: 'saturnRealPerihelionAtSun' }
-    ]
-  },
-  uranus: {
-    label: 'Uranus',
-    fixedPerihelion: () => uranusFixedPerihelionAtSun,
-    perihelionOf: () => uranusPerihelionFromEarth,
-    steps: () => [
-      { obj: uranusPerihelionDurationEcliptic1, name: 'uranusPerihelionDurationEcliptic1', parentName: 'startingPoint' },
-      { obj: uranusPerihelionFromEarth, name: 'uranusPerihelionFromEarth', parentName: 'uranusPerihelionDurationEcliptic1' },
-      { obj: uranusPerihelionDurationEcliptic2, name: 'uranusPerihelionDurationEcliptic2', parentName: 'uranusPerihelionFromEarth' },
-      { obj: uranusRealPerihelionAtSun, name: 'uranusRealPerihelionAtSun', parentName: 'uranusPerihelionDurationEcliptic2' },
-      { obj: uranus, name: 'uranus', parentName: 'uranusRealPerihelionAtSun' }
-    ]
-  },
-  neptune: {
-    label: 'Neptune',
-    fixedPerihelion: () => neptuneFixedPerihelionAtSun,
-    perihelionOf: () => neptunePerihelionFromEarth,
-    steps: () => [
-      { obj: neptunePerihelionDurationEcliptic1, name: 'neptunePerihelionDurationEcliptic1', parentName: 'startingPoint' },
-      { obj: neptunePerihelionFromEarth, name: 'neptunePerihelionFromEarth', parentName: 'neptunePerihelionDurationEcliptic1' },
-      { obj: neptunePerihelionDurationEcliptic2, name: 'neptunePerihelionDurationEcliptic2', parentName: 'neptunePerihelionFromEarth' },
-      { obj: neptuneRealPerihelionAtSun, name: 'neptuneRealPerihelionAtSun', parentName: 'neptunePerihelionDurationEcliptic2' },
-      { obj: neptune, name: 'neptune', parentName: 'neptuneRealPerihelionAtSun' }
-    ]
-  },
-  pluto: {
-    label: 'Pluto',
-    fixedPerihelion: () => plutoFixedPerihelionAtSun,
-    perihelionOf: () => plutoPerihelionFromEarth,
-    steps: () => [
-      { obj: plutoPerihelionDurationEcliptic1, name: 'plutoPerihelionDurationEcliptic1', parentName: 'startingPoint' },
-      { obj: plutoPerihelionFromEarth, name: 'plutoPerihelionFromEarth', parentName: 'plutoPerihelionDurationEcliptic1' },
-      { obj: plutoPerihelionDurationEcliptic2, name: 'plutoPerihelionDurationEcliptic2', parentName: 'plutoPerihelionFromEarth' },
-      { obj: plutoRealPerihelionAtSun, name: 'plutoRealPerihelionAtSun', parentName: 'plutoPerihelionDurationEcliptic2' },
-      { obj: pluto, name: 'pluto', parentName: 'plutoRealPerihelionAtSun' }
-    ]
-  },
-  halleys: {
-    label: "Halley's Comet",
-    fixedPerihelion: () => halleysFixedPerihelionAtSun,
-    perihelionOf: () => halleysPerihelionFromEarth,
-    steps: () => [
-      { obj: halleysPerihelionDurationEcliptic1, name: 'halleysPerihelionDurationEcliptic1', parentName: 'startingPoint' },
-      { obj: halleysPerihelionFromEarth, name: 'halleysPerihelionFromEarth', parentName: 'halleysPerihelionDurationEcliptic1' },
-      { obj: halleysPerihelionDurationEcliptic2, name: 'halleysPerihelionDurationEcliptic2', parentName: 'halleysPerihelionFromEarth' },
-      { obj: halleysRealPerihelionAtSun, name: 'halleysRealPerihelionAtSun', parentName: 'halleysPerihelionDurationEcliptic2' },
-      { obj: halleys, name: 'halleys', parentName: 'halleysRealPerihelionAtSun' }
-    ]
-  },
-  eros: {
-    label: 'Eros',
-    fixedPerihelion: () => erosFixedPerihelionAtSun,
-    perihelionOf: () => erosPerihelionFromEarth,
-    steps: () => [
-      { obj: erosPerihelionDurationEcliptic1, name: 'erosPerihelionDurationEcliptic1', parentName: 'startingPoint' },
-      { obj: erosPerihelionFromEarth, name: 'erosPerihelionFromEarth', parentName: 'erosPerihelionDurationEcliptic1' },
-      { obj: erosPerihelionDurationEcliptic2, name: 'erosPerihelionDurationEcliptic2', parentName: 'erosPerihelionFromEarth' },
-      { obj: erosRealPerihelionAtSun, name: 'erosRealPerihelionAtSun', parentName: 'erosPerihelionDurationEcliptic2' },
-      { obj: eros, name: 'eros', parentName: 'erosRealPerihelionAtSun' }
-    ]
-  }
+  mercury: { label: 'Mercury', chain: true,  obj: () => mercury },
+  venus:   { label: 'Venus',   chain: true,  obj: () => venus },
+  mars:    { label: 'Mars',    chain: true,  obj: () => mars },
+  jupiter: { label: 'Jupiter', chain: true,  obj: () => jupiter },
+  saturn:  { label: 'Saturn',  chain: true,  obj: () => saturn },
+  uranus:  { label: 'Uranus',  chain: true,  obj: () => uranus },
+  neptune: { label: 'Neptune', chain: true,  obj: () => neptune },
+  pluto:   { label: 'Pluto',   chain: false, obj: () => pluto },
+  halleys: { label: "Halley's Comet", chain: false, obj: () => halleys },
+  eros:    { label: 'Eros',    chain: false, obj: () => eros },
 };
 
 // ================================================================
@@ -14081,1727 +13998,489 @@ const PLANET_OBJECTS = {
   eros: () => eros
 };
 
-// Hierarchy inspector state
+// ═══════════════════════════════════════════════════════════════════════
+// PLANET INSPECTOR (plan 06 R10) — the orbit of date from the N-body chain
+// ═══════════════════════════════════════════════════════════════════════
+// One view per planet, everything from the chain the scene renders:
+// elements of date via _kcElementsOfDate at o.julianDay, heliocentric points
+// via _kcHelioAU through the frame bridge _kcR, the rendered ecliptic of date
+// (the sun-plane container's pole n̂ and equinox ĝ — R4). The visual (the
+// former "Step 4", the part worth keeping): the actual chain orbit fanned
+// from the Sun, green above / red below the ecliptic of date, its ascending
+// and descending nodes and its highest and lowest points found ON that orbit,
+// the perihelion point from the chain's ϖ with the Sun→perihelion line, the
+// Sun→planet line, the true anomaly ν swept at the Sun and the chain's mean
+// anomaly M beside it. RETIRED here: the 5-step K-wheel walk with its
+// Settings / Runtime State / Validation / Hierarchy Path, the solar-period
+// reference, the P2 device point and the anomalies measured at a wheel pivot
+// — after K5 that pivot sat at the K start angle, 90° from the rendered
+// planet, so nothing was measured from the Sun (owner-reported). The
+// position report (vs the NASA/JPL test dates) stays, on demand.
 const hierarchyInspector = {
   panel: null,
   currentPlanet: 'mercury',
-  currentStep: 0,
   highlightActive: false,
-  axesHelper: null,
-  startPosArrow: null,
-  currentPosArrow: null,
-  orbitCenterArrow: null,
-  rotationArrow: null,
-  inclinationPlane: null,
-  ascendingNode: null,
-  descendingNode: null,
-  aboveHalfPlane: null,       // GREEN half-plane (above ecliptic)
-  belowHalfPlane: null,       // RED half-plane (below ecliptic)
-  highestPointMarker: null,   // GREEN sphere at highest point (90° after ascending node)
-  lowestPointMarker: null,    // RED sphere at lowest point (90° after descending node)
-  perihelionDot: null,
-  perihelionArrow: null,
-  earthPerihelionArrow: null, // Green arrow from planet perihelion to Earth perihelion (Step 2)
-  // Anomaly visualization elements (updated live)
-  anomalyGroup: null,
-  perihelionLine: null,
-  trueAnomalyLine: null,
-  meanAnomalyLine: null,
-  trueAnomalyArc: null,
-  meanAnomalyArc: null,
-  // New anomaly visualization elements (P→Planet, Sun→Planet lines and arcs)
-  pToPlanetLine: null,
-  sunToPlanetLine: null,
-  meanAnomalyArcAtP: null,
-  trueAnomalyArcAtSun: null,
-  _meanArcAtPRadius: null,
-  _trueArcAtSunRadius: null,
-  // Temporary perihelion visibility state (for step-based camera focus)
-  _tempPerihelionVisible: null,
-  _tempPerihelionOriginalVisible: null,
-  _tempPerihelionOrbitOriginalVisible: null,
-  // Camera control flag - when true, hierarchy inspector controls camera target
+  showAllResults: false,
+  // Camera: while active the animation loop follows _cameraTarget (an
+  // Object3D — the Sun mesh for the orbit view, the planet mesh for the
+  // planet view) instead of o.lookAtObj.
   _cameraControlActive: false,
-  _cameraTarget: null,  // The object to focus on (for animation loop)
+  _cameraTarget: null,
+  _lastTargetPos: null,     // the target's last world position — the loop translates the camera by its displacement
   helpers: {
-    showAxes: true,
-    showStartPos: true,
-    showOrbitCenter: false,  // Solar period reference - off by default
-    showRotationDir: true,
-    showInclinationPlane: true,
-    showPerihelionPoint: true,
-    showAnomalies: true
-  }
+    showInclinationPlane: true,   // orbit fan, nodes, extremes, ecliptic ring
+    showPerihelion: true,         // perihelion point + Sun→perihelion line
+    showAnomalies: true,          // Sun→planet line, ν and M arcs
+    showLocator: true,            // cyan ring around the rendered planet
+  },
+  group: null,          // THREE.Group in WORLD coordinates; all helper meshes
+  parts: null,          // named handles into `group` (built per planet)
+  _frame: null,         // the per-frame orbit frame (pooled vectors)
+  _orbitSampleJD: null, // epoch of the last orbit resample
+  _orbitSampleMs: 0,
+  _els: null,           // cached readout DOM elements (per planet)
+  _lastReadoutJD: null,
+  _lastReadoutPlanet: null,
 };
 
-// Get parent object by name
-function getParentObject(parentName) {
-  if (parentName === 'startingPoint') return startingPoint;
-  // Search through all hierarchies for the object
-  for (const planetKey of Object.keys(PLANET_HIERARCHIES)) {
-    const steps = PLANET_HIERARCHIES[planetKey].steps();
-    for (const step of steps) {
-      if (step.name === parentName) return step.obj;
-    }
-  }
-  return null;
-}
+const _HI_ORBIT_SEGS = 256;   // orbit fan resolution (one period of the chain orbit)
+const _HI_ARC_SEGS = 64;      // anomaly arcs
+const _HI_TILT_DEG = 3;       // top-down camera tilt: keeps the screen-up direction defined (see focusInspectorCamera)
+const _hiD2R = Math.PI / 180;
+const _hiWrap360 = (d) => ((d % 360) + 360) % 360;
+const _hiWrap180 = (d) => ((d + 540) % 360 + 360) % 360 - 180;
+const _hiClamp1 = (x) => Math.min(1, Math.max(-1, x));
+const _hiQuat = new THREE.Quaternion();
+const _hiTmpA = new THREE.Vector3(), _hiTmpB = new THREE.Vector3(), _hiTmpC = new THREE.Vector3();
+const _hiFollowDelta = new THREE.Vector3();   // the animation loop's camera-follow displacement
 
-// Calculate period from speed (preserves sign to indicate direction)
-function speedToPeriod(speed) {
-  if (!speed || speed === 0) return Infinity;
-  // Preserve sign: negative speed = negative period (opposite direction)
-  return (2 * Math.PI) / speed;
-}
-
-// Calculate arcseconds per century from period (preserves sign)
-function periodToArcsecPerCentury(periodYears) {
-  if (!isFinite(periodYears) || periodYears === 0) return 0;
-  // Preserve sign: negative period = negative arcsec/century (retrograde precession)
-  return 129600000 / periodYears; // 360° * 3600 arcsec/degree * 100 years = 129,600,000 arcsec/century
-}
-
-// Format number with precision
-function formatNum(val, precision = 4) {
-  if (val === undefined || val === null) return 'undefined';
-  if (typeof val !== 'number') return String(val);
-  if (isNaN(val)) return 'NaN';
-  if (!isFinite(val)) return val > 0 ? 'Infinity' : '-Infinity';
-  if (Math.abs(val) > 1e9) return '∞';  // show infinity symbol for very large numbers
-  return val.toFixed(precision);
-}
-
-// Validate a step and return issues
-function validateStep(stepData, stepIndex, steps) {
-  const issues = [];
-  const obj = stepData.obj;
-
-  // Check for NaN values
-  if (isNaN(obj.speed)) issues.push({ type: 'error', msg: 'Speed is NaN' });
-  if (isNaN(obj.startPos)) issues.push({ type: 'error', msg: 'StartPos is NaN' });
-  if (isNaN(obj.orbitRadius)) issues.push({ type: 'error', msg: 'OrbitRadius is NaN' });
-  if (isNaN(obj.orbitCentera) || isNaN(obj.orbitCenterb) || isNaN(obj.orbitCenterc)) {
-    issues.push({ type: 'error', msg: 'OrbitCenter has NaN values' });
-  }
-
-  // Check for zero speed on precession steps (steps 0, 2)
-  if ((stepIndex === 0 || stepIndex === 2) && obj.speed === 0) {
-    issues.push({ type: 'warning', msg: 'Speed is 0 - no precession will occur' });
-  }
-
-  // Check runtime objects exist
-  if (!obj.containerObj) issues.push({ type: 'error', msg: 'containerObj not created' });
-  if (!obj.pivotObj) issues.push({ type: 'error', msg: 'pivotObj not created' });
-  if (!obj.orbitObj) issues.push({ type: 'warning', msg: 'orbitObj not created' });
-
-  // Check parent-child connection
-  if (stepIndex > 0) {
-    const parentObj = getParentObject(stepData.parentName);
-    if (parentObj && parentObj.pivotObj && obj.containerObj) {
-      if (obj.containerObj.parent !== parentObj.pivotObj) {
-        issues.push({ type: 'error', msg: `Not attached to parent's pivot (${stepData.parentName})` });
-      }
-    }
-  }
-
-  // Check if orbitRadius and orbitCenter both have non-zero values
-  if (obj.orbitRadius > 0 && (obj.orbitCentera !== 0 || obj.orbitCenterb !== 0 || obj.orbitCenterc !== 0)) {
-    issues.push({ type: 'warning', msg: 'Both orbitRadius and orbitCenter are set' });
-  }
-
-  // Step 2 (PerihelionFromEarth) should point at the Sun - calculate angle to Sun
-  if (stepIndex === 1 && obj.pivotObj && sun.pivotObj) {
-    // Get world positions (using reusable temp vectors)
-    obj.pivotObj.getWorldPosition(_hiObjWorldPos);
-    sun.pivotObj.getWorldPosition(_hiSunWorldPos);
-
-    // Calculate angle from object to Sun in XZ plane
-    const dx = _hiSunWorldPos.x - _hiObjWorldPos.x;
-    const dz = _hiSunWorldPos.z - _hiObjWorldPos.z;
-    const angleToSunRad = Math.atan2(-dz, dx); // Note: -dz because of coordinate system
-    const angleToSunDeg = angleToSunRad * 180 / Math.PI;
-
-    // Get current rotation (startPos + accumulated rotation)
-    const startPosRad = (obj.startPos || 0) * Math.PI / 180;
-    const currentRotation = obj.orbitObj?.rotation?.y ?? 0;
-    const currentAngleRad = startPosRad + currentRotation;
-    const currentAngleDeg = currentAngleRad * 180 / Math.PI;
-
-    // Normalize angles to -180 to 180
-    const normalizeAngle = (a) => ((a + 180) % 360 + 360) % 360 - 180;
-    const normalizedCurrent = normalizeAngle(currentAngleDeg);
-    const normalizedToSun = normalizeAngle(angleToSunDeg);
-    const angleDiff = Math.abs(normalizeAngle(normalizedCurrent - normalizedToSun));
-
-    issues.push({
-      type: 'info',
-      msg: `Angle between Perihelion and Sun: ${(normalizedToSun - 90).toFixed(2)}°`
-    });
-
-    // Calculate distance between earthPerihelionFromEarth and the planet's perihelion
-    if (earthPerihelionFromEarth?.pivotObj && obj.pivotObj) {
-      earthPerihelionFromEarth.pivotObj.getWorldPosition(_hiEarthPeriPos);
-
-      const distanceSceneUnits = Math.sqrt(
-        Math.pow(_hiObjWorldPos.x - _hiEarthPeriPos.x, 2) +
-        Math.pow(_hiObjWorldPos.y - _hiEarthPeriPos.y, 2) +
-        Math.pow(_hiObjWorldPos.z - _hiEarthPeriPos.z, 2)
-      );
-      const distanceAU = distanceSceneUnits / 100; // scene units to AU
-
-      issues.push({
-        type: 'info',
-        msg: `Calculated distance perihelion Sun barycenter: ${distanceAU.toFixed(6)} AU`
-      });
-    }
-
-    // Calculate angle from earthPerihelionFromEarth to planet perihelion using apparentRaFromPdA
-    // This uses the astronomical Right Ascension calculation for accuracy
-    if (earthPerihelionFromEarth && obj) {
-      // Reference longitude of perihelion values (expected on model start date)
-      const referenceLongitudes = {
-        mercury: planets.mercury.longitudePerihelion,
-        venus: planets.venus.longitudePerihelion,
-        mars: planets.mars.longitudePerihelion,
-        jupiter: planets.jupiter.longitudePerihelion,
-        saturn: planets.saturn.longitudePerihelion,
-        uranus: planets.uranus.longitudePerihelion,
-        neptune: planets.neptune.longitudePerihelion,
-        pluto: planets.pluto.longitudePerihelion,
-        halleys: planets.halleys.longitudePerihelion,
-        eros: planets.eros.longitudePerihelion
-      };
-
-      const currentPlanet = hierarchyInspector.currentPlanet;
-      const referenceLong = referenceLongitudes[currentPlanet];
-
-      try {
-        const angleDeg = apparentRaFromPdA(earthPerihelionFromEarth, obj);
-        issues.push({
-          type: 'info',
-          msg: `Calculated longitude of perihelion: ${angleDeg.toFixed(6)}°`
-        });
-      } catch (e) {
-        // If calculation fails (e.g., missing ra/distKm), skip silently
-      }
-
-      if (referenceLong !== undefined) {
-        issues.push({
-          type: 'reference',
-          msg: `Reference longitude of perihelion: ${referenceLong.toFixed(6)}°`
-        });
-      }
-    }
-  }
-
-  // Step 4 (RealPerihelionAtSun) - comprehensive orbital diagnostics
-  if (stepIndex === 3) {
-    const tiltaDeg = obj.orbitTilta || 0;
-    const tiltbDeg = obj.orbitTiltb || 0;
-    const startPosDeg = obj.startPos || 0;
-
-    // Calculate the total inclination magnitude
-    const totalInclinationDeg = Math.sqrt(tiltaDeg * tiltaDeg + tiltbDeg * tiltbDeg);
-
-    // Calculate the longitude of ascending node from tilt components
-    // The encoding formula used in RealPerihelionAtSun objects is:
-    //   orbitTilta = cos((-90-Ω) * π/180) * -inclination
-    //   orbitTiltb = sin((-90-Ω) * π/180) * -inclination
-    // The negative inclination flips signs, equivalent to adding 180°:
-    //   orbitTilta = cos((90-Ω) * π/180) * inclination
-    //   orbitTiltb = sin((90-Ω) * π/180) * inclination
-    // To reverse: θ = atan2(tiltb, tilta) = (90 - Ω), so Ω = 90 - θ
-    const theta = Math.atan2(tiltbDeg, tiltaDeg) * 180 / Math.PI;
-    let ascNodeAngleDeg = 90 - theta;
-    // Normalize to 0-360 range
-    ascNodeAngleDeg = ((ascNodeAngleDeg % 360) + 360) % 360;
-
-    issues.push({
-      type: 'valid',
-      msg: `orbitTilta: ${tiltaDeg.toFixed(4)}° (rotation around X)`
-    });
-    issues.push({
-      type: 'valid',
-      msg: `orbitTiltb: ${tiltbDeg.toFixed(4)}° (rotation around Z)`
-    });
-    issues.push({
-      type: 'valid',
-      msg: `Total inclination: ${totalInclinationDeg.toFixed(4)}°`
-    });
-
-  }
-
-  // Step 5 (actual planet) - RA validation now shown in Position Report section
-
-  if (issues.length === 0) {
-    issues.push({ type: 'valid', msg: 'All checks passed' });
-  }
-
-  return issues;
-}
-
-// Create visual helpers for current step
-// Options:
-//   skipClear: if true, don't call clearVisualHelpers (caller has already done it)
-function createVisualHelpers(stepData, options = {}) {
-  const { skipClear = false } = options;
-  if (!skipClear) {
-    // Force clean all anomaly elements since we're recreating for potentially a new step
-    clearVisualHelpers({ forceCleanAnomalies: true });
-  }
-
-  const obj = stepData.obj;
-  if (!obj.pivotObj) return;
-
-  const scale = Math.max(50, obj.orbitRadius || 50);
-
-  // Axes helper (XYZ)
-  if (hierarchyInspector.helpers.showAxes) {
-    hierarchyInspector.axesHelper = new THREE.AxesHelper(scale * 0.5);
-    obj.pivotObj.add(hierarchyInspector.axesHelper);
-  }
-
-  // StartPos direction arrow (WHITE - initial/to-be position)
-  if (hierarchyInspector.helpers.showStartPos && obj.startPos !== undefined) {
-    const startPosRad = (obj.startPos || 0) * Math.PI / 180;
-    const arrowDir = new THREE.Vector3(Math.cos(startPosRad), 0, -Math.sin(startPosRad));
-    const arrowLength = scale * 0.4;
-    hierarchyInspector.startPosArrow = new THREE.ArrowHelper(
-      arrowDir, new THREE.Vector3(0, 0, 0), arrowLength, 0xffd700, arrowLength * 0.15, arrowLength * 0.08
-    );
-    obj.pivotObj.add(hierarchyInspector.startPosArrow);
-
-    // Current position arrow (WHITE - where object currently is)
-    // The current rotation is stored in orbitObj.rotation.y
-    const currentRotation = obj.orbitObj?.rotation?.y ?? 0;
-    const currentPosRad = startPosRad + currentRotation;
-    const currentDir = new THREE.Vector3(Math.cos(currentPosRad), 0, -Math.sin(currentPosRad));
-    hierarchyInspector.currentPosArrow = new THREE.ArrowHelper(
-      currentDir, new THREE.Vector3(0, 0, 0), arrowLength * 1.1, 0xffffff, arrowLength * 0.15, arrowLength * 0.08
-    );
-    obj.pivotObj.add(hierarchyInspector.currentPosArrow);
-  }
-
-  // Orbit center offset arrow
-  if (hierarchyInspector.helpers.showOrbitCenter) {
-    const offsetX = obj.orbitCentera || 0;
-    const offsetY = obj.orbitCenterc || 0;
-    const offsetZ = obj.orbitCenterb || 0;
-    if (offsetX !== 0 || offsetY !== 0 || offsetZ !== 0) {
-      const offsetVec = new THREE.Vector3(offsetX, offsetY, offsetZ);
-      const offsetLength = offsetVec.length();
-      hierarchyInspector.orbitCenterArrow = new THREE.ArrowHelper(
-        offsetVec.clone().normalize(), new THREE.Vector3(0, 0, 0), offsetLength, 0x00ffff, offsetLength * 0.15, offsetLength * 0.08
-      );
-      obj.pivotObj.add(hierarchyInspector.orbitCenterArrow);
-    }
-  }
-
-  // Rotation direction indicator
-  if (hierarchyInspector.helpers.showRotationDir && obj.speed !== 0) {
-    const isCounterClockwise = obj.speed > 0;
-    const color = isCounterClockwise ? 0x00ff00 : 0xff0000;
-    const curve = new THREE.EllipseCurve(0, 0, scale * 0.3, scale * 0.3, 0, Math.PI * 1.5, !isCounterClockwise);
-    const points = curve.getPoints(32);
-    const geometry = new THREE.BufferGeometry().setFromPoints(points.map(p => new THREE.Vector3(p.x, 0, p.y)));
-    const material = new THREE.LineBasicMaterial({ color: color, linewidth: 2 });
-    hierarchyInspector.rotationArrow = new THREE.Line(geometry, material);
-    obj.pivotObj.add(hierarchyInspector.rotationArrow);
-  }
-
-  // Green arrow from planet perihelion to Earth perihelion (Step 2 only)
-  if (hierarchyInspector.currentStep === 1 && earthPerihelionFromEarth?.pivotObj && obj.pivotObj) {
-    obj.pivotObj.getWorldPosition(_hiPlanetPeriPos);
-    earthPerihelionFromEarth.pivotObj.getWorldPosition(_hiEarthPeriPos);
-
-    // Calculate direction and distance (reusing temp vector)
-    _hiDirection.subVectors(_hiEarthPeriPos, _hiPlanetPeriPos);
-    const distance = _hiDirection.length();
-
-    if (distance > 0.001) {
-      _hiDirection.normalize();
-      // Create green arrow from planet perihelion pointing to Earth perihelion
-      hierarchyInspector.earthPerihelionArrow = new THREE.ArrowHelper(
-        _hiDirection,
-        _hiPlanetPeriPos,
-        distance,
-        0x00ff00,  // Green color
-        distance * 0.1,  // Head length
-        distance * 0.05  // Head width
-      );
-      scene.add(hierarchyInspector.earthPerihelionArrow);
-    }
-  }
-
-  // Inclination plane with ascending/descending nodes (Step 4 only - RealPerihelionAtSun)
-  // Step 4 is index 3 (0-based), and it has orbitTilta for orbital inclination
-  if (hierarchyInspector.helpers.showInclinationPlane &&
-      hierarchyInspector.currentStep === 3 &&
-      (obj.orbitTilta !== undefined || obj.orbitTiltb !== undefined)) {
-
-    // Get the actual tilt values in degrees (as stored in the object)
-    const tiltaDeg = obj.orbitTilta || 0;
-    const tiltbDeg = obj.orbitTiltb || 0;
-    const tiltaRad = tiltaDeg * Math.PI / 180;
-    const tiltbRad = tiltbDeg * Math.PI / 180;
-
-    const planeRadius = scale * 0.5;
-
-    // Create a group to hold the inclined plane and nodes
-    hierarchyInspector.inclinationPlane = new THREE.Group();
-
-    // Create ecliptic plane reference (flat ring at y=0) - BLUE DASHED
-    const eclipticCurve = new THREE.EllipseCurve(0, 0, planeRadius * 1.05, planeRadius * 1.05, 0, Math.PI * 2, false);
-    const eclipticPoints = eclipticCurve.getPoints(64);
-    const eclipticGeometry = new THREE.BufferGeometry().setFromPoints(
-      eclipticPoints.map(p => new THREE.Vector3(p.x, 0, p.y))
-    );
-    const eclipticMaterial = new THREE.LineDashedMaterial({
-      color: 0x4488ff,
-      linewidth: 1,
-      dashSize: 5,
-      gapSize: 3
-    });
-    const eclipticLine = new THREE.Line(eclipticGeometry, eclipticMaterial);
-    eclipticLine.computeLineDistances();
-    hierarchyInspector.inclinationPlane.add(eclipticLine);
-
-    // COORDINATE SYSTEM EXPLANATION:
-    // The inclinationPlane is added to obj.pivotObj, which is INSIDE orbitContainer.
-    // orbitContainer already has the tilt applied (rotation.x and rotation.z).
-    // Therefore, our LOCAL y=0 plane IS the tilted orbital plane in world space.
-    // The WORLD ecliptic (world y=0) appears tilted relative to our local frame.
-    //
-    // To find nodes and color the half-planes correctly, we need to transform
-    // LOCAL points to WORLD space to check which side of the ecliptic they're on.
-    //
-    // The parent (orbitContainer) applies rotation via Euler angles:
-    //   rotation.x = tiltaRad, rotation.z = tiltbRad (default 'XYZ' order)
-    // We must match this EXACTLY by using the same Euler approach
-    const localToWorld = new THREE.Matrix4();
-    localToWorld.makeRotationFromEuler(new THREE.Euler(tiltaRad, 0, tiltbRad, 'XYZ'));
-
-    // Get the ACTUAL ascending node angle from the o.xxxAscendingNode property
-    // This is the authoritative value that's dynamically calculated for the current date
-    const ascNodePropertyMap = {
-      mercury: 'mercuryAscendingNode',
-      venus: 'venusAscendingNode',
-      mars: 'marsAscendingNode',
-      jupiter: 'jupiterAscendingNode',
-      saturn: 'saturnAscendingNode',
-      uranus: 'uranusAscendingNode',
-      neptune: 'neptuneAscendingNode',
-      pluto: 'plutoAscendingNode',
-      halleys: 'halleysAscendingNode',
-      eros: 'erosAscendingNode'
+/** The pooled orbit frame (allocated once). */
+function _hiFrame() {
+  if (!hierarchyInspector._frame) {
+    hierarchyInspector._frame = {
+      S: new THREE.Vector3(), P: new THREE.Vector3(), r: new THREE.Vector3(),
+      p: new THREE.Vector3(), q: new THREE.Vector3(), nOrb: new THREE.Vector3(),
+      n: new THREE.Vector3(), g: new THREE.Vector3(), u2: new THREE.Vector3(),
+      node: new THREE.Vector3(), tmp: new THREE.Vector3(),
+      el: null, obj: null, jd: 0, aScene: 0, pDays: 0,
+      trueAnomalyDeg: 0, meanAnomalyDeg: 0, eocDeg: 0, rAU: 0, rPeriAU: 0, rApoAU: 0,
+      inclDateDeg: 0, nodeLonDateDeg: 0, argLatDeg: 0, heightAU: 0, maxHeightAU: 0,
     };
-    const ascNodeProp = ascNodePropertyMap[hierarchyInspector.currentPlanet];
-    const ascNodeAngleDeg = ascNodeProp ? (o[ascNodeProp] || 0) : 0;
-    const ascNodeAngleRad = ascNodeAngleDeg * Math.PI / 180;
+  }
+  return hierarchyInspector._frame;
+}
 
-    // Calculate ascending node position in LOCAL coordinates
-    // The ascending node angle is in ecliptic longitude (measured from vernal equinox)
-    // Our model is 90° rotated (from March 21 to June 21), so we add 90° counterclockwise
-    // Original: X = cos(angle), Z = -sin(angle)
-    // After 90° CCW rotation: X = -sin(angle), Z = -cos(angle)
-    let ascendingNodePos = new THREE.Vector3(
-      planeRadius * -Math.sin(ascNodeAngleRad),
-      0,
-      planeRadius * -Math.cos(ascNodeAngleRad)
-    );
+/** Rotate a J2000-ecliptic triple through the chain frame bridge R into world axes. */
+function _hiRotJ2000(R, v, out) {
+  return out.set(
+    R[0][0] * v[0] + R[0][1] * v[1] + R[0][2] * v[2],
+    R[1][0] * v[0] + R[1][1] * v[1] + R[1][2] * v[2],
+    R[2][0] * v[0] + R[2][1] * v[1] + R[2][2] * v[2]);
+}
 
-    // Descending node is 180° opposite the ascending node
-    let descendingNodePos = new THREE.Vector3(
-      -ascendingNodePos.x,
-      0,
-      -ascendingNodePos.z
-    );
+/**
+ * The orbit frame of date for a chain planet at the scene epoch: the chain
+ * elements, the perihelion/in-plane/normal directions in WORLD axes (the same
+ * element→position convention as kcComputeHeliocentricEclipticFromElements,
+ * through the frame bridge R), the rendered ecliptic-of-date pole n̂ and
+ * equinox ĝ, and the derived angles. Null while the frame bridge is not yet
+ * derived (first frame) or for a no-chain body.
+ */
+function computeInspectorOrbitFrame(planetKey) {
+  const target = PLANET_HIERARCHIES[planetKey];
+  if (!target || !target.chain || !_kcR) return null;
+  const f = _hiFrame();
+  const obj = target.obj();
+  if (!obj?.planetObj || !sun?.planetObj) return null;
+  const jd = o.julianDay;
+  const el = _kcElementsOfDate(planetKey, jd);
+  const R = _kcR;
+  const Om = el.ascNodeEclipticDeg * _hiD2R, inc = el.inclEclipticDeg * _hiD2R;
+  const w = (el.lonPeriEclipticDeg - el.ascNodeEclipticDeg) * _hiD2R;
+  const cw = Math.cos(w), sw = Math.sin(w), cO = Math.cos(Om), sO = Math.sin(Om), ci = Math.cos(inc), si = Math.sin(inc);
+  // perihelion direction p̂, the in-plane direction 90° ahead q̂, the orbit normal n̂_orb (J2000 ecliptic)
+  _hiRotJ2000(R, [cw * cO - sw * sO * ci, cw * sO + sw * cO * ci, sw * si], f.p).normalize();
+  _hiRotJ2000(R, [-sw * cO - cw * sO * ci, -sw * sO + cw * cO * ci, cw * si], f.q).normalize();
+  _hiRotJ2000(R, [si * sO, -si * cO, ci], f.nOrb).normalize();
+  // the rendered ecliptic of date: the sun-plane container's world basis is [ĝ, n̂, ĝ×n̂] (R4)
+  earthPerihelionPrecession1.containerObj.getWorldQuaternion(_hiQuat);
+  f.n.set(0, 1, 0).applyQuaternion(_hiQuat).normalize();
+  f.g.set(1, 0, 0).applyQuaternion(_hiQuat).normalize();
+  f.u2.crossVectors(f.n, f.g).normalize();          // ecliptic longitude +90°
+  sun.planetObj.getWorldPosition(f.S);
+  obj.planetObj.getWorldPosition(f.P);              // the RENDERED planet (light-time retarded, as the eye sees it)
+  f.el = el; f.obj = obj; f.jd = jd;
+  f.aScene = 100 * el.aAU;
+  f.pDays = 365.25 * Math.pow(el.aAU, 1.5);         // Kepler III in the solar-mass unit (as _kcUpdateOrbitLine)
+  f.r.subVectors(f.P, f.S);
+  f.rAU = f.r.length() / 100;
+  f.rPeriAU = el.aAU * (1 - el.e);
+  f.rApoAU = el.aAU * (1 + el.e);
+  // ν at the Sun: the angle from p̂ to the planet in the orbit plane (sign from n̂_orb via q̂)
+  f.trueAnomalyDeg = _hiWrap360(Math.atan2(f.r.dot(f.q), f.r.dot(f.p)) / _hiD2R);
+  f.meanAnomalyDeg = _hiWrap360(el.meanAnomalyDeg ?? (el.meanLonEclipticDeg - el.lonPeriEclipticDeg));
+  f.eocDeg = _hiWrap180(f.trueAnomalyDeg - f.meanAnomalyDeg);
+  // of-date geometry against the rendered ecliptic
+  f.inclDateDeg = Math.acos(_hiClamp1(f.nOrb.dot(f.n))) / _hiD2R;
+  f.node.crossVectors(f.n, f.nOrb);                 // the ascending node direction (n̂_ecl × n̂_orb)
+  if (f.node.lengthSq() < 1e-18) f.node.copy(f.g);
+  f.node.normalize();
+  f.nodeLonDateDeg = _hiWrap360(Math.atan2(f.node.dot(f.u2), f.node.dot(f.g)) / _hiD2R);
+  f.tmp.crossVectors(f.node, f.r);
+  f.argLatDeg = _hiWrap360(Math.atan2(f.tmp.dot(f.nOrb), f.r.dot(f.node)) / _hiD2R);
+  f.heightAU = f.r.dot(f.n) / 100;
+  f.maxHeightAU = f.rAU * Math.sin(f.inclDateDeg * _hiD2R);
+  return f;
+}
 
-    // Find highest and lowest points by sampling the orbit
-    // These are 90° after the ascending/descending nodes
-    const numSamples = 360;
-    let highestLocalPos = new THREE.Vector3();
-    let lowestLocalPos = new THREE.Vector3();
-    let maxWorldY = -Infinity;
-    let minWorldY = Infinity;
+// ─── visual helpers (one THREE.Group in world coordinates) ─────────────────
 
-    for (let i = 0; i < numSamples; i++) {
-      const angle = (i / numSamples) * Math.PI * 2;
+function _hiLine(color, n, dashed) {
+  const geom = new THREE.BufferGeometry();
+  geom.setAttribute('position', new THREE.BufferAttribute(new Float32Array(n * 3), 3));
+  const mat = dashed
+    ? new THREE.LineDashedMaterial({ color, dashSize: 3, gapSize: 2 })
+    : new THREE.LineBasicMaterial({ color });
+  const line = new THREE.Line(geom, mat);
+  line.frustumCulled = false;
+  return line;
+}
+function _hiSphere(color, radius) {
+  const m = new THREE.Mesh(new THREE.SphereGeometry(radius, 16, 16),
+    new THREE.MeshBasicMaterial({ color, depthTest: false }));
+  m.renderOrder = 998;
+  return m;
+}
+function _hiArrow(color, length) {
+  return new THREE.ArrowHelper(new THREE.Vector3(0, 1, 0), new THREE.Vector3(), length, color, length * 0.35, length * 0.2);
+}
+function _hiLabelSprite(text, sizeScene) {
+  const canvas = document.createElement('canvas');
+  canvas.width = 64; canvas.height = 64;
+  const ctx = canvas.getContext('2d');
+  ctx.fillStyle = '#ffffff';
+  ctx.font = 'bold 44px Arial';
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.fillText(text, 32, 32);
+  const sprite = new THREE.Sprite(new THREE.SpriteMaterial({ map: new THREE.CanvasTexture(canvas), depthTest: false, transparent: true }));
+  sprite.scale.set(sizeScene, sizeScene, 1);
+  sprite.renderOrder = 1001;
+  return sprite;
+}
+function _hiSetLine(line, i, v) {
+  const a = line.geometry.attributes.position.array;
+  a[i * 3] = v.x; a[i * 3 + 1] = v.y; a[i * 3 + 2] = v.z;
+}
+function _hiFlagLine(line) {
+  line.geometry.attributes.position.needsUpdate = true;
+  if (line.material.isLineDashedMaterial) line.computeLineDistances();
+}
 
-      // Point on LOCAL orbital plane (flat circle at local y=0)
-      const pLocal = new THREE.Vector3(planeRadius * Math.cos(angle), 0, planeRadius * Math.sin(angle));
+/** Build the helper group for the current planet (idempotent per planet). */
+function createVisualHelpers() {
+  clearVisualHelpers();
+  const f = computeInspectorOrbitFrame(hierarchyInspector.currentPlanet);
+  if (!f) return;
+  const H = hierarchyInspector, h = H.helpers;
+  const group = new THREE.Group();
+  group.name = 'PlanetInspectorHelpers';
+  const parts = { planet: H.currentPlanet };
+  const a = f.aScene;
+  const N = _HI_ORBIT_SEGS;
 
-      // Transform to WORLD space to check ecliptic position
-      const pWorld = pLocal.clone().applyMatrix4(localToWorld);
-
-      // Track highest and lowest points (in WORLD y), but store LOCAL positions for markers
-      if (pWorld.y > maxWorldY) {
-        maxWorldY = pWorld.y;
-        highestLocalPos.copy(pLocal);
-      }
-      if (pWorld.y < minWorldY) {
-        minWorldY = pWorld.y;
-        lowestLocalPos.copy(pLocal);
-      }
-    }
-
-    // ===== BUILD THE ORBITAL PLANE WITH TWO COLORED HALVES =====
-    // Geometry is FLAT in LOCAL space (y=0). The parent transform tilts it in world.
-    // We color segments based on their WORLD y position (above/below ecliptic).
-
-    // Generate points for the orbit outline (LOCAL y=0 plane)
-    const numPoints = 64;
-    const orbitPoints = [];        // LOCAL positions for geometry
-    const orbitPointsWorld = [];   // WORLD positions for coloring logic
-    for (let i = 0; i <= numPoints; i++) {
-      const angle = (i / numPoints) * Math.PI * 2;
-      const localPoint = new THREE.Vector3(
-        planeRadius * Math.cos(angle),
-        0,
-        planeRadius * Math.sin(angle)
-      );
-      orbitPoints.push(localPoint);
-      orbitPointsWorld.push(localPoint.clone().applyMatrix4(localToWorld));
-    }
-
-    // Create the tilted orbit outline - WHITE LINE
-    const orbitGeometry = new THREE.BufferGeometry().setFromPoints(orbitPoints);
-    const orbitMaterial = new THREE.LineBasicMaterial({ color: 0xffffff, linewidth: 2 });
-    const orbitLine = new THREE.Line(orbitGeometry, orbitMaterial);
-    hierarchyInspector.inclinationPlane.add(orbitLine);
-
-    // Create two half-disc meshes for ABOVE and BELOW ecliptic portions
-    // Geometry uses LOCAL positions, but we check WORLD y to determine coloring
-
-    // Helper function to create a half-disc mesh
-    // localPoints: positions for geometry (in local space)
-    // worldPoints: positions for above/below check (in world space)
-    const createHalfDisc = (localPoints, worldPoints, color, isAbove) => {
-      const vertices = [];
-      const indices = [];
-      const center = new THREE.Vector3(0, 0, 0);
-
-      // Add center point (local origin)
-      vertices.push(center.x, center.y, center.z);
-
-      // Add edge points from LOCAL positions (for geometry)
-      for (let i = 0; i < localPoints.length; i++) {
-        const p = localPoints[i];
-        vertices.push(p.x, p.y, p.z);
-      }
-
-      // Create triangles from center to each pair of adjacent points
-      // Use WORLD y to determine if segment is above/below ecliptic
-      for (let i = 1; i < localPoints.length; i++) {
-        const p1World = worldPoints[i - 1];
-        const p2World = worldPoints[i];
-
-        // Check if midpoint of this segment is above or below WORLD ecliptic (y=0)
-        const midWorldY = (p1World.y + p2World.y) / 2;
-        const segmentIsAbove = midWorldY > 0;
-
-        if (segmentIsAbove === isAbove) {
-          indices.push(0, i, i + 1);
-        }
-      }
-
-      if (indices.length === 0) return null;
-
-      const geometry = new THREE.BufferGeometry();
-      geometry.setAttribute('position', new THREE.Float32BufferAttribute(vertices, 3));
-      geometry.setIndex(indices);
-      geometry.computeVertexNormals();
-
-      const material = new THREE.MeshBasicMaterial({
-        color: color,
-        side: THREE.DoubleSide,
-        transparent: true,
-        opacity: 0.3
-      });
-
-      return new THREE.Mesh(geometry, material);
+  if (h.showInclinationPlane) {
+    // the orbit fan: centre (the Sun) + N+1 ring points; two meshes SHARE the
+    // position attribute and split the triangles by the ring points' height
+    const pos = new THREE.BufferAttribute(new Float32Array((N + 2) * 3), 3);
+    const mkFan = (color) => {
+      const g = new THREE.BufferGeometry();
+      g.setAttribute('position', pos);
+      g.setIndex([]);
+      const m = new THREE.Mesh(g, new THREE.MeshBasicMaterial({ color, side: THREE.DoubleSide, transparent: true, opacity: 0.3, depthWrite: false }));
+      m.frustumCulled = false;
+      return m;
     };
-
-    // Create GREEN half for segments ABOVE world ecliptic (world y > 0)
-    const aboveHalf = createHalfDisc(orbitPoints, orbitPointsWorld, 0x00ff00, true);
-    if (aboveHalf) {
-      hierarchyInspector.inclinationPlane.add(aboveHalf);
-      hierarchyInspector.aboveHalfPlane = aboveHalf;
-    }
-
-    // Create RED half for segments BELOW world ecliptic (world y < 0)
-    const belowHalf = createHalfDisc(orbitPoints, orbitPointsWorld, 0xff0000, false);
-    if (belowHalf) {
-      hierarchyInspector.inclinationPlane.add(belowHalf);
-      hierarchyInspector.belowHalfPlane = belowHalf;
-    }
-
-    // ===== NODE MARKERS =====
-
-    // Ascending node marker - MAGENTA sphere with UP arrow (planet rises above ecliptic here)
-    const ascNodeGeometry = new THREE.SphereGeometry(planeRadius * 0.08, 16, 16);
-    const ascNodeMaterial = new THREE.MeshBasicMaterial({ color: 0xff00ff }); // Magenta
-    hierarchyInspector.ascendingNode = new THREE.Mesh(ascNodeGeometry, ascNodeMaterial);
-    hierarchyInspector.ascendingNode.position.copy(ascendingNodePos);
-    hierarchyInspector.inclinationPlane.add(hierarchyInspector.ascendingNode);
-
-    // Ascending node arrow pointing up
-    const ascArrow = new THREE.ArrowHelper(
-      new THREE.Vector3(0, 1, 0),
-      ascendingNodePos,
-      planeRadius * 0.3,
-      0xff00ff, // Magenta
-      planeRadius * 0.1,
-      planeRadius * 0.05
-    );
-    hierarchyInspector.inclinationPlane.add(ascArrow);
-    hierarchyInspector._ascNodeArrow = ascArrow; // Cache for performance
-
-    // Descending node marker - CYAN sphere with DOWN arrow (planet drops below ecliptic here)
-    const descNodeGeometry = new THREE.SphereGeometry(planeRadius * 0.08, 16, 16);
-    const descNodeMaterial = new THREE.MeshBasicMaterial({ color: 0x00ffff }); // Cyan
-    hierarchyInspector.descendingNode = new THREE.Mesh(descNodeGeometry, descNodeMaterial);
-    hierarchyInspector.descendingNode.position.copy(descendingNodePos);
-    hierarchyInspector.inclinationPlane.add(hierarchyInspector.descendingNode);
-
-    // Descending node arrow pointing down
-    const descArrow = new THREE.ArrowHelper(
-      new THREE.Vector3(0, -1, 0),
-      descendingNodePos,
-      planeRadius * 0.3,
-      0x00ffff, // Cyan
-      planeRadius * 0.1,
-      planeRadius * 0.05
-    );
-    hierarchyInspector.inclinationPlane.add(descArrow);
-    hierarchyInspector._descNodeArrow = descArrow; // Cache for performance
-
-    // Line of nodes (yellow dashed) - connects ascending and descending nodes
-    const nodesLineGeometry = new THREE.BufferGeometry().setFromPoints([
-      ascendingNodePos, descendingNodePos
-    ]);
-    const nodesLineMaterial = new THREE.LineDashedMaterial({
-      color: 0xffff00,
-      linewidth: 2,
-      dashSize: 3,
-      gapSize: 2
-    });
-    const nodesLine = new THREE.Line(nodesLineGeometry, nodesLineMaterial);
-    nodesLine.computeLineDistances();
-    hierarchyInspector.inclinationPlane.add(nodesLine);
-    hierarchyInspector._nodesLine = nodesLine; // Cache for performance
-
-    // ===== HIGHEST/LOWEST POINT MARKERS =====
-    // Use LOCAL positions (the parent transform will place them correctly in world)
-
-    // Highest point marker - GREEN small sphere (maximum altitude above ecliptic)
-    const highGeometry = new THREE.SphereGeometry(planeRadius * 0.05, 12, 12);
-    const highMaterial = new THREE.MeshBasicMaterial({ color: 0x00ff00 }); // Green
-    const highMarker = new THREE.Mesh(highGeometry, highMaterial);
-    highMarker.position.copy(highestLocalPos);
-    hierarchyInspector.inclinationPlane.add(highMarker);
-    hierarchyInspector.highestPointMarker = highMarker;
-
-    const highArrow = new THREE.ArrowHelper(
-      new THREE.Vector3(0, 1, 0),  // UP arrow - highest point above ecliptic
-      highestLocalPos,
-      planeRadius * 0.15,
-      0x00ff00, // Green
-      planeRadius * 0.05,
-      planeRadius * 0.03
-    );
-    hierarchyInspector.inclinationPlane.add(highArrow);
-    hierarchyInspector._highArrow = highArrow;
-
-    // Lowest point marker - RED small sphere (maximum depth below ecliptic)
-    const lowGeometry = new THREE.SphereGeometry(planeRadius * 0.05, 12, 12);
-    const lowMaterial = new THREE.MeshBasicMaterial({ color: 0xff0000 }); // Red
-    const lowMarker = new THREE.Mesh(lowGeometry, lowMaterial);
-    lowMarker.position.copy(lowestLocalPos);
-    hierarchyInspector.inclinationPlane.add(lowMarker);
-    hierarchyInspector.lowestPointMarker = lowMarker;
-
-    const lowArrow = new THREE.ArrowHelper(
-      new THREE.Vector3(0, -1, 0),  // DOWN arrow - lowest point below ecliptic
-      lowestLocalPos,
-      planeRadius * 0.15,
-      0xff0000, // Red
-      planeRadius * 0.05,
-      planeRadius * 0.03
-    );
-    hierarchyInspector.inclinationPlane.add(lowArrow);
-    hierarchyInspector._lowArrow = lowArrow;
-
-    // Add to containerObj (orbitContainer) NOT pivotObj!
-    // The inclinationPlane should only inherit the orbital tilt (rotation.x, rotation.z)
-    // but NOT the orbit.rotation.y which changes with startPos and animation.
-    // The ascending/descending nodes are fixed points in space relative to the ecliptic.
-    (obj.tiltGroupObj || obj.containerObj).add(hierarchyInspector.inclinationPlane);
+    parts.fanPos = pos;
+    parts.fanAbove = mkFan(0x00ff00);
+    parts.fanBelow = mkFan(0xff0000);
+    parts.heights = new Float64Array(N + 1);
+    parts.orbitLine = _hiLine(0xffffff, N + 1, false);
+    parts.eclipticRing = _hiLine(0x4488ff, N + 1, true);
+    parts.nodesLine = _hiLine(0xffff00, 2, true);
+    parts.ascNode = _hiSphere(0xff00ff, a * 0.03);
+    parts.descNode = _hiSphere(0x00ffff, a * 0.03);
+    parts.ascArrow = _hiArrow(0xff00ff, a * 0.18);
+    parts.descArrow = _hiArrow(0x00ffff, a * 0.18);
+    parts.highPoint = _hiSphere(0x00ff00, a * 0.02);
+    parts.lowPoint = _hiSphere(0xff0000, a * 0.02);
+    parts.highArrow = _hiArrow(0x00ff00, a * 0.1);
+    parts.lowArrow = _hiArrow(0xff0000, a * 0.1);
+    group.add(parts.fanAbove, parts.fanBelow, parts.orbitLine, parts.eclipticRing, parts.nodesLine,
+      parts.ascNode, parts.descNode, parts.ascArrow, parts.descArrow,
+      parts.highPoint, parts.lowPoint, parts.highArrow, parts.lowArrow);
   }
+  if (h.showPerihelion) {
+    parts.periPoint = _hiSphere(0x00ff00, a * 0.025);
+    parts.periPoint.renderOrder = 999;
+    parts.periLabel = _hiLabelSprite('P', a * 0.09);
+    parts.periLine = _hiLine(0x00ff00, 2, false);
+    group.add(parts.periPoint, parts.periLabel, parts.periLine);
+  }
+  if (h.showAnomalies) {
+    parts.sunPlanetLine = _hiLine(0xffbf00, 2, false);
+    parts.trueArc = _hiLine(0xffbf00, _HI_ARC_SEGS + 1, false);
+    parts.meanArc = _hiLine(0x00ffff, _HI_ARC_SEGS + 1, true);
+    parts.trueArcR = a * 0.42 * (1 - f.el.e);
+    parts.meanArcR = a * 0.30 * (1 - f.el.e);
+    group.add(parts.sunPlanetLine, parts.trueArc, parts.meanArc);
+  }
+  if (h.showLocator) {
+    const size = Math.max((f.obj.size || 1) * 3, 2);
+    parts.locator = new THREE.Mesh(new THREE.TorusGeometry(size, size * 0.1, 8, 32),
+      new THREE.MeshBasicMaterial({ color: 0x00ffff, transparent: true, opacity: 0.8, side: THREE.DoubleSide, depthTest: false }));
+    parts.locator.renderOrder = 998;
+    group.add(parts.locator);
+  }
+  scene.add(group);
+  H.group = group;
+  H.parts = parts;
+  H._orbitSampleJD = null;
+  updateInspectorVisuals(f, true);
+}
 
-  // Arrow from P (FixedPerihelionAtSun) to Sun (Step 4 only)
-  // This arrow will be updated dynamically in updateHierarchyLiveData()
-  if (hierarchyInspector.helpers.showPerihelionPoint && hierarchyInspector.currentStep === 3) {
-    // Get the FixedPerihelionAtSun object for the current planet
-    const planetKey = hierarchyInspector.currentPlanet;
-    const fixedPerihelionObjects = {
-      mercury: mercuryFixedPerihelionAtSun,
-      venus: venusFixedPerihelionAtSun,
-      mars: marsFixedPerihelionAtSun,
-      jupiter: jupiterFixedPerihelionAtSun,
-      saturn: saturnFixedPerihelionAtSun,
-      uranus: uranusFixedPerihelionAtSun,
-      neptune: neptuneFixedPerihelionAtSun,
-      pluto: plutoFixedPerihelionAtSun,
-      halleys: halleysFixedPerihelionAtSun,
-      eros: erosFixedPerihelionAtSun
+/** Remove and dispose the helper group. */
+function clearVisualHelpers() {
+  const H = hierarchyInspector;
+  if (!H.group) return;
+  H.group.parent?.remove(H.group);
+  H.group.traverse((child) => {
+    child.geometry?.dispose?.();
+    if (child.material) { child.material.map?.dispose?.(); child.material.dispose?.(); }
+  });
+  H.group = null;
+  H.parts = null;
+  H._orbitSampleJD = null;
+}
+
+/**
+ * Per-frame geometry update. The ORBIT (fan, outline, nodes, extremes,
+ * ecliptic ring) is resampled from the chain over one period when the epoch
+ * has moved by more than 1/720 of the period and at most four times a second
+ * (the _kcUpdateOrbitLine floor: 257 chain evaluations per resample); the
+ * planet-dependent parts (lines, arcs, locator, perihelion) move every frame.
+ */
+function updateInspectorVisuals(f, force = false) {
+  const H = hierarchyInspector, P = H.parts;
+  if (!P || P.planet !== H.currentPlanet) return;
+  const nowMs = performance.now();
+  const N = _HI_ORBIT_SEGS;
+  if (P.fanPos && (force || H._orbitSampleJD === null ||
+      (Math.abs(f.jd - H._orbitSampleJD) > f.pDays / 720 && nowMs - H._orbitSampleMs >= 250))) {
+    H._orbitSampleJD = f.jd; H._orbitSampleMs = nowMs;
+    const R = _kcR, key = H.currentPlanet;
+    const fp = P.fanPos.array, op = P.orbitLine.geometry.attributes.position.array, ep = P.eclipticRing.geometry.attributes.position.array;
+    fp[0] = f.S.x; fp[1] = f.S.y; fp[2] = f.S.z;
+    let iHi = 0, iLo = 0;
+    for (let i = 0; i <= N; i++) {
+      const hv = _kcHelioAU(key, f.jd + (i / N - 0.5) * f.pDays);
+      _hiRotJ2000(R, hv, _hiTmpA).multiplyScalar(100).add(f.S);
+      const k = (i + 1) * 3;
+      fp[k] = _hiTmpA.x; fp[k + 1] = _hiTmpA.y; fp[k + 2] = _hiTmpA.z;
+      op[i * 3] = _hiTmpA.x; op[i * 3 + 1] = _hiTmpA.y; op[i * 3 + 2] = _hiTmpA.z;
+      const hgt = _hiTmpB.subVectors(_hiTmpA, f.S).dot(f.n);
+      P.heights[i] = hgt;
+      if (hgt > P.heights[iHi]) iHi = i;
+      if (hgt < P.heights[iLo]) iLo = i;
+      // the ecliptic-of-date reference ring at the semi-major axis
+      const t = (i / N) * 2 * Math.PI;
+      _hiTmpC.copy(f.S).addScaledVector(f.g, f.aScene * Math.cos(t)).addScaledVector(f.u2, f.aScene * Math.sin(t));
+      ep[i * 3] = _hiTmpC.x; ep[i * 3 + 1] = _hiTmpC.y; ep[i * 3 + 2] = _hiTmpC.z;
+    }
+    P.fanPos.needsUpdate = true;
+    _hiFlagLine(P.orbitLine);
+    _hiFlagLine(P.eclipticRing);
+    // fan triangles split by the ring segment's mean height
+    const above = [], below = [];
+    for (let i = 0; i < N; i++) {
+      ((P.heights[i] + P.heights[i + 1]) / 2 > 0 ? above : below).push(0, i + 1, i + 2);
+    }
+    P.fanAbove.geometry.setIndex(above);
+    P.fanBelow.geometry.setIndex(below);
+    // nodes: the orbit's crossings of the ecliptic of date, interpolated on the sampled orbit
+    const ringPt = (i, out) => out.set(fp[(i + 1) * 3], fp[(i + 1) * 3 + 1], fp[(i + 1) * 3 + 2]);
+    let ascFound = false, descFound = false;
+    for (let i = 0; i < N; i++) {
+      const h0 = P.heights[i], h1 = P.heights[i + 1];
+      if (h0 === h1 || (h0 < 0) === (h1 < 0)) continue;
+      const t = h0 / (h0 - h1);
+      ringPt(i, _hiTmpA); ringPt(i + 1, _hiTmpB);
+      _hiTmpC.lerpVectors(_hiTmpA, _hiTmpB, t);
+      if (h0 < 0 && !ascFound) { ascFound = true; P.ascNode.position.copy(_hiTmpC); P.ascArrow.position.copy(_hiTmpC); }
+      else if (h0 >= 0 && !descFound) { descFound = true; P.descNode.position.copy(_hiTmpC); P.descArrow.position.copy(_hiTmpC); }
+    }
+    P.ascArrow.setDirection(f.n);
+    P.descArrow.setDirection(_hiTmpA.copy(f.n).negate());
+    _hiSetLine(P.nodesLine, 0, P.ascNode.position);
+    _hiSetLine(P.nodesLine, 1, P.descNode.position);
+    _hiFlagLine(P.nodesLine);
+    ringPt(iHi, P.highPoint.position); ringPt(iLo, P.lowPoint.position);
+    P.highArrow.position.copy(P.highPoint.position); P.highArrow.setDirection(f.n);
+    P.lowArrow.position.copy(P.lowPoint.position); P.lowArrow.setDirection(_hiTmpA.copy(f.n).negate());
+  }
+  if (P.periPoint) {
+    _hiTmpA.copy(f.S).addScaledVector(f.p, 100 * f.rPeriAU);
+    P.periPoint.position.copy(_hiTmpA);
+    P.periLabel.position.copy(_hiTmpA).addScaledVector(f.n, f.aScene * 0.06);
+    _hiSetLine(P.periLine, 0, f.S); _hiSetLine(P.periLine, 1, _hiTmpA); _hiFlagLine(P.periLine);
+  }
+  if (P.sunPlanetLine) {
+    _hiSetLine(P.sunPlanetLine, 0, f.S); _hiSetLine(P.sunPlanetLine, 1, f.P); _hiFlagLine(P.sunPlanetLine);
+    const sweep = (line, radius, deg) => {
+      const rad = deg * _hiD2R;
+      for (let i = 0; i <= _HI_ARC_SEGS; i++) {
+        const t = rad * i / _HI_ARC_SEGS;
+        _hiTmpA.copy(f.S).addScaledVector(f.p, radius * Math.cos(t)).addScaledVector(f.q, radius * Math.sin(t));
+        _hiSetLine(line, i, _hiTmpA);
+      }
+      _hiFlagLine(line);
     };
-    const fixedPerihelion = fixedPerihelionObjects[planetKey];
-
-    // Store reference for dynamic updates
-    hierarchyInspector._fixedPerihelionObj = fixedPerihelion;
-    hierarchyInspector._perihelionArrowScale = scale;
-
-    // Create arrow group that will be updated dynamically
-    hierarchyInspector.perihelionArrow = new THREE.Group();
-
-    // Create initial line geometry (will be updated each frame)
-    const lineLength = scale * 1.5;
-    const lineGeometry = new THREE.BufferGeometry();
-    lineGeometry.setAttribute('position', new THREE.Float32BufferAttribute([0, 0, -lineLength, 0, 0, lineLength], 3));
-    const lineMaterial = new THREE.LineBasicMaterial({ color: 0x00ff00, linewidth: 2 });
-    hierarchyInspector._perihelionLine = new THREE.Line(lineGeometry, lineMaterial);
-    hierarchyInspector.perihelionArrow.add(hierarchyInspector._perihelionLine);
-
-    // Create arrowhead (will be updated each frame)
-    hierarchyInspector._perihelionArrowHead = new THREE.ArrowHelper(
-      new THREE.Vector3(0, 0, 1),
-      new THREE.Vector3(0, 0, lineLength * 0.85),
-      lineLength * 0.15,
-      0x00ff00,
-      lineLength * 0.1,
-      lineLength * 0.05
-    );
-    hierarchyInspector.perihelionArrow.add(hierarchyInspector._perihelionArrowHead);
-
-    // Add to scene (will be positioned in updateHierarchyLiveData)
-    scene.add(hierarchyInspector.perihelionArrow);
-
-    // Initialize arrow position immediately to avoid misplacement on first frame
-    if (fixedPerihelion) {
-      const sourceObj = fixedPerihelion.planetObj || fixedPerihelion.pivotObj;
-      if (sourceObj) {
-        // Initialize cached vectors
-        hierarchyInspector._sunPosVec3 = new THREE.Vector3();
-        hierarchyInspector._dirVec3 = new THREE.Vector3();
-        hierarchyInspector._defaultDir = new THREE.Vector3(0, 0, 1);
-        hierarchyInspector._arrowQuat = new THREE.Quaternion();
-
-        // Get initial positions
-        const initialPos = new THREE.Vector3();
-        sourceObj.getWorldPosition(initialPos);
-        hierarchyInspector.perihelionArrow.position.copy(initialPos);
-
-        // Get Sun's position and calculate direction
-        if (sun && sun.pivotObj) {
-          sun.pivotObj.getWorldPosition(hierarchyInspector._sunPosVec3);
-          hierarchyInspector._dirVec3.subVectors(hierarchyInspector._sunPosVec3, initialPos).normalize();
-
-          // Set initial rotation
-          if (hierarchyInspector._dirVec3.lengthSq() > 0.0001) {
-            hierarchyInspector._arrowQuat.setFromUnitVectors(hierarchyInspector._defaultDir, hierarchyInspector._dirVec3);
-            hierarchyInspector.perihelionArrow.setRotationFromQuaternion(hierarchyInspector._arrowQuat);
-          }
-        }
-      }
-    }
+    sweep(P.trueArc, P.trueArcR, f.trueAnomalyDeg);
+    sweep(P.meanArc, P.meanArcR, f.meanAnomalyDeg);
   }
-
-  // Anomaly visualization (Step 4 only - RealPerihelionAtSun)
-  // Shows True Anomaly and Mean Anomaly as lines/arcs from Sun through orbit
-  // Note: currentStep is 0-indexed, so step 4 = index 3
-  if (hierarchyInspector.helpers.showAnomalies && hierarchyInspector.currentStep === 3) {
-    const anomalyRadius = scale * 0.5; // Match inclination plane radius
-
-    // Arc radii based on the planet's elliptic orbit size (distance between P and orbit center)
-    // This makes the visualization proportional to the actual orbit eccentricity
-    const ellipticOrbitRadius = obj.orbitRadius || anomalyRadius * 0.5;
-
-    // Only create the anomalyGroup and its contents if it doesn't exist
-    // This allows the visualization to persist when toggling OTHER helper checkboxes
-    if (!hierarchyInspector.anomalyGroup) {
-      // Create a group for anomaly visuals - will be added to scene at Sun's position
-      hierarchyInspector.anomalyGroup = new THREE.Group();
-
-      const arcSegments = 32;
-      const trueArcRadius = ellipticOrbitRadius * 1.2;   // True anomaly arc (outer)
-      const meanArcRadius = ellipticOrbitRadius * 1.0;   // Mean anomaly arc (inner)
-      hierarchyInspector._trueArcRadius = trueArcRadius;
-      hierarchyInspector._meanArcRadius = meanArcRadius;
-
-      const trueArcGeo = new THREE.BufferGeometry();
-      const trueArcPositions = new Float32Array((arcSegments + 1) * 3);
-      trueArcGeo.setAttribute('position', new THREE.BufferAttribute(trueArcPositions, 3));
-      const trueArcMat = new THREE.LineBasicMaterial({ color: 0xff9800, linewidth: 2 });
-      hierarchyInspector.trueAnomalyArc = new THREE.Line(trueArcGeo, trueArcMat);
-      hierarchyInspector.anomalyGroup.add(hierarchyInspector.trueAnomalyArc);
-
-      // Mean Anomaly arc (yellow dashed) - shows the uniform angle
-      const meanArcGeo = new THREE.BufferGeometry();
-      const meanArcPositions = new Float32Array((arcSegments + 1) * 3);
-      meanArcGeo.setAttribute('position', new THREE.BufferAttribute(meanArcPositions, 3));
-      const meanArcMat = new THREE.LineDashedMaterial({
-        color: 0xffeb3b,
-        dashSize: 1,
-        gapSize: 1,
-        linewidth: 2
-      });
-      hierarchyInspector.meanAnomalyArc = new THREE.Line(meanArcGeo, meanArcMat);
-      hierarchyInspector.anomalyGroup.add(hierarchyInspector.meanAnomalyArc);
-
-      // Start marker for True Anomaly arc (small sphere at 0°)
-      const trueStartMarkerGeo = new THREE.SphereGeometry(ellipticOrbitRadius * 0.04, 8, 8);
-      const trueStartMarkerMat = new THREE.MeshBasicMaterial({ color: 0xff9800 });
-      hierarchyInspector.trueAnomalyStartMarker = new THREE.Mesh(trueStartMarkerGeo, trueStartMarkerMat);
-      hierarchyInspector.trueAnomalyStartMarker.position.set(trueArcRadius, 0, 0); // At arc start (0°)
-      hierarchyInspector.anomalyGroup.add(hierarchyInspector.trueAnomalyStartMarker);
-
-      // Start marker for Mean Anomaly arc (small sphere at 0°)
-      const meanStartMarkerGeo = new THREE.SphereGeometry(ellipticOrbitRadius * 0.035, 8, 8);
-      const meanStartMarkerMat = new THREE.MeshBasicMaterial({ color: 0xffeb3b });
-      hierarchyInspector.meanAnomalyStartMarker = new THREE.Mesh(meanStartMarkerGeo, meanStartMarkerMat);
-      hierarchyInspector.meanAnomalyStartMarker.position.set(meanArcRadius, 0, 0); // At arc start (0°)
-      hierarchyInspector.anomalyGroup.add(hierarchyInspector.meanAnomalyStartMarker);
-
-      // Direction arrow for True Anomaly (shows counter-clockwise direction)
-      // Arrow points in the direction of increasing anomaly (counter-clockwise = -Z in Three.js when starting from +X)
-      const trueArrowDir = new THREE.Vector3(0, 0, -1); // Counter-clockwise direction
-      hierarchyInspector.trueAnomalyArrow = new THREE.ArrowHelper(
-        trueArrowDir,
-        new THREE.Vector3(trueArcRadius, 0, 0), // Start at 0° position
-        ellipticOrbitRadius * 0.1, // Length
-        0xff9800, // Orange
-        ellipticOrbitRadius * 0.05, // Head length
-        ellipticOrbitRadius * 0.03 // Head width
-      );
-      hierarchyInspector.anomalyGroup.add(hierarchyInspector.trueAnomalyArrow);
-
-      // Direction arrow for Mean Anomaly (shows counter-clockwise direction)
-      const meanArrowDir = new THREE.Vector3(0, 0, -1); // Counter-clockwise direction
-      hierarchyInspector.meanAnomalyArrow = new THREE.ArrowHelper(
-        meanArrowDir,
-        new THREE.Vector3(meanArcRadius, 0, 0), // Start at 0° position
-        ellipticOrbitRadius * 0.08, // Length
-        0xffeb3b, // Yellow
-        ellipticOrbitRadius * 0.04, // Head length
-        ellipticOrbitRadius * 0.025 // Head width
-      );
-      hierarchyInspector.anomalyGroup.add(hierarchyInspector.meanAnomalyArrow);
-
-      // Earth-Sun reference line
-      // This shows the direction from Earth through Sun to the opposite side
-      // - From Earth to Sun: subtle/transparent
-      // - From Sun to beyond mean anomaly circle: same color as mean anomaly
-      const earthSunLineLength = meanArcRadius * 1.15; // Extends just past the mean anomaly arc
-
-      // Create a group for the Earth-Sun line (will be rotated to point away from Earth)
-      hierarchyInspector.earthSunLine = new THREE.Group();
-
-      // Part 1: Sun to beyond mean anomaly circle (yellow, same as mean anomaly)
-      const sunToArcGeo = new THREE.BufferGeometry().setFromPoints([
-        new THREE.Vector3(0, 0, 0),
-        new THREE.Vector3(earthSunLineLength, 0, 0)
-      ]);
-      const sunToArcMat = new THREE.LineBasicMaterial({
-        color: 0xffeb3b,
-        linewidth: 2
-      });
-      const sunToArcLine = new THREE.Line(sunToArcGeo, sunToArcMat);
-      hierarchyInspector.earthSunLine.add(sunToArcLine);
-
-      // Part 2: Earth to Sun (subtle/transparent) - this will be in negative X direction
-      // We'll get the actual Earth distance dynamically, but use a reasonable estimate for now
-      const earthToSunGeo = new THREE.BufferGeometry().setFromPoints([
-        new THREE.Vector3(0, 0, 0),
-        new THREE.Vector3(-meanArcRadius * 3, 0, 0) // Extends toward Earth (will be clipped by scene)
-      ]);
-      const earthToSunMat = new THREE.LineBasicMaterial({
-        color: 0xffeb3b,
-        transparent: true,
-        opacity: 0.2
-      });
-      const earthToSunLine = new THREE.Line(earthToSunGeo, earthToSunMat);
-      hierarchyInspector.earthSunLine.add(earthToSunLine);
-
-      hierarchyInspector.anomalyGroup.add(hierarchyInspector.earthSunLine);
-
-      // Add to scene (will be positioned at Sun in updateHierarchyLiveData)
-      scene.add(hierarchyInspector.anomalyGroup);
-    }
-
-    // P → Planet line (Red) - for Mean Anomaly visualization
-    // Shows direction from orbit center (P) to planet position
-    // Only create if doesn't already exist (these persist across helper checkbox toggles)
-    if (!hierarchyInspector.pToPlanetLine) {
-      const pToPlanetGeo = new THREE.BufferGeometry();
-      pToPlanetGeo.setAttribute('position', new THREE.BufferAttribute(new Float32Array(6), 3));
-      const pToPlanetMat = new THREE.LineBasicMaterial({ color: 0x00ffff, linewidth: 2 });
-      hierarchyInspector.pToPlanetLine = new THREE.Line(pToPlanetGeo, pToPlanetMat);
-      scene.add(hierarchyInspector.pToPlanetLine); // Add to scene, not group (world coords)
-    }
-
-    // Sun → Planet line (Amber) - for True Anomaly visualization
-    // Shows direction from Sun (focus) to planet position
-    if (!hierarchyInspector.sunToPlanetLine) {
-      const sunToPlanetGeo = new THREE.BufferGeometry();
-      sunToPlanetGeo.setAttribute('position', new THREE.BufferAttribute(new Float32Array(6), 3));
-      const sunToPlanetMat = new THREE.LineBasicMaterial({ color: 0xffbf00, linewidth: 2 });
-      hierarchyInspector.sunToPlanetLine = new THREE.Line(sunToPlanetGeo, sunToPlanetMat);
-      scene.add(hierarchyInspector.sunToPlanetLine); // Add to scene, not group (world coords)
-    }
-
-    // Mean Anomaly Arc (Cyan, dashed) - centered at P (orbit center)
-    if (!hierarchyInspector.meanAnomalyArcAtP) {
-      const newArcSegments = 64;
-      const meanArcAtPGeo = new THREE.BufferGeometry();
-      const meanArcAtPPositions = new Float32Array((newArcSegments + 1) * 3);
-      meanArcAtPGeo.setAttribute('position', new THREE.BufferAttribute(meanArcAtPPositions, 3));
-      const meanArcAtPMat = new THREE.LineDashedMaterial({
-        color: 0x00ffff,
-        linewidth: 2,
-        dashSize: 3,
-        gapSize: 2
-      });
-      hierarchyInspector.meanAnomalyArcAtP = new THREE.Line(meanArcAtPGeo, meanArcAtPMat);
-      scene.add(hierarchyInspector.meanAnomalyArcAtP); // Add to scene (world coords)
-    }
-
-    // True Anomaly Arc (Amber, solid) - centered at Sun (focus)
-    if (!hierarchyInspector.trueAnomalyArcAtSun) {
-      const trueArcSegments = 64;
-      const trueArcAtSunGeo = new THREE.BufferGeometry();
-      const trueArcAtSunPositions = new Float32Array((trueArcSegments + 1) * 3);
-      trueArcAtSunGeo.setAttribute('position', new THREE.BufferAttribute(trueArcAtSunPositions, 3));
-      const trueArcAtSunMat = new THREE.LineBasicMaterial({ color: 0xffbf00, linewidth: 2 });
-      hierarchyInspector.trueAnomalyArcAtSun = new THREE.Line(trueArcAtSunGeo, trueArcAtSunMat);
-      scene.add(hierarchyInspector.trueAnomalyArcAtSun); // Add to scene (world coords)
-    }
-
-    // Store arc radii for dynamic updates
-    if (!hierarchyInspector._meanArcAtPRadius) {
-      hierarchyInspector._meanArcAtPRadius = ellipticOrbitRadius * 0.3;
-    }
-    if (!hierarchyInspector._trueArcAtSunRadius) {
-      hierarchyInspector._trueArcAtSunRadius = ellipticOrbitRadius * 0.4;
-    }
-
-    // Initialize anomaly group position and arc geometry immediately to avoid misplacement on first frame
-    // Position at the SUN (center of solar system), not at the orbital container
-    if (sun && sun.pivotObj) {
-      sun.pivotObj.getWorldPosition(_hiSunPos);
-      hierarchyInspector.anomalyGroup.position.copy(_hiSunPos);
-
-      // Calculate initial rotation to align with perihelion direction
-      const planetKey = hierarchyInspector.currentPlanet;
-      const initFixedPerihelionObjects = {
-        mercury: mercuryFixedPerihelionAtSun,
-        venus: venusFixedPerihelionAtSun,
-        mars: marsFixedPerihelionAtSun,
-        jupiter: jupiterFixedPerihelionAtSun,
-        saturn: saturnFixedPerihelionAtSun,
-        uranus: uranusFixedPerihelionAtSun,
-        neptune: neptuneFixedPerihelionAtSun,
-        pluto: plutoFixedPerihelionAtSun,
-        halleys: halleysFixedPerihelionAtSun,
-        eros: erosFixedPerihelionAtSun
-      };
-      const initFixedPerihelion = initFixedPerihelionObjects[planetKey];
-
-      if (initFixedPerihelion) {
-        const sourceObj = initFixedPerihelion.planetObj || initFixedPerihelion.pivotObj;
-        if (sourceObj) {
-          sourceObj.getWorldPosition(_hiPerihelionPos);
-
-          // Calculate direction from Sun to Perihelion (P point)
-          const dx = _hiPerihelionPos.x - _hiSunPos.x;
-          const dz = _hiPerihelionPos.z - _hiSunPos.z;
-          // atan2(dz, dx) gives angle from +X to Sun→P direction
-          // Add PI to flip 180° so markers are on P side, not Sun side
-          const perihelionAngle = Math.atan2(dz, dx);
-
-          // Rotate so local +X points toward P (away from Sun center)
-          hierarchyInspector.anomalyGroup.rotation.y = -perihelionAngle + Math.PI;
-
-          // Apply orbital plane tilt (use visual tilt group if available)
-          const tiltSrc1 = (obj && obj.tiltGroupObj) || (obj && obj.containerObj);
-          if (tiltSrc1) {
-            hierarchyInspector.anomalyGroup.rotation.x = tiltSrc1.rotation.x;
-            hierarchyInspector.anomalyGroup.rotation.z = tiltSrc1.rotation.z;
-          }
-
-          // Initialize Earth-Sun line rotation
-          if (hierarchyInspector.earthSunLine && earth && earth.pivotObj) {
-            earth.pivotObj.getWorldPosition(_hiEarthPos);
-
-            // Direction from Earth to Sun
-            const dxE = _hiSunPos.x - _hiEarthPos.x;
-            const dzE = _hiSunPos.z - _hiEarthPos.z;
-            const earthToSunAngle = Math.atan2(dzE, dxE);
-
-            // Convert to local space
-            const groupRotY = hierarchyInspector.anomalyGroup.rotation.y;
-            const localAngle = earthToSunAngle + groupRotY;
-
-            hierarchyInspector.earthSunLine.rotation.y = -localAngle;
-          }
-        }
-      }
-
-      // Calculate the Earth-Sun angle in local space for arc initialization
-      // This should match what updateHierarchyLiveData does
-      let initEarthSunLocalAngle = 0;
-      if (earth && earth.pivotObj) {
-        earth.pivotObj.getWorldPosition(_hiEarthPos);
-
-        // Direction from Earth to Sun
-        const dxE = _hiSunPos.x - _hiEarthPos.x;
-        const dzE = _hiSunPos.z - _hiEarthPos.z;
-        const earthToSunAngle = Math.atan2(dzE, dxE);
-
-        // Convert to local space
-        const groupRotY = hierarchyInspector.anomalyGroup.rotation.y;
-        initEarthSunLocalAngle = earthToSunAngle + groupRotY;
-      }
-
-      // Use the same angle for both arcs (true anomaly will be adjusted for eccentricity later)
-      const trueAnomalyRad = initEarthSunLocalAngle;
-      const meanAnomalyRad = initEarthSunLocalAngle;
-
-      // Initialize true anomaly arc geometry
-      if (hierarchyInspector.trueAnomalyArc) {
-        const arcSegments = 32;
-        const arcRadius = hierarchyInspector._trueArcRadius || 50;
-        const positions = hierarchyInspector.trueAnomalyArc.geometry.attributes.position.array;
-        for (let i = 0; i <= arcSegments; i++) {
-          const t = i / arcSegments;
-          const angle = t * trueAnomalyRad;
-          positions[i * 3] = arcRadius * Math.cos(angle);
-          positions[i * 3 + 1] = 0;
-          positions[i * 3 + 2] = -arcRadius * Math.sin(angle);
-        }
-        hierarchyInspector.trueAnomalyArc.geometry.attributes.position.needsUpdate = true;
-      }
-
-      // Initialize mean anomaly arc geometry
-      if (hierarchyInspector.meanAnomalyArc) {
-        const arcSegments = 32;
-        const arcRadius = hierarchyInspector._meanArcRadius || 40;
-        const positions = hierarchyInspector.meanAnomalyArc.geometry.attributes.position.array;
-        for (let i = 0; i <= arcSegments; i++) {
-          const t = i / arcSegments;
-          const angle = t * meanAnomalyRad;
-          positions[i * 3] = arcRadius * Math.cos(angle);
-          positions[i * 3 + 1] = 0;
-          positions[i * 3 + 2] = -arcRadius * Math.sin(angle);
-        }
-        hierarchyInspector.meanAnomalyArc.geometry.attributes.position.needsUpdate = true;
-        hierarchyInspector.meanAnomalyArc.computeLineDistances();
-      }
-    }
-  }
-
-  // Make RealPerihelionAtSun and FixedPerihelionAtSun visible at Step 4
-  // This helps visualize the perihelion movement around the real perihelion point
-  if (hierarchyInspector.currentStep === 3) {
-    const planetKey = hierarchyInspector.currentPlanet;
-
-    // Mapping of planet keys to their RealPerihelionAtSun and FixedPerihelionAtSun objects
-    const perihelionObjects = {
-      mercury: { fromSun: mercuryRealPerihelionAtSun, atSun: mercuryFixedPerihelionAtSun },
-      venus: { fromSun: venusRealPerihelionAtSun, atSun: venusFixedPerihelionAtSun },
-      mars: { fromSun: marsRealPerihelionAtSun, atSun: marsFixedPerihelionAtSun },
-      jupiter: { fromSun: jupiterRealPerihelionAtSun, atSun: jupiterFixedPerihelionAtSun },
-      saturn: { fromSun: saturnRealPerihelionAtSun, atSun: saturnFixedPerihelionAtSun },
-      uranus: { fromSun: uranusRealPerihelionAtSun, atSun: uranusFixedPerihelionAtSun },
-      neptune: { fromSun: neptuneRealPerihelionAtSun, atSun: neptuneFixedPerihelionAtSun },
-      pluto: { fromSun: plutoRealPerihelionAtSun, atSun: plutoFixedPerihelionAtSun },
-      halleys: { fromSun: halleysRealPerihelionAtSun, atSun: halleysFixedPerihelionAtSun },
-      eros: { fromSun: erosRealPerihelionAtSun, atSun: erosFixedPerihelionAtSun }
-    };
-
-    const objects = perihelionObjects[planetKey];
-    if (objects) {
-      // Store original state to restore later
-      hierarchyInspector._perihelionFromSunOriginalVisible = objects.fromSun.planetObj?.visible;
-      hierarchyInspector._perihelionAtSunOriginalVisible = objects.atSun.planetObj?.visible;
-      hierarchyInspector._perihelionFromSunOrbitOriginalVisible = objects.fromSun.orbitLineObj?.visible;
-
-      // Make RealPerihelionAtSun visible (purple sphere and orbit line)
-      if (objects.fromSun.planetObj) {
-        objects.fromSun.planetObj.visible = true;
-        // Store original scale and set consistent size (base size varies between objects)
-        hierarchyInspector._perihelionFromSunOriginalScale = objects.fromSun.planetObj.scale.clone();
-        // Calculate scale to achieve size 1.5: scale = 1.5 / baseSize
-        const fromSunScale = 1.5 / (objects.fromSun.size || 1);
-        objects.fromSun.planetObj.scale.setScalar(fromSunScale);
-        // Change color to purple to distinguish it
-        if (objects.fromSun.planetObj.material) {
-          hierarchyInspector._perihelionFromSunOriginalColor = objects.fromSun.planetObj.material.color.clone();
-          objects.fromSun.planetObj.material.color.setHex(0x9932cc); // Purple
-          objects.fromSun.planetObj.material.emissive = new THREE.Color(0x9932cc);
-          objects.fromSun.planetObj.material.emissiveIntensity = 0.5;
-          // Render on top of scene objects, but below green dot (which has renderOrder 999)
-          objects.fromSun.planetObj.material.depthTest = false;
-          objects.fromSun.planetObj.renderOrder = 997;
-        }
-
-        // Create "P2" label sprite and attach to the planetObj
-        // Only show P2 label if purple dot is far enough from green dot
-        let showP2Label = true;
-        if (objects.atSun.planetObj && objects.fromSun.planetObj) {
-          objects.fromSun.planetObj.getWorldPosition(_hiPurpleWorldPos);
-          objects.atSun.planetObj.getWorldPosition(_hiGreenWorldPos);
-          const distance = _hiPurpleWorldPos.distanceTo(_hiGreenWorldPos);
-          // If dots are closer than 3 units, don't show P2 label (green dot would overlap it)
-          if (distance < 3) {
-            showP2Label = false;
-          }
-        }
-
-        if (showP2Label) {
-          const canvas = document.createElement('canvas');
-          canvas.width = 64;
-          canvas.height = 64;
-          const ctx = canvas.getContext('2d');
-          ctx.fillStyle = '#000000';
-          ctx.font = 'bold 36px Arial';
-          ctx.textAlign = 'center';
-          ctx.textBaseline = 'middle';
-          ctx.fillText('P2', 32, 32);
-
-          const texture = new THREE.CanvasTexture(canvas);
-          const spriteMaterial = new THREE.SpriteMaterial({
-            map: texture,
-            depthTest: false,
-            transparent: true
-          });
-          const sprite = new THREE.Sprite(spriteMaterial);
-          // Counter-scale to achieve consistent size regardless of parent's scale
-          const labelSize = 1.5 / fromSunScale;
-          sprite.scale.set(labelSize, labelSize, 1);
-          sprite.renderOrder = 998; // Above purple dot (997), below green dot (999)
-          objects.fromSun.planetObj.add(sprite);
-          hierarchyInspector._perihelionFromSunLabel = sprite;
-        }
-      }
-      // Also make the orbit line visible (this is the elliptical path)
-      if (objects.fromSun.orbitLineObj) {
-        objects.fromSun.orbitLineObj.visible = true;
-        // Store original color and change to purple
-        hierarchyInspector._perihelionFromSunOrbitOriginalColor = objects.fromSun.orbitLineObj.material?.color?.clone();
-        if (objects.fromSun.orbitLineObj.material) {
-          objects.fromSun.orbitLineObj.material.color.setHex(0x9932cc); // Purple
-          objects.fromSun.orbitLineObj.material.opacity = 0.8;
-        }
-      }
-
-      // Make FixedPerihelionAtSun visible (green sphere - the "real" perihelion)
-      if (objects.atSun.planetObj) {
-        objects.atSun.planetObj.visible = true;
-        // Store original scale and set consistent size (base size varies between objects)
-        hierarchyInspector._perihelionAtSunOriginalScale = objects.atSun.planetObj.scale.clone();
-        // Calculate scale to achieve size 1.5 (slightly bigger): scale = 1.5 / baseSize
-        const atSunScale = 1.5 / (objects.atSun.size || 1);
-        objects.atSun.planetObj.scale.setScalar(atSunScale);
-        // Change color to bright green to distinguish it as the "real" perihelion point
-        if (objects.atSun.planetObj.material) {
-          hierarchyInspector._perihelionAtSunOriginalColor = objects.atSun.planetObj.material.color.clone();
-          objects.atSun.planetObj.material.color.setHex(0x00ff00); // Bright green
-          objects.atSun.planetObj.material.emissive = new THREE.Color(0x00ff00);
-          objects.atSun.planetObj.material.emissiveIntensity = 0.5;
-          // Render on top of other objects, and write to depth buffer so it can occlude P2
-          objects.atSun.planetObj.material.depthTest = false;
-          objects.atSun.planetObj.material.depthWrite = true;
-          objects.atSun.planetObj.renderOrder = 999;
-        }
-
-        // Create "P" label sprite and attach to the planetObj
-        const canvas = document.createElement('canvas');
-        canvas.width = 64;
-        canvas.height = 64;
-        const ctx = canvas.getContext('2d');
-        ctx.fillStyle = '#000000';
-        ctx.font = 'bold 48px Arial';
-        ctx.textAlign = 'center';
-        ctx.textBaseline = 'middle';
-        ctx.fillText('P', 32, 32);
-
-        const texture = new THREE.CanvasTexture(canvas);
-        const spriteMaterial = new THREE.SpriteMaterial({
-          map: texture,
-          depthTest: false,
-          transparent: true
-        });
-        const sprite = new THREE.Sprite(spriteMaterial);
-        // Counter-scale to achieve consistent size regardless of parent's scale
-        // Parent is scaled by atSunScale, so we divide by it to get consistent world size
-        const labelSize = 2.5 / atSunScale;
-        sprite.scale.set(labelSize, labelSize, 1);
-        sprite.renderOrder = 1001; // Highest - always on top
-        objects.atSun.planetObj.add(sprite);
-        hierarchyInspector._perihelionLabel = sprite;
-      }
-
-      // Store references for cleanup
-      hierarchyInspector._perihelionFromSunObj = objects.fromSun;
-      hierarchyInspector._perihelionAtSunObj = objects.atSun;
-    }
-  }
-
-  // Planet locator circle (Step 4 and Step 5 only)
-  // Creates a bright circle around the planet to make it easier to find
-  if (hierarchyInspector.currentStep === 3 || hierarchyInspector.currentStep === 4) {
-    const planetKey = hierarchyInspector.currentPlanet;
-    const hierarchy = PLANET_HIERARCHIES[planetKey];
-    if (hierarchy) {
-      const steps = hierarchy.steps();
-      // Get the actual planet (Step 5, index 4)
-      const planetStepObj = steps[4]?.obj;
-      if (planetStepObj && planetStepObj.planetObj) {
-        // Create a circle that will surround the planet
-        // Size based on planet's actual size or a minimum visible size
-        const planetSize = planetStepObj.size || 1;
-        const circleRadius = Math.max(planetSize * 3, 2); // At least 3x planet size, minimum 2 units
-
-        // Create ring geometry (torus for 3D visibility from any angle)
-        const ringGeometry = new THREE.TorusGeometry(circleRadius, circleRadius * 0.1, 8, 32);
-        const ringMaterial = new THREE.MeshBasicMaterial({
-          color: 0x00ffff, // Cyan color
-          transparent: true,
-          opacity: 0.8,
-          side: THREE.DoubleSide,
-          depthTest: false // Always visible
-        });
-        const ring = new THREE.Mesh(ringGeometry, ringMaterial);
-        ring.renderOrder = 998; // Render on top
-
-        // Add to scene (will be positioned in updateHierarchyLiveData)
-        scene.add(ring);
-        hierarchyInspector._planetLocatorCircle = ring;
-        hierarchyInspector._planetLocatorTarget = planetStepObj;
-
-        // Initialize position immediately
-        if (planetStepObj.planetObj) {
-          planetStepObj.planetObj.getWorldPosition(_hiTempPos);
-          ring.position.copy(_hiTempPos);
-        }
-      }
-    }
+  if (P.locator) {
+    P.locator.position.copy(f.P);
+    P.locator.lookAt(camera.position);
   }
 }
 
-// Clear visual helpers
-// Options:
-//   forceCleanAnomalies: if true, always clean anomaly elements; if false, only clean if showAnomalies is off or not step 3
-function clearVisualHelpers(options = {}) {
-  const { forceCleanAnomalies = false } = options;
+// ─── camera ────────────────────────────────────────────────────────────────
 
-  // Determine if we should clean anomaly elements
-  // Clean them if: forced OR showAnomalies is off OR not on step 3
-  const shouldCleanAnomalies = forceCleanAnomalies ||
-                               !hierarchyInspector.helpers.showAnomalies ||
-                               hierarchyInspector.currentStep !== 3;
-
-  // Restore temporary perihelion visibility (used by step-based camera focus)
-  if (hierarchyInspector._tempPerihelionVisible) {
-    const prevObj = hierarchyInspector._tempPerihelionVisible;
-    if (prevObj.planetObj) {
-      prevObj.planetObj.visible = hierarchyInspector._tempPerihelionOriginalVisible ?? false;
-    }
-    if (prevObj.orbitLineObj) {
-      prevObj.orbitLineObj.visible = hierarchyInspector._tempPerihelionOrbitOriginalVisible ?? false;
-    }
-    hierarchyInspector._tempPerihelionVisible = null;
-    hierarchyInspector._tempPerihelionOriginalVisible = null;
-    hierarchyInspector._tempPerihelionOrbitOriginalVisible = null;
-  }
-
-  if (hierarchyInspector.axesHelper) {
-    hierarchyInspector.axesHelper.parent?.remove(hierarchyInspector.axesHelper);
-    hierarchyInspector.axesHelper.dispose?.();
-    hierarchyInspector.axesHelper = null;
-  }
-  if (hierarchyInspector.startPosArrow) {
-    hierarchyInspector.startPosArrow.parent?.remove(hierarchyInspector.startPosArrow);
-    hierarchyInspector.startPosArrow = null;
-  }
-  if (hierarchyInspector.currentPosArrow) {
-    hierarchyInspector.currentPosArrow.parent?.remove(hierarchyInspector.currentPosArrow);
-    hierarchyInspector.currentPosArrow = null;
-  }
-  if (hierarchyInspector.orbitCenterArrow) {
-    hierarchyInspector.orbitCenterArrow.parent?.remove(hierarchyInspector.orbitCenterArrow);
-    hierarchyInspector.orbitCenterArrow = null;
-  }
-  if (hierarchyInspector.earthPerihelionArrow) {
-    hierarchyInspector.earthPerihelionArrow.parent?.remove(hierarchyInspector.earthPerihelionArrow);
-    hierarchyInspector.earthPerihelionArrow.dispose?.();
-    hierarchyInspector.earthPerihelionArrow = null;
-  }
-  if (hierarchyInspector.rotationArrow) {
-    hierarchyInspector.rotationArrow.parent?.remove(hierarchyInspector.rotationArrow);
-    hierarchyInspector.rotationArrow.geometry?.dispose();
-    hierarchyInspector.rotationArrow.material?.dispose();
-    hierarchyInspector.rotationArrow = null;
-  }
-  if (hierarchyInspector.inclinationPlane) {
-    hierarchyInspector.inclinationPlane.parent?.remove(hierarchyInspector.inclinationPlane);
-    // Dispose all children geometries and materials
-    hierarchyInspector.inclinationPlane.traverse((child) => {
-      if (child.geometry) child.geometry.dispose();
-      if (child.material) child.material.dispose();
-    });
-    hierarchyInspector.inclinationPlane = null;
-    hierarchyInspector.ascendingNode = null;
-    hierarchyInspector.descendingNode = null;
-    hierarchyInspector.aboveHalfPlane = null;
-    hierarchyInspector.belowHalfPlane = null;
-    hierarchyInspector.highestPointMarker = null;
-    hierarchyInspector.lowestPointMarker = null;
-    hierarchyInspector._highArrow = null;
-    hierarchyInspector._lowArrow = null;
-    hierarchyInspector._ascNodeArrow = null;
-    hierarchyInspector._descNodeArrow = null;
-    hierarchyInspector._nodesLine = null;
-    // Reset tilt cache to force recalculation on next creation
-    _lastAscNodeTiltA = null;
-    _lastAscNodeTiltB = null;
-  }
-  if (hierarchyInspector.perihelionDot) {
-    hierarchyInspector.perihelionDot.parent?.remove(hierarchyInspector.perihelionDot);
-    hierarchyInspector.perihelionDot.geometry?.dispose();
-    hierarchyInspector.perihelionDot.material?.dispose();
-    hierarchyInspector.perihelionDot = null;
-  }
-  if (hierarchyInspector.perihelionArrow) {
-    hierarchyInspector.perihelionArrow.parent?.remove(hierarchyInspector.perihelionArrow);
-    hierarchyInspector.perihelionArrow = null;
-    hierarchyInspector._perihelionLine = null;
-    hierarchyInspector._perihelionArrowHead = null;
-    hierarchyInspector._fixedPerihelionObj = null;
-    hierarchyInspector._perihelionArrowScale = null;
-    // Clear cached vectors (they'll be recreated if needed)
-    hierarchyInspector._sunPosVec3 = null;
-    hierarchyInspector._dirVec3 = null;
-    hierarchyInspector._defaultDir = null;
-    hierarchyInspector._arrowQuat = null;
-  }
-  // Clean up anomaly visualization elements only when appropriate
-  // (when showAnomalies is off, not on step 3, or forced)
-  if (shouldCleanAnomalies && hierarchyInspector.anomalyGroup) {
-    hierarchyInspector.anomalyGroup.parent?.remove(hierarchyInspector.anomalyGroup);
-    hierarchyInspector.anomalyGroup.traverse((child) => {
-      if (child.geometry) child.geometry.dispose();
-      if (child.material) child.material.dispose();
-    });
-    hierarchyInspector.anomalyGroup = null;
-    hierarchyInspector.trueAnomalyArc = null;
-    hierarchyInspector.meanAnomalyArc = null;
-    hierarchyInspector.trueAnomalyStartMarker = null;
-    hierarchyInspector.meanAnomalyStartMarker = null;
-    hierarchyInspector.trueAnomalyArrow = null;
-    hierarchyInspector.meanAnomalyArrow = null;
-    hierarchyInspector.earthSunLine = null;
-    hierarchyInspector._trueArcRadius = null;
-    hierarchyInspector._meanArcRadius = null;
-  }
-  // Clean up new anomaly visualization elements (added to scene directly)
-  // Only clean when shouldCleanAnomalies is true
-  if (shouldCleanAnomalies) {
-    if (hierarchyInspector.pToPlanetLine) {
-      hierarchyInspector.pToPlanetLine.parent?.remove(hierarchyInspector.pToPlanetLine);
-      hierarchyInspector.pToPlanetLine.geometry?.dispose();
-      hierarchyInspector.pToPlanetLine.material?.dispose();
-      hierarchyInspector.pToPlanetLine = null;
-    }
-    if (hierarchyInspector.sunToPlanetLine) {
-      hierarchyInspector.sunToPlanetLine.parent?.remove(hierarchyInspector.sunToPlanetLine);
-      hierarchyInspector.sunToPlanetLine.geometry?.dispose();
-      hierarchyInspector.sunToPlanetLine.material?.dispose();
-      hierarchyInspector.sunToPlanetLine = null;
-    }
-    if (hierarchyInspector.meanAnomalyArcAtP) {
-      hierarchyInspector.meanAnomalyArcAtP.parent?.remove(hierarchyInspector.meanAnomalyArcAtP);
-      hierarchyInspector.meanAnomalyArcAtP.geometry?.dispose();
-      hierarchyInspector.meanAnomalyArcAtP.material?.dispose();
-      hierarchyInspector.meanAnomalyArcAtP = null;
-    }
-    if (hierarchyInspector.trueAnomalyArcAtSun) {
-      hierarchyInspector.trueAnomalyArcAtSun.parent?.remove(hierarchyInspector.trueAnomalyArcAtSun);
-      hierarchyInspector.trueAnomalyArcAtSun.geometry?.dispose();
-      hierarchyInspector.trueAnomalyArcAtSun.material?.dispose();
-      hierarchyInspector.trueAnomalyArcAtSun = null;
-    }
-    hierarchyInspector._meanArcAtPRadius = null;
-    hierarchyInspector._trueArcAtSunRadius = null;
-  }
-
-  // Restore original state of RealPerihelionAtSun and FixedPerihelionAtSun objects
-  if (hierarchyInspector._perihelionFromSunObj) {
-    const obj = hierarchyInspector._perihelionFromSunObj;
-    if (obj.planetObj) {
-      obj.planetObj.visible = hierarchyInspector._perihelionFromSunOriginalVisible ?? false;
-      // Restore original scale
-      if (hierarchyInspector._perihelionFromSunOriginalScale) {
-        obj.planetObj.scale.copy(hierarchyInspector._perihelionFromSunOriginalScale);
-      }
-      // Restore original color and depth settings
-      if (hierarchyInspector._perihelionFromSunOriginalColor && obj.planetObj.material) {
-        obj.planetObj.material.color.copy(hierarchyInspector._perihelionFromSunOriginalColor);
-        obj.planetObj.material.emissive = new THREE.Color(0x000000);
-        obj.planetObj.material.emissiveIntensity = 0;
-        obj.planetObj.material.depthTest = true;
-        obj.planetObj.renderOrder = 0;
-      }
-    }
-    // Restore orbit line visibility and color
-    if (obj.orbitLineObj) {
-      obj.orbitLineObj.visible = hierarchyInspector._perihelionFromSunOrbitOriginalVisible ?? false;
-      if (hierarchyInspector._perihelionFromSunOrbitOriginalColor && obj.orbitLineObj.material) {
-        obj.orbitLineObj.material.color.copy(hierarchyInspector._perihelionFromSunOrbitOriginalColor);
-        obj.orbitLineObj.material.opacity = 0.4;
-      }
-    }
-    hierarchyInspector._perihelionFromSunObj = null;
-    hierarchyInspector._perihelionFromSunOriginalVisible = null;
-    hierarchyInspector._perihelionFromSunOriginalScale = null;
-    hierarchyInspector._perihelionFromSunOriginalColor = null;
-    hierarchyInspector._perihelionFromSunOrbitOriginalVisible = null;
-    hierarchyInspector._perihelionFromSunOrbitOriginalColor = null;
-  }
-  // Remove RealPerihelionAtSun label sprite (P2)
-  if (hierarchyInspector._perihelionFromSunLabel) {
-    hierarchyInspector._perihelionFromSunLabel.parent?.remove(hierarchyInspector._perihelionFromSunLabel);
-    hierarchyInspector._perihelionFromSunLabel.material?.map?.dispose();
-    hierarchyInspector._perihelionFromSunLabel.material?.dispose();
-    hierarchyInspector._perihelionFromSunLabel = null;
-  }
-  if (hierarchyInspector._perihelionAtSunObj) {
-    const obj = hierarchyInspector._perihelionAtSunObj;
-    if (obj.planetObj) {
-      obj.planetObj.visible = hierarchyInspector._perihelionAtSunOriginalVisible ?? false;
-      // Restore original scale
-      if (hierarchyInspector._perihelionAtSunOriginalScale) {
-        obj.planetObj.scale.copy(hierarchyInspector._perihelionAtSunOriginalScale);
-      }
-      // Restore original color and depth settings
-      if (hierarchyInspector._perihelionAtSunOriginalColor && obj.planetObj.material) {
-        obj.planetObj.material.color.copy(hierarchyInspector._perihelionAtSunOriginalColor);
-        obj.planetObj.material.emissive = new THREE.Color(0x000000);
-        obj.planetObj.material.emissiveIntensity = 0;
-        obj.planetObj.material.depthTest = true;
-        obj.planetObj.renderOrder = 0;
-      }
-    }
-    hierarchyInspector._perihelionAtSunObj = null;
-    hierarchyInspector._perihelionAtSunOriginalVisible = null;
-    hierarchyInspector._perihelionAtSunOriginalScale = null;
-    hierarchyInspector._perihelionAtSunOriginalColor = null;
-  }
-  // Remove perihelion label sprite
-  if (hierarchyInspector._perihelionLabel) {
-    hierarchyInspector._perihelionLabel.parent?.remove(hierarchyInspector._perihelionLabel);
-    hierarchyInspector._perihelionLabel.material?.map?.dispose();
-    hierarchyInspector._perihelionLabel.material?.dispose();
-    hierarchyInspector._perihelionLabel = null;
-  }
-  // Remove planet locator circle
-  if (hierarchyInspector._planetLocatorCircle) {
-    hierarchyInspector._planetLocatorCircle.parent?.remove(hierarchyInspector._planetLocatorCircle);
-    hierarchyInspector._planetLocatorCircle.geometry?.dispose();
-    hierarchyInspector._planetLocatorCircle.material?.dispose();
-    hierarchyInspector._planetLocatorCircle = null;
-    hierarchyInspector._planetLocatorTarget = null;
-  }
-}
-
-// Focus camera on the current step's pivot object with step-aware positioning
-function focusOnStepObject(stepData) {
-  const obj = stepData.obj;
-  if (!obj.pivotObj) return;
-
-  const step = hierarchyInspector.currentStep;
-  const planetKey = hierarchyInspector.currentPlanet;
-  const planetData = PLANET_HIERARCHIES[planetKey];
-
-  // Get perihelion object for this planet
-  const perihelionObj = planetData.perihelionOf?.();
-
-  // Clean up any previously temporarily shown perihelion
-  if (hierarchyInspector._tempPerihelionVisible) {
-    const prevObj = hierarchyInspector._tempPerihelionVisible;
-    if (prevObj.planetObj) {
-      prevObj.planetObj.visible = hierarchyInspector._tempPerihelionOriginalVisible ?? false;
-    }
-    if (prevObj.orbitLineObj) {
-      prevObj.orbitLineObj.visible = hierarchyInspector._tempPerihelionOrbitOriginalVisible ?? false;
-    }
-    hierarchyInspector._tempPerihelionVisible = null;
-    hierarchyInspector._tempPerihelionOriginalVisible = null;
-    hierarchyInspector._tempPerihelionOrbitOriginalVisible = null;
-  }
-
-  let targetPos = new THREE.Vector3();
-  let viewDistance;
-  let focusObj = null;  // The object to track in animation loop
-
-  if (step === 0) {
-    // Step 1 (index 0): Focus on earthPerihelionFromEarth
-    if (earthPerihelionFromEarth?.pivotObj) {
-      // Store original visibility and make visible temporarily
-      hierarchyInspector._tempPerihelionOriginalVisible = earthPerihelionFromEarth.planetObj?.visible;
-      hierarchyInspector._tempPerihelionOrbitOriginalVisible = earthPerihelionFromEarth.orbitLineObj?.visible;
-      hierarchyInspector._tempPerihelionVisible = earthPerihelionFromEarth;
-
-      if (earthPerihelionFromEarth.planetObj) earthPerihelionFromEarth.planetObj.visible = true;
-      if (earthPerihelionFromEarth.orbitLineObj) earthPerihelionFromEarth.orbitLineObj.visible = true;
-
-      focusObj = earthPerihelionFromEarth;
-      earthPerihelionFromEarth.pivotObj.updateMatrixWorld(true);
-      earthPerihelionFromEarth.pivotObj.getWorldPosition(targetPos);
-      viewDistance = Math.max(100, (earthPerihelionFromEarth.orbitRadius || 50) * 2);
-    } else {
-      // Fallback to step object
-      focusObj = obj;
-      obj.pivotObj.updateMatrixWorld(true);
-      obj.pivotObj.getWorldPosition(targetPos);
-      viewDistance = Math.max(100, (obj.orbitRadius || 50) * 2);
-    }
-  } else if (step <= 2) {
-    // Steps 2, 3 (indices 1, 2): Focus on PERIHELION object
-    if (perihelionObj?.pivotObj) {
-      // Store original visibility and make visible temporarily
-      hierarchyInspector._tempPerihelionOriginalVisible = perihelionObj.planetObj?.visible;
-      hierarchyInspector._tempPerihelionOrbitOriginalVisible = perihelionObj.orbitLineObj?.visible;
-      hierarchyInspector._tempPerihelionVisible = perihelionObj;
-
-      if (perihelionObj.planetObj) perihelionObj.planetObj.visible = true;
-      if (perihelionObj.orbitLineObj) perihelionObj.orbitLineObj.visible = true;
-
-      focusObj = perihelionObj;
-      perihelionObj.pivotObj.updateMatrixWorld(true);
-      perihelionObj.pivotObj.getWorldPosition(targetPos);
-      viewDistance = Math.max(100, (perihelionObj.orbitRadius || 50) * 2);
-    } else {
-      // Fallback to step object if no perihelion
-      focusObj = obj;
-      obj.pivotObj.updateMatrixWorld(true);
-      obj.pivotObj.getWorldPosition(targetPos);
-      viewDistance = Math.max(100, (obj.orbitRadius || 50) * 2);
-    }
-  } else if (step === 3) {
-    // Step 4 (index 3): Focus on Sun
-    focusObj = sun;
-    sun.pivotObj.updateMatrixWorld(true);
-    sun.pivotObj.getWorldPosition(targetPos);
-    viewDistance = Math.max(200, (obj.orbitRadius || 100) * 2);
+/**
+ * Orbit view: straight down onto the ecliptic of date at the Sun, the
+ * equinox ĝ to the RIGHT (longitudes run counter-clockwise), tilted by
+ * _HI_TILT_DEG toward ecliptic longitude 270° so the screen-up direction is
+ * defined — a camera exactly on the pole axis leaves three.js's lookAt to
+ * pick the roll from a fallback perturbation, which is where the former
+ * inspector's "90° clockwise" start came from. Planet view: from behind the
+ * planet toward the Sun.
+ */
+function focusInspectorCamera(mode) {
+  const f = computeInspectorOrbitFrame(hierarchyInspector.currentPlanet);
+  if (!f) return;
+  const H = hierarchyInspector;
+  H._cameraControlActive = true;
+  if (mode === 'planet') {
+    H._cameraTarget = f.obj.planetObj;
+    const d = Math.max(20, (f.obj.size || 1) * 40);
+    _hiTmpA.copy(f.r).normalize();                       // Sun→planet
+    camera.position.copy(f.P).addScaledVector(_hiTmpA, d).addScaledVector(f.n, d * 0.35);
+    controls.target.copy(f.P);
   } else {
-    // Step 5 (index 4): Focus on planet
-    focusObj = obj;
-    obj.pivotObj.updateMatrixWorld(true);
-    obj.pivotObj.getWorldPosition(targetPos);
-    viewDistance = Math.max(100, (obj.orbitRadius || 50) * 2);
+    H._cameraTarget = sun.planetObj;
+    const d = Math.max(200, f.aScene * 2.6);
+    const up = _hiTmpB.crossVectors(f.n, f.g).normalize();  // screen-up = n̂ × ĝ ⇒ ĝ to the right
+    const tilt = _HI_TILT_DEG * _hiD2R;
+    _hiTmpA.copy(f.n).multiplyScalar(Math.cos(tilt)).addScaledVector(up, -Math.sin(tilt)).normalize();
+    camera.position.copy(f.S).addScaledVector(_hiTmpA, d);
+    controls.target.copy(f.S);
   }
-
-  // Enable hierarchy inspector camera control
-  hierarchyInspector._cameraControlActive = true;
-  hierarchyInspector._cameraTarget = focusObj;
-
-  // Set camera target
-  controls.target.copy(targetPos);
-
-  // Position camera based on step
-  if (step <= 3) {
-    // Steps 1-4: Looking down on celestial plane (Y+ is up, Earth below, Sun on top)
-    camera.position.set(targetPos.x, targetPos.y + viewDistance, targetPos.z);
-  } else {
-    // Step 5: Looking from Sun towards planet (camera behind planet, looking towards Sun)
-    const sunPos = new THREE.Vector3();
-    sun.pivotObj.updateMatrixWorld(true);
-    sun.pivotObj.getWorldPosition(sunPos);
-
-    const direction = new THREE.Vector3().subVectors(targetPos, sunPos).normalize();
-    camera.position.copy(targetPos).add(direction.multiplyScalar(viewDistance));
-  }
-
-  // Update controls
+  (H._lastTargetPos ??= new THREE.Vector3()).copy(controls.target);   // the follow starts from here
   controls.minDistance = 0;
   controls.maxDistance = Infinity;
   controls.update();
-
-  // Reset near plane to default for unrestricted zooming
   camera.near = 0.1;
   camera.updateProjectionMatrix();
 }
 
-// Build hierarchy tree HTML
-function buildHierarchyTree(steps, currentIdx) {
-  let html = '<span style="color:rgba(255,255,255,0.4)">startingPoint</span>\n';
-  const indent = '    ';
-  steps.forEach((step, idx) => {
-    const prefix = indent.repeat(idx + 1) + '\u2514\u2500\u2500 ';
-    if (idx === currentIdx) {
-      html += `${prefix}<span class="hi-current">\u2605 ${step.name}</span>  \u2190 CURRENT\n`;
-    } else {
-      html += `${prefix}${step.name}\n`;
-    }
-  });
-  return html;
+// ─── panel ─────────────────────────────────────────────────────────────────
+
+const _HI_ROWS_ELEMENTS = [
+  ['aAU', 'Semi-major axis (a)', 'AU', 'The chain’s a of date (engine-D element chain + the banked secular-series override).'],
+  ['e', 'Eccentricity (e)', '', ''],
+  ['inclJ2000', 'Inclination (i, J2000 ecliptic)', '°', 'The chain element: the orbit plane against the FIXED J2000 ecliptic. The of-date value against the rendered ecliptic is in the geometry section.'],
+  ['ascNodeJ2000', 'Ascending node (Ω, J2000 ecliptic)', '°', ''],
+  ['lonPeri', 'Longitude of perihelion (ϖ, J2000 ecliptic)', '°', 'The element every reference table publishes; the same channel as the planet panel’s ϖ row.'],
+  ['argPeri', 'Argument of perihelion (ω = ϖ − Ω)', '°', ''],
+  ['meanLon', 'Mean longitude (λ̄)', '°', ''],
+  ['period', 'Period (Kepler III, a³⁄²)', 'yr', 'In the solar-mass unit — the ring and the fan span exactly one of these.'],
+  ['rPeri', 'Perihelion distance a(1−e)', 'AU', ''],
+  ['rApo', 'Aphelion distance a(1+e)', 'AU', ''],
+];
+const _HI_ROWS_LIVE = [
+  ['rAU', 'Sun → planet distance (rendered)', 'AU', 'The rendered planet is light-time retarded (astrometric), as the eye sees it.'],
+  ['trueAnomaly', 'True anomaly (ν) at the Sun', '°', 'Angle at the Sun from the perihelion direction to the rendered planet, in the orbit plane — the amber arc.'],
+  ['meanAnomaly', 'Mean anomaly (M) of the chain', '°', 'The chain’s uniform angle since perihelion (λ̄ − ϖ) — the cyan dashed arc, drawn at the Sun for comparison.'],
+  ['eoc', 'Equation of centre (ν − M)', '°', ''],
+  ['inclDate', 'Inclination to the ecliptic OF DATE', '°', 'The angle between the orbit normal and the rendered ecliptic pole n̂ (R4: the engine’s ecliptic of date). The fan’s tilt.'],
+  ['nodeLonDate', 'Ascending node longitude OF DATE', '°', 'From the rendered equinox ĝ along the ecliptic of date to the node direction n̂_ecl × n̂_orb — the magenta marker.'],
+  ['argLat', 'Argument of latitude (u, node → planet)', '°', '0° at the ascending node, 90° at the highest point, 180° at the descending node.'],
+  ['height', 'Height above the ecliptic of date', 'AU', ''],
+  ['heightPct', 'Height / maximum height', '%', ''],
+  ['hemisphere', 'Hemisphere', '', ''],
+  ['planetRA', 'Planet RA (scene equator of date)', '', ''],
+  ['planetDec', 'Planet Dec', '', ''],
+  ['sunDec', 'Sun Dec', '', ''],
+  ['decVsSun', 'Planet Dec vs Sun Dec', '', 'At a transit the two agree.'],
+];
+
+function _hiGridHtml(rows) {
+  return '<div class="hi-props">' + rows.map(([id, label, unit, tip]) =>
+    `<span class="hi-key"${tip ? ` title="${tip.replace(/"/g, '&quot;')}"` : ''}>${label}</span>` +
+    `<span class="hi-val" data-id="${id}"></span>`).join('') + '</div>';
 }
 
-// Update inspector display
-function updateInspectorDisplay() {
+function _hiBuildReadouts(planetKey) {
   const panel = hierarchyInspector.panel;
-  if (!panel) return;
-
-  const planetData = PLANET_HIERARCHIES[hierarchyInspector.currentPlanet];
-  if (!planetData) return;
-
-  const steps = planetData.steps();
-  const stepData = steps[hierarchyInspector.currentStep];
-  const obj = stepData.obj;
-
-  // Update step indicator
-  panel.querySelector('.hi-step-indicator').textContent =
-    `STEP ${hierarchyInspector.currentStep + 1} of ${steps.length}: ${obj.name || stepData.name}`;
-
-  // Step 4 (index 3): Turn off some helpers by default for cleaner anomaly visualization
-  const isStep4 = hierarchyInspector.currentStep === 3;
-  const step4OffHelpers = ['showAxes', 'showStartPos', 'showRotationDir'];
-  step4OffHelpers.forEach(helper => {
-    const checkbox = panel.querySelector(`input[data-helper="${helper}"]`);
-    if (checkbox) {
-      if (isStep4) {
-        checkbox.checked = false;
-        hierarchyInspector.helpers[helper] = false;
-      } else {
-        checkbox.checked = true;
-        hierarchyInspector.helpers[helper] = true;
-      }
-    }
-  });
-
-  // Show/hide Visual Legend section (only visible on Step 4)
-  const legendSection = panel.querySelector('.hi-legend-section');
-  if (legendSection) {
-    legendSection.style.display = isStep4 ? 'block' : 'none';
-  }
-
-  // Show/hide Live Data section (only visible on Step 4)
-  const liveSection = panel.querySelector('.hi-live-section');
-  if (liveSection) {
-    liveSection.style.display = isStep4 ? 'block' : 'none';
-  }
-
-  // Show/hide Report section (only visible on Step 5 - index 4)
-  const isStep5 = hierarchyInspector.currentStep === 4;
-  const reportSection = panel.querySelector('.hi-report-section');
-  if (reportSection) {
-    reportSection.style.display = isStep5 ? 'block' : 'none';
-    if (isStep5) {
-      // Generate and display report for Step 5
-      generateAndDisplayReport(hierarchyInspector.currentPlanet);
-    }
-  }
-
-  // Show/hide Step 4 specific helper checkboxes
-  const step4Helpers = ['showOrbitCenter', 'showInclinationPlane', 'showPerihelionPoint', 'showAnomalies'];
-  step4Helpers.forEach(helper => {
-    const label = panel.querySelector(`input[data-helper="${helper}"]`)?.parentElement;
-    if (label) {
-      label.style.display = isStep4 ? '' : 'none';
-    }
-  });
-  // Also hide the solar period section when not on Step 4
-  const solarPeriodSection = panel.querySelector('.hi-solar-period-section');
-  if (solarPeriodSection && !isStep4) {
-    solarPeriodSection.style.display = 'none';
-  }
-
-  // Calculate derived values
-  const periodYears = speedToPeriod(obj.speed);
-  const arcsecPerCentury = periodToArcsecPerCentury(periodYears);
-  const currentRotation = obj.orbitObj?.rotation?.y ?? 0;
-  if (obj.pivotObj) obj.pivotObj.getWorldPosition(_hiWorldPos);
-
-  // Build settings section
-  const settingsHtml = `
-    <div class="hi-props">
-      <span class="hi-key">name</span><span class="hi-val">"${obj.name || 'unnamed'}"</span>
-      <span class="hi-key">startPos</span><span class="hi-val">${formatNum(obj.startPos, 2)}\u00b0</span>
-      <span class="hi-key">speed (raw)</span><span class="hi-val">${formatNum(obj.speed, 8)} rad/yr</span>
-      <span class="hi-key">speed (period)</span><span class="hi-val">${formatNum(periodYears, 2)} years</span>
-      <span class="hi-key">speed (arcsec)</span><span class="hi-val">${formatNum(arcsecPerCentury, 2)} "/century</span>
-      <span class="hi-key">tilt</span><span class="hi-val">${formatNum(obj.tilt, 2)}\u00b0</span>
-      <span class="hi-key">orbitRadius</span><span class="hi-val">${formatNum(obj.orbitRadius, 4)}</span>
-      <span class="hi-key">orbitCenter</span><span class="hi-val">(${formatNum(obj.orbitCentera, 4)}, ${formatNum(obj.orbitCenterb, 4)}, ${formatNum(obj.orbitCenterc, 4)})</span>
-      <span class="hi-key">orbitTilt</span><span class="hi-val">(${formatNum(obj.orbitTilta, 2)}\u00b0, ${formatNum(obj.orbitTiltb, 2)}\u00b0)</span>
-      <span class="hi-key">visible</span><span class="hi-val">${obj.visible}</span>
-      <span class="hi-key">isNotPhysical</span><span class="hi-val">${obj.isNotPhysicalObject ?? false}</span>
-    </div>
-  `;
-  panel.querySelector('.hi-settings-content').innerHTML = settingsHtml;
-
-  // Build runtime section
-  const runtimeHtml = `
-    <div class="hi-props">
-      <span class="hi-key">Current rotation</span><span class="hi-val">${formatNum(currentRotation, 4)} rad (${formatNum(currentRotation * 180 / Math.PI, 2)}\u00b0)</span>
-      <span class="hi-key">World position</span><span class="hi-val">(${formatNum(_hiWorldPos.x, 2)}, ${formatNum(_hiWorldPos.y, 2)}, ${formatNum(_hiWorldPos.z, 2)})</span>
-      <span class="hi-key">containerObj</span><span class="hi-val">${obj.containerObj ? '\u2713 exists' : '\u2717 missing'}</span>
-      <span class="hi-key">orbitObj</span><span class="hi-val">${obj.orbitObj ? '\u2713 exists' : '\u2717 missing'}</span>
-      <span class="hi-key">pivotObj</span><span class="hi-val">${obj.pivotObj ? '\u2713 exists' : '\u2717 missing'}</span>
-      <span class="hi-key">planetObj</span><span class="hi-val">${obj.planetObj ? '\u2713 exists' : '\u2717 missing'}</span>
-    </div>
-  `;
-  panel.querySelector('.hi-runtime-content').innerHTML = runtimeHtml;
-
-  // Build validation section
-  const issues = validateStep(stepData, hierarchyInspector.currentStep, steps);
-  let validationHtml = '';
-  issues.forEach(issue => {
-    const icon = issue.type === 'valid' ? '\u2713' : issue.type === 'warning' ? '\u26a0' : issue.type === 'info' ? '\u2139' : issue.type === 'reference' ? '\u2192' : '\u2717';
-    validationHtml += `<div class="hi-validation-item ${issue.type}"><span class="hi-validation-icon">${icon}</span>${issue.msg}</div>`;
-  });
-  panel.querySelector('.hi-validation-content').innerHTML = validationHtml;
-
-  // Build hierarchy tree
-  panel.querySelector('.hi-tree').innerHTML = buildHierarchyTree(steps, hierarchyInspector.currentStep);
-
-  // Clear Live Data section when not on Step 4 (the section is hidden, but reset cached elements)
-  if (hierarchyInspector.currentStep !== 3) {
-    _liveDataElements = null;
-  }
-  // If on Step 4, updateHierarchyLiveData() will populate it
-
-  // Update nav buttons
-  panel.querySelector('.hi-prev-btn').disabled = hierarchyInspector.currentStep === 0;
-  panel.querySelector('.hi-next-btn').disabled = hierarchyInspector.currentStep === steps.length - 1;
-
-  // Always show visual helpers and focus on the object when panel is open
-  createVisualHelpers(stepData);
-  focusOnStepObject(stepData);
-
-  // Update highlight button state
-  const highlightBtn = panel.querySelector('.hi-highlight-btn');
-  highlightBtn.classList.add('active');
-  highlightBtn.textContent = 'Hide Helpers';
-  hierarchyInspector.highlightActive = true;
+  panel.querySelector('.hi-elements-content').innerHTML = _hiGridHtml(_HI_ROWS_ELEMENTS);
+  panel.querySelector('.hi-live-content').innerHTML = _hiGridHtml(_HI_ROWS_LIVE);
+  const els = { planet: planetKey };
+  panel.querySelectorAll('.hi-val[data-id]').forEach((el) => { els[el.dataset.id] = el; });
+  hierarchyInspector._els = els;
 }
 
-// Create inspector panel HTML
+function _hiWriteReadouts(f) {
+  const e = hierarchyInspector._els;
+  if (!e) return;
+  const el = f.el;
+  const fx = (v, d, unit = '') => (Number.isFinite(v) ? v.toFixed(d) + unit : '—');
+  e.aAU.textContent = fx(el.aAU, 6, ' AU');
+  e.e.textContent = fx(el.e, 6);
+  e.inclJ2000.textContent = fx(el.inclEclipticDeg, 4, '°');
+  e.ascNodeJ2000.textContent = fx(_hiWrap360(el.ascNodeEclipticDeg), 4, '°');
+  e.lonPeri.textContent = fx(_hiWrap360(el.lonPeriEclipticDeg), 4, '°');
+  e.argPeri.textContent = fx(_hiWrap360(el.lonPeriEclipticDeg - el.ascNodeEclipticDeg), 4, '°');
+  e.meanLon.textContent = fx(_hiWrap360(el.meanLonEclipticDeg), 4, '°');
+  e.period.textContent = fx(f.pDays / 365.25, 4, ' yr');
+  e.rPeri.textContent = fx(f.rPeriAU, 6, ' AU');
+  e.rApo.textContent = fx(f.rApoAU, 6, ' AU');
+  e.rAU.textContent = fx(f.rAU, 6, ' AU');
+  e.trueAnomaly.textContent = fx(f.trueAnomalyDeg, 3, '°');
+  e.meanAnomaly.textContent = fx(f.meanAnomalyDeg, 3, '°');
+  e.eoc.textContent = (f.eocDeg >= 0 ? '+' : '') + fx(f.eocDeg, 3, '°');
+  e.inclDate.textContent = fx(f.inclDateDeg, 4, '°');
+  e.nodeLonDate.textContent = fx(f.nodeLonDateDeg, 4, '°');
+  e.argLat.textContent = fx(f.argLatDeg, 3, '°');
+  e.height.textContent = (f.heightAU >= 0 ? '+' : '') + fx(f.heightAU, 6, ' AU');
+  e.heightPct.textContent = f.maxHeightAU > 1e-9 ? fx(100 * f.heightAU / f.maxHeightAU, 1, ' %') : '—';
+  const north = f.heightAU > 1e-7, south = f.heightAU < -1e-7;
+  e.hemisphere.textContent = north ? 'NORTH of the ecliptic' : south ? 'SOUTH of the ecliptic' : 'ON the ecliptic';
+  e.hemisphere.style.color = north ? '#4caf50' : south ? '#ffc107' : '#64b5f6';
+  e.height.style.color = e.heightPct.style.color = e.hemisphere.style.color;
+  e.planetRA.textContent = f.obj.raDisplay || '—';
+  e.planetDec.textContent = f.obj.decDisplay || '—';
+  e.sunDec.textContent = sun.decDisplay || '—';
+  const planetDecDeg = Number.isFinite(f.obj.dec) ? 90 - f.obj.dec * 180 / Math.PI : NaN;
+  const sunDecDeg = Number.isFinite(sun.dec) ? 90 - sun.dec * 180 / Math.PI : NaN;
+  const dDec = planetDecDeg - sunDecDeg;
+  e.decVsSun.textContent = !Number.isFinite(dDec) ? '—' : Math.abs(dDec) < 0.01 ? 'SAME as the Sun'
+    : `${Math.abs(dDec).toFixed(2)}° ${dDec > 0 ? 'NORTH' : 'SOUTH'} of the Sun`;
+}
+
 function createInspectorPanel() {
   const panel = document.createElement('div');
   panel.id = 'hierarchyInspector';
+  const chainKeys = Object.keys(PLANET_HIERARCHIES).filter((k) => PLANET_HIERARCHIES[k].chain);
   panel.innerHTML = `
     <div class="hi-header">
       <h2>Planet Inspector</h2>
@@ -15810,35 +14489,47 @@ function createInspectorPanel() {
     <div class="hi-selector">
       <label>Planet:</label>
       <select class="hi-planet-select">
-        ${Object.entries(PLANET_HIERARCHIES).map(([key, val]) =>
-          `<option value="${key}">${val.label}</option>`
-        ).join('')}
+        ${chainKeys.map((key) => `<option value="${key}">${PLANET_HIERARCHIES[key].label}</option>`).join('')}
       </select>
     </div>
-    <div class="hi-step-indicator">STEP 1 of 5</div>
+    <div class="hi-step-indicator">ORBIT OF DATE — the N-body element chain the scene renders</div>
     <div class="hi-body">
       <div class="hi-section">
-        <div class="hi-section-title">Settings</div>
-        <div class="hi-settings-content"></div>
+        <div class="hi-section-title">Chain elements of date</div>
+        <div class="hi-elements-content"></div>
       </div>
-      <div class="hi-section">
-        <div class="hi-section-title">Runtime State</div>
-        <div class="hi-runtime-content"></div>
+      <div class="hi-section hi-live-section">
+        <div class="hi-section-title">Orbit geometry <span style="color:#4caf50; font-size:10px;">(live)</span></div>
+        <div class="hi-live-content" style="font-family: var(--pl-mono-font);"></div>
       </div>
-      <div class="hi-section">
-        <div class="hi-section-title">Validation</div>
-        <div class="hi-validation-content"></div>
+      <div class="hi-section hi-legend-section">
+        <div class="hi-section-title">Visual Legend</div>
+        <div class="hi-legend-content" style="font-size: 11px; line-height: 1.6;">
+          <div><span style="color:#ffffff">White</span> outline: the chain orbit over one period, fanned from the Sun</div>
+          <div><span style="color:#00ff00">GREEN</span> fan: above the ecliptic of date &middot; <span style="color:#ff0000">RED</span> fan: below</div>
+          <div><span style="color:#4488ff">Blue</span> dashed ring: the ecliptic of date at the semi-major axis</div>
+          <div><span style="color:#ff00ff">Magenta</span> sphere ↑: ascending node &middot; <span style="color:#00ffff">Cyan</span> sphere ↓: descending node (<span style="color:#ffff00">yellow</span> dashed: line of nodes)</div>
+          <div><span style="color:#00ff00">Green</span> small ↑: highest point &middot; <span style="color:#ff0000">Red</span> small ↓: lowest point</div>
+          <div><span style="color:#00ff00">P</span> + green line: perihelion of the chain elements, from the Sun</div>
+          <div><span style="color:#ffbf00">Amber</span> line and arc: Sun → planet, true anomaly ν at the Sun</div>
+          <div><span style="color:#00ffff">Cyan</span> dashed arc: the chain’s mean anomaly M (an angle, drawn at the Sun beside ν)</div>
+          <div><span style="color:#00ffff">Cyan</span> ring: the rendered planet</div>
+        </div>
       </div>
-      <div class="hi-section hi-live-section" style="display: none;">
-        <div class="hi-section-title">Live Data <span style="color:#4caf50; font-size:10px;">(updates in real-time)</span></div>
-        <div class="hi-live-content" style="font-family: var(--pl-mono-font); color: #4caf50;"></div>
+      <div class="hi-helpers">
+        <div class="hi-helpers-title">Visual Helpers</div>
+        <label class="hi-helper-row"><input type="checkbox" data-helper="showInclinationPlane" checked> Orbit plane, nodes and extremes</label>
+        <label class="hi-helper-row"><input type="checkbox" data-helper="showPerihelion" checked> Perihelion point and Sun → perihelion line</label>
+        <label class="hi-helper-row"><input type="checkbox" data-helper="showAnomalies" checked> Sun → planet line and anomaly arcs</label>
+        <label class="hi-helper-row"><input type="checkbox" data-helper="showLocator" checked> Planet locator ring</label>
       </div>
-      <div class="hi-section hi-report-section" style="display: none;">
-        <div class="hi-section-title">Position Report <span style="color:#64b5f6; font-size:10px;">(Step 5)</span></div>
+      <div class="hi-section hi-report-section">
+        <div class="hi-section-title">Position Report <span style="color:#64b5f6; font-size:10px;">(vs the NASA / JPL test dates)</span></div>
         <div class="hi-report-content">
-          <div class="hi-report-loading">Generating report...</div>
-          <pre class="hi-report"></pre>
-          <div class="hi-report-buttons">
+          <button class="hi-report-btn generate">Generate report</button>
+          <div class="hi-report-loading" style="display:none;">Generating report...</div>
+          <pre class="hi-report" style="display:none;"></pre>
+          <div class="hi-report-buttons" style="display:none;">
             <button class="hi-report-btn download">Download Excel</button>
             <button class="hi-report-btn copy">Copy Report</button>
             <label class="hi-report-checkbox-label">
@@ -15848,250 +14539,141 @@ function createInspectorPanel() {
           </div>
         </div>
       </div>
-      <div class="hi-section hi-legend-section" style="display: none;">
-        <div class="hi-section-title">Visual Legend</div>
-        <div class="hi-legend-content" style="font-size: 11px; line-height: 1.6;">
-          <div><span style="color:#00ff00">GREEN</span> half-plane: Above ecliptic</div>
-          <div><span style="color:#ff0000">RED</span> half-plane: Below ecliptic</div>
-          <div><span style="color:#ff00ff">Magenta</span> sphere ↑: Ascending node</div>
-          <div><span style="color:#00ffff">Cyan</span> sphere ↓: Descending node</div>
-          <div><span style="color:#00ff00">Green</span> sphere ↑: Highest point (max north)</div>
-          <div><span style="color:#ff0000">Red</span> sphere ↓: Lowest point (max south)</div>
-          <div><span style="color:#800080">Purple</span> line →: Current angle perihelion to Sun</div>
-          <div><span style="color:#00ffff">Cyan</span> arrow →: Mean Anomaly angle to perihelion</div>
-          <div><span style="color:#ffbf00">Amber</span> arrow →: True Anomaly angle to perihelion</div>
-          <div>P point →: Fixed perihelion point</div>
-          <div>P2 point →: Real perihelion point (ellipse)</div>
-        </div>
-      </div>
-      <div class="hi-section">
-        <div class="hi-section-title">Hierarchy Path</div>
-        <div class="hi-tree"></div>
-      </div>
-      <div class="hi-helpers">
-        <div class="hi-helpers-title">Visual Helpers</div>
-        <label class="hi-helper-row"><input type="checkbox" data-helper="showAxes" checked> Show Axes (XYZ)</label>
-        <label class="hi-helper-row"><input type="checkbox" data-helper="showStartPos" checked> Show StartPos Direction</label>
-        <label class="hi-helper-row"><input type="checkbox" data-helper="showRotationDir" checked> Show Rotation Direction</label>
-        <label class="hi-helper-row"><input type="checkbox" data-helper="showOrbitCenter"> Show Startpos Reference Information (Step 4)</label>
-        <div class="hi-solar-period-section" style="display: none; margin-left: 20px; margin-bottom: 8px; padding: 8px; background: rgba(0,255,255,0.05); border-left: 2px solid #00ffff; font-size: 11px;">
-          <div style="color: rgba(255,255,255,0.5); font-size: 10px; margin-bottom: 4px;">SOLAR PERIOD REFERENCE</div>
-          <div style="color: rgba(255,255,255,0.4); font-size: 9px; margin-bottom: 6px;">(Planet's position on its orbit around the Sun)</div>
-          <div style="display: grid; grid-template-columns: 1fr auto; gap: 2px 8px;">
-            <span style="color: #00ffff;">Reference angle on Solar period</span>
-            <span data-id="refAngleHelper" style="color: #00ffff;"></span>
-            <span style="color: rgba(255,255,255,0.6);">Orbital period (solar)</span>
-            <span data-id="orbitPeriodSolarHelper" style="color: rgba(255,255,255,0.6);"></span>
-            <span style="color: #00ffff;">Days before next alignment</span>
-            <span data-id="daysUntilAlignmentHelper" style="color: #00ffff;"></span>
-          </div>
-          <div style="color: rgba(255,255,255,0.4); font-size: 9px; margin-top: 4px;">(planet alignment with the cyan arrow = start of planet orbit)</div>
-        </div>
-        <label class="hi-helper-row"><input type="checkbox" data-helper="showInclinationPlane" checked> Show Inclination Plane (Step 4)</label>
-        <label class="hi-helper-row"><input type="checkbox" data-helper="showPerihelionPoint" checked> Show Perihelion Point & Arrow (Step 4)</label>
-        <label class="hi-helper-row"><input type="checkbox" data-helper="showAnomalies" checked> Show Anomalies Visualization (Step 4)</label>
-      </div>
     </div>
     <div class="hi-footer">
-      <button class="hi-nav-btn hi-prev-btn">\u25c0 Prev</button>
-      <button class="hi-nav-btn hi-highlight-btn">Highlight in Scene</button>
-      <button class="hi-nav-btn hi-next-btn">Next \u25b6</button>
-    </div>
-  `;
+      <button class="hi-nav-btn hi-view-orbit-btn" title="Top-down on the Sun, equinox to the right">⬇ Orbit view</button>
+      <button class="hi-nav-btn hi-highlight-btn active">Hide Helpers</button>
+      <button class="hi-nav-btn hi-view-planet-btn" title="From behind the planet toward the Sun">◉ Planet view</button>
+    </div>`;
   document.body.appendChild(panel);
 
-  // Event listeners
   panel.querySelector('.hi-close').addEventListener('click', closeHierarchyInspector);
-
   panel.querySelector('.hi-planet-select').addEventListener('change', (e) => {
     hierarchyInspector.currentPlanet = e.target.value;
-    hierarchyInspector.currentStep = 0;
     updateInspectorDisplay();
   });
-
-  panel.querySelector('.hi-prev-btn').addEventListener('click', () => {
-    if (hierarchyInspector.currentStep > 0) {
-      hierarchyInspector.currentStep--;
-      updateInspectorDisplay();
-    }
-  });
-
-  panel.querySelector('.hi-next-btn').addEventListener('click', () => {
-    const steps = PLANET_HIERARCHIES[hierarchyInspector.currentPlanet].steps();
-    if (hierarchyInspector.currentStep < steps.length - 1) {
-      hierarchyInspector.currentStep++;
-      updateInspectorDisplay();
-    }
-  });
-
+  panel.querySelector('.hi-view-orbit-btn').addEventListener('click', () => focusInspectorCamera('orbit'));
+  panel.querySelector('.hi-view-planet-btn').addEventListener('click', () => focusInspectorCamera('planet'));
   panel.querySelector('.hi-highlight-btn').addEventListener('click', (e) => {
     hierarchyInspector.highlightActive = !hierarchyInspector.highlightActive;
     e.target.classList.toggle('active', hierarchyInspector.highlightActive);
-    e.target.textContent = hierarchyInspector.highlightActive ? 'Hide Helpers' : 'Highlight in Scene';
-    if (hierarchyInspector.highlightActive) {
-      const steps = PLANET_HIERARCHIES[hierarchyInspector.currentPlanet].steps();
-      createVisualHelpers(steps[hierarchyInspector.currentStep]);
-    } else {
-      // Highlight turned off - force clean everything
-      clearVisualHelpers({ forceCleanAnomalies: true });
-    }
+    e.target.textContent = hierarchyInspector.highlightActive ? 'Hide Helpers' : 'Show Helpers';
+    if (hierarchyInspector.highlightActive) createVisualHelpers(); else clearVisualHelpers();
   });
-
-  // Helper checkboxes
-  panel.querySelectorAll('.hi-helper-row input').forEach(checkbox => {
+  panel.querySelectorAll('.hi-helper-row input').forEach((checkbox) => {
     checkbox.addEventListener('change', (e) => {
-      const helperName = e.target.dataset.helper;
-      hierarchyInspector.helpers[helperName] = e.target.checked;
-
-      // Toggle solar period section visibility when showOrbitCenter is toggled
-      if (helperName === 'showOrbitCenter') {
-        const solarPeriodSection = panel.querySelector('.hi-solar-period-section');
-        if (solarPeriodSection) {
-          solarPeriodSection.style.display = e.target.checked ? 'block' : 'none';
-        }
-      }
-
-      if (hierarchyInspector.highlightActive) {
-        // Only force clean anomaly elements if the showAnomalies checkbox was toggled
-        const forceCleanAnomalies = (helperName === 'showAnomalies');
-        clearVisualHelpers({ forceCleanAnomalies });
-        const steps = PLANET_HIERARCHIES[hierarchyInspector.currentPlanet].steps();
-        // Skip clear since we just did it with the right forceCleanAnomalies setting
-        createVisualHelpers(steps[hierarchyInspector.currentStep], { skipClear: true });
-      }
+      hierarchyInspector.helpers[e.target.dataset.helper] = e.target.checked;
+      if (hierarchyInspector.highlightActive) createVisualHelpers();
     });
   });
-
-  // Report buttons (Step 5)
+  // Position report — on demand (it walks the scene through the test dates)
+  panel.querySelector('.hi-report-btn.generate').addEventListener('click', () => {
+    generateAndDisplayReport(hierarchyInspector.currentPlanet);
+  });
   panel.querySelector('.hi-report-btn.download').addEventListener('click', async () => {
-    if (_currentReportData && _currentReportData.excelData) {
-      await exportPlanetReportToExcel(_currentReportData.planetKey, _currentReportData.excelData);
-    }
+    if (_currentReportData?.excelData) await exportPlanetReportToExcel(_currentReportData.planetKey, _currentReportData.excelData);
   });
-
   panel.querySelector('.hi-report-btn.copy').addEventListener('click', () => {
-    if (_currentReportData && _currentReportData.screenReport) {
-      copyReportToClipboard(_currentReportData.screenReport);
-    }
+    if (_currentReportData?.screenReport) copyReportToClipboard(_currentReportData.screenReport);
   });
-
-  // Show all results checkbox (Step 5)
   panel.querySelector('.hi-report-show-all').addEventListener('change', async (e) => {
-    const showAll = e.target.checked;
-    hierarchyInspector.showAllResults = showAll;
-
-    // Regenerate report with new setting
-    if (_currentReportData && _currentReportData.planetKey) {
+    hierarchyInspector.showAllResults = e.target.checked;
+    if (_currentReportData?.planetKey) {
       const reportElement = panel.querySelector('.hi-report');
       const loadingElement = panel.querySelector('.hi-report-loading');
-
       loadingElement.style.display = 'block';
       reportElement.style.display = 'none';
-
-      const result = await generatePlanetReport(_currentReportData.planetKey, showAll);
-
+      const result = await generatePlanetReport(_currentReportData.planetKey, e.target.checked);
       _currentReportData.screenReport = result.screenReport;
       reportElement.innerHTML = result.screenReport;
-
       loadingElement.style.display = 'none';
       reportElement.style.display = 'block';
     }
   });
-
-  // Keyboard navigation
-  const keyHandler = (e) => {
+  // Keyboard: ←/→ previous/next planet, Escape/q close
+  document.addEventListener('keydown', (e) => {
     if (!panel.classList.contains('visible')) return;
-
-    // Don't intercept keyboard events when user is typing in an input field
-    // (e.g., editing date/time in dat.GUI)
     const activeEl = document.activeElement;
-    const isTyping = activeEl && (
-      activeEl.tagName === 'INPUT' ||
-      activeEl.tagName === 'TEXTAREA' ||
-      activeEl.isContentEditable
-    );
-    if (isTyping) return;
-
+    if (activeEl && (activeEl.tagName === 'INPUT' || activeEl.tagName === 'TEXTAREA' || activeEl.isContentEditable)) return;
+    const select = panel.querySelector('.hi-planet-select');
     if (e.key === 'ArrowLeft' || e.key === 'p') {
-      panel.querySelector('.hi-prev-btn').click();
+      select.selectedIndex = (select.selectedIndex + select.length - 1) % select.length;
+      select.dispatchEvent(new Event('change'));
     } else if (e.key === 'ArrowRight' || e.key === 'n') {
-      panel.querySelector('.hi-next-btn').click();
+      select.selectedIndex = (select.selectedIndex + 1) % select.length;
+      select.dispatchEvent(new Event('change'));
     } else if (e.key === 'Escape' || e.key === 'q') {
       closeHierarchyInspector();
     }
-  };
-  document.addEventListener('keydown', keyHandler);
-
+  });
   return panel;
 }
 
-// Open the hierarchy inspector
-function openHierarchyInspector() {
-  if (!hierarchyInspector.panel) {
-    hierarchyInspector.panel = createInspectorPanel();
+/** (Re)build the readouts and the helpers for the current planet and point the camera at its orbit. */
+function updateInspectorDisplay() {
+  const H = hierarchyInspector;
+  if (!H.panel) return;
+  const target = PLANET_HIERARCHIES[H.currentPlanet];
+  if (!target) return;
+  H.panel.querySelector('.hi-step-indicator').textContent =
+    `${target.label.toUpperCase()} — orbit of date from the N-body element chain the scene renders`;
+  // the report belongs to the planet it was generated for
+  const reportEl = H.panel.querySelector('.hi-report'), btns = H.panel.querySelector('.hi-report-buttons');
+  if (_currentReportData && _currentReportData.planetKey !== H.currentPlanet) {
+    reportEl.style.display = 'none'; btns.style.display = 'none'; _currentReportData = null;
   }
+  _hiBuildReadouts(H.currentPlanet);
+  H._lastReadoutJD = null;
+  H.highlightActive = true;
+  const highlightBtn = H.panel.querySelector('.hi-highlight-btn');
+  highlightBtn.classList.add('active');
+  highlightBtn.textContent = 'Hide Helpers';
+  createVisualHelpers();
+  focusInspectorCamera('orbit');
+  updateHierarchyLiveData();
+}
+
+function openHierarchyInspector() {
+  if (!hierarchyInspector.panel) hierarchyInspector.panel = createInspectorPanel();
   hierarchyInspector.panel.classList.add('visible');
   hierarchyInspector.panel.querySelector('.hi-planet-select').value = hierarchyInspector.currentPlanet;
   updateInspectorDisplay();
-  // Hide the planet data panel while hierarchy inspector is open
+  // Hide the planet data panel while the inspector is open
   labelDismissed = true;
   const planetLabel = document.getElementById('planetLabel');
-  if (planetLabel) {
-    planetLabel.style.display = 'none';
-  }
-  // Hide orbit plane helper of current lookAtObj
-  if (o.lookAtObj?.orbitPlaneHelper) {
-    o.lookAtObj.orbitPlaneHelper.visible = false;
-  }
-  // Hide focus ring (shown when looking at Sun)
-  if (focusRing) {
-    focusRing.visible = false;
-  }
+  if (planetLabel) planetLabel.style.display = 'none';
+  if (o.lookAtObj?.orbitPlaneHelper) o.lookAtObj.orbitPlaneHelper.visible = false;
+  if (focusRing) focusRing.visible = false;
 }
 
-// Close the hierarchy inspector
 function closeHierarchyInspector() {
-  if (hierarchyInspector.panel) {
-    hierarchyInspector.panel.classList.remove('visible');
-    // Set highlightActive to false BEFORE clearVisualHelpers so anomaly elements are cleaned up
-    hierarchyInspector.highlightActive = false;
-    // Disable hierarchy inspector camera control
-    hierarchyInspector._cameraControlActive = false;
-    hierarchyInspector._cameraTarget = null;
-    // Force clean everything when closing inspector
-    clearVisualHelpers({ forceCleanAnomalies: true });
-    const highlightBtn = hierarchyInspector.panel.querySelector('.hi-highlight-btn');
-    highlightBtn.classList.remove('active');
-    highlightBtn.textContent = 'Highlight in Scene';
-    // Reset view to Earth with default bird's eye view (same as initial load)
-    o.lookAtObj = earth;
-    camera.position.set(0, 500, 0);
-    controls.target.set(0, 0, 0);
-    focusPlanet(earth);
-    // Show the planet data panel with Earth data
-    labelDismissed = false;
-    const planetLabel = document.getElementById('planetLabel');
-    if (planetLabel) {
-      planetLabel.style.display = 'block';
-    }
-    // Update the "Look at" dropdown to show Earth
-    o.Target = 'Earth';
-    // Hide all orbit plane helpers
-    planetObjects.forEach(p => {
-      if (p.orbitPlaneHelper) p.orbitPlaneHelper.visible = false;
+  const H = hierarchyInspector;
+  if (!H.panel) return;
+  H.panel.classList.remove('visible');
+  H.highlightActive = false;
+  H._cameraControlActive = false;
+  H._cameraTarget = null;
+  H._lastTargetPos = null;
+  clearVisualHelpers();
+  const highlightBtn = H.panel.querySelector('.hi-highlight-btn');
+  highlightBtn.classList.remove('active');
+  highlightBtn.textContent = 'Show Helpers';
+  // Reset view to Earth with the default bird's eye view (same as initial load)
+  o.lookAtObj = earth;
+  camera.position.set(0, 500, 0);
+  controls.target.set(0, 0, 0);
+  focusPlanet(earth);
+  labelDismissed = false;
+  const planetLabel = document.getElementById('planetLabel');
+  if (planetLabel) planetLabel.style.display = 'block';
+  o.Target = 'Earth';
+  planetObjects.forEach((p) => { if (p.orbitPlaneHelper) p.orbitPlaneHelper.visible = false; });
+  // Update the "Look at" dropdown to show Earth
+  const guiContainer = document.getElementById('gui');
+  if (guiContainer) {
+    guiContainer.querySelectorAll('select').forEach((select) => {
+      if (Array.from(select.options).some((opt) => opt.value === 'Earth')) select.value = 'Earth';
     });
-    // Update the GUI dropdown by finding the select element
-    const guiContainer = document.getElementById('gui');
-    if (guiContainer) {
-      const selectElements = guiContainer.querySelectorAll('select');
-      selectElements.forEach(select => {
-        // Find the "Look at" dropdown by checking its options
-        const hasEarthOption = Array.from(select.options).some(opt => opt.value === 'Earth');
-        if (hasEarthOption) {
-          select.value = 'Earth';
-        }
-      });
-    }
   }
 }
 
@@ -22931,1196 +21513,33 @@ function closeVerificationPanel() {
 }
 
 // Update live data in hierarchy inspector (called from render loop)
-let _lastLiveDataJD = null;
-let _lastLiveDataPlanet = null; // Track planet changes to force refresh
-let _lastLiveDataStep = null; // Track step changes to force refresh when returning to Step 4
-const _liveDataVec3 = new THREE.Vector3(); // Reusable vector for performance
-const _liveDataVec3b = new THREE.Vector3(); // Second reusable vector for sun position
-const _liveDataInvTiltMatrix = new THREE.Matrix4(); // Reusable inverse tilt matrix
-const _liveDataTiltMatrix = new THREE.Matrix4(); // Reusable tilt matrix
-const _liveDataFlatPos = new THREE.Vector3(); // Reusable vector for flat orbital position
-const _liveDataP1 = new THREE.Vector3(); // Reusable vectors for node sampling
-const _liveDataP2 = new THREE.Vector3();
-const _liveDataP1World = new THREE.Vector3(); // Reusable vectors for world positions
-const _liveDataP2World = new THREE.Vector3();
-const _liveDataLocalPt = new THREE.Vector3(); // Reusable for orbit point sampling
-const _liveDataWorldPt = new THREE.Vector3();
-const _liveDataLocalToWorld = new THREE.Matrix4(); // Reusable transform matrix for node updates
-const _liveDataNewAscPos = new THREE.Vector3(); // Reusable for ascending node position
-const _liveDataNewDescPos = new THREE.Vector3(); // Reusable for descending node position
-const _liveDataNewHighPos = new THREE.Vector3(); // Reusable for highest point position
-const _liveDataNewLowPos = new THREE.Vector3(); // Reusable for lowest point position
-const _liveDataEuler = new THREE.Euler(); // Reusable Euler for rotation calculations
-const _liveDataDebugLocal = new THREE.Vector3(); // Reusable for debug local position
-const _liveDataDebugWorld = new THREE.Vector3(); // Reusable for debug world position
-const _liveDataDebugMarker = new THREE.Vector3(); // Reusable for debug marker world position
-// Pre-allocated arrays for half-disc geometry (64 points + 1 wrap + 1 center = 66 vertices * 3 = 198 floats)
-const _halfDiscVertices = new Float32Array(198);
-const _halfDiscIndices = []; // Indices array reused between calls
-// Reusable vectors for hierarchy inspector validation and display
-const _hiObjWorldPos = new THREE.Vector3();
-const _hiSunWorldPos = new THREE.Vector3();
-const _hiEarthPeriPos = new THREE.Vector3();
-const _hiPlanetPeriPos = new THREE.Vector3();
-const _hiDirection = new THREE.Vector3();
-const _hiWorldPos = new THREE.Vector3();
-// Reusable vectors for Step 3 visual helpers
-const _hiSunPos = new THREE.Vector3();
-const _hiPerihelionPos = new THREE.Vector3();
-const _hiEarthPos = new THREE.Vector3();
-const _hiPPos = new THREE.Vector3(); // P = orbit center position
-const _hiPlanetPos = new THREE.Vector3(); // Current planet position
-// Reusable vectors for updatePlanetAnomalies
-const _anomalySunPos = new THREE.Vector3();
-const _anomalyPPos = new THREE.Vector3();
-const _anomalyPlanetPos = new THREE.Vector3();
-// Reusable vectors for updateMoonOrbitalElements
-const _moonEarthPos = new THREE.Vector3();
-const _moonOrbitCenterPos = new THREE.Vector3();
-const _moonPos = new THREE.Vector3();
-const _hiPurpleWorldPos = new THREE.Vector3();
-const _hiGreenWorldPos = new THREE.Vector3();
-const _hiTempPos = new THREE.Vector3();
-// Reusable vectors for camera positioning
-const _hiTargetPos = new THREE.Vector3();
-const _hiCamSunPos = new THREE.Vector3();
-const _hiCamDirection = new THREE.Vector3();
-let _cachedAscNodeOrbitalAngle = null; // Cached ascending node orbital angle
-let _cachedTiltA = null, _cachedTiltB = null; // Cached tilt values to detect changes
-let _liveDataElements = null; // Cached DOM element references for live data updates
-let _lastAscNodeTiltA = null, _lastAscNodeTiltB = null; // Cache to skip unchanged ascending node updates
-let _lastArcTrueAnomaly = null, _lastArcMeanAnomaly = null; // Cache for arc update throttling
+/**
+ * Planet Inspector — per-frame update (called from the animation loop): the
+ * orbit frame of date from the chain, the helper geometry, and the readouts
+ * (rewritten when the epoch moved or the planet changed, so a paused scene
+ * keeps a copyable panel). Plan 06 R10 — replaces the K-wheel live data.
+ */
 function updateHierarchyLiveData() {
   try {
-    if (!hierarchyInspector.panel || !hierarchyInspector.panel.classList.contains('visible')) return;
-
-    // If not on Step 4, reset tracking so we refresh when returning to Step 4
-    if (hierarchyInspector.currentStep !== 3) {
-      _lastLiveDataStep = null;
-      return;
+    const H = hierarchyInspector;
+    if (!H.panel || !H.panel.classList.contains('visible')) return;
+    const f = computeInspectorOrbitFrame(H.currentPlanet);
+    if (!f) return;
+    if (H.highlightActive) {
+      if (!H.group || H.parts?.planet !== H.currentPlanet) createVisualHelpers();
+      else updateInspectorVisuals(f);
     }
-
-  // Only update when simulation is running OR Julian Day has changed OR planet/step changed
-  // This allows copy/paste when paused
-  const currentJD = o.julianDay;
-  const currentPlanet = hierarchyInspector.currentPlanet;
-  const currentStep = hierarchyInspector.currentStep;
-  const planetChanged = _lastLiveDataPlanet !== currentPlanet;
-  const stepChanged = _lastLiveDataStep !== currentStep;
-
-  if (!o.Run && _lastLiveDataJD !== null && Math.abs(currentJD - _lastLiveDataJD) < 0.0001 && !planetChanged && !stepChanged) {
-    return; // Simulation paused, no JD change, same planet, and same step - skip update
-  }
-  _lastLiveDataJD = currentJD;
-  _lastLiveDataPlanet = currentPlanet;
-  _lastLiveDataStep = currentStep;
-
-  const liveContent = hierarchyInspector.panel.querySelector('.hi-live-content');
-  if (!liveContent) return;
-
-  const steps = PLANET_HIERARCHIES[hierarchyInspector.currentPlanet].steps();
-  const stepData = steps[hierarchyInspector.currentStep];
-  const obj = stepData.obj;
-
-  if (!obj) return;
-
-  // Get the actual planet object (Step 5) to check its real world position
-  const planetStep = steps[4]; // Step 5 is the actual planet
-  const planetObj = planetStep?.obj;
-
-  // Get tilt values for ascending node calculation
-  const tiltaDeg = obj.orbitTilta || 0;
-  const tiltbDeg = obj.orbitTiltb || 0;
-
-  // The tilt encoding is:
-  //   orbitTilta = cos((-90 - Ω) * π/180) * (-inclination)
-  //   orbitTiltb = sin((-90 - Ω) * π/180) * (-inclination)
-  // The negative inclination flips signs, equivalent to:
-  //   atan2(tiltb, tilta) = 90 - Ω
-  // Therefore: Ω = 90 - atan2(tiltb, tilta)
-  // But we now use the DYNAMIC ascending node from o.<planet>AscendingNode
-  // which accounts for changes in Earth's obliquity over time
-  // Map planet keys to their o.xxxAscendingNode property names
-  const ascendingNodePropertyMap = {
-    mercury: 'mercuryAscendingNode',
-    venus: 'venusAscendingNode',
-    mars: 'marsAscendingNode',
-    jupiter: 'jupiterAscendingNode',
-    saturn: 'saturnAscendingNode',
-    uranus: 'uranusAscendingNode',
-    neptune: 'neptuneAscendingNode',
-    pluto: 'plutoAscendingNode',
-    halleys: 'halleysAscendingNode',
-    eros: 'erosAscendingNode'
-  };
-
-  // Use dynamic value if available, otherwise fall back to static calculation
-  let ascNodeAngleDeg;
-  const ascNodeProperty = ascendingNodePropertyMap[hierarchyInspector.currentPlanet];
-  if (ascNodeProperty && o[ascNodeProperty] !== undefined && o[ascNodeProperty] !== 0) {
-    ascNodeAngleDeg = o[ascNodeProperty];
-  } else {
-    // Fallback to static calculation
-    const theta = Math.atan2(tiltbDeg, tiltaDeg) * 180 / Math.PI;
-    ascNodeAngleDeg = 90 - theta;
-    ascNodeAngleDeg = ((ascNodeAngleDeg % 360) + 360) % 360;
-  }
-
-  // Get world positions (reuse vector for performance)
-  let planetWorldY = 0;
-  let planetWorldX = 0, planetWorldZ = 0;
-
-  if (planetObj?.pivotObj) {
-    planetObj.pivotObj.getWorldPosition(_liveDataVec3);
-    planetWorldX = _liveDataVec3.x;
-    planetWorldY = _liveDataVec3.y;
-    planetWorldZ = _liveDataVec3.z;
-  }
-
-  // Calculate orbital plane height metrics
-  const inclinationRad = Math.sqrt(tiltaDeg*tiltaDeg + tiltbDeg*tiltbDeg) * Math.PI / 180;
-  const orbitRadius = Math.sqrt(planetWorldX*planetWorldX + planetWorldZ*planetWorldZ);
-  const maxY = orbitRadius * Math.sin(inclinationRad);
-
-  // Calculate angle from planet to ascending node
-  // The planet's ecliptic longitude from its world position:
-  let planetEclipticLong = Math.atan2(-planetWorldZ, planetWorldX) * 180 / Math.PI;
-  planetEclipticLong = ((planetEclipticLong % 360) + 360) % 360;
-
-  // Angular distance from the ascending node (measured along the ecliptic)
-  let eclipticAngleFromAscNode = planetEclipticLong - ascNodeAngleDeg;
-  eclipticAngleFromAscNode = ((eclipticAngleFromAscNode + 180) % 360 + 360) % 360 - 180;
-
-  // The "angle from ascending node" in orbital terms is the argument of latitude (u)
-  // u = 0° at ascending node, 90° at highest point, 180° at descending node, 270° at lowest
-  //
-  // We can calculate this from the planet's Y height relative to maxY:
-  // Y/maxY = sin(u) for the ascending half (0° to 180°)
-  //
-  // To determine which half of the orbit we're in (ascending vs descending),
-  // we check if the ecliptic angle is in [0°, 180°] or [-180°, 0°]
-  let anglePlanetFromAscNode = 0;
-  if (maxY > 0.001) {
-    const yRatio = Math.max(-1, Math.min(1, planetWorldY / maxY));
-    const yAngle = Math.asin(yRatio) * 180 / Math.PI; // -90 to +90
-
-    // Determine which half of orbit based on ecliptic position
-    if (eclipticAngleFromAscNode >= 0 && eclipticAngleFromAscNode <= 180) {
-      // Ascending half: angle is directly the yAngle (0 to 90 to 0)
-      // But we need to distinguish 0-90 from 90-180
-      if (eclipticAngleFromAscNode <= 90) {
-        anglePlanetFromAscNode = yAngle; // 0 to 90
-      } else {
-        anglePlanetFromAscNode = 180 - yAngle; // 90 to 180 (but yAngle goes 90 to 0)
-      }
-    } else {
-      // Descending half: angle is -yAngle (0 to -90 to 0)
-      if (eclipticAngleFromAscNode >= -90) {
-        anglePlanetFromAscNode = yAngle; // 0 to -90 (yAngle is already negative here)
-      } else {
-        anglePlanetFromAscNode = -180 - yAngle; // -90 to -180
-      }
-    }
-  }
-
-  // Calculate angle from ascending node.
-  // READOUT-CONVENTION NOTE (the no-decision cleanup batch — the audited
-  // "wrong 'sun.ra is ecliptic' comment"): sun.ra is NOT an ecliptic
-  // longitude — the readout loop measures every body's ra/dec in the
-  // EARTH-EQUATORIAL local frame (obj.ra = SPHERICAL.theta there, the
-  // scene's own zero convention). Using it as a λ proxy carries the
-  // RA-vs-λ projection difference (±2.4°-class through the year). This
-  // hierarchy-inspector angle is a debug display calibrated on the scene
-  // convention, so the VALUE is deliberately left as-is; only the false
-  // claim in the old comment is corrected. A convention-pure rewrite
-  // would need the scene frame's zero offset audited first.
-  const sunEclipticLongitude = (sun.ra * 180 / Math.PI + 360) % 360;
-  // Angle from ascending node = current ecliptic longitude - ascending node longitude
-  let angleFromAscNode = sunEclipticLongitude - ascNodeAngleDeg;
-  // Normalize to 0-360 first, then convert to ±180 range
-  angleFromAscNode = ((angleFromAscNode % 360) + 360) % 360;
-  if (angleFromAscNode > 180) {
-    angleFromAscNode = angleFromAscNode - 360; // Convert 181-359 to -179 to -1
-  }
-
-  // Calculate angle from longitude of perihelion
-  // Get the longitude of perihelion for this planet
-  const perihelionLongValues = {
-    mercury: o.mercuryPerihelion,
-    venus: o.venusPerihelion,
-    mars: o.marsPerihelion,
-    jupiter: o.jupiterPerihelion,
-    saturn: o.saturnPerihelion,
-    uranus: o.uranusPerihelion,
-    neptune: o.neptunePerihelion,
-    pluto: o.plutoPerihelion,
-    halleys: o.halleysPerihelion,
-    eros: o.erosPerihelion
-  };
-  const perihelionLong = perihelionLongValues[hierarchyInspector.currentPlanet] ?? 0;
-  // Angle from perihelion = current ecliptic longitude - longitude of perihelion
-  let angleFromPerihelion = sunEclipticLongitude - perihelionLong;
-  // Normalize to 0-360 first, then convert to ±180 range
-  angleFromPerihelion = ((angleFromPerihelion % 360) + 360) % 360;
-  if (angleFromPerihelion > 180) {
-    angleFromPerihelion = angleFromPerihelion - 360; // Convert 181-359 to -179 to -1
-  }
-
-  // Get planet label for display
-  const planetLabel = PLANET_HIERARCHIES[hierarchyInspector.currentPlanet]?.label || 'Planet';
-
-  // Get celestial coordinates directly from planet/sun objects
-  // These are the same values used in info panels
-  const planetRA = planetObj?.raDisplay || 'N/A';
-  const planetDec = planetObj?.decDisplay || 'N/A';
-  const sunDecDisplay = sun.decDisplay || 'N/A';
-
-  // Get raw Dec values in degrees for comparison
-  const planetDecValue = planetObj?.dec ? 90 - (planetObj.dec * 180 / Math.PI) : 0;
-  const sunDecValue = 90 - (sun.dec * 180 / Math.PI);
-
-  // Determine ecliptic position based on World Y (model's ecliptic plane)
-  let orbitalPlanePos, orbitalPlanePosColor;
-  const actuallyAbove = planetWorldY > 0.001;
-  const actuallyBelow = planetWorldY < -0.001;
-
-  if (!actuallyAbove && !actuallyBelow) {
-    orbitalPlanePos = 'ON ecliptic plane';
-    orbitalPlanePosColor = '#64b5f6';
-  } else if (actuallyAbove) {
-    orbitalPlanePos = 'NORTH of ecliptic';
-    orbitalPlanePosColor = '#4caf50';
-  } else {
-    orbitalPlanePos = 'SOUTH of ecliptic';
-    orbitalPlanePosColor = '#ffc107';
-  }
-
-  // Calculate Dec difference (planet relative to Sun)
-  const decDiff = planetDecValue - sunDecValue;
-  let decComparison, decComparisonColor;
-  if (Math.abs(decDiff) < 0.01) {
-    decComparison = 'SAME as Sun';
-    decComparisonColor = '#64b5f6';
-  } else if (decDiff > 0) {
-    decComparison = `${decDiff.toFixed(2)}° NORTH of Sun`;
-    decComparisonColor = '#4caf50';
-  } else {
-    decComparison = `${Math.abs(decDiff).toFixed(2)}° SOUTH of Sun`;
-    decComparisonColor = '#ffc107';
-  }
-
-  // Calculate reference angle on Solar period (live update)
-  // Option A: Starts at startPos value (e.g., 115.71° for Venus at model start)
-  // Increases as planet moves, wraps at 360° → 0°
-  // Shows 0° when planet aligns with the cyan arrow
-  let refAngleDeg = 0;
-  if (obj.speed !== undefined && obj.startPos !== undefined) {
-    // Get the child planet's speed (actual orbital speed) for the Solar period
-    const planetKey = hierarchyInspector.currentPlanet;
-    const hierarchy = PLANET_HIERARCHIES[planetKey];
-    let childPlanetSpeed = obj.speed;
-    let childStartPos = 0;
-    if (hierarchy) {
-      const steps = hierarchy.steps();
-      if (steps.length > 4 && steps[4].obj) {
-        if (steps[4].obj.speed !== undefined) childPlanetSpeed = steps[4].obj.speed;
-        if (steps[4].obj.startPos !== undefined) childStartPos = steps[4].obj.startPos;
-      }
-    }
-
-    // Calculate initial angle based on child planet's startPos
-    // The RealPerihelionAtSun.startPos = 2 * childStartPos (e.g., planets.mercury.startpos * 2 = 588)
-    //
-    // Rules for initial angle (counting DOWN from this value to 0):
-    // - If 2 * childStartPos >= 360: initialAngle = childStartPos (e.g., Mercury: 294°)
-    // - If 2 * childStartPos < 360: initialAngle = 2 * childStartPos (e.g., Mars: 243.31°)
-    //
-    // This represents "degrees remaining until alignment with cyan arrow"
-    const doubleStartPos = childStartPos * 2;
-    let initialAngle;
-    if (doubleStartPos >= 360) {
-      initialAngle = childStartPos; // Mercury: 294°
-    } else {
-      initialAngle = doubleStartPos; // Mars: 243.31°
-    }
-
-    // Calculate how many degrees the planet has traveled in its Solar period
-    // childPlanetSpeed is in rad/year, o.pos is in years (where 1 = meansolaryearlengthinDays)
-    // Note: outer planets (Mars, Jupiter, etc.) have NEGATIVE speed, so use absolute value
-    const traveledDeg = Math.abs(childPlanetSpeed) * o.pos * 180 / Math.PI;
-
-    // Reference angle COUNTS DOWN: starts at initialAngle, decreases to 0
-    // refAngleDeg = initialAngle - traveledDeg (mod 360)
-    refAngleDeg = (initialAngle - traveledDeg) % 360;
-    if (refAngleDeg < 0) refAngleDeg += 360;
-
-    // Calculate days until next alignment (when refAngleDeg reaches 0)
-    // Solar orbit length in days = (holisticyearLength / planetSolarYearCount) * meansolaryearlengthinDays
-    const solarYearCounts = {
-      mercury: mercurySolarYearCount,
-      venus: venusSolarYearCount,
-      mars: marsSolarYearCount,
-      jupiter: jupiterSolarYearCount,
-      saturn: saturnSolarYearCount,
-      uranus: uranusSolarYearCount,
-      neptune: neptuneSolarYearCount,
-      pluto: plutoSolarYearCount,
-      halleys: halleysSolarYearCount,
-      eros: erosSolarYearCount
-    };
-    const planetSolarYearCount = solarYearCounts[planetKey];
-    const planetSolarOrbitDays = planetSolarYearCount ? (holisticyearLength / planetSolarYearCount) * meansolaryearlengthinDays : 0;
-    window._orbitPeriodSolar = planetSolarOrbitDays;
-    window._daysUntilAlignment = planetSolarOrbitDays > 0 ? (refAngleDeg / 360) * planetSolarOrbitDays : 0;
-
-  }
-
-  // Calculate True Anomaly and Mean Anomaly dynamically from the model
-  // The child planet orbits inside RealPerihelionAtSun container.
-  // Its orbital angle θ = speed * pos - startPos * (π/180) [from moveModel]
-  // This θ represents the True Anomaly (angle from perihelion direction)
-
-  // Get the child planet object (Step 5 in hierarchy)
-  const anomalyPlanetKey = hierarchyInspector.currentPlanet;
-  const anomalyHierarchy = PLANET_HIERARCHIES[anomalyPlanetKey];
-  let childPlanet = null;
-  if (anomalyHierarchy) {
-    const steps = anomalyHierarchy.steps();
-    if (steps.length > 4 && steps[4].obj) {
-      childPlanet = steps[4].obj;
-    }
-  }
-
-  // Note: The Mean/True Anomaly values are now calculated dynamically
-  // in the anomaly visualization update section below, based on the
-  // actual Earth-Sun line angle. This ensures the arc always ends
-  // exactly at the Earth-Sun line.
-
-  // Check if we need to rebuild DOM structure (planet changed or first time)
-  const needsRebuild = !_liveDataElements || _liveDataElements.planet !== hierarchyInspector.currentPlanet;
-
-  if (needsRebuild) {
-    // Build the DOM structure once with data-id attributes for efficient updates
-    liveContent.innerHTML = `
-      <div style="display: grid; grid-template-columns: 200px 1fr; gap: 6px 12px; font-size: 12px;">
-        <span style="color: rgba(255,255,255,0.5); font-size: 10px; grid-column: 1 / -1; margin-top: 4px;">CELESTIAL COORDINATES</span>
-        <span style="color: rgba(255,255,255,0.4); font-size: 9px; grid-column: 1 / -1;">(Position relative to Earth's equator)</span>
-        <span style="color: rgba(255,255,255,0.6);">${planetLabel} RA</span>
-        <span data-id="planetRA" style="color: #4caf50;"></span>
-        <span style="color: rgba(255,255,255,0.6);">${planetLabel} Dec</span>
-        <span data-id="planetDec" style="color: #4caf50;"></span>
-        <span style="color: rgba(255,255,255,0.6);">Sun Dec</span>
-        <span data-id="sunDec" style="color: #4caf50;"></span>
-        <span style="color: rgba(255,255,255,0.6);">${planetLabel} vs Sun Dec</span>
-        <span data-id="decComparison"></span>
-        <span style="color: rgba(255,255,255,0.4); font-size: 9px; grid-column: 1 / -1;">(At transit: ${planetLabel} Dec ≈ Sun Dec)</span>
-
-        <span style="color: rgba(255,255,255,0.5); font-size: 10px; grid-column: 1 / -1; margin-top: 8px;">ECLIPTIC POSITION OF PLANET</span>
-        <span style="color: rgba(255,255,255,0.4); font-size: 9px; grid-column: 1 / -1;">(Height above/below ecliptic plane in 3D model)</span>
-        <span style="color: rgba(255,255,255,0.6);">Ecliptic position</span>
-        <span data-id="eclipticPos"></span>
-        <span style="color: rgba(255,255,255,0.6);">Height above ecliptic</span>
-        <span data-id="heightEcliptic"></span>
-        <span style="color: rgba(255,255,255,0.6);">Height ratio (% of max)</span>
-        <span data-id="heightRatio" style="color: #4caf50;"></span>
-        <span style="color: rgba(255,255,255,0.6);">Angle planet from asc. node</span>
-        <span data-id="anglePlanetAsc" style="color: #4caf50;"></span>
-        <span style="color: rgba(255,255,255,0.4); font-size: 9px; grid-column: 1 / -1;">(±90° based on Y height)</span>
-
-        <span style="color: rgba(255,255,255,0.5); font-size: 10px; grid-column: 1 / -1; margin-top: 8px;">CONTROL PERIHELION PLACEMENT IN 3D MODEL</span>
-        <span style="color: rgba(255,255,255,0.4); font-size: 9px; grid-column: 1 / -1;">(Verify P position matches Long.Peri - startAngle)</span>
-        <span style="color: rgba(255,255,255,0.6);">Start Angle of Model</span>
-        <span data-id="startAngleModel" style="color: rgba(255,255,255,0.6);"></span>
-        <span style="color: rgba(255,255,255,0.6);">Expected P angle (Long.Peri - ${startAngleModel.toFixed(1)}°)</span>
-        <span data-id="perihelionExpected" style="color: rgba(255,255,255,0.6);"></span>
-        <span style="color: rgba(255,255,255,0.6);">Expected P distance (Sun → P)</span>
-        <span data-id="perihelionDistanceExpected" style="color: rgba(255,255,255,0.6);"></span>
-        <span style="color: #00ff00;">Actual P angle (Sun → P)</span>
-        <span data-id="perihelionAngle3D" style="color: #00ff00;"></span>
-        <span style="color: #00ff00;">Actual P distance (Sun → P)</span>
-        <span data-id="perihelionDistance3D" style="color: #00ff00;"></span>
-
-        <span style="color: rgba(255,255,255,0.5); font-size: 10px; grid-column: 1 / -1; margin-top: 8px;">CURRENT ASCENDING NODE DISTANCE</span>
-        <span style="color: rgba(255,255,255,0.4); font-size: 9px; grid-column: 1 / -1;">(Current angle of Earth-Sun view to ascending node & longitude of perihelion)</span>
-        <span style="color: #ffff00;">Current Angle from asc. node</span>
-        <span data-id="angleFromAsc" style="color: #ffff00;"></span>
-        <span style="color: rgba(255,255,255,0.4); font-size: 9px; grid-column: 1 / -1;">(±180° Sun ecliptic longitude - ascending node)</span>
-        <span style="color: #ffff00;">Current Angle from long. perihelion</span>
-        <span data-id="angleFromPeri" style="color: #ffff00;"></span>
-        <span style="color: rgba(255,255,255,0.4); font-size: 9px; grid-column: 1 / -1;">(±180° Sun ecliptic longitude - longitude of perihelion)</span>
-
-        <span style="color: rgba(255,255,255,0.5); font-size: 10px; grid-column: 1 / -1; margin-top: 8px;">ORBITAL ELEMENTS</span>
-        <span style="color: rgba(255,255,255,0.4); font-size: 9px; grid-column: 1 / -1;">(The orientation of the plane of the orbit)</span>
-        <span style="color: #ff00ff;">Longitude of Ascending Node (Ω)</span>
-        <span data-id="ascendingNodeLong" style="color: #ff00ff;"></span>
-        <span style="color: #ffffff;">Argument of Periapsis (ω)</span>
-        <span data-id="argumentOfPeriapsis" style="color: #ffffff;"></span>
-        <span style="color: #00ff00;">Longitude of Perihelion (ϖ)</span>
-        <span data-id="longitudeOfPerihelion" style="color: #00ff00;"></span>
-
-        <span style="color: rgba(255,255,255,0.5); font-size: 10px; grid-column: 1 / -1; margin-top: 8px;">ORBITAL ANOMALIES</span>
-        <span style="color: rgba(255,255,255,0.4); font-size: 9px; grid-column: 1 / -1;">(Angle from perihelion in planet's orbit)</span>
-        <span style="color: #00ffff;">Mean Anomaly (M)</span>
-        <span data-id="meanAnomaly" style="color: #00ffff;"></span>
-        <span style="color: #ffbf00;">True Anomaly (ν)</span>
-        <span data-id="trueAnomaly" style="color: #ffbf00;"></span>
-        <span style="color: #ff69b4;">Equation of Center (ν − M)</span>
-        <span data-id="equationOfCenter" style="color: #ff69b4;"></span>
-        <span style="color: rgba(255,255,255,0.4); font-size: 9px; grid-column: 1 / -1;">(M = uniform motion, ν = actual position from perihelion)</span>
-        <span style="color: rgba(255,255,255,0.5); font-size: 10px; grid-column: 1 / -1; margin-top: 8px;">REFERENCE ANOMALIES (21 Jun 2000)</span>
-        <span style="color: rgba(255,255,255,0.6);">Mean Anomaly (ref)</span>
-        <span data-id="refMeanAnomaly" style="color: rgba(255,255,255,0.6);"></span>
-        <span style="color: rgba(255,255,255,0.6);">True Anomaly (ref)</span>
-        <span data-id="refTrueAnomaly" style="color: rgba(255,255,255,0.6);"></span>
-        <span style="color: rgba(255,255,255,0.6);">Equation of Center (ref)</span>
-        <span data-id="refEquationOfCenter" style="color: rgba(255,255,255,0.6);"></span>
-      </div>
-    `;
-
-    // Cache element references for fast updates
-    _liveDataElements = {
-      planet: hierarchyInspector.currentPlanet,
-      planetRA: liveContent.querySelector('[data-id="planetRA"]'),
-      planetDec: liveContent.querySelector('[data-id="planetDec"]'),
-      sunDec: liveContent.querySelector('[data-id="sunDec"]'),
-      decComparison: liveContent.querySelector('[data-id="decComparison"]'),
-      eclipticPos: liveContent.querySelector('[data-id="eclipticPos"]'),
-      heightEcliptic: liveContent.querySelector('[data-id="heightEcliptic"]'),
-      heightRatio: liveContent.querySelector('[data-id="heightRatio"]'),
-      anglePlanetAsc: liveContent.querySelector('[data-id="anglePlanetAsc"]'),
-      angleFromAsc: liveContent.querySelector('[data-id="angleFromAsc"]'),
-      angleFromPeri: liveContent.querySelector('[data-id="angleFromPeri"]'),
-      ascendingNodeLong: liveContent.querySelector('[data-id="ascendingNodeLong"]'),
-      argumentOfPeriapsis: liveContent.querySelector('[data-id="argumentOfPeriapsis"]'),
-      // Solar period reference elements are now in the helper section, not live content
-      refAngle: hierarchyInspector.panel.querySelector('[data-id="refAngleHelper"]'),
-      orbitPeriodSolar: hierarchyInspector.panel.querySelector('[data-id="orbitPeriodSolarHelper"]'),
-      daysUntilAlignment: hierarchyInspector.panel.querySelector('[data-id="daysUntilAlignmentHelper"]'),
-      meanAnomaly: liveContent.querySelector('[data-id="meanAnomaly"]'),
-      trueAnomaly: liveContent.querySelector('[data-id="trueAnomaly"]'),
-      equationOfCenter: liveContent.querySelector('[data-id="equationOfCenter"]'),
-      refMeanAnomaly: liveContent.querySelector('[data-id="refMeanAnomaly"]'),
-      refTrueAnomaly: liveContent.querySelector('[data-id="refTrueAnomaly"]'),
-      refEquationOfCenter: liveContent.querySelector('[data-id="refEquationOfCenter"]'),
-      longitudeOfPerihelion: liveContent.querySelector('[data-id="longitudeOfPerihelion"]'),
-      startAngleModel: liveContent.querySelector('[data-id="startAngleModel"]'),
-      perihelionExpected: liveContent.querySelector('[data-id="perihelionExpected"]'),
-      perihelionDistanceExpected: liveContent.querySelector('[data-id="perihelionDistanceExpected"]'),
-      perihelionAngle3D: liveContent.querySelector('[data-id="perihelionAngle3D"]'),
-      perihelionDistance3D: liveContent.querySelector('[data-id="perihelionDistance3D"]')
-    };
-
-    // Get reference anomaly values for current planet (21 Jun 2000 00:00 UTC)
-    const refAnomalies = {
-      mercury: { mean: planets.mercury.meanAnomaly, true: planets.mercury.trueAnomaly },
-      venus: { mean: planets.venus.meanAnomaly, true: planets.venus.trueAnomaly },
-      mars: { mean: planets.mars.meanAnomaly, true: planets.mars.trueAnomaly },
-      jupiter: { mean: planets.jupiter.meanAnomaly, true: planets.jupiter.trueAnomaly },
-      saturn: { mean: planets.saturn.meanAnomaly, true: planets.saturn.trueAnomaly },
-      uranus: { mean: planets.uranus.meanAnomaly, true: planets.uranus.trueAnomaly },
-      neptune: { mean: planets.neptune.meanAnomaly, true: planets.neptune.trueAnomaly },
-      pluto: { mean: planets.pluto.meanAnomaly, true: planets.pluto.trueAnomaly },
-      halleys: { mean: planets.halleys.meanAnomaly, true: planets.halleys.trueAnomaly },
-      eros: { mean: planets.eros.meanAnomaly, true: planets.eros.trueAnomaly }
-    };
-    const refAnomaly = refAnomalies[hierarchyInspector.currentPlanet];
-    if (refAnomaly) {
-      _liveDataElements.refMeanAnomaly.textContent = refAnomaly.mean.toFixed(2) + '°';
-      _liveDataElements.refTrueAnomaly.textContent = refAnomaly.true.toFixed(2) + '°';
-      const refEoc = refAnomaly.true - refAnomaly.mean;
-      _liveDataElements.refEquationOfCenter.textContent = (refEoc >= 0 ? '+' : '') + refEoc.toFixed(2) + '°';
-    }
-
-    // Set expected perihelion distance (one-time, static value)
-    // These values are in scene units (AU * 100), so divide by 100 to get AU
-    const perihelionDistances = {
-      mercury: mercuryPerihelionDistance,
-      venus: venusPerihelionDistance,
-      mars: marsPerihelionDistance,
-      jupiter: jupiterPerihelionDistance,
-      saturn: saturnPerihelionDistance,
-      uranus: uranusPerihelionDistance,
-      neptune: neptunePerihelionDistance,
-      pluto: plutoPerihelionDistance,
-      halleys: halleysPerihelionDistance,
-      eros: erosPerihelionDistance
-    };
-    const expectedPeriDist = perihelionDistances[hierarchyInspector.currentPlanet];
-    if (expectedPeriDist !== undefined) {
-      _liveDataElements.perihelionDistanceExpected.textContent = (expectedPeriDist / 100).toFixed(6) + ' AU';
-    }
-  }
-
-  // Update only the text content (much faster than innerHTML)
-  const el = _liveDataElements;
-  el.planetRA.textContent = planetRA;
-  el.planetDec.textContent = planetDec;
-  el.sunDec.textContent = sunDecDisplay;
-  el.decComparison.textContent = decComparison;
-  el.decComparison.style.color = decComparisonColor;
-  el.eclipticPos.textContent = orbitalPlanePos;
-  el.eclipticPos.style.color = orbitalPlanePosColor;
-  el.heightEcliptic.textContent = planetWorldY.toFixed(4);
-  el.heightEcliptic.style.color = planetWorldY > 0 ? '#4caf50' : '#ffc107';
-  el.heightRatio.textContent = maxY > 0.001 ? (planetWorldY / maxY * 100).toFixed(1) + '%' : 'N/A';
-  el.heightRatio.style.color = planetWorldY > 0 ? '#4caf50' : '#ffc107';
-  el.anglePlanetAsc.textContent = anglePlanetFromAscNode.toFixed(2) + '°';
-  el.anglePlanetAsc.style.color = planetWorldY > 0 ? '#4caf50' : '#ffc107';
-  el.angleFromAsc.textContent = angleFromAscNode.toFixed(2) + '°';
-  el.angleFromPeri.textContent = angleFromPerihelion.toFixed(2) + '°';
-  el.ascendingNodeLong.textContent = ascNodeAngleDeg.toFixed(4) + '°';
-
-  // Get argument of periapsis for current planet
-  const argumentOfPeriapsisValues = {
-    mercury: o.mercuryArgumentOfPeriapsis,
-    venus: o.venusArgumentOfPeriapsis,
-    mars: o.marsArgumentOfPeriapsis,
-    jupiter: o.jupiterArgumentOfPeriapsis,
-    saturn: o.saturnArgumentOfPeriapsis,
-    uranus: o.uranusArgumentOfPeriapsis,
-    neptune: o.neptuneArgumentOfPeriapsis,
-    pluto: o.plutoArgumentOfPeriapsis,
-    halleys: o.halleysArgumentOfPeriapsis,
-    eros: o.erosArgumentOfPeriapsis
-  };
-  const argPeri = argumentOfPeriapsisValues[hierarchyInspector.currentPlanet] ?? 0;
-  el.argumentOfPeriapsis.textContent = argPeri.toFixed(4) + '°';
-
-  // Get longitude of perihelion for current planet — the ECLIPTIC channel
-  // (the coordinate observers publish); the RA-projected channel stays in
-  // the angle-from-perihelion math above, which differences it against
-  // sun.ra in the same scene-equator channel.
-  const longitudeOfPerihelionValues = {
-    mercury: o.mercuryPerihelionEcliptic,
-    venus: o.venusPerihelionEcliptic,
-    mars: o.marsPerihelionEcliptic,
-    jupiter: o.jupiterPerihelionEcliptic,
-    saturn: o.saturnPerihelionEcliptic,
-    uranus: o.uranusPerihelionEcliptic,
-    neptune: o.neptunePerihelionEcliptic,
-    pluto: o.plutoPerihelionEcliptic,
-    halleys: o.halleysPerihelionEcliptic,
-    eros: o.erosPerihelionEcliptic
-  };
-  const longPeri = longitudeOfPerihelionValues[hierarchyInspector.currentPlanet] ?? 0;
-  el.longitudeOfPerihelion.textContent = longPeri.toFixed(4) + '°';
-
-  // Show the fixed start angle of the model (Earth→Sun at June 21, 2000 00:00 UTC)
-  el.startAngleModel.textContent = startAngleModel.toFixed(8) + '°';
-
-  // Calculate expected perihelion angle: longitude of perihelion - start angle
-  let periExpected = ((longPeri - startAngleModel) % 360 + 360) % 360;
-  el.perihelionExpected.textContent = periExpected.toFixed(4) + '°';
-
-  // Calculate the actual Sun → P angle from the 3D model
-  // Define fixedPerihelionObjects once for reuse below
-  const fixedPerihelionObjects = {
-    mercury: mercuryFixedPerihelionAtSun,
-    venus: venusFixedPerihelionAtSun,
-    mars: marsFixedPerihelionAtSun,
-    jupiter: jupiterFixedPerihelionAtSun,
-    saturn: saturnFixedPerihelionAtSun,
-    uranus: uranusFixedPerihelionAtSun,
-    neptune: neptuneFixedPerihelionAtSun,
-    pluto: plutoFixedPerihelionAtSun,
-    halleys: halleysFixedPerihelionAtSun,
-    eros: erosFixedPerihelionAtSun
-  };
-  const fixedPerihelion = fixedPerihelionObjects[hierarchyInspector.currentPlanet];
-
-  // Get sun and perihelion world positions once for reuse throughout this function
-  let sunWorldPosX = 0, sunWorldPosZ = 0;
-  let periWorldPosX = 0, periWorldPosZ = 0;
-  let hasSunPos = false, hasPeriPos = false;
-
-  if (sun && sun.pivotObj) {
-    sun.pivotObj.getWorldPosition(_liveDataVec3);
-    sunWorldPosX = _liveDataVec3.x;
-    sunWorldPosZ = _liveDataVec3.z;
-    hasSunPos = true;
-  }
-
-  if (fixedPerihelion) {
-    const sourceObj = fixedPerihelion.planetObj || fixedPerihelion.pivotObj;
-    if (sourceObj) {
-      sourceObj.getWorldPosition(_liveDataVec3b);
-      periWorldPosX = _liveDataVec3b.x;
-      periWorldPosZ = _liveDataVec3b.z;
-      hasPeriPos = true;
-    }
-  }
-
-  if (hasSunPos && hasPeriPos) {
-    // Calculate Sun → P angle
-    const dxSP = periWorldPosX - sunWorldPosX;
-    const dzSP = periWorldPosZ - sunWorldPosZ;
-    const sunPAngleRad = Math.atan2(-dzSP, dxSP);
-    const sunPAngleDeg = ((sunPAngleRad * 180 / Math.PI) % 360 + 360) % 360;
-
-    // Combined angle = fixed startAngleModel + Sun→P
-    const combinedAngle = ((startAngleModel + sunPAngleDeg) % 360 + 360) % 360;
-
-    el.perihelionAngle3D.textContent = combinedAngle.toFixed(4) + '°';
-
-    // Calculate Sun → P distance in AU (scene units / 100 = AU)
-    const distanceSceneUnits = Math.sqrt(dxSP * dxSP + dzSP * dzSP);
-    const distanceAU = distanceSceneUnits / 100;
-    el.perihelionDistance3D.textContent = distanceAU.toFixed(6) + ' AU';
-  } else {
-    el.perihelionAngle3D.textContent = 'N/A';
-    el.perihelionDistance3D.textContent = 'N/A';
-  }
-
-  el.refAngle.textContent = refAngleDeg.toFixed(2) + '°';
-  el.orbitPeriodSolar.textContent = (window._orbitPeriodSolar?.toFixed(2) ?? '0.00') + ' days';
-  el.daysUntilAlignment.textContent = (window._daysUntilAlignment?.toFixed(2) ?? '0.00') + ' days';
-  el.meanAnomaly.textContent = (window._meanAnomaly?.toFixed(2) ?? '0.00') + '°';
-  el.trueAnomaly.textContent = (window._trueAnomaly?.toFixed(2) ?? '0.00') + '°';
-  const eocValue = (window._trueAnomaly ?? 0) - (window._meanAnomaly ?? 0);
-  el.equationOfCenter.textContent = (eocValue >= 0 ? '+' : '') + eocValue.toFixed(2) + '°';
-
-  // Update anomaly visualization if it exists
-  // The anomaly visualization shows True Anomaly and Mean Anomaly as angles from perihelion
-  // It should be centered at the SUN (the focus of the ellipse)
-  // Reuse sun and perihelion positions fetched above
-  if (hierarchyInspector.anomalyGroup && hasSunPos) {
-    // Position the anomaly group at the SUN (center of the solar system)
-    // Use _liveDataVec3 which still contains sun position from above
-    hierarchyInspector.anomalyGroup.position.set(sunWorldPosX, _liveDataVec3.y, sunWorldPosZ);
-
-    // Calculate the rotation to align the anomaly 0° direction with the perihelion direction
-    // The anomaly arcs should start (0°) pointing toward the fixed perihelion point
-    // Reuse fixedPerihelionObjects and perihelion position defined above
-
-    if (hasPeriPos) {
-      // Calculate direction from Sun to Perihelion (P) in the XZ plane (ecliptic)
-      // Using already-fetched positions
-      const dx = periWorldPosX - sunWorldPosX;
-      const dz = periWorldPosZ - sunWorldPosZ;
-
-      // Calculate the angle to align the anomaly visualization with the perihelion direction
-      //
-      // Goal: Start markers (at local +X) should be on the P side (far from Sun),
-      //       and arcs should sweep counter-clockwise from there toward Earth
-      //
-      // In Three.js (looking down from +Y / north pole view):
-      // - +X is right, +Z is toward viewer (Earth is at -Z roughly)
-      // - atan2(dz, dx) gives angle from +X axis to Sun→P direction
-      // - Add PI to flip 180° so markers are on the P side, not the Sun side
-      const perihelionAngle = Math.atan2(dz, dx);
-
-      // Rotate so local +X points toward P (away from Sun center, toward perihelion)
-      hierarchyInspector.anomalyGroup.rotation.y = -perihelionAngle + Math.PI;
-
-      // Apply orbital plane tilt (use visual tilt group if available)
-      const tiltSrc2 = (obj && obj.tiltGroupObj) || (obj && obj.containerObj);
-      if (tiltSrc2) {
-        hierarchyInspector.anomalyGroup.rotation.x = tiltSrc2.rotation.x;
-        hierarchyInspector.anomalyGroup.rotation.z = tiltSrc2.rotation.z;
-      }
-    }
-
-    // Calculate the Earth-Sun line angle in local space of the anomalyGroup
-    // This angle is used for both the Earth-Sun line AND the mean anomaly arc
-    // so they always align perfectly
-    let earthSunLocalAngle = 0;
-
-    if (earth && earth.pivotObj) {
-      // Get Earth's world position (Sun position already stored above)
-      earth.pivotObj.getWorldPosition(_liveDataVec3b);
-
-      // Calculate direction from Earth to Sun in world space (using stored sun position)
-      const dxWorld = sunWorldPosX - _liveDataVec3b.x;
-      const dzWorld = sunWorldPosZ - _liveDataVec3b.z;
-      const earthToSunAngleWorld = Math.atan2(dzWorld, dxWorld);
-
-      // Convert to local space of anomalyGroup
-      // The anomalyGroup is rotated so +X points toward perihelion
-      const groupRotY = hierarchyInspector.anomalyGroup.rotation.y;
-      earthSunLocalAngle = earthToSunAngleWorld + groupRotY;
-
-      // Update the Earth-Sun reference line to point in this direction
-      if (hierarchyInspector.earthSunLine) {
-        hierarchyInspector.earthSunLine.rotation.y = -earthSunLocalAngle;
-      }
-    }
-
-    // =====================================================================
-    // PROPER TRUE ANOMALY AND MEAN ANOMALY CALCULATION
-    // Based on actual 3D positions, not Earth-Sun line angle
-    // - True Anomaly (ν): Angle at SUN from perihelion to planet
-    // - Mean Anomaly (M): Angle at P (orbit center) from perihelion to planet
-    // =====================================================================
-
-    // Get the fixedPerihelion object for this planet (P = orbit center)
-    const fixedPerihelionObj = anomalyHierarchy.fixedPerihelion ? anomalyHierarchy.fixedPerihelion() : null;
-
-    let trueAnomalyRad = 0;
-    let meanAnomalyRad = 0;
-    let periAngleSun = 0;  // Perihelion direction angle from Sun (for arc drawing)
-    let periAngleP = 0;    // Perihelion direction angle from P (for arc drawing)
-
-    // We need: Sun position, P position (orbit center), Planet position, Perihelion position
-    if (fixedPerihelionObj && childPlanet && sun && sun.pivotObj) {
-      // Get world positions (using pooled vectors for performance)
-      sun.pivotObj.getWorldPosition(_hiSunPos);
-      fixedPerihelionObj.pivotObj.getWorldPosition(_hiPPos);  // P = orbit center
-      if (childPlanet.planetObj) {
-        childPlanet.planetObj.getWorldPosition(_hiPlanetPos);
-      } else if (childPlanet.pivotObj) {
-        childPlanet.pivotObj.getWorldPosition(_hiPlanetPos);
-      }
-      // Perihelion point (the marker on the orbit)
-      if (fixedPerihelionObj.planetObj) {
-        fixedPerihelionObj.planetObj.getWorldPosition(_hiPerihelionPos);
-      }
-
-      // Calculate direction vectors (in XZ plane - ecliptic)
-      // In an elliptical orbit:
-      // - P (center) is at the geometric center of the ellipse
-      // - Sun (focus) is between P and perihelion, at distance a*e from P
-      // - Perihelion is in the direction from P toward Sun, beyond the Sun
-      //
-      // Layout: P -------- Sun ------- Perihelion
-      //
-      // So perihelion direction from both P and Sun is: P → Sun direction
-
-      // Perihelion direction (from P toward Sun and perihelion)
-      const periDirX = _hiSunPos.x - _hiPPos.x;
-      const periDirZ = _hiSunPos.z - _hiPPos.z;
-
-      // For both True Anomaly and Mean Anomaly, the perihelion reference is the same direction
-      const periDirFromSunX = periDirX;
-      const periDirFromSunZ = periDirZ;
-      const periDirFromPX = periDirX;
-      const periDirFromPZ = periDirZ;
-
-      // Planet direction from Sun (for True Anomaly)
-      const planetDirFromSunX = _hiPlanetPos.x - _hiSunPos.x;
-      const planetDirFromSunZ = _hiPlanetPos.z - _hiSunPos.z;
-
-      // Planet direction from P (for Mean Anomaly)
-      const planetDirFromPX = _hiPlanetPos.x - _hiPPos.x;
-      const planetDirFromPZ = _hiPlanetPos.z - _hiPPos.z;
-
-      // Calculate angles using atan2 (counter-clockwise from +X axis)
-      // Note: Three.js uses right-handed coords, +Z toward viewer
-      // Negate Z for standard counter-clockwise angle measurement
-      periAngleSun = Math.atan2(-periDirFromSunZ, periDirFromSunX);
-      const planetAngleSun = Math.atan2(-planetDirFromSunZ, planetDirFromSunX);
-
-      periAngleP = Math.atan2(-periDirFromPZ, periDirFromPX);
-      const planetAngleP = Math.atan2(-planetDirFromPZ, planetDirFromPX);
-
-      // True Anomaly: angle at Sun from perihelion to planet
-      trueAnomalyRad = planetAngleSun - periAngleSun;
-
-      // Mean Anomaly: angle at P from perihelion to planet
-      meanAnomalyRad = planetAngleP - periAngleP;
-
-      // Normalize to 0 to 2*PI range
-      trueAnomalyRad = ((trueAnomalyRad % (2 * Math.PI)) + (2 * Math.PI)) % (2 * Math.PI);
-      meanAnomalyRad = ((meanAnomalyRad % (2 * Math.PI)) + (2 * Math.PI)) % (2 * Math.PI);
-
-      // Update the new visualization lines (P→Planet and Sun→Planet)
-      if (hierarchyInspector.pToPlanetLine) {
-        const positions = hierarchyInspector.pToPlanetLine.geometry.attributes.position.array;
-        positions[0] = _hiPPos.x; positions[1] = _hiPPos.y; positions[2] = _hiPPos.z;
-        positions[3] = _hiPlanetPos.x; positions[4] = _hiPlanetPos.y; positions[5] = _hiPlanetPos.z;
-        hierarchyInspector.pToPlanetLine.geometry.attributes.position.needsUpdate = true;
-      }
-
-      if (hierarchyInspector.sunToPlanetLine) {
-        const positions = hierarchyInspector.sunToPlanetLine.geometry.attributes.position.array;
-        positions[0] = _hiSunPos.x; positions[1] = _hiSunPos.y; positions[2] = _hiSunPos.z;
-        positions[3] = _hiPlanetPos.x; positions[4] = _hiPlanetPos.y; positions[5] = _hiPlanetPos.z;
-        hierarchyInspector.sunToPlanetLine.geometry.attributes.position.needsUpdate = true;
-      }
-
-      // Update Mean Anomaly Arc (centered at P, sweeps from perihelion to planet)
-      if (hierarchyInspector.meanAnomalyArcAtP) {
-        const arcRadius = hierarchyInspector._meanArcAtPRadius || 20;
-        const positions = hierarchyInspector.meanAnomalyArcAtP.geometry.attributes.position.array;
-        const arcSegments = 64;
-
-        for (let i = 0; i <= arcSegments; i++) {
-          const t = i / arcSegments;
-          const angle = periAngleP + t * meanAnomalyRad;
-          positions[i * 3] = _hiPPos.x + arcRadius * Math.cos(angle);
-          positions[i * 3 + 1] = _hiPPos.y;
-          positions[i * 3 + 2] = _hiPPos.z - arcRadius * Math.sin(angle);
-        }
-        hierarchyInspector.meanAnomalyArcAtP.geometry.attributes.position.needsUpdate = true;
-        hierarchyInspector.meanAnomalyArcAtP.computeLineDistances();
-      }
-
-      // Update True Anomaly Arc (centered at Sun, sweeps from perihelion to planet)
-      if (hierarchyInspector.trueAnomalyArcAtSun) {
-        const arcRadius = hierarchyInspector._trueArcAtSunRadius || 25;
-        const positions = hierarchyInspector.trueAnomalyArcAtSun.geometry.attributes.position.array;
-        const arcSegments = 64;
-
-        for (let i = 0; i <= arcSegments; i++) {
-          const t = i / arcSegments;
-          const angle = periAngleSun + t * trueAnomalyRad;
-          positions[i * 3] = _hiSunPos.x + arcRadius * Math.cos(angle);
-          positions[i * 3 + 1] = _hiSunPos.y;
-          positions[i * 3 + 2] = _hiSunPos.z - arcRadius * Math.sin(angle);
-        }
-        hierarchyInspector.trueAnomalyArcAtSun.geometry.attributes.position.needsUpdate = true;
-      }
-    }
-
-    // Update display values (convert to degrees)
-    const meanAnomalyDeg = meanAnomalyRad * 180 / Math.PI;
-    const trueAnomalyDeg = trueAnomalyRad * 180 / Math.PI;
-    window._meanAnomaly = meanAnomalyDeg;
-    window._trueAnomaly = trueAnomalyDeg;
-
-    // Update the UI display immediately after calculation
-    // (The earlier display update in the function runs before these values are calculated)
-    if (_liveDataElements && _liveDataElements.meanAnomaly) {
-      _liveDataElements.meanAnomaly.textContent = meanAnomalyDeg.toFixed(2) + '°';
-    }
-    if (_liveDataElements && _liveDataElements.trueAnomaly) {
-      _liveDataElements.trueAnomaly.textContent = trueAnomalyDeg.toFixed(2) + '°';
-    }
-    if (_liveDataElements && _liveDataElements.equationOfCenter) {
-      const equationOfCenter = trueAnomalyDeg - meanAnomalyDeg;
-      _liveDataElements.equationOfCenter.textContent = (equationOfCenter >= 0 ? '+' : '') + equationOfCenter.toFixed(2) + '°';
-    }
-
-    // Keep existing arc visualization for Earth-Sun line (legacy, still useful)
-    // The arc should sweep counter-clockwise from perihelion (0°) to the Earth-Sun line
-    let arcAngle = -earthSunLocalAngle;
-    arcAngle = ((arcAngle % (2 * Math.PI)) + (2 * Math.PI)) % (2 * Math.PI);
-
-    // Update true anomaly arc (from perihelion 0° to Earth-Sun line)
-    // NOTE: This OLD arc uses arcAngle (Earth-Sun angle), not the new trueAnomalyRad
-    if (hierarchyInspector.trueAnomalyArc) {
-      const arcSegments = 32;
-      const arcRadius = hierarchyInspector._trueArcRadius || 50;
-      const positions = hierarchyInspector.trueAnomalyArc.geometry.attributes.position.array;
-
-      for (let i = 0; i <= arcSegments; i++) {
-        const t = i / arcSegments;
-        const angle = t * arcAngle; // From 0 to Earth-Sun line (NOT trueAnomalyRad!)
-        positions[i * 3] = arcRadius * Math.cos(angle);     // X
-        positions[i * 3 + 1] = 0;                            // Y
-        positions[i * 3 + 2] = -arcRadius * Math.sin(angle); // Z (negative for counter-clockwise)
-      }
-      hierarchyInspector.trueAnomalyArc.geometry.attributes.position.needsUpdate = true;
-    }
-
-    // Update mean anomaly arc (from perihelion 0° to Earth-Sun line)
-    // NOTE: This OLD arc uses arcAngle (Earth-Sun angle), not the new meanAnomalyRad
-    if (hierarchyInspector.meanAnomalyArc) {
-      const arcSegments = 32;
-      const arcRadius = hierarchyInspector._meanArcRadius || 40;
-      const positions = hierarchyInspector.meanAnomalyArc.geometry.attributes.position.array;
-
-      for (let i = 0; i <= arcSegments; i++) {
-        const t = i / arcSegments;
-        const angle = t * arcAngle; // From 0 to Earth-Sun line (NOT meanAnomalyRad!)
-        positions[i * 3] = arcRadius * Math.cos(angle);     // X
-        positions[i * 3 + 1] = 0;                            // Y
-        positions[i * 3 + 2] = -arcRadius * Math.sin(angle); // Z (negative for clockwise in Three.js)
-      }
-      hierarchyInspector.meanAnomalyArc.geometry.attributes.position.needsUpdate = true;
-      hierarchyInspector.meanAnomalyArc.computeLineDistances();
-    }
-  }
-
-  // Update ascending/descending node marker positions based on dynamic ascending node
-  // The inclinationPlane is attached to containerObj, which rotates based on dynamic ascending node.
-  // We need to recalculate the LOCAL positions where the orbital plane intersects the ecliptic.
-
-  // DEBUG: Check if hierarchy inspector visuals exist
-  if (_debugAscendingNodeLogEnabled && hierarchyInspector.currentPlanet === 'mercury') {
-    const now = Date.now();
-    if (now - _debugAscendingNodeLastLog < _debugAscendingNodeInterval + 150) {
-      const hasPlane = !!hierarchyInspector.inclinationPlane;
-      const hasAsc = !!hierarchyInspector.ascendingNode;
-      const hasDesc = !!hierarchyInspector.descendingNode;
-      console.log(`📐 Hierarchy inspector: plane=${hasPlane}, ascNode=${hasAsc}, descNode=${hasDesc}`);
-    }
-  }
-
-  if (hierarchyInspector.inclinationPlane && hierarchyInspector.ascendingNode && hierarchyInspector.descendingNode) {
-    const planetKey = hierarchyInspector.currentPlanet;
-    const realPerihelionObjects = {
-      mercury: mercuryRealPerihelionAtSun,
-      venus: venusRealPerihelionAtSun,
-      mars: marsRealPerihelionAtSun,
-      jupiter: jupiterRealPerihelionAtSun,
-      saturn: saturnRealPerihelionAtSun,
-      uranus: uranusRealPerihelionAtSun,
-      neptune: neptuneRealPerihelionAtSun,
-      pluto: plutoRealPerihelionAtSun,
-      halleys: halleysRealPerihelionAtSun,
-      eros: erosRealPerihelionAtSun
-    };
-    const obj = realPerihelionObjects[planetKey];
-
-    if (obj && obj.containerObj) {
-      // Get the current tilt rotation (use visual tilt group if available)
-      const tiltSrc = obj.tiltGroupObj || obj.containerObj;
-      const tiltaRad = tiltSrc.rotation.x;
-      const tiltbRad = tiltSrc.rotation.z;
-
-      // PERFORMANCE: Skip expensive recalculation if tilt hasn't changed significantly (>0.0001 rad ≈ 0.006°)
-      const tiltChanged = _lastAscNodeTiltA === null ||
-        Math.abs(tiltaRad - _lastAscNodeTiltA) > 0.0001 ||
-        Math.abs(tiltbRad - _lastAscNodeTiltB) > 0.0001;
-
-      // DEBUG: Check if tiltChanged is blocking the update
-      if (_debugAscendingNodeLogEnabled && hierarchyInspector.currentPlanet === 'mercury') {
-        const now = Date.now();
-        if (now - _debugAscendingNodeLastLog < _debugAscendingNodeInterval + 200) {
-          console.log(`🔄 tiltChanged=${tiltChanged}, tiltaRad=${tiltaRad.toFixed(6)}, lastA=${_lastAscNodeTiltA?.toFixed(6) || 'null'}`);
-        }
-      }
-
-      if (tiltChanged) {
-        _lastAscNodeTiltA = tiltaRad;
-        _lastAscNodeTiltB = tiltbRad;
-
-        // Build the local-to-world transformation matrix (reuse pooled matrix and euler)
-        _liveDataEuler.set(tiltaRad, 0, tiltbRad, 'XYZ');
-        _liveDataLocalToWorld.makeRotationFromEuler(_liveDataEuler);
-
-        // Get the scale used for the inclination plane
-        const scale = hierarchyInspector._perihelionArrowScale || 100;
-        const planeRadius = scale * 0.5;
-
-        // Get the ACTUAL ascending node angle from the o.xxxAscendingNode property
-        // This is the authoritative value that's dynamically calculated for the current date
-        const ascNodePropertyMap = {
-          mercury: 'mercuryAscendingNode',
-          venus: 'venusAscendingNode',
-          mars: 'marsAscendingNode',
-          jupiter: 'jupiterAscendingNode',
-          saturn: 'saturnAscendingNode',
-          uranus: 'uranusAscendingNode',
-          neptune: 'neptuneAscendingNode',
-          pluto: 'plutoAscendingNode',
-          halleys: 'halleysAscendingNode',
-          eros: 'erosAscendingNode'
-        };
-        const ascNodeProp = ascNodePropertyMap[hierarchyInspector.currentPlanet];
-        const ascNodeAngleDeg = ascNodeProp ? (o[ascNodeProp] || 0) : 0;
-        const ascNodeAngleRad = ascNodeAngleDeg * Math.PI / 180;
-
-        // Calculate ascending node position in LOCAL coordinates
-        // Our model is 90° rotated (from March 21 to June 21), so we add 90° counterclockwise
-        // After 90° CCW rotation: X = -sin(angle), Z = -cos(angle)
-        _liveDataNewAscPos.set(
-          planeRadius * -Math.sin(ascNodeAngleRad),
-          0,
-          planeRadius * -Math.cos(ascNodeAngleRad)
-        );
-
-        // Descending node is 180° opposite
-        _liveDataNewDescPos.set(
-          -_liveDataNewAscPos.x,
-          0,
-          -_liveDataNewAscPos.z
-        );
-
-        // Update marker positions
-        hierarchyInspector.ascendingNode.position.copy(_liveDataNewAscPos);
-        hierarchyInspector.descendingNode.position.copy(_liveDataNewDescPos);
-
-        // Update the arrows attached to the nodes using cached references if available
-        // PERFORMANCE: Use cached references instead of searching children
-        if (hierarchyInspector._ascNodeArrow) {
-          hierarchyInspector._ascNodeArrow.position.copy(_liveDataNewAscPos);
-        }
-        if (hierarchyInspector._descNodeArrow) {
-          hierarchyInspector._descNodeArrow.position.copy(_liveDataNewDescPos);
-        }
-
-        // Update the line of nodes using cached reference
-        if (hierarchyInspector._nodesLine) {
-          const positions = hierarchyInspector._nodesLine.geometry.attributes.position.array;
-          positions[0] = _liveDataNewAscPos.x;
-          positions[1] = _liveDataNewAscPos.y;
-          positions[2] = _liveDataNewAscPos.z;
-          positions[3] = _liveDataNewDescPos.x;
-          positions[4] = _liveDataNewDescPos.y;
-          positions[5] = _liveDataNewDescPos.z;
-          hierarchyInspector._nodesLine.geometry.attributes.position.needsUpdate = true;
-          hierarchyInspector._nodesLine.computeLineDistances();
-        }
-
-        // Update the half-plane geometries (green above / red below ecliptic)
-        // PERFORMANCE: Reuse orbit point arrays instead of recreating
-        if (hierarchyInspector.aboveHalfPlane && hierarchyInspector.belowHalfPlane) {
-          const numPoints = 64;
-
-          // DEBUG: Test if ascending node world Y is ~0 (it should be, since that's where orbit crosses ecliptic)
-          if (_debugAscendingNodeLogEnabled && hierarchyInspector.currentPlanet === 'mercury') {
-            const now = Date.now();
-            if (now - _debugAscendingNodeLastLog < _debugAscendingNodeInterval + 500) {
-              const testX = planeRadius * -Math.sin(ascNodeAngleRad);
-              const testZ = planeRadius * -Math.cos(ascNodeAngleRad);
-              _liveDataDebugLocal.set(testX, 0, testZ);
-              _liveDataDebugWorld.copy(_liveDataDebugLocal).applyMatrix4(_liveDataLocalToWorld);
-              // Also get actual marker world position
-              if (hierarchyInspector.ascendingNode) {
-                hierarchyInspector.ascendingNode.getWorldPosition(_liveDataDebugMarker);
-              }
-              console.log(`🟢🔴 Asc node: local(${testX.toFixed(1)}, 0, ${testZ.toFixed(1)}) → matrixY: ${_liveDataDebugWorld.y.toFixed(4)}, actualWorldPos: (${_liveDataDebugMarker.x.toFixed(1)}, ${_liveDataDebugMarker.y.toFixed(4)}, ${_liveDataDebugMarker.z.toFixed(1)})`);
-            }
-          }
-
-          // Helper to rebuild half-disc geometry (uses pooled arrays for performance)
-          const rebuildHalfDiscGeometry = (mesh, isAbove) => {
-            // Center point at index 0
-            _halfDiscVertices[0] = 0;
-            _halfDiscVertices[1] = 0;
-            _halfDiscVertices[2] = 0;
-
-            // Generate points
-            for (let i = 0; i <= numPoints; i++) {
-              const angle = (i / numPoints) * Math.PI * 2;
-              const idx = (i + 1) * 3;
-              _halfDiscVertices[idx] = planeRadius * Math.cos(angle);
-              _halfDiscVertices[idx + 1] = 0;
-              _halfDiscVertices[idx + 2] = planeRadius * Math.sin(angle);
-            }
-
-            // Clear and rebuild indices based on world Y position
-            _halfDiscIndices.length = 0;
-            for (let i = 1; i <= numPoints; i++) {
-              const angle1 = ((i - 1) / numPoints) * Math.PI * 2;
-              const angle2 = (i / numPoints) * Math.PI * 2;
-
-              // Calculate world Y for midpoint (reuse pooled vectors)
-              _liveDataLocalPt.set(planeRadius * Math.cos(angle1), 0, planeRadius * Math.sin(angle1));
-              _liveDataWorldPt.copy(_liveDataLocalPt).applyMatrix4(_liveDataLocalToWorld);
-              const y1 = _liveDataWorldPt.y;
-
-              _liveDataLocalPt.set(planeRadius * Math.cos(angle2), 0, planeRadius * Math.sin(angle2));
-              _liveDataWorldPt.copy(_liveDataLocalPt).applyMatrix4(_liveDataLocalToWorld);
-              const y2 = _liveDataWorldPt.y;
-
-              const midWorldY = (y1 + y2) / 2;
-              const segmentIsAbove = midWorldY > 0;
-
-              if (segmentIsAbove === isAbove) {
-                _halfDiscIndices.push(0, i, i + 1);
-              }
-            }
-
-            // Update geometry - reuse existing BufferAttribute if possible
-            const posAttr = mesh.geometry.attributes.position;
-            if (posAttr && posAttr.array.length === _halfDiscVertices.length) {
-              posAttr.array.set(_halfDiscVertices);
-              posAttr.needsUpdate = true;
-            } else {
-              mesh.geometry.setAttribute('position', new THREE.Float32BufferAttribute(_halfDiscVertices.slice(), 3));
-            }
-            mesh.geometry.setIndex(_halfDiscIndices);
-            mesh.geometry.computeVertexNormals();
-            if (mesh.geometry.index) mesh.geometry.index.needsUpdate = true;
-          };
-
-          rebuildHalfDiscGeometry(hierarchyInspector.aboveHalfPlane, true);
-          rebuildHalfDiscGeometry(hierarchyInspector.belowHalfPlane, false);
-        }
-
-        // Update highest/lowest point markers (90° after ascending/descending nodes)
-        // PERFORMANCE: Use pooled vectors
-        if (hierarchyInspector.highestPointMarker && hierarchyInspector.lowestPointMarker) {
-          let maxWorldY = -Infinity;
-          let minWorldY = Infinity;
-          _liveDataNewHighPos.set(0, 0, 0);
-          _liveDataNewLowPos.set(0, 0, 0);
-
-          const numSamples = 360;
-          for (let i = 0; i < numSamples; i++) {
-            const angle = (i / numSamples) * Math.PI * 2;
-            _liveDataLocalPt.set(planeRadius * Math.cos(angle), 0, planeRadius * Math.sin(angle));
-            _liveDataWorldPt.copy(_liveDataLocalPt).applyMatrix4(_liveDataLocalToWorld);
-
-            if (_liveDataWorldPt.y > maxWorldY) {
-              maxWorldY = _liveDataWorldPt.y;
-              _liveDataNewHighPos.copy(_liveDataLocalPt);
-            }
-            if (_liveDataWorldPt.y < minWorldY) {
-              minWorldY = _liveDataWorldPt.y;
-              _liveDataNewLowPos.copy(_liveDataLocalPt);
-            }
-          }
-
-          // Update marker positions
-          hierarchyInspector.highestPointMarker.position.copy(_liveDataNewHighPos);
-          hierarchyInspector.lowestPointMarker.position.copy(_liveDataNewLowPos);
-
-          // Update arrows
-          if (hierarchyInspector._highArrow) {
-            hierarchyInspector._highArrow.position.copy(_liveDataNewHighPos);
-          }
-          if (hierarchyInspector._lowArrow) {
-            hierarchyInspector._lowArrow.position.copy(_liveDataNewLowPos);
-          }
-        }
-      } // End of tiltChanged block
-    }
-  }
-
-  // Update perihelion arrow (green line from P to Sun)
-  if (hierarchyInspector.perihelionArrow && hierarchyInspector._fixedPerihelionObj) {
-    const fixedPerihelion = hierarchyInspector._fixedPerihelionObj;
-
-    // Use planetObj if available, otherwise fall back to pivotObj
-    const sourceObj = fixedPerihelion.planetObj || fixedPerihelion.pivotObj;
-    if (sourceObj) {
-      // Reuse vectors for performance (using existing _liveDataVec3 pattern)
-      sourceObj.getWorldPosition(_liveDataVec3);
-
-      // Get Sun's world position using a second reusable vector
-      if (!hierarchyInspector._sunPosVec3) {
-        hierarchyInspector._sunPosVec3 = new THREE.Vector3();
-      }
-      if (sun && sun.pivotObj) {
-        sun.pivotObj.getWorldPosition(hierarchyInspector._sunPosVec3);
-      }
-
-      // Position the arrow group at the P point
-      hierarchyInspector.perihelionArrow.position.copy(_liveDataVec3);
-
-      // Calculate direction to Sun and make the arrow look at it
-      if (!hierarchyInspector._dirVec3) {
-        hierarchyInspector._dirVec3 = new THREE.Vector3();
-        hierarchyInspector._defaultDir = new THREE.Vector3(0, 0, 1);
-        hierarchyInspector._arrowQuat = new THREE.Quaternion();
-      }
-      hierarchyInspector._dirVec3.subVectors(hierarchyInspector._sunPosVec3, _liveDataVec3).normalize();
-
-      // Only update rotation if direction is valid (not zero length)
-      if (hierarchyInspector._dirVec3.lengthSq() > 0.0001) {
-        hierarchyInspector._arrowQuat.setFromUnitVectors(hierarchyInspector._defaultDir, hierarchyInspector._dirVec3);
-        hierarchyInspector.perihelionArrow.setRotationFromQuaternion(hierarchyInspector._arrowQuat);
-      }
-    }
-  }
-
-  // Update planet locator circle position (follows the planet)
-  if (hierarchyInspector._planetLocatorCircle && hierarchyInspector._planetLocatorTarget) {
-    const target = hierarchyInspector._planetLocatorTarget;
-    if (target.planetObj) {
-      target.planetObj.getWorldPosition(_liveDataVec3);
-      hierarchyInspector._planetLocatorCircle.position.copy(_liveDataVec3);
-      // Make the circle face the camera for better visibility
-      hierarchyInspector._planetLocatorCircle.lookAt(camera.position);
-    }
-  }
+    if (!H._els || H._els.planet !== H.currentPlanet) _hiBuildReadouts(H.currentPlanet);
+    const jd = o.julianDay;
+    if (!o.Run && H._lastReadoutJD !== null && Math.abs(jd - H._lastReadoutJD) < 1e-4 && H._lastReadoutPlanet === H.currentPlanet) return;
+    H._lastReadoutJD = jd;
+    H._lastReadoutPlanet = H.currentPlanet;
+    _hiWriteReadouts(f);
   } catch (err) {
-    console.error('[HierarchyLiveData] Error:', err);
+    console.error('[PlanetInspector] Error:', err);
   }
 }
+
 
 //*************************************************************
 // CREATE SETTINGS AND SETUP GUI
@@ -36077,10 +33496,19 @@ function render(now) {
   // NOT on pure camera movement — getWorldPosition() matrix math causes
   // floating-point micro-jitter that prevents damping from ever settling.
   if (o.Run || forceAllUpdates) {
-    if (hierarchyInspector._cameraControlActive && hierarchyInspector._cameraTarget?.pivotObj) {
-      controls.target.copy(
-        hierarchyInspector._cameraTarget.pivotObj.getWorldPosition(tmpVec)
-      );
+    if (hierarchyInspector._cameraControlActive && hierarchyInspector._cameraTarget?.getWorldPosition) {
+      // R10: the inspector's target is an Object3D (the Sun mesh for the orbit
+      // view, the planet MESH for the planet view — the chain moves the mesh,
+      // the K pivot it used to follow no longer carries the planet). The
+      // camera TRANSLATES with the target: in this geocentric scene the Sun
+      // itself moves ~1 AU around Earth, so a camera left in world space
+      // would slide off its top-down view within weeks of scene time (the
+      // user's own orbit/zoom offsets are preserved — only the displacement
+      // is applied).
+      hierarchyInspector._cameraTarget.getWorldPosition(tmpVec);
+      if (hierarchyInspector._lastTargetPos) camera.position.add(_hiFollowDelta.subVectors(tmpVec, hierarchyInspector._lastTargetPos));
+      (hierarchyInspector._lastTargetPos ??= new THREE.Vector3()).copy(tmpVec);
+      controls.target.copy(tmpVec);
     } else if (o.lookAtObj && (o.lookAtObj.planetObj || o.lookAtObj.pivotObj)) {
       // Follow the MESH, not pivotObj: for planets the pivot is the WOBBLE
       // CENTER (planet rides the circle's edge), so targeting it parks the
@@ -55347,6 +52775,10 @@ function updateOrbitalPlaneRotations() {
  * Called each frame after updateAscendingNodes() and before updateHierarchyLiveData().
  */
 const _ANOM_CHAIN_KEYS = new Set(['mercury', 'venus', 'mars', 'jupiter', 'saturn', 'uranus', 'neptune']);
+// Reusable vectors for updatePlanetAnomalies (declared beside their user since R10)
+const _anomalySunPos = new THREE.Vector3();
+const _anomalyPPos = new THREE.Vector3();
+const _anomalyPlanetPos = new THREE.Vector3();
 function updatePlanetAnomalies() {
   // Get Sun position (common for all planets) - using pooled vector
   sun.pivotObj.getWorldPosition(_anomalySunPos);
@@ -55534,6 +52966,10 @@ function updatePlanetAnomalies() {
  * - Longitude of Perigee (ϖ): ecliptic longitude of perigee direction
  * - Phase Angle: full 0–360° Sun-Earth-Moon angle for lunar phase
  */
+// Reusable vectors for updateMoonOrbitalElements (declared beside their user since R10)
+const _moonEarthPos = new THREE.Vector3();
+const _moonOrbitCenterPos = new THREE.Vector3();
+const _moonPos = new THREE.Vector3();
 function updateMoonOrbitalElements() {
   // Focus = Earth (replaces Sun for lunar orbit)
   earth.pivotObj.getWorldPosition(_moonEarthPos);

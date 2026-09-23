@@ -17,7 +17,7 @@ The simulation includes several interactive panels for inspecting planetary data
 
 | Panel | Purpose |
 |-------|---------|
-| **Planet Hierarchy Inspector** | Inspect the 5-step hierarchy chain for each planet |
+| **Planet Inspector** | The orbit of date of a chain planet from the N-body chain: elements, orbit plane with nodes and extremes, perihelion, anomalies, position report — see [doc 51](51-planet-inspector-reference.md) |
 | **PlanetStats Panel** | Per-planet data display with collapsible groups, charts, and dynamic rows |
 | **Invariable Plane Analysis** | View planet heights above/below the invariable plane |
 | **Balance Trend Analysis** | Track mass-weighted balance over time |
@@ -35,83 +35,55 @@ The simulation includes several interactive panels for inspecting planetary data
 
 ---
 
-## Planet Hierarchy Inspector
+## Planet Inspector
 
 ### Purpose
 
-Each planet in the Holistic Universe Model is built using a **5-step hierarchical chain** of nested Three.js objects. The Planet Hierarchy Inspector allows visual inspection of this chain for debugging and verification.
+One view per chain planet of the orbit the scene renders: the N-body element
+chain's elements of date, the orbit plane against the ecliptic of date with
+its nodes and extremes, the perihelion, the true and mean anomalies, and the
+position report against the NASA/JPL test dates. Everything it shows comes
+from the evaluators that place the planet (`_kcElementsOfDate`,
+`_kcHelioAU`, the frame bridge, the engine ecliptic of date) — nothing is
+computed on a path of its own. Full description: [doc 51](51-planet-inspector-reference.md).
 
-### The 5-Step Hierarchy Pattern
-
-For each planet (e.g., Venus), the hierarchy is:
-
-```
-barycenterEarthAndSun (root for all planets)
-    └── [Planet]PerihelionDurationEcliptic1     (Step 1: Forward ecliptic precession)
-            └── [Planet]PerihelionFromEarth     (Step 2: Perihelion position offset)
-                    └── [Planet]PerihelionDurationEcliptic2 (Step 3: Reverse ecliptic precession)
-                            └── [Planet]RealPerihelionAtSun (Step 4: Heliocentric orbit setup)
-                                    └── [planet]            (Step 5: The actual planet)
-```
-
-### What Each Step Does
-
-> Since the P5 flip — and definitively since the K5 legacy-chain
-> excision (the `?keplerChains=0` opt-out is gone) — this device chain
-> is **scene scaffolding**: the planet meshes, orbit rings and the
-> `PERIHELION [PLANET]` markers are placed each frame from the engine-D
-> chain's positions. The hierarchy below still exists and rotates, but
-> serves only as anchor geometry for the display devices.
-
-| Step | Object Name Pattern | Purpose |
-|------|---------------------|---------|
-| 1 | `[Planet]PerihelionDurationEcliptic1` | Forward perihelion precession (+ω rate) |
-| 2 | `[Planet]PerihelionFromEarth` | Geocentric transform (+2π/yr) + perihelion offset |
-| 3 | `[Planet]PerihelionDurationEcliptic2` | Reverse perihelion precession (−ω, cancels Step 1) |
-| 4 | `[Planet]RealPerihelionAtSun` | Heliocentric orbit frame: inclination tilt, −2π/yr |
-| 5 | `[planet]` | The actual planet with size, texture, rotation |
-
-### Properties Displayed Per Step
-
-| Property | Description | Units |
-|----------|-------------|-------|
-| `name` | Human-readable identifier | string |
-| `startPos` | Initial angular position | degrees |
-| `speed` | Angular velocity | radians per model year |
-| `speed (period)` | Derived orbital period | years |
-| `tilt` | Axial tilt | degrees |
-| `orbitRadius` | Radius of circular orbit | scene units |
-| `orbitCenter` | (a, b, c) offset from parent | scene units |
-| `orbitTilt` | (a, b) tilt angles | degrees |
+> The former inspector walked the K device's five nested wheels per planet
+> (settings, runtime state, validation, hierarchy path). Since the K5
+> excision those wheels are scene scaffolding — the meshes, rings and
+> perihelion markers are placed from the chain — and the wheel pivots the
+> old anomaly visual measured from sat 90° off the rendered planet. The walk
+> is retired (plan 06 R10); the orbit visual is rebuilt on the chain.
 
 ### Accessing the Inspector
 
 1. Open the Tweakpane Tools folder
 2. Click "Planet Inspector"
-3. Select a planet from the dropdown
-4. Use Prev/Next buttons to navigate steps
+3. Select a planet from the dropdown (← / → switch planets)
+4. **Orbit view** looks down onto the ecliptic of date at the Sun, equinox to the right; **Planet view** looks from behind the planet toward the Sun
+5. **Generate report** in the Position Report section runs the NASA/JPL test-date comparison on demand
 
 ### Visual Markers
 
-When Step 4 (RealPerihelionAtSun) is selected:
-
-| Marker | Color | Description |
+| Marker | Color | Construction |
 |--------|-------|-------------|
-| Ascending node | Magenta ↑ | Where orbit crosses ecliptic going north |
-| Descending node | Cyan ↓ | Where orbit crosses ecliptic going south |
-| Highest point | Green ↑ | Maximum north (90° after ascending) |
-| Lowest point | Red ↓ | Maximum south (90° after descending) |
-| Above-plane region | Green | Portion of orbit above ecliptic |
-| Below-plane region | Red | Portion of orbit below ecliptic |
+| Orbit outline and fan | white outline, green above / red below | the chain orbit over one period, fanned from the Sun, split by height above the ecliptic of date |
+| Ecliptic ring | blue dashed | the ecliptic of date at the semi-major axis |
+| Ascending / descending node | magenta ↑ / cyan ↓ | the sampled orbit's crossings of the ecliptic of date; yellow dashed line of nodes |
+| Highest / lowest point | green ↑ / red ↓ | the samples of maximum / minimum height |
+| Perihelion "P" and Sun → P line | green | the chain elements' perihelion direction at a(1 − e) |
+| Sun → planet line, ν arc | amber | the true anomaly swept at the Sun |
+| M arc | cyan dashed | the chain's mean anomaly beside ν |
+| Locator ring | cyan | around the rendered planet |
 
 ### Code Locations
 
 | Component | Location |
 |-----------|----------|
-| `hierarchyInspector` state | `src/script.js` (search the identifier) |
-| `PLANET_HIERARCHIES` registry | `src/script.js` |
-| `createVisualHelpers()` | `src/script.js` |
-| `updateHierarchyLiveData()` | `src/script.js` |
+| `PLANET_HIERARCHIES` (targets) and `hierarchyInspector` state | `src/script.js` |
+| `computeInspectorOrbitFrame()` | `src/script.js` |
+| `createVisualHelpers()` / `updateInspectorVisuals()` / `clearVisualHelpers()` | `src/script.js` |
+| `focusInspectorCamera()`, `createInspectorPanel()` | `src/script.js` |
+| `updateHierarchyLiveData()` (per frame) | `src/script.js` |
 
 ---
 

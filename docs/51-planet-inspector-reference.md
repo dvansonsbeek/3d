@@ -1,358 +1,133 @@
 ---
-docVersion: 1.0
+docVersion: 2.0
 modelVersion: v14.0
 coefficients: sha256:bb6a03c877eedab8
 status: current
 ---
 
-# Planet Hierarchy Inspector - Calculation Logic
+# Planet Inspector — the orbit of date from the N-body chain
 
 ## Overview
 
-The Planet Hierarchy Inspector displays orbital plane information for Step 4 objects (`[Planet]RealPerihelionAtSun`). This document describes how the calculations work, including the **dynamic ascending node** feature that updates orbital plane visualizations in real-time as Earth's obliquity changes.
+The Planet Inspector (Tools → Planet Inspector) shows, for one of the seven
+chain planets, the orbit the scene actually renders: the N-body element
+chain's elements of date, the orbit plane against the ecliptic of date with
+its nodes and extremes, the perihelion, the true and mean anomalies, and the
+position report against the NASA/JPL test dates. Everything it displays comes
+from the same evaluators the scene uses to place the planet; nothing in the
+inspector is computed on its own path.
 
-**Related Documentation:**
-- [Geometric Orbital Elements — the No-Chain Bodies](31-no-chain-body-elements.md) - The node/inclination device for the no-chain bodies (chain planets read the element chain)
-
----
-
-## 1. Orbital Tilt Encoding
-
-### How tilt values are stored in `createPlanet`
-
-Each planet's orbital inclination is encoded using two values:
-
-```javascript
-orbitTilta: Math.cos(((-90 - Ω) * Math.PI) / 180) * -i
-orbitTiltb: Math.sin(((-90 - Ω) * Math.PI) / 180) * -i
-```
-
-Where:
-- `Ω` (Omega) = Longitude of the ascending node (degrees from vernal equinox)
-- `i` = Orbital inclination (degrees)
-
-### Simplified Form
-
-The encoding can be simplified using trigonometric identities:
-- `cos(-90° - Ω) = -sin(Ω)`
-- `sin(-90° - Ω) = -cos(Ω)`
-
-Therefore:
-- `orbitTilta = -sin(Ω) * -i = sin(Ω) * i`
-- `orbitTiltb = -cos(Ω) * -i = cos(Ω) * i`
-
-### Example: Venus
-```javascript
-// From public/input/astro-reference.json (planets.venus):
-//   eclipticInclinationJ2000 = 3.39467605   // i = 3.39°
-//   ascendingNode            = 76.67877109  // Ω = 76.68°
-
-// Calculated values:
-// orbitTilta = sin(76.68°) * 3.39 ≈ 3.30°
-// orbitTiltb = cos(76.68°) * 3.39 ≈ 0.79°
-```
-
-### Application in createPlanet
-
-The tilt is applied to `orbitContainer` using Euler angles:
-```javascript
-orbitContainer.rotation.x = pd.orbitTilta * Math.PI/180;
-orbitContainer.rotation.z = pd.orbitTiltb * Math.PI/180;
-```
+**Related documentation:**
+- [41 — Scene graph hierarchy](41-scene-graph-hierarchy.md) — the engine frame of date and the chain placement
+- [31 — Geometric orbital elements, the no-chain bodies](31-no-chain-body-elements.md) — Pluto, Halley and Eros keep the device construction and are not in the inspector
+- [52 — Analysis and export tools](52-analysis-export-tools.md) — the position report
 
 ---
 
-## 2. Coordinate Systems
-
-### Three.js World Coordinates
-- **Y-axis**: Up (perpendicular to ecliptic plane)
-- **X-axis**: Right (toward vernal equinox, 0°)
-- **Z-axis**: Toward camera when looking down Y (toward 90°/summer solstice)
-
-### Ecliptic Plane
-- The ecliptic plane is at `y = 0`
-- Points with `y > 0` are **above** the ecliptic (north)
-- Points with `y < 0` are **below** the ecliptic (south)
-
-### Ecliptic Longitude (when viewed from above/north)
-- **0°** = Right (+X direction, vernal equinox)
-- **90°** = Top (+Z direction, summer solstice)
-- **180°** = Left (-X direction, autumnal equinox)
-- **270°** = Bottom (-Z direction, winter solstice)
-
-### Model Start Position
-- The model starts at **June 21** (summer solstice)
-- June 21 corresponds to ecliptic longitude **90°**
-
----
-
-## 3. Object Hierarchy (CRITICAL)
-
-### The Three.js Scene Graph for Planets
-
-```
-orbitContainer (rotation.x = orbitTilta, rotation.z = orbitTiltb)
-├── inclinationPlane ← Visualization added HERE (inherits tilt only)
-│   ├── eclipticLine (blue dashed circle at y=0)
-│   ├── orbitLine (white circle showing orbital path)
-│   ├── aboveHalfPlane (green mesh for y > 0 in world space)
-│   ├── belowHalfPlane (red mesh for y < 0 in world space)
-│   ├── ascendingNode (magenta sphere with up arrow)
-│   ├── descendingNode (cyan sphere with down arrow)
-│   ├── highestPointMarker (green sphere at max north, 90° after ascending)
-│   ├── lowestPointMarker (red sphere at max south, 90° after descending)
-│   └── nodesLine (yellow dashed line connecting nodes)
-└── orbit (rotation.y = orbital position, changes with animation)
-    ├── orbitLine (rotation.x = PI/2)
-    └── pivot (position.x = semi-major axis)
-        └── rotationAxis → planet mesh
-```
-
-### Why This Hierarchy Matters
-
-**The ascending/descending nodes shift over time** due to changes in Earth's obliquity. However, they do NOT depend on:
-- `startPos` (where the planet starts in its orbit)
-- `orbit.rotation.y` (the planet's current orbital position)
-
-**Therefore**, the `inclinationPlane` visualization must be added to `orbitContainer`, NOT to `pivot` or any child of `orbit`. This ensures it inherits only the orbital tilt, not the orbital position rotation.
-
-### Dynamic Updates
-
-The `orbitContainer.rotation` is updated each frame by `updateOrbitalPlaneRotations()` to reflect the current dynamic ascending node. See [Geometric Orbital Elements](31-no-chain-body-elements.md) for details.
-
----
-
-## 4. Node Definitions
-
-### Ascending Node
-- The point where the orbit crosses the ecliptic going from **south to north** (below to above)
-- At this point, the planet is moving from `y < 0` to `y > 0`
-- Marked with a **magenta sphere** with an **up arrow**
-
-### Descending Node
-- The point where the orbit crosses the ecliptic going from **north to south** (above to below)
-- At this point, the planet is moving from `y > 0` to `y < 0`
-- Marked with a **cyan sphere** with a **down arrow**
-
-### Venus Ascending Node
-- Located at ecliptic longitude **76.68°**
-- This corresponds to approximately **June 8** in the calendar
-
----
-
-## 5. Visualization Implementation
-
-### Local vs World Coordinate Systems
-
-The visualization is added to `orbitContainer`, so:
-- **LOCAL y=0 plane** = the tilted orbital plane (appears tilted in world space)
-- **WORLD y=0 plane** = the ecliptic
-
-### Transform Matrix
-
-To check where local points appear in world space, we use a transform matrix matching the parent's Euler rotation:
-
-```javascript
-const localToWorld = new THREE.Matrix4();
-localToWorld.makeRotationFromEuler(new THREE.Euler(tiltaRad, 0, tiltbRad, 'XYZ'));
-```
-
-### Finding Node Positions
-
-1. Sample points on the LOCAL orbital plane (flat circle at local y=0)
-2. Transform each point to WORLD space using `localToWorld`
-3. Find where the transformed points cross WORLD y=0
-4. Store the LOCAL positions for placing markers (parent transform handles world placement)
-
-```javascript
-for (let i = 0; i < numSamples; i++) {
-  // Points on LOCAL orbital plane
-  const p1Local = new THREE.Vector3(planeRadius * Math.cos(angle1), 0, planeRadius * Math.sin(angle1));
-
-  // Transform to WORLD space
-  const p1World = p1Local.clone().applyMatrix4(localToWorld);
-
-  // Find crossings of WORLD y=0
-  if (p1World.y <= 0 && p2World.y > 0) {
-    // DESCENDING node (planet orbits clockwise, so loop direction is opposite)
-    descendingNodePos.lerpVectors(p1Local, p2Local, t);  // Store LOCAL position
-  } else if (p1World.y >= 0 && p2World.y < 0) {
-    // ASCENDING node
-    ascendingNodePos.lerpVectors(p1Local, p2Local, t);   // Store LOCAL position
-  }
-}
-```
-
-> **Note on the crossing sense**: this excerpt labels a negative→positive world-y
-> crossing "descending" because the *sampling loop* here runs in the clockwise
-> orbital direction; §8's algorithm description ("ascending: y negative →
-> positive") states the convention in the physical orbital direction. The
-> shipped code computes `ascendingNodePos` directly from the node angle
-> (`descendingNodePos` is its point reflection), so neither sampling comment is
-> load-bearing.
-
-### Half-Plane Coloring
-
-- **Green half-plane**: Segments where WORLD y > 0 (above ecliptic)
-- **Red half-plane**: Segments where WORLD y < 0 (below ecliptic)
-
-The geometry uses LOCAL positions (flat at y=0), but the coloring decision uses WORLD y positions.
-
----
-
-## 6. Reference Values
-
-### Venus Orbital Parameters
-| Parameter | Value | Source |
-|-----------|-------|--------|
-| Orbital inclination | 3.39467605° | Model constant |
-| Ascending node longitude | <!--v:venusAscNodeEclJ2000-->76.67877109<!--/v-->° | Model constant |
-
-### Calendar Dates to Ecliptic Longitude (Approximate)
-| Date | Ecliptic Longitude |
-|------|-------------------|
-| March 20 (Vernal equinox) | 0° |
-| June 8 (Venus asc. node) | ~76.68° |
-| June 21 (Summer solstice) | 90° |
-| September 22 (Autumnal equinox) | 180° |
-| December 21 (Winter solstice) | 270° |
-
----
-
-## 7. Key Code Locations
-
-| Component | File | Description |
-|-----------|------|-------------|
-| Venus constants | `public/input/astro-reference.json` (`planets.venus`) | Orbital parameters |
-| hierarchyInspector state | `src/script.js` (`hierarchyInspector`) | Inspector state with all marker references |
-| PLANET_HIERARCHIES registry | `src/script.js` (`PLANET_HIERARCHIES`) | Per-planet 5-step hierarchy definitions |
-| createVisualHelpers() | `src/script.js` | Node detection and half-plane rendering |
-| Live data updates | `src/script.js` (`updateHierarchyLiveData`) | Dynamic marker position updates |
-| Dynamic ascending node calculation | `src/script.js` (`calculateDynamicAscendingNodeFromTilts`) | Main calculation function |
-| updateAscendingNodes() | `src/script.js` | Updates all planet ascending nodes |
-| updateOrbitalPlaneRotations() | `src/script.js` | Updates container rotations |
-
----
-
-## 8. Dynamic Ascending Node Updates
-
-### Overview
-
-The ascending node is NOT fixed—it shifts over time as Earth's obliquity changes. The implementation updates the visual markers in real-time.
-
-### Update Flow (Each Frame)
-
-1. **`updateAscendingNodes()`** calculates new ascending node values for all planets using `calculateDynamicAscendingNodeFromTilts()`
-2. **`updateOrbitalPlaneRotations()`** updates the `containerObj.rotation` for each planet's RealPerihelionAtSun object
-3. **`updateHierarchyLiveData()`** recalculates LOCAL marker positions based on current container rotation
-
-### What Gets Updated
-
-| Element | Update Method |
-|---------|---------------|
-| Container rotation | `updateOrbitalPlaneRotations()` - rotates entire orbital plane |
-| Ascending/descending nodes | Sample orbit, find world y=0 crossings |
-| Highest/lowest point markers | Sample orbit, find max/min world y positions |
-| Half-plane geometries | Rebuild triangle indices based on world y positions |
-| Line of nodes | Update vertex positions to connect nodes |
-| Node arrows | Move to new node positions |
-
-### Marker Position Algorithm
-
-```javascript
-// Build transform matrix from current container rotation
-const localToWorld = new THREE.Matrix4();
-localToWorld.makeRotationFromEuler(new THREE.Euler(tiltaRad, 0, tiltbRad, 'XYZ'));
-
-// Sample orbit points and find ecliptic crossings
-for (let i = 0; i < numSamples; i++) {
-  const localPt = new THREE.Vector3(radius * Math.cos(angle), 0, radius * Math.sin(angle));
-  const worldPt = localPt.clone().applyMatrix4(localToWorld);
-
-  // Ascending node: world y goes from negative to positive
-  // Descending node: world y goes from positive to negative
-  // Highest point: maximum world y
-  // Lowest point: minimum world y
-}
-```
-
-### Half-Plane Geometry Rebuild
-
-The green/red half-planes show which parts of the orbit are above/below the ecliptic. When the ascending node changes, the half-plane geometries must be rebuilt:
-
-```javascript
-const rebuildHalfDiscGeometry = (mesh, isAbove) => {
-  const indices = [];
-  // Only include triangles where midpoint world Y matches isAbove
-  for (let i = 1; i < orbitPoints.length; i++) {
-    const midWorldY = (orbitPointsWorld[i-1].y + orbitPointsWorld[i].y) / 2;
-    if ((midWorldY > 0) === isAbove) {
-      indices.push(0, i, i + 1);  // Triangle from center to edge segment
-    }
-  }
-  mesh.geometry.setIndex(indices);
-  mesh.geometry.computeVertexNormals();
-};
-```
-
----
-
-## 9. Historical Issues (Resolved)
-
-### Issue: Visualization rotated with orbital position
-**Symptom**: Changing `startPos` caused the ascending node marker to move.
-
-**Cause**: The `inclinationPlane` was added to `pivotObj`, which is a child of `orbit`. Since `orbit.rotation.y` changes with the planet's orbital position, the visualization rotated incorrectly.
-
-**Fix**: Add `inclinationPlane` to `containerObj` (the `orbitContainer`) instead of `pivotObj`. This ensures the visualization only inherits the orbital tilt, not the orbital position.
-
-```javascript
-// WRONG - rotates with orbital position
-obj.pivotObj.add(hierarchyInspector.inclinationPlane);
-
-// CORRECT - only inherits tilt
-obj.containerObj.add(hierarchyInspector.inclinationPlane);
-```
-
-### Issue: Static ascending nodes
-**Symptom**: Node markers stayed fixed at epoch 2000 positions even when simulating far into future/past.
-
-**Cause**: The ascending node visualization was created once at initialization using static `orbitTilta`/`orbitTiltb` values.
-
-**Fix**: Added `updateOrbitalPlaneRotations()` to dynamically update container rotations, and extended `updateHierarchyLiveData()` to recalculate marker positions each frame based on current container rotation.
-
----
-
-## 10. Ecliptic Position Calculations
-
-The Planet Hierarchy Inspector shows real-time ecliptic position data for the selected planet.
-
-### Values Displayed
-
-| Field | Source | Description |
-|-------|--------|-------------|
-| Height above ecliptic | `planetObj.getWorldPosition().y` | Actual world Y coordinate |
-| Height ratio (%) | `worldY / maxY * 100` | Percentage of max height for this orbit |
-| Angle from ascending node | `eclipticLongitude - ascNodeAngle` | Planet's position in its orbit relative to ascending node |
-| Ascending node longitude | `o.[planet]AscendingNode` | Dynamic ascending node value |
-
-### Ecliptic Longitude Calculation
-
-```javascript
-// Get planet's world position
-planet.pivotObj.getWorldPosition(vec);
-
-// Calculate ecliptic longitude from X,Z coordinates
-// 0° = +X (vernal equinox), 90° = +Z (summer solstice)
-const eclipticLongitude = Math.atan2(vec.z, vec.x) * 180 / Math.PI;
-
-// Angle from ascending node
-const angleFromAsc = ((eclipticLongitude - ascNodeAngleDeg) % 360 + 360) % 360;
-```
-
-### Important Notes
-
-- **Height above ecliptic** is the actual 3D world Y position, not a formula
-- **Angle from ascending node** uses the dynamic ascending node, updated each frame
-- These values can be used to verify the orbital mechanics are working correctly
-
+## 1. What replaced the hierarchy walk
+
+Until plan 06 R10 the inspector walked the K device's five nested wheels per
+planet (PerihelionDurationEcliptic1 → PerihelionFromEarth →
+PerihelionDurationEcliptic2 → RealPerihelionAtSun → planet) and showed each
+wheel's settings, runtime rotation, wiring validation and hierarchy path. Since
+the K5 excision those wheels are scene scaffolding: the planet meshes, the
+orbit rings and the perihelion markers are placed every frame from the N-body
+chain. The wheel pivots kept turning at the K start angle, so the old
+anomaly visual, which measured angles at a wheel pivot, opened 90° rotated
+from the rendered planet and measured nothing from the Sun. The walk, the
+settings, the runtime state, the validation, the hierarchy path, the
+solar-period reference and the "P2" device point are gone. The orbit visual
+was the valuable part and is rebuilt on the chain.
+
+## 2. Sources
+
+| Quantity | Source |
+|---|---|
+| Elements of date (a, e, i, Ω, ϖ, λ̄, M) | `_kcElementsOfDate(planet, o.julianDay)` — `@essrt/physics/planets/keplerian-chain` with the banked secular-series override, at the engine year (true TT) |
+| Heliocentric points of the orbit | `_kcHelioAU(planet, jd)` over one Kepler-III period, through the frame bridge `_kcR` into world axes |
+| Rendered planet | the planet mesh's world position (light-time retarded, as the eye sees it) |
+| Ecliptic of date (pole n̂, equinox ĝ) | the sun-plane container's world basis `[ĝ, n̂, ĝ×n̂]`, placed from the engine every frame (R4) |
+| Sun | the Sun mesh's world position |
+
+The elements are in the fixed J2000 ecliptic frame, the frame every reference
+table publishes. The of-date geometry (inclination to the rendered ecliptic,
+node longitude of date, argument of latitude, heights) is measured against
+n̂ and ĝ in world space. At J2000 the two frames coincide; away from it they
+part by the motion of the ecliptic.
+
+## 3. The visual
+
+All helpers live in one `THREE.Group` in world coordinates and are rebuilt
+when the planet or a checkbox changes.
+
+| Element | Colour | Construction |
+|---|---|---|
+| Orbit outline | white | the chain orbit sampled over one period (257 points), fanned from the Sun |
+| Orbit fan | green above / red below | the fan's triangles split by the ring points' height above the ecliptic of date |
+| Ecliptic ring | blue, dashed | a circle of radius a in the ecliptic of date around the Sun |
+| Ascending / descending node | magenta ↑ / cyan ↓ | the sampled orbit's crossings of the ecliptic of date, interpolated between samples; yellow dashed line of nodes |
+| Highest / lowest point | green ↑ / red ↓ | the samples of maximum / minimum height |
+| Perihelion "P" + green line | green | the perihelion direction of the chain elements (Ω, i, ω = ϖ − Ω, the same rotation as the chain's element-to-position), at distance a(1 − e) from the Sun |
+| Sun → planet line, ν arc | amber | the true anomaly swept at the Sun in the orbit plane, from the perihelion direction to the rendered planet |
+| M arc | cyan, dashed | the chain's mean anomaly (λ̄ − ϖ) swept at the Sun beside ν — an angle, not a geometric point |
+| Locator ring | cyan torus | around the rendered planet, facing the camera |
+
+The orbit is resampled when the epoch has moved by more than 1/720 of the
+period and at most four times a second (the same floor the orbit rings use);
+the planet-dependent parts move every frame.
+
+## 4. The camera
+
+**Orbit view** looks down onto the ecliptic of date at the Sun with the
+equinox ĝ to the right, so ecliptic longitudes run counter-clockwise. The
+camera sits 3° off the pole toward longitude 270°: a camera exactly on the
+pole axis leaves three.js's `lookAt` to choose the roll from a fallback
+perturbation, which is where the former inspector's rotated start came from.
+**Planet view** looks from behind the planet toward the Sun. While the
+inspector is open the animation loop follows the inspector's target (the Sun
+mesh or the planet mesh) instead of the "Look at" body.
+
+## 5. Readouts
+
+**Chain elements of date:** a, e, i and Ω (J2000 ecliptic), ϖ, ω = ϖ − Ω,
+λ̄, the Kepler-III period a^3/2 in years, the perihelion and aphelion
+distances.
+
+**Orbit geometry (live):** the Sun→planet distance of the rendered planet, ν
+at the Sun, the chain's M, ν − M, the inclination to the ecliptic of date, the
+ascending node longitude of date, the argument of latitude (0° at the
+ascending node, 90° at the highest point), the height above the ecliptic of
+date and its share of the maximum, the hemisphere, and the planet's RA/Dec
+against the Sun's Dec (at a transit the two agree).
+
+A consistency check worth knowing: ν from the geometry and ν from Kepler's
+equation on the chain's M and e agree to the size of the chain's periodic
+terms (about 0.01° for Mercury and Venus at J2000).
+
+## 6. Position report
+
+The report compares the rendered planet's RA/Dec with the NASA transit
+catalogue dates and the model-start reference, with Excel export and
+clipboard copy; it is generated on demand (the button walks the scene through
+the test dates and restores the epoch). Its longitude rows still read the
+`o.<planet>PerihelionEcliptic` / `o.<planet>AscendingNode` channels; see doc
+52 for the report format.
+
+## 7. Keyboard
+
+| Key | Action |
+|---|---|
+| ← or P | previous planet |
+| → or N | next planet |
+| Escape or Q | close |
+
+## 8. Code locations
+
+| Component | Location |
+|---|---|
+| `PLANET_HIERARCHIES` (the targets; `chain: false` bodies are report-only) | `src/script.js` |
+| `hierarchyInspector` state, `computeInspectorOrbitFrame()` | `src/script.js` |
+| `createVisualHelpers()`, `updateInspectorVisuals()`, `clearVisualHelpers()` | `src/script.js` |
+| `focusInspectorCamera()`, `createInspectorPanel()`, `updateInspectorDisplay()` | `src/script.js` |
+| `updateHierarchyLiveData()` (per-frame, from the animation loop) | `src/script.js` |
+| `window.__test__.inspectorProbe()` (headless probe: group size, angles, equinox on screen) | `src/script.js` |

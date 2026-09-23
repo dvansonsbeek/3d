@@ -140,9 +140,9 @@ Displays real-time astronomical coordinates for all bodies:
 
 Use these values to verify against other planetariums like Stellarium.
 
-### Planet Inspector
+### Planet Information Panel (planet stats)
 
-Click on any planet to show a collapsible sidebar handle on the left edge. Click the handle to expand the full information panel:
+Click on any planet to show a collapsible sidebar handle on the left edge. Click the handle to expand the full information panel (the Planet Inspector under Tools is a different view: the orbit of date from the N-body chain, doc 51):
 
 **Orbital Elements:**
 - Semi-major axis (a)
@@ -225,14 +225,14 @@ The **Settings > Camera show/hide** folder shows your current viewpoint:
 
 ## Keyboard Shortcuts
 
-### Hierarchy Inspector
+### Planet Inspector (Tools → Planet Inspector)
 
-When the Hierarchy Inspector panel is open:
+When the Planet Inspector panel is open:
 
 | Key | Action |
 |-----|--------|
-| **←** or **P** | Previous step |
-| **→** or **N** | Next step |
+| **←** or **P** | Previous planet |
+| **→** or **N** | Next planet |
 | **Escape** or **Q** | Close inspector |
 
 ---

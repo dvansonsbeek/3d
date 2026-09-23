@@ -46,7 +46,7 @@ Reports (observed category)
 └── Solar Day
 
 Tools
-├── Planet Inspector          [opens Hierarchy Inspector]
+├── Planet Inspector          [opens the Planet Inspector — orbit of date + position report]
 ├── WebGeoCalc Explorer
 ├── LOD-Climate Rhythm
 ├── Climate Formula Explorer
@@ -351,10 +351,10 @@ Planet position reports provide detailed validation data comparing calculated po
 
 ### Accessing Reports
 
-1. Open the **Hierarchy Inspector** (`Tools > Planet Inspector`)
-2. Navigate to **Step 5** (planet validation)
-3. Click on a planet name to generate its report
-4. Use **Download Excel** or **Copy to Clipboard** buttons
+1. Open the **Planet Inspector** (`Tools > Planet Inspector`)
+2. Select the planet
+3. In the **Position Report** section click **Generate report** (the scene walks through the test dates and returns)
+4. Use **Download Excel** or **Copy Report**; **Show all results** includes the dates hidden from the screen view
 
 ### Report Contents
 

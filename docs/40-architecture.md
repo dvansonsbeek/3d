@@ -446,7 +446,7 @@ function render(now) {
   // 30 Hz — CSS2D label flag (labelElapsed counter)
   // 20 Hz — UI: date/time strings, Julian Day, camera position
   // 10 Hz — Heavy astronomy: predictions, ascending nodes, anomalies,
-  //          inclinations, invariable plane, hierarchy inspector
+  //          inclinations, invariable plane, Planet Inspector
   // 10 Hz — Position tracking: elongations, perihelion, orientations
   //  5 Hz — DOM labels: planet panel grid rebuild
   // 30 Hz — Visual effects: lighting, flares
@@ -487,7 +487,7 @@ Critical ordering for dependent calculations:
        ↓
 9. calculateInvariablePlaneFromAngularMomentum()  // Option A validation
        ↓
-10. updateHierarchyLiveData()                    // Live hierarchy inspector
+10. updateHierarchyLiveData()                    // Planet Inspector (orbit of date, live)
        ↓
 11. updateInclinationPathMarker()                // Inclination visualization
        ↓
