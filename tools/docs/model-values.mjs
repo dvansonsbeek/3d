@@ -177,6 +177,16 @@ const model = rd('public/input/model-parameters.json');
 const astro = rd('public/input/astro-reference.json');
 const versionInfo = rd('public/input/model-version.json');
 const dtFit = rd('data/deltaT-4flag-fit.json');
+// The package model on the SERIES tier (the API's construction), built lazily
+// on the first key that reads it — plan 06 Phase 7's spin-channel keys.
+const phys = await import('@essrt/physics');
+const physModel = (() => {
+  /** @type {any} */ let m;
+  return () => {
+    if (!m) m = phys.createModel(undefined, { secularSeriesArtifact: rd('data/nbody-secular-series.json') });
+    return m;
+  };
+})();
 
 /** `1234567.89` -> `1,234,567.89` (the form the prose uses for H). */
 const thousands = (n, dp = 0) => {
@@ -2243,6 +2253,46 @@ export const VALUES = {
       jupiterSpinPrecObsArcsecPerYr: { get: () => sp.jupiterSpinPrecessionApproxArcsecPerYr, render: (v) => Number(v).toFixed(1), unit: '″/yr', note: 'Jupiter spin precession ≈ (Saillenfest 2020, MoI-dependent −2.7…−2.9) — adjacent to the engine’s s7 (citation target)' },
       saturnSpinPrecLongTermArcsecPerYr: { get: () => sp.saturnSpinPrecessionPresentArcsecPerYr / sp.saturnPresentToLongTermFraction, render: (v) => Number(v).toFixed(3), unit: '″/yr', note: 'Saturn’s long-term pole rate (present −0.45 ÷ 0.68, the Titan-cycle fraction; Ward & Hamilton 2004) — sits on the engine’s s8 to ~4% (citation-derived target)' },
     };
+  })(),
+
+  // ── Plan 06 Phase 7: the planets' spin channel — DERIVED ────────────────
+  // The precession constant from each planet's OWN torques (astro-reference
+  // planetSpinPhysical: J₂, C/MR², the IAU pole and spin, the regular
+  // satellites; Ward & Hamilton 2004 form) on the model's OWN orbit (chain
+  // a/e/n, the deep ζ plane history), the spin integrated from the IAU J2000
+  // pole — ONE home packages/physics/src/planets/spin-channel.cjs, read here
+  // through the package model. The observed rows above are the closures /
+  // targets these are checked against (test:spin-channel).
+  ...(() => {
+    const spin = (p) => physModel().planets.spin(p);
+    const band = (p) => spin(p).obliquityEnvelopeDeg(2000, 1_000_000);
+    // the engine's own leading nodal line per planet (the deep ζ table), as the C-4 block reads it
+    const leadZeta = (p) => {
+      const z = rd('data/nbody-deep-secular-modes.json').modes[p].zeta.filter((x) => Math.abs(x.omegaRadPerYr) > 1e-9)
+        .sort((a, b) => Math.hypot(b.re, b.im) - Math.hypot(a.re, a.im))[0];
+      return (z.omegaRadPerYr * 180 / Math.PI) * 3600;
+    };
+    const s8 = () => leadZeta('neptune');
+    const s1 = () => leadZeta('mercury');
+    /** @type {Record<string, any>} */
+    const keys = {};
+    const NAMES = { mercury: 'Mercury', venus: 'Venus', mars: 'Mars', jupiter: 'Jupiter', saturn: 'Saturn', uranus: 'Uranus', neptune: 'Neptune' };
+    for (const [p, N] of Object.entries(NAMES)) {
+      keys[`${p}SpinAlphaDerivedArcsecPerYr`] = { get: () => spin(p).alphaArcsecPerYr, render: (v) => Number(v).toFixed(p === 'uranus' || p === 'neptune' ? 4 : 3), unit: '″/yr', note: `${N}'s precession constant α DERIVED from its own J₂, C/MR², spin and satellites on the model's orbit (Ward & Hamilton 2004 form; the ${p === 'mercury' ? 'free constant — Mercury is Cassini-locked, α_free/|s1| = the lock statement' : 'torque side of the spin channel'})` };
+      keys[`${p}SpinMomentOfInertiaFactor`] = { get: () => astro.planetSpinPhysical[p].momentOfInertiaFactor, render: (v) => String(v), unit: '', note: `${N}'s normalized polar moment of inertia C/MR² as INPUT to the spin channel (${astro.planetSpinPhysical[p].momentOfInertiaFactorClass}; source in the astro-reference planetSpinPhysical _description)` };
+      keys[`${p}ObliquityJ2000DerivedDeg`] = { get: () => spin(p).obliquityJ2000Deg, render: (v) => Number(v).toFixed(3), unit: '°', note: `${N}'s J2000 obliquity to its own orbit, DERIVED as the angle between the IAU J2000 pole (angular-momentum sense: Venus ≈ 177°, Uranus ≈ 98°) and the chain's J2000 orbit plane — not an input` };
+      if (p === 'mercury') continue;
+      keys[`${p}SpinPrecDerivedArcsecPerYr`] = { get: () => spin(p).spinPrecessionRateArcsecPerYrJ2000, render: (v) => Number(v).toFixed(p === 'uranus' || p === 'neptune' ? 4 : 3), unit: '″/yr', note: `${N}'s J2000 pole precession rate about its orbit normal, ψ̇ = −α cos ε, DERIVED (negative = retrograde precession of a prograde spinner; Venus's retrograde spin precesses prograde)` };
+      keys[`${p}AxialPrecessionPeriodDerivedYr`] = { get: () => spin(p).axialPrecessionPeriodYearsJ2000, render: (v) => thousands(Math.round(v)), unit: 'yr', note: `${N}'s axial precession period at J2000 on the derived channel (2π/|ψ̇|; the retired device row read an integer fraction of the anchor unit)` };
+      keys[`${p}ObliquityBandMinDeg`] = { get: () => band(p).minDeg, render: (v) => Number(v).toFixed(2), unit: '°', note: `${N}'s obliquity minimum over ±1 Myr around J2000, the spin integrated on the planet's own ζ plane history (quasi-periodic tables: the envelope, never chaotic diffusion)` };
+      keys[`${p}ObliquityBandMaxDeg`] = { get: () => band(p).maxDeg, render: (v) => Number(v).toFixed(2), unit: '°', note: `${N}'s obliquity maximum over ±1 Myr around J2000 (same integration)` };
+    }
+    keys.mercurySpinFreeToNodeRatio = { get: () => spin('mercury').alphaArcsecPerYr / Math.abs(s1()), render: (v) => Number(v).toFixed(1), unit: '×', note: 'Mercury: the free precession constant over its own node rate (s1) — ≫ 1 is the Cassini lock (Margot 2007) stated from the model\'s own numbers; the shipped axial row is the node rate' };
+    keys.marsSpinPrecClosurePct = { get: () => (spin('mars').spinPrecessionRateArcsecPerYrJ2000 / astro.planetSpinObserved.marsSpinPrecessionArcsecPerYr - 1) * 100, render: (v) => Number(v).toFixed(2), unit: '%', note: 'Mars: the derived pole rate against the measured −7.606 ″/yr (Konopliv 2016) — a CLOSURE (the source inferred C/MR² from this rate), through the model\'s own a, e, n' };
+    keys.venusSpinPrecClosurePct = { get: () => (Math.abs(spin('venus').spinPrecessionRateArcsecPerYrJ2000) / 44.58 - 1) * 100, render: (v) => Number(v).toFixed(2), unit: '%', note: 'Venus: the derived pole rate against the measured 44.58 ± 3.3 ″/yr (Margot et al. 2021) — a closure of their C/MR² inference' };
+    keys.saturnSpinPrecVsS8Pct = { get: () => (spin('saturn').spinPrecessionRateArcsecPerYrJ2000 / s8() - 1) * 100, render: (v) => Number(v).toFixed(1), unit: '%', note: 'Saturn: the derived pole rate against the engine\'s OWN s8 (the Ward–Hamilton capture line) at the gravity-constrained C/MR² 0.2181 — the WH04 libration band 0.2257–0.2438 lands within +7…−1 % (measured in the Phase 7 lab)' };
+    keys.jupiterSpinAlphaVsSaillenfestLowPct = { get: () => (spin('jupiter').alphaArcsecPerYr / 2.64 - 1) * 100, render: (v) => Number(v).toFixed(1), unit: '%', note: 'Jupiter: the derived α relative to the low end of Saillenfest et al. 2020\'s 2.64–3.17 ″/yr range (positive = inside the range; their range spans the older moment-of-inertia band, the gravity-constrained 0.2639 sits at its low end)' };
+    return keys;
   })(),
 
   // ── The sharpened leg-1 obliquity statement (owner-adopted) ─────────────

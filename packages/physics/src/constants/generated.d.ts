@@ -2,14 +2,14 @@
 // Gives the TypeScript website full type safety at the boundary (§2g) while
 // packages/physics stays JavaScript.
 
-export declare const CONSTANTS_HASH: "2f0bb1d372d35ed9";
+export declare const CONSTANTS_HASH: "e494df9692e192e4";
 
 export declare const MODEL_VERSION: string;
 
 export declare const PREPRINT_DOI: string;
 
 export declare const DEFAULT_CONSTANTS: {
-  readonly hash: "2f0bb1d372d35ed9";
+  readonly hash: "e494df9692e192e4";
   readonly additionalBodies: {
     "pluto": {
       "name": string;
@@ -370,6 +370,113 @@ export declare const DEFAULT_CONSTANTS: {
       "meanAnomaly": number;
       "trueAnomaly": number;
       "rotationPeriodDays": number;
+    };
+  };
+  readonly planetSpinPhysical: {
+    "mercury": {
+      "j2": number;
+      "j2ReferenceRadiusKm": number;
+      "momentOfInertiaFactor": number;
+      "momentOfInertiaFactorClass": string;
+      "rotationRateDegPerDay": number;
+      "poleRaJ2000Deg": number;
+      "poleDecJ2000Deg": number;
+      "cassiniLocked": boolean;
+      "satellites": unknown[];
+    };
+    "venus": {
+      "j2": number;
+      "j2ReferenceRadiusKm": number;
+      "momentOfInertiaFactor": number;
+      "momentOfInertiaFactorClass": string;
+      "rotationRateDegPerDay": number;
+      "poleRaJ2000Deg": number;
+      "poleDecJ2000Deg": number;
+      "cassiniLocked": boolean;
+      "satellites": unknown[];
+    };
+    "mars": {
+      "j2": number;
+      "j2ReferenceRadiusKm": number;
+      "momentOfInertiaFactor": number;
+      "momentOfInertiaFactorClass": string;
+      "rotationRateDegPerDay": number;
+      "poleRaJ2000Deg": number;
+      "poleDecJ2000Deg": number;
+      "cassiniLocked": boolean;
+      "satellites": Array<{
+        "name": string;
+        "gmKm3S2": number;
+        "semiMajorAxisKm": number;
+        "orbitalPeriodDays": number;
+      }>;
+    };
+    "jupiter": {
+      "j2": number;
+      "j2ReferenceRadiusKm": number;
+      "momentOfInertiaFactor": number;
+      "momentOfInertiaFactorClass": string;
+      "momentOfInertiaFactorAlternative": number;
+      "rotationRateDegPerDay": number;
+      "poleRaJ2000Deg": number;
+      "poleDecJ2000Deg": number;
+      "cassiniLocked": boolean;
+      "satellites": Array<{
+        "name": string;
+        "gmKm3S2": number;
+        "semiMajorAxisKm": number;
+        "orbitalPeriodDays": number;
+      }>;
+    };
+    "saturn": {
+      "j2": number;
+      "j2ReferenceRadiusKm": number;
+      "momentOfInertiaFactor": number;
+      "momentOfInertiaFactorClass": string;
+      "momentOfInertiaFactorAlternative": [number, number];
+      "rotationRateDegPerDay": number;
+      "poleRaJ2000Deg": number;
+      "poleDecJ2000Deg": number;
+      "cassiniLocked": boolean;
+      "satellites": Array<{
+        "name": string;
+        "gmKm3S2": number;
+        "semiMajorAxisKm": number;
+        "orbitalPeriodDays": number;
+      }>;
+    };
+    "uranus": {
+      "j2": number;
+      "j2ReferenceRadiusKm": number;
+      "momentOfInertiaFactor": number;
+      "momentOfInertiaFactorClass": string;
+      "rotationRateDegPerDay": number;
+      "poleRaJ2000Deg": number;
+      "poleDecJ2000Deg": number;
+      "cassiniLocked": boolean;
+      "satellites": Array<{
+        "name": string;
+        "gmKm3S2": number;
+        "semiMajorAxisKm": number;
+        "orbitalPeriodDays": number;
+      }>;
+    };
+    "neptune": {
+      "j2": number;
+      "j2ReferenceRadiusKm": number;
+      "momentOfInertiaFactor": number;
+      "momentOfInertiaFactorClass": string;
+      "rotationRateDegPerDay": number;
+      "poleRaJ2000Deg": number;
+      "poleDecJ2000Deg": number;
+      "cassiniLocked": boolean;
+      "satellites": Array<{
+        "name": string;
+        "gmKm3S2": number;
+        "semiMajorAxisKm": number;
+        "orbitalPeriodDays": number;
+        "retrograde": boolean;
+      }>;
     };
   };
   readonly planets: {

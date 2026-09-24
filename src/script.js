@@ -6152,6 +6152,16 @@ if (typeof window !== 'undefined') {
     // key angles and where the orbit view puts the equinox ĝ on screen (the
     // former inspector started 90° rotated; the fix is a defined screen-up).
     jumpJD: (jd) => { jumpToJulianDay(jd); forceSceneUpdate(); },   // scene jump for probes (setEpoch* only move the f(Y) epoch)
+    // Plan 06 Phase 7 — the planet panels' spin-channel rows, evaluated at the
+    // scene's current epoch through the same row factory the panels use.
+    spinRowsProbe: (planet) => {
+      const opts = { mercury: { cassini: true }, venus: { retrograde: true }, uranus: { retrograde: true } }[planet] || {};
+      return _planetSpinRows(planet, planet, opts).map((r) => ({
+        label: r.label(),
+        value: r.value.map((p) => (typeof p.v === 'function' ? p.v() : (p.v ?? p.small))),
+        hover: typeof r.hover === 'function' ? r.hover()[0] : r.hover[0],
+      }));
+    },
     inspectorProbe: () => {
       const H = hierarchyInspector;
       const f = computeInspectorOrbitFrame(H.currentPlanet);
@@ -42346,6 +42356,51 @@ function _tierModelB() {
   }
   return _tierUmbraModel;
 }
+/**
+ * Plan 06 Phase 7 — the planets' spin channel rows for the planet panels'
+ * "Long-Period Cycles" section. Every value is read from the package model's
+ * ONE home (@essrt/physics/planets/spin-channel): the precession constant α
+ * from the planet's OWN J₂, C/MR², spin rate and satellites (astro-reference
+ * planetSpinPhysical, cited) on the chain's orbit, and the spin integrated on
+ * the planet's OWN orbit-plane history (the deep ζ table) from the IAU J2000
+ * pole. Rows read the scene at the ENGINE year (true TT, R4b). Beyond ±10 Myr
+ * the channel is outside its ζ tables' domain and the rows go blank.
+ * @param {string} key @param {string} name
+ * @param {{ cassini?: boolean, retrograde?: boolean, note?: string }} [opts]
+ */
+function _planetSpinRows(key, name, opts = {}) {
+  const spin = () => _tierModelB().planets.spin(key);
+  const yr = () => _engineYearTT(o.julianDay);
+  let bandMemo = null;
+  const band = () => { if (!bandMemo) bandMemo = spin().obliquityEnvelopeDeg(2000, 1000000); return bandMemo; };
+  const home = ` ONE home @essrt/physics/planets/spin-channel; inputs astro-reference planetSpinPhysical (cited per value); the closures and targets are the test:spin-channel gate and doc 109 §19.`;
+  if (opts.cassini) {
+    return [
+      {label : () => `Free precession constant α (derived)`,
+       value : [ { v: () => spin().alphaArcsecPerYr, dec:1, sep:',' },{ small: '″/yr' }],
+       hover : () => { const s = spin(); return [`${name}'s own torque-derived precession constant (J₂, C/MR², the 3:2 spin, no satellites; Ward & Hamilton 2004 form on the chain's a, e, n) — ${(s.alphaArcsecPerYr / Math.abs(DEEP_MODES_ARTIFACT.planetLeadingZetaArcsecPerYr[key])).toFixed(0)}× its own node rate: the spin cannot precess freely at that rate and follows the orbit's node instead (the Cassini lock, Margot 2007; derived J2000 obliquity ${(s.obliquityJ2000Deg * 60).toFixed(2)}′). The axial row above IS that lock.${home}`]; }},
+    ];
+  }
+  const retro = opts.retrograde
+    ? ` ${name}'s rotation is retrograde, so the obliquity is read on the angular-momentum axis (≈ 180° − the IAU tilt) and the pole precesses PROGRADE (positive rate).`
+    : '';
+  const note = opts.note ? ` ${opts.note}` : '';
+  return [
+    {label : () => `Axial Precession Period (derived, of date)`,
+     value : [ { v: () => { const r = spin().spinPrecessionRateArcsecPerYrAtYear(yr()); return r === null ? NaN : 1296000 / Math.abs(r); }, dec:0, sep:',', infinity: 1e9 },{ small: 'years' }],
+     hover : () => { const s = spin(); return [`${name}'s axial precession period on the model's OWN spin channel: α from ${name}'s J₂, C/MR² (${s.momentOfInertiaFactor}, ${s.momentOfInertiaFactorClass}), spin rate and satellites (Ward & Hamilton 2004: α = 3/2·n²/ω·(1−e²)^−3/2·(J₂+q)/(λ+l)) on the chain's orbit; the spin integrated on ${name}'s own orbit-plane history from the IAU J2000 pole, ψ̇ = −α cos ε(t), period 2π/|ψ̇| at the scene's engine year (J2000: ${fmtNum(s.axialPrecessionPeriodYearsJ2000, 0, ',')} yr). The retired device row read an integer fraction of the anchor unit.${retro}${note}${home}`]; }},
+    {label : () => `Spin precession rate (derived, of date)`,
+     value : [ { v: () => spin().spinPrecessionRateArcsecPerYrAtYear(yr()) ?? NaN, dec: (key === 'uranus' || key === 'neptune') ? 4 : 3, sep:',' },{ small: '″/yr' }],
+     hover : () => { const s = spin(); return [`The pole's precession rate about ${name}'s orbit normal of date, ψ̇ = −α cos ε(t) (negative = retrograde precession of a prograde spinner). α = ${s.alphaArcsecPerYr.toFixed(4)} ″/yr derived; at J2000 ψ̇ = ${s.spinPrecessionRateArcsecPerYrJ2000.toFixed(4)} ″/yr.${retro}${home}`]; }},
+    {label : () => `Obliquity to orbit (derived, of date)`,
+     value : [ { v: () => spin().obliquityDegAtYear(yr()) ?? NaN, dec:3 },{ small: '°' }],
+     hover : () => { const s = spin(); return [`The angle between ${name}'s spin axis and its own orbit plane of date, from the spin equation dŝ/dt = α(ŝ·n̂)(ŝ×n̂) on the planet's own ζ plane history. The J2000 value ${s.obliquityJ2000Deg.toFixed(3)}° is DERIVED (the IAU pole against the chain's J2000 plane), not an input — its agreement with the IAU tilt is the channel's first check.${retro}${note}${home}`]; }},
+    {label : () => `Obliquity band ±1 Myr (derived)`,
+     value : [ { v: () => { const b = band(); return `${b.minDeg.toFixed(2)}° – ${b.maxDeg.toFixed(2)}°`; } }],
+     hover : () => { const b = band(); return [`${name}'s obliquity envelope over ±1 Myr around J2000 on the model's own plane history (mean ${b.meanDeg.toFixed(2)}°). A BAND, not a cycle: the quasi-periodic ζ tables show the response envelope near the nodal lines, never true chaotic diffusion${key === 'mars' ? ' — for Mars this is the Laskar–Robutel chaotic-obliquity class, stated as the envelope on our own modes' : ''}.${home}`]; },
+     static: true},
+  ];
+}
 const _umbraTierMemo = { jd: NaN, out: null };
 function umbraFromSceneAtJd(jd) {
   // U2 (the umbra strangler): DELEGATED to the package besselian tier — the
@@ -45577,6 +45632,7 @@ const planetStats = {
       {label : () => `Axial Precession Period`,
        value : [ { v: () => 1296000*100/CHAIN_ARTIFACT.windowElementRates.mercury.nodeRateArcsecCy, dec:2, sep:',', infinity: 1e9 },{ small: 'years' }],
        hover : [`Mercury is in a Cassini state (MESSENGER): its spin axis precesses with the orbit's ascending node. Value = the chain's MEASURED window node rate (governed artifact windowElementRates, 1800–2100). Negative = retrograde. At J2000.`]},
+      ..._planetSpinRows('mercury', 'Mercury', { cassini: true }),
       {label : () => `Eccentricity Cycle (g-mode beat)`,
        value : [ { v: () => { const _s = _kcSecularShape('mercury'); return 1296000/Math.abs(_s.dom.arcsecPerYr - _s.sub.arcsecPerYr); }, dec:0, sep:',', infinity: 1e9 },{ small: 'years' }],
        hover : [`|e| wobble period = the beat of the two largest secular modes of Mercury's eccentricity vector (base mode × largest companion — the two rows below; the model's own N-body mode table, doc 109 §11). Replaces the retired law-loop beat of the device axial and ICRF periods.`]},
@@ -45886,6 +45942,7 @@ const planetStats = {
        highlight: true},
     null,
     {header : '—  Long-Period Cycles —' },
+      ..._planetSpinRows('venus', 'Venus', { retrograde: true, note: 'Closure at J2000: the derived pole rate against the measured 44.58 ± 3.3 ″/yr (Margot et al. 2021, whose C/MR² was inferred from that rate).' }),
       {label : () => `Eccentricity Cycle (g-mode beat)`,
        value : [ { v: () => { const _s = _kcSecularShape('venus'); return 1296000/Math.abs(_s.dom.arcsecPerYr - _s.sub.arcsecPerYr); }, dec:0, sep:',', infinity: 1e9 },{ small: 'years' }],
        hover : [`|e| wobble period = the beat of the two largest secular modes of Venus's eccentricity vector (base mode × largest companion — the two rows below; the model's own N-body mode table, doc 109 §11). Replaces the retired law-loop beat of the device axial and ICRF periods.`]},    null,
@@ -46201,6 +46258,7 @@ const planetStats = {
        highlight: true},
     null,
     {header : '—  Long-Period Cycles —' },
+      ..._planetSpinRows('mars', 'Mars', { note: 'Closure at J2000: the derived pole rate against the measured −7.606 ″/yr (Konopliv 2016, whose C/MR² was inferred from that rate) — within 0.1 %.' }),
       {label : () => `Eccentricity Cycle (g-mode beat)`,
        value : [ { v: () => { const _s = _kcSecularShape('mars'); return 1296000/Math.abs(_s.dom.arcsecPerYr - _s.sub.arcsecPerYr); }, dec:0, sep:',', infinity: 1e9 },{ small: 'years' }],
        hover : [`|e| wobble period = the beat of the two largest secular modes of Mars's eccentricity vector (base mode × largest companion — the two rows below; the model's own N-body mode table, doc 109 §11). Replaces the retired law-loop beat of the device axial and ICRF periods.`]},
@@ -46519,6 +46577,7 @@ const planetStats = {
        highlight: true},
     null,
     {header : '—  Long-Period Cycles —' },
+      ..._planetSpinRows('jupiter', 'Jupiter', { note: 'Prediction (gravity-constrained C/MR² 0.2639): α lands at the low end of Saillenfest et al. 2020\'s 2.64–3.17 ″/yr range; the spin is adjacent to the engine\'s own s7 line.' }),
       {label : () => `Eccentricity Cycle (g-mode beat)`,
        value : [ { v: () => { const _s = _kcSecularShape('jupiter'); return 1296000/Math.abs(_s.dom.arcsecPerYr - _s.sub.arcsecPerYr); }, dec:0, sep:',', infinity: 1e9 },{ small: 'years' }],
        hover : [`|e| wobble period = the beat of the two largest secular modes of Jupiter's eccentricity vector (base mode × largest companion — the two rows below; the model's own N-body mode table, doc 109 §11). Replaces the retired law-loop beat of the device axial and ICRF periods.`]},    null,
@@ -46834,6 +46893,7 @@ const planetStats = {
        highlight: true},
     null,
     {header : '—  Long-Period Cycles —' },
+      ..._planetSpinRows('saturn', 'Saturn', { note: 'Prediction (gravity-constrained C/MR² 0.2181): the derived pole rate lands ~11 % above the engine\'s own s8 line (the Ward–Hamilton capture); inside the WH04 libration band 0.2257–0.2438 it lands within 7 %.' }),
       {label : () => `Eccentricity Cycle (g-mode beat)`,
        value : [ { v: () => { const _s = _kcSecularShape('saturn'); return 1296000/Math.abs(_s.dom.arcsecPerYr - _s.sub.arcsecPerYr); }, dec:0, sep:',', infinity: 1e9 },{ small: 'years' }],
        hover : [`|e| wobble period = the beat of the two largest secular modes of Saturn's eccentricity vector (base mode × largest companion — the two rows below; the model's own N-body mode table, doc 109 §11). Replaces the retired law-loop beat of the device axial and ICRF periods.`]},    null,
@@ -47149,6 +47209,7 @@ const planetStats = {
        highlight: true},
     null,
     {header : '—  Long-Period Cycles —' },
+      ..._planetSpinRows('uranus', 'Uranus', { retrograde: true, note: 'C/MR² is the interior-model class (no measurement); the satellites\' quadrupole dominates J₂ and the period is of order 10⁸ yr.' }),
       {label : () => `Eccentricity Cycle (g-mode beat)`,
        value : [ { v: () => { const _s = _kcSecularShape('uranus'); return 1296000/Math.abs(_s.dom.arcsecPerYr - _s.sub.arcsecPerYr); }, dec:0, sep:',', infinity: 1e9 },{ small: 'years' }],
        hover : [`|e| wobble period = the beat of the two largest secular modes of Uranus's eccentricity vector (base mode × largest companion — the two rows below; the model's own N-body mode table, doc 109 §11). Replaces the retired law-loop beat of the device axial and ICRF periods.`]},    null,
@@ -47464,6 +47525,7 @@ const planetStats = {
        highlight: true},
     null,
     {header : '—  Long-Period Cycles —' },
+      ..._planetSpinRows('neptune', 'Neptune', { note: 'Starts from the MEAN pole (the 688-yr Triton-forced nutation is not in the channel): the J2000 obliquity reads 27.85°, 0.5° below the instantaneous IAU 28.32°. C/MR² is the interior-model class; Triton\'s retrograde orbit enters the angular-momentum term with its sign.' }),
       {label : () => `Eccentricity Cycle (g-mode beat)`,
        value : [ { v: () => { const _s = _kcSecularShape('neptune'); return 1296000/Math.abs(_s.dom.arcsecPerYr - _s.sub.arcsecPerYr); }, dec:0, sep:',', infinity: 1e9 },{ small: 'years' }],
        hover : [`|e| wobble period = the beat of the two largest secular modes of Neptune's eccentricity vector (base mode × largest companion — the two rows below; the model's own N-body mode table, doc 109 §11). Replaces the retired law-loop beat of the device axial and ICRF periods.`]},    null,

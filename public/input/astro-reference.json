@@ -299,6 +299,113 @@
     "jupiterObliquityJ2000Deg": 3.13,
     "saturnObliquityJ2000Deg": 26.73
   },
+  "planetSpinPhysical": {
+    "_description": "The planets' spin-channel INPUTS (plan 06 Phase 7, ex-K8b-3): each planet's degree-2 gravity, polar moment of inertia, IAU spin pole and rotation rate, and its regular satellites — the torque side of the precession constant α = (3/2)(n²/ω)(1−e²)^(−3/2)·(J₂+q)/(λ+l) (Ward & Hamilton 2004, AJ 128, 2501, eqs. 1–3: q = ½Σ(m_i/M)(a_i/R)², l = Σ(m_i/M)(a_i/R)²(n_i/ω)); the orbital side (a, e, mean motion, the orbit-plane history n̂(t)) is the model's own N-body chain and its deep ζ tables. ONE HOME: packages/physics/src/planets/spin-channel.cjs. MATCHED PAIRS: j2 is quoted at its source's reference radius j2ReferenceRadiusKm (J₂R² is the physical quantity; a_i/R uses the same radius). momentOfInertiaFactorClass names how λ = C/MR² was obtained — 'spin-inferred' (from the measured precession rate, so the channel's rate for that planet is a CLOSURE of the source, not an independent test), 'gravity-constrained' (interior models fitted to the measured J₂–J₆, independent of the spin), 'interior-model' (no measurement; a modelled class). rotationRateDegPerDay is the IAU W-dot, SIGNED (negative = retrograde rotation: Venus, Uranus); the channel spins on the angular-momentum direction = the IAU north pole times the sign. Satellite GM values are the ephemeris masses; only the regular satellites that matter for q enter (Mars's two are kept for completeness; retrograde Triton carries its sign in l). POLES are the J2000 spin direction the integration starts from, so they are the IAU expressions EVALUATED at J2000, not their constant terms: the 2015 Mars model writes the pole as a precession-cone centre (317.269202°, 54.432516°) plus a 1.59° circle term, which at J2000 evaluates to (317.681°, 52.887°) = the 2009 constants used here (NASA Mars fact sheet: 317.681, 52.887; obliquity to orbit 25.19°); Neptune's constant terms (299.36°, 43.46°) are the MEAN pole about which the 688-yr Triton-forced nutation (0.70° sin N, 0.51° cos N) turns — the channel integrates the secular precession only, so it starts from the mean pole and its J2000 obliquity (27.85°) is the mean-pole value, 0.5° below the instantaneous IAU tilt 28.32°. SOURCES — pole/rotation: IAU WGCCRE 2015 report (Archinal et al. 2018, CMDA 130, 22) as carried by NAIF pck00011.tpc; satellites: JPL SSD Planetary Satellite Physical Parameters (GM, ephemerides MAR097/JUP365/SAT441/URA111/NEP097) and Planetary Satellite Orbital Parameters (mean a, P); Mercury J₂ 5.03e-5 (Smith et al. 2012, Science 336, 214) and C/MR² 0.346 ± 0.014 (Margot et al. 2012, JGR 117, E00L09); Venus J₂ 4.4044e-6 at 6051 km (MGNP180U, Konopliv et al. 1999, Icarus 139, 3) and C/MR² 0.337 ± 0.024 inferred from the measured pole precession 44.58 ± 3.3 ″/yr (Margot et al. 2021, Nat. Astron. 5, 676); Mars J₂ 1.956608e-3 at 3396 km and C/MR² 0.3644 ± 0.0005 inferred from ψ̇ = −7608.3 ± 2.1 mas/yr (MRO120D, Konopliv et al. 2016, Icarus 274, 253); Jupiter J₂ 14696.572e-6 at 71492 km (Juno, Iess et al. 2018, Nature 555, 220) and C/MR² 0.26393 ± 0.00001 from the gravity-constrained CMS models (Militzer & Hubbard 2023, PSJ 4, 95; the empirical two-layer Juno fits of Ni 2018, A&A 613, A32, give 0.2749–0.2762 — kept as the alternative); Saturn J₂ 16290.573e-6 at 60330 km (Cassini Grand Finale, Iess et al. 2019, Science 364, eaat2965) and C/MR² 0.2181 ± 0.0002 (Militzer & Hubbard 2023; the s8-libration inference of Ward & Hamilton 2004 is 0.2257–0.2438 — kept as the alternative band); Uranus J₂ 3510.68e-6 at 25559 km (Jacobson 2014, AJ 148, 76) and Neptune J₂ 3408.43e-6 at 25225 km (Jacobson 2009, AJ 137, 4322), their C/MR² the interior-model class (Helled et al. 2011, ApJ 726, 15). Mercury is Cassini-locked (Margot et al. 2007, Science 316, 710): its spin follows the orbit node; the channel reports α_free/|s| as the lock statement and the shipped axial row stays the chain's node rate.",
+    "mercury": {
+      "j2": 5.03e-5,
+      "j2ReferenceRadiusKm": 2440.0,
+      "momentOfInertiaFactor": 0.346,
+      "momentOfInertiaFactorClass": "spin-inferred",
+      "rotationRateDegPerDay": 6.1385108,
+      "poleRaJ2000Deg": 281.0103,
+      "poleDecJ2000Deg": 61.4155,
+      "cassiniLocked": true,
+      "satellites": []
+    },
+    "venus": {
+      "j2": 4.4044e-6,
+      "j2ReferenceRadiusKm": 6051.0,
+      "momentOfInertiaFactor": 0.337,
+      "momentOfInertiaFactorClass": "spin-inferred",
+      "rotationRateDegPerDay": -1.4813688,
+      "poleRaJ2000Deg": 272.76,
+      "poleDecJ2000Deg": 67.16,
+      "cassiniLocked": false,
+      "satellites": []
+    },
+    "mars": {
+      "j2": 1.956608e-3,
+      "j2ReferenceRadiusKm": 3396.0,
+      "momentOfInertiaFactor": 0.3644,
+      "momentOfInertiaFactorClass": "spin-inferred",
+      "rotationRateDegPerDay": 350.891982443297,
+      "poleRaJ2000Deg": 317.68143,
+      "poleDecJ2000Deg": 52.8865,
+      "cassiniLocked": false,
+      "satellites": [
+        { "name": "Phobos", "gmKm3S2": 0.0007087, "semiMajorAxisKm": 9375, "orbitalPeriodDays": 0.3187 },
+        { "name": "Deimos", "gmKm3S2": 0.0000962, "semiMajorAxisKm": 23457, "orbitalPeriodDays": 1.2625 }
+      ]
+    },
+    "jupiter": {
+      "j2": 0.014696572,
+      "j2ReferenceRadiusKm": 71492.0,
+      "momentOfInertiaFactor": 0.26393,
+      "momentOfInertiaFactorClass": "gravity-constrained",
+      "momentOfInertiaFactorAlternative": 0.2756,
+      "rotationRateDegPerDay": 870.536,
+      "poleRaJ2000Deg": 268.056595,
+      "poleDecJ2000Deg": 64.495303,
+      "cassiniLocked": false,
+      "satellites": [
+        { "name": "Io", "gmKm3S2": 5959.91547, "semiMajorAxisKm": 421800, "orbitalPeriodDays": 1.762732 },
+        { "name": "Europa", "gmKm3S2": 3202.7121, "semiMajorAxisKm": 671100, "orbitalPeriodDays": 3.525463 },
+        { "name": "Ganymede", "gmKm3S2": 9887.83275, "semiMajorAxisKm": 1070400, "orbitalPeriodDays": 7.155588 },
+        { "name": "Callisto", "gmKm3S2": 7179.2834, "semiMajorAxisKm": 1882700, "orbitalPeriodDays": 16.69044 }
+      ]
+    },
+    "saturn": {
+      "j2": 0.016290573,
+      "j2ReferenceRadiusKm": 60330.0,
+      "momentOfInertiaFactor": 0.2181,
+      "momentOfInertiaFactorClass": "gravity-constrained",
+      "momentOfInertiaFactorAlternative": [0.2257, 0.2438],
+      "rotationRateDegPerDay": 810.7939024,
+      "poleRaJ2000Deg": 40.589,
+      "poleDecJ2000Deg": 83.537,
+      "cassiniLocked": false,
+      "satellites": [
+        { "name": "Mimas", "gmKm3S2": 2.50349, "semiMajorAxisKm": 186000, "orbitalPeriodDays": 0.942422 },
+        { "name": "Enceladus", "gmKm3S2": 7.21037, "semiMajorAxisKm": 238400, "orbitalPeriodDays": 1.370218 },
+        { "name": "Tethys", "gmKm3S2": 41.21353, "semiMajorAxisKm": 295000, "orbitalPeriodDays": 1.887802 },
+        { "name": "Dione", "gmKm3S2": 73.11607, "semiMajorAxisKm": 377700, "orbitalPeriodDays": 2.736916 },
+        { "name": "Rhea", "gmKm3S2": 153.94175, "semiMajorAxisKm": 527200, "orbitalPeriodDays": 4.517503 },
+        { "name": "Titan", "gmKm3S2": 8978.1371, "semiMajorAxisKm": 1221900, "orbitalPeriodDays": 15.945448 },
+        { "name": "Iapetus", "gmKm3S2": 120.51511, "semiMajorAxisKm": 3561700, "orbitalPeriodDays": 79.331002 }
+      ]
+    },
+    "uranus": {
+      "j2": 0.00351068,
+      "j2ReferenceRadiusKm": 25559.0,
+      "momentOfInertiaFactor": 0.225,
+      "momentOfInertiaFactorClass": "interior-model",
+      "rotationRateDegPerDay": -501.1600928,
+      "poleRaJ2000Deg": 257.311,
+      "poleDecJ2000Deg": -15.175,
+      "cassiniLocked": false,
+      "satellites": [
+        { "name": "Miranda", "gmKm3S2": 4.3, "semiMajorAxisKm": 129846, "orbitalPeriodDays": 1.413479 },
+        { "name": "Ariel", "gmKm3S2": 83.5, "semiMajorAxisKm": 190929, "orbitalPeriodDays": 2.520379 },
+        { "name": "Umbriel", "gmKm3S2": 85.1, "semiMajorAxisKm": 265986, "orbitalPeriodDays": 4.144177 },
+        { "name": "Titania", "gmKm3S2": 226.9, "semiMajorAxisKm": 436298, "orbitalPeriodDays": 8.705869 },
+        { "name": "Oberon", "gmKm3S2": 205.3, "semiMajorAxisKm": 583511, "orbitalPeriodDays": 13.463237 }
+      ]
+    },
+    "neptune": {
+      "j2": 0.00340843,
+      "j2ReferenceRadiusKm": 25225.0,
+      "momentOfInertiaFactor": 0.23,
+      "momentOfInertiaFactorClass": "interior-model",
+      "rotationRateDegPerDay": 541.1397757,
+      "poleRaJ2000Deg": 299.36,
+      "poleDecJ2000Deg": 43.46,
+      "cassiniLocked": false,
+      "satellites": [
+        { "name": "Triton", "gmKm3S2": 1428.49546, "semiMajorAxisKm": 354800, "orbitalPeriodDays": 5.876994, "retrograde": true },
+        { "name": "Proteus", "gmKm3S2": 2.58342, "semiMajorAxisKm": 117600, "orbitalPeriodDays": 1.122315 }
+      ]
+    }
+  },
   "ascendingNodesSouamiSouchay": {
     "_description": "Raw ascending nodes on invariable plane from Souami & Souchay (2012) Table 2. invariablePlaneOnEclipticDeg is the PLANE's own ascending node on the ecliptic (107°34'56\" — docs/05), consumed only by the model-values registry.",
     "invariablePlaneOnEclipticDeg": 107.582,

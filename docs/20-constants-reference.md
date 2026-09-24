@@ -72,6 +72,7 @@ measurements taken as-is:
 | One J2000 heliocentric state (positions + velocities, all eight planets) | JPL Horizons vectors, one epoch |
 | Mass ratios | JPL DE440 |
 | Relativistic correction | 1PN, standard form |
+| The planets' spin inputs — J₂ (at its source's reference radius), C/MR² (class named: gravity-constrained / spin-inferred / interior-model), the IAU J2000 pole and signed rotation rate, the regular satellites' GM and orbits | `astro-reference.json` `planetSpinPhysical` (cited per value in its `_description`); the precession constant is DERIVED from them in `planets/spin-channel.cjs` (plan 06 Phase 7) |
 
 Everything downstream — the element chains, the secular g/s mode tables,
 the 405.6-kyr eccentricity metronome, the obliquity hybrid — is derived

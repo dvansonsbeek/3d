@@ -189,5 +189,28 @@ export function assembleModel(C: Readonly<Record<string, any>>, F: Readonly<Reco
         perihelionLongitudeDeg: (k: string, year: number) => number;
         ascendingNodeInvPlaneDeg: (k: string, year: number) => number;
         invPlaneInclinationDeg: (k: string, year: number) => number;
+        spin: (k: string) => Readonly<{
+            key: string;
+            cassiniLocked: boolean;
+            momentOfInertiaFactor: number;
+            momentOfInertiaFactorClass: string;
+            alphaArcsecPerYr: number;
+            satelliteQuadrupole: number;
+            satelliteAngularMomentum: number;
+            spinRetrograde: boolean;
+            meanMotionRadPerYr: number;
+            obliquityJ2000Deg: number;
+            spinPrecessionRateArcsecPerYrJ2000: number | null;
+            axialPrecessionPeriodYearsJ2000: number | null;
+            obliquityDegAtYear: (year: number) => number | null;
+            spinPrecessionRateArcsecPerYrAtYear: (year: number) => number | null;
+            obliquityEnvelopeDeg: (year: number, spanYr: number) => {
+                minDeg: number;
+                meanDeg: number;
+                maxDeg: number;
+            } | null;
+            stepYr: 25;
+            maxSpanYr: 10000000;
+        }>;
     }>;
 }>;

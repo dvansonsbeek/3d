@@ -168,6 +168,10 @@ const MIGRATED = [
   'model.planets',
   'astro.planetOrbitalElements',
   'model.perihelionPassageRef',
+  // Plan 06 Phase 7 — the planets' spin inputs. script.js never held them: the
+  // browser reads the derived channel through the package model
+  // (createModel().planets.spin), so every leaf is migrated by construction.
+  'astro.planetSpinPhysical',
 
   // Phase 5f block 9 — DE440 mass ratios, deep-time alphas and tapers, the two
   // Earth eccentricity anchors, and the four additional bodies.

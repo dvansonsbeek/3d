@@ -93,7 +93,20 @@ function measure() {
     v[`${tag}.epsOneSourceDeg`] = oneSource && inWindow ? num(oneSource.epsDeg(year)) : null;
     v[`${tag}.epsLawDeg`] = num(m.earth.obliquityCombDeg(year));   // the K comb (device) — the published ε is the hybrid since S3b
     v[`${tag}.perihelionLongitudeDeg`] = num(m.earth.perihelionLongitudeDeg(year));
+    // plan 06 Phase 7 — the planets' spin channel (own torques on the own ζ
+    // plane history; null beyond ±10 Myr, so the deep anchors record null)
+    for (const p of m.planets.keys) {
+      const s = m.planets.spin(p);
+      v[`${tag}.spin.${p}.obliquityDeg`] = num(s.obliquityDegAtYear(year));
+      v[`${tag}.spin.${p}.precessionRateArcsecPerYr`] = num(s.spinPrecessionRateArcsecPerYrAtYear(year));
+    }
   };
+  // the spin channel's J2000 constants (the derived α and the derived J2000 obliquity)
+  for (const p of m.planets.keys) {
+    const s = m.planets.spin(p);
+    v[`spin.${p}.alphaArcsecPerYr`] = num(s.alphaArcsecPerYr);
+    v[`spin.${p}.obliquityJ2000Deg`] = num(s.obliquityJ2000Deg);
+  }
 
   for (const y of WANDER_YEARS) row(`wander@${y}`, y);
   for (const ma of DEEP_AGES_MA) {

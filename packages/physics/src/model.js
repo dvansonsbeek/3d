@@ -25,6 +25,7 @@ import { createYearLengths, ONE_FAMILY_WINDOW_YEARS } from './earth/year-lengths
 import { createDeepOrbitalHistory } from './earth/deep-orbital-history.cjs';
 import { CHAIN_ARTIFACT } from './planets/chain-artifact.js';
 import { buildPlanetChainsFromArtifactData, computeApsidalSecularDegPerYr } from './planets/keplerian-chain.cjs';
+import { createPlanetSpinChannel } from './planets/spin-channel.cjs';
 import { createDeltaTCycles } from './deltat/cycles.cjs';
 import { createDeepTimeLod } from './deltat/deep-time.cjs';
 import { createMoonRecessionHistory, createSolarChannelBudget } from './deltat/recession-history.cjs';
@@ -772,6 +773,36 @@ export function assembleModel(C, F, laws = {}, secularSeriesArtifact = /** @type
       axialTiltJ2000: ar.axialTiltJ2000,
     });
   }
+
+  // ── The planets' spin channel (plan 06 Phase 7): the precession constant
+  // from each planet's OWN torques (astro-reference planetSpinPhysical) on the
+  // model's OWN orbit — the chain's J2000 a/e/plane and the deep ζ table —
+  // integrated as dŝ/dt = α(ŝ·n̂)(ŝ×n̂) from the IAU J2000 pole. ONE home:
+  // planets/spin-channel.cjs; built lazily per planet, pure in `year`.
+  /** @type {Map<string, ReturnType<typeof createPlanetSpinChannel>>} */
+  const spinChannels = new Map();
+  /** @param {string} k */
+  const planetSpin = (k) => {
+    if (!PLANET_KEYS.includes(k)) throw new Error(`planets.spin: unknown planet '${k}'`);
+    let ch = spinChannels.get(k);
+    if (!ch) {
+      const A = /** @type {any} */ (CHAIN_ARTIFACT).j2000AnchorElements[k];
+      ch = createPlanetSpinChannel({
+        key: k,
+        spin: C.planetSpinPhysical[k],
+        zetaModes: /** @type {any} */ (DEEP_MODES_ARTIFACT).planetZeta[k],
+        anchorInclEclipticDeg: A.inclEclipticDeg,
+        anchorAscNodeEclipticDeg: A.ascNodeEclipticDeg,
+        semiMajorAxisAU: A.aAU,
+        eccentricity: A.e,
+        massFractionOfSun: massFraction[k],
+        gmSunKm3S2: GM_SUN,
+        obliquityJ2000Deg: C.earthOrbital.obliquityJ2000_deg,
+      });
+      spinChannels.set(k, ch);
+    }
+    return ch;
+  };
 
   /** Perihelion longitude (linear lattice rate). @param {string} k @param {number} year @returns {number} */
   const planetPerihelionDeg = (k, year) => {
@@ -1577,6 +1608,7 @@ export function assembleModel(C, F, laws = {}, secularSeriesArtifact = /** @type
       perihelionLongitudeDeg: planetPerihelionDeg,
       ascendingNodeInvPlaneDeg: planetAscNodeDeg,
       invPlaneInclinationDeg: planetInclinationDeg,
+      spin: planetSpin,
     }),
   });
 }

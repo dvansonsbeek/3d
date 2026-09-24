@@ -799,6 +799,59 @@ response near resonances, never true chaotic diffusion — the full
 Laskar–Robutel wandering is a statement about the class, not
 reproduced pointwise.
 
+### 19a. Phase 7 — the derived spin channel (plan 06)
+
+The landscape above judged CITED spin constants against the engine's
+lines. Plan 06 Phase 7 closes the circle: each planet's precession
+constant is now DERIVED from its own torques, the way the Earth channel
+composes its rate from the solar and lunar torques. ONE home:
+`packages/physics/src/planets/spin-channel.cjs`, read through
+`createModel().planets.spin(k)`.
+
+**The construction.** α = (3/2)(n²/ω)(1 − e²)^(−3/2)·(J₂ + q)/(λ + l) with
+q = ½Σ(m_i/M)(a_i/R)² and l = Σ(m_i/M)(a_i/R)²(n_i/ω) (Ward & Hamilton
+2004, eqs. 1–3) — J₂ at its source's reference radius, λ = C/MR², the
+signed IAU rotation rate, the regular satellites' GM and mean orbits
+(`astro-reference.json` `planetSpinPhysical`, every value cited in its
+`_description`); n, a and e from the chain's J2000 anchor elements
+(n² a³ = GM☉(1 + μ)). The spin then rides dŝ/dt = α(ŝ·n̂)(ŝ×n̂) on the
+planet's OWN deep ζ plane history, from the IAU J2000 pole in the
+angular-momentum sense — so the J2000 obliquity to the orbit is a derived
+angle, the first check of every row. Values are pure in `year`
+(append-only trajectories from J2000, 25-yr RK4 steps, ±10 Myr domain).
+
+**What the numbers mean.** The moment of inertia carries the epistemic
+class: `spin-inferred` (Mars, Venus, Mercury — the source inferred C/MR²
+from the measured precession rate, so the channel's rate is a CLOSURE of
+that inference through the model's own orbit), `gravity-constrained`
+(Jupiter, Saturn — interior models fitted to the measured J₂–J₆, so the
+rate is a prediction), `interior-model` (Uranus, Neptune — no measurement
+to close against). Read the live values from the registry keys
+`<planet>SpinAlphaDerivedArcsecPerYr`, `<planet>SpinPrecDerivedArcsecPerYr`,
+`<planet>AxialPrecessionPeriodDerivedYr`, `<planet>ObliquityJ2000DerivedDeg`,
+`<planet>ObliquityBand{Min,Max}Deg`, and the verdict keys
+`marsSpinPrecClosurePct`, `venusSpinPrecClosurePct`, `saturnSpinPrecVsS8Pct`,
+`jupiterSpinAlphaVsSaillenfestLowPct`, `mercurySpinFreeToNodeRatio` —
+**never from prose**. The gate `test:spin-channel` (fail-proven on a 1 % J₂
+plant) pins: every derived J2000 obliquity on the IAU tilt to 0.02° (Neptune
+against its mean-pole value — the channel starts from the mean pole, the
+688-yr Triton nutation is not in it); the Mars closure to 0.3 % and the
+Venus closure inside Margot 2021's 1σ; Saturn's derived pole rate on the
+engine's own s8 within 15 % at the gravity-constrained C/MR² (inside the
+Ward–Hamilton libration band it lands within 7 % — the lock is what fixed
+their inference of Saturn's moment, and the channel reproduces that
+reasoning on our own line); Mercury's free α at ~150× its node rate (the
+Cassini lock as a statement of the model's own numbers; the shipped axial
+row stays the chain's node rate); visit-order purity.
+
+**A band, not a cycle.** The channel publishes each planet's obliquity
+envelope over ±1 Myr rather than an "obliquity cycle": on the
+quasi-periodic ζ tables Mars reads the Laskar–Robutel class as an envelope
+(≈13–35°), Jupiter, Saturn, Uranus and Neptune stay within a few degrees.
+The retired device rows (`axialPrecessionFraction`, `obliquityCycleFraction`
+— integer fractions of the anchor unit) leave the planet panels with this
+channel; their fields retire in the follow-up commit.
+
 ## 20. The invariable-plane node origin — derived, not fitted (K5c closure)
 
 Two longitude origins live on the engine's own invariable plane. The K5c

@@ -445,7 +445,22 @@ const BLOCKS_CHAIN5 = {
   'calcmap-cardinal-spread': blockCardinalSpread,
 };
 
+/** Chain 6 — the planets' spin channel (plan 06 Phase 7): the derived constants per planet. */
+function blockPlanetSpin() {
+  const rows = [
+    '| planet | λ = C/MR² (class) | q | l | α ″/yr | ε₀ derived ° | ψ̇₀ ″/yr | T₀ yr | band ±1 Myr ° |',
+    '|---|---|---|---|---|---|---|---|---|',
+  ];
+  for (const k of m.planets.keys) {
+    const s = m.planets.spin(k);
+    const band = s.obliquityEnvelopeDeg(2000, 1_000_000);
+    rows.push(`| ${k} | ${s.momentOfInertiaFactor} (${s.momentOfInertiaFactorClass}) | ${e(s.satelliteQuadrupole, 2)} | ${e(s.satelliteAngularMomentum, 2)} | ${f(s.alphaArcsecPerYr, 4)} | ${f(s.obliquityJ2000Deg, 3)} | ${s.cassiniLocked ? 'Cassini-locked (node rate)' : f(s.spinPrecessionRateArcsecPerYrJ2000, 4)} | ${s.cassiniLocked ? '—' : Math.round(s.axialPrecessionPeriodYearsJ2000).toLocaleString('en-US')} | ${s.cassiniLocked ? '—' : `${f(band.minDeg, 2)}–${f(band.maxDeg, 2)}`} |`);
+  }
+  return rows.join('\n');
+}
+
 const BLOCKS = {
+  'calcmap-planet-spin': blockPlanetSpin,
   'calcmap-e-chain-values': blockEChain,
   'calcmap-kpl': blockKpl,
   'calcmap-lunar-periods': blockLunarPeriods,

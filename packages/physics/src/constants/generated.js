@@ -33,7 +33,7 @@
  * carry it so a counterfactual is reproducible (§2d).
  * @type {string}
  */
-export const CONSTANTS_HASH = "2f0bb1d372d35ed9";
+export const CONSTANTS_HASH = "e494df9692e192e4";
 
 /** Model version label — single source: public/input/model-version.json (§10 two-axis scheme). */
 export const MODEL_VERSION = "v14.0";
@@ -43,7 +43,7 @@ export const PREPRINT_DOI = "10.21203/rs.3.rs-8758810/v4";
 
 /** @type {Readonly<Record<string, unknown>>} */
 export const DEFAULT_CONSTANTS = Object.freeze({
-  hash: "2f0bb1d372d35ed9",
+  hash: "e494df9692e192e4",
   additionalBodies: {
     "pluto": {
       "name": "Pluto",
@@ -428,6 +428,216 @@ export const DEFAULT_CONSTANTS = Object.freeze({
       "meanAnomaly": 262.5003424,
       "trueAnomaly": 261.2242728,
       "rotationPeriodDays": 0.671300001591743
+    }
+  },
+  planetSpinPhysical: {
+    "mercury": {
+      "j2": 0.0000503,
+      "j2ReferenceRadiusKm": 2440,
+      "momentOfInertiaFactor": 0.346,
+      "momentOfInertiaFactorClass": "spin-inferred",
+      "rotationRateDegPerDay": 6.1385108,
+      "poleRaJ2000Deg": 281.0103,
+      "poleDecJ2000Deg": 61.4155,
+      "cassiniLocked": true,
+      "satellites": []
+    },
+    "venus": {
+      "j2": 0.0000044044,
+      "j2ReferenceRadiusKm": 6051,
+      "momentOfInertiaFactor": 0.337,
+      "momentOfInertiaFactorClass": "spin-inferred",
+      "rotationRateDegPerDay": -1.4813688,
+      "poleRaJ2000Deg": 272.76,
+      "poleDecJ2000Deg": 67.16,
+      "cassiniLocked": false,
+      "satellites": []
+    },
+    "mars": {
+      "j2": 0.001956608,
+      "j2ReferenceRadiusKm": 3396,
+      "momentOfInertiaFactor": 0.3644,
+      "momentOfInertiaFactorClass": "spin-inferred",
+      "rotationRateDegPerDay": 350.891982443297,
+      "poleRaJ2000Deg": 317.68143,
+      "poleDecJ2000Deg": 52.8865,
+      "cassiniLocked": false,
+      "satellites": [
+        {
+          "name": "Phobos",
+          "gmKm3S2": 0.0007087,
+          "semiMajorAxisKm": 9375,
+          "orbitalPeriodDays": 0.3187
+        },
+        {
+          "name": "Deimos",
+          "gmKm3S2": 0.0000962,
+          "semiMajorAxisKm": 23457,
+          "orbitalPeriodDays": 1.2625
+        }
+      ]
+    },
+    "jupiter": {
+      "j2": 0.014696572,
+      "j2ReferenceRadiusKm": 71492,
+      "momentOfInertiaFactor": 0.26393,
+      "momentOfInertiaFactorClass": "gravity-constrained",
+      "momentOfInertiaFactorAlternative": 0.2756,
+      "rotationRateDegPerDay": 870.536,
+      "poleRaJ2000Deg": 268.056595,
+      "poleDecJ2000Deg": 64.495303,
+      "cassiniLocked": false,
+      "satellites": [
+        {
+          "name": "Io",
+          "gmKm3S2": 5959.91547,
+          "semiMajorAxisKm": 421800,
+          "orbitalPeriodDays": 1.762732
+        },
+        {
+          "name": "Europa",
+          "gmKm3S2": 3202.7121,
+          "semiMajorAxisKm": 671100,
+          "orbitalPeriodDays": 3.525463
+        },
+        {
+          "name": "Ganymede",
+          "gmKm3S2": 9887.83275,
+          "semiMajorAxisKm": 1070400,
+          "orbitalPeriodDays": 7.155588
+        },
+        {
+          "name": "Callisto",
+          "gmKm3S2": 7179.2834,
+          "semiMajorAxisKm": 1882700,
+          "orbitalPeriodDays": 16.69044
+        }
+      ]
+    },
+    "saturn": {
+      "j2": 0.016290573,
+      "j2ReferenceRadiusKm": 60330,
+      "momentOfInertiaFactor": 0.2181,
+      "momentOfInertiaFactorClass": "gravity-constrained",
+      "momentOfInertiaFactorAlternative": [
+        0.2257,
+        0.2438
+      ],
+      "rotationRateDegPerDay": 810.7939024,
+      "poleRaJ2000Deg": 40.589,
+      "poleDecJ2000Deg": 83.537,
+      "cassiniLocked": false,
+      "satellites": [
+        {
+          "name": "Mimas",
+          "gmKm3S2": 2.50349,
+          "semiMajorAxisKm": 186000,
+          "orbitalPeriodDays": 0.942422
+        },
+        {
+          "name": "Enceladus",
+          "gmKm3S2": 7.21037,
+          "semiMajorAxisKm": 238400,
+          "orbitalPeriodDays": 1.370218
+        },
+        {
+          "name": "Tethys",
+          "gmKm3S2": 41.21353,
+          "semiMajorAxisKm": 295000,
+          "orbitalPeriodDays": 1.887802
+        },
+        {
+          "name": "Dione",
+          "gmKm3S2": 73.11607,
+          "semiMajorAxisKm": 377700,
+          "orbitalPeriodDays": 2.736916
+        },
+        {
+          "name": "Rhea",
+          "gmKm3S2": 153.94175,
+          "semiMajorAxisKm": 527200,
+          "orbitalPeriodDays": 4.517503
+        },
+        {
+          "name": "Titan",
+          "gmKm3S2": 8978.1371,
+          "semiMajorAxisKm": 1221900,
+          "orbitalPeriodDays": 15.945448
+        },
+        {
+          "name": "Iapetus",
+          "gmKm3S2": 120.51511,
+          "semiMajorAxisKm": 3561700,
+          "orbitalPeriodDays": 79.331002
+        }
+      ]
+    },
+    "uranus": {
+      "j2": 0.00351068,
+      "j2ReferenceRadiusKm": 25559,
+      "momentOfInertiaFactor": 0.225,
+      "momentOfInertiaFactorClass": "interior-model",
+      "rotationRateDegPerDay": -501.1600928,
+      "poleRaJ2000Deg": 257.311,
+      "poleDecJ2000Deg": -15.175,
+      "cassiniLocked": false,
+      "satellites": [
+        {
+          "name": "Miranda",
+          "gmKm3S2": 4.3,
+          "semiMajorAxisKm": 129846,
+          "orbitalPeriodDays": 1.413479
+        },
+        {
+          "name": "Ariel",
+          "gmKm3S2": 83.5,
+          "semiMajorAxisKm": 190929,
+          "orbitalPeriodDays": 2.520379
+        },
+        {
+          "name": "Umbriel",
+          "gmKm3S2": 85.1,
+          "semiMajorAxisKm": 265986,
+          "orbitalPeriodDays": 4.144177
+        },
+        {
+          "name": "Titania",
+          "gmKm3S2": 226.9,
+          "semiMajorAxisKm": 436298,
+          "orbitalPeriodDays": 8.705869
+        },
+        {
+          "name": "Oberon",
+          "gmKm3S2": 205.3,
+          "semiMajorAxisKm": 583511,
+          "orbitalPeriodDays": 13.463237
+        }
+      ]
+    },
+    "neptune": {
+      "j2": 0.00340843,
+      "j2ReferenceRadiusKm": 25225,
+      "momentOfInertiaFactor": 0.23,
+      "momentOfInertiaFactorClass": "interior-model",
+      "rotationRateDegPerDay": 541.1397757,
+      "poleRaJ2000Deg": 299.36,
+      "poleDecJ2000Deg": 43.46,
+      "cassiniLocked": false,
+      "satellites": [
+        {
+          "name": "Triton",
+          "gmKm3S2": 1428.49546,
+          "semiMajorAxisKm": 354800,
+          "orbitalPeriodDays": 5.876994,
+          "retrograde": true
+        },
+        {
+          "name": "Proteus",
+          "gmKm3S2": 2.58342,
+          "semiMajorAxisKm": 117600,
+          "orbitalPeriodDays": 1.122315
+        }
+      ]
     }
   },
   planets: {

@@ -204,6 +204,12 @@ const CLASSIFICATION = {
     // Observed planetary spin-precession constants + obliquities (C-4 spin/
     // Cassini landscape citations, doc 109 §19) — comparison targets only.
     planetSpinObserved: 'target',
+    // The planets' spin-channel INPUTS (plan 06 Phase 7): J₂, C/MR², the IAU
+    // pole and rotation rate, the regular satellites. Measured reality the
+    // precession constant is DERIVED from (planets/spin-channel.cjs), so a
+    // counterfactual over them is legitimate ("what if Saturn's moment of
+    // inertia were the Ward–Hamilton band") — anchor, like planetOrbitalElements.
+    planetSpinPhysical: 'anchor',
     // Cox & Chao dJ2/dt + Peltier factor — citation inputs of the shipped
     // alphaClimateScale calibration; consumed only by the registry.
     giaCoxChaoPeltier: 'target',

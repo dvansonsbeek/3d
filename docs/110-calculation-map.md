@@ -826,3 +826,59 @@ Retired device's RA formula constants (the record; since R1 the shipped RA is th
    while JD_X integrates SI days — 365.243888 vs 365.243182 d at −10000
    (61 s), equal at J2000 to the 118 ms fit-basis gap. A displayed rate
    must name its window; a displayed length must name its day.
+
+---
+
+## Chain 6 — the planets' spin channel (plan 06 Phase 7)
+
+The Earth channel (chain 2.3) composes ψ̇ from the solar and lunar torques
+on the recession history. Chain 6 is the same question for the seven
+planets: the precession constant from each planet's OWN quadrupole and spin
+with its regular satellites, on the model's OWN orbit and orbit-plane
+history. Engine: the orbital dynamics engine's chain and ζ tables + the
+cited spin inputs. H-role: **—** (H does not enter; the retired device rows
+were **L**).
+
+### 6.1 The formula and its inputs
+
+| step | formula | inputs | code |
+|---|---|---|---|
+| precession constant | α = (3/2)(n²/ω)(1 − e²)^(−3/2)·(J₂ + q)/(λ + l) | J₂ at its reference radius, λ = C/MR², ω from the signed IAU rotation rate (`astro-reference.json` `planetSpinPhysical`); n = 2π√((1 + μ)/a³) and e from the chain's J2000 anchor elements | `packages/physics/src/planets/spin-channel.cjs` `computePlanetPrecessionConstant` |
+| satellite terms | q = ½Σ(m_i/M)(a_i/R)², l = Σ(m_i/M)(a_i/R)²(n_i/ω) | satellite GM and mean orbits (JPL SSD), M = the DE440 system GM minus the satellites; a_i at the same reference radius as J₂ | same |
+| the spin | dŝ/dt = α(ŝ·n̂)(ŝ×n̂), ŝ(J2000) = the IAU pole × sign(ω) | the planet's deep ζ table anchored at the chain's J2000 plane; the IAU J2000 pole (ecliptic J2000 via ε₀) | `createPlanetSpinChannel` (RK4, 25-yr steps, ±10 Myr) |
+| obliquity, rate, period | ε(t) = acos(ŝ·n̂); ψ̇ = −α cos ε(t); T = 2π/\|ψ̇\| | — | `obliquityDegAtYear`, `spinPrecessionRateArcsecPerYrAtYear`, `axialPrecessionPeriodYearsJ2000` |
+
+Type: α and the J2000 rate are **B** (present-epoch); the band is a **C**
+window statement over ±1 Myr. The moment of inertia's class travels with
+the row: spin-inferred (a closure), gravity-constrained (a prediction),
+interior-model (unmeasured).
+
+### 6.2 Live values — the spreadsheet check
+
+<!-- generated:calcmap-planet-spin -->
+| planet | λ = C/MR² (class) | q | l | α ″/yr | ε₀ derived ° | ψ̇₀ ″/yr | T₀ yr | band ±1 Myr ° |
+|---|---|---|---|---|---|---|---|---|
+| mercury | 0.346 (spin-inferred) | 0.00e+0 | 0.00e+0 | 834.6774 | 0.034 | Cassini-locked (node rate) | — | — |
+| venus | 0.337 (spin-inferred) | 0.00e+0 | 0.00e+0 | 44.6713 | 177.362 | 44.6240 | 29,043 | 177.23–178.52 |
+| mars | 0.3644 (spin-inferred) | 1.17e-7 | 4.93e-7 | 8.3985 | 25.192 | -7.5997 | 170,532 | 13.12–34.56 |
+| jupiter | 0.26393 (gravity-constrained) | 3.03e-2 | 2.63e-3 | 2.6497 | 3.120 | -2.6457 | 489,843 | 2.59–3.93 |
+| saturn | 0.2181 (gravity-constrained) | 5.43e-2 | 2.82e-3 | 0.8625 | 26.731 | -0.7703 | 1,682,466 | 26.38–28.53 |
+| uranus | 0.225 (interior-model) | 1.61e-2 | 2.44e-3 | 0.0466 | 97.770 | 0.0063 | 205,646,752 | 95.82–98.04 |
+| neptune | 0.23 (interior-model) | 2.07e-2 | -4.68e-3 | 0.0139 | 27.848 | -0.0123 | 105,623,757 | 26.47–28.02 |
+<!-- /generated:calcmap-planet-spin -->
+
+### 6.3 Findings from this chain (to act on)
+
+1. **Rate against rate.** A precession constant α is not a pole rate; the
+   observable is ψ̇ = −α cos ε. A first comparison of α with Saturn's
+   long-term pole rate read "+34 %" where rate-vs-rate reads +11 % at the
+   gravity-constrained C/MR² and within 7 % inside the Ward–Hamilton band.
+2. **The pole is the evaluated IAU expression, not its constant term.** The
+   2015 Mars model writes the pole as a precession-cone centre plus a 1.59°
+   circle; its constant terms alone put the obliquity at 23.9° against the
+   IAU 25.19°. Neptune's constants are the mean pole (the channel's start),
+   0.5° from the instantaneous tilt through the Triton nutation.
+3. **Closures are not tests.** Where C/MR² was inferred from the measured
+   precession (Mars, Venus, Mercury), reproducing the rate verifies the
+   formula and the model's own a, e, n — not the moment. The predictions
+   are Jupiter and Saturn.

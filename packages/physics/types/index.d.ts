@@ -70,6 +70,7 @@ export { computeEarthFrameOfDate, solveWheelAngleForLongitude } from "./earth/fr
 export { eccentricityFromCycles, computeEccentricityIntegrated } from "./planets/ecc-channel.cjs";
 export { buildPlanetChainsFromArtifactData, computePlanetElementsAtYear, computeHeliocentricEclipticFromElements, computePoissonArgRad, computeOsculatingElements, solveKeplerRad, computeApsidalSecularDegPerYr, ANCHOR_EPOCH_YEAR, ANCHOR_EPOCH_JD } from "./planets/keplerian-chain.cjs";
 export { computeEquatorNodeOriginSFrameDeg, convertNodeSFrameToEquatorOriginDeg } from "./planets/inv-plane-frame.cjs";
+export { computePlanetPrecessionConstant, createPlanetSpinChannel } from "./planets/spin-channel.cjs";
 export { CHAIN_ARTIFACT, CHAIN_ARTIFACT_HASH } from "./planets/chain-artifact.js";
 export { DEEP_MODES_ARTIFACT, DEEP_MODES_ARTIFACT_HASH } from "./moon/deep-modes-artifact.cjs";
 export { createYearLengths, ONE_FAMILY_WINDOW_YEARS } from "./earth/year-lengths.cjs";

@@ -1,6 +1,6 @@
 {
   "name": "@essrt/physics",
-  "version": "8.0.0",
+  "version": "8.1.0",
   "description": "ESSRT (Expanding Solar System Resonance Theory) physics core — pure, injectable-constants, no I/O, no globals, no DOM. The complete model incl. fitted coefficients; every published version immutably ships one recorded model identity.",
   "essrt": {
     "modelVersion": "v14.0",
@@ -55,6 +55,7 @@
     "./planets/asc-node-integrator": { "types": "./types/planets/asc-node-integrator.d.cts", "default": "./src/planets/asc-node-integrator.cjs" },
     "./planets/orbit-chain": { "types": "./types/planets/orbit-chain.d.cts", "default": "./src/planets/orbit-chain.cjs" },
     "./planets/keplerian-chain": { "types": "./types/planets/keplerian-chain.d.cts", "default": "./src/planets/keplerian-chain.cjs" },
+    "./planets/spin-channel": { "types": "./types/planets/spin-channel.d.cts", "default": "./src/planets/spin-channel.cjs" },
     "./planets/inv-plane-frame": { "types": "./types/planets/inv-plane-frame.d.cts", "default": "./src/planets/inv-plane-frame.cjs" },
     "./planets/secular-series": { "types": "./types/planets/secular-series.d.cts", "default": "./src/planets/secular-series.cjs" },
     "./planets/model": { "types": "./types/planets/model.d.cts", "default": "./src/planets/model.cjs" },
