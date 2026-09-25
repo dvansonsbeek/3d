@@ -4410,14 +4410,10 @@ function meanAnomalisticMonthAtAge(t_Ma) { return _moonChain().anomalisticMonthS
 /** Moon nodal (draconic) month in seconds. */
 function meanNodalMonthAtAge(t_Ma) { return _moonChain().nodalMonthSecondsAtAge(t_Ma); }
 
-// ───── Anomalistic year + stellar/sidereal days ─────
-/** Anomalistic year in seconds (Fibonacci coupling H/(H−16)). */
-function meanAnomalisticYearSecondsAtAge(t_Ma) {
-  const H_t      = meanHAtAge(t_Ma);
-  const T_sid_s  = meanSiderealYearSecondsAtAge(t_Ma);
-  const T_trop_s = T_sid_s * (H_t - 13) / H_t;
-  return T_trop_s * H_t / (H_t - 16);
-}
+// ───── Stellar/sidereal days ─────
+// (The retired integer-law anomalistic year, T_trop·H/(H−16), lived here;
+// the anomalistic year of date has ONE home — the year-lengths factory's
+// construction on the chain's apsidal tangent, _yearLengthsM().)
 
 /** Stellar day in seconds (Earth rotation vs fixed stars). */
 function meanStellarDayAtAge(t_Ma) {
@@ -19774,28 +19770,24 @@ const VFP_CATEGORIES = [
     // ── Anomalistic Year (owner-requested, after Sidereal Year): perihelion
     // to perihelion, of date. ONE home — the year-lengths factory's secular
     // mean-element construction on the chain's apsidal tangent (the rate
-    // family the Precession Periods panel shows), λ̇-corrected; the frozen
-    // era clock's H/(H − 16) coupling is the clickable device line.
+    // family the Precession Periods panel shows), λ̇-corrected. NaN before the
+    // series has loaded (the cardinal panels' rule); no device line — the
+    // retired integer-law year (T_trop·H/(H−16)) is gone with its evaluator.
     id: 'anomalistic-year', group: 'Earth clock', label: 'Anomalistic Year', unit: ' days', precision: 9,
-    defaultRef: 'Meeus (1998), derived',
     frame: 'Anomalistic year (SI days of 86,400 s), perihelion to perihelion, of date',
     yLabel: 'days',
     residualLabel: 'seconds', residualScale: 86400,
     paperTitle: 'Anomalistic Year Comparison',
     model: { name: 'This model', color: '#f0b040',
-      fn: year => _hybridSpinActive()
-        ? _yearLengthsM().anomalisticYearSecondsAtYear(year) / 86400
-        : meanAnomalisticYearSecondsAtAge((startmodelYear - year) / 1e6) / 86400 },
+      fn: year => _hybridSpinActive() ? _yearLengthsM().anomalisticYearSecondsAtYear(year) / 86400 : NaN },
     references: [
       { name: 'Meeus (1998), derived', color: '#4fc3f7', fn: anomalisticYearMeeusDerived, validYears: [-10000, 10000], sourceUrl: 'https://ui.adsabs.harvard.edu/abs/2003A%26A...412..567C' },
-      { name: 'This model — H/(H − 16) counter (device)', color: '#ce93d8',
-        fn: year => meanAnomalisticYearSecondsAtAge((startmodelYear - year) / 1e6) / 86400 },
     ],
     j2000extras: [
       { name: 'IAU (observed)', color: '#ef5350',
         value: () => ASTRO_REFERENCE.anomalisticYearJ2000 },
     ],
-    reading: 'The anomalistic year exceeds the sidereal year by T·ϖ̇/360 — about 4.7 minutes today — and that excess follows the perihelion’s sidereal motion, so the curve swings with the eccentricity cycle: slow perihelion motion near eccentricity maxima, fast near the minima; it is the Perihelion Precession panel read in year units. The model line is the secular mean-element construction on the chain’s apsidal tangent, the same rate family the Precession Periods panel shows, λ̇-corrected. The clickable second line is the frozen era clock’s H/(H − 16) coupling, a device. Meeus’s line is Chapront’s sidereal year with the Table 31.B perihelion rate in the J2000 ecliptic frame, the sidereal motion the definition needs.',
+    reading: 'The anomalistic year exceeds the sidereal year by T·ϖ̇/360 — about 4.7 minutes today — and that excess follows the perihelion’s sidereal motion, so the curve swings with the eccentricity cycle: slow perihelion motion near eccentricity maxima, fast near the minima; it is the Perihelion Precession panel read in year units. The model line is the secular mean-element construction on the chain’s apsidal tangent, the same rate family the Precession Periods panel shows, λ̇-corrected. Meeus’s line is Chapront’s sidereal year with the Table 31.B perihelion rate in the J2000 ecliptic frame, the sidereal motion the definition needs.',
   },
   {
     id: 'axial-precession', group: 'Earth axis', label: 'Axial Precession Period', unit: ' yr', precision: 2,
@@ -20079,23 +20071,21 @@ const VFP_CATEGORIES = [
     // e_E modulation, 3232.60 d at J2000) is STAR-referenced, so it is
     // bridged to date through the model's own axial precession of date,
     // 1/T_date = 1/T_star + 1/T_p — and reproduces Meeus's J2000-centred
-    // secular slope (measured: within 8e-5 yr over 1000–2500). The chain's
-    // of-date H² cycle counter (apsidalPrecessionSecondsOfDateAtAge, the
-    // T·H = const device, legacy '…ICRF' name) is the clickable second
-    // line: a device, no orbital physics, flat. DAYS, as the planet stats
-    // (a "year" is Julian in one place and mean solar in another).
+    // secular slope (measured: within 8e-5 yr over 1000–2500). No device
+    // line: the chain's of-date cycle counter (apsidalPrecessionSecondsOfDateAtAge,
+    // a bookkeeping convention with no orbital physics) stays in the engine,
+    // unsurfaced. DAYS, as the planet stats (a "year" is Julian in one place
+    // and mean solar in another).
     model: { name: 'This model', color: '#f0b040',
       fn: year => 1 / (86400 / meanLunarPerigeePrecessionAtAge((startmodelYear - year) / 1e6) + 1 / (_vfpAxialPrecessionYears(year) * 365.25)) },
     references: [
       { name: 'Meeus (1998), Ch. 47 rates', color: '#4fc3f7', fn: year => moonPerigeePrecessionYearsMeeus(year) * 365.25, validYears: [-1999, 3000], sourceUrl: 'https://en.wikipedia.org/wiki/Lunar_precession' },
-      { name: 'This model — H² cycle counter (device)', color: '#ce93d8',
-        fn: year => meanApsidalPrecessionSecondsICRFAtAge((startmodelYear - year) / 1e6) / 86400 },
     ],
     j2000extras: [
       { name: 'Registry anchor (Meeus/IERS, of date)', color: '#ef5350',
         value: () => K.moonReference.moonApsidalPrecessionDaysInputICRF },
     ],
-    reading: 'The perigee advances once round the equinox of date in about 3,231.5 days (8.85 years). The model line is the chain’s Brouwer–Clemence route: the rate rides m², the Sun’s to the Moon’s mean motion, so the period goes as the sidereal year squared over the sidereal month, modulated by Earth’s orbital eccentricity of date through the solar perturbation — it dips at every eccentricity maximum, and near J2000 its slope is the secular decrease of Earth’s eccentricity, the same physics behind Meeus’s T² term; the star-referenced period is bridged to date through the model’s own axial precession (1/T_date = 1/T_star + 1/T_p). The clickable second line is the chain’s H² cycle counter (the T_apsidal·H = const device): a bookkeeping convention riding the spin unit, no orbital physics, flat. Meeus’s line is 36,000° over d(L′ − M′)/dT from the Ch. 47 mean arguments (Chapront ELP-2000/82), a J2000-centred fit offered on the canon’s −2000 → 3000 range only.',
+    reading: 'The perigee advances once round the equinox of date in about 3,231.5 days (8.85 years). The model line is the chain’s Brouwer–Clemence route: the rate rides m², the Sun’s to the Moon’s mean motion, so the period goes as the sidereal year squared over the sidereal month, modulated by Earth’s orbital eccentricity of date through the solar perturbation — it dips at every eccentricity maximum, and near J2000 its slope is the secular decrease of Earth’s eccentricity, the same physics behind Meeus’s T² term; the star-referenced period is bridged to date through the model’s own axial precession (1/T_date = 1/T_star + 1/T_p). Meeus’s line is 36,000° over d(L′ − M′)/dT from the Ch. 47 mean arguments (Chapront ELP-2000/82), a J2000-centred fit offered on the canon’s −2000 → 3000 range only.',
   },
   {
     // ── Moon · Node Regression: the same for the node's retrograde cycle.
@@ -20110,14 +20100,12 @@ const VFP_CATEGORIES = [
       fn: year => 1 / (86400 / meanLunarNodePrecessionAtAge((startmodelYear - year) / 1e6) - 1 / (_vfpAxialPrecessionYears(year) * 365.25)) },
     references: [
       { name: 'Meeus (1998), Ch. 47 rates', color: '#4fc3f7', fn: year => moonNodeRegressionYearsMeeus(year) * 365.25, validYears: [-1999, 3000], sourceUrl: 'https://en.wikipedia.org/wiki/Lunar_precession' },
-      { name: 'This model — H² cycle counter (device)', color: '#ce93d8',
-        fn: year => meanNodalPrecessionSecondsICRFAtAge((startmodelYear - year) / 1e6) / 86400 },
     ],
     j2000extras: [
       { name: 'Registry anchor (Meeus/IERS, of date)', color: '#ef5350',
         value: () => K.moonReference.moonNodalPrecessionDaysInputICRF },
     ],
-    reading: 'The node regresses once round the equinox of date in about 6,798.4 days (18.61 years) — the eclipse-season and the lunar-standstill cycle. The model line is the chain’s Brouwer–Clemence route on the same m² law as the perigee, modulated by Earth’s orbital eccentricity of date through the solar perturbation — it dips at every eccentricity maximum, and near J2000 its slope is Meeus’s; the star-referenced period is bridged to date through the model’s own axial precession (1/T_date = 1/T_star − 1/T_p, the node running retrograde). The clickable second line is the chain’s H² cycle counter (the T_nodal·H = const device): a bookkeeping convention riding the spin unit, no orbital physics, flat. Meeus’s line is 36,000° over d(L′ − F)/dT from the Ch. 47 mean arguments (Chapront ELP-2000/82), a J2000-centred fit offered on the canon’s −2000 → 3000 range only.',
+    reading: 'The node regresses once round the equinox of date in about 6,798.4 days (18.61 years) — the eclipse-season and the lunar-standstill cycle. The model line is the chain’s Brouwer–Clemence route on the same m² law as the perigee, modulated by Earth’s orbital eccentricity of date through the solar perturbation — it dips at every eccentricity maximum, and near J2000 its slope is Meeus’s; the star-referenced period is bridged to date through the model’s own axial precession (1/T_date = 1/T_star − 1/T_p, the node running retrograde). Meeus’s line is 36,000° over d(L′ − F)/dT from the Ch. 47 mean arguments (Chapront ELP-2000/82), a J2000-centred fit offered on the canon’s −2000 → 3000 range only.',
   },
 ];
 // The panel ORDER (owner-ruled): the physics builds up — the orbit, the axis,
@@ -25270,7 +25258,7 @@ function setupGUI() {
      'no hardcoded reference values. Identifies over/under-prediction per era; read the ' +
      'residual columns against the ~100-300 s inter-reference disagreement.');
 
-  addTestButton('ΔT Breakdown (H/5 physics vs Bond stack)', () => {
+  addTestButton('ΔT Breakdown (tidal-LOD physics vs Bond stack)', () => {
     console.log('\n══════════════════════════════════════════════════════════');
     console.log('  ΔT COMPONENT BREAKDOWN — how the tweakpane value builds up');
     console.log('══════════════════════════════════════════════════════════');
@@ -41827,7 +41815,7 @@ async function runSolarDayReport(year, onProgress) {
     [],
     [`YEAR: ${year}`],
     [`Tropical year length at year ${year}:`, tropicalYearAtEpoch.toFixed(9), 'days'],
-    [`Mean tropical year (H-cycle average):`, meansolaryearlengthinDays.toFixed(9), 'days'],
+    [`Mean tropical year (long-term mean):`, meansolaryearlengthinDays.toFixed(9), 'days'],
     [`Intervals measured per starting point:`, numDays + 1,
       `(${numDays} whole + the ${residual.toFixed(6)} fraction that completes the year)`],
     [],
@@ -46080,7 +46068,7 @@ const planetStats = {
        hover : [`EPOCH-SPECIFIC MEAN LOD (1b): physics-derived rotation period at current year (tidal + GIA + ΔT residual). ABSOLUTE MEAN LOD (1a, mass-loss trend only, no GIA/ΔT): ${fmtNum(absoluteMeanLodSec(o.currentYear || 2000), 6, ',')} SI sec at current year.`]},
       {label : () => `Sidereal day (SI seconds)`,
        value : [ { small: () => meanSiderealday },{ v: () => o.siderealDayReal, dec:10, sep:',' }],
-       hover : [`One rotation relative to the MOVING vernal equinox — ~3m 56s shorter than the solar day. Left = MEAN family: H-cycle mean year lengths × the secular LOD (meanlengthofday). Right = CURRENT family: this epoch's year length × the kinematic LOD. They differ by ~0.3 ms at J2000 — mean vs epoch, not an error. Both are built on the epoch's actual LOD, so both shrink into the deep past (78,698 s at −380 Ma). NOT the 86400-anchored form used in the Days & Years report section 4, which stays pinned near 86,164.09 at every epoch by construction.`]},
+       hover : [`One rotation relative to the MOVING vernal equinox — ~3m 56s shorter than the solar day. Left = MEAN family: long-term mean year lengths × the secular LOD (meanlengthofday). Right = CURRENT family: this epoch's year length × the kinematic LOD. They differ by ~0.3 ms at J2000 — mean vs epoch, not an error. Both are built on the epoch's actual LOD, so both shrink into the deep past (78,698 s at −380 Ma). NOT the 86400-anchored form used in the Days & Years report section 4, which stays pinned near 86,164.09 at every epoch by construction.`]},
       {label : () => `Stellar day (SI seconds)`,
        value : [ { small: () => meanStellarday },{ v: () => o.stellarDayReal, dec:10, sep:',' }],
        hover : [`One rotation relative to the FIXED STARS (ICRF). Longer than the sidereal day by ~8.37 ms, because the equinox precesses westward. That offset carries cos(ε): the precession is in LONGITUDE (along the ecliptic) while the offset is defined along the EQUATOR, m = p·cos ε. Left/Right are the same MEAN vs CURRENT families as the sidereal day above. At J2000 the live value matches the IAU 2000A stellar day (86,164.098904 s) to ~0.01 ms.`]},
@@ -46177,7 +46165,7 @@ const planetStats = {
        static: true},
       {label : () => `└ Perihelion rate of date (full chain)`,
        value : [ { v: () => 129600000 / _kcApsidalPeriodYears('earth', o.julianDay), dec:1, sep:',' },{ small: '″/100yr' }],
-       hover : [`The chain's apsidal rate at the current scene date: central difference of ϖ over ±150 yr on the full chain, periodic terms included. In the current window it reads ≈ the framework's H/3 apsidal law's epoch-local tangent. The same quantity the tweakpane Prec row shows`]},
+       hover : [`The chain's apsidal rate at the current scene date: central difference of ϖ over ±150 yr on the full chain, periodic terms included. In the current window it reads ≈ the framework's eccentricity law's epoch-local apsidal tangent. The same quantity the tweakpane Prec row shows`]},
 
     ],
 
@@ -46256,7 +46244,7 @@ const planetStats = {
        info  : 'https://en.wikipedia.org/wiki/Orbit_of_the_Moon'},
       {label : () => `Synodic month`,
        value : [ { v: () => moonSynodicMonth, dec:10, sep:',' },{ small: 'days' }],
-       hover : [`The Moon's phase cycle — new moon to new moon. Longer than the sidereal month because while the Moon orbits Earth, Earth also moves along its orbit around the Sun, so the Moon needs ~2.2 extra days each orbit to catch up to the same Sun-Moon alignment. Derived from the sidereal month: per anchor interval the Moon completes ${fmtNum(N_sid_J2000,3,',')} sidereal orbits (exactly ${fmtNum(8*N_sid_J2000,0,',')} per eight intervals). Synodic orbits = sidereal + 13 − Y = ${fmtNum(N_sid_J2000,3,',')} + 13 − ${fmtNum(holisticyearLength,0,',')} = ${fmtNum(N_sid_J2000+13-holisticyearLength,3,',')}. The −Y (the interval's year count) subtracts Earth's solar orbits (one fewer Moon-Sun alignment per Earth year); +13 adds general precession (13 cycles per anchor interval by construction). Period = ${fmtNum(holisticyearLength*meansolaryearlengthinDays,0,',')} / ${fmtNum(N_sid_J2000+13-holisticyearLength,3,',')} = ${fmtNum(moonSynodicMonth,10,',')} d. All derived from the 3 lunar month inputs (at J2000)`]},
+       hover : [`The Moon's phase cycle — new moon to new moon. Longer than the sidereal month because while the Moon orbits Earth, Earth also moves along its orbit around the Sun, so the Moon needs ~2.2 extra days each orbit to catch up to the same Sun-Moon alignment. Derived from the sidereal month: per anchor interval the Moon completes ${fmtNum(N_sid_J2000,3,',')} sidereal orbits (exactly ${fmtNum(8*N_sid_J2000,0,',')} per eight intervals). Synodic orbits = sidereal orbits + equinox turns − Earth years = ${fmtNum(N_sid_J2000+13-holisticyearLength,3,',')}: the Earth years (${fmtNum(holisticyearLength,0,',')}) subtract Earth's solar orbits (one fewer Moon–Sun alignment per Earth year); the equinox turns (one per axial precession period) add general precession. Period = ${fmtNum(holisticyearLength*meansolaryearlengthinDays,0,',')} / ${fmtNum(N_sid_J2000+13-holisticyearLength,3,',')} = ${fmtNum(moonSynodicMonth,10,',')} d. All derived from the 3 lunar month inputs (at J2000)`]},
       {label : () => `Anomalistic month`,
        value : [ { v: () => moonAnomalisticMonth, dec:10, sep:',' },{ small: 'days' }],
        hover : [`Time between successive perigee passages — the closest point in the Moon's elliptical orbit around Earth. Slightly longer than the sidereal month because the perigee point itself slowly advances (apsidal precession, ~8.85 yr cycle), so the Moon needs a little extra time to reach the shifting perigee. In one anchor interval (${fmtNum(holisticyearLength*meansolaryearlengthinDays,0,',')} d), the Moon completes ${fmtNum(N_sid_J2000 - N_apsidalE_J2000,3,',')} anomalistic orbits (= N_sidereal − N_apsidal_Earth, kinematic identity; exactly ${fmtNum(8*(N_sid_J2000 - N_apsidalE_J2000),0,',')} per eight intervals). Period = ${fmtNum(holisticyearLength*meansolaryearlengthinDays,0,',')} / ${fmtNum(N_sid_J2000 - N_apsidalE_J2000,3,',')} = ${fmtNum(moonAnomalisticMonth,10,',')} d (at J2000)`]},
@@ -46265,7 +46253,7 @@ const planetStats = {
        hover : [`Time between successive crossings of the ascending node — where the Moon's orbit crosses the ecliptic plane going northward. Shorter than the sidereal month because the nodes slowly regress westward (nodal precession, ~18.6 yr cycle), so the Moon meets the retreating node a little sooner. Critical for predicting eclipses, which can only occur near the nodes. In one anchor interval (${fmtNum(holisticyearLength*meansolaryearlengthinDays,0,',')} d), the Moon completes ${fmtNum(N_sid_J2000 + N_nodalE_J2000,3,',')} draconic orbits (= N_sidereal + N_nodal_Earth, kinematic identity; exactly ${fmtNum(8*(N_sid_J2000 + N_nodalE_J2000),0,',')} per eight intervals). Period = ${fmtNum(holisticyearLength*meansolaryearlengthinDays,0,',')} / ${fmtNum(N_sid_J2000 + N_nodalE_J2000,3,',')} = ${fmtNum(moonNodalMonth,10,',')} d (at J2000)`]},
       {label : () => `Tropical month`,
        value : [ { v: () => moonTropicalMonth, dec:10, sep:',' },{ small: 'days' }],
-       hover : [`Time for the Moon to return to the same ecliptic longitude, measured relative to the vernal equinox. Slightly shorter than the sidereal month because the vernal equinox slowly drifts westward due to axial precession, so the Moon reaches the same longitude a little sooner. Derived from the sidereal month: per anchor interval the Moon completes ${fmtNum(N_sid_J2000,3,',')} sidereal orbits (exactly ${fmtNum(8*N_sid_J2000,0,',')} per eight intervals). Tropical orbits = sidereal + 13 = ${fmtNum(N_sid_J2000,3,',')} + 13 = ${fmtNum(N_sid_J2000+13,3,',')}. The +13 accounts for general precession (one equinox turn per 13 counts of the anchor interval — the chain's calendar convention): the westward drift of the equinox adds 13 extra returns to the same ecliptic longitude per anchor interval. Period = ${fmtNum(holisticyearLength*meansolaryearlengthinDays,0,',')} / ${fmtNum(N_sid_J2000+13,3,',')} = ${fmtNum(moonTropicalMonth,10,',')} d. All derived from the 3 lunar month inputs (at J2000)`],
+       hover : [`Time for the Moon to return to the same ecliptic longitude, measured relative to the vernal equinox. Slightly shorter than the sidereal month because the vernal equinox slowly drifts westward due to axial precession, so the Moon reaches the same longitude a little sooner. Derived from the sidereal month: per anchor interval the Moon completes ${fmtNum(N_sid_J2000,3,',')} sidereal orbits (exactly ${fmtNum(8*N_sid_J2000,0,',')} per eight intervals). Tropical orbits = sidereal orbits + equinox turns = ${fmtNum(N_sid_J2000+13,3,',')}. The equinox turns account for general precession (one per axial precession period — the chain's calendar convention): the westward drift of the equinox adds one extra return to the same ecliptic longitude per precession period. Period = ${fmtNum(holisticyearLength*meansolaryearlengthinDays,0,',')} / ${fmtNum(N_sid_J2000+13,3,',')} = ${fmtNum(moonTropicalMonth,10,',')} d. All derived from the 3 lunar month inputs (at J2000)`],
        info  : 'https://eclipse.gsfc.nasa.gov/LEcat5/LEcatalog.html'},
 
     {header : '—  Orbital Shape & Geometry —' },
@@ -46347,20 +46335,20 @@ const planetStats = {
       {label : () => `Full Moon cycle (observed)`,
        value : [ { v: () => moonFullMoonCycleEarth, dec:10, sep:',' },{ small: 'days' }],
        hover : [`Time between successive perigee full moons ("supermoon" alignments) — a physical conjunction cycle, frame-independent: there is only one observed value. This is the beat frequency between the synodic month (phase cycle) and the anomalistic month (perigee cycle): P = P_syn × P_anom / (P_syn − P_anom) = ${fmtNum(moonSynodicMonth,4,',')} × ${fmtNum(moonAnomalisticMonth,4,',')} / ${fmtNum(moonSynodicMonth - moonAnomalisticMonth,4,',')} = ${fmtNum(moonFullMoonCycleEarth,4,',')} d. All derived from the 3 lunar month inputs (at J2000)`]},
-      {label : () => `Full Moon cycle (H/13-frame partner)`,
+      {label : () => `Full Moon cycle (equinox-frame partner)`,
        value : [ { v: () => moonFullMoonCycleICRF, dec:10, sep:',' },{ small: 'days' }],
-       hover : [`Bookkeeping partner of the observed cycle in the equinox-co-rotating frame: the count per anchor interval differs by +13 (cycles_partner = cycles_observed + 13 — the lunar chain's calendar convention). Not a directly-observed period — conjunction cycles are frame-independent; this value carries the frame arithmetic. All derived from the 3 lunar month inputs`]},
+       hover : [`Bookkeeping partner of the observed cycle in the equinox-co-rotating frame: the count per anchor interval differs by one cycle per axial precession period (the lunar chain's calendar convention). Not a directly-observed period — conjunction cycles are frame-independent; this value carries the frame arithmetic. All derived from the 3 lunar month inputs`]},
      null,
       {label : () => `Draconic year (observed — eclipse year)`,
        value : [ { v: () => moonDraconicYearEarth, dec:10, sep:',' },{ small: 'days' }],
        hover : [`Time for the Sun to return to the Moon's ascending node — the ECLIPSE YEAR (eclipses can only occur when the Sun is near a lunar node). A physical conjunction cycle, frame-independent: tropical year ⊕ of-date node and sidereal year ⊕ star-referenced node give the same value (the general precession cancels). Matches the observed 346.620 d. All derived from the 3 lunar month inputs (at J2000)`]},
       {label : () => `Draconic year (precession-frame partner)`,
        value : [ { v: () => moonDraconicYearICRF, dec:10, sep:',' },{ small: 'days' }],
-       hover : [`Bookkeeping partner of the eclipse year in the frame co-rotating with the equinox: the count per anchor interval differs by 13 (the frozen clock’s calendar convention; equivalently the harmonic sum with frames mixed, 1/P = 1/${fmtNum(meansolaryearlengthinDays,4,',')} + 1/${fmtNum(moonNodalPrecessionindaysEarth,4,',')}). Not a directly-observed period; carries the frame arithmetic of the lunar chain. All derived from the 3 lunar month inputs (at J2000)`]},
+       hover : [`Bookkeeping partner of the eclipse year in the frame co-rotating with the equinox: the count per anchor interval differs by one cycle per axial precession period (the frozen clock’s calendar convention; equivalently the harmonic sum with frames mixed, 1/P = 1/${fmtNum(meansolaryearlengthinDays,4,',')} + 1/${fmtNum(moonNodalPrecessionindaysEarth,4,',')}). Not a directly-observed period; carries the frame arithmetic of the lunar chain. All derived from the 3 lunar month inputs (at J2000)`]},
     null,
       {label : () => `Apsidal precession (of date)`,
        value : [ { v: () => moonApsidalPrecessionindaysICRF, dec:10, sep:',' },{ small: 'days' }],
-       hover : [`Time for the Moon's line of apsides (the perigee–apogee axis) to complete one full prograde rotation relative to the EQUINOX OF DATE — the observed ≈${fmtNum(moonApsidalPrecessionindaysICRF/meansolaryearlengthinDays,2,',')}-year cycle (the Meeus/IERS observable). The star-referenced period is the row below; the two differ by the general precession (±13 cycles per anchor interval — the chain's calendar convention). Note: internal *ICRF variable names are legacy — the values are of-date. All derived from the 3 lunar month inputs (at J2000)`]},
+       hover : [`Time for the Moon's line of apsides (the perigee–apogee axis) to complete one full prograde rotation relative to the EQUINOX OF DATE — the observed ≈${fmtNum(moonApsidalPrecessionindaysICRF/meansolaryearlengthinDays,2,',')}-year cycle (the Meeus/IERS observable). The star-referenced period is the row below; the two differ by the general precession (one cycle per axial precession period — the chain's calendar convention). Note: internal *ICRF variable names are legacy — the values are of-date. All derived from the 3 lunar month inputs (at J2000)`]},
       {label : () => ``,
        value : [ { v: () => moonApsidalPrecessionindaysICRF/meansolaryearlengthinDays, dec:10, sep:',' },{ small: 'years' }]},
       {label : () => `Apsidal precession (fixed stars)`,
@@ -46747,7 +46735,7 @@ const planetStats = {
     {header : '—  Orbital Period & Motion —' },
       {label : () => `Orbits per anchor interval`,
        value : [ { v: () => _kcNOfDate('mercury', o.currentYear) * (holisticyearLength * meansolaryearlengthinDays / 365.25) / 360, dec:1, sep:',' },{ small: 'orbits' }],
-       hover : [`Mercury completes n × H(days)/360° orbits while Earth completes ${fmtNum(holisticyearLength,0,',')} solar years — BOTH of date: n from the banked λ̇ channel (the model's own ±10-Myr constant-GM N-body drift ÷ the Driver-2 mass-loss stretch) and H·mSY at the epoch, so the structural count holds while both stretch together; only the planet's real dynamical drift moves it. A dynamical output, NOT an integer count (doc 109 §9).`]},
+       hover : [`Mercury completes n orbits per anchor interval while Earth completes${fmtNum(holisticyearLength,0,',')} solar years — BOTH of date: n from the banked λ̇ channel (the model's own ±10-Myr constant-GM N-body drift ÷ the Driver-2 mass-loss stretch) and the anchor interval's length at the epoch, so the structural count holds while both stretch together; only the planet's real dynamical drift moves it. A dynamical output, NOT an integer count (doc 109 §9).`]},
       {label : () => `Orbital period (P)`,
        value : [ { v: () => 360/_kcNOfDate('mercury', o.currentYear), dec:6, sep:',' },{ small: 'Julian years' }],
        hover : [`Mercury's sidereal orbital period OF DATE: P = 360°/n with n from the model's own banked λ̇ channel — λ̇₀ (the ±10-Myr run's secular J2000 rate, 2-kyr window: it averages the great-inequality-class wiggles a short era-window fit absorbs, and matches JPL-class periods) × the planet's own constant-GM N-body drift (±10 Myr, clamped beyond) ÷ the Driver-2 mass-loss stretch (the model's falsifiable μ-leg). All factors ≡ 1 at J2000; Julian years = 365.25 SI days (the chain's clock is JD/TT). The era evaluator keeps its own fitted window rate — the measured decomposition split is banked in the artifact (Neptune −497 ppm the largest: a 300-yr window fit absorbs local U–N-inequality slope).`]},
@@ -46762,7 +46750,7 @@ const planetStats = {
        hover : [`The banked λ̇ channel of date (degrees per Julian year: secular J2000 rate × the planet's own N-body drift ÷ the Driver-2 mass-loss stretch), converted to °/SI-day by ÷365.25 — a pure unit conversion; the chain's clock is JD/TT. (365.2422 is Earth's measured mean solar year — an Earth observable that plays no role in another planet's clock.)`]},
       {label : () => `Period (Kepler verification)`,
        value : [ { v: () => OrbitalFormulas.keplerPeriod(mercuryOrbitDistance * currentAUDistance), dec:6, sep:',' },{ small: 'days' }],
-       hover : [`Kepler's 3rd Law: P = 2π√(a³/(GM_Sun + GM_Earth)) × (meanSolar/meanSidereal ≈ 0.99996). The system-mass denominator anchors the model's AU and applies to every planet. Algebraically identical to the elaborate two-body form P = 2π√((a−Δa)³/(GM_Sun + GM_Earth − GM_body)) with the exact symmetric Δa = a·(1 − ((GM_Sun + GM_Earth − GM_body)/(GM_Sun + GM_Earth))^(1/3)) — the (a−Δa)³ and (GM_sys − GM_body) terms cancel exactly (see doc 24). The compensation factor reconciles the model's dual year-frame: GM is derived in sidereal-year units, orbit distances in solar-year units via H-cycle ratios. Deliberately stays on the DEVICE inputs — this row verifies the model’s GM↔AU closure, not the ephemeris; the surrounding rows are the chain’s dynamical values.`]},
+       hover : [`Kepler's 3rd Law: P = 2π√(a³/(GM_Sun + GM_Earth)) × (meanSolar/meanSidereal ≈ 0.99996). The system-mass denominator anchors the model's AU and applies to every planet. Algebraically identical to the elaborate two-body form P = 2π√((a−Δa)³/(GM_Sun + GM_Earth − GM_body)) with the exact symmetric Δa = a·(1 − ((GM_Sun + GM_Earth − GM_body)/(GM_Sun + GM_Earth))^(1/3)) — the (a−Δa)³ and (GM_sys − GM_body) terms cancel exactly (see doc 24). The compensation factor reconciles the model's dual year-frame: GM is derived in sidereal-year units, orbit distances in solar-year units via long-term-mean ratios. Deliberately stays on the DEVICE inputs — this row verifies the model’s GM↔AU closure, not the ephemeris; the surrounding rows are the chain’s dynamical values.`]},
     null,
       {label : () => `Length of Day`,
        value : [ { v: () => (mercuryRotationPeriod*(((360/_kcNOfDate('mercury', o.currentYear))*365.25)*24))/((((360/_kcNOfDate('mercury', o.currentYear))*365.25)*24)-mercuryRotationPeriod), dec:6, sep:',' }, { small : 'hours' }],
@@ -47057,7 +47045,7 @@ const planetStats = {
     {header : '—  Orbital Period & Motion —' },
       {label : () => `Orbits per anchor interval`,
        value : [ { v: () => _kcNOfDate('venus', o.currentYear) * (holisticyearLength * meansolaryearlengthinDays / 365.25) / 360, dec:1, sep:',' },{ small: 'orbits' }],
-       hover : [`Venus completes n × H(days)/360° orbits while Earth completes ${fmtNum(holisticyearLength,0,',')} solar years — BOTH of date: n from the banked λ̇ channel (the model's own ±10-Myr constant-GM N-body drift ÷ the Driver-2 mass-loss stretch) and H·mSY at the epoch, so the structural count holds while both stretch together; only the planet's real dynamical drift moves it. A dynamical output, NOT an integer count (doc 109 §9).`]},
+       hover : [`Venus completes n orbits per anchor interval while Earth completes${fmtNum(holisticyearLength,0,',')} solar years — BOTH of date: n from the banked λ̇ channel (the model's own ±10-Myr constant-GM N-body drift ÷ the Driver-2 mass-loss stretch) and the anchor interval's length at the epoch, so the structural count holds while both stretch together; only the planet's real dynamical drift moves it. A dynamical output, NOT an integer count (doc 109 §9).`]},
       {label : () => `Orbital period (P)`,
        value : [ { v: () => 360/_kcNOfDate('venus', o.currentYear), dec:6, sep:',' },{ small: 'Julian years' }],
        hover : [`Venus's sidereal orbital period OF DATE: P = 360°/n with n from the model's own banked λ̇ channel — λ̇₀ (the ±10-Myr run's secular J2000 rate, 2-kyr window: it averages the great-inequality-class wiggles a short era-window fit absorbs, and matches JPL-class periods) × the planet's own constant-GM N-body drift (±10 Myr, clamped beyond) ÷ the Driver-2 mass-loss stretch (the model's falsifiable μ-leg). All factors ≡ 1 at J2000; Julian years = 365.25 SI days (the chain's clock is JD/TT). The era evaluator keeps its own fitted window rate — the measured decomposition split is banked in the artifact (Neptune −497 ppm the largest: a 300-yr window fit absorbs local U–N-inequality slope).`]},
@@ -47072,7 +47060,7 @@ const planetStats = {
        hover : [`The banked λ̇ channel of date (degrees per Julian year: secular J2000 rate × the planet's own N-body drift ÷ the Driver-2 mass-loss stretch), converted to °/SI-day by ÷365.25 — a pure unit conversion; the chain's clock is JD/TT. (365.2422 is Earth's measured mean solar year — an Earth observable that plays no role in another planet's clock.)`]},
       {label : () => `Period (Kepler verification)`,
        value : [ { v: () => OrbitalFormulas.keplerPeriod(venusOrbitDistance * currentAUDistance), dec:6, sep:',' },{ small: 'days' }],
-       hover : [`Kepler's 3rd Law: P = 2π√(a³/(GM_Sun + GM_Earth)) × (meanSolar/meanSidereal ≈ 0.99996). The system-mass denominator anchors the model's AU and applies to every planet. Algebraically identical to the elaborate two-body form P = 2π√((a−Δa)³/(GM_Sun + GM_Earth − GM_body)) with the exact symmetric Δa = a·(1 − ((GM_Sun + GM_Earth − GM_body)/(GM_Sun + GM_Earth))^(1/3)) — the (a−Δa)³ and (GM_sys − GM_body) terms cancel exactly (see doc 24). The compensation factor reconciles the model's dual year-frame: GM is derived in sidereal-year units, orbit distances in solar-year units via H-cycle ratios. Deliberately stays on the DEVICE inputs — this row verifies the model’s GM↔AU closure, not the ephemeris; the surrounding rows are the chain’s dynamical values.`]},
+       hover : [`Kepler's 3rd Law: P = 2π√(a³/(GM_Sun + GM_Earth)) × (meanSolar/meanSidereal ≈ 0.99996). The system-mass denominator anchors the model's AU and applies to every planet. Algebraically identical to the elaborate two-body form P = 2π√((a−Δa)³/(GM_Sun + GM_Earth − GM_body)) with the exact symmetric Δa = a·(1 − ((GM_Sun + GM_Earth − GM_body)/(GM_Sun + GM_Earth))^(1/3)) — the (a−Δa)³ and (GM_sys − GM_body) terms cancel exactly (see doc 24). The compensation factor reconciles the model's dual year-frame: GM is derived in sidereal-year units, orbit distances in solar-year units via long-term-mean ratios. Deliberately stays on the DEVICE inputs — this row verifies the model’s GM↔AU closure, not the ephemeris; the surrounding rows are the chain’s dynamical values.`]},
     null,
       {label : () => `Length of Day`,
        value : [ { v: () => (venusRotationPeriod*(((360/_kcNOfDate('venus', o.currentYear))*365.25)*24))/((((360/_kcNOfDate('venus', o.currentYear))*365.25)*24)+venusRotationPeriod), dec:6, sep:',' }, { small : 'hours' }],
@@ -47370,7 +47358,7 @@ const planetStats = {
     {header : '—  Orbital Period & Motion —' },
       {label : () => `Orbits per anchor interval`,
        value : [ { v: () => _kcNOfDate('mars', o.currentYear) * (holisticyearLength * meansolaryearlengthinDays / 365.25) / 360, dec:1, sep:',' },{ small: 'orbits' }],
-       hover : [`Mars completes n × H(days)/360° orbits while Earth completes ${fmtNum(holisticyearLength,0,',')} solar years — BOTH of date: n from the banked λ̇ channel (the model's own ±10-Myr constant-GM N-body drift ÷ the Driver-2 mass-loss stretch) and H·mSY at the epoch, so the structural count holds while both stretch together; only the planet's real dynamical drift moves it. A dynamical output, NOT an integer count (doc 109 §9).`]},
+       hover : [`Mars completes n orbits per anchor interval while Earth completes${fmtNum(holisticyearLength,0,',')} solar years — BOTH of date: n from the banked λ̇ channel (the model's own ±10-Myr constant-GM N-body drift ÷ the Driver-2 mass-loss stretch) and the anchor interval's length at the epoch, so the structural count holds while both stretch together; only the planet's real dynamical drift moves it. A dynamical output, NOT an integer count (doc 109 §9).`]},
       {label : () => `Orbital period (P)`,
        value : [ { v: () => 360/_kcNOfDate('mars', o.currentYear), dec:6, sep:',' },{ small: 'Julian years' }],
        hover : [`Mars's sidereal orbital period OF DATE: P = 360°/n with n from the model's own banked λ̇ channel — λ̇₀ (the ±10-Myr run's secular J2000 rate, 2-kyr window: it averages the great-inequality-class wiggles a short era-window fit absorbs, and matches JPL-class periods) × the planet's own constant-GM N-body drift (±10 Myr, clamped beyond) ÷ the Driver-2 mass-loss stretch (the model's falsifiable μ-leg). All factors ≡ 1 at J2000; Julian years = 365.25 SI days (the chain's clock is JD/TT). The era evaluator keeps its own fitted window rate — the measured decomposition split is banked in the artifact (Neptune −497 ppm the largest: a 300-yr window fit absorbs local U–N-inequality slope).`]},
@@ -47385,7 +47373,7 @@ const planetStats = {
        hover : [`The banked λ̇ channel of date (degrees per Julian year: secular J2000 rate × the planet's own N-body drift ÷ the Driver-2 mass-loss stretch), converted to °/SI-day by ÷365.25 — a pure unit conversion; the chain's clock is JD/TT. (365.2422 is Earth's measured mean solar year — an Earth observable that plays no role in another planet's clock.)`]},
       {label : () => `Period (Kepler verification)`,
        value : [ { v: () => OrbitalFormulas.keplerPeriod(marsOrbitDistance * currentAUDistance), dec:6, sep:',' },{ small: 'days' }],
-       hover : [`Kepler's 3rd Law: P = 2π√(a³/(GM_Sun + GM_Earth)) × (meanSolar/meanSidereal ≈ 0.99996). The system-mass denominator anchors the model's AU and applies to every planet. Algebraically identical to the elaborate two-body form P = 2π√((a−Δa)³/(GM_Sun + GM_Earth − GM_body)) with the exact symmetric Δa = a·(1 − ((GM_Sun + GM_Earth − GM_body)/(GM_Sun + GM_Earth))^(1/3)) — the (a−Δa)³ and (GM_sys − GM_body) terms cancel exactly (see doc 24). The compensation factor reconciles the model's dual year-frame: GM is derived in sidereal-year units, orbit distances in solar-year units via H-cycle ratios. Deliberately stays on the DEVICE inputs — this row verifies the model’s GM↔AU closure, not the ephemeris; the surrounding rows are the chain’s dynamical values.`]},
+       hover : [`Kepler's 3rd Law: P = 2π√(a³/(GM_Sun + GM_Earth)) × (meanSolar/meanSidereal ≈ 0.99996). The system-mass denominator anchors the model's AU and applies to every planet. Algebraically identical to the elaborate two-body form P = 2π√((a−Δa)³/(GM_Sun + GM_Earth − GM_body)) with the exact symmetric Δa = a·(1 − ((GM_Sun + GM_Earth − GM_body)/(GM_Sun + GM_Earth))^(1/3)) — the (a−Δa)³ and (GM_sys − GM_body) terms cancel exactly (see doc 24). The compensation factor reconciles the model's dual year-frame: GM is derived in sidereal-year units, orbit distances in solar-year units via long-term-mean ratios. Deliberately stays on the DEVICE inputs — this row verifies the model’s GM↔AU closure, not the ephemeris; the surrounding rows are the chain’s dynamical values.`]},
     null,
       {label : () => `Length of Day`,
        value : [ { v: () => (marsRotationPeriod*(((360/_kcNOfDate('mars', o.currentYear))*365.25)*24))/((((360/_kcNOfDate('mars', o.currentYear))*365.25)*24)-marsRotationPeriod), dec:6, sep:',' }, { small : 'hours' }],
@@ -47687,7 +47675,7 @@ const planetStats = {
     {header : '—  Orbital Period & Motion —' },
       {label : () => `Orbits per anchor interval`,
        value : [ { v: () => _kcNOfDate('jupiter', o.currentYear) * (holisticyearLength * meansolaryearlengthinDays / 365.25) / 360, dec:1, sep:',' },{ small: 'orbits' }],
-       hover : [`Jupiter completes n × H(days)/360° orbits while Earth completes ${fmtNum(holisticyearLength,0,',')} solar years — BOTH of date: n from the banked λ̇ channel (the model's own ±10-Myr constant-GM N-body drift ÷ the Driver-2 mass-loss stretch) and H·mSY at the epoch, so the structural count holds while both stretch together; only the planet's real dynamical drift moves it. A dynamical output, NOT an integer count (doc 109 §9).`]},
+       hover : [`Jupiter completes n orbits per anchor interval while Earth completes${fmtNum(holisticyearLength,0,',')} solar years — BOTH of date: n from the banked λ̇ channel (the model's own ±10-Myr constant-GM N-body drift ÷ the Driver-2 mass-loss stretch) and the anchor interval's length at the epoch, so the structural count holds while both stretch together; only the planet's real dynamical drift moves it. A dynamical output, NOT an integer count (doc 109 §9).`]},
       {label : () => `Orbital period (P)`,
        value : [ { v: () => 360/_kcNOfDate('jupiter', o.currentYear), dec:6, sep:',' },{ small: 'Julian years' }],
        hover : [`Jupiter's sidereal orbital period OF DATE: P = 360°/n with n from the model's own banked λ̇ channel — λ̇₀ (the ±10-Myr run's secular J2000 rate, 2-kyr window: it averages the great-inequality-class wiggles a short era-window fit absorbs, and matches JPL-class periods) × the planet's own constant-GM N-body drift (±10 Myr, clamped beyond) ÷ the Driver-2 mass-loss stretch (the model's falsifiable μ-leg). All factors ≡ 1 at J2000; Julian years = 365.25 SI days (the chain's clock is JD/TT). The era evaluator keeps its own fitted window rate — the measured decomposition split is banked in the artifact (Neptune −497 ppm the largest: a 300-yr window fit absorbs local U–N-inequality slope).`]},
@@ -47702,7 +47690,7 @@ const planetStats = {
        hover : [`The banked λ̇ channel of date (degrees per Julian year: secular J2000 rate × the planet's own N-body drift ÷ the Driver-2 mass-loss stretch), converted to °/SI-day by ÷365.25 — a pure unit conversion; the chain's clock is JD/TT. (365.2422 is Earth's measured mean solar year — an Earth observable that plays no role in another planet's clock.)`]},
       {label : () => `Period (Kepler verification)`,
        value : [ { v: () => OrbitalFormulas.keplerPeriod(jupiterOrbitDistance * currentAUDistance), dec:6, sep:',' },{ small: 'days' }],
-       hover : [`Kepler's 3rd Law: P = 2π√(a³/(GM_Sun + GM_Earth)) × (meanSolar/meanSidereal ≈ 0.99996). The system-mass denominator anchors the model's AU and applies to every planet. Algebraically identical to the elaborate two-body form P = 2π√((a−Δa)³/(GM_Sun + GM_Earth − GM_body)) with the exact symmetric Δa = a·(1 − ((GM_Sun + GM_Earth − GM_body)/(GM_Sun + GM_Earth))^(1/3)) — the (a−Δa)³ and (GM_sys − GM_body) terms cancel exactly (see doc 24). The compensation factor reconciles the model's dual year-frame: GM is derived in sidereal-year units, orbit distances in solar-year units via H-cycle ratios. Deliberately stays on the DEVICE inputs — this row verifies the model’s GM↔AU closure, not the ephemeris; the surrounding rows are the chain’s dynamical values.`]},
+       hover : [`Kepler's 3rd Law: P = 2π√(a³/(GM_Sun + GM_Earth)) × (meanSolar/meanSidereal ≈ 0.99996). The system-mass denominator anchors the model's AU and applies to every planet. Algebraically identical to the elaborate two-body form P = 2π√((a−Δa)³/(GM_Sun + GM_Earth − GM_body)) with the exact symmetric Δa = a·(1 − ((GM_Sun + GM_Earth − GM_body)/(GM_Sun + GM_Earth))^(1/3)) — the (a−Δa)³ and (GM_sys − GM_body) terms cancel exactly (see doc 24). The compensation factor reconciles the model's dual year-frame: GM is derived in sidereal-year units, orbit distances in solar-year units via long-term-mean ratios. Deliberately stays on the DEVICE inputs — this row verifies the model’s GM↔AU closure, not the ephemeris; the surrounding rows are the chain’s dynamical values.`]},
     null,
       {label : () => `Length of Day`,
        value : [ { v: () => (jupiterRotationPeriod*(((360/_kcNOfDate('jupiter', o.currentYear))*365.25)*24))/((((360/_kcNOfDate('jupiter', o.currentYear))*365.25)*24)-jupiterRotationPeriod), dec:6, sep:',' }, { small : 'hours' }],
@@ -47999,7 +47987,7 @@ const planetStats = {
     {header : '—  Orbital Period & Motion —' },
       {label : () => `Orbits per anchor interval`,
        value : [ { v: () => _kcNOfDate('saturn', o.currentYear) * (holisticyearLength * meansolaryearlengthinDays / 365.25) / 360, dec:1, sep:',' },{ small: 'orbits' }],
-       hover : [`Saturn completes n × H(days)/360° orbits while Earth completes ${fmtNum(holisticyearLength,0,',')} solar years — BOTH of date: n from the banked λ̇ channel (the model's own ±10-Myr constant-GM N-body drift ÷ the Driver-2 mass-loss stretch) and H·mSY at the epoch, so the structural count holds while both stretch together; only the planet's real dynamical drift moves it. A dynamical output, NOT an integer count (doc 109 §9).`]},
+       hover : [`Saturn completes n orbits per anchor interval while Earth completes${fmtNum(holisticyearLength,0,',')} solar years — BOTH of date: n from the banked λ̇ channel (the model's own ±10-Myr constant-GM N-body drift ÷ the Driver-2 mass-loss stretch) and the anchor interval's length at the epoch, so the structural count holds while both stretch together; only the planet's real dynamical drift moves it. A dynamical output, NOT an integer count (doc 109 §9).`]},
       {label : () => `Orbital period (P)`,
        value : [ { v: () => 360/_kcNOfDate('saturn', o.currentYear), dec:6, sep:',' },{ small: 'Julian years' }],
        hover : [`Saturn's sidereal orbital period OF DATE: P = 360°/n with n from the model's own banked λ̇ channel — λ̇₀ (the ±10-Myr run's secular J2000 rate, 2-kyr window: it averages the great-inequality-class wiggles a short era-window fit absorbs, and matches JPL-class periods) × the planet's own constant-GM N-body drift (±10 Myr, clamped beyond) ÷ the Driver-2 mass-loss stretch (the model's falsifiable μ-leg). All factors ≡ 1 at J2000; Julian years = 365.25 SI days (the chain's clock is JD/TT). The era evaluator keeps its own fitted window rate — the measured decomposition split is banked in the artifact (Neptune −497 ppm the largest: a 300-yr window fit absorbs local U–N-inequality slope).`]},
@@ -48014,7 +48002,7 @@ const planetStats = {
        hover : [`The banked λ̇ channel of date (degrees per Julian year: secular J2000 rate × the planet's own N-body drift ÷ the Driver-2 mass-loss stretch), converted to °/SI-day by ÷365.25 — a pure unit conversion; the chain's clock is JD/TT. (365.2422 is Earth's measured mean solar year — an Earth observable that plays no role in another planet's clock.)`]},
       {label : () => `Period (Kepler verification)`,
        value : [ { v: () => OrbitalFormulas.keplerPeriod(saturnOrbitDistance * currentAUDistance), dec:6, sep:',' },{ small: 'days' }],
-       hover : [`Kepler's 3rd Law: P = 2π√(a³/(GM_Sun + GM_Earth)) × (meanSolar/meanSidereal ≈ 0.99996). The system-mass denominator anchors the model's AU and applies to every planet. Algebraically identical to the elaborate two-body form P = 2π√((a−Δa)³/(GM_Sun + GM_Earth − GM_body)) with the exact symmetric Δa = a·(1 − ((GM_Sun + GM_Earth − GM_body)/(GM_Sun + GM_Earth))^(1/3)) — the (a−Δa)³ and (GM_sys − GM_body) terms cancel exactly (see doc 24). The compensation factor reconciles the model's dual year-frame: GM is derived in sidereal-year units, orbit distances in solar-year units via H-cycle ratios. Deliberately stays on the DEVICE inputs — this row verifies the model’s GM↔AU closure, not the ephemeris; the surrounding rows are the chain’s dynamical values.`]},
+       hover : [`Kepler's 3rd Law: P = 2π√(a³/(GM_Sun + GM_Earth)) × (meanSolar/meanSidereal ≈ 0.99996). The system-mass denominator anchors the model's AU and applies to every planet. Algebraically identical to the elaborate two-body form P = 2π√((a−Δa)³/(GM_Sun + GM_Earth − GM_body)) with the exact symmetric Δa = a·(1 − ((GM_Sun + GM_Earth − GM_body)/(GM_Sun + GM_Earth))^(1/3)) — the (a−Δa)³ and (GM_sys − GM_body) terms cancel exactly (see doc 24). The compensation factor reconciles the model's dual year-frame: GM is derived in sidereal-year units, orbit distances in solar-year units via long-term-mean ratios. Deliberately stays on the DEVICE inputs — this row verifies the model’s GM↔AU closure, not the ephemeris; the surrounding rows are the chain’s dynamical values.`]},
     null,
       {label : () => `Length of Day`,
        value : [ { v: () => (saturnRotationPeriod*(((360/_kcNOfDate('saturn', o.currentYear))*365.25)*24))/((((360/_kcNOfDate('saturn', o.currentYear))*365.25)*24)-saturnRotationPeriod), dec:6, sep:',' }, { small : 'hours' }],
@@ -48312,7 +48300,7 @@ const planetStats = {
     {header : '—  Orbital Period & Motion —' },
       {label : () => `Orbits per anchor interval`,
        value : [ { v: () => _kcNOfDate('uranus', o.currentYear) * (holisticyearLength * meansolaryearlengthinDays / 365.25) / 360, dec:1, sep:',' },{ small: 'orbits' }],
-       hover : [`Uranus completes n × H(days)/360° orbits while Earth completes ${fmtNum(holisticyearLength,0,',')} solar years — BOTH of date: n from the banked λ̇ channel (the model's own ±10-Myr constant-GM N-body drift ÷ the Driver-2 mass-loss stretch) and H·mSY at the epoch, so the structural count holds while both stretch together; only the planet's real dynamical drift moves it. A dynamical output, NOT an integer count (doc 109 §9).`]},
+       hover : [`Uranus completes n orbits per anchor interval while Earth completes${fmtNum(holisticyearLength,0,',')} solar years — BOTH of date: n from the banked λ̇ channel (the model's own ±10-Myr constant-GM N-body drift ÷ the Driver-2 mass-loss stretch) and the anchor interval's length at the epoch, so the structural count holds while both stretch together; only the planet's real dynamical drift moves it. A dynamical output, NOT an integer count (doc 109 §9).`]},
       {label : () => `Orbital period (P)`,
        value : [ { v: () => 360/_kcNOfDate('uranus', o.currentYear), dec:6, sep:',' },{ small: 'Julian years' }],
        hover : [`Uranus's sidereal orbital period OF DATE: P = 360°/n with n from the model's own banked λ̇ channel — λ̇₀ (the ±10-Myr run's secular J2000 rate, 2-kyr window: it averages the great-inequality-class wiggles a short era-window fit absorbs, and matches JPL-class periods) × the planet's own constant-GM N-body drift (±10 Myr, clamped beyond) ÷ the Driver-2 mass-loss stretch (the model's falsifiable μ-leg). All factors ≡ 1 at J2000; Julian years = 365.25 SI days (the chain's clock is JD/TT). The era evaluator keeps its own fitted window rate — the measured decomposition split is banked in the artifact (Neptune −497 ppm the largest: a 300-yr window fit absorbs local U–N-inequality slope).`]},
@@ -48327,7 +48315,7 @@ const planetStats = {
        hover : [`The banked λ̇ channel of date (degrees per Julian year: secular J2000 rate × the planet's own N-body drift ÷ the Driver-2 mass-loss stretch), converted to °/SI-day by ÷365.25 — a pure unit conversion; the chain's clock is JD/TT. (365.2422 is Earth's measured mean solar year — an Earth observable that plays no role in another planet's clock.)`]},
       {label : () => `Period (Kepler verification)`,
        value : [ { v: () => OrbitalFormulas.keplerPeriod(uranusOrbitDistance * currentAUDistance), dec:6, sep:',' },{ small: 'days' }],
-       hover : [`Kepler's 3rd Law: P = 2π√(a³/(GM_Sun + GM_Earth)) × (meanSolar/meanSidereal ≈ 0.99996). The system-mass denominator anchors the model's AU and applies to every planet. Algebraically identical to the elaborate two-body form P = 2π√((a−Δa)³/(GM_Sun + GM_Earth − GM_body)) with the exact symmetric Δa = a·(1 − ((GM_Sun + GM_Earth − GM_body)/(GM_Sun + GM_Earth))^(1/3)) — the (a−Δa)³ and (GM_sys − GM_body) terms cancel exactly (see doc 24). The compensation factor reconciles the model's dual year-frame: GM is derived in sidereal-year units, orbit distances in solar-year units via H-cycle ratios. Deliberately stays on the DEVICE inputs — this row verifies the model’s GM↔AU closure, not the ephemeris; the surrounding rows are the chain’s dynamical values.`]},
+       hover : [`Kepler's 3rd Law: P = 2π√(a³/(GM_Sun + GM_Earth)) × (meanSolar/meanSidereal ≈ 0.99996). The system-mass denominator anchors the model's AU and applies to every planet. Algebraically identical to the elaborate two-body form P = 2π√((a−Δa)³/(GM_Sun + GM_Earth − GM_body)) with the exact symmetric Δa = a·(1 − ((GM_Sun + GM_Earth − GM_body)/(GM_Sun + GM_Earth))^(1/3)) — the (a−Δa)³ and (GM_sys − GM_body) terms cancel exactly (see doc 24). The compensation factor reconciles the model's dual year-frame: GM is derived in sidereal-year units, orbit distances in solar-year units via long-term-mean ratios. Deliberately stays on the DEVICE inputs — this row verifies the model’s GM↔AU closure, not the ephemeris; the surrounding rows are the chain’s dynamical values.`]},
     null,
       {label : () => `Length of Day`,
        value : [ { v: () => (uranusRotationPeriod*(((360/_kcNOfDate('uranus', o.currentYear))*365.25)*24))/((((360/_kcNOfDate('uranus', o.currentYear))*365.25)*24)+uranusRotationPeriod), dec:6, sep:',' }, { small : 'hours' }],
@@ -48625,7 +48613,7 @@ const planetStats = {
     {header : '—  Orbital Period & Motion —' },
       {label : () => `Orbits per anchor interval`,
        value : [ { v: () => _kcNOfDate('neptune', o.currentYear) * (holisticyearLength * meansolaryearlengthinDays / 365.25) / 360, dec:1, sep:',' },{ small: 'orbits' }],
-       hover : [`Neptune completes n × H(days)/360° orbits while Earth completes ${fmtNum(holisticyearLength,0,',')} solar years — BOTH of date: n from the banked λ̇ channel (the model's own ±10-Myr constant-GM N-body drift ÷ the Driver-2 mass-loss stretch) and H·mSY at the epoch, so the structural count holds while both stretch together; only the planet's real dynamical drift moves it. A dynamical output, NOT an integer count (doc 109 §9).`]},
+       hover : [`Neptune completes n orbits per anchor interval while Earth completes${fmtNum(holisticyearLength,0,',')} solar years — BOTH of date: n from the banked λ̇ channel (the model's own ±10-Myr constant-GM N-body drift ÷ the Driver-2 mass-loss stretch) and the anchor interval's length at the epoch, so the structural count holds while both stretch together; only the planet's real dynamical drift moves it. A dynamical output, NOT an integer count (doc 109 §9).`]},
       {label : () => `Orbital period (P)`,
        value : [ { v: () => 360/_kcNOfDate('neptune', o.currentYear), dec:6, sep:',' },{ small: 'Julian years' }],
        hover : [`Neptune's sidereal orbital period OF DATE: P = 360°/n with n from the model's own banked λ̇ channel — λ̇₀ (the ±10-Myr run's secular J2000 rate, 2-kyr window: it averages the great-inequality-class wiggles a short era-window fit absorbs, and matches JPL-class periods) × the planet's own constant-GM N-body drift (±10 Myr, clamped beyond) ÷ the Driver-2 mass-loss stretch (the model's falsifiable μ-leg). All factors ≡ 1 at J2000; Julian years = 365.25 SI days (the chain's clock is JD/TT). The era evaluator keeps its own fitted window rate — the measured decomposition split is banked in the artifact (Neptune −497 ppm the largest: a 300-yr window fit absorbs local U–N-inequality slope).`]},
@@ -48640,7 +48628,7 @@ const planetStats = {
        hover : [`The banked λ̇ channel of date (degrees per Julian year: secular J2000 rate × the planet's own N-body drift ÷ the Driver-2 mass-loss stretch), converted to °/SI-day by ÷365.25 — a pure unit conversion; the chain's clock is JD/TT. (365.2422 is Earth's measured mean solar year — an Earth observable that plays no role in another planet's clock.)`]},
       {label : () => `Period (Kepler verification)`,
        value : [ { v: () => OrbitalFormulas.keplerPeriod(neptuneOrbitDistance * currentAUDistance), dec:6, sep:',' },{ small: 'days' }],
-       hover : [`Kepler's 3rd Law: P = 2π√(a³/(GM_Sun + GM_Earth)) × (meanSolar/meanSidereal ≈ 0.99996). The system-mass denominator anchors the model's AU and applies to every planet. Algebraically identical to the elaborate two-body form P = 2π√((a−Δa)³/(GM_Sun + GM_Earth − GM_body)) with the exact symmetric Δa = a·(1 − ((GM_Sun + GM_Earth − GM_body)/(GM_Sun + GM_Earth))^(1/3)) — the (a−Δa)³ and (GM_sys − GM_body) terms cancel exactly (see doc 24). The compensation factor reconciles the model's dual year-frame: GM is derived in sidereal-year units, orbit distances in solar-year units via H-cycle ratios. Deliberately stays on the DEVICE inputs — this row verifies the model’s GM↔AU closure, not the ephemeris; the surrounding rows are the chain’s dynamical values.`]},
+       hover : [`Kepler's 3rd Law: P = 2π√(a³/(GM_Sun + GM_Earth)) × (meanSolar/meanSidereal ≈ 0.99996). The system-mass denominator anchors the model's AU and applies to every planet. Algebraically identical to the elaborate two-body form P = 2π√((a−Δa)³/(GM_Sun + GM_Earth − GM_body)) with the exact symmetric Δa = a·(1 − ((GM_Sun + GM_Earth − GM_body)/(GM_Sun + GM_Earth))^(1/3)) — the (a−Δa)³ and (GM_sys − GM_body) terms cancel exactly (see doc 24). The compensation factor reconciles the model's dual year-frame: GM is derived in sidereal-year units, orbit distances in solar-year units via long-term-mean ratios. Deliberately stays on the DEVICE inputs — this row verifies the model’s GM↔AU closure, not the ephemeris; the surrounding rows are the chain’s dynamical values.`]},
     null,
       {label : () => `Length of Day`,
        value : [ { v: () => (neptuneRotationPeriod*(((360/_kcNOfDate('neptune', o.currentYear))*365.25)*24))/((((360/_kcNOfDate('neptune', o.currentYear))*365.25)*24)-neptuneRotationPeriod), dec:6, sep:',' }, { small : 'hours' }],
@@ -48960,7 +48948,7 @@ const planetStats = {
        hover : [`Mean angular motion: n = 360°/P. Rate at which mean anomaly increases`]},
       {label : () => `Period (Kepler verification)`,
        value : [ { v: () => OrbitalFormulas.keplerPeriod(plutoOrbitDistance * currentAUDistance), dec:6, sep:',' },{ small: 'days' }],
-       hover : [`Kepler's 3rd Law: P = 2π√(a³/(GM_Sun + GM_Earth)) × (meanSolar/meanSidereal ≈ 0.99996). The system-mass denominator anchors the model's AU and applies to every planet. Algebraically identical to the elaborate two-body form P = 2π√((a−Δa)³/(GM_Sun + GM_Earth − GM_body)) with the exact symmetric Δa = a·(1 − ((GM_Sun + GM_Earth − GM_body)/(GM_Sun + GM_Earth))^(1/3)) — the (a−Δa)³ and (GM_sys − GM_body) terms cancel exactly (see doc 24). The compensation factor reconciles the model's dual year-frame: GM is derived in sidereal-year units, orbit distances in solar-year units via H-cycle ratios.`]},
+       hover : [`Kepler's 3rd Law: P = 2π√(a³/(GM_Sun + GM_Earth)) × (meanSolar/meanSidereal ≈ 0.99996). The system-mass denominator anchors the model's AU and applies to every planet. Algebraically identical to the elaborate two-body form P = 2π√((a−Δa)³/(GM_Sun + GM_Earth − GM_body)) with the exact symmetric Δa = a·(1 − ((GM_Sun + GM_Earth − GM_body)/(GM_Sun + GM_Earth))^(1/3)) — the (a−Δa)³ and (GM_sys − GM_body) terms cancel exactly (see doc 24). The compensation factor reconciles the model's dual year-frame: GM is derived in sidereal-year units, orbit distances in solar-year units via long-term-mean ratios.`]},
     null,
       {label : () => `Length of Day`,
        value : [ { v: () => (plutoRotationPeriod*(((holisticyearLength/plutoSolarYearCount)*meansolaryearlengthinDays)*24))/((((holisticyearLength/plutoSolarYearCount)*meansolaryearlengthinDays)*24)-plutoRotationPeriod), dec:6, sep:',' }, { small : 'hours' }],
@@ -49263,7 +49251,7 @@ const planetStats = {
        hover : [`Mean angular motion: n = 360°/P. Rate at which mean anomaly increases`]},
       {label : () => `Period (Kepler verification)`,
        value : [ { v: () => OrbitalFormulas.keplerPeriod(halleysOrbitDistance * currentAUDistance), dec:6, sep:',' },{ small: 'days' }],
-       hover : [`Kepler's 3rd Law: P = 2π√(a³/(GM_Sun + GM_Earth)) × (meanSolar/meanSidereal ≈ 0.99996). The system-mass denominator anchors the model's AU and applies to every planet. Algebraically identical to the elaborate two-body form P = 2π√((a−Δa)³/(GM_Sun + GM_Earth − GM_body)) with the exact symmetric Δa = a·(1 − ((GM_Sun + GM_Earth − GM_body)/(GM_Sun + GM_Earth))^(1/3)) — the (a−Δa)³ and (GM_sys − GM_body) terms cancel exactly (see doc 24). The compensation factor reconciles the model's dual year-frame: GM is derived in sidereal-year units, orbit distances in solar-year units via H-cycle ratios.`]},
+       hover : [`Kepler's 3rd Law: P = 2π√(a³/(GM_Sun + GM_Earth)) × (meanSolar/meanSidereal ≈ 0.99996). The system-mass denominator anchors the model's AU and applies to every planet. Algebraically identical to the elaborate two-body form P = 2π√((a−Δa)³/(GM_Sun + GM_Earth − GM_body)) with the exact symmetric Δa = a·(1 − ((GM_Sun + GM_Earth − GM_body)/(GM_Sun + GM_Earth))^(1/3)) — the (a−Δa)³ and (GM_sys − GM_body) terms cancel exactly (see doc 24). The compensation factor reconciles the model's dual year-frame: GM is derived in sidereal-year units, orbit distances in solar-year units via long-term-mean ratios.`]},
     null,
       {label : () => `Length of Day`,
        value : [ { v: () => (halleysRotationPeriod*(((holisticyearLength/halleysSolarYearCount)*meansolaryearlengthinDays)*24))/((((holisticyearLength/halleysSolarYearCount)*meansolaryearlengthinDays)*24)-halleysRotationPeriod), dec:6, sep:',' }, { small : 'hours' }],
@@ -49552,7 +49540,7 @@ const planetStats = {
        hover : [`Mean angular motion: n = 360°/P. Rate at which mean anomaly increases`]},
       {label : () => `Period (Kepler verification)`,
        value : [ { v: () => OrbitalFormulas.keplerPeriod(erosOrbitDistance * currentAUDistance), dec:6, sep:',' },{ small: 'days' }],
-       hover : [`Kepler's 3rd Law: P = 2π√(a³/(GM_Sun + GM_Earth)) × (meanSolar/meanSidereal ≈ 0.99996). The system-mass denominator anchors the model's AU and applies to every planet. Algebraically identical to the elaborate two-body form P = 2π√((a−Δa)³/(GM_Sun + GM_Earth − GM_body)) with the exact symmetric Δa = a·(1 − ((GM_Sun + GM_Earth − GM_body)/(GM_Sun + GM_Earth))^(1/3)) — the (a−Δa)³ and (GM_sys − GM_body) terms cancel exactly (see doc 24). The compensation factor reconciles the model's dual year-frame: GM is derived in sidereal-year units, orbit distances in solar-year units via H-cycle ratios.`]},
+       hover : [`Kepler's 3rd Law: P = 2π√(a³/(GM_Sun + GM_Earth)) × (meanSolar/meanSidereal ≈ 0.99996). The system-mass denominator anchors the model's AU and applies to every planet. Algebraically identical to the elaborate two-body form P = 2π√((a−Δa)³/(GM_Sun + GM_Earth − GM_body)) with the exact symmetric Δa = a·(1 − ((GM_Sun + GM_Earth − GM_body)/(GM_Sun + GM_Earth))^(1/3)) — the (a−Δa)³ and (GM_sys − GM_body) terms cancel exactly (see doc 24). The compensation factor reconciles the model's dual year-frame: GM is derived in sidereal-year units, orbit distances in solar-year units via long-term-mean ratios.`]},
     null,
       {label : () => `Length of Day`,
        value : [ { v: () => (erosRotationPeriod*(((holisticyearLength/erosSolarYearCount)*meansolaryearlengthinDays)*24))/((((holisticyearLength/erosSolarYearCount)*meansolaryearlengthinDays)*24)-erosRotationPeriod), dec:6, sep:',' }, { small : 'hours' }],
