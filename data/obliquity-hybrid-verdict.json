@@ -92,12 +92,12 @@
   "files": {
    "data/la2004-earth-51myr-back.asc": "sha256:3f13b9f8e69085baf40bc67a2669e6f6af4148fef9218ed2158772aa91e35f8c",
    "data/nbody-deep-secular-modes.json": "sha256:77e0baf779e85de548e532ec52e2ace55a9bdba3bbd2f67002fa9fbdfc3440de",
-   "data/nbody-secular-series.json": "sha256:817c4d7fa45755bff34f97f15d6f20df0062b51c820b85d586155e40dbb1885f",
+   "data/nbody-secular-series.json": "sha256:3c593df1cc78789b500e472a315a5aa47d98cd4bbbaa81e6b8c8b5abb13aafa2",
    "packages/physics/src/deltat/deep-time.cjs": "sha256:66fc46692b495255a0b97a82785397e82797b59c336091f92d54f0974ab74e51",
    "packages/physics/src/earth/deep-orbital-history.cjs": "sha256:efc951b45c1c87d040e29ebbeaf12d0d25e10fe578e3529f49964eaab4532111",
    "packages/physics/src/earth/precession-composed.cjs": "sha256:7f30ac5597b745a88b453c54bb47da39e5ec3c8bb8b349e34e8a15752c04a208",
    "tools/explore/stage-c-obliquity-hybrid.mjs": "sha256:383891c893099b818dfa1b03053ea1c255e0e6b156cd025efe2e445599f0d44b",
-   "tools/lib/deep-time.js": "sha256:fbaa2b52423d02874e4d63a3ab116bcc75e26e502e8843a60ca1e7521c072705",
+   "tools/lib/deep-time.js": "sha256:e9e40865167bc44d8a683b58939e54c9e670f4e42fb8f883a75a545e6de04b95",
    "tools/verify/obliquity-hybrid.js": "sha256:25116ae143e66f2daaf0fed88c8d18c01010b1ece8f590a1c979736d275d49db"
   }
  }

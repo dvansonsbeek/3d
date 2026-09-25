@@ -846,11 +846,11 @@
     "generator": "node tools/verify/sun-vs-horizons.js --write",
     "files": {
       "data/jpl-sun-ecliptic-longitude-tt.json": "sha256:1b3ef502d849b1a3cbffca70e91fe7ed29b6331073688b81addf617a9e8d5ed5",
-      "data/nbody-secular-series.json": "sha256:817c4d7fa45755bff34f97f15d6f20df0062b51c820b85d586155e40dbb1885f",
+      "data/nbody-secular-series.json": "sha256:3c593df1cc78789b500e472a315a5aa47d98cd4bbbaa81e6b8c8b5abb13aafa2",
       "packages/physics/src/earth/year-lengths.cjs": "sha256:918c3dbf9140555fca479440e1d1479013b6c400073e695e46047871b45573be",
       "packages/physics/src/eclipse/finders.cjs": "sha256:168755d5e01397b7f63f2ffa49101afe0da0046e5fbd9e7ef6d04be6d7f5d330",
       "packages/physics/src/eclipse/sun-planetary-completion.cjs": "sha256:865c409e3fe5f3b7619fad607b3b41ce29b4352c7301120b39747642c763732c",
-      "packages/physics/src/model.js": "sha256:96d67e1846bf0ba74fc50ea1d7f9f7650360460e1d5c0dd845157998cfea79af",
+      "packages/physics/src/model.js": "sha256:7e0cedf797e4c1d772665fba48652af3380b9cabd0330013ed34d84d90256bb0",
       "tools/explore/fetch-jpl-sun-longitude-tt.mjs": "sha256:e067a851ecb54bc3cf70afa9b1c8d48ea27219a8b6de4a05aedcd02e2447488c",
       "tools/verify/sun-vs-horizons.js": "sha256:f11f1dd23997038d49f416776cf2d607de9ca9bd080611e40b13d4d1a1cccae2"
     }

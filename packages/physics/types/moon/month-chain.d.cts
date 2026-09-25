@@ -14,6 +14,8 @@
  *     nNodalOfDateJ2000: number,
  *     moonApsidalJ2000Seconds: number,
  *     moonNodalJ2000Seconds: number,
+ *     moonApsidalOfDateJ2000Seconds: number,
+ *     moonNodalOfDateJ2000Seconds: number,
  *     moonSiderealMonthJ2000Seconds: number,
  *     sPerigee: number,
  *     sNode: number,
@@ -47,6 +49,8 @@ export function createMoonMonthChain({ constants, fns }: {
         nNodalOfDateJ2000: number;
         moonApsidalJ2000Seconds: number;
         moonNodalJ2000Seconds: number;
+        moonApsidalOfDateJ2000Seconds: number;
+        moonNodalOfDateJ2000Seconds: number;
         moonSiderealMonthJ2000Seconds: number;
         sPerigee: number;
         sNode: number;

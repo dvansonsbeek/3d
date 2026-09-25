@@ -156,6 +156,10 @@ const _moonApsidalEarthDays = TOTAL_DAYS_IN_H_J2000 / N_apsidalE_J2000;
 const _moonNodalEarthDays   = TOTAL_DAYS_IN_H_J2000 / N_nodalE_J2000;
 const MOON_APSIDAL_J2000_S = _moonApsidalEarthDays * LOD_NOW_H13_S;  // ≈ 8.85 yr
 const MOON_NODAL_J2000_S   = _moonNodalEarthDays   * LOD_NOW_H13_S;  // ≈ 18.60 yr
+// the OF-DATE anchors (the H² counter's J2000 period, the Meeus/IERS
+// observables 3231.49 d / 6798.38 d — mirrors src/script.js)
+const MOON_APSIDAL_OFDATE_J2000_S = (TOTAL_DAYS_IN_H_J2000 / N_apsidalI_J2000) * LOD_NOW_H13_S;
+const MOON_NODAL_OFDATE_J2000_S   = (TOTAL_DAYS_IN_H_J2000 / N_nodalI_J2000)   * LOD_NOW_H13_S;
 const MOON_SIDEREAL_MONTH_J2000_S = C.moonSiderealMonth * LOD_NOW_H13_S;   // 8H-quantized month (chain-anchor consistency, mirrors src/script.js)
 
 // Per-planet semi-major axes at J2000 (km). AU-ratio via Kepler 3rd law:
@@ -248,6 +252,8 @@ function _moonChain() {
         nNodalOfDateJ2000: N_nodalI_J2000,
         moonApsidalJ2000Seconds: MOON_APSIDAL_J2000_S,
         moonNodalJ2000Seconds: MOON_NODAL_J2000_S,
+        moonApsidalOfDateJ2000Seconds: MOON_APSIDAL_OFDATE_J2000_S,
+        moonNodalOfDateJ2000Seconds: MOON_NODAL_OFDATE_J2000_S,
         moonSiderealMonthJ2000Seconds: MOON_SIDEREAL_MONTH_J2000_S,
         sPerigee: _ECOMP_S_W, sNode: _ECOMP_S_N,
       },

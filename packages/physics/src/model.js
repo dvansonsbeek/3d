@@ -869,6 +869,10 @@ export function assembleModel(C, F, laws = {}, secularSeriesArtifact = /** @type
   const nNodalEJ2000 = nNodalIJ2000 + 13;
   const moonApsidalJ2000Seconds = (totalDaysInH / nApsidalEJ2000) * meanLengthOfDay;
   const moonNodalJ2000Seconds = (totalDaysInH / nNodalEJ2000) * meanLengthOfDay;
+  // the OF-DATE anchors (the H² counter's J2000 period — the Meeus/IERS
+  // observables 3231.49 d / 6798.38 d)
+  const moonApsidalOfDateJ2000Seconds = (totalDaysInH / nApsidalIJ2000) * meanLengthOfDay;
+  const moonNodalOfDateJ2000Seconds = (totalDaysInH / nNodalIJ2000) * meanLengthOfDay;
   const moonSiderealMonthJ2000Seconds = moonSiderealMonth * meanLengthOfDay;
 
   // 8H-lattice derived months (constants.js §Moon derived months)
@@ -898,6 +902,8 @@ export function assembleModel(C, F, laws = {}, secularSeriesArtifact = /** @type
       nNodalOfDateJ2000: nNodalIJ2000,
       moonApsidalJ2000Seconds,
       moonNodalJ2000Seconds,
+      moonApsidalOfDateJ2000Seconds,
+      moonNodalOfDateJ2000Seconds,
       moonSiderealMonthJ2000Seconds,
       sPerigee: MOON_ECC_SENSITIVITY_PERIGEE,
       sNode: MOON_ECC_SENSITIVITY_NODE,

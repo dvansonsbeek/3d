@@ -58,6 +58,8 @@
  *     nNodalOfDateJ2000: number,
  *     moonApsidalJ2000Seconds: number,
  *     moonNodalJ2000Seconds: number,
+ *     moonApsidalOfDateJ2000Seconds: number,
+ *     moonNodalOfDateJ2000Seconds: number,
  *     moonSiderealMonthJ2000Seconds: number,
  *     sPerigee: number,
  *     sNode: number,
@@ -82,7 +84,9 @@ function createMoonMonthChain({ constants, fns }) {
     gmEarthMoonM3PerS2, massRatioEarthMoon, moonSiderealMonthInputDays,
     holisticYearJ2000, meanSiderealYearJ2000Seconds,
     nApsidalOfDateJ2000, nNodalOfDateJ2000,
-    moonApsidalJ2000Seconds, moonNodalJ2000Seconds, moonSiderealMonthJ2000Seconds,
+    moonApsidalJ2000Seconds, moonNodalJ2000Seconds,
+    moonApsidalOfDateJ2000Seconds, moonNodalOfDateJ2000Seconds,
+    moonSiderealMonthJ2000Seconds,
     sPerigee, sNode,
   } = constants;
   const { meanLodSecondsAtAge, meanSiderealYearSecondsAtAge, meanHAtAge, modulation } = fns;
@@ -161,22 +165,29 @@ function createMoonMonthChain({ constants, fns }) {
     return nNodalOfDateJ2000 * Math.pow(hT / holisticYearJ2000, 2);
   }
 
-  /** @param {number} tMa @returns {number | null} */
+  /** The of-date period from the H² counter: N ∝ H² and period = H·T_yr/N
+   *  ⇒ period ∝ T_yr / H, anchored on the engine's own of-date J2000 period
+   *  (the t_Ma === 0 fast path returns it EXACTLY, as the star-referenced
+   *  anchors do). UNIT FIX: the earlier form rebuilt the period as
+   *  H × sidereal-year seconds / N while N was counted in mean-SOLAR-year
+   *  days — the sidereal/solar ratio 1.0000388 put the J2000 perigee cycle
+   *  2.9 h and the node 6.2 h above the anchors (found by the Formula
+   *  Verification Moon panels against Meeus). The year RATIO carries the
+   *  evolution; the anchor carries the unit. @param {number} tMa
+   *  @returns {number | null} */
   function apsidalPrecessionSecondsOfDateAtAge(tMa) {
-    const n = apsidalCyclesOfDateAtAge(tMa);
+    if (tMa === 0) return moonApsidalOfDateJ2000Seconds;
     const hT = meanHAtAge(tMa);
-    const tYrS = meanSiderealYearSecondsAtAge(tMa);
-    if (n === null || hT === null) return null;
-    return hT * tYrS / n;     // H in years × seconds/year / N
+    if (hT === null) return null;
+    return moonApsidalOfDateJ2000Seconds * (meanSiderealYearSecondsAtAge(tMa) / meanSiderealYearJ2000Seconds) * (holisticYearJ2000 / hT);
   }
 
   /** @param {number} tMa @returns {number | null} */
   function nodalPrecessionSecondsOfDateAtAge(tMa) {
-    const n = nodalCyclesOfDateAtAge(tMa);
+    if (tMa === 0) return moonNodalOfDateJ2000Seconds;
     const hT = meanHAtAge(tMa);
-    const tYrS = meanSiderealYearSecondsAtAge(tMa);
-    if (n === null || hT === null) return null;
-    return hT * tYrS / n;
+    if (hT === null) return null;
+    return moonNodalOfDateJ2000Seconds * (meanSiderealYearSecondsAtAge(tMa) / meanSiderealYearJ2000Seconds) * (holisticYearJ2000 / hT);
   }
 
   /** Perigee precession period in seconds — Brouwer–Clemence m² scaling ×
