@@ -19231,6 +19231,24 @@ function _cardinalYearSeconds(year, type) {
 function _cardinalYearDays(year, type) {
   return _cardinalYearSeconds(year, type) / 86400;
 }
+/** The four northern seasons in SI days — the interval between successive
+ *  cardinal points of the TRUE Sun: a quarter of the tropical year of date
+ *  plus the difference of the two ends' timing offsets Δt (the one-source
+ *  cardinal structure's eocOffsetSeconds; winter ends at NEXT year's VE).
+ *  'MEAN' is the quarter year itself. Unlike the cardinal YEAR lengths (a
+ *  year-to-year DIFFERENCE of Δt, which carries an eccentricity-decay term
+ *  2·sin M·de/dt), a season depends on Δt itself — so with perihelion on a
+ *  solstice the seasons pair off exactly (spring = summer, autumn = winter
+ *  at 1246 AD). NaN before the one-source series has loaded. */
+function _seasonDurationDays(year, season) {
+  if (!_hybridSpinActive()) return NaN;
+  const yl = _yearLengthsM();
+  const quarter = yl.tropicalYearSecondsAtYear(year + 0.5) / 4;
+  if (season === 'MEAN') return quarter / 86400;
+  const off = (y, type) => yl.cardinal.eocOffsetSeconds(y, type);
+  const ends = { SPRING: ['VE', 'SS', 0], SUMMER: ['SS', 'AE', 0], AUTUMN: ['AE', 'WS', 0], WINTER: ['WS', 'VE', 1] }[season];
+  return (quarter + off(year + ends[2], ends[1]) - off(year, ends[0])) / 86400;
+}
 
 // The series-driven hybrid (the ONE evaluator): factory built lazily AFTER
 // the series arrives; deep ζ modes remain only the beyond-span tail.
@@ -19898,6 +19916,36 @@ const VFP_CATEGORIES = [
     customPaper: () => _vfpANPaperSvg(),
   },
   {
+    // ── Season Durations (owner: "the duration of the seasons … 'days a
+    // season'") — the cardinal-year panel's companion: the four northern
+    // seasons of the TRUE Sun in days against the mean quarter year, from
+    // the same one-source cardinal structure (_seasonDurationDays). The
+    // Bromberg / Meeus picture: with perihelion on the December solstice
+    // (1246 AD) spring = summer and autumn = winter exactly.
+    id: 'season-durations', group: 'Earth clock', label: 'Season Durations', unit: ' days', precision: 4,
+    yLabel: 'days',
+    residualLabel: 'days', residualScale: 1,
+    paperTitle: 'Season Durations',
+    frame: 'The four northern seasons in SI days — the interval between successive cardinal points of the true Sun (spring VE → SS, summer SS → AE, autumn AE → WS, winter WS → VE) — against the mean quarter of the tropical year of date; the residual pane is each season’s departure from that quarter',
+    model: { name: 'Mean quarter year (T/4, of date)', color: '#f0b040',
+      fn: year => _seasonDurationDays(year, 'MEAN') },
+    references: [
+      { name: 'Spring (VE → SS)', color: '#e6d534', preserveColor: true, fn: year => _seasonDurationDays(year, 'SPRING') },
+      { name: 'Summer (SS → AE)', color: '#1a9c2e', preserveColor: true, fn: year => _seasonDurationDays(year, 'SUMMER') },
+      { name: 'Autumn (AE → WS)', color: '#b0323a', preserveColor: true, fn: year => _seasonDurationDays(year, 'AUTUMN') },
+      { name: 'Winter (WS → VE)', color: '#2251e0', preserveColor: true, fn: year => _seasonDurationDays(year, 'WINTER') },
+    ],
+    // Meeus, Astronomical Algorithms — the season lengths for the year
+    // 2000 (cited anchors, never inputs)
+    j2000extras: [
+      { name: 'Spring — Meeus (year 2000)', color: '#e6d534', value: () => 92.76 },
+      { name: 'Summer — Meeus (year 2000)', color: '#1a9c2e', value: () => 93.65 },
+      { name: 'Autumn — Meeus (year 2000)', color: '#b0323a', value: () => 89.84 },
+      { name: 'Winter — Meeus (year 2000)', color: '#2251e0', value: () => 88.99 },
+    ],
+    modelNote: 'A season is a quarter of the tropical year plus the difference of the true Sun’s timing offsets Δt = −(T/360°)·EoC at its two ends, so it depends on the offsets <em>themselves</em>: with perihelion on the December solstice (1246 AD) the figure is symmetric about that solstice — spring = summer, autumn = winter — and the lengths pair off exactly there. The Cardinal Year Lengths panel is the year-to-year <em>change</em> of the same offsets, which adds an eccentricity-decay term 2·sin M·de/dt (about ±4 s today at the equinoxes), so its equinox years cross the mean some 230 years before the alignment, not at it. The seasons’ spread breathes with the eccentricity of date: it vanishes at every eccentricity minimum.',
+  },
+  {
     // ── Climatic precession e·sin ϖ (owner: "are we missing panels?") —
     // the third Milankovitch curve beside eccentricity and obliquity: the
     // eccentricity-modulated precession of the perihelion against the
@@ -19934,7 +19982,7 @@ const VFP_ORDER = [
   'eccentricity', 'perihelion', 'inclination', 'ascending-node',   // Earth orbit
   'obliquity', 'axial-precession',                                  // Earth axis
   'all-precession', 'climatic-precession', 'analemma',             // Earth cycles
-  'tropical-year', 'sidereal-year', 'cardinal-year-lengths', 'solar-day', 'delta-t',   // Earth clock
+  'tropical-year', 'sidereal-year', 'cardinal-year-lengths', 'season-durations', 'solar-day', 'delta-t',   // Earth clock
   'planet-inclinations', 'planet-eccentricities',                   // All planets
 ];
 VFP_CATEGORIES.sort((a, b) => VFP_ORDER.indexOf(a.id) - VFP_ORDER.indexOf(b.id));
