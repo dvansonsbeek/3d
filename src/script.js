@@ -20014,6 +20014,62 @@ const VFP_CATEGORIES = [
     afterRender: (el) => _vfpMOAfterRender(el),
     customPaper: () => _vfpMOPaperSvg(_vfpCurrentTabFor('milankovitch-overview').range),
   },
+  {
+    // ── Moon · Perigee Precession (owner-requested: the lunar twin of the
+    // Earth precession panels): the period of the perigee's advance against
+    // the equinox of date from the lunar chain (Brouwer–Clemence m²
+    // scaling: the rate rides m², m the Sun's to the Moon's mean motion, so
+    // the Moon's distance as a^{3/2}), against the Meeus Ch. 47 rate
+    // polynomial and the registry's J2000 anchor.
+    id: 'moon-perigee', group: 'Moon', label: 'Perigee Precession', unit: ' yr', precision: 6,
+    defaultRef: 'Meeus (1998), Ch. 47 rates',
+    yLabel: 'years (perigee cycle, equinox of date)',
+    residualLabel: 'years', residualScale: 1,
+    paperTitle: 'Lunar Perigee Precession Period',
+    frame: 'Period of the lunar perigee’s advance against the equinox of date (Julian years)',
+    // FRAME: Meeus's rates are equinox-of-date, so the model line is the
+    // chain's OF-DATE period (apsidalPrecessionSecondsOfDateAtAge — the
+    // registry anchor's convention; the legacy '…ICRF' name is the of-date
+    // value). The chain's star-referenced route (perigeePrecessionSecondsAtAge,
+    // Brouwer–Clemence m² scaling, 3232.60 d at J2000) is offered as a
+    // second, clickable line BRIDGED to date through the model's own axial
+    // precession of date, 1/T_date = 1/T_star + 1/T_p — the two deep-time
+    // tiers stay visible on one convention, never anchored together.
+    model: { name: 'This model (lunar chain, of date)', color: '#f0b040',
+      fn: year => meanApsidalPrecessionSecondsICRFAtAge((startmodelYear - year) / 1e6) / JULIAN_YEAR_SECONDS },
+    references: [
+      { name: 'Meeus (1998), Ch. 47 rates', color: '#4fc3f7', fn: moonPerigeePrecessionYearsMeeus, validYears: [-1999, 3000], sourceUrl: 'https://en.wikipedia.org/wiki/Lunar_precession' },
+      { name: 'This model (Brouwer–Clemence m², bridged to date)', color: '#ce93d8',
+        fn: year => 1 / (JULIAN_YEAR_SECONDS / meanLunarPerigeePrecessionAtAge((startmodelYear - year) / 1e6) + 1 / _vfpAxialPrecessionYears(year)) },
+    ],
+    j2000extras: [
+      { name: 'Registry anchor (the chain’s J2000 input, of date)', color: '#ef5350',
+        value: () => K.moonReference.moonApsidalPrecessionDaysInputICRF / 365.25 },
+    ],
+    reading: 'The perigee advances once round the equinox of date in about 8.85 years. The one-source line is the chain’s of-date counter, the T_apsidal·H = const law (the cycle count per unit scales as H², the period as the sidereal year over H) — a slow, monotonic drift that rides the spin unit. The second line, off by default, is the chain’s Brouwer–Clemence route: the rate rides m², the Sun’s to the Moon’s mean motion, so the period goes as the sidereal year squared over the sidereal month, modulated by Earth’s orbital eccentricity of date through the solar perturbation — it dips at every eccentricity maximum, the ~100-kyr wobble the of-date counter does not carry; both are read on one convention through the model’s own axial precession (1/T_date = 1/T_star + 1/T_p). Meeus’s line is 36,000° over d(L′ − M′)/dT from the Ch. 47 mean arguments (Chapront ELP-2000/82), whose T² terms are a J2000-centred fit (the tidal secular acceleration among them), offered on the canon’s −2000 → 3000 range only.',
+  },
+  {
+    // ── Moon · Node Regression: the same for the node's retrograde cycle.
+    id: 'moon-node', group: 'Moon', label: 'Node Regression', unit: ' yr', precision: 6,
+    defaultRef: 'Meeus (1998), Ch. 47 rates',
+    yLabel: 'years (node cycle, equinox of date)',
+    residualLabel: 'years', residualScale: 1,
+    paperTitle: 'Lunar Node Regression Period',
+    frame: 'Period of the lunar node’s regression against the equinox of date (Julian years)',
+    // the node regresses: the bridge to date is 1/T_date = 1/T_star − 1/T_p
+    model: { name: 'This model (lunar chain, of date)', color: '#f0b040',
+      fn: year => meanNodalPrecessionSecondsICRFAtAge((startmodelYear - year) / 1e6) / JULIAN_YEAR_SECONDS },
+    references: [
+      { name: 'Meeus (1998), Ch. 47 rates', color: '#4fc3f7', fn: moonNodeRegressionYearsMeeus, validYears: [-1999, 3000], sourceUrl: 'https://en.wikipedia.org/wiki/Lunar_precession' },
+      { name: 'This model (Brouwer–Clemence m², bridged to date)', color: '#ce93d8',
+        fn: year => 1 / (JULIAN_YEAR_SECONDS / meanLunarNodePrecessionAtAge((startmodelYear - year) / 1e6) - 1 / _vfpAxialPrecessionYears(year)) },
+    ],
+    j2000extras: [
+      { name: 'Registry anchor (the chain’s J2000 input, of date)', color: '#ef5350',
+        value: () => K.moonReference.moonNodalPrecessionDaysInputICRF / 365.25 },
+    ],
+    reading: 'The node regresses once round the equinox of date in about 18.61 years — the eclipse-season and the lunar-standstill cycle. The one-source line is the chain’s of-date counter, the T_nodal·H = const law, a slow monotonic drift riding the spin unit. The second line, off by default, is the chain’s Brouwer–Clemence route on the same m² law as the perigee, modulated by Earth’s orbital eccentricity of date through the solar perturbation — it dips at every eccentricity maximum; both are read on one convention through the model’s own axial precession (1/T_date = 1/T_star − 1/T_p, the node running retrograde). Meeus’s line is 36,000° over d(L′ − F)/dT from the Ch. 47 mean arguments (Chapront ELP-2000/82), a J2000-centred fit offered on the canon’s −2000 → 3000 range only.',
+  },
 ];
 // The panel ORDER (owner-ruled): the physics builds up — the orbit, the axis,
 // what the two produce together, the clock, the other planets. The groups are
@@ -20024,6 +20080,7 @@ const VFP_ORDER = [
   'obliquity', 'axial-precession',                                  // Earth axis
   'all-precession', 'climatic-precession', 'insolation-65n', 'milankovitch-overview', 'analemma',   // Earth cycles
   'tropical-year', 'sidereal-year', 'cardinal-year-lengths', 'season-durations', 'solar-day', 'delta-t',   // Earth clock
+  'moon-perigee', 'moon-node',                                      // Moon
   'planet-inclinations', 'planet-eccentricities',                   // All planets
 ];
 VFP_CATEGORIES.sort((a, b) => VFP_ORDER.indexOf(a.id) - VFP_ORDER.indexOf(b.id));
@@ -21170,6 +21227,35 @@ function _vfpAPAfterRender(bodyEl) {
     tip.style.left = Math.max(0, tx) + 'px';
     tip.style.top = Math.max(0, ty) + 'px';
   });
+}
+
+// ── Moon: the Meeus Ch. 47 mean-argument RATES → precession periods of date ──
+// The Meeus (1998, Ch. 47; Chapront ELP-2000/82) polynomials of the Moon's
+// mean longitude L′, mean anomaly M′ and argument of latitude F (degrees, T
+// in Julian centuries from J2000) — the coefficients the Moon's longitude
+// evaluator carries inline. The perigee advances at d(L′ − M′)/dT, the node
+// regresses at d(L′ − F)/dT, both against the equinox of date; a period of
+// date is 36,000° over the rate (Julian years). Offered on the canon's
+// −2000 → 3000 range: the T² terms are a fit centred on J2000 (the tidal
+// secular acceleration among them), not deep-time physics.
+const JULIAN_YEAR_SECONDS = 365.25 * 86400;
+const _MEEUS47_LP = [218.3164477, 481267.88123421, -0.0015786, 1 / 538841, -1 / 65194000];
+const _MEEUS47_MP = [134.9633964, 477198.8675055, 0.0087414, 1 / 69699, -1 / 14712000];
+const _MEEUS47_F = [93.2720950, 483202.0175233, -0.0036539, -1 / 3526000, 1 / 863310000];
+function _meeus47RateDegPerCy(c, T) { return c[1] + 2 * c[2] * T + 3 * c[3] * T * T + 4 * c[4] * T * T * T; }
+/** The model's axial precession period of date (years) — the Axial
+ *  Precession Period panel's one line, the frame bridge from a
+ *  star-referenced lunar period to the equinox of date. */
+function _vfpAxialPrecessionYears(year) { return _vfpCategoryById('axial-precession').model.fn(year); }
+/** Lunar perigee precession period of date (Julian years), Meeus Ch. 47 rates. */
+function moonPerigeePrecessionYearsMeeus(year) {
+  const T = (year - 2000) / 100;
+  return 36000 / Math.abs(_meeus47RateDegPerCy(_MEEUS47_LP, T) - _meeus47RateDegPerCy(_MEEUS47_MP, T));
+}
+/** Lunar node regression period of date (Julian years), Meeus Ch. 47 rates. */
+function moonNodeRegressionYearsMeeus(year) {
+  const T = (year - 2000) / 100;
+  return 36000 / Math.abs(_meeus47RateDegPerCy(_MEEUS47_LP, T) - _meeus47RateDegPerCy(_MEEUS47_F, T));
 }
 
 // ── Daily insolation — Berger (1978)'s closed form ──────────────────
