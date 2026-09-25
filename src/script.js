@@ -21833,7 +21833,8 @@ function renderVFPChart(category, currentYear) {
   return `<div class="vfp-legend">${legend}</div>
     ${tabStrip}
     <div class="vfp-chart-container" style="position:relative;">${mainSVG}${tipDiv}</div>
-    ${category.noComparisons ? '' : `<div class="vfp-chart-container vfp-residual" style="position:relative;">${resSVG}${tipDiv}</div>`}
+    ${category.noComparisons ? '' : `<div style="display:flex;justify-content:flex-end;padding:2px 4px 0;"><button data-vfp-res-toggle style="padding:1px 9px;border-radius:4px;border:1px solid #2a2f3a;background:#232a36;color:#8a93a5;font-size:10px;cursor:pointer;">${_vfpResidualOpen ? 'Residual ▴' : 'Residual ▾'}</button></div>
+    <div class="vfp-chart-container vfp-residual" data-vfp-res-wrap style="position:relative;${_vfpResidualOpen ? '' : 'display:none;'}">${resSVG}${tipDiv}</div>`}
     ${j2000Table}
     ${caption}`;
 }
@@ -21844,6 +21845,10 @@ function renderVFPChart(category, currentYear) {
 // residual chart and the J2000 table carry the differences); both charts'
 // cursors move together.
 let _vfpHoverCtx = null;
+// The residual pane is collapsible (owner: the hover covers the values; the
+// pane stays the one place the DIFFERENCE is a curve) — one setting for
+// the whole panel, default open, remembered for the session.
+let _vfpResidualOpen = true;
 function _vfpGenericAfterRender(bodyEl) {
   const C = _vfpHoverCtx;
   if (!C) return;
@@ -21854,6 +21859,16 @@ function _vfpGenericAfterRender(bodyEl) {
       updateVerificationPanel(C.category.id);
     });
   });
+  // the residual toggle — flips the pane in place, no re-render
+  const resToggle = bodyEl.querySelector('button[data-vfp-res-toggle]');
+  const resWrap = bodyEl.querySelector('div[data-vfp-res-wrap]');
+  if (resToggle && resWrap) {
+    resToggle.addEventListener('click', () => {
+      _vfpResidualOpen = !_vfpResidualOpen;
+      resWrap.style.display = _vfpResidualOpen ? '' : 'none';
+      resToggle.textContent = _vfpResidualOpen ? 'Residual ▴' : 'Residual ▾';
+    });
+  }
   const svgs = [bodyEl.querySelector('svg[data-vfp-main]'), bodyEl.querySelector('svg[data-vfp-res]')].filter((s) => s);
   if (!svgs.length) return;
   const cursors = svgs.map((s) => s.querySelector('line[data-vfp-cursor]'));
