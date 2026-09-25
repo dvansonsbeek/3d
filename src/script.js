@@ -19898,6 +19898,16 @@ const VFP_CATEGORIES = [
     customPaper: () => _vfpAPPaperSvg(_VFPAP_PAPER_RANGE),
     customPaperAlt: () => _vfpAPPaperSvg(_VFPAP_CYCLES_RANGE),
   },
+  {
+    // ── Analemma (owner-requested): the Sun's figure-8 at four editable
+    // epochs (defaults 113,000 BC · 44,000 BC · 2000 AD · 28,000 AD) from the
+    // model's obliquity, eccentricity and perihelion of date; "Export for
+    // Paper" prints the four figures on white; no cycles form.
+    id: 'analemma', label: 'Analemma',
+    customRender: () => renderVFPAnalemma(),
+    afterRender: (el) => _vfpANAfterRender(el),
+    customPaper: () => _vfpANPaperSvg(),
+  },
 ];
 
 // ── VFP: Inclination of all planets — custom static chart ────────
@@ -21149,6 +21159,272 @@ function _vfpAPAfterRender(bodyEl) {
     tip.style.left = Math.max(0, tx) + 'px';
     tip.style.top = Math.max(0, ty) + 'px';
   });
+}
+
+// ── VFP: Analemma — the Sun's figure-8 at four epochs ─────────────
+// (owner-requested; replaces the static "Predicted analemma" picture, whose
+// years came from the retired constant-rate device.) The analemma is the
+// Sun's declination against the equation of time over one year at a fixed
+// mean solar time; the TWO-BODY form on the model's elements OF DATE — the
+// obliquity (the Obliquity chart's one-source line: the figure's height and
+// the 2ε-type term), the eccentricity (the eccentricity twin's Earth route:
+// the size of the eccentricity term) and the perihelion longitude of date
+// (the perihelion chart's series sampler: the term's PHASE against the
+// equinox — the tilt and twist). Verified: J2000 reads +16.42 / −14.25 min
+// and ±23.439°; the Sun's perigee on the December solstice mirrors the
+// figure about the vertical axis, on the September equinox it is point-
+// symmetric (residuals 1e-12). The scene's real Sun adds the lunar and
+// planetary ripple (< 0.5 min) — the shape is unchanged. Sky view facing
+// south: East on the LEFT, a fast Sun (E > 0) stands WEST of the meridian
+// at mean noon (the source picture's E/W labels are the shadow-on-the-ground
+// view, mirrored).
+const _VFPAN_DEFAULT_YEARS = [-113000, -44000, 2000, 28000];
+const _vfpANState = { years: _VFPAN_DEFAULT_YEARS.slice() };
+const _VFPAN_DOMAIN_YEARS = 10000000;   // the banked series span (±10 Myr)
+/** Earth's perihelion longitude of date (equinox-referenced, degrees) — the
+ *  perihelion chart's one-source line and its not-loaded fallback. */
+function _vfpANPeriEarthDeg(year) {
+  return _hybridSpinActive()
+    ? _hybridSeriesSampleAt(year).periOfDateDeg
+    : (((_kcPerihelionEclLonDeg('earth', yearToJDApprox(year)) + (360 / _certifiedAxialPrecessionJ2000Years()) * (year - 2000)) % 360) + 360) % 360;
+}
+function _vfpANInputs(year) {
+  const y = Math.max(-_VFPAN_DOMAIN_YEARS, Math.min(_VFPAN_DOMAIN_YEARS, year));
+  const days = _hybridSpinActive() ? _yearLengthsM().tropicalYearSecondsAtYear(y) / 86400 : 365.2422;
+  return { year: y, e: _vfpPEEarthEcc(y), epsDeg: _sceneEpsTargetDeg(y), periEarthDeg: _vfpANPeriEarthDeg(y), days };
+}
+/** The analemma curve: n points of one mean-sun year (f = fraction of the
+ *  year from the March equinox of the MEAN sun) → equation of time (min),
+ *  declination (°), the Sun's true longitude (°). */
+function _vfpANCurve(inp, n) {
+  const D = Math.PI / 180, eps = inp.epsDeg * D, w = inp.periEarthDeg * D, e = inp.e;
+  const pts = new Array(n);
+  for (let i = 0; i < n; i++) {
+    const Ls = (2 * Math.PI * i) / n;          // mean longitude of the SUN from the equinox of date
+    const M = Ls + Math.PI - w;                // Earth's mean anomaly
+    let E = M;
+    for (let k = 0; k < 12; k++) E = M + e * Math.sin(E);
+    const nu = 2 * Math.atan2(Math.sqrt(1 + e) * Math.sin(E / 2), Math.sqrt(1 - e) * Math.cos(E / 2));
+    const lamS = nu + w + Math.PI;             // the Sun's true longitude
+    const ra = Math.atan2(Math.cos(eps) * Math.sin(lamS), Math.cos(lamS));
+    let dE = Ls - ra;
+    while (dE > Math.PI) dE -= 2 * Math.PI;
+    while (dE < -Math.PI) dE += 2 * Math.PI;
+    pts[i] = { f: i / n, eotMin: (dE / D) * 4, decDeg: Math.asin(Math.sin(eps) * Math.sin(lamS)) / D, lamSDeg: (((lamS / D) % 360) + 360) % 360 };
+  }
+  return pts;
+}
+/** Where on the mean-sun year (fraction f) the Sun's TRUE longitude crosses
+ *  targetDeg — the cardinal points and the perigee, interpolated on a fine
+ *  curve. */
+function _vfpANFractionAtTrueLon(fine, targetDeg) {
+  const n = fine.length;
+  for (let i = 0; i < n; i++) {
+    const a = fine[i].lamSDeg, b = fine[(i + 1) % n].lamSDeg;
+    let da = ((targetDeg - a) % 360 + 540) % 360 - 180, db = ((targetDeg - b) % 360 + 540) % 360 - 180;
+    if (da >= 0 && db < 0 && Math.abs(da) < 90 && Math.abs(db) < 90) {
+      const t = da / (da - db);
+      return ((i + t) / n) % 1;
+    }
+  }
+  return NaN;
+}
+const _VFPAN_CARDINALS = [
+  { lon: 0, short: 'Mar eq', name: 'March equinox' },
+  { lon: 90, short: 'Jun sol', name: 'June solstice' },
+  { lon: 180, short: 'Sep eq', name: 'September equinox' },
+  { lon: 270, short: 'Dec sol', name: 'December solstice' },
+];
+/** One epoch's full description: inputs, curve, marker fractions, the
+ *  perihelion date against the nearest cardinal point, the extremes. */
+function _vfpANEpoch(year) {
+  const inp = _vfpANInputs(year);
+  const n = Math.max(300, Math.round(inp.days));
+  const pts = _vfpANCurve(inp, n);
+  const fine = _vfpANCurve(inp, 3650);
+  const perigeeDeg = ((inp.periEarthDeg + 180) % 360 + 360) % 360;
+  const fPeri = _vfpANFractionAtTrueLon(fine, perigeeDeg);
+  const cards = _VFPAN_CARDINALS.map((c) => ({ ...c, f: _vfpANFractionAtTrueLon(fine, c.lon) }));
+  let nearest = null;
+  for (const c of cards) {
+    let df = fPeri - c.f;
+    while (df > 0.5) df -= 1;
+    while (df < -0.5) df += 1;
+    if (!nearest || Math.abs(df) < Math.abs(nearest.df)) nearest = { c, df };
+  }
+  const offsetDays = nearest ? nearest.df * inp.days : NaN;
+  let eotMax = -Infinity, eotMin = Infinity;
+  for (const p of pts) { if (p.eotMin > eotMax) eotMax = p.eotMin; if (p.eotMin < eotMin) eotMin = p.eotMin; }
+  return { inp, pts, fPeri, cards, perigeeDeg, nearestCardinal: nearest ? nearest.c : null, offsetDays, eotMax, eotMin };
+}
+/** The model's own symmetric years — ONE perihelion cycle in order: the
+ *  Sun's perigee crossing the December solstice nearest to J2000, then the
+ *  following crossings of the March equinox, the June solstice and the
+ *  September equinox (a 10-yr scan on the of-date perihelion, linear between
+ *  steps; the source picture's 1246 · 6486 · 11,725 · 16,964 were the
+ *  retired constant-rate device's readings of the same four events). */
+let _vfpANSymmetricM = null;
+function _vfpANSymmetricYears() {
+  if (_vfpANSymmetricM) return _vfpANSymmetricM;
+  const step = 10;
+  const crossings = (lon, y0, y1, pick) => {
+    let prev = null, prevY = NaN, best = NaN, bestDist = Infinity;
+    for (let y = y0; y <= y1; y += step) {
+      const pg = ((_vfpANPeriEarthDeg(y) + 180) % 360 + 360) % 360;
+      if (prev !== null) {
+        const da = ((lon - prev) % 360 + 540) % 360 - 180, db = ((lon - pg) % 360 + 540) % 360 - 180;
+        if (da >= 0 && db < 0 && Math.abs(da) < 90 && Math.abs(db) < 90) {
+          const yc = prevY + step * (da / (da - db));
+          if (pick === 'first') return Math.round(yc);
+          if (Math.abs(yc - 2000) < bestDist) { best = Math.round(yc); bestDist = Math.abs(yc - 2000); }
+        }
+      }
+      prev = pg; prevY = y;
+    }
+    return best;
+  };
+  const dec = crossings(270, -30000, 30000, 'nearest');
+  const order = [270, 0, 90, 180];
+  const years = [dec];
+  for (let i = 1; i < order.length && Number.isFinite(years[i - 1]); i++) years.push(crossings(order[i], years[i - 1], years[i - 1] + 40000, 'first'));
+  return (_vfpANSymmetricM = order.map((lon, i) => ({ ..._VFPAN_CARDINALS.find((c) => c.lon === lon), year: years[i] })));
+}
+const _vfpANFmtYear = (y) => y === 0 ? '0' : Math.abs(y).toLocaleString('en-US') + (y < 0 ? ' BC' : ' AD');
+const _vfpANFmtDms = (deg) => {
+  const s = Math.round(deg * 3600), d = Math.floor(s / 3600), m = Math.floor((s - d * 3600) / 60), sec = s - d * 3600 - m * 60;
+  return d + '°' + String(m).padStart(2, '0') + '′' + String(sec).padStart(2, '0') + '″';
+};
+/** The four figures in ONE SVG, shared scale (6 px per degree, both axes —
+ *  the figure is as thin as it really is), screen or paper style. */
+function _vfpANChartCore(years, style) {
+  const paper = style === 'paper';
+  const W = 800, COLW = 200, HEAD = 96, PLOT = 372, FOOT = 46, H = HEAD + PLOT + FOOT;
+  const PX = 6;   // px per degree on both axes (1 min of time = 0.25°)
+  const cText = paper ? '#222' : '#e8ecf4', cDim = paper ? '#555' : '#8a93a5', cGrid = paper ? '#ccc' : '#2f3542';
+  const cDot = paper ? '#b45309' : '#f0b040', cCard = paper ? '#2563eb' : '#4fc3f7', cPeri = paper ? '#b91c1c' : '#ef5350';
+  const epochs = years.map((y) => _vfpANEpoch(y));
+  let body = '';
+  const decMax = 30, eotMaxDeg = 8;   // ±30° declination, ±32 min of time
+  epochs.forEach((E, k) => {
+    const x0 = k * COLW, cx = x0 + COLW / 2, cy = HEAD + PLOT / 2;
+    const toX = (eotMin) => cx + (eotMin * 0.25) * PX;      // a FAST Sun (E > 0) stands WEST = right, facing south
+    const toY = (decDeg) => cy - decDeg * PX;
+    // header
+    const inp = E.inp;
+    // short form — the full cardinal name overran the 200-px column
+    const periText = E.nearestCardinal
+      ? 'perihelion ' + Math.abs(E.offsetDays).toFixed(0) + ' d ' + (E.offsetDays >= 0 ? 'after' : 'before') + ' ' + E.nearestCardinal.name.replace('March', 'Mar').replace('June', 'Jun').replace('September', 'Sep').replace('December', 'Dec')
+      : '';
+    body += '<text x="' + cx + '" y="' + 18 + '" text-anchor="middle" fill="' + cText + '" font-size="14" font-weight="600">' + _vfpANFmtYear(inp.year) + '</text>' +
+      '<text x="' + cx + '" y="' + 36 + '" text-anchor="middle" fill="' + cDim + '" font-size="10">e ' + inp.e.toFixed(6) + ' · ε ' + _vfpANFmtDms(inp.epsDeg) + '</text>' +
+      '<text x="' + cx + '" y="' + 51 + '" text-anchor="middle" fill="' + cDim + '" font-size="10">Sun’s perigee at λ = ' + E.perigeeDeg.toFixed(1) + '°</text>' +
+      '<text x="' + cx + '" y="' + 66 + '" text-anchor="middle" fill="' + cDim + '" font-size="10">' + escapeXml(periText) + '</text>' +
+      '<text x="' + cx + '" y="' + 84 + '" text-anchor="middle" fill="' + cDim + '" font-size="9">equation of time ' + (E.eotMin >= 0 ? '+' : '−') + Math.abs(E.eotMin).toFixed(1) + ' … +' + E.eotMax.toFixed(1) + ' min</text>';
+    // axes
+    body += '<line x1="' + cx + '" y1="' + toY(decMax) + '" x2="' + cx + '" y2="' + toY(-decMax) + '" stroke="' + cGrid + '" stroke-width="0.8"/>' +
+      '<line x1="' + (cx - eotMaxDeg * PX) + '" y1="' + cy + '" x2="' + (cx + eotMaxDeg * PX) + '" y2="' + cy + '" stroke="' + cGrid + '" stroke-width="0.8"/>';
+    for (const d of [-20, -10, 10, 20]) {
+      body += '<line x1="' + (cx - 5) + '" y1="' + toY(d) + '" x2="' + (cx + 5) + '" y2="' + toY(d) + '" stroke="' + cGrid + '" stroke-width="0.8"/>' +
+        '<text x="' + (cx - 8) + '" y="' + toY(d) + '" text-anchor="end" dominant-baseline="middle" fill="' + cDim + '" font-size="8">' + (d > 0 ? '+' : '−') + Math.abs(d) + '°</text>';
+    }
+    for (const mnt of [-20, 20]) {
+      body += '<line x1="' + toX(mnt) + '" y1="' + (cy - 4) + '" x2="' + toX(mnt) + '" y2="' + (cy + 4) + '" stroke="' + cGrid + '" stroke-width="0.8"/>' +
+        '<text x="' + toX(mnt) + '" y="' + (cy + 14) + '" text-anchor="middle" fill="' + cDim + '" font-size="8">' + Math.abs(mnt) + ' min</text>';
+    }
+    body += '<text x="' + (cx - eotMaxDeg * PX) + '" y="' + (cy - 6) + '" text-anchor="start" fill="' + cDim + '" font-size="8">E</text>' +
+      '<text x="' + (cx + eotMaxDeg * PX) + '" y="' + (cy - 6) + '" text-anchor="end" fill="' + cDim + '" font-size="8">W</text>';
+    // the daily dots
+    for (const p of E.pts) body += '<circle cx="' + toX(p.eotMin).toFixed(1) + '" cy="' + toY(p.decDeg).toFixed(1) + '" r="1.1" fill="' + cDot + '"/>';
+    // cardinal points + the perihelion, read off the fine curve at their fractions
+    const at = (f) => { const i = Math.round(f * E.pts.length) % E.pts.length; return E.pts[i]; };
+    for (const c of E.cards) {
+      if (!Number.isFinite(c.f)) continue;
+      const p = at(c.f);
+      const side = c.lon === 180 ? 1 : -1;   // Sep eq to the right, the other three to the left (the two equinoxes share the crossing)
+      body += '<circle cx="' + toX(p.eotMin).toFixed(1) + '" cy="' + toY(p.decDeg).toFixed(1) + '" r="3" fill="' + cCard + '" stroke="' + (paper ? '#fff' : '#151a22') + '" stroke-width="1"/>' +
+        '<text x="' + (toX(p.eotMin) + side * 7).toFixed(1) + '" y="' + toY(p.decDeg).toFixed(1) + '" text-anchor="' + (side > 0 ? 'start' : 'end') + '" dominant-baseline="middle" fill="' + cCard + '" font-size="8">' + c.short + '</text>';
+    }
+    if (Number.isFinite(E.fPeri)) {
+      const p = at(E.fPeri);
+      body += '<rect x="' + (toX(p.eotMin) - 3.2).toFixed(1) + '" y="' + (toY(p.decDeg) - 3.2).toFixed(1) + '" width="6.4" height="6.4" transform="rotate(45 ' + toX(p.eotMin).toFixed(1) + ' ' + toY(p.decDeg).toFixed(1) + ')" fill="' + cPeri + '" stroke="' + (paper ? '#fff' : '#151a22') + '" stroke-width="1"/>' +
+        '<text x="' + (toX(p.eotMin) + 10).toFixed(1) + '" y="' + (toY(p.decDeg) + 12).toFixed(1) + '" fill="' + cPeri + '" font-size="8">perihelion</text>';
+    }
+    if (k > 0) body += '<line x1="' + x0 + '" y1="' + 8 + '" x2="' + x0 + '" y2="' + (H - 8) + '" stroke="' + cGrid + '" stroke-width="0.5" stroke-dasharray="2,4"/>';
+  });
+  body += '<text x="' + 8 + '" y="' + (H - 14) + '" fill="' + cDim + '" font-size="9">Sky view facing south · same scale in every figure (6 px per degree; 1 min of time = 0.25°) · dots: one per day of the year of date · ◆ perihelion · ● cardinal points</text>';
+  return { W, H, body, epochs };
+}
+function _vfpANNoteParts(core) {
+  const sym = _vfpANSymmetricYears();
+  const frame = 'The Sun’s declination against the equation of time over one year at a fixed mean solar time — the figure-8 a fixed camera records. Sky view facing south: East on the left, a fast Sun (positive equation of time) stands west of the meridian at mean noon.';
+  const model = 'Each figure is the two-body analemma on the model’s own elements OF DATE — the obliquity (the Obliquity chart’s one-source line: the figure’s height ±ε and the 2ε-type term), the eccentricity (the eccentricity chart’s Earth route: the size of the eccentricity term, ≈ 2e in radians of time) and the perihelion longitude of date (the perihelion chart’s line: the term’s phase against the equinox — the tilt and the twist). The scene’s real Sun adds the lunar and planetary ripple (under half a minute), which does not change the shape.';
+  const rules = 'Symmetry: with the Sun’s perigee on a solstice the figure mirrors about the vertical axis; on an equinox it is point-symmetric. The model’s own symmetric years nearest to now: ' +
+    sym.map((s) => s.name + ' ' + (Number.isFinite(s.year) ? _vfpANFmtYear(s.year) : '—')).join(' · ') + '.';
+  const values = 'Read at the four epochs: ' + core.epochs.map((E) => _vfpANFmtYear(E.inp.year) + ' — e ' + E.inp.e.toFixed(5) + ', ε ' + E.inp.epsDeg.toFixed(3) + '°, equation of time ' + E.eotMin.toFixed(1) + ' … +' + E.eotMax.toFixed(1) + ' min').join('; ') + '.';
+  return { frame, model, rules, values };
+}
+function renderVFPAnalemma() {
+  const years = _vfpANState.years;
+  const core = _vfpANChartCore(years, 'screen');
+  let controls = '<div style="padding:8px 6px;border:1px solid #2a2f3a;border-radius:6px 6px 0 0;background:#171c26;line-height:2;font-size:11px;color:#8a93a5;">Years (astronomical, negative = BC): ';
+  years.forEach((y, i) => {
+    controls += '<input type="number" data-vfpan-year="' + i + '" value="' + y + '" step="1000" style="width:92px;margin:0 8px 0 2px;background:#232a36;color:#e8ecf4;border:1px solid #2a2f3a;border-radius:4px;padding:1px 4px;font-size:11px;">';
+  });
+  const btn = (attr, label) => '<button ' + attr + ' style="margin-left:6px;padding:1px 9px;border-radius:4px;border:1px solid #2a2f3a;background:#232a36;color:#8a93a5;font-size:10px;cursor:pointer;">' + label + '</button>';
+  controls += '<span style="float:right;">' + btn('data-vfpan-sym="1"', 'symmetric years') + btn('data-vfpan-reset="1"', 'reset') + '</span></div>';
+  const P = _vfpANNoteParts(core);
+  return '<div class="vfp-chart-block">' +
+    controls +
+    '<svg data-vfpan-svg viewBox="0 0 ' + core.W + ' ' + core.H + '" width="100%" style="display:block;background:#151a22;border-radius:0 0 6px 6px;">' + core.body + '</svg>' +
+    '<div style="padding:8px 4px 2px;color:#8a93a5;font-size:11px;line-height:1.5;"><strong>Frame:</strong> ' + P.frame + ' ' + P.model + '</div>' +
+    '<div style="padding:2px 4px 8px;color:#8a93a5;font-size:11px;line-height:1.5;"><strong>Symmetry &amp; values:</strong> ' + P.rules + ' ' + P.values + '</div>' +
+    '</div>';
+}
+function _vfpANPaperSvg() {
+  const core = _vfpANChartCore(_vfpANState.years, 'paper');
+  const P = _vfpANNoteParts(core);
+  const notes = [P.frame, P.model, P.rules, P.values];
+  const wrapText = (t) => {
+    const out = [];
+    let line = '';
+    for (const w of t.split(' ')) {
+      if (line && (line + ' ' + w).length > 130) { out.push(line); line = w; } else { line = line ? line + ' ' + w : w; }
+    }
+    if (line) out.push(line);
+    return out;
+  };
+  const lines = [];
+  for (const nt of notes) for (const l of wrapText(nt)) lines.push(l);
+  const TOP = 30, Hp = TOP + core.H + lines.length * 15 + 12;
+  let noteText = '';
+  lines.forEach((l, i) => { noteText += '<text x="24" y="' + (TOP + core.H + (i + 1) * 15 - 4) + '" fill="#444" font-size="11">' + escapeXml(l) + '</text>'; });
+  return '<?xml version="1.0" encoding="UTF-8"?>\n' +
+    '<svg viewBox="0 0 ' + core.W + ' ' + Hp + '" width="' + core.W + '" height="' + Hp + '" xmlns="http://www.w3.org/2000/svg" font-family="Inter,Helvetica,Arial,sans-serif">' +
+    '<rect width="' + core.W + '" height="' + Hp + '" fill="white"/>' +
+    '<text x="' + (core.W / 2) + '" y="18" text-anchor="middle" fill="#222" font-size="16" font-weight="600">The Analemma at Four Epochs</text>' +
+    '<g transform="translate(0,' + TOP + ')">' + core.body + '</g>' +
+    noteText +
+    '</svg>';
+}
+function _vfpANAfterRender(bodyEl) {
+  bodyEl.querySelectorAll('input[data-vfpan-year]').forEach((el) => {
+    el.addEventListener('change', () => {
+      const v = Number(el.value);
+      if (!Number.isFinite(v)) return;
+      _vfpANState.years[Number(el.dataset.vfpanYear)] = Math.max(-_VFPAN_DOMAIN_YEARS, Math.min(_VFPAN_DOMAIN_YEARS, Math.round(v)));
+      // re-render AFTER the event chain: replacing the body's innerHTML while
+      // the focused input's change/blur is still dispatching threw
+      // "node to be removed is no longer a child" (measured headless)
+      setTimeout(() => updateVerificationPanel('analemma'), 0);
+    });
+  });
+  const symBtn = bodyEl.querySelector('button[data-vfpan-sym]');
+  if (symBtn) symBtn.addEventListener('click', () => {
+    const sym = _vfpANSymmetricYears();
+    if (sym.every((s) => Number.isFinite(s.year))) { _vfpANState.years = sym.map((s) => s.year); updateVerificationPanel('analemma'); }
+  });
+  const resetBtn = bodyEl.querySelector('button[data-vfpan-reset]');
+  if (resetBtn) resetBtn.addEventListener('click', () => { _vfpANState.years = _VFPAN_DEFAULT_YEARS.slice(); updateVerificationPanel('analemma'); });
 }
 // ── SVG Chart Renderer ───────────────────────────────────────────
 
