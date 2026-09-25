@@ -19225,9 +19225,11 @@ function _cardinalYearSeconds(year, type) {
 }
 // Display form: minutes past 365 d 5 h (the Bromberg axis — the four-curve
 // spread of ±2 min is illegible in day units).
-const _CARDINAL_YEAR_BASE_S = 365 * 86400 + 5 * 3600;
-function _cardinalYearExcessMinutes(year, type) {
-  return (_cardinalYearSeconds(year, type) - _CARDINAL_YEAR_BASE_S) / 60;
+/** The cardinal-year lengths in SI days — the unit the year panels share
+ *  (owner: the panel read minutes past 365 d 5 h while its siblings read
+ *  days; the minutes form and its 365 d 5 h base are retired with it). */
+function _cardinalYearDays(year, type) {
+  return _cardinalYearSeconds(year, type) / 86400;
 }
 
 // The series-driven hybrid (the ONE evaluator): factory built lazily AFTER
@@ -19379,7 +19381,7 @@ function ascNodeInvPlaneModel(year) {
 
 const VFP_CATEGORIES = [
   {
-    id: 'eccentricity', label: 'Eccentricity', unit: '', precision: 8,
+    id: 'eccentricity', group: 'Earth orbit', label: 'Eccentricity', unit: '', precision: 8,
     yLabel: 'eccentricity',
     residualLabel: 'eccentricity (dimensionless)', residualScale: 1,   // was 'AU' — e carries no unit
     primaryRef: 'Meeus',   // C-5: by name, index-shift-proof
@@ -19408,7 +19410,7 @@ const VFP_CATEGORIES = [
     ],
   },
   {
-    id: 'obliquity', label: 'Obliquity', unit: '°', precision: 6,
+    id: 'obliquity', group: 'Earth axis', label: 'Obliquity', unit: '°', precision: 6,
     yLabel: 'degrees',
     residualLabel: 'arcseconds', residualScale: 3600,
     primaryRef: 'Chapront',   // C-5: by name, index-shift-proof
@@ -19441,7 +19443,7 @@ const VFP_CATEGORIES = [
     ],
   },
   {
-    id: 'inclination', label: 'Inclination to Invariable Plane', unit: '°', precision: 4,
+    id: 'inclination', group: 'Earth orbit', label: 'Inclination (invariable plane)', unit: '°', precision: 4,
     yLabel: 'degrees',
     residualLabel: 'arcseconds', residualScale: 3600,
     fixedYRange: [0, 3], fixedYTicks: [0, 0.5, 1.0, 1.5, 2.0, 2.5, 3.0],
@@ -19458,7 +19460,7 @@ const VFP_CATEGORIES = [
     ],
   },
   {
-    id: 'ascending-node', label: 'Ascending Node on Invariable Plane', unit: '°', precision: 2,
+    id: 'ascending-node', group: 'Earth orbit', label: 'Ascending Node (invariable plane)', unit: '°', precision: 2,
     yLabel: 'degrees',
     residualLabel: 'degrees', residualScale: 1,
     wrap360: true,
@@ -19472,7 +19474,7 @@ const VFP_CATEGORIES = [
     ],
   },
   {
-    id: 'perihelion', label: 'Longitude of Perihelion', unit: '°', precision: 3,
+    id: 'perihelion', group: 'Earth orbit', label: 'Perihelion Longitude', unit: '°', precision: 3,
     yLabel: 'degrees',
     residualLabel: 'degrees', residualScale: 1,
     wrap360: true,
@@ -19504,7 +19506,7 @@ const VFP_CATEGORIES = [
     ],
   },
   {
-    id: 'tropical-year', label: 'Tropical Year', unit: ' days', precision: 8,
+    id: 'tropical-year', group: 'Earth clock', label: 'Tropical Year', unit: ' days', precision: 8,
     yLabel: 'days',
     residualLabel: 'seconds', residualScale: 86400,
     paperTitle: 'Tropical Year Comparison',
@@ -19579,47 +19581,43 @@ const VFP_CATEGORIES = [
     // canon check (Meeus): VE 49.02 · SS 47.94 · AE 48.51 · WS 49.55 min
     // past 365 d 5 h — building this chart found and fixed the cardinal
     // structure's 180° perigee-frame slip (VE↔AE, SS↔WS were swapped).
-    id: 'cardinal-year-lengths', label: 'Cardinal Year Lengths', unit: ' min', precision: 2,
-    yLabel: 'minutes past 365 d 5 h',
-    residualLabel: 'seconds', residualScale: 60,
-    chartRange: [-30000, 30000],
-    paperRange: [-30000, 30000], paperTitle: 'Cardinal Year Lengths',
-    // y-ranges from the MEASURED extremes with the wobbling of-date mean
-    // (era ±30 kyr: 47.08–50.21 · cycles: 45.36–51.60) — sized so no
-    // curve leaves the frame (owner-corrected: the smooth-mean sizing
-    // clipped the equinox curves).
-    fixedYRange: [46.5, 51], fixedYTicks: [47, 48, 49, 50, 51],
-    fmtValue: v => Number.isFinite(v) ? v.toFixed(2) : 'N/A',
-    // The four curves are the model's OWN decomposition around its own
-    // mean — Δ-vs-model numbers and a residual pane would just restate
-    // the chart (owner: comparisons against the mean have no value here).
-    noComparisons: true,
+    id: 'cardinal-year-lengths', group: 'Earth clock', label: 'Cardinal Year Lengths', unit: ' days', precision: 8,
+    yLabel: 'days',
+    // In SI DAYS like the Tropical and Sidereal Year panels (owner); the
+    // residual pane = each cardinal year − the mean tropical year, in
+    // seconds — the ±40-s swings that ARE this panel's content.
+    residualLabel: 'seconds', residualScale: 86400,
+    paperTitle: 'Cardinal Year Lengths',
+    // y-range from the MEASURED extremes with the wobbling of-date mean
+    // (era: 47.08–50.21 min past 365 d 5 h → 365.2410–365.2432 d), sized
+    // so no curve leaves the frame (owner-corrected: the smooth-mean
+    // sizing clipped the equinox curves).
+    fixedYRange: [365.2406, 365.2438], fixedYTicks: [365.2410, 365.2415, 365.2420, 365.2425, 365.2430, 365.2435],
     paperAlt: {
-      range: [-248000, 102000], title: 'Cardinal Year Lengths Cycles',
-      yRange: [45, 52],
-      yTicks: [45, 46, 47, 48, 49, 50, 51, 52],
-      yDecimals: 0,
+      yRange: [365.2395, 365.2445],
+      yTicks: [365.2395, 365.2405, 365.2415, 365.2425, 365.2435, 365.2445],
+      yDecimals: 4,
       refLines: [
-        { value: () => (computeSolarYearDaysDirect(2000) * 86400 - _CARDINAL_YEAR_BASE_S) / 60,
+        { value: () => computeSolarYearDaysDirect(2000),
           label: 'Mean tropical year at J2000', color: '#888', dash: true, yOffset: 0 },
       ],
     },
     model: { name: 'Mean tropical year (of date)', color: '#f0b040',
-      fn: year => _cardinalYearExcessMinutes(year, 'MEAN') },
+      fn: year => _cardinalYearDays(year, 'MEAN') },
     references: [
       { name: 'VE year (northward equinox)', color: '#1a9c2e', preserveColor: true,
-        fn: year => _cardinalYearExcessMinutes(year, 'VE') },
+        fn: year => _cardinalYearDays(year, 'VE') },
       { name: 'SS year (north solstice)', color: '#e23333', preserveColor: true,
-        fn: year => _cardinalYearExcessMinutes(year, 'SS') },
+        fn: year => _cardinalYearDays(year, 'SS') },
       { name: 'AE year (southward equinox)', color: '#8b4513', preserveColor: true,
-        fn: year => _cardinalYearExcessMinutes(year, 'AE') },
+        fn: year => _cardinalYearDays(year, 'AE') },
       { name: 'WS year (south solstice)', color: '#2251e0', preserveColor: true,
-        fn: year => _cardinalYearExcessMinutes(year, 'WS') },
+        fn: year => _cardinalYearDays(year, 'WS') },
     ],
-    modelNote: `The four <strong>cardinal-point year lengths</strong> (successive same-event intervals: VE&rarr;VE, SS&rarr;SS, AE&rarr;AE, WS&rarr;WS) around the mean tropical year of date, in <strong>minutes past 365 d 5 h</strong>. All five curves come from the model's own one-source movement &mdash; the mean is the Tropical Year chart's line. <strong>How it is derived:</strong> the true Sun runs ahead of or behind the mean Sun by the <em>equation of center</em>, EoC(M) &asymp; 2e&middot;sin&thinsp;M (M = the Sun's angle from its perigee, which sits opposite Earth's perihelion &varpi;). Each cardinal event therefore occurs early or late by &Delta;t = &minus;(T/360&deg;)&middot;EoC, and the year measured between two same-type events is T<sub>X</sub> = T<sub>mean</sub> + d(&Delta;t)/dyr &mdash; the <em>drift</em> of that timing offset. As perihelion precesses through the seasons (the ~21 kyr apsidal-vs-equinox cycle), each curve swings around the mean with amplitude proportional to the <strong>eccentricity e(t)</strong>: today's e &asymp; 0.0167 gives the &plusmn;0.8 min swing, and in the Export Cycles view the envelope visibly breathes with the Eccentricity chart's 100/405-kyr cycles &mdash; shrinking toward e-minima. J2000 values match the canonical set (Meeus): VE 49.02, SS 47.94, AE 48.51, WS 49.55. Comparison figure: Bromberg's numerical-integration chart (site offline; <a href="https://web.archive.org/web/20241221111118/https://www.kalendis.free.nf/seasons.htm?i=1" target="_blank" rel="noopener">archived copy</a>) &mdash; this panel reproduces it from the analytic movement.`,
+    modelNote: `The four <strong>cardinal-point year lengths</strong> (successive same-event intervals: VE&rarr;VE, SS&rarr;SS, AE&rarr;AE, WS&rarr;WS) around the mean tropical year of date, in <strong>SI days</strong>; the residual pane shows each cardinal year minus the mean, in seconds. All five curves come from the model's own one-source movement &mdash; the mean is the Tropical Year chart's line. <strong>How it is derived:</strong> the true Sun runs ahead of or behind the mean Sun by the <em>equation of center</em>, EoC(M) &asymp; 2e&middot;sin&thinsp;M (M = the Sun's angle from its perigee, which sits opposite Earth's perihelion &varpi;). Each cardinal event therefore occurs early or late by &Delta;t = &minus;(T/360&deg;)&middot;EoC, and the year measured between two same-type events is T<sub>X</sub> = T<sub>mean</sub> + d(&Delta;t)/dyr &mdash; the <em>drift</em> of that timing offset. As perihelion precesses through the seasons (the ~21 kyr apsidal-vs-equinox cycle), each curve swings around the mean with amplitude proportional to the <strong>eccentricity e(t)</strong>: today's e &asymp; 0.0167 gives the &plusmn;0.8 min swing, and in the Export Cycles view the envelope visibly breathes with the Eccentricity chart's 100/405-kyr cycles &mdash; shrinking toward e-minima. J2000 values match the canonical set (Meeus), as minutes past 365 d 5 h: VE 49.02, SS 47.94, AE 48.51, WS 49.55. Comparison figure: Bromberg's numerical-integration chart (site offline; <a href="https://web.archive.org/web/20241221111118/https://www.kalendis.free.nf/seasons.htm?i=1" target="_blank" rel="noopener">archived copy</a>) &mdash; this panel reproduces it from the analytic movement.`,
   },
   {
-    id: 'solar-day', label: 'Solar Day Length', unit: ' s', precision: 6,
+    id: 'solar-day', group: 'Earth clock', label: 'Solar Day Length', unit: ' s', precision: 6,
     yLabel: 'seconds',
     residualLabel: 'milliseconds', residualScale: 1000,
     paperTitle: 'Solar Day Length Comparison',
@@ -19695,7 +19693,7 @@ const VFP_CATEGORIES = [
     ],
   },
   {
-    id: 'sidereal-year', label: 'Sidereal Year', unit: ' days', precision: 9,
+    id: 'sidereal-year', group: 'Earth clock', label: 'Sidereal Year', unit: ' days', precision: 9,
     yLabel: 'days',
     residualLabel: 'seconds', residualScale: 86400,
     paperTitle: 'Sidereal Year Comparison',
@@ -19747,7 +19745,7 @@ const VFP_CATEGORIES = [
     modelNote: `Both curves are in <strong>SI 86400-s days</strong>. The model curve is the one-source sidereal year of date: the framework's mass-loss law (Driver 2, IAU-anchored at J2000 via the H/13 identity: 31,558,149.7635 s → 365.256363004 SI days) divided by the model's own banked <strong>mean-longitude-rate ratio</strong> λ̇(y)/λ̇(2000) — the planetary epoch drift measured from the framework's ±10 Myr N-body run at <em>constant</em> solar mass, so the two tiers separate cleanly. That planetary drift is what makes Chapront's polynomial steep, and the engine reproduces it to ~0.1 s over ±12 kyr (banked gate); the residual gap is the polynomial's own extrapolation class. With the one-source movement opted out the line falls back to the mass-loss slope alone.`,
   },
   {
-    id: 'axial-precession', label: 'Axial Precession Period', unit: ' yr', precision: 2,
+    id: 'axial-precession', group: 'Earth axis', label: 'Axial Precession Period', unit: ' yr', precision: 2,
     yLabel: 'years',
     residualLabel: 'years', residualScale: 1,
     paperRange: [-23000, 23000], paperTitle: 'Axial Precession Period Comparison',
@@ -19815,7 +19813,7 @@ const VFP_CATEGORIES = [
     ],
   },
   {
-    id: 'delta-t', label: 'ΔT (TT − UT1)', unit: ' s', precision: 0,
+    id: 'delta-t', group: 'Earth clock', label: 'ΔT (TT − UT1)', unit: ' s', precision: 0,
     yLabel: 'seconds (ΔT absolute, TT − UT1)',
     residualLabel: 'seconds', residualScale: 1,
     // Espenak & Meeus polynomial validity ≈ [-1999, 3000]: ΔT keeps TWO
@@ -19866,14 +19864,13 @@ const VFP_CATEGORIES = [
     // planets have NO published deep-time series to compare (searched
     // 2026-09-15: IMCCE La2010 is Earth-only; the planets stay engine-D,
     // era-validated against JPL by the chain-vs-JPL gate).
-    id: 'planet-inclinations', label: 'Inclination of all planets',
+    id: 'planet-inclinations', group: 'All planets', label: 'Inclination',
     customRender: () => renderVFPPlanetInclinations(),
     afterRender: (el) => _vfpPIAfterRender(el),
     // Paper forms (owner items 3–4, 2026-09-15): the same information as
-    // the screen chart, printable on white — "Export for Paper" prints
-    // the screen range, "Export Cycles" the wider _VFPPI_CYCLES_RANGE.
-    customPaper: () => _vfpPIPaperSvg(_VFPPI_SCREEN_RANGE),
-    customPaperAlt: () => _vfpPIPaperSvg(_VFPPI_CYCLES_RANGE),
+    // the screen chart, printable on white — "Export" prints the current
+    // one of the four standard windows.
+    customPaper: () => _vfpPIPaperSvg(_vfpCurrentTabFor('planet-inclinations').range),   // the current window
   },
   {
     // ── Eccentricity of all planets (owner-requested companion,
@@ -19883,36 +19880,47 @@ const VFP_CATEGORIES = [
     // span, La2010 Earth overlay (e = hypot(k,h); measured z-series rms
     // 2.5e-5 over −248…0 kyr), both paper exports over the shared
     // _VFPPI_* ranges.
-    id: 'planet-eccentricities', label: 'Eccentricity of all planets',
+    id: 'planet-eccentricities', group: 'All planets', label: 'Eccentricity',
     customRender: () => renderVFPPlanetEccentricities(),
     afterRender: (el) => _vfpPEAfterRender(el),
-    customPaper: () => _vfpPEPaperSvg(_VFPPI_SCREEN_RANGE),
-    customPaperAlt: () => _vfpPEPaperSvg(_VFPPI_CYCLES_RANGE),
+    customPaper: () => _vfpPEPaperSvg(_vfpCurrentTabFor('planet-eccentricities').range),
   },
   {
     // ── All Precession Periods (owner-requested): Earth's five of-date
     // precession periods in ONE chart — perihelion, axial and apsidal on by
     // default, the obliquity cycle and the ecliptic precession selectable —
     // each against a like-for-like published tangent. Screen −200,000 →
-    // +100,000; "Export for Paper" −250,000 → +100,000 (the La2004 span);
-    // "Export Cycles" ±1,000,000 (inside the one-family ±2 Myr window).
-    id: 'all-precession', label: 'All Precession Periods',
+    // +100,000 at first; now the four standard windows (all inside the
+    // one-family ±2 Myr window), "Export" printing the current one.
+    id: 'all-precession', group: 'Earth cycles', label: 'Precession Periods (all five)',
     customRender: () => renderVFPAllPrecession(),
     afterRender: (el) => _vfpAPAfterRender(el),
-    customPaper: () => _vfpAPPaperSvg(_VFPAP_PAPER_RANGE),
-    customPaperAlt: () => _vfpAPPaperSvg(_VFPAP_CYCLES_RANGE),
+    customPaper: () => _vfpAPPaperSvg(_vfpCurrentTabFor('all-precession').range),
   },
   {
     // ── Analemma (owner-requested): the Sun's figure-8 at four editable
     // epochs (defaults 113,000 BC · 44,000 BC · 2000 AD · 28,000 AD) from the
     // model's obliquity, eccentricity and perihelion of date; "Export for
     // Paper" prints the four figures on white; no cycles form.
-    id: 'analemma', label: 'Analemma',
+    id: 'analemma', group: 'Earth cycles', label: 'Analemma',
     customRender: () => renderVFPAnalemma(),
     afterRender: (el) => _vfpANAfterRender(el),
     customPaper: () => _vfpANPaperSvg(),
   },
 ];
+// The panel ORDER (owner-ruled): the physics builds up — the orbit, the axis,
+// what the two produce together, the clock, the other planets. The groups are
+// the dropdown's headers and the header title's prefix ("Earth orbit ·
+// Eccentricity"); the definitions above keep their historical positions.
+const VFP_ORDER = [
+  'eccentricity', 'perihelion', 'inclination', 'ascending-node',   // Earth orbit
+  'obliquity', 'axial-precession',                                  // Earth axis
+  'all-precession', 'analemma',                                     // Earth cycles
+  'tropical-year', 'sidereal-year', 'cardinal-year-lengths', 'solar-day', 'delta-t',   // Earth clock
+  'planet-inclinations', 'planet-eccentricities',                   // All planets
+];
+VFP_CATEGORIES.sort((a, b) => VFP_ORDER.indexOf(a.id) - VFP_ORDER.indexOf(b.id));
+const _vfpTitleOf = (cat) => (cat.group ? cat.group + ' · ' : '') + cat.label;
 
 // ── VFP: Inclination of all planets — custom static chart ────────
 // (config above; owner spec items 1–8 with decisions E1–E3.)
@@ -19964,13 +19972,14 @@ const _VFPPI_SCREEN_RANGE = [-250000, 100000];
 const _VFPPI_CYCLES_RANGE = [-1000000, 1000000];
 const _vfpPICacheByRange = {};   // static samples — once per session per range
 function _vfpPISamples(range) {
-  const y0 = (range || _VFPPI_SCREEN_RANGE)[0], y1 = (range || _VFPPI_SCREEN_RANGE)[1];
+  const r = range || _vfpCurrentTabFor('planet-inclinations').range;
+  const y0 = r[0], y1 = r[1];
   // The series artifact lands ASYNC after page load; a render before it
   // arrives must not lock seriesless (skeleton-class) samples in for the
   // session — the key carries the loaded flag (the mutable-cache trap).
   const key = y0 + ':' + y1 + ':' + (_planetSeriesData ? 's' : 'k');
   if (_vfpPICacheByRange[key]) return _vfpPICacheByRange[key];
-  const N = Math.round((y1 - y0) / 1000) + 1;   // 1-kyr steps
+  const N = _vfpSamplesForSpan(y0, y1);   // the window's sample count
   const yrToJd = (y) => KC_ANCHOR_EPOCH_JD + (y - KC_ANCHOR_EPOCH_YEAR) * 365.25;
   const yrs = new Array(N);
   const data = {};
@@ -20069,7 +20078,7 @@ function _vfpPIChartCore(range, tab, on, style) {
         const v = tab === 'ecl' ? B.inDeg[i] : _vfpPIJplInvDeg(B.inDeg[i], B.omDeg[i]);
         d += (started ? 'L' : 'M') + toX(y).toFixed(1) + ',' + toY(v).toFixed(1);
         started = true;
-        const j = Math.round((y - S.y0) / 1000);
+        const j = Math.round(((y - S.y0) / (S.y1 - S.y0)) * (S.yrs.length - 1));
         if (j >= 0 && j < S.yrs.length) { const dd = S.data[p][tab][j] - v; s2 += dd * dd; n++; }
       }
       // thin + translucent (owner 2026-09-15): the osculating short-period
@@ -20098,7 +20107,7 @@ function _vfpPIChartCore(range, tab, on, style) {
       if (y < S.y0 || y > S.y1) continue;
       d += (started ? 'L' : 'M') + toX(y).toFixed(1) + ',' + toY(row.inclination).toFixed(1);
       started = true;
-      const j = Math.round((y - S.y0) / 1000);
+      const j = Math.round(((y - S.y0) / (S.y1 - S.y0)) * (S.yrs.length - 1));
       if (j >= 0 && j < S.yrs.length) { const dd = S.data.earth.inv[j] - row.inclination; s2 += dd * dd; n++; }
     }
     if (started) {
@@ -20116,9 +20125,7 @@ function _vfpPIChartCore(range, tab, on, style) {
     grid += '<line x1="' + PAD.l + '" y1="' + toY(v).toFixed(1) + '" x2="' + (W - PAD.r) + '" y2="' + toY(v).toFixed(1) + '" stroke="' + cGrid + '" stroke-width="0.5"/>' +
       '<text x="' + (PAD.l - 6) + '" y="' + toY(v).toFixed(1) + '" fill="' + cTick + '" font-size="' + fYT + '" text-anchor="end" dominant-baseline="middle">' + v.toFixed(yTickStep < 1 ? 1 : 0) + '°</text>';
   }
-  let xStep = 1000000;
-  for (const c of [50000, 100000, 200000, 250000, 500000, 1000000]) { xStep = c; if ((S.y1 - S.y0) / c <= 6) break; }
-  for (let xt = Math.ceil(S.y0 / xStep) * xStep; xt <= S.y1 + 1e-9; xt += xStep) {
+  for (const xt of _vfpYearTicks(S.y0, S.y1)) {   // the standard windows' round-step ticks
     const xp = toX(xt);
     const ta = xp > W - PAD.r - 40 ? 'end' : xp < PAD.l + 40 ? 'start' : 'middle';
     const lbl = xt === 0 ? '0' : Math.abs(xt).toLocaleString('en-US') + (xt < 0 ? ' BC' : ' AD');
@@ -20146,7 +20153,9 @@ function renderVFPPlanetInclinations() {
     const active = tab === id;
     return '<button data-vfppi-tab="' + id + '" style="flex:1 1 50%;padding:6px 0;border-radius:6px 6px 0 0;border:1px solid ' + (active ? '#4a5568' : '#2a2f3a') + ';border-bottom:none;background:' + (active ? '#232a36' : '#171c26') + ';color:' + (active ? '#e8ecf4' : '#8a93a5') + ';font-size:12px;cursor:pointer;">' + label + '</button>';
   };
-  let controls = '<div style="display:flex;gap:6px;padding:4px 4px 0;">' +
+  // the four standard windows first, then the panel's own frame choice
+  let controls = _vfpCustomTabStrip('planet-inclinations') +
+    '<div style="display:flex;gap:6px;padding:4px 4px 0;">' +
     tabBtn('ecl', 'Inclination to Ecliptic (all planets)') +
     tabBtn('inv', 'Inclination to Invariable plane (all planets)') +
     '</div><div style="padding:8px 6px;border:1px solid #2a2f3a;border-radius:0 0 0 0;background:#171c26;line-height:2;">';
@@ -20209,9 +20218,8 @@ function _vfpPINoteParts(tab, on, core) {
     : '';
   return { frame, model, jpl, la2010 };
 }
-// One paper form serves both header buttons — "Export for Paper" prints
-// the screen range, "Export Cycles" prints _VFPPI_CYCLES_RANGE — in the
-// house paper style (renderVFPPaperChart: 16px title, centered 11px
+// One paper form for any window — "Export" prints the current standard
+// window — in the house paper style (renderVFPPaperChart: 16px title, centered 11px
 // legend rows, rotated 12px y-axis label, 11/10px #555 ticks, plot
 // border), the toggle-gated notes wrapped below.
 function _vfpPIPaperSvg(range) {
@@ -20280,6 +20288,7 @@ function _vfpPIPaperSvg(range) {
     '</svg>';
 }
 function _vfpPIAfterRender(bodyEl) {
+  _vfpWireCustomTabs(bodyEl, 'planet-inclinations');
   bodyEl.querySelectorAll('button[data-vfppi-tab]').forEach((btn) => {
     btn.addEventListener('click', () => {
       _vfpPIState.tab = btn.dataset.vfppiTab;
@@ -20327,7 +20336,7 @@ function _vfpPIAfterRender(bodyEl) {
     cursor.setAttribute('x1', cx);
     cursor.setAttribute('x2', cx);
     cursor.setAttribute('visibility', 'visible');
-    let rows = '<div style="color:#8a93a5;margin-bottom:2px;">Year ' + (y < 0 ? '−' : '+') + Math.abs(y).toLocaleString('en-US') + '</div>';
+    let rows = '<div style="color:#8a93a5;margin-bottom:2px;">Year ' + (y < 0 ? '−' : '+') + Math.round(Math.abs(y)).toLocaleString('en-US') + '</div>';
     for (const p of _vfpPI_PLANETS) {
       if (!on[p]) continue;
       rows += '<div style="display:flex;justify-content:space-between;gap:16px;"><span style="color:' + _vfpPICss(p) + ';">' + p.charAt(0).toUpperCase() + p.slice(1) + '</span><span>' + S.data[p][tab][i].toFixed(4) + '°</span></div>';
@@ -20370,10 +20379,11 @@ function _vfpPEEarthEcc(year) {
   return computeEccentricityEarthAtYear(year);
 }
 function _vfpPESamples(range) {
-  const y0 = (range || _VFPPI_SCREEN_RANGE)[0], y1 = (range || _VFPPI_SCREEN_RANGE)[1];
+  const r = range || _vfpCurrentTabFor('planet-eccentricities').range;
+  const y0 = r[0], y1 = r[1];
   const key = y0 + ':' + y1 + ':' + (_planetSeriesData ? 's' : 'k');
   if (_vfpPECacheByRange[key]) return _vfpPECacheByRange[key];
-  const N = Math.round((y1 - y0) / 1000) + 1;   // 1-kyr steps
+  const N = _vfpSamplesForSpan(y0, y1);   // the window's sample count
   const yrToJd = (y) => KC_ANCHOR_EPOCH_JD + (y - KC_ANCHOR_EPOCH_YEAR) * 365.25;
   const yrs = new Array(N);
   const data = {};
@@ -20424,7 +20434,7 @@ function _vfpPEChartCore(range, on, style) {
         const v = B.ec[i];
         d += (started ? 'L' : 'M') + toX(y).toFixed(1) + ',' + toY(v).toFixed(1);
         started = true;
-        const j = Math.round((y - S.y0) / 1000);
+        const j = Math.round(((y - S.y0) / (S.y1 - S.y0)) * (S.yrs.length - 1));
         if (j >= 0 && j < S.yrs.length) { const dd = S.data[p][j] - v; s2 += dd * dd; n++; }
       }
       // thin + translucent (owner 2026-09-15): the osculating short-period
@@ -20452,7 +20462,7 @@ function _vfpPEChartCore(range, on, style) {
       if (y < S.y0 || y > S.y1) continue;
       d += (started ? 'L' : 'M') + toX(y).toFixed(1) + ',' + toY(row.eccentricity).toFixed(1);
       started = true;
-      const j = Math.round((y - S.y0) / 1000);
+      const j = Math.round(((y - S.y0) / (S.y1 - S.y0)) * (S.yrs.length - 1));
       if (j >= 0 && j < S.yrs.length) { const dd = S.data.earth[j] - row.eccentricity; s2 += dd * dd; n++; }
     }
     if (started) {
@@ -20468,9 +20478,7 @@ function _vfpPEChartCore(range, on, style) {
     grid += '<line x1="' + PAD.l + '" y1="' + toY(v).toFixed(1) + '" x2="' + (W - PAD.r) + '" y2="' + toY(v).toFixed(1) + '" stroke="' + cGrid + '" stroke-width="0.5"/>' +
       '<text x="' + (PAD.l - 6) + '" y="' + toY(v).toFixed(1) + '" fill="' + cTick + '" font-size="' + fYT + '" text-anchor="end" dominant-baseline="middle">' + v.toFixed(2) + '</text>';
   }
-  let xStep = 1000000;
-  for (const c of [50000, 100000, 200000, 250000, 500000, 1000000]) { xStep = c; if ((S.y1 - S.y0) / c <= 6) break; }
-  for (let xt = Math.ceil(S.y0 / xStep) * xStep; xt <= S.y1 + 1e-9; xt += xStep) {
+  for (const xt of _vfpYearTicks(S.y0, S.y1)) {   // the standard windows' round-step ticks
     const xp = toX(xt);
     const ta = xp > W - PAD.r - 40 ? 'end' : xp < PAD.l + 40 ? 'start' : 'middle';
     const lbl = xt === 0 ? '0' : Math.abs(xt).toLocaleString('en-US') + (xt < 0 ? ' BC' : ' AD');
@@ -20506,9 +20514,10 @@ function renderVFPPlanetEccentricities() {
   // the hover wiring (afterRender) maps pointer x back to a sample via this
   _vfpPEState._screenGeom = { W, H, PAD, y0: S.y0, y1: S.y1 };
   const cap = (p) => p.charAt(0).toUpperCase() + p.slice(1);
-  // ── per-planet checkboxes (dimmed when off) + all/none — no tab
-  // strip: eccentricity has one frame-free view ──
-  let controls = '<div style="padding:8px 6px;border:1px solid #2a2f3a;border-radius:6px 6px 0 0;background:#171c26;line-height:2;">';
+  // ── the four standard windows, then per-planet checkboxes (dimmed when
+  // off) + all/none — no frame strip: eccentricity has one frame-free view ──
+  let controls = _vfpCustomTabStrip('planet-eccentricities') +
+    '<div style="padding:8px 6px;border:1px solid #2a2f3a;border-radius:0;background:#171c26;line-height:2;">';
   for (const p of _vfpPI_PLANETS) {
     controls += '<label style="margin-right:10px;font-size:11px;color:' + _vfpPICss(p) + ';opacity:' + (on[p] ? '1' : '0.45') + ';cursor:pointer;white-space:nowrap;">' +
       '<input type="checkbox" data-vfppe="' + p + '"' + (on[p] ? ' checked' : '') + ' style="vertical-align:-2px;margin-right:3px;">' + cap(p) + '</label>';
@@ -20604,6 +20613,7 @@ function _vfpPEPaperSvg(range) {
     '</svg>';
 }
 function _vfpPEAfterRender(bodyEl) {
+  _vfpWireCustomTabs(bodyEl, 'planet-eccentricities');
   bodyEl.querySelectorAll('input[data-vfppe]').forEach((cbEl) => {
     cbEl.addEventListener('change', () => {
       _vfpPEState.on[cbEl.dataset.vfppe] = cbEl.checked;
@@ -20640,7 +20650,7 @@ function _vfpPEAfterRender(bodyEl) {
     cursor.setAttribute('x1', cx);
     cursor.setAttribute('x2', cx);
     cursor.setAttribute('visibility', 'visible');
-    let rows = '<div style="color:#8a93a5;margin-bottom:2px;">Year ' + (y < 0 ? '−' : '+') + Math.abs(y).toLocaleString('en-US') + '</div>';
+    let rows = '<div style="color:#8a93a5;margin-bottom:2px;">Year ' + (y < 0 ? '−' : '+') + Math.round(Math.abs(y)).toLocaleString('en-US') + '</div>';
     for (const p of _vfpPI_PLANETS) {
       if (!on[p]) continue;
       rows += '<div style="display:flex;justify-content:space-between;gap:16px;"><span style="color:' + _vfpPICss(p) + ';">' + p.charAt(0).toUpperCase() + p.slice(1) + '</span><span>' + S.data[p][i].toFixed(5) + '</span></div>';
@@ -20750,9 +20760,6 @@ const _vfpAP_SERIES = [
     refName: 'La2010 (Laskar) — 360°/(dΩ/dt), node on the invariable plane', ref: (y) => _vfpAPTangentYears((yy) => _la2010Interp(yy - 2000, 4), y, 2000) },
 ];
 const _vfpAPState = { on: { peri: true, axial: true, apsidal: true, obliq: false, ecl: false }, log: true, ecc: false };
-const _VFPAP_SCREEN_RANGE = [-200000, 100000];
-const _VFPAP_PAPER_RANGE  = [-250000, 100000];
-const _VFPAP_CYCLES_RANGE = [-1000000, 1000000];
 const _vfpAPCacheByRange = {};   // static samples — once per session per range
 /** The model's period (years, magnitude) for one series at a Julian year —
  *  the existing evaluators only; NaN before the one-source series has loaded. */
@@ -20783,10 +20790,11 @@ function _vfpAPModelYears(key, year) {
   return Math.abs(yl.axialPrecessionYearsAtYear(year));   // axial
 }
 function _vfpAPSamples(range) {
-  const y0 = (range || _VFPAP_SCREEN_RANGE)[0], y1 = (range || _VFPAP_SCREEN_RANGE)[1];
+  const r = range || _vfpCurrentTabFor('all-precession').range;
+  const y0 = r[0], y1 = r[1];
   const key = y0 + ':' + y1 + ':' + (_hybridSpinActive() ? 's' : 'k') + (_planetSeriesData ? 's' : 'k');
   if (_vfpAPCacheByRange[key]) return _vfpAPCacheByRange[key];
-  const N = Math.round((y1 - y0) / 1000) + 1;   // 1-kyr steps
+  const N = _vfpSamplesForSpan(y0, y1);   // the window's sample count
   const yrs = new Array(N), model = {}, ref = {}, markers = {}, local = {};
   const ecc = new Array(N);   // the context trace: the model's own e(t) (the eccentricity twin's Earth route)
   for (const s of _vfpAP_SERIES) { model[s.key] = new Array(N); ref[s.key] = new Array(N); }
@@ -20931,9 +20939,7 @@ function _vfpAPChartCore(range, on, log, style, showEcc) {
     grid += '<line x1="' + PAD.l + '" y1="' + yp.toFixed(1) + '" x2="' + (W - PAD.r) + '" y2="' + yp.toFixed(1) + '" stroke="' + cGrid + '" stroke-width="0.5"/>' +
       '<text x="' + (PAD.l - 6) + '" y="' + yp.toFixed(1) + '" fill="' + cTick + '" font-size="' + fYT + '" text-anchor="end" dominant-baseline="middle">' + v.toLocaleString('en-US') + '</text>';
   }
-  let xStep = 1000000;
-  for (const c of [50000, 100000, 200000, 250000, 500000, 1000000]) { xStep = c; if ((S.y1 - S.y0) / c <= 6) break; }
-  for (let xt = Math.ceil(S.y0 / xStep) * xStep; xt <= S.y1 + 1e-9; xt += xStep) {
+  for (const xt of _vfpYearTicks(S.y0, S.y1)) {   // the standard windows' round-step ticks
     const xp = toX(xt);
     const ta = xp > W - PAD.r - 40 ? 'end' : xp < PAD.l + 40 ? 'start' : 'middle';
     const lbl = xt === 0 ? '0' : Math.abs(xt).toLocaleString('en-US') + (xt < 0 ? ' BC' : ' AD');
@@ -21003,7 +21009,8 @@ function renderVFPAllPrecession() {
   const core = _vfpAPChartCore(null, on, log, 'screen', showEcc);
   const W = core.W, H = core.H, PAD = core.PAD, S = core.S;
   _vfpAPState._screenGeom = { W, H, PAD, y0: S.y0, y1: S.y1 };
-  let controls = '<div style="padding:8px 6px;border:1px solid #2a2f3a;border-radius:6px 6px 0 0;background:#171c26;line-height:2;">';
+  let controls = _vfpCustomTabStrip('all-precession') +
+    '<div style="padding:8px 6px;border:1px solid #2a2f3a;border-radius:0;background:#171c26;line-height:2;">';
   for (const s of _vfpAP_SERIES) {
     controls += '<label style="margin-right:10px;font-size:11px;color:' + s.screen + ';opacity:' + (on[s.key] ? '1' : '0.45') + ';cursor:pointer;white-space:nowrap;">' +
       '<input type="checkbox" data-vfpap="' + s.key + '"' + (on[s.key] ? ' checked' : '') + ' style="vertical-align:-2px;margin-right:3px;">' + s.short + '</label>';
@@ -21036,9 +21043,8 @@ function renderVFPAllPrecession() {
     '<div style="padding:2px 4px 8px;color:#8a93a5;font-size:11px;line-height:1.5;"><strong>References:</strong> ' + [P.refs, P.markers, P.rms, P.ecc].filter((t) => t).join(' ') + '</div>' +
     '</div>';
 }
-// One paper form serves both header buttons — "Export for Paper" prints
-// _VFPAP_PAPER_RANGE, "Export Cycles" _VFPAP_CYCLES_RANGE — the house paper
-// style, the toggle-gated notes wrapped below.
+// One paper form for any window — "Export" prints the current standard
+// window — the house paper style, the toggle-gated notes wrapped below.
 function _vfpAPPaperSvg(range) {
   const on = _vfpAPState.on, log = _vfpAPState.log, showEcc = _vfpAPState.ecc;
   const core = _vfpAPChartCore(range, on, log, 'paper', showEcc);
@@ -21099,6 +21105,7 @@ function _vfpAPPaperSvg(range) {
     '</svg>';
 }
 function _vfpAPAfterRender(bodyEl) {
+  _vfpWireCustomTabs(bodyEl, 'all-precession');
   bodyEl.querySelectorAll('input[data-vfpap]').forEach((cbEl) => {
     cbEl.addEventListener('change', () => {
       _vfpAPState.on[cbEl.dataset.vfpap] = cbEl.checked;
@@ -21147,7 +21154,7 @@ function _vfpAPAfterRender(bodyEl) {
     cursor.setAttribute('x1', cx);
     cursor.setAttribute('x2', cx);
     cursor.setAttribute('visibility', 'visible');
-    let rows = '<div style="color:#8a93a5;margin-bottom:2px;">Year ' + (y < 0 ? '−' : '+') + Math.abs(y).toLocaleString('en-US') + ' · model · reference (yr)</div>';
+    let rows = '<div style="color:#8a93a5;margin-bottom:2px;">Year ' + (y < 0 ? '−' : '+') + Math.round(Math.abs(y)).toLocaleString('en-US') + ' · model · reference (yr)</div>';
     for (const s of _vfpAP_SERIES) {
       if (!on[s.key]) continue;
       rows += '<div style="display:flex;justify-content:space-between;gap:16px;"><span style="color:' + s.screen + ';">' + s.short + '</span><span>' + fmt(S.model[s.key][i]) + ' · ' + fmt(S.ref[s.key][i]) + '</span></div>';
@@ -21451,6 +21458,29 @@ function _vfpCurrentTab(category) {
   const tabs = _vfpTabsFor(category);
   return tabs.find((t) => t.key === _vfpTabState[category.id]) || tabs.find((t) => t.key === _VFP_DEFAULT_TAB) || tabs[0];
 }
+/** The custom panels share the same four windows: their state lives under
+ *  their category id, their strip is the same buttons, their sampling the
+ *  window's count (never fewer than 200 points — the 1650–2050 window
+ *  would otherwise get ONE 1-kyr sample). */
+function _vfpCurrentTabFor(catId) { return _vfpCurrentTab({ id: catId }); }
+function _vfpCustomTabStrip(catId) {
+  const cur = _vfpCurrentTabFor(catId).key;
+  let s = '<div style="display:flex;gap:6px;padding:4px 4px 0;">';
+  for (const t of _VFP_TABS) {
+    const active = t.key === cur;
+    s += '<button data-vfp-tab="' + t.key + '" style="flex:1 1 0;padding:6px 0;border-radius:6px 6px 0 0;border:1px solid ' + (active ? '#4a5568' : '#2a2f3a') + ';border-bottom:none;background:' + (active ? '#232a36' : '#171c26') + ';color:' + (active ? '#e8ecf4' : '#8a93a5') + ';font-size:12px;cursor:pointer;">' + t.label + '</button>';
+  }
+  return s + '</div>';
+}
+function _vfpWireCustomTabs(bodyEl, catId) {
+  bodyEl.querySelectorAll('button[data-vfp-tab]').forEach((b) => {
+    b.addEventListener('click', () => { _vfpTabState[catId] = b.dataset.vfpTab; updateVerificationPanel(catId); });
+  });
+}
+function _vfpSamplesForSpan(y0, y1) {
+  const t = _VFP_TABS.find((x) => x.range[0] === y0 && x.range[1] === y1);
+  return t ? t.samples + 1 : Math.max(200, Math.min(2001, Math.round((y1 - y0) / 1000) + 1));
+}
 /** A reference is drawn solid inside its declared validity window
  *  (`validYears: [a, b]`, absent = everywhere) and dotted beyond it. */
 function _vfpRefValid(curve, yr) {
@@ -21566,7 +21596,12 @@ function renderVFPChart(category, currentYear) {
         inPath = false;
       }
       const x = xScale(yr).toFixed(1);
-      const y = scaleY(Math.min(Math.max(v, yMin - (yMax - yMin)), yMax + (yMax - yMin))).toFixed(1);
+      // only a beyond-validity stretch is clamped (to a span either side of
+      // the MAIN chart's range — a polynomial at ±1 Myr is astronomically
+      // large); in-range values pass through, whichever scale draws them
+      // (clamping residuals to the main bounds flattened every residual pane)
+      const vv = valid === false ? Math.min(Math.max(v, yMin - (yMax - yMin)), yMax + (yMax - yMin)) : v;
+      const y = scaleY(vv).toFixed(1);
       d += inPath ? ` L${x},${y}` : ` M${x},${y}`;
       inPath = true;
     }
@@ -21858,178 +21893,8 @@ function escapeXml(s) {
     .replace(/'/g, '&apos;');
 }
 
-function renderVFPPaperChart(category) {
-  const W = 1000, H = 500, PAD = { l: 80, r: 30, t: 50, b: 45 };
-  const plotW = W - PAD.l - PAD.r;
-  const plotH = H - PAD.t - PAD.b;
-  const [yearMin, yearMax] = category.paperRange || [-12000, 12000];
-  const nSamples = 300;
-  const step = (yearMax - yearMin) / nSamples;
-
-  // Paper colors
-  const modelColor = '#2563eb'; // blue
-  const refColors = ['#b91c1c', '#15803d', '#7e22ce', '#b45309']; // dark red, dark green, purple, amber
-  const textColor = '#333';
-  const gridColor = '#ddd';
-  const axisColor = '#999';
-
-  // Sample all curves
-  const allCurves = [
-    { ...category.model, color: modelColor },
-    ...category.references.map((r, i) => ({ ...r, color: r.preserveColor ? r.color : refColors[i % refColors.length] }))
-  ];
-  const samples = allCurves.map(() => []);
-  for (let i = 0; i <= nSamples; i++) {
-    const yr = yearMin + i * step;
-    allCurves.forEach((curve, ci) => {
-      const v = curve.fn(yr);
-      samples[ci].push({ yr, v: Number.isFinite(v) ? v : NaN });
-    });
-  }
-
-  // Y range — paper overrides take priority, then UI fixedYRange, then auto
-  let yMin, yMax;
-  if (category.paperYRange) {
-    [yMin, yMax] = category.paperYRange;
-  } else if (category.fixedYRange) {
-    [yMin, yMax] = category.fixedYRange;
-  } else {
-    yMin = Infinity; yMax = -Infinity;
-    for (const s of samples) for (const { v } of s) {
-      if (Number.isFinite(v)) { yMin = Math.min(yMin, v); yMax = Math.max(yMax, v); }
-    }
-    if (!Number.isFinite(yMin)) { yMin = 0; yMax = 1; }
-    const yMargin = (yMax - yMin) * 0.08 || 0.001;
-    yMin -= yMargin; yMax += yMargin;
-  }
-
-  const xScale = yr => PAD.l + (yr - yearMin) / (yearMax - yearMin) * plotW;
-  const yScale = v => PAD.t + (1 - (v - yMin) / (yMax - yMin)) * plotH;
-
-  // Y-axis formatting
-  function fmtY(v) {
-    if (category.fmtValue) return category.fmtValue(v);
-    const range = yMax - yMin;
-    if (range === 0) return v.toFixed(category.precision);
-    const rangeDecimals = Math.max(0, -Math.floor(Math.log10(range)) + 2);
-    return v.toFixed(Math.min(Math.max(rangeDecimals, 1), category.precision));
-  }
-
-  // Build path — for paper export, wrap360 draws connecting vertical lines (sawtooth)
-  function buildPath(data) {
-    let d = '', inPath = false;
-    for (let i = 0; i < data.length; i++) {
-      const { yr, v } = data[i];
-      if (!Number.isFinite(v)) { inPath = false; continue; }
-      if (category.wrap360 && inPath && i > 0 && Number.isFinite(data[i - 1].v) &&
-          Math.abs(v - data[i - 1].v) > 180) {
-        // Interpolate x where the crossing happens
-        const prevYr = data[i - 1].yr, prevV = data[i - 1].v;
-        if (v < prevV) {
-          // wrapping from ~360 down to ~0: prev=359, curr=1 → crossing at 360
-          const frac = (360 - prevV) / ((v + 360) - prevV);
-          const crossX = xScale(prevYr + frac * (yr - prevYr)).toFixed(1);
-          d += ` L${crossX},${yScale(360).toFixed(1)}`;
-          d += ` L${crossX},${yScale(0).toFixed(1)}`;
-        } else {
-          // wrapping from ~0 up to ~360: prev=1, curr=359 → crossing at 0
-          const frac = (0 - prevV) / ((v - 360) - prevV);
-          const crossX = xScale(prevYr + frac * (yr - prevYr)).toFixed(1);
-          d += ` L${crossX},${yScale(0).toFixed(1)}`;
-          d += ` L${crossX},${yScale(360).toFixed(1)}`;
-        }
-        d += ` L${xScale(yr).toFixed(1)},${yScale(v).toFixed(1)}`;
-        continue;
-      }
-      const x = xScale(yr).toFixed(1);
-      const y = yScale(v).toFixed(1);
-      d += inPath ? ` L${x},${y}` : ` M${x},${y}`;
-      inPath = true;
-    }
-    return d;
-  }
-
-  // Grid
-  let grid = '';
-  const yTickValues = category.paperYTicks || category.fixedYTicks || Array.from({ length: 6 }, (_, i) => yMin + i * (yMax - yMin) / 5);
-  for (const v of yTickValues) {
-    const y = yScale(v).toFixed(1);
-    grid += `<line x1="${PAD.l}" y1="${y}" x2="${W - PAD.r}" y2="${y}" stroke="${gridColor}" stroke-width="0.5"/>`;
-    grid += `<text x="${PAD.l - 8}" y="${y}" text-anchor="end" dominant-baseline="middle" fill="#555" font-size="11" font-weight="400" font-family="Inter,Helvetica,Arial,sans-serif">${fmtY(v)}</text>`;
-  }
-
-  // X-axis ticks
-  const xRange = yearMax - yearMin;
-  const xTickStep = xRange > 200000 ? 50000 : xRange > 80000 ? 10000 : 5000;
-  const xTicksArr = [];
-  for (let yr = yearMin; yr <= yearMax; yr += xTickStep) xTicksArr.push(yr);
-  function fmtXYear(yr) { return yr.toLocaleString(); }
-  for (const yr of xTicksArr) {
-    const x = xScale(yr).toFixed(1);
-    grid += `<line x1="${x}" y1="${PAD.t}" x2="${x}" y2="${H - PAD.b}" stroke="#e8e8e8" stroke-width="0.5"/>`;
-    grid += `<text x="${x}" y="${H - PAD.b + 16}" text-anchor="middle" fill="#555" font-size="10" font-weight="400" font-family="Inter,Helvetica,Arial,sans-serif">${fmtXYear(yr)}</text>`;
-  }
-
-  // Plot border
-  grid += `<rect x="${PAD.l}" y="${PAD.t}" width="${plotW}" height="${plotH}" fill="none" stroke="#ccc" stroke-width="0.5"/>`;
-
-  // Clip path to keep curves within plot area
-  const clipDef = `<defs><clipPath id="vfp-paper-clip"><rect x="${PAD.l}" y="${PAD.t}" width="${plotW}" height="${plotH}"/></clipPath></defs>`;
-
-  // Curves — model thicker, clipped to plot area
-  let curvePaths = '';
-  allCurves.forEach((curve, ci) => {
-    const d = buildPath(samples[ci]);
-    const dashAttr = curve.dash ? ' stroke-dasharray="6,4"' : '';
-    curvePaths += `<path d="${d}" fill="none" stroke="${curve.color}" stroke-width="${ci === 0 ? 2.5 : 1.8}" clip-path="url(#vfp-paper-clip)"${dashAttr}/>`;
-  });
-
-  // J2000 marker
-  const j2000x = xScale(2000).toFixed(1);
-  const j2000val = category.model.fn(2000);
-  let j2000marker = '';
-  if (Number.isFinite(j2000val)) {
-    const j2000y = yScale(j2000val).toFixed(1);
-    j2000marker = `<circle cx="${j2000x}" cy="${j2000y}" r="3.5" fill="${modelColor}" stroke="white" stroke-width="1.5"/>`;
-    const j2000text = `J2000; ${(category.fmtValue || (v => v.toFixed(category.precision)))(j2000val)}`;
-    const j2000tw = j2000text.length * 5.8 + 12;
-    // Position label to the left if J2000 is near the right edge
-    const j2000AtRightEdge = Number(j2000x) + j2000tw + 12 > W - PAD.r;
-    const j2000tx = j2000AtRightEdge ? Number(j2000x) - j2000tw - 4 : Number(j2000x) + 8;
-    const j2000ty = Number(j2000y) - 12;
-    j2000marker += `<rect x="${j2000tx - 4}" y="${j2000ty - 10}" width="${j2000tw}" height="16" rx="3" fill="white" stroke="#ccc" stroke-width="0.7"/>`;
-    j2000marker += `<text x="${j2000tx + 2}" y="${j2000ty + 2}" fill="${textColor}" font-size="9.5" font-weight="500" font-family="Inter,Helvetica,Arial,sans-serif">${j2000text}</text>`;
-  }
-
-  // Legend — centered, evenly spaced
-  const legendY = 32;
-  const legendItemWidths = allCurves.map(c => 28 + c.name.length * 6.2 + 24);
-  const legendTotalW = legendItemWidths.reduce((a, b) => a + b, 0);
-  let legendX = (W - legendTotalW) / 2;
-  let legendItems = '';
-  allCurves.forEach((curve, ci) => {
-    const dashAttr = curve.dash ? ' stroke-dasharray="6,4"' : '';
-    legendItems += `<line x1="${legendX}" y1="${legendY}" x2="${legendX + 22}" y2="${legendY}" stroke="${curve.color}" stroke-width="${ci === 0 ? 2.5 : 1.8}"${dashAttr}/>`;
-    legendItems += `<text x="${legendX + 28}" y="${legendY + 4}" fill="${textColor}" font-size="11" font-family="Inter,Helvetica,Arial,sans-serif">${escapeXml(curve.name)}</text>`;
-    legendX += legendItemWidths[ci];
-  });
-
-  // Title
-  const title = `<text x="${W / 2}" y="18" text-anchor="middle" fill="#222" font-size="16" font-weight="600" font-family="Inter,Helvetica,Arial,sans-serif">${category.paperTitle || category.label + ' Comparison'}</text>`;
-
-  // Y-axis label
-  const yAxisLabel = `<text x="16" y="${PAD.t + plotH / 2}" text-anchor="middle" dominant-baseline="middle" transform="rotate(-90,16,${PAD.t + plotH / 2})" fill="#444" font-size="12" font-weight="500" font-family="Inter,Helvetica,Arial,sans-serif">${category.yLabel}</text>`;
-
-  // X-axis label
-  const xAxisLabel = `<text x="${PAD.l + plotW / 2}" y="${H - 5}" text-anchor="middle" fill="#444" font-size="12" font-weight="500" font-family="Inter,Helvetica,Arial,sans-serif">Years (BC / AD)</text>`;
-
-  return `<?xml version="1.0" encoding="UTF-8"?>
-<svg viewBox="0 0 ${W} ${H}" width="${W}" height="${H}" xmlns="http://www.w3.org/2000/svg">
-  <rect width="${W}" height="${H}" fill="white"/>
-  ${clipDef}${grid}${yAxisLabel}${xAxisLabel}${title}${legendItems}${curvePaths}${j2000marker}
-</svg>`;
-}
-
+// (The former fixed-window paper renderer is gone: renderVFPPaperChartAlt
+// prints any window — "Export" hands it the current one.)
 function renderVFPPaperChartAlt(category, altConfig) {
   // altConfig defaults to category.paperAlt for backwards-compat with the
   // "Export Cycles" button; pass an explicit config (e.g. category.paperRecent)
@@ -22214,7 +22079,7 @@ function exportVFPPaper() {
   if (cat.customPaper) svg = cat.customPaper();
   else {
     const tab = _vfpCurrentTab(cat);
-    const cfg = { range: tab.range, title: cat.label + ' — ' + tab.label };
+    const cfg = { range: tab.range, title: cat.label + (cat.group && cat.group.startsWith('Earth') ? ' (Earth)' : '') + ' — ' + tab.label };
     const designed = tab.key === 'quaternary' ? cat.paperAlt : tab.key === 'recent' ? cat.paperRecent : tab.key === 'era' && cat.paperYRange ? { yRange: cat.paperYRange, yTicks: cat.paperYTicks } : null;
     if (designed) { for (const k of ['yRange', 'yTicks', 'yDecimals', 'refLines', 'events']) if (designed[k] !== undefined) cfg[k] = designed[k]; }
     svg = renderVFPPaperChartAlt(cat, cfg);
@@ -22224,22 +22089,6 @@ function exportVFPPaper() {
   const url = URL.createObjectURL(blob);
   const win = window.open(url, '_blank');
   if (win) win.document.title = title;
-}
-
-function exportVFPPaperAlt() {
-  if (!verificationPanel) return;
-  const idx = VFP_CATEGORIES.findIndex(c => c.id === verificationPanel._currentCategory);
-  if (idx < 0) return;
-  const cat = VFP_CATEGORIES[idx];
-  // Custom cycles form (the all-planets inclination chart's wider range)
-  // takes precedence; the generic path needs a paperAlt config.
-  const svg = cat.customPaperAlt ? cat.customPaperAlt()
-    : (cat.paperAlt ? renderVFPPaperChartAlt(cat, cat.paperAlt) : null);
-  if (!svg) return;
-  const blob = new Blob([svg], { type: 'image/svg+xml' });
-  const url = URL.createObjectURL(blob);
-  const win = window.open(url, '_blank');
-  if (win) win.document.title = cat.paperAlt ? cat.paperAlt.title : cat.label;
 }
 
 // ── Panel DOM ────────────────────────────────────────────────────
@@ -22263,15 +22112,7 @@ function createVerificationPanel() {
   const header = document.createElement('div');
   header.className = 'vfp-header';
   header.innerHTML = '<h2>Formula Verification <span class="vfp-subtitle">\u2014 Model vs Published Formulas</span></h2>';
-  // ONE "Export" button prints the current view (owner). The cycles button
-  // survives only for the custom panels that still carry a second range —
-  // it goes when they take the standard tabs.
-  const exportAltBtn = document.createElement('button');
-  exportAltBtn.className = 'vfp-export-btn';
-  exportAltBtn.textContent = 'Export cycles';
-  exportAltBtn.addEventListener('click', exportVFPPaperAlt);
-  exportAltBtn.style.display = 'none';
-  header.appendChild(exportAltBtn);
+  // ONE "Export" button prints the current view (owner)
   const exportBtn = document.createElement('button');
   exportBtn.className = 'vfp-export-btn';
   exportBtn.textContent = 'Export';
@@ -22312,10 +22153,21 @@ function createVerificationPanel() {
   const dropdown = document.createElement('div');
   dropdown.className = 'vfp-dropdown';
   dropdown.style.display = 'none';
+  let lastGroup = null;
   for (const cat of VFP_CATEGORIES) {
+    if (cat.group && cat.group !== lastGroup) {
+      // a group header row — the subject the panels below describe
+      const head = document.createElement('div');
+      head.className = 'vfp-dropdown-group';
+      head.textContent = cat.group;
+      head.style.cssText = 'padding:6px 12px 2px;font-size:10px;letter-spacing:0.08em;text-transform:uppercase;color:#8a93a5;cursor:default;';
+      dropdown.appendChild(head);
+      lastGroup = cat.group;
+    }
     const item = document.createElement('div');
     item.className = 'vfp-dropdown-item';
     item.textContent = cat.label;
+    if (cat.group) item.style.paddingLeft = '24px';
     item.addEventListener('click', () => { dropdown.style.display = 'none'; updateVerificationPanel(cat.id); });
     dropdown.appendChild(item);
   }
@@ -22333,7 +22185,6 @@ function createVerificationPanel() {
   panel._navPrev = navPrev;
   panel._navNext = navNext;
   panel._dropdown = dropdown;
-  panel._exportAltBtn = exportAltBtn;
   panel._exportBtn = exportBtn;
   panel._currentCategory = VFP_CATEGORIES[0].id;
 
@@ -22347,11 +22198,10 @@ function updateVerificationPanel(categoryId) {
   if (idx < 0) return;
   const cat = VFP_CATEGORIES[idx];
   verificationPanel._currentCategory = categoryId;
-  verificationPanel._navName.textContent = cat.label;
+  verificationPanel._navName.textContent = _vfpTitleOf(cat);
   verificationPanel._navPrev.disabled = idx === 0;
   verificationPanel._navNext.disabled = idx === VFP_CATEGORIES.length - 1;
   verificationPanel._dropdown.style.display = 'none';
-  verificationPanel._exportAltBtn.style.display = cat.customPaperAlt ? '' : 'none';
   // Custom-rendered categories export their own paper form when they
   // declare one (customPaper); only those without one hide the button.
   if (verificationPanel._exportBtn) verificationPanel._exportBtn.style.display = (cat.customRender && !cat.customPaper) ? 'none' : '';
