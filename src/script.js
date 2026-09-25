@@ -6041,6 +6041,15 @@ if (typeof window !== 'undefined') {
         hover: typeof r.hover === 'function' ? r.hover()[0] : r.hover[0],
       }));
     },
+    // Phase 7 follow-up — focus a planet and show its wobble centre so the
+    // helper-label loop fills the label's dynamic spans (headless probe path).
+    focusPlanetLabel: (planet) => {
+      const wc = _planetWobbleCenters.find((w) => w.key === planet);
+      if (!wc) return false;
+      o.lookAtObj = wc.body; wc.obj.visible = true; showHideObject(wc.obj);
+      positionChanged = true; forceSceneUpdate();
+      return true;
+    },
     inspectorProbe: () => {
       const H = hierarchyInspector;
       const f = computeInspectorOrbitFrame(H.currentPlanet);
@@ -10382,29 +10391,41 @@ for (const wc of [mercuryWobbleCenter, venusWobbleCenter, marsWobbleCenter,
 /* — Planet Wobble Center labels — */
 /* P5/K5b — the label shows only what the shipped default engine computes:
    the chain's elements of date (perihelion precession of date, e of date,
-   both live) plus the observed J2000 tilt. The lattice spin-family lines
-   (axial precession, obliquity cycle, eccentricity cycle, tilt/ecc
-   amplitudes) LEFT the label with K8b (plan 02) and return only when
-   re-derived on the chain, uniformly for all planets — that rule stands.
-   What the SPIN group below shows instead is the C-4 landscape reading
-   (doc 109 §19): each planet's CITED observed spin precession against
-   the engine's own zero-fitted s-lines (deep ζ leading modes, embedded
-   via DEEP_MODES_ARTIFACT). No model spin-rate claims. Observed values
-   mirror the astro-reference planetSpinObserved TARGET block (citations,
-   never inputs); they sit below the check-literals distinctiveness
-   cutoff, so GREP THAT BLOCK when editing it — these are the copies. */
+   both live) and, since plan 06 Phase 7, the planet's SPIN CHANNEL: the
+   tilt of date (the rendered obliquity, from the channel) and the SPIN
+   group's DERIVED line — the J2000 pole precession rate ψ̇₀ = −α cos ε₀
+   and its period, α from the planet's own J₂, C/MR², spin rate and
+   satellites on the chain's orbit (ONE home @essrt/physics/planets/
+   spin-channel, read through the package model). The K device's lattice
+   spin-family lines (integer axial / obliquity-cycle fractions) that left
+   the label with K8b are RETIRED, not returned. Beside the derived line
+   the C-4 landscape reading stays (doc 109 §19): each planet's CITED
+   observed spin precession against the engine's own zero-fitted s-lines
+   (deep ζ leading modes, embedded via DEEP_MODES_ARTIFACT). Observed
+   values mirror the astro-reference planetSpinObserved TARGET block
+   (citations, never inputs); they sit below the check-literals
+   distinctiveness cutoff, so GREP THAT BLOCK when editing it — these are
+   the copies. */
 const _dmLeadZeta = DEEP_MODES_ARTIFACT.planetLeadingZetaArcsecPerYr || {};
 const _spinRowsFor = (key) => {
   const s1 = _dmLeadZeta.mercury, s7 = _dmLeadZeta.uranus, s8 = _dmLeadZeta.neptune;
+  // The channel's DERIVED line is the first row of every planet's Spin
+  // group; its text is filled on the first frame (the package model lives
+  // in a `let` declared far below — reading it here at module load would
+  // be a temporal-dead-zone throw), see _spinDerivedText.
   switch (key) {
     case 'mercury': return [
       ['val', 'Cassini-locked — 3:2 state'],
       ['sub', 'Margot 2007 — observational anchor'],
     ];
+    case 'venus': return [
+      ['val', 'Observed: 44.58 ± 3.3 ″/yr (cited; retrograde spin)'],
+      ['sub', 'Closure — Margot 2021'],
+    ];
     case 'mars': return [
       ['val', 'Observed: −7.606 ″/yr (cited)'],
       ['val', 'Inside our inner s-multiplet (s1 ' + s1.toFixed(3) + ')'],
-      ['sub', 'Chaotic obliquity class — ±6° response'],
+      ['sub', 'Chaotic obliquity class — a band, not a cycle'],
     ];
     case 'jupiter': return [
       ['val', 'Observed: ≈−2.8 ″/yr (cited)'],
@@ -10416,8 +10437,25 @@ const _spinRowsFor = (key) => {
       ['val', 'Our s8: ' + s8.toFixed(3) + ' ″/yr → on resonance'],
       ['sub', 'Capture — Ward & Hamilton 2004'],
     ];
-    default: return null;   // venus/uranus/neptune: nothing claimed (bare label)
+    case 'uranus': return [
+      ['sub', 'Interior-model C/MR² — no measured rate (retrograde spin)'],
+    ];
+    case 'neptune': return [
+      ['sub', 'Interior-model C/MR² — mean pole (Triton nutation not modelled)'],
+    ];
+    default: return null;
   }
+};
+/** The Spin group's derived line: the channel's J2000 pole precession rate
+ *  ψ̇₀ = −α cos ε₀ and its period (Mercury: the free constant against its own
+ *  node rate — the Cassini lock stated from the model's own numbers). */
+const _spinDerivedText = (key) => {
+  const sp = _tierModelB().planets.spin(key);
+  if (sp.cassiniLocked) {
+    return 'Derived α (free): ' + sp.alphaArcsecPerYr.toFixed(0) + ' ″/yr = ' + (sp.alphaArcsecPerYr / Math.abs(_dmLeadZeta.mercury)).toFixed(0) + '× the node rate → locked';
+  }
+  const r = sp.spinPrecessionRateArcsecPerYrJ2000;
+  return 'Derived: ' + r.toFixed(Math.abs(r) < 0.1 ? 4 : 3).replace('-', '−') + ' ″/yr · ' + Math.round(sp.axialPrecessionPeriodYearsJ2000).toLocaleString() + ' yr (own torques)';
 };
 const _planetWobbleCenters = [
   { obj: mercuryWobbleCenter, body: mercury, name: "Mercury", key: 'mercury', tilt: planets.mercury.axialTiltJ2000 },
@@ -10450,14 +10488,23 @@ for (const wc of _planetWobbleCenters) {
   precSpan.style.cssText = 'font-variant-numeric:tabular-nums;';
   precSpan.textContent = '—';
   wc._precSpan = precSpan;
+  // Phase 7: the tilt of date — the rendered obliquity from the spin channel
+  const tiltSpan = document.createElement('span');
+  tiltSpan.style.cssText = 'font-variant-numeric:tabular-nums;';
+  tiltSpan.textContent = '—';
+  wc._tiltSpan = tiltSpan;
 
   const sep = 'margin-top:6px;padding-top:4px;border-top:1px solid rgba(255,255,255,.1);';
   const grp = 'font:600 8.5px/1.2 Inter,system-ui,sans-serif;color:rgba(255,255,255,.55);letter-spacing:.05em;text-transform:uppercase;margin-top:6px;';
 
   // C-4 SPIN group (doc 109 §19): observed (cited) vs the engine's node lines
   const spinRows = _spinRowsFor(wc.key);
+  const derivedSpan = document.createElement('span');
+  derivedSpan.textContent = '…';
+  wc._derivedSpan = derivedSpan;
   const spinHtml = spinRows
     ? '<div style="' + grp + sep + '">Spin</div>' +
+      '<div style="' + val + '" data-spin-derived="1"></div>' +
       spinRows.map(([cls, text]) =>
         '<div style="' + (cls === 'val' ? val : sub) + '">' + text + '</div>').join('')
     : '';
@@ -10467,7 +10514,8 @@ for (const wc of _planetWobbleCenters) {
     '<div style="' + grp + sep + '">Precession</div>' +
     '<div style="' + val + '">Perihelion (of date): </div>' +
     '<div style="' + grp + sep + '">Axial</div>' +
-    '<div style="' + val + '">Tilt (J2000): ' + wc.tilt.toFixed(2) + '°</div>' +
+    '<div style="' + val + '">Tilt (of date): </div>' +
+    '<div style="' + sub + '">IAU J2000 tilt ' + wc.tilt.toFixed(2) + '° · the channel\'s obliquity of date, acute</div>' +
     spinHtml +
     '<div style="' + grp + sep + '">Eccentricity</div>' +
     '<div style="' + val + '">Current: </div>' +
@@ -10477,6 +10525,10 @@ for (const wc of _planetWobbleCenters) {
   eccLine.appendChild(eccSpan);
   const precLine = [...inner.querySelectorAll('div')].find(d => d.textContent.startsWith('Perihelion (of date):'));
   precLine.appendChild(precSpan);
+  const tiltLine = [...inner.querySelectorAll('div')].find(d => d.textContent.startsWith('Tilt (of date):'));
+  tiltLine.appendChild(tiltSpan);
+  const derivedLine = inner.querySelector('div[data-spin-derived]');
+  if (derivedLine) derivedLine.appendChild(derivedSpan);
 
   div.appendChild(inner);
   wc._innerDiv = inner;
@@ -10499,7 +10551,7 @@ const HELPER_LABEL_FADE_OUT = 20;    /* start fading in below 0.2 AU */
 const _helperLabelObjects = [
   { obj: earthWobbleCenter,        div: wobbleLabelDiv },
   { obj: earthPerihelionFromEarth,  div: periLabelDiv },
-  ..._planetWobbleCenters.map(wc => ({ obj: wc.obj, div: wc._div, parentPlanet: wc.name, innerDiv: wc._innerDiv, eccSpan: wc._eccSpan, precSpan: wc._precSpan, planetKey: wc.key })),
+  ..._planetWobbleCenters.map(wc => ({ obj: wc.obj, div: wc._div, parentPlanet: wc.name, innerDiv: wc._innerDiv, eccSpan: wc._eccSpan, precSpan: wc._precSpan, tiltSpan: wc._tiltSpan, derivedSpan: wc._derivedSpan, planetKey: wc.key })),
 ];
 
 //END CREATE AND CONFIGURE PLANETS
@@ -17081,7 +17133,22 @@ function essrtRenderPaperChart(qtyKey, rangeKey) {
   const xmlEsc = (s) => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 
   const W = 1200, H = 720;
-  const margin = { top: 90, right: 50, bottom: 110, left: 130 };
+  // SVG text does not wrap: split the subtitle into lines on a character
+  // budget from the plot width (12 px Inter ≈ 0.52 em per char — measured
+  // 5.8 px at 12 px), and open the top margin per extra line so the frame
+  // and the Wu legend stay clear.
+  const subtitleLines = (() => {
+    const budget = Math.floor((W - 130 - 50) / (12 * 0.52));
+    const lines = []; let cur = '';
+    for (const word of String(spec.subtitle).split(/\s+/)) {
+      if (cur && (cur + ' ' + word).length > budget) { lines.push(cur); cur = word; }
+      else cur = cur ? cur + ' ' + word : word;
+    }
+    if (cur) lines.push(cur);
+    return lines;
+  })();
+  const SUB_LINE_H = 15;
+  const margin = { top: subtitleLines.length > 1 ? 102 + SUB_LINE_H * (subtitleLines.length - 1) : 90, right: 50, bottom: 110, left: 130 };
   const plotW = W - margin.left - margin.right;
   const plotH = H - margin.top - margin.bottom;
 
@@ -17249,7 +17316,8 @@ function essrtRenderPaperChart(qtyKey, rangeKey) {
     `;
   }
   const title    = `<text x="${margin.left + plotW / 2}" y="${36}" text-anchor="middle" font-size="20" fill="#111" font-weight="600">${xmlEsc(spec.title)}</text>`;
-  const subtitle = `<text x="${margin.left + plotW / 2}" y="${62}" text-anchor="middle" font-size="12" fill="#555">${xmlEsc(spec.subtitle)}</text>`;
+  const subtitle = `<text x="${margin.left + plotW / 2}" y="${62}" text-anchor="middle" font-size="12" fill="#555">` +
+    subtitleLines.map((l, i) => `<tspan x="${margin.left + plotW / 2}" dy="${i === 0 ? 0 : SUB_LINE_H}">${xmlEsc(l)}</tspan>`).join('') + `</text>`;
   const yAxisLabel = `<text x="${36}" y="${margin.top + plotH / 2}" text-anchor="middle" font-size="13" fill="#222" transform="rotate(-90 36 ${margin.top + plotH / 2})">${xmlEsc(spec.yLabel)}</text>`;
   const xAxisLabel = `<text x="${margin.left + plotW / 2}" y="${H - 14}" text-anchor="middle" font-size="13" fill="#222">Time (Ma; negative = past, 0 = J2000) — Range: ${xmlEsc(range.label)}</text>`;
   const credit     = `<text x="${W - 16}" y="${H - 6}" text-anchor="end" font-size="9" fill="#888">ESSRT Explorer — Holistic Universe Model</text>`;
@@ -19817,6 +19885,19 @@ const VFP_CATEGORIES = [
     customPaper: () => _vfpPEPaperSvg(_VFPPI_SCREEN_RANGE),
     customPaperAlt: () => _vfpPEPaperSvg(_VFPPI_CYCLES_RANGE),
   },
+  {
+    // ── All Precession Periods (owner-requested): Earth's five of-date
+    // precession periods in ONE chart — perihelion, axial and apsidal on by
+    // default, the obliquity cycle and the ecliptic precession selectable —
+    // each against a like-for-like published tangent. Screen −200,000 →
+    // +100,000; "Export for Paper" −250,000 → +100,000 (the La2004 span);
+    // "Export Cycles" ±1,000,000 (inside the one-family ±2 Myr window).
+    id: 'all-precession', label: 'All Precession Periods',
+    customRender: () => renderVFPAllPrecession(),
+    afterRender: (el) => _vfpAPAfterRender(el),
+    customPaper: () => _vfpAPPaperSvg(_VFPAP_PAPER_RANGE),
+    customPaperAlt: () => _vfpAPPaperSvg(_VFPAP_CYCLES_RANGE),
+  },
 ];
 
 // ── VFP: Inclination of all planets — custom static chart ────────
@@ -20550,6 +20631,514 @@ function _vfpPEAfterRender(bodyEl) {
       if (!on[p]) continue;
       rows += '<div style="display:flex;justify-content:space-between;gap:16px;"><span style="color:' + _vfpPICss(p) + ';">' + p.charAt(0).toUpperCase() + p.slice(1) + '</span><span>' + S.data[p][i].toFixed(5) + '</span></div>';
     }
+    tip.innerHTML = rows;
+    tip.style.display = 'block';
+    const wr = svg.parentElement.getBoundingClientRect();
+    let tx = e.clientX - wr.left + 14;
+    if (tx + tip.offsetWidth > wr.width - 4) tx = e.clientX - wr.left - tip.offsetWidth - 14;
+    let ty = e.clientY - wr.top + 12;
+    if (ty + tip.offsetHeight > wr.height - 4) ty = wr.height - tip.offsetHeight - 4;
+    tip.style.left = Math.max(0, tx) + 'px';
+    tip.style.top = Math.max(0, ty) + 'px';
+  });
+}
+
+// ── VFP: All Precession Periods — Earth's precession periods in ONE view ──
+// (owner-requested: "an all precession period overview where the user can
+// see the different movements"). Five of-date PERIODS, each the model's
+// EXISTING evaluator (one home each, never a re-derivation): the perihelion
+// precession of date anom/(anom − trop) (the "Apsidal meets Axial" row), the
+// axial precession sid/(sid − trop) (the Axial chart's line), the apsidal
+// precession against the ecliptic 360°/the chain's secular apsidal tangent
+// (the "Duration against Ecliptic" row), the obliquity cycle — the beat
+// 2π/(ψ̇ − |s₃|) on that axial rate (the panel row's form) — and the ecliptic
+// precession, the node-on-invariable-plane tangent (the Predictions cell).
+// Periods plot as MAGNITUDES; the legend names the retrograde ones. The
+// references are LIKE-FOR-LIKE of-date tangents on the published tables the
+// repo ships (Vondrák 2011 p_A; La2004 ϖ of date; La2010 ϖ and Ω in the
+// invariable plane) plus the spacing of the La2004 obliquity extrema (a
+// period of an oscillation has no tangent). Log y by default — every series'
+// percentage swing gets the same height (a 112-kyr line flattens the 21-kyr
+// ones on a linear axis); a Linear/Log toggle keeps both views.
+function _vfpAPTangentYears(fnDeg, year, h) {
+  const a = fnDeg(year - h), b = fnDeg(year + h);
+  if (!Number.isFinite(a) || !Number.isFinite(b)) return NaN;
+  let d = b - a;
+  while (d > 180) d -= 360;
+  while (d < -180) d += 360;
+  return d === 0 ? NaN : Math.abs(360 * (2 * h) / d);
+}
+/** The LOCAL period of an oscillating series (years): the interval between
+ *  successive events of the same kind — maxima, minima, upward and downward
+ *  crossings of the running mean (four full-cycle readings per cycle, each
+ *  at its interval's midpoint; extrema refined by the 3-point parabolic
+ *  vertex, crossings interpolated) on a 1-kyr grid padded 60 kyr beyond the
+ *  range; linear between readings, NaN outside them. The SAME estimator
+ *  serves the model's own obliquity curve and the published table —
+ *  like-for-like by construction (owner: the cycle sometimes runs faster,
+ *  sometimes slower than its mean — a cycle-mean beat cannot show that). */
+function _vfpAPLocalPeriod(fnDeg, y0, y1) {
+  const h = 1000, PADK = 60000, HALF = 41000;
+  const ys = [], vs = [];
+  for (let y = y0 - PADK; y <= y1 + PADK; y += h) {
+    const v = fnDeg(y);
+    if (Number.isFinite(v)) { ys.push(y); vs.push(v); }
+  }
+  const n = vs.length, pts = [];
+  const at = (y) => {
+    if (pts.length < 2 || y < pts[0].year || y > pts[pts.length - 1].year) return NaN;
+    let j = 0;
+    while (j < pts.length - 2 && pts[j + 1].year < y) j++;
+    const a = pts[j], b = pts[j + 1];
+    const f = b.year === a.year ? 0 : (y - a.year) / (b.year - a.year);
+    return a.period + (b.period - a.period) * f;
+  };
+  if (n < 5) return { pts, at, meanPeriod: NaN };
+  const w = Math.round(HALF / h), rm = new Array(n);
+  let acc = 0, lo = 0, hi = -1;
+  for (let i = 0; i < n; i++) {
+    while (hi + 1 < n && hi + 1 <= i + w) { hi++; acc += vs[hi]; }
+    while (lo < i - w) { acc -= vs[lo]; lo++; }
+    rm[i] = acc / (hi - lo + 1);
+  }
+  const ev = { max: [], min: [], up: [], down: [] };
+  for (let i = 1; i < n - 1; i++) {
+    const a = vs[i - 1], b = vs[i], c = vs[i + 1];
+    if (b > a && b >= c) { const den = a - 2 * b + c; ev.max.push(ys[i] + (den ? h * (a - c) / (2 * den) : 0)); }
+    else if (b < a && b <= c) { const den = a - 2 * b + c; ev.min.push(ys[i] + (den ? h * (a - c) / (2 * den) : 0)); }
+    // crossings only on a COMPLETE running-mean window — a table's end
+    // truncates the window and biases the mean (measured: cutting the
+    // model's own series at La2004's +100 kyr end moved its downward
+    // crossing 1.3 kyr later, the "+63 kyr bump"); extrema need no mean
+    if (i - w < 0 || i + w > n - 1) continue;
+    const d0 = vs[i] - rm[i], d1 = vs[i + 1] - rm[i + 1];
+    if (d0 <= 0 && d1 > 0) ev.up.push(ys[i] + h * d0 / (d0 - d1));
+    else if (d0 >= 0 && d1 < 0) ev.down.push(ys[i] + h * d0 / (d0 - d1));
+  }
+  for (const k of Object.keys(ev)) {
+    const T = ev[k];
+    for (let i = 1; i < T.length; i++) pts.push({ year: (T[i - 1] + T[i]) / 2, period: T[i] - T[i - 1], kind: k });
+  }
+  pts.sort((p, q) => p.year - q.year);
+  const meanPeriod = pts.length ? pts.reduce((s, p) => s + p.period, 0) / pts.length : NaN;
+  return { pts, at, meanPeriod };
+}
+const _vfpAP_SERIES = [
+  { key: 'peri', short: 'Perihelion', name: 'Perihelion precession (of date, vs the equinox)', screen: '#f0b040', paper: '#b45309', def: true,
+    refName: 'La2004 (Laskar) — 360°/(dϖ/dt), ϖ of date', ref: (y) => _vfpAPTangentYears(perihelionLa2004, y, 1000) },
+  { key: 'axial', short: 'Axial', name: 'Axial precession (retrograde)', screen: '#4fc3f7', paper: '#2563eb', def: true,
+    refName: 'Vondrák (2011) — p_A rate, inside its ±200 kyr validity', ref: (y) => Math.abs(y - 2000) <= 200000 ? axialPrecessionVondrak2011(y) : NaN },
+  { key: 'apsidal', short: 'Apsidal', name: 'Apsidal precession (vs the ecliptic)', screen: '#81c784', paper: '#15803d', def: true,
+    refName: 'La2010 (Laskar) — 360°/(dϖ/dt), invariable-plane frame', ref: (y) => _vfpAPTangentYears((yy) => _la2010Interp(yy - 2000, 3), y, 2000) },
+  { key: 'obliq', short: 'Obliquity cycle', name: 'Obliquity cycle (local period of the model’s own obliquity curve)', screen: '#ce93d8', paper: '#7e22ce', def: false,
+    refName: 'La2004 (Laskar) — the same local-period estimator on its obliquity (markers: its measured intervals)', ref: null, local: true },
+  { key: 'ecl', short: 'Ecliptic', name: 'Ecliptic precession (node on the invariable plane, retrograde)', screen: '#ef5350', paper: '#b91c1c', def: false,
+    refName: 'La2010 (Laskar) — 360°/(dΩ/dt), node on the invariable plane', ref: (y) => _vfpAPTangentYears((yy) => _la2010Interp(yy - 2000, 4), y, 2000) },
+];
+const _vfpAPState = { on: { peri: true, axial: true, apsidal: true, obliq: false, ecl: false }, log: true, ecc: false };
+const _VFPAP_SCREEN_RANGE = [-200000, 100000];
+const _VFPAP_PAPER_RANGE  = [-250000, 100000];
+const _VFPAP_CYCLES_RANGE = [-1000000, 1000000];
+const _vfpAPCacheByRange = {};   // static samples — once per session per range
+/** The model's period (years, magnitude) for one series at a Julian year —
+ *  the existing evaluators only; NaN before the one-source series has loaded. */
+function _vfpAPModelYears(key, year) {
+  if (key === 'ecl') {
+    const jd = KC_ANCHOR_EPOCH_JD + (year - KC_ANCHOR_EPOCH_YEAR) * 365.25;
+    const n1 = _kcChartElementsOfDate('earth', jd - 150 * 365.25).ascNodeInvPlaneDeg;
+    const n2 = _kcChartElementsOfDate('earth', jd + 150 * 365.25).ascNodeInvPlaneDeg;
+    let d = n2 - n1;
+    while (d > 180) d -= 360;
+    while (d < -180) d += 360;
+    return d === 0 ? NaN : Math.abs(360 * 300 / d);
+  }
+  if (key === 'apsidal') {
+    if (!_kcChains) _kcChains = buildPlanetChainsFromArtifactData(CHAIN_ARTIFACT);
+    return Math.abs(360 / kcApsidalSecularDegPerYr(year, _kcChains.earth, _kcChains));
+  }
+  // 'obliq' is a SERIES quantity (the local period of the model's own ε(t)
+  // curve, _vfpAPLocalPeriod in _vfpAPSamples) — not a point evaluator. Two
+  // point forms were tried and rejected: the instantaneous beat on the axial
+  // rate of date ripples at the cycle's own period through that rate's cos ε
+  // term (±2 kyr), and the cycle-mean beat 2π/(ψ̇ − |s₃|) is flat — neither
+  // is what "the cycle runs faster, then slower" means.
+  if (key === 'obliq') return NaN;
+  if (!_hybridSpinActive()) return NaN;
+  const yl = _yearLengthsM();
+  if (key === 'peri') return Math.abs(yl.perihelionPrecessionYearsAtYear(year));
+  return Math.abs(yl.axialPrecessionYearsAtYear(year));   // axial
+}
+function _vfpAPSamples(range) {
+  const y0 = (range || _VFPAP_SCREEN_RANGE)[0], y1 = (range || _VFPAP_SCREEN_RANGE)[1];
+  const key = y0 + ':' + y1 + ':' + (_hybridSpinActive() ? 's' : 'k') + (_planetSeriesData ? 's' : 'k');
+  if (_vfpAPCacheByRange[key]) return _vfpAPCacheByRange[key];
+  const N = Math.round((y1 - y0) / 1000) + 1;   // 1-kyr steps
+  const yrs = new Array(N), model = {}, ref = {}, markers = {}, local = {};
+  const ecc = new Array(N);   // the context trace: the model's own e(t) (the eccentricity twin's Earth route)
+  for (const s of _vfpAP_SERIES) { model[s.key] = new Array(N); ref[s.key] = new Array(N); }
+  // the obliquity cycle: the ONE estimator on the model's own ε(t) (the
+  // Obliquity chart's one-source line) and on the La2004 table
+  const lpModel = _vfpAPLocalPeriod((y) => _sceneEpsTargetDeg(y), y0, y1);
+  const lpRef = _vfpAPLocalPeriod(obliquityLa2004, y0, y1);
+  markers.obliq = lpRef.pts;
+  local.obliq = { model: lpModel, ref: lpRef };
+  for (let i = 0; i < N; i++) {
+    const y = y0 + ((y1 - y0) * i) / (N - 1);
+    yrs[i] = y;
+    ecc[i] = _vfpPEEarthEcc(y);
+    for (const s of _vfpAP_SERIES) {
+      model[s.key][i] = s.local ? lpModel.at(y) : _vfpAPModelYears(s.key, y);
+      ref[s.key][i] = s.local ? lpRef.at(y) : (s.ref ? s.ref(y) : NaN);
+    }
+  }
+  return (_vfpAPCacheByRange[key] = { y0, y1, yrs, model, ref, markers, local, ecc });
+}
+function _vfpAPChartCore(range, on, log, style, showEcc) {
+  const S = _vfpAPSamples(range);
+  const paper = style === 'paper';
+  const W = 800, H = 380, PAD = { l: 66, r: showEcc ? 52 : 24, t: 16, b: 34 };
+  const pw = W - PAD.l - PAD.r, ph = H - PAD.t - PAD.b;
+  const cGrid = paper ? '#ddd' : '#2a2f3a', cTick = paper ? '#555' : '#888';
+  const fYT = paper ? 11 : 9, fXT = paper ? 10 : 9;
+  const col = (s) => paper ? s.paper : s.screen;
+  const ok = (v) => Number.isFinite(v) && v > 0;
+  // y range over what is actually drawn — ROBUST: a tangent period passes
+  // through infinity where the angle's rate crosses zero (the apsidal ϖ
+  // swings back at eccentricity minima, the node at inclination minima —
+  // measured: the raw apsidal range reached 4 Myr and 683 % rms; the node
+  // swings through 180° in a few kyr at −380 kyr), so each series is capped
+  // at three times its own median over the range, the excursion is drawn
+  // clamped at the cap AS A DOTTED STRETCH (off scale, not a value), and the
+  // rms pairs skip those samples. HIGH side only: a SHORT period is a fast,
+  // well-defined rate (the perihelion through the +27 kyr e-minimum reads
+  // 22 kyr), never a singularity — a low cap drew it dotted (owner-found).
+  const med = (arr) => { const v = arr.filter(ok).sort((a, b) => a - b); return v.length ? v[(v.length - 1) >> 1] : NaN; };
+  const cap = {};
+  let vmin = Infinity, vmax = -Infinity;
+  for (const s of _vfpAP_SERIES) {
+    if (!on[s.key]) continue;
+    const m = med(S.model[s.key]);
+    cap[s.key] = Number.isFinite(m) ? 3 * m : Infinity;
+    const take = (v) => { if (ok(v)) { const c = Math.min(v, cap[s.key]); if (c < vmin) vmin = c; if (c > vmax) vmax = c; } };
+    for (const v of S.model[s.key]) take(v);
+    for (const v of S.ref[s.key]) take(v);
+    if (S.markers[s.key]) for (const p of S.markers[s.key]) if (p.year >= S.y0 && p.year <= S.y1) take(p.period);
+  }
+  if (!Number.isFinite(vmin)) { vmin = 10000; vmax = 200000; }
+  const lo = log ? vmin / 1.08 : 0, hi = vmax * 1.08;
+  const toX = (y) => PAD.l + ((y - S.y0) / (S.y1 - S.y0)) * pw;
+  const toY = (v0) => {
+    const v = Math.min(Math.max(v0, log ? lo : 0), hi);
+    return log
+      ? PAD.t + (1 - (Math.log(v) - Math.log(lo)) / (Math.log(hi) - Math.log(lo))) * ph
+      : PAD.t + (1 - (v - lo) / (hi - lo)) * ph;
+  };
+  // two paths per series: the in-range stretch and the clamped (off-scale)
+  // stretch, the latter drawn dotted; a clamped point also closes/opens the
+  // neighbouring in-range segment so the curve stays continuous
+  const paths = (arr, k) => {
+    let solid = '', clamped = '', sStarted = false, cStarted = false;
+    const pt = (i, v) => toX(S.yrs[i]).toFixed(1) + ',' + toY(v).toFixed(1);
+    for (let i = 0; i < arr.length; i++) {
+      const v = arr[i];
+      if (!ok(v)) { sStarted = false; cStarted = false; continue; }
+      const off = v > cap[k];
+      if (off) {
+        if (sStarted) { solid += 'L' + pt(i, v); sStarted = false; }
+        clamped += (cStarted ? 'L' : 'M') + pt(i, v);
+        cStarted = true;
+      } else {
+        if (cStarted) { clamped += 'L' + pt(i, v); cStarted = false; }
+        solid += (sStarted ? 'L' : 'M') + pt(i, v);
+        sStarted = true;
+      }
+    }
+    return { solid, clamped };
+  };
+  const entries = [], rmsParts = [];
+  let curves = '';
+  let anyClamped = false;
+  for (const s of _vfpAP_SERIES) {
+    if (!on[s.key]) continue;
+    const c = col(s);
+    const pm = paths(S.model[s.key], s.key);
+    curves += '<path d="' + pm.solid + '" fill="none" stroke="' + c + '" stroke-width="1.6"/>';
+    if (pm.clamped) { anyClamped = true; curves += '<path d="' + pm.clamped + '" fill="none" stroke="' + c + '" stroke-width="1" stroke-dasharray="2,3" opacity="0.6"/>'; }
+    entries.push({ name: s.name, color: c, dash: '' });
+    if (s.ref || s.local) {
+      const pr = paths(S.ref[s.key], s.key);
+      const d = pr.solid;
+      if (pr.clamped) { anyClamped = true; curves += '<path d="' + pr.clamped + '" fill="none" stroke="' + c + '" stroke-width="0.9" stroke-dasharray="2,3" opacity="0.5"/>'; }
+      if (d) {
+        curves += '<path d="' + d + '" fill="none" stroke="' + c + '" stroke-width="1.3" stroke-dasharray="4,3" opacity="0.85"/>';
+        entries.push({ name: s.refName, color: c, dash: '4,3' });
+        // period rms inside the cap, plus — for the TANGENT series — the
+        // rate-domain rms 360°/T in ″/yr over the WHOLE overlap: the rate
+        // is finite where the period passes through infinity, so nothing
+        // is skipped and the plateaus' kyr-scale offsets stop dominating
+        let s2 = 0, sm = 0, n = 0, skipped = 0, r2 = 0, nr = 0;
+        for (let i = 0; i < S.yrs.length; i++) {
+          const m = S.model[s.key][i], r = S.ref[s.key][i];
+          if (!ok(m) || !ok(r)) continue;
+          if (!s.local) { const dr = 1296000 / m - 1296000 / r; r2 += dr * dr; nr++; }
+          if (m > cap[s.key] || r > cap[s.key]) { skipped++; continue; }
+          s2 += (m - r) * (m - r); sm += m; n++;
+        }
+        if (n) rmsParts.push(s.short + ' vs ' + s.refName.split(' — ')[0] + ': rms ' + Math.round(Math.sqrt(s2 / n)).toLocaleString('en-US') + ' yr (' + (100 * Math.sqrt(s2 / n) / (sm / n)).toFixed(2) + ' %) over ' + n + ' kyr of overlap' + (skipped ? ' (' + skipped + ' kyr where either tangent passes through infinity skipped)' : '') +
+          (nr ? '; as a rate, ' + Math.sqrt(r2 / nr).toFixed(3) + ' ″/yr rms over all ' + nr + ' kyr' : ''));
+      }
+    }
+    if (S.markers[s.key]) {
+      // the reference's measured intervals — the readings its dashed line
+      // runs through (the rms rides the generic pair above)
+      for (const p of S.markers[s.key]) {
+        if (p.year < S.y0 || p.year > S.y1) continue;
+        curves += '<circle cx="' + toX(p.year).toFixed(1) + '" cy="' + toY(p.period).toFixed(1) + '" r="2.4" fill="' + c + '" stroke="' + (paper ? '#fff' : '#151a22') + '" stroke-width="0.8" opacity="0.9"/>';
+      }
+    }
+  }
+  // grid + axes — the twins' BC/AD conventions; y in years
+  let grid = '';
+  // ticks: the log ladder when it lands ≥ 4 rungs in range, else nice-step
+  // ticks over [lo, hi] (a single enabled series spans a few percent — the
+  // ladder gave ONE tick, owner-found)
+  let yTicks = [];
+  if (log) {
+    for (const v of [5000, 7000, 10000, 15000, 20000, 25000, 30000, 40000, 50000, 60000, 80000, 100000, 120000, 150000, 200000, 300000, 500000, 700000, 1000000]) if (v >= lo && v <= hi) yTicks.push(v);
+  }
+  if (yTicks.length < 4) {
+    yTicks = [];
+    const span = hi - lo, p10 = Math.pow(10, Math.floor(Math.log10(span / 5)));
+    const step = [1, 2, 2.5, 5, 10].map((k) => k * p10).find((k) => span / k <= 8) || 10 * p10;
+    for (let v = Math.ceil(lo / step) * step; v <= hi + 1e-9; v += step) yTicks.push(v);
+  }
+  for (const v of yTicks) {
+    const yp = toY(v === 0 && log ? lo : v);
+    grid += '<line x1="' + PAD.l + '" y1="' + yp.toFixed(1) + '" x2="' + (W - PAD.r) + '" y2="' + yp.toFixed(1) + '" stroke="' + cGrid + '" stroke-width="0.5"/>' +
+      '<text x="' + (PAD.l - 6) + '" y="' + yp.toFixed(1) + '" fill="' + cTick + '" font-size="' + fYT + '" text-anchor="end" dominant-baseline="middle">' + v.toLocaleString('en-US') + '</text>';
+  }
+  let xStep = 1000000;
+  for (const c of [50000, 100000, 200000, 250000, 500000, 1000000]) { xStep = c; if ((S.y1 - S.y0) / c <= 6) break; }
+  for (let xt = Math.ceil(S.y0 / xStep) * xStep; xt <= S.y1 + 1e-9; xt += xStep) {
+    const xp = toX(xt);
+    const ta = xp > W - PAD.r - 40 ? 'end' : xp < PAD.l + 40 ? 'start' : 'middle';
+    const lbl = xt === 0 ? '0' : Math.abs(xt).toLocaleString('en-US') + (xt < 0 ? ' BC' : ' AD');
+    grid += '<line x1="' + xp.toFixed(1) + '" y1="' + PAD.t + '" x2="' + xp.toFixed(1) + '" y2="' + (H - PAD.b) + '" stroke="' + cGrid + '" stroke-width="0.5"/>' +
+      '<text x="' + xp.toFixed(1) + '" y="' + (H - PAD.b + 12) + '" fill="' + cTick + '" font-size="' + fXT + '" text-anchor="' + ta + '">' + lbl + '</text>';
+  }
+  // J2000 marker — the house convention of the formula charts
+  if (S.y0 <= 2000 && S.y1 >= 2000) {
+    const xj = toX(2000).toFixed(1);
+    // label just above the x-axis, inside the frame — at the top it collided
+    // with the dense apsidal curve in the ±1 Myr export
+    grid += '<line x1="' + xj + '" y1="' + PAD.t + '" x2="' + xj + '" y2="' + (H - PAD.b) + '" stroke="' + (paper ? '#999' : '#8a93a5') + '" stroke-width="0.8" stroke-dasharray="3,3" opacity="0.8"/>' +
+      '<text x="' + xj + '" y="' + (H - PAD.b - 4) + '" fill="' + cTick + '" font-size="' + fXT + '" text-anchor="middle">J2000</text>';
+  }
+  // the context trace: the model's own e(t) on a right-hand axis — every
+  // swing of the perihelion lines sits on an eccentricity extremum
+  if (showEcc) {
+    let eMax = 0;
+    for (const v of S.ecc) if (Number.isFinite(v) && v > eMax) eMax = v;
+    const eTop = Math.max(0.01, Math.ceil(eMax * 1.1 * 100) / 100);
+    const toYe = (e) => PAD.t + (1 - e / eTop) * ph;
+    const cE = paper ? '#8a8a8a' : '#8a93a5';
+    let d = '', started = false;
+    for (let i = 0; i < S.ecc.length; i++) {
+      const e = S.ecc[i];
+      if (!Number.isFinite(e)) { started = false; continue; }
+      d += (started ? 'L' : 'M') + toX(S.yrs[i]).toFixed(1) + ',' + toYe(e).toFixed(1);
+      started = true;
+    }
+    curves += '<path d="' + d + '" fill="none" stroke="' + cE + '" stroke-width="1" opacity="' + (paper ? '0.8' : '0.7') + '"/>';
+    const eStep = eTop > 0.04 ? 0.02 : 0.01;
+    for (let e = 0; e <= eTop + 1e-9; e += eStep) {
+      grid += '<text x="' + (W - PAD.r + 5) + '" y="' + toYe(e).toFixed(1) + '" fill="' + cE + '" font-size="' + fYT + '" text-anchor="start" dominant-baseline="middle">' + e.toFixed(2) + '</text>';
+    }
+    grid += '<text x="' + (W - PAD.r + 5) + '" y="' + (PAD.t - 4) + '" fill="' + cE + '" font-size="9" text-anchor="start">e</text>';
+    entries.push({ name: 'Eccentricity e(t), the model’s own (right axis, context)', color: cE, dash: '' });
+  }
+  if (paper) grid += '<rect x="' + PAD.l + '" y="' + PAD.t + '" width="' + pw + '" height="' + ph + '" fill="none" stroke="#ccc" stroke-width="0.5"/>';
+  return { W, H, PAD, S, body: grid + curves, entries, rmsParts, anyClamped };
+}
+// ONE home for the caption sentences — every sentence gates on what is drawn.
+function _vfpAPNoteParts(on, log, core, showEcc) {
+  const frame = 'Earth’s precession PERIODS of date, in years, plotted as magnitudes (the axial and ecliptic motions are retrograde); ' + (log ? 'log y-axis — every series’ percentage swing has the same height.' : 'linear y-axis.') + ' A tangent period passes through infinity where its angle’s rate crosses zero (the perihelion swings back at eccentricity minima, the node at inclination minima): each series is clamped at three times its own median over the range (a short period is a fast, well-defined rate and is drawn as is)' + (core.anyClamped ? ', the clamped stretches drawn dotted (off scale, not a value)' : '') + '.';
+  const ecc = showEcc ? 'Grey, right axis: the model’s own eccentricity of date e(t) (the eccentricity chart’s Earth route) — every swing of the perihelion lines sits on an eccentricity extremum: at a minimum the perihelion direction is ill-defined and swings fast (or back), at a maximum it runs slowest.' : '';
+  const parts = [];
+  if (on.peri) parts.push('perihelion precession = anomalistic/(anomalistic − tropical) of the one-source years of date (the perihelion against the moving equinox)');
+  if (on.axial) parts.push('axial precession = sidereal/(sidereal − tropical) — the Axial Precession chart’s line');
+  if (on.apsidal) parts.push('apsidal precession = 360°/the N-body chain’s secular apsidal tangent (the perihelion against the ecliptic)');
+  if (on.obliq) {
+    const carrier = _obliqBeatYearsAtAge(0);
+    parts.push('obliquity cycle = the LOCAL period of the model’s own obliquity curve ε(t) (the Obliquity chart’s one-source line): the interval between successive maxima, minima, upward and downward crossings of the ±41-kyr running mean (crossings read only where that window is complete — a table’s end biases the mean) — four full-cycle readings per cycle, each at its interval’s midpoint, linear between them; its carrier is the beat 2π/(ψ̇ − |s₃|) of the composed lunisolar precession against the engine’s dominant nodal mode' + (Number.isFinite(carrier) ? ' (' + Math.round(carrier).toLocaleString('en-US') + ' yr at J2000)' : '') + ', the swing around it the interference of the engine’s other nodal modes (s₄, s₆, s₂ …) with the dominant one');
+  }
+  if (on.ecl) parts.push('ecliptic precession = the ±150-yr tangent of the orbit’s node on the invariable plane');
+  const model = parts.length ? 'Solid: the model’s own evaluators, one home each — ' + parts.join('; ') + '.' : 'No series enabled.';
+  const refParts = [];
+  if (on.peri) refParts.push('La2004 (Laskar et al. 2004, doi:10.1051/0004-6361:20041335) ϖ of date, 360°/(dϖ/dt) at its 1-kyr step, −250…+100 kyr');
+  if (on.obliq) refParts.push('La2004 (Laskar et al. 2004' + (on.peri ? '' : ', doi:10.1051/0004-6361:20041335') + ') obliquity through the SAME local-period estimator, its measured intervals as markers, −250…+100 kyr');
+  if (on.axial) refParts.push('Vondrák et al. (2011, doi:10.1051/0004-6361/201117274) p_A rate, drawn inside its stated ±200 kyr validity');
+  if (on.apsidal || on.ecl) refParts.push('La2010 (Laskar et al. 2011, doi:10.1051/0004-6361/201116836) ' + [on.apsidal ? 'ϖ' : '', on.ecl ? 'Ω' : ''].filter((t) => t).join(' and ') + ' in the invariable-plane frame, the same tangent at its 2-kyr step, −500 kyr → 0');
+  const refs = refParts.length ? 'Dashed: like-for-like of-date tangents on the published tables — ' + refParts.join('; ') + '.' : '';
+  const markers = '';
+  const rms = core.rmsParts.length ? 'Over the overlap: ' + core.rmsParts.join(' · ') + '.' : '';
+  return { frame, model, refs, markers, rms, ecc };
+}
+function renderVFPAllPrecession() {
+  const on = _vfpAPState.on, log = _vfpAPState.log, showEcc = _vfpAPState.ecc;
+  const core = _vfpAPChartCore(null, on, log, 'screen', showEcc);
+  const W = core.W, H = core.H, PAD = core.PAD, S = core.S;
+  _vfpAPState._screenGeom = { W, H, PAD, y0: S.y0, y1: S.y1 };
+  let controls = '<div style="padding:8px 6px;border:1px solid #2a2f3a;border-radius:6px 6px 0 0;background:#171c26;line-height:2;">';
+  for (const s of _vfpAP_SERIES) {
+    controls += '<label style="margin-right:10px;font-size:11px;color:' + s.screen + ';opacity:' + (on[s.key] ? '1' : '0.45') + ';cursor:pointer;white-space:nowrap;">' +
+      '<input type="checkbox" data-vfpap="' + s.key + '"' + (on[s.key] ? ' checked' : '') + ' style="vertical-align:-2px;margin-right:3px;">' + s.short + '</label>';
+  }
+  controls += '<label style="margin-right:10px;font-size:11px;color:#8a93a5;opacity:' + (showEcc ? '1' : '0.55') + ';cursor:pointer;white-space:nowrap;">' +
+    '<input type="checkbox" data-vfpap-ecc="1"' + (showEcc ? ' checked' : '') + ' style="vertical-align:-2px;margin-right:3px;">e(t) context</label>';
+  const btn = (attr, v, label, active) => '<button ' + attr + '="' + v + '" style="margin-left:6px;padding:1px 9px;border-radius:4px;border:1px solid ' + (active ? '#f0b040' : '#2a2f3a') + ';background:#232a36;color:' + (active ? '#f0b040' : '#8a93a5') + ';font-size:10px;cursor:pointer;">' + label + '</button>';
+  controls += '<span style="float:right;">' + btn('data-vfpap-scale', 'log', 'Log', log) + btn('data-vfpap-scale', 'lin', 'Linear', !log) +
+    '<span style="margin-left:10px;"></span>' + btn('data-vfpap-all', '1', 'all', false) + btn('data-vfpap-all', '0', 'none', false) + '</span></div>';
+  const swatchCss = (en) => en.dash
+    ? 'background:repeating-linear-gradient(90deg,' + en.color + ' 0 ' + (en.dash === '2,3' ? '2px,transparent 2px 5px' : '6px,transparent 6px 9px') + ');'
+    : 'background:' + en.color + ';';
+  let legendHtml = '<div class="vfp-legend">';
+  for (const en of core.entries) legendHtml += '<div class="vfp-legend-item"><span class="vfp-legend-swatch" style="' + swatchCss(en) + '"></span>' + en.name + '</div>';
+  legendHtml += '</div>';
+  const P = _vfpAPNoteParts(on, log, core, showEcc);
+  const fmtY = (y) => y === 0 ? '0' : Math.abs(y).toLocaleString('en-US') + (y < 0 ? ' BC' : ' AD');
+  return '<div class="vfp-chart-block">' +
+    controls +
+    legendHtml +
+    '<div style="position:relative;">' +
+    '<svg data-vfpap-svg viewBox="0 0 ' + W + ' ' + H + '" width="100%" style="display:block;background:#151a22;border-radius:0 0 6px 6px;">' +
+    core.body +
+    '<text x="' + PAD.l + '" y="' + (PAD.t - 4) + '" fill="#aaa" font-size="9">period (years' + (log ? ', log scale' : '') + ')</text>' +
+    '<line data-vfpap-cursor x1="-10" x2="-10" y1="' + PAD.t + '" y2="' + (H - PAD.b) + '" stroke="#8a93a5" stroke-width="0.8" visibility="hidden"/>' +
+    '</svg>' +
+    '<div data-vfpap-tip style="position:absolute;display:none;pointer-events:none;background:rgba(13,17,23,0.95);border:1px solid #3a4356;border-radius:6px;padding:6px 10px;font-size:11px;line-height:1.55;color:#e8ecf4;white-space:nowrap;z-index:5;"></div>' +
+    '</div>' +
+    '<div style="padding:8px 4px 2px;color:#8a93a5;font-size:11px;line-height:1.5;"><strong>Frame:</strong> ' + P.frame + ' ' + P.model + ' Static chart, ' + fmtY(S.y0) + ' → ' + fmtY(S.y1) + '; hover the chart for every enabled period (model · reference) at a year.</div>' +
+    '<div style="padding:2px 4px 8px;color:#8a93a5;font-size:11px;line-height:1.5;"><strong>References:</strong> ' + [P.refs, P.markers, P.rms, P.ecc].filter((t) => t).join(' ') + '</div>' +
+    '</div>';
+}
+// One paper form serves both header buttons — "Export for Paper" prints
+// _VFPAP_PAPER_RANGE, "Export Cycles" _VFPAP_CYCLES_RANGE — the house paper
+// style, the toggle-gated notes wrapped below.
+function _vfpAPPaperSvg(range) {
+  const on = _vfpAPState.on, log = _vfpAPState.log, showEcc = _vfpAPState.ecc;
+  const core = _vfpAPChartCore(range, on, log, 'paper', showEcc);
+  const W = core.W, H = core.H, PAD = core.PAD, S = core.S;
+  const ph = H - PAD.t - PAD.b;
+  const fmtY = (y) => y === 0 ? '0' : Math.abs(y).toLocaleString('en-US') + (y < 0 ? ' BC' : ' AD');
+  const title = 'All Precession Periods — ' + fmtY(S.y0) + ' → ' + fmtY(S.y1);
+  const P = _vfpAPNoteParts(on, log, core, showEcc);
+  const notes = [P.frame, P.model, P.refs, P.markers, P.rms, P.ecc].filter((t) => t);
+  const wrapText = (t) => {
+    const out = [];
+    let line = '';
+    for (const w of t.split(' ')) {
+      if (line && (line + ' ' + w).length > 130) { out.push(line); line = w; } else { line = line ? line + ' ' + w : w; }
+    }
+    if (line) out.push(line);
+    return out;
+  };
+  const lines = [];
+  for (const nt of notes) for (const l of wrapText(nt)) lines.push(l);
+  const lw = core.entries.map((en) => 28 + en.name.length * 6.2 + 24);
+  const legendRows = [];
+  {
+    let row = [], wsum = 0;
+    core.entries.forEach((en, i) => {
+      if (row.length && wsum + lw[i] > W - 40) { legendRows.push({ row, wsum }); row = []; wsum = 0; }
+      row.push(i); wsum += lw[i];
+    });
+    if (row.length) legendRows.push({ row, wsum });
+  }
+  let legendSvg = '';
+  legendRows.forEach((r, ri) => {
+    let lx = (W - r.wsum) / 2;
+    const ly = 34 + ri * 16;
+    for (const i of r.row) {
+      const en = core.entries[i];
+      legendSvg += '<line x1="' + lx.toFixed(1) + '" y1="' + ly + '" x2="' + (lx + 22).toFixed(1) + '" y2="' + ly + '" stroke="' + en.color + '" stroke-width="1.8"' + (en.dash ? ' stroke-dasharray="' + en.dash + '"' : '') + '/>' +
+        '<text x="' + (lx + 28).toFixed(1) + '" y="' + (ly + 4) + '" fill="#333" font-size="11">' + escapeXml(en.name) + '</text>';
+      lx += lw[i];
+    }
+  });
+  const TOP = 34 + legendRows.length * 16 + 4;
+  const XAXIS = 16;
+  const Hp = TOP + H + XAXIS + lines.length * 15 + 8;
+  let noteText = '';
+  lines.forEach((l, i) => {
+    noteText += '<text x="' + PAD.l + '" y="' + (TOP + H + XAXIS + (i + 1) * 15 - 4) + '" fill="#444" font-size="11">' + escapeXml(l) + '</text>';
+  });
+  return '<?xml version="1.0" encoding="UTF-8"?>\n' +
+    '<svg viewBox="0 0 ' + W + ' ' + Hp + '" width="' + W + '" height="' + Hp + '" xmlns="http://www.w3.org/2000/svg" font-family="Inter,Helvetica,Arial,sans-serif">' +
+    '<rect width="' + W + '" height="' + Hp + '" fill="white"/>' +
+    '<text x="' + (W / 2) + '" y="18" text-anchor="middle" fill="#222" font-size="16" font-weight="600">' + escapeXml(title) + '</text>' +
+    legendSvg +
+    '<g transform="translate(0,' + TOP + ')">' + core.body +
+    '<text x="16" y="' + (PAD.t + ph / 2) + '" text-anchor="middle" dominant-baseline="middle" transform="rotate(-90,16,' + (PAD.t + ph / 2) + ')" fill="#444" font-size="12" font-weight="500">Period (years' + (log ? ', log scale' : '') + ')</text>' +
+    '<text x="' + (PAD.l + (W - PAD.l - PAD.r) / 2) + '" y="' + (H + 8) + '" text-anchor="middle" fill="#444" font-size="12" font-weight="500">Years (BC / AD)</text></g>' +
+    noteText +
+    '</svg>';
+}
+function _vfpAPAfterRender(bodyEl) {
+  bodyEl.querySelectorAll('input[data-vfpap]').forEach((cbEl) => {
+    cbEl.addEventListener('change', () => {
+      _vfpAPState.on[cbEl.dataset.vfpap] = cbEl.checked;
+      updateVerificationPanel('all-precession');
+    });
+  });
+  bodyEl.querySelectorAll('button[data-vfpap-all]').forEach((b) => {
+    b.addEventListener('click', () => {
+      const onAll = b.dataset.vfpapAll === '1';
+      for (const s of _vfpAP_SERIES) _vfpAPState.on[s.key] = onAll;
+      updateVerificationPanel('all-precession');
+    });
+  });
+  bodyEl.querySelectorAll('button[data-vfpap-scale]').forEach((b) => {
+    b.addEventListener('click', () => {
+      _vfpAPState.log = b.dataset.vfpapScale === 'log';
+      updateVerificationPanel('all-precession');
+    });
+  });
+  bodyEl.querySelectorAll('input[data-vfpap-ecc]').forEach((cbEl) => {
+    cbEl.addEventListener('change', () => {
+      _vfpAPState.ecc = cbEl.checked;
+      updateVerificationPanel('all-precession');
+    });
+  });
+  // hover: every enabled period at the pointed year — model · reference
+  const svg = bodyEl.querySelector('svg[data-vfpap-svg]');
+  const tip = bodyEl.querySelector('div[data-vfpap-tip]');
+  const cursor = svg ? svg.querySelector('line[data-vfpap-cursor]') : null;
+  const G = _vfpAPState._screenGeom;
+  if (!svg || !tip || !cursor || !G) return;
+  const S = _vfpAPSamples();
+  const on = _vfpAPState.on;
+  const fmt = (v) => Number.isFinite(v) ? Math.round(v).toLocaleString('en-US') : '—';
+  const hide = () => { tip.style.display = 'none'; cursor.setAttribute('visibility', 'hidden'); };
+  svg.addEventListener('mouseleave', hide);
+  svg.addEventListener('mousemove', (e) => {
+    const r = svg.getBoundingClientRect();
+    if (!r.width) return;
+    const px = ((e.clientX - r.left) / r.width) * G.W;
+    if (px < G.PAD.l || px > G.W - G.PAD.r) { hide(); return; }
+    const pw = G.W - G.PAD.l - G.PAD.r;
+    const i = Math.round(((px - G.PAD.l) / pw) * (S.yrs.length - 1));
+    const y = S.yrs[i];
+    const cx = (G.PAD.l + ((y - G.y0) / (G.y1 - G.y0)) * pw).toFixed(1);
+    cursor.setAttribute('x1', cx);
+    cursor.setAttribute('x2', cx);
+    cursor.setAttribute('visibility', 'visible');
+    let rows = '<div style="color:#8a93a5;margin-bottom:2px;">Year ' + (y < 0 ? '−' : '+') + Math.abs(y).toLocaleString('en-US') + ' · model · reference (yr)</div>';
+    for (const s of _vfpAP_SERIES) {
+      if (!on[s.key]) continue;
+      rows += '<div style="display:flex;justify-content:space-between;gap:16px;"><span style="color:' + s.screen + ';">' + s.short + '</span><span>' + fmt(S.model[s.key][i]) + ' · ' + fmt(S.ref[s.key][i]) + '</span></div>';
+    }
+    if (_vfpAPState.ecc && Number.isFinite(S.ecc[i])) rows += '<div style="display:flex;justify-content:space-between;gap:16px;"><span style="color:#8a93a5;">e(t)</span><span>' + S.ecc[i].toFixed(4) + '</span></div>';
     tip.innerHTML = rows;
     tip.style.display = 'block';
     const wr = svg.parentElement.getBoundingClientRect();
@@ -33593,6 +34182,17 @@ function render(now) {
         hl.precSpan.textContent = isFinite(_T)
           ? Math.abs(Math.round(_T)).toLocaleString() + ' yr (' + (_T >= 0 ? 'prograde' : 'retrograde') + ')'
           : 'near-stationary';
+      }
+      // Phase 7: the tilt of date from the spin channel (the same value the
+      // mesh renders — o.<planet>Obliquity, angular-momentum sense; shown acute)
+      if (hl.planetKey && hl.tiltSpan) {
+        const _eps = o[hl.planetKey + 'Obliquity'];
+        hl.tiltSpan.textContent = Number.isFinite(_eps) ? Math.min(_eps, 180 - _eps).toFixed(3) + '°' : '—';
+      }
+      // the channel's derived J2000 line — a constant, filled once
+      if (hl.planetKey && hl.derivedSpan && !hl.derivedSpan.dataset.done) {
+        hl.derivedSpan.textContent = _spinDerivedText(hl.planetKey);
+        hl.derivedSpan.dataset.done = '1';
       }
     }
   }
