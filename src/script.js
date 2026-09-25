@@ -21516,6 +21516,19 @@ function _vfpYearTicks(yearMin, yearMax) {
   return out;
 }
 const _vfpFmtYearBcAd = (yr) => yr === 0 ? '0' : yr < 0 ? Math.abs(yr).toLocaleString('en-US') + ' BC' : yr.toLocaleString('en-US') + ' AD';
+/** Round-step value ticks for any range: ≤ 7 ticks on a 1/2/2.5/5 step,
+ *  with the decimals that step needs (a 2.5-step needs one more). */
+function _vfpNiceTicks(lo, hi) {
+  const span = hi - lo;
+  if (!(span > 0) || !Number.isFinite(span)) return { ticks: [lo], step: 1, decimals: 0 };
+  const p10 = Math.pow(10, Math.floor(Math.log10(span / 5)));
+  const mult = [1, 2, 2.5, 5, 10].find((k) => span / (k * p10) <= 7) || 10;
+  const step = mult * p10;
+  const ticks = [];
+  for (let v = Math.ceil(lo / step - 1e-9) * step; v <= hi + step * 1e-9; v += step) ticks.push(Math.abs(v) < step * 1e-6 ? 0 : v);   // no "-0"
+  const decimals = Math.max(0, -Math.floor(Math.log10(step)) + (mult === 2.5 ? 1 : 0));
+  return { ticks, step, decimals };
+}
 function renderVFPChart(category, currentYear) {
   // Custom-rendered categories (the all-planets inclination chart) own
   // their whole body — sampling, toggles, legend — and skip the generic
@@ -21628,21 +21641,29 @@ function renderVFPChart(category, currentYear) {
     return d;
   }
 
-  // Y-axis tick formatting — auto-detect needed decimals from data range
+  // Y ticks: the category's designed ticks only with its designed (±23 kyr)
+  // range; every other window gets round-step ticks from its own range,
+  // labelled with the decimals the STEP needs (owner-found: the designed
+  // ticks crowded the middle of the ±1 Myr window and fell outside the
+  // 1000–2500 window entirely — no labels at all; and the old decimal cap
+  // at `precision` collapsed a 1e-8-day step into identical labels)
+  const yFixed = !!(category.fixedYTicks && category.fixedYRange && tab.key === 'era');
+  const yNice = yFixed ? null : _vfpNiceTicks(yMin, yMax);
+  const yTickValues = yFixed ? category.fixedYTicks : yNice.ticks;
   function fmtY(v) {
-    if (category.fmtValue) return category.fmtValue(v);
-    const range = yMax - yMin;
-    if (range === 0) return v.toFixed(category.precision);
-    // Determine decimals needed to show meaningful variation
-    const rangeDecimals = Math.max(0, -Math.floor(Math.log10(range)) + 2);
-    const decimals = Math.min(Math.max(rangeDecimals, 1), category.precision);
-    return v.toFixed(decimals);
+    if (category.fmtValue && (yFixed || yNice.step >= 1)) return category.fmtValue(v);
+    if (yFixed) {
+      // the designed ticks: decimals from the designed range, capped at precision (as before)
+      const range = yMax - yMin;
+      const rangeDecimals = range > 0 ? Math.max(0, -Math.floor(Math.log10(range)) + 2) : category.precision;
+      return v.toFixed(Math.min(Math.max(rangeDecimals, 1), category.precision));
+    }
+    return v.toFixed(yNice.decimals);
   }
 
   // Plot area background
   let mainGrid = `<rect x="${PAD.l}" y="${PAD.t}" width="${plotW}" height="${plotH_main}" fill="rgba(255,255,255,0.015)" rx="2"/>`;
   // Grid + axes for main chart
-  const yTickValues = category.fixedYTicks || Array.from({ length: 6 }, (_, i) => yMin + i * (yMax - yMin) / 5);
   for (const v of yTickValues) {
     const y = yScale(v).toFixed(1);
     mainGrid += `<line x1="${PAD.l}" y1="${y}" x2="${W - PAD.r}" y2="${y}" stroke="rgba(255,255,255,0.1)" stroke-width="0.5"/>`;
@@ -21809,7 +21830,7 @@ function renderVFPChart(category, currentYear) {
     const a = Math.abs(v);
     return a >= 1000 ? a.toFixed(0) : a >= 1 ? a.toFixed(2) : a >= 0.001 ? a.toFixed(6) : a >= 1e-7 ? a.toFixed(9) : a.toExponential(2);
   };
-  const frameText = (category.frame || (category.yLabel + (category.unit ? ' (' + category.unit.trim() + ')' : ''))) +
+  const frameText = (category.frame || (category.yLabel + (category.unit && category.unit.trim() !== category.yLabel ? ' (' + category.unit.trim() + ')' : ''))) +
     (category.wrap360 ? '; an angle, wrapping at 360\u00b0' : '') + '. Window: ' + _vfpFmtYearBcAd(yearMin) + ' \u2192 ' + _vfpFmtYearBcAd(yearMax) + '.';
   const modelText = category.model.name + (category.modelText ? ' \u2014 ' + category.modelText : '') + '.';
   const refItems = category.references.map((ref) => {
@@ -21847,8 +21868,8 @@ function renderVFPChart(category, currentYear) {
 let _vfpHoverCtx = null;
 // The residual pane is collapsible (owner: the hover covers the values; the
 // pane stays the one place the DIFFERENCE is a curve) — one setting for
-// the whole panel, default open, remembered for the session.
-let _vfpResidualOpen = true;
+// the whole panel, default COLLAPSED (owner), remembered for the session.
+let _vfpResidualOpen = false;
 function _vfpGenericAfterRender(bodyEl) {
   const C = _vfpHoverCtx;
   if (!C) return;
