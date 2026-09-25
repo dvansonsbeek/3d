@@ -19401,6 +19401,7 @@ const VFP_CATEGORIES = [
   {
     id: 'eccentricity', group: 'Earth orbit', label: 'Eccentricity', unit: '', precision: 8,
     frame: 'Earth’s orbital eccentricity (dimensionless), of date',
+    reading: 'The one-source e of date is the modulus of the engine’s own eccentricity vector, the banked N-body series; its ~100-kyr and 405-kyr cycles are the beats of the secular g-modes. The era polynomial (Meeus) holds inside ±10 kyr; Berger 1978 and La2004 carry the cycles across the window.',
     yLabel: 'eccentricity',
     residualLabel: 'eccentricity (dimensionless)', residualScale: 1,   // was 'AU' — e carries no unit
     primaryRef: 'Meeus',   // C-5: by name, index-shift-proof
@@ -19431,6 +19432,7 @@ const VFP_CATEGORIES = [
   {
     id: 'obliquity', group: 'Earth axis', label: 'Obliquity', unit: '°', precision: 6,
     frame: 'Obliquity of the ecliptic (degrees), the rendered movement of date',
+    reading: 'The rendered movement: the series hybrid of the engine’s nodal modes coupled to the composed lunisolar precession — the ±1° cycle of ~41 kyr. The era polynomials (Laskar 1986, Capitaine, Chapront) are single-cycle fits valid ±10 kyr; Berger 1978 and La2004 carry the cycle across the window.',
     yLabel: 'degrees',
     residualLabel: 'arcseconds', residualScale: 3600,
     primaryRef: 'Chapront',   // C-5: by name, index-shift-proof
@@ -19465,6 +19467,7 @@ const VFP_CATEGORIES = [
   {
     id: 'inclination', group: 'Earth orbit', label: 'Inclination (invariable plane)', unit: '°', precision: 4,
     frame: 'Inclination of Earth’s orbit (degrees) to the model’s invariable plane, of date',
+    reading: 'The engine Earth’s orbit normal against the model’s own invariable plane, the banked ζ series: the ~70-kyr nodal cycle with the deep s-mode beats breathing its amplitude (down to 0.39° at −284 kyr, near zero after +500 kyr). La2010 is read in the same plane.',
     yLabel: 'degrees',
     residualLabel: 'arcseconds', residualScale: 3600,
     fixedYRange: [0, 3], fixedYTicks: [0, 0.5, 1.0, 1.5, 2.0, 2.5, 3.0],
@@ -19483,6 +19486,7 @@ const VFP_CATEGORIES = [
   {
     id: 'ascending-node', group: 'Earth orbit', label: 'Ascending Node (invariable plane)', unit: '°', precision: 2,
     frame: 'Ascending node of Earth’s orbit (degrees) on the invariable plane, Souami & Souchay node origin, of date, wrapping at 360°',
+    reading: 'The node regresses around the invariable plane once per ~70 kyr, the dominant nodal mode; where the inclination passes near zero (after +500 kyr) the node is ill-defined and jumps, so the sawtooth breaks. The origin is the Souami & Souchay node, the convention La2010 publishes.',
     yLabel: 'degrees',
     residualLabel: 'degrees', residualScale: 1,
     wrap360: true,
@@ -19498,6 +19502,7 @@ const VFP_CATEGORIES = [
   {
     id: 'perihelion', group: 'Earth orbit', label: 'Perihelion Longitude', unit: '°', precision: 3,
     frame: 'Longitude of Earth’s perihelion (degrees) from the equinox of date, wrapping at 360°',
+    reading: 'The one-source ϖ of date turns once per ~21 kyr against the moving equinox: the apsidal precession against the stars (~112 kyr) meeting the axial precession (~25.8 kyr). Meeus is the era polynomial; La2004 carries the same convention across the window.',
     yLabel: 'degrees',
     residualLabel: 'degrees', residualScale: 1,
     wrap360: true,
@@ -19595,7 +19600,7 @@ const VFP_CATEGORIES = [
       { name: 'IAU (observed)', color: '#ef5350',
         value: () => ASTRO_REFERENCE.tropicalYearMeanJ2000 },
     ],
-    modelNote: `Both curves are in <strong>SI 86400-s days</strong>. Our model derives the tropical year from the mean of 4 cardinal-point cadences (VE / SS / AE / WS), evaluated at each sample year with a <strong>J2000-anchored</strong> rebasing so the value is independent of where the simulation is currently parked. Captures <strong>Fourier-fitted orbital-precession structure</strong> across &plusmn;12 kyr and tracks Laskar's polynomial within ~0.2 s.`,
+    reading: 'The one-source tropical year of date: the sidereal year times (1 − p/360°) with p the year-over-year regression of the movement’s own equinox — the equinox-rate wobble the Laskar polynomial fits inside ±10 kyr; Vondrák’s long-period series, converted through the same beat, carries it to ±200 kyr.',
   },
   {
     // The Bromberg exhibit (sym454.org/seasons): the four cardinal-point
@@ -19607,6 +19612,7 @@ const VFP_CATEGORIES = [
     // structure's 180° perigee-frame slip (VE↔AE, SS↔WS were swapped).
     id: 'cardinal-year-lengths', group: 'Earth clock', label: 'Cardinal Year Lengths', unit: ' days', precision: 8,
     frame: 'The four cardinal-point year lengths and the mean tropical year (SI days), of date',
+    referencesText: 'none — the four lines are the model’s own decomposition around its own mean; Bromberg’s numerical chart is the comparison figure (site offline, <a href="https://web.archive.org/web/20241221111118/https://www.kalendis.free.nf/seasons.htm?i=1" target="_blank" rel="noopener">archived copy</a>).',
     yLabel: 'days',
     // In SI DAYS like the Tropical and Sidereal Year panels (owner); the
     // residual pane = each cardinal year − the mean tropical year, in
@@ -19639,11 +19645,12 @@ const VFP_CATEGORIES = [
       { name: 'WS year (south solstice)', color: '#2251e0', preserveColor: true,
         fn: year => _cardinalYearDays(year, 'WS') },
     ],
-    modelNote: `The four <strong>cardinal-point year lengths</strong> (successive same-event intervals: VE&rarr;VE, SS&rarr;SS, AE&rarr;AE, WS&rarr;WS) around the mean tropical year of date, in <strong>SI days</strong>; the residual pane shows each cardinal year minus the mean, in seconds. All five curves come from the model's own one-source movement &mdash; the mean is the Tropical Year chart's line. <strong>How it is derived:</strong> the true Sun runs ahead of or behind the mean Sun by the <em>equation of center</em>, EoC(M) &asymp; 2e&middot;sin&thinsp;M (M = the Sun's angle from its perigee, which sits opposite Earth's perihelion &varpi;). Each cardinal event therefore occurs early or late by &Delta;t = &minus;(T/360&deg;)&middot;EoC, and the year measured between two same-type events is T<sub>X</sub> = T<sub>mean</sub> + d(&Delta;t)/dyr &mdash; the <em>drift</em> of that timing offset. As perihelion precesses through the seasons (the ~21 kyr apsidal-vs-equinox cycle), each curve swings around the mean with amplitude proportional to the <strong>eccentricity e(t)</strong>: today's e &asymp; 0.0167 gives the &plusmn;0.8 min swing, and in the Export Cycles view the envelope visibly breathes with the Eccentricity chart's 100/405-kyr cycles &mdash; shrinking toward e-minima. J2000 values match the canonical set (Meeus), as minutes past 365 d 5 h: VE 49.02, SS 47.94, AE 48.51, WS 49.55. Comparison figure: Bromberg's numerical-integration chart (site offline; <a href="https://web.archive.org/web/20241221111118/https://www.kalendis.free.nf/seasons.htm?i=1" target="_blank" rel="noopener">archived copy</a>) &mdash; this panel reproduces it from the analytic movement.`,
+    reading: 'Each cardinal year (VE → VE, SS → SS, AE → AE, WS → WS) is the year-to-year change of the true Sun’s timing offset Δt = −(T/360°)·EoC at that point, so as perihelion precesses through the seasons (~21 kyr) each line swings around the mean with an amplitude set by the eccentricity of date. The equinox years cross the mean ~230 years before the 1246 perihelion–solstice alignment, not at it: the change carries an eccentricity-decay term 2·sin M·de/dt, about ±4 s today. The Meeus year-2000 set, as minutes past 365 d 5 h: VE 49.02, SS 47.94, AE 48.51, WS 49.55.',
   },
   {
     id: 'solar-day', group: 'Earth clock', label: 'Solar Day Length', unit: ' s', precision: 6,
     frame: 'Mean solar day (SI seconds), of date',
+    reading: 'The model’s mean solar day of date from its day-length stack: the tidal secular lengthening, the nodal-period term and the fitted cycle stack; the long-term mean is that stack without its cycles, and Bills & Ray (1999) the constant tidal rate of the lunar-laser and eclipse era.',
     yLabel: 'seconds',
     residualLabel: 'milliseconds', residualScale: 1000,
     paperTitle: 'Solar Day Length Comparison',
@@ -19769,11 +19776,12 @@ const VFP_CATEGORIES = [
       { name: 'NASA/JPL (observed)', color: '#ef5350',
         value: () => ASTRO_REFERENCE.siderealYearJ2000 },
     ],
-    modelNote: `Both curves are in <strong>SI 86400-s days</strong>. The model curve is the one-source sidereal year of date: the framework's mass-loss law (Driver 2, IAU-anchored at J2000 via the H/13 identity: 31,558,149.7635 s → 365.256363004 SI days) divided by the model's own banked <strong>mean-longitude-rate ratio</strong> λ̇(y)/λ̇(2000) — the planetary epoch drift measured from the framework's ±10 Myr N-body run at <em>constant</em> solar mass, so the two tiers separate cleanly. That planetary drift is what makes Chapront's polynomial steep, and the engine reproduces it to ~0.1 s over ±12 kyr (banked gate); the residual gap is the polynomial's own extrapolation class. With the one-source movement opted out the line falls back to the mass-loss slope alone.`,
+    reading: 'The one-source sidereal year of date: the solar-mass-loss law (IAU-anchored at J2000) divided by the banked mean-longitude-rate ratio from the model’s ±10 Myr N-body run at constant solar mass — the planetary epoch drift that makes Chapront’s polynomial steep, reproduced to ~0.1 s over ±12 kyr; the rest of the gap is the polynomial’s own extrapolation.',
   },
   {
     id: 'axial-precession', group: 'Earth axis', label: 'Axial Precession Period', unit: ' yr', precision: 2,
     frame: 'Axial precession period (years), the instantaneous beat sidereal/(sidereal − tropical) of date',
+    reading: 'The instantaneous beat of the one-source sidereal and tropical years, ≈ 25,771 yr at J2000, wobbling with the 41-kyr obliquity cycle through cos ε. Vondrák’s long-period series tracks it cycle for cycle inside ±200 kyr; Capitaine’s era polynomial departs beyond ±10 kyr.',
     yLabel: 'years',
     residualLabel: 'years', residualScale: 1,
     paperRange: [-23000, 23000], paperTitle: 'Axial Precession Period Comparison',
@@ -19867,7 +19875,7 @@ const VFP_CATEGORIES = [
       { name: 'Espenak & Meeus (NASA Canon)', color: '#4fc3f7', fn: deltaTEspenakMeeusRaw, validYears: [-1999, 3000],
         sourceUrl: 'https://eclipse.gsfc.nasa.gov/SEcat5/deltatpoly.html' },
     ],
-    modelNote: `Both curves show <strong>absolute ΔT (TT − UT1)</strong> in seconds. Our model is the calibrated long-term trend: <code>deltaTStart</code> (~54.6&nbsp;s J2000 anchor, joint world) + Simpson integral of Layer 2 + the ecliptic-precession LOD term + Bond/Hallstatt/Jose5/Jose4 + Core-mantle swing stack (jointly fit against Espenak history 1650-2017, RMS ≈ 13.4&nbsp;s). The J2000 anchor sits below the IERS instantaneous observation (63.6&nbsp;s) by design — the ~9&nbsp;s gap is the industrial-era Earth-rotation acceleration (mass redistribution, ice loss, groundwater pumping) that no cyclic model can capture. <strong>Espenak &amp; Meeus</strong> is the NASA Five Millennium Canon piecewise polynomial fit to observed eclipse timings; divergence from our model (~15&nbsp;s at the 1900 dip, near-zero at 1870 and 2010) shows what our cyclic stack cannot resolve — short-scale (~50-year) wiggles need shorter-period corrections than our harmonic cycle stack (all ≥ 700&nbsp;yr) allows. Both curves match to ~1&nbsp;s at J2000+50&nbsp;yr and again near 2050.`,
+    reading: 'The model’s calibrated long-term trend: the J2000 anchor (~54.6 s, the joint fit) plus the integrated day-length history with the ecliptic-precession term and the harmonic cycle stack, fitted against the Espenak history 1650–2017 (rms ≈ 13.4 s). The anchor sits ~9 s below the IERS instantaneous 63.6 s by design — the industrial-era rotation acceleration no cyclic model captures. Espenak & Meeus is the NASA canon’s eclipse-timing polynomial; the ~15 s gap at the 1900 dip is the ~50-year structure the stack’s ≥ 700-yr cycles cannot resolve.',
   },
   {
     // ── Inclination of all planets (owner spec 2026-09-15) — the LAST
@@ -19937,7 +19945,8 @@ const VFP_CATEGORIES = [
     yLabel: 'days',
     residualLabel: 'days', residualScale: 1,
     paperTitle: 'Season Durations',
-    frame: 'The four northern seasons (SI days) between successive cardinal points of the true Sun — spring VE → SS, summer SS → AE, autumn AE → WS, winter WS → VE — and the mean quarter tropical year, of date',
+    frame: 'The four northern seasons (SI days) between successive cardinal points of the true Sun, and the mean quarter tropical year, of date',
+    referencesText: 'none — the four seasons are the model’s own; the Meeus year-2000 lengths are the anchors in the Reading.',
     model: { name: 'Mean quarter year (T/4, of date)', color: '#f0b040',
       fn: year => _seasonDurationDays(year, 'MEAN') },
     references: [
@@ -19954,7 +19963,7 @@ const VFP_CATEGORIES = [
       { name: 'Autumn — Meeus (year 2000)', color: '#b0323a', value: () => 89.84 },
       { name: 'Winter — Meeus (year 2000)', color: '#2251e0', value: () => 88.99 },
     ],
-    modelNote: 'A season is a quarter of the tropical year plus the difference of the true Sun’s timing offsets Δt = −(T/360°)·EoC at its two ends, so it depends on the offsets <em>themselves</em>: with perihelion on the December solstice (1246 AD) the figure is symmetric about that solstice — spring = summer, autumn = winter — and the lengths pair off exactly there. The Cardinal Year Lengths panel is the year-to-year <em>change</em> of the same offsets, which adds an eccentricity-decay term 2·sin M·de/dt (about ±4 s today at the equinoxes), so its equinox years cross the mean some 230 years before the alignment, not at it. The seasons’ spread breathes with the eccentricity of date: it vanishes at every eccentricity minimum.',
+    reading: 'A season is a quarter of the tropical year plus the difference of the true Sun’s timing offsets Δt = −(T/360°)·EoC at its two ends (spring VE → SS, summer SS → AE, autumn AE → WS, winter WS → VE), so it depends on the offsets themselves: with perihelion on the December solstice (1246 AD) spring = summer and autumn = winter exactly. The spread breathes with the eccentricity of date and vanishes at every eccentricity minimum.',
   },
   {
     // ── Climatic precession e·sin ϖ (owner: "are we missing panels?") —
@@ -19982,7 +19991,7 @@ const VFP_CATEGORIES = [
           return Number.isFinite(e) && Number.isFinite(w) ? e * Math.sin(w * Math.PI / 180) : NaN;
         } },
     ],
-    modelNote: 'The third Milankovitch curve beside eccentricity and obliquity: the eccentricity-modulated precession of Earth’s perihelion against the equinox of date. Sign convention: ϖ is the longitude of Earth’s <em>perihelion</em> from the equinox of date, the angle the Perihelion Longitude panel draws, so the index is positive when perihelion falls in the half-year after the March equinox. Laskar’s insolation tables use the longitude of <em>perigee</em> ϖ̃ = ϖ + 180°; their e·sin ϖ̃ is the negative of this curve. The La2004 line here is built from La2004’s own eccentricity and perihelion columns with this panel’s convention, so the two are like-for-like. The ~21-kyr envelope is the eccentricity of date: the index vanishes at every eccentricity minimum, whatever the perihelion does.',
+    reading: 'The third Milankovitch curve beside eccentricity and obliquity: the eccentricity-modulated precession of the perihelion against the equinox of date, from the series sampler’s own e·sin ϖ. The index is positive when perihelion falls in the half-year after the March equinox; Laskar’s perigee-based e·sin ϖ̃ is its negative, and the La2004 line is built from La2004’s own e and ϖ with this convention. The ~21-kyr envelope is the eccentricity of date: the index vanishes at every eccentricity minimum.',
   },
 ];
 // The panel ORDER (owner-ruled): the physics builds up — the orbit, the axis,
@@ -20289,8 +20298,8 @@ function _vfpPINoteParts(tab, on, core) {
     core.jplRmsParts.length ? 'Δrms vs JPL Horizons over the overlap: ' + core.jplRmsParts.join(' · ') + ' (the osculating short-period wiggle the secular curves average out is included).' : '',
     core.la2010Note ? core.la2010Note.trim() : '',
   ].filter((t) => t).join(' ');
-  const note = 'Solid curves: the model’s own N-body chain elements of date, series-governed' + (on.earth ? ' (Earth rides its own engine series)' : '') + '. Hover the chart for every enabled planet’s value at a year.';
-  return { frame, references, reading, note };
+  const physics = 'Solid curves: the model’s own N-body chain elements of date, series-governed' + (on.earth ? ' (Earth rides its own engine series)' : '') + ' — the fast inner-planet cycles are the beats of the inner s-modes, the slow outer ones the s₆ … s₈ lines; the Horizons overlay’s short-period wiggle is what the secular curves average out.';
+  return { frame, references, reading: (reading ? reading + ' ' : '') + physics };
 }
 // One paper form for any window — "Export" prints the current standard
 // window — in the house paper style (renderVFPPaperChart: 16px title, centered 11px
@@ -20305,51 +20314,18 @@ function _vfpPIPaperSvg(range) {
   const fmtY = (y) => y === 0 ? '0' : Math.abs(y).toLocaleString('en-US') + (y < 0 ? ' BC' : ' AD');
   const title = 'Inclination of all planets — ' + (tab === 'ecl' ? 'to the J2000 ecliptic' : 'to the invariable plane') + ', ' + fmtY(S.y0) + ' → ' + fmtY(S.y1);
   const P = _vfpPINoteParts(tab, on, core);
-  const notes = _vfpCaptionParagraphs(P);
-  const wrapText = (t) => {
-    const out = [];
-    let line = '';
-    for (const w of t.split(' ')) {
-      if (line && (line + ' ' + w).length > 130) { out.push(line); line = w; } else { line = line ? line + ' ' + w : w; }
-    }
-    if (line) out.push(line);
-    return out;
-  };
-  const lines = [];
-  for (const nt of notes) for (const l of wrapText(nt)) lines.push(l);
+  const cap = _vfpPaperCaption(P, PAD.l, 130);   // the standard caption under the export
   // centered legend rows between title and plot (the renderVFPPaperChart
   // convention: 22px swatches, 11px text); standalone SVG is strict XML,
   // so every text line — legend names, title, notes — goes through
   // escapeXml (the La2010 "A&A 532 A89" citation was an EntityRef error;
   // the Bills & Ray lesson, again)
-  const lw = core.entries.map((en) => 28 + en.name.length * 6.2 + 24);
-  const legendRows = [];
-  {
-    let row = [], wsum = 0;
-    core.entries.forEach((en, i) => {
-      if (row.length && wsum + lw[i] > W - 40) { legendRows.push({ row, wsum }); row = []; wsum = 0; }
-      row.push(i); wsum += lw[i];
-    });
-    if (row.length) legendRows.push({ row, wsum });
-  }
-  let legendSvg = '';
-  legendRows.forEach((r, ri) => {
-    let lx = (W - r.wsum) / 2;
-    const ly = 34 + ri * 16;
-    for (const i of r.row) {
-      const en = core.entries[i];
-      legendSvg += '<line x1="' + lx.toFixed(1) + '" y1="' + ly + '" x2="' + (lx + 22).toFixed(1) + '" y2="' + ly + '" stroke="' + en.color + '" stroke-width="1.8"' + (en.dash ? ' stroke-dasharray="' + en.dash + '"' : '') + '/>' +
-        '<text x="' + (lx + 28).toFixed(1) + '" y="' + (ly + 4) + '" fill="#333" font-size="11">' + escapeXml(en.name) + '</text>';
-      lx += lw[i];
-    }
-  });
-  const TOP = 34 + legendRows.length * 16 + 4;
+  const legend = _vfpPaperLegend(core.entries, W);   // the standard export legend
+  const legendSvg = legend.svg;
+  const TOP = legend.bottom + 4;
   const XAXIS = 16;   // the 'Years (BC / AD)' row under the chart
-  const Hp = TOP + H + XAXIS + lines.length * 15 + 8;
-  let noteText = '';
-  lines.forEach((l, i) => {
-    noteText += '<text x="' + PAD.l + '" y="' + (TOP + H + XAXIS + (i + 1) * 15 - 4) + '" fill="#444" font-size="11">' + escapeXml(l) + '</text>';
-  });
+  const Hp = TOP + H + XAXIS + cap.height + 8;
+  const noteText = cap.svg(TOP + H + XAXIS);
   return '<?xml version="1.0" encoding="UTF-8"?>\n' +
     '<svg viewBox="0 0 ' + W + ' ' + Hp + '" width="' + W + '" height="' + Hp + '" xmlns="http://www.w3.org/2000/svg" font-family="Inter,Helvetica,Arial,sans-serif">' +
     '<rect width="' + W + '" height="' + Hp + '" fill="white"/>' +
@@ -20581,8 +20557,8 @@ function _vfpPENoteParts(on, core) {
     core.jplRmsParts.length ? 'Δrms vs JPL Horizons over the overlap: ' + core.jplRmsParts.join(' · ') + ' (the osculating short-period wiggle the secular curves average out is included).' : '',
     core.la2010Note ? core.la2010Note.trim() : '',
   ].filter((t) => t).join(' ');
-  const note = 'Solid curves: the model’s own N-body chain elements of date, series-governed' + (on.earth ? ' (Earth rides its own engine series, e = |z|)' : '') + '.' + beats + ' Hover the chart for every enabled planet’s value at a year.';
-  return { frame, references, reading, note };
+  const physics = 'Solid curves: the model’s own N-body chain elements of date, series-governed' + (on.earth ? ' (Earth rides its own engine series, e = |z|)' : '') + ' — each planet’s eccentricity is the modulus of its secular eccentricity vector, the g-modes’ beats.' + beats;
+  return { frame, references, reading: (reading ? reading + ' ' : '') + physics };
 }
 function renderVFPPlanetEccentricities() {
   const on = _vfpPEState.on;
@@ -20633,46 +20609,13 @@ function _vfpPEPaperSvg(range) {
   const fmtY = (y) => y === 0 ? '0' : Math.abs(y).toLocaleString('en-US') + (y < 0 ? ' BC' : ' AD');
   const title = 'Eccentricity of all planets — ' + fmtY(S.y0) + ' → ' + fmtY(S.y1);
   const P = _vfpPENoteParts(on, core);
-  const notes = _vfpCaptionParagraphs(P);
-  const wrapText = (t) => {
-    const out = [];
-    let line = '';
-    for (const w of t.split(' ')) {
-      if (line && (line + ' ' + w).length > 130) { out.push(line); line = w; } else { line = line ? line + ' ' + w : w; }
-    }
-    if (line) out.push(line);
-    return out;
-  };
-  const lines = [];
-  for (const nt of notes) for (const l of wrapText(nt)) lines.push(l);
-  const lw = core.entries.map((en) => 28 + en.name.length * 6.2 + 24);
-  const legendRows = [];
-  {
-    let row = [], wsum = 0;
-    core.entries.forEach((en, i) => {
-      if (row.length && wsum + lw[i] > W - 40) { legendRows.push({ row, wsum }); row = []; wsum = 0; }
-      row.push(i); wsum += lw[i];
-    });
-    if (row.length) legendRows.push({ row, wsum });
-  }
-  let legendSvg = '';
-  legendRows.forEach((r, ri) => {
-    let lx = (W - r.wsum) / 2;
-    const ly = 34 + ri * 16;
-    for (const i of r.row) {
-      const en = core.entries[i];
-      legendSvg += '<line x1="' + lx.toFixed(1) + '" y1="' + ly + '" x2="' + (lx + 22).toFixed(1) + '" y2="' + ly + '" stroke="' + en.color + '" stroke-width="1.8"' + (en.dash ? ' stroke-dasharray="' + en.dash + '"' : '') + '/>' +
-        '<text x="' + (lx + 28).toFixed(1) + '" y="' + (ly + 4) + '" fill="#333" font-size="11">' + escapeXml(en.name) + '</text>';
-      lx += lw[i];
-    }
-  });
-  const TOP = 34 + legendRows.length * 16 + 4;
+  const cap = _vfpPaperCaption(P, PAD.l, 130);   // the standard caption under the export
+  const legend = _vfpPaperLegend(core.entries, W);   // the standard export legend
+  const legendSvg = legend.svg;
+  const TOP = legend.bottom + 4;
   const XAXIS = 16;   // the 'Years (BC / AD)' row under the chart
-  const Hp = TOP + H + XAXIS + lines.length * 15 + 8;
-  let noteText = '';
-  lines.forEach((l, i) => {
-    noteText += '<text x="' + PAD.l + '" y="' + (TOP + H + XAXIS + (i + 1) * 15 - 4) + '" fill="#444" font-size="11">' + escapeXml(l) + '</text>';
-  });
+  const Hp = TOP + H + XAXIS + cap.height + 8;
+  const noteText = cap.svg(TOP + H + XAXIS);
   return '<?xml version="1.0" encoding="UTF-8"?>\n' +
     '<svg viewBox="0 0 ' + W + ' ' + Hp + '" width="' + W + '" height="' + Hp + '" xmlns="http://www.w3.org/2000/svg" font-family="Inter,Helvetica,Arial,sans-serif">' +
     '<rect width="' + W + '" height="' + Hp + '" fill="white"/>' +
@@ -20978,8 +20921,8 @@ function _vfpAPChartCore(range, on, log, style, showEcc) {
           if (m > cap[s.key] || r > cap[s.key]) { skipped++; continue; }
           s2 += (m - r) * (m - r); sm += m; n++;
         }
-        if (n) rmsParts.push(s.short + ' vs ' + s.refName.split(' — ')[0] + ': rms ' + Math.round(Math.sqrt(s2 / n)).toLocaleString('en-US') + ' yr (' + (100 * Math.sqrt(s2 / n) / (sm / n)).toFixed(2) + ' %) over ' + n + ' kyr of overlap' + (skipped ? ' (' + skipped + ' kyr where either tangent passes through infinity skipped)' : '') +
-          (nr ? '; as a rate, ' + Math.sqrt(r2 / nr).toFixed(3) + ' ″/yr rms over all ' + nr + ' kyr' : ''));
+        if (n) rmsParts.push(s.short + ' vs ' + s.refName.split(' — ')[0].replace(' (Laskar)', '') + ': ' + Math.round(Math.sqrt(s2 / n)).toLocaleString('en-US') + ' yr (' + (100 * Math.sqrt(s2 / n) / (sm / n)).toFixed(1) + ' %)' +
+          (nr ? ', ' + Math.sqrt(r2 / nr).toFixed(2) + ' ″/yr as a rate' : '') + ' over ' + n + ' kyr' + (skipped ? ' (' + skipped + ' kyr near infinity skipped)' : ''));
       }
     }
     if (S.markers[s.key]) {
@@ -21055,27 +20998,24 @@ function _vfpAPChartCore(range, on, log, style, showEcc) {
 // ONE home for the caption sentences — every sentence gates on what is drawn.
 function _vfpAPNoteParts(on, log, core, showEcc) {
   const frame = 'Earth’s precession periods (years), of date, plotted as magnitudes — the axial and ecliptic motions are retrograde; ' + (log ? 'log y-axis, every series’ percentage swing the same height' : 'linear y-axis') + '.';
-  const clampNote = 'A tangent period passes through infinity where its angle’s rate crosses zero (the perihelion swings back at eccentricity minima, the node at inclination minima): each series is clamped at three times its own median over the window — a short period is a fast, well-defined rate and is drawn as is' + (core.anyClamped ? '; the clamped stretches are drawn dotted (off scale, not a value)' : '') + '.';
+  const clampNote = 'Where an angle’s rate crosses zero its tangent period passes through infinity (the perihelion swings back at eccentricity minima): each series is clamped at three times its median' + (core.anyClamped ? ', the clamped stretches dotted' : '') + '.';
   const ecc = showEcc ? 'Grey, right axis: the model’s own eccentricity of date e(t) (the eccentricity chart’s Earth route) — every swing of the perihelion lines sits on an eccentricity extremum: at a minimum the perihelion direction is ill-defined and swings fast (or back), at a maximum it runs slowest.' : '';
   const parts = [];
-  if (on.peri) parts.push('perihelion precession = anomalistic/(anomalistic − tropical) of the one-source years of date (the perihelion against the moving equinox)');
-  if (on.axial) parts.push('axial precession = sidereal/(sidereal − tropical) — the Axial Precession chart’s line');
-  if (on.apsidal) parts.push('apsidal precession = 360°/the N-body chain’s secular apsidal tangent (the perihelion against the ecliptic)');
-  if (on.obliq) {
-    const carrier = _obliqBeatYearsAtAge(0);
-    parts.push('obliquity cycle = the LOCAL period of the model’s own obliquity curve ε(t) (the Obliquity chart’s one-source line): the interval between successive maxima, minima, upward and downward crossings of the ±41-kyr running mean (crossings read only where that window is complete — a table’s end biases the mean) — four full-cycle readings per cycle, each at its interval’s midpoint, linear between them; its carrier is the beat 2π/(ψ̇ − |s₃|) of the composed lunisolar precession against the engine’s dominant nodal mode' + (Number.isFinite(carrier) ? ' (' + Math.round(carrier).toLocaleString('en-US') + ' yr at J2000)' : '') + ', the swing around it the interference of the engine’s other nodal modes (s₄, s₆, s₂ …) with the dominant one');
-  }
-  if (on.ecl) parts.push('ecliptic precession = the ±150-yr tangent of the orbit’s node on the invariable plane');
-  const model = parts.length ? 'Solid: the model’s own evaluators, one home each — ' + parts.join('; ') + '.' : 'No series enabled.';
+  if (on.peri) parts.push('the perihelion year-length beat');
+  if (on.axial) parts.push('the axial year-length beat');
+  if (on.apsidal) parts.push('the chain’s apsidal tangent');
+  if (on.obliq) parts.push('the local period of the model’s own ε(t), four readings per cycle around the beat 2π/(ψ̇ − |s₃|)');
+  if (on.ecl) parts.push('the node tangent on the invariable plane');
+  const model = parts.length ? 'Solid: the model’s own evaluators — ' + parts.join('; ') + '.' : 'No series enabled.';
   const refParts = [];
   if (on.peri) refParts.push('La2004 (Laskar et al. 2004, doi:10.1051/0004-6361:20041335) ϖ of date, 360°/(dϖ/dt) at its 1-kyr step, −250…+100 kyr');
   if (on.obliq) refParts.push('La2004 (Laskar et al. 2004' + (on.peri ? '' : ', doi:10.1051/0004-6361:20041335') + ') obliquity through the SAME local-period estimator, its measured intervals as markers, −250…+100 kyr');
   if (on.axial) refParts.push('Vondrák et al. (2011, doi:10.1051/0004-6361/201117274) p_A rate, drawn inside its stated ±200 kyr validity');
   if (on.apsidal || on.ecl) refParts.push('La2010 (Laskar et al. 2011, doi:10.1051/0004-6361/201116836) ' + [on.apsidal ? 'ϖ' : '', on.ecl ? 'Ω' : ''].filter((t) => t).join(' and ') + ' in the invariable-plane frame, the same tangent at its 2-kyr step, −500 kyr → 0');
   const references = refParts.length ? 'Dashed: like-for-like of-date tangents on the published tables — ' + refParts.join('; ') + '.' : '';
-  const reading = core.rmsParts.length ? 'Over the overlap: ' + core.rmsParts.join(' · ') + '.' : '';
-  const note = model + ' ' + clampNote + (ecc ? ' ' + ecc : '') + ' Hover the chart for every enabled period (model · reference) at a year.';
-  return { frame: frame.replace(/\.$/, '') + ' · ' + _vfpFmtYearBcAd(core.S.y0) + ' → ' + _vfpFmtYearBcAd(core.S.y1) + '.', references, reading, note };
+  const reading = core.rmsParts.length ? 'Rms over the overlap — ' + core.rmsParts.join(' · ') + '.' : '';
+  const physics = model + ' ' + clampNote + (ecc ? ' ' + ecc : '');
+  return { frame: frame.replace(/\.$/, '') + ' · ' + _vfpFmtYearBcAd(core.S.y0) + ' → ' + _vfpFmtYearBcAd(core.S.y1) + '.', references, reading: (reading ? reading + ' ' : '') + physics };
 }
 function renderVFPAllPrecession() {
   const on = _vfpAPState.on, log = _vfpAPState.log, showEcc = _vfpAPState.ecc;
@@ -21125,46 +21065,13 @@ function _vfpAPPaperSvg(range) {
   const fmtY = (y) => y === 0 ? '0' : Math.abs(y).toLocaleString('en-US') + (y < 0 ? ' BC' : ' AD');
   const title = 'All Precession Periods — ' + fmtY(S.y0) + ' → ' + fmtY(S.y1);
   const P = _vfpAPNoteParts(on, log, core, showEcc);
-  const notes = _vfpCaptionParagraphs(P);
-  const wrapText = (t) => {
-    const out = [];
-    let line = '';
-    for (const w of t.split(' ')) {
-      if (line && (line + ' ' + w).length > 130) { out.push(line); line = w; } else { line = line ? line + ' ' + w : w; }
-    }
-    if (line) out.push(line);
-    return out;
-  };
-  const lines = [];
-  for (const nt of notes) for (const l of wrapText(nt)) lines.push(l);
-  const lw = core.entries.map((en) => 28 + en.name.length * 6.2 + 24);
-  const legendRows = [];
-  {
-    let row = [], wsum = 0;
-    core.entries.forEach((en, i) => {
-      if (row.length && wsum + lw[i] > W - 40) { legendRows.push({ row, wsum }); row = []; wsum = 0; }
-      row.push(i); wsum += lw[i];
-    });
-    if (row.length) legendRows.push({ row, wsum });
-  }
-  let legendSvg = '';
-  legendRows.forEach((r, ri) => {
-    let lx = (W - r.wsum) / 2;
-    const ly = 34 + ri * 16;
-    for (const i of r.row) {
-      const en = core.entries[i];
-      legendSvg += '<line x1="' + lx.toFixed(1) + '" y1="' + ly + '" x2="' + (lx + 22).toFixed(1) + '" y2="' + ly + '" stroke="' + en.color + '" stroke-width="1.8"' + (en.dash ? ' stroke-dasharray="' + en.dash + '"' : '') + '/>' +
-        '<text x="' + (lx + 28).toFixed(1) + '" y="' + (ly + 4) + '" fill="#333" font-size="11">' + escapeXml(en.name) + '</text>';
-      lx += lw[i];
-    }
-  });
-  const TOP = 34 + legendRows.length * 16 + 4;
+  const cap = _vfpPaperCaption(P, PAD.l, 130);   // the standard caption under the export
+  const legend = _vfpPaperLegend(core.entries, W);   // the standard export legend
+  const legendSvg = legend.svg;
+  const TOP = legend.bottom + 4;
   const XAXIS = 16;
-  const Hp = TOP + H + XAXIS + lines.length * 15 + 8;
-  let noteText = '';
-  lines.forEach((l, i) => {
-    noteText += '<text x="' + PAD.l + '" y="' + (TOP + H + XAXIS + (i + 1) * 15 - 4) + '" fill="#444" font-size="11">' + escapeXml(l) + '</text>';
-  });
+  const Hp = TOP + H + XAXIS + cap.height + 8;
+  const noteText = cap.svg(TOP + H + XAXIS);
   return '<?xml version="1.0" encoding="UTF-8"?>\n' +
     '<svg viewBox="0 0 ' + W + ' ' + Hp + '" width="' + W + '" height="' + Hp + '" xmlns="http://www.w3.org/2000/svg" font-family="Inter,Helvetica,Arial,sans-serif">' +
     '<rect width="' + W + '" height="' + Hp + '" fill="white"/>' +
@@ -21439,12 +21346,12 @@ function _vfpANChartCore(years, style) {
 }
 function _vfpANNoteParts(core) {
   const sym = _vfpANSymmetricYears();
-  const frame = 'The Sun’s declination against the equation of time over one year at a fixed mean solar time — the figure-8 a fixed camera records. Sky view facing south: East on the left, a fast Sun (positive equation of time) stands west of the meridian at mean noon.';
-  const model = 'Each figure is the two-body analemma on the model’s own elements OF DATE — the obliquity (the Obliquity chart’s one-source line: the figure’s height ±ε and the 2ε-type term), the eccentricity (the eccentricity chart’s Earth route: the size of the eccentricity term, ≈ 2e in radians of time) and the perihelion longitude of date (the perihelion chart’s line: the term’s phase against the equinox — the tilt and the twist). The scene’s real Sun adds the lunar and planetary ripple (under half a minute), which does not change the shape.';
+  const frame = 'The Sun’s declination (degrees) against the equation of time (minutes) over one year at a fixed mean solar time — the figure-8 — sky view facing south, East on the left, a fast Sun west of the meridian at mean noon · four epochs.';
+  const model = 'Each figure is the two-body analemma on the model’s own elements of date: the obliquity sets the height, the eccentricity the size of the eccentricity term, the perihelion longitude its phase — the tilt and the twist. The scene’s real Sun adds under half a minute of lunar and planetary ripple, which does not change the shape.';
   const rules = 'Symmetry: with the Sun’s perigee on a solstice the figure mirrors about the vertical axis; on an equinox it is point-symmetric.';
   const reading = 'At the four epochs: ' + core.epochs.map((E) => _vfpANFmtYear(E.inp.year) + ' — e ' + E.inp.e.toFixed(5) + ', ε ' + E.inp.epsDeg.toFixed(3) + '°, equation of time ' + E.eotMin.toFixed(1) + ' … +' + E.eotMax.toFixed(1) + ' min').join('; ') +
     '. The model’s own symmetric years nearest to now: ' + sym.map((s) => s.name + ' ' + (Number.isFinite(s.year) ? _vfpANFmtYear(s.year) : '—')).join(' · ') + '.';
-  return { frame, references: '', reading, note: model + ' ' + rules };
+  return { frame, references: '', reading: reading + ' ' + model + ' ' + rules };
 }
 function renderVFPAnalemma() {
   const years = _vfpANState.years;
@@ -21465,21 +21372,9 @@ function renderVFPAnalemma() {
 function _vfpANPaperSvg() {
   const core = _vfpANChartCore(_vfpANState.years, 'paper');
   const P = _vfpANNoteParts(core);
-  const notes = _vfpCaptionParagraphs(P);
-  const wrapText = (t) => {
-    const out = [];
-    let line = '';
-    for (const w of t.split(' ')) {
-      if (line && (line + ' ' + w).length > 130) { out.push(line); line = w; } else { line = line ? line + ' ' + w : w; }
-    }
-    if (line) out.push(line);
-    return out;
-  };
-  const lines = [];
-  for (const nt of notes) for (const l of wrapText(nt)) lines.push(l);
-  const TOP = 30, Hp = TOP + core.H + lines.length * 15 + 12;
-  let noteText = '';
-  lines.forEach((l, i) => { noteText += '<text x="24" y="' + (TOP + core.H + (i + 1) * 15 - 4) + '" fill="#444" font-size="11">' + escapeXml(l) + '</text>'; });
+  const cap = _vfpPaperCaption(P, 24, 130);   // the standard caption under the export
+  const TOP = 30, Hp = TOP + core.H + cap.height + 12;
+  const noteText = cap.svg(TOP + core.H);
   return '<?xml version="1.0" encoding="UTF-8"?>\n' +
     '<svg viewBox="0 0 ' + core.W + ' ' + Hp + '" width="' + core.W + '" height="' + Hp + '" xmlns="http://www.w3.org/2000/svg" font-family="Inter,Helvetica,Arial,sans-serif">' +
     '<rect width="' + core.W + '" height="' + Hp + '" fill="white"/>' +
@@ -21576,20 +21471,110 @@ const _vfpFmtYearBcAd = (yr) => yr === 0 ? '0' : yr < 0 ? Math.abs(yr).toLocaleS
  *  and link; Reading = the numbers (rms per reference over the window, the
  *  J2000 anchor, the observed values); Note = the physics in a few
  *  sentences. Numbers live in the Reading, never in the Frame or the Note. */
+const _VFP_CAPTION_BLOCKS = [['Frame', 'frame'], ['References', 'references'], ['Reading', 'reading']];
 function _vfpCaptionHtml(blocks) {
   let s = '<div style="margin:8px 4px 6px;padding-top:6px;border-top:1px solid #2a2f3a;color:#8a93a5;font-size:11px;line-height:1.5;">';
-  for (const [label, text] of [['Frame', blocks.frame], ['References', blocks.references], ['Reading', blocks.reading], ['Note', blocks.note]]) {
-    if (text) s += '<div style="margin-top:6px;"><strong>' + label + ':</strong> ' + text + '</div>';
+  for (const [label, key] of _VFP_CAPTION_BLOCKS) {
+    if (blocks[key]) s += '<div style="margin-top:6px;"><strong>' + label + ':</strong> ' + blocks[key] + '</div>';
   }
   return s + '</div>';
 }
-/** The same four blocks as plain labelled paragraphs for the paper forms. */
-function _vfpCaptionParagraphs(blocks) {
-  const out = [];
-  for (const [label, text] of [['Frame', blocks.frame], ['References', blocks.references], ['Reading', blocks.reading], ['Note', blocks.note]]) {
-    if (text) out.push(label + ': ' + String(text).replace(/<[^>]+>/g, '').replace(/&rarr;/g, '→').replace(/&mdash;/g, '—').replace(/&nbsp;/g, ' ').replace(/&plusmn;/g, '±').replace(/&asymp;/g, '≈').replace(/&Delta;/g, 'Δ').replace(/&middot;/g, '·').replace(/&minus;/g, '−').replace(/&deg;/g, '°').replace(/&varpi;/g, 'ϖ').replace(/&thinsp;/g, ' ').replace(/&amp;/g, '&'));
+const _vfpPlainText = (t) => String(t).replace(/<[^>]+>/g, '').replace(/&rarr;/g, '→').replace(/&mdash;/g, '—').replace(/&nbsp;/g, ' ').replace(/&plusmn;/g, '±').replace(/&asymp;/g, '≈').replace(/&Delta;/g, 'Δ').replace(/&middot;/g, '·').replace(/&minus;/g, '−').replace(/&deg;/g, '°').replace(/&varpi;/g, 'ϖ').replace(/&thinsp;/g, ' ').replace(/&amp;/g, '&');
+/** The same blocks under a paper export — ONE renderer for every form
+ *  (owner: "standardize the text underneath the export"): each block a
+ *  wrapped paragraph with its label in bold, 15-px lines, a 6-px gap
+ *  between blocks, left-aligned at x. Returns the height and an svg(yTop)
+ *  builder so the form can size itself first. */
+function _vfpPaperCaption(blocks, x, maxChars) {
+  const paras = [];
+  for (const [label, key] of _VFP_CAPTION_BLOCKS) {
+    if (!blocks[key]) continue;
+    const words = (label + ': ' + _vfpPlainText(blocks[key])).split(/\s+/);
+    const lines = [];
+    let line = '';
+    for (const w of words) {
+      if (line && (line + ' ' + w).length > maxChars) { lines.push(line); line = w; } else { line = line ? line + ' ' + w : w; }
+    }
+    if (line) lines.push(line);
+    paras.push({ label, lines });
   }
-  return out;
+  const LINE = 15, GAP = 6;
+  const height = paras.reduce((h, p) => h + p.lines.length * LINE + GAP, 0);
+  const svg = (yTop) => {
+    let s = '', y = yTop;
+    for (const p of paras) {
+      p.lines.forEach((l, i) => {
+        y += LINE;
+        const body = i === 0 ? l.slice(p.label.length + 1) : l;
+        s += '<text x="' + x + '" y="' + (y - 4) + '" fill="#444" font-size="11">' + (i === 0 ? '<tspan font-weight="600">' + p.label + ':</tspan>' : '') + escapeXml(body) + '</text>';
+      });
+      y += GAP;
+    }
+    return s;
+  };
+  return { height, svg };
+}
+/** The legend under a paper export's title — ONE renderer for every form
+ *  (owner: "standardize the export legend"): centred rows that WRAP at the
+ *  page width (a single row overran the 1000-px page with five long names
+ *  and clipped at both edges), 22-px swatch + 11-px text, 16-px row pitch,
+ *  the first row at y = 34; `bottom` is where the plot may start. */
+function _vfpPaperLegend(entries, W) {
+  const widths = entries.map((en) => 28 + en.name.length * 6.2 + 24);
+  const rows = [];
+  let row = [], wsum = 0;
+  entries.forEach((en, i) => {
+    if (row.length && wsum + widths[i] > W - 40) { rows.push({ row, wsum }); row = []; wsum = 0; }
+    row.push(i); wsum += widths[i];
+  });
+  if (row.length) rows.push({ row, wsum });
+  let svg = '';
+  rows.forEach((r, ri) => {
+    let lx = (W - r.wsum) / 2;
+    const ly = 34 + ri * 16;
+    for (const i of r.row) {
+      const en = entries[i];
+      const dash = en.dash === true ? '6,4' : en.dash;
+      svg += '<line x1="' + lx.toFixed(1) + '" y1="' + ly + '" x2="' + (lx + 22).toFixed(1) + '" y2="' + ly + '" stroke="' + en.color + '" stroke-width="' + (en.bold ? 2.5 : 1.8) + '"' + (dash ? ' stroke-dasharray="' + dash + '"' : '') + '/>' +
+        '<text x="' + (lx + 28).toFixed(1) + '" y="' + (ly + 4) + '" fill="#333" font-size="11" font-family="Inter,Helvetica,Arial,sans-serif">' + escapeXml(en.name) + '</text>';
+      lx += widths[i];
+    }
+  });
+  return { svg, rows: rows.length, bottom: 34 + rows.length * 16 };
+}
+/** The generic panels' three blocks — ONE builder for the screen and the
+ *  paper export: Frame = the category's frame sentence · the window;
+ *  References = each reference with its validity and link; Reading = the
+ *  measures (rms per reference over the window, the J2000 anchor with the
+ *  observed values) followed by the category's physics sentences. */
+function _vfpGenericCaptionBlocks(category, yearMin, yearMax, rmsParts, rLabel, withLinks) {
+  const fmtRms = (v) => {
+    const a = Math.abs(v);
+    return a >= 1000 ? a.toFixed(0) : a >= 1 ? a.toFixed(2) : a >= 0.001 ? a.toFixed(6) : a >= 1e-7 ? a.toFixed(9) : a.toExponential(2);
+  };
+  const fmtV = category.fmtValue || ((v) => v.toFixed(category.precision));
+  const frame = (category.frame || (category.yLabel + (category.unit && category.unit.trim() !== category.yLabel ? ' (' + category.unit.trim() + ')' : ''))) +
+    ' · ' + _vfpFmtYearBcAd(yearMin) + ' → ' + _vfpFmtYearBcAd(yearMax) + '.';
+  let references;
+  if (category.referencesText) references = category.referencesText;
+  else {
+    const items = category.references.map((ref) => {
+      const valid = ref.validYears ? ', valid ' + _vfpFmtYearBcAd(ref.validYears[0]) + ' → ' + _vfpFmtYearBcAd(ref.validYears[1]) : '';
+      const link = withLinks && ref.sourceUrl ? ' <a href="' + ref.sourceUrl + '" target="_blank" rel="noopener" class="vfp-source-link" title="Source">↗</a>' : '';
+      return ref.name + valid + link;
+    });
+    const anyValid = category.references.some((r) => r.validYears);
+    references = items.length ? items.join(' · ') + (anyValid ? ' — dotted beyond validity.' : '.') : '';
+  }
+  const measures = rmsParts.map((r) => r.name + ' rms ' + fmtRms(r.rms) + ' ' + rLabel + ' over ' + r.n + ' samples');
+  const modelJ2000v = category.model.fn(2000);
+  const anchor = ['J2000: model ' + (Number.isFinite(modelJ2000v) ? fmtV(modelJ2000v) + (category.unit || '') : '—')];
+  for (const extra of category.j2000extras || []) {
+    const v = typeof extra.value === 'function' ? extra.value() : extra.value;
+    if (Number.isFinite(v)) anchor.push(extra.name + ' ' + fmtV(v) + (category.unit || ''));
+  }
+  const reading = (measures.length ? measures.join(' · ') + '. ' : '') + anchor.join(' · ') + '.' + (category.reading ? ' ' + category.reading : '');
+  return { frame, references, reading };
 }
 /** Round-step value ticks for any range: ≤ 7 ticks on a 1/2/2.5/5 step,
  *  with the decimals that step needs (a 2.5-step needs one more). */
@@ -21899,30 +21884,9 @@ function renderVFPChart(category, currentYear) {
   }
   tabStrip += '</div>';
 
-  // The standard caption \u2014 Frame \u00b7 References \u00b7 Reading \u00b7 Note \u2014 built
-  // from the category's own data (_vfpCaptionHtml, the same on every panel)
-  const fmtRms = (v) => {
-    const a = Math.abs(v);
-    return a >= 1000 ? a.toFixed(0) : a >= 1 ? a.toFixed(2) : a >= 0.001 ? a.toFixed(6) : a >= 1e-7 ? a.toFixed(9) : a.toExponential(2);
-  };
-  const fmtV = category.fmtValue || ((v) => v.toFixed(category.precision));
-  const frameText = (category.frame || (category.yLabel + (category.unit && category.unit.trim() !== category.yLabel ? ' (' + category.unit.trim() + ')' : ''))) +
-    ' \u00b7 ' + _vfpFmtYearBcAd(yearMin) + ' \u2192 ' + _vfpFmtYearBcAd(yearMax) + '.';
-  const refItems = category.references.map((ref) => {
-    const valid = ref.validYears ? ' (valid ' + _vfpFmtYearBcAd(ref.validYears[0]) + ' \u2192 ' + _vfpFmtYearBcAd(ref.validYears[1]) + ', dotted beyond)' : '';
-    const link = ref.sourceUrl ? ' <a href="' + ref.sourceUrl + '" target="_blank" rel="noopener" class="vfp-source-link" title="Source">\u2197</a>' : '';
-    return ref.name + valid + link;
-  });
-  const refsText = refItems.length ? refItems.join(' \u00b7 ') + '.' : '';
-  const readingParts = rmsParts.map((r) => r.name + ' rms ' + fmtRms(r.rms) + ' ' + rLabel + ' over ' + r.n + ' samples');
-  const modelJ2000v = category.model.fn(2000);
-  const anchorParts = ['J2000: model ' + (Number.isFinite(modelJ2000v) ? fmtV(modelJ2000v) + (category.unit || '') : '\u2014')];
-  for (const extra of category.j2000extras || []) {
-    const v = typeof extra.value === 'function' ? extra.value() : extra.value;
-    if (Number.isFinite(v)) anchorParts.push(extra.name + ' ' + fmtV(v) + (category.unit || ''));
-  }
-  const readingText = (readingParts.length ? readingParts.join(' \u00b7 ') + '. ' : '') + anchorParts.join(' \u00b7 ') + '.';
-  const caption = _vfpCaptionHtml({ frame: frameText, references: refsText, reading: readingText, note: category.modelNote || '' });
+  // The standard caption \u2014 Frame \u00b7 References \u00b7 Reading \u2014 the ONE builder
+  // the paper export uses too
+  const caption = _vfpCaptionHtml(_vfpGenericCaptionBlocks(category, yearMin, yearMax, rmsParts, rLabel, true));
 
   const tipDiv = '<div data-vfp-tip style="position:absolute;display:none;pointer-events:none;background:rgba(13,17,23,0.95);border:1px solid #3a4356;border-radius:6px;padding:6px 10px;font-size:11px;line-height:1.55;color:#e8ecf4;white-space:nowrap;z-index:5;"></div>';
   return `<div class="vfp-legend">${legend}</div>
@@ -22030,9 +21994,8 @@ function renderVFPPaperChartAlt(category, altConfig) {
   // "Export Cycles" button; pass an explicit config (e.g. category.paperRecent)
   // to render a different range/yRange without a second renderer copy.
   const alt = altConfig || category.paperAlt;
-  const W = 1000, H = 500, PAD = { l: 80, r: 120, t: 50, b: 45 };
+  const W = 1000, PAD = { l: 80, r: 120, t: 50, b: 45 };
   const plotW = W - PAD.l - PAD.r;
-  const plotH = H - PAD.t - PAD.b;
   const [yearMin, yearMax] = alt.range;
   const nSamples = 400;
   const step = (yearMax - yearMin) / nSamples;
@@ -22052,6 +22015,12 @@ function renderVFPPaperChartAlt(category, altConfig) {
       .filter(r => !excludeSet.has(r.name))
       .map((r, i) => ({ ...r, color: r.preserveColor ? r.color : refColors[i % refColors.length] }))
   ];
+  // the standard export legend wraps into rows; the plot starts under it
+  // (a single row clipped at both page edges with five long names)
+  const legend = _vfpPaperLegend(allCurves.map((c, ci) => ({ name: c.name, color: c.color, dash: !!c.dash, bold: ci === 0 })), W);
+  PAD.t = legend.bottom + 12;
+  const H = PAD.t + 405 + PAD.b;   // a 405-px plot whatever the legend's height
+  const plotH = H - PAD.t - PAD.b;
   const samples = allCurves.map(() => []);
   for (let i = 0; i <= nSamples; i++) {
     const yr = yearMin + i * step;
@@ -22154,18 +22123,8 @@ function renderVFPPaperChartAlt(category, altConfig) {
     curvePaths += `<path d="${d}" fill="none" stroke="${curve.color}" stroke-width="${ci === 0 ? 2 : 1.5}" clip-path="url(#vfp-paper-alt-clip)"${dashAttr}/>`;
   });
 
-  // Legend
-  const legendY = 32;
-  const legendItemWidths = allCurves.map(c => 28 + c.name.length * 6.2 + 24);
-  const legendTotalW = legendItemWidths.reduce((a, b) => a + b, 0);
-  let legendX = (W - legendTotalW) / 2;
-  let legendItems = '';
-  allCurves.forEach((curve, ci) => {
-    const dashAttr = curve.dash ? ' stroke-dasharray="6,4"' : '';
-    legendItems += `<line x1="${legendX}" y1="${legendY}" x2="${legendX + 22}" y2="${legendY}" stroke="${curve.color}" stroke-width="${ci === 0 ? 2.5 : 1.8}"${dashAttr}/>`;
-    legendItems += `<text x="${legendX + 28}" y="${legendY + 4}" fill="${textColor}" font-size="11" font-family="Inter,Helvetica,Arial,sans-serif">${escapeXml(curve.name)}</text>`;
-    legendX += legendItemWidths[ci];
-  });
+  // Legend — the standard export legend (built above, the plot sits under it)
+  const legendItems = legend.svg;
 
   // J2000 marker
   const j2000x = xScale(2000).toFixed(1);
@@ -22188,10 +22147,28 @@ function renderVFPPaperChartAlt(category, altConfig) {
   const yAxisLabel = `<text x="16" y="${PAD.t + plotH / 2}" text-anchor="middle" dominant-baseline="middle" transform="rotate(-90,16,${PAD.t + plotH / 2})" fill="#444" font-size="12" font-weight="500" font-family="Inter,Helvetica,Arial,sans-serif">${category.yLabel}</text>`;
   const xAxisLabel = `<text x="${PAD.l + plotW / 2}" y="${H - 5}" text-anchor="middle" fill="#444" font-size="12" font-weight="500" font-family="Inter,Helvetica,Arial,sans-serif">Years (BC / AD)</text>`;
 
+  // The standard caption under the export — the same three blocks as the
+  // screen (owner: "standardize the text underneath the export"); the rms
+  // per reference from this form's own samples (inside validity)
+  const rScale = category.residualScale || 1, rLabel = category.residualLabel || category.yLabel;
+  const rmsParts = category.noComparisons ? [] : allCurves.slice(1).map((curve, ri) => {
+    let s2 = 0, n = 0;
+    for (let i = 0; i < samples[0].length; i++) {
+      const m = samples[0][i].v, r = samples[ri + 1][i].v;
+      if (!Number.isFinite(m) || !Number.isFinite(r)) continue;
+      let d = r - m;
+      if (category.wrap360) d = ((d + 180) % 360 + 360) % 360 - 180;
+      d *= rScale; s2 += d * d; n++;
+    }
+    return n ? { name: curve.name, rms: Math.sqrt(s2 / n), n } : null;
+  }).filter((r) => r);
+  const cap = _vfpPaperCaption(_vfpGenericCaptionBlocks(category, yearMin, yearMax, rmsParts, rLabel, false), PAD.l, 150);
+  const Hp = H + cap.height + 10;
+
   return `<?xml version="1.0" encoding="UTF-8"?>
-<svg viewBox="0 0 ${W} ${H}" width="${W}" height="${H}" xmlns="http://www.w3.org/2000/svg">
-  <rect width="${W}" height="${H}" fill="white"/>
-  ${clipDef}${grid}${refLinesSVG}${eventsSVG}${yAxisLabel}${xAxisLabel}${title}${legendItems}${curvePaths}${j2000marker}
+<svg viewBox="0 0 ${W} ${Hp}" width="${W}" height="${Hp}" xmlns="http://www.w3.org/2000/svg" font-family="Inter,Helvetica,Arial,sans-serif">
+  <rect width="${W}" height="${Hp}" fill="white"/>
+  ${clipDef}${grid}${refLinesSVG}${eventsSVG}${yAxisLabel}${xAxisLabel}${title}${legendItems}${curvePaths}${j2000marker}${cap.svg(H + 4)}
 </svg>`;
 }
 
