@@ -19907,6 +19907,34 @@ const VFP_CATEGORIES = [
     afterRender: (el) => _vfpANAfterRender(el),
     customPaper: () => _vfpANPaperSvg(),
   },
+  {
+    // ── Climatic precession e·sin ϖ (owner: "are we missing panels?") —
+    // the third Milankovitch curve beside eccentricity and obliquity: the
+    // eccentricity-modulated precession of the perihelion against the
+    // equinox of date. ONE home: the series sampler's eSinPeri (e · sin of
+    // the SAME of-date ϖ the Perihelion Longitude panel draws — Earth's
+    // perihelion from the moving equinox); La2004 read the same way from
+    // its own e and ϖ columns, like-for-like by construction. Laskar's
+    // insolation tables use the longitude of PERIGEE ϖ̃ = ϖ + 180°, so their
+    // e·sin ϖ̃ is the negative of this panel's index — stated in the Note.
+    id: 'climatic-precession', group: 'Earth cycles', label: 'Climatic Precession (e·sin ϖ)', unit: '', precision: 6,
+    yLabel: 'e · sin ϖ',
+    residualLabel: 'e·sin ϖ (dimensionless)', residualScale: 1,
+    paperTitle: 'Climatic Precession e·sin ϖ',
+    frame: 'The climatic precession index e·sin ϖ (dimensionless): the eccentricity-modulated precession of Earth’s perihelion against the equinox of date — the third Milankovitch curve beside eccentricity and obliquity. ϖ is the Perihelion Longitude panel’s angle (Earth’s perihelion from the moving equinox)',
+    model: { name: 'This model (one-source)', color: '#f0b040',
+      fn: year => _hybridSpinActive()
+        ? _hybridSeriesSampleAt(year).eSinPeri
+        : _vfpPEEarthEcc(year) * Math.sin(_vfpANPeriEarthDeg(year) * Math.PI / 180) },
+    references: [
+      { name: 'La2004 (Laskar)', color: '#e53935', validYears: [-248000, 102000], sourceUrl: 'https://doi.org/10.1051/0004-6361:20041335',
+        fn: year => {
+          const e = eccLa2004(year), w = perihelionLa2004(year);
+          return Number.isFinite(e) && Number.isFinite(w) ? e * Math.sin(w * Math.PI / 180) : NaN;
+        } },
+    ],
+    modelNote: 'Sign convention: ϖ is the longitude of Earth’s <em>perihelion</em> from the equinox of date, the angle the Perihelion Longitude panel draws, so the index is positive when perihelion falls in the half-year after the March equinox. Laskar’s insolation tables use the longitude of <em>perigee</em> ϖ̃ = ϖ + 180°; their e·sin ϖ̃ is the negative of this curve. The La2004 line here is built from La2004’s own eccentricity and perihelion columns with this panel’s convention, so the two are like-for-like. The ~21-kyr envelope is the eccentricity of date: the index vanishes at every eccentricity minimum, whatever the perihelion does.',
+  },
 ];
 // The panel ORDER (owner-ruled): the physics builds up — the orbit, the axis,
 // what the two produce together, the clock, the other planets. The groups are
@@ -19915,7 +19943,7 @@ const VFP_CATEGORIES = [
 const VFP_ORDER = [
   'eccentricity', 'perihelion', 'inclination', 'ascending-node',   // Earth orbit
   'obliquity', 'axial-precession',                                  // Earth axis
-  'all-precession', 'analemma',                                     // Earth cycles
+  'all-precession', 'climatic-precession', 'analemma',             // Earth cycles
   'tropical-year', 'sidereal-year', 'cardinal-year-lengths', 'solar-day', 'delta-t',   // Earth clock
   'planet-inclinations', 'planet-eccentricities',                   // All planets
 ];
