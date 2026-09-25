@@ -19381,7 +19381,7 @@ const VFP_CATEGORIES = [
   {
     id: 'eccentricity', label: 'Eccentricity', unit: '', precision: 8,
     yLabel: 'eccentricity',
-    residualLabel: 'AU', residualScale: 1,
+    residualLabel: 'eccentricity (dimensionless)', residualScale: 1,   // was 'AU' — e carries no unit
     primaryRef: 'Meeus',   // C-5: by name, index-shift-proof
     paperRange: [-23000, 23000], paperTitle: 'Eccentricity Comparison',
     paperAlt: {
@@ -19398,9 +19398,9 @@ const VFP_CATEGORIES = [
     model: { name: 'This model (one-source)', color: '#f0b040',
       fn: year => _sceneEccTargetAt(year) },
     references: [
-      { name: 'Meeus (1991)', color: '#4fc3f7', fn: eccMeeus, sourceUrl: 'https://en.wikipedia.org/wiki/Orbital_eccentricity' },
-      { name: 'Berger (1978)', color: '#ce93d8', fn: eccBerger1978, sourceUrl: 'https://doi.org/10.1175/1520-0469(1978)035%3C2362:LTVODI%3E2.0.CO;2' },
-      { name: 'La2004 (Laskar)', color: '#ff8a65', fn: eccLa2004, sourceUrl: 'https://doi.org/10.1051/0004-6361:20041335' },
+      { name: 'Meeus (1991)', color: '#4fc3f7', fn: eccMeeus, validYears: [-10000, 10000], sourceUrl: 'https://en.wikipedia.org/wiki/Orbital_eccentricity' },
+      { name: 'Berger (1978)', color: '#ce93d8', fn: eccBerger1978, validYears: [-1000000, 1000000], sourceUrl: 'https://doi.org/10.1175/1520-0469(1978)035%3C2362:LTVODI%3E2.0.CO;2' },
+      { name: 'La2004 (Laskar)', color: '#ff8a65', fn: eccLa2004, validYears: [-248000, 102000], sourceUrl: 'https://doi.org/10.1051/0004-6361:20041335' },
     ],
     j2000extras: [
       { name: 'NASA/JPL (observed)', color: '#ef5350',
@@ -19429,11 +19429,11 @@ const VFP_CATEGORIES = [
     model: { name: 'This model (one-source)', color: '#f0b040',
       fn: year => _sceneEpsTargetDeg(year) },
     references: [
-      { name: 'Laskar (1986)', color: '#4fc3f7', fn: meanObliquityLaskar1986, sourceUrl: 'https://en.wikipedia.org/wiki/Axial_tilt' },
-      { name: 'Capitaine (2006)', color: '#81c784', fn: meanObliquityIAU2006, sourceUrl: 'https://ui.adsabs.harvard.edu/abs/2003A%26A...412..567C' },
-      { name: 'Chapront (2002)', color: '#ce93d8', fn: obliquityChapront2002, sourceUrl: 'https://ui.adsabs.harvard.edu/abs/2003A%26A...412..567C' },
-      { name: 'Berger (1978)', color: '#ff8a65', fn: obliquityBerger1978, sourceUrl: 'https://doi.org/10.1175/1520-0469(1978)035%3C2362:LTVODI%3E2.0.CO;2' },
-      { name: 'La2004 (Laskar)', color: '#e53935', fn: obliquityLa2004, sourceUrl: 'https://doi.org/10.1051/0004-6361:20041335' },
+      { name: 'Laskar (1986)', color: '#4fc3f7', fn: meanObliquityLaskar1986, validYears: [-10000, 10000], sourceUrl: 'https://en.wikipedia.org/wiki/Axial_tilt' },
+      { name: 'Capitaine (2006)', color: '#81c784', fn: meanObliquityIAU2006, validYears: [-10000, 10000], sourceUrl: 'https://ui.adsabs.harvard.edu/abs/2003A%26A...412..567C' },
+      { name: 'Chapront (2002)', color: '#ce93d8', fn: obliquityChapront2002, validYears: [-10000, 10000], sourceUrl: 'https://ui.adsabs.harvard.edu/abs/2003A%26A...412..567C' },
+      { name: 'Berger (1978)', color: '#ff8a65', fn: obliquityBerger1978, validYears: [-1000000, 1000000], sourceUrl: 'https://doi.org/10.1175/1520-0469(1978)035%3C2362:LTVODI%3E2.0.CO;2' },
+      { name: 'La2004 (Laskar)', color: '#e53935', fn: obliquityLa2004, validYears: [-248000, 102000], sourceUrl: 'https://doi.org/10.1051/0004-6361:20041335' },
     ],
     j2000extras: [
       { name: 'IAU (observed)', color: '#ef5350',
@@ -19450,7 +19450,7 @@ const VFP_CATEGORIES = [
     model: { name: 'This model', color: '#f0b040',
       fn: inclInvPlaneModel },
     references: [
-      { name: 'La2010 (Laskar)', color: '#4fc3f7', fn: inclinationLa2010, sourceUrl: 'https://doi.org/10.1051/0004-6361/201116836' },
+      { name: 'La2010 (Laskar)', color: '#4fc3f7', fn: inclinationLa2010, validYears: [-498000, 2000], sourceUrl: 'https://doi.org/10.1051/0004-6361/201116836' },
     ],
     j2000extras: [
       { name: 'Souami & Souchay (2012)', color: '#ef5350',
@@ -19468,7 +19468,7 @@ const VFP_CATEGORIES = [
     model: { name: 'This model (S&S/La2010 node origin, derived)', color: '#f0b040',
       fn: ascNodeInvPlaneModel },
     references: [
-      { name: 'La2010 (Laskar)', color: '#4fc3f7', fn: ascNodeLa2010, sourceUrl: 'https://doi.org/10.1051/0004-6361/201116836' },
+      { name: 'La2010 (Laskar)', color: '#4fc3f7', fn: ascNodeLa2010, validYears: [-498000, 2000], sourceUrl: 'https://doi.org/10.1051/0004-6361/201116836' },
     ],
   },
   {
@@ -19493,8 +19493,8 @@ const VFP_CATEGORIES = [
         ? _hybridSeriesSampleAt(year).periOfDateDeg
         : (((_kcPerihelionEclLonDeg('earth', yearToJDApprox(year)) + (360 / _certifiedAxialPrecessionJ2000Years()) * (year - 2000)) % 360) + 360) % 360 },
     references: [
-      { name: 'Meeus (1991)', color: '#81c784', fn: perihelionMeeusEarth, sourceUrl: 'https://ui.adsabs.harvard.edu/abs/1994A%26A...282..663S' },
-      { name: 'La2004 (Laskar)', color: '#e53935', fn: perihelionLa2004, sourceUrl: 'https://doi.org/10.1051/0004-6361:20041335' },
+      { name: 'Meeus (1991)', color: '#81c784', fn: perihelionMeeusEarth, validYears: [-10000, 10000], sourceUrl: 'https://ui.adsabs.harvard.edu/abs/1994A%26A...282..663S' },
+      { name: 'La2004 (Laskar)', color: '#e53935', fn: perihelionLa2004, validYears: [-248000, 102000], sourceUrl: 'https://doi.org/10.1051/0004-6361:20041335' },
     ],
     j2000extras: [
       // 102.947° is the IAU/Standish MEAN-elements convention, not an
@@ -19551,14 +19551,14 @@ const VFP_CATEGORIES = [
         };
       })() },
     references: [
-      { name: 'Laskar (1986)', color: '#4fc3f7', fn: tropicalYearLaskar, sourceUrl: 'https://en.wikipedia.org/wiki/Tropical_year' },
+      { name: 'Laskar (1986)', color: '#4fc3f7', fn: tropicalYearLaskar, validYears: [-10000, 10000], sourceUrl: 'https://en.wikipedia.org/wiki/Tropical_year' },
       // The LONG-PERIOD reference (cycles view): T_trop = T_sid·(1 − 1/P)
       // with P from Vondrák's Table-3 periodic series — valid ±200 kyr,
       // unlike the fit-era Laskar polynomial (single-cycle). T_sid held at
       // the J2000 baseline: its own variation is seconds-class, second-
       // order against the ~±50 s precession wobble carried by P. Measured
       // vs the one-source line: rms 3.4 s inside ±198 kyr, 0.03 s at J2000.
-      { name: 'Vondrák (2011), derived', color: '#81c784',
+      { name: 'Vondrák (2011), derived', color: '#81c784', validYears: [-200000, 200000],
         fn: year => {
           const P = axialPrecessionVondrak2011(year);
           return Number.isFinite(P) ? SIDEREAL_YEAR_DAYS_KINEMATIC_J2000 * (1 - 1 / P) : NaN;
@@ -19738,7 +19738,7 @@ const VFP_CATEGORIES = [
         return meanSiderealYearSecondsAtAge((startmodelYear - year) / 1e6) / 86400;
       }},
     references: [
-      { name: 'Chapront (2002)', color: '#4fc3f7', fn: siderealYearChapront, sourceUrl: 'https://ui.adsabs.harvard.edu/abs/2003A%26A...412..567C' },
+      { name: 'Chapront (2002)', color: '#4fc3f7', fn: siderealYearChapront, validYears: [-10000, 10000], sourceUrl: 'https://ui.adsabs.harvard.edu/abs/2003A%26A...412..567C' },
     ],
     j2000extras: [
       { name: 'NASA/JPL (observed)', color: '#ef5350',
@@ -19806,8 +19806,8 @@ const VFP_CATEGORIES = [
         };
       })() },
     references: [
-      { name: 'Capitaine (2003)', color: '#4fc3f7', fn: axialPrecessionCapitaine2009, sourceUrl: 'https://ui.adsabs.harvard.edu/abs/2003A%26A...412..567C' },
-      { name: 'Vondr\u00e1k (2011)', color: '#81c784', fn: axialPrecessionVondrak2011, sourceUrl: 'https://doi.org/10.1051/0004-6361/201117274' },
+      { name: 'Capitaine (2003)', color: '#4fc3f7', fn: axialPrecessionCapitaine2009, validYears: [-10000, 10000], sourceUrl: 'https://ui.adsabs.harvard.edu/abs/2003A%26A...412..567C' },
+      { name: 'Vondr\u00e1k (2011)', color: '#81c784', fn: axialPrecessionVondrak2011, validYears: [-200000, 200000], sourceUrl: 'https://doi.org/10.1051/0004-6361/201117274' },
     ],
     j2000extras: [
       { name: 'IAU (observed)', color: '#ef5350',
@@ -19818,10 +19818,14 @@ const VFP_CATEGORIES = [
     id: 'delta-t', label: 'ΔT (TT − UT1)', unit: ' s', precision: 0,
     yLabel: 'seconds (ΔT absolute, TT − UT1)',
     residualLabel: 'seconds', residualScale: 1,
-    // Espenak & Meeus polynomial validity ≈ [-1999, 3000] — clip both the
-    // modal and paper views to that so the reference isn't extrapolated wildly.
-    chartRange: [-1999, 3000],
-    paperRange: [-1999, 3000], paperTitle: 'ΔT (TT − UT1) Comparison',
+    // Espenak & Meeus polynomial validity ≈ [-1999, 3000]: ΔT keeps TWO
+    // windows only — the recent one and the canon's — its references end
+    // at 3000 and the trend means nothing at a million years.
+    tabs: [
+      { key: 'recent', label: '1650 – 2050 AD', range: [1650, 2050], samples: 200 },
+      { key: 'era', label: '2000 BC – 3000 AD', range: [-1999, 3000], samples: 250 },
+    ],
+    paperTitle: 'ΔT (TT − UT1) Comparison',
     // "Export Recent" view — zoomed to the 1650-2050 window where both curves
     // have highest resolution and where the ΔT dip / rebound near 1900 CE is
     // visible. Uses same curves as the main chart.
@@ -19843,7 +19847,7 @@ const VFP_CATEGORIES = [
     model: { name: 'This model (ΔT trend)', color: '#f0b040',
       fn: year => deltaTStart + meanDeltaTSecondsAtAge((startmodelYear - year) / 1e6) },
     references: [
-      { name: 'Espenak & Meeus (NASA Canon)', color: '#4fc3f7', fn: deltaTEspenakMeeusRaw,
+      { name: 'Espenak & Meeus (NASA Canon)', color: '#4fc3f7', fn: deltaTEspenakMeeusRaw, validYears: [-1999, 3000],
         sourceUrl: 'https://eclipse.gsfc.nasa.gov/SEcat5/deltatpoly.html' },
     ],
     modelNote: `Both curves show <strong>absolute ΔT (TT − UT1)</strong> in seconds. Our model is the calibrated long-term trend: <code>deltaTStart</code> (~54.6&nbsp;s J2000 anchor, joint world) + Simpson integral of Layer 2 + the ecliptic-precession LOD term + Bond/Hallstatt/Jose5/Jose4 + Core-mantle swing stack (jointly fit against Espenak history 1650-2017, RMS ≈ 13.4&nbsp;s). The J2000 anchor sits below the IERS instantaneous observation (63.6&nbsp;s) by design — the ~9&nbsp;s gap is the industrial-era Earth-rotation acceleration (mass redistribution, ice loss, groundwater pumping) that no cyclic model can capture. <strong>Espenak &amp; Meeus</strong> is the NASA Five Millennium Canon piecewise polynomial fit to observed eclipse timings; divergence from our model (~15&nbsp;s at the 1900 dip, near-zero at 1870 and 2010) shows what our cyclic stack cannot resolve — short-scale (~50-year) wiggles need shorter-period corrections than our harmonic cycle stack (all ≥ 700&nbsp;yr) allows. Both curves match to ~1&nbsp;s at J2000+50&nbsp;yr and again near 2050.`,
@@ -21428,6 +21432,40 @@ function _vfpANAfterRender(bodyEl) {
 }
 // ── SVG Chart Renderer ───────────────────────────────────────────
 
+// ── The four standard time windows (owner-ruled): every generic category
+// shows the same tabs, default ±23 kyr; a category may restrict them
+// (`tabs: [...]` — ΔT keeps the recent window and its −1999…3000 canon
+// window, its references end at 3000 and the trend means nothing at a
+// million years). Sampling grows with the window so the 41-kyr obliquity
+// cycle keeps ≥ 10 points per cycle at ±1 Myr.
+const _VFP_TABS = [
+  { key: 'recent', label: '1650 – 2050 AD', range: [1650, 2050], samples: 200 },
+  { key: 'era', label: '23,000 BC – 23,000 AD', range: [-23000, 23000], samples: 240 },
+  { key: 'quaternary', label: '250,000 BC – 100,000 AD', range: [-250000, 100000], samples: 400 },
+  { key: 'myr', label: '1,000,000 BC – 1,000,000 AD', range: [-1000000, 1000000], samples: 800 },
+];
+const _VFP_DEFAULT_TAB = 'era';
+const _vfpTabState = {};   // categoryId → tab key
+function _vfpTabsFor(category) { return category.tabs || _VFP_TABS; }
+function _vfpCurrentTab(category) {
+  const tabs = _vfpTabsFor(category);
+  return tabs.find((t) => t.key === _vfpTabState[category.id]) || tabs.find((t) => t.key === _VFP_DEFAULT_TAB) || tabs[0];
+}
+/** A reference is drawn solid inside its declared validity window
+ *  (`validYears: [a, b]`, absent = everywhere) and dotted beyond it. */
+function _vfpRefValid(curve, yr) {
+  return !curve.validYears || (yr >= curve.validYears[0] && yr <= curve.validYears[1]);
+}
+/** Nice year ticks for any window: ≤ 8 ticks on a round step. */
+function _vfpYearTicks(yearMin, yearMax) {
+  const span = yearMax - yearMin;
+  let step = 500000;
+  for (const c of [50, 100, 200, 500, 1000, 2000, 5000, 10000, 20000, 50000, 100000, 200000, 250000, 500000]) { step = c; if (span / c <= 8) break; }
+  const out = [];
+  for (let y = Math.ceil(yearMin / step) * step; y <= yearMax + 1e-9; y += step) out.push(y);
+  return out;
+}
+const _vfpFmtYearBcAd = (yr) => yr === 0 ? '0' : yr < 0 ? Math.abs(yr).toLocaleString('en-US') + ' BC' : yr.toLocaleString('en-US') + ' AD';
 function renderVFPChart(category, currentYear) {
   // Custom-rendered categories (the all-planets inclination chart) own
   // their whole body — sampling, toggles, legend — and skip the generic
@@ -21437,47 +21475,48 @@ function renderVFPChart(category, currentYear) {
   const plotW = W - PAD.l - PAD.r;
   const plotH_main = H_MAIN - PAD.t - PAD.b;
   const plotH_res = H_RES - PAD.t - PAD.b;
-  // Per-category chartRange overrides the default modal window. Charts whose
-  // reference formulas have a narrow validity range (e.g. Espenak/Meeus ΔT,
-  // valid roughly -1999..3000) should override to avoid drawing a mostly-empty
-  // horizontal axis.
-  const [yearMin, yearMax] = category.chartRange || [-12000, 12000];
-  const nSamples = 200;
+  // The window is the category's current tab (the four standard windows).
+  const tab = _vfpCurrentTab(category);
+  const [yearMin, yearMax] = tab.range;
+  const nSamples = tab.samples || 200;
   const step = (yearMax - yearMin) / nSamples;
 
-  // Sample all curves
+  // Sample all curves; a reference outside its validity window is sampled
+  // too (drawn dotted) but never sets the y range or enters the residuals
   const allCurves = [category.model, ...category.references];
   const samples = allCurves.map(() => []);
   for (let i = 0; i <= nSamples; i++) {
     const yr = yearMin + i * step;
     allCurves.forEach((curve, ci) => {
       const v = curve.fn(yr);
-      samples[ci].push({ yr, v: Number.isFinite(v) ? v : NaN });
+      samples[ci].push({ yr, v: Number.isFinite(v) ? v : NaN, valid: ci === 0 || _vfpRefValid(curve, yr) });
     });
   }
 
-  // Residuals (reference - model), with wrap360 normalization
+  // Residuals (reference - model), with wrap360 normalization, inside validity only
   const residuals = category.references.map((_, ri) =>
     samples[0].map((m, i) => {
-      const rv = samples[ri + 1][i].v, mv = m.v;
-      if (!Number.isFinite(rv) || !Number.isFinite(mv)) return { yr: m.yr, v: NaN };
+      const rs = samples[ri + 1][i];
+      const rv = rs.v, mv = m.v;
+      if (!rs.valid || !Number.isFinite(rv) || !Number.isFinite(mv)) return { yr: m.yr, v: NaN, valid: true };
       let diff = rv - mv;
       if (category.wrap360) {
         // Normalize difference to [-180, +180]
         diff = ((diff + 180) % 360 + 360) % 360 - 180;
       }
-      return { yr: m.yr, v: diff };
+      return { yr: m.yr, v: diff, valid: true };
     })
   );
 
-  // Y range for main chart
+  // Y range for main chart — the category's fixed range on its designed
+  // ±23 kyr window, auto (valid samples only) on the others
   let yMin, yMax;
-  if (category.fixedYRange) {
+  if (category.fixedYRange && tab.key === 'era') {
     [yMin, yMax] = category.fixedYRange;
   } else {
     yMin = Infinity; yMax = -Infinity;
-    for (const s of samples) for (const { v } of s) {
-      if (Number.isFinite(v)) { yMin = Math.min(yMin, v); yMax = Math.max(yMax, v); }
+    for (const s of samples) for (const { v, valid } of s) {
+      if (valid && Number.isFinite(v)) { yMin = Math.min(yMin, v); yMax = Math.max(yMax, v); }
     }
     if (!Number.isFinite(yMin)) { yMin = 0; yMax = 1; }
     const yMargin = (yMax - yMin) * 0.08 || 0.001;
@@ -21498,64 +21537,36 @@ function renderVFPChart(category, currentYear) {
   const rMargin = (rMax - rMin) * 0.12 || 0.0001;
   rMin -= rMargin; rMax += rMargin;
 
-  // Compute endpoint differences (at the chart's yearMin and yearMax) for the primary reference
-  // C-5 hardening: primaryRef is resolved BY NAME (a string matched against
-  // the reference's name prefix). Three residual-reference bugs in one
-  // review came from positional indices silently pointing at the wrong
-  // curve after a references-array edit (the obliquity residuals ran vs
-  // Laskar while commented Chapront; the perihelion default hit our own
-  // law at index 0). Numeric indices remain accepted for back-compat; an
-  // unmatched name falls back to 0 loudly (console.warn, once per chart).
-  const primaryIdx = (() => {
-    if (typeof category.primaryRef === 'string') {
-      const i = category.references.findIndex((r) => r.name.startsWith(category.primaryRef));
-      if (i >= 0) return i;
-      if (!category._primaryRefWarned) {
-        category._primaryRefWarned = true;
-        console.warn(`VFP ${category.id}: primaryRef "${category.primaryRef}" matches no reference — falling back to index 0`);
-      }
-      return 0;
-    }
-    return category.primaryRef || 0;
-  })();
-  const primaryName = category.references[primaryIdx]?.name || '';
-  const primaryModelFn = category.model.fn;
-  const primaryRefFn = category.references[primaryIdx]?.fn;
-  let diffAtStart = NaN, diffAtEnd = NaN;
-  let modelValStart = NaN, refValStart = NaN, modelValEnd = NaN, refValEnd = NaN;
-  if (primaryRefFn) {
-    modelValStart = primaryModelFn(yearMin); refValStart = primaryRefFn(yearMin);
-    modelValEnd = primaryModelFn(yearMax); refValEnd = primaryRefFn(yearMax);
-    if (Number.isFinite(modelValStart) && Number.isFinite(refValStart)) {
-      let d = refValStart - modelValStart;
-      if (category.wrap360) d = ((d + 180) % 360 + 360) % 360 - 180;
-      diffAtStart = d * rScale_;
-    }
-    if (Number.isFinite(modelValEnd) && Number.isFinite(refValEnd)) {
-      let d = refValEnd - modelValEnd;
-      if (category.wrap360) d = ((d + 180) % 360 + 360) % 360 - 180;
-      diffAtEnd = d * rScale_;
-    }
-  }
+  // The reading per reference: rms of (reference − model) over the visible
+  // window INSIDE the reference's validity, in the residual unit — the same
+  // measure the custom panels print (the endpoint-difference block it
+  // replaces read two points; owner: removed on every panel)
+  const rmsParts = category.noComparisons ? [] : category.references.map((ref, ri) => {
+    let s2 = 0, n = 0;
+    for (const { v } of scaledResiduals[ri]) if (Number.isFinite(v)) { s2 += v * v; n++; }
+    return n ? { name: ref.name, rms: Math.sqrt(s2 / n), n } : null;
+  }).filter((r) => r);
 
   // Coordinate transforms
   const xScale = yr => PAD.l + (yr - yearMin) / (yearMax - yearMin) * plotW;
   const yScale = v => PAD.t + (1 - (v - yMin) / (yMax - yMin)) * plotH_main;
   const rScaleFn = v => PAD.t + (1 - (v - rMin) / (rMax - rMin)) * plotH_res;
 
-  // Build SVG path for a data series (handles NaN gaps and optional 360 wrapping)
-  function buildPath(data, scaleY, wrap360) {
+  // Build SVG path for a data series (handles NaN gaps and optional 360
+  // wrapping); `wantValid` selects the in-validity (solid) or the beyond-
+  // validity (dotted, clipped to the plot) stretch of a reference
+  function buildPath(data, scaleY, wrap360, wantValid = true) {
     let d = '', inPath = false;
     for (let i = 0; i < data.length; i++) {
-      const { yr, v } = data[i];
-      if (!Number.isFinite(v)) { inPath = false; continue; }
+      const { yr, v, valid } = data[i];
+      if (!Number.isFinite(v) || (valid !== undefined && valid !== wantValid)) { inPath = false; continue; }
       // Break path at 360/0 discontinuity
       if (wrap360 && i > 0 && Number.isFinite(data[i - 1].v) &&
           Math.abs(v - data[i - 1].v) > 180) {
         inPath = false;
       }
       const x = xScale(yr).toFixed(1);
-      const y = scaleY(v).toFixed(1);
+      const y = scaleY(Math.min(Math.max(v, yMin - (yMax - yMin)), yMax + (yMax - yMin))).toFixed(1);
       d += inPath ? ` L${x},${y}` : ` M${x},${y}`;
       inPath = true;
     }
@@ -21582,13 +21593,14 @@ function renderVFPChart(category, currentYear) {
     mainGrid += `<line x1="${PAD.l}" y1="${y}" x2="${W - PAD.r}" y2="${y}" stroke="rgba(255,255,255,0.1)" stroke-width="0.5"/>`;
     mainGrid += `<text x="${PAD.l - 5}" y="${y}" text-anchor="end" dominant-baseline="middle" fill="rgba(255,255,255,0.45)" font-size="9">${fmtY(v)}</text>`;
   }
-  // X-axis ticks with BC/AD labels
-  const xTicks = [-10000, -5000, 0, 5000, 10000];
-  function fmtXYear(yr) { return yr === 0 ? '0' : yr < 0 ? Math.abs(yr).toLocaleString() + ' BC' : yr.toLocaleString() + ' AD'; }
+  // X-axis ticks with BC/AD labels — from the window
+  const xTicks = _vfpYearTicks(yearMin, yearMax);
+  const fmtXYear = _vfpFmtYearBcAd;
   for (const yr of xTicks) {
     const x = xScale(yr).toFixed(1);
+    const ta = Number(x) > W - PAD.r - 30 ? 'end' : Number(x) < PAD.l + 30 ? 'start' : 'middle';
     mainGrid += `<line x1="${x}" y1="${PAD.t}" x2="${x}" y2="${H_MAIN - PAD.b}" stroke="rgba(255,255,255,0.07)" stroke-width="0.5"/>`;
-    mainGrid += `<text x="${x}" y="${H_MAIN - PAD.b + 13}" text-anchor="middle" fill="rgba(255,255,255,0.4)" font-size="8">${fmtXYear(yr)}</text>`;
+    mainGrid += `<text x="${x}" y="${H_MAIN - PAD.b + 13}" text-anchor="${ta}" fill="rgba(255,255,255,0.4)" font-size="8">${fmtXYear(yr)}</text>`;
   }
 
   // Current year marker with label
@@ -21600,13 +21612,27 @@ function renderVFPChart(category, currentYear) {
     marker += `<text x="${mx}" y="${PAD.t - 4}" text-anchor="middle" fill="rgba(235,100,100,0.8)" font-size="8" font-family="Inter,system-ui,sans-serif">${yrLabel}</text>`;
   }
 
-  // Draw curves
+  // Draw curves — solid inside validity, dotted (clipped) beyond it
+  const mainClip = `<defs><clipPath id="vfp-main-clip"><rect x="${PAD.l}" y="${PAD.t}" width="${plotW}" height="${plotH_main}"/></clipPath></defs>`;
   let curvePaths = '';
   allCurves.forEach((curve, ci) => {
-    const d = buildPath(samples[ci], yScale, category.wrap360);
+    const d = buildPath(samples[ci], yScale, category.wrap360, true);
     const dashAttr = curve.dash ? ' stroke-dasharray="6,4"' : '';
-    curvePaths += `<path d="${d}" fill="none" stroke="${curve.color}" stroke-width="${ci === 0 ? 2.5 : 1.5}" stroke-opacity="${ci === 0 ? 1 : 0.85}"${dashAttr}/>`;
+    curvePaths += `<path d="${d}" fill="none" stroke="${curve.color}" stroke-width="${ci === 0 ? 2.5 : 1.5}" stroke-opacity="${ci === 0 ? 1 : 0.85}" clip-path="url(#vfp-main-clip)"${dashAttr}/>`;
+    if (ci > 0 && curve.validYears) {
+      const dOut = buildPath(samples[ci], yScale, category.wrap360, false);
+      if (dOut) curvePaths += `<path d="${dOut}" fill="none" stroke="${curve.color}" stroke-width="1" stroke-opacity="0.5" stroke-dasharray="2,3" clip-path="url(#vfp-main-clip)"/>`;
+    }
   });
+  // the observed / anchor values as points at J2000 (the J2000 table's extras)
+  let extraMarkers = '';
+  if (category.j2000extras && 2000 >= yearMin && 2000 <= yearMax) {
+    for (const extra of category.j2000extras) {
+      const v = typeof extra.value === 'function' ? extra.value() : extra.value;
+      if (!Number.isFinite(v) || v < yMin || v > yMax) continue;
+      extraMarkers += `<circle cx="${xScale(2000).toFixed(1)}" cy="${yScale(v).toFixed(1)}" r="3" fill="${extra.color}" stroke="#151a22" stroke-width="1"><title>${extra.name}</title></circle>`;
+    }
+  }
 
   // Y-axis label
   const yAxisLabel = `<text x="12" y="${PAD.t + plotH_main / 2}" text-anchor="middle" dominant-baseline="middle" transform="rotate(-90,12,${PAD.t + plotH_main / 2})" fill="rgba(255,255,255,0.45)" font-size="9" font-family="Inter,system-ui,sans-serif">${category.yLabel}</text>`;
@@ -21615,7 +21641,7 @@ function renderVFPChart(category, currentYear) {
   // wired by _vfpGenericAfterRender — the all-planets panels' logic, once
   // for every generic category; owner-requested)
   const mainSVG = `<svg data-vfp-main viewBox="0 0 ${W} ${H_MAIN}" style="width:100%;height:auto;" xmlns="http://www.w3.org/2000/svg">
-    ${mainGrid}${yAxisLabel}${marker}${curvePaths}
+    ${mainClip}${mainGrid}${yAxisLabel}${marker}${curvePaths}${extraMarkers}
     <line data-vfp-cursor x1="-10" x2="-10" y1="${PAD.t}" y2="${H_MAIN - PAD.b}" stroke="#8a93a5" stroke-width="0.8" visibility="hidden"/>
   </svg>`;
 
@@ -21644,8 +21670,9 @@ function renderVFPChart(category, currentYear) {
   // X ticks for residual
   for (const yr of xTicks) {
     const x = xScale(yr).toFixed(1);
+    const ta = Number(x) > W - PAD.r - 30 ? 'end' : Number(x) < PAD.l + 30 ? 'start' : 'middle';
     resGrid += `<line x1="${x}" y1="${PAD.t}" x2="${x}" y2="${H_RES - PAD.b}" stroke="rgba(255,255,255,0.06)" stroke-width="0.5"/>`;
-    resGrid += `<text x="${x}" y="${H_RES - PAD.b + 12}" text-anchor="middle" fill="rgba(255,255,255,0.4)" font-size="8">${fmtXYear(yr)}</text>`;
+    resGrid += `<text x="${x}" y="${H_RES - PAD.b + 12}" text-anchor="${ta}" fill="rgba(255,255,255,0.4)" font-size="8">${fmtXYear(yr)}</text>`;
   }
 
   // Current year marker on residual
@@ -21712,51 +21739,48 @@ function renderVFPChart(category, currentYear) {
   }
   j2000Table += '</table></div>';
 
-  // Endpoint difference summary
-  let maxDiffHTML = '';
-  function fmtDiff(v) {
-    const absVal = Math.abs(v);
-    const sign = v >= 0 ? '+' : '\u2212';
-    const num = absVal >= 1000 ? absVal.toFixed(0) : absVal >= 1 ? absVal.toFixed(2) : absVal >= 0.001 ? absVal.toFixed(6) : absVal >= 0.0000001 ? absVal.toFixed(9) : absVal.toExponential(2);
-    return sign + num;
+  // The tab strip \u2014 the four standard windows (the all-planets panels' strip)
+  const tabs = _vfpTabsFor(category);
+  let tabStrip = '<div style="display:flex;gap:6px;padding:4px 4px 0;">';
+  for (const t of tabs) {
+    const active = t.key === tab.key;
+    tabStrip += '<button data-vfp-tab="' + t.key + '" style="flex:1 1 0;padding:6px 0;border-radius:6px 6px 0 0;border:1px solid ' + (active ? '#4a5568' : '#2a2f3a') + ';border-bottom:none;background:' + (active ? '#232a36' : '#171c26') + ';color:' + (active ? '#e8ecf4' : '#8a93a5') + ';font-size:12px;cursor:pointer;">' + t.label + '</button>';
   }
-  // Format base values in the original unit for context
-  function fmtBase(v) {
-    if (!Number.isFinite(v)) return 'N/A';
-    return (category.fmtValue || (x => Number.isFinite(x) ? x.toFixed(category.precision) : 'N/A'))(v) + (category.unit || '');
-  }
-  // "1234 BC" / "1234 AD" for endpoint labels + range note, honouring the
-  // per-category chartRange.
-  const fmtYearLabel = (y) => y < 0
-    ? `${Math.abs(y).toLocaleString('en-US')} BC`
-    : `${y.toLocaleString('en-US')} AD`;
-  if (primaryRefFn && !category.noComparisons && (Number.isFinite(diffAtStart) || Number.isFinite(diffAtEnd))) {
-    maxDiffHTML = `<div class="vfp-max-diff"><div class="vfp-max-diff-title">Difference vs ${primaryName} (in ${rLabel}):</div><div class="vfp-max-diff-row">`;
-    if (Number.isFinite(diffAtStart)) {
-      maxDiffHTML += `<span>At ${fmtYearLabel(yearMin)}: <strong>${fmtDiff(diffAtStart)} ${rLabel}</strong> <span class="vfp-max-diff-sep">\u00b7</span> <span class="vfp-max-diff-context">${fmtBase(modelValStart)} vs ${fmtBase(refValStart)}</span></span>`;
-    }
-    if (Number.isFinite(diffAtEnd)) {
-      maxDiffHTML += `<span>At ${fmtYearLabel(yearMax)}: <strong>${fmtDiff(diffAtEnd)} ${rLabel}</strong> <span class="vfp-max-diff-sep">\u00b7</span> <span class="vfp-max-diff-context">${fmtBase(modelValEnd)} vs ${fmtBase(refValEnd)}</span></span>`;
-    }
-    maxDiffHTML += '</div></div>';
-  }
+  tabStrip += '</div>';
 
-  // Optional category-specific explanation of why model and references may diverge
-  const modelNote = category.modelNote
-    ? `<div class="vfp-model-note"><span class="vfp-note-label">Note</span>${category.modelNote}</div>`
-    : '';
-
-  // Year range note
-  const rangeNote = `<div class="vfp-range-note">Range: ${fmtYearLabel(yearMin)} \u2013 ${fmtYearLabel(yearMax)} &middot; Reference formulas become unreliable outside their stated validity window</div>`;
+  // The standard caption \u2014 Frame \u00b7 Model \u00b7 References \u00b7 Reading \u00b7 Note \u2014
+  // built from the category's own data (the custom panels' pattern)
+  const fmtRms = (v) => {
+    const a = Math.abs(v);
+    return a >= 1000 ? a.toFixed(0) : a >= 1 ? a.toFixed(2) : a >= 0.001 ? a.toFixed(6) : a >= 1e-7 ? a.toFixed(9) : a.toExponential(2);
+  };
+  const frameText = (category.frame || (category.yLabel + (category.unit ? ' (' + category.unit.trim() + ')' : ''))) +
+    (category.wrap360 ? '; an angle, wrapping at 360\u00b0' : '') + '. Window: ' + _vfpFmtYearBcAd(yearMin) + ' \u2192 ' + _vfpFmtYearBcAd(yearMax) + '.';
+  const modelText = category.model.name + (category.modelText ? ' \u2014 ' + category.modelText : '') + '.';
+  const refItems = category.references.map((ref) => {
+    const valid = ref.validYears ? ' (valid ' + _vfpFmtYearBcAd(ref.validYears[0]) + ' \u2192 ' + _vfpFmtYearBcAd(ref.validYears[1]) + ', dotted beyond)' : '';
+    const link = ref.sourceUrl ? ' <a href="' + ref.sourceUrl + '" target="_blank" rel="noopener" class="vfp-source-link" title="Source">\u2197</a>' : '';
+    return ref.name + valid + link;
+  });
+  const refsText = refItems.length ? refItems.join(' \u00b7 ') + '.' : 'none.';
+  const readingParts = rmsParts.map((r) => r.name + ' rms ' + fmtRms(r.rms) + ' ' + rLabel + ' over ' + r.n + ' samples');
+  const modelJ2000v = category.model.fn(2000);
+  const readingText = (readingParts.length ? readingParts.join(' \u00b7 ') + '. ' : '') + 'J2000 anchor: ' + (Number.isFinite(modelJ2000v) ? (category.fmtValue || ((v) => v.toFixed(category.precision)))(modelJ2000v) + (category.unit || '') : '\u2014') + (category.j2000extras && category.j2000extras.length ? ' (observed / reference values in the table above).' : '.');
+  const caption = '<div style="padding:8px 4px 2px;color:#8a93a5;font-size:11px;line-height:1.5;">' +
+    '<div><strong>Frame:</strong> ' + frameText + '</div>' +
+    '<div><strong>Model:</strong> ' + modelText + '</div>' +
+    '<div><strong>References:</strong> ' + refsText + '</div>' +
+    '<div><strong>Reading:</strong> ' + readingText + '</div>' +
+    (category.modelNote ? '<div><strong>Note:</strong> ' + category.modelNote + '</div>' : '') +
+    '</div>';
 
   const tipDiv = '<div data-vfp-tip style="position:absolute;display:none;pointer-events:none;background:rgba(13,17,23,0.95);border:1px solid #3a4356;border-radius:6px;padding:6px 10px;font-size:11px;line-height:1.55;color:#e8ecf4;white-space:nowrap;z-index:5;"></div>';
   return `<div class="vfp-legend">${legend}</div>
+    ${tabStrip}
     <div class="vfp-chart-container" style="position:relative;">${mainSVG}${tipDiv}</div>
-    ${j2000Table}
-    ${maxDiffHTML}
     ${category.noComparisons ? '' : `<div class="vfp-chart-container vfp-residual" style="position:relative;">${resSVG}${tipDiv}</div>`}
-    ${modelNote}
-    ${rangeNote}`;
+    ${j2000Table}
+    ${caption}`;
 }
 // ── Generic hover readout (owner-requested: the all-planets panels' logic
 // for every generic category). Pointer x → the year (rounded to 10 yr);
@@ -21768,6 +21792,13 @@ let _vfpHoverCtx = null;
 function _vfpGenericAfterRender(bodyEl) {
   const C = _vfpHoverCtx;
   if (!C) return;
+  // the tab strip
+  bodyEl.querySelectorAll('button[data-vfp-tab]').forEach((b) => {
+    b.addEventListener('click', () => {
+      _vfpTabState[C.category.id] = b.dataset.vfpTab;
+      updateVerificationPanel(C.category.id);
+    });
+  });
   const svgs = [bodyEl.querySelector('svg[data-vfp-main]'), bodyEl.querySelector('svg[data-vfp-res]')].filter((s) => s);
   if (!svgs.length) return;
   const cursors = svgs.map((s) => s.querySelector('line[data-vfp-cursor]'));
@@ -22016,7 +22047,9 @@ function renderVFPPaperChartAlt(category, altConfig) {
   const textColor = '#333';
   const gridColor = '#ddd';
 
-  // Sample all curves (exclude specified refs for long-term view)
+  // Sample all curves (exclude specified refs for long-term view); a
+  // reference is sampled inside its validity window only — the paper form
+  // draws no dotted continuation
   const excludeSet = new Set(alt.excludeRefs || []);
   const allCurves = [
     { ...category.model, color: modelColor },
@@ -22028,17 +22061,34 @@ function renderVFPPaperChartAlt(category, altConfig) {
   for (let i = 0; i <= nSamples; i++) {
     const yr = yearMin + i * step;
     allCurves.forEach((curve, ci) => {
-      const v = curve.fn(yr);
+      const v = ci === 0 || _vfpRefValid(curve, yr) ? curve.fn(yr) : NaN;
       samples[ci].push({ yr, v: Number.isFinite(v) ? v : NaN });
     });
   }
 
-  const [yMin, yMax] = alt.yRange;
+  // y range: the designed one when given, else from the sampled data with
+  // an 8 % margin and six round ticks
+  let yMin, yMax, yTicks = alt.yTicks, yDecimals = alt.yDecimals;
+  if (alt.yRange) { [yMin, yMax] = alt.yRange; }
+  else {
+    yMin = Infinity; yMax = -Infinity;
+    for (const s of samples) for (const { v } of s) if (Number.isFinite(v)) { yMin = Math.min(yMin, v); yMax = Math.max(yMax, v); }
+    if (!Number.isFinite(yMin)) { yMin = 0; yMax = 1; }
+    const m = (yMax - yMin) * 0.08 || 0.001;
+    yMin -= m; yMax += m;
+  }
+  if (!yTicks) {
+    const span = yMax - yMin, p10 = Math.pow(10, Math.floor(Math.log10(span / 5)));
+    const st = [1, 2, 2.5, 5, 10].map((k) => k * p10).find((k) => span / k <= 7) || 10 * p10;
+    yTicks = [];
+    for (let v = Math.ceil(yMin / st) * st; v <= yMax + 1e-9; v += st) yTicks.push(v);
+    if (yDecimals === undefined) yDecimals = Math.max(0, -Math.floor(Math.log10(st)));
+  }
+  if (yDecimals === undefined) yDecimals = 2;
   const xScale = yr => PAD.l + (yr - yearMin) / (yearMax - yearMin) * plotW;
   const yScale = v => PAD.t + (1 - (v - yMin) / (yMax - yMin)) * plotH;
 
-  const yDecimals = alt.yDecimals !== undefined ? alt.yDecimals : 2;
-  function fmtY(v) { return v.toFixed(yDecimals); }
+  function fmtY(v) { return category.fmtValue && !alt.yTicks ? category.fmtValue(v) : v.toFixed(yDecimals); }
 
   // Build path
   function buildPath(data) {
@@ -22055,27 +22105,16 @@ function renderVFPPaperChartAlt(category, altConfig) {
   // Plot border + grid
   let grid = `<rect x="${PAD.l}" y="${PAD.t}" width="${plotW}" height="${plotH}" fill="none" stroke="#ccc" stroke-width="0.5"/>`;
 
-  for (const v of alt.yTicks) {
+  for (const v of yTicks) {
     const y = yScale(v).toFixed(1);
     grid += `<line x1="${PAD.l}" y1="${y}" x2="${W - PAD.r}" y2="${y}" stroke="${gridColor}" stroke-width="0.5"/>`;
     grid += `<text x="${PAD.l - 8}" y="${y}" text-anchor="end" dominant-baseline="middle" fill="#555" font-size="11" font-family="Inter,Helvetica,Arial,sans-serif">${fmtY(v)}</text>`;
   }
 
-  // X-axis
-  const xRange = yearMax - yearMin;
-  const xTickStep = xRange > 200000 ? 50000
-                  : xRange > 80000  ? 10000
-                  : xRange > 20000  ? 5000
-                  : xRange > 5000   ? 1000
-                  : xRange > 1000   ? 100
-                  : xRange > 200    ? 50
-                  : xRange > 50     ? 10
-                  : 5;
-  // Plain year format (no thousands separators — locales like nl-NL would
-  // otherwise render 1650 as "1.650" which reads like a decimal number).
-  function fmtXYear(yr) { return String(Math.round(yr)); }
-  const xTickStart = Math.ceil(yearMin / xTickStep) * xTickStep;
-  for (let yr = xTickStart; yr <= yearMax; yr += xTickStep) {
+  // X-axis — the same round-step ticks as the screen chart, BC/AD labels
+  // ('en-US' separators: nl-NL would render 1650 as "1.650")
+  const fmtXYear = _vfpFmtYearBcAd;
+  for (const yr of _vfpYearTicks(yearMin, yearMax)) {
     const x = xScale(yr).toFixed(1);
     grid += `<line x1="${x}" y1="${PAD.t}" x2="${x}" y2="${H - PAD.b}" stroke="#e8e8e8" stroke-width="0.5"/>`;
     grid += `<text x="${x}" y="${H - PAD.b + 16}" text-anchor="middle" fill="#555" font-size="10" font-weight="400" font-family="Inter,Helvetica,Arial,sans-serif">${fmtXYear(yr)}</text>`;
@@ -22167,11 +22206,24 @@ function exportVFPPaper() {
   if (idx < 0) return;
   const cat = VFP_CATEGORIES[idx];
   // Custom-rendered categories supply their own paper form (customPaper).
-  const svg = cat.customPaper ? cat.customPaper() : renderVFPPaperChart(cat);
+  // Generic categories export the CURRENT tab (owner: one "Export" button,
+  // it prints the current view); the y range comes from the category's
+  // designed setting for that window where one exists, else auto.
+  let title = cat.paperTitle || cat.label;
+  let svg;
+  if (cat.customPaper) svg = cat.customPaper();
+  else {
+    const tab = _vfpCurrentTab(cat);
+    const cfg = { range: tab.range, title: cat.label + ' — ' + tab.label };
+    const designed = tab.key === 'quaternary' ? cat.paperAlt : tab.key === 'recent' ? cat.paperRecent : tab.key === 'era' && cat.paperYRange ? { yRange: cat.paperYRange, yTicks: cat.paperYTicks } : null;
+    if (designed) { for (const k of ['yRange', 'yTicks', 'yDecimals', 'refLines', 'events']) if (designed[k] !== undefined) cfg[k] = designed[k]; }
+    svg = renderVFPPaperChartAlt(cat, cfg);
+    title = cfg.title;
+  }
   const blob = new Blob([svg], { type: 'image/svg+xml' });
   const url = URL.createObjectURL(blob);
   const win = window.open(url, '_blank');
-  if (win) win.document.title = cat.paperTitle || cat.label;
+  if (win) win.document.title = title;
 }
 
 function exportVFPPaperAlt() {
@@ -22188,19 +22240,6 @@ function exportVFPPaperAlt() {
   const url = URL.createObjectURL(blob);
   const win = window.open(url, '_blank');
   if (win) win.document.title = cat.paperAlt ? cat.paperAlt.title : cat.label;
-}
-
-function exportVFPPaperRecent() {
-  if (!verificationPanel) return;
-  const idx = VFP_CATEGORIES.findIndex(c => c.id === verificationPanel._currentCategory);
-  if (idx < 0) return;
-  const cat = VFP_CATEGORIES[idx];
-  if (!cat.paperRecent) return;
-  const svg = renderVFPPaperChartAlt(cat, cat.paperRecent);
-  const blob = new Blob([svg], { type: 'image/svg+xml' });
-  const url = URL.createObjectURL(blob);
-  const win = window.open(url, '_blank');
-  if (win) win.document.title = cat.paperRecent.title;
 }
 
 // ── Panel DOM ────────────────────────────────────────────────────
@@ -22224,21 +22263,18 @@ function createVerificationPanel() {
   const header = document.createElement('div');
   header.className = 'vfp-header';
   header.innerHTML = '<h2>Formula Verification <span class="vfp-subtitle">\u2014 Model vs Published Formulas</span></h2>';
-  const exportRecentBtn = document.createElement('button');
-  exportRecentBtn.className = 'vfp-export-btn';
-  exportRecentBtn.textContent = 'Export Recent';
-  exportRecentBtn.addEventListener('click', exportVFPPaperRecent);
-  exportRecentBtn.style.display = 'none';
-  header.appendChild(exportRecentBtn);
+  // ONE "Export" button prints the current view (owner). The cycles button
+  // survives only for the custom panels that still carry a second range —
+  // it goes when they take the standard tabs.
   const exportAltBtn = document.createElement('button');
   exportAltBtn.className = 'vfp-export-btn';
-  exportAltBtn.textContent = 'Export Cycles';
+  exportAltBtn.textContent = 'Export cycles';
   exportAltBtn.addEventListener('click', exportVFPPaperAlt);
   exportAltBtn.style.display = 'none';
   header.appendChild(exportAltBtn);
   const exportBtn = document.createElement('button');
   exportBtn.className = 'vfp-export-btn';
-  exportBtn.textContent = 'Export for Paper';
+  exportBtn.textContent = 'Export';
   exportBtn.addEventListener('click', exportVFPPaper);
   header.appendChild(exportBtn);
   const close = document.createElement('div');
@@ -22298,7 +22334,6 @@ function createVerificationPanel() {
   panel._navNext = navNext;
   panel._dropdown = dropdown;
   panel._exportAltBtn = exportAltBtn;
-  panel._exportRecentBtn = exportRecentBtn;
   panel._exportBtn = exportBtn;
   panel._currentCategory = VFP_CATEGORIES[0].id;
 
@@ -22316,8 +22351,7 @@ function updateVerificationPanel(categoryId) {
   verificationPanel._navPrev.disabled = idx === 0;
   verificationPanel._navNext.disabled = idx === VFP_CATEGORIES.length - 1;
   verificationPanel._dropdown.style.display = 'none';
-  verificationPanel._exportAltBtn.style.display = (cat.paperAlt || cat.customPaperAlt) ? '' : 'none';
-  verificationPanel._exportRecentBtn.style.display = cat.paperRecent ? '' : 'none';
+  verificationPanel._exportAltBtn.style.display = cat.customPaperAlt ? '' : 'none';
   // Custom-rendered categories export their own paper form when they
   // declare one (customPaper); only those without one hide the button.
   if (verificationPanel._exportBtn) verificationPanel._exportBtn.style.display = (cat.customRender && !cat.customPaper) ? 'none' : '';
