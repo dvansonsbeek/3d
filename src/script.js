@@ -19814,12 +19814,20 @@ const VFP_CATEGORIES = [
     frame: 'ΔT = TT − UT1 (seconds), the model’s long-term trend',
     yLabel: 'seconds (ΔT absolute, TT − UT1)',
     residualLabel: 'seconds', residualScale: 1,
-    // Espenak & Meeus polynomial validity ≈ [-1999, 3000]: ΔT keeps TWO
-    // windows only — the recent one and the canon's — its references end
-    // at 3000 and the trend means nothing at a million years.
+    // ΔT's own four windows in the four standard slots (owner): the
+    // telescopic era, the eclipse canon's span, and the two deep windows
+    // where the parabolic trend reads in YEARS (ΔT ≈ 1.6 h at −250 kyr is
+    // 4.8e7 s; the tab's valueScale/unit re-express the same curve — the
+    // axis, hover, J2000 table, caption and export all read the tab's unit).
     tabs: [
-      { key: 'recent', label: '1000 – 2500 AD', range: [1000, 2500], samples: 300 },
+      { key: 'recent', label: '1650 – 2050 AD', range: [1650, 2050], samples: 200 },
       { key: 'era', label: '2000 BC – 3000 AD', range: [-1999, 3000], samples: 250 },
+      { key: 'quaternary', label: '250,000 BC – 100,000 AD', range: [-249999, 100000], samples: 400,
+        valueScale: 1 / 31556952, unit: ' yr', unitLabel: 'years', precision: 2, fmtValue: null,
+        yLabel: 'years (ΔT, TT − UT1)', residualLabel: 'years', residualScale: 1 },
+      { key: 'myr', label: '1,000,000 BC – 1,000,000 AD', range: [-999999, 1000000], samples: 800,
+        valueScale: 1 / 31556952, unit: ' yr', unitLabel: 'years', precision: 1, fmtValue: null,
+        yLabel: 'years (ΔT, TT − UT1)', residualLabel: 'years', residualScale: 1 },
     ],
     paperTitle: 'ΔT (TT − UT1) Comparison',
     fmtValue: v => Number.isFinite(v) ? v.toLocaleString('en-US', { maximumFractionDigits: 0 }) : 'N/A',
@@ -19835,8 +19843,14 @@ const VFP_CATEGORIES = [
     references: [
       { name: 'Espenak & Meeus (NASA Canon)', color: '#4fc3f7', fn: deltaTEspenakMeeusRaw, validYears: [-1999, 3000],
         sourceUrl: 'https://eclipse.gsfc.nasa.gov/SEcat5/deltatpoly.html' },
+      // the observational spline (the same table the ΔT stack was fit
+      // against, doc 102); the JSON is app-loaded — NaN until it arrives,
+      // openVerificationPanel re-renders the panel on load
+      { name: 'Stephenson et al. (2016)', color: '#81c784', validYears: [-720, 2016],
+        fn: year => { const v = _stephensonDtPoly ? stephensonDeltaT(year, _stephensonDtPoly) : null; return v === null ? NaN : v; },
+        sourceUrl: 'https://doi.org/10.1098/rspa.2016.0404' },
     ],
-    reading: 'The model’s calibrated long-term trend: the J2000 anchor (~54.6 s, the joint fit) plus the integrated day-length history with the ecliptic-precession term and the harmonic cycle stack, fitted against the Espenak history 1650–2017 (rms ≈ 13.4 s). The anchor sits ~9 s below the IERS instantaneous 63.6 s by design — the industrial-era rotation acceleration no cyclic model captures. Espenak & Meeus is the NASA canon’s eclipse-timing polynomial; the ~15 s gap at the 1900 dip is the ~50-year structure the stack’s ≥ 700-yr cycles cannot resolve.',
+    reading: 'The model’s calibrated long-term trend: the J2000 anchor (~54.6 s, the joint fit) plus the integrated day-length history with the ecliptic-precession term and the harmonic cycle stack, fitted against the Espenak history 1650–2017 (rms ≈ 13.4 s). The anchor sits ~9 s below the IERS instantaneous 63.6 s by design — the industrial-era rotation acceleration no cyclic model captures. Espenak & Meeus is the NASA canon’s eclipse-timing polynomial; Stephenson, Morrison & Hohenkerk (2016) is the observational spline from −720 to 2016 the stack was fit against; the ~15 s gap at the 1900 dip is the ~50-year structure the stack’s ≥ 700-yr cycles cannot resolve. On the two deep windows the trend is read in years: the parabola of the secular spin-down, with no observational reference beyond the canon.',
   },
   {
     // ── Inclination of all planets (owner spec 2026-09-15) — the LAST
@@ -21503,18 +21517,44 @@ function _vfpPaperLegend(entries, W) {
   });
   return { svg, rows: rows.length, bottom: 34 + rows.length * 16 };
 }
+/** The window's VIEW of a category (owner: ΔT in seconds on the near
+ *  windows, in years on the deep ones): a tab may carry valueScale, unit,
+ *  precision, fmtValue, yLabel, residualLabel and residualScale; the
+ *  returned curves and anchors are scaled once here, so the axis, hover,
+ *  J2000 table, caption and export all read the same unit. */
+function _vfpWindowUnits(category, tab) {
+  const scale = tab.valueScale || 1;
+  const wrap = (c) => scale === 1 ? c : { ...c, fn: (y) => c.fn(y) * scale };
+  return {
+    model: wrap(category.model),
+    references: category.references.map(wrap),
+    j2000extras: (category.j2000extras || []).map((e) => scale === 1 ? e : { ...e, value: () => (typeof e.value === 'function' ? e.value() : e.value) * scale }),
+    unit: tab.unit !== undefined ? tab.unit : category.unit,
+    unitLabel: tab.unitLabel || ((tab.unit !== undefined ? tab.unit : category.unit) || '').trim(),
+    precision: tab.precision !== undefined ? tab.precision : category.precision,
+    fmtValue: 'fmtValue' in tab ? tab.fmtValue : (scale === 1 ? category.fmtValue : null),
+    yLabel: tab.yLabel || category.yLabel,
+    rLabel: tab.residualLabel || category.residualLabel || category.yLabel,
+    rScale: tab.residualScale !== undefined ? tab.residualScale : (category.residualScale || 1),
+    scaled: scale !== 1,
+  };
+}
 /** The generic panels' three blocks — ONE builder for the screen and the
  *  paper export: Frame = the category's frame sentence · the window;
  *  References = each reference with its validity and link; Reading = the
  *  measures (rms per reference over the window, the J2000 anchor with the
  *  observed values) followed by the category's physics sentences. */
-function _vfpGenericCaptionBlocks(category, yearMin, yearMax, rmsParts, rLabel, withLinks) {
+function _vfpGenericCaptionBlocks(category, yearMin, yearMax, rmsParts, rLabel, withLinks, V) {
+  V = V || _vfpWindowUnits(category, {});
   const fmtRms = (v) => {
     const a = Math.abs(v);
     return a >= 1000 ? a.toFixed(0) : a >= 1 ? a.toFixed(2) : a >= 0.001 ? a.toFixed(6) : a >= 1e-7 ? a.toFixed(9) : a.toExponential(2);
   };
+  // the J2000 anchor is a point value: it stays in the category's own unit
+  // whatever the window's scale (ΔT reads 54 s, never 0.00 yr)
   const fmtV = category.fmtValue || ((v) => v.toFixed(category.precision));
   const frame = (category.frame || (category.yLabel + (category.unit && category.unit.trim() !== category.yLabel ? ' (' + category.unit.trim() + ')' : ''))) +
+    (V.scaled ? ', shown in ' + V.unitLabel + ' on this window' : '') +
     ' · ' + _vfpFmtYearBcAd(yearMin) + ' → ' + _vfpFmtYearBcAd(yearMax) + '.';
   let references;
   if (category.referencesText) references = category.referencesText;
@@ -21527,7 +21567,11 @@ function _vfpGenericCaptionBlocks(category, yearMin, yearMax, rmsParts, rLabel, 
     const anyValid = category.references.some((r) => r.validYears);
     references = items.length ? items.join(' · ') + (anyValid ? ' — dotted beyond validity.' : '.') : '';
   }
-  const measures = rmsParts.map((r) => r.name + ' rms ' + fmtRms(r.rms) + ' ' + rLabel + ' over ' + r.n + ' samples');
+  // a reference whose validity holds fewer than ten of the window's samples
+  // gets no rms (ΔT's canon on the ±1 Myr window: two samples say nothing)
+  const measures = rmsParts.map((r) => r.n < 10
+    ? r.name + ': ' + r.n + (r.n === 1 ? ' sample' : ' samples') + ' inside validity on this window, no rms'
+    : r.name + ' rms ' + fmtRms(r.rms) + ' ' + rLabel + ' over ' + r.n + ' samples');
   const modelJ2000v = category.model.fn(2000);
   const anchor = ['J2000: model ' + (Number.isFinite(modelJ2000v) ? fmtV(modelJ2000v) + (category.unit || '') : '—')];
   for (const extra of category.j2000extras || []) {
@@ -21564,10 +21608,12 @@ function renderVFPChart(category, currentYear) {
   const [yearMin, yearMax] = tab.range;
   const nSamples = tab.samples || 200;
   const step = (yearMax - yearMin) / nSamples;
+  // the window's view: unit, precision, formatter and the curves scaled to it
+  const V = _vfpWindowUnits(category, tab);
 
   // Sample all curves; a reference outside its validity window is sampled
   // too (drawn dotted) but never sets the y range or enters the residuals
-  const allCurves = [category.model, ...category.references];
+  const allCurves = [V.model, ...V.references];
   const samples = allCurves.map(() => []);
   for (let i = 0; i <= nSamples; i++) {
     const yr = yearMin + i * step;
@@ -21608,8 +21654,8 @@ function renderVFPChart(category, currentYear) {
   }
 
   // Scale residuals to display unit
-  const rScale_ = category.residualScale || 1;
-  const rLabel = category.residualLabel || category.yLabel;
+  const rScale_ = V.rScale;
+  const rLabel = V.rLabel;
   const scaledResiduals = residuals.map(r => r.map(({ yr, v }) => ({ yr, v: Number.isFinite(v) ? v * rScale_ : NaN })));
 
   // Y range for residuals (in display units)
@@ -21672,12 +21718,12 @@ function renderVFPChart(category, currentYear) {
   const yNice = yFixed ? null : _vfpNiceTicks(yMin, yMax);
   const yTickValues = yFixed ? category.fixedYTicks : yNice.ticks;
   function fmtY(v) {
-    if (category.fmtValue && (yFixed || yNice.step >= 1)) return category.fmtValue(v);
+    if (V.fmtValue && (yFixed || yNice.step >= 1)) return V.fmtValue(v);
     if (yFixed) {
       // the designed ticks: decimals from the designed range, capped at precision (as before)
       const range = yMax - yMin;
-      const rangeDecimals = range > 0 ? Math.max(0, -Math.floor(Math.log10(range)) + 2) : category.precision;
-      return v.toFixed(Math.min(Math.max(rangeDecimals, 1), category.precision));
+      const rangeDecimals = range > 0 ? Math.max(0, -Math.floor(Math.log10(range)) + 2) : V.precision;
+      return v.toFixed(Math.min(Math.max(rangeDecimals, 1), V.precision));
     }
     return v.toFixed(yNice.decimals);
   }
@@ -21723,8 +21769,8 @@ function renderVFPChart(category, currentYear) {
   });
   // the observed / anchor values as points at J2000 (the J2000 table's extras)
   let extraMarkers = '';
-  if (category.j2000extras && 2000 >= yearMin && 2000 <= yearMax) {
-    for (const extra of category.j2000extras) {
+  if (V.j2000extras.length && 2000 >= yearMin && 2000 <= yearMax) {
+    for (const extra of V.j2000extras) {
       const v = typeof extra.value === 'function' ? extra.value() : extra.value;
       if (!Number.isFinite(v) || v < yMin || v > yMax) continue;
       extraMarkers += `<circle cx="${xScale(2000).toFixed(1)}" cy="${yScale(v).toFixed(1)}" r="3" fill="${extra.color}" stroke="#151a22" stroke-width="1"><title>${extra.name}</title></circle>`;
@@ -21732,7 +21778,7 @@ function renderVFPChart(category, currentYear) {
   }
 
   // Y-axis label
-  const yAxisLabel = `<text x="12" y="${PAD.t + plotH_main / 2}" text-anchor="middle" dominant-baseline="middle" transform="rotate(-90,12,${PAD.t + plotH_main / 2})" fill="rgba(255,255,255,0.45)" font-size="9" font-family="Inter,system-ui,sans-serif">${category.yLabel}</text>`;
+  const yAxisLabel = `<text x="12" y="${PAD.t + plotH_main / 2}" text-anchor="middle" dominant-baseline="middle" transform="rotate(-90,12,${PAD.t + plotH_main / 2})" fill="rgba(255,255,255,0.45)" font-size="9" font-family="Inter,system-ui,sans-serif">${V.yLabel}</text>`;
 
   // Main SVG (data-vfp-main + a hidden cursor: the generic hover readout,
   // wired by _vfpGenericAfterRender — the all-planets panels' logic, once
@@ -21797,7 +21843,7 @@ function renderVFPChart(category, currentYear) {
   // the hover context the generic afterRender reads (module-level: the
   // category's own evaluators are called LIVE at the pointed year, so the
   // readout is exact, not the 120-yr sample grid)
-  _vfpHoverCtx = { category, yearMin, yearMax, W, PAD, plotW, fmtBase: (v) => (category.fmtValue || ((x) => Number.isFinite(x) ? x.toFixed(category.precision) : 'N/A'))(v) + (category.unit || '') };
+  _vfpHoverCtx = { category, model: V.model, references: V.references, yearMin, yearMax, W, PAD, plotW, fmtBase: (v) => (V.fmtValue || ((x) => Number.isFinite(x) ? x.toFixed(V.precision) : 'N/A'))(v) + (V.unit || '') };
 
   // Legend
   let legend = '';
@@ -21807,8 +21853,11 @@ function renderVFPChart(category, currentYear) {
 
   // J2000 values table
   let j2000Table = '<div class="vfp-j2000"><table><colgroup><col><col><col></colgroup><tr><th>Formula</th><th>Value at J2000</th><th>\u0394 vs Model</th></tr>';
+  // the J2000 anchor is a point value: the table stays in the category's own
+  // unit whatever the window's scale (ΔT reads 54 s, never 0.00 yr)
+  const baseCurves = [category.model, ...category.references];
   const modelJ2000 = category.model.fn(2000);
-  for (const curve of allCurves) {
+  for (const curve of baseCurves) {
     const v = curve.fn(2000);
     let diff = '';
     if (curve !== category.model && !category.noComparisons && Number.isFinite(v) && Number.isFinite(modelJ2000)) {
@@ -21847,7 +21896,7 @@ function renderVFPChart(category, currentYear) {
 
   // The standard caption \u2014 Frame \u00b7 References \u00b7 Reading \u2014 the ONE builder
   // the paper export uses too
-  const caption = _vfpCaptionHtml(_vfpGenericCaptionBlocks(category, yearMin, yearMax, rmsParts, rLabel, true));
+  const caption = _vfpCaptionHtml(_vfpGenericCaptionBlocks(category, yearMin, yearMax, rmsParts, rLabel, true, V));
 
   const tipDiv = '<div data-vfp-tip style="position:absolute;display:none;pointer-events:none;background:rgba(13,17,23,0.95);border:1px solid #3a4356;border-radius:6px;padding:6px 10px;font-size:11px;line-height:1.55;color:#e8ecf4;white-space:nowrap;z-index:5;"></div>';
   return `<div class="vfp-legend">${legend}</div>
@@ -21911,11 +21960,12 @@ function _vfpGenericAfterRender(bodyEl) {
       cursors.forEach((c) => { if (c) { c.setAttribute('x1', cx); c.setAttribute('x2', cx); c.setAttribute('visibility', 'visible'); } });
       // values only (owner: the Δ column is not needed — the residual chart
       // and the J2000 table carry the differences)
-      const m = cat.model.fn(yr);
+      // the window's scaled curves (ΔT reads in years on the deep windows)
+      const m = C.model.fn(yr);
       let rows = '<div style="color:#8a93a5;margin-bottom:2px;">Year ' + fmtYear(yr) + '</div>';
       const row = (name, color, val) => '<div style="display:flex;justify-content:space-between;gap:16px;"><span style="color:' + color + ';">' + name + '</span><span>' + val + '</span></div>';
-      rows += row(cat.model.name, cat.model.color, Number.isFinite(m) ? C.fmtBase(m) : '—');
-      for (const ref of cat.references) {
+      rows += row(C.model.name, C.model.color, Number.isFinite(m) ? C.fmtBase(m) : '—');
+      for (const ref of C.references) {
         const v = ref.fn(yr);
         rows += row(ref.name, ref.color, Number.isFinite(v) ? C.fmtBase(v) : '—');
       }
@@ -21964,17 +22014,20 @@ function renderVFPPaperChartAlt(category, altConfig) {
   const tabFor = _vfpTabsFor(category).find((t) => t.range[0] === yearMin && t.range[1] === yearMax);
   const nSamples = tabFor ? tabFor.samples : 400;
   const step = (yearMax - yearMin) / nSamples;
+  const V = _vfpWindowUnits(category, tabFor || {});   // the window's unit view, as the screen
 
   const modelColor = '#2563eb';
-  const refColors = ['#b91c1c', '#15803d', '#7e22ce', '#b45309'];
+  // six print-safe reference colours in a fixed order (a fifth reference
+  // used to reuse the first's dark red — Obliquity's La2004 vs Laskar 1986)
+  const refColors = ['#b91c1c', '#15803d', '#7e22ce', '#b45309', '#0e7490', '#be185d'];
   const textColor = '#333';
   const gridColor = '#ddd';
 
   // Sample all curves; a reference is sampled inside its validity window
   // only — the paper form draws no dotted continuation
   const allCurves = [
-    { ...category.model, color: modelColor },
-    ...category.references
+    { ...V.model, color: modelColor },
+    ...V.references
       .map((r, i) => ({ ...r, color: r.preserveColor ? r.color : refColors[i % refColors.length] }))
   ];
   // the standard export legend wraps into rows; the plot starts under it
@@ -22015,12 +22068,12 @@ function renderVFPPaperChartAlt(category, altConfig) {
     if (yDecimals === undefined) yDecimals = nt.decimals;
   } else if (yDecimals === undefined) {
     const span = yMax - yMin;
-    yDecimals = span > 0 ? Math.min(Math.max(Math.max(0, -Math.floor(Math.log10(span)) + 2), 1), category.precision) : category.precision;
+    yDecimals = span > 0 ? Math.min(Math.max(Math.max(0, -Math.floor(Math.log10(span)) + 2), 1), V.precision) : V.precision;
   }
   const xScale = yr => PAD.l + (yr - yearMin) / (yearMax - yearMin) * plotW;
   const yScale = v => PAD.t + (1 - (v - yMin) / (yMax - yMin)) * plotH;
 
-  function fmtY(v) { return category.fmtValue && (alt.yTicks || niceStep >= 1) ? category.fmtValue(v) : v.toFixed(yDecimals); }
+  function fmtY(v) { return V.fmtValue && (alt.yTicks || niceStep >= 1) ? V.fmtValue(v) : v.toFixed(yDecimals); }
 
   // Build path
   function buildPath(data) {
@@ -22096,12 +22149,12 @@ function renderVFPPaperChartAlt(category, altConfig) {
 
   // J2000 marker
   const j2000x = xScale(2000).toFixed(1);
-  const j2000val = category.model.fn(2000);
+  const j2000val = V.model.fn(2000);
   let j2000marker = '';
   if (Number.isFinite(j2000val) && j2000val >= yMin && j2000val <= yMax) {
     const j2000y = yScale(j2000val).toFixed(1);
     j2000marker = `<circle cx="${j2000x}" cy="${j2000y}" r="3.5" fill="${modelColor}" stroke="white" stroke-width="1.5"/>`;
-    const j2000text = `J2000; ${(category.fmtValue || (v => v.toFixed(category.precision)))(j2000val)}`;
+    const j2000text = `J2000; ${(V.fmtValue || (v => v.toFixed(V.precision)))(j2000val)}`;
     const j2000tw = j2000text.length * 5.8 + 12;
     const j2000AtRightEdge = Number(j2000x) + j2000tw + 12 > W - PAD.r;
     const j2000tx = j2000AtRightEdge ? Number(j2000x) - j2000tw - 4 : Number(j2000x) + 8;
@@ -22112,13 +22165,13 @@ function renderVFPPaperChartAlt(category, altConfig) {
 
   // Title + axis labels
   const title = `<text x="${W / 2}" y="18" text-anchor="middle" fill="#222" font-size="16" font-weight="600" font-family="Inter,Helvetica,Arial,sans-serif">${alt.title}</text>`;
-  const yAxisLabel = `<text x="16" y="${PAD.t + plotH / 2}" text-anchor="middle" dominant-baseline="middle" transform="rotate(-90,16,${PAD.t + plotH / 2})" fill="#444" font-size="12" font-weight="500" font-family="Inter,Helvetica,Arial,sans-serif">${category.yLabel}</text>`;
+  const yAxisLabel = `<text x="16" y="${PAD.t + plotH / 2}" text-anchor="middle" dominant-baseline="middle" transform="rotate(-90,16,${PAD.t + plotH / 2})" fill="#444" font-size="12" font-weight="500" font-family="Inter,Helvetica,Arial,sans-serif">${V.yLabel}</text>`;
   const xAxisLabel = `<text x="${PAD.l + plotW / 2}" y="${H - 5}" text-anchor="middle" fill="#444" font-size="12" font-weight="500" font-family="Inter,Helvetica,Arial,sans-serif">Years (BC / AD)</text>`;
 
   // The standard caption under the export — the same three blocks as the
   // screen (owner: "standardize the text underneath the export"); the rms
   // per reference from this form's own samples (inside validity)
-  const rScale = category.residualScale || 1, rLabel = category.residualLabel || category.yLabel;
+  const rScale = V.rScale, rLabel = V.rLabel;
   const rmsParts = category.noComparisons ? [] : allCurves.slice(1).map((curve, ri) => {
     let s2 = 0, n = 0;
     for (let i = 0; i < samples[0].length; i++) {
@@ -22130,7 +22183,7 @@ function renderVFPPaperChartAlt(category, altConfig) {
     }
     return n ? { name: curve.name, rms: Math.sqrt(s2 / n), n } : null;
   }).filter((r) => r);
-  const cap = _vfpPaperCaption(_vfpGenericCaptionBlocks(category, yearMin, yearMax, rmsParts, rLabel, false), PAD.l, 150);
+  const cap = _vfpPaperCaption(_vfpGenericCaptionBlocks(category, yearMin, yearMax, rmsParts, rLabel, false, V), PAD.l, 150);
   const Hp = H + cap.height + 10;
 
   return `<?xml version="1.0" encoding="UTF-8"?>
@@ -22293,6 +22346,13 @@ function openVerificationPanel() {
   if (!verificationPanel) verificationPanel = createVerificationPanel();
   verificationPanel.classList.add('visible');
   updateVerificationPanel(verificationPanel._currentCategory);
+  // the ΔT panel's Stephenson reference is app-loaded JSON: fetch once, and
+  // re-render the panel if it is the one on screen when the spline arrives
+  if (!_stephensonDtPoly) {
+    loadStephensonDtPolynomial().then((poly) => {
+      if (poly && verificationPanel.classList.contains('visible') && verificationPanel._currentCategory === 'delta-t') updateVerificationPanel('delta-t');
+    });
+  }
 }
 
 function closeVerificationPanel() {
