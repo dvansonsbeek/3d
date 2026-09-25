@@ -18972,6 +18972,24 @@ function perihelionMeeusEarth(year) {
     + 0.0002 * arcsecToDeg * Math.pow(T, 6)) % 360 + 360) % 360;
 }
 
+/** The perihelion's SIDEREAL rate — Meeus (1998) Table 31.B, Earth, the
+ *  longitude of perihelion referred to the J2000 ecliptic and equinox:
+ *  π = 102.937348 + 0.3225654 T + 0.00014799 T² − 0.000000039 T³ (degrees,
+ *  T Julian centuries from J2000); its derivative in degrees per century
+ *  (0.3226°/cy ≈ 11.6″/yr at J2000). Table 31.A above is the OF-DATE form. */
+function perihelionRateMeeusJ2000FrameDegPerCy(year) {
+  const T = (yearToJDApprox(year) - j2000JD) / julianCenturyDays;
+  return 0.3225654 + 2 * 0.00014799 * T - 3 * 0.000000039 * T * T;
+}
+/** The anomalistic year of date (SI days), derived as the Tropical panel
+ *  derives Vondrák: Chapront's sidereal year with the Table 31.B sidereal
+ *  perihelion rate — T_anom = 360 / (360/T_sid − ϖ̇), ϖ̇ per day. */
+function anomalisticYearMeeusDerived(year) {
+  const tSid = siderealYearChapront(year);
+  const wPerDay = perihelionRateMeeusJ2000FrameDegPerCy(year) / julianCenturyDays;
+  return 360 / (360 / tSid - wPerDay);
+}
+
 // 8.6-1: the published reference curves live in @essrt/physics/reference/
 // published-curves — exactly as published, per-curve provenance in the
 // module header. This browser injects its approximate calendar→JD
@@ -19753,6 +19771,33 @@ const VFP_CATEGORIES = [
     reading: 'The one-source sidereal year of date: the solar-mass-loss law (IAU-anchored at J2000) divided by the banked mean-longitude-rate ratio from the model’s ±10 Myr N-body run at constant solar mass — the planetary epoch drift that makes Chapront’s polynomial steep, reproduced to ~0.1 s over ±12 kyr; the rest of the gap is the polynomial’s own extrapolation.',
   },
   {
+    // ── Anomalistic Year (owner-requested, after Sidereal Year): perihelion
+    // to perihelion, of date. ONE home — the year-lengths factory's secular
+    // mean-element construction on the chain's apsidal tangent (the rate
+    // family the Precession Periods panel shows), λ̇-corrected; the frozen
+    // era clock's H/(H − 16) coupling is the clickable device line.
+    id: 'anomalistic-year', group: 'Earth clock', label: 'Anomalistic Year', unit: ' days', precision: 9,
+    defaultRef: 'Meeus (1998), derived',
+    frame: 'Anomalistic year (SI days of 86,400 s), perihelion to perihelion, of date',
+    yLabel: 'days',
+    residualLabel: 'seconds', residualScale: 86400,
+    paperTitle: 'Anomalistic Year Comparison',
+    model: { name: 'This model', color: '#f0b040',
+      fn: year => _hybridSpinActive()
+        ? _yearLengthsM().anomalisticYearSecondsAtYear(year) / 86400
+        : meanAnomalisticYearSecondsAtAge((startmodelYear - year) / 1e6) / 86400 },
+    references: [
+      { name: 'Meeus (1998), derived', color: '#4fc3f7', fn: anomalisticYearMeeusDerived, validYears: [-10000, 10000], sourceUrl: 'https://ui.adsabs.harvard.edu/abs/2003A%26A...412..567C' },
+      { name: 'This model — H/(H − 16) counter (device)', color: '#ce93d8',
+        fn: year => meanAnomalisticYearSecondsAtAge((startmodelYear - year) / 1e6) / 86400 },
+    ],
+    j2000extras: [
+      { name: 'IAU (observed)', color: '#ef5350',
+        value: () => ASTRO_REFERENCE.anomalisticYearJ2000 },
+    ],
+    reading: 'The anomalistic year exceeds the sidereal year by T·ϖ̇/360 — about 4.7 minutes today — and that excess follows the perihelion’s sidereal motion, so the curve swings with the eccentricity cycle: slow perihelion motion near eccentricity maxima, fast near the minima; it is the Perihelion Precession panel read in year units. The model line is the secular mean-element construction on the chain’s apsidal tangent, the same rate family the Precession Periods panel shows, λ̇-corrected. The clickable second line is the frozen era clock’s H/(H − 16) coupling, a device. Meeus’s line is Chapront’s sidereal year with the Table 31.B perihelion rate in the J2000 ecliptic frame, the sidereal motion the definition needs.',
+  },
+  {
     id: 'axial-precession', group: 'Earth axis', label: 'Axial Precession Period', unit: ' yr', precision: 2,
     defaultRef: 'Vondrák (2011)',   // equal to Capitaine within noise on ±23 kyr (16.1 vs 15.5 yr), valid to ±200 kyr
     frame: 'Axial precession period (years), the instantaneous beat sidereal/(sidereal − tropical) of date',
@@ -20083,7 +20128,7 @@ const VFP_ORDER = [
   'eccentricity', 'perihelion', 'inclination', 'ascending-node',   // Earth orbit
   'obliquity', 'axial-precession',                                  // Earth axis
   'all-precession', 'climatic-precession', 'insolation-65n', 'milankovitch-overview', 'analemma',   // Earth cycles
-  'tropical-year', 'sidereal-year', 'cardinal-year-lengths', 'season-durations', 'solar-day', 'delta-t',   // Earth clock
+  'tropical-year', 'sidereal-year', 'anomalistic-year', 'cardinal-year-lengths', 'season-durations', 'solar-day', 'delta-t',   // Earth clock
   'moon-perigee', 'moon-node',                                      // Moon
   'planet-inclinations', 'planet-eccentricities',                   // All planets
 ];
