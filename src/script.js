@@ -19400,6 +19400,7 @@ function ascNodeInvPlaneModel(year) {
 const VFP_CATEGORIES = [
   {
     id: 'eccentricity', group: 'Earth orbit', label: 'Eccentricity', unit: '', precision: 8,
+    frame: 'Earth’s orbital eccentricity (dimensionless), of date',
     yLabel: 'eccentricity',
     residualLabel: 'eccentricity (dimensionless)', residualScale: 1,   // was 'AU' — e carries no unit
     primaryRef: 'Meeus',   // C-5: by name, index-shift-proof
@@ -19429,6 +19430,7 @@ const VFP_CATEGORIES = [
   },
   {
     id: 'obliquity', group: 'Earth axis', label: 'Obliquity', unit: '°', precision: 6,
+    frame: 'Obliquity of the ecliptic (degrees), the rendered movement of date',
     yLabel: 'degrees',
     residualLabel: 'arcseconds', residualScale: 3600,
     primaryRef: 'Chapront',   // C-5: by name, index-shift-proof
@@ -19462,6 +19464,7 @@ const VFP_CATEGORIES = [
   },
   {
     id: 'inclination', group: 'Earth orbit', label: 'Inclination (invariable plane)', unit: '°', precision: 4,
+    frame: 'Inclination of Earth’s orbit (degrees) to the model’s invariable plane, of date',
     yLabel: 'degrees',
     residualLabel: 'arcseconds', residualScale: 3600,
     fixedYRange: [0, 3], fixedYTicks: [0, 0.5, 1.0, 1.5, 2.0, 2.5, 3.0],
@@ -19479,6 +19482,7 @@ const VFP_CATEGORIES = [
   },
   {
     id: 'ascending-node', group: 'Earth orbit', label: 'Ascending Node (invariable plane)', unit: '°', precision: 2,
+    frame: 'Ascending node of Earth’s orbit (degrees) on the invariable plane, Souami & Souchay node origin, of date, wrapping at 360°',
     yLabel: 'degrees',
     residualLabel: 'degrees', residualScale: 1,
     wrap360: true,
@@ -19493,6 +19497,7 @@ const VFP_CATEGORIES = [
   },
   {
     id: 'perihelion', group: 'Earth orbit', label: 'Perihelion Longitude', unit: '°', precision: 3,
+    frame: 'Longitude of Earth’s perihelion (degrees) from the equinox of date, wrapping at 360°',
     yLabel: 'degrees',
     residualLabel: 'degrees', residualScale: 1,
     wrap360: true,
@@ -19525,6 +19530,7 @@ const VFP_CATEGORIES = [
   },
   {
     id: 'tropical-year', group: 'Earth clock', label: 'Tropical Year', unit: ' days', precision: 8,
+    frame: 'Mean tropical year (SI days of 86,400 s), of date',
     yLabel: 'days',
     residualLabel: 'seconds', residualScale: 86400,
     paperTitle: 'Tropical Year Comparison',
@@ -19600,6 +19606,7 @@ const VFP_CATEGORIES = [
     // past 365 d 5 h — building this chart found and fixed the cardinal
     // structure's 180° perigee-frame slip (VE↔AE, SS↔WS were swapped).
     id: 'cardinal-year-lengths', group: 'Earth clock', label: 'Cardinal Year Lengths', unit: ' days', precision: 8,
+    frame: 'The four cardinal-point year lengths and the mean tropical year (SI days), of date',
     yLabel: 'days',
     // In SI DAYS like the Tropical and Sidereal Year panels (owner); the
     // residual pane = each cardinal year − the mean tropical year, in
@@ -19636,6 +19643,7 @@ const VFP_CATEGORIES = [
   },
   {
     id: 'solar-day', group: 'Earth clock', label: 'Solar Day Length', unit: ' s', precision: 6,
+    frame: 'Mean solar day (SI seconds), of date',
     yLabel: 'seconds',
     residualLabel: 'milliseconds', residualScale: 1000,
     paperTitle: 'Solar Day Length Comparison',
@@ -19712,6 +19720,7 @@ const VFP_CATEGORIES = [
   },
   {
     id: 'sidereal-year', group: 'Earth clock', label: 'Sidereal Year', unit: ' days', precision: 9,
+    frame: 'Sidereal year (SI days of 86,400 s), of date',
     yLabel: 'days',
     residualLabel: 'seconds', residualScale: 86400,
     paperTitle: 'Sidereal Year Comparison',
@@ -19764,6 +19773,7 @@ const VFP_CATEGORIES = [
   },
   {
     id: 'axial-precession', group: 'Earth axis', label: 'Axial Precession Period', unit: ' yr', precision: 2,
+    frame: 'Axial precession period (years), the instantaneous beat sidereal/(sidereal − tropical) of date',
     yLabel: 'years',
     residualLabel: 'years', residualScale: 1,
     paperRange: [-23000, 23000], paperTitle: 'Axial Precession Period Comparison',
@@ -19832,6 +19842,7 @@ const VFP_CATEGORIES = [
   },
   {
     id: 'delta-t', group: 'Earth clock', label: 'ΔT (TT − UT1)', unit: ' s', precision: 0,
+    frame: 'ΔT = TT − UT1 (seconds), the model’s long-term trend',
     yLabel: 'seconds (ΔT absolute, TT − UT1)',
     residualLabel: 'seconds', residualScale: 1,
     // Espenak & Meeus polynomial validity ≈ [-1999, 3000]: ΔT keeps TWO
@@ -19926,7 +19937,7 @@ const VFP_CATEGORIES = [
     yLabel: 'days',
     residualLabel: 'days', residualScale: 1,
     paperTitle: 'Season Durations',
-    frame: 'The four northern seasons in SI days — the interval between successive cardinal points of the true Sun (spring VE → SS, summer SS → AE, autumn AE → WS, winter WS → VE) — against the mean quarter of the tropical year of date; the residual pane is each season’s departure from that quarter',
+    frame: 'The four northern seasons (SI days) between successive cardinal points of the true Sun — spring VE → SS, summer SS → AE, autumn AE → WS, winter WS → VE — and the mean quarter tropical year, of date',
     model: { name: 'Mean quarter year (T/4, of date)', color: '#f0b040',
       fn: year => _seasonDurationDays(year, 'MEAN') },
     references: [
@@ -19959,7 +19970,7 @@ const VFP_CATEGORIES = [
     yLabel: 'e · sin ϖ',
     residualLabel: 'e·sin ϖ (dimensionless)', residualScale: 1,
     paperTitle: 'Climatic Precession e·sin ϖ',
-    frame: 'The climatic precession index e·sin ϖ (dimensionless): the eccentricity-modulated precession of Earth’s perihelion against the equinox of date — the third Milankovitch curve beside eccentricity and obliquity. ϖ is the Perihelion Longitude panel’s angle (Earth’s perihelion from the moving equinox)',
+    frame: 'The climatic precession index e·sin ϖ (dimensionless), ϖ the longitude of Earth’s perihelion from the equinox of date',
     model: { name: 'This model (one-source)', color: '#f0b040',
       fn: year => _hybridSpinActive()
         ? _hybridSeriesSampleAt(year).eSinPeri
@@ -19971,7 +19982,7 @@ const VFP_CATEGORIES = [
           return Number.isFinite(e) && Number.isFinite(w) ? e * Math.sin(w * Math.PI / 180) : NaN;
         } },
     ],
-    modelNote: 'Sign convention: ϖ is the longitude of Earth’s <em>perihelion</em> from the equinox of date, the angle the Perihelion Longitude panel draws, so the index is positive when perihelion falls in the half-year after the March equinox. Laskar’s insolation tables use the longitude of <em>perigee</em> ϖ̃ = ϖ + 180°; their e·sin ϖ̃ is the negative of this curve. The La2004 line here is built from La2004’s own eccentricity and perihelion columns with this panel’s convention, so the two are like-for-like. The ~21-kyr envelope is the eccentricity of date: the index vanishes at every eccentricity minimum, whatever the perihelion does.',
+    modelNote: 'The third Milankovitch curve beside eccentricity and obliquity: the eccentricity-modulated precession of Earth’s perihelion against the equinox of date. Sign convention: ϖ is the longitude of Earth’s <em>perihelion</em> from the equinox of date, the angle the Perihelion Longitude panel draws, so the index is positive when perihelion falls in the half-year after the March equinox. Laskar’s insolation tables use the longitude of <em>perigee</em> ϖ̃ = ϖ + 180°; their e·sin ϖ̃ is the negative of this curve. The La2004 line here is built from La2004’s own eccentricity and perihelion columns with this panel’s convention, so the two are like-for-like. The ~21-kyr envelope is the eccentricity of date: the index vanishes at every eccentricity minimum, whatever the perihelion does.',
   },
 ];
 // The panel ORDER (owner-ruled): the physics builds up — the orbit, the axis,
@@ -20209,7 +20220,6 @@ function renderVFPPlanetInclinations() {
   const on = _vfpPIState.on[tab];
   const core = _vfpPIChartCore(null, tab, on, 'screen');
   const W = core.W, H = core.H, PAD = core.PAD, S = core.S;
-  const la2010Note = core.la2010Note;
   // the hover wiring (afterRender) maps pointer x back to a sample via this
   _vfpPIState._screenGeom = { W, H, PAD, y0: S.y0, y1: S.y1 };
   const cap = (p) => p.charAt(0).toUpperCase() + p.slice(1);
@@ -20243,10 +20253,6 @@ function renderVFPPlanetInclinations() {
   // (the paper notes use the same one) — no Earth text unless Earth is
   // drawn, no reference text unless the overlay is drawn
   const P = _vfpPINoteParts(tab, on, core);
-  const jplNote = P.jpl ? ' ' + P.jpl.replace('JPL Horizons', '<strong>JPL Horizons</strong>') : ' —';
-  const la2010Legend = P.la2010
-    ? ' Dashed: <a href="https://doi.org/10.1051/0004-6361/201116836" target="_blank" style="color:#e879f9;">La2010 (Laskar et al. 2011)</a>, the repo’s La2010 Earth elements table (1-kyr, to 500,000 BC).' + la2010Note
-    : '';
   const fmtY = (y) => y === 0 ? '0' : Math.abs(y).toLocaleString('en-US') + (y < 0 ? ' BC' : ' AD');
   return '<div class="vfp-chart-block">' +
     controls +
@@ -20262,8 +20268,7 @@ function renderVFPPlanetInclinations() {
     '</svg>' +
     '<div data-vfppi-tip style="position:absolute;display:none;pointer-events:none;background:rgba(13,17,23,0.95);border:1px solid #3a4356;border-radius:6px;padding:6px 10px;font-size:11px;line-height:1.55;color:#e8ecf4;white-space:nowrap;z-index:5;"></div>' +
     '</div>' +
-    '<div style="padding:8px 4px 2px;color:#8a93a5;font-size:11px;line-height:1.5;"><strong>Frame:</strong> ' + P.frame + ' ' + P.model + ' Static chart, ' + fmtY(S.y0) + ' → ' + fmtY(S.y1) + '; hover the chart for every enabled planet’s value at a year.</div>' +
-    '<div style="padding:2px 4px 8px;color:#8a93a5;font-size:11px;line-height:1.5;"><strong>References:</strong>' + (jplNote || ' —') + la2010Legend + ' The planets have no published deep-time series beyond the Horizons span (IMCCE’s La2010 is Earth-only).</div>' +
+    _vfpCaptionHtml(P) +
     '</div>';
 }
 // ONE HOME for the chart's caption sentences — the screen subtitle and
@@ -20272,17 +20277,20 @@ function renderVFPPlanetInclinations() {
 // chart actually draws: Earth mentions on the Earth toggle, the JPL line
 // on drawn overlays, the La2010 line on a drawn overlay.
 function _vfpPINoteParts(tab, on, core) {
-  const frame = tab === 'ecl'
-    ? 'Orbital inclination of date to the FIXED J2000 ecliptic.' + (on.earth ? ' Earth is drawn in this fixed frame; its of-date ecliptic inclination is 0 by definition.' : '')
-    : 'Orbital inclination of date to the model’s own invariable plane.';
-  const model = 'Solid curves: the model’s own N-body chain elements of date, series-governed' + (on.earth ? ' (Earth rides its own engine series).' : '.');
-  const jpl = core.jplRmsParts.length
-    ? 'Dotted (inside the shaded band): JPL Horizons DE441 osculating elements, −9998…+9999 in 100-yr steps' + (tab === 'inv' ? ', converted to the inv-plane with the model’s banked plane' : '') + ' — Δrms over the overlap: ' + core.jplRmsParts.join(' · ') + ' (Δrms includes the osculating short-period wiggle the secular curves average out).'
-    : '';
-  const la2010 = core.la2010Note
-    ? 'Dashed: La2010 (Laskar et al. 2011, A&A 532 A89, doi:10.1051/0004-6361/201116836), the repo’s La2010 Earth elements table (1-kyr, to 500,000 BC).' + core.la2010Note
-    : '';
-  return { frame, model, jpl, la2010 };
+  const S = core.S;
+  const frame = (tab === 'ecl'
+    ? 'Orbital inclination (degrees) of date to the fixed J2000 ecliptic' + (on.earth ? ' — Earth drawn in this fixed frame, its of-date ecliptic inclination being 0 by definition' : '')
+    : 'Orbital inclination (degrees) of date to the model’s own invariable plane') + ' · ' + _vfpFmtYearBcAd(S.y0) + ' → ' + _vfpFmtYearBcAd(S.y1) + '.';
+  const refs = [];
+  if (core.jplRmsParts.length) refs.push('JPL Horizons DE441 osculating elements (dotted, inside the shaded band), −9998 → +9999 in 100-yr steps' + (tab === 'inv' ? ', converted to the invariable plane with the model’s banked plane' : ''));
+  if (core.la2010Note) refs.push('La2010 (<a href="https://doi.org/10.1051/0004-6361/201116836" target="_blank" rel="noopener">Laskar et al. 2011</a>, A&amp;A 532 A89), the repo’s La2010 Earth elements table (dashed; 1-kyr, to 500,000 BC)');
+  const references = (refs.length ? refs.join(' · ') + '. ' : '') + 'The planets have no published deep-time series beyond the Horizons span (IMCCE’s La2010 is Earth-only).';
+  const reading = [
+    core.jplRmsParts.length ? 'Δrms vs JPL Horizons over the overlap: ' + core.jplRmsParts.join(' · ') + ' (the osculating short-period wiggle the secular curves average out is included).' : '',
+    core.la2010Note ? core.la2010Note.trim() : '',
+  ].filter((t) => t).join(' ');
+  const note = 'Solid curves: the model’s own N-body chain elements of date, series-governed' + (on.earth ? ' (Earth rides its own engine series)' : '') + '. Hover the chart for every enabled planet’s value at a year.';
+  return { frame, references, reading, note };
 }
 // One paper form for any window — "Export" prints the current standard
 // window — in the house paper style (renderVFPPaperChart: 16px title, centered 11px
@@ -20297,7 +20305,7 @@ function _vfpPIPaperSvg(range) {
   const fmtY = (y) => y === 0 ? '0' : Math.abs(y).toLocaleString('en-US') + (y < 0 ? ' BC' : ' AD');
   const title = 'Inclination of all planets — ' + (tab === 'ecl' ? 'to the J2000 ecliptic' : 'to the invariable plane') + ', ' + fmtY(S.y0) + ' → ' + fmtY(S.y1);
   const P = _vfpPINoteParts(tab, on, core);
-  const notes = [P.frame, P.model, P.jpl, P.la2010].filter((t) => t);
+  const notes = _vfpCaptionParagraphs(P);
   const wrapText = (t) => {
     const out = [];
     let line = '';
@@ -20557,21 +20565,24 @@ function _vfpPEChartCore(range, on, style) {
 // ONE home for the eccentricity chart's caption sentences (the twin's
 // doctrine): every sentence gates on what is actually drawn.
 function _vfpPENoteParts(on, core) {
-  const frame = 'Orbital eccentricity of date (dimensionless — frame-free, so one view).';
-  const model = 'Solid curves: the model’s own N-body chain elements of date, series-governed' + (on.earth ? ' (Earth rides its own engine series, e = |z|).' : '.');
+  const S = core.S;
+  const frame = 'Orbital eccentricity (dimensionless) of date — frame-free, so one view · ' + _vfpFmtYearBcAd(S.y0) + ' → ' + _vfpFmtYearBcAd(S.y1) + '.';
   // the scatter's name, from the BANKED beat predictions (live artifact
   // values, never literals; sentence gated on the artifact's presence)
   const pld = _planetSeriesData && _planetSeriesData.verdict && _planetSeriesData.verdict.planetLamDot;
-  const beats = pld
-    ? ' The scatter has a name: the osculating wiggle is dominated by the Jupiter–Saturn great inequality (~' + Math.round(pld.greatInequalityYr) + ' yr) and the Uranus–Neptune near-2:1 beat (~' + Math.round(pld.uranusNeptuneBeatYr) + ' yr) — both banked from the model’s own N-body run (doc 109 §21).'
+  const beats = pld && core.jplRmsParts.length
+    ? ' The Horizons scatter has a name: the osculating wiggle is dominated by the Jupiter–Saturn great inequality (~' + Math.round(pld.greatInequalityYr) + ' yr) and the Uranus–Neptune near-2:1 beat (~' + Math.round(pld.uranusNeptuneBeatYr) + ' yr) — both banked from the model’s own N-body run (doc 109 §21).'
     : '';
-  const jpl = core.jplRmsParts.length
-    ? 'Dotted (inside the shaded band): JPL Horizons DE441 osculating elements, −9998…+9999 in 100-yr steps — Δrms over the overlap: ' + core.jplRmsParts.join(' · ') + ' (Δrms includes the osculating short-period wiggle the secular curves average out).' + beats
-    : '';
-  const la2010 = core.la2010Note
-    ? 'Dashed: La2010 (Laskar et al. 2011, A&A 532 A89, doi:10.1051/0004-6361/201116836), the repo’s La2010 Earth elements table (1-kyr, to 500,000 BC).' + core.la2010Note
-    : '';
-  return { frame, model, jpl, la2010 };
+  const refs = [];
+  if (core.jplRmsParts.length) refs.push('JPL Horizons DE441 osculating elements (dotted, inside the shaded band), −9998 → +9999 in 100-yr steps');
+  if (core.la2010Note) refs.push('La2010 (<a href="https://doi.org/10.1051/0004-6361/201116836" target="_blank" rel="noopener">Laskar et al. 2011</a>, A&amp;A 532 A89), the repo’s La2010 Earth elements table (dashed; 1-kyr, to 500,000 BC)');
+  const references = (refs.length ? refs.join(' · ') + '. ' : '') + 'The planets have no published deep-time series beyond the Horizons span (IMCCE’s La2010 is Earth-only).';
+  const reading = [
+    core.jplRmsParts.length ? 'Δrms vs JPL Horizons over the overlap: ' + core.jplRmsParts.join(' · ') + ' (the osculating short-period wiggle the secular curves average out is included).' : '',
+    core.la2010Note ? core.la2010Note.trim() : '',
+  ].filter((t) => t).join(' ');
+  const note = 'Solid curves: the model’s own N-body chain elements of date, series-governed' + (on.earth ? ' (Earth rides its own engine series, e = |z|)' : '') + '.' + beats + ' Hover the chart for every enabled planet’s value at a year.';
+  return { frame, references, reading, note };
 }
 function renderVFPPlanetEccentricities() {
   const on = _vfpPEState.on;
@@ -20597,10 +20608,6 @@ function renderVFPPlanetEccentricities() {
   for (const en of core.entries) legendHtml += '<div class="vfp-legend-item"><span class="vfp-legend-swatch" style="' + swatchCss(en) + '"></span>' + en.name + '</div>';
   legendHtml += '</div>';
   const P = _vfpPENoteParts(on, core);
-  const jplNote = P.jpl ? ' ' + P.jpl.replace('JPL Horizons', '<strong>JPL Horizons</strong>') : ' —';
-  const la2010Legend = P.la2010
-    ? ' Dashed: <a href="https://doi.org/10.1051/0004-6361/201116836" target="_blank" style="color:#e879f9;">La2010 (Laskar et al. 2011)</a>, the repo’s La2010 Earth elements table (1-kyr, to 500,000 BC).' + core.la2010Note
-    : '';
   const fmtY = (y) => y === 0 ? '0' : Math.abs(y).toLocaleString('en-US') + (y < 0 ? ' BC' : ' AD');
   return '<div class="vfp-chart-block">' +
     controls +
@@ -20613,8 +20620,7 @@ function renderVFPPlanetEccentricities() {
     '</svg>' +
     '<div data-vfppe-tip style="position:absolute;display:none;pointer-events:none;background:rgba(13,17,23,0.95);border:1px solid #3a4356;border-radius:6px;padding:6px 10px;font-size:11px;line-height:1.55;color:#e8ecf4;white-space:nowrap;z-index:5;"></div>' +
     '</div>' +
-    '<div style="padding:8px 4px 2px;color:#8a93a5;font-size:11px;line-height:1.5;"><strong>Frame:</strong> ' + P.frame + ' ' + P.model + ' Static chart, ' + fmtY(S.y0) + ' → ' + fmtY(S.y1) + '; hover the chart for every enabled planet’s value at a year.</div>' +
-    '<div style="padding:2px 4px 8px;color:#8a93a5;font-size:11px;line-height:1.5;"><strong>References:</strong>' + jplNote + la2010Legend + ' The planets have no published deep-time series beyond the Horizons span (IMCCE’s La2010 is Earth-only).</div>' +
+    _vfpCaptionHtml(P) +
     '</div>';
 }
 // One paper form serves both header buttons for the eccentricity twin —
@@ -20627,7 +20633,7 @@ function _vfpPEPaperSvg(range) {
   const fmtY = (y) => y === 0 ? '0' : Math.abs(y).toLocaleString('en-US') + (y < 0 ? ' BC' : ' AD');
   const title = 'Eccentricity of all planets — ' + fmtY(S.y0) + ' → ' + fmtY(S.y1);
   const P = _vfpPENoteParts(on, core);
-  const notes = [P.frame, P.model, P.jpl, P.la2010].filter((t) => t);
+  const notes = _vfpCaptionParagraphs(P);
   const wrapText = (t) => {
     const out = [];
     let line = '';
@@ -21048,7 +21054,8 @@ function _vfpAPChartCore(range, on, log, style, showEcc) {
 }
 // ONE home for the caption sentences — every sentence gates on what is drawn.
 function _vfpAPNoteParts(on, log, core, showEcc) {
-  const frame = 'Earth’s precession PERIODS of date, in years, plotted as magnitudes (the axial and ecliptic motions are retrograde); ' + (log ? 'log y-axis — every series’ percentage swing has the same height.' : 'linear y-axis.') + ' A tangent period passes through infinity where its angle’s rate crosses zero (the perihelion swings back at eccentricity minima, the node at inclination minima): each series is clamped at three times its own median over the range (a short period is a fast, well-defined rate and is drawn as is)' + (core.anyClamped ? ', the clamped stretches drawn dotted (off scale, not a value)' : '') + '.';
+  const frame = 'Earth’s precession periods (years), of date, plotted as magnitudes — the axial and ecliptic motions are retrograde; ' + (log ? 'log y-axis, every series’ percentage swing the same height' : 'linear y-axis') + '.';
+  const clampNote = 'A tangent period passes through infinity where its angle’s rate crosses zero (the perihelion swings back at eccentricity minima, the node at inclination minima): each series is clamped at three times its own median over the window — a short period is a fast, well-defined rate and is drawn as is' + (core.anyClamped ? '; the clamped stretches are drawn dotted (off scale, not a value)' : '') + '.';
   const ecc = showEcc ? 'Grey, right axis: the model’s own eccentricity of date e(t) (the eccentricity chart’s Earth route) — every swing of the perihelion lines sits on an eccentricity extremum: at a minimum the perihelion direction is ill-defined and swings fast (or back), at a maximum it runs slowest.' : '';
   const parts = [];
   if (on.peri) parts.push('perihelion precession = anomalistic/(anomalistic − tropical) of the one-source years of date (the perihelion against the moving equinox)');
@@ -21065,10 +21072,10 @@ function _vfpAPNoteParts(on, log, core, showEcc) {
   if (on.obliq) refParts.push('La2004 (Laskar et al. 2004' + (on.peri ? '' : ', doi:10.1051/0004-6361:20041335') + ') obliquity through the SAME local-period estimator, its measured intervals as markers, −250…+100 kyr');
   if (on.axial) refParts.push('Vondrák et al. (2011, doi:10.1051/0004-6361/201117274) p_A rate, drawn inside its stated ±200 kyr validity');
   if (on.apsidal || on.ecl) refParts.push('La2010 (Laskar et al. 2011, doi:10.1051/0004-6361/201116836) ' + [on.apsidal ? 'ϖ' : '', on.ecl ? 'Ω' : ''].filter((t) => t).join(' and ') + ' in the invariable-plane frame, the same tangent at its 2-kyr step, −500 kyr → 0');
-  const refs = refParts.length ? 'Dashed: like-for-like of-date tangents on the published tables — ' + refParts.join('; ') + '.' : '';
-  const markers = '';
-  const rms = core.rmsParts.length ? 'Over the overlap: ' + core.rmsParts.join(' · ') + '.' : '';
-  return { frame, model, refs, markers, rms, ecc };
+  const references = refParts.length ? 'Dashed: like-for-like of-date tangents on the published tables — ' + refParts.join('; ') + '.' : '';
+  const reading = core.rmsParts.length ? 'Over the overlap: ' + core.rmsParts.join(' · ') + '.' : '';
+  const note = model + ' ' + clampNote + (ecc ? ' ' + ecc : '') + ' Hover the chart for every enabled period (model · reference) at a year.';
+  return { frame: frame.replace(/\.$/, '') + ' · ' + _vfpFmtYearBcAd(core.S.y0) + ' → ' + _vfpFmtYearBcAd(core.S.y1) + '.', references, reading, note };
 }
 function renderVFPAllPrecession() {
   const on = _vfpAPState.on, log = _vfpAPState.log, showEcc = _vfpAPState.ecc;
@@ -21105,8 +21112,7 @@ function renderVFPAllPrecession() {
     '</svg>' +
     '<div data-vfpap-tip style="position:absolute;display:none;pointer-events:none;background:rgba(13,17,23,0.95);border:1px solid #3a4356;border-radius:6px;padding:6px 10px;font-size:11px;line-height:1.55;color:#e8ecf4;white-space:nowrap;z-index:5;"></div>' +
     '</div>' +
-    '<div style="padding:8px 4px 2px;color:#8a93a5;font-size:11px;line-height:1.5;"><strong>Frame:</strong> ' + P.frame + ' ' + P.model + ' Static chart, ' + fmtY(S.y0) + ' → ' + fmtY(S.y1) + '; hover the chart for every enabled period (model · reference) at a year.</div>' +
-    '<div style="padding:2px 4px 8px;color:#8a93a5;font-size:11px;line-height:1.5;"><strong>References:</strong> ' + [P.refs, P.markers, P.rms, P.ecc].filter((t) => t).join(' ') + '</div>' +
+    _vfpCaptionHtml(P) +
     '</div>';
 }
 // One paper form for any window — "Export" prints the current standard
@@ -21119,7 +21125,7 @@ function _vfpAPPaperSvg(range) {
   const fmtY = (y) => y === 0 ? '0' : Math.abs(y).toLocaleString('en-US') + (y < 0 ? ' BC' : ' AD');
   const title = 'All Precession Periods — ' + fmtY(S.y0) + ' → ' + fmtY(S.y1);
   const P = _vfpAPNoteParts(on, log, core, showEcc);
-  const notes = [P.frame, P.model, P.refs, P.markers, P.rms, P.ecc].filter((t) => t);
+  const notes = _vfpCaptionParagraphs(P);
   const wrapText = (t) => {
     const out = [];
     let line = '';
@@ -21435,10 +21441,10 @@ function _vfpANNoteParts(core) {
   const sym = _vfpANSymmetricYears();
   const frame = 'The Sun’s declination against the equation of time over one year at a fixed mean solar time — the figure-8 a fixed camera records. Sky view facing south: East on the left, a fast Sun (positive equation of time) stands west of the meridian at mean noon.';
   const model = 'Each figure is the two-body analemma on the model’s own elements OF DATE — the obliquity (the Obliquity chart’s one-source line: the figure’s height ±ε and the 2ε-type term), the eccentricity (the eccentricity chart’s Earth route: the size of the eccentricity term, ≈ 2e in radians of time) and the perihelion longitude of date (the perihelion chart’s line: the term’s phase against the equinox — the tilt and the twist). The scene’s real Sun adds the lunar and planetary ripple (under half a minute), which does not change the shape.';
-  const rules = 'Symmetry: with the Sun’s perigee on a solstice the figure mirrors about the vertical axis; on an equinox it is point-symmetric. The model’s own symmetric years nearest to now: ' +
-    sym.map((s) => s.name + ' ' + (Number.isFinite(s.year) ? _vfpANFmtYear(s.year) : '—')).join(' · ') + '.';
-  const values = 'Read at the four epochs: ' + core.epochs.map((E) => _vfpANFmtYear(E.inp.year) + ' — e ' + E.inp.e.toFixed(5) + ', ε ' + E.inp.epsDeg.toFixed(3) + '°, equation of time ' + E.eotMin.toFixed(1) + ' … +' + E.eotMax.toFixed(1) + ' min').join('; ') + '.';
-  return { frame, model, rules, values };
+  const rules = 'Symmetry: with the Sun’s perigee on a solstice the figure mirrors about the vertical axis; on an equinox it is point-symmetric.';
+  const reading = 'At the four epochs: ' + core.epochs.map((E) => _vfpANFmtYear(E.inp.year) + ' — e ' + E.inp.e.toFixed(5) + ', ε ' + E.inp.epsDeg.toFixed(3) + '°, equation of time ' + E.eotMin.toFixed(1) + ' … +' + E.eotMax.toFixed(1) + ' min').join('; ') +
+    '. The model’s own symmetric years nearest to now: ' + sym.map((s) => s.name + ' ' + (Number.isFinite(s.year) ? _vfpANFmtYear(s.year) : '—')).join(' · ') + '.';
+  return { frame, references: '', reading, note: model + ' ' + rules };
 }
 function renderVFPAnalemma() {
   const years = _vfpANState.years;
@@ -21453,14 +21459,13 @@ function renderVFPAnalemma() {
   return '<div class="vfp-chart-block">' +
     controls +
     '<svg data-vfpan-svg viewBox="0 0 ' + core.W + ' ' + core.H + '" width="100%" style="display:block;background:#151a22;border-radius:0 0 6px 6px;">' + core.body + '</svg>' +
-    '<div style="padding:8px 4px 2px;color:#8a93a5;font-size:11px;line-height:1.5;"><strong>Frame:</strong> ' + P.frame + ' ' + P.model + '</div>' +
-    '<div style="padding:2px 4px 8px;color:#8a93a5;font-size:11px;line-height:1.5;"><strong>Symmetry &amp; values:</strong> ' + P.rules + ' ' + P.values + '</div>' +
+    _vfpCaptionHtml(P) +
     '</div>';
 }
 function _vfpANPaperSvg() {
   const core = _vfpANChartCore(_vfpANState.years, 'paper');
   const P = _vfpANNoteParts(core);
-  const notes = [P.frame, P.model, P.rules, P.values];
+  const notes = _vfpCaptionParagraphs(P);
   const wrapText = (t) => {
     const out = [];
     let line = '';
@@ -21564,6 +21569,28 @@ function _vfpYearTicks(yearMin, yearMax) {
   return out;
 }
 const _vfpFmtYearBcAd = (yr) => yr === 0 ? '0' : yr < 0 ? Math.abs(yr).toLocaleString('en-US') + ' BC' : yr.toLocaleString('en-US') + ' AD';
+/** The standard caption on every panel (owner): Frame · References ·
+ *  Reading · Note — one shape, an empty block omitted, a gap between
+ *  blocks, a rule above. Frame = what is plotted (unit) · the frame or
+ *  convention · the window; References = each reference with its validity
+ *  and link; Reading = the numbers (rms per reference over the window, the
+ *  J2000 anchor, the observed values); Note = the physics in a few
+ *  sentences. Numbers live in the Reading, never in the Frame or the Note. */
+function _vfpCaptionHtml(blocks) {
+  let s = '<div style="margin:8px 4px 6px;padding-top:6px;border-top:1px solid #2a2f3a;color:#8a93a5;font-size:11px;line-height:1.5;">';
+  for (const [label, text] of [['Frame', blocks.frame], ['References', blocks.references], ['Reading', blocks.reading], ['Note', blocks.note]]) {
+    if (text) s += '<div style="margin-top:6px;"><strong>' + label + ':</strong> ' + text + '</div>';
+  }
+  return s + '</div>';
+}
+/** The same four blocks as plain labelled paragraphs for the paper forms. */
+function _vfpCaptionParagraphs(blocks) {
+  const out = [];
+  for (const [label, text] of [['Frame', blocks.frame], ['References', blocks.references], ['Reading', blocks.reading], ['Note', blocks.note]]) {
+    if (text) out.push(label + ': ' + String(text).replace(/<[^>]+>/g, '').replace(/&rarr;/g, '→').replace(/&mdash;/g, '—').replace(/&nbsp;/g, ' ').replace(/&plusmn;/g, '±').replace(/&asymp;/g, '≈').replace(/&Delta;/g, 'Δ').replace(/&middot;/g, '·').replace(/&minus;/g, '−').replace(/&deg;/g, '°').replace(/&varpi;/g, 'ϖ').replace(/&thinsp;/g, ' ').replace(/&amp;/g, '&'));
+  }
+  return out;
+}
 /** Round-step value ticks for any range: ≤ 7 ticks on a 1/2/2.5/5 step,
  *  with the decimals that step needs (a 2.5-step needs one more). */
 function _vfpNiceTicks(lo, hi) {
@@ -21872,31 +21899,30 @@ function renderVFPChart(category, currentYear) {
   }
   tabStrip += '</div>';
 
-  // The standard caption \u2014 Frame \u00b7 Model \u00b7 References \u00b7 Reading \u00b7 Note \u2014
-  // built from the category's own data (the custom panels' pattern)
+  // The standard caption \u2014 Frame \u00b7 References \u00b7 Reading \u00b7 Note \u2014 built
+  // from the category's own data (_vfpCaptionHtml, the same on every panel)
   const fmtRms = (v) => {
     const a = Math.abs(v);
     return a >= 1000 ? a.toFixed(0) : a >= 1 ? a.toFixed(2) : a >= 0.001 ? a.toFixed(6) : a >= 1e-7 ? a.toFixed(9) : a.toExponential(2);
   };
+  const fmtV = category.fmtValue || ((v) => v.toFixed(category.precision));
   const frameText = (category.frame || (category.yLabel + (category.unit && category.unit.trim() !== category.yLabel ? ' (' + category.unit.trim() + ')' : ''))) +
-    (category.wrap360 ? '; an angle, wrapping at 360\u00b0' : '') + '. Window: ' + _vfpFmtYearBcAd(yearMin) + ' \u2192 ' + _vfpFmtYearBcAd(yearMax) + '.';
-  const modelText = category.model.name + (category.modelText ? ' \u2014 ' + category.modelText : '') + '.';
+    ' \u00b7 ' + _vfpFmtYearBcAd(yearMin) + ' \u2192 ' + _vfpFmtYearBcAd(yearMax) + '.';
   const refItems = category.references.map((ref) => {
     const valid = ref.validYears ? ' (valid ' + _vfpFmtYearBcAd(ref.validYears[0]) + ' \u2192 ' + _vfpFmtYearBcAd(ref.validYears[1]) + ', dotted beyond)' : '';
     const link = ref.sourceUrl ? ' <a href="' + ref.sourceUrl + '" target="_blank" rel="noopener" class="vfp-source-link" title="Source">\u2197</a>' : '';
     return ref.name + valid + link;
   });
-  const refsText = refItems.length ? refItems.join(' \u00b7 ') + '.' : 'none.';
+  const refsText = refItems.length ? refItems.join(' \u00b7 ') + '.' : '';
   const readingParts = rmsParts.map((r) => r.name + ' rms ' + fmtRms(r.rms) + ' ' + rLabel + ' over ' + r.n + ' samples');
   const modelJ2000v = category.model.fn(2000);
-  const readingText = (readingParts.length ? readingParts.join(' \u00b7 ') + '. ' : '') + 'J2000 anchor: ' + (Number.isFinite(modelJ2000v) ? (category.fmtValue || ((v) => v.toFixed(category.precision)))(modelJ2000v) + (category.unit || '') : '\u2014') + (category.j2000extras && category.j2000extras.length ? ' (observed / reference values in the table above).' : '.');
-  const caption = '<div style="padding:8px 4px 2px;color:#8a93a5;font-size:11px;line-height:1.5;">' +
-    '<div><strong>Frame:</strong> ' + frameText + '</div>' +
-    '<div><strong>Model:</strong> ' + modelText + '</div>' +
-    '<div><strong>References:</strong> ' + refsText + '</div>' +
-    '<div><strong>Reading:</strong> ' + readingText + '</div>' +
-    (category.modelNote ? '<div><strong>Note:</strong> ' + category.modelNote + '</div>' : '') +
-    '</div>';
+  const anchorParts = ['J2000: model ' + (Number.isFinite(modelJ2000v) ? fmtV(modelJ2000v) + (category.unit || '') : '\u2014')];
+  for (const extra of category.j2000extras || []) {
+    const v = typeof extra.value === 'function' ? extra.value() : extra.value;
+    if (Number.isFinite(v)) anchorParts.push(extra.name + ' ' + fmtV(v) + (category.unit || ''));
+  }
+  const readingText = (readingParts.length ? readingParts.join(' \u00b7 ') + '. ' : '') + anchorParts.join(' \u00b7 ') + '.';
+  const caption = _vfpCaptionHtml({ frame: frameText, references: refsText, reading: readingText, note: category.modelNote || '' });
 
   const tipDiv = '<div data-vfp-tip style="position:absolute;display:none;pointer-events:none;background:rgba(13,17,23,0.95);border:1px solid #3a4356;border-radius:6px;padding:6px 10px;font-size:11px;line-height:1.55;color:#e8ecf4;white-space:nowrap;z-index:5;"></div>';
   return `<div class="vfp-legend">${legend}</div>
