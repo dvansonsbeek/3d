@@ -19400,6 +19400,7 @@ function ascNodeInvPlaneModel(year) {
 const VFP_CATEGORIES = [
   {
     id: 'eccentricity', group: 'Earth orbit', label: 'Eccentricity', unit: '', precision: 8,
+    defaultRef: 'La2004 (Laskar)',   // rms 2.1e-5 on ±23 kyr (Meeus 9.2e-5, Berger 1.9e-4)
     frame: 'Earth’s orbital eccentricity (dimensionless), of date',
     reading: 'The one-source e of date is the modulus of the engine’s own eccentricity vector, the banked N-body series; its ~100-kyr and 405-kyr cycles are the beats of the secular g-modes. The era polynomial (Meeus) holds inside ±10 kyr; Berger 1978 and La2004 carry the cycles across the window.',
     yLabel: 'eccentricity',
@@ -19425,6 +19426,7 @@ const VFP_CATEGORIES = [
   },
   {
     id: 'obliquity', group: 'Earth axis', label: 'Obliquity', unit: '°', precision: 6,
+    defaultRef: 'La2004 (Laskar)',   // rms 4.4″ on ±23 kyr (Laskar 1986 8.5″, Berger 12.9″)
     frame: 'Obliquity of the ecliptic (degrees), the rendered movement of date',
     reading: 'The rendered movement: the series hybrid of the engine’s nodal modes coupled to the composed lunisolar precession — the ±1° cycle of ~41 kyr. The era polynomials (Laskar 1986, Capitaine, Chapront) are single-cycle fits valid ±10 kyr; Berger 1978 and La2004 carry the cycle across the window.',
     yLabel: 'degrees',
@@ -19487,6 +19489,7 @@ const VFP_CATEGORIES = [
   },
   {
     id: 'perihelion', group: 'Earth orbit', label: 'Perihelion Longitude', unit: '°', precision: 3,
+    defaultRef: 'La2004 (Laskar)',   // Meeus fits ±23 kyr slightly better (0.034° vs 0.091°) but ends at ±10 kyr
     frame: 'Longitude of Earth’s perihelion (degrees) from the equinox of date, wrapping at 360°',
     reading: 'The one-source ϖ of date turns once per ~21 kyr against the moving equinox: the apsidal precession against the stars (~112 kyr) meeting the axial precession (~25.8 kyr). Meeus is the era polynomial; La2004 carries the same convention across the window.',
     yLabel: 'degrees',
@@ -19520,6 +19523,7 @@ const VFP_CATEGORIES = [
   },
   {
     id: 'tropical-year', group: 'Earth clock', label: 'Tropical Year', unit: ' days', precision: 8,
+    defaultRef: 'Vondrák (2011), derived',   // rms 0.81 s on ±23 kyr (Laskar 1986 1.85 s)
     frame: 'Mean tropical year (SI days of 86,400 s), of date',
     yLabel: 'days',
     residualLabel: 'seconds', residualScale: 86400,
@@ -19625,6 +19629,7 @@ const VFP_CATEGORIES = [
   },
   {
     id: 'solar-day', group: 'Earth clock', label: 'Solar Day Length', unit: ' s', precision: 6,
+    defaultRef: 'Bills & Ray (1999)',   // the external witness; the long-term mean is the model's own line
     frame: 'Mean solar day (SI seconds), of date',
     reading: 'The model’s mean solar day of date from its day-length stack: the tidal secular lengthening, the nodal-period term and the fitted cycle stack; the long-term mean is that stack without its cycles, and Bills & Ray (1999) the constant tidal rate of the lunar-laser and eclipse era.',
     yLabel: 'seconds',
@@ -19747,6 +19752,7 @@ const VFP_CATEGORIES = [
   },
   {
     id: 'axial-precession', group: 'Earth axis', label: 'Axial Precession Period', unit: ' yr', precision: 2,
+    defaultRef: 'Vondrák (2011)',   // equal to Capitaine within noise on ±23 kyr (16.1 vs 15.5 yr), valid to ±200 kyr
     frame: 'Axial precession period (years), the instantaneous beat sidereal/(sidereal − tropical) of date',
     reading: 'The instantaneous beat of the one-source sidereal and tropical years, ≈ 25,771 yr at J2000, wobbling with the 41-kyr obliquity cycle through cos ε. Vondrák’s long-period series tracks it cycle for cycle inside ±200 kyr; Capitaine’s era polynomial departs beyond ±10 kyr.',
     yLabel: 'years',
@@ -19811,6 +19817,7 @@ const VFP_CATEGORIES = [
   },
   {
     id: 'delta-t', group: 'Earth clock', label: 'ΔT (TT − UT1)', unit: ' s', precision: 0,
+    defaultRef: 'Stephenson et al. (2016)',   // the observational spline: rms 46.9 s vs the canon's 316 s on 2000 BC – 3000 AD
     frame: 'ΔT = TT − UT1 (seconds), the model’s long-term trend',
     yLabel: 'seconds (ΔT absolute, TT − UT1)',
     residualLabel: 'seconds', residualScale: 1,
@@ -21517,6 +21524,21 @@ function _vfpPaperLegend(entries, W) {
   });
   return { svg, rows: rows.length, bottom: 34 + rows.length * 16 };
 }
+/** Reference toggles (owner: "we only compare to 1 by default, the others
+ *  are clickable"): a generic panel with more than one external reference
+ *  shows its `defaultRef` (the best fit on the ±23 kyr window that stays
+ *  valid on the deep windows) and offers the rest as legend pills; the
+ *  choice is kept per panel for the session. The two cardinal panels
+ *  (referencesText — their lines are the model's own) keep every line. */
+let _vfpRefsOn = {};
+function _vfpRefToggles(category) { return !category.customRender && !category.referencesText && category.references.length > 1; }
+function _vfpDefaultRefName(category) { return category.defaultRef || category.references[0].name; }
+function _vfpRefOn(category, ref) {
+  if (!_vfpRefToggles(category)) return true;
+  const st = _vfpRefsOn[category.id] || (_vfpRefsOn[category.id] = {});
+  if (!(ref.name in st)) st[ref.name] = ref.name === _vfpDefaultRefName(category);
+  return st[ref.name];
+}
 /** The window's VIEW of a category (owner: ΔT in seconds on the near
  *  windows, in years on the deep ones): a tab may carry valueScale, unit,
  *  precision, fmtValue, yLabel, residualLabel and residualScale; the
@@ -21527,7 +21549,9 @@ function _vfpWindowUnits(category, tab) {
   const wrap = (c) => scale === 1 ? c : { ...c, fn: (y) => c.fn(y) * scale };
   return {
     model: wrap(category.model),
-    references: category.references.map(wrap),
+    // the SHOWN references only, each remembering its position in the
+    // category's list (the export palette is fixed per position)
+    references: category.references.map((r, i) => ({ ...wrap(r), refIndex: i })).filter((r) => _vfpRefOn(category, r)),
     j2000extras: (category.j2000extras || []).map((e) => scale === 1 ? e : { ...e, value: () => (typeof e.value === 'function' ? e.value() : e.value) * scale }),
     unit: tab.unit !== undefined ? tab.unit : category.unit,
     unitLabel: tab.unitLabel || ((tab.unit !== undefined ? tab.unit : category.unit) || '').trim(),
@@ -21562,7 +21586,7 @@ function _vfpGenericCaptionBlocks(category, yearMin, yearMax, rmsParts, rLabel, 
     const items = category.references.map((ref) => {
       const valid = ref.validYears ? ', valid ' + _vfpFmtYearBcAd(ref.validYears[0]) + ' → ' + _vfpFmtYearBcAd(ref.validYears[1]) : '';
       const link = withLinks && ref.sourceUrl ? ' <a href="' + ref.sourceUrl + '" target="_blank" rel="noopener" class="vfp-source-link" title="Source">↗</a>' : '';
-      return ref.name + valid + link;
+      return ref.name + valid + link + (_vfpRefOn(category, ref) ? '' : ' (off)');
     });
     const anyValid = category.references.some((r) => r.validYears);
     references = items.length ? items.join(' · ') + (anyValid ? ' — dotted beyond validity.' : '.') : '';
@@ -21624,7 +21648,7 @@ function renderVFPChart(category, currentYear) {
   }
 
   // Residuals (reference - model), with wrap360 normalization, inside validity only
-  const residuals = category.references.map((_, ri) =>
+  const residuals = V.references.map((_, ri) =>
     samples[0].map((m, i) => {
       const rs = samples[ri + 1][i];
       const rv = rs.v, mv = m.v;
@@ -21671,7 +21695,7 @@ function renderVFPChart(category, currentYear) {
   // window INSIDE the reference's validity, in the residual unit — the same
   // measure the custom panels print (the endpoint-difference block it
   // replaces read two points; owner: removed on every panel)
-  const rmsParts = category.noComparisons ? [] : category.references.map((ref, ri) => {
+  const rmsParts = category.noComparisons ? [] : V.references.map((ref, ri) => {
     let s2 = 0, n = 0;
     for (const { v } of scaledResiduals[ri]) if (Number.isFinite(v)) { s2 += v * v; n++; }
     return n ? { name: ref.name, rms: Math.sqrt(s2 / n), n } : null;
@@ -21845,17 +21869,23 @@ function renderVFPChart(category, currentYear) {
   // readout is exact, not the 120-yr sample grid)
   _vfpHoverCtx = { category, model: V.model, references: V.references, yearMin, yearMax, W, PAD, plotW, fmtBase: (v) => (V.fmtValue || ((x) => Number.isFinite(x) ? x.toFixed(V.precision) : 'N/A'))(v) + (V.unit || '') };
 
-  // Legend
-  let legend = '';
-  for (const curve of allCurves) {
-    legend += `<div class="vfp-legend-item"><span class="vfp-legend-swatch" style="background:${curve.color}"></span>${curve.name}</div>`;
+  // Legend — the model and the default reference are plain entries; the
+  // other references are toggle pills (dimmed when off), see _vfpRefOn
+  const toggles = _vfpRefToggles(category);
+  let legend = `<div class="vfp-legend-item"><span class="vfp-legend-swatch" style="background:${V.model.color}"></span>${V.model.name}</div>`;
+  for (const ref of category.references) {
+    const on = _vfpRefOn(category, ref);
+    const sw = `<span class="vfp-legend-swatch" style="background:${ref.color}"></span>${ref.name}`;
+    legend += toggles && ref.name !== _vfpDefaultRefName(category)
+      ? `<button type="button" class="vfp-legend-item vfp-legend-toggle" data-vfp-ref="${ref.name}" aria-pressed="${on}" title="${on ? 'Hide' : 'Show'} ${ref.name}">${sw}</button>`
+      : `<div class="vfp-legend-item">${sw}</div>`;
   }
 
   // J2000 values table
   let j2000Table = '<div class="vfp-j2000"><table><colgroup><col><col><col></colgroup><tr><th>Formula</th><th>Value at J2000</th><th>\u0394 vs Model</th></tr>';
   // the J2000 anchor is a point value: the table stays in the category's own
   // unit whatever the window's scale (ΔT reads 54 s, never 0.00 yr)
-  const baseCurves = [category.model, ...category.references];
+  const baseCurves = [category.model, ...category.references.filter((r) => _vfpRefOn(category, r))];
   const modelJ2000 = category.model.fn(2000);
   for (const curve of baseCurves) {
     const v = curve.fn(2000);
@@ -21925,6 +21955,15 @@ function _vfpGenericAfterRender(bodyEl) {
   bodyEl.querySelectorAll('button[data-vfp-tab]').forEach((b) => {
     b.addEventListener('click', () => {
       _vfpTabKey = b.dataset.vfpTab;
+      updateVerificationPanel(C.category.id);
+    });
+  });
+  // the reference pills — flip the reference and re-render (chart, residual,
+  // hover, table, reading and export all follow the shown set)
+  bodyEl.querySelectorAll('button[data-vfp-ref]').forEach((b) => {
+    b.addEventListener('click', () => {
+      const st = _vfpRefsOn[C.category.id] || (_vfpRefsOn[C.category.id] = {});
+      st[b.dataset.vfpRef] = !st[b.dataset.vfpRef];
       updateVerificationPanel(C.category.id);
     });
   });
@@ -22028,7 +22067,7 @@ function renderVFPPaperChartAlt(category, altConfig) {
   const allCurves = [
     { ...V.model, color: modelColor },
     ...V.references
-      .map((r, i) => ({ ...r, color: r.preserveColor ? r.color : refColors[i % refColors.length] }))
+      .map((r) => ({ ...r, color: r.preserveColor ? r.color : refColors[r.refIndex % refColors.length] }))
   ];
   // the standard export legend wraps into rows; the plot starts under it
   // (a single row clipped at both page edges with five long names)
