@@ -21611,9 +21611,12 @@ function renderVFPChart(category, currentYear) {
   // Y-axis label
   const yAxisLabel = `<text x="12" y="${PAD.t + plotH_main / 2}" text-anchor="middle" dominant-baseline="middle" transform="rotate(-90,12,${PAD.t + plotH_main / 2})" fill="rgba(255,255,255,0.45)" font-size="9" font-family="Inter,system-ui,sans-serif">${category.yLabel}</text>`;
 
-  // Main SVG
-  const mainSVG = `<svg viewBox="0 0 ${W} ${H_MAIN}" style="width:100%;height:auto;" xmlns="http://www.w3.org/2000/svg">
+  // Main SVG (data-vfp-main + a hidden cursor: the generic hover readout,
+  // wired by _vfpGenericAfterRender — the all-planets panels' logic, once
+  // for every generic category; owner-requested)
+  const mainSVG = `<svg data-vfp-main viewBox="0 0 ${W} ${H_MAIN}" style="width:100%;height:auto;" xmlns="http://www.w3.org/2000/svg">
     ${mainGrid}${yAxisLabel}${marker}${curvePaths}
+    <line data-vfp-cursor x1="-10" x2="-10" y1="${PAD.t}" y2="${H_MAIN - PAD.b}" stroke="#8a93a5" stroke-width="0.8" visibility="hidden"/>
   </svg>`;
 
   // Residual chart
@@ -21662,10 +21665,15 @@ function renderVFPChart(category, currentYear) {
   // Residual Y-axis label
   const resYLabel = `<text x="12" y="${PAD.t + plotH_res / 2}" text-anchor="middle" dominant-baseline="middle" transform="rotate(-90,12,${PAD.t + plotH_res / 2})" fill="rgba(255,255,255,0.45)" font-size="8" font-family="Inter,system-ui,sans-serif">${rLabel}</text>`;
 
-  const resSVG = `<svg viewBox="0 0 ${W} ${H_RES}" style="width:100%;height:auto;" xmlns="http://www.w3.org/2000/svg">
+  const resSVG = `<svg data-vfp-res viewBox="0 0 ${W} ${H_RES}" style="width:100%;height:auto;" xmlns="http://www.w3.org/2000/svg">
     ${resGrid}${resYLabel}${resMarker}${resPaths}
     <text x="${W / 2}" y="12" text-anchor="middle" fill="rgba(255,255,255,0.5)" font-size="9" font-family="Inter,system-ui,sans-serif">Residual (Reference \u2212 Model) in ${rLabel}</text>
+    <line data-vfp-cursor x1="-10" x2="-10" y1="${PAD.t}" y2="${H_RES - PAD.b}" stroke="#8a93a5" stroke-width="0.8" visibility="hidden"/>
   </svg>`;
+  // the hover context the generic afterRender reads (module-level: the
+  // category's own evaluators are called LIVE at the pointed year, so the
+  // readout is exact, not the 120-yr sample grid)
+  _vfpHoverCtx = { category, yearMin, yearMax, W, PAD, plotW, fmtBase: (v) => (category.fmtValue || ((x) => Number.isFinite(x) ? x.toFixed(category.precision) : 'N/A'))(v) + (category.unit || '') };
 
   // Legend
   let legend = '';
@@ -21741,13 +21749,69 @@ function renderVFPChart(category, currentYear) {
   // Year range note
   const rangeNote = `<div class="vfp-range-note">Range: ${fmtYearLabel(yearMin)} \u2013 ${fmtYearLabel(yearMax)} &middot; Reference formulas become unreliable outside their stated validity window</div>`;
 
+  const tipDiv = '<div data-vfp-tip style="position:absolute;display:none;pointer-events:none;background:rgba(13,17,23,0.95);border:1px solid #3a4356;border-radius:6px;padding:6px 10px;font-size:11px;line-height:1.55;color:#e8ecf4;white-space:nowrap;z-index:5;"></div>';
   return `<div class="vfp-legend">${legend}</div>
-    <div class="vfp-chart-container">${mainSVG}</div>
+    <div class="vfp-chart-container" style="position:relative;">${mainSVG}${tipDiv}</div>
     ${j2000Table}
     ${maxDiffHTML}
-    ${category.noComparisons ? '' : `<div class="vfp-chart-container vfp-residual">${resSVG}</div>`}
+    ${category.noComparisons ? '' : `<div class="vfp-chart-container vfp-residual" style="position:relative;">${resSVG}${tipDiv}</div>`}
     ${modelNote}
     ${rangeNote}`;
+}
+// ── Generic hover readout (owner-requested: the all-planets panels' logic
+// for every generic category). Pointer x → the year (rounded to 10 yr);
+// the readout evaluates the model and every reference LIVE at that year
+// (the category's own fns) and prints the values (no Δ column — owner: the
+// residual chart and the J2000 table carry the differences); both charts'
+// cursors move together.
+let _vfpHoverCtx = null;
+function _vfpGenericAfterRender(bodyEl) {
+  const C = _vfpHoverCtx;
+  if (!C) return;
+  const svgs = [bodyEl.querySelector('svg[data-vfp-main]'), bodyEl.querySelector('svg[data-vfp-res]')].filter((s) => s);
+  if (!svgs.length) return;
+  const cursors = svgs.map((s) => s.querySelector('line[data-vfp-cursor]'));
+  const tips = svgs.map((s) => s.parentElement.querySelector('div[data-vfp-tip]'));
+  const hide = () => {
+    tips.forEach((t) => { if (t) t.style.display = 'none'; });
+    cursors.forEach((c) => { if (c) c.setAttribute('visibility', 'hidden'); });
+  };
+  const cat = C.category;
+  const fmtYear = (y) => y === 0 ? '0' : (y < 0 ? '−' : '+') + Math.abs(y).toLocaleString('en-US');
+  svgs.forEach((svg, si) => {
+    svg.addEventListener('mouseleave', hide);
+    svg.addEventListener('mousemove', (e) => {
+      const r = svg.getBoundingClientRect();
+      if (!r.width) return;
+      const px = ((e.clientX - r.left) / r.width) * C.W;
+      if (px < C.PAD.l || px > C.W - C.PAD.r) { hide(); return; }
+      const yr = Math.round((C.yearMin + ((px - C.PAD.l) / C.plotW) * (C.yearMax - C.yearMin)) / 10) * 10;
+      const cx = (C.PAD.l + ((yr - C.yearMin) / (C.yearMax - C.yearMin)) * C.plotW).toFixed(1);
+      cursors.forEach((c) => { if (c) { c.setAttribute('x1', cx); c.setAttribute('x2', cx); c.setAttribute('visibility', 'visible'); } });
+      // values only (owner: the Δ column is not needed — the residual chart
+      // and the J2000 table carry the differences)
+      const m = cat.model.fn(yr);
+      let rows = '<div style="color:#8a93a5;margin-bottom:2px;">Year ' + fmtYear(yr) + '</div>';
+      const row = (name, color, val) => '<div style="display:flex;justify-content:space-between;gap:16px;"><span style="color:' + color + ';">' + name + '</span><span>' + val + '</span></div>';
+      rows += row(cat.model.name, cat.model.color, Number.isFinite(m) ? C.fmtBase(m) : '—');
+      for (const ref of cat.references) {
+        const v = ref.fn(yr);
+        rows += row(ref.name, ref.color, Number.isFinite(v) ? C.fmtBase(v) : '—');
+      }
+      tips.forEach((t, ti) => { if (t && ti !== si) t.style.display = 'none'; });
+      const tip = tips[si];
+      if (!tip) return;
+      tip.innerHTML = rows;
+      tip.style.display = 'block';
+      const wr = svg.parentElement.getBoundingClientRect();
+      let tx = e.clientX - wr.left + 14;
+      if (tx + tip.offsetWidth > wr.width - 4) tx = e.clientX - wr.left - tip.offsetWidth - 14;
+      let ty = e.clientY - wr.top + 12;
+      if (ty + tip.offsetHeight > wr.height - 4) ty = wr.height - tip.offsetHeight - 4;
+      tip.style.left = Math.max(0, tx) + 'px';
+      tip.style.top = Math.max(0, ty) + 'px';
+    });
+  });
 }
 
 // ── Paper Export ─────────────────────────────────────────────────
@@ -22259,6 +22323,7 @@ function updateVerificationPanel(categoryId) {
   if (verificationPanel._exportBtn) verificationPanel._exportBtn.style.display = (cat.customRender && !cat.customPaper) ? 'none' : '';
   verificationPanel._body.innerHTML = renderVFPChart(cat, o.currentYear || 2000);
   if (cat.afterRender) cat.afterRender(verificationPanel._body);
+  else if (!cat.customRender) _vfpGenericAfterRender(verificationPanel._body);   // the generic hover readout
 }
 
 function openVerificationPanel() {
