@@ -19820,20 +19820,10 @@ const VFP_CATEGORIES = [
     // windows only — the recent one and the canon's — its references end
     // at 3000 and the trend means nothing at a million years.
     tabs: [
-      { key: 'recent', label: '1650 – 2050 AD', range: [1650, 2050], samples: 200 },
+      { key: 'recent', label: '1000 – 2500 AD', range: [1000, 2500], samples: 300 },
       { key: 'era', label: '2000 BC – 3000 AD', range: [-1999, 3000], samples: 250 },
     ],
     paperTitle: 'ΔT (TT − UT1) Comparison',
-    // "Export Recent" view — zoomed to the 1650-2050 window where both curves
-    // have highest resolution and where the ΔT dip / rebound near 1900 CE is
-    // visible. Uses same curves as the main chart.
-    paperRecent: {
-      range: [1650, 2050], title: 'ΔT (TT − UT1) — Recent (1650-2050)',
-      yRange: [-20, 110], yTicks: [-20, 0, 20, 40, 60, 80, 100],
-      refLines: [
-        { value: () => 0, label: 'ΔT = 0 (TT − UT1 zero)', color: '#888', dash: true, yOffset: 0 },
-      ],
-    },
     fmtValue: v => Number.isFinite(v) ? v.toLocaleString('en-US', { maximumFractionDigits: 0 }) : 'N/A',
     // Model curve shows the calibrated long-term ΔT trend (H/5 LOD physics +
     // 4-flag stack + Core-mantle swing, jointly fit against Espenak & Meeus
@@ -21474,22 +21464,24 @@ function _vfpANAfterRender(bodyEl) {
 // million years). Sampling grows with the window so the 41-kyr obliquity
 // cycle keeps ≥ 10 points per cycle at ±1 Myr.
 const _VFP_TABS = [
-  { key: 'recent', label: '1650 – 2050 AD', range: [1650, 2050], samples: 200 },
+  { key: 'recent', label: '1000 – 2500 AD', range: [1000, 2500], samples: 300 },
   { key: 'era', label: '23,000 BC – 23,000 AD', range: [-23000, 23000], samples: 240 },
   { key: 'quaternary', label: '250,000 BC – 100,000 AD', range: [-250000, 100000], samples: 400 },
   { key: 'myr', label: '1,000,000 BC – 1,000,000 AD', range: [-1000000, 1000000], samples: 800 },
 ];
 const _VFP_DEFAULT_TAB = 'era';
-const _vfpTabState = {};   // categoryId → tab key
+// ONE current window for the whole panel (owner: switching panels keeps the
+// window you chose); a category without that window (ΔT) shows its default.
+let _vfpTabKey = _VFP_DEFAULT_TAB;
 function _vfpTabsFor(category) { return category.tabs || _VFP_TABS; }
 function _vfpCurrentTab(category) {
   const tabs = _vfpTabsFor(category);
-  return tabs.find((t) => t.key === _vfpTabState[category.id]) || tabs.find((t) => t.key === _VFP_DEFAULT_TAB) || tabs[0];
+  return tabs.find((t) => t.key === _vfpTabKey) || tabs.find((t) => t.key === _VFP_DEFAULT_TAB) || tabs[0];
 }
-/** The custom panels share the same four windows: their state lives under
- *  their category id, their strip is the same buttons, their sampling the
- *  window's count (never fewer than 200 points — the 1650–2050 window
- *  would otherwise get ONE 1-kyr sample). */
+/** The custom panels share the same four windows and the ONE current
+ *  window, their strip is the same buttons, their sampling the window's
+ *  count (never fewer than 200 points — the 1000–2500 window would
+ *  otherwise get two 1-kyr samples). */
 function _vfpCurrentTabFor(catId) { return _vfpCurrentTab({ id: catId }); }
 function _vfpCustomTabStrip(catId) {
   const cur = _vfpCurrentTabFor(catId).key;
@@ -21502,7 +21494,7 @@ function _vfpCustomTabStrip(catId) {
 }
 function _vfpWireCustomTabs(bodyEl, catId) {
   bodyEl.querySelectorAll('button[data-vfp-tab]').forEach((b) => {
-    b.addEventListener('click', () => { _vfpTabState[catId] = b.dataset.vfpTab; updateVerificationPanel(catId); });
+    b.addEventListener('click', () => { _vfpTabKey = b.dataset.vfpTab; updateVerificationPanel(catId); });
   });
 }
 function _vfpSamplesForSpan(y0, y1) {
@@ -21858,7 +21850,7 @@ function _vfpGenericAfterRender(bodyEl) {
   // the tab strip
   bodyEl.querySelectorAll('button[data-vfp-tab]').forEach((b) => {
     b.addEventListener('click', () => {
-      _vfpTabState[C.category.id] = b.dataset.vfpTab;
+      _vfpTabKey = b.dataset.vfpTab;
       updateVerificationPanel(C.category.id);
     });
   });
@@ -22108,7 +22100,7 @@ function exportVFPPaper() {
   else {
     const tab = _vfpCurrentTab(cat);
     const cfg = { range: tab.range, title: cat.label + (cat.group && cat.group.startsWith('Earth') ? ' (Earth)' : '') + ' — ' + tab.label };
-    const designed = tab.key === 'quaternary' ? cat.paperAlt : tab.key === 'recent' ? cat.paperRecent : tab.key === 'era' && cat.paperYRange ? { yRange: cat.paperYRange, yTicks: cat.paperYTicks } : null;
+    const designed = tab.key === 'quaternary' ? cat.paperAlt : tab.key === 'era' && cat.paperYRange ? { yRange: cat.paperYRange, yTicks: cat.paperYTicks } : null;
     if (designed) { for (const k of ['yRange', 'yTicks', 'yDecimals', 'refLines', 'events']) if (designed[k] !== undefined) cfg[k] = designed[k]; }
     svg = renderVFPPaperChartAlt(cat, cfg);
     title = cfg.title;

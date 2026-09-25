@@ -2518,10 +2518,13 @@ details.wgc-chart-collapsible > .wgc-chart { margin-top:8px; }
   color: #fff;
   font-size: 13px;
   font-weight: 600;
-  padding: 7px 24px;
+  padding: 7px 16px;
   border-radius: 6px;
   cursor: pointer;
-  min-width: 340px;
+  width: 500px;                 /* fixed: the arrows must not move with the name's length (owner) */
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
   text-align: center;
   text-transform: uppercase;
   letter-spacing: 1px;
@@ -2703,7 +2706,7 @@ details.wgc-chart-collapsible > .wgc-chart { margin-top:8px; }
 @media (max-width: 600px) {
   .vfp-dialog { width: 100vw; height: 100vh; border-radius: 0; }
   .vfp-legend { gap: 8px; }
-  .vfp-nav-name { min-width: 200px; font-size: 11px; }
+  .vfp-nav-name { width: 220px; font-size: 11px; }
 }
 
 /* ══════════════════════════════════════════════════════════════════
