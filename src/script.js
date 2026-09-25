@@ -19405,13 +19405,7 @@ const VFP_CATEGORIES = [
     yLabel: 'eccentricity',
     residualLabel: 'eccentricity (dimensionless)', residualScale: 1,   // was 'AU' — e carries no unit
     primaryRef: 'Meeus',   // C-5: by name, index-shift-proof
-    paperRange: [-23000, 23000], paperTitle: 'Eccentricity Comparison',
-    paperAlt: {
-      range: [-248000, 102000], title: 'Eccentricity Cycles',
-      yRange: [0, 0.06], yTicks: [0, 0.01, 0.02, 0.03, 0.04, 0.05, 0.06],
-      excludeRefs: ['Meeus (1991)'], // polynomial diverges beyond ±10k years
-      noJ2000: true,
-    },
+    paperTitle: 'Eccentricity Comparison',
     // D4 review: "This model" IS the rendered movement — the one-source e
     // (banked series inside ±10 Myr, mode tail beyond; the K law when the
     // series has not loaded / opted out — _sceneEccTargetAt's own fallback).
@@ -19436,13 +19430,7 @@ const VFP_CATEGORIES = [
     yLabel: 'degrees',
     residualLabel: 'arcseconds', residualScale: 3600,
     primaryRef: 'Chapront',   // C-5: by name, index-shift-proof
-    paperRange: [-23000, 23000], paperTitle: 'Obliquity Comparison',
-    paperYRange: [20, 28], paperYTicks: [20, 21, 22, 23, 24, 25, 26, 27, 28],
-    paperAlt: {
-      range: [-248000, 102000], title: 'Obliquity Cycles',
-      yRange: [22, 25], yTicks: [22, 22.5, 23, 23.5, 24, 24.5, 25],
-      excludeRefs: ['Laskar (1986)', 'Capitaine (2006)', 'Chapront (2002)'],
-    },
+    paperTitle: 'Obliquity Comparison',
     fixedYRange: [22, 25], fixedYTicks: [22, 23, 24, 25],
     // D4 review: ONE model line — the rendered movement itself
     // (_sceneEpsTargetDeg: the series hybrid inside ±10 Myr, the α(H(t))
@@ -19471,8 +19459,7 @@ const VFP_CATEGORIES = [
     yLabel: 'degrees',
     residualLabel: 'arcseconds', residualScale: 3600,
     fixedYRange: [0, 3], fixedYTicks: [0, 0.5, 1.0, 1.5, 2.0, 2.5, 3.0],
-    paperRange: [-500000, 2000], paperTitle: 'Inclination to Invariable Plane',
-    paperYRange: [0, 3], paperYTicks: [0, 0.5, 1.0, 1.5, 2.0, 2.5, 3.0],
+    paperTitle: 'Inclination to Invariable Plane',
     model: { name: 'This model', color: '#f0b040',
       fn: inclInvPlaneModel },
     references: [
@@ -19491,8 +19478,7 @@ const VFP_CATEGORIES = [
     residualLabel: 'degrees', residualScale: 1,
     wrap360: true,
     fixedYRange: [0, 360], fixedYTicks: [0, 60, 120, 180, 240, 300, 360],
-    paperRange: [-500000, 2000], paperTitle: 'Ascending Node on Invariable Plane',
-    paperYRange: [0, 400], paperYTicks: [0, 50, 100, 150, 200, 250, 300, 350, 400],
+    paperTitle: 'Ascending Node on Invariable Plane',
     model: { name: 'This model (S&S/La2010 node origin, derived)', color: '#f0b040',
       fn: ascNodeInvPlaneModel },
     references: [
@@ -19507,7 +19493,6 @@ const VFP_CATEGORIES = [
     residualLabel: 'degrees', residualScale: 1,
     wrap360: true,
     paperTitle: 'Longitude Perihelion Comparison',
-    paperRange: [-23000, 23000], paperYRange: [0, 400], paperYTicks: [0, 50, 100, 150, 200, 250, 300, 350, 400],
     fixedYRange: [0, 360], fixedYTicks: [0, 60, 120, 180, 240, 300, 360],
     // D4 review: ONE model line — the one-source ϖ of date (the sampler's
     // equinox-referenced periOfDateDeg: series inside ±10 Myr, the
@@ -19540,16 +19525,9 @@ const VFP_CATEGORIES = [
     residualLabel: 'seconds', residualScale: 86400,
     paperTitle: 'Tropical Year Comparison',
     fixedYRange: [365.2418, 365.2426], fixedYTicks: [365.2418, 365.2420, 365.2422, 365.2424, 365.2426],
-    // Cycles view (the standard Export Cycles range): the equinox-rate
-    // wobble over ±250 kyr (measured one-source span 365.24151–365.24266);
-    // the Laskar fit-era formula rides along for comparison and visibly
-    // departs beyond its ±10-kyr class validity.
-    paperAlt: {
-      range: [-248000, 102000], title: 'Tropical Year Cycles',
-      yRange: [365.2414, 365.2428],
-      yTicks: [365.2414, 365.2416, 365.2418, 365.2420, 365.2422, 365.2424, 365.2426, 365.2428],
-      yDecimals: 4,
-    },
+    // The Quaternary window: the equinox-rate wobble over ±250 kyr
+    // (measured one-source span 365.24151–365.24266); the Laskar fit-era
+    // formula is drawn solid inside its ±10-kyr validity, dotted beyond.
     // D4 review: ONE model line — the ONE-SOURCE tropical year OF DATE,
     // SI 86400-s days: T_trop(y) = T_sid_SI(y)·(1 − p_yr/360°) with p_yr
     // the year-over-year RETROGRADE advance of the movement's own equinox
@@ -19624,10 +19602,8 @@ const VFP_CATEGORIES = [
     // so no curve leaves the frame (owner-corrected: the smooth-mean
     // sizing clipped the equinox curves).
     fixedYRange: [365.2406, 365.2438], fixedYTicks: [365.2410, 365.2415, 365.2420, 365.2425, 365.2430, 365.2435],
+    // paper annotation for the Quaternary window (the y range follows the screen)
     paperAlt: {
-      yRange: [365.2395, 365.2445],
-      yTicks: [365.2395, 365.2405, 365.2415, 365.2425, 365.2435, 365.2445],
-      yDecimals: 4,
       refLines: [
         { value: () => computeSolarYearDaysDirect(2000),
           label: 'Mean tropical year at J2000', color: '#888', dash: true, yOffset: 0 },
@@ -19654,9 +19630,8 @@ const VFP_CATEGORIES = [
     yLabel: 'seconds',
     residualLabel: 'milliseconds', residualScale: 1000,
     paperTitle: 'Solar Day Length Comparison',
+    // paper annotations for the Quaternary window (the y range follows the screen)
     paperAlt: {
-      range: [-248000, 102000], title: 'Solar Day Length Cycles',
-      yRange: [86395, 86402], yTicks: [86395, 86396, 86397, 86398, 86399, 86400, 86401, 86402],
       refLines: [
         { value: () => 86400, label: 'SI second baseline (86400 s)', color: '#888', dash: true, yOffset: 0 },
       ],
@@ -19732,18 +19707,10 @@ const VFP_CATEGORIES = [
     residualLabel: 'seconds', residualScale: 86400,
     paperTitle: 'Sidereal Year Comparison',
     fixedYRange: [365.25635, 365.256375], fixedYTicks: [365.25635, 365.256355, 365.25636, 365.256365, 365.25637, 365.256375],
-    // D6 cycles view (the standard Export Cycles range): the planetary λ̇
-    // drift's ~20-kyr cycles + envelope over the mass-loss slope
-    // (measured span 365.256329–365.256375 over this range).
-    paperAlt: {
-      range: [-248000, 102000], title: 'Sidereal Year Cycles',
-      yRange: [365.25632, 365.25638],
-      yTicks: [365.25632, 365.25633, 365.25634, 365.25635, 365.25636, 365.25637, 365.25638],
-      yDecimals: 5,
-      // Chapront rides along for comparison (owner request, matching the
-      // short-period Export for Paper); its fit-era polynomial visibly
-      // leaves the frame beyond ~±12 kyr — that departure IS the point.
-    },
+    // The Quaternary window (D6): the planetary λ̇ drift's ~20-kyr cycles +
+    // envelope over the mass-loss slope (measured span 365.256329–365.256375
+    // over that window); Chapront's fit-era polynomial is drawn solid inside
+    // its ±10-kyr validity, dotted beyond — that departure IS the point.
     // SI 86400-s day form. D6: ONE-SOURCE line — the H-chain mass-loss
     // slope (Driver 2: past years SHORTER, IAU-anchored at J2000 via the
     // H/13 identity: 31,558,149.7635 s = 365.256363004 SI days) DIVIDED by
@@ -19784,7 +19751,7 @@ const VFP_CATEGORIES = [
     reading: 'The instantaneous beat of the one-source sidereal and tropical years, ≈ 25,771 yr at J2000, wobbling with the 41-kyr obliquity cycle through cos ε. Vondrák’s long-period series tracks it cycle for cycle inside ±200 kyr; Capitaine’s era polynomial departs beyond ±10 kyr.',
     yLabel: 'years',
     residualLabel: 'years', residualScale: 1,
-    paperRange: [-23000, 23000], paperTitle: 'Axial Precession Period Comparison',
+    paperTitle: 'Axial Precession Period Comparison',
     fixedYRange: [25000, 26600], fixedYTicks: [25000, 25400, 25800, 26200, 26600],
     // Cycles view (the standard Export Cycles range): the one-source
     // instantaneous P over ±250 kyr (measured span 24621–26670 yr).
@@ -19792,12 +19759,6 @@ const VFP_CATEGORIES = [
     // inside its ±200 kyr validity against the ~2000-yr swing); the
     // Capitaine era polynomial rides along and visibly departs — the
     // same in-era/out-of-era comparison as the year charts.
-    paperAlt: {
-      range: [-248000, 102000], title: 'Axial Precession Period Cycles',
-      yRange: [24400, 26800],
-      yTicks: [24400, 24800, 25200, 25600, 26000, 26400, 26800],
-      yDecimals: 0,
-    },
     fmtValue: v => Number.isFinite(v) ? v.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : 'N/A',
     // D4 review: ONE model line — the ONE-SOURCE instantaneous precession
     // period P(y) = 360° / p_yr, with p_yr the year-over-year RETROGRADE
@@ -21997,7 +21958,11 @@ function renderVFPPaperChartAlt(category, altConfig) {
   const W = 1000, PAD = { l: 80, r: 120, t: 50, b: 45 };
   const plotW = W - PAD.l - PAD.r;
   const [yearMin, yearMax] = alt.range;
-  const nSamples = 400;
+  // the window's own sample count (the screen's), so the auto y range sees
+  // the same extremes — 400 samples under-sampled the 21-kyr climatic
+  // precession on ±1 Myr and the export's range came out narrower
+  const tabFor = _vfpTabsFor(category).find((t) => t.range[0] === yearMin && t.range[1] === yearMax);
+  const nSamples = tabFor ? tabFor.samples : 400;
   const step = (yearMax - yearMin) / nSamples;
 
   const modelColor = '#2563eb';
@@ -22005,14 +21970,11 @@ function renderVFPPaperChartAlt(category, altConfig) {
   const textColor = '#333';
   const gridColor = '#ddd';
 
-  // Sample all curves (exclude specified refs for long-term view); a
-  // reference is sampled inside its validity window only — the paper form
-  // draws no dotted continuation
-  const excludeSet = new Set(alt.excludeRefs || []);
+  // Sample all curves; a reference is sampled inside its validity window
+  // only — the paper form draws no dotted continuation
   const allCurves = [
     { ...category.model, color: modelColor },
     ...category.references
-      .filter(r => !excludeSet.has(r.name))
       .map((r, i) => ({ ...r, color: r.preserveColor ? r.color : refColors[i % refColors.length] }))
   ];
   // the standard export legend wraps into rows; the plot starts under it
@@ -22041,18 +22003,24 @@ function renderVFPPaperChartAlt(category, altConfig) {
     const m = (yMax - yMin) * 0.08 || 0.001;
     yMin -= m; yMax += m;
   }
+  // ticks and their decimals exactly as the screen chart makes them: the
+  // designed ticks with the designed range (decimals from that range,
+  // capped at precision), else the round-step ticks with the decimals the
+  // step needs — so the export reads like the panel (owner: the two must
+  // match)
+  let niceStep = Infinity;
   if (!yTicks) {
-    const span = yMax - yMin, p10 = Math.pow(10, Math.floor(Math.log10(span / 5)));
-    const st = [1, 2, 2.5, 5, 10].map((k) => k * p10).find((k) => span / k <= 7) || 10 * p10;
-    yTicks = [];
-    for (let v = Math.ceil(yMin / st) * st; v <= yMax + 1e-9; v += st) yTicks.push(v);
-    if (yDecimals === undefined) yDecimals = Math.max(0, -Math.floor(Math.log10(st)));
+    const nt = _vfpNiceTicks(yMin, yMax);
+    yTicks = nt.ticks; niceStep = nt.step;
+    if (yDecimals === undefined) yDecimals = nt.decimals;
+  } else if (yDecimals === undefined) {
+    const span = yMax - yMin;
+    yDecimals = span > 0 ? Math.min(Math.max(Math.max(0, -Math.floor(Math.log10(span)) + 2), 1), category.precision) : category.precision;
   }
-  if (yDecimals === undefined) yDecimals = 2;
   const xScale = yr => PAD.l + (yr - yearMin) / (yearMax - yearMin) * plotW;
   const yScale = v => PAD.t + (1 - (v - yMin) / (yMax - yMin)) * plotH;
 
-  function fmtY(v) { return category.fmtValue && !alt.yTicks ? category.fmtValue(v) : v.toFixed(yDecimals); }
+  function fmtY(v) { return category.fmtValue && (alt.yTicks || niceStep >= 1) ? category.fmtValue(v) : v.toFixed(yDecimals); }
 
   // Build path
   function buildPath(data) {
@@ -22187,8 +22155,12 @@ function exportVFPPaper() {
   else {
     const tab = _vfpCurrentTab(cat);
     const cfg = { range: tab.range, title: cat.label + (cat.group && cat.group.startsWith('Earth') ? ' (Earth)' : '') + ' — ' + tab.label };
-    const designed = tab.key === 'quaternary' ? cat.paperAlt : tab.key === 'era' && cat.paperYRange ? { yRange: cat.paperYRange, yTicks: cat.paperYTicks } : null;
-    if (designed) { for (const k of ['yRange', 'yTicks', 'yDecimals', 'refLines', 'events']) if (designed[k] !== undefined) cfg[k] = designed[k]; }
+    // the export follows the SCREEN's y range (owner: the two must match):
+    // the category's fixed range on its ±23 kyr window, auto elsewhere; a
+    // category's paper annotations (reference lines, event markers) ride
+    // the Quaternary window
+    if (tab.key === 'era' && cat.fixedYRange) { cfg.yRange = cat.fixedYRange; cfg.yTicks = cat.fixedYTicks; }
+    if (tab.key === 'quaternary' && cat.paperAlt) { for (const k of ['refLines', 'events']) if (cat.paperAlt[k]) cfg[k] = cat.paperAlt[k]; }
     svg = renderVFPPaperChartAlt(cat, cfg);
     title = cfg.title;
   }
