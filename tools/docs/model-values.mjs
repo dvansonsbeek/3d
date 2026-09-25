@@ -3033,23 +3033,22 @@ export const VALUES = {
     return out;
   })(),
 
-  // ── Planet orientation lattice (11-2am) ─────────────────────────────────
-  // Perihelion longitudes from the tracked elements; axial periods from the
-  // engine's per-planet axialPrecessionYears (Earth = H/13), with the
-  // Uranus/Neptune frozen estimates rendered by floor-to-3-significant-
-  // figures (reproduces the site's 204,000,000 / 22,800,000 exactly);
-  // signed ICRF periods via the n8 − 104 frame identity (Earth alone
-  // prograde); obliquity cycles and means from the engine's derived planet
-  // fields (Venus/Neptune tidally damped: cycle = |ICRF|).
+  // ── Planet orientation (11-2am; plan 06 Phase 7 commit 2) ───────────────
+  // Perihelion longitudes from the tracked elements; the AXIAL periods from
+  // the spin channel — each planet's precession constant DERIVED from its
+  // own torques on the model's own orbit (Mercury: Cassini-locked, the row
+  // is the chain's node period, as the panel shows); signed ICRF periods via
+  // the n8 − 104 frame identity (Earth alone prograde); the "mean obliquity"
+  // is the K law's input = the derived J2000 obliquity (acute). The device
+  // rows these replaced (integer axial and obliquity-cycle fractions of the
+  // anchor unit; the `<planet>ObliqCycle` keys) are retired — no obliquity
+  // CYCLE is claimed for any planet (the bands are the `<planet>ObliquityBand*`
+  // keys above).
   ...(() => {
     const n8 = (p) => {
       if (p === 'earth') return 128;
       const [num, den] = model.planets[p].perihelionEclipticFraction;
       return (8 * den / Math.abs(num)) * Math.sign(num);
-    };
-    const floor3sig = (x) => {
-      const m10 = Math.pow(10, Math.floor(Math.log10(x)) - 2);
-      return Math.floor(x / m10) * m10;
     };
     const planets7 = ['mercury', 'venus', 'mars', 'jupiter', 'saturn', 'uranus', 'neptune'];
     const out = {
@@ -3059,42 +3058,33 @@ export const VALUES = {
     for (const p of planets7) {
       out[`${p}PeriLongJ2000`] = { get: () => C.planets[p].longitudePerihelion, render: (v) => Number(v).toFixed(3), unit: '°' };
       out[`${p}AxialPeriod`] = {
-        get: () => Math.abs(C.planets[p].axialPrecessionYears),
-        render: (p === 'uranus' || p === 'neptune')
-          ? (v) => thousands(floor3sig(v))
-          : (v) => thousands(Math.round(v)),
+        get: () => (p === 'mercury'
+          ? Math.abs(1296000 * 100 / rd('data/nbody-secular-frequencies.json').windowElementRates.mercury.nodeRateArcsecCy)
+          : physModel().planets.spin(p).axialPrecessionPeriodYearsJ2000),
+        render: (v) => thousands(Math.round(v)),
         unit: 'yr',
-        note: (p === 'uranus' || p === 'neptune') ? 'frozen estimate — floor to 3 significant figures' : undefined,
+        note: p === 'mercury'
+          ? 'Cassini-locked: the spin follows the orbit node — the chain\'s measured window node period (1800–2100)'
+          : 'the spin channel\'s J2000 axial precession period, 2π/|ψ̇₀| with ψ̇₀ = −α cos ε₀ DERIVED from the planet\'s own torques (same value as the <planet>AxialPrecessionPeriodDerivedYr key; this name kept for the site)',
       };
       out[`${p}IcrfPeriod`] = {
         get: () => { const s = n8(p) - 104; return Math.sign(s) * (8 * C.H) / Math.abs(s); },
         render: (v) => thousands(Math.round(v)),
         unit: 'yr',
       };
-      out[`${p}ObliqCycle`] = { get: () => Math.abs(C.planets[p].obliquityCycle), render: (v) => thousands(Math.round(v)), unit: 'yr' };
-      out[`${p}MeanObliq`] = { get: () => C.planets[p].obliquityMean, render: (v) => Number(v).toFixed(2), unit: '°' };
+      out[`${p}MeanObliq`] = { get: () => C.planets[p].obliquityMean, render: (v) => Number(v).toFixed(2), unit: '°', note: 'the K eccentricity law\'s obliquity input since Phase 7 commit 2: the derived J2000 obliquity (IAU pole vs the chain\'s plane), acute' };
     }
     return out;
   })(),
 
   // ── Eccentricity cycles + phases + ascending nodes (11-2an) ─────────────
-  // Cycle periods LIVE from the engine's wobble beat (which lands exactly on
-  // the lattice); labels derived from the new per-planet
-  // eccentricityCycleFraction in model-parameters (Dennis review: structure
-  // belongs there, not in the citations file), '≈'-prefixed via the stored
-  // approx flag (the tidally-damped pair — a physical caveat, not numeric
-  // looseness). Phases from the engine planet fields (Earth = perihelion
+  // Cycle periods LIVE from the engine — since plan 06 Phase 7 commit 2 the
+  // chain's OWN g-mode beat (the `<planet>EccCycleFormula` lattice labels
+  // and the eccentricityCycleFraction field they read are retired with the
+  // device beat). Phases from the engine planet fields (Earth = perihelion
   // longitude + 90°, the e_E-line convention); ascending-node periods and
   // 8H cycle counts from the engine (Earth = −H/5, the ecliptic precession).
   ...(() => {
-    const eccLabel = (p) => {
-      const [num, den] = model.planets[p].eccentricityCycleFraction;
-      const approx = model.planets[p].eccentricityCycleApprox ? '≈' : '';
-      const n = Math.abs(num);
-      if (n === 1) return `${approx}H/${den}`;
-      if (den === 1) return `${approx}${n}H`;
-      return `${approx}${n}H/${den}`;
-    };
     const planets7 = ['mercury', 'venus', 'mars', 'jupiter', 'saturn', 'uranus', 'neptune'];
     const out = {
       earthEccPhaseJ2000: { get: () => astro.earthOrbital.earthPerihelionLongitudeJ2000 + 90, render: (v) => Number(v).toFixed(2), unit: '°', note: 'perihelion longitude + 90° — the e_E-line phase convention' },
@@ -3102,8 +3092,7 @@ export const VALUES = {
       earthAscNodeN: { get: () => Math.round(-8 * C.H / (-C.H / 5)), render: (v) => String(v) },
     };
     for (const p of planets7) {
-      out[`${p}EccCycle`] = { get: () => C.planets[p].wobblePeriod, render: (v) => thousands(Math.round(v)), unit: 'yr' };
-      out[`${p}EccCycleFormula`] = { get: () => eccLabel(p), render: (v) => String(v) };
+      out[`${p}EccCycle`] = { get: () => C.planets[p].wobblePeriod, render: (v) => thousands(Math.round(v)), unit: 'yr', note: 'since Phase 7 commit 2 the chain\'s OWN g-mode beat (dominant mode × largest companion of the eccentricity vector — the panel\'s "Eccentricity Cycle (g-mode beat)" row), the period the K law rides; the device beat of its integer fractions is retired' };
       out[`${p}EccPhaseJ2000`] = { get: () => C.planets[p].eccentricityPhaseJ2000, render: (v) => Number(v).toFixed(2), unit: '°' };
       out[`${p}AscNodePeriod`] = { get: () => C.planets[p].ascendingNodePeriod, render: (v) => thousands(Math.round(v)), unit: 'yr' };
       out[`${p}AscNodeN`] = { get: () => Math.round(-8 * C.H / C.planets[p].ascendingNodePeriod), render: (v) => String(v) };

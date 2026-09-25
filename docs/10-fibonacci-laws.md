@@ -482,7 +482,7 @@ The half-power difference in Fibonacci divisor scaling (1/d vs 1/√d) and the s
 | Earth | In-phase | 3 | 1.539 × 10⁻⁵ |
 | Mars | In-phase | 5 | 4.379 × 10⁻⁵ |
 | Jupiter | In-phase | 5 | <!--v:jupiterEccWeightSci-->7.928 × 10⁻³<!--/v--> |
-| Uranus | In-phase | 21 | <!--v:uranusEccWeightSci-->5.705 × 10⁻³<!--/v--> |
+| Uranus | In-phase | 21 | <!--v:uranusEccWeightSci-->5.707 × 10⁻³<!--/v--> |
 | Neptune | In-phase | 34 | 1.734 × 10⁻³ |
 | Saturn | Anti-phase | 3 | 1.547 × 10⁻² |
 
@@ -493,7 +493,7 @@ The half-power difference in Fibonacci divisor scaling (1/d vs 1/√d) and the s
 Balance: 99.8636%
 ```
 
-Saturn alone carries the entire anti-phase contribution. The in-phase group is dominated by Jupiter (<!--v:jupiterEccWeightSci-->7.928 × 10⁻³<!--/v-->), Uranus (<!--v:uranusEccWeightSci-->5.705 × 10⁻³<!--/v-->), and Neptune (1.734 × 10⁻³), with the four inner planets contributing only 6.5 × 10⁻⁵ combined.
+Saturn alone carries the entire anti-phase contribution. The in-phase group is dominated by Jupiter (<!--v:jupiterEccWeightSci-->7.928 × 10⁻³<!--/v-->), Uranus (<!--v:uranusEccWeightSci-->5.707 × 10⁻³<!--/v-->), and Neptune (1.734 × 10⁻³), with the four inner planets contributing only 6.5 × 10⁻⁵ combined.
 
 ### Mirror Pair Decomposition
 

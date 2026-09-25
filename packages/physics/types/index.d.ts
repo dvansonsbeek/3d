@@ -15,6 +15,7 @@ export * as planetFibonacciLaws from "./planets/fibonacci-laws.cjs";
 export * as planetOrientation from "./planets/orientation.cjs";
 export { integrateAscendingNode } from "./planets/asc-node-integrator.cjs";
 export * as planetOrbitChain from "./planets/orbit-chain.cjs";
+export { computeSecularShape } from "./planets/secular-shape.cjs";
 export { createSecularSeriesOverride } from "./planets/secular-series.cjs";
 export { createDeepEccChannel } from "./moon/deep-ecc-channel.cjs";
 export { createDeepOrbitalHistory } from "./earth/deep-orbital-history.cjs";
@@ -70,7 +71,7 @@ export { computeEarthFrameOfDate, solveWheelAngleForLongitude } from "./earth/fr
 export { eccentricityFromCycles, computeEccentricityIntegrated } from "./planets/ecc-channel.cjs";
 export { buildPlanetChainsFromArtifactData, computePlanetElementsAtYear, computeHeliocentricEclipticFromElements, computePoissonArgRad, computeOsculatingElements, solveKeplerRad, computeApsidalSecularDegPerYr, ANCHOR_EPOCH_YEAR, ANCHOR_EPOCH_JD } from "./planets/keplerian-chain.cjs";
 export { computeEquatorNodeOriginSFrameDeg, convertNodeSFrameToEquatorOriginDeg } from "./planets/inv-plane-frame.cjs";
-export { computePlanetPrecessionConstant, createPlanetSpinChannel } from "./planets/spin-channel.cjs";
+export { computePlanetPrecessionConstant, createPlanetSpinChannel, createPlanetSpinChannelFromArtifacts, computeObliquityJ2000Deg } from "./planets/spin-channel.cjs";
 export { CHAIN_ARTIFACT, CHAIN_ARTIFACT_HASH } from "./planets/chain-artifact.js";
 export { DEEP_MODES_ARTIFACT, DEEP_MODES_ARTIFACT_HASH } from "./moon/deep-modes-artifact.cjs";
 export { createYearLengths, ONE_FAMILY_WINDOW_YEARS } from "./earth/year-lengths.cjs";

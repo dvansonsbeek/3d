@@ -11,7 +11,7 @@ import { Pane } from 'tweakpane';
 //
 // Generated at build time, not fetched at runtime — `holisticyearLength` is read
 // at module scope below, and Phase 15 requires offline === hosted.
-import { DEFAULT_CONSTANTS as K, REFERENCE_DATA as R, FITTED_COEFFICIENTS as FIT, CONSTANTS_HASH, COEFFICIENTS_HASH, MODEL_VERSION, PREPRINT_DOI, createEpochPrimitives, createPhaseMachinery, createMoonEccChannel, createDeepEccChannel, DEEP_MODES_ARTIFACT, createDeepOrbitalHistory, createYearLengths, createMoonMonthChain, createChainCycleIntegrator, createMoonArguments, createMoonSeries, createMoonApparent, derivePlanetGeometry, planetFibonacciLaws as _FL, computeEccentricityIntegrated, planetOrientation as _PO, planetOrbitChain as _POC, integrateAscendingNode, createDeltaTCycles, createDeepTimeLod, createMoonRecessionHistory, createSolarChannelBudget, deltaTEspenakMeeusCanonSeconds, evalClimateL1OrbitalPermil, createAlphaGiaChannel, computeSolarTorqueShare, createEclipseFinders, createSunLongitudeCorrection, createModel, buildPlanetChainsFromArtifactData, computePlanetElementsAtYear as kcComputePlanetElementsAtYear, computeApsidalSecularDegPerYr as kcApsidalSecularDegPerYr, computeHeliocentricEclipticFromElements as kcComputeHeliocentricEclipticFromElements, computeEquatorNodeOriginSFrameDeg, convertNodeSFrameToEquatorOriginDeg, createSecularSeriesOverride, CHAIN_ARTIFACT, ANCHOR_EPOCH_YEAR as KC_ANCHOR_EPOCH_YEAR, ANCHOR_EPOCH_JD as KC_ANCHOR_EPOCH_JD, computeEarthFrameOfDate, solveWheelAngleForLongitude } from '@essrt/physics';
+import { computeObliquityJ2000Deg, computeSecularShape, DEFAULT_CONSTANTS as K, REFERENCE_DATA as R, FITTED_COEFFICIENTS as FIT, CONSTANTS_HASH, COEFFICIENTS_HASH, MODEL_VERSION, PREPRINT_DOI, createEpochPrimitives, createPhaseMachinery, createMoonEccChannel, createDeepEccChannel, DEEP_MODES_ARTIFACT, createDeepOrbitalHistory, createYearLengths, createMoonMonthChain, createChainCycleIntegrator, createMoonArguments, createMoonSeries, createMoonApparent, derivePlanetGeometry, planetFibonacciLaws as _FL, computeEccentricityIntegrated, planetOrientation as _PO, planetOrbitChain as _POC, integrateAscendingNode, createDeltaTCycles, createDeepTimeLod, createMoonRecessionHistory, createSolarChannelBudget, deltaTEspenakMeeusCanonSeconds, evalClimateL1OrbitalPermil, createAlphaGiaChannel, computeSolarTorqueShare, createEclipseFinders, createSunLongitudeCorrection, createModel, buildPlanetChainsFromArtifactData, computePlanetElementsAtYear as kcComputePlanetElementsAtYear, computeApsidalSecularDegPerYr as kcApsidalSecularDegPerYr, computeHeliocentricEclipticFromElements as kcComputeHeliocentricEclipticFromElements, computeEquatorNodeOriginSFrameDeg, convertNodeSFrameToEquatorOriginDeg, createSecularSeriesOverride, CHAIN_ARTIFACT, ANCHOR_EPOCH_YEAR as KC_ANCHOR_EPOCH_YEAR, ANCHOR_EPOCH_JD as KC_ANCHOR_EPOCH_JD, computeEarthFrameOfDate, solveWheelAngleForLongitude } from '@essrt/physics';
 // K8 — the reference package: ONE-WAY imports (comparison only;
 // @essrt/reference is private-by-construction and nothing in the model
 // chain depends on it). publishedCurves migrated here from
@@ -304,11 +304,12 @@ const planets = {};
 const latticeYears = (frac) => (frac ? holisticyearLength * frac[0] / frac[1] : undefined);
 
 // Mercury
-// The derived members (perihelionEclipticYears, axialPrecessionYears,
-// obliquityCycle) deliberately stay as arithmetic. They encode the H-lattice
-// fractions the JSON stores as integer pairs — [8,11] is written here as
-// H/(1+3/8) = 8H/11 — so importing them would change the expression's form,
-// not merely its source. Phase 6 owns that.
+// The derived member perihelionEclipticYears deliberately stays as arithmetic.
+// It encodes the fraction the JSON stores as an integer pair — [8,11] is
+// written here as H/(1+3/8) = 8H/11 — so importing it would change the
+// expression's form, not merely its source. (The axial and obliquity-cycle
+// fractions retired with plan 06 Phase 7 commit 2: the planets' spin rides
+// the spin channel, @essrt/physics/planets/spin-channel.)
 planets.mercury = {
   // Astro references (astro-reference.json -> planetOrbitalElements.mercury)
   solarYearInput: K.planetOrbitalElements.mercury.solarYearInput,
@@ -323,8 +324,6 @@ planets.mercury = {
   // Model parameters (model-parameters.json -> planets.mercury)
   angleCorrection: K.planets.mercury.angleCorrection,
   perihelionEclipticYears: latticeYears(K.planets.mercury.perihelionEclipticFraction),
-  axialPrecessionYears: latticeYears(K.planets.mercury.axialPrecessionFraction),
-  obliquityCycle: latticeYears(K.planets.mercury.obliquityCycleFraction),
   startpos: K.planets.mercury.startpos,
   eocFraction: K.planets.mercury.eocFraction,
   perihelionRef_JD: K.perihelionPassageRef.mercury,
@@ -349,10 +348,6 @@ planets.venus = {
   // Model parameters (model-parameters.json -> planets.venus)
   angleCorrection: K.planets.venus.angleCorrection,
   perihelionEclipticYears: latticeYears(K.planets.venus.perihelionEclipticFraction),
-  axialPrecessionYears: latticeYears(K.planets.venus.axialPrecessionFraction),
-  // obliquityCycle derived below from |ICRF| (tidally damped) — the JSON pair is
-  // null and the key stays ABSENT here, not undefined; downstream code tests for
-  // its presence.
   startpos: K.planets.venus.startpos,
   eocFraction: K.planets.venus.eocFraction,
   perihelionRef_JD: K.perihelionPassageRef.venus,
@@ -377,8 +372,6 @@ planets.mars = {
   // Model parameters (model-parameters.json -> planets.mars)
   angleCorrection: K.planets.mars.angleCorrection,
   perihelionEclipticYears: latticeYears(K.planets.mars.perihelionEclipticFraction),
-  axialPrecessionYears: latticeYears(K.planets.mars.axialPrecessionFraction),
-  obliquityCycle: latticeYears(K.planets.mars.obliquityCycleFraction),
   startpos: K.planets.mars.startpos,
   eocFraction: K.planets.mars.eocFraction,
   perihelionRef_JD: K.perihelionPassageRef.mars,
@@ -403,8 +396,6 @@ planets.jupiter = {
   // Model parameters (model-parameters.json -> planets.jupiter)
   angleCorrection: K.planets.jupiter.angleCorrection,
   perihelionEclipticYears: latticeYears(K.planets.jupiter.perihelionEclipticFraction),
-  axialPrecessionYears: latticeYears(K.planets.jupiter.axialPrecessionFraction),
-  obliquityCycle: latticeYears(K.planets.jupiter.obliquityCycleFraction),
   startpos: K.planets.jupiter.startpos,
   eocFraction: K.planets.jupiter.eocFraction,
   perihelionRef_JD: K.perihelionPassageRef.jupiter,
@@ -429,8 +420,6 @@ planets.saturn = {
   // Model parameters (model-parameters.json -> planets.saturn)
   angleCorrection: K.planets.saturn.angleCorrection,
   perihelionEclipticYears: latticeYears(K.planets.saturn.perihelionEclipticFraction),
-  axialPrecessionYears: latticeYears(K.planets.saturn.axialPrecessionFraction),
-  obliquityCycle: latticeYears(K.planets.saturn.obliquityCycleFraction),
   startpos: K.planets.saturn.startpos,
   eocFraction: K.planets.saturn.eocFraction,
   perihelionRef_JD: K.perihelionPassageRef.saturn,
@@ -455,8 +444,6 @@ planets.uranus = {
   // Model parameters (model-parameters.json -> planets.uranus)
   angleCorrection: K.planets.uranus.angleCorrection,
   perihelionEclipticYears: latticeYears(K.planets.uranus.perihelionEclipticFraction),
-  axialPrecessionYears: latticeYears(K.planets.uranus.axialPrecessionFraction),
-  obliquityCycle: latticeYears(K.planets.uranus.obliquityCycleFraction),
   startpos: K.planets.uranus.startpos,
   eocFraction: K.planets.uranus.eocFraction,
   perihelionRef_JD: K.perihelionPassageRef.uranus,
@@ -481,9 +468,6 @@ planets.neptune = {
   // Model parameters (model-parameters.json -> planets.neptune)
   angleCorrection: K.planets.neptune.angleCorrection,
   perihelionEclipticYears: latticeYears(K.planets.neptune.perihelionEclipticFraction),
-  axialPrecessionYears: latticeYears(K.planets.neptune.axialPrecessionFraction),
-  // obliquityCycle derived below from |ICRF| (tidally damped) — JSON pair is
-  // null; key stays ABSENT, as for Venus.
   startpos: K.planets.neptune.startpos,
   eocFraction: K.planets.neptune.eocFraction,
   perihelionRef_JD: K.perihelionPassageRef.neptune,
@@ -1489,82 +1473,48 @@ for (const key of ['mercury','venus','mars','jupiter','saturn','uranus','neptune
 // Phase 8.3 L2: the wobble law lives ONCE in @essrt/physics (this delegate
 // reads the LIVE holisticyearLength, so recomputePlanetCyclesForEpoch keeps
 // its epoch semantics; the sign-free beat convention is in the module).
-function calcWobblePeriod(periEclYr, axialYr) {
-  return _FL.computeWobblePeriodYears(periEclYr, axialYr, holisticyearLength);
+// Plan 06 Phase 7 commit 2: the K eccentricity law's cycle period is the
+// chain's OWN g-mode beat — the dominant mode × largest companion of the
+// planet's eccentricity vector (keplerian-chain computeSecularShape, the
+// panel's "Eccentricity Cycle (g-mode beat)" row; ONE home, both scene twins).
+// The device's beat of its integer axial and obliquity fractions is retired.
+// A constant: the g-modes scale only with the solar mass (Driver 2), so the
+// epoch recompute leaves these alone.
+function calcWobblePeriod(planetKey) {
+  return computeSecularShape(CHAIN_ARTIFACT, planetKey).beatYears;
 }
-let   mercuryWobblePeriod  = calcWobblePeriod(planets.mercury.perihelionEclipticYears, planets.mercury.axialPrecessionYears);  // Phase 5: mutable
-let   venusWobblePeriod    = calcWobblePeriod(planets.venus.perihelionEclipticYears,   planets.venus.axialPrecessionYears);    // Phase 5: mutable
-let   marsWobblePeriod     = calcWobblePeriod(planets.mars.perihelionEclipticYears,    planets.mars.axialPrecessionYears);     // Phase 5: mutable
-let   jupiterWobblePeriod  = calcWobblePeriod(planets.jupiter.perihelionEclipticYears, planets.jupiter.axialPrecessionYears);  // Phase 5: mutable
-let   saturnWobblePeriod   = calcWobblePeriod(planets.saturn.perihelionEclipticYears,  planets.saturn.axialPrecessionYears);   // Phase 5: mutable
-let   uranusWobblePeriod   = calcWobblePeriod(planets.uranus.perihelionEclipticYears,  planets.uranus.axialPrecessionYears);   // Phase 5: mutable
-let   neptuneWobblePeriod  = calcWobblePeriod(planets.neptune.perihelionEclipticYears, planets.neptune.axialPrecessionYears);  // Phase 5: mutable
+const mercuryWobblePeriod  = calcWobblePeriod('mercury');
+const venusWobblePeriod    = calcWobblePeriod('venus');
+const marsWobblePeriod     = calcWobblePeriod('mars');
+const jupiterWobblePeriod  = calcWobblePeriod('jupiter');
+const saturnWobblePeriod   = calcWobblePeriod('saturn');
+const uranusWobblePeriod   = calcWobblePeriod('uranus');
+const neptuneWobblePeriod  = calcWobblePeriod('neptune');
 
-// Obliquity Cycle (predicted)
-// Theory: perihelion ecliptic rate = obliquity rate + ecliptic rate (Fibonacci decomposition).
-// The perihelion rate numerator N decomposes as N = A + B (Fibonacci sum).
-// Obliquity = |inclination − ecliptic| where inclination ≈ perihelion ecliptic.
-// Confirmed for Mercury (0.2%), Earth (2%), Mars (0.7%).
-// Venus/Neptune: obliquity cycle = ICRF period (8H/100). The two-component formula cancels exactly:
-// mean − A·cos(ω_ICRF·t) + A·cos(ω_obliq·t) = mean when ω_obliq = ω_ICRF → constant obliquity.
-// Aliases: source of truth is planets.<key>.obliquityCycle (declared in the
-// planet blocks above). Kept as named constants for compact downstream use.
-let   mercuryObliquityCycle = planets.mercury.obliquityCycle;   // 8H/3 = 894,179 yr (Bills 2005 ~895 kyr, 0.2% match) — Phase 5: mutable
-let   venusObliquityCycle   = _FL.resolveObliquityCycleYears(undefined, planets.venus.perihelionEclipticYears, holisticyearLength);   // = |ICRF| (tidally damped, cancels) — Phase 5: mutable
-let   marsObliquityCycle    = planets.mars.obliquityCycle;       // 8H/21 = 127,740 yr — Phase 5: mutable
-let   jupiterObliquityCycle = planets.jupiter.obliquityCycle;    // H/2 = 167,659 yr — Phase 5: mutable
-let   saturnObliquityCycle  = planets.saturn.obliquityCycle;     // H/3 = 111,765 yr — Phase 5: mutable
-let   uranusObliquityCycle  = planets.uranus.obliquityCycle;     // H/2 = 167,659 yr — Phase 5: mutable
-let   neptuneObliquityCycle = _FL.resolveObliquityCycleYears(undefined, planets.neptune.perihelionEclipticYears, holisticyearLength);  // = |ICRF| (tidally damped, cancels) — Phase 5: mutable
-
-// Mean obliquity (analytical, averaged over 8H = Solar System Resonance Cycle)
-// mean = tiltJ2000 + amp×cos(ωᵢ·t₂₀₀₀) − amp×cos(ωₒ·t₂₀₀₀)
-function calcObliquityMean(planetKey, obliqCycle) {
-  if (!obliqCycle) return planets[planetKey].axialTiltJ2000;
-  const p = planets[planetKey];
-  const amp = p.invPlaneInclinationAmplitude;
-
-  // Phase 8: integrated phase from J2000-fixed eccentricity anchor to year
-  // 2000, using J2000-fixed ICRF + obliquity cycle periods. Frame-independent.
-  //
-  // TDZ guard via try/catch: at module load (lines 3654-3660) the Phase 8
-  // anchors in the deep-time block (~line 4400) don't exist yet. Accessing
-  // a `const` in TDZ throws ReferenceError — we catch and fall back to the
-  // snapshot path, which at module load uses J2000 values for all live
-  // globals (same answer as integrated would give).
-  try {
-    // Phase 8 integrated path — touches Phase 8 anchors (may throw TDZ at load)
-    const periJ2000 = PERIHELION_ECLIPTIC_YEARS_J2000[planetKey] ?? p.perihelionEclipticYears;
-    const icrfPeriod_J2000 = 1 / (1 / periJ2000 - 13 / HOLISTIC_YEAR_J2000);
-    const obliqCycle_J2000 = OBLIQUITY_CYCLE_J2000[planetKey] !== null
-      ? OBLIQUITY_CYCLE_J2000[planetKey]
-      : Math.abs(1 / (1 / periJ2000 - 13 / HOLISTIC_YEAR_J2000));
-    const N_icrf  = HOLISTIC_YEAR_J2000 / Math.abs(icrfPeriod_J2000);
-    const N_obliq = HOLISTIC_YEAR_J2000 / Math.abs(obliqCycle_J2000);
-    const cyc_icrf  = cyclesBetweenYears(ECCENTRICITY_ANCHOR_J2000_FIXED, 2000, N_icrf)  ?? 0;
-    const cyc_obliq = cyclesBetweenYears(ECCENTRICITY_ANCHOR_J2000_FIXED, 2000, N_obliq) ?? 0;
-    return p.axialTiltJ2000 + amp * Math.cos(2 * Math.PI * cyc_icrf)
-                            - amp * Math.cos(2 * Math.PI * cyc_obliq);
-  } catch (e) {
-    // Module-load fallback (TDZ) — snapshot law from @essrt/physics (8.3 L2),
-    // live J2000 globals for H and the eccentricity anchor.
-    return _FL.computeObliquityMeanSnapshot({
-      axialTiltJ2000: p.axialTiltJ2000,
-      invPlaneInclinationAmplitude: amp,
-      perihelionEclipticYears: p.perihelionEclipticYears,
-    }, obliqCycle, {
-      H: holisticyearLength,
-      t2000: 2000 - (balancedYear - systemResetN * holisticyearLength),
-    });
-  }
+// The K eccentricity law's obliquity input (Plan 06 Phase 7 commit 2): the
+// spin channel's DERIVED J2000 obliquity — the IAU pole against the chain's
+// J2000 plane (spin-channel computeObliquityJ2000Deg, no mode table, no
+// integration) — in the acute form the law reads (sin|ε|; Venus 2.6°,
+// Uranus 82.2°). The device's snapshot "mean obliquity" on its retired
+// obliquity-cycle fraction and the *ObliquityCycle aliases are gone; the
+// planets' obliquity OF DATE is computePlanetObliquity (the channel).
+function calcObliquityMean(planetKey) {
+  const A = CHAIN_ARTIFACT.j2000AnchorElements[planetKey];
+  const eps = computeObliquityJ2000Deg({
+    spin: K.planetSpinPhysical[planetKey],
+    anchorInclEclipticDeg: A.inclEclipticDeg,
+    anchorAscNodeEclipticDeg: A.ascNodeEclipticDeg,
+    obliquityJ2000Deg: K.earthOrbital.obliquityJ2000_deg,
+  });
+  return Math.min(eps, 180 - eps);
 }
-let   mercuryObliquityMean = calcObliquityMean('mercury', mercuryObliquityCycle);  // Phase 5: mutable
-let   venusObliquityMean   = calcObliquityMean('venus',   venusObliquityCycle);    // Phase 5: mutable
-let   marsObliquityMean    = calcObliquityMean('mars',    marsObliquityCycle);     // Phase 5: mutable
-let   jupiterObliquityMean = calcObliquityMean('jupiter', jupiterObliquityCycle);  // Phase 5: mutable
-let   saturnObliquityMean  = calcObliquityMean('saturn',  saturnObliquityCycle);   // Phase 5: mutable
-let   uranusObliquityMean  = calcObliquityMean('uranus',  uranusObliquityCycle);   // Phase 5: mutable
-let   neptuneObliquityMean = calcObliquityMean('neptune', neptuneObliquityCycle);  // Phase 5: mutable
+const mercuryObliquityMean = calcObliquityMean('mercury');
+const venusObliquityMean   = calcObliquityMean('venus');
+const marsObliquityMean    = calcObliquityMean('mars');
+const jupiterObliquityMean = calcObliquityMean('jupiter');
+const saturnObliquityMean  = calcObliquityMean('saturn');
+const uranusObliquityMean  = calcObliquityMean('uranus');
+const neptuneObliquityMean = calcObliquityMean('neptune');
 
 // K-derived eccentricity parameters
 // K = e_amp_Earth × √m_Earth / (sin(meanObliquity) × √d_Earth) — universal eccentricity amplitude constant
@@ -2606,13 +2556,14 @@ const SATURN_PERIOD_J2000_S  = planets.saturn.solarYearInput  * 86400;
 const URANUS_PERIOD_J2000_S  = planets.uranus.solarYearInput  * 86400;
 const NEPTUNE_PERIOD_J2000_S = planets.neptune.solarYearInput * 86400;
 
-// Per-planet cycle-period anchors (frozen at module load — Phase 5 will mutate
-// the live `planets[k].perihelionEclipticYears`, `planets[k].axialPrecessionYears`,
-// `planets[k].obliquityCycle` at deep time so the scene-graph + cached helpers
-// can re-derive correctly. The mean*AtAge() functions are H-driven and do NOT
-// read these snapshots, but having them as `const` makes recompute trivial:
-//   period(t) = period_J2000 × (H_t / H_J2000)
-// because every planet cycle is structurally 8H/N (or H/N), N invariant.
+// Per-planet cycle-period anchors (frozen at module load — Phase 5 mutates
+// the live `planets[k].perihelionEclipticYears` at deep time so the scene-graph
+// + cached helpers can re-derive correctly. The mean*AtAge() functions are
+// H-driven and do NOT read these snapshots, but having them as `const` makes
+// recompute trivial: period(t) = period_J2000 × (H_t / H_J2000).
+// Plan 06 Phase 7 commit 2: the axial and obliquity-cycle anchors are GONE —
+// the planets' spin rides the spin channel and the K eccentricity law's period
+// is the chain's g-mode beat (both constant in the epoch recompute).
 const PLANET_KEYS = ['mercury','venus','mars','jupiter','saturn','uranus','neptune'];
 const PERIHELION_ECLIPTIC_YEARS_J2000 = {
   mercury: planets.mercury.perihelionEclipticYears,   // = +8H/11
@@ -2622,27 +2573,6 @@ const PERIHELION_ECLIPTIC_YEARS_J2000 = {
   saturn:  planets.saturn.perihelionEclipticYears,    // = -8H/65 (retro)
   uranus:  planets.uranus.perihelionEclipticYears,    // = +H/3 = 8H/24
   neptune: planets.neptune.perihelionEclipticYears,   // = +2H  = 8H/4
-};
-const AXIAL_PRECESSION_YEARS_J2000 = {
-  mercury: planets.mercury.axialPrecessionYears,      // = -8H/9
-  venus:   planets.venus.axialPrecessionYears,        // = +8H/91
-  mars:    planets.mars.axialPrecessionYears,         // = -H/2
-  jupiter: planets.jupiter.axialPrecessionYears,      // = -8H/21
-  saturn:  planets.saturn.axialPrecessionYears,       // = -4H/3
-  uranus:  planets.uranus.axialPrecessionYears,       // = +610H
-  neptune: planets.neptune.axialPrecessionYears,      // = -68H
-};
-// Venus + Neptune: obliquityCycle is derived inline from peri + H (tidally
-// damped → cycle = |ICRF|). For those, store `null` and re-derive in the
-// recompute function. The other 5 are direct 8H/N anchors.
-const OBLIQUITY_CYCLE_J2000 = {
-  mercury: planets.mercury.obliquityCycle,            // = +8H/3
-  venus:   null,
-  mars:    planets.mars.obliquityCycle,               // = +8H/21
-  jupiter: planets.jupiter.obliquityCycle,            // = +H/2  = 8H/16
-  saturn:  planets.saturn.obliquityCycle,             // = +H/3  = 8H/24
-  uranus:  planets.uranus.obliquityCycle,             // = +H/2  = 8H/16
-  neptune: null,
 };
 // Lunar precession period anchors at J2000 — pre-computed once so the
 // per-call functions don't re-evaluate them every frame.
@@ -5141,49 +5071,27 @@ const ECCENTRICITY_ANCHOR_J2000_FIXED = BALANCED_YEAR_J2000_FIXED - systemResetN
 // `calcObliquityMean` as the J2000-fixed reference for ICRF + obliquity
 // cycle phase advance.
 
-// Per-planet eccentricity wobble anchors. The wobble cycle period is
-// |1/axial - 1/perihelion|^-1 (calcWobblePeriod), which equals H × kw for
-// some structural constant kw. The anchor year is computed once from the
-// J2000 wobble period and the planet's eccentricityPhaseJ2000.
-// NB: planets.X.eccentricityPhaseJ2000 may not exist for all planets — fall
-// back to a sensible default if missing.
-function _wobbleDivisorFor(periEcliptic, axial) {
-  // Wobble = beat of axial precession and ICRF perihelion precession (NOT
-  // ecliptic perihelion). For each planet this evaluates to a clean 8H/N
-  // integer divisor: Mercury 8H/84, Venus 8H/19, Mars 8H/52, Jupiter 8H/44,
-  // Saturn 8H/163, Uranus 8H/80, Neptune 8H/100. Matches calcWobblePeriod
-  // at line ~3625 (which is used in the eccentricity base/amp derivation at
-  // line ~3727-3738) — these must agree so the runtime phase advance is
-  // consistent with the J2000 calibration anchor.
-  //
-  // History (2026-06-16): previously used axial-vs-ECLIPTIC perihelion beat
-  // here while the calibration path used axial-vs-ICRF beat (calcWobblePeriod).
-  // The mismatch produced wobble periods up to 42× different, causing the
-  // runtime eccentricity to drift in phase relative to the calibration anchor
-  // at any year ≠ J2000. Surfaced by the (since removed) 8H configuration check.
-  // See docs/archive/old-documents/eccentricity-wobble-formula-analysis.md.
-  const H13 = HOLISTIC_YEAR_J2000 / 13;
-  const inclICRF = (periEcliptic * H13) / (H13 - periEcliptic);
-  // Special case: very-long axial period (tidally damped) — wobble approaches
-  // |inclICRF| directly. Same convention as calcWobblePeriod.
-  if (Math.abs(axial) > 8 * HOLISTIC_YEAR_J2000) return HOLISTIC_YEAR_J2000 / Math.abs(inclICRF);
-  const P = 1 / Math.abs(1 / Math.abs(axial) - 1 / Math.abs(inclICRF));
-  return HOLISTIC_YEAR_J2000 / P;   // divisor_N
-}
-
+// Per-planet eccentricity wobble anchors. Plan 06 Phase 7 commit 2: the
+// wobble cycle period is the chain's OWN g-mode beat (calcWobblePeriod → the
+// *WobblePeriod constants; the device's beat of its integer axial and
+// obliquity fractions is retired). The anchor year is computed once from the
+// J2000 period and the planet's eccentricityPhaseJ2000; the "divisor" the
+// wobble wheels' cycle counters carry is H/P of that period — a counter
+// convention for the scaffolding wheels, not a structural claim.
 const _planetEccAnchors_J2000   = {};     // year-anchor per planet (FIXED) — for computeEccentricityEarth (formula path; cos symmetric, sign of phase doesn't matter)
 const _planetSceneAnchors_J2000 = {};     // year-anchor per planet for SCENE rendering (Phase 9.12 Option B) — sign flipped vs formula anchor to match scene-graph snapshot convention θ_scene(J2000) = -phaseJ2000
-const _planetWobbleDivisors     = {};     // structural divisor N per planet
-const _planetWobblePeriodJ2000  = {};     // wobble period at J2000 (FIXED, years)
+const _planetWobbleDivisors     = {};     // the wheel counters' H/P per planet
+const _planetWobblePeriodJ2000  = {};     // wobble period at J2000 (FIXED, years) — the g-mode beat
+const _WOBBLE_PERIOD_BY_KEY = {
+  mercury: mercuryWobblePeriod, venus: venusWobblePeriod, mars: marsWobblePeriod, jupiter: jupiterWobblePeriod,
+  saturn: saturnWobblePeriod, uranus: uranusWobblePeriod, neptune: neptuneWobblePeriod,
+};
 for (const k of PLANET_KEYS) {
-  const peri_J2000  = PERIHELION_ECLIPTIC_YEARS_J2000[k];
-  const axial_J2000 = AXIAL_PRECESSION_YEARS_J2000[k];
-  const N_wobble    = _wobbleDivisorFor(peri_J2000, axial_J2000);
-  const P_wobble_J2000 = HOLISTIC_YEAR_J2000 / N_wobble;
+  const P_wobble_J2000 = _WOBBLE_PERIOD_BY_KEY[k];
   const phaseJ2000  = planets[k].eccentricityPhaseJ2000 ?? 0;
   _planetEccAnchors_J2000[k]   = 2000 - (phaseJ2000 / 360) * P_wobble_J2000;
   _planetSceneAnchors_J2000[k] = 2000 + (phaseJ2000 / 360) * P_wobble_J2000;
-  _planetWobbleDivisors[k]     = N_wobble;
+  _planetWobbleDivisors[k]     = HOLISTIC_YEAR_J2000 / P_wobble_J2000;
   _planetWobblePeriodJ2000[k]  = P_wobble_J2000;
 }
 
@@ -5412,11 +5320,9 @@ function recomputeMoonAndAuForEpoch(t_Ma) {
 // a structural integer N. The integers stay invariant; absolute periods scale
 // as `period(t) = period_J2000 × (H_t / H_J2000)`. This function mutates:
 //   • planets[k].perihelionEclipticYears   (element 1)
-//   • planets[k].axialPrecessionYears      (element 3)
-//   • planets[k].obliquityCycle            (element 4 — explicit 8H/N anchors only)
-//   • *WobblePeriod                        (element 6 — eccentricity cycle, derived from peri+axial)
-//   • *ObliquityCycle                      (element 4 — cached alias + Venus/Neptune ICRF-derived)
-//   • *ObliquityMean                       (the mean tilt evaluated at the current epoch)
+// (Plan 06 Phase 7 commit 2: the axial and obliquity-cycle elements, the
+// device wobble periods and the obliquity means no longer live here — the
+// spin channel and the chain's g-mode beat are constants of the artifacts.)
 //
 // Elements 2 (perihelion ICRF) and 5 (ascending-node inv-plane) are derived
 // quantities that AUTO-update because their formulas reference the mutated
@@ -5435,42 +5341,15 @@ function recomputePlanetCyclesForEpoch(t_Ma) {
   const r = H_t / HOLISTIC_YEAR_J2000;
 
   // Mutate the planets.X.* config fields. Downstream code that reads from
-  // planets.X.perihelionEclipticYears etc. will see the epoch-correct value.
+  // planets.X.perihelionEclipticYears will see the epoch-correct value.
+  // Plan 06 Phase 7 commit 2: the axial and obliquity-cycle fields are gone
+  // (the spin channel carries the planets' spin); the K law's cycle period
+  // (the chain's g-mode beat) and obliquity input (the derived J2000
+  // obliquity) are constants here — the g-modes scale only with the solar
+  // mass (Driver 2), not with H.
   for (const k of PLANET_KEYS) {
     planets[k].perihelionEclipticYears = PERIHELION_ECLIPTIC_YEARS_J2000[k] * r;
-    planets[k].axialPrecessionYears    = AXIAL_PRECESSION_YEARS_J2000[k]    * r;
-    if (OBLIQUITY_CYCLE_J2000[k] !== null) {
-      planets[k].obliquityCycle        = OBLIQUITY_CYCLE_J2000[k] * r;
-    }
-    // Venus + Neptune: obliquityCycle is derived; left untouched on config,
-    // the cached *ObliquityCycle helper is re-evaluated below from the
-    // already-mutated peri + live H.
   }
-
-  // Re-derive the 7 cached helpers from the now-mutated planets.X.* values.
-  mercuryWobblePeriod  = calcWobblePeriod(planets.mercury.perihelionEclipticYears, planets.mercury.axialPrecessionYears);
-  venusWobblePeriod    = calcWobblePeriod(planets.venus.perihelionEclipticYears,   planets.venus.axialPrecessionYears);
-  marsWobblePeriod     = calcWobblePeriod(planets.mars.perihelionEclipticYears,    planets.mars.axialPrecessionYears);
-  jupiterWobblePeriod  = calcWobblePeriod(planets.jupiter.perihelionEclipticYears, planets.jupiter.axialPrecessionYears);
-  saturnWobblePeriod   = calcWobblePeriod(planets.saturn.perihelionEclipticYears,  planets.saturn.axialPrecessionYears);
-  uranusWobblePeriod   = calcWobblePeriod(planets.uranus.perihelionEclipticYears,  planets.uranus.axialPrecessionYears);
-  neptuneWobblePeriod  = calcWobblePeriod(planets.neptune.perihelionEclipticYears, planets.neptune.axialPrecessionYears);
-
-  mercuryObliquityCycle = planets.mercury.obliquityCycle;
-  venusObliquityCycle   = Math.abs(1 / (1 / planets.venus.perihelionEclipticYears - 13 / holisticyearLength));
-  marsObliquityCycle    = planets.mars.obliquityCycle;
-  jupiterObliquityCycle = planets.jupiter.obliquityCycle;
-  saturnObliquityCycle  = planets.saturn.obliquityCycle;
-  uranusObliquityCycle  = planets.uranus.obliquityCycle;
-  neptuneObliquityCycle = Math.abs(1 / (1 / planets.neptune.perihelionEclipticYears - 13 / holisticyearLength));
-
-  mercuryObliquityMean = calcObliquityMean('mercury', mercuryObliquityCycle);
-  venusObliquityMean   = calcObliquityMean('venus',   venusObliquityCycle);
-  marsObliquityMean    = calcObliquityMean('mars',    marsObliquityCycle);
-  jupiterObliquityMean = calcObliquityMean('jupiter', jupiterObliquityCycle);
-  saturnObliquityMean  = calcObliquityMean('saturn',  saturnObliquityCycle);
-  uranusObliquityMean  = calcObliquityMean('uranus',  uranusObliquityCycle);
-  neptuneObliquityMean = calcObliquityMean('neptune', neptuneObliquityCycle);
 
   // (The predictive-formula feature-template cache that was invalidated here
   // left with the planet predict device — plan 06 R8.)
@@ -44363,7 +44242,7 @@ function loadTexture( url, onLoad ) {
 
 // Historical model predictions frozen at first access (J2000 state). The formula
 // reads deep-time-mutable globals (holisticyearLength, planets.X.perihelionEclipticYears,
-// mercuryObliquityCycle, etc.), so re-evaluating at runtime after setEpoch would
+// etc.), so re-evaluating at runtime after setEpoch would
 // give the epoch-shifted value instead of "what the model predicts at year 1900."
 //
 // Lazy memoization (rather than module-load `const`): the function chain needs
@@ -45365,9 +45244,6 @@ const planetStats = {
        constant: true},
       'null_row',
     null,
-      {label : () => `Axial tilt (dynamic obliquity)`,
-       value : [ { v: () => o.mercuryObliquity, dec:6, sep:',' },{ small: 'degrees (°)' }],
-       hover : [`Dynamic obliquity oscillating with period ${fmtNum(mercuryObliquityCycle, 0, ',')} years (the device law’s period; observed ~895 kyr, 0.2 % apart). Amplitude: ±${planets.mercury.invPlaneInclinationAmplitude.toFixed(4)}°. Mean: ${mercuryObliquityMean.toFixed(4)}°. J2000 value: ${planets.mercury.axialTiltJ2000}°`]},
       {label : () => `Orbital Eccentricity (e)`,
        value : [ { v: () => _kcElementsOfDate('mercury', o.julianDay).e, dec:8, sep:',' },{ small: 'dimensionless' }],
        hover : [`The chain's eccentricity of date — |z| of the element set the scene renders (secular modes + derived periodic terms)`]},
@@ -45678,9 +45554,6 @@ const planetStats = {
        constant: true},
       'null_row',
     null,
-      {label : () => `Axial tilt (dynamic obliquity)`,
-       value : [ { v: () => o.venusObliquity, dec:6, sep:',' },{ small: 'degrees (°)' }],
-       hover : [`Venus obliquity cycle = the ICRF perihelion period (tidally damped): the two-component formula cancels exactly, producing constant obliquity. Mean: ${venusObliquityMean.toFixed(4)}°. Apparent tilt 177.36° due to retrograde spin`]},
       {label : () => `Orbital Eccentricity (e)`,
        value : [ { v: () => _kcElementsOfDate('venus', o.julianDay).e, dec:8, sep:',' },{ small: 'dimensionless' }],
        hover : [`The chain's eccentricity of date — |z| of the element set the scene renders (secular modes + derived periodic terms)`]},
@@ -45994,9 +45867,6 @@ const planetStats = {
        hover : [`Phobos and Deimos — two small irregular moons, likely captured asteroids`],
        static: true},
     null,
-      {label : () => `Axial tilt (dynamic obliquity)`,
-       value : [ { v: () => o.marsObliquity, dec:6, sep:',' },{ small: 'degrees (°)' }],
-       hover : [`Dynamic obliquity oscillating with period ${fmtNum(marsObliquityCycle, 0, ',')} years (the device law’s period; observed ~124,800 yr, 2.4 % apart). Amplitude: ±${planets.mars.invPlaneInclinationAmplitude.toFixed(4)}°. Mean: ${marsObliquityMean.toFixed(4)}°. J2000 value: ${planets.mars.axialTiltJ2000}°. Similar to Earth's tilt (25.19° vs 23.4°)`]},
       {label : () => `Orbital Eccentricity (e)`,
        value : [ { v: () => _kcElementsOfDate('mars', o.julianDay).e, dec:8, sep:',' },{ small: 'dimensionless' }],
        hover : [`The chain's eccentricity of date — |z| of the element set the scene renders (secular modes + derived periodic terms)`]},
@@ -46314,9 +46184,6 @@ const planetStats = {
        hover : [`95 known moons including the four Galilean moons: Io, Europa, Ganymede, and Callisto`],
        static: true},
     null,
-      {label : () => `Axial tilt (dynamic obliquity)`,
-       value : [ { v: () => o.jupiterObliquity, dec:6, sep:',' },{ small: 'degrees (°)' }],
-       hover : [`Device obliquity oscillation: the displayed tilt of date rides the device law at ${fmtNum(jupiterObliquityCycle, 0, ',')} years (an era-typed device descriptor; the former integer-decomposition obliquity PREDICTION is retired, doc 109 §9, and Jupiter has no published observed cycle to compare). Amplitude: ±${planets.jupiter.invPlaneInclinationAmplitude.toFixed(4)}°. Mean: ${jupiterObliquityMean.toFixed(4)}°. J2000 value: ${planets.jupiter.axialTiltJ2000}°`]},
       {label : () => `Orbital Eccentricity (e)`,
        value : [ { v: () => _kcElementsOfDate('jupiter', o.julianDay).e, dec:8, sep:',' },{ small: 'dimensionless' }],
        hover : [`The chain's eccentricity of date — |z| of the element set the scene renders (secular modes + derived periodic terms)`]},
@@ -46629,9 +46496,6 @@ const planetStats = {
        hover : [`274 known moons including Titan (second largest moon) and Enceladus (subsurface ocean)`],
        static: true},
     null,
-      {label : () => `Axial tilt (dynamic obliquity)`,
-       value : [ { v: () => o.saturnObliquity, dec:6, sep:',' },{ small: 'degrees (°)' }],
-       hover : [`Device obliquity oscillation: the displayed tilt of date rides the device law at ${fmtNum(saturnObliquityCycle, 0, ',')} years (an era-typed device descriptor; the former integer-decomposition obliquity PREDICTION and the mirror-pair/balance framing are retired, doc 109 §9, and Saturn has no published observed cycle to compare). Amplitude: ±${planets.saturn.invPlaneInclinationAmplitude.toFixed(4)}°. Mean: ${saturnObliquityMean.toFixed(4)}°. J2000 value: ${planets.saturn.axialTiltJ2000}°. The device runs anti-phase (maximum at the balanced year)`]},
       {label : () => `Orbital Eccentricity (e)`,
        value : [ { v: () => _kcElementsOfDate('saturn', o.julianDay).e, dec:8, sep:',' },{ small: 'dimensionless' }],
        hover : [`The chain's eccentricity of date — |z| of the element set the scene renders (secular modes + derived periodic terms)`]},
@@ -46945,9 +46809,6 @@ const planetStats = {
        hover : [`28 known moons, all named after characters from Shakespeare and Alexander Pope`],
        static: true},
     null,
-      {label : () => `Axial tilt (dynamic obliquity)`,
-       value : [ { v: () => o.uranusObliquity, dec:6, sep:',' },{ small: 'degrees (°)' }],
-       hover : [`Device obliquity oscillation: the displayed tilt of date rides the device law at ${fmtNum(uranusObliquityCycle, 0, ',')} years (an era-typed device descriptor; the former integer-decomposition obliquity PREDICTION is retired, doc 109 §9, and Uranus has no published observed cycle to compare). Amplitude: ±${planets.uranus.invPlaneInclinationAmplitude.toFixed(4)}°. Mean: ${uranusObliquityMean.toFixed(4)}°. J2000 value: ${planets.uranus.axialTiltJ2000}°. Uranus rolls on its side (82.23°)`]},
       {label : () => `Orbital Eccentricity (e)`,
        value : [ { v: () => _kcElementsOfDate('uranus', o.julianDay).e, dec:8, sep:',' },{ small: 'dimensionless' }],
        hover : [`The chain's eccentricity of date — |z| of the element set the scene renders (secular modes + derived periodic terms)`]},
@@ -47261,9 +47122,6 @@ const planetStats = {
        hover : [`16 known moons including Triton — a captured Kuiper belt object with retrograde orbit`],
        static: true},
     null,
-      {label : () => `Axial tilt (dynamic obliquity)`,
-       value : [ { v: () => o.neptuneObliquity, dec:6, sep:',' },{ small: 'degrees (°)' }],
-       hover : [`Neptune obliquity cycle = the ICRF perihelion period (tidally damped): the two-component formula cancels exactly, producing constant obliquity. Mean: ${neptuneObliquityMean.toFixed(4)}°. Similar to Earth and Saturn`]},
       {label : () => `Orbital Eccentricity (e)`,
        value : [ { v: () => _kcElementsOfDate('neptune', o.julianDay).e, dec:8, sep:',' },{ small: 'dimensionless' }],
        hover : [`The chain's eccentricity of date — |z| of the element set the scene renders (secular modes + derived periodic terms)`]},
@@ -53599,14 +53457,22 @@ function updateDynamicInclinations() {
   o.erosInvPlaneInclinationDynamic = computePlanetInvPlaneInclinationDynamic('eros', o.currentYear);
   o.ceresInvPlaneInclinationDynamic = computePlanetInvPlaneInclinationDynamic('ceres', o.currentYear);
 
-  // Dynamic obliquity (axial tilt) for all planets — anchored to J2000 observed values
-  o.mercuryObliquity = computePlanetObliquity('mercury', o.currentYear);
-  o.venusObliquity = computePlanetObliquity('venus', o.currentYear);
-  o.marsObliquity = computePlanetObliquity('mars', o.currentYear);
-  o.jupiterObliquity = computePlanetObliquity('jupiter', o.currentYear);
-  o.saturnObliquity = computePlanetObliquity('saturn', o.currentYear);
-  o.uranusObliquity = computePlanetObliquity('uranus', o.currentYear);
-  o.neptuneObliquity = computePlanetObliquity('neptune', o.currentYear);
+  // Plan 06 Phase 7 commit 2: the planets' obliquity OF DATE from the spin
+  // channel (ONE home @essrt/physics/planets/spin-channel, through the package
+  // model) at the ENGINE year (R4b) — the o.<planet>Obliquity value in the
+  // angular-momentum sense (Venus ≈ 177°, Uranus ≈ 98°) and the RENDERED tilt
+  // of each planet's rotation axis in the scene's acute convention (the spin
+  // direction carries the retrograde sign, as at J2000). Until commit 2 the
+  // meshes stood at the static J2000 tilt and the panel row read the retired
+  // two-component device law.
+  {
+    const engineYear = _engineYearOfSceneYear(o.currentYear);
+    for (const [k, pd] of [['mercury', mercury], ['venus', venus], ['mars', mars], ['jupiter', jupiter], ['saturn', saturn], ['uranus', uranus], ['neptune', neptune]]) {
+      const eps = computePlanetObliquity(k, engineYear);
+      o[`${k}Obliquity`] = eps;
+      if (pd.rotationAxis) pd.rotationAxis.rotation.z = -Math.min(eps, 180 - eps) * Math.PI / 180;
+    }
+  }
 
   // P5/K5b option A (owner-ruled) — Earth's perihelion DISPLAY rides the
   // chain like every planet: the chain ϖ is the J2000-frame longitude,
@@ -54995,57 +54861,21 @@ function computeEccentricityEarth(
  * @param {number} currentYear – decimal year
  * @returns {number} obliquity in degrees
  */
-function computePlanetObliquity(planetName, currentYear) {
+// Plan 06 Phase 7 commit 2 — the planet's obliquity to its own orbit of date
+// from the spin channel (ONE home @essrt/physics/planets/spin-channel, read
+// through the package model): α from the planet's own torques, the spin
+// integrated on its own ζ plane history from the IAU J2000 pole. `engineYear`
+// is the engine year (Julian years from J2000 on the chain's TT axis — callers
+// convert the scene year with _engineYearOfSceneYear). Angular-momentum sense
+// (Venus ≈ 177°, Uranus ≈ 98°); Mercury's Cassini lock returns its constant;
+// outside the channel's ±10-Myr domain the J2000 value, never null. Mirror:
+// tools/lib/orbital-engine.js computePlanetObliquity (the same factory).
+function computePlanetObliquity(planetName, engineYear) {
   const p = planets[planetName];
-  const tiltJ2000 = p.axialTiltJ2000;
-
-  // Phase 8.5: J2000-fixed periods + integrated phase (frame-independent).
-  // Mirrors the dual-path TDZ pattern from calcObliquityMean — if the deep-
-  // time anchors aren't yet initialized (module-load callers), fall back to
-  // the snapshot form which is also J2000 at load time.
-  try {
-    const periJ2000 = PERIHELION_ECLIPTIC_YEARS_J2000[planetName] ?? p.perihelionEclipticYears;
-    const icrfPeriod_J2000 = 1 / (1 / periJ2000 - 13 / HOLISTIC_YEAR_J2000);
-    const obliqCycle_J2000 = OBLIQUITY_CYCLE_J2000[planetName] !== null
-      ? OBLIQUITY_CYCLE_J2000[planetName]
-      : Math.abs(1 / (1 / periJ2000 - 13 / HOLISTIC_YEAR_J2000));
-
-    // Venus, Neptune: no obliquity cycle — return static tilt
-    if (!obliqCycle_J2000) return tiltJ2000;
-
-    const N_icrf  = HOLISTIC_YEAR_J2000 / Math.abs(icrfPeriod_J2000);
-    const N_obliq = HOLISTIC_YEAR_J2000 / Math.abs(obliqCycle_J2000);
-    const amp = p.invPlaneInclinationAmplitude;
-
-    const phaseIncl_cur  = phaseAdvanceRadians(BALANCED_YEAR_J2000_FIXED, currentYear, N_icrf);
-    const phaseIncl_2000 = phaseAdvanceRadians(BALANCED_YEAR_J2000_FIXED, 2000, N_icrf);
-    const phaseObliq_cur  = phaseAdvanceRadians(BALANCED_YEAR_J2000_FIXED, currentYear, N_obliq);
-    const phaseObliq_2000 = phaseAdvanceRadians(BALANCED_YEAR_J2000_FIXED, 2000, N_obliq);
-
-    if (phaseIncl_cur === null || phaseObliq_cur === null) return tiltJ2000;
-
-    const inclComponent  = -amp * (Math.cos(phaseIncl_cur)  - Math.cos(phaseIncl_2000  ?? 0));
-    const obliqComponent =  amp * (Math.cos(phaseObliq_cur) - Math.cos(phaseObliq_2000 ?? 0));
-
-    return tiltJ2000 + inclComponent + obliqComponent;
-  } catch (e) {
-    // Module-load TDZ fallback — snapshot mode using live J2000 globals.
-    const obliqCycles = {
-      mercury: mercuryObliquityCycle, venus: venusObliquityCycle, mars: marsObliquityCycle,
-      jupiter: jupiterObliquityCycle, saturn: saturnObliquityCycle, uranus: uranusObliquityCycle, neptune: neptuneObliquityCycle,
-    };
-    if (!obliqCycles[planetName]) return tiltJ2000;
-    const amp = p.invPlaneInclinationAmplitude;
-    const t = currentYear - balancedYear;
-    const t2000 = 2000 - balancedYear;
-    const genPrecRate = 1 / (holisticyearLength / 13);
-    const icrfPeriod = 1 / (1 / p.perihelionEclipticYears - genPrecRate);
-    const phaseIncl = 2 * Math.PI / icrfPeriod;
-    const inclComponent = -amp * (Math.cos(phaseIncl * t) - Math.cos(phaseIncl * t2000));
-    const phaseObliq = 2 * Math.PI / obliqCycles[planetName];
-    const obliqComponent = amp * (Math.cos(phaseObliq * t) - Math.cos(phaseObliq * t2000));
-    return tiltJ2000 + inclComponent + obliqComponent;
-  }
+  if (!p || !K.planetSpinPhysical || !K.planetSpinPhysical[planetName]) return p ? p.axialTiltJ2000 : 0;
+  const ch = _tierModelB().planets.spin(planetName);
+  const eps = ch.obliquityDegAtYear(engineYear);
+  return eps === null ? ch.obliquityJ2000Deg : eps;
 }
 
 /* -----------------------------------------------------------------

@@ -198,13 +198,13 @@ Three pre-MPT-only peaks correspond to **Venus-Neptune, Earth-Uranus, and Neptun
 
 ### 3.6 Cross-planet obliquity validation
 
-The model's obliquity-period claims for the inner solar system match three independent peer-reviewed references with **zero free parameters** (the per-planet obliquity tabulation is archived — [retired record](retired-record.md)):
+The model's obliquity-period claims for the inner solar system match three independent peer-reviewed references with **zero free parameters** (the per-planet obliquity tabulation is archived — [retired record](retired-record.md); the planet rows below are the comb-era RECORD as literals — the device obliquity cycles retired with plan 06 Phase 7, the shipped model publishes obliquity BANDS from the planets' spin channel, doc 109 §19a):
 
 | Planet | Published period | Reference | Model H/n | Period (yr) | Deviation |
 |---|---|---|---|---|---|
-| **Mercury** | 895,000 yr | Bills & Comstock 2005, *JGR-Planets* 110, E04006 | **8H/3** | <!--v:mercuryObliqCycle-->894,179<!--/v--> | **+0.09 %** |
+| **Mercury** | 895,000 yr | Bills & Comstock 2005, *JGR-Planets* 110, E04006 | **8H/3** | 894,179 (record) | **+0.09 %** |
 | **Earth** | 41,000 yr | Laskar 2004 (La2004); Berger 1978 | **H/8** | <!--v:hDiv8-->41,915<!--/v--> | **+2.2 %** |
-| **Mars** | 124,800 yr (chaotic mean) | Ward 1973 *Science* 181; Laskar 2004 *Icarus* 170 | **8H/21** | <!--v:marsObliqCycle-->127,740<!--/v--> | **+2.4 %** |
+| **Mars** | 124,800 yr (chaotic mean) | Ward 1973 *Science* 181; Laskar 2004 *Icarus* 170 | **8H/21** | 127,740 (record) | **+2.4 %** |
 
 **Three for three** on planets with published values, all within 2.5 %. Mercury's 0.09 % match against an independent dynamical calculation (Bills & Comstock used Cassini-state forced-obliquity theory, corroborated by Yseboodt & Margot 2006, Peale 2005, Bois & Rambaux 2007) is the model's tightest cross-validation against non-Holistic published references.
 
@@ -214,11 +214,11 @@ For Jupiter, Saturn, Uranus, and Neptune, standard secular theory reports **no r
 
 | Planet | Published literature | Model H/n prediction |
 |---|---|---:|
-| Venus | tidally damped at 177° (Correia & Laskar 2003) | 8H/110 = **<!--v:venusObliqCycle-->24,387<!--/v--> yr** (model: net residual after two opposing precession components nearly cancel) |
+| Venus | tidally damped at 177° (Correia & Laskar 2003) | 8H/110 = **24,387 yr (record)** (model: net residual after two opposing precession components nearly cancel) |
 | Jupiter | "No regular cycle" — Gyr secular trend 3.1° → 6–37° (Saillenfest 2020) | H/2 = **<!--v:hDiv2-->167,659<!--/v--> yr** |
 | Saturn | "No regular cycle" — Gyr trend 26.7° → 65°+ via Neptune resonance (Saillenfest 2021; Wisdom 2022) | H/3 = **<!--v:earthPeriPeriodICRF-->111,570<!--/v--> yr** |
 | Uranus | Frozen — > 100 Myr precession (Saillenfest 2022) | H/2 = **<!--v:hDiv2-->167,659<!--/v--> yr** |
-| Neptune | Frozen (Rogoszinski & Hamilton 2020) | 8H/100 = **<!--v:neptuneObliqCycle-->26,825<!--/v--> yr** |
+| Neptune | Frozen (Rogoszinski & Hamilton 2020) | 8H/100 = **26,825 yr (record)** |
 
 This is a **falsifiable but currently un-testable set of predictions**: no kiloyear-resolution obliquity observations exist for the outer planets, so neither the "no cycle" standard view nor the model's specific period can be directly verified at present. Future precision astrometry from probes (Juno extended mission for Jupiter; dedicated Saturn-system or ice-giant missions) could discriminate. (The canonical model-vs-standard obliquity comparison table is archived — [retired record](retired-record.md).)
 

@@ -161,10 +161,10 @@ const MIGRATED = [
   // passage reference JDs. Prefixes are safe here: every leaf under these three
   // roots is migrated.
   //
-  // NOT migrated: perihelionEclipticYears / axialPrecessionYears /
-  // obliquityCycle. Those encode the H-lattice fractions the JSON stores as
-  // integer pairs ([8,11] written as H/(1+3/8)), so importing them would change
-  // the expression's form rather than its source. Phase 6 owns that.
+  // NOT migrated: perihelionEclipticYears. It encodes the fraction the JSON
+  // stores as an integer pair ([8,11] written as H/(1+3/8)), so importing it
+  // would change the expression's form rather than its source. (The axial and
+  // obliquity-cycle fractions retired with plan 06 Phase 7 commit 2.)
   'model.planets',
   'astro.planetOrbitalElements',
   'model.perihelionPassageRef',

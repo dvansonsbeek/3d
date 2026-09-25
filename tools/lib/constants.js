@@ -164,8 +164,9 @@ for (const [key, mp] of Object.entries(modelParams.planets)) {
     antiPhase: mp.antiPhase || false,
     ascendingNodeCyclesIn8H: mp.ascendingNodeCyclesIn8H,
     ascendingNodePeriod: mp.ascendingNodeCyclesIn8H ? -(8 * H) / mp.ascendingNodeCyclesIn8H : null,
-    obliquityCycle: fractionToYears(mp.obliquityCycleFraction),
-    axialPrecessionYears: fractionToYears(mp.axialPrecessionFraction),
+    // (axialPrecessionYears / obliquityCycle — the K device's integer
+    // fractions — retired with plan 06 Phase 7 commit 2: the spin channel
+    // carries the planets' precession and obliquity.)
     // Astro references (from astro-reference.json)
     solarYearInput: ar.solarYearInput,
     orbitalEccentricityJ2000: ar.orbitalEccentricityJ2000,
@@ -175,18 +176,6 @@ for (const [key, mp] of Object.entries(modelParams.planets)) {
     ascendingNode: ar.ascendingNode,
     invPlaneInclinationJ2000: ar.invPlaneInclinationJ2000,
   };
-}
-
-// Tidally damped planets (obliquityCycleFraction = null): set obliquity cycle
-// to |ICRF perihelion period|. The two-component formula then cancels exactly,
-// producing constant obliquity. Physically: the spin axis tracks the orbital
-// plane in lockstep, so the angle between them never changes.
-const _H13_obliq = H / 13;
-for (const p of Object.values(planets)) {
-  if (p.obliquityCycle === null && p.perihelionEclipticYears) {
-    const icrfPeriod = 1 / (1 / p.perihelionEclipticYears - 1 / _H13_obliq);
-    p.obliquityCycle = Math.abs(icrfPeriod);
-  }
 }
 
 // Derive orbitTilta/b from ascendingNode + eclipticInclinationJ2000
@@ -477,13 +466,19 @@ for (const [key, p] of Object.entries(planets)) {
   }
 }
 
-// Derive wobblePeriod for each planet (beat of axial precession and ICRF inclination)
-// Matches script.js calcWobblePeriod(). Needed before K derivation for base eccentricity.
-// If |axial| > 8H (effectively frozen, e.g. Uranus ~200 Myr, Neptune ~23 Myr),
-// treat as infinite: wobble = |ICRF period| exactly.
+// The K eccentricity law's cycle period for each carrier: the chain's OWN
+// g-mode beat (dominant mode × largest companion of the planet's eccentricity
+// vector, keplerian-chain computeSecularShape — the panel's "Eccentricity
+// Cycle (g-mode beat)" row). Plan 06 Phase 7 commit 2: this replaces the
+// device's beat of its integer axial and obliquity fractions; the scene
+// twins read the same artifact, so both wobble wheels turn on one period.
+const { computeSecularShape } = require('@essrt/physics/planets/secular-shape');
+const { computeObliquityJ2000Deg } = require('@essrt/physics/planets/spin-channel');
+const CHAIN_DATA = JSON.parse(fs.readFileSync(
+  path.resolve(__dirname, '..', '..', 'data', 'nbody-secular-frequencies.json'), 'utf8'));
 for (const [key, p] of Object.entries(planets)) {
-  if (p.perihelionEclipticYears && p.axialPrecessionYears) {
-    p.wobblePeriod = FL.computeWobblePeriodYears(p.perihelionEclipticYears, p.axialPrecessionYears, H);
+  if (CHAIN_DATA.secularModes && CHAIN_DATA.secularModes[key]) {
+    p.wobblePeriod = computeSecularShape(CHAIN_DATA, key).beatYears;
   }
 }
 
@@ -495,26 +490,28 @@ eccentricityAmplitudeK = FL.computeKConstant({
   earthTiltMeanDeg: earthtiltMean,
 });
 
-// Obliquity cycles (loaded per-planet from model-parameters.json via p.obliquityCycle).
-// Mercury: 8H/3 (Fibonacci decomposition). Mars: 8H/21 (= Jupiter axial, mirror swap).
-// Venus/Neptune: 8H/100 (= ICRF period → two-component formula cancels → constant obliquity).
-
 // Compute model mean obliquity, K-derived eccentricity amplitudes, and phase-derived
 // base eccentricities for each planet. Closes the loop:
 // PSI → incl amp → mean tilt → K → ecc amp → phase from eccentricity anchor → base
 // Anchor = balancedYear - systemResetN × H  (n=0: balancedYear, n=7: System Reset)
-const genPrecRate = 1 / (H / 13);
 const eccentricityAnchor = balancedYear - systemResetN * H;
 const t2000 = 2000 - eccentricityAnchor;
 for (const [key, p] of Object.entries(planets)) {
   if (!p.fibonacciD || !massFraction[key]) continue;
-  // Mean obliquity — the shared snapshot law (8.3 L2; the browser's TDZ
-  // fallback form, which is what both engines ship at load).
-  p.obliquityMean = FL.computeObliquityMeanSnapshot({
-    axialTiltJ2000: p.axialTiltJ2000,
-    invPlaneInclinationAmplitude: p.invPlaneInclinationAmplitude,
-    perihelionEclipticYears: p.perihelionEclipticYears,
-  }, p.obliquityCycle, { H, t2000 });
+  // The K law's obliquity input: the spin channel's DERIVED J2000 obliquity
+  // (the IAU pole against the chain's J2000 plane; acute — the law reads
+  // sin|ε|). Plan 06 Phase 7 commit 2: replaces the device's snapshot
+  // "mean obliquity" on its retired obliquity-cycle fraction.
+  {
+    const A = CHAIN_DATA.j2000AnchorElements[key];
+    const eps = computeObliquityJ2000Deg({
+      spin: astroRef.planetSpinPhysical[key],
+      anchorInclEclipticDeg: A.inclEclipticDeg,
+      anchorAscNodeEclipticDeg: A.ascNodeEclipticDeg,
+      obliquityJ2000Deg: ASTRO_REFERENCE.obliquityJ2000_deg,
+    });
+    p.obliquityMean = Math.min(eps, 180 - eps);
+  }
   // K law — the shared implementation (8.3 L2). The old no-wobblePeriod
   // `else` branch was DEAD code (this loop is fibonacciD-guarded and all
   // seven carriers have wobble periods) and is dropped — the fixtures
@@ -755,6 +752,10 @@ module.exports = {
 
   // Mass, PSI, eccentricities
   GM_SUN,
+  // Plan 06 Phase 7: the planets' spin inputs (astro-reference planetSpinPhysical)
+  // and the chain data — the Node scene engine builds the spin channel from them.
+  PLANET_SPIN_PHYSICAL: astroRef.planetSpinPhysical,
+  CHAIN_DATA,
   M_SUN,
   GM_EARTH_ALONE,
   GM_MOON_ALONE,

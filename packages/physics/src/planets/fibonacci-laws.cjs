@@ -65,46 +65,12 @@ function computeInclinationLaw(b, psiConstant) {
   return { amplitude, mean };
 }
 
-/**
- * Wobble period: beat of axial precession and perihelion ICRF precession.
- * @param {number} periEclYr @param {number} axialYr @param {number} H
- * @returns {number} years */
-function computeWobblePeriodYears(periEclYr, axialYr, H) {
-  const H13 = H / 13;
-  const inclICRF = (periEclYr * H13) / (H13 - periEclYr);
-  if (Math.abs(axialYr) > 8 * H) return Math.abs(inclICRF);
-  const wobbleRate = Math.abs(1 / Math.abs(axialYr) - 1 / Math.abs(inclICRF));
-  return 1 / wobbleRate;
-}
-
-/**
- * Obliquity cycle with the Venus/Neptune fallback: the record's cycle if
- * present, else |ICRF| (tidally damped — the two-component obliquity
- * formula cancels exactly, constant tilt).
- * @param {number | null | undefined} obliquityCycleYears
- * @param {number} periEclYr @param {number} H @returns {number} */
-function resolveObliquityCycleYears(obliquityCycleYears, periEclYr, H) {
-  if (obliquityCycleYears !== undefined && obliquityCycleYears !== null) return obliquityCycleYears;
-  return Math.abs(1 / (1 / periEclYr - 13 / H));
-}
-
-/**
- * Mean obliquity, SNAPSHOT form (the load-time law both engines ship):
- * mean = tiltJ2000 + amp·cos(ωᵢ·t₂₀₀₀) − amp·cos(ωₒ·t₂₀₀₀).
- * @param {{ axialTiltJ2000: number, invPlaneInclinationAmplitude: number,
- *   perihelionEclipticYears: number }} b
- * @param {number | null | undefined} obliqCycleYears — falsy ⇒ static tilt
- * @param {{ H: number, t2000: number }} env — t2000 = 2000 − eccentricity
- *   anchor (balancedYear − systemResetN·H)
- * @returns {number} degrees */
-function computeObliquityMeanSnapshot(b, obliqCycleYears, env) {
-  if (!obliqCycleYears) return b.axialTiltJ2000;
-  const amp = b.invPlaneInclinationAmplitude;
-  const genPrecRate = 1 / (env.H / 13);
-  const icrfPeriod = 1 / (1 / b.perihelionEclipticYears - genPrecRate);
-  return b.axialTiltJ2000 + amp * Math.cos(2 * Math.PI * env.t2000 / icrfPeriod)
-                          - amp * Math.cos(2 * Math.PI * env.t2000 / obliqCycleYears);
-}
+// (The device's wobble beat of integer axial and obliquity fractions, the
+// Venus/Neptune |ICRF| obliquity-cycle fallback and the snapshot "mean
+// obliquity" left with plan 06 Phase 7 commit 2: the K law's cycle period is
+// the chain's own g-mode beat (keplerian-chain computeSecularShape) and its
+// obliquity input the derived J2000 obliquity (spin-channel
+// computeObliquityJ2000Deg). docs/retired-record.md carries the record.)
 
 /**
  * K constant from Earth's calibration. @param {{
@@ -137,7 +103,6 @@ function computeEccentricityLaw(b, env) {
 }
 
 module.exports = {
-  computePsiConstant, computeInclinationLaw, computeWobblePeriodYears,
-  resolveObliquityCycleYears, computeObliquityMeanSnapshot,
+  computePsiConstant, computeInclinationLaw,
   computeKConstant, computeEccentricityLaw,
 };

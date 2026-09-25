@@ -63,8 +63,11 @@ const pickInputs = (b) => ({
   inclinationCycleAnchor: b.inclinationCycleAnchor,
   antiPhase: b.antiPhase,
   perihelionEclipticYears: b.perihelionEclipticYears,
-  axialPrecessionYears: b.axialPrecessionYears,
-  obliquityCycle: b.obliquityCycle,
+  // Plan 06 Phase 7 commit 2: the K law's cycle period (the chain's g-mode
+  // beat) and obliquity input (the derived J2000 obliquity) are INPUTS of the
+  // record, computed by the load-time chain from the governed artifacts.
+  wobblePeriodYears: b.wobblePeriod,
+  obliquityMeanDeg: b.obliquityMean,
   axialTiltJ2000: b.axialTiltJ2000,
   orbitalEccentricityJ2000: b.orbitalEccentricityJ2000,
   ascendingNode: b.ascendingNode,

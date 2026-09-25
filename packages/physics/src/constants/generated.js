@@ -33,7 +33,7 @@
  * carry it so a counterfactual is reproducible (§2d).
  * @type {string}
  */
-export const CONSTANTS_HASH = "e494df9692e192e4";
+export const CONSTANTS_HASH = "b9c4d78647577e67";
 
 /** Model version label — single source: public/input/model-version.json (§10 two-axis scheme). */
 export const MODEL_VERSION = "v14.0";
@@ -43,7 +43,7 @@ export const PREPRINT_DOI = "10.21203/rs.3.rs-8758810/v4";
 
 /** @type {Readonly<Record<string, unknown>>} */
 export const DEFAULT_CONSTANTS = Object.freeze({
-  hash: "e494df9692e192e4",
+  hash: "b9c4d78647577e67",
   additionalBodies: {
     "pluto": {
       "name": "Pluto",
@@ -656,19 +656,7 @@ export const DEFAULT_CONSTANTS = Object.freeze({
       "ascendingNodeInvPlane": 32.83,
       "inclinationCycleAnchor": 234.52,
       "antiPhase": false,
-      "ascendingNodeCyclesIn8H": 9,
-      "obliquityCycleFraction": [
-        8,
-        3
-      ],
-      "axialPrecessionFraction": [
-        -8,
-        9
-      ],
-      "eccentricityCycleFraction": [
-        2,
-        21
-      ]
+      "ascendingNodeCyclesIn8H": 9
     },
     "venus": {
       "name": "Venus",
@@ -685,16 +673,7 @@ export const DEFAULT_CONSTANTS = Object.freeze({
       "ascendingNodeInvPlane": 54.7,
       "inclinationCycleAnchor": 218.64,
       "antiPhase": false,
-      "ascendingNodeCyclesIn8H": 1,
-      "obliquityCycleFraction": null,
-      "axialPrecessionFraction": [
-        8,
-        91
-      ],
-      "eccentricityCycleFraction": [
-        8,
-        19
-      ]
+      "ascendingNodeCyclesIn8H": 1
     },
     "mars": {
       "name": "Mars",
@@ -711,19 +690,7 @@ export const DEFAULT_CONSTANTS = Object.freeze({
       "ascendingNodeInvPlane": 354.87,
       "inclinationCycleAnchor": 236.07,
       "antiPhase": false,
-      "ascendingNodeCyclesIn8H": 64,
-      "obliquityCycleFraction": [
-        8,
-        21
-      ],
-      "axialPrecessionFraction": [
-        -1,
-        2
-      ],
-      "eccentricityCycleFraction": [
-        8,
-        52
-      ]
+      "ascendingNodeCyclesIn8H": 64
     },
     "jupiter": {
       "name": "Jupiter",
@@ -740,19 +707,7 @@ export const DEFAULT_CONSTANTS = Object.freeze({
       "ascendingNodeInvPlane": 312.89,
       "inclinationCycleAnchor": 287.06,
       "antiPhase": false,
-      "ascendingNodeCyclesIn8H": 36,
-      "obliquityCycleFraction": [
-        1,
-        2
-      ],
-      "axialPrecessionFraction": [
-        -8,
-        21
-      ],
-      "eccentricityCycleFraction": [
-        8,
-        44
-      ]
+      "ascendingNodeCyclesIn8H": 36
     },
     "saturn": {
       "name": "Saturn",
@@ -769,19 +724,7 @@ export const DEFAULT_CONSTANTS = Object.freeze({
       "ascendingNodeInvPlane": 118.81,
       "inclinationCycleAnchor": 116.26,
       "antiPhase": true,
-      "ascendingNodeCyclesIn8H": 36,
-      "obliquityCycleFraction": [
-        1,
-        3
-      ],
-      "axialPrecessionFraction": [
-        -4,
-        3
-      ],
-      "eccentricityCycleFraction": [
-        8,
-        163
-      ]
+      "ascendingNodeCyclesIn8H": 36
     },
     "uranus": {
       "name": "Uranus",
@@ -798,20 +741,7 @@ export const DEFAULT_CONSTANTS = Object.freeze({
       "ascendingNodeInvPlane": 307.8,
       "inclinationCycleAnchor": 21.33,
       "antiPhase": false,
-      "ascendingNodeCyclesIn8H": 11,
-      "obliquityCycleFraction": [
-        1,
-        2
-      ],
-      "axialPrecessionFraction": [
-        610,
-        1
-      ],
-      "eccentricityCycleFraction": [
-        1,
-        10
-      ],
-      "eccentricityCycleApprox": true
+      "ascendingNodeCyclesIn8H": 11
     },
     "neptune": {
       "name": "Neptune",
@@ -828,17 +758,7 @@ export const DEFAULT_CONSTANTS = Object.freeze({
       "ascendingNodeInvPlane": 192.04,
       "inclinationCycleAnchor": 174.04,
       "antiPhase": false,
-      "ascendingNodeCyclesIn8H": 3,
-      "obliquityCycleFraction": null,
-      "axialPrecessionFraction": [
-        -68,
-        1
-      ],
-      "eccentricityCycleFraction": [
-        2,
-        25
-      ],
-      "eccentricityCycleApprox": true
+      "ascendingNodeCyclesIn8H": 3
     }
   },
   timeReference: {

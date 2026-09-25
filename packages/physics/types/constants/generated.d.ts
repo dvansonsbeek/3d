@@ -2,14 +2,14 @@
 // Gives the TypeScript website full type safety at the boundary (§2g) while
 // packages/physics stays JavaScript.
 
-export declare const CONSTANTS_HASH: "e494df9692e192e4";
+export declare const CONSTANTS_HASH: "b9c4d78647577e67";
 
 export declare const MODEL_VERSION: string;
 
 export declare const PREPRINT_DOI: string;
 
 export declare const DEFAULT_CONSTANTS: {
-  readonly hash: "e494df9692e192e4";
+  readonly hash: "b9c4d78647577e67";
   readonly additionalBodies: {
     "pluto": {
       "name": string;
@@ -493,9 +493,6 @@ export declare const DEFAULT_CONSTANTS: {
       "inclinationCycleAnchor": number;
       "antiPhase": boolean;
       "ascendingNodeCyclesIn8H": number;
-      "obliquityCycleFraction": [number, number];
-      "axialPrecessionFraction": [number, number];
-      "eccentricityCycleFraction": [number, number];
     };
     "venus": {
       "name": string;
@@ -510,9 +507,6 @@ export declare const DEFAULT_CONSTANTS: {
       "inclinationCycleAnchor": number;
       "antiPhase": boolean;
       "ascendingNodeCyclesIn8H": number;
-      "obliquityCycleFraction": null;
-      "axialPrecessionFraction": [number, number];
-      "eccentricityCycleFraction": [number, number];
     };
     "mars": {
       "name": string;
@@ -527,9 +521,6 @@ export declare const DEFAULT_CONSTANTS: {
       "inclinationCycleAnchor": number;
       "antiPhase": boolean;
       "ascendingNodeCyclesIn8H": number;
-      "obliquityCycleFraction": [number, number];
-      "axialPrecessionFraction": [number, number];
-      "eccentricityCycleFraction": [number, number];
     };
     "jupiter": {
       "name": string;
@@ -544,9 +535,6 @@ export declare const DEFAULT_CONSTANTS: {
       "inclinationCycleAnchor": number;
       "antiPhase": boolean;
       "ascendingNodeCyclesIn8H": number;
-      "obliquityCycleFraction": [number, number];
-      "axialPrecessionFraction": [number, number];
-      "eccentricityCycleFraction": [number, number];
     };
     "saturn": {
       "name": string;
@@ -561,9 +549,6 @@ export declare const DEFAULT_CONSTANTS: {
       "inclinationCycleAnchor": number;
       "antiPhase": boolean;
       "ascendingNodeCyclesIn8H": number;
-      "obliquityCycleFraction": [number, number];
-      "axialPrecessionFraction": [number, number];
-      "eccentricityCycleFraction": [number, number];
     };
     "uranus": {
       "name": string;
@@ -578,10 +563,6 @@ export declare const DEFAULT_CONSTANTS: {
       "inclinationCycleAnchor": number;
       "antiPhase": boolean;
       "ascendingNodeCyclesIn8H": number;
-      "obliquityCycleFraction": [number, number];
-      "axialPrecessionFraction": [number, number];
-      "eccentricityCycleFraction": [number, number];
-      "eccentricityCycleApprox": boolean;
     };
     "neptune": {
       "name": string;
@@ -596,10 +577,6 @@ export declare const DEFAULT_CONSTANTS: {
       "inclinationCycleAnchor": number;
       "antiPhase": boolean;
       "ascendingNodeCyclesIn8H": number;
-      "obliquityCycleFraction": null;
-      "axialPrecessionFraction": [number, number];
-      "eccentricityCycleFraction": [number, number];
-      "eccentricityCycleApprox": boolean;
     };
   };
   readonly timeReference: {

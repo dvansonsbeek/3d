@@ -520,7 +520,7 @@
       "public/input/lunar-eclipses-historical.json": "sha256:81dd0c83007eb899abeb97b0b987ae2d128d0e7ec4356622c7d15ed8175ad6c1",
       "public/input/lunar-eclipses-nasa.json": "sha256:2b0f6d1b4dab2d1e8a432a812b027631cfecde9714ce0600f030da5e2a2a792e",
       "public/input/lunar-eclipses-stephenson-2016.json": "sha256:ed8040ef4d688023ca38c1c8eac83b40bc36f75edb0894ba46dd04f2aed32fe6",
-      "public/input/model-parameters.json": "sha256:c90f564c593e45c4e36974927227bdcf40ea010f23284b1e5e16cef488dc2d3a",
+      "public/input/model-parameters.json": "sha256:9a6beaadfcd802297dc18e2b7abe78083bc86c939f1d92df2ade81344f878e22",
       "public/input/stephenson-2016-deltaT-polynomial.json": "sha256:e8f9611c0e6173d2e2807c46bf920673e533c085b9366e1dfc424c6fd1186df7",
       "tools/verify/lunar-alignment.js": "sha256:262cd3068e15d619ebf1c0cd9519e0501865a9c44b91d554100a7da9af44752b"
     }

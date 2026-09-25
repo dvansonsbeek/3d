@@ -59,6 +59,31 @@ frequencies OFF the 8H lattice (docs 108/109); the planets' periods are
 now dynamical outputs of the chains. Earth's kinematic identities
 (H/13, H/3, H/16, H/8) remain documented in docs 10, 11 and 40.
 
+**The planets' device spin rows** (plan 06 Phase 7): the per-planet
+`axialPrecessionFraction` and `obliquityCycleFraction` integer fractions
+of the anchor unit in `model-parameters.json`, the two-component device
+obliquity law that oscillated each planet's tilt on them
+(`computePlanetObliquity` in both scene twins, the `*ObliquityCycle`
+aliases, the snapshot "mean obliquity"), and the "wobble" beat of the
+axial fraction against the ICRF perihelion period that set the K
+eccentricity law's cycle period and the scaffolding wheels' speeds. The
+claimed obliquity cycles (Mercury 894,179 yr, Mars 127,740, Jupiter and
+Uranus 167,659, Saturn 111,772, Venus and Neptune the |ICRF| period)
+and axial periods (Mercury 298,060, Venus 29,478, Mars 167,659, Jupiter
+127,740, Saturn 447,089, Uranus ~2.04×10⁸, Neptune ~2.28×10⁷) are
+withdrawn with them. Replaced by the spin channel
+(`packages/physics/src/planets/spin-channel.cjs`, doc 109 §19a, doc 110
+chain 6): each planet's precession constant DERIVED from its own J₂,
+moment of inertia, spin and satellites on the model's own orbit, the spin
+integrated on the planet's own orbit-plane history from the IAU J2000
+pole — the rendered tilt of date, the panel rows, the registry keys
+`<planet>AxialPeriod` (Mercury: the chain's node period, Cassini-locked)
+and the obliquity BANDS (no cycle is claimed); the K law's period is the
+chain's own g-mode beat (`<planet>EccCycle`) and its obliquity input the
+derived J2000 obliquity (`<planet>MeanObliq`). The `<planet>ObliqCycle`
+registry keys are removed; doc 91's obliquity table carries the retired
+values as literals under its comb-era banner.
+
 **The spin-only deep-time clock** ("H ∝ LOD", "H(t) = H₀·LOD(t)/LOD₀",
 "the structural H(t)/13 precession period"): the statement that Earth's
 axial-precession period at deep time scales with the day length alone.

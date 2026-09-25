@@ -25,7 +25,8 @@ import { createYearLengths, ONE_FAMILY_WINDOW_YEARS } from './earth/year-lengths
 import { createDeepOrbitalHistory } from './earth/deep-orbital-history.cjs';
 import { CHAIN_ARTIFACT } from './planets/chain-artifact.js';
 import { buildPlanetChainsFromArtifactData, computeApsidalSecularDegPerYr } from './planets/keplerian-chain.cjs';
-import { createPlanetSpinChannel } from './planets/spin-channel.cjs';
+import { computeSecularShape } from './planets/secular-shape.cjs';
+import { createPlanetSpinChannelFromArtifacts, computeObliquityJ2000Deg } from './planets/spin-channel.cjs';
 import { createDeltaTCycles } from './deltat/cycles.cjs';
 import { createDeepTimeLod } from './deltat/deep-time.cjs';
 import { createMoonRecessionHistory, createSolarChannelBudget } from './deltat/recession-history.cjs';
@@ -718,10 +719,13 @@ export function assembleModel(C, F, laws = {}, secularSeriesArtifact = /** @type
     const mp = C.planets[k];
     const ar = C.planetOrbitalElements[k];
     const ecl = /** @type {number} */ (fractionToYears(mp.perihelionEclipticFraction));
-    const axial = /** @type {number} */ (fractionToYears(mp.axialPrecessionFraction));
-    const obliquityCycle = fractionToYears(mp.obliquityCycleFraction)
-      ?? Math.abs(1 / (1 / ecl - 1 / (H / 13)));
-    const wobble = FL.computeWobblePeriodYears(ecl, axial, H);
+    // Plan 06 Phase 7 commit 2: the K device's integer axial and obliquity
+    // fractions are retired. The eccentricity law's cycle period is the
+    // chain's OWN g-mode beat (the dominant mode × largest companion of the
+    // planet's eccentricity vector), its obliquity input the DERIVED J2000
+    // obliquity of the spin channel (the IAU pole against the chain's J2000
+    // plane, acute form) — both from the governed artifacts, no fractions.
+    const wobble = computeSecularShape(/** @type {any} */ (CHAIN_ARTIFACT), k).beatYears;
     const il = FL.computeInclinationLaw({
       fibonacciD: mp.fibonacciD,
       massFrac: massFraction[k],
@@ -730,11 +734,13 @@ export function assembleModel(C, F, laws = {}, secularSeriesArtifact = /** @type
       inclinationCycleAnchor: mp.inclinationCycleAnchor,
       antiPhase: mp.antiPhase || false,
     }, PSI);
-    const obliquityMean = FL.computeObliquityMeanSnapshot({
-      axialTiltJ2000: ar.axialTiltJ2000,
-      invPlaneInclinationAmplitude: il.amplitude,
-      perihelionEclipticYears: ecl,
-    }, obliquityCycle, { H, t2000 });
+    const obliquityDerived = computeObliquityJ2000Deg({
+      spin: C.planetSpinPhysical[k],
+      anchorInclEclipticDeg: /** @type {any} */ (CHAIN_ARTIFACT).j2000AnchorElements[k].inclEclipticDeg,
+      anchorAscNodeEclipticDeg: /** @type {any} */ (CHAIN_ARTIFACT).j2000AnchorElements[k].ascNodeEclipticDeg,
+      obliquityJ2000Deg: C.earthOrbital.obliquityJ2000_deg,
+    });
+    const obliquityMean = Math.min(obliquityDerived, 180 - obliquityDerived);   // acute: the K law reads sin|ε|
     const el = FL.computeEccentricityLaw({
       fibonacciD: mp.fibonacciD,
       massFrac: massFraction[k],
@@ -754,8 +760,6 @@ export function assembleModel(C, F, laws = {}, secularSeriesArtifact = /** @type
       longitudePerihelion: ar.longitudePerihelion,
       ascendingNodeCyclesIn8H: mp.ascendingNodeCyclesIn8H,
       ascendingNodePeriod: -(8 * H) / mp.ascendingNodeCyclesIn8H,
-      axialPrecessionYears: axial,
-      obliquityCycle,
       wobblePeriod: wobble,
       fibonacciD: mp.fibonacciD,
       antiPhase: mp.antiPhase || false,
@@ -779,22 +783,18 @@ export function assembleModel(C, F, laws = {}, secularSeriesArtifact = /** @type
   // model's OWN orbit — the chain's J2000 a/e/plane and the deep ζ table —
   // integrated as dŝ/dt = α(ŝ·n̂)(ŝ×n̂) from the IAU J2000 pole. ONE home:
   // planets/spin-channel.cjs; built lazily per planet, pure in `year`.
-  /** @type {Map<string, ReturnType<typeof createPlanetSpinChannel>>} */
+  /** @type {Map<string, ReturnType<typeof createPlanetSpinChannelFromArtifacts>>} */
   const spinChannels = new Map();
   /** @param {string} k */
   const planetSpin = (k) => {
     if (!PLANET_KEYS.includes(k)) throw new Error(`planets.spin: unknown planet '${k}'`);
     let ch = spinChannels.get(k);
     if (!ch) {
-      const A = /** @type {any} */ (CHAIN_ARTIFACT).j2000AnchorElements[k];
-      ch = createPlanetSpinChannel({
+      ch = createPlanetSpinChannelFromArtifacts({
         key: k,
-        spin: C.planetSpinPhysical[k],
-        zetaModes: /** @type {any} */ (DEEP_MODES_ARTIFACT).planetZeta[k],
-        anchorInclEclipticDeg: A.inclEclipticDeg,
-        anchorAscNodeEclipticDeg: A.ascNodeEclipticDeg,
-        semiMajorAxisAU: A.aAU,
-        eccentricity: A.e,
+        planetSpinPhysical: C.planetSpinPhysical,
+        chainAnchorElements: /** @type {any} */ (CHAIN_ARTIFACT).j2000AnchorElements,
+        planetZeta: /** @type {any} */ (DEEP_MODES_ARTIFACT).planetZeta,
         massFractionOfSun: massFraction[k],
         gmSunKm3S2: GM_SUN,
         obliquityJ2000Deg: C.earthOrbital.obliquityJ2000_deg,

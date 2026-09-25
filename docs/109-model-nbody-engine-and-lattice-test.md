@@ -848,9 +848,19 @@ row stays the chain's node rate); visit-order purity.
 envelope over ±1 Myr rather than an "obliquity cycle": on the
 quasi-periodic ζ tables Mars reads the Laskar–Robutel class as an envelope
 (≈13–35°), Jupiter, Saturn, Uranus and Neptune stay within a few degrees.
-The retired device rows (`axialPrecessionFraction`, `obliquityCycleFraction`
-— integer fractions of the anchor unit) leave the planet panels with this
-channel; their fields retire in the follow-up commit.
+The device rows (`axialPrecessionFraction`, `obliquityCycleFraction` —
+integer fractions of the anchor unit) are RETIRED with the channel's second
+commit: the planets' rendered obliquity of date and the panel value ride
+`computePlanetObliquity` = the channel in both scene twins (the meshes had
+stood at the static J2000 tilt); the K eccentricity law's cycle period is
+the chain's own g-mode beat (`computeSecularShape`) and its obliquity input
+the derived J2000 obliquity — both constants of the artifacts, no fractions;
+the two-component device obliquity law, the `*ObliquityCycle` aliases, the
+wobble-beat of the fractions and the snapshot "mean obliquity" are gone
+(docs/retired-record.md). The registry keys `<planet>ObliqCycle` are
+removed (no obliquity cycle is claimed); `<planet>AxialPeriod` reads the
+channel (Mercury: the chain's node period) and `<planet>EccCycle` the
+g-mode beat.
 
 ## 20. The invariable-plane node origin — derived, not fitted (K5c closure)
 

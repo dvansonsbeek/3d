@@ -32,11 +32,20 @@
  * interior-model class with no measured rate to close against.
  *
  * Time here is `year` (Julian years from J2000 on the chain's TT axis —
- * the engine year). Samples are grown from J2000 outward on a fixed step
- * and never revised, so every value is pure in `year` (visit-order
- * independent — the sampler-purity lesson). Beyond ±MAX_SPAN_YR the
- * channel returns null: the ζ tables are the deep tier's, and the domain
- * is the model's.
+ * the engine year). Samples are grown from J2000 outward on fixed steps and
+ * never revised, so every value is pure in `year` (visit-order independent —
+ * the sampler-purity lesson). TWO TIERS, each its own append-only track from
+ * J2000: a fine track (25-yr steps) serves |t| ≤ FINE_SPAN_YR, a coarse track
+ * (250-yr steps) serves beyond, to MAX_SPAN_YR; the tier a year reads is fixed
+ * by the year alone. Beyond ±MAX_SPAN_YR the channel returns null: the ζ
+ * tables are the deep tier's, and the domain is the model's.
+ *
+ * Since commit 2 of Phase 7 the channel also REPLACES the retired device
+ * rows: the planets' rendered obliquity of date (both scene twins), the K
+ * eccentricity law's "mean obliquity" input (the derived J2000 obliquity,
+ * `computeObliquityJ2000Deg`), and — through the chain's own g-mode beat
+ * (keplerian-chain `computeSecularShape`) — the "wobble period" the K
+ * device beat from its integer axial and obliquity fractions.
  */
 
 'use strict';
@@ -45,12 +54,29 @@ const D2R = Math.PI / 180;
 const R2D = 180 / Math.PI;
 const ARCSEC_PER_RAD = R2D * 3600;
 const DAYS_PER_JULIAN_YEAR = 365.25;
-/** the integration step (yr): the shortest free precession period in the set is Venus's ~29 kyr */
-const STEP_YR = 25;
+/**
+ * The integration step is the planet's OWN: 1/300 of its J2000 precession
+ * period, clamped to [STEP_MIN_YR, STEP_MAX_YR] — Venus (29-kyr period) at
+ * the 100-yr floor, Mars at ~570 yr, Jupiter ~1,600, the rest at the
+ * 2,000-yr cap (the cap resolves the fastest ζ mode, ~45 kyr, at 22 samples
+ * per cycle). One step per planet from J2000 → one track per direction, no
+ * tiers, no seam. MEASURED against a 25-yr research step: 1/100 of the
+ * period left Mars 2–5 mdeg off (its plane rides the dense inner s-band, the
+ * sensitive class) while Jupiter agreed to 1e-8°; 1/300 brings Mars to
+ * 3e-4° and Venus to 1e-7°. Cost: all seven channels to −5.34 Myr in ~0.3 s
+ * on a fresh model, to −100 kyr in ~10 ms.
+ */
+const STEP_MIN_YR = 100;
+const STEP_MAX_YR = 2000;
+const STEPS_PER_PRECESSION_PERIOD = 300;
 /** the reachable span (yr): the deep ζ tables' domain for the obliquity hybrid */
 const MAX_SPAN_YR = 10_000_000;
 
 /** @typedef {{ name?: string, gmKm3S2: number, semiMajorAxisKm: number, orbitalPeriodDays: number, retrograde?: boolean }} SpinSatellite */
+/** @typedef {{ j2: number, j2ReferenceRadiusKm: number, momentOfInertiaFactor: number,
+ *   momentOfInertiaFactorClass?: string, rotationRateDegPerDay: number,
+ *   poleRaJ2000Deg: number, poleDecJ2000Deg: number, cassiniLocked?: boolean,
+ *   satellites: ReadonlyArray<SpinSatellite> }} SpinInputs */
 
 /**
  * The precession constant from the planet's own torques.
@@ -96,6 +122,8 @@ const cross = (a, b) => [a[1] * b[2] - a[2] * b[1], a[2] * b[0] - a[0] * b[2], a
 const dot = (a, b) => a[0] * b[0] + a[1] * b[1] + a[2] * b[2];
 /** @param {number[]} a */
 const unit = (a) => { const r = Math.hypot(a[0], a[1], a[2]); return [a[0] / r, a[1] / r, a[2] / r]; };
+/** @param {number[]} a @param {number[]} b */
+const angleDeg = (a, b) => Math.acos(Math.max(-1, Math.min(1, dot(a, b)))) * R2D;
 
 /**
  * The IAU pole (ICRF equatorial RA/Dec) as an ecliptic-J2000 unit vector.
@@ -106,6 +134,41 @@ function poleEclipticJ2000(raDeg, decDeg, obliquityJ2000Deg) {
   const ra = raDeg * D2R, dec = decDeg * D2R, eps = obliquityJ2000Deg * D2R;
   const x = Math.cos(dec) * Math.cos(ra), y = Math.cos(dec) * Math.sin(ra), z = Math.sin(dec);
   return [x, y * Math.cos(eps) + z * Math.sin(eps), -y * Math.sin(eps) + z * Math.cos(eps)];
+}
+
+/**
+ * The orbit normal of a plane (i, Ω) in ecliptic J2000 — the h-vector direction.
+ * @param {number} inclDeg @param {number} ascNodeDeg @returns {number[]}
+ */
+function orbitNormalFromElements(inclDeg, ascNodeDeg) {
+  const i = inclDeg * D2R, Om = ascNodeDeg * D2R;
+  return [Math.sin(i) * Math.sin(Om), -Math.sin(i) * Math.cos(Om), Math.cos(i)];
+}
+
+/**
+ * The spin direction at J2000 in the angular-momentum sense: the IAU pole,
+ * reversed for a retrograde rotator (negative IAU rotation rate).
+ * @param {SpinInputs} spin @param {number} obliquityJ2000Deg @returns {number[]}
+ */
+function spinAxisJ2000(spin, obliquityJ2000Deg) {
+  const pole = poleEclipticJ2000(spin.poleRaJ2000Deg, spin.poleDecJ2000Deg, obliquityJ2000Deg);
+  return spin.rotationRateDegPerDay < 0 ? [-pole[0], -pole[1], -pole[2]] : pole;
+}
+
+/**
+ * The DERIVED J2000 obliquity to the planet's own orbit, degrees: the angle
+ * between the J2000 spin axis (angular-momentum sense — Venus ≈ 177°,
+ * Uranus ≈ 98°) and the chain's J2000 orbit plane. Needs no mode table and
+ * no integration — the load-time twins read it for the K device's
+ * "mean obliquity" slot (commit 2 of Phase 7); the acute form is
+ * `min(ε, 180 − ε)`.
+ * @param {{ spin: SpinInputs, anchorInclEclipticDeg: number,
+ *   anchorAscNodeEclipticDeg: number, obliquityJ2000Deg: number }} p
+ * @returns {number}
+ */
+function computeObliquityJ2000Deg(p) {
+  return angleDeg(spinAxisJ2000(p.spin, p.obliquityJ2000Deg),
+    orbitNormalFromElements(p.anchorInclEclipticDeg, p.anchorAscNodeEclipticDeg));
 }
 
 /**
@@ -142,14 +205,11 @@ function createOrbitNormalEvaluator(zetaModes, anchorInclEclipticDeg, anchorAscN
 /**
  * @param {{
  *   key: string,
- *   spin: { j2: number, j2ReferenceRadiusKm: number, momentOfInertiaFactor: number,
- *     momentOfInertiaFactorClass?: string, rotationRateDegPerDay: number,
- *     poleRaJ2000Deg: number, poleDecJ2000Deg: number, cassiniLocked?: boolean,
- *     satellites: ReadonlyArray<SpinSatellite> },
+ *   spin: SpinInputs,
  *   zetaModes: ReadonlyArray<{omegaRadPerYr: number, re: number, im: number}>,
  *   anchorInclEclipticDeg: number, anchorAscNodeEclipticDeg: number,
  *   semiMajorAxisAU: number, eccentricity: number, massFractionOfSun: number,
- *   gmSunKm3S2: number, obliquityJ2000Deg: number,
+ *   gmSunKm3S2: number, obliquityJ2000Deg: number, stepYr?: number,
  * }} deps — spin from the astro-reference planetSpinPhysical block; the ζ
  *   table and the J2000 anchor elements from the governed artifacts; the
  *   mass fraction (planet system / Sun) for the two-body mean motion
@@ -181,9 +241,8 @@ function createPlanetSpinChannel(deps) {
   const orbitNormalAt = createOrbitNormalEvaluator(zetaModes, anchorInclEclipticDeg, anchorAscNodeEclipticDeg);
   const n0 = orbitNormalAt(0);
   // the J2000 spin: the IAU pole in the angular-momentum sense
-  const pole = poleEclipticJ2000(spin.poleRaJ2000Deg, spin.poleDecJ2000Deg, obliquityJ2000Deg);
-  const s0 = constant.spinRetrograde ? [-pole[0], -pole[1], -pole[2]] : pole;
-  const obliquityJ2000 = Math.acos(Math.max(-1, Math.min(1, dot(s0, n0)))) * R2D;
+  const s0 = spinAxisJ2000(spin, obliquityJ2000Deg);
+  const obliquityJ2000 = angleDeg(s0, n0);
   // the closed-form J2000 pole precession on the orbit normal: ψ̇ = −α cos ε
   const spinPrecessionRateArcsecPerYrJ2000 = -constant.alphaArcsecPerYr * Math.cos(obliquityJ2000 * D2R);
   const axialPrecessionPeriodYearsJ2000 = 1296000 / Math.abs(spinPrecessionRateArcsecPerYrJ2000);
@@ -209,7 +268,10 @@ function createPlanetSpinChannel(deps) {
     ]);
   };
 
-  // append-only trajectories from J2000, one per direction: sample i sits at t = ±i·STEP_YR
+  // the planet's own step (a research override `deps.stepYr` for the labs)
+  const stepYr = deps.stepYr ?? (cassiniLocked ? STEP_MAX_YR
+    : Math.min(STEP_MAX_YR, Math.max(STEP_MIN_YR, axialPrecessionPeriodYearsJ2000 / STEPS_PER_PRECESSION_PERIOD)));
+  // append-only trajectories from J2000, one per direction: sample i sits at t = sign · i · step
   /** @typedef {{ eps: number[], last: number[] }} Track */
   /** @returns {Track} */
   const mkTrack = () => ({ eps: [obliquityJ2000], last: s0.slice() });
@@ -218,26 +280,25 @@ function createPlanetSpinChannel(deps) {
   const grow = (tr, sign, count) => {
     while (tr.eps.length <= count) {
       const i = tr.eps.length - 1;
-      const t = sign * i * STEP_YR;
-      const h = sign * STEP_YR;
+      const t = sign * i * stepYr;
+      const h = sign * stepYr;
       const s = rk4(tr.last, t, h);
-      const n = orbitNormalAt(t + h);
-      tr.eps.push(Math.acos(Math.max(-1, Math.min(1, dot(s, n)))) * R2D);
+      tr.eps.push(angleDeg(s, orbitNormalAt(t + h)));
       tr.last = s;
     }
   };
-  /** the sample arrays bracketing t, or null outside the domain @param {number} tYr */
+  /** the samples bracketing t, or null outside the domain @param {number} tYr */
   const bracket = (tYr) => {
     if (!Number.isFinite(tYr) || Math.abs(tYr) > MAX_SPAN_YR) return null;
     const tr = tYr < 0 ? bwd : fwd;
     const sign = tYr < 0 ? -1 : 1;
-    const x = Math.abs(tYr) / STEP_YR;
+    const x = Math.abs(tYr) / stepYr;
     const i = Math.floor(x);
     grow(tr, sign, i + 1);
-    return { tr, i, f: x - i, sign };
+    return { tr, i, f: x - i };
   };
 
-  /** obliquity to the planet's own orbit of date, degrees (angular-momentum sense: Venus ≈ 177°, Uranus ≈ 98°) @param {number} year */
+  /** obliquity to the planet's own orbit of date, degrees (angular-momentum sense: Venus ≈ 177°, Uranus ≈ 98°); null beyond ±10 Myr @param {number} year */
   const obliquityDegAtYear = (year) => {
     if (cassiniLocked) return obliquityJ2000;
     const b = bracket(year - 2000);
@@ -262,7 +323,7 @@ function createPlanetSpinChannel(deps) {
     const lo = bracket(year - 2000 - spanYr), hi = bracket(year - 2000 + spanYr);
     if (!lo || !hi) return null;
     let mn = Infinity, mx = -Infinity, sum = 0, cnt = 0;
-    for (let t = year - 2000 - spanYr; t <= year - 2000 + spanYr; t += STEP_YR) {
+    for (let t = year - 2000 - spanYr; t <= year - 2000 + spanYr; t += stepYr) {
       const b = bracket(t);
       if (!b) continue;
       const e = b.tr.eps[b.i];
@@ -289,9 +350,42 @@ function createPlanetSpinChannel(deps) {
     obliquityDegAtYear,
     spinPrecessionRateArcsecPerYrAtYear,
     obliquityEnvelopeDeg,
-    stepYr: STEP_YR,
+    stepYr,
     maxSpanYr: MAX_SPAN_YR,
   });
 }
 
-module.exports = { computePlanetPrecessionConstant, createPlanetSpinChannel, poleEclipticJ2000, createOrbitNormalEvaluator };
+/**
+ * The channel from the governed artifacts — the ONE construction every
+ * runtime shares (the package model, the Node scene engine, the browser
+ * through the model): the spin block, the chain's J2000 anchor elements and
+ * the deep ζ table for `key`.
+ * @param {{
+ *   key: string,
+ *   planetSpinPhysical: Record<string, SpinInputs>,
+ *   chainAnchorElements: Record<string, { aAU: number, e: number, inclEclipticDeg: number, ascNodeEclipticDeg: number }>,
+ *   planetZeta: Record<string, ReadonlyArray<{omegaRadPerYr: number, re: number, im: number}>>,
+ *   massFractionOfSun: number, gmSunKm3S2: number, obliquityJ2000Deg: number,
+ * }} deps
+ */
+function createPlanetSpinChannelFromArtifacts(deps) {
+  const A = deps.chainAnchorElements[deps.key];
+  if (!A) throw new Error(`createPlanetSpinChannelFromArtifacts: no chain anchor for '${deps.key}'`);
+  return createPlanetSpinChannel({
+    key: deps.key,
+    spin: deps.planetSpinPhysical[deps.key],
+    zetaModes: deps.planetZeta[deps.key],
+    anchorInclEclipticDeg: A.inclEclipticDeg,
+    anchorAscNodeEclipticDeg: A.ascNodeEclipticDeg,
+    semiMajorAxisAU: A.aAU,
+    eccentricity: A.e,
+    massFractionOfSun: deps.massFractionOfSun,
+    gmSunKm3S2: deps.gmSunKm3S2,
+    obliquityJ2000Deg: deps.obliquityJ2000Deg,
+  });
+}
+
+module.exports = {
+  computePlanetPrecessionConstant, createPlanetSpinChannel, createPlanetSpinChannelFromArtifacts,
+  computeObliquityJ2000Deg, poleEclipticJ2000, createOrbitNormalEvaluator,
+};

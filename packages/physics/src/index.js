@@ -127,12 +127,13 @@ export { integrateAscendingNode } from './planets/asc-node-integrator.cjs';
 export * as planetOrbitChain from './planets/orbit-chain.cjs';
 // P5/K4.6c — the engine-D Keplerian chain (pure evaluator + the embedded
 // governed artifact; the browser flag path consumes exactly these).
+export { computeSecularShape } from './planets/secular-shape.cjs';
 export { buildPlanetChainsFromArtifactData, computePlanetElementsAtYear, computeHeliocentricEclipticFromElements, computePoissonArgRad, computeOsculatingElements, solveKeplerRad, computeApsidalSecularDegPerYr, ANCHOR_EPOCH_YEAR, ANCHOR_EPOCH_JD } from './planets/keplerian-chain.cjs';
 export { computeEquatorNodeOriginSFrameDeg, convertNodeSFrameToEquatorOriginDeg } from './planets/inv-plane-frame.cjs';
 export { createSecularSeriesOverride } from './planets/secular-series.cjs';
 // Plan 06 Phase 7 — the planets' spin channel (the precession constant from
 // each planet's own torques, the spin integrated on its own ζ plane history).
-export { computePlanetPrecessionConstant, createPlanetSpinChannel } from './planets/spin-channel.cjs';
+export { computePlanetPrecessionConstant, createPlanetSpinChannel, createPlanetSpinChannelFromArtifacts, computeObliquityJ2000Deg } from './planets/spin-channel.cjs';
 export { CHAIN_ARTIFACT, CHAIN_ARTIFACT_HASH } from './planets/chain-artifact.js';
 // Engine-switch Stage B, T5d-(d): the deep-time Earth-z channel (the deep
 // lunar-chain modulation rides it; era consumers stay on the H/3 channel).

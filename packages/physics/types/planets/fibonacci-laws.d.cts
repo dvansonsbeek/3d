@@ -26,35 +26,6 @@ export function computeInclinationLaw(b: {
     mean: number;
 };
 /**
- * Wobble period: beat of axial precession and perihelion ICRF precession.
- * @param {number} periEclYr @param {number} axialYr @param {number} H
- * @returns {number} years */
-export function computeWobblePeriodYears(periEclYr: number, axialYr: number, H: number): number;
-/**
- * Obliquity cycle with the Venus/Neptune fallback: the record's cycle if
- * present, else |ICRF| (tidally damped — the two-component obliquity
- * formula cancels exactly, constant tilt).
- * @param {number | null | undefined} obliquityCycleYears
- * @param {number} periEclYr @param {number} H @returns {number} */
-export function resolveObliquityCycleYears(obliquityCycleYears: number | null | undefined, periEclYr: number, H: number): number;
-/**
- * Mean obliquity, SNAPSHOT form (the load-time law both engines ship):
- * mean = tiltJ2000 + amp·cos(ωᵢ·t₂₀₀₀) − amp·cos(ωₒ·t₂₀₀₀).
- * @param {{ axialTiltJ2000: number, invPlaneInclinationAmplitude: number,
- *   perihelionEclipticYears: number }} b
- * @param {number | null | undefined} obliqCycleYears — falsy ⇒ static tilt
- * @param {{ H: number, t2000: number }} env — t2000 = 2000 − eccentricity
- *   anchor (balancedYear − systemResetN·H)
- * @returns {number} degrees */
-export function computeObliquityMeanSnapshot(b: {
-    axialTiltJ2000: number;
-    invPlaneInclinationAmplitude: number;
-    perihelionEclipticYears: number;
-}, obliqCycleYears: number | null | undefined, env: {
-    H: number;
-    t2000: number;
-}): number;
-/**
  * K constant from Earth's calibration. @param {{
  *   eccentricityAmplitude: number, massEarthAlone: number, massSun: number,
  *   earthTiltMeanDeg: number }} c @returns {number} */

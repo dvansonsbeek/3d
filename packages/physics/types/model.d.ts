@@ -209,7 +209,7 @@ export function assembleModel(C: Readonly<Record<string, any>>, F: Readonly<Reco
                 meanDeg: number;
                 maxDeg: number;
             } | null;
-            stepYr: 25;
+            stepYr: number;
             maxSpanYr: 10000000;
         }>;
     }>;

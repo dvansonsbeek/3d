@@ -131,55 +131,54 @@ function computeObliquityIntegrals(currentYear) {
   };
 }
 
+// Plan 06 Phase 7 commit 2 — the planets' obliquity rides the spin channel
+// (ONE home @essrt/physics/planets/spin-channel, the same construction the
+// package model and the browser use): α from the planet's own torques, the
+// spin integrated on its own ζ plane history from the IAU J2000 pole. Built
+// lazily per planet from the governed artifacts.
+let _planetSpinChannels = null;
+function _planetSpin(planetName) {
+  if (!_planetSpinChannels) _planetSpinChannels = new Map();
+  let ch = _planetSpinChannels.get(planetName);
+  if (!ch) {
+    const { createPlanetSpinChannelFromArtifacts } = require('@essrt/physics/planets/spin-channel');
+    const deepModes = JSON.parse(require('fs').readFileSync(
+      require('path').resolve(__dirname, '..', '..', 'data', 'nbody-deep-secular-modes.json'), 'utf8'));
+    const planetZeta = {};
+    for (const [k, m] of Object.entries(deepModes.modes)) planetZeta[k] = m.zeta;
+    ch = createPlanetSpinChannelFromArtifacts({
+      key: planetName,
+      planetSpinPhysical: C.PLANET_SPIN_PHYSICAL,
+      chainAnchorElements: C.CHAIN_DATA.j2000AnchorElements,
+      planetZeta,
+      massFractionOfSun: C.massFraction[planetName],
+      gmSunKm3S2: C.GM_SUN,
+      obliquityJ2000Deg: C.ASTRO_REFERENCE.obliquityJ2000_deg,
+    });
+    _planetSpinChannels.set(planetName, ch);
+  }
+  return ch;
+}
+
 /**
- * Compute dynamic obliquity (axial tilt) for a non-Earth planet.
- * Anchored to J2000: at year 2000, returns the known axial tilt.
- * Venus and Neptune have no obliquity cycle (returns static value).
- * Source: script.js computePlanetObliquity() (newly added)
+ * The planet's obliquity to its own orbit of date, degrees, from the spin
+ * channel (angular-momentum sense: Venus ≈ 177°, Uranus ≈ 98°; Mercury's
+ * Cassini lock returns its constant). `year` is the ENGINE year (Julian
+ * years from J2000 on the chain's TT axis — the browser twin converts its
+ * scene year first). Returns the J2000 tilt outside the channel's ±10-Myr
+ * domain so a renderer never receives null. Mirror: src/script.js
+ * computePlanetObliquity.
  *
  * @param {string} planetName - e.g. 'mercury', 'mars'
- * @param {number} currentYear - decimal year
+ * @param {number} year - engine year
  * @returns {number} obliquity in degrees
  */
-function computePlanetObliquity(planetName, currentYear) {
+function computePlanetObliquity(planetName, year) {
   const p = C.planets[planetName];
-  if (!p) return 0;
-
-  const tiltJ2000 = p.axialTiltJ2000;
-
-  // Venus, Neptune: no obliquity cycle — return static tilt
-  if (!p.obliquityCycle) return tiltJ2000;
-
-  // Two-component obliquity (same structure as Earth's -cos(H/3) + cos(H/8)):
-  //   1. Inclination component at ICRF perihelion period (NEGATIVE sign)
-  //   2. Obliquity precession component at obliquityCycle period (POSITIVE sign)
-  // Both with same amplitude, anchored to axialTiltJ2000 at J2000.
-  //
-  // 8.3-1 S-P3: J2000-fixed periods + INTEGRATED phase (frame-independent),
-  // mirroring the browser's primary branch (src/script.js
-  // computePlanetObliquity). This mirror previously used the snapshot form
-  // exclusively — identical at J2000 by anchoring, divergent as Δt² at deep
-  // time (the class Phase 7 dissolved for the cardinal points).
-  const amp = p.invPlaneInclinationAmplitude;
-  // 13/H, not 1/(H/13) — the browser's primary-branch operation order.
-  const icrfPeriod_J2000 = 1 / (1 / p.perihelionEclipticYears - 13 / C.H);
-  const N_icrf = C.H / Math.abs(icrfPeriod_J2000);
-  const N_obliq = C.H / Math.abs(p.obliquityCycle);
-  const cyclesBetween = dtm().cyclesBetweenYears;
-  const phaseAdv = (yearA, yearB, N) => {
-    const c = cyclesBetween(yearA, yearB, N);
-    return c === null ? null : c * 2 * Math.PI;
-  };
-  const phaseIncl_cur = phaseAdv(C.balancedYear, currentYear, N_icrf);
-  const phaseIncl_2000 = phaseAdv(C.balancedYear, 2000, N_icrf);
-  const phaseObliq_cur = phaseAdv(C.balancedYear, currentYear, N_obliq);
-  const phaseObliq_2000 = phaseAdv(C.balancedYear, 2000, N_obliq);
-  if (phaseIncl_cur === null || phaseObliq_cur === null) return tiltJ2000;
-
-  const inclComponent = -amp * (Math.cos(phaseIncl_cur) - Math.cos(phaseIncl_2000 ?? 0));
-  const obliqComponent = amp * (Math.cos(phaseObliq_cur) - Math.cos(phaseObliq_2000 ?? 0));
-
-  return tiltJ2000 + inclComponent + obliqComponent;
+  if (!p || !C.PLANET_SPIN_PHYSICAL || !C.PLANET_SPIN_PHYSICAL[planetName]) return p ? p.axialTiltJ2000 : 0;
+  const ch = _planetSpin(planetName);
+  const eps = ch.obliquityDegAtYear(year);
+  return eps === null ? ch.obliquityJ2000Deg : eps;
 }
 
 /**

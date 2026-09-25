@@ -46,8 +46,8 @@ const FL = require('./fibonacci-laws.cjs');
  * @property {number} [inclinationCycleAnchor]
  * @property {boolean} [antiPhase]
  * @property {number} [perihelionEclipticYears]
- * @property {number} [axialPrecessionYears]
- * @property {number|null} [obliquityCycle]
+ * @property {number} [wobblePeriodYears] - carriers: the chain's g-mode beat (input since Phase 7 commit 2)
+ * @property {number} [obliquityMeanDeg] - carriers: the derived J2000 obliquity (input since Phase 7 commit 2)
  * @property {number} [axialTiltJ2000]
  * @property {number} [orbitalEccentricityJ2000]
  * @property {number} [ascendingNode]
@@ -138,25 +138,22 @@ function createPlanetModel(env, bodies) {
       rec.invPlaneInclinationMean = il.mean;
     }
 
-    if (b.perihelionEclipticYears && b.axialPrecessionYears) {
-      rec.wobblePeriodYears = FL.computeWobblePeriodYears(
-        b.perihelionEclipticYears, b.axialPrecessionYears, env.holisticYears,
-      );
-    }
+    // Plan 06 Phase 7 commit 2: the K law's cycle period and obliquity input
+    // are INPUTS of the record now — the chain's own g-mode beat
+    // (keplerian-chain computeSecularShape) and the derived J2000 obliquity
+    // (spin-channel computeObliquityJ2000Deg); the device's integer axial and
+    // obliquity fractions are retired.
+    if (b.wobblePeriodYears !== undefined) rec.wobblePeriodYears = b.wobblePeriodYears;
+    if (b.obliquityMeanDeg !== undefined) rec.obliquityMeanDeg = b.obliquityMeanDeg;
 
     if (b.fibonacciD && massFrac) {
-      rec.obliquityMeanDeg = FL.computeObliquityMeanSnapshot({
-        axialTiltJ2000: /** @type {number} */ (b.axialTiltJ2000),
-        invPlaneInclinationAmplitude: /** @type {number} */ (rec.invPlaneInclinationAmplitude),
-        perihelionEclipticYears: /** @type {number} */ (b.perihelionEclipticYears),
-      }, b.obliquityCycle, { H: env.holisticYears, t2000 });
       const el = FL.computeEccentricityLaw({
         fibonacciD: b.fibonacciD, massFrac,
         solarYearInput: b.solarYearInput,
         orbitalEccentricityJ2000: /** @type {number} */ (b.orbitalEccentricityJ2000),
         antiPhase: /** @type {boolean} */ (b.antiPhase),
       }, {
-        kConstant, obliquityMeanDeg: rec.obliquityMeanDeg,
+        kConstant, obliquityMeanDeg: /** @type {number} */ (rec.obliquityMeanDeg),
         wobblePeriodYears: /** @type {number} */ (rec.wobblePeriodYears), t2000,
         meanSolarYearDays: env.meanSolarYearDays,
       });

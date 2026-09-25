@@ -1372,7 +1372,7 @@
  "meta": {
   "script": "scripts/t1_beat_model_vs_comb.py",
   "doc": "docs/92-climate-formula.md (T1, plan 06)",
-  "runtime_sec": 145.4748945236206,
+  "runtime_sec": 517.2922542095184,
   "environment": {
    "python": "3.12.3",
    "numpy": "2.4.1",
@@ -1383,7 +1383,7 @@
   "generator": "python3 scripts/t1_beat_model_vs_comb.py --write",
   "files": {
    "data/lr04-stack.txt": "sha256:7d1a6ca7ffc033e45e20fb76a7f39c8d99df87baa1094260f9dbdc09f0bb8945",
-   "data/t1-engine-frequencies.json": "sha256:c59e3855cc830d7df009624cc743115f8d594f671a31af6f9bc86d79a3f497d4",
+   "data/t1-engine-frequencies.json": "sha256:90842edc226c86abb1d2039590d39599b1553a159ef75449a066d4fff7b2e6f3",
    "data/westerhold2020-cenogrid.tab": "sha256:c149bacb6b0f14b0dc3c7c5204306350df177c8b30221d7f4efa55d35324d2a3",
    "scripts/milankovitch_climate_formula.py": "sha256:bfb5b1436169ee44301f24cddd8cf74d55818e3fd9fbe0a4e062bf7f7e610d75",
    "scripts/t1_beat_model_vs_comb.py": "sha256:8c5b07be83d78a6e9d627fefd274ce4380d7ec5cf701416719151d04094baaa2"

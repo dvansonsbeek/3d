@@ -102,7 +102,7 @@ The Berger climatic-precession spectrum is a **set of six** peaks from `g_j + k`
 | 22,428 | g₂ + k (Venus) | n = 120 → 22,354 | 0.33 % | **Earth.Axial(104) + Jupiter.Obliq(16)** (clean 2-term beat) |
 | 19,155 | g₃ + k (Earth) | n = 141 → 19,025 | 0.68 % | **In canonical L1 as the Berger-quintet completion (k+g₃, doc 92 §2.3)** |
 | 18,976 | g₄ + k (Mars) | n = 141 → 19,025 | 0.26 % | — (nearest n=141 is attributed to k+g₃; k+g₄ enters via sideband n=152) |
-| 16,469 | g₆ + k (Saturn) | n = 163 → <!--v:saturnEccCycle-->16,457<!--/v--> | 0.07 % | — (not in canonical L1) |
+| 16,469 | g₆ + k (Saturn) | n = 163 → 16,457 (record; the device beat retired with plan 06 Phase 7) | 0.07 % | — (not in canonical L1) |
 
 All six peaks match an integer-divisor position. **Berger names each peak after a single planet** (g_j + k convention) while the Holistic model derives the same LR04 lattice peaks via **multi-planet beats from PLANET_CYCLES** — see [doc 93 — L1 attribution reference](93-l1-attribution-reference.md) for all 33 L1 lattice components with full ranked attribution alternatives. The structural decomposition is `n = 104 + δ_j` where 104 = 8 × 13 is Earth's axial precession integer (see website [eigenfrequencies.mdx §"Berger climatic precession peaks"](https://www.holisticuniverse.com/model/eigenfrequencies#berger-climatic-precession-peaks)).
 

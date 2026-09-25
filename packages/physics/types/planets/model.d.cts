@@ -10,8 +10,14 @@ export type PlanetModelBody = {
     inclinationCycleAnchor?: number | undefined;
     antiPhase?: boolean | undefined;
     perihelionEclipticYears?: number | undefined;
-    axialPrecessionYears?: number | undefined;
-    obliquityCycle?: number | null | undefined;
+    /**
+     * - carriers: the chain's g-mode beat (input since Phase 7 commit 2)
+     */
+    wobblePeriodYears?: number | undefined;
+    /**
+     * - carriers: the derived J2000 obliquity (input since Phase 7 commit 2)
+     */
+    obliquityMeanDeg?: number | undefined;
     axialTiltJ2000?: number | undefined;
     orbitalEccentricityJ2000?: number | undefined;
     ascendingNode?: number | undefined;
@@ -60,8 +66,8 @@ export type PlanetModelRecord = {
  * @property {number} [inclinationCycleAnchor]
  * @property {boolean} [antiPhase]
  * @property {number} [perihelionEclipticYears]
- * @property {number} [axialPrecessionYears]
- * @property {number|null} [obliquityCycle]
+ * @property {number} [wobblePeriodYears] - carriers: the chain's g-mode beat (input since Phase 7 commit 2)
+ * @property {number} [obliquityMeanDeg] - carriers: the derived J2000 obliquity (input since Phase 7 commit 2)
  * @property {number} [axialTiltJ2000]
  * @property {number} [orbitalEccentricityJ2000]
  * @property {number} [ascendingNode]
