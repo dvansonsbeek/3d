@@ -19414,7 +19414,7 @@ const VFP_CATEGORIES = [
     // series has not loaded / opted out — _sceneEccTargetAt's own fallback).
     // The retired H/3-law reference curve and its base′ mean line are gone
     // (the frozen-clock family; the era chain stays available in panels).
-    model: { name: 'This model (one-source)', color: '#f0b040',
+    model: { name: 'This model', color: '#f0b040',
       fn: year => _sceneEccTargetAt(year) },
     references: [
       { name: 'Meeus (1991)', color: '#4fc3f7', fn: eccMeeus, validYears: [-10000, 10000], sourceUrl: 'https://en.wikipedia.org/wiki/Orbital_eccentricity' },
@@ -19442,7 +19442,7 @@ const VFP_CATEGORIES = [
     // opted out). The internal tier lines (deep ζ modes, era ζ tier), the
     // frozen fitted-law line and the K-family mean refline are gone — the
     // frozen era device lives on in the gates and registry, not here.
-    model: { name: 'This model (one-source)', color: '#f0b040',
+    model: { name: 'This model', color: '#f0b040',
       fn: year => _sceneEpsTargetDeg(year) },
     references: [
       { name: 'Laskar (1986)', color: '#4fc3f7', fn: meanObliquityLaskar1986, validYears: [-10000, 10000], sourceUrl: 'https://en.wikipedia.org/wiki/Axial_tilt' },
@@ -19476,14 +19476,14 @@ const VFP_CATEGORIES = [
   },
   {
     id: 'ascending-node', group: 'Earth orbit', label: 'Ascending Node (invariable plane)', unit: '°', precision: 2,
-    frame: 'Ascending node of Earth’s orbit (degrees) on the invariable plane, Souami & Souchay node origin, of date, wrapping at 360°',
+    frame: 'Ascending node of Earth’s orbit (degrees) on the invariable plane, node origin per Souami & Souchay and La2010 (derived), of date, wrapping at 360°',
     reading: 'The node regresses around the invariable plane once per ~70 kyr, the dominant nodal mode; where the inclination passes near zero (after +500 kyr) the node is ill-defined and jumps, so the sawtooth breaks. The origin is the Souami & Souchay node, the convention La2010 publishes.',
     yLabel: 'degrees',
     residualLabel: 'degrees', residualScale: 1,
     wrap360: true,
     fixedYRange: [0, 360], fixedYTicks: [0, 60, 120, 180, 240, 300, 360],
     paperTitle: 'Ascending Node on Invariable Plane',
-    model: { name: 'This model (S&S/La2010 node origin, derived)', color: '#f0b040',
+    model: { name: 'This model', color: '#f0b040',
       fn: ascNodeInvPlaneModel },
     references: [
       { name: 'La2010 (Laskar)', color: '#4fc3f7', fn: ascNodeLa2010, validYears: [-498000, 2000], sourceUrl: 'https://doi.org/10.1051/0004-6361/201116836' },
@@ -19508,7 +19508,7 @@ const VFP_CATEGORIES = [
     // residuals previously defaulted to index 0 = our own H/16 law (the
     // same primaryRef class as the obliquity find).
     primaryRef: 'La2004',   // C-5: by name (of-date-capable across the full ±23 kyr window)
-    model: { name: 'This model (one-source)', color: '#f0b040',
+    model: { name: 'This model', color: '#f0b040',
       fn: year => _hybridSpinActive()
         ? _hybridSeriesSampleAt(year).periOfDateDeg
         : (((_kcPerihelionEclLonDeg('earth', yearToJDApprox(year)) + (360 / _certifiedAxialPrecessionJ2000Years()) * (year - 2000)) % 360) + 360) % 360 },
@@ -19547,7 +19547,7 @@ const VFP_CATEGORIES = [
     // rate mean + the λ̇ correction), identical to the Predictions panel,
     // the report's Physics column and the API. Falls back to the smooth
     // secular mean when the one-source movement is opted out.
-    model: { name: 'This model (one-source)', color: '#f0b040',
+    model: { name: 'This model', color: '#f0b040',
       fn: (() => {
         let a = null;
         return (year) => {
@@ -19695,7 +19695,7 @@ const VFP_CATEGORIES = [
       // sits ~0.14 s ABOVE the blue curve because J2000 is a warm interglacial
       // (L1(2000) ≈ −1.04, near L1 minimum). Dashed to signal "hypothetical
       // climate-averaged trajectory + framework's H/5 ecliptic frame".
-      { name: 'This model (long term mean)', color: '#d946ef', dash: true, preserveColor: true,
+      { name: 'This model — long-term mean', color: '#d946ef', dash: true, preserveColor: true,
         fn: year => {
           const t_Ma = (startmodelYear - year) / 1e6;
           const layer1 = meanLodSecondsAtAgeMeanAlpha(t_Ma);
@@ -19735,7 +19735,7 @@ const VFP_CATEGORIES = [
     // A Fourier-ripple variant was tried here but rejected: the
     // SIDEREAL_YEAR_HARMONICS fit captures only periodic H/8 obliquity
     // ripples and MISSES the secular mass-loss slope (wrong direction).
-    model: { name: 'This model (one-source)', color: '#f0b040',
+    model: { name: 'This model', color: '#f0b040',
       fn: year => {
         if (_hybridSpinActive()) {
           const os = _siderealYearOneSourceSeconds(year);
@@ -19789,7 +19789,7 @@ const VFP_CATEGORIES = [
     //   • sol_days  = MEAN_SOLAR_YEAR_J2000_DAYS + Σ TROPICAL_YEAR_HARMONICS(year)
     //   • lod       = MEAN_SIDEREAL_YEAR_J2000_S / sid_days   (kinematic; cancels
     //                                                          in the precession ratio)
-    model: { name: 'This model (one-source)', color: '#f0b040',
+    model: { name: 'This model', color: '#f0b040',
       fn: (() => {
         // S5 call-site convergence: the one family's axial beat —
         // sid/(sid − trop) from _yearLengthsM, ≡ 360/p_geom to second
@@ -19847,7 +19847,7 @@ const VFP_CATEGORIES = [
     // 63.6 s. Reference curve is
     // NASA's Five Millennium Canon piecewise polynomial fit to observed eclipse
     // timings (~5-millennia validity).
-    model: { name: 'This model (ΔT trend)', color: '#f0b040',
+    model: { name: 'This model', color: '#f0b040',
       fn: year => deltaTStart + meanDeltaTSecondsAtAge((startmodelYear - year) / 1e6) },
     references: [
       { name: 'Espenak & Meeus (NASA Canon)', color: '#4fc3f7', fn: deltaTEspenakMeeusRaw, validYears: [-1999, 3000],
@@ -19964,7 +19964,7 @@ const VFP_CATEGORIES = [
     residualLabel: 'e·sin ϖ (dimensionless)', residualScale: 1,
     paperTitle: 'Climatic Precession e·sin ϖ',
     frame: 'The climatic precession index e·sin ϖ (dimensionless), ϖ the longitude of Earth’s perihelion from the equinox of date',
-    model: { name: 'This model (one-source)', color: '#f0b040',
+    model: { name: 'This model', color: '#f0b040',
       fn: year => _hybridSpinActive()
         ? _hybridSeriesSampleAt(year).eSinPeri
         : _vfpPEEarthEcc(year) * Math.sin(_vfpANPeriEarthDeg(year) * Math.PI / 180) },
@@ -19991,7 +19991,7 @@ const VFP_CATEGORIES = [
     residualLabel: 'W/m²', residualScale: 1,
     paperTitle: 'Summer Insolation at 65°N',
     frame: 'Mean daily insolation at the top of the atmosphere on the June solstice at 65°N (W/m²), from the elements of date',
-    model: { name: 'This model (one-source)', color: '#f0b040',
+    model: { name: 'This model', color: '#f0b040',
       fn: year => computeDailyInsolationWm2(_vfpPEEarthEcc(year), _sceneEpsTargetDeg(year), _vfpANPeriEarthDeg(year), 65, 90) },
     references: [
       { name: 'La2004 (Laskar)', color: '#e53935', validYears: [-248000, 102000], sourceUrl: 'https://doi.org/10.1051/0004-6361:20041335',
@@ -20028,7 +20028,7 @@ const VFP_CATEGORIES = [
     yLabel: 'days (perigee cycle, equinox of date)',
     residualLabel: 'days', residualScale: 1,
     paperTitle: 'Lunar Perigee Precession Period',
-    frame: 'Period of the lunar perigee’s advance against the equinox of date (days of 86,400 s)',
+    frame: 'Period of the lunar perigee’s advance against the equinox of date (days of 86,400 s), the chain’s Brouwer–Clemence route bridged to the equinox of date',
     // FRAME: Meeus's rates are equinox-of-date; the chain's physics route
     // (perigeePrecessionSecondsAtAge — Brouwer–Clemence m² scaling with the
     // e_E modulation, 3232.60 d at J2000) is STAR-referenced, so it is
@@ -20039,18 +20039,18 @@ const VFP_CATEGORIES = [
     // T·H = const device, legacy '…ICRF' name) is the clickable second
     // line: a device, no orbital physics, flat. DAYS, as the planet stats
     // (a "year" is Julian in one place and mean solar in another).
-    model: { name: 'This model (Brouwer–Clemence m², bridged to date)', color: '#f0b040',
+    model: { name: 'This model', color: '#f0b040',
       fn: year => 1 / (86400 / meanLunarPerigeePrecessionAtAge((startmodelYear - year) / 1e6) + 1 / (_vfpAxialPrecessionYears(year) * 365.25)) },
     references: [
       { name: 'Meeus (1998), Ch. 47 rates', color: '#4fc3f7', fn: year => moonPerigeePrecessionYearsMeeus(year) * 365.25, validYears: [-1999, 3000], sourceUrl: 'https://en.wikipedia.org/wiki/Lunar_precession' },
-      { name: 'This model (H² cycle counter, of date — device)', color: '#ce93d8',
+      { name: 'This model — H² cycle counter (device)', color: '#ce93d8',
         fn: year => meanApsidalPrecessionSecondsICRFAtAge((startmodelYear - year) / 1e6) / 86400 },
     ],
     j2000extras: [
       { name: 'Registry anchor (Meeus/IERS, of date)', color: '#ef5350',
         value: () => K.moonReference.moonApsidalPrecessionDaysInputICRF },
     ],
-    reading: 'The perigee advances once round the equinox of date in about 3,231.5 days (8.85 years). The one-source line is the chain’s Brouwer–Clemence route: the rate rides m², the Sun’s to the Moon’s mean motion, so the period goes as the sidereal year squared over the sidereal month, modulated by Earth’s orbital eccentricity of date through the solar perturbation — it dips at every eccentricity maximum, and near J2000 its slope is the secular decrease of Earth’s eccentricity, the same physics behind Meeus’s T² term; the star-referenced period is bridged to date through the model’s own axial precession (1/T_date = 1/T_star + 1/T_p). The clickable second line is the chain’s H² cycle counter (the T_apsidal·H = const device): a bookkeeping convention riding the spin unit, no orbital physics, flat. Meeus’s line is 36,000° over d(L′ − M′)/dT from the Ch. 47 mean arguments (Chapront ELP-2000/82), a J2000-centred fit offered on the canon’s −2000 → 3000 range only.',
+    reading: 'The perigee advances once round the equinox of date in about 3,231.5 days (8.85 years). The model line is the chain’s Brouwer–Clemence route: the rate rides m², the Sun’s to the Moon’s mean motion, so the period goes as the sidereal year squared over the sidereal month, modulated by Earth’s orbital eccentricity of date through the solar perturbation — it dips at every eccentricity maximum, and near J2000 its slope is the secular decrease of Earth’s eccentricity, the same physics behind Meeus’s T² term; the star-referenced period is bridged to date through the model’s own axial precession (1/T_date = 1/T_star + 1/T_p). The clickable second line is the chain’s H² cycle counter (the T_apsidal·H = const device): a bookkeeping convention riding the spin unit, no orbital physics, flat. Meeus’s line is 36,000° over d(L′ − M′)/dT from the Ch. 47 mean arguments (Chapront ELP-2000/82), a J2000-centred fit offered on the canon’s −2000 → 3000 range only.',
   },
   {
     // ── Moon · Node Regression: the same for the node's retrograde cycle.
@@ -20059,20 +20059,20 @@ const VFP_CATEGORIES = [
     yLabel: 'days (node cycle, equinox of date)',
     residualLabel: 'days', residualScale: 1,
     paperTitle: 'Lunar Node Regression Period',
-    frame: 'Period of the lunar node’s regression against the equinox of date (days of 86,400 s)',
+    frame: 'Period of the lunar node’s regression against the equinox of date (days of 86,400 s), the chain’s Brouwer–Clemence route bridged to the equinox of date',
     // the node regresses: the bridge to date is 1/T_date = 1/T_star − 1/T_p
-    model: { name: 'This model (Brouwer–Clemence m², bridged to date)', color: '#f0b040',
+    model: { name: 'This model', color: '#f0b040',
       fn: year => 1 / (86400 / meanLunarNodePrecessionAtAge((startmodelYear - year) / 1e6) - 1 / (_vfpAxialPrecessionYears(year) * 365.25)) },
     references: [
       { name: 'Meeus (1998), Ch. 47 rates', color: '#4fc3f7', fn: year => moonNodeRegressionYearsMeeus(year) * 365.25, validYears: [-1999, 3000], sourceUrl: 'https://en.wikipedia.org/wiki/Lunar_precession' },
-      { name: 'This model (H² cycle counter, of date — device)', color: '#ce93d8',
+      { name: 'This model — H² cycle counter (device)', color: '#ce93d8',
         fn: year => meanNodalPrecessionSecondsICRFAtAge((startmodelYear - year) / 1e6) / 86400 },
     ],
     j2000extras: [
       { name: 'Registry anchor (Meeus/IERS, of date)', color: '#ef5350',
         value: () => K.moonReference.moonNodalPrecessionDaysInputICRF },
     ],
-    reading: 'The node regresses once round the equinox of date in about 6,798.4 days (18.61 years) — the eclipse-season and the lunar-standstill cycle. The one-source line is the chain’s Brouwer–Clemence route on the same m² law as the perigee, modulated by Earth’s orbital eccentricity of date through the solar perturbation — it dips at every eccentricity maximum, and near J2000 its slope is Meeus’s; the star-referenced period is bridged to date through the model’s own axial precession (1/T_date = 1/T_star − 1/T_p, the node running retrograde). The clickable second line is the chain’s H² cycle counter (the T_nodal·H = const device): a bookkeeping convention riding the spin unit, no orbital physics, flat. Meeus’s line is 36,000° over d(L′ − F)/dT from the Ch. 47 mean arguments (Chapront ELP-2000/82), a J2000-centred fit offered on the canon’s −2000 → 3000 range only.',
+    reading: 'The node regresses once round the equinox of date in about 6,798.4 days (18.61 years) — the eclipse-season and the lunar-standstill cycle. The model line is the chain’s Brouwer–Clemence route on the same m² law as the perigee, modulated by Earth’s orbital eccentricity of date through the solar perturbation — it dips at every eccentricity maximum, and near J2000 its slope is Meeus’s; the star-referenced period is bridged to date through the model’s own axial precession (1/T_date = 1/T_star − 1/T_p, the node running retrograde). The clickable second line is the chain’s H² cycle counter (the T_nodal·H = const device): a bookkeeping convention riding the spin unit, no orbital physics, flat. Meeus’s line is 36,000° over d(L′ − F)/dT from the Ch. 47 mean arguments (Chapront ELP-2000/82), a J2000-centred fit offered on the canon’s −2000 → 3000 range only.',
   },
 ];
 // The panel ORDER (owner-ruled): the physics builds up — the orbit, the axis,
