@@ -19975,6 +19975,45 @@ const VFP_CATEGORIES = [
     ],
     reading: 'The third Milankovitch curve beside eccentricity and obliquity: the eccentricity-modulated precession of the perihelion against the equinox of date, from the series sampler’s own e·sin ϖ. The index is positive when perihelion falls in the half-year after the March equinox; Laskar’s perigee-based e·sin ϖ̃ is its negative, and the La2004 line is built from La2004’s own e and ϖ with this convention. The ~21-kyr envelope is the eccentricity of date: the index vanishes at every eccentricity minimum.',
   },
+  {
+    // ── Summer insolation at 65°N (owner-requested: the one Milankovitch
+    // curve the panels lacked — the forcing the climate record is read
+    // against): mean daily insolation at the top of the atmosphere on the
+    // June solstice (λ☉ = 90°) at 65°N, Berger (1978)'s closed form on the
+    // three elements OF DATE the panels already draw — e (the eccentricity
+    // twin's Earth route), ε (the Obliquity chart's one-source line) and ϖ
+    // (the perihelion of date, equinox of date). The La2004 line is the SAME
+    // formula on La2004's own e, ε and ϖ (the Climatic Precession pattern).
+    id: 'insolation-65n', group: 'Earth cycles', label: 'Summer Insolation (65°N)', unit: ' W/m²', precision: 1,
+    yLabel: 'W/m² (June solstice, 65°N)',
+    residualLabel: 'W/m²', residualScale: 1,
+    paperTitle: 'Summer Insolation at 65°N',
+    frame: 'Mean daily insolation at the top of the atmosphere on the June solstice at 65°N (W/m²), from the elements of date',
+    model: { name: 'This model (one-source)', color: '#f0b040',
+      fn: year => computeDailyInsolationWm2(_vfpPEEarthEcc(year), _sceneEpsTargetDeg(year), _vfpANPeriEarthDeg(year), 65, 90) },
+    references: [
+      { name: 'La2004 (Laskar)', color: '#e53935', validYears: [-248000, 102000], sourceUrl: 'https://doi.org/10.1051/0004-6361:20041335',
+        fn: year => computeDailyInsolationWm2(eccLa2004(year), obliquityLa2004(year), perihelionLa2004(year), 65, 90) },
+    ],
+    reading: 'Berger’s closed form on the model’s own elements of date: W = (S₀/π)·(a/r)²·(H₀ sin φ sin δ + cos φ cos δ sin H₀), with δ = asin(sin ε sin λ☉) the Sun’s declination, H₀ the half-day arc, (a/r)² = (1 + e cos(λ☉ − ϖ̃))²/(1 − e²)² the distance factor and ϖ̃ = ϖ + 180° the longitude of perigee, S₀ = 1361 W/m². Eccentricity and perihelion set the distance factor (the ~21-kyr climatic precession), the obliquity sets the declination (the 41-kyr cycle); their sum is the forcing behind the marine isotope stages. The La2004 line is the same formula on La2004’s own e, ε and ϖ.',
+  },
+  {
+    // ── Milankovitch Overview (owner-requested, after the classic stacked
+    // figure): the model's own curves on one time axis with the two proxy
+    // records the Climate Formula Explorer already loads. Its own four
+    // windows (the figure's ±800 kyr among them); "Export" prints the
+    // current one.
+    id: 'milankovitch-overview', group: 'Earth cycles', label: 'Milankovitch Overview',
+    tabs: [
+      { key: 'recent', label: '150,000 BC – 20,000 AD', range: [-149999, 20000], samples: 400 },
+      { key: 'era', label: '250,000 BC – 100,000 AD', range: [-249999, 100000], samples: 500 },
+      { key: 'quaternary', label: '800,000 BC – 800,000 AD', range: [-799999, 800000], samples: 800 },
+      { key: 'myr', label: '1,000,000 BC – 1,000,000 AD', range: [-999999, 1000000], samples: 800 },
+    ],
+    customRender: () => renderVFPMilankovitch(),
+    afterRender: (el) => _vfpMOAfterRender(el),
+    customPaper: () => _vfpMOPaperSvg(_vfpCurrentTabFor('milankovitch-overview').range),
+  },
 ];
 // The panel ORDER (owner-ruled): the physics builds up — the orbit, the axis,
 // what the two produce together, the clock, the other planets. The groups are
@@ -19983,7 +20022,7 @@ const VFP_CATEGORIES = [
 const VFP_ORDER = [
   'eccentricity', 'perihelion', 'inclination', 'ascending-node',   // Earth orbit
   'obliquity', 'axial-precession',                                  // Earth axis
-  'all-precession', 'climatic-precession', 'analemma',             // Earth cycles
+  'all-precession', 'climatic-precession', 'insolation-65n', 'milankovitch-overview', 'analemma',   // Earth cycles
   'tropical-year', 'sidereal-year', 'cardinal-year-lengths', 'season-durations', 'solar-day', 'delta-t',   // Earth clock
   'planet-inclinations', 'planet-eccentricities',                   // All planets
 ];
@@ -21133,6 +21172,289 @@ function _vfpAPAfterRender(bodyEl) {
   });
 }
 
+// ── Daily insolation — Berger (1978)'s closed form ──────────────────
+/** Total solar irradiance at 1 au (W/m²), Kopp & Lean (2011). */
+const SOLAR_CONSTANT_WM2 = 1361;
+/** Mean daily insolation at the top of the atmosphere (W/m²) at latitude
+ *  φ on the day the Sun's geocentric ecliptic longitude is λ☉, from the
+ *  elements of date: e, ε (degrees) and ϖ the longitude of PERIHELION
+ *  (degrees, equinox of date). Berger (1978), eq. 10:
+ *    W = (S₀/π) (a/r)² (H₀ sin φ sin δ + cos φ cos δ sin H₀),
+ *    δ = asin(sin ε sin λ☉), H₀ = acos(−tan φ tan δ) (0 in polar night,
+ *    π in polar day), (a/r)² = (1 + e cos(λ☉ − ϖ̃))² / (1 − e²)² with
+ *    ϖ̃ = ϖ + 180° the longitude of perigee (the true anomaly of the Sun's
+ *    geocentric position is λ☉ − ϖ̃). NaN in → NaN out. */
+function computeDailyInsolationWm2(eccentricity, obliquityDeg, perihelionDeg, latitudeDeg, solarLongitudeDeg) {
+  const D = Math.PI / 180;
+  const e = eccentricity, eps = obliquityDeg * D, phi = latitudeDeg * D, lam = solarLongitudeDeg * D;
+  const perigee = (perihelionDeg + 180) * D;
+  const rho2 = Math.pow(1 + e * Math.cos(lam - perigee), 2) / Math.pow(1 - e * e, 2);
+  const delta = Math.asin(Math.sin(eps) * Math.sin(lam));
+  const x = -Math.tan(phi) * Math.tan(delta);
+  const H0 = x <= -1 ? Math.PI : x >= 1 ? 0 : Math.acos(x);
+  return (SOLAR_CONSTANT_WM2 / Math.PI) * rho2 * (H0 * Math.sin(phi) * Math.sin(delta) + Math.cos(phi) * Math.cos(delta) * Math.sin(H0));
+}
+
+// ── VFP: Milankovitch Overview — the classic stacked figure, from the model ──
+// (owner-requested, after the Wikipedia "Milankovitch cycles" figure.) Seven
+// strips on ONE time axis: the model's obliquity, eccentricity, perihelion
+// of date (sin ϖ), climatic precession (e·sin ϖ) and June-solstice
+// insolation at 65°N — the panels' own lines — then the LR04 benthic δ¹⁸O
+// stack (axis inverted, colder down) and the EPICA Dome C CO₂ record, the
+// Climate Formula Explorer's app-loaded JSON. Each model strip's label
+// carries the period MEASURED on the window (the mean spacing of the
+// curve's prominent maxima; the eccentricity also its envelope) — the
+// model's own numbers, not the textbook's. The proxies are shown for the
+// pacing, never fitted: an open correspondence, not a validation. The
+// figure's "axial precession 26,000 years" label on the e·sin ϖ strip is
+// NOT reproduced — that curve runs at the ~21-kyr climatic precession; the
+// 26-kyr motion of the pole is the Axial Precession Period panel's.
+const _vfpMO_ID = 'milankovitch-overview';
+const _vfpMO_STRIPS = [
+  { key: 'obliq', name: 'Obliquity ε', short: 'Obliquity', unit: '°', dec: 2, screen: '#5ea0ff', paper: '#1d4ed8', period: true,
+    fn: (y) => _sceneEpsTargetDeg(y) },
+  { key: 'ecc', name: 'Eccentricity e', short: 'Eccentricity', unit: '', dec: 4, screen: '#4ade80', paper: '#15803d', period: true, envelope: true,
+    fn: (y) => _vfpPEEarthEcc(y) },
+  { key: 'sinPeri', name: 'Perihelion of date, sin ϖ', short: 'sin ϖ', unit: '', dec: 3, screen: '#c084fc', paper: '#7e22ce', period: true,
+    fn: (y) => Math.sin(_vfpANPeriEarthDeg(y) * Math.PI / 180) },
+  { key: 'cp', name: 'Climatic precession e·sin ϖ', short: 'e·sin ϖ', unit: '', dec: 4, screen: '#f87171', paper: '#b91c1c', period: true,
+    fn: (y) => _vfpPEEarthEcc(y) * Math.sin(_vfpANPeriEarthDeg(y) * Math.PI / 180) },
+  { key: 'ins', name: 'Summer insolation 65°N, June solstice', short: 'Insolation 65°N', unit: ' W/m²', dec: 1, screen: '#e8ecf4', paper: '#222', period: true,
+    fn: (y) => computeDailyInsolationWm2(_vfpPEEarthEcc(y), _sceneEpsTargetDeg(y), _vfpANPeriEarthDeg(y), 65, 90) },
+  { key: 'lr04', name: 'LR04 benthic δ¹⁸O (Lisiecki & Raymo 2005)', short: 'LR04 δ¹⁸O', unit: ' ‰', dec: 2, screen: '#d4a373', paper: '#92400e', invert: true,
+    data: () => cfmLR04Data, valKey: 'd18o_per_mille' },
+  { key: 'co2', name: 'EPICA Dome C CO₂ (Bereiter 2015)', short: 'EPICA CO₂', unit: ' ppm', dec: 0, screen: '#34d399', paper: '#047857',
+    data: () => cfmEpicaData, valKey: 'co2_ppm' },
+];
+const _vfpMOState = { _screenGeom: null, dataRequested: false };
+const _vfpMOCacheByRange = {};
+/** The proxies' JSON (age in kyr BP, t = 0 at 1950 CE) read at a year by
+ *  linear interpolation; NaN outside the record. */
+function _vfpMOProxyAt(json, valKey, year) {
+  if (!json) return NaN;
+  const ages = json.age_kyr_BP, vals = json[valKey];
+  const age = (1950 - year) / 1000;
+  if (!(age >= ages[0] && age <= ages[ages.length - 1])) return NaN;
+  let lo = 0, hi = ages.length - 1;
+  while (hi - lo > 1) { const m = (lo + hi) >> 1; if (ages[m] <= age) lo = m; else hi = m; }
+  const f = (age - ages[lo]) / ((ages[hi] - ages[lo]) || 1);
+  return vals[lo] * (1 - f) + vals[hi] * f;
+}
+/** The mean period (kyr) of a sampled curve on the window: the mean spacing
+ *  of its PROMINENT maxima — two neighbouring maxima both survive only when
+ *  the dip between them is at least 10 % of the curve's range, else the
+ *  lower one goes (a ripple on a flat stretch is not a cycle). Returns the
+ *  surviving maxima's indices too (the eccentricity's envelope is the same
+ *  estimator run on its maxima). */
+function _vfpMOMeanPeriodKyr(yrs, arr) {
+  let lo = Infinity, hi = -Infinity;
+  for (const v of arr) if (Number.isFinite(v)) { lo = Math.min(lo, v); hi = Math.max(hi, v); }
+  if (!(hi > lo)) return { kyr: NaN, n: 0, idx: [] };
+  const prom = 0.1 * (hi - lo);
+  const cand = [];
+  for (let i = 1; i < arr.length - 1; i++) if (Number.isFinite(arr[i]) && arr[i] > arr[i - 1] && arr[i] >= arr[i + 1]) cand.push(i);
+  const minBetween = (a, b) => { let m = Infinity; for (let i = a; i <= b; i++) if (Number.isFinite(arr[i])) m = Math.min(m, arr[i]); return m; };
+  let changed = true;
+  while (changed && cand.length > 1) {
+    changed = false;
+    for (let k = 0; k < cand.length - 1; k++) {
+      const a = cand[k], b = cand[k + 1];
+      if (Math.min(arr[a], arr[b]) - minBetween(a, b) < prom) { cand.splice(arr[a] >= arr[b] ? k + 1 : k, 1); changed = true; break; }
+    }
+  }
+  if (cand.length < 2) return { kyr: NaN, n: 0, idx: cand };
+  let sum = 0;
+  for (let k = 0; k < cand.length - 1; k++) sum += yrs[cand[k + 1]] - yrs[cand[k]];
+  return { kyr: sum / (cand.length - 1) / 1000, n: cand.length - 1, idx: cand };
+}
+function _vfpMOSamples(range) {
+  const r = range || _vfpCurrentTabFor(_vfpMO_ID).range;
+  const y0 = r[0], y1 = r[1];
+  const tab = _vfpTabsFor(_vfpCategoryById(_vfpMO_ID)).find((t) => t.range[0] === y0 && t.range[1] === y1);
+  const N = (tab ? tab.samples : 800) + 1;
+  const key = y0 + ':' + y1 + ':' + (_hybridSpinActive() ? 's' : 'k') + (cfmLR04Data ? 'L' : '-') + (cfmEpicaData ? 'E' : '-');
+  if (_vfpMOCacheByRange[key]) return _vfpMOCacheByRange[key];
+  const yrs = new Array(N), vals = {}, periods = {};
+  for (const s of _vfpMO_STRIPS) vals[s.key] = new Array(N);
+  for (let i = 0; i < N; i++) {
+    const y = y0 + ((y1 - y0) * i) / (N - 1);
+    yrs[i] = y;
+    for (const s of _vfpMO_STRIPS) vals[s.key][i] = s.data ? _vfpMOProxyAt(s.data(), s.valKey, y) : s.fn(y);
+  }
+  for (const s of _vfpMO_STRIPS) {
+    if (!s.period) continue;
+    const p = _vfpMOMeanPeriodKyr(yrs, vals[s.key]);
+    if (s.envelope && p.idx.length > 2) p.env = _vfpMOMeanPeriodKyr(p.idx.map((i) => yrs[i]), p.idx.map((i) => vals[s.key][i]));
+    periods[s.key] = p;
+  }
+  return (_vfpMOCacheByRange[key] = { y0, y1, yrs, vals, periods });
+}
+/** Fetch the two proxy records once (the Climate Formula Explorer's
+ *  loaders, cached in its globals) and re-render the panel on arrival. */
+function _vfpMORequestData() {
+  if (_vfpMOState.dataRequested) return;
+  _vfpMOState.dataRequested = true;
+  Promise.all([loadCfmLR04Data(), loadEpicaData()]).then(() => {
+    if (verificationPanel && verificationPanel.classList.contains('visible') && verificationPanel._currentCategory === _vfpMO_ID) updateVerificationPanel(_vfpMO_ID);
+  });
+}
+function _vfpMOChartCore(range, style) {
+  const S = _vfpMOSamples(range);
+  const paper = style === 'paper';
+  // each strip: a 13-px label band, the curve below it (the label never
+  // sits on the curve); the right pad clears the last year label
+  const W = 800, SH = 84, LAB = 13, GAP = 6, PAD = { l: 64, r: 44, t: 14, b: 30 };
+  const n = _vfpMO_STRIPS.length;
+  const H = PAD.t + n * SH + (n - 1) * GAP + PAD.b;
+  const pw = W - PAD.l - PAD.r;
+  const cGrid = paper ? '#e4e4e4' : '#242a36', cTick = paper ? '#555' : '#8a93a5', cBox = paper ? '#bbb' : '#3a4356';
+  const toX = (y) => PAD.l + ((y - S.y0) / (S.y1 - S.y0)) * pw;
+  const bottom = H - PAD.b;
+  let body = '';
+  // the shared year axis: grid through every strip, labels under the last
+  for (const yt of _vfpYearTicks(S.y0, S.y1)) {
+    const x = toX(yt).toFixed(1);
+    body += '<line x1="' + x + '" x2="' + x + '" y1="' + PAD.t + '" y2="' + bottom + '" stroke="' + cGrid + '" stroke-width="0.6"/>';
+    body += '<text x="' + x + '" y="' + (bottom + 14) + '" text-anchor="middle" fill="' + cTick + '" font-size="' + (paper ? 10 : 9) + '">' + _vfpFmtYearBcAd(yt) + '</text>';
+  }
+  const strips = [];
+  _vfpMO_STRIPS.forEach((s, si) => {
+    const top = PAD.t + si * (SH + GAP);
+    const arr = S.vals[s.key];
+    let lo = Infinity, hi = -Infinity;
+    for (const v of arr) if (Number.isFinite(v)) { lo = Math.min(lo, v); hi = Math.max(hi, v); }
+    const has = hi > lo;
+    if (!has) { lo = 0; hi = 1; }
+    const m = (hi - lo) * 0.08;
+    const yLo = lo - m, yHi = hi + m;
+    const cTop = top + LAB, cH = SH - LAB;   // the curve's band
+    const toY = (v) => { const f = (v - yLo) / (yHi - yLo); return cTop + (s.invert ? f : 1 - f) * cH; };
+    const col = paper ? s.paper : s.screen;
+    body += '<rect x="' + PAD.l + '" y="' + top + '" width="' + pw + '" height="' + SH + '" fill="' + (paper ? '#fcfcfc' : 'rgba(255,255,255,0.015)') + '" stroke="' + cBox + '" stroke-width="0.6"/>';
+    if (has) {
+      // the strip's extremes as its two labels (the figure's style); the
+      // inverted δ¹⁸O strip reads its low value at the top
+      const fmt = (v) => v.toFixed(s.dec);
+      body += '<text x="' + (PAD.l - 5) + '" y="' + (cTop + 6) + '" text-anchor="end" dominant-baseline="middle" fill="' + cTick + '" font-size="9">' + fmt(s.invert ? lo : hi) + '</text>';
+      body += '<text x="' + (PAD.l - 5) + '" y="' + (top + SH - 6) + '" text-anchor="end" dominant-baseline="middle" fill="' + cTick + '" font-size="9">' + fmt(s.invert ? hi : lo) + '</text>';
+      let d = '', started = false;
+      for (let i = 0; i < arr.length; i++) {
+        const v = arr[i];
+        if (!Number.isFinite(v)) { started = false; continue; }
+        d += (started ? 'L' : 'M') + toX(S.yrs[i]).toFixed(1) + ',' + toY(v).toFixed(1);
+        started = true;
+      }
+      body += '<path d="' + d + '" fill="none" stroke="' + col + '" stroke-width="' + (paper ? 1.1 : 1.2) + '"/>';
+    } else {
+      body += '<text x="' + (PAD.l + pw / 2) + '" y="' + (top + SH / 2) + '" text-anchor="middle" dominant-baseline="middle" fill="' + cTick + '" font-size="10">' + (s.data ? (s.data() ? 'no record in this window' : 'loading the record …') : '—') + '</text>';
+    }
+    const P = S.periods[s.key];
+    let lab = s.name + (s.unit ? ' (' + s.unit.trim() + ')' : '');
+    if (P && P.n >= 2) lab += ' — ' + P.kyr.toFixed(1) + ' kyr' + (P.env && P.env.n >= 2 ? ', envelope ' + P.env.kyr.toFixed(0) + ' kyr' : '');
+    body += '<text x="' + (PAD.l + 6) + '" y="' + (top + 10) + '" fill="' + col + '" font-size="10" font-weight="600">' + escapeXml(lab) + '</text>';
+    strips.push({ key: s.key, top, yLo, yHi });
+  });
+  // the J2000 marker through every strip
+  if (2000 >= S.y0 && 2000 <= S.y1) {
+    const x = toX(2000).toFixed(1);
+    body += '<line x1="' + x + '" x2="' + x + '" y1="' + PAD.t + '" y2="' + bottom + '" stroke="' + (paper ? '#c62828' : '#ef5350') + '" stroke-width="0.8" stroke-dasharray="3,3"/>';
+    body += '<text x="' + x + '" y="' + (PAD.t - 4) + '" text-anchor="middle" fill="' + (paper ? '#c62828' : '#ef5350') + '" font-size="9">2,000</text>';
+  }
+  return { S, W, H, PAD, pw, body, strips };
+}
+function _vfpMONoteParts(core, withLinks) {
+  const S = core.S;
+  const frame = 'Seven strips on one time axis — the model’s obliquity, eccentricity, perihelion of date (sin ϖ), climatic precession (e·sin ϖ) and June-solstice insolation at 65°N, then the LR04 benthic δ¹⁸O stack (axis inverted, colder down) and the EPICA Dome C CO₂ record · ' +
+    _vfpFmtYearBcAd(S.y0) + ' → ' + _vfpFmtYearBcAd(S.y1) + '.';
+  const link = (u) => withLinks ? ' <a href="' + u + '" target="_blank" rel="noopener" class="vfp-source-link" title="Source">↗</a>' : '';
+  const references = 'LR04 — Lisiecki & Raymo (2005), the benthic δ¹⁸O stack, 5,320 kyr BP → 1950' + link('https://doi.org/10.1029/2004PA001071') +
+    ' · EPICA Dome C CO₂ — Bereiter et al. (2015), 800 kyr BP → 1950, 2-kyr bins' + link('https://doi.org/10.1002/2014GL061957') +
+    '; the five model strips are the panels’ own lines (Obliquity, Eccentricity, Perihelion Longitude, Climatic Precession, Summer Insolation) — no published series is overlaid here.';
+  const parts = [];
+  for (const s of _vfpMO_STRIPS) {
+    const P = S.periods[s.key];
+    if (!P || P.n < 2) continue;
+    parts.push(s.short + ' ' + P.kyr.toFixed(1) + ' kyr over ' + P.n + ' intervals' + (P.env && P.env.n >= 2 ? ' (envelope ' + P.env.kyr.toFixed(0) + ' kyr over ' + P.env.n + ')' : ''));
+  }
+  const reading = (parts.length ? 'Periods measured on this window as the mean spacing of each curve’s prominent maxima — ' + parts.join(' · ') + '. ' : '') +
+    'Every model strip is drawn from the model’s own elements of date; nothing here is fitted to the proxies, which are shown for their pacing — the 41-kyr obliquity beat of the early Pleistocene, the ~100-kyr glacial cycles of the last 800 kyr riding the eccentricity envelope. An open correspondence, not a validation: the fitted climate formula lives in the Climate Formula Explorer.';
+  return { frame, references, reading };
+}
+function renderVFPMilankovitch() {
+  _vfpMORequestData();
+  const core = _vfpMOChartCore(null, 'screen');
+  const W = core.W, H = core.H, PAD = core.PAD, S = core.S;
+  _vfpMOState._screenGeom = { W, H, PAD, y0: S.y0, y1: S.y1 };
+  const controls = _vfpCustomTabStrip(_vfpMO_ID);
+  const P = _vfpMONoteParts(core, true);
+  return '<div class="vfp-chart-block">' +
+    controls +
+    '<div style="position:relative;">' +
+    '<svg data-vfpmo-svg viewBox="0 0 ' + W + ' ' + H + '" width="100%" style="display:block;background:#151a22;border-radius:0 0 6px 6px;">' +
+    core.body +
+    '<line data-vfpmo-cursor x1="-10" x2="-10" y1="' + PAD.t + '" y2="' + (H - PAD.b) + '" stroke="#8a93a5" stroke-width="0.8" visibility="hidden"/>' +
+    '</svg>' +
+    '<div data-vfpmo-tip style="position:absolute;display:none;pointer-events:none;background:rgba(13,17,23,0.95);border:1px solid #3a4356;border-radius:6px;padding:6px 10px;font-size:11px;line-height:1.55;color:#e8ecf4;white-space:nowrap;z-index:5;"></div>' +
+    '</div>' +
+    _vfpCaptionHtml(P) +
+    '</div>';
+}
+function _vfpMOPaperSvg(range) {
+  const core = _vfpMOChartCore(range, 'paper');
+  const W = core.W, H = core.H, PAD = core.PAD, S = core.S;
+  const title = 'Milankovitch Overview — ' + _vfpFmtYearBcAd(S.y0) + ' → ' + _vfpFmtYearBcAd(S.y1);
+  const cap = _vfpPaperCaption(_vfpMONoteParts(core, false), PAD.l, 130);
+  const TOP = 30, XAXIS = 16;
+  const Hp = TOP + H + XAXIS + cap.height + 8;
+  return '<?xml version="1.0" encoding="UTF-8"?>\n' +
+    '<svg viewBox="0 0 ' + W + ' ' + Hp + '" width="' + W + '" height="' + Hp + '" xmlns="http://www.w3.org/2000/svg" font-family="Inter,Helvetica,Arial,sans-serif">' +
+    '<rect width="' + W + '" height="' + Hp + '" fill="white"/>' +
+    '<text x="' + (W / 2) + '" y="18" text-anchor="middle" fill="#222" font-size="16" font-weight="600">' + escapeXml(title) + '</text>' +
+    '<g transform="translate(0,' + TOP + ')">' + core.body +
+    '<text x="' + (PAD.l + core.pw / 2) + '" y="' + (H + 8) + '" text-anchor="middle" fill="#444" font-size="12" font-weight="500">Years (BC / AD)</text></g>' +
+    cap.svg(TOP + H + XAXIS) +
+    '</svg>';
+}
+function _vfpMOAfterRender(bodyEl) {
+  _vfpWireCustomTabs(bodyEl, _vfpMO_ID);
+  // hover: every strip's value at the pointed year
+  const svg = bodyEl.querySelector('svg[data-vfpmo-svg]');
+  const tip = bodyEl.querySelector('div[data-vfpmo-tip]');
+  const cursor = svg ? svg.querySelector('line[data-vfpmo-cursor]') : null;
+  const G = _vfpMOState._screenGeom;
+  if (!svg || !tip || !cursor || !G) return;
+  const S = _vfpMOSamples();
+  const hide = () => { tip.style.display = 'none'; cursor.setAttribute('visibility', 'hidden'); };
+  svg.addEventListener('mouseleave', hide);
+  svg.addEventListener('mousemove', (e) => {
+    const r = svg.getBoundingClientRect();
+    if (!r.width) return;
+    const px = ((e.clientX - r.left) / r.width) * G.W;
+    if (px < G.PAD.l || px > G.W - G.PAD.r) { hide(); return; }
+    const pw = G.W - G.PAD.l - G.PAD.r;
+    const i = Math.round(((px - G.PAD.l) / pw) * (S.yrs.length - 1));
+    const y = S.yrs[i];
+    const cx = (G.PAD.l + ((y - G.y0) / (G.y1 - G.y0)) * pw).toFixed(1);
+    cursor.setAttribute('x1', cx);
+    cursor.setAttribute('x2', cx);
+    cursor.setAttribute('visibility', 'visible');
+    let rows = '<div style="color:#8a93a5;margin-bottom:2px;">Year ' + (y < 0 ? '−' : '+') + Math.round(Math.abs(y)).toLocaleString('en-US') + '</div>';
+    for (const s of _vfpMO_STRIPS) {
+      const v = S.vals[s.key][i];
+      rows += '<div style="display:flex;justify-content:space-between;gap:16px;"><span style="color:' + s.screen + ';">' + s.short + '</span><span>' + (Number.isFinite(v) ? v.toFixed(s.dec) + s.unit : '—') + '</span></div>';
+    }
+    tip.innerHTML = rows;
+    tip.style.display = 'block';
+    const wr = svg.parentElement.getBoundingClientRect();
+    let tx = e.clientX - wr.left + 14;
+    if (tx + tip.offsetWidth > wr.width - 4) tx = e.clientX - wr.left - tip.offsetWidth - 14;
+    let ty = e.clientY - wr.top + 12;
+    if (ty + tip.offsetHeight > wr.height - 4) ty = wr.height - tip.offsetHeight - 4;
+    tip.style.left = Math.max(0, tx) + 'px';
+    tip.style.top = Math.max(0, ty) + 'px';
+  });
+}
+
 // ── VFP: Analemma — the Sun's figure-8 at four epochs ─────────────
 // (owner-requested; replaces the static "Predicted analemma" picture, whose
 // years came from the retired constant-rate device.) The analemma is the
@@ -21412,11 +21734,12 @@ function _vfpCurrentTab(category) {
  *  window, their strip is the same buttons, their sampling the window's
  *  count (never fewer than 200 points — the 1000–2500 window would
  *  otherwise get two 1-kyr samples). */
-function _vfpCurrentTabFor(catId) { return _vfpCurrentTab({ id: catId }); }
+const _vfpCategoryById = (id) => VFP_CATEGORIES.find((c) => c.id === id) || { id };
+function _vfpCurrentTabFor(catId) { return _vfpCurrentTab(_vfpCategoryById(catId)); }
 function _vfpCustomTabStrip(catId) {
   const cur = _vfpCurrentTabFor(catId).key;
   let s = '<div style="display:flex;gap:6px;padding:4px 4px 0;">';
-  for (const t of _VFP_TABS) {
+  for (const t of _vfpTabsFor(_vfpCategoryById(catId))) {   // a custom panel may carry its own four windows
     const active = t.key === cur;
     s += '<button data-vfp-tab="' + t.key + '" style="flex:1 1 0;padding:6px 0;border-radius:6px 6px 0 0;border:1px solid ' + (active ? '#4a5568' : '#2a2f3a') + ';border-bottom:none;background:' + (active ? '#232a36' : '#171c26') + ';color:' + (active ? '#e8ecf4' : '#8a93a5') + ';font-size:12px;cursor:pointer;">' + t.label + '</button>';
   }
