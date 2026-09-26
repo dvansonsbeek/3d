@@ -20054,6 +20054,14 @@ const VFP_CATEGORIES = [
     customPaper: () => _vfpMOPaperSvg(_vfpCurrentTabFor('milankovitch-overview').range),
   },
   {
+    // ── Moon · Month Lengths (owner-requested): the chain's months of date
+    // as strips against the Meeus Ch. 47 rates — see renderVFPMonthLengths.
+    id: 'moon-months', group: 'Moon', label: 'Month Lengths',
+    customRender: () => renderVFPMonthLengths(),
+    afterRender: (el) => _vfpMLAfterRender(el),
+    customPaper: () => _vfpMLPaperSvg(_vfpCurrentTabFor('moon-months').range),
+  },
+  {
     // ── Moon · Perigee Precession (owner-requested: the lunar twin of the
     // Earth precession panels): the period of the perigee's advance against
     // the equinox of date from the lunar chain (Brouwer–Clemence m²
@@ -20117,7 +20125,7 @@ const VFP_ORDER = [
   'obliquity', 'axial-precession',                                  // Earth axis
   'all-precession', 'climatic-precession', 'insolation-65n', 'milankovitch-overview', 'analemma',   // Earth cycles
   'tropical-year', 'sidereal-year', 'anomalistic-year', 'cardinal-year-lengths', 'season-durations', 'solar-day', 'delta-t',   // Earth clock
-  'moon-perigee', 'moon-node',                                      // Moon
+  'moon-months', 'moon-perigee', 'moon-node',                       // Moon
   'planet-inclinations', 'planet-eccentricities',                   // All planets
 ];
 VFP_CATEGORIES.sort((a, b) => VFP_ORDER.indexOf(a.id) - VFP_ORDER.indexOf(b.id));
@@ -21293,6 +21301,256 @@ function moonPerigeePrecessionYearsMeeus(year) {
 function moonNodeRegressionYearsMeeus(year) {
   const T = (year - 2000) / 100;
   return 36000 / Math.abs(_meeus47RateDegPerCy(_MEEUS47_LP, T) - _meeus47RateDegPerCy(_MEEUS47_F, T));
+}
+
+// ── Moon: the months of date from the Meeus Ch. 47 rates ────────────
+// tropical = 360°/L̇′ (L′ is referred to the equinox of date), sidereal =
+// 360°/(L̇′ − ṗ_A) with the IAU 2006 general precession in longitude,
+// synodic = 360°/Ḋ, anomalistic = 360°/Ṁ′, draconic = 360°/Ḟ (the three
+// differences are frame-free). Days of 86,400 s.
+const _MEEUS47_D = [297.8501921, 445267.1114034, -0.0018819, 1 / 545868, -1 / 113065000];
+/** IAU 2006 general precession in longitude p_A (Capitaine et al. 2003, P03),
+ *  its RATE in ″ per Julian century at T centuries from J2000. */
+function generalPrecessionRateIAU2006ArcsecPerCy(T) {
+  return 5028.796195 + 2 * 1.1054348 * T + 3 * 0.00007964 * T * T - 4 * 0.000023857 * T * T * T - 5 * 0.0000000383 * T * T * T * T;
+}
+const _meeusMonthDays = (rateDegPerCy) => 360 * julianCenturyDays / rateDegPerCy;
+const _meeusT = (year) => (yearToJDApprox(year) - j2000JD) / julianCenturyDays;
+function moonTropicalMonthDaysMeeus(year) { return _meeusMonthDays(_meeus47RateDegPerCy(_MEEUS47_LP, _meeusT(year))); }
+function moonSiderealMonthDaysMeeus(year) { const T = _meeusT(year); return _meeusMonthDays(_meeus47RateDegPerCy(_MEEUS47_LP, T) - generalPrecessionRateIAU2006ArcsecPerCy(T) / 3600); }
+function moonSynodicMonthDaysMeeus(year) { return _meeusMonthDays(_meeus47RateDegPerCy(_MEEUS47_D, _meeusT(year))); }
+function moonAnomalisticMonthDaysMeeus(year) { return _meeusMonthDays(_meeus47RateDegPerCy(_MEEUS47_MP, _meeusT(year))); }
+function moonDraconicMonthDaysMeeus(year) { return _meeusMonthDays(_meeus47RateDegPerCy(_MEEUS47_F, _meeusT(year))); }
+
+// ── VFP: Moon · Month Lengths — the months of date as strips ────────────
+// (owner-requested.) The chain's five months at age — the sidereal month is
+// Kepler's third law on the recession distance of date (Driver 1½ directly:
+// it lengthens at the tidal rate the LLR-anchored recession sets), the
+// synodic its beat with the sidereal year (both drivers), the anomalistic
+// and draconic its beats with the perigee and node cycles (the Moon
+// panels'), the tropical folds in the axial precession — each on its own
+// strip against the Meeus Ch. 47 rate of date (solid on the canon's
+// −2000 → 3000 range, dotted beyond). Sidereal and synodic on by default,
+// the other three selectable (owner). The months differ by two days while
+// their drifts are fractions of a second: a shared axis would show five
+// flat lines, hence strips.
+const _vfpML_ID = 'moon-months';
+const _VFPML_VALID = [-1999, 3000];
+const _vfpML_STRIPS = [
+  { key: 'sid', name: 'Sidereal month', screen: '#5ea0ff', paper: '#1d4ed8', model: (t) => meanMoonSiderealMonthAtAge(t), ref: moonSiderealMonthDaysMeeus, refShort: 'L̇′ − ṗ_A' },
+  { key: 'syn', name: 'Synodic month', screen: '#4ade80', paper: '#15803d', model: (t) => meanSynodicMonthAtAge(t), ref: moonSynodicMonthDaysMeeus, refShort: 'Ḋ' },
+  { key: 'anom', name: 'Anomalistic month', screen: '#f87171', paper: '#b91c1c', model: (t) => meanAnomalisticMonthAtAge(t), ref: moonAnomalisticMonthDaysMeeus, refShort: 'Ṁ′' },
+  { key: 'drac', name: 'Draconic month', screen: '#c084fc', paper: '#7e22ce', model: (t) => meanNodalMonthAtAge(t), ref: moonDraconicMonthDaysMeeus, refShort: 'Ḟ' },
+  { key: 'trop', name: 'Tropical month', screen: '#e8ecf4', paper: '#222', model: (t) => meanTropicalMonthAtAge(t), ref: moonTropicalMonthDaysMeeus, refShort: 'L̇′' },
+];
+const _vfpML_REF_COLOR = { screen: '#f472b6', paper: '#be185d' };   // Meeus, magenta — no strip uses it
+const _vfpMLState = { on: { sid: true, syn: true, anom: false, drac: false, trop: false }, _screenGeom: null };
+const _vfpMLCacheByRange = {};
+function _vfpMLSamples(range) {
+  const r = range || _vfpCurrentTabFor(_vfpML_ID).range;
+  const y0 = r[0], y1 = r[1];
+  const key = y0 + ':' + y1;
+  if (_vfpMLCacheByRange[key]) return _vfpMLCacheByRange[key];
+  const N = _vfpSamplesForSpan(y0, y1);
+  const yrs = new Array(N), model = {}, ref = {}, stats = {};
+  for (const s of _vfpML_STRIPS) { model[s.key] = new Array(N); ref[s.key] = new Array(N); }
+  const days = (sec) => Number.isFinite(sec) ? sec / 86400 : NaN;   // the chain returns null past the tidal lock
+  for (let i = 0; i < N; i++) {
+    const y = y0 + ((y1 - y0) * i) / (N - 1);
+    yrs[i] = y;
+    const t = (startmodelYear - y) / 1e6;
+    for (const s of _vfpML_STRIPS) { model[s.key][i] = days(s.model(t)); ref[s.key][i] = s.ref(y); }
+  }
+  // per strip: the J2000 pair and the rms of (Meeus − model) in seconds over
+  // the window's samples inside the canon's validity
+  for (const s of _vfpML_STRIPS) {
+    let s2 = 0, n = 0;
+    for (let i = 0; i < N; i++) {
+      if (yrs[i] < _VFPML_VALID[0] || yrs[i] > _VFPML_VALID[1]) continue;
+      const d = (ref[s.key][i] - model[s.key][i]) * 86400;
+      if (Number.isFinite(d)) { s2 += d * d; n++; }
+    }
+    stats[s.key] = { rmsS: n ? Math.sqrt(s2 / n) : NaN, n, modelJ2000: days(s.model((startmodelYear - 2000) / 1e6)), refJ2000: s.ref(2000) };
+  }
+  return (_vfpMLCacheByRange[key] = { y0, y1, yrs, model, ref, stats });
+}
+function _vfpMLChartCore(range, on, style) {
+  const S = _vfpMLSamples(range);
+  const paper = style === 'paper';
+  const strips = _vfpML_STRIPS.filter((s) => on[s.key]);
+  const W = 800, SH = 96, LAB = 13, GAP = 6, PAD = { l: 78, r: 44, t: 14, b: 30 };
+  const n = Math.max(1, strips.length);
+  const H = PAD.t + n * SH + (n - 1) * GAP + PAD.b;
+  const pw = W - PAD.l - PAD.r;
+  // the Meeus line in ONE colour no strip uses (magenta), on both surfaces
+  const cGrid = paper ? '#e4e4e4' : '#242a36', cTick = paper ? '#555' : '#8a93a5', cBox = paper ? '#bbb' : '#3a4356', cRef = _vfpML_REF_COLOR[paper ? 'paper' : 'screen'];
+  const toX = (y) => PAD.l + ((y - S.y0) / (S.y1 - S.y0)) * pw;
+  const bottom = H - PAD.b;
+  let body = '';
+  for (const yt of _vfpYearTicks(S.y0, S.y1)) {
+    const x = toX(yt).toFixed(1);
+    body += '<line x1="' + x + '" x2="' + x + '" y1="' + PAD.t + '" y2="' + bottom + '" stroke="' + cGrid + '" stroke-width="0.6"/>';
+    body += '<text x="' + x + '" y="' + (bottom + 14) + '" text-anchor="middle" fill="' + cTick + '" font-size="' + (paper ? 10 : 9) + '">' + _vfpFmtYearBcAd(yt) + '</text>';
+  }
+  const valid = (y) => y >= _VFPML_VALID[0] && y <= _VFPML_VALID[1];
+  if (!strips.length) body += '<text x="' + (PAD.l + pw / 2) + '" y="' + (PAD.t + SH / 2) + '" text-anchor="middle" dominant-baseline="middle" fill="' + cTick + '" font-size="11">no month selected</text>';
+  strips.forEach((s, si) => {
+    const top = PAD.t + si * (SH + GAP);
+    const cTop = top + LAB, cH = SH - LAB;
+    const m = S.model[s.key], rf = S.ref[s.key];
+    // the range from the model everywhere and the reference INSIDE validity
+    let lo = Infinity, hi = -Infinity;
+    for (let i = 0; i < m.length; i++) {
+      if (Number.isFinite(m[i])) { lo = Math.min(lo, m[i]); hi = Math.max(hi, m[i]); }
+      if (valid(S.yrs[i]) && Number.isFinite(rf[i])) { lo = Math.min(lo, rf[i]); hi = Math.max(hi, rf[i]); }
+    }
+    const has = hi > lo;
+    if (!has) { lo = 0; hi = 1; }
+    const mg = (hi - lo) * 0.1;
+    const yLo = lo - mg, yHi = hi + mg;
+    const toY = (v) => cTop + (1 - (v - yLo) / (yHi - yLo)) * cH;
+    const col = paper ? s.paper : s.screen;
+    body += '<rect x="' + PAD.l + '" y="' + top + '" width="' + pw + '" height="' + SH + '" fill="' + (paper ? '#fcfcfc' : 'rgba(255,255,255,0.015)') + '" stroke="' + cBox + '" stroke-width="0.6"/>';
+    if (has) {
+      // the strip's extremes as its axis labels, with the decimals the span needs
+      const dec = Math.min(9, Math.max(4, -Math.floor(Math.log10(hi - lo)) + 1));
+      body += '<text x="' + (PAD.l - 5) + '" y="' + (cTop + 6) + '" text-anchor="end" dominant-baseline="middle" fill="' + cTick + '" font-size="9">' + hi.toFixed(dec) + '</text>';
+      body += '<text x="' + (PAD.l - 5) + '" y="' + (top + SH - 6) + '" text-anchor="end" dominant-baseline="middle" fill="' + cTick + '" font-size="9">' + lo.toFixed(dec) + '</text>';
+      // the reference: solid inside validity, dotted beyond, clamped to the strip
+      let solid = '', dotted = '', sOn = false, dOn = false;
+      for (let i = 0; i < rf.length; i++) {
+        const v = rf[i];
+        if (!Number.isFinite(v)) { sOn = false; dOn = false; continue; }
+        const p = toX(S.yrs[i]).toFixed(1) + ',' + Math.max(cTop, Math.min(top + SH, toY(v))).toFixed(1);
+        if (valid(S.yrs[i])) { solid += (sOn ? 'L' : 'M') + p; sOn = true; if (dOn) { dotted += 'L' + p; dOn = false; } }
+        else { if (sOn) { dotted += 'M' + p; sOn = false; dOn = true; } else { dotted += (dOn ? 'L' : 'M') + p; dOn = true; } }
+      }
+      if (dotted) body += '<path d="' + dotted + '" fill="none" stroke="' + cRef + '" stroke-width="1" stroke-dasharray="2,3" opacity="0.7"/>';
+      if (solid) body += '<path d="' + solid + '" fill="none" stroke="' + cRef + '" stroke-width="1.4"/>';
+      let d = '', started = false;
+      for (let i = 0; i < m.length; i++) {
+        const v = m[i];
+        if (!Number.isFinite(v)) { started = false; continue; }
+        d += (started ? 'L' : 'M') + toX(S.yrs[i]).toFixed(1) + ',' + toY(v).toFixed(1);
+        started = true;
+      }
+      body += '<path d="' + d + '" fill="none" stroke="' + col + '" stroke-width="1.5"/>';
+    }
+    const st = S.stats[s.key];
+    const lab = s.name + ' (d) — J2000 model ' + (Number.isFinite(st.modelJ2000) ? st.modelJ2000.toFixed(7) : '—') + ' · Meeus ' + st.refJ2000.toFixed(7) +
+      (st.n ? ' · rms ' + st.rmsS.toFixed(2) + ' s over ' + st.n + ' samples inside validity' : '');
+    body += '<text x="' + (PAD.l + 6) + '" y="' + (top + 10) + '" fill="' + col + '" font-size="10" font-weight="600">' + escapeXml(lab) + '</text>';
+  });
+  if (2000 >= S.y0 && 2000 <= S.y1) {
+    const x = toX(2000).toFixed(1);
+    body += '<line x1="' + x + '" x2="' + x + '" y1="' + PAD.t + '" y2="' + bottom + '" stroke="' + (paper ? '#c62828' : '#ef5350') + '" stroke-width="0.8" stroke-dasharray="3,3"/>';
+    body += '<text x="' + x + '" y="' + (PAD.t - 4) + '" text-anchor="middle" fill="' + (paper ? '#c62828' : '#ef5350') + '" font-size="9">2,000</text>';
+  }
+  return { S, W, H, PAD, pw, body, strips };
+}
+function _vfpMLNoteParts(core, on, withLinks) {
+  const S = core.S;
+  const names = _vfpML_STRIPS.filter((s) => on[s.key]).map((s) => s.name.toLowerCase());
+  const frame = 'The Moon’s months of date (days of 86,400 s) — ' + (names.length ? names.join(', ') : 'none selected') + ' — each on its own strip · ' +
+    _vfpFmtYearBcAd(S.y0) + ' → ' + _vfpFmtYearBcAd(S.y1) + '.';
+  const link = withLinks ? ' <a href="https://en.wikipedia.org/wiki/Lunar_month" target="_blank" rel="noopener" class="vfp-source-link" title="Source">↗</a>' : '';
+  const references = 'Meeus (1998) Ch. 47 mean-argument rates (Chapront ELP-2000/82): tropical = 360°/L̇′, sidereal = 360°/(L̇′ − ṗ_A) with the IAU 2006 general precession, synodic = 360°/Ḋ, anomalistic = 360°/Ṁ′, draconic = 360°/Ḟ' + link +
+    ' — a J2000-centred fit offered on the canon’s ' + _vfpFmtYearBcAd(_VFPML_VALID[0]) + ' → ' + _vfpFmtYearBcAd(_VFPML_VALID[1]) + ' range, dotted beyond.';
+  const parts = [];
+  for (const s of _vfpML_STRIPS) {
+    if (!on[s.key]) continue;
+    const st = S.stats[s.key];
+    parts.push(s.name + ': J2000 model ' + (Number.isFinite(st.modelJ2000) ? st.modelJ2000.toFixed(7) : '—') + ' d vs Meeus ' + st.refJ2000.toFixed(7) + ' d' +
+      (st.n ? ', rms ' + st.rmsS.toFixed(2) + ' s over ' + st.n + ' samples inside validity' : ', no sample inside validity on this window'));
+  }
+  const reading = (parts.length ? parts.join(' · ') + '. ' : '') +
+    'The sidereal month is Kepler’s third law on the recession distance of date: it lengthens at the tidal rate the LLR-anchored recession sets, the deceleration of the Moon’s mean longitude the ELP secular term records; Meeus’s L′ also carries the planetary part of that term, which an orbit-size law does not, so the two slopes part by a fraction of a second at the canon’s edges. The synodic month is the beat of the sidereal month with the sidereal year and so mixes both drivers; the anomalistic and draconic months are its beats with the perigee and node cycles of the Moon panels; the tropical month folds in the axial precession.';
+  return { frame, references, reading };
+}
+function renderVFPMonthLengths() {
+  const on = _vfpMLState.on;
+  const core = _vfpMLChartCore(null, on, 'screen');
+  const W = core.W, H = core.H, PAD = core.PAD, S = core.S;
+  _vfpMLState._screenGeom = { W, H, PAD, y0: S.y0, y1: S.y1 };
+  let controls = _vfpCustomTabStrip(_vfpML_ID) +
+    '<div style="padding:8px 6px;border:1px solid #2a2f3a;border-radius:0;background:#171c26;line-height:2;">';
+  for (const s of _vfpML_STRIPS) {
+    controls += '<label style="margin-right:12px;font-size:11px;color:' + s.screen + ';opacity:' + (on[s.key] ? '1' : '0.45') + ';cursor:pointer;white-space:nowrap;">' +
+      '<input type="checkbox" data-vfpml="' + s.key + '"' + (on[s.key] ? ' checked' : '') + ' style="vertical-align:-2px;margin-right:3px;">' + s.name + '</label>';
+  }
+  controls += '<span style="float:right;font-size:10px;color:#8a93a5;">model in each strip’s colour · Meeus <span style="display:inline-block;width:18px;height:3px;background:' + _vfpML_REF_COLOR.screen + ';vertical-align:middle;margin:0 4px 0 2px;"></span></span></div>';
+  const P = _vfpMLNoteParts(core, on, true);
+  return '<div class="vfp-chart-block">' +
+    controls +
+    '<div style="position:relative;">' +
+    '<svg data-vfpml-svg viewBox="0 0 ' + W + ' ' + H + '" width="100%" style="display:block;background:#151a22;border-radius:0 0 6px 6px;">' +
+    core.body +
+    '<line data-vfpml-cursor x1="-10" x2="-10" y1="' + PAD.t + '" y2="' + (H - PAD.b) + '" stroke="#8a93a5" stroke-width="0.8" visibility="hidden"/>' +
+    '</svg>' +
+    '<div data-vfpml-tip style="position:absolute;display:none;pointer-events:none;background:rgba(13,17,23,0.95);border:1px solid #3a4356;border-radius:6px;padding:6px 10px;font-size:11px;line-height:1.55;color:#e8ecf4;white-space:nowrap;z-index:5;"></div>' +
+    '</div>' +
+    _vfpCaptionHtml(P) +
+    '</div>';
+}
+function _vfpMLPaperSvg(range) {
+  const on = _vfpMLState.on;
+  const core = _vfpMLChartCore(range, on, 'paper');
+  const W = core.W, H = core.H, PAD = core.PAD, S = core.S;
+  const title = 'Moon · Month Lengths — ' + _vfpFmtYearBcAd(S.y0) + ' → ' + _vfpFmtYearBcAd(S.y1);
+  const legend = _vfpPaperLegend(core.strips.map((s) => ({ name: s.name + ' (model)', color: s.paper, dash: false, bold: false })).concat([{ name: 'Meeus (1998), Ch. 47 rates', color: _vfpML_REF_COLOR.paper, dash: false, bold: false }]), W);
+  const cap = _vfpPaperCaption(_vfpMLNoteParts(core, on, false), PAD.l, 130);
+  const TOP = legend.bottom + 4, XAXIS = 16;
+  const Hp = TOP + H + XAXIS + cap.height + 8;
+  return '<?xml version="1.0" encoding="UTF-8"?>\n' +
+    '<svg viewBox="0 0 ' + W + ' ' + Hp + '" width="' + W + '" height="' + Hp + '" xmlns="http://www.w3.org/2000/svg" font-family="Inter,Helvetica,Arial,sans-serif">' +
+    '<rect width="' + W + '" height="' + Hp + '" fill="white"/>' +
+    '<text x="' + (W / 2) + '" y="18" text-anchor="middle" fill="#222" font-size="16" font-weight="600">' + escapeXml(title) + '</text>' +
+    legend.svg +
+    '<g transform="translate(0,' + TOP + ')">' + core.body +
+    '<text x="' + (PAD.l + core.pw / 2) + '" y="' + (H + 8) + '" text-anchor="middle" fill="#444" font-size="12" font-weight="500">Years (BC / AD)</text></g>' +
+    cap.svg(TOP + H + XAXIS) +
+    '</svg>';
+}
+function _vfpMLAfterRender(bodyEl) {
+  _vfpWireCustomTabs(bodyEl, _vfpML_ID);
+  bodyEl.querySelectorAll('input[data-vfpml]').forEach((cbEl) => {
+    cbEl.addEventListener('change', () => { _vfpMLState.on[cbEl.dataset.vfpml] = cbEl.checked; updateVerificationPanel(_vfpML_ID); });
+  });
+  const svg = bodyEl.querySelector('svg[data-vfpml-svg]');
+  const tip = bodyEl.querySelector('div[data-vfpml-tip]');
+  const cursor = svg ? svg.querySelector('line[data-vfpml-cursor]') : null;
+  const G = _vfpMLState._screenGeom;
+  if (!svg || !tip || !cursor || !G) return;
+  const S = _vfpMLSamples();
+  const on = _vfpMLState.on;
+  const hide = () => { tip.style.display = 'none'; cursor.setAttribute('visibility', 'hidden'); };
+  svg.addEventListener('mouseleave', hide);
+  svg.addEventListener('mousemove', (e) => {
+    const r = svg.getBoundingClientRect();
+    if (!r.width) return;
+    const px = ((e.clientX - r.left) / r.width) * G.W;
+    if (px < G.PAD.l || px > G.W - G.PAD.r) { hide(); return; }
+    const pw = G.W - G.PAD.l - G.PAD.r;
+    const i = Math.round(((px - G.PAD.l) / pw) * (S.yrs.length - 1));
+    const y = S.yrs[i];
+    const cx = (G.PAD.l + ((y - G.y0) / (G.y1 - G.y0)) * pw).toFixed(1);
+    cursor.setAttribute('x1', cx); cursor.setAttribute('x2', cx); cursor.setAttribute('visibility', 'visible');
+    const f = (v) => Number.isFinite(v) ? v.toFixed(7) + ' d' : '—';
+    let rows = '<div style="color:#8a93a5;margin-bottom:2px;">Year ' + (y < 0 ? '−' : '+') + Math.round(Math.abs(y)).toLocaleString('en-US') + ' · model · Meeus</div>';
+    for (const s of _vfpML_STRIPS) {
+      if (!on[s.key]) continue;
+      rows += '<div style="display:flex;justify-content:space-between;gap:16px;"><span style="color:' + s.screen + ';">' + s.name + '</span><span>' + f(S.model[s.key][i]) + ' · ' + f(S.ref[s.key][i]) + '</span></div>';
+    }
+    tip.innerHTML = rows;
+    tip.style.display = 'block';
+    const wr = svg.parentElement.getBoundingClientRect();
+    let tx = e.clientX - wr.left + 14;
+    if (tx + tip.offsetWidth > wr.width - 4) tx = e.clientX - wr.left - tip.offsetWidth - 14;
+    let ty = e.clientY - wr.top + 12;
+    if (ty + tip.offsetHeight > wr.height - 4) ty = wr.height - tip.offsetHeight - 4;
+    tip.style.left = Math.max(0, tx) + 'px';
+    tip.style.top = Math.max(0, ty) + 'px';
+  });
 }
 
 // ── Daily insolation — Berger (1978)'s closed form ──────────────────
@@ -46373,13 +46631,6 @@ const planetStats = {
        hover : [`Time for the Moon's apsidal and nodal precession cycles to realign — when perigee and the ascending node return to the same relative position. This is the beat frequency between the anomalistic and draconic months: P = P_anom × P_drac / (P_anom − P_drac). ≈ ${fmtNum(moonApsidalMeetsNodalindays/meansolaryearlengthinDays,2,',')} years. All derived from the 3 lunar month inputs (at J2000)`]},
       {label : () => ``,
        value : [ { v: () => moonApsidalMeetsNodalindays/meansolaryearlengthinDays, dec:10, sep:',' },{ small: 'years' }]},
-    null,
-      {label : () => `Lunar Leveling Cycle`,
-       value : [ { v: () => moonLunarLevelingCycleindays, dec:10, sep:',' },{ small: 'days' }],
-       hover : [`The beat frequency between the nodal and apsidal precession periods (Earth frame). This cycle represents when the two precession effects return to the same relative phase. Linked to the Chandler wobble (~433 days). P = P_nodal × P_apsidal / (P_nodal − P_apsidal). ≈ ${fmtNum(moonLunarLevelingCycleindays/meansolaryearlengthinDays,2,',')} years. All derived from the 3 lunar month inputs (at J2000)`],
-       info  : 'https://geoenergymath.com/2014/04/05/the-chandler-wobble-and-the-soim/'},
-      {label : () => ``,
-       value : [ { v: () => moonLunarLevelingCycleindays/meansolaryearlengthinDays, dec:10, sep:',' },{ small: 'years' }]},
 
     {header : '—  Orbital Orientation to Ecliptic —' },
       {label : () => `Longitude of perigee (ϖ)`,
