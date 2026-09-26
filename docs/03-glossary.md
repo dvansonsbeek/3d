@@ -142,7 +142,7 @@ The point in an orbit closest to the Sun. Earth reaches perihelion around Januar
 The point in an orbit farthest from the Sun. Earth reaches aphelion around July 4.
 
 ### Obliquity
-The angle between Earth's rotational axis and the perpendicular to its orbital plane. Currently about 23.44°, but oscillates between ~22.1° and ~24.5° over H/8 years (Laskar 1993 range; the model's own two-component range is 22.78°–24.05°).
+The angle between Earth's rotational axis and the perpendicular to its orbital plane. Currently about 23.44°, oscillating between ~22.1° and ~24.5° on the ~41-kyr beat of the precession clock against the orbit plane's nodal mode s₃ (Laskar 1993 range). The model derives it from one precession equation on its own N-body orbit plane (doc 109 §18); it is not split into separate axial and inclination components.
 
 ---
 

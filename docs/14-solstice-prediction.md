@@ -20,6 +20,17 @@ status: current
 > doc 110 §5.3). The
 > `CARDINAL_POINT_*` coefficients stay in the coefficients file as the
 > record until the cleanup phase; this document is that record.
+>
+> **Formula 1 below (the cardinal-point right ascension) was the device's
+> azimuth in the scene's own axis frame, not a quantity of the sky.** Its
+> two equal-amplitude sine terms on the apsidal and beat periods, the
+> 5h 47m mean and the 6.3° swing belong to the retired two-component
+> obliquity device. A cardinal point's right ascension in the equator and
+> equinox of date is its target longitude by construction (0h/6h/12h/18h;
+> `createModel().cardinal.raDeg` returns exactly that), and in the fixed
+> ICRF the solstice point advances with the precession of the equinoxes.
+> No RA prediction remains; the website's former prediction and the
+> paper's subsection were removed.
 
 ## Overview
 

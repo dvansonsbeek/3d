@@ -137,17 +137,19 @@ The climate formula's orbital lines against the Cenozoic isotope record (the com
   is statistically consistent with the pinned column, χ² = 6.7 over 5
   centuries under the E5 basis — the dLOD/dt stack survives its
   falsification test — [doc 102 §Phase C verdict](102-gia-alpha-lunar-validation.md).
-- **The framework-native Sun (E4/E5)** — the certified eclipse chain's
-  Sun is assembled entirely from the model's own laws (the H/16
-  eccentricity channel + the derived H/3 inclination coupling; L₀ + the
-  mean tropical rate + the f(Y) year-harmonic drift shape + the derived
-  cos-ε torque term on the two-component obliquity law), zero fitted
-  sun constants, shared by all three runtimes. It beats the Meeus Ch. 25
-  basis against JPL in-window (0.95″ vs 1.28″ scatter) and against the
-  ancient solar corpus (Babylon −135 at 194 km vs the Meeus-era 206;
-  −708 Lu at 9 km), with the torque term's per-divisor structure
-  blind-selected by the corpus before its derivation existed —
-  [doc 103 §E4/E5 update](103-135-babylonian-case-study.md).
+- **The certified Sun** — the eclipse chain's Sun is assembled from the
+  model's own dynamics: a mean longitude that integrates the one-source
+  tropical year, Kepler's equation of centre on the one-source e(t) and
+  ϖ(t) (the banked N-body series), and the derived planetary completion
+  (the Sun's long inequalities from the model's own engine), shared by
+  all three runtimes. Against JPL Horizons over ±3000 yr it reads
+  <!--v:sunVsHorizonsMeanArcsec-->9.45<!--/v-->″ mean / <!--v:sunVsHorizonsSdArcsec-->7.60<!--/v-->″ sd
+  (modern sd <!--v:sunVsHorizonsModernSdArcsec-->0.96<!--/v-->″); the Babylon −135 umbra
+  track sits <!--v:babylon135BestGapKm-->177<!--/v--> km from the documented
+  station — [doc 103](103-135-babylonian-case-study.md). The era-device
+  Sun assembly this bullet once described (the H/16 eccentricity
+  channel, the H/3 coupling and the cos-ε torque term on the
+  two-component obliquity law) is retired.
 
 ## D. The honesty ledger — what does NOT validate, asserted anyway
 

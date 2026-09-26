@@ -48,7 +48,7 @@ and why.
 | # | Document | Description |
 |---|----------|-------------|
 | 11 | [Day & Year Length Formulas](11-length-day-year-formulas.md) | Tropical year and day length: measurement methods, validation, the frozen-era laws and the one-source year lengths |
-| 14 | [Solstice Prediction](14-solstice-prediction.md) | Solstice RA and timing from the cardinal-point harmonic combs — the cardinal-point machinery |
+| 14 | [Solstice Prediction](14-solstice-prediction.md) | Record of the retired fitted cardinal-point model (harmonic combs on the frozen era clock; its RA formula was the device's own axis frame) — the cardinal instants now ride the certified Sun (`createModel().cardinal`) |
 | 65 | [Equation of Center](65-equation-of-center.md) | The Sun wheel's variable-speed construction: the geometric/analytic split, the derived exact-Kepler corrector (default path), the certified-Sun δ overlay, and the registry-resident legacy harmonic layer |
 | 13 | [Perihelion Precession](13-mercury-precession-breakdown.md) | The two perihelion coordinates and their methods, the Earth-frame projection account (§1.8, gate-pinned for all seven planets), and the Laplace–Lagrange comparison |
 

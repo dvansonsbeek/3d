@@ -81,7 +81,7 @@ the lattice tested at its own quantity type).
 Earth's own motion — spin, precession devices, tides, H(t), the cardinal
 points, the one-source movement — stays on the engine-K hierarchy and is
 documented where it lives: [doc 11](11-length-day-year-formulas.md)
-(years and days), [doc 14](14-solstice-prediction.md) (cardinal points),
+(years and days), [doc 14](14-solstice-prediction.md) (the retired cardinal-point combs, kept as the record),
 [doc 40](40-architecture.md) (the one-source movement),
 [doc 99](99-expanding-solar-system-resonance-theory.md) (ESSRT).
 

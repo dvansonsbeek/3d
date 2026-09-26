@@ -417,5 +417,5 @@ Training data: `data/02-solar-measurements.csv`
 
 ## Related
 
-- [Solstice Prediction](14-solstice-prediction.md) — cardinal point harmonic formulas
+- [Solstice Prediction](14-solstice-prediction.md) — record of the retired cardinal-point harmonic formulas
 - **Solar Day Report** (browser: Reports > Solar Day) — measures 365 noon-to-noon intervals from 6 starting points, visualizes the analemma and equation-of-time bias by starting angle
