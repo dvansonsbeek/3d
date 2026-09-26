@@ -1,0 +1,1053 @@
+{
+ "_description": "T7 \u2014 the fixed-phase L1 (holisticuniverse plan 06 \u00a74, pre-registered before\nthis script existed; outcomes written there first).\n\n    python3 scripts/t7_fixed_phase_l1.py            print the verdict\n    python3 scripts/t7_fixed_phase_l1.py --write    write data/t7-fixed-phase-l1.json (inputs-stamped)\n\nWHAT L1 IS TODAY: 28 lines on the engine's own frequencies with per-regime\nFITTED cos/sin pairs \u2014 a free amplitude AND a free phase per line, 56 free\nnumbers per regime, ridge-shrunk (scripts/milankovitch_climate_formula.py).\nThe GIA channel \u03b1(t) = \u03b1\u2080 \u2212 k\u00b7[L1 \u2212 \u27e8L1\u27e9_\u03c4] inherits those fitted phases.\n\nTHE TEST: the 56 numbers replaced by the MODEL'S OWN histories as regressors \u2014\n  (a) three families: e(t), \u03b5(t), e\u00b7sin \u03d6(t) from the banked \u00b110-Myr engine\n      run (data/t7-model-orbital-histories.json \u2014 the one-source movement the\n      scene renders, built at 1 kyr), one amplitude each + ONE common climate\n      lag \u03c4 (the forcing at t + \u03c4 kyr BP drives the proxy at t): 4 free numbers\n  (b) the single classic forcing, the model's own June-solstice insolation at\n      65\u00b0N (Berger's daily form on the same e, \u03b5, \u03d6), one amplitude + one lag:\n      2 free numbers\n  free   the shipped L1: 28 lines, free cos/sin per line, the fitter's own\n         ridge (L1 only \u2014 the 405-kyr family is inside L1 since T1; L3 steps\n         fall outside every regime window by the fitter's strict rule)\nSame LR04 preprocessing (1-kyr grid, linear detrend per window), same regimes.\n\nPRE-REGISTERED OUTCOMES (plan 06 \u00a74 T7):\n  (1) in-window, per regime: fixed-phase R\u00b2 < free R\u00b2 (a constrained subset; a\n      higher value would be a solver defect) AND fixed-phase R\u00b2 > the 95th\n      percentile of the same-size null \u2014 phase-randomised surrogates of the\n      SAME regressors (same amplitude spectrum, random Fourier phases; the\n      same 4 free numbers and the same lag scan). Failing the null = the\n      model's phases are wrong over the window \u2192 doc 108 \u00a76 first.\n  (2) THE DISCRIMINATING PREDICTION \u2014 hold-out: fit on one half of the regime\n      window, score the other, both orders. Expected: fixed-phase hold-out R\u00b2\n      \u2265 the free fit's hold-out R\u00b2 in post-MPT AND pre-iNHG.\n  (3) every number written by this script; La2004 (data/la2004-earth-51myr-\n      back.asc) is a CONFIRMATION column only \u2014 the same models on Laskar's\n      e, \u03b5, \u03d6\u0304.\n  (c) variant, run as a diagnostic regardless of (2): the Imbrie & Imbrie\n      (1980) ice-volume response to the model's \u2212Q65N (asymmetric time\n      constant), one amplitude + the two response parameters on a small grid.\n\nLR04's age model is orbitally tuned (Lisiecki & Raymo 2005) \u2014 every model here\nsees the same imprint; the hold-out compares models, not the record.",
+ "config": {
+  "regimes": [
+   "post-mpt",
+   "inhg-mpt",
+   "pre-inhg"
+  ],
+  "lags_kyr": [
+   0.0,
+   0.5,
+   1.0,
+   1.5,
+   2.0,
+   2.5,
+   3.0,
+   3.5,
+   4.0,
+   4.5,
+   5.0,
+   5.5,
+   6.0,
+   6.5,
+   7.0,
+   7.5,
+   8.0,
+   8.5,
+   9.0,
+   9.5,
+   10.0,
+   10.5,
+   11.0,
+   11.5,
+   12.0,
+   12.5,
+   13.0,
+   13.5,
+   14.0,
+   14.5,
+   15.0,
+   15.5,
+   16.0,
+   16.5,
+   17.0,
+   17.5,
+   18.0,
+   18.5,
+   19.0,
+   19.5,
+   20.0
+  ],
+  "n_null": 300,
+  "rng_seed": 20260926,
+  "imbrie_tm_kyr": [
+   10.0,
+   17.0,
+   25.0
+  ],
+  "imbrie_b": [
+   0.3,
+   0.6
+  ],
+  "ridge_lambda": 1.0,
+  "l1_lines": 28,
+  "lr04_dt_kyr": 1.0,
+  "detrend": "linear per window (the fitter's preprocess)",
+  "holdout": "each regime window split at its midpoint; fit one half (lag and coefficients chosen on it), score the other; both orders; mean reported"
+ },
+ "results": {
+  "post-mpt": {
+   "window_kyr": [
+    0,
+    1000
+   ],
+   "n": 1001,
+   "free_28_lines": {
+    "r2": 0.7788098703157482,
+    "condition": 1785864.5224030165,
+    "n_free": 56,
+    "holdout": {
+     "halves": [
+      {
+       "fit": [
+        0,
+        500.0
+       ],
+       "score": [
+        500.0,
+        1000
+       ],
+       "r2_fit": 0.8709212869460659,
+       "r2_holdout": -8.15922708547443
+      },
+      {
+       "fit": [
+        500.0,
+        1000
+       ],
+       "score": [
+        0,
+        500.0
+       ],
+       "r2_fit": 0.8283539312599052,
+       "r2_holdout": -1.6386920495808295
+      }
+     ],
+     "r2_holdout_mean": -4.89895956752763
+    },
+    "ridge_scan": {
+     "1.0": {
+      "r2_in_window": 0.7788098703157482,
+      "r2_holdout_mean": -4.89895956752763
+     },
+     "10.0": {
+      "r2_in_window": 0.7419956325515709,
+      "r2_holdout_mean": -0.6964395621678122
+     },
+     "100.0": {
+      "r2_in_window": 0.6844627113153239,
+      "r2_holdout_mean": -0.1537978167063817
+     },
+     "1000.0": {
+      "r2_in_window": 0.49713040432391387,
+      "r2_holdout_mean": 0.020438482195902052
+     }
+    },
+    "best_holdout_any_lambda": 0.020438482195902052
+   },
+   "fixed_a_e_eps_esinw": {
+    "in_window": {
+     "r2": 0.3777224586331057,
+     "lag_kyr": 5.5,
+     "coefficients": [
+      8.29258876463758,
+      -13.286135393765475,
+      -0.33920710838331125,
+      4.255337023346854
+     ]
+    },
+    "holdout": {
+     "halves": [
+      {
+       "fit": [
+        0,
+        500.0
+       ],
+       "score": [
+        500.0,
+        1000
+       ],
+       "lag_kyr": 5.5,
+       "r2_fit": 0.3462581219227602,
+       "r2_holdout": 0.4098428295345865
+      },
+      {
+       "fit": [
+        500.0,
+        1000
+       ],
+       "score": [
+        0,
+        500.0
+       ],
+       "lag_kyr": 6.5,
+       "r2_fit": 0.44689472217558657,
+       "r2_holdout": 0.30389641814045343
+      }
+     ],
+     "r2_holdout_mean": 0.35686962383751997
+    },
+    "n_free": 4
+   },
+   "fixed_a_e_eps_esinw_la2004": {
+    "in_window": {
+     "r2": 0.37981457642934313,
+     "lag_kyr": 5.5,
+     "coefficients": [
+      8.36625794031551,
+      -13.28547406774031,
+      -0.34240231779812014,
+      4.188286060653316
+     ]
+    },
+    "holdout": {
+     "halves": [
+      {
+       "fit": [
+        0,
+        500.0
+       ],
+       "score": [
+        500.0,
+        1000
+       ],
+       "lag_kyr": 5.5,
+       "r2_fit": 0.3470383825578145,
+       "r2_holdout": 0.4135236080435325
+      },
+      {
+       "fit": [
+        500.0,
+        1000
+       ],
+       "score": [
+        0,
+        500.0
+       ],
+       "lag_kyr": 6.0,
+       "r2_fit": 0.4493092027618938,
+       "r2_holdout": 0.3104843784352579
+      }
+     ],
+     "r2_holdout_mean": 0.3620039932393952
+    }
+   },
+   "fixed_b_q65n": {
+    "in_window": {
+     "r2": 0.1470941685441145,
+     "lag_kyr": 4.5,
+     "coefficients": [
+      3.496082781743513,
+      -0.007086082268815932
+     ]
+    },
+    "holdout": {
+     "halves": [
+      {
+       "fit": [
+        0,
+        500.0
+       ],
+       "score": [
+        500.0,
+        1000
+       ],
+       "lag_kyr": 5.0,
+       "r2_fit": 0.15645328821469673,
+       "r2_holdout": 0.12113941768285863
+      },
+      {
+       "fit": [
+        500.0,
+        1000
+       ],
+       "score": [
+        0,
+        500.0
+       ],
+       "lag_kyr": 4.5,
+       "r2_fit": 0.14119567861005122,
+       "r2_holdout": 0.14393895441690863
+      }
+     ],
+     "r2_holdout_mean": 0.13253918604988363
+    },
+    "n_free": 2
+   },
+   "fixed_b_q65n_la2004": {
+    "in_window": {
+     "r2": 0.14832525322393297,
+     "lag_kyr": 4.5,
+     "coefficients": [
+      3.511271710919594,
+      -0.007117405994848917
+     ]
+    },
+    "holdout": {
+     "halves": [
+      {
+       "fit": [
+        0,
+        500.0
+       ],
+       "score": [
+        500.0,
+        1000
+       ],
+       "lag_kyr": 4.5,
+       "r2_fit": 0.15701951737771425,
+       "r2_holdout": 0.12436669207078321
+      },
+      {
+       "fit": [
+        500.0,
+        1000
+       ],
+       "score": [
+        0,
+        500.0
+       ],
+       "lag_kyr": 4.5,
+       "r2_fit": 0.14279655513475997,
+       "r2_holdout": 0.1450412269340543
+      }
+     ],
+     "r2_holdout_mean": 0.13470395950241876
+    }
+   },
+   "variant_c_imbrie": {
+    "in_window": {
+     "r2": 0.13251667338588236,
+     "tm_kyr": 17.0,
+     "b": 0.3
+    },
+    "holdout": {
+     "halves": [
+      {
+       "fit": [
+        0,
+        500.0
+       ],
+       "score": [
+        500.0,
+        1000
+       ],
+       "tm_kyr": 25.0,
+       "b": 0.3,
+       "r2_fit": 0.13961181606155548,
+       "r2_holdout": 0.107425890120604
+      },
+      {
+       "fit": [
+        500.0,
+        1000
+       ],
+       "score": [
+        0,
+        500.0
+       ],
+       "tm_kyr": 17.0,
+       "b": 0.3,
+       "r2_fit": 0.12435908728303435,
+       "r2_holdout": 0.13340161241560355
+      }
+     ],
+     "r2_holdout_mean": 0.12041375126810377
+    }
+   },
+   "null_phase_randomised_a": {
+    "n": 300,
+    "in_window": {
+     "mean": 0.18464431633372033,
+     "p95": 0.2566979743632751,
+     "max": 0.30662670430735883
+    },
+    "holdout": {
+     "mean": 0.06575222218885374,
+     "p95": 0.19343699769734185,
+     "max": 0.2806267411469483
+    },
+    "p_in_window": 0.0,
+    "p_holdout": 0.0
+   },
+   "null_phase_randomised_b": {
+    "n": 300,
+    "in_window": {
+     "mean": 0.04306019166115867,
+     "p95": 0.08065664516923889,
+     "max": 0.10713865821252289
+    },
+    "holdout": {
+     "mean": 0.018102263782524396,
+     "p95": 0.06758646996784806,
+     "max": 0.09982840457727465
+    },
+    "p_in_window": 0.0,
+    "p_holdout": 0.0
+   }
+  },
+  "inhg-mpt": {
+   "window_kyr": [
+    1000,
+    2700
+   ],
+   "n": 1701,
+   "free_28_lines": {
+    "r2": 0.5910872805728644,
+    "condition": 3212.7288053647517,
+    "n_free": 56,
+    "holdout": {
+     "halves": [
+      {
+       "fit": [
+        1000,
+        1850.0
+       ],
+       "score": [
+        1850.0,
+        2700
+       ],
+       "r2_fit": 0.687560989725531,
+       "r2_holdout": -12.732388850075495
+      },
+      {
+       "fit": [
+        1850.0,
+        2700
+       ],
+       "score": [
+        1000,
+        1850.0
+       ],
+       "r2_fit": 0.7205969522862075,
+       "r2_holdout": -2.8457431454548754
+      }
+     ],
+     "r2_holdout_mean": -7.789065997765185
+    },
+    "ridge_scan": {
+     "1.0": {
+      "r2_in_window": 0.5910872805728644,
+      "r2_holdout_mean": -7.789065997765185
+     },
+     "10.0": {
+      "r2_in_window": 0.5827907164575791,
+      "r2_holdout_mean": -0.6839034444920884
+     },
+     "100.0": {
+      "r2_in_window": 0.5716710272731734,
+      "r2_holdout_mean": -0.06473255807045247
+     },
+     "1000.0": {
+      "r2_in_window": 0.423033917189757,
+      "r2_holdout_mean": -0.00019976197852983324
+     }
+    },
+    "best_holdout_any_lambda": -0.00019976197852983324
+   },
+   "fixed_a_e_eps_esinw": {
+    "in_window": {
+     "r2": 0.4578336670883635,
+     "lag_kyr": 6.5,
+     "coefficients": [
+      6.835961366966395,
+      -3.630958826285343,
+      -0.2885492011791997,
+      1.1980103810671796
+     ]
+    },
+    "holdout": {
+     "halves": [
+      {
+       "fit": [
+        1000,
+        1850.0
+       ],
+       "score": [
+        1850.0,
+        2700
+       ],
+       "lag_kyr": 6.0,
+       "r2_fit": 0.43442071520108094,
+       "r2_holdout": 0.4712008464158489
+      },
+      {
+       "fit": [
+        1850.0,
+        2700
+       ],
+       "score": [
+        1000,
+        1850.0
+       ],
+       "lag_kyr": 6.5,
+       "r2_fit": 0.4961087241085148,
+       "r2_holdout": 0.41970369003191843
+      }
+     ],
+     "r2_holdout_mean": 0.4454522682238837
+    },
+    "n_free": 4
+   },
+   "fixed_a_e_eps_esinw_la2004": {
+    "in_window": {
+     "r2": 0.45771027428390143,
+     "lag_kyr": 5.0,
+     "coefficients": [
+      6.7565014418596165,
+      -3.626506003167225,
+      -0.28533931155541437,
+      1.4634020489240258
+     ]
+    },
+    "holdout": {
+     "halves": [
+      {
+       "fit": [
+        1000,
+        1850.0
+       ],
+       "score": [
+        1850.0,
+        2700
+       ],
+       "lag_kyr": 5.5,
+       "r2_fit": 0.4373701031857916,
+       "r2_holdout": 0.46669362565183903
+      },
+      {
+       "fit": [
+        1850.0,
+        2700
+       ],
+       "score": [
+        1000,
+        1850.0
+       ],
+       "lag_kyr": 5.0,
+       "r2_fit": 0.49534863992667144,
+       "r2_holdout": 0.41759991620719017
+      }
+     ],
+     "r2_holdout_mean": 0.4421467709295146
+    }
+   },
+   "fixed_b_q65n": {
+    "in_window": {
+     "r2": 0.1505593422027427,
+     "lag_kyr": 4.5,
+     "coefficients": [
+      2.0146617895861385,
+      -0.004086439598008496
+     ]
+    },
+    "holdout": {
+     "halves": [
+      {
+       "fit": [
+        1000,
+        1850.0
+       ],
+       "score": [
+        1850.0,
+        2700
+       ],
+       "lag_kyr": 4.5,
+       "r2_fit": 0.15928417970185305,
+       "r2_holdout": 0.13872761614001716
+      },
+      {
+       "fit": [
+        1850.0,
+        2700
+       ],
+       "score": [
+        1000,
+        1850.0
+       ],
+       "lag_kyr": 4.5,
+       "r2_fit": 0.13970954222339127,
+       "r2_holdout": 0.15834522441397658
+      }
+     ],
+     "r2_holdout_mean": 0.14853642027699687
+    },
+    "n_free": 2
+   },
+   "fixed_b_q65n_la2004": {
+    "in_window": {
+     "r2": 0.15424403082685134,
+     "lag_kyr": 3.5,
+     "coefficients": [
+      2.038988254105197,
+      -0.004137875933379914
+     ]
+    },
+    "holdout": {
+     "halves": [
+      {
+       "fit": [
+        1000,
+        1850.0
+       ],
+       "score": [
+        1850.0,
+        2700
+       ],
+       "lag_kyr": 4.0,
+       "r2_fit": 0.1599422689560489,
+       "r2_holdout": 0.14459331063963266
+      },
+      {
+       "fit": [
+        1850.0,
+        2700
+       ],
+       "score": [
+        1000,
+        1850.0
+       ],
+       "lag_kyr": 3.5,
+       "r2_fit": 0.14787646746578587,
+       "r2_holdout": 0.15870541744764355
+      }
+     ],
+     "r2_holdout_mean": 0.1516493640436381
+    }
+   },
+   "variant_c_imbrie": {
+    "in_window": {
+     "r2": 0.2267529395994472,
+     "tm_kyr": 17.0,
+     "b": 0.3
+    },
+    "holdout": {
+     "halves": [
+      {
+       "fit": [
+        1000,
+        1850.0
+       ],
+       "score": [
+        1850.0,
+        2700
+       ],
+       "tm_kyr": 17.0,
+       "b": 0.3,
+       "r2_fit": 0.21440281353137802,
+       "r2_holdout": 0.24043171643257444
+      },
+      {
+       "fit": [
+        1850.0,
+        2700
+       ],
+       "score": [
+        1000,
+        1850.0
+       ],
+       "tm_kyr": 17.0,
+       "b": 0.3,
+       "r2_fit": 0.24303761157420467,
+       "r2_holdout": 0.21237790502942167
+      }
+     ],
+     "r2_holdout_mean": 0.22640481073099805
+    }
+   },
+   "null_phase_randomised_a": {
+    "n": 300,
+    "in_window": {
+     "mean": 0.3041963487935345,
+     "p95": 0.3800763688414979,
+     "max": 0.4404247753676649
+    },
+    "holdout": {
+     "mean": 0.21394937667588332,
+     "p95": 0.3460293898903216,
+     "max": 0.4028877792614125
+    },
+    "p_in_window": 0.0,
+    "p_holdout": 0.0
+   },
+   "null_phase_randomised_b": {
+    "n": 300,
+    "in_window": {
+     "mean": 0.06112625969446792,
+     "p95": 0.09491889266778805,
+     "max": 0.12894670837157962
+    },
+    "holdout": {
+     "mean": 0.0286649365265249,
+     "p95": 0.07629943601102762,
+     "max": 0.11337593357049064
+    },
+    "p_in_window": 0.0,
+    "p_holdout": 0.0
+   }
+  },
+  "pre-inhg": {
+   "window_kyr": [
+    2700,
+    5320
+   ],
+   "n": 2621,
+   "free_28_lines": {
+    "r2": 0.37358515647251644,
+    "condition": 58.97971975778726,
+    "n_free": 56,
+    "holdout": {
+     "halves": [
+      {
+       "fit": [
+        2700,
+        4010.0
+       ],
+       "score": [
+        4010.0,
+        5320
+       ],
+       "r2_fit": 0.6108925827885822,
+       "r2_holdout": -16.06742188650427
+      },
+      {
+       "fit": [
+        4010.0,
+        5320
+       ],
+       "score": [
+        2700,
+        4010.0
+       ],
+       "r2_fit": 0.3828985393393747,
+       "r2_holdout": -1.0050643155411962
+      }
+     ],
+     "r2_holdout_mean": -8.536243101022734
+    },
+    "ridge_scan": {
+     "1.0": {
+      "r2_in_window": 0.37358515647251644,
+      "r2_holdout_mean": -8.536243101022734
+     },
+     "10.0": {
+      "r2_in_window": 0.35636818843406637,
+      "r2_holdout_mean": -1.6421970122820428
+     },
+     "100.0": {
+      "r2_in_window": 0.3378784820588745,
+      "r2_holdout_mean": -0.5274191408704061
+     },
+     "1000.0": {
+      "r2_in_window": 0.2522793536007025,
+      "r2_holdout_mean": -0.11425489046186033
+     }
+    },
+    "best_holdout_any_lambda": -0.11425489046186033
+   },
+   "fixed_a_e_eps_esinw": {
+    "in_window": {
+     "r2": 0.2248419799127137,
+     "lag_kyr": 6.5,
+     "coefficients": [
+      3.081303447043777,
+      -2.004331015959895,
+      -0.13029978963895816,
+      0.587532450357328
+     ]
+    },
+    "holdout": {
+     "halves": [
+      {
+       "fit": [
+        2700,
+        4010.0
+       ],
+       "score": [
+        4010.0,
+        5320
+       ],
+       "lag_kyr": 6.5,
+       "r2_fit": 0.23579360365332047,
+       "r2_holdout": 0.1311760152519128
+      },
+      {
+       "fit": [
+        4010.0,
+        5320
+       ],
+       "score": [
+        2700,
+        4010.0
+       ],
+       "lag_kyr": 6.5,
+       "r2_fit": 0.24781792396579572,
+       "r2_holdout": 0.19436688884783582
+      }
+     ],
+     "r2_holdout_mean": 0.1627714520498743
+    },
+    "n_free": 4
+   },
+   "fixed_a_e_eps_esinw_la2004": {
+    "in_window": {
+     "r2": 0.22006845647518058,
+     "lag_kyr": 3.0,
+     "coefficients": [
+      2.994808745742184,
+      -2.0818557837466805,
+      -0.1265439226738163,
+      0.6243531448300188
+     ]
+    },
+    "holdout": {
+     "halves": [
+      {
+       "fit": [
+        2700,
+        4010.0
+       ],
+       "score": [
+        4010.0,
+        5320
+       ],
+       "lag_kyr": 3.5,
+       "r2_fit": 0.2446861009360639,
+       "r2_holdout": 0.08483076794937561
+      },
+      {
+       "fit": [
+        4010.0,
+        5320
+       ],
+       "score": [
+        2700,
+        4010.0
+       ],
+       "lag_kyr": 2.5,
+       "r2_fit": 0.23130531817723932,
+       "r2_holdout": 0.1846221731785751
+      }
+     ],
+     "r2_holdout_mean": 0.13472647056397535
+    }
+   },
+   "fixed_b_q65n": {
+    "in_window": {
+     "r2": 0.057559285043893293,
+     "lag_kyr": 5.5,
+     "coefficients": [
+      0.7696039367166092,
+      -0.0015661470475595782
+     ]
+    },
+    "holdout": {
+     "halves": [
+      {
+       "fit": [
+        2700,
+        4010.0
+       ],
+       "score": [
+        4010.0,
+        5320
+       ],
+       "lag_kyr": 5.5,
+       "r2_fit": 0.06377268775904033,
+       "r2_holdout": 0.02920496715828691
+      },
+      {
+       "fit": [
+        4010.0,
+        5320
+       ],
+       "score": [
+        2700,
+        4010.0
+       ],
+       "lag_kyr": 7.5,
+       "r2_fit": 0.05862464168905157,
+       "r2_holdout": 0.043472687582852165
+      }
+     ],
+     "r2_holdout_mean": 0.03633882737056954
+    },
+    "n_free": 2
+   },
+   "fixed_b_q65n_la2004": {
+    "in_window": {
+     "r2": 0.05918688997295252,
+     "lag_kyr": 3.5,
+     "coefficients": [
+      0.7798727160846309,
+      -0.0015875826633660038
+     ]
+    },
+    "holdout": {
+     "halves": [
+      {
+       "fit": [
+        2700,
+        4010.0
+       ],
+       "score": [
+        4010.0,
+        5320
+       ],
+       "lag_kyr": 3.5,
+       "r2_fit": 0.0670753383790117,
+       "r2_holdout": 0.02538036906508545
+      },
+      {
+       "fit": [
+        4010.0,
+        5320
+       ],
+       "score": [
+        2700,
+        4010.0
+       ],
+       "lag_kyr": 3.5,
+       "r2_fit": 0.05180250985321588,
+       "r2_holdout": 0.05388141305873051
+      }
+     ],
+     "r2_holdout_mean": 0.03963089106190798
+    }
+   },
+   "variant_c_imbrie": {
+    "in_window": {
+     "r2": 0.07516587249098716,
+     "tm_kyr": 17.0,
+     "b": 0.3
+    },
+    "holdout": {
+     "halves": [
+      {
+       "fit": [
+        2700,
+        4010.0
+       ],
+       "score": [
+        4010.0,
+        5320
+       ],
+       "tm_kyr": 10.0,
+       "b": 0.3,
+       "r2_fit": 0.07442439849761673,
+       "r2_holdout": 0.055464607524585374
+      },
+      {
+       "fit": [
+        4010.0,
+        5320
+       ],
+       "score": [
+        2700,
+        4010.0
+       ],
+       "tm_kyr": 17.0,
+       "b": 0.3,
+       "r2_fit": 0.08249193560159529,
+       "r2_holdout": 0.06606543299591039
+      }
+     ],
+     "r2_holdout_mean": 0.06076502026024788
+    }
+   },
+   "null_phase_randomised_a": {
+    "n": 300,
+    "in_window": {
+     "mean": 0.0502455048383786,
+     "p95": 0.11203360674142004,
+     "max": 0.16529223590321362
+    },
+    "holdout": {
+     "mean": -0.13418169712523767,
+     "p95": 0.05322481155317264,
+     "max": 0.14697895164619668
+    },
+    "p_in_window": 0.0,
+    "p_holdout": 0.0
+   },
+   "null_phase_randomised_b": {
+    "n": 300,
+    "in_window": {
+     "mean": 0.008082678861471166,
+     "p95": 0.019589794553343587,
+     "max": 0.03181130593040593
+    },
+    "holdout": {
+     "mean": -0.03210345353736139,
+     "p95": 0.0054104285301400795,
+     "max": 0.014045462647218454
+    },
+    "p_in_window": 0.0,
+    "p_holdout": 0.0
+   }
+  }
+ },
+ "verdict": {
+  "checks": {
+   "post-mpt": {
+    "outcome1_fixed_below_free": {
+     "a": true,
+     "b": true
+    },
+    "outcome1_fixed_clears_own_null_p95": {
+     "a": true,
+     "b": true
+    },
+    "outcome2_holdout_fixed_ge_free": {
+     "a": true,
+     "b": true
+    },
+    "robustness_holdout_fixed_ge_free_at_best_lambda": {
+     "a": true,
+     "b": true
+    }
+   },
+   "inhg-mpt": {
+    "outcome1_fixed_below_free": {
+     "a": true,
+     "b": true
+    },
+    "outcome1_fixed_clears_own_null_p95": {
+     "a": true,
+     "b": true
+    },
+    "outcome2_holdout_fixed_ge_free": {
+     "a": true,
+     "b": true
+    },
+    "robustness_holdout_fixed_ge_free_at_best_lambda": {
+     "a": true,
+     "b": true
+    }
+   },
+   "pre-inhg": {
+    "outcome1_fixed_below_free": {
+     "a": true,
+     "b": true
+    },
+    "outcome1_fixed_clears_own_null_p95": {
+     "a": true,
+     "b": true
+    },
+    "outcome2_holdout_fixed_ge_free": {
+     "a": true,
+     "b": true
+    },
+    "robustness_holdout_fixed_ge_free_at_best_lambda": {
+     "a": true,
+     "b": true
+    }
+   }
+  },
+  "prediction2_holds_post_mpt_and_pre_inhg": true
+ },
+ "meta": {
+  "script": "scripts/t7_fixed_phase_l1.py",
+  "plan": "holisticuniverse plan 06 \u00a74 T7",
+  "doc": "docs/92-climate-formula.md",
+  "runtime_sec": 24.673616647720337,
+  "environment": {
+   "python": "3.12.3",
+   "numpy": "2.4.1",
+   "scipy": "1.17.0"
+  }
+ },
+ "inputs": {
+  "generator": "python3 scripts/t7_fixed_phase_l1.py --write",
+  "files": {
+   "data/l1-physical-lines.json": "sha256:7a8a800a1b0d67dddc5355cbb99cf5aa66fe3923f3a3ee18b91d721a1df19418",
+   "data/la2004-earth-51myr-back.asc": "sha256:3f13b9f8e69085baf40bc67a2669e6f6af4148fef9218ed2158772aa91e35f8c",
+   "data/lr04-stack.txt": "sha256:7d1a6ca7ffc033e45e20fb76a7f39c8d99df87baa1094260f9dbdc09f0bb8945",
+   "data/t7-model-orbital-histories.json": "sha256:629be8dc0ac4dd8c035ff8542a80fd376d0508b5ed07c373b897cef5fe75c82f",
+   "scripts/milankovitch_climate_formula.py": "sha256:bfb5b1436169ee44301f24cddd8cf74d55818e3fd9fbe0a4e062bf7f7e610d75",
+   "scripts/t7_fixed_phase_l1.py": "sha256:1377480d8a9c4fb31da2d608d7fffc7c9629ad2fc27432b672fa6e2bad509852",
+   "tools/explore/t7-export-orbital-histories.mjs": "sha256:16098d2768adc337c064092db795cc7b9d0d995ad684335d93d14662ff2962d7"
+  }
+ }
+}
