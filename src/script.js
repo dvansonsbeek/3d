@@ -20073,27 +20073,31 @@ const VFP_CATEGORIES = [
     yLabel: 'days (perigee cycle, equinox of date)',
     residualLabel: 'days', residualScale: 1,
     paperTitle: 'Lunar Perigee Precession Period',
-    frame: 'Period of the lunar perigee’s advance against the equinox of date (days of 86,400 s), the chain’s Brouwer–Clemence route bridged to the equinox of date',
-    // FRAME: Meeus's rates are equinox-of-date; the chain's physics route
-    // (perigeePrecessionSecondsAtAge — Brouwer–Clemence m² scaling with the
-    // e_E modulation, 3232.60 d at J2000) is STAR-referenced, so it is
-    // bridged to date through the model's own axial precession of date,
-    // 1/T_date = 1/T_star + 1/T_p — and reproduces Meeus's J2000-centred
-    // secular slope (measured: within 8e-5 yr over 1000–2500). No device
-    // line: the chain's of-date cycle counter (apsidalPrecessionSecondsOfDateAtAge,
-    // a bookkeeping convention with no orbital physics) stays in the engine,
-    // unsurfaced. DAYS, as the planet stats (a "year" is Julian in one place
-    // and mean solar in another).
+    frame: 'Period of the lunar perigee’s advance against the equinox of date — the apsidal precession (days of 86,400 s), from the model’s own perigee longitude of date',
+    // THE MODEL SIDE IS THE MODEL'S OWN PERIGEE OF DATE — ϖ = L′ − M′ from
+    // the framework's lunar arguments (the Moon evaluator's skeleton, ONE
+    // home with the Month Lengths panel), 360° over its ±½-yr rate: the
+    // exact mirror of Meeus's d(L′ − M′)/dT. The chain's dynamical route
+    // (perigeePrecessionSecondsAtAge — Brouwer–Clemence m² with the e_E
+    // modulation, STAR-referenced, 3232.60 d at J2000) bridged to date
+    // through the model's axial precession (1/T_date = 1/T_star + 1/T_p)
+    // was the first model line; it read a steeper slope than Meeus (owner:
+    // "did we implement it correctly?") — it stays as the clickable
+    // second line so the split between the two tiers is measurable. DAYS,
+    // as the planet stats (a "year" is Julian in one place and mean solar
+    // in another).
     model: { name: 'This model', color: '#f0b040',
-      fn: year => 1 / (86400 / meanLunarPerigeePrecessionAtAge((startmodelYear - year) / 1e6) + 1 / (_vfpAxialPrecessionYears(year) * 365.25)) },
+      fn: year => 360 / _vfpMoonAngleRateDegPerYear('peri', year) * 365.25 },
     references: [
       { name: 'Meeus (1998), Ch. 47 rates', color: '#4fc3f7', fn: year => moonPerigeePrecessionYearsMeeus(year) * 365.25, validYears: [-1999, 3000], sourceUrl: 'https://en.wikipedia.org/wiki/Lunar_precession' },
+      { name: 'This model — dynamical chain (Brouwer–Clemence), bridged to date', color: '#ce93d8',
+        fn: year => 1 / (86400 / meanLunarPerigeePrecessionAtAge((startmodelYear - year) / 1e6) + 1 / (_vfpAxialPrecessionYears(year) * 365.25)) },
     ],
     j2000extras: [
       { name: 'Registry anchor (Meeus/IERS, of date)', color: '#ef5350',
         value: () => K.moonReference.moonApsidalPrecessionDaysInputICRF },
     ],
-    reading: 'The perigee advances once round the equinox of date in about 3,231.5 days (8.85 years). The model line is the chain’s Brouwer–Clemence route: the rate rides m², the Sun’s to the Moon’s mean motion, so the period goes as the sidereal year squared over the sidereal month, modulated by Earth’s orbital eccentricity of date through the solar perturbation — it dips at every eccentricity maximum, and near J2000 its slope is the secular decrease of Earth’s eccentricity, the same physics behind Meeus’s T² term; the star-referenced period is bridged to date through the model’s own axial precession (1/T_date = 1/T_star + 1/T_p). Meeus’s line is 36,000° over d(L′ − M′)/dT from the Ch. 47 mean arguments (Chapront ELP-2000/82), a J2000-centred fit offered on the canon’s −2000 → 3000 range only.',
+    reading: 'The perigee advances once round the equinox of date in about 3,231.5 days (8.85 years) — the lunar apsidal precession. The model line is 360° over the rate of the model’s own perigee longitude of date, ϖ = L′ − M′ from the framework’s lunar arguments (the Moon evaluator’s skeleton, one home with the Month Lengths panel), whose secular term is the phase-aware solar-eccentricity channel: the perigee runs faster at every eccentricity maximum, and near J2000 its slope is the secular decrease of Earth’s eccentricity, the physics behind Meeus’s T² term. The clickable second line is the chain’s dynamical route — Brouwer–Clemence m² scaling with the same eccentricity modulation, star-referenced, bridged to date through the model’s axial precession (1/T_date = 1/T_star + 1/T_p) — the deep-time tier the months ride; its slope near J2000 is read against the first. Meeus’s line is 36,000° over d(L′ − M′)/dT from the Ch. 47 mean arguments (Chapront ELP-2000/82), a J2000-centred fit offered on the canon’s −2000 → 3000 range only.',
   },
   {
     // ── Moon · Node Regression: the same for the node's retrograde cycle.
@@ -20102,18 +20106,22 @@ const VFP_CATEGORIES = [
     yLabel: 'days (node cycle, equinox of date)',
     residualLabel: 'days', residualScale: 1,
     paperTitle: 'Lunar Node Regression Period',
-    frame: 'Period of the lunar node’s regression against the equinox of date (days of 86,400 s), the chain’s Brouwer–Clemence route bridged to the equinox of date',
-    // the node regresses: the bridge to date is 1/T_date = 1/T_star − 1/T_p
+    frame: 'Period of the lunar node’s regression against the equinox of date — the nodal precession (days of 86,400 s), from the model’s own node longitude of date',
+    // the model's own node of date, Ω = L′ − F (regressing: the rate is
+    // negative, the period its magnitude); the chain route's bridge to date
+    // is 1/T_date = 1/T_star − 1/T_p
     model: { name: 'This model', color: '#f0b040',
-      fn: year => 1 / (86400 / meanLunarNodePrecessionAtAge((startmodelYear - year) / 1e6) - 1 / (_vfpAxialPrecessionYears(year) * 365.25)) },
+      fn: year => 360 / Math.abs(_vfpMoonAngleRateDegPerYear('node', year)) * 365.25 },
     references: [
       { name: 'Meeus (1998), Ch. 47 rates', color: '#4fc3f7', fn: year => moonNodeRegressionYearsMeeus(year) * 365.25, validYears: [-1999, 3000], sourceUrl: 'https://en.wikipedia.org/wiki/Lunar_precession' },
+      { name: 'This model — dynamical chain (Brouwer–Clemence), bridged to date', color: '#ce93d8',
+        fn: year => 1 / (86400 / meanLunarNodePrecessionAtAge((startmodelYear - year) / 1e6) - 1 / (_vfpAxialPrecessionYears(year) * 365.25)) },
     ],
     j2000extras: [
       { name: 'Registry anchor (Meeus/IERS, of date)', color: '#ef5350',
         value: () => K.moonReference.moonNodalPrecessionDaysInputICRF },
     ],
-    reading: 'The node regresses once round the equinox of date in about 6,798.4 days (18.61 years) — the eclipse-season and the lunar-standstill cycle. The model line is the chain’s Brouwer–Clemence route on the same m² law as the perigee, modulated by Earth’s orbital eccentricity of date through the solar perturbation — it dips at every eccentricity maximum, and near J2000 its slope is Meeus’s; the star-referenced period is bridged to date through the model’s own axial precession (1/T_date = 1/T_star − 1/T_p, the node running retrograde). Meeus’s line is 36,000° over d(L′ − F)/dT from the Ch. 47 mean arguments (Chapront ELP-2000/82), a J2000-centred fit offered on the canon’s −2000 → 3000 range only.',
+    reading: 'The node regresses once round the equinox of date in about 6,798.4 days (18.61 years) — the lunar nodal precession, the eclipse-season and lunar-standstill cycle. The model line is 360° over the rate of the model’s own node longitude of date, Ω = L′ − F from the framework’s lunar arguments (one home with the Month Lengths panel), whose secular term is the phase-aware solar-eccentricity channel on the node’s own sensitivity. The clickable second line is the chain’s dynamical route on the same m² law as the perigee, star-referenced and bridged to date through the model’s axial precession (1/T_date = 1/T_star − 1/T_p, the node running retrograde) — the deep-time tier the months ride. Meeus’s line is 36,000° over d(L′ − F)/dT from the Ch. 47 mean arguments (Chapront ELP-2000/82), a J2000-centred fit offered on the canon’s −2000 → 3000 range only.',
   },
 ];
 // The panel ORDER (owner-ruled): the physics builds up — the orbit, the axis,
@@ -21365,6 +21373,17 @@ function _vfpMLModelMonthDays(key, year, sidereal) {
   let r = _vfpMLArgRateDegPerDay(key, year);
   if (sidereal) r -= 360 / (_vfpAxialPrecessionYears(year) * 365.25);
   return Number.isFinite(r) && r > 0 ? 360 / r : NaN;
+}
+/** The model's perigee (ϖ = L′ − M′, advancing) and node (Ω = L′ − F,
+ *  regressing) of date from the framework's lunar arguments, as a rate in
+ *  degrees per year over a ±½-yr stencil (the angle moves 40.7°/yr and
+ *  −19.3°/yr: inside the ±180° wrap) — the Moon precession panels' model
+ *  side, ONE home with the Month Lengths panel and the Moon evaluator. */
+function _vfpMoonAngleRateDegPerYear(kind, year) {
+  const jd = yearToJDApprox(year), half = 365.25 / 2;
+  const ang = (a) => kind === 'peri' ? a.Lp - a.Mp : a.Lp - a.F;
+  const d = ang(_moonArgsAt(jd + half)) - ang(_moonArgsAt(jd - half));
+  return ((d + 540) % 360 + 360) % 360 - 180;
 }
 const _vfpML_STRIPS = [
   { key: 'sid', name: 'Sidereal month', screen: '#5ea0ff', paper: '#1d4ed8', model: (y) => _vfpMLModelMonthDays('Lp', y, true), ref: moonSiderealMonthDaysMeeus },
