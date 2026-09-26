@@ -6284,6 +6284,28 @@ if (typeof window !== 'undefined') {
     // wiring, and both paper exports. Test surface, not an API.
     vfpPISetRefData: (la, jpl) => { if (la) _la2010ElementsData = la; if (jpl) _jplInclData = jpl; },
     vfpPISeriesLoaded: () => _planetSeriesData !== null,
+    // Perf-gate surface (the R9 class): force ONE resample of every chain
+    // planet's orbit ring at jd — the 10-yr JD condition and the 250-ms
+    // wall-clock floor bypassed — and return its wall time (ringMs, 7 × 257
+    // chain evaluations on the one-bridge year route) next to the LIVE cost
+    // of the regression class itself: one ring's 257 vertices read through
+    // the per-JD route (_kcHelioAU → _kcElementsOfDate → the ΔT bridge per
+    // vertex; perJdRingMs, Mars, a fresh jd so the exact-key memo misses).
+    // The gate is ringMs/7 against perJdRingMs (perf-regression row 5).
+    ringResampleProbe: (jd) => {
+      const t0 = performance.now();
+      for (const obj of planetObjects) {
+        if (!_KC_PLANET_NAMES.has(obj.name)) continue;
+        if (obj._kcOrbitLine) { obj._kcOrbitLine._kcSampleJD = undefined; obj._kcOrbitLine._kcSampleMs = 0; }
+        _kcUpdateOrbitLine(obj, obj.name.toLowerCase(), jd);
+      }
+      const t1 = performance.now();
+      const jdM = jd + 0.123;
+      const pDays = 365.25 * Math.pow(_kcElementsOfDate('mars', jdM).aAU, 1.5);
+      for (let i = 0; i <= _KC_ORBIT_SEGS; i++) _kcHelioAU('mars', jdM + (i / _KC_ORBIT_SEGS - 0.5) * pDays);
+      const t2 = performance.now();
+      return { ringMs: t1 - t0, perJdRingMs: t2 - t1 };
+    },
     vfpPIState: () => _vfpPIState,
     vfpPIRender: () => renderVFPPlanetInclinations(),
     vfpPIAfterRender: (el) => _vfpPIAfterRender(el),
@@ -14221,8 +14243,9 @@ function updateInspectorVisuals(f, force = false) {
     const fp = P.fanPos.array, op = P.orbitLine.geometry.attributes.position.array, ep = P.eclipticRing.geometry.attributes.position.array;
     fp[0] = f.S.x; fp[1] = f.S.y; fp[2] = f.S.z;
     let iHi = 0, iLo = 0;
+    const yC = _engineYearTT(f.jd);   // one ΔT bridge per resample, as the scene rings (_kcHelioAUAtEngineYear)
     for (let i = 0; i <= N; i++) {
-      const hv = _kcHelioAU(key, f.jd + (i / N - 0.5) * f.pDays);
+      const hv = _kcHelioAUAtEngineYear(key, yC + (i / N - 0.5) * f.pDays / 365.25);
       _hiRotJ2000(R, hv, _hiTmpA).multiplyScalar(100).add(f.S);
       const k = (i + 1) * 3;
       fp[k] = _hiTmpA.x; fp[k + 1] = _hiTmpA.y; fp[k + 2] = _hiTmpA.z;
@@ -19189,6 +19212,24 @@ let _zetaSeriesEndYr = 0;
         _moonArgsM.reset();
         // (R4: the J2000 pose bridge _kcR is read from the deterministic K
         // device — nothing to re-derive when the artifact lands)
+        // Perf (measured, the Play-start wait): the rebuilt tier model's
+        // chain-cycle tables (±250 kyr — the four Moon chains and the
+        // year, ~1.2 s of α(t)/LOD-stack evaluation) and the Moon factory's
+        // normalisations were built on the FIRST RENDERED FRAME after this
+        // block — nothing renders while paused, so that frame was the first
+        // Play frame, felt as a ~1.3-s wait before the scene started (since
+        // R4c, whose cardinal panel builds the pre-landing model in the
+        // initial frames and leaves the post-landing rebuild to the next).
+        // Request one paused frame NOW: the render loop runs its full pass
+        // in the load's idle time, every lazy build lands there, and the
+        // paused scene shows the hybrid pose (not the K fallback) from here.
+        // The umbra tier's one-JD memo must be dropped with the model it
+        // served: a paused frame reads the SAME JD as the pre-landing frame,
+        // and a memo hit would skip the rebuilt model's Moon chain — the very
+        // path whose first call builds the tables (measured: with the memo
+        // kept, the wait stayed at 1.5 s).
+        _umbraTierMemo.jd = NaN;
+        positionChanged = true;
         console.log(`secular series loaded from ${url} (earth + ${Object.keys(a.bodies).length - 1} planets) — planet deep-time elements + Earth ε/e one-source ${HYBRID_SPIN_REQUESTED ? 'ON (D4; the K device is only the pre-load fallback — plan 06 D5)' : 'planets on; Earth on the K device (fallback)'}`);
         return;
       } catch (e) { /* try the next candidate */ }
@@ -52185,6 +52226,25 @@ function _kcHelioAU(nameLower, jd) {
   const p = kcComputeHeliocentricEclipticFromElements(el);
   return [p.xAU, p.yAU, p.zAU];
 }
+/** The chain's heliocentric ecliptic-J2000 AU at an ENGINE year (true TT,
+ *  Julian from J2000 — _engineYearTT's axis), bypassing the JD→TT bridge and
+ *  the exact-key memo: for the RING samplers, which read 257 vertices per
+ *  planet per resample. Since R9 every _kcElementsOfDate read pays the ΔT
+ *  Simpson integration (33 nodes of the LOD stack, α(t) included), so a ring
+ *  resample paid 7 × 257 of them — measured 35 % of the frame at 1000 yr/s,
+ *  where the 10-yr resample condition fires every frame (4×/s floor). The
+ *  ring's SHAPE over one period does not need ΔT per vertex — ΔT varies by
+ *  seconds to minutes across a period, and the vertex at the current date
+ *  reads the mesh's own year exactly — so the samplers bridge ONCE per
+ *  resample and step in Julian years. Same elements, same override, same
+ *  order as _kcElementsOfDate; the mesh, panels and traces keep the exact
+ *  per-JD route. */
+function _kcHelioAUAtEngineYear(nameLower, year) {
+  if (!_kcChains) _kcChains = buildPlanetChainsFromArtifactData(CHAIN_ARTIFACT);
+  const el = kcComputePlanetElementsAtYear(year, _kcChains[nameLower], _kcChains);
+  const p = kcComputeHeliocentricEclipticFromElements(_planetSeriesData ? _kcSeriesSecularEl(nameLower, year, el) : el);
+  return [p.xAU, p.yAU, p.zAU];
+}
 // D5 (?hybridSpin) — the planets' deep-time secular elements: beyond a
 // planet's MEASURED handover boundary (banked in the artifact verdict —
 // Mercury ±22–36 kyr, Jupiter/Saturn Myr-class) the era chain's
@@ -52683,8 +52743,9 @@ function _kcUpdateOrbitLine(obj, nm, jd) {
     line._kcSampleMs = _resampleNowMs;
     const pDays = 365.25 * Math.pow(_kcElementsOfDate(nm, jd).aAU, 1.5);   // Kepler III, solar-mass unit
     const arr = line.geometry.attributes.position.array;
+    const yC = _engineYearTT(jd);   // ONE ΔT bridge per resample; the vertices step in Julian years (see _kcHelioAUAtEngineYear)
     for (let i = 0; i <= _KC_ORBIT_SEGS; i++) {
-      const hv = _kcHelioAU(nm, jd + (i / _KC_ORBIT_SEGS - 0.5) * pDays);
+      const hv = _kcHelioAUAtEngineYear(nm, yC + (i / _KC_ORBIT_SEGS - 0.5) * pDays / 365.25);
       arr[i * 3] = 100 * hv[0]; arr[i * 3 + 1] = 100 * hv[1]; arr[i * 3 + 2] = 100 * hv[2];
     }
     line.geometry.attributes.position.needsUpdate = true;

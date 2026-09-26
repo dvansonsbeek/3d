@@ -35,8 +35,26 @@
  * steps and rebuilt the deep tier ~125 times); after the fix 1.7 s. The
  * row is the ratio first(−5.34 Myr) / first(−100 kyr): healthy 3.0–3.1
  * (three fresh pages), the regression class ~40; limit 8.
+ *
+ * TWO TRAVEL-SPEED ROWS (the owner's "waiting time before Play / stutter
+ * at 1000 yr/s", bisected 2026-09-26 — both classes invisible to the rows
+ * above, which never press Play):
+ *   5. RING RESAMPLE — the seven chain rings resample 257 vertices each when
+ *      the epoch moves 10 yr (4×/s floor); at 1000 yr/s that is every
+ *      frame. R9 put a ΔT Simpson integration under every chain read, so
+ *      one resample cost 7 × 257 of them — 35 % of the frame, measured. The
+ *      row is resample(fresh jd) / in-table full update (per pair): the
+ *      samplers now bridge UT→TT once per resample and step in Julian years.
+ *   6. PLAY START — on a FRESH page (the suite's probes would warm what this
+ *      row measures): Play → first date change, over the median frame gap
+ *      while playing at the default speed. R4c left the post-landing tier
+ *      model's ±250-kyr chain-cycle tables to the first RENDERED frame — the
+ *      first Play frame (~1.3 s); the landing block now requests one paused
+ *      frame and drops the umbra memo, so the build lands in load idle time.
+ *   Limits set from both builds measured on the same box (see the row
+ *   comments); the pre-fix build fails both rows, the fixed build passes.
  */
-/* global performance -- the timing calls live inside page.evaluate callbacks, which execute in the browser */
+/* global performance, requestAnimationFrame -- the timing calls live inside page.evaluate callbacks, which execute in the browser */
 import { openSimulator } from './harness.mjs';
 
 const TIGHTEN = Number(process.env.ESSRT_PERF_TIGHTEN || 1);
@@ -123,8 +141,53 @@ try {
   console.log(`      trace sample ms: modern ${traceBase.toFixed(2)} · +300k ${traceDeep.toFixed(2)}`);
   gate('trace fill: deep(+300k) / modern ratio', traceDeep / traceBase, 10, 'x');
 
+  // ── 5. Ring resample (the R9 class): one forced resample of the seven
+  // chain rings at a fresh in-table jd (the shipped one-bridge year route),
+  // per ring, against the LIVE cost of the regression class — one ring's 257
+  // vertices read through the per-JD route, a ΔT integration per vertex. A
+  // re-route of the rings through per-JD reads reads 1.0 here; healthy 0.08
+  // (measured: 2.4 vs 31.5 ms per ring); limit 0.5. The pre-fix build fails
+  // the row by the missing hook (NaN) — its class cost is the per-JD figure. ──
+  // three DISTINCT jds (the per-JD route's exact-key memo would serve a repeat)
+  const ringRuns = [];
+  for (let k = 0; k < 3; k++) {
+    ringRuns.push(await sim.page.evaluate((jd) => {
+      const r = window.__test__.ringResampleProbe ? window.__test__.ringResampleProbe(jd) : null;
+      return r ? { ...r, ratio: r.ringMs / 7 / r.perJdRingMs } : { ringMs: NaN, perJdRingMs: NaN, ratio: NaN };   // no hook → NaN → the row FAILS, never skips
+    }, jdOf(100000) + 4321 + k * 97.3));
+  }
+  ringRuns.sort((a, b) => a.ratio - b.ratio);
+  const ringRaw = ringRuns[1], ring = ringRaw.ratio;
+  console.log(`      ring resample ms: 7 rings ${ringRaw.ringMs.toFixed(1)} (${(ringRaw.ringMs / 7).toFixed(1)} per ring) · one ring via the per-JD route ${ringRaw.perJdRingMs.toFixed(1)}`);
+  gate('ring resample: per-ring year route / per-JD route ratio', ring, 0.5, 'x');
+
   if (sim.errors.length) { console.log('FAIL  page errors — ' + sim.errors.slice(0, 3).join('|')); fail++; }
 } finally { await sim.dispose(); }
+
+// ── 6. Play start (the R4c class) — a FRESH page, nothing warmed by probes ──
+{
+  const fresh = await openSimulator();
+  try {
+    await fresh.page.waitForFunction(() => window.__test__ && window.__test__.vfpPISeriesLoaded(), null, { timeout: 60000 });
+    await fresh.page.waitForTimeout(2500);   // the landing block's paused frame (and the initial render) settle
+    const dateText = () => fresh.page.evaluate(() => { const el = [...document.querySelectorAll('input')].find((i) => /^\d{4}-\d\d-\d\d$/.test(i.value)); return el ? el.value : '?'; });
+    const before = await dateText();
+    const t0 = Date.now();
+    const clicked = await fresh.page.evaluate(() => { const b = [...document.querySelectorAll('button')].find((x) => /Play/.test(x.textContent || '')); if (!b) return false; b.click(); return true; });
+    if (!clicked) { console.log('FAIL  play start — Play button not found'); fail++; }
+    let firstMs = NaN;
+    while (Date.now() - t0 < 15000) { if ((await dateText()) !== before) { firstMs = Date.now() - t0; break; } await fresh.page.waitForTimeout(20); }
+    const steady = await fresh.page.evaluate(async (ms) => {
+      const gaps = []; let last = performance.now(); const start = last;
+      await new Promise((res) => { const step = (t) => { gaps.push(t - last); last = t; if (t - start < ms) requestAnimationFrame(step); else res(); }; requestAnimationFrame(step); });
+      gaps.sort((a, b) => a - b);
+      return gaps[Math.floor(gaps.length / 2)];
+    }, 3000);
+    console.log(`      play start: Play → first date change ${firstMs.toFixed(0)} ms · steady frame gap ${steady.toFixed(0)} ms (default speed)`);
+    gate('play start: first-change delay / steady frame gap ratio', firstMs / steady, 5, 'x');
+    if (fresh.errors.length) { console.log('FAIL  page errors (fresh page) — ' + fresh.errors.slice(0, 3).join('|')); fail++; }
+  } finally { await fresh.dispose(); }
+}
 
 console.log(fail === 0 ? 'PERF-REGRESSION: ALL PASS' : `PERF-REGRESSION: ${fail} FAILURES`);
 process.exit(fail === 0 ? 0 : 1);

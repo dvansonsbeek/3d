@@ -195,8 +195,11 @@ plus the epoch-consistency gate (pure f(Y) evaluators ≡ the epoch-anchor
 chain at ±1/±5 Myr; the golden master cannot catch that class), plus
 `test:perf` — the deep-time performance gate (RATIO thresholds, deep vs
 in-table cost, runner-speed independent; born from four ungated ratio
-regressions, one owner-bisected at 28×; fail-proven via
-`ESSRT_PERF_TIGHTEN=0.01`).
+regressions, one owner-bisected at 28×; plus two travel-speed rows the
+steady-state rows cannot see — the orbit-ring resample against the per-JD
+route and the Play-start delay on a fresh page, both bisected from the
+owner's "waiting time before Play / stutter at 1000 yr/s"; fail-proven via
+`ESSRT_PERF_TIGHTEN=0.01` and on the pre-fix build).
 `npm run test:transparency` is the Phase 6 acceptance gate — **green (84/84,
 round-trip bit-exact) since Phase B** and required in CI; red there is a
 regression of the Phase 6 exit criterion, not a tracked state.
