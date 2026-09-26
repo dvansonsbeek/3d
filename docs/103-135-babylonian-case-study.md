@@ -7,7 +7,7 @@ status: current
 
 # -135 Babylonian solar eclipse — case study
 
-**Status**: the framework places -135 Apr 15 Babylon at **BestGap <!--v:babylon135BestGapKm-->385<!--/v--> km at ΔUT <!--v:babylon135BestDeltaUT-->-1h01<!--/v-->** within the ±4h scan window; verdict **off-peak** — inside the regional class and consistent with the diary's totality report at the identification-cascade level. The ΔT-free matcher places the traditional date as the unique survivor with required-ΔT inside Stephenson's published totality window, and the local-circumstance instrument reads magnitude **0.988** at the site on the traditional date. The framework's own predicted UT (<!--v:babylon135FrameworkUT-->06:00<!--/v-->) sits within 9 min of the documented UT (<!--v:babylon135DocumentedUT-->06:14<!--/v-->) — not a ΔT-signal event.
+**Status**: the framework places -135 Apr 15 Babylon at **BestGap <!--v:babylon135BestGapKm-->177<!--/v--> km at ΔUT <!--v:babylon135BestDeltaUT-->-0h54<!--/v-->** within the ±4h scan window; verdict **off-peak** — inside the regional class and consistent with the diary's totality report at the identification-cascade level. The ΔT-free matcher places the traditional date as the unique survivor with required-ΔT inside Stephenson's published totality window, and the local-circumstance instrument reads magnitude **0.988** at the site on the traditional date. The framework's own predicted UT (<!--v:babylon135FrameworkUT-->06:05<!--/v-->) sits within 9 min of the documented UT (<!--v:babylon135DocumentedUT-->06:14<!--/v-->) — not a ΔT-signal event.
 
 Values are generated (`tools/verify/eclipse-audit.js --write`) through the umbra tier: the package besselian is the single umbra implementation — the same `@essrt/physics` chain the api centerline gate certifies. Its basis: the framework-native Sun (mean longitude = L₀ + the mean tropical rate + the f(Y) year-harmonic drift shape in SI/TT plus the derived luni-solar torque term δp = −p₀·tan ε·δε(t) on the model's own two-component obliquity law; eccentricity = the J2000-anchored H/3 inclination-coupling line — the same frame-invariant law the Moon's E-factor rides; zero fitted sun constants end to end), the derived 70-term planetary completion on framework-native carriers, the full-series Moon with the derived Delaunay + planetary tails and the doc-66 §1 secular completions in the arguments, the elliptical Sun distance, the exact axis∩ellipsoid ground mapping, and the WGS84 geodetic output convention. This assembled Sun beats a Meeus Ch. 25 basis both against JPL in-window (0.95″ vs 1.28″ scatter) and against the ancient corpus timing structure; the Meeus polynomial remains only as the finders' un-injected default.
 
@@ -37,10 +37,10 @@ Audit-26 result for -135 Apr 15 (documented UT 06:14):
 
 | Quantity | Value |
 |---|---:|
-| Framework's own eclipse UT (MdlUT) | <!--v:babylon135FrameworkUT-->06:00<!--/v--> |
+| Framework's own eclipse UT (MdlUT) | <!--v:babylon135FrameworkUT-->06:05<!--/v--> |
 | Documented UT | <!--v:babylon135DocumentedUT-->06:14<!--/v--> |
-| BestΔUT (offset giving minimum umbra↔site distance) | <!--v:babylon135BestDeltaUT-->-1h01<!--/v--> |
-| **BestGap (umbra↔site at BestΔUT)** | **<!--v:babylon135BestGapKm-->385<!--/v--> km** |
+| BestΔUT (offset giving minimum umbra↔site distance) | <!--v:babylon135BestDeltaUT-->-0h54<!--/v--> |
+| **BestGap (umbra↔site at BestΔUT)** | **<!--v:babylon135BestGapKm-->177<!--/v--> km** |
 | Verdict | **off-peak** |
 
 ---
@@ -171,4 +171,4 @@ At this high-γ presentation the framework computes deep-totality-boundary circu
 - **IMCCE — "L'éclipse de Babylone"** ([link](https://promenade.imcce.fr/en/pages4/468.html)) — the "two pictures" narrative: without Earth-rotation slowdown the totality band passes through Morocco, not Babylon; IMCCE explicitly acknowledges the polynomial-precision limit at deep historical past ("limits of the current celestial mechanics… irregularities in the rotation of our planet impossible to determine in advance").
 - **Russian geology repository — historical-eclipse compilation** ([link](https://repository.geologyscience.ru/server/api/core/bitstreams/6dd0f726-52e0-4e06-a7c4-28fb9cfa2aa6/content)) — independent third source for path-geometry / ΔT-sensitivity framing.
 
-These sources establish the context every reconstruction shares: the eclipse's geographic placement at Babylon depends critically on Sun precision, the ΔT model, and the greatest-eclipse convention. Within that context the framework's prediction — BestGap <!--v:babylon135BestGapKm-->385<!--/v--> km within the scan window, UT within 9 minutes, deep-totality-boundary local circumstances at the site — places the traditional identification on solid footing.
+These sources establish the context every reconstruction shares: the eclipse's geographic placement at Babylon depends critically on Sun precision, the ΔT model, and the greatest-eclipse convention. Within that context the framework's prediction — BestGap <!--v:babylon135BestGapKm-->177<!--/v--> km within the scan window, UT within 9 minutes, deep-totality-boundary local circumstances at the site — places the traditional identification on solid footing.

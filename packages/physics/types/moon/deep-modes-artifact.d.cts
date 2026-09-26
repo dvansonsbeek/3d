@@ -136,5 +136,7 @@ export const DEEP_MODES_ARTIFACT: Readonly<{
     anchorPeriEclipticDeg: 462.9179213996577;
     anchorInclEclipticDeg: 0.00010345820355474172;
     anchorAscNodeEclipticDeg: 140.29217988414328;
+    anchorZDotPerYr: number[];
+    slopeTaperYears: 27943.083333333332;
 }>;
 export const DEEP_MODES_ARTIFACT_HASH: "77e0baf779e85de5";

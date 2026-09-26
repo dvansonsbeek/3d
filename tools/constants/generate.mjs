@@ -565,6 +565,23 @@ function buildDeepModes(chainArt) {
   const art = JSON.parse(raw);
   const hash = createHash('sha256').update(raw).digest('hex').slice(0, 16);
   const anchor = chainArt.art.j2000AnchorElements.earth;
+  // The SLOPE anchor (deep-ecc-channel.cjs): the run's own J2000 z-rate,
+  // read from the banked ±10-Myr series the mode table compresses — the
+  // series' one home, a ±1-cadence-step central difference at the J2000
+  // node (measured: the table's own ė was 19 % steep, the series' is the
+  // run's) — and the taper the arguments' rate anchors ride (H/12), so the
+  // three engines build the identical channel from the embed alone.
+  const series = JSON.parse(readFileSync(SECULAR_SERIES_PATH, 'utf8'));
+  const eb = series.bodies.earth;
+  const i0 = Math.round((0 - series.t0Yr) / eb.stepYr);
+  if (!(i0 > 0 && i0 + 1 < eb.zQ.length && series.t0Yr + i0 * eb.stepYr === 0)) {
+    throw new Error('secular-series artifact: no J2000 node for the z-rate anchor — regenerate it first (node tools/verify/secular-series.js --write)');
+  }
+  const anchorZDotPerYr = [
+    (eb.zQ[i0 + 1] - eb.zQ[i0 - 1]) / (2 * eb.stepYr),
+    (eb.zP[i0 + 1] - eb.zP[i0 - 1]) / (2 * eb.stepYr),
+  ];
+  const slopeTaperYears = read('model-parameters.json').foundational.holisticyearLength / 12;
   return {
     hash,
     payload: {
@@ -605,6 +622,9 @@ function buildDeepModes(chainArt) {
       anchorPeriEclipticDeg: anchor.lonPeriEclipticDeg,
       anchorInclEclipticDeg: anchor.inclEclipticDeg,
       anchorAscNodeEclipticDeg: anchor.ascNodeEclipticDeg,
+      // the slope anchor pair (see above): [d(e·cos ϖ)/dt, d(e·sin ϖ)/dt] per year
+      anchorZDotPerYr,
+      slopeTaperYears,
     },
   };
 }
@@ -619,7 +639,9 @@ function emitDeepModes({ hash, payload }) {
  * emitted VERBATIM, plus the J2000 anchor pair (e, ϖ) joined from
  * data/nbody-secular-frequencies.json j2000AnchorElements.earth — the
  * anchor's ONE home, plus the per-planet leading proper ζ modes (″/yr,
- * the C-4 s-lines for the zoom labels — doc 109 §19). Two gates guard
+ * the C-4 s-lines for the zoom labels — doc 109 §19), plus the J2000
+ * z-rate pair from data/nbody-secular-series.json (the slope anchor of
+ * the deep eccentricity channel) and its H/12 taper. Two gates guard
  * the chain: check:artifacts pins artifact ↔ engine; generate.mjs
  * check mode pins this embed ↔ artifact.
  * CJS because the lunar-chain consumers are CommonJS modules.

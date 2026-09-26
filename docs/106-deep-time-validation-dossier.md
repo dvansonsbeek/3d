@@ -94,9 +94,9 @@ The climate formula's orbital lines against the Cenozoic isotope record (the com
 ## C. Historical era — gate- and artifact-backed
 
 - **Babylonian eclipse case study (−135)** — the framework places the
-  totality path <!--v:babylon135BestGapKm-->385<!--/v--> km from Babylon at
-  ΔUT <!--v:babylon135BestDeltaUT-->-1h01<!--/v--> (framework
-  <!--v:babylon135FrameworkUT-->06:00<!--/v--> vs documented
+  totality path <!--v:babylon135BestGapKm-->177<!--/v--> km from Babylon at
+  ΔUT <!--v:babylon135BestDeltaUT-->-0h54<!--/v--> (framework
+  <!--v:babylon135FrameworkUT-->06:05<!--/v--> vs documented
   <!--v:babylon135DocumentedUT-->06:14<!--/v-->):
   [doc 103](103-135-babylonian-case-study.md), eclipse-audit artifacts under
   freshness guard.

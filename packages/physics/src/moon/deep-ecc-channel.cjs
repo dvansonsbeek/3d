@@ -45,14 +45,41 @@
 'use strict';
 
 /**
+ * THE SLOPE ANCHOR (owner-approved model change, after the Moon panels).
+ * The 18-term table reproduces the attractor and the 405-kyr beat, but
+ * nothing constrained its local DERIVATIVE at J2000: measured, its ė read
+ * −5.00e-5/cy against the run's own −4.24e-5 (and the observed −4.20e-5),
+ * a 19 % slope error that the lunar chain multiplied straight into the
+ * perigee and node curvature (−44″/cy² against Meeus's −37″/cy² — the
+ * "18 % split" the Moon precession panels showed). Against the ±10-Myr
+ * series the table compresses, the error is a LINEAR vector drift of
+ * 2.25e-4 per kyr out to ±20 kyr (an unresolved ultra-long mode), then
+ * spectrum-class either way. So the anchored form gains a second,
+ * BOUNDED term of the same class as the constant remainder:
+ *
+ *     z(t) = Σ … + (z_J2000 − Σ(0)) + (ż_J2000 − Σ̇(0))·I(t),
+ *     I(t) = ∫₀ᵗ cos²(π τ / 2T_q) dτ  (the arguments' taper: linear near
+ *            J2000, saturating at ±T_q/2 beyond |t| ≥ T_q)
+ *
+ * — ż_J2000 is the run's own z-rate at J2000 (script-written into the
+ * artifact by generate.mjs from the banked series: "we are the source"),
+ * T_q the H/12 taper the arguments' rate anchors ride. Inside the canon it
+ * restores the run's slope exactly; beyond ±T_q it is a constant vector
+ * offset of ~3e-3, the size of the table's own spectrum-class scatter
+ * there, never a growing polynomial. Absent the two fields (an older
+ * artifact), the channel is the value-anchored form above, unchanged.
+ *
  * @param {{
  *   earthZ: ReadonlyArray<{omegaRadPerYr: number, re: number, im: number}>,
  *   anchorE: number,
  *   anchorPeriEclipticDeg: number,
+ *   anchorZDotPerYr?: ReadonlyArray<number>,
+ *   slopeTaperYears?: number,
  * }} artifact — the embedded deep-modes artifact (earth z-modes + the J2000
- *   anchor pair joined from the chain artifact's one home).
+ *   anchor pair joined from the chain artifact's one home, + the J2000
+ *   z-rate pair and the taper from the series' one home).
  */
-function createDeepEccChannel({ earthZ, anchorE, anchorPeriEclipticDeg }) {
+function createDeepEccChannel({ earthZ, anchorE, anchorPeriEclipticDeg, anchorZDotPerYr, slopeTaperYears }) {
   const D2R = Math.PI / 180;
   const zA = [anchorE * Math.cos(anchorPeriEclipticDeg * D2R), anchorE * Math.sin(anchorPeriEclipticDeg * D2R)];
   /** @param {number} tYr @returns {[number, number]} */
@@ -65,27 +92,47 @@ function createDeepEccChannel({ earthZ, anchorE, anchorPeriEclipticDeg }) {
     }
     return [re, im];
   };
-  const s0 = modeSum(0);
-  const R = [zA[0] - s0[0], zA[1] - s0[1]];   // the constant remainder
-
-  /** Earth's e at tYr years from J2000 (negative = past).
-   *  @param {number} tYr @returns {number} */
-  function eccAt(tYr) {
-    const [x, y] = modeSum(tYr);
-    return Math.hypot(x + R[0], y + R[1]);
-  }
-
-  /** de/dyear — analytic from the mode sum: d|z|/dt = (z·ż)/|z|.
-   *  @param {number} tYr @returns {number} */
-  function eccRateAt(tYr) {
-    const [x0, y0] = modeSum(tYr);
-    const x = x0 + R[0], y = y0 + R[1];
+  /** dΣ/dt (per year) — analytic. @param {number} tYr @returns {[number, number]} */
+  const modeSumRate = (tYr) => {
     let dx = 0, dy = 0;
     for (const m of earthZ) {
       const c = Math.cos(m.omegaRadPerYr * tYr), s = Math.sin(m.omegaRadPerYr * tYr);
       dx += m.omegaRadPerYr * (-m.re * s - m.im * c);
       dy += m.omegaRadPerYr * (m.re * c - m.im * s);
     }
+    return [dx, dy];
+  };
+  const s0 = modeSum(0);
+  const R = [zA[0] - s0[0], zA[1] - s0[1]];   // the constant remainder
+  // the slope anchor: the run's J2000 z-rate minus the table's, through the taper
+  const Tq = (anchorZDotPerYr && typeof slopeTaperYears === 'number' && slopeTaperYears > 0) ? slopeTaperYears : 0;
+  const sDot0 = modeSumRate(0);
+  const DZ = Tq > 0 && anchorZDotPerYr ? [anchorZDotPerYr[0] - sDot0[0], anchorZDotPerYr[1] - sDot0[1]] : [0, 0];
+  /** ∫₀ᵗ cos²(π τ / 2T_q) dτ, saturating at ±T_q/2. @param {number} t */
+  const iEnv = (t) => {
+    if (Tq <= 0) return 0;
+    if (Math.abs(t) >= Tq) return Math.sign(t) * Tq / 2;
+    return t / 2 + (Tq / (2 * Math.PI)) * Math.sin(Math.PI * t / Tq);
+  };
+  /** cos²(π t / 2T_q), 0 beyond |t| ≥ T_q — dI/dt. @param {number} t */
+  const env = (t) => (Tq <= 0 || Math.abs(t) >= Tq) ? 0 : Math.cos(Math.PI * t / (2 * Tq)) ** 2;
+
+  /** Earth's e at tYr years from J2000 (negative = past).
+   *  @param {number} tYr @returns {number} */
+  function eccAt(tYr) {
+    const [x, y] = modeSum(tYr);
+    const I = iEnv(tYr);
+    return Math.hypot(x + R[0] + DZ[0] * I, y + R[1] + DZ[1] * I);
+  }
+
+  /** de/dyear — analytic: d|z|/dt = (z·ż)/|z|, the slope anchor's
+   *  tapered rate included. @param {number} tYr @returns {number} */
+  function eccRateAt(tYr) {
+    const [x0, y0] = modeSum(tYr);
+    const I = iEnv(tYr), E = env(tYr);
+    const x = x0 + R[0] + DZ[0] * I, y = y0 + R[1] + DZ[1] * I;
+    const [dx0, dy0] = modeSumRate(tYr);
+    const dx = dx0 + DZ[0] * E, dy = dy0 + DZ[1] * E;
     const r = Math.hypot(x, y);
     return r === 0 ? 0 : (x * dx + y * dy) / r;
   }

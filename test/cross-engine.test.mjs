@@ -29,6 +29,10 @@
  *     previous climate coefficients by luck. Identical code, identical data,
  *     different runtime arithmetic — a tolerance is the honest statement,
  *     and the certified window (≤ 50 kyr) stays bit-exact.
+ *   - DEEP year lengths (|year| > 50 kyr): within 1e-7 d — the same class
+ *     (a year length is the difference of two deep JDs); measured 1–2 ULP
+ *     of the JD at −302,635 once the deep eccentricity channel's slope
+ *     anchor moved the Moon there. In-era year lengths stay bit-exact.
  */
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
@@ -47,6 +51,13 @@ const fixture = JSON.parse(readFileSync(
 const YL_TOL_DAYS = 0;      // bit-exact — achieved at Phase 7.2 (shared code)
 const DEEP_YEARS = 50000;   // beyond the certified fine zone the runtimes' Math differs at the last bit (header)
 const DEEP_JD_TOL_DAYS = 1e-6;
+// DEEP year lengths (|year| > DEEP_YEARS): the difference of two deep
+// solstice JDs, so the same last-bit class as the JDs themselves — measured
+// 1.49e-8 and 2.98e-8 d (1–2 ULP of a JD of magnitude 1e8) on solsticeVE /
+// solsticeAE at −302,635 after the deep eccentricity channel's slope anchor
+// moved the Moon (and with it the geocentric Sun) at that epoch; the
+// certified window stays bit-exact.
+const DEEP_YL_TOL_DAYS = 1e-7;
 // Plan 06 R5 — the Moon SERIES inputs (the shared Meeus series on the
 // framework-native arguments, at the scene's true TT): browser moonScene
 // lon/lat/dist vs the Node engine at the same UT JD. Measured before the fix:
@@ -135,8 +146,9 @@ for (const [key, browserVal] of Object.entries(fixture)) {
   } else {
     const d = Math.abs(browserVal - nodeVal);
     if (Object.is(browserVal, nodeVal)) { exact++; continue; }
-    if (d <= YL_TOL_DAYS) { withinTol++; continue; }
-    console.log(`  DIVERGED (>${YL_TOL_DAYS}) ${key}  Δ=${d.toExponential(3)}`);
+    const tol = (m && Math.abs(Number(m[2])) > DEEP_YEARS) ? DEEP_YL_TOL_DAYS : YL_TOL_DAYS;
+    if (d <= tol) { withinTol++; continue; }
+    console.log(`  DIVERGED (>${tol}) ${key}  Δ=${d.toExponential(3)}`);
     failures++;
   }
 }

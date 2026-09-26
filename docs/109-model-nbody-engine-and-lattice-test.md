@@ -639,6 +639,23 @@ keys `earthDeepBeatPeriodKyr`, `earthDeepBeatLa2004PeriodKyr`,
 **Read the live values from the artifact or the keys, never from this
 paragraph.**
 
+**The slope anchor (after the Moon precession panels).** The 18-term
+table reproduces the attractor, but nothing constrained its local
+derivative at J2000: measured, its ė read −5.00e-5/cy against the run's
+own −4.24e-5 (and the observed −4.20e-5), a 19 % slope error that the
+lunar chain multiplied straight into the perigee and node curvature
+(−44″/cy² against Meeus's −37″/cy²). Against the ±10-Myr series the table
+compresses, the error is a linear vector drift of ~2.3e-4 per kyr out to
+±20 kyr — an unresolved ultra-long mode — then spectrum-class either way.
+The anchored evaluator (`moon/deep-ecc-channel.cjs`) therefore carries a
+second bounded term of the same class as its constant remainder: the
+run's own J2000 z-rate (script-written into the embed by `generate.mjs`
+from the banked series, the one home) minus the table's, through the
+arguments' H/12 cos² taper — linear inside the canon, a constant vector
+offset beyond. Measured: ė −4.236e-5/cy, the perigee curvature −37.4″/cy²,
+the deep-time modulation moved by 5e-5 at 1 Ma; the era chain and the
+Eccentricity panel are untouched (they never read this channel).
+
 Anatomy of the residual gap to the rock value (measured, plan 02 §8
 Stage-B record): the engine's g5 matches La2004 to 0.0002 ″/yr; the
 whole beat gap is g2 sitting ≈ 0.4 % low, which decomposes into the

@@ -854,7 +854,7 @@ the measured MPP02-vs-JPL comparison floor (~0.33″); dense 2-day JPL
 arbiter λ 2.22″ / β 0.38″; the 179-syzygy fleet Δ-instrument improving;
 NASA centerlines mean <!--v:centerlinesMeanArcsec-->6.5<!--/v-->″ / max
 <!--v:centerlinesMaxArcsec-->11.1<!--/v-->″; audit verdicts 3/13/5/0/5;
-Babylon −135 BestGap <!--v:babylon135BestGapKm-->385<!--/v--> km
+Babylon −135 BestGap <!--v:babylon135BestGapKm-->177<!--/v--> km
 (doc 103). What remains is genuinely floor: the ~0.8″ λ post-census
 residual (sub-0.04″ deep dust + beyond-3-body), the doctrine-blocked
 ~5e-5 parameter class (the three biggest Meeus head amplitudes off by
@@ -980,7 +980,7 @@ tested this directly: Meeus Ch. 47, ELP-2000/82 (truncated and full), and
 ELP/MPP02 (DE-fit and LLR-fit) all converge to β ≈ 0.706° at the -135
 conjunction — within 0.001°, consistent with NASA's γ = 0.7119. **The Moon
 series is not the source of the -135 residual** — the audited BestGap
-(<!--v:babylon135BestGapKm-->385<!--/v--> km, off-peak verdict, UT within
+(<!--v:babylon135BestGapKm-->177<!--/v--> km, off-peak verdict, UT within
 9 minutes; see
 [Historical Solar Eclipse Validation](https://holisticuniverse.com/model/historical-eclipse-validation)
 and [doc 103](103-135-babylonian-case-study.md)) is a *where* residual
