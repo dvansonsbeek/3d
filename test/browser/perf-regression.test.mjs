@@ -26,6 +26,10 @@
  *   full update   +100k 8 ms · +300k 11 ms (ratio 1.4) · +1.5M 22 ms (2.7)
  *   light update  +100k 2 ms · +300k  5 ms (ratio 2.5) · +1.5M 15 ms (7)
  *   C-VIS frame   0.03 ms   ·  trace sample ratio ~3
+ * (Between 2026-09-23 and 2026-09-26 the rows read ~106/125/167 ms: the
+ * cold-jump row's −5.34 Myr scene state, restored by every probe, added a
+ * ~53-ms perihelion-calendar hint walk per update — see the reset below
+ * the cold-jump row. Those readings were the artefact, not the update.)
  *
  * THE COLD-JUMP ROW (plan 06 R4 follow-up, a class the steady-state rows
  * cannot see): the FIRST evaluation at a deep epoch on a fresh page builds
@@ -88,6 +92,15 @@ try {
   }, { near: jdOf(-100000), deep: jdOf(-5340000) });
   console.log(`      cold jump ms (first eval on a fresh page): −100k ${cold.nearMs.toFixed(0)} · −5.34M ${cold.deepMs.toFixed(0)}`);
   gate('cold jump: first(−5.34M) / first(−100k) ratio', cold.deepMs / cold.nearMs, 8, 'x');
+  // Bring the scene back to a modern epoch (measured 2026-09-26): the cold
+  // jump leaves o.julianDay at −5.34 Myr, and every hybridSpinProbe below
+  // restores that JD after its own jump — so each update paid the
+  // perihelion-calendar converter's year-by-year hint walk TWICE across
+  // 5.4 Myr (~10 ms per Myr): the in-table full update read 106 ms per pair
+  // where the true cost is 3–6 ms, and the constant ~53 ms in numerator and
+  // denominator compressed every ratio below toward 1 (a 28× class would
+  // have read ~4.5 against the limit 6). Rows 1–5 now measure the update.
+  await sim.page.evaluate((jd) => window.__test__.sceneSunRaDecAt(jd), jdOf(2000));
 
   // ── warmup: one-time lazy builds (cycle tables, samplers, chains) ──
   await sim.page.evaluate((jds) => jds.forEach((jd) => {
