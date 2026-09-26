@@ -146,7 +146,7 @@ Rows are distributed across tabs to reduce scrolling. The tab bar appears betwee
 | **Standard planets** (Mercury–Neptune, Pluto, Halley's, Eros) | GENERAL, ORBIT, POSITION, CYCLES | 4 tabs |
 | **Earth** | GENERAL, ORBIT, POSITION, CYCLES | Same 4 tabs; extra Date Specific + Precession Cycles sections go into CYCLES |
 | **Moon** | GENERAL, ORBIT, CYCLES | 3 tabs; eclipse cycles in CYCLES |
-| **Sun** | *(no tab bar)* | All sections shown flat |
+| **Sun** | GENERAL, POSITION, CYCLES | The Sun's header map (TAB_CONFIG.sunHeaderMap) — POSITION carries the **Solar Mass Loss (Driver 2)** block: the radiative (L☉/c²) and solar-wind mass-loss rates, their total as Ṁ/M per year against the Pitjeva & Pitjev (2012) ephemeris bound, the implied AU growth against Pitjeva & Standish (2009), and the implied sidereal-year drift (T ∝ M⁻²) that the Formula Verification Sidereal Year panel carries and the μ-consistency falsification leg rides — the model's second driver on a surface, registry-driven, no typed numbers |
 
 #### Tab-to-Section Mapping (Standard Planets)
 
