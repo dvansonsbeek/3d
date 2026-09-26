@@ -74,7 +74,11 @@ when the planet or a checkbox changes.
 
 The orbit is resampled when the epoch has moved by more than 1/720 of the
 period and at most four times a second (the same floor the orbit rings use);
-the planet-dependent parts move every frame.
+the planet-dependent parts move every frame. A resample bridges UT → TT once
+(the engine year at the current JD) and steps its vertices in Julian years, as
+the scene rings do: the shape over one period does not need ΔT per vertex, and
+the vertex at the current date reads the mesh's own year exactly. The mesh,
+panels and traces keep the exact per-JD route.
 
 ## 4. The camera
 

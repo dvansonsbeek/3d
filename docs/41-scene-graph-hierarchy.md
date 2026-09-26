@@ -354,7 +354,14 @@ the K device geometry at the chain anchor epoch — the sun-plane normal as the
 pole, the axis frame's RA = 0 direction projected onto that plane as the
 longitude origin — read once, with no correction. The device is deterministic
 there, so the bridge is too: nothing derived from a first frame's Sun, nothing
-to re-derive when the series artifact lands. History (plan 06 R3): the former
+to re-derive when the series artifact lands. What the landing block DOES do is
+request one paused frame (and drop the umbra tier's one-JD memo with the tier
+model it served): the rebuilt package model's chain-cycle tables and the Moon
+factory's normalisations are lazy builds (~1.2 s), and nothing renders while
+paused, so without that frame they landed on the first Play frame — the
+measured "wait before the scene starts" — while the paused scene kept showing
+the pre-landing K pose. Since that frame, the paused scene shows the hybrid
+pose from landing on. History (plan 06 R3): the former
 **Earth-direction triad** (the chain Earth's heliocentric direction matched to
 the scene's Earth–Sun direction at two instants) was a body match that folded
 the chain Earth's +3.5″ offset from the certified Sun at J2000 (the chain
