@@ -21336,12 +21336,42 @@ function moonDraconicMonthDaysMeeus(year) { return _meeusMonthDays(_meeus47RateD
 // flat lines, hence strips.
 const _vfpML_ID = 'moon-months';
 const _VFPML_VALID = [-1999, 3000];
+// THE MODEL SIDE IS THE MEAN-LONGITUDE RATE, not the orbit size: the chain's
+// Kepler month on the recession distance lengthens at the tidal rate alone,
+// while Meeus's L′ rate is the OBSERVED mean longitude, whose secular term
+// also carries the planetary part (Earth's decreasing eccentricity weakening
+// the solar perturbation, +5.9″/cy² against the tides' −12.8″/cy²) — the
+// first build compared the two and read a 2.3× slope split (owner: "the
+// curves do not match"). The framework's own lunar arguments (_moonArgsAt,
+// the Moon evaluator's skeleton: the tidal month chain plus the planetary,
+// obliquity and secular-completion carriers) ARE the model's mean longitude
+// of date, so each strip mirrors Meeus's definition exactly — a month is
+// 360° over the argument's rate (a one-day central difference), the
+// sidereal month with the model's own axial precession removed.
+// the rate over ONE YEAR (±½ yr central difference — the year-length
+// machinery's stencil): a one-day difference read the chain integrator's
+// grid nodes as one-sample notches. The arguments wrap at 360°, so the
+// year's whole turns are unwrapped against the Meeus mean rate (the
+// model-vs-Meeus rate split is ~1e-8, far inside the ±180° ambiguity).
+const _vfpML_MEEUS_DEG_PER_CY = { Lp: 481267.88123421, D: 445267.1114034, Mp: 477198.8675055, F: 483202.0175233 };
+function _vfpMLArgRateDegPerDay(key, year) {
+  const jd = yearToJDApprox(year), half = 365.25 / 2;
+  const expected = (_vfpML_MEEUS_DEG_PER_CY[key] / julianCenturyDays) * 2 * half;
+  const raw = _moonArgsAt(jd + half)[key] - _moonArgsAt(jd - half)[key];
+  const d = ((raw - expected + 540) % 360 + 360) % 360 - 180;
+  return (expected + d) / (2 * half);
+}
+function _vfpMLModelMonthDays(key, year, sidereal) {
+  let r = _vfpMLArgRateDegPerDay(key, year);
+  if (sidereal) r -= 360 / (_vfpAxialPrecessionYears(year) * 365.25);
+  return Number.isFinite(r) && r > 0 ? 360 / r : NaN;
+}
 const _vfpML_STRIPS = [
-  { key: 'sid', name: 'Sidereal month', screen: '#5ea0ff', paper: '#1d4ed8', model: (t) => meanMoonSiderealMonthAtAge(t), ref: moonSiderealMonthDaysMeeus, refShort: 'L̇′ − ṗ_A' },
-  { key: 'syn', name: 'Synodic month', screen: '#4ade80', paper: '#15803d', model: (t) => meanSynodicMonthAtAge(t), ref: moonSynodicMonthDaysMeeus, refShort: 'Ḋ' },
-  { key: 'anom', name: 'Anomalistic month', screen: '#f87171', paper: '#b91c1c', model: (t) => meanAnomalisticMonthAtAge(t), ref: moonAnomalisticMonthDaysMeeus, refShort: 'Ṁ′' },
-  { key: 'drac', name: 'Draconic month', screen: '#c084fc', paper: '#7e22ce', model: (t) => meanNodalMonthAtAge(t), ref: moonDraconicMonthDaysMeeus, refShort: 'Ḟ' },
-  { key: 'trop', name: 'Tropical month', screen: '#e8ecf4', paper: '#222', model: (t) => meanTropicalMonthAtAge(t), ref: moonTropicalMonthDaysMeeus, refShort: 'L̇′' },
+  { key: 'sid', name: 'Sidereal month', screen: '#5ea0ff', paper: '#1d4ed8', model: (y) => _vfpMLModelMonthDays('Lp', y, true), ref: moonSiderealMonthDaysMeeus },
+  { key: 'syn', name: 'Synodic month', screen: '#4ade80', paper: '#15803d', model: (y) => _vfpMLModelMonthDays('D', y, false), ref: moonSynodicMonthDaysMeeus },
+  { key: 'anom', name: 'Anomalistic month', screen: '#f87171', paper: '#b91c1c', model: (y) => _vfpMLModelMonthDays('Mp', y, false), ref: moonAnomalisticMonthDaysMeeus },
+  { key: 'drac', name: 'Draconic month', screen: '#c084fc', paper: '#7e22ce', model: (y) => _vfpMLModelMonthDays('F', y, false), ref: moonDraconicMonthDaysMeeus },
+  { key: 'trop', name: 'Tropical month', screen: '#e8ecf4', paper: '#222', model: (y) => _vfpMLModelMonthDays('Lp', y, false), ref: moonTropicalMonthDaysMeeus },
 ];
 const _vfpML_REF_COLOR = { screen: '#f472b6', paper: '#be185d' };   // Meeus, magenta — no strip uses it
 const _vfpMLState = { on: { sid: true, syn: true, anom: false, drac: false, trop: false }, _screenGeom: null };
@@ -21354,12 +21384,10 @@ function _vfpMLSamples(range) {
   const N = _vfpSamplesForSpan(y0, y1);
   const yrs = new Array(N), model = {}, ref = {}, stats = {};
   for (const s of _vfpML_STRIPS) { model[s.key] = new Array(N); ref[s.key] = new Array(N); }
-  const days = (sec) => Number.isFinite(sec) ? sec / 86400 : NaN;   // the chain returns null past the tidal lock
   for (let i = 0; i < N; i++) {
     const y = y0 + ((y1 - y0) * i) / (N - 1);
     yrs[i] = y;
-    const t = (startmodelYear - y) / 1e6;
-    for (const s of _vfpML_STRIPS) { model[s.key][i] = days(s.model(t)); ref[s.key][i] = s.ref(y); }
+    for (const s of _vfpML_STRIPS) { model[s.key][i] = s.model(y); ref[s.key][i] = s.ref(y); }
   }
   // per strip: the J2000 pair and the rms of (Meeus − model) in seconds over
   // the window's samples inside the canon's validity
@@ -21370,7 +21398,7 @@ function _vfpMLSamples(range) {
       const d = (ref[s.key][i] - model[s.key][i]) * 86400;
       if (Number.isFinite(d)) { s2 += d * d; n++; }
     }
-    stats[s.key] = { rmsS: n ? Math.sqrt(s2 / n) : NaN, n, modelJ2000: days(s.model((startmodelYear - 2000) / 1e6)), refJ2000: s.ref(2000) };
+    stats[s.key] = { rmsS: n ? Math.sqrt(s2 / n) : NaN, n, modelJ2000: s.model(2000), refJ2000: s.ref(2000) };
   }
   return (_vfpMLCacheByRange[key] = { y0, y1, yrs, model, ref, stats });
 }
@@ -21378,7 +21406,7 @@ function _vfpMLChartCore(range, on, style) {
   const S = _vfpMLSamples(range);
   const paper = style === 'paper';
   const strips = _vfpML_STRIPS.filter((s) => on[s.key]);
-  const W = 800, SH = 96, LAB = 13, GAP = 6, PAD = { l: 78, r: 44, t: 14, b: 30 };
+  const W = 800, SH = 84, LAB = 13, GAP = 6, PAD = { l: 78, r: 44, t: 14, b: 30 };
   const n = Math.max(1, strips.length);
   const H = PAD.t + n * SH + (n - 1) * GAP + PAD.b;
   const pw = W - PAD.l - PAD.r;
@@ -21436,9 +21464,9 @@ function _vfpMLChartCore(range, on, style) {
       }
       body += '<path d="' + d + '" fill="none" stroke="' + col + '" stroke-width="1.5"/>';
     }
+    // a short label (the J2000 pair lives in the Reading): the name and the rms
     const st = S.stats[s.key];
-    const lab = s.name + ' (d) — J2000 model ' + (Number.isFinite(st.modelJ2000) ? st.modelJ2000.toFixed(7) : '—') + ' · Meeus ' + st.refJ2000.toFixed(7) +
-      (st.n ? ' · rms ' + st.rmsS.toFixed(2) + ' s over ' + st.n + ' samples inside validity' : '');
+    const lab = s.name + (st.n ? ' — rms vs Meeus ' + st.rmsS.toFixed(2) + ' s' : '');
     body += '<text x="' + (PAD.l + 6) + '" y="' + (top + 10) + '" fill="' + col + '" font-size="10" font-weight="600">' + escapeXml(lab) + '</text>';
   });
   if (2000 >= S.y0 && 2000 <= S.y1) {
@@ -21464,7 +21492,7 @@ function _vfpMLNoteParts(core, on, withLinks) {
       (st.n ? ', rms ' + st.rmsS.toFixed(2) + ' s over ' + st.n + ' samples inside validity' : ', no sample inside validity on this window'));
   }
   const reading = (parts.length ? parts.join(' · ') + '. ' : '') +
-    'The sidereal month is Kepler’s third law on the recession distance of date: it lengthens at the tidal rate the LLR-anchored recession sets, the deceleration of the Moon’s mean longitude the ELP secular term records; Meeus’s L′ also carries the planetary part of that term, which an orbit-size law does not, so the two slopes part by a fraction of a second at the canon’s edges. The synodic month is the beat of the sidereal month with the sidereal year and so mixes both drivers; the anomalistic and draconic months are its beats with the perigee and node cycles of the Moon panels; the tropical month folds in the axial precession.';
+    'Each month is 360° over the rate of the model’s own lunar mean argument of date — the framework’s L′, D, M′ and F, the skeleton the Moon evaluator runs on: the tidal month chain (Kepler’s third law on the LLR-anchored recession distance) plus the planetary, obliquity and secular-completion carriers — mirroring Meeus’s definition term for term, the sidereal month with the model’s axial precession removed where Meeus removes the IAU one. The orbit-size month alone lengthens at the tidal rate, 2.3 times the observed slope: the observed mean longitude also carries the planetary secular term, Earth’s decreasing eccentricity weakening the solar perturbation, which the carriers supply. The synodic month is the beat with the mean Sun; the anomalistic and draconic months carry the perigee and node cycles of the Moon panels.';
   return { frame, references, reading };
 }
 function renderVFPMonthLengths() {
