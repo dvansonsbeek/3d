@@ -63,8 +63,13 @@ HIST_REL = 'data/t7-model-orbital-histories.json'
 LA2004_REL = 'data/la2004-earth-51myr-back.asc'
 OUT_REL = 'data/t7-fixed-phase-l1.json'
 SELF_REL = 'scripts/t7_fixed_phase_l1.py'
-INPUT_FILES = [HIST_REL, LA2004_REL, 'data/lr04-stack.txt', 'data/l1-physical-lines.json',
+CFC_REL = 'public/input/climate-formula-coefficients.json'
+INPUT_FILES = [HIST_REL, LA2004_REL, 'data/lr04-stack.txt', 'data/l1-physical-lines.json', CFC_REL,
+               'public/input/model-parameters.json', 'public/input/astro-reference.json',
                'scripts/milankovitch_climate_formula.py', 'tools/explore/t7-export-orbital-histories.mjs', SELF_REL]
+BANDS_KYR = {'precession_18_24': (18.0, 24.0), 'obliquity_38_44': (38.0, 44.0), 'hundred_kyr_85_135': (85.0, 135.0), 'long_ecc_350_450': (350.0, 450.0)}
+BLOCK_CV_N = 4
+RIDGE_CV = (1.0, 100.0)
 
 REGIMES = ['post-mpt', 'inhg-mpt', 'pre-inhg']
 LAGS_KYR = np.arange(0.0, 20.01, 0.5)          # the climate lag scan (forcing leads the proxy)
@@ -287,9 +292,119 @@ def run_regime(rg):
     return res
 
 
+# ── robustness (added after the first run; not pre-registered, reported in full) ─────
+def free_curve(f, t):
+    yhat = np.full_like(t, f._intercept, dtype=float)
+    for P in mcf.L1_PERIODS_KYR:
+        w = 2 * np.pi / P
+        yhat += f._l1_a[P] * np.cos(w * t) + f._l1_b[P] * np.sin(w * t)
+    return yhat
+
+
+def band_powers(x):
+    """Fraction of the series' variance (mean removed) per period band, on the 1-kyr grid."""
+    F = np.fft.rfft(x - x.mean()); freq = np.fft.rfftfreq(len(x), d=1.0); P = np.abs(F) ** 2
+    tot = float(P[1:].sum())
+    return {k: float(P[(freq >= 1 / b[1]) & (freq <= 1 / b[0])].sum() / tot) for k, b in BANDS_KYR.items()}, tot
+
+
+def robustness(rg):
+    lo, hi = mcf.REGIME_WINDOWS[rg]
+    t, y = mcf.preprocess(ages, vals, window=(lo, hi))
+    out = {}
+    # (i) the lag profile — how sharply the climate lag is constrained
+    prof = np.array([r2(y, regressors('a', T_HIST, MODEL, t, lag) @ ols(regressors('a', T_HIST, MODEL, t, lag), y)) for lag in LAGS_KYR])
+    half = prof >= prof.max() - 0.5 * (prof.max() - prof.min())
+    out['lag_profile_a'] = dict(r2_by_lag=[float(v) for v in prof], best_lag_kyr=float(LAGS_KYR[int(prof.argmax())]),
+                                r2_at_zero_lag=float(prof[0]), r2_at_max_lag=float(prof[-1]),
+                                half_height_range_kyr=[float(LAGS_KYR[half].min()), float(LAGS_KYR[half].max())])
+    # (ii) band powers: what the free fit explains that the fixed-phase model cannot
+    f, _, _ = fit_free(t, y, (lo, hi))
+    yn = (y - f._fit_y_mean) / f._fit_y_std
+    res_free = yn - free_curve(f, t)
+    lag, beta, _ = fit_fixed('a', T_HIST, MODEL, t, y)
+    res_fixed = (y - regressors('a', T_HIST, MODEL, t, lag) @ beta) / y.std()
+    by, ty = band_powers((y - y.mean()) / y.std()); bf, tf = band_powers(res_free); bx, tx = band_powers(res_fixed)
+    out['band_variance_fraction_of_record'] = {k: dict(record=by[k], left_by_free=bf[k] * tf / ty, left_by_fixed_a=bx[k] * tx / ty) for k in BANDS_KYR}
+    out['residual_variance_fraction'] = dict(free=tf / ty, fixed_a=tx / ty)
+    # (iii) block cross-validation — leave one of BLOCK_CV_N equal blocks out
+    edges = np.linspace(lo, hi, BLOCK_CV_N + 1)
+    cv = {f'free_lambda_{lam:g}': [] for lam in RIDGE_CV}; cv.update({'fixed_a': [], 'fixed_b': []})
+    lam0 = mcf.L1_RIDGE_LAMBDA
+    try:
+        for k in range(BLOCK_CV_N):
+            sm = (t >= edges[k]) & (t <= edges[k + 1]); fm = ~sm
+            for lam in RIDGE_CV:
+                mcf.L1_RIDGE_LAMBDA = lam
+                ff, _, _ = fit_free(t[fm], y[fm], (lo, hi))
+                cv[f'free_lambda_{lam:g}'].append(score_free(ff, t[sm], y[sm]))
+            mcf.L1_RIDGE_LAMBDA = lam0
+            for kind in ('a', 'b'):
+                lg, bt, _ = fit_fixed(kind, T_HIST, MODEL, t[fm], y[fm])
+                cv['fixed_' + kind].append(score_fixed(kind, T_HIST, MODEL, lg, bt, t[sm], y[sm]))
+    finally:
+        mcf.L1_RIDGE_LAMBDA = lam0
+    out['block_cv'] = {k: dict(mean=float(np.mean(v)), min=float(min(v)), max=float(max(v)), blocks=[float(x) for x in v]) for k, v in cv.items()}
+    # (iv) local fidelity inside the window — what a hindcast consumer (α(t), memory τ ≈ 6 kyr) actually feels
+    if rg == 'post-mpt':
+        yhat_free = free_curve(f, t)
+        yhat_fixed = (regressors('a', T_HIST, MODEL, t, lag) @ beta - f._fit_y_mean) / f._fit_y_std
+        loc = {}
+        for w0, w1 in ((0, 30), (0, 60), (0, 130), (0, 250)):
+            m = (t >= w0) & (t <= w1)
+            loc[f'{w0}_{w1}'] = dict(r2_free=r2(yn[m], yhat_free[m]), r2_fixed_a=r2(yn[m], yhat_fixed[m]),
+                                     corr_free=float(np.corrcoef(yn[m], yhat_free[m])[0, 1]), corr_fixed_a=float(np.corrcoef(yn[m], yhat_fixed[m])[0, 1]))
+        m1 = (t >= 10) & (t <= 30)
+        loc['lgm_max_kyr'] = dict(record=float(t[m1][yn[m1].argmax()]), free=float(t[m1][yhat_free[m1].argmax()]), fixed_a=float(t[m1][yhat_fixed[m1].argmax()]))
+        out['local_fidelity_normalised'] = loc
+    return out
+
+
+def alpha_consequence(results):
+    """α(t) on the two forcings (post-MPT), τ from the registry, k from the J2000 Cox–Chao rate — and the historical ΔT it implies."""
+    cfc = json.loads((ROOT / CFC_REL).read_text()); reg = cfc['regimes']['lr04-post-mpt']; ystd = reg['denormalization']['y_std']
+    mp = json.loads((ROOT / 'public/input/model-parameters.json').read_text())['deepTime']
+    alpha0 = json.loads((ROOT / 'public/input/astro-reference.json').read_text())['physicalConstants']['earthMoiFactorJ2000']
+    rate, tau = mp['alphaGiaRateJ2000PerYr'], float(mp['alphaGiaRelaxationKyr'])
+    dt = 0.01; tk = np.arange(0.0, 200.0, dt)
+    # shipped: the per-line causal filter (createAlphaGiaChannel's laggedL1Terms)
+    Lsh = np.zeros_like(tk)
+    for c in reg['L1']:
+        wt = 2 * np.pi / c['period_kyr'] * tau; d = 1 + wt * wt; Hre, Him = wt * wt / d, wt / d
+        a, b = c['a'] * Hre - c['b'] * Him, c['a'] * Him + c['b'] * Hre
+        w = 2 * np.pi / c['period_kyr']; Lsh += a * np.cos(w * tk) + b * np.sin(w * tk)
+    Lsh *= ystd
+    # fixed-phase: F(t + lag) minus its causal exponential mean over the past (same τ), numerically
+    fa = results['post-mpt']['fixed_a_e_eps_esinw']['in_window']; co, lag = fa['coefficients'], fa['lag_kyr']
+    tt = tk + lag
+    F = co[1] * np.interp(tt, T_HIST, MODEL['e']) + co[2] * np.interp(tt, T_HIST, MODEL['eps_deg']) + co[3] * np.interp(tt, T_HIST, MODEL['e_sin_peri'])
+    a_ = np.exp(-dt / tau); m = np.zeros_like(F); m[-1] = F[-1]
+    for i in range(len(F) - 2, -1, -1):
+        m[i] = a_ * m[i + 1] + (1 - a_) * F[i + 1]
+    Lfx = F - m
+    def alpha_of(L):
+        slope = -(L[1] - L[0]) / (dt * 1000)      # per year (t is kyr BP)
+        k = -rate / slope
+        return alpha0 - k * (L - L[0]), k
+    ash, ksh = alpha_of(Lsh); afx, kfx = alpha_of(Lfx)
+    n30 = int(30 / dt)
+    out = dict(tau_kyr=tau, alpha_j2000=alpha0, rate_per_yr=rate, k_shipped=float(ksh), k_fixed=float(kfx),
+               alpha_peak_kyr_bp=dict(shipped=float(tk[int(ash[:n30].argmax())]), fixed=float(tk[int(afx[:n30].argmax())])),
+               delta_lod_ms_from_alpha={str(T): dict(shipped=float(86400e3 * (ash[int(T / dt)] - alpha0) / alpha0), fixed=float(86400e3 * (afx[int(T / dt)] - alpha0) / alpha0)) for T in (5, 10, 15, 21, 30, 50)},
+               delta_t_shift_seconds_fixed_minus_shipped={})
+    for T_yr in (1000, 2000, 2700, 4000):
+        i = int(round(T_yr / (dt * 1000)))
+        dl = 86400 * (afx[:i + 1] - ash[:i + 1]) / alpha0
+        out['delta_t_shift_seconds_fixed_minus_shipped'][str(T_yr)] = float(np.trapezoid(dl, dx=dt * 1000 * 365.25))
+    return out
+
+
 def main():
     t0 = time.time()
     results = {rg: run_regime(rg) for rg in REGIMES}
+    for rg in REGIMES:
+        results[rg]['robustness'] = robustness(rg)
+    alpha = alpha_consequence(results)
 
     def v(rg, *keys):
         x = results[rg]
@@ -310,7 +425,14 @@ def main():
             robustness_holdout_fixed_ge_free_at_best_lambda={'a': a_h >= free_best, 'b': b_h >= free_best},
         )
     prediction_holds = all(checks[rg]['outcome2_holdout_fixed_ge_free']['a'] or checks[rg]['outcome2_holdout_fixed_ge_free']['b'] for rg in ('post-mpt', 'pre-inhg'))
-    verdict = dict(checks=checks, prediction2_holds_post_mpt_and_pre_inhg=prediction_holds)
+    block_cv_skill = {rg: results[rg]['robustness']['block_cv']['fixed_a']['mean'] > results[rg]['null_phase_randomised_a']['holdout']['p95'] for rg in REGIMES}
+    verdict = dict(checks=checks, prediction2_holds_post_mpt_and_pre_inhg=prediction_holds,
+                   block_cv_fixed_a_above_null_holdout_p95=block_cv_skill,
+                   reading=('Both pre-registered outcomes hold on the half split. Under 4-block cross-validation the fixed-phase skill is robust in '
+                            'post-MPT and iNHG-MPT and MARGINAL in pre-iNHG (mean about zero); the climate lag is loosely constrained (half-height '
+                            'range roughly 1-12 kyr); the in-window gap to the free fit is the 100-kyr band, which a linear response to e, eps, e*sin(peri) '
+                            'does not generate; over the recent 0-30 kyr the free fit reproduces the record more closely than the fixed-phase model, '
+                            'and the two alpha(t) histories agree to a few percent to 10 kyr BP yet imply a historical DeltaT difference of order 100 s at 2700 BP.'))
 
     # ── report ──
     print(f'T7 — the fixed-phase L1 vs the shipped free-phase L1 (LR04; lag scan 0–{LAGS_KYR[-1]:.0f} kyr; null N = {N_NULL})')
@@ -336,8 +458,19 @@ def main():
             print(f"  {rg:9s} b     fit {h['fit'][0]:5.0f}–{h['fit'][1]:5.0f}  R²fit {h['r2_fit']:7.4f}  hold {h['r2_holdout']:8.4f}  lag {h['lag_kyr']:4.1f}")
         c = v(rg, 'fixed_a_e_eps_esinw', 'in_window', 'coefficients')
         print(f"  {rg:9s} a coefficients (normalised δ¹⁸O per unit): e {c[1]:+.2f}  ε {c[2]:+.3f}/°  e·sin ϖ {c[3]:+.2f}   · variant c: Tm {v(rg,'variant_c_imbrie','in_window','tm_kyr')} kyr, b {v(rg,'variant_c_imbrie','in_window','b')}")
+    print('\nrobustness:')
+    for rg in REGIMES:
+        rb = results[rg]['robustness']; lp = rb['lag_profile_a']; cvb = rb['block_cv']
+        print(f"  {rg:9s} lag half-height {lp['half_height_range_kyr'][0]:.1f}–{lp['half_height_range_kyr'][1]:.1f} kyr (R² at lag 0 {lp['r2_at_zero_lag']:.3f}) · "
+              f"4-block CV: " + ' · '.join(f"{k} {v['mean']:+.3f} [{v['min']:+.2f},{v['max']:+.2f}]" for k, v in cvb.items()))
+        for k, b in rb['band_variance_fraction_of_record'].items():
+            print(f"     {k:20s} record {b['record']:.3f} · left by free {b['left_by_free']:.3f} · left by fixed {b['left_by_fixed_a']:.3f}")
+    lf = results['post-mpt']['robustness']['local_fidelity_normalised']
+    print('  post-mpt local fidelity: ' + ' · '.join(f"{k} free {v['r2_free']:.3f} / fixed {v['r2_fixed_a']:.3f}" for k, v in lf.items() if k != 'lgm_max_kyr') + f" · LGM max {lf['lgm_max_kyr']}")
+    print(f"  α(t): k shipped {alpha['k_shipped']:.3e} fixed {alpha['k_fixed']:.3e} · peak {alpha['alpha_peak_kyr_bp']} · δLOD(ms) " + ' · '.join(f"{T}k {v['shipped']:+.1f}/{v['fixed']:+.1f}" for T, v in alpha['delta_lod_ms_from_alpha'].items())
+          + ' · ΔT shift (s) ' + ' · '.join(f"{T}BP {v:+.0f}" for T, v in alpha['delta_t_shift_seconds_fixed_minus_shipped'].items()))
     print('\nchecks:', json.dumps(checks, indent=None))
-    print('prediction (2) holds in post-MPT and pre-iNHG:', prediction_holds)
+    print('prediction (2) holds in post-MPT and pre-iNHG:', prediction_holds, '· block-CV skill above null:', block_cv_skill)
     print(f'elapsed {time.time() - t0:.1f} s')
 
     if '--write' in sys.argv:
@@ -346,8 +479,10 @@ def main():
             config=dict(regimes=REGIMES, lags_kyr=[float(x) for x in LAGS_KYR], n_null=N_NULL, rng_seed=20260926,
                         imbrie_tm_kyr=IMBRIE_TM_KYR, imbrie_b=IMBRIE_B, ridge_lambda=mcf.L1_RIDGE_LAMBDA,
                         l1_lines=len(mcf.L1_PERIODS_KYR), lr04_dt_kyr=1.0, detrend='linear per window (the fitter\'s preprocess)',
-                        holdout='each regime window split at its midpoint; fit one half (lag and coefficients chosen on it), score the other; both orders; mean reported'),
-            results=results, verdict=verdict,
+                        holdout='each regime window split at its midpoint; fit one half (lag and coefficients chosen on it), score the other; both orders; mean reported',
+                        robustness=dict(block_cv_blocks=BLOCK_CV_N, ridge_lambdas_cv=list(RIDGE_CV), bands_kyr=BANDS_KYR,
+                                        note='added after the first run (not pre-registered): lag profile, band powers, block CV, local fidelity, alpha consequence')),
+            results=results, alpha_consequence=alpha, verdict=verdict,
             meta=dict(script=SELF_REL, plan='holisticuniverse plan 06 §4 T7', doc='docs/92-climate-formula.md', runtime_sec=time.time() - t0,
                       environment=dict(python=platform.python_version(), numpy=np.__version__, scipy=scipy.__version__)),
             inputs=build_inputs_block(f'python3 {SELF_REL} --write', INPUT_FILES),

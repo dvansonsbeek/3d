@@ -3376,6 +3376,36 @@ export const VALUES = {
         o.canonR2Stitched = { get: () => cc().meta.stitched_lr04_r2, render: f2, note: 'three-regime stitched canonical fit evaluated over the full LR04 record (export_climate_formula_browser.py)' };
         o.canonR2CenCo2pip = { get: () => cf().cenco2pip_evaluation.r2_l1_l2_l3, render: f4, note: 'canonical formula on CenCO2PIP CO₂ (0–66 Ma)' };
         o.canonL5FloorPostMpt = { get: () => 100 * (1 - cf().regime_fits['post-mpt'].r2_l1_l2_l3), render: (v) => String(Math.round(v)), unit: '%', note: 'post-MPT L5 stochastic floor, 1 − R²' };
+        // T7 — the fixed-phase L1 test (plan 06 §4 T7; data/t7-fixed-phase-l1.json): the model's own e, ε, e·sin ϖ with one
+        // coefficient each + one climate lag, against the shipped free-phase L1 — the description-vs-prediction split doc 92 quotes.
+        const t7 = () => rd('data/t7-fixed-phase-l1.json');
+        for (const [key, reg] of [['PostMpt', 'post-mpt'], ['InhgMpt', 'inhg-mpt'], ['PreInhg', 'pre-inhg']]) {
+          o[`t7FixedR2${key}`] = { get: () => t7().results[reg].fixed_a_e_eps_esinw.in_window.r2, render: f3, note: `T7: fixed-phase (e, ε, e·sin ϖ + lag) in-window R², ${reg}` };
+          o[`t7FixedHoldout${key}`] = { get: () => t7().results[reg].fixed_a_e_eps_esinw.holdout.r2_holdout_mean, render: f3, note: `T7: fixed-phase hold-out R² (half split, both orders, mean), ${reg}` };
+          o[`t7FixedBlockCv${key}`] = { get: () => t7().results[reg].robustness.block_cv.fixed_a.mean, render: f3s, note: `T7: fixed-phase 4-block leave-one-out R² (mean), ${reg}` };
+          o[`t7FreeR2${key}`] = { get: () => t7().results[reg].free_28_lines.r2, render: f3, note: `T7: shipped free-phase L1 in-window R² (L1 only, ridge λ = 1), ${reg}` };
+          o[`t7FreeHoldout${key}`] = { get: () => t7().results[reg].free_28_lines.holdout.r2_holdout_mean, render: (v) => (v >= 0 ? '+' : '−') + Math.abs(Number(v)).toFixed(2), note: `T7: shipped free-phase L1 hold-out R² (half split, mean), ${reg}` };
+          o[`t7FreeBestHoldout${key}`] = { get: () => t7().results[reg].free_28_lines.best_holdout_any_lambda, render: (v) => (v >= 0 ? '+' : '−') + Math.abs(Number(v)).toFixed(2), note: `T7: free-phase L1 hold-out R² at the best ridge λ of 1/10/100/1000, ${reg}` };
+          o[`t7NullP95${key}`] = { get: () => t7().results[reg].null_phase_randomised_a.in_window.p95, render: f3, note: `T7: phase-randomised null, 95th percentile of in-window R² (same regressors, random Fourier phases), ${reg}` };
+          o[`t7LagKyr${key}`] = { get: () => t7().results[reg].fixed_a_e_eps_esinw.in_window.lag_kyr, render: (v) => Number(v).toFixed(1), unit: 'kyr', note: `T7: fitted climate lag of the fixed-phase model, ${reg}` };
+          o[`t7La2004R2${key}`] = { get: () => t7().results[reg].fixed_a_e_eps_esinw_la2004.in_window.r2, render: f3, note: `T7: the same fixed-phase model on La2004's e, ε, ϖ̄ — the confirmation column, in-window R², ${reg}` };
+        }
+        o.t7Record100kSharePostMpt = { get: () => t7().results['post-mpt'].robustness.band_variance_fraction_of_record.hundred_kyr_85_135.record, render: f2, note: 'T7: fraction of post-MPT LR04 variance in the 85–135-kyr band' };
+        o.t7Fixed100kLeftPostMpt = { get: () => t7().results['post-mpt'].robustness.band_variance_fraction_of_record.hundred_kyr_85_135.left_by_fixed_a, render: f2, note: 'T7: fraction of post-MPT LR04 variance in the 85–135-kyr band left unexplained by the fixed-phase model' };
+        o.t7LagHalfHeightLoPostMpt = { get: () => t7().results['post-mpt'].robustness.lag_profile_a.half_height_range_kyr[0], render: (v) => Number(v).toFixed(0), unit: 'kyr', note: 'T7: lower end of the lag profile\'s half-height range, post-MPT' };
+        o.t7LagHalfHeightHiPostMpt = { get: () => t7().results['post-mpt'].robustness.lag_profile_a.half_height_range_kyr[1], render: (v) => Number(v).toFixed(0), unit: 'kyr', note: 'T7: upper end of the lag profile\'s half-height range, post-MPT' };
+        o.t7Local30kR2Free = { get: () => t7().results['post-mpt'].robustness.local_fidelity_normalised['0_30'].r2_free, render: f2, note: 'T7: free-phase fit\'s local R² over 0–30 kyr (inside its window) — the hindcast α(t) feels' };
+        o.t7Local30kR2Fixed = { get: () => t7().results['post-mpt'].robustness.local_fidelity_normalised['0_30'].r2_fixed_a, render: f2, note: 'T7: fixed-phase model\'s local R² over 0–30 kyr' };
+        o.t7DeltaTShift2700 = { get: () => t7().alpha_consequence.delta_t_shift_seconds_fixed_minus_shipped['2700'], render: (v) => (v >= 0 ? '+' : '−') + Math.abs(Number(v)).toFixed(0), unit: 's', note: 'T7: historical ΔT shift at 2700 BP if α(t) rode the fixed-phase forcing instead of the shipped L1 (before any stack refit)' };
+        o.t7AlphaPeakKyrShipped = { get: () => t7().alpha_consequence.alpha_peak_kyr_bp.shipped, render: (v) => Number(v).toFixed(1), unit: 'kyr BP', note: 'T7: α(t) peak on the shipped lagged L1' };
+        o.t7AlphaPeakKyrFixed = { get: () => t7().alpha_consequence.alpha_peak_kyr_bp.fixed, render: (v) => Number(v).toFixed(1), unit: 'kyr BP', note: 'T7: α(t) peak on the fixed-phase forcing' };
+        // T7 / WP2 — the ΔT joint fitter (report mode) with α(t) on three ice-history proxies (data/t7-alpha-proxy-dt-fit.json)
+        const t7p = () => rd('data/t7-alpha-proxy-dt-fit.json');
+        for (const [key, p] of [['Shipped', 'shipped'], ['Fixed', 'fixed'], ['Lr04', 'lr04']]) {
+          o[`t7AlphaProxy${key}EspenakRms`] = { get: () => t7p().results[p].espenakRmsS, render: f2, unit: 's', note: `T7/WP2: ΔT stack refit with α(t) on the ${p} ice proxy — Espenak RMS (1650–2010 canon)` };
+          o[`t7AlphaProxy${key}FullRms`] = { get: () => t7p().results[p].fullRmsS, render: f2, unit: 's', note: `T7/WP2: ΔT stack refit with α(t) on the ${p} ice proxy — full-window RMS (Stephenson −720..2017)` };
+        }
+        o.t7AlphaProxyHookParityFull = { get: () => t7p().verdict.hook_parity_shipped_minus_baseline_s.full, render: f2, unit: 's', note: 'T7/WP2: the table hook\'s parity — shipped proxy through the hook minus the unpatched fitter, full-window RMS' };
         return o;
       })(),
       // doc 97 prose values (the tables themselves are generated by scripts/generate_doc97_tables.py)

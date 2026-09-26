@@ -16485,7 +16485,9 @@ Composition (28 lines, doc 92 §2 — the engine-written list):
  • 10 eccentricity lines gᵢ−gⱼ (94.9–134.5 kyr) — planetary beats, fixed at every epoch
  • the 405.6-kyr g₂−g₅ long-eccentricity metronome and its 202.8 / 135.2-kyr carbon-thermostat harmonics (doc 92 §3)
 
-Fitted via sequential ridge regression — see doc 92 §9."><input type="checkbox" data-layer="l1" ${cfmLayerVisibility.l1 ? 'checked' : ''}/><span class="cfm-swatch cfm-swatch-l1"></span>L1 alone</label>
+Fitted via sequential ridge regression — see doc 92 §9.
+
+Description, not prediction (T7, doc 92 §2): the per-line amplitudes AND phases are fitted inside each regime window, so the per-regime R² shown here describes the record; fitted on one half of a window the same lines have no skill on the other half. The model's own e(t), ε(t), e·sin ϖ(t) with one coefficient each and a ~6-kyr climate lag keep about half the in-window R² out of sample (post-MPT, iNHG–MPT) — the transferable part; the 100-kyr band is what the fitted lines describe and the linear response cannot generate."><input type="checkbox" data-layer="l1" ${cfmLayerVisibility.l1 ? 'checked' : ''}/><span class="cfm-swatch cfm-swatch-l1"></span>L1 alone</label>
       <label class="cfm-layer-check" title="L2 alone — formula evaluated with ONLY the carbon thermostat enabled.
 Displayed curve = baseline + L2 contributions.
 

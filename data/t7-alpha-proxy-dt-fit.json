@@ -1,0 +1,114 @@
+{
+ "_description": "T7 / WP2 — the ΔT joint fitter (report mode, never --write) with α(t) on three ice-history proxies: the shipped post-MPT L1 (hook parity), the T7 fixed-phase forcing, the LR04 record itself. Regenerate: python3 tools/explore/t7-alpha-proxy-tables.py --write && node tools/explore/t7-alpha-proxy-dt-fit.cjs --write",
+ "results": {
+  "baseline_unpatched": {
+   "usno": 86400.0021,
+   "deltaTStart": 54.55,
+   "espenakRmsS": 13.43,
+   "fullRmsS": 28.75,
+   "amplitudesS": {
+    "bond": 365.65,
+    "hallstatt": 80,
+    "jose5": 50,
+    "jose4": 50,
+    "res_kick1": 419.99,
+    "res_kick2": 179.32,
+    "intercept": 22.06
+   }
+  },
+  "shipped": {
+   "usno": 86400.0021,
+   "deltaTStart": 54.45,
+   "espenakRmsS": 13.46,
+   "fullRmsS": 28.87,
+   "amplitudesS": {
+    "bond": 365.59,
+    "hallstatt": 80,
+    "jose5": 50,
+    "jose4": 50,
+    "res_kick1": 417.5,
+    "res_kick2": 179.32,
+    "intercept": 21.55
+   }
+  },
+  "fixed": {
+   "usno": 86400.0023,
+   "deltaTStart": 57.32,
+   "espenakRmsS": 14.47,
+   "fullRmsS": 38.77,
+   "amplitudesS": {
+    "bond": 352.11,
+    "hallstatt": 80,
+    "jose5": 50,
+    "jose4": 50,
+    "res_kick1": 315.11,
+    "res_kick2": 179.32,
+    "intercept": 8.34
+   }
+  },
+  "lr04": {
+   "usno": 86400.0008,
+   "deltaTStart": 2.83,
+   "espenakRmsS": 37.46,
+   "fullRmsS": 64.38,
+   "amplitudesS": {
+    "bond": 355.92,
+    "hallstatt": 80,
+    "jose5": 50,
+    "jose4": 41.58,
+    "res_kick1": 773.34,
+    "res_kick2": 18.69,
+    "intercept": -5.22
+   }
+  }
+ },
+ "verdict": {
+  "hook_parity_shipped_minus_baseline_s": {
+   "espenak": 0.030000000000001137,
+   "full": 0.120000000000001
+  },
+  "fixed_minus_shipped_s": {
+   "espenak": 1.0099999999999998,
+   "full": 9.900000000000002
+  },
+  "lr04_minus_shipped_s": {
+   "espenak": 24,
+   "full": 35.50999999999999
+  },
+  "best_proxy_by_espenak_rms": "shipped",
+  "best_proxy_by_full_rms": "shipped",
+  "decision": "KEEP the shipped L1 as the α(t) ice-history proxy (pre-registered rule: best eclipse-era ΔT after refit wins; tie → shipped)"
+ },
+ "meta": {
+  "generated_by": "tools/explore/t7-alpha-proxy-dt-fit.cjs",
+  "command": "node tools/explore/t7-alpha-proxy-dt-fit.cjs --write",
+  "runtime_sec": 1.283,
+  "node": "v22.19.0",
+  "inputs": [
+   {
+    "path": "data/t7-alpha-proxy-tables.json",
+    "sha256": "c7a1b1fb02551f82aa6cc058f4849a1360bbed76c4dea697b5c4fd1ef386986e"
+   },
+   {
+    "path": "packages/fitting/src/dt-corrections-fit.cjs",
+    "sha256": "2e1e0def356645fd32c548bf3b06cc1114ad6278d51924296268163e9e4a39bb"
+   },
+   {
+    "path": "tools/lib/deep-time.js",
+    "sha256": "e9e40865167bc44d8a683b58939e54c9e670f4e42fb8f883a75a545e6de04b95"
+   },
+   {
+    "path": "packages/physics/src/climate/l1-orbital.cjs",
+    "sha256": "fb683b5334c84b12d0034d692101a867c63acdd9a74903bc2ae52bc82856ee39"
+   },
+   {
+    "path": "public/input/climate-formula-coefficients.json",
+    "sha256": "2c31cb77751d1b4a5693fb2f4a8d9925f51453fbb272ba2ea1171b1b3f1735df"
+   },
+   {
+    "path": "tools/explore/t7-alpha-proxy-dt-fit.cjs",
+    "sha256": "e55e6bb6e26bfeac582e72b4d0c80fb53e32f255b650bdf80f95fc117b8ccb31"
+   }
+  ]
+ }
+}

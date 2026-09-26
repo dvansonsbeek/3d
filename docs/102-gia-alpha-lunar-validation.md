@@ -126,6 +126,22 @@ against the historical ΔT record (plan 06 D7; the rheology estimate below
 gives 4–6 kyr). No parameters are fitted to the eclipse data. Detailed in
 [§ The α(t) physics](#the-αt-physics) below.
 
+The ice-history proxy is the climate formula's in-window DESCRIPTION of
+LR04 — deliberately, and measured (doc 92 §2 T7 and its WP2 follow-up,
+`tools/explore/t7-alpha-proxy-dt-fit.cjs`, report mode): the ΔT joint
+fitter refit with α(t) on the shipped L1 reads Espenak RMS
+<!--v:t7AlphaProxyShippedEspenakRms-->13.46<!--/v--> s / full-window
+<!--v:t7AlphaProxyShippedFullRms-->28.87<!--/v--> s, on the T7
+fixed-phase forcing (the model's own e, ε, e·sin ϖ with a climate lag —
+the model's PREDICTION of the record) <!--v:t7AlphaProxyFixedEspenakRms-->14.47<!--/v--> /
+<!--v:t7AlphaProxyFixedFullRms-->38.77<!--/v--> s, and on the LR04 record
+itself <!--v:t7AlphaProxyLr04EspenakRms-->37.46<!--/v--> /
+<!--v:t7AlphaProxyLr04FullRms-->64.38<!--/v--> s (its J2000 slope is
+unresolved at 1-kyr sampling). What α(t) with a 6-kyr memory needs is the
+closest hindcast of the ACTUAL recent ice history, and inside the record
+window that is the description, not the prediction; the pre-registered
+rule (best eclipse-era ΔT after refit; tie → shipped) keeps it here.
+
 ---
 
 ## The α(t) physics
