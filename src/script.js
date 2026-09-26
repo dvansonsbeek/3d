@@ -46498,7 +46498,7 @@ const planetStats = {
        constant: true},
       {label : () => `Orbital Eccentricity (e)`,
        value : [ { v: () => moonOrbitalEccentricityBase, dec:6, sep:',' },{ small: '' }],
-       hover : [`Eccentricity of Moon's orbit around Earth. Varies 0.026–0.077 due to solar perturbations`],
+       hover : [`Eccentricity of the Moon's orbit around Earth — a registry constant (the ELP/Brown mean value), the same at every epoch: the model carries no lunar eccentricity of date. The osculating value swings 0.026–0.077 through the evection and variation terms (periods of a month to a year, inside the Meeus series), and its secular tidal change is of order 1e-9 per century — invisible on every window the Formula Verification panels show, which is why there is no Moon eccentricity panel. The eccentricity that DOES vary in the lunar chain is Earth's (the solar perturbation's modulation), verified on the Earth orbit · Eccentricity panel`],
        constant: true},
       {label : () => `Ecliptic Inclination (i)`,
        value : [ { v: () => moonEclipticInclinationJ2000, dec:6, sep:',' },{ small: 'degrees (°)' }],

@@ -97,12 +97,17 @@ classical constant:
 - **e_E itself — the engine's own deep z-vector.** The lunar
   channel's eccentricity history is the ±10-Myr deep mode table
   (doc 109 §17, `moon/deep-ecc-channel.cjs`), anchored exactly at the JPL
-  J2000 seed — it carries the 405-kyr-class deep spectrum a single line
-  cannot. The derived H/3 line (below) remains its epoch-local tangent and
-  the clock-side basis (eclipse Sun equation of centre, cardinal braid);
-  the two agree within 4.2e-5 across the historical era. The
-  astro-reference (e₀, ė₀, ë₀) values are the documented Taylor-check
-  anchors.
+  J2000 seed in VALUE and — since the Formula Verification Moon panels
+  found the table's own J2000 slope 19 % steep (ė −5.00e-5/cy against the
+  run's −4.24e-5, multiplied straight into the perigee and node
+  curvature) — in SLOPE: the run's own J2000 z-rate, script-written into
+  the embed from the banked series, through the arguments' H/12 taper (a
+  bounded term of the same class as the constant remainder; doc 109 §17).
+  It carries the 405-kyr-class deep spectrum a single line cannot. The
+  derived H/3 line (below) remains its epoch-local tangent and the
+  clock-side basis (eclipse Sun equation of centre, cardinal braid); the
+  two agree within 4.2e-5 across the historical era. The astro-reference
+  (e₀, ė₀, ë₀) values are the documented Taylor-check anchors.
 - **The sign paradox, dissolved.** Brown's m²-scaling predicts apsidal
   precession ACCELERATING while Meeus's M′ T² says decelerating. Both are
   true at once: the Lunar Precession Invariant governs the MEAN rate
@@ -934,6 +939,18 @@ entanglement the framework-native fundamental arguments resolve (the Lunar
 Precession Invariant carries the tidal MEAN rate; the bounded
 solar-eccentricity channel carries the oscillatory part; §1).
 
+Measured on the Formula Verification Moon panels (§8), the month and
+precession rates of the framework-native arguments against the Meeus
+Ch. 47 rates over 1000 → 2500: sidereal, synodic, tropical and draconic
+months within 0.00–0.02 s rms, the anomalistic within 0.01 s; the perigee
+cycle within 0.0015 d and the node cycle within 0.0010 d, with the same
+secular slope — the of-date perigee curvature −37.4″/cy² against Meeus's
+−37.15″/cy² once the deep channel's slope anchor landed (before it, the
+chain's Kepler month alone lengthened at the tidal rate, 2.3× the observed
+slope, and the perigee curvature read −44″/cy²: the two findings the
+panels were built to expose). Beyond the canon's −2000 → 3000 the Meeus
+rates are a J2000-centred polynomial and the two part, as they must.
+
 The deep-time Moon distance (`meanMoonDistanceMetresAtAge`), LOD evolution,
 and Moon sidereal period are exposed via the calculator and the ESSRT
 modal. The 3D simulation's Moon orbit position uses the J2000-anchored
@@ -1065,6 +1082,19 @@ is the adjudication record of the audit's ancient rows.
 ---
 
 ## 8. Validation Tools
+
+**Formula Verification · Moon group (live, in the simulator; doc 50).**
+Three panels read the framework-native arguments against the Meeus
+Ch. 47 rates on the four standard windows, each with hover, residual and
+export: **Month Lengths** (the five months of date as strips, sidereal
+and synodic on by default — each 360° over the one-year rate of the
+model's own L′, D, M′ and F, the sidereal month with the model's axial
+precession removed), **Perigee Precession** (ϖ = L′ − M′, the apsidal
+precession) and **Node Regression** (Ω = L′ − F, the nodal precession),
+the last two with the chain's dynamical Brouwer–Clemence route bridged to
+date as a clickable second line so the two deep-time tiers stay
+comparable. They are the surfaces that found the orbit-size-vs-mean-
+longitude split and the deep channel's slope error (§5).
 
 `tools/explore/moon-ancient-eclipses.js` — Tests Moon-Sun separation at
 historical and ancient solar eclipses from 584 BCE to 2024 CE, organized by
