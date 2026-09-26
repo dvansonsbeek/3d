@@ -20060,11 +20060,13 @@ const VFP_CATEGORIES = [
     // F minus the Meeus polynomials, in arcseconds — see renderVFPMoonArguments.
     // Its own windows: the polynomials are a J2000-centred fit.
     id: 'moon-arguments', group: 'Moon', label: 'Mean Arguments',
+    // (the secular departure stays inside the ±180° wrap to ±10 kyr — M′'s
+    // T² term reaches ~108° there; ±23 kyr would wrap)
     tabs: [
       { key: 'recent', label: '1000 – 2500 AD', range: [1000, 2500], samples: 300 },
       { key: 'era', label: '2000 BC – 3000 AD', range: [-1999, 3000], samples: 250 },
-      { key: 'quaternary', label: '10,000 BC – 10,000 AD', range: [-9999, 10000], samples: 400 },
-      { key: 'myr', label: '23,000 BC – 23,000 AD', range: [-22999, 23000], samples: 460 },
+      { key: 'quaternary', label: '5000 BC – 5000 AD', range: [-4999, 5000], samples: 400 },
+      { key: 'myr', label: '10,000 BC – 10,000 AD', range: [-9999, 10000], samples: 400 },
     ],
     customRender: () => renderVFPMoonArguments(),
     afterRender: (el) => _vfpMAAfterRender(el),
@@ -21615,24 +21617,31 @@ function _vfpMLAfterRender(bodyEl) {
   });
 }
 
-// ── VFP: Moon · Mean Arguments — the framework's L′, D, M′, F minus Meeus ──
-// (owner-requested.) The accumulated ANGLES the eclipse chain consumes:
-// the framework-native lunar arguments (the Moon evaluator's skeleton —
+// ── VFP: Moon · Mean Arguments — the secular content of L′, D, M′, F ──
+// (owner-requested; first built as model − Meeus, redone on the owner's
+// read: "more a residual panel … no legend … why not the absolute values?")
+// An argument advances 12–14° a day, so its absolute value over a
+// millennium is a sawtooth of thousands of turns. The ABSOLUTE quantity
+// worth a line is each argument's secular departure from its own J2000
+// linear rate — A(t) − (A₀ + Ȧ₀·T), the T² and higher content the eclipse
+// chain consumes — drawn for the model (the framework-native arguments:
 // the tidal month chain plus the planetary, obliquity and secular-
-// completion carriers, the phase-aware perigee and node channels) minus
-// the pure Meeus Ch. 47 polynomials, in arcseconds, one strip per
-// argument, on this panel's own windows (the Meeus polynomials are a
-// J2000-centred fit: solid on the canon's −2000 → 3000, dotted beyond,
-// where their T³/T⁴ tails run to tens of degrees). The Month Lengths and
-// precession panels verify the RATES; this is their integral.
+// completion carriers, the phase-aware perigee and node channels) and for
+// the pure Meeus Ch. 47 polynomial, two lines per strip against ONE
+// linear reference (Meeus's J2000 constant and rate, so both lines read
+// 0 at J2000 and the same parabola is the same curve). The Meeus line is
+// a J2000-centred fit: solid on the canon's −2000 → 3000, dotted beyond.
+// The Month Lengths and precession panels verify the RATES; this is
+// their integral, in arcseconds (degrees when large).
 const _vfpMA_ID = 'moon-arguments';
 const _VFPMA_VALID = [-1999, 3000];
 const _vfpMA_STRIPS = [
-  { key: 'Lp', name: 'L′ — mean longitude', screen: '#5ea0ff', paper: '#1d4ed8', what: 'the tidal month chain with the planetary, obliquity and secular-completion carriers' },
-  { key: 'D', name: 'D — mean elongation from the Sun', screen: '#4ade80', paper: '#15803d', what: 'L′ minus the model’s mean Sun (the year-length clock)' },
-  { key: 'Mp', name: 'M′ — mean anomaly', screen: '#f87171', paper: '#b91c1c', what: 'L′ minus the perigee of date (the phase-aware channel)' },
-  { key: 'F', name: 'F — argument of latitude', screen: '#c084fc', paper: '#7e22ce', what: 'L′ minus the node of date' },
+  { key: 'Lp', name: 'L′ — mean longitude', screen: '#5ea0ff', paper: '#1d4ed8', lin: _MEEUS47_LP, what: 'the tidal month chain with the planetary, obliquity and secular-completion carriers (its parabola is the tidal deceleration plus the planetary secular term)' },
+  { key: 'D', name: 'D — mean elongation from the Sun', screen: '#4ade80', paper: '#15803d', lin: _MEEUS47_D, what: 'L′ minus the model’s mean Sun (the year-length clock)' },
+  { key: 'Mp', name: 'M′ — mean anomaly', screen: '#f87171', paper: '#b91c1c', lin: _MEEUS47_MP, what: 'L′ minus the perigee of date (the phase-aware solar-eccentricity channel: its parabola is the perigee’s secular acceleration)' },
+  { key: 'F', name: 'F — argument of latitude', screen: '#c084fc', paper: '#7e22ce', lin: _MEEUS47_F, what: 'L′ minus the node of date' },
 ];
+const _vfpMA_REF_COLOR = { screen: '#f472b6', paper: '#be185d' };   // Meeus, magenta — no strip uses it
 const _vfpMAState = { _screenGeom: null };
 const _vfpMACacheByRange = {};
 function _vfpMASamples(range) {
@@ -21642,29 +21651,31 @@ function _vfpMASamples(range) {
   if (_vfpMACacheByRange[key]) return _vfpMACacheByRange[key];
   const tab = _vfpTabsFor(_vfpCategoryById(_vfpMA_ID)).find((t) => t.range[0] === y0 && t.range[1] === y1);
   const N = (tab ? tab.samples : 400) + 1;
-  const yrs = new Array(N), diff = {}, stats = {};
-  for (const s of _vfpMA_STRIPS) diff[s.key] = new Array(N);
+  const yrs = new Array(N), model = {}, meeus = {}, stats = {};
+  for (const s of _vfpMA_STRIPS) { model[s.key] = new Array(N); meeus[s.key] = new Array(N); }
   const M = _moonArgsM();
   const wrap180 = (d) => ((d + 540) % 360 + 360) % 360 - 180;
+  // the departure from the J2000 linear rate (″): the angle's whole turns
+  // fall out of the wrap; the secular content stays inside ±180° on this
+  // panel's windows (M′'s T² term reaches ~108° at ±10 kyr)
+  const dep = (aDeg, c, T) => wrap180(aDeg - (c[0] + c[1] * T)) * 3600;
   for (let i = 0; i < N; i++) {
     const y = y0 + ((y1 - y0) * i) / (N - 1);
     yrs[i] = y;
-    const jd = yearToJDApprox(y);
+    const jd = yearToJDApprox(y), T = (jd - j2000JD) / julianCenturyDays;
     const a = _moonArgsAt(jd), m = M.pureMeeusArgs(jd);
-    for (const s of _vfpMA_STRIPS) diff[s.key][i] = wrap180(a[s.key] - m[s.key]) * 3600;
+    for (const s of _vfpMA_STRIPS) { model[s.key][i] = dep(a[s.key], s.lin, T); meeus[s.key][i] = dep(m[s.key], s.lin, T); }
   }
-  const jd0 = yearToJDApprox(2000);
-  const a0 = _moonArgsAt(jd0), m0 = M.pureMeeusArgs(jd0);
   for (const s of _vfpMA_STRIPS) {
     let s2 = 0, n = 0, mx = 0;
     for (let i = 0; i < N; i++) {
       if (yrs[i] < _VFPMA_VALID[0] || yrs[i] > _VFPMA_VALID[1]) continue;
-      const d = diff[s.key][i];
+      const d = model[s.key][i] - meeus[s.key][i];
       if (Number.isFinite(d)) { s2 += d * d; n++; mx = Math.max(mx, Math.abs(d)); }
     }
-    stats[s.key] = { rms: n ? Math.sqrt(s2 / n) : NaN, max: mx, n, j2000: wrap180(a0[s.key] - m0[s.key]) * 3600 };
+    stats[s.key] = { rms: n ? Math.sqrt(s2 / n) : NaN, max: mx, n };
   }
-  return (_vfpMACacheByRange[key] = { y0, y1, yrs, diff, stats });
+  return (_vfpMACacheByRange[key] = { y0, y1, yrs, model, meeus, stats });
 }
 function _vfpMAChartCore(range, style) {
   const S = _vfpMASamples(range);
@@ -21686,36 +21697,49 @@ function _vfpMAChartCore(range, style) {
   // the canon's validity as a shaded band
   const vx0 = Math.max(S.y0, _VFPMA_VALID[0]), vx1 = Math.min(S.y1, _VFPMA_VALID[1]);
   if (vx1 > vx0) body += '<rect x="' + toX(vx0).toFixed(1) + '" y="' + PAD.t + '" width="' + (toX(vx1) - toX(vx0)).toFixed(1) + '" height="' + (bottom - PAD.t) + '" fill="' + (paper ? 'rgba(0,0,0,0.03)' : 'rgba(255,255,255,0.03)') + '"/>';
+  const cRef = _vfpMA_REF_COLOR[paper ? 'paper' : 'screen'];
+  const fmt = (v) => Math.abs(v) >= 3600 ? (v / 3600).toFixed(Math.abs(v) >= 36000 ? 1 : 2) + '°' : (Math.abs(v) >= 100 ? v.toFixed(0) : Math.abs(v) >= 10 ? v.toFixed(1) : v.toFixed(2)) + '″';
   _vfpMA_STRIPS.forEach((s, si) => {
     const top = PAD.t + si * (SH + GAP);
     const cTop = top + LAB, cH = SH - LAB;
-    const arr = S.diff[s.key];
-    // the range from the samples INSIDE validity (the polynomial's tails
-    // beyond it run to degrees), symmetric about zero
-    let mx = 0;
-    for (let i = 0; i < arr.length; i++) if (valid(S.yrs[i]) && Number.isFinite(arr[i])) mx = Math.max(mx, Math.abs(arr[i]));
-    if (!(mx > 0)) mx = 1;
-    const yLim = mx * 1.15;
-    const toY = (v) => cTop + (1 - (Math.max(-yLim, Math.min(yLim, v)) + yLim) / (2 * yLim)) * cH;
+    const mo = S.model[s.key], me = S.meeus[s.key];
+    // the range from the model everywhere and Meeus INSIDE validity (its
+    // tails beyond it run away); the zero line is J2000's departure
+    let lo = 0, hi = 0;
+    for (let i = 0; i < mo.length; i++) {
+      if (Number.isFinite(mo[i])) { lo = Math.min(lo, mo[i]); hi = Math.max(hi, mo[i]); }
+      if (valid(S.yrs[i]) && Number.isFinite(me[i])) { lo = Math.min(lo, me[i]); hi = Math.max(hi, me[i]); }
+    }
+    if (!(hi > lo)) { lo = -1; hi = 1; }
+    const mg = (hi - lo) * 0.1;
+    const yLo = lo - mg, yHi = hi + mg;
+    const toY = (v) => cTop + (1 - (Math.max(yLo, Math.min(yHi, v)) - yLo) / (yHi - yLo)) * cH;
     const col = paper ? s.paper : s.screen;
     body += '<rect x="' + PAD.l + '" y="' + top + '" width="' + pw + '" height="' + SH + '" fill="' + (paper ? '#fcfcfc' : 'rgba(255,255,255,0.015)') + '" stroke="' + cBox + '" stroke-width="0.6"/>';
     body += '<line x1="' + PAD.l + '" x2="' + (PAD.l + pw) + '" y1="' + toY(0).toFixed(1) + '" y2="' + toY(0).toFixed(1) + '" stroke="' + cZero + '" stroke-width="0.7" stroke-dasharray="4,3"/>';
-    const fmt = (v) => (Math.abs(v) >= 100 ? v.toFixed(0) : Math.abs(v) >= 10 ? v.toFixed(1) : v.toFixed(2)) + '″';
-    body += '<text x="' + (PAD.l - 5) + '" y="' + (cTop + 6) + '" text-anchor="end" dominant-baseline="middle" fill="' + cTick + '" font-size="9">+' + fmt(yLim) + '</text>';
-    body += '<text x="' + (PAD.l - 5) + '" y="' + toY(0).toFixed(1) + '" text-anchor="end" dominant-baseline="middle" fill="' + cTick + '" font-size="9">0</text>';
-    body += '<text x="' + (PAD.l - 5) + '" y="' + (top + SH - 6) + '" text-anchor="end" dominant-baseline="middle" fill="' + cTick + '" font-size="9">−' + fmt(yLim) + '</text>';
+    body += '<text x="' + (PAD.l - 5) + '" y="' + (cTop + 6) + '" text-anchor="end" dominant-baseline="middle" fill="' + cTick + '" font-size="9">' + fmt(hi) + '</text>';
+    body += '<text x="' + (PAD.l - 5) + '" y="' + (top + SH - 6) + '" text-anchor="end" dominant-baseline="middle" fill="' + cTick + '" font-size="9">' + fmt(lo) + '</text>';
+    // Meeus: solid inside validity, dotted beyond (clamped to the strip)
     let solid = '', dotted = '', sOn = false, dOn = false;
-    for (let i = 0; i < arr.length; i++) {
-      const v = arr[i];
+    for (let i = 0; i < me.length; i++) {
+      const v = me[i];
       if (!Number.isFinite(v)) { sOn = false; dOn = false; continue; }
       const p = toX(S.yrs[i]).toFixed(1) + ',' + toY(v).toFixed(1);
       if (valid(S.yrs[i])) { solid += (sOn ? 'L' : 'M') + p; sOn = true; if (dOn) { dotted += 'L' + p; dOn = false; } }
       else { if (sOn) { dotted += 'M' + p; sOn = false; dOn = true; } else { dotted += (dOn ? 'L' : 'M') + p; dOn = true; } }
     }
-    if (dotted) body += '<path d="' + dotted + '" fill="none" stroke="' + col + '" stroke-width="1" stroke-dasharray="2,3" opacity="0.7"/>';
-    if (solid) body += '<path d="' + solid + '" fill="none" stroke="' + col + '" stroke-width="1.5"/>';
+    if (dotted) body += '<path d="' + dotted + '" fill="none" stroke="' + cRef + '" stroke-width="1" stroke-dasharray="2,3" opacity="0.7"/>';
+    if (solid) body += '<path d="' + solid + '" fill="none" stroke="' + cRef + '" stroke-width="1.4"/>';
+    let d = '', started = false;
+    for (let i = 0; i < mo.length; i++) {
+      const v = mo[i];
+      if (!Number.isFinite(v)) { started = false; continue; }
+      d += (started ? 'L' : 'M') + toX(S.yrs[i]).toFixed(1) + ',' + toY(v).toFixed(1);
+      started = true;
+    }
+    body += '<path d="' + d + '" fill="none" stroke="' + col + '" stroke-width="1.5"/>';
     const st = S.stats[s.key];
-    const lab = s.name + ' — model − Meeus' + (st.n ? ' · rms ' + fmt(st.rms) + ', max ' + fmt(st.max) + ' inside the canon' : '');
+    const lab = s.name + (st.n ? ' — model − Meeus rms ' + fmt(st.rms) + ', max ' + fmt(st.max) + ' inside the canon' : '');
     body += '<text x="' + (PAD.l + 6) + '" y="' + (top + 10) + '" fill="' + col + '" font-size="10" font-weight="600">' + escapeXml(lab) + '</text>';
   });
   if (2000 >= S.y0 && 2000 <= S.y1) {
@@ -21727,18 +21751,18 @@ function _vfpMAChartCore(range, style) {
 }
 function _vfpMANoteParts(core, withLinks) {
   const S = core.S;
-  const frame = 'The Moon’s four mean arguments of date — L′, D, M′, F — as the model’s framework-native value minus the Meeus Ch. 47 polynomial (arcseconds), one strip each, the canon’s validity shaded · ' +
+  const frame = 'The Moon’s four mean arguments of date — L′, D, M′, F — as their secular departure from the J2000 linear rate, A(t) − (A₀ + Ȧ₀·T) (arcseconds, degrees when large), model and Meeus on one strip each, the canon’s validity shaded · ' +
     _vfpFmtYearBcAd(S.y0) + ' → ' + _vfpFmtYearBcAd(S.y1) + '.';
   const link = withLinks ? ' <a href="https://en.wikipedia.org/wiki/Lunar_theory" target="_blank" rel="noopener" class="vfp-source-link" title="Source">↗</a>' : '';
-  const references = 'Meeus (1998) Ch. 47 mean-argument polynomials (Chapront ELP-2000/82; T in Julian centuries from J2000)' + link +
-    ' — a J2000-centred fit offered on the canon’s ' + _vfpFmtYearBcAd(_VFPMA_VALID[0]) + ' → ' + _vfpFmtYearBcAd(_VFPMA_VALID[1]) + ' range, dotted beyond, where their T³ and T⁴ tails run to degrees.';
-  const fmt = (v) => (Math.abs(v) >= 100 ? v.toFixed(0) : Math.abs(v) >= 10 ? v.toFixed(1) : v.toFixed(2)) + '″';
+  const references = 'Meeus (1998) Ch. 47 mean-argument polynomials (Chapront ELP-2000/82; T in Julian centuries from J2000) — their J2000 constant and rate are the linear reference of every strip, their T², T³ and T⁴ terms the Meeus line' + link +
+    ' — a J2000-centred fit offered on the canon’s ' + _vfpFmtYearBcAd(_VFPMA_VALID[0]) + ' → ' + _vfpFmtYearBcAd(_VFPMA_VALID[1]) + ' range, dotted beyond, where its tails run away.';
+  const fmt = (v) => Math.abs(v) >= 3600 ? (v / 3600).toFixed(2) + '°' : (Math.abs(v) >= 100 ? v.toFixed(0) : Math.abs(v) >= 10 ? v.toFixed(1) : v.toFixed(2)) + '″';
   const parts = [];
   for (const s of _vfpMA_STRIPS) {
     const st = S.stats[s.key];
-    parts.push(s.name.split(' — ')[0] + ': J2000 ' + fmt(st.j2000) + (st.n ? ', rms ' + fmt(st.rms) + ' and max ' + fmt(st.max) + ' over ' + st.n + ' samples inside the canon' : ', no sample inside the canon on this window'));
+    parts.push(s.name.split(' — ')[0] + ': model − Meeus' + (st.n ? ' rms ' + fmt(st.rms) + ', max ' + fmt(st.max) + ' over ' + st.n + ' samples inside the canon' : ' — no sample inside the canon on this window'));
   }
-  const reading = parts.join(' · ') + '. Each strip is the accumulated angle the eclipse chain consumes: L′ is ' + _vfpMA_STRIPS[0].what + '; D is ' + _vfpMA_STRIPS[1].what + '; M′ is ' + _vfpMA_STRIPS[2].what + '; F is ' + _vfpMA_STRIPS[3].what + '. The Month Lengths and the two precession panels verify these arguments’ rates; this panel is their integral — the T² and T³ content of the model against the polynomial’s, so a curvature split that reads as a slope on the rate panels reads here as a growing arc. The certified skeleton equals the polynomial at J2000 by construction; inside the canon the differences are the carriers’ and channels’ departure from a frozen Taylor fit, and beyond it the polynomial, not the model, is what runs away.';
+  const reading = parts.join(' · ') + '; both lines are 0 at J2000 by construction. Each strip is the accumulated angle the eclipse chain consumes: L′ is ' + _vfpMA_STRIPS[0].what + '; D is ' + _vfpMA_STRIPS[1].what + '; M′ is ' + _vfpMA_STRIPS[2].what + '; F is ' + _vfpMA_STRIPS[3].what + '. The Month Lengths and the two precession panels verify these arguments’ rates; this panel is their integral — the T² and higher content of the model against the polynomial’s, so a curvature split that reads as a slope on the rate panels reads here as two parabolas parting. Inside the canon the split is the carriers’ and channels’ departure from a frozen Taylor fit; beyond it the polynomial, not the model, is what runs away.';
   return { frame, references, reading };
 }
 function renderVFPMoonArguments() {
@@ -21746,8 +21770,13 @@ function renderVFPMoonArguments() {
   const W = core.W, H = core.H, PAD = core.PAD, S = core.S;
   _vfpMAState._screenGeom = { W, H, PAD, y0: S.y0, y1: S.y1 };
   const P = _vfpMANoteParts(core, true);
+  // the legend: the model in each strip's colour, Meeus in one colour
+  let legend = '<div class="vfp-legend">';
+  for (const s of _vfpMA_STRIPS) legend += '<div class="vfp-legend-item"><span class="vfp-legend-swatch" style="background:' + s.screen + '"></span>' + s.name.split(' — ')[0] + ' (model)</div>';
+  legend += '<div class="vfp-legend-item"><span class="vfp-legend-swatch" style="background:' + _vfpMA_REF_COLOR.screen + '"></span>Meeus (1998), Ch. 47</div></div>';
   return '<div class="vfp-chart-block">' +
     _vfpCustomTabStrip(_vfpMA_ID) +
+    legend +
     '<div style="position:relative;">' +
     '<svg data-vfpma-svg viewBox="0 0 ' + W + ' ' + H + '" width="100%" style="display:block;background:#151a22;border-radius:0 0 6px 6px;">' +
     core.body +
@@ -21761,8 +21790,8 @@ function renderVFPMoonArguments() {
 function _vfpMAPaperSvg(range) {
   const core = _vfpMAChartCore(range, 'paper');
   const W = core.W, H = core.H, PAD = core.PAD, S = core.S;
-  const title = 'Moon · Mean Arguments, model − Meeus — ' + _vfpFmtYearBcAd(S.y0) + ' → ' + _vfpFmtYearBcAd(S.y1);
-  const legend = _vfpPaperLegend(_vfpMA_STRIPS.map((s) => ({ name: s.name, color: s.paper, dash: false, bold: false })), W);
+  const title = 'Moon · Mean Arguments, secular departure from the J2000 rate — ' + _vfpFmtYearBcAd(S.y0) + ' → ' + _vfpFmtYearBcAd(S.y1);
+  const legend = _vfpPaperLegend(_vfpMA_STRIPS.map((s) => ({ name: s.name.split(' — ')[0] + ' (model)', color: s.paper, dash: false, bold: false })).concat([{ name: 'Meeus (1998), Ch. 47', color: _vfpMA_REF_COLOR.paper, dash: false, bold: false }]), W);
   const cap = _vfpPaperCaption(_vfpMANoteParts(core, false), PAD.l, 130);
   const TOP = legend.bottom + 4, XAXIS = 16;
   const Hp = TOP + H + XAXIS + cap.height + 8;
@@ -21797,8 +21826,8 @@ function _vfpMAAfterRender(bodyEl) {
     const cx = (G.PAD.l + ((y - G.y0) / (G.y1 - G.y0)) * pw).toFixed(1);
     cursor.setAttribute('x1', cx); cursor.setAttribute('x2', cx); cursor.setAttribute('visibility', 'visible');
     const f = (v) => Number.isFinite(v) ? (Math.abs(v) >= 3600 ? (v / 3600).toFixed(3) + '°' : v.toFixed(2) + '″') : '—';
-    let rows = '<div style="color:#8a93a5;margin-bottom:2px;">Year ' + (y < 0 ? '−' : '+') + Math.round(Math.abs(y)).toLocaleString('en-US') + ' · model − Meeus</div>';
-    for (const s of _vfpMA_STRIPS) rows += '<div style="display:flex;justify-content:space-between;gap:16px;"><span style="color:' + s.screen + ';">' + s.name.split(' — ')[0] + '</span><span>' + f(S.diff[s.key][i]) + '</span></div>';
+    let rows = '<div style="color:#8a93a5;margin-bottom:2px;">Year ' + (y < 0 ? '−' : '+') + Math.round(Math.abs(y)).toLocaleString('en-US') + ' · model · Meeus · Δ</div>';
+    for (const s of _vfpMA_STRIPS) rows += '<div style="display:flex;justify-content:space-between;gap:16px;"><span style="color:' + s.screen + ';">' + s.name.split(' — ')[0] + '</span><span>' + f(S.model[s.key][i]) + ' · ' + f(S.meeus[s.key][i]) + ' · ' + f(S.model[s.key][i] - S.meeus[s.key][i]) + '</span></div>';
     tip.innerHTML = rows;
     tip.style.display = 'block';
     const wr = svg.parentElement.getBoundingClientRect();
