@@ -447,7 +447,7 @@ chain 3.3), the lunar ARGUMENTS' obliquity-rate term (a device-anchored
 matched triple), the hybrid's own J2000 anchor ε₀, and the console
 diagnostics that name the formula. In the package the same split is
 `model.earth.obliquityDeg` (the hybrid — the API's earth route and
-cross-validation curves, the registry's obliquity keys, the dashboard)
+cross-validation curves, the registry's obliquity keys)
 versus `model.earth.obliquityCombDeg` (the device).
 
 ### 4.2 The scene's tilt geometry — the device the comb was fitted to

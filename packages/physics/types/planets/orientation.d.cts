@@ -25,7 +25,7 @@ export function invPlaneInclinationAt(body: {
 }): number;
 /**
  * Ascending node on the invariable plane — the LINEAR year-2000-anchored
- * convention (node-integrator/dashboard; see the header).
+ * convention (node-integrator; see the header).
  * @param {{ ascendingNodeInvPlane?: number, ascendingNodePeriod?: number,
  *   perihelionEclipticYears: number }} body
  * @param {number} year @returns {number} degrees 0–360 */

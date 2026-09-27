@@ -1,6 +1,6 @@
 // ═══════════════════════════════════════════════════════════════════════════
 // ORBITAL ENGINE — Time-dependent orbital element functions
-// Extracted from src/script.js for use by optimization tools and dashboard.
+// Extracted from src/script.js for use by the optimization tools.
 //
 // All functions here compute orbital ELEMENTS (eccentricity, obliquity,
 // inclination, year lengths, perihelion longitude, precession, day length)
@@ -11,7 +11,8 @@
 //   LONGITUDE OF PERIHELION → INCLINATION → PRECESSION →
 //   YEAR LENGTH → DAY LENGTH → COMPOSITE
 //
-// Primary consumers: tools/optimize.js, tools/export-dashboard-data.js
+// Primary consumer: tools/optimize.js (the dashboard exporter that also
+// consumed it is retired — docs/retired-record.md)
 // ═══════════════════════════════════════════════════════════════════════════
 
 const C = require('./constants');
@@ -601,7 +602,7 @@ function computePlanetInvPlaneInclinationDynamic(planetName, currentYear, julian
  */
 function computeEclipticInclination(planetName, currentYear) {
   // 8.3-1 S-P4 RESOLUTION: this is NOT a duplicate of the scene form — it is
-  // the NODE-INTEGRATOR / dashboard convention (mirror of src/script.js
+  // the NODE-INTEGRATOR convention (mirror of src/script.js
   // getEclipticInclinationAtYear, which calculateDynamicAscendingNodeFromTilts
   // consumes for its segment midpoints). The scene tilt is the OTHER quantity
   // (computeEclipticInclinationFromBalanced below — balanced-year anchor,
@@ -885,9 +886,9 @@ function computeLengthOfSiderealYearSec() {
  *   meanlengthofday = meansiderealyearlengthinSeconds / meansiderealyearlengthinDays
  * Both inputs are CONSTANTS at module load — LOD is constant across years in
  * non-deep-time mode. (For deep-time mode, src/script.js:5630 reassigns to
- * meanLodSecondsAtAge(t_Ma) — that function is browser-only.) The dashboard
- * year range (±300 kyr) gives <2 sec LOD variation under deep-time evolution
- * — negligible at this scale — so we return the J2000 constant.
+ * meanLodSecondsAtAge(t_Ma) — that function is browser-only.) Over ±300 kyr
+ * the LOD varies by <2 s under deep-time evolution — negligible at this
+ * scale — so we return the J2000 constant.
  *
  * Earlier version divided C.meanSiderealYearSeconds by the year-specific
  * (Fourier-oscillating) siderealYearDays, which produced ~0.3 ms spurious

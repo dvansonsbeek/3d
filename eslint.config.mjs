@@ -6,7 +6,7 @@
  * of IP-unified-architecture.md, executable.
  *
  * SCOPE. `packages/` and `test/` are linted. `src/script.js` (~59,300 lines),
- * `tools/`, `scripts/` and `dashboard/` are pre-migration code — linting them
+ * `tools/` and `scripts/` are pre-migration code — linting them
  * now would produce thousands of findings that say nothing about the
  * architecture and would train everyone to ignore the output. Phase 8's
  * physics extraction is complete; these trees join when `tools/lib`
@@ -37,7 +37,7 @@ export default [
       // bundled JS here continuously; unignored it swept 4.5k phantom
       // lint errors into the chain the moment npm start was restarted.
       'dist-dev/**', '.parcel-cache-build/**',
-      'src/**', 'tools/**', 'scripts/**', 'dashboard/**', 'public/**',
+      'src/**', 'tools/**', 'scripts/**', 'public/**',
       'data/**', 'docs/**', 'web-bundles/**',
       'packages/analysis/**',
       // Harness workspace — a KEPT git worktree under .claude/worktrees/ is a
@@ -77,7 +77,7 @@ export default [
         { type: 'fitting',   pattern: 'packages/fitting/*' },
         { type: 'reference', pattern: 'packages/reference/*' },
         { type: 'adapter',   pattern: 'packages/(api|mcp|render)/*', capture: ['name'] },
-        { type: 'app',       pattern: 'packages/(simulator|dashboard)/*', capture: ['name'] },
+        { type: 'app',       pattern: 'packages/(simulator)/*', capture: ['name'] },
       ],
       'boundaries/include': ['packages/**/*.js', 'packages/**/*.mjs', 'packages/**/*.cjs'],
     },

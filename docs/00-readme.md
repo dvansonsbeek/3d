@@ -108,12 +108,12 @@ and why.
 | 40 | [Architecture](40-architecture.md) | Code structure, file organization, module responsibilities, and the one-source movement |
 | 41 | [Scene Graph Hierarchy](41-scene-graph-hierarchy.md) | Three.js nested rotation layers — the engine-K hierarchy and the chain rendering path |
 | 50 | [UI Panels Reference](50-ui-panels-reference.md) | Tweakpane control panel and sidebar implementations |
-| 51 | [Planet Inspector Reference](51-planet-inspector-reference.md) | Planet Inspector — the orbit of date from the N-body chain: sources, visual, camera, readouts |
+| 51 | [Planet Orbit Analysis Reference](51-planet-inspector-reference.md) | Planet Orbit Analysis — the orbit of date from the N-body chain: sources, visual, camera, readouts |
 | 52 | [Analysis & Export Tools](52-analysis-export-tools.md) | Report generation, data export, and console validation tests |
-| 56 | [WebGeoCalc Explorer](56-webgeocalc-explorer.md) | Tools-menu modal showing observed perihelion-precession history (JPL NAIF WebGeoCalc) per planet — tests the chain's own ϖ(t) against observation |
-| 57 | [Formula Verification](57-formula-verification.md) | Tools-menu modal comparing the model's predictions against published analytical formulas (Meeus, Chapront, Capitaine, Vondrák, Laskar, Berger, Bills & Ray) across the 11 verification categories |
-| 58 | [Climate Formula Explorer](58-climate-formula-explorer.md) | Tools-menu modal visualizing the climate formula against LR04 / CENOGRID / EPICA / CenCO2PIP |
-| 59 | [ESSRT Explorer](59-essrt-explorer.md) | Tools-menu modal for the deep-time evolution of H, LOD, year length and Moon distance under ESSRT |
+| 56 | [Perihelion of Planets Verification](56-webgeocalc-explorer.md) | Tools-menu modal showing observed perihelion-precession history (JPL NAIF WebGeoCalc) per planet — tests the chain's own ϖ(t) against observation |
+| 57 | [Framework Verification](57-formula-verification.md) | Tools-menu modal comparing the model's predictions against published analytical formulas (Meeus, Chapront, Capitaine, Vondrák, Laskar, Berger, Bills & Ray) across the 11 verification categories |
+| 58 | [Earth Climate Analysis](58-climate-formula-explorer.md) | Tools-menu modal visualizing the climate formula against LR04 / CENOGRID / EPICA / CenCO2PIP |
+| 59 | [Earth–Moon Genesis Analysis](59-essrt-explorer.md) | Tools-menu modal for the deep-time evolution of the clock, LOD, year length and Moon distance under ESSRT |
 
 ### The record
 

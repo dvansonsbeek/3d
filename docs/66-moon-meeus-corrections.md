@@ -97,7 +97,7 @@ classical constant:
 - **e_E itself — the engine's own deep z-vector.** The lunar
   channel's eccentricity history is the ±10-Myr deep mode table
   (doc 109 §17, `moon/deep-ecc-channel.cjs`), anchored exactly at the JPL
-  J2000 seed in VALUE and — since the Formula Verification Moon panels
+  J2000 seed in VALUE and — since the Framework Verification Moon panels
   found the table's own J2000 slope 19 % steep (ė −5.00e-5/cy against the
   run's −4.24e-5, multiplied straight into the perigee and node
   curvature) — in SLOPE: the run's own J2000 z-rate, script-written into
@@ -939,7 +939,7 @@ entanglement the framework-native fundamental arguments resolve (the Lunar
 Precession Invariant carries the tidal MEAN rate; the bounded
 solar-eccentricity channel carries the oscillatory part; §1).
 
-Measured on the Formula Verification Moon panels (§8), the month and
+Measured on the Framework Verification Moon panels (§8), the month and
 precession rates of the framework-native arguments against the Meeus
 Ch. 47 rates over 1000 → 2500: sidereal, synodic, tropical and draconic
 months within 0.00–0.02 s rms, the anomalistic within 0.01 s; the perigee
@@ -1083,7 +1083,7 @@ is the adjudication record of the audit's ancient rows.
 
 ## 8. Validation Tools
 
-**Formula Verification · Moon group (live, in the simulator; doc 50).**
+**Framework Verification · Moon group (live, in the simulator; doc 50).**
 Three panels read the framework-native arguments against the Meeus
 Ch. 47 rates on the four standard windows, each with hover, residual and
 export: **Month Lengths** (the five months of date as strips, sidereal

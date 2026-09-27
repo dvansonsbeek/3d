@@ -2798,7 +2798,7 @@ function meanLodHoursAtAge(t_Ma) { return _deepLod().lodHoursAtAge(t_Ma); }
  *    stack   — All-cycles 4-flag ΔT stack rate (Layer 3 addition):
  *              d/dt of Bond/Hallstatt/Jose5/Jose4 δLOD sum. Captures millennial
  *              structure (Bond 1466 yr, Hallstatt 2430 yr, Jose5 897 yr,
- *              Jose4 716 yr) that maps to the LOD-Climate Rhythm
+ *              Jose4 716 yr) that maps to the Earth dLOD/dt Analysis
  *              (sub-Milankovitch modulation).
  *    net_L2  — Layer 2 net (tidal + gia). Matches IERS +1.75 ms/century at J2000
  *              within ~1% (framework value: +1.77).
@@ -6025,7 +6025,7 @@ if (typeof window !== 'undefined') {
     // predictions (date/JD/RA/year-length per point) read after a FULL update
     // at jd — since R4c the package crossings seeded at the displayed
     // calendar year's midpoint (no runtime anchor offsets any more).
-    // R10 — Planet Inspector probe: the helper group's size, the orbit frame's
+    // R10 — Planet Orbit Analysis probe: the helper group's size, the orbit frame's
     // key angles and where the orbit view puts the equinox ĝ on screen (the
     // former inspector started 90° rotated; the fix is a defined screen-up).
     jumpJD: (jd) => { jumpToJulianDay(jd); forceSceneUpdate(); },   // scene jump for probes (setEpoch* only move the f(Y) epoch)
@@ -6316,6 +6316,31 @@ if (typeof window !== 'undefined') {
       return { type: r.blob.type, width: r.width, height: r.height, bytes: r.blob.size, decoded };
     },
     chartExportOpen: (svgString, title) => openChartExportModal(svgString, title),
+    // the export standard's gate: every paper form, rendered as the Export
+    // buttons render it (data loaded first), keyed by panel
+    chartExportForms: async () => {
+      await Promise.all([loadWGCData(), loadCfmLR04Data(), loadEpicaData(), lcrLoadProxyData()]);
+      const wgcPlanet = wgcData && Object.keys(wgcData).find((k) => k.toUpperCase() === 'MERCURY') || Object.keys(wgcData || {})[0];
+      const generic = VFP_CATEGORIES.find((c) => c.id === 'obliquity');
+      const gTab = _vfpCurrentTab(generic);
+      return {
+        'perihelion of planets (perihelion chart)':  wgcRenderPaperSVG(wgcPlanet, {}),
+        'perihelion of planets (all 3 charts)':      wgcRenderPaperSVG(wgcPlanet, { node: true, arg: true }),
+        'earth climate analysis':     cfmRenderPaperChart('postMPT', {}),
+        'earth-moon genesis analysis': essrtRenderPaperChart('lod', 'phanero'),
+        'earth dlod/dt analysis':     lcrRenderPaperSVG('historical'),
+        'framework verification (generic)': renderVFPPaperChartAlt(generic, { range: gTab.range, title: generic.label + ' — ' + gTab.label }),
+        'planet inclinations':        _vfpPIPaperSvg(_VFPPI_SCREEN_RANGE),
+        'planet eccentricities':      _vfpPEPaperSvg(_VFPPI_SCREEN_RANGE),
+        'all precession':             _vfpAPPaperSvg(_vfpCurrentTabFor('all-precession').range),
+        'analemma':                   _vfpANPaperSvg(),
+        'milankovitch overview':      _vfpMOPaperSvg(_vfpCurrentTabFor('milankovitch-overview').range),
+        'moon arguments':             _vfpMAPaperSvg(_vfpCurrentTabFor('moon-arguments').range),
+        'moon months':                _vfpMLPaperSvg(_vfpCurrentTabFor('moon-months').range),
+        'planet orbit analysis (orbit of date)': inspectorRenderPaperSVG('jupiter'),
+      };
+    },
+    inspectorPaperSvg: (planetKey) => inspectorRenderPaperSVG(planetKey || hierarchyInspector.currentPlanet),
     vfpPIState: () => _vfpPIState,
     vfpPIRender: () => renderVFPPlanetInclinations(),
     vfpPIAfterRender: (el) => _vfpPIAfterRender(el),
@@ -10654,51 +10679,104 @@ const plane = new THREE.GridHelper(o.starDistance * 2, 30, 0x008800, 0x000088);
 earth.pivotObj.add(plane);
 plane.visible = false;
 
-// Zodiac
-const zodiac = new THREE.PolarGridHelper(250, 24, 1, 64, 0x000000, 0x555555);
-
-// Generate zodiac circular text texture
-const zodiacText = "      GEMINI             TAURUS             ARIES             PISCES          AQUARIUS       CAPRICORN     SAGITTARIUS      SCORPIO             LIBRA              VIRGO                LEO               CANCER ";
-const zCanvas = getCircularText(
-    zodiacText,
-    800,
-    0,
-    "right",
-    false,
-    true,
-    "Arial",
-    "18pt",
-    2
-);
-
-// Create texture and mesh for circular label
-const zTexture = new THREE.CanvasTexture(zCanvas);
-zTexture.anisotropy = 8;
-zTexture.minFilter = THREE.LinearMipMapLinearFilter;
-zTexture.magFilter = THREE.LinearFilter;
-zTexture.needsUpdate = true;
-
-const zLabelGeometry = new THREE.RingGeometry(235, 250, 64);
-const zLabelMaterial = new THREE.MeshBasicMaterial({
-    map: zTexture,
-    side: THREE.DoubleSide,
-    transparent: true,
-    opacity: 1,
-    depthWrite: false
-});
-
-const zLabel = new THREE.Mesh(zLabelGeometry, zLabelMaterial);
-zLabel.rotation.x = -Math.PI / 2;
-zodiac.add(zLabel);
-
-// Add to scene
-earth.pivotObj.add(zodiac);
-zodiac.position.y = 0;
-// ECCENTRICITY UNIFICATION (D6): the former offset compensated the Earth
-// wobble circle's displacement (A·2π/(H/13)·Δt); with the circle retired the
-// zodiac ring is centred on Earth. (Was: −(eccentricityAmplitude·2π/(H/13))·Δt·100 "to align to start Aquarius".)
-zodiac.position.z = 0;
+// Ecliptic constellations — the thirteen IAU constellations the ecliptic
+// crosses (the table the Planet Orbit Analysis's export uses), as a STAR-FIXED
+// band: its plane is the J2000 ecliptic and its 0° the J2000 equinox, placed
+// through the chain's frame bridge R in moveModel (world-fixed, like the
+// constellation outlines it names), so the equinox of date, the perihelion
+// marker and the solstice axis precess THROUGH it. (Was: twelve equal signs
+// on the K wheel, turned by −60° minus the device anomaly every frame — the
+// "zodiac's old behaviour", a hand-tuned orientation, not a placed one.)
+// The variable keeps its name; the toggle is "Zodiac constellations (IAU)".
+// The table: the J2000 ecliptic longitude at which the ecliptic ENTERS each
+// constellation (the IAU 1930 Delporte boundaries, B1875 lines, read at the
+// ecliptic; ~0.1°). A star-fixed naming of the sidereal direction: carried
+// with the precession of the equinox of date; the stars' own proper motions
+// are NOT applied (over 10⁵ years they displace the figures by degrees).
+// Shared with the Planet Orbit Analysis's export (its constellation band and the
+// "vernal equinox … in <constellation>" row).
+const _HI_ECLIPTIC_CONSTELLATIONS = [
+  ['Pisces', 351.57], ['Aries', 29.09], ['Taurus', 53.47], ['Gemini', 90.44], ['Cancer', 118.26],
+  ['Leo', 138.19], ['Virgo', 174.15], ['Libra', 217.80], ['Scorpius', 241.14], ['Ophiuchus', 247.64],
+  ['Sagittarius', 266.60], ['Capricornus', 299.71], ['Aquarius', 327.89],
+];
+const zodiac = new THREE.Group();
+zodiac.name = 'eclipticConstellations';
+{
+  const RZ = 250;   // scene units (2.5 AU), the former wheel's radius
+  // longitude λ in the band's local frame: +x = the equinox, +90° = local −z
+  // (the label ring's +y after its −π/2 tilt), +y = the ecliptic north pole
+  const lonDir = (lonDeg) => { const a = lonDeg * Math.PI / 180; return new THREE.Vector3(Math.cos(a), 0, -Math.sin(a)); };
+  const pts = [];
+  for (const [, start] of _HI_ECLIPTIC_CONSTELLATIONS) pts.push(new THREE.Vector3(0, 0, 0), lonDir(start).multiplyScalar(RZ));   // the boundary radials
+  for (let i = 0; i < 128; i++) pts.push(lonDir(360 * i / 128).multiplyScalar(RZ), lonDir(360 * (i + 1) / 128).multiplyScalar(RZ));   // the rim
+  zodiac.add(new THREE.LineSegments(new THREE.BufferGeometry().setFromPoints(pts), new THREE.LineBasicMaterial({ color: 0x555555 })));
+  // the names, drawn on the flat picture of the annulus (RingGeometry UVs are planar; the texture's up is the geometry's +y)
+  const size = 2048, zCanvas = document.createElement('canvas');
+  zCanvas.width = zCanvas.height = size;
+  const zc = zCanvas.getContext('2d');
+  zc.fillStyle = '#ffffff'; zc.textAlign = 'center'; zc.textBaseline = 'middle';
+  const cxy = size / 2, rText = (size / 2) * (242.5 / RZ);
+  _HI_ECLIPTIC_CONSTELLATIONS.forEach(([name, start], i) => {
+    const next = _HI_ECLIPTIC_CONSTELLATIONS[(i + 1) % _HI_ECLIPTIC_CONSTELLATIONS.length][1];
+    const span = ((next - start) % 360 + 360) % 360, mid = start + span / 2;
+    const a = mid * Math.PI / 180, x = cxy + rText * Math.cos(a), y = cxy - rText * Math.sin(a);
+    zc.save(); zc.translate(x, y); zc.rotate((Math.sin(a) < 0 ? 270 - mid : 90 - mid) * Math.PI / 180);
+    zc.font = `bold ${span < 12 ? 30 : 42}px Arial`;
+    zc.fillText((span < 12 ? name.slice(0, 3) : name).toUpperCase(), 0, 0);   // Scorpius' 6.5° holds its IAU abbreviation
+    zc.restore();
+  });
+  const zTexture = new THREE.CanvasTexture(zCanvas);
+  zTexture.anisotropy = 8;
+  zTexture.minFilter = THREE.LinearMipMapLinearFilter;
+  zTexture.magFilter = THREE.LinearFilter;
+  const zLabel = new THREE.Mesh(new THREE.RingGeometry(235, RZ, 64),
+    new THREE.MeshBasicMaterial({ map: zTexture, side: THREE.DoubleSide, transparent: true, opacity: 1, depthWrite: false }));
+  zLabel.rotation.x = -Math.PI / 2;
+  zodiac.add(zLabel);
+}
+scene.add(zodiac);   // world-fixed; centred on Earth and oriented from R in moveModel
 zodiac.visible = false;
+
+// Zodiac signs — the twelve equal 30° signs of the tropical zodiac, Aries 0°
+// at the vernal equinox OF DATE: an inner ring placed every frame on the
+// engine's ecliptic of date (the sun-plane container's world basis, the one
+// the Planet Orbit Analysis reads), so it turns with the equinox against the
+// star-fixed constellation band — the precession of the equinoxes shown as
+// the drift between the two rings (about one sign today, one more sign per
+// ~2,150 years).
+const zodiacSigns = new THREE.Group();
+zodiacSigns.name = 'zodiacSigns';
+{
+  const R1 = 196, R2 = 214;   // inside the constellation band (235–250)
+  const lonDir = (lonDeg) => { const a = lonDeg * Math.PI / 180; return new THREE.Vector3(Math.cos(a), 0, -Math.sin(a)); };
+  const SIGNS = ['ARIES', 'TAURUS', 'GEMINI', 'CANCER', 'LEO', 'VIRGO', 'LIBRA', 'SCORPIO', 'SAGITTARIUS', 'CAPRICORN', 'AQUARIUS', 'PISCES'];
+  const pts = [];
+  for (let k = 0; k < 12; k++) pts.push(lonDir(30 * k).multiplyScalar(R1), lonDir(30 * k).multiplyScalar(R2));   // the sign boundaries
+  for (let i = 0; i < 128; i++) for (const r of [R1, R2]) pts.push(lonDir(360 * i / 128).multiplyScalar(r), lonDir(360 * (i + 1) / 128).multiplyScalar(r));
+  zodiacSigns.add(new THREE.LineSegments(new THREE.BufferGeometry().setFromPoints(pts), new THREE.LineBasicMaterial({ color: 0x8a7a3a })));
+  const size = 2048, sCanvas = document.createElement('canvas');
+  sCanvas.width = sCanvas.height = size;
+  const sc = sCanvas.getContext('2d');
+  sc.fillStyle = '#ffe08a'; sc.textAlign = 'center'; sc.textBaseline = 'middle'; sc.font = 'bold 36px Arial';
+  const cxy = size / 2, rText = (size / 2) * (205 / R2);
+  SIGNS.forEach((name, k) => {
+    const mid = 30 * k + 15, a = mid * Math.PI / 180, x = cxy + rText * Math.cos(a), y = cxy - rText * Math.sin(a);
+    sc.save(); sc.translate(x, y); sc.rotate((Math.sin(a) < 0 ? 270 - mid : 90 - mid) * Math.PI / 180);
+    sc.fillText(name, 0, 0);
+    sc.restore();
+  });
+  const sTexture = new THREE.CanvasTexture(sCanvas);
+  sTexture.anisotropy = 8;
+  sTexture.minFilter = THREE.LinearMipMapLinearFilter;
+  sTexture.magFilter = THREE.LinearFilter;
+  const sLabel = new THREE.Mesh(new THREE.RingGeometry(R1, R2, 64),
+    new THREE.MeshBasicMaterial({ map: sTexture, side: THREE.DoubleSide, transparent: true, opacity: 1, depthWrite: false }));
+  sLabel.rotation.x = -Math.PI / 2;
+  zodiacSigns.add(sLabel);
+}
+scene.add(zodiacSigns);   // centred on Earth and oriented on the ecliptic of date in moveModel
+zodiacSigns.visible = false;
 
 // Add Glow effect of zodiac (64 segments is sufficient for a smooth glow ring)
 const glowGeometry = new THREE.RingGeometry(255, 265, 64);
@@ -14104,6 +14182,256 @@ function computeInspectorOrbitFrame(planetKey) {
   return f;
 }
 
+// ─── the inspector's paper export ───────────────────────────────────────────
+// The orbit picture per planet (owner: the hand-made 09_<planet>_orbit_picture
+// figures, now printed from the scene): the Orbit view drawn flat — the frame
+// computeInspectorOrbitFrame renders, projected onto the ecliptic of date
+// (equinox to the right, longitude counter-clockwise), the orbit split by its
+// side of the ecliptic, the line of nodes, the line of apsides, the rendered
+// planet with its direction of motion, and a month ring at the model's own
+// Sun longitude on the first of each month of the scene year. Nothing here is
+// computed on a path of its own; the page is the standard export page.
+const _HI_PAPER = { above: '#15803d', below: '#b91c1c', ecliptic: '#2563eb', asc: '#c026d3', desc: '#0891b2', peri: '#15803d', sun: '#d97706', planet: '#0e7490', ring: '#9ca3af', text: '#374151' };
+const _HI_MONTHS = ['JANUARY', 'FEBRUARY', 'MARCH', 'APRIL', 'MAY', 'JUNE', 'JULY', 'AUGUST', 'SEPTEMBER', 'OCTOBER', 'NOVEMBER', 'DECEMBER'];
+// (_HI_ECLIPTIC_CONSTELLATIONS — the thirteen IAU constellations the ecliptic
+// crosses — is defined beside the scene's zodiac-constellations band, which
+// is built at load from the same table.)
+const _HI_CARDINALS = [['VE', 0, 'VERNAL EQUINOX'], ['SS', 90, 'SUMMER SOLSTICE'], ['AE', 180, 'AUTUMNAL EQUINOX'], ['WS', 270, 'WINTER SOLSTICE']];
+
+/** The constellation (of the thirteen) that holds a J2000 ecliptic longitude. */
+function _hiConstellationAt(lonJ2000) {
+  const lon = _hiWrap360(lonJ2000);
+  let best = null;   // the greatest entry longitude at or below lon; below Aries' 29° the band is still Pisces (it wraps through 0°)
+  for (const [n, start] of _HI_ECLIPTIC_CONSTELLATIONS) if (lon >= start && (best === null || start > best[1])) best = [n, start];
+  return best ? best[0] : _HI_ECLIPTIC_CONSTELLATIONS[0][0];
+}
+
+/** "YYYY-MM-DD HH:MM UT" for a JD (UT). */
+function _hiDateTimeFromJD(jd) {
+  const d = _hiCalendarFromJD(jd);
+  const frac = jd + 0.5 - Math.floor(jd + 0.5);
+  const mins = Math.round(frac * 1440), hh = Math.floor(mins / 60) % 24, mm = mins % 60;
+  return `${d.year}-${String(d.month).padStart(2, '0')}-${String(d.day).padStart(2, '0')} ${String(hh).padStart(2, '0')}:${String(mm).padStart(2, '0')} UT`;
+}
+
+/** The model's four cardinal instants of the scene year (the Earth-predictions panel's call: the crossing nearest the calendar year's midpoint). */
+function _hiCardinalDates(year) {
+  const out = {};
+  try {
+    const seed = dateToJulianDay(year, 7, 2) + 0.5, cpM = _tierModelB().cardinal;
+    for (const [cp] of _HI_CARDINALS) out[cp] = _hiDateTimeFromJD(cpM.jdNearUT(seed, cp));
+  } catch (e) { for (const [cp] of _HI_CARDINALS) out[cp] = '—'; }
+  return out;
+}
+
+/** Gregorian calendar date of a JD (Meeus ch. 7). */
+function _hiCalendarFromJD(jd) {
+  const Z = Math.floor(jd + 0.5), F = jd + 0.5 - Z;
+  let A = Z;
+  if (Z >= 2299161) { const a = Math.floor((Z - 1867216.25) / 36524.25); A = Z + 1 + a - Math.floor(a / 4); }
+  const B = A + 1524, C = Math.floor((B - 122.1) / 365.25), D = Math.floor(365.25 * C), E = Math.floor((B - D) / 30.6001);
+  const day = Math.floor(B - D - Math.floor(30.6001 * E) + F);
+  const month = E < 14 ? E - 1 : E - 13;
+  const year = month > 2 ? C - 4716 : C - 4715;
+  return { year, month, day };
+}
+
+/** The Sun's ecliptic longitude of date on the first of each month of `year` (the model's own certified Sun; the mean 30° comb if a date is out of the calendar helper's range). */
+function _hiMonthSunLongitudes(year) {
+  return _HI_MONTHS.map((_, i) => {
+    try { return _hiWrap360(_tierModelB().eclipse.sunLonDegAtJD(dateToJulianDay(year, i + 1, 1))); }
+    catch (e) { return _hiWrap360(360 * (i - 2) / 12); }
+  });
+}
+
+function inspectorRenderPaperSVG(planetKey) {
+  const target = PLANET_HIERARCHIES[planetKey];
+  const f = target && target.chain ? computeInspectorOrbitFrame(planetKey) : null;
+  if (!f) return '<svg xmlns="http://www.w3.org/2000/svg" width="600" height="100"><text x="20" y="50" font-family="Inter,system-ui,sans-serif" font-size="14" fill="#222">Planet Orbit Analysis: the orbit frame is not ready yet</text></svg>';
+  const el = f.el, C = _HI_PAPER;
+  const W = 800, PLOT = 736;   // the month ring (radius 310), the constellation band (to 358) and their names
+  // the equinox of date in the chain's J2000 frame (R's columns are the J2000
+  // axes in world coordinates): where the vernal point stands among the stars
+  const Rj = _kcR, gJx = Rj[0][0] * f.g.x + Rj[1][0] * f.g.y + Rj[2][0] * f.g.z, gJy = Rj[0][1] * f.g.x + Rj[1][1] * f.g.y + Rj[2][1] * f.g.z;
+  const eqLonJ2000 = _hiWrap360(Math.atan2(gJy, gJx) / _hiD2R);
+  const eqConstellation = _hiConstellationAt(eqLonJ2000);
+  // projection onto the ecliptic of date: x along ĝ (the equinox), y along û₂ (longitude +90°), h along n̂
+  const proj = (v) => ({ x: v.dot(f.g), y: v.dot(f.u2), h: v.dot(f.n) });
+  const tmp = new THREE.Vector3();
+  const orbitPt = (nuDeg) => {
+    const nu = nuDeg * _hiD2R;
+    const r = el.aAU * (1 - el.e * el.e) / (1 + el.e * Math.cos(nu));
+    tmp.set(0, 0, 0).addScaledVector(f.p, r * Math.cos(nu)).addScaledVector(f.q, r * Math.sin(nu));
+    return proj(tmp);
+  };
+  // one period sampled from the ascending node: the first arc lies above the ecliptic of date
+  const nuAsc = _hiWrap360(Math.atan2(f.node.dot(f.q), f.node.dot(f.p)) / _hiD2R);
+  const N = _HI_ORBIT_SEGS;
+  const pts = [];
+  for (let i = 0; i <= N; i++) pts.push(orbitPt(nuAsc + 360 * i / N));
+  let kDesc = pts.findIndex((p, i) => i > 2 && p.h <= 0);
+  if (kDesc < 0) kDesc = N;
+  const rMax = pts.reduce((m, p) => Math.max(m, Math.hypot(p.x, p.y)), 0);
+  const R = 250, scale = R / rMax, ringR = R * 1.24;
+
+  const dt = _hiCalendarFromJD(f.jd);
+  const dateStr = `${dt.year}-${String(dt.month).padStart(2, '0')}-${String(dt.day).padStart(2, '0')}`;
+  const legend = [
+    { name: 'Orbit above the ecliptic of date', color: C.above, bold: true },
+    { name: 'Orbit below the ecliptic of date', color: C.below, bold: true },
+    { name: 'Ecliptic of date at a', color: C.ecliptic, dash: '6,4' },
+    { name: 'Ascending node ↑', color: C.asc, marker: 'dot' },
+    { name: 'Descending node ↓', color: C.desc, marker: 'dot' },
+    { name: 'Perihelion P · aphelion A', color: C.peri, marker: 'diamond' },
+    { name: 'Sun → planet: the rendered planet and its motion', color: C.sun },
+    { name: 'Ω and ω: arcs at the Sun, from the equinox of date', color: '#6b7280' },
+    { name: 'Month ring: the Sun’s longitude on the 1st', color: C.ring },
+    { name: 'Cardinal points: the model’s dates (UT)', color: C.text },
+    { name: 'IAU constellation boundaries (J2000), carried with the precession', color: C.ring },
+  ];
+  const head = chartExportHeader(`Planet Orbit Analysis — ${target.label}, orbit of date ${dateStr}`, legend, W);
+  // the values block under the diagram: the three angles (and i) in both
+  // frames, e and a, the equinox of date among the stars — the same numbers
+  // the inspector's readout rows show
+  const ROW = 16, VALUE_ROWS = 8, BLOCK = 10 + VALUE_ROWS * ROW + 6;
+  const top = head.bottom + 8, H = top + PLOT + BLOCK + CHART_EXPORT_CREDIT_H;
+  const cx = W / 2, cy = top + PLOT / 2;
+  const X = (p) => (cx + p.x * scale).toFixed(1), Y = (p) => (cy - p.y * scale).toFixed(1);
+  const path = (arr) => arr.map((p, i) => `${i ? 'L' : 'M'}${X(p)},${Y(p)}`).join(' ');
+  let s = '';
+
+  // the month ring — the Sun's longitude on the first of each month, read counter-clockwise
+  s += `<circle cx="${cx}" cy="${cy}" r="${ringR.toFixed(1)}" fill="none" stroke="${C.ring}" stroke-width="1"/>`;
+  _hiMonthSunLongitudes(dt.year).forEach((lon, i) => {
+    const a = lon * _hiD2R, ca = Math.cos(a), sa = Math.sin(a);
+    s += `<line x1="${(cx + (ringR - 5) * ca).toFixed(1)}" y1="${(cy - (ringR - 5) * sa).toFixed(1)}" x2="${(cx + (ringR + 5) * ca).toFixed(1)}" y2="${(cy - (ringR + 5) * sa).toFixed(1)}" stroke="${C.ring}" stroke-width="1"/>`;
+    const lx = cx + (ringR + 18) * ca, ly = cy - (ringR + 18) * sa;
+    const rot = sa < 0 ? 270 - lon : 90 - lon;   // along the ring, upright on the lower half too
+    s += `<text x="${lx.toFixed(1)}" y="${ly.toFixed(1)}" text-anchor="middle" dominant-baseline="middle" font-size="11" font-weight="600" fill="${C.text}" transform="rotate(${rot.toFixed(1)} ${lx.toFixed(1)} ${ly.toFixed(1)})">${_HI_MONTHS[i]}</text>`;
+  });
+  // the four cardinal points — fixed on the ring by construction (0°, 90°,
+  // 180°, 270° of the ecliptic of date), each with the model's date of the
+  // scene year, so the month ring's drift against the seasons reads itself
+  const cpDates = _hiCardinalDates(dt.year);
+  for (const [cp, deg, name] of _HI_CARDINALS) {
+    const a = deg * _hiD2R, ca = Math.cos(a), sa = Math.sin(a);
+    s += `<line x1="${(cx + (ringR - 10) * ca).toFixed(1)}" y1="${(cy - (ringR - 10) * sa).toFixed(1)}" x2="${(cx + (ringR + 10) * ca).toFixed(1)}" y2="${(cy - (ringR + 10) * sa).toFixed(1)}" stroke="${C.text}" stroke-width="1.6"/>`;
+    const lr = ringR - 13, lx = cx + lr * ca, ly = cy - lr * sa;
+    const rot = sa < -1e-9 ? 270 - deg : 90 - deg;
+    s += `<text x="${lx.toFixed(1)}" y="${ly.toFixed(1)}" text-anchor="middle" dominant-baseline="middle" font-size="9.5" font-weight="600" fill="${C.text}" transform="rotate(${rot.toFixed(1)} ${lx.toFixed(1)} ${ly.toFixed(1)})">${name} · ${cpDates[cp]}</text>`;
+  }
+  s += `<line x1="${cx}" y1="${cy}" x2="${(cx + R * 0.34).toFixed(1)}" y2="${cy}" stroke="#6b7280" stroke-width="0.8" stroke-dasharray="3,3"/>`;
+
+  // the constellation band: the IAU boundaries at J2000 longitude λ sit at
+  // λ − λ_eq in the ecliptic of date (the precession of the equinox)
+  const bIn = ringR + 30, bOut = ringR + 48, bMid = ringR + 39;
+  s += `<circle cx="${cx}" cy="${cy}" r="${bIn.toFixed(1)}" fill="none" stroke="${C.ring}" stroke-width="0.8"/>`;
+  s += `<circle cx="${cx}" cy="${cy}" r="${bOut.toFixed(1)}" fill="none" stroke="${C.ring}" stroke-width="0.8"/>`;
+  _HI_ECLIPTIC_CONSTELLATIONS.forEach(([name, start], i) => {
+    const next = _HI_ECLIPTIC_CONSTELLATIONS[(i + 1) % _HI_ECLIPTIC_CONSTELLATIONS.length][1];
+    const span = _hiWrap360(next - start), lon0 = _hiWrap360(start - eqLonJ2000), mid = _hiWrap360(lon0 + span / 2);
+    const a0 = lon0 * _hiD2R;
+    s += `<line x1="${(cx + bIn * Math.cos(a0)).toFixed(1)}" y1="${(cy - bIn * Math.sin(a0)).toFixed(1)}" x2="${(cx + bOut * Math.cos(a0)).toFixed(1)}" y2="${(cy - bOut * Math.sin(a0)).toFixed(1)}" stroke="${C.ring}" stroke-width="0.8"/>`;
+    const am = mid * _hiD2R, lx = cx + bMid * Math.cos(am), ly = cy - bMid * Math.sin(am);
+    const rot = Math.sin(am) < 0 ? 270 - mid : 90 - mid;
+    const label = span < 12 ? name.slice(0, 3) : name;   // Scorpius' 6.5° holds its IAU abbreviation
+    s += `<text x="${lx.toFixed(1)}" y="${ly.toFixed(1)}" text-anchor="middle" dominant-baseline="middle" font-size="8.5" fill="#6b7280" transform="rotate(${rot.toFixed(1)} ${lx.toFixed(1)} ${ly.toFixed(1)})">${label}</text>`;
+  });
+  for (const deg of [45, 225]) {   // the sense of the year on the ring
+    const a = deg * _hiD2R, tx = -Math.sin(a), ty = Math.cos(a);   // the counter-clockwise tangent
+    const px = cx + ringR * Math.cos(a), py = cy - ringR * Math.sin(a);
+    const tip = [px + 9 * tx, py - 9 * ty], l = [px - 6 * tx + 5 * Math.cos(a), py + 6 * ty - 5 * Math.sin(a)], r2 = [px - 6 * tx - 5 * Math.cos(a), py + 6 * ty + 5 * Math.sin(a)];
+    s += `<polygon points="${tip[0].toFixed(1)},${tip[1].toFixed(1)} ${l[0].toFixed(1)},${l[1].toFixed(1)} ${r2[0].toFixed(1)},${r2[1].toFixed(1)}" fill="${C.ring}"/>`;
+  }
+
+  // the ecliptic of date at the semi-major axis, the two halves of the orbit
+  s += `<circle cx="${cx}" cy="${cy}" r="${(el.aAU * scale).toFixed(1)}" fill="none" stroke="${C.ecliptic}" stroke-width="1" stroke-dasharray="6,4"/>`;
+  const above = pts.slice(0, kDesc + 1), below = pts.slice(kDesc);
+  s += `<path d="${path(above)} Z" fill="${C.above}" opacity="0.07"/>`;
+  s += `<path d="${path(below)} Z" fill="${C.below}" opacity="0.07"/>`;
+  s += `<path d="${path(above)}" fill="none" stroke="${C.above}" stroke-width="2.2"/>`;
+  s += `<path d="${path(below)}" fill="none" stroke="${C.below}" stroke-width="2.2"/>`;
+
+  // the line of nodes with the two nodes on the orbit
+  const nodeDir = proj(f.node), L = rMax * 1.08;
+  s += `<line x1="${(cx - nodeDir.x * L * scale).toFixed(1)}" y1="${(cy + nodeDir.y * L * scale).toFixed(1)}" x2="${(cx + nodeDir.x * L * scale).toFixed(1)}" y2="${(cy - nodeDir.y * L * scale).toFixed(1)}" stroke="#6b7280" stroke-width="1" stroke-dasharray="2,3"/>`;
+  // labels sit on the INNER side of the orbit (a node near the ring collided
+  // with the month names), with a white halo over the shading
+  const labelAt = (p, text, color, outX, outY) => {
+    const off = 15, dirX = -outX, dirY = -outY;
+    const lx = cx + p.x * scale + dirX * off, ly = cy - p.y * scale - dirY * off;
+    const anchor = dirX < -0.3 ? 'end' : dirX > 0.3 ? 'start' : 'middle';
+    const attrs = `x="${lx.toFixed(1)}" y="${ly.toFixed(1)}" text-anchor="${anchor}" dominant-baseline="middle" font-size="12" font-weight="600"`;
+    return `<text ${attrs} fill="#fff" stroke="#fff" stroke-width="4" stroke-linejoin="round">${text}</text><text ${attrs} fill="${color}">${text}</text>`;
+  };
+  const asc = pts[0], desc = orbitPt(nuAsc + 180);
+  s += `<circle cx="${X(asc)}" cy="${Y(asc)}" r="5.5" fill="${C.asc}" stroke="#fff" stroke-width="1.2"/>` + labelAt(asc, 'Ascending node ↑', C.asc, nodeDir.x, nodeDir.y);
+  s += `<circle cx="${X(desc)}" cy="${Y(desc)}" r="5.5" fill="${C.desc}" stroke="#fff" stroke-width="1.2"/>` + labelAt(desc, 'Descending node ↓', C.desc, -nodeDir.x, -nodeDir.y);
+
+  // the line of apsides with P and A
+  const P = orbitPt(0), A = orbitPt(180), pDir = proj(f.p);
+  s += `<line x1="${X(A)}" y1="${Y(A)}" x2="${X(P)}" y2="${Y(P)}" stroke="${C.peri}" stroke-width="1.2"/>`;
+  for (const [pt, name, dx, dy] of [[P, 'P', pDir.x, pDir.y], [A, 'A', -pDir.x, -pDir.y]]) {
+    s += `<rect x="${(+X(pt) - 4).toFixed(1)}" y="${(+Y(pt) - 4).toFixed(1)}" width="8" height="8" transform="rotate(45 ${X(pt)} ${Y(pt)})" fill="${C.peri}" stroke="#fff" stroke-width="1"/>` + labelAt(pt, name, C.peri, dx, dy);
+  }
+
+  // Ω and ω as arcs at the Sun: Ω from the equinox to the ascending node
+  // along the ecliptic of date, ω from the node to P (the projection of the
+  // in-plane angle; the block below carries the exact numbers)
+  const arc = (r, fromDeg, spanDeg, color, label) => {
+    const a0 = fromDeg * _hiD2R, a1 = (fromDeg + spanDeg) * _hiD2R, am = (fromDeg + spanDeg / 2) * _hiD2R;
+    const x0 = cx + r * Math.cos(a0), y0 = cy - r * Math.sin(a0), x1 = cx + r * Math.cos(a1), y1 = cy - r * Math.sin(a1);
+    const lx = cx + (r + 13) * Math.cos(am), ly = cy - (r + 13) * Math.sin(am);
+    return `<path d="M${x0.toFixed(1)},${y0.toFixed(1)} A${r},${r} 0 ${spanDeg > 180 ? 1 : 0} 0 ${x1.toFixed(1)},${y1.toFixed(1)}" fill="none" stroke="${color}" stroke-width="1.3"/>` +
+      `<text x="${lx.toFixed(1)}" y="${ly.toFixed(1)}" text-anchor="middle" dominant-baseline="middle" font-size="13" font-style="italic" font-weight="600" fill="${color}">${label}</text>`;
+  };
+  const nodeDeg = _hiWrap360(Math.atan2(nodeDir.y, nodeDir.x) / _hiD2R), periDeg = _hiWrap360(Math.atan2(pDir.y, pDir.x) / _hiD2R);
+  s += arc(R * 0.22, 0, nodeDeg, C.asc, 'Ω');
+  s += arc(R * 0.30, nodeDeg, _hiWrap360(periDeg - nodeDeg), C.peri, 'ω');
+
+  // the Sun, the rendered planet, its direction of motion
+  s += `<circle cx="${cx}" cy="${cy}" r="7" fill="#f59e0b" stroke="#b45309" stroke-width="1"/>`;
+  const pl = { x: f.r.dot(f.g) / 100, y: f.r.dot(f.u2) / 100 };
+  s += `<line x1="${cx}" y1="${cy}" x2="${X(pl)}" y2="${Y(pl)}" stroke="${C.sun}" stroke-width="1.4"/>`;
+  const nu = f.trueAnomalyDeg * _hiD2R;
+  tmp.set(0, 0, 0).addScaledVector(f.p, -Math.sin(nu)).addScaledVector(f.q, el.e + Math.cos(nu));
+  const v = proj(tmp), vn = Math.hypot(v.x, v.y) || 1, vx = v.x / vn, vy = v.y / vn;
+  const ax0 = +X(pl) + vx * 13, ay0 = +Y(pl) - vy * 13, ax1 = ax0 + vx * 26, ay1 = ay0 - vy * 26;
+  s += `<line x1="${ax0.toFixed(1)}" y1="${ay0.toFixed(1)}" x2="${ax1.toFixed(1)}" y2="${ay1.toFixed(1)}" stroke="${C.sun}" stroke-width="1.6"/>`;
+  s += `<polygon points="${(ax1 + vx * 7).toFixed(1)},${(ay1 - vy * 7).toFixed(1)} ${(ax1 - vy * 4).toFixed(1)},${(ay1 - vx * 4).toFixed(1)} ${(ax1 + vy * 4).toFixed(1)},${(ay1 + vx * 4).toFixed(1)}" fill="${C.sun}"/>`;
+  s += `<circle cx="${X(pl)}" cy="${Y(pl)}" r="10" fill="none" stroke="${C.planet}" stroke-width="1.5"/><circle cx="${X(pl)}" cy="${Y(pl)}" r="4.5" fill="${C.planet}"/>`;
+
+  // the values block — the readout rows' numbers, both frames named
+  const fx = (v, d, unit = '') => (Number.isFinite(v) ? v.toFixed(d) + unit : '—');
+  const omJ = _hiWrap360(el.ascNodeEclipticDeg), lpJ = _hiWrap360(el.lonPeriEclipticDeg), wJ = _hiWrap360(lpJ - omJ);
+  const omD = f.nodeLonDateDeg, wD = _hiWrap360(f.argLatDeg - f.trueAnomalyDeg), lpD = _hiWrap360(omD + wD);
+  const rows = [
+    ['', 'J2000 ecliptic', 'ecliptic of date'],
+    ['Ascending node Ω', fx(omJ, 3, '°'), fx(omD, 3, '°')],
+    ['Argument of perihelion ω = ϖ − Ω', fx(wJ, 3, '°'), fx(wD, 3, '°')],
+    ['Longitude of perihelion ϖ = Ω + ω', fx(lpJ, 3, '°'), fx(lpD, 3, '°')],
+    ['Inclination i', fx(el.inclEclipticDeg, 3, '°'), fx(f.inclDateDeg, 3, '°')],
+    ['Eccentricity e', fx(el.e, 6), ''],
+    ['Semi-major axis a', fx(el.aAU, 6, ' AU'), ''],
+    [`Vernal equinox of date, among the stars: in ${eqConstellation}`, fx(eqLonJ2000, 3, '°'), ''],
+  ];
+  const bx = cx - 250, by = top + PLOT + 10;
+  s += `<line x1="${bx}" y1="${by - 4}" x2="${cx + 250}" y2="${by - 4}" stroke="#e5e7eb" stroke-width="1"/>`;
+  rows.forEach((r, i) => {
+    const y = by + ROW * (i + 1) - 4, bold = i === 0 ? ' font-weight="600"' : '';
+    s += `<text x="${bx}" y="${y}" font-size="11.5" fill="${C.text}"${bold}>${r[0]}</text>`;
+    s += `<text x="${cx + 95}" y="${y}" text-anchor="end" font-size="11.5" fill="${C.text}"${bold}>${r[1]}</text>`;
+    s += `<text x="${cx + 250}" y="${y}" text-anchor="end" font-size="11.5" fill="${C.text}"${bold}>${r[2]}</text>`;
+  });
+
+  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${W} ${H}" width="${W}" height="${H}" font-family="Inter, system-ui, sans-serif">
+    <rect width="${W}" height="${H}" fill="white"/>
+    ${head.svg}
+    ${s}
+    ${chartExportCredit(W, H)}
+  </svg>`;
+}
+
 // ─── visual helpers (one THREE.Group in world coordinates) ─────────────────
 
 function _hiLine(color, n, dashed) {
@@ -14460,7 +14788,11 @@ function createInspectorPanel() {
   const chainKeys = Object.keys(PLANET_HIERARCHIES).filter((k) => PLANET_HIERARCHIES[k].chain);
   panel.innerHTML = `
     <div class="hi-header">
-      <h2>Planet Inspector</h2>
+      <div class="hi-title-block">
+        <h2>Planet Orbit Analysis</h2>
+        <div class="hi-subtitle">Inspect the orbit of date of one planet from the N-body chain — elements, geometry, the orbit picture and the position report vs NASA/JPL</div>
+      </div>
+      <button class="hi-export-btn" title="Export the orbit picture on screen — the orbit of date top-down with its nodes, apsides and the planet (PNG or SVG download)">Export</button>
       <div class="hi-close" title="Close"></div>
     </div>
     <div class="hi-selector">
@@ -14469,7 +14801,6 @@ function createInspectorPanel() {
         ${chainKeys.map((key) => `<option value="${key}">${PLANET_HIERARCHIES[key].label}</option>`).join('')}
       </select>
     </div>
-    <div class="hi-step-indicator">ORBIT OF DATE — the N-body element chain the scene renders</div>
     <div class="hi-body">
       <div class="hi-section">
         <div class="hi-section-title">Chain elements of date</div>
@@ -14491,6 +14822,7 @@ function createInspectorPanel() {
           <div><span style="color:#ffbf00">Amber</span> line and arc: Sun → planet, true anomaly ν at the Sun</div>
           <div><span style="color:#00ffff">Cyan</span> dashed arc: the chain’s mean anomaly M (an angle, drawn at the Sun beside ν)</div>
           <div><span style="color:#00ffff">Cyan</span> ring: the rendered planet</div>
+          <div style="margin-top:6px; color:#8a93a5;">Export — the orbit picture: its month ring puts each month at the Sun’s longitude on the 1st. The Gregorian calendar drifts against the seasons by about a day per 3,300 years, so away from J2000 the vernal equinox leaves March; the four cardinal ticks carry the model’s own dates for the scene year. The outer band carries the IAU constellation boundaries of J2000 with the precession of the equinox of date — a naming of the sidereal direction, not a sky view: over 10⁵ years the stars’ proper motions dissolve the figures.</div>
         </div>
       </div>
       <div class="hi-helpers">
@@ -14525,6 +14857,11 @@ function createInspectorPanel() {
   document.body.appendChild(panel);
 
   panel.querySelector('.hi-close').addEventListener('click', closeHierarchyInspector);
+  // ONE "Export" prints the orbit picture of the selected planet at the scene date
+  panel.querySelector('.hi-export-btn').addEventListener('click', () => {
+    const key = hierarchyInspector.currentPlanet;
+    openChartExportModal(inspectorRenderPaperSVG(key), `Planet Orbit Analysis — ${PLANET_HIERARCHIES[key].label}`);
+  });
   panel.querySelector('.hi-planet-select').addEventListener('change', (e) => {
     hierarchyInspector.currentPlanet = e.target.value;
     updateInspectorDisplay();
@@ -14592,8 +14929,7 @@ function updateInspectorDisplay() {
   if (!H.panel) return;
   const target = PLANET_HIERARCHIES[H.currentPlanet];
   if (!target) return;
-  H.panel.querySelector('.hi-step-indicator').textContent =
-    `${target.label.toUpperCase()} — orbit of date from the N-body element chain the scene renders`;
+  // (the header subtitle is static; the planet's name is the selector's)
   // the report belongs to the planet it was generated for
   const reportEl = H.panel.querySelector('.hi-report'), btns = H.panel.querySelector('.hi-report-buttons');
   if (_currentReportData && _currentReportData.planetKey !== H.currentPlanet) {
@@ -15012,11 +15348,11 @@ function wgcRenderPlanet(planetKey) {
         Earth\u2019s mean ecliptic at J2000, an inertial reference plane. Earth\u2019s current orbital plane
         precesses relative to the invariable plane in ecliptic with period ${Math.round(1296000 / _s3ArcsecPerYr()).toLocaleString('en-US')} yr (the dominant nodal mode s₃).
       </div>
-      <details class="wgc-chart-collapsible">
+      <details class="wgc-chart-collapsible" data-wgc-chart="node">
         <summary>Ascending node longitude vs. Time (\u03A9) \u2014 ecliptic frame, click to expand</summary>
         ${wgcRenderChart('Ascending node longitude vs. Time (\u03A9) \u2014 ecliptic frame', d.yrArr, d.omArr, '#2aa198', '')}
       </details>
-      <details class="wgc-chart-collapsible">
+      <details class="wgc-chart-collapsible" data-wgc-chart="arg">
         <summary>Argument of periapsis vs. Time (\u03C9) \u2014 ecliptic frame, click to expand</summary>
         ${wgcRenderChart('Argument of periapsis vs. Time (\u03C9) \u2014 ecliptic frame', d.yrArr, d.wArr, '#859900', '')}
       </details>
@@ -15100,7 +15436,7 @@ function wgcModelCurves(planetKey, d) {
 // in paper-friendly colors against a near-white plot area.
 function wgcPaperChartPanel(xOff, yOff, W, H, opts) {
   const xmlEsc = s => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
-  const { title, yrArr, values, color, modelValues, label, omitRate } = opts;
+  const { title, yrArr, values, color, modelValues } = opts;
   const m = { top: 30, right: 24, bottom: 32, left: 70 };
   const plotW = W - m.left - m.right;
   const plotH = H - m.top - m.bottom;
@@ -15116,7 +15452,7 @@ function wgcPaperChartPanel(xOff, yOff, W, H, opts) {
 
   const COL_AXIS = '#666', COL_TICK = '#aaa', COL_GRID = '#e8e8e8';
   const COL_PLOT_BG = '#fafafa', COL_FRAME = '#bbb';
-  const COL_TEXT = '#222', COL_DIM = '#666';
+  const COL_TEXT = '#222';
 
   let s = '';
   // Chart title
@@ -15161,104 +15497,76 @@ function wgcPaperChartPanel(xOff, yOff, W, H, opts) {
   const trendY1 = fit.slope * xmax + fit.intercept;
   s += `<line x1="${sx(xmin).toFixed(1)}" y1="${sy(trendY0).toFixed(1)}" x2="${sx(xmax).toFixed(1)}" y2="${sy(trendY1).toFixed(1)}" stroke="${color}" stroke-width="0.8" stroke-dasharray="4,3" opacity="0.6"/>`;
 
-  // Legend (only on chart with model overlay)
-  if (modelValues) {
-    const lx = xOff + m.left + 8, ly = yOff + m.top + 8;
-    s += `<rect x="${lx}" y="${ly}" width="230" height="32" fill="rgba(255,255,255,0.85)" stroke="#ccc" stroke-width="0.5" rx="3"/>`;
-    s += `<line x1="${lx + 6}" y1="${ly + 11}" x2="${lx + 22}" y2="${ly + 11}" stroke="${color}" stroke-width="1.6"/>`;
-    s += `<text x="${lx + 27}" y="${ly + 14}" font-size="10" fill="${COL_TEXT}">Observed (WebGeoCalc, ecliptic)</text>`;
-    s += `<line x1="${lx + 6}" y1="${ly + 24}" x2="${lx + 22}" y2="${ly + 24}" stroke="#cc3333" stroke-width="1.6"/>`;
-    s += `<text x="${lx + 27}" y="${ly + 27}" font-size="10" fill="${COL_TEXT}">Model (ecliptic-frame rate + equatorial projection)</text>`;
-  }
-  // Rate footer (omitted when omitRate is true — for planets whose long-term trend
-  // cannot be determined from the 1900–2026 baseline)
-  const rateArcSecCy = fit.slope * 3600 * 100;
-  if (omitRate) {
-    if (label) s += `<text x="${xOff + m.left}" y="${(yOff + H - 4).toFixed(1)}" font-size="10" fill="${COL_DIM}">${xmlEsc(label)}</text>`;
-  } else {
-    s += `<text x="${xOff + m.left}" y="${(yOff + H - 4).toFixed(1)}" font-size="10" fill="${COL_DIM}">Observed OLS trend: <tspan font-weight="700" fill="${COL_TEXT}">${rateArcSecCy.toFixed(1)} ″/cy</tspan>${label ? ' · ' + xmlEsc(label) : ''}</text>`;
-  }
+  // (the series legend is the page's standard legend row — wgcRenderPaperSVG;
+  // the fitted rates and the baseline read in the panel, not on the picture)
   return s;
 }
 
 // Render the WGC export as a paper-styled self-contained SVG.
-// opts.includeAllCharts: false → just the main perihelion chart; true → 3 stacked charts.
+// opts.node / opts.arg: add the ascending-node / argument-of-periapsis charts
+// under the perihelion chart (the ones expanded on screen).
 function wgcRenderPaperSVG(planetKey, opts) {
   opts = opts || {};
-  const includeAll = !!opts.includeAllCharts;
-  const xmlEsc = s => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  const showNode = !!opts.node, showArg = !!opts.arg;   // the charts expanded on screen
   if (!wgcData || !wgcData[planetKey]) return '<svg xmlns="http://www.w3.org/2000/svg" width="600" height="100"><text x="20" y="50" font-family="Inter,system-ui,sans-serif" font-size="14" fill="#222">WGC data not loaded for ' + planetKey + '</text></svg>';
   const d = wgcData[planetKey];
   const planetName = planetKey[0] + planetKey.slice(1).toLowerCase();
 
-  // Compute rates
-  const piFit = wgcLinearFit(d.yrArr, wgcUnwrap(d.piArr));
-  const rateRawCy = piFit.slope * 3600 * 100;
-  const rateSinCy = (d.rates && d.rates.sinPi != null) ? d.rates.sinPi : rateRawCy;
-  const baselineYr = d.yrArr[d.yrArr.length - 1] - d.yrArr[0];
-  const oscPeriod = d.oscPeriod || 10;
-  const nCycles = baselineYr / oscPeriod;
-  const reliable = nCycles >= 4;
-  const undeterminedTrend = ['VENUS', 'JUPITER', 'SATURN', 'URANUS', 'NEPTUNE'].includes(planetKey.toUpperCase());
   const model = wgcModelCurves(planetKey, d);
 
-  // Layout
+  // The standard export page: title + legend rows, the chart(s), the credit.
+  // The fitted rates, the baseline count and the frame note read in the
+  // panel; the picture carries the series and their axes only.
   const W = 1100;
-  const HEADER_H = 110;
   const CHART_H = 320;
   const CHART_GAP = 16;
-  const FOOTER_H = 36;
-  const numCharts = includeAll ? 3 : 1;
-  const HGT = HEADER_H + numCharts * CHART_H + (numCharts - 1) * CHART_GAP + FOOTER_H;
+  const numCharts = 1 + (showNode ? 1 : 0) + (showArg ? 1 : 0);
+  const COL_OBS = '#1976d2', COL_NODE = '#00796b', COL_ARG = '#558b2f', COL_MODEL = '#cc3333';
+  const legend = [{ name: numCharts > 1 ? 'Observed ϖ = Ω + ω (WebGeoCalc, ecliptic)' : 'Observed (WebGeoCalc, ecliptic)', color: COL_OBS, bold: true }];
+  if (showNode) legend.push({ name: 'Observed Ω', color: COL_NODE });
+  if (showArg) legend.push({ name: 'Observed ω', color: COL_ARG });
+  if (model) legend.push({ name: 'Model (ecliptic-frame rate + equatorial projection)', color: COL_MODEL });
+  legend.push({ name: 'Linear trend (OLS)', color: '#888', dash: '4,3' });
+  const head = chartExportHeader(`Perihelion of Planets Verification — ${planetName}, JPL WebGeoCalc 1900–2026`, legend, W);
+  const HEADER_H = head.bottom + 8;
+  const HGT = HEADER_H + numCharts * CHART_H + (numCharts - 1) * CHART_GAP + CHART_EXPORT_CREDIT_H;
 
-  const COL_TEXT = '#222', COL_DIM = '#555';
   let s = '';
   s += `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${W} ${HGT}" width="${W}" height="${HGT}" font-family="Inter, system-ui, sans-serif">`;
   s += `<rect x="0" y="0" width="${W}" height="${HGT}" fill="#ffffff"/>`;
+  s += head.svg;
 
-  // Header
-  s += `<text x="${W/2}" y="28" text-anchor="middle" font-size="20" font-weight="700" fill="${COL_TEXT}">WebGeoCalc Explorer — ${xmlEsc(planetName)} perihelion precession</text>`;
-  s += `<text x="${W/2}" y="48" text-anchor="middle" font-size="12" fill="${COL_DIM}">Observed angles 1900–2026 from JPL NAIF WebGeoCalc — ecliptic frame (ϖ = Ω + ω)</text>`;
-  // Rate summary
-  const observedLine = undeterminedTrend
-    ? `Observed: ⚠ long-term trend cannot be determined from 1900–2026 baseline (sign flips across sub-windows)`
-    : `Observed: raw OLS ${rateRawCy.toFixed(1)} ″/cy · sin+lin ${rateSinCy.toFixed(1)} ″/cy`;
-  s += `<text x="40" y="72" font-size="12" fill="${COL_TEXT}">${xmlEsc(observedLine)}</text>`;
-  if (model) {
-    const grPart = model.grCy !== null ? ` · the ${model.excessCy.toFixed(2)} is the model's account of the ${model.grCy.toFixed(2)} relativistic advance (same constants) — doc 13 §1.8` : '';
-    const modelLine = `Model: ${model.projectedCy.toFixed(1)} ″/cy = ecliptic-frame rate ${model.latticeCy.toFixed(1)} (${wgcLatticeLabel(planetKey)}) + equatorial projection ${model.excessCy.toFixed(2)} (dα/dλ − 1)${grPart}`;
-    s += `<text x="40" y="88" font-size="12" fill="${COL_TEXT}">${xmlEsc(modelLine)}</text>`;
-  }
-  s += `<text x="40" y="${model ? 104 : 88}" font-size="11" fill="${COL_DIM}">Baseline: ${Math.round(baselineYr)} yr · ${nCycles.toFixed(1)}× dominant oscillation period (${oscPeriod} yr) · ${reliable ? 'raw OLS reliable' : '⚠ too few cycles — use sin+lin'}</text>`;
-
-  // Charts
-  const piLabel = `Baseline: ${d.yrArr[0]}–${Math.round(d.yrArr[d.yrArr.length-1])}`;
-  s += wgcPaperChartPanel(0, HEADER_H, W, CHART_H, {
+  // Charts — the perihelion chart always, the others as expanded on screen
+  let yOff = HEADER_H;
+  s += wgcPaperChartPanel(0, yOff, W, CHART_H, {
     title: 'Longitude of perihelion vs. Time (ϖ = Ω + ω)',
-    yrArr: d.yrArr, values: d.piArr, color: '#1976d2',
-    modelValues: model ? model.values : null, label: piLabel, omitRate: undeterminedTrend,
+    yrArr: d.yrArr, values: d.piArr, color: COL_OBS,
+    modelValues: model ? model.values : null,
   });
-  if (includeAll) {
-    s += wgcPaperChartPanel(0, HEADER_H + CHART_H + CHART_GAP, W, CHART_H, {
+  if (showNode) {
+    yOff += CHART_H + CHART_GAP;
+    s += wgcPaperChartPanel(0, yOff, W, CHART_H, {
       title: 'Ascending node longitude vs. Time (Ω) — ecliptic frame',
-      yrArr: d.yrArr, values: d.omArr, color: '#00796b', modelValues: null, label: '',
+      yrArr: d.yrArr, values: d.omArr, color: COL_NODE, modelValues: null,
     });
-    s += wgcPaperChartPanel(0, HEADER_H + 2 * (CHART_H + CHART_GAP), W, CHART_H, {
+  }
+  if (showArg) {
+    yOff += CHART_H + CHART_GAP;
+    s += wgcPaperChartPanel(0, yOff, W, CHART_H, {
       title: 'Argument of periapsis vs. Time (ω) — ecliptic frame',
-      yrArr: d.yrArr, values: d.wArr, color: '#558b2f', modelValues: null, label: '',
+      yrArr: d.yrArr, values: d.wArr, color: COL_ARG, modelValues: null,
     });
   }
 
-  // Footer
-  const footerY = HGT - 14;
-  s += `<text x="${W/2}" y="${footerY}" text-anchor="middle" font-size="10" fill="${COL_DIM}">Data: JPL NAIF WebGeoCalc · Reference frame: ECLIPJ2000 (Earth's mean ecliptic at J2000, inertial). Earth's current orbital plane precesses relative to the invariable plane in ecliptic with period ${Math.round(1296000 / _s3ArcsecPerYr()).toLocaleString('en-US')} yr (the dominant nodal mode s₃).</text>`;
+  s += chartExportCredit(W, HGT);
   s += '</svg>';
   return s;
 }
 
 // ── Chart export: paper SVG → PNG, shown in an in-app modal ─────────────────
-// Every Tools-panel export (WebGeoCalc, Climate Formula, ESSRT, LOD-Climate
-// Rhythm, Formula Verification) renders a self-contained paper-style SVG
+// Every Tools-panel export (Framework Verification, Perihelion of Planets
+// Verification, Earth–Moon Genesis Analysis, Earth Climate Analysis, dLOD/dt
+// Analysis) renders a self-contained paper-style SVG
 // string — text/line/path/rect/clipPath only, no foreignObject, no external
 // images or stylesheets, width/height on the root. Those SVGs used to be
 // opened as a blob: URL in a new tab: a vector document nobody could save as a
@@ -15305,6 +15613,41 @@ function chartExportDownload(blob, filename) {
   const a = Object.assign(document.createElement('a'), { href: url, download: filename });
   document.body.appendChild(a); a.click(); a.remove();
   setTimeout(() => URL.revokeObjectURL(url), 60000);   // iOS Safari reads the blob after the click returns
+}
+
+// ── The paper-export standard (owner: "only the picture") ───────────────────
+// Every Tools-panel export shares ONE layout: a 16-px title at y = 18, the
+// wrapping legend rows under it (_vfpPaperLegend, first row at y = 34), the
+// plot under the legend, axis and tick labels only, and a 9-px credit in the
+// bottom-right corner. No subtitle, no caption paragraphs, no fitted numbers,
+// no footer sentences — that reading lives in the panels, not in the picture.
+const CHART_EXPORT_CREDIT = 'ESSRT · holisticuniverse.com';
+const CHART_EXPORT_CREDIT_H = 16;    // the strip under the plot the credit sits in
+
+/** Title + legend rows. Returns { svg, bottom } — `bottom` is where the plot may start. */
+function chartExportHeader(title, legendEntries, W) {
+  const entries = legendEntries || [];
+  const legend = _vfpPaperLegend(entries, W);
+  const svg = `<text x="${W / 2}" y="18" text-anchor="middle" fill="#222" font-size="16" font-weight="600" font-family="Inter,Helvetica,Arial,sans-serif">${escapeXml(title)}</text>` + legend.svg;
+  return { svg, bottom: entries.length ? legend.bottom : 30 };
+}
+
+/** The credit line, bottom-right of a W × H page. */
+function chartExportCredit(W, H) {
+  return `<text x="${W - 12}" y="${H - 7}" text-anchor="end" font-size="9" fill="#888" font-family="Inter,Helvetica,Arial,sans-serif">${CHART_EXPORT_CREDIT}</text>`;
+}
+
+// ── One in-flight open per panel ─────────────────────────────────────────────
+// The Tools panels build asynchronously (their data loads first). A second
+// click while one was in flight built a SECOND panel: the first stayed in the
+// DOM, orphaned and unclosable, on top of the second — "when I am quick the
+// panels no longer open" (owner). Further clicks now join the open in flight.
+const _panelOpening = new Map();
+function _openPanelOnce(key, build) {
+  if (_panelOpening.has(key)) return _panelOpening.get(key);
+  const p = (async () => { try { return await build(); } finally { _panelOpening.delete(key); } })();
+  _panelOpening.set(key, p);
+  return p;
 }
 
 /** Show a paper-style chart SVG as a downloadable picture (PNG first, SVG kept). */
@@ -15370,13 +15713,14 @@ function openChartExportModal(svgString, title) {
   });
 }
 
+/** Export the current planet: the perihelion chart plus whichever of the
+ *  node / argument charts are expanded on screen ({ node, arg }). */
 function exportWGCPaper(planetKey, opts) {
   opts = opts || {};
-  const includeAll = !!opts.includeAllCharts;
   if (!wgcData) { alert('WGC data not loaded yet'); return; }
-  const svg = wgcRenderPaperSVG(planetKey, { includeAllCharts: includeAll });
+  const svg = wgcRenderPaperSVG(planetKey, opts);
   const planetName = planetKey[0] + planetKey.slice(1).toLowerCase();
-  openChartExportModal(svg, `WebGeoCalc Explorer — ${planetName} (${includeAll ? 'all 3 charts' : 'perihelion only'})`);
+  openChartExportModal(svg, `Perihelion of Planets Verification — ${planetName}`);
 }
 
 async function createWGCPanel() {
@@ -15397,12 +15741,11 @@ async function createWGCPanel() {
     <div class="wgc-container">
       <div class="wgc-header">
         <div class="wgc-title-block">
-          <div class="wgc-title">WebGeoCalc Explorer</div>
-          <div class="wgc-subtitle">Observed perihelion precession from JPL NAIF WebGeoCalc (1900\u20132026)</div>
+          <div class="wgc-title">Perihelion of Planets Verification</div>
+          <div class="wgc-subtitle">The model vs the observed perihelion precession from JPL NAIF WebGeoCalc (1900\u20132026)</div>
         </div>
         <div class="wgc-controls">
-          <button class="wgc-export-btn" data-wgc-export="perihelion" title="Export the current planet's perihelion chart as a paper-styled picture (PNG or SVG download)">Export perihelion chart</button>
-          <button class="wgc-export-btn" data-wgc-export="all" title="Export the current planet's perihelion + ascending node + argument of periapsis charts as one paper-styled picture (PNG or SVG download)">Export full set</button>
+          <button class="wgc-export-btn" data-wgc-export title="Export the current planet's charts as on screen \u2014 the perihelion chart plus any expanded chart (PNG or SVG download)">Export</button>
         </div>
         <div class="wgc-close" title="Close"></div>
       </div>
@@ -15430,20 +15773,24 @@ async function createWGCPanel() {
     });
   });
 
-  // Event: export buttons (use the currently-selected planet)
-  const exportPerihelionBtn = panel.querySelector('[data-wgc-export="perihelion"]');
-  const exportAllBtn = panel.querySelector('[data-wgc-export="all"]');
-  if (exportPerihelionBtn) exportPerihelionBtn.addEventListener('click', () => exportWGCPaper(wgcSelectedPlanet, { includeAllCharts: false }));
-  if (exportAllBtn) exportAllBtn.addEventListener('click', () => exportWGCPaper(wgcSelectedPlanet, { includeAllCharts: true }));
+  // ONE "Export": the selected planet as on screen — the perihelion chart
+  // plus whichever of the two collapsible charts are expanded
+  const exportBtn = panel.querySelector('[data-wgc-export]');
+  if (exportBtn) exportBtn.addEventListener('click', () => {
+    const open = (key) => { const d = panel.querySelector(`details[data-wgc-chart="${key}"]`); return !!(d && d.open); };
+    exportWGCPaper(wgcSelectedPlanet, { node: open('node'), arg: open('arg') });
+  });
 
   document.body.appendChild(panel);
   return panel;
 }
 
-async function openWGCPanel() {
-  if (wgcPanel) { wgcPanel.remove(); wgcPanel = null; }
-  wgcPanel = await createWGCPanel();
-  wgcPanel.classList.add('visible');
+function openWGCPanel() {
+  return _openPanelOnce('wgc', async () => {
+    if (wgcPanel) { wgcPanel.remove(); wgcPanel = null; }
+    wgcPanel = await createWGCPanel();
+    wgcPanel.classList.add('visible');
+  });
 }
 
 function closeWGCPanel() {
@@ -15484,6 +15831,7 @@ let cfmSelectedProxy = 'd18o';          // only relevant for CENOGRID tab; 'd18o
 // L3 toggle — its contribution is visible as the gap between Total and
 // the L1/L2 alone lines.
 let cfmLayerVisibility = {
+  data:  true,   // the proxy record under the formula (off = the formula alone)
   total: true,
   l1:    true,
   l2:    true,
@@ -16130,7 +16478,7 @@ function cfmRenderChart(tabKey) {
   // Layer legend entries — rendered as an HTML strip above the chart so
   // markers (MPT, iNHG, today, etc.) never collide with the legend box.
   const legendItems = [];
-  legendItems.push({ color: '#8cb4ff', label: proxyLabel, kind: 'data' });
+  if (cfmLayerVisibility.data)  legendItems.push({ color: '#8cb4ff', label: proxyLabel, kind: 'data' });
   if (cfmLayerVisibility.total) legendItems.push({ color: '#ffffff', label: 'Total (L1+L2+L3)', kind: 'total' });
   if (cfmLayerVisibility.l1)    legendItems.push({ color: '#ffe066', label: 'L1 alone (orbital)', kind: 'l1' });
   if (cfmLayerVisibility.l2)    legendItems.push({ color: '#66e0a0', label: 'L2 alone (carbon thermostat)', kind: 'l2' });
@@ -16179,7 +16527,7 @@ function cfmRenderChart(tabKey) {
       ${eventMarkers}
       ${transitionMarkers}
       ${futureMarkers}
-      <path d="${dataPath}" fill="none" stroke="#8cb4ff" stroke-width="1.3" opacity="0.95"/>
+      ${cfmLayerVisibility.data ? `<path d="${dataPath}" fill="none" stroke="#8cb4ff" stroke-width="1.3" opacity="0.95"/>` : ''}
       ${layerPaths}
     </svg>
     ${r2Table}
@@ -16192,18 +16540,16 @@ function cfmRenderChart(tabKey) {
 
 // ───────────────────────────────────────────────────────────────────
 // Paper export — white-background SVG of the current tab.
-// Mirrors renderVFPPaperChart's style (Formula Verification modal).
+// Mirrors renderVFPPaperChart's style (Framework Verification modal).
 //
 // opts.includeData   default true   — overlay the proxy data line
 // opts.layers        default ['total'] — which formula layers to draw
 //                                     subset of ['l1','l2','total']
-// opts.titleSuffix   default ''    — appended to the chart title
 // ───────────────────────────────────────────────────────────────────
 function cfmRenderPaperChart(tabKey, opts) {
   opts = opts || {};
   const includeData = opts.includeData !== false;
   const layers = opts.layers || ['total'];
-  const titleSuffix = opts.titleSuffix || '';
   // SVG/XML entity escaping — proxy labels contain '&' (e.g. "Lisiecki & Raymo")
   // which would break the SVG parser if inserted raw into text elements.
   const xmlEsc = s => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
@@ -16211,23 +16557,22 @@ function cfmRenderPaperChart(tabKey, opts) {
   // Tab → window + title (mirrors cfmRenderChart switch)
   let t_lo, t_hi, title, isCenogrid = false, isEpica = false, isCenco2pip = false;
   switch (tabKey) {
-    case 'past200':    t_lo = 0;    t_hi = 200;   title = 'Climate Formula — Last 200 kyr'; break;
-    case 'postMPT':    t_lo = 0;    t_hi = 700;   title = 'Climate Formula — Post-MPT (0–700 kyr BP)'; break;
-    case 'postMPText': t_lo = 0;    t_hi = 1200;  title = 'Climate Formula — Post-MPT extended (0–1,200 kyr BP)'; break;
-    case 'full':       t_lo = 0;    t_hi = 5320;  title = 'Climate Formula — Full LR04 (0–5,320 kyr BP)'; break;
+    case 'past200':    t_lo = 0;    t_hi = 200;   title = 'Earth Climate Analysis — Last 200 kyr'; break;
+    case 'postMPT':    t_lo = 0;    t_hi = 700;   title = 'Earth Climate Analysis — Post-MPT (0–700 kyr BP)'; break;
+    case 'postMPText': t_lo = 0;    t_hi = 1200;  title = 'Earth Climate Analysis — Post-MPT extended (0–1,200 kyr BP)'; break;
+    case 'full':       t_lo = 0;    t_hi = 5320;  title = 'Earth Climate Analysis — Full LR04 (0–5,320 kyr BP)'; break;
     case 'cenogrid':
       t_lo = 0; t_hi = 67000; isCenogrid = true;
-      title = `Climate Formula — CENOGRID (0–67 Myr BP, ${cfmSelectedProxy === 'd13c' ? 'δ¹³C' : 'δ¹⁸O'})`;
+      title = `Earth Climate Analysis — CENOGRID (0–67 Myr BP, ${cfmSelectedProxy === 'd13c' ? 'δ¹³C' : 'δ¹⁸O'})`;
       break;
     case 'epica':      t_lo = 0;    t_hi = 800;   isEpica = true;
-      title = 'Climate Formula — EPICA CO₂ (0–800 kyr BP)'; break;
+      title = 'Earth Climate Analysis — EPICA CO₂ (0–800 kyr BP)'; break;
     case 'cenco2pip':  t_lo = 0;    t_hi = 66000; isCenco2pip = true;
-      title = 'Climate Formula — CenCO2PIP CO₂ (0–66 Myr BP)'; break;
+      title = 'Earth Climate Analysis — CenCO2PIP CO₂ (0–66 Myr BP)'; break;
     case 'future':     t_lo = -250; t_hi = 250;
-      title = 'Climate Formula — Forward projection (−250 to +250 kyr)'; break;
-    default:           t_lo = 0;    t_hi = 200;   title = 'Climate Formula'; break;
+      title = 'Earth Climate Analysis — Forward projection (−250 to +250 kyr)'; break;
+    default:           t_lo = 0;    t_hi = 200;   title = 'Earth Climate Analysis'; break;
   }
-  if (titleSuffix) title += ' — ' + titleSuffix;
 
   // Data source selection (mirrors cfmRenderChart)
   let dataAges, dataVals, proxyLabel;
@@ -16274,10 +16619,19 @@ function cfmRenderPaperChart(tabKey, opts) {
     l2V.push(evalAt(t, 'l2'));
   }
 
-  // Chart layout — paper-figure size
-  const W = 1000, H = 520, PAD = { l: 80, r: 30, t: 80, b: 70 };
+  // The standard export page: title + legend rows above a 370-px plot,
+  // the credit strip under the axis label (the R² caption reads in the panel)
+  const legendItems = [];
+  if (includeData)              legendItems.push({ name: proxyLabel,                    color: '#1f2937' });
+  if (layers.includes('total')) legendItems.push({ name: 'Total formula (L1+L2+L3)',    color: '#dc2626', bold: true });
+  if (layers.includes('l1'))    legendItems.push({ name: 'L1 only (orbital lines)',     color: '#b45309' });
+  if (layers.includes('l2'))    legendItems.push({ name: 'L2 only (carbon thermostat)', color: '#15803d' });
+  const W = 1000;
+  const head = chartExportHeader(title, legendItems, W);
+  const PAD = { l: 80, r: 30, t: head.bottom + 14, b: 70 };
   const plotW = W - PAD.l - PAD.r;
-  const plotH = H - PAD.t - PAD.b;
+  const plotH = 370;
+  const H = PAD.t + plotH + PAD.b + CHART_EXPORT_CREDIT_H;
 
   // Y-range — locked to data + Total like the modal chart
   const allV = [];
@@ -16374,7 +16728,7 @@ function cfmRenderPaperChart(tabKey, opts) {
     }
     xAxisLabel = 'Calendar year (today ≈ 2000 AD; past ← → future)';
   }
-  const xLabel = `<text x="${PAD.l + plotW / 2}" y="${H - 18}" text-anchor="middle" fill="${colors.axisLabel}" font-size="12" font-weight="500" font-family="Inter,Helvetica,Arial,sans-serif">${xAxisLabel}</text>`;
+  const xLabel = `<text x="${PAD.l + plotW / 2}" y="${H - CHART_EXPORT_CREDIT_H - 18}" text-anchor="middle" fill="${colors.axisLabel}" font-size="12" font-weight="500" font-family="Inter,Helvetica,Arial,sans-serif">${xAxisLabel}</text>`;
 
   // Plot border + clip path
   const plotBorder = `<rect x="${PAD.l}" y="${PAD.t}" width="${plotW}" height="${plotH}" fill="${colors.plotBg}" stroke="${colors.border}" stroke-width="0.5"/>`;
@@ -16461,54 +16815,12 @@ function cfmRenderPaperChart(tabKey, opts) {
     curvePaths += `<path d="${buildPath(fT, totalV)}" fill="none" stroke="${colors.total}" stroke-width="2.2" clip-path="url(#cfm-paper-clip)"/>`;
   }
 
-  // Title
-  const titleText = `<text x="${W / 2}" y="22" text-anchor="middle" fill="${colors.title}" font-size="16" font-weight="700" font-family="Inter,Helvetica,Arial,sans-serif">${xmlEsc(title)}</text>`;
-
-  // R² caption (using stitched / single-regime R² same as modal)
-  let r2Caption = '';
-  if (useLR04Stitch || useCenogridStitch) {
-    let ssRes = 0, ssTot = 0;
-    const dMean = dV.length ? dV.reduce((a, b) => a + b, 0) / dV.length : 0;
-    for (let i = 0; i < dT.length; i++) {
-      const yPred = evalAt(dT[i], 'all');
-      if (!Number.isFinite(yPred)) continue;
-      ssRes += (dV[i] - yPred) ** 2;
-      ssTot += (dV[i] - dMean) ** 2;
-    }
-    const stitchedR2 = ssTot > 0 ? 1 - ssRes / ssTot : NaN;
-    r2Caption = `Stitched fit R² = ${stitchedR2.toFixed(4)}`;
-  } else if (CLIMATE_FORMULA_COEFFS && CLIMATE_FORMULA_COEFFS.regimes[regimeKey]) {
-    const r2 = CLIMATE_FORMULA_COEFFS.regimes[regimeKey].r2;
-    r2Caption = `Per-regime R² = ${r2.l1_l2_l3.toFixed(4)} · L1 = ${r2.l1_only.toFixed(4)} · regime: ${regimeKey}`;
-  }
-  const r2Text = r2Caption
-    ? `<text x="${W / 2}" y="42" text-anchor="middle" fill="${colors.subtitle}" font-size="11" font-family="Inter,Helvetica,Arial,sans-serif">${xmlEsc(r2Caption)}</text>`
-    : '';
-
-  // Legend
-  const legendItems = [];
-  if (includeData)              legendItems.push({ color: colors.data,  label: proxyLabel,                  width: 1.4 });
-  if (layers.includes('total')) legendItems.push({ color: colors.total, label: 'Total formula (L1+L2+L3)',  width: 2.2 });
-  if (layers.includes('l1'))    legendItems.push({ color: colors.l1,    label: 'L1 only (orbital lines)', width: 1.6 });
-  if (layers.includes('l2'))    legendItems.push({ color: colors.l2,    label: 'L2 only (carbon thermostat)', width: 1.6 });
-  const legendY = 62;
-  const legendItemWidths = legendItems.map(c => 28 + c.label.length * 6.0 + 16);
-  const legendTotalW = legendItemWidths.reduce((a, b) => a + b, 0);
-  let legendX = (W - legendTotalW) / 2;
-  let legendSVG = '';
-  legendItems.forEach((it, i) => {
-    legendSVG += `<line x1="${legendX}" y1="${legendY}" x2="${legendX + 22}" y2="${legendY}" stroke="${it.color}" stroke-width="${it.width}"/>`;
-    legendSVG += `<text x="${legendX + 28}" y="${legendY + 4}" fill="${colors.title}" font-size="11" font-family="Inter,Helvetica,Arial,sans-serif">${xmlEsc(it.label)}</text>`;
-    legendX += legendItemWidths[i];
-  });
-
   return `<?xml version="1.0" encoding="UTF-8"?>
 <svg viewBox="0 0 ${W} ${H}" width="${W}" height="${H}" xmlns="http://www.w3.org/2000/svg">
   <rect width="${W}" height="${H}" fill="${colors.bg}"/>
   ${clipDef}
-  ${titleText}
-  ${r2Text}
-  ${legendSVG}
+  ${head.svg}
+  ${chartExportCredit(W, H)}
   ${plotBorder}
   ${yticks}
   ${xticks}
@@ -16533,18 +16845,16 @@ function exportCfmPaper(opts) {
   if (tabKey === 'cenco2pip' && !cfmCenco2pipData) { alert('CenCO2PIP data not loaded yet'); return; }
   const svg = cfmRenderPaperChart(tabKey, opts);
   const titleMap = {
-    past200: 'Climate Formula — Last 200 kyr',
-    postMPT: 'Climate Formula — Post-MPT (0–700 kyr BP)',
-    postMPText: 'Climate Formula — Post-MPT extended',
-    full: 'Climate Formula — Full LR04',
-    cenogrid: 'Climate Formula — CENOGRID',
-    epica: 'Climate Formula — EPICA CO₂',
-    cenco2pip: 'Climate Formula — CenCO2PIP CO₂',
-    future: 'Climate Formula — Forward projection',
+    past200: 'Earth Climate Analysis — Last 200 kyr',
+    postMPT: 'Earth Climate Analysis — Post-MPT (0–700 kyr BP)',
+    postMPText: 'Earth Climate Analysis — Post-MPT extended',
+    full: 'Earth Climate Analysis — Full LR04',
+    cenogrid: 'Earth Climate Analysis — CENOGRID',
+    epica: 'Earth Climate Analysis — EPICA CO₂',
+    cenco2pip: 'Earth Climate Analysis — CenCO2PIP CO₂',
+    future: 'Earth Climate Analysis — Forward projection',
   };
-  let docTitle = titleMap[tabKey] || 'Climate Formula';
-  if (opts.titleSuffix) docTitle += ' — ' + opts.titleSuffix;
-  openChartExportModal(svg, docTitle);
+  openChartExportModal(svg, titleMap[tabKey] || 'Earth Climate Analysis');
 }
 
 async function createClimateFormulaPanel() {
@@ -16582,6 +16892,7 @@ async function createClimateFormulaPanel() {
   const layerToggles = `
     <div class="cfm-layer-toggles">
       <span class="cfm-layer-toggles-label">Layers:</span>
+      <label class="cfm-layer-check" title="The proxy record under the formula (LR04, CENOGRID, EPICA or CenCO2PIP per tab). Off = the formula alone — the Export prints what is on screen."><input type="checkbox" data-layer="data" ${cfmLayerVisibility.data ? 'checked' : ''}> Proxy data</label>
       <label class="cfm-layer-check" title="Total formula = baseline + L1 + L2 + L3 (the complete prediction at each timestamp). The L1/L2/L3 toggles below show the same formula evaluated cumulatively — each one ADDS the next layer to the previous, so toggling them on in sequence builds up to the Total."><input type="checkbox" data-layer="total" ${cfmLayerVisibility.total ? 'checked' : ''}/><span class="cfm-swatch cfm-swatch-total"></span>Total</label>
       <label class="cfm-layer-check" title="L1 only — Orbital forcing applied to the baseline.
 Displayed curve = baseline + L1 contributions (the formula's prediction with ONLY L1 enabled).
@@ -16615,10 +16926,9 @@ Note: L1, L2, and Total each carry the baseline once — they do NOT visually su
     <div class="cfm-overlay"></div>
     <div class="cfm-container">
       <div class="cfm-header">
-        <div class="cfm-title">Climate Formula Explorer</div>
-        <div class="cfm-subtitle">Per-regime decomposition of paleoclimate proxies into orbital (L1) + carbon-cycle (L2) + boundary-condition (L3) layers</div>
-        <button class="cfm-export-btn" data-cfm-export="formula-only" title="Export the current tab as a paper-style picture showing ONLY the model formula curve (no data overlay); PNG or SVG download">Export Formula Only</button>
-        <button class="cfm-export-btn" data-cfm-export="paper" title="Export the current tab as a paper-style picture (white background, formula curve + proxy data overlay); PNG or SVG download">Export Formula &amp; Data</button>
+        <div class="cfm-title">Earth Climate Analysis</div>
+        <div class="cfm-subtitle">The climate formula vs the proxy records — orbital (L1) + carbon-cycle (L2) + boundary-condition (L3) layers, fitted per regime</div>
+        <button class="cfm-export-btn" data-cfm-export title="Export the current tab with the layers toggled on screen as a picture (PNG or SVG download)">Export</button>
         <div class="cfm-close" title="Close"></div>
       </div>
       <div class="cfm-body">
@@ -16682,35 +16992,25 @@ Note: L1, L2, and Total each carry the baseline once — they do NOT visually su
     });
   });
 
-  // Export buttons. "Formula Only" is contextual — only the LR04 windows
-  // (postMPT / postMPText / full / future) have a meaningful "formula
-  // without overlay" view; for CENOGRID / EPICA / CenCO2PIP the proxy
-  // data IS the comparison story, so the secondary button is hidden.
-  const exportFormulaOnlyBtn = panel.querySelector('[data-cfm-export="formula-only"]');
-  const exportPaperBtn       = panel.querySelector('[data-cfm-export="paper"]');
-  function updateExportButtonVisibility() {
-    const lr04Tab = cfmSelectedTab === 'postMPT' || cfmSelectedTab === 'postMPText'
-                    || cfmSelectedTab === 'full' || cfmSelectedTab === 'past200'
-                    || cfmSelectedTab === 'future';
-    if (exportFormulaOnlyBtn) exportFormulaOnlyBtn.style.display = lr04Tab ? '' : 'none';
-  }
-  updateExportButtonVisibility();
-  if (exportPaperBtn) exportPaperBtn.addEventListener('click', () => exportCfmPaper({ includeData: true,  layers: ['total'], titleSuffix: 'Formula & Data' }));
-  if (exportFormulaOnlyBtn) exportFormulaOnlyBtn.addEventListener('click', () => exportCfmPaper({ includeData: false, layers: ['total'], titleSuffix: 'Formula only' }));
-
-  // Update export-button visibility whenever the tab changes
-  panel.querySelectorAll('.cfm-tab').forEach(tab => {
-    tab.addEventListener('click', updateExportButtonVisibility);
-  });
+  // ONE "Export" prints the current view: the tab on screen with the
+  // layers toggled on screen (the former "formula only" picture is the
+  // Proxy-data toggle off).
+  const exportBtn = panel.querySelector('[data-cfm-export]');
+  if (exportBtn) exportBtn.addEventListener('click', () => exportCfmPaper({
+    includeData: cfmLayerVisibility.data,
+    layers: ['total', 'l1', 'l2'].filter((k) => cfmLayerVisibility[k]),
+  }));
 
   document.body.appendChild(panel);
   return panel;
 }
 
-async function openClimateFormulaPanel() {
-  if (climateFormulaPanel) { climateFormulaPanel.remove(); climateFormulaPanel = null; }
-  climateFormulaPanel = await createClimateFormulaPanel();
-  climateFormulaPanel.classList.add('visible');
+function openClimateFormulaPanel() {
+  return _openPanelOnce('cfm', async () => {
+    if (climateFormulaPanel) { climateFormulaPanel.remove(); climateFormulaPanel = null; }
+    climateFormulaPanel = await createClimateFormulaPanel();
+    climateFormulaPanel.classList.add('visible');
+  });
 }
 
 function closeClimateFormulaPanel() {
@@ -17270,22 +17570,14 @@ function essrtRenderPaperChart(qtyKey, rangeKey) {
   const xmlEsc = (s) => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 
   const W = 1200, H = 720;
-  // SVG text does not wrap: split the subtitle into lines on a character
-  // budget from the plot width (12 px Inter ≈ 0.52 em per char — measured
-  // 5.8 px at 12 px), and open the top margin per extra line so the frame
-  // and the Wu legend stay clear.
-  const subtitleLines = (() => {
-    const budget = Math.floor((W - 130 - 50) / (12 * 0.52));
-    const lines = []; let cur = '';
-    for (const word of String(spec.subtitle).split(/\s+/)) {
-      if (cur && (cur + ' ' + word).length > budget) { lines.push(cur); cur = word; }
-      else cur = cur ? cur + ' ' + word : word;
-    }
-    if (cur) lines.push(cur);
-    return lines;
-  })();
-  const SUB_LINE_H = 15;
-  const margin = { top: subtitleLines.length > 1 ? 102 + SUB_LINE_H * (subtitleLines.length - 1) : 90, right: 50, bottom: 110, left: 130 };
+  // The standard export page: title + legend rows (the model line; the Wu
+  // anchors when shown), a plot of fixed height, the axis labels, the credit.
+  // The panel's subtitle paragraph reads on screen, not on the picture.
+  const wuShow = spec.hasWu && rangeKey === 'phanero';
+  const legend = [{ name: spec.title + ' — model', color: '#1a5fb4', bold: true }];
+  if (wuShow) legend.push({ name: 'Wu et al. 2024 (±2σ)', color: '#e07b00', marker: 'dot' });
+  const head = chartExportHeader(spec.title + ' — ' + range.label, legend, W);
+  const margin = { top: head.bottom + 14, right: 50, bottom: 110, left: 130 };
   const plotW = W - margin.left - margin.right;
   const plotH = H - margin.top - margin.bottom;
 
@@ -17293,7 +17585,6 @@ function essrtRenderPaperChart(qtyKey, rangeKey) {
 
   // Y range — per-range override first, then spec's declared cap, then auto.
   let yMin, yMax;
-  const wuShow = spec.hasWu && rangeKey === 'phanero';
   const yOverride = spec.yRangeOverrides && spec.yRangeOverrides[rangeKey];
   if (yOverride && Number.isFinite(yOverride.yMin) && Number.isFinite(yOverride.yMax)) {
     yMin = yOverride.yMin; yMax = yOverride.yMax;
@@ -17424,11 +17715,6 @@ function essrtRenderPaperChart(qtyKey, rangeKey) {
         <circle cx="${xt}" cy="${yt}" r="5" fill="#e07b00" stroke="#fff" stroke-width="1"/>`;
     }).join('');
   }
-  const wuLegend = wuShow ? `<a href="https://www.science.org/doi/10.1126/sciadv.ado2412" target="_blank" rel="noopener">
-    <circle cx="${margin.left + plotW - 240}" cy="${margin.top - 30}" r="5" fill="#e07b00" stroke="#fff" stroke-width="1"/>
-    <text x="${margin.left + plotW - 228}" y="${margin.top - 26}" font-size="12" fill="#1858a6" text-decoration="underline">Wu et al. 2024 (±2σ)</text>
-  </a>` : '';
-
   const frame = `<rect x="${margin.left}" y="${margin.top}" width="${plotW}" height="${plotH}" fill="white" stroke="#222" stroke-width="0.8"/>`;
 
   // Extrapolation zone — anything future of J2000. Subtle grey wash so the
@@ -17452,17 +17738,12 @@ function essrtRenderPaperChart(qtyKey, rangeKey) {
       <text x="${xStart + zoneW / 2}" y="${margin.top + 18}" font-size="11" fill="#666" opacity="0.9" text-anchor="middle" font-style="italic" font-weight="500">Extrapolation</text>
     `;
   }
-  const title    = `<text x="${margin.left + plotW / 2}" y="${36}" text-anchor="middle" font-size="20" fill="#111" font-weight="600">${xmlEsc(spec.title)}</text>`;
-  const subtitle = `<text x="${margin.left + plotW / 2}" y="${62}" text-anchor="middle" font-size="12" fill="#555">` +
-    subtitleLines.map((l, i) => `<tspan x="${margin.left + plotW / 2}" dy="${i === 0 ? 0 : SUB_LINE_H}">${xmlEsc(l)}</tspan>`).join('') + `</text>`;
   const yAxisLabel = `<text x="${36}" y="${margin.top + plotH / 2}" text-anchor="middle" font-size="13" fill="#222" transform="rotate(-90 36 ${margin.top + plotH / 2})">${xmlEsc(spec.yLabel)}</text>`;
-  const xAxisLabel = `<text x="${margin.left + plotW / 2}" y="${H - 14}" text-anchor="middle" font-size="13" fill="#222">Time (Ma; negative = past, 0 = J2000) — Range: ${xmlEsc(range.label)}</text>`;
-  const credit     = `<text x="${W - 16}" y="${H - 6}" text-anchor="end" font-size="9" fill="#888">ESSRT Explorer · holisticuniverse.com</text>`;
+  const xAxisLabel = `<text x="${margin.left + plotW / 2}" y="${H - 18}" text-anchor="middle" font-size="13" fill="#222">Time (Ma; negative = past, 0 = J2000)</text>`;
 
   return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${W} ${H}" width="${W}" height="${H}" font-family="Inter, system-ui, sans-serif">
     <rect width="${W}" height="${H}" fill="white"/>
-    ${title}
-    ${subtitle}
+    ${head.svg}
     ${frame}
     ${extrapolationZone}
     ${yticks.join('')}
@@ -17470,10 +17751,9 @@ function essrtRenderPaperChart(qtyKey, rangeKey) {
     ${eraMarkers}
     ${dataPath}
     ${wuOverlay}
-    ${wuLegend}
     ${yAxisLabel}
     ${xAxisLabel}
-    ${credit}
+    ${chartExportCredit(W, H)}
   </svg>`;
 }
 
@@ -17481,7 +17761,7 @@ function essrtExport(rangeKey) {
   const svg = essrtRenderPaperChart(essrtSelectedQty, rangeKey);
   const range = ESSRT_RANGE_TABS.find(r => r.key === rangeKey);
   const spec = ESSRT_QTY_SPECS[essrtSelectedQty];
-  openChartExportModal(svg, `ESSRT — ${spec.title} — ${range.label}`);
+  openChartExportModal(svg, `Earth–Moon Genesis Analysis — ${spec.title} — ${range.label}`);
 }
 
 async function createEssrtPanel() {
@@ -17500,11 +17780,10 @@ async function createEssrtPanel() {
     <div class="cfm-container">
       <div class="cfm-header">
         <div style="display:flex; flex-direction:column; align-items:flex-start; flex:1; min-width:0">
-          <div class="cfm-title">Expanding Solar System Resonance Theory (ESSRT)</div>
-          <div class="cfm-subtitle" style="margin:2px 0 0 0; font-size:11px; color:#9b9b9b; line-height:1.4">Earth's clock is the mean lunisolar precession period — and it <strong>lengthens monotonically in time</strong>: shorter in the past, longer in the future, as tidal friction slows the spin and the receding Moon weakens its torque. The precession-band climate lines ride it; the planetary eccentricity beats do not.</div>
+          <div class="cfm-title">Earth–Moon Genesis Analysis</div>
+          <div class="cfm-subtitle">The model's own evolution from Earth–Moon genesis (−4.5 Gyr) to +1 Gyr — the clock lengthens as tidal friction slows the spin and the receding Moon weakens its torque</div>
         </div>
-        <button class="cfm-export-btn" data-essrt-export="full"    title="Export this chart over the FULL (−4.54 to +1 Gyr) time range as a paper-style picture (white background); PNG or SVG download">Export Full</button>
-        <button class="cfm-export-btn" data-essrt-export="phanero" title="Export this chart over the Phanerozoic 650 Ma window as a paper-style picture (white background); PNG or SVG download">Export Phanerozoic</button>
+        <button class="cfm-export-btn" data-essrt-export title="Export the quantity and time range on screen as a picture (PNG or SVG download)">Export</button>
         <div class="cfm-close" title="Close"></div>
       </div>
       <div class="cfm-body">
@@ -17614,10 +17893,9 @@ async function createEssrtPanel() {
     });
   });
 
-  // Export buttons (top-right in header)
-  panel.querySelectorAll('[data-essrt-export]').forEach(btn => {
-    btn.addEventListener('click', () => essrtExport(btn.getAttribute('data-essrt-export')));
-  });
+  // ONE "Export" (top-right in header) prints the quantity + range on screen
+  const exportBtn = panel.querySelector('[data-essrt-export]');
+  if (exportBtn) exportBtn.addEventListener('click', () => essrtExport(essrtSelectedRange));
 
   document.body.appendChild(panel);
   requestAnimationFrame(() => panel.classList.add('visible'));
@@ -17626,9 +17904,11 @@ async function createEssrtPanel() {
   return panel;
 }
 
-async function openEssrtPanel() {
-  if (essrtPanel) { essrtPanel.remove(); essrtPanel = null; }
-  essrtPanel = await createEssrtPanel();
+function openEssrtPanel() {
+  return _openPanelOnce('essrt', async () => {
+    if (essrtPanel) { essrtPanel.remove(); essrtPanel = null; }
+    essrtPanel = await createEssrtPanel();
+  });
 }
 
 function closeEssrtPanel() {
@@ -17692,7 +17972,7 @@ const LCR_BOND_EVENTS = [
 //   - CHART overlay = GISP2 Alley 2000 (Greenland temperature) — smoothest
 //     signal across the Holocene window, best for visual overlay.
 //   - CHART overlay (deep) = LR04 benthic stack (Lisiecki & Raymo 2005),
-//     derived at load from the Climate Formula Explorer's lr04-data.json as
+//     derived at load from the Earth Climate Analysis's lr04-data.json as
 //     inverted δ¹⁸O anomaly — covers the full 200-kyr glacial tab where
 //     GISP2 runs out (~27,950 BC).
 //   - CORRELATION target = Bond 2001 IRD stack — Bond's OWN dataset, the
@@ -18106,7 +18386,7 @@ async function lcrLoadProxyData() {
       src.dataDetrended = lcrDetrendSeries(src.data, 5000);
     }
   }
-  // Derive the LR04 overlay source from the Climate Formula Explorer's data
+  // Derive the LR04 overlay source from the Earth Climate Analysis's data
   // file: inverted benthic δ¹⁸O anomaly vs core-top (positive = warm), same
   // sign convention as the Bond IRD source. 1-kyr native resolution; clipped
   // to the widest LCR tab (200,000 BC) to keep the series small.
@@ -18635,13 +18915,18 @@ ${esc(src.region)} • ${esc(src.unit)}</title></path>`;
   </svg>`;
 }
 
-/** Export the currently-visible LOD-Climate Rhythm chart as a paper-style
+/** Export the currently-visible Earth dLOD/dt Analysis chart as a paper-style
  *  SVG (white background, dark text) in a new tab. Reuses lcrRenderChart's
  *  output — strips hover overlays, remaps dark-theme colors to light-theme
  *  equivalents, and wraps in an outer SVG with title, subtitle, and footer.
  *  Curve/band colors are kept as-is — they read fine on white too. */
 function lcrExport() {
-  const rangeKey = lcrSelectedRange;
+  const range = LCR_RANGE_TABS.find(r => r.key === lcrSelectedRange) || LCR_RANGE_TABS[0];
+  openChartExportModal(lcrRenderPaperSVG(range.key), `Earth dLOD/dt Analysis — ${range.label}`);
+}
+
+/** The Earth dLOD/dt Analysis paper form for one range tab (the export's picture). */
+function lcrRenderPaperSVG(rangeKey) {
   const range = LCR_RANGE_TABS.find(r => r.key === rangeKey) || LCR_RANGE_TABS[0];
 
   // 1. Get the interactive chart SVG, then strip the outer <svg> wrapper so
@@ -18712,114 +18997,37 @@ function lcrExport() {
   inner = inner.replace(/(<text[^>]+)font-size="11"([^>]*>Calendar year)/,   '$1font-size="13"$2');
   inner = inner.replace(/(<text[^>]+)font-size="11"([^>]*>Temperature anom)/,'$1font-size="13"$2');
 
-  // 4. Pull the validated-window Bond 2001 IRD correlation for the subtitle.
-  const corr = lcrComputeCorrelations(-4000, 1800);
-  const rTxt = (corr && corr.r_stack != null)
-    ? `${corr.r_stack >= 0 ? '+' : ''}${corr.r_stack.toFixed(2)}`
-    : 'n/a';
-
-  // 5. Compose the outer paper SVG. Chart is 1100x420; add margin for
-  //    title, subtitle, a horizontal legend row above the chart, and a
-  //    one-line footer below. Typography matches the ESSRT paper export:
-  //    centered title (20pt, weight 600, #111), centered subtitle (12pt,
-  //    #555), centered legend (12pt, #333), and a right-aligned credit
-  //    line at 9pt #888.
+  // 4. Compose the standard export page: title + legend rows (one entry per
+  //    visible layer, swatches in the PRINT palette so they match the
+  //    recolored curves), the 1100×420 chart, the credit. The Bond
+  //    correlation sentence and the fit provenance read in the panel.
   const chartW = 1100, chartH = 420;
   const chartX = 50;
-  const legendY = 94;                      // baseline of legend row
-  const chartY  = legendY + 22;            // chart starts below the legend
   const outerW  = chartW + 100;
-  const outerH  = chartY + chartH + 44;    // footer sits at bottom
-  const xmlEsc = (s) => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
-
-  // Legend row — one entry per currently-visible layer. Swatches use the
-  // PRINT palette so they match the darkened curves in the recolored chart.
-  // Widths are approximate (~6.4 px per character at font-size 12) so the
-  // row can be pre-measured and centered without touching the DOM.
   const legendEntries = [];
-  const swatchW = 26;
-  const swatchLabelGap = 7;
-  const entryGap = 26;
-  if (lcrLayerVisibility.tidal) {
-    legendEntries.push({
-      swatch: `<line x1="0" y1="0" x2="${swatchW}" y2="0" stroke="${PRINT.rust}" stroke-width="1.6" stroke-dasharray="4,3"/>`,
-      label: 'Tidal (L1)',
-    });
-  }
-  if (lcrLayerVisibility.netL2) {
-    legendEntries.push({
-      swatch: `<line x1="0" y1="0" x2="${swatchW}" y2="0" stroke="${PRINT.teal}" stroke-width="2.2"/>`,
-      label: '+ GIA (L2)',
-    });
-  }
-  if (lcrLayerVisibility.netL3) {
-    legendEntries.push({
-      swatch: `<line x1="0" y1="0" x2="${swatchW}" y2="0" stroke="${PRINT.gold}" stroke-width="1.6" stroke-dasharray="6,3"/>`,
-      label: '+ Cycles (L3)',
-    });
-  }
-  if (lcrLayerVisibility.netL4) {
-    legendEntries.push({
-      swatch: `<line x1="0" y1="0" x2="${swatchW}" y2="0" stroke="${PRINT.orange}" stroke-width="2.4"/>`,
-      label: '+ Core-mantle (L4)',
-    });
-  }
-  if (lcrLayerVisibility.bands) {
-    legendEntries.push({
-      swatch: `<rect x="0" y="-5" width="${swatchW / 2}" height="10" fill="${PRINT.warmBand}" opacity="0.35"/><rect x="${swatchW / 2}" y="-5" width="${swatchW / 2}" height="10" fill="${PRINT.coldBand}" opacity="0.35"/>`,
-      label: 'Periods (warm / cold)',
-    });
-  }
-  if (lcrLayerVisibility.bondCurve) {
-    legendEntries.push({
-      swatch: `<line x1="0" y1="0" x2="${swatchW}" y2="0" stroke="${PRINT.lavender}" stroke-width="1.4" stroke-dasharray="5,3"/>`,
-      label: 'Bond cycle',
-    });
-  }
-  if (lcrLayerVisibility.resonator) {
-    legendEntries.push({
-      swatch: `<line x1="0" y1="0" x2="${swatchW}" y2="0" stroke="${PRINT.resGreen}" stroke-width="1.6"/>`,
-      label: 'Core-mantle swing (isolated)',
-    });
-  }
-  if (lcrLayerVisibility.proxy) {
-    legendEntries.push({
-      swatch: `<line x1="0" y1="0" x2="${swatchW}" y2="0" stroke="${PRINT.pink}" stroke-width="1.8"/>`,
-      label: 'Temp. (GISP2)',
-    });
-  }
-  if (lcrLayerVisibility.proxyLR04) {
-    legendEntries.push({
-      swatch: `<line x1="0" y1="0" x2="${swatchW}" y2="0" stroke="${PRINT.green}" stroke-width="1.8"/>`,
-      label: 'Temp. (LR04, −δ¹⁸O)',
-    });
-  }
-
-  const itemWidths = legendEntries.map(e => swatchW + swatchLabelGap + e.label.length * 6.4);
-  const totalLegendW = itemWidths.reduce((a, b) => a + b, 0) + entryGap * Math.max(0, legendEntries.length - 1);
-  let legendX = Math.max(24, (outerW - totalLegendW) / 2);
-  const legendSvg = legendEntries.map((e, i) => {
-    const item = `<g transform="translate(${legendX}, ${legendY})">
-      ${e.swatch}
-      <text x="${swatchW + swatchLabelGap}" y="4" font-size="12" fill="#333333">${xmlEsc(e.label)}</text>
-    </g>`;
-    legendX += itemWidths[i] + entryGap;
-    return item;
-  }).join('');
+  if (lcrLayerVisibility.tidal)     legendEntries.push({ name: 'Tidal (L1)', color: PRINT.rust, dash: '4,3' });
+  if (lcrLayerVisibility.netL2)     legendEntries.push({ name: '+ GIA (L2)', color: PRINT.teal, bold: true });
+  if (lcrLayerVisibility.netL3)     legendEntries.push({ name: '+ Cycles (L3)', color: PRINT.gold, dash: '6,3' });
+  if (lcrLayerVisibility.netL4)     legendEntries.push({ name: '+ Core-mantle (L4)', color: PRINT.orange, bold: true });
+  if (lcrLayerVisibility.bands)     legendEntries.push({ name: 'Warm periods', color: PRINT.warmBand, marker: 'rect' }, { name: 'Cold periods', color: PRINT.coldBand, marker: 'rect' });
+  if (lcrLayerVisibility.bondCurve) legendEntries.push({ name: 'Bond cycle', color: PRINT.lavender, dash: '5,3' });
+  if (lcrLayerVisibility.resonator) legendEntries.push({ name: 'Core-mantle swing (isolated)', color: PRINT.resGreen });
+  if (lcrLayerVisibility.proxy)     legendEntries.push({ name: 'Temp. (GISP2)', color: PRINT.pink });
+  if (lcrLayerVisibility.proxyLR04) legendEntries.push({ name: 'Temp. (LR04, −δ¹⁸O)', color: PRINT.green });
+  const head = chartExportHeader(`Earth dLOD/dt Analysis — ${range.label}`, legendEntries, outerW);
+  const chartY  = head.bottom + 8;
+  const outerH  = chartY + chartH + CHART_EXPORT_CREDIT_H;
 
   const paperSvg = `<?xml version="1.0" encoding="UTF-8"?>
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${outerW} ${outerH}" width="${outerW}" height="${outerH}" font-family="Inter, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif">
   <rect width="${outerW}" height="${outerH}" fill="#ffffff"/>
-  <text x="${outerW / 2}" y="38" text-anchor="middle" font-size="20" font-weight="600" fill="#111">LOD–Climate Rhythm — ${xmlEsc(range.label)}</text>
-  <text x="${outerW / 2}" y="64" text-anchor="middle" font-size="12" fill="#555">Framework's cyclic LOD-rate modulation (Tidal + GIA + cycles + Core-mantle swing) versus Bond 2001 IRD — r = ${rTxt} in the validated window (4,000 BC – 1,800 AD).</text>
-  ${legendSvg}
+  ${head.svg}
   <g transform="translate(${chartX}, ${chartY})">
     ${inner}
   </g>
-  <text x="${outerW - 16}" y="${outerH - 10}" text-anchor="end" font-size="9" fill="#888">LOD-Climate Rhythm · ESSRT · holisticuniverse.com · Out-of-sample retrodiction (fit: Espenak ΔT 1650–2017, no climate proxies)</text>
+  ${chartExportCredit(outerW, outerH)}
 </svg>`;
-
-  openChartExportModal(paperSvg, `LOD–Climate Rhythm — ${range.label}`);
+  return paperSvg;
 }
 
 async function createLcrPanel() {
@@ -18844,7 +19052,7 @@ async function createLcrPanel() {
       <label class="cfm-layer-check" title="Bond harmonic (1466 yr; the stack’s n = 1830 line) ISOLATED from the 4-cycle stack. A clean 1466-yr sinusoid. TESTED: its phase does NOT align with Bond's own IRD record — band-limited projection puts the two ~175° apart, essentially anti-phase, and allowing a drifting phase does not recover alignment (PLV p = 0.49). The harmonic earns its place as a ΔT correction, not as a reproduction of the Bond climate cycle. Full-stack prediction has additional Hallstatt / Jose5 / Jose4 crossings on top of this."><input type="checkbox" data-lcr-layer="bondCurve" ${lcrLayerVisibility.bondCurve ? 'checked' : ''}/><span class="lcr-swatch lcr-swatch-bondcurve"></span>Bond</label>
       <label class="cfm-layer-check" title="Core-mantle swing episode ISOLATED (Resonator driver — the 4th dLOD/dt channel): impulse-consistent damped oscillation of the core eigenmode (T₀ ≈ 3,916 yr, Q = 1.8), excitation −1600, termination +1600, zero before and after. Rendered on the Net L2 baseline like the Bond curve. See docs/104."><input type="checkbox" data-lcr-layer="resonator" ${lcrLayerVisibility.resonator ? 'checked' : ''}/><span class="lcr-swatch lcr-swatch-resonator"></span>Core</label>
       <label class="cfm-layer-check" title="GISP2 Alley 2000 Greenland ice-core temperature reconstruction on the secondary right-hand °C-anomaly axis. Independent paleoclimate reconstruction — not part of the framework fit. Covers 27,950 BC to 1850 AD at 100-yr resolution, with two anchor points appended at 1950 and 2000 AD for visual continuity to the modern era."><input type="checkbox" data-lcr-layer="proxy" ${lcrLayerVisibility.proxy ? 'checked' : ''}/><span class="lcr-swatch lcr-swatch-proxy"></span>GISP2</label>
-      <label class="cfm-layer-check" title="LR04 global benthic δ¹⁸O stack (Lisiecki & Raymo 2005, 57 sites) shown as inverted anomaly vs core-top on the secondary axis — positive = warm, same sign convention as the Bond IRD panel. Independent paleoclimate reconstruction — not part of the framework fit; the same dataset the Climate Formula Explorer fits against. 1-kyr resolution; covers the full 200,000 BC tab where GISP2 ends (~27,950 BC)."><input type="checkbox" data-lcr-layer="proxyLR04" ${lcrLayerVisibility.proxyLR04 ? 'checked' : ''}/><span class="lcr-swatch lcr-swatch-proxylr04"></span>LR04</label>
+      <label class="cfm-layer-check" title="LR04 global benthic δ¹⁸O stack (Lisiecki & Raymo 2005, 57 sites) shown as inverted anomaly vs core-top on the secondary axis — positive = warm, same sign convention as the Bond IRD panel. Independent paleoclimate reconstruction — not part of the framework fit; the same dataset the Earth Climate Analysis fits against. 1-kyr resolution; covers the full 200,000 BC tab where GISP2 ends (~27,950 BC)."><input type="checkbox" data-lcr-layer="proxyLR04" ${lcrLayerVisibility.proxyLR04 ? 'checked' : ''}/><span class="lcr-swatch lcr-swatch-proxylr04"></span>LR04</label>
     </div>
   `;
 
@@ -18859,9 +19067,9 @@ async function createLcrPanel() {
     <div class="cfm-overlay"></div>
     <div class="cfm-container">
       <div class="cfm-header">
-        <div class="cfm-title">LOD-Climate Rhythm</div>
-        <div class="cfm-subtitle">Framework's cyclic LOD-rate modulation, compared against paleoclimate proxy data</div>
-        <button class="cfm-export-btn" data-lcr-export title="Export the current chart (with the layers currently toggled) as a paper-style picture — white background, dark text; PNG or SVG download.">Export LOD-Climate graph</button>
+        <div class="cfm-title">Earth dLOD/dt Analysis</div>
+        <div class="cfm-subtitle">The day-length rate decomposed into its drivers, vs named climate periods and the GISP2 / LR04 temperature proxies</div>
+        <button class="cfm-export-btn" data-lcr-export title="Export the current chart with the layers toggled on screen as a picture (PNG or SVG download)">Export</button>
         <div class="cfm-close" title="Close"></div>
       </div>
       <div class="cfm-body">
@@ -19032,14 +19240,16 @@ async function createLcrPanel() {
   return panel;
 }
 
-async function openLcrPanel() {
-  if (lcrPanel) { lcrPanel.remove(); lcrPanel = null; }
-  // Wipe series cache — range specs (LCR_RANGE_TABS) can change between
-  // sessions during development, and cached samples over stale windows
-  // would render at the wrong X-scale.
-  for (const k of Object.keys(_lcrSeriesCache)) delete _lcrSeriesCache[k];
-  await lcrLoadProxyData();
-  lcrPanel = await createLcrPanel();
+function openLcrPanel() {
+  return _openPanelOnce('lcr', async () => {
+    if (lcrPanel) { lcrPanel.remove(); lcrPanel = null; }
+    // Wipe series cache — range specs (LCR_RANGE_TABS) can change between
+    // sessions during development, and cached samples over stale windows
+    // would render at the wrong X-scale.
+    for (const k of Object.keys(_lcrSeriesCache)) delete _lcrSeriesCache[k];
+    await lcrLoadProxyData();
+    lcrPanel = await createLcrPanel();
+  });
 }
 
 function closeLcrPanel() {
@@ -20186,7 +20396,7 @@ const VFP_CATEGORIES = [
   {
     // ── Milankovitch Overview (owner-requested, after the classic stacked
     // figure): the model's own curves on one time axis with the two proxy
-    // records the Climate Formula Explorer already loads. Its own four
+    // records the Earth Climate Analysis already loads. Its own four
     // windows (the figure's ±800 kyr among them); "Export" prints the
     // current one.
     id: 'milankovitch-overview', group: 'Earth cycles', label: 'Milankovitch Overview',
@@ -20608,28 +20818,21 @@ function _vfpPIPaperSvg(range) {
   const ph = H - PAD.t - PAD.b;
   const fmtY = (y) => y === 0 ? '0' : Math.abs(y).toLocaleString('en-US') + (y < 0 ? ' BC' : ' AD');
   const title = 'Inclination of all planets — ' + (tab === 'ecl' ? 'to the J2000 ecliptic' : 'to the invariable plane') + ', ' + fmtY(S.y0) + ' → ' + fmtY(S.y1);
-  const P = _vfpPINoteParts(tab, on, core);
-  const cap = _vfpPaperCaption(P, PAD.l, 130);   // the standard caption under the export
-  // centered legend rows between title and plot (the renderVFPPaperChart
-  // convention: 22px swatches, 11px text); standalone SVG is strict XML,
-  // so every text line — legend names, title, notes — goes through
-  // escapeXml (the La2010 "A&A 532 A89" citation was an EntityRef error;
-  // the Bills & Ray lesson, again)
-  const legend = _vfpPaperLegend(core.entries, W);   // the standard export legend
-  const legendSvg = legend.svg;
-  const TOP = legend.bottom + 4;
+  // the standard export page: title + legend rows, the plot, the credit
+  // (standalone SVG is strict XML, so every text line goes through
+  // escapeXml — the La2010 "A&A 532 A89" citation was an EntityRef error)
+  const head = chartExportHeader(title, core.entries, W);
+  const TOP = head.bottom + 4;
   const XAXIS = 16;   // the 'Years (BC / AD)' row under the chart
-  const Hp = TOP + H + XAXIS + cap.height + 8;
-  const noteText = cap.svg(TOP + H + XAXIS);
+  const Hp = TOP + H + XAXIS + CHART_EXPORT_CREDIT_H;
   return '<?xml version="1.0" encoding="UTF-8"?>\n' +
     '<svg viewBox="0 0 ' + W + ' ' + Hp + '" width="' + W + '" height="' + Hp + '" xmlns="http://www.w3.org/2000/svg" font-family="Inter,Helvetica,Arial,sans-serif">' +
     '<rect width="' + W + '" height="' + Hp + '" fill="white"/>' +
-    '<text x="' + (W / 2) + '" y="18" text-anchor="middle" fill="#222" font-size="16" font-weight="600">' + escapeXml(title) + '</text>' +
-    legendSvg +
+    head.svg +
     '<g transform="translate(0,' + TOP + ')">' + core.body +
     '<text x="16" y="' + (PAD.t + ph / 2) + '" text-anchor="middle" dominant-baseline="middle" transform="rotate(-90,16,' + (PAD.t + ph / 2) + ')" fill="#444" font-size="12" font-weight="500">Inclination (degrees)</text>' +
     '<text x="' + (PAD.l + (W - PAD.l - PAD.r) / 2) + '" y="' + (H + 8) + '" text-anchor="middle" fill="#444" font-size="12" font-weight="500">Years (BC / AD)</text></g>' +
-    noteText +
+    chartExportCredit(W, Hp) +
     '</svg>';
 }
 function _vfpPIAfterRender(bodyEl) {
@@ -20903,23 +21106,18 @@ function _vfpPEPaperSvg(range) {
   const ph = H - PAD.t - PAD.b;
   const fmtY = (y) => y === 0 ? '0' : Math.abs(y).toLocaleString('en-US') + (y < 0 ? ' BC' : ' AD');
   const title = 'Eccentricity of all planets — ' + fmtY(S.y0) + ' → ' + fmtY(S.y1);
-  const P = _vfpPENoteParts(on, core);
-  const cap = _vfpPaperCaption(P, PAD.l, 130);   // the standard caption under the export
-  const legend = _vfpPaperLegend(core.entries, W);   // the standard export legend
-  const legendSvg = legend.svg;
-  const TOP = legend.bottom + 4;
+  const head = chartExportHeader(title, core.entries, W);   // the standard export page
+  const TOP = head.bottom + 4;
   const XAXIS = 16;   // the 'Years (BC / AD)' row under the chart
-  const Hp = TOP + H + XAXIS + cap.height + 8;
-  const noteText = cap.svg(TOP + H + XAXIS);
+  const Hp = TOP + H + XAXIS + CHART_EXPORT_CREDIT_H;
   return '<?xml version="1.0" encoding="UTF-8"?>\n' +
     '<svg viewBox="0 0 ' + W + ' ' + Hp + '" width="' + W + '" height="' + Hp + '" xmlns="http://www.w3.org/2000/svg" font-family="Inter,Helvetica,Arial,sans-serif">' +
     '<rect width="' + W + '" height="' + Hp + '" fill="white"/>' +
-    '<text x="' + (W / 2) + '" y="18" text-anchor="middle" fill="#222" font-size="16" font-weight="600">' + escapeXml(title) + '</text>' +
-    legendSvg +
+    head.svg +
     '<g transform="translate(0,' + TOP + ')">' + core.body +
     '<text x="16" y="' + (PAD.t + ph / 2) + '" text-anchor="middle" dominant-baseline="middle" transform="rotate(-90,16,' + (PAD.t + ph / 2) + ')" fill="#444" font-size="12" font-weight="500">Eccentricity (dimensionless)</text>' +
     '<text x="' + (PAD.l + (W - PAD.l - PAD.r) / 2) + '" y="' + (H + 8) + '" text-anchor="middle" fill="#444" font-size="12" font-weight="500">Years (BC / AD)</text></g>' +
-    noteText +
+    chartExportCredit(W, Hp) +
     '</svg>';
 }
 function _vfpPEAfterRender(bodyEl) {
@@ -21359,23 +21557,18 @@ function _vfpAPPaperSvg(range) {
   const ph = H - PAD.t - PAD.b;
   const fmtY = (y) => y === 0 ? '0' : Math.abs(y).toLocaleString('en-US') + (y < 0 ? ' BC' : ' AD');
   const title = 'All Precession Periods — ' + fmtY(S.y0) + ' → ' + fmtY(S.y1);
-  const P = _vfpAPNoteParts(on, log, core, showEcc);
-  const cap = _vfpPaperCaption(P, PAD.l, 130);   // the standard caption under the export
-  const legend = _vfpPaperLegend(core.entries, W);   // the standard export legend
-  const legendSvg = legend.svg;
-  const TOP = legend.bottom + 4;
+  const head = chartExportHeader(title, core.entries, W);   // the standard export page
+  const TOP = head.bottom + 4;
   const XAXIS = 16;
-  const Hp = TOP + H + XAXIS + cap.height + 8;
-  const noteText = cap.svg(TOP + H + XAXIS);
+  const Hp = TOP + H + XAXIS + CHART_EXPORT_CREDIT_H;
   return '<?xml version="1.0" encoding="UTF-8"?>\n' +
     '<svg viewBox="0 0 ' + W + ' ' + Hp + '" width="' + W + '" height="' + Hp + '" xmlns="http://www.w3.org/2000/svg" font-family="Inter,Helvetica,Arial,sans-serif">' +
     '<rect width="' + W + '" height="' + Hp + '" fill="white"/>' +
-    '<text x="' + (W / 2) + '" y="18" text-anchor="middle" fill="#222" font-size="16" font-weight="600">' + escapeXml(title) + '</text>' +
-    legendSvg +
+    head.svg +
     '<g transform="translate(0,' + TOP + ')">' + core.body +
     '<text x="16" y="' + (PAD.t + ph / 2) + '" text-anchor="middle" dominant-baseline="middle" transform="rotate(-90,16,' + (PAD.t + ph / 2) + ')" fill="#444" font-size="12" font-weight="500">Period (years' + (log ? ', log scale' : '') + ')</text>' +
     '<text x="' + (PAD.l + (W - PAD.l - PAD.r) / 2) + '" y="' + (H + 8) + '" text-anchor="middle" fill="#444" font-size="12" font-weight="500">Years (BC / AD)</text></g>' +
-    noteText +
+    chartExportCredit(W, Hp) +
     '</svg>';
 }
 function _vfpAPAfterRender(bodyEl) {
@@ -21708,18 +21901,16 @@ function _vfpMLPaperSvg(range) {
   const core = _vfpMLChartCore(range, on, 'paper');
   const W = core.W, H = core.H, PAD = core.PAD, S = core.S;
   const title = 'Moon · Month Lengths — ' + _vfpFmtYearBcAd(S.y0) + ' → ' + _vfpFmtYearBcAd(S.y1);
-  const legend = _vfpPaperLegend(core.strips.map((s) => ({ name: s.name + ' (model)', color: s.paper, dash: false, bold: false })).concat([{ name: 'Meeus (1998), Ch. 47 rates', color: _vfpML_REF_COLOR.paper, dash: false, bold: false }]), W);
-  const cap = _vfpPaperCaption(_vfpMLNoteParts(core, on, false), PAD.l, 130);
-  const TOP = legend.bottom + 4, XAXIS = 16;
-  const Hp = TOP + H + XAXIS + cap.height + 8;
+  const head = chartExportHeader(title, core.strips.map((s) => ({ name: s.name + ' (model)', color: s.paper, dash: false, bold: false })).concat([{ name: 'Meeus (1998), Ch. 47 rates', color: _vfpML_REF_COLOR.paper, dash: false, bold: false }]), W);
+  const TOP = head.bottom + 4, XAXIS = 16;
+  const Hp = TOP + H + XAXIS + CHART_EXPORT_CREDIT_H;
   return '<?xml version="1.0" encoding="UTF-8"?>\n' +
     '<svg viewBox="0 0 ' + W + ' ' + Hp + '" width="' + W + '" height="' + Hp + '" xmlns="http://www.w3.org/2000/svg" font-family="Inter,Helvetica,Arial,sans-serif">' +
     '<rect width="' + W + '" height="' + Hp + '" fill="white"/>' +
-    '<text x="' + (W / 2) + '" y="18" text-anchor="middle" fill="#222" font-size="16" font-weight="600">' + escapeXml(title) + '</text>' +
-    legend.svg +
+    head.svg +
     '<g transform="translate(0,' + TOP + ')">' + core.body +
     '<text x="' + (PAD.l + core.pw / 2) + '" y="' + (H + 8) + '" text-anchor="middle" fill="#444" font-size="12" font-weight="500">Years (BC / AD)</text></g>' +
-    cap.svg(TOP + H + XAXIS) +
+    chartExportCredit(W, Hp) +
     '</svg>';
 }
 function _vfpMLAfterRender(bodyEl) {
@@ -21938,18 +22129,16 @@ function _vfpMAPaperSvg(range) {
   const core = _vfpMAChartCore(range, 'paper');
   const W = core.W, H = core.H, PAD = core.PAD, S = core.S;
   const title = 'Moon · Mean Arguments, secular departure from the J2000 rate — ' + _vfpFmtYearBcAd(S.y0) + ' → ' + _vfpFmtYearBcAd(S.y1);
-  const legend = _vfpPaperLegend(_vfpMA_STRIPS.map((s) => ({ name: s.name.split(' — ')[0] + ' (model)', color: s.paper, dash: false, bold: false })).concat([{ name: 'Meeus (1998), Ch. 47', color: _vfpMA_REF_COLOR.paper, dash: false, bold: false }]), W);
-  const cap = _vfpPaperCaption(_vfpMANoteParts(core, false), PAD.l, 130);
-  const TOP = legend.bottom + 4, XAXIS = 16;
-  const Hp = TOP + H + XAXIS + cap.height + 8;
+  const head = chartExportHeader(title, _vfpMA_STRIPS.map((s) => ({ name: s.name.split(' — ')[0] + ' (model)', color: s.paper, dash: false, bold: false })).concat([{ name: 'Meeus (1998), Ch. 47', color: _vfpMA_REF_COLOR.paper, dash: false, bold: false }]), W);
+  const TOP = head.bottom + 4, XAXIS = 16;
+  const Hp = TOP + H + XAXIS + CHART_EXPORT_CREDIT_H;
   return '<?xml version="1.0" encoding="UTF-8"?>\n' +
     '<svg viewBox="0 0 ' + W + ' ' + Hp + '" width="' + W + '" height="' + Hp + '" xmlns="http://www.w3.org/2000/svg" font-family="Inter,Helvetica,Arial,sans-serif">' +
     '<rect width="' + W + '" height="' + Hp + '" fill="white"/>' +
-    '<text x="' + (W / 2) + '" y="18" text-anchor="middle" fill="#222" font-size="16" font-weight="600">' + escapeXml(title) + '</text>' +
-    legend.svg +
+    head.svg +
     '<g transform="translate(0,' + TOP + ')">' + core.body +
     '<text x="' + (PAD.l + core.pw / 2) + '" y="' + (H + 8) + '" text-anchor="middle" fill="#444" font-size="12" font-weight="500">Years (BC / AD)</text></g>' +
-    cap.svg(TOP + H + XAXIS) +
+    chartExportCredit(W, Hp) +
     '</svg>';
 }
 function _vfpMAAfterRender(bodyEl) {
@@ -22016,7 +22205,7 @@ function computeDailyInsolationWm2(eccentricity, obliquityDeg, perihelionDeg, la
 // of date (sin ϖ), climatic precession (e·sin ϖ) and June-solstice
 // insolation at 65°N — the panels' own lines — then the LR04 benthic δ¹⁸O
 // stack (axis inverted, colder down) and the EPICA Dome C CO₂ record, the
-// Climate Formula Explorer's app-loaded JSON. Each model strip's label
+// Earth Climate Analysis's app-loaded JSON. Each model strip's label
 // carries the period MEASURED on the window (the mean spacing of the
 // curve's prominent maxima; the eccentricity also its envelope) — the
 // model's own numbers, not the textbook's. The proxies are shown for the
@@ -22104,7 +22293,7 @@ function _vfpMOSamples(range) {
   }
   return (_vfpMOCacheByRange[key] = { y0, y1, yrs, vals, periods });
 }
-/** Fetch the two proxy records once (the Climate Formula Explorer's
+/** Fetch the two proxy records once (the Earth Climate Analysis's
  *  loaders, cached in its globals) and re-render the panel on arrival. */
 function _vfpMORequestData() {
   if (_vfpMOState.dataRequested) return;
@@ -22192,7 +22381,7 @@ function _vfpMONoteParts(core, withLinks) {
     parts.push(s.short + ' ' + P.kyr.toFixed(1) + ' kyr over ' + P.n + ' intervals' + (P.env && P.env.n >= 2 ? ' (envelope ' + P.env.kyr.toFixed(0) + ' kyr over ' + P.env.n + ')' : ''));
   }
   const reading = (parts.length ? 'Periods measured on this window as the mean spacing of each curve’s prominent maxima — ' + parts.join(' · ') + '. ' : '') +
-    'Every model strip is drawn from the model’s own elements of date; nothing here is fitted to the proxies, which are shown for their pacing — the 41-kyr obliquity beat of the early Pleistocene, the ~100-kyr glacial cycles of the last 800 kyr riding the eccentricity envelope. An open correspondence, not a validation: the fitted climate formula lives in the Climate Formula Explorer.';
+    'Every model strip is drawn from the model’s own elements of date; nothing here is fitted to the proxies, which are shown for their pacing — the 41-kyr obliquity beat of the early Pleistocene, the ~100-kyr glacial cycles of the last 800 kyr riding the eccentricity envelope. An open correspondence, not a validation: the fitted climate formula lives in the Earth Climate Analysis.';
   return { frame, references, reading };
 }
 function renderVFPMilankovitch() {
@@ -22218,16 +22407,16 @@ function _vfpMOPaperSvg(range) {
   const core = _vfpMOChartCore(range, 'paper');
   const W = core.W, H = core.H, PAD = core.PAD, S = core.S;
   const title = 'Milankovitch Overview — ' + _vfpFmtYearBcAd(S.y0) + ' → ' + _vfpFmtYearBcAd(S.y1);
-  const cap = _vfpPaperCaption(_vfpMONoteParts(core, false), PAD.l, 130);
-  const TOP = 30, XAXIS = 16;
-  const Hp = TOP + H + XAXIS + cap.height + 8;
+  const head = chartExportHeader(title, _vfpMO_STRIPS.map((s) => ({ name: s.name, color: s.paper, dash: false, bold: false })), W);
+  const TOP = head.bottom + 4, XAXIS = 16;
+  const Hp = TOP + H + XAXIS + CHART_EXPORT_CREDIT_H;
   return '<?xml version="1.0" encoding="UTF-8"?>\n' +
     '<svg viewBox="0 0 ' + W + ' ' + Hp + '" width="' + W + '" height="' + Hp + '" xmlns="http://www.w3.org/2000/svg" font-family="Inter,Helvetica,Arial,sans-serif">' +
     '<rect width="' + W + '" height="' + Hp + '" fill="white"/>' +
-    '<text x="' + (W / 2) + '" y="18" text-anchor="middle" fill="#222" font-size="16" font-weight="600">' + escapeXml(title) + '</text>' +
+    head.svg +
     '<g transform="translate(0,' + TOP + ')">' + core.body +
     '<text x="' + (PAD.l + core.pw / 2) + '" y="' + (H + 8) + '" text-anchor="middle" fill="#444" font-size="12" font-weight="500">Years (BC / AD)</text></g>' +
-    cap.svg(TOP + H + XAXIS) +
+    chartExportCredit(W, Hp) +
     '</svg>';
 }
 function _vfpMOAfterRender(bodyEl) {
@@ -22407,7 +22596,7 @@ const _vfpANFmtDms = (deg) => {
  *  the figure is as thin as it really is), screen or paper style. */
 function _vfpANChartCore(years, style) {
   const paper = style === 'paper';
-  const W = 800, COLW = 200, HEAD = 96, PLOT = 372, FOOT = 46, H = HEAD + PLOT + FOOT;
+  const W = 800, COLW = 200, HEAD = 96, PLOT = 372, FOOT = paper ? 16 : 46, H = HEAD + PLOT + FOOT;   // the screen foot holds the reading line
   const PX = 6;   // px per degree on both axes (1 min of time = 0.25°)
   const cText = paper ? '#222' : '#e8ecf4', cDim = paper ? '#555' : '#8a93a5', cGrid = paper ? '#ccc' : '#2f3542';
   const cDot = paper ? '#b45309' : '#f0b040', cCard = paper ? '#2563eb' : '#4fc3f7', cPeri = paper ? '#b91c1c' : '#ef5350';
@@ -22460,8 +22649,14 @@ function _vfpANChartCore(years, style) {
     }
     if (k > 0) body += '<line x1="' + x0 + '" y1="' + 8 + '" x2="' + x0 + '" y2="' + (H - 8) + '" stroke="' + cGrid + '" stroke-width="0.5" stroke-dasharray="2,4"/>';
   });
-  body += '<text x="' + 8 + '" y="' + (H - 14) + '" fill="' + cDim + '" font-size="9">Sky view facing south · same scale in every figure (6 px per degree; 1 min of time = 0.25°) · dots: one per day of the year of date · ◆ perihelion · ● cardinal points</text>';
-  return { W, H, body, epochs };
+  // the reading line stays on screen; the paper form carries its symbols in
+  // the standard legend row instead (owner: "only the picture")
+  if (!paper) body += '<text x="' + 8 + '" y="' + (H - 14) + '" fill="' + cDim + '" font-size="9">Sky view facing south · same scale in every figure (6 px per degree; 1 min of time = 0.25°) · dots: one per day of the year of date · ◆ perihelion · ● cardinal points</text>';
+  return { W, H, body, epochs, legend: [
+    { name: 'Sun, one dot per day of the year of date', color: cDot, marker: 'dots' },
+    { name: 'Cardinal points', color: cCard, marker: 'dot' },
+    { name: 'Perihelion', color: cPeri, marker: 'diamond' },
+  ] };
 }
 function _vfpANNoteParts(core) {
   const sym = _vfpANSymmetricYears();
@@ -22490,16 +22685,14 @@ function renderVFPAnalemma() {
 }
 function _vfpANPaperSvg() {
   const core = _vfpANChartCore(_vfpANState.years, 'paper');
-  const P = _vfpANNoteParts(core);
-  const cap = _vfpPaperCaption(P, 24, 130);   // the standard caption under the export
-  const TOP = 30, Hp = TOP + core.H + cap.height + 12;
-  const noteText = cap.svg(TOP + core.H);
+  const head = chartExportHeader('The Analemma at Four Epochs — sky view facing south', core.legend, core.W);   // the standard export page
+  const TOP = head.bottom + 4, Hp = TOP + core.H + CHART_EXPORT_CREDIT_H;
   return '<?xml version="1.0" encoding="UTF-8"?>\n' +
     '<svg viewBox="0 0 ' + core.W + ' ' + Hp + '" width="' + core.W + '" height="' + Hp + '" xmlns="http://www.w3.org/2000/svg" font-family="Inter,Helvetica,Arial,sans-serif">' +
     '<rect width="' + core.W + '" height="' + Hp + '" fill="white"/>' +
-    '<text x="' + (core.W / 2) + '" y="18" text-anchor="middle" fill="#222" font-size="16" font-weight="600">The Analemma at Four Epochs</text>' +
+    head.svg +
     '<g transform="translate(0,' + TOP + ')">' + core.body + '</g>' +
-    noteText +
+    chartExportCredit(core.W, Hp) +
     '</svg>';
 }
 function _vfpANAfterRender(bodyEl) {
@@ -22600,45 +22793,16 @@ function _vfpCaptionHtml(blocks) {
   return s + '</div>';
 }
 const _vfpPlainText = (t) => String(t).replace(/<[^>]+>/g, '').replace(/&rarr;/g, '→').replace(/&mdash;/g, '—').replace(/&nbsp;/g, ' ').replace(/&plusmn;/g, '±').replace(/&asymp;/g, '≈').replace(/&Delta;/g, 'Δ').replace(/&middot;/g, '·').replace(/&minus;/g, '−').replace(/&deg;/g, '°').replace(/&varpi;/g, 'ϖ').replace(/&thinsp;/g, ' ').replace(/&amp;/g, '&');
-/** The same blocks under a paper export — ONE renderer for every form
- *  (owner: "standardize the text underneath the export"): each block a
- *  wrapped paragraph with its label in bold, 15-px lines, a 6-px gap
- *  between blocks, left-aligned at x. Returns the height and an svg(yTop)
- *  builder so the form can size itself first. */
-function _vfpPaperCaption(blocks, x, maxChars) {
-  const paras = [];
-  for (const [label, key] of _VFP_CAPTION_BLOCKS) {
-    if (!blocks[key]) continue;
-    const words = (label + ': ' + _vfpPlainText(blocks[key])).split(/\s+/);
-    const lines = [];
-    let line = '';
-    for (const w of words) {
-      if (line && (line + ' ' + w).length > maxChars) { lines.push(line); line = w; } else { line = line ? line + ' ' + w : w; }
-    }
-    if (line) lines.push(line);
-    paras.push({ label, lines });
-  }
-  const LINE = 15, GAP = 6;
-  const height = paras.reduce((h, p) => h + p.lines.length * LINE + GAP, 0);
-  const svg = (yTop) => {
-    let s = '', y = yTop;
-    for (const p of paras) {
-      p.lines.forEach((l, i) => {
-        y += LINE;
-        const body = i === 0 ? l.slice(p.label.length + 1) : l;
-        s += '<text x="' + x + '" y="' + (y - 4) + '" fill="#444" font-size="11">' + (i === 0 ? '<tspan font-weight="600">' + p.label + ':</tspan>' : '') + escapeXml(body) + '</text>';
-      });
-      y += GAP;
-    }
-    return s;
-  };
-  return { height, svg };
-}
 /** The legend under a paper export's title — ONE renderer for every form
  *  (owner: "standardize the export legend"): centred rows that WRAP at the
  *  page width (a single row overran the 1000-px page with five long names
  *  and clipped at both edges), 22-px swatch + 11-px text, 16-px row pitch,
- *  the first row at y = 34; `bottom` is where the plot may start. */
+ *  the first row at y = 34; `bottom` is where the plot may start. An entry
+ *  is { name, color, dash?, bold?, marker? }: the swatch is a line unless
+ *  `marker` names a symbol — 'dot' (a filled circle), 'diamond', 'dots' (a
+ *  daily-sample trail) or 'rect' (a shaded band) — for figures whose
+ *  series are symbols rather than curves (the analemma, the LOD-climate
+ *  period bands). The paper exports go through chartExportHeader. */
 function _vfpPaperLegend(entries, W) {
   const widths = entries.map((en) => 28 + en.name.length * 6.2 + 24);
   const rows = [];
@@ -22648,14 +22812,22 @@ function _vfpPaperLegend(entries, W) {
     row.push(i); wsum += widths[i];
   });
   if (row.length) rows.push({ row, wsum });
+  const swatch = (en, lx, ly) => {
+    const cx = (lx + 11).toFixed(1);
+    if (en.marker === 'dot') return '<circle cx="' + cx + '" cy="' + ly + '" r="3.5" fill="' + en.color + '" stroke="#fff" stroke-width="1"/>';
+    if (en.marker === 'diamond') return '<rect x="' + (lx + 7.5).toFixed(1) + '" y="' + (ly - 3.5) + '" width="7" height="7" transform="rotate(45 ' + cx + ' ' + ly + ')" fill="' + en.color + '" stroke="#fff" stroke-width="1"/>';
+    if (en.marker === 'dots') return [3, 8, 13, 18].map((dx) => '<circle cx="' + (lx + dx).toFixed(1) + '" cy="' + ly + '" r="1.3" fill="' + en.color + '"/>').join('');
+    if (en.marker === 'rect') return '<rect x="' + lx.toFixed(1) + '" y="' + (ly - 5) + '" width="22" height="10" fill="' + en.color + '" opacity="0.35"/>';
+    const dash = en.dash === true ? '6,4' : en.dash;
+    return '<line x1="' + lx.toFixed(1) + '" y1="' + ly + '" x2="' + (lx + 22).toFixed(1) + '" y2="' + ly + '" stroke="' + en.color + '" stroke-width="' + (en.bold ? 2.5 : 1.8) + '"' + (dash ? ' stroke-dasharray="' + dash + '"' : '') + '/>';
+  };
   let svg = '';
   rows.forEach((r, ri) => {
     let lx = (W - r.wsum) / 2;
     const ly = 34 + ri * 16;
     for (const i of r.row) {
       const en = entries[i];
-      const dash = en.dash === true ? '6,4' : en.dash;
-      svg += '<line x1="' + lx.toFixed(1) + '" y1="' + ly + '" x2="' + (lx + 22).toFixed(1) + '" y2="' + ly + '" stroke="' + en.color + '" stroke-width="' + (en.bold ? 2.5 : 1.8) + '"' + (dash ? ' stroke-dasharray="' + dash + '"' : '') + '/>' +
+      svg += swatch(en, lx, ly) +
         '<text x="' + (lx + 28).toFixed(1) + '" y="' + (ly + 4) + '" fill="#333" font-size="11" font-family="Inter,Helvetica,Arial,sans-serif">' + escapeXml(en.name) + '</text>';
       lx += widths[i];
     }
@@ -23207,10 +23379,10 @@ function renderVFPPaperChartAlt(category, altConfig) {
     ...V.references
       .map((r) => ({ ...r, color: r.preserveColor ? r.color : refColors[r.refIndex % refColors.length] }))
   ];
-  // the standard export legend wraps into rows; the plot starts under it
-  // (a single row clipped at both page edges with five long names)
-  const legend = _vfpPaperLegend(allCurves.map((c, ci) => ({ name: c.name, color: c.color, dash: !!c.dash, bold: ci === 0 })), W);
-  PAD.t = legend.bottom + 12;
+  // the standard export page: title + legend rows (they wrap; a single row
+  // clipped at both page edges with five long names), the plot under them
+  const head = chartExportHeader(alt.title, allCurves.map((c, ci) => ({ name: c.name, color: c.color, dash: !!c.dash, bold: ci === 0 })), W);
+  PAD.t = head.bottom + 12;
   const H = PAD.t + 405 + PAD.b;   // a 405-px plot whatever the legend's height
   const plotH = H - PAD.t - PAD.b;
   const samples = allCurves.map(() => []);
@@ -23321,9 +23493,6 @@ function renderVFPPaperChartAlt(category, altConfig) {
     curvePaths += `<path d="${d}" fill="none" stroke="${curve.color}" stroke-width="${ci === 0 ? 2 : 1.5}" clip-path="url(#vfp-paper-alt-clip)"${dashAttr}/>`;
   });
 
-  // Legend — the standard export legend (built above, the plot sits under it)
-  const legendItems = legend.svg;
-
   // J2000 marker
   const j2000x = xScale(2000).toFixed(1);
   const j2000val = V.model.fn(2000);
@@ -23340,33 +23509,16 @@ function renderVFPPaperChartAlt(category, altConfig) {
     j2000marker += `<text x="${j2000tx + 2}" y="${j2000ty + 2}" fill="${textColor}" font-size="9.5" font-weight="500" font-family="Inter,Helvetica,Arial,sans-serif">${j2000text}</text>`;
   }
 
-  // Title + axis labels
-  const title = `<text x="${W / 2}" y="18" text-anchor="middle" fill="#222" font-size="16" font-weight="600" font-family="Inter,Helvetica,Arial,sans-serif">${alt.title}</text>`;
+  // Axis labels; the page ends with the credit strip (no caption — the
+  // Frame / References / Reading blocks stay on the screen form)
   const yAxisLabel = `<text x="16" y="${PAD.t + plotH / 2}" text-anchor="middle" dominant-baseline="middle" transform="rotate(-90,16,${PAD.t + plotH / 2})" fill="#444" font-size="12" font-weight="500" font-family="Inter,Helvetica,Arial,sans-serif">${V.yLabel}</text>`;
   const xAxisLabel = `<text x="${PAD.l + plotW / 2}" y="${H - 5}" text-anchor="middle" fill="#444" font-size="12" font-weight="500" font-family="Inter,Helvetica,Arial,sans-serif">Years (BC / AD)</text>`;
-
-  // The standard caption under the export — the same three blocks as the
-  // screen (owner: "standardize the text underneath the export"); the rms
-  // per reference from this form's own samples (inside validity)
-  const rScale = V.rScale, rLabel = V.rLabel;
-  const rmsParts = category.noComparisons ? [] : allCurves.slice(1).map((curve, ri) => {
-    let s2 = 0, n = 0;
-    for (let i = 0; i < samples[0].length; i++) {
-      const m = samples[0][i].v, r = samples[ri + 1][i].v;
-      if (!Number.isFinite(m) || !Number.isFinite(r)) continue;
-      let d = r - m;
-      if (category.wrap360) d = ((d + 180) % 360 + 360) % 360 - 180;
-      d *= rScale; s2 += d * d; n++;
-    }
-    return n ? { name: curve.name, rms: Math.sqrt(s2 / n), n } : null;
-  }).filter((r) => r);
-  const cap = _vfpPaperCaption(_vfpGenericCaptionBlocks(category, yearMin, yearMax, rmsParts, rLabel, false, V), PAD.l, 150);
-  const Hp = H + cap.height + 10;
+  const Hp = H + CHART_EXPORT_CREDIT_H;
 
   return `<?xml version="1.0" encoding="UTF-8"?>
 <svg viewBox="0 0 ${W} ${Hp}" width="${W}" height="${Hp}" xmlns="http://www.w3.org/2000/svg" font-family="Inter,Helvetica,Arial,sans-serif">
   <rect width="${W}" height="${Hp}" fill="white"/>
-  ${clipDef}${grid}${refLinesSVG}${eventsSVG}${yAxisLabel}${xAxisLabel}${title}${legendItems}${curvePaths}${j2000marker}${cap.svg(H + 4)}
+  ${clipDef}${grid}${refLinesSVG}${eventsSVG}${yAxisLabel}${xAxisLabel}${head.svg}${curvePaths}${j2000marker}${chartExportCredit(W, Hp)}
 </svg>`;
 }
 
@@ -23417,7 +23569,7 @@ function createVerificationPanel() {
   // Header
   const header = document.createElement('div');
   header.className = 'vfp-header';
-  header.innerHTML = '<h2>Formula Verification <span class="vfp-subtitle">\u2014 Model vs Published Formulas</span></h2>';
+  header.innerHTML = '<h2>Framework Verification <span class="vfp-subtitle">\u2014 the model vs published formulas (Laskar, Meeus, Capitaine, \u2026), \u00b123 kyr to \u00b11 Myr</span></h2>';
   // ONE "Export" button prints the current view (owner)
   const exportBtn = document.createElement('button');
   exportBtn.className = 'vfp-export-btn';
@@ -23535,7 +23687,7 @@ function closeVerificationPanel() {
 
 // Update live data in hierarchy inspector (called from render loop)
 /**
- * Planet Inspector — per-frame update (called from the animation loop): the
+ * Planet Orbit Analysis — per-frame update (called from the animation loop): the
  * orbit frame of date from the chain, the helper geometry, and the readouts
  * (rewritten when the epoch moved or the planet changed, so a paused scene
  * keeps a copyable panel). Plan 06 R10 — replaces the K-wheel live data.
@@ -23580,7 +23732,7 @@ const fibGaugeEls = {};
 // plan 02 post-K8 queue item 3): it wrote o.fibInclinationBalance /
 // o.fibEccentricityBalance, both WRITE-ONLY since the Fibonacci Balance
 // gauge folder retired with the model restatement (audited 2026-09-08: no
-// consumer in script.js, tools/lib or dashboard). The Law-3/Law-5 record
+// consumer in script.js or tools/lib). The Law-3/Law-5 record
 // lives in doc 10 Status + the retired-laws probe surface (planetLaws
 // goldens, fed by @essrt/physics/planets/fibonacci-laws — untouched).
 // fibGaugeEls above KEEPS its historical name: it now serves only the
@@ -25003,7 +25155,7 @@ function setupGUI() {
   const dtFolder = daysFolder.addFolder({ title: '\u0394T (TT \u2212 UT1)' });
   addTooltip(dtFolder.addBinding(predictions, 'deltaTCorrectionSeconds', {
     label: '\u0394T trend (s)', readonly: true, format: v => v.toFixed(2)
-  }), 'Model-calibrated long-term TREND of \u0394T (TT \u2212 UT1) in seconds. Reads \u2248 54.6 s at J2000 \u2014 the smooth trend value passing through 2000, distinct from the IERS instantaneous observation of ~63.6 s (the ~9-s gap is industrial-era Earth-rotation acceleration our cyclic model does not attempt to capture). Formula: deltaTStart + Simpson integral of Layer 2 + the ecliptic-precession LOD term + 4-flag stack + Core-mantle swing (jointly fit under the hard USNO closure; Espenak history 1650-2017 RMS \u2248 13.4 s). Used by Meeus geometry, eclipse timing, and the live accumulator. The pure-physics-only (no cycles) variant is available on the Formula Verification chart at Reports \u2192 Days & Years \u2192 \u0394T.');
+  }), 'Model-calibrated long-term TREND of \u0394T (TT \u2212 UT1) in seconds. Reads \u2248 54.6 s at J2000 \u2014 the smooth trend value passing through 2000, distinct from the IERS instantaneous observation of ~63.6 s (the ~9-s gap is industrial-era Earth-rotation acceleration our cyclic model does not attempt to capture). Formula: deltaTStart + Simpson integral of Layer 2 + the ecliptic-precession LOD term + 4-flag stack + Core-mantle swing (jointly fit under the hard USNO closure; Espenak history 1650-2017 RMS \u2248 13.4 s). Used by Meeus geometry, eclipse timing, and the live accumulator. The pure-physics-only (no cycles) variant is available on the Framework Verification chart at Reports \u2192 Days & Years \u2192 \u0394T.');
   addTooltip(dtFolder.addBinding(predictions, 'predictedDeltatPerYear', {
     label: 'Rate (s/yr)', readonly: true, format: v => v.toFixed(4)
   }), 'Current d(\u0394T)/dt = (LOD_real \u2212 86400) \u00d7 solarYearDays. LOD_real is Layer 4 = o.lodKinematic + h5Correction + dtCycleLodCorrectionSum(year), i.e. the same value shown as Solar Day = REAL. Positive = clocks running slower than TT (Earth day > 86400 SI s).');
@@ -25308,9 +25460,11 @@ function setupGUI() {
 
   showHideFolder.element.querySelector('.tp-fldv_c').appendChild(visChipContainer);
 
-  // ── Earth Zodiac (title = toggle, expand = size slider) ──
-  const zodiacFolder = makeToggleFolder(visFolder, 'Earth Zodiac', zodiac, 'visible', null,
-    'Zodiac band with the 12 astrological signs. Click to toggle.');
+  // ── Zodiac constellations (title = toggle, expand = size slider) and the zodiac signs ──
+  const zodiacFolder = makeToggleFolder(visFolder, 'Zodiac constellations (IAU)', zodiac, 'visible', null,
+    'The band of the thirteen IAU constellations the ecliptic crosses, at their J2000 boundaries and fixed to the stars: the equinox of date, the perihelion marker and the solstice axis precess through it. A naming of the sidereal direction, not a sky view — the stars’ own proper motions are not applied. Click to toggle.');
+  makeToggleFolder(visFolder, 'Zodiac signs', zodiacSigns, 'visible', null,
+    'The twelve equal 30° signs of the tropical zodiac, Aries 0° at the vernal equinox OF DATE — fixed to the seasons, not to the stars. The inner ring turns with the equinox against the star-fixed constellation band: the precession of the equinoxes as the drift between the two rings (about one sign today, one more per ~2,150 years). Click to toggle.');
   addTooltip(zodiacFolder.addBinding(o, 'zodiacSize', { label: 'Size', min: 0.01, max: 10, step: 0.1 })
     .on('change', () => changeZodiacScale()),
     'Scale the zodiac band.');
@@ -25595,33 +25749,47 @@ function setupGUI() {
   // ── Tools ──
   const toolsFolder = gui.addFolder({ title: 'Tools', expanded: false });
   toolsFolder.element.dataset.category = 'tools';
-  addFolderTooltip(toolsFolder, 'Planet hierarchy inspector and console validation tests.');
+  addFolderTooltip(toolsFolder, 'Two groups: Verification — the model against references (published formulas, JPL observations, the standard theory’s ghost bodies) — and Analysis — the model’s own predictions (one planet’s orbit of date, the deep-time evolution, Earth’s climate, the day-length rate); plus the console diagnostics.');
 
-  addTooltip(toolsFolder.addButton({ title: 'Planet Inspector' }).on('click', () => openHierarchyInspector()),
-    'Open the planet hierarchy inspector. Shows orbital elements, scene graph, and live positional data for each planet.');
   // The Invariable Plane Inspector, Eccentricity Balance Scale and Solar
   // System Resonance Cycle panels were removed with the Fibonacci-law
   // retirement (the model restatement; doc 10 Status + doc 109 carry the
   // record); their fbe*/gho* subsystems were excised with the legacy
   // chains (K5).
-  addTooltip(toolsFolder.addButton({ title: 'WebGeoCalc Explorer' }).on('click', () => openWGCPanel()),
-    'Observed perihelion precession rates for all 8 planets (1900\u20132026) from JPL WebGeoCalc. Three charts per planet: ascending node, argument of periapsis, longitude of perihelion.');
-  addTooltip(toolsFolder.addButton({ title: 'LOD-Climate Rhythm' }).on('click', () => openLcrPanel()),
-    'Sub-Milankovitch driver decomposition (tidal + GIA + 4-flag stack) mapped against named historical climate transitions. Framework predictions vs mainstream MWP / LIA / Bond events / 8.2 ka / 4.2 ka / LBA / Iron Age cold / modern warming.');
-
-  addTooltip(toolsFolder.addButton({ title: 'Climate Formula Explorer' }).on('click', () => openClimateFormulaPanel()),
-    'Modular climate formula: L1 orbital lines (the engine’s secular beats + the 405.6-kyr eccentricity family) + L2 silicate-weathering carbon thermostat (405/202/135 kyr) + L3 boundary-condition steps (PETM, EOT, Mi-1, MMCT, iNHG, MPT). Per-regime fits vs LR04 \u03b4\u00b9\u2078O (Lisiecki & Raymo 2005) and CENOGRID \u03b4\u00b9\u2078O / \u03b4\u00b9\u00b3C (Westerhold 2020). Independent layer toggles + per-layer R\u00b2 breakdown. Forward-projection tab; cross-regime prediction fails honestly (doc 92 \u00a78.4).');
-  addTooltip(toolsFolder.addButton({ title: 'ESSRT Explorer' }).on('click', () => openEssrtPanel()),
-    'Expanding Solar System Resonance Theory \u2014 deep-time evolution of LOD, the lunisolar precession period, the obliquity beat, AU, Moon distance, and per-planet orbital parameters from Earth-Moon genesis (\u22124.5 Gyr, giant-impact epoch) to +5 Gyr future. Wu et al. 2024 cyclostratigraphy overlay on the Phanerozoic 650 Ma window.');
-  addTooltip(toolsFolder.addButton({ title: 'Formula Verification' }).on('click', () => openVerificationPanel()),
-    'Compare the model against published formulas (Laskar, Meeus, Capitaine, etc.) for eccentricity, obliquity, year lengths, and precession over \u00B112,000 years.');
-  addTooltip(toolsFolder.addButton({ title: 'Data Explorer' }).on('click', () => window.open('https://data.holisticuniverse.com', '_blank')),
-    'Open the Orbital Data Explorer dashboard. Interactive charts for orbital elements, sky positions, and Earth predictions across a 335-kyr deep-time window.');
-
-  // ── K8: the Standard-Model overlay — a comparison INSTRUMENT, so it
-  // lives under Tools (owner: too prominent as a top-level menu item).
+  // The panels on two topic TABS (owner: the nested folders read crowded and
+  // mixed buttons with a sub-folder): VERIFICATION — the model against
+  // references — in the panel's "observed" colour, ANALYSIS — the model's
+  // own predictions — in the "calculated" colour, so the legend at the foot
+  // of the panel explains the Tools folder too. A tab page holds buttons
+  // only; the two instrument FOLDERS (the standard-model overlay, the
+  // console tests) sit under the tabs. Each panel has ONE "Export" that
+  // prints the current view.
+  const toolTabs = toolsFolder.addTab({ pages: [{ title: 'Verification' }, { title: 'Analysis' }] });
+  const verifyFolder = toolTabs.pages[0], analysisFolder = toolTabs.pages[1];
   {
-    const stdFolder = toolsFolder.addFolder({ title: 'Standard Model (VSOP87 · MPP02)', expanded: false });
+    const tabItems = toolTabs.element.querySelectorAll('.tp-tbiv');
+    if (tabItems[0]) tabItems[0].title = 'The model against references: published formulas and the JPL WebGeoCalc observations.';
+    if (tabItems[1]) tabItems[1].title = 'The model’s own predictions: one planet’s orbit of date, the deep-time evolution from Earth–Moon genesis, Earth’s climate formula, the day-length rate.';
+  }
+  addTooltip(verifyFolder.addButton({ title: 'Framework Verification' }).on('click', () => openVerificationPanel()),
+    'The model against published formulas (Laskar, Meeus, Capitaine, Vondr\u00e1k, Berger, \u2026) for eccentricity, obliquity, year lengths, precession, \u0394T and the Moon, on four windows from \u00b123,000 years to \u00b11 Myr; plus the all-planet inclination and eccentricity charts, the precession periods, the Milankovitch overview and the analemma.');
+  addTooltip(verifyFolder.addButton({ title: 'Perihelion of Planets Verification' }).on('click', () => openWGCPanel()),
+    'The model against JPL WebGeoCalc observations: the observed perihelion precession of the seven planets over 1900\u20132026 (longitude of perihelion, with the ascending node and the argument of periapsis on request) next to the model\u2019s own rate.');
+  addTooltip(analysisFolder.addButton({ title: 'Planet Orbit Analysis' }).on('click', () => openHierarchyInspector()),
+    'Inspect the orbit of date of one planet from the N-body chain: its elements, the orbit geometry drawn in the 3D scene (plane, nodes, extremes, perihelion, anomalies), the orbit picture export, and the position report against the NASA/JPL test dates.');
+  addTooltip(analysisFolder.addButton({ title: 'Earth\u2013Moon Genesis Analysis' }).on('click', () => openEssrtPanel()),
+    'The model\u2019s own evolution from Earth\u2013Moon genesis (\u22124.5 Gyr, the giant-impact epoch) to +1 Gyr: the day length, the lunisolar precession period, the obliquity beat, the AU, the Moon\u2019s distance and the planets\u2019 orbital parameters, with the Wu et al. 2024 cyclostratigraphy anchors on the Phanerozoic 650 Ma window.');
+  addTooltip(analysisFolder.addButton({ title: 'Earth Climate Analysis' }).on('click', () => openClimateFormulaPanel()),
+    'Modular climate formula: L1 orbital lines (the engine’s secular beats + the 405.6-kyr eccentricity family) + L2 silicate-weathering carbon thermostat (405/202/135 kyr) + L3 boundary-condition steps (PETM, EOT, Mi-1, MMCT, iNHG, MPT). Per-regime fits vs LR04 \u03b4\u00b9\u2078O (Lisiecki & Raymo 2005) and CENOGRID \u03b4\u00b9\u2078O / \u03b4\u00b9\u00b3C (Westerhold 2020). Independent layer toggles + per-layer R\u00b2 breakdown. Forward-projection tab; cross-regime prediction fails honestly (doc 92 \u00a78.4).');
+  addTooltip(analysisFolder.addButton({ title: 'Earth dLOD/dt Analysis' }).on('click', () => openLcrPanel()),
+    'The day-length rate dLOD/dt decomposed into its drivers (tidal + GIA + the cycle stack + the core\u2013mantle swing) against named historical climate periods (MWP / LIA / Bond events / 8.2 ka / 4.2 ka / LBA / Iron Age cold / modern warming) and the GISP2 / LR04 temperature proxies.');
+
+  // ── K8: the Standard-Model overlay — a comparison INSTRUMENT (toggles and
+  // readouts, not a panel), so it is a folder under the tabs, beside the
+  // console tests (owner: too prominent as a top-level menu item; not a
+  // button, so not on the Verification tab).
+  {
+    const stdFolder = toolsFolder.addFolder({ title: 'Standard Model overlay (VSOP87 · MPP02)', expanded: false });
     addFolderTooltip(stdFolder, 'The Sun, Moon and the seven planets AS THE CURRENT SCIENTIFIC MODEL predicts them (planets/Sun: VSOP87A, truncated series measured at 0.3–3.6″ RMS vs JPL Horizons over 1600–2400; Moon: ELP/MPP02, measured 0.22″ RMS over the observed-ΔT era, on the standard Stephenson-2016 ΔT), shown as pale-blue ghost bodies — the planets with the standard theory’s own orbit rings — next to the model’s own, with the live angular separation per body. Both sides use the same astrometric convention. The comparison is published either way it falls — nothing in the model is tuned to it. Beyond ±4,000 years the ghosts are a stated extrapolation of the standard theory: the divergence you see at deep time is part of the model’s claim.');
     addTooltip(stdFolder.addBinding(o, 'showStandardModel', { label: 'Show ghost bodies' }),
       'Toggle the VSOP87 ghost markers in the 3D scene. Ghosts share each body’s size and follow the standard theory’s positions.');
@@ -28848,7 +29016,7 @@ function setupGUI() {
     console.log('  All-cycles 4-flag stack (flags only, swing excluded) — zero-crossing timings vs named climate transitions');
     console.log('  Bond (n=1830, 1466 yr) + Hallstatt (n=1104, 2430 yr) + Jose5 (n=2989, 897 yr) + Jose4 (n=3749, 716 yr)');
     console.log('  (The Core-mantle swing is core-supplied, not climate — excluded here so crossings match');
-    console.log('   the LOD-Climate Rhythm modal\'s ▲/▼ markers, which gate on the flags-only L3 curve.)');
+    console.log('   the Earth dLOD/dt Analysis modal\'s ▲/▼ markers, which gate on the flags-only L3 curve.)');
     console.log('════════════════════════════════════════════════════════════════════════════════════');
     console.log('  PEAK  = stack LOD at MAX, derivative + → −. After this year, stack rate < 0, Earth');
     console.log('          spins up vs secular baseline → warm episode STARTS.');
@@ -28981,7 +29149,7 @@ function setupGUI() {
     console.log('  early/mid-Holocene transitions to match tightly (Bond 4, 4.2 ka, Iron Age) while');
     console.log('  post-500-CE transitions (LIA, Modern) match loosely in this flags-only view — the');
     console.log('  calibrated late-Holocene comparisons are the Bond IRD correlation (r = +0.36) and');
-    console.log('  the LOD-Climate Rhythm modal, not this crossing table.');
+    console.log('  the Earth dLOD/dt Analysis modal, not this crossing table.');
     console.log('════════════════════════════════════════════════════════════════════════════════════');
 
     window._stackClimateMatch = { crossings, matches, offsets, meanAbs };
@@ -46882,7 +47050,7 @@ const planetStats = {
        constant: true},
       {label : () => `Orbital Eccentricity (e)`,
        value : [ { v: () => moonOrbitalEccentricityBase, dec:6, sep:',' },{ small: '' }],
-       hover : [`Eccentricity of the Moon's orbit around Earth — a registry constant (the ELP/Brown mean value), the same at every epoch: the model carries no lunar eccentricity of date. The osculating value swings 0.026–0.077 through the evection and variation terms (periods of a month to a year, inside the Meeus series), and its secular tidal change is of order 1e-9 per century — invisible on every window the Formula Verification panels show, which is why there is no Moon eccentricity panel. The eccentricity that DOES vary in the lunar chain is Earth's (the solar perturbation's modulation), verified on the Earth orbit · Eccentricity panel`],
+       hover : [`Eccentricity of the Moon's orbit around Earth — a registry constant (the ELP/Brown mean value), the same at every epoch: the model carries no lunar eccentricity of date. The osculating value swings 0.026–0.077 through the evection and variation terms (periods of a month to a year, inside the Meeus series), and its secular tidal change is of order 1e-9 per century — invisible on every window the Framework Verification panels show, which is why there is no Moon eccentricity panel. The eccentricity that DOES vary in the lunar chain is Earth's (the solar perturbation's modulation), verified on the Earth orbit · Eccentricity panel`],
        constant: true},
       {label : () => `Ecliptic Inclination (i)`,
        value : [ { v: () => moonEclipticInclinationJ2000, dec:6, sep:',' },{ small: 'degrees (°)' }],
@@ -47355,7 +47523,7 @@ const planetStats = {
        constant: true},
       {label : () => `Sidereal-year drift, implied`,
        value : [ { v: () => 2 * SOLAR_MASS_LOSS_FRAC_PER_YR * 100 * meansiderealyearlengthinSeconds * 1000, dec:4, sep:',' },{ small: 'ms per century' }],
-       hover : [`With a ∝ 1/M and T² ∝ a³/M, the period goes as M⁻²: dT/T = −2·dM/M = +${fmtScientific(2 * SOLAR_MASS_LOSS_FRAC_PER_YR, 3)} per year, ${fmtNum(2 * SOLAR_MASS_LOSS_FRAC_PER_YR * 100 * meansiderealyearlengthinSeconds * 1000, 4, ',')} ms per century on the sidereal year — the slope the Formula Verification Sidereal Year panel carries on its deep windows (past years shorter, IAU-anchored at J2000). At 2.48 Ga the same law is the μ-consistency leg of the falsification criterion: the rock-measured long-eccentricity period must track 405.6 kyr / μ^1.153 under this mass history`]},
+       hover : [`With a ∝ 1/M and T² ∝ a³/M, the period goes as M⁻²: dT/T = −2·dM/M = +${fmtScientific(2 * SOLAR_MASS_LOSS_FRAC_PER_YR, 3)} per year, ${fmtNum(2 * SOLAR_MASS_LOSS_FRAC_PER_YR * 100 * meansiderealyearlengthinSeconds * 1000, 4, ',')} ms per century on the sidereal year — the slope the Framework Verification Sidereal Year panel carries on its deep windows (past years shorter, IAU-anchored at J2000). At 2.48 Ga the same law is the μ-consistency leg of the falsification criterion: the rock-measured long-eccentricity period must track 405.6 kyr / μ^1.153 under this mass history`]},
 
     {header : '—  Sun-SSB Barycentric Motion —' },
       {label : () => `Sun-SSB offset`,
@@ -52113,7 +52281,8 @@ function changeSphereScale() {
 }
   
 function changeZodiacScale() {
-      zodiac.scale.set(o.zodiacSize, o.zodiacSize, o.zodiacSize);  
+      zodiac.scale.set(o.zodiacSize, o.zodiacSize, o.zodiacSize);
+      zodiacSigns.scale.set(o.zodiacSize, o.zodiacSize, o.zodiacSize);   // the signs ring scales with the band
 }
 
 function updatePosition() {
@@ -53897,10 +54066,23 @@ function moveModel(pos) {
   // from the engine on top of the animated device (see _applyEngineEarthFrame).
   _applyEngineEarthFrame(o.julianDay);
 
-  // zodiac band keeps its old behaviour
-  zodiac.rotation.y = -Math.PI / 3 - earthTheta;
+  // the zodiac-constellations band: centred on Earth, oriented ONCE from
+  // the chain's frame bridge (the J2000 ecliptic and equinox in world axes)
+  // — star-fixed; nothing of date turns it
+  earth.planetObj.getWorldPosition(zodiac.position);
+  if (_kcR && !zodiac.userData.placed) {
+    const X = new THREE.Vector3(_kcR[0][0], _kcR[1][0], _kcR[2][0]);   // the J2000 equinox
+    const Y = new THREE.Vector3(_kcR[0][2], _kcR[1][2], _kcR[2][2]);   // the J2000 ecliptic pole
+    const Z = new THREE.Vector3().crossVectors(X, Y);                  // = −(longitude +90°), the band's local −z convention
+    zodiac.quaternion.setFromRotationMatrix(new THREE.Matrix4().makeBasis(X, Y, Z));
+    zodiac.userData.placed = true;
+  }
+  // the zodiac-signs ring rides the ecliptic OF DATE: the sun-plane
+  // container's world basis (x̂ the equinox of date, ŷ the pole — R4)
+  earth.planetObj.getWorldPosition(zodiacSigns.position);
+  earthPerihelionPrecession1.containerObj.getWorldQuaternion(zodiacSigns.quaternion);
 
-  // Inclination path rotates with zodiac to stay aligned (but is independent object)
+  // Inclination path keeps the former wheel's rotation (an independent object)
   if (typeof inclinationPathGroup !== 'undefined') {
     inclinationPathGroup.rotation.y = -Math.PI / 3 - earthTheta;
   }
@@ -56546,7 +56728,7 @@ function updatePredictions() {
     // it onto the Espenak/IERS observational scale so the displayed value reads
     // ~56.0 s at J2000 and follows the Espenak history trend.
     // The pure-physics-only variant `deltaTStart + pureH5DeltaTAtAge(t_Ma_now)` is still
-    // available on the Formula Verification chart at Reports → Days & Years → ΔT.
+    // available on the Framework Verification chart at Reports → Days & Years → ΔT.
     predictions.deltaTCorrectionSeconds = o.deltaTCorrectionSeconds = deltaTStart + meanDeltaTSecondsAtAge(t_Ma_now);
     predictions.alphaMoiFactor = o.alphaMoiFactor = earthMoiFactorAtAge(t_Ma_now);
   }

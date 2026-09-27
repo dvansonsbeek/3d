@@ -7,7 +7,7 @@ name: check
 # work — which is the same reason Phase 4's referential-transparency test must be
 # present and failing before the fix lands.
 #
-# Scope is packages/ only. src/script.js, tools/, scripts/ and dashboard/ are
+# Scope is packages/ only. src/script.js, tools/ and scripts/ are
 # pre-migration and join as Phase 8 extracts from them.
 
 on:

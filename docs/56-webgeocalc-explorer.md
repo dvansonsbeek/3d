@@ -5,11 +5,11 @@ coefficients: sha256:bb6a03c877eedab8
 status: current
 ---
 
-# WebGeoCalc Explorer
+# Perihelion of Planets Verification
 
 ## Overview
 
-The **WebGeoCalc Explorer** is a modal panel in the Tools menu that shows the actual observed perihelion-precession history of each planet, based on JPL NAIF WebGeoCalc ephemeris queries over the 1900–2026 observational baseline. For each planet it plots the three angles that describe the orientation of the orbit in the ecliptic frame — ascending node `Ω`, argument of periapsis `ω`, and longitude of perihelion `ϖ = Ω + ω` — and overlays the model's prediction so the observed data and the model can be compared directly, in the same frame the data live in.
+The **Perihelion of Planets Verification** is a modal panel in the Tools menu that shows the actual observed perihelion-precession history of each planet, based on JPL NAIF WebGeoCalc ephemeris queries over the 1900–2026 observational baseline. For each planet it plots the three angles that describe the orientation of the orbit in the ecliptic frame — ascending node `Ω`, argument of periapsis `ω`, and longitude of perihelion `ϖ = Ω + ω` — and overlays the model's prediction so the observed data and the model can be compared directly, in the same frame the data live in.
 
 This is the panel that tests the model's perihelion rates against *observation*, not another theory. The model line is the N-body chain's own `ϖ(t)` — nothing in it is calibrated to WebGeoCalc; the device's ecliptic-period values (`perihelionEclipticYears` per planet) remain as window-epoch descriptors ([doc 109 §9](109-model-nbody-engine-and-lattice-test.md)). The Explorer makes that comparison visible.
 
@@ -93,7 +93,7 @@ Re-running `node tools/explore/wgc-perihelion-rates.js` regenerates the JSON fro
 
 ```
 ┌─────────────────────────────────────────────────────────┐
-│  WebGeoCalc Explorer                             [×]    │
+│  Perihelion of Planets Verification                             [×]    │
 │  Observed perihelion precession 1900–2026 (JPL NAIF)    │
 ├─────────────────────────────────────────────────────────┤
 │  [Mercury] [Venus] [Mars] [Jupiter] [Saturn] ...        │  ← tab row
@@ -167,5 +167,5 @@ The red and blue curves tracking each other over 1900–2026 is the visual valid
 | Data generator | `tools/explore/wgc-perihelion-rates.js` |
 | WebGeoCalc HTTP client | `tools/lib/webgeocalc-client.js` |
 | Committed data | `public/input/wgc-perihelion-data.json` |
-| Tools-menu button | "WebGeoCalc Explorer" in Tweakpane Tools folder (`src/script.js`) |
+| Tools-menu button | "Perihelion of Planets Verification" in Tweakpane Tools folder (`src/script.js`) |
 | CSS | `.wgc-*` classes in `src/style.css` |

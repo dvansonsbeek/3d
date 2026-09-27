@@ -5,11 +5,11 @@ coefficients: sha256:bb6a03c877eedab8
 status: current
 ---
 
-# Planet Inspector — the orbit of date from the N-body chain
+# Planet Orbit Analysis — the orbit of date from the N-body chain
 
 ## Overview
 
-The Planet Inspector (Tools → Planet Inspector) shows, for one of the seven
+The Planet Orbit Analysis (Tools → Planet Orbit Analysis) shows, for one of the seven
 chain planets, the orbit the scene actually renders: the N-body element
 chain's elements of date, the orbit plane against the ecliptic of date with
 its nodes and extremes, the perihelion, the true and mean anomalies, and the
@@ -125,7 +125,51 @@ the test dates and restores the epoch). Its longitude rows still read the
 `o.<planet>PerihelionEcliptic` / `o.<planet>AscendingNode` channels; see doc
 52 for the report format.
 
-## 7. Keyboard
+## 7. Export
+
+One **Export** button in the header prints the orbit picture of the selected
+planet at the scene date as the standard export page (doc 57, "The export
+standard"): the Orbit view drawn flat — the frame of §2 projected onto the
+ecliptic of date, equinox to the right, longitude counter-clockwise — with
+the orbit split by its side of the ecliptic (green above, red below, the
+halves lightly shaded), the ecliptic ring at the semi-major axis, the line
+of nodes with the ascending and descending nodes on the orbit, the line of
+apsides with P and A, the Sun, the rendered planet with the Sun → planet
+line and its direction of motion, a month ring whose twelve labels sit at
+the model's own Sun longitude on the first of each month of the scene year,
+the four cardinal points on that ring (fixed at 0°, 90°, 180°, 270° of the
+ecliptic of date by construction) each with the model's own date and UT
+time for the scene year — the Earth-predictions panel's call, the crossing
+nearest the calendar year's midpoint — and Ω and ω as arcs at the Sun — Ω
+from the equinox to the ascending node along the ecliptic of date, ω from
+the node to P (the projection of the in-plane angle). Outside the month
+ring a band carries the thirteen IAU constellations the ecliptic crosses,
+at their J2000 entry longitudes rotated by the precession of the equinox of
+date (the equinox's direction read in the chain's J2000 frame through the
+frame bridge). Under the diagram a values block carries the readout rows'
+numbers with the frame named: the ascending node Ω, the argument of
+perihelion ω = ϖ − Ω, the longitude of perihelion ϖ = Ω + ω and the
+inclination i, each in the J2000 ecliptic (the chain element, what the
+reference tables publish) and in the ecliptic of date (the frame the picture
+is drawn in; ω of date is the argument of latitude minus the true anomaly),
+e and a, and the vernal equinox of date as a J2000 longitude with the
+constellation that holds it. `inspectorRenderPaperSVG(planetKey)` builds it
+from `computeInspectorOrbitFrame`; nothing is computed on a path of its own.
+
+Two things the picture makes visible away from J2000, stated in the panel's
+legend section. The Gregorian calendar (365.2425 d) is longer than the
+tropical year of date, so the calendar drifts against the seasons by about a
+day per 3,300 years: at 222000 AD the vernal equinox falls on 19 January,
+and the month ring shows MARCH some 40° past the equinox tick while the tick
+carries the model's date. And the constellation band is a NAMING of the
+sidereal direction — the IAU boundaries of J2000 carried with the
+precession — not a sky view: over 10⁵ years the stars' proper motions
+displace the figures by degrees, which the band does not apply.
+The picture is shown in the chart-export modal (Download PNG / Download
+SVG / Share / Copy), and the `chart-export` browser gate renders it as one of
+the fourteen forms it checks.
+
+## 8. Keyboard
 
 | Key | Action |
 |---|---|
@@ -133,7 +177,7 @@ the test dates and restores the epoch). Its longitude rows still read the
 | → or N | next planet |
 | Escape or Q | close |
 
-## 8. Code locations
+## 9. Code locations
 
 | Component | Location |
 |---|---|

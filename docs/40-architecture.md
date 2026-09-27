@@ -446,7 +446,7 @@ function render(now) {
   // 30 Hz — CSS2D label flag (labelElapsed counter)
   // 20 Hz — UI: date/time strings, Julian Day, camera position
   // 10 Hz — Heavy astronomy: predictions, ascending nodes, anomalies,
-  //          inclinations, invariable plane, Planet Inspector
+  //          inclinations, invariable plane, Planet Orbit Analysis
   // 10 Hz — Position tracking: elongations, perihelion, orientations
   //  5 Hz — DOM labels: planet panel grid rebuild
   // 30 Hz — Visual effects: lighting, flares
@@ -487,7 +487,7 @@ Critical ordering for dependent calculations:
        ↓
 9. calculateInvariablePlaneFromAngularMomentum()  // Option A validation
        ↓
-10. updateHierarchyLiveData()                    // Planet Inspector (orbit of date, live)
+10. updateHierarchyLiveData()                    // Planet Orbit Analysis (orbit of date, live)
        ↓
 11. updateInclinationPathMarker()                // Inclination visualization
        ↓
@@ -683,11 +683,16 @@ Tweakpane Root ("Expanding Solar System Resonance Theory")
 │  └─▼ Solar Day (analemma + day length by starting angle)
 │
 └─▼ Tools
-   ├─ Planet Inspector           [button]
-   ├─ Data Explorer              [button → holisticuniverse.com]
-   ├─▼ Console Tests (F12)       (buttons, not toggles)
-   ├─▼ Camera
-   └─▼ Debug
+   ├─ [tab] Verification         (the model against references — "observed" colour)
+   │   ├─ Framework Verification            [button]
+   │   └─ Perihelion of Planets Verification [button]
+   ├─ [tab] Analysis             (the model's own predictions — "calculated" colour)
+   │   ├─ Planet Orbit Analysis             [button]
+   │   ├─ Earth–Moon Genesis Analysis       [button]
+   │   ├─ Earth Climate Analysis            [button]
+   │   └─ Earth dLOD/dt Analysis            [button]
+   ├─▼ Standard Model overlay (VSOP87 · MPP02)  (ghost-body overlay)
+   └─▼ Console Tests (F12)       (buttons, not toggles)
 ```
 
 ---

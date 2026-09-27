@@ -5,16 +5,16 @@ coefficients: sha256:bb6a03c877eedab8
 status: current
 ---
 
-# Formula Verification
+# Framework Verification
 
 ## Overview
 
-The **Formula Verification** panel is a modal in the Tools menu that compares the model's predictions against published analytical formulas from celestial-mechanics literature — Meeus, Chapront, Capitaine, Vondrák, Laskar, Berger, Bills & Ray. For eleven separate quantities (eccentricity, obliquity, inclination, ascending node, perihelion longitude, tropical year, cardinal year lengths, solar day length, sidereal year, axial precession period, ΔT) it plots the model and every available reference on a common time axis spanning **12,000 BC → 12,000 AD** (the Cardinal Year Lengths chart spans ±30,000 yr), shows a residual chart of each reference minus the model, and a J2000 comparison table that reports every formula's value at J2000 and its delta from the model.
+The **Framework Verification** panel is a modal in the Tools menu that compares the model's predictions against published analytical formulas from celestial-mechanics literature — Meeus, Chapront, Capitaine, Vondrák, Laskar, Berger, Bills & Ray. For eleven separate quantities (eccentricity, obliquity, inclination, ascending node, perihelion longitude, tropical year, cardinal year lengths, solar day length, sidereal year, axial precession period, ΔT) it plots the model and every available reference on a common time axis spanning **12,000 BC → 12,000 AD** (the Cardinal Year Lengths chart spans ±30,000 yr), shows a residual chart of each reference minus the model, and a J2000 comparison table that reports every formula's value at J2000 and its delta from the model.
 
-This is the analytical twin of the [WebGeoCalc Explorer](56-webgeocalc-explorer.md):
+This is the analytical twin of the [Perihelion of Planets Verification](56-webgeocalc-explorer.md):
 
-- WebGeoCalc Explorer → compares the model against **observed JPL data** (1900–2026).
-- Formula Verification → compares the model against **published closed-form formulas** (±12 000 yr).
+- Perihelion of Planets Verification → compares the model against **observed JPL data** (1900–2026).
+- Framework Verification → compares the model against **published closed-form formulas** (±12 000 yr).
 
 Together the two panels let you check the model from two independent directions: does it match what JPL *measures*, and does it match what textbook celestial mechanics *predicts*?
 
@@ -74,13 +74,9 @@ The panel closes on "×" click, Escape, or overlay click.
 
 ## Export for paper
 
-Three buttons in the header produce publication-grade SVG exports:
+One **Export** button in the header prints the current view — the category and the window tab on screen — as a publication-grade picture. On a generic category `exportVFPPaper()` hands `renderVFPPaperChartAlt(category, config)` the current tab's range and the screen's y range; the cycles window (−248,000 BC → +102,000 AD) carries the category's `paperAlt` annotations (reference lines, the Marine Isotope Stage peaks on the solar-day chart) and compares against La2004 where an N-body reference exists, since the polynomial references (Meeus, Chapront) diverge outside the century-scale window; ΔT's near window (1650 → 2050 AD) adds the dashed ΔT = 0 baseline from `paperRecent`. A custom category prints its own `customPaper` form. The SVG is rasterized in the browser and shown in the chart-export modal (`openChartExportModal`) with Download PNG / Download SVG / Share / Copy.
 
-- **Export for Paper** — renders the current category to a clean SVG with the default `[−12 000, +12 000]` year range and the model + references, without the UI chrome. Uses the category's `paperRange`, `paperTitle`, `paperYRange`, and `paperYTicks` if defined.
-- **Export Cycles** — only visible for categories that have a `paperAlt` block (seven of the eleven: eccentricity, obliquity, tropical year, cardinal year lengths, solar day, sidereal year, axial precession). Renders a much longer-baseline plot (−248 000 BC to +102 000 AD) to show the model's long-term oscillation cycles — against La2004 where an N-body reference exists. Excludes the polynomial references (Meeus, Chapront) that diverge badly outside the century-scale window, and overlays a mean-value reference line. The solar-day cycles view also marks the Marine Isotope Stage peaks (LR04) against the model's LOD extrema.
-- **Export Recent** — only visible for categories that have a `paperRecent` block (currently: ΔT). Renders a zoomed 1650-2050 SVG so short-scale features (e.g. the 1900 ΔT dip) are readable. Same curves as the main chart, plus a dashed reference baseline (ΔT = 0) for visual grounding.
-
-Exports are triggered by `exportVFPPaper()`, `exportVFPPaperAlt()`, and `exportVFPPaperRecent()`. All three call the same `renderVFPPaperChartAlt(category, altConfig)` renderer with different config blocks — the "Recent" and "Cycles" variants pass `paperRecent` / `paperAlt` respectively. The SVG is rasterized in the browser and shown in the chart-export modal (`openChartExportModal`) with Download PNG / Download SVG / Share / Copy; the `chart-export` browser gate pins the rasterizer.
+**The export standard.** Every Tools-panel export — the seven custom Framework-Verification forms, the generic one, the Perihelion of Planets Verification, the Earth Climate Analysis, the Earth–Moon Genesis Analysis, the Earth dLOD/dt Analysis and the Planet Orbit Analysis' orbit picture — is the same page: a 16-px title at the top, the shared wrapping legend row under it (`chartExportHeader` → `_vfpPaperLegend`; symbol swatches for figures whose series are dots or bands), the plot with its axis and tick labels, and the credit "ESSRT · holisticuniverse.com" in a 16-px strip bottom-right (`chartExportCredit`). No subtitle, no caption paragraphs, no fitted numbers, no footer sentences: the panels' Frame / References / Reading blocks, R² lines, rate summaries and correlation sentences read on screen, not on the picture. The `chart-export` browser gate renders all fourteen forms through the `chartExportForms` hook and pins the standard (root size, title at y = 18, exactly one credit in the bottom strip, nothing else below it, no text longer than 110 characters); it is fail-proven on a planted caption (`ESSRT_CHART_EXPORT_PLANT=2`) as well as on the rasterizer's pixel size (`=1`).
 
 ### Charts consistency
 
@@ -132,7 +128,7 @@ At any point the panel answers: *"Does our model agree with published celestial 
 - **Century-scale (±100 yr)** — the model agrees with Meeus, Chapront, Capitaine polynomials at the J2000-value level to a few arcseconds or sub-second time units; all curves are essentially indistinguishable in the main chart, and the residual chart shows deviations at the noise floor of the polynomial fits.
 - **Millennial-scale (±5 000 yr)** — the model still tracks the polynomial references closely; residuals grow but stay within the polynomials' stated validity.
 - **Ten-kyr-scale (±12 000 yr)** — polynomial references start to diverge (they were fit for a narrow window); the model tracks Laskar's La2004/La2010 N-body integrations instead, which are the only references valid at this range.
-- **100-kyr-scale (Export Cycles)** — the model's Earth eccentricity and obliquity laws are compared directly against Laskar's full N-body integration over several glacial cycles. This is where Milankovitch features appear.
+- **100-kyr-scale (the cycles window)** — the model's Earth eccentricity and obliquity laws are compared directly against Laskar's full N-body integration over several glacial cycles. This is where Milankovitch features appear.
 
 ## Why this panel matters for the model's claims
 
@@ -142,7 +138,7 @@ Cases where the model *disagrees* with a reference are also documented in the pa
 
 ## Scope and limitations
 
-1. **Earth only.** All eleven categories describe Earth quantities (Earth's orbit + Earth's spin axis + Earth's rotation clock ΔT). Planet-specific perihelion motion lives in the WebGeoCalc Explorer.
+1. **Earth only.** All eleven categories describe Earth quantities (Earth's orbit + Earth's spin axis + Earth's rotation clock ΔT). Planet-specific perihelion motion lives in the Perihelion of Planets Verification.
 2. **No interactive year slider.** The charts are plotted over a fixed range (−12 000 to +12 000). To inspect values at a specific year, read the J2000 table or advance the simulation's date and re-open the panel.
 3. **Reference formulas go stale outside their range.** A polynomial fit to ±2 000 years *will* give nonsense at year −10 000. The panel plots them anyway (with the range note) so the reader can see the divergence — useful for understanding *why* N-body solutions are needed at long range.
 4. **Paper-export is SVG-only.** No PNG / PDF export. Use browser screenshot or an external SVG-to-PDF converter.
@@ -160,10 +156,10 @@ Cases where the model *disagrees* with a reference are also documented in the pa
 
 ## Related documentation
 
-- [WebGeoCalc Explorer](56-webgeocalc-explorer.md) — the observational complement of this panel (model vs JPL data, 1900–2026).
+- [Perihelion of Planets Verification](56-webgeocalc-explorer.md) — the observational complement of this panel (model vs JPL data, 1900–2026).
 - [Perihelion Precession](13-mercury-precession-breakdown.md) — the internal computation methods used by the simulation for ϖ (the panel's category-5 model line is the one-source perihelion of date), and the reference-frame discussion (ecliptic vs ICRF) that applies to category 4's ascending-node comparison.
 - [Orbital Formulas Reference](21-orbital-formulas-reference.md) — the `OrbitalFormulas` library referenced by the model formulas.
-- [Expanding Solar System Resonance Theory](99-expanding-solar-system-resonance-theory.md) — Deep-time scaling of H(t); becomes marginally relevant at the Export Cycles 350-kyr baseline.
+- [Expanding Solar System Resonance Theory](99-expanding-solar-system-resonance-theory.md) — Deep-time scaling of H(t); becomes marginally relevant at the cycles window's 350-kyr baseline.
 
 ## Code Location
 
@@ -177,5 +173,5 @@ Cases where the model *disagrees* with a reference are also documented in the pa
 | Reference formulas (polynomial) | `eccMeeus`, `eccHarkness`, `obliquityChapront2002`, `perihelionMeeus`, `perihelionMeeusEarth`, `tropicalYearLaskar`, `solarDayPeters`, `siderealYearChapront`, `axialPrecessionCapitaine2009` in `src/script.js` |
 | Reference formulas (trig series) | `eccBerger1978`, `obliquityBerger1978`, `axialPrecessionVondrak2011` in `src/script.js` |
 | Reference formulas (N-body tables) | `eccLa2004`, `obliquityLa2004`, `perihelionLa2004`, `inclinationLa2010`, `ascNodeLa2010` in `src/script.js` (data arrays `_LA2004`, `_LA2010`) |
-| Tools-menu button | "Formula Verification" in Tweakpane Tools folder (`src/script.js`) |
+| Tools-menu button | "Framework Verification" in Tweakpane Tools folder (`src/script.js`) |
 | CSS | `.vfp-*` classes in `src/style.css` |

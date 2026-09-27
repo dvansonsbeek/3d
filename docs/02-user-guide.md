@@ -142,7 +142,7 @@ Use these values to verify against other planetariums like Stellarium.
 
 ### Planet Information Panel (planet stats)
 
-Click on any planet to show a collapsible sidebar handle on the left edge. Click the handle to expand the full information panel (the Planet Inspector under Tools is a different view: the orbit of date from the N-body chain, doc 51):
+Click on any planet to show a collapsible sidebar handle on the left edge. Click the handle to expand the full information panel (the Planet Orbit Analysis under Tools is a different view: the orbit of date from the N-body chain, doc 51):
 
 **Orbital Elements:**
 - Semi-major axis (a)
@@ -181,7 +181,8 @@ The **Show / Hide** folder contains a chip-grid of toggle buttons grouped by pla
 | **Polar Line** | Shows Earth's axis orientation pointing toward Polaris |
 | **Star Names** | Labels for prominent stars |
 | **Constellations** | Constellation outlines |
-| **Zodiac Wheel** | The 12 zodiac constellations centered on Earth |
+| **Zodiac constellations (IAU)** | The band of the thirteen IAU constellations the ecliptic crosses, centred on Earth and fixed to the stars (J2000 boundaries carried with the precession) — the equinox of date and the perihelion marker precess through it |
+| **Zodiac signs** | The twelve equal 30° signs of the tropical zodiac, Aries 0° at the vernal equinox of date — fixed to the seasons; the inner ring turns with the equinox against the constellation band, the precession of the equinoxes as the drift between the two |
 
 ### Trace Paths
 
@@ -225,9 +226,9 @@ The **Settings > Camera show/hide** folder shows your current viewpoint:
 
 ## Keyboard Shortcuts
 
-### Planet Inspector (Tools → Planet Inspector)
+### Planet Orbit Analysis (Tools → Planet Orbit Analysis)
 
-When the Planet Inspector panel is open:
+When the Planet Orbit Analysis panel is open:
 
 | Key | Action |
 |-----|--------|

@@ -201,10 +201,8 @@ const STEPS = [
   // cannot corrupt a source file the way a regex patcher can. Runs every time.
   { id: '9',  phase: 2, name: 'Regenerate constants module',
     cmd: 'node tools/constants/generate.mjs --write' },
-
-  // Phase 8: Dashboard data
-  { id: '10', phase: 2, name: 'Export dashboard data',
-    cmd: 'node tools/export-dashboard-data.js' },
+  // (Step 10, the Data Explorer dashboard export, retired with the
+  // dashboard — docs/retired-record.md.)
 ];
 
 // ─── Filter steps ───────────────────────────────────────────────────────────

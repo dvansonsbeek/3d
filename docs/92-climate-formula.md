@@ -206,7 +206,7 @@ The 25 canonical integers come from Berger 1978 + Laskar 2004 eigenmode beats + 
 
 **Composition summary**: 5 direct planetary periods (Mercury / Mars / Jupiter axial-obliquity, the obliquity centroid, the Mars nodal harmonic) + 8 g-beats (eccentricity band) + 10 s-beats (nodal / obliquity band, including k+s₃ and k+s₄ which are climatic-precession-style additions to s-rates, and the two Mars-line 8H-sidebands n=35 and n=53, re-attributed 2026-08 after the Mars 8H/36 refit) + 2 canonical climatic-precession lines (n=113, n=120) + 6 MTM-significant sidebands added in Tier B Round 1 + **1 Berger-quintet completion (n=141)** = **32 total**.
 
-Source: `L1_LABELS` dict in `scripts/milankovitch_climate_formula.py`. The same labels populate the L1 hover-tooltip in the Climate Formula Explorer modal (see §13.2).
+Source: `L1_LABELS` dict in `scripts/milankovitch_climate_formula.py`. The same labels populate the L1 hover-tooltip in the Earth Climate Analysis modal (see §13.2).
 
 ---
 
@@ -1276,11 +1276,11 @@ Forward projection (next 250 kyr from today) is purely within the post-MPT regim
 
 ---
 
-## 13. Climate Formula Explorer modal (`src/script.js`)
+## 13. Earth Climate Analysis modal (`src/script.js`)
 
 The interactive modal that visualizes the canonical formula across 8 time windows (CenCO2PIP 66M, CENOGRID 67M, LR04 5.3M, LR04 1.2M, EPICA 800k, LR04 700k, LR04 200k, LR04 forward) with layer toggles (Total / L1 / L2 / L3), per-regime R² breakdowns, forward-projection markers, and cross-proxy comparison tables, is documented in its own dedicated panel reference:
 
-→ **[doc 58 — Climate Formula Explorer](58-climate-formula-explorer.md)** — complete tab list, layer toggles, Y-axis conventions, R² breakdown panel, forward-projection markers, cross-proxy comparison tables, forward-projection note (Ganopolski-vs-Caillon framing), and code locations.
+→ **[doc 58 — Earth Climate Analysis](58-climate-formula-explorer.md)** — complete tab list, layer toggles, Y-axis conventions, R² breakdown panel, forward-projection markers, cross-proxy comparison tables, forward-projection note (Ganopolski-vs-Caillon framing), and code locations.
 
 The modal is read-only and reads coefficients from the embedded `CLIMATE_FORMULA_COEFFS` block (synced from `public/input/climate-formula-coefficients.json` via the §14 pipeline below).
 
@@ -1312,7 +1312,7 @@ data/cenco2pip-100kyr-bayesian.csv
        │
        ▼  src/script.js                               (imports CLIMATE_FORMULA_COEFFS, ~22 KB)
        │
-       ▼  Climate Formula Explorer modal renders the 8 tabs
+       ▼  Earth Climate Analysis modal renders the 8 tabs
 ```
 
 To regenerate after fit changes:

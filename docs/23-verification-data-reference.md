@@ -11,7 +11,7 @@ This document describes the astronomical verification data embedded in the simul
 
 **Related Documents:**
 - [52 - Analysis & Export Tools](52-analysis-export-tools.md) - Planet report generation and data export
-- [51 - Planet Inspector Reference](51-planet-inspector-reference.md) - Where reports are displayed
+- [51 - Planet Orbit Analysis Reference](51-planet-inspector-reference.md) - Where reports are displayed
 - [20 - Constants Reference](20-constants-reference.md) - Orbital constants and sources
 - [99 - Expanding Solar System Resonance Theory](99-expanding-solar-system-resonance-theory.md) - Deep-time integrator machinery referenced in the "Deep-time integration" subsection
 - [102 - GIA α(t) lunar validation](102-gia-alpha-lunar-validation.md) and [106 - Deep-time validation dossier](106-deep-time-validation-dossier.md) - the deep-time validation docs

@@ -5,11 +5,11 @@ coefficients: sha256:bb6a03c877eedab8
 status: current
 ---
 
-# Climate Formula Explorer
+# Earth Climate Analysis
 
 ## Overview
 
-The **Climate Formula Explorer** is a modal panel in the Tools menu that visualizes the canonical **L1+L2+L3 climate formula** (the orbital-forcing + carbon-cycle-thermostat + boundary-condition-step decomposition; see [doc 92](92-climate-formula.md)) overlaid on each of the four climate proxy records — **CenCO2PIP** (deep-time atmospheric CO₂, 0–66 Ma), **CENOGRID** (Cenozoic benthic δ¹⁸O / δ¹³C, 0–67 Ma), **LR04** (Pliocene-Pleistocene benthic δ¹⁸O, 0–5.3 Ma), and **EPICA Dome C** (atmospheric CO₂, 0–800 kyr). The modal exposes the same formula evaluated across 8 time windows from the deep-time 67-Myr CENOGRID record down to a forward projection of the next 250 kyr.
+The **Earth Climate Analysis** is a modal panel in the Tools menu that visualizes the canonical **L1+L2+L3 climate formula** (the orbital-forcing + carbon-cycle-thermostat + boundary-condition-step decomposition; see [doc 92](92-climate-formula.md)) overlaid on each of the four climate proxy records — **CenCO2PIP** (deep-time atmospheric CO₂, 0–66 Ma), **CENOGRID** (Cenozoic benthic δ¹⁸O / δ¹³C, 0–67 Ma), **LR04** (Pliocene-Pleistocene benthic δ¹⁸O, 0–5.3 Ma), and **EPICA Dome C** (atmospheric CO₂, 0–800 kyr). The modal exposes the same formula evaluated across 8 time windows from the deep-time 67-Myr CENOGRID record down to a forward projection of the next 250 kyr.
 
 This is the panel that grounds the model's climate claims in *observation*. The climate formula's orbital lines (the 28 physical lines of [doc 92 §2](92-climate-formula.md) — the engine's own secular beats plus the 405 / 202 / 135 kyr carbon-thermostat family; the comb era labelled them as 33 integer divisors) and the 6-step L3 Heaviside boundary-condition transitions (PETM, EOT, Mi-1, MMCT, iNHG, MPT) are fitted with sequential ridge regression per regime — see [doc 92 §9](92-climate-formula.md#9-the-canonical-climate-formula) for the canonical architecture.
 
@@ -18,7 +18,7 @@ This is the panel that grounds the model's climate claims in *observation*. The 
 ## Accessing the Explorer
 
 1. Open the Tweakpane Tools folder.
-2. Click **"Climate Formula Explorer"**.
+2. Click **"Earth Climate Analysis"**.
 3. Use the time-window tabs across the top to switch records.
 4. Use the layer toggles (Total / L1 / L2 / L3) to add or remove formula layers.
 5. On CENOGRID, use the δ¹⁸O / δ¹³C sub-toggle.
@@ -109,7 +109,7 @@ data/cenco2pip-100kyr-bayesian.csv
        │
        ▼  src/script.js                               (imports CLIMATE_FORMULA_COEFFS, ~22 KB)
        │
-       ▼  Climate Formula Explorer modal renders the 8 tabs
+       ▼  Earth Climate Analysis modal renders the 8 tabs
 ```
 
 Re-running scripts only needed after dataset updates or refit changes — see [doc 92 §14](92-climate-formula.md#14-reproducing-the-canonical-formula-pipeline-browser--modal) for the regeneration recipe and tooling.
@@ -124,7 +124,7 @@ Re-running scripts only needed after dataset updates or refit changes — see [d
 | Coefficient block | `CLIMATE_FORMULA_COEFFS` (embedded in bundle from `public/input/climate-formula-coefficients.json`) |
 | Lazy proxy-data loaders | `loadCfmLR04Data()`, `loadCenogridData()`, `loadEpicaData()`, `loadCenco2pipData()` |
 | Extrema detection (forward tab) | `cfmFindExtrema()` in `src/script.js` |
-| Tools-menu button | "Climate Formula Explorer" in Tweakpane Tools folder |
+| Tools-menu button | "Earth Climate Analysis" in Tweakpane Tools folder |
 | CSS | `.cfm-*` classes in `src/style.css` |
 
 ## Scope and limitations
@@ -144,6 +144,6 @@ Re-running scripts only needed after dataset updates or refit changes — see [d
 - [doc 94 — Insolation null test](94-insolation-null-test.md) — empirical anchor for the "lattice subsumes Berger insolation" claim (ΔR² ≈ 0)
 - [doc 95 — Climate summary](95-climate-summary.md) — the synthesis statement the modal visualizes
 - [doc 99 — Expanding Solar System Resonance Theory (ESSRT)](99-expanding-solar-system-resonance-theory.md) — deep-time scaling of the precession-band lines on the composed clock
-- [doc 59 — ESSRT Explorer](59-essrt-explorer.md) — sibling Tools-menu modal for deep-time H/LOD/year evolution
-- [doc 57 — Formula Verification](57-formula-verification.md) — sibling Tools-menu modal comparing model vs published celestial-mechanics formulas
-- [doc 56 — WebGeoCalc Explorer](56-webgeocalc-explorer.md) — sibling Tools-menu modal showing observed perihelion-precession history
+- [doc 59 — Earth–Moon Genesis Analysis](59-essrt-explorer.md) — sibling Tools-menu modal for the deep-time clock/LOD/year evolution
+- [doc 57 — Framework Verification](57-formula-verification.md) — sibling Tools-menu modal comparing model vs published celestial-mechanics formulas
+- [doc 56 — Perihelion of Planets Verification](56-webgeocalc-explorer.md) — sibling Tools-menu modal showing observed perihelion-precession history

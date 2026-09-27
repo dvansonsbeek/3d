@@ -106,17 +106,6 @@ version is reproducible forever:
 npm install @essrt/physics @essrt/model-values
 ```
 
-### Orbital Data Explorer (Dashboard)
-
-An interactive data dashboard for exploring planetary orbital elements across a 335-kyr deep-time window:
-
-```bash
-npm run dashboard:export   # generate JSON data from the orbital engine
-npm run dashboard          # start dashboard at http://localhost:5050
-```
-
-Features: multi-planet overlay, synchronized zoom/pan, light/dark mode, CSV export, range presets (the whole anchor interval and ±56 / ±34 / ±21 / ±13 / ±10 kyr windows around 2000), and obliquity decomposition for Earth.
-
 ### Python Analysis Scripts (Optional)
 
 The `scripts/` directory contains statistical analysis and verification scripts (the historical integer-significance and exoplanet tests, eccentricity analysis, Milankovitch spectral analysis on LR04 + Cheng2016 paleoclimate records producing the **climate formula**, Planet Nine falsification). To use them:
@@ -186,7 +175,7 @@ Two things worth knowing before you read a red result as breakage:
 - Time controls: play, pause, speed adjustment, and date navigation
 - Click any planet to focus the camera and see its orbital data
 - Planet info sidebar with per-planet data, charts, and precession analysis
-- **Climate Formula Explorer** — Tools-menu modal plotting the canonical L1+L2+L3 formula over four proxy records across eight time-window tabs (CenCO2PIP 66 Myr → forward projection of the next natural glaciation)
+- **Earth Climate Analysis** — Tools-menu modal plotting the canonical L1+L2+L3 formula over four proxy records across eight time-window tabs (CenCO2PIP 66 Myr → forward projection of the next natural glaciation)
 - Console tests for year length, day length, and calibration verification
 - Export functionality for solstice dates and object positions
 - Built with [Three.js](https://threejs.org/) and [Tweakpane v4](https://tweakpane.github.io/docs/)
@@ -298,7 +287,6 @@ in [NOTICE](NOTICE) — that is the authoritative list; this is the short versio
 
 **Libraries** — [Three.js](https://threejs.org/) (rendering) ·
 [Tweakpane](https://tweakpane.github.io/docs/) (UI) ·
-[Plotly.js](https://plotly.com/javascript/) (dashboard charts) ·
 [SheetJS](https://sheetjs.com/) (spreadsheets)
 
 **Data** — [Yale Bright Star Catalog](https://github.com/brettonw/YaleBrightStarCatalog)

@@ -6,7 +6,7 @@ across ±500 Myr. [Preprint](https://doi.org/10.21203/rs.3.rs-8758810/v4) ·
 [Live demo](https://3d.holisticuniverse.com)
 
 **Scale:** `src/script.js` ~60,000 lines · `tools/` ~240 tracked JS scripts
-across 9 directories (~360 on disk with the untracked local archives) · ~245 Python files · 47 docs (24 retired-machinery docs archived out of the tree — `docs/retired-record.md` is the public record; `docs/archive/retired/`, gitignored, holds the files — and the strip-and-restructure pass merged five more into their live homes) · two web UIs (simulator, `dashboard/`).
+across 9 directories (~360 on disk with the untracked local archives) · ~245 Python files · 47 docs (24 retired-machinery docs archived out of the tree — `docs/retired-record.md` is the public record; `docs/archive/retired/`, gitignored, holds the files — and the strip-and-restructure pass merged five more into their live homes) · one web UI (the simulator; the Data Explorer dashboard is retired — `docs/retired-record.md`).
 **`npm run check` enforces a twenty-four-step gate chain; CI runs it plus a
 headless-browser job and auto-deploys the simulator to GitHub Pages on
 green main.**
@@ -202,7 +202,13 @@ owner's "waiting time before Play / stutter at 1000 yr/s"; fail-proven via
 `ESSRT_PERF_TIGHTEN=0.01` and on the pre-fix build). The `test:snapshot`
 chain also carries `chart-export` — the Tools panels' paper-SVG → PNG
 rasterizer behind every Export button (exact pixel size, independent decode,
-byte floor; fail-proven via `ESSRT_CHART_EXPORT_PLANT=1`).
+byte floor; fail-proven via `ESSRT_CHART_EXPORT_PLANT=1`) and the export
+STANDARD on all fourteen forms (title + legend row above, the plot, one
+credit strip below, no caption text — doc 57; fail-proven via `=2`), and
+`tools-panels` — every Tools button opens its panel with no page error,
+three clicks within a frame leave ONE panel, and it closes again (born
+from a ReferenceError on open and the double-build race; fail-proven via
+`ESSRT_TOOLS_PLANT=1`).
 `npm run test:transparency` is the Phase 6 acceptance gate — **green (84/84,
 round-trip bit-exact) since Phase B** and required in CI; red there is a
 regression of the Phase 6 exit criterion, not a tracked state.

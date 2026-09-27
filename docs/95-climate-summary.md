@@ -150,7 +150,7 @@ The conventional summary "climate is driven by Milankovitch insolation forcing" 
 
 ### 5.4 An observation about the current era
 
-A consequence visible directly in the dashboard's forward-projection modal (Climate Formula Explorer in [`src/script.js`](../src/script.js)): **the L2 405-kyr carbon-thermostat layer in the canonical formula sits near a warming peak around the present era.** This is a fitted observation from LR04 — the layer's phase is set by the regression, and the cycle position then falls where it falls.
+A consequence visible directly in the simulator's forward-projection tab (Earth Climate Analysis in [`src/script.js`](../src/script.js)): **the L2 405-kyr carbon-thermostat layer in the canonical formula sits near a warming peak around the present era.** This is a fitted observation from LR04 — the layer's phase is set by the regression, and the cycle position then falls where it falls.
 
 Quantitatively:
 
@@ -158,7 +158,7 @@ Quantitatively:
 |----------|-------|--------|
 | L2 fundamental period | 405 kyr | g₂ − g₅ (Venus–Jupiter eccentricity beat) |
 | L2 amplitude (post-MPT fit) | ~0.5–1.0 °C peak-to-trough | [`data/milankovitch-climate-formula.json`](../data/milankovitch-climate-formula.json) |
-| Current phase | Near warm peak | Climate Formula Explorer modal |
+| Current phase | Near warm peak | Earth Climate Analysis modal |
 | L2 rate of change at peak | < 0.005 °C / century | Derivative of fitted sinusoid |
 
 **What this observation does and does not say.** To preempt misreading in either direction:

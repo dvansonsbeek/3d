@@ -209,7 +209,7 @@ don't disagree qualitatively. But it fails where frame matters:
 - **Saturn (sign flip)**: first-order L-L gives prograde +1,867 ″/cy, but
   WebGeoCalc measures ecliptic-of-date retrograde over 1800–2100, with
   magnitude window-dependent (sliding 126-year OLS gives anywhere from
-  −1,800 to −3,600 ″/cy; the WebGeoCalc Explorer panel flags Saturn as
+  −1,800 to −3,600 ″/cy; the Perihelion of Planets Verification panel flags Saturn as
   un-determined because of this window sensitivity). The *direction*
   retrograde is robust; the *magnitude* is not pinpointable from the
   1800–2100 baseline. Either way, the sign disagreement with L-L is

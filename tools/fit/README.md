@@ -437,8 +437,6 @@ Step 3:  Export from browser GUI              → data/01-holistic-year-objects-
               step in the entire pipeline that requires the toggle off —
               all other steps run in Node or Python, which have no
               deep-time chain and are J2000-locked by construction.
-              Step 10 (dashboard export) is intentionally deep-time-aware;
-              don't disable for that one.
            4. Verify `holisticyearLength` returns `335317` (or
               `335316.9999...` — the physics-derived J2000 value, see
               memory note `meanlengthofday-j2000-value`; the ~1e-10 delta
@@ -846,21 +844,12 @@ Publish: the website consumes the published packages — after Step 9, run
          data/significance-results.json) — the model-values registry reads
          both.
 
-── Phase 7: Dashboard ─────────────────────────────────────────────
+── Phase 7: (retired) ─────────────────────────────────────────────
 
-Step 10: node tools/export-dashboard-data.js  → dashboard/data/*.json
-         Exports orbital elements, sky positions, and Earth predictions
-         for the dashboard visualizations. Uses stepYears intervals.
-
-         Uses tools/lib/deep-time.js (ESSRT Architecture α chain ported
-         from src/script.js — dual-source per IP-dashboard-deep-time-
-         alignment.md Q1) so per-year values match production tweakpane
-         displays. Dashboard time range (±300 kyr) is well within the
-         deep-time chain's validated range. Adds three deep-time arrays
-         to earth.json: holisticYearAtYear, auKmAtYear, moonDistanceKmAtYear.
-
-         When updating src/script.js mean*AtAge functions, the equivalent
-         in tools/lib/deep-time.js MUST be updated in parallel — they are
+Step 10 was the Data Explorer dashboard export; the dashboard is retired
+         (docs/retired-record.md). The rule it carried still holds: when
+         updating src/script.js mean*AtAge functions, the equivalent in
+         tools/lib/deep-time.js MUST be updated in parallel — they are
          the same chain in two locations.
 ```
 
@@ -895,7 +884,7 @@ Step 11 (= pipeline step 7c — the runner executes it in a normal pass;
          cycles are post-integration cosmetic corrections to the framework's
          historical ΔT curve, not part of the LOD physics. They do NOT feed
          Step 6a (nor the frozen era clock) and do NOT affect the
-         dashboard's model-values snapshot.
+         model-values registry.
 
          Candidate identification: `scripts/lattice_harmonic_scan.py` cross-
          validates harmonic divisors against multiple paleoclimate archives
@@ -1044,7 +1033,7 @@ Step 3 (browser export) is always manual — the runner checks the data file exi
 - Steps 4b-d (ML training): **~10 min combined**
 - Step 5c (Moon): **~1 min** (5a-5b retired — K5 excision)
 - **Step 6a (CSV export): ~2 hours** — this is the pipeline bottleneck. Default step timeout raised to 3 h.
-- Steps 7a-7c, 8-10 (balance, ΔT joint fit, verify, constants, dashboard): ~5-10 min combined
+- Steps 7a-7c, 8-9 (balance, ΔT joint fit, verify, constants): ~5-10 min combined
 - Steps 7f-7i (campaign-artifact generators): ~5 min combined, dominated by 7i (eclipse audit, ~2-4 min; 7g retired at plan 06 R8)
 - **TOTAL Phase 2: ~2.5-3 hours** dominated by Step 6a.
 
@@ -1114,9 +1103,6 @@ node tools/fit/verify-pipeline.js                                            # S
 node tools/fit/verify-pipeline.js --write                                    # update baselines.json
 npm run constants:generate                                                   # Step 9
 
-# Phase 7: Dashboard
-node tools/export-dashboard-data.js                                          # Step 10
-
 # Phase 8: Sub-Milankovitch ΔT correction stack (independent of Phases 1–7)
 # Automated in the runner as step 7c. Re-run standalone only on Phase-8 triggers (see
 # "What triggers a refit?" table): change to a Bond/Hallstatt/Jose5/Jose4 _LATTICE_N,
@@ -1148,7 +1134,6 @@ npm run values:package:write     # re-render @essrt/model-values + re-stamp docs
 | Browser simulation | `src/script.js` ← imports the generated constants module |
 | Solar measurements (CSV) | `data/02-solar-measurements.csv` (1-year steps, ~160 MB) |
 | Browser export (Excel) | `data/01-holistic-year-objects-data.xlsx` (1-year steps, ~300 MB) |
-| Dashboard data | `dashboard/data/*.json` |
 
 Note: Large data files (>100 MB) are excluded from git via `.gitignore`.
 They are generated locally by steps 3 and 6a.

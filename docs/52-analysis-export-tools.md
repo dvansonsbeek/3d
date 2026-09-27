@@ -10,7 +10,7 @@ status: current
 This document describes all data export, report generation, and validation systems in the ESSRT simulation.
 
 **Related Documents:**
-- [51 - Planet Inspector Reference](51-planet-inspector-reference.md) - Planet inspector panel and where planet reports are displayed
+- [51 - Planet Orbit Analysis Reference](51-planet-inspector-reference.md) - Planet inspector panel and where planet reports are displayed
 - [50 - UI Panels Reference](50-ui-panels-reference.md) - Panel system overview
 - [21 - Orbital Formulas Reference](21-orbital-formulas-reference.md) - Calculations used in exports
 - [99 - Expanding Solar System Resonance Theory (ESSRT)](99-expanding-solar-system-resonance-theory.md) - Deep-time scaling of H(t) and epoch helpers
@@ -46,14 +46,15 @@ Reports (observed category)
 └── Solar Day
 
 Tools
-├── Planet Inspector          [opens the Planet Inspector — orbit of date + position report]
-├── WebGeoCalc Explorer
-├── LOD-Climate Rhythm
-├── Climate Formula Explorer
-├── ESSRT Explorer
-├── Formula Verification
-├── Data Explorer             [opens data.holisticuniverse.com]
-├── Standard Model (VSOP87 · MPP02)   [ghost-body overlay sub-folder]
+├── [tab] Verification                [the model against references — the "observed" colour]
+│   ├── Framework Verification
+│   └── Perihelion of Planets Verification
+├── [tab] Analysis                    [the model's own predictions — the "calculated" colour]
+│   ├── Planet Orbit Analysis         [orbit of date + orbit picture + position report]
+│   ├── Earth–Moon Genesis Analysis
+│   ├── Earth Climate Analysis
+│   └── Earth dLOD/dt Analysis
+├── Standard Model overlay (VSOP87 · MPP02)   [ghost-body overlay sub-folder]
 └── Console Tests (F12)
 ```
 
@@ -351,7 +352,7 @@ Planet position reports provide detailed validation data comparing calculated po
 
 ### Accessing Reports
 
-1. Open the **Planet Inspector** (`Tools > Planet Inspector`)
+1. Open the **Planet Orbit Analysis** (`Tools > Planet Orbit Analysis`)
 2. Select the planet
 3. In the **Position Report** section click **Generate report** (the scene walks through the test dates and returns)
 4. Use **Download Excel** or **Copy Report**; **Show all results** includes the dates hidden from the screen view
@@ -700,5 +701,5 @@ Reports compare against these reference sources:
 
 ---
 
-**Previous**: [51 - Planet Inspector Reference](51-planet-inspector-reference.md)
-**Next**: [56 - WebGeoCalc Explorer](56-webgeocalc-explorer.md)
+**Previous**: [51 - Planet Orbit Analysis Reference](51-planet-inspector-reference.md)
+**Next**: [56 - Perihelion of Planets Verification](56-webgeocalc-explorer.md)

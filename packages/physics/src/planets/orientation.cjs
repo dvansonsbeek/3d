@@ -14,7 +14,7 @@
  *
  * Two ascending-node conventions exist and BOTH are quantities (the S-P4
  * lesson): the year-2000-anchored linear node here
- * (ascendingNodeInvPlaneLinearAt — the node-integrator/dashboard mirror)
+ * (ascendingNodeInvPlaneLinearAt — the node-integrator mirror)
  * and the balanced-year −8H/N node inside the scene tilt
  * (eclipticInclinationFromBalanced). Do not merge them.
  */
@@ -54,7 +54,7 @@ function invPlaneInclinationAt(body, yearsSinceBalanced, env) {
 
 /**
  * Ascending node on the invariable plane — the LINEAR year-2000-anchored
- * convention (node-integrator/dashboard; see the header).
+ * convention (node-integrator; see the header).
  * @param {{ ascendingNodeInvPlane?: number, ascendingNodePeriod?: number,
  *   perihelionEclipticYears: number }} body
  * @param {number} year @returns {number} degrees 0–360 */

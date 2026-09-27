@@ -286,6 +286,21 @@ browser ≡ Node to 0.000″; the planets' JPL RMS improved on every target
 The registry constants of the retired harmonics and the Step-0 fitter remain
 as the record.
 
+**The Data Explorer dashboard** (`dashboard/`, `tools/export-dashboard-data.js`,
+`tools/export-positions-data.js`, the reserved `packages/dashboard` slot;
+data.holisticuniverse.com): three static chart pages — orbital elements,
+Earth predictions, planet positions — fed by pre-generated JSON. Its planet
+traces rode the retired geometric device (the base-plus-amplitude
+eccentricity law, the tilt-derived dynamic inclination and ascending node,
+the two-component obliquity, a linear perihelion precession), its Earth page
+the retired H/3 + H/8 obliquity split, the solstice-RA device and the Earth
+Rate of Deviation, and its positions page graded the pre-chain scene against
+JPL. Retired whole: the simulator's Framework Verification and Perihelion of
+Planets Verification panels render the same comparisons from the N-body
+chain with an Export on every chart, and the API, the MCP server and the
+`@essrt/model-values` registry serve every value per epoch. The domain
+redirects to the simulator.
+
 ## What this does NOT retire
 
 The lunisolar precession clock — the recession history, the LOD/tide/ΔT

@@ -5,11 +5,11 @@ coefficients: sha256:bb6a03c877eedab8
 status: current
 ---
 
-# ESSRT Explorer
+# Earth–Moon Genesis Analysis
 
 ## Overview
 
-The **ESSRT Explorer** is a modal panel in the Tools menu that visualizes the **Expanding Solar System Resonance Theory** (see [doc 99](99-expanding-solar-system-resonance-theory.md)) — how the mean lunisolar precession period, the obliquity beat, length-of-day, sidereal/tropical year length, Moon distance, and Earth-Sun distance evolve across deep time.
+The **Earth–Moon Genesis Analysis** is a modal panel in the Tools menu that visualizes the **Expanding Solar System Resonance Theory** (see [doc 99](99-expanding-solar-system-resonance-theory.md)) — how the mean lunisolar precession period, the obliquity beat, length-of-day, sidereal/tropical year length, Moon distance, and Earth-Sun distance evolve across deep time.
 
 The clock — the mean lunisolar precession period — lengthens monotonically across geological time via two physically independent drivers (the climate formula's precession-band lines ride it; its eccentricity-band lines, planetary beats, do not):
 
@@ -18,16 +18,16 @@ The clock — the mean lunisolar precession period — lengthens monotonically a
 
 The panel plots each quantity over the full Hadean → +1 Gyr range or a focused Phanerozoic 650-Myr window, with anchor-point validation against the Wu et al. 2024 cyclostratigraphic compilation.
 
-This is the panel that grounds the model's deep-time claims in *observation*. The model's deep-time claims (the composed precession clock of [doc 99](99-expanding-solar-system-resonance-theory.md), the climate formula's precession-band lines of [doc 92](92-climate-formula.md)) all live on a scaffold whose absolute scale evolves with the tidal history. The ESSRT Explorer makes that evolution visible.
+This is the panel that grounds the model's deep-time claims in *observation*. The model's deep-time claims (the composed precession clock of [doc 99](99-expanding-solar-system-resonance-theory.md), the climate formula's precession-band lines of [doc 92](92-climate-formula.md)) all live on a scaffold whose absolute scale evolves with the tidal history. The Earth–Moon Genesis Analysis makes that evolution visible.
 
 ## Accessing the Explorer
 
 1. Open the Tweakpane Tools folder.
-2. Click **"ESSRT Explorer"**.
+2. Click **"Earth–Moon Genesis Analysis"**.
 3. Use the **Quantity** tabs (top row, gold accent) to select what to plot.
 4. Use the **Range** tabs (second row, teal accent) to select the time range.
 
-The two-tab-row layout matches the layered look of the Climate Formula Explorer ([doc 58](58-climate-formula-explorer.md)). Quantity tabs use the standard gold active-state; range tabs use a teal-cyan accent (`#3ec9b9`) so the two rows are visually distinct.
+The two-tab-row layout matches the layered look of the Earth Climate Analysis ([doc 58](58-climate-formula-explorer.md)). Quantity tabs use the standard gold active-state; range tabs use a teal-cyan accent (`#3ec9b9`) so the two rows are visually distinct.
 
 ## Quantity tabs
 
@@ -57,9 +57,9 @@ Some quantities use a tighter Phanerozoic Y-range than the Full range — e.g., 
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
-│ Expanding Solar System Resonance Theory (ESSRT)       [×]   │
-│ The lunisolar precession clock lengthens monotonically...   │
-│                                            [Export Full] [Export Phanerozoic] │
+│ Earth–Moon Genesis Analysis                            [×]   │
+│ The model's own evolution from Earth–Moon genesis ...       │
+│                                                    [Export] │
 ├─────────────────────────────────────────────────────────────┤
 │ [Axial Precession][Obliquity][LOD][Year][AU][Moon]          │  ← Quantity (gold)
 │ [Full (−4.5 to +1 Gyr)] [Phanerozoic (650 Ma)]              │  ← Range (teal)
@@ -131,12 +131,9 @@ These prevent the common misreading that the modal is showing *the obliquity osc
 
 ## Export buttons
 
-Two buttons in the header produce publication-grade SVG exports:
+One **Export** button in the header prints the view on screen — the current quantity over the current range tab (Full, −4.5 to +1 Gyr, or the Phanerozoic 650 Ma window) — as the standard export page (white background, sized for figure inclusion); on the Phanerozoic window the Wu et al. 2024 anchors take a dot entry in the legend row.
 
-- **Export Full** — renders the current quantity over the Full (−4.5 to +1 Gyr) range as a paper-style SVG (white background, sized for figure inclusion).
-- **Export Phanerozoic** — renders the current quantity over the Phanerozoic 650 Ma window as a paper-style SVG.
-
-Both use `essrtRenderPaperChart()` which mirrors the modal renderer's geometry so the export looks identical to the on-screen view minus the interactive UI chrome. Triggered by `essrtExport(rangeKey)`; the SVG is rasterized in the browser and shown in the chart-export modal (`openChartExportModal`) with Download PNG / Download SVG / Share / Copy buttons.
+It uses `essrtRenderPaperChart()`, which mirrors the modal renderer's plot geometry and dresses it in the shared export page — title, legend row, the plot with its axes, the credit "ESSRT · holisticuniverse.com" (doc 57, "The export standard"); the quantity's subtitle paragraph reads on screen only. Triggered by `essrtExport(rangeKey)`; the SVG is rasterized in the browser and shown in the chart-export modal (`openChartExportModal`) with Download PNG / Download SVG / Share / Copy buttons.
 
 ## Validation summary
 
@@ -168,8 +165,8 @@ Full per-anchor agreement table + statistical summary at [doc 99 §"Validation a
 | Tick computer | `essrtNiceTicks(min, max, targetTicks)` — round-number Y-axis ticks |
 | Series sampler | `essrtComputeSeries(spec, t_lo, t_hi, N, planetKey)` |
 | Underlying physics | `meanLodSecondsAtAge`, `meanHAtAge`, `meanSiderealYearSecondsAtAge`, `meanTropicalYearSecondsAtAge`, `meanMoonDistanceMetresAtAge`, `meanAuAtAge`, `meanPlanetOrbitalPeriodAtAge` (all in the deep-time block of `src/script.js`) |
-| Tools-menu button | "ESSRT Explorer" in Tweakpane Tools folder |
-| CSS | `.cfm-*` classes shared with Climate Formula Explorer + ESSRT-specific overrides |
+| Tools-menu button | "Earth–Moon Genesis Analysis" in Tweakpane Tools folder |
+| CSS | `.cfm-*` classes shared with Earth Climate Analysis + ESSRT-specific overrides |
 
 ## Scope and limitations
 
@@ -184,7 +181,7 @@ Full per-anchor agreement table + statistical summary at [doc 99 §"Validation a
 - [doc 99 — Expanding Solar System Resonance Theory (ESSRT)](99-expanding-solar-system-resonance-theory.md) — complete theoretical framework, Driver 1 + 2 derivations, per-anchor validation tables, deep-time L1 predictions, falsifiable claims
 - [doc 92 — Climate Formula](92-climate-formula.md) — the L1 integer-divisor lattice that stays invariant under H(t) scaling
 - [doc 10 — the six relations (historical record)](10-fibonacci-laws.md) — the retired integer identities; the modal scales the dynamical periods (the composed precession period and the obliquity beat)
-- [doc 58 — Climate Formula Explorer](58-climate-formula-explorer.md) — sibling Tools-menu modal (companion to ESSRT Explorer)
-- [doc 57 — Formula Verification](57-formula-verification.md) — sibling Tools-menu modal comparing model vs published celestial-mechanics formulas across ±12 kyr
-- [doc 56 — WebGeoCalc Explorer](56-webgeocalc-explorer.md) — sibling Tools-menu modal showing observed perihelion-precession history (JPL NAIF, 1900–2026)
+- [doc 58 — Earth Climate Analysis](58-climate-formula-explorer.md) — sibling Tools-menu modal (companion to Earth–Moon Genesis Analysis)
+- [doc 57 — Framework Verification](57-formula-verification.md) — sibling Tools-menu modal comparing model vs published celestial-mechanics formulas across ±12 kyr
+- [doc 56 — Perihelion of Planets Verification](56-webgeocalc-explorer.md) — sibling Tools-menu modal showing observed perihelion-precession history (JPL NAIF, 1900–2026)
 - [doc 50 — UI Panels Reference](50-ui-panels-reference.md) — overview of all UI panels

@@ -195,7 +195,7 @@ This document is the *framework* — what the model says about Milankovitch.
 
 The empirical evidence lives in [doc 91 — Milankovitch Evidence & Hypothesis Tests](91-milankovitch-evidence.md): spectral analysis of LR04 + Cheng 2016 + EPICA + CENOGRID, the comb-era 33-component formula (record), per-planet contributions, the MPT amplitude-growth analysis, a pre-registered super-cycle hypothesis test (NULL), fourteen falsifiable follow-up tests (16 positives / 2 partials / 5 nulls), and the 405-kyr off-lattice characterization as a Layer-2 carbon-cycle thermostat resonance.
 
-The canonical L1 + L2 + L3 modular formula — per-regime ridge fitting across LR04 / CENOGRID / EPICA / CenCO2PIP, stitched per-regime evaluation, and the Climate Formula Explorer modal in `src/script.js` — is documented in [doc 92 — Climate Formula: Architecture, Variance & Implementation](92-climate-formula.md).
+The canonical L1 + L2 + L3 modular formula — per-regime ridge fitting across LR04 / CENOGRID / EPICA / CenCO2PIP, stitched per-regime evaluation, and the Earth Climate Analysis modal in `src/script.js` — is documented in [doc 92 — Climate Formula: Architecture, Variance & Implementation](92-climate-formula.md).
 
 **Five headline findings from doc 91 §1**:
 
