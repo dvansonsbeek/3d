@@ -107,9 +107,9 @@ The display shows:
 
 ### EARTH-WOBBLE-CENTER ("The Death Star")
 
-This gray sphere represents the gravitational center around which Earth's axis wobbles over one precession period (<!--v:axialPrecRound-->~25,771<!--/v--> years at J2000). It's the pivot point for axial precession.
+This small grey marker rides Earth's precession frame: it circles Earth once per precession period (<!--v:axialPrecRound-->~25,771<!--/v--> years at J2000) at a fixed display distance, marking the solstice direction — the direction Earth's axis leans within the sun plane. It is a display marker, not a physics node: every instrument measures from Earth itself.
 
-**To observe**: Speed up time to 1,000+ years and watch Earth orbit this point.
+**To observe**: focus on Earth, enable Tracing › Wobble, speed up time to 1,000+ years per second and watch it draw its circle around Earth.
 
 ### PERIHELION-OF-EARTH (White Dot)
 
@@ -172,7 +172,7 @@ Shows which planets are currently above or below the invariable plane:
 
 ### Show / Hide
 
-The **Show / Hide** folder contains a chip-grid of toggle buttons grouped by planet (Sun, Mercury, Venus, Earth, Moon, Mars, Jupiter, Saturn, Uranus, Neptune, Pluto, Halley's, Eros). Click any chip to toggle visibility of that object. Groups include both physical bodies and their associated reference objects (perihelion points, precession layers, etc.).
+The **Show / Hide** folder contains a chip-grid of toggle buttons grouped by planet (Sun, Mercury, Venus, Earth, Moon, Mars, Jupiter, Saturn, Uranus, Neptune, Pluto, Halley's, Eros). Click any chip to toggle visibility of that object. For the seven chain planets a group holds the planet, **Perihelion at Sun** (the perihelion point of the orbit of date, Sun + a(1−e) in the chain's perihelion direction, with a Sun → P line — the same construction as the Planet Orbit Analysis' P) and **Perihelion at Earth** (the geocentric direction marker at the legacy display radius); the device wheels behind the planets (the ecliptic-duration and fixed/real-perihelion wheels) and the retired eccentricity-cycle wobble centres have no chips. Pluto, Halley's and Eros have no group (they render as before). The Moon's group is the Moon, **Apsidal Precession** — the perigee of date, Earth + a(1−e) in the orbit plane at the argument F − M′ with an Earth → perigee line, advancing once per ~8.85 yr — and **Nodal Precession** — the line of nodes, the ascending ↑ and descending ↓ nodes on the mean-distance circle at the longitude L′ − F with a dashed line through Earth, regressing once per ~18.6 yr; both are drawn from the framework-native lunar arguments on the ecliptic of date (focus on Earth and zoom in to the Moon's orbit to see them). The Moon's device wheels have no chips, and neither do Earth's five precession wheels (the Earth frame is placed from the engine; Earth's group is the Earth, its Wobble Center and its Perihelion). The Sun's group is the Sun, **Sun barycenter** — the Solar System Barycenter as the mass-weighted sum of the chain's heliocentric positions of date (the same sum as the Sun panel's Sun-SSB rows), with a Sun → SSB line and the barycenter's path around the Sun over ±25 years (focus on the Sun and zoom in: the loops span about two solar radii) — and **Sun barycenter at Earth**, the same vector and path drawn from Earth's centre: a transposed display, not a position, so the Sun's wobble reads where the camera usually sits (the loops reach past the Moon's orbit).
 
 ### Celestial Tools
 

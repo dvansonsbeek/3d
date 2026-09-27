@@ -5188,6 +5188,12 @@ function recomputeTimeUnitsForEpoch(t_Ma) {
 function updateAllTracesForEpoch() {
   earth.traceLength                = sYear * 1000000;
   earth.traceStep                  = sYear;
+  // The wobble-centre marker (D7: circles Earth once per precession period at
+  // the Law-4 display radius) is a year-step secular trace like the
+  // perihelion markers. It had NO trace parameters — vertexCount = NaN, an
+  // empty line — so the Tracing chip "Wobble" drew nothing (owner report).
+  earthWobbleCenter.traceLength    = sYear * 1000000;
+  earthWobbleCenter.traceStep      = sYear;
   earthPerihelionFromEarth.traceLength = sYear * 1000000;
   earthPerihelionFromEarth.traceStep   = sYear;
   sun.traceLength                  = sYear * 1000000;
@@ -6370,6 +6376,93 @@ if (typeof window !== 'undefined') {
         pathPoints: pos ? pos.count : 0,
         markerLabel: ud.labelDiv.textContent,
       };
+    },
+    // Perihelion-at-Sun gate hook: switch a chain planet's marker on, place
+    // it at the current epoch and return its geometry against the chain
+    // elements — the distance from the Sun (AU), a(1−e), the marker's
+    // longitude in the J2000 ecliptic (through the frame bridge) beside the
+    // chain's ϖ, and the marker's component along the orbit normal.
+    periSunMarkerProbe: (planetName) => {
+      const planetObj = planetObjects.find((p) => p.name === planetName);
+      if (!planetObj || !_KC_PLANET_NAMES.has(planetName) || !_kcR) return null;
+      const nm = planetName.toLowerCase(), m = _kcPeriSunMarker(planetObj);
+      m.visible = true; m.onToggle(true);
+      _kcUpdatePeriSunMarker(planetObj, nm, o.julianDay);
+      const el = _kcElementsOfDate(nm, o.julianDay), R = _kcR;
+      const S = new THREE.Vector3(); sun.planetObj.getWorldPosition(S);
+      const d = m.dot.position.clone().sub(S);
+      const j = [R[0][0] * d.x + R[1][0] * d.y + R[2][0] * d.z, R[0][1] * d.x + R[1][1] * d.y + R[2][1] * d.z, R[0][2] * d.x + R[1][2] * d.y + R[2][2] * d.z];   // Rᵀ·d: J2000 ecliptic
+      const D2R = Math.PI / 180, Om = el.ascNodeEclipticDeg * D2R, inc = el.inclEclipticDeg * D2R;
+      const n = [Math.sin(inc) * Math.sin(Om), -Math.sin(inc) * Math.cos(Om), Math.cos(inc)];   // the orbit normal (J2000 ecliptic)
+      m.visible = false; m.onToggle(false);
+      return { distAU: d.length() / 100, aPeriAU: el.aAU * (1 - el.e), lonJ2000Deg: ((Math.atan2(j[1], j[0]) / D2R) % 360 + 360) % 360,
+        lonPeriDeg: ((el.lonPeriEclipticDeg % 360) + 360) % 360, normalComponentAU: (j[0] * n[0] + j[1] * n[1] + j[2] * n[2]) / 100 };
+    },
+    // Sun-barycenter gate hook: place the marker at the current epoch and
+    // return its offset from the Sun (km) beside computeSunSSBOffset's
+    // magnitude — the same sum in two bases — and the path's sample count.
+    ssbMarkerProbe: () => {
+      const m = _ssbMarker('sun'), me = _ssbMarker('earth');
+      m.visible = true; me.visible = true; m.onToggle(true); me.onToggle(true);
+      _ssbUpdateMarker(o.julianDay);
+      const S = new THREE.Vector3(), E = new THREE.Vector3(); sun.planetObj.getWorldPosition(S); earth.rotationAxis.getWorldPosition(E);
+      const offKm = m.dot.position.distanceTo(S) / 100 * AU_J2000_KM;
+      const vSun = m.dot.position.clone().sub(S), vEarth = me.dot.position.clone().sub(E);
+      const year = 2000 + (o.julianDay - KC_ANCHOR_EPOCH_JD) / 365.25;
+      const panel = computeSunSSBOffset(year);
+      const pa = m.path.geometry.attributes.position.array;
+      let finite = 0; for (let i = 0; i < pa.length; i += 3) if (Number.isFinite(pa[i]) && (pa[i] !== 0 || pa[i + 1] !== 0 || pa[i + 2] !== 0)) finite++;
+      m.visible = false; me.visible = false; m.onToggle(false); me.onToggle(false);
+      return { offsetKm: offKm, panelMagnitudeKm: panel.magnitude, dominantPlanet: panel.dominantPlanet, pathPoints: finite,
+        earthViewSameVectorUnits: vSun.distanceTo(vEarth), earthViewOriginAtEarthUnits: me.line.geometry.attributes.position.array.slice(0, 3).map((c, i) => c - [E.x, E.y, E.z][i]).reduce((a, c) => a + Math.abs(c), 0) };
+    },
+    // Moon-markers gate hook: place the perigee and the nodes at the current
+    // epoch and return their geometry against the lunar arguments — the
+    // perigee's distance (AU) beside a(1−e), its longitude and latitude of
+    // date beside L′ − M′ and the in-plane latitude, the ascending node's
+    // longitude beside L′ − F and its height above the ecliptic.
+    moonMarkerProbe: () => {
+      const A = _moonMarker('apsidal'), Nn = _moonMarker('nodal');
+      A.visible = true; Nn.visible = true; A.onToggle(true); Nn.onToggle(true);
+      _moonUpdateMarkers(o.julianDay);
+      const f = _moonOrbitFrameOfDate(o.julianDay), D2R = Math.PI / 180;
+      const lonLat = (p) => { const v = p.clone().sub(_MM_E); return { lon: ((Math.atan2(v.dot(_MM_U), v.dot(_MM_G)) / D2R) % 360 + 360) % 360, lat: Math.asin(Math.max(-1, Math.min(1, v.dot(_MM_N) / v.length()))) / D2R, distAU: v.length() / 100 }; };
+      const per = lonLat(A.dots[0].position), asc = lonLat(Nn.dots[0].position), desc = lonLat(Nn.dots[1].position);
+      const wrap = (d) => ((d % 360) + 360) % 360;
+      // the perigee's expected of-date longitude/latitude from the in-plane geometry
+      const u = f.w, expLat = Math.asin(Math.sin(u) * Math.sin(f.inc)) / D2R;
+      const expLon = wrap((f.Om + Math.atan2(Math.sin(u) * Math.cos(f.inc), Math.cos(u))) / D2R);
+      A.visible = false; Nn.visible = false; A.onToggle(false); Nn.onToggle(false);
+      return { perigee: per, perigeeExpectedLonDeg: expLon, perigeeExpectedLatDeg: expLat, aPeriAU: f.rP / 100, aAU: f.a / 100,
+        ascNode: asc, descNode: desc, nodeLonExpectedDeg: wrap(f.Om / D2R), argsDeg: { Lp: wrap(f.args.Lp), Mp: wrap(f.args.Mp), F: wrap(f.args.F) } };
+    },
+    // Trace gate hooks: switch one traced object's trace on/off as the
+    // Tracing chips do, and read its trace line back — parameters, vertex
+    // count, how many vertices are filled (finite and not the initial
+    // zeros), and their radius around Earth (world units).
+    traceEnable: (name, on) => {
+      const obj = tracePlanets.find((p) => p.name === name);
+      if (!obj) return false;
+      o.traceBtn = true;
+      obj.traceOn = !!on;
+      resetAllTraces();
+      return true;
+    },
+    traceProbe: (name) => {
+      const obj = tracePlanets.find((p) => p.name === name);
+      if (!obj) return null;
+      const line = obj.traceLine, attr = line && line.geometry && line.geometry.attributes.position;
+      const arr = attr ? attr.array : new Float32Array(0);
+      const e = new THREE.Vector3(); earth.rotationAxis.getWorldPosition(e);
+      let filled = 0, rMin = Infinity, rMax = 0;
+      for (let i = 0; i < arr.length; i += 3) {
+        const x = arr[i], y = arr[i + 1], z = arr[i + 2];
+        if (!Number.isFinite(x) || !Number.isFinite(y) || !Number.isFinite(z) || (x === 0 && y === 0 && z === 0)) continue;
+        filled++;
+        const r = Math.hypot(x - e.x, y - e.y, z - e.z);
+        if (r < rMin) rMin = r; if (r > rMax) rMax = r;
+      }
+      return { traceLength: obj.traceLength, traceStep: obj.traceStep, vertices: arr.length / 3, filled, rMinUnits: filled ? rMin : null, rMaxUnits: filled ? rMax : null, visible: !!(line && line.visible), orbitRadiusUnits: obj.orbitRadius };
     },
     // Trace-sampling probe (the round-7 stairs hunt): runs the EXACT
     // tracePlanet sampling loop for one traced object over an arbitrary
@@ -14096,6 +14189,15 @@ const _HI_ORBIT_SEGS = 256;   // orbit fan resolution (one period of the chain o
 const _HI_ARC_SEGS = 64;      // anomaly arcs
 const _HI_TILT_DEG = 3;       // top-down camera tilt: keeps the screen-up direction defined (see focusInspectorCamera)
 const _hiD2R = Math.PI / 180;
+const _kcPeriSunMarkers = {};   // the chain planets' perihelion-at-Sun markers (built by the Show/Hide grid; see _kcPeriSunMarker)
+const _moonMarkers = {};        // the Moon's perigee and line-of-nodes markers (built by the Show/Hide grid; see _moonMarker)
+const _ssbMarkers = {};         // the Sun-barycenter marker (built by the Show/Hide grid; see _ssbMarker)
+const _SSB_PATH_HALF_YEARS = 25, _SSB_PATH_STEP_YEARS = 0.25, _SSB_PATH_SAMPLES = 2 * _SSB_PATH_HALF_YEARS / _SSB_PATH_STEP_YEARS;
+const _SSB_BODIES = [['mercury', 'M_MERCURY_SYSTEM'], ['venus', 'M_VENUS_SYSTEM'], ['earth', 'M_EARTH_SYSTEM'], ['mars', 'M_MARS_SYSTEM'],
+  ['jupiter', 'M_JUPITER_SYSTEM'], ['saturn', 'M_SATURN_SYSTEM'], ['uranus', 'M_URANUS_SYSTEM'], ['neptune', 'M_NEPTUNE_SYSTEM']];
+const _ssbPathMemo = new Map();   // quantized year → [x, y, z] world offset (scene units); cleared on a series change
+let _ssbPathMemoSeries = null;
+const _SSB_S = new THREE.Vector3(), _SSB_D = new THREE.Vector3();
 const _hiWrap360 = (d) => ((d % 360) + 360) % 360;
 const _hiWrap180 = (d) => ((d + 540) % 360 + 360) % 360 - 180;
 const _hiClamp1 = (x) => Math.min(1, Math.max(-1, x));
@@ -25322,16 +25424,22 @@ function setupGUI() {
   // Explicit chip name overrides (only needed for non-obvious names)
   const visChipOverrides = {
     'Starting Point': null,  // exclude from UI
-    'Barycenter Earth and Sun': 'Barycenter',
+    'Sun Barycenter Marker': 'Sun barycenter',
+    'Sun Barycenter At Earth Marker': 'Sun barycenter at Earth',
     'EARTH-WOBBLE-CENTER': 'Wobble Center',
-    'Halleys': "Halley's",
   };
 
   // Auto-generate short chip name by stripping planet prefix from object name
   function visChipName(objName) {
     if (objName in visChipOverrides) return visChipOverrides[objName];
-    // "PERIHELION X" or "PERIHELION-OF-X" → "Perihelion"
-    if (objName.startsWith('PERIHELION')) return 'Perihelion';
+    // "PERIHELION X" → "Perihelion at Earth" (the geocentric direction
+    // marker); "PERIHELION-OF-EARTH" → "Perihelion"; the chain planets' own
+    // "X Perihelion At Sun" → "Perihelion at Sun"
+    if (objName === 'PERIHELION-OF-EARTH') return 'Perihelion';
+    if (objName.startsWith('PERIHELION')) return 'Perihelion at Earth';
+    if (/^\S+ Perihelion At Sun$/.test(objName)) return 'Perihelion at Sun';
+    if (objName === 'Moon Apsidal Precession Marker') return 'Apsidal Precession';
+    if (objName === 'Moon Nodal Precession Marker') return 'Nodal Precession';
     // Strip planet prefix: "Mercury Perihelion Duration Ecliptic1" → "Perihelion Duration Ecliptic1"
     // Then shorten common suffixes
     const suffixMap = [
@@ -25366,10 +25474,26 @@ function setupGUI() {
     { label: 'Saturn',   match: n => n === 'Saturn' || n.includes('SATURN') || n.startsWith('Saturn ') },
     { label: 'Uranus',   match: n => n === 'Uranus' || n.includes('URANUS') || n.startsWith('Uranus ') },
     { label: 'Neptune',  match: n => n === 'Neptune' || n.includes('NEPTUNE') || n.startsWith('Neptune ') },
-    { label: 'Pluto',    match: n => n === 'Pluto' || n.includes('PLUTO') || n.startsWith('Pluto ') },
-    { label: "Halley's", match: n => n === 'Halleys' || n.includes('HALLEYS') || n.startsWith('Halleys ') },
-    { label: 'Eros',     match: n => n === 'Eros' || n.includes('EROS') || n.startsWith('Eros ') },
+    // (Pluto, Halley's and Eros — the no-chain device bodies — have no
+    // Show/Hide group, owner-ruled; they render as before.)
   ];
+
+  // Objects that get NO chip (owner audit): the device wheels behind every
+  // planet (K5: scene scaffolding for the chain planets, kept as parents
+  // only — their circles and pivots are the retired geometry, the "Real
+  // Perihelion" pivot ~90° off the chain; for Pluto, Halley's and Eros the
+  // wheels ARE the path, but only the body is a toggle), the planets'
+  // eccentricity-cycle wobble centres (the retired K-derived framing), the
+  // no-chain bodies' geocentric perihelion markers, and the Moon's two
+  // apsidal–nodal canceller wheels and its leveling cycle (intermediate
+  // wheels; the Moon keeps its body, Apsidal Precession and Nodal Precession).
+  const retiredWheelChip = (n) =>
+    /^(Mercury|Venus|Mars|Jupiter|Saturn|Uranus|Neptune|Pluto|Halleys|Eros) (Perihelion Duration Ecliptic\d|Real Perihelion At Sun|Fixed Perihelion At Sun)$/.test(n)
+    || /^(MERCURY|VENUS|MARS|JUPITER|SATURN|URANUS|NEPTUNE)-WOBBLE-CENTER$/.test(n)
+    || /^(PERIHELION (PLUTO|HALLEYS|EROS)|Pluto|Halleys|Eros)$/.test(n)
+    || n === 'Barycenter Earth and Sun'   // the Sun's orbit-centre node (radius zero); the Sun barycenter is a MARKER (see _ssbMarker)
+    || /^Earth (Inclination Precession|Ecliptic Precession|Obliquity Precession|Perihelion Precession\d)$/.test(n)   // Earth's five K precession wheels (owner): the Earth frame is PLACED from the engine (R4); the wheels are scaffolding
+    || /^Moon (Apsidal Nodal Precession\d|Lunar Leveling Cycle|Apsidal Precession|Nodal Precession)$/.test(n);   // the Moon's wheels; its two precessions are MARKERS (see _moonMarker)
 
   // Auto-assign each planetObject to its group
   const claimed = new Set();
@@ -25377,11 +25501,17 @@ function setupGUI() {
     const objs = planetObjects.filter(obj => {
       if (claimed.has(obj)) return false;
       if (visChipOverrides[obj.name] === null) return false;  // excluded
+      if (retiredWheelChip(obj.name)) { claimed.add(obj); return false; }
       if (g.match(obj.name)) { claimed.add(obj); return true; }
       return false;
     });
     // Put the physical planet first in each group
     objs.sort((a, b) => (a.isNotPhysicalObject ? 1 : 0) - (b.isNotPhysicalObject ? 1 : 0));
+    // the chain planets' perihelion AT THE SUN, right after the planet
+    const chainPlanet = objs.find((obj) => !obj.isNotPhysicalObject && /^(Mercury|Venus|Mars|Jupiter|Saturn|Uranus|Neptune)$/.test(obj.name));
+    if (chainPlanet) objs.splice(1, 0, _kcPeriSunMarker(chainPlanet));
+    if (g.label === 'Moon') objs.push(_moonMarker('apsidal'), _moonMarker('nodal'));   // the perigee and the line of nodes, of date
+    if (g.label === 'Sun') objs.push(_ssbMarker('sun'), _ssbMarker('earth'));           // the Solar System Barycenter and its path, at the Sun and transposed to Earth
     return { label: g.label, objects: objs };
   });
 
@@ -25422,7 +25552,7 @@ function setupGUI() {
         obj.visible = !obj.visible;
         chip.classList.toggle('active', obj.visible);
         chip.setAttribute('aria-pressed', String(obj.visible));
-        showHideObject(obj);
+        if (obj.onToggle) obj.onToggle(obj.visible); else showHideObject(obj);
       });
       grid.appendChild(chip);
     });
@@ -52983,6 +53113,220 @@ window._kcDebug = () => ({ R: _kcR, chains: !!_kcChains });   // K4b parity prob
 const _KC_ORBIT_SEGS = 256;
 const _KC_ORBIT_RESAMPLE_DAYS = 3652.5;   // ~10 yr between vertex resamples
 const _KC_M4 = new THREE.Matrix4();
+// P5/K5b — the perihelion AT THE SUN (owner: the Show/Hide "Real Perihelion"
+// chip showed the retired device's pivot wheel, ~90° off the chain, as doc
+// 51 §1 records for the old anomaly visual): a marker at Sun + a(1−e)·p̂ with
+// a Sun → P line, p̂ from the chain elements of date through the frame
+// bridge — the same construction as the Planet Orbit Analysis' P. One per
+// chain planet, each with its own Show/Hide chip; the device wheels' chips
+// (Ecliptic Dur. 1/2, Real/Fixed Perihelion) are gone for the chain planets.
+// (_kcPeriSunMarkers — nameLower → the chip object { name, visible, group,
+// dot, line, onToggle } — is declared beside the inspector constants: the
+// Show/Hide chip grid builds it before this section is evaluated.)
+function _kcPeriSunMarker(planetObj) {
+  const nm = planetObj.name.toLowerCase();
+  if (_kcPeriSunMarkers[nm]) return _kcPeriSunMarkers[nm];
+  const group = new THREE.Group();
+  group.visible = false;
+  const dot = new THREE.Mesh(new THREE.SphereGeometry(1, 12, 12), new THREE.MeshBasicMaterial({ color: planetObj.color, depthTest: false }));
+  dot.renderOrder = 997;
+  const lineGeom = new THREE.BufferGeometry();
+  lineGeom.setAttribute('position', new THREE.BufferAttribute(new Float32Array(6), 3));
+  const line = new THREE.Line(lineGeom, new THREE.LineBasicMaterial({ color: planetObj.color, transparent: true, opacity: 0.65 }));
+  line.frustumCulled = false;
+  group.add(dot); group.add(line);
+  scene.add(group);
+  const m = { name: planetObj.name + ' Perihelion At Sun', planet: planetObj, visible: false, group, dot, line, isNotPhysicalObject: true,
+    onToggle: (on) => { group.visible = !!on; if (on) _kcUpdatePeriSunMarker(planetObj, nm, o.julianDay); } };
+  _kcPeriSunMarkers[nm] = m;
+  return m;
+}
+function _kcUpdatePeriSunMarker(planetObj, nm, jd) {
+  const m = _kcPeriSunMarkers[nm];
+  if (!m || !m.visible || !_kcR) return;
+  const el = _kcElementsOfDate(nm, jd), R = _kcR, D2R = Math.PI / 180;
+  const Om = el.ascNodeEclipticDeg * D2R, inc = el.inclEclipticDeg * D2R, w = (el.lonPeriEclipticDeg - el.ascNodeEclipticDeg) * D2R;
+  const cw = Math.cos(w), sw = Math.sin(w), cO = Math.cos(Om), sO = Math.sin(Om), ci = Math.cos(inc), si = Math.sin(inc);
+  const p = [cw * cO - sw * sO * ci, cw * sO + sw * cO * ci, sw * si];   // p̂ in the J2000 ecliptic (as computeInspectorOrbitFrame)
+  const rP = 100 * el.aAU * (1 - el.e);                                   // a(1−e), scene units
+  sun.planetObj.getWorldPosition(_KC_TS);
+  const px = _KC_TS.x + rP * (R[0][0] * p[0] + R[0][1] * p[1] + R[0][2] * p[2]);
+  const py = _KC_TS.y + rP * (R[1][0] * p[0] + R[1][1] * p[1] + R[1][2] * p[2]);
+  const pz = _KC_TS.z + rP * (R[2][0] * p[0] + R[2][1] * p[1] + R[2][2] * p[2]);
+  m.dot.position.set(px, py, pz);
+  m.dot.scale.setScalar(rP * 0.008);   // reads at the orbit's own scale
+  const a = m.line.geometry.attributes.position.array;
+  a[0] = _KC_TS.x; a[1] = _KC_TS.y; a[2] = _KC_TS.z; a[3] = px; a[4] = py; a[5] = pz;
+  m.line.geometry.attributes.position.needsUpdate = true;
+}
+
+// The Moon's apsidal and nodal precession as MARKERS (owner: the "Apsidal
+// Precession" / "Nodal Precession" chips toggled the device wheels — a
+// 540-km offset circle and a zero-radius pivot, nothing at any zoom). The
+// perigee of date — Earth + a(1−e) in the orbit plane at the argument
+// F − M′, with an Earth → perigee line — advances with the 8.85-yr apsidal
+// precession; the line of nodes — the ascending ↑ and descending ↓ nodes
+// on the mean-distance circle at the longitude L′ − F, a dashed line through
+// Earth — regresses with the 18.6-yr nodal precession. Both from the
+// framework-native lunar arguments (_moonArgsAt, TT = UT + the scene's ΔT
+// bridge as the certified-Sun read) on the engine's ecliptic of date (R4),
+// the registry's constant inclination; a and e are the mean-geometry
+// registry values (direction indicators, not the perturbed Moon).
+function _moonMarker(kind) {   // 'apsidal' | 'nodal'
+  if (_moonMarkers[kind]) return _moonMarkers[kind];
+  const group = new THREE.Group();
+  group.visible = false;
+  const dot = (color) => { const d = new THREE.Mesh(new THREE.SphereGeometry(1, 12, 12), new THREE.MeshBasicMaterial({ color, depthTest: false })); d.renderOrder = 997; group.add(d); return d; };
+  const line = (color, dashed) => {
+    const g = new THREE.BufferGeometry();
+    g.setAttribute('position', new THREE.BufferAttribute(new Float32Array(6), 3));
+    const l = new THREE.Line(g, dashed ? new THREE.LineDashedMaterial({ color, dashSize: 0.012, gapSize: 0.008, transparent: true, opacity: 0.85 })
+                                     : new THREE.LineBasicMaterial({ color, transparent: true, opacity: 0.85 }));
+    l.frustumCulled = false; group.add(l); return l;
+  };
+  const m = kind === 'apsidal'
+    ? { name: 'Moon Apsidal Precession Marker', kind, visible: false, group, dots: [dot(0x33cc66)], line: line(0x33cc66, false), isNotPhysicalObject: true }
+    : { name: 'Moon Nodal Precession Marker', kind, visible: false, group, dots: [dot(0xff33ff), dot(0x33ffff)], line: line(0xffff66, true), isNotPhysicalObject: true };
+  m.onToggle = (on) => { group.visible = !!on; if (on) _moonUpdateMarkers(o.julianDay); };
+  scene.add(group);
+  _moonMarkers[kind] = m;
+  return m;
+}
+const _MM_Q = new THREE.Quaternion(), _MM_E = new THREE.Vector3(), _MM_G = new THREE.Vector3(), _MM_N = new THREE.Vector3(), _MM_U = new THREE.Vector3(),
+      _MM_ND = new THREE.Vector3(), _MM_T = new THREE.Vector3(), _MM_P = new THREE.Vector3(), _MM_P2 = new THREE.Vector3();
+/** The Moon's of-date orbit frame around Earth: the ecliptic-of-date basis, the node direction and the in-plane point at argument u (scene units). */
+function _moonOrbitFrameOfDate(jdUT) {
+  const args = _moonArgsAt(jdUT + deltaTStart / 86400);
+  const D2R = Math.PI / 180;
+  const Om = (args.Lp - args.F) * D2R, w = (args.F - args.Mp) * D2R, inc = moonEclipticInclinationJ2000 * D2R;
+  earthPerihelionPrecession1.containerObj.getWorldQuaternion(_MM_Q);   // the engine's ecliptic of date (R4): x̂ the equinox, ŷ the pole
+  _MM_G.set(1, 0, 0).applyQuaternion(_MM_Q).normalize();
+  _MM_N.set(0, 1, 0).applyQuaternion(_MM_Q).normalize();
+  _MM_U.crossVectors(_MM_N, _MM_G).normalize();                          // longitude +90°
+  earth.rotationAxis.getWorldPosition(_MM_E);
+  _MM_ND.copy(_MM_G).multiplyScalar(Math.cos(Om)).addScaledVector(_MM_U, Math.sin(Om));   // the ascending node's direction
+  _MM_T.crossVectors(_MM_N, _MM_ND).normalize();                                          // in the ecliptic, 90° past the node
+  const a = (moonDistance / currentAUDistance) * 100, rP = a * (1 - moonOrbitalEccentricityBase);
+  const at = (u, r, out) => out.copy(_MM_ND).multiplyScalar(r * Math.cos(u)).addScaledVector(_MM_T, r * Math.sin(u) * Math.cos(inc)).addScaledVector(_MM_N, r * Math.sin(u) * Math.sin(inc)).add(_MM_E);
+  return { args, Om, w, inc, a, rP, at };
+}
+function _moonUpdateMarkers(jdUT) {
+  const A = _moonMarkers.apsidal, Nn = _moonMarkers.nodal;
+  if (!(A && A.visible) && !(Nn && Nn.visible)) return;
+  const f = _moonOrbitFrameOfDate(jdUT);
+  const setLine = (line, p0, p1) => {
+    const arr = line.geometry.attributes.position.array;
+    arr[0] = p0.x; arr[1] = p0.y; arr[2] = p0.z; arr[3] = p1.x; arr[4] = p1.y; arr[5] = p1.z;
+    line.geometry.attributes.position.needsUpdate = true;
+    if (line.material.isLineDashedMaterial) line.computeLineDistances();
+  };
+  if (A && A.visible) {
+    f.at(f.w, f.rP, _MM_P);
+    A.dots[0].position.copy(_MM_P); A.dots[0].scale.setScalar(f.a * 0.035);
+    setLine(A.line, _MM_E, _MM_P);
+  }
+  if (Nn && Nn.visible) {
+    f.at(0, f.a, _MM_P); Nn.dots[0].position.copy(_MM_P); Nn.dots[0].scale.setScalar(f.a * 0.035);
+    f.at(Math.PI, f.a, _MM_P2); Nn.dots[1].position.copy(_MM_P2); Nn.dots[1].scale.setScalar(f.a * 0.035);
+    _MM_P.copy(_MM_E).addScaledVector(_MM_ND, -1.15 * f.a); _MM_P2.copy(_MM_E).addScaledVector(_MM_ND, 1.15 * f.a);
+    setLine(Nn.line, _MM_P, _MM_P2);
+  }
+}
+
+// The Sun barycenter as a MARKER (owner: the "Barycenter" chip toggled the
+// Sun's orbit-centre node — radius zero, nothing to show): the Solar System
+// Barycenter at Sun + Σ M_b·r⃗_b / M_S over the chain's heliocentric
+// positions of date — the SAME mass-weighted sum computeSunSSBOffset takes
+// for the Sun panel's Sun-SSB rows and chart, here in world axes through
+// the frame bridge instead of the invariable-plane frame (a rotation: the
+// magnitude is identical, and the gate checks it) — with a Sun → SSB line
+// and the SSB's path around the Sun over the panel's ±25-yr window,
+// translated with the Sun every frame. Doc 24: a centre-of-mass sum, not a
+// gravity simulation.
+// (the path constants, the memo and the scratch vectors are declared beside
+// the marker registries: the Show/Hide grid builds the marker during GUI
+// setup, before this section is evaluated — a dev bundle keeps `const` in
+// place, the production bundle hoists it, so only the dev page threw)
+/** The Sun → SSB offset at jd in world axes, scene units (100 = 1 AU). */
+function _ssbOffsetWorld(jd, out) {
+  const R = _kcR, masses = { M_MERCURY_SYSTEM, M_VENUS_SYSTEM, M_EARTH_SYSTEM, M_MARS_SYSTEM, M_JUPITER_SYSTEM, M_SATURN_SYSTEM, M_URANUS_SYSTEM, M_NEPTUNE_SYSTEM };
+  let x = 0, y = 0, z = 0;
+  for (const [key, mKey] of _SSB_BODIES) {
+    const r = _kcHelioAU(key, jd), s = 100 * masses[mKey] / M_SUN;
+    x += s * (R[0][0] * r[0] + R[0][1] * r[1] + R[0][2] * r[2]);
+    y += s * (R[1][0] * r[0] + R[1][1] * r[1] + R[1][2] * r[2]);
+    z += s * (R[2][0] * r[0] + R[2][1] * r[1] + R[2][2] * r[2]);
+  }
+  return out.set(x, y, z);
+}
+// Two views of the one vector (owner): 'sun' — the barycenter where it is,
+// Sun + Δr⃗ — and 'earth' — the SAME Δr⃗ and path drawn from Earth's centre, a
+// transposed DISPLAY (like "Perihelion at Earth"), so the Sun's wobble reads
+// where the camera usually sits; true size and orientation, only the origin
+// differs.
+function _ssbMarker(kind = 'sun') {
+  if (_ssbMarkers[kind]) return _ssbMarkers[kind];
+  const group = new THREE.Group();
+  group.visible = false;
+  const dot = new THREE.Mesh(new THREE.SphereGeometry(1, 12, 12), new THREE.MeshBasicMaterial({ color: 0xffe066, depthTest: false }));
+  dot.renderOrder = 997; group.add(dot);
+  const mkLine = (n, color, opacity) => {
+    const g = new THREE.BufferGeometry();
+    g.setAttribute('position', new THREE.BufferAttribute(new Float32Array(n * 3), 3));
+    // drawn on top: the SSB sits within ~2 R☉ of the Sun's centre, INSIDE a
+    // size-boosted Sun sphere (Planets Size Boost) — depth-tested lines vanish there
+    const l = new THREE.Line(g, new THREE.LineBasicMaterial({ color, transparent: true, opacity, depthTest: false }));
+    l.renderOrder = 996;
+    l.frustumCulled = false; group.add(l); return l;
+  };
+  const m = { name: kind === 'earth' ? 'Sun Barycenter At Earth Marker' : 'Sun Barycenter Marker', kind, visible: false, group, dot,
+    line: mkLine(2, 0xffe066, 0.9), path: mkLine(_SSB_PATH_SAMPLES + 1, 0xffe066, 0.45), isNotPhysicalObject: true, _pathY0: null };
+  m.onToggle = (on) => { group.visible = !!on; if (on) _ssbUpdateMarker(o.julianDay); };
+  scene.add(group);
+  _ssbMarkers[kind] = m;
+  return m;
+}
+function _ssbUpdateMarker(jdUT) {
+  const shown = ['sun', 'earth'].map((k) => _ssbMarkers[k]).filter((m) => m && m.visible);
+  if (!shown.length || !_kcR) return;
+  _ssbOffsetWorld(jdUT, _SSB_D);
+  // the path: ±25 yr around the date on the panel chart's quarter-year grid
+  // (its exact-argument memo makes a sliding window cheap), re-anchored to
+  // its origin every frame
+  if (_ssbPathMemoSeries !== _planetSeriesData) { _ssbPathMemo.clear(); _ssbPathMemoSeries = _planetSeriesData; for (const m of shown) m._pathY0 = null; }
+  const year = 2000 + (jdUT - KC_ANCHOR_EPOCH_JD) / 365.25;
+  const y0 = Math.round((year - _SSB_PATH_HALF_YEARS) / _SSB_PATH_STEP_YEARS) * _SSB_PATH_STEP_YEARS;
+  for (const m of shown) {
+    if (m.kind === 'earth') earth.rotationAxis.getWorldPosition(_SSB_S); else sun.planetObj.getWorldPosition(_SSB_S);
+    m.dot.position.copy(_SSB_S).add(_SSB_D);
+    m.dot.scale.setScalar(0.04);   // scene units — a tenth of the rendered Sun's radius
+    const la = m.line.geometry.attributes.position.array;
+    la[0] = _SSB_S.x; la[1] = _SSB_S.y; la[2] = _SSB_S.z; la[3] = m.dot.position.x; la[4] = m.dot.position.y; la[5] = m.dot.position.z;
+    m.line.geometry.attributes.position.needsUpdate = true;
+    if (m._pathY0 !== y0) {
+      m._pathY0 = y0;
+      m._pathOffsets = [];
+      for (let i = 0; i <= _SSB_PATH_SAMPLES; i++) {
+        const yr = y0 + i * _SSB_PATH_STEP_YEARS;
+        let off = _ssbPathMemo.get(yr);
+        if (off === undefined) {
+          const v = _ssbOffsetWorld(KC_ANCHOR_EPOCH_JD + (yr - 2000) * 365.25, new THREE.Vector3());
+          off = [v.x, v.y, v.z];
+          if (_ssbPathMemo.size >= 1024) _ssbPathMemo.delete(_ssbPathMemo.keys().next().value);
+          _ssbPathMemo.set(yr, off);
+        }
+        m._pathOffsets.push(off);
+      }
+    }
+    const pa = m.path.geometry.attributes.position.array;
+    for (let i = 0; i < m._pathOffsets.length; i++) {
+      const off = m._pathOffsets[i];
+      pa[i * 3] = _SSB_S.x + off[0]; pa[i * 3 + 1] = _SSB_S.y + off[1]; pa[i * 3 + 2] = _SSB_S.z + off[2];
+    }
+    m.path.geometry.attributes.position.needsUpdate = true;
+  }
+}
+
 function _kcUpdateOrbitLine(obj, nm, jd) {
   let line = obj._kcOrbitLine;
   if (!line) {
@@ -53342,6 +53686,7 @@ function updatePositions() {
       if (obj.ringObj) obj.ringObj.position.copy(_KC_V);
       obj.planetObj.updateMatrixWorld(true);   // same-tick consumers read fresh world matrices
       _kcUpdateOrbitLine(obj, _nm, o.julianDay);
+      _kcUpdatePeriSunMarker(obj, _nm, o.julianDay);
     }
 
     // P5/K5b — the perihelion MARKERS onto the chain: chain ϖ(t) direction
@@ -54065,6 +54410,9 @@ function moveModel(pos) {
   // R4: the Earth frame — sun plane, apsidal wheel, Sun and axis — placed
   // from the engine on top of the animated device (see _applyEngineEarthFrame).
   _applyEngineEarthFrame(o.julianDay);
+
+  _moonUpdateMarkers(o.julianDay);   // the Moon's perigee / line-of-nodes markers (when shown) on the placed frame
+  _ssbUpdateMarker(o.julianDay);     // the Sun-barycenter marker (when shown) on the placed Sun
 
   // the zodiac-constellations band: centred on Earth, oriented ONCE from
   // the chain's frame bridge (the J2000 ecliptic and equinox in world axes)

@@ -208,7 +208,16 @@ credit strip below, no caption text — doc 57; fail-proven via `=2`), and
 `tools-panels` — every Tools button opens its panel with no page error,
 three clicks within a frame leave ONE panel, and it closes again (born
 from a ReferenceError on open and the double-build race; fail-proven via
-`ESSRT_TOOLS_PLANT=1`).
+`ESSRT_TOOLS_PLANT=1`), and `perihelion-at-sun` — the Show/Hide grid: the
+chain planets' "Perihelion at Sun" marker sits at a(1−e) in the orbit
+plane at the chain's ϖ, the Moon's "Apsidal/Nodal Precession" markers
+(the perigee at F − M′, the nodes at L′ − F) and the "Sun barycenter"
+marker (≡ the Sun panel's Sun-SSB sum) are placed as stated, and every
+group's chip list is exact — no device-wheel chips (born from the "Real
+Perihelion" wheel ~90° off the chain and three chips that showed nothing;
+fail-proven via `ESSRT_PERI_SUN_PLANT=1`). The wobble-centre gate also pins the Tracing
+"Wobble" fill (a trace needs its parameters set in
+`updateAllTracesForEpoch`, the ONE place; a missing object traces nothing).
 `npm run test:transparency` is the Phase 6 acceptance gate — **green (84/84,
 round-trip bit-exact) since Phase B** and required in CI; red there is a
 regression of the Phase 6 exit criterion, not a tracked state.
