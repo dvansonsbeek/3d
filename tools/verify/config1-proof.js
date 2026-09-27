@@ -5,7 +5,7 @@
 //
 // This script demonstrates why the default configuration (Me21 Ve34 Ma5 Ju5 Sa3 Ur21 Ne34,
 // Saturn-only anti-phase) is the most likely correct Fibonacci d-value
-// configuration for the Holistic Universe Model.
+// configuration for the ESSRT model.
 //
 // The proof has four parts:
 //

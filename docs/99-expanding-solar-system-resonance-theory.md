@@ -1911,7 +1911,7 @@ Both NASA Espenak/Meeus and Stephenson 2016 are polynomials fit to essentially t
 | File | What it does |
 |---|---|
 | `src/script.js` (simulator) | `earthMoiFactorAtAge()`, `iEarthAtAge()`, applied inside `meanLodSecondsAtAge()` |
-| `src/lib/orbital/deepTime.ts` (Holistic Universe website) | Same two functions, same constants, mirrored |
+| `src/lib/orbital/deepTime.ts` (holisticuniverse.com website) | Same two functions, same constants, mirrored |
 
 Downstream quantities auto-update through the calculation chain: LOD, sidereal day, stellar day, measured solar day, year-in-days, ΔT — all propagate from the single `meanLodSecondsAtAge` modification.
 

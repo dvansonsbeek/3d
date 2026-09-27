@@ -7,7 +7,7 @@ status: current
 
 # Coordinate Frames Reference
 
-This document describes the coordinate reference frames and transformations used in the Holistic Universe Model simulation.
+This document describes the coordinate reference frames and transformations used in the ESSRT simulation.
 
 **Related Documents:**
 - [20 - Constants Reference](20-constants-reference.md) - J2000-anchored constants + epoch helpers

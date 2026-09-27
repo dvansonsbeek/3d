@@ -7,7 +7,7 @@ status: current
 
 # The Six Fibonacci Relations
 
-This document describes the six Fibonacci relations (published under their historical name, "Fibonacci Laws of Planetary Motion") as implemented in the Holistic Universe Model. The six relations form a symmetric architecture anchored on Earth and extending to all eight planets through Fibonacci numbers: an Earth-specific cycle hierarchy, paired inclination and eccentricity relations (amplitude constants + collective balance), and a three-planet coupling at H/8.
+This document describes the six Fibonacci relations (published under their historical name, "Fibonacci Laws of Planetary Motion") as implemented in the simulator. The six relations form a symmetric architecture anchored on Earth and extending to all eight planets through Fibonacci numbers: an Earth-specific cycle hierarchy, paired inclination and eccentricity relations (amplitude constants + collective balance), and a three-planet coupling at H/8.
 
 ---
 

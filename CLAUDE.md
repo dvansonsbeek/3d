@@ -1,4 +1,4 @@
-# Holistic Universe Model — simulator
+# Expanding Solar System Resonance Theory (ESSRT) — simulator
 
 Geocentric solar-system model and 3D simulator implementing the Expanding Solar
 System Resonance Theory (ESSRT). The model is analytic and parametric, valid
@@ -199,7 +199,10 @@ regressions, one owner-bisected at 28×; plus two travel-speed rows the
 steady-state rows cannot see — the orbit-ring resample against the per-JD
 route and the Play-start delay on a fresh page, both bisected from the
 owner's "waiting time before Play / stutter at 1000 yr/s"; fail-proven via
-`ESSRT_PERF_TIGHTEN=0.01` and on the pre-fix build).
+`ESSRT_PERF_TIGHTEN=0.01` and on the pre-fix build). The `test:snapshot`
+chain also carries `chart-export` — the Tools panels' paper-SVG → PNG
+rasterizer behind every Export button (exact pixel size, independent decode,
+byte floor; fail-proven via `ESSRT_CHART_EXPORT_PLANT=1`).
 `npm run test:transparency` is the Phase 6 acceptance gate — **green (84/84,
 round-trip bit-exact) since Phase B** and required in CI; red there is a
 regression of the Phase 6 exit criterion, not a tracked state.

@@ -13,8 +13,8 @@ This glossary defines the key terms used throughout the documentation. For a com
 
 ## Core Model Concepts
 
-### Holistic Universe Model
-A geo-heliocentric framework that models the solar system through two interacting forces: axial precession (clockwise) and apsidal precession (counter-clockwise). These opposing movements generate all observable precession phenomena.
+### The model (a holistic view of our universe)
+The Expanding Solar System Resonance Theory as a geo-heliocentric framework: Earth's spin and time on one derived clock with two counter-rotating reference points (axial precession clockwise, apsidal precession counter-clockwise), the planets on the model's own N-body chain. Published at holisticuniverse.com; the simulator and this documentation call it ESSRT.
 
 ### The lunisolar precession clock
 The mean lunisolar precession period — Earth's spin clock, <!--v:lunisolarPeriodJ2000Yr-->25,771.4<!--/v--> years at J2000: the period of the composed torque rate, Earth's spin carrying the solar and lunar torques. Earth's other long cycles are stated as periods and ratios against it (the simulator's Lunisolar Clock panel shows them live; the ratios are J2000 readings that wander, not laws). Under [ESSRT](#expanding-solar-system-resonance-theory-essrt) the period evolves at deep time with the tidal history. The former "Earth Fundamental Cycle" — one master cycle divided by 13, 3 and 16 — is retired ([retired record](retired-record.md)); its fitted timing anchor survives as a Ledger-2 constant ([Constants Reference](20-constants-reference.md)).
@@ -36,7 +36,7 @@ A reference frame that is heliocentric (Earth orbits the Sun) but viewed from Ea
 ## Precession Types
 
 ### Axial Precession
-The slow wobble of Earth's rotational axis, causing the celestial poles to trace circles against the stars. Period: H/13 years in the Holistic Model.
+The slow wobble of Earth's rotational axis, causing the celestial poles to trace circles against the stars. Period: the clock, <!--v:axialPrecExact-->25,771.40<!--/v--> years at J2000 in the model.
 
 ### Apsidal Precession
 The slow rotation of PERIHELION-OF-EARTH around the EARTH-WOBBLE-CENTER — the perihelion's revolution against the fixed stars. Period: H/3 years. (Historically called "inclination precession" in this framework, after the retired assumption tying the inclination cycle to this period; the orbital plane's motion is the separate nodal story. Scene nodes and code identifiers keep the historical name.)
@@ -164,7 +164,7 @@ A scientific paper providing high-precision values for planetary orbital inclina
 A secular perturbation theory describing how planetary orbital elements oscillate over long timescales due to mutual gravitational interactions.
 
 ### Milankovitch Cycles
-Long-term variations in Earth's orbital parameters (eccentricity, obliquity, precession) that affect climate. The Holistic Model provides a unified framework for these cycles — see [Doc 90](90-milankovitch-language.md) (framework), [Doc 91](91-milankovitch-evidence.md) (evidence + 14 hypothesis tests), and [Doc 92](92-climate-formula.md) (canonical L1+L2+L3 climate formula). Under [ESSRT](#expanding-solar-system-resonance-theory-essrt) the same lattice extends across geological time.
+Long-term variations in Earth's orbital parameters (eccentricity, obliquity, precession) that affect climate. The model provides a unified framework for these cycles — see [Doc 90](90-milankovitch-language.md) (framework), [Doc 91](91-milankovitch-evidence.md) (evidence + 14 hypothesis tests), and [Doc 92](92-climate-formula.md) (canonical L1+L2+L3 climate formula). Under [ESSRT](#expanding-solar-system-resonance-theory-essrt) the same lattice extends across geological time.
 
 ---
 
@@ -184,7 +184,7 @@ The difference between True Anomaly and Mean Anomaly (ν - M). Represents how mu
 ## Further Reading
 
 For the complete glossary with detailed explanations, visit:
-**[Holistic Universe Glossary](https://www.holisticuniverse.com/en/reference/glossary)**
+**[holisticuniverse.com Glossary](https://www.holisticuniverse.com/en/reference/glossary)**
 
 ---
 

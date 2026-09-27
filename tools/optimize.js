@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 // ═══════════════════════════════════════════════════════════════════════════
-// OPTIMIZE CLI — Diagnostics and optimization for the Holistic Universe Model
+// OPTIMIZE CLI — Diagnostics and optimization for the ESSRT model
 //
 // Usage:
 //   node tools/optimize.js diagnose <planet>

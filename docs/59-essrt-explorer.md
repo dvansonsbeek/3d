@@ -136,7 +136,7 @@ Two buttons in the header produce publication-grade SVG exports:
 - **Export Full** — renders the current quantity over the Full (−4.5 to +1 Gyr) range as a paper-style SVG (white background, sized for figure inclusion).
 - **Export Phanerozoic** — renders the current quantity over the Phanerozoic 650 Ma window as a paper-style SVG.
 
-Both use `essrtRenderPaperChart()` which mirrors the modal renderer's geometry so the export looks identical to the on-screen view minus the interactive UI chrome. Triggered by `essrtExport(rangeKey)`; opens the SVG in a new tab as a data URL; right-click to save or screenshot.
+Both use `essrtRenderPaperChart()` which mirrors the modal renderer's geometry so the export looks identical to the on-screen view minus the interactive UI chrome. Triggered by `essrtExport(rangeKey)`; the SVG is rasterized in the browser and shown in the chart-export modal (`openChartExportModal`) with Download PNG / Download SVG / Share / Copy buttons.
 
 ## Validation summary
 

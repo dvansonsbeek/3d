@@ -1,6 +1,6 @@
 # Python Library — `tools/lib/python/`
 
-Shared Python library for the Holistic Universe Model. Provides constants, formula builders, fitted coefficients, and prediction utilities used by training scripts and research analysis.
+Shared Python library for the ESSRT model. Provides constants, formula builders, fitted coefficients, and prediction utilities used by training scripts and research analysis.
 
 All constants originate from `tools/lib/constants.js` (the single source of truth) and are loaded at import time via a Node.js bridge — no values are hardcoded here.
 

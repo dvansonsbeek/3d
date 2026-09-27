@@ -502,7 +502,7 @@ Modal that visualizes the **Expanding Solar System Resonance Theory (ESSRT)** �
 | **Quantity tabs (gold, 6)** | Axial Precession (the composed lunisolar period), Obliquity period (the beat), Length of Day, Length of Year, AU Distance, Moon Distance — all derived from the regime-aware recession history + angular-momentum conservation + Driver 2 solar mass loss |
 | **Range tabs (teal, 2)** | Full deep-time (genesis −4.498 Gyr → +1 Gyr) and Phanerozoic 650 Ma |
 | **Hover tooltip** | Year and value at any point on the chart, with snap-to-nearest-sample |
-| **Export buttons** | "Export Full" and "Export Phanerozoic" — produce paper-style SVG (white background) for the selected quantity over those ranges |
+| **Export buttons** | "Export Full" and "Export Phanerozoic" — render the selected quantity over those ranges as a paper-style chart (white background) in the chart-export modal: Download PNG / Download SVG / Share / Copy |
 | **Validation references** | Curves pass through anchored data points from cyclostratigraphy (Wu 2024, Boulila 2018), tidal-rhythmite measurements (Williams 2000), Devonian coral growth bands (Wells 1963), and the Patterson 1956 Pb-Pb age constraint |
 
 ### Full Reference
@@ -536,7 +536,7 @@ It is the interactive home of the **Σ_stack ↔ Bond 2001 IRD comparison** — 
 | **Transition markers ▲/▼** | Zero-crossings of the stack rate on the + Cycles (L3) curve: ▲ PEAK (stack at max, rate turns negative → Earth spins up vs baseline → warm episode starts), ▼ TROUGH (stack at min → cooling starts). The matching console test *All cycles (4-flag stack) ↔ climate transitions* scans −5000 to +5000 CE and matches each crossing to the nearest named transition of the correct sign |
 | **Temperature overlay** | GISP2 (Alley 2000) Greenland ice-core reconstruction on a secondary right-hand °C-anomaly axis, 27,950 BC–1850 AD at 100-yr resolution — independent reconstruction, not part of any framework fit. A 5-kyr rolling-mean detrend (`lcrDetrendSeries`) removes the Milankovitch-scale trend so Bond-scale oscillations are visible |
 | **Evidence panels (3, collapsible)** | *Framework ↔ Bond 2001 IRD correlation (detrended)* — Pearson r for Σ_stack and for the isolated Bond harmonic, plus best-lag cross-correlation (±500 yr scan) · *Sign convention check* — Σ_stack sign vs warm/cold at 10 named events (dynamic match count; joint world 4/5 within the validated window) · *Bond event ↔ nearest framework ▼ TROUGH crossing* — offsets from Bond 0–8 (1450 CE back to 9150 BC) |
-| **Export button** | "Export LOD-Climate graph" — paper-style SVG (white background, ESSRT-export typography) of the current tab with the currently-toggled layers |
+| **Export button** | "Export LOD-Climate graph" — paper-style chart (white background, ESSRT-export typography) of the current tab with the currently-toggled layers, shown in the chart-export modal with Download PNG / Download SVG / Share / Copy |
 
 ### Proxy roles (fixed, no user selector)
 

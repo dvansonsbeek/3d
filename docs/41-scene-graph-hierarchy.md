@@ -7,7 +7,7 @@ status: current
 
 # Scene Graph Hierarchy
 
-This document describes the Three.js scene graph hierarchy used in the Holistic Universe Model simulation. Understanding this nested structure is essential because **all astronomical motions are implemented through composed rotations** of parent-child relationships.
+This document describes the Three.js scene graph hierarchy used in the ESSRT simulation. Understanding this nested structure is essential because **all astronomical motions are implemented through composed rotations** of parent-child relationships.
 
 **Engine-D rendering (the ONLY planet path since the K5 legacy-chain excision):** the seven planets' rendered positions, orbit rings, traces, perihelion markers, panels and the invariable-plane machinery (heights, mass gauge, Sun-SSB) are computed from the model's own N-body chain (`@essrt/physics/planets/keplerian-chain` + the governed artifact `data/nbody-secular-frequencies.json`); Earth, the Moon and the Sun stay on the hierarchy (the two-engine interface — the Sun's chain hangs from the perihelion-of-Earth construction and every historical gate is calibrated on it). The geometric hierarchy below still exists and rotates, but serves only as anchor scaffolding for the display devices and as the rendering path for the no-chain bodies (Pluto, Halley, Eros); its fitted corrections were deleted with the excision (the records are archived — [retired record](retired-record.md)), and the `?keplerChains=0` opt-out is gone. The `Mid-Eccentricity Orbit` node (the one law's base′ reference circle) was removed with the flip.
 
@@ -16,7 +16,7 @@ This document describes the Three.js scene graph hierarchy used in the Holistic 
 - [40 - Architecture](40-architecture.md) - Overall code structure
 - [04 - Dynamic Elements Overview](04-dynamic-elements-overview.md) - What orbital elements change over time
 
-**Source:** [Technical Guide](https://www.holisticuniverse.com/en/simulation/technical-guide) on the Holistic Universe website
+**Source:** [Technical Guide](https://www.holisticuniverse.com/en/simulation/technical-guide) on holisticuniverse.com
 
 ---
 

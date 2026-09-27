@@ -1,6 +1,6 @@
 // ═══════════════════════════════════════════════════════════════════════════
 // OPTIMIZER — Diagnostics, sensitivity analysis, and parameter optimization
-//             for the Holistic Universe Model
+//             for the ESSRT model
 //
 // Usage:
 //   const opt = require('./optimizer');

@@ -34,7 +34,7 @@ status: current
 
 ## Overview
 
-The Holistic Universe Model predicts the timing and position of all four cardinal
+The model predicts the timing and position of all four cardinal
 points (VE, SS, AE, WS) using **23 harmonics + the ecc-braid/joint/derived term families** per cardinal point:
 4 fundamentals on the anchor's divisors (Y/3, Y/5, Y/8, Y/13 — Y/16 is NOT in the divisor set; its content lives in the ECC_TERMS braid; Y = the frozen era clock's unit, a device) plus 19 overtones from
 nonlinear interactions between the precession cycles.

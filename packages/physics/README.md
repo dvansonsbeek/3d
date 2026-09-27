@@ -1,7 +1,7 @@
 # @essrt/physics
 
 The physics core of **ESSRT** — the Expanding Solar System Resonance Theory —
-as implemented by the [Holistic Universe Model](https://3d.holisticuniverse.com)
+as implemented by the [ESSRT simulator](https://3d.holisticuniverse.com)
 ([source, AGPL-3.0](https://github.com/dvansonsbeek/3d)). Pure computation:
 no I/O, no globals, no DOM, constants injected. The package ships the
 **complete model**, including the fitted coefficients, so an installed copy

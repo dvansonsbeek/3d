@@ -35,6 +35,8 @@ const TERMS = [
   ['8H as a cycle name', /(?<![A-Za-z0-9_/])8H(?![A-Za-z0-9_])/g],
   ['H-lattice', /\bH-lattice\b/g],
   ['Fibonacci', /Fibonacci/gi],
+  // The former project name; the model is ESSRT, the organisation holisticuniverse.com.
+  ['Holistic Universe Model', /Holistic Universe Model/gi],
   ['engine K/D as a public name', /\bengine [KD]\b/gi],
 ];
 

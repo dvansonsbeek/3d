@@ -223,7 +223,7 @@ don't disagree qualitatively. But it fails where frame matters:
   makes the perihelion direction frame-sensitive to tiny perturbations.
   L-L's single-frame treatment gives ~+1,200 ″/cy; observation gives ~0.
 
-**The Holistic Universe Model tracks both frames explicitly.** For every
+**The model tracks both frames explicitly.** For every
 planet the model stores:
 
 - `perihelionEclipticYears` — rate of perihelion motion in the ecliptic-
@@ -247,7 +247,7 @@ conventions).
 **Testable prediction from the frame distinction.** Standard secular theory
 says Saturn's ecliptic retrograde rate is a transient phase of the
 Great-Inequality oscillation (~900-yr period) and will reverse within
-~450 yr. The Holistic Universe Model says Saturn's ecliptic rate is
+~450 yr. The model says Saturn's ecliptic rate is
 permanently retrograde at `−3,140 ″/cy` (the device's ecliptic-period value) because that's the correct
 date-frame expression of the stable ICRF structure. Long-baseline JPL
 DE441 integrations (13 000 BC → 17 000 AD) can in principle distinguish

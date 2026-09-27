@@ -9,7 +9,7 @@ status: current
 
 ## Overview
 
-The **Formula Verification** panel is a modal in the Tools menu that compares the Holistic Universe Model's predictions against published analytical formulas from celestial-mechanics literature — Meeus, Chapront, Capitaine, Vondrák, Laskar, Berger, Bills & Ray. For eleven separate quantities (eccentricity, obliquity, inclination, ascending node, perihelion longitude, tropical year, cardinal year lengths, solar day length, sidereal year, axial precession period, ΔT) it plots the model and every available reference on a common time axis spanning **12,000 BC → 12,000 AD** (the Cardinal Year Lengths chart spans ±30,000 yr), shows a residual chart of each reference minus the model, and a J2000 comparison table that reports every formula's value at J2000 and its delta from the model.
+The **Formula Verification** panel is a modal in the Tools menu that compares the model's predictions against published analytical formulas from celestial-mechanics literature — Meeus, Chapront, Capitaine, Vondrák, Laskar, Berger, Bills & Ray. For eleven separate quantities (eccentricity, obliquity, inclination, ascending node, perihelion longitude, tropical year, cardinal year lengths, solar day length, sidereal year, axial precession period, ΔT) it plots the model and every available reference on a common time axis spanning **12,000 BC → 12,000 AD** (the Cardinal Year Lengths chart spans ±30,000 yr), shows a residual chart of each reference minus the model, and a J2000 comparison table that reports every formula's value at J2000 and its delta from the model.
 
 This is the analytical twin of the [WebGeoCalc Explorer](56-webgeocalc-explorer.md):
 
@@ -80,7 +80,7 @@ Three buttons in the header produce publication-grade SVG exports:
 - **Export Cycles** — only visible for categories that have a `paperAlt` block (seven of the eleven: eccentricity, obliquity, tropical year, cardinal year lengths, solar day, sidereal year, axial precession). Renders a much longer-baseline plot (−248 000 BC to +102 000 AD) to show the model's long-term oscillation cycles — against La2004 where an N-body reference exists. Excludes the polynomial references (Meeus, Chapront) that diverge badly outside the century-scale window, and overlays a mean-value reference line. The solar-day cycles view also marks the Marine Isotope Stage peaks (LR04) against the model's LOD extrema.
 - **Export Recent** — only visible for categories that have a `paperRecent` block (currently: ΔT). Renders a zoomed 1650-2050 SVG so short-scale features (e.g. the 1900 ΔT dip) are readable. Same curves as the main chart, plus a dashed reference baseline (ΔT = 0) for visual grounding.
 
-Exports are triggered by `exportVFPPaper()`, `exportVFPPaperAlt()`, and `exportVFPPaperRecent()`. All three call the same `renderVFPPaperChartAlt(category, altConfig)` renderer with different config blocks — the "Recent" and "Cycles" variants pass `paperRecent` / `paperAlt` respectively. They open in a new tab as an SVG data URL; the reader can right-click to save or screenshot.
+Exports are triggered by `exportVFPPaper()`, `exportVFPPaperAlt()`, and `exportVFPPaperRecent()`. All three call the same `renderVFPPaperChartAlt(category, altConfig)` renderer with different config blocks — the "Recent" and "Cycles" variants pass `paperRecent` / `paperAlt` respectively. The SVG is rasterized in the browser and shown in the chart-export modal (`openChartExportModal`) with Download PNG / Download SVG / Share / Copy; the `chart-export` browser gate pins the rasterizer.
 
 ### Charts consistency
 
@@ -136,7 +136,7 @@ At any point the panel answers: *"Does our model agree with published celestial 
 
 ## Why this panel matters for the model's claims
 
-The Holistic Universe Model is an analytic framework — harmonic bases on a fitted anchor for Earth's spin and time — with its own N-body chain for the planets — not a restatement of standard secular theory. A natural skeptical question is: "how does such a model compare with the polynomial and N-body formulas that the astronomy community already uses?" This panel answers that question visually, quantitatively, and for eleven independent quantities at once.
+ESSRT is an analytic framework — harmonic bases on a fitted anchor for Earth's spin and time — with its own N-body chain for the planets — not a restatement of standard secular theory. A natural skeptical question is: "how does such a model compare with the polynomial and N-body formulas that the astronomy community already uses?" This panel answers that question visually, quantitatively, and for eleven independent quantities at once.
 
 Cases where the model *disagrees* with a reference are also documented in the panel — rather than hidden. The residual chart and J2000 table make the gaps numerical and reproducible. Together with WebGeoCalc (the observational comparison), this panel is the second leg of the model's validation.
 

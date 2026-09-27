@@ -20,7 +20,7 @@ import { vsop87AstrometricGeoEclipticAU, vsop87GeoEclipticAU, vsop87HelioEclipti
 
 
 /*
-  Expanding Solar System Resonance Theory (ESSRT) — Holistic Universe Model
+  Expanding Solar System Resonance Theory (ESSRT) — a holistic view of our universe · holisticuniverse.com
   (model version: see MODEL_VERSION from the generated constants)
 
   Copyright (C) 2025-2026 D. van Sonsbeek
@@ -6306,6 +6306,16 @@ if (typeof window !== 'undefined') {
       const t2 = performance.now();
       return { ringMs: t1 - t0, perJdRingMs: t2 - t1 };
     },
+    // chart-export gate: rasterize a paper SVG string exactly as the export
+    // modal does and report the PNG's type, pixel size and byte count
+    chartExportPngProbe: async (svgString, scale) => {
+      const r = await svgStringToPngBlob(svgString, scale);
+      const bmp = await createImageBitmap(r.blob);     // independent decode of the PNG bytes
+      const decoded = { width: bmp.width, height: bmp.height };
+      bmp.close();
+      return { type: r.blob.type, width: r.width, height: r.height, bytes: r.blob.size, decoded };
+    },
+    chartExportOpen: (svgString, title) => openChartExportModal(svgString, title),
     vfpPIState: () => _vfpPIState,
     vfpPIRender: () => renderVFPPlanetInclinations(),
     vfpPIAfterRender: (el) => _vfpPIAfterRender(el),
@@ -15246,18 +15256,127 @@ function wgcRenderPaperSVG(planetKey, opts) {
   return s;
 }
 
+// ── Chart export: paper SVG → PNG, shown in an in-app modal ─────────────────
+// Every Tools-panel export (WebGeoCalc, Climate Formula, ESSRT, LOD-Climate
+// Rhythm, Formula Verification) renders a self-contained paper-style SVG
+// string — text/line/path/rect/clipPath only, no foreignObject, no external
+// images or stylesheets, width/height on the root. Those SVGs used to be
+// opened as a blob: URL in a new tab: a vector document nobody could save as a
+// picture, blocked by popup blockers, unusable on an iPad. They are now
+// rasterized in the browser (Image → canvas → PNG) and shown in a modal with
+// Download PNG / Download SVG / Share / Copy. The canvas stays untainted
+// because the SVG references nothing external, and the text renders with the
+// page's own fonts, so the PNG matches the panel.
+const CHART_EXPORT_PNG_SCALE = 2;    // device pixels per SVG unit (print quality)
+const CHART_EXPORT_MAX_PX = 4096;    // iOS Safari's canvas limit per side
+
+function chartExportSlug(title) {
+  const s = String(title).normalize('NFKD').replace(/[^\w\s-]+/g, '').trim().replace(/\s+/g, '-').replace(/-+/g, '-');
+  return s.slice(0, 80) || 'chart';
+}
+
+/** Rasterize a self-contained SVG string to a PNG Blob. Resolves { blob, width, height }. */
+function svgStringToPngBlob(svgString, scale) {
+  return new Promise((resolve, reject) => {
+    const root = (svgString.match(/<svg\b[^>]*>/) || [''])[0];
+    const attr = (name) => { const m = root.match(new RegExp('\\s' + name + '="\\s*([\\d.]+)')); return m ? +m[1] : 0; };
+    const vb = root.match(/\sviewBox="\s*[-\d.]+\s+[-\d.]+\s+([\d.]+)\s+([\d.]+)/);
+    const w = attr('width') || (vb ? +vb[1] : 0), h = attr('height') || (vb ? +vb[2] : 0);
+    if (!(w > 0 && h > 0)) { reject(new Error('chart export: the SVG root carries no width/height')); return; }
+    const s = Math.min(scale, CHART_EXPORT_MAX_PX / Math.max(w, h));
+    const url = URL.createObjectURL(new Blob([svgString], { type: 'image/svg+xml;charset=utf-8' }));
+    const img = new Image();
+    img.onload = () => {
+      URL.revokeObjectURL(url);
+      const c = document.createElement('canvas');
+      c.width = Math.round(w * s); c.height = Math.round(h * s);
+      const ctx = c.getContext('2d');
+      ctx.fillStyle = '#ffffff'; ctx.fillRect(0, 0, c.width, c.height);   // paper background under any transparency
+      ctx.drawImage(img, 0, 0, c.width, c.height);
+      c.toBlob((blob) => (blob ? resolve({ blob, width: c.width, height: c.height }) : reject(new Error('chart export: toBlob returned null'))), 'image/png');
+    };
+    img.onerror = () => { URL.revokeObjectURL(url); reject(new Error('chart export: the SVG failed to decode')); };
+    img.src = url;
+  });
+}
+
+function chartExportDownload(blob, filename) {
+  const url = URL.createObjectURL(blob);
+  const a = Object.assign(document.createElement('a'), { href: url, download: filename });
+  document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 60000);   // iOS Safari reads the blob after the click returns
+}
+
+/** Show a paper-style chart SVG as a downloadable picture (PNG first, SVG kept). */
+function openChartExportModal(svgString, title) {
+  const slug = chartExportSlug(title);
+  const isTouch = window.matchMedia && window.matchMedia('(pointer: coarse)').matches;
+  const modal = document.createElement('div');
+  modal.className = 'chart-export-modal';
+  modal.innerHTML = `
+    <div class="chart-export-card" role="dialog" aria-modal="true" aria-label="Export chart">
+      <div class="chart-export-head">
+        <div class="chart-export-title"></div>
+        <button type="button" class="chart-export-close" aria-label="Close">&#x2715;</button>
+      </div>
+      <div class="chart-export-body"><div class="chart-export-status">Rendering picture…</div></div>
+      <div class="chart-export-actions">
+        <button type="button" class="cfm-export-btn" data-act="png" disabled>Download PNG</button>
+        <button type="button" class="cfm-export-btn" data-act="svg">Download SVG</button>
+        <button type="button" class="cfm-export-btn" data-act="share" hidden>Share…</button>
+        <button type="button" class="cfm-export-btn" data-act="copy" hidden>Copy image</button>
+      </div>
+      <div class="chart-export-hint">${isTouch ? 'Long-press the picture to save it to Photos, or use Share.' : 'Right-click the picture to copy it, or use the buttons.'}</div>
+    </div>`;
+  modal.querySelector('.chart-export-title').textContent = title;
+  const body = modal.querySelector('.chart-export-body');
+  const btn = (act) => modal.querySelector(`[data-act="${act}"]`);
+  let pngUrl = null;
+  const close = () => {
+    if (pngUrl) URL.revokeObjectURL(pngUrl);
+    document.removeEventListener('keydown', onKey);
+    modal.remove();
+  };
+  const onKey = (e) => { if (e.key === 'Escape') close(); };
+  document.addEventListener('keydown', onKey);
+  modal.addEventListener('click', (e) => { if (e.target === modal) close(); });
+  modal.querySelector('.chart-export-close').addEventListener('click', close);
+  btn('svg').addEventListener('click', () => chartExportDownload(new Blob([svgString], { type: 'image/svg+xml;charset=utf-8' }), slug + '.svg'));
+  document.body.appendChild(modal);
+
+  svgStringToPngBlob(svgString, CHART_EXPORT_PNG_SCALE).then(({ blob, width, height }) => {
+    pngUrl = URL.createObjectURL(blob);
+    const img = document.createElement('img');
+    img.src = pngUrl; img.alt = title;
+    img.width = width / CHART_EXPORT_PNG_SCALE; img.height = height / CHART_EXPORT_PNG_SCALE;
+    body.replaceChildren(img);
+    btn('png').disabled = false;
+    btn('png').addEventListener('click', () => chartExportDownload(blob, slug + '.png'));
+    const file = new File([blob], slug + '.png', { type: 'image/png' });
+    if (navigator.canShare && navigator.canShare({ files: [file] })) {
+      btn('share').hidden = false;
+      btn('share').addEventListener('click', () => navigator.share({ files: [file], title }).catch(() => {}));
+    }
+    if (navigator.clipboard && navigator.clipboard.write && window.ClipboardItem) {
+      btn('copy').hidden = false;
+      btn('copy').addEventListener('click', () => {
+        navigator.clipboard.write([new ClipboardItem({ 'image/png': blob })])
+          .then(() => { btn('copy').textContent = 'Copied'; setTimeout(() => { btn('copy').textContent = 'Copy image'; }, 1500); })
+          .catch(() => { btn('copy').textContent = 'Copy failed'; });
+      });
+    }
+  }).catch((err) => {
+    body.replaceChildren(Object.assign(document.createElement('div'), { className: 'chart-export-status', textContent: String(err.message || err) + ' — the SVG download still works.' }));
+  });
+}
+
 function exportWGCPaper(planetKey, opts) {
   opts = opts || {};
   const includeAll = !!opts.includeAllCharts;
   if (!wgcData) { alert('WGC data not loaded yet'); return; }
   const svg = wgcRenderPaperSVG(planetKey, { includeAllCharts: includeAll });
-  const blob = new Blob([svg], { type: 'image/svg+xml' });
-  const url = URL.createObjectURL(blob);
-  const win = window.open(url, '_blank');
-  if (win) {
-    const planetName = planetKey[0] + planetKey.slice(1).toLowerCase();
-    win.document.title = `WebGeoCalc Explorer — ${planetName} (${includeAll ? 'all 3 charts' : 'perihelion only'})`;
-  }
+  const planetName = planetKey[0] + planetKey.slice(1).toLowerCase();
+  openChartExportModal(svg, `WebGeoCalc Explorer — ${planetName} (${includeAll ? 'all 3 charts' : 'perihelion only'})`);
 }
 
 async function createWGCPanel() {
@@ -15282,8 +15401,8 @@ async function createWGCPanel() {
           <div class="wgc-subtitle">Observed perihelion precession from JPL NAIF WebGeoCalc (1900\u20132026)</div>
         </div>
         <div class="wgc-controls">
-          <button class="wgc-export-btn" data-wgc-export="perihelion" title="Open a paper-styled SVG of the current planet's perihelion chart in a new tab">Export perihelion chart</button>
-          <button class="wgc-export-btn" data-wgc-export="all" title="Open a paper-styled SVG of the current planet's perihelion + ascending node + argument of periapsis charts in a new tab">Export full set</button>
+          <button class="wgc-export-btn" data-wgc-export="perihelion" title="Export the current planet's perihelion chart as a paper-styled picture (PNG or SVG download)">Export perihelion chart</button>
+          <button class="wgc-export-btn" data-wgc-export="all" title="Export the current planet's perihelion + ascending node + argument of periapsis charts as one paper-styled picture (PNG or SVG download)">Export full set</button>
         </div>
         <div class="wgc-close" title="Close"></div>
       </div>
@@ -16413,24 +16532,19 @@ function exportCfmPaper(opts) {
   if (tabKey === 'epica'     && !cfmEpicaData)     { alert('EPICA data not loaded yet'); return; }
   if (tabKey === 'cenco2pip' && !cfmCenco2pipData) { alert('CenCO2PIP data not loaded yet'); return; }
   const svg = cfmRenderPaperChart(tabKey, opts);
-  const blob = new Blob([svg], { type: 'image/svg+xml' });
-  const url = URL.createObjectURL(blob);
-  const win = window.open(url, '_blank');
-  if (win) {
-    const titleMap = {
-      past200: 'Climate Formula — Last 200 kyr',
-      postMPT: 'Climate Formula — Post-MPT (0–700 kyr BP)',
-      postMPText: 'Climate Formula — Post-MPT extended',
-      full: 'Climate Formula — Full LR04',
-      cenogrid: 'Climate Formula — CENOGRID',
-      epica: 'Climate Formula — EPICA CO₂',
-      cenco2pip: 'Climate Formula — CenCO2PIP CO₂',
-      future: 'Climate Formula — Forward projection',
-    };
-    let docTitle = titleMap[tabKey] || 'Climate Formula';
-    if (opts.titleSuffix) docTitle += ' — ' + opts.titleSuffix;
-    win.document.title = docTitle;
-  }
+  const titleMap = {
+    past200: 'Climate Formula — Last 200 kyr',
+    postMPT: 'Climate Formula — Post-MPT (0–700 kyr BP)',
+    postMPText: 'Climate Formula — Post-MPT extended',
+    full: 'Climate Formula — Full LR04',
+    cenogrid: 'Climate Formula — CENOGRID',
+    epica: 'Climate Formula — EPICA CO₂',
+    cenco2pip: 'Climate Formula — CenCO2PIP CO₂',
+    future: 'Climate Formula — Forward projection',
+  };
+  let docTitle = titleMap[tabKey] || 'Climate Formula';
+  if (opts.titleSuffix) docTitle += ' — ' + opts.titleSuffix;
+  openChartExportModal(svg, docTitle);
 }
 
 async function createClimateFormulaPanel() {
@@ -16503,8 +16617,8 @@ Note: L1, L2, and Total each carry the baseline once — they do NOT visually su
       <div class="cfm-header">
         <div class="cfm-title">Climate Formula Explorer</div>
         <div class="cfm-subtitle">Per-regime decomposition of paleoclimate proxies into orbital (L1) + carbon-cycle (L2) + boundary-condition (L3) layers</div>
-        <button class="cfm-export-btn" data-cfm-export="formula-only" title="Export the current tab as a paper-style SVG showing ONLY the model formula curve (no data overlay)">Export Formula Only</button>
-        <button class="cfm-export-btn" data-cfm-export="paper" title="Export the current tab as a paper-style SVG (white background, formula curve + proxy data overlay)">Export Formula &amp; Data</button>
+        <button class="cfm-export-btn" data-cfm-export="formula-only" title="Export the current tab as a paper-style picture showing ONLY the model formula curve (no data overlay); PNG or SVG download">Export Formula Only</button>
+        <button class="cfm-export-btn" data-cfm-export="paper" title="Export the current tab as a paper-style picture (white background, formula curve + proxy data overlay); PNG or SVG download">Export Formula &amp; Data</button>
         <div class="cfm-close" title="Close"></div>
       </div>
       <div class="cfm-body">
@@ -17343,7 +17457,7 @@ function essrtRenderPaperChart(qtyKey, rangeKey) {
     subtitleLines.map((l, i) => `<tspan x="${margin.left + plotW / 2}" dy="${i === 0 ? 0 : SUB_LINE_H}">${xmlEsc(l)}</tspan>`).join('') + `</text>`;
   const yAxisLabel = `<text x="${36}" y="${margin.top + plotH / 2}" text-anchor="middle" font-size="13" fill="#222" transform="rotate(-90 36 ${margin.top + plotH / 2})">${xmlEsc(spec.yLabel)}</text>`;
   const xAxisLabel = `<text x="${margin.left + plotW / 2}" y="${H - 14}" text-anchor="middle" font-size="13" fill="#222">Time (Ma; negative = past, 0 = J2000) — Range: ${xmlEsc(range.label)}</text>`;
-  const credit     = `<text x="${W - 16}" y="${H - 6}" text-anchor="end" font-size="9" fill="#888">ESSRT Explorer — Holistic Universe Model</text>`;
+  const credit     = `<text x="${W - 16}" y="${H - 6}" text-anchor="end" font-size="9" fill="#888">ESSRT Explorer · holisticuniverse.com</text>`;
 
   return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${W} ${H}" width="${W}" height="${H}" font-family="Inter, system-ui, sans-serif">
     <rect width="${W}" height="${H}" fill="white"/>
@@ -17365,14 +17479,9 @@ function essrtRenderPaperChart(qtyKey, rangeKey) {
 
 function essrtExport(rangeKey) {
   const svg = essrtRenderPaperChart(essrtSelectedQty, rangeKey);
-  const blob = new Blob([svg], { type: 'image/svg+xml' });
-  const url = URL.createObjectURL(blob);
-  const win = window.open(url, '_blank');
-  if (win) {
-    const range = ESSRT_RANGE_TABS.find(r => r.key === rangeKey);
-    const spec = ESSRT_QTY_SPECS[essrtSelectedQty];
-    win.addEventListener('load', () => { win.document.title = `ESSRT — ${spec.title} — ${range.label}`; });
-  }
+  const range = ESSRT_RANGE_TABS.find(r => r.key === rangeKey);
+  const spec = ESSRT_QTY_SPECS[essrtSelectedQty];
+  openChartExportModal(svg, `ESSRT — ${spec.title} — ${range.label}`);
 }
 
 async function createEssrtPanel() {
@@ -17394,8 +17503,8 @@ async function createEssrtPanel() {
           <div class="cfm-title">Expanding Solar System Resonance Theory (ESSRT)</div>
           <div class="cfm-subtitle" style="margin:2px 0 0 0; font-size:11px; color:#9b9b9b; line-height:1.4">Earth's clock is the mean lunisolar precession period — and it <strong>lengthens monotonically in time</strong>: shorter in the past, longer in the future, as tidal friction slows the spin and the receding Moon weakens its torque. The precession-band climate lines ride it; the planetary eccentricity beats do not.</div>
         </div>
-        <button class="cfm-export-btn" data-essrt-export="full"    title="Export this chart over the FULL (−4.54 to +1 Gyr) time range as a paper-style SVG (white background)">Export Full</button>
-        <button class="cfm-export-btn" data-essrt-export="phanero" title="Export this chart over the Phanerozoic 650 Ma window as a paper-style SVG (white background)">Export Phanerozoic</button>
+        <button class="cfm-export-btn" data-essrt-export="full"    title="Export this chart over the FULL (−4.54 to +1 Gyr) time range as a paper-style picture (white background); PNG or SVG download">Export Full</button>
+        <button class="cfm-export-btn" data-essrt-export="phanero" title="Export this chart over the Phanerozoic 650 Ma window as a paper-style picture (white background); PNG or SVG download">Export Phanerozoic</button>
         <div class="cfm-close" title="Close"></div>
       </div>
       <div class="cfm-body">
@@ -18707,15 +18816,10 @@ function lcrExport() {
   <g transform="translate(${chartX}, ${chartY})">
     ${inner}
   </g>
-  <text x="${outerW - 16}" y="${outerH - 10}" text-anchor="end" font-size="9" fill="#888">LOD-Climate Rhythm · Holistic Universe Model · Out-of-sample retrodiction (fit: Espenak ΔT 1650–2017, no climate proxies)</text>
+  <text x="${outerW - 16}" y="${outerH - 10}" text-anchor="end" font-size="9" fill="#888">LOD-Climate Rhythm · ESSRT · holisticuniverse.com · Out-of-sample retrodiction (fit: Espenak ΔT 1650–2017, no climate proxies)</text>
 </svg>`;
 
-  const blob = new Blob([paperSvg], { type: 'image/svg+xml' });
-  const url = URL.createObjectURL(blob);
-  const win = window.open(url, '_blank');
-  if (win) {
-    win.addEventListener('load', () => { win.document.title = `LOD–Climate Rhythm — ${range.label}`; });
-  }
+  openChartExportModal(paperSvg, `LOD–Climate Rhythm — ${range.label}`);
 }
 
 async function createLcrPanel() {
@@ -18757,7 +18861,7 @@ async function createLcrPanel() {
       <div class="cfm-header">
         <div class="cfm-title">LOD-Climate Rhythm</div>
         <div class="cfm-subtitle">Framework's cyclic LOD-rate modulation, compared against paleoclimate proxy data</div>
-        <button class="cfm-export-btn" data-lcr-export title="Export the current chart (with the layers currently toggled) as a paper-style SVG in a new tab — white background, dark text.">Export LOD-Climate graph</button>
+        <button class="cfm-export-btn" data-lcr-export title="Export the current chart (with the layers currently toggled) as a paper-style picture — white background, dark text; PNG or SVG download.">Export LOD-Climate graph</button>
         <div class="cfm-close" title="Close"></div>
       </div>
       <div class="cfm-body">
@@ -23290,10 +23394,7 @@ function exportVFPPaper() {
     svg = renderVFPPaperChartAlt(cat, cfg);
     title = cfg.title;
   }
-  const blob = new Blob([svg], { type: 'image/svg+xml' });
-  const url = URL.createObjectURL(blob);
-  const win = window.open(url, '_blank');
-  if (win) win.document.title = title;
+  openChartExportModal(svg, title);
 }
 
 // ── Panel DOM ────────────────────────────────────────────────────
@@ -23643,7 +23744,7 @@ function setupGUI() {
   if (titleEl) {
     const versionEl = document.createElement('div');
     versionEl.style.cssText = 'font-size: 9px; font-weight: 400; letter-spacing: 0.05em; opacity: 0.60; margin-top: 2px; cursor: help;';
-    versionEl.textContent = 'Holistic Universe Model ' + MODEL_VERSION;
+    versionEl.textContent = 'ESSRT ' + MODEL_VERSION;
     versionEl.title =
       MODEL_VERSION + ' highlights:\n' +
       '• The restatement (two engines + two expansions): the Earth-family core (spin, tides, H(t), eclipses, LOD, deep-time climate) stands validated; planetary orbits follow standard secular dynamics, re-measured with the model’s own N-body engine.\n' +
@@ -23768,7 +23869,7 @@ function setupGUI() {
     const a = (href, text) => '<a href="' + href + '" target="_blank" rel="noopener" '
       + 'style="color: hsla(210,60%,65%,1); text-decoration: none;">' + text + '</a>';
 
-    line('Holistic Universe Model — Expanding Solar System Resonance Theory');
+    line('Expanding Solar System Resonance Theory (ESSRT) — a holistic view of our universe · holisticuniverse.com');
     line('Copyright © 2025–2026 D. van Sonsbeek');
     line('Licensed under ' + a('https://www.gnu.org/licenses/agpl-3.0.html', 'AGPL-3.0')
        + ' · ' + a('https://github.com/dvansonsbeek/3d', 'Source code'));
@@ -35326,7 +35427,7 @@ if (!o.Performance) stats.dom.style.display = 'none';
 /* Watermark / branding — bottom-right */
 const sceneWatermark = document.createElement('div');
 sceneWatermark.id = 'sceneWatermark';
-sceneWatermark.innerHTML = 'Holistic Universe Model · <a href="https://www.holisticuniverse.com" target="_blank" rel="noopener">holisticuniverse.com</a><span class="wm-version">' + MODEL_VERSION + '</span>';
+sceneWatermark.innerHTML = 'ESSRT · <a href="https://www.holisticuniverse.com" target="_blank" rel="noopener">holisticuniverse.com</a><span class="wm-version">' + MODEL_VERSION + '</span>';
 document.body.appendChild(sceneWatermark);
 
 /* Simulation date HUD — bottom-left */
@@ -44454,7 +44555,7 @@ function workbookToBlob (wb) {
  */
 function buildProvenance (what, detail) {
   return [
-    'Holistic Universe Model — geocentric solar-system model',
+    'ESSRT · holisticuniverse.com — geocentric solar-system model',
     `Report:    ${what}`,
     `Detail:    ${detail}`,
     `Generated: ${new Date().toISOString()}`,

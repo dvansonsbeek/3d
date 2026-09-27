@@ -256,7 +256,7 @@ STRUCTURAL_TESTS = {
 # The "amplitudes" of long-term planetary inclination/eccentricity oscillations
 # are not directly observable on human timescales (Earth's obliquity oscillation
 # has a ~41,000 year period; precise astronomical observations only span ~200
-# years). The amplitudes used in this script come from the Holistic model's own
+# years). The amplitudes used in this script come from the model's own
 # parametrization:
 #     INCLINATION_AMPS[p] := PSI / (D[p] × √m[p])
 #     ECC_AMPLITUDE[p]    := K × sin(tilt[p]) × √D[p] / (√m[p] × a[p]^1.5)

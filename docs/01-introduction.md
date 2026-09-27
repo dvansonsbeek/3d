@@ -5,11 +5,11 @@ coefficients: sha256:bb6a03c877eedab8
 status: current
 ---
 
-# Introduction to the Holistic Universe Model
+# Introduction to the Expanding Solar System Resonance Theory
 
-## What is the Holistic Universe Model?
+## What is ESSRT?
 
-The Holistic Universe Model is a geo-heliocentric framework that describes planetary and lunar movements through two interacting forces. Rather than treating astronomical phenomena as isolated events, the model unifies precession cycles, climate patterns, and timekeeping variations into a single coherent system.
+The Expanding Solar System Resonance Theory (ESSRT) — a holistic view of our universe — is a geo-heliocentric framework that describes planetary and lunar movements through two interacting forces. Rather than treating astronomical phenomena as isolated events, the model unifies precession cycles, climate patterns, and timekeeping variations into a single coherent system.
 
 > "Simple is hard and complex is easy." - The model's guiding principle
 

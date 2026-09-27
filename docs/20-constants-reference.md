@@ -7,7 +7,7 @@ status: current
 
 # Constants Reference
 
-This document is the **single source of truth** for all constants used in the Holistic Universe Model simulation. Other documents should reference this document rather than duplicating values.
+This document is the **single source of truth** for all constants used in the ESSRT simulation. Other documents should reference this document rather than duplicating values.
 
 > **Synchronized with `tools/lib/constants.js`** — the frontmatter `coefficients` hash records the exact coefficient state this doc tracks.
 

@@ -5,7 +5,7 @@ coefficients: sha256:bb6a03c877eedab8
 status: current
 ---
 
-# Milankovitch Language of the Holistic Model
+# Milankovitch Language of the Model
 
 > **TL;DR.** The model has **five** natural Milankovitch-band periods, all read against one clock — the mean lunisolar precession period — and connected by frame arithmetic: **apsidal precession (<!--v:inclPrecYears-->~111,570<!--/v--> yr; historically "inclination precession" in this framework), nodal (ecliptic) precession (<!--v:eclPrecYears-->~68,751<!--/v--> yr, the s₃ mode), the obliquity beat (<!--v:obliqCycleYears-->~41,224<!--/v--> yr), axial precession (<!--v:earthAxialPeriod-->25,771<!--/v--> yr), and perihelion-of-date precession (<!--v:periPrecYears-->~20,936<!--/v--> yr)**. Two of them are beats of the others — obliquity = axial − nodal, perihelion-of-date = axial + apsidal — frame arithmetic that holds at every epoch (§3). Standard secular theory gives the same periods because they ARE the same quantities: the model's values are its own engine's (the chain's apsidal tangent, the dominant nodal mode, the composed precession rate), and Berger 1978's climatic-precession peaks are the p + g_i lines of the shipped climate formula ([doc 92 §2](92-climate-formula.md)). *Note: in this framework the perihelion-of-date period is **perihelion precession** (the rotation of Earth's apsidal line in the ecliptic frame), distinct from **climatic precession** (~23.7 kyr dominant, e·sin ϖ — the p + g₀ line). The earlier presentation — five integer divisors of one master cycle closing as an integer algebra — is retired ([retired record](retired-record.md)): the integers were J2000 readings of these periods against the fitted anchor, and the live ratios wander.*
 >
@@ -77,7 +77,7 @@ The identities are geometric facts of any precessing axis and orbit; they hold a
 
 ## 4. Comparison with Standard Secular Theory — Direct Matches
 
-> **A note on eigenmode labelling.** The secular eigenmodes g_j (apsidal) and s_j (nodal) are **mathematical objects** — eigenvalues of the Laplace-Lagrange perturbation matrix capturing gravitational coupling between all eight planets. Both Berger 1978 and the Holistic model accept the eigenmodes. What differs is **attribution**: Berger labels each g_j / s_j by the planet whose contribution dominates that mode (g₅ = "Jupiter", g₂ = "Venus", …), while the Holistic model treats the eigenmodes as **composite modes of the multi-planet system** and does not equate them to single-planet quantities. The model's planet-specific cycles are per-planet quantities (e.g., Jupiter's ecliptic perihelion period 68.78 kyr, its ICRF perihelion period 41.27 kyr and its axial period — three distinct device cycles, none equal to 1/g₅; the per-planet integer tabulation is archived, [retired record](retired-record.md), and [doc 109](109-model-nbody-engine-and-lattice-test.md) carries the measured frequencies). The "(Jupiter)" / "(Mercury)" / etc. labels in the tables that follow are Berger's convention, retained for consistency with the literature.
+> **A note on eigenmode labelling.** The secular eigenmodes g_j (apsidal) and s_j (nodal) are **mathematical objects** — eigenvalues of the Laplace-Lagrange perturbation matrix capturing gravitational coupling between all eight planets. Both Berger 1978 and this model accept the eigenmodes. What differs is **attribution**: Berger labels each g_j / s_j by the planet whose contribution dominates that mode (g₅ = "Jupiter", g₂ = "Venus", …), while this model treats the eigenmodes as **composite modes of the multi-planet system** and does not equate them to single-planet quantities. The model's planet-specific cycles are per-planet quantities (e.g., Jupiter's ecliptic perihelion period 68.78 kyr, its ICRF perihelion period 41.27 kyr and its axial period — three distinct device cycles, none equal to 1/g₅; the per-planet integer tabulation is archived, [retired record](retired-record.md), and [doc 109](109-model-nbody-engine-and-lattice-test.md) carries the measured frequencies). The "(Jupiter)" / "(Mercury)" / etc. labels in the tables that follow are Berger's convention, retained for consistency with the literature.
 
 ### 4.1 Standard Milankovitch periods
 
@@ -104,7 +104,7 @@ The Berger climatic-precession spectrum is a **set of six** peaks from `g_j + k`
 | 18,976 | g₄ + k (Mars) | n = 141 → 19,025 | 0.26 % | — (nearest n=141 is attributed to k+g₃; k+g₄ enters via sideband n=152) |
 | 16,469 | g₆ + k (Saturn) | n = 163 → 16,457 (record; the device beat retired with plan 06 Phase 7) | 0.07 % | — (not in canonical L1) |
 
-All six peaks match an integer-divisor position. **Berger names each peak after a single planet** (g_j + k convention) while the Holistic model derives the same LR04 lattice peaks via **multi-planet beats from PLANET_CYCLES** — see [doc 93 — L1 attribution reference](93-l1-attribution-reference.md) for all 33 L1 lattice components with full ranked attribution alternatives. The structural decomposition is `n = 104 + δ_j` where 104 = 8 × 13 is Earth's axial precession integer (see website [eigenfrequencies.mdx §"Berger climatic precession peaks"](https://www.holisticuniverse.com/model/eigenfrequencies#berger-climatic-precession-peaks)).
+All six peaks match an integer-divisor position. **Berger names each peak after a single planet** (g_j + k convention) while the model derives the same LR04 lattice peaks via **multi-planet beats from PLANET_CYCLES** — see [doc 93 — L1 attribution reference](93-l1-attribution-reference.md) for all 33 L1 lattice components with full ranked attribution alternatives. The structural decomposition is `n = 104 + δ_j` where 104 = 8 × 13 is Earth's axial precession integer (see website [eigenfrequencies.mdx §"Berger climatic precession peaks"](https://www.holisticuniverse.com/model/eigenfrequencies#berger-climatic-precession-peaks)).
 
 ### 4.3 Eigenfrequency convergence at H/3 and H/5
 
@@ -243,7 +243,7 @@ The framework laid out in §§ 1–5 of this document (five spin-tier periods re
 **Deep-time cycles**
 12. Boulila, S., Vahlenkamp, M., De Vleeschouwer, D., Laskar, J., Yamamoto, Y., Pälike, H., et al. (2018). Towards a robust and consistent middle Eocene astronomical timescale. *Earth and Planetary Science Letters* 486, 94–107. https://doi.org/10.1016/j.epsl.2018.01.003
 
-**Holistic model**
+**This model**
 13. eigenfrequencies.mdx — full eigenfrequency / divisor / Berger comparison
 14. supporting-evidence.mdx §1 (100-kyr problem) and §12 (eigenfrequency convergence)
 

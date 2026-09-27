@@ -11,7 +11,7 @@ status: current
 
 The **WebGeoCalc Explorer** is a modal panel in the Tools menu that shows the actual observed perihelion-precession history of each planet, based on JPL NAIF WebGeoCalc ephemeris queries over the 1900–2026 observational baseline. For each planet it plots the three angles that describe the orientation of the orbit in the ecliptic frame — ascending node `Ω`, argument of periapsis `ω`, and longitude of perihelion `ϖ = Ω + ω` — and overlays the model's prediction so the observed data and the model can be compared directly, in the same frame the data live in.
 
-This is the panel that tests the Holistic Universe Model's perihelion rates against *observation*, not another theory. The model line is the N-body chain's own `ϖ(t)` — nothing in it is calibrated to WebGeoCalc; the device's ecliptic-period values (`perihelionEclipticYears` per planet) remain as window-epoch descriptors ([doc 109 §9](109-model-nbody-engine-and-lattice-test.md)). The Explorer makes that comparison visible.
+This is the panel that tests the model's perihelion rates against *observation*, not another theory. The model line is the N-body chain's own `ϖ(t)` — nothing in it is calibrated to WebGeoCalc; the device's ecliptic-period values (`perihelionEclipticYears` per planet) remain as window-epoch descriptors ([doc 109 §9](109-model-nbody-engine-and-lattice-test.md)). The Explorer makes that comparison visible.
 
 > **Scope note (ESSRT).** The Explorer is inherently a present-epoch observational tool — the 1900–2026 baseline is the densest, most accurate stretch of JPL/NAIF ephemerides (DE440/DE441). The device ecliptic periods shown in the comparison column are the no-chain scaffolding's J2000 conventions (the former integer labels are retired); their literal rate values in ″/century are J2000-evaluated. Under [ESSRT](99-expanding-solar-system-resonance-theory.md), H(t) evolves at deep time via Drivers 1 (LOD growth) and 2 (Kepler), scaling literal rates proportionally; the comparison against WebGeoCalc is a present-epoch test of an underlying scale-invariant framework.
 
@@ -68,7 +68,7 @@ All three angles are measured in the **ecliptic-of-date** frame — the plane th
 ω_ICRF = ω_ecliptic − ω_gen              (ω_gen = 2π / (H/13))
 ```
 
-For the Holistic Universe Model this distinction is load-bearing: the panel's model line is the N-body chain's ϖ(t) in the plotted frame — nothing is calibrated to the observations; agreement (Mercury: observed 572.0 vs the engine's 572.0 ″/cy window rate, relativity inside as a derived term) is the measurement. See [docs/13-mercury-precession-breakdown.md § 1.5a Reference Frames](13-mercury-precession-breakdown.md) for the full discussion of why ecliptic-only first-order L-L fails where a two-frame treatment succeeds.
+For the model this distinction is load-bearing: the panel's model line is the N-body chain's ϖ(t) in the plotted frame — nothing is calibrated to the observations; agreement (Mercury: observed 572.0 vs the engine's 572.0 ″/cy window rate, relativity inside as a derived term) is the measurement. See [docs/13-mercury-precession-breakdown.md § 1.5a Reference Frames](13-mercury-precession-breakdown.md) for the full discussion of why ecliptic-only first-order L-L fails where a two-frame treatment succeeds.
 
 ## Data pipeline
 

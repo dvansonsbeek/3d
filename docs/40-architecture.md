@@ -34,7 +34,7 @@ status: current
 
 ## Executive Summary
 
-The Interactive 3D Solar System Simulation is a sophisticated WebGL-based astronomical visualization tool that implements the Holistic Universe Model. It provides accurate planetary positions, precession cycles, and orbital mechanics calculations spanning hundreds of thousands of years.
+The Interactive 3D Solar System Simulation is a sophisticated WebGL-based astronomical visualization tool that implements the Expanding Solar System Resonance Theory (ESSRT). It provides accurate planetary positions, precession cycles, and orbital mechanics calculations spanning hundreds of thousands of years.
 
 **Key Statistics:**
 - Single monolithic script.js (~59,800 lines)
@@ -740,7 +740,7 @@ All orbital elements are embedded in script.js from authoritative sources:
 - **JPL Horizons** - Planetary ephemerides (J2000 epoch)
 - **Souami & Souchay 2012** - Invariable plane parameters
 - **NASA Planetary Fact Sheet** - Physical constants
-- **Holistic Universe Model** - Long-term cycle parameters
+- **ESSRT** - Long-term cycle parameters
 
 ### No External APIs
 
@@ -810,7 +810,7 @@ The balance calculation lives inside `updateInvariablePlaneBalance()`, summing `
 3. **Meeus, Jean** - "Astronomical Algorithms" (1998)
 4. **Souami & Souchay** - "The solar system's invariable plane" (2012)
 5. **NASA JPL Horizons** - https://ssd.jpl.nasa.gov/horizons/
-6. **Holistic Universe Model** - https://www.holisticuniverse.com
+6. **holisticuniverse.com** - https://www.holisticuniverse.com
 
 ### Internal
 - [41 — Scene Graph Hierarchy](41-scene-graph-hierarchy.md) — full scene-graph structure with §Part 15 covering deep-time integrator tags

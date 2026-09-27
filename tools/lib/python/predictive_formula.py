@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 """
-HOLISTIC UNIVERSE MODEL — PREDICTIVE FORMULA SYSTEM
+ESSRT — PREDICTIVE FORMULA SYSTEM
 =====================================================
 
-Deterministic formulas for calculating all Holistic Universe Model values
+Deterministic formulas for calculating all ESSRT model values
 from a single input: YEAR. No observations required.
 
 SECTIONS:
@@ -24,7 +24,7 @@ Adding new formula categories:
   - Constants go in Section A; the formula function goes in its own section
   - This keeps the file extensible without reordering existing code
 
-Author: Holistic Universe Model
+Author: D. van Sonsbeek (holisticuniverse.com)
 License: MIT
 """
 
@@ -1556,7 +1556,7 @@ def predict_total_precession(year: int, planet_key: str, coefficients: List[floa
 
 if __name__ == "__main__":
     print("=" * 70)
-    print("HOLISTIC UNIVERSE MODEL — PREDICTIVE FORMULA SYSTEM")
+    print("ESSRT — PREDICTIVE FORMULA SYSTEM")
     print("=" * 70)
 
     # Verify feature count

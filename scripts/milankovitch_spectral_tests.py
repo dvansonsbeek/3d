@@ -3,7 +3,7 @@
 MILANKOVITCH SPECTRAL TESTS
 ============================
 
-Consolidated spectral-evidence pipeline for the Holistic model's Milankovitch
+Consolidated spectral-evidence pipeline for the model's Milankovitch
 predictions. Runs four tests on paleoclimate data:
 
   §7.1 — 405-kyr absence test (vs standard eccentricity-attribution prediction; MTM on full LR04)

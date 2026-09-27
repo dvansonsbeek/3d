@@ -11,11 +11,11 @@ Fibonacci investigation scripts. Import with:
 Data sources:
   - Masses: JPL DE440 (solar mass units)
   - J2000 eccentricities: NASA Planetary Fact Sheet
-  - Base eccentricities: Holistic Universe Model midpoint predictions
+  - Base eccentricities: the model's midpoint predictions
   - Inclination amplitudes: Computed from ψ/(d×√m) with pure Fibonacci divisors
   - Semi-major axes: NASA Planetary Fact Sheet (AU)
   - Orbital periods: Derived from semi-major axes (years)
-  - Oscillation period fractions: Holistic Universe Model (T_osc/H = a/b)
+  - Oscillation period fractions: the model's (T_osc/H = a/b)
 
 Framework (2025):
   - Single ψ-constant for all 8 planets

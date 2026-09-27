@@ -7,7 +7,7 @@ status: current
 
 # User Guide: 3D Solar System Simulation
 
-This guide explains how to use the Interactive 3D Solar System Simulation - the heart of the Holistic Universe Model where theory becomes something you can explore and verify.
+This guide explains how to use the Interactive 3D Solar System Simulation - the heart of ESSRT where theory becomes something you can explore and verify.
 
 ## Getting Started
 

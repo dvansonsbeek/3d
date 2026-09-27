@@ -5,7 +5,7 @@ coefficients: sha256:bb6a03c877eedab8
 status: current
 ---
 
-# Holistic Universe Model — Documentation
+# Expanding Solar System Resonance Theory (ESSRT) — Documentation
 
 This is the technical documentation for the [3D Solar System Simulation](https://3d.holisticuniverse.com). It covers the theory, calculations, architecture, and tooling behind the model. If you're looking for the scientific background, visit [holisticuniverse.com](https://holisticuniverse.com).
 
@@ -84,7 +84,7 @@ and why.
 
 | # | Document | Description |
 |---|----------|-------------|
-| 90 | [Milankovitch Language of the Holistic Model](90-milankovitch-language.md) | The model's Milankovitch framework: five H-divisor periods closed by beat algebra; all six Berger 1978 climatic-precession peaks matched within 0.7% |
+| 90 | [Milankovitch Language of the Model](90-milankovitch-language.md) | The model's Milankovitch framework: five H-divisor periods closed by beat algebra; all six Berger 1978 climatic-precession peaks matched within 0.7% |
 | 91 | [Milankovitch Evidence & Hypothesis Tests](91-milankovitch-evidence.md) | Empirical tests on LR04 + Cheng 2016 + EPICA + CENOGRID: the climate formula, per-planet contributions, pre-registered super-cycle nulls, fourteen falsifiable follow-up tests, and the 405-kyr off-lattice characterization |
 | 92 | [Climate Formula — Architecture, Variance Decomposition & Implementation](92-climate-formula.md) | The canonical L1 + L2 + L3 climate formula: per-regime ridge-fit architecture, five-layer variance decomposition, LR04 R² = 0.87 post-MPT (0.93 stitched), EPICA CO₂ cross-proxy R² = 0.84, and the reproducing pipeline |
 | 93 | [L1 Lattice Attribution Reference](93-l1-attribution-reference.md) | Per-L1-integer dual attribution (Berger label vs the model's best Earth–planet beat), scored by physical plausibility, on all 33 components — generator-owned |
