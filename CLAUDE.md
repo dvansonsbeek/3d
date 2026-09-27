@@ -198,8 +198,13 @@ in-table cost, runner-speed independent; born from four ungated ratio
 regressions, one owner-bisected at 28×; plus two travel-speed rows the
 steady-state rows cannot see — the orbit-ring resample against the per-JD
 route and the Play-start delay on a fresh page, both bisected from the
-owner's "waiting time before Play / stutter at 1000 yr/s"; fail-proven via
-`ESSRT_PERF_TIGHTEN=0.01` and on the pre-fix build). The `test:snapshot`
+owner's "waiting time before Play / stutter at 1000 yr/s"; plus the
+paused-idle row — a paused, untouched page must leave the render loop's
+idle check in place (Tweakpane's readonly rows re-emit `change` on every
+poll tick and the pane-wide handler woke every frame: a full update + a
+GPU frame at the display rate, forever; the pre-guard build reads 1.0
+against the 0.05 limit); fail-proven via `ESSRT_PERF_TIGHTEN=0.01` and on
+the pre-fix builds). The `test:snapshot`
 chain also carries `chart-export` — the Tools panels' paper-SVG → PNG
 rasterizer behind every Export button (exact pixel size, independent decode,
 byte floor; fail-proven via `ESSRT_CHART_EXPORT_PLANT=1`) and the export
@@ -215,7 +220,11 @@ plane at the chain's ϖ, the Moon's "Apsidal/Nodal Precession" markers
 marker (≡ the Sun panel's Sun-SSB sum) are placed as stated, and every
 group's chip list is exact — no device-wheel chips (born from the "Real
 Perihelion" wheel ~90° off the chain and three chips that showed nothing;
-fail-proven via `ESSRT_PERI_SUN_PLANT=1`). The wobble-centre gate also pins the Tracing
+fail-proven via `ESSRT_PERI_SUN_PLANT=1`), and a chip click WAKES the
+paused render loop (the class the monitor guard exposed: a UI path that
+changes scene state without setting `positionChanged` — now every user
+interaction wakes the loop for one frame; the pre-fix build reads 0 active
+frames after the click). The wobble-centre gate also pins the Tracing
 "Wobble" fill (a trace needs its parameters set in
 `updateAllTracesForEpoch`, the ONE place; a missing object traces nothing).
 `npm run test:transparency` is the Phase 6 acceptance gate — **green (84/84,

@@ -57,6 +57,14 @@
  *      frame and drops the umbra memo, so the build lands in load idle time.
  *   Limits set from both builds measured on the same box (see the row
  *   comments); the pre-fix build fails both rows, the fixed build passes.
+ *
+ * THE PAUSED-IDLE ROW (row 7, the monitor-tick class): a paused, untouched
+ *   page must cost nothing per frame. Tweakpane's readonly rows re-emit
+ *   `change` on every poll tick and the pane-wide change handler woke the
+ *   render loop on each — every paused frame ran the full update and a GPU
+ *   frame (20/20 measured; 0/180 with the guard). The row is the share of
+ *   frames passing the idle check on the fresh page before Play; the
+ *   pre-guard build reads 1.0 against the limit 0.05.
  */
 /* global performance, requestAnimationFrame -- the timing calls live inside page.evaluate callbacks, which execute in the browser */
 import { openSimulator } from './harness.mjs';
@@ -183,6 +191,19 @@ try {
   try {
     await fresh.page.waitForFunction(() => window.__test__ && window.__test__.vfpPISeriesLoaded(), null, { timeout: 60000 });
     await fresh.page.waitForTimeout(2500);   // the landing block's paused frame (and the initial render) settle
+    // ── 7. PAUSED IDLE (the monitor-tick class, found profiling the owner's
+    // "performance seems worse"): a paused, untouched page must leave the render
+    // loop's idle check in place. Tweakpane's ~300 readonly rows re-emit `change`
+    // on every 200-ms poll tick and the pane-wide change handler woke the loop
+    // on each — measured 20/20 paused frames active (a full update + a GPU frame
+    // at the display rate, forever); 0/180 with the monitor guard. The row is the
+    // share of frames that passed the idle check over 3 s; the pre-guard build
+    // reads 1.0, limit 0.05 (a stray label re-project allowed). No hook → NaN → FAIL.
+    await fresh.page.evaluate(() => window.__test__.wakeStats && window.__test__.wakeStats(true));
+    await fresh.page.waitForTimeout(3000);
+    const idle = await fresh.page.evaluate(() => (window.__test__.wakeStats ? window.__test__.wakeStats(false) : null));
+    console.log(`      paused idle: ${idle ? idle.active : '?'} of ${idle ? idle.frames : '?'} frames passed the idle check in 3 s`);
+    gate('paused idle: active frames / frames (fresh page, before Play)', idle && idle.frames ? idle.active / idle.frames : NaN, 0.05, 'x');
     const dateText = () => fresh.page.evaluate(() => { const el = [...document.querySelectorAll('input')].find((i) => /^\d{4}-\d\d-\d\d$/.test(i.value)); return el ? el.value : '?'; });
     const before = await dateText();
     const t0 = Date.now();

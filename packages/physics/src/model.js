@@ -673,8 +673,17 @@ export function assembleModel(C, F, laws = {}, secularSeriesArtifact = /** @type
 
   // ── ΔT (TT − UT1): raw Simpson + sequential stack adds ────────────────────
   /** @param {number} tMa @returns {number} */
+  // Exact-argument memo (the alphaMemo pattern above): the cardinal Newton
+  // solve asks for ΔT at the SAME jd twice per step (jdTTFromUT in the
+  // apparent Sun and again under the planetary completion) — measured 8.8 →
+  // 5.6 ms per panel year (8 solves) at modern epochs, values bit-identical.
+  /** @type {Map<number, number>} */
+  const dtMemo = new Map();
+  /** @param {number} tMa @returns {number} */
   const meanDeltaTSecondsAtAge = (tMa) => {
     if (tMa === 0) return 0;
+    const hit = dtMemo.get(tMa);
+    if (hit !== undefined) return hit;
     let result = deepLod.deltaTRawSecondsAtAge(tMa);
     const yearY = 2000 - tMa * 1e6;
     result += dtCycles.cycleDeltaTSecondsAt('bond', yearY);
@@ -682,6 +691,8 @@ export function assembleModel(C, F, laws = {}, secularSeriesArtifact = /** @type
     result += dtCycles.cycleDeltaTSecondsAt('jose5', yearY);
     result += dtCycles.cycleDeltaTSecondsAt('jose4', yearY);
     result += dtCycles.swingDeltaTSecondsAt(yearY);
+    if (dtMemo.size >= 8192) dtMemo.clear();
+    dtMemo.set(tMa, result);
     return result;
   };
   /** @param {number} year @returns {number} */

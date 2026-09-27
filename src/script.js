@@ -5943,6 +5943,8 @@ function currentEpochTMa() { return currentEpoch_t_Ma; }
 if (typeof window !== 'undefined') {
   window.__test__ = {
     setEpochByAge, setEpoch, resetEpochToJ2000, currentEpochTMa, isDeepTimeMode,
+    // the render loop's idle-check counters (the perf gate's paused-idle row)
+    wakeStats: (reset) => { const s = { frames: _wake.frames, active: _wake.active }; if (reset) { _wake.frames = 0; _wake.active = 0; } return s; },
     // Cycles-tab perihelion breakdown (doc 13 §1.8): the two coordinates and the
     // relativistic advance from the model constants — probed by the browser golden
     // so the panel can never drift from the registry / closure gate silently.
@@ -12415,6 +12417,20 @@ let starSizeMaterial = null;
 let starsMesh;
 
 let needsLabelUpdate = true;
+let cameraMoved = true; // Force first update
+let positionChanged = false; // Set true when date/time changed externally (GUI, jump, etc.)
+// The idle-check counters the perf gate's paused-idle row reads (frames seen
+// by the loop; frames that passed the idle check) — two integer increments.
+const _wake = { frames: 0, active: 0 };
+// Any user interaction wakes the loop for ONE frame — the structural guard for
+// the class the monitor guard exposed: a UI path that changes scene state
+// without setting positionChanged (owner: "Perihelion at Earth" appeared only
+// on a camera move or Play). Before the guard, the monitor ticks woke every
+// frame and hid it; ~88 custom DOM handlers exist and auditing each is how the
+// class comes back. One forced frame per event costs nothing.
+for (const evName of ['click', 'change', 'input', 'keydown', 'pointerup']) {
+  document.addEventListener(evName, () => { positionChanged = true; needsLabelUpdate = true; }, { capture: true, passive: true });
+}
 // 2) Whenever you know the labels need repositioning:
 //    • On camera move:
 controls.addEventListener('change', () => { needsLabelUpdate = true; });
@@ -12658,9 +12674,9 @@ let updatePredictionElapsed = 0;
 let astroCalcElapsed = 0;  // Throttle for heavy astronomical calculations (10 Hz)
 let visualElapsed = 0;  // Throttle for visual effects (30 Hz)
 let labelElapsed = 0;   // Throttle for CSS2D label updates during playback (30 Hz)
-
-let cameraMoved = true; // Force first update
-let positionChanged = false; // Set true when date/time changed externally (GUI, jump, etc.)
+// (cameraMoved / positionChanged / _wake are declared beside needsLabelUpdate
+// above: showHideObject sets positionChanged and runs at module scope before
+// this point — a dev bundle keeps `let` in place and threw the TDZ error)
 let _needsInitialSceneUpdate = true; // Force forceSceneUpdate() on first render frame
 let eggTriggered = false;
 
@@ -23971,8 +23987,19 @@ function setupGUI() {
 
   // Any GUI change triggers a render (visibility toggles, sliders, colors etc.)
   // Guard: ignore changes fired by the render loop's own .refresh() calls
-  gui.on('change', () => {
-    if (!o._renderLoopRefreshing) positionChanged = true;
+  gui.on('change', (ev) => {
+    if (o._renderLoopRefreshing) return;
+    // Readonly (monitor) bindings re-emit `change` on EVERY 200-ms poll tick
+    // (Tweakpane 4 pushes a fresh buffer array per tick, compared by identity),
+    // and there are ~300 of them: this handler set positionChanged ~100×/s on
+    // a paused, untouched page, so the render loop's idle check never held — a
+    // paused scene ran the full update + a GPU frame at the display rate
+    // (measured: 20/20 paused frames active; 0/180 with this guard; the
+    // perf gate's paused-idle row pins it). A monitor shows a value, nobody
+    // can change it — nothing to refresh.
+    const c = ev && ev.target && ev.target.controller;
+    if (c && c.value && c.value.ticker) return;
+    positionChanged = true;
   });
 
   // Mobile: gear icon to show/hide GUI panel
@@ -25553,6 +25580,7 @@ function setupGUI() {
         chip.classList.toggle('active', obj.visible);
         chip.setAttribute('aria-pressed', String(obj.visible));
         if (obj.onToggle) obj.onToggle(obj.visible); else showHideObject(obj);
+        positionChanged = true; needsLabelUpdate = true;   // the marker path bypasses showHideObject
       });
       grid.appendChild(chip);
     });
@@ -35783,7 +35811,9 @@ function render(now) {
   // Wake triggers: o.Run, cameraMoved, positionChanged (GUI/resize/drag),
   //                needsLabelUpdate (camera zoom/orbit events)
   const active = o.Run || cameraMoved || positionChanged || needsLabelUpdate;
+  _wake.frames++;
   if (!active) return;
+  _wake.active++;
 
   //stats.begin();
   //stats.update();
@@ -53287,7 +53317,10 @@ function _ssbMarker(kind = 'sun') {
   return m;
 }
 function _ssbUpdateMarker(jdUT) {
-  const shown = ['sun', 'earth'].map((k) => _ssbMarkers[k]).filter((m) => m && m.visible);
+  const mS = _ssbMarkers.sun, mE = _ssbMarkers.earth;   // (hidden: two reads, no allocation)
+  const shown = [];
+  if (mS && mS.visible) shown.push(mS);
+  if (mE && mE.visible) shown.push(mE);
   if (!shown.length || !_kcR) return;
   _ssbOffsetWorld(jdUT, _SSB_D);
   // the path: ±25 yr around the date on the panel chart's quarter-year grid
@@ -53296,6 +53329,7 @@ function _ssbUpdateMarker(jdUT) {
   if (_ssbPathMemoSeries !== _planetSeriesData) { _ssbPathMemo.clear(); _ssbPathMemoSeries = _planetSeriesData; for (const m of shown) m._pathY0 = null; }
   const year = 2000 + (jdUT - KC_ANCHOR_EPOCH_JD) / 365.25;
   const y0 = Math.round((year - _SSB_PATH_HALF_YEARS) / _SSB_PATH_STEP_YEARS) * _SSB_PATH_STEP_YEARS;
+  const nowMs = performance.now();
   for (const m of shown) {
     if (m.kind === 'earth') earth.rotationAxis.getWorldPosition(_SSB_S); else sun.planetObj.getWorldPosition(_SSB_S);
     m.dot.position.copy(_SSB_S).add(_SSB_D);
@@ -53303,8 +53337,12 @@ function _ssbUpdateMarker(jdUT) {
     const la = m.line.geometry.attributes.position.array;
     la[0] = _SSB_S.x; la[1] = _SSB_S.y; la[2] = _SSB_S.z; la[3] = m.dot.position.x; la[4] = m.dot.position.y; la[5] = m.dot.position.z;
     m.line.geometry.attributes.position.needsUpdate = true;
-    if (m._pathY0 !== y0) {
-      m._pathY0 = y0;
+    // the 250-ms wall-clock floor of the panel chart and the orbit rings: at
+    // travel speeds the quarter-year window slides every frame — 201 samples
+    // × 8 chain evaluations a frame without it; between resamples the path
+    // holds its last shape (the dot and the line are exact every frame)
+    if (m._pathY0 !== y0 && (m._pathY0 === null || nowMs - (m._pathMs ?? 0) >= 250)) {
+      m._pathY0 = y0; m._pathMs = nowMs;
       m._pathOffsets = [];
       for (let i = 0; i <= _SSB_PATH_SAMPLES; i++) {
         const yr = y0 + i * _SSB_PATH_STEP_YEARS;
@@ -54417,8 +54455,8 @@ function moveModel(pos) {
   // the zodiac-constellations band: centred on Earth, oriented ONCE from
   // the chain's frame bridge (the J2000 ecliptic and equinox in world axes)
   // — star-fixed; nothing of date turns it
-  earth.planetObj.getWorldPosition(zodiac.position);
-  if (_kcR && !zodiac.userData.placed) {
+  if (zodiac.visible) earth.planetObj.getWorldPosition(zodiac.position);
+  if (zodiac.visible && _kcR && !zodiac.userData.placed) {
     const X = new THREE.Vector3(_kcR[0][0], _kcR[1][0], _kcR[2][0]);   // the J2000 equinox
     const Y = new THREE.Vector3(_kcR[0][2], _kcR[1][2], _kcR[2][2]);   // the J2000 ecliptic pole
     const Z = new THREE.Vector3().crossVectors(X, Y);                  // = −(longitude +90°), the band's local −z convention
@@ -54427,8 +54465,10 @@ function moveModel(pos) {
   }
   // the zodiac-signs ring rides the ecliptic OF DATE: the sun-plane
   // container's world basis (x̂ the equinox of date, ŷ the pole — R4)
-  earth.planetObj.getWorldPosition(zodiacSigns.position);
-  earthPerihelionPrecession1.containerObj.getWorldQuaternion(zodiacSigns.quaternion);
+  if (zodiacSigns.visible) {   // (hidden rings cost nothing per frame)
+    earth.planetObj.getWorldPosition(zodiacSigns.position);
+    earthPerihelionPrecession1.containerObj.getWorldQuaternion(zodiacSigns.quaternion);
+  }
 
   // Inclination path keeps the former wheel's rotation (an independent object)
   if (typeof inclinationPathGroup !== 'undefined') {
@@ -58618,6 +58658,7 @@ function showHideObject(obj) {
     if (obj.labelObj) {
       obj.labelObj.visible = obj.visible;
     }
+    positionChanged = true; needsLabelUpdate = true;   // a paused loop must draw the change
 }
 
 function showHideAxisHelpers() {

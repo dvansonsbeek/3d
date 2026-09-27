@@ -458,7 +458,8 @@ function render(now) {
 ```
 
 **Key idle detection mechanisms:**
-- **`positionChanged`** is set by: `gui.on('change')` global listener, `controls.addEventListener('start')`, `onWindowResize()`, and any code that modifies scene state
+- **`positionChanged`** is set by: `gui.on('change')` global listener (which IGNORES readonly/monitor bindings — Tweakpane 4 monitors re-emit `change` on every 200-ms poll tick whether the value moved or not, and with ~300 of them the handler woke the loop every frame of a paused page; the perf gate's paused-idle row pins the guard), `controls.addEventListener('start')`, `onWindowResize()`, and any code that modifies scene state
+- **Any user interaction** (`click`, `change`, `input`, `keydown`, `pointerup` on the document, capture phase) wakes the loop for ONE frame — the structural guard for a UI path that changes scene state without setting the flag (the Show/Hide chips showed the class once the paused loop truly idled); the Show/Hide gate pins it
 - **`cameraMoved`** uses epsilon threshold so OrbitControls damping eventually settles to zero
 - **`controls.target`** is NOT recomputed on pure camera movement — only when scene moves. This prevents floating-point jitter from keeping the loop awake indefinitely
 
@@ -713,7 +714,7 @@ Tweakpane Root ("Expanding Solar System Resonance Theory")
 | **Geometry Reuse** | Shared sphere geometry, scaled per planet | Reduces memory |
 | **Visibility Culling** | Optional bodies can be hidden | Reduces draw calls |
 | **Label Throttling** | DOM updates at 5 Hz | Reduces layout thrashing |
-| **GUI Change Listener** | `gui.on('change')` sets `positionChanged = true` | Wakes idle loop only when needed |
+| **GUI Change Listener** | `gui.on('change')` sets `positionChanged = true` for INPUT changes; monitor (readonly) ticks are ignored | Wakes idle loop only when needed — a paused, untouched page costs nothing per frame |
 
 ### Performance Budgets
 

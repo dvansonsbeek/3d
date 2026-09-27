@@ -125,7 +125,15 @@ function createDeepTimeLod(deps) {
    * the unit H(t) below.
    * @param {number} t_Ma @returns {number|null} */
   function eraClockHAtAge(t_Ma) {
-    const LOD_s = lodSecondsAtAge(t_Ma);
+    return eraClockHFromLod(lodSecondsAtAge(t_Ma));
+  }
+  // The `…FromLod` twins take an ALREADY-COMPUTED LOD(t): the Simpson ΔT
+  // integrand below evaluated the LOD four times and the tropical year twice
+  // per node through these helpers (measured 8.8 → 4.8 ms per cardinal panel
+  // year with the model's ΔT memo). Same operations, same inputs — every
+  // value bit-identical (11,958-value sweep, 0 differences).
+  /** @param {number|null} LOD_s @returns {number|null} */
+  function eraClockHFromLod(LOD_s) {
     if (LOD_s === null) return null;
     return K.holisticYearJ2000 * LOD_s / K.lodNowH13Seconds;
   }
@@ -156,7 +164,11 @@ function createDeepTimeLod(deps) {
    * ≡ H_era wherever (a₀/a_M)³ ≈ 1. Identifier kept (plan 06 P4).
    * @param {number} t_Ma @returns {number|null} */
   function hAtAge(t_Ma) {
-    const hEra = eraClockHAtAge(t_Ma);
+    return hFromLod(t_Ma, lodSecondsAtAge(t_Ma));
+  }
+  /** @param {number} t_Ma @param {number|null} LOD_s @returns {number|null} */
+  function hFromLod(t_Ma, LOD_s) {
+    const hEra = eraClockHFromLod(LOD_s);
     const term = composed.torqueTermAtAge(t_Ma);
     return hEra === null || term === null ? null : hEra / term;
   }
@@ -202,8 +214,12 @@ function createDeepTimeLod(deps) {
    * ±2 Myr, measured), and re-basing would move every comb coefficient
    * for a rounding-level gain. This tier stays a named device. */
   function tropicalYearSecondsAtAge(t_Ma) {
+    return tropicalYearSecondsFromLod(t_Ma, lodSecondsAtAge(t_Ma));
+  }
+  /** @param {number} t_Ma @param {number|null} LOD_s @returns {number} */
+  function tropicalYearSecondsFromLod(t_Ma, LOD_s) {
     const sidSec = siderealYearSecondsAtAge(t_Ma);
-    const Ht = hAtAge(t_Ma);
+    const Ht = hFromLod(t_Ma, LOD_s);
     if (Ht === null) return sidSec * (1 - 13 / K.holisticYearJ2000);
     return sidSec * (1 - 13 / Ht);
   }
@@ -281,15 +297,16 @@ function createDeepTimeLod(deps) {
       const tau = i * h;
       const lodMean = lodSecondsAtAge(tau);
       if (lodMean === null) return NaN;
-      const yearS = tropicalYearSecondsAtAge(tau);
+      const yearS = tropicalYearSecondsFromLod(tau, lodMean);
       // Ecliptic "missing motion" — the solar day is measured against the
       // Sun on the ECLIPTIC, whose plane turns on the invariable plane at the
       // nodal rate s₃ (period ≈ 68,751 yr, an orbital quantity), not in the
       // inclination frame. Adds ~3.4 ms at J2000; the fitted cycle stack
       // closes Layer-4 LOD_real onto the USNO anchor. Non-null: the helper
       // can only be null when lodSecondsAtAge(tau) is null, which already
-      // returned NaN above — the checker can't see the chain.
-      const lodH5Raw = lodMean + /** @type {number} */ (eclipticLodCorrectionSecondsAtAge(tau));
+      // returned NaN above. Spelled inline from the node's own lodMean and
+      // yearS — the same operations as eclipticLodCorrectionSecondsAtAge(tau).
+      const lodH5Raw = lodMean + lodMean / (deps.nodalPeriodYearsFn() * (yearS / 86400));
       const integrand = (86400 - lodH5Raw) * yearS * 1e6 / 86400;
       const w = (i === 0 || i === n) ? 1 : (i % 2 === 1 ? 4 : 2);
       sum += w * integrand;

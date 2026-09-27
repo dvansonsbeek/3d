@@ -69,6 +69,23 @@ try {
   check('Moon perigee marker: distance = a(1−e)', !!mm && Math.abs(mm.perigee.distAU - mm.aPeriAU * PLANT) < 1e-9, mm ? `${mm.perigee.distAU.toFixed(9)} vs ${(mm.aPeriAU * PLANT).toFixed(9)} AU` : 'probe returned null');
   check('Moon perigee marker: longitude/latitude of date from L′ − M′ in the inclined plane', !!mm && Math.abs(wrapd(mm.perigee.lon - mm.perigeeExpectedLonDeg)) < 1e-6 && Math.abs(mm.perigee.lat - mm.perigeeExpectedLatDeg) < 1e-6, mm ? `λ ${mm.perigee.lon.toFixed(4)}° (exp ${mm.perigeeExpectedLonDeg.toFixed(4)}), β ${mm.perigee.lat.toFixed(4)}° (exp ${mm.perigeeExpectedLatDeg.toFixed(4)})` : '');
   check('Moon nodes: on the ecliptic of date at L′ − F and L′ − F + 180°, at distance a', !!mm && Math.abs(wrapd(mm.ascNode.lon - mm.nodeLonExpectedDeg)) < 1e-6 && Math.abs(wrapd(mm.descNode.lon - mm.nodeLonExpectedDeg - 180)) < 1e-6 && Math.abs(mm.ascNode.lat) < 1e-6 && Math.abs(mm.descNode.lat) < 1e-6 && Math.abs(mm.ascNode.distAU - mm.aAU) < 1e-9, mm ? `asc λ ${mm.ascNode.lon.toFixed(4)}° β ${mm.ascNode.lat.toExponential(1)}°, desc λ ${mm.descNode.lon.toFixed(4)}°, Ω = L′ − F = ${mm.nodeLonExpectedDeg.toFixed(4)}°` : '');
+  // A chip click must WAKE the paused loop (owner: "Perihelion at Earth" appeared
+  // only on a camera move or Play once the paused loop truly idled — the monitor
+  // ticks used to wake every frame and hid the class). Fail-proven on the
+  // pre-fix build: 0 active frames after the click.
+  await sim.page.waitForTimeout(1500);   // let the landing settle so the counters start from an idle loop
+  const wake = await sim.page.evaluate(async () => {
+    window.__test__.wakeStats(true);
+    const chip = [...document.querySelectorAll('.trace-chip')].find((c) => c.title === 'Mercury Perihelion At Sun');
+    if (!chip) return null;
+    chip.click();
+    await new Promise((r) => setTimeout(r, 400));
+    const s = window.__test__.wakeStats(false);
+    const pressed = chip.getAttribute('aria-pressed') === 'true';
+    chip.click();   // leave the scene as found
+    return { active: s.active, frames: s.frames, pressed };
+  });
+  check('a Show/Hide chip click wakes the paused loop (the frame that draws the marker)', !!wake && wake.active >= 1 && wake.pressed, wake ? `${wake.active} of ${wake.frames} frames active after the click · chip pressed ${wake.pressed}` : 'chip not found');
   check('page came up without errors', sim.errors.length === 0, sim.errors.slice(0, 3).join(' | '));
 } catch (e) {
   check('suite ran to completion', false, String((e && e.stack) || e));

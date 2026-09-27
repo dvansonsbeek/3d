@@ -48,6 +48,18 @@ const INPUT_FILES = [
   'packages/physics/src/eclipse/finders.cjs',
   'packages/physics/src/eclipse/sun-planetary-completion.cjs',
   'packages/physics/src/earth/year-lengths.cjs',
+  // The apparent Sun also rides the Moon (the geocentric Sun carries the
+  // Earth–Moon barycentric wobble; nutation from the lunar arguments) and the
+  // ΔT stack (UT ↔ TT). Missing here, the deep-eccentricity slope anchor
+  // (e338d1bd) moved 266 values at the sixth decimal without this gate seeing
+  // it — found regenerating on the untouched code.
+  'packages/physics/src/moon/deep-ecc-channel.cjs',
+  'packages/physics/src/moon/deep-modes-artifact.cjs',
+  'packages/physics/src/moon/arguments.cjs',
+  'packages/physics/src/deltat/deep-time.cjs',
+  'packages/physics/src/deltat/cycles.cjs',
+  'packages/physics/src/deltat/recession-history.cjs',
+  'packages/physics/src/climate/l1-orbital.cjs',
   'tools/verify/sun-vs-horizons.js',
 ];
 
