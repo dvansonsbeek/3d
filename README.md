@@ -8,7 +8,7 @@
 
 ![Solar System Simulation](https://raw.githubusercontent.com/dvansonsbeek/3d/master/public/readme.png)
 
-> **[Live Demo](https://3d.holisticuniverse.com)** — Experience the simulation in your browser (auto-deployed from every verified commit)
+> **[Live Demo](https://3d.holisticuniverse.com)** — Experience the simulation in your browser (auto-deployed from every verified commit). Visits are counted with [GoatCounter](https://www.goatcounter.com/) — cookieless, no personal data; see the [privacy policy](https://holisticuniverse.com/en/privacypolicy).
 >
 > **[Preprint](https://doi.org/10.21203/rs.3.rs-8758810/v4)** — Read the accompanying research paper
 

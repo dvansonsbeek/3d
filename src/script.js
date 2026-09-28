@@ -15761,8 +15761,16 @@ function chartExportCredit(W, H) {
 // DOM, orphaned and unclosable, on top of the second — "when I am quick the
 // panels no longer open" (owner). Further clicks now join the open in flight.
 const _panelOpening = new Map();
+/** GoatCounter custom event (index.html loads the counter; a no-op when it is
+ *  absent, blocked, or on localhost where the counter does not count). */
+function _gcEvent(path, title) {
+  const gc = window.goatcounter;
+  if (gc && typeof gc.count === 'function') gc.count({ path, title, event: true });
+}
+const _GC_PANEL_TITLES = { wgc: 'Perihelion of Planets Verification', essrt: 'Framework Verification', cfm: 'Earth Climate Analysis', lcr: 'Earth dLOD/dt Analysis' };
 function _openPanelOnce(key, build) {
   if (_panelOpening.has(key)) return _panelOpening.get(key);
+  _gcEvent('tools/' + key, _GC_PANEL_TITLES[key] || key);
   const p = (async () => { try { return await build(); } finally { _panelOpening.delete(key); } })();
   _panelOpening.set(key, p);
   return p;
@@ -15771,6 +15779,7 @@ function _openPanelOnce(key, build) {
 /** Show a paper-style chart SVG as a downloadable picture (PNG first, SVG kept). */
 function openChartExportModal(svgString, title) {
   const slug = chartExportSlug(title);
+  _gcEvent('export/' + slug, 'Export: ' + title);
   const isTouch = window.matchMedia && window.matchMedia('(pointer: coarse)').matches;
   const modal = document.createElement('div');
   modal.className = 'chart-export-modal';
