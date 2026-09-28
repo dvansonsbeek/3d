@@ -317,7 +317,7 @@ Input constants used in the formulas above:
 
 | Constant | Variable | Formula | Value |
 |----------|----------|---------|-------|
-| Derived Mean Eccentricity | `eccentricityDerivedMean` | sqrt(base² + amplitude²) | ~<!--v:eccentricityDerivedMean-->0.0155200<!--/v--> |
+| Derived Mean Eccentricity | `eccentricityDerivedMean` | e(J2000) / (1 + cos θ₀/2) | the retired single-line law's base′ — the scene's flag-off fallback and the Node twin only; the published e is the N-body series |
 | EoC Eccentricity | `eocEccentricity` | derivedMean - base/2 | ~<!--v:eocEccentricityValue-->0.00836<!--/v--> |
 | Perihelion Phase Offset | `perihelionPhaseOffset` | (see constants.js derivation) | ~<!--v:periPhaseOffsetDeg-->0.4830<!--/v--> deg |
 
@@ -870,7 +870,7 @@ All 8 planet amplitudes are derived at runtime from K using model mean obliquity
 
 ## Planet Eccentricity Phase Constants (J2000)
 
-Phase angles for the planets' eccentricity oscillations are derived at runtime from the balanced-year phase: `phase = (2000 - balancedYear) / wobblePeriod × 360°`. Earth is not in this family: its e(t) rides the one H/3 law on the System-Reset anchor (θ₃(J2000) = <!--v:earthEccPhaseH3J2000-->81.18<!--/v-->°, shared with the inclination law, the Moon channel and the Sun imprint), so nothing solves an Earth eccentricity phase. The phases are not stored in JSON — they are computed by constants.js and script.js.
+Phase angles for the planets' eccentricity oscillations are derived at runtime from the balanced-year phase: `phase = (2000 - balancedYear) / wobblePeriod × 360°`. Earth is not in this family: its published e(t) is the N-body series (the one-source movement; the lunar chain reads the ±10-Myr mode table anchored at J2000), so nothing solves an Earth eccentricity phase. The phases are not stored in JSON — they are computed by constants.js and script.js.
 
 ## Per-Planet EoC Fractions (legacy scaffolding since the K5 excision)
 

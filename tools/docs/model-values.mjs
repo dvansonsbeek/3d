@@ -573,25 +573,10 @@ export const VALUES = {
     unit: '″',
     note: 'IAU mean element − series secular element at J2000 (a convention gap, labelled not reconciled)',
   },
-  // ── The one eccentricity law: |e| rides the H/3 line
-  //    e(t) = base′·(1 + cos θ₃/2) on the System-Reset anchor. Extremes are
-  //    analytic: min = base′/2 at θ₃ = 180°, max = 3·base′/2 at θ₃ = 0°;
-  //    epochs from balancedYear (min at bY + k·H/3, max at bY + (k+½)·H/3).
-  eccentricityDerivedMean: {
-    get: () => C.eccentricityBaseDerived,
-    render: (v) => Number(v).toFixed(7),
-    note: "base′ of the one H/3 law — derived: e(J2000)/(1 + cos θ₀/2) on the System-Reset anchor",
-  },
-  eccentricityMin: {
-    get: () => C.eccentricityBaseDerived * 0.5,
-    render: (v) => `~${Number(v).toFixed(4)}`,
-    note: 'one-law minimum: base′/2 at θ₃ = 180°',
-  },
-  eccentricityMax: {
-    get: () => C.eccentricityBaseDerived * 1.5,
-    render: (v) => `~${Number(v).toFixed(4)}`,
-    note: 'one-law maximum: 3·base′/2 at θ₃ = 0°',
-  },
+  // (The single-line eccentricity law's keys — eccentricityDerivedMean / Min /
+  //  Max, earthEccPhaseH3J2000, earthEccDotModelJ2000, earthEccDotAgreementPct
+  //  — are retired: the published e is the N-body series on every path; the
+  //  law survives only as the scene's flag-off fallback and the Node twin.)
   eccentricityAmplitude: {
     get: () => model.earth.eccentricityAmplitude,
     render: (v) => Number(v).toFixed(6),
@@ -600,28 +585,6 @@ export const VALUES = {
   // ── Derived companions (the A-closure, the one-law rate test, the day
   //    bases, the perihelion-at-June-solstice epochs). All derived — no
   //    stored literals (feedback: use value tags).
-  earthEccPhaseH3J2000: {
-    get: () => astro.earthOrbital.earthPerihelionLongitudeJ2000 - astro.earthOrbital.earthInclinationCycleAnchor,
-    render: (v) => Number(v).toFixed(2), unit: '°',
-    note: 'θ₃(J2000) of the one H/3 law = ϖ_ICRF(J2000) − the inclination-cycle anchor',
-  },
-  earthEccDotModelJ2000: {
-    get: () => {
-      const th = (astro.earthOrbital.earthPerihelionLongitudeJ2000 - astro.earthOrbital.earthInclinationCycleAnchor) * Math.PI / 180;
-      return -(C.eccentricityBaseDerived / 2) * Math.sin(th) * (2 * Math.PI * 3 / C.H) * 100;
-    },
-    render: (v) => Number(v).toPrecision(3).replace('-', '−'), unit: '/cy',
-    note: 'the one law\'s de/dt at J2000 — a prediction (zero fitted inputs); compare earthEccDotJ2000 (observed)',
-  },
-  earthEccDotAgreementPct: {
-    get: () => {
-      const th = (astro.earthOrbital.earthPerihelionLongitudeJ2000 - astro.earthOrbital.earthInclinationCycleAnchor) * Math.PI / 180;
-      const model = -(C.eccentricityBaseDerived / 2) * Math.sin(th) * (2 * Math.PI * 3 / C.H) * 100;
-      return Math.abs(model / astro.earthOrbital.earthEccentricityDotJ2000 - 1) * 100;
-    },
-    render: (v) => Number(v).toFixed(1), unit: '%',
-    note: '|model ė / observed ė − 1| at J2000',
-  },
   periJuneSolsticeNextAD: {
     get: () => Math.round(C.perihelionalignmentYear + C.H / 32),
     render: (v) => thousands(v),
@@ -1639,10 +1602,9 @@ export const VALUES = {
       periAlignYear:    { get: () => C.perihelionalignmentYear, render: (v) => String(v) },
       periAlignYearRound: { get: () => C.perihelionalignmentYear, render: (v) => Number(v).toFixed(2) },
       periAlignJD:      { get: () => C.perihelionalignmentJD, render: (v) => thousands(v), unit: 'JD' },
-      eccNextMax:  { get: () => Math.round(C.balancedYear + 7 * C.H / 6), render: (v) => thousands(v), note: 'next θ₃ = 0° epoch of the H/3 eccentricity law (balancedYear + 7H/6)' },
-      eccNextMin:  { get: () => Math.round(C.balancedYear + C.H), render: (v) => thousands(v), note: 'next θ₃ = 180° epoch of the H/3 eccentricity law (balancedYear + H)' },
+      // (eccNextMax / eccNextMin / eccPrevMinBC — the single-line eccentricity
+      // law's extreme epochs — are retired: the published e is the N-body series)
       eccPrevMin:  { get: () => Math.round(Math.abs(C.perihelionalignmentYear - HDIV16() / 2)), render: (v) => thousands(v) },
-      eccPrevMinBC: { get: () => Math.round(Math.abs(C.balancedYear + 2 * C.H / 3)), render: (v) => thousands(v) + ' BC', note: 'last θ₃ = 180° epoch of the H/3 eccentricity law (balancedYear + 2H/3)' },
       eccPrevMinJD: { get: () => C.perihelionalignmentJD - (HDIV16() * C.meanSolarYearDays / 2), render: (v) => thousands(v, 1), unit: 'JD' },
       nextBalancedYear: { get: () => C.balancedYear + C.H, render: (v) => thousands(v) },
       tempGraphMostLikely: { get: () => C.temperatureGraphMostLikely, render: (v) => String(v), note: 'temperature-graph phase pick (14.5 H/16 cycles)' },
@@ -3008,7 +2970,10 @@ export const VALUES = {
       if (!rows.has(lo) || !rows.has(hi)) throw new Error(`model-values: La2004 grid has no bracket for ${calYear}`);
       return rows.get(lo) + ((t - lo) / 1000) * (rows.get(hi) - rows.get(lo));
     };
-    const oeEcc = (y) => require(join(ROOT, 'tools', 'lib', 'orbital-engine.js')).computeEccentricityEarth(y);
+    // the PUBLISHED eccentricity — the one-source N-body series (the value the
+    // Earth panel, the Sun's equation of centre and the cardinal chain read);
+    // the Node twin's computeEccentricityEarth is the retired single-line law
+    const oeEcc = (y) => oneMovement().e(y);
     const out = {
       startAngleModel: { get: () => model.foundational.startAngleModel, render: (v) => Number(v).toFixed(8), unit: '°' },
       correctionDays: { get: () => model.foundational.correctionDays, render: (v) => Number(v).toFixed(4), unit: 'd' },

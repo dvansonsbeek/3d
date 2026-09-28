@@ -117,7 +117,7 @@ gives −0.79°, a difference with <0.001° effect on Sun position).
 | `useVariableSpeed` | true | Toggle |
 
 The geometric offset carries `e(t)·û(ϖ)` itself:
-- `eccentricityDerivedMean` = <!--v:eccentricityDerivedMean-->0.0155200<!--/v--> — base′, the one law's mean (derived from e(J2000) and the System-Reset anchor)
+- `eccentricityDerivedMean` = 0.0155200 — base′ of the retired single-line law (derived from e(J2000) and the System-Reset anchor); the legacy path's constant, not a published value — the published e is the N-body series
 - `eccentricityAmplitude` = <!--v:eccentricityAmplitude-->0.001356<!--/v--> — the Law-4 input A and the wobble-marker distance; not a scene arm
 
 ### Start-date independence
@@ -292,7 +292,7 @@ baselines).
 
 The residual it absorbs originates from a definitional eccentricity
 difference: the legacy path's `eccentricityDerivedMean`
-(<!--v:eccentricityDerivedMean-->0.0155200<!--/v-->, the one law's base′)
+(0.0155200, the retired single-line law's base′)
 vs Meeus's IAU J2000 value (<!--v:j2000Eccentricity-->0.01671022<!--/v-->),
 propagating through `2e·sin(M)` as a ~280″ annual term.
 

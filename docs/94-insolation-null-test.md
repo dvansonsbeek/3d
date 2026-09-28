@@ -271,7 +271,7 @@ The model's eccentricity is the one H/3 law (docs/10 §Law 4):
 e(t) = base′ · (1 + cos θ₃(t) / 2)
 ```
 
-with base′ = <!--v:eccentricityDerivedMean-->0.0155200<!--/v--> derived from the observed J2000
+with base′ = 0.0155200 (the single-line law this measurement was run on — since retired from the published paths, where the eccentricity is the N-body series; a re-run on the series is pending) derived from the observed J2000
 value and the System-Reset anchor. Over the LR04 record this gives
 e(t) ∈ [<!--v:insolStabEccMinModel-->0.0078<!--/v-->, <!--v:insolStabEccMaxModel-->0.0233<!--/v-->] — a
 single 111.8-kyr line, against La2004's multi-mode envelope
