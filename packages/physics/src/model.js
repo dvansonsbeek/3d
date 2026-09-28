@@ -411,9 +411,9 @@ export function assembleModel(C, F, laws = {}, secularSeriesArtifact = /** @type
   // own ±10-Myr mode table, anchored form — feeds the ENTIRE lunar chain
   // (modulation, cycle counts, arguments eccAt/channelIntegral, E-factor).
   // The Sun/clock machinery (eclipse Sun EoC, besselian Sun distance,
-  // cardinal braid) stays on the H/3 channel above — a certification
-  // split, not a physics one (the two agree within 4.2e-5 in-era). The
-  // laws hook deliberately does NOT reach this channel.
+  // cardinal braid) reads the one-source series below (plan 06 layer B —
+  // the two agree within 4.2e-5 in-era). The laws hook deliberately does
+  // NOT reach this channel.
   const deepEcc = createDeepEccChannel(DEEP_MODES_ARTIFACT);
   /** @param {number} year @returns {number} */
   // Plan 06 layer B: the PUBLISHED Earth eccentricity is the one-source series

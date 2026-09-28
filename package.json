@@ -49,6 +49,7 @@
     "check:data": "node tools/verify/data-provenance.js",
     "check:docs": "npm run lint && npm run typecheck && npm run check:boundaries && npm run test:literals && npm run test:vocabulary && npm run test:docs-fresh && npm run check:artifacts && npm run docs:values && npm run docs:tables && npm run values:package",
     "check:engine": "npm run check:docs && npm run test:purity && npm run test:layer0 && npm run test:layer1 && npm run test:constants && npm run test:counterfactual && npm run test:planet-model && npm run test:sampler-purity && npm run test:spin-channel && npm run test:verify && npm run test:fixtures",
+    "figures:nbody": "node tools/explore/eccentricity-shapes.mjs && node tools/explore/deep-ecc-history.mjs",
     "docs:values": "node tools/docs/render-doc-values.mjs",
     "docs:values:write": "node tools/docs/render-doc-values.mjs --write",
     "docs:tables": "python3 scripts/generate_doc97_tables.py --check && node tools/docs/render-calculation-map.mjs --check && node tools/docs/render-doc99-tables.mjs --check && node tools/docs/render-doc92-tables.mjs --check",
