@@ -203,8 +203,12 @@ paused-idle row — a paused, untouched page must leave the render loop's
 idle check in place (Tweakpane's readonly rows re-emit `change` on every
 poll tick and the pane-wide handler woke every frame: a full update + a
 GPU frame at the display rate, forever; the pre-guard build reads 1.0
-against the 0.05 limit); fail-proven via `ESSRT_PERF_TIGHTEN=0.01` and on
-the pre-fix builds). The `test:snapshot`
+against the 0.05 limit); plus the monitor-polling row — the pane's ~319
+readonly rows are LOOP-DRIVEN (tickers disposed after setupGUI, the
+visible rows re-read on the 5-Hz DOM tick), so a paused page emits ~0 pane
+change events where the polling build emitted ~4,800 in 3 s (limit 5), and
+a visible monitor must still change while playing; fail-proven via
+`ESSRT_PERF_TIGHTEN=0.01` and on the pre-fix builds). The `test:snapshot`
 chain also carries `chart-export` — the Tools panels' paper-SVG → PNG
 rasterizer behind every Export button (exact pixel size, independent decode,
 byte floor; fail-proven via `ESSRT_CHART_EXPORT_PLANT=1`) and the export

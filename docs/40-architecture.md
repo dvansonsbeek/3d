@@ -715,6 +715,7 @@ Tweakpane Root ("Expanding Solar System Resonance Theory")
 | **Visibility Culling** | Optional bodies can be hidden | Reduces draw calls |
 | **Label Throttling** | DOM updates at 5 Hz | Reduces layout thrashing |
 | **GUI Change Listener** | `gui.on('change')` sets `positionChanged = true` for INPUT changes; monitor (readonly) ticks are ignored | Wakes idle loop only when needed — a paused, untouched page costs nothing per frame |
+| **Loop-driven monitors** | The pane's ~319 readonly rows have no poll timers (disposed after `setupGUI()`); the render loop's 5-Hz DOM tick re-reads only the rows in expanded folders / selected tab pages | A paused page runs no monitor reads or DOM rewrites (was ~1,600/s); collapsed folders cost nothing while playing |
 
 ### Performance Budgets
 

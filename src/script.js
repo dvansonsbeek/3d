@@ -5944,7 +5944,7 @@ if (typeof window !== 'undefined') {
   window.__test__ = {
     setEpochByAge, setEpoch, resetEpochToJ2000, currentEpochTMa, isDeepTimeMode,
     // the render loop's idle-check counters (the perf gate's paused-idle row)
-    wakeStats: (reset) => { const s = { frames: _wake.frames, active: _wake.active }; if (reset) { _wake.frames = 0; _wake.active = 0; } return s; },
+    wakeStats: (reset) => { const s = { frames: _wake.frames, active: _wake.active, paneEvents: _wake.paneEvents, monitors: _wake.monitors }; if (reset) { _wake.frames = 0; _wake.active = 0; _wake.paneEvents = 0; } return s; },
     // Cycles-tab perihelion breakdown (doc 13 §1.8): the two coordinates and the
     // relativistic advance from the model constants — probed by the browser golden
     // so the panel can never drift from the registry / closure gate silently.
@@ -12421,7 +12421,7 @@ let cameraMoved = true; // Force first update
 let positionChanged = false; // Set true when date/time changed externally (GUI, jump, etc.)
 // The idle-check counters the perf gate's paused-idle row reads (frames seen
 // by the loop; frames that passed the idle check) — two integer increments.
-const _wake = { frames: 0, active: 0 };
+const _wake = { frames: 0, active: 0, paneEvents: 0, monitors: 0 };
 // Any user interaction wakes the loop for ONE frame — the structural guard for
 // the class the monitor guard exposed: a UI path that changes scene state
 // without setting positionChanged (owner: "Perihelion at Earth" appeared only
@@ -23978,6 +23978,13 @@ const LUNAR_ECLIPSE_PRESETS = [
 const _lunarEclipseState = { idx: 0 };
 
 setupGUI()
+// The pane's 319 readonly rows each polled on a 200-ms timer — ~1,600 reads +
+// DOM text rewrites a second, on a paused page too (measured after the loop
+// itself idled: 15 ms/s of JS, 80 % of the idle page's cost). A monitor shows
+// loop-produced state, so the loop drives it: every interval ticker is disposed
+// here and the VISIBLE monitors are re-read on the render loop's 5-Hz DOM tick
+// (only while the loop is active). ONE home — a new readonly row inherits it.
+_convertMonitorsToLoopDriven(o._guiPane);
 function setupGUI() {
   const gui = new Pane({ title: 'Expanding Solar System Resonance Theory', expanded: true });
   gui.element.id = 'gui';
@@ -23988,6 +23995,7 @@ function setupGUI() {
   // Any GUI change triggers a render (visibility toggles, sliders, colors etc.)
   // Guard: ignore changes fired by the render loop's own .refresh() calls
   gui.on('change', (ev) => {
+    _wake.paneEvents++;   // (the perf gate's monitor-polling row: ~0 on a paused page)
     if (o._renderLoopRefreshing) return;
     // Readonly (monitor) bindings re-emit `change` on EVERY 200-ms poll tick
     // (Tweakpane 4 pushes a fresh buffer array per tick, compared by identity),
@@ -35788,6 +35796,31 @@ document.addEventListener('keydown', e => {
 //*************************************************************
 // THE ANIMATE/RENDER LOOP (BE CAREFUL WITH ADDING/ CHANGING)
 //*************************************************************
+// ── Loop-driven monitors (see the note at the setupGUI() call) ─────────────
+/** Walk the pane's blades: `children` of folders/pages, `pages` of tabs. With
+ *  visibleOnly, collapsed folders and unselected tab pages are skipped. */
+function _forEachBlade(api, fn, visibleOnly) {
+  const kids = api.pages ? api.pages.filter((p) => !visibleOnly || p.selected) : (api.children || []);
+  for (const c of kids) {
+    if (c.children || c.pages) {
+      if (visibleOnly && c.expanded === false) continue;
+      _forEachBlade(c, fn, visibleOnly);
+    } else fn(c);
+  }
+}
+/** A readonly (monitor) binding: its value carries the poll ticker. */
+function _isMonitorApi(api) { const c = api.controller; return !!(c && c.value && c.value.ticker); }
+function _convertMonitorsToLoopDriven(pane) {
+  let n = 0;
+  if (pane) _forEachBlade(pane, (api) => { if (_isMonitorApi(api)) { api.controller.value.ticker.dispose(); n++; } }, false);
+  _wake.monitors = n;
+}
+/** Re-read the monitors someone can see (expanded folders, selected tab pages). */
+function _refreshVisibleMonitors() {
+  if (!o._guiPane) return;
+  _forEachBlade(o._guiPane, (api) => { if (_isMonitorApi(api)) api.refresh(); }, true);
+}
+
 function render(now) {
   requestAnimationFrame(render);
 
@@ -36010,6 +36043,7 @@ function render(now) {
   if (domElapsed >= 0.2 || forceAllUpdates) {
     domElapsed = 0;
     updateDomLabel();
+    _refreshVisibleMonitors();   // the pane's readonly rows are loop-driven (no poll timers)
     dateHUD.textContent = o.Date;
 
     const periDistEl = document.getElementById('periDistHUD');

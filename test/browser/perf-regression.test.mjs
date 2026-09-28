@@ -204,6 +204,19 @@ try {
     const idle = await fresh.page.evaluate(() => (window.__test__.wakeStats ? window.__test__.wakeStats(false) : null));
     console.log(`      paused idle: ${idle ? idle.active : '?'} of ${idle ? idle.frames : '?'} frames passed the idle check in 3 s`);
     gate('paused idle: active frames / frames (fresh page, before Play)', idle && idle.frames ? idle.active / idle.frames : NaN, 0.05, 'x');
+    // ── 8. MONITOR POLLING: the pane's ~319 readonly rows each polled on a
+    // 200-ms timer, emitting a pane `change` per tick — ~1,600 reads + DOM text
+    // rewrites a second on a paused page (15 ms/s of JS, 80 % of the idle
+    // page's cost). They are loop-driven now (tickers disposed after setupGUI;
+    // visible rows re-read on the 5-Hz DOM tick). The row counts pane change
+    // events over the same paused 3 s: the polling build reads ~4,800.
+    console.log(`      monitor polling: ${idle ? idle.paneEvents : '?'} pane change events in 3 s paused · ${idle ? idle.monitors : '?'} monitors converted`);
+    gate('monitor polling: pane change events while paused (3 s)', idle ? idle.paneEvents : NaN, 5, 'events');
+    // the rows must still UPDATE while playing: a monitor visible by default
+    // (Invariable Plane → "Mass height (inv. plane)") read before Play and after
+    // the steady-state window below
+    const monitorText = () => fresh.page.evaluate(() => { const row = [...document.querySelectorAll('#gui .tp-lblv')].find((r) => /Mass height/.test(r.querySelector('.tp-lblv_l')?.textContent || '')); return row ? (row.querySelector('.tp-lblv_v input')?.value ?? row.querySelector('.tp-lblv_v')?.textContent ?? '').trim() : null; });   // a monitor renders as a readonly <input>: read its value
+    const monitorBefore = await monitorText();
     const dateText = () => fresh.page.evaluate(() => { const el = [...document.querySelectorAll('input')].find((i) => /^\d{4}-\d\d-\d\d$/.test(i.value)); return el ? el.value : '?'; });
     const before = await dateText();
     const t0 = Date.now();
@@ -219,6 +232,10 @@ try {
     }, 3000);
     console.log(`      play start: Play → first date change ${firstMs.toFixed(0)} ms · steady frame gap ${steady.toFixed(0)} ms (default speed)`);
     gate('play start: first-change delay / steady frame gap ratio', firstMs / steady, 5, 'x');
+    const monitorAfter = await monitorText();
+    const monitorOk = monitorBefore !== null && monitorAfter !== null && monitorBefore !== monitorAfter;
+    console.log(`${monitorOk ? 'PASS' : 'FAIL'}  loop-driven monitors update while playing  — "Mass height" ${monitorBefore} → ${monitorAfter}`);
+    if (!monitorOk) fail++;
     if (fresh.errors.length) { console.log('FAIL  page errors (fresh page) — ' + fresh.errors.slice(0, 3).join('|')); fail++; }
   } finally { await fresh.dispose(); }
 }
