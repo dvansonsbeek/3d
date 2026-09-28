@@ -1599,7 +1599,12 @@ export const VALUES = {
       oneAU: { get: () => C.currentAUDistance, render: (v) => thousands(v, 6), unit: 'km', note: 'the model-derived AU' },
       balancedYear:     { get: () => C.balancedYear, render: (v) => thousands(v) },
       balancedYearBC:   { get: () => Math.abs(C.balancedYear), render: (v) => thousands(v) + ' BC' },
-      periAlignYear:    { get: () => C.perihelionalignmentYear, render: (v) => String(v) },
+      periAlignYear:    { get: () => C.perihelionalignmentYear, render: (v) => String(v), note: 'the device\'s phase anchor — Meeus\'s mean-element root of ϖ_of-date = 90° (1246.1); the model\'s own series crosses later: periAlignYearSeries' },
+      // the model's OWN perihelion–solstice alignment: the year the published
+      // (series) longitude of perihelion of date crosses 90° — 2.3 yr after the
+      // mean-element anchor (the series' secular element sits 70″ below the IAU
+      // mean element at J2000, plus its own rate). Two conventions, labelled.
+      periAlignYearSeries: { get: () => { const pom = (y) => ((physModel().earth.perihelionLongitudeDeg(y) % 360) + 360) % 360; let lo = 1100, hi = 1400; for (let i = 0; i < 60; i++) { const mid = (lo + hi) / 2; if (pom(mid) > 90) hi = mid; else lo = mid; } return (lo + hi) / 2; }, render: (v) => Number(v).toFixed(1), unit: 'AD', note: 'the year the model\'s own (series) longitude of perihelion of date = 90° — the perihelion at the December solstice by the model\'s dynamics; the device anchors at periAlignYear (Meeus)' },
       periAlignYearRound: { get: () => C.perihelionalignmentYear, render: (v) => Number(v).toFixed(2) },
       periAlignJD:      { get: () => C.perihelionalignmentJD, render: (v) => thousands(v), unit: 'JD' },
       // (eccNextMax / eccNextMin / eccPrevMinBC — the single-line eccentricity
