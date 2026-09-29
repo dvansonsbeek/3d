@@ -929,6 +929,6 @@ the whole system.
 | [90 - Milankovitch Language](90-milankovitch-language.md) | Framework terminology and Berger/Laskar eigenmode notation |
 | [91 - Milankovitch Evidence](91-milankovitch-evidence.md) | Empirical L1 lattice fit (33 integers); foundational test data |
 | [92 - Climate Formula](92-climate-formula.md) | L1+L2+L3 canonical formula (33 integers + selection criteria for L1) |
-| [93 - L1 Lattice Attribution Reference](93-l1-attribution-reference.md) | Per-integer Berger vs Holistic attribution |
+| 93 - L1 Lattice Attribution Reference (archived — [retired record](retired-record.md)) | Per-integer Berger vs Holistic attribution, comb-era record |
 | Doc 97 (archived — [retired record](retired-record.md); superseded by [92](92-climate-formula.md)/[95](95-climate-summary.md)) | Test C-Invariant + Test C-Balance + Test C-Libration referenced in this doc's intro; Test C-50 ESSRT re-analysis |
 | [99 - Expanding Solar System Resonance Theory (ESSRT)](99-expanding-solar-system-resonance-theory.md) | Deep-time scaling of H(t); the formalism behind the proper-physics lattice used in Test C-50 re-analysis |

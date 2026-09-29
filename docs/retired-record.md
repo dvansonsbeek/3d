@@ -7,7 +7,7 @@ status: current
 
 # Retired Documentation — the Record
 
-Twenty-four documents were removed from this tree when the model's
+Twenty-six documents were removed from this tree when the model's
 restatement made their subject matter historical. This page is the
 public record of what was retired and why; the full texts remain in git
 history (every removal is one commit, `git log --diff-filter=D --
@@ -152,8 +152,27 @@ Earth-forcing counterpart. T5 found the ΔT stack's lattice labels carry
 zero information (chance level; the ~1.5-kyr oscillation is real, its
 period from the record). The shipped climate formula's L1 is the physical
 line set (`data/l1-physical-lines.json`, one home; doc 92 §2); the ΔT
-stack keeps its four periods with the divisors as identifiers. Docs 91,
-93, 94, 98 stand as the comb-era record with status banners.
+stack keeps its four periods with the divisors as identifiers. Docs 91
+and 98 stand as the comb-era record with status banners; doc 94 was
+re-measured on the shipped model (the physical-line L1, the N-body
+eccentricity series) and reads the present state; docs 93 and 96 are
+archived (next paragraph).
+
+**The comb-era attribution and positioning records** (docs 93, 96): the
+per-integer dual attribution of the 33-integer comb — each divisor's
+Berger label against the model's best Earth–planet beat, scored by
+physical plausibility (doc 93, generator-owned from `PLANET_CYCLES`) —
+and the literature positioning written in the comb's own terms ("33
+integer divisors of a single fundamental period", "ΔR² = 0 under Laskar
+2010 substitution"; doc 96). Both described the retired comb: the shipped
+L1's 28 physical lines carry their Berger/Laskar attribution by
+construction (|g_i − g_j|, p + s_i, p + g_i — doc 92 §2's generated
+table), so the attribution question the comb needed no longer arises, and
+the present-state positioning lives on the website's climate-formula page
+(its related-work section) with the insolation test's re-measured reading
+(doc 94: no cross-window-stable gain, not "ΔR² = 0"). The `l1N24*`
+registry keys and `data/l1-n24-attribution-results.json` stay as the
+frozen comb-era record doc 94 §10 reads.
 
 **The planet predictive-precession device** (`PREDICT_COEFFS_PHYSICAL` /
 `_UNIFIED` / `_OBSERVED`, `@essrt/physics/planets/predict`, the browser's
@@ -309,7 +328,7 @@ stack, the deep-time scaling of precession and the falsification legs
 kinematic day (doc 11's frozen year-length laws — the day-length
 taxonomy is the open doctrine item; doc 14's cardinal model is retired
 above); the one-source movement and its verification
-(docs 40, 57, 108, 109); the climate programme (docs 90–96, 98); the
+(docs 40, 57, 108, 109); the climate programme (docs 90–92, 94, 95, 98); the
 Moon (doc 66), the legacy-device calibration record (doc 68) and the
 Δa mass-derivation chain (doc 24, which now
 carries the whole thread — the solar-Δa correction is live physics

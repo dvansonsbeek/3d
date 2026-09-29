@@ -87,10 +87,8 @@ and why.
 | 90 | [Milankovitch Language of the Model](90-milankovitch-language.md) | The model's Milankovitch framework: five H-divisor periods closed by beat algebra; all six Berger 1978 climatic-precession peaks matched within 0.7% |
 | 91 | [Milankovitch Evidence & Hypothesis Tests](91-milankovitch-evidence.md) | Empirical tests on LR04 + Cheng 2016 + EPICA + CENOGRID: the climate formula, per-planet contributions, pre-registered super-cycle nulls, fourteen falsifiable follow-up tests, and the 405-kyr off-lattice characterization |
 | 92 | [Climate Formula — Architecture, Variance Decomposition & Implementation](92-climate-formula.md) | The canonical L1 + L2 + L3 climate formula: per-regime ridge-fit architecture, five-layer variance decomposition, LR04 R² = 0.87 post-MPT (0.93 stitched), EPICA CO₂ cross-proxy R² = 0.84, and the reproducing pipeline |
-| 93 | [L1 Lattice Attribution Reference](93-l1-attribution-reference.md) | Per-L1-integer dual attribution (Berger label vs the model's best Earth–planet beat), scored by physical plausibility, on all 33 components — generator-owned |
-| 94 | [Insolation Extension Test (strong null)](94-insolation-null-test.md) | Adding classical Berger insolation features to the climate formula buys ΔR² ≤ +0.0041 — the climate formula already encodes the insolation-relevant variance |
+| 94 | [Insolation Extension Test (no fourth layer)](94-insolation-null-test.md) | Adding classical Berger insolation features to the climate formula yields no cross-window-stable gain — measured on the shipped model with the model's own orbit and with La2004/La2010; the lines already carry the insolation-relevant variance |
 | 95 | [Climate Summary — Gravitational Coupling, Not Insolation](95-climate-summary.md) | Capstone synthesis of docs 90–94 |
-| 96 | [Related Work — Literature Context](96-related-work.md) | The framework relative to the 2018–2024 revisions of classical Milankovitch theory |
 
 ### Reference
 

@@ -235,8 +235,8 @@ gravitational coupling among solar-system bodies that produces the 8H lattice.
 Berger's secular theory derives ε(t) and e(t) as sums of beats among
 Laskar's fundamental frequencies (g₁..g₈, s₁..s₈). Those beats are L1's
 lines — the engine's own |gᵢ − gⱼ|, p + sᵢ and p + gᵢ combinations
-([doc 92 §2](92-climate-formula.md); [doc 93](93-l1-attribution-reference.md)
-is the comb-era attribution record). Once L1 is in the formula, adding the
+([doc 92 §2](92-climate-formula.md); the comb-era attribution record, doc 93,
+is archived — [retired record](retired-record.md)). Once L1 is in the formula, adding the
 literally-derived quantities is double-counting at the linear level.
 
 ### 5.2 Classical insolation has very low standalone explanatory power for LR04
@@ -626,6 +626,6 @@ Outputs: [`data/l1-n24-attribution-results.json`](../data/l1-n24-attribution-res
 - [Doc 90 — Milankovitch language](90-milankovitch-language.md) — terminology primer
 - [Doc 91 — Milankovitch evidence](91-milankovitch-evidence.md) — orbital forcing → climate mapping
 - [Doc 92 — Climate formula](92-climate-formula.md) — canonical L1+L2+L3 architecture (the formula tested here)
-- [Doc 93 — L1 attribution reference](93-l1-attribution-reference.md) — per-integer Berger vs Holistic attribution; explains why L1 already encodes Berger insolation beats
+- Doc 93 — L1 attribution reference (comb-era record, archived: [retired record](retired-record.md)) — the shipped lines carry their Berger/Laskar attribution by construction (doc 92 §2)
 - [Doc 95 — Climate summary](95-climate-summary.md) — the synthesis statement this doc empirically defends
 - [Doc 99 — Expanding Solar System Resonance Theory (ESSRT)](99-expanding-solar-system-resonance-theory.md) — Deep-time scaling of H(t)

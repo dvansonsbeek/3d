@@ -50,7 +50,7 @@ These three are themselves derived from the gravitational coupling among the pla
 
 ### 1.2 The beat-line paradigm (this framework)
 
-Climate is driven by the **gravitational rhythm of the entire solar system**, parameterized as the engine's own secular beat lines — |g_i − g_j|, p + s_i, p + g_i — the physical L1 set of [doc 92 §2](92-climate-formula.md) (the comb era parameterized them as integer divisors of an 8H = <!--v:eightH-->2,682,536<!--/v-->-yr base; retired by T1). Each integer corresponds to a specific planet–planet beat or a direct planet-cycle harmonic. The full L1 set is 33 integers (see [doc 93](93-l1-attribution-reference.md) for per-integer attribution).
+Climate is driven by the **gravitational rhythm of the entire solar system**, parameterized as the engine's own secular beat lines — |g_i − g_j|, p + s_i, p + g_i — the physical L1 set of [doc 92 §2](92-climate-formula.md) (the comb era parameterized them as integer divisors of an 8H = <!--v:eightH-->2,682,536<!--/v-->-yr base; retired by T1). Each integer corresponds to a specific planet–planet beat or a direct planet-cycle harmonic. The full L1 set is 33 integers (see doc 93 (comb-era attribution record, archived — [retired record](retired-record.md)) for per-integer attribution).
 
 The two paradigms are **not contradictory** — they describe the same gravitational physics. They differ in:
 
@@ -74,7 +74,7 @@ Berger's three insolation features ε(t), e(t), ϖ(t) are themselves *defined* a
 
 The periods in the first column are computed from the Laskar 2004 eigenmode beats — e.g. for the obliquity row, k + s₃ = 50.29 − 18.85 = 31.44″/yr, giving period <!--v:arcsecInCircle-->1,296,000<!--/v--> / 31.44 = 41,222 yr ≈ 41.2 kyr. The often-cited textbook rounding "41 kyr" (Berger 1978) and our model's 8H/65 = 41.27 kyr both refer to this same Laskar eigenmode period.
 
-Every Berger insolation peak is *somewhere* in the L1 lattice (see [doc 93](93-l1-attribution-reference.md) for the full mapping). The lattice contains all of Berger, plus integer-divisor structure that Berger's reduction does not surface (planet-planet beats not historically considered insolation-relevant, like 8H/16 Mars Axial, 8H/35 Earth-Mercury-Saturn 3-term beat, etc.).
+Every Berger insolation peak is *somewhere* in the L1 line set (the shipped lines are the Berger/Laskar beats by construction — [doc 92 §2](92-climate-formula.md); the comb-era mapping, doc 93, is archived in the [retired record](retired-record.md)). The lattice contains all of Berger, plus integer-divisor structure that Berger's reduction does not surface (planet-planet beats not historically considered insolation-relevant, like 8H/16 Mars Axial, 8H/35 Earth-Mercury-Saturn 3-term beat, etc.).
 
 This is why **adding Berger insolation features to L1+L2+L3 yields no stable gain**: the information is already there, parameterized at a finer-grained level.
 
@@ -179,7 +179,7 @@ Two distinct natural-cycle signals point opposite directions for the current era
 
 Both signals are real; they sit at different timescales. Mainstream Holocene-attribution discussions emphasize the first (precession-cooling); the second (405-kyr-warming-baseline) is rarely cited outside cyclostratigraphy.
 
-This is connected to the "Holocene Temperature Conundrum" — an active scientific debate ([Bova et al. 2021](https://www.nature.com/articles/s41586-022-05536-w)) about why proxy records and climate models disagree on the magnitude and direction of Holocene-era temperature trends. Our framework's fitted L2 phase happens to provide one quantitative element to that conversation. For positioning against the broader literature see [doc 96 §2](96-related-work.md#2-direct-revision-of-classical-tenets--zeebe--lantink-2024-aj) (Zeebe & Lantink 2024 on the 405-kyr metronome) and [doc 96 §5](96-related-work.md#5-methodological-neighbor--cyclostratigraphy-hinnov-acycle) (the cyclostratigraphy tradition).
+This is connected to the "Holocene Temperature Conundrum" — an active scientific debate ([Bova et al. 2021](https://www.nature.com/articles/s41586-022-05536-w)) about why proxy records and climate models disagree on the magnitude and direction of Holocene-era temperature trends. Our framework's fitted L2 phase happens to provide one quantitative element to that conversation. For positioning against the broader literature see doc 96 §2 (comb-era positioning, archived — [retired record](retired-record.md)) (Zeebe & Lantink 2024 on the 405-kyr metronome) and doc 96 §5 (archived — [retired record](retired-record.md)) (the cyclostratigraphy tradition).
 
 The observation is offered here as an empirical fact about the model's fitted output — not as a contribution to the anthropogenic-warming debate.
 
@@ -192,7 +192,7 @@ Each row is a measured quantity with a script that reproduces it:
 | Quantity | Value | Source / script |
 |----------|-------|-----------------|
 | 8H Solar System Resonance Cycle | <!--v:eightH-->2,682,536<!--/v--> yr (at J2000) | `model-parameters.json` (per-planet tabulation archived — [retired record](retired-record.md)) |
-| L1 lattice integers | 33 | [doc 93](93-l1-attribution-reference.md) |
+| L1 lines (shipped) | 28 physical lines (25 orbital + the 405-kyr family) | [doc 92 §2](92-climate-formula.md) |
 | L1 alone, post-MPT LR04 | R² = 0.870 | `scripts/milankovitch_climate_formula.py` |
 | L1+L2+L3, post-MPT LR04 | R² = <!--v:canonR2PostMpt-->0.7788<!--/v--> | `data/milankovitch-climate-formula.json` |
 | L1+L2+L3, EPICA CO₂ | R² = <!--v:canonR2Epica-->0.7301<!--/v--> | same |
@@ -200,7 +200,7 @@ Each row is a measured quantity with a script that reproduces it:
 | Berger insolation alone, LR04 0–500 kyr | R² = <!--v:insolLaskarLaskarOnlyR2Lr04-->0.202<!--/v--> (Laskar e) | `scripts/milankovitch_insolation_laskar_check.py` |
 | Berger insolation added to L1+L2+L3 | no cross-window-stable gain — max cross-validated ΔR² <!--v:insolStabMaxModelCv-->+0.0174<!--/v--> (model) / <!--v:insolStabMaxLaskarCv-->+0.0130<!--/v--> (La2004), full record, tentative band | `scripts/milankovitch_insolation_stability.py` |
 | L3 step at MPT (LR04 jump) | β = +1.13 | `data/milankovitch-climate-formula.json` |
-| L1 dual-attribution rate (comb-era record) | 33 / 33 comb divisors attributed (29 / 33 also carry a Berger label) | [doc 93](93-l1-attribution-reference.md) |
+| L1 dual-attribution rate (comb-era record) | 33 / 33 comb divisors attributed (29 / 33 also carry a Berger label) | doc 93, archived — [retired record](retired-record.md) |
 | Forward-projection R² across MPT | −0.87 (failure) | doc 92 Tier B R3-3 |
 
 All numbers reproducible with `python3 scripts/milankovitch_*.py` (deterministic, no random seeds).
@@ -213,7 +213,7 @@ For the climate-modeling community: replace "Milankovitch insolation forcing" wi
 
 For everyone else: Earth's climate has rhythms because the solar system has rhythms. The Sun and the other seven planets are pulling on Earth's orbit at all times; the integer-divisor structure of the combined pull is what shows up in deep-sea sediments, in ice cores, and in atmospheric CO₂. We did not "discover" this — it is in Laskar's secular theory already. What this framework adds is an explicit, more-complete decomposition basis and the empirical demonstration that it strictly subsumes the classical insolation parameterization.
 
-For how this conclusion relates to recent peer-reviewed work — Zeebe & Lantink 2024, Dutkiewicz et al. 2024, Wunsch 2003, Roe 2006, Boulila 2019, the cyclostratigraphy tradition, Munk's tidal-vs-insolation gap — see [doc 96 — Related work](96-related-work.md). The framework sits within an active 2024 wave of revisions to classical Milankovitch theory, not in contradiction to it; the genuinely-novel contributions are the **single fundamental-period 8H structure**, the **dual-attribution finding**, and the **empirical ΔR² = 0 result under Laskar 2010 substitution**.
+For how this conclusion relates to recent peer-reviewed work — Zeebe & Lantink 2024, Dutkiewicz et al. 2024, Wunsch 2003, Roe 2006, Boulila 2019, the cyclostratigraphy tradition, Munk's tidal-vs-insolation gap — see the related-work section of the website's climate-formula page (the comb-era positioning, doc 96, is archived: [retired record](retired-record.md)). The framework sits within an active 2024 wave of revisions to classical Milankovitch theory, not in contradiction to it; the contributions not found in the surveyed literature are the **lines as the engine's own secular beats with frequencies fixed before any fit** and the **insolation test** (no cross-window-stable gain from the Berger features on top of the lines, with the model's orbit or with Laskar's).
 
 ---
 
@@ -222,9 +222,8 @@ For how this conclusion relates to recent peer-reviewed work — Zeebe & Lantink
 - [Doc 90 — Milankovitch language](90-milankovitch-language.md) — terminology primer (g_j, s_j, k, eigenmode beats)
 - [Doc 91 — Milankovitch evidence](91-milankovitch-evidence.md) — orbital-forcing → climate mapping, 14 hypothesis tests
 - [Doc 92 — Climate formula](92-climate-formula.md) — canonical L1+L2+L3 architecture, regime-aware fits, forward-projection limits
-- [Doc 93 — L1 attribution reference](93-l1-attribution-reference.md) — per-integer Berger vs Holistic top-1 attribution
 - [Doc 94 — Insolation null test](94-insolation-null-test.md) — empirical basis for the conclusion synthesized here
-- [Doc 96 — Related work](96-related-work.md) — position of this framework in the 2024 climate-forcing literature
+- Docs 93 (comb-era attribution) and 96 (comb-era related-work positioning) — archived, [retired record](retired-record.md)
 - [Doc 92 — Climate Formula](92-climate-formula.md) §2.3 — what each L1 integer is
 - [Doc 10 — The six Fibonacci relations](10-fibonacci-laws.md) — the structural identities the integer divisors encode
 - [Doc 99 — Expanding Solar System Resonance Theory (ESSRT)](99-expanding-solar-system-resonance-theory.md) — Deep-time scaling of H(t); the structural "gravity not insolation" thesis is epoch-independent

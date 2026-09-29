@@ -83,8 +83,8 @@ The climate formula's orbital lines against the Cenozoic isotope record (the com
   mis-citation of Cretaceous and Eocene records, withdrawn: [doc 99 §Predicted climate lines](99-expanding-solar-system-resonance-theory.md#predicted-climate-lines-at-each-age--obliquity-band).
 - **The 405-kyr caveat, stated plainly** — the Laskar g₂−g₅ eccentricity
   eigenbeat was *off* the comb-era grid (it is a line of the shipped physical set); the record's 405-kyr power is
-  carbon-cycle amplified and is not claimed for the lattice:
-  [doc 93](93-l1-attribution-reference.md).
+  carbon-cycle amplified and is not claimed for the lattice (the comb-era
+  attribution record, doc 93, is archived — [retired record](retired-record.md)).
 - **Discriminating power, stated plainly** — the 66-Ma record cannot
   distinguish a fixed lattice from an H(t)-rescaled one (2.4σ):
   [doc 98](98-lattice-mechanism.md). The LOD-climate correlation fails its
