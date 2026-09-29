@@ -143,8 +143,13 @@ Each nesting layer applies its rotation to all children, creating composite prec
 > container takes [X = ĝ, Y = n̂, Z = ĝ×n̂] (the sun plane), the apsidal wheel
 > pair turns ±ϖ_Sun(t) (the offset arm −e(t)·û toward the Sun's aphelion), the
 > Sun sits on the wheel at the angle that realizes the certified longitude on
-> the offset circle, and `earth.rotationAxis` takes [X = ŝ×ĝ, Y = ŝ, Z = ĝ]
-> (RA 0 IS the equinox of date). `_applyEngineEarthFrame` in both twins,
+> the offset circle, `earth.rotationAxis` takes [X = ŝ×ĝ, Y = ŝ, Z = ĝ]
+> (RA 0 IS the equinox of date), and the Moon stack's root container takes
+> [X = n̂×ĝ, Y = n̂, Z = ĝ] — the ring's plane on the ecliptic of date, its
+> node zero on the true equinox (the scene convention's longitude zero is a
+> quarter turn from ĝ); on the device's flat J2000 base the ring's plane had
+> read 0.5° at −3 kyr and 8.7° at −5 Myr off the rendered Moon's orbit plane,
+> now 0.1–0.2° at every epoch. `_applyEngineEarthFrame` in both twins,
 > identical ops; the J2000 pose of the K device is the bridge everything is
 > placed relative to. Four relative corrections that used to sit on the K
 > geometry (tilt, equinox azimuth, apsidal delta, the δ Newton read) are gone

@@ -424,7 +424,14 @@ choice as the nodal layer; count identity N_apsI = N_trop − N_anom), so the
 visible ring's perigee tracks the Meeus perigee across epochs; the pair
 cancels exactly, leaving the tropical-month sum untouched. The startPos values
 are J2000-element anchored (Ω = 125.0446°, ϖ = 83.3532°, Δ = 0.0000° via the
-in-sim anchoring meter). The Meeus latitude series (the full 60-term Ch. 47
+in-sim anchoring meter). The stack's BASE is placed from the engine every
+frame like the sun plane (`_applyEngineEarthFrame`, both twins): its root
+container takes the ecliptic pole and true equinox of date, so the visible
+ring's plane follows the ecliptic of date — 0.09–0.22° from the rendered Moon's
+orbit plane at every epoch, where the device's flat J2000 base had read 0.54°
+at −3 kyr, 3.8° at −30 kyr and 8.7° at −5 Myr (measured on the Node twin, the
+plane normal of the raw ring track against the rendered track over a month).
+The Meeus latitude series (the full 60-term Ch. 47
 table plus the derived extension tails) is the source of the PERIODIC
 perturbation terms and drives the displayed position; the secular geometry
 does not depend on it.

@@ -53063,6 +53063,18 @@ function _applyEngineEarthFrame(jdUT) {
   const n = toW(F.n, _KC_TA), g = toW(F.g, _KC_TE), s = toW(F.s, _KC_TS);
   // the sun plane and the apsidal wheel
   _kcSetWorldRotation(earthPerihelionPrecession1.containerObj, g, n, _HTC_U.crossVectors(g, n));
+  // the Moon stack's base — the ecliptic OF DATE (pole n, equinox g), placed
+  // like the sun plane. The stack used to hang on the device's flat J2000 base
+  // + axial wheel: the visible ring's plane sat 0.5° (−3 kyr), 1.5° (−10 kyr),
+  // 3.8° (−30 kyr), 8.7° (−5 Myr) off the rendered series Moon's orbit plane,
+  // and the node layer's zero drifted 0.086 %/turn against the true equinox
+  // (scene-ring item 1, measured on the Node twin). The rendered Moon cannot
+  // move: the override maps the series direction through this stack's inverse
+  // world matrix. The stack's longitude zero is the scene convention's, a
+  // quarter turn from ĝ (measured exactly 90.0000° at J2000 on the Node twin):
+  // basis [X = n̂ × ĝ, Y = n̂, Z = ĝ]. Mirror: tools/lib/scene-graph.js
+  // _applyEngineEarthFrame.
+  _kcSetWorldRotation(moonApsidalPrecession.containerObj, _HTC_U.crossVectors(n, g), n, g);
   const peri = (smp.periOfDateDeg + 180) * (Math.PI / 180);
   earthPerihelionPrecession1.orbitObj.rotation.y = peri;
   earthPerihelionPrecession2.orbitObj.rotation.y = -peri;

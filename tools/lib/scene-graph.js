@@ -1551,6 +1551,12 @@ function _applyEngineEarthFrame(graph, jdUT) {
   // the other sign leaves the Sun's direction exact but swaps its distance —
   // the planets, placed about that Sun, then read ~1° off).
   graph.earthPeriPrec1.container.worldRotOverride = [g, n, cross(g, n)];
+  // the Moon stack's base — the ecliptic OF DATE (pole n, equinox g), placed
+  // like the sun plane (scene-ring item 1; mirrors src/script.js — the ring's
+  // plane read 0.5°…8.7° off the rendered series Moon on the flat J2000 base;
+  // the stack's longitude zero is the scene convention's quarter turn from ĝ:
+  // basis [X = n̂ × ĝ, Y = n̂, Z = ĝ]).
+  graph.moonApsidalPrec.container.worldRotOverride = [cross(n, g), n, g];
   const peri = (smp.periOfDateDeg + 180) * d2r;
   graph.earthPeriPrec1.orbit.ry = peri;
   graph.earthPeriPrec2.orbit.ry = -peri;
