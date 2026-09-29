@@ -6,7 +6,7 @@
       0,
       500
     ],
-    "runtime_sec": 0.03734326362609863,
+    "runtime_sec": 0.02940678596496582,
     "obliquity_source": "model (computeObliquityEarth) \u2014 held identical in both variants",
     "eccentricity_perihelion_sources": {
       "V1": "model",
@@ -20,29 +20,29 @@
       500
     ],
     "n_samples": 501,
-    "r2_l1": 0.9423754109685781,
-    "r2_l1_l2": 0.9423766130397437,
-    "r2_l1_l2_l3": 0.9423766130397437,
-    "v1_model_r2": 0.9429932210944411,
-    "v1_delta_r2": 0.0006166080546973207,
+    "r2_l1": 0.8689904790503572,
+    "r2_l1_l2": 0.8689904790503572,
+    "r2_l1_l2_l3": 0.8689904790503572,
+    "v1_model_r2": 0.8697602022412427,
+    "v1_delta_r2": 0.0007697231908855295,
     "v1_coefs": {
-      "gamma_eps_anom": -0.0014223518041107048,
-      "gamma_ecc": 0.0021870077665699294,
-      "gamma_e_sin_peri": 0.022058900105077994,
-      "gamma_e_cos_peri": -0.011253678405451627
+      "gamma_eps_anom": -0.005381701512391044,
+      "gamma_ecc": -0.027006421485385682,
+      "gamma_e_sin_peri": 0.003673808684757161,
+      "gamma_e_cos_peri": -0.002511444551556279
     },
-    "v2_laskar_r2": 0.9423810751096059,
-    "v2_delta_r2": 4.462069862154472e-06,
+    "v2_laskar_r2": 0.8765744945598177,
+    "v2_delta_r2": 0.007584015509460529,
     "v2_coefs": {
-      "gamma_eps_anom": 0.00030065067701055554,
-      "gamma_ecc": -0.0015436066036170946,
-      "gamma_e_sin_peri": -0.0012615778979100068,
-      "gamma_e_cos_peri": 0.0002254305371716213
+      "gamma_eps_anom": -0.008895710843052455,
+      "gamma_ecc": -0.03509053668412866,
+      "gamma_e_sin_peri": 0.07903113836570227,
+      "gamma_e_cos_peri": -0.029564710297420086
     },
     "laskar_feature_ranges": {
       "eps_range": [
-        -1.2393670098602527,
-        1.2659590697324
+        -1.3731539341356154,
+        1.0072290784793694
       ],
       "ecc_range": [
         0.0041544,
@@ -59,8 +59,8 @@
     }
   },
   "lr04_insol_only": {
-    "model_only_r2": 0.19107157383660356,
-    "laskar_only_r2": 0.29275114712361094
+    "model_only_r2": 0.23335403889351625,
+    "laskar_only_r2": 0.2018530113622038
   },
   "epica_three_way": {
     "regime": "epica-0-500-kyr",
@@ -69,29 +69,29 @@
       500
     ],
     "n_samples": 501,
-    "r2_l1": 0.9229907371114497,
-    "r2_l1_l2": 0.9229923979495837,
-    "r2_l1_l2_l3": 0.9229923979495837,
-    "v1_model_r2": 0.9245151428677256,
-    "v1_delta_r2": 0.0015227449181419717,
+    "r2_l1": 0.8236262653386012,
+    "r2_l1_l2": 0.8236262653386012,
+    "r2_l1_l2_l3": 0.8236262653386012,
+    "v1_model_r2": 0.8242785288960658,
+    "v1_delta_r2": 0.0006522635574646163,
     "v1_coefs": {
-      "gamma_eps_anom": -0.0023593787496835558,
-      "gamma_ecc": 0.001350633860567393,
-      "gamma_e_sin_peri": -0.0350345873074448,
-      "gamma_e_cos_peri": -0.017112787040801276
+      "gamma_eps_anom": 0.004193651685733061,
+      "gamma_ecc": 0.025204019491669904,
+      "gamma_e_sin_peri": -0.001143356559423886,
+      "gamma_e_cos_peri": -0.0015895677290455473
     },
-    "v2_laskar_r2": 0.9229994722180753,
-    "v2_delta_r2": 7.0742684916691445e-06,
+    "v2_laskar_r2": 0.8315684145816067,
+    "v2_delta_r2": 0.007942149243005514,
     "v2_coefs": {
-      "gamma_eps_anom": -0.0017691737421145143,
-      "gamma_ecc": 0.0014265495892196575,
-      "gamma_e_sin_peri": -0.0004343383953758086,
-      "gamma_e_cos_peri": 0.0013394356155033162
+      "gamma_eps_anom": 0.007191996670752265,
+      "gamma_ecc": 0.028065952985288044,
+      "gamma_e_sin_peri": -0.08556425669740264,
+      "gamma_e_cos_peri": 0.006491938584746565
     },
     "laskar_feature_ranges": {
       "eps_range": [
-        -1.2393670098602527,
-        1.2659590697324
+        -1.3731539341356154,
+        1.0072290784793694
       ],
       "ecc_range": [
         0.0041544,
@@ -108,10 +108,10 @@
     }
   },
   "epica_insol_only": {
-    "model_only_r2": 0.11804589808397847,
-    "laskar_only_r2": 0.17198134929402975
+    "model_only_r2": 0.09894145061596893,
+    "laskar_only_r2": 0.1292124910108785
   },
-  "verdict": "NULL CONFIRMED \u2014 even with Laskar's full-range e(t), L1 already captures the variance",
-  "max_delta_r2_model": 0.0015227449181419717,
-  "max_delta_r2_laskar": 7.0742684916691445e-06
+  "verdict": "TENTATIVE \u2014 Laskar e(t) brings \u0394R\u00b2 into ambiguous range; further checks warranted",
+  "max_delta_r2_model": 0.0007697231908855295,
+  "max_delta_r2_laskar": 0.007942149243005514
 }

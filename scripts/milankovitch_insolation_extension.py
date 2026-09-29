@@ -9,15 +9,18 @@ Test design
 Current canonical climate formula (doc 92):
     C(t) = c₀ + L1(t) + L2(t) + L3(t)
 
-L1 = 32 integer-divisor sinusoids of 8H (orbital-coupling lattice)
-L2 = 3 carbon-thermostat lines (405 / 202 / 135 kyr)
+L1 = the engine's 28 physical orbital lines (25 secular beats + the 405-kyr
+     family; data/l1-physical-lines.json, plan 06 T1)
+L2 = the 405-kyr carbon-thermostat family (folded into L1 since T1 — the L2
+     step adds nothing on top of L1)
 L3 = 6 Cenozoic step components
 
 Insolation extension adds 4 features (the classical Berger 1978 basis):
     L_insol(t) = γ₁·ε(t) + γ₂·e(t) + γ₃·[e·sin ϖ](t) + γ₄·[e·cos ϖ](t)
 
-where ε, e, ϖ are computed by our model (script.js → orbital-engine) at LR04
-sample times. Data file: data/insolation-features.csv (built by
+where ε, e, ϖ are the shipped model's own Earth orbit (@essrt/physics
+createModel: the obliquity hybrid, the N-body eccentricity series, ϖ of date)
+at LR04 sample times. Data file: data/insolation-features.csv (built by
 scripts/extract_insolation_features.js).
 
 ΔR² = R²(L1+L2+L3+L_insol) − R²(L1+L2+L3)
@@ -27,9 +30,8 @@ Interpretation
 ΔR² > 0.02   → insolation captures significant off-lattice variance L1 misses
                 → adopt L_insol as canonical 4th layer
 0.005 < ΔR² < 0.02 → tentative; verify cross-window stability
-ΔR² < 0.005  → null result. L1's 32 integers already capture insolation-driven
-                variance. Doc 94 documents this null finding (itself an
-                important result that strengthens doc 95's thesis).
+ΔR² < 0.005  → null result. L1's lines already carry the insolation-driven
+                variance. Doc 94 documents the measurement.
 
 Output: data/insolation-extension-results.json
 """
@@ -50,14 +52,14 @@ sys.path.insert(0, str(SCRIPT_DIR))
 # Reuse the canonical ClimateFormula machinery
 from milankovitch_climate_formula import (
     ClimateFormula, REGIME_WINDOWS, L3_TRANSITIONS_MA,
-    L1_LATTICE_INTEGERS, L1_RIDGE_LAMBDA, EIGHT_H, H,
+    L1_PERIODS_KYR, L1_RIDGE_LAMBDA,
     load_lr04, preprocess,
 )
 
 DATA_DIR = SCRIPT_DIR.parent / "data"
 # INSOL_FEATURES_CSV overrides the feature source (Stage C-2: the deep-source
-# variant data/insolation-features-deep.csv); default = the H/3-law CSV, so
-# every prior invocation is unchanged.
+# variant data/insolation-features-deep.csv); default = the shipped-model CSV,
+# so every prior invocation is unchanged.
 INSOL_CSV = Path(os.environ.get("INSOL_FEATURES_CSV", str(DATA_DIR / "insolation-features.csv")))
 OUT_PATH = DATA_DIR / "insolation-extension-results.json"
 
@@ -283,9 +285,8 @@ def main():
     out = {
         'metadata': {
             'script': Path(__file__).name,
-            'H_kyr': H,
-            'eight_H_kyr': EIGHT_H,
-            'L1_n_components': len(L1_LATTICE_INTEGERS),
+            'L1_lines_source': 'data/l1-physical-lines.json',
+            'L1_n_components': len(L1_PERIODS_KYR),
             'insolation_features': ['eps_anom (ε−23.45°)', 'ecc (e)', 'e·sin(ϖ)', 'e·cos(ϖ)'],
             'runtime_sec': time.time() - t0,
         },

@@ -7,39 +7,39 @@ status: current
 
 # Insolation Extension Test — Does Classical Berger Insolation Add Anything to L1+L2+L3?
 
-> **Status (plan 06 T1 — historical record).** This test was run with the integer-label comb (periods as integer fractions of an eight-unit base) as L1. T1 retired the labels; the shipped L1 is the engine's own physical line set ([doc 92 §2](92-climate-formula.md)). The null result — classical insolation features add no cross-window-stable variance once the orbital lines are in — does not depend on how the lines were labelled. Kept as the record.
+> **Status (present state).** Measured on the shipped model: L1 is the engine's own physical line set ([doc 92 §2](92-climate-formula.md)), and the insolation features are the shipped model's Earth orbit (the N-body eccentricity series, the obliquity hybrid, ϖ of date). The comb-era measurement — the integer-label comb as L1, the single-line e(t) as the model's eccentricity — survives as the record in §10 and in git history; its pre-iNHG sensitivity and the n = 24 attribution were properties of that retired eccentricity law and do not exist on the shipped model (§4, §9).
 
 > **TL;DR.** We tested whether adding the classical Berger 1978 insolation features
 > — obliquity ε(t), eccentricity e(t), and the climatic-precession products
 > e·sin(ϖ) and e·cos(ϖ) — to the canonical climate formula (L1+L2+L3) improves
-> R². **Result for classical insolation: null.** With the real orbital
-> elements (La2010a on 0–500 kyr, §8; La2004 over the full 5.3-Myr record, §9)
-> the added layer has no cross-window-stable gain in any LR04 regime —
-> ΔR² = <!--v:insolLaskarV2DeltaR2Lr04-->+0.00000<!--/v--> on LR04 0–500 kyr,
-> <!--v:insolLaskarV2DeltaR2Epica-->+0.00001<!--/v--> on EPICA CO₂, and a maximum
-> cross-validated <!--v:insolStabMaxLaskarCv-->+0.0050<!--/v--> anywhere in the record.
-> Classical insolation features **alone** explain only
-> R² = <!--v:insolExtInsolOnlyR2PostMpt-->0.0544<!--/v--> of post-MPT LR04 (vs L1 alone at
-> R² = <!--v:insolExtR2L1PostMpt-->0.870<!--/v-->). The 8H gravitational-coupling lattice
-> already encodes the insolation-relevant variance.
+> R². **Result: no fourth layer.** The pre-registered rule (§2.3) adopts the
+> layer only on a cross-window-stable gain above 0.02, and no window reaches it.
+> Every regime window is negative out of sample; the full 5.3-Myr record is the
+> one window with an out-of-sample gain —
+> <!--v:insolStabModelCvLr04Full-->+0.0174<!--/v--> with the model's own features,
+> <!--v:insolStabLaskarCvLr04Full-->+0.0130<!--/v--> with La2004's — inside the
+> tentative band (0.005–0.02), below the bar; its in-sample reading of
+> <!--v:insolExtDeltaR2Lr04Full-->+0.0568<!--/v--> does not hold out of sample (§9).
+> On 0–500 kyr the independent La2010a elements add
+> <!--v:insolLaskarV2DeltaR2Lr04-->+0.00758<!--/v--> on LR04 and
+> <!--v:insolLaskarV2DeltaR2Epica-->+0.00794<!--/v--> on EPICA CO₂ in sample (§8), the
+> model's own <!--v:insolLaskarV1DeltaR2Lr04-->+0.00077<!--/v--> and
+> <!--v:insolLaskarV1DeltaR2Epica-->+0.00065<!--/v-->. Classical insolation features
+> **alone** explain R² = <!--v:insolExtInsolOnlyR2PostMpt-->0.2362<!--/v--> of post-MPT
+> LR04, against L1 alone at R² = <!--v:insolExtR2L1PostMpt-->0.779<!--/v-->
+> (<!--v:insolExtL1OverInsolPostMpt-->3×<!--/v-->). The orbital lines carry the
+> insolation-relevant variance; the four features add no stable variance on top.
 >
-> **What the model's own e(t) does (§4, §9):** with the model's H/3 eccentricity
-> line in the features, the pre-registered statistic reads
-> max ΔR² = <!--v:insolExtMaxDeltaR2-->+0.0297<!--/v--> in the pre-iNHG regime
-> (2.7–5.3 Myr) and survives cross-validation there against the pre-admission
-> lattice (e(t) feature alone:
-> <!--v:l1N24EccCvPreInhg-->+0.0144<!--/v-->). La2004's e(t) does not reproduce
-> it. §10 attributes the gain: it is the single lattice line n = 24
-> (8H/24 = H/3, <!--v:l1N24PeriodKyr-->111.8<!--/v--> kyr), which was not among L1's
-> original 32 divisors — a free-phase 8H/24 pair gives the identical cross-validated
-> gain and e(t) adds nothing on top of it. A lattice attribution, not an
-> insolation effect and not a layer; n = 24 is now admitted to L1 (§10.3), the
-> record's own best period for the line is 8H/24 within 0.8% (§10.4). With the
-> line inside the shipped lattice, the features retain nothing further out of
-> sample (<!--v:insolStabModelCvPreInhg-->+0.0024<!--/v-->, §9). Climate is driven by gravitational
-> rhythms; classical insolation is a downstream proxy, not a primary driver.
+> **The model's and La2004's features read alike** (§9: to the third decimal in
+> sample, within 0.005 out of sample, in every regime) — expected, since the
+> model's e(t) is the same secular system integrated from its own seed. The
+> comb-era measurement's pre-iNHG sensitivity to the *model's* e(t), attributed
+> there to a missing lattice line n = 24, was a property of the retired
+> single-line eccentricity law against the retired integer comb; on the shipped
+> model the pre-iNHG window reads <!--v:insolStabModelCvPreInhg-->−0.0197<!--/v-->
+> out of sample. §10 keeps that attribution as the record.
 
-> **Scope note (ESSRT).** The augmented-regression test and the L1 lattice integer-divisor structure are scale-invariant. The 8H = <!--v:eightH-->2,682,536<!--/v--> yr value and the climate-test windows (LR04 0-5320 kyr, EPICA 0-800 kyr, La2010 0-500 kyr) are J2000-evaluated / present-epoch. Under [ESSRT](99-expanding-solar-system-resonance-theory.md), H(t) evolves at deep time via Drivers 1 (LOD growth) and 2 (Kepler) — sub-percent drift over the post-MPT 0-1 Myr window where the test is most discriminative; modest over the full 5.3 Myr LR04 record. The result that L1 fully absorbs Laskar's insolation is structural (per §5.1) and therefore epoch-invariant.
+> **Scope note (ESSRT).** The line periods and the climate-test windows (LR04 0–5320 kyr, EPICA 0–800 kyr, La2010 0–500 kyr) are J2000-evaluated; the orbital lines' deep-time drift over the 5.3-Myr record is at the sub-percent level (the solar-mass law, [doc 109](109-model-nbody-engine-and-lattice-test.md)). The linear-algebra reading of §5.1 — the four features are projections of the same secular modes the lines enumerate — is epoch-invariant.
 
 **Generated by:** [`scripts/milankovitch_insolation_extension.py`](../scripts/milankovitch_insolation_extension.py)
 + [`scripts/extract_insolation_features.js`](../scripts/extract_insolation_features.js)
@@ -56,8 +56,8 @@ The canonical climate formula (doc 92) is
 C(t) = c₀ + L1(t) + L2(t) + L3(t)
 ```
 
-L1 = 32 integer divisors of 8H = <!--v:eightH-->2,682,536<!--/v--> yr at J2000 (orbital-coupling lattice — the pre-admission lattice; §§1–9 are measured against it, and that measurement is what led to admitting n = 24 as the 33rd divisor in §10)
-L2 = 3 carbon-thermostat lines (405 / 202 / 135 kyr)
+L1 = the engine's 28 physical orbital lines — 25 secular beats at relative mode amplitude ≥ 0.1 plus the 405-kyr family ([doc 92 §2](92-climate-formula.md); `data/l1-physical-lines.json`)
+L2 = the 405-kyr carbon-thermostat family — folded into L1 since T1, so the L2 column below equals the L1 column
 L3 = 6 Heaviside step components
 
 Standard Milankovitch theory (Berger 1978) attributes climate variation to
@@ -75,7 +75,7 @@ quantity. So we asked:
 > L1+L2+L3?**
 
 If yes — adopt them as a 4th canonical layer (L_insol).
-If no — L1's lattice integers already encode whatever insolation contributes.
+If no — L1's lines already encode whatever insolation contributes.
 
 ---
 
@@ -83,14 +83,15 @@ If no — L1's lattice integers already encode whatever insolation contributes.
 
 ### 2.1 Insolation feature extraction
 
-Our model exposes the three Milankovitch primitives as analytical functions in
-[`tools/lib/orbital-engine.js`](../tools/lib/orbital-engine.js):
+The shipped model exposes the three Milankovitch primitives on the
+`@essrt/physics` `createModel()` surface, built on the banked N-body series
+artifact — the same construction the simulator, the API and the registry use:
 
 | Function | Returns |
 |----------|---------|
-| `computeObliquityEarth(year)` | ε(t) in degrees (16-harmonic, RMSE 0.004″) |
-| `computeEccentricityEarth(year)` | e(t) (the one H/3 law, base′·(1 + cos θ₃/2)) |
-| `calcEarthPerihelionPredictive(year)` | ϖ(t) in degrees (11-harmonic Fourier) |
+| `earth.obliquityDeg(year)` | ε(t) in degrees — the obliquity hybrid (one precession equation on the engine's own orbit plane) |
+| `earth.eccentricity(year)` | e(t) — the N-body secular series (the planets' modes, anchored at J2000) |
+| `earth.perihelionLongitudeDeg(year)` | ϖ(t) in degrees, of date |
 
 The extractor [`scripts/extract_insolation_features.js`](../scripts/extract_insolation_features.js)
 dumps these at every LR04 sample time (2115 samples spanning 0–5320 kyr BP)
@@ -137,13 +138,13 @@ The same procedure was repeated for four LR04 regimes plus EPICA CO₂.
 
 | Regime | Window (kyr) | L1 | L1+L2+L3 | + L_insol | **ΔR²** |
 |--------|-------------:|------:|---------:|----------:|--------:|
-| post-MPT  | 0–1000  | <!--v:insolExtR2L1PostMpt-->0.870<!--/v--> | **<!--v:insolExtR2CanonPostMpt-->0.8735<!--/v-->** | **<!--v:insolExtR2FullPostMpt-->0.8774<!--/v-->** | **<!--v:insolExtDeltaR2PostMpt-->+0.0038<!--/v-->** |
-| iNHG-MPT  | 1000–2700 | <!--v:insolExtR2L1InhgMpt-->0.722<!--/v--> | **<!--v:insolExtR2CanonInhgMpt-->0.7289<!--/v-->** | **<!--v:insolExtR2FullInhgMpt-->0.7358<!--/v-->** | **<!--v:insolExtDeltaR2InhgMpt-->+0.0069<!--/v-->** |
-| pre-iNHG  | 2700–5320 | <!--v:insolExtR2L1PreInhg-->0.381<!--/v--> | **<!--v:insolExtR2CanonPreInhg-->0.4298<!--/v-->** | **<!--v:insolExtR2FullPreInhg-->0.4595<!--/v-->** | **<!--v:insolExtDeltaR2PreInhg-->+0.0297<!--/v-->** |
-| lr04-full | 0–5320  | <!--v:insolExtR2L1Lr04Full-->0.239<!--/v--> | **<!--v:insolExtR2CanonLr04Full-->0.2553<!--/v-->** | **<!--v:insolExtR2FullLr04Full-->0.2587<!--/v-->** | **<!--v:insolExtDeltaR2Lr04Full-->+0.0035<!--/v-->** |
-| EPICA CO₂ | 0–800   | —     | **<!--v:insolExtR2CanonEpicaCo2-->0.8452<!--/v-->** | **<!--v:insolExtR2FullEpicaCo2-->0.8491<!--/v-->** | **<!--v:insolExtDeltaR2EpicaCo2-->+0.0040<!--/v-->** |
+| post-MPT  | 0–1000  | <!--v:insolExtR2L1PostMpt-->0.779<!--/v--> | **<!--v:insolExtR2CanonPostMpt-->0.7788<!--/v-->** | **<!--v:insolExtR2FullPostMpt-->0.7803<!--/v-->** | **<!--v:insolExtDeltaR2PostMpt-->+0.0015<!--/v-->** |
+| iNHG-MPT  | 1000–2700 | <!--v:insolExtR2L1InhgMpt-->0.591<!--/v--> | **<!--v:insolExtR2CanonInhgMpt-->0.5911<!--/v-->** | **<!--v:insolExtR2FullInhgMpt-->0.5918<!--/v-->** | **<!--v:insolExtDeltaR2InhgMpt-->+0.0008<!--/v-->** |
+| pre-iNHG  | 2700–5320 | <!--v:insolExtR2L1PreInhg-->0.374<!--/v--> | **<!--v:insolExtR2CanonPreInhg-->0.3736<!--/v-->** | **<!--v:insolExtR2FullPreInhg-->0.3888<!--/v-->** | **<!--v:insolExtDeltaR2PreInhg-->+0.0152<!--/v-->** |
+| lr04-full | 0–5320  | <!--v:insolExtR2L1Lr04Full-->0.193<!--/v--> | **<!--v:insolExtR2CanonLr04Full-->0.2003<!--/v-->** | **<!--v:insolExtR2FullLr04Full-->0.2571<!--/v-->** | **<!--v:insolExtDeltaR2Lr04Full-->+0.0568<!--/v-->** |
+| EPICA CO₂ | 0–800   | —     | **<!--v:insolExtR2CanonEpicaCo2-->0.7301<!--/v-->** | **<!--v:insolExtR2FullEpicaCo2-->0.7305<!--/v-->** | **<!--v:insolExtDeltaR2EpicaCo2-->+0.0004<!--/v-->** |
 
-**Max ΔR² = <!--v:insolExtMaxDeltaR2-->+0.0297<!--/v-->** (pre-iNHG) — inside the pre-registered POSITIVE band (§2.3), which is why the cross-window stability check of §9 decides the verdict (§4).
+**Max ΔR² = <!--v:insolExtMaxDeltaR2-->+0.0568<!--/v-->** (the full record) — inside the pre-registered POSITIVE band (§2.3) in sample, which is why the cross-window stability check of §9 decides the verdict (§4).
 
 ### 3.2 L_insol coefficients (post-MPT)
 
@@ -152,14 +153,13 @@ canonical-residual are:
 
 | Coefficient | Value | Feature |
 |-------------|------:|---------|
-| γ ε−23.45° | <!--v:insolExtGammaEpsPostMpt-->−0.0182<!--/v--> | obliquity anomaly |
-| γ e | <!--v:insolExtGammaEccPostMpt-->+0.0150<!--/v--> | eccentricity |
-| γ e·sin(ϖ) | <!--v:insolExtGammaESinPostMpt-->+0.0487<!--/v--> | climatic precession (sin) |
-| γ e·cos(ϖ) | <!--v:insolExtGammaECosPostMpt-->−0.0361<!--/v--> | climatic precession (cos) |
+| γ ε−23.45° | <!--v:insolExtGammaEpsPostMpt-->−0.0075<!--/v--> | obliquity anomaly |
+| γ e | <!--v:insolExtGammaEccPostMpt-->−0.0346<!--/v--> | eccentricity |
+| γ e·sin(ϖ) | <!--v:insolExtGammaESinPostMpt-->+0.0058<!--/v--> | climatic precession (sin) |
+| γ e·cos(ϖ) | <!--v:insolExtGammaECosPostMpt-->−0.0139<!--/v--> | climatic precession (cos) |
 
-All four coefficients are small (≤ 8% of normalized residual range).
-Eccentricity has the largest residual coefficient, but its contribution to
-the overall R² is still only ~0.4%.
+All four coefficients are small. Eccentricity has the largest residual
+coefficient; together the four add the post-MPT ΔR² of §3.1.
 
 ### 3.3 L_insol-only baseline (the headline)
 
@@ -168,58 +168,55 @@ no L2, no L3), we ran a pure 4-feature regression against the LR04 stack:
 
 | Regime | R²_insol_only |
 |--------|--------------:|
-| post-MPT | **<!--v:insolExtInsolOnlyR2PostMpt-->0.0544<!--/v-->** |
-| iNHG-MPT | <!--v:insolExtInsolOnlyR2InhgMpt-->0.0105<!--/v--> |
-| pre-iNHG | <!--v:insolExtInsolOnlyR2PreInhg-->0.0298<!--/v--> |
-| lr04-full | <!--v:insolExtInsolOnlyR2Lr04Full-->0.0035<!--/v--> |
+| post-MPT | **<!--v:insolExtInsolOnlyR2PostMpt-->0.2362<!--/v-->** |
+| iNHG-MPT | <!--v:insolExtInsolOnlyR2InhgMpt-->0.1665<!--/v--> |
+| pre-iNHG | <!--v:insolExtInsolOnlyR2PreInhg-->0.0939<!--/v--> |
+| lr04-full | <!--v:insolExtInsolOnlyR2Lr04Full-->0.1167<!--/v--> |
 
 **Compare to L1 alone:**
 
 | Regime | R²_L1 | R²_insol_only | L1 / insol ratio |
 |--------|------:|--------------:|----------------:|
-| post-MPT | <!--v:insolExtR2L1PostMpt-->0.870<!--/v--> | <!--v:insolExtInsolOnlyR2PostMpt-->0.0544<!--/v--> | **<!--v:insolExtL1OverInsolPostMpt-->16×<!--/v-->** |
-| iNHG-MPT | <!--v:insolExtR2L1InhgMpt-->0.722<!--/v--> | <!--v:insolExtInsolOnlyR2InhgMpt-->0.0105<!--/v--> | **<!--v:insolExtL1OverInsolInhgMpt-->69×<!--/v-->** |
-| pre-iNHG | <!--v:insolExtR2L1PreInhg-->0.381<!--/v--> | <!--v:insolExtInsolOnlyR2PreInhg-->0.0298<!--/v--> | **<!--v:insolExtL1OverInsolPreInhg-->13×<!--/v-->** |
-| lr04-full | <!--v:insolExtR2L1Lr04Full-->0.239<!--/v--> | <!--v:insolExtInsolOnlyR2Lr04Full-->0.0035<!--/v--> | **<!--v:insolExtL1OverInsolLr04Full-->68×<!--/v-->** |
+| post-MPT | <!--v:insolExtR2L1PostMpt-->0.779<!--/v--> | <!--v:insolExtInsolOnlyR2PostMpt-->0.2362<!--/v--> | **<!--v:insolExtL1OverInsolPostMpt-->3×<!--/v-->** |
+| iNHG-MPT | <!--v:insolExtR2L1InhgMpt-->0.591<!--/v--> | <!--v:insolExtInsolOnlyR2InhgMpt-->0.1665<!--/v--> | **<!--v:insolExtL1OverInsolInhgMpt-->4×<!--/v-->** |
+| pre-iNHG | <!--v:insolExtR2L1PreInhg-->0.374<!--/v--> | <!--v:insolExtInsolOnlyR2PreInhg-->0.0939<!--/v--> | **<!--v:insolExtL1OverInsolPreInhg-->4×<!--/v-->** |
+| lr04-full | <!--v:insolExtR2L1Lr04Full-->0.193<!--/v--> | <!--v:insolExtInsolOnlyR2Lr04Full-->0.1167<!--/v--> | **<!--v:insolExtL1OverInsolLr04Full-->2×<!--/v-->** |
 
-The 8H gravitational-coupling lattice (L1) carries **an order of magnitude
-or more explanatory power than the classical insolation features** at every
-LR04 time window tested.
+The orbital lines (L1) carry **several times the explanatory power of the
+classical insolation features** at every LR04 time window tested (the ratio
+column).
 
 ---
 
-## 4. Verdict — null for classical insolation; a pre-iNHG sensitivity to the model's own e(t)
+## 4. Verdict — no fourth layer
 
 ```
-Max ΔR² (model features)  = <!--v:insolExtMaxDeltaR2-->+0.0297<!--/v-->   pre-iNHG, in-sample, pre-admission lattice → POSITIVE band
-Cross-validated, pre-admission lattice, e(t) alone      = <!--v:l1N24EccCvPreInhg-->+0.0144<!--/v-->  (survives → the §10 attribution)
-Cross-validated, shipped lattice (n = 24 admitted, §10.3) = <!--v:insolStabModelCvPreInhg-->+0.0024<!--/v-->  (nothing left on top)
-Cross-validated, same regime, La2004 features  = <!--v:insolStabLaskarCvPreInhg-->−0.0211<!--/v-->  (no gain)
-Every other regime, cross-validated, either set ≤ +0.005
+Max ΔR² (model features, in-sample)               = <!--v:insolExtMaxDeltaR2-->+0.0568<!--/v-->   full record → POSITIVE band in sample; §9 decides
+Cross-validated, full record, model features      = <!--v:insolStabModelCvLr04Full-->+0.0174<!--/v-->   (TENTATIVE band, below the 0.02 bar)
+Cross-validated, full record, La2004 features     = <!--v:insolStabLaskarCvLr04Full-->+0.0130<!--/v-->   (same reading)
+Cross-validated, every regime window, either set  < 0
 ```
 
-Read with §9, the statistic splits into two statements:
+Read with §8 and §9, the statistic makes two statements:
 
-1. **Classical insolation adds nothing.** With the real orbital elements
-   (La2004 e(t), ϖ(t); §9) the L_insol layer has no cross-window-stable
-   gain in any LR04 regime, and on the 0–500 kyr window (§8) La2010a's
-   features add ΔR² = <!--v:insolLaskarV2DeltaR2Lr04-->+0.00000<!--/v--> (LR04)
-   and <!--v:insolLaskarV2DeltaR2Epica-->+0.00001<!--/v--> (EPICA CO₂). L1's 32
-   integer-divisor lattice already encodes the variance that Berger's
-   parameterization carries. **No 4th canonical layer is adopted.**
-2. **The pre-iNHG record is sensitive to the model's H/3 eccentricity line.**
-   The one gain that survives cross-validation is produced by the *model's*
-   e(t) — the H/3 law and its ϖ-products — in the 2.7–5.3 Myr window, where
-   the canonical fit is weakest (R² = <!--v:insolExtR2CanonPreInhg-->0.4298<!--/v-->).
-   Because La2004's e(t) does not reproduce it, this is not an insolation
-   effect. §10 identifies it as the single lattice line n = 24
-   (8H/24 = H/3, <!--v:l1N24PeriodKyr-->111.8<!--/v--> kyr), which was not among
-   L1's original 32 divisors: a free-phase 8H/24 pair reproduces the model e(t)
-   feature (R² <!--v:l1N24R2EccByLine-->0.998<!--/v-->) and the identical
-   cross-validated gain, e(t) adds nothing on top of it, and the data's phase
-   agrees with the model's fixed H/3 phase to
-   <!--v:l1N24PhaseDiffDegPreInhg-->−8.5<!--/v-->°. Attributed and, after the
-   whole-lattice audit of §10.3, admitted to L1 — not a climate-formula layer.
+1. **No cross-window-stable gain — no fourth layer.** The one out-of-sample
+   gain is on the full 5.3-Myr record, where the canonical fit is weakest
+   (R² = <!--v:insolExtR2CanonLr04Full-->0.2003<!--/v-->) and the in-sample
+   reading is largest; it stays inside the tentative band. Every regime window
+   is negative out of sample. On 0–500 kyr (§8) the independent La2010a
+   elements add <!--v:insolLaskarV2DeltaR2Lr04-->+0.00758<!--/v--> (LR04) and
+   <!--v:insolLaskarV2DeltaR2Epica-->+0.00794<!--/v--> (EPICA CO₂) in sample —
+   tentative-band readings whose enclosing regime (post-MPT) cross-validates
+   negative (§9). **No 4th canonical layer is adopted.**
+2. **The model's own orbit and La2004 agree on this test.** In every regime
+   the two feature sets read alike, in sample and out of sample (§9). The
+   model's e(t) is the same secular system integrated from its own seed, so
+   this is expected — and it closes the comb-era finding that the pre-iNHG
+   window was sensitive to the *model's* e(t) alone (§10, the record): that
+   sensitivity belonged to the retired single-line eccentricity law, not to
+   the orbit. On the shipped model pre-iNHG reads
+   <!--v:insolStabModelCvPreInhg-->−0.0197<!--/v--> (model) and
+   <!--v:insolStabLaskarCvPreInhg-->−0.0155<!--/v--> (La2004) out of sample.
 
 The canonical formula `C(t) = c₀ + L1(t) + L2(t) + L3(t)` stands.
 
@@ -237,19 +234,21 @@ The three quantities ε(t), e(t), ϖ(t) are themselves *products* of the same
 gravitational coupling among solar-system bodies that produces the 8H lattice.
 Berger's secular theory derives ε(t) and e(t) as sums of beats among
 Laskar's fundamental frequencies (g₁..g₈, s₁..s₈). Those beats are L1's
-33 integers (see [doc 93](93-l1-attribution-reference.md) for the
-dual-attribution mapping). Once L1 is in the formula, adding the
-literally-derived quantities is double-counting.
+lines — the engine's own |gᵢ − gⱼ|, p + sᵢ and p + gᵢ combinations
+([doc 92 §2](92-climate-formula.md); [doc 93](93-l1-attribution-reference.md)
+is the comb-era attribution record). Once L1 is in the formula, adding the
+literally-derived quantities is double-counting at the linear level.
 
 ### 5.2 Classical insolation has very low standalone explanatory power for LR04
 
-R²_insol_only = **0.049** at post-MPT (and ≤ 0.008 pre-MPT) — classical
-insolation features alone explain less than 5% of the LR04 stack. This is
-not a controversial number; it is the direct consequence of the fact that
-LR04 captures **ice volume**, not summer-day insolation. Ice volume responds
-to the integrated gravitational-coupling rhythm of the solar system, not
-to local insolation peaks at 65°N. (See [doc 91](91-milankovitch-evidence.md)
-for how L1's lattice maps to LR04 spectral peaks.)
+R²_insol_only = **<!--v:insolExtInsolOnlyR2PostMpt-->0.2362<!--/v-->** at post-MPT
+and <!--v:insolExtInsolOnlyR2Lr04Full-->0.1167<!--/v--> over the full record (§3.3) —
+the four linear features alone explain about a quarter of post-MPT LR04,
+against <!--v:insolExtR2L1PostMpt-->0.779<!--/v--> for the lines alone. LR04 records
+**ice volume**, an integrated response, not the summer-day insolation at 65°N;
+the lines, each with its fitted amplitude and phase, carry that integrated
+response and the four features do not. (See [doc 91](91-milankovitch-evidence.md)
+for the comb-era mapping of LR04 spectral peaks.)
 
 ### 5.3 This sets up [doc 95](95-climate-summary.md): climate is determined by our solar system
 
@@ -263,23 +262,17 @@ is what L1 captures, and that rhythm explains the variance.
 
 ## 6. Caveats
 
-### 6.1 Model e(t) is a single harmonic line
+### 6.1 Model e(t) is the N-body series
 
-The model's eccentricity is the one H/3 law (docs/10 §Law 4):
-
-```
-e(t) = base′ · (1 + cos θ₃(t) / 2)
-```
-
-with base′ = 0.0155200 (the single-line law this measurement was run on — since retired from the published paths, where the eccentricity is the N-body series; a re-run on the series is pending) derived from the observed J2000
-value and the System-Reset anchor. Over the LR04 record this gives
-e(t) ∈ [<!--v:insolStabEccMinModel-->0.0078<!--/v-->, <!--v:insolStabEccMaxModel-->0.0233<!--/v-->] — a
-single 111.8-kyr line, against La2004's multi-mode envelope
-[<!--v:insolStabEccMinLaskar-->0.0002<!--/v-->, <!--v:insolStabEccMaxLaskar-->0.0578<!--/v-->].
-
-**This caveat is tested directly — §8 (La2010a on 0–500 kyr) and §9 (La2004
-over the full record): substituting the real e(t), ϖ(t) removes the gain
-rather than adding to it.**
+The model's eccentricity is the engine's own secular series — the planets'
+modes from the N-body integration, anchored at J2000
+([doc 109](109-model-nbody-engine-and-lattice-test.md)). Over the LR04 record it spans
+e(t) ∈ [<!--v:insolStabEccMinModel-->0.0006<!--/v-->, <!--v:insolStabEccMaxModel-->0.0578<!--/v-->],
+against La2004's [<!--v:insolStabEccMinLaskar-->0.0002<!--/v-->, <!--v:insolStabEccMaxLaskar-->0.0578<!--/v-->]
+— the same class of multi-mode envelope. The two are nonetheless different
+solutions (own seed, own mode table), which is why §8 and §9 run the test with
+La2010a / La2004 substituted in: the result must not depend on whose orbital
+elements are used, and it does not.
 
 ### 6.2 We tested four features, not the full Berger 1978 expansion
 
@@ -296,11 +289,12 @@ linear Milankovitch features (ε, e, e·sin ϖ, e·cos ϖ) because:
 
 ### 6.3 Window/regime dependence
 
-ΔR² is slightly larger in regimes where L1+L2+L3 alone is weaker
-(post-MPT 0.004; pre-iNHG 0.0007). This is expected — when the canonical
-formula already explains most variance, there is little headroom for
-additional features. The fact that ΔR² is small in every window tested
-strengthens the null, rather than weakening it.
+In-sample ΔR² is largest where L1+L2+L3 alone is weakest — the full record
+(R² <!--v:insolExtR2CanonLr04Full-->0.2003<!--/v-->, ΔR²
+<!--v:insolExtDeltaR2Lr04Full-->+0.0568<!--/v-->) — and smallest in the well-fitted
+post-MPT window. That is the expected headroom effect, and it is why the
+in-sample statistic alone cannot decide: the full-record gain shrinks to
+<!--v:insolStabModelCvLr04Full-->+0.0174<!--/v--> out of sample (§9).
 
 ---
 
@@ -319,7 +313,9 @@ python3 scripts/milankovitch_insolation_laskar_check.py
 # Step 4 — cross-window stability with La2004 over the full record (§9)
 python3 scripts/milankovitch_insolation_stability.py
 
-# Step 5 — L1 attribution of the pre-iNHG gain: the lattice line n = 24 (§10)
+# Step 5 — RETIRED: the comb-era n = 24 attribution (§10) indexes the integer
+# comb and the single-line e(t); the script refuses to run on the shipped
+# fitter and its result file is the frozen comb-era record
 python3 scripts/milankovitch_l1_n24_attribution.py
 ```
 
@@ -329,18 +325,18 @@ Outputs: [`data/insolation-extension-results.json`](../data/insolation-extension
 (per-regime breakdown, L_insol-only R², coefficients, verdict string),
 [`data/insolation-laskar-check-results.json`](../data/insolation-laskar-check-results.json),
 [`data/insolation-stability-results.json`](../data/insolation-stability-results.json)
-and [`data/l1-n24-attribution-results.json`](../data/l1-n24-attribution-results.json).
+and, frozen as the comb-era record for §10,
+[`data/l1-n24-attribution-results.json`](../data/l1-n24-attribution-results.json).
 Every number in this document is a registry marker bound to these files.
 
 ---
 
 ## 8. Hardening test — substituting Laskar 2010 e(t) and ϖ(t)
 
-The principal caveat to §3's result is that our model's eccentricity is a single
-harmonic line (§6.1). If the variance "missing" from L1 is concentrated in the
-wide-amplitude tails of Laskar's true eccentricity, then using our e(t) might
-mask a real effect. So we ran the test again with **La2010a values** (Laskar et
-al. 2011, A&A 532, A89) substituted in directly.
+§3 uses the model's own orbit. If the result depended on whose orbital
+elements are used, it would say something about the model's orbit rather than
+about insolation (§6.1), so we ran the test again with **La2010a values**
+(Laskar et al. 2011, A&A 532, A89) substituted in directly.
 
 ### 8.1 Data
 
@@ -369,63 +365,61 @@ substantively).
 
 | Dataset | V0 L1+L2+L3 | V1 + model insol | V2 + Laskar insol | ΔR² (V1) | ΔR² (V2) |
 |---------|------------:|----------------:|------------------:|---------:|---------:|
-| LR04 0–500 kyr | <!--v:insolLaskarV0R2Lr04-->0.9424<!--/v--> | <!--v:insolLaskarV1R2Lr04-->0.9430<!--/v--> | **<!--v:insolLaskarV2R2Lr04-->0.9424<!--/v-->** | <!--v:insolLaskarV1DeltaR2Lr04-->+0.00062<!--/v--> | **<!--v:insolLaskarV2DeltaR2Lr04-->+0.00000<!--/v-->** |
-| EPICA CO₂ 0–500 kyr | <!--v:insolLaskarV0R2Epica-->0.9230<!--/v--> | <!--v:insolLaskarV1R2Epica-->0.9245<!--/v--> | **<!--v:insolLaskarV2R2Epica-->0.9230<!--/v-->** | <!--v:insolLaskarV1DeltaR2Epica-->+0.00152<!--/v--> | **<!--v:insolLaskarV2DeltaR2Epica-->+0.00001<!--/v-->** |
+| LR04 0–500 kyr | <!--v:insolLaskarV0R2Lr04-->0.8690<!--/v--> | <!--v:insolLaskarV1R2Lr04-->0.8698<!--/v--> | **<!--v:insolLaskarV2R2Lr04-->0.8766<!--/v-->** | <!--v:insolLaskarV1DeltaR2Lr04-->+0.00077<!--/v--> | **<!--v:insolLaskarV2DeltaR2Lr04-->+0.00758<!--/v-->** |
+| EPICA CO₂ 0–500 kyr | <!--v:insolLaskarV0R2Epica-->0.8236<!--/v--> | <!--v:insolLaskarV1R2Epica-->0.8243<!--/v--> | **<!--v:insolLaskarV2R2Epica-->0.8316<!--/v-->** | <!--v:insolLaskarV1DeltaR2Epica-->+0.00065<!--/v--> | **<!--v:insolLaskarV2DeltaR2Epica-->+0.00794<!--/v-->** |
 
 ### 8.4 L_insol-only baselines (no L1/L2/L3)
 
 To confirm that the substitution actually matters somewhere, we ran each
 insolation parameterization **alone** against the same target:
 
-| Dataset | L_insol-only (model) | L_insol-only (**Laskar**) | Laskar improvement |
+| Dataset | L_insol-only (model) | L_insol-only (**Laskar**) | Laskar / model − 1 |
 |---------|---------------------:|--------------------------:|------------------:|
-| LR04 0–500 kyr | R² = <!--v:insolLaskarModelOnlyR2Lr04-->0.191<!--/v--> | R² = **<!--v:insolLaskarLaskarOnlyR2Lr04-->0.293<!--/v-->** | <!--v:insolLaskarOnlyGainPctLr04-->53%<!--/v--> better |
-| EPICA CO₂ 0–500 kyr | R² = <!--v:insolLaskarModelOnlyR2Epica-->0.118<!--/v--> | R² = **<!--v:insolLaskarLaskarOnlyR2Epica-->0.172<!--/v-->** | <!--v:insolLaskarOnlyGainPctEpica-->46%<!--/v--> better |
+| LR04 0–500 kyr | R² = <!--v:insolLaskarModelOnlyR2Lr04-->0.233<!--/v--> | R² = **<!--v:insolLaskarLaskarOnlyR2Lr04-->0.202<!--/v-->** | <!--v:insolLaskarOnlyGainPctLr04-->-13%<!--/v--> |
+| EPICA CO₂ 0–500 kyr | R² = <!--v:insolLaskarModelOnlyR2Epica-->0.099<!--/v--> | R² = **<!--v:insolLaskarLaskarOnlyR2Epica-->0.129<!--/v-->** | <!--v:insolLaskarOnlyGainPctEpica-->31%<!--/v--> |
 
-Laskar's full-range eccentricity does carry substantially more raw signal than
-our single-line parameterization when no other features are present.
+Alone, the two parameterizations carry comparable raw signal — the model's
+reads higher on LR04, La2010a's on EPICA CO₂.
 
 ### 8.5 Interpretation
 
-The hardening test produces the strongest possible form of the null:
+The hardening test says the result does not depend on whose orbital elements
+are used:
 
-> **Laskar's better-parameterized insolation has more raw explanatory power
-> than ours, yet adds literally zero R² when L1+L2+L3 is already in the model.**
+> **With an independent orbital solution the four features add
+> <!--v:insolLaskarV2DeltaR2Lr04-->+0.00758<!--/v--> (LR04) and
+> <!--v:insolLaskarV2DeltaR2Epica-->+0.00794<!--/v--> (EPICA CO₂) in sample on
+> 0–500 kyr — tentative-band readings on a window whose enclosing regime
+> cross-validates negative (§9).**
 
-The L1 lattice **fully absorbs** every bit of variance that Laskar's wide-range
-e(t) and high-fidelity ϖ(t) would otherwise contribute. The two are not
-*independent* sources of explained variance — they are *the same source*,
-parameterized differently. L1 encodes the gravitational-coupling rhythm at the
-fundamental integer-divisor lattice; Berger's classical insolation
-parameterization is a projection of that same rhythm onto four time-domain
-features. The projection loses information; the lattice does not.
+The lines and Berger's four features are not *independent* sources of
+explained variance: at the linear level the features are projections of the
+same secular modes the lines enumerate (§5.1). The residual in-sample readings
+are what a 500-kyr window leaves un-spanned by 28 fixed-frequency lines fitted
+on the enclosing 1,000-kyr regime — not a stable signal, as §9 shows.
 
 **Concretely:**
-- Adding Laskar's insolation to L1+L2+L3 yields ΔR² = <!--v:insolLaskarV2DeltaR2Lr04-->+0.00000<!--/v--> (LR04) and
-  <!--v:insolLaskarV2DeltaR2Epica-->+0.00001<!--/v--> (EPICA CO₂) — orders of magnitude below the
-  §2.3 thresholds, at numerical noise.
-- The model variant reads slightly higher on this window (V1 ΔR² =
-  <!--v:insolLaskarV1DeltaR2Lr04-->+0.00062<!--/v--> on LR04, <!--v:insolLaskarV1DeltaR2Epica-->+0.00152<!--/v--> on
-  EPICA CO₂) because the model's e(t) is slightly more colinear with the
-  L1+L2+L3 residual — the same effect §9 shows at full strength in the
-  pre-iNHG regime; on 0–500 kyr it is well inside the NULL band.
+- La2010a's features on L1+L2+L3: ΔR² = <!--v:insolLaskarV2DeltaR2Lr04-->+0.00758<!--/v--> (LR04),
+  <!--v:insolLaskarV2DeltaR2Epica-->+0.00794<!--/v--> (EPICA CO₂) — tentative band in sample.
+- The model's own features: <!--v:insolLaskarV1DeltaR2Lr04-->+0.00077<!--/v--> (LR04),
+  <!--v:insolLaskarV1DeltaR2Epica-->+0.00065<!--/v--> (EPICA CO₂) — null band.
 
 ### 8.6 What this resolves
 
-Three loose ends from the main result are now closed:
+Three questions the main result leaves open are answered:
 
-1. **§6.1 caveat (single-line e(t))** — resolved for classical insolation. Substituting the true wide-range
-   La2010 eccentricity does not bring the missing variance into view; it isn't
-   missing because L1 has it.
-2. **§5.1 claim (insolation is downstream of gravitational coupling)** — now
-   empirically tightened. Laskar's e(t) is *defined* as a Fourier decomposition
-   of the same g_j/s_j secular rhythm L1 enumerates as integer divisors of 8H.
-   The substitution test gives ΔR² = 0 because the two formulations are
-   information-equivalent — confirmation by construction.
-3. **§5.3 forward reference to doc 95** — strengthened. The thesis "climate is
-   determined by our solar system, not by solar insolation" no longer relies on
-   our narrow eccentricity. It holds under the most generous insolation
-   parameterization available.
+1. **Dependence on the model's orbit (§6.1)** — none that changes the verdict.
+   Substituting the independent La2010a elements moves the in-sample reading
+   from the null band to the tentative band on a 500-kyr window; the
+   cross-window check (§9) finds no stable gain for either set.
+2. **§5.1 claim (insolation is downstream of gravitational coupling)** —
+   consistent. La2004/La2010 e(t) and ϖ(t) are Fourier decompositions of the
+   same g/s secular rhythm the lines enumerate, and the residual gain of a
+   4-feature projection on top of 28 fitted lines is small and not stable.
+3. **§5.3 forward reference to doc 95** — the thesis "climate is determined by
+   the solar system's rhythm, not by solar insolation directly" rests on the
+   lines' explanatory power (§3.3) and reads the same with the model's orbit
+   or with Laskar's.
 
 ### 8.7 Reproducibility
 
@@ -453,50 +447,56 @@ the full regime exactly as the extension test does, the L_insol coefficients
 are fitted on one half of the window and scored on the other, both
 directions, mean reported.
 
-The baseline is the **shipped** lattice — which, since the §10.3 admission,
-includes n = 24. The CV columns therefore answer the post-admission question
-(*is anything left on top of the shipped formula?*); the in-sample model
-column carries the extension test's pre-admission measurement (§3, pre-iNHG
-baseline R² = <!--v:insolExtR2CanonPreInhg-->0.4298<!--/v--> without the line
-vs <!--v:l1N24R2WithLinePreInhg-->0.4493<!--/v--> with it). The pre-admission
-cross-validated reading is §10's.
+The baseline is the **shipped** formula (the physical-line L1). The in-sample
+model column is §3's statistic; the CV columns answer *is anything left on top
+of the shipped formula out of sample?*
 
 | Regime | Window (kyr) | ΔR² model (in-sample) | ΔR² La2004 (in-sample) | CV ΔR² model | CV ΔR² La2004 |
 |--------|-------------:|----------------------:|-----------------------:|-------------:|--------------:|
-| post-MPT  | 0–1000    | <!--v:insolExtDeltaR2PostMpt-->+0.0038<!--/v--> | <!--v:insolStabLaskarDeltaR2PostMpt-->+0.0008<!--/v--> | <!--v:insolStabModelCvPostMpt-->+0.0032<!--/v--> | <!--v:insolStabLaskarCvPostMpt-->−0.0048<!--/v--> |
-| iNHG-MPT  | 1000–2700 | <!--v:insolExtDeltaR2InhgMpt-->+0.0069<!--/v--> | <!--v:insolStabLaskarDeltaR2InhgMpt-->+0.0028<!--/v--> | <!--v:insolStabModelCvInhgMpt-->−0.0116<!--/v--> | <!--v:insolStabLaskarCvInhgMpt-->−0.0127<!--/v--> |
-| pre-iNHG  | 2700–5320 | **<!--v:insolExtDeltaR2PreInhg-->+0.0297<!--/v-->** | <!--v:insolStabLaskarDeltaR2PreInhg-->+0.0103<!--/v--> | **<!--v:insolStabModelCvPreInhg-->+0.0024<!--/v-->** | <!--v:insolStabLaskarCvPreInhg-->−0.0211<!--/v--> |
-| lr04-full | 0–5320    | <!--v:insolExtDeltaR2Lr04Full-->+0.0035<!--/v--> | <!--v:insolStabLaskarDeltaR2Lr04Full-->+0.0233<!--/v--> | <!--v:insolStabModelCvLr04Full-->−0.0167<!--/v--> | <!--v:insolStabLaskarCvLr04Full-->+0.0050<!--/v--> |
+| post-MPT  | 0–1000    | <!--v:insolExtDeltaR2PostMpt-->+0.0015<!--/v--> | <!--v:insolStabLaskarDeltaR2PostMpt-->+0.0015<!--/v--> | <!--v:insolStabModelCvPostMpt-->−0.0059<!--/v--> | <!--v:insolStabLaskarCvPostMpt-->−0.0057<!--/v--> |
+| iNHG-MPT  | 1000–2700 | <!--v:insolExtDeltaR2InhgMpt-->+0.0008<!--/v--> | <!--v:insolStabLaskarDeltaR2InhgMpt-->+0.0009<!--/v--> | <!--v:insolStabModelCvInhgMpt-->−0.0142<!--/v--> | <!--v:insolStabLaskarCvInhgMpt-->−0.0134<!--/v--> |
+| pre-iNHG  | 2700–5320 | **<!--v:insolExtDeltaR2PreInhg-->+0.0152<!--/v-->** | <!--v:insolStabLaskarDeltaR2PreInhg-->+0.0158<!--/v--> | **<!--v:insolStabModelCvPreInhg-->−0.0197<!--/v-->** | <!--v:insolStabLaskarCvPreInhg-->−0.0155<!--/v--> |
+| lr04-full | 0–5320    | <!--v:insolExtDeltaR2Lr04Full-->+0.0568<!--/v--> | <!--v:insolStabLaskarDeltaR2Lr04Full-->+0.0558<!--/v--> | <!--v:insolStabModelCvLr04Full-->+0.0174<!--/v--> | <!--v:insolStabLaskarCvLr04Full-->+0.0130<!--/v--> |
 
 Reading:
 
-- **La2004 features never pass the stability bar.** Their one in-sample gain
-  (lr04-full, +0.02) collapses out of sample to
-  <!--v:insolStabLaskarCvLr04Full-->+0.0050<!--/v-->; the maximum cross-validated
-  gain with the real orbital elements anywhere is
-  <!--v:insolStabMaxLaskarCv-->+0.0050<!--/v-->. Classical insolation adds nothing
-  the lattice does not already carry — the §4 verdict.
-- **The model's e(t) gain lives in pre-iNHG only — and the shipped lattice
-  has already absorbed it.** Against the pre-admission lattice it
-  cross-validates at <!--v:l1N24EccCvPreInhg-->+0.0144<!--/v--> (§10); with
-  n = 24 admitted, the features retain only
-  <!--v:insolStabModelCvPreInhg-->+0.0024<!--/v--> on top (both halves
-  positive, below the stability bar). Its e(t) spans
-  <!--v:insolStabEccMinModel-->0.0078<!--/v-->–<!--v:insolStabEccMaxModel-->0.0233<!--/v-->
-  over the record as a single H/3 line; La2004's spans
+- **Neither feature set passes the stability bar.** The only positive
+  out-of-sample readings are on the full record —
+  <!--v:insolStabModelCvLr04Full-->+0.0174<!--/v--> (model) and
+  <!--v:insolStabLaskarCvLr04Full-->+0.0130<!--/v--> (La2004) — inside the
+  tentative band, below 0.02; the in-sample
+  <!--v:insolExtDeltaR2Lr04Full-->+0.0568<!--/v--> /
+  <!--v:insolStabLaskarDeltaR2Lr04Full-->+0.0558<!--/v--> there does not hold.
+  Every regime window is negative for both sets. Maximum cross-validated gain
+  anywhere: <!--v:insolStabMaxModelCv-->+0.0174<!--/v--> (model),
+  <!--v:insolStabMaxLaskarCv-->+0.0130<!--/v--> (La2004) — the §4 verdict.
+- **The two feature sets agree.** In sample they read alike to the third
+  decimal in every regime; out of sample within 0.005. The model's e(t) spans
+  <!--v:insolStabEccMinModel-->0.0006<!--/v-->–<!--v:insolStabEccMaxModel-->0.0578<!--/v-->
+  over the record, La2004's
   <!--v:insolStabEccMinLaskar-->0.0002<!--/v-->–<!--v:insolStabEccMaxLaskar-->0.0578<!--/v-->
-  as a multi-mode beat. That the gain follows the single line and not the real
-  orbit identifies it as a lattice-family regressor (the H/3 term, n = 24)
-  helping the weakest-fit regime — an L1-attribution question, answered in
-  §10, not an insolation result.
+  — the same multi-mode envelope. The comb-era pre-iNHG reading (a gain for
+  the model's features only, §10) was a property of the retired single-line
+  e(t): on the shipped model pre-iNHG reads
+  <!--v:insolStabModelCvPreInhg-->−0.0197<!--/v--> (model) and
+  <!--v:insolStabLaskarCvPreInhg-->−0.0155<!--/v--> (La2004).
 
 Output: [`data/insolation-stability-results.json`](../data/insolation-stability-results.json).
 
 ---
 
-## 10. L1 attribution — the gain is the lattice line n = 24
+## 10. L1 attribution — the gain is the lattice line n = 24 (comb-era record)
 
-The model's e(t) is a single line on 8H/24 = H/3 =
+> **Retired record.** This section was measured on the integer-label comb as
+> L1 and the single-line e(t) as the model's eccentricity — both since retired
+> (plan 06 T1; the eccentricity is the N-body series). Its markers read the
+> frozen `data/l1-n24-attribution-results.json`; the script refuses to re-run
+> on the shipped fitter (amplitudes are keyed by period, not by comb index),
+> and on the shipped model the gain it attributes does not exist (§9). Kept as
+> the record of how the comb-era measurement was read; nothing in §§1–9
+> depends on it.
+
+The comb-era model e(t) was a single line on 8H/24 = H/3 =
 <!--v:l1N24PeriodKyr-->111.8<!--/v--> kyr, and **n = 24 was not one of L1's
 original 32 divisors** — that list ran <!--v:l1N24NeighbourLo-->22<!--/v--> →
 <!--v:l1N24NeighbourHi-->25<!--/v-->. So the §9 gain had two candidate
@@ -508,7 +508,7 @@ separates them on the same canonical residual, ridge and split-half CV as §9.
 
 | Regressor on the L1+L2+L3 residual | in-sample ΔR² | CV ΔR² |
 |---|---:|---:|
-| all four model features (§9) | <!--v:insolExtDeltaR2PreInhg-->+0.0297<!--/v--> | <!--v:insolStabModelCvPreInhg-->+0.0024<!--/v--> |
+| all four model features (§9) | <!--v:insolExtDeltaR2PreInhg-->+0.0152<!--/v--> | <!--v:insolStabModelCvPreInhg-->−0.0197<!--/v--> |
 | model e(t) alone — fixed H/3 phase, one parameter | <!--v:l1N24EccInSamplePreInhg-->+0.0187<!--/v--> | <!--v:l1N24EccCvPreInhg-->+0.0144<!--/v--> |
 | pure lattice pair cos/sin(2π·24·t/8H) — free phase | <!--v:l1N24LineInSamplePreInhg-->+0.0191<!--/v--> | **<!--v:l1N24LineCvPreInhg-->+0.0144<!--/v-->** |
 | e·sin ϖ, e·cos ϖ pair alone | — | <!--v:l1N24PeriPairCvPreInhg-->−0.0062<!--/v--> |

@@ -18,11 +18,13 @@ status: current
 > physical-line formula reads **R² = <!--v:canonR2PostMpt-->0.7788<!--/v-->**
 > post-MPT with ridge, sequential fitting — plan 06 T1, the honest price of
 > the split); the classical Berger 1978 insolation parameterization alone
-> explains only **R² = 0.05** of the same record. When L1 is already in the
-> model, adding *any* insolation parameterization — including Laskar 2010's
-> wide-range eccentricity — yields **ΔR² ≈ 0**. The two are not independent
-> forcings; they are different projections of the same physics, and the line
-> set is strictly more expressive. (The comb-era label "8H lattice" used
+> explains **R² = <!--v:insolExtInsolOnlyR2PostMpt-->0.2362<!--/v-->** of the same
+> record. When L1 is already in the model, adding the insolation features —
+> with the model's own orbit or with Laskar's — yields **no cross-window-stable
+> gain** (doc 94: every regime window negative out of sample; the full record
+> inside the tentative band at <!--v:insolStabMaxModelCv-->+0.0174<!--/v-->). The
+> two are not independent forcings; they are different projections of the same
+> physics, and the line set carries more of the record's variance. (The comb-era label "8H lattice" used
 > below is the record's vocabulary; the shipped lines carry no integer label.)
 
 **Status:** synthesis of the doc 90–94 cluster.
@@ -54,7 +56,7 @@ The two paradigms are **not contradictory** — they describe the same gravitati
 
 - **Granularity:** L1 enumerates 33 integer-divisor frequencies; Berger collapses these into 3 time-domain functions.
 - **Channel:** Berger's reduction implicitly assumes insolation is the sole transmission mechanism. The lattice paradigm is agnostic about transmission — it captures the rhythm itself.
-- **Expressivity:** Adding Berger insolation features to L1+L2+L3 yields ΔR² ≈ 0 (see §3). The lattice contains the variance the projection produces; the reverse is not true.
+- **Expressivity:** Adding Berger insolation features to L1+L2+L3 yields no cross-window-stable gain (see §3). The lines carry the variance the projection produces, up to a remainder that does not hold across windows; the reverse is not true.
 
 ---
 
@@ -74,7 +76,7 @@ The periods in the first column are computed from the Laskar 2004 eigenmode beat
 
 Every Berger insolation peak is *somewhere* in the L1 lattice (see [doc 93](93-l1-attribution-reference.md) for the full mapping). The lattice contains all of Berger, plus integer-divisor structure that Berger's reduction does not surface (planet-planet beats not historically considered insolation-relevant, like 8H/16 Mars Axial, 8H/35 Earth-Mercury-Saturn 3-term beat, etc.).
 
-This is why **adding Berger insolation features to L1+L2+L3 yields ΔR² = 0**: the information is already there, parameterized at a finer-grained level.
+This is why **adding Berger insolation features to L1+L2+L3 yields no stable gain**: the information is already there, parameterized at a finer-grained level.
 
 ---
 
@@ -84,22 +86,22 @@ All numbers from the canonical regression scripts:
 
 | Test | LR04 (post-MPT, 0–1000 kyr) | LR04 (0–500 kyr, Laskar window) | EPICA CO₂ (0–800 kyr) |
 |------|----------------------------:|--------------------------------:|----------------------:|
-| **L1 alone** (33 lattice integers) | **R² = <!--v:canonPostMptL1Only-->0.779<!--/v-->** | R² ≈ 0.93 | R² = <!--v:canonEpicaCo2L1Only-->0.730<!--/v--> |
-| **L1+L2+L3** (canonical formula) | **R² = <!--v:canonR2PostMpt-->0.7788<!--/v-->** | **R² = 0.9424** | **R² = <!--v:canonR2Epica-->0.7301<!--/v-->** |
-| Berger insolation alone (model e/ϖ) | R² = 0.049 | R² = 0.188 | R² = 0.096 |
-| **Berger insolation alone (Laskar e/ϖ)** | — | **R² = 0.293** | **R² = 0.172** |
-| L1+L2+L3 + Berger insolation (model) | R² = 0.8776 → ΔR² = +0.0041 | R² = 0.9436 → +0.00123 | R² = 0.8494 → +0.0042 |
-| **L1+L2+L3 + Berger insolation (Laskar)** | — | **R² = 0.9424 → +0.00000** | **R² = 0.8452 → +0.00001** |
+| **L1 alone** (28 physical lines) | **R² = <!--v:canonPostMptL1Only-->0.779<!--/v-->** | — | R² = <!--v:canonEpicaCo2L1Only-->0.730<!--/v--> |
+| **L1+L2+L3** (canonical formula) | **R² = <!--v:canonR2PostMpt-->0.7788<!--/v-->** | **R² = <!--v:insolLaskarV0R2Lr04-->0.8690<!--/v-->** | **R² = <!--v:canonR2Epica-->0.7301<!--/v-->** |
+| Berger insolation alone (model e/ϖ) | R² = <!--v:insolExtInsolOnlyR2PostMpt-->0.2362<!--/v--> | R² = <!--v:insolLaskarModelOnlyR2Lr04-->0.233<!--/v--> | — |
+| **Berger insolation alone (Laskar e/ϖ)** | — | **R² = <!--v:insolLaskarLaskarOnlyR2Lr04-->0.202<!--/v-->** | — |
+| L1+L2+L3 + Berger insolation (model) | ΔR² = <!--v:insolExtDeltaR2PostMpt-->+0.0015<!--/v--> in sample, <!--v:insolStabModelCvPostMpt-->−0.0059<!--/v--> cross-validated | ΔR² = <!--v:insolLaskarV1DeltaR2Lr04-->+0.00077<!--/v--> | ΔR² = <!--v:insolExtDeltaR2EpicaCo2-->+0.0004<!--/v--> |
+| **L1+L2+L3 + Berger insolation (Laskar)** | ΔR² = <!--v:insolStabLaskarDeltaR2PostMpt-->+0.0015<!--/v--> in sample, <!--v:insolStabLaskarCvPostMpt-->−0.0057<!--/v--> cross-validated | **ΔR² = <!--v:insolLaskarV2DeltaR2Lr04-->+0.00758<!--/v-->** | — |
 
-(The insolation-addition rows are doc 94's measurement at the pre-admission 32-integer stage — its canonical baselines 0.9424 / 0.8452 predate the n=24 admission; the ΔR² ≈ 0 conclusion is unaffected.)
+(Every number is a doc 94 registry marker, measured on the shipped model — the physical-line L1 and the N-body eccentricity series; doc 94 §§3, 8, 9. The 0–500 kyr column is in-sample; its enclosing post-MPT regime cross-validates negative.)
 
 Three lines tell the story:
 
-1. **The 8H lattice (L1) carries the variance.** R² = 0.87 on post-MPT LR04 — the lattice alone, 33 sinusoids at fixed gravitational-rhythm frequencies.
-2. **Classical insolation alone explains very little.** R² = 0.05 (with our model's e) → R² = 0.29 (with Laskar's full-range e). Significant absolute, but **a fraction of what L1 captures.**
-3. **The two parameterizations carry overlapping, not independent, information.** Adding Laskar's better-parameterized insolation to L1+L2+L3 yields **ΔR² = 0.000** on LR04 and **ΔR² = 0.00001** on EPICA. The lattice already contains all of it.
+1. **The orbital lines (L1) carry the variance.** R² = <!--v:canonPostMptL1Only-->0.779<!--/v--> on post-MPT LR04 — the lines alone, 28 sinusoids at the engine's own secular frequencies.
+2. **Classical insolation alone explains a fraction.** R² = <!--v:insolExtInsolOnlyR2PostMpt-->0.2362<!--/v--> post-MPT with the model's orbit, <!--v:insolLaskarLaskarOnlyR2Lr04-->0.202<!--/v--> on 0–500 kyr with Laskar's — real, but **a third or less of what L1 captures** (<!--v:insolExtL1OverInsolPostMpt-->3×<!--/v-->).
+3. **The two parameterizations carry overlapping, not independent, information.** Added to L1+L2+L3, neither the model's nor Laskar's features produce a cross-window-stable gain: the maximum cross-validated ΔR² anywhere is <!--v:insolStabMaxModelCv-->+0.0174<!--/v--> (model) / <!--v:insolStabMaxLaskarCv-->+0.0130<!--/v--> (La2004), on the full record, inside the tentative band; every regime window is negative. The lines already contain what holds across windows.
 
-The third line is the crux. Berger insolation's R² = 0.29 (Laskar e) is real — it's just *already inside L1*.
+The third line is the crux. Berger insolation's standalone R² is real — it is *already inside L1*.
 
 For the full breakdowns (per regime, per coefficient), see [doc 94 §3](94-insolation-null-test.md#3-results) (model-insolation test) and [doc 94 §8](94-insolation-null-test.md#8-hardening-test--substituting-laskar-2010-et-and-ϖt) (Laskar hardening test).
 
@@ -195,10 +197,10 @@ Each row is a measured quantity with a script that reproduces it:
 | L1+L2+L3, post-MPT LR04 | R² = <!--v:canonR2PostMpt-->0.7788<!--/v--> | `data/milankovitch-climate-formula.json` |
 | L1+L2+L3, EPICA CO₂ | R² = <!--v:canonR2Epica-->0.7301<!--/v--> | same |
 | L1+L2+L3, CenCO2PIP (0–66 Ma) | R² = 0.7626 | same |
-| Berger insolation alone, LR04 0–500 kyr | R² = 0.293 (Laskar e) | `scripts/milankovitch_insolation_laskar_check.py` |
-| Berger insolation added to L1+L2+L3 | ΔR² = 0.00000 (LR04), 0.00001 (EPICA CO₂) | same |
+| Berger insolation alone, LR04 0–500 kyr | R² = <!--v:insolLaskarLaskarOnlyR2Lr04-->0.202<!--/v--> (Laskar e) | `scripts/milankovitch_insolation_laskar_check.py` |
+| Berger insolation added to L1+L2+L3 | no cross-window-stable gain — max cross-validated ΔR² <!--v:insolStabMaxModelCv-->+0.0174<!--/v--> (model) / <!--v:insolStabMaxLaskarCv-->+0.0130<!--/v--> (La2004), full record, tentative band | `scripts/milankovitch_insolation_stability.py` |
 | L3 step at MPT (LR04 jump) | β = +1.13 | `data/milankovitch-climate-formula.json` |
-| L1 dual-attribution rate | 33 / 33 Holistic attributions (29 / 33 also carry a Berger label; n = 24 is Earth's own line, no secular counterpart) | [doc 93](93-l1-attribution-reference.md) |
+| L1 dual-attribution rate (comb-era record) | 33 / 33 comb divisors attributed (29 / 33 also carry a Berger label) | [doc 93](93-l1-attribution-reference.md) |
 | Forward-projection R² across MPT | −0.87 (failure) | doc 92 Tier B R3-3 |
 
 All numbers reproducible with `python3 scripts/milankovitch_*.py` (deterministic, no random seeds).

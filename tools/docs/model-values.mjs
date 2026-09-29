@@ -677,7 +677,8 @@ export const VALUES = {
   // 1/√(1−e²) − 1 at the eccentricity-cycle extremes.
   // ── Insolation extension test (doc 94): tracked results of the three
   //    instruments scripts/milankovitch_insolation_{extension,laskar_check,
-  //    stability}.py — re-measured on the one-law e(t). ΔR² rendered signed.
+  //    stability}.py — measured on the shipped model (the physical-line L1,
+  //    the N-body eccentricity series as e(t)). ΔR² rendered signed.
   ...(() => {
     const sdr = (v) => (v >= 0 ? '+' : '−') + Math.abs(Number(v)).toFixed(4);
     const ext = () => rd('data/insolation-extension-results.json');
@@ -706,16 +707,19 @@ export const VALUES = {
     }
     out.insolStabMaxModelCv = { get: () => stb().max_model_cv_delta_r2, render: sdr, note: 'max cross-validated ΔR² (model features) across the LR04 regimes' };
     out.insolStabMaxLaskarCv = { get: () => stb().max_laskar_cv_delta_r2, render: sdr, note: 'max cross-validated ΔR² (La2004 features) across the LR04 regimes' };
-    out.insolStabEccMinModel = { get: () => stb().ecc_range_model_0_5320kyr[0], render: (v) => Number(v).toFixed(4), note: 'the one-law e(t) minimum over the LR04 span (0–5320 kyr)' };
-    out.insolStabEccMaxModel = { get: () => stb().ecc_range_model_0_5320kyr[1], render: (v) => Number(v).toFixed(4), note: 'the one-law e(t) maximum over the LR04 span (0–5320 kyr)' };
+    out.insolStabEccMinModel = { get: () => stb().ecc_range_model_0_5320kyr[0], render: (v) => Number(v).toFixed(4), note: 'the model e(t) (N-body series) minimum over the LR04 span (0–5320 kyr)' };
+    out.insolStabEccMaxModel = { get: () => stb().ecc_range_model_0_5320kyr[1], render: (v) => Number(v).toFixed(4), note: 'the model e(t) (N-body series) maximum over the LR04 span (0–5320 kyr)' };
     out.insolStabEccMinLaskar = { get: () => stb().ecc_range_laskar_0_5320kyr[0], render: (v) => Number(v).toFixed(4), note: 'La2004 e(t) minimum over the LR04 span' };
     out.insolStabEccMaxLaskar = { get: () => stb().ecc_range_laskar_0_5320kyr[1], render: (v) => Number(v).toFixed(4), note: 'La2004 e(t) maximum over the LR04 span' };
-    // L1 attribution of the pre-iNHG e(t) gain: the lattice line n = 24 (8H/24 = H/3)
+    // L1 attribution of the comb-era pre-iNHG e(t) gain (n = 24 of the retired
+    // integer comb; the retired single-line e(t)) — FROZEN RECORD: the script is
+    // retired (plan 06 T1 + the eccentricity series), the file is not regenerated;
+    // doc 94 §10 is the record. On the shipped model the gain does not exist.
     const n24 = () => rd('data/l1-n24-attribution-results.json');
     const pre = () => n24().regime_results['pre-inhg'];
     const f4 = (v) => Number(v).toFixed(4);
     out.l1N24LineN = { get: () => n24().metadata.line_n, render: (v) => String(v), note: 'the lattice divisor tested: 8H/n = H/3' };
-    out.l1N24PeriodKyr = { get: () => n24().metadata.line_period_kyr, render: (v) => Number(v).toFixed(1), note: '8H/24 in kyr — the one-law eccentricity line' };
+    out.l1N24PeriodKyr = { get: () => n24().metadata.line_period_kyr, render: (v) => Number(v).toFixed(1), note: '8H/24 in kyr — the retired single-line eccentricity period (comb-era record)' };
     out.l1N24NeighbourLo = { get: () => n24().metadata.l1_neighbours[0], render: (v) => String(v), note: 'nearest L1 divisor below 24' };
     out.l1N24NeighbourHi = { get: () => n24().metadata.l1_neighbours[1], render: (v) => String(v), note: 'nearest L1 divisor above 24' };
     out.l1N24EccCvPreInhg = { get: () => pre().ecc_only.cv, render: sdr, note: 'CV ΔR² of the model e(t) feature ALONE (fixed H/3 phase), pre-iNHG' };

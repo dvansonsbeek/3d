@@ -141,7 +141,7 @@ Re-running scripts only needed after dataset updates or refit changes — see [d
 - [doc 91 — Milankovitch evidence](91-milankovitch-evidence.md) — empirical 33-integer L1 fit, per-planet contributions, 14 hypothesis tests, 405-kyr off-lattice characterization
 - [doc 92 — Climate Formula architecture](92-climate-formula.md) — complete L1+L2+L3 derivation, per-regime ridge-fit R² values, variance-decomposition Tier A / B analyses, forward-projection limits
 - [doc 93 — L1 attribution reference](93-l1-attribution-reference.md) — per-integer Berger vs Holistic top-1 attribution
-- [doc 94 — Insolation null test](94-insolation-null-test.md) — empirical anchor for the "lattice subsumes Berger insolation" claim (ΔR² ≈ 0)
+- [doc 94 — Insolation null test](94-insolation-null-test.md) — empirical anchor for the "lines subsume Berger insolation" claim (no cross-window-stable gain)
 - [doc 95 — Climate summary](95-climate-summary.md) — the synthesis statement the modal visualizes
 - [doc 99 — Expanding Solar System Resonance Theory (ESSRT)](99-expanding-solar-system-resonance-theory.md) — deep-time scaling of the precession-band lines on the composed clock
 - [doc 59 — Earth–Moon Genesis Analysis](59-essrt-explorer.md) — sibling Tools-menu modal for the deep-time clock/LOD/year evolution

@@ -2,6 +2,15 @@
 """
 L1 attribution of the pre-iNHG e(t) gain — is it the lattice line n = 24?
 
+RETIRED — comb-era record (plan 06 T1 + the eccentricity series). The shipped
+fitter reads data/l1-physical-lines.json and keys its amplitudes by period, so
+the integer-comb manipulation below no longer reaches it (KeyError 24), and the
+single-line e(t) whose gain this script attributes is no longer in the features
+CSV (the model's eccentricity is the N-body series; on it the pre-iNHG gain does
+not cross-validate — doc 94 §9). data/l1-n24-attribution-results.json is the
+comb-era record and is not regenerated; main() refuses rather than write a
+mixed file. Doc 94 §10 carries the record.
+
 Doc 94 §9 finds one cross-validated gain from adding the model's own
 insolation features (e, e·sin ϖ, e·cos ϖ, ε) to the canonical L1+L2+L3
 residual: pre-iNHG (2.7–5.3 Myr), model features only, not La2004's.
@@ -65,6 +74,9 @@ def both(res, y_norm, r2c, X):
 
 
 def main():
+    sys.exit("milankovitch_l1_n24_attribution.py is RETIRED with the integer comb (plan 06 T1) "
+             "and the single-line e(t); data/l1-n24-attribution-results.json is the comb-era "
+             "record and is not regenerated (doc 94 §10).")
     t0 = time.time()
     ages, vals = load_lr04()
     model = load_insolation_features()

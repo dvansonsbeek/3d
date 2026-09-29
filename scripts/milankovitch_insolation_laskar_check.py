@@ -5,16 +5,11 @@ MILANKOVITCH INSOLATION EXTENSION — LASKAR HARDENING TEST
 
 Follow-up to scripts/milankovitch_insolation_extension.py / doc 94.
 
-The first test used our model's e(t) and ϖ(t) (narrow eccentricity range
-0.014–0.017). Result: max ΔR² = +0.0041 (strong null).
-
-The natural pushback: maybe the null comes from our narrow eccentricity,
-not from L1 being complete. The user noted that obliquity is essentially
-the same between our model and current theory, but eccentricity differs
-significantly (Laskar: 0.004–0.05; ours: 0.014–0.017).
-
-This script swaps in La2010a (Laskar 2011, A&A 532, A89) tabulated
-eccentricity and longitude-of-perihelion and re-runs the regression.
+The first test uses the model's own e(t) and ϖ(t). The hardening question:
+does the result depend on WHOSE orbital elements are used? This script swaps
+in La2010a (Laskar 2011, A&A 532, A89) tabulated eccentricity and
+longitude-of-perihelion — an independent orbital solution — and re-runs the
+regression on the same window.
 
 Data source: public/input/la2010-orbital-elements.json
   - 501 samples, 1-kyr resolution
@@ -28,10 +23,11 @@ Three regression variants compared on the SAME 0-500 kyr LR04 window:
 Obliquity is held to our model in both V1 and V2 (per user feedback:
 ε(t) matches between model and theory).
 
-If V2 ΔR² > V1 ΔR² substantially → Laskar's wider eccentricity carries
-                                   real explanatory power that L1 misses.
-If V2 ΔR² ≈ V1 ΔR²              → L1 captures it regardless of how
-                                   e(t) is parameterized. Null is robust.
+If V2 ΔR² > V1 ΔR² substantially → the independent solution carries
+                                   explanatory power the model's own orbit
+                                   does not.
+If V2 ΔR² ≈ V1 ΔR²              → the result does not depend on whose
+                                   orbital elements are used.
 
 Output: data/insolation-laskar-check-results.json
 """
@@ -218,8 +214,8 @@ def main():
     laskar = load_la2010()
     print(f"  {len(laskar['age_kyr'])} samples, 0–{laskar['age_kyr'].max():.0f} kyr")
     print(f"  Laskar e(t) range: {laskar['ecc'].min():.5f} to {laskar['ecc'].max():.5f}")
-    print(f"  Laskar e amplitude vs model: "
-          f"{(laskar['ecc'].max()-laskar['ecc'].min()) / (model_feats['ecc'].max()-model_feats['ecc'].min()):.1f}× wider")
+    print(f"  Laskar e range / model e range (0–500 kyr vs the model's full LR04 span): "
+          f"{(laskar['ecc'].max()-laskar['ecc'].min()) / (model_feats['ecc'].max()-model_feats['ecc'].min()):.1f}×")
 
     print(f"\nLoading LR04 stack ...")
     ages, vals = load_lr04()
@@ -232,8 +228,8 @@ def main():
     print(f"{'='*78}")
     lr04_results = fit_three_variants(t_lr, y_lr, "lr04-0-500-kyr", model_feats, laskar)
     print(f"  V0 — L1+L2+L3 only:               R² = {lr04_results['r2_l1_l2_l3']:.4f}")
-    print(f"  V1 — + L_insol(MODEL)  e=narrow:  R² = {lr04_results['v1_model_r2']:.4f}  ΔR² = {lr04_results['v1_delta_r2']:+.5f}")
-    print(f"  V2 — + L_insol(LASKAR) e=wide:    R² = {lr04_results['v2_laskar_r2']:.4f}  ΔR² = {lr04_results['v2_delta_r2']:+.5f}")
+    print(f"  V1 — + L_insol(MODEL e, ϖ):       R² = {lr04_results['v1_model_r2']:.4f}  ΔR² = {lr04_results['v1_delta_r2']:+.5f}")
+    print(f"  V2 — + L_insol(La2010 e, ϖ):      R² = {lr04_results['v2_laskar_r2']:.4f}  ΔR² = {lr04_results['v2_delta_r2']:+.5f}")
     print(f"\n  Laskar feature ranges on this window (standardized inputs):")
     for k, (lo, hi) in lr04_results['laskar_feature_ranges'].items():
         print(f"    {k:12s} {lo:+.5f} to {hi:+.5f}")
