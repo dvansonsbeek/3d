@@ -11,7 +11,7 @@ import { Pane } from 'tweakpane';
 //
 // Generated at build time, not fetched at runtime — `holisticyearLength` is read
 // at module scope below, and Phase 15 requires offline === hosted.
-import { computeObliquityJ2000Deg, computeSecularShape, DEFAULT_CONSTANTS as K, REFERENCE_DATA as R, FITTED_COEFFICIENTS as FIT, CONSTANTS_HASH, COEFFICIENTS_HASH, MODEL_VERSION, PREPRINT_DOI, createEpochPrimitives, createPhaseMachinery, createMoonEccChannel, createDeepEccChannel, DEEP_MODES_ARTIFACT, createDeepOrbitalHistory, createYearLengths, createMoonMonthChain, createChainCycleIntegrator, createMoonArguments, createMoonSeries, createMoonApparent, derivePlanetGeometry, planetFibonacciLaws as _FL, computeEccentricityIntegrated, planetOrientation as _PO, planetOrbitChain as _POC, integrateAscendingNode, createDeltaTCycles, createDeepTimeLod, createMoonRecessionHistory, createSolarChannelBudget, deltaTEspenakMeeusCanonSeconds, evalClimateL1OrbitalPermil, createAlphaGiaChannel, computeSolarTorqueShare, createEclipseFinders, createSunLongitudeCorrection, createModel, buildPlanetChainsFromArtifactData, computePlanetElementsAtYear as kcComputePlanetElementsAtYear, computeApsidalSecularDegPerYr as kcApsidalSecularDegPerYr, computeHeliocentricEclipticFromElements as kcComputeHeliocentricEclipticFromElements, computeEquatorNodeOriginSFrameDeg, convertNodeSFrameToEquatorOriginDeg, createSecularSeriesOverride, CHAIN_ARTIFACT, ANCHOR_EPOCH_YEAR as KC_ANCHOR_EPOCH_YEAR, ANCHOR_EPOCH_JD as KC_ANCHOR_EPOCH_JD, computeEarthFrameOfDate, solveWheelAngleForLongitude } from '@essrt/physics';
+import { computeObliquityJ2000Deg, computeSecularShape, DEFAULT_CONSTANTS as K, REFERENCE_DATA as R, FITTED_COEFFICIENTS as FIT, CONSTANTS_HASH, COEFFICIENTS_HASH, MODEL_VERSION, PREPRINT_DOI, createEpochPrimitives, createPhaseMachinery, createDeepCalendar, createMoonEccChannel, createDeepEccChannel, DEEP_MODES_ARTIFACT, createDeepOrbitalHistory, createYearLengths, createMoonMonthChain, createChainCycleIntegrator, createMoonArguments, createMoonSeries, createMoonApparent, derivePlanetGeometry, planetFibonacciLaws as _FL, computeEccentricityIntegrated, planetOrientation as _PO, planetOrbitChain as _POC, integrateAscendingNode, createDeltaTCycles, createDeepTimeLod, createMoonRecessionHistory, createSolarChannelBudget, deltaTEspenakMeeusCanonSeconds, evalClimateL1OrbitalPermil, createAlphaGiaChannel, computeSolarTorqueShare, createEclipseFinders, createSunLongitudeCorrection, createModel, buildPlanetChainsFromArtifactData, computePlanetElementsAtYear as kcComputePlanetElementsAtYear, computeApsidalSecularDegPerYr as kcApsidalSecularDegPerYr, computeHeliocentricEclipticFromElements as kcComputeHeliocentricEclipticFromElements, computeEquatorNodeOriginSFrameDeg, convertNodeSFrameToEquatorOriginDeg, createSecularSeriesOverride, CHAIN_ARTIFACT, ANCHOR_EPOCH_YEAR as KC_ANCHOR_EPOCH_YEAR, ANCHOR_EPOCH_JD as KC_ANCHOR_EPOCH_JD, computeEarthFrameOfDate, solveWheelAngleForLongitude } from '@essrt/physics';
 // K8 — the reference package: ONE-WAY imports (comparison only;
 // @essrt/reference is private-by-construction and nothing in the model
 // chain depends on it). publishedCurves migrated here from
@@ -1021,20 +1021,22 @@ const tripleSynodicYears = (() => {
   const _nSe = 360 / _Ts + 360 / planets.saturn.perihelionEclipticYears;
   return 3 * 360 / (_nJe - _nSe);
 })();
-// Framework's H-lattice sidereal year in days, derived from the T_axial = H/13
-// identity: T_sid = T_trop × H / (H − 13). This is the framework's own MEAN
-// prediction, independent of the IAU reference — used to anchor meanlengthofday.
-let   meansiderealyearlengthinDays_kinematic = meansolaryearlengthinDays * holisticyearLength / (holisticyearLength - 13);
+// The sidereal year in days by the lattice route at J2000 — T_sid = T_trop × H / (H − 13),
+// the T_axial = H/13 identity; the framework's own MEAN, independent of the IAU
+// reference — used to anchor meanlengthofday. A J2000 CONSTANT, not an epoch
+// global: "kinematic" is not a code path but f(2000) (year/day plan §2c; Layer 1's
+// `siderealYearDaysViaLattice`). At any other epoch the same quantity is
+// `meansiderealyearlengthinDays`, which recomputeEpochAnchors fills from Layer 0.
+const meansiderealyearlengthinDays_kinematic = meansolaryearlengthinDays * holisticyearLength / (holisticyearLength - 13);
 // MEAN LOD at J2000: 86399.99968 s under H=335,317 (from H/13 identity).
 // Supersedes Method B (which used the IAU tautology denominator + × 86400.00001).
 let   meanlengthofday = meansiderealyearlengthinSeconds/meansiderealyearlengthinDays_kinematic;  // Phase 1: mutable for deep-time mode
 
-// The sidereal Fourier BASELINE — frozen at the module-load kinematic value.
-// SIDEREAL_YEAR_HARMONICS were fitted around this constant. recomputeEpochAnchors
-// rewrites the `meansiderealyearlengthinDays_kinematic` GLOBAL for deep-time
-// display, and a formula baseline that moves with scene state is exactly the
-// transparency violation (f(Y) must depend on Y alone — plan §5c). Formula
-// sites read this const; display sites read the mutable global.
+// The sidereal Fourier BASELINE — the J2000 lattice-route value.
+// SIDEREAL_YEAR_HARMONICS were fitted around this constant; a formula baseline
+// that moves with scene state is exactly the transparency violation (f(Y) must
+// depend on Y alone — plan §5c). Kept as its own name so the formula sites read
+// as "the fit baseline", not "a year length".
 const SIDEREAL_YEAR_DAYS_KINEMATIC_J2000 = meansiderealyearlengthinDays_kinematic;
 
 // Module-load values of the seven epoch globals — what resetEpochToJ2000
@@ -1047,7 +1049,6 @@ const _EPOCH_SEEDS_J2000 = Object.freeze({
   holisticyearLength, H,
   meanlengthofday, meansiderealyearlengthinSeconds,
   meansiderealyearlengthinDays, meansolaryearlengthinDays,
-  meansiderealyearlengthinDays_kinematic,
 });
 
 let   meanSiderealday = (meansolaryearlengthinDays/(meansolaryearlengthinDays+1))*meanlengthofday;  // Phase 6: mutable (Tier 2)
@@ -4534,11 +4535,6 @@ function recomputeEpochAnchors(t_Ma) {
   meansiderealyearlengthinSeconds  = T_sid_s;
   meansiderealyearlengthinDays     = T_sid_s / LOD_s;
   meansolaryearlengthinDays        = T_trop_s / LOD_s;
-  // Fix (2026-07-17): the Fourier fit `computeSiderealYearDaysDirect` uses
-  // `meansiderealyearlengthinDays_kinematic` as its baseline. Under deep-time this
-  // must track the mutated H + solar days too — otherwise sidereal days stays
-  // frozen at J2000 while solar days shifts, breaking all precession ratios.
-  meansiderealyearlengthinDays_kinematic = meansolaryearlengthinDays * holisticyearLength / (holisticyearLength - 13);
   recomputeTimeUnitsForEpoch(t_Ma);   // Phase 6.7: re-derive sDay/sYear/etc from new days
   return true;
 }
@@ -4740,83 +4736,43 @@ function findBalancedYearAtCycle(cycleOffset) {
   // 3-point alignment at deep past. Using SI here makes the button target JDs
   // where SI-year delta IS exactly N·H_J2000, so scene rotations return to
   // integer × 2π every click.
-  const refCumul = _cumulIntegralAtYear(BALANCED_YEAR_J2000_FIXED);
-  if (refCumul === null) return null;
-  // Initial guess: solve raw integral = cycleOffset
-  let Y = _yearAtCumulIntegral(refCumul + cycleOffset);
-  if (Y === null) return null;
-  // Iterate: adjust Y so that _jdToSIyear(yearToJD(Y)) gives the SI-year where
-  // cyclesBetweenYears(BAL, Y_SI, 1) = cycleOffset (= integer).
-  for (let iter = 0; iter < 5; iter++) {
-    const jd = yearToJD(Y);
-    if (jd === null) return Y;
-    const Y_SI = _jdToSIyear(jd);
-    if (!Number.isFinite(Y_SI)) return Y;
-    const corrected = cyclesBetweenYears(BALANCED_YEAR_J2000_FIXED, Y_SI, 1);
-    if (corrected === null) return Y;
-    const error = corrected - cycleOffset;
-    if (Math.abs(error) < 1e-12) break;
-    // Adjust Y by Δcycle × H (where Δcycle = -error, so Y_new = Y - error × H).
-    // H here is the local H value at Y — use live holisticyearLength as approximation.
-    Y = Y - error * holisticyearLength;
-  }
-  return Y;
+  // ONE implementation (the deep calendar, @essrt/physics): the Newton step
+  // uses H at J2000 where this body once stepped with the live
+  // holisticyearLength — the iteration converges to 1e-12 cycles either way.
+  return _deepCal().balancedYearAtCycle(cycleOffset);
 }
 
-// ───── Cumulative days-from-J2000 table (Phase 9.11) ─────
-// Mirrors _cumulIntegralTable but stores ∫ daysPerYear(t) dt from
-// startmodelYear (= 2000.5, where the JD anchor sits) instead of ∫ 1/H.
-// Used by `yearToJD` to convert a deep-time year to a Julian Date.
+// ───── The deep-time calendar — ONE home (year/day collapse) ─────
+// year → JD by the ∫ daysPerYear dt table on the phase grid, the SI-year
+// label, and the balanced-event finder: `@essrt/physics/phase/deep-calendar`,
+// extracted verbatim from the bodies that stood here (and their Node twins
+// in tools/lib/deep-time.js — the PHASE-B-DUPLICATE family). Built lazily
+// from this engine's phase machinery, days-per-year source and lattice-α
+// pin; the table itself is built on first use, under the lattice α (R2).
 //
-// History: 9.12.5 / 9.12.7 attempted Julian linear 365.25 to make
-// `yearToJD ↔ jdToYearLinear` round-trip identity (which would fix the ~130yr
-// e_min offset at deep past). But that broke navigation past JD ≈ -721M
-// (root cause not isolated yet — possibly some downstream consumer breaks
-// at the shifted JD values). Reverted to deep-time-aware integration which
-// allows navigation across the full table range, accepting a small ~1e-6
-// eccentricity drift at extreme deep-past balanced years.
-let _cumulDaysTable = null;
-
-function _ensureCumulDaysTable() {
-  if (_cumulDaysTable !== null) return;
-  _withLatticeAlpha(_buildCumulDaysTable);   // R2: lattice tables pin α
-}
-
-function _buildCumulDaysTable() {
-  _ensureCumulIntegralTable();
-  const N = _cumulIntegralLength();
-  const j2000Idx = _cumulIntegralJ2000IdxGet();
-  _cumulDaysTable = new Float64Array(N);
-
-  const daysPerYear = (year) => {
-    const t_Ma = (startmodelYear - year) / 1e6;
-    return meanYearInDaysAtAge(t_Ma);
-  };
-
-  const gridYearAtJ2000Idx = _CUMUL_INTEGRAL_YEAR_MIN + j2000Idx * _CUMUL_INTEGRAL_STEP;
-  const partialYearOffset = startmodelYear - gridYearAtJ2000Idx;
-  const daysAtJ2000 = meanYearInDaysAtAge(0);
-  _cumulDaysTable[j2000Idx] = -partialYearOffset * daysAtJ2000;
-
-  let prev = daysPerYear(gridYearAtJ2000Idx);
-  for (let i = j2000Idx + 1; i < N; i++) {
-    const yr = _CUMUL_INTEGRAL_YEAR_MIN + i * _CUMUL_INTEGRAL_STEP;
-    const curr = daysPerYear(yr);
-    _cumulDaysTable[i] = (prev !== null && curr !== null && !Number.isNaN(_cumulDaysTable[i - 1]))
-      ? _cumulDaysTable[i - 1] + 0.5 * (prev + curr) * _CUMUL_INTEGRAL_STEP
-      : NaN;
-    prev = curr;
-  }
-
-  prev = daysPerYear(gridYearAtJ2000Idx);
-  for (let i = j2000Idx - 1; i >= 0; i--) {
-    const yr = _CUMUL_INTEGRAL_YEAR_MIN + i * _CUMUL_INTEGRAL_STEP;
-    const curr = daysPerYear(yr);
-    _cumulDaysTable[i] = (prev !== null && curr !== null && !Number.isNaN(_cumulDaysTable[i + 1]))
-      ? _cumulDaysTable[i + 1] - 0.5 * (prev + curr) * _CUMUL_INTEGRAL_STEP
-      : NaN;
-    prev = curr;
-  }
+// History kept with the code: 9.12.5 / 9.12.7 attempted Julian linear 365.25
+// to make `yearToJD ↔ jdToYearLinear` a round-trip identity (which would fix
+// the ~130-yr e_min offset at deep past) but broke navigation past
+// JD ≈ −721M; reverted to the deep-time-aware integration, which allows
+// navigation across the full table range at a ~1e-6 eccentricity drift at
+// extreme deep-past balanced years. The module header carries the 0.6-d
+// zero-point offset and why it must not be "fixed" in isolation.
+let _deepCalM = null;
+function _deepCal() {
+  if (_deepCalM !== null) return _deepCalM;
+  _deepCalM = createDeepCalendar({
+    phase: _phase,
+    meanYearInDaysAtAgeMa: meanYearInDaysAtAge,
+    withLatticeAlpha: _withLatticeAlpha,
+    startModelJD: startmodelJD,
+    startModelYear: startmodelYear,
+    startModelYearWithCorrection: startmodelyearwithCorrection,
+    siTropicalYearDays: SI_TROPICAL_YEAR_DAYS,
+    balancedYear: BALANCED_YEAR_J2000_FIXED,
+    hJ2000: HOLISTIC_YEAR_J2000,
+    cyclesBetween: cyclesBetweenYears,   // this engine's toggle-aware form
+  });
+  return _deepCalM;
 }
 
 /** Convert a decimal calendar year to a Julian Date, integrating the
@@ -4824,19 +4780,7 @@ function _buildCumulDaysTable() {
  *  to `year`. Returns null if `year` is outside the precomputed table
  *  domain or past the tidal-lock asymptote. At year = startmodelYear
  *  returns startmodelJD exactly. */
-function yearToJD(year) {
-  if (!Number.isFinite(year)) return null;
-  _ensureCumulDaysTable();
-  if (year < _CUMUL_INTEGRAL_YEAR_MIN || year > _CUMUL_INTEGRAL_YEAR_MAX) return null;
-  const idx_f = (year - _CUMUL_INTEGRAL_YEAR_MIN) / _CUMUL_INTEGRAL_STEP;
-  const idx_lo = Math.floor(idx_f);
-  const idx_hi = Math.min(idx_lo + 1, _cumulDaysTable.length - 1);
-  const v_lo = _cumulDaysTable[idx_lo];
-  const v_hi = _cumulDaysTable[idx_hi];
-  if (Number.isNaN(v_lo) || Number.isNaN(v_hi)) return null;
-  const daysFromStartmodel = v_lo + (idx_f - idx_lo) * (v_hi - v_lo);
-  return startmodelJD + daysFromStartmodel;
-}
+function yearToJD(year) { return _deepCal().yearToJD(year); }
 
 // ───── Scene time coordinate ↔ JD (R4) ─────────────────────────────────────
 // `pos` counts tropical years since startmodelJD; the Sun advances 2π per
@@ -5668,7 +5612,7 @@ const J2000_CALENDAR_YEAR = startmodelYear;   // 2000.5
 // ~N × 0.0281 / H cycle offset — visible as ~1.74" shift in Earth perihelion
 // display under DEEP_TIME=true. Anchoring at startmodelyearwithCorrection
 // aligns all year coordinates consistently and eliminates that shift.
-const _jdToSIyear = (jd) => startmodelyearwithCorrection + (jd - startmodelJD) / SI_TROPICAL_YEAR_DAYS;
+const _jdToSIyear = (jd) => _deepCal().jdToSIyear(jd);   // ONE home: the deep calendar
 const STARTMODEL_YEAR_SI = _jdToSIyear(startmodelJD);
 // R4b (plan 06, owner): THE ENGINE'S YEAR at a true-UT instant — the one
 // argument every read of the one-source sample (ε, e, ϖ, the frame of date)
@@ -5904,7 +5848,6 @@ function resetEpochToJ2000() {
   meansiderealyearlengthinSeconds = _EPOCH_SEEDS_J2000.meansiderealyearlengthinSeconds;
   meansiderealyearlengthinDays = _EPOCH_SEEDS_J2000.meansiderealyearlengthinDays;
   meansolaryearlengthinDays = _EPOCH_SEEDS_J2000.meansolaryearlengthinDays;
-  meansiderealyearlengthinDays_kinematic = _EPOCH_SEEDS_J2000.meansiderealyearlengthinDays_kinematic;
   recomputeTimeUnitsForEpoch(0);          // mirrors recomputeEpochAnchors' tail
   recomputeDerivedAnchorsForEpoch(0);
   recomputeMoonAndAuForEpoch(0);
@@ -5966,11 +5909,13 @@ if (typeof window !== 'undefined') {
     computeAnomalisticYearDaysDirect: (y) => computeAnomalisticYearSecFromDaysFourier(y, 1),
     // Delegation gate (Phase 20.2): the ONE Layer-4 composite, pure.
     computeLodRealSecondsAtEpoch,
-    // The seven globals recomputeEpochAnchors mutates, read live.
+    // The six globals recomputeEpochAnchors mutates, read live (the former
+    // seventh, the kinematic sidereal year, is a J2000 constant since the
+    // year/day collapse — "kinematic" is f(2000), not an epoch state).
     anchors: () => ({
       holisticyearLength, H, meanlengthofday,
       meansiderealyearlengthinSeconds, meansiderealyearlengthinDays,
-      meansolaryearlengthinDays, meansiderealyearlengthinDays_kinematic,
+      meansolaryearlengthinDays,
     }),
 
     // ── Phase 8.2-0 lunar surface ────────────────────────────────────────────
@@ -20326,7 +20271,7 @@ const VFP_CATEGORIES = [
           const sidDays = evalYearFourier(yF, SIDEREAL_YEAR_DAYS_KINEMATIC_J2000, SIDEREAL_YEAR_HARMONICS);
           const solYear = evalYearFourier(yF, MEAN_SOLAR_YEAR_J2000_DAYS,      TROPICAL_YEAR_HARMONICS);
           const lod = MEAN_SIDEREAL_YEAR_J2000_S / sidDays;
-          return computeAxialPrecessionRealLOD(MEAN_SIDEREAL_YEAR_J2000_S, solYear, lod);
+          return computeAxialPrecessionYears(MEAN_SIDEREAL_YEAR_J2000_S, solYear, lod);
         };
       })() },
     references: [
@@ -38682,7 +38627,7 @@ async function runBalancedYearStateDiagnostic() {
   console.log('');
   console.log('  Live cumulative-integral tables (should be null-then-frozen after 1st touch):');
   console.log(`    phase table (@essrt/physics/phase)       = ${_phaseM !== null ? 'BUILT (' + _cumulIntegralLength() + ' entries)' : 'null'}`);
-  console.log(`    _cumulDaysTable                        = ${_cumulDaysTable !== null ? 'BUILT (' + _cumulDaysTable.length + ' entries)' : 'null'}`);
+  console.log(`    deep calendar days table               = ${_deepCalM !== null && _deepCal().cumulDaysTableLength() !== null ? 'BUILT (' + _deepCal().cumulDaysTableLength() + ' entries)' : 'null'}`);
   console.log(`    _J2000_DRIFT_CACHE.size                = ${_J2000_DRIFT_CACHE.size}`);
   console.log('');
   console.log('  Sim position/time globals:');
@@ -57012,7 +56957,7 @@ function updatePredictions() {
   if (_hybridSpinActive()) predictions.solarYearDays = predictions.solarYearSeconds / 86400;
   // Axial precession = sid_sec / (sid_sec − sol_sec). Both sec values consistently
   // derived from measured days × o.lodKinematic, equal to the pure days ratio.
-  o.axialPrecession = computeAxialPrecessionRealLOD(o.siderealYearSeconds, o.solarYearDays, o.lodKinematic);
+  o.axialPrecession = computeAxialPrecessionYears(o.siderealYearSeconds, o.solarYearDays, o.lodKinematic);
   // DISPLAY: the beat of the DISPLAYED one-source rows (ONE family, SI
   // basis) — recomputing sid/(sid−sol) from the panel rows reproduces this
   // exactly, and it matches the Axial Precession chart's one-source line
@@ -57534,29 +57479,17 @@ function diagnoseLodLayers(year) {
 
 
 /**
- * Compute the axial precession.
- *
- * @param {number} siderealYearSeconds – the length of the sidereal year (in seconds)
- * @param {number} solarYearDays    – the length of the solar year (in days)
- * @returns {number} axialPrecession
- */
-function computeAxialPrecession(
-  siderealYearSeconds,
-  solarYearDays
-  ) {
-  return siderealYearSeconds /
-         (siderealYearSeconds - (solarYearDays * 86400));
-}
-
-/**
- * Compute the axial precession with Real LOD.
+ * Compute the axial precession period in years — ONE function; the day length
+ * is the argument (SI: 86400; the epoch's own LOD otherwise). The former
+ * SI-hardcoded twin and the "RealLOD" name are gone (year/day plan §2c: the
+ * unit is not a function variant).
  *
  * @param {number} siderealYearSeconds – the length of the sidereal year (in seconds)
  * @param {number} solarYearDays    – the length of the solar year (in days)
  * @param {number} lengthofDay          – number of seconds in one solar day (e.g. 86400)
- * @returns {number} axialPrecession
+ * @returns {number} axialPrecession period in years
  */
-function computeAxialPrecessionRealLOD(
+function computeAxialPrecessionYears(
   siderealYearSeconds,
   solarYearDays,
   lengthofDay

@@ -1203,140 +1203,71 @@ const EPOCH_PARAMS = Object.freeze({
 
 // ─── Year↔JD under deep time, and the H-balanced event finder ─────────────
 //
-// PHASE-B-DUPLICATE. These five are ported from `src/script.js`
-// (`_jdToSIyear` :6156, `_yearAtCumulIntegral` :5250, `_ensureCumulDaysTable`
-// :5357, `yearToJD` :5400, `findBalancedYearAtCycle` :5301). The browser copy
-// is the original and stays authoritative until Phase B of
-// `IP-deeptime-scene-graph-alignment_new.md` collapses both into
-// `packages/physics` layer0. Grep PHASE-B-DUPLICATE to find every copy.
-//
-// They exist here because Step 6a's `Cycle` column cannot be computed without
+// ONE implementation, `@essrt/physics/phase/deep-calendar` (the year/day
+// collapse — formerly the PHASE-B-DUPLICATE family hand-mirrored from
+// `src/script.js`). Both engines build the calendar from their own phase
+// machinery, days-per-year source and lattice-α pin, and delegate. The export
+// names below are kept: Step 6a's `Cycle` column (packages/fitting) needs
 // them, and that column is what stops `Model Year` — a chaining-step counter
 // that means a tropical year for the cardinals and an anomalistic one for the
 // apsides — from being used as a phase axis (R15).
+const { createDeepCalendar } = _req('@essrt/physics/phase/deep-calendar');
+let _deepCalM = null;
+function _deepCal() {
+  if (_deepCalM !== null) return _deepCalM;
+  _deepCalM = createDeepCalendar({
+    phase: _phase,
+    meanYearInDaysAtAgeMa: meanYearInDaysAtAge,
+    withLatticeAlpha: _withLatticeAlpha,
+    startModelJD: C.startmodelJD,
+    startModelYear: C.startmodelYear,
+    startModelYearWithCorrection: C.startModelYearWithCorrection,
+    siTropicalYearDays: SI_TROPICAL_YEAR_DAYS,
+    balancedYear: C.balancedYear,
+    hJ2000: C.H,
+    cyclesBetween: cyclesBetweenYears,
+  });
+  return _deepCalM;
+}
 
 /**
- * SI-tropical-year label for a JD, anchored at startModelYearWithCorrection.
- *
- * NOT a calendar year: the scene's precession rotations integrate on this axis
- * (`cyclesBetweenYears(anchor, _jdToSIyear(jd), N)`), so a fit on it agrees
- * with the runtime by construction. Using the calendar axis instead costs 63×
- * on the 6b obliquity fit and makes the basis invent H/4, H/7, H/10 (R13).
- * Round-trip bias `Y_SI − Y` is −11.0 yr at −302,635 and grows quadratically.
- *
+ * SI-tropical-year label for a JD, anchored at startModelYearWithCorrection —
+ * NOT a calendar year (the scene's precession rotations integrate on this
+ * axis; R13). One home: the deep calendar.
  * @param {number} jd
  * @returns {number} SI-year label
  */
-const _jdToSIyear = (jd) =>
-  C.startModelYearWithCorrection + (jd - C.startmodelJD) / SI_TROPICAL_YEAR_DAYS;
+const _jdToSIyear = (jd) => _deepCal().jdToSIyear(jd);
 
 /**
  * Inverse of `_cumulIntegralAtYear` — the year at a given cumulative ∫1/H dt.
  * @param {number} targetCumul
  * @returns {number|null} null outside the table domain
  */
-function _yearAtCumulIntegral(targetCumul) { return _phase().yearAtCumul(targetCumul); }
-
-/** ∫ daysPerYear dt from startmodelYear, on the same grid as the 1/H table. */
-let _cumulDaysTable = null;
-
-function _ensureCumulDaysTable() {
-  if (_cumulDaysTable !== null) return;
-  _withLatticeAlpha(_buildCumulDaysTable);   // R2: lattice tables pin α
-}
-
-function _buildCumulDaysTable() {
-  _ensureCumulIntegralTable();
-  const N = _cumulIntegralLength();
-  const j2000Idx = _cumulIntegralJ2000IdxGet();
-  _cumulDaysTable = new Float64Array(N);
-
-  const daysPerYear = (year) => meanYearInDaysAtAge((C.startmodelYear - year) / 1e6);
-
-  const gridYearAtJ2000Idx = _CUMUL_INTEGRAL_YEAR_MIN + j2000Idx * _CUMUL_INTEGRAL_STEP;
-  const partialYearOffset = C.startmodelYear - gridYearAtJ2000Idx;
-  _cumulDaysTable[j2000Idx] = -partialYearOffset * meanYearInDaysAtAge(0);
-
-  let prev = daysPerYear(gridYearAtJ2000Idx);
-  for (let i = j2000Idx + 1; i < N; i++) {
-    const curr = daysPerYear(_CUMUL_INTEGRAL_YEAR_MIN + i * _CUMUL_INTEGRAL_STEP);
-    _cumulDaysTable[i] = (prev !== null && curr !== null && !Number.isNaN(_cumulDaysTable[i - 1]))
-      ? _cumulDaysTable[i - 1] + 0.5 * (prev + curr) * _CUMUL_INTEGRAL_STEP
-      : NaN;
-    prev = curr;
-  }
-
-  prev = daysPerYear(gridYearAtJ2000Idx);
-  for (let i = j2000Idx - 1; i >= 0; i--) {
-    const curr = daysPerYear(_CUMUL_INTEGRAL_YEAR_MIN + i * _CUMUL_INTEGRAL_STEP);
-    _cumulDaysTable[i] = (prev !== null && curr !== null && !Number.isNaN(_cumulDaysTable[i + 1]))
-      ? _cumulDaysTable[i + 1] - 0.5 * (prev + curr) * _CUMUL_INTEGRAL_STEP
-      : NaN;
-    prev = curr;
-  }
-}
+function _yearAtCumulIntegral(targetCumul) { return _deepCal().yearAtCumulIntegral(targetCumul); }
 
 /**
  * Calendar year → JD, integrating days-per-year from startmodelYear.
  *
  * Named `yearToJDDeepTime` because `constants.js` already exports a SNAPSHOT
  * `yearToJD` that is linear in `meanSolarYearDays`. The collision would have
- * been silent, and the two disagree by −465 d at −100 kyr.
- *
- * CARRIES A KNOWN 0.6 d ZERO-POINT OFFSET — measured here at −0.600 d, matching
- * the browser exactly. The anchor cell is seeded by linear extrapolation but
- * read back by interpolation across a 10-kyr cell. The sibling 1/H table was
- * normalised to read 0 at the anchor; this one never was (old plan §5d trap 1).
- *
- * DO NOT "fix" it in isolation. `balancedYearAtCycle` is the only consumer and
- * it round-trips through `cyclesBetweenYears`, which absorbs the offset — that
- * is why the bracket lands on −302635.004 / 32682.268 exactly. Normalising the
- * table without re-checking that round-trip moves the Step 6a window.
+ * been silent, and the two disagree by −465 d at −100 kyr. The known 0.6-d
+ * zero-point offset and why it must not be "fixed" in isolation: see the
+ * deep-calendar module header.
  *
  * @param {number} year
  * @returns {number|null} null outside the table domain
  */
-function yearToJDDeepTime(year) {
-  if (!Number.isFinite(year)) return null;
-  _ensureCumulDaysTable();
-  if (year < _CUMUL_INTEGRAL_YEAR_MIN || year > _CUMUL_INTEGRAL_YEAR_MAX) return null;
-  const idx_f = (year - _CUMUL_INTEGRAL_YEAR_MIN) / _CUMUL_INTEGRAL_STEP;
-  const idx_lo = Math.floor(idx_f);
-  const idx_hi = Math.min(idx_lo + 1, _cumulDaysTable.length - 1);
-  const v_lo = _cumulDaysTable[idx_lo], v_hi = _cumulDaysTable[idx_hi];
-  if (Number.isNaN(v_lo) || Number.isNaN(v_hi)) return null;
-  return C.startmodelJD + v_lo + (idx_f - idx_lo) * (v_hi - v_lo);
-}
+function yearToJDDeepTime(year) { return _deepCal().yearToJD(year); }
 
 /**
- * Calendar year of the k-th H-balanced event, k = 0 being `C.balancedYear`.
- *
- * The JD round-trip is deliberate, NOT a shortcut to bisecting
- * `cyclesBetweenYears` in calendar units: calendar-year delta = H_J2000
- * exactly, but SI-year delta does not — they differ by ~6.7 SI yr per H.
- * Dropping the round-trip returns the SI label instead of the calendar year.
+ * Calendar year of the k-th H-balanced event, k = 0 being `C.balancedYear`
+ * (the deliberate JD round-trip: see the deep-calendar module header).
  *
  * @param {number} cycleOffset integer cycle index; negative = past
  * @returns {number|null}
  */
-function balancedYearAtCycle(cycleOffset) {
-  const refCumul = _cumulIntegralAtYear(C.balancedYear);
-  if (refCumul === null) return null;
-  let Y = _yearAtCumulIntegral(refCumul + cycleOffset);
-  if (Y === null) return null;
-  for (let iter = 0; iter < 5; iter++) {
-    const jd = yearToJDDeepTime(Y);
-    if (jd === null) return Y;
-    const Y_SI = _jdToSIyear(jd);
-    if (!Number.isFinite(Y_SI)) return Y;
-    const corrected = cyclesBetweenYears(C.balancedYear, Y_SI, 1);
-    if (corrected === null) return Y;
-    const error = corrected - cycleOffset;
-    if (Math.abs(error) < 1e-12) break;
-    Y = Y - error * C.H;
-  }
-  return Y;
-}
+function balancedYearAtCycle(cycleOffset) { return _deepCal().balancedYearAtCycle(cycleOffset); }
 
 // ─── Scene time coordinate ↔ JD (R4) ───────────────────────────────────────
 // `pos` counts tropical years since startmodelJD. Under deep time the year

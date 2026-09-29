@@ -57,16 +57,18 @@ export const createDerivedViews = ({ primitives: L0 }) => {
    * browser shows exactly the same one-epoch split, which is how we know the
    * port is faithful rather than merely close.
    *
-   * It exists because `src/script.js` carries BOTH as separate mutable globals
+   * It exists because `src/script.js` carried BOTH as separate mutable globals
    * — `meansiderealyearlengthinDays` and `meansiderealyearlengthinDays_kinematic`
-   * — and they hold the same value at every epoch once `recomputeEpochAnchors`
-   * has run. They diverge only at module load, where one is the IAU anchor
-   * (365.256363004) and the other is lattice-derived: the 118 ms of R16.
+   * — holding the same value at every epoch once `recomputeEpochAnchors` had
+   * run, diverging only at module load, where one is the IAU anchor
+   * (365.256363004) and the other lattice-derived: the 118 ms of R16.
    *
    * So the "kinematic" variant was never a different quantity, only a
-   * different arrival route with a different starting constant. Keeping the
-   * route explicit here lets B.3 retire one global without asserting the
-   * equality on faith.
+   * different arrival route with a different starting constant. The year/day
+   * collapse retired the mutable global: `meansiderealyearlengthinDays_kinematic`
+   * is now a J2000 CONSTANT in the browser (this route at f(2000)), and the
+   * epoch value is read from `meansiderealyearlengthinDays`. This view stays
+   * so the equality is measured, not asserted.
    *
    * @param {number} year
    * @returns {number|null}

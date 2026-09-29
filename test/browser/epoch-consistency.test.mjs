@@ -44,7 +44,9 @@ const rows = await s.page.evaluate(({ EPOCHS_MA }) => {
       t, year,
       // What the epoch-anchor chain says at this epoch (the mutated globals,
       // plus the anomalistic identity anom = trop·(H/16)/(H/16−1) they imply).
-      sidKinAnchor: a.meansiderealyearlengthinDays_kinematic,
+      // The sidereal anchor is the ONE remaining sidereal-year global (the
+      // "kinematic" twin is a J2000 constant since the year/day collapse).
+      sidKinAnchor: a.meansiderealyearlengthinDays,
       solAnchor: a.meansolaryearlengthinDays,
       anomAnchor: a.meansolaryearlengthinDays * (H_t / 16) / (H_t / 16 - 1),
       // What the pure f(Y) evaluators say at the same year, J2000 scene state.
@@ -68,7 +70,7 @@ console.log('============================================================');
 let fail = 0;
 for (const r of rows) {
   for (const [label, evalV, anchorV] of [
-    ['sidereal (kinematic)', r.sidEval, r.sidKinAnchor],
+    ['sidereal', r.sidEval, r.sidKinAnchor],
     ['tropical', r.solEval, r.solAnchor],
     ['anomalistic', r.anomEval, r.anomAnchor],
   ]) {

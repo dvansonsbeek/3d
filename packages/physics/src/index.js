@@ -99,6 +99,10 @@ export { createDerivedViews } from './layer1/index.js';
 // purpose: tools/lib requires the same files via the exports-map subpaths;
 // re-exported here so bundled ESM consumers need only the package root).
 export { createPhaseMachinery } from './phase/index.cjs';
+// The deep-time calendar (year ↔ JD under the drifting year length, the
+// H-balanced event finder) — ONE implementation for both engines since the
+// year/day collapse (formerly the PHASE-B-DUPLICATE family).
+export { createDeepCalendar } from './phase/deep-calendar.cjs';
 export { createCardinalModel } from './cardinal/index.cjs';
 // D4b: the one-source cardinal structure — the EoC layer (year lengths,
 // crossing offsets, the e(t)-proportional spread) on the movement's own

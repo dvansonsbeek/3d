@@ -38,8 +38,10 @@ const MAPPING = [
   { global: 'meansiderealyearlengthinSeconds', view: L0.siderealYearSeconds },
   { global: 'meansiderealyearlengthinDays', view: L1.siderealYearDays },
   { global: 'meansolaryearlengthinDays', view: L1.tropicalYearDays },
-  // The lattice route, which script.js keeps as a separate global.
-  { global: 'meansiderealyearlengthinDays_kinematic', view: L1.siderealYearDaysViaLattice },
+  // The lattice route (`siderealYearDaysViaLattice`) no longer has a browser
+  // global to compare against: `meansiderealyearlengthinDays_kinematic` is a
+  // J2000 constant since the year/day collapse. Its equality with the direct
+  // route is measured below (the 2-ULP check), not asserted.
 ];
 
 // t = 0 is EXCLUDED, deliberately. Since B.3b, resetEpochToJ2000 restores the

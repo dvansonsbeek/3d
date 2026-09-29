@@ -652,19 +652,20 @@ function computeEclipticInclinationFromBalanced(key, yearsSinceBalanced) {
 /**
  * Compute axial precession (in years per full cycle).
  *
- * Source: src/script.js:56123 — production uses ONLY the 3-arg RealLOD form
- * (callers at lines 23607, 55952). The earlier 2-arg version here hardcoded
- * 86400 as LOD which gave inconsistent precession when called with
- * meanLengthOfDay-based siderealYearSec (off by ~22 yr at J2000, ~488 yr at
- * deep time). Now: pass LOD explicitly; defaults to C.meanLengthOfDay for
- * the non-deep-time case (matches production).
+ * Source: src/script.js `computeAxialPrecessionYears` — ONE function, the day
+ * length is the argument (year/day plan §2c: the unit is not a function
+ * variant; the former "RealLOD" name and the SI-hardcoded twin are gone). An
+ * earlier 2-arg version here hardcoded 86400 as LOD, which gave inconsistent
+ * precession when called with meanLengthOfDay-based siderealYearSec (off by
+ * ~22 yr at J2000, ~488 yr at deep time). Pass LOD explicitly; defaults to
+ * C.meanLengthOfDay for the non-deep-time case (matches production).
  *
  * @param {number} siderealYearSec - sidereal year in seconds
  * @param {number} solarYearDays - solar year in days
  * @param {number} [lengthOfDay] - seconds per solar day (defaults to C.meanLengthOfDay)
  * @returns {number} axial precession period in years
  */
-function computeAxialPrecessionRealLOD(siderealYearSec, solarYearDays, lengthOfDay) {
+function computeAxialPrecessionYears(siderealYearSec, solarYearDays, lengthOfDay) {
   const lod = lengthOfDay !== undefined ? lengthOfDay : C.meanLengthOfDay;
   return siderealYearSec / (siderealYearSec - (solarYearDays * lod));
 }
@@ -846,8 +847,10 @@ function anomalisticYearDaysBase(year) {
   return (tropD * (Ht / 16)) / (Ht / 16 - 1);
 }
 
-/** Compute anomalistic year length with variable LOD, in seconds. */
-function computeLengthOfAnomalisticYearRealLOD(year, lengthOfDay) {
+/** Anomalistic year length in seconds at a given day length — the days
+ *  evaluator × the day length the caller picks (year/day plan §2c: the unit
+ *  is the argument, not a function variant; formerly "…RealLOD"). */
+function computeAnomalisticYearSecondsAtDayLength(year, lengthOfDay) {
   const anomDays = evalYearFourier(year, anomalisticYearDaysBase(year), C.ANOMALISTIC_YEAR_HARMONICS);
   return anomDays * lengthOfDay;
 }
@@ -1100,7 +1103,7 @@ function computeEarthOrbitalElements(year) {
   // Deep-time anchors + Fourier-varying year lengths
   const lengthOfDay = computeLengthOfDay(t_Ma);
   const siderealYearSec = siderealYearDays * lengthOfDay;
-  const precession = computeAxialPrecessionRealLOD(siderealYearSec, solarYearDays, lengthOfDay);
+  const precession = computeAxialPrecessionYears(siderealYearSec, solarYearDays, lengthOfDay);
   const perihelionLong = calcEarthPerihelionPredictive(year);
   const erd = calcERD(year);
 
@@ -1167,7 +1170,7 @@ module.exports = {
   computeEclipticInclinationFromBalanced,   // 8.3-1 S-P4: the canonical balanced-year form (scene-graph delegates here)
 
   // Precession
-  computeAxialPrecessionRealLOD,
+  computeAxialPrecessionYears,
   computePerihelionPrecession,
   computeInclinationPrecessionPeriod,
   computeObliquityPrecession,
@@ -1178,7 +1181,7 @@ module.exports = {
   computeLengthOfSolarYear,
   computeLengthOfSimplifiedSolarYear,
   computeLengthOfSiderealYear,
-  computeLengthOfAnomalisticYearRealLOD,
+  computeAnomalisticYearSecondsAtDayLength,
   computeLengthOfAnomalisticYearDays,
   computeLengthOfSolarYearSec,
   computeLengthOfSiderealYearSec,
