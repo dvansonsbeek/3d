@@ -1238,6 +1238,10 @@ function _deepCal() {
  * @returns {number} SI-year label
  */
 const _jdToSIyear = (jd) => _deepCal().jdToSIyear(jd);
+/** The exact inverse (the Moon layers' argument clock reads the lunar
+ *  arguments at the JD of the SI year the dispatch passes). ONE home.
+ *  @param {number} ySI @returns {number} JD */
+function siYearToJD(ySI) { return _deepCal().siYearToJD(ySI); }
 
 /**
  * Inverse of `_cumulIntegralAtYear` — the year at a given cumulative ∫1/H dt.
@@ -1422,6 +1426,7 @@ module.exports = {
   // Step 6a's `Cycle` column needs all four; `SI_TROPICAL_YEAR_DAYS` is the
   // axis they share, exported so a caller cannot re-derive it differently.
   _jdToSIyear,
+  siYearToJD,
   _yearAtCumulIntegral,
   yearToJDDeepTime,
   balancedYearAtCycle,

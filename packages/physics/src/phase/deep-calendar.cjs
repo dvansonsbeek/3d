@@ -52,6 +52,7 @@
  *   scene's precession rotations integrate on this axis; a fit on it agrees
  *   with the runtime by construction; the round-trip bias Y_SI − Y is −11.0 yr
  *   at −302,635 and grows quadratically).
+ * @property {(ySI: number) => number} siYearToJD the exact inverse of jdToSIyear.
  * @property {(targetCumul: number) => (number | null)} yearAtCumulIntegral
  *   inverse of the phase machinery's cumulAtYear — null outside the table.
  * @property {() => void} ensureCumulDaysTable builds the ∫ daysPerYear dt table
@@ -103,6 +104,10 @@ function createDeepCalendar({
 }) {
   /** @type {(jd: number) => number} */
   const jdToSIyear = (jd) => startModelYearWithCorrection + (jd - startModelJD) / siTropicalYearDays;
+  /** The exact inverse: SI-year label → JD (the Moon layers' argument clock
+   *  reads the lunar arguments at the JD of the SI year the dispatch passes).
+   *  @type {(ySI: number) => number} */
+  const siYearToJD = (ySI) => startModelJD + (ySI - startModelYearWithCorrection) * siTropicalYearDays;
 
   /** @type {(targetCumul: number) => (number | null)} */
   const yearAtCumulIntegral = (targetCumul) => phase().yearAtCumul(targetCumul);
@@ -191,6 +196,7 @@ function createDeepCalendar({
 
   return Object.freeze({
     jdToSIyear,
+    siYearToJD,
     yearAtCumulIntegral,
     ensureCumulDaysTable,
     yearToJD,

@@ -431,6 +431,16 @@ ring's plane follows the ecliptic of date — 0.09–0.22° from the rendered Mo
 orbit plane at every epoch, where the device's flat J2000 base had read 0.54°
 at −3 kyr, 3.8° at −30 kyr and 8.7° at −5 Myr (measured on the Node twin, the
 plane normal of the raw ring track against the rendered track over a month).
+The moon layer's in-plane clock is the arguments' own F = L′ − Ω — the SAME
+lunar arguments the rendered Moon and the eclipse finders ride (the
+draconitic-month cycle count it replaced lacked the arguments' L′ completion
+and let the ring's Moon lag the rendered one by 1.7° at −3 kyr, 16° at
+−10 kyr, 81° at −30 kyr) — and the rendered distance rides the recession
+(the series' distance column carries the J2000 mean; × a(t)/a₀ from the
+month chain, 1 at J2000: −77 m at −2 kyr, +3.7 km at +100 kyr). Measured on
+the Node twin after both: the ring's Moon and the rendered Moon agree to
+0.2–0.4° mean separation at every epoch — the periodic-terms floor, the
+Meeus latitude series being the only thing the override still adds.
 The Meeus latitude series (the full 60-term Ch. 47
 table plus the derived extension tails) is the source of the PERIODIC
 perturbation terms and drives the displayed position; the secular geometry

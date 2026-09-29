@@ -20,6 +20,10 @@ export type DeepCalendar = {
      */
     jdToSIyear: (jd: number) => number;
     /**
+     * the exact inverse of jdToSIyear.
+     */
+    siYearToJD: (ySI: number) => number;
+    /**
      *   inverse of the phase machinery's cumulAtYear — null outside the table.
      */
     yearAtCumulIntegral: (targetCumul: number) => (number | null);
@@ -60,6 +64,7 @@ export type DeepCalendar = {
  *   scene's precession rotations integrate on this axis; a fit on it agrees
  *   with the runtime by construction; the round-trip bias Y_SI − Y is −11.0 yr
  *   at −302,635 and grows quadratically).
+ * @property {(ySI: number) => number} siYearToJD the exact inverse of jdToSIyear.
  * @property {(targetCumul: number) => (number | null)} yearAtCumulIntegral
  *   inverse of the phase machinery's cumulAtYear — null outside the table.
  * @property {() => void} ensureCumulDaysTable builds the ∫ daysPerYear dt table

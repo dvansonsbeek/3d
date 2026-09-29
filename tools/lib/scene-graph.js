@@ -193,6 +193,13 @@ function _moonChainCyclesTools(periodFn, yearA, yearB) {
 // Named moon-chain wrappers (mirror of src/script.js meanMoon*Between family;
 // used by both the deep-time argument branch and the layer integrator branch)
 const _mcDraconic      = (a, b) => _moonChainCyclesTools(DT.meanNodalMonthAtAge, a, b);
+// ONE L′ clock for the ring's Moon (mirrors src/script.js
+// moonArgumentOfLatitudeCyclesBetween, identical ops): the moon layer's
+// in-plane angle is the arguments' F = L′ − Ω, counted from the anchor.
+const _mcArgF = (a, b) => {
+  const F = (y) => _moonArgsM().argsAt(DT.siYearToJD(y)).F;
+  return ((((F(b) - F(a)) % 360) + 360) % 360) / 360;
+};
 const _mcTropical      = (a, b) => _moonChainCyclesTools(DT.meanTropicalMonthAtAge, a, b);
 const _mcAnomalistic   = (a, b) => _moonChainCyclesTools(DT.meanAnomalisticMonthAtAge, a, b);
 const _mcApsidalOfDate = (a, b) => {
@@ -958,7 +965,7 @@ function buildSceneGraph() {
     speed: (Math.PI * 2) / (1 / (C.meanSolarYearDays / C.moonNodalMonth)),  // draconitic (nodal-month) clock
     eccentricity: C.moonOrbitalEccentricity,
     lunarPerturbations: true,
-    _dtMoonIntegrator: _mcDraconic, _dtMoonSign: +1,   // Phase 9.13 mirror (draconitic clock)
+    _dtMoonIntegrator: _mcArgF, _dtMoonSign: +1,   // the arguments' F (was the draconitic-month count; Phase 9.13 mirror)
   };
   const moonNodes = makeObjectNodes('moon', moonDef);
   moonNodalPrec.pivot.addChild(moonNodes.container);
@@ -1257,7 +1264,13 @@ function moveModel(graph, pos) {
       // in dynamical time — this shift was MISSING in the tools mirror (the
       // browser had it), which was the whole browser-vs-tools deep-time delta
       // (~4 yr of ΔT at +200 kyr → args differing by ~150° in ϖ).
-      const d = _jdTTToolsFromUT(_jdFromPosTools(pos)) - C.j2000JD;
+      const _jdUTm = _jdFromPosTools(pos);
+      const d = _jdTTToolsFromUT(_jdUTm) - C.j2000JD;
+      // Scene-ring item 2 (mirrors src/script.js): the series distance on the
+      // recession — the chain's a(t)/a₀ at the block's age (1 in snapshot mode).
+      const _aRatio = DEEP_TIME_ENABLED
+        ? DT.meanMoonDistanceAtAge((C.startmodelYear - jdToDecimalYear(_jdUTm)) / 1e6) / DT.meanMoonDistanceAtAge(0)
+        : 1;
       // Phase 8.2-6: the full evaluation lives in @essrt/physics/moon/series
       // (shared with the browser scene block — one implementation). The
       // engine keeps the pos→JD_TT conversion above and the node writes.
@@ -1268,7 +1281,7 @@ function moveModel(graph, pos) {
       nodes._meeusT = _sr.T;
       // Series distance — exposed on the computePlanetPosition result so
       // meters can pair override angles with the OVERRIDE distance.
-      nodes._meeusDistKm = _sr.distKm;
+      nodes._meeusDistKm = _sr.distKm * _aRatio;
     }
     if (nodes.isEllipse) {
       const x = Math.cos(θ) * nodes.a;

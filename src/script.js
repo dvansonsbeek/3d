@@ -7404,7 +7404,19 @@ const moon = {
 // Moon position under Farhat-evolving sidereal-month period. Anchor matches
 // Earth's `_dtCycleAnchor = STARTMODEL_YEAR_SI` so the integrator returns
 // 0 at startmodel (preserves modern J2000 Moon position).
-moon._dtMoonIntegrator = meanMoonDraconicOrbitsBetween;  // draconitic clock (was tropical)
+// ONE L′ clock for the ring's Moon (scene-ring follow-up, 2026-09): the layer's
+// in-plane angle is the argument of latitude F = L′ − Ω of the SAME lunar
+// arguments the rendered Moon and the eclipse finders ride, counted from the
+// anchor (0 there — the J2000 pose and the startPos anchors are untouched).
+// The draconitic-month cycle count it replaces lacked the arguments' L′
+// completion: the raw Moon lagged the rendered one by 1.7° at −3 kyr, 16° at
+// −10 kyr, 81° at −30 kyr (measured on the Node twin). Identical ops in
+// tools/lib/scene-graph.js (_mcArgF).
+function moonArgumentOfLatitudeCyclesBetween(anchorYearSI, yearSI) {
+  const F = (y) => _moonArgsM().argsAt(_deepCal().siYearToJD(y)).F;
+  return ((((F(yearSI) - F(anchorYearSI)) % 360) + 360) % 360) / 360;
+}
+moon._dtMoonIntegrator = moonArgumentOfLatitudeCyclesBetween;  // the arguments' F (was the draconitic-month count)
 moon._dtMoonSign       = +1;  // Moon orbits prograde (eastward)
 moon._dtMoonAnchor     = STARTMODEL_YEAR_SI;
 
@@ -54344,9 +54356,17 @@ function moveModel(pos) {
       // consistent with the same ΔT model used by the Sun wrapper and the
       // eclipse geometry code.
       let d = o.julianDay - j2000JD;
+      // Scene-ring item 2: the series' distance column carries the J2000 mean
+      // distance, while the ring's radius rides the recession history — the
+      // rendered Moon sat ~4 km inside/outside its ring at ±100 kyr, ~76 km at
+      // ±2 Myr. The rendered distance is scaled by the chain's a(t)/a₀ at the
+      // same age this block already uses for ΔT (1 in snapshot mode). Mirror:
+      // tools/lib/scene-graph.js.
+      let _aRatio = 1;
       if (DEEP_TIME_MODE_ENABLED) {
         const decYear_d = julianDateToDecimalYear(o.julianDay);
         const t_Ma_d = (J2000_CALENDAR_YEAR - decYear_d) / 1e6;
+        _aRatio = meanMoonDistanceAtAge(t_Ma_d) / meanMoonDistanceAtAge(0);
         const deltaT_sec_d = meanDeltaTSecondsAtAge(t_Ma_d);
         if (Number.isFinite(deltaT_sec_d)) {
           // Plan 06 R3 item 2 — THE SCENE CLOCK IS TRUE TT: the model's absolute
@@ -54370,7 +54390,7 @@ function moveModel(pos) {
       obj._meeusLatRad = _sr.latRad;
       obj._meeusLonDeg = _sr.lonDeg;   // ecliptic longitude in degrees (geometric; the derived extension inside, the retired Lp anchor reads 0)
       obj._meeusT = _sr.T;             // store T for obliquity computation
-      obj._meeusDistKm = _sr.distKm;   // matches _meeusMoonDistance / eclipse dispatchers
+      obj._meeusDistKm = _sr.distKm * _aRatio;   // the series distance on the recession (1 at J2000; matches _meeusMoonDistance / eclipse dispatchers there)
     }
 
     // Dynamic geocentric elipticOrbit for Type II + III planets

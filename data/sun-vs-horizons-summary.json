@@ -846,7 +846,7 @@
     "generator": "node tools/verify/sun-vs-horizons.js --write",
     "files": {
       "data/jpl-sun-ecliptic-longitude-tt.json": "sha256:1b3ef502d849b1a3cbffca70e91fe7ed29b6331073688b81addf617a9e8d5ed5",
-      "data/nbody-secular-series.json": "sha256:e2f0e28b3ee5f826b5aa580e157c5b084598d14bc2fc90cd3133fbfe1e1955db",
+      "data/nbody-secular-series.json": "sha256:69e799372ed033cf6791dfa0421261361b6cb600a7db06b05d44234111dd2580",
       "packages/physics/src/climate/l1-orbital.cjs": "sha256:fb683b5334c84b12d0034d692101a867c63acdd9a74903bc2ae52bc82856ee39",
       "packages/physics/src/deltat/cycles.cjs": "sha256:da684bd21865005f05ceec845683f1549efc17d5b11aeac2cf362b3f8e52bf99",
       "packages/physics/src/deltat/deep-time.cjs": "sha256:42334b8c071a8d320312ad8f116c95360501f055757cbf1888d4822f708ace47",
