@@ -1515,7 +1515,7 @@
   "script": "scripts/t7_fixed_phase_l1.py",
   "plan": "holisticuniverse plan 06 \u00a74 T7",
   "doc": "docs/92-climate-formula.md",
-  "runtime_sec": 25.149829626083374,
+  "runtime_sec": 27.315793991088867,
   "environment": {
    "python": "3.12.3",
    "numpy": "2.4.1",
@@ -1525,7 +1525,7 @@
  "inputs": {
   "generator": "python3 scripts/t7_fixed_phase_l1.py --write",
   "files": {
-   "data/l1-physical-lines.json": "sha256:7a8a800a1b0d67dddc5355cbb99cf5aa66fe3923f3a3ee18b91d721a1df19418",
+   "data/l1-physical-lines.json": "sha256:c253a2cd7dde35ef6ae1772cc137622713427ef935413c7d5db03db4c0a1a223",
    "data/la2004-earth-51myr-back.asc": "sha256:3f13b9f8e69085baf40bc67a2669e6f6af4148fef9218ed2158772aa91e35f8c",
    "data/lr04-stack.txt": "sha256:7d1a6ca7ffc033e45e20fb76a7f39c8d99df87baa1094260f9dbdc09f0bb8945",
    "data/t7-model-orbital-histories.json": "sha256:629be8dc0ac4dd8c035ff8542a80fd376d0508b5ed07c373b897cef5fe75c82f",

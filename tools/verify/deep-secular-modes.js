@@ -23,8 +23,12 @@
  * PROVENANCE CHAIN (the 337-MB dump is untracked — too large for git):
  *   1. the run:   node tools/explore/lattice-long-window-test.mjs \
  *                   years=20000000 integrator=wh dt=2 order=2 gr=1 \
- *                   frame=both sample=20000            (~3.4 h)
+ *                   frame=both sample=20000 lunar=1 asteroids=1   (~3.4 h)
  *      → tools/explore/lattice-long-window-ecliptic-20000000-gr.local.json
+ *      (the calibrated lunar quadrupole on the Sun–EMB interaction and
+ *      Ceres/Vesta/Pallas as force-only bodies — the dump's `physics` block
+ *      records both and is copied into meta; the pre-lunar twin
+ *      `…-gr-pre-lunar.local.json` is the point-mass record)
  *   2. --write here: decimate 4× (80,000-d sampling still oversamples the
  *      fastest secular period ~200×; validated — identical frequencies to
  *      the undecimated extraction), NAFF at 18 terms (~75 min), verdict
@@ -41,11 +45,22 @@
  *   - the strongest Earth e-beat period inside the REGISTERED T5c window
  *     395–415 kyr (the criterion the single H/3 line cannot meet).
  *
- * MEASURED CONTEXT banked with the verdict (the 409.4-vs-405.6 anatomy,
- * plan 02 §8): g5 exact to 0.0002 ″/yr; the 0.9% beat gap is g2 0.029 ″/yr
- * low — omitted bodies (separate Moon, asteroids; the measured sensitivity
- * class: 1PN moved g1 by +0.47 ″/yr) plus g2's own chaotic diffusion
- * (measured window sensitivity: 1-Myr 7.3956 vs 20-Myr 7.4230).
+ * MEASURED CONTEXT banked with the verdict (doc 109 §17): g5 matches La2004
+ * to 0.0001 ″/yr. The point-mass run (EMB merged, no asteroids — the
+ * pre-lunar dump) read g2 = 7.4230 ″/yr, 0.029 ″/yr (0.39 %) below La2004's
+ * 7.452, beat 409.4 kyr; the shipped run's lunar quadrupole + asteroids move
+ * g2 to 7.4524 (the lab's asteroid measurement is null for Earth, so it is
+ * the Moon) — on La2004 to its published digits (La2010a: 7.453; the
+ * literature's own 100-Myr wander of g2 is 0.019 ″/yr) — and the beat to
+ * 405.6 against La2004's 405.7 and the rock value 405.6. No gap remains to
+ * attribute. Measured with naff-frequencies.mjs on the two dumps. The same
+ * pair in the time domain: the shipped run's Earth e(t) tracks La2004 at
+ * 3e-5 rms over the last 500 kyr and 7e-5 over 5–10 Myr; the point-mass run
+ * departs to 7e-4 and 1e-2 on the same windows.
+ *
+ * REFERENCE VALUES: La2004's main secular frequencies as tabulated in
+ * Laskar et al. (2011), A&A 532, A89, Table 6 (La2004 | La2010a columns):
+ * g2 7.452 | 7.453, g5 4.257452 | 4.257482.
  */
 'use strict';
 
@@ -59,7 +74,7 @@ const { ROOT, buildInputsBlock } = require('../lib/artifact-inputs');
 const WRITE = process.argv.includes('--write');
 const OUT = path.join(ROOT, 'data', 'nbody-deep-secular-modes.json');
 const DUMP = path.join(ROOT, 'tools', 'explore', 'lattice-long-window-ecliptic-20000000-gr.local.json');
-const RUN_CMD = 'node tools/explore/lattice-long-window-test.mjs years=20000000 integrator=wh dt=2 order=2 gr=1 frame=both sample=20000';
+const RUN_CMD = 'node tools/explore/lattice-long-window-test.mjs years=20000000 integrator=wh dt=2 order=2 gr=1 frame=both sample=20000 lunar=1 asteroids=1';
 const DECIMATE = 4;
 const NAFF_TERMS = 18;
 // Stage C: the obliquity hybrid consumes the deep ζ table — 16 terms
@@ -72,6 +87,10 @@ const RAD2AS = (180 / Math.PI) * 3600;
 // Laskar 2004 Table 3 reference values — THEORY labels, never inputs.
 const LA2004 = { g5: 4.2575, g2: 7.452 };
 const ROCK_METRONOME_KYR = 405.6;   // the rock-record long-eccentricity period (plan 04 leg)
+// The point-mass twin's g2 (the pre-lunar 20-Myr dump, EMB merged, no
+// asteroids; naff-frequencies.mjs terms=6) — a RECORD for the verdict note,
+// never an input: that dump is untracked and not read here.
+const POINT_MASS_G2 = 7.4230;
 
 /** @param {{omegaRadPerYr:number,re:number,im:number}[]} Z @returns {{beatArcsecPerYr:number,beatPeriodKyr:number,lines:{periodKyr:number,amp:number}[]}} */
 function beatVerdict(Z) {
@@ -155,6 +174,11 @@ if (!(v.beatPeriodKyr >= 395 && v.beatPeriodKyr <= 415)) {
 }
 const la2004BeatPeriodKyr = 1296000 / (LA2004.g2 - LA2004.g5) / 1000;
 const inBand = (lo, hi) => { const l = v.lines.find((q) => q.periodKyr >= lo && q.periodKyr <= hi); return l ? l.periodKyr : null; };
+// the verdict note's numbers are WRITTEN from this extraction (the second
+// Earth z-mode by amplitude is g2 — asserted, so the note cannot mislabel)
+const g2 = earthZ[1].omegaRadPerYr * RAD2AS;
+if (Math.abs(g2 - LA2004.g2) > 0.05) { console.error(`REFUSING: Earth second z-mode ${g2.toFixed(4)} ″/yr is not g2-class (La2004 ${LA2004.g2} ± 0.05)`); process.exit(1); }
+const verdictNote = `g5 matches La2004 to ${Math.abs(lead - LA2004.g5).toFixed(4)} ″/yr and g2 (${g2.toFixed(4)}) to ${Math.abs(g2 - LA2004.g2).toFixed(4)} ″/yr (La2004 ${LA2004.g2}, La2010a 7.453) — the point-mass run read ${POINT_MASS_G2.toFixed(4)} (EMB merged, no asteroids; the pre-lunar dump), ${(LA2004.g2 - POINT_MASS_G2).toFixed(3)} ″/yr low; the lunar quadrupole + asteroids this run carries supply ${(g2 - POINT_MASS_G2).toFixed(4)} ″/yr (the lab’s asteroid effect on Earth is null, so it is the Moon) and close that gap — doc 109 §17.`;
 
 const art = {
   _description: 'Engine-D DEEP-TIME secular mode table from the model’s own ±10-Myr N-body run (WH order-2, dt 2 d, 1PN, NAFF 18 terms on the 4×-decimated series) — the two-tier Earth-z design’s deep-time law (plan 02 §8 Stage B). Ecliptic-J2000 z-modes (z = e·e^{iϖ} = Σ (re+i·im)·e^{iωt}, t years from J2000), all eight planets. The 1-Myr era-local table (nbody-secular-frequencies.json) stays the in-window evaluator; NO consumer reads this table until its T5d-revised per-consumer gate passes (registered in the plan). La2004 values are theory reference labels, never inputs; the falsification criterion keeps the ROCK 405.6-kyr metronome as its reference. See tools/verify/deep-secular-modes.js for the assertions carried.',
@@ -163,13 +187,16 @@ const art = {
     gr: D.gr, seed: 'JPL Horizons J2000 heliocentric state vectors (tools/explore/j2000-state.mjs, the one home)',
     masses: 'DE440 mass ratios (astro-reference physicalConstants)',
     runCommand: RUN_CMD,
+    // the dump's own provenance block: the lunar quadrupole (calibrated
+    // effective factor) and the force-only asteroids the run carried
+    physics: D.physics ?? null,
     dumpFile: 'tools/explore/lattice-long-window-ecliptic-20000000-gr.local.json (untracked, 337 MB)',
     dumpSha256: dumpSha,
     conservationMaxDE: maxDE,
     decimation: DECIMATE, naffTerms: NAFF_TERMS, naffZetaTerms: NAFF_ZETA_TERMS,
     naffZetaTermsEra: NAFF_ZETA_TERMS_ERA,
     frame: 'ecliptic-J2000 (z-modes for the lunar-chain e; ζ-modes for the Stage-C obliquity hybrid — the invariable-frame ζ table remains unbanked, no consumer)',
-    laskarRef: 'Laskar, J. et al. (2004), A&A 428, 261–285, Table 3 (theory reference labels)',
+    laskarRef: 'Laskar, J. et al. (2004), A&A 428, 261–285, Table 3, as tabulated beside La2010a in Laskar et al. (2011), A&A 532, A89, Table 6 (theory reference labels)',
   },
   verdict: {
     strongestBeatPeriodKyr: v.beatPeriodKyr,
@@ -180,7 +207,7 @@ const art = {
     companion95Kyr: inBand(90, 100),
     earthLeadingModesArcsecPerYr: earthZ.slice(0, 4).map((m) => m.omegaRadPerYr * RAD2AS),
     topBeatLines: v.lines.map((l) => ({ periodKyr: l.periodKyr, productAmp: l.amp })),
-    note: 'g5 matches La2004 to 0.0002 ″/yr; the beat gap vs 405.6 is g2 (chaotic-diffusion window sensitivity + omitted separate-Moon/asteroid terms) — the anatomy is the plan’s Stage-B record.',
+    note: verdictNote,
   },
   modes: MT.modes,
   // The era-tier ζ table (pure 8-term extraction — the Stage-C obliquity

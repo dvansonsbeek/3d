@@ -87,6 +87,27 @@ solar/lunar eclipse search over a JD window, greatest-eclipse convention),
 records and orientation at epoch). Validation targets are refused as
 inputs — a counterfactual cannot move the goalposts it is judged by.
 
+### The series artifact
+
+Earth's published orbit history (eccentricity, perihelion, obliquity) is
+the engine's banked N-body series — a 9-MB governed artifact kept in the
+[public repository](https://github.com/dvansonsbeek/3d)
+(`data/nbody-secular-series.json`), not inside this package. Pass it in to
+get the published values:
+
+```js
+const series = JSON.parse(readFileSync('nbody-secular-series.json', 'utf8'));
+const model = createModel(undefined, { secularSeriesArtifact: series });
+model.earth.eccentricity(2000 - 100000);   // 0.04008 — the series (La2004: 0.04006)
+createModel().earth.eccentricity(2000 - 100000);   // 0.03374 — the mode table
+```
+
+Without the artifact `createModel()` evaluates the embedded 18-term mode
+table at every epoch: exact at J2000, a compact approximation away from it
+(RMS 3.6·10⁻³ in e against La2010a over the last 500 kyr, where the series
+reads 2.5·10⁻⁵). The hosted API, the MCP server and the simulator always
+pass the artifact.
+
 ## Underneath: a parts library
 
 `createModel()` is assembly over unassembled factories. Each factory

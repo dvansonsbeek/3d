@@ -112,7 +112,13 @@ tried first and is a recorded negative result: worse than RK4 at equal cost
 (−74 ″/cy at 0.25 d). The engine's physics content — the Sun and eight
 planets as point masses with the Earth–Moon system as one body; not the
 Moon separately, not the Sun's J₂, not asteroids, not Earth's spin — is
-stated in the module header so that a run's scope is not overstated.
+stated in the module header so that a run's scope is not overstated. Two
+optional ingredients extend it, each recorded in the dump's `physics`
+block: `lunar=1`, the Moon's quadrupole on the Sun–EMB interaction at a
+coefficient calibrated against a real-Moon run, and `asteroids=1`, Ceres,
+Vesta and Pallas as force-only bodies. The shipped ±10-Myr run carries
+both (§17 measures what they change); the 1-Myr era-local run carries
+neither.
 Beyond ~5 Myr a single trajectory is one realisation of a chaotic system:
 frequencies and amplitudes are robust, phases are not.
 
@@ -656,17 +662,43 @@ offset beyond. Measured: ė −4.236e-5/cy, the perigee curvature −37.4″/cy�
 the deep-time modulation moved by 5e-5 at 1 Ma; the era chain and the
 Eccentricity panel are untouched (they never read this channel).
 
-Anatomy of the residual gap to the rock value (measured, plan 02 §8
-Stage-B record): the engine's g5 matches La2004 to 0.0002 ″/yr; the
-whole beat gap is g2 sitting ≈ 0.4 % low, which decomposes into the
-deliberately minimal ingredient list (the Earth–Moon pair merged into
-its barycenter, no asteroids — the measured sensitivity class: 1PN
-alone moves g1 by +0.47 ″/yr) plus g2's own chaotic diffusion (measured
-in our own data as a 0.027 ″/yr shift between the 1-Myr and 20-Myr
-window estimates — the size of the entire gap). The attribution
-experiment (Moon as a tenth body + the big-four asteroids, each
-ingredient's shift measured separately) is queued as a research
-follow-up. Two standing readings: the falsification criterion keeps
+Anatomy of the beat against La2004 and the rock value — MEASURED. The
+engine's g5 matches La2004 to 0.0001 ″/yr, so the beat is decided by g2.
+On the point-mass ingredient list (the Earth–Moon pair merged into its
+barycenter, no asteroids) the 20-Myr run read g2 = 7.4230 ″/yr, 0.029 ″/yr
+(0.39 %) below La2004's 7.452, and the beat 409.4 kyr. The shipped
+table's run carries the calibrated lunar quadrupole on the Sun–EMB
+interaction and Ceres, Vesta and Pallas as force-only bodies (the dump's
+`physics` block, copied into the artifact's meta; the lab's own
+measurement puts the asteroids at null for Earth, so the shift is the
+Moon's): g2 reads <!--v:earthDeepG2ArcsecPerYr-->7.4524<!--/v--> ″/yr —
+on La2004 to its published digits (La2010a gives 7.453; the literature's
+own 100-Myr wander of g2 is 0.019 ″/yr) — and the beat
+<!--v:earthDeepBeatPeriodKyr-->405.6<!--/v--> kyr against La2004's
+<!--v:earthDeepBeatLa2004PeriodKyr-->405.7<!--/v--> and the rock value
+<!--v:earthDeepBeatRockKyr-->405.6<!--/v-->. No gap remains to attribute.
+g3 and g4 moved the same way (17.3560 → 17.3689 and 17.9055 → 17.9170
+″/yr, against La2004's 17.368 and 17.916), g5 not at all. Measured with
+`tools/explore/naff-frequencies.mjs` on the two 20-Myr dumps (the shipped
+one and its pre-lunar twin, both untracked). A short window cannot make
+this measurement: on the point-mass run the 1-Myr estimate of g2 reads
+7.3956 against the 20-Myr 7.4230.
+
+The same pair in the time domain (`tools/explore/ecc-dump-vs-la2004.mjs`,
+theory against theory, zero lag): the shipped run's Earth e(t) tracks
+La2004 at 3.0·10⁻⁵ rms over the last 500 kyr, 3.4·10⁻⁵ over 1–2 Myr and
+7.1·10⁻⁵ over 5–10 Myr; the point-mass run departs to 6.8·10⁻⁴, 2.3·10⁻³
+and 1.0·10⁻² on the same windows. The published series (the 500-yr
+resampling of the shipped run) reads 2.5·10⁻⁵ against La2010a over the
+last 500 kyr — the figure `tools/explore/deep-ecc-history.mjs` draws. A
+`createModel()` built WITHOUT the series artifact is a different
+evaluator (the 18-term mode table everywhere) and reads 3.6·10⁻³ on the
+same comparison: every published surface passes the artifact.
+
+The reference values are La2004's main secular frequencies as tabulated
+beside La2010a in Laskar et al. (2011, A&A 532, A89, Table 6) — theory
+labels, never inputs.
+Two standing readings: the falsification criterion keeps
 using the ROCK metronome, never the engine's reproduction of it; and
 per the registered two-tier decision the 1-Myr era-local table remains
 the in-window evaluator — this deep table owns deep time.

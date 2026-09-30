@@ -9,6 +9,19 @@ export const DEEP_MODES_ARTIFACT: Readonly<{
         seed: string;
         masses: string;
         runCommand: string;
+        physics: {
+            lunarQuadrupole: {
+                qTilde: number;
+                aEmKm: number;
+                effectiveFactor: number;
+                provenance: string;
+            };
+            asteroids: {
+                ceres: number;
+                pallas: number;
+                vesta: number;
+            };
+        };
         dumpFile: string;
         dumpSha256: string;
         conservationMaxDE: number;
@@ -139,4 +152,4 @@ export const DEEP_MODES_ARTIFACT: Readonly<{
     anchorZDotPerYr: number[];
     slopeTaperYears: 27943.083333333332;
 }>;
-export const DEEP_MODES_ARTIFACT_HASH: "77e0baf779e85de5";
+export const DEEP_MODES_ARTIFACT_HASH: "cbdc477b7442c333";

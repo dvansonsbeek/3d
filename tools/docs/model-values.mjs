@@ -2110,7 +2110,7 @@ export const VALUES = {
       earthDeepG2ArcsecPerYr: {
         get: () => dm().verdict.earthLeadingModesArcsecPerYr[1],
         render: (v) => Number(v).toFixed(4), unit: '″/yr',
-        note: 'Earth deep z second mode (g2, Venus’s term) — La2004 gives 7.452; the 0.4% gap is the measured omitted-body + chaotic-diffusion budget (plan 02 §8 Stage-B anatomy)',
+        note: 'Earth deep z second mode (g2, Venus’s term) — La2004 gives 7.452, La2010a 7.453 (theory labels); the point-mass run read 7.4230, and the shipped run’s lunar quadrupole + asteroids close that 0.029 ″/yr gap (doc 109 §17)',
       },
       deepRunSpanYears: {
         get: () => dm().meta.spanYears,

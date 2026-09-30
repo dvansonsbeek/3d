@@ -846,7 +846,7 @@
     "generator": "node tools/verify/sun-vs-horizons.js --write",
     "files": {
       "data/jpl-sun-ecliptic-longitude-tt.json": "sha256:1b3ef502d849b1a3cbffca70e91fe7ed29b6331073688b81addf617a9e8d5ed5",
-      "data/nbody-secular-series.json": "sha256:69e799372ed033cf6791dfa0421261361b6cb600a7db06b05d44234111dd2580",
+      "data/nbody-secular-series.json": "sha256:c22ec8baeed91c80ad3b0f4ae32c3e29b1066e5157a665a607628e6d0a55b2e0",
       "packages/physics/src/climate/l1-orbital.cjs": "sha256:fb683b5334c84b12d0034d692101a867c63acdd9a74903bc2ae52bc82856ee39",
       "packages/physics/src/deltat/cycles.cjs": "sha256:da684bd21865005f05ceec845683f1549efc17d5b11aeac2cf362b3f8e52bf99",
       "packages/physics/src/deltat/deep-time.cjs": "sha256:42334b8c071a8d320312ad8f116c95360501f055757cbf1888d4822f708ace47",
@@ -857,7 +857,7 @@
       "packages/physics/src/model.js": "sha256:88fd4ff7942aa1e71ba9418be2cb404438ec535b20775d5f389786dd52231e3b",
       "packages/physics/src/moon/arguments.cjs": "sha256:d40f15e0ced6311754bc1350a66854a917112a58a6995250b110fddca4073e3b",
       "packages/physics/src/moon/deep-ecc-channel.cjs": "sha256:7ce15d1c4f61f2ea730d7673d705a1eb2a31bff20b720cd00d8f1d34a3e85220",
-      "packages/physics/src/moon/deep-modes-artifact.cjs": "sha256:e4e3cd59684cccf8e61fd01cbec02390cdc20614b1523b22192eb6fca7e7f08d",
+      "packages/physics/src/moon/deep-modes-artifact.cjs": "sha256:a9e51a569b09bccdb46122d4592003c999e809ec2a6e0ed61ea8df05a04e666c",
       "tools/explore/fetch-jpl-sun-longitude-tt.mjs": "sha256:e067a851ecb54bc3cf70afa9b1c8d48ea27219a8b6de4a05aedcd02e2447488c",
       "tools/verify/sun-vs-horizons.js": "sha256:6ba810a37c6762faa56df4dee879749ba3ad8cc623233dfc3f34bea8494eeb2b"
     }

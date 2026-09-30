@@ -21,7 +21,11 @@ const SITE = process.env.ESSRT_SITE_DIR;
 const OUT = KV.out || (SITE ? SITE.replace(/\/$/, '') + '/public/img/109_earth_deep_ecc.svg' : ROOT + 'tools/explore/deep-ecc-history.local.svg');
 const FROM = Number(KV.from || -1000000), TO = Number(KV.to || 200000), STEP = 500;
 
-const model = createModel();
+// The SHIPPED surface reads the banked series — createModel() WITHOUT the
+// artifact is a different evaluator (the 18-term mode-table tail: measured
+// RMS 3.62e-3 against La2010a where the series reads 2.5e-5; plan 06 R1's
+// trap, which this figure carried until the series was passed here).
+const model = createModel(undefined, { secularSeriesArtifact: JSON.parse(readFileSync(ROOT + 'data/nbody-secular-series.json', 'utf8')) });
 const la = JSON.parse(readFileSync(ROOT + 'public/input/la2010-orbital-elements.json', 'utf8'));
 const laRows = la.data.map((r) => [r.year, r.eccentricity]);   // year: 0 = J2000 epoch of the file (years before present)
 
@@ -45,7 +49,7 @@ const X = (y) => L + (y - FROM) / (TO - FROM) * (W - L - R), Y = (e) => T + (1 -
 let svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${W} ${H}" width="${W}" height="${H}" font-family="Inter, system-ui, sans-serif">`;
 svg += `<rect width="${W}" height="${H}" fill="${COL.bg}"/>`;
 svg += `<text x="${W / 2}" y="24" text-anchor="middle" font-size="17" font-weight="700" fill="${COL.text}">Earth's eccentricity through deep time — the model's own dynamics against Laskar 2010</text>`;
-svg += `<text x="${W / 2}" y="40" text-anchor="middle" font-size="11" fill="${COL.dim}">Rust: the shipped model (the engine's own N-body secular series). Blue: La2010a over its −500-kyr span — theory against theory: RMS ${(rms * 1e3).toFixed(2)}·10⁻³, max ${(maxAbs * 1e3).toFixed(2)}·10⁻³ over ${n} points.</text>`;
+svg += `<text x="${W / 2}" y="40" text-anchor="middle" font-size="11" fill="${COL.dim}">Rust: the shipped model (the engine's own N-body secular series). Blue: La2010a over its −500-kyr span — theory against theory: RMS ${(rms * 1e5).toFixed(1)}·10⁻⁵, max ${(maxAbs * 1e5).toFixed(1)}·10⁻⁵ over ${n} points.</text>`;
 svg += `<text x="${W / 2}" y="54" text-anchor="middle" font-size="11" fill="${COL.dim}">Ticks: the envelope maxima of the model curve and their spacing (which ~100-kyr peak tops the envelope sets it here; the long-eccentricity beat itself is measured in the ±10-Myr table).</text>`;
 // grid + axes
 for (let e = 0; e <= eMax + 1e-9; e += 0.01) { svg += `<line x1="${L}" y1="${Y(e).toFixed(1)}" x2="${W - R}" y2="${Y(e).toFixed(1)}" stroke="${COL.grid}" stroke-width="1"/><text x="${L - 6}" y="${(Y(e) + 3.5).toFixed(1)}" text-anchor="end" font-size="10" fill="${COL.dim}">${e.toFixed(2)}</text>`; }
@@ -75,5 +79,5 @@ svg += '</svg>';
 if (SITE && !existsSync(SITE)) { console.error(`ESSRT_SITE_DIR not found: ${SITE}`); process.exit(1); }
 writeFileSync(OUT, svg);
 console.log(`maxima (kyr): ${maxima.map(([y]) => (y / 1000).toFixed(0)).join(', ')} · spacings: ${maxima.slice(1).map(([y], i) => ((y - maxima[i][0]) / 1000).toFixed(0)).join(', ')} kyr`);
-console.log(`vs La2010 over ${n} points: RMS ${(rms * 1e3).toFixed(3)}e-3 · max |Δ| ${(maxAbs * 1e3).toFixed(3)}e-3`);
+console.log(`vs La2010 over ${n} points: RMS ${(rms * 1e5).toFixed(2)}e-5 · max |Δ| ${(maxAbs * 1e5).toFixed(2)}e-5`);
 console.log(`wrote ${OUT} (${(svg.length / 1024).toFixed(0)} kB)`);
