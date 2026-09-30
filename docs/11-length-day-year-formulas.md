@@ -1,6 +1,6 @@
 ---
 docVersion: 1.0
-modelVersion: v15.0
+modelVersion: v16.0
 coefficients: sha256:bb6a03c877eedab8
 status: current
 ---
@@ -105,7 +105,9 @@ siderealYear = JD_interval × 360 / (360 − dWA)
 
 where `dWA` is the world-angle advancement over one tropical year interval (single-year step). For multi-year spans (stepYears > 1), use `step × 360 − dWA` in the denominator. This is the same formula used by `year-length-harmonics.js`.
 
-Sidereal year variations are much smaller than tropical — the orbital period is nearly constant, with only tiny perturbations from planetary gravitational interactions.
+**Limits of that estimator (measured 2026-09).** Per cardinal type it is not the sidereal year: the world angle is read at the event, where the Sun's speed differs from the mean by up to 2e, so the missing arc `dWA` (≈50″) is traversed at the local speed — a ±50 s offset that drifts with the equation of centre as the perihelion moves against the equinox (VE-to-VE −54 → +35 s across −4000…+4000, SS-to-SS −6 → −52 → −32 s). The four cardinal types averaged cancel it through the third harmonic. Event to event it also carries the Sun's periodic terms — the 6.44″ lunar equation alone is ~150 s of event timing — so even a 200-year baseline resolves only ~1 s. The clean reading is the cumulative sidereal angle (one turn per event minus the world-angle advance), the four-cardinal mean, with the planetary completion removed per event (`sunLonDegAtJD − sunLonCompletedDegAtJD`), against TT: then a ±100-year window resolves milliseconds, and the scene reproduces the one-family sidereal, tropical and anomalistic years of date to a few ms at every epoch sampled (`tools/verify/scene-year-lengths.js`, the gate; `tools/explore/scene-sample-events.cjs` + `scene-sample-check.cjs`, the instruments).
+
+Sidereal year variations are much smaller than tropical — the orbital period is nearly constant, with only tiny perturbations from planetary gravitational interactions (the D6 λ̇ channel: about −0.1 s per millennium, `earth/sidereal-year-channel.cjs`).
 
 ### Anomalistic Year (8 harmonics)
 
@@ -258,8 +260,8 @@ All precession periods emerge from ratios of year lengths:
 | Precession | Formula | Mean period |
 |------------|---------|-------------|
 | Axial | `Y_sid / (Y_sid − Y_trop)` | T_p = <!--v:earthAxialPeriod-->25,771<!--/v--> yr |
-| Perihelion | `Y_anom(s) / (Y_anom(s) − Y_trop(s))` | H/16 ≈ <!--v:earthPeriPeriod-->20,936<!--/v--> yr |
-| Inclination | `Y_anom(s) / (Y_anom(s) − Y_sid(s))` | H/3 ≈ <!--v:earthPeriPeriodICRF-->111,570<!--/v--> yr |
+| Perihelion | `Y_anom(s) / (Y_anom(s) − Y_trop(s))` | H/16 ≈ <!--v:earthPeriPeriod-->20,935<!--/v--> yr |
+| Inclination | `Y_anom(s) / (Y_anom(s) − Y_sid(s))` | H/3 ≈ <!--v:earthPeriPeriodICRF-->111,548<!--/v--> yr |
 | Obliquity | the beat of the clock against the nodal mode: 1/(1/T_p − 1/T_s₃) (the retired label H/8 read <!--v:hDiv8-->41,915<!--/v--> yr) | <!--v:obliqCycleYears-->~41,224<!--/v--> yr |
 | Ecliptic (nodal) | the N-body chain's dominant nodal mode s₃: 1,296,000/\|s₃\| (the retired label H/5 read <!--v:hDiv5-->67,063<!--/v--> yr) | <!--v:eclPrecYears-->~68,751<!--/v--> yr |
 

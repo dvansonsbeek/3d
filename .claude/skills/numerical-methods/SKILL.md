@@ -151,6 +151,14 @@ rate split 111,491 vs 111,570 yr on the derived beat.
 - A series sampled at 250 yr cannot state a rate below its band limit — the
   spread across reasonable stencils IS the uncertainty.
 - The smooth mode-sum tangent is the stencil-stable local statement (flat
-  from ±1 to ±500 yr where the raw series wobbles ±0.015 ″/yr).
-- Every surface quoting one physical rate must ride ONE evaluator family
-  (`computeApsidalSecularDegPerYr` is the one home for the apsidal tangent).
+  from ±1 to ±500 yr where the raw series wobbles ±0.015 ″/yr) — but it is
+  a different engine's rate: away from J2000 the chain tangent parted from
+  the scene's own perihelion passages by seconds of anomalistic year (3.3 s
+  at 0 AD, 395 s at +25 kyr), so the published family now rides the
+  movement's own year-over-year rate, ripple named (2026-09).
+- Every surface quoting one physical rate must ride ONE evaluator family —
+  and the family is the one the SCENE realises (owner: "all calculations
+  should match what we measure in the scene"): Earth's apsidal rate is
+  `yearLengths.apsidalRateFixedArcsecPerJulianYr`, the anomalistic year, the
+  Prec. cell and the beats all read it; the scene-sampled gate
+  (`tools/verify/scene-year-lengths.js`) pins the agreement to 30 ms.

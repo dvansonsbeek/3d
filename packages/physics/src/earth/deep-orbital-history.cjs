@@ -342,12 +342,46 @@ function createDeepOrbitalHistory({
     return [o[0] / r, o[1] / r, o[2] / r];
   };
 
-  /** Equinox-node longitude only (J2000 ecliptic frame) — the light read
-   *  used for the node-rate finite difference at store time. */
-  function eqLonOnlyDeg(/** @type {number[]} */ s, /** @type {number} */ t) {
+  /** The equinox's GENERAL-PRECESSION longitude (deg, J2000 ecliptic frame):
+   *  the broken angle through the ascending node of the ecliptic of date on
+   *  the J2000 ecliptic — Π (the node's longitude) plus the arc along the
+   *  ecliptic of date from that node to the equinox. This is the p_A of the
+   *  precession literature (Lieske 1977; Simon et al. 1994: p_A = Λ_A − Π_A):
+   *  the quantity the mean longitude OF DATE subtracts from the fixed-frame
+   *  mean longitude — the N-body λ = Ω + ω + M is itself this broken angle
+   *  (lattice-long-window-test.mjs), so the tropical year of date must be
+   *  built on THIS rate. NOT the projected longitude atan2(g_y, g_x)
+   *  (equinoxLonJ2000Deg, which the frame reconstruction needs): the two
+   *  agree at J2000, where the ecliptic of date coincides with the J2000
+   *  ecliptic, and part with the SQUARE of the ecliptic's tilt to its J2000
+   *  position — (i²/4)·sin 2u class: 0.9″ at 0 AD, 5.9″ at −3000,
+   *  arcminutes at deep time; as a rate 0.05 s of tropical year at ±4 kyr,
+   *  0.1–0.2 s at ±10 kyr, ~1 s beyond 100 kyr (measured 2026-09: the scene's
+   *  own sidereal angle read exactly this against the projected-rate law at
+   *  16 epochs, and the re-booked Sun is flat against DE441 in the inertial
+   *  frame over −2500…+2000 where the projected booking ramped to +5.6″).
+   *  Degenerate node as i → 0: the dogleg's two parts compensate each other's
+   *  error, and below 1e-9 the projected form is the exact limit.
+   *  @param {number[]} n the ecliptic pole of date @param {number[]} gu the unit equinox */
+  function generalPrecessionLonDeg(n, gu) {
+    const Nx = -n[1], Ny = n[0];            // ẑ × n̂ — the ascending node of the ecliptic of date
+    const sN = Math.hypot(Nx, Ny);
+    if (sN < 1e-9) return Math.atan2(gu[1], gu[0]) * R2D;
+    const N = [Nx / sN, Ny / sN, 0];
+    const Pi = Math.atan2(N[1], N[0]);
+    const u = Math.atan2(dot(n, cross(N, gu)), dot(N, gu));
+    return (Pi + u) * R2D;
+  }
+
+  /** Equinox-node longitudes only (J2000 ecliptic frame; projected and
+   *  general-precession forms) — the light read used for the node-rate
+   *  finite differences at store time. */
+  function eqLonsOnlyDeg(/** @type {number[]} */ s, /** @type {number} */ t) {
     const n = orbitNormal(t);
     const g = cross(s, n);
-    return Math.atan2(g[1], g[0]) * R2D;
+    const gn = Math.hypot(g[0], g[1], g[2]);
+    const gu = [g[0] / gn, g[1] / gn, g[2] / gn];
+    return { proj: Math.atan2(gu[1], gu[0]) * R2D, general: generalPrecessionLonDeg(n, gu) };
   }
 
   /** One quantity bundle at time t (years from J2000) from spin axis s. */
@@ -383,26 +417,38 @@ function createDeepOrbitalHistory({
       // interpolation on the grid is exact to the ζ series' own resolution.
       orbitNormalX: n[0],
       orbitNormalY: n[1],
-      // The equinox node (ŝ×n̂) longitude in the J2000 ecliptic frame —
-      // its year-over-year retrograde advance IS the general precession of
-      // date, wobble included (the n̂(t) geometry generates the equinox
-      // wobble; ψ̇ itself is the secular α(H(t))). Consumers derive the
-      // tropical year of date from it: T_trop = T_sid·(1 − p_yr/360°).
-      // ⚠ RATE-CONSUMER CONTRACT (measured): this field's rate is correct
+      // The equinox node (ŝ×n̂) PROJECTED longitude in the J2000 ecliptic
+      // frame — the frame reconstruction's input (frame-of-date.cjs rebuilds
+      // the unit equinox from it). Its rate is the general precession only
+      // to first order in the ecliptic's tilt to its J2000 position: the
+      // tropical-year consumers read generalPrecessionLonDeg below (measured
+      // 2026-09 — the projected rate booked the Sun's mean longitude of date
+      // 5.9″ off at −3000 and the sidereal year of date 1 s off at depth).
+      // ⚠ RATE-CONSUMER CONTRACT (measured): these fields' rates are correct
       // AS IS — α is self-anchored to the LUNISOLAR rate at construction
       // (K_LUNI, the one-RK4-step probe above), so the realized general
-      // precession p_geom(J2000) equals 360/axialPrecessionYearsJ2000 by
-      // construction. No correction, no δ subtraction. History (why this
-      // contract exists): before the self-anchor, α carried the GENERAL
-      // sid/(sid−sol) rate and the n̂(t) geometry re-added the planetary
-      // mean — a double-count of +0.097″/yr ≈ +2.4 s of tropical year at
-      // J2000 — and consumers had to subtract the runtime anchor
+      // precession p_geom(J2000) equals 360/axialPrecessionYearsJ2000 per
+      // JULIAN year (the sampler's time unit) by construction. No
+      // correction, no δ subtraction. History (why this contract exists):
+      // before the self-anchor, α carried the GENERAL sid/(sid−sol) rate and
+      // the n̂(t) geometry re-added the planetary mean — a double-count of
+      // +0.097″/yr ≈ +2.4 s of tropical year at J2000 — and consumers had to
+      // subtract the runtime anchor
       //   δ = p_geom(J2000) − 360/axialPrecessionYearsJ2000.
       // A consumer may still measure δ at runtime as a SELF-CHECK; it
       // must read ≈0 (sub-1e-4 ″/yr class). The LONGITUDE itself is raw
       // geometry and has always needed no correction.
       equinoxLonJ2000Deg: ((Math.atan2(gu[1], gu[0]) * R2D) % 360 + 360) % 360,
       equinoxLonRateDegPerYr: 0,   // filled at store time (build's ±2.5-yr central difference)
+      // The equinox's GENERAL-PRECESSION longitude (the broken angle through
+      // the node of the ecliptic of date — the literature's p_A; see
+      // generalPrecessionLonDeg above): its year-over-year retrograde advance
+      // IS the general precession of date, wobble included (the n̂(t)
+      // geometry generates the equinox wobble; ψ̇ itself is the secular
+      // α(H(t)) times the two factors of date). The tropical year of date is
+      // built on this rate (earth/year-lengths.cjs).
+      generalPrecessionLonDeg: ((generalPrecessionLonDeg(n, gu) % 360) + 360) % 360,
+      generalPrecessionLonRateDegPerYr: 0,   // filled at store time (build's ±2.5-yr central difference)
     };
   }
 
@@ -445,9 +491,10 @@ function createDeepOrbitalHistory({
       const storeWithRate = (/** @type {number} */ key, /** @type {number[]} */ sv, /** @type {number} */ tv) => {
         const smp = sampleAt(sv, tv);
         const hR = 2.5;
-        const lp = eqLonOnlyDeg(rk4(sv, tv, +hR), tv + hR);
-        const lm = eqLonOnlyDeg(rk4(sv, tv, -hR), tv - hR);
-        smp.equinoxLonRateDegPerYr = (((lp - lm + 540) % 360) - 180) / (2 * hR);
+        const lp = eqLonsOnlyDeg(rk4(sv, tv, +hR), tv + hR);
+        const lm = eqLonsOnlyDeg(rk4(sv, tv, -hR), tv - hR);
+        smp.equinoxLonRateDegPerYr = (((lp.proj - lm.proj + 540) % 360) - 180) / (2 * hR);
+        smp.generalPrecessionLonRateDegPerYr = (((lp.general - lm.general + 540) % 360) - 180) / (2 * hR);
         grid.set(key, smp);
       };
       storeWithRate(0, s, 0);
@@ -476,6 +523,19 @@ function createDeepOrbitalHistory({
         const f = (tYr - k0) / stepYr;
         const lerp = (/** @type {number} */ x, /** @type {number} */ y) => x + (y - x) * f;
         const dAng = (/** @type {number} */ x, /** @type {number} */ y) => x + (((y - x + 540) % 360) - 180) * f;
+        // C1 (cubic Hermite) on a wrapped angle with node rates (deg/yr) —
+        // linear interpolation here made the realized equinox RATE
+        // piecewise-constant per grid cell (the measured per-year
+        // precession staircase). Node rates come from the build's own
+        // ±2.5-yr central differences.
+        const hermiteAngle = (/** @type {number} */ l0, /** @type {number} */ l1, /** @type {number} */ r0, /** @type {number} */ r1) => {
+          const dl = ((l1 - l0 + 540) % 360) - 180;   // unwrapped segment
+          const m0 = r0 * stepYr, m1 = r1 * stepYr;
+          const f2 = f * f, f3 = f2 * f;
+          const v = (2 * f3 - 3 * f2 + 1) * l0 + (f3 - 2 * f2 + f) * m0
+            + (-2 * f3 + 3 * f2) * (l0 + dl) + (f3 - f2) * m1;
+          return ((v % 360) + 360) % 360;
+        };
         return {
           epsDeg: lerp(a.epsDeg, b.epsDeg),
           e: lerp(a.e, b.e),
@@ -485,21 +545,12 @@ function createDeepOrbitalHistory({
           inclEclDeg: lerp(a.inclEclDeg, b.inclEclDeg),
           orbitNormalX: lerp(a.orbitNormalX, b.orbitNormalX),
           orbitNormalY: lerp(a.orbitNormalY, b.orbitNormalY),
-          // C1 (cubic Hermite) — linear interpolation here made the
-          // realized equinox RATE piecewise-constant per grid cell (the
-          // measured per-year precession staircase). Node rates come from
-          // the build's own ±2.5-yr central differences.
-          equinoxLonJ2000Deg: (() => {
-            const l0 = a.equinoxLonJ2000Deg;
-            const dl = ((b.equinoxLonJ2000Deg - l0 + 540) % 360) - 180;   // unwrapped segment
-            const m0 = a.equinoxLonRateDegPerYr * stepYr;
-            const m1 = (b.equinoxLonRateDegPerYr ?? a.equinoxLonRateDegPerYr) * stepYr;
-            const f2 = f * f, f3 = f2 * f;
-            const v = (2 * f3 - 3 * f2 + 1) * l0 + (f3 - 2 * f2 + f) * m0
-              + (-2 * f3 + 3 * f2) * (l0 + dl) + (f3 - f2) * m1;
-            return ((v % 360) + 360) % 360;
-          })(),
+          equinoxLonJ2000Deg: hermiteAngle(a.equinoxLonJ2000Deg, b.equinoxLonJ2000Deg, a.equinoxLonRateDegPerYr, b.equinoxLonRateDegPerYr ?? a.equinoxLonRateDegPerYr),
           equinoxLonRateDegPerYr: lerp(a.equinoxLonRateDegPerYr, b.equinoxLonRateDegPerYr ?? a.equinoxLonRateDegPerYr),
+          // the same C1 form for the general-precession longitude (its
+          // year-over-year difference is the tropical-year law's p).
+          generalPrecessionLonDeg: hermiteAngle(a.generalPrecessionLonDeg, b.generalPrecessionLonDeg, a.generalPrecessionLonRateDegPerYr, b.generalPrecessionLonRateDegPerYr ?? a.generalPrecessionLonRateDegPerYr),
+          generalPrecessionLonRateDegPerYr: lerp(a.generalPrecessionLonRateDegPerYr, b.generalPrecessionLonRateDegPerYr ?? a.generalPrecessionLonRateDegPerYr),
         };
       },
     };

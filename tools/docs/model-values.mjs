@@ -409,9 +409,9 @@ export const VALUES = {
     get: () => oneYL().inclinationPrecessionYearsAtYear(2000),
     render: (v) => `~${thousands(Math.round(v))}`,
     unit: 'yr',
-    note: 'apsidal precession period at J2000 — the perihelion against the stars, the engine-D chain’s secular tangent (the Prec. cell’s rate; the key keeps the historical inclPrec name). S6: was H/3 = 111,772',
+    note: 'apsidal precession period at J2000, Julian years — the perihelion against the stars, the ONE movement’s own apsidal rate of date (the scene’s perihelion; anom/(anom − sid) of the one family, the Prec. cell’s rate; the key keeps the historical inclPrec name). Before 2026-09 the engine-D chain’s secular tangent; S6: was H/3 = 111,772',
   },
-  inclPrecFormula: { get: () => oneYL().inclinationPrecessionYearsAtYear(2000), render: () => 'the N-body chain’s secular apsidal tangent at J2000' },
+  inclPrecFormula: { get: () => oneYL().inclinationPrecessionYearsAtYear(2000), render: () => 'the beat of the one-family anomalistic and sidereal years at J2000, T_anom·T_sid/(T_anom − T_sid) — the movement’s own apsidal rate of date' },
   eclPrecYears: {
     get: () => 1296000 / s3ArcsecPerYr(),
     render: (v) => `~${thousands(Math.round(v))}`,
@@ -433,9 +433,9 @@ export const VALUES = {
     get: () => oneYL().axialPrecessionYearsAtYear(2000),
     render: (v) => thousands(v, 2),
     unit: 'yr',
-    note: 'axial precession period at J2000 — the of-date year laws’ beat (one-family route), the model’s one J2000 precession reading (S5)',
+    note: 'axial precession period at J2000, Julian years — the of-date year laws’ beat (one-family route), the model’s one J2000 precession reading (S5); the same number as 360°/the frame’s precession rate per Julian year (2026-09: the dimensionless T_sid/(T_sid − T_trop) counted tropical years, 0.55 yr off this)',
   },
-  axialPrecFormula: { get: () => oneYL().axialPrecessionYearsAtYear(2000), render: () => 'the of-date year laws’ beat at J2000, T_sid/(T_sid − T_trop)', note: 'consumed by the website appendix; S5 retired the former "H / 13" rendering' },
+  axialPrecFormula: { get: () => oneYL().axialPrecessionYearsAtYear(2000), render: () => 'the of-date year laws’ beat at J2000, T_sid·T_trop/((T_sid − T_trop)·365.25 d)', note: 'consumed by the website appendix; S5 retired the former "H / 13" rendering' },
   periPrecYears: {
     get: () => oneYL().perihelionPrecessionYearsAtYear(2000),
     render: (v) => `~${thousands(Math.round(v))}`,
@@ -1307,7 +1307,7 @@ export const VALUES = {
       anomalisticYearDays:   { get: () => C.meanAnomalisticYearDays, render: (v) => thousands(v, 7), unit: 'd' },
       anomalisticYearDaysFull: { get: () => C.meanAnomalisticYearDays, render: (v) => v.toFixed(9), unit: 'd', note: '9-dp render of anomalisticYearDays' },
       anomalisticYearSeconds: { get: () => C.meanAnomalisticYearDays * C.meanLengthOfDay, render: (v) => thousands(v, 2), unit: 's' },
-      anomalisticYearJ2000Days: { get: () => oneYL().anomalisticYearSecondsAtYear(2000) / 86400, render: (v) => thousands(v, 7), unit: 'd', note: 'the one-family anomalistic year of date at J2000 (the chain’s apsidal tangent), SI days' },
+      anomalisticYearJ2000Days: { get: () => oneYL().anomalisticYearSecondsAtYear(2000) / 86400, render: (v) => thousands(v, 7), unit: 'd', note: 'the one-family anomalistic year of date at J2000 (the movement’s own apsidal line — the scene’s perihelion), SI days' },
       anomalisticYearJ2000Seconds: { get: () => oneYL().anomalisticYearSecondsAtYear(2000), render: (v) => thousands(v, 2), unit: 's' },
       siderealSolarDiffSeconds: {
         get: () => oneYL().siderealYearSecondsAtYear(2000) - oneYL().tropicalYearSecondsAtYear(2000),
@@ -1951,17 +1951,11 @@ export const VALUES = {
   // owner's by-hand finding, measured: over ±26 kyr the ratio is nowhere
   // pinned.
   ...(() => {
-    let chainsM = null;
-    const chains = () => {
-      if (!chainsM) {
-        const KC = require(join(ROOT, 'packages', 'physics', 'src', 'planets', 'keplerian-chain.cjs'));
-        const ART = require(join(ROOT, 'packages', 'physics', 'src', 'planets', 'chain-artifact.js')).CHAIN_ARTIFACT;
-        chainsM = { KC, ch: KC.buildPlanetChainsFromArtifactData(ART) };
-      }
-      return chainsM;
-    };
-    const tApsYr = (y) => { const c = chains(); return 360 / c.KC.computeApsidalSecularDegPerYr(y, c.ch.earth, c.ch); };
-    const tPYr = (y) => oneYL().axialPrecessionYearsAtYear(y);   // the published of-date T_p (S5)
+    // T_aps: the ONE movement's own apsidal period of date (anom/(anom − sid)
+    // of the one family — the scene's perihelion; the planet chain's secular
+    // tangent left this family 2026-09, year-lengths.cjs), Julian years.
+    const tApsYr = (y) => oneYL().inclinationPrecessionYearsAtYear(y);
+    const tPYr = (y) => oneYL().axialPrecessionYearsAtYear(y);   // the published of-date T_p (S5), Julian years
     const apsPerPrec = (y) => tApsYr(y) / tPYr(y);
     const periPerPrec = (y) => { const tp = tPYr(y), ta = tApsYr(y); return (1 / (1 / tp + 1 / ta)) / tp; };
     let wander = null;
@@ -1974,8 +1968,8 @@ export const VALUES = {
       return wander;
     };
     return {
-      lunisolarPeriodJ2000Yr: { get: () => tPYr(2000), render: (v) => thousands(v, 1), unit: 'yr', note: 'the lunisolar precession period T_p at J2000 — the model’s ONE J2000 precession reading (the of-date year laws’ beat, ≡ the composed clock’s anchor; IAU 25,771.6). S5: the former 25,793.6 was H/13, the fit anchor’s reading' },
-      lunisolarApsidalPerPrecessionJ2000: { get: () => apsPerPrec(2000), render: (v) => Number(v).toFixed(3), note: 'T_aps/T_p at J2000 — the perihelion’s period against the stars (the chain’s secular apsidal tangent) in of-date precession periods; a J2000 reading, not a law' },
+      lunisolarPeriodJ2000Yr: { get: () => tPYr(2000), render: (v) => thousands(v, 1), unit: 'yr', note: 'the lunisolar precession period T_p at J2000, JULIAN years — the model’s ONE J2000 precession reading (the of-date year laws’ beat ≡ 360°/the frame’s rate per Julian year ≡ the composed clock’s anchor; IAU 25,771.6). S5: the former 25,793.6 was H/13, the fit anchor’s reading' },
+      lunisolarApsidalPerPrecessionJ2000: { get: () => apsPerPrec(2000), render: (v) => Number(v).toFixed(3), note: 'T_aps/T_p at J2000 — the perihelion’s period against the stars (the ONE movement’s own apsidal rate of date, the scene’s perihelion) in of-date precession periods; a J2000 reading, not a law' },
       lunisolarPeriOfDatePerPrecessionJ2000: { get: () => periPerPrec(2000), render: (v) => Number(v).toFixed(4), note: 'T_peri/T_p at J2000, T_peri = 1/(1/T_p + 1/T_aps) the perihelion-of-date period (equinox precession + inertial perihelion motion — frame arithmetic at every epoch)' },
       lunisolarApsidalPerPrecessionWanderMin: { get: () => wanderScan().mn, render: (v) => Number(v).toFixed(2), note: 'minimum of T_aps/T_p over ±26 kyr (500-yr scan) — the ratio is not pinned' },
       lunisolarApsidalPerPrecessionWanderMax: { get: () => wanderScan().mx, render: (v) => Number(v).toFixed(2), note: 'maximum of T_aps/T_p over ±26 kyr (500-yr scan)' },

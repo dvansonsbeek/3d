@@ -1,7 +1,7 @@
 export const SIDEREAL_CHANNEL_ARTIFACT: Readonly<{
     t0Yr: -10000000;
     stepYr: 2000;
-    windowYr: 2000;
+    windowYr: 10000;
     lamDotRel: number[];
     meta: {
         dumpSha256: string;
@@ -9,4 +9,4 @@ export const SIDEREAL_CHANNEL_ARTIFACT: Readonly<{
         chaprontGate: number;
     };
 }>;
-export const SIDEREAL_CHANNEL_ARTIFACT_HASH: "528101ca3410dc9b";
+export const SIDEREAL_CHANNEL_ARTIFACT_HASH: "a6f4729c2de722af";

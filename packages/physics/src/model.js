@@ -24,7 +24,6 @@ import { createPhaseMachinery } from './phase/index.cjs';
 import { createYearLengths, ONE_FAMILY_WINDOW_YEARS } from './earth/year-lengths.cjs';
 import { createDeepOrbitalHistory } from './earth/deep-orbital-history.cjs';
 import { CHAIN_ARTIFACT } from './planets/chain-artifact.js';
-import { buildPlanetChainsFromArtifactData, computeApsidalSecularDegPerYr } from './planets/keplerian-chain.cjs';
 import { computeSecularShape } from './planets/secular-shape.cjs';
 import { createPlanetSpinChannelFromArtifacts, computeObliquityJ2000Deg } from './planets/spin-channel.cjs';
 import { createDeltaTCycles } from './deltat/cycles.cjs';
@@ -533,9 +532,6 @@ export function assembleModel(C, F, laws = {}, secularSeriesArtifact = /** @type
   // path; the npm package alone has no 8 MB series), the movement runs the
   // SERIES tier exactly like the browser — killing the mode-vs-series
   // value split (measured: 6 s on the anomalistic year at J2000).
-  // The engine-D planet chains (ONE build; the one-family route's apsidal
-  // tangent and the lunisolar surface's n_aps read the same instance).
-  const kcChainsM = buildPlanetChainsFromArtifactData(CHAIN_ARTIFACT);
   // The ONE-SOURCE movement: the hybrid's ε(t) (plan 06 Phase 3 S3b — THE
   // published obliquity) and the one-family year lengths, on the same
   // per-tier sampler.
@@ -611,13 +607,12 @@ export function assembleModel(C, F, laws = {}, secularSeriesArtifact = /** @type
       }
       return samplers.get(key).at(t);
     };
-    // The anomalistic rides the chain's SECULAR apsidal tangent (the same
-    // rate family the panel's Prec. cell shows) — ONE helper, keplerian-chain.
-    const kcChains = kcChainsM;
+    // The anomalistic year rides THIS movement's own apsidal line (the
+    // scene's perihelion) — the factory owns the construction; the planet
+    // chain's secular tangent is no longer a member (year-lengths.cjs).
     const yearLengths = createYearLengths({
       sampleAt,
       massLossSiderealSecondsAtYearFn: (year) => deepLod.siderealYearSecondsAtAge(yearToTMa(year)),
-      apsidalSecularDegPerYrFn: (year) => computeApsidalSecularDegPerYr(year, kcChains.earth, kcChains),
     });
     return {
       yearLengths,
@@ -1505,23 +1500,23 @@ export function assembleModel(C, F, laws = {}, secularSeriesArtifact = /** @type
         const psiDot = r === null ? 1296000 / certifiedAxialPrecessionJ2000Years() : r;
         return 1296000 / (psiDot - s3ArcsecPerYr);
       },
-      /** The apsidal (perihelion vs the stars) period from the engine-D chain's secular tangent, years — inside the published window only (the tangent is an extrapolation beyond the banked series: it turns negative at −5 Myr); null beyond. @param {number} year @returns {number|null} */
-      apsidalPeriodYearsAtYear: (year) => (Math.abs(year - 2000) <= ONE_FAMILY_WINDOW_YEARS ? 360 / computeApsidalSecularDegPerYr(year, kcChainsM.earth, kcChainsM) : null),
+      /** The apsidal (perihelion vs the stars) period of date, JULIAN years — the ONE movement's own apsidal rate (the scene's perihelion; anom/(anom − sid) of the one family, ≡ 360°/apsidalRateFixedArcsecPerJulianYr), inside the published window only; null beyond. Before 2026-09 this rode the planet chain's secular tangent, which parted from the scene's perihelion passages by seconds of anomalistic year within a few millennia (year-lengths.cjs). @param {number} year @returns {number|null} */
+      apsidalPeriodYearsAtYear: (year) => (Math.abs(year - 2000) <= ONE_FAMILY_WINDOW_YEARS ? yearLengthsM.inclinationPrecessionYearsAtYear(year) : null),
       /** T_aps(t) / T_p(t) — the apsidal period in of-date precession periods (4.33 at J2000, a reading; 0.84 … 9.9 across ±26 kyr, measured); null beyond the published window. @param {number} year @returns {number|null} */
       apsidalPerPrecessionAtYear: (year) => {
         if (Math.abs(year - 2000) > ONE_FAMILY_WINDOW_YEARS) return null;
-        return (360 / computeApsidalSecularDegPerYr(year, kcChainsM.earth, kcChainsM)) / publishedAxialPrecessionYearsAtYear(year);
+        return yearLengthsM.inclinationPrecessionYearsAtYear(year) / publishedAxialPrecessionYearsAtYear(year);
       },
-      /** T_peri(t) = 1/(1/T_p + 1/T_aps) — the perihelion-of-date period (equinox precession + inertial perihelion motion, frame arithmetic at every epoch), years, on the of-date T_p; null beyond the published window. @param {number} year @returns {number|null} */
+      /** T_peri(t) = 1/(1/T_p + 1/T_aps) — the perihelion-of-date period (equinox precession + inertial perihelion motion, frame arithmetic at every epoch), JULIAN years, on the of-date T_p — ≡ the one family's anom/(anom − trop); null beyond the published window. @param {number} year @returns {number|null} */
       periOfDatePeriodYearsAtYear: (year) => {
         if (Math.abs(year - 2000) > ONE_FAMILY_WINDOW_YEARS) return null;
-        const tp = publishedAxialPrecessionYearsAtYear(year), taps = 360 / computeApsidalSecularDegPerYr(year, kcChainsM.earth, kcChainsM);
+        const tp = publishedAxialPrecessionYearsAtYear(year), taps = yearLengthsM.inclinationPrecessionYearsAtYear(year);
         return 1 / (1 / tp + 1 / taps);
       },
       /** T_peri(t) / T_p(t) (0.812 at J2000 — the J2000 reading); null beyond the published window. @param {number} year @returns {number|null} */
       periOfDatePerPrecessionAtYear: (year) => {
         if (Math.abs(year - 2000) > ONE_FAMILY_WINDOW_YEARS) return null;
-        const tp = publishedAxialPrecessionYearsAtYear(year), taps = 360 / computeApsidalSecularDegPerYr(year, kcChainsM.earth, kcChainsM);
+        const tp = publishedAxialPrecessionYearsAtYear(year), taps = yearLengthsM.inclinationPrecessionYearsAtYear(year);
         return (1 / (1 / tp + 1 / taps)) / tp;
       },
       /** The published of-date window, years from 2000. */

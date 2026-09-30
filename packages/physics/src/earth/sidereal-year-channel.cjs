@@ -18,10 +18,20 @@
 // J2000 node lamDotRel ≡ 1 by construction, so the caller's anchor is
 // preserved exactly.
 //
-// Scope: this channel feeds the model/chart surface for the sidereal year
-// OF DATE. The scene's sidereal frame stays on the certified H/13
-// identity — a 3e-8 relative frame change is invisible in the render and
-// would disturb the certified frozen-clock pair.
+// Scope: this channel is the sidereal year OF DATE everywhere — the
+// model/chart surfaces AND the scene: since plan 06 R1 the Sun's mean
+// longitude of date integrates the one-family tropical year (this channel
+// minus the movement's own general precession), so the scene's measured
+// sidereal angle reproduces this law (the scene-sampled gate,
+// tools/verify/scene-year-lengths.js). The frozen era clock's sidereal
+// year (mass-loss only, no planetary drift) is the certified era device,
+// not a member of this family.
+//
+// ESTIMATOR (2026-09): each banked node is the least-squares slope of a
+// quadratic fitted to the dump's unwrapped L over ±5 kyr — the former
+// 2-kyr boxcar of per-step rates telescoped to the difference of the
+// OSCULATING longitude at the window's two ends and left 0.1–0.3 s of
+// node noise (−266 ms at +4000 against DE441; +18…28″ of Sun by 6500).
 
 const { SIDEREAL_CHANNEL_ARTIFACT } = require('./sidereal-channel-artifact.cjs');
 

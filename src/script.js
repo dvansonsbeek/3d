@@ -11,7 +11,7 @@ import { Pane } from 'tweakpane';
 //
 // Generated at build time, not fetched at runtime — `holisticyearLength` is read
 // at module scope below, and Phase 15 requires offline === hosted.
-import { computeObliquityJ2000Deg, computeSecularShape, DEFAULT_CONSTANTS as K, REFERENCE_DATA as R, FITTED_COEFFICIENTS as FIT, CONSTANTS_HASH, COEFFICIENTS_HASH, MODEL_VERSION, PREPRINT_DOI, createEpochPrimitives, createPhaseMachinery, createDeepCalendar, createMoonEccChannel, createDeepEccChannel, DEEP_MODES_ARTIFACT, createDeepOrbitalHistory, createYearLengths, createMoonMonthChain, createChainCycleIntegrator, createMoonArguments, createMoonSeries, createMoonApparent, derivePlanetGeometry, planetFibonacciLaws as _FL, computeEccentricityIntegrated, planetOrientation as _PO, planetOrbitChain as _POC, integrateAscendingNode, createDeltaTCycles, createDeepTimeLod, createMoonRecessionHistory, createSolarChannelBudget, deltaTEspenakMeeusCanonSeconds, evalClimateL1OrbitalPermil, createAlphaGiaChannel, computeSolarTorqueShare, createEclipseFinders, createSunLongitudeCorrection, createModel, buildPlanetChainsFromArtifactData, computePlanetElementsAtYear as kcComputePlanetElementsAtYear, computeApsidalSecularDegPerYr as kcApsidalSecularDegPerYr, computeHeliocentricEclipticFromElements as kcComputeHeliocentricEclipticFromElements, computeEquatorNodeOriginSFrameDeg, convertNodeSFrameToEquatorOriginDeg, createSecularSeriesOverride, CHAIN_ARTIFACT, ANCHOR_EPOCH_YEAR as KC_ANCHOR_EPOCH_YEAR, ANCHOR_EPOCH_JD as KC_ANCHOR_EPOCH_JD, computeEarthFrameOfDate, solveWheelAngleForLongitude } from '@essrt/physics';
+import { computeObliquityJ2000Deg, computeSecularShape, DEFAULT_CONSTANTS as K, REFERENCE_DATA as R, FITTED_COEFFICIENTS as FIT, CONSTANTS_HASH, COEFFICIENTS_HASH, MODEL_VERSION, PREPRINT_DOI, createEpochPrimitives, createPhaseMachinery, createDeepCalendar, createMoonEccChannel, createDeepEccChannel, DEEP_MODES_ARTIFACT, createDeepOrbitalHistory, createYearLengths, createMoonMonthChain, createChainCycleIntegrator, createMoonArguments, createMoonSeries, createMoonApparent, derivePlanetGeometry, planetFibonacciLaws as _FL, computeEccentricityIntegrated, planetOrientation as _PO, planetOrbitChain as _POC, integrateAscendingNode, createDeltaTCycles, createDeepTimeLod, createMoonRecessionHistory, createSolarChannelBudget, deltaTEspenakMeeusCanonSeconds, evalClimateL1OrbitalPermil, createAlphaGiaChannel, computeSolarTorqueShare, createEclipseFinders, createSunLongitudeCorrection, createModel, buildPlanetChainsFromArtifactData, computePlanetElementsAtYear as kcComputePlanetElementsAtYear, computeHeliocentricEclipticFromElements as kcComputeHeliocentricEclipticFromElements, computeEquatorNodeOriginSFrameDeg, convertNodeSFrameToEquatorOriginDeg, createSecularSeriesOverride, CHAIN_ARTIFACT, ANCHOR_EPOCH_YEAR as KC_ANCHOR_EPOCH_YEAR, ANCHOR_EPOCH_JD as KC_ANCHOR_EPOCH_JD, computeEarthFrameOfDate, solveWheelAngleForLongitude } from '@essrt/physics';
 // K8 — the reference package: ONE-WAY imports (comparison only;
 // @essrt/reference is private-by-construction and nothing in the model
 // chain depends on it). publishedCurves migrated here from
@@ -4418,7 +4418,7 @@ function meanNodalMonthAtAge(t_Ma) { return _moonChain().nodalMonthSecondsAtAge(
 // ───── Stellar/sidereal days ─────
 // (The retired integer-law anomalistic year, T_trop·H/(H−16), lived here;
 // the anomalistic year of date has ONE home — the year-lengths factory's
-// construction on the chain's apsidal tangent, _yearLengthsM().)
+// construction on the movement's own apsidal line, _yearLengthsM().)
 
 /** Stellar day in seconds (Earth rotation vs fixed stars). */
 function meanStellarDayAtAge(t_Ma) {
@@ -19642,10 +19642,12 @@ let _zetaSeriesEndYr = 0;
   })();
 }
 // D6: the sidereal-year-of-date channel — the banked λ̇ ratio (planetary
-// epoch drift, constant-GM run) times the H-chain mass-loss law. Chart
-// surface only: the scene's sidereal frame stays the certified H/13
-// identity. Built lazily once the artifact (with lamDotRel) arrives;
-// null = artifact absent or pre-D6 → callers fall back to mass-loss only.
+// epoch drift, constant-GM run) times the H-chain mass-loss law. The
+// scene rides it too: the Sun's mean longitude of date integrates the
+// one-family tropical year (plan 06 R1), so the rendered Sun's sidereal
+// motion IS this channel (measured at 16 epochs, 2026-09). Built lazily
+// once the artifact (with lamDotRel) arrives; null = artifact absent or
+// pre-D6 → callers fall back to mass-loss only.
 // S2 (owner: ONE implementation): the of-date year-length family — years,
 // per-cardinal lengths and precession beats — comes from the ONE package
 // factory (createYearLengths), built on the SERIES-tier movement sampler
@@ -19659,15 +19661,12 @@ function _yearLengthsM() {
     _yearLengthsCache = createYearLengths({
       sampleAt: (y) => _hybridSeriesSampleAt(y),
       massLossSiderealSecondsAtYearFn: (y) => meanSiderealYearSecondsAtAge((startmodelYear - y) / 1e6),
-      // The anomalistic rides the chain's SECULAR apsidal tangent — the
-      // same rate family the Perihelion Longitudes Prec. cell shows
-      // (_kcApsidalPeriodYears), so the Predictions beat and the Prec.
-      // cell agree by construction (owner-found: 111,491 vs 111,570).
-      // ONE helper: keplerian-chain computeApsidalSecularDegPerYr.
-      apsidalSecularDegPerYrFn: (y) => {
-        if (!_kcChains) _kcChains = buildPlanetChainsFromArtifactData(CHAIN_ARTIFACT);
-        return kcApsidalSecularDegPerYr(y, _kcChains.earth, _kcChains);
-      },
+      // The anomalistic year rides THIS movement's own apsidal line — the
+      // scene's perihelion (year-lengths.cjs owns the construction). Earth's
+      // Perihelion Longitudes Prec. cell reads the SAME family
+      // (_kcApsidalPeriodYears → inclinationPrecessionYearsAtYear), so the
+      // Predictions beat and the cell agree by construction (owner-found
+      // split 111,491 vs 111,570 stays closed — now on the scene's family).
     });
   }
   return _yearLengthsCache;
@@ -21377,8 +21376,10 @@ function _vfpAPModelYears(key, year) {
     return d === 0 ? NaN : Math.abs(360 * 300 / d);
   }
   if (key === 'apsidal') {
-    if (!_kcChains) _kcChains = buildPlanetChainsFromArtifactData(CHAIN_ARTIFACT);
-    return Math.abs(360 / kcApsidalSecularDegPerYr(year, _kcChains.earth, _kcChains));
+    // the ONE movement's own apsidal rate (the scene's perihelion) — the
+    // same family as the anomalistic year and Earth's Prec. cell
+    if (!_hybridSpinActive()) return NaN;
+    return Math.abs(_yearLengthsM().inclinationPrecessionYearsAtYear(year));
   }
   // 'obliq' is a SERIES quantity (the local period of the model's own ε(t)
   // curve, _vfpAPLocalPeriod in _vfpAPSamples) — not a point evaluator. Two
@@ -47148,11 +47149,11 @@ const planetStats = {
     {header : '—  Perihelion Precession (apsidal · g) —' },
       {label : () => `Perihelion Precession Duration against Ecliptic`,
        value : [ { v: () => _kcApsidalPeriodYears('earth', o.julianDay), dec:2, sep:',', infinity: 1e9 },{ small: 'years' }],
-       hover : () => { const _s = _kcSecularShape('earth'); return [`Period for Earth's perihelion to complete one revolution against the ecliptic — the OF-DATE TANGENT of the chain's elements of date (±150-yr central difference; the SAME evaluator as the Prec. cell under Perihelion Longitudes). The one law's fixed apsidal carrier (${fmtNum(holisticyearLength/3,0,',')} yr) is the second route: the ~0.15% gap between the two is a measured tension, kept visible and anchored to neither. Stable deep-time base: the dominant secular mode ${_s.dom.g[0]} (borrowed from Jupiter), ${Math.round(1296000/_s.dom.arcsecPerYr).toLocaleString('en-US')} yr.`]; },
+       hover : () => { const _s = _kcSecularShape('earth'); return [`Period for Earth's perihelion to complete one revolution against the fixed stars — the ONE movement's own apsidal rate of date (the scene's apsidal wheel; the year-over-year advance of the series' ϖ, the same family as the anomalistic year, so anom/(anom − sid) reproduces this number exactly; the SAME evaluator as the Prec. cell under Perihelion Longitudes). Julian years. The one law's fixed apsidal carrier (${fmtNum(holisticyearLength/3,0,',')} yr) is the second route: the ~0.15% gap between the two is a measured tension, kept visible and anchored to neither. Stable deep-time base: the dominant secular mode ${_s.dom.g[0]} (borrowed from Jupiter), ${Math.round(1296000/_s.dom.arcsecPerYr).toLocaleString('en-US')} yr.`]; },
        highlight: true},
       {label : () => `Axial precession period`,
        value : [ { v: () => -predictions.axialPrecession, dec:2, sep:',' },{ small: 'years' }],
-       hover : [`Retrograde (the equinox regresses — hence the minus): the beat of the one-source sidereal and tropical years, sid/(sid − trop) — the same dynamical of-date value the Predictions panel shows (≈25,771.4 at J2000, matching IAU).`],
+       hover : [`Retrograde (the equinox regresses — hence the minus): the beat of the one-source sidereal and tropical years in Julian years, sid·trop/((sid − trop)·365.25 d) — the same dynamical of-date value the Predictions panel shows (≈25,771.4 at J2000, matching IAU; the same number as 360° over the frame's precession rate per Julian year).`],
        tpLink: true},
       {label : () => `Obliquity cycle (derived beat)`,
        value : [ { v: () => 1296000 / (1296000 / predictions.axialPrecession - Math.abs(CHAIN_ARTIFACT.s.earth.arcsecPerYr)), dec:0, sep:',' },{ small: 'years' }],
@@ -47191,9 +47192,9 @@ const planetStats = {
        value : [ { v: () => '—' }],
        hover : [`The smaller modes of the table summed: base + companion + these account for 100 % of the summed mode amplitudes. Each turns at its own frequency, so no single rate applies to the group`],
        static: true},
-      {label : () => `└ Perihelion rate of date (full chain)`,
+      {label : () => `└ Perihelion rate of date (the movement)`,
        value : [ { v: () => 129600000 / _kcApsidalPeriodYears('earth', o.julianDay), dec:1, sep:',' },{ small: '″/100yr' }],
-       hover : [`The chain's apsidal rate at the current scene date: central difference of ϖ over ±150 yr on the full chain, periodic terms included. In the current window it reads ≈ the framework's eccentricity law's epoch-local apsidal tangent. The same quantity the tweakpane Prec row shows`]},
+       hover : [`The ONE movement's apsidal rate against the fixed stars at the current scene date: the year-over-year advance of the series' perihelion of date (the scene's apsidal wheel) minus the general precession of date — per Julian century. The same quantity the tweakpane Prec row and the anomalistic year carry.`]},
 
     ],
 
@@ -52947,8 +52948,15 @@ const _KC_ANCHOR = new THREE.Vector3();   // scratch for the device origin
 // current window because the GI dynamics put it there; a very large value
 // means the apse is near-stationary at that date (physical, not an error).
 function _kcApsidalPeriodYears(nameLower, jd) {
-  if (!_kcChains) _kcChains = buildPlanetChainsFromArtifactData(CHAIN_ARTIFACT);
   const year = _engineYearTT(jd);   // R9: the engine year (true TT), as _kcElementsOfDate
+  // EARTH rides the ONE movement (the scene's apsidal wheel turns with the
+  // series' ϖ of date): the one family's anom/(anom − sid), ≡ 360°/its
+  // apsidal rate of date — the same number the anomalistic year, the
+  // Predictions beat and the API's lunisolar surface carry (owner, 2026-09:
+  // all calculations match what the scene measures). The chain stencil
+  // below stays the planets' evaluator.
+  if (nameLower === 'earth' && _hybridSpinActive()) return _yearLengthsM().inclinationPrecessionYearsAtYear(year);
+  if (!_kcChains) _kcChains = buildPlanetChainsFromArtifactData(CHAIN_ARTIFACT);
   const D = 150;
   const w1 = kcComputePlanetElementsAtYear(year - D, _kcChains[nameLower], _kcChains).lonPeriEclipticDeg;
   const w2 = kcComputePlanetElementsAtYear(year + D, _kcChains[nameLower], _kcChains).lonPeriEclipticDeg;
@@ -57002,11 +57010,14 @@ function updatePredictions() {
   // derived from measured days × o.lodKinematic, equal to the pure days ratio.
   o.axialPrecession = computeAxialPrecessionYears(o.siderealYearSeconds, o.solarYearDays, o.lodKinematic);
   // DISPLAY: the beat of the DISPLAYED one-source rows (ONE family, SI
-  // basis) — recomputing sid/(sid−sol) from the panel rows reproduces this
-  // exactly, and it matches the Axial Precession chart's one-source line
-  // (≈25,771.4 at J2000, declining with date).
+  // basis) in JULIAN years — sid·sol/((sid − sol)·365.25 d): recomputing it
+  // from the panel rows reproduces this exactly, and it matches the Axial
+  // Precession chart's one-source line and the package's
+  // yearLengths.axialPrecessionYearsAtYear (≈25,771.4 at J2000, declining
+  // with date). The dimensionless sid/(sid − sol) counts tropical years and
+  // reads 0.55 yr more (2026-09: the unit slip the scene check exposed).
   predictions.axialPrecession = _hybridSpinActive()
-    ? predictions.siderealYearSeconds / (predictions.siderealYearSeconds - predictions.solarYearSeconds)
+    ? predictions.siderealYearSeconds * predictions.solarYearSeconds / ((predictions.siderealYearSeconds - predictions.solarYearSeconds) * 365.25 * 86400)
     : o.axialPrecession;
   // The lunisolar clock (plan 06 Phase 3 S3 → S5), in periods and ratios:
   // T_p(t) the PUBLISHED precession period of date — the Axial row's value
@@ -57023,12 +57034,16 @@ function updatePredictions() {
       : _deepLod().lunisolarPrecessionPeriodYearsAtAge(_tMaLs);
     if (_Tp !== null && Number.isFinite(_Tp)) {
       predictions.lunisolarMeanPeriod = _Tp;
-      // the apsidal tangent is read inside the published window (±2 Myr,
-      // ONE_FAMILY_WINDOW_YEARS) only; beyond it the tangent is an
-      // extrapolation of the banked series (negative by −5 Myr).
-      if (Math.abs(yearForFormula - 2000) <= 2000000) {
-        if (!_kcChains) _kcChains = buildPlanetChainsFromArtifactData(CHAIN_ARTIFACT);
-        const _Taps = 360 / kcApsidalSecularDegPerYr(yearForFormula, _kcChains.earth, _kcChains);
+      // the apsidal period is read inside the published window (±2 Myr,
+      // ONE_FAMILY_WINDOW_YEARS) only, and only once the series has loaded:
+      // _yearLengthsM() builds the hybrid sampler, and a build BEFORE the
+      // artifact arrives would cache the ζ-mode tail as the movement (the
+      // plan-06 R1 trap — measured here as every planet 100–240″ off at
+      // −1000 and the deep Moon 1000″ off in the cross-engine gate).
+      if (Math.abs(yearForFormula - 2000) <= 2000000 && _hybridSpinActive()) {
+        // the ONE movement's own apsidal period (anom/(anom − sid) of the
+        // one family — the scene's perihelion; mirrors model.js lunisolar)
+        const _Taps = _yearLengthsM().inclinationPrecessionYearsAtYear(yearForFormula);
         predictions.lunisolarApsidalPeriod = _Taps;
         predictions.lunisolarApsidalPerPrecession = _Taps / _Tp;
         predictions.lunisolarPeriOfDatePerPrecession = (1 / (1 / _Tp + 1 / _Taps)) / _Tp;

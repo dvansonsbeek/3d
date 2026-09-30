@@ -1,6 +1,6 @@
 ---
 docVersion: 1.0
-modelVersion: v15.0
+modelVersion: v16.0
 coefficients: sha256:bb6a03c877eedab8
 status: current
 ---
@@ -128,7 +128,7 @@ are J2000 readings at Earth's spin–orbit–tide interface — the axial
 precession and the obliquity beat on the spin side, the apsidal and
 perihelion-of-date periods as the epoch-local tangents of the orbital side
 — readings that wander (the apsidal-to-axial ratio runs
-<!--v:lunisolarApsidalPerPrecessionWanderMin-->0.83<!--/v-->–<!--v:lunisolarApsidalPerPrecessionWanderMax-->9.89<!--/v-->
+<!--v:lunisolarApsidalPerPrecessionWanderMin-->1.07<!--/v-->–<!--v:lunisolarApsidalPerPrecessionWanderMax-->9.86<!--/v-->
 across ±26 kyr), not laws.
 
 ### The composition is what nature measures
@@ -594,11 +594,11 @@ L(t) = L₀ + mean tropical rate · t + D(t)          (mean longitude)
    the IAU/Laskar drift expression to 0.1 s over −1000..+3000. THE
    OBSERVATION-CLASS CHECK (plan 06 I1, JPL Horizons' apparent Sun on a
    10-day TT grid over ±3000 yr, <!--v:sunVsHorizonsN-->219,152<!--/v--> instants): the model's apparent
-   Sun sits <!--v:sunVsHorizonsMeanArcsec-->3.66<!--/v-->″ from Horizons on average with sd <!--v:sunVsHorizonsSdArcsec-->3.52<!--/v-->″ over the whole
-   span — near zero in 1000–3000 (<!--v:sunVsHorizonsMeanP1000Arcsec-->1.2<!--/v--> / <!--v:sunVsHorizonsMeanP2000Arcsec-->1.4<!--/v-->″),
-   <!--v:sunVsHorizonsMeanM2000Arcsec-->5.5<!--/v-->″ at −2000..−1000 (the size of the difference between the model's
-   equinox of date and Horizons' of-date frame) — and <!--v:sunVsHorizonsModernSdArcsec-->0.95<!--/v-->″ scatter in
-   1970–2049 (mean offset <!--v:sunVsHorizonsModernMeanArcsec-->0.75<!--/v-->″, the L0 anchor and aberration conventions).
+   Sun sits <!--v:sunVsHorizonsMeanArcsec-->2.57<!--/v-->″ from Horizons on average with sd <!--v:sunVsHorizonsSdArcsec-->3.34<!--/v-->″ over the whole
+   span — near zero in 1000–3000 (<!--v:sunVsHorizonsMeanP1000Arcsec-->1.3<!--/v--> / <!--v:sunVsHorizonsMeanP2000Arcsec-->0.1<!--/v-->″),
+   <!--v:sunVsHorizonsMeanM2000Arcsec-->3.3<!--/v-->″ at −2000..−1000 (the size of the difference between the model's
+   equinox of date and Horizons' of-date frame) — and <!--v:sunVsHorizonsModernSdArcsec-->0.94<!--/v-->″ scatter in
+   1970–2049 (mean offset <!--v:sunVsHorizonsModernMeanArcsec-->0.74<!--/v-->″, the L0 anchor and aberration conventions).
 
 **e(t) and ϖ(t)** are the banked N-body series' Earth elements plus the
 derived mean-element offset of the era (doc 110 chain 1.1; plan 06 layer B)
@@ -608,7 +608,7 @@ carries no equinox-referenced period; the perihelion longitude does. The
 cardinal instants are the APPARENT crossings of this Sun (aberration and
 the leading nutation terms applied, both derived) — the former fitted
 cardinal-point model left with R1 (doc 110 chain 5); against Horizons' own
-crossings the instants are <!--v:cardinalVsHorizonsMeanMin-->−1.49<!--/v--> min on average over ±3000 yr, within a
+crossings the instants are <!--v:cardinalVsHorizonsMeanMin-->−1.04<!--/v--> min on average over ±3000 yr, within a
 minute in 1000–3000.
 
 **Accuracy**: <!--v:frameworkSunVsJplRms-->1.03<!--/v-->″ RMS vs JPL over the modern window 1970–2049

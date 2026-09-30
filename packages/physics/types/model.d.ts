@@ -61,11 +61,11 @@ export function assembleModel(C: Readonly<Record<string, any>>, F: Readonly<Reco
         nodalPeriodYears: number;
         /** The obliquity beat 2π/(ψ̇(t) − |s₃|), years — the SHIPPED deep-time obliquity period (falsification leg 1; 41,224 at J2000, on the composed rate). @param {number} year @returns {number} */
         obliquityBeatYearsAtYear: (year: number) => number;
-        /** The apsidal (perihelion vs the stars) period from the engine-D chain's secular tangent, years — inside the published window only (the tangent is an extrapolation beyond the banked series: it turns negative at −5 Myr); null beyond. @param {number} year @returns {number|null} */
+        /** The apsidal (perihelion vs the stars) period of date, JULIAN years — the ONE movement's own apsidal rate (the scene's perihelion; anom/(anom − sid) of the one family, ≡ 360°/apsidalRateFixedArcsecPerJulianYr), inside the published window only; null beyond. Before 2026-09 this rode the planet chain's secular tangent, which parted from the scene's perihelion passages by seconds of anomalistic year within a few millennia (year-lengths.cjs). @param {number} year @returns {number|null} */
         apsidalPeriodYearsAtYear: (year: number) => number | null;
         /** T_aps(t) / T_p(t) — the apsidal period in of-date precession periods (4.33 at J2000, a reading; 0.84 … 9.9 across ±26 kyr, measured); null beyond the published window. @param {number} year @returns {number|null} */
         apsidalPerPrecessionAtYear: (year: number) => number | null;
-        /** T_peri(t) = 1/(1/T_p + 1/T_aps) — the perihelion-of-date period (equinox precession + inertial perihelion motion, frame arithmetic at every epoch), years, on the of-date T_p; null beyond the published window. @param {number} year @returns {number|null} */
+        /** T_peri(t) = 1/(1/T_p + 1/T_aps) — the perihelion-of-date period (equinox precession + inertial perihelion motion, frame arithmetic at every epoch), JULIAN years, on the of-date T_p — ≡ the one family's anom/(anom − trop); null beyond the published window. @param {number} year @returns {number|null} */
         periOfDatePeriodYearsAtYear: (year: number) => number | null;
         /** T_peri(t) / T_p(t) (0.812 at J2000 — the J2000 reading); null beyond the published window. @param {number} year @returns {number|null} */
         periOfDatePerPrecessionAtYear: (year: number) => number | null;
@@ -116,6 +116,8 @@ export function assembleModel(C: Readonly<Record<string, any>>, F: Readonly<Reco
         axialPrecessionYearsAtYear: (y: number) => number;
         perihelionPrecessionYearsAtYear: (y: number) => number;
         inclinationPrecessionYearsAtYear: (y: number) => number;
+        generalPrecessionArcsecPerJulianYr: (y: number) => number;
+        apsidalRateFixedArcsecPerJulianYr: (y: number) => number;
         cardinal: Readonly<{
             yearLengthSeconds: (y: number, type: "VE" | "SS" | "AE" | "WS") => number;
             eocOffsetSeconds: (y: number, type: "VE" | "SS" | "AE" | "WS") => number;

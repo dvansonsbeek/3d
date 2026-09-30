@@ -78,6 +78,8 @@ export function createDeepOrbitalHistory({ zModes, zetaModes, zetaSeries, zSerie
             orbitNormalY: number;
             equinoxLonJ2000Deg: number;
             equinoxLonRateDegPerYr: number;
+            generalPrecessionLonDeg: number;
+            generalPrecessionLonRateDegPerYr: number;
         };
     };
     alphaArcsecPerYr: number;

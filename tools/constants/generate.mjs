@@ -542,7 +542,8 @@ function emitSiderealChannel({ hash, payload }) {
  *
  * Source: data/nbody-secular-series.json bodies.earth.lamDotRel — the
  * D6 mean-longitude-rate ratio to J2000 (planetary epoch drift, from the
- * model's own constant-GM ±10 Myr run; 2-kyr boxcar, own 2-kyr cadence,
+ * model's own constant-GM ±10 Myr run; the least-squares quadratic slope
+ * of the unwrapped L over the window named in windowYr, own 2-kyr cadence,
  * ratio ≡ 1 at the J2000 node). The sidereal-year-of-date data source
  * for createSiderealYearChannel: T_sid(y) = massLossLaw(y)/lamDotRel(y).
  * Cross-validated against the Chapront polynomial by the generator's

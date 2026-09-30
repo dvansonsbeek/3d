@@ -1,6 +1,6 @@
 ---
 docVersion: 1.0
-modelVersion: v15.0
+modelVersion: v16.0
 coefficients: sha256:bb6a03c877eedab8
 status: current
 ---
@@ -537,18 +537,18 @@ month evolution is chain-integrated on the model's own recession history. The `t
 section of the same gate measures the difference directly, on the TT axis
 (framework opposition vs the NASA canon's greatest-eclipse instant, era
 bins ±40 yr, modern definitional baseline subtracted): a smooth secular
-drift reaching <!--v:lunarDrift800Minutes-->−3.0<!--/v--> min at the −750 era
+drift reaching <!--v:lunarDrift800Minutes-->−3.1<!--/v--> min at the −750 era
 and vanishing toward the present — an effective
-Δṅ ≈ <!--v:lunarTheoryDriftDeltaNdot-->0.24<!--/v--> ″/cy² between the two
+Δṅ ≈ <!--v:lunarTheoryDriftDeltaNdot-->0.25<!--/v--> ″/cy² between the two
 theories. A re-reduction of the tablets with the framework's own Moon
 shifts each century's implied ΔT by exactly that drift, which converts
 the one-sided residual column above into sign-mixed, noise-class scatter:
 
 | Century | residual today | **pre-registered** residual after framework re-reduction |
 |---|---:|---:|
-| -800…-701 | <!--v:lunarCentury800ResidualHours-->−0.01<!--/v--> hr | <!--v:lunarPredictedReduced800Minutes-->+2.4<!--/v--> min |
+| -800…-701 | <!--v:lunarCentury800ResidualHours-->−0.01<!--/v--> hr | <!--v:lunarPredictedReduced800Minutes-->+2.5<!--/v--> min |
 | -700…-601 | <!--v:lunarCentury700ResidualHours-->−0.08<!--/v--> hr | <!--v:lunarPredictedReduced700Minutes-->−2.6<!--/v--> min |
-| -600…-501 | <!--v:lunarCentury600ResidualHours-->−0.09<!--/v--> hr | <!--v:lunarPredictedReduced600Minutes-->−2.7<!--/v--> min |
+| -600…-501 | <!--v:lunarCentury600ResidualHours-->−0.09<!--/v--> hr | <!--v:lunarPredictedReduced600Minutes-->−2.6<!--/v--> min |
 | -500…-401 | <!--v:lunarCentury500ResidualHours-->−0.18<!--/v--> hr | <!--v:lunarPredictedReduced500Minutes-->−8.5<!--/v--> min |
 | -400…-301 | <!--v:lunarCentury400ResidualHours-->−0.22<!--/v--> hr | <!--v:lunarPredictedReduced400Minutes-->−11.5<!--/v--> min |
 

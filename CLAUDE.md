@@ -10,8 +10,8 @@ across 9 directories (~360 on disk with the untracked local archives) · ~245 Py
 **`npm run check` enforces a twenty-four-step gate chain; CI runs it plus a
 headless-browser job and auto-deploys the simulator to GitHub Pages on
 green main.**
-Golden masters live in `packages/fixtures/`. Of the 32 scripts in `tools/verify/`,
-only 4 can actually fail — see the Verification section.
+Golden masters live in `packages/fixtures/`. Of the 33 scripts in `tools/verify/`,
+only 5 can actually fail — see the Verification section.
 
 ---
 
@@ -153,6 +153,32 @@ would silently churn a structural claim for a rounding-level gain.
   (`j2RateJ2000PerYr`), never through the J₂→α factor of the length-of-day
   side. `tools/verify/equinox-vs-vondrak.js` refuses to write if a factor is
   dropped.
+- **The scene is the reference — and it needs its own instrument.** Owner:
+  "all calculations should match what we measure in the scene." Sampling
+  the Node scene twin at 16 epochs with the exporter's own event definitions
+  (2026-09) found three law-level slips the goldens could not see: the
+  tropical-year law read the equinox's PROJECTED J2000 longitude rate where
+  the mean longitude of date needs the general precession — the broken angle
+  through the node of the ecliptic of date (the literature's p_A; the N-body
+  L = Ω + ω + M is that angle) — equal at J2000 and parting with the square
+  of the ecliptic's tilt (0.05 s of year at ±4 kyr, ~1 s beyond 100 kyr, 5.9″
+  of Sun at −3000; `generalPrecessionLonDeg`); the precession period was
+  counted in TROPICAL years by the pair's beat and realised per JULIAN year
+  by the frame (26 ms of tropical year, 0.55 yr of period — periods are now
+  Julian years, and the year relations are rate-form with the unit named);
+  and the published anomalistic year rode the planet chain's secular tangent
+  where the scene's perihelion follows the series (3.3 s at 0 AD, 395 s at
+  +25 kyr). The measurement discipline matters as much as the finding: a
+  per-event `dJD·360/(360 − dWA)` is not a sidereal year (±50 s of
+  equation-of-centre drift per cardinal type, ~150 s of lunar-equation
+  timing per event) — remove the planetary completion per event and read the
+  cumulative angle, four-cardinal mean, against TT. Gate:
+  `tools/verify/scene-year-lengths.js`. The inertial referee for the sidereal
+  law is DE441 in the fixed J2000 frame (`tools/explore/sun-inertial-vs-de441.cjs`):
+  the λ̇ channel's 2-kyr boxcar of per-step rates telescoped to the osculating
+  longitude's endpoint difference and left 0.1–0.3 s of node noise, which the
+  Sun's longitude integrated to +18…28″ at 4000–6500 — now a least-squares
+  quadratic slope over 10 kyr (rms 5.4″ over ±9000 yr, was 18.9″).
 - **A campaign recording hashes what it RUNS ON, or it goes stale unseen.**
   The deep-eccentricity slope anchor (e338d1bd) moved the lunar-alignment
   recording — per-century medians by 100–500 s, identified events 228 → 244 —
@@ -257,10 +283,14 @@ frames after the click). The wobble-centre gate also pins the Tracing
 round-trip bit-exact) since Phase B** and required in CI; red there is a
 regression of the Phase 6 exit criterion, not a tracked state.
 
-`/gates` runs the standalone model checks. `tools/verify/` holds 32 scripts, and
+`/gates` runs the standalone model checks. `tools/verify/` holds 33 scripts, and
 **28 of them cannot fail** — no exit path, no assertion, so running them proves
-nothing. `npm run test:verify:list` gives the classification: 4 gate · 3 liftable
-· 12 narrative · 13 generator (the suite FAILS on any unclassified script). **Never
+nothing. `npm run test:verify:list` gives the classification: 5 gate · 3 liftable
+· 12 narrative · 13 generator (the suite FAILS on any unclassified script). The
+fifth gate, `scene-year-lengths.js`, samples the Node scene twin at −4000 and
++10,000 with the solar-measurements exporter's own event definitions and pins
+the measured sidereal, tropical and anomalistic years of date to the one-family
+laws within 30 ms (fail-proven via `ESSRT_SCENE_YEARS_PLANT=1`). **Never
 run a generator as a test** — `balance-search.js` rewrites the tracked
 `data/balance-presets.json`, `nbody-secular.js` rewrites
 `data/nbody-secular-frequencies.json`, `deep-secular-modes.js` rewrites
@@ -364,7 +394,7 @@ what actually made corrections stick here.
 | `src/script.js` | browser scene + UI + formulas (monolith) |
 | `tools/lib/` | Node engine — `scene-graph`, `orbital-engine`, `deep-time`, `constants` |
 | `tools/fit/` | CLI shims for the fitting pipeline — implementations live in `packages/fitting/src` |
-| `tools/verify/` | 32 scripts: 4 gate · 3 liftable · 12 narrative · 13 generator (`npm run test:verify:list`) |
+| `tools/verify/` | 33 scripts: 5 gate · 3 liftable · 12 narrative · 13 generator (`npm run test:verify:list`) |
 | `packages/physics`, `packages/model-values` | the published npm packages (@essrt scope) — the website and world consume these; refits reach them via `values:package:write` + republish |
 | `tools/explore/` | ~200 research one-offs — findings live in `docs/` |
 | `public/input/fitted-coefficients.json` | single source of truth for fitted values |

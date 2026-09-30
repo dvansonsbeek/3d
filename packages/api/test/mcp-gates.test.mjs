@@ -65,7 +65,7 @@ const toolCall = (name, args) => {
     ['essrt_bodies', { body: 'mercury' }, (d) => (Math.round(d.record.perihelionEclipticYears) === 243867 ? null : `mercury: ${d.record.perihelionEclipticYears}`)],
     ['essrt_values', { key: 'usnoLodJ2000' }, (d) => (d.value === '86,400.0021' ? null : `usnoLodJ2000: ${d.value}`)],   // plan 06 T2 item: the ecliptic term on the nodal period re-closed the joint optimum at 0021
     ['essrt_derivations', { quantity: 'axialPrecession' }, (d) => (Math.abs(d.periodYears - 25771.4) < 0.5 ? null : `period: ${d.periodYears}`)],
-    ['essrt_derivations', { quantity: 'inclinationPrecession' }, (d) => (Math.abs(d.periodYears - 111570) < 5 && d.status === 'current' ? null : `apsidal: ${d.periodYears} ${d.status}`)],
+    ['essrt_derivations', { quantity: 'inclinationPrecession' }, (d) => (Math.abs(d.periodYears - 111548) < 5 && d.status === 'current' ? null : `apsidal: ${d.periodYears} ${d.status}`)],   // 111,548: the movement's own apsidal rate of date (2026-09; was the chain tangent's 111,570)
     ['essrt_climate', { year: 2000 }, (d) => (typeof d.years[0].l1OrbitalPermil === 'number' ? null : 'no L1 value')],
     ['essrt_cross_validation', { curve: 'obliquity-berger1978', year: 2000 }, (d) => (Math.abs(d.years[0].model - d.years[0].published) < 0.05 ? null : `Berger delta: ${d.years[0].delta}`)],
     ['essrt_eclipses', { kind: 'solar', startYear: 2024, stopYear: 2025 }, (d) => (d.count === 2 && d.events[0].type === 'Total' && Math.abs(d.events[0].jd - 2460409.263) < 0.01 ? null : `2024 solar: ${JSON.stringify(d.events?.map((/** @type {any} */ e) => e.type))}`)],

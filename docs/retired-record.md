@@ -1,6 +1,6 @@
 ---
 docVersion: 1.0
-modelVersion: v15.0
+modelVersion: v16.0
 coefficients: sha256:bb6a03c877eedab8
 status: current
 ---
@@ -221,7 +221,7 @@ family matches the IAU/Laskar expression to 0.1 s over four millennia).
 Both now ride the one Sun whose mean longitude integrates the one-source
 tropical year; the cardinal instants are its apparent crossings — against
 JPL Horizons' own crossings over ±3000 yr (the observation-class reference
-that replaced Meeus here, plan 06 I1) they sit <!--v:cardinalVsHorizonsMeanMin-->−1.49<!--/v--> min on average,
+that replaced Meeus here, plan 06 I1) they sit <!--v:cardinalVsHorizonsMeanMin-->−1.04<!--/v--> min on average,
 within a minute in 1000–3000, where the retired device sat hours (doc 110
 §5.3). The coefficients stay in the file as the record until the cleanup
 phase.

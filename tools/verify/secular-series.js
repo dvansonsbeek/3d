@@ -183,34 +183,71 @@ if (maxResampleZ > 2e-5) { console.error('REFUSING: z resample fidelity exceeds 
 // with CONSTANT GM — pure planetary dynamics, cleanly separable from the
 // mass-loss tier (which the run does not contain). Banked as a RATIO to
 // the J2000 value so consumers multiply their own mass-loss law by it.
-// Per-step rate from the dump's L, unwrapped: the integer revolutions per
-// ~54.76-yr raw step are unambiguous (the fractional drift is ~1e-7).
-const LAMDOT_WINDOW_YR = 2000;
-// Banked at its own 2-kyr cadence: the boxcar already removed sub-2-kyr
-// content, so the 500-yr series cadence oversamples it 4× for nothing —
-// and the coarser grid is what the physics package embeds (~200 KB).
+// The dump's L, unwrapped: the integer revolutions per ~54.76-yr raw step
+// are unambiguous (the fractional drift is ~1e-7).
+// ESTIMATOR (2026-09, measured against DE441 in the fixed J2000 frame): each
+// node is the SLOPE of a least-squares quadratic fitted to the unwrapped L
+// over ±LAMDOT_WINDOW_YR/2. The former recipe — a 2-kyr boxcar of the
+// per-step rates — telescopes to the difference of the OSCULATING mean
+// longitude at the window's two ends, so every node carried the
+// short-period terms there: node noise 0.1–0.3 s of sidereal year (banked −
+// DE441-implied: −266 ms at +4000, +258 ms at +8000; rms second difference
+// of the nodes over ±10 Myr 57e-9 where the quadratic fit reads 0.8e-9),
+// which the Sun's longitude INTEGRATES — +18…28″ over 4000–6500 against
+// DE441. The 10-kyr quadratic keeps every secular variation (the fastest
+// genuine λ̇ modulation rides the ~100-kyr eccentricity cycles) and rejects
+// the periodic content the completion table carries explicitly (the
+// 1,783-yr Earth–Mars–Jupiter inequality); against the DE441-implied nodes
+// it reads 43 ms rms where the boxcar read 180 ms.
+const LAMDOT_WINDOW_YR = 10000;
+// Banked at a 2-kyr cadence (the coarser grid is what the physics package
+// embeds, ~200 KB; the estimator is smooth on that scale).
 const LAMDOT_STEP_YR = 2000;
-const lamDotRaw = new Float64Array(NR - 1);
+const lamUnwrappedDeg = new Float64Array(NR);
 {
   const expRev = rDt * 365.25 / 365.2563630;   // ≈ revolutions per raw step
+  lamUnwrappedDeg[0] = E.L[0];
   for (let i = 1; i < NR; i++) {
     let f = (E.L[i] - E.L[i - 1]) / 360;
     f -= Math.floor(f);                         // fractional revolutions [0,1)
     const k = Math.round(expRev - f);           // integer revolutions
-    lamDotRaw[i - 1] = ((k + f) * 360) / rDt;   // deg per Julian year, at the step midpoint
+    lamUnwrappedDeg[i] = lamUnwrappedDeg[i - 1] + (k + f) * 360;
   }
 }
-const lamDotS = smooth(lamDotRaw, LAMDOT_WINDOW_YR);
+/** The least-squares slope (deg per Julian year) of a quadratic in time
+ *  fitted to an unwrapped longitude over the samples within ±W/2 of tt —
+ *  the rate AT tt (the fit's linear coefficient), on the raw grid.
+ *  @param {Float64Array} lam @param {number} tt @param {number} W */
+const lsqSlopeDegPerYr = (lam, tt, W) => {
+  const a = Math.max(0, Math.ceil((tt - W / 2 - rT0) / rDt)), b = Math.min(NR - 1, Math.floor((tt + W / 2 - rT0) / rDt));
+  // normal equations for L = c0 + c1·x + c2·x², x = (t − tt)/1000 (millennia, for conditioning)
+  const S = [0, 0, 0, 0, 0], R = [0, 0, 0];
+  for (let i = a; i <= b; i++) {
+    const x = (tR[i] - tt) / 1000; let pw = 1;
+    for (let k = 0; k < 5; k++) { S[k] += pw; if (k < 3) R[k] += pw * lam[i]; pw *= x; }
+  }
+  const A = [[S[0], S[1], S[2], R[0]], [S[1], S[2], S[3], R[1]], [S[2], S[3], S[4], R[2]]];
+  for (let i = 0; i < 3; i++) for (let j = i + 1; j < 3; j++) { const f = A[j][i] / A[i][i]; for (let k = i; k < 4; k++) A[j][k] -= f * A[i][k]; }
+  const c2 = A[2][3] / A[2][2], c1 = (A[1][3] - A[1][2] * c2) / A[1][1];
+  return c1 / 1000;
+};
+const lamDot0 = lsqSlopeDegPerYr(lamUnwrappedDeg, 0, LAMDOT_WINDOW_YR);
+const nLam = Math.floor((tR[NR - 1] - rT0) / LAMDOT_STEP_YR) + 1;
+const lamDotRel = Array.from({ length: nLam }, (_, i) =>
+  Number((lsqSlopeDegPerYr(lamUnwrappedDeg, t0Yr + i * LAMDOT_STEP_YR, LAMDOT_WINDOW_YR) / lamDot0).toFixed(12)));
+{
+  let s2 = 0;
+  for (let i = 1; i < nLam - 1; i++) s2 += (lamDotRel[i - 1] - 2 * lamDotRel[i] + lamDotRel[i + 1]) ** 2;
+  console.log(`earth λ̇ channel: ${nLam} samples @ ${LAMDOT_STEP_YR} yr (least-squares quadratic slope, window ${LAMDOT_WINDOW_YR} yr) · λ̇(J2000) ${lamDot0.toFixed(6)} °/yr · rel range [${Math.min(...lamDotRel).toFixed(9)}, ${Math.max(...lamDotRel).toFixed(9)}] · node roughness (rms 2nd difference) ${(Math.sqrt(s2 / (nLam - 2)) * 1e9).toFixed(2)}e-9`);
+}
+// The planets' channels below keep the 2-kyr boxcar of per-step rates
+// (display class; the great inequality deliberately retained — see C1).
+const PLANET_LAMDOT_BOXCAR_YR = 2000;
 const liMid = (/** @type {Float64Array} */ arr, /** @type {number} */ tt) => {
   // midpoint grid: value j sits at rT0 + (j + 0.5)·rDt
   const x = (tt - rT0) / rDt - 0.5, i = Math.max(0, Math.min(NR - 3, Math.floor(x))), f = x - i;
   return arr[i] * (1 - f) + arr[i + 1] * f;
 };
-const lamDot0 = liMid(lamDotS, 0);
-const nLam = Math.floor((tR[NR - 1] - rT0) / LAMDOT_STEP_YR) + 1;
-const lamDotRel = Array.from({ length: nLam }, (_, i) =>
-  Number((liMid(lamDotS, t0Yr + i * LAMDOT_STEP_YR) / lamDot0).toFixed(12)));
-console.log(`earth λ̇ channel: ${nLam} samples @ ${LAMDOT_STEP_YR} yr (boxcar ${LAMDOT_WINDOW_YR} yr) · λ̇(J2000) ${lamDot0.toFixed(6)} °/yr · rel range [${Math.min(...lamDotRel).toFixed(9)}, ${Math.max(...lamDotRel).toFixed(9)}]`);
 
 // ── D5: the seven planets' blocks (same recipe; 1000-yr display cadence) ──
 // Consumers are the deep-time ELEMENT readouts (rings/positions beyond the
@@ -267,11 +304,15 @@ for (const pl of PLANETS7) {
 }
 
 // ── C1: the seven planets' λ̇ channels (plan 02 §11, owner-approved
-// mirror of D6, 2026-09-15) — the SAME recipe per planet: per-step
-// wrap-counted λ̇ from the dump's L (wrap prior = the chain's own
-// era-window mean motion, giving two independent routes to the J2000
-// rate — banked as a cross-gate), the 2-kyr boxcar, banked as a ratio
-// to the J2000 node at the 2-kyr cadence. The Driver-2 mass-loss tier
+// mirror of D6, 2026-09-15) — per planet: per-step wrap-counted λ̇ from
+// the dump's L (wrap prior = the chain's own era-window mean motion,
+// giving two independent routes to the J2000 rate — banked as a
+// cross-gate), the 2-kyr boxcar, banked as a ratio to the J2000 node at
+// the 2-kyr cadence. The planets KEEP the boxcar when Earth's channel
+// moved to the least-squares slope (2026-09): their channels are
+// display-class period rows where the great inequality is deliberately
+// retained, and the estimator's node noise is the GI-phase class the
+// C1 record already names. The Driver-2 mass-loss tier
 // is deliberately NOT here (the run's GM is constant): consumers
 // compose P_p(y) = P_win · massLossLaw(y) / lamDotRel_p(y), exactly
 // like Earth's shipped sidereal-year channel.
@@ -288,7 +329,7 @@ for (const pl of PLANETS7) {
     const k = Math.round(expRev - f);           // integer revolutions
     raw[i - 1] = ((k + f) * 360) / rDt;         // deg per Julian year, step midpoint
   }
-  const rawS = smooth(raw, LAMDOT_WINDOW_YR);
+  const rawS = smooth(raw, PLANET_LAMDOT_BOXCAR_YR);
   const l0 = liMid(rawS, 0);
   const rel = Array.from({ length: nLam }, (_, i) =>
     Number((liMid(rawS, t0Yr + i * LAMDOT_STEP_YR) / l0).toFixed(12)));
@@ -328,7 +369,7 @@ for (const pl of PLANETS7) {
   let maxRawDev = 0;
   for (let i = 0; i < NR - 1; i++) maxRawDev = Math.max(maxRawDev, Math.abs(raw[i] / l0 - 1));
   if (maxRawDev > 5e-2) { console.error(`${pl}: REFUSING — raw λ̇ deviates ${(maxRawDev * 100).toFixed(2)}% from the J2000 rate — wrap-count breakage class`); process.exit(1); }
-  Object.assign(planetBodies[pl], { lamDotRel: rel, lamDotStepYr: LAMDOT_STEP_YR, lamDotWindowYr: LAMDOT_WINDOW_YR });
+  Object.assign(planetBodies[pl], { lamDotRel: rel, lamDotStepYr: LAMDOT_STEP_YR, lamDotWindowYr: PLANET_LAMDOT_BOXCAR_YR, lamDotEstimator: 'boxcar of per-step rates' });
   planetLamDotRows.push({ body: pl, lamDotJ2000DegPerYr: Number(l0.toFixed(9)), eraWindowMeanDegPerYr: Number(eraWinMean.toFixed(9)), vsChainWinNPpm: Number((crossRel * 1e6).toFixed(3)), relRange10Myr: [Number(relMin.toFixed(12)), Number(relMax.toFixed(12))], relRange12Kyr: [Number(eraMin.toFixed(12)), Number(eraMax.toFixed(12))] });
 }
 // The two celebrated near-commensurabilities as BEAT PREDICTIONS from the
@@ -589,7 +630,7 @@ const artifact = {
   },
   t0Yr,
   bodies: {
-    earth: { stepYr: STEP_YR, zetaQ: q, zetaP: p, zQ: zq, zP: zp, lamDotRel, lamDotStepYr: LAMDOT_STEP_YR, lamDotWindowYr: LAMDOT_WINDOW_YR },
+    earth: { stepYr: STEP_YR, zetaQ: q, zetaP: p, zQ: zq, zP: zp, lamDotRel, lamDotStepYr: LAMDOT_STEP_YR, lamDotWindowYr: LAMDOT_WINDOW_YR, lamDotEstimator: 'least-squares quadratic slope of the unwrapped L' },
     ...planetBodies,
   },
   verdict: {
@@ -615,7 +656,7 @@ const artifact = {
       lamDotJ2000DegPerYr: lamDot0,
       rows: sidChk.map((r) => ({ tYr: r.t, channelDriftS: Number(r.chanS.toFixed(4)), chaprontDriftS: Number(r.chapS.toFixed(4)) })),
       maxAbsDiffS: Number(sidMaxDiff.toFixed(4)),
-      note: 'D6: the banked λ̇ channel (lamDotRel) vs the Chapront/Capitaine sidereal-year polynomial — planetary-only drift (the dump\'s GM is constant); consumers multiply their own mass-loss law by 1/lamDotRel. THE one cross-validation home for the sidereal-year drift.',
+      note: 'D6: the banked λ̇ channel (lamDotRel) vs the Chapront/Capitaine sidereal-year polynomial — planetary-only drift (the dump\'s GM is constant); consumers multiply their own mass-loss law by 1/lamDotRel. THE one cross-validation home for the sidereal-year drift. Estimator since 2026-09: the least-squares quadratic slope of the unwrapped L over ±5 kyr per node (the former 2-kyr boxcar of per-step rates left 0.1–0.3 s of node noise against DE441 — the scene-sampled gate and tools/explore/sun-inertial-vs-de441.mjs are the referees).',
     },
     planetLamDot: {
       rows: planetLamDotRows,

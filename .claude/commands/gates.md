@@ -17,8 +17,10 @@ node tools/verify/measure-rms-by-epoch.js
 ```
 
 If the user passes `full` as an argument, run `npm run test:verify -- --all`
-instead of hand-running scripts — the suite's classification (32 scripts:
-4 gate · 3 liftable · 12 narrative · 13 generator; `npm run test:verify:list`)
+instead of hand-running scripts — the suite's classification (33 scripts:
+5 gate · 3 liftable · 12 narrative · 13 generator; `npm run test:verify:list`;
+the fifth gate, `scene-year-lengths.js`, samples the Node scene twin for
+~1 min — the scene is the reference for the year lengths of date)
 excludes the generators, which REWRITE tracked data and must never run
 as tests. Several narratives are slow and some need network access to JPL.
 Say which were skipped and why rather than silently omitting them.

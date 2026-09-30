@@ -153,14 +153,11 @@ function createOneSourceMovement() {
   // λ̇-corrected coherently. Identical construction in model.js (API) and
   // script.js (browser).
   const { createYearLengths } = require('../../packages/physics/src/earth/year-lengths.cjs');
-  // The anomalistic rides the chain's SECULAR apsidal tangent (the same
-  // rate family the panel's Prec. cell shows) — ONE helper, keplerian-chain.
-  const kcm = require('../../packages/physics/src/planets/keplerian-chain.cjs');
-  const kcChains = kcm.buildPlanetChainsFromArtifactData(CHAIN_ARTIFACT);
+  // The anomalistic year rides THIS movement's own apsidal line (the scene's
+  // perihelion) — the factory owns the construction (year-lengths.cjs).
   const yearLengths = createYearLengths({
     sampleAt,
     massLossSiderealSecondsAtYearFn: (year) => DT.meanSiderealYearSecondsAtAge((2000 - year) / 1e6),
-    apsidalSecularDegPerYrFn: (year) => kcm.computeApsidalSecularDegPerYr(year, kcChains.earth, kcChains),
   });
   // Back-compat shape for the fixture recorder and existing callers.
   const cardinal = {

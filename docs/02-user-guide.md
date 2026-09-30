@@ -1,6 +1,6 @@
 ---
 docVersion: 1.0
-modelVersion: v15.0
+modelVersion: v16.0
 coefficients: sha256:bb6a03c877eedab8
 status: current
 ---
@@ -113,7 +113,7 @@ This small grey marker rides Earth's precession frame: it circles Earth once per
 
 ### PERIHELION-OF-EARTH (White Dot)
 
-This white dot marks the point closest to the Sun in Earth's orbit. It moves at the model's measured apsidal rate — in the current era one revolution per <!--v:inclPrecYears-->~111,570<!--/v--> years; the displayed direction follows the model's own N-body dynamics.
+This white dot marks the point closest to the Sun in Earth's orbit. It moves at the model's measured apsidal rate — in the current era one revolution per <!--v:inclPrecYears-->~111,548<!--/v--> years; the displayed direction follows the model's own N-body dynamics.
 
 **To observe**: Speed up time to 10,000+ years and watch it drift through the zodiac.
 

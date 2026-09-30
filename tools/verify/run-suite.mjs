@@ -96,6 +96,8 @@ const MANIFEST = [
     note: 'Phase 13: @essrt/physics semver + the essrt.modelVersion pairing vs model-version.json — a refit can never ship without a version bump recording it' },
   { n: 'data-provenance.js', class: 'gate', ms: 1500,
     note: 'Phase 12: every tracked file under data/ must be manifest-covered (PROVENANCE.md row, directory, or self-describing/ledgered generated JSON); no dangling rows; ledger scripts exist' },
+  { n: 'scene-year-lengths.js', class: 'gate', ms: 52000,
+    note: 'the scene is the reference (owner, 2026-09-30): the Node scene twin sampled with the solar-measurements exporter\'s own event definitions at −4000 and +10,000 (±100 yr) — RA, ε, e, the apsidal line, the published cardinal instants, and the sidereal/tropical/anomalistic years of date against the one-family laws to 30 ms (the planetary completion removed per event). Fail-proven via ESSRT_SCENE_YEARS_PLANT=1; the pre-restatement laws fail it (57 ms / 26 ms / 1.1 s at −4000)' },
   { n: 'paleo-anchors.js', class: 'gate', ms: 2000,
     note: 'Phase 19 + Driver 1½: 41 deep-time anchors (Wells 1963 · Winter 2020 · Pannella 1972 · Williams 2000 · Mitchell-Kirscher 2023 · Wu 2024 · Patterson/Roche · the mid-Precambrian set: Farhat 2022 proxies + Zhou 2024 paired a+LOD + Xiamaling + Nanfen, matched by the regime-aware recession history) recomputed LIVE from the engine vs data/paleo-validation-anchors.json; documented deviations (Williams 620 Ma, the Wu Pangea interval) are BANDS — an unexplained improvement fails too (the verify-laws precedent)' },
 

@@ -1,6 +1,6 @@
 ---
 docVersion: 1.0
-modelVersion: v15.0
+modelVersion: v16.0
 coefficients: sha256:bb6a03c877eedab8
 status: current
 ---
@@ -237,8 +237,8 @@ See the [Python Scripts README](../scripts/README.md) for details.
 |---------|-------|-------------|
 | The clock | <!--v:lunisolarPeriodJ2000Yr-->25,771.4<!--/v--> years | The mean lunisolar precession period at J2000 — Earth's spin clock; the other cycles are read against it as ratios |
 | Axial Precession | <!--v:axialPrecRound-->~25,771<!--/v--> yr | Earth's wobble around the EARTH-WOBBLE-CENTER |
-| Apsidal Precession | <!--v:inclPrecYears-->~111,570<!--/v--> yr | PERIHELION-OF-EARTH orbit period against the stars (<!--v:lunisolarApsidalPerPrecessionJ2000-->4.329<!--/v--> precession periods today) |
-| Perihelion Precession | <!--v:periPrecYears-->~20,936<!--/v--> yr | The perihelion-of-date cycle: the axial and apsidal rates add |
+| Apsidal Precession | <!--v:inclPrecYears-->~111,548<!--/v--> yr | PERIHELION-OF-EARTH orbit period against the stars (<!--v:lunisolarApsidalPerPrecessionJ2000-->4.328<!--/v--> precession periods today) |
+| Perihelion Precession | <!--v:periPrecYears-->~20,935<!--/v--> yr | The perihelion-of-date cycle: the axial and apsidal rates add |
 | Obliquity Range | ~22.1° – ~24.5° | Earth's axial tilt oscillation |
 
 For all constants and their sources, see the [Constants Reference](20-constants-reference.md).
