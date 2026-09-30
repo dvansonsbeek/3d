@@ -216,7 +216,7 @@ For Jupiter, Saturn, Uranus, and Neptune, standard secular theory reports **no r
 |---|---|---:|
 | Venus | tidally damped at 177° (Correia & Laskar 2003) | 8H/110 = **24,387 yr (record)** (model: net residual after two opposing precession components nearly cancel) |
 | Jupiter | "No regular cycle" — Gyr secular trend 3.1° → 6–37° (Saillenfest 2020) | H/2 = **<!--v:hDiv2-->167,659<!--/v--> yr** |
-| Saturn | "No regular cycle" — Gyr trend 26.7° → 65°+ via Neptune resonance (Saillenfest 2021; Wisdom 2022) | H/3 = **<!--v:earthPeriPeriodICRF-->111,548<!--/v--> yr** |
+| Saturn | "No regular cycle" — Gyr trend 26.7° → 65°+ via Neptune resonance (Saillenfest 2021; Wisdom 2022) | H/3 = **<!--v:earthPeriPeriodICRF-->111,582<!--/v--> yr** |
 | Uranus | Frozen — > 100 Myr precession (Saillenfest 2022) | H/2 = **<!--v:hDiv2-->167,659<!--/v--> yr** |
 | Neptune | Frozen (Rogoszinski & Hamilton 2020) | 8H/100 = **26,825 yr (record)** |
 

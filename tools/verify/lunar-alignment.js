@@ -74,6 +74,11 @@ const INPUT_FILES = [
   // eccentricity channel, its arguments, the model assembly and the ΔT stack
   // were not hashed here. The recording sat stale for four days.
   'packages/physics/src/model.js',
+  // the Sun of date the lunar arguments ride (mean longitude on the one-family
+  // tropical year over the movement's own frame — 2026-09)
+  'packages/physics/src/earth/deep-orbital-history.cjs',
+  'packages/physics/src/earth/year-lengths.cjs',
+  'packages/physics/src/earth/sidereal-channel-artifact.cjs',
   'packages/physics/src/moon/deep-ecc-channel.cjs',
   'packages/physics/src/moon/arguments.cjs',
   'packages/physics/src/moon/month-chain.cjs',

@@ -7,9 +7,9 @@ status: current
 
 # Milankovitch Language of the Model
 
-> **TL;DR.** The model has **five** natural Milankovitch-band periods, all read against one clock — the mean lunisolar precession period — and connected by frame arithmetic: **apsidal precession (<!--v:inclPrecYears-->~111,548<!--/v--> yr; historically "inclination precession" in this framework), nodal (ecliptic) precession (<!--v:eclPrecYears-->~68,751<!--/v--> yr, the s₃ mode), the obliquity beat (<!--v:obliqCycleYears-->~41,224<!--/v--> yr), axial precession (<!--v:earthAxialPeriod-->25,771<!--/v--> yr), and perihelion-of-date precession (<!--v:periPrecYears-->~20,935<!--/v--> yr)**. Two of them are beats of the others — obliquity = axial − nodal, perihelion-of-date = axial + apsidal — frame arithmetic that holds at every epoch (§3). Standard secular theory gives the same periods because they ARE the same quantities: the model's values are its own engine's (the movement's apsidal rate of date, the dominant nodal mode, the composed precession rate), and Berger 1978's climatic-precession peaks are the p + g_i lines of the shipped climate formula ([doc 92 §2](92-climate-formula.md)). *Note: in this framework the perihelion-of-date period is **perihelion precession** (the rotation of Earth's apsidal line in the ecliptic frame), distinct from **climatic precession** (~23.7 kyr dominant, e·sin ϖ — the p + g₀ line). The earlier presentation — five integer divisors of one master cycle closing as an integer algebra — is retired ([retired record](retired-record.md)): the integers were J2000 readings of these periods against the fitted anchor, and the live ratios wander.*
+> **TL;DR.** The model has **five** natural Milankovitch-band periods, all read against one clock — the mean lunisolar precession period — and connected by frame arithmetic: **apsidal precession (<!--v:inclPrecYears-->~111,582<!--/v--> yr; historically "inclination precession" in this framework), nodal (ecliptic) precession (<!--v:eclPrecYears-->~68,751<!--/v--> yr, the s₃ mode), the obliquity beat (<!--v:obliqCycleYears-->~41,224<!--/v--> yr), axial precession (<!--v:earthAxialPeriod-->25,771<!--/v--> yr), and perihelion-of-date precession (<!--v:periPrecYears-->~20,936<!--/v--> yr)**. Two of them are beats of the others — obliquity = axial − nodal, perihelion-of-date = axial + apsidal — frame arithmetic that holds at every epoch (§3). Standard secular theory gives the same periods because they ARE the same quantities: the model's values are its own engine's (the movement's apsidal rate of date, the dominant nodal mode, the composed precession rate), and Berger 1978's climatic-precession peaks are the p + g_i lines of the shipped climate formula ([doc 92 §2](92-climate-formula.md)). *Note: in this framework the perihelion-of-date period is **perihelion precession** (the rotation of Earth's apsidal line in the ecliptic frame), distinct from **climatic precession** (~23.7 kyr dominant, e·sin ϖ — the p + g₀ line). The earlier presentation — five integer divisors of one master cycle closing as an integer algebra — is retired ([retired record](retired-record.md)): the integers were J2000 readings of these periods against the fitted anchor, and the live ratios wander.*
 >
-> For the **100-kyr ice age problem**, the model's <!--v:inclPrecYears-->~111,548<!--/v-->-yr apsidal-precession period lies in the same Rayleigh-limited band as the empirical centroid (Mercury-Mars s₁−s₄ nodal beat at ~107 kyr) — both sit on the *inclination-side / orbital-plane* family of eigenmode beats that Muller & MacDonald (1997, *PNAS*) argued for spectrally over direct eccentricity.
+> For the **100-kyr ice age problem**, the model's <!--v:inclPrecYears-->~111,582<!--/v-->-yr apsidal-precession period lies in the same Rayleigh-limited band as the empirical centroid (Mercury-Mars s₁−s₄ nodal beat at ~107 kyr) — both sit on the *inclination-side / orbital-plane* family of eigenmode beats that Muller & MacDonald (1997, *PNAS*) argued for spectrally over direct eccentricity.
 >
 > Companion docs: [91 — Milankovitch Evidence & Hypothesis Tests](91-milankovitch-evidence.md) (the comb-era empirical tests — 14 hypothesis tests + the 405-kyr characterization; historical record, plan 06 T1); [92 — Climate Formula: Architecture, Variance & Implementation](92-climate-formula.md) (canonical L1+L2+L3 modular formula + per-regime ridge fits across LR04 / CENOGRID / EPICA / CenCO2PIP + Climate Formula Explorer modal).
 
@@ -48,11 +48,11 @@ The clock is the **mean lunisolar precession period**, <!--v:lunisolarPeriodJ200
 
 | Cycle | What it is | Years (J2000) | Source |
 |---|---|---:|---|
-| **Apsidal precession** | the movement's own apsidal rate of date (the beat of the one-family anomalistic and sidereal years — the scene's perihelion) | **<!--v:inclPrecYears-->~111,548<!--/v-->** | Earth's apsidal line vs the fixed stars (ICRF perihelion); §5.3 proposes an orbital-plane component at this period |
+| **Apsidal precession** | the movement's own apsidal rate of date (the beat of the one-family anomalistic and sidereal years — the scene's perihelion) | **<!--v:inclPrecYears-->~111,582<!--/v-->** | Earth's apsidal line vs the fixed stars (ICRF perihelion); §5.3 proposes an orbital-plane component at this period |
 | **Nodal (ecliptic) precession** | the dominant nodal mode s₃ of Earth's orbit on the invariable plane | **<!--v:eclPrecYears-->~68,751<!--/v-->** | Earth's orbital plane regression = **nodal regression** (`f_nodal` in §3); Jupiter's ecliptic perihelion period (<!--v:jupiterPeriPeriod-->68,783<!--/v--> yr, a window-epoch device value) sits nearby |
 | **Obliquity oscillation** | the beat 2π/(ψ̇ − \|s₃\|) of the composed precession against the nodal mode | **<!--v:obliqCycleYears-->~41,224<!--/v-->** | Beat: f_axial − f_nodal; falsification leg 1 at deep time |
 | **Axial precession** | the composed lunisolar torque rate's period | **<!--v:earthAxialPeriod-->25,771<!--/v-->** | Earth's spin-axis equinox precession |
-| **Perihelion-of-date precession** | the of-date year laws' beat: f_axial + f_apsidal | **<!--v:periPrecYears-->~20,935<!--/v-->** | Also the carrier of the Berger climatic-precession band (~19–24 kyr); the dominant Berger peak is the p + g₀ line at 23.76 kyr (doc 92 §2). |
+| **Perihelion-of-date precession** | the of-date year laws' beat: f_axial + f_apsidal | **<!--v:periPrecYears-->~20,936<!--/v-->** | Also the carrier of the Berger climatic-precession band (~19–24 kyr); the dominant Berger peak is the p + g₀ line at 23.76 kyr (doc 92 §2). |
 
 None of the five is fitted to a Milankovitch value: the apsidal and nodal periods are the N-body chain's, the axial precession is the composed torque rate's period, and the two beats follow from those three by frame arithmetic. (The earlier statement here — "all five are integer divisors of H, locked by integer arithmetic" — is retired: 111,772 / 67,063 / 41,915 / 25,794 / 20,957 were the fitted anchor's fractions, 0.1–2.5 % off the dynamical values above.)
 
@@ -71,7 +71,7 @@ The five cycles are not independently chosen — they satisfy four **kinematic b
 
 Only the first two are physically independent — the rest follow algebraically. The right-hand column is what the identities looked like when the five periods were read as integer fractions of the fitted anchor: the arithmetic closed because the readings were rounded to integers that happen to add, not because the periods are locked. The obliquity row is the one physical beat the model predicts at deep time (2π/(ψ̇ − |s₃|), falsification leg 1).
 
-The identities are geometric facts of any precessing axis and orbit; they hold at every epoch. The former reading that they "close only because the divisors are those particular integers" is retired ([retired record](retired-record.md)): the integers were the J2000 values of the five periods against the fitted anchor, and the live ratios wander — T_aps/T_p runs <!--v:lunisolarApsidalPerPrecessionWanderMin-->1.07<!--/v-->–<!--v:lunisolarApsidalPerPrecessionWanderMax-->9.86<!--/v--> across ±26 kyr (the simulator's Lunisolar Clock panel). Any two of the three primary rates (axial, apsidal, nodal) plus the identities fix the two beats.
+The identities are geometric facts of any precessing axis and orbit; they hold at every epoch. The former reading that they "close only because the divisors are those particular integers" is retired ([retired record](retired-record.md)): the integers were the J2000 values of the five periods against the fitted anchor, and the live ratios wander — T_aps/T_p runs <!--v:lunisolarApsidalPerPrecessionWanderMin-->1.07<!--/v-->–<!--v:lunisolarApsidalPerPrecessionWanderMax-->9.85<!--/v--> across ±26 kyr (the simulator's Lunisolar Clock panel). Any two of the three primary rates (axial, apsidal, nodal) plus the identities fix the two beats.
 
 ---
 
@@ -85,11 +85,11 @@ None of the five model periods is fitted to a Milankovitch value — they are th
 
 | Model | Standard value | Source | Deviation |
 |---|---|---|---|
-| apsidal <!--v:inclPrecYears-->~111,548<!--/v--> yr | ~111,700 yr (apsidal precession incl GR) | Bretagnon 1974, Standish 1992 | ≈ 0.1 % |
+| apsidal <!--v:inclPrecYears-->~111,582<!--/v--> yr | ~111,700 yr (apsidal precession incl GR) | Bretagnon 1974, Standish 1992 | ≈ 0.1 % |
 | nodal <!--v:eclPrecYears-->~68,751<!--/v--> yr | 68,761 yr (s₃ Earth nodal eigenfrequency) | Laskar 2004 | ≈ 0.01 % (the same mode) |
 | obliquity beat <!--v:obliqCycleYears-->~41,224<!--/v--> yr | ~41,000 yr (Berger obliquity peak); 41,222 yr as k + s₃ | Berger 1978; Laskar 2004 | ≈ 0.5 % / 0.01 % |
 | axial <!--v:earthAxialPeriod-->25,771<!--/v--> yr | ~25,772 yr (axial precession k) | IAU 2006 | ≈ 0.00 % |
-| perihelion-of-date <!--v:periPrecYears-->~20,935<!--/v--> yr | 19/22/23 kyr triplet centroid ~22 kyr | Berger 1978 | **< 5 %** (within band) |
+| perihelion-of-date <!--v:periPrecYears-->~20,936<!--/v--> yr | 19/22/23 kyr triplet centroid ~22 kyr | Berger 1978 | **< 5 %** (within band) |
 
 ### 4.2 Berger 1978 climatic-precession spectrum
 
@@ -110,7 +110,7 @@ All six peaks match an integer-divisor position. **Berger names each peak after 
 
 The Laskar (La2004) secular solution decomposes eccentricity and inclination into eight g_j and s_j eigenmodes. **Multiple independent combinations converge on H/3 and H/5**:
 
-**The apsidal period, <!--v:inclPrecYears-->~111,548<!--/v--> yr**, sits among three combinations:
+**The apsidal period, <!--v:inclPrecYears-->~111,582<!--/v--> yr**, sits among three combinations:
 
 | Combination | Physical meaning | Period (yr) | Deviation |
 |---|---|---:|---:|

@@ -57096,14 +57096,17 @@ function updatePredictions() {
 
   o.perihelionPrecession = o.anomalisticYearSeconds/(o.anomalisticYearSeconds-o.solarYearSeconds);
   o.inclinationPrecession = o.anomalisticYearSeconds/(o.anomalisticYearSeconds-o.siderealYearSeconds);
-  // DISPLAY (D6): beats of the DISPLAYED one-source years — self-consistent
-  // with the year rows above (the engine's dynamical values; the H-lattice
-  // identities remain the kinematic family in the tooltips/registry).
+  // DISPLAY (D6): beats of the DISPLAYED one-source years in JULIAN years
+  // (T_a·T_b/((T_a − T_b)·365.25 d), the package's beatJulianYears form) —
+  // self-consistent with the year rows above and with the Axial row (the
+  // engine's dynamical values; the H-lattice identities remain the
+  // kinematic family in the tooltips/registry).
+  const _JY_S = 365.25 * 86400;
   predictions.perihelionPrecession = _hybridSpinActive()
-    ? predictions.anomalisticYearSeconds / (predictions.anomalisticYearSeconds - predictions.solarYearSeconds)
+    ? predictions.anomalisticYearSeconds * predictions.solarYearSeconds / ((predictions.anomalisticYearSeconds - predictions.solarYearSeconds) * _JY_S)
     : o.perihelionPrecession;
   predictions.inclinationPrecession = _hybridSpinActive()
-    ? predictions.anomalisticYearSeconds / (predictions.anomalisticYearSeconds - predictions.siderealYearSeconds)
+    ? predictions.anomalisticYearSeconds * predictions.siderealYearSeconds / ((predictions.anomalisticYearSeconds - predictions.siderealYearSeconds) * _JY_S)
     : o.inclinationPrecession;
   // Obliquity — pure H-lattice framework value (H/8), NOT axial × 13/8
   // (the ratio form would inherit Fourier ripple from axialPrecession).

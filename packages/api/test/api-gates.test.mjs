@@ -141,10 +141,12 @@ for (const url of SAMPLE_REQUESTS) {
   if (deriv.latticeDivisor !== 13) failures.push(`derivations/axialPrecession divisor: ${deriv.latticeDivisor}`);
   if (Math.abs(deriv.periodYears - 25771.4) > 0.5) failures.push(`derivations/axialPrecession period: ${deriv.periodYears}`);
   // S6: the Earth-cycle rows carry the DYNAMICAL periods (the registry's values), never the device H/n.
-  // (inclinationPrecession 111,548: the movement's own apsidal rate of date since 2026-09 — was the chain tangent's 111,570.)
-  for (const [q, expect] of /** @type {Array<[string, number]>} */ ([['inclinationPrecession', 111548], ['perihelionPrecession', 20935], ['eclipticPrecession', 68751], ['obliquityCycle', 41224]])) {
+  // (inclinationPrecession ≈ 111,580: the movement's own apsidal rate of date since 2026-09 — was the chain tangent's
+  // 111,570; its J2000 reading carries the banked series' own ±0.04 ″/yr ripple, ≈ ±400 yr on the period, so the
+  // tolerance is 60 yr where the smooth quantities keep 5.)
+  for (const [q, expect, tol] of /** @type {Array<[string, number, number]>} */ ([['inclinationPrecession', 111580, 60], ['perihelionPrecession', 20936, 5], ['eclipticPrecession', 68751, 5], ['obliquityCycle', 41224, 5]])) {
     const d = dataOf(`/v1/derivations/${q}`);
-    if (typeof d.periodYears !== 'number' || Math.abs(d.periodYears - expect) > 5) failures.push(`derivations/${q} period: ${d.periodYears} (expected ≈ ${expect})`);
+    if (typeof d.periodYears !== 'number' || Math.abs(d.periodYears - expect) > tol) failures.push(`derivations/${q} period: ${d.periodYears} (expected ≈ ${expect})`);
     if (d.status !== 'current') failures.push(`derivations/${q} status: ${d.status}`);
   }
   if (dataOf('/v1/derivations/solarSystemResonanceCycle').status !== 'retired') failures.push('derivations/solarSystemResonanceCycle must be marked retired');

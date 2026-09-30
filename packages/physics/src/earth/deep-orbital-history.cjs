@@ -373,15 +373,13 @@ function createDeepOrbitalHistory({
     return (Pi + u) * R2D;
   }
 
-  /** Equinox-node longitudes only (J2000 ecliptic frame; projected and
-   *  general-precession forms) — the light read used for the node-rate
-   *  finite differences at store time. */
+  /** The three of-date longitudes whose node RATES the grid stores (the
+   *  projected and general-precession equinox longitudes, the perihelion
+   *  longitude of date) — read from a full sample at the probe state, so the
+   *  rates are finite differences of exactly the stored quantities. */
   function eqLonsOnlyDeg(/** @type {number[]} */ s, /** @type {number} */ t) {
-    const n = orbitNormal(t);
-    const g = cross(s, n);
-    const gn = Math.hypot(g[0], g[1], g[2]);
-    const gu = [g[0] / gn, g[1] / gn, g[2] / gn];
-    return { proj: Math.atan2(gu[1], gu[0]) * R2D, general: generalPrecessionLonDeg(n, gu) };
+    const smp = sampleAt(s, t);
+    return { proj: smp.equinoxLonJ2000Deg, general: smp.generalPrecessionLonDeg, peri: smp.periOfDateDeg };
   }
 
   /** One quantity bundle at time t (years from J2000) from spin axis s. */
@@ -449,6 +447,7 @@ function createDeepOrbitalHistory({
       // built on this rate (earth/year-lengths.cjs).
       generalPrecessionLonDeg: ((generalPrecessionLonDeg(n, gu) % 360) + 360) % 360,
       generalPrecessionLonRateDegPerYr: 0,   // filled at store time (build's ±2.5-yr central difference)
+      periOfDateRateDegPerYr: 0,             // filled at store time — the C1 input for periOfDateDeg (the apsidal rate of date)
     };
   }
 
@@ -488,6 +487,12 @@ function createDeepOrbitalHistory({
       // centuries with steps at the 1700/1800/1900/2000 cell edges
       // (measured; the levels were the real wobble at 100-yr resolution,
       // the staircase was this interpolation order).
+      // The perihelion longitude of date gets the same C1 treatment (2026-09,
+      // owner-found): linear interpolation of periOfDateDeg made the
+      // movement's year-over-year apsidal rate — the anomalistic year, the
+      // Prec. cell — a staircase of ±0.1 s across the 100-yr cells, reading
+      // 365.2596375 d at 2000.0 and 365.2596390 d at 2000.5, and the panel's
+      // apsidal beat 111,494 where the registry read 111,548.
       const storeWithRate = (/** @type {number} */ key, /** @type {number[]} */ sv, /** @type {number} */ tv) => {
         const smp = sampleAt(sv, tv);
         const hR = 2.5;
@@ -495,6 +500,7 @@ function createDeepOrbitalHistory({
         const lm = eqLonsOnlyDeg(rk4(sv, tv, -hR), tv - hR);
         smp.equinoxLonRateDegPerYr = (((lp.proj - lm.proj + 540) % 360) - 180) / (2 * hR);
         smp.generalPrecessionLonRateDegPerYr = (((lp.general - lm.general + 540) % 360) - 180) / (2 * hR);
+        smp.periOfDateRateDegPerYr = (((lp.peri - lm.peri + 540) % 360) - 180) / (2 * hR);
         grid.set(key, smp);
       };
       storeWithRate(0, s, 0);
@@ -522,7 +528,6 @@ function createDeepOrbitalHistory({
         if (!a) throw new Error(`deep-orbital-history: ${tYr} outside the built range`);
         const f = (tYr - k0) / stepYr;
         const lerp = (/** @type {number} */ x, /** @type {number} */ y) => x + (y - x) * f;
-        const dAng = (/** @type {number} */ x, /** @type {number} */ y) => x + (((y - x + 540) % 360) - 180) * f;
         // C1 (cubic Hermite) on a wrapped angle with node rates (deg/yr) —
         // linear interpolation here made the realized equinox RATE
         // piecewise-constant per grid cell (the measured per-year
@@ -539,7 +544,8 @@ function createDeepOrbitalHistory({
         return {
           epsDeg: lerp(a.epsDeg, b.epsDeg),
           e: lerp(a.e, b.e),
-          periOfDateDeg: ((dAng(a.periOfDateDeg, b.periOfDateDeg) % 360) + 360) % 360,
+          periOfDateDeg: hermiteAngle(a.periOfDateDeg, b.periOfDateDeg, a.periOfDateRateDegPerYr, b.periOfDateRateDegPerYr ?? a.periOfDateRateDegPerYr),
+          periOfDateRateDegPerYr: lerp(a.periOfDateRateDegPerYr, b.periOfDateRateDegPerYr ?? a.periOfDateRateDegPerYr),
           eSinPeri: lerp(a.eSinPeri, b.eSinPeri),
           eCosPeri: lerp(a.eCosPeri, b.eCosPeri),
           inclEclDeg: lerp(a.inclEclDeg, b.inclEclDeg),

@@ -132,6 +132,11 @@ const INPUT_FILES = [
   // the audit-26 / Babylon / centerlines umbra chain — U1: the package
   // besselian tier (single implementation; the scene twin is retired here):
   'packages/physics/src/model.js',
+  // the Sun of date (mean longitude on the one-family tropical year over the
+  // movement's own frame — 2026-09)
+  'packages/physics/src/earth/deep-orbital-history.cjs',
+  'packages/physics/src/earth/year-lengths.cjs',
+  'packages/physics/src/earth/sidereal-channel-artifact.cjs',
   'packages/physics/src/eclipse/besselian.cjs',
   'packages/physics/src/eclipse/sun-planetary-completion.cjs',
   'packages/physics/src/moon/series-extension.cjs',

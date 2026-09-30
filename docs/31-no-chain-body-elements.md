@@ -100,7 +100,7 @@ ecliptic rate − general precession H/13). Literal values J2000-evaluated:
 |--------|----------------|-------------|----------------|
 | Mercury | `Y × 8/11` | <!--v:mercuryPeriPeriodICRF-->28,844<!--/v--> yr | Retrograde |
 | Venus | `−8Y/6` | <!--v:venusPeriPeriodICRF-->24,387<!--/v--> yr | Retrograde |
-| Earth | `H / 16` | `H/3` ≈ <!--v:earthPeriPeriodICRF-->111,548<!--/v--> yr | Prograde (sole) |
+| Earth | `H / 16` | `H/3` ≈ <!--v:earthPeriPeriodICRF-->111,582<!--/v--> yr | Prograde (sole) |
 | Mars | `Y × 8/36` | <!--v:marsPeriPeriodICRF-->39,449<!--/v--> yr | Retrograde |
 | Jupiter | `8Y/39` | <!--v:jupiterPeriPeriodICRF-->41,270<!--/v--> yr | Retrograde |
 | Saturn | `−8Y/65` | <!--v:saturnPeriPeriodICRF-->15,873<!--/v--> yr | Retrograde |

@@ -71,6 +71,7 @@ export function createDeepOrbitalHistory({ zModes, zetaModes, zetaSeries, zSerie
             epsDeg: number;
             e: number;
             periOfDateDeg: number;
+            periOfDateRateDegPerYr: number;
             eSinPeri: number;
             eCosPeri: number;
             inclEclDeg: number;

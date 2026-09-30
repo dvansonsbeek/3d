@@ -128,7 +128,7 @@ are J2000 readings at Earth's spin–orbit–tide interface — the axial
 precession and the obliquity beat on the spin side, the apsidal and
 perihelion-of-date periods as the epoch-local tangents of the orbital side
 — readings that wander (the apsidal-to-axial ratio runs
-<!--v:lunisolarApsidalPerPrecessionWanderMin-->1.07<!--/v-->–<!--v:lunisolarApsidalPerPrecessionWanderMax-->9.86<!--/v-->
+<!--v:lunisolarApsidalPerPrecessionWanderMin-->1.07<!--/v-->–<!--v:lunisolarApsidalPerPrecessionWanderMax-->9.85<!--/v-->
 across ±26 kyr), not laws.
 
 ### The composition is what nature measures

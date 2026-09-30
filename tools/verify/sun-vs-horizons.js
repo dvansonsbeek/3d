@@ -45,6 +45,12 @@ const INPUT_FILES = [
   'data/nbody-secular-series.json',
   'tools/explore/fetch-jpl-sun-longitude-tt.mjs',
   'packages/physics/src/model.js',
+  // The Sun's mean longitude of date integrates the one-family tropical year
+  // on the movement's own frame of date — the sampler is an input (2026-09:
+  // the general-precession booking and the C1 perihelion rate live there).
+  'packages/physics/src/earth/deep-orbital-history.cjs',
+  'packages/physics/src/earth/sidereal-year-channel.cjs',
+  'packages/physics/src/earth/sidereal-channel-artifact.cjs',
   'packages/physics/src/eclipse/finders.cjs',
   'packages/physics/src/eclipse/sun-planetary-completion.cjs',
   'packages/physics/src/earth/year-lengths.cjs',
