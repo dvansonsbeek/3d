@@ -4,9 +4,10 @@
  * (packages/fitting/src/export-solar-measurements.cjs). Shim keeps the
  * documented CLI path; argv passes through unchanged.
  *
- * CAUTION (CLAUDE.md): this generates the gitignored 159 MB
- * data/02-solar-measurements.csv in ~2h24m. Never run it as a test; back
- * the CSV up before any deliberate regeneration.
+ * The kept artifact is the WINDOW CSV (`npm run fit:6a2`, −4000…+4000,
+ * ~25 min). Without --start/--end/--output this writes the full-period
+ * data/02-solar-measurements.csv (160 MB, ~2 h 24 m) — retired as a kept
+ * file, on demand only. Never run it as a test.
  */
 
 require('../../packages/fitting/src/export-solar-measurements.cjs');

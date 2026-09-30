@@ -17,11 +17,10 @@ node tools/verify/measure-rms-by-epoch.js
 ```
 
 If the user passes `full` as an argument, run `npm run test:verify -- --all`
-instead of hand-running scripts — the suite's classification (24 scripts:
-6 gate · 4 liftable · 10 narrative · 4 generator; `npm run test:verify:list`)
-excludes the four generators, which REWRITE tracked data and must never run
-as tests. Several narratives are slow and some need
-`data/02-solar-measurements.csv` (166 MB, gitignored) or network access to JPL.
+instead of hand-running scripts — the suite's classification (32 scripts:
+4 gate · 3 liftable · 12 narrative · 13 generator; `npm run test:verify:list`)
+excludes the generators, which REWRITE tracked data and must never run
+as tests. Several narratives are slow and some need network access to JPL.
 Say which were skipped and why rather than silently omitting them.
 
 ## How to report

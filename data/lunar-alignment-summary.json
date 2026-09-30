@@ -11,11 +11,11 @@
     "unmatchedModel": 6,
     "unmatchedCanon": 0,
     "typeAgree": 1447,
-    "meanAbsResidualMinutes": 8.516,
-    "meanAbsResidualMinutesFull": 8.51627872488622,
-    "rmsResidualMinutes": 9.822,
-    "rmsResidualMinutesFull": 9.821502232953248,
-    "maxAbsResidualMinutes": 19.483
+    "meanAbsResidualMinutes": 8.517,
+    "meanAbsResidualMinutesFull": 8.517450676807043,
+    "rmsResidualMinutes": 9.823,
+    "rmsResidualMinutesFull": 9.823185794560294,
+    "maxAbsResidualMinutes": 19.31
   },
   "visibility": {
     "entriesChecked": 14,
@@ -141,11 +141,11 @@
     "found": true,
     "type": "Partial",
     "canonType": "Partial",
-    "magnitudeUmbral": 0.8777,
+    "magnitudeUmbral": 0.914,
     "canonMagnitudeUmbral": 0.9199,
-    "ttResidualMinutes": 8.44,
+    "ttResidualMinutes": -3.63,
     "visibleFromBabylon": true,
-    "babylonMoonAltitudeDeg": 32.62
+    "babylonMoonAltitudeDeg": 35.15
   },
   "dtBands": {
     "overall": {
@@ -280,201 +280,213 @@
   },
   "theoryDrift": {
     "binHalfWidthYears": 40,
-    "modernBaselineMinutes": 0.71,
+    "modernBaselineMinutes": 0.72,
     "bins": {
       "100": {
         "n": 196,
-        "signedMeanMinutes": -0.47
+        "signedMeanMinutes": -0.05
       },
       "500": {
         "n": 201,
-        "signedMeanMinutes": 0.2
+        "signedMeanMinutes": 0.33
       },
       "1000": {
         "n": 191,
-        "signedMeanMinutes": 0.14
+        "signedMeanMinutes": 0.22
       },
       "1500": {
         "n": 180,
-        "signedMeanMinutes": 0.32
+        "signedMeanMinutes": 0.33
       },
       "1800": {
         "n": 202,
-        "signedMeanMinutes": 0.7
+        "signedMeanMinutes": 0.71
       },
       "2000": {
         "n": 183,
         "signedMeanMinutes": 1.12
       },
       "-750": {
-        "n": 189,
-        "signedMeanMinutes": -2.81
+        "n": 190,
+        "signedMeanMinutes": -2.28
       },
       "-650": {
         "n": 204,
-        "signedMeanMinutes": -1.57
+        "signedMeanMinutes": -1.43
       },
       "-550": {
-        "n": 203,
-        "signedMeanMinutes": -2.34
+        "n": 204,
+        "signedMeanMinutes": -2.02
       },
       "-450": {
-        "n": 192,
-        "signedMeanMinutes": -2.06
+        "n": 193,
+        "signedMeanMinutes": -1.55
       },
       "-350": {
-        "n": 180,
-        "signedMeanMinutes": -0.52
+        "n": 186,
+        "signedMeanMinutes": -0.95
       },
       "-250": {
         "n": 183,
-        "signedMeanMinutes": -1.78
+        "signedMeanMinutes": -1.62
       },
       "-100": {
         "n": 201,
-        "signedMeanMinutes": -0.69
+        "signedMeanMinutes": -0.38
       }
     },
     "driftVsModernMinutes": {
-      "100": -1.18,
-      "500": -0.51,
-      "1000": -0.57,
+      "100": -0.77,
+      "500": -0.39,
+      "1000": -0.5,
       "1500": -0.39,
       "1800": -0.01,
-      "2000": 0.41,
-      "-750": -3.52,
-      "-650": -2.28,
-      "-550": -3.05,
-      "-450": -2.77,
-      "-350": -1.23,
-      "-250": -2.49,
-      "-100": -1.4
+      "2000": 0.4,
+      "-750": -3,
+      "-650": -2.15,
+      "-550": -2.74,
+      "-450": -2.27,
+      "-350": -1.67,
+      "-250": -2.34,
+      "-100": -1.1
     },
-    "effectiveDeltaNdotArcsecPerCy2": 0.28,
+    "effectiveDeltaNdotArcsecPerCy2": 0.24,
     "predictedReducedResidualMinutes": {
-      "-800": 2.9,
-      "-700": -2.5,
-      "-600": -2.3,
-      "-500": -8,
-      "-400": -12
+      "-800": 2.4,
+      "-700": -2.6,
+      "-600": -2.7,
+      "-500": -8.5,
+      "-400": -11.5
     }
   },
   "phaseC": {
     "window": "S01/S02/S04, years −800..−301, weight>0 (null=1)",
-    "identified": 63,
+    "identified": 69,
     "viaYearStraddle": 4,
-    "ambiguous": 7,
+    "ambiguous": 1,
     "dropped": 1,
     "perCentury": {
+      "-800": {
+        "n": 2,
+        "medianMinutes": 15.5,
+        "seMinutes": 40.1,
+        "preRegisteredMinutes": 2.4,
+        "z": 0.3
+      },
       "-700": {
-        "n": 5,
-        "medianMinutes": -13.1,
-        "seMinutes": 11.1,
-        "preRegisteredMinutes": -2.5,
-        "z": -1
+        "n": 6,
+        "medianMinutes": -20.4,
+        "seMinutes": 8,
+        "preRegisteredMinutes": -2.6,
+        "z": -2.2
       },
       "-600": {
-        "n": 20,
-        "medianMinutes": -3.9,
-        "seMinutes": 7.5,
-        "preRegisteredMinutes": -2.3,
-        "z": -0.2
+        "n": 21,
+        "medianMinutes": -10.3,
+        "seMinutes": 5.7,
+        "preRegisteredMinutes": -2.7,
+        "z": -1.3
       },
       "-500": {
-        "n": 12,
-        "medianMinutes": -13.9,
-        "seMinutes": 17.2,
-        "preRegisteredMinutes": -8,
-        "z": -0.3
+        "n": 13,
+        "medianMinutes": -19.8,
+        "seMinutes": 14.2,
+        "preRegisteredMinutes": -8.5,
+        "z": -0.8
       },
       "-400": {
-        "n": 26,
-        "medianMinutes": -6.1,
-        "seMinutes": 3.5,
-        "preRegisteredMinutes": -12,
-        "z": 1.7
+        "n": 27,
+        "medianMinutes": -10.5,
+        "seMinutes": 2.6,
+        "preRegisteredMinutes": -11.5,
+        "z": 0.4
       }
     },
-    "chi2": 4,
-    "chi2Centuries": 4
+    "chi2": 7.7,
+    "chi2Centuries": 5
   },
   "denseTargets": {
     "window": "S01/S02/S04/S05/S09, years −800..+1280, weight>0 (null=1); S07 excluded (unmarked lunar/solar mix)",
-    "identified": 228,
+    "identified": 244,
     "viaYearStraddle": 10,
-    "ambiguous": 18,
+    "ambiguous": 2,
     "dropped": 1,
     "weightZeroExcluded": 9,
     "perCentury": {
       "400": {
         "n": 5,
-        "medianSeconds": -296,
-        "seSeconds": 563
+        "medianSeconds": -276,
+        "seSeconds": 416
       },
       "500": {
         "n": 11,
-        "medianSeconds": -227,
-        "seSeconds": 156
+        "medianSeconds": -231,
+        "seSeconds": 204
       },
       "800": {
         "n": 5,
-        "medianSeconds": 568,
-        "seSeconds": 249
+        "medianSeconds": 530,
+        "seSeconds": 287
       },
       "900": {
         "n": 17,
-        "medianSeconds": -306,
-        "seSeconds": 261
+        "medianSeconds": -410,
+        "seSeconds": 248
       },
       "1000": {
         "n": 38,
-        "medianSeconds": 159,
-        "seSeconds": 141
+        "medianSeconds": 178,
+        "seSeconds": 123
       },
       "1100": {
         "n": 4,
-        "medianSeconds": 865,
-        "seSeconds": 272
+        "medianSeconds": 892,
+        "seSeconds": 232
       },
       "1200": {
         "n": 17,
-        "medianSeconds": 462,
+        "medianSeconds": 443,
         "seSeconds": 144
       },
+      "-800": {
+        "n": 2,
+        "medianSeconds": 928,
+        "seSeconds": 2406
+      },
       "-700": {
-        "n": 5,
-        "medianSeconds": -787,
-        "seSeconds": 663
+        "n": 6,
+        "medianSeconds": -1225,
+        "seSeconds": 478
       },
       "-600": {
-        "n": 20,
-        "medianSeconds": -233,
-        "seSeconds": 451
+        "n": 21,
+        "medianSeconds": -618,
+        "seSeconds": 341
       },
       "-500": {
-        "n": 12,
-        "medianSeconds": -836,
-        "seSeconds": 1035
+        "n": 13,
+        "medianSeconds": -1191,
+        "seSeconds": 852
       },
       "-400": {
-        "n": 26,
-        "medianSeconds": -367,
-        "seSeconds": 207
+        "n": 27,
+        "medianSeconds": -631,
+        "seSeconds": 155
       },
       "-300": {
         "n": 13,
-        "medianSeconds": -1085,
-        "seSeconds": 1060
+        "medianSeconds": -1183,
+        "seSeconds": 1200
       },
       "-200": {
-        "n": 43,
-        "medianSeconds": 204,
-        "seSeconds": 190
+        "n": 50,
+        "medianSeconds": -27,
+        "seSeconds": 211
       },
       "-100": {
-        "n": 12,
-        "medianSeconds": -400,
-        "seSeconds": 342
+        "n": 15,
+        "medianSeconds": 113,
+        "seSeconds": 386
       }
     },
     "chi2CenturiesUsed": [
@@ -493,36 +505,46 @@
       "1200"
     ],
     "ablationChi2": {
-      "fullStack": 29.5,
-      "minus_bond": 68.2,
-      "minus_hallstatt": 25.4,
-      "minus_jose5": 30.6,
-      "minus_jose4": 29.1,
-      "minus_resonator": 47.2,
-      "noCycles": 76.9
+      "fullStack": 48.9,
+      "minus_bond": 66.9,
+      "minus_hallstatt": 44.8,
+      "minus_jose5": 50.5,
+      "minus_jose4": 44.6,
+      "minus_resonator": 79.7,
+      "noCycles": 78.2
     }
   },
   "inputs": {
     "generator": "node tools/verify/lunar-alignment.js --write",
     "files": {
+      "data/core-mantle-resonator-stage1.json": "sha256:0a4900017f6a3883e0e53cd034858586bc5589dac1de06245cd2824f64e3325f",
+      "data/deltaT-4flag-fit.json": "sha256:3f86b8b5d52f4a71b15a37ce03d8a4a299b643335b316a0c7a1ded840aeb3104",
       "data/rspa20160404supp2/Table-S10.txt": "sha256:67a949e3a80574880b3e79338c3527fe9b7be639dd2c06080a098b75610abe7f",
       "data/rspa20160404supp2/Table-S11.txt": "sha256:19538f6ff8889df919da4ed1587296d540c9827d1155b605d9f3da0428916d2c",
       "data/rspa20160404supp2/Table-S12.txt": "sha256:f8f24b020db4af857c184cc164212e07d5109efda2a9c6da7551130022f1abc6",
       "data/rspa20160404supp2/Table-S13.txt": "sha256:515a56e47aeec316f35f509ab699187a3ed8f0b220ad131c34133ec34dddc7ce",
       "data/rspa20160404supp2/Table-S14.txt": "sha256:67485e0c349f5c2e7ec3aa4f7952e93832fc1d6728f4bd8f4bfbcd26f7c6a6e6",
       "packages/api/src/app.js": "sha256:b182c6c3c5128cd4ecf5cda7d7af5fcb847b1f200ee2399a696e563552984cd3",
+      "packages/physics/src/deltat/cycles.cjs": "sha256:da684bd21865005f05ceec845683f1549efc17d5b11aeac2cf362b3f8e52bf99",
       "packages/physics/src/eclipse/finders.cjs": "sha256:168755d5e01397b7f63f2ffa49101afe0da0046e5fbd9e7ef6d04be6d7f5d330",
+      "packages/physics/src/model.js": "sha256:2eb5aac80fca81808cf3779dbf156650a2f497d5e14c4c10a14b162d7f51e7d6",
       "packages/physics/src/moon/apparent.cjs": "sha256:5a63a95cf8d26c4d44e7b7acd4308cbd7240aa2bcee70d04c70b273413090335",
+      "packages/physics/src/moon/arguments.cjs": "sha256:d40f15e0ced6311754bc1350a66854a917112a58a6995250b110fddca4073e3b",
+      "packages/physics/src/moon/deep-ecc-channel.cjs": "sha256:7ce15d1c4f61f2ea730d7673d705a1eb2a31bff20b720cd00d8f1d34a3e85220",
       "packages/physics/src/moon/ecc-channel.cjs": "sha256:e986b8ca3dbfdaa8508f49f315bc81718503b91eb56298d9ad4d7c29186fc691",
+      "packages/physics/src/moon/month-chain.cjs": "sha256:338ca51dd147d0de3c30636b4f12c2c4127d92dcb0a46e7304412ab607782e8c",
+      "packages/physics/src/moon/series-extension.cjs": "sha256:d295a78eaedb0246ff142ed726c57ec2353d183c0ccbd3d767157f19623c6461",
       "packages/physics/src/moon/series.cjs": "sha256:044185825129b0a37619882c2eaa7ded446d35b8994c5a2b6a5d0cd56d13ee4d",
+      "public/input/astro-reference.json": "sha256:e9bc66d7a416351bc2476caca21426800e75302e102206f230955fd70ad37305",
       "public/input/fitted-coefficients.json": "sha256:64b475ba9ee5d08101165f981e07f059ebe86f22a9a98deefa6450338525eba1",
       "public/input/lunar-eclipses-documented.json": "sha256:586806e4f83c3f0ebd2d5afefce41c19664d8fa24023b7a9e0f79b7c8a668558",
       "public/input/lunar-eclipses-historical.json": "sha256:81dd0c83007eb899abeb97b0b987ae2d128d0e7ec4356622c7d15ed8175ad6c1",
       "public/input/lunar-eclipses-nasa.json": "sha256:2b0f6d1b4dab2d1e8a432a812b027631cfecde9714ce0600f030da5e2a2a792e",
       "public/input/lunar-eclipses-stephenson-2016.json": "sha256:ed8040ef4d688023ca38c1c8eac83b40bc36f75edb0894ba46dd04f2aed32fe6",
-      "public/input/model-parameters.json": "sha256:9a6beaadfcd802297dc18e2b7abe78083bc86c939f1d92df2ade81344f878e22",
+      "public/input/model-parameters.json": "sha256:1c015fb70b5673e56846f82291a20e6f76efd99231d94f1e12904c0f57d9a8a9",
       "public/input/stephenson-2016-deltaT-polynomial.json": "sha256:e8f9611c0e6173d2e2807c46bf920673e533c085b9366e1dfc424c6fd1186df7",
-      "tools/verify/lunar-alignment.js": "sha256:262cd3068e15d619ebf1c0cd9519e0501865a9c44b91d554100a7da9af44752b"
+      "tools/lib/deep-time.js": "sha256:954cc8bf006f133fee14bdefb738f7947623f676e695b43cb6c8b57585627f61",
+      "tools/verify/lunar-alignment.js": "sha256:3e5aa4265bc14389d83b61361a8dbd07a35cfe4139fa6280fb0ed6848b992402"
     }
   }
 }

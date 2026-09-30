@@ -128,7 +128,7 @@ At NASA-UT the two land ~5,000 km apart for this event. The spread is definition
 | Moon arguments (D/M coupling) | ≤ 0.0061° / ~39 km | Exonerated |
 | Greatest-eclipse convention | Definitional spread between catalog conventions | Not physics |
 
-What remains in the BestGap is the composite of the along-track dial degeneracy, the certified series' own instant residual class vs DE441 (a series-accuracy topic), and scan-grid sampling. The theory-difference drift against ELP-class reductions is Δṅ ≈ <!--v:lunarTheoryDriftDeltaNdot-->0.28<!--/v--> ″/cy² ([doc 102](102-gia-alpha-lunar-validation.md)).
+What remains in the BestGap is the composite of the along-track dial degeneracy, the certified series' own instant residual class vs DE441 (a series-accuracy topic), and scan-grid sampling. The theory-difference drift against ELP-class reductions is Δṅ ≈ <!--v:lunarTheoryDriftDeltaNdot-->0.24<!--/v--> ″/cy² ([doc 102](102-gia-alpha-lunar-validation.md)).
 
 ---
 

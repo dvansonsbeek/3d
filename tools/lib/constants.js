@@ -659,6 +659,7 @@ module.exports = {
   RECESSION_REGIME: modelParams.deepTime.recessionRegime,
   ALPHA_GIA_RATE_J2000_PER_YR: modelParams.deepTime.alphaGiaRateJ2000PerYr,
   ALPHA_GIA_RELAXATION_KYR: modelParams.deepTime.alphaGiaRelaxationKyr,
+  J2_RATE_J2000_PER_YR: modelParams.deepTime.j2RateJ2000PerYr,   // the OBSERVED dJ2/dt (Cox & Chao 2002) — the GIA channel's J2 scale (the precession of date)
   DT_STACK_TAPER_FULL_HALFWIDTH_YR: modelParams.deepTime.dtStackTaperFullHalfwidthYr,
   DT_STACK_TAPER_TOTAL_HALFWIDTH_YR: modelParams.deepTime.dtStackTaperTotalHalfwidthYr,
 

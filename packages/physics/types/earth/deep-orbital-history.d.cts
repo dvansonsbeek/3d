@@ -13,6 +13,8 @@
  *   axialPrecessionYearsJ2000: number,
  *   obliquityJ2000Deg: number,
  *   axialPrecessionYearsAtYearFn?: (year: number) => number,
+ *   solarTorqueShareJ2000?: number,
+ *   dynamicalEllipticityRatioAtYearFn?: (year: number) => number,
  * }} deps — mode tables from the governed deep artifact (choose the ζ tier
  *   per consumer: era = its own 8-term extraction, deep = the 16-term
  *   table; NEVER a slice); anchors from the chain artifact's one home; the
@@ -25,9 +27,12 @@
  *   vs La2004 over −200 kyr vs the deep tier's 0.069° — the C-1 verdict,
  *   plan 02) and zetaModes serves only as the TAIL beyond the span (the
  *   seam at the span edge is the extraction residual, far outside every
- *   certified window).
+ *   certified window). solarTorqueShareJ2000 and
+ *   dynamicalEllipticityRatioAtYearFn: THE PRECESSION OF DATE — the two
+ *   factors on the precession constant (see alphaAtGeneral below); absent,
+ *   the constant is the secular law alone, bit-identical.
  */
-export function createDeepOrbitalHistory({ zModes, zetaModes, zetaSeries, zSeries, anchorE, anchorPeriEclipticDeg, anchorInclEclipticDeg, anchorAscNodeEclipticDeg, axialPrecessionYearsJ2000, obliquityJ2000Deg, axialPrecessionYearsAtYearFn, }: {
+export function createDeepOrbitalHistory({ zModes, zetaModes, zetaSeries, zSeries, anchorE, anchorPeriEclipticDeg, anchorInclEclipticDeg, anchorAscNodeEclipticDeg, axialPrecessionYearsJ2000, obliquityJ2000Deg, axialPrecessionYearsAtYearFn, solarTorqueShareJ2000, dynamicalEllipticityRatioAtYearFn, }: {
     zModes: ReadonlyArray<{
         omegaRadPerYr: number;
         re: number;
@@ -57,6 +62,8 @@ export function createDeepOrbitalHistory({ zModes, zetaModes, zetaSeries, zSerie
     axialPrecessionYearsJ2000: number;
     obliquityJ2000Deg: number;
     axialPrecessionYearsAtYearFn?: (year: number) => number;
+    solarTorqueShareJ2000?: number;
+    dynamicalEllipticityRatioAtYearFn?: (year: number) => number;
 }): {
     build: (t0Yr: number, t1Yr: number, stepYr: number) => {
         /** @param {number} tYr */
@@ -76,4 +83,13 @@ export function createDeepOrbitalHistory({ zModes, zetaModes, zetaSeries, zSerie
     alphaArcsecPerYr: number;
     alphaLunisolarArcsecPerYr: number;
     axialPrecessionYearsLunisolarJ2000: number;
+    /** THE PRECESSION OF DATE — the two factors this integration applies to
+     *  the secular precession constant at t years from J2000 (both 1 at
+     *  t = 0; both 1 everywhere when the options are absent). ONE home for
+     *  the published surface and the docs.
+     *  @param {number} t @returns {{solarTorque: number, ellipticity: number}} */
+    precessionOfDateFactorsAt: (t: number) => {
+        solarTorque: number;
+        ellipticity: number;
+    };
 };

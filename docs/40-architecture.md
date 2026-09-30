@@ -169,7 +169,7 @@ WebGL Render (60 FPS target)
 │
 ├── data/
 │   ├── 01-holistic-year-objects-data.xlsx  # Full H export (perihelion, precession)
-│   ├── 02-solar-measurements.csv          # Cardinal points, year lengths (full H)
+│   ├── 02-solar-measurements-window.csv   # Cardinal points, year lengths, −4000…+4000 (gitignored; npm run fit:6a2)
 │   ├── reference-data.json                # JPL-enriched verification data
 │   └── balance-presets.json               # 15 deep-analysis balance presets (96 candidates → 15 survivors)
 │

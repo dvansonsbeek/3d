@@ -10,7 +10,7 @@ across 9 directories (~360 on disk with the untracked local archives) · ~245 Py
 **`npm run check` enforces a twenty-four-step gate chain; CI runs it plus a
 headless-browser job and auto-deploys the simulator to GitHub Pages on
 green main.**
-Golden masters live in `packages/fixtures/`. Of the 29 scripts in `tools/verify/`,
+Golden masters live in `packages/fixtures/`. Of the 32 scripts in `tools/verify/`,
 only 4 can actually fail — see the Verification section.
 
 ---
@@ -80,21 +80,22 @@ would silently churn a structural claim for a rounding-level gain.
   not a formula bug.
 - **Capture a baseline before touching shared machinery.** Two minutes; it has
   caught a 583.7″ regression.
-- `data/02-solar-measurements.csv` is 160 MB and gitignored — no git recovery.
-  Back it up before regenerating (2 h 24 m). It is the C-4b-era campaign
-  record and KNOWN STALE vs the post-C-4b movement arcs (D4c/D4d-rev;
-  measured SS@−997 off 2.9 h) — the LIVING check is Step 6a2
-  (`npm run fit:6a2` → the ~48k-row window CSV) + `npm run check:csv-smoke`
-  (bit-exact window compare, fail-proven; tools/fit/README Step 6a2).
+- **The solar-measurements check is the WINDOW CSV.** Step 6a2
+  (`npm run fit:6a2` → `data/02-solar-measurements-window.csv`, −4000…+4000,
+  ~48k rows, gitignored) + `npm run check:csv-smoke` (bit-exact window
+  compare, fail-proven; tools/fit/README Step 6a2) — regenerate it whenever
+  the engine's frame of date moves. The full-period file
+  (`data/02-solar-measurements.csv`, 160 MB, one row per year of the anchor
+  unit) is RETIRED and deleted: it was the C-4b-era campaign record, stale
+  against every later movement arc (measured SS@−997 off 2.9 h), and no gate
+  or fitter reads it. The exporter can still write one on demand (2 h 24 m).
 - **The deep-time alignment campaign is COMPLETE** — engine ≡ CSV bit-exact
-  AS OF ITS ERA (the claim is historically scoped: the CSV is the C-4b-era
-  record and the post-C-4b movement arcs moved the engine — see the CSV
-  bullet below; Step 6a2 + check:csv-smoke are the living check), all
+  AS OF ITS ERA (the claim is historically scoped: that CSV was the
+  C-4b-era record and the later movement arcs moved the engine; Step 6a2 +
+  check:csv-smoke are the living check), all
   sixteen R-items closed, the cardinal-point fit (now Step 6d; "6c" in
   campaign-era docs) at 0.26–0.29 min over ±270 kyr (Earth-frame) via the §10
-  derived form + edge-trim + the §10g quadrature-locked joint sidebands. Do
-  not regenerate the full CSV outside a conscious campaign step (2 h 24 m,
-  and it would NOT be an identical file anymore). Coefficients and
+  derived form + edge-trim + the §10g quadrature-locked joint sidebands. Coefficients and
   runtime evaluation form are a MATCHED PAIR — never ship one without the
   other (~1162-minute-class error), and the pair includes the NUMERICS: the
   ∫1/H convention is the 10-kyr trapezoid table, built under the pinned
@@ -138,6 +139,27 @@ would silently churn a structural claim for a rounding-level gain.
   composed with the body's own constant-GM N-body drift — Earth's D6
   sidereal-year channel is the pattern (`T(y) = massLossLaw(y)/lamDotRel(y)`,
   every factor ≡ 1 at J2000).
+- **The secular law is not the rate of date.** The composed ψ̇(t) — leg 1's
+  law, the unit H(t) — scales the J2000 rate on the tidal history. The spin
+  integration multiplies it by two factors of date, both exactly 1 at J2000:
+  the solar torque's (1 − e²)^(−3/2) at the eccentricity OF DATE and
+  J₂(t)/J₂₀ from the GIA channel (ONE home `earth/deep-orbital-history`
+  `alphaAtGeneral`; `climate/l1-orbital` `j2RatioAt`). On the secular law
+  alone the equinox lagged Vondrák 2011 by 27″ at −3000 — the Sun's whole
+  ancient residual against Horizons — and the obliquity drifted 80″ rms off
+  La2004 over a million years: the solar-share formula held e at J2000 (a
+  purity freeze without its twin) and the polar-moment channel was read on
+  the length-of-day side only. The J₂ side is scaled on the OBSERVED dJ₂/dt
+  (`j2RateJ2000PerYr`), never through the J₂→α factor of the length-of-day
+  side. `tools/verify/equinox-vs-vondrak.js` refuses to write if a factor is
+  dropped.
+- **A campaign recording hashes what it RUNS ON, or it goes stale unseen.**
+  The deep-eccentricity slope anchor (e338d1bd) moved the lunar-alignment
+  recording — per-century medians by 100–500 s, identified events 228 → 244 —
+  and nothing flagged it for four days: the lunar chain's eccentricity
+  channel, its arguments and the model assembly were not in the inputs
+  block. After a model change, run the campaign generators plain (the
+  reproduction check) even when the freshness gate passes.
 - **A fit-window edge phase-locked to the lattice masquerades as physics.**
   The "e(t)-minimum residual peak" was window-edge divergence — both bracket
   ends sit at H/16 phase ≈ 0°. Check the edge/interior split before believing
@@ -235,17 +257,19 @@ frames after the click). The wobble-centre gate also pins the Tracing
 round-trip bit-exact) since Phase B** and required in CI; red there is a
 regression of the Phase 6 exit criterion, not a tracked state.
 
-`/gates` runs the standalone model checks. `tools/verify/` holds 29 scripts, and
-**25 of them cannot fail** — no exit path, no assertion, so running them proves
+`/gates` runs the standalone model checks. `tools/verify/` holds 32 scripts, and
+**28 of them cannot fail** — no exit path, no assertion, so running them proves
 nothing. `npm run test:verify:list` gives the classification: 4 gate · 3 liftable
-· 12 narrative · 10 generator (the suite FAILS on any unclassified script). **Never
+· 12 narrative · 13 generator (the suite FAILS on any unclassified script). **Never
 run a generator as a test** — `balance-search.js` rewrites the tracked
 `data/balance-presets.json`, `nbody-secular.js` rewrites
 `data/nbody-secular-frequencies.json`, `deep-secular-modes.js` rewrites
 `data/nbody-deep-secular-modes.json`, `secular-series.js` rewrites
 `data/nbody-secular-series.json`, `obliquity-hybrid.js` rewrites
 `data/obliquity-hybrid-verdict.json`, `measure-rms-by-epoch.js` rewrites
-`data/chain-vs-jpl-rms.json` under `--write` (a plain run only prints), and
+`data/chain-vs-jpl-rms.json` under `--write` (a plain run only prints),
+`equinox-vs-vondrak.js` rewrites `data/equinox-vs-vondrak.json` under
+`--write` (and REFUSES if a precession-of-date factor is missing), and
 the four campaign generators (cassini-results / lod-climate-correlation /
 eclipse-audit / lunar-alignment) rewrite their `data/*.json` under
 `--write` (the latter two REFUSE on divergence; `--rebaseline` is the
@@ -340,7 +364,7 @@ what actually made corrections stick here.
 | `src/script.js` | browser scene + UI + formulas (monolith) |
 | `tools/lib/` | Node engine — `scene-graph`, `orbital-engine`, `deep-time`, `constants` |
 | `tools/fit/` | CLI shims for the fitting pipeline — implementations live in `packages/fitting/src` |
-| `tools/verify/` | 29 scripts: 4 gate · 3 liftable · 12 narrative · 10 generator (`npm run test:verify:list`) |
+| `tools/verify/` | 32 scripts: 4 gate · 3 liftable · 12 narrative · 13 generator (`npm run test:verify:list`) |
 | `packages/physics`, `packages/model-values` | the published npm packages (@essrt scope) — the website and world consume these; refits reach them via `values:package:write` + republish |
 | `tools/explore/` | ~200 research one-offs — findings live in `docs/` |
 | `public/input/fitted-coefficients.json` | single source of truth for fitted values |

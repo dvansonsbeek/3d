@@ -83,6 +83,8 @@ const MANIFEST = [
     writes: 'data/nbody-secular-series.json (tracked; --write only — needs the same untracked ±10-Myr dump as deep-secular-modes). The Stage-C ONE-SOURCE histories: ALL EIGHT planets\' ζ AND z series (Earth 500-yr/1-kyr boxcar — it drives the obliquity-hybrid integration; planets 1000-yr/4-kyr boxcar — deep-time element display), with the banked quality verdict: hybrid ε vs IAU-2006/La2004, α(H(t)) era-regression + deep-deep band + the leg-1 fork rows, series e/ϖ vs the era-certified chain, and the MEASURED per-planet chain-handover boundaries (the D5 ring-blowup fix). A plain run only prints the banked verdict' },
   { n: 'sun-vs-horizons.js', class: 'generator', ms: 600000, slow: true,
     writes: 'data/sun-vs-horizons-summary.json (tracked; --write only — the model\'s apparent Sun and cardinal instants against the ±3000-yr Horizons TT cache; plain run = reproduction check)' },
+  { n: 'equinox-vs-vondrak.js', class: 'generator', ms: 300000, slow: true,
+    writes: 'data/equinox-vs-vondrak.json (tracked; --write only — the precession of date against its two theory referees: the equinox vs Vondrák 2011 over ±3000 yr beside the secular law alone, the obliquity vs La2004 over the last Myr; --write REFUSES if a precession-of-date term is missing; plain run = reproduction check)' },
   { n: 'earth-osculating-offset.js', class: 'generator', ms: 30000,
     writes: 'data/earth-osculating-mean-offset.json (tracked; --write only — the nine-body real-state run from the Horizons seed, ±110 yr; plain run = reproduction check). The eclipse Sun’s mean-element offset over the secular series (plan 06 layer B)' },
   { n: 'lunar-alignment.js', class: 'generator', ms: 82000, slow: true,

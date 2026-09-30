@@ -33,7 +33,7 @@
  * carry it so a counterfactual is reproducible (§2d).
  * @type {string}
  */
-export const CONSTANTS_HASH = "b9c4d78647577e67";
+export const CONSTANTS_HASH = "726b10e23d8ace09";
 
 /** Model version label — single source: public/input/model-version.json (§10 two-axis scheme). */
 export const MODEL_VERSION = "v14.0";
@@ -43,7 +43,7 @@ export const PREPRINT_DOI = "10.21203/rs.3.rs-8758810/v4";
 
 /** @type {Readonly<Record<string, unknown>>} */
 export const DEFAULT_CONSTANTS = Object.freeze({
-  hash: "b9c4d78647577e67",
+  hash: "726b10e23d8ace09",
   additionalBodies: {
     "pluto": {
       "name": "Pluto",
@@ -182,6 +182,7 @@ export const DEFAULT_CONSTANTS = Object.freeze({
     "alpha4PerMa4": 1.3619800519e-16,
     "alphaGiaRateJ2000PerYr": -1.35e-11,
     "alphaGiaRelaxationKyr": 6,
+    "j2RateJ2000PerYr": -2.7e-11,
     "dtStackTaperFullHalfwidthYr": 300000,
     "dtStackTaperTotalHalfwidthYr": 400000,
     "recessionRegime": {

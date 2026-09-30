@@ -7,7 +7,10 @@
  *   - Perihelion (min wobble-center distance), Aphelion (max distance)
  *   - World-angle (sidereal position) at each event
  *
- * Output: data/02-solar-measurements.csv
+ * Output: --output <file> (the kept artifact is the WINDOW CSV,
+ *   data/02-solar-measurements-window.csv, written by `npm run fit:6a2`;
+ *   without --output the default path is the full-period
+ *   data/02-solar-measurements.csv — retired as a kept file, on demand only)
  *   Type, Model Year, JD, RA (deg), Obliquity (deg), World Angle (deg), Distance (AU)
  *
  * 1-year steps allow a narrow search window (±2 days) and simple forward chaining.
@@ -18,12 +21,13 @@
  * coefficients FROZEN as the certified era clock (a harmonic re-fit against
  * the one-source movement is a cross-family fit, measured 30-60× RMS
  * blowup; scripts in tools/fit/archive/ — see "The frozen era clock" in
- * tools/fit/README.md). The CSV is the banked RECORD of the one-source
- * movement — validation and research consumers only.
+ * tools/fit/README.md). The window CSV is the living check of the
+ * one-source movement (`npm run check:csv-smoke`, bit-exact).
  *
- * Usage (SG_ONE_SOURCE=1 is the standing regeneration mode since Stage C-4b):
- *   SG_ONE_SOURCE=1 node tools/fit/export-solar-measurements.js    # full H (~2 h 24 m measured)
- *   node tools/fit/export-solar-measurements.js --start -25000 --end 25000  # test range (legacy K movement)
+ * Usage:
+ *   npm run fit:6a2                                                         # the window, −4000…+4000 (~25 min)
+ *   node tools/fit/export-solar-measurements.js --start -25000 --end 25000 --output <file>   # any range
+ *   node tools/fit/export-solar-measurements.js                             # the full period, on demand (~2 h 24 m, 160 MB)
  */
 
 const fs = require('fs');

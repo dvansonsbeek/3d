@@ -100,7 +100,7 @@ let fromStep = null;
 if (flag === '--from') {
   fromStep = args[1];
   if (!fromStep) {
-    console.error('Usage: --from <step>  (e.g., --from 5c, --from 6a)');
+    console.error('Usage: --from <step>  (e.g., --from 5c, --from 6a2)');
     process.exit(1);
   }
 }
@@ -133,14 +133,17 @@ const STEPS = [
   { id: '5c', phase: 2, name: 'Moon eclipse optimizer',
     cmd: 'node tools/fit/moon-eclipse-optimizer.js --write' },
 
-  // Phase 5: Solar measurements & harmonic fits
-  // 6a observed: ~2h 3min at H=335,317 (14,579 samples × 6 event types × cardinal-point
-  // bisection with ±2-day narrow window). 3h timeout gives generous margin.
-  // SG_ONE_SOURCE=1 (Stage C-4b): the scene's ε(t)/e(t) come from the banked
-  // engine series — the standing regeneration mode. BACK UP THE CSV FIRST
-  // (159 MB, gitignored, no git recovery — see the README's Phase 5 block).
-  { id: '6a', phase: 2, name: 'Export solar measurements (~2 hr, one-source movement)',
-    cmd: 'SG_ONE_SOURCE=1 node tools/fit/export-solar-measurements.js', timeout: 3 * 60 * 60 * 1000 },
+  // Phase 5: Solar measurements
+  // (Step 6a — the FULL-period export, one row per year of the anchor unit,
+  // ~2 h, 160 MB — RETIRED as a pipeline step and as a kept file: it was the
+  // C-4b-era campaign record, stale against every later movement arc, read
+  // by no gate or fitter. The exporter still writes one on demand. The id
+  // 6a is never reused — README numbering is shared vocabulary.)
+  // 6a2: the SAME exporter over −4000…+4000 — the window CSV the bit-exact
+  // smoke gate (npm run check:csv-smoke) compares against; ~25 min. The
+  // command is `npm run fit:6a2` spelled out.
+  { id: '6a2', phase: 2, name: 'Export solar measurements — the window CSV (~25 min)',
+    cmd: 'node tools/fit/export-solar-measurements.js --start -4000 --end 4000 --output data/02-solar-measurements-window.csv', timeout: 60 * 60 * 1000 },
   // (Step 6b — the obliquity-harmonics fit — RETIRED with the one-source
   // movement, D1-revised: SOLSTICE_OBLIQUITY_HARMONICS are frozen at their
   // last K-scene fit; re-fitting against a one-source CSV would be a

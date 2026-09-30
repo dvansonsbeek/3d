@@ -70,17 +70,35 @@ export function laggedL1Terms(l1Terms: Array<{
  *   relaxationKyr: number,
  *   alphaGiaRateJ2000PerYr: number,
  *   alphaJ2000: number,
- * }} cfg - relaxationKyr and alphaGiaRateJ2000PerYr are model-parameters
- *   deepTime constants; alphaJ2000 the IERS moment-of-inertia factor
+ *   j2RateJ2000PerYr?: number,
+ *   j2J2000?: number,
+ * }} cfg - relaxationKyr, alphaGiaRateJ2000PerYr and j2RateJ2000PerYr are
+ *   model-parameters deepTime constants; alphaJ2000 the IERS
+ *   moment-of-inertia factor; j2J2000 Earth's J₂ (astro-reference)
  * @returns {{
  *   alphaAt: (year: number) => number,
+ *   j2RatioAt: (year: number) => number,
  *   laggedL1PermilAt: (year: number) => number,
  *   kPerPermille: number,
  *   relaxationKyr: number,
  *   laggedL1Terms: Array<{period_kyr: number, a: number, b: number}>,
  * }}
+ *
+ * THE SAME REDISTRIBUTION, ITS SECOND OBSERVABLE — j2RatioAt(year) = J₂(t)/J₂₀.
+ * The mass that changes the polar moment changes the oblateness, and the
+ * luni-solar precession rate is proportional to it (ψ̇ ∝ (C − A)/C; the
+ * consumer is the spin integration, earth/deep-orbital-history). The J₂ side
+ * is scaled on its OWN observation, exactly as the α side is on its rate:
+ *
+ *   J₂(t) = J₂₀ − k_J · [ L1'(t) − L1'(2000) ],   k_J = −(dJ₂/dt)_obs / (dL1'/dt)₂₀₀₀
+ *
+ * so dJ₂/dt(J2000) IS the observed satellite rate (Cox & Chao 2002) by
+ * construction, and the J₂→α conversion factor never enters. A constant
+ * dJ₂/dt would be a rate valid at a point used across a span; this is the
+ * history. Bounded: ±5·10⁻⁴ over the glacial cycles, no secular part.
+ * Without the two constants the ratio is 1 at every year.
  */
-export function createAlphaGiaChannel({ l1Terms, yStdDenormalization, relaxationKyr, alphaGiaRateJ2000PerYr, alphaJ2000 }: {
+export function createAlphaGiaChannel({ l1Terms, yStdDenormalization, relaxationKyr, alphaGiaRateJ2000PerYr, alphaJ2000, j2RateJ2000PerYr, j2J2000 }: {
     l1Terms: Array<{
         period_kyr: number;
         a: number;
@@ -90,8 +108,11 @@ export function createAlphaGiaChannel({ l1Terms, yStdDenormalization, relaxation
     relaxationKyr: number;
     alphaGiaRateJ2000PerYr: number;
     alphaJ2000: number;
+    j2RateJ2000PerYr?: number;
+    j2J2000?: number;
 }): {
     alphaAt: (year: number) => number;
+    j2RatioAt: (year: number) => number;
     laggedL1PermilAt: (year: number) => number;
     kPerPermille: number;
     relaxationKyr: number;

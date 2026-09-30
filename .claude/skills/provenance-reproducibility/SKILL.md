@@ -54,12 +54,15 @@ is *supposed* to hold old numbers — forcing it to update destroys the record.
 
 ## 3. Derived artefacts: the recipe is the artefact
 
-`data/02-solar-measurements.csv` is 2,011,909 rows and 166 MB — the model's own
-output, deterministic given the constants. It is gitignored.
+The solar-measurements export is the model's own output, deterministic given
+the constants: 2,011,909 rows and 166 MB over the full period, 48,006 rows over
+the −4000…+4000 window that is kept (`data/02-solar-measurements-window.csv`).
+It is gitignored.
 
 That is the right call: the reproducibility artefact is
 `export-solar-measurements.js` **plus** the constants, both public. Committing
-the output would commit a 2 h 24 m cache.
+the output would commit a cache (2 h 24 m for the full period — which is why
+the full-period file could be retired outright once it went stale).
 
 Rule: if an artefact is derived and the generator is public, ship the generator
 and a small committed fixture subset for CI — not the artefact.

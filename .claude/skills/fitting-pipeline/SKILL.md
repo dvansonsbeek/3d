@@ -82,15 +82,19 @@ cascade diagnostics that rank the flags backwards**, and Jose5/Jose4 are a
 Evaluate by leave-one-out against the full stack. A cascade ordering answers a
 different question than the one being asked.
 
-## 7. Back up the corpus before regenerating
+## 7. Back up a gitignored corpus before regenerating
 
-`data/02-solar-measurements.csv` is 166 MB, gitignored, and takes **2 h 24 m** to
-rebuild. There is no git recovery. Back it up before any regeneration.
+A gitignored generated file has no git recovery. Back it up before any
+regeneration that a gate will compare against — today that is the window CSV
+`data/02-solar-measurements-window.csv` (`npm run fit:6a2`, ~25 min; the
+bit-exact smoke gate's reference).
 
 The file is *derived* and deterministic given the constants, so the
 reproducibility artefact is `export-solar-measurements.js` plus the constants —
 but that is a reason not to commit it, not a reason to be casual about losing it
-mid-campaign.
+mid-campaign. (The full-period export, 166 MB and 2 h 24 m, is where this rule
+was learned; it is retired as a kept file — it had gone stale against the
+engine and no gate or fitter read it.)
 
 ## 8. Fit the structure, not the points
 

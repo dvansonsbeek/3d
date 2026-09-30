@@ -377,6 +377,12 @@ const mkTier = (withAxialFn) => createDeepOrbitalHistory({
   axialPrecessionYearsAtYearFn: withAxialFn
     ? ((H0) => (yr) => axialPrecessionYearsJ2000 * model.epoch.hAtYear(yr) / H0)(model.epoch.hAtYear(2000))
     : undefined,
+  // THE PRECESSION OF DATE (plan 06 §9 item 10) — the shipped movement's two
+  // of-date factors, from the package surface (the solar share and the GIA
+  // channel's J₂ ratio), so this verdict describes the movement that ships.
+  // The α₀ control twin stays on the bare constant.
+  solarTorqueShareJ2000: withAxialFn ? model.lunisolar.solarShareJ2000 : undefined,
+  dynamicalEllipticityRatioAtYearFn: withAxialFn ? model.lunisolar.ellipticityRatioOfDateAtYear : undefined,
 });
 const tier = mkTier(true);
 // IAU 2006 mean obliquity (Hilton et al. 2006), arcsec; T = Julian centuries from J2000

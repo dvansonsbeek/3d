@@ -67,6 +67,22 @@ const INPUT_FILES = [
   'packages/api/src/app.js',
   'public/input/model-parameters.json',
   'public/input/fitted-coefficients.json',
+  // THE REST OF WHAT THIS CAMPAIGN ACTUALLY RUNS ON (measured, 2026-09-30):
+  // the deep-eccentricity slope anchor (e338d1bd) moved the per-century
+  // medians by 100–500 s, the identified events 228 → 244 and the full-stack
+  // χ² 29.5 → 49.5 — and nothing flagged it, because the lunar chain's
+  // eccentricity channel, its arguments, the model assembly and the ΔT stack
+  // were not hashed here. The recording sat stale for four days.
+  'packages/physics/src/model.js',
+  'packages/physics/src/moon/deep-ecc-channel.cjs',
+  'packages/physics/src/moon/arguments.cjs',
+  'packages/physics/src/moon/month-chain.cjs',
+  'packages/physics/src/moon/series-extension.cjs',
+  'packages/physics/src/deltat/cycles.cjs',
+  'tools/lib/deep-time.js',
+  'data/deltaT-4flag-fit.json',
+  'data/core-mantle-resonator-stage1.json',
+  'public/input/astro-reference.json',
 ];
 
 // Deep-inside-region observer cities for the visibility section. Chosen well

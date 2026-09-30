@@ -56,8 +56,15 @@ const _alphaGia = (() => {
     relaxationKyr: C.ALPHA_GIA_RELAXATION_KYR,
     alphaGiaRateJ2000PerYr: C.ALPHA_GIA_RATE_J2000_PER_YR,
     alphaJ2000: C.EARTH_MOI_FACTOR,
+    // the channel's second observable, J₂(t)/J₂₀ — scaled on the OBSERVED dJ₂/dt
+    j2RateJ2000PerYr: C.J2_RATE_J2000_PER_YR,
+    j2J2000: C.earthJ2,
   });
 })();
+/** J₂(t)/J₂₀ of the GIA channel at a calendar year — PURE in year (never the
+ *  lattice-α pin: the spin integration's samplers are cached). The precession
+ *  of date multiplies it into the precession constant (deep-orbital-history). */
+const j2RatioAtYear = (year) => _alphaGia.j2RatioAt(year);
 // the derived coupling, per ‰ — kept under its historical export name for the registry
 const ALPHA_CLIMATE_SCALE      = _alphaGia.kPerPermille;
 
@@ -1460,6 +1467,7 @@ module.exports = {
   meanLunisolarPrecessionRateArcsecPerYrAtAge, meanLunisolarPrecessionPeriodYearsAtAge,
   eraClockHAtAge, eraClockTropicalYearSecondsAtAge, eraClockYearInDaysAtAge,
   PRECESSION_SOLAR_SHARE_J2000, precessionRateJ2000ArcsecPerYr, certifiedAxialPrecessionJ2000Years,
+  j2RatioAtYear,
   // Driver 2
   meanAuAtAge, meanSiderealYearSecondsAtAge, meanTropicalYearSecondsAtAge,
   meanTropicalYearDaysAtAge, meanYearInDaysAtAge,

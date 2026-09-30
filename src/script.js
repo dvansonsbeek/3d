@@ -2407,6 +2407,10 @@ function _alphaGia() {
       relaxationKyr: ALPHA_GIA_RELAXATION_KYR,
       alphaGiaRateJ2000PerYr: ALPHA_GIA_RATE_J2000_PER_YR,
       alphaJ2000: EARTH_MOI_FACTOR,
+      // the channel's second observable, J₂(t)/J₂₀ — scaled on the OBSERVED
+      // dJ₂/dt (Cox & Chao 2002); the spin integration's precession of date
+      j2RateJ2000PerYr: K.deepTime.j2RateJ2000PerYr,
+      j2J2000: K.physicalConstants.earthJ2,
     });
   }
   return _alphaGiaChannel;
@@ -19735,6 +19739,13 @@ function _deepHistSeries() {
       axialPrecessionYearsAtYearFn: ((axial0, H0) =>
         (yr) => axial0 * meanHAtAge((2000 - yr) / 1e6) / H0
       )(sid / (sid - sol), meanHAtAge(0)),
+      // THE PRECESSION OF DATE (plan 06 §9 item 10): the solar torque at the
+      // eccentricity of date and the oblateness of date from the GIA channel
+      // (read PURE — never the lattice-α pin; the samplers are cached) — both
+      // exactly 1 at J2000. Twins: packages/physics model.js and
+      // tools/lib/deep-orbital-history.js (identical deps).
+      solarTorqueShareJ2000: PRECESSION_SOLAR_SHARE_J2000,
+      dynamicalEllipticityRatioAtYearFn: (yr) => _alphaGia().j2RatioAt(yr),
     });
   }
   return _deepHistSeriesM;

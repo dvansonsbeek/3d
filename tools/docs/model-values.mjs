@@ -1436,12 +1436,44 @@ export const VALUES = {
           cardinalVsHorizonsMeanMin:    { get: () => svh.cardinal.all.mean, render: f2, unit: 'min', note: 'model cardinal instants − Horizons\' own crossings, mean over −3000..+3000 (24k events)' },
           cardinalVsHorizonsSdMin:      { get: () => svh.cardinal.all.sd, render: f2, unit: 'min', note: 'model cardinal instants − Horizons, sd over −3000..+3000' },
           sunVsHorizonsN:               { get: () => svh.sun.all.n, render: (v) => thousands(v), note: 'Horizons TT instants compared (10-day grid, ±3000 yr)' },
+          sunVsHorizonsWorstMillenniumMeanArcsec: { get: () => Math.max(...svh.sun.perMillennium.map((m) => Math.abs(m.mean))), render: f1, unit: '″', note: 'the largest per-millennium |mean| of model apparent Sun − Horizons over −3000..+3000 — whichever millennium it is (the difference between two equinoxes of date: the model\'s and Horizons\' IAU76/80 frame)' },
+          cardinalVsHorizonsWorstMillenniumMeanMin: { get: () => Math.max(...svh.cardinal.perMillennium.map((m) => Math.abs(m.mean))), render: f1, unit: 'min', note: 'the largest per-millennium |mean| of model cardinal instants − Horizons over −3000..+3000' },
         };
         for (const from of [-3000, -2000, -1000, 0, 1000, 2000]) {
           const tag = from < 0 ? `M${-from}` : `P${from}`;
           out[`sunVsHorizonsMean${tag}Arcsec`] = { get: () => mil(from).mean, render: f1, unit: '″', note: `model apparent Sun − Horizons, mean over the millennium ${from}..${from + 1000}` };
           out[`sunVsHorizonsSd${tag}Arcsec`] = { get: () => mil(from).sd, render: f1, unit: '″', note: `sd over the millennium ${from}..${from + 1000}` };
           out[`cardinalVsHorizonsMean${tag}Min`] = { get: () => cmil(from).mean, render: f2, unit: 'min', note: `model cardinal instants − Horizons, mean over ${from}..${from + 1000}` };
+        }
+        return out;
+      })(),
+      // Plan 06 §9 item 10 — THE PRECESSION OF DATE against its two theory
+      // referees (tools/verify/equinox-vs-vondrak.js): the equinox vs Vondrák
+      // et al. 2011 over ±3000 yr, the obliquity vs La2004 over the last Myr,
+      // each beside the secular law alone; and the two factors themselves.
+      ...(() => {
+        const evv = rd('data/equinox-vs-vondrak.json');
+        const row = (y) => evv.equinox.rows.find((r) => r.year === y);
+        const win = (a, b) => evv.obliquity.windows.find((w) => w.fromKyr === a && w.toKyr === b);
+        const s1 = (v) => (v > 0 ? '+' : '') + Number(v).toFixed(1).replace('-', '−'), f1 = (v) => Number(v).toFixed(1), f2 = (v) => Number(v).toFixed(2);
+        const out = {
+          equinoxVsVondrakMaxAbsArcsec:        { get: () => evv.equinox.maxAbsArcsec, render: f1, unit: '″', note: 'max |model − Vondrák 2011| of the equinox of date over ±3000 yr (theory vs theory; the Sun\'s of-date longitude moves by the negative)' },
+          equinoxVsVondrakMaxAbsInnerArcsec:   { get: () => evv.equinox.maxAbsInnerArcsec, render: f1, unit: '″', note: 'the same inside −500…+2500' },
+          equinoxSecularOnlyMaxAbsArcsec:      { get: () => evv.equinox.secularOnlyMaxAbsArcsec, render: f1, unit: '″', note: 'max |Δequinox| over ±3000 yr on the secular precession law ALONE (without the two factors of date) — what the factors close' },
+          obliqVsVondrakMaxAbsArcsec:          { get: () => evv.equinox.obliquityMaxAbsArcsec, render: f1, unit: '″', note: 'max |model − Vondrák 2011| of the mean obliquity over ±3000 yr' },
+          obliqVsLa2004RmsLastMyrArcsec:       { get: () => win(-1000, 0).modelRmsArcsec, render: f1, unit: '″', note: 'obliquity, model − La2004, rms over the last million years (theory vs theory)' },
+          obliqSecularOnlyVsLa2004RmsLastMyrArcsec: { get: () => win(-1000, 0).secularOnlyRmsArcsec, render: f1, unit: '″', note: 'the same on the secular precession law alone — the J2000-frozen solar torque drifts out of phase with La2004' },
+          obliqVsLa2004RmsLast100KyrArcsec:    { get: () => win(-100, 0).modelRmsArcsec, render: f1, unit: '″', note: 'obliquity, model − La2004, rms over the last 100 kyr' },
+          precOfDateSolarTorqueMeanLastMyrPct: { get: () => evv.factors.lastMyr.solarTorque.meanMinusOne * 100, render: (v) => Number(v).toFixed(3), unit: '%', note: 'mean over the last Myr of the solar-torque factor of date minus 1 — the mean e² sits above today\'s, so the precession runs this much faster than the J2000-frozen torque' },
+          precOfDateSolarTorqueMaxLastMyrPct:  { get: () => evv.factors.lastMyr.solarTorque.maxMinusOne * 100, render: f2, unit: '%', note: 'largest solar-torque factor of date minus 1 over the last Myr (at the eccentricity maxima)' },
+          precOfDateEllipticityAmpLastMyrPct:  { get: () => Math.max(Math.abs(evv.factors.lastMyr.ellipticity.minMinusOne), Math.abs(evv.factors.lastMyr.ellipticity.maxMinusOne)) * 100, render: f2, unit: '%', note: 'largest excursion of J₂(t)/J₂₀ from 1 over the last Myr (the ice-age oblateness; bounded, no secular part)' },
+          precOfDateEquinoxShiftAtM1MyrDeg:    { get: () => evv.obliquity.equinoxShiftAtM1MyrDeg, render: f1, unit: '°', note: 'accumulated equinox at −1 Myr, the movement minus the secular law alone' },
+          j2RateJ2000Per1e11Yr:                { get: () => evv.factors.j2RateJ2000PerYr * 1e11, render: (v) => Number(v).toFixed(1).replace('-', '−'), unit: '×10⁻¹¹ /yr', note: 'the GIA channel\'s realized dJ₂/dt at J2000 — the observed satellite rate (Cox & Chao 2002) by construction; the model-parameters input j2RateJ2000PerYr' },
+        };
+        for (const y of [-3000, -2500, -2000, -1500, -1000, -500, 0, 1000, 3000]) {
+          const tag = y < 0 ? `M${-y}` : `P${y}`;
+          out[`equinoxVsVondrak${tag}Arcsec`] = { get: () => row(y).equinoxArcsec, render: s1, unit: '″', note: `equinox of date, model − Vondrák 2011 at ${y} (+ = east)` };
+          out[`equinoxSecularOnly${tag}Arcsec`] = { get: () => row(y).secularOnlyArcsec, render: s1, unit: '″', note: `the same on the secular precession law alone at ${y}` };
         }
         return out;
       })(),

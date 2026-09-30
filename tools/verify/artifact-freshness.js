@@ -63,6 +63,8 @@ const REQUIRED = [
   'data/earth-osculating-mean-offset.json',
   // plan 06 I1 — the Sun and the cardinal instants against the ±3000-yr Horizons TT cache:
   'data/sun-vs-horizons-summary.json',
+  // plan 06 §9 item 10 — the precession of date against Vondrák 2011 and La2004:
+  'data/equinox-vs-vondrak.json',
 ];
 
 // Artifacts STALE BY CONSTRUCTION (plan 06 R3 item 1 cleanup, owner-checked):

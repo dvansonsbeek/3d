@@ -8,9 +8,10 @@
  * (8,001 years × 6 events = 48,006 rows, ~25 min since R4 — the exporter
  * evaluates the certified Sun per probe, measured 36 s per 200 yr) instead of the full-H
  * run (335,318 years × 6 events = 2,011,908 rows, 2 h 24 m). The full 6a
- * CSV stays as the C-4b-era campaign record; 6a2 is the LIVING check
- * artifact, cheap to re-base whenever the movement changes deliberately
- * (pass --start/--end for a smaller run).
+ * CSV is retired (it was the C-4b-era campaign record, stale against the
+ * later movement arcs); 6a2 is the LIVING check artifact, cheap to re-base
+ * whenever the movement changes deliberately (pass --start/--end for a
+ * smaller run).
  *
  * THIS SMOKE. Regenerates the FULL 6a2 range into a scratch file with
  * the real exporter and compares EVERY row against the 6a2 file

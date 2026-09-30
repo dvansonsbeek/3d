@@ -7,113 +7,113 @@
    300.0
   ],
   "dedupeFrac": 0.005,
-  "pArcsecPerYr": 50.288312947219346,
+  "pArcsecPerYr": 50.2883129476783,
   "source": "data/t1-engine-frequencies.json"
  },
  "lines": [
   {
    "family": "climatic precession",
    "label": "p+g2",
-   "arcsecPerYr": 68.20533085460849,
-   "periodKyr": 19.001447302743085,
+   "arcsecPerYr": 68.20533085506744,
+   "periodKyr": 19.001447302615222,
    "relAmp": 0.6717512938116206
   },
   {
    "family": "climatic precession",
    "label": "p+g3",
-   "arcsecPerYr": 67.65725935309159,
-   "periodKyr": 19.155372422586602,
+   "arcsecPerYr": 67.65725935355054,
+   "periodKyr": 19.15537242245666,
    "relAmp": 0.4607842722501143
   },
   {
    "family": "climatic precession",
    "label": "p+g1",
-   "arcsecPerYr": 57.7407367857284,
-   "periodKyr": 22.445158689425114,
+   "arcsecPerYr": 57.740736786187355,
+   "periodKyr": 22.445158689246707,
    "relAmp": 0.8620468725902352
   },
   {
    "family": "climatic precession",
    "label": "p+g4",
-   "arcsecPerYr": 55.878579640216444,
-   "periodKyr": 23.193145000186338,
+   "arcsecPerYr": 55.8785796406754,
+   "periodKyr": 23.19314499999584,
    "relAmp": 0.19922380139666943
   },
   {
    "family": "climatic precession",
    "label": "p+g0",
-   "arcsecPerYr": 54.54567191824911,
-   "periodKyr": 23.75990531278803,
+   "arcsecPerYr": 54.54567191870807,
+   "periodKyr": 23.75990531258811,
    "relAmp": 1.0
   },
   {
    "family": "obliquity",
    "label": "p+s12",
-   "arcsecPerYr": 47.29590619598246,
-   "periodKyr": 27.401948799325222,
+   "arcsecPerYr": 47.295906196441415,
+   "periodKyr": 27.40194879905932,
    "relAmp": 0.10427591691403815
   },
   {
    "family": "obliquity",
    "label": "p+s1",
-   "arcsecPerYr": 44.703070000052044,
-   "periodKyr": 28.99129746566603,
+   "arcsecPerYr": 44.703070000511,
+   "periodKyr": 28.991297465368383,
    "relAmp": 0.5416346168208136
   },
   {
    "family": "obliquity",
    "label": "p+s14",
-   "arcsecPerYr": 44.4515194672501,
-   "periodKyr": 29.15535881635801,
+   "arcsecPerYr": 44.451519467709055,
+   "periodKyr": 29.15535881605699,
    "relAmp": 0.1423622336951359
   },
   {
    "family": "obliquity",
    "label": "p+s9",
-   "arcsecPerYr": 43.52756581100016,
-   "periodKyr": 29.77423561031016,
+   "arcsecPerYr": 43.52756581145911,
+   "periodKyr": 29.774235609996225,
    "relAmp": 0.10094037508523732
   },
   {
    "family": "obliquity",
    "label": "p+s3",
-   "arcsecPerYr": 43.24580236785677,
-   "periodKyr": 29.9682264876481,
+   "arcsecPerYr": 43.24580236831572,
+   "periodKyr": 29.968226487330057,
    "relAmp": 0.47895531494942417
   },
   {
    "family": "obliquity",
    "label": "p+s2",
-   "arcsecPerYr": 32.532859715326055,
-   "periodKyr": 39.83664551288928,
+   "arcsecPerYr": 32.53285971578501,
+   "periodKyr": 39.83664551232728,
    "relAmp": 0.48491909690353013
   },
   {
    "family": "obliquity",
    "label": "p+s4",
-   "arcsecPerYr": 31.9845811935052,
-   "periodKyr": 40.51952383428945,
+   "arcsecPerYr": 31.984581193964154,
+   "periodKyr": 40.51952383370802,
    "relAmp": 0.32380140712519323
   },
   {
    "family": "obliquity",
    "label": "p+s0",
-   "arcsecPerYr": 31.437729989697413,
-   "periodKyr": 41.224350499375035,
+   "arcsecPerYr": 31.437729990156367,
+   "periodKyr": 41.224350498773205,
    "relAmp": 1.0
   },
   {
    "family": "obliquity",
    "label": "p+s7",
-   "arcsecPerYr": 30.88973745421211,
-   "periodKyr": 41.95568194521116,
+   "arcsecPerYr": 30.889737454671064,
+   "periodKyr": 41.955681944587795,
    "relAmp": 0.1787778028028384
   },
   {
    "family": "obliquity",
    "label": "p+s10",
-   "arcsecPerYr": 23.940447214232886,
-   "periodKyr": 54.13432708264164,
+   "arcsecPerYr": 23.94044721469184,
+   "periodKyr": 54.13432708160385,
    "relAmp": 0.16050220301405962
   },
   {
@@ -207,21 +207,21 @@
   }
  ],
  "periodsKyr": [
-  19.001447302743085,
-  19.155372422586602,
-  22.445158689425114,
-  23.193145000186338,
-  23.75990531278803,
-  27.401948799325222,
-  28.99129746566603,
-  29.15535881635801,
-  29.77423561031016,
-  29.9682264876481,
-  39.83664551288928,
-  40.51952383428945,
-  41.224350499375035,
-  41.95568194521116,
-  54.13432708264164,
+  19.001447302615222,
+  19.15537242245666,
+  22.445158689246707,
+  23.19314499999584,
+  23.75990531258811,
+  27.40194879905932,
+  28.991297465368383,
+  29.15535881605699,
+  29.774235609996225,
+  29.968226487330057,
+  39.83664551232728,
+  40.51952383370802,
+  41.224350498773205,
+  41.955681944587795,
+  54.13432708160385,
   94.87791796545507,
   96.84902527885197,
   98.8438666515722,
@@ -239,7 +239,7 @@
  "meta": {
   "script": "scripts/l1_physical_lines.py",
   "doc": "docs/92-climate-formula.md (T1 disposition, plan 06)",
-  "runtime_sec": 0.0006854534149169922,
+  "runtime_sec": 0.001046895980834961,
   "environment": {
    "python": "3.12.3"
   }
@@ -247,7 +247,7 @@
  "inputs": {
   "generator": "python3 scripts/l1_physical_lines.py --write",
   "files": {
-   "data/t1-engine-frequencies.json": "sha256:6b3f8698f0c041d99b1ffdb1acb8c114b1c2274e62469ef875f6dab368b4cfc4",
+   "data/t1-engine-frequencies.json": "sha256:e379b3c2eace0e54d96a37d346be98d545f58e8abf2a7b11bc851c25b0e3c8cd",
    "scripts/l1_physical_lines.py": "sha256:98f298a22ee6bdb22a294bdf08f08787b6a4bbd6b7c9aed46de4adea28bc88f6"
   }
  }

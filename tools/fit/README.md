@@ -220,7 +220,7 @@ the D4 one-source clock design, NOT a re-fit:
 - `correctionSun`
 - `perihelionalignmentYear`
 - `eccentricityBase` / `eccentricityAmplitude`
-- Anything else that would change `data/02-solar-measurements.csv`
+- Anything else that would change the solar-measurements export (the 6a2 window CSV)
 
 ## `--write` flag convention
 
@@ -234,7 +234,7 @@ then `npm run constants:generate` (Step 9).
 | Script | Produces | Data source |
 |--------|----------|-------------|
 | `derive-eccentricity-amplitudes.js` | Verification only (no output) | Verifies K-derived amplitudes match runtime |
-| `export-solar-measurements.js` | `data/02-solar-measurements.csv` | Scene-graph simulation (1-year steps, single pass) |
+| `export-solar-measurements.js` | `data/02-solar-measurements-window.csv` via `npm run fit:6a2` (the full-period `data/02-solar-measurements.csv` is retired; written only on demand) | Scene-graph simulation (1-year steps, single pass) |
 | `sun-longitude-harmonics.js` | `SUN_LONGITUDE_MEAN`, `SUN_LONGITUDE_HARMONICS` (anchor-divisor harmonic terms; **see design rule above** — only divisors n where anchor/n maps to a known physical cycle are allowed) | Scene-graph Sun vs Meeus Ch.25 (computed in-script, no CSV). **Status 2026-06 (Phase Z-B): ENABLED** — Sun-only application with runtime divisor-whitelist filter (skips legacy [168] term automatically). Closes ~96% of the framework's 200" Sun-vs-Meeus residual. **2026-08 (FQ-3): retired from the moveModel display path** (exact-Kepler corrector, doc 65); still consumed by the Step-6a instrument + the legacy A/B path, and still fitter-owned here. |
 | `sun-planetary-completion-fit.js` | NOTHING (read-only, the Step-0 companion — 20.3h, SUPERSEDED by Stage D2) | JPL Horizons live (960 all-phase + 179 syzygy epochs, network required — so it can never be a gate). Was the dev record behind the v1 fitted 10-term table; the shipped table is now the DERIVED 70-term extraction on FRAMEWORK-native carriers (FQ-5 N3: `tools/explore/d2-derived-sun.mjs` → `n2-sun-framework-carriers.mjs` → `n3-carrier-swap-preview.mjs`; the carrier rates are injected live from the planet records by `model.js`), so its coefficient-drift part no longer applies — its syzygy + NASA-centerline scoreboards remain valid verification. After ANY Step-0 refit OR planet-record period change, re-run the N3 extraction chain and re-embed the table + its `PAIRED_SUN_HARMONICS_SHA256` by hand — the test:model fingerprint gate enforces the pairing. |
 | `eoc-fractions.js` | Per-planet `eocFraction` | `data/reference-data.json` |
@@ -554,6 +554,11 @@ Step 5c: moon-eclipse-optimizer.js            → (RETIRED, plan 06 R3 item 1)
 ── Phase 5: Solar measurements & harmonic fits ─────────────────────
 
 Step 6a: export-solar-measurements.js         → data/02-solar-measurements.csv
+         RETIRED AS A KEPT FILE: the full-period export (one row per year
+         of the anchor unit, 160 MB) was the C-4b-era campaign record,
+         stale against every later movement arc, read by no gate or fitter —
+         deleted. The exporter still writes one on demand (2 h 24 m); the
+         measurement list below describes what either export contains.
 
 Step 6a2 (owner, 2026-09-16): `npm run fit:6a2`
          → data/02-solar-measurements-window.csv (gitignored)
@@ -562,10 +567,8 @@ Step 6a2 (owner, 2026-09-16): `npm run fit:6a2`
          × 6 events = 2,011,908 rows, 2 h 24 m) — the LIVING check
          artifact ("do not generate 335,318 calculations — only
          ~50,000, or 10,000"); pass --start/--end for a smaller window.
-         The full 6a CSV stays as the C-4b-era campaign record — it is
-         KNOWN STALE vs the post-C-4b movement arcs (D4c/D4d-rev;
-         measured SS@−997 off by 2.9 h) and is only regenerated as a
-         conscious campaign step.
+         The full 6a CSV is retired (above): against the post-C-4b
+         movement arcs it measured SS@−997 off by 2.9 h.
          CHECK: `npm run check:csv-smoke` regenerates the FULL 6a2
          range into a scratch file and compares EVERY row against the
          6a2 artifact BIT-EXACTLY (~25 min since plan 06 R4: the
@@ -609,7 +612,7 @@ CARDINAL_POINT_* family and the comb-based Sun drift left the runtime —
 the cardinal instants are the apparent crossings of the one certified Sun
 whose mean longitude integrates the one-source tropical year (against JPL
 Horizons' own crossings over ±3000 yr the shipped instants are within a
-minute in 1000–3000 and 3–8 min in the ancient era, where the fitted device
+minute in 1000–3000 and about two minutes in the ancient era, where the fitted device
 sat hours — `tools/verify/sun-vs-horizons.js`; the era-clock year carried
 no secular drift). The constants stay in the coefficients file as the
 record until the cleanup phase. A harmonic re-fit
@@ -920,20 +923,20 @@ Step 11 (= pipeline step 7c — the runner executes it in a normal pass;
 > per-row cycle axis (R12/R13), event-row anchors (R14), shipped divisor
 > sets (R10), and the §10 derived cardinal form (R5/R7/R8/R9) with its
 > runtime mirrors (R11). That was THE LAST FIT — see "The frozen era
-> clock" above. `data/02-solar-measurements.csv` now carries the
-> one-source movement (the Stage C-4b regeneration; the only Node scene since plan 06 item 3);
-> the K-movement fit basis lives in the off-repo backup.
+> clock" above. The full-period CSV it was fitted on is no longer kept
+> (the repo's last copy was the Stage C-4b one-source regeneration, retired
+> as stale); the K-movement fit basis lives in the off-repo backup.
 >
 > Coefficients and runtime evaluation form are a MATCHED PAIR. Any future
 > change to either side must land with its counterpart — shipping one without
 > the other is a ~1162-minute-class error
 > (`holisticuniverse/docs/plans/IP-deeptime-scene-graph-alignment_new.md` §5).
 
-Note: `data/02-solar-measurements.csv` is generated by Step 6a (~2 h for full H at 1-year steps).
-It contains all solar events (cardinal points + perihelion/aphelion) with world-angles.
-No fitting step reads it any more (the harmonic clock is frozen — see "The
-frozen era clock") — it is the banked record of the one-source movement, for
-validation and research consumers. The frozen clock's runtime devices are
+Note: the Step 6a exporter writes all solar events (cardinal points +
+perihelion/aphelion) with world-angles, one block per year. No fitting step
+reads its output any more (the harmonic clock is frozen — see "The frozen era
+clock"); the kept artifact is the 6a2 window CSV, the full-period file is
+retired. The frozen clock's runtime devices are
 unchanged: the cardinal-point-derived tropical year remains the
 authoritative runtime version.
 
@@ -944,21 +947,21 @@ authoritative runtime version.
 | `H` (holisticyearLength) | ALL (1→10) — and Phase 8 (Step 11 = 7c) because `BOND_PERIOD_YR = 8·H / BOND_LATTICE_N`, so `ω = 2π/period` re-derives for all four cycles. |
 | `longitudePerihelion` (any planet) | 2 (that planet only) |
 | `solarYearInput` (any planet) / `inputmeanlengthsolaryearindays` / `moonSiderealMonthInput` / `yearLengthRef.siderealYear` | **The Sun-completion carriers ride these** (FQ-5 N3: `model.js` computes the carrier rates live; plan 06 I2: SIDEREAL — record rate minus the model's J2000 precession, Earth the sidereal year). Re-run the extraction chain (`tools/explore/n2-sun-framework-carriers.mjs` → `i2-sidereal-carrier-table.mjs` for the 70 short-period rows, `i2-long-inequality.mjs` for the two long-period rows on the model's own WH engine), re-embed the TERMS + `PAIRED_CARRIER_RATES_SHA256` in `eclipse/sun-planetary-completion.cjs` — the test:model fingerprint gate FAILS until you do (fail-proven). Plus the planet's own step 2 where applicable. |
-| `earthtiltMean` | 1, 3→4d, 6a (record CSV) + ⚠ FROZEN-CLOCK COUPLED (see "The frozen era clock") |
-| `earthInvPlaneInclinationAmplitude` | 1, 3→4d, 6a (record CSV) + ⚠ FROZEN-CLOCK COUPLED (see "The frozen era clock") |
-| `earthInvPlaneInclinationMean` | 3, 6a (record CSV) + ⚠ FROZEN-CLOCK COUPLED (see "The frozen era clock") |
-| `correctionSun` | 1, 6a (record CSV) + ⚠ FROZEN-CLOCK COUPLED (see "The frozen era clock") |
+| `earthtiltMean` | 1, 3→4d, 6a2 (window CSV) + ⚠ FROZEN-CLOCK COUPLED (see "The frozen era clock") |
+| `earthInvPlaneInclinationAmplitude` | 1, 3→4d, 6a2 (window CSV) + ⚠ FROZEN-CLOCK COUPLED (see "The frozen era clock") |
+| `earthInvPlaneInclinationMean` | 3, 6a2 (window CSV) + ⚠ FROZEN-CLOCK COUPLED (see "The frozen era clock") |
+| `correctionSun` | 1, 6a2 (window CSV) + ⚠ FROZEN-CLOCK COUPLED (see "The frozen era clock") |
 | `SUN_LONGITUDE_HARMONICS` / `SUN_LONGITUDE_MEAN` | **Step 0 is the source.** Re-run Step 0 (`SUN_HARMONICS_DISABLED=1 node tools/fit/sun-longitude-harmonics.js --write`) when any of these change: (a) `holisticyearLength` — the anchor-divisor whitelist and the year-multiple seed harmonics all shift; (b) `perihelionalignmentYear` or `balancedYear` — the phase anchor moves; (c) `eccentricityBase` / `eccentricityAmplitude` — the ~8% Meeus vs framework eccentricity gap shifts, changing the ~280" annual harmonic amplitude; (d) `moonApsidalPrecessionDaysInputICRF` / `moonNodalPrecessionDaysInputICRF` — the auto-derived N_apsidal / N_nodal divisors on the whitelist shift; (e) `_eclSunLon` (Meeus Ch.25) or `_meeusMoonLon` change; (f) `SUN_HARMONICS_ENABLED` toggles between framework-native and Meeus-parity mode. After Step 0 --write, re-run the full pipeline (1 → 2 → … → 9) so all downstream steps re-calibrate against the new Sun frame. The harmonics are NOT re-fit as part of ordinary refits. The runtime divisor-whitelist filter automatically skips design-rule-violating divisors. |
 | ~~Sun T² polynomial (inline in `moveModel`)~~ | **REMOVED 2026-06** — violates design rule (polynomial-in-T not cyclic). Do not re-introduce. |
-| `eccentricityBase` / `eccentricityAmplitude` | **0, 1, 3→4a, 6a (record CSV) + ⚠ FROZEN-CLOCK COUPLED (see "The frozen era clock")** (re-fit Step 0 because eccentricity gap definition changed; then re-run pipeline) |
-| `correctionDays` | 3, 6a (record CSV) + ⚠ FROZEN-CLOCK COUPLED (see "The frozen era clock") |
+| `eccentricityBase` / `eccentricityAmplitude` | **0, 1, 3→4a, 6a2 (window CSV) + ⚠ FROZEN-CLOCK COUPLED (see "The frozen era clock")** (re-fit Step 0 because eccentricity gap definition changed; then re-run pipeline) |
+| `correctionDays` | 3, 6a2 (window CSV) + ⚠ FROZEN-CLOCK COUPLED (see "The frozen era clock") |
 | `useVariableSpeed` | ALL (1→10) |
 | Planet `startpos` | — (Steps 2/5a-5b retired — K5 excision; legacy scene angle) |
 | Planet `eocFraction` | 3 (5a-5b retired — K5 excision) |
 | Planet `solarYearInput` | 4c→4d (Steps 2/5a-5b retired — K5 excision) |
 | Planet `orbitalEccentricityBase` | — (Steps 2/5a-5b retired — K5 excision; legacy law constant) |
-| `perihelionalignmentYear` | 1, 3→4a, 6a (record CSV) + ⚠ FROZEN-CLOCK COUPLED (see "The frozen era clock") |
-| `stepYears` | Must divide H evenly. Affects 4a→4d, 6a (record CSV) + ⚠ FROZEN-CLOCK COUPLED (see "The frozen era clock") (downsampling) |
+| `perihelionalignmentYear` | 1, 3→4a, 6a2 (window CSV) + ⚠ FROZEN-CLOCK COUPLED (see "The frozen era clock") |
+| `stepYears` | Must divide H evenly. Affects 4a→4d, 6a2 (window CSV) + ⚠ FROZEN-CLOCK COUPLED (see "The frozen era clock") (downsampling) |
 | `siderealYearJ2000` (in yearLengthRef) | Derived: `meansiderealyearlengthinSeconds = siderealYearJ2000 × 86400` |
 | Bond / Hallstatt / Jose5 / Jose4 `_LATTICE_N` (divisor of the anchor's eight-unit interval) | Step 11 (= 7c; independent of the orbital steps). The 4-flag ΔT stack has no upstream dependency on Steps 1–10; the fit re-runs against the Stephenson residual, reaches `src/script.js` and `tools/lib/deep-time.js` through the JSON (Step 9 / direct read), and the website via the republished `@essrt/physics` (see "Publishing to the website"). |
 | `_TAPER_FULL_HALFWIDTH_YR` / `_TAPER_TOTAL_HALFWIDTH_YR` (Holocene taper) | None — the taper is applied at runtime and does not affect the shipped cos/sin coefficients. Verify L-5b after change. |
@@ -1019,7 +1022,7 @@ Instead of running each step manually, use `run-pipeline.js`:
 
 ```bash
 node tools/fit/run-pipeline.js --phase1        # Step 1 only (Step 2 retired — K5 excision)
-node tools/fit/run-pipeline.js --phase2        # Steps 4a-10 (~2.5 hrs, requires Step 3 data)
+node tools/fit/run-pipeline.js --phase2        # Steps 4a-10 (~1 hr, requires Step 3 data)
 node tools/fit/run-pipeline.js --all           # Step 1, then 4a-10
 node tools/fit/run-pipeline.js --from 5c       # Resume from Step 5c onwards
 ```
@@ -1032,10 +1035,10 @@ Step 3 (browser export) is always manual — the runner checks the data file exi
 - Step 4a (Perihelion harmonics): **~7 min**
 - Steps 4b-d (ML training): **~10 min combined**
 - Step 5c (Moon): **~1 min** (5a-5b retired — K5 excision)
-- **Step 6a (CSV export): ~2 hours** — this is the pipeline bottleneck. Default step timeout raised to 3 h.
+- **Step 6a2 (window CSV export): ~25 min** — the pipeline's longest step since the full-period Step 6a (~2 hours) was retired.
 - Steps 7a-7c, 8-9 (balance, ΔT joint fit, verify, constants): ~5-10 min combined
 - Steps 7f-7i (campaign-artifact generators): ~5 min combined, dominated by 7i (eclipse audit, ~2-4 min; 7g retired at plan 06 R8)
-- **TOTAL Phase 2: ~2.5-3 hours** dominated by Step 6a.
+- **TOTAL Phase 2: ~1 hour** dominated by Step 6a2.
 
 ### Manual step-by-step
 
@@ -1084,11 +1087,12 @@ python3 tools/fit/python/verify_perihelion_erd.py                            # S
 node tools/fit/moon-eclipse-optimizer.js --write                             # Step 5c
 
 # Phase 5: Solar measurements & harmonic fits
-# FIRST: back up the CSV outside the repo — 159 MB, gitignored, NO git recovery.
-cp data/02-solar-measurements.csv ~/holistic-archive/02-solar-measurements.$(date +%Y%m%d).csv
-node tools/fit/export-solar-measurements.js                                  # Step 6a (~2 h; the one-source movement, the only Node scene — see Step 6a notes)
+npm run fit:6a2                                                              # Step 6a2 → the window CSV (−4000…+4000; ~25 min) — re-base it when the engine's frame of date moves
+npm run check:csv-smoke                                                      # the bit-exact window compare
+# (The full-period Step 6a export is retired as a kept file — see Step 6a;
+# `node tools/fit/export-solar-measurements.js` still writes one on demand, ~2 h.)
 # (The obliquity / year-length / cardinal harmonic fits are retired —
-# coefficients frozen; see "The frozen era clock". Nothing runs after 6a.)
+# coefficients frozen; see "The frozen era clock". Nothing runs after 6a2.)
 # (Sun longitude harmonics moved to Phase 0 — see top of this block.
 # It does NOT need to re-run here as part of routine refits.)
 
@@ -1132,7 +1136,7 @@ npm run values:package:write     # re-render @essrt/model-values + re-stamp docs
 | Fitted coefficients (JSON) | `public/input/fitted-coefficients.json` ← single source of truth |
 | ML coefficients (Python) | `tools/lib/python/coefficients/*_coeffs*.py` |
 | Browser simulation | `src/script.js` ← imports the generated constants module |
-| Solar measurements (CSV) | `data/02-solar-measurements.csv` (1-year steps, ~160 MB) |
+| Solar measurements (CSV) | `data/02-solar-measurements-window.csv` (−4000…+4000, 1-year steps, 3.7 MB, gitignored; the full-period file is retired) |
 | Browser export (Excel) | `data/01-holistic-year-objects-data.xlsx` (1-year steps, ~300 MB) |
 
 Note: Large data files (>100 MB) are excluded from git via `.gitignore`.

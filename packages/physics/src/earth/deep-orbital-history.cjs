@@ -45,6 +45,8 @@
  *   axialPrecessionYearsJ2000: number,
  *   obliquityJ2000Deg: number,
  *   axialPrecessionYearsAtYearFn?: (year: number) => number,
+ *   solarTorqueShareJ2000?: number,
+ *   dynamicalEllipticityRatioAtYearFn?: (year: number) => number,
  * }} deps — mode tables from the governed deep artifact (choose the ζ tier
  *   per consumer: era = its own 8-term extraction, deep = the 16-term
  *   table; NEVER a slice); anchors from the chain artifact's one home; the
@@ -57,13 +59,17 @@
  *   vs La2004 over −200 kyr vs the deep tier's 0.069° — the C-1 verdict,
  *   plan 02) and zetaModes serves only as the TAIL beyond the span (the
  *   seam at the span edge is the extraction residual, far outside every
- *   certified window).
+ *   certified window). solarTorqueShareJ2000 and
+ *   dynamicalEllipticityRatioAtYearFn: THE PRECESSION OF DATE — the two
+ *   factors on the precession constant (see alphaAtGeneral below); absent,
+ *   the constant is the secular law alone, bit-identical.
  */
 function createDeepOrbitalHistory({
   zModes, zetaModes, zetaSeries, zSeries,
   anchorE, anchorPeriEclipticDeg, anchorInclEclipticDeg, anchorAscNodeEclipticDeg,
   axialPrecessionYearsJ2000, obliquityJ2000Deg,
   axialPrecessionYearsAtYearFn,
+  solarTorqueShareJ2000, dynamicalEllipticityRatioAtYearFn,
 }) {
   const D2R = Math.PI / 180, R2D = 180 / Math.PI;
 
@@ -198,10 +204,59 @@ function createDeepOrbitalHistory({
   // dynamical). No new constants: ψ̇(t)'s J2000 anchor is the same
   // certified year-length machinery; only its deep-time scaling is injected. Absent the option, α stays constant (the
   // pre-D1 ±Myr-class behavior, bit-identical).
-  const alphaAtGeneral = axialPrecessionYearsAtYearFn
+  const alphaSecular = axialPrecessionYearsAtYearFn
     ? (/** @type {number} */ t) =>
         ((2 * Math.PI) / axialPrecessionYearsAtYearFn(2000 + t)) / Math.cos(EPS0)
     : () => ALPHA;
+  // THE PRECESSION OF DATE (plan 06 §9 item 10 — owner: "adopt it in the
+  // model"). The secular law above scales the J2000 rate on the tidal history;
+  // the torque of date carries two more factors, both exactly 1 at J2000:
+  //
+  //   SOLAR TORQUE — ∝ (1 − e²)^(−3/2): the Sun's share f_S of the torque is
+  //   the engine's own solar-share formula, which holds e at its J2000 value;
+  //   here it rides the eccentricity OF DATE, the z this factory already
+  //   carries. Measured: the frozen form runs the precession 0.032 % slow on
+  //   the million-year mean (the mean e² sits above today's) — 4.5° of
+  //   equinox at −1 Myr, the obliquity ~100″ rms off La2004 there; with the
+  //   factor it holds 12″ rms over the last Myr (La2004 integrates the same
+  //   eccentricity-dependent torque).
+  //
+  //   DYNAMICAL ELLIPTICITY — ψ̇ ∝ (C − A)/C ∝ J₂: the injected J₂(t)/J₂₀ of
+  //   the engine's GIA channel (climate/l1-orbital j2RatioAt — the ice-age
+  //   mass redistribution the length-of-day side already carries, scaled on
+  //   the observed dJ₂/dt). Bounded ±5·10⁻⁴, no secular part.
+  //
+  // Together they close the millennial equinox: against Vondrák et al. (2011)
+  // the lag was −26.5″ at −2950 and −20.1″ at −2450 (the Sun's whole residual
+  // against Horizons there); with them −6.3″ and −3.7″, ≤ 0.3″ inside
+  // −450…+2500 (banked by tools/verify/equinox-vs-vondrak.js, which refuses
+  // to write if a factor is dropped). Absent both options the constant is
+  // the secular law alone — bit-identical to the pre-adoption factory.
+  const hasOfDate = solarTorqueShareJ2000 !== undefined || dynamicalEllipticityRatioAtYearFn !== undefined;
+  const oneMinusE0Sq = (() => { const [x0, y0] = zAt(0); return 1 - (x0 * x0 + y0 * y0); })();
+  const solarTorqueFactor = solarTorqueShareJ2000 !== undefined
+    ? (/** @type {number} */ t) => {
+        const [zx, zy] = zAt(t);
+        return 1 + solarTorqueShareJ2000 * (Math.pow((1 - (zx * zx + zy * zy)) / oneMinusE0Sq, -1.5) - 1);
+      }
+    : () => 1;
+  const ellipticityFactor = dynamicalEllipticityRatioAtYearFn
+    ? (/** @type {number} */ t) => dynamicalEllipticityRatioAtYearFn(2000 + t)
+    : () => 1;
+  // Two-entry memo on the precession constant of date: RK4 asks k2 and k3 at
+  // the same instant and the next step's k1 repeats this step's k4 — half
+  // the evaluations of the secular law AND of the two factors (measured: the
+  // tier builds cost what they did before the factors), the values
+  // bit-identical (a pure function of t).
+  let memoT0 = NaN, memoV0 = 0, memoT1 = NaN, memoV1 = 0;
+  const alphaOfDate = (/** @type {number} */ t) => {
+    if (t === memoT0) return memoV0;
+    if (t === memoT1) return memoV1;
+    const v = alphaSecular(t) * (solarTorqueFactor(t) * ellipticityFactor(t));
+    memoT1 = memoT0; memoV1 = memoV0; memoT0 = t; memoV0 = v;
+    return v;
+  };
+  const alphaAtGeneral = hasOfDate ? alphaOfDate : alphaSecular;
 
   const cross = (/** @type {number[]} */ a, /** @type {number[]} */ b) =>
     [a[1] * b[2] - a[2] * b[1], a[2] * b[0] - a[0] * b[2], a[0] * b[1] - a[1] * b[0]];
@@ -456,6 +511,12 @@ function createDeepOrbitalHistory({
     // D4e diagnostics: the self-anchored lunisolar rate actually integrated.
     alphaLunisolarArcsecPerYr: ALPHA * K_LUNI * R2D * 3600,
     axialPrecessionYearsLunisolarJ2000: axialPrecessionYearsJ2000 / K_LUNI,
+    /** THE PRECESSION OF DATE — the two factors this integration applies to
+     *  the secular precession constant at t years from J2000 (both 1 at
+     *  t = 0; both 1 everywhere when the options are absent). ONE home for
+     *  the published surface and the docs.
+     *  @param {number} t @returns {{solarTorque: number, ellipticity: number}} */
+    precessionOfDateFactorsAt: (t) => ({ solarTorque: solarTorqueFactor(t), ellipticity: ellipticityFactor(t) }),
   };
 }
 

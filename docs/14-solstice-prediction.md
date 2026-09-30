@@ -14,8 +14,10 @@ status: current
 > leading nutation terms derived), whose mean longitude integrates the
 > one-source tropical year. Measured against JPL Horizons' own equinox and
 > solstice crossings over ±3000 yr (the observation-class reference, plan
-> 06 I1): the shipped instants are <!--v:cardinalVsHorizonsMeanMin-->−3.84<!--/v--> min from Horizons on average,
-> within a minute in 1000–3000 and 3–8 min early in the ancient era; the
+> 06 I1): the shipped instants are <!--v:cardinalVsHorizonsMeanMin-->−1.49<!--/v--> min from Horizons on average,
+> within a minute in 1000–3000 and about two minutes early in the ancient
+> era (the difference between the model's equinox of date and Horizons'
+> of-date frame); the
 > fitted model below sat hours from the same reference (4.5 h at 0 AD,
 > doc 110 §5.3). The
 > `CARDINAL_POINT_*` coefficients stay in the coefficients file as the
@@ -287,7 +289,7 @@ be at 5h 35m RA (the minimum).
 
 Cardinal point observations generated from the headless scene-graph (no browser needed):
 - Script: `tools/fit/export-solar-measurements.js` (single-pass, configurable step size)
-- File: [../data/02-solar-measurements.csv](../data/02-solar-measurements.csv)
+- File: the full-period export `data/02-solar-measurements.csv` — the fit's basis, no longer kept (the kept artifact is the −4000…+4000 window CSV, `npm run fit:6a2`)
 - 2,011,908 data points (6 types × 335,318 rows) spanning one full anchor interval
 - Step: 1 year (single-pass export)
 - Columns: Type, Model Year, JD, RA (°), Obliquity (°), World Angle (°), Distance (AU)

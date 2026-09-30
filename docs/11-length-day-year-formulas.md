@@ -407,13 +407,14 @@ If `H` or `inputmeanlengthsolaryearindays` changes:
 2. **The harmonic fitters are FROZEN and retired** (git history commit
    16d7c87f; README §"The frozen era clock"): the coefficients are the
    certified era device, and re-fitting them against a one-source export
-   is a cross-family error (measured, the C-4b adjudication). Step 6a
-   (`export-solar-measurements.js`) remains the measurement/reference
-   export. If `H` or the input mean year ever changes, the freeze itself
+   is a cross-family error (measured, the C-4b adjudication). The same
+   exporter (`export-solar-measurements.js`) remains the measurement
+   export over the −4000…+4000 window (Step 6a2); the full-period file is
+   retired. If `H` or the input mean year ever changes, the freeze itself
    must be re-adjudicated (an owner decision), not silently re-run.
 3. **stepYears must divide H evenly** — current: H=<!--v:H-->335,317<!--/v-->, stepYears=1 (335,318 rows)
 
-Training data: `data/02-solar-measurements.csv`
+Training data (the frozen fit's basis): the full-period solar-measurements export, one row per year of the anchor unit — no longer kept in the repo (the kept artifact is the window CSV, `data/02-solar-measurements-window.csv`)
 
 ## Related
 

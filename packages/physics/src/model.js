@@ -148,6 +148,10 @@ export function assembleModel(C, F, laws = {}, secularSeriesArtifact = /** @type
     relaxationKyr: C.deepTime.alphaGiaRelaxationKyr,
     alphaGiaRateJ2000PerYr: C.deepTime.alphaGiaRateJ2000PerYr,
     alphaJ2000: earthMoiFactorJ2000,
+    // the channel's second observable, J₂(t)/J₂₀ — scaled on the OBSERVED
+    // dJ₂/dt; consumed by the spin integration below (the precession of date)
+    j2RateJ2000PerYr: C.deepTime.j2RateJ2000PerYr,
+    j2J2000: C.physicalConstants.earthJ2,
   });
 
   let latticeAlphaPin = false;
@@ -577,6 +581,14 @@ export function assembleModel(C, F, laws = {}, secularSeriesArtifact = /** @type
         const h = deepLod.hAtAge((startmodelYear - yr) / 1e6);
         return axial0 * (h === null ? 1 : h / H0);
       },
+      // THE PRECESSION OF DATE (plan 06 §9 item 10): on top of the secular
+      // law above, the solar torque at the eccentricity of date and the
+      // oblateness of date from the GIA channel — both exactly 1 at J2000,
+      // so the unit H(t) and the J2000 anchor are untouched. The channel is
+      // read PURE (alphaGia, not the lattice-pin-aware earthMoiFactorAtAge):
+      // the samplers are cached, their values must be pure in year.
+      solarTorqueShareJ2000: EPOCH_PARAMS.precessionSolarShareJ2000,
+      dynamicalEllipticityRatioAtYearFn: alphaGia.j2RatioAt,
     });
     // PER-TIER ROUTING (the anomalistic-contamination fix): one sampler PER
     // grid tier, built on first entry and KEPT — a query always reads the
@@ -615,6 +627,8 @@ export function assembleModel(C, F, laws = {}, secularSeriesArtifact = /** @type
       periOfDateDegAt: (year) => sampleAt(year).periOfDateDeg,
       /** The hybrid's obliquity at a decimal year, degrees — the banked series inside its span, the α(t)-coupled ζ-tail integration beyond (the deep sampler grows ~0.1 s/Myr). @param {number} year @returns {number} */
       epsAt: (year) => sampleAt(year).epsDeg,
+      /** The precession of date's two factors at a decimal year (the factory's own — ONE home). @param {number} year @returns {{solarTorque: number, ellipticity: number}} */
+      precessionOfDateFactorsAt: (year) => hist.precessionOfDateFactorsAt(year - 2000),
     };
   })();
   const yearLengthsM = oneSourceM.yearLengths;
@@ -1471,6 +1485,10 @@ export function assembleModel(C, F, laws = {}, secularSeriesArtifact = /** @type
       ofDatePeriodYearsAtYear: publishedAxialPrecessionYearsAtYear,
       /** f_S, the solar fraction of the J2000 precession torque. */
       solarShareJ2000: EPOCH_PARAMS.precessionSolarShareJ2000,
+      /** THE PRECESSION OF DATE — the solar-torque factor 1 + f_S·([(1 − e²)/(1 − e₀²)]^(−3/2) − 1) at the eccentricity of date (1 at J2000; +3.2·10⁻⁴ on the million-year mean). The spin integration multiplies it into the secular rate. @param {number} year @returns {number} */
+      solarTorqueFactorOfDateAtYear: (year) => oneSourceM.precessionOfDateFactorsAt(year).solarTorque,
+      /** THE PRECESSION OF DATE — J₂(t)/J₂₀, the oblateness of date from the GIA channel (ψ̇ ∝ J₂; 1 at J2000, bounded ±5·10⁻⁴; dJ₂/dt at J2000 = the observed satellite rate). @param {number} year @returns {number} */
+      ellipticityRatioOfDateAtYear: (year) => oneSourceM.precessionOfDateFactorsAt(year).ellipticity,
       /** (a₀/a_M(t))³ — the lunar torque's growth on the recession history. @param {number} year @returns {number} */
       lunarTorqueFactorAtYear: (year) => { const f = deepLod.lunarTorqueFactorAtAge(yearToTMa(year)); return f === null ? 1 : f; },
       /** f_S + (1 − f_S)(a₀/a_M)³ — the torque term the unit divides H_era by. @param {number} year @returns {number} */

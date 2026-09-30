@@ -15,7 +15,13 @@
  *    1950.0; coefficients from the palinsol R package (Crucifix).
  *    Table 4 eccentricity (19 terms), Table 1 obliquity (47 terms).
  *  - Vondrák, Capitaine & Wallace (2011), A&A 534, A22 — Table 3
- *    long-term precession p_A (polynomial + 10 periodic terms).
+ *    long-term precession p_A (polynomial + 10 periodic terms); and the
+ *    FRAME OF DATE — the ecliptic pole (P_A, Q_A: cubic + 8 periodic
+ *    terms) and the equator pole (X_A, Y_A: cubic + 14 periodic terms),
+ *    coefficients as coded in ERFA/SOFA ltpecl and ltpequ. The series is
+ *    IAU 2006 inside ±1 kyr of J2000 and a fit to numerical integrations
+ *    (Laskar et al. 1993; Mercury 6) beyond, valid ±200 kyr — a THEORY
+ *    reference for a multi-millennium equinox, never an observation.
  *  - Laskar et al. (2004), A&A 428, 261–285 — the La2004 N-body
  *    solution (IMCCE): [year, eccentricity, obliquity°, perihelion°]
  *    at 1000-yr intervals, −250,000..+100,000 from J2000, linearly
@@ -133,6 +139,81 @@ function axialPrecessionVondrak2011(year) {
   const rateArcsecPerCy = (pA1 - pA2) / (2 * h);
   if (Math.abs(rateArcsecPerCy) < 1) return NaN;
   return 129600000 / rateArcsecPerCy; // period in years
+}
+
+// Vondrák et al. (2011) — the ecliptic pole P_A, Q_A: polynomial rows
+// (arcsec, powers of T in Julian centuries from J2000) and periodic rows
+// [period (cy), C_P, C_Q, S_P, S_Q] (arcsec); as in ERFA ltpecl.c.
+const _VONDRAK_PQ_POL = [
+  [5851.607687, -0.1189000, -0.00028913, 0.000000101],
+  [-1600.886300, 1.1689818, -0.00000020, -0.000000437],
+];
+const _VONDRAK_PQ_PER = [
+  [708.15, -5486.751211, -684.661560, 667.666730, -5523.863691],
+  [2309.00, -17.127623, 2446.283880, -2354.886252, -549.747450],
+  [1620.00, -617.517403, 399.671049, -428.152441, -310.998056],
+  [492.20, 413.442940, -356.652376, 376.202861, 421.535876],
+  [1183.00, 78.614193, -186.387003, 184.778874, -36.776172],
+  [622.00, -180.732815, -316.800070, 335.321713, -145.278396],
+  [882.00, -87.676083, 198.296701, -185.138669, -34.744450],
+  [547.00, 46.140315, 101.135679, -120.972830, 22.885731],
+];
+// … and the equator pole X_A, Y_A: polynomial rows and periodic rows
+// [period (cy), C_X, C_Y, S_X, S_Y] (arcsec); as in ERFA ltpequ.c.
+const _VONDRAK_XY_POL = [
+  [5453.282155, 0.4252841, -0.00037173, -0.000000152],
+  [-73750.930350, -0.7675452, -0.00018725, 0.000000231],
+];
+const _VONDRAK_XY_PER = [
+  [256.75, -819.940624, 75004.344875, 81491.287984, 1558.515853],
+  [708.15, -8444.676815, 624.033993, 787.163481, 7774.939698],
+  [274.20, 2600.009459, 1251.136893, 1251.296102, -2219.534038],
+  [241.45, 2755.175630, -1102.212834, -1257.950837, -2523.969396],
+  [2309.00, -167.659835, -2660.664980, -2966.799730, 247.850422],
+  [492.20, 871.855056, 699.291817, 639.744522, -846.485643],
+  [396.10, 44.769698, 153.167220, 131.600209, -1393.124055],
+  [288.90, -512.313065, -950.865637, -445.040117, 368.526116],
+  [231.10, -819.415595, 499.754645, 584.522874, 749.045012],
+  [1610.00, -538.071099, -145.188210, -89.756563, 444.704518],
+  [620.00, -189.793622, 558.116553, 524.429630, 235.934465],
+  [157.87, -402.922932, -23.923029, -13.549067, 374.049623],
+  [220.30, 179.516345, -165.405086, -210.157124, -171.330180],
+  [1200.00, -9.814756, 9.344131, -44.919798, -22.899655],
+];
+
+/**
+ * Vondrák et al. (2011) frame of date at a Julian epoch: the ecliptic pole n̂,
+ * the equator pole ŝ and the equinox ĝ = ŝ × n̂ (the ascending node of the
+ * ecliptic on the equator), unit vectors in the J2000 ECLIPTIC frame (x toward
+ * the J2000 equinox, z the J2000 ecliptic pole), and the mean obliquity.
+ * The equator pole is published in the J2000 equatorial frame and rotated
+ * here by the J2000 obliquity 84381.406″ (IAU 2006).
+ * @param {number} epj - Julian epoch (TT)
+ * @returns {{n: number[], s: number[], g: number[], epsDeg: number}}
+ */
+function vondrakFrameOfDate2011(epj) {
+  const AS2R = Math.PI / 648000;
+  const t = (epj - 2000) / 100, w = 2 * Math.PI * t;
+  let p = 0, q = 0, x = 0, y = 0;
+  for (const r of _VONDRAK_PQ_PER) { const a = w / r[0], s = Math.sin(a), c = Math.cos(a); p += c * r[1] + s * r[3]; q += c * r[2] + s * r[4]; }
+  for (const r of _VONDRAK_XY_PER) { const a = w / r[0], s = Math.sin(a), c = Math.cos(a); x += c * r[1] + s * r[3]; y += c * r[2] + s * r[4]; }
+  let tt = 1;
+  for (let i = 0; i < 4; i++) {
+    p += _VONDRAK_PQ_POL[0][i] * tt; q += _VONDRAK_PQ_POL[1][i] * tt;
+    x += _VONDRAK_XY_POL[0][i] * tt; y += _VONDRAK_XY_POL[1][i] * tt;
+    tt *= t;
+  }
+  p *= AS2R; q *= AS2R; x *= AS2R; y *= AS2R;
+  const n = [p, -q, Math.sqrt(Math.max(0, 1 - p * p - q * q))];
+  const z = Math.sqrt(Math.max(0, 1 - x * x - y * y));
+  const eps0 = 84381.406 * AS2R, ce = Math.cos(eps0), se = Math.sin(eps0);
+  const s = [x, y * ce + z * se, -y * se + z * ce];
+  const gx = s[1] * n[2] - s[2] * n[1], gy = s[2] * n[0] - s[0] * n[2], gz = s[0] * n[1] - s[1] * n[0];
+  const gn = Math.hypot(gx, gy, gz);
+  return {
+    n, s, g: [gx / gn, gy / gn, gz / gn],
+    epsDeg: Math.acos(Math.max(-1, Math.min(1, s[0] * n[0] + s[1] * n[1] + s[2] * n[2]))) * 180 / Math.PI,
+  };
 }
 
 // Laskar et al. (2004) La2004 N-body solution (IMCCE):
@@ -270,7 +351,7 @@ function createPublishedCurves(deps) {
 
 module.exports = {
   createPublishedCurves,
-  eccBerger1978, obliquityBerger1978, axialPrecessionVondrak2011,
+  eccBerger1978, obliquityBerger1978, axialPrecessionVondrak2011, vondrakFrameOfDate2011,
   eccLa2004, obliquityLa2004, perihelionLa2004,
   stephensonDeltaT, stephensonDeltaTExtended, meeusMeanObliquityRad,
 };

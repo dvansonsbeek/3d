@@ -99,6 +99,12 @@ function createOneSourceMovement() {
     // NOT the frozen era clock's H_era. Twins: packages/physics model.js and
     // src/script.js _deepHistSeries.
     axialPrecessionYearsAtYearFn: (yr) => axial0 * DT.meanHAtAge((2000 - yr) / 1e6) / H0,
+    // THE PRECESSION OF DATE (plan 06 §9 item 10): the solar torque at the
+    // eccentricity of date and the oblateness of date from the GIA channel —
+    // both exactly 1 at J2000. Twins: packages/physics model.js and
+    // src/script.js _deepHistSeries (identical deps).
+    solarTorqueShareJ2000: DT.PRECESSION_SOLAR_SHARE_J2000,
+    dynamicalEllipticityRatioAtYearFn: DT.j2RatioAtYear,
   });
 
   // grown-grid sampler (the browser's tiers: 250-aligned beyond ±50 kyr).

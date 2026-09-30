@@ -45,6 +45,10 @@ export function assembleModel(C: Readonly<Record<string, any>>, F: Readonly<Reco
         ofDatePeriodYearsAtYear: (year: number) => number;
         /** f_S, the solar fraction of the J2000 precession torque. */
         solarShareJ2000: number;
+        /** THE PRECESSION OF DATE — the solar-torque factor 1 + f_S·([(1 − e²)/(1 − e₀²)]^(−3/2) − 1) at the eccentricity of date (1 at J2000; +3.2·10⁻⁴ on the million-year mean). The spin integration multiplies it into the secular rate. @param {number} year @returns {number} */
+        solarTorqueFactorOfDateAtYear: (year: number) => number;
+        /** THE PRECESSION OF DATE — J₂(t)/J₂₀, the oblateness of date from the GIA channel (ψ̇ ∝ J₂; 1 at J2000, bounded ±5·10⁻⁴; dJ₂/dt at J2000 = the observed satellite rate). @param {number} year @returns {number} */
+        ellipticityRatioOfDateAtYear: (year: number) => number;
         /** (a₀/a_M(t))³ — the lunar torque's growth on the recession history. @param {number} year @returns {number} */
         lunarTorqueFactorAtYear: (year: number) => number;
         /** f_S + (1 − f_S)(a₀/a_M)³ — the torque term the unit divides H_era by. @param {number} year @returns {number} */

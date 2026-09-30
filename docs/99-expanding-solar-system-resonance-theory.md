@@ -594,9 +594,10 @@ L(t) = L₀ + mean tropical rate · t + D(t)          (mean longitude)
    the IAU/Laskar drift expression to 0.1 s over −1000..+3000. THE
    OBSERVATION-CLASS CHECK (plan 06 I1, JPL Horizons' apparent Sun on a
    10-day TT grid over ±3000 yr, <!--v:sunVsHorizonsN-->219,152<!--/v--> instants): the model's apparent
-   Sun sits <!--v:sunVsHorizonsMeanArcsec-->9.45<!--/v-->″ from Horizons on average with sd <!--v:sunVsHorizonsSdArcsec-->7.60<!--/v-->″ over the whole
-   span — near zero in 1000–3000 (<!--v:sunVsHorizonsMeanP1000Arcsec-->1.4<!--/v--> / <!--v:sunVsHorizonsMeanP2000Arcsec-->1.7<!--/v-->″), a slowly
-   varying bias of <!--v:sunVsHorizonsMeanM2000Arcsec-->15.7<!--/v-->″ at −2000..−1000 — and <!--v:sunVsHorizonsModernSdArcsec-->0.96<!--/v-->″ scatter in
+   Sun sits <!--v:sunVsHorizonsMeanArcsec-->3.66<!--/v-->″ from Horizons on average with sd <!--v:sunVsHorizonsSdArcsec-->3.52<!--/v-->″ over the whole
+   span — near zero in 1000–3000 (<!--v:sunVsHorizonsMeanP1000Arcsec-->1.2<!--/v--> / <!--v:sunVsHorizonsMeanP2000Arcsec-->1.4<!--/v-->″),
+   <!--v:sunVsHorizonsMeanM2000Arcsec-->5.5<!--/v-->″ at −2000..−1000 (the size of the difference between the model's
+   equinox of date and Horizons' of-date frame) — and <!--v:sunVsHorizonsModernSdArcsec-->0.95<!--/v-->″ scatter in
    1970–2049 (mean offset <!--v:sunVsHorizonsModernMeanArcsec-->0.75<!--/v-->″, the L0 anchor and aberration conventions).
 
 **e(t) and ϖ(t)** are the banked N-body series' Earth elements plus the
@@ -607,7 +608,7 @@ carries no equinox-referenced period; the perihelion longitude does. The
 cardinal instants are the APPARENT crossings of this Sun (aberration and
 the leading nutation terms applied, both derived) — the former fitted
 cardinal-point model left with R1 (doc 110 chain 5); against Horizons' own
-crossings the instants are <!--v:cardinalVsHorizonsMeanMin-->−3.84<!--/v--> min on average over ±3000 yr, within a
+crossings the instants are <!--v:cardinalVsHorizonsMeanMin-->−1.49<!--/v--> min on average over ±3000 yr, within a
 minute in 1000–3000.
 
 **Accuracy**: <!--v:frameworkSunVsJplRms-->1.03<!--/v-->″ RMS vs JPL over the modern window 1970–2049
@@ -951,6 +952,24 @@ days/yr  = tropical_year_s(t) / LOD(t)
 
 T_p(t) = 1,296,000/ψ̇(t) with ψ̇(t) = [ω(t)/ω₀]·p₀·[f_S + (1 − f_S)(a₀/a_M(t))³] — Earth's spin (angular-momentum conservation on the recession history) carrying the solar and lunar torques, the lunar torque growing as the Moon was closer; p₀ = 50.2883 ″/yr, the model's derived J2000 rate (T_p = 25,771.4 yr; plan 06 S5). The obliquity beat is 1,296,000/(ψ̇ − |s₃|) with |s₃| = 18.8506 ″/yr, the dominant nodal mode of Earth's orbit (the engine's deep secular modes; μ = 1). The spin-only clock the model carried before (H₀·LOD/LOD₀ ÷ 13) read 23,553 yr at the Devonian where the composed clock reads 21,699 — retired, `docs/retired-record.md`.
 <!-- /generated:doc99-clock-through-time -->
+
+**The precession of date.** The table is the secular law. The movement of
+date — the equinox, the obliquity, the tropical year — rides it times two
+factors, both exactly 1 at J2000. The first is the solar torque at the
+eccentricity of date, 1 + f_S·([(1 − e²)/(1 − e₀²)]^(−3/2) − 1): the Sun's
+share of the torque carries the orbit's eccentricity, and today's sits
+below the long-term mean. The second is the oblateness of date, J₂(t)/J₂₀:
+the precession rate is proportional to the dynamical ellipticity, and the
+ice-age mass redistribution that changes the polar moment (the α(t) of the
+length-of-day stack) changes it too; the channel is scaled on the observed
+dJ₂/dt (<!--v:j2RateJ2000Per1e11Yr-->−2.7<!--/v--> ×10⁻¹¹ /yr, Cox & Chao 2002) and is bounded, ±<!--v:precOfDateEllipticityAmpLastMyrPct-->0.02<!--/v--> %, with
+no secular part. Theory against theory: the equinox of date holds
+<!--v:equinoxVsVondrakMaxAbsArcsec-->6.6<!--/v-->″ of Vondrák et al. (2011) over ±3000 yr where the secular law alone
+reads <!--v:equinoxSecularOnlyMaxAbsArcsec-->27.2<!--/v-->″, and the obliquity holds <!--v:obliqVsLa2004RmsLastMyrArcsec-->13.7<!--/v-->″ rms of La2004 over the last
+million years where the secular law alone reads <!--v:obliqSecularOnlyVsLa2004RmsLastMyrArcsec-->79.5<!--/v-->″
+([doc 110 §2.3](110-calculation-map.md) carries the formulas). The deep-time
+rows above, the precession gates at 1.4 and 2.46 Ga and the obliquity beat
+are statements of the secular law and do not move.
 
 **Devonian days/yr = <!--v:daysPerYearAtDevonian-->399.96<!--/v-->** (tropical) — matches Wells 1963's directly-counted coral growth rings of ~400 days/year essentially exactly (−0.01 %). (Wells's "400" rounded count is consistent with modern reanalysis at 398–402 range; the framework's <!--v:daysPerYearAtDevonian-->399.96<!--/v--> sits at its centre.)
 
