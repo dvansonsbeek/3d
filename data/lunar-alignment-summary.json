@@ -530,7 +530,7 @@
       "packages/physics/src/earth/sidereal-channel-artifact.cjs": "sha256:6fd5fb28354d58f565f8ba3f352a49bfbd87443110880167a0f2374e9ff4ad5a",
       "packages/physics/src/earth/year-lengths.cjs": "sha256:c93061fd40a0dfcafcac65e00eaf74638094aafe7a858361aae14e92f1e7d077",
       "packages/physics/src/eclipse/finders.cjs": "sha256:168755d5e01397b7f63f2ffa49101afe0da0046e5fbd9e7ef6d04be6d7f5d330",
-      "packages/physics/src/model.js": "sha256:ea848fbf49a3f93e9238def124a0686521b208efc1dd9fba5b9bcf66a2b3e2be",
+      "packages/physics/src/model.js": "sha256:b42cb6db8472887e95402210daeec5f1c06ef39edecb8b3bdf2639a4a67f84a0",
       "packages/physics/src/moon/apparent.cjs": "sha256:5a63a95cf8d26c4d44e7b7acd4308cbd7240aa2bcee70d04c70b273413090335",
       "packages/physics/src/moon/arguments.cjs": "sha256:d40f15e0ced6311754bc1350a66854a917112a58a6995250b110fddca4073e3b",
       "packages/physics/src/moon/deep-ecc-channel.cjs": "sha256:7ce15d1c4f61f2ea730d7673d705a1eb2a31bff20b720cd00d8f1d34a3e85220",

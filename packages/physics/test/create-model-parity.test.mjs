@@ -189,28 +189,30 @@ if (model.identity.counterfactual !== false) failures.push('identity: default as
   const { createHash } = await import('node:crypto');
   const { PAIRED_CARRIER_RATES_SHA256 } = require('../src/eclipse/sun-planetary-completion.cjs');
   const { DEFAULT_CONSTANTS: C } = await import('../src/index.js');
-  const H = C.foundational.holisticyearLength;
-  const mSY = Math.round(C.foundational.inputmeanlengthsolaryearindays * (H / 8)) / (H / 8);
   const dpc = (/** @type {number} */ f) => 360 * 36525 * f;
-  // plan 06 I2 — SIDEREAL carriers: the record's of-date rate minus the
-  // model's own J2000 precession (mean solar year vs sidereal year), Earth
-  // the framework sidereal year — identical arithmetic to model.js.
-  const p0 = dpc(1 / mSY) - dpc(1 / C.yearLengthRef.siderealYear);
+  // plan 06 I3 — the carriers are the model's own banked J2000 sidereal mean
+  // motions (the embedded sun-completion artifact, regenerated with the
+  // series by generate.mjs), Earth the framework sidereal year, the Moon
+  // elongation from the sidereal month/year identity — identical arithmetic
+  // to computeCarrierRatesDegPerCy (mirrored here on purpose: a series
+  // re-bank that moves the carriers must be caught against the frozen table).
+  const { SUN_COMPLETION_ARTIFACT } = require('../src/eclipse/sun-completion-artifact.cjs');
+  const L = SUN_COMPLETION_ARTIFACT.planetLamDotJ2000DegPerYr;
   const liveRates = [
-    dpc(1 / C.planetOrbitalElements.mercury.solarYearInput) - p0,
-    dpc(1 / C.planetOrbitalElements.venus.solarYearInput) - p0,
+    L.mercury * 100,
+    L.venus * 100,
     dpc(1 / C.yearLengthRef.siderealYear),
-    dpc(1 / C.planetOrbitalElements.mars.solarYearInput) - p0,
-    dpc(1 / C.planetOrbitalElements.jupiter.solarYearInput) - p0,
-    dpc(1 / C.planetOrbitalElements.saturn.solarYearInput) - p0,
+    L.mars * 100,
+    L.jupiter * 100,
+    L.saturn * 100,
     dpc(1 / C.moonReference.moonSiderealMonthInput - 1 / C.yearLengthRef.siderealYear),
   ];
   const liveFp = createHash('sha256').update(JSON.stringify(liveRates)).digest('hex').slice(0, 16);
   if (liveFp !== PAIRED_CARRIER_RATES_SHA256) {
     failures.push(`sun-completion matched pair: carrier rates hash ${liveFp} != paired ${PAIRED_CARRIER_RATES_SHA256}`
-      + ' — a planet-period / year / month input moved without re-deriving the v3 TERMS'
-      + ' (re-run the N3 extraction chain: n2-sun-framework-carriers.mjs → n3-carrier-swap-preview.mjs,'
-      + ' re-embed the table + fingerprint)');
+      + ' — the series\' banked mean motions, the year or the month input moved without re-deriving the TERMS'
+      + ' (re-run the extraction chain: n2-sun-framework-carriers.mjs → n3-carrier-swap-preview.mjs for the short-period rows,'
+      + ' i3-long-period-dalembert.mjs for the long-period rows; re-embed the tables + fingerprint)');
   }
 }
 

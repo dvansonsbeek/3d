@@ -1,6 +1,6 @@
 ---
 docVersion: 1.0
-modelVersion: v16.0
+modelVersion: v16.1
 coefficients: sha256:bb6a03c877eedab8
 status: current
 ---
@@ -760,19 +760,32 @@ belongs to the framework's own ϖ(t)/e(t) laws), read analytically as a
 70-term table: main synodic tones plus eccentricity-modulation sidebands
 (main ± modulator anomaly, main ± M_E — the largest single terms ARE
 sidebands: 2(E−J)−M_E 8.3″, E−M−M_Ma 7.5″, invisible to
-constant-amplitude fitting), plus two LONG-PERIOD rows (plan 06 I2): the
-Earth–Mars–Jupiter long inequality 4λ_E − 8λ_Ma + 3λ_J (≈1783 yr, 6.3″)
-and the Venus–Earth term 8λ_V − 13λ_E (≈238 yr, 1.8″), derived on the
-model's own Wisdom–Holman engine over −5100..+1100 yr (the same Horizons
-J2000 seed and DE440 masses as the chain artifact; the integration
-reproduces DE441's Earth longitude to 0.7″ over six millennia) — terms a
-200-yr extraction window folds into its secular basis, and the reason the
-certified Sun carried a 6″ ripple against Horizons over ±3000 yr. The
-planetary mean-longitude RATES and the Moon-elongation rate are
-framework-native carriers injected by `model.js` — computed live from
-the framework's own planet records, SIDEREAL since I2 (the record's
-of-date rate minus the model's own J2000 precession; Earth the framework
-sidereal year; the elongation from the sidereal month/year identity): a
+constant-amplitude fitting), plus the LONG-PERIOD rows (plan 06 I2 → I3):
+the Earth–Mars–Jupiter long inequality 4λ_E − 8λ_Ma + 3λ_J (≈1783 yr, 6.9″
+at J2000) in D'Alembert form — a sum over Earth, Mars and Jupiter of
+e_X(t)·[a cos(θ + ϖ_X(t)) + b sin(θ + ϖ_X(t))] on the e-vectors OF DATE
+(the embedded 1-kyr grid from the banked series), derived on the model's
+own Wisdom–Holman engine over ±20,000 yr (the same Horizons J2000 seed and
+DE440 masses as the chain artifact) — and the Venus–Earth term 8λ_V −
+13λ_E (≈239 yr, 1.8″) as a constant row derived over ±3100 yr. The I2
+constant long-inequality row (derived over −5100..+1100 yr) was exact
+inside ±3000 yr and 3.7″ off outside, because the inequality is first order
+in the eccentricities and its composed amplitude rides the perihelia of
+date — the model's own run shows the line growing from 3.2″ at −18 kyr to
+9.0″ at +14 kyr; the D'Alembert row reproduces that to 0.05″ in band. The
+Venus–Earth term is formally fifth order and resonant (a cluster of lines
+beating on ~20 kyr), so no single-ϖ form holds and its row is a local
+description of the historical era. These
+are terms a 200-yr extraction window folds into its secular basis, and the
+reason the certified Sun carried a 6″ ripple against Horizons over ±3000
+yr. The planetary mean-longitude RATES and the Moon-elongation rate are
+framework-native carriers injected by `model.js`: since I3 the planets'
+carriers are the model's own banked J2000 sidereal mean motions (the
+embedded artifact; the former record-based carriers sat 4.1″/yr off for
+Venus — 83° of the Venus–Earth argument at ±9000 yr), Earth the framework
+sidereal year, the elongation from the sidereal month/year identity, and
+the lunar equation's argument is the framework's own Moon elongation of
+date (ṅ included; the constant-rate carrier ran ~29° off it at ±9000 yr): a
 perturbation argument is inertial, and on of-date carriers every
 argument whose multipliers do not sum to zero drifted with precession —
 42..52° at −3000 for the table's Σk = −1 rows, the dominant ancient

@@ -2,6 +2,13 @@
 // longitude, DERIVED from the model's own N-body (the long-window twin of the
 // D2 derived-signal extraction, tools/explore/d2-derived-sun.mjs).
 //
+// SUPERSEDED (plan 06 I3, tools/explore/i3-long-period-dalembert.mjs): the two
+// rows this script derived had CONSTANT amplitudes and record-based carriers;
+// measured against DE441 in the fixed J2000 frame they held inside ±3000 yr and
+// left 3.7″ outside — the inequality is first order in the eccentricities and
+// rides the e-vectors of date (D'Alembert form, derived over ±20 kyr on the
+// banked carriers). Kept as the record of the I2 derivation.
+//
 // WHY: against JPL Horizons over ±3000 yr (plan 06 I1, data/sun-vs-horizons-
 // summary.json) the model's Sun carried a 6″ ripple with the period of the
 // argument 4λ_E − 8λ_Ma + 3λ_J (≈1783 yr) — the classical Earth–Mars–Jupiter

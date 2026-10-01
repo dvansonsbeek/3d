@@ -1,6 +1,6 @@
 ---
 docVersion: 1.0
-modelVersion: v16.0
+modelVersion: v16.1
 coefficients: sha256:bb6a03c877eedab8
 status: current
 ---
@@ -594,11 +594,11 @@ L(t) = L₀ + mean tropical rate · t + D(t)          (mean longitude)
    the IAU/Laskar drift expression to 0.1 s over −1000..+3000. THE
    OBSERVATION-CLASS CHECK (plan 06 I1, JPL Horizons' apparent Sun on a
    10-day TT grid over ±3000 yr, <!--v:sunVsHorizonsN-->219,152<!--/v--> instants): the model's apparent
-   Sun sits <!--v:sunVsHorizonsMeanArcsec-->2.57<!--/v-->″ from Horizons on average with sd <!--v:sunVsHorizonsSdArcsec-->3.34<!--/v-->″ over the whole
-   span — near zero in 1000–3000 (<!--v:sunVsHorizonsMeanP1000Arcsec-->1.3<!--/v--> / <!--v:sunVsHorizonsMeanP2000Arcsec-->0.1<!--/v-->″),
-   <!--v:sunVsHorizonsMeanM2000Arcsec-->3.3<!--/v-->″ at −2000..−1000 (the size of the difference between the model's
-   equinox of date and Horizons' of-date frame) — and <!--v:sunVsHorizonsModernSdArcsec-->0.94<!--/v-->″ scatter in
-   1970–2049 (mean offset <!--v:sunVsHorizonsModernMeanArcsec-->0.74<!--/v-->″, the L0 anchor and aberration conventions).
+   Sun sits <!--v:sunVsHorizonsMeanArcsec-->2.49<!--/v-->″ from Horizons on average with sd <!--v:sunVsHorizonsSdArcsec-->3.32<!--/v-->″ over the whole
+   span — near zero in 1000–3000 (<!--v:sunVsHorizonsMeanP1000Arcsec-->2.0<!--/v--> / <!--v:sunVsHorizonsMeanP2000Arcsec-->−0.7<!--/v-->″),
+   <!--v:sunVsHorizonsMeanM2000Arcsec-->3.5<!--/v-->″ at −2000..−1000 (the size of the difference between the model's
+   equinox of date and Horizons' of-date frame) — and <!--v:sunVsHorizonsModernSdArcsec-->0.78<!--/v-->″ scatter in
+   1970–2049 (mean offset <!--v:sunVsHorizonsModernMeanArcsec-->0.83<!--/v-->″, the L0 anchor and aberration conventions).
 
 **e(t) and ϖ(t)** are the banked N-body series' Earth elements plus the
 derived mean-element offset of the era (doc 110 chain 1.1; plan 06 layer B)
@@ -608,7 +608,7 @@ carries no equinox-referenced period; the perihelion longitude does. The
 cardinal instants are the APPARENT crossings of this Sun (aberration and
 the leading nutation terms applied, both derived) — the former fitted
 cardinal-point model left with R1 (doc 110 chain 5); against Horizons' own
-crossings the instants are <!--v:cardinalVsHorizonsMeanMin-->−1.04<!--/v--> min on average over ±3000 yr, within a
+crossings the instants are <!--v:cardinalVsHorizonsMeanMin-->−1.01<!--/v--> min on average over ±3000 yr, within a
 minute in 1000–3000.
 
 **Accuracy**: <!--v:frameworkSunVsJplRms-->1.03<!--/v-->″ RMS vs JPL over the modern window 1970–2049
@@ -618,11 +618,14 @@ Sun read 0.80″ — both Suns carried ~0.02–0.03″/yr trends against JPL ove
 1900–2100 — and bought the era: the era-clock Sun was 12 minutes off in the
 medieval era and diverging after 2100 (R1 record). Plan 06 I2 located the
 trend: the Earth–Mars–Jupiter long inequality 4λ_E − 8λ_Ma + 3λ_J (≈1783
-yr, 6.3″), a perturbation of Earth's mean motion a smooth year cannot
-carry, derived on the model's own N-body engine and shipped as a
-long-period row of the planetary completion together with the 238-yr
-Venus–Earth term (doc 66); against Horizons over ±3000 yr the modern-window
-mean went +8.4 → +0.8″ and the per-millennium scatter roughly halved. What
+yr, 6.9″ at J2000), a perturbation of Earth's mean motion a smooth year
+cannot carry, derived on the model's own N-body engine and shipped as a
+long-period row of the planetary completion together with the 239-yr
+Venus–Earth term (doc 66) — since plan 06 I3 in D'Alembert form, the
+amplitude and phase riding the planets' eccentricity vectors of date (the
+constant rows held inside ±3000 yr and drifted 3.7″ beyond); against
+Horizons over ±3000 yr the modern-window mean went +8.4 → +0.8″ and the
+per-millennium scatter roughly halved. What
 remains secular there is a precession-rate finding, labelled and not
 tuned: the model's general precession runs 0.4–0.7″/cy below the P03
 series over −3000..0 (+0.03 at 2000, +0.17 at 3000; +22″ of accumulated

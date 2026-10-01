@@ -179,6 +179,23 @@ would silently churn a structural claim for a rounding-level gain.
   longitude's endpoint difference and left 0.1–0.3 s of node noise, which the
   Sun's longitude integrated to +18…28″ at 4000–6500 — now a least-squares
   quadratic slope over 10 kyr (rms 5.4″ over ±9000 yr, was 18.9″).
+- **A term's amplitude is a function of the elements, not a constant — and a
+  degenerate basis will "fit" the wrong physics inside any one window.** The
+  Sun's 1,783-yr long inequality shipped as a constant row (I2) that held
+  inside ±3000 yr and drifted 3.7″ beyond: it is first order in the
+  eccentricities, so its composed amplitude and phase ride e_X(t)·e^{iϖ_X(t)}
+  of Earth, Mars and Jupiter (D'Alembert: Σk_λ + Σj_ϖ = 0, the argument's
+  Σk = −1 gives +ϖ_X). The first D'Alembert cut used θ − ϖ_X — the wrong
+  sign — and still fitted ±9 kyr to 0.3″ with three near-collinear columns
+  carrying thousands of ″/e; the ±3100-vs-±9100 window test and a sliding-
+  window phase track exposed it (the line's period read 1848 yr against the
+  1781-yr carrier, the sign that ϖ enters with a plus). With the right sign
+  the same basis clears the band to 0.05″ over ±20 kyr with a
+  window-independent composed amplitude. Rules: derive over the window the
+  rows will be used in; test window independence on the COMPOSED function,
+  not the coefficients; and a term with Σk ≠ ±1 (the 239-yr 8V−13E, fifth
+  order, resonant) is a cluster of lines — no single-ϖ form holds; it stays
+  a constant row with its window named. `tools/explore/i3-long-period-dalembert.mjs`.
 - **A campaign recording hashes what it RUNS ON, or it goes stale unseen.**
   The deep-eccentricity slope anchor (e338d1bd) moved the lunar-alignment
   recording — per-century medians by 100–500 s, identified events 228 → 244 —

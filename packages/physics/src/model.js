@@ -36,7 +36,7 @@ import { createMoonMonthChain } from './moon/month-chain.cjs';
 import { createChainCycleIntegrator } from './chain-cycles/index.cjs';
 import { createMoonArguments, jdToDecimalYear } from './moon/arguments.cjs';
 import { createMoonSeries } from './moon/series.cjs';
-import { createSunPlanetaryCompletion } from './eclipse/sun-planetary-completion.cjs';
+import { createSunPlanetaryCompletion, computeCarrierRatesDegPerCy } from './eclipse/sun-planetary-completion.cjs';
 import { createEclipseFinders } from './eclipse/finders.cjs';
 import { createBesselian } from './eclipse/besselian.cjs';
 import { driver2PeriodSecondsAtAge } from './planets/orbit-chain.cjs';
@@ -1276,20 +1276,21 @@ export function assembleModel(C, F, laws = {}, secularSeriesArtifact = /** @type
   // (the composed table reproduces the N3 one there: JPL 1900–2100
   // all-phase sd unchanged to 0.01″). The parity gate's fingerprint mirrors
   // this arithmetic (test/create-model-parity.test.mjs).
-  const degPerCyOf = /** @param {number} cyclesPerDay */ (cyclesPerDay) => 360 * 36525 * cyclesPerDay;
-  const carrierPrecessionDegPerCy = degPerCyOf(1 / meanSolarYearDays) - degPerCyOf(1 / meanSiderealYearDays);
-  const carrierRatesDegPerCy = {
-    planets: [
-      degPerCyOf(1 / C.planetOrbitalElements.mercury.solarYearInput) - carrierPrecessionDegPerCy,
-      degPerCyOf(1 / C.planetOrbitalElements.venus.solarYearInput) - carrierPrecessionDegPerCy,
-      degPerCyOf(1 / meanSiderealYearDays),
-      degPerCyOf(1 / C.planetOrbitalElements.mars.solarYearInput) - carrierPrecessionDegPerCy,
-      degPerCyOf(1 / C.planetOrbitalElements.jupiter.solarYearInput) - carrierPrecessionDegPerCy,
-      degPerCyOf(1 / C.planetOrbitalElements.saturn.solarYearInput) - carrierPrecessionDegPerCy,
-    ],
-    moonElongation: degPerCyOf(1 / moonSiderealMonthInput - 1 / meanSiderealYearDays),
-  };
-  const { sunPlanetaryCompletionDeg } = createSunPlanetaryCompletion({ embWobbleArcsec, carrierRatesDegPerCy });
+  // PLAN 06 I3 — the carriers are the model's own banked J2000 sidereal mean
+  // motions (the embedded sun-completion artifact; ONE home,
+  // computeCarrierRatesDegPerCy — the former record-based arithmetic sat
+  // 4.1″/yr off for Venus, 1.7″/yr for Jupiter: 83° of the Venus–Earth
+  // argument at ±9000 yr), Earth the framework sidereal year, the Moon
+  // elongation from the sidereal month/year identity. The long-period rows
+  // ride the embedded e-vectors of date, and the lunar equation rides the
+  // framework's own Moon elongation of date (ṅ included) — the constant-rate
+  // carrier ran ~29° off it at ±9000 yr.
+  const carrierRatesDegPerCy = computeCarrierRatesDegPerCy({ meanSiderealYearDays, moonSiderealMonthDays: moonSiderealMonthInput });
+  const { sunPlanetaryCompletionDeg } = createSunPlanetaryCompletion({
+    embWobbleArcsec,
+    carrierRatesDegPerCy,
+    moonElongationDegAtT: /** @param {number} T */ (T) => moonArgs.argsAt(j2000JD + T * julianCenturyDays).D,
+  });
   const besselian = createBesselian({
     moonFullAtDaysTT: /** @param {number} dDaysTT */ (dDaysTT) => {
       const ev = moonSeries.sceneEvalAt(dDaysTT);

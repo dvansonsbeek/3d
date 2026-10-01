@@ -107,6 +107,8 @@
 
 'use strict';
 
+const { SUN_COMPLETION_ARTIFACT } = require('./sun-completion-artifact.cjs');
+
 /** J2000 mean-longitude phase anchors (deg), body order Mercury, Venus,
  *  Earth (EMB), Mars, Jupiter, Saturn — declared epoch constants
  *  (header (ii)); the RATES are injected (framework-derived). */
@@ -130,25 +132,25 @@ const ARG_D0 = 297.8501921;
  * detrended 0.033 min). Individual coefficients redistribute between the
  * near-degenerate ±M sideband families; only the composed function ships.
  *
- * PLAN 06 I2 — the LONG-PERIOD rows (the last two): the Earth–Mars–
- * Jupiter long inequality 4λ_E − 8λ_Ma + 3λ_J (carrier period 1801 yr;
- * the classical ~1783-yr term of the solar theory) and the Venus–Earth
- * term 8λ_V − 13λ_E (238 yr), DERIVED on the model's own Wisdom–Holman
- * engine (tools/explore/nbody-wh.mjs, the chain artifact's integrator) on
- * the campaign's ONE Horizons J2000 seed, Sun + eight planets, DE440
- * masses, 1PN, order 2, dt 2 d, −5100..+1100 yr: the EMB's osculating
- * mean longitude Ω+ω+M in yearly means, LSQ on [1, T, T²] + cos/sin of
- * the arguments on THESE carriers (tools/explore/i2-long-inequality.mjs).
- * Measured: 6.27″ / 1.84″; step-converged (dt 1 d: 6.272 / 1.869); the
- * integration reproduces DE441's Earth longitude to 0.68″ sd over 6000
- * yr with 0.03″ left at the 1783-yr argument. Neither could come from the
- * 200-yr D2 window (the term's in-window ramp went to the projected-out
- * secular basis; the 240-yr term folded into it). WHY they were missing:
- * the certified Sun integrates a smooth tropical year for its mean
- * longitude; against Horizons its residual carried exactly this 6″ ripple
- * (plan 06 I1 analysis) — with the same phase in the sidereal residual, a
- * perturbation of Earth's mean motion, not a frame effect. Sub-0.2″
- * candidates left out (2J−5S 0.17″, 5V−8E 0.17″: window-dependent phase).
+ * PLAN 06 I2 → I3 — the LONG-PERIOD rows live in LONG_PERIOD_TERMS below
+ * (D'Alembert form on the e-vectors of date, derived over ±20 kyr; I3). The
+ * I2 record: the Earth–Mars–Jupiter long inequality 4λ_E − 8λ_Ma + 3λ_J
+ * (the classical ~1783-yr term) and the Venus–Earth term 8λ_V − 13λ_E
+ * (≈239 yr) were first DERIVED as constant rows on the model's own
+ * Wisdom–Holman engine over −5100..+1100 yr (6.27″ / 1.84″;
+ * tools/explore/i2-long-inequality.mjs). Neither could come from the 200-yr
+ * D2 window (the term's in-window ramp went to the projected-out secular
+ * basis; the 240-yr term folded into it). WHY they were missing: the
+ * certified Sun integrates a smooth tropical year for its mean longitude;
+ * against Horizons its residual carried exactly this 6″ ripple (plan 06 I1
+ * analysis) — with the same phase in the sidereal residual, a perturbation
+ * of Earth's mean motion, not a frame effect. Sub-0.2″ candidates left out
+ * (2J−5S 0.17″, 5V−8E 0.17″: window-dependent phase). The CARRIERS moved
+ * with I3 from the planet records' rounded of-date periods minus p₀ to the
+ * model's own banked J2000 sidereal mean motions (computeCarrierRatesDegPerCy;
+ * the 70 short-period literals are KEPT — the two carrier sets share the
+ * J2000 anchors and part by ≤ 12″/yr·|k|, i.e. ≤ 0.3°·|k| at the 200-yr
+ * window's edges, the same class as the I2 of-date→sidereal move).
  * @type {Array<[number[], number[], number, number]>}
  */
 const TERMS = [
@@ -222,28 +224,128 @@ const TERMS = [
   [[0, 0, 1, -1, 0, 0], [0, 0, 1, 0, 0, 0], 0.0188, 0.0523],
   [[0, 2, -2, 0, 0, 0], [0, 0, 1, 0, 0, 0], -0.0421, -0.0340],
   [[0, 0, 1, -1, 0, 0], [0, 0, -1, 0, 0, 0], -0.0353, -0.0379],
-  // plan 06 I2 — the long-period rows (see the doc comment above)
-  [[0, 0, 4, -8, 3, 0], [0, 0, 0, 0, 0, 0], 6.2314, -0.7168],
-  [[0, 8, -13, 0, 0, 0], [0, 0, 0, 0, 0, 0], 1.8389, 0.1419],
+  // plan 06 I3 — the Venus–Earth term 8λ_V − 13λ_E (≈239 yr on the banked
+  // carriers): a CONSTANT row, derived on the model's own run over ±3100 yr
+  // (i3-long-period-dalembert.mjs `2 20000 3100 4`; the I2 row read 1.84/0.14″
+  // on the record carriers over −5100..+1100). The term is formally FIFTH order
+  // (Σk = −5) and resonant (divisor 1.5°/yr: e⁵/ν² reaches the arcsecond), so it
+  // is a CLUSTER of lines (ϖ/Ω multipliers summing to +5) beating on ~20 kyr —
+  // no single-ϖ D'Alembert form holds (the {V,E} form shifted the Sun +0.9″ at
+  // J2000 against Horizons' modern window; this row 0.74 → 0.83″ mean with the
+  // scatter 0.94 → 0.78″), and the row is a LOCAL description of the
+  // Horizons-certified era (≈1″ beyond it).
+  [[0, 8, -13, 0, 0, 0], [0, 0, 0, 0, 0, 0], 1.4825, 0.9436],
 ];
+
+/**
+ * PLAN 06 I3 — the LONG INEQUALITY in D'ALEMBERT form (superseding the
+ * constant-amplitude row of I2, 6.23/−0.72″): the Earth–Mars–Jupiter long
+ * inequality 4λ_E − 8λ_Ma + 3λ_J (≈1783 yr) as a sum over bodies X of
+ *     e_X(t)·[a_X·cos(θ + ϖ_X(t)) + b_X·sin(θ + ϖ_X(t))]
+ * with e_X, ϖ_X the e-vectors OF DATE (the embedded artifact, ecliptic J2000;
+ * D'Alembert: Σk_λ + Σj_ϖ = 0 and the argument has Σk = −1, so +ϖ_X).
+ * WHY (measured 2026-10 on the model's inertial Sun against DE441 in the fixed
+ * J2000 frame, tools/explore/sun-inertial-vs-de441.cjs): the constant rows left
+ * 0.08″ at the 1783-yr period inside ±3000 yr and 3.7″ outside on both sides —
+ * the inequality is first order in the eccentricities and its composed
+ * amplitude/phase ride the e-vectors of date (the model's own N-body shows the
+ * line growing 3.2″ → 9.0″ from −18 to +14 kyr). DERIVED on the model's own
+ * Wisdom–Holman run over ±20,000 yr (tools/explore/i3-long-period-dalembert.mjs
+ * `2 20000 9100 4`: yearly means of the EMB's osculating mean longitude, a
+ * degree-4 secular detrend — diagnostic — plus these columns on the SAME
+ * embedded e-vectors; dt 2 d, step-converged against dt 1 d): the 1783-yr band
+ * left in the residual 0.05″ inside ±9100 and 0.07/0.05″ outside, the composed
+ * J2000 amplitude 6.88″ on ±20 kyr vs 6.89″ on ±9100 (window-independent; the
+ * constant row read 6.12 vs 6.89), and the ±9100-fitted rows evaluated over
+ * ±20 kyr leave 0.28/0.53″ (rms Δ 0.57″). Against Horizons' modern window the
+ * row moves the Sun by −0.36″ at J2000 with the scatter 0.94 → 0.89″ (the I2
+ * constant row was derived off-centre, −5100..+1100). The Venus–Earth term is
+ * NOT of this form — see its constant row in TERMS. The individual a_X, b_X
+ * are NOT physically separable (the three perihelia
+ * rotate only 33–80° per 9 kyr, so the columns are near-collinear — the first
+ * cut, with the WRONG sign θ − ϖ_X, "fitted" ±9 kyr with coefficients of
+ * thousands of ″/e and failed the window test); only the composed function
+ * ships, as for the ±M sideband pairs. Beyond ±50 kyr the e-vectors are held at
+ * the grid's ends (bounded, the former constant-row class).
+ * Extraction-native sign (N-body − smooth), negated in the evaluator.
+ * @type {Array<[number[], number, number, number]>} [l-multipliers, bodyIndex (0 Me … 5 S), a (″/e), b (″/e)]
+ */
+const LONG_PERIOD_TERMS = [
+  [[0, 0, 4, -8, 3, 0], 2, -785.9521, 591.0878],   // 4E−8Ma+3J · earth
+  [[0, 0, 4, -8, 3, 0], 3, -80.4721, 77.5236],     // 4E−8Ma+3J · mars
+  [[0, 0, 4, -8, 3, 0], 4, 159.5521, -303.8727],   // 4E−8Ma+3J · jupiter
+];
+/** body index → the embedded e-vector series' key */
+const ECC_BODY_KEY = [null, 'venus', 'earth', 'mars', 'jupiter', null];
 
 const D2R = Math.PI / 180;
 
 /**
+ * The e-vector (e·cos ϖ, e·sin ϖ; ecliptic J2000) of a body at T Julian
+ * centuries TT from J2000, from the embedded 1-kyr grid (linear between nodes,
+ * held at the grid's ends). The ONE source for every runtime — an
+ * artifact-less createModel() and the browser before its series load compute
+ * the identical rows.
+ * @param {number} bodyIndex 0 Me, 1 V, 2 E, 3 Ma, 4 J, 5 S (only 1–4 are embedded)
+ * @param {number} T
+ * @returns {[number, number]}
+ */
+function eccVectorOfDateEmbedded(bodyIndex, T) {
+  const key = ECC_BODY_KEY[bodyIndex];
+  if (!key) throw new RangeError(`sun-planetary-completion: no embedded e-vector series for body index ${bodyIndex}`);
+  const grid = SUN_COMPLETION_ARTIFACT.eccVectors;
+  const b = /** @type {Record<string, {zQ: number[], zP: number[]}>} */ (grid.bodies)[key];
+  const x = Math.min(Math.max((T * 100 - grid.t0Yr) / grid.stepYr, 0), b.zQ.length - 1);
+  const i = Math.min(Math.floor(x), b.zQ.length - 2), f = x - i;
+  return [b.zQ[i] + (b.zQ[i + 1] - b.zQ[i]) * f, b.zP[i] + (b.zP[i + 1] - b.zP[i]) * f];
+}
+
+/**
+ * The completion's CARRIER rates (deg per Julian century TT) — ONE home for the
+ * model wiring and the matched-pair gate. Planets: the model's own banked J2000
+ * sidereal mean motions (the embedded artifact; the former carriers were the
+ * planet records' rounded of-date periods minus p₀ — Venus 4.1″/yr and Jupiter
+ * 1.7″/yr off the run's own motion, 83° of the Venus–Earth argument at ±9000 yr).
+ * Earth: the framework sidereal year (the D6 ratio-only doctrine for the run's
+ * absolute Earth rate). Moon elongation: sidereal month vs sidereal year.
+ * @param {{ meanSiderealYearDays: number, moonSiderealMonthDays: number }} c
+ * @returns {{ planets: number[], moonElongation: number }}
+ */
+function computeCarrierRatesDegPerCy({ meanSiderealYearDays, moonSiderealMonthDays }) {
+  const L = SUN_COMPLETION_ARTIFACT.planetLamDotJ2000DegPerYr;
+  const degPerCyOf = (/** @type {number} */ cyclesPerDay) => 360 * 36525 * cyclesPerDay;
+  return {
+    planets: [L.mercury * 100, L.venus * 100, degPerCyOf(1 / meanSiderealYearDays), L.mars * 100, L.jupiter * 100, L.saturn * 100],
+    moonElongation: degPerCyOf(1 / moonSiderealMonthDays - 1 / meanSiderealYearDays),
+  };
+}
+
+/**
  * @param {{ embWobbleArcsec: number,
- *           carrierRatesDegPerCy: { planets: number[], moonElongation: number } }} opts
+ *           carrierRatesDegPerCy: { planets: number[], moonElongation: number },
+ *           eccVectorOfDate?: (bodyIndex: number, T: number) => [number, number],
+ *           moonElongationDegAtT?: (T: number) => number }} opts
  *   - embWobbleArcsec: the DERIVED Earth-around-EMB wobble amplitude
  *     a_M·μ/AU in arcsec (μ = 1/(1+M_E/M_M));
- *   - carrierRatesDegPerCy.planets: the six FRAMEWORK mean-longitude
- *     rates (deg/Julian-century TT), body order Me,V,E,Ma,J,S — one
- *     revolution per the model's own tropical period records;
+ *   - carrierRatesDegPerCy.planets: the six mean-longitude rates (deg/
+ *     Julian-century TT), body order Me,V,E,Ma,J,S — computeCarrierRatesDegPerCy
+ *     (the model's own banked J2000 sidereal mean motions; Earth the framework
+ *     sidereal year);
  *   - carrierRatesDegPerCy.moonElongation: the framework Moon
- *     mean-elongation rate (deg/cy TT) for the EMB-wobble carrier.
- *   All computed from live constants by the model wiring so the
- *   carrier↔table matched pair tracks the constants.
+ *     mean-elongation rate (deg/cy TT) — the EMB-wobble carrier's rate when
+ *     moonElongationDegAtT is absent;
+ *   - eccVectorOfDate: the e-vectors of date for the D'Alembert rows (default:
+ *     the embedded grid — the ONE source; an override is for instruments);
+ *   - moonElongationDegAtT: the Moon's mean elongation OF DATE (deg) at T —
+ *     the framework's own argument (ṅ included). The constant-rate carrier
+ *     D₀ + D₁·T ran ~29° off it at ±9000 yr: the lunar equation (6.44″) read
+ *     as the largest short-period line left against DE441 at −9000 (2.8″ at
+ *     29.53 d; the −9000 bin's scatter 4.13 → 3.62″ on the argument of date).
+ *   Injected by the model wiring so the carrier↔table matched pair tracks the
+ *   constants and the embedded artifact.
  * @returns {{ sunPlanetaryCompletionDeg: (T: number) => number }}
  */
-function createSunPlanetaryCompletion({ embWobbleArcsec, carrierRatesDegPerCy }) {
+function createSunPlanetaryCompletion({ embWobbleArcsec, carrierRatesDegPerCy, eccVectorOfDate = eccVectorOfDateEmbedded, moonElongationDegAtT = undefined }) {
   if (!Number.isFinite(embWobbleArcsec)) {
     throw new Error('createSunPlanetaryCompletion: embWobbleArcsec must be a finite number (derived a_M·μ/AU in arcsec)');
   }
@@ -270,7 +372,15 @@ function createSunPlanetaryCompletion({ embWobbleArcsec, carrierRatesDegPerCy })
       for (let i = 0; i < 6; i++) th += kl[i] * l[i] + kM[i] * M[i];
       table += cA * Math.cos(th) + sA * Math.sin(th);
     }
-    const D = (ARG_D0 + D1 * T) * D2R;
+    // the long-period rows — amplitude and phase on the e-vectors of date
+    for (const [kl, X, a, b] of LONG_PERIOD_TERMS) {
+      let th = 0;
+      for (let i = 0; i < 6; i++) th += kl[i] * l[i];
+      const [q, p] = eccVectorOfDate(X, T);
+      const e = Math.hypot(q, p), w = Math.atan2(p, q);
+      table += e * (a * Math.cos(th + w) + b * Math.sin(th + w));
+    }
+    const D = moonElongationDegAtT ? moonElongationDegAtT(T) * D2R : (ARG_D0 + D1 * T) * D2R;
     const arcsec = -table - embWobbleArcsec * Math.sin(D);
     return arcsec / 3600;
   }
@@ -284,19 +394,21 @@ function createSunPlanetaryCompletion({ embWobbleArcsec, carrierRatesDegPerCy })
 const PAIRED_SUN_HARMONICS_SHA256 = 'cbc189cea1c20292';   // eccentricity unification: Step-0 refit → N2/N3 re-derived (fidelity 0.616″, 70 terms)
 
 /** sha256/16 of JSON.stringify([...planets, moonElongation]) — the seven
- *  full-precision carrier rates (deg/cy TT) the TERMS table pairs with:
- *  the SIDEREAL carriers of plan 06 I2 (record rate − the model's J2000
- *  precession; Earth the framework sidereal year; the N3 literals kept,
- *  the two long-period rows derived on these rates). The model wiring
- *  recomputes the rates live from the planet records, so a planet-period /
- *  year / month input change moves the carriers automatically while the
- *  table stays frozen — a silent few-arcsec stale below the api gate's
- *  ≤12″ backstop. test:model recomputes this fingerprint from live
- *  constants (identical arithmetic to model.js) and fails on mismatch:
- *  re-run the extraction chain (tools/explore/n2-sun-framework-carriers.mjs
- *  → i2-sidereal-carrier-table.mjs for the short-period rows,
- *  i2-long-inequality.mjs for the long-period rows), re-embed TERMS, and
- *  update this value. */
-const PAIRED_CARRIER_RATES_SHA256 = '2d066e92bae955e4';
+ *  full-precision carrier rates (deg/cy TT) the tables pair with: since plan
+ *  06 I3 the model's own banked J2000 sidereal mean motions for the planets
+ *  (the embedded sun-completion artifact), Earth the framework sidereal year,
+ *  the Moon elongation from the sidereal month/year identity
+ *  (computeCarrierRatesDegPerCy; the N3 short-period literals kept, the
+ *  LONG_PERIOD_TERMS derived on these rates). The model wiring recomputes
+ *  the rates live, so a series re-bank, a year or a month input change moves
+ *  the carriers automatically while the tables stay frozen — a silent
+ *  few-arcsec stale below the api gate's ≤12″ backstop. test:model recomputes
+ *  this fingerprint from the live artifact + constants (identical arithmetic)
+ *  and fails on mismatch: re-run the extraction chain
+ *  (tools/explore/n2-sun-framework-carriers.mjs → i2-sidereal-carrier-table.mjs
+ *  for the short-period rows, i3-long-period-dalembert.mjs for the long-period
+ *  rows), re-embed the tables, and update this value. History: 2d066e92bae955e4
+ *  was the I2 record-based carrier set. */
+const PAIRED_CARRIER_RATES_SHA256 = '8e11456fcf8db81c';
 
-module.exports = { createSunPlanetaryCompletion, PAIRED_SUN_HARMONICS_SHA256, PAIRED_CARRIER_RATES_SHA256 };
+module.exports = { createSunPlanetaryCompletion, computeCarrierRatesDegPerCy, eccVectorOfDateEmbedded, PAIRED_SUN_HARMONICS_SHA256, PAIRED_CARRIER_RATES_SHA256 };

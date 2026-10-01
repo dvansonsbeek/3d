@@ -561,6 +561,78 @@ module.exports = { SIDEREAL_CHANNEL_ARTIFACT, SIDEREAL_CHANNEL_ARTIFACT_HASH };
 `;
 }
 
+// The Sun planetary completion's embedded data (plan 06 I3): the planets'
+// J2000 sidereal mean motions — the completion's CARRIERS — and the
+// e-vectors of date of Venus, Earth, Mars and Jupiter on a 1-kyr grid over
+// ±50 kyr — the D'Alembert long-period rows' amplitude/phase inputs. Both
+// from the ONE governed series artifact (verdict.planetLamDot and the
+// bodies' zQ/zP, ecliptic J2000), so an artifact-less createModel() and the
+// browser before its async series load compute the IDENTICAL Sun (the plan
+// 06 R1 trap class). Same two-gate guard as the sidereal embed.
+const OUT_SUN_COMPLETION = join(ROOT, 'packages/physics/src/eclipse/sun-completion-artifact.cjs');
+const SUN_COMPLETION_ECC_BODIES = ['venus', 'earth', 'mars', 'jupiter'];
+const SUN_COMPLETION_ECC_HALF_YR = 50000;
+const SUN_COMPLETION_ECC_STEP_YR = 1000;
+
+function buildSunCompletionArtifact() {
+  const art = JSON.parse(readFileSync(SECULAR_SERIES_PATH, 'utf8'));
+  const rows = art.verdict && art.verdict.planetLamDot && art.verdict.planetLamDot.rows;
+  if (!Array.isArray(rows)) throw new Error('secular-series artifact carries no planet λ̇ rows — regenerate it first (node tools/verify/secular-series.js --write)');
+  /** @type {Record<string, number>} */
+  const planetLamDotJ2000DegPerYr = {};
+  for (const r of rows) planetLamDotJ2000DegPerYr[r.body] = r.lamDotJ2000DegPerYr;
+  /** @type {Record<string, {zQ: number[], zP: number[]}>} */
+  const eccVectors = {};
+  for (const body of SUN_COMPLETION_ECC_BODIES) {
+    const b = art.bodies[body];
+    const zQ = [], zP = [];
+    for (let t = -SUN_COMPLETION_ECC_HALF_YR; t <= SUN_COMPLETION_ECC_HALF_YR; t += SUN_COMPLETION_ECC_STEP_YR) {
+      const x = (t - art.t0Yr) / b.stepYr, i = Math.round(x);
+      if (Math.abs(x - i) > 1e-9 || i < 0 || i >= b.zQ.length) throw new Error(`secular-series artifact: no ${body} node at t = ${t} yr for the Sun-completion embed`);
+      zQ.push(b.zQ[i]); zP.push(b.zP[i]);
+    }
+    eccVectors[body] = { zQ, zP };
+  }
+  const payload = {
+    planetLamDotJ2000DegPerYr,
+    eccVectors: { t0Yr: -SUN_COMPLETION_ECC_HALF_YR, stepYr: SUN_COMPLETION_ECC_STEP_YR, bodies: eccVectors },
+    meta: {
+      dumpSha256: art.meta.dumpSha256,
+      source: 'data/nbody-secular-series.json verdict.planetLamDot (J2000 sidereal mean motions) + bodies.<X>.zQ/zP at the 1-kyr nodes (ecliptic J2000, verbatim)',
+    },
+  };
+  const hash = createHash('sha256').update(JSON.stringify(payload)).digest('hex').slice(0, 16);
+  return { hash, payload };
+}
+
+function emitSunCompletionArtifact({ hash, payload }) {
+  return `/**
+ * GENERATED — do not edit. Regenerate:
+ *   node tools/constants/generate.mjs --write
+ *
+ * Source: data/nbody-secular-series.json — the Sun planetary completion's
+ * embedded data (plan 06 I3): planetLamDotJ2000DegPerYr, the planets' J2000
+ * sidereal mean motions from the model's own ±10-Myr run (the completion's
+ * CARRIERS; the former carriers were the planet records' rounded of-date
+ * periods minus p₀ — Venus 4.1″/yr, Jupiter 1.7″/yr off the run's own
+ * motion); and eccVectors, the e·e^{iϖ} of Venus, Earth, Mars and Jupiter on
+ * a 1-kyr grid over ±50 kyr (ecliptic J2000) — the D'Alembert long-period
+ * rows' amplitude and phase of date. Earth's carrier stays the framework
+ * sidereal year (the D6 ratio-only doctrine for the run's absolute Earth
+ * rate). Two gates guard the chain: check:artifacts pins artifact ↔ engine;
+ * generate.mjs check mode pins this embed ↔ artifact. CJS for the .cjs
+ * completion consumer.
+ */
+'use strict';
+
+const SUN_COMPLETION_ARTIFACT_HASH = ${JSON.stringify(hash)};
+
+const SUN_COMPLETION_ARTIFACT = Object.freeze(${JSON.stringify(payload)});
+
+module.exports = { SUN_COMPLETION_ARTIFACT, SUN_COMPLETION_ARTIFACT_HASH };
+`;
+}
+
 function buildDeepModes(chainArt) {
   const raw = readFileSync(DEEP_MODES_PATH, 'utf8');
   const art = JSON.parse(raw);
@@ -735,6 +807,8 @@ const deepModes = buildDeepModes(chainArt);
 const deepJs = emitDeepModes(deepModes);
 const siderealChan = buildSiderealChannel();
 const siderealJs = emitSiderealChannel(siderealChan);
+const sunCompletion = buildSunCompletionArtifact();
+const sunCompletionJs = emitSunCompletionArtifact(sunCompletion);
 
 if (write) {
   mkdirSync(dirname(OUT_JS), { recursive: true });
@@ -745,14 +819,16 @@ if (write) {
   writeFileSync(OUT_CHAIN, chainJs);
   writeFileSync(OUT_DEEP_MODES, deepJs);
   writeFileSync(OUT_SIDEREAL, siderealJs);
+  writeFileSync(OUT_SUN_COMPLETION, sunCompletionJs);
   console.log(`generated ${countLeaves(result.included)} values in ${Object.keys(result.included).length} blocks`);
   console.log(`  constants hash    ${result.hash}`);
   console.log(`  coefficients hash ${coeffs.hash}  (${Object.keys(coeffs.out).length} arrays, full precision)`);
   console.log(`  chain artifact    ${chainArt.hash}  (engine-D governed artifact, verbatim)`);
   console.log(`  deep-modes embed  ${deepModes.hash}  (deep-time Earth-z table, verbatim + joined anchor)`);
   console.log(`  sidereal embed    ${siderealChan.hash}  (D6 λ̇ channel, ${siderealChan.payload.lamDotRel.length} samples @ ${siderealChan.payload.stepYr} yr)`);
+  console.log(`  sun-completion    ${sunCompletion.hash}  (planet λ̇ carriers + ${SUN_COMPLETION_ECC_BODIES.length} e-vector series @ ${SUN_COMPLETION_ECC_STEP_YR} yr over ±${SUN_COMPLETION_ECC_HALF_YR} yr)`);
   console.log(`  excluded: ${Object.entries(result.excluded).map(([b, c]) => `${b} (${c})`).join(', ')}`);
-  console.log('  -> packages/physics/src/constants/{generated.js,generated.d.ts,coefficients.js,coefficients.d.ts} + planets/chain-artifact.js + moon/deep-modes-artifact.cjs + earth/sidereal-channel-artifact.cjs');
+  console.log('  -> packages/physics/src/constants/{generated.js,generated.d.ts,coefficients.js,coefficients.d.ts} + planets/chain-artifact.js + moon/deep-modes-artifact.cjs + earth/sidereal-channel-artifact.cjs + eclipse/sun-completion-artifact.cjs');
   process.exit(0);
 }
 
@@ -763,6 +839,7 @@ let currentCoeffsDts = null;
 let currentChain = null;
 let currentDeep = null;
 let currentSidereal = null;
+let currentSunCompletion = null;
 try {
   current = readFileSync(OUT_JS, 'utf8');
   currentDts = readFileSync(OUT_DTS, 'utf8');
@@ -771,6 +848,7 @@ try {
   currentChain = readFileSync(OUT_CHAIN, 'utf8');
   currentDeep = readFileSync(OUT_DEEP_MODES, 'utf8');
   currentSidereal = readFileSync(OUT_SIDEREAL, 'utf8');
+  currentSunCompletion = readFileSync(OUT_SUN_COMPLETION, 'utf8');
 } catch { /* handled below */ }
 
 console.log('GENERATED CONSTANTS — check');
@@ -779,11 +857,11 @@ console.log(`  ${countLeaves(result.included)} values · ${Object.keys(result.in
 console.log(`  excluded (never injectable): ${Object.keys(result.excluded).join(', ')}`);
 console.log(`  coefficients: ${Object.keys(coeffs.out).length} arrays · hash ${coeffs.hash}`);
 
-if (current === null || currentCoeffs === null || currentCoeffsDts === null || currentChain === null || currentDeep === null || currentSidereal === null) {
+if (current === null || currentCoeffs === null || currentCoeffsDts === null || currentChain === null || currentDeep === null || currentSidereal === null || currentSunCompletion === null) {
   console.log('\nFAIL — a generated module is missing. Run with --write.');
   process.exit(1);
 }
-if (current !== js || currentDts !== dts || currentCoeffs !== coeffJs || currentCoeffsDts !== coeffDts || currentChain !== chainJs || currentDeep !== deepJs || currentSidereal !== siderealJs) {
+if (current !== js || currentDts !== dts || currentCoeffs !== coeffJs || currentCoeffsDts !== coeffDts || currentChain !== chainJs || currentDeep !== deepJs || currentSidereal !== siderealJs || currentSunCompletion !== sunCompletionJs) {
   console.log('\nFAIL — a generated module is STALE relative to the JSON source of truth.');
   console.log('Run: node tools/constants/generate.mjs --write');
   process.exit(1);

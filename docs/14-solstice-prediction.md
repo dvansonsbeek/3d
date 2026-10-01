@@ -1,6 +1,6 @@
 ---
 docVersion: 1.0
-modelVersion: v16.0
+modelVersion: v16.1
 coefficients: sha256:bb6a03c877eedab8
 status: current
 ---
@@ -14,7 +14,7 @@ status: current
 > leading nutation terms derived), whose mean longitude integrates the
 > one-source tropical year. Measured against JPL Horizons' own equinox and
 > solstice crossings over ±3000 yr (the observation-class reference, plan
-> 06 I1): the shipped instants are <!--v:cardinalVsHorizonsMeanMin-->−1.04<!--/v--> min from Horizons on average,
+> 06 I1): the shipped instants are <!--v:cardinalVsHorizonsMeanMin-->−1.01<!--/v--> min from Horizons on average,
 > within a minute in 1000–3000 and about two minutes early in the ancient
 > era (the difference between the model's equinox of date and Horizons'
 > of-date frame); the
