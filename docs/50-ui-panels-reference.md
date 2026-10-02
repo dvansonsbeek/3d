@@ -479,7 +479,7 @@ Modal that visualizes the canonical **L1+L2+L3 climate formula** (see [doc 92](9
 
 ### Full Reference
 
-See [doc 58 — Earth Climate Analysis](58-climate-formula-explorer.md) for the complete panel reference (tab list, layer toggles, Y-axis conventions, R² breakdown, forward-projection markers, code locations). The underlying L1+L2+L3 architecture, per-regime ridge-fit R² values, 33 L1 integers + Berger/Holistic dual attribution, and variance-decomposition Tier B analyses live in [doc 92 — Climate Formula: Architecture, Variance & Implementation](92-climate-formula.md).
+See [doc 58 — Earth Climate Analysis](58-climate-formula-explorer.md) for the complete panel reference (tab list, layer toggles, Y-axis conventions, R² breakdown, forward-projection markers, code locations). The underlying L1+L2+L3 architecture, per-regime ridge-fit R² values, 28 L1 lines + Berger/Holistic dual attribution, and variance-decomposition Tier B analyses live in [doc 92 — Climate Formula: Architecture, Variance & Implementation](92-climate-formula.md).
 
 ---
 

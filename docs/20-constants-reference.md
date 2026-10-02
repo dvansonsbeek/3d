@@ -205,7 +205,7 @@ These constants define the model. Changing any of them changes the theory.
 | Perihelion alignment year | `perihelionalignmentYear` | <!--v:periAlignYear-->1246.03125<!--/v--> AD |
 | Obliquity cycle position | `temperatureGraphMostLikely` | 14.5 (of 16) |
 
-The anchor is the unit of the correction bases and of the frozen era clock; it was fitted on the 1246 AD perihelion–solstice alignment (the perihelion-of-date beat). It is not a period: Earth's precession periods are the dynamical values of [Part 2 — Derived Constants](#part-2--derived-constants) — the axial precession period is <!--v:axialPrecExact-->25,771.40<!--/v--> years, of which the anchor is 13.011, a fit constant (plan 06 S5). The former presentation of the anchor as a "master cycle divided by small integers" is retired ([retired record](retired-record.md)).
+The anchor is the unit of the correction bases and of the frozen era clock; it was fitted on the 1246 AD perihelion–solstice alignment of the IAU mean elements (Meeus); the model's own series crosses two years later, at 1247.7 AD. It is not a period: Earth's precession periods are the dynamical values of [Part 2 — Derived Constants](#part-2--derived-constants) — the axial precession period is <!--v:axialPrecExact-->25,771.40<!--/v--> years, of which the anchor is 13.011, a fit constant (plan 06 S5). The former presentation of the anchor as a "master cycle divided by small integers" is retired ([retired record](retired-record.md)).
 
 ## Earth Parameters
 
