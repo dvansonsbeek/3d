@@ -352,7 +352,7 @@
     "earthPrecComposed2460MaArcsecPerYr": "104.6",
     "earthPrecComposed650MaArcsecPerYr": "67.8",
     "earthPrecLunarJ2000ArcsecPerYr": "34.4",
-    "earthPrecRateJ2000ArcsecPerYr": "50.3",
+    "earthPrecRateJ2000ArcsecPerYr": "50.2883",
     "earthPrecSolarJ2000ArcsecPerYr": "15.9",
     "earthPrecSolarShareJ2000Pct": "31.6",
     "earthRAAngle": "~1.255",
