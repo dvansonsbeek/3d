@@ -1938,8 +1938,8 @@ export const VALUES = {
       // 50.2875 ″/yr turns on a 0.003 % difference, which 50.3 cannot carry —
       // the website had to hard-code the rate to state it at all.
       earthPrecRateJ2000ArcsecPerYr: { get: () => dtl().precessionRateJ2000ArcsecPerYr(), render: (v) => Number(v).toFixed(4), unit: '″/yr', note: 'the model’s J2000 axial-precession rate — 1,296,000/T_p(J2000), the certified year laws’ beat at 2000 (S5; IAU 50.2879)' },
-      earthPrecSolarJ2000ArcsecPerYr: { get: () => dtl().precessionRateJ2000ArcsecPerYr() * dtl().PRECESSION_SOLAR_SHARE_J2000, render: (v) => Number(v).toFixed(1), unit: '″/yr', note: 'the solar torque’s share of the J2000 rate, f_S · ψ̇₀ (S5 — replaces the hand split 16.8/33.4 of doc 99)' },
-      earthPrecLunarJ2000ArcsecPerYr: { get: () => dtl().precessionRateJ2000ArcsecPerYr() * (1 - dtl().PRECESSION_SOLAR_SHARE_J2000), render: (v) => Number(v).toFixed(1), unit: '″/yr', note: 'the lunar torque’s share of the J2000 rate, (1 − f_S) · ψ̇₀' },
+      earthPrecSolarJ2000ArcsecPerYr: { get: () => dtl().precessionRateJ2000ArcsecPerYr() * dtl().PRECESSION_SOLAR_SHARE_J2000, render: (v) => Number(v).toFixed(4), unit: '″/yr',note: 'the solar torque’s share of the J2000 rate, f_S · ψ̇₀ (S5 — replaces the hand split 16.8/33.4 of doc 99)' },
+      earthPrecLunarJ2000ArcsecPerYr: { get: () => dtl().precessionRateJ2000ArcsecPerYr() * (1 - dtl().PRECESSION_SOLAR_SHARE_J2000), render: (v) => Number(v).toFixed(4), unit: '″/yr',note: 'the lunar torque’s share of the J2000 rate, (1 − f_S) · ψ̇₀' },
     };
     for (const age of [650, 1400, 2460]) {
       out[`earthPrecComposed${age}MaArcsecPerYr`] = { get: () => composedAt(age), render: (v) => Number(v).toFixed(1), unit: '″/yr', note: `the two engines composed at ${age} Ma: ω(t) × (solar torque + lunar torque on the recession history), μ = 1 — the model’s ψ̇(t), = 1,296,000·13/H(t) on the unit (plan 06 D6/Phase 3)` };

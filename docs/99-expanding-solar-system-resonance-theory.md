@@ -142,7 +142,7 @@ the spin-and-tides channel supplying ω(t) and a_moon(t), the orbital engine's s
 
 | age | the two engines composed, ψ̇(t) = [ω/ω₀]·p₀·[f_S + (1 − f_S)(a₀/a_M)³] (″/yr) | external reading |
 |---|---|---|
-| J2000 | <!--v:earthPrecRateJ2000ArcsecPerYr-->50.3<!--/v--> | IAU: 50.29 (measured) |
+| J2000 | <!--v:earthPrecRateJ2000ArcsecPerYr-->50.2883<!--/v--> | IAU: 50.29 (measured) |
 | 650 Ma | **<!--v:earthPrecComposed650MaArcsecPerYr-->67.8<!--/v-->** | **Wu et al. 2024: 67.64** (cyclostratigraphic inference) |
 | 1400 Ma | **<!--v:earthPrecComposed1400MaArcsecPerYr-->86.6<!--/v-->** | **Meyers & Malinverno 2018: 85.79 ± 2.72** (Xiamaling; gate row `xiamaling-prec-1400`, <!--v:anchorXiamalingPrec1400DeltaPct-->+0.94<!--/v--> %) |
 | 2460 Ma | **<!--v:earthPrecComposed2460MaArcsecPerYr-->104.6<!--/v-->** | **Lantink et al. 2022: 108.6 ± 8.5** (Joffre; gate row `lantink-prec-2460`, <!--v:anchorLantinkPrec2460DeltaPct-->−3.68<!--/v--> %) |
@@ -1099,9 +1099,9 @@ Quantitative reconciliation at 650 Ma using the physical formula:
 
 | Contribution | Modern (J2000, derived from the constants) | 650 Ma scaling |
 |:---|---:|:---|
-| Solar (constant n_S, scales with ω) | <!--v:earthPrecSolarJ2000ArcsecPerYr-->15.9<!--/v--> ″/yr | × ω(t)/ω₀ |
-| Lunar (n_M² ∝ a_moon⁻³, scales with ω × a_moon⁻³) | <!--v:earthPrecLunarJ2000ArcsecPerYr-->34.4<!--/v--> ″/yr | × ω(t)/ω₀ × (a₀/a_M(t))³ |
-| Total | <!--v:earthPrecRateJ2000ArcsecPerYr-->50.3<!--/v--> ″/yr | **<!--v:earthPrecComposed650MaArcsecPerYr-->67.8<!--/v--> ″/yr** at 650 Ma (the shipped composed clock, `earth/precession-composed`) |
+| Solar (constant n_S, scales with ω) | <!--v:earthPrecSolarJ2000ArcsecPerYr-->15.9141<!--/v--> ″/yr | × ω(t)/ω₀ |
+| Lunar (n_M² ∝ a_moon⁻³, scales with ω × a_moon⁻³) | <!--v:earthPrecLunarJ2000ArcsecPerYr-->34.3742<!--/v--> ″/yr | × ω(t)/ω₀ × (a₀/a_M(t))³ |
+| Total | <!--v:earthPrecRateJ2000ArcsecPerYr-->50.2883<!--/v--> ″/yr | **<!--v:earthPrecComposed650MaArcsecPerYr-->67.8<!--/v--> ″/yr** at 650 Ma (the shipped composed clock, `earth/precession-composed`) |
 
 This lands on Wu et al.'s **67.64 ″/yr** to a few tenths of a percent — the lunar 1/a_moon³ coupling closes the gap quantitatively. (The earlier hand split 16.8/33.4 on a 50.2 total was the H/13-anchored reading; the values above are the registry's, one home.)
 
