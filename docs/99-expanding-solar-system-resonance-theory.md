@@ -1561,7 +1561,7 @@ The framework reveals not just *that* the Moon drifts away, but *why it must*.
 
 ### The structural cause
 
-The framework's structural near-invariant `H × days/yr ≈ TOTAL_DAYS_IN_H = 122,471,920` (exact at J2000; drifting −71 ppm at Devonian and −850 ppm at Hadean from Driver 2 / solar mass loss alone — <!--v:driftAtDevonianPpm-->−77999<!--/v--> ppm and <!--v:driftAtHadeanPpm-->−1000179<!--/v--> ppm total) is preserved at the modern epoch and varies smoothly with geological time. This requires:
+The framework's structural near-invariant `U × days/yr ≈ TOTAL_DAYS_IN_H = 122,471,920` — U the era-clock counter, pure spin scaling U = U₀·LOD(t)/LOD₀, not the unit H(t), which carries the lunar-torque term as well (exact at J2000; drifting from Driver 2 / solar mass loss alone — <!--v:driftAtDevonianPpm-->−74<!--/v--> ppm and <!--v:driftAtHadeanPpm-->−999<!--/v--> ppm total) is preserved at the modern epoch and varies smoothly with geological time. This requires:
 - Earth's rotation rate (LOD) must slowly change
 - The orbital year length (in seconds) must stay fixed
 - Therefore `days/yr = year_seconds / LOD` must change inversely with LOD

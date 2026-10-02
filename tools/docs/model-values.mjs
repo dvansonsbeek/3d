@@ -1479,7 +1479,12 @@ export const VALUES = {
       })(),
       sunMeanOffsetPomArcsec:    { get: () => osc.dPomArcsec, render: (v) => (v >= 0 ? '+' : '') + Number(v).toFixed(2), unit: '″', note: 'mean-element ϖ offset of the eclipse Sun over the derivation window (osculating − secular)' },
       sunMeanOffsetE:            { get: () => osc.dE, render: (v) => (v >= 0 ? '+' : '') + Number(v).toExponential(2), note: 'mean-element e offset of the eclipse Sun over the derivation window (osculating − secular)' },
-      lunarResidualRmsSeconds:   { get: () => L.frameworkMeanAbsResidualSeconds, render: (v) => thousands(v), unit: 's' },
+      // Mean |residual|, never an RMS — the former key name (lunarResidualRmsSeconds)
+      // described the wrong statistic for a value that has always been the mean
+      // absolute residual, and the website published it in a table column headed
+      // "Mean |residual|" beside NASA's mean-abs figure. Same value as
+      // lunarDtBandsFrameworkMeanAbsSeconds below.
+      lunarResidualMeanAbsSeconds: { get: () => L.frameworkMeanAbsResidualSeconds, render: (v) => thousands(v), unit: 's', note: 'mean |residual| of the framework against the primary-source lunar timings' },
       lunarResidualMinutes:      { get: () => L.frameworkMeanAbsResidualSeconds / 60, render: (v) => Number(v).toFixed(1), unit: 'min' },
       solarResidualSecondsModel: { get: () => S.frameworkMeanAbsResidualSeconds, render: (v) => thousands(v), unit: 's' },
       solarResidualMinutes:      { get: () => S.frameworkMeanAbsResidualSeconds / 60, render: (v) => Number(v).toFixed(1), unit: 'min' },
@@ -3119,7 +3124,13 @@ export const VALUES = {
     };
     const genesisMa = () => astro.knownValues.moonGenesisAgeGa * 1000;
     const totalDays0 = () => C.H * C.meanSolarYearDays;
-    const driftPpm = (tMa) => (dtl().meanHAtAge(tMa) * dtl().meanYearInDaysAtAge(tMa) / totalDays0() - 1) * 1e6;
+    // The day-count near-invariant is defined on the ERA-CLOCK COUNTER U(t)
+    // (U = U_0 · LOD(t)/LOD_0 — pure spin scaling), not on H(t): H carries the
+    // lunar-torque term as well, so H × days/yr is a different quantity and
+    // drifts ~1000× further. Pairing meanHAtAge with meanYearInDaysAtAge read
+    // −214,009 ppm at 1 Gyr against the invariant's actual −196 ppm, and pinned
+    // at −1,000,179 ppm (−100%) at the Roche crossing where meanHAtAge → 0.
+    const driftPpm = (tMa) => (dtl().eraClockHAtAge(tMa) * dtl().eraClockYearInDaysAtAge(tMa) / totalDays0() - 1) * 1e6;
     const lockLodSeconds = () => {
       const p = P();
       return 2 * Math.PI * Math.sqrt(p.moonLockDistanceM ** 3 / p.gmEarthMoonM3S2);

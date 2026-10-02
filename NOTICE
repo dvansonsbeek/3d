@@ -51,11 +51,11 @@ The scene graph itself is original. The Tychosium builds 31 nodes on an
 epicycle/deferent geometry; this project builds 73 nodes on a precession
 hierarchy.
 
-Also original: the Expanding Solar System Resonance Theory, the six Fibonacci
-Laws, the L1 climate formula, the planet inspector, the LOD-climate tool, the
-Earth Fundamental Cycle (H) lattice, the deep-time engine, the derived moon, the
-fitting pipeline, the verification suite and the documentation. The upstream
-work is 3,432 lines; this one is 64,673.
+Also original: the Expanding Solar System Resonance Theory, the N-body engine
+and its governed element chain, the lunisolar precession clock, the L1 climate
+formula, the planet inspector, the LOD-climate tool, the deep-time engine, the
+derived moon, the fitting pipeline, the verification suite and the
+documentation. The upstream work is 3,432 lines; this one is 64,673.
 
 The Tychosium implements the TYCHOS model of Simon Shack. This project implements
 a different model and reaches different conclusions; the shared lineage is in the
@@ -78,9 +78,10 @@ solely by the author, which the GPL components above are not. The line falls
 where the code does:
 
   Available under separate terms
-      The model itself — the ESSRT formulas, the Earth Fundamental Cycle
-      lattice, the deep-time engine, the fitted coefficients — together with
-      services built over it. This is original work throughout.
+      The model itself — the N-body engine and its governed element chain,
+      the lunisolar precession clock, the ESSRT deep-time engine, the fitted
+      anchor and its correction bases, and the fitted coefficients — together
+      with services built over it. This is original work throughout.
 
   NOT available under separate terms
       The 3D simulator's scene-graph construction, which uses the settings-object
