@@ -34,7 +34,7 @@ Each category has: the quantity being plotted, the unit of the y-axis, a primary
 | 6 | Tropical Year | days | one-source tropical year of date (`createYearLengths` family) | Laskar 1986 |
 | 7 | Cardinal Year Lengths | min past 365 d 5 h | the model's own four cardinal-point year lengths + their of-date mean | — (own decomposition, no comparison rows) |
 | 8 | Solar Day Length | s | model solar day + dashed long-term-mean line | Bills & Ray 1999 |
-| 9 | Sidereal & Stellar Day | s | the sidereal day of date on the Solar Day panel's day (× Y/(Y+1)) + the stellar day of date (+ the equinox's daily regression on the equator) + dashed long-term-mean line | Bills & Ray 1999 converted with the same Y/(Y+1); IAU J2000 values as extras |
+| 9 | Sidereal & Stellar Day | s | the sidereal day of date on the Solar Day panel's day (× Y/(Y+1)) + the stellar day of date (+ the equinox's daily regression on the equator) + dashed long-term-mean line; the hover prints stellar − sidereal in ms | — (own lines; IAU J2000 values as extras) |
 | 10 | Sidereal Year | days | one-source sidereal year of date | Chapront 2002 |
 | 11 | Axial Precession Period | yr | one-source precession period of date | Capitaine 2003, Vondrák 2011 |
 | 12 | ΔT (TT − UT1) | s | calibrated ΔT trend (deltaTStart + Layer-2 integral + H/5 LOD + cycle stack) | Espenak & Meeus history (1650–2017) |
@@ -98,7 +98,7 @@ The panel implements the following closed-form formulas as JavaScript functions.
 | `perihelionMeeus(year)` | Meeus 1991 | Earth perihelion longitude |
 | `perihelionMeeusEarth(year)` | Meeus 1991 Table 31.A / Simon 1994 | Earth perihelion longitude |
 | `tropicalYearLaskar(year)` | Laskar 1986 | Tropical year length |
-| `solarDayPeters(year)` | Bills & Ray 1999 (linear tidal recession) | Solar day length; Sidereal & Stellar Day (converted × Y/(Y+1)) |
+| `solarDayPeters(year)` | Bills & Ray 1999 (linear tidal recession) | Solar day length |
 | `siderealYearChapront(year)` | Chapront 2002 | Sidereal year length |
 | `axialPrecessionCapitaine2009(year)` | Capitaine 2003 / IAU 2006 | Axial precession period |
 

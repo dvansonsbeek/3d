@@ -20225,13 +20225,19 @@ const VFP_CATEGORIES = [
     // equator), so on the seconds axis they draw as one line; the residual
     // pane (ms) and the J2000 table carry the split.
     id: 'sidereal-stellar-day', group: 'Earth clock', label: 'Sidereal & Stellar Day', unit: ' s', precision: 6,
-    // the external witness (first = the baseline) and the model's own stellar line both start on
-    defaultRef: ['Bills & Ray (1999), as sidereal day', 'This model — stellar day'],
+    defaultRef: 'This model — stellar day',   // the model's own line is the baseline (no external witness — owner)
     frame: 'Mean sidereal day and mean stellar day (SI seconds), of date — on the Solar Day panel’s mean solar day of date',
-    reading: 'The sidereal day is the solar day of date times Y/(Y + 1), Y the mean tropical year in days of date — one rotation more against the equinox than there are solar days in a year. The stellar day adds the equinox’s daily regression projected onto the equator, sidereal · cos ε / (T_p · (Y + 1)) with T_p the axial precession period of date — the ~8.4 ms the Days & Years rows show. Both ride the Solar Day panel’s day-length stack, so at J2000 they sit above the IAU values by that day’s excess over 86,400 s — the IAU values, like the Days & Years rows, rest on the 86,400-s kinematic day. Bills & Ray’s constant tidal rate is converted with the same Y/(Y + 1).',
+    reading: 'The sidereal day is the solar day of date times Y/(Y + 1), Y the mean tropical year in days of date — one rotation more against the equinox than there are solar days in a year. The stellar day adds the equinox’s daily regression projected onto the equator, sidereal · cos ε / (T_p · (Y + 1)) with T_p the axial precession period of date — the ~8.4 ms the Days & Years rows show; the hover prints that split of date. Both ride the Solar Day panel’s day-length stack, so at J2000 they sit above the IAU values by that day’s excess over 86,400 s — the IAU values, like the Days & Years rows, rest on the 86,400-s kinematic day.',
     yLabel: 'seconds',
     residualLabel: 'milliseconds', residualScale: 1000,
     paperTitle: 'Sidereal and Stellar Day Comparison',
+    // the hover's extra row (owner: "see if it stays 8.37 ms"): the split of date in ms
+    hoverExtras: [
+      { name: 'stellar − sidereal', fn: (year) => {
+        const sid = _vfpSiderealDaySecondsOfDate(year), st = _vfpStellarDaySecondsOfDate(year);
+        return (sid !== null && st !== null) ? ((st - sid) * 1000).toFixed(3) + ' ms' : '—';
+      } },
+    ],
     // paper annotations for the Quaternary window (the y range follows the screen)
     paperAlt: {
       refLines: [
@@ -20244,8 +20250,6 @@ const VFP_CATEGORIES = [
       { name: 'This model — stellar day', color: '#10b981', preserveColor: true, fn: _vfpStellarDaySecondsOfDate },
       { name: 'This model — long-term mean', color: '#d946ef', dash: true, preserveColor: true,
         fn: year => _vfpSiderealDaySecondsOfDate(year, _vfpSolarDayLongTermMeanSeconds(year)) },
-      { name: 'Bills & Ray (1999), as sidereal day', color: '#4fc3f7',
-        fn: year => _vfpSiderealDaySecondsOfDate(year, solarDayPeters(year)), sourceUrl: 'https://doi.org/10.1029/1999GL008348' },
     ],
     j2000extras: [
       { name: 'IAU sidereal day', color: '#ef5350', value: () => ASTRO_REFERENCE.siderealDayJ2000 },
@@ -23018,22 +23022,11 @@ function _vfpPaperLegend(entries, W) {
  *  (referencesText — their lines are the model's own) keep every line. */
 let _vfpRefsOn = {};
 function _vfpRefToggles(category) { return !category.customRender && !category.referencesText && category.references.length > 1; }
-// `defaultRef` names the baseline reference (a plain legend entry, always
-// on); as an array it names the baseline FIRST and further references that
-// start ON as pills (Sidereal & Stellar Day: the model's own stellar line
-// beside the external witness).
-function _vfpDefaultRefName(category) {
-  const d = category.defaultRef;
-  return (Array.isArray(d) ? d[0] : d) || category.references[0].name;
-}
-function _vfpRefDefaultOn(category, ref) {
-  const d = category.defaultRef;
-  return Array.isArray(d) ? d.includes(ref.name) : ref.name === _vfpDefaultRefName(category);
-}
+function _vfpDefaultRefName(category) { return category.defaultRef || category.references[0].name; }
 function _vfpRefOn(category, ref) {
   if (!_vfpRefToggles(category)) return true;
   const st = _vfpRefsOn[category.id] || (_vfpRefsOn[category.id] = {});
-  if (!(ref.name in st)) st[ref.name] = _vfpRefDefaultOn(category, ref);
+  if (!(ref.name in st)) st[ref.name] = ref.name === _vfpDefaultRefName(category);
   return st[ref.name];
 }
 /** The window's VIEW of a category (owner: ΔT in seconds on the near
@@ -23505,6 +23498,10 @@ function _vfpGenericAfterRender(bodyEl) {
         const v = ref.fn(yr);
         rows += row(ref.name, ref.color, Number.isFinite(v) ? C.fmtBase(v) : '—');
       }
+      // a category's own extra rows (hoverExtras: name + fn(year) → text),
+      // for a quantity the curves carry only as a split — Sidereal & Stellar
+      // Day prints stellar − sidereal in ms
+      for (const x of cat.hoverExtras || []) rows += row(x.name, x.color || '#8a93a5', x.fn(yr));
       tips.forEach((t, ti) => { if (t && ti !== si) t.style.display = 'none'; });
       const tip = tips[si];
       if (!tip) return;
