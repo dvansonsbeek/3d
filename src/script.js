@@ -20251,9 +20251,20 @@ const VFP_CATEGORIES = [
       { name: 'This model — long-term mean', color: '#d946ef', dash: true, preserveColor: true,
         fn: year => _vfpSiderealDaySecondsOfDate(year, _vfpSolarDayLongTermMeanSeconds(year)) },
     ],
+    // The IAU values rest on the 86,400-s day; under each, the calculation
+    // on that day with the model's own J2000 inputs (owner: show it) — the
+    // labels quote Y, ε and T_p live, the values are computed, so nothing
+    // here can go stale.
     j2000extras: [
-      { name: 'IAU sidereal day', color: '#ef5350', value: () => ASTRO_REFERENCE.siderealDayJ2000 },
-      { name: 'IAU stellar day', color: '#ef5350', value: () => ASTRO_REFERENCE.stellarDayJ2000 },
+      { name: 'IAU sidereal day (based upon 86,400 s/day)', color: '#ef5350', value: () => ASTRO_REFERENCE.siderealDayJ2000 },
+      { name: () => `Sidereal day on 86,400 s/day: Y · 86,400 / (Y + 1), Y = ${_vfpTropicalYearDaysOfDate(2000).toFixed(8)} d`, color: '#8a93a5',
+        value: () => { const Y = _vfpTropicalYearDaysOfDate(2000); return 86400 * Y / (Y + 1); } },
+      { name: 'IAU stellar day (based upon 86,400 s/day)', color: '#ef5350', value: () => ASTRO_REFERENCE.stellarDayJ2000 },
+      { name: () => `Stellar day on 86,400 s/day: sidereal · (1 + cos ε / (T_p · (Y + 1))), ε = ${_sceneEpsTargetDeg(2000).toFixed(5)}°, T_p = ${_axialPrecessionPeriodYearsAtAge(0).toFixed(1)} yr`, color: '#8a93a5',
+        value: () => {
+          const Y = _vfpTropicalYearDaysOfDate(2000);
+          return 86400 * Y / (Y + 1) * (1 + stellarDayRaProjection(_sceneEpsTargetDeg(2000)) / (_axialPrecessionPeriodYearsAtAge(0) * (Y + 1)));
+        } },
     ],
   },
   {
@@ -23023,6 +23034,10 @@ function _vfpPaperLegend(entries, W) {
 let _vfpRefsOn = {};
 function _vfpRefToggles(category) { return !category.customRender && !category.referencesText && category.references.length > 1; }
 function _vfpDefaultRefName(category) { return category.defaultRef || category.references[0].name; }
+/** A J2000 extra's label: a string, or a function when the label quotes
+ *  live inputs (Sidereal & Stellar Day prints its calculation with the
+ *  model's own J2000 Y, ε and T_p — never hard-coded numbers). */
+function _vfpExtraName(extra) { return typeof extra.name === 'function' ? extra.name() : extra.name; }
 function _vfpRefOn(category, ref) {
   if (!_vfpRefToggles(category)) return true;
   const st = _vfpRefsOn[category.id] || (_vfpRefsOn[category.id] = {});
@@ -23090,7 +23105,7 @@ function _vfpGenericCaptionBlocks(category, yearMin, yearMax, rmsParts, rLabel, 
   const anchor = ['J2000: model ' + (Number.isFinite(modelJ2000v) ? fmtV(modelJ2000v) + (category.unit || '') : '—')];
   for (const extra of category.j2000extras || []) {
     const v = typeof extra.value === 'function' ? extra.value() : extra.value;
-    if (Number.isFinite(v)) anchor.push(extra.name + ' ' + fmtV(v) + (category.unit || ''));
+    if (Number.isFinite(v)) anchor.push(_vfpExtraName(extra) + ' ' + fmtV(v) + (category.unit || ''));
   }
   const reading = (measures.length ? measures.join(' · ') + '. ' : '') + anchor.join(' · ') + '.' + (category.reading ? ' ' + category.reading : '');
   return { frame, references, reading };
@@ -23287,7 +23302,7 @@ function renderVFPChart(category, currentYear) {
     for (const extra of V.j2000extras) {
       const v = typeof extra.value === 'function' ? extra.value() : extra.value;
       if (!Number.isFinite(v) || v < yMin || v > yMax) continue;
-      extraMarkers += `<circle cx="${xScale(2000).toFixed(1)}" cy="${yScale(v).toFixed(1)}" r="3" fill="${extra.color}" stroke="#151a22" stroke-width="1"><title>${extra.name}</title></circle>`;
+      extraMarkers += `<circle cx="${xScale(2000).toFixed(1)}" cy="${yScale(v).toFixed(1)}" r="3" fill="${extra.color}" stroke="#151a22" stroke-width="1"><title>${_vfpExtraName(extra)}</title></circle>`;
     }
   }
 
@@ -23400,7 +23415,7 @@ function renderVFPChart(category, currentYear) {
         if (category.wrap360) d = ((d + 180) % 360 + 360) % 360 - 180;
         diff = (d >= 0 ? '+' : '') + d.toExponential(3);
       }
-      j2000Table += `<tr><td><span class="vfp-legend-swatch" style="background:${extra.color};display:inline-block;vertical-align:middle;margin-right:6px"></span>${extra.name}</td><td>${fmtV(v)}${category.unit}</td><td>${diff}</td></tr>`;
+      j2000Table += `<tr><td><span class="vfp-legend-swatch" style="background:${extra.color};display:inline-block;vertical-align:middle;margin-right:6px"></span>${_vfpExtraName(extra)}</td><td>${fmtV(v)}${category.unit}</td><td>${diff}</td></tr>`;
     }
   }
   j2000Table += '</table></div>';
