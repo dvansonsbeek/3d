@@ -646,13 +646,17 @@ const OBLIQUITY_MEAN = FIT.SOLSTICE_OBLIQUITY_MEAN_FITTED;
 // a structural count on the ecliptic lattice — and must NOT be projected.
 //
 // TWO FAMILIES, each internally consistent. The sidereal day is always
-// (tropical days × sidereal-year-seconds / sidereal-year-days) / (tropical days + 1);
-// what differs is whether the inputs are H-cycle MEANS or the epoch's CURRENT
-// values — meanlengthofday IS the mean form of that LOD, identically:
-//   sidereal_year_seconds / meansiderealyearlengthinDays === meanlengthofday.
+// tropical days × LOD / (tropical days + 1); what differs is the LOD and the
+// year: the MEAN family takes the H-cycle means (meanlengthofday IS the mean
+// form of the kinematic LOD, identically:
+//   sidereal_year_seconds / meansiderealyearlengthinDays === meanlengthofday),
+// the CURRENT family the epoch's REAL LOD of date (lodReal — the pane's Solar
+// Day row, the report's "real" column, the Formula Verification panel; owner:
+// one day for the three. The package's siderealDaySeconds and the published
+// registry values ride the kinematic day — a named split).
 // The obliquity must follow the same choice:
 //   MEAN family    (meanSiderealday → meanStellarday)  → OBLIQUITY_MEAN
-//   CURRENT family (siderealDayReal, the report rows)  → computeObliquityEarth(year)
+//   CURRENT family (siderealDayReal, the report rows)  → the obliquity of date
 // At J2000 the two obliquities differ by 0.0008 ms on the offset, but across the
 // deep-time obliquity range (~22.0°–24.5°) the offset runs 8.46 → 8.30 ms, so a
 // deep-time run must track the epoch's own obliquity.
@@ -25352,10 +25356,10 @@ function setupGUI() {
   }), 'Physical (observable) length of one solar day = framework\'s full prediction (Tidal + GIA + all cycles). At J2000 \u2248 86400.0018 s. Broken down in the Solar Day decomposition sub-folder below.');
   addTooltip(daysFolder.addBinding(predictions, 'siderealDayReal', {
     label: 'Sidereal Day (s)', readonly: true, format: fmt6
-  }), 'One rotation relative to the MOVING vernal equinox — shorter than the solar day by ~235.9 s. Its day-length basis is the IAU sidereal year in SI seconds divided by the model\'s sidereal year in days: anchored on the 86400 SI-second day at J2000. That basis — not the LOD_real shown as Solar Day above — is why this reproduces the IAU sidereal day (86164.090531 s) to ~9 µs.');
+  }), 'One rotation relative to the MOVING vernal equinox — shorter than the solar day by ~235.9 s: Solar Day × Y/(Y + 1), Y the tropical year of date in days, on the REAL solar day shown above (the same day the Formula Verification panel plots). The IAU constant 86164.090531 s rests on the nominal 86,400-s day, so this row sits above it by the real day\'s excess over 86,400 s (~1.7 ms today).');
   addTooltip(daysFolder.addBinding(predictions, 'stellarDayReal', {
     label: 'Stellar Day (s)', readonly: true, format: fmt6
-  }), 'One rotation relative to the fixed stars. Longer than a sidereal day by ~8.37 ms — the axial precession rate projected onto the equator (m = p·cos ε), which is the rate this offset depends on.');
+  }), 'One rotation relative to the fixed stars. Longer than a sidereal day by ~8.37 ms — the equinox\'s daily regression projected onto the equator, sidereal · cos ε / (T_p · (Y + 1)), T_p the composed precession period of date. On the real solar day like the row above; the IAU 86164.098904 s rests on the 86,400-s day.');
 
   // \u0394T sub-folder (moved from Orbital Elements per Stage 6b)
   const dtFolder = daysFolder.addFolder({ title: '\u0394T (TT \u2212 UT1)' });
@@ -37963,19 +37967,22 @@ async function runYearAnalysisExport(years) {
       derivedDayLength / ((holisticyearLength / 5) * meansolaryearlengthinDays) +
       dtCycleLodCorrectionSum(year);
     // Sidereal and stellar day use the SAME formulas as the tweakpane
-    // (predictions.siderealDayReal / stellarDayReal, script.js ~60850), evaluated
-    // at this row's year instead of the live epoch:
-    //   sidereal = solY × LOD_kinematic / (solY + 1)
-    //   stellar  = sidereal / (H/13) / (solY + 1) × cos(ε) + sidereal
-    // The base is the KINEMATIC LOD, not LOD real. That is not an oversight:
-    // the sidereal day is a rotation quantity tied to the kinematic construction,
-    // and the kinematic base reproduces ASTRO_REFERENCE.siderealDayJ2000
-    // (86164.090531) to 1 µs, whereas LOD real misses it by 1.39 ms.
+    // (predictions.siderealDayReal / stellarDayReal), evaluated at this row's
+    // year instead of the live epoch:
+    //   sidereal = solY × LOD_real / (solY + 1)
+    //   stellar  = sidereal / T_p(t) / (solY + 1) × cos(ε) + sidereal
+    // The base is the REAL LOD of this row (the "real" column), the same day
+    // the pane's Solar Day row and the Formula Verification panel ride
+    // (owner: one day for the three). Formerly the kinematic LOD, which
+    // reproduced ASTRO_REFERENCE.siderealDayJ2000 (86164.090531) to 1 µs —
+    // the IAU constant is DEFINED on the nominal 86,400-s day — while LOD
+    // real sits ~1.4–1.8 ms above it; the IAU values are the comparison in
+    // the panel's J2000 table, not this column's basis.
     // solY is computeSolarYearDaysDirect — the same source as o.solarYearDays —
     // NOT the cardinal-measured year used for the year columns.
     const solarYearDaysRow = computeSolarYearDaysDirect(year);
-    const siderealDayRow = (solarYearDaysRow * derivedDayLength) / (solarYearDaysRow + 1);
-    // CURRENT family: siderealDayRow is built from this row's own kinematic LOD,
+    const siderealDayRow = (solarYearDaysRow * lodRealRow) / (solarYearDaysRow + 1);
+    // CURRENT family: siderealDayRow is built from this row's own real LOD,
     // so the projection must use this row's own obliquity, not OBLIQUITY_MEAN.
     const stellarDayRow = (siderealDayRow / _axialPrecessionPeriodYearsAtAge((2000 - year) / 1e6)) / (solarYearDaysRow + 1)
       * stellarDayRaProjection(_sceneEpsTargetDeg(year)) + siderealDayRow;   // layer A: the published ε (hybrid), K comb only as its flag-off fallback
@@ -47188,10 +47195,10 @@ const planetStats = {
        hover : [`EPOCH-SPECIFIC MEAN LOD (1b): physics-derived rotation period at current year (tidal + GIA + ΔT residual). ABSOLUTE MEAN LOD (1a, mass-loss trend only, no GIA/ΔT): ${fmtNum(absoluteMeanLodSec(o.currentYear || 2000), 6, ',')} SI sec at current year.`]},
       {label : () => `Sidereal day (SI seconds)`,
        value : [ { small: () => meanSiderealday },{ v: () => o.siderealDayReal, dec:10, sep:',' }],
-       hover : [`One rotation relative to the MOVING vernal equinox — ~3m 56s shorter than the solar day. Left = MEAN family: long-term mean year lengths × the secular LOD (meanlengthofday). Right = CURRENT family: this epoch's year length × the kinematic LOD. They differ by ~0.3 ms at J2000 — mean vs epoch, not an error. Both are built on the epoch's actual LOD, so both shrink into the deep past (78,698 s at −380 Ma). NOT the 86400-anchored form used in the Days & Years report section 4, which stays pinned near 86,164.09 at every epoch by construction.`]},
+       hover : [`One rotation relative to the MOVING vernal equinox — ~3m 56s shorter than the solar day. Left = MEAN family: long-term mean year lengths × the secular LOD (meanlengthofday). Right = CURRENT family: this epoch's year length × the REAL LOD of date (the pane's Solar Day row, the Days & Years report's "real" column and the Formula Verification panel — one day). They differ by the real day's excess over the secular mean (~2 ms at J2000) — mean vs epoch, not an error. Both shrink into the deep past (78,698 s at −380 Ma). The IAU constant (86,164.090531 s) rests on the nominal 86,400-s day.`]},
       {label : () => `Stellar day (SI seconds)`,
        value : [ { small: () => meanStellarday },{ v: () => o.stellarDayReal, dec:10, sep:',' }],
-       hover : [`One rotation relative to the FIXED STARS (ICRF). Longer than the sidereal day by ~8.37 ms, because the equinox precesses westward. That offset carries cos(ε): the precession is in LONGITUDE (along the ecliptic) while the offset is defined along the EQUATOR, m = p·cos ε. Left/Right are the same MEAN vs CURRENT families as the sidereal day above. At J2000 the live value matches the IAU 2000A stellar day (86,164.098904 s) to ~0.01 ms.`]},
+       hover : [`One rotation relative to the FIXED STARS (ICRF). Longer than the sidereal day by ~8.37 ms, because the equinox precesses westward. That offset carries cos(ε): the precession is in LONGITUDE (along the ecliptic) while the offset is defined along the EQUATOR, m = p·cos ε. Left/Right are the same MEAN vs CURRENT families as the sidereal day above. The IAU 2000A stellar day (86,164.098904 s) rests on the nominal 86,400-s day; the live value sits above it by the real day's excess over 86,400 s (~1.8 ms at J2000) with the same 8.37-ms split.`]},
      null,
       {label : () => `Solar year (SI seconds)`,
        value : [ { small: () => meanlengthofday*meansolaryearlengthinDays },{ v: () => predictions.solarYearSeconds, dec:6, sep:',' }],
@@ -57147,11 +57154,19 @@ function updatePredictions() {
   }
   // perihelionPrecession is computed after anomalistic year (depends on it)
 
-  // Sidereal/stellar day in REAL epoch LOD — was hard-coded to 86,400 s
-  // (J2000 day), leaving these values stuck at the modern 23.93 hr at every
-  // epoch. Using o.lodKinematic (epoch LOD seconds) lets them evolve correctly.
-  predictions.siderealDayReal = o.siderealDayReal = (o.solarYearDays*o.lodKinematic)/(o.solarYearDays+1);
-  // CURRENT family: o.siderealDayReal uses this epoch's kinematic LOD, so the
+  // Sidereal/stellar day of date on the REAL solar day of date (lodReal — the
+  // Solar Day row of this folder and the Formula Verification panel's day;
+  // owner: the three Days rows ride ONE day). Formerly on o.lodKinematic, the
+  // IAU-anchored 86,400-s day: that reproduced the IAU constants at J2000 —
+  // they are DEFINED on the nominal 86,400-s day — while the Solar Day row
+  // read 86400.0018, two days in one folder (the "name its window" class).
+  // The IAU values stay the comparison in the panel's J2000 table; the
+  // published registry values (siderealDayJ2000 / stellarDayJ2000 in
+  // model-values, the package's siderealDaySeconds) still ride the
+  // kinematic day — a named split, not an oversight.
+  const _lodRealForDays = computeLodRealSecondsAtEpoch(yearForFormula);
+  predictions.siderealDayReal = o.siderealDayReal = (o.solarYearDays*_lodRealForDays)/(o.solarYearDays+1);
+  // CURRENT family: o.siderealDayReal uses this epoch's real LOD, so the
   // projection tracks this epoch's obliquity (OBLIQUITY_MEAN is the MEAN form).
   // S5: one turn of the equinox per T_p(t) (the composed clock), not per the counter H/13.
   // Layer A (plan 06): the RA projection reads the published ε (the hybrid via
