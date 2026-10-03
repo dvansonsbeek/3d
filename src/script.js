@@ -19862,6 +19862,91 @@ function ascNodeInvPlaneModel(year) {
   return convertNodeSFrameToEquatorOriginDeg(sFrameDeg, _kcNodeOriginSSDeg());
 }
 
+// ── Earth-clock day and year lines: ONE home for the Solar Day, the
+// Sidereal & Stellar Day and the Tropical Year panels ─────────────
+/** The Solar Day panel's "This model" line — the mean solar day of date in
+ *  SI seconds: the day-length stack (tidal secular lengthening, the
+ *  nodal-period term, the fitted cycle stack) with the kinematic offset
+ *  that anchors it to the Days & Years rows at J2000 (see the panel's
+ *  comment block). null outside the stack's domain. */
+function _vfpSolarDaySecondsOfDate(year) {
+  const t_Ma = (startmodelYear - year) / 1e6;
+  const layer3 = meanLodSecondsWithCorrectionsAtAge(t_Ma);
+  if (layer3 === null) return null;
+  // Kinematic offset (recomputed here — cheap; keeps the formula self-documenting).
+  const kinAt2000 = meansiderealyearlengthinSeconds / computeSiderealYearDaysDirect(2000);
+  const physAt2000 = meanLodSecondsAtAge(0);
+  const kinematicOffset = kinAt2000 - physAt2000;
+  return layer3 + h5Correction(year) + kinematicOffset;
+}
+/** The Solar Day panel's dashed "long-term mean" line — the tidal mean with
+ *  α at its climate mean, plus the nodal-period term (no cycle stack). */
+function _vfpSolarDayLongTermMeanSeconds(year) {
+  const t_Ma = (startmodelYear - year) / 1e6;
+  const layer1 = meanLodSecondsAtAgeMeanAlpha(t_Ma);
+  return (layer1 !== null) ? layer1 + h5Correction(year) : null;
+}
+/** The Tropical Year panel's "This model" line — the one-source mean
+ *  tropical year of date in days of 86,400 s (the same family as the
+ *  Predictions panel, the report and the API); the smooth secular mean
+ *  when the one-source movement is opted out. */
+const _vfpTropicalYearDaysOfDate = (() => {
+  let a = null;
+  return (year) => {
+    if (_hybridSpinActive()) return _yearLengthsM().tropicalYearSecondsAtYear(year) / 86400;
+    if (!a) {
+      const sid = computeSiderealYearDaysDirect(2000), sol = computeSolarYearDaysDirect(2000);
+      a = { axial0: sid / (sid - sol), H0: meanHAtAge(0) };
+    }
+    // Plan 06 Phase 3: the secular precession period axial0·H(t)/H₀ on
+    // the UNIT H(t) = 13·T_p,composed — the same scaling the hybrid
+    // precesses on (not the frozen era clock's H_era).
+    const tMa = (2000 - year) / 1e6;
+    const h = meanHAtAge(tMa);
+    return meanSiderealYearSecondsAtAge(tMa) / 86400
+      * (1 - 1 / (a.axial0 * (h === null ? 1 : h / a.H0)));
+  };
+})();
+/** Mean sidereal day of date in SI seconds: the solar day of date times
+ *  Y/(Y + 1), Y the mean tropical year in days of date — one more rotation
+ *  against the equinox than there are solar days in a year (the Days &
+ *  Years row's expression on the Solar Day panel's day; that row rides the
+ *  kinematic day, hence the J2000 split the panel's reading names). The
+ *  second argument swaps the day in (the long-term mean, a witness). */
+function _vfpSiderealDaySecondsOfDate(year, solarDaySeconds = _vfpSolarDaySecondsOfDate(year)) {
+  if (solarDaySeconds === null || !Number.isFinite(solarDaySeconds)) return null;
+  const Y = _vfpTropicalYearDaysOfDate(year);
+  return solarDaySeconds * Y / (Y + 1);
+}
+/** Mean stellar day of date in SI seconds: the sidereal day plus the
+ *  equinox's daily regression projected onto the equator —
+ *  sidereal · cos ε(t) / (T_p(t) · (Y + 1)), one turn of the equinox per
+ *  axial precession period of date (the Days & Years row's expression;
+ *  the obliquity of date, see stellarDayRaProjection). */
+function _vfpStellarDaySecondsOfDate(year) {
+  const sid = _vfpSiderealDaySecondsOfDate(year);
+  if (sid === null) return null;
+  const Y = _vfpTropicalYearDaysOfDate(year);
+  const Tp = _axialPrecessionPeriodYearsAtAge((2000 - year) / 1e6);
+  return sid * (1 + stellarDayRaProjection(_sceneEpsTargetDeg(year)) / (Tp * (Y + 1)));
+}
+// Marine Isotope Stage (MIS) peak ages from Lisiecki & Raymo 2005 (LR04
+// stack) — the paper annotations of the day-length panels' Quaternary
+// window. Ages are labeled at PEAK positions (glacial max / interglacial
+// max), not stage midpoints, so they align with the model's L1
+// orbital-cycle extrema. Chart LOD peaks = glacial (α max), troughs =
+// interglacial (α min). MIS 8 (peak ~260 ka BP) omitted: outside the
+// chart window. Next-glacial projection per Berger & Loutre 2002
+// (Science 297:1287).
+const VFP_QUATERNARY_MIS_EVENTS = [
+  { year: -215000, label: 'MIS 7e (interglacial)', color: '#15803d' },
+  { year: -140000, label: 'MIS 6 (glacial peak)',  color: '#b45309' },
+  { year: -125000, label: 'MIS 5e Eemian',         color: '#15803d' },
+  { year:  -50000, label: 'MIS 3 (interstadial)',  color: '#7e22ce' },
+  { year:  -22000, label: 'MIS 2 / LGM',           color: '#b91c1c' },
+  { year:   60500, label: 'Next glacial (proj.)',  color: '#b45309' },
+];
+
 // ── Category definitions ─────────────────────────────────────────
 
 const VFP_CATEGORIES = [
@@ -20011,25 +20096,9 @@ const VFP_CATEGORIES = [
     // _yearLengthsM().tropicalYearSecondsAtYear (the movement's equinox-
     // rate mean + the λ̇ correction), identical to the Predictions panel,
     // the report's Physics column and the API. Falls back to the smooth
-    // secular mean when the one-source movement is opted out.
-    model: { name: 'This model', color: '#f0b040',
-      fn: (() => {
-        let a = null;
-        return (year) => {
-          if (_hybridSpinActive()) return _yearLengthsM().tropicalYearSecondsAtYear(year) / 86400;
-          if (!a) {
-            const sid = computeSiderealYearDaysDirect(2000), sol = computeSolarYearDaysDirect(2000);
-            a = { axial0: sid / (sid - sol), H0: meanHAtAge(0) };
-          }
-          // Plan 06 Phase 3: the secular precession period axial0·H(t)/H₀ on
-          // the UNIT H(t) = 13·T_p,composed — the same scaling the hybrid
-          // precesses on (not the frozen era clock's H_era).
-          const tMa = (2000 - year) / 1e6;
-          const h = meanHAtAge(tMa);
-          return meanSiderealYearSecondsAtAge(tMa) / 86400
-            * (1 - 1 / (a.axial0 * (h === null ? 1 : h / a.H0)));
-        };
-      })() },
+    // secular mean when the one-source movement is opted out. ONE home:
+    // _vfpTropicalYearDaysOfDate (the Sidereal & Stellar Day panel's Y).
+    model: { name: 'This model', color: '#f0b040', fn: _vfpTropicalYearDaysOfDate },
     references: [
       { name: 'Laskar (1986)', color: '#4fc3f7', fn: tropicalYearLaskar, validYears: [-10000, 10000], sourceUrl: 'https://en.wikipedia.org/wiki/Tropical_year' },
       // The LONG-PERIOD reference (cycles view): T_trop = T_sid·(1 − 1/P)
@@ -20107,21 +20176,9 @@ const VFP_CATEGORIES = [
       refLines: [
         { value: () => 86400, label: 'SI second baseline (86400 s)', color: '#888', dash: true, yOffset: 0 },
       ],
-      // Marine Isotope Stage (MIS) peak ages from Lisiecki & Raymo 2005
-      // (LR04 stack). Ages are labeled at PEAK positions (glacial max /
-      // interglacial max), not stage midpoints, so they align with the
-      // model's L1 orbital-cycle extrema. Chart LOD peaks = glacial (α max),
-      // troughs = interglacial (α min). MIS 8 (peak ~260 ka BP) omitted:
-      // outside the chart window. Next-glacial projection per Berger &
-      // Loutre 2002 (Science 297:1287).
-      events: [
-        { year: -215000, label: 'MIS 7e (interglacial)', color: '#15803d' },
-        { year: -140000, label: 'MIS 6 (glacial peak)',  color: '#b45309' },
-        { year: -125000, label: 'MIS 5e Eemian',         color: '#15803d' },
-        { year:  -50000, label: 'MIS 3 (interstadial)',  color: '#7e22ce' },
-        { year:  -22000, label: 'MIS 2 / LGM',           color: '#b91c1c' },
-        { year:   60500, label: 'Next glacial (proj.)',  color: '#b45309' },
-      ],
+      // Marine Isotope Stage peak ages (Lisiecki & Raymo 2005) — the ONE
+      // list shared with the Sidereal & Stellar Day panel.
+      events: VFP_QUATERNARY_MIS_EVENTS,
     },
     // Blue "This model" = REAL LOD (Layer 4): tidal + GIA + 4-flag DT cycles + swing + H/5
     // ecliptic missing motion. Physics-derived SHAPE (tidal secular drift + DT
@@ -20141,17 +20198,8 @@ const VFP_CATEGORIES = [
     // Purple dash "long term mean" = Tidal Mean (Layer 1) + H/5 (unshifted physics):
     // α held at long-term climate mean, sits ~0.107 s above blue at J2000.
     // See docs/archive/old-documents/IP-tweakpane-days-years-precession-restructure.md § Solar Day layer stack.
-    model: { name: 'This model', color: '#f0b040',
-      fn: year => {
-        const t_Ma = (startmodelYear - year) / 1e6;
-        const layer3 = meanLodSecondsWithCorrectionsAtAge(t_Ma);
-        if (layer3 === null) return null;
-        // Kinematic offset (recomputed here — cheap; keeps the formula self-documenting).
-        const kinAt2000 = meansiderealyearlengthinSeconds / computeSiderealYearDaysDirect(2000);
-        const physAt2000 = meanLodSecondsAtAge(0);
-        const kinematicOffset = kinAt2000 - physAt2000;
-        return layer3 + h5Correction(year) + kinematicOffset;
-      } },
+    // ONE home: _vfpSolarDaySecondsOfDate (the Sidereal & Stellar Day panel's day).
+    model: { name: 'This model', color: '#f0b040', fn: _vfpSolarDaySecondsOfDate },
     references: [
       { name: 'Bills & Ray (1999)', color: '#4fc3f7', fn: solarDayPeters, sourceUrl: 'https://doi.org/10.1029/1999GL008348' },
       // Layer 1 (Tidal Mean) + H/5: α held at LONG-TERM (glacial-cycle) MEAN value.
@@ -20161,15 +20209,47 @@ const VFP_CATEGORIES = [
       // (L1(2000) ≈ −1.04, near L1 minimum). Dashed to signal "hypothetical
       // climate-averaged trajectory + framework's H/5 ecliptic frame".
       { name: 'This model — long-term mean', color: '#d946ef', dash: true, preserveColor: true,
-        fn: year => {
-          const t_Ma = (startmodelYear - year) / 1e6;
-          const layer1 = meanLodSecondsAtAgeMeanAlpha(t_Ma);
-          return (layer1 !== null) ? layer1 + h5Correction(year) : null;
-        } },
+        fn: _vfpSolarDayLongTermMeanSeconds },
     ],
     j2000extras: [
       { name: 'IAU (observed)', color: '#ef5350',
         value: () => ASTRO_REFERENCE.solarDayJ2000 },
+    ],
+  },
+  {
+    // The Solar Day panel's two rotation-period twins (owner): the sidereal
+    // day (one rotation against the moving equinox) and the stellar day
+    // (against the fixed stars), both of date, both built on the Solar Day
+    // panel's day-length stack — the Days & Years rows' expressions on that
+    // day. The two differ by ~8.4 ms (the equinox's daily regression on the
+    // equator), so on the seconds axis they draw as one line; the residual
+    // pane (ms) and the J2000 table carry the split.
+    id: 'sidereal-stellar-day', group: 'Earth clock', label: 'Sidereal & Stellar Day', unit: ' s', precision: 6,
+    // the external witness (first = the baseline) and the model's own stellar line both start on
+    defaultRef: ['Bills & Ray (1999), as sidereal day', 'This model — stellar day'],
+    frame: 'Mean sidereal day and mean stellar day (SI seconds), of date — on the Solar Day panel’s mean solar day of date',
+    reading: 'The sidereal day is the solar day of date times Y/(Y + 1), Y the mean tropical year in days of date — one rotation more against the equinox than there are solar days in a year. The stellar day adds the equinox’s daily regression projected onto the equator, sidereal · cos ε / (T_p · (Y + 1)) with T_p the axial precession period of date — the ~8.4 ms the Days & Years rows show. Both ride the Solar Day panel’s day-length stack, so at J2000 they sit above the IAU values by that day’s excess over 86,400 s — the IAU values, like the Days & Years rows, rest on the 86,400-s kinematic day. Bills & Ray’s constant tidal rate is converted with the same Y/(Y + 1).',
+    yLabel: 'seconds',
+    residualLabel: 'milliseconds', residualScale: 1000,
+    paperTitle: 'Sidereal and Stellar Day Comparison',
+    // paper annotations for the Quaternary window (the y range follows the screen)
+    paperAlt: {
+      refLines: [
+        { value: () => ASTRO_REFERENCE.siderealDayJ2000, label: 'IAU sidereal day at J2000', color: '#888', dash: true, yOffset: 0 },
+      ],
+      events: VFP_QUATERNARY_MIS_EVENTS,
+    },
+    model: { name: 'This model', color: '#f0b040', fn: _vfpSiderealDaySecondsOfDate },
+    references: [
+      { name: 'This model — stellar day', color: '#10b981', preserveColor: true, fn: _vfpStellarDaySecondsOfDate },
+      { name: 'This model — long-term mean', color: '#d946ef', dash: true, preserveColor: true,
+        fn: year => _vfpSiderealDaySecondsOfDate(year, _vfpSolarDayLongTermMeanSeconds(year)) },
+      { name: 'Bills & Ray (1999), as sidereal day', color: '#4fc3f7',
+        fn: year => _vfpSiderealDaySecondsOfDate(year, solarDayPeters(year)), sourceUrl: 'https://doi.org/10.1029/1999GL008348' },
+    ],
+    j2000extras: [
+      { name: 'IAU sidereal day', color: '#ef5350', value: () => ASTRO_REFERENCE.siderealDayJ2000 },
+      { name: 'IAU stellar day', color: '#ef5350', value: () => ASTRO_REFERENCE.stellarDayJ2000 },
     ],
   },
   {
@@ -20600,7 +20680,7 @@ const VFP_ORDER = [
   'eccentricity', 'perihelion', 'inclination', 'ascending-node',   // Earth orbit
   'obliquity', 'axial-precession',                                  // Earth axis
   'all-precession', 'climatic-precession', 'insolation-65n', 'milankovitch-overview', 'analemma',   // Earth cycles
-  'tropical-year', 'sidereal-year', 'anomalistic-year', 'cardinal-year-lengths', 'season-durations', 'solar-day', 'delta-t',   // Earth clock
+  'tropical-year', 'sidereal-year', 'anomalistic-year', 'cardinal-year-lengths', 'season-durations', 'solar-day', 'sidereal-stellar-day', 'delta-t',   // Earth clock
   'moon-arguments', 'moon-months', 'moon-perigee', 'moon-node',     // Moon
   'planet-inclinations', 'planet-eccentricities',                   // All planets
 ];
@@ -22938,11 +23018,22 @@ function _vfpPaperLegend(entries, W) {
  *  (referencesText — their lines are the model's own) keep every line. */
 let _vfpRefsOn = {};
 function _vfpRefToggles(category) { return !category.customRender && !category.referencesText && category.references.length > 1; }
-function _vfpDefaultRefName(category) { return category.defaultRef || category.references[0].name; }
+// `defaultRef` names the baseline reference (a plain legend entry, always
+// on); as an array it names the baseline FIRST and further references that
+// start ON as pills (Sidereal & Stellar Day: the model's own stellar line
+// beside the external witness).
+function _vfpDefaultRefName(category) {
+  const d = category.defaultRef;
+  return (Array.isArray(d) ? d[0] : d) || category.references[0].name;
+}
+function _vfpRefDefaultOn(category, ref) {
+  const d = category.defaultRef;
+  return Array.isArray(d) ? d.includes(ref.name) : ref.name === _vfpDefaultRefName(category);
+}
 function _vfpRefOn(category, ref) {
   if (!_vfpRefToggles(category)) return true;
   const st = _vfpRefsOn[category.id] || (_vfpRefsOn[category.id] = {});
-  if (!(ref.name in st)) st[ref.name] = ref.name === _vfpDefaultRefName(category);
+  if (!(ref.name in st)) st[ref.name] = _vfpRefDefaultOn(category, ref);
   return st[ref.name];
 }
 /** The window's VIEW of a category (owner: ΔT in seconds on the near
