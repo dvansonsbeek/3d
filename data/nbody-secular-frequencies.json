@@ -27,7 +27,7 @@
    "amplitude": 0.17545096694269685,
    "nearestLaskar": {
     "mode": "g1",
-    "arcsecPerYr": 5.5965
+    "arcsecPerYr": 5.59
    }
   },
   "venus": {
@@ -35,7 +35,7 @@
    "amplitude": 0.022570769830788477,
    "nearestLaskar": {
     "mode": "g2",
-    "arcsecPerYr": 7.4555
+    "arcsecPerYr": 7.452
    }
   },
   "earth": {
@@ -43,7 +43,7 @@
    "amplitude": 0.019341964493845513,
    "nearestLaskar": {
     "mode": "g5",
-    "arcsecPerYr": 4.2575
+    "arcsecPerYr": 4.257452
    }
   },
   "mars": {
@@ -51,7 +51,7 @@
    "amplitude": 0.08882914197372903,
    "nearestLaskar": {
     "mode": "g4",
-    "arcsecPerYr": 17.9159
+    "arcsecPerYr": 17.916
    }
   },
   "jupiter": {
@@ -59,7 +59,7 @@
    "amplitude": 0.044182672664934045,
    "nearestLaskar": {
     "mode": "g5",
-    "arcsecPerYr": 4.2575
+    "arcsecPerYr": 4.257452
    }
   },
   "saturn": {
@@ -67,7 +67,7 @@
    "amplitude": 0.04819349426795283,
    "nearestLaskar": {
     "mode": "g6",
-    "arcsecPerYr": 28.2455
+    "arcsecPerYr": 28.245
    }
   },
   "uranus": {
@@ -75,7 +75,7 @@
    "amplitude": 0.0332189082697614,
    "nearestLaskar": {
     "mode": "g5",
-    "arcsecPerYr": 4.2575
+    "arcsecPerYr": 4.257452
    }
   },
   "neptune": {
@@ -83,7 +83,7 @@
    "amplitude": 0.009569000717364112,
    "nearestLaskar": {
     "mode": "g8",
-    "arcsecPerYr": 0.673
+    "arcsecPerYr": 0.673021
    }
   }
  },
@@ -93,7 +93,7 @@
    "amplitude": 0.059409340430501154,
    "nearestLaskar": {
     "mode": "s1",
-    "arcsecPerYr": -5.6197
+    "arcsecPerYr": -5.59
    }
   },
   "venus": {
@@ -101,7 +101,7 @@
    "amplitude": 0.013576723462640201,
    "nearestLaskar": {
     "mode": "s3",
-    "arcsecPerYr": -18.8506
+    "arcsecPerYr": -18.85
    }
   },
   "earth": {
@@ -109,7 +109,7 @@
    "amplitude": 0.01184463735421656,
    "nearestLaskar": {
     "mode": "s3",
-    "arcsecPerYr": -18.8506
+    "arcsecPerYr": -18.85
    }
   },
   "mars": {
@@ -117,7 +117,7 @@
    "amplitude": 0.021473581268835227,
    "nearestLaskar": {
     "mode": "s4",
-    "arcsecPerYr": -17.7553
+    "arcsecPerYr": -17.755
    }
   },
   "jupiter": {
@@ -125,7 +125,7 @@
    "amplitude": 0.0031511446932465333,
    "nearestLaskar": {
     "mode": "s6",
-    "arcsecPerYr": -26.3475
+    "arcsecPerYr": -26.347855
    }
   },
   "saturn": {
@@ -133,7 +133,7 @@
    "amplitude": 0.007853480398801458,
    "nearestLaskar": {
     "mode": "s6",
-    "arcsecPerYr": -26.3475
+    "arcsecPerYr": -26.347855
    }
   },
   "uranus": {
@@ -141,7 +141,7 @@
    "amplitude": 0.008744980387074497,
    "nearestLaskar": {
     "mode": "s7",
-    "arcsecPerYr": -2.9927
+    "arcsecPerYr": -2.9925259
    }
   },
   "neptune": {
@@ -149,7 +149,7 @@
    "amplitude": 0.005960579851589255,
    "nearestLaskar": {
     "mode": "s8",
-    "arcsecPerYr": -0.6919
+    "arcsecPerYr": -0.691736
    }
   }
  },
@@ -875,11 +875,11 @@
   },
   "saturnG6": {
    "measured": 28.245581358956457,
-   "laskar": 28.2455
+   "laskar": 28.245
   },
   "jupiterG5": {
    "measured": 4.256769523195223,
-   "laskar": 4.2575
+   "laskar": 4.257452
   }
  },
  "inputs": {
@@ -890,11 +890,11 @@
    "tools/explore/j2000-state.mjs": "sha256:af2361cdca688cb8f5850229be97db8f70464824e20648e7e8a26ea6edb5ca5a",
    "tools/explore/k45-residual-naff.mjs": "sha256:228eb4874adca9171d61c1697ffbbaac3ce82891476a34762bf882840ccae406",
    "tools/explore/k45e-amplitude-solve.mjs": "sha256:d5ce9f8d3e38d49988b089542882833dd4c631125b5b4e21eff13b119eee45e8",
-   "tools/explore/lattice-long-window-test.mjs": "sha256:67f3282d0898cd189f4ee48558f9514dba66d896e7aacc3165423d523d6274f1",
+   "tools/explore/lattice-long-window-test.mjs": "sha256:6b0819f6078cdbe3ec0ec2c6ca5e7feee51acf0c9bcf87b51d8f1b6c30180b03",
    "tools/explore/naff-frequencies.mjs": "sha256:d875f65e0346346bde09402a0620f8109e3d0fc90e052ce8900b6f4af4ac0e5f",
    "tools/explore/nbody-wh.mjs": "sha256:b33813d3a1655e44a23964ac267f34863fb92af6bfbf6fe5886517bc649257a2",
    "tools/lib/keplerian-chain.js": "sha256:620299515d5520bb3a03fba5affafc7a036fb151fca3457a5194e8771cc97fb8",
-   "tools/verify/nbody-secular.js": "sha256:95873972aab80bc156ec4c709e6a4e197699a7c0d2f4db1159a08178ffc3e3d8"
+   "tools/verify/nbody-secular.js": "sha256:e8b5152ad7ce0408a82d020f146fecc1c937a6492897926c095744ad6f375bec"
   }
  },
  "periodicTerms": {

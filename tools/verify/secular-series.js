@@ -87,6 +87,10 @@ if (D.integrator !== 'wh' || D.dt !== 2 || D.gr !== true) {
   console.error(`REFUSING: dump is not the registered run (integrator ${D.integrator}, dt ${D.dt}, gr ${D.gr})`);
   process.exit(1);
 }
+if (!(D.sampling && D.sampling.kind === 'running mean')) {
+  console.error(`REFUSING: dump sampling ${JSON.stringify(D.sampling ?? 'absent')} is not the registered running mean (mean=1) — see deep-secular-modes.js`);
+  process.exit(1);
+}
 const span = D.t[D.t.length - 1] - D.t[0];
 if (Math.abs(span - 20000000) > 40000) { console.error(`REFUSING: dump span ${span} yr is not the registered ±10 Myr`); process.exit(1); }
 if (D.conservation && Math.abs(D.conservation.maxDE ?? D.conservation) > 1e-7) {
@@ -108,12 +112,17 @@ const rT0 = tR[0], rDt = tR[1] - tR[0];
 
 // Anti-alias filter (C-4a): a centered boxcar over SMOOTH_YR applied to BOTH
 // raw series before resampling. The banked series is the SECULAR history;
-// the raw osculating elements carry short-period/aliased content (measured:
-// unfiltered z resample departure 1.1e-4 ≈ 0.7% of e — EoC-relevant noise;
-// ζ is quiet at 6e-6 but gets the SAME recipe, one construction). Standard
-// decimation practice, zero fitted constants; the window is a convention
-// pinned in meta. Attenuation of the fastest secular mode (~49 kyr):
-// sinc(π·1/49) = 0.9993 — a 0.07% amplitude bias, far below every gate.
+// the raw samples are RUNNING MEANS over their own 54.76-yr interval
+// (dump mean=1 — the earlier point samples aliased ~1e-4 of Jupiter/Venus
+// short-period content into the secular band, which no boxcar of 19 such
+// points could remove: Earth's secular e read 0.5e-5 rms off DE441 through
+// this filter, 0.08e-5 with the means). The boxcar stays: 19 contiguous
+// interval means ARE one 1040-yr mean, and the measured resample
+// departures (1.1e-4 unfiltered z, 6e-6 ζ) were the original reason — one
+// recipe for both. Standard decimation practice, zero fitted constants; the
+// window is a convention pinned in meta. Attenuation of the fastest secular
+// mode (~49 kyr): sinc(π·1/49) = 0.9993 — a 0.07% amplitude bias, far
+// below every gate.
 const SMOOTH_YR = 1000;
 // D5: the PLANET blocks smooth over 4 kyr — the Jupiter–Saturn Great
 // Inequality (~883-yr quasi-period) is genuine physics but SHORT-PERIOD
@@ -143,9 +152,30 @@ const liRaw = (arr, tt) => {
   return arr[i] * (1 - f) + arr[i + 1] * f;
 };
 
-// resample to the artifact cadence, 9-decimal rounding
-const n = Math.floor((tR[NR - 1] - rT0) / STEP_YR) + 1;
-const t0Yr = rT0;
+// resample to the artifact cadence, 9-decimal rounding.
+// THE NODE GRID is anchored at a multiple of the COARSEST cadence (the λ̇
+// channel's 2000 yr; the planets' 1000 and Earth's 500 divide it) and kept
+// INSIDE the raw span, so every node is interpolated, never extrapolated,
+// and J2000, the ±50-kyr 1-kyr nodes the Sun completion embeds and the λ̇
+// anchor all fall on nodes exactly. The point-sampled dump ran to
+// ±10,000,000 (a multiple of every cadence, so anchoring at the first raw
+// sample was the same grid); the running-mean dump has no half-window end
+// samples and spans ±9,999,945 — anchoring at its first sample put every
+// node off the cadence lattice and extrapolated the last 390 yr (fidelity
+// 3.2e-4 at the end, 6e-6 everywhere else). Beyond the last node the
+// consumers hand over to the mode tail, as they always did.
+// NO NODE INSIDE THE BOXCAR'S EDGE ZONE either: within half a filter width
+// of a raw end the centered boxcar is one-sided and its output has a kink,
+// which a node placed there turns into interpolation error (measured: z
+// 4.5e-5 with the last Earth node 55 yr inside the zone). The shared origin
+// clears the WIDEST filter (the planets' 4 kyr); each series' last node
+// clears its own.
+const GRID_ANCHOR_YR = 2000;
+const t0Yr = Math.ceil((rT0 + SMOOTH_PLANET_YR / 2) / GRID_ANCHOR_YR) * GRID_ANCHOR_YR;
+const tLastEarthYr = tR[NR - 1] - SMOOTH_YR / 2;
+const tLastPlanetYr = tR[NR - 1] - SMOOTH_PLANET_YR / 2;
+const n = Math.floor((tLastEarthYr - t0Yr) / STEP_YR) + 1;
+const tEdgeNodeYr = t0Yr + (n - 1) * STEP_YR;
 const q = Array.from({ length: n }, (_, i) => Number(liRaw(qS, t0Yr + i * STEP_YR).toFixed(9)));
 const p = Array.from({ length: n }, (_, i) => Number(liRaw(pS, t0Yr + i * STEP_YR).toFixed(9)));
 const zq = Array.from({ length: n }, (_, i) => Number(liRaw(zqS, t0Yr + i * STEP_YR).toFixed(9)));
@@ -164,6 +194,7 @@ const liS = (arr, tt) => {
 };
 let maxResample = 0, maxResampleZ = 0;
 for (let i = 0; i < NR; i++) {
+  if (tR[i] < t0Yr || tR[i] > tEdgeNodeYr) continue;   // raw samples outside the node grid are not represented
   maxResample = Math.max(maxResample,
     Math.abs(liS(q, tR[i]) - qS[i]), Math.abs(liS(p, tR[i]) - pS[i]));
   maxResampleZ = Math.max(maxResampleZ,
@@ -232,7 +263,7 @@ const lsqSlopeDegPerYr = (lam, tt, W) => {
   return c1 / 1000;
 };
 const lamDot0 = lsqSlopeDegPerYr(lamUnwrappedDeg, 0, LAMDOT_WINDOW_YR);
-const nLam = Math.floor((tR[NR - 1] - rT0) / LAMDOT_STEP_YR) + 1;
+const nLam = Math.floor((tLastEarthYr - t0Yr) / LAMDOT_STEP_YR) + 1;
 const lamDotRel = Array.from({ length: nLam }, (_, i) =>
   Number((lsqSlopeDegPerYr(lamUnwrappedDeg, t0Yr + i * LAMDOT_STEP_YR, LAMDOT_WINDOW_YR) / lamDot0).toFixed(12)));
 {
@@ -275,7 +306,8 @@ for (const pl of PLANETS7) {
   // 1000 yr, over the 1e-4 bound).
   let chosen = null;
   for (const stepTry of [PLANET_STEP_YR, STEP_YR]) {
-    const nP = Math.floor((tR[NR - 1] - rT0) / stepTry) + 1;
+    const nP = Math.floor((tLastPlanetYr - t0Yr) / stepTry) + 1;
+    const tEdgeP = t0Yr + (nP - 1) * stepTry;
     const bq = Array.from({ length: nP }, (_, i) => round7(liRaw(pqS, t0Yr + i * stepTry)));
     const bp = Array.from({ length: nP }, (_, i) => round7(liRaw(ppS, t0Yr + i * stepTry)));
     const bzq = Array.from({ length: nP }, (_, i) => round7(liRaw(pzqS, t0Yr + i * stepTry)));
@@ -286,6 +318,7 @@ for (const pl of PLANETS7) {
     };
     let fid = 0;
     for (let i = 0; i < NR; i += 4) {
+      if (tR[i] < t0Yr || tR[i] > tEdgeP) continue;
       fid = Math.max(fid,
         Math.abs(liP(bq, tR[i]) - pqS[i]), Math.abs(liP(bp, tR[i]) - ppS[i]),
         Math.abs(liP(bzq, tR[i]) - pzqS[i]), Math.abs(liP(bzp, tR[i]) - pzpS[i]));
@@ -620,7 +653,11 @@ const artifact = {
     // the dump's own provenance block (lunar quadrupole + force-only asteroids)
     physics: D.physics ?? null,
     rawSampleDays: D.sampleDays,
+    // the dump's sampling form: running means over each raw interval (mean=1)
+    sampling: D.sampling ?? null,
     cadenceYr: STEP_YR, samples: n, roundedDecimals: 9,
+    // the node grid: origin on a multiple of gridAnchorYr inside the raw span (see the resample block)
+    gridAnchorYr: GRID_ANCHOR_YR, rawSpanYr: [Number(rT0.toFixed(3)), Number(tR[NR - 1].toFixed(3))], lastNodeYr: tEdgeNodeYr,
     antiAliasBoxcarYr: SMOOTH_YR,
     resampleMaxDeparture: Number(maxResample.toExponential(2)),
     resampleMaxDepartureZ: Number(maxResampleZ.toExponential(2)),

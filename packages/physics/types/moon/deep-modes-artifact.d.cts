@@ -22,6 +22,12 @@ export const DEEP_MODES_ARTIFACT: Readonly<{
                 vesta: number;
             };
         };
+        sampling: {
+            kind: string;
+            windowDays: number;
+            accumulateDays: number;
+            form: string;
+        };
         dumpFile: string;
         dumpSha256: string;
         conservationMaxDE: number;
@@ -152,4 +158,4 @@ export const DEEP_MODES_ARTIFACT: Readonly<{
     anchorZDotPerYr: number[];
     slopeTaperYears: 27943.083333333332;
 }>;
-export const DEEP_MODES_ARTIFACT_HASH: "cbdc477b7442c333";
+export const DEEP_MODES_ARTIFACT_HASH: "7633dd8f434fd6fc";

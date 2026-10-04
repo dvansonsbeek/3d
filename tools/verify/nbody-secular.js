@@ -65,9 +65,15 @@ const PLANETS = ['mercury', 'venus', 'earth', 'mars', 'jupiter', 'saturn', 'uran
 const ARCSEC_PER_RAD = 648000 / Math.PI;
 // Laskar, J. et al. (2004), A&A 428, 261–285, Table 3 — external REFERENCE
 // values (another theory's integration, not observations); labels only.
+// La2004's main secular frequencies (″/yr) as TABULATED in Laskar et al.
+// (2011), A&A 532, A89, Table 6 (La2004 beside La2010a). LABELS and sanity
+// thresholds only — never inputs. The former set here (g2 7.4555, g1 5.5965,
+// s3 −18.8506, …) had no traceable source (its s3 equalled the engine's own
+// to four decimals) and was replaced 2026-10 with the publication's digits
+// (verified against the table; deep-secular-modes.js already carried them).
 const LASKAR2004 = {
-  g: { g1: 5.5965, g2: 7.4555, g3: 17.3711, g4: 17.9159, g5: 4.2575, g6: 28.2455, g7: 3.0876, g8: 0.6730 },
-  s: { s1: -5.6197, s2: -7.0797, s3: -18.8506, s4: -17.7553, s6: -26.3475, s7: -2.9927, s8: -0.6919 },
+  g: { g1: 5.59, g2: 7.452, g3: 17.368, g4: 17.916, g5: 4.257452, g6: 28.2450, g7: 3.087951, g8: 0.673021 },
+  s: { s1: -5.59, s2: -7.05, s3: -18.850, s4: -17.755, s6: -26.347855, s7: -2.9925259, s8: -0.691736 },
 };
 
 /** Derived instantaneous 1PN apsidal supplement (″/cy) — shared constants only. */

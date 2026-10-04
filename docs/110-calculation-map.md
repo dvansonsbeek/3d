@@ -1,7 +1,7 @@
 ---
 docVersion: 1.0
-modelVersion: v16.1
-coefficients: sha256:bb6a03c877eedab8
+modelVersion: v16.2
+coefficients: sha256:96f7a2194ea29f0e
 status: current
 ---
 
@@ -81,10 +81,10 @@ compose them (T = (year − 2000)/100; the of-date angles wrapped to 0–360°).
 | year | T (cy) | e — deep modes | e — H/3 law | E = e/e₀ | (g/g₀)^s_ϖ | (g/g₀)^s_Ω | I(T, s_ϖ) (cy) | I(T, s_Ω) (cy) | perigee ϖ of date (°) | node Ω of date (°) |
 |---|---|---|---|---|---|---|---|---|---|---|
 | 2000 | 0.00 | 0.0167024 | 0.0167024 | 1.000000 | 1.0000000 | 1.0000000 | 0.0000e+0 | 0.0000e+0 | 83.3531 | 125.0444 |
-| 1246 | -7.54 | 0.0170188 | 0.0170131 | 1.018940 | 1.0000385 | 1.0000163 | -1.4526e-4 | -6.1434e-5 | 2.3985 | 308.5508 |
-| -584 | -25.84 | 0.0177603 | 0.0177027 | 1.063334 | 1.0001317 | 1.0000557 | -1.7038e-3 | -7.2057e-4 | 53.1055 | 64.5198 |
-| -2584 | -45.84 | 0.0185236 | 0.0183397 | 1.109036 | 1.0002317 | 1.0000980 | -5.3420e-3 | -2.2592e-3 | 18.0271 | 230.2215 |
-| -10000 | -120.00 | 0.0207249 | 0.0196329 | 1.240829 | 1.0005439 | 1.0002300 | -3.4927e-2 | -1.4770e-2 | 179.5862 | 49.9668 |
+| 1246 | -7.54 | 0.0170163 | 0.0170121 | 1.018791 | 1.0000382 | 1.0000162 | -1.4412e-4 | -6.0953e-5 | 2.4031 | 308.5499 |
+| -584 | -25.84 | 0.0177517 | 0.0177013 | 1.062823 | 1.0001306 | 1.0000552 | -1.6900e-3 | -7.1472e-4 | 53.1619 | 64.5084 |
+| -2584 | -45.84 | 0.0185087 | 0.0183478 | 1.108142 | 1.0002297 | 1.0000972 | -5.2972e-3 | -2.2403e-3 | 18.2092 | 230.1849 |
+| -10000 | -120.00 | 0.0206932 | 0.0196385 | 1.238935 | 1.0005392 | 1.0002280 | -3.4623e-2 | -1.4641e-2 | 180.8257 | 49.7176 |
 
 Anchors the rows above use: e₀ (JPL J2000 seed, the deep channel's anchor) = 0.0167024357 · e(J2000) IAU (the H/3 law's anchor) = 0.01671022 · g₀ = (1 − e₀²)^(−3/2) = 1.0004186030 · ϖ̇₀ = LPR − MPR = 4069.0137287 °/cy · Ω̇₀ = LPR − FR = -1934.1362891 °/cy · s_ϖ = 2.407, s_Ω = 1.018.
 <!-- /generated:calcmap-e-chain-values -->
@@ -97,8 +97,8 @@ The Δe² carrier's coefficient (step 6), derived — not a constant:
 | T2_LP (Meeus L′ T² coefficient) | -0.0015786 °/cy² | Meeus Ch. 47 polynomial, literal |
 | T2_LP_TIDAL = (−25.86″/cy²)/2 | -3.591667e-3 °/cy² | LLR tidal n̈/2 |
 | t2obl = (J₂ figure + Lieske ṗ_A T²)/3600 | 3.621194e-4 °/cy² | astro-reference elpW1T2Decomposition: 0.1925 + 1.11113 ″/cy² |
-| Δ(e²) per century at J2000 = e(+50 yr)² − e(−50 yr)² | -1.415084e-6 | the deep channel (the doc-66 value −2332 °/cy per e² was derived on the H/3 line's slope) |
-| **K_PL = 2·(T2_LP − T2_LP_TIDAL − t2obl)/Δ(e²)** | **-2333.36 °/cy per e²** | arguments.cjs kPlValue() — the same budget numerator, the live channel's slope |
+| Δ(e²) per century at J2000 = e(+50 yr)² − e(−50 yr)² | -1.404195e-6 | the deep channel (the doc-66 value −2332 °/cy per e² was derived on the H/3 line's slope) |
+| **K_PL = 2·(T2_LP − T2_LP_TIDAL − t2obl)/Δ(e²)** | **-2351.45 °/cy per e²** | arguments.cjs kPlValue() — the same budget numerator, the live channel's slope |
 <!-- /generated:calcmap-kpl -->
 
 The deep-time lunar periods (step 7), from the Node engine's month chain
@@ -108,13 +108,13 @@ The deep-time lunar periods (step 7), from the Node engine's month chain
 | age (Ma) | sidereal month (d) | perigee period (yr) | node period (yr) | H(t) (yr) | (g/g₀)^s_ϖ | (g/g₀)^s_Ω |
 |---|---|---|---|---|---|---|
 | 0 | 27.321662 | 8.85038 | 18.59952 | 335317.0 | 1.0000000 | 1.0000000 |
-| 0.002584 | 27.321651 | 8.84922 | 18.59849 | 335316.6 | 1.0001317 | 1.0000557 |
-| 0.01 | 27.321621 | 8.84620 | 18.59582 | 335315.6 | 1.0004742 | 1.0002005 |
-| 0.1 | 27.321253 | 8.81490 | 18.56811 | 335301.9 | 1.0040400 | 1.0017067 |
-| 1 | 27.317580 | 8.81358 | 18.56837 | 335166.3 | 1.0043245 | 1.0018267 |
-| 10 | 27.280854 | 8.77885 | 18.55175 | 333813.4 | 1.0096520 | 1.0040709 |
-| 380 | 25.771659 | 9.38443 | 19.71812 | 282328.9 | 0.9996711 | 0.9998609 |
-| 650 | 24.643977 | 9.81175 | 20.61734 | 248541.1 | 0.9997848 | 0.9999090 |
+| 0.002584 | 27.321651 | 8.84923 | 18.59850 | 335316.6 | 1.0001306 | 1.0000552 |
+| 0.01 | 27.321621 | 8.84623 | 18.59585 | 335315.6 | 1.0004700 | 1.0001987 |
+| 0.1 | 27.321253 | 8.81483 | 18.56805 | 335301.9 | 1.0040476 | 1.0017099 |
+| 1 | 27.317580 | 8.81347 | 18.56828 | 335166.3 | 1.0043371 | 1.0018320 |
+| 10 | 27.280854 | 8.77896 | 18.55185 | 333813.4 | 1.0096392 | 1.0040654 |
+| 380 | 25.771659 | 9.38441 | 19.71810 | 282328.9 | 0.9996735 | 0.9998619 |
+| 650 | 24.643977 | 9.81169 | 20.61728 | 248541.1 | 0.9997916 | 0.9999119 |
 <!-- /generated:calcmap-lunar-periods -->
 
 ### 1.4 Findings from this chain (to act on)
@@ -231,11 +231,11 @@ length-of-day side carries as α(t), read in its own observable — k_J is
 fixed by the OBSERVED dJ₂/dt (input `j2RateJ2000PerYr`, Cox & Chao 2002:
 <!--v:j2RateJ2000Per1e11Yr-->−2.7<!--/v--> ×10⁻¹¹ /yr), so the J₂→α conversion of the length-of-day side never
 enters. Measured (`tools/verify/equinox-vs-vondrak.js`, theory against
-theory): the equinox of date sits within <!--v:equinoxVsVondrakMaxAbsArcsec-->6.6<!--/v-->″ of Vondrák et al. (2011)
-over ±3000 yr (<!--v:equinoxVsVondrakMaxAbsInnerArcsec-->0.3<!--/v-->″ inside −500…+2500) where the secular law alone reads
-<!--v:equinoxSecularOnlyMaxAbsArcsec-->27.2<!--/v-->″ — the whole of the Sun's former ancient residual against Horizons;
-the obliquity holds <!--v:obliqVsLa2004RmsLastMyrArcsec-->13.7<!--/v-->″ rms against La2004 over the last million years
-where the secular law alone reads <!--v:obliqSecularOnlyVsLa2004RmsLastMyrArcsec-->79.5<!--/v-->″ (La2004 integrates the same
+theory): the equinox of date sits within <!--v:equinoxVsVondrakMaxAbsArcsec-->5.8<!--/v-->″ of Vondrák et al. (2011)
+over ±3000 yr (<!--v:equinoxVsVondrakMaxAbsInnerArcsec-->0.4<!--/v-->″ inside −500…+2500) where the secular law alone reads
+<!--v:equinoxSecularOnlyMaxAbsArcsec-->26.4<!--/v-->″ — the whole of the Sun's former ancient residual against Horizons;
+the obliquity holds <!--v:obliqVsLa2004RmsLastMyrArcsec-->13.1<!--/v-->″ rms against La2004 over the last million years
+where the secular law alone reads <!--v:obliqSecularOnlyVsLa2004RmsLastMyrArcsec-->78.9<!--/v-->″ (La2004 integrates the same
 eccentricity-dependent torque). Over the last Myr F_sun averages
 +<!--v:precOfDateSolarTorqueMeanLastMyrPct-->0.032<!--/v--> % (the mean e² sits above today's — <!--v:precOfDateEquinoxShiftAtM1MyrDeg-->4.2<!--/v-->° of equinox at −1 Myr) and
 J₂(t)/J₂₀ stays within ±<!--v:precOfDateEllipticityAmpLastMyrPct-->0.02<!--/v--> % with no secular part.
@@ -277,14 +277,14 @@ one-source movement):
 <!-- generated:calcmap-ofdate-precession -->
 | year | T_p (A) comb pair (yr) — the frozen device | p (A) (″/yr) | **T_p (B) one-family (yr) — PUBLISHED** (`epoch.axialPrecessionYearsAtYear`, API/MCP) | p (B) (″/yr) | (A) − (B) (yr) | T_p composed (yr) — the deep-time clock, same J2000 anchor (S5) | ε, hybrid (°) |
 |---|---|---|---|---|---|---|---|
-| -10000 | 26293.30 | 49.2901 | **26459.51** | 48.9805 | -166.21 | 25771.3 | 24.15887 |
-| -2584 | 26069.06 | 49.7141 | **26253.29** | 49.3652 | -184.24 | 25771.3 | 23.98230 |
-| -584 | 25946.80 | 49.9484 | **26058.29** | 49.7347 | -111.49 | 25771.4 | 23.76559 |
-| 0 | 25908.26 | 50.0227 | **25995.59** | 49.8546 | -87.33 | 25771.4 | 23.69482 |
-| 1246 | 25823.50 | 50.1868 | **25857.09** | 50.1216 | -33.59 | 25771.4 | 23.53707 |
+| -10000 | 26293.30 | 49.2901 | **26459.42** | 48.9807 | -166.12 | 25771.3 | 24.15887 |
+| -2584 | 26069.06 | 49.7141 | **26253.21** | 49.3654 | -184.16 | 25771.3 | 23.98229 |
+| -584 | 25946.80 | 49.9484 | **26058.32** | 49.7346 | -111.52 | 25771.4 | 23.76559 |
+| 0 | 25908.26 | 50.0227 | **25995.50** | 49.8548 | -87.24 | 25771.4 | 23.69481 |
+| 1246 | 25823.50 | 50.1868 | **25856.91** | 50.1220 | -33.41 | 25771.4 | 23.53705 |
 | 2000 | 25771.40 | 50.2883 | **25771.40** | 50.2883 | -0.00 | 25771.4 | 23.43928 |
-| 5000 | 25571.19 | 50.6820 | **25447.64** | 50.9281 | 123.54 | 25771.4 | 23.06398 |
-| 10000 | 25342.65 | 51.1391 | **25110.28** | 51.6123 | 232.38 | 25771.5 | 22.65350 |
+| 5000 | 25571.19 | 50.6820 | **25447.54** | 50.9283 | 123.65 | 25771.4 | 23.06397 |
+| 10000 | 25342.65 | 51.1391 | **25110.20** | 51.6125 | 232.45 | 25771.5 | 22.65351 |
 <!-- /generated:calcmap-ofdate-precession -->
 
 ### 2.5 Findings from this chain (to act on)
@@ -391,14 +391,14 @@ a property of the basis chosen, not a finding.
 <!-- generated:calcmap-year-lengths-of-date -->
 | year | sid (A) comb (d) — device | **sid (B) one-family (d) — published** | trop (A) comb (d) — device | trop (A′) cardinal (d) — device | **trop (B) one-family (d) — published** | anom (A) comb (d) — device | **anom (B) one-family (d) — published** |
 |---|---|---|---|---|---|---|---|
-| -10000 | 365.257363 | 365.256350 | 365.243472 | 365.243547 | 365.242546 | 365.260631 | 365.259146 |
-| -2584 | 365.256701 | 365.256358 | 365.242690 | 365.242783 | 365.242445 | 365.259970 | 365.259472 |
-| -584 | 365.256552 | 365.256360 | 365.242475 | 365.242533 | 365.242343 | 365.259822 | 365.259558 |
-| 0 | 365.256510 | 365.256361 | 365.242412 | 365.242457 | 365.242310 | 365.259780 | 365.259587 |
-| 1246 | 365.256418 | 365.256362 | 365.242274 | 365.242292 | 365.242236 | 365.259689 | 365.259622 |
-| 2000 | 365.256363 | 365.256363 | 365.242190 | 365.242190 | 365.242190 | 365.259633 | 365.259637 |
-| 5000 | 365.256129 | 365.256366 | 365.241845 | 365.241779 | 365.242014 | 365.259399 | 365.259729 |
-| 10000 | 365.255694 | 365.256371 | 365.241282 | 365.241156 | 365.241825 | 365.258963 | 365.259971 |
+| -10000 | 365.257363 | 365.256350 | 365.243472 | 365.243547 | 365.242546 | 365.260631 | 365.259154 |
+| -2584 | 365.256701 | 365.256358 | 365.242690 | 365.242783 | 365.242445 | 365.259970 | 365.259481 |
+| -584 | 365.256552 | 365.256360 | 365.242475 | 365.242533 | 365.242343 | 365.259822 | 365.259553 |
+| 0 | 365.256510 | 365.256361 | 365.242412 | 365.242457 | 365.242310 | 365.259780 | 365.259570 |
+| 1246 | 365.256418 | 365.256362 | 365.242274 | 365.242292 | 365.242236 | 365.259689 | 365.259613 |
+| 2000 | 365.256363 | 365.256363 | 365.242190 | 365.242190 | 365.242190 | 365.259633 | 365.259634 |
+| 5000 | 365.256129 | 365.256366 | 365.241845 | 365.241779 | 365.242013 | 365.259399 | 365.259730 |
+| 10000 | 365.255694 | 365.256371 | 365.241282 | 365.241156 | 365.241825 | 365.258963 | 365.259961 |
 
 Comb divisors (the H-divisor harmonics each (A) family adds to its tidal-chain base): tropical 3, 5, 6, 8, 11, 13, 14, 16, 19, 22, 24, 27 · sidereal 3, 5, 8, 9, 16, 32 · anomalistic 3, 8, 9, 17, 18, 19, 20, 24 (phase = div × cycles since the balanced year).
 <!-- /generated:calcmap-year-lengths-of-date -->
@@ -553,22 +553,22 @@ hybrid and the K law at the exact years):
 <!-- generated:calcmap-obliquity-values -->
 | year | ε hybrid (°) | ε K law (°) | ε La2004 (°) | hybrid − K law (″) | hybrid − La2004 (″) | K law − La2004 (″) |
 |---|---|---|---|---|---|---|
-| -48000 | 24.41101 | 24.14159 | 24.41134 | 970 | -1 | -971 |
-| -28000 | 22.23037 | 23.47788 | 22.22990 | -4491 | 2 | 4493 |
-| -20000 | 22.80511 | 24.07349 | 22.80525 | -4566 | -0 | 4566 |
+| -48000 | 24.41100 | 24.14159 | 24.41134 | 970 | -1 | -971 |
+| -28000 | 22.23039 | 23.47788 | 22.22990 | -4491 | 2 | 4493 |
+| -20000 | 22.80510 | 24.07349 | 22.80525 | -4566 | -1 | 4566 |
 | -10000 | 24.15887 | 24.52945 | 24.15921 | -1334 | -1 | 1333 |
-| -2584 | 23.98230 | 24.01380 | — | -113 | — | — |
+| -2584 | 23.98229 | 24.01380 | — | -113 | — | — |
 | -584 | 23.76559 | 23.77333 | — | -28 | — | — |
-| 0 | 23.69482 | 23.69908 | 23.69494 | -15 | -0 | 15 |
-| 1246 | 23.53707 | 23.53762 | — | -2 | — | — |
+| 0 | 23.69481 | 23.69908 | 23.69494 | -15 | -0 | 15 |
+| 1246 | 23.53705 | 23.53762 | — | -2 | — | — |
 | 2000 | 23.43928 | 23.43934 | 23.43929 | -0 | -0 | 0 |
-| 5000 | 23.06398 | 23.06503 | 23.06390 | -4 | 0 | 4 |
-| 10000 | 22.65350 | 22.61823 | 22.65342 | 127 | 0 | -127 |
-| 20000 | 23.06278 | 22.76933 | 23.06303 | 1056 | -1 | -1057 |
-| 30000 | 23.90874 | 23.41005 | 23.90927 | 1795 | -2 | -1797 |
+| 5000 | 23.06397 | 23.06503 | 23.06390 | -4 | 0 | 4 |
+| 10000 | 22.65351 | 22.61823 | 22.65342 | 127 | 0 | -127 |
+| 20000 | 23.06279 | 22.76933 | 23.06303 | 1056 | -1 | -1057 |
+| 30000 | 23.90873 | 23.41005 | 23.90927 | 1795 | -2 | -1797 |
 | 50000 | 22.60697 | 22.55623 | 22.60721 | 183 | -1 | -184 |
 
-dε/dt at J2000 (″/cy): hybrid series -46.80 (the published ε, S3b) · K law -46.82 (the device) · IAU 2006 -46.84 · banked verdict integrations: era-tier ζ -48.00, full-tier ζ -38.91 (data/obliquity-hybrid-verdict.json).
+dε/dt at J2000 (″/cy): hybrid series -46.79 (the published ε, S3b) · K law -46.82 (the device) · IAU 2006 -46.84 · banked verdict integrations: era-tier ζ -48.00, full-tier ζ -38.91 (data/obliquity-hybrid-verdict.json).
 α at J2000 (″/yr): p₀/cos ε₀ = 54.811 with p₀ = 1,296,000/(H/13) (the form the registry and the shipped hybrid use) · 54.811 in the verdict artifact (ψ̇ = the of-date beat 50.288 ″/yr) — the two J2000 precession readings of chain 2, finding 2.
 Banked window rms vs La2004 (″), hybrid / fitted K law: ±13 kyr 50 / 530 · ±50 kyr 427 / 389 · ±130 kyr 488 / 381 · ±270 kyr 490 / 453 (era-tier ζ). La2004 is a THEORY reference, not an observation.
 <!-- /generated:calcmap-obliquity-values -->
@@ -652,11 +652,11 @@ record), returned event JDs from fitted coefficients frozen at the last
 spin-and-tides-side fit (the fitters are retired, git 16d7c87f). THE
 OBSERVATION-CLASS VERDICT (plan 06 I1, `tools/verify/sun-vs-horizons.js`
 against JPL Horizons' own crossings over ±3000 yr, TT): the shipped instants
-sit <!--v:cardinalVsHorizonsMeanMin-->−1.01<!--/v--> min from Horizons on average (sd <!--v:cardinalVsHorizonsSdMin-->1.39<!--/v--> min), within
-a minute in 1000–3000 (<!--v:cardinalVsHorizonsMeanP1000Min-->−0.79<!--/v--> / <!--v:cardinalVsHorizonsMeanP2000Min-->0.27<!--/v--> min) and about two minutes early in
-the ancient era (<!--v:cardinalVsHorizonsMeanM1000Min-->−1.82<!--/v--> min at −1000..0, <!--v:cardinalVsHorizonsMeanM2000Min-->−1.44<!--/v--> min at −2000..−1000) — the
+sit <!--v:cardinalVsHorizonsMeanMin-->−0.71<!--/v--> min from Horizons on average (sd <!--v:cardinalVsHorizonsSdMin-->0.94<!--/v--> min), within
+a minute in 1000–3000 (<!--v:cardinalVsHorizonsMeanP1000Min-->−0.75<!--/v--> / <!--v:cardinalVsHorizonsMeanP2000Min-->0.31<!--/v--> min) and about two minutes early in
+the ancient era (<!--v:cardinalVsHorizonsMeanM1000Min-->−1.45<!--/v--> min at −1000..0, <!--v:cardinalVsHorizonsMeanM2000Min-->−0.95<!--/v--> min at −2000..−1000) — the
 size of the difference between two equinoxes of date: the model's (within
-<!--v:equinoxVsVondrakMaxAbsArcsec-->6.6<!--/v-->″ of Vondrák et al. 2011 over the span, §2.3) and Horizons' own of-date
+<!--v:equinoxVsVondrakMaxAbsArcsec-->5.8<!--/v-->″ of Vondrák et al. 2011 over the span, §2.3) and Horizons' own of-date
 frame (IAU76/80, a long-term model beyond ±200 yr from 2000). The
 retired device sat hours from the same reference (the gap table in §5.3:
 4.5 h at 0 AD, 6.5 d at −10000). The **one-source cardinal structure** (`createCardinalStructure`)
@@ -767,26 +767,26 @@ device first):
 <!-- generated:calcmap-cardinal-decomposition -->
 | year | lincoef·(Y−2000) (d) | drift Simpson (d) | Ih (d) | Σ sinusoids − δ(2000) (d) | equation-of-centre orders (d) | joint sidebands (d) | JD_SS − anchor (d) | cycles since the balanced year, integrated | linear (Y − bY)/H |
 |---|---|---|---|---|---|---|---|---|---|
-| -10000 | -4382906.2754 | 0.02155 | -2.17476 | -0.15117 | 0.14925 | 0.00306 | -4382914.79362 | 0.8727114 | 0.8727115 |
-| -2584 | -1674270.1972 | 0.00702 | -0.38503 | -0.06334 | 2.45811 | -0.00072 | -1674269.15536 | 0.8948279 | 0.8948279 |
-| -584 | -943785.8180 | 0.00378 | -0.12539 | -0.01218 | 1.53599 | 0.00051 | -943784.71924 | 0.9007924 | 0.9007924 |
-| 0 | -730484.3792 | 0.00288 | -0.07549 | -0.00315 | 1.19344 | 0.00055 | -730483.44862 | 0.9025340 | 0.9025340 |
-| 1246 | -275392.6110 | 0.00105 | -0.01081 | 0.00396 | 0.43630 | 0.00027 | -275392.21132 | 0.9062499 | 0.9062499 |
+| -10000 | -4382906.2754 | 0.02155 | -2.17476 | -0.15117 | 0.14914 | 0.00306 | -4382914.79205 | 0.8727114 | 0.8727115 |
+| -2584 | -1674270.1972 | 0.00702 | -0.38503 | -0.06334 | 2.45896 | -0.00072 | -1674269.15443 | 0.8948279 | 0.8948279 |
+| -584 | -943785.8180 | 0.00378 | -0.12539 | -0.01218 | 1.53591 | 0.00051 | -943784.71995 | 0.9007924 | 0.9007924 |
+| 0 | -730484.3792 | 0.00288 | -0.07549 | -0.00315 | 1.19328 | 0.00055 | -730483.44931 | 0.9025340 | 0.9025340 |
+| 1246 | -275392.6110 | 0.00105 | -0.01081 | 0.00396 | 0.43630 | 0.00027 | -275392.21156 | 0.9062499 | 0.9062499 |
 | 2000 | 0.0000 | 0.00000 | 0.00000 | -0.00000 | -0.00000 | 0.00000 | 0.00014 | 0.9084985 | 0.9084985 |
-| 5000 | 1095726.5688 | -0.00379 | -0.16868 | -0.05919 | -1.11594 | -0.00006 | 1095724.72671 | 0.9174453 | 0.9174453 |
-| 10000 | 2921937.5169 | -0.00868 | -1.08615 | -0.13416 | -0.10744 | 0.00041 | 2921932.91257 | 0.9323565 | 0.9323565 |
+| 5000 | 1095726.5688 | -0.00379 | -0.16868 | -0.05919 | -1.11610 | -0.00006 | 1095724.72621 | 0.9174453 | 0.9174453 |
+| 10000 | 2921937.5169 | -0.00868 | -1.08615 | -0.13416 | -0.10738 | 0.00041 | 2921932.91132 | 0.9323565 | 0.9323565 |
 
 
 | year | retired device − shipped crossing (min): VE · SS · AE · WS |
 |---|---|
-| -10000 | 9332.1 · 9167.3 · 9405.2 · 9579.8 |
-| -2584 | 1413.5 · 1402.8 · 1369.2 · 1375.0 |
-| -584 | 418.4 · 437.7 · 437.9 · 417.1 |
-| 0 | 266.2 · 270.2 · 272.9 · 264.5 |
-| 1246 | 36.5 · 44.8 · 47.9 · 49.5 |
+| -10000 | 9330.3 · 9164.8 · 9403.6 · 9578.8 |
+| -2584 | 1414.1 · 1402.7 · 1367.3 · 1373.7 |
+| -584 | 418.8 · 438.6 · 436.7 · 415.5 |
+| 0 | 266.3 · 270.9 · 272.2 · 263.2 |
+| 1246 | 36.5 · 45.2 · 47.9 · 49.0 |
 | 2000 | 0.9 · -0.2 · -5.0 · -2.4 |
-| 5000 | 684.1 · 712.1 · 712.1 · 688.2 |
-| 10000 | 4493.5 · 4706.4 · 5005.5 · 4775.1 |
+| 5000 | 683.5 · 712.5 · 713.0 · 687.9 |
+| 10000 | 4494.9 · 4708.3 · 5005.9 · 4775.0 |
 
 Plan 06 R1: this decomposition is the RETIRED device's (the record — its coefficients stay in the file); the shipped `cardinal.jd` is the apparent crossing of the one Sun, and the second table is the measured gap between the two (the 2000 row is the anchor convention: the device was pinned to the USNO instants, the crossing carries the mean-longitude anchor L0 and aberration/nutation derived). The six component columns sum to the eighth exactly. Every term is zero at 2000 by construction — the self-correction δ_X(2000) pins the anchor.
 <!-- /generated:calcmap-cardinal-decomposition -->
@@ -796,14 +796,14 @@ The four events and the year lengths:
 <!-- generated:calcmap-cardinal-events -->
 | year | VE | SS | AE | WS | SS→SS interval (d) | `yearLengthDays(SS)` (d, the crossing interval — the same quantity since R1) | mean of four (d) | one-family mean tropical year (s) | e |
 |---|---|---|---|---|---|---|---|---|---|
-| -10000 | -10000 03-19 12:40 | -10000 06-16 06:45 | -10000 09-13 15:03 | -10000 12-16 12:17 | 365.244460 | 365.244460 | 365.243547 | 31556957.02 | 0.01963 |
-| -2584 | -2584 03-21 18:01 | -2584 06-23 22:04 | -2584 09-22 04:14 | -2584 12-19 16:13 | 365.243899 | 365.243899 | 365.242783 | 31556947.70 | 0.01834 |
-| -584 | -584 03-21 04:50 | -584 06-23 08:32 | -584 09-23 08:00 | -584 12-20 20:18 | 365.241648 | 365.241648 | 365.242533 | 31556938.71 | 0.01770 |
-| 0 | 0 03-20 15:52 | 0 06-22 15:02 | 0 09-23 01:48 | 0 12-20 18:24 | 365.243504 | 365.243504 | 365.242457 | 31556935.79 | 0.01750 |
-| 1246 | 1246 03-20 13:53 | 1246 06-21 20:44 | 1246 09-23 03:40 | 1246 12-21 11:32 | 365.240335 | 365.240335 | 365.242292 | 31556929.30 | 0.01701 |
+| -10000 | -10000 03-19 12:43 | -10000 06-16 06:47 | -10000 09-13 15:04 | -10000 12-16 12:19 | 365.244459 | 365.244459 | 365.243547 | 31556957.02 | 0.01964 |
+| -2584 | -2584 03-21 18:00 | -2584 06-23 22:06 | -2584 09-22 04:17 | -2584 12-19 16:13 | 365.243898 | 365.243898 | 365.242783 | 31556947.69 | 0.01835 |
+| -584 | -584 03-21 04:50 | -584 06-23 08:31 | -584 09-23 08:01 | -584 12-20 20:20 | 365.241647 | 365.241647 | 365.242533 | 31556938.71 | 0.01770 |
+| 0 | 0 03-20 15:53 | 0 06-22 15:01 | 0 09-23 01:48 | 0 12-20 18:26 | 365.243504 | 365.243504 | 365.242457 | 31556935.79 | 0.01749 |
+| 1246 | 1246 03-20 13:53 | 1246 06-21 20:43 | 1246 09-23 03:40 | 1246 12-21 11:32 | 365.240335 | 365.240335 | 365.242292 | 31556929.29 | 0.01701 |
 | 2000 | 2000 03-20 07:35 | 2000 06-21 01:48 | 2000 09-22 17:28 | 2000 12-21 13:37 | 365.242507 | 365.242507 | 365.242190 | 31556925.25 | 0.01670 |
-| 5000 | 5000 03-20 08:51 | 5000 06-18 19:14 | 5000 09-20 12:01 | 5000 12-21 15:41 | 365.247241 | 365.247241 | 365.241779 | 31556909.69 | 0.01533 |
-| 10000 | 10000 03-16 15:08 | 10000 06-13 23:42 | 10000 09-12 15:21 | 10000 12-14 22:18 | 365.239194 | 365.239194 | 365.241156 | 31556893.06 | 0.01261 |
+| 5000 | 5000 03-20 08:51 | 5000 06-18 19:14 | 5000 09-20 12:00 | 5000 12-21 15:41 | 365.247241 | 365.247241 | 365.241779 | 31556909.68 | 0.01533 |
+| 10000 | 10000 03-16 15:06 | 10000 06-13 23:40 | 10000 09-12 15:21 | 10000 12-14 22:18 | 365.239195 | 365.239195 | 365.241156 | 31556893.05 | 0.01261 |
 
 Dates on the proleptic Gregorian calendar from the TRUE-UT JD of the APPARENT crossing of the one Sun (since plan 06 R3 item 2 the finder-axis root minus the deltaTStart bridge — before it the published instants were 0.9 min late) (plan 06 R1 — formerly the retired device's JD); the `year` argument is the calendar year of the event. The single-year intervals carry nutation and the short-period terms (they match Meeus ch. 27's successive instants to seconds); the mean tropical year is the one-family column.
 <!-- /generated:calcmap-cardinal-events -->
@@ -813,12 +813,12 @@ The e(t)-spread by both devices, the anomalistic year, the RA:
 <!-- generated:calcmap-cardinal-spread -->
 | year | crossing intervals: T_X − mean (s) VE · SS · AE · WS | one-source structure: T_X − mean (s) VE · SS · AE · WS | structure anomalistic year (s) | RA of VE (°) — the target by construction since R1 | e |
 |---|---|---|---|---|---|
-| -10000 | 399.7 · 78.8 · -346.4 · 21.4 | 7.9 · 55.0 · -6.3 · -56.6 | 31558390.20 | 0.0000 | 0.01963 |
-| -2584 | 356.1 · 96.4 · 404.1 · -64.9 | -48.1 · -25.1 · 47.2 · 26.0 | 31558418.37 | 0.0000 | 0.01834 |
-| 0 | 55.4 · 90.5 · 25.2 · 169.5 | -15.0 · -50.5 · 16.1 · 49.4 | 31558428.28 | 0.0000 | 0.01750 |
-| 2000 | 400.5 · 27.4 · -734.8 · -274.6 | 16.0 · -48.6 · -14.9 · 47.5 | 31558432.60 | 0.0000 | 0.01670 |
-| 5000 | 218.0 · 471.9 · -195.9 · -117.6 | 44.2 · -15.1 · -45.0 · 15.8 | 31558440.55 | 0.0000 | 0.01533 |
-| 10000 | 221.0 · -169.5 · -732.5 · -347.4 | 12.7 · 37.7 · -12.2 · -38.3 | 31558461.49 | 0.0000 | 0.01261 |
+| -10000 | 399.4 · 78.8 · -346.6 · 21.3 | 7.8 · 55.0 · -6.2 · -56.7 | 31558390.88 | 0.0000 | 0.01964 |
+| -2584 | 356.1 · 96.3 · 404.0 · -64.7 | -48.1 · -25.1 · 47.2 · 26.0 | 31558419.18 | 0.0000 | 0.01835 |
+| 0 | 55.5 · 90.5 · 25.2 · 169.5 | -15.0 · -50.5 · 16.0 · 49.4 | 31558426.89 | 0.0000 | 0.01749 |
+| 2000 | 400.5 · 27.4 · -734.8 · -274.6 | 16.0 · -48.6 · -14.9 · 47.5 | 31558432.38 | 0.0000 | 0.01670 |
+| 5000 | 218.1 · 471.9 · -195.9 · -117.6 | 44.2 · -15.0 · -45.0 · 15.8 | 31558440.67 | 0.0000 | 0.01533 |
+| 10000 | 221.0 · -169.4 · -732.6 · -347.3 | 12.8 · 37.7 · -12.2 · -38.2 | 31558460.65 | 0.0000 | 0.01261 |
 
 Retired device's RA formula constants (the record; since R1 the shipped RA is the target longitude by construction): raMean = base − earthRAAngle/sin ε̄ = base − 3.157955°, amplitude A/sin ε̄ = 1.600721° on −sin(2π·3·c) + sin(2π·8·c) (base 0/90/180/270° for VE/SS/AE/WS). Balanced year used by both devices: -302635.00000.
 <!-- /generated:calcmap-cardinal-spread -->

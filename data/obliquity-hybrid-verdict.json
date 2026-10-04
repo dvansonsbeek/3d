@@ -3,85 +3,85 @@
  "verdict": {
   "alphaArcsecPerYr": 54.81121681698938,
   "psiDotH13ArcsecPerYr": 50.28831266926504,
-  "rateSeriesArcsecPerCy": -46.794405249141846,
-  "rateFullArcsecPerCy": -38.91352679300795,
-  "rateEraArcsecPerCy": -47.99866880899728,
+  "rateSeriesArcsecPerCy": -46.78709371251131,
+  "rateFullArcsecPerCy": -38.91379242264463,
+  "rateEraArcsecPerCy": -47.99890774472928,
   "iauRateArcsecPerCy": -46.836769,
-  "beatKyr": 41.224350863857005,
+  "beatKyr": 41.22435093824844,
   "zetaTermsFull": 16,
   "zetaTermsEra": 8,
   "windowsFull": {
    "13": {
-    "hybridRmsArcsec": 529.2786192515939,
-    "hybridCorr": 0.9948654246290807,
+    "hybridRmsArcsec": 529.2713161680445,
+    "hybridCorr": 0.9948651054702462,
     "fittedLawRmsArcsec": 529.6750388392322,
     "fittedLawCorr": 0.9948193703072242
    },
    "50": {
-    "hybridRmsArcsec": 388.5273440905841,
-    "hybridCorr": 0.998128486252185,
+    "hybridRmsArcsec": 388.52871616462585,
+    "hybridCorr": 0.9981285425802966,
     "fittedLawRmsArcsec": 388.8424278556015,
     "fittedLawCorr": 0.9981050946902329
    },
    "130": {
-    "hybridRmsArcsec": 380.01465778207796,
-    "hybridCorr": 0.9961737997066801,
+    "hybridRmsArcsec": 380.019595407789,
+    "hybridCorr": 0.996173749692772,
     "fittedLawRmsArcsec": 381.21130524889645,
     "fittedLawCorr": 0.9960859975935684
    },
    "270": {
-    "hybridRmsArcsec": 429.67846069522835,
-    "hybridCorr": 0.9924333051642124,
+    "hybridRmsArcsec": 429.68936064970273,
+    "hybridCorr": 0.9924328058189807,
     "fittedLawRmsArcsec": 453.1146277571114,
     "fittedLawCorr": 0.9908621986462298
    },
    "600": {
-    "hybridRmsArcsec": 587.3971637408473,
-    "hybridCorr": 0.9731804759080359,
+    "hybridRmsArcsec": 587.416255944484,
+    "hybridCorr": 0.9731785529465661,
     "fittedLawRmsArcsec": 646.3333872510794,
     "fittedLawCorr": 0.9662036702845237
    },
    "1000": {
-    "hybridRmsArcsec": 687.2742682711519,
-    "hybridCorr": 0.9481071441969516,
+    "hybridRmsArcsec": 687.2949095431939,
+    "hybridCorr": 0.9481038129063416,
     "fittedLawRmsArcsec": 769.4334067235466,
     "fittedLawCorr": 0.9325784138198311
    }
   },
   "windowsEra": {
    "13": {
-    "hybridRmsArcsec": 49.975927492688804,
-    "hybridCorr": 0.999829419507291,
+    "hybridRmsArcsec": 49.96516385050455,
+    "hybridCorr": 0.9998294196417337,
     "fittedLawRmsArcsec": 529.6750388392322,
     "fittedLawCorr": 0.9948193703072242
    },
    "50": {
-    "hybridRmsArcsec": 426.7100713884221,
-    "hybridCorr": 0.9905757160221264,
+    "hybridRmsArcsec": 426.7062801313648,
+    "hybridCorr": 0.9905757425369925,
     "fittedLawRmsArcsec": 388.8424278556015,
     "fittedLawCorr": 0.9981050946902329
    },
    "130": {
-    "hybridRmsArcsec": 488.4096711860342,
-    "hybridCorr": 0.9820421110156291,
+    "hybridRmsArcsec": 488.406410276667,
+    "hybridCorr": 0.9820422947175481,
     "fittedLawRmsArcsec": 381.21130524889645,
     "fittedLawCorr": 0.9960859975935684
    },
    "270": {
-    "hybridRmsArcsec": 489.89651907526843,
-    "hybridCorr": 0.9821108135739055,
+    "hybridRmsArcsec": 489.89340712978634,
+    "hybridCorr": 0.982110983196137,
     "fittedLawRmsArcsec": 453.1146277571114,
     "fittedLawCorr": 0.9908621986462298
    },
    "600": {
-    "hybridRmsArcsec": 548.2839546081985,
-    "hybridCorr": 0.9724062543335538,
+    "hybridRmsArcsec": 548.2813054176148,
+    "hybridCorr": 0.9724064695872137,
     "fittedLawRmsArcsec": 646.3333872510794,
     "fittedLawCorr": 0.9662036702845237
    },
    "1000": {
-    "hybridRmsArcsec": 644.4456434025797,
-    "hybridCorr": 0.9495619707894856,
+    "hybridRmsArcsec": 644.444974667402,
+    "hybridCorr": 0.9495619191574651,
     "fittedLawRmsArcsec": 769.4334067235466,
     "fittedLawCorr": 0.9325784138198311
    }
@@ -91,8 +91,8 @@
   "generator": "node tools/verify/obliquity-hybrid.js --write",
   "files": {
    "data/la2004-earth-51myr-back.asc": "sha256:3f13b9f8e69085baf40bc67a2669e6f6af4148fef9218ed2158772aa91e35f8c",
-   "data/nbody-deep-secular-modes.json": "sha256:cbdc477b7442c333645eb435c728fe0c1f93e2973a0ed4ba7e0725ea6d0267db",
-   "data/nbody-secular-series.json": "sha256:9193b7b0310fdc7bcc8ef6a4b481d64ef1a4c162353fc3842e628878f08821f9",
+   "data/nbody-deep-secular-modes.json": "sha256:7633dd8f434fd6fc1ddaf07fd3ec3623e91e09322002ec08d53b8a12e6883fb7",
+   "data/nbody-secular-series.json": "sha256:35dfc98b8b5e68d4fc0f6f9d9f80f7f863e5660db7eb843ac1c9bdde8b00e693",
    "packages/physics/src/deltat/deep-time.cjs": "sha256:42334b8c071a8d320312ad8f116c95360501f055757cbf1888d4822f708ace47",
    "packages/physics/src/earth/deep-orbital-history.cjs": "sha256:352053008614a9bba087d5f5c7d493eaff6566b51476b1e9bcb55df971f974c7",
    "packages/physics/src/earth/precession-composed.cjs": "sha256:7f30ac5597b745a88b453c54bb47da39e5ec3c8bb8b349e34e8a15752c04a208",

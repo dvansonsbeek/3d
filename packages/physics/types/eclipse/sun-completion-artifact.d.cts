@@ -35,4 +35,4 @@ export const SUN_COMPLETION_ARTIFACT: Readonly<{
         source: string;
     };
 }>;
-export const SUN_COMPLETION_ARTIFACT_HASH: "5ad17b275a003f6e";
+export const SUN_COMPLETION_ARTIFACT_HASH: "e7a389dbfe3551f9";

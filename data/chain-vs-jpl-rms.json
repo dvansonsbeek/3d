@@ -9,104 +9,104 @@
     "mercury": {
       "buckets": {
         "<1600": {
-          "rmsDeg": 0.021933,
-          "rmsArcsec": 79,
+          "rmsDeg": 0.021905,
+          "rmsArcsec": 78.9,
           "n": 1
         },
         "1600-1699": {
-          "rmsDeg": 0.023511,
-          "rmsArcsec": 84.6,
+          "rmsDeg": 0.023448,
+          "rmsArcsec": 84.4,
           "n": 2510
         },
         "1700-1799": {
-          "rmsDeg": 0.016601,
-          "rmsArcsec": 59.8,
+          "rmsDeg": 0.01648,
+          "rmsArcsec": 59.3,
           "n": 2514
         },
         "1800-1899": {
-          "rmsDeg": 0.010014,
+          "rmsDeg": 0.010012,
           "rmsArcsec": 36,
           "n": 1263
         },
         "1900-1999": {
-          "rmsDeg": 0.004136,
-          "rmsArcsec": 14.9,
+          "rmsDeg": 0.004114,
+          "rmsArcsec": 14.8,
           "n": 1267
         },
         "2000-2099": {
-          "rmsDeg": 0.004515,
-          "rmsArcsec": 16.3,
+          "rmsDeg": 0.004398,
+          "rmsArcsec": 15.8,
           "n": 1379
         },
         "2100-2199": {
-          "rmsDeg": 0.010142,
-          "rmsArcsec": 36.5,
+          "rmsDeg": 0.010008,
+          "rmsArcsec": 36,
           "n": 1283
         },
         "2200-2299": {
-          "rmsDeg": 0.015483,
-          "rmsArcsec": 55.7,
+          "rmsDeg": 0.015329,
+          "rmsArcsec": 55.2,
           "n": 2501
         },
         "2300-2399": {
-          "rmsDeg": 0.020619,
-          "rmsArcsec": 74.2,
+          "rmsDeg": 0.020235,
+          "rmsArcsec": 72.8,
           "n": 2500
         }
       },
       "refWindow": "2000-2099",
-      "refRmsArcsec": 16.3
+      "refRmsArcsec": 15.8
     },
     "venus": {
       "buckets": {
         "<1600": {
-          "rmsDeg": 0.109931,
-          "rmsArcsec": 395.8,
+          "rmsDeg": 0.109804,
+          "rmsArcsec": 395.3,
           "n": 1
         },
         "1600-1699": {
-          "rmsDeg": 0.026968,
-          "rmsArcsec": 97.1,
+          "rmsDeg": 0.026829,
+          "rmsArcsec": 96.6,
           "n": 2501
         },
         "1700-1799": {
-          "rmsDeg": 0.019438,
-          "rmsArcsec": 70,
+          "rmsDeg": 0.019143,
+          "rmsArcsec": 68.9,
           "n": 2503
         },
         "1800-1899": {
-          "rmsDeg": 0.01191,
-          "rmsArcsec": 42.9,
+          "rmsDeg": 0.011931,
+          "rmsArcsec": 43,
           "n": 1252
         },
         "1900-1999": {
-          "rmsDeg": 0.006568,
-          "rmsArcsec": 23.6,
+          "rmsDeg": 0.006517,
+          "rmsArcsec": 23.5,
           "n": 1253
         },
         "2000-2099": {
-          "rmsDeg": 0.008975,
-          "rmsArcsec": 32.3,
+          "rmsDeg": 0.008543,
+          "rmsArcsec": 30.8,
           "n": 3234
         },
         "2100-2199": {
-          "rmsDeg": 0.018718,
-          "rmsArcsec": 67.4,
+          "rmsDeg": 0.018191,
+          "rmsArcsec": 65.5,
           "n": 3162
         },
         "2200-2299": {
-          "rmsDeg": 0.018426,
-          "rmsArcsec": 66.3,
+          "rmsDeg": 0.018125,
+          "rmsArcsec": 65.2,
           "n": 2507
         },
         "2300-2399": {
-          "rmsDeg": 0.025117,
-          "rmsArcsec": 90.4,
+          "rmsDeg": 0.024423,
+          "rmsArcsec": 87.9,
           "n": 2500
         }
       },
       "refWindow": "2000-2099",
-      "refRmsArcsec": 32.3
+      "refRmsArcsec": 30.8
     },
     "moon": {
       "buckets": {
@@ -127,78 +127,78 @@
     "mars": {
       "buckets": {
         "1600-1699": {
-          "rmsDeg": 0.017889,
-          "rmsArcsec": 64.4,
+          "rmsDeg": 0.017781,
+          "rmsArcsec": 64,
           "n": 2458
         },
         "1700-1799": {
-          "rmsDeg": 0.015073,
-          "rmsArcsec": 54.3,
+          "rmsDeg": 0.014914,
+          "rmsArcsec": 53.7,
           "n": 2500
         },
         "1800-1899": {
-          "rmsDeg": 0.011437,
+          "rmsDeg": 0.011434,
           "rmsArcsec": 41.2,
           "n": 1251
         },
         "1900-1999": {
-          "rmsDeg": 0.010334,
-          "rmsArcsec": 37.2,
+          "rmsDeg": 0.010305,
+          "rmsArcsec": 37.1,
           "n": 1300
         },
         "2000-2099": {
-          "rmsDeg": 0.009945,
-          "rmsArcsec": 35.8,
+          "rmsDeg": 0.009917,
+          "rmsArcsec": 35.7,
           "n": 1409
         },
         "2100-2199": {
-          "rmsDeg": 0.010742,
-          "rmsArcsec": 38.7,
+          "rmsDeg": 0.010703,
+          "rmsArcsec": 38.5,
           "n": 1317
         },
         "2200-2299": {
-          "rmsDeg": 0.012591,
-          "rmsArcsec": 45.3,
+          "rmsDeg": 0.01251,
+          "rmsArcsec": 45,
           "n": 2501
         },
         "2300-2399": {
-          "rmsDeg": 0.01501,
-          "rmsArcsec": 54,
+          "rmsDeg": 0.014783,
+          "rmsArcsec": 53.2,
           "n": 2500
         }
       },
       "refWindow": "2000-2099",
-      "refRmsArcsec": 35.8
+      "refRmsArcsec": 35.7
     },
     "jupiter": {
       "buckets": {
         "1600-1699": {
-          "rmsDeg": 0.003954,
-          "rmsArcsec": 14.2,
+          "rmsDeg": 0.003929,
+          "rmsArcsec": 14.1,
           "n": 2465
         },
         "1700-1799": {
-          "rmsDeg": 0.003741,
-          "rmsArcsec": 13.5,
+          "rmsDeg": 0.003728,
+          "rmsArcsec": 13.4,
           "n": 2505
         },
         "1800-1899": {
-          "rmsDeg": 0.003126,
+          "rmsDeg": 0.003125,
           "rmsArcsec": 11.3,
           "n": 1256
         },
         "1900-1999": {
-          "rmsDeg": 0.002806,
+          "rmsDeg": 0.002805,
           "rmsArcsec": 10.1,
           "n": 1262
         },
         "2000-2099": {
-          "rmsDeg": 0.002645,
+          "rmsDeg": 0.002644,
           "rmsArcsec": 9.5,
           "n": 2577
         },
         "2100-2199": {
-          "rmsDeg": 0.002871,
+          "rmsDeg": 0.002868,
           "rmsArcsec": 10.3,
           "n": 2495
         }
@@ -209,32 +209,32 @@
     "saturn": {
       "buckets": {
         "1700-1799": {
-          "rmsDeg": 0.00905,
+          "rmsDeg": 0.009066,
           "rmsArcsec": 32.6,
           "n": 1253
         },
         "1800-1899": {
-          "rmsDeg": 0.006346,
-          "rmsArcsec": 22.8,
+          "rmsDeg": 0.00635,
+          "rmsArcsec": 22.9,
           "n": 1257
         },
         "1900-1999": {
-          "rmsDeg": 0.004587,
+          "rmsDeg": 0.004588,
           "rmsArcsec": 16.5,
           "n": 1262
         },
         "2000-2099": {
-          "rmsDeg": 0.003966,
+          "rmsDeg": 0.003965,
           "rmsArcsec": 14.3,
           "n": 2571
         },
         "2100-2199": {
-          "rmsDeg": 0.006429,
+          "rmsDeg": 0.006423,
           "rmsArcsec": 23.1,
           "n": 2494
         },
         "2200-2299": {
-          "rmsDeg": 0.009031,
+          "rmsDeg": 0.009015,
           "rmsArcsec": 32.5,
           "n": 1257
         }
@@ -245,18 +245,18 @@
     "uranus": {
       "buckets": {
         "1600-1699": {
-          "rmsDeg": 0.005048,
+          "rmsDeg": 0.005059,
           "rmsArcsec": 18.2,
           "n": 2451
         },
         "1700-1799": {
-          "rmsDeg": 0.00496,
+          "rmsDeg": 0.004972,
           "rmsArcsec": 17.9,
           "n": 2502
         },
         "1800-1899": {
-          "rmsDeg": 0.005346,
-          "rmsArcsec": 19.2,
+          "rmsDeg": 0.00535,
+          "rmsArcsec": 19.3,
           "n": 1250
         },
         "1900-1999": {
@@ -265,23 +265,23 @@
           "n": 1253
         },
         "2000-2099": {
-          "rmsDeg": 0.004687,
+          "rmsDeg": 0.004688,
           "rmsArcsec": 16.9,
           "n": 1359
         },
         "2100-2199": {
-          "rmsDeg": 0.003419,
+          "rmsDeg": 0.003421,
           "rmsArcsec": 12.3,
           "n": 1270
         },
         "2200-2299": {
-          "rmsDeg": 0.005534,
-          "rmsArcsec": 19.9,
+          "rmsDeg": 0.005547,
+          "rmsArcsec": 20,
           "n": 2501
         },
         "2300-2399": {
-          "rmsDeg": 0.004942,
-          "rmsArcsec": 17.8,
+          "rmsDeg": 0.00497,
+          "rmsArcsec": 17.9,
           "n": 2450
         }
       },
@@ -291,12 +291,12 @@
     "neptune": {
       "buckets": {
         "1600-1699": {
-          "rmsDeg": 0.002989,
+          "rmsDeg": 0.002992,
           "rmsArcsec": 10.8,
           "n": 2452
         },
         "1700-1799": {
-          "rmsDeg": 0.003573,
+          "rmsDeg": 0.003571,
           "rmsArcsec": 12.9,
           "n": 2506
         },
@@ -316,17 +316,17 @@
           "n": 1364
         },
         "2100-2199": {
-          "rmsDeg": 0.002634,
+          "rmsDeg": 0.002637,
           "rmsArcsec": 9.5,
           "n": 1271
         },
         "2200-2299": {
-          "rmsDeg": 0.002798,
+          "rmsDeg": 0.002802,
           "rmsArcsec": 10.1,
           "n": 2501
         },
         "2300-2399": {
-          "rmsDeg": 0.002656,
+          "rmsDeg": 0.002677,
           "rmsArcsec": 9.6,
           "n": 2500
         }
@@ -340,7 +340,7 @@
     "files": {
       "data/jpl-cache.json": "sha256:221582af7d1e956fd20e58a2b32f2c956a6d1ec1f8d17d3f24c7730a269205d1",
       "packages/physics/src/moon/ecc-channel.cjs": "sha256:e986b8ca3dbfdaa8508f49f315bc81718503b91eb56298d9ad4d7c29186fc691",
-      "packages/physics/src/planets/chain-artifact.js": "sha256:f274782fb51df2c52034733cad4e3e7563502951b09dd7358e1fd299c584dd13",
+      "packages/physics/src/planets/chain-artifact.js": "sha256:dcaf0c1dae34d5d865f0ead14fe770a9492de164048a009fec31f9867fab7054",
       "packages/physics/src/planets/keplerian-chain.cjs": "sha256:c4a5e7d74e672ed22a21dc25961385a870411e9c67173007d8da29694f2286fd",
       "tools/lib/scene-graph.js": "sha256:9fa6e516b3b307f287d1232aa4c9ea9f0a5934eb2995e1f131eab5b55cba38a4",
       "tools/verify/measure-rms-by-epoch.js": "sha256:b19c35ca9ce42b0a69cc3226062e8184c1679016995386e5005dc9053803fa59"

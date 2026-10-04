@@ -1,7 +1,7 @@
 ---
 docVersion: 1.0
-modelVersion: v16.1
-coefficients: sha256:bb6a03c877eedab8
+modelVersion: v16.2
+coefficients: sha256:96f7a2194ea29f0e
 status: current
 ---
 
@@ -94,8 +94,8 @@ The climate formula's orbital lines against the Cenozoic isotope record (the com
 ## C. Historical era — gate- and artifact-backed
 
 - **Babylonian eclipse case study (−135)** — the framework places the
-  totality path <!--v:babylon135BestGapKm-->177<!--/v--> km from Babylon at
-  ΔUT <!--v:babylon135BestDeltaUT-->-0h54<!--/v--> (framework
+  totality path <!--v:babylon135BestGapKm-->169<!--/v--> km from Babylon at
+  ΔUT <!--v:babylon135BestDeltaUT-->-0h53<!--/v--> (framework
   <!--v:babylon135FrameworkUT-->06:05<!--/v--> vs documented
   <!--v:babylon135DocumentedUT-->06:14<!--/v-->):
   [doc 103](103-135-babylonian-case-study.md), eclipse-audit artifacts under
@@ -116,9 +116,9 @@ The climate formula's orbital lines against the Cenozoic isotope record (the com
   documented visibility regions vs the api observer tier
   (<!--v:lunarVisibilityInsideAgree-->14<!--/v-->/<!--v:lunarVisibilityChecked-->14<!--/v-->
   both directions); the −746 Feb 6 Babylonian partial (magnitude
-  <!--v:lunarBabylon746MagnitudeUmbral-->0.914<!--/v--> vs canon
+  <!--v:lunarBabylon746MagnitudeUmbral-->0.916<!--/v--> vs canon
   <!--v:lunarBabylon746CanonMagnitudeUmbral-->0.920<!--/v-->, visible from
-  Babylon at <!--v:lunarBabylon746AltitudeDeg-->35.2<!--/v-->°); the
+  Babylon at <!--v:lunarBabylon746AltitudeDeg-->35.3<!--/v-->°); the
   <!--v:lunarDtBandsN-->267<!--/v--> raw Stephenson-2016 timing reductions
   (framework ΔT mean abs <!--v:lunarDtBandsFrameworkMeanAbsSeconds-->1,211<!--/v--> s —
   statistically identical to Stephenson's own fitted spline at
@@ -130,7 +130,7 @@ The climate formula's orbital lines against the Cenozoic isotope record (the com
   <!--v:lunarDtBoundsBabylon135HighSeconds-->12,140<!--/v-->] s contains the
   framework's <!--v:lunarDtBoundsBabylon135FrameworkSeconds-->12,028<!--/v--> s);
   and the measured framework-vs-ELP lunar-theory drift
-  (Δṅ ≈ <!--v:lunarTheoryDriftDeltaNdot-->0.25<!--/v--> ″/cy²) with the
+  (Δṅ ≈ <!--v:lunarTheoryDriftDeltaNdot-->0.24<!--/v--> ″/cy²) with the
   PRE-REGISTERED re-reduction prediction pinned before the contact-time
   machinery existed — and now MEASURED against it: the Phase C
   differential re-reduction (69/75 Babylonian observations identified)
@@ -143,9 +143,9 @@ The climate formula's orbital lines against the Cenozoic isotope record (the com
   ϖ(t) (the banked N-body series), and the derived planetary completion
   (the Sun's long inequalities from the model's own engine), shared by
   all three runtimes. Against JPL Horizons over ±3000 yr it reads
-  <!--v:sunVsHorizonsMeanArcsec-->2.49<!--/v-->″ mean / <!--v:sunVsHorizonsSdArcsec-->3.32<!--/v-->″ sd
+  <!--v:sunVsHorizonsMeanArcsec-->1.74<!--/v-->″ mean / <!--v:sunVsHorizonsSdArcsec-->2.06<!--/v-->″ sd
   (modern sd <!--v:sunVsHorizonsModernSdArcsec-->0.78<!--/v-->″); the Babylon −135 umbra
-  track sits <!--v:babylon135BestGapKm-->177<!--/v--> km from the documented
+  track sits <!--v:babylon135BestGapKm-->169<!--/v--> km from the documented
   station — [doc 103](103-135-babylonian-case-study.md). The era-device
   Sun assembly this bullet once described (the H/16 eccentricity
   channel, the H/3 coupling and the cos-ε torque term on the

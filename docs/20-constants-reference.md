@@ -1,7 +1,7 @@
 ---
 docVersion: 1.0
-modelVersion: v16.1
-coefficients: sha256:bb6a03c877eedab8
+modelVersion: v16.2
+coefficients: sha256:96f7a2194ea29f0e
 status: current
 ---
 
@@ -282,11 +282,11 @@ These are computed from foundational constants. The formula is the definition; t
 
 | Cycle | Formula | Period (years) | Direction |
 |-------|---------|----------------|-----------|
-| Apsidal Precession | H / 3 | <!--v:inclPrecYears-->~111,582<!--/v--> | Counter-clockwise |
+| Apsidal Precession | H / 3 | <!--v:inclPrecYears-->~111,667<!--/v--> | Counter-clockwise |
 | Ecliptic Precession | H / 5 | <!--v:eclPrecYears-->~68,751<!--/v--> | Counter-clockwise |
 | Obliquity Cycle | H / 8 | <!--v:obliqCycleYears-->~41,224<!--/v--> | Clockwise (negative) |
 | Axial Precession | the of-date year laws' beat at J2000 (route B; the fit-era label H/13 read 25,794, retired as a period — plan 06 S5) | <!--v:axialPrecRound-->~25,771<!--/v--> | Clockwise (negative) |
-| Perihelion Precession | H / 16 | <!--v:periPrecYears-->~20,936<!--/v--> | Both directions |
+| Perihelion Precession | H / 16 | <!--v:periPrecYears-->~20,939<!--/v--> | Both directions |
 
 ## Time Constants
 
@@ -300,7 +300,7 @@ These are computed from foundational constants. The formula is the definition; t
 | Mean Stellar Day | `meanStellarDay` | (meanSiderealDay/T_p) / (meanSolarYearDays+1) · cos ε + meanSiderealDay — T_p the certified J2000 precession period, not the counter H/13 | <!--v:meanStellarDaySeconds-->86,164.0985929<!--/v--> s |
 | Balanced Year | `balancedYear` | perihelionalignmentYear - (14.5 × H/16) | <!--v:balancedYear-->-302,635<!--/v--> |
 | Perihelion Alignment JD | `perihelionalignmentJD` | startmodelJD - meanSolarYearDays × (startModelYearWithCorrection - perihelionalignmentYear) | ~<!--v:periAlignJD-->2,176,153<!--/v--> |
-| Perihelion Cycle Length | `perihelionCycleLength` | H / 16 | <!--v:periPrecYears-->~20,936<!--/v--> years |
+| Perihelion Cycle Length | `perihelionCycleLength` | H / 16 | <!--v:periPrecYears-->~20,939<!--/v--> years |
 | Total Days in H | `totalDaysInH` | H × meanSolarYearDays | ~<!--v:totalDaysInH-->122,471,920<!--/v--> days |
 | J2000.0 epoch JD | `j2000JD` | startmodelJD - (startmodelYear - 2000) × meanSolarYearDays | ~2451545.0 |
 | Julian century | `julianCenturyDays` | 36525 (100 × 365.25) | 36,525 days (IAU Julian century) |
@@ -398,7 +398,7 @@ only (the planet chains ride the orbital dynamics engine); the historical record
 |--------|----------|---------------|-----------|-------------|-------------|
 | Mercury | <!--v:mercuryInclMean-->6.703228<!--/v--> | <!--v:mercuryInclAmp-->0.386501<!--/v--> | 6.32 - 7.09 | <!--v:mercuryInclCycleAnchor-->234.52<!--/v-->° | <!--v:mercuryPeriPeriodICRF-->28,844<!--/v--> yr |
 | Venus | <!--v:venusInclMean-->2.151359<!--/v--> | 0.062165 | 2.09 - 2.21 | <!--v:venusInclCycleAnchor-->218.64<!--/v-->° | <!--v:venusPeriPeriodICRF-->24,387<!--/v--> yr |
-| Earth | <!--v:earthInclMean-->1.48113<!--/v--> | <!--v:earthInclAmp-->0.63607<!--/v--> | 0.85 - 2.12 | <!--v:earthInclCycleAnchor-->21.77<!--/v-->° | H/3 ≈ <!--v:earthPeriPeriodICRF-->111,582<!--/v--> yr |
+| Earth | <!--v:earthInclMean-->1.48113<!--/v--> | <!--v:earthInclAmp-->0.63607<!--/v--> | 0.85 - 2.12 | <!--v:earthInclCycleAnchor-->21.77<!--/v-->° | H/3 ≈ <!--v:earthPeriPeriodICRF-->111,667<!--/v--> yr |
 | Mars | <!--v:marsInclMean-->1.833263<!--/v--> | <!--v:marsInclAmp-->1.164287<!--/v--> | 0.67 - 3.00 | <!--v:marsInclCycleAnchor-->236.07<!--/v-->° | <!--v:marsPeriPeriodICRF-->39,449<!--/v--> yr |
 | Jupiter | <!--v:jupiterInclMean-->0.321086<!--/v--> | <!--v:jupiterInclAmp-->0.021405<!--/v--> | 0.30 - 0.34 | <!--v:jupiterInclCycleAnchor-->287.06<!--/v-->° | <!--v:jupiterPeriPeriodICRF-->41,270<!--/v--> yr |
 | Saturn | <!--v:saturnInclMean-->0.984969<!--/v--> | <!--v:saturnInclAmp-->0.065196<!--/v--> | 0.92 - 1.05 | <!--v:saturnInclCycleAnchor-->116.26<!--/v-->° (anti-phase) | <!--v:saturnPeriPeriodICRF-->15,873<!--/v--> yr |
@@ -426,7 +426,7 @@ only (the planet chains ride the orbital dynamics engine); the historical record
 |--------|---------|----------------|
 | Mercury | Y / (1 + 3/8) | ~<!--v:mercuryPeriPeriod-->243,867<!--/v--> |
 | Venus | −8Y / 6 | ~-<!--v:venusPeriPeriod-->447,089<!--/v--> (retrograde) |
-| Earth | the perihelion-of-date beat (the of-date year laws; the device's Y/16 read 20,957) | <!--v:periPrecYears-->~20,936<!--/v--> |
+| Earth | the perihelion-of-date beat (the of-date year laws; the device's Y/16 read 20,957) | <!--v:periPrecYears-->~20,939<!--/v--> |
 | Mars | Y × 8/36 | ~<!--v:marsPeriPeriod-->74,515<!--/v--> |
 | Jupiter | 8Y / 39 | ~<!--v:jupiterPeriPeriod-->68,783<!--/v--> |
 | Saturn | −8Y / 65 | ~-<!--v:saturnPeriPeriod-->41,270<!--/v--> (retrograde) |

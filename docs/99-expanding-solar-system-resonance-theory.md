@@ -1,7 +1,7 @@
 ---
 docVersion: 1.0
-modelVersion: v16.1
-coefficients: sha256:bb6a03c877eedab8
+modelVersion: v16.2
+coefficients: sha256:96f7a2194ea29f0e
 status: current
 ---
 
@@ -128,7 +128,7 @@ are J2000 readings at Earth's spin–orbit–tide interface — the axial
 precession and the obliquity beat on the spin side, the apsidal and
 perihelion-of-date periods as the epoch-local tangents of the orbital side
 — readings that wander (the apsidal-to-axial ratio runs
-<!--v:lunisolarApsidalPerPrecessionWanderMin-->1.07<!--/v-->–<!--v:lunisolarApsidalPerPrecessionWanderMax-->9.85<!--/v-->
+<!--v:lunisolarApsidalPerPrecessionWanderMin-->1.08<!--/v-->–<!--v:lunisolarApsidalPerPrecessionWanderMax-->9.81<!--/v-->
 across ±26 kyr), not laws.
 
 ### The composition is what nature measures
@@ -594,11 +594,11 @@ L(t) = L₀ + mean tropical rate · t + D(t)          (mean longitude)
    the IAU/Laskar drift expression to 0.1 s over −1000..+3000. THE
    OBSERVATION-CLASS CHECK (plan 06 I1, JPL Horizons' apparent Sun on a
    10-day TT grid over ±3000 yr, <!--v:sunVsHorizonsN-->219,152<!--/v--> instants): the model's apparent
-   Sun sits <!--v:sunVsHorizonsMeanArcsec-->2.49<!--/v-->″ from Horizons on average with sd <!--v:sunVsHorizonsSdArcsec-->3.32<!--/v-->″ over the whole
-   span — near zero in 1000–3000 (<!--v:sunVsHorizonsMeanP1000Arcsec-->2.0<!--/v--> / <!--v:sunVsHorizonsMeanP2000Arcsec-->−0.7<!--/v-->″),
-   <!--v:sunVsHorizonsMeanM2000Arcsec-->3.5<!--/v-->″ at −2000..−1000 (the size of the difference between the model's
+   Sun sits <!--v:sunVsHorizonsMeanArcsec-->1.74<!--/v-->″ from Horizons on average with sd <!--v:sunVsHorizonsSdArcsec-->2.06<!--/v-->″ over the whole
+   span — near zero in 1000–3000 (<!--v:sunVsHorizonsMeanP1000Arcsec-->1.8<!--/v--> / <!--v:sunVsHorizonsMeanP2000Arcsec-->−0.8<!--/v-->″),
+   <!--v:sunVsHorizonsMeanM2000Arcsec-->2.3<!--/v-->″ at −2000..−1000 (the size of the difference between the model's
    equinox of date and Horizons' of-date frame) — and <!--v:sunVsHorizonsModernSdArcsec-->0.78<!--/v-->″ scatter in
-   1970–2049 (mean offset <!--v:sunVsHorizonsModernMeanArcsec-->0.83<!--/v-->″, the L0 anchor and aberration conventions).
+   1970–2049 (mean offset <!--v:sunVsHorizonsModernMeanArcsec-->0.84<!--/v-->″, the L0 anchor and aberration conventions).
 
 **e(t) and ϖ(t)** are the banked N-body series' Earth elements plus the
 derived mean-element offset of the era (doc 110 chain 1.1; plan 06 layer B)
@@ -608,7 +608,7 @@ carries no equinox-referenced period; the perihelion longitude does. The
 cardinal instants are the APPARENT crossings of this Sun (aberration and
 the leading nutation terms applied, both derived) — the former fitted
 cardinal-point model left with R1 (doc 110 chain 5); against Horizons' own
-crossings the instants are <!--v:cardinalVsHorizonsMeanMin-->−1.01<!--/v--> min on average over ±3000 yr, within a
+crossings the instants are <!--v:cardinalVsHorizonsMeanMin-->−0.71<!--/v--> min on average over ±3000 yr, within a
 minute in 1000–3000.
 
 **Accuracy**: <!--v:frameworkSunVsJplRms-->1.03<!--/v-->″ RMS vs JPL over the modern window 1970–2049
@@ -967,9 +967,9 @@ ice-age mass redistribution that changes the polar moment (the α(t) of the
 length-of-day stack) changes it too; the channel is scaled on the observed
 dJ₂/dt (<!--v:j2RateJ2000Per1e11Yr-->−2.7<!--/v--> ×10⁻¹¹ /yr, Cox & Chao 2002) and is bounded, ±<!--v:precOfDateEllipticityAmpLastMyrPct-->0.02<!--/v--> %, with
 no secular part. Theory against theory: the equinox of date holds
-<!--v:equinoxVsVondrakMaxAbsArcsec-->6.6<!--/v-->″ of Vondrák et al. (2011) over ±3000 yr where the secular law alone
-reads <!--v:equinoxSecularOnlyMaxAbsArcsec-->27.2<!--/v-->″, and the obliquity holds <!--v:obliqVsLa2004RmsLastMyrArcsec-->13.7<!--/v-->″ rms of La2004 over the last
-million years where the secular law alone reads <!--v:obliqSecularOnlyVsLa2004RmsLastMyrArcsec-->79.5<!--/v-->″
+<!--v:equinoxVsVondrakMaxAbsArcsec-->5.8<!--/v-->″ of Vondrák et al. (2011) over ±3000 yr where the secular law alone
+reads <!--v:equinoxSecularOnlyMaxAbsArcsec-->26.4<!--/v-->″, and the obliquity holds <!--v:obliqVsLa2004RmsLastMyrArcsec-->13.1<!--/v-->″ rms of La2004 over the last
+million years where the secular law alone reads <!--v:obliqSecularOnlyVsLa2004RmsLastMyrArcsec-->78.9<!--/v-->″
 ([doc 110 §2.3](110-calculation-map.md) carries the formulas). The deep-time
 rows above, the precession gates at 1.4 and 2.46 Ga and the obliquity beat
 are statements of the secular law and do not move.

@@ -1,7 +1,7 @@
 ---
 docVersion: 1.0
-modelVersion: v16.1
-coefficients: sha256:bb6a03c877eedab8
+modelVersion: v16.2
+coefficients: sha256:96f7a2194ea29f0e
 status: current
 ---
 
@@ -433,7 +433,7 @@ The framework's independent validation is the 26-event solar-eclipse
 alignment audit (current certified-chain run): 16/26 with the umbra
 reaching the observation site (3 confirmed at greatest moment + 13
 off-peak alignments — including −135 Babylon at BestGap
-<!--v:babylon135BestGapKm-->177<!--/v--> km and −708 Lu at 9 km),
+<!--v:babylon135BestGapKm-->169<!--/v--> km and −708 Lu at 9 km),
 5/26 regional (framework umbra in same continental band
 but off site), 0/26 with residual ΔT-signal — the framework agrees
 with the documented UT on every event — and 5/26 geographic-class
@@ -537,16 +537,16 @@ month evolution is chain-integrated on the model's own recession history. The `t
 section of the same gate measures the difference directly, on the TT axis
 (framework opposition vs the NASA canon's greatest-eclipse instant, era
 bins ±40 yr, modern definitional baseline subtracted): a smooth secular
-drift reaching <!--v:lunarDrift800Minutes-->−3.1<!--/v--> min at the −750 era
+drift reaching <!--v:lunarDrift800Minutes-->−3.0<!--/v--> min at the −750 era
 and vanishing toward the present — an effective
-Δṅ ≈ <!--v:lunarTheoryDriftDeltaNdot-->0.25<!--/v--> ″/cy² between the two
+Δṅ ≈ <!--v:lunarTheoryDriftDeltaNdot-->0.24<!--/v--> ″/cy² between the two
 theories. A re-reduction of the tablets with the framework's own Moon
 shifts each century's implied ΔT by exactly that drift, which converts
 the one-sided residual column above into sign-mixed, noise-class scatter:
 
 | Century | residual today | **pre-registered** residual after framework re-reduction |
 |---|---:|---:|
-| -800…-701 | <!--v:lunarCentury800ResidualHours-->−0.01<!--/v--> hr | <!--v:lunarPredictedReduced800Minutes-->+2.5<!--/v--> min |
+| -800…-701 | <!--v:lunarCentury800ResidualHours-->−0.01<!--/v--> hr | <!--v:lunarPredictedReduced800Minutes-->+2.4<!--/v--> min |
 | -700…-601 | <!--v:lunarCentury700ResidualHours-->−0.08<!--/v--> hr | <!--v:lunarPredictedReduced700Minutes-->−2.6<!--/v--> min |
 | -600…-501 | <!--v:lunarCentury600ResidualHours-->−0.09<!--/v--> hr | <!--v:lunarPredictedReduced600Minutes-->−2.6<!--/v--> min |
 | -500…-401 | <!--v:lunarCentury500ResidualHours-->−0.18<!--/v--> hr | <!--v:lunarPredictedReduced500Minutes-->−8.5<!--/v--> min |

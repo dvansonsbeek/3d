@@ -234,7 +234,7 @@ const TERMS = [
   // J2000 against Horizons' modern window; this row 0.74 → 0.83″ mean with the
   // scatter 0.94 → 0.78″), and the row is a LOCAL description of the
   // Horizons-certified era (≈1″ beyond it).
-  [[0, 8, -13, 0, 0, 0], [0, 0, 0, 0, 0, 0], 1.4825, 0.9436],
+  [[0, 8, -13, 0, 0, 0], [0, 0, 0, 0, 0, 0], 1.4825, 0.9435],
 ];
 
 /**
@@ -267,13 +267,19 @@ const TERMS = [
  * thousands of ″/e and failed the window test); only the composed function
  * ships, as for the ±M sideband pairs. Beyond ±50 kyr the e-vectors are held at
  * the grid's ends (bounded, the former constant-row class).
+ * RE-DERIVED on the running-mean series (the mean=1 dump; `2 20000 3100 4`):
+ * the carriers moved in their 9th digit and the embedded e-vectors by ~1e-5
+ * (the point-sampling alias gone), so the near-collinear a_X/b_X moved ~0.5 %
+ * while the COMPOSED function held — J2000 amplitude 6.87″ on ±20 kyr, 6.87″
+ * on ±3100, 6.87″ at dt/2; band left 0.09″ inside ±3100 and 0.13/0.10″
+ * outside. The 8V−13E row re-read 1.4825/0.9435 (was /0.9436).
  * Extraction-native sign (N-body − smooth), negated in the evaluator.
  * @type {Array<[number[], number, number, number]>} [l-multipliers, bodyIndex (0 Me … 5 S), a (″/e), b (″/e)]
  */
 const LONG_PERIOD_TERMS = [
-  [[0, 0, 4, -8, 3, 0], 2, -785.9521, 591.0878],   // 4E−8Ma+3J · earth
-  [[0, 0, 4, -8, 3, 0], 3, -80.4721, 77.5236],     // 4E−8Ma+3J · mars
-  [[0, 0, 4, -8, 3, 0], 4, 159.5521, -303.8727],   // 4E−8Ma+3J · jupiter
+  [[0, 0, 4, -8, 3, 0], 2, -790.7951, 592.4140],   // 4E−8Ma+3J · earth
+  [[0, 0, 4, -8, 3, 0], 3, -81.3844, 77.5882],     // 4E−8Ma+3J · mars
+  [[0, 0, 4, -8, 3, 0], 4, 160.5173, -304.5553],   // 4E−8Ma+3J · jupiter
 ];
 /** body index → the embedded e-vector series' key */
 const ECC_BODY_KEY = [null, 'venus', 'earth', 'mars', 'jupiter', null];
@@ -409,6 +415,6 @@ const PAIRED_SUN_HARMONICS_SHA256 = 'cbc189cea1c20292';   // eccentricity unific
  *  for the short-period rows, i3-long-period-dalembert.mjs for the long-period
  *  rows), re-embed the tables, and update this value. History: 2d066e92bae955e4
  *  was the I2 record-based carrier set. */
-const PAIRED_CARRIER_RATES_SHA256 = '8e11456fcf8db81c';
+const PAIRED_CARRIER_RATES_SHA256 = '26552b86ad69eaf2';   // running-mean series re-bank (mean=1 dump): carriers moved in the 9th digit, LONG_PERIOD_TERMS + the 8V−13E row re-derived on them; history: 8e11456fcf8db81c (I3), 2d066e92bae955e4 (I2)
 
 module.exports = { createSunPlanetaryCompletion, computeCarrierRatesDegPerCy, eccVectorOfDateEmbedded, PAIRED_SUN_HARMONICS_SHA256, PAIRED_CARRIER_RATES_SHA256 };

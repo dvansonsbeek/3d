@@ -59,7 +59,7 @@
 //   Jupiter/Saturn near 0 vs −1,739 (their nodes precess about the invariable
 //   plane; the ecliptic-J2000 mean is not the lattice's quantity either).
 //
-//   node tools/explore/lattice-long-window-test.mjs [years=100000] [integrator=wh|rk4] [dt=2|0.2] [order=2|4] [gr=1] [sample=1000] [frame=ecliptic|equatorial|invariable]
+//   node tools/explore/lattice-long-window-test.mjs [years=100000] [integrator=wh|rk4] [dt=2|0.2] [order=2|4] [gr=1] [sample=1000] [frame=ecliptic|equatorial|invariable] [lunar=1] [asteroids=1] [mean=1 [acc=20]]
 //   (the node column must be read in frame=invariable — see the 1-Myr block;
 //    default integrator is Wisdom–Holman, nbody-wh.mjs: 1 Myr ≈ 13 min instead of 73)
 
@@ -91,8 +91,27 @@ const GR_ON = KV.gr === '1' || KV.gr === 'true';
 const LUNAR_ON = KV.lunar === '1';
 const ASTEROIDS_ON = KV.asteroids === '1';
 const FRAME = (KV.frame || 'ecliptic').toLowerCase();   // ecliptic | equatorial | invariable — readout frame for the elements
-if ((LUNAR_ON || ASTEROIDS_ON) && (KV.integrator || 'wh').toLowerCase() !== 'wh') {
-  console.error('lunar=1 / asteroids=1 are wired for the WH integrator only'); process.exit(1);
+// mean=1 — RUNNING-MEAN sampling (2026-10): each dumped sample is the mean of
+// the osculating elements over the interval of `sample` days CENTRED on the
+// sample instant (accumulated every `acc` days, default 20 d), in VECTOR form —
+// z = e·e^{iϖ}, ζ = sin(i/2)·e^{iΩ}, the unwrapped mean longitude L and a are
+// averaged, and e/ϖ/i/Ω are read back from the mean vectors. WHY: a point
+// sample every 20,000 d (54.757 yr) ALIASES the osculating elements'
+// short-period content (Jupiter 11.86 yr, Venus 8 yr, the synodic lines,
+// ~10⁻⁴ in Earth's e-vector) into the secular band, where the consumers'
+// 1-kyr boxcar (≈18 samples) cannot remove it — measured as the banked
+// series' Earth e sitting up to 1.2·10⁻⁵ below DE441's secular e with a
+// Δϖ of −180″ over −3500…−1500 (the Sun's 5″ annual term there), while the
+// same physics run fresh and averaged matched DE441 to 0.01·10⁻⁵
+// (tools/explore/evector-ingredient-isolation.mjs). The t grid is unchanged
+// (the sample instants, t = 0 included — the J2000 node the consumers need);
+// the first/last half-intervals of each direction are merged (t = 0) or
+// dropped (the run's ends). Point sampling (the default) stays for the
+// window runs whose consumers read instantaneous elements (the chain anchors).
+const MEAN_ON = KV.mean === '1';
+const ACC_DAYS = parseFloat(KV.acc || '20');
+if ((LUNAR_ON || ASTEROIDS_ON || MEAN_ON) && (KV.integrator || 'wh').toLowerCase() !== 'wh') {
+  console.error('lunar=1 / asteroids=1 / mean=1 are wired for the WH integrator only'); process.exit(1);
 }
 const D2R = Math.PI / 180, DAY = 86400;
 const GM_S = TL.GM_SUN, GM_EM = P.GM_EM, H = TL.H;
@@ -146,7 +165,29 @@ const lunarQuadForce = (r, v, t, GMS, i) => {
 // the spurious-drift runs must stay pure numerics, no physics terms).
 let EXTRA_FORCES = [];
 
-function integrate(gms, Y, years, sampleDays, onSample) {
+/**
+ * A running-mean accumulator (mean=1): per interval, the planets' osculating
+ * VECTOR sums in every readout frame — sum[frame][planet] = [Σ e cos ϖ,
+ * Σ e sin ϖ, Σ sin(i/2) cos Ω, Σ sin(i/2) sin Ω, Σ L_unwrapped (deg), Σ a]
+ * over n samples; lastL carries the unwrapping across the interval.
+ */
+function mkMeanAccumulator(frames, bodies) {
+  return { n: 0, sum: frames.map(() => Array.from({ length: bodies }, () => new Float64Array(6))), lastL: frames.map(() => new Float64Array(bodies).fill(NaN)) };
+}
+/** the dump's `w, Om, e, inc, L, a` (degrees / AU) from an accumulator's sums */
+function meanElements(sum, nSamples) {
+  const zq = sum[0] / nSamples, zp = sum[1] / nSamples, hq = sum[2] / nSamples, hp = sum[3] / nSamples;
+  return {
+    w: ((Math.atan2(zp, zq) / D2R) % 360 + 360) % 360,
+    Om: ((Math.atan2(hp, hq) / D2R) % 360 + 360) % 360,
+    e: Math.hypot(zq, zp),
+    inc: 2 * Math.asin(Math.min(1, Math.hypot(hq, hp))) / D2R,
+    L: ((sum[4] / nSamples) % 360 + 360) % 360,
+    a: sum[5] / nSamples,
+  };
+}
+
+function integrate(gms, Y, years, sampleDays, onSample, meanSink = null) {
   const n = gms.length;
   if (INTEGRATOR === 'wh') {
     // Wisdom–Holman: exact Kepler drifts, perturbation kicks; onSample gets a
@@ -160,10 +201,52 @@ function integrate(gms, Y, years, sampleDays, onSample) {
     // secular growth means a numerical problem, not physics. |ΔL|/L should be ~1e-12.
     const E0 = sim.energy(), L0 = sim.angularMomentum(), Ln0 = Math.hypot(...L0);
     let maxDE = 0;
-    for (let s = 0; s <= steps; s++) {
-      if (s % every === 0) onSample(Math.sign(years) * s * DT / 365.25, snapshot());
-      if (s % (every * 100) === 0) maxDE = Math.max(maxDE, Math.abs((sim.energy() - E0) / E0));
-      sim.step();
+    if (meanSink) {
+      // mean=1: running means over intervals CENTRED on the sample instants
+      // k·every (step s belongs to interval k = round(s/every)); the planets'
+      // osculating vectors accumulate every accEvery steps in every readout
+      // frame. k = 0 is a half interval (merged with the other direction's by
+      // the caller); the run's far-end partial interval is dropped.
+      const accEvery = Math.max(1, Math.round(ACC_DAYS / DT)), bodies = names.length, frames = FRAMES_OUT;
+      if (every % (2 * accEvery) !== 0) { console.error(`mean=1 needs sample/acc to be an even integer (sample ${sampleDays} d, acc ${ACC_DAYS} d)`); process.exit(1); }
+      // Each interval is SYMMETRIC about its sample instant — offsets −every/2 …
+      // +every/2 inclusive, the two boundary samples shared with the neighbours
+      // — so the mean of the unwrapped mean longitude L is L at the centre
+      // (a one-sided interval biases L by n̄·Δt/2: 10 d of Earth's motion is
+      // 9.9°, measured on the first cut).
+      const expected = every / accEvery + 1;
+      let k = 0, acc = mkMeanAccumulator(frames, bodies);
+      const addSample = (a, Yn) => {
+        frames.forEach((fr, f) => {
+          for (let i = 1; i <= bodies; i++) {
+            const o = oscul(Yn, i, n, gms, ROTS[fr]), S = a.sum[f][i - 1], w = o.w * D2R, Om = o.Om * D2R, s2 = Math.sin(o.inc * D2R / 2);
+            S[0] += o.e * Math.cos(w); S[1] += o.e * Math.sin(w); S[2] += s2 * Math.cos(Om); S[3] += s2 * Math.sin(Om);
+            let L = o.L; const prev = a.lastL[f][i - 1];
+            if (!Number.isNaN(prev)) { while (L - prev > 180) L -= 360; while (L - prev < -180) L += 360; }
+            a.lastL[f][i - 1] = L; S[4] += L; S[5] += o.a;
+          }
+        });
+        a.n++;
+      };
+      const flush = (kIdx, a) => { if (kIdx === 0 || a.n >= 0.9 * expected) meanSink.push(kIdx, Math.sign(years) * kIdx * every * DT / 365.25, a); };
+      for (let s = 0; s <= steps; s++) {
+        const kNow = Math.round(s / every);   // ties (the shared boundary) round UP into the next interval
+        const isAcc = s % accEvery === 0;
+        if (kNow !== k) {
+          if (isAcc && s - kNow * every === -every / 2) addSample(acc, snapshot());   // the boundary sample closes the old interval too
+          flush(k, acc); k = kNow; acc = mkMeanAccumulator(frames, bodies);
+        }
+        if (isAcc) addSample(acc, snapshot());
+        if (s % (every * 100) === 0) maxDE = Math.max(maxDE, Math.abs((sim.energy() - E0) / E0));
+        sim.step();
+      }
+      flush(k, acc);
+    } else {
+      for (let s = 0; s <= steps; s++) {
+        if (s % every === 0) onSample(Math.sign(years) * s * DT / 365.25, snapshot());
+        if (s % (every * 100) === 0) maxDE = Math.max(maxDE, Math.abs((sim.energy() - E0) / E0));
+        sim.step();
+      }
     }
     const L1 = sim.angularMomentum();
     if (n > 2) DIAG.push({ years, maxDE, dE: Math.abs((sim.energy() - E0) / E0), dL: Math.hypot(L1[0] - L0[0], L1[1] - L0[1], L1[2] - L0[2]) / Ln0 });   // the two-body calibration runs are not reported
@@ -234,8 +317,33 @@ const ELEMS = ['w', 'Om', 'e', 'inc', 'L', 'a'];
 const mk = () => Object.fromEntries(FRAMES_OUT.map((fr) => [fr, { t: [], ...Object.fromEntries(ELEMS.map((el) => [el, Object.fromEntries(names.map((k) => [k, []]))])) }]));
 const fwd = mk(), bwd = mk();
 const sampler = (S) => (t, Y) => { for (const fr of FRAMES_OUT) { S[fr].t.push(t); for (let i = 1; i <= names.length; i++) { const o = oscul(Y, i, n, gms, ROTS[fr]); for (const el of ELEMS) S[fr][el][names[i - 1]].push(o[el]); } } };   // planets only — the force-only asteroids are never sampled
-integrate(gms, Float64Array.from(Y0), YEARS / 2, SAMPLE_DAYS, sampler(fwd));
-integrate(gms, Float64Array.from(Y0), -YEARS / 2, SAMPLE_DAYS, sampler(bwd));
+if (MEAN_ON) {
+  // mean=1: each direction's sink stores the completed intervals' mean
+  // elements; the two half-intervals at t = 0 are merged afterwards and
+  // written into BOTH stores, so the concatenation below (bwd.slice(1)) is
+  // unchanged.
+  const mkSink = (S) => { const zero = { acc: null }; return { zero, push: (k, t, acc) => { if (k === 0) { zero.acc = acc; return; } for (let f = 0; f < FRAMES_OUT.length; f++) { const fr = FRAMES_OUT[f]; S[fr].t.push(t); for (let i = 0; i < names.length; i++) { const o = meanElements(acc.sum[f][i], acc.n); for (const el of ELEMS) S[fr][el][names[i]].push(o[el]); } } } }; };
+  const sinkF = mkSink(fwd), sinkB = mkSink(bwd);
+  integrate(gms, Float64Array.from(Y0), YEARS / 2, SAMPLE_DAYS, null, sinkF);
+  integrate(gms, Float64Array.from(Y0), -YEARS / 2, SAMPLE_DAYS, null, sinkB);
+  const zf = sinkF.zero.acc, zb = sinkB.zero.acc;
+  for (let f = 0; f < FRAMES_OUT.length; f++) {
+    const fr = FRAMES_OUT[f];
+    for (const S of [fwd, bwd]) S[fr].t.unshift(0);
+    for (let i = 0; i < names.length; i++) {
+      // both half-intervals start at the SAME s = 0 sample and unwrap L from it,
+      // so their sums sit on one branch: the plain sum is the symmetric mean
+      // (the s = 0 sample is counted in both halves — one sample in ~2000)
+      const sum = new Float64Array(6); for (let c = 0; c < 6; c++) sum[c] = zf.sum[f][i][c] + zb.sum[f][i][c];
+      const o = meanElements(sum, zf.n + zb.n);
+      for (const S of [fwd, bwd]) for (const el of ELEMS) S[fr][el][names[i]].unshift(o[el]);
+    }
+  }
+  console.log(`mean=1: ${fwd[FRAMES_OUT[0]].t.length + bwd[FRAMES_OUT[0]].t.length - 1} running-mean samples over ${SAMPLE_DAYS}-d intervals, accumulated every ${ACC_DAYS} d`);
+} else {
+  integrate(gms, Float64Array.from(Y0), YEARS / 2, SAMPLE_DAYS, sampler(fwd));
+  integrate(gms, Float64Array.from(Y0), -YEARS / 2, SAMPLE_DAYS, sampler(bwd));
+}
 const primary = FRAMES_OUT[0];
 const T = Float64Array.from([...bwd[primary].t.slice(1).reverse(), ...fwd[primary].t]);
 const ELF = {};   // ELF[frame][el][planet]
@@ -252,6 +360,12 @@ if (KV.dump !== '0') {
     // ascending node of the invariable plane on the ecliptic (λ of ẑ_ecl × ẑ_inv).
     const _zInv = ROTS.invariable[2];
     const out = { years: YEARS, integrator: INTEGRATOR, dt: DT, gr: GR_ON, frame: fr, sampleDays: SAMPLE_DAYS, conservation: DIAG,
+      // the SAMPLING (2026-10): point samples alias the short-period content
+      // of the osculating elements into the secular band at 54.76-yr
+      // cadence; the running mean is alias-free by construction
+      sampling: MEAN_ON
+        ? { kind: 'running mean', windowDays: SAMPLE_DAYS, accumulateDays: ACC_DAYS, form: 'z = e·e^{iϖ}, ζ = sin(i/2)·e^{iΩ}, the unwrapped L and a averaged over the interval centred on each sample instant; e/ϖ/i/Ω read back from the mean vectors' }
+        : { kind: 'point sample', note: 'instantaneous osculating elements at each sample instant — aliases sub-interval content' },
       // the apsidal-fidelity physics content (plan 02 record): the run's
       // provenance must say what forces/bodies produced it
       physics: {

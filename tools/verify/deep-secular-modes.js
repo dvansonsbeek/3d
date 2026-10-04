@@ -23,12 +23,22 @@
  * PROVENANCE CHAIN (the 337-MB dump is untracked — too large for git):
  *   1. the run:   node tools/explore/lattice-long-window-test.mjs \
  *                   years=20000000 integrator=wh dt=2 order=2 gr=1 \
- *                   frame=both sample=20000 lunar=1 asteroids=1   (~3.4 h)
+ *                   frame=both sample=20000 lunar=1 asteroids=1 mean=1   (~13 h)
  *      → tools/explore/lattice-long-window-ecliptic-20000000-gr.local.json
  *      (the calibrated lunar quadrupole on the Sun–EMB interaction and
  *      Ceres/Vesta/Pallas as force-only bodies — the dump's `physics` block
  *      records both and is copied into meta; the pre-lunar twin
- *      `…-gr-pre-lunar.local.json` is the point-mass record)
+ *      `…-gr-pre-lunar.local.json` is the point-mass record).
+ *      mean=1: each 20,000-d sample is the RUNNING MEAN of the osculating
+ *      vectors (z, ζ, unwrapped L, a) over its own interval, accumulated
+ *      every 20 d — not the instantaneous elements at the sample instant.
+ *      Measured: point sampling at 54.76 yr aliased ~1e-4 of Jupiter/Venus
+ *      short-period content into the secular band (Earth's secular e
+ *      0.5e-5 rms off DE441 through the series' 1-kyr boxcar, ϖ 56″); the
+ *      running mean reads 0.08e-5 / 6″. The dump's `sampling` block records
+ *      the form and is copied into meta; a point-sampled dump is refused.
+ *      Cost: the element conversion every 20 d makes the run ~13 h of
+ *      compute (measured 48,588 s) where the point-sampled run took 3.4 h.
  *   2. --write here: decimate 4× (80,000-d sampling still oversamples the
  *      fastest secular period ~200×; validated — identical frequencies to
  *      the undecimated extraction), NAFF at 18 terms (~75 min), verdict
@@ -74,7 +84,7 @@ const { ROOT, buildInputsBlock } = require('../lib/artifact-inputs');
 const WRITE = process.argv.includes('--write');
 const OUT = path.join(ROOT, 'data', 'nbody-deep-secular-modes.json');
 const DUMP = path.join(ROOT, 'tools', 'explore', 'lattice-long-window-ecliptic-20000000-gr.local.json');
-const RUN_CMD = 'node tools/explore/lattice-long-window-test.mjs years=20000000 integrator=wh dt=2 order=2 gr=1 frame=both sample=20000 lunar=1 asteroids=1';
+const RUN_CMD = 'node tools/explore/lattice-long-window-test.mjs years=20000000 integrator=wh dt=2 order=2 gr=1 frame=both sample=20000 lunar=1 asteroids=1 mean=1';
 const DECIMATE = 4;
 const NAFF_TERMS = 18;
 // Stage C: the obliquity hybrid consumes the deep ζ table — 16 terms
@@ -118,7 +128,7 @@ if (!WRITE) {
 }
 
 if (!fs.existsSync(DUMP)) {
-  console.error('REFUSING: the ±10-Myr ecliptic dump is absent. Produce it first (≈3.4 h):');
+  console.error('REFUSING: the ±10-Myr ecliptic dump is absent. Produce it first (≈13 h):');
   console.error('  ' + RUN_CMD);
   process.exit(1);
 }
@@ -129,6 +139,10 @@ const dumpSha = crypto.createHash('sha256').update(dumpBuf).digest('hex');
 const D = JSON.parse(dumpBuf.toString('utf8'));
 if (!(D.integrator === 'wh' && D.dt === 2 && D.gr === true && D.years === 20000000)) {
   console.error(`REFUSING: dump meta ${D.integrator}/dt${D.dt}/gr${D.gr}/${D.years} is not the registered run (wh/dt2/1PN/20e6).`);
+  process.exit(1);
+}
+if (!(D.sampling && D.sampling.kind === 'running mean')) {
+  console.error(`REFUSING: dump sampling ${JSON.stringify(D.sampling ?? 'absent')} is not the registered running mean (mean=1); point sampling aliases short-period content into the secular band.`);
   process.exit(1);
 }
 const maxDE = Math.max(...D.conservation.map((c) => c.maxDE));
@@ -190,6 +204,8 @@ const art = {
     // the dump's own provenance block: the lunar quadrupole (calibrated
     // effective factor) and the force-only asteroids the run carried
     physics: D.physics ?? null,
+    // the dump's sampling form: running means over each 20,000-d interval
+    sampling: D.sampling ?? null,
     dumpFile: 'tools/explore/lattice-long-window-ecliptic-20000000-gr.local.json (untracked, 337 MB)',
     dumpSha256: dumpSha,
     conservationMaxDE: maxDE,

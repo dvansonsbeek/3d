@@ -11,8 +11,14 @@
  * (test:snapshot runs first in the chain).
  *
  * Expectations, calibrated from measurement:
- *   - solstice JDs: BIT-EXACT (Object.is) — the two engines share the §10
- *     evaluation form and the integrated-phase convention; measured 0.000 ms.
+ *   - solstice JDs (in era, |year| ≤ 50 kyr): within 1e-9 d (2 ULP of a JD
+ *     of magnitude 4e6, 86 µs) — the two engines share the §10 evaluation
+ *     form and the integrated-phase convention and read bit-exact (Object.is)
+ *     from Phase 7.2 to v16.1; the v16.2 running-mean re-bank moved the
+ *     hybrid's series inputs and three cardinal instants at year 6000 came
+ *     out 1 ULP apart (4.7e-10 d) — the runtime last-bit class below reaching
+ *     the certified window, identical code and data. Bit-exact still counts
+ *     as exact; the tolerance names what the runtimes can do.
  *   - year lengths: BIT-EXACT since Phase 7.2 — the pre-extraction ≤5.6e-8 d
  *     gap turned out to be OPERATION-ORDER divergence between the two
  *     hand-mirrors (per-div phaseAdvance vs 2π·div·c), not the twins; the
@@ -51,6 +57,8 @@ const fixture = JSON.parse(readFileSync(
 const YL_TOL_DAYS = 0;      // bit-exact — achieved at Phase 7.2 (shared code)
 const DEEP_YEARS = 50000;   // beyond the certified fine zone the runtimes' Math differs at the last bit (header)
 const DEEP_JD_TOL_DAYS = 1e-6;
+// In-era solstice JDs: 2 ULP of a JD ~4e6 (header: 1 ULP measured at year 6000 after the v16.2 re-bank).
+const ERA_JD_TOL_DAYS = 1e-9;
 // DEEP year lengths (|year| > DEEP_YEARS): the difference of two deep
 // solstice JDs, so the same last-bit class as the JDs themselves — measured
 // 1.49e-8 and 2.98e-8 d (1–2 ULP of a JD of magnitude 1e8) on solsticeVE /
@@ -114,15 +122,14 @@ for (const [key, browserVal] of Object.entries(fixture)) {
   }
   if ((m = key.match(/^solsticeJD_(SS|WS|VE|AE)@(-?\d+)$/))) {
     nodeVal = OE.computeSolsticeJD(Number(m[2]), m[1]);
-    klass = 'exact';
-    if (Math.abs(Number(m[2])) > DEEP_YEARS) {
-      if (Object.is(browserVal, nodeVal)) { exact++; continue; }
-      const d = Math.abs(browserVal - nodeVal);
-      if (d <= DEEP_JD_TOL_DAYS) { withinTol++; continue; }
-      console.log(`  DIVERGED (deep, >${DEEP_JD_TOL_DAYS} d) ${key}  Δ=${d.toExponential(3)} d`);
-      failures++;
-      continue;
-    }
+    if (Object.is(browserVal, nodeVal)) { exact++; continue; }
+    const deep = Math.abs(Number(m[2])) > DEEP_YEARS;
+    const jdTol = deep ? DEEP_JD_TOL_DAYS : ERA_JD_TOL_DAYS;
+    const d = Math.abs(browserVal - nodeVal);
+    if (d <= jdTol) { withinTol++; continue; }
+    console.log(`  DIVERGED (${deep ? 'deep' : 'era'}, >${jdTol} d) ${key}  Δ=${d.toExponential(3)} d`);
+    failures++;
+    continue;
   } else if ((m = key.match(/^solstice(SS|WS|VE|AE)@(-?\d+)$/))) {
     nodeVal = OE.computeSolsticeYearLength(Number(m[2]), m[1]);
     klass = 'tol';

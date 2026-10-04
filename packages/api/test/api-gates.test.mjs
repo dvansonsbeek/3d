@@ -141,10 +141,12 @@ for (const url of SAMPLE_REQUESTS) {
   if (deriv.latticeDivisor !== 13) failures.push(`derivations/axialPrecession divisor: ${deriv.latticeDivisor}`);
   if (Math.abs(deriv.periodYears - 25771.4) > 0.5) failures.push(`derivations/axialPrecession period: ${deriv.periodYears}`);
   // S6: the Earth-cycle rows carry the DYNAMICAL periods (the registry's values), never the device H/n.
-  // (inclinationPrecession ≈ 111,580: the movement's own apsidal rate of date since 2026-09 — was the chain tangent's
-  // 111,570; its J2000 reading carries the banked series' own ±0.04 ″/yr ripple, ≈ ±400 yr on the period, so the
-  // tolerance is 60 yr where the smooth quantities keep 5.)
-  for (const [q, expect, tol] of /** @type {Array<[string, number, number]>} */ ([['inclinationPrecession', 111580, 60], ['perihelionPrecession', 20936, 5], ['eclipticPrecession', 68751, 5], ['obliquityCycle', 41224, 5]])) {
+  // (inclinationPrecession ≈ 111,667: the movement's own apsidal rate of date since 2026-09 — was the chain tangent's
+  // 111,570, then 111,580 on the point-sampled series; the running-mean re-bank (v16.2) removed the sampling alias
+  // from the series' J2000 slope and the reading moved to 111,667. The J2000 reading still carries the banked
+  // series' own ripple, so the tolerance is 60 yr where the smooth quantities keep 5 — tight enough to catch the
+  // family split (chain tangent vs series, ~90 yr) the "name its window" trap records.)
+  for (const [q, expect, tol] of /** @type {Array<[string, number, number]>} */ ([['inclinationPrecession', 111667, 60], ['perihelionPrecession', 20936, 5], ['eclipticPrecession', 68751, 5], ['obliquityCycle', 41224, 5]])) {
     const d = dataOf(`/v1/derivations/${q}`);
     if (typeof d.periodYears !== 'number' || Math.abs(d.periodYears - expect) > tol) failures.push(`derivations/${q} period: ${d.periodYears} (expected ≈ ${expect})`);
     if (d.status !== 'current') failures.push(`derivations/${q} status: ${d.status}`);

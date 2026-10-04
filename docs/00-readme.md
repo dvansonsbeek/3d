@@ -1,7 +1,7 @@
 ---
 docVersion: 1.0
-modelVersion: v16.1
-coefficients: sha256:bb6a03c877eedab8
+modelVersion: v16.2
+coefficients: sha256:96f7a2194ea29f0e
 status: current
 ---
 
@@ -77,7 +77,7 @@ and why.
 | 102 | [Pure-tidal + GIA α(t) vs the historical lunar record](102-gia-alpha-lunar-validation.md) | 267 primary-source lunar observations (Stephenson 2016): framework mean \|residual\| **20.2 min** vs NASA's fitted polynomial at 20.0 min — a 2-s excess over Stephenson's own fit, with zero ΔT-polynomial fitting; the α(t) GIA channel from independent satellite gravimetry; the 4-flag ΔT stack; the full hypothesis-testing and residual-decomposition record |
 | 104 | [The Millennial Rotation Swing](104-millennial-rotation-swing.md) | The core–mantle identification of the post-stack residual: one aperiodic swing, independently confirmed against archeomagnetic core-flow ΔLOD (r = +0.91), the lattice closed under difference tones, and the low-Q Magneto-Coriolis eigenmode reading |
 | 105 | [ΔT stack: what each flag buys](105-dt-stack-flag-audit.md) | Audit of the four ΔT correction flags under pre-fixed criteria: the shipped set is optimal in- and out-of-sample (Espenak RMS <!--v:deltaTEspenakRmsSeconds-->13.4<!--/v--> s); the two measurement traps (stage_* metrics rank backwards; Jose5/Jose4 are a coupled pair) |
-| 103 | [-135 Babylonian solar eclipse case study](103-135-babylonian-case-study.md) | The flagship ancient event: BestGap <!--v:babylon135BestGapKm-->177<!--/v--> km (off-peak verdict), documented UT matched to 9 minutes, local magnitude 0.988, the ΔT-free cascade selecting the traditional date uniquely — plus the component decomposition and the α(t) sensitivity proof |
+| 103 | [-135 Babylonian solar eclipse case study](103-135-babylonian-case-study.md) | The flagship ancient event: BestGap <!--v:babylon135BestGapKm-->169<!--/v--> km (off-peak verdict), documented UT matched to 9 minutes, local magnitude 0.988, the ΔT-free cascade selecting the traditional date uniquely — plus the component decomposition and the α(t) sensitivity proof |
 | 107 | [Ancient-record review — identification adjudication](107-ancient-record-review.md) | Local-circumstance re-testing of the audit's ancient rows: every first-hand record validates at its traditional date; the "geographic" verdicts are identification errors in second-hand chains; the Lu −708 record identified uniquely by the chronology-free ganzhi filter |
 
 ### Climate
@@ -237,8 +237,8 @@ See the [Python Scripts README](../scripts/README.md) for details.
 |---------|-------|-------------|
 | The clock | <!--v:lunisolarPeriodJ2000Yr-->25,771.4<!--/v--> years | The mean lunisolar precession period at J2000 — Earth's spin clock; the other cycles are read against it as ratios |
 | Axial Precession | <!--v:axialPrecRound-->~25,771<!--/v--> yr | Earth's wobble around the EARTH-WOBBLE-CENTER |
-| Apsidal Precession | <!--v:inclPrecYears-->~111,582<!--/v--> yr | PERIHELION-OF-EARTH orbit period against the stars (<!--v:lunisolarApsidalPerPrecessionJ2000-->4.330<!--/v--> precession periods today) |
-| Perihelion Precession | <!--v:periPrecYears-->~20,936<!--/v--> yr | The perihelion-of-date cycle: the axial and apsidal rates add |
+| Apsidal Precession | <!--v:inclPrecYears-->~111,667<!--/v--> yr | PERIHELION-OF-EARTH orbit period against the stars (<!--v:lunisolarApsidalPerPrecessionJ2000-->4.333<!--/v--> precession periods today) |
+| Perihelion Precession | <!--v:periPrecYears-->~20,939<!--/v--> yr | The perihelion-of-date cycle: the axial and apsidal rates add |
 | Obliquity Range | ~22.1° – ~24.5° | Earth's axial tilt oscillation |
 
 For all constants and their sources, see the [Constants Reference](20-constants-reference.md).

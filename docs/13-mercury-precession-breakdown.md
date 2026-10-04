@@ -1,7 +1,7 @@
 ---
 docVersion: 1.0
-modelVersion: v16.1
-coefficients: sha256:bb6a03c877eedab8
+modelVersion: v16.2
+coefficients: sha256:96f7a2194ea29f0e
 status: current
 ---
 
@@ -366,7 +366,7 @@ are not a reading of the anomaly.
 | Jupiter | <!--v:jupiterPeriRateEclipticArcsecCy-->1,884.19<!--/v--> | <!--v:jupiterPeriRaSlopeJ2000-->0.92693<!--/v--> | <!--v:jupiterPeriRateRaProjectedJ2000-->1,746.52<!--/v--> | <!--v:jupiterPeriProjectionExcessJ2000-->-137.67<!--/v--> | <!--v:jupiterPeriAnomalyGrArcsecCy-->0.06<!--/v--> | <!--v:jupiterPeriRateEarthFrameMeasuredJ2000-->1,751.14<!--/v--> |
 | Saturn | <!--v:saturnPeriRateEclipticArcsecCy-->-3,140.31<!--/v--> | <!--v:saturnPeriRaSlopeJ2000-->1.08966<!--/v--> | <!--v:saturnPeriRateRaProjectedJ2000-->-3,421.86<!--/v--> | <!--v:saturnPeriProjectionExcessJ2000-->-281.55<!--/v--> | <!--v:saturnPeriAnomalyGrArcsecCy-->0.01<!--/v--> | <!--v:saturnPeriRateEarthFrameMeasuredJ2000-->-3,422.68<!--/v--> |
 | Uranus | <!--v:uranusPeriRateEclipticArcsecCy-->1,159.50<!--/v--> | <!--v:uranusPeriRaSlopeJ2000-->0.92126<!--/v--> | <!--v:uranusPeriRateRaProjectedJ2000-->1,068.21<!--/v--> | <!--v:uranusPeriProjectionExcessJ2000-->-91.29<!--/v--> | <!--v:uranusPeriAnomalyGrArcsecCy-->0.00<!--/v--> | <!--v:uranusPeriRateEarthFrameMeasuredJ2000-->1,065.23<!--/v--> |
-| Neptune | <!--v:neptunePeriRateEclipticArcsecCy-->193.25<!--/v--> | <!--v:neptunePeriRaSlopeJ2000-->0.99870<!--/v--> | <!--v:neptunePeriRateRaProjectedJ2000-->193.00<!--/v--> | <!--v:neptunePeriProjectionExcessJ2000-->-0.25<!--/v--> | <!--v:neptunePeriAnomalyGrArcsecCy-->0.00<!--/v--> | <!--v:neptunePeriRateEarthFrameMeasuredJ2000-->203.13<!--/v--> |
+| Neptune | <!--v:neptunePeriRateEclipticArcsecCy-->193.25<!--/v--> | <!--v:neptunePeriRaSlopeJ2000-->0.99870<!--/v--> | <!--v:neptunePeriRateRaProjectedJ2000-->193.00<!--/v--> | <!--v:neptunePeriProjectionExcessJ2000-->-0.25<!--/v--> | <!--v:neptunePeriAnomalyGrArcsecCy-->0.00<!--/v--> | <!--v:neptunePeriRateEarthFrameMeasuredJ2000-->203.12<!--/v--> |
 
 The projection excess reproduces the GR advance for Mercury and for no other
 planet (Venus −1.92 vs 8.62; Mars −100.85 vs 1.35; the outer planets' excesses

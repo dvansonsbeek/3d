@@ -1,7 +1,7 @@
 ---
 docVersion: 1.0
-modelVersion: v16.1
-coefficients: sha256:bb6a03c877eedab8
+modelVersion: v16.2
+coefficients: sha256:96f7a2194ea29f0e
 status: current
 ---
 
@@ -686,9 +686,16 @@ this measurement: on the point-mass run the 1-Myr estimate of g2 reads
 
 The same pair in the time domain (`tools/explore/ecc-dump-vs-la2004.mjs`,
 theory against theory, zero lag): the shipped run's Earth e(t) tracks
-La2004 at 3.0·10⁻⁵ rms over the last 500 kyr, 3.4·10⁻⁵ over 1–2 Myr and
-7.1·10⁻⁵ over 5–10 Myr; the point-mass run departs to 6.8·10⁻⁴, 2.3·10⁻³
-and 1.0·10⁻² on the same windows. The published series (the 500-yr
+La2004 at 2.4·10⁻⁵ rms over the last 500 kyr, 2.9·10⁻⁵ over 1–2 Myr and
+6.9·10⁻⁵ over 5–10 Myr; the point-mass run departs to 6.8·10⁻⁴, 2.3·10⁻³
+and 1.0·10⁻² on the same windows. The shipped dump records each 20,000-d
+sample as the RUNNING MEAN of the osculating vectors over its interval
+(`mean=1`): point-sampling the same run at 54.76 yr aliased ~10⁻⁴ of
+Jupiter/Venus short-period content into the secular band (Earth's secular
+e read 0.5·10⁻⁵ rms below DE441 through the series' 1-kyr boxcar, the
+Sun's 5″ annual line at −3500), which the 19-sample boxcar could not
+remove; the means bring it to 0.1·10⁻⁵ and 8″, and the La2004 figures
+above from 3.0/3.4/7.1·10⁻⁵ to the values quoted. The published series (the 500-yr
 resampling of the shipped run) reads 2.5·10⁻⁵ against La2010a over the
 last 500 kyr — the figure `tools/explore/deep-ecc-history.mjs` draws. A
 `createModel()` built WITHOUT the series artifact is a different

@@ -84,4 +84,4 @@ export const PAIRED_SUN_HARMONICS_SHA256: "cbc189cea1c20292";
  *  for the short-period rows, i3-long-period-dalembert.mjs for the long-period
  *  rows), re-embed the tables, and update this value. History: 2d066e92bae955e4
  *  was the I2 record-based carrier set. */
-export const PAIRED_CARRIER_RATES_SHA256: "8e11456fcf8db81c";
+export const PAIRED_CARRIER_RATES_SHA256: "26552b86ad69eaf2";

@@ -11,13 +11,18 @@
 // Reference: data/la2004-earth-51myr-back.asc (kyr from J2000, e, ε, ϖ̃; 1-kyr grid).
 // Read-only: prints, writes nothing.
 //
-// MEASURED (rms Δe at zero lag | the lag that minimizes it is 0 for the shipped run):
-//   window (kyr)      shipped run   point-mass run
-//     −500 … 0          3.0e-5         6.8e-4
-//    −1000 … −500       3.2e-5         1.2e-3
-//    −2000 … −1000      3.4e-5         2.3e-3
-//    −5000 … −3000      4.7e-5         6.0e-3
-//   −10000 … −5000      7.1e-5         1.0e-2
+// MEASURED (rms Δe at zero lag | the lag that minimizes it is 0 for the shipped run).
+// "shipped" = the running-mean dump (mean=1 — each 20,000-d sample the mean of
+// the osculating vectors over its interval); "point" = the same physics point-
+// sampled every 20,000 d (aliased ~1e-4 of Jupiter/Venus short-period content
+// into the secular band — the former shipped dump); "point-mass" = no lunar
+// quadrupole, no asteroids:
+//   window (kyr)      shipped (mean)   point-sampled   point-mass run
+//     −500 … 0          2.43e-5          3.0e-5           6.8e-4
+//    −1000 … −500       2.59e-5          3.2e-5           1.2e-3
+//    −2000 … −1000      2.87e-5          3.4e-5           2.3e-3
+//    −5000 … −3000      4.40e-5          4.7e-5           6.0e-3
+//   −10000 … −5000      6.89e-5          7.1e-5           1.0e-2
 
 import { readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
