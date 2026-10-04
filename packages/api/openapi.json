@@ -80,7 +80,7 @@
       "get": { "summary": "List bodies + the accuracy statement", "responses": { "200": { "description": "Envelope" } } }
     },
     "/v1/bodies/{body}": {
-      "get": { "summary": "One body: structural record + elements at epoch(s), with accuracy statement", "parameters": [{ "name": "body", "in": "path", "required": true, "schema": { "type": "string" } }, { "$ref": "#/components/parameters/year" }, { "$ref": "#/components/parameters/jd" }], "responses": { "200": { "description": "Envelope" }, "404": { "$ref": "#/components/responses/Problem" } } }
+      "get": { "summary": "One body: structural record + elements at epoch(s) from the model's N-body chain (perihelion longitude, invariable-plane node and inclination; a frames block names source and frames), with accuracy statement", "parameters": [{ "name": "body", "in": "path", "required": true, "schema": { "type": "string" } }, { "$ref": "#/components/parameters/year" }, { "$ref": "#/components/parameters/jd" }], "responses": { "200": { "description": "Envelope" }, "404": { "$ref": "#/components/responses/Problem" } } }
     },
     "/v1/values": {
       "get": { "summary": "The rendered model-values registry: key list + coefficients identity", "responses": { "200": { "description": "Envelope" } } }

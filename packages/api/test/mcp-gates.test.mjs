@@ -63,6 +63,7 @@ const toolCall = (name, args) => {
     ['essrt_earth', { year: 2000 }, (d) => (Math.abs(d.years[0].obliquityDeg - 23.4393) < 0.0002 ? null : `obliquity: ${d.years[0].obliquityDeg}`)],
     ['essrt_moon', { year: 2000 }, (d) => (Math.abs(d.years[0].distanceKm - 384400) < 1000 ? null : `moon distance: ${d.years[0].distanceKm}`)],
     ['essrt_bodies', { body: 'mercury' }, (d) => (Math.round(d.record.perihelionEclipticYears) === 243867 ? null : `mercury: ${d.record.perihelionEclipticYears}`)],
+    ['essrt_bodies', { body: 'mercury', year: 2000 }, (d) => (Math.abs(d.at[0].invPlaneInclinationDeg - 6.3446) < 0.001 && /chain/.test(d.frames.source) ? null : `mercury elements not the chain's: ${JSON.stringify(d.at[0])}`)],   // v16.2: the chain, not the record's linear rates
     ['essrt_values', { key: 'usnoLodJ2000' }, (d) => (d.value === '86,400.0021' ? null : `usnoLodJ2000: ${d.value}`)],   // plan 06 T2 item: the ecliptic term on the nodal period re-closed the joint optimum at 0021
     ['essrt_derivations', { quantity: 'axialPrecession' }, (d) => (Math.abs(d.periodYears - 25771.4) < 0.5 ? null : `period: ${d.periodYears}`)],
     ['essrt_derivations', { quantity: 'inclinationPrecession' }, (d) => (Math.abs(d.periodYears - 111634) < 60 && d.status === 'current' ? null : `apsidal: ${d.periodYears} ${d.status}`)],   // ≈111,634 ± the series' own ripple (v16.2 running-mean re-bank + polar e-vector interpolation; was 111,580 on the point-sampled series): the movement's apsidal rate of date (2026-09; was the chain tangent's 111,570)

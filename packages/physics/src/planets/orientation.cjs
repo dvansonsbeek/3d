@@ -17,6 +17,15 @@
  * (ascendingNodeInvPlaneLinearAt — the node-integrator mirror)
  * and the balanced-year −8H/N node inside the scene tilt
  * (eclipticInclinationFromBalanced). Do not merge them.
+ *
+ * SCOPE SINCE v16.2 (owner-found audit): these record-based forms — the
+ * planet record's linear lattice rates, the −8H/N node period, the
+ * balanced-year inclination oscillation — are the RETIRED device. They serve
+ * the structural record and the browser's no-chain bodies (Pluto, Halley,
+ * Eros) only. The seven planets' elements of date on every published surface
+ * (the simulator, the API's /v1/bodies, the MCP essrt_bodies) ride the N-body
+ * Keplerian chain with the series handover (model.js planetChainElementsAt;
+ * src/script.js _kcElementsOfDate).
  */
 
 'use strict';

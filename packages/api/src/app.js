@@ -68,6 +68,14 @@ const PLANET_ACCURACY = Object.freeze({
   reference: 'JPL Horizons, 1800–2200 AD',
 });
 
+const PLANET_ELEMENT_FRAMES = Object.freeze({
+  source: 'the model’s N-body Keplerian chain (the path the simulator renders), with the banked secular series beyond each planet’s measured handover boundary',
+  perihelionLongitudeDeg: 'ecliptic longitude of perihelion, J2000 ecliptic and equinox',
+  ascendingNodeInvPlaneDeg: 'ascending node on the model’s invariable plane, measured from the plane’s ascending node on the ICRF equator (the Souami & Souchay 2012 origin)',
+  invPlaneInclinationDeg: 'inclination of the orbit plane to the model’s invariable plane',
+  epoch: 'the decimal year is read as the chain’s dynamical-time argument',
+});
+
 const EPOCH_SECTIONS = Object.freeze(['h', 'lod', 'alpha', 'deltaT', 'siderealYearSeconds', 'tropicalYearSeconds', 'moonDistanceKm', 'axialPrecessionYears']);
 const CARDINAL_TYPES = Object.freeze(['SS', 'WS', 'VE', 'AE']);
 
@@ -303,7 +311,11 @@ export function createApi() {
       return envelope({
         identity: id,
         inputEcho: { path, body: key, ...t.echo },
-        data: { body: key, record, at: atYears, accuracy: PLANET_ACCURACY },
+        data: {
+          body: key, record, at: atYears, accuracy: PLANET_ACCURACY,
+          // the elements' source and frames (v16.2: the N-body chain, as the simulator renders — formerly the record's linear rates)
+          frames: PLANET_ELEMENT_FRAMES,
+        },
       });
     }
 

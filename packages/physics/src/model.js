@@ -19,7 +19,9 @@
  */
 import { deriveEpochParams } from './layer0/derive-params.js';
 import * as FL from './planets/fibonacci-laws.cjs';
-import * as planetOrientation from './planets/orientation.cjs';
+import { buildPlanetChainsFromArtifactData, computePlanetElementsAtYear } from './planets/keplerian-chain.cjs';
+import { createSecularSeriesOverride } from './planets/secular-series.cjs';
+import { computeEquatorNodeOriginSFrameDeg, convertNodeSFrameToEquatorOriginDeg } from './planets/inv-plane-frame.cjs';
 import { createPhaseMachinery } from './phase/index.cjs';
 import { createYearLengths, ONE_FAMILY_WINDOW_YEARS } from './earth/year-lengths.cjs';
 import { createDeepOrbitalHistory } from './earth/deep-orbital-history.cjs';
@@ -728,7 +730,6 @@ export function assembleModel(C, F, laws = {}, secularSeriesArtifact = /** @type
   });
   const systemResetN = C.foundational.systemResetN;
   const t2000 = 2000 - (balancedYear - systemResetN * H);
-  const balancedJD = startmodelJD - meanSolarYearDays * (startModelYearWithCorrection - balancedYear);
 
   /** @param {[number, number]|null} frac @returns {number|null} */
   const fractionToYears = (frac) => (frac === null ? null : (H * frac[0]) / frac[1]);
@@ -824,39 +825,49 @@ export function assembleModel(C, F, laws = {}, secularSeriesArtifact = /** @type
     return ch;
   };
 
-  /** Perihelion longitude (linear lattice rate). @param {string} k @param {number} year @returns {number} */
-  const planetPerihelionDeg = (k, year) => {
-    const p = PLANET_RECORDS[k];
-    return (((p.longitudePerihelion + (360.0 * (year - 2000)) / p.perihelionEclipticYears) % 360) + 360) % 360;
+  // The planets' elements of date ride THE CHAIN — the only planet path the
+  // simulator renders (K5) — with the D5 series handover beyond each planet's
+  // measured boundary when the series artifact is supplied: the mirror of the
+  // browser's _kcElementsOfDate → _kcSeriesSecularEl. Until v16.2 the API
+  // served the retired device here (the record's linear lattice rates:
+  // perihelionEclipticYears, ascendingNodePeriod = −8H/N, the balanced-year
+  // inclination oscillation) — a published surface disagreeing with the
+  // simulator (owner-found audit, 2026-10). Those forms
+  // (planets/orientation.cjs) now serve only the structural record and the
+  // browser's no-chain bodies (Pluto, Halley, Eros). The chain's argument is
+  // dynamical time; the API's decimal year is taken as that argument (ΔT on a
+  // secular element is far below its stated accuracy).
+  let planetChains = /** @type {any} */ (null);
+  let planetSeriesOverride = /** @type {any} */ (null);
+  let planetNodeOriginSSDeg = /** @type {number|null} */ (null);
+  /** @param {string} k @param {number} year */
+  const planetChainElementsAt = (k, year) => {
+    if (!planetChains) planetChains = buildPlanetChainsFromArtifactData(/** @type {any} */ (CHAIN_ARTIFACT));
+    const el = computePlanetElementsAtYear(year, planetChains[k], planetChains);
+    const seriesArt = /** @type {any} */ (secularSeriesArtifact);
+    if (!seriesArt) return el;
+    if (!planetSeriesOverride) {
+      planetSeriesOverride = createSecularSeriesOverride({
+        series: seriesArt,
+        anchorElements: /** @type {any} */ (CHAIN_ARTIFACT).j2000AnchorElements,
+        invariablePlane: /** @type {any} */ (CHAIN_ARTIFACT).invariablePlane,
+        planetZModes: /** @type {any} */ (DEEP_MODES_ARTIFACT).planetZ,
+        planetZetaModes: /** @type {any} */ (DEEP_MODES_ARTIFACT).planetZeta,
+      });
+    }
+    return planetSeriesOverride.applyToElements(k, year, el);
   };
-  /** Ascending node on the invariable plane. @param {string} k @param {number} year @returns {number} */
+  /** Ecliptic longitude of perihelion, J2000 ecliptic and equinox (the chain's ϖ). @param {string} k @param {number} year @returns {number} */
+  const planetPerihelionDeg = (k, year) => planetChainElementsAt(k, year).lonPeriEclipticDeg;
+  /** Ascending node on the model's invariable plane, from the plane's ascending node on the ICRF equator (the Souami & Souchay 2012 origin; derived conversion, inv-plane-frame). @param {string} k @param {number} year @returns {number} */
   const planetAscNodeDeg = (k, year) => {
-    const p = PLANET_RECORDS[k];
-    return planetOrientation.ascendingNodeInvPlaneLinearAt({
-      ascendingNodeInvPlane: p.ascendingNodeInvPlane,
-      ascendingNodePeriod: p.ascendingNodePeriod,
-      perihelionEclipticYears: p.perihelionEclipticYears,
-    }, year);
+    if (planetNodeOriginSSDeg === null) {
+      planetNodeOriginSSDeg = computeEquatorNodeOriginSFrameDeg(/** @type {any} */ (CHAIN_ARTIFACT).invariablePlane, C.earthOrbital.obliquityJ2000_deg);
+    }
+    return convertNodeSFrameToEquatorOriginDeg(planetChainElementsAt(k, year).ascNodeInvPlaneDeg, planetNodeOriginSSDeg);
   };
-  /** Invariable-plane inclination (signed ICRF rate, scene year→JD axis). @param {string} k @param {number} year @returns {number} */
-  const planetInclinationDeg = (k, year) => {
-    const p = PLANET_RECORDS[k];
-    const jd = startmodelJD + (year - startmodelYear) * meanSolarYearDays;
-    const yearsSinceBalanced = (jd - balancedJD) / meanSolarYearDays;
-    return planetOrientation.invPlaneInclinationAt({
-      isEarth: false,
-      invPlaneInclinationJ2000: p.invPlaneInclinationJ2000,
-      invPlaneInclinationMean: p.invPlaneInclinationMean,
-      invPlaneInclinationAmplitude: p.invPlaneInclinationAmplitude,
-      inclinationCycleAnchor: p.inclinationCycleAnchor,
-      longitudePerihelion: p.longitudePerihelion,
-      perihelionEclipticYears: p.perihelionEclipticYears,
-      antiPhase: p.antiPhase,
-    }, yearsSinceBalanced, {
-      H,
-      yearsFromBalancedToJ2000: (startmodelJD - balancedJD) / meanSolarYearDays,
-    });
-  };
+  /** Inclination to the model's invariable plane (exact orbit-normal rotation). @param {string} k @param {number} year @returns {number} */
+  const planetInclinationDeg = (k, year) => planetChainElementsAt(k, year).inclInvPlaneDeg;
 
   // ── Time axis: exact JD ↔ model-year conversion ───────────────────────────
   // The model's `year` inputs live on the SI axis (the axis the fits were

@@ -1,6 +1,6 @@
 {
   "name": "@essrt/physics",
-  "version": "11.2.0",
+  "version": "11.3.0",
   "description": "ESSRT (Expanding Solar System Resonance Theory) physics core — pure, injectable-constants, no I/O, no globals, no DOM. The complete model incl. fitted coefficients; every published version immutably ships one recorded model identity.",
   "essrt": {
     "modelVersion": "v16.2",
