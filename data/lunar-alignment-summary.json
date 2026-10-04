@@ -12,9 +12,9 @@
     "unmatchedCanon": 0,
     "typeAgree": 1447,
     "meanAbsResidualMinutes": 8.518,
-    "meanAbsResidualMinutesFull": 8.517577475925972,
+    "meanAbsResidualMinutesFull": 8.51754764097518,
     "rmsResidualMinutes": 9.823,
-    "rmsResidualMinutesFull": 9.823462981358086,
+    "rmsResidualMinutesFull": 9.823393358904951,
     "maxAbsResidualMinutes": 19.299
   },
   "visibility": {
@@ -143,7 +143,7 @@
     "canonType": "Partial",
     "magnitudeUmbral": 0.9159,
     "canonMagnitudeUmbral": 0.9199,
-    "ttResidualMinutes": -4.47,
+    "ttResidualMinutes": -4.48,
     "visibleFromBabylon": true,
     "babylonMoonAltitudeDeg": 35.32
   },
@@ -415,7 +415,7 @@
     "perCentury": {
       "400": {
         "n": 5,
-        "medianSeconds": -272,
+        "medianSeconds": -271,
         "seSeconds": 408
       },
       "500": {
@@ -435,7 +435,7 @@
       },
       "1000": {
         "n": 38,
-        "medianSeconds": 179,
+        "medianSeconds": 178,
         "seSeconds": 123
       },
       "1100": {
@@ -465,8 +465,8 @@
       },
       "-500": {
         "n": 13,
-        "medianSeconds": -1211,
-        "seSeconds": 857
+        "medianSeconds": -1210,
+        "seSeconds": 856
       },
       "-400": {
         "n": 27,
@@ -480,7 +480,7 @@
       },
       "-200": {
         "n": 50,
-        "medianSeconds": -26,
+        "medianSeconds": -27,
         "seSeconds": 214
       },
       "-100": {
@@ -505,12 +505,12 @@
       "1200"
     ],
     "ablationChi2": {
-      "fullStack": 50.5,
+      "fullStack": 50.6,
       "minus_bond": 66.8,
-      "minus_hallstatt": 46.3,
-      "minus_jose5": 52.4,
-      "minus_jose4": 45.7,
-      "minus_resonator": 82.8,
+      "minus_hallstatt": 46.4,
+      "minus_jose5": 52.5,
+      "minus_jose4": 45.8,
+      "minus_resonator": 82.9,
       "noCycles": 78.4
     }
   },
@@ -526,7 +526,7 @@
       "data/rspa20160404supp2/Table-S14.txt": "sha256:67485e0c349f5c2e7ec3aa4f7952e93832fc1d6728f4bd8f4bfbcd26f7c6a6e6",
       "packages/api/src/app.js": "sha256:b182c6c3c5128cd4ecf5cda7d7af5fcb847b1f200ee2399a696e563552984cd3",
       "packages/physics/src/deltat/cycles.cjs": "sha256:da684bd21865005f05ceec845683f1549efc17d5b11aeac2cf362b3f8e52bf99",
-      "packages/physics/src/earth/deep-orbital-history.cjs": "sha256:352053008614a9bba087d5f5c7d493eaff6566b51476b1e9bcb55df971f974c7",
+      "packages/physics/src/earth/deep-orbital-history.cjs": "sha256:84b18c22798d2c7017bbf7ddffe485a8bb23754335dde8383152af7009e80730",
       "packages/physics/src/earth/sidereal-channel-artifact.cjs": "sha256:a46f99abbf000b8c59ec31d1c048a05fb5ae6515554f5e33f208d8dcd3f5cdf8",
       "packages/physics/src/earth/year-lengths.cjs": "sha256:c93061fd40a0dfcafcac65e00eaf74638094aafe7a858361aae14e92f1e7d077",
       "packages/physics/src/eclipse/finders.cjs": "sha256:168755d5e01397b7f63f2ffa49101afe0da0046e5fbd9e7ef6d04be6d7f5d330",

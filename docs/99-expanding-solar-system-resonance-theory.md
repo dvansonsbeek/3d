@@ -594,7 +594,7 @@ L(t) = L₀ + mean tropical rate · t + D(t)          (mean longitude)
    the IAU/Laskar drift expression to 0.1 s over −1000..+3000. THE
    OBSERVATION-CLASS CHECK (plan 06 I1, JPL Horizons' apparent Sun on a
    10-day TT grid over ±3000 yr, <!--v:sunVsHorizonsN-->219,152<!--/v--> instants): the model's apparent
-   Sun sits <!--v:sunVsHorizonsMeanArcsec-->1.74<!--/v-->″ from Horizons on average with sd <!--v:sunVsHorizonsSdArcsec-->2.06<!--/v-->″ over the whole
+   Sun sits <!--v:sunVsHorizonsMeanArcsec-->1.74<!--/v-->″ from Horizons on average with sd <!--v:sunVsHorizonsSdArcsec-->2.08<!--/v-->″ over the whole
    span — near zero in 1000–3000 (<!--v:sunVsHorizonsMeanP1000Arcsec-->1.8<!--/v--> / <!--v:sunVsHorizonsMeanP2000Arcsec-->−0.8<!--/v-->″),
    <!--v:sunVsHorizonsMeanM2000Arcsec-->2.3<!--/v-->″ at −2000..−1000 (the size of the difference between the model's
    equinox of date and Horizons' of-date frame) — and <!--v:sunVsHorizonsModernSdArcsec-->0.78<!--/v-->″ scatter in

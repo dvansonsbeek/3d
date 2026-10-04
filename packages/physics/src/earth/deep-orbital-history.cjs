@@ -174,11 +174,60 @@ function createDeepOrbitalHistory({
   if (zSeries) {
     const { t0Yr, stepYr, q: sq, p: sp } = zSeries;
     const nS = sq.length, tEndYr = t0Yr + (nS - 1) * stepYr;
-    const li = mkSeriesCubic(t0Yr, stepYr, nS);   // C1 (see mkSeriesCubic)
-    const R = [zAnchor[0] - li(sq, 0), zAnchor[1] - li(sp, 0)];
-    zAt = (/** @type {number} */ t) => (t >= t0Yr && t <= tEndYr)
-      ? [li(sq, t) + R[0], li(sp, t) + R[1]]
-      : zModeSum(t);
+    // POLAR-TANGENT Hermite (v16.2, owner-found via the anomalistic year).
+    // Differentiating cubic-interpolated Cartesian components with
+    // central-difference tangents gives an angular rate that differs from the
+    // angle's own slope by second-order terms, (ϖ̇·Δt)² and ë·Δt², a few
+    // 1e-4 relative at the 500-yr node spacing — measured −0.003 ″/yr on the
+    // J2000 apsidal rate at EVERY epoch (11.606 against the series' 11.609;
+    // 0.07 s of anomalistic year, 32 yr of apsidal period): a steady
+    // estimator bias, not noise. The components keep the Cartesian Hermite
+    // (pure arithmetic per sample — the browser/Node bit-exactness of the
+    // in-era cardinal model depends on it: a per-sample cos/sin/atan2 form
+    // split six in-era year lengths by half a ULP between the two V8s), but
+    // each node's component tangents are BUILT FROM THE POLAR CHORDS,
+    //   m_q = ė·q/e − ϖ̇·p,  m_p = ė·p/e + ϖ̇·q,
+    // so at the node (q·m_p − p·m_q)/e² = ϖ̇ and (q·m_q + p·m_p)/e = ė exactly:
+    // the node tangent IS the series' angle slope and e slope. The J2000
+    // anchor joins as a constant ROTATION (angular rate preserved) and an e
+    // OFFSET through hypot (identical across runtimes) — a constant Cartesian
+    // shift of a rotating vector bends its angular rate (+0.001 ″/yr
+    // measured). e(0) and ϖ(0) still equal the anchor. ζ keeps the plain
+    // form: it passes through zero near J2000.
+    const eS = new Float64Array(nS), thS = new Float64Array(nS);
+    let prev = 0, acc = 0;
+    for (let k = 0; k < nS; k++) {
+      eS[k] = Math.hypot(sq[k], sp[k]);
+      const a = Math.atan2(sp[k], sq[k]);
+      if (k) { let d = a - prev; if (d > Math.PI) d -= 2 * Math.PI; else if (d < -Math.PI) d += 2 * Math.PI; acc += d; }
+      prev = a; thS[k] = acc;
+    }
+    const mq = new Float64Array(nS), mp = new Float64Array(nS);
+    for (let k = 0; k < nS; k++) {
+      const k0 = k > 0 ? k - 1 : k, k1 = k + 1 < nS ? k + 1 : k;
+      const h = k1 - k0;   // 2 inside, 1 at the ends (one-sided, as mkSeriesCubic)
+      const eDot = (eS[k1] - eS[k0]) / h, thDot = (thS[k1] - thS[k0]) / h;
+      mq[k] = eDot * sq[k] / eS[k] - thDot * sp[k];
+      mp[k] = eDot * sp[k] / eS[k] + thDot * sq[k];
+    }
+    const herm = (/** @type {Float64Array|ReadonlyArray<number>} */ v, /** @type {Float64Array} */ m, /** @type {number} */ tt) => {
+      const x = (tt - t0Yr) / stepYr;
+      const i = Math.max(0, Math.min(nS - 2, Math.floor(x)));
+      const f = x - i, f2 = f * f, f3 = f2 * f;
+      return (2 * f3 - 3 * f2 + 1) * v[i] + (f3 - 2 * f2 + f) * m[i]
+        + (-2 * f3 + 3 * f2) * v[i + 1] + (f3 - f2) * m[i + 1];
+    };
+    // the J2000 join: rotate the series' z(0) onto the anchor's direction, offset e to the anchor's e
+    const q0 = herm(sq, mq, 0), p0 = herm(sp, mp, 0), r0 = Math.hypot(q0, p0);
+    const cr = (zAnchor[0] * q0 + zAnchor[1] * p0) / (anchorE * r0);
+    const ci = (zAnchor[1] * q0 - zAnchor[0] * p0) / (anchorE * r0);
+    const dE = anchorE - r0;
+    zAt = (/** @type {number} */ t) => {
+      if (!(t >= t0Yr && t <= tEndYr)) return zModeSum(t);
+      const q = herm(sq, mq, t), p = herm(sp, mp, t);
+      const s = 1 + dE / Math.hypot(q, p);
+      return [(q * cr - p * ci) * s, (q * ci + p * cr) * s];
+    };
   }
 
   /** @param {number} t */

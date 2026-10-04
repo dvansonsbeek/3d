@@ -25,9 +25,9 @@ The model starts from a single observation: two of Earth's precession motions ro
 | Motion | Direction | Cycle |
 |--------|-----------|-------|
 | Axial Precession | Clockwise | <!--v:axialPrecRound-->~25,771<!--/v--> years |
-| Apsidal Precession | Counter-clockwise | <!--v:inclPrecYears-->~111,667<!--/v--> years |
+| Apsidal Precession | Counter-clockwise | <!--v:inclPrecYears-->~111,635<!--/v--> years |
 
-These two counter-rotating motions combine into the climatic precession — the perihelion-of-date cycle, <!--v:lunisolarPeriOfDatePerPrecessionJ2000-->0.8125<!--/v--> of the axial precession period at J2000, because the two rates add. The apsidal period itself is <!--v:lunisolarApsidalPerPrecessionJ2000-->4.333<!--/v--> precession periods today and wanders between <!--v:lunisolarApsidalPerPrecessionWanderMin-->1.08<!--/v--> and <!--v:lunisolarApsidalPerPrecessionWanderMax-->9.81<!--/v--> across ±26 kyr — the simulator's Lunisolar Clock panel shows the live ratios. From this starting point, the model derives what is normally calculated separately: precession of the equinoxes, obliquity oscillation, eccentricity cycles, Milankovitch beat frequencies, the length of days and years, and the orbital-forcing component of climate (the timing of glacial-interglacial cycles).
+These two counter-rotating motions combine into the climatic precession — the perihelion-of-date cycle, <!--v:lunisolarPeriOfDatePerPrecessionJ2000-->0.8124<!--/v--> of the axial precession period at J2000, because the two rates add. The apsidal period itself is <!--v:lunisolarApsidalPerPrecessionJ2000-->4.332<!--/v--> precession periods today and wanders between <!--v:lunisolarApsidalPerPrecessionWanderMin-->1.08<!--/v--> and <!--v:lunisolarApsidalPerPrecessionWanderMax-->9.81<!--/v--> across ±26 kyr — the simulator's Lunisolar Clock panel shows the live ratios. From this starting point, the model derives what is normally calculated separately: precession of the equinoxes, obliquity oscillation, eccentricity cycles, Milankovitch beat frequencies, the length of days and years, and the orbital-forcing component of climate (the timing of glacial-interglacial cycles).
 
 Everything comes together in **one clock: the mean lunisolar precession period**, <!--v:lunisolarPeriodJ2000Yr-->25,771.4<!--/v--> years at J2000 — the period of the composed torque rate, which evolves on geological timescales with Earth's spin and the Moon's recession (see the deep-time section below). Earth's other long cycles are read against it as ratios of periods, and the obliquity band is the beat of that precession against the orbit's inclination mode (<!--v:obliqBeatJ2000Kyr-->41.2<!--/v--> kyr today) — and this simulation visualizes it all in one interactive view.
 
@@ -65,8 +65,8 @@ Earlier versions presented Earth's cycles as small-integer divisions of one mast
 The Sun is still the center of our solar system. The model uses a geo-heliocentric frame — viewing from Earth's perspective — to make the two counter-rotating precession motions visible:
 
 - **Earth's wobble center** (the EARTH-WOBBLE-CENTER marker) circles Earth clockwise in <!--v:axialPrecRound-->~25,771<!--/v--> years — this is axial precession
-- **Earth's perihelion point** wobbles counter-clockwise around the Sun in <!--v:inclPrecYears-->~111,667<!--/v--> years — this is apsidal precession
-- These two motions **meet every <!--v:periPrecYears-->~20,939<!--/v--> years** — producing perihelion precession
+- **Earth's perihelion point** wobbles counter-clockwise around the Sun in <!--v:inclPrecYears-->~111,635<!--/v--> years — this is apsidal precession
+- These two motions **meet every <!--v:periPrecYears-->~20,938<!--/v--> years** — producing perihelion precession
 - Earth orbits its perihelion point (close to the Sun) in 1 solar year; the seven planets follow their own N-body element chains (Kepler ellipses of date)
 
 The result: obliquity, inclination and the precession movements all follow from these two counter-rotating motions read against one clock. They are reference points, not forces, and their periods happen to stand near 13:3 at J2000 — a reading of two different clocks that wanders either side of the epoch, not a gearing between them.
@@ -256,8 +256,8 @@ The cardinal points (solstices/equinoxes) are **derived, not independently fitte
 
 - **The clock**: the mean lunisolar precession period, <!--v:lunisolarPeriodJ2000Yr-->25,771.4<!--/v--> years at J2000 (evolves under deep-time tidal evolution)
 - **Axial precession**: <!--v:axialPrecRound-->~25,771<!--/v--> years
-- **Apsidal precession**: <!--v:inclPrecYears-->~111,667<!--/v--> years
-- **Perihelion precession**: <!--v:periPrecYears-->~20,939<!--/v--> years — the beat of the two, 1/T_peri = 1/T_p + 1/T_aps
+- **Apsidal precession**: <!--v:inclPrecYears-->~111,635<!--/v--> years
+- **Perihelion precession**: <!--v:periPrecYears-->~20,938<!--/v--> years — the beat of the two, 1/T_peri = 1/T_p + 1/T_aps
 - **Model parameters**: two engines, three ledgers — zero free parameters on the planetary side, four named constants on the spin-and-tides side, and a gated fitted-correction stack; everything else is derived or anchored to astronomical observations (the canonical accounting is in the [Constants Reference](docs/20-constants-reference.md))
 
 ---

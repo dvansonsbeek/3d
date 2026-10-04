@@ -260,8 +260,8 @@ All precession periods emerge from ratios of year lengths:
 | Precession | Formula | Mean period |
 |------------|---------|-------------|
 | Axial | `Y_sid / (Y_sid − Y_trop)` | T_p = <!--v:earthAxialPeriod-->25,771<!--/v--> yr |
-| Perihelion | `Y_anom(s) / (Y_anom(s) − Y_trop(s))` | H/16 ≈ <!--v:earthPeriPeriod-->20,939<!--/v--> yr |
-| Inclination | `Y_anom(s) / (Y_anom(s) − Y_sid(s))` | H/3 ≈ <!--v:earthPeriPeriodICRF-->111,667<!--/v--> yr |
+| Perihelion | `Y_anom(s) / (Y_anom(s) − Y_trop(s))` | H/16 ≈ <!--v:earthPeriPeriod-->20,938<!--/v--> yr |
+| Inclination | `Y_anom(s) / (Y_anom(s) − Y_sid(s))` | H/3 ≈ <!--v:earthPeriPeriodICRF-->111,635<!--/v--> yr |
 | Obliquity | the beat of the clock against the nodal mode: 1/(1/T_p − 1/T_s₃) (the retired label H/8 read <!--v:hDiv8-->41,915<!--/v--> yr) | <!--v:obliqCycleYears-->~41,224<!--/v--> yr |
 | Ecliptic (nodal) | the N-body chain's dominant nodal mode s₃: 1,296,000/\|s₃\| (the retired label H/5 read <!--v:hDiv5-->67,063<!--/v--> yr) | <!--v:eclPrecYears-->~68,751<!--/v--> yr |
 

@@ -41,7 +41,7 @@ In the 3D simulation, this point is visualized as "The Death Star."
 This point determines Earth's varying distance to the Sun throughout the year (perihelion around January 3rd, aphelion around July 4th).
 
 - It orbits **counter-clockwise** around the EARTH-WOBBLE-CENTER
-- One complete orbit takes approximately **<!--v:inclPrecYears-->~111,667<!--/v--> years** (apsidal precession; see [Constants Reference](20-constants-reference.md))
+- One complete orbit takes approximately **<!--v:inclPrecYears-->~111,635<!--/v--> years** (apsidal precession; see [Constants Reference](20-constants-reference.md))
 - This slowly changes Earth's argument of periapsis relative to the fixed stars
 
 In the 3D simulation, this appears as a white dot.
@@ -50,10 +50,10 @@ In the 3D simulation, this appears as a white dot.
 
 The two movements interact:
 - Earth moves clockwise around EARTH-WOBBLE-CENTER (one axial precession period, <!--v:axialPrecRound-->~25,771<!--/v--> years)
-- PERIHELION-OF-EARTH moves counter-clockwise (one apsidal period, <!--v:inclPrecYears-->~111,667<!--/v--> years)
-- They meet and realign every **<!--v:periPrecYears-->~20,939<!--/v--> years** — the perihelion-of-date cycle, because the two rates add
+- PERIHELION-OF-EARTH moves counter-clockwise (one apsidal period, <!--v:inclPrecYears-->~111,635<!--/v--> years)
+- They meet and realign every **<!--v:periPrecYears-->~20,938<!--/v--> years** — the perihelion-of-date cycle, because the two rates add
 
-The solstice–perihelion alignment moves around the zodiac on that cycle. The simulator's Lunisolar Clock panel shows the live ratio of the two periods: <!--v:lunisolarApsidalPerPrecessionJ2000-->4.333<!--/v--> today, wandering between <!--v:lunisolarApsidalPerPrecessionWanderMin-->1.08<!--/v--> and <!--v:lunisolarApsidalPerPrecessionWanderMax-->9.81<!--/v--> across ±26 kyr.
+The solstice–perihelion alignment moves around the zodiac on that cycle. The simulator's Lunisolar Clock panel shows the live ratio of the two periods: <!--v:lunisolarApsidalPerPrecessionJ2000-->4.332<!--/v--> today, wandering between <!--v:lunisolarApsidalPerPrecessionWanderMin-->1.08<!--/v--> and <!--v:lunisolarApsidalPerPrecessionWanderMax-->9.81<!--/v--> across ±26 kyr.
 
 ---
 
@@ -64,8 +64,8 @@ Earth's spin tier runs on one clock: the mean lunisolar precession period, <!--v
 | Cycle | Period at J2000 | In precession periods |
 |-------|-----------------|-----------------------|
 | Axial precession | <!--v:axialPrecRound-->~25,771<!--/v--> yr | 1 |
-| Apsidal precession | <!--v:inclPrecYears-->~111,667<!--/v--> yr | <!--v:lunisolarApsidalPerPrecessionJ2000-->4.333<!--/v--> |
-| Perihelion-of-date | <!--v:periPrecYears-->~20,939<!--/v--> yr | <!--v:lunisolarPeriOfDatePerPrecessionJ2000-->0.8125<!--/v--> |
+| Apsidal precession | <!--v:inclPrecYears-->~111,635<!--/v--> yr | <!--v:lunisolarApsidalPerPrecessionJ2000-->4.332<!--/v--> |
+| Perihelion-of-date | <!--v:periPrecYears-->~20,938<!--/v--> yr | <!--v:lunisolarPeriOfDatePerPrecessionJ2000-->0.8124<!--/v--> |
 
 The ratios are J2000 readings, not laws — the apsidal ratio wanders across ±26 kyr as the table above the panel shows. The model's earlier presentation, one "master cycle" divided by the small integers 13, 3 and 16, is retired ([retired record](retired-record.md)); the fitted timing anchor that presentation was built on remains a Ledger-2 constant of the [Constants Reference](20-constants-reference.md), and [doc 10](10-fibonacci-laws.md) keeps the historical derivation.
 

@@ -14,76 +14,76 @@
    "13": {
     "hybridRmsArcsec": 529.2713161680445,
     "hybridCorr": 0.9948651054702462,
-    "fittedLawRmsArcsec": 529.6750388392322,
-    "fittedLawCorr": 0.9948193703072242
+    "fittedLawRmsArcsec": 529.6677391901577,
+    "fittedLawCorr": 0.9948190496473519
    },
    "50": {
     "hybridRmsArcsec": 388.52871616462585,
     "hybridCorr": 0.9981285425802966,
-    "fittedLawRmsArcsec": 388.8424278556015,
-    "fittedLawCorr": 0.9981050946902329
+    "fittedLawRmsArcsec": 388.8438055937707,
+    "fittedLawCorr": 0.9981051504368691
    },
    "130": {
     "hybridRmsArcsec": 380.019595407789,
     "hybridCorr": 0.996173749692772,
-    "fittedLawRmsArcsec": 381.21130524889645,
-    "fittedLawCorr": 0.9960859975935684
+    "fittedLawRmsArcsec": 381.2162230783061,
+    "fittedLawCorr": 0.9960859499661409
    },
    "270": {
     "hybridRmsArcsec": 429.68936064970273,
     "hybridCorr": 0.9924328058189807,
-    "fittedLawRmsArcsec": 453.1146277571114,
-    "fittedLawCorr": 0.9908621986462298
+    "fittedLawRmsArcsec": 453.1255226439789,
+    "fittedLawCorr": 0.9908616581703765
    },
    "600": {
     "hybridRmsArcsec": 587.416255944484,
     "hybridCorr": 0.9731785529465661,
-    "fittedLawRmsArcsec": 646.3333872510794,
-    "fittedLawCorr": 0.9662036702845237
+    "fittedLawRmsArcsec": 646.3523450195995,
+    "fittedLawCorr": 0.9662015609678656
    },
    "1000": {
     "hybridRmsArcsec": 687.2949095431939,
     "hybridCorr": 0.9481038129063416,
-    "fittedLawRmsArcsec": 769.4334067235466,
-    "fittedLawCorr": 0.9325784138198311
+    "fittedLawRmsArcsec": 769.4540978877961,
+    "fittedLawCorr": 0.9325746722053745
    }
   },
   "windowsEra": {
    "13": {
     "hybridRmsArcsec": 49.96516385050455,
     "hybridCorr": 0.9998294196417337,
-    "fittedLawRmsArcsec": 529.6750388392322,
-    "fittedLawCorr": 0.9948193703072242
+    "fittedLawRmsArcsec": 529.6677391901577,
+    "fittedLawCorr": 0.9948190496473519
    },
    "50": {
     "hybridRmsArcsec": 426.7062801313648,
     "hybridCorr": 0.9905757425369925,
-    "fittedLawRmsArcsec": 388.8424278556015,
-    "fittedLawCorr": 0.9981050946902329
+    "fittedLawRmsArcsec": 388.8438055937707,
+    "fittedLawCorr": 0.9981051504368691
    },
    "130": {
     "hybridRmsArcsec": 488.406410276667,
     "hybridCorr": 0.9820422947175481,
-    "fittedLawRmsArcsec": 381.21130524889645,
-    "fittedLawCorr": 0.9960859975935684
+    "fittedLawRmsArcsec": 381.2162230783061,
+    "fittedLawCorr": 0.9960859499661409
    },
    "270": {
     "hybridRmsArcsec": 489.89340712978634,
     "hybridCorr": 0.982110983196137,
-    "fittedLawRmsArcsec": 453.1146277571114,
-    "fittedLawCorr": 0.9908621986462298
+    "fittedLawRmsArcsec": 453.1255226439789,
+    "fittedLawCorr": 0.9908616581703765
    },
    "600": {
     "hybridRmsArcsec": 548.2813054176148,
     "hybridCorr": 0.9724064695872137,
-    "fittedLawRmsArcsec": 646.3333872510794,
-    "fittedLawCorr": 0.9662036702845237
+    "fittedLawRmsArcsec": 646.3523450195995,
+    "fittedLawCorr": 0.9662015609678656
    },
    "1000": {
     "hybridRmsArcsec": 644.444974667402,
     "hybridCorr": 0.9495619191574651,
-    "fittedLawRmsArcsec": 769.4334067235466,
-    "fittedLawCorr": 0.9325784138198311
+    "fittedLawRmsArcsec": 769.4540978877961,
+    "fittedLawCorr": 0.9325746722053745
    }
   }
  },
@@ -92,9 +92,9 @@
   "files": {
    "data/la2004-earth-51myr-back.asc": "sha256:3f13b9f8e69085baf40bc67a2669e6f6af4148fef9218ed2158772aa91e35f8c",
    "data/nbody-deep-secular-modes.json": "sha256:7633dd8f434fd6fc1ddaf07fd3ec3623e91e09322002ec08d53b8a12e6883fb7",
-   "data/nbody-secular-series.json": "sha256:35dfc98b8b5e68d4fc0f6f9d9f80f7f863e5660db7eb843ac1c9bdde8b00e693",
+   "data/nbody-secular-series.json": "sha256:591539ada7f70540610b9daff5a2c0a707500e9407fd4b2887b6d6537824beab",
    "packages/physics/src/deltat/deep-time.cjs": "sha256:42334b8c071a8d320312ad8f116c95360501f055757cbf1888d4822f708ace47",
-   "packages/physics/src/earth/deep-orbital-history.cjs": "sha256:352053008614a9bba087d5f5c7d493eaff6566b51476b1e9bcb55df971f974c7",
+   "packages/physics/src/earth/deep-orbital-history.cjs": "sha256:84b18c22798d2c7017bbf7ddffe485a8bb23754335dde8383152af7009e80730",
    "packages/physics/src/earth/precession-composed.cjs": "sha256:7f30ac5597b745a88b453c54bb47da39e5ec3c8bb8b349e34e8a15752c04a208",
    "tools/explore/stage-c-obliquity-hybrid.mjs": "sha256:383891c893099b818dfa1b03053ea1c255e0e6b156cd025efe2e445599f0d44b",
    "tools/lib/deep-time.js": "sha256:954cc8bf006f133fee14bdefb738f7947623f676e695b43cb6c8b57585627f61",
