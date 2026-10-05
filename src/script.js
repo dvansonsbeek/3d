@@ -44020,7 +44020,7 @@ async function analyzeSolarDayMultiEpoch() {
 
     if (result) {
       const offsetA = (result.methodA.mean - meanlengthofday) * 1000;  // ms
-      const obliquity = getObliquityAtYear(epochYear);
+      const obliquity = computeObliquityEarth(epochYear);   // R9: the 16-harmonic law, not the retired two-cosine device
       const inclination = getEarthInclinationAtYear(epochYear);
       const eclipticInclination = obliquity - inclination;
       const ecc = computeEccentricityEarthAtYear(epochYear);  // the ONE law (unification)
@@ -55603,27 +55603,17 @@ function getEarthInclinationAtYear(year) {
   return computeInclinationEarth(year, null, null, earthInvPlaneInclinationMean, earthInvPlaneInclinationAmplitude);
 }
 
-/**
- * Compute Earth's obliquity at a specific year.
- *
- * @param {number} year - Year to compute for
- * @returns {number} Earth obliquity in degrees
- */
-function getObliquityAtYear(year) {
-  // Phase 9.10c: J2000-anchored phase via cyclesBetweenYears (Phase 9.10b
-  // drift-corrected). Pre-migration this used live balancedYear +
-  // holisticyearLength snapshot phase, which drifts under deep-time scrubbing
-  // when `recomputeDerivedAnchorsForEpoch` mutates `balancedYear`. Formula
-  // structure (Pythagorean 2-harmonic approximation with earthtiltMean) is
-  // deliberately preserved — callers in `integrateEffect` rely on the clean
-  // H/3+H/8 extremum structure rather than the 16-harmonic computeObliquityEarth.
-  const cycles3 = cyclesBetweenYears(BALANCED_YEAR_J2000_FIXED, year, 3);
-  const cycles8 = cyclesBetweenYears(BALANCED_YEAR_J2000_FIXED, year, 8);
-  if (cycles3 === null || cycles8 === null) return earthtiltMean;
-  const phase3 = cycles3 * 2 * Math.PI;
-  const phase8 = cycles8 * 2 * Math.PI;
-  return earthtiltMean - earthInvPlaneInclinationAmplitude * Math.cos(phase3) + earthInvPlaneInclinationAmplitude * Math.cos(phase8);
-}
+// R9 (plan 07): `getObliquityAtYear` stood here — the retired two-cosine
+// device form, earthtiltMean − A·cos(phase3) + A·cos(phase8). Its own comment
+// said the structure was "deliberately preserved" because the callers in
+// `integrateEffect` relied on the clean H/3+H/8 extremum structure; that was
+// the stated blocker on retiring earthtiltMean. Those callers now read
+// `computeObliquityEarth`, the same law the Node twin injects, and the
+// sampling search uses the twin's 500-yr step — so the structure is no longer
+// relied on by anything and the function is gone. The device constants it
+// read survive elsewhere (R9 is only half-done: ψ is still DEFINED from
+// earthInvPlaneInclinationAmplitude via computePsiConstant, so that constant
+// cannot go until R5 lands).
 
 /**
  * Find the year when Earth's inclination equals a target value.
@@ -55783,18 +55773,29 @@ function calculateDynamicAscendingNodeFromTilts(orbitTilta, orbitTiltb, currentO
     { ascendingNodeDeg: staticOmegaDeg, inclinationDeg: planetInclination },
     currentYear,
     {
-      obliquityAt: getObliquityAtYear,
+      // R9 prerequisite: the integrator reads the SAME obliquity as its Node
+      // twin (orbital-engine injects computeObliquityEarth). It used to read
+      // getObliquityAtYear — the retired two-cosine device form — so the two
+      // engines ran one law on two different obliquities: equal at J2000 by
+      // construction and parting with distance (measured 7.5″ at −5,000, 55″
+      // at −10,000, 222″ at −20,000, 156″ at +20,000), which dΩ/dε carried
+      // straight into the integrated node. Nothing gated it: the smoke
+      // surface's probe was never recorded until now.
+      obliquityAt: computeObliquityEarth,
       earthInclinationAt: getEarthInclinationAtYear,
       obliquityExtremaInRange: (yearMin, yearMax) => {
         // Sample to find obliquity direction changes, bisect to the extremum.
+        // The 500-yr step is the Node twin's, for its reason: well below half
+        // the shortest period (~5,235 yr), so the search finds the law's own
+        // turning points and not sampling artefacts.
         const extrema = [];
-        const sampleStep = Math.min(1000, (yearMax - yearMin) / 100);
+        const sampleStep = Math.min(500, (yearMax - yearMin) / 100);
         if (sampleStep > 0) {
-          let prevObl = getObliquityAtYear(yearMin);
+          let prevObl = computeObliquityEarth(yearMin);
           let prevDir = 0;
 
           for (let y = yearMin + sampleStep; y <= yearMax; y += sampleStep) {
-            const obl = getObliquityAtYear(y);
+            const obl = computeObliquityEarth(y);
             const curDir = obl > prevObl ? 1 : (obl < prevObl ? -1 : 0);
 
             if (prevDir !== 0 && curDir !== 0 && prevDir !== curDir) {
@@ -55803,9 +55804,9 @@ function calculateDynamicAscendingNodeFromTilts(orbitTilta, orbitTiltb, currentO
               let hi = y;
               for (let iter = 0; iter < 20; iter++) {
                 const mid = (lo + hi) / 2;
-                const oblLo = getObliquityAtYear(lo);
-                const oblMid = getObliquityAtYear(mid);
-                const oblHi = getObliquityAtYear(hi);
+                const oblLo = computeObliquityEarth(lo);
+                const oblMid = computeObliquityEarth(mid);
+                const oblHi = computeObliquityEarth(hi);
 
                 if ((oblMid > oblLo && oblMid > oblHi) || (oblMid < oblLo && oblMid < oblHi)) {
                   extrema.push(mid);
