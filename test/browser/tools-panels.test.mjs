@@ -63,6 +63,20 @@ try {
     check(`${name}: three quick clicks leave ONE panel, visible`, r.found && r.rapid && r.rapid.count === 1 && r.rapid.visible === 1, r.found ? JSON.stringify(r.rapid) : '');
     check(`${name}: closes again`, r.found && r.closed && r.closed.count === 1 && r.closed.visible === 0, r.found ? JSON.stringify(r.closed) : '');
   }
+  // ── The Framework-Verification panel ORDER invariant ──────────────────────
+  // VFP_CATEGORIES is SORTED by VFP_ORDER, so a category id missing from the
+  // order array scores indexOf = −1 and silently sorts FIRST — and the first
+  // category is also the default-open panel. Measured: the perihelion panel
+  // shipped at the top of the list exactly that way, registered in the
+  // definitions but not in the order. Two lists, both required; this fails on
+  // either half drifting.
+  const order = await sim.page.evaluate(() => window.__test__.vfpOrderAudit());
+  check('every VFP category is placed in VFP_ORDER (none silently sorts first)',
+    order.missingFromOrder.length === 0, 'missing: ' + (order.missingFromOrder.join(', ') || 'none'));
+  check('VFP_ORDER carries no id without a category',
+    order.staleInOrder.length === 0, 'stale: ' + (order.staleInOrder.join(', ') || 'none'));
+  check('the All-planets panels close the list, perihelion last',
+    order.last === 'planet-perihelion', 'last: ' + order.last + ' · first: ' + order.first);
   check('page came up without errors', sim.errors.length === 0, sim.errors.slice(0, 3).join(' | '));
 } catch (e) {
   check('suite ran to completion', false, String((e && e.stack) || e));

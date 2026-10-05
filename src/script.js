@@ -6318,6 +6318,17 @@ if (typeof window !== 'undefined') {
     vfpPPRender: () => renderVFPPlanetPerihelion(),
     vfpPPAfterRender: (el) => _vfpPPAfterRender(el),
     vfpPPPaperSvg: (range) => _vfpPPPaperSvg(range || _VFPPI_SCREEN_RANGE),
+    // The panel-ORDER invariant. VFP_CATEGORIES is sorted by VFP_ORDER, so an
+    // id missing from the order array scores indexOf = −1 and silently sorts
+    // FIRST — it also becomes the default-open panel. Measured: the perihelion
+    // panel shipped at the top of the list exactly that way, registered in the
+    // definitions but not in the order. Two lists, both required.
+    vfpOrderAudit: () => ({
+      missingFromOrder: VFP_CATEGORIES.map((c) => c.id).filter((id) => VFP_ORDER.indexOf(id) < 0),
+      staleInOrder: VFP_ORDER.filter((id) => !VFP_CATEGORIES.some((c) => c.id === id)),
+      first: VFP_CATEGORIES[0] && VFP_CATEGORIES[0].id,
+      last: VFP_CATEGORIES[VFP_CATEGORIES.length - 1] && VFP_CATEGORIES[VFP_CATEGORIES.length - 1].id,
+    }),
     openVerificationPanel: () => openVerificationPanel(),
     updateVerificationPanel: (id) => updateVerificationPanel(id),
     // C1 period-of-date probe surface: the two-tier composition, per factor
@@ -20714,7 +20725,7 @@ const VFP_ORDER = [
   'all-precession', 'climatic-precession', 'insolation-65n', 'milankovitch-overview', 'analemma',   // Earth cycles
   'tropical-year', 'sidereal-year', 'anomalistic-year', 'cardinal-year-lengths', 'season-durations', 'solar-day', 'sidereal-stellar-day', 'delta-t',   // Earth clock
   'moon-arguments', 'moon-months', 'moon-perigee', 'moon-node',     // Moon
-  'planet-inclinations', 'planet-eccentricities',                   // All planets
+  'planet-inclinations', 'planet-eccentricities', 'planet-perihelion',   // All planets
 ];
 VFP_CATEGORIES.sort((a, b) => VFP_ORDER.indexOf(a.id) - VFP_ORDER.indexOf(b.id));
 const _vfpTitleOf = (cat) => (cat.group ? cat.group + ' · ' : '') + cat.label;
