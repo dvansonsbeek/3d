@@ -1881,16 +1881,6 @@ export const VALUES = {
   // numH; else numH/den, '−' prefix when retrograde). Eccentricities from
   // the per-planet JPL DE440 J2000 elements (Earth from astro earthOrbital).
   ...(() => {
-    const periFraction = (planet) => (planet === 'pluto'
-      ? model.additionalBodies.pluto.perihelionEclipticFraction
-      : model.planets[planet].perihelionEclipticFraction);
-    const periLabel = ([num, den]) => {
-      const sign = num < 0 ? '−' : '';
-      const n = Math.abs(num);
-      if (n === 1) return `${sign}H/${den}`;
-      if (den === 1) return `${sign}${n}H`;
-      return `${sign}${n}H/${den}`;
-    };
     const out = {};
     // Plan 07 (planet channel migration): the perihelion period and rate of
     // each planet are THE CHAIN'S — `<p>PeriPeriod` the perihelion period
@@ -1907,17 +1897,11 @@ export const VALUES = {
     // quote; Neptune's window rate is ill-conditioned (e = 0.011) and its
     // secular mode is the only bounded statement.
     const PERI_NOTE = (p) => `of-date perihelion period/rate: the chain's secular g (${chainArt().g[p].nearestLaskar.mode}, ${chainG(p).toFixed(4)} ″/yr) + the J2000 general precession; inertial twin <${p}PeriPeriodICRF>, era window <${p}PeriRateNowArcsecCy>`;
-    const PERI_TYPE = {
-      mercury: 'type B — present-epoch Newtonian rate (the long-term mean is g₁; see mercuryPeriFreqArcsecPerYr)',
-      venus: 'type C — window-epoch descriptor (small-e z is mode-mixed; ill-conditioned in short windows)',
-      mars: 'type A — long-term mean (2.7 % under the g₄ eigenfrequency)',
-      jupiter: 'type C — window-epoch descriptor (the long-term mean is g₅ ≈ 426 ″/cy)',
-      saturn: 'type C — window-epoch descriptor (retrograde in the present window; the long-term mean g₆ ≈ +2,824 ″/cy is PROGRADE)',
-      uranus: 'type C — window-epoch descriptor',
-      neptune: 'type C — window-epoch descriptor',
-      pluto: 'window-epoch descriptor (untyped)',
-    };
-    void PERI_TYPE; void periFraction; void periLabel;   // the retired descriptors' typing and labels — kept above as the record of what the device published
+    // (The doc-109 §9 typing of the retired 8H/N descriptors — "type A long-term
+    // mean · B present-epoch rate · C window-epoch value" — and the H/den label
+    // builder stood here, kept alive by a `void` so lint would pass. Dead code is
+    // not a record: docs/retired-record.md and git history carry what the device
+    // published, and the live notes below say what each key is now.)
     for (const planet of ['mercury', 'venus', 'mars', 'jupiter', 'saturn', 'uranus', 'neptune']) {
       const ofDateArcsecPerYr = () => chainG(planet) + pAJ2000ArcsecPerYr();
       out[`${planet}PeriPeriod`] = {
@@ -2466,10 +2450,23 @@ export const VALUES = {
       out[`cardinalAnchor${cp}2000JD`] = { get: () => astro.cardinalPointAnchors[cp], render: (v) => String(v), unit: 'JD', note: `USNO 2000 ${label} (UTC, minute precision)` };
     }
     out.iauPrecessionInputYears = { get: () => astro.yearLengthRef.iauPrecessionJ2000, render: (v) => thousands(v, 2), unit: 'yr', note: 'stored iauPrecessionJ2000 input — IAU 2006 rate on the model day basis' };
-    out.earthEccCycle = { get: () => C.H / 3, render: (v) => thousands(Math.round(v)), unit: 'yr', note: 'the period of Earth\'s |e| oscillation — the one H/3 eccentricity law (doc 108). The H/16 = 13+3 wobble beat is the perihelion-DIRECTION cycle (periPrecYears), not the eccentricity cycle' };
+    // `earthEccCycle` stood here, publishing H/3 as "the period of Earth's |e|
+    // oscillation — the one H/3 eccentricity law". That law was retired from
+    // the physics on 2026-09-28: Earth's eccentricity is the engine's N-body
+    // series on every shipped path, and a multi-mode beat has no single period
+    // to publish. The key had NO consumer in the docs, the site or the paper —
+    // a retired claim nothing read. Deleted rather than restated (plan 07: a
+    // name whose quantity is the device itself goes with the device).
+    // The node cycle, by contrast, SURVIVES as a quantity — it is the chain's
+    // leading nodal eigenmode — so the key keeps its name and changes its
+    // getter: 1,296,000/|s| yr, the twin of <p>PeriPeriodICRF on the g side.
     for (const p of ['mercury', 'venus', 'mars', 'jupiter', 'saturn', 'uranus', 'neptune']) {
-      const n = model.planets[p].ascendingNodeCyclesIn8H;
-      out[`${p}AscNodeCycleYears`] = { get: () => (8 * C.H) / n, render: (v) => thousands(Math.round(v)), unit: 'yr', note: `asc-node cycle = 8H/${n}` };
+      out[`${p}AscNodeCycleYears`] = {
+        get: () => 1296000 / Math.abs(chainArt().s[p].arcsecPerYr),
+        render: (v) => thousands(Math.round(v)),
+        unit: 'yr',
+        note: `nodal cycle on the invariable plane — the chain's leading secular nodal mode (${chainArt().s[p].nearestLaskar.mode}, ${chainArt().s[p].arcsecPerYr.toFixed(3)} ″/yr; regression, so the period is quoted as a magnitude). Plan 07: was the device's 8H/${model.planets[p].ascendingNodeCyclesIn8H}`,
+      };
     }
     return out;
   })(),

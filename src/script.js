@@ -20940,6 +20940,13 @@ function _vfpPIChartCore(range, tab, on, style) {
     grid += '<line x1="' + xp.toFixed(1) + '" y1="' + PAD.t + '" x2="' + xp.toFixed(1) + '" y2="' + (H - PAD.b) + '" stroke="' + cGrid + '" stroke-width="0.5"/>' +
       '<text x="' + xp.toFixed(1) + '" y="' + (H - PAD.b + 12) + '" fill="' + cTick + '" font-size="' + fXT + '" text-anchor="' + ta + '">' + lbl + '</text>';
   }
+  // J2000 marker — the house convention of the formula charts. This panel and
+  // its eccentricity twin were the two that lacked it (owner, 2026-10-05).
+  if (S.y0 <= 2000 && S.y1 >= 2000) {
+    const xj = toX(2000).toFixed(1);
+    grid += '<line x1="' + xj + '" y1="' + PAD.t + '" x2="' + xj + '" y2="' + (H - PAD.b) + '" stroke="' + (paper ? '#999' : '#8a93a5') + '" stroke-width="0.8" stroke-dasharray="3,3" opacity="0.8"/>' +
+      '<text x="' + xj + '" y="' + (H - PAD.b - 4) + '" fill="' + cTick + '" font-size="' + fXT + '" text-anchor="middle">J2000</text>';
+  }
   if (paper) grid += '<rect x="' + PAD.l + '" y="' + PAD.t + '" width="' + pw + '" height="' + ph + '" fill="none" stroke="#ccc" stroke-width="0.5"/>';
   // the legend never lives in the core body: the screen shows the HTML
   // .vfp-legend strip above the chart, the paper form draws entries as a
@@ -21249,6 +21256,13 @@ function _vfpPEChartCore(range, on, style) {
     const lbl = xt === 0 ? '0' : Math.abs(xt).toLocaleString('en-US') + (xt < 0 ? ' BC' : ' AD');
     grid += '<line x1="' + xp.toFixed(1) + '" y1="' + PAD.t + '" x2="' + xp.toFixed(1) + '" y2="' + (H - PAD.b) + '" stroke="' + cGrid + '" stroke-width="0.5"/>' +
       '<text x="' + xp.toFixed(1) + '" y="' + (H - PAD.b + 12) + '" fill="' + cTick + '" font-size="' + fXT + '" text-anchor="' + ta + '">' + lbl + '</text>';
+  }
+  // J2000 marker — the house convention of the formula charts (see the
+  // inclination twin: these two were the panels that lacked it).
+  if (S.y0 <= 2000 && S.y1 >= 2000) {
+    const xj = toX(2000).toFixed(1);
+    grid += '<line x1="' + xj + '" y1="' + PAD.t + '" x2="' + xj + '" y2="' + (H - PAD.b) + '" stroke="' + (paper ? '#999' : '#8a93a5') + '" stroke-width="0.8" stroke-dasharray="3,3" opacity="0.8"/>' +
+      '<text x="' + xj + '" y="' + (H - PAD.b - 4) + '" fill="' + cTick + '" font-size="' + fXT + '" text-anchor="middle">J2000</text>';
   }
   if (paper) grid += '<rect x="' + PAD.l + '" y="' + PAD.t + '" width="' + pw + '" height="' + ph + '" fill="none" stroke="#ccc" stroke-width="0.5"/>';
   return { W, H, PAD, S, body: band + grid + curves, entries, jplRmsParts, la2010Note };
