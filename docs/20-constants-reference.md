@@ -396,14 +396,14 @@ only (the planet chains ride the orbital dynamics engine); the historical record
 
 | Planet | Mean (deg) | Amplitude (deg) | Range (deg) | Phase Angle | ICRF Period |
 |--------|----------|---------------|-----------|-------------|-------------|
-| Mercury | <!--v:mercuryInclMean-->6.703228<!--/v--> | <!--v:mercuryInclAmp-->0.386501<!--/v--> | 6.32 - 7.09 | <!--v:mercuryInclCycleAnchor-->234.52<!--/v-->° | <!--v:mercuryPeriPeriodICRF-->28,844<!--/v--> yr |
-| Venus | <!--v:venusInclMean-->2.151359<!--/v--> | 0.062165 | 2.09 - 2.21 | <!--v:venusInclCycleAnchor-->218.64<!--/v-->° | <!--v:venusPeriPeriodICRF-->24,387<!--/v--> yr |
+| Mercury | <!--v:mercuryInclMean-->6.690356<!--/v--> | <!--v:mercuryInclAmp-->5.414244<!--/v--> | 6.32 - 7.09 | <!--v:mercuryInclCycleAnchor-->234.52<!--/v-->° | <!--v:mercuryPeriPeriodICRF-->232,437<!--/v--> yr |
+| Venus | <!--v:venusInclMean-->1.538007<!--/v--> | 0.062165 | 2.09 - 2.21 | <!--v:venusInclCycleAnchor-->218.64<!--/v-->° | <!--v:venusPeriPeriodICRF-->174,997<!--/v--> yr |
 | Earth | <!--v:earthInclMean-->1.48113<!--/v--> | <!--v:earthInclAmp-->0.63607<!--/v--> | 0.85 - 2.12 | <!--v:earthInclCycleAnchor-->21.77<!--/v-->° | H/3 ≈ <!--v:earthPeriPeriodICRF-->111,635<!--/v--> yr |
-| Mars | <!--v:marsInclMean-->1.833263<!--/v--> | <!--v:marsInclAmp-->1.164287<!--/v--> | 0.67 - 3.00 | <!--v:marsInclCycleAnchor-->236.07<!--/v-->° | <!--v:marsPeriPeriodICRF-->39,449<!--/v--> yr |
-| Jupiter | <!--v:jupiterInclMean-->0.321086<!--/v--> | <!--v:jupiterInclAmp-->0.021405<!--/v--> | 0.30 - 0.34 | <!--v:jupiterInclCycleAnchor-->287.06<!--/v-->° | <!--v:jupiterPeriPeriodICRF-->41,270<!--/v--> yr |
-| Saturn | <!--v:saturnInclMean-->0.984969<!--/v--> | <!--v:saturnInclAmp-->0.065196<!--/v--> | 0.92 - 1.05 | <!--v:saturnInclCycleAnchor-->116.26<!--/v-->° (anti-phase) | <!--v:saturnPeriPeriodICRF-->15,873<!--/v--> yr |
-| Uranus | <!--v:uranusInclMean-->1.015183<!--/v--> | <!--v:uranusInclAmp-->0.023832<!--/v--> | 0.99 - 1.04 | 21.33° | H/10 ≈ <!--v:uranusPeriPeriodICRF-->33,532<!--/v--> yr |
-| Neptune | <!--v:neptuneInclMean-->0.743803<!--/v--> | <!--v:neptuneInclAmp-->0.013552<!--/v--> | 0.73 - 0.76 | <!--v:neptuneInclCycleAnchor-->174.04<!--/v-->° | 2H/25 ≈ <!--v:neptunePeriPeriodICRF-->26,825<!--/v--> yr |
+| Mars | <!--v:marsInclMean-->4.205751<!--/v--> | <!--v:marsInclAmp-->3.368563<!--/v--> | 0.67 - 3.00 | <!--v:marsInclCycleAnchor-->236.07<!--/v-->° | <!--v:marsPeriPeriodICRF-->72,335<!--/v--> yr |
+| Jupiter | <!--v:jupiterInclMean-->0.362180<!--/v--> | <!--v:jupiterInclAmp-->0.137944<!--/v--> | 0.30 - 0.34 | <!--v:jupiterInclCycleAnchor-->287.06<!--/v-->° | <!--v:jupiterPeriPeriodICRF-->304,456<!--/v--> yr |
+| Saturn | <!--v:saturnInclMean-->0.891047<!--/v--> | <!--v:saturnInclAmp-->0.273630<!--/v--> | 0.92 - 1.05 | <!--v:saturnInclCycleAnchor-->116.26<!--/v-->° (anti-phase) | <!--v:saturnPeriPeriodICRF-->45,883<!--/v--> yr |
+| Uranus | <!--v:uranusInclMean-->1.019370<!--/v--> | <!--v:uranusInclAmp-->0.146147<!--/v--> | 0.99 - 1.04 | 21.33° | H/10 ≈ <!--v:uranusPeriPeriodICRF-->330,515<!--/v--> yr |
+| Neptune | <!--v:neptuneInclMean-->0.668278<!--/v--> | <!--v:neptuneInclAmp-->0.201769<!--/v--> | 0.73 - 0.76 | <!--v:neptuneInclCycleAnchor-->174.04<!--/v-->° | 2H/25 ≈ <!--v:neptunePeriPeriodICRF-->2,136,796<!--/v--> yr |
 | Pluto | <!--v:plutoInclMean-->15.716200<!--/v--> | <!--v:plutoInclAmp-->0.717024<!--/v--> | 15.00 - 16.43 | <!--v:plutoInclCycleAnchor-->203.32<!--/v-->° | H/12 ≈ <!--v:plutoPeriPeriodICRF-->27,943<!--/v--> yr |
 
 **Formula**: `i(t) = mean + amplitude × cos(ω̃_ICRF(t) - cycleAnchor)` (Saturn: sign flipped, anti-phase)
@@ -424,21 +424,21 @@ only (the planet chains ride the orbital dynamics engine); the historical record
 
 | Planet | Device construction (Y = the anchor interval `holisticyearLength`; retired framing) | Period (years) |
 |--------|---------|----------------|
-| Mercury | Y / (1 + 3/8) | ~<!--v:mercuryPeriPeriod-->243,867<!--/v--> |
-| Venus | −8Y / 6 | ~-<!--v:venusPeriPeriod-->447,089<!--/v--> (retrograde) |
+| Mercury | Y / (1 + 3/8) | ~<!--v:mercuryPeriPeriod-->23,199<!--/v--> |
+| Venus | −8Y / 6 | ~-<!--v:venusPeriPeriod-->22,463<!--/v--> (retrograde) |
 | Earth | the perihelion-of-date beat (the of-date year laws; the device's Y/16 read 20,957) | <!--v:periPrecYears-->~20,938<!--/v--> |
-| Mars | Y × 8/36 | ~<!--v:marsPeriPeriod-->74,515<!--/v--> |
-| Jupiter | 8Y / 39 | ~<!--v:jupiterPeriPeriod-->68,783<!--/v--> |
-| Saturn | −8Y / 65 | ~-<!--v:saturnPeriPeriod-->41,270<!--/v--> (retrograde) |
-| Uranus | Y / 3 | ~<!--v:uranusPeriPeriod-->111,772<!--/v--> |
-| Neptune | Y × 2 | ~<!--v:neptunePeriPeriod-->670,634<!--/v--> |
+| Mars | Y × 8/36 | ~<!--v:marsPeriPeriod-->19,002<!--/v--> |
+| Jupiter | 8Y / 39 | ~<!--v:jupiterPeriPeriod-->23,760<!--/v--> |
+| Saturn | −8Y / 65 | ~-<!--v:saturnPeriPeriod-->16,502<!--/v--> (retrograde) |
+| Uranus | Y / 3 | ~<!--v:uranusPeriPeriod-->23,907<!--/v--> |
+| Neptune | Y × 2 | ~<!--v:neptunePeriPeriod-->25,464<!--/v--> |
 
 These are the model's typed lattice descriptors ([doc 109 §9](109-model-nbody-engine-and-lattice-test.md)
 gives each planet's quantity type). Mercury's row is the Newtonian rate; the observed motion adds the
 derived relativistic supplement:
-<!--v:mercuryPeriRateEclipticArcsecCy-->531.44<!--/v--> +
+<!--v:mercuryPeriRateEclipticArcsecCy-->529.03<!--/v--> +
 <!--v:mercuryPeriAnomalyGrArcsecCy-->42.98<!--/v--> =
-<!--v:mercuryPeriRateWithRelativisticArcsecCy-->574.4<!--/v--> ″/cy
+<!--v:mercuryPeriRateWithRelativisticArcsecCy-->572.0<!--/v--> ″/cy
 (design choice A — additive and stated, never folded into a divisor; see
 [doc 13 §1.8](13-mercury-precession-breakdown.md)).
 
@@ -911,11 +911,11 @@ Calibrated to reproduce exact J2000 ecliptic inclinations (optimized by [Ascendi
 | Earth | <!--v:earthAscNodeJ2000-->284.51<!--/v--> | 0.00 deg (S&S 2012) |
 | Mercury | 32.83 | +0.61 deg |
 | Venus | 54.70 | +2.39 deg |
-| Mars | <!--v:marsOmegaJ2000-->354.87<!--/v--> | +1.92 deg |
-| Jupiter | <!--v:jupiterOmegaJ2000-->312.89<!--/v--> | +5.97 deg |
-| Saturn | <!--v:saturnOmegaJ2000-->118.81<!--/v--> | -3.46 deg |
-| Uranus | <!--v:uranusOmegaJ2000-->307.80<!--/v--> | -0.64 deg |
-| Neptune | <!--v:neptuneOmegaJ2000-->192.04<!--/v--> | +2.76 deg |
+| Mars | <!--v:marsOmegaJ2000-->353.10<!--/v--> | +1.92 deg |
+| Jupiter | <!--v:jupiterOmegaJ2000-->313.59<!--/v--> | +5.97 deg |
+| Saturn | <!--v:saturnOmegaJ2000-->120.39<!--/v--> | -3.46 deg |
+| Uranus | <!--v:uranusOmegaJ2000-->308.62<!--/v--> | -0.64 deg |
+| Neptune | <!--v:neptuneOmegaJ2000-->191.35<!--/v--> | +2.76 deg |
 | Pluto | <!--v:plutoOmegaJ2000-->101.06<!--/v--> | -6.00 deg |
 
 The calibration methodology (the closed-form Ω solution against the JPL J2000 ecliptic inclinations) is in [doc 31 §Verified J2000 node anchors](31-no-chain-body-elements.md#verified-j2000-node-anchors).

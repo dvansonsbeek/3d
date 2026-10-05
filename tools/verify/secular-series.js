@@ -569,10 +569,36 @@ const forkRows = [-500, -100, -50, -10, -1, 1, 10, 50, 100, 500].map((tMa) => ({
 // ── D5: the chain-handover boundary, MEASURED per planet ────────────────
 // The era chain (SKELETON tier — the periodic layer is era-local osculating
 // structure, not divergence) vs the banked series, stepping outward until
-// the divergence exceeds the display-invisible class (|Δe| > 0.005 or
-// |Δi| > 0.25°). Beyond its boundary a planet's secular elements read the
-// series; inside it the certified chain stays the evaluator.
-const skeleton = phys.buildPlanetChainsFromArtifactData(CHAIN, { skeletonOnly: true });
+// the divergence exceeds the display-invisible class, measured on VECTORS of
+// the published quantities (plan 07): the e-vector distance |Δz| > 0.005
+// (eccentricity AND perihelion direction) or the angle between the two orbit
+// normals > 0.25° (inclination AND node). The former scalar pair (|Δe|,
+// |Δi_ecliptic|) was blind to the node: for the outer planets the inclination
+// to the INVARIABLE plane is the small difference of two ~1.5° tilts, so a
+// node error the ecliptic inclination could not see became degrees of
+// published inclination inside the boundary — measured on the API's new
+// chain elements: Jupiter 2.17° against the series' 0.33° at +4.4 Myr with a
+// 4,566-kyr boundary, Uranus 2.44° against 1.01° at +306 kyr (boundary 326).
+// Beyond its boundary a planet's secular elements read the series; inside it
+// the certified chain stays the evaluator.
+// MEASURED ON THE SKELETON PLUS THE ERA AFFINE (plan 07): the chain's K4.5
+// periodic layer carries the era-typed window affine (`windowAffine`: off +
+// slope·dt on k/h, q/p, a, λ̄), fitted over 1800–2100 — the one UNBOUNDED
+// part of the chain (the no-polynomial trap: Saturn's ζ slopes ~1e-9/yr
+// reach 0.2° of inclination per Myr, its k/h slopes 2e-8/yr 0.02 in e). The
+// skeleton alone omits it, so the former boundaries let the evaluated chain
+// run to Jupiter Ω 176° against the series' 118° at −3.2 Myr (i_inv 1.64°
+// vs 0.44°) and Uranus i_inv 0.27° vs 1.05° at +140 kyr, INSIDE their
+// boundaries. The bounded periodic terms (the great inequality and its
+// kin, deliberately smoothed out of the series) are left out of the
+// comparison — including them counts their amplitude as divergence from the
+// first step (measured: every outer planet "departs" within ±8 kyr).
+const skeletonBase = phys.buildPlanetChainsFromArtifactData(CHAIN, { skeletonOnly: true });
+/** @type {Record<string, any>} */ const skeleton = {};
+for (const [k, ch] of Object.entries(skeletonBase)) {
+  const wa = CHAIN.periodicTerms && CHAIN.periodicTerms[k] && CHAIN.periodicTerms[k].windowAffine;
+  skeleton[k] = wa ? { ...ch, periodicTerms: { windowAffine: wa } } : ch;
+}
 const planetHandover = {};
 let handoverMinKyr = Infinity;
 for (const pl of PLANETS7) {
@@ -592,9 +618,17 @@ for (const pl of PLANETS7) {
     for (let k = 2; k <= 9000; k += 2) {
       const t = dir * k * 1000;
       const el = phys.computePlanetElementsAtYear(2000 + t, skeleton[pl], skeleton);
-      const eS = Math.hypot(liP(B.zQ, t) + Rz2[0], liP(B.zP, t) + Rz2[1]);
-      const iS = 2 * Math.asin(Math.min(1, Math.hypot(liP(B.zetaQ, t) + Rq2[0], liP(B.zetaP, t) + Rq2[1]))) * R2D;
-      if (Math.abs(el.e - eS) > 0.005 || Math.abs(el.inclEclipticDeg - iS) > 0.25) return k;
+      // e-vector distance (e and ϖ together)
+      const zSx = liP(B.zQ, t) + Rz2[0], zSy = liP(B.zP, t) + Rz2[1];
+      const dz = Math.hypot(el.e * Math.cos(el.lonPeriEclipticDeg * D2R) - zSx, el.e * Math.sin(el.lonPeriEclipticDeg * D2R) - zSy);
+      // orbit-normal angle (i and Ω together), both in the ecliptic J2000 frame
+      const qSx = liP(B.zetaQ, t) + Rq2[0], qSy = liP(B.zetaP, t) + Rq2[1];
+      const iS = 2 * Math.asin(Math.min(1, Math.hypot(qSx, qSy))), OmS = Math.atan2(qSy, qSx);
+      const iC = el.inclEclipticDeg * D2R, OmC = el.ascNodeEclipticDeg * D2R;
+      const nS = [Math.sin(iS) * Math.sin(OmS), -Math.sin(iS) * Math.cos(OmS), Math.cos(iS)];
+      const nC = [Math.sin(iC) * Math.sin(OmC), -Math.sin(iC) * Math.cos(OmC), Math.cos(iC)];
+      const normalAngleDeg = Math.acos(Math.min(1, Math.max(-1, nS[0] * nC[0] + nS[1] * nC[1] + nS[2] * nC[2]))) * R2D;
+      if (dz > 0.005 || normalAngleDeg > 0.25) return k;
     }
     return 9000;
   };

@@ -44,6 +44,26 @@
 //   shipped path for all seven planets; 1800–2100 all but Neptune.
 //   K4.6b RESULT (measured): — filled after the inner-planet run —
 //
+// K4.7c — THE SEED CAP (plan 07 step 2 finding, measured against a fresh
+//   planets-only WH run over ±9 kyr sampled on the integrator's own clock):
+//   the ±10-kyr NAFF seeds carried lines at 10,120 yr (the extraction's own
+//   window floor, attributed at 137% error), 5.4–7.7 kyr and 6.7 kyr into
+//   this ±2.5-kyr solve, where they cover ≤ half a cycle and are collinear
+//   with the affine. The solve returned cancelling pairs — Uranus z 1.0e-2
+//   and 6.1e-3 (23% and 14% of e) with an affine slope 6× the N-body's
+//   local tangent; Neptune λ̄ 18,571″ at 10,120 yr with a 6.7″/yr slope
+//   (the NAFF's own in-window slope reads 1.2″/yr) — exact in-window (δz
+//   52µ, δλ̄ 10″) and divergent outside it: Uranus z 8,247µ at 2.5–5 kyr
+//   and 50,792µ at 5–9 kyr; Neptune λ̄ 6,697″ and 51,902″ (14°). The scene's
+//   deep-time Neptune sat 16° off the model's own engine at 8 kyr, and the
+//   D5 handover (measured on the skeleton) could not see it. With the seeds
+//   capped at 2·SPAN_YR (prototype, NAFF seeds + the shipped sub-window
+//   lines): Uranus z 58/136/264µ and λ̄ 15/106/168″ over 0–2.5/2.5–5/5–9
+//   kyr; Neptune z 50/70/110µ, λ̄ 10/69/98″; Saturn z 489→69µ. The price of
+//   a bounded basis is Jupiter's/Saturn's in-window λ̄ (9→52″, 18→126″ —
+//   the dropped lines were absorbing slow in-window content a 5-kyr window
+//   cannot resolve; the no-polynomial rule applies to them as to T²).
+//
 //   node tools/explore/k45e-amplitude-solve.mjs
 
 import { createRequire } from 'node:module';
@@ -196,7 +216,15 @@ const EXPORT = {};
 console.log(`era-centered amplitude solve (±${SPAN_YR} yr, cad ${CAD_YR} yr; extraction seeds + golden-refined augmentation):`);
 for (const p of PLANETS) {
   const PR = PRIOR[p] || {};
-  const seed = (list) => dedupe((list || []).map((x2) => x2.omegaRadPerYr));
+  // K4.7c — the SEED CAP: a seed line whose period exceeds 2·SPAN_YR covers
+  // less than half a cycle in this window and is collinear with the affine
+  // [1, t] (the ill-conditioned-regressor trap, measured: the ±10-kyr
+  // extraction's own floor line at 10,120 yr — attributed at 137% error —
+  // solved to 1.0e-2 in Uranus's z against e = 0.044, and to 18,571″ in
+  // Neptune's λ̄, cancelling against the affine in-window and diverging
+  // outside it). scanPeaks already caps its own lines at 2·SPAN_YR; the
+  // seeds must obey the same bound.
+  const seed = (list) => dedupe((list || []).map((x2) => x2.omegaRadPerYr).filter((w) => Math.abs(2 * Math.PI / w) <= 2 * SPAN_YR));
   // ── scalar channels (λ̄ arcsec, a ppm): era affine + lines
   const fitScalar = (y, ws0, floor, maxAdd, pminYr) => {
     let ws = ws0.slice(), x, resid;

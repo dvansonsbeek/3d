@@ -98,14 +98,14 @@ ecliptic rate − general precession H/13). Literal values J2000-evaluated:
 
 | Planet | Ecliptic Period | ICRF Period | ICRF Direction |
 |--------|----------------|-------------|----------------|
-| Mercury | `Y × 8/11` | <!--v:mercuryPeriPeriodICRF-->28,844<!--/v--> yr | Retrograde |
-| Venus | `−8Y/6` | <!--v:venusPeriPeriodICRF-->24,387<!--/v--> yr | Retrograde |
+| Mercury | `Y × 8/11` | <!--v:mercuryPeriPeriodICRF-->232,437<!--/v--> yr | Retrograde |
+| Venus | `−8Y/6` | <!--v:venusPeriPeriodICRF-->174,997<!--/v--> yr | Retrograde |
 | Earth | `H / 16` | `H/3` ≈ <!--v:earthPeriPeriodICRF-->111,635<!--/v--> yr | Prograde (sole) |
-| Mars | `Y × 8/36` | <!--v:marsPeriPeriodICRF-->39,449<!--/v--> yr | Retrograde |
-| Jupiter | `8Y/39` | <!--v:jupiterPeriPeriodICRF-->41,270<!--/v--> yr | Retrograde |
-| Saturn | `−8Y/65` | <!--v:saturnPeriPeriodICRF-->15,873<!--/v--> yr | Retrograde |
-| Uranus | `H / 3` | `H/10` ≈ <!--v:uranusPeriPeriodICRF-->33,532<!--/v--> yr | Retrograde |
-| Neptune | `H × 2` | `2H/25` ≈ <!--v:neptunePeriPeriodICRF-->26,825<!--/v--> yr | Retrograde |
+| Mars | `Y × 8/36` | <!--v:marsPeriPeriodICRF-->72,335<!--/v--> yr | Retrograde |
+| Jupiter | `8Y/39` | <!--v:jupiterPeriPeriodICRF-->304,456<!--/v--> yr | Retrograde |
+| Saturn | `−8Y/65` | <!--v:saturnPeriPeriodICRF-->45,883<!--/v--> yr | Retrograde |
+| Uranus | `H / 3` | `H/10` ≈ <!--v:uranusPeriPeriodICRF-->330,515<!--/v--> yr | Retrograde |
+| Neptune | `H × 2` | `2H/25` ≈ <!--v:neptunePeriPeriodICRF-->2,136,796<!--/v--> yr | Retrograde |
 | Pluto | `H` | `H/12` ≈ <!--v:plutoPeriPeriodICRF-->27,943<!--/v--> yr | Retrograde |
 
 All ICRF perihelion periods divide evenly into the anchor's eight-unit interval, Y₈ = <!--v:eightH-->2,682,536<!--/v--> years (a device construction of the no-chain scaffolding)
@@ -192,11 +192,11 @@ given Earth's reference Ω of <!--v:earthAscNodeJ2000-->284.51<!--/v-->°
 | Mercury | 32.22 | 32.83 | +0.61° |
 | Venus | 52.31 | 54.70 | +2.39° |
 | Earth | <!--v:earthAscNodeJ2000-->284.51<!--/v--> | <!--v:earthAscNodeJ2000-->284.51<!--/v--> | 0.00° |
-| Mars | <!--v:marsOmegaSS-->352.95<!--/v--> | <!--v:marsOmegaJ2000-->354.87<!--/v--> | +1.92° |
-| Jupiter | <!--v:jupiterOmegaSS-->306.92<!--/v--> | <!--v:jupiterOmegaJ2000-->312.89<!--/v--> | +5.97° |
-| Saturn | <!--v:saturnOmegaSS-->122.27<!--/v--> | <!--v:saturnOmegaJ2000-->118.81<!--/v--> | -3.46° |
-| Uranus | <!--v:uranusOmegaSS-->308.44<!--/v--> | <!--v:uranusOmegaJ2000-->307.80<!--/v--> | -0.64° |
-| Neptune | <!--v:neptuneOmegaSS-->189.28<!--/v--> | <!--v:neptuneOmegaJ2000-->192.04<!--/v--> | +2.76° |
+| Mars | <!--v:marsOmegaSS-->352.95<!--/v--> | <!--v:marsOmegaJ2000-->353.10<!--/v--> | +1.92° |
+| Jupiter | <!--v:jupiterOmegaSS-->306.92<!--/v--> | <!--v:jupiterOmegaJ2000-->313.59<!--/v--> | +5.97° |
+| Saturn | <!--v:saturnOmegaSS-->122.27<!--/v--> | <!--v:saturnOmegaJ2000-->120.39<!--/v--> | -3.46° |
+| Uranus | <!--v:uranusOmegaSS-->308.44<!--/v--> | <!--v:uranusOmegaJ2000-->308.62<!--/v--> | -0.64° |
+| Neptune | <!--v:neptuneOmegaSS-->189.28<!--/v--> | <!--v:neptuneOmegaJ2000-->191.35<!--/v--> | +2.76° |
 | Pluto | <!--v:plutoOmegaSS-->107.06<!--/v--> | <!--v:plutoOmegaJ2000-->101.06<!--/v--> | -6.00° |
 
 ### The tilt-derived ecliptic ascending node

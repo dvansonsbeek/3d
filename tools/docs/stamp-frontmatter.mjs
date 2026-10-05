@@ -53,9 +53,15 @@ const HOLISTIC = process.argv.includes('--holistic');
 // scaffolding: Law-4 Δa derivations, balance constructions, planet
 // lattice-period tables, Planet Nine screening) out of the tree entirely —
 // docs/archive/retired/ (gitignored) holds the files, git history the
-// diffs, docs/retired-record.md the public record. The set is empty until
-// a future doc genuinely freezes IN the tree.
-const HISTORICAL = new Set([]);
+// diffs, docs/retired-record.md the public record. A doc that genuinely
+// freezes IN the tree is listed here.
+const HISTORICAL = new Set([
+  // Plan 07 (planet channel migration): the six Fibonacci relations' record —
+  // its value markers were frozen to the retired device's numbers when the
+  // planets' periods, inclinations and nodes moved onto the N-body chain; the
+  // doc describes the retired laws and must not track the live registry.
+  '10-fibonacci-laws.md',
+]);
 // No doc is superseded today (§10a survey: zero point forward to a successor).
 const SUPERSEDED = new Set([]);
 

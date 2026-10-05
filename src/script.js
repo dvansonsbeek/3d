@@ -46843,13 +46843,21 @@ function loadTexture( url, onLoad ) {
 // Neptune's ϖ swings ~16°/cy on its near-zero e) and lives on the planet panel's chain rows,
 // never under a lattice label.
 function perihelionFrameBreakdown(planetKey, year) {
-  const p = planets[planetKey];
   const D2R = Math.PI / 180;
-  const lattice = 1296000 / p.perihelionEclipticYears * 100;                                    // (a) ″/cy
+  // Plan 07: the motion projected is THE CHAIN'S — the sidereal rate is the
+  // chain's 1800–2100 window rate with 1PN OFF (the NEWTONIAN window) and the
+  // perihelion longitude of date the chain's ϖ (J2000 ecliptic frame, series
+  // handover beyond the boundary). Twin of tools/docs/model-values.mjs
+  // predictiveMachinery (identical ops — the base must match there, or the
+  // two surfaces quote different windows of one rate); the relativistic
+  // supplement stays an explicit addition, never folded into the projection.
+  // The retired lattice motion (the IAU J2000 ϖ advanced at H·num/den) is
+  // gone. The property name `lattice` is kept for the callers.
+  const lattice = CHAIN_ARTIFACT.windowRatesArcsecCy.newton[planetKey];                         // (a) ″/cy, sidereal, Newtonian
   const eps = _sceneEpsTargetDeg(year) * D2R;   // Phase 3 S3b: the published ε (the hybrid)
   const epsRate = (_sceneEpsTargetDeg(year + 50) - _sceneEpsTargetDeg(year - 50)) * 3600;  // ″/cy
-  // projection excess and obliquity-rate term for the lattice motion at ecliptic longitude lamDeg
-  const lam = (p.longitudePerihelion + (360 / p.perihelionEclipticYears) * (year - 2000)) * D2R;
+  // projection excess and obliquity-rate term for the chain motion at ecliptic longitude lamDeg
+  const lam = _kcPerihelionEclLonDeg(planetKey, yearToJDApprox(year)) * D2R;
   const den = Math.cos(lam) ** 2 + Math.sin(lam) ** 2 * Math.cos(eps) ** 2;
   const projection = lattice * (Math.cos(eps) / den - 1);
   const obliquityTerm = (-Math.sin(lam) * Math.cos(lam) * Math.sin(eps) / den) * epsRate;

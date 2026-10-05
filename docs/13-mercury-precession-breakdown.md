@@ -58,16 +58,16 @@ ecliptic value. Two implementations exist:
   Earth-frame RA rate is §1.8's identity applied to the lattice motion
   (rate × dα/dλ + ∂α/∂ε·ε̇), evaluated at any year for all seven planets —
   one formula, zero fitted constants. Mercury:
-  <!--v:mercuryEarthFrameRa1900-->578.78<!--/v--> ″/cy at 1900,
-  <!--v:mercuryEarthFrameRa2000-->578.79<!--/v--> ″/cy at 2000. (The former
+  <!--v:mercuryEarthFrameRa1900-->576.17<!--/v--> ″/cy at 1900,
+  <!--v:mercuryEarthFrameRa2000-->576.19<!--/v--> ″/cy at 2000. (The former
   "predict basis" — ~2,421 fitted terms per planet trained on the retired
   geometric scene's export — is in the [retired record](retired-record.md).)
 
 | Metric | Mercury |
 |--------|-----------------|
-| Rate at J2000 (Earth-frame RA) | <!--v:mercuryPeriRateEarthFrameMeasuredJ2000-->578.79<!--/v--> ″/cy = <!--v:mercuryPeriRateEclipticArcsecCy-->531.44<!--/v--> × dα/dλ + <!--v:mercuryPeriObliquityRateTermJ2000-->4.31<!--/v--> |
-| Lattice (ecliptic) rate | <!--v:mercuryPeriRateEclipticArcsecCy-->531.44<!--/v--> ″/cy |
-| Earth-frame range over H | <!--v:mercuryFluctuationMin-->-48<!--/v--> to <!--v:mercuryFluctuationMax-->+48<!--/v--> ″/cy about the lattice rate |
+| Rate at J2000 (Earth-frame RA) | <!--v:mercuryPeriRateEarthFrameMeasuredJ2000-->576.19<!--/v--> ″/cy = <!--v:mercuryPeriRateEclipticArcsecCy-->529.03<!--/v--> × dα/dλ + <!--v:mercuryPeriObliquityRateTermJ2000-->4.31<!--/v--> |
+| Lattice (ecliptic) rate | <!--v:mercuryPeriRateEclipticArcsecCy-->529.03<!--/v--> ″/cy |
+| Earth-frame range over H | <!--v:mercuryFluctuationMin-->-47<!--/v--> to <!--v:mercuryFluctuationMax-->+50<!--/v--> ″/cy about the lattice rate |
 | Dominant Earth-frame period | ~<!--v:mercuryOscillationPeriod-->7,451<!--/v--> years (H/45) |
 
 ### The Earth-frame fluctuation pattern
@@ -258,7 +258,7 @@ these. See [docs/10-fibonacci-laws.md §Law 6](10-fibonacci-laws.md#law-6-saturn
 ### 1.6 Mercury's advance on the Cycles tab
 
 The Cycles tab pairs Mercury's projection excess at the IAU J2000 perihelion
-longitude (§1.8, <!--v:mercuryPeriProjectionExcessJ2000-->42.71<!--/v-->″/cy)
+longitude (§1.8, <!--v:mercuryPeriProjectionExcessJ2000-->42.51<!--/v-->″/cy)
 with the general-relativistic advance derived from the model's own constants
 (<!--v:mercuryPeriAnomalyGrArcsecCy-->42.98<!--/v-->″/cy). The former
 "Missing advance around 1900 AD (Model)" row read the retired predictive
@@ -267,13 +267,14 @@ measured verdict on the projection.
 
 ### 1.7 Historical Context
 
-Urbain Le Verrier (1859) discovered that Mercury's observed perihelion precession (~575 ″/cy) exceeded Newtonian predictions (~532 ″/cy) by about 43 ″/cy; General Relativity (1915) explained the difference as spacetime curvature near the Sun — one of GR's first experimental confirmations. First-order secular theory **overestimates the Newtonian rate by ~4%** compared to Park et al. (2017) for Mercury (553 vs 532 ″/cy — see §1.2 and §1.5); the model's own value sits within ~0.1%:
+Urbain Le Verrier (1859) discovered that Mercury's observed perihelion precession (~575 ″/cy) exceeded Newtonian predictions (~532 ″/cy) by about 43 ″/cy; General Relativity (1915) explained the difference as spacetime curvature near the Sun — one of GR's first experimental confirmations. First-order secular theory **overestimates the Newtonian rate by ~4%** compared to Park et al. (2017) for Mercury (553 vs 532 ″/cy — see §1.2 and §1.5); the model's own value sits within
+~<!--v:mercuryModelVsParkNewtonianDeltaPct-->0.6<!--/v-->%:
 
-| Source | Mercury Total |
+| Source | Mercury Newtonian rate |
 |--------|---------------|
-| Our model (H×8/11) | 531.4"/cy |
-| Park et al. (2017) | 532"/cy |
-| Difference | ~0.1% |
+| Our model (the chain's Newtonian era window, 1800–2100) | <!--v:mercuryModelBaseline-->529.0<!--/v-->"/cy |
+| Park et al. (2017) ICRF total minus the derived GR advance | <!--v:mercuryNewtonianModern-->532.33<!--/v-->"/cy |
+| Difference | ~<!--v:mercuryModelVsParkNewtonianDeltaPct-->0.6<!--/v-->% |
 
 **No calibration factors are used** — values are calculated from first principles, with all their inherent limitations (no indirect Venus→Earth→Mercury chains, no higher-order terms, no eccentricity/inclination corrections, short-period terms assumed to average to zero).
 
@@ -301,16 +302,16 @@ IS this projection, so the identity holds by construction and the gate is
 gone.)
 
 **Mercury.** The ecliptic advance is the lattice divisor,
-<!--v:mercuryPeriRateEclipticArcsecCy-->531.44<!--/v--> ″/cy (the device's ecliptic-period value). At the
+<!--v:mercuryPeriRateEclipticArcsecCy-->529.03<!--/v--> ″/cy (the device's ecliptic-period value). At the
 IAU J2000 perihelion longitude (77.457°) and the IAU 2006 obliquity the slope
 is <!--v:mercuryPeriRaSlopeJ2000-->1.08036<!--/v-->, the projected rate
-<!--v:mercuryPeriRateRaProjectedJ2000-->574.14<!--/v--> ″/cy, and the excess
-over the ecliptic advance **<!--v:mercuryPeriProjectionExcessJ2000-->42.71<!--/v--> ″/cy**.
+<!--v:mercuryPeriRateRaProjectedJ2000-->571.54<!--/v--> ″/cy, and the excess
+over the ecliptic advance **<!--v:mercuryPeriProjectionExcessJ2000-->42.51<!--/v--> ″/cy**.
 The general-relativistic advance derived from the same model constants
 (6π GM/(c² a (1 − e²)) per orbit) is
 <!--v:mercuryPeriAnomalyGrArcsecCy-->42.98<!--/v--> ″/cy. Adding the obliquity-rate
 term (<!--v:mercuryPeriObliquityRateTermJ2000-->4.31<!--/v-->) gives the
-Earth-frame rate, <!--v:mercuryPeriRateEarthFrameMeasuredJ2000-->578.79<!--/v--> ″/cy
+Earth-frame rate, <!--v:mercuryPeriRateEarthFrameMeasuredJ2000-->576.19<!--/v--> ″/cy
 at J2000 (plan 06 R8: this sum IS the model's Earth-frame rate; the retired
 device's 579.83 carried a κ ≤ 1.4″/cy residual of the retired scene) — the
 amount above the ecliptic advance oscillates around zero over a full
@@ -318,8 +319,10 @@ perihelion cycle as the perihelion turns against the equinox.
 
 The observational precision matters here: the ranging determinations pin the
 inertial excess at 42.980 ± 0.002 ″/cy (Pireaux & Rozelot 2003; Pitjeva's
-EPM2008 residual to the GR-inclusive rate −0.004 ± 0.005 ″/cy), so 42.71
-differs from the observed excess by 0.27 ″/cy — a 0.6 % agreement, not an
+EPM2008 residual to the GR-inclusive rate −0.004 ± 0.005 ″/cy), so
+<!--v:mercuryPeriProjectionExcessJ2000-->42.51<!--/v--> differs from the
+observed excess by <!--v:mercuryProjectionVsGrGapArcsecCy-->0.47<!--/v--> ″/cy
+— a <!--v:mercuryProjectionVsGrDeltaPct-->1.1<!--/v--> % agreement, not an
 exact one. The classical determinations (Le Verrier 1859: transits, plus
 meridian observations reduced to apparent geocentric *longitude*; Newcomb
 1882/1895; Clemence 1947) form the perihelion correction as an ecliptic
@@ -360,13 +363,13 @@ are not a reading of the anomaly.
 
 | planet | ecliptic ″/cy | dα/dλ | projected ″/cy | excess ″/cy | GR advance ″/cy | Earth-frame measured ″/cy |
 |---|---|---|---|---|---|---|
-| Mercury | <!--v:mercuryPeriRateEclipticArcsecCy-->531.44<!--/v--> | <!--v:mercuryPeriRaSlopeJ2000-->1.08036<!--/v--> | <!--v:mercuryPeriRateRaProjectedJ2000-->574.14<!--/v--> | <!--v:mercuryPeriProjectionExcessJ2000-->42.71<!--/v--> | <!--v:mercuryPeriAnomalyGrArcsecCy-->42.98<!--/v--> | <!--v:mercuryPeriRateEarthFrameMeasuredJ2000-->578.79<!--/v--> |
-| Venus | <!--v:venusPeriRateEclipticArcsecCy-->-289.87<!--/v--> | <!--v:venusPeriRaSlopeJ2000-->1.00661<!--/v--> | <!--v:venusPeriRateRaProjectedJ2000-->-291.79<!--/v--> | <!--v:venusPeriProjectionExcessJ2000-->-1.92<!--/v--> | <!--v:venusPeriAnomalyGrArcsecCy-->8.62<!--/v--> | <!--v:venusPeriRateEarthFrameMeasuredJ2000-->-301.93<!--/v--> |
-| Mars | <!--v:marsPeriRateEclipticArcsecCy-->1,739.25<!--/v--> | <!--v:marsPeriRaSlopeJ2000-->0.94201<!--/v--> | <!--v:marsPeriRateRaProjectedJ2000-->1,638.40<!--/v--> | <!--v:marsPeriProjectionExcessJ2000-->-100.85<!--/v--> | <!--v:marsPeriAnomalyGrArcsecCy-->1.35<!--/v--> | <!--v:marsPeriRateEarthFrameMeasuredJ2000-->1,631.31<!--/v--> |
-| Jupiter | <!--v:jupiterPeriRateEclipticArcsecCy-->1,884.19<!--/v--> | <!--v:jupiterPeriRaSlopeJ2000-->0.92693<!--/v--> | <!--v:jupiterPeriRateRaProjectedJ2000-->1,746.52<!--/v--> | <!--v:jupiterPeriProjectionExcessJ2000-->-137.67<!--/v--> | <!--v:jupiterPeriAnomalyGrArcsecCy-->0.06<!--/v--> | <!--v:jupiterPeriRateEarthFrameMeasuredJ2000-->1,751.14<!--/v--> |
-| Saturn | <!--v:saturnPeriRateEclipticArcsecCy-->-3,140.31<!--/v--> | <!--v:saturnPeriRaSlopeJ2000-->1.08966<!--/v--> | <!--v:saturnPeriRateRaProjectedJ2000-->-3,421.86<!--/v--> | <!--v:saturnPeriProjectionExcessJ2000-->-281.55<!--/v--> | <!--v:saturnPeriAnomalyGrArcsecCy-->0.01<!--/v--> | <!--v:saturnPeriRateEarthFrameMeasuredJ2000-->-3,422.68<!--/v--> |
-| Uranus | <!--v:uranusPeriRateEclipticArcsecCy-->1,159.50<!--/v--> | <!--v:uranusPeriRaSlopeJ2000-->0.92126<!--/v--> | <!--v:uranusPeriRateRaProjectedJ2000-->1,068.21<!--/v--> | <!--v:uranusPeriProjectionExcessJ2000-->-91.29<!--/v--> | <!--v:uranusPeriAnomalyGrArcsecCy-->0.00<!--/v--> | <!--v:uranusPeriRateEarthFrameMeasuredJ2000-->1,065.23<!--/v--> |
-| Neptune | <!--v:neptunePeriRateEclipticArcsecCy-->193.25<!--/v--> | <!--v:neptunePeriRaSlopeJ2000-->0.99870<!--/v--> | <!--v:neptunePeriRateRaProjectedJ2000-->193.00<!--/v--> | <!--v:neptunePeriProjectionExcessJ2000-->-0.25<!--/v--> | <!--v:neptunePeriAnomalyGrArcsecCy-->0.00<!--/v--> | <!--v:neptunePeriRateEarthFrameMeasuredJ2000-->203.12<!--/v--> |
+| Mercury | <!--v:mercuryPeriRateEclipticArcsecCy-->529.03<!--/v--> | <!--v:mercuryPeriRaSlopeJ2000-->1.08036<!--/v--> | <!--v:mercuryPeriRateRaProjectedJ2000-->571.54<!--/v--> | <!--v:mercuryPeriProjectionExcessJ2000-->42.51<!--/v--> | <!--v:mercuryPeriAnomalyGrArcsecCy-->42.98<!--/v--> | <!--v:mercuryPeriRateEarthFrameMeasuredJ2000-->576.19<!--/v--> |
+| Venus | <!--v:venusPeriRateEclipticArcsecCy-->14.09<!--/v--> | <!--v:venusPeriRaSlopeJ2000-->1.00574<!--/v--> | <!--v:venusPeriRateRaProjectedJ2000-->14.17<!--/v--> | <!--v:venusPeriProjectionExcessJ2000-->0.08<!--/v--> | <!--v:venusPeriAnomalyGrArcsecCy-->8.62<!--/v--> | <!--v:venusPeriRateEarthFrameMeasuredJ2000-->4.04<!--/v--> |
+| Mars | <!--v:marsPeriRateEclipticArcsecCy-->1,596.46<!--/v--> | <!--v:marsPeriRaSlopeJ2000-->0.94195<!--/v--> | <!--v:marsPeriRateRaProjectedJ2000-->1,503.78<!--/v--> | <!--v:marsPeriProjectionExcessJ2000-->-92.68<!--/v--> | <!--v:marsPeriAnomalyGrArcsecCy-->1.35<!--/v--> | <!--v:marsPeriRateEarthFrameMeasuredJ2000-->1,496.96<!--/v--> |
+| Jupiter | <!--v:jupiterPeriRateEclipticArcsecCy-->488.47<!--/v--> | <!--v:jupiterPeriRaSlopeJ2000-->0.92805<!--/v--> | <!--v:jupiterPeriRateRaProjectedJ2000-->453.32<!--/v--> | <!--v:jupiterPeriProjectionExcessJ2000-->-35.15<!--/v--> | <!--v:jupiterPeriAnomalyGrArcsecCy-->0.06<!--/v--> | <!--v:jupiterPeriRateEarthFrameMeasuredJ2000-->458.14<!--/v--> |
+| Saturn | <!--v:saturnPeriRateEclipticArcsecCy-->-1,576.66<!--/v--> | <!--v:saturnPeriRaSlopeJ2000-->1.08993<!--/v--> | <!--v:saturnPeriRateRaProjectedJ2000-->-1,718.45<!--/v--> | <!--v:saturnPeriProjectionExcessJ2000-->-141.79<!--/v--> | <!--v:saturnPeriAnomalyGrArcsecCy-->0.01<!--/v--> | <!--v:saturnPeriRateEarthFrameMeasuredJ2000-->-1,718.30<!--/v--> |
+| Uranus | <!--v:uranusPeriRateEclipticArcsecCy-->806.60<!--/v--> | <!--v:uranusPeriRaSlopeJ2000-->0.92143<!--/v--> | <!--v:uranusPeriRateRaProjectedJ2000-->743.22<!--/v--> | <!--v:uranusPeriProjectionExcessJ2000-->-63.38<!--/v--> | <!--v:uranusPeriAnomalyGrArcsecCy-->0.00<!--/v--> | <!--v:uranusPeriRateEarthFrameMeasuredJ2000-->740.18<!--/v--> |
+| Neptune | <!--v:neptunePeriRateEclipticArcsecCy-->9,101.68<!--/v--> | <!--v:neptunePeriRaSlopeJ2000-->0.97447<!--/v--> | <!--v:neptunePeriRateRaProjectedJ2000-->8,869.34<!--/v--> | <!--v:neptunePeriProjectionExcessJ2000-->-232.34<!--/v--> | <!--v:neptunePeriAnomalyGrArcsecCy-->0.00<!--/v--> | <!--v:neptunePeriRateEarthFrameMeasuredJ2000-->8,872.20<!--/v--> |
 
 The projection excess reproduces the GR advance for Mercury and for no other
 planet (Venus −1.92 vs 8.62; Mars −100.85 vs 1.35; the outer planets' excesses
@@ -377,8 +380,8 @@ are Mercury −0.004 ± 0.005, Venus +0.024 ± 0.033, Earth +0.006 ± 0.007,
 Mars −0.007 ± 0.007 ″/cy — the inertial excesses equal 42.98 / 8.62 / 3.84 /
 1.35 ″/cy to those precisions, and the projection values are excluded as
 their cause by three orders of magnitude for Venus and Mars. Earth's own perihelion of
-date (H/16, <!--v:earthPeriRateEclipticOfDateArcsecCy-->6,184.00<!--/v--> ″/cy)
-projects with an excess of <!--v:earthPeriProjectionExcessJ2000-->493.18<!--/v--> ″/cy
+date (H/16, <!--v:earthPeriRateEclipticOfDateArcsecCy-->6,189.76<!--/v--> ″/cy)
+projects with an excess of <!--v:earthPeriProjectionExcessJ2000-->493.64<!--/v--> ″/cy
 against a GR advance of 3.84. This table is the pre-registered test of the
 statement "the Mercury anomaly is the equatorial projection of the ecliptic
 advance" applied to all planets; the statement's scope, frame wording and

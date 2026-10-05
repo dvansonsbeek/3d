@@ -133,32 +133,34 @@ function predictiveMachinery() {
   // window rate; the outer planets' are great-inequality-dominated, Neptune's
   // ϖ swings ~16°/cy on its near-zero e) and never rides a lattice key.
   const D2R = Math.PI / 180;
-  const periFraction8 = (planet) => {
-    const [num, den] = model.planets[planet].perihelionEclipticFraction;
-    return (8 * den / Math.abs(num)) * Math.sign(num);
-  };
-  const latticeBaseline = (planet) => {
-    if (planet === 'uranus') return Math.sign(periFraction8(planet)) * 1296000 / (C.H / 3) * 100;
-    const n8 = periFraction8(planet);
-    return Math.sign(n8) * 1296000 / ((8 * C.H) / Math.abs(n8)) * 100;
-  };
-  // The projection terms of the lattice motion at year y (the IAU J2000 ϖ
-  // advanced at the lattice rate; doc 13 §1.8 "projection excess + obliquity-
-  // rate term"): the Earth-frame rate minus the lattice rate. Its extremes
-  // over one perihelion cycle (the `<p>FluctuationMin/Max` keys) are a
-  // property of the projection — λ against the equinox — which is what the
-  // retired device's "fluctuation" was measuring in the retired scene.
-  const latticeFluct = (y, p) => {
-    const P = C.planets[p];
+  // Plan 07: the motion projected is THE CHAIN'S — the sidereal rate is the
+  // 1800–2100 window rate with 1PN OFF (the NEWTONIAN window), the perihelion
+  // longitude of date is the chain's ϖ (J2000 ecliptic frame, the series
+  // handover beyond each planet's boundary). The Newtonian window is ONE base
+  // across the whole doc-13 projection family, so the paper's stated closure
+  // (projection excess + obliquity-rate term = the Earth-frame rate) holds on
+  // a single rate, and the relativistic supplement stays an explicit, stated
+  // addition rather than something already folded into the projected number.
+  // The model's TOTAL rate of date is <p>PeriRateNowArcsecCy.
+  // The retired lattice motion (the IAU J2000 ϖ advanced at H·num/den) is
+  // gone; browser twin: src/script.js perihelionFrameBreakdown, identical ops.
+  const chainBaseline = (planet) => chainWindowNewton(planet);
+  // The projection terms of the chain motion at year y (doc 13 §1.8
+  // "projection excess + obliquity-rate term"): the Earth-frame rate minus
+  // the sidereal rate. Its extremes over one secular perihelion period (the
+  // `<p>FluctuationMin/Max` keys) are a property of the projection — λ
+  // against the equinox — which is what the retired device's "fluctuation"
+  // was measuring in the retired scene.
+  const chainFluct = (y, p) => {
     const eps = oneEps(y) * D2R;
     const epsRate = (oneEps(y + 50) - oneEps(y - 50)) * 3600;
-    const lam = (P.longitudePerihelion + (360 / P.perihelionEclipticYears) * (y - 2000)) * D2R;
+    const lam = physModel().planets.perihelionLongitudeDeg(p, y) * D2R;
     const den = Math.cos(lam) ** 2 + Math.sin(lam) ** 2 * Math.cos(eps) ** 2;
-    const rate = latticeBaseline(p);
+    const rate = chainBaseline(p);
     return rate * (Math.cos(eps) / den - 1) + (-Math.sin(lam) * Math.cos(lam) * Math.sin(eps) / den) * epsRate;
   };
-  const fluct = latticeFluct;
-  const totalPrecession = (y, p) => latticeBaseline(p) + latticeFluct(y, p);   // the Earth-frame RA rate, frame (b)
+  const fluct = chainFluct;
+  const totalPrecession = (y, p) => chainBaseline(p) + chainFluct(y, p);   // the Earth-frame RA rate, frame (b)
   const calcEarthPerihelionDeg = (year) => {
     const mc = dtl().cyclesBetweenYears(C.balancedYear, year, 16);
     if (mc === null) return 270.0;
@@ -170,13 +172,43 @@ function predictiveMachinery() {
     }
     return ((L + C.PERI_OFFSET) % 360 + 360) % 360;
   };
-  _predictHelpersM = { fluct, latticeFluct, erdBrowserForm, totalPrecession, latticeBaseline, calcEarthPerihelionDeg };
+  _predictHelpersM = { fluct, chainFluct, erdBrowserForm, totalPrecession, chainBaseline, calcEarthPerihelionDeg };
   return _predictHelpersM;
 }
 const model = rd('public/input/model-parameters.json');
 const astro = rd('public/input/astro-reference.json');
 const versionInfo = rd('public/input/model-version.json');
 const dtFit = rd('data/deltaT-4flag-fit.json');
+// Plan 07 (planet channel migration) — THE CHAIN ARTIFACT as the planets' one
+// home: secular eigenfrequencies g/s (″/yr, the leading z/ζ modes of the
+// 1-Myr WH+NAFF run), the 1800–2100 window rates (1PN and Newtonian), the
+// J2000 anchor elements. Every planet key below that read the retired
+// device (H·num/den periods, the ψ/K inclination and eccentricity laws)
+// reads this instead; the key NAMES stay so the markers re-render.
+const chainArt = (() => { /** @type {any} */ let a; return () => a || (a = rd('data/nbody-secular-frequencies.json')); })();
+/** Leading secular apsidal frequency, ″/yr, prograde positive. @param {string} p */
+const chainG = (p) => chainArt().g[p].arcsecPerYr;
+/** The era window rates (1800–2100), ″/cy: gr = 1PN on, newton = off. @param {string} p */
+const chainWindowGr = (p) => chainArt().windowRatesArcsecCy.gr[p];
+const chainWindowNewton = (p) => chainArt().windowRatesArcsecCy.newton[p];
+/** The J2000 general precession rate, ″/yr (the one-family beat at 2000). */
+const pAJ2000ArcsecPerYr = () => 1296000 / oneYL().axialPrecessionYearsAtYear(2000);
+/** The chain's inclination to the invariable plane over the banked ±10-Myr
+ *  series (the API's `invPlaneInclinationDeg`, sampled every 2 kyr): mean and
+ *  half-range — the engine's replacement of the ψ law's mean/amplitude. A
+ *  multi-mode quantity has no single amplitude; the half-range is stated as
+ *  such in the notes. @param {string} p */
+const chainInclStats = (() => {
+  /** @type {Record<string, {mean:number, half:number, min:number, max:number}>} */ const memo = {};
+  return (p) => {
+    if (memo[p]) return memo[p];
+    const f = physModel().planets.invPlaneInclinationDeg;
+    let s = 0, n = 0, mn = Infinity, mx = -Infinity;
+    for (let y = -9996000; y <= 9996000; y += 2000) { const v = f(p, 2000 + y); s += v; n++; if (v < mn) mn = v; if (v > mx) mx = v; }
+    memo[p] = { mean: s / n, half: (mx - mn) / 2, min: mn, max: mx };
+    return memo[p];
+  };
+})();
 // The package model on the SERIES tier (the API's construction), built lazily
 // on the first key that reads it — plan 06 Phase 7's spin-channel keys.
 const phys = await import('@essrt/physics');
@@ -1860,10 +1892,21 @@ export const VALUES = {
       return `${sign}${n}H/${den}`;
     };
     const out = {};
-    // Doc-109 §9 / doc-55 typing of each planet's lattice descriptor (the
-    // restatement, Batch D): the values do not move; the type says WHAT the
-    // 8H/N label describes. A = long-term mean · B = present-epoch rate ·
-    // C = window-epoch value. Engine-D means live in <p>PeriFreqArcsecPerYr.
+    // Plan 07 (planet channel migration): the perihelion period and rate of
+    // each planet are THE CHAIN'S — `<p>PeriPeriod` the perihelion period
+    // AGAINST THE EQUINOX OF DATE, 1,296,000/(g + p_A) yr (the same quantity
+    // Earth's row has always published — the of-date beat), `<p>PeriPeriodICRF`
+    // / `<p>IcrfPeriod` the inertial period 1,296,000/|g| yr, `<p>PeriRate`
+    // the of-date rate in °/yr; g the leading secular apsidal eigenfrequency
+    // (type A — bounded for every planet, the quantity the deep-time chain and
+    // the climate lines ride), p_A the J2000 general precession. The former
+    // H·num/den descriptors (the retired device; Mercury 243,867 yr = 531.4
+    // ″/cy, Pluto = H exactly) and their 8H/N labels are gone; the era window
+    // rate (1800–2100, 1PN) stays in <p>PeriRateNowArcsecCy, Newtonian in
+    // <p>ModelBaseline. The notes below say which of the two a page should
+    // quote; Neptune's window rate is ill-conditioned (e = 0.011) and its
+    // secular mode is the only bounded statement.
+    const PERI_NOTE = (p) => `of-date perihelion period/rate: the chain's secular g (${chainArt().g[p].nearestLaskar.mode}, ${chainG(p).toFixed(4)} ″/yr) + the J2000 general precession; inertial twin <${p}PeriPeriodICRF>, era window <${p}PeriRateNowArcsecCy>`;
     const PERI_TYPE = {
       mercury: 'type B — present-epoch Newtonian rate (the long-term mean is g₁; see mercuryPeriFreqArcsecPerYr)',
       venus: 'type C — window-epoch descriptor (small-e z is mode-mixed; ill-conditioned in short windows)',
@@ -1874,29 +1917,22 @@ export const VALUES = {
       neptune: 'type C — window-epoch descriptor',
       pluto: 'window-epoch descriptor (untyped)',
     };
-    for (const planet of ['mercury', 'venus', 'mars', 'jupiter', 'saturn', 'uranus', 'neptune', 'pluto']) {
-      const periodYears = () => {
-        const [num, den] = periFraction(planet);
-        return (C.H * Math.abs(num)) / den;
-      };
+    void PERI_TYPE; void periFraction; void periLabel;   // the retired descriptors' typing and labels — kept above as the record of what the device published
+    for (const planet of ['mercury', 'venus', 'mars', 'jupiter', 'saturn', 'uranus', 'neptune']) {
+      const ofDateArcsecPerYr = () => chainG(planet) + pAJ2000ArcsecPerYr();
       out[`${planet}PeriPeriod`] = {
-        get: periodYears,
+        get: () => 1296000 / ofDateArcsecPerYr(),
         render: (v) => thousands(Math.round(v)),
         unit: 'yr',
-        note: PERI_TYPE[planet],
+        note: PERI_NOTE(planet),
       };
-      out[`${planet}PeriFormula`] = { get: () => periLabel(periFraction(planet)), render: (v) => String(v), note: PERI_TYPE[planet] };
-      if (planet !== 'pluto') {
-        out[`${planet}PeriRate`] = {
-          get: () => {
-            const [num, den] = periFraction(planet);
-            return Math.sign(num) * 360 / ((C.H * Math.abs(num)) / den);
-          },
-          render: (v) => thousands(v, 6),
-          unit: '°/yr',
-          note: PERI_TYPE[planet],
-        };
-      }
+      out[`${planet}PeriFormula`] = { get: () => `${chainArt().g[planet].nearestLaskar.mode} + p_A`, render: (v) => String(v), note: `the leading secular apsidal mode of the chain plus the J2000 general precession (was the 8H/N lattice label)` };
+      out[`${planet}PeriRate`] = {
+        get: () => ofDateArcsecPerYr() / 3600,
+        render: (v) => thousands(v, 6),
+        unit: '°/yr',
+        note: PERI_NOTE(planet),
+      };
     }
     // Earth's perihelion-of-date period is the one-family route's beat (S6: was the device's H/16).
     out.earthPeriRate = { get: () => 360 / oneYL().perihelionPrecessionYearsAtYear(2000), render: (v) => thousands(v, 6), unit: '°/yr', note: 'perihelion-of-date rate at J2000 — the of-date year laws’ beat (S6; was 360/(H/16))' };
@@ -2445,26 +2481,24 @@ export const VALUES = {
   // stored perihelionEclipticFraction (Earth from its structural H/16
   // effective period, n8 = 128 → 8H/24 = H/3); no new data.
   ...(() => {
-    const n8Ecliptic = (planet) => {
-      if (planet === 'earth') return 128;   // H/16 effective period
-      const [num, den] = model.planets[planet].perihelionEclipticFraction;
-      return (8 * den / Math.abs(num)) * Math.sign(num);
-    };
+    // Plan 07: the planets' inertial (vs the stars) perihelion period is the
+    // chain's secular mode, 1,296,000/|g| yr — the retired device's
+    // 8H/(n8 − 104) "frame identity" (the no-chain scaffolding's RA-frame
+    // convention) is gone, and with it the minor bodies' [1,1]-default rows.
     const out = {};
     for (const planet of ['mercury', 'venus', 'earth', 'mars', 'jupiter', 'saturn', 'uranus', 'neptune']) {
       out[`${planet}PeriPeriodICRF`] = {
-        // S6: Earth's apsidal period against the stars is the N-body chain's secular tangent (the
-        // one-family route's value), not the device identity 8H/(128 − 104) = H/3 = 111,772.
-        get: () => (planet === 'earth' ? oneYL().inclinationPrecessionYearsAtYear(2000) : (8 * C.H) / Math.abs(n8Ecliptic(planet) - 104)),
+        // S6: Earth's apsidal period against the stars is the one-family route's value.
+        get: () => (planet === 'earth' ? oneYL().inclinationPrecessionYearsAtYear(2000) : 1296000 / Math.abs(chainG(planet))),
         render: (v) => thousands(Math.round(v)),
         unit: 'yr',
-        note: planet === 'earth' ? 'Earth’s apsidal period vs the stars — the chain’s secular tangent (S6; was H/3 = 111,772)' : 'device: ecliptic lattice rate − the frame term (the no-chain scaffolding’s convention)',
+        note: planet === 'earth' ? 'Earth’s apsidal period vs the stars — the one-family route (S6)' : `inertial perihelion period, 1,296,000/|g| — the chain’s leading secular apsidal mode (${chainArt().g[planet].nearestLaskar.mode}); prograde`,
       };
     }
-    // Minor bodies ride the same identity over their stored fractions. All
-    // four currently store the [1,1] default (ecliptic period = H → ICRF
-    // H/12, retrograde) — the fraction is a default, not a fitted claim; a
-    // per-body fit would flow through automatically.
+    // The NO-CHAIN bodies (Pluto, Halley, Eros, Ceres) have no engine series; their
+    // rows stay the device's convention over the stored [1,1] default fraction
+    // (8H/(n8 − 104)), named as such — doc 31 documents them. They go when the
+    // bodies get a chain or are retired (plan 07 §3, outside R1–R9).
     for (const [body, el] of Object.entries(model.additionalBodies)) {
       if (body.startsWith('_') || !el?.perihelionEclipticFraction) continue;
       out[`${body}PeriPeriodICRF`] = {
@@ -2475,7 +2509,7 @@ export const VALUES = {
         },
         render: (v) => thousands(Math.round(v)),
         unit: 'yr',
-        note: 'ecliptic lattice rate − H/13 frame term (fraction is the [1,1] default, not fitted)',
+        note: 'NO-CHAIN BODY — the retired device’s frame identity over the stored [1,1] default fraction (not fitted, not an engine value)',
       };
     }
     return out;
@@ -2498,23 +2532,26 @@ export const VALUES = {
   })(),
 
   // ── Planet invariable-plane inclination family (11-2ab) ─────────────────
-  // Mean/amplitude LIVE from the engine's inclination-law derivation
-  // (C.planets — amplitude = ψ/(d·√m), mean anchored at the ICRF perihelion
-  // phase); anchors and Fibonacci d from model-parameters; Ω and i_J2000
-  // from the tracked elements. Porting this surfaced website defect #7
-  // (precision-loss class): the site derived its table from 5-dp EARTH_INCLIN
-  // constants and a 4-dp Mars perihelion longitude, leaving five table
-  // values 1 µdeg off the simulator — both site tables now carry the 3d
-  // full-precision values.
+  // Plan 07: mean and half-range of the CHAIN's inclination to the model's
+  // invariable plane over the banked ±10-Myr series (the API's
+  // invPlaneInclinationDeg, sampled every 2 kyr) — the engine's reading of
+  // what the retired ψ law (amplitude = ψ/(d·√m), anchored at an inclination
+  // cycle anchor) described. A multi-mode quantity has no single amplitude;
+  // `<p>InclAmp` is the half-range and says so. The Fibonacci divisor and the
+  // cycle anchor keys (`<p>InclD`, `<p>InclCycleAnchor`) are gone with the
+  // law; `<p>OmegaJ2000` is the chain's J2000 node from the Souami & Souchay
+  // origin (the API's value); `<p>InclJ2000` stays the S&S 2012 reference.
+  // (The earlier port surfaced website defect #7, precision loss from 5-dp
+  // constants — both site tables carry the registry's full precision.)
   ...(() => {
     const out = {};
     for (const planet of ['mercury', 'venus', 'mars', 'jupiter', 'saturn', 'uranus', 'neptune']) {
-      out[`${planet}InclMean`] = { get: () => C.planets[planet].invPlaneInclinationMean, render: (v) => Number(v).toFixed(6), unit: '°' };
-      out[`${planet}InclAmp`] = { get: () => C.planets[planet].invPlaneInclinationAmplitude, render: (v) => Number(v).toFixed(6), unit: '°' };
-      out[`${planet}InclCycleAnchor`] = { get: () => model.planets[planet].inclinationCycleAnchor, render: (v) => Number(v).toFixed(2), unit: '°' };
-      out[`${planet}InclD`] = { get: () => model.planets[planet].fibonacciD, render: (v) => String(v), note: 'Fibonacci divisor of the inclination law' };
-      out[`${planet}OmegaJ2000`] = { get: () => C.planets[planet].ascendingNodeInvPlane, render: (v) => Number(v).toFixed(2), unit: '°' };
-      out[`${planet}InclJ2000`] = { get: () => astro.planetOrbitalElements[planet].invPlaneInclinationJ2000, render: (v) => String(v), unit: '°' };
+      out[`${planet}InclMean`] = { get: () => chainInclStats(planet).mean, render: (v) => Number(v).toFixed(6), unit: '°', note: 'mean inclination to the invariable plane over the banked ±10-Myr series (plan 07; was the ψ law’s mean)' };
+      out[`${planet}InclAmp`] = { get: () => chainInclStats(planet).half, render: (v) => Number(v).toFixed(6), unit: '°', note: 'HALF-RANGE of the inclination to the invariable plane over ±10 Myr — a multi-mode quantity, not a single amplitude (plan 07; was ψ/(d·√m))' };
+      out[`${planet}OmegaJ2000`] = { get: () => physModel().planets.ascendingNodeInvPlaneDeg(planet, 2000), render: (v) => Number(v).toFixed(2), unit: '°', note: 'the chain’s J2000 ascending node on the invariable plane, S&S origin (plan 07; was the device’s verified node)' };
+      // the device INPUT the retired ψ law was phased on — still in model-parameters.json until plan 07 R8 deletes the inputs; docs 20/31 document it as such
+      out[`${planet}InclCycleAnchor`] = { get: () => model.planets[planet].inclinationCycleAnchor, render: (v) => Number(v).toFixed(2), unit: '°', note: 'RETIRED-DEVICE INPUT (the ψ inclination law’s phase anchor), kept while the input exists; no live surface reads it (plan 07 R8 deletes it)' };
+      out[`${planet}InclJ2000`] = { get: () => astro.planetOrbitalElements[planet].invPlaneInclinationJ2000, render: (v) => String(v), unit: '°', note: 'Souami & Souchay 2012 — the reference beside the chain anchor' };
     }
     return out;
   })(),
@@ -2532,7 +2569,7 @@ export const VALUES = {
     const pl = () => model.additionalBodies.pluto;
     const inclOf = (planet) => (planet === 'pluto'
       ? { mean: pl().invPlaneInclinationMean, amp: pl().invPlaneInclinationAmplitude }
-      : { mean: C.planets[planet].invPlaneInclinationMean, amp: C.planets[planet].invPlaneInclinationAmplitude });
+      : { mean: chainInclStats(planet).mean, amp: chainInclStats(planet).half });   // plan 07: the chain's series range
     const j2000Of = (planet) => {
       if (planet === 'earth') return astro.earthOrbital.earthInclinationJ2000_deg;
       if (planet === 'pluto') return astro.additionalBodiesReference.pluto.invPlaneInclinationJ2000;
@@ -2567,35 +2604,28 @@ export const VALUES = {
   })(),
 
   // ── Axial-precession identities + perihelion baselines (11-2ad) ─────────
-  // Baselines are the lattice periods as ″/cy (1,296,000/T × 100, signed from
-  // the stored fractions — Earth on its ICRF H/3 apsidal rate). (The
-  // `<p>PredTerms` counts that lived here read the PREDICT_COEFFS_PHYSICAL
-  // array lengths — retired with the planet predict device, plan 06 R8.)
+  // Plan 07: `<p>ModelBaseline` is the chain's NEWTONIAN era window rate
+  // (1800–2100, 1PN off) in ″/cy — the baseline Mercury's relativistic
+  // supplement sits on (gr − newton = 43.0 ″/cy, the engine's own 1PN
+  // advance); Earth's row is the one-family apsidal rate vs the stars. The
+  // lattice periods as ″/cy and Saturn's lattice/frame-identity rates
+  // (`saturnEclipticRateArcsec`, `saturnICRFRateArcsec` — the retired
+  // "anti-phase" story's numbers) are gone. (The `<p>PredTerms` counts that
+  // lived here went with the planet predict device, plan 06 R8.)
   ...(() => {
-    const n8 = (planet) => {
-      const [num, den] = model.planets[planet].perihelionEclipticFraction;
-      return (8 * den / Math.abs(num)) * Math.sign(num);
-    };
-    const baselineArcsecCy = (planet) => {
-      if (planet === 'earth' || planet === 'uranus') {
-        const sign = planet === 'earth' ? 1 : Math.sign(n8(planet));
-        return sign * 1296000 / (C.H / 3) * 100;
-      }
-      const T = (8 * C.H) / Math.abs(n8(planet));
-      return Math.sign(n8(planet)) * 1296000 / T * 100;
-    };
+    const baselineArcsecCy = (planet) => (planet === 'earth'
+      ? 1296000 * 100 / oneYL().inclinationPrecessionYearsAtYear(2000)
+      : chainWindowNewton(planet));
     const out = {
       axialPrecExact: { get: () => oneYL().axialPrecessionYearsAtYear(2000), render: (v) => thousands(v, 2), unit: 'yr', note: 'the J2000 of-date axial precession period (S5; was H/13)' },
       siderealYearsPerAxialPrec: { get: () => Math.round(oneYL().axialPrecessionYearsAtYear(2000)) - 1, render: (v) => thousands(v), note: 'one fewer sidereal year than tropical years per axial precession period (coin rotation) — on the J2000 of-date period (S5; was round(H/13) − 1)' },
-      saturnEclipticRateArcsec: { get: () => Math.sign(n8('saturn')) * 1296000 / ((8 * C.H) / Math.abs(n8('saturn'))), render: (v) => thousands(v, 1), unit: '″/yr' },
-      saturnICRFRateArcsec: { get: () => -1296000 / ((8 * C.H) / Math.abs(n8('saturn') - 104)), render: (v) => thousands(v, 1), unit: '″/yr', note: 'ICRF divisor via the n8 − 104 frame identity' },
     };
     for (const planet of ['mercury', 'venus', 'earth', 'mars', 'jupiter', 'saturn', 'uranus', 'neptune']) {
       out[`${planet}ModelBaseline`] = {
         get: () => baselineArcsecCy(planet),
         render: (v) => thousands(v, 1),
         unit: '″/cy',
-        note: planet === 'earth' ? 'ICRF apsidal rate (H/3)' : 'lattice perihelion rate',
+        note: planet === 'earth' ? 'apsidal rate vs the stars — the one-family route (S6)' : 'the chain’s Newtonian era window rate (1800–2100, 1PN off); with 1PN see <p>PeriRateNowArcsecCy',
       };
     }
     return out;
@@ -2619,16 +2649,12 @@ export const VALUES = {
       mercuryPark2017Rate: { get: () => kv().mercuryPark2017RateArcsecCy, render: (v) => String(v), unit: '″/cy', note: 'Park 2017 MESSENGER-era determination' },
       mercuryAnomalyClassic: { get: () => kv().mercuryAnomalyClassicArcsecCy, render: (v) => String(v), unit: '″/cy', note: 'the classic GR anomaly — citation' },
       mercuryBaselineDiff: {
-        get: () => {
-          const [num, den] = model.planets.mercury.perihelionEclipticFraction;
-          const baseline = 1296000 / ((C.H * Math.abs(num)) / den) * 100;
-          return Math.abs(kv().mercuryNewtonianArcsecCy - baseline);
-        },
+        get: () => Math.abs(kv().mercuryNewtonianArcsecCy - chainWindowNewton('mercury')),
         render: (v) => thousands(v, 1),
         unit: '″/cy',
-        note: 'textbook Newtonian vs the lattice baseline',
+        note: 'textbook Newtonian vs the chain’s Newtonian era window rate (plan 07; was the lattice baseline)',
       },
-      mercuryAnomalyJ2000:    { get: mercuryFluctuation2000, render: (v) => thousands(v, 0), unit: '″/cy', note: 'LEGACY name — the Earth-frame RA rate minus the lattice rate at J2000 (the equatorial projection terms, R8); not the relativistic anomaly (that is mercuryPeriAnomalyGrArcsecCy)ficients at 2000' },
+      mercuryAnomalyJ2000:    { get: mercuryFluctuation2000, render: (v) => thousands(v, 0), unit: '″/cy', note: 'LEGACY name — the Earth-frame RA rate minus the chain’s Newtonian sidereal rate at J2000 (the equatorial projection terms, R8); not the relativistic anomaly (that is mercuryPeriAnomalyGrArcsecCy)' },
       mercuryEpoch2000Offset: { get: mercuryFluctuation2000, render: (v) => thousands(v, 1), unit: '″/cy' },
       mercuryObservedRate: { get: () => kv().mercuryObservedRateArcsecCy, render: (v) => thousands(v), unit: '″/cy', note: 'WebGeocalc 1900–2000 heliocentric trend' },
       venusObservedRate:   { get: () => kv().venusObservedRateArcsecCy, render: (v) => thousands(v), unit: '″/cy', note: '~0 — flips sign across sub-windows' },
@@ -2645,7 +2671,7 @@ export const VALUES = {
 
   // ── Fluctuation ranges + geocentric chain (11-2af) ──────────────────────
   // Plan 06 R8: the per-planet "fluctuation" range is the range of the
-  // PROJECTION TERMS of the lattice motion (predictiveMachinery.latticeFluct:
+  // PROJECTION TERMS of the chain motion (predictiveMachinery.chainFluct:
   // projection excess + obliquity-rate term, doc 13 §1.8) over one perihelion
   // cycle centred on J2000 — a property of the perihelion's longitude against
   // the equinox, ε from the published one-source movement. It replaces the
@@ -2656,29 +2682,30 @@ export const VALUES = {
   // Geocentric chain = ICRF citations + the general-precession equinox drift
   // (knownValues).
   ...(() => {
-    const { latticeFluct, erdBrowserForm } = predictiveMachinery();
+    const { chainFluct, erdBrowserForm } = predictiveMachinery();
     let scans = null;
     const scan = () => {
       if (!scans) {
         scans = {};
-        const cycleOf = (p) => Math.abs(C.planets[p].perihelionEclipticYears);
+        // one secular perihelion period, 1,296,000/|g| (plan 07: the chain's leading mode, not the lattice fraction)
+        const cycleOf = (p) => 1296000 / Math.abs(chainG(p));
         {
           const T = cycleOf('mercury');
           let mn = Infinity, mx = -Infinity, mnY = 0, mxY = 0;
           for (let y = Math.round(2000 - T / 2); y <= 2000 + T / 2; y += 100) {
-            const f = latticeFluct(y, 'mercury');
+            const f = chainFluct(y, 'mercury');
             if (f < mn) { mn = f; mnY = y; }
             if (f > mx) { mx = f; mxY = y; }
           }
-          for (let y = mnY - 100; y <= mnY + 100; y++) { const f = latticeFluct(y, 'mercury'); if (f < mn) { mn = f; mnY = y; } }
-          for (let y = mxY - 100; y <= mxY + 100; y++) { const f = latticeFluct(y, 'mercury'); if (f > mx) { mx = f; mxY = y; } }
+          for (let y = mnY - 100; y <= mnY + 100; y++) { const f = chainFluct(y, 'mercury'); if (f < mn) { mn = f; mnY = y; } }
+          for (let y = mxY - 100; y <= mxY + 100; y++) { const f = chainFluct(y, 'mercury'); if (f > mx) { mx = f; mxY = y; } }
           scans.mercury = { mn, mx, mnY, mxY };
         }
         for (const p of ['venus', 'mars', 'jupiter', 'saturn', 'uranus', 'neptune']) {
           const T = cycleOf(p);
           let mn = Infinity, mx = -Infinity;
           for (let y = Math.round(2000 - T / 2); y <= 2000 + T / 2; y += Math.max(100, Math.round(T / 4000))) {
-            const f = latticeFluct(y, p);
+            const f = chainFluct(y, p);
             if (f < mn) mn = f;
             if (f > mx) mx = f;
           }
@@ -2794,7 +2821,15 @@ export const VALUES = {
     const raSlope = (lamDeg, epsDeg) => { const l = lamDeg * D2R, e = epsDeg * D2R; return Math.cos(e) / (Math.cos(l) ** 2 + Math.sin(l) ** 2 * Math.cos(e) ** 2); };
     const dAlphaDeps = (lamDeg, epsDeg) => { const l = lamDeg * D2R, e = epsDeg * D2R; return -Math.sin(l) * Math.cos(l) * Math.sin(e) / (Math.cos(l) ** 2 + Math.sin(l) ** 2 * Math.cos(e) ** 2); };
     const epsRateArcsecCy = () => (oneEps(2050) - oneEps(1950)) * 3600;   // the published obliquity (the hybrid)
-    const eclRate = (p) => 1296000 / C.planets[p].perihelionEclipticYears * 100;
+    // Plan 07: the ecliptic rate this family publishes is the chain's
+    // NEWTONIAN era window (1800–2100, 1PN off). The paper names this key
+    // "the chain's Newtonian rate" and builds the published identity on it —
+    // newton + the 1PN supplement = the total era window, all three read from
+    // the SAME window, so the sum is exact by construction (gr − newton). It
+    // is also the base the retired "anomaly = RA projection" claim was tested
+    // on (doc 13 §1.8): projecting the 1PN-inclusive rate would count the 43″
+    // twice. The model's TOTAL rate of date is <p>PeriRateNowArcsecCy.
+    const eclRate = (p) => chainWindowNewton(p);
     const grAdvance = (p) => {   // ″/cy, 6π GM_sun / (c² a (1 − e²)) per orbit × orbits per century
       const P = C.planets[p];
       const aAU = Math.pow(P.solarYearInput / C.meanSiderealYearDays, 2 / 3);
@@ -2803,10 +2838,10 @@ export const VALUES = {
       return perOrbit * (36525 / P.solarYearInput) * 206264.806;
     };
     for (const p of ['mercury', 'venus', 'mars', 'jupiter', 'saturn', 'uranus', 'neptune']) {
-      const lamA = () => C.planets[p].longitudePerihelion;
-      const lamB = () => C.planets[p].longitudePerihelion + C.planets[p].angleCorrection;
-      out[`${p}PeriRateEclipticArcsecCy`] = { get: () => eclRate(p), render: (v) => thousands(v, 2), unit: '″/cy', note: 'the lattice divisor: 1296000 / perihelionEclipticYears × 100' };
-      out[`${p}PeriRaSlopeJ2000`] = { get: () => raSlope(lamA(), epsJ2000()), render: (v) => Number(v).toFixed(5), note: 'dα/dλ at the IAU J2000 perihelion longitude, IAU 2006 obliquity' };
+      const lamA = () => chainArt().j2000AnchorElements[p].lonPeriEclipticDeg;   // the chain's J2000 ϖ (plan 07; was the IAU input)
+      const lamB = () => chainArt().j2000AnchorElements[p].lonPeriEclipticDeg + C.planets[p].angleCorrection;
+      out[`${p}PeriRateEclipticArcsecCy`] = { get: () => eclRate(p), render: (v) => thousands(v, 2), unit: '″/cy', note: 'the chain’s sidereal era window rate (1800–2100, 1PN on) — the projection’s input (plan 07; was the lattice divisor)' };
+      out[`${p}PeriRaSlopeJ2000`] = { get: () => raSlope(lamA(), epsJ2000()), render: (v) => Number(v).toFixed(5), note: 'dα/dλ at the chain’s J2000 perihelion longitude, IAU 2006 obliquity (plan 07; was the IAU J2000 input)' };
       out[`${p}PeriRateRaProjectedJ2000`] = { get: () => eclRate(p) * raSlope(lamA(), epsJ2000()), render: (v) => thousands(v, 2), unit: '″/cy' };
       out[`${p}PeriProjectionExcessJ2000`] = { get: () => eclRate(p) * (raSlope(lamA(), epsJ2000()) - 1), render: (v) => thousands(v, 2), unit: '″/cy', note: 'reading A: the projected rate minus the ecliptic rate' };
       out[`${p}PeriRaSlopeMarkerJ2000`] = { get: () => raSlope(lamB(), epsJ2000()), render: (v) => Number(v).toFixed(5), note: 'reading B: at the scene marker longitude (IAU λ + angleCorrection)' };
@@ -2829,13 +2864,49 @@ export const VALUES = {
       note: 'general-relativistic advance from the model constants (a = 1 AU, e J2000) — documentation-grade beside Earth’s H/16 chain',
     };
     out.mercuryPeriRateWithRelativisticArcsecCy = {
-      get: () => eclRate('mercury') + grAdvance('mercury'),
+      get: () => chainWindowGr('mercury'),   // plan 07: the chain's 1PN era window — the Newtonian window PLUS the engine's own relativistic advance
       render: (v) => thousands(v, 1),
       unit: '″/cy',
-      note: 'Mercury’s stated total (P8a, design choice A): the lattice present-epoch Newtonian rate (8H/11 = 531.4 ″/cy) + the derived 1PN supplement (43.0) = 574.4 — additive and stated, never folded into a divisor; lands on the observed 572-window / 560-mean family',
+      note: 'Mercury’s stated total (P8a, design choice A): the chain’s NEWTONIAN era window (529.0 ″/cy, <mercuryModelBaseline> / <mercuryPeriRateEclipticArcsecCy>) + the 1PN supplement (43.0) = the chain’s 1PN era window (572.0) — the engine computes BOTH window rates, so the sum is exact by construction (gr − newton); the analytic 6πGM/(c²a(1−e²)) from the model constants (<mercuryPeriAnomalyGrArcsecCy>) is the INDEPENDENT check of the same 43.0. Additive and stated, never folded into a divisor; lands on the observed 572-window family',
     };
-    out.earthPeriRateEclipticOfDateArcsecCy = { get: () => 1296000 / (C.H / 16) * 100, render: (v) => thousands(v, 2), unit: '″/cy', note: 'H/16 — the perihelion OF DATE (not the inertial advance)' };
-    out.earthPeriProjectionExcessJ2000 = { get: () => 1296000 / (C.H / 16) * 100 * (raSlope(astro.earthOrbital.earthPerihelionLongitudeJ2000, epsJ2000()) - 1), render: (v) => thousands(v, 2), unit: '″/cy' };
+    // The residual of the CLOSED "anomaly = RA projection" reading (doc 13
+    // §1.8): the equatorial projection of the Newtonian ecliptic rate against
+    // the relativistic advance. Both legs are model quantities, so the gap and
+    // its percentage are registry-derived rather than written into the doc —
+    // they move with the chain instead of going stale in prose.
+    const mercuryProjExcessJ2000 = () => {
+      const lam = chainArt().j2000AnchorElements.mercury.lonPeriEclipticDeg;
+      return eclRate('mercury') * (raSlope(lam, epsJ2000()) - 1);
+    };
+    out.mercuryProjectionVsGrGapArcsecCy = {
+      get: () => grAdvance('mercury') - mercuryProjExcessJ2000(),
+      render: (v) => Number(v).toFixed(2),
+      unit: '″/cy',
+      note: 'how far the equatorial projection of the Newtonian ecliptic rate falls SHORT of the relativistic advance — the residual that closed the projection reading (doc 13 §1.8); positive = the projection is too small',
+    };
+    out.mercuryProjectionVsGrDeltaPct = {
+      get: () => (grAdvance('mercury') - mercuryProjExcessJ2000()) / grAdvance('mercury') * 100,
+      render: (v) => Number(v).toFixed(1),
+      unit: '%',
+      note: 'the same residual as a fraction of the relativistic advance — the agreement level of the closed projection reading, not an exact identity (doc 13 §1.8)',
+    };
+    // The model's Newtonian rate against Park 2017's Newtonian subtotal
+    // (575.31 ICRF − the GR advance): doc 13 §1.7's agreement figure, derived
+    // so it tracks the chain. On the retired lattice this read ~0.1 %; on the
+    // chain's Newtonian era window it is ~0.6 % — a weaker, honest statement.
+    out.mercuryModelVsParkNewtonianDeltaPct = {
+      get: () => {
+        const parkNewtonian = astro.knownValues.mercuryPark2017RateArcsecCy - grAdvance('mercury');
+        return Math.abs(parkNewtonian - chainWindowNewton('mercury')) / parkNewtonian * 100;
+      },
+      render: (v) => Number(v).toFixed(1),
+      unit: '%',
+      note: 'the chain’s Newtonian era window vs Park 2017 minus the derived GR advance (<mercuryNewtonianModern>) — doc 13 §1.7',
+    };
+    // Plan 07: Earth's perihelion-of-date rate is the one-family beat (S6 missed this pair — they still read the device's H/16)
+    const earthOfDateArcsecCy = () => 1296000 * 100 / oneYL().perihelionPrecessionYearsAtYear(2000);
+    out.earthPeriRateEclipticOfDateArcsecCy = { get: earthOfDateArcsecCy, render: (v) => thousands(v, 2), unit: '″/cy', note: 'the perihelion OF DATE (not the inertial advance) — the one-family beat at J2000 (was H/16)' };
+    out.earthPeriProjectionExcessJ2000 = { get: () => earthOfDateArcsecCy() * (raSlope(astro.earthOrbital.earthPerihelionLongitudeJ2000, epsJ2000()) - 1), render: (v) => thousands(v, 2), unit: '″/cy' };
     out.obliquityRateJ2000ArcsecCy = { get: epsRateArcsecCy, render: (v) => thousands(v, 1), unit: '″/cy', note: 'shipped obliquity law, central difference 1950–2050' };
     for (const y of [1800, 1900, 2000, 2100]) {
       out[`mercuryHelio${y}`] = { get: () => pm().totalPrecession(y, 'mercury'), render: (v) => thousands(v, 2), unit: '″/cy', note: 'LEGACY name (not heliocentric) — Earth-frame RA rate, frame (b); use mercuryEarthFrameRa{y}' };
@@ -2845,8 +2916,8 @@ export const VALUES = {
     }
     // Ecliptic longitude OF DATE (frame a), both reduction systems — doc 13 §1.8 / tools/explore/mercury-perihelion-frames.mjs
     out.generalPrecessionNewcombArcsecCy = { get: () => astro.knownValues.generalPrecessionNewcombArcsecCy, render: (v) => thousands(v, 3), unit: '″/cy', note: 'Newcomb general precession used in the Le Verrier→Clemence reductions — citation' };
-    out.mercuryLonOfDateModel = { get: () => 1296000 / C.planets.mercury.perihelionEclipticYears * 100 + astro.knownValues.generalPrecessionArcsecCy, render: (v) => thousands(v, 2), unit: '″/cy', note: 'lattice rate + IAU 2006 p_A — the model in frame (a), modern system' };
-    out.mercuryLonOfDateModelClassical = { get: () => 1296000 / C.planets.mercury.perihelionEclipticYears * 100 + astro.knownValues.generalPrecessionNewcombArcsecCy, render: (v) => thousands(v, 2), unit: '″/cy', note: 'lattice rate + Newcomb p_A — the model in frame (a), classical system' };
+    out.mercuryLonOfDateModel = { get: () => chainWindowGr('mercury') + astro.knownValues.generalPrecessionArcsecCy, render: (v) => thousands(v, 2), unit: '″/cy', note: 'the chain’s 1800–2100 window rate (1PN) + IAU 2006 p_A — the model in frame (a), modern system (plan 07; was the lattice rate)' };
+    out.mercuryLonOfDateModelClassical = { get: () => chainWindowGr('mercury') + astro.knownValues.generalPrecessionNewcombArcsecCy, render: (v) => thousands(v, 2), unit: '″/cy', note: 'the chain’s window rate + Newcomb p_A — the model in frame (a), classical system (plan 07; was the lattice rate)' };
     out.mercuryObservedLonOfDateClemence = { get: () => astro.knownValues.mercuryObservedLonOfDateClemenceArcsecCy, render: (v) => thousands(v, 2), unit: '″/cy', note: 'Clemence 1947: 1765–1937 longitudes vs the equinox of date (± 0.41) — the only equinox-referred OBSERVATION; a modern-system equinox total does NOT exist and must not be manufactured by adding p_A to an ICRF rate' };
     out.mercuryNewtonianClassical = { get: () => astro.knownValues.mercuryNewtonianClassicalArcsecCy, render: (v) => thousands(v, 2), unit: '″/cy', note: 'Clemence 1947 Newtonian subtotal 5,557.18 − Newcomb p_A — citation' };
     out.mercuryNewtonianModern = { get: () => astro.knownValues.mercuryPark2017RateArcsecCy - grAdvance('mercury'), render: (v) => thousands(v, 2), unit: '″/cy', note: 'Park 2017 ICRF total minus the GR advance derived from the model constants' };
@@ -3053,18 +3124,16 @@ export const VALUES = {
   // CYCLE is claimed for any planet (the bands are the `<planet>ObliquityBand*`
   // keys above).
   ...(() => {
-    const n8 = (p) => {
-      if (p === 'earth') return 128;
-      const [num, den] = model.planets[p].perihelionEclipticFraction;
-      return (8 * den / Math.abs(num)) * Math.sign(num);
-    };
+    // Plan 07: the "ICRF" periods are the inertial perihelion periods, 1,296,000/|g| from the
+    // chain's leading secular mode (Earth: the one-family route) — the 8H/(n8 − 104) frame
+    // identity of the retired scene is gone; all prograde.
     const planets7 = ['mercury', 'venus', 'mars', 'jupiter', 'saturn', 'uranus', 'neptune'];
     const out = {
       earthAxialPeriod: { get: () => oneYL().axialPrecessionYearsAtYear(2000), render: (v) => thousands(Math.round(v)), unit: 'yr', note: 'the J2000 of-date axial precession period (S5; was H/13)' },
-      earthIcrfPeriod: { get: () => (8 * C.H) / Math.abs(n8('earth') - 104), render: (v) => thousands(Math.round(v)), unit: 'yr', note: 'prograde — the only positive sign in the family' },
+      earthIcrfPeriod: { get: () => oneYL().inclinationPrecessionYearsAtYear(2000), render: (v) => thousands(Math.round(v)), unit: 'yr', note: 'Earth’s apsidal period vs the stars — the one-family route (S6; was the device’s H/3 = 111,772)' },
     };
     for (const p of planets7) {
-      out[`${p}PeriLongJ2000`] = { get: () => C.planets[p].longitudePerihelion, render: (v) => Number(v).toFixed(3), unit: '°' };
+      out[`${p}PeriLongJ2000`] = { get: () => chainArt().j2000AnchorElements[p].lonPeriEclipticDeg, render: (v) => Number(v).toFixed(3), unit: '°', note: 'the chain’s J2000 ecliptic longitude of perihelion (the API’s value; plan 07 — was the IAU input)' };
       out[`${p}AxialPeriod`] = {
         get: () => (p === 'mercury'
           ? Math.abs(1296000 * 100 / rd('data/nbody-secular-frequencies.json').windowElementRates.mercury.nodeRateArcsecCy)
@@ -3076,9 +3145,10 @@ export const VALUES = {
           : 'the spin channel\'s J2000 axial precession period, 2π/|ψ̇₀| with ψ̇₀ = −α cos ε₀ DERIVED from the planet\'s own torques (same value as the <planet>AxialPrecessionPeriodDerivedYr key; this name kept for the site)',
       };
       out[`${p}IcrfPeriod`] = {
-        get: () => { const s = n8(p) - 104; return Math.sign(s) * (8 * C.H) / Math.abs(s); },
+        get: () => 1296000 / Math.abs(chainG(p)),
         render: (v) => thousands(Math.round(v)),
         unit: 'yr',
+        note: `inertial perihelion period — the chain’s leading secular mode (${chainArt().g[p].nearestLaskar.mode}); ≡ <${p}PeriPeriodICRF>`,
       };
       out[`${p}MeanObliq`] = { get: () => C.planets[p].obliquityMean, render: (v) => Number(v).toFixed(2), unit: '°', note: 'the K eccentricity law\'s obliquity input since Phase 7 commit 2: the derived J2000 obliquity (IAU pole vs the chain\'s plane), acute' };
     }
