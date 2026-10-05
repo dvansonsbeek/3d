@@ -6293,6 +6293,7 @@ if (typeof window !== 'undefined') {
         'framework verification (generic)': renderVFPPaperChartAlt(generic, { range: gTab.range, title: generic.label + ' — ' + gTab.label }),
         'planet inclinations':        _vfpPIPaperSvg(_VFPPI_SCREEN_RANGE),
         'planet eccentricities':      _vfpPEPaperSvg(_VFPPI_SCREEN_RANGE),
+        'planet perihelion':          _vfpPPPaperSvg(_VFPPI_SCREEN_RANGE),
         'all precession':             _vfpAPPaperSvg(_vfpCurrentTabFor('all-precession').range),
         'analemma':                   _vfpANPaperSvg(),
         'milankovitch overview':      _vfpMOPaperSvg(_vfpCurrentTabFor('milankovitch-overview').range),
@@ -6312,6 +6313,11 @@ if (typeof window !== 'undefined') {
     vfpPERender: () => renderVFPPlanetEccentricities(),
     vfpPEAfterRender: (el) => _vfpPEAfterRender(el),
     vfpPEPaperSvg: (range) => _vfpPEPaperSvg(range || _VFPPI_SCREEN_RANGE),
+    // the perihelion-precession sibling's smoke surface
+    vfpPPState: () => _vfpPPState,
+    vfpPPRender: () => renderVFPPlanetPerihelion(),
+    vfpPPAfterRender: (el) => _vfpPPAfterRender(el),
+    vfpPPPaperSvg: (range) => _vfpPPPaperSvg(range || _VFPPI_SCREEN_RANGE),
     openVerificationPanel: () => openVerificationPanel(),
     updateVerificationPanel: (id) => updateVerificationPanel(id),
     // C1 period-of-date probe surface: the two-tier composition, per factor
@@ -20476,6 +20482,21 @@ const VFP_CATEGORIES = [
     customPaper: () => _vfpPEPaperSvg(_vfpCurrentTabFor('planet-eccentricities').range),
   },
   {
+    // ── Perihelion precession of all planets (owner-requested 2026-10-05):
+    // the third sibling. The RATE the perihelion turns, ″/century, for all
+    // eight including Earth, each planet in two readings — with relativity
+    // (1PN, solid) and Newtonian (dashed) — over the four standard windows,
+    // in either frame (against the stars / against the equinox of date).
+    // The rate is the SECULAR family on a named ±1,000-yr stencil, NOT the
+    // Prec. cells' ±150-yr window rate: see the block comment at
+    // renderVFPPlanetPerihelion for why a deep-time window forces that
+    // choice, and for the e → 0 conditioning the faint stretches mark.
+    id: 'planet-perihelion', group: 'All planets', label: 'Perihelion precession',
+    customRender: () => renderVFPPlanetPerihelion(),
+    afterRender: (el) => _vfpPPAfterRender(el),
+    customPaper: () => _vfpPPPaperSvg(_vfpCurrentTabFor('planet-perihelion').range),
+  },
+  {
     // ── All Precession Periods (owner-requested): Earth's five of-date
     // precession periods in ONE chart — perihelion, axial and apsidal on by
     // default, the obliquity cycle and the ecliptic precession selectable —
@@ -21348,6 +21369,404 @@ function _vfpPEAfterRender(bodyEl) {
       if (!on[p]) continue;
       rows += '<div style="display:flex;justify-content:space-between;gap:16px;"><span style="color:' + _vfpPICss(p) + ';">' + p.charAt(0).toUpperCase() + p.slice(1) + '</span><span>' + S.data[p][i].toFixed(5) + '</span></div>';
     }
+    tip.innerHTML = rows;
+    tip.style.display = 'block';
+    const wr = svg.parentElement.getBoundingClientRect();
+    let tx = e.clientX - wr.left + 14;
+    if (tx + tip.offsetWidth > wr.width - 4) tx = e.clientX - wr.left - tip.offsetWidth - 14;
+    let ty = e.clientY - wr.top + 12;
+    if (ty + tip.offsetHeight > wr.height - 4) ty = wr.height - tip.offsetHeight - 4;
+    tip.style.left = Math.max(0, tx) + 'px';
+    tip.style.top = Math.max(0, ty) + 'px';
+  });
+}
+
+// ── VFP: Perihelion precession of all planets (owner-requested 2026-10-05) ──
+// The inclination/eccentricity twins' third sibling: the RATE at which each
+// planet's perihelion turns, arcsec/century, against epoch, for all eight.
+//
+// WHICH RATE FAMILY (the load-bearing choice — a displayed rate must name its
+// window). The planet panels' "Prec." cells show the WINDOW rate: a ±150-yr
+// central difference on the FULL chain (_kcApsidalPeriodYears), which keeps the
+// Great-Inequality local slope on purpose. That family cannot be sampled across
+// a deep-time window: its ~900-yr content aliases at kyr steps into noise (the
+// v16.2 running-mean lesson). So this panel rides the SECULAR tier — the smooth
+// series evaluator the two sibling panels already use (_kcChartElementsOfDate,
+// handover forced to 0) — differenced over a NAMED ±1000-yr stencil. The two
+// surfaces therefore quote different windows of one physical rate BY DESIGN;
+// the caption says so, so the numbers are never mistaken for each other.
+// EARTH rides its own one family (the year-length factory's apsidal/perihelion
+// periods — the same number the Prec. cell, the anomalistic year and the API
+// carry), never the planet-series override, mirroring the twins' Earth route.
+//
+// NEWTONIAN vs WITH RELATIVITY. The engine integrates with 1PN ON, and no
+// GR-off time series is banked — only a single era-window number. So the
+// Newtonian curve is the engine's secular rate MINUS the analytic 1PN advance
+// of date, 6πGM/(c²a(1−e²)) per orbit, evaluated on the elements of date (it
+// breathes with e(t), it is not a constant offset). That is the paper's own
+// construction and it is gated: the generator's P8b check reads the engine's
+// measured gr−newton difference as 42.985 against the analytic 42.981 ″/cy for
+// Mercury. It is NOT two independent integrations, and the caption states that.
+// GM and the AU are the FIXED J2000 constants, never the mutable
+// currentAUDistance (deep-time mode reassigns it — the purity-freeze class),
+// which is also the physically right choice: the chain is a constant-GM run.
+//
+// CONDITIONING. dϖ/dt diverges as e → 0: the perihelion direction stops being
+// defined. Measured on this evaluator — Mercury (e 0.206) reads 571.6 ″/cy at
+// every stencil from ±500 to ±4000 yr, while Venus at J2000 (e 0.0067) reads
+// 31.2 / 29.5 / 23.4 / −0.9 and at +50 kyr (e 0.0022) −2514 / −2500 / −2428 /
+// −2176. Those excursions are real in sign and order but are not
+// determinations, so the curve is drawn FAINT below e = 0.01 and the legend
+// says the number is not a measurement there.
+const _vfpPPState = {
+  on: { mercury: true, venus: true, earth: true, mars: true, jupiter: true, saturn: true, uranus: true, neptune: true },
+  frame: 'sid',   // 'sid' = against the stars (ecliptic J2000) · 'ofdate' = against the equinox of date
+};
+const _vfpPPCacheByRange = {};   // static samples — once per session per range+frame
+const _VFPPP_STENCIL_YR = 1000;  // the NAMED differencing half-width (secular tier)
+const _VFPPP_ECC_FLOOR = 0.01;   // below this the perihelion direction is ill-defined
+// …and the PLANET-RELATIVE half of the same test. An absolute e floor is the
+// wrong criterion on its own: measured, Saturn's e falls to 0.0103 at +14,000
+// and its rate rises to 10,170 ″/cy (3.6× its own g₆) — the singularity, but
+// sitting just ABOVE any 0.01 floor; Earth reaches 5,407 ″/cy at +23,000 on
+// e = 0.0030. A rate that has left its own secular eigenfrequency by this
+// factor is mode-mixing, not a determination.
+const _VFPPP_REF_RATIO = 2;
+// The planet's secular reference rate, ″/cy — the leading apsidal mode for the
+// chain planets, Earth's own one-family J2000 apsidal rate. Frame-independent
+// by construction: the test runs on the SIDEREAL rate, so adding the general
+// precession for the of-date view cannot change what is flagged.
+function _vfpPPRefRateArcsecCy(p) {
+  if (p === 'earth') return Math.abs(_vfpPPEarthRateArcsecCy(2000, 'sid'));
+  const g = CHAIN_ARTIFACT.g && CHAIN_ARTIFACT.g[p];
+  return g ? Math.abs(g.arcsecPerYr) * 100 : Infinity;
+}
+const _vfpPPYrToJd = (y) => KC_ANCHOR_EPOCH_JD + (y - KC_ANCHOR_EPOCH_YEAR) * 365.25;
+// The general precession in longitude at the epoch, ″/yr — the project's
+// convention (1,296,000 / the one-family axial precession period), the same
+// p_A the registry's of-date perihelion keys add.
+function _vfpPPGeneralPrecArcsecPerYr(year) {
+  const P = _yearLengthsM().axialPrecessionYearsAtYear(year);
+  return P ? 1296000 / P : 0;
+}
+// Earth's secular apsidal rate, ″/cy, from its OWN family: the apsidal period
+// against the stars, or the perihelion-of-date beat. Signed prograde positive.
+function _vfpPPEarthRateArcsecCy(year, frame) {
+  const YL = _yearLengthsM();
+  const P = frame === 'ofdate' ? YL.perihelionPrecessionYearsAtYear(year) : YL.inclinationPrecessionYearsAtYear(year);
+  return P ? 129600000 / P : 0;
+}
+// The secular sidereal apsidal rate of a chain planet, ″/cy: dϖ/dt of the
+// SMOOTH series tier over the named stencil, differenced on the ANGLE (polar,
+// never the interpolated Cartesian e-vector components — the estimator-bias
+// class the hybrid's polar-chord fix closed).
+function _vfpPPChainRateArcsecCy(p, year) {
+  const w1 = _kcChartElementsOfDate(p, _vfpPPYrToJd(year - _VFPPP_STENCIL_YR)).lonPeriEclipticDeg;
+  const w2 = _kcChartElementsOfDate(p, _vfpPPYrToJd(year + _VFPPP_STENCIL_YR)).lonPeriEclipticDeg;
+  let d = w2 - w1;
+  while (d > 180) d -= 360;
+  while (d < -180) d += 360;
+  return (d * 3600) / (2 * _VFPPP_STENCIL_YR) * 100;
+}
+// The 1PN secular advance of date, ″/cy — one home for all eight bodies.
+function _vfpPP1pnSupplementArcsecCy(aAU, e, periodYr) {
+  if (!(aAU > 0) || !(periodYr > 0)) return 0;
+  const perOrbitRad = (6 * Math.PI * GM_SUN) / (speedOfLight * speedOfLight * aAU * AU_J2000_KM * (1 - e * e));
+  return perOrbitRad * 206264.806 * (100 / periodYr);
+}
+function _vfpPPSamples(range) {
+  const r = range || _vfpCurrentTabFor('planet-perihelion').range;
+  const y0 = r[0], y1 = r[1];
+  const frame = _vfpPPState.frame;
+  const key = y0 + ':' + y1 + ':' + frame + ':' + (_planetSeriesData ? 's' : 'k');
+  if (_vfpPPCacheByRange[key]) return _vfpPPCacheByRange[key];
+  const N = _vfpSamplesForSpan(y0, y1);
+  const yrs = new Array(N);
+  const data = {};   // per planet: gr[], newton[], ecc[]
+  for (const p of _vfpPI_PLANETS) data[p] = { gr: new Array(N), newton: new Array(N), ecc: new Array(N), ill: new Array(N) };
+  const ref = {};
+  for (const p of _vfpPI_PLANETS) ref[p] = _vfpPPRefRateArcsecCy(p);
+  for (let i = 0; i < N; i++) {
+    const y = y0 + ((y1 - y0) * i) / (N - 1);
+    yrs[i] = y;
+    const pA = frame === 'ofdate' ? _vfpPPGeneralPrecArcsecPerYr(y) * 100 : 0;
+    for (const p of _vfpPI_PLANETS) {
+      let sid, e, aAU, periodYr;
+      if (p === 'earth') {
+        sid = _vfpPPEarthRateArcsecCy(y, 'sid');
+        e = _vfpPEEarthEcc(y);
+        aAU = _kcChartElementsOfDate('earth', _vfpPPYrToJd(y)).aAU;
+        periodYr = Math.pow(aAU, 1.5);
+      } else {
+        const el = _kcChartElementsOfDate(p, _vfpPPYrToJd(y));
+        sid = _vfpPPChainRateArcsecCy(p, y);
+        e = el.e;
+        aAU = el.aAU;
+        periodYr = Math.pow(aAU, 1.5);
+      }
+      // the of-date reading adds the general precession; Earth's of-date beat
+      // is its OWN family's period, not sidereal + p_A
+      const gr = p === 'earth' && frame === 'ofdate' ? _vfpPPEarthRateArcsecCy(y, 'ofdate') : sid + pA;
+      const supp = _vfpPP1pnSupplementArcsecCy(aAU, e, periodYr);
+      data[p].gr[i] = gr;
+      data[p].newton[i] = gr - supp;
+      data[p].ecc[i] = e;
+      // the conditioning flag — tested on the SIDEREAL rate, so the frame
+      // toggle cannot change what is marked
+      data[p].ill[i] = e < _VFPPP_ECC_FLOOR || Math.abs(sid) > _VFPPP_REF_RATIO * ref[p];
+    }
+  }
+  return (_vfpPPCacheByRange[key] = { y0, y1, yrs, data, frame });
+}
+function _vfpPPChartCore(range, on, style) {
+  const S = _vfpPPSamples(range);
+  const paper = style === 'paper';
+  const W = 800, H = 380, PAD = { l: 64, r: 24, t: 16, b: 34 };
+  const pw = W - PAD.l - PAD.r, ph = H - PAD.t - PAD.b;
+  const cGrid = paper ? '#ddd' : '#2a2f3a', cTick = paper ? '#555' : '#888';
+  const fYT = paper ? 11 : 9, fXT = paper ? 10 : 9;
+  // Signed axis — Venus, Jupiter and Saturn run retrograde in places. The
+  // range is taken over the WELL-CONDITIONED samples only: a singular
+  // excursion (Saturn 10,170 ″/cy at +14,000, Earth 5,407 at +23,000) would
+  // otherwise crush every real curve into a band around zero. Those stretches
+  // are still drawn, faint, and clipped at the axes.
+  // A min/max over the well-conditioned samples is still dragged by the
+  // approach to a singularity (Saturn passes 5,700 ″/cy before the flag even
+  // trips), so the range is the 2nd–98th PERCENTILE of the drawn,
+  // well-conditioned values — a robust statistic, named in the caption.
+  let lo = 0, hi = 0, clipped = false;
+  const pool = [];
+  for (const p of _vfpPI_PLANETS) {
+    if (!on[p]) continue;
+    for (let i = 0; i < S.yrs.length; i++) {
+      if (S.data[p].ill[i]) continue;
+      pool.push(S.data[p].gr[i], S.data[p].newton[i]);
+    }
+  }
+  if (!pool.length) {   // every selected sample is ill-conditioned — fall back to all of them
+    for (const p of _vfpPI_PLANETS) {
+      if (!on[p]) continue;
+      for (const v of S.data[p].gr) pool.push(v);
+    }
+  }
+  if (pool.length) {
+    pool.sort((a, b) => a - b);
+    const q = (f) => pool[Math.min(pool.length - 1, Math.max(0, Math.round(f * (pool.length - 1))))];
+    lo = Math.min(0, q(0.02));
+    hi = Math.max(0, q(0.98));
+  }
+  if (hi === lo) hi = lo + 1;
+  const padv = (hi - lo) * 0.08;
+  lo -= padv; hi += padv;
+  const rawStep = (hi - lo) / 7;
+  const mag = Math.pow(10, Math.floor(Math.log10(Math.abs(rawStep) || 1)));
+  const step = (rawStep / mag <= 1 ? 1 : rawStep / mag <= 2 ? 2 : rawStep / mag <= 5 ? 5 : 10) * mag;
+  const yLo = Math.floor(lo / step) * step, yHi = Math.ceil(hi / step) * step;
+  const toX = (y) => PAD.l + ((y - S.y0) / (S.y1 - S.y0)) * pw;
+  const toY = (v) => PAD.t + (1 - (v - yLo) / (yHi - yLo)) * ph;
+  const cap = (p) => p.charAt(0).toUpperCase() + p.slice(1);
+  // split a series into well-conditioned and ill-conditioned runs
+  const runs = (arr, ill) => {
+    const out = { ok: '', faint: '' };
+    let mode = null;
+    for (let i = 0; i < arr.length; i++) {
+      const m = ill[i] ? 'faint' : 'ok';
+      const pt = toX(S.yrs[i]).toFixed(1) + ',' + toY(arr[i]).toFixed(1);
+      if (m !== mode) {
+        if (mode !== null) out[m] += 'M' + (toX(S.yrs[i - 1]).toFixed(1) + ',' + toY(arr[i - 1]).toFixed(1)) + 'L' + pt;
+        else out[m] += 'M' + pt;
+        mode = m;
+      } else out[m] += 'L' + pt;
+    }
+    return out;
+  };
+  const entries = [];
+  let curves = '', anyFaint = false, anySplit = false;
+  for (const p of _vfpPI_PLANETS) {
+    if (!on[p]) continue;
+    const col = _vfpPICss(p, style);
+    const rg = runs(S.data[p].gr, S.data[p].ill);
+    const rn = runs(S.data[p].newton, S.data[p].ill);
+    for (let i = 0; i < S.yrs.length; i++) if (S.data[p].gr[i] > yHi || S.data[p].gr[i] < yLo) { clipped = true; break; }
+    if (rn.ok) curves += '<path d="' + rn.ok + '" fill="none" stroke="' + col + '" stroke-width="1.3" stroke-dasharray="5,3" opacity="0.95"/>';
+    if (rn.faint) curves += '<path d="' + rn.faint + '" fill="none" stroke="' + col + '" stroke-width="1.1" stroke-dasharray="5,3" opacity="0.3"/>';
+    if (rg.ok) curves += '<path d="' + rg.ok + '" fill="none" stroke="' + col + '" stroke-width="1.6"/>';
+    if (rg.faint) { curves += '<path d="' + rg.faint + '" fill="none" stroke="' + col + '" stroke-width="1.4" opacity="0.3"/>'; anyFaint = true; }
+    // does the pair separate by more than a line width anywhere on screen?
+    let maxSep = 0;
+    for (let i = 0; i < S.yrs.length; i++) maxSep = Math.max(maxSep, Math.abs(toY(S.data[p].gr[i]) - toY(S.data[p].newton[i])));
+    if (maxSep > 1.2) anySplit = true;
+    entries.push({ name: cap(p), color: col, dash: '' });
+  }
+  entries.push({ name: 'solid: with relativity (1PN) · dashed: Newtonian', color: paper ? '#555' : '#cfd6e4', dash: '' });
+  if (anyFaint) entries.push({ name: 'faint: perihelion ill-defined (e → 0) — shape, not a value', color: paper ? '#999' : '#6b7486', dash: '' });
+  if (clipped) entries.push({ name: 'axis: robust range — excursions run off it', color: paper ? '#999' : '#6b7486', dash: '' });
+  // grid + axes
+  let grid = '';
+  for (let v = yLo; v <= yHi + step * 1e-6; v += step) {
+    const zero = Math.abs(v) < step * 1e-6;
+    grid += '<line x1="' + PAD.l + '" y1="' + toY(v).toFixed(1) + '" x2="' + (W - PAD.r) + '" y2="' + toY(v).toFixed(1) + '" stroke="' + (zero ? (paper ? '#aaa' : '#49536b') : cGrid) + '" stroke-width="' + (zero ? '0.9' : '0.5') + '"/>' +
+      '<text x="' + (PAD.l - 6) + '" y="' + toY(v).toFixed(1) + '" fill="' + cTick + '" font-size="' + fYT + '" text-anchor="end" dominant-baseline="middle">' + Math.round(v).toLocaleString('en-US') + '</text>';
+  }
+  for (const xt of _vfpYearTicks(S.y0, S.y1)) {
+    const xp = toX(xt);
+    const ta = xp > W - PAD.r - 40 ? 'end' : xp < PAD.l + 40 ? 'start' : 'middle';
+    const lbl = xt === 0 ? '0' : Math.abs(xt).toLocaleString('en-US') + (xt < 0 ? ' BC' : ' AD');
+    grid += '<line x1="' + xp.toFixed(1) + '" y1="' + PAD.t + '" x2="' + xp.toFixed(1) + '" y2="' + (H - PAD.b) + '" stroke="' + cGrid + '" stroke-width="0.5"/>' +
+      '<text x="' + xp.toFixed(1) + '" y="' + (H - PAD.b + 12) + '" fill="' + cTick + '" font-size="' + fXT + '" text-anchor="' + ta + '">' + lbl + '</text>';
+  }
+  if (paper) grid += '<rect x="' + PAD.l + '" y="' + PAD.t + '" width="' + pw + '" height="' + ph + '" fill="none" stroke="#ccc" stroke-width="0.5"/>';
+  // the curves are clipped to the plot rect — a singular excursion leaves the
+  // frame instead of dragging the axis
+  const clipId = 'vfppp-clip-' + (paper ? 'p' : 's');
+  const defs = '<defs><clipPath id="' + clipId + '"><rect x="' + PAD.l + '" y="' + PAD.t + '" width="' + pw + '" height="' + ph + '"/></clipPath></defs>';
+  return { W, H, PAD, S, body: defs + grid + '<g clip-path="url(#' + clipId + ')">' + curves + '</g>', entries, anySplit, clipped };
+}
+// ONE home for this panel's caption sentences — every sentence gates on what
+// is actually drawn, the twins' doctrine.
+function _vfpPPNoteParts(on, core) {
+  const S = core.S;
+  const frameTxt = S.frame === 'ofdate'
+    ? 'against the EQUINOX OF DATE (the secular rate plus the general precession in longitude) — what an Earth-based coordinate system sees'
+    : 'against the STARS (ecliptic J2000) — the planet’s own dynamics, the frame in which the relativistic advance is defined';
+  const frame = 'Perihelion precession rate of date, ″/century, ' + frameTxt + ' · ' +
+    _vfpFmtYearBcAd(S.y0) + ' → ' + _vfpFmtYearBcAd(S.y1) + '.';
+  const references = 'No published deep-time perihelion-rate series exists to compare against (IMCCE’s La2010 is Earth-only, and the Horizons span carries osculating elements, not secular rates); the era-window rates are gated against JPL Horizons by the chain-vs-JPL gate, and Mercury’s 1PN supplement against the engine’s own 1PN-on/1PN-off difference.';
+  const supp = [];
+  for (const p of _vfpPI_PLANETS) {
+    if (!on[p]) continue;
+    const i = Math.round((2000 - S.y0) / (S.y1 - S.y0) * (S.yrs.length - 1));
+    if (i < 0 || i >= S.yrs.length) continue;
+    const d = S.data[p].gr[i] - S.data[p].newton[i];
+    supp.push(p.charAt(0).toUpperCase() + p.slice(1).slice(0, 2) + ' ' + d.toFixed(d < 0.1 ? 4 : 2));
+  }
+  const reading = (supp.length ? 'Relativistic advance at J2000, ″/cy: ' + supp.join(' · ') + '. ' : '') +
+    (core.anySplit
+      ? 'The solid and dashed curves separate where that advance exceeds the line width — Mercury’s 43″/cy is the visible case; for the giants it is thousandths of an arcsecond and the pair reads as one line.'
+      : 'At this scale the relativistic advance is thinner than the line width for every selected planet, so the solid and dashed curves coincide — the numbers above are the separation.');
+  const physics = 'Solid: the model’s own secular rate — dϖ/dt of the smooth series tier, a ±' +
+    _VFPPP_STENCIL_YR.toLocaleString('en-US') + '-yr central difference of the perihelion ANGLE' +
+    (on.earth ? ', with Earth on its own one-family apsidal period (the number its Prec. cell, the anomalistic year and the API all carry)' : '') +
+    '. Dashed: that rate minus the analytic 1PN advance of date, 6πGM/(c²a(1−e²)) per orbit on the elements of date — a DERIVED supplement, not a second integration; the engine’s measured 1PN-on minus 1PN-off difference for Mercury is 42.985 ″/cy against the analytic 42.981, which is the gate on this construction. ' +
+    'This is the SECULAR family: the planet panels’ “Prec.” cells show the ±150-yr WINDOW rate on the full chain instead, which keeps the Great-Inequality local slope and so reads a different number for the same physical motion — that family cannot be sampled across a deep-time window without aliasing its ~900-yr content. ' +
+    'As e → 0 the perihelion direction stops being defined and the rate diverges — a singularity of the polar coordinate, not physics. Mercury (e 0.21) reads 571.6 ″/cy at every stencil from ±500 to ±4,000 yr, while Venus at J2000 (e 0.0067) reads 31.2 / 29.5 / 23.4 / −0.9 and even changes sign. The faint test is planet-relative because an absolute floor misses it: Saturn’s e falls to 0.0103 at +14,000 and its rate rises to 10,170 ″/cy, 3.6× its own g₆, and Earth reaches 5,407 ″/cy at +23,000 on e = 0.0030. Those stretches are drawn for shape only, and the axis is scaled to the 2nd–98th percentile of the well-conditioned samples — a robust range, so an approach to the singularity cannot crush the rest.' +
+    (core.clipped ? ' At this window a singular excursion runs off the axis.' : '');
+  return { frame, references, reading: reading + ' ' + physics };
+}
+function renderVFPPlanetPerihelion() {
+  const on = _vfpPPState.on;
+  const core = _vfpPPChartCore(null, on, 'screen');
+  const W = core.W, H = core.H, PAD = core.PAD, S = core.S;
+  _vfpPPState._screenGeom = { W, H, PAD, y0: S.y0, y1: S.y1 };
+  const cap = (p) => p.charAt(0).toUpperCase() + p.slice(1);
+  let controls = _vfpCustomTabStrip('planet-perihelion') +
+    '<div style="padding:8px 6px;border:1px solid #2a2f3a;border-radius:0;background:#171c26;line-height:2;">';
+  for (const p of _vfpPI_PLANETS) {
+    controls += '<label style="margin-right:10px;font-size:11px;color:' + _vfpPICss(p) + ';opacity:' + (on[p] ? '1' : '0.45') + ';cursor:pointer;white-space:nowrap;">' +
+      '<input type="checkbox" data-vfppp="' + p + '"' + (on[p] ? ' checked' : '') + ' style="vertical-align:-2px;margin-right:3px;">' + cap(p) + '</label>';
+  }
+  const allBtn = (v, label) => '<button data-vfppp-all="' + v + '" style="margin-left:6px;padding:1px 9px;border-radius:4px;border:1px solid #2a2f3a;background:#232a36;color:#8a93a5;font-size:10px;cursor:pointer;">' + label + '</button>';
+  controls += '<span style="float:right;">' + allBtn('1', 'all') + allBtn('0', 'none') + '</span></div>';
+  // frame strip — the two conventions, named (the inclination twin's idiom)
+  const fBtn = (key, label) => '<button data-vfppp-frame="' + key + '" style="flex:1 1 0;padding:5px 0;border:1px solid ' + (S.frame === key ? '#4a5568' : '#2a2f3a') + ';background:' + (S.frame === key ? '#232a36' : '#171c26') + ';color:' + (S.frame === key ? '#e8ecf4' : '#8a93a5') + ';font-size:11px;cursor:pointer;">' + label + '</button>';
+  controls += '<div style="display:flex;gap:6px;padding:6px 4px 0;">' + fBtn('sid', 'against the stars (ecliptic J2000)') + fBtn('ofdate', 'against the equinox of date') + '</div>';
+  const swatchCss = (en) => en.dash
+    ? 'background:repeating-linear-gradient(90deg,' + en.color + ' 0 ' + (en.dash === '1,3' ? '2px,transparent 2px 5px' : '6px,transparent 6px 9px') + ');'
+    : 'background:' + en.color + ';';
+  let legendHtml = '<div class="vfp-legend">';
+  for (const en of core.entries) legendHtml += '<div class="vfp-legend-item"><span class="vfp-legend-swatch" style="' + swatchCss(en) + '"></span>' + en.name + '</div>';
+  legendHtml += '</div>';
+  const P = _vfpPPNoteParts(on, core);
+  return '<div class="vfp-chart-block">' +
+    controls +
+    legendHtml +
+    '<div style="position:relative;">' +
+    '<svg data-vfppp-svg viewBox="0 0 ' + W + ' ' + H + '" width="100%" style="display:block;background:#151a22;border-radius:0 0 6px 6px;">' +
+    core.body +
+    '<text x="' + PAD.l + '" y="' + (PAD.t - 4) + '" fill="#aaa" font-size="9">perihelion precession (″/century)</text>' +
+    '<line data-vfppp-cursor x1="-10" x2="-10" y1="' + PAD.t + '" y2="' + (H - PAD.b) + '" stroke="#8a93a5" stroke-width="0.8" visibility="hidden"/>' +
+    '</svg>' +
+    '<div data-vfppp-tip style="position:absolute;display:none;pointer-events:none;background:rgba(13,17,23,0.95);border:1px solid #3a4356;border-radius:6px;padding:6px 10px;font-size:11px;line-height:1.55;color:#e8ecf4;white-space:nowrap;z-index:5;"></div>' +
+    '</div>' +
+    _vfpCaptionHtml(P) +
+    '</div>';
+}
+function _vfpPPPaperSvg(range) {
+  const on = _vfpPPState.on;
+  const core = _vfpPPChartCore(range, on, 'paper');
+  const W = core.W, H = core.H, PAD = core.PAD, S = core.S;
+  const ph = H - PAD.t - PAD.b;
+  const fmtY = (y) => y === 0 ? '0' : Math.abs(y).toLocaleString('en-US') + (y < 0 ? ' BC' : ' AD');
+  const title = 'Perihelion precession of all planets — ' +
+    (S.frame === 'ofdate' ? 'against the equinox of date' : 'against the stars (ecliptic J2000)') +
+    ', ' + fmtY(S.y0) + ' → ' + fmtY(S.y1);
+  const head = chartExportHeader(title, core.entries, W);
+  const TOP = head.bottom + 4;
+  const XAXIS = 16;
+  const Hp = TOP + H + XAXIS + CHART_EXPORT_CREDIT_H;
+  return '<?xml version="1.0" encoding="UTF-8"?>\n' +
+    '<svg viewBox="0 0 ' + W + ' ' + Hp + '" width="' + W + '" height="' + Hp + '" xmlns="http://www.w3.org/2000/svg" font-family="Inter,Helvetica,Arial,sans-serif">' +
+    '<rect width="' + W + '" height="' + Hp + '" fill="white"/>' +
+    head.svg +
+    '<g transform="translate(0,' + TOP + ')">' + core.body +
+    '<text x="16" y="' + (PAD.t + ph / 2) + '" text-anchor="middle" dominant-baseline="middle" transform="rotate(-90,16,' + (PAD.t + ph / 2) + ')" fill="#444" font-size="12" font-weight="500">Perihelion precession (″/century)</text>' +
+    '<text x="' + (PAD.l + (W - PAD.l - PAD.r) / 2) + '" y="' + (H + 8) + '" text-anchor="middle" fill="#444" font-size="12" font-weight="500">Years (BC / AD)</text></g>' +
+    chartExportCredit(W, Hp) +
+    '</svg>';
+}
+function _vfpPPAfterRender(bodyEl) {
+  _vfpWireCustomTabs(bodyEl, 'planet-perihelion');
+  bodyEl.querySelectorAll('input[data-vfppp]').forEach((cbEl) => {
+    cbEl.addEventListener('change', () => {
+      _vfpPPState.on[cbEl.dataset.vfppp] = cbEl.checked;
+      updateVerificationPanel('planet-perihelion');
+    });
+  });
+  bodyEl.querySelectorAll('button[data-vfppp-all]').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const onAll = btn.dataset.vfpppAll === '1';
+      for (const p of _vfpPI_PLANETS) _vfpPPState.on[p] = onAll;
+      updateVerificationPanel('planet-perihelion');
+    });
+  });
+  bodyEl.querySelectorAll('button[data-vfppp-frame]').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      _vfpPPState.frame = btn.dataset.vfpppFrame;
+      updateVerificationPanel('planet-perihelion');
+    });
+  });
+  const svg = bodyEl.querySelector('svg[data-vfppp-svg]');
+  const tip = bodyEl.querySelector('div[data-vfppp-tip]');
+  const cursor = svg ? svg.querySelector('line[data-vfppp-cursor]') : null;
+  const G = _vfpPPState._screenGeom;
+  if (!svg || !tip || !cursor || !G) return;
+  const S = _vfpPPSamples();
+  const on = _vfpPPState.on;
+  const hide = () => { tip.style.display = 'none'; cursor.setAttribute('visibility', 'hidden'); };
+  svg.addEventListener('mouseleave', hide);
+  svg.addEventListener('mousemove', (e) => {
+    const r = svg.getBoundingClientRect();
+    if (!r.width) return;
+    const px = ((e.clientX - r.left) / r.width) * G.W;
+    if (px < G.PAD.l || px > G.W - G.PAD.r) { hide(); return; }
+    const pw = G.W - G.PAD.l - G.PAD.r;
+    const i = Math.round(((px - G.PAD.l) / pw) * (S.yrs.length - 1));
+    const y = S.yrs[i];
+    const cx = (G.PAD.l + ((y - G.y0) / (G.y1 - G.y0)) * pw).toFixed(1);
+    cursor.setAttribute('x1', cx);
+    cursor.setAttribute('x2', cx);
+    cursor.setAttribute('visibility', 'visible');
+    let rows = '<div style="color:#8a93a5;margin-bottom:2px;">Year ' + (y < 0 ? '−' : '+') + Math.round(Math.abs(y)).toLocaleString('en-US') +
+      ' · ″/cy — 1PN · Newtonian · advance</div>';
+    for (const p of _vfpPI_PLANETS) {
+      if (!on[p]) continue;
+      const gr = S.data[p].gr[i], nw = S.data[p].newton[i], ec = S.data[p].ecc[i];
+      const ill = ec < _VFPPP_ECC_FLOOR;
+      rows += '<div style="display:flex;justify-content:space-between;gap:14px;opacity:' + (ill ? '0.55' : '1') + ';">' +
+        '<span style="color:' + _vfpPICss(p) + ';">' + p.charAt(0).toUpperCase() + p.slice(1) + (ill ? ' *' : '') + '</span>' +
+        '<span>' + gr.toFixed(1) + ' · ' + nw.toFixed(1) + ' · ' + (gr - nw).toFixed((gr - nw) < 0.1 ? 4 : 2) + '</span></div>';
+    }
+    rows += '<div style="color:#6b7486;margin-top:2px;">* e &lt; ' + _VFPPP_ECC_FLOOR + ': direction ill-defined</div>';
     tip.innerHTML = rows;
     tip.style.display = 'block';
     const wr = svg.parentElement.getBoundingClientRect();

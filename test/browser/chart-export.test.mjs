@@ -16,8 +16,8 @@
  *  3. the PNG bytes decode (createImageBitmap) to those same dimensions and
  *     the file is not a blank canvas (byte floor).
  *
- * THE EXPORT STANDARD (owner: "only the picture"): every one of the fourteen
- * paper forms (thirteen renderers, the Planet Orbit Analysis' orbit picture among
+ * THE EXPORT STANDARD (owner: "only the picture"): every one of the fifteen
+ * paper forms (fourteen renderers, the Planet Orbit Analysis' orbit picture among
  * them; the perihelion panel prints one or three charts) is
  * rendered through the `chartExportForms` hook, data loaded, and checked for
  *  4. a root width/height, a 16-px title at y = 18 and the credit
@@ -84,7 +84,7 @@ try {
   // 4–5. the export standard on every form
   const forms = await sim.page.evaluate(() => window.__test__.chartExportForms());
   const names = Object.keys(forms);
-  check('every paper form renders', names.length === 14 && names.every((n) => typeof forms[n] === 'string' && forms[n].length > 500), names.map((n) => `${n}: ${(forms[n] || '').length}`).join(', '));
+  check('every paper form renders', names.length === 15 && names.every((n) => typeof forms[n] === 'string' && forms[n].length > 500), names.map((n) => `${n}: ${(forms[n] || '').length}`).join(', '));
   for (const name of names) {
     let svg = forms[name];
     if (PLANT_CAPTION && name === 'analemma') svg = svg.replace('</svg>', `<text x="24" y="99999" fill="#444" font-size="11">Frame: ${'x '.repeat(80)}</text></svg>`);
