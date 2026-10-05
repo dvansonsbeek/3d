@@ -21609,40 +21609,30 @@ function _vfpPPChartCore(range, on, style) {
     if (maxSep > 1.2) anySplit = true;
     entries.push({ name: cap(p), color: col, dash: '' });
   }
-  // ── The present-epoch witnesses (the siblings carry a JPL overlay; on a RATE
-  // chart it can only be a marker). JPL's published rates are the 1900–2100
-  // TREND — the WINDOW family, not the secular one plotted here — so the
-  // model's OWN era-window rate is drawn beside each observed band. THAT pair
-  // is the like-for-like comparison; the gap from the secular curve is the
-  // family split made visible, and Saturn is the clear case (the window family
-  // is retrograde there, the secular one prograde). Sidereal frame only: these
-  // rates are referred to a fixed frame, so they say nothing about the of-date
-  // reading, which carries the general precession on top.
+  // ── The present-epoch witness lives in the READING, not on the plot ───────
+  // JPL's published rates (the 1900–2100 trend) were drawn here as a whisker
+  // per planet with the model's era-window rate as a dot. They read as marks
+  // floating near J2000 — a reader had to decode the legend to know what they
+  // were — so the comparison is now stated in numbers underneath, where it is
+  // exact. Nothing is lost: the Reading names each planet's model window
+  // against the observed band, and ticks the ones that fall inside it.
+  // Sidereal frame only — these rates are referred to a fixed frame and say
+  // nothing about the of-date reading, which carries the general precession.
   const jplParts = [];
-  let witnessDrawn = false;
   if (S.y0 <= 2000 && S.y1 >= 2000 && S.frame === 'sid' && R.perihelionPrecessionRatesJPL) {
     const JPLR = R.perihelionPrecessionRatesJPL;
-    const sel = _vfpPI_PLANETS.filter((p) => on[p]);
-    sel.forEach((p, k) => {
+    for (const p of _vfpPI_PLANETS) {
+      if (!on[p]) continue;
       const band = JPLR[p];
       const win = CHAIN_ARTIFACT.windowRatesArcsecCy && CHAIN_ARTIFACT.windowRatesArcsecCy.gr[p];
-      if (!band || win === undefined) return;
+      if (!band || win === undefined) continue;
       const bLo = band.min !== undefined ? band.min : band.value;
       const bHi = band.max !== undefined ? band.max : band.value;
-      const x = toX(2000) + (k - (sel.length - 1) / 2) * 7;
-      const col = _vfpPICss(p, style);
-      const y1 = toY(bHi), y2 = toY(bLo);
-      curves += '<line x1="' + x.toFixed(1) + '" y1="' + y1.toFixed(1) + '" x2="' + x.toFixed(1) + '" y2="' + y2.toFixed(1) + '" stroke="' + col + '" stroke-width="1.3" opacity="0.85"/>' +
-        '<line x1="' + (x - 3).toFixed(1) + '" y1="' + y1.toFixed(1) + '" x2="' + (x + 3).toFixed(1) + '" y2="' + y1.toFixed(1) + '" stroke="' + col + '" stroke-width="1.3" opacity="0.85"/>' +
-        '<line x1="' + (x - 3).toFixed(1) + '" y1="' + y2.toFixed(1) + '" x2="' + (x + 3).toFixed(1) + '" y2="' + y2.toFixed(1) + '" stroke="' + col + '" stroke-width="1.3" opacity="0.85"/>' +
-        '<circle cx="' + x.toFixed(1) + '" cy="' + toY(win).toFixed(1) + '" r="2.6" fill="' + col + '" stroke="' + (paper ? '#fff' : '#151a22') + '" stroke-width="0.8"/>';
-      witnessDrawn = true;
       const inBand = win >= Math.min(bLo, bHi) && win <= Math.max(bLo, bHi);
       jplParts.push(cap(p).slice(0, 2) + ' ' + Math.round(win) + (band.value !== undefined ? ' vs ' + band.value : ' in ' + bLo + '…' + bHi) + (inBand ? ' ✓' : ''));
-    });
+    }
   }
   entries.push({ name: 'solid: with relativity (1PN) · dashed: Newtonian', color: paper ? '#555' : '#cfd6e4', dash: '' });
-  if (witnessDrawn) entries.push({ name: 'at J2000 — whisker: JPL observed · dot: model era window', color: paper ? '#555' : '#cfd6e4', dash: '' });
   if (anyFaint) entries.push({ name: 'faint: perihelion ill-defined (e → 0) — shape, not a value', color: paper ? '#999' : '#6b7486', dash: '' });
   if (clipped) entries.push({ name: 'axis: robust range — excursions run off it', color: paper ? '#999' : '#6b7486', dash: '' });
   // grid + axes
@@ -21682,7 +21672,7 @@ function _vfpPPNoteParts(on, core) {
   const frame = 'Perihelion precession rate of date, ″/century, ' + frameTxt + ' · ' +
     _vfpFmtYearBcAd(S.y0) + ' → ' + _vfpFmtYearBcAd(S.y1) + '.';
   const references = (core.jplParts && core.jplParts.length
-    ? 'JPL SPICE/WebGeoCalc observed perihelion precession rates, the 1900–2100 trend (whiskers at J2000, with the model’s own era-window rate as the dot beside each) — a validation reference, never a model input. '
+    ? 'JPL SPICE/WebGeoCalc observed perihelion precession rates, the 1900–2100 trend — a validation reference, never a model input; the comparison is stated in the Reading rather than drawn, the observed band being the WINDOW family and the curves the secular one. '
     : '') +
     'La2010 is deliberately NOT overlaid here: its perihelion longitude is referred to the INVARIABLE PLANE while this chart is ecliptic-J2000, and an apsidal rate is not frame-free — the two would differ by the ecliptic’s own motion, so the comparison would be mislabelled rather than informative. No published deep-time perihelion-RATE series exists for the planets in this frame (the Horizons span carries osculating elements, not secular rates). The era-window rates are gated against JPL Horizons by the chain-vs-JPL gate, and Mercury’s 1PN supplement against the engine’s own 1PN-on/1PN-off difference.';
   const supp = [];
