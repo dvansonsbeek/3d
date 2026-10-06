@@ -7453,28 +7453,6 @@ moonNodalPrecession.              _dtMoonIntegrator = meanMoonNodalOfDateCyclesB
 moonNodalPrecession.              _dtMoonSign       = -1;
 moonNodalPrecession.              _dtMoonAnchor     = STARTMODEL_YEAR_SI;
 
-const mercuryPerihelionDurationEcliptic1 = {
-  name: "Mercury Perihelion Duration Ecliptic1",
-  startPos: 0,
-  speed: Math.PI*2/planets.mercury.perihelionEclipticYears,
-  tilt: 0,
-  orbitRadius: 0,
-  orbitCentera: 0,
-  orbitCenterb: 0,
-  orbitCenterc: 0,
-  orbitTilta: 0,
-  orbitTiltb: 0,
-
-  size: 0.5,
-  color: 0xFFFF00,
-  visible: false,
-  containerObj:"",
-  orbitObj:"",
-  planetObj:"",
-  pivotObj:"",
-  isNotPhysicalObject: true,
-};
-
 const mercuryPerihelionFromEarth = {
   name: "PERIHELION MERCURY",
   startPos: 0,
@@ -7499,28 +7477,6 @@ const mercuryPerihelionFromEarth = {
   traceLength : sYear * 1000000,
   traceStep : sYear, 
   traceOn: false,
-  isNotPhysicalObject: true,
-};
-
-const mercuryPerihelionDurationEcliptic2 = {
-  name: "Mercury Perihelion Duration Ecliptic2",
-  startPos: 0,
-  speed: -Math.PI*2/planets.mercury.perihelionEclipticYears,
-  tilt: 0,
-  orbitRadius: 0,
-  orbitCentera: 0,
-  orbitCenterb: 0,
-  orbitCenterc: 0,
-  orbitTilta: 0,
-  orbitTiltb: 0,
-
-  size: 0.5,
-  color: 0xFFFF00,
-  visible: false,
-  containerObj:"",
-  orbitObj:"",
-  planetObj:"",
-  pivotObj:"",
   isNotPhysicalObject: true,
 };
 
@@ -7619,28 +7575,6 @@ const mercury = {
   traceOn: false,
 };
 
-const venusPerihelionDurationEcliptic1 = {
-  name: "Venus Perihelion Duration Ecliptic1",
-  startPos: 0,
-  speed: Math.PI*2/planets.venus.perihelionEclipticYears,
-  tilt: 0,
-  orbitRadius: 0,
-  orbitCentera: 0,
-  orbitCenterb: 0,
-  orbitCenterc: 0,
-  orbitTilta: 0,
-  orbitTiltb: 0,
-
-  size: 0.5,
-  color: 0xFFFF00,
-  visible: false,
-  containerObj:"",
-  orbitObj:"",
-  planetObj:"",
-  pivotObj:"",
-  isNotPhysicalObject: true,
-};
-
 const venusPerihelionFromEarth = {
   name: "PERIHELION VENUS",
   startPos: 0,
@@ -7665,28 +7599,6 @@ const venusPerihelionFromEarth = {
   traceLength : sYear * 1000000,
   traceStep : sYear, 
   traceOn: false,
-  isNotPhysicalObject: true,
-};
-
-const venusPerihelionDurationEcliptic2 = {
-  name: "Venus Perihelion Duration Ecliptic2",
-  startPos: 0,
-  speed: -Math.PI*2/planets.venus.perihelionEclipticYears,
-  tilt: 0,
-  orbitRadius: 0,
-  orbitCentera: 0,
-  orbitCenterb: 0,
-  orbitCenterc: 0,
-  orbitTilta: 0,
-  orbitTiltb: 0,
-
-  size: 0.01,
-  color: 0xFFFF00,
-  visible: false,
-  containerObj:"",
-  orbitObj:"",
-  planetObj:"",
-  pivotObj:"",
   isNotPhysicalObject: true,
 };
 
@@ -7769,28 +7681,6 @@ const venus = {
   traceOn: false,
 };
 
-const marsPerihelionDurationEcliptic1 = {
-  name: "Mars Perihelion Duration Ecliptic1",
-  startPos: 0,
-  speed: Math.PI*2/planets.mars.perihelionEclipticYears,
-  tilt: 0,
-  orbitRadius: 0,
-  orbitCentera: 0,
-  orbitCenterb: 0,
-  orbitCenterc: 0,
-  orbitTilta: 0,
-  orbitTiltb: 0,
-
-  size: 0.5,
-  color: 0xFFFF00,
-  visible: false,
-  containerObj:"",
-  orbitObj:"",
-  planetObj:"",
-  pivotObj:"",
-  isNotPhysicalObject: true,
-};
-
 const marsPerihelionFromEarth = {
   name: "PERIHELION MARS",
   startPos: 0,
@@ -7815,28 +7705,6 @@ const marsPerihelionFromEarth = {
   traceLength : sYear * 1000000,
   traceStep : sYear,
   traceOn: false,
-  isNotPhysicalObject: true,
-};
-
-const marsPerihelionDurationEcliptic2 = {
-  name: "Mars Perihelion Duration Ecliptic2",
-  startPos: 0,
-  speed: -Math.PI*2/planets.mars.perihelionEclipticYears,
-  tilt: 0,
-  orbitRadius: 0,
-  orbitCentera: 0,
-  orbitCenterb: 0,
-  orbitCenterc: 0,
-  orbitTilta: 0,
-  orbitTiltb: 0,
-
-  size: 0.01,
-  color: 0xFFFF00,
-  visible: false,
-  containerObj:"",
-  orbitObj:"",
-  planetObj:"",
-  pivotObj:"",
   isNotPhysicalObject: true,
 };
 
@@ -7925,28 +7793,6 @@ const mars = {
   traceOn: false,
 };
 
-const jupiterPerihelionDurationEcliptic1 = {
-  name: "Jupiter Perihelion Duration Ecliptic1",
-  startPos: 0,
-  speed: Math.PI*2/planets.jupiter.perihelionEclipticYears,
-  tilt: 0,
-  orbitRadius: 0,
-  orbitCentera: 0,
-  orbitCenterb: 0,
-  orbitCenterc: 0,
-  orbitTilta: 0,
-  orbitTiltb: 0,
-
-  size: 0.5,
-  color: 0xFFFF00,
-  visible: false,
-  containerObj:"",
-  orbitObj:"",
-  planetObj:"",
-  pivotObj:"",
-  isNotPhysicalObject: true,
-};
-
 const jupiterPerihelionFromEarth = {
   name: "PERIHELION JUPITER",
   startPos: 0,
@@ -7971,28 +7817,6 @@ const jupiterPerihelionFromEarth = {
   traceLength : sYear * 1000000,
   traceStep : sYear,
   traceOn: false,
-  isNotPhysicalObject: true,
-};
-
-const jupiterPerihelionDurationEcliptic2 = {
-  name: "Jupiter Perihelion Duration Ecliptic2",
-  startPos: 0,
-  speed: -Math.PI*2/planets.jupiter.perihelionEclipticYears,
-  tilt: 0,
-  orbitRadius: 0,
-  orbitCentera: 0,
-  orbitCenterb: 0,
-  orbitCenterc: 0,
-  orbitTilta: 0,
-  orbitTiltb: 0,
-
-  size: 0.01,
-  color: 0xFFFF00,
-  visible: false,
-  containerObj:"",
-  orbitObj:"",
-  planetObj:"",
-  pivotObj:"",
   isNotPhysicalObject: true,
 };
 
@@ -8084,28 +7908,6 @@ const jupiter = {
   traceOn: false,
 };
 
-const saturnPerihelionDurationEcliptic1 = {
-  name: "Saturn Perihelion Duration Ecliptic1",
-  startPos: 0,
-  speed: Math.PI*2/planets.saturn.perihelionEclipticYears,
-  tilt: 0,
-  orbitRadius: 0,
-  orbitCentera: 0,
-  orbitCenterb: 0,
-  orbitCenterc: 0,
-  orbitTilta: 0,
-  orbitTiltb: 0,
-
-  size: 0.5,
-  color: 0xFFFF00,
-  visible: false,
-  containerObj:"",
-  orbitObj:"",
-  planetObj:"",
-  pivotObj:"",
-  isNotPhysicalObject: true,
-};
-
 const saturnPerihelionFromEarth = {
   name: "PERIHELION SATURN",
   startPos: 0,
@@ -8130,28 +7932,6 @@ const saturnPerihelionFromEarth = {
   traceLength : sYear * 1000000,
   traceStep : sYear,  
   traceOn: false,
-  isNotPhysicalObject: true,
-};
-
-const saturnPerihelionDurationEcliptic2 = {
-  name: "Saturn Perihelion Duration Ecliptic2",
-  startPos: 0,
-  speed: -Math.PI*2/planets.saturn.perihelionEclipticYears,
-  tilt: 0,
-  orbitRadius: 0,
-  orbitCentera: 0,
-  orbitCenterb: 0,
-  orbitCenterc: 0,
-  orbitTilta: 0,
-  orbitTiltb: 0,
-
-  size: 0.01,
-  color: 0xFFFF00,
-  visible: false,
-  containerObj:"",
-  orbitObj:"",
-  planetObj:"",
-  pivotObj:"",
   isNotPhysicalObject: true,
 };
 
@@ -8243,28 +8023,6 @@ const saturn = {
   traceOn: false,
 };
 
-const uranusPerihelionDurationEcliptic1 = {
-  name: "Uranus Perihelion Duration Ecliptic1",
-  startPos: 0,
-  speed: Math.PI*2/planets.uranus.perihelionEclipticYears,
-  tilt: 0,
-  orbitRadius: 0,
-  orbitCentera: 0,
-  orbitCenterb: 0,
-  orbitCenterc: 0,
-  orbitTilta: 0,
-  orbitTiltb: 0,
-
-  size: 0.5,
-  color: 0xFFFF00,
-  visible: false,
-  containerObj:"",
-  orbitObj:"",
-  planetObj:"",
-  pivotObj:"",
-  isNotPhysicalObject: true,
-};
-
 const uranusPerihelionFromEarth = {
   name: "PERIHELION URANUS",
   startPos: 0,
@@ -8289,28 +8047,6 @@ const uranusPerihelionFromEarth = {
   traceLength : sYear * 1000000,
   traceStep : sYear,
   traceOn: false,
-  isNotPhysicalObject: true,
-};
-
-const uranusPerihelionDurationEcliptic2 = {
-  name: "Uranus Perihelion Duration Ecliptic2",
-  startPos: 0,
-  speed: -Math.PI*2/planets.uranus.perihelionEclipticYears,
-  tilt: 0,
-  orbitRadius: 0,
-  orbitCentera: 0,
-  orbitCenterb: 0,
-  orbitCenterc: 0,
-  orbitTilta: 0,
-  orbitTiltb: 0,
-
-  size: 0.01,
-  color: 0xFFFF00,
-  visible: false,
-  containerObj:"",
-  orbitObj:"",
-  planetObj:"",
-  pivotObj:"",
   isNotPhysicalObject: true,
 };
 
@@ -8402,28 +8138,6 @@ const uranus = {
   traceOn: false,
 };
 
-const neptunePerihelionDurationEcliptic1 = {
-  name: "Neptune Perihelion Duration Ecliptic1",
-  startPos: 0,
-  speed: Math.PI*2/planets.neptune.perihelionEclipticYears,
-  tilt: 0,
-  orbitRadius: 0,
-  orbitCentera: 0,
-  orbitCenterb: 0,
-  orbitCenterc: 0,
-  orbitTilta: 0,
-  orbitTiltb: 0,
-
-  size: 0.5,
-  color: 0xFFFF00,
-  visible: false,
-  containerObj:"",
-  orbitObj:"",
-  planetObj:"",
-  pivotObj:"",
-  isNotPhysicalObject: true,
-};
-
 const neptunePerihelionFromEarth = {
   name: "PERIHELION NEPTUNE",
   startPos: 0,
@@ -8448,28 +8162,6 @@ const neptunePerihelionFromEarth = {
   traceLength : sYear * 1000000,
   traceStep : sYear,
   traceOn: false,
-  isNotPhysicalObject: true,
-};
-
-const neptunePerihelionDurationEcliptic2 = {
-  name: "Neptune Perihelion Duration Ecliptic2",
-  startPos: 0,
-  speed: -Math.PI*2/planets.neptune.perihelionEclipticYears,
-  tilt: 0,
-  orbitRadius: 0,
-  orbitCentera: 0,
-  orbitCenterb: 0,
-  orbitCenterc: 0,
-  orbitTilta: 0,
-  orbitTiltb: 0,
-
-  size: 0.01,
-  color: 0xFFFF00,
-  visible: false,
-  containerObj:"",
-  orbitObj:"",
-  planetObj:"",
-  pivotObj:"",
   isNotPhysicalObject: true,
 };
 
@@ -35743,152 +35435,6 @@ function setupGUI() {
      'to whichever planets are currently tagged.');
 
   // ────────────────────────────────────────────────────────────────────────
-  // P-C(any) generalized verification — walks all currently-tagged perihelion
-  // ecliptic frames and checks: tag fields correct, E1+E2 pair cancellation,
-  // bit-equivalence at startmodelJD, deep-time evolution matches expectation.
-  // ────────────────────────────────────────────────────────────────────────
-  addTestButton('Verify Perihelion Ecliptic Frame Pairs', () => {
-    console.log('\n══════════════════════════════════════════════════════════════════════════════════');
-    console.log('  Phase P-C(any) verification — perihelion ecliptic frames (the device’s ecliptic-period descriptors)');
-    console.log('  Each tagged planet: tag integrity + pair cancellation + bit-equivalence');
-    console.log('══════════════════════════════════════════════════════════════════════════════════\n');
-
-    let passCount = 0, failCount = 0;
-    const note = (label, ok, detail) => {
-      ok ? passCount++ : failCount++;
-      console.log(`  ${ok ? '✓' : '✗'} ${label}` + (detail ? `    ${detail}` : ''));
-    };
-
-    const PLANETS = [
-      { key: 'mercury', E1: mercuryPerihelionDurationEcliptic1, E2: mercuryPerihelionDurationEcliptic2 },
-      { key: 'venus',   E1: venusPerihelionDurationEcliptic1,   E2: venusPerihelionDurationEcliptic2   },
-      { key: 'mars',    E1: marsPerihelionDurationEcliptic1,    E2: marsPerihelionDurationEcliptic2    },
-      { key: 'jupiter', E1: jupiterPerihelionDurationEcliptic1, E2: jupiterPerihelionDurationEcliptic2 },
-      { key: 'saturn',  E1: saturnPerihelionDurationEcliptic1,  E2: saturnPerihelionDurationEcliptic2  },
-      { key: 'uranus',  E1: uranusPerihelionDurationEcliptic1,  E2: uranusPerihelionDurationEcliptic2  },
-      { key: 'neptune', E1: neptunePerihelionDurationEcliptic1, E2: neptunePerihelionDurationEcliptic2 },
-    ];
-
-    const tagged   = PLANETS.filter(p => Number.isFinite(p.E1._dtCycleN) && Number.isFinite(p.E2._dtCycleN));
-    const untagged = PLANETS.filter(p => !Number.isFinite(p.E1._dtCycleN) || !Number.isFinite(p.E2._dtCycleN));
-    console.log(`Tagged planets:    [${tagged.map(p => p.key).join(', ')}]`);
-    console.log(`Untagged planets:  [${untagged.map(p => p.key).join(', ')}]`);
-    console.log('');
-
-    // Sample year for deep-time check
-    const jdOf = (Y, M, D, h = 12) => {
-      const isJulian = (Y < 1582) || (Y === 1582 && (M < 10 || (M === 10 && D < 15)));
-      let y = Y, m = M;
-      if (m <= 2) { y -= 1; m += 12; }
-      const A = Math.floor(y / 100);
-      const B = isJulian ? 0 : (2 - A + Math.floor(A / 4));
-      return Math.floor(365.25 * (y + 4716)) + Math.floor(30.6001 * (m + 1)) + D + B - 1524.5 + h / 24;
-    };
-    const y_thales_SI    = _jdToSIyear(jdOf(-584, 5, 28, 12));
-
-    for (const p of tagged) {
-      console.log(`── ${p.key.toUpperCase()} ──`);
-
-      // CORRECTED 2026-06-20: divisor for cyclesBetweenYears is N/8, not N
-      // (perihelion ecliptic period = 8H/N → H-form divisor = N/8).
-      const expectedN_H = _planetPerihelionDivisors[p.key] / 8;
-      const expectedBase = _planetPerihelionSigns[p.key];
-
-      // 1. Tag integrity
-      const nOk1 = p.E1._dtCycleN === expectedN_H;
-      const nOk2 = p.E2._dtCycleN === expectedN_H;
-      const sOk1 = p.E1._dtCycleSign === expectedBase * (+1);
-      const sOk2 = p.E2._dtCycleSign === expectedBase * (-1);
-      const aOk1 = p.E1._dtCycleAnchor === STARTMODEL_YEAR_SI;
-      const aOk2 = p.E2._dtCycleAnchor === STARTMODEL_YEAR_SI;
-      note(`E1 tag: N=${p.E1._dtCycleN} (exp ${expectedN_H} = ${_planetPerihelionDivisors[p.key]}/8), sign=${p.E1._dtCycleSign} (exp ${expectedBase * +1}), anchor matches`,
-           nOk1 && sOk1 && aOk1);
-      note(`E2 tag: N=${p.E2._dtCycleN} (exp ${expectedN_H} = ${_planetPerihelionDivisors[p.key]}/8), sign=${p.E2._dtCycleSign} (exp ${expectedBase * -1}), anchor matches`,
-           nOk2 && sOk2 && aOk2);
-
-      // 2. Sign cancellation (E1 + E2 = 0 in sign-multiplied terms)
-      const signSum = p.E1._dtCycleSign + p.E2._dtCycleSign;
-      note(`Sign cancellation: E1.sign + E2.sign = ${signSum} (must be 0)`, signSum === 0);
-
-      // 3. Bit-equivalence at startmodelJD: integrator returns ~0 cycles at the anchor.
-      // (cyclesBetweenYears uses a cumulative integral table; at yA===yB the result
-      // is sub-1e-9 cycles ≈ sub-mas rotation. Below visual resolution; cancelled
-      // exactly by the E1+E2 pair anyway.)
-      const cyc_at_anchor = cyclesBetweenYears(STARTMODEL_YEAR_SI, STARTMODEL_YEAR_SI, expectedN_H);
-      note(`Cycles at anchor: ${cyc_at_anchor.toExponential(2)} (< 1e-9 required; pair cancels regardless)`,
-           Math.abs(cyc_at_anchor) < 1e-9);
-
-      // 4. Deep-time evolution at year -584 — INTEGRATOR vs SNAPSHOT per-frame.
-      // The pair cancellation (E1+E2=0) is necessary but NOT sufficient — we
-      // also need each frame's integrator output to match the snapshot per-frame
-      // value, else intermediate objects (perihelion arrows) get displaced.
-      // The factor-of-8 divisor bug (P-D revert, 2026-06-20) was hidden by the
-      // pair cancellation here; explicit snapshot comparison would have caught it.
-      const cyc_thales = cyclesBetweenYears(STARTMODEL_YEAR_SI, y_thales_SI, p.E1._dtCycleN);
-      const θ_E1_int_thales = cyc_thales * 2 * Math.PI * p.E1._dtCycleSign;
-      const θ_E2_int_thales = cyc_thales * 2 * Math.PI * p.E2._dtCycleSign;
-      const θ_pair_thales = θ_E1_int_thales + θ_E2_int_thales;
-      // Snapshot value per frame at year -584: speed × pos where pos = year_si - anchor_si.
-      // (At year -584, pos ≈ -2584; speed is in rad/year.)
-      const pos_thales = y_thales_SI - STARTMODEL_YEAR_SI;
-      const θ_E1_snap_thales = p.E1.speed * pos_thales;
-      const θ_E2_snap_thales = p.E2.speed * pos_thales;
-      const e1_match_rad = θ_E1_int_thales - θ_E1_snap_thales;
-      const e2_match_rad = θ_E2_int_thales - θ_E2_snap_thales;
-      note(`Year -584: E1 int=${(θ_E1_int_thales*180/Math.PI).toFixed(3)}°, snap=${(θ_E1_snap_thales*180/Math.PI).toFixed(3)}°, diff=${(e1_match_rad*180/Math.PI).toExponential(2)}°`,
-           Math.abs(e1_match_rad) < 0.001);  // <1mrad agreement = sub-mas at planet scale
-      note(`Year -584: E2 int=${(θ_E2_int_thales*180/Math.PI).toFixed(3)}°, snap=${(θ_E2_snap_thales*180/Math.PI).toFixed(3)}°, diff=${(e2_match_rad*180/Math.PI).toExponential(2)}°`,
-           Math.abs(e2_match_rad) < 0.001);
-      note(`Year -584: pair cancels to ${θ_pair_thales.toExponential(2)} rad`,
-           Math.abs(θ_pair_thales) < 1e-12);
-      console.log('');
-    }
-
-    // Regression: untagged frames remain on snapshot path
-    if (untagged.length > 0) {
-      console.log('── UNTAGGED ──');
-      for (const p of untagged) {
-        const e1Has = p.E1._dtCycleN !== undefined;
-        const e2Has = p.E2._dtCycleN !== undefined;
-        note(`${p.key.padEnd(8)} E1+E2 unchanged (E1.tagged=${e1Has}, E2.tagged=${e2Has})`,
-             !e1Has && !e2Has);
-      }
-      console.log('');
-    }
-
-    // Regression: Moon-chain dispatch unchanged
-    console.log('── REGRESSION CHECK ──');
-    const moonOk = moon._dtMoonIntegrator === meanMoonOrbitsBetweenYears && !moon._dtPlanetIntegrator && !moon._dtCycleN;
-    note('Moon-chain dispatch unchanged (no planet-style tags leaked onto moon)', moonOk);
-
-    // Summary
-    console.log('\n══════════════════════════════════════════════════════════════════════════════════');
-    console.log(`  SUMMARY:  ${passCount} passed, ${failCount} failed`);
-    if (failCount === 0) {
-      console.log(`  ✓ All ${tagged.length} tagged perihelion-ecliptic frame pair(s) verified.`);
-      console.log('  Visual checks REQUIRED:');
-      console.log('    1. Each tagged planet at modern epoch — position unchanged (pair cancels).');
-      console.log('    2. The "perihelion arrow" object (e.g. mercuryPerihelionFromEarth) may');
-      console.log('       visibly shift IF the per-frame integrator differs from snapshot at');
-      console.log('       this epoch. Dry-run says no, but eye-check anyway.');
-      console.log('    3. Untagged planets unchanged.');
-      console.log('    4. Moon position unchanged.');
-      if (untagged.length > 0) {
-        console.log(`  Next: tag ${untagged[0].key} perihelion ecliptic pair (Phase P-C${tagged.length + 1}).`);
-      } else {
-        console.log('  All 7 planet perihelion ecliptic pairs tagged. Ready for Phase P-D.');
-      }
-    } else {
-      console.log('  ✗ Verification FAILED — revert the most-recently-added tag pair and diagnose.');
-    }
-    console.log('══════════════════════════════════════════════════════════════════════════════════');
-  }, 'Generalized P-C verification: walks all currently-tagged ' +
-     '*PerihelionDurationEcliptic1/2 pairs and checks tag integrity, sign ' +
-     'cancellation, bit-equivalence at startmodelJD, and deep-time pair ' +
-     'cancellation at year -584. Same button for P-C1 through P-C7 — output ' +
-     'adapts to whichever planets are currently tagged.');
-
-  // ────────────────────────────────────────────────────────────────────────
   // P-D verification — per-planet _dtPerihelionDivisor for eq-of-center.
   // Signed divisor: positive N for prograde, negative N for retrograde.
   // ────────────────────────────────────────────────────────────────────────
@@ -36027,63 +35573,49 @@ function setupGUI() {
     // depends on epoch (must be tagged) vs. constant (snapshot OK).
     const CHAINS = {
       mercury: [
-        { obj: mercuryPerihelionDurationEcliptic1, role: 'Perihelion ecliptic E1 (Law-6)',           epochDep: true,  expectTag: '_dtCycleN' },
         { obj: mercuryPerihelionFromEarth,         role: 'Perihelion-from-Earth arrow (visual, geocentric)', epochDep: false, expectTag: 'snapshot' },
-        { obj: mercuryPerihelionDurationEcliptic2, role: 'Perihelion ecliptic E2 (Law-6, counter-rotates E1)', epochDep: true,  expectTag: '_dtCycleN' },
         { obj: mercuryRealPerihelionAtSun,         role: 'Real-perihelion-at-Sun offset (Kepler ellipse anchor)', epochDep: false, expectTag: 'snapshot' },
         { obj: mercury,                            role: 'Planet (orbital integrator)',              epochDep: true,  expectTag: '_dtPlanetIntegrator' },
         { obj: mercuryFixedPerihelionAtSun,        role: 'Fixed-perihelion-at-Sun marker (visual)',  epochDep: false, expectTag: 'snapshot' },
         { obj: mercuryWobbleCenter,                role: 'Wobble center (Law-6 eccentricity beat)',  epochDep: true,  expectTag: '_dtCycleN' },
       ],
       venus: [
-        { obj: venusPerihelionDurationEcliptic1, role: 'Perihelion ecliptic E1 (Law-6, RETROGRADE)', epochDep: true,  expectTag: '_dtCycleN' },
         { obj: venusPerihelionFromEarth,         role: 'Perihelion-from-Earth arrow',                epochDep: false, expectTag: 'snapshot' },
-        { obj: venusPerihelionDurationEcliptic2, role: 'Perihelion ecliptic E2',                     epochDep: true,  expectTag: '_dtCycleN' },
         { obj: venusRealPerihelionAtSun,         role: 'Real-perihelion-at-Sun offset',              epochDep: false, expectTag: 'snapshot' },
         { obj: venus,                            role: 'Planet (orbital integrator)',                epochDep: true,  expectTag: '_dtPlanetIntegrator' },
         { obj: venusFixedPerihelionAtSun,        role: 'Fixed-perihelion-at-Sun marker',             epochDep: false, expectTag: 'snapshot' },
         { obj: venusWobbleCenter,                role: 'Wobble center',                              epochDep: true,  expectTag: '_dtCycleN' },
       ],
       mars: [
-        { obj: marsPerihelionDurationEcliptic1, role: 'Perihelion ecliptic E1 (Law-6)',              epochDep: true,  expectTag: '_dtCycleN' },
         { obj: marsPerihelionFromEarth,         role: 'Perihelion-from-Earth arrow',                 epochDep: false, expectTag: 'snapshot' },
-        { obj: marsPerihelionDurationEcliptic2, role: 'Perihelion ecliptic E2',                      epochDep: true,  expectTag: '_dtCycleN' },
         { obj: marsRealPerihelionAtSun,         role: 'Real-perihelion-at-Sun offset',               epochDep: false, expectTag: 'snapshot' },
         { obj: mars,                            role: 'Planet (orbital integrator, SIGN -1 quirk)',  epochDep: true,  expectTag: '_dtPlanetIntegrator' },
         { obj: marsFixedPerihelionAtSun,        role: 'Fixed-perihelion-at-Sun marker',              epochDep: false, expectTag: 'snapshot' },
         { obj: marsWobbleCenter,                role: 'Wobble center',                               epochDep: true,  expectTag: '_dtCycleN' },
       ],
       jupiter: [
-        { obj: jupiterPerihelionDurationEcliptic1, role: 'Perihelion ecliptic E1 (Law-6)',           epochDep: true,  expectTag: '_dtCycleN' },
         { obj: jupiterPerihelionFromEarth,         role: 'Perihelion-from-Earth arrow',              epochDep: false, expectTag: 'snapshot' },
-        { obj: jupiterPerihelionDurationEcliptic2, role: 'Perihelion ecliptic E2',                   epochDep: true,  expectTag: '_dtCycleN' },
         { obj: jupiterRealPerihelionAtSun,         role: 'Real-perihelion-at-Sun offset',            epochDep: false, expectTag: 'snapshot' },
         { obj: jupiter,                            role: 'Planet (orbital integrator)',              epochDep: true,  expectTag: '_dtPlanetIntegrator' },
         { obj: jupiterFixedPerihelionAtSun,        role: 'Fixed-perihelion-at-Sun marker',           epochDep: false, expectTag: 'snapshot' },
         { obj: jupiterWobbleCenter,                role: 'Wobble center',                            epochDep: true,  expectTag: '_dtCycleN' },
       ],
       saturn: [
-        { obj: saturnPerihelionDurationEcliptic1, role: 'Perihelion ecliptic E1 (Law-6, RETROGRADE)', epochDep: true,  expectTag: '_dtCycleN' },
         { obj: saturnPerihelionFromEarth,         role: 'Perihelion-from-Earth arrow',                epochDep: false, expectTag: 'snapshot' },
-        { obj: saturnPerihelionDurationEcliptic2, role: 'Perihelion ecliptic E2',                     epochDep: true,  expectTag: '_dtCycleN' },
         { obj: saturnRealPerihelionAtSun,         role: 'Real-perihelion-at-Sun offset',              epochDep: false, expectTag: 'snapshot' },
         { obj: saturn,                            role: 'Planet (orbital integrator)',                epochDep: true,  expectTag: '_dtPlanetIntegrator' },
         { obj: saturnFixedPerihelionAtSun,        role: 'Fixed-perihelion-at-Sun marker',             epochDep: false, expectTag: 'snapshot' },
         { obj: saturnWobbleCenter,                role: 'Wobble center',                              epochDep: true,  expectTag: '_dtCycleN' },
       ],
       uranus: [
-        { obj: uranusPerihelionDurationEcliptic1, role: 'Perihelion ecliptic E1 (Law-6)',            epochDep: true,  expectTag: '_dtCycleN' },
         { obj: uranusPerihelionFromEarth,         role: 'Perihelion-from-Earth arrow',               epochDep: false, expectTag: 'snapshot' },
-        { obj: uranusPerihelionDurationEcliptic2, role: 'Perihelion ecliptic E2',                    epochDep: true,  expectTag: '_dtCycleN' },
         { obj: uranusRealPerihelionAtSun,         role: 'Real-perihelion-at-Sun offset',             epochDep: false, expectTag: 'snapshot' },
         { obj: uranus,                            role: 'Planet (orbital integrator)',               epochDep: true,  expectTag: '_dtPlanetIntegrator' },
         { obj: uranusFixedPerihelionAtSun,        role: 'Fixed-perihelion-at-Sun marker',            epochDep: false, expectTag: 'snapshot' },
         { obj: uranusWobbleCenter,                role: 'Wobble center',                             epochDep: true,  expectTag: '_dtCycleN' },
       ],
       neptune: [
-        { obj: neptunePerihelionDurationEcliptic1, role: 'Perihelion ecliptic E1 (Law-6)',           epochDep: true,  expectTag: '_dtCycleN' },
         { obj: neptunePerihelionFromEarth,         role: 'Perihelion-from-Earth arrow',              epochDep: false, expectTag: 'snapshot' },
-        { obj: neptunePerihelionDurationEcliptic2, role: 'Perihelion ecliptic E2',                   epochDep: true,  expectTag: '_dtCycleN' },
         { obj: neptuneRealPerihelionAtSun,         role: 'Real-perihelion-at-Sun offset',            epochDep: false, expectTag: 'snapshot' },
         { obj: neptune,                            role: 'Planet (orbital integrator)',              epochDep: true,  expectTag: '_dtPlanetIntegrator' },
         { obj: neptuneFixedPerihelionAtSun,        role: 'Fixed-perihelion-at-Sun marker',           epochDep: false, expectTag: 'snapshot' },
