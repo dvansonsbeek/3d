@@ -5485,9 +5485,6 @@ function updateMercuryForEpoch() {
   mercury.size        = (diameters.mercuryDiameter / 2 / currentAUDistance) * 100;
   mercury.perihelionPrecessionRate =
     (Math.PI * 2 / planets.mercury.perihelionEclipticYears) * _hRatioJ2000OverNow();
-  // Phase 5: scene-graph perihelion-ecliptic drivers (8H/N integer invariant)
-  mercuryPerihelionDurationEcliptic1.speed =  Math.PI * 2 / planets.mercury.perihelionEclipticYears;
-  mercuryPerihelionDurationEcliptic2.speed = -Math.PI * 2 / planets.mercury.perihelionEclipticYears;
   // Phase 3.5: Mercury 3:2 spin-orbit lock (Pettengill & Dyce 1965). The lock
   // is enforced tidally — 3 sidereal rotations per 2 orbits — so the rotation
   // period mutates with the orbital period at deep time. All three live values
@@ -5503,8 +5500,6 @@ function updateVenusForEpoch() {
   venus.size          = (diameters.venusDiameter / 2 / currentAUDistance) * 100;
   venus.perihelionPrecessionRate =
     (Math.PI * 2 / planets.venus.perihelionEclipticYears) * _hRatioJ2000OverNow();
-  venusPerihelionDurationEcliptic1.speed =  Math.PI * 2 / planets.venus.perihelionEclipticYears;
-  venusPerihelionDurationEcliptic2.speed = -Math.PI * 2 / planets.venus.perihelionEclipticYears;
 }
 function updateMarsForEpoch() {
   mars.speed          = Math.PI * 2 / (holisticyearLength / marsSolarYearCount);
@@ -5512,8 +5507,6 @@ function updateMarsForEpoch() {
   mars.size           = (diameters.marsDiameter / 2 / currentAUDistance) * 100;
   mars.perihelionPrecessionRate =
     (Math.PI * 2 / planets.mars.perihelionEclipticYears) * _hRatioJ2000OverNow();
-  marsPerihelionDurationEcliptic1.speed =  Math.PI * 2 / planets.mars.perihelionEclipticYears;
-  marsPerihelionDurationEcliptic2.speed = -Math.PI * 2 / planets.mars.perihelionEclipticYears;
 }
 function updateJupiterForEpoch() {
   jupiter.speed       = Math.PI * 2 / (holisticyearLength / jupiterSolarYearCount);
@@ -5521,8 +5514,6 @@ function updateJupiterForEpoch() {
   jupiter.size        = (diameters.jupiterDiameter / 2 / currentAUDistance) * 100;
   jupiter.perihelionPrecessionRate =
     (Math.PI * 2 / planets.jupiter.perihelionEclipticYears) * _hRatioJ2000OverNow();
-  jupiterPerihelionDurationEcliptic1.speed =  Math.PI * 2 / planets.jupiter.perihelionEclipticYears;
-  jupiterPerihelionDurationEcliptic2.speed = -Math.PI * 2 / planets.jupiter.perihelionEclipticYears;
 }
 function updateSaturnForEpoch() {
   saturn.speed        = Math.PI * 2 / (holisticyearLength / saturnSolarYearCount);
@@ -5530,8 +5521,6 @@ function updateSaturnForEpoch() {
   saturn.size         = (diameters.saturnDiameter / 2 / currentAUDistance) * 100;
   saturn.perihelionPrecessionRate =
     (Math.PI * 2 / planets.saturn.perihelionEclipticYears) * _hRatioJ2000OverNow();
-  saturnPerihelionDurationEcliptic1.speed =  Math.PI * 2 / planets.saturn.perihelionEclipticYears;
-  saturnPerihelionDurationEcliptic2.speed = -Math.PI * 2 / planets.saturn.perihelionEclipticYears;
 }
 function updateUranusForEpoch() {
   uranus.speed        = Math.PI * 2 / (holisticyearLength / uranusSolarYearCount);
@@ -5539,8 +5528,6 @@ function updateUranusForEpoch() {
   uranus.size         = (diameters.uranusDiameter / 2 / currentAUDistance) * 100;
   uranus.perihelionPrecessionRate =
     (Math.PI * 2 / planets.uranus.perihelionEclipticYears) * _hRatioJ2000OverNow();
-  uranusPerihelionDurationEcliptic1.speed =  Math.PI * 2 / planets.uranus.perihelionEclipticYears;
-  uranusPerihelionDurationEcliptic2.speed = -Math.PI * 2 / planets.uranus.perihelionEclipticYears;
 }
 function updateNeptuneForEpoch() {
   neptune.speed       = Math.PI * 2 / (holisticyearLength / neptuneSolarYearCount);
@@ -5548,8 +5535,6 @@ function updateNeptuneForEpoch() {
   neptune.size        = (diameters.neptuneDiameter / 2 / currentAUDistance) * 100;
   neptune.perihelionPrecessionRate =
     (Math.PI * 2 / planets.neptune.perihelionEclipticYears) * _hRatioJ2000OverNow();
-  neptunePerihelionDurationEcliptic1.speed =  Math.PI * 2 / planets.neptune.perihelionEclipticYears;
-  neptunePerihelionDurationEcliptic2.speed = -Math.PI * 2 / planets.neptune.perihelionEclipticYears;
 }
 
 /** Full Phase 3 orchestrator: safe subset + all 7 outer planets. */
@@ -7867,7 +7852,8 @@ const marsRealPerihelionAtSun = {
   orbitCenterc: 0,
   orbitTilta: Math.cos(((-90-planets.mars.ascendingNode)*Math.PI)/180)*-planets.mars.eclipticInclinationJ2000,
   orbitTiltb: Math.sin(((-90-planets.mars.ascendingNode)*Math.PI)/180)*-planets.mars.eclipticInclinationJ2000,
-  eclipticPrecLayer: marsPerihelionDurationEcliptic1,
+  // R7 experiment: is this branch live for a chain planet?
+
   longitudePerihelion: planets.mars.longitudePerihelion,
   planetType: 'II',
   _orbitalEccentricity: planets.mars.orbitalEccentricityBase,
@@ -8022,7 +8008,8 @@ const jupiterRealPerihelionAtSun = {
   orbitCenterc: 0,
   orbitTilta: Math.cos(((-90-planets.jupiter.ascendingNode)*Math.PI)/180)*-planets.jupiter.eclipticInclinationJ2000,
   orbitTiltb: Math.sin(((-90-planets.jupiter.ascendingNode)*Math.PI)/180)*-planets.jupiter.eclipticInclinationJ2000,
-  eclipticPrecLayer: jupiterPerihelionDurationEcliptic1,
+  // R7 experiment: is this branch live for a chain planet?
+
   longitudePerihelion: planets.jupiter.longitudePerihelion,
   signFlip: 1,
 
@@ -8180,7 +8167,8 @@ const saturnRealPerihelionAtSun = {
   orbitCenterc: 0,
   orbitTilta: Math.cos(((-90-planets.saturn.ascendingNode)*Math.PI)/180)*-planets.saturn.eclipticInclinationJ2000,
   orbitTiltb: Math.sin(((-90-planets.saturn.ascendingNode)*Math.PI)/180)*-planets.saturn.eclipticInclinationJ2000,
-  eclipticPrecLayer: saturnPerihelionDurationEcliptic1,
+  // R7 experiment: is this branch live for a chain planet?
+
   longitudePerihelion: planets.saturn.longitudePerihelion,
   signFlip: -1,
 
@@ -8338,7 +8326,8 @@ const uranusRealPerihelionAtSun = {
   orbitCenterc: 0,
   orbitTilta: Math.cos(((-90-planets.uranus.ascendingNode)*Math.PI)/180)*-planets.uranus.eclipticInclinationJ2000,
   orbitTiltb: Math.sin(((-90-planets.uranus.ascendingNode)*Math.PI)/180)*-planets.uranus.eclipticInclinationJ2000,
-  eclipticPrecLayer: uranusPerihelionDurationEcliptic1,
+  // R7 experiment: is this branch live for a chain planet?
+
   longitudePerihelion: planets.uranus.longitudePerihelion,
   signFlip: 1,
 
@@ -8496,7 +8485,8 @@ const neptuneRealPerihelionAtSun = {
   orbitCenterc: 0,
   orbitTilta: Math.cos(((-90-planets.neptune.ascendingNode)*Math.PI)/180)*-planets.neptune.eclipticInclinationJ2000,
   orbitTiltb: Math.sin(((-90-planets.neptune.ascendingNode)*Math.PI)/180)*-planets.neptune.eclipticInclinationJ2000,
-  eclipticPrecLayer: neptunePerihelionDurationEcliptic1,
+  // R7 experiment: is this branch live for a chain planet?
+
   longitudePerihelion: planets.neptune.longitudePerihelion,
   signFlip: 1,
 
@@ -9280,89 +9270,15 @@ neptune._dtPlanetSign       = Math.sign(neptune.speed);
 // NOT N. Initial P-C tagging used N and was off by factor 8 — caught when P-D
 // reproduced the same bug visibly via the eq-of-center perihelion phase. See the
 // P-D revert comment further down. Same N/8 convention applies to P-D below.
-{
-  const N        = _planetPerihelionDivisors.mercury;   // = 11 (the integer in 8H/N)
-  const baseSign = _planetPerihelionSigns.mercury;      // = +1 (prograde)
-  mercuryPerihelionDurationEcliptic1._dtCycleN      = N / 8;
-  mercuryPerihelionDurationEcliptic1._dtCycleSign   = baseSign * (+1);
-  mercuryPerihelionDurationEcliptic1._dtCycleAnchor = STARTMODEL_YEAR_SI;
-  mercuryPerihelionDurationEcliptic2._dtCycleN      = N / 8;
-  mercuryPerihelionDurationEcliptic2._dtCycleSign   = baseSign * (-1);
-  mercuryPerihelionDurationEcliptic2._dtCycleAnchor = STARTMODEL_YEAR_SI;
-}
 
 // ───── Phase P-C2 — Venus perihelion ecliptic frames (RETROGRADE) ─────
 // Venus's perihelionEclipticYears is NEGATIVE → retrograde perihelion precession.
 // baseSign = -1 → E1 = -1, E2 = +1 (opposite of Mercury). Matches the existing
 // snapshot speeds (venusPerihelionDurationEcliptic1.speed < 0 because periEclipticYears
 // is negative; *Ecliptic2.speed > 0).
-{
-  const N        = _planetPerihelionDivisors.venus;     // = 6
-  const baseSign = _planetPerihelionSigns.venus;        // = -1 (retrograde)
-  venusPerihelionDurationEcliptic1._dtCycleN      = N / 8;
-  venusPerihelionDurationEcliptic1._dtCycleSign   = baseSign * (+1);   // = -1
-  venusPerihelionDurationEcliptic1._dtCycleAnchor = STARTMODEL_YEAR_SI;
-  venusPerihelionDurationEcliptic2._dtCycleN      = N / 8;
-  venusPerihelionDurationEcliptic2._dtCycleSign   = baseSign * (-1);   // = +1
-  venusPerihelionDurationEcliptic2._dtCycleAnchor = STARTMODEL_YEAR_SI;
-}
-
-// ───── Phase P-C3/4/5/6/7 — Remaining perihelion ecliptic frame pairs ─────
-// Both sign conventions (prograde and retrograde) verified in P-C1/P-C2.
-// Mars, Jupiter, Uranus, Neptune: prograde (baseSign = +1) — same shape as Mercury.
-// Saturn: retrograde (baseSign = -1) — same shape as Venus.
-// Batched after P-C2 since both patterns are now exercised; one combined
-// visual verification covers all 5.
-{
-  const N        = _planetPerihelionDivisors.mars;      // = 36
-  const baseSign = _planetPerihelionSigns.mars;         // = +1 (prograde)
-  marsPerihelionDurationEcliptic1._dtCycleN      = N / 8;
-  marsPerihelionDurationEcliptic1._dtCycleSign   = baseSign * (+1);
-  marsPerihelionDurationEcliptic1._dtCycleAnchor = STARTMODEL_YEAR_SI;
-  marsPerihelionDurationEcliptic2._dtCycleN      = N / 8;
-  marsPerihelionDurationEcliptic2._dtCycleSign   = baseSign * (-1);
-  marsPerihelionDurationEcliptic2._dtCycleAnchor = STARTMODEL_YEAR_SI;
-}
-{
-  const N        = _planetPerihelionDivisors.jupiter;   // = 39
-  const baseSign = _planetPerihelionSigns.jupiter;      // = +1 (prograde)
-  jupiterPerihelionDurationEcliptic1._dtCycleN      = N / 8;
-  jupiterPerihelionDurationEcliptic1._dtCycleSign   = baseSign * (+1);
-  jupiterPerihelionDurationEcliptic1._dtCycleAnchor = STARTMODEL_YEAR_SI;
-  jupiterPerihelionDurationEcliptic2._dtCycleN      = N / 8;
-  jupiterPerihelionDurationEcliptic2._dtCycleSign   = baseSign * (-1);
-  jupiterPerihelionDurationEcliptic2._dtCycleAnchor = STARTMODEL_YEAR_SI;
-}
-{
-  const N        = _planetPerihelionDivisors.saturn;    // = 65
-  const baseSign = _planetPerihelionSigns.saturn;       // = -1 (retrograde)
-  saturnPerihelionDurationEcliptic1._dtCycleN      = N / 8;
-  saturnPerihelionDurationEcliptic1._dtCycleSign   = baseSign * (+1);   // = -1
-  saturnPerihelionDurationEcliptic1._dtCycleAnchor = STARTMODEL_YEAR_SI;
-  saturnPerihelionDurationEcliptic2._dtCycleN      = N / 8;
-  saturnPerihelionDurationEcliptic2._dtCycleSign   = baseSign * (-1);   // = +1
-  saturnPerihelionDurationEcliptic2._dtCycleAnchor = STARTMODEL_YEAR_SI;
-}
-{
-  const N        = _planetPerihelionDivisors.uranus;    // = 24
-  const baseSign = _planetPerihelionSigns.uranus;       // = +1 (prograde)
-  uranusPerihelionDurationEcliptic1._dtCycleN      = N / 8;
-  uranusPerihelionDurationEcliptic1._dtCycleSign   = baseSign * (+1);
-  uranusPerihelionDurationEcliptic1._dtCycleAnchor = STARTMODEL_YEAR_SI;
-  uranusPerihelionDurationEcliptic2._dtCycleN      = N / 8;
-  uranusPerihelionDurationEcliptic2._dtCycleSign   = baseSign * (-1);
-  uranusPerihelionDurationEcliptic2._dtCycleAnchor = STARTMODEL_YEAR_SI;
-}
-{
-  const N        = _planetPerihelionDivisors.neptune;   // = 4
-  const baseSign = _planetPerihelionSigns.neptune;      // = +1 (prograde)
-  neptunePerihelionDurationEcliptic1._dtCycleN      = N / 8;
-  neptunePerihelionDurationEcliptic1._dtCycleSign   = baseSign * (+1);
-  neptunePerihelionDurationEcliptic1._dtCycleAnchor = STARTMODEL_YEAR_SI;
-  neptunePerihelionDurationEcliptic2._dtCycleN      = N / 8;
-  neptunePerihelionDurationEcliptic2._dtCycleSign   = baseSign * (-1);
-  neptunePerihelionDurationEcliptic2._dtCycleAnchor = STARTMODEL_YEAR_SI;
-}
+// R7 (plan 07): the per-planet `_dtCycleN` tagging of those wheels went with
+// them. The `_dtCycleN` MECHANISM stays — the Sun's layers and the no-chain
+// bodies still use it; only the seven chain planets' entries are gone.
 
 // ───── Phase P-D — Per-planet _dtPerihelionDivisor for eq-of-center ─────
 // docs/archive/old-documents/IP-planet-deep-time-scene-graph.md
@@ -55546,13 +55462,13 @@ function updatePerihelion() {
   // Reads directly from precession layer rotation - the "true" heliocentric value
   // Stable precession rate, unaffected by Earth's reference frame
   // ═══════════════════════════════════════════════════════════════════════════
-  o["mercuryPerihelionEcliptic"] = perihelionLongitudeEcliptic(mercuryPerihelionDurationEcliptic1, planets.mercury.longitudePerihelion);
-  o["venusPerihelionEcliptic"] = perihelionLongitudeEcliptic(venusPerihelionDurationEcliptic1, planets.venus.longitudePerihelion);
-  o["marsPerihelionEcliptic"] = perihelionLongitudeEcliptic(marsPerihelionDurationEcliptic1, planets.mars.longitudePerihelion);
-  o["jupiterPerihelionEcliptic"] = perihelionLongitudeEcliptic(jupiterPerihelionDurationEcliptic1, planets.jupiter.longitudePerihelion);
-  o["saturnPerihelionEcliptic"] = perihelionLongitudeEcliptic(saturnPerihelionDurationEcliptic1, planets.saturn.longitudePerihelion);
-  o["uranusPerihelionEcliptic"] = perihelionLongitudeEcliptic(uranusPerihelionDurationEcliptic1, planets.uranus.longitudePerihelion);
-  o["neptunePerihelionEcliptic"] = perihelionLongitudeEcliptic(neptunePerihelionDurationEcliptic1, planets.neptune.longitudePerihelion);
+  // R7 (plan 07): the seven chain planets' device readings stood here and were
+  // overwritten by the chain block below on the very next statement — dead
+  // work, and misleading to read. What the device would have shown is why the
+  // override exists: measured against the chain's ϖ of date, the linear
+  // advance is 8.6° out for Neptune and 2.5° for Saturn AT J2000, 45° for
+  // Neptune by 2100 and 77° for Saturn by 7000. The no-chain bodies below have
+  // no such override and keep the device reading, which is all they have.
   o["plutoPerihelionEcliptic"] = perihelionLongitudeEcliptic(plutoPerihelionDurationEcliptic1, planets.pluto.longitudePerihelion);
   o["halleysPerihelionEcliptic"] = perihelionLongitudeEcliptic(halleysPerihelionDurationEcliptic1, planets.halleys.longitudePerihelion);
   o["erosPerihelionEcliptic"] = perihelionLongitudeEcliptic(erosPerihelionDurationEcliptic1, planets.eros.longitudePerihelion);
