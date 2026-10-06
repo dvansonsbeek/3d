@@ -195,6 +195,7 @@ export function assembleModel(C: Readonly<Record<string, any>>, F: Readonly<Reco
         perihelionLongitudeDeg: (k: string, year: number) => number;
         ascendingNodeInvPlaneDeg: (k: string, year: number) => number;
         invPlaneInclinationDeg: (k: string, year: number) => number;
+        eccentricity: (k: string, year: number) => number;
         spin: (k: string) => Readonly<{
             key: string;
             cassiniLocked: boolean;

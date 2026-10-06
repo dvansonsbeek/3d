@@ -62,7 +62,9 @@ const toolCall = (name, args) => {
     ['essrt_cardinal_points', { year: 2000, types: 'SS' }, (d) => (Math.abs(d.years[0].points.SS.jd - 2451716.575) < 0.1 ? null : `SS JD: ${d.years[0].points.SS.jd}`)],
     ['essrt_earth', { year: 2000 }, (d) => (Math.abs(d.years[0].obliquityDeg - 23.4393) < 0.0002 ? null : `obliquity: ${d.years[0].obliquityDeg}`)],
     ['essrt_moon', { year: 2000 }, (d) => (Math.abs(d.years[0].distanceKm - 384400) < 1000 ? null : `moon distance: ${d.years[0].distanceKm}`)],
-    ['essrt_bodies', { body: 'mercury' }, (d) => (Math.round(d.record.perihelionEclipticYears) === 243867 ? null : `mercury: ${d.record.perihelionEclipticYears}`)],
+    // R8: the chain's secular period 1,296,000/g1 (was the device's 8H/11 = 243,867)
+    ['essrt_bodies', { body: 'mercury' }, (d) => (Math.round(d.record.perihelionEclipticYears) === 232437 ? null : `mercury: ${d.record.perihelionEclipticYears}`)],
+    ['essrt_bodies', { body: 'mercury' }, (d) => ('fibonacciD' in d.record || 'inclinationCycleAnchor' in d.record ? `device fields still served: ${Object.keys(d.record).join(',')}` : null)],
     ['essrt_bodies', { body: 'mercury', year: 2000 }, (d) => (Math.abs(d.at[0].invPlaneInclinationDeg - 6.3446) < 0.001 && /chain/.test(d.frames.source) ? null : `mercury elements not the chain's: ${JSON.stringify(d.at[0])}`)],   // v16.2: the chain, not the record's linear rates
     ['essrt_values', { key: 'usnoLodJ2000' }, (d) => (d.value === '86,400.0021' ? null : `usnoLodJ2000: ${d.value}`)],   // plan 06 T2 item: the ecliptic term on the nodal period re-closed the joint optimum at 0021
     ['essrt_derivations', { quantity: 'axialPrecession' }, (d) => (Math.abs(d.periodYears - 25771.4) < 0.5 ? null : `period: ${d.periodYears}`)],

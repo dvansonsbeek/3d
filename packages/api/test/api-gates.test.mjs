@@ -154,7 +154,15 @@ for (const url of SAMPLE_REQUESTS) {
   }
   if (dataOf('/v1/derivations/solarSystemResonanceCycle').status !== 'retired') failures.push('derivations/solarSystemResonanceCycle must be marked retired');
   const merc = dataOf('/v1/bodies/mercury');
-  if (Math.round(merc.record.perihelionEclipticYears) !== 243867) failures.push(`mercury ecl period: ${merc.record.perihelionEclipticYears}`);
+  // R8: the served record carries the CHAIN's secular periods, not the retired
+  // device's lattice (this row pinned 243,867 = 8H/11). 232,437 yr is
+  // 1,296,000/g1, the same number the registry publishes as mercuryPeriPeriodICRF
+  // — the two surfaces agreeing is the point of the change.
+  if (Math.round(merc.record.perihelionEclipticYears) !== 232437) failures.push(`mercury ecl period: ${merc.record.perihelionEclipticYears}`);
+  // …and the device's descriptors are gone from what is served.
+  for (const gone of ['fibonacciD', 'antiPhase', 'inclinationCycleAnchor', 'wobblePeriod', 'ascendingNodeCyclesIn8H', 'orbitalEccentricityBase', 'orbitalEccentricityAmplitude', 'invPlaneInclinationAmplitude']) {
+    if (gone in merc.record) failures.push(`device field still served: record.${gone}`);
+  }
   // v16.2: the elements ride the N-body chain (the path the simulator renders), not the record's linear
   // rates. Pins: Mercury's J2000 row is the chain's anchor (ϖ 77.457 — IAU 77.456; i to the invariable
   // plane 6.3446; node from the S&S origin 32.49 — S&S 2012 32.22), a deep row is the chain moving

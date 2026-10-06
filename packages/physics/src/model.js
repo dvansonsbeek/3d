@@ -735,7 +735,9 @@ export function assembleModel(C, F, laws = {}, secularSeriesArtifact = /** @type
   const fractionToYears = (frac) => (frac === null ? null : (H * frac[0]) / frac[1]);
 
   /** @type {Record<string, Record<string, any>>} */
-  const PLANET_RECORDS = {};
+  const PLANET_RECORDS = {};              // internal: the fitters read the device fields
+  /** @type {Record<string, Record<string, any>>} */
+  const PUBLISHED_PLANET_RECORDS = {};    // what model.planets.record() serves (R8)
   for (const k of PLANET_KEYS) {
     const mp = C.planets[k];
     const ar = C.planetOrbitalElements[k];
@@ -796,6 +798,43 @@ export function assembleModel(C, F, laws = {}, secularSeriesArtifact = /** @type
       eccentricityPhaseJ2000: el.phaseJ2000,
       solarYearInput: ar.solarYearInput,
       axialTiltJ2000: ar.axialTiltJ2000,
+    });
+    // R8 (plan 07): what `model.planets.record()` PUBLISHES is not the record
+    // above. The record keeps the ψ/K law outputs because the fitting pipeline
+    // reads them (step 7a derive-eccentricity-amplitudes, the EoC fractions) —
+    // but nothing outside needs the device, and serving it made /v1/bodies
+    // contradict the model's own chain on the SAME quantities: Mercury's node
+    // cycle 298,060 yr against the chain's 232,001, Jupiter's perihelion period
+    // 68,783 against 304,456, Neptune's 670,634 against 2,136,796. The two
+    // views are separated here: internal keeps the device for the fitters,
+    // published carries the structural inputs and the chain.
+    //   · kept as-is — the REFERENCE inputs (IAU J2000 ϖ, Souami & Souchay
+    //     node and inclination, DE440 e, the period input, the axial tilt) and
+    //     `obliquityMean`, which is engine-DERIVED (the spin channel against
+    //     the chain's J2000 plane), not a device value.
+    //   · repointed, the quantity surviving as a chain eigenmode — the two
+    //     PERIODS, now 1,296,000/g and 1,296,000/s. Signs kept as before:
+    //     apsidal prograde positive, nodal regression negative.
+    //   · dropped, the quantity BEING the device — ascendingNodeCyclesIn8H,
+    //     fibonacciD, antiPhase, inclinationCycleAnchor, wobblePeriod (lattice
+    //     inputs and the device's beat), and the inclination/eccentricity
+    //     mean+amplitude+phase triples, which presume a single oscillation the
+    //     chain does not have. Their honest replacement is the value AT AN
+    //     EPOCH, which `/v1/bodies` already serves in its `at[]` rows.
+    const chainModes = /** @type {any} */ (CHAIN_ARTIFACT);
+    const gArc = chainModes.g[k] && chainModes.g[k].arcsecPerYr;
+    const sArc = chainModes.s[k] && chainModes.s[k].arcsecPerYr;
+    PUBLISHED_PLANET_RECORDS[k] = Object.freeze({
+      name: mp.name,
+      solarYearInput: ar.solarYearInput,
+      longitudePerihelion: ar.longitudePerihelion,
+      ascendingNodeInvPlane: mp.ascendingNodeInvPlane,
+      invPlaneInclinationJ2000: ar.invPlaneInclinationJ2000,
+      orbitalEccentricityJ2000: ar.orbitalEccentricityJ2000,
+      axialTiltJ2000: ar.axialTiltJ2000,
+      obliquityMean,
+      perihelionEclipticYears: gArc ? 1296000 / gArc : undefined,
+      ascendingNodePeriod: sArc ? 1296000 / sArc : undefined,
     });
   }
 
@@ -868,6 +907,11 @@ export function assembleModel(C, F, laws = {}, secularSeriesArtifact = /** @type
   };
   /** Inclination to the model's invariable plane (exact orbit-normal rotation). @param {string} k @param {number} year @returns {number} */
   const planetInclinationDeg = (k, year) => planetChainElementsAt(k, year).inclInvPlaneDeg;
+  /** Orbital eccentricity of date, from the same chain elements (R8): the
+   *  honest replacement for the record's retired base + amplitude + phase
+   *  triple, which presumed a single oscillation the chain's multi-mode
+   *  e-vector does not have. @param {string} k @param {number} year @returns {number} */
+  const planetEccentricity = (k, year) => planetChainElementsAt(k, year).e;
 
   // ── Time axis: exact JD ↔ model-year conversion ───────────────────────────
   // The model's `year` inputs live on the SI axis (the axis the fits were
@@ -1646,10 +1690,11 @@ export function assembleModel(C, F, laws = {}, secularSeriesArtifact = /** @type
     }),
     planets: Object.freeze({
       keys: Object.freeze([...PLANET_KEYS]),
-      record: /** @param {string} k @returns {Record<string, any>|undefined} */ (k) => PLANET_RECORDS[k],
+      record: /** @param {string} k @returns {Record<string, any>|undefined} */ (k) => PUBLISHED_PLANET_RECORDS[k],
       perihelionLongitudeDeg: planetPerihelionDeg,
       ascendingNodeInvPlaneDeg: planetAscNodeDeg,
       invPlaneInclinationDeg: planetInclinationDeg,
+      eccentricity: planetEccentricity,
       spin: planetSpin,
     }),
   });

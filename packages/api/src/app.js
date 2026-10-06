@@ -73,7 +73,9 @@ const PLANET_ELEMENT_FRAMES = Object.freeze({
   perihelionLongitudeDeg: 'ecliptic longitude of perihelion, J2000 ecliptic and equinox',
   ascendingNodeInvPlaneDeg: 'ascending node on the model’s invariable plane, measured from the plane’s ascending node on the ICRF equator (the Souami & Souchay 2012 origin)',
   invPlaneInclinationDeg: 'inclination of the orbit plane to the model’s invariable plane',
+  eccentricity: 'orbital eccentricity of date, the modulus of the chain’s secular eccentricity vector',
   epoch: 'the decimal year is read as the chain’s dynamical-time argument',
+  record: 'the body’s structural inputs (IAU J2000 longitude of perihelion, Souami & Souchay 2012 node and inclination, DE440 eccentricity, the orbital-period input, the axial tilt), the DERIVED J2000 obliquity, and the two secular PERIODS 1,296,000/g and 1,296,000/s from the same chain — apsidal prograde positive, nodal regression negative. R8: the retired device’s lattice descriptors are no longer served; for a value at an epoch read the at[] rows.',
 });
 
 const EPOCH_SECTIONS = Object.freeze(['h', 'lod', 'alpha', 'deltaT', 'siderealYearSeconds', 'tropicalYearSeconds', 'moonDistanceKm', 'axialPrecessionYears']);
@@ -307,6 +309,7 @@ export function createApi() {
         perihelionLongitudeDeg: model.planets.perihelionLongitudeDeg(key, y),
         ascendingNodeInvPlaneDeg: model.planets.ascendingNodeInvPlaneDeg(key, y),
         invPlaneInclinationDeg: model.planets.invPlaneInclinationDeg(key, y),
+        eccentricity: model.planets.eccentricity(key, y),
       }));
       return envelope({
         identity: id,
