@@ -404,7 +404,6 @@ only (the planet chains ride the orbital dynamics engine); the historical record
 | Saturn | <!--v:saturnInclMean-->0.891047<!--/v--> | <!--v:saturnInclAmp-->0.273630<!--/v--> | 0.92 - 1.05 | <!--v:saturnInclCycleAnchor-->116.26<!--/v-->° (anti-phase) | <!--v:saturnPeriPeriodICRF-->45,883<!--/v--> yr |
 | Uranus | <!--v:uranusInclMean-->1.019370<!--/v--> | <!--v:uranusInclAmp-->0.146147<!--/v--> | 0.99 - 1.04 | 21.33° | H/10 ≈ <!--v:uranusPeriPeriodICRF-->330,515<!--/v--> yr |
 | Neptune | <!--v:neptuneInclMean-->0.668278<!--/v--> | <!--v:neptuneInclAmp-->0.201769<!--/v--> | 0.73 - 0.76 | <!--v:neptuneInclCycleAnchor-->174.04<!--/v-->° | 2H/25 ≈ <!--v:neptunePeriPeriodICRF-->2,136,796<!--/v--> yr |
-| Pluto | <!--v:plutoInclMean-->15.716200<!--/v--> | <!--v:plutoInclAmp-->0.717024<!--/v--> | 15.00 - 16.43 | <!--v:plutoInclCycleAnchor-->203.32<!--/v-->° | H/12 ≈ <!--v:plutoPeriPeriodICRF-->27,943<!--/v--> yr |
 
 **Formula**: `i(t) = mean + amplitude × cos(ω̃_ICRF(t) - cycleAnchor)` (Saturn: sign flipped, anti-phase)
 
@@ -760,7 +759,6 @@ Each planet has a per-planet cycle anchor (ICRF perihelion longitude where the p
 | Saturn | <!--v:saturnInclCycleAnchor-->116.26<!--/v-->° | n=7* | anti-phase |
 | Uranus | 21.33° | n=7* | |
 | Neptune | <!--v:neptuneInclCycleAnchor-->174.04<!--/v-->° | n=7 | |
-| Pluto | <!--v:plutoInclCycleAnchor-->203.32<!--/v-->° | — | not fitted |
 
 \* Jupiter, Saturn, and Uranus have ICRF periods that divide H exactly; their phase at n=7 numerically coincides with their phase at n=0 (and any other anchor).
 

@@ -2492,23 +2492,17 @@ export const VALUES = {
         note: planet === 'earth' ? 'Earth’s apsidal period vs the stars — the one-family route (S6)' : `inertial perihelion period, 1,296,000/|g| — the chain’s leading secular apsidal mode (${chainArt().g[planet].nearestLaskar.mode}); prograde`,
       };
     }
-    // The NO-CHAIN bodies (Pluto, Halley, Eros, Ceres) have no engine series; their
-    // rows stay the device's convention over the stored [1,1] default fraction
-    // (8H/(n8 − 104)), named as such — doc 31 documents them. They go when the
-    // bodies get a chain or are retired (plan 07 §3, outside R1–R9).
-    for (const [body, el] of Object.entries(model.additionalBodies)) {
-      if (body.startsWith('_') || !el?.perihelionEclipticFraction) continue;
-      out[`${body}PeriPeriodICRF`] = {
-        get: () => {
-          const [num, den] = el.perihelionEclipticFraction;
-          const n8 = (8 * den / Math.abs(num)) * Math.sign(num);
-          return (8 * C.H) / Math.abs(n8 - 104);
-        },
-        render: (v) => thousands(Math.round(v)),
-        unit: 'yr',
-        note: 'NO-CHAIN BODY — the retired device’s frame identity over the stored [1,1] default fraction (not fitted, not an engine value)',
-      };
-    }
+    // The no-chain bodies' `<body>PeriPeriodICRF` rows stood here, built from
+    // the retired device's frame identity over each body's stored
+    // perihelionEclipticFraction. All four stored the SAME [1,1] placeholder,
+    // so all four published one number — 27,943 yr — for four unrelated
+    // orbits, against Pluto's true apsidal period of order 3.7 Myr. Pluto,
+    // Halley and Eros have been removed from the model entirely; Ceres remains
+    // only as a force-only perturber in the N-body run and as reference data,
+    // neither of which needs a perihelion period. The bodies' OBSERVED values
+    // (DE440 mass ratio, J2000 node and inclination) stay — they are external
+    // measurements used in the mass-from-moon and ascending-node calibrations,
+    // independent of whether anything is drawn.
     return out;
   })(),
 
@@ -2573,9 +2567,11 @@ export const VALUES = {
       return astro.planetOrbitalElements[planet].invPlaneInclinationJ2000;
     };
     const out = {
-      plutoInclMean: { get: () => pl().invPlaneInclinationMean, render: (v) => Number(v).toFixed(6), unit: '°', note: 'stored value — no ψ-law mass fraction for Pluto' },
-      plutoInclAmp: { get: () => pl().invPlaneInclinationAmplitude, render: (v) => Number(v).toFixed(6), unit: '°' },
-      plutoInclCycleAnchor: { get: () => pl().inclinationCycleAnchor, render: (v) => Number(v).toFixed(2), unit: '°' },
+      // plutoInclMean / plutoInclAmp / plutoInclCycleAnchor are gone with the
+      // body: they described a device inclination OSCILLATION (a mean, an
+      // amplitude and a phase anchor) for an orbit the model no longer carries.
+      // What survives below is observed: the node the ascending-node
+      // calibration compares, and the J2000 inclination it is measured against.
       plutoOmegaJ2000: { get: () => pl().ascendingNodeInvPlane, render: (v) => Number(v).toFixed(2), unit: '°', note: 'the model\'s VERIFIED node — deliberately ≠ raw S&S 107.06 (docs/32)' },
       plutoInclJ2000: { get: () => astro.additionalBodiesReference.pluto.invPlaneInclinationJ2000, render: (v) => String(v), unit: '°' },
       holisticYearFactors: {

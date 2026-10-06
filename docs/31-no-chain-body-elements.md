@@ -15,8 +15,18 @@ banked invariable plane ([doc 04](04-dynamic-elements-overview.md),
 **geometric-elements device** that remains in the code for everything the
 chain does not serve:
 
-- the **no-chain bodies** — Pluto, Halley's Comet, Eros (and Ceres, which
-  carries the same S&S-style node constants);
+- **Ceres**, which carries S&S-style node constants as reference data (it is
+  a force-only perturber in the N-body run, never a rendered body);
+
+> **Pluto, Halley's Comet and Eros are gone.** They were rendered from this
+> device with no chain behind them, and all four no-chain bodies stored the
+> same placeholder perihelion fraction — one period of 27,943 yr for four
+> unrelated orbits, against Pluto's true apsidal period of order 3.7 Myr.
+> Nothing gated them and nothing published them, so they were removed rather
+> than carried as decoration. Their OBSERVED values survive where they are
+> actually used: Pluto/Charon in the mass-from-moon derivation and Pluto's
+> node in the ascending-node calibration.
+
 - **Earth's engine-K devices** — the H/3 inclination oscillation and −H/5
   node regression that anchor the certified historical-era machinery;
 - the **probe-pinned reference implementations**
@@ -78,7 +88,6 @@ the eight anchors in the current eight-unit interval:
 | **Saturn** | **<!--v:saturnInclCycleAnchor-->116.26<!--/v-->°** | **Anti-phase** | n=7 (= n=0)* | -<!--v:systemResetYearPlain-->2,649,854<!--/v--> | **Retrograde** | **Increasing** |
 | Uranus | 21.33° | In-phase | n=7 (= n=0)* | -<!--v:systemResetYearPlain-->2,649,854<!--/v--> | Retrograde | Decreasing |
 | Neptune | <!--v:neptuneInclCycleAnchor-->174.04<!--/v-->° | In-phase | n=7 | -<!--v:systemResetYearPlain-->2,649,854<!--/v--> | Retrograde | Decreasing |
-| Pluto | <!--v:plutoInclCycleAnchor-->203.32<!--/v-->° | — | — | — | Retrograde | — |
 
 \* Uranus's ICRF perihelion period (H/10) divides H exactly, so its n=7 phase coincides with n=0; Jupiter and Saturn carry non-integer cycles per anchor interval, so their per-anchor phases differ.
 
@@ -106,7 +115,6 @@ ecliptic rate − general precession H/13). Literal values J2000-evaluated:
 | Saturn | `−8Y/65` | <!--v:saturnPeriPeriodICRF-->45,883<!--/v--> yr | Retrograde |
 | Uranus | `H / 3` | `H/10` ≈ <!--v:uranusPeriPeriodICRF-->330,515<!--/v--> yr | Retrograde |
 | Neptune | `H × 2` | `2H/25` ≈ <!--v:neptunePeriPeriodICRF-->2,136,796<!--/v--> yr | Retrograde |
-| Pluto | `H` | `H/12` ≈ <!--v:plutoPeriPeriodICRF-->27,943<!--/v--> yr | Retrograde |
 
 All ICRF perihelion periods divide evenly into the anchor's eight-unit interval, Y₈ = <!--v:eightH-->2,682,536<!--/v--> years (a device construction of the no-chain scaffolding)
 at J2000, so all bodies return simultaneously to their balanced-year
