@@ -86,15 +86,11 @@ function balanceMachinery() {
   if (_balanceHelpersM) return _balanceHelpersM;
   let balM = null;
   const bal = () => { if (!balM) balM = rd('data/balance-presets.json'); return balM; };
-  const planets8 = ['mercury', 'venus', 'earth', 'mars', 'jupiter', 'saturn', 'uranus', 'neptune'];
-  const semiMajor = (p) => (p === 'earth' ? 1 : Math.pow(C.planets[p].solarYearInput / C.meanSolarYearDays, 2 / 3));
-  const dFibo = (p) => (p === 'earth' ? 3 : model.planets[p].fibonacciD);
-  const eccBase = (p) => (p === 'earth' ? C.eccentricityBase : C.planets[p].orbitalEccentricityBase);
-  const antiPhase = (p) => (p === 'earth' ? false : !!model.planets[p].antiPhase);
-  const eccWeightCoeff = (p) => Math.sqrt(C.massFraction[p]) * Math.pow(semiMajor(p), 1.5) / Math.sqrt(dFibo(p));
-  const eccWeight = (p) => eccWeightCoeff(p) * eccBase(p);
-  const inPhaseTotal = () => planets8.filter((p) => !antiPhase(p)).reduce((s, p) => s + eccWeight(p), 0);
-  _balanceHelpersM = { bal, planets8, semiMajor, dFibo, eccBase, antiPhase, eccWeightCoeff, eccWeight, inPhaseTotal };
+  // Plan 07 R5/R6: the weight helpers that stood here (semiMajor, dFibo,
+  // eccBase, antiPhase, eccWeightCoeff, eccWeight, inPhaseTotal) read the
+  // device — the integer divisors and the K law's base eccentricity — and
+  // went with the keys they fed. What is left is the recorded search artifact.
+  _balanceHelpersM = { bal };
   return _balanceHelpersM;
 }
 
@@ -880,38 +876,24 @@ export const VALUES = {
   },
 
   // ── Per-planet eccentricities ───────────────────────────────────────────
-  // 3d SHIPS these (model-parameters: orbitalEccentricityBase locked by the
-  // Law 5 balance constraint, orbitalEccentricityJ2000 the JPL observation);
-  // the website RE-DERIVES its bases from the K constant + phase machinery.
-  // Parity across this family is therefore a live check that the website's
-  // Law-4/5 re-implementation still lands on the shipped values.
-  // Decimal places per planet vary DELIBERATELY on the site (venus/earth/mars
-  // 1dp in VsJ2000 because the deviations are large; the rest 2dp).
+  // What survives here is the OBSERVATION: orbitalEccentricityJ2000, the JPL
+  // value each planet's chain is anchored on.
+  //
+  // Plan 07 R6: `<p>EccBase`, `<p>EccAmp` and `<p>EccVsJ2000` stood beside it
+  // and go with the K law that produced them — the device's System-Reset
+  // construction, base = A·cosθ + √(e² − A²sin²θ) at the J2000 phase. Measured
+  // before removal (plan 07 §9e): scaling the law's outputs by 1.10 moved no
+  // scene position and no published record field, and the three keys had no
+  // consumer in the docs, on the website or in the paper. The note that stood
+  // here called this family "a live check" of the website's own re-derivation;
+  // the website does carry a copy of the law, but nothing renders these keys,
+  // so no check was running.
   ...Object.fromEntries(['mercury', 'venus', 'mars', 'jupiter', 'saturn', 'uranus', 'neptune']
-    .flatMap((p) => [
-      // NB: these live on the engine's composed constants (C.planets — the
-      // K-derivation output), NOT in raw model-parameters.json.
-      [`${p}EccBase`, {
-        get: () => C.planets[p].orbitalEccentricityBase,
-        render: (v) => Number(v).toFixed(5),
-      }],
-      [`${p}EccAmp`, {
-        get: () => C.planets[p].orbitalEccentricityAmplitude,
-        render: (v) => Number(v).toExponential(3),
-        note: 'K-law amplitude',
-      }],
-      [`${p}EccJ2000`, {
-        get: () => C.planets[p].orbitalEccentricityJ2000,
-        render: (v) => Number(v).toFixed(5),
-        note: 'JPL observed',
-      }],
-      [`${p}EccVsJ2000`, {
-        get: () => (C.planets[p].orbitalEccentricityBase
-          / C.planets[p].orbitalEccentricityJ2000 - 1) * 100,
-        render: (v) => fmtSignedPct(v, { venus: 1, mars: 1 }[p] ?? 2),
-        unit: '%',
-      }],
-    ])),
+    .map((p) => [`${p}EccJ2000`, {
+      get: () => C.planets[p].orbitalEccentricityJ2000,
+      render: (v) => Number(v).toFixed(5),
+      note: 'JPL observed',
+    }])),
   earthEccBase: {
     get: () => model.earth.eccentricityBase,
     render: (v) => Number(v).toFixed(5),
@@ -2991,22 +2973,17 @@ export const VALUES = {
   // spreads and the LL residual are campaign snapshots in knownValues
   // (scripts/fibonacci_amd_structure.py, Law 3 verification).
   ...(() => {
-    const { bal, planets8, semiMajor, dFibo, antiPhase, eccWeight } = balanceMachinery();
-    const amdWeights = () => {
-      const w = {};
-      let total = 0;
-      for (const p of planets8) { w[p] = Math.sqrt(semiMajor(p)) / (dFibo(p) ** 2); total += w[p]; }
-      return { w, total };
-    };
+    const { bal } = balanceMachinery();
+    // Plan 07 R5/R6: the keys COMPUTED from the device left with it — the AMD
+    // shares (√a/d², on the retired integer divisors) and the eccentricity
+    // weights (√m·a^1.5/√d · e_base, on the K law's base). Both were
+    // consumer-less, and neither quantity survives the laws that defined its
+    // weighting. What stays below reads `data/balance-presets.json`, the
+    // RECORDED campaign artifact, which outlives the live device: those rows
+    // are the retired framing's evidence record, not a live derivation.
     const out = {
-      // (amdAlpha* removed: the α-scan claim was retired as numerology —
-      // no longer published on the website or in the docs.)
+      // (amdAlpha* removed earlier: the α-scan claim was retired as numerology.)
       laplaceLagrangeResidualDeg: { get: () => astro.knownValues.laplaceLagrangeResidualDeg, render: (v) => String(v), unit: '°', note: 'Σ(i_amp·√m) vs the LL amplitude-sum prediction — Law 3 verification snapshot' },
-      amdShareEarth:   { get: () => { const { w, total } = amdWeights(); return 100 * w.earth / total; }, render: (v) => Number(v).toFixed(1), unit: '%' },
-      amdShareSaturn:  { get: () => { const { w, total } = amdWeights(); return 100 * w.saturn / total; }, render: (v) => Number(v).toFixed(1), unit: '%' },
-      amdShareJupiter: { get: () => { const { w, total } = amdWeights(); return 100 * w.jupiter / total; }, render: (v) => Number(v).toFixed(1), unit: '%' },
-      amdShareEarthSaturn: { get: () => { const { w, total } = amdWeights(); return 100 * (w.earth + w.saturn) / total; }, render: (v) => Number(v).toFixed(0), unit: '%' },
-      amdShareEJS: { get: () => { const { w, total } = amdWeights(); return 100 * (w.earth + w.jupiter + w.saturn) / total; }, render: (v) => Number(v).toFixed(0), unit: '%' },
       balanceInclPct:     { get: () => bal().currentConfig.inclBalance, render: (v) => Number(v).toFixed(4) + '%', note: 'Law 3' },
       balanceEccPct:      { get: () => bal().currentConfig.eccBalance, render: (v) => Number(v).toFixed(4) + '%', note: 'Law 5, BASE eccentricity — the 99.8636 reference value' },
       balanceEccResidualPct: { get: () => 100 - bal().currentConfig.eccBalance, render: (v) => Number(v).toFixed(2) + '%' },
@@ -3014,13 +2991,7 @@ export const VALUES = {
       saturnPredErr:      { get: () => Math.abs(bal().currentConfig.saturnPredErrPct), render: (v) => Number(v).toFixed(2) + '%', note: 'Finding 4 — Saturn e predicted vs observed' },
       balanceThreshold:   { get: () => bal().threshold, render: (v) => Number(v).toFixed(3) + '%' },
       balancePresetCount: { get: () => bal().count, render: (v) => String(v), note: 'threshold-passing configs (the JSON presetCount field is the 15 deep survivors)' },
-      innerFourEccWeight: { get: () => eccWeight('mercury') + eccWeight('venus') + eccWeight('earth') + eccWeight('mars'), render: (v) => Number(v).toFixed(5) },
-      inPhaseEccWeightTotal:   { get: () => planets8.filter((p) => !antiPhase(p)).reduce((s, p) => s + eccWeight(p), 0), render: (v) => Number(v).toFixed(5) },
-      antiPhaseEccWeightTotal: { get: () => planets8.filter(antiPhase).reduce((s, p) => s + eccWeight(p), 0), render: (v) => Number(v).toFixed(5), note: 'Saturn alone' },
     };
-    for (const p of planets8) {
-      out[`${p}EccWeight`] = { get: () => eccWeight(p), render: (v) => Number(v).toFixed(5), note: '√m·a^1.5/√d · e_base' };
-    }
     return out;
   })(),
 
@@ -3033,16 +3004,13 @@ export const VALUES = {
   // June-solstice start convention, the structural companion of JD
   // 2,451,716.5).
   ...(() => {
-    const { bal, planets8, antiPhase, eccWeightCoeff, eccWeight, inPhaseTotal } = balanceMachinery();
+    const { bal } = balanceMachinery();
+    // Plan 07 R5/R6: the Law-5 weight rows that stood here — saturnEccCoeff,
+    // saturnEccPredicted, the in-phase shares and the *Sci twins of the
+    // weight totals — are the scientific-notation forms of the keys removed
+    // above, and go for the same reason. The `bal()` rows that remain are the
+    // recorded configuration search, not a live device derivation.
     const out = {
-      saturnEccCoeff: { get: () => eccWeightCoeff('saturn'), render: (v) => Number(v).toFixed(4) },
-      saturnEccPredicted: { get: () => inPhaseTotal() / eccWeightCoeff('saturn'), render: (v) => Number(v).toFixed(5), note: 'Law 5: in-phase total / Saturn coefficient' },
-      jupiterInPhaseShare: { get: () => 100 * eccWeight('jupiter') / inPhaseTotal(), render: (v) => Number(v).toFixed(0), unit: '%' },
-      uranusInPhaseShare:  { get: () => 100 * eccWeight('uranus') / inPhaseTotal(), render: (v) => Number(v).toFixed(0), unit: '%' },
-      neptuneInPhaseShare: { get: () => 100 * eccWeight('neptune') / inPhaseTotal(), render: (v) => Number(v).toFixed(0), unit: '%' },
-      innerFourEccWeightSci: { get: () => eccWeight('mercury') + eccWeight('venus') + eccWeight('earth') + eccWeight('mars'), render: (v) => fmtSci(v, 1) },
-      inPhaseEccWeightTotalSci: { get: inPhaseTotal, render: (v) => fmtSci(v, 3) },
-      antiPhaseEccWeightTotalSci: { get: () => planets8.filter(antiPhase).reduce((s, p) => s + eccWeight(p), 0), render: (v) => fmtSci(v, 3) },
       configNumber: { get: () => bal().currentConfig.rank, render: (v) => String(v) },
       configSearchSpace: { get: () => bal().searchSpace, render: (v) => thousands(v) },
       configSearchPct: { get: () => 100 / bal().searchSpace, render: (v) => `${Number(v).toFixed(7)}%`, note: 'one configuration out of the exhaustive space' },
@@ -3055,9 +3023,6 @@ export const VALUES = {
       startModelYear: { get: () => C.startmodelYear, render: (v) => String(v) },
       startSolstice: { get: () => 1, render: (v) => String(v), note: 'June-solstice start convention (structural, pairs with startModelJD)' },
     };
-    for (const p of planets8) {
-      out[`${p}EccWeightSci`] = { get: () => eccWeight(p), render: (v) => fmtSci(v, 3) };
-    }
     return out;
   })(),
 
@@ -3164,7 +3129,9 @@ export const VALUES = {
     };
     for (const p of planets7) {
       out[`${p}EccCycle`] = { get: () => C.planets[p].wobblePeriod, render: (v) => thousands(Math.round(v)), unit: 'yr', note: 'since Phase 7 commit 2 the chain\'s OWN g-mode beat (dominant mode × largest companion of the eccentricity vector — the panel\'s "Eccentricity Cycle (g-mode beat)" row), the period the K law rides; the device beat of its integer fractions is retired' };
-      out[`${p}EccPhaseJ2000`] = { get: () => C.planets[p].eccentricityPhaseJ2000, render: (v) => Number(v).toFixed(2), unit: '°' };
+      // (plan 07 R6: `<p>EccPhaseJ2000` was the K law's J2000 phase angle,
+      // 360·t2000/wobble + 90° (270° anti-phase). It goes with the law —
+      // no consumer, and the chain's eccentricity has no single phase.)
       out[`${p}AscNodePeriod`] = { get: () => C.planets[p].ascendingNodePeriod, render: (v) => thousands(Math.round(v)), unit: 'yr' };
       out[`${p}AscNodeN`] = { get: () => Math.round(-8 * C.H / C.planets[p].ascendingNodePeriod), render: (v) => String(v) };
     }
