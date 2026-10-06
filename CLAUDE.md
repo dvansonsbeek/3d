@@ -10,7 +10,7 @@ across 9 directories (~360 on disk with the untracked local archives) · ~245 Py
 **`npm run check` enforces a twenty-four-step gate chain; CI runs it plus a
 headless-browser job and auto-deploys the simulator to GitHub Pages on
 green main.**
-Golden masters live in `packages/fixtures/`. Of the 33 scripts in `tools/verify/`,
+Golden masters live in `packages/fixtures/`. Of the 24 scripts in `tools/verify/`,
 only 5 can actually fail — see the Verification section.
 
 ---
@@ -300,16 +300,15 @@ frames after the click). The wobble-centre gate also pins the Tracing
 round-trip bit-exact) since Phase B** and required in CI; red there is a
 regression of the Phase 6 exit criterion, not a tracked state.
 
-`/gates` runs the standalone model checks. `tools/verify/` holds 33 scripts, and
-**28 of them cannot fail** — no exit path, no assertion, so running them proves
-nothing. `npm run test:verify:list` gives the classification: 5 gate · 3 liftable
-· 12 narrative · 13 generator (the suite FAILS on any unclassified script). The
+`/gates` runs the standalone model checks. `tools/verify/` holds 24 scripts, and
+**19 of them cannot fail** — no exit path, no assertion, so running them proves
+nothing. `npm run test:verify:list` gives the classification: 5 gate · 1 liftable
+· 6 narrative · 12 generator (the suite FAILS on any unclassified script). The
 fifth gate, `scene-year-lengths.js`, samples the Node scene twin at −4000 and
 +10,000 with the solar-measurements exporter's own event definitions and pins
 the measured sidereal, tropical and anomalistic years of date to the one-family
 laws within 30 ms (fail-proven via `ESSRT_SCENE_YEARS_PLANT=1`). **Never
-run a generator as a test** — `balance-search.js` rewrites the tracked
-`data/balance-presets.json`, `nbody-secular.js` rewrites
+run a generator as a test** — `nbody-secular.js` rewrites
 `data/nbody-secular-frequencies.json`, `deep-secular-modes.js` rewrites
 `data/nbody-deep-secular-modes.json`, `secular-series.js` rewrites
 `data/nbody-secular-series.json`, `obliquity-hybrid.js` rewrites
@@ -322,16 +321,23 @@ eclipse-audit / lunar-alignment) rewrite their `data/*.json` under
 `--write` (the latter two REFUSE on divergence; `--rebaseline` is the
 conscious re-measurement path).
 
-**The integer-law retirement.** `verify-laws`, `dual-balance-optimizer` and
-`config1-proof` are narrative class (kept as the record, no longer gates): the
-structural claims they gated — exact eccentricity balance, the Saturn
-e-prediction, Config #7 mirror uniqueness, the node integers — were
-re-evaluated with the engine's own dynamical inputs
-(`tools/explore/balance-with-dynamical-nodes.mjs`; doc 109 is the evidence
-record) and retired. What survives as a documented observation: under the
-retired integer weights the 8-planet eccentricity balance holds to ~98 % with the
-engine's long-term mean eccentricities (99.8636 % was the tuned-inputs
-figure). **The planet chains moved to engine-D elements (the P5 flip,
+**The integer-law retirement, COMPLETED (plan 07 R6).** The structural claims —
+exact eccentricity balance, the Saturn e-prediction, Config #7 mirror
+uniqueness, the node integers — were re-evaluated with the engine's own
+dynamical inputs (doc 109 is the evidence record) and retired; the nine
+instruments that computed them are now DELETED with the ψ/K laws they read
+(`verify-laws`, `balance-search`, `config1-proof`, `configuration-analysis`,
+`dual-balance-optimizer`, `eccentricity-balance`, `epoch-independence`,
+`inclination-verification`, `inclination-optimization`, plus
+`tools/explore/balance-with-dynamical-nodes.mjs`). `docs/retired-record.md` is
+the record. What survives as a documented observation: under the retired
+integer weights the 8-planet eccentricity balance holds to ~98 % with the
+engine's long-term mean eccentricities (99.8636 % was the tuned-inputs figure
+— and note that figure had quietly stopped reproducing: the live construction
+read 99.8717 % at retirement, because upstream inputs moved after the last
+search run and nothing re-recorded the preset, since no gate and no published
+surface read it). `data/balance-presets.json` stays as the frozen search
+record that docs 10/109 cite; it is no longer regenerable. **The planet chains moved to engine-D elements (the P5 flip,
 9aa91a6), and the legacy geometric planet path was EXCISED (K5,
 c0399f6): the chain is the ONLY planet path** — the simulator renders
 the seven planets, their orbit rings, traces, perihelion markers, panels
@@ -383,8 +389,8 @@ long-eccentricity period must track 405.6 kyr / μ^1.153 (the engine-measured
 beat response, W5; 1/μ is the first-order case) under the measured solar
 mass history (currently μ(2.48 Ga) = 1.00 ± 0.07, quoted through the
 conservative first-order slope). The former Config-#7
-criterion (checks 46–50 of `verify-laws`, the mirror-unique configuration in
-`data/balance-presets.json`) is retired with its record.
+criterion (checks 46–50 of the deleted `verify-laws`, the mirror-unique
+configuration in `data/balance-presets.json`) is retired with its record.
 
 ## Skills
 
@@ -411,7 +417,7 @@ what actually made corrections stick here.
 | `src/script.js` | browser scene + UI + formulas (monolith) |
 | `tools/lib/` | Node engine — `scene-graph`, `orbital-engine`, `deep-time`, `constants` |
 | `tools/fit/` | CLI shims for the fitting pipeline — implementations live in `packages/fitting/src` |
-| `tools/verify/` | 33 scripts: 5 gate · 3 liftable · 12 narrative · 13 generator (`npm run test:verify:list`) |
+| `tools/verify/` | 24 scripts: 5 gate · 1 liftable · 6 narrative · 12 generator (`npm run test:verify:list`) |
 | `packages/physics`, `packages/model-values` | the published npm packages (@essrt scope) — the website and world consume these; refits reach them via `values:package:write` + republish |
 | `tools/explore/` | ~200 research one-offs — findings live in `docs/` |
 | `public/input/fitted-coefficients.json` | single source of truth for fitted values |

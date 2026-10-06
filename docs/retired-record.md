@@ -320,6 +320,35 @@ chain with an Export on every chart, and the API, the MCP server and the
 `@essrt/model-values` registry serve every value per epoch. The domain
 redirects to the simulator.
 
+**The balance and Fibonacci-law verification scripts** (`tools/verify/`:
+`verify-laws.js`, `balance-search.js`, `config1-proof.js`,
+`configuration-analysis.js`, `dual-balance-optimizer.js`,
+`eccentricity-balance.js`, `epoch-independence.js`,
+`inclination-verification.js`, `inclination-optimization.js`; and
+`tools/explore/balance-with-dynamical-nodes.mjs`). The documents went at the
+restatement; these are the instruments that computed them, and they go at
+plan 07 R6 with the ψ/K laws themselves. None was a gate — seven were
+narrative class, `balance-search.js` was the generator that wrote
+`data/balance-presets.json`, and the suite's own classification already
+recorded that running them proved nothing.
+
+Each read the retired construction directly: the seven eccentricity-side
+scripts built their base-eccentricity table from `orbitalEccentricityBase`,
+the K law's System-Reset output; the two inclination-side scripts read the ψ
+law's amplitude and mean and the device's divisor periods. With the laws
+deleted there is nothing for them to compute.
+
+One measurement is worth keeping, because it is part of why the construction
+was retired rather than repaired: the Law-5 balance recomputed from the live
+device at retirement read **99.8717 %** (or 99.8704 % on the Kepler axis),
+against the **99.86362 %** recorded in `data/balance-presets.json` from the
+last `balance-search` run, with the Saturn prediction 0.05372653 against
+0.05371910. Upstream inputs had moved after that run and nothing re-recorded
+the preset, because no gate and no published surface read the live
+construction — the reference number had quietly stopped reproducing. The
+engine-input re-evaluation that superseded all of this is doc 109; what
+survives as an observation, not a law, is in doc 10.
+
 ## What this does NOT retire
 
 The lunisolar precession clock — the recession history, the LOD/tide/ΔT

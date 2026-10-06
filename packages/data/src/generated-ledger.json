@@ -3,7 +3,6 @@
   "files": {
     "N-scaling-refinements.json": "tools/explore/refine-N-scaling-formulas.js",
     "action-closure.json": "scripts/action_closure_test.py",
-    "balance-presets.json": "tools/verify/balance-search.js",
     "cenogrid-l1-lattice-extension.json": "scripts/cenogrid_l1_lattice_extension.py",
     "cenogrid-mtm-ftest.json": "scripts/cenogrid_mtm_ftest.py",
     "chirikov-resonance.json": "scripts/chirikov_resonance_test.py",

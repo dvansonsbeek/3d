@@ -1,4 +1,5 @@
 {
+  "_description": "FROZEN RECORD of the retired Law-3/Law-5 balance configuration search. Its generator, tools/verify/balance-search.js, was deleted at plan 07 R6 with the psi/K laws it computed from, so this file is no longer regenerable and is no longer ledgered — it is kept because docs 10 and 109 cite it and because it is the record of the configuration search behind the retired Config-7 claim. Nothing in the engine, the scene or the published packages reads it: the BALANCE_PRESETS constant it still feeds has had no consumer since the K8b-2 restatement, and the registry rows built on it have none. NOTE: the eccBalance recorded here (99.86362) no longer reproduces from the live construction, which read 99.8717 at retirement — upstream inputs moved after the last search run and nothing re-recorded it. See docs/retired-record.md.",
   "generated": "2026-08-06T20:39:26.976Z",
   "threshold": 99.994,
   "searchSpace": 7558272,
