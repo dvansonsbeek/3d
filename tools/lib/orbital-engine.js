@@ -182,62 +182,22 @@ function computePlanetObliquity(planetName, year) {
   return eps === null ? ch.obliquityJ2000Deg : eps;
 }
 
-/**
- * Compute planet inclination tilt relative (deviation from mean).
- * For Earth: H/3 component. For planets: inclination(t) - inclinationMean.
- *
- * @param {string} planetName - planet key or 'earth'
- * @param {number} currentYear - decimal year
- * @returns {number} relative deviation in degrees
- */
-function computeInclinationTiltRelative(planetName, currentYear) {
-  if (planetName === 'earth') {
-    return computeObliquityIntegrals(currentYear).component3;
-  }
-  const p = C.planets[planetName];
-  if (!p) return 0;
-  const incl = computePlanetInvPlaneInclinationDynamic(planetName, currentYear);
-  return incl - p.invPlaneInclinationMean;
-}
-
-/**
- * Compute axial tilt absolute for any planet.
- * For Earth: earthtiltMean + H/8 component.
- * For planets: obliquity - inclination deviation = the axial component.
- *
- * @param {string} planetName - planet key or 'earth'
- * @param {number} currentYear - decimal year
- * @returns {number} axial tilt in degrees
- */
-function computeAxialTiltAbsolute(planetName, currentYear) {
-  if (planetName === 'earth') {
-    return C.earthtiltMean + computeObliquityIntegrals(currentYear).component8;
-  }
-  const p = C.planets[planetName];
-  if (!p) return 0;
-  // For planets: axial component = obliquity - inclination deviation
-  // At J2000: axialTiltJ2000 - 0 = axialTiltJ2000 ✓
-  const inclRel = computeInclinationTiltRelative(planetName, currentYear);
-  const obliq = computePlanetObliquity(planetName, currentYear);
-  return obliq - inclRel;
-}
-
-/**
- * Compute axial tilt relative (deviation from mean) for any planet.
- * For Earth: H/8 component. For planets: axialTilt(t) - axialTiltJ2000.
- *
- * @param {string} planetName - planet key or 'earth'
- * @param {number} currentYear - decimal year
- * @returns {number} relative deviation in degrees
- */
-function computeAxialTiltRelative(planetName, currentYear) {
-  if (planetName === 'earth') {
-    return computeObliquityIntegrals(currentYear).component8;
-  }
-  const p = C.planets[planetName];
-  if (!p) return 0;
-  return computeAxialTiltAbsolute(planetName, currentYear) - p.axialTiltJ2000;
-}
+// Plan 07 R5: computeInclinationTiltRelative / computeAxialTiltAbsolute /
+// computeAxialTiltRelative stood here. They were a closed cluster — each
+// called only the next — exported but called by NOTHING: no consumer in
+// src/, tools/, packages/ or test/, and no row in the 834-value tools-lib
+// golden. They built a planet's axial tilt of date as
+// obliquity(t) − [i_invPlane(t) − i_mean], with i(t) from the psi device and
+// i_mean the device's near-J2000 mean, and their own comment asserted "at
+// J2000: axialTiltJ2000 − 0" — which was never true, because the device's
+// deviation at J2000 is A·cos(ϖ − anchor), not zero.
+//
+// Measured before removal: the construction disagreed with the IAU J2000
+// axial tilts the model anchors on (Mercury 0.390° against 0.03°, Mars
+// 25.394° against 25.19°, Saturn 26.791° against 26.73°), while the model's
+// OWN spin channel — planets/spin-channel.cjs, each planet's torques on the
+// chain's orbit — reproduces them (0.0340°, 25.1916°, 26.7312°). The quantity
+// survives and has one home: `model.planets.spin(k).obliquityDegAtYear(y)`.
 
 // ═══════════════════════════════════════════════════════════════════════════
 // ECCENTRICITY
@@ -1138,9 +1098,6 @@ module.exports = {
   computeObliquityEarth,
   computeObliquityIntegrals,
   computePlanetObliquity,
-  computeInclinationTiltRelative,
-  computeAxialTiltAbsolute,
-  computeAxialTiltRelative,
 
   // Eccentricity
   computeEccentricity,

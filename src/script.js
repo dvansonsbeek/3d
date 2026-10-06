@@ -9056,9 +9056,6 @@ let o = {
   saturnEclipticInclinationDynamic: 0,
   uranusEclipticInclinationDynamic: 0,
   neptuneEclipticInclinationDynamic: 0,
-  plutoEclipticInclinationDynamic: 0,
-  halleysEclipticInclinationDynamic: 0,
-  erosEclipticInclinationDynamic: 0,
 
   // Dynamic ecliptic inclination using Souami & Souchay (2012) ascending nodes
   // For comparison with original published data
@@ -9069,9 +9066,6 @@ let o = {
   saturnEclipticInclinationSouamiSouchayDynamic: 0,
   uranusEclipticInclinationSouamiSouchayDynamic: 0,
   neptuneEclipticInclinationSouamiSouchayDynamic: 0,
-  plutoEclipticInclinationSouamiSouchayDynamic: 0,
-  halleysEclipticInclinationSouamiSouchayDynamic: 0,
-  erosEclipticInclinationSouamiSouchayDynamic: 0,
 
   // Fibonacci Balance (dynamic, updated each frame)
 
@@ -54732,10 +54726,10 @@ function updateDynamicInclinations() {
   o.saturnInvPlaneInclinationDynamic = _kcElementsOfDate('saturn', o.julianDay).inclInvPlaneDeg;
   o.uranusInvPlaneInclinationDynamic = _kcElementsOfDate('uranus', o.julianDay).inclInvPlaneDeg;
   o.neptuneInvPlaneInclinationDynamic = _kcElementsOfDate('neptune', o.julianDay).inclInvPlaneDeg;
-  o.plutoInvPlaneInclinationDynamic = computePlanetInvPlaneInclinationDynamic('pluto', o.currentYear);
-  o.halleysInvPlaneInclinationDynamic = computePlanetInvPlaneInclinationDynamic('halleys', o.currentYear);
-  o.erosInvPlaneInclinationDynamic = computePlanetInvPlaneInclinationDynamic('eros', o.currentYear);
-  o.ceresInvPlaneInclinationDynamic = computePlanetInvPlaneInclinationDynamic('ceres', o.currentYear);
+  // (Pluto, Halley, Eros and Ceres read the psi device here. The first three
+  // left the model with the no-chain bodies and Ceres is a force-only
+  // perturber that is never drawn, so all four outputs were dead — Ceres's
+  // had no reader at all. Plan 07 R5.)
 
   // Plan 06 Phase 7 commit 2: the planets' obliquity OF DATE from the spin
   // channel (ONE home @essrt/physics/planets/spin-channel, through the package
@@ -54800,10 +54794,7 @@ function updateDynamicInclinations() {
     { key: 'jupiter', incl: o.jupiterInvPlaneInclinationDynamic, ascNodeSS: o.jupiterAscendingNodeInvPlaneSouamiSouchay, ascNodeVerified: o.jupiterAscendingNodeInvPlane },
     { key: 'saturn',  incl: o.saturnInvPlaneInclinationDynamic,  ascNodeSS: o.saturnAscendingNodeInvPlaneSouamiSouchay,  ascNodeVerified: o.saturnAscendingNodeInvPlane },
     { key: 'uranus',  incl: o.uranusInvPlaneInclinationDynamic,  ascNodeSS: o.uranusAscendingNodeInvPlaneSouamiSouchay,  ascNodeVerified: o.uranusAscendingNodeInvPlane },
-    { key: 'neptune', incl: o.neptuneInvPlaneInclinationDynamic, ascNodeSS: o.neptuneAscendingNodeInvPlaneSouamiSouchay, ascNodeVerified: o.neptuneAscendingNodeInvPlane },
-    { key: 'pluto',   incl: o.plutoInvPlaneInclinationDynamic,   ascNodeSS: o.plutoAscendingNodeInvPlaneSouamiSouchay,   ascNodeVerified: o.plutoAscendingNodeInvPlane },
-    { key: 'halleys', incl: o.halleysInvPlaneInclinationDynamic, ascNodeSS: o.halleysAscendingNodeInvPlaneSouamiSouchay, ascNodeVerified: o.halleysAscendingNodeInvPlane },
-    { key: 'eros',    incl: o.erosInvPlaneInclinationDynamic,    ascNodeSS: o.erosAscendingNodeInvPlaneSouamiSouchay,    ascNodeVerified: o.erosAscendingNodeInvPlane }
+    { key: 'neptune', incl: o.neptuneInvPlaneInclinationDynamic, ascNodeSS: o.neptuneAscendingNodeInvPlaneSouamiSouchay, ascNodeVerified: o.neptuneAscendingNodeInvPlane }
   ];
 
   for (const { key, incl, ascNodeSS, ascNodeVerified } of planetConfigs) {
