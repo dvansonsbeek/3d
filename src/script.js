@@ -5045,38 +5045,17 @@ for (const k of PLANET_KEYS) {
   _planetWobblePeriodJ2000[k]  = P_wobble_J2000;
 }
 
-// ───── Phase P-C0 — Perihelion ecliptic 8H/N divisor + sign tables ─────
-// docs/archive/old-documents/IP-planet-deep-time-scene-graph.md
-//
-// Each planet's perihelion ecliptic period satisfies the Law-6 invariant
-// |periEclipticYears| = 8H_J2000 / N for a fixed positive integer N:
-//   Mercury 11, Venus 6, Mars 36, Jupiter 39, Saturn 65, Uranus 24, Neptune 4
-// Venus and Saturn have *retrograde* perihelion ecliptic precession (their
-// raw PERIHELION_ECLIPTIC_YEARS_J2000 entries are negative); the rest are
-// prograde. We split the table into |N| (always positive) + sign so the
-// `_dtCycleN` dispatch (which requires positive N) can consume |N| while
-// the existing `_dtCycleSign` carries the direction.
-//
-// Consumed by Phase P-C1+ when tagging
-// `*PerihelionDurationEcliptic1/2._dtCycleN`. The 8H/N invariant is validated
-// at module load below — any planet whose periEclipticYears doesn't lie on the
-// lattice will emit a `console.error`. The "Verify Perihelion Ecliptic Frame
-// Pairs" button exercises the resulting tags end-to-end.
-const _planetPerihelionDivisors = {};
-const _planetPerihelionSigns    = {};
-for (const k of PLANET_KEYS) {
-  const periEclipticYears = PERIHELION_ECLIPTIC_YEARS_J2000[k];
-  const sign = Math.sign(periEclipticYears);
-  const N    = Math.round((8 * HOLISTIC_YEAR_J2000) / Math.abs(periEclipticYears));
-  // Verify Law-6 8H/N invariant: |recovered − actual| / |actual| ≤ 1e-6.
-  const recovered = sign * (8 * HOLISTIC_YEAR_J2000) / N;
-  const relErr    = Math.abs(recovered - periEclipticYears) / Math.abs(periEclipticYears);
-  if (relErr > 1e-6) {
-    console.error(`Phase P-C0: planet ${k} perihelion ecliptic period ${periEclipticYears} not on the eight-unit divisor grid (sign=${sign}, N=${N}, recovered=${recovered}, relErr=${relErr})`);
-  }
-  _planetPerihelionDivisors[k] = N;
-  _planetPerihelionSigns[k]    = sign;
-}
+// ───── R7 (plan 07) — the LAW-6 GUARD is retired ─────
+// A table of integers N with Mercury 11, Venus 6, Mars 36, Jupiter 39,
+// Saturn 65, Uranus 24, Neptune 4 stood here, recomputed at module load from
+// 8H / |periEclipticYears| and console.error'd if any planet had drifted off
+// the eight-unit divisor grid. The plan is explicit that such a guard is not
+// to be relaxed but deleted — "a guard that enforces a retired law is worse
+// than none" — and there is now nothing for it to enforce: the planets'
+// periods are the chain's secular eigenfrequencies (1,296,000/g and /s) and
+// lie on no grid. Its two outputs fed the wheels' _dtCycleN tagging and the
+// per-planet _dtPerihelionDivisor, both of which are gone; the Sun's own
+// divisor is a literal 16 and never came from here.
 
 // DELETED: EARTH_ECC_DIVISOR_N = 16 (Earth perihelion cycle, H/16). Declared and
 // never referenced. The live H/16 relationship is carried by
@@ -8998,20 +8977,14 @@ neptune._dtPlanetSign       = Math.sign(neptune.speed);
 // θ (P-B1+) uses _currentYearSI_TT. The mixed-coordinate M error is bounded
 // by ω_peri × ΔT, which for Mercury at year -584 is ~8e-7° — utterly
 // negligible. No conditional dispatch needed.
-mercury._dtPerihelionDivisor = (_planetPerihelionDivisors.mercury / 8) * _planetPerihelionSigns.mercury;  // = +1.375
-mercury._dtPerihelionAnchor  = STARTMODEL_YEAR_SI;
-venus._dtPerihelionDivisor   = (_planetPerihelionDivisors.venus   / 8) * _planetPerihelionSigns.venus;    // = -0.75  (retrograde)
-venus._dtPerihelionAnchor    = STARTMODEL_YEAR_SI;
-mars._dtPerihelionDivisor    = (_planetPerihelionDivisors.mars    / 8) * _planetPerihelionSigns.mars;     // = +4.5
-mars._dtPerihelionAnchor     = STARTMODEL_YEAR_SI;
-jupiter._dtPerihelionDivisor = (_planetPerihelionDivisors.jupiter / 8) * _planetPerihelionSigns.jupiter;  // = +4.875
-jupiter._dtPerihelionAnchor  = STARTMODEL_YEAR_SI;
-saturn._dtPerihelionDivisor  = (_planetPerihelionDivisors.saturn  / 8) * _planetPerihelionSigns.saturn;   // = -8.125 (retrograde)
-saturn._dtPerihelionAnchor   = STARTMODEL_YEAR_SI;
-uranus._dtPerihelionDivisor  = (_planetPerihelionDivisors.uranus  / 8) * _planetPerihelionSigns.uranus;   // = +3
-uranus._dtPerihelionAnchor   = STARTMODEL_YEAR_SI;
-neptune._dtPerihelionDivisor = (_planetPerihelionDivisors.neptune / 8) * _planetPerihelionSigns.neptune;  // = +0.5
-neptune._dtPerihelionAnchor  = STARTMODEL_YEAR_SI;
+// R7: the seven chain planets' _dtPerihelionDivisor / _dtPerihelionAnchor tags
+// stood here, carrying (N/8)·sign off the 8H/N grid. They are gone because the
+// branch that read them — the equation-of-centre phase in the update loop —
+// "now serves the Moon, Pluto and the no-chain bodies only" since K5 put the
+// chain planets on their own elements. MEASURED before removing: commenting
+// all fourteen moves nothing across the browser goldens. The Sun keeps its own
+// sun._dtPerihelionDivisor = 16, which is a literal and never came from the
+// Law-6 grid.
 
 //*************************************************************
 // ADD CONSTANTS
@@ -35433,111 +35406,6 @@ function setupGUI() {
      'startmodelJD, and TT-vs-UT shift at year -584 against dry-run ' +
      'predictions. Same button used for P-B1 through P-B7 — output adapts ' +
      'to whichever planets are currently tagged.');
-
-  // ────────────────────────────────────────────────────────────────────────
-  // P-D verification — per-planet _dtPerihelionDivisor for eq-of-center.
-  // Signed divisor: positive N for prograde, negative N for retrograde.
-  // ────────────────────────────────────────────────────────────────────────
-  addTestButton('Verify Perihelion Phase (Eq-of-Center)', () => {
-    console.log('\n══════════════════════════════════════════════════════════════════════════════════');
-    console.log('  Phase P-D verification — per-planet _dtPerihelionDivisor');
-    console.log('  Signed divisor (- for retrograde Venus/Saturn). Dispatch uses UT (OK).');
-    console.log('══════════════════════════════════════════════════════════════════════════════════\n');
-
-    let passCount = 0, failCount = 0;
-    const note = (label, ok, detail) => {
-      ok ? passCount++ : failCount++;
-      console.log(`  ${ok ? '✓' : '✗'} ${label}` + (detail ? `    ${detail}` : ''));
-    };
-
-    // CORRECTED 2026-06-20: divisor for cyclesBetweenYears is N/8, not N
-    // (perihelion ecliptic period = 8H/N → H-form divisor = N/8).
-    const PLANETS = [
-      { key: 'mercury', obj: mercury, expectedDivisor: +11 / 8 },   // +1.375
-      { key: 'venus',   obj: venus,   expectedDivisor:  -6 / 8 },   // -0.75 (retrograde)
-      { key: 'mars',    obj: mars,    expectedDivisor: +36 / 8 },   // +4.5
-      { key: 'jupiter', obj: jupiter, expectedDivisor: +39 / 8 },   // +4.875
-      { key: 'saturn',  obj: saturn,  expectedDivisor: -65 / 8 },   // -8.125 (retrograde)
-      { key: 'uranus',  obj: uranus,  expectedDivisor: +24 / 8 },   // +3
-      { key: 'neptune', obj: neptune, expectedDivisor:  +4 / 8 },   // +0.5
-    ];
-
-    const jdOf = (Y, M, D, h = 12) => {
-      const isJulian = (Y < 1582) || (Y === 1582 && (M < 10 || (M === 10 && D < 15)));
-      let y = Y, m = M;
-      if (m <= 2) { y -= 1; m += 12; }
-      const A = Math.floor(y / 100);
-      const B = isJulian ? 0 : (2 - A + Math.floor(A / 4));
-      return Math.floor(365.25 * (y + 4716)) + Math.floor(30.6001 * (m + 1)) + D + B - 1524.5 + h / 24;
-    };
-    const y_thales_SI = _jdToSIyear(jdOf(-584, 5, 28, 12));
-
-    // ── Test 1: tag fields ──
-    console.log('TEST 1 — _dtPerihelionDivisor + _dtPerihelionAnchor set correctly per planet');
-    for (const p of PLANETS) {
-      const divOk    = p.obj._dtPerihelionDivisor === p.expectedDivisor;
-      const anchorOk = p.obj._dtPerihelionAnchor === STARTMODEL_YEAR_SI;
-      const label    = `${p.key.padEnd(8)} divisor=${p.obj._dtPerihelionDivisor} (exp ${p.expectedDivisor}), anchor matches`;
-      note(label, divOk && anchorOk);
-    }
-
-    // ── Test 2: J2000 bit-equivalence ──
-    console.log('\nTEST 2 — at startmodelJD: _pCycles === 0 → perihelionPhase === perihelionPhaseJ2000');
-    for (const p of PLANETS) {
-      const cyc = cyclesBetweenYears(STARTMODEL_YEAR_SI, STARTMODEL_YEAR_SI, p.obj._dtPerihelionDivisor);
-      note(`${p.key.padEnd(8)} cycles at anchor = ${cyc.toExponential(2)} (< 1e-9 required)`,
-           Math.abs(cyc) < 1e-9);
-    }
-
-    // ── Test 3: Deep-time signed evolution + snapshot comparison ──
-    // CRITICAL: also compare against the SNAPSHOT perihelionPhase shift to
-    // catch divisor-magnitude bugs (the factor-of-8 bug that caused the P-D
-    // revert on 2026-06-20). Sign-only checks aren't enough.
-    console.log('\nTEST 3 — at year -584: integrator vs snapshot perihelion phase shift');
-    const pos_thales = y_thales_SI - STARTMODEL_YEAR_SI;
-    for (const p of PLANETS) {
-      const cyc = cyclesBetweenYears(STARTMODEL_YEAR_SI, y_thales_SI, p.obj._dtPerihelionDivisor);
-      const shift_int_rad = cyc * 2 * Math.PI;
-      const shift_snap_rad = (p.obj.perihelionPrecessionRate || 0) * pos_thales;
-      const diff_rad = shift_int_rad - shift_snap_rad;
-      const shift_int_deg = shift_int_rad * 180 / Math.PI;
-      const shift_snap_deg = shift_snap_rad * 180 / Math.PI;
-      const match = Math.abs(diff_rad) < 0.001;  // <1 mrad ≈ sub-mas at planet scale
-      note(`${p.key.padEnd(8)} integrator=${shift_int_deg.toFixed(3)}°, snapshot=${shift_snap_deg.toFixed(3)}°, diff=${(diff_rad*180/Math.PI).toExponential(2)}°`,
-           match);
-    }
-
-    // ── Test 4: Sun's existing tag still intact ──
-    console.log('\nTEST 4 — regression: Sun\'s existing _dtPerihelionDivisor = 16 unchanged');
-    note(`sun._dtPerihelionDivisor === 16 (was tagged in earlier Phase 9.x)`,
-         sun._dtPerihelionDivisor === 16);
-    note(`sun._dtPerihelionAnchor === STARTMODEL_YEAR_SI`,
-         sun._dtPerihelionAnchor === STARTMODEL_YEAR_SI);
-
-    // ── Test 5: Moon not tagged ──
-    console.log('\nTEST 5 — regression: Moon-chain unaffected');
-    note(`moon._dtPerihelionDivisor is undefined (Moon doesn\'t use eq-of-center perihelion)`,
-         moon._dtPerihelionDivisor === undefined);
-
-    // ── Summary ──
-    console.log('\n══════════════════════════════════════════════════════════════════════════════════');
-    console.log(`  SUMMARY:  ${passCount} passed, ${failCount} failed`);
-    if (failCount === 0) {
-      console.log('  ✓ All 7 planets tagged. Visual verification REQUIRED:');
-      console.log('    1. Each planet at modern epoch — position unchanged (perihelion at anchor = perihelionPhaseJ2000).');
-      console.log('    2. Planet eccentricity wobble unchanged at modern epoch.');
-      console.log('    3. Deep-time scrub: planets remain in continuous motion, position may shift slightly');
-      console.log('       compared to pre-P-D snapshot path (sub-degree for inner planets at year -584).');
-      console.log('    4. Sun + Moon positions unchanged.');
-      console.log('  After visual confirmation: P-D complete. P-E (composition audit, read-only) next.');
-    } else {
-      console.log('  ✗ Phase P-D FAILED — revert the per-planet _dtPerihelionDivisor block and diagnose.');
-    }
-    console.log('══════════════════════════════════════════════════════════════════════════════════');
-  }, 'Phase P-D verification: confirms _dtPerihelionDivisor + _dtPerihelionAnchor ' +
-     'are set correctly per planet (signed divisor for retrograde), J2000 ' +
-     'bit-equivalence holds, deep-time perihelion phase evolves with the ' +
-     'correct sign, and existing Sun + Moon tags are unaffected.');
 
   // ────────────────────────────────────────────────────────────────────────
   // Composition audit — walk each planet's full scene-graph chain and
