@@ -590,9 +590,14 @@ right-ascension rate of the perihelion marker in the retired geometric scene
 | Saturn | Planet | Full Keplerian | Ring system |
 | Uranus | Planet | Full Keplerian | Extreme axial tilt |
 | Neptune | Planet | Full Keplerian | - |
-| Pluto | Dwarf | Full Keplerian | Optional visibility |
-| Halley's Comet | Comet | Full Keplerian | Optional, 76-year orbit |
-| Eros (433) | Asteroid | Full Keplerian | Optional |
+
+Pluto, Halley's Comet and Eros were rendered here until the no-chain bodies
+were removed: they had no element chain, and all four no-chain bodies shared
+one placeholder perihelion fraction — a single 27,943-yr period standing in
+for four unrelated orbits, against Pluto's true apsidal period of order
+3.7 Myr. Pluto's mass, semi-major axis and node remain as INPUTS to the
+invariable-plane angular-momentum sum, which follows Souami & Souchay's
+ten-body convention; Ceres remains a force-only perturber in the N-body run.
 
 ---
 

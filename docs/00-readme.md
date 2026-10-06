@@ -58,7 +58,7 @@ and why.
 |---|----------|-------------|
 | 04 | [Orbital Elements: the Chain and the Devices](04-dynamic-elements-overview.md) | The three tiers: the Keplerian chain (THE planet path — source-of-truth doctrine, elements of date, secular shapes), the engine-K hierarchy (Earth/Moon/Sun), and the no-chain bodies |
 | 05 | [The Invariable Plane](05-invariable-plane-overview.md) | The plane the model banks from its own chain artifact (K5c s-frame + derived Souami & Souchay origin conversion), heights, nodes, crossings, and the two live self-checks |
-| 31 | [Geometric Orbital Elements — the No-Chain Bodies](31-no-chain-body-elements.md) | The inclination-oscillation and node-regression device for Pluto/Halley/Eros, Earth's engine-K devices, and the probe-pinned reference implementations |
+| 31 | [Geometric Orbital Elements — the No-Chain Bodies](31-no-chain-body-elements.md) | The inclination-oscillation and node-regression device for Ceres's reference constants, Earth's engine-K devices, and the probe-pinned reference implementations |
 | 68 | [Orbital Period Calibration](68-orbital-period-calibration.md) | The legacy device-chain period calibration against ancient observations (the rendered planets read the chain) |
 | 72 | [The Closed Loop](72-the-closed-loop.md) | How PSI and K derive the orbital-oscillation amplitudes from Earth alone — the retired law framework's construction record |
 

@@ -19,7 +19,7 @@ inspector is computed on its own path.
 
 **Related documentation:**
 - [41 — Scene graph hierarchy](41-scene-graph-hierarchy.md) — the engine frame of date and the chain placement
-- [31 — Geometric orbital elements, the no-chain bodies](31-no-chain-body-elements.md) — Pluto, Halley and Eros keep the device construction and are not in the inspector
+- [31 — Geometric orbital elements, the no-chain bodies](31-no-chain-body-elements.md) — the geometric device that remains for Ceres's reference constants and Earth's engine-K devices (Pluto, Halley and Eros were removed with it)
 - [52 — Analysis and export tools](52-analysis-export-tools.md) — the position report
 
 ---

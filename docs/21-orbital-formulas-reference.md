@@ -98,7 +98,7 @@ For the full derivation including the physical interpretation of the Δa correct
 
 ### 1.2 Per-Planet Static Constants
 
-For each planet (Mercury, Venus, Mars, Jupiter, Saturn, Uranus, Neptune, Pluto, Halley's, Eros):
+For each planet (Mercury, Venus, Mars, Jupiter, Saturn, Uranus, Neptune):
 
 For current values, see [Constants Reference](20-constants-reference.md).
 

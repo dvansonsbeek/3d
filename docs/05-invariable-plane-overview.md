@@ -65,7 +65,7 @@ For the **chain bodies** (the seven planets and Earth), each frame:
 
 Implementation: `updatePlanetInvariablePlaneHeights()` in [src/script.js](../src/script.js), fed by the Keplerian chain (`@essrt/physics/planets/keplerian-chain`).
 
-For the **no-chain bodies** (Pluto, Halley, Eros — legacy scene scaffolding, see [doc 04](04-dynamic-elements-overview.md)), the geometric construction remains:
+The **no-chain bodies** (Pluto, Halley, Eros) used the geometric construction below and have since been removed — see [doc 04](04-dynamic-elements-overview.md). It is kept here as the record of how a body without an element chain was placed:
 
 ```
 height = sin(i_inv) × sin(angleFromNode) × distance
@@ -166,7 +166,7 @@ Enable via **Celestial Tools > Earth Inclination to Invariable plane**: a transl
 ## Summary
 
 - The invariable plane is fixed, physics-defined, and giant-planet-dominated; the model banks **its own** plane from the chain artifact and expresses node longitudes in the Souami & Souchay origin via a derived, zero-fitted-constant conversion (0.0001° vs La2010 at J2000).
-- Chain bodies get exact projected heights (`r⃗ · ẑ_inv`) and element-of-date nodes; only the no-chain bodies (Pluto, Halley, Eros) keep the geometric sin(i)·sin(u)·r construction.
+- Every rendered body now gets exact projected heights (`r⃗ · ẑ_inv`) and element-of-date nodes from the chain; the geometric sin(i)·sin(u)·r construction went with the no-chain bodies.
 - Inclination and node are two distinct angles at two distinct rates — for Earth: i_inv on the H/3 ICRF-perihelion cycle, Ω at −H/5 — and every planet still crosses the plane twice per orbit regardless of tilt.
 - Two live self-checks (angular-momentum Option A vs B, mass-weighted balance) continuously verify the geometry.
 

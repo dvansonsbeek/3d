@@ -20,9 +20,9 @@ three tiers, and knowing which body sits on which tier answers most
    certified historical-era devices: Earth's spin/tides/H(t) machinery
    and the Moon's 3D precession hierarchy. This is the two-engine
    interface; the historical gate suite is calibrated on it.
-3. **The no-chain bodies — Pluto, Halley's Comet, Eros.** Legacy scene
-   scaffolding: the geometric elements device documented in
-   [doc 31](31-no-chain-body-elements.md).
+3. **The geometric elements device.** What is left of it after the no-chain
+   bodies went: Ceres's reference constants and Earth's engine-K devices,
+   documented in [doc 31](31-no-chain-body-elements.md).
 
 ---
 
@@ -118,14 +118,22 @@ geometrically from `matrixWorld` rather than analytically. See
 [doc 66](66-moon-meeus-corrections.md) for the Moon's correction
 framework.
 
-## Tier 3: The No-Chain Bodies (Pluto, Halley's, Eros)
+## Tier 3: What remains of the geometric elements device
 
-These render from the geometric elements device — the inclination
-oscillation law, the two-normal ecliptic inclination, and the
-tilt-derived ecliptic node — documented in full in
-[doc 31](31-no-chain-body-elements.md). The same document covers the
-probe-pinned reference implementations and the fitted J2000 constants
-they carry.
+Pluto, Halley's Comet and Eros rendered from this device — the inclination
+oscillation law, the two-normal ecliptic inclination, and the tilt-derived
+ecliptic node. They are gone: there was no element chain behind them, and
+all four no-chain bodies shared one placeholder perihelion fraction, so all
+four published a single 27,943-yr period for four unrelated orbits (Pluto's
+true apsidal period is of order 3.7 Myr). Nothing gated them and nothing
+published them.
+
+What the device still carries is documented in
+[doc 31](31-no-chain-body-elements.md): Ceres's reference constants — it is
+a force-only perturber in the N-body run — Earth's engine-K devices, and the
+probe-pinned reference implementations. Pluto's observed mass and node also
+survive as INPUTS to the invariable-plane angular-momentum sum, which follows
+Souami & Souchay's ten-body convention.
 
 ---
 
