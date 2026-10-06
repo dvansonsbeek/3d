@@ -42,10 +42,10 @@ const env = {
     earthInvPlaneInclinationAmplitude: C.earthInvPlaneInclinationAmplitude,
     massEarthAlone: C.GM_EARTH_ALONE / C.G_CONSTANT,
     // The planted violation: 1 ULP on the Sun mass must surface as mismatches
-    // in ψ- and K-family outputs across every carrier.
+    // in the ψ-family outputs across every carrier. (Plan 07 R6: the K family
+    // is retired, so eccentricityAmplitude and earthTiltMeanDeg — its two
+    // calibration inputs — are no longer part of this env.)
     massSun: plant ? C.M_SUN * (1 + 2.3e-16) : C.M_SUN,
-    eccentricityAmplitude: C.eccentricityAmplitude,
-    earthTiltMeanDeg: C.earthtiltMean,
   },
   massFractions: C.massFraction,
 };
@@ -106,8 +106,7 @@ const cmp = (label, expected, actual) => {
   }
 };
 
-cmp('kConstant', C.eccentricityAmplitudeK, model.kConstant);
-cmp('eccentricityAnchor', C.eccentricityAnchor, model.eccentricityAnchor);
+// (Plan 07 R6: kConstant and eccentricityAnchor left with the K law.)
 
 for (const [key, p] of Object.entries(C.planets)) {
   const rec = model.bodies[key];
@@ -115,9 +114,9 @@ for (const [key, p] of Object.entries(C.planets)) {
   cmp(`${key}.invPlaneInclinationMean`, p.invPlaneInclinationMean, rec.invPlaneInclinationMean);
   cmp(`${key}.wobblePeriod`, p.wobblePeriod, rec.wobblePeriodYears);
   cmp(`${key}.obliquityMean`, p.obliquityMean, rec.obliquityMeanDeg);
-  cmp(`${key}.eccAmplitude`, p.orbitalEccentricityAmplitude, rec.eccentricityAmplitude);
-  cmp(`${key}.eccBase`, p.orbitalEccentricityBase, rec.eccentricityBase);
-  cmp(`${key}.eccPhaseJ2000`, p.eccentricityPhaseJ2000, rec.eccentricityPhaseJ2000Deg);
+  // (Plan 07 R6: the eccAmplitude / eccBase / eccPhaseJ2000 triple went with
+  // the K law. The ψ pair above still crosses the twins, and the 1-ULP plant
+  // still surfaces through it.)
   const d = C.derived[key];
   cmp(`${key}.solarYearCount`, d.solarYearCount, rec.geometry.solarYearCount);
   cmp(`${key}.orbitDistance`, d.orbitDistance, rec.geometry.orbitDistance);

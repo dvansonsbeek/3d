@@ -52,7 +52,8 @@ EARTH_INCLINATION_AMPLITUDE = C['earthInvPlaneInclinationAmplitude']
 EARTH_RA_ANGLE = C['earthRAAngle']
 EARTH_BASE_ECCENTRICITY = C['eccentricityBase']
 EARTH_ECCENTRICITY_AMPLITUDE = C['eccentricityAmplitude']
-EARTH_ECCENTRICITY_K = C['eccentricityAmplitudeK']
+# (plan 07 R6: EARTH_ECCENTRICITY_K — the K constant inverted from Earth's
+# calibration — went with the K law; it had no consumer outside this module.)
 
 # Derived
 PERIHELION_CYCLE_LENGTH = C['perihelionCycleLength']

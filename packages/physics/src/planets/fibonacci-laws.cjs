@@ -72,37 +72,24 @@ function computeInclinationLaw(b, psiConstant) {
 // obliquity input the derived J2000 obliquity (spin-channel
 // computeObliquityJ2000Deg). docs/retired-record.md carries the record.)
 
-/**
- * K constant from Earth's calibration. @param {{
- *   eccentricityAmplitude: number, massEarthAlone: number, massSun: number,
- *   earthTiltMeanDeg: number }} c @returns {number} */
-function computeKConstant(c) {
-  return c.eccentricityAmplitude * Math.sqrt(c.massEarthAlone / c.massSun)
-    / (Math.sin(c.earthTiltMeanDeg * Math.PI / 180) * Math.sqrt(3));
-}
-
-/**
- * K law: eccentricity amplitude, base and J2000 phase.
- * @param {{ fibonacciD: number, massFrac: number, solarYearInput: number,
- *   orbitalEccentricityJ2000: number, antiPhase: boolean }} b
- * @param {{ kConstant: number, obliquityMeanDeg: number,
- *   wobblePeriodYears: number, t2000: number, meanSolarYearDays: number }} env
- * @returns {{ amplitude: number, base: number, phaseJ2000: number }} */
-function computeEccentricityLaw(b, env) {
-  const a = Math.pow(b.solarYearInput / env.meanSolarYearDays, 2 / 3);
-  const amplitude = env.kConstant * Math.sin(Math.abs(env.obliquityMeanDeg) * Math.PI / 180) * Math.sqrt(b.fibonacciD)
-    / (Math.sqrt(b.massFrac) * Math.pow(a, 1.5));
-  const eJ2000 = b.orbitalEccentricityJ2000;
-  const phaseOffset = b.antiPhase ? 270 : 90;
-  const phaseDeg = (env.t2000 / env.wobblePeriodYears) * 360 + phaseOffset;
-  const cosTheta = Math.cos(phaseDeg * Math.PI / 180);
-  const sinTheta = Math.sin(phaseDeg * Math.PI / 180);
-  const disc = eJ2000 * eJ2000 - amplitude * amplitude * sinTheta * sinTheta;
-  const base = amplitude * cosTheta + Math.sqrt(Math.max(0, disc));
-  return { amplitude, base, phaseJ2000: ((phaseDeg % 360) + 360) % 360 };
-}
+// Plan 07 R6: computeKConstant and computeEccentricityLaw stood here — the
+// K relation (K = e_amp·√m·a^1.5 / (sin(tilt)·√d), inverted per planet) and
+// the System-Reset eccentricity construction it fed
+// (base = A·cosθ + √(e_J2000² − A²sin²θ) at the J2000 phase, θ measured on
+// the wobble beat with a 90°/270° anti-phase offset).
+//
+// They are DELETED, not reclassified. Measured first (plan 07 §9e): scaling
+// their outputs by 1.10 moved no scene position and no published record
+// field — both twins place planets from the N-body chain, which overwrites
+// the construction entirely — and the registry keys built on them had no
+// consumer in the docs, on the website or in the paper. The nine balance and
+// Fibonacci-law instruments that computed from them are retired with them;
+// docs/retired-record.md is the record.
+//
+// A planet's eccentricity of date now has one home: the chain
+// (`model.planets.eccentricity(k, year)`), and its long-term shape is the
+// chain's own g-mode structure.
 
 module.exports = {
   computePsiConstant, computeInclinationLaw,
-  computeKConstant, computeEccentricityLaw,
 };

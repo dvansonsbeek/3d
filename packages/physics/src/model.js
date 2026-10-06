@@ -97,12 +97,11 @@ export function assembleModel(C, F, laws = {}, secularSeriesArtifact = /** @type
   const meanAnomalisticYearDays = (meanSolarYearDays * (H / 16)) / (H / 16 - 1);
   const meanTropicalYearJ2000Seconds = meanSolarYearDays * meanLengthOfDay;
 
-  const earthtiltMean = C.earth.earthtiltMean;
   const earthInclAmplitude = C.earth.earthInvPlaneInclinationAmplitude;
-  // eccentricityAmplitude: the Law-4 input A (the 1246 triangle closure; the
-  // wobble-marker distance). It is the K calibration input ONLY — Earth's
-  // eccentricity law does not use it; see eccentricityAt (base' derived) below.
-  const eccentricityAmplitude = C.earth.eccentricityAmplitude;
+  // Plan 07 R6: `earthtiltMean` and `eccentricityAmplitude` were read here
+  // ONLY to invert the K constant from Earth's calibration. With the K law
+  // retired nothing in this module reads either — they remain on C.earth for
+  // the Earth-side devices (R9) and the registry.
   const earthInclMean = C.earthOrbital.earthInclinationJ2000_deg
     - earthInclAmplitude * Math.cos(((C.earthOrbital.earthPerihelionLongitudeJ2000
       - C.earthOrbital.earthInclinationCycleAnchor) * Math.PI) / 180);
@@ -722,14 +721,9 @@ export function assembleModel(C, F, laws = {}, secularSeriesArtifact = /** @type
     massEarthAlone,
     massSun: M_SUN,
   });
-  const eccentricityAmplitudeK = FL.computeKConstant({
-    eccentricityAmplitude,
-    massEarthAlone,
-    massSun: M_SUN,
-    earthTiltMeanDeg: earthtiltMean,
-  });
-  const systemResetN = C.foundational.systemResetN;
-  const t2000 = 2000 - (balancedYear - systemResetN * H);
+  // (plan 07 R6: eccentricityAmplitudeK — the K constant inverted from
+  // Earth's calibration — and the t2000 phase offset it fed went with the
+  // eccentricity law. systemResetN is kept where other consumers read it.)
 
   /** @param {[number, number]|null} frac @returns {number|null} */
   const fractionToYears = (frac) => (frac === null ? null : (H * frac[0]) / frac[1]);
@@ -763,20 +757,7 @@ export function assembleModel(C, F, laws = {}, secularSeriesArtifact = /** @type
       anchorAscNodeEclipticDeg: /** @type {any} */ (CHAIN_ARTIFACT).j2000AnchorElements[k].ascNodeEclipticDeg,
       obliquityJ2000Deg: C.earthOrbital.obliquityJ2000_deg,
     });
-    const obliquityMean = Math.min(obliquityDerived, 180 - obliquityDerived);   // acute: the K law reads sin|ε|
-    const el = FL.computeEccentricityLaw({
-      fibonacciD: mp.fibonacciD,
-      massFrac: massFraction[k],
-      solarYearInput: ar.solarYearInput,
-      orbitalEccentricityJ2000: ar.orbitalEccentricityJ2000,
-      antiPhase: mp.antiPhase || false,
-    }, {
-      kConstant: eccentricityAmplitudeK,
-      obliquityMeanDeg: obliquityMean,
-      wobblePeriodYears: wobble,
-      t2000,
-      meanSolarYearDays,
-    });
+    const obliquityMean = Math.min(obliquityDerived, 180 - obliquityDerived);   // acute form of the derived J2000 obliquity
     PLANET_RECORDS[k] = Object.freeze({
       name: mp.name,
       perihelionEclipticYears: ecl,
@@ -793,15 +774,14 @@ export function assembleModel(C, F, laws = {}, secularSeriesArtifact = /** @type
       invPlaneInclinationMean: il.mean,
       obliquityMean,
       orbitalEccentricityJ2000: ar.orbitalEccentricityJ2000,
-      orbitalEccentricityAmplitude: el.amplitude,
-      orbitalEccentricityBase: el.base,
-      eccentricityPhaseJ2000: el.phaseJ2000,
       solarYearInput: ar.solarYearInput,
       axialTiltJ2000: ar.axialTiltJ2000,
     });
     // R8 (plan 07): what `model.planets.record()` PUBLISHES is not the record
-    // above. The record keeps the ψ/K law outputs because the fitting pipeline
-    // reads them (step 7a derive-eccentricity-amplitudes, the EoC fractions) —
+    // above. The internal record kept the ψ/K law outputs for the fitting
+    // pipeline; at R6 the K half and both fitter steps that read it are gone,
+    // so what remains above is the ψ half (until R5) and the structural inputs.
+    // The separation stands for the same reason it was made —
     // but nothing outside needs the device, and serving it made /v1/bodies
     // contradict the model's own chain on the SAME quantities: Mercury's node
     // cycle 298,060 yr against the chain's 232,001, Jupiter's perihelion period

@@ -1,4 +1,5 @@
 {
+  "_description": "FROZEN RECORD of the Law-5 balance mass-uncertainty Monte Carlo. Its generator, scripts/mass_uncertainty_monte_carlo.py, was deleted at plan 07 R6 with the K law whose base eccentricities it perturbed, so this file is no longer regenerable and is no longer ledgered. Nothing reads it — it is retained only as the record of the attribution it measured. See docs/retired-record.md.",
   "framework": "Mass-uncertainty Monte Carlo for Law 5 balance",
   "n_trials": 100000,
   "relative_mass_uncertainty_sigmas": {

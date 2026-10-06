@@ -166,11 +166,12 @@ const STEPS = [
   // comment. It runs once as Phase 0 prerequisite, not as part of the
   // routine cascade.
 
-  // Phase 5b: Eccentricity amplitudes & balance law verification
-  { id: '7a', phase: 2, name: 'Derive eccentricity amplitudes',
-    cmd: 'node tools/fit/derive-eccentricity-amplitudes.js --write' },
-  { id: '7b', phase: 2, name: 'Balance search (presets)',
-    cmd: 'node tools/verify/balance-search.js' },
+  // Phase 5b (steps 7a/7b) REMOVED at plan 07 R6 with the psi/K laws. 7a
+  // (derive-eccentricity-amplitudes) was documented "verification only (no
+  // output)" and had no write path despite the --write it was invoked with;
+  // 7b ran balance-search, the generator behind data/balance-presets.json,
+  // which is now a frozen record. Both computed from the K law, which is
+  // gone; the planets' eccentricity of date comes from the N-body chain.
 
   // Phase 6: ΔT correction stack (Bond + Hallstatt + Jose5 + Jose4)
   // Fits the 4-flag sub-Milankovitch cascade against Stephenson 2016 ΔT

@@ -216,12 +216,12 @@ SQRT_M = {p: math.sqrt(MASS[p]) for p in PLANET_NAMES}
 ECC_J2000 = {p['name']: p['orbitalEccentricityJ2000'] for p in _C['planets'].values()}
 ECC_J2000["Earth"] = _C['ASTRO_REFERENCE']['earthEccentricityJ2000']
 
-# Base eccentricities (from constants.js orbitalEccentricityBase)
-ECC_BASE = {p['name']: p['orbitalEccentricityBase'] for p in _C['planets'].values()}
-ECC_BASE["Earth"] = EARTH_BASE_ECCENTRICITY
-
-# Eccentricity amplitudes (from constants.js orbitalEccentricityAmplitude)
-ECC_AMPLITUDE_K = _C['eccentricityAmplitudeK']
+# Plan 07 R6: ECC_BASE and ECC_AMPLITUDE_K are RETIRED with the K law. The
+# planets' base eccentricity was the K law's System-Reset construction and the
+# K constant was inverted from Earth's calibration; neither exists any more.
+# Analyses that want "the planet eccentricities" should use ECC_J2000 above —
+# the observed values the N-body chain is anchored on. Earth's own base and
+# amplitude survive as EARTH_BASE_ECCENTRICITY / EARTH_ECCENTRICITY_AMPLITUDE.
 
 AXIAL_TILT = {p['name']: p['axialTiltJ2000'] for p in _C['planets'].values()}
 AXIAL_TILT["Earth"] = EARTH_OBLIQUITY_MEAN
@@ -234,27 +234,23 @@ PERIHELION_ECLIPTIC_YEARS = {p['name']: p['perihelionEclipticYears'] for p in _C
 # Obliquity cycle theory: obliquity = |inclination − ecliptic|; Venus/Neptune static.
 # Mercury: 8H/3 (Fibonacci decomposition). Mars: 8H/21 (= Jupiter axial, mirror swap).
 # Venus/Neptune: 8H/100 (= ICRF period → two-component formula cancels → constant obliquity).
-OBLIQUITY_CYCLE = {p['name']: p['obliquityCycle'] for p in _C['planets'].values()}
-OBLIQUITY_CYCLE["Earth"] = H / 8  # Earth: 8 = 5 + 3 (Fibonacci decomposition: H/5 + H/3 beat)
+# The planets' obliquityCycle was retired at plan 06 Phase 7 commit 2 (the
+# device's beat of its integer axial and obliquity fractions); this dict has
+# raised KeyError on import ever since, which made the whole module — and
+# every script importing it — unrunnable, unnoticed, because no gate runs
+# them. Fixed at plan 07 R6. Earth's H/8 entry survives.
+OBLIQUITY_CYCLE = {"Earth": H / 8}  # 8 = 5 + 3 (the H/5 + H/3 beat)
 
-ECC_AMPLITUDE = {p['name']: p['orbitalEccentricityAmplitude'] for p in _C['planets'].values()}
-ECC_AMPLITUDE["Earth"] = EARTH_ECCENTRICITY_AMPLITUDE
+# Plan 07 R6: the planets' ECC_AMPLITUDE and ECC_PHASE_J2000 went with the K
+# law too. Earth's amplitude and phase stay, on the Earth side.
+EARTH_ECC_AMPLITUDE = EARTH_ECCENTRICITY_AMPLITUDE
+EARTH_ECC_PHASE_J2000 = _C['ASTRO_REFERENCE']['earthPerihelionLongitudeJ2000'] + 90  # ω + 90°
 
-# Eccentricity phase angles at J2000 (degrees)
-# Inner planets: solved from J2000 constraint cos(φ) = (e_J2000 - e_base) / e_amplitude
-# Outer planets: set to maximize proximity to JPL J2000 eccentricity (amplitude negligible)
-# Each planet oscillates at its own eccentricity cycle (axial-meets-inclination beat)
-# Earth phase = ω + 90° = 192.95° (longitude of perihelion + 90°)
-ECC_PHASE_J2000 = {p['name']: p['eccentricityPhaseJ2000'] for p in _C['planets'].values()}
-ECC_PHASE_J2000["Earth"] = _C['ASTRO_REFERENCE']['earthPerihelionLongitudeJ2000'] + 90  # ω + 90°
-
-# Default eccentricity set for balance computations: BASE values
-# (base eccentricities give 100% Law 5 balance by construction)
-ECCENTRICITIES = dict(ECC_BASE)
-
-# Aliases
+# Plan 07 R6: ECCENTRICITIES / ECC / ECC_DUAL_BALANCED all aliased ECC_BASE,
+# the retired balance construction. The eccentricity set an analysis should
+# use is ECC_J2000 — the observation, not a construction fitted to balance.
+ECCENTRICITIES = dict(ECC_J2000)
 ECC = ECCENTRICITIES
-ECC_DUAL_BALANCED = ECC_BASE  # Legacy alias (base eccentricities supersede dual-balanced)
 
 # ═══════════════════════════════════════════════════════════════════════════
 # FIBONACCI DIVISORS (pure Fibonacci, mirror-symmetric)
@@ -433,17 +429,15 @@ def eta(planet):
     return INCL_AMP[planet] * SQRT_M[planet]
 
 
-def xi(planet, use_j2000=False):
+def xi(planet, use_j2000=True):
     """Mass-weighted eccentricity: ξ = e × √m
-    If use_j2000=True, uses ECC_J2000 values; otherwise uses ECC_BASE (default).
+
+    Plan 07 R6: the `use_j2000=False` branch read ECC_BASE, the retired K
+    law's construction. The observed J2000 eccentricity is now the only
+    source, and the parameter is kept only so existing call sites still work.
     """
-    e = ECC_J2000[planet] if use_j2000 else ECC_BASE[planet]
+    e = ECC_J2000[planet]
     return e * SQRT_M[planet]
-
-
-def xi_base(planet):
-    """Mass-weighted base eccentricity: ξ = e_base × √m"""
-    return ECC_BASE[planet] * SQRT_M[planet]
 
 
 def pct_err(predicted, actual):
@@ -505,11 +499,9 @@ def pisano_period(m):
 # Mass-weighted inclination amplitudes
 ETA = {p: eta(p) for p in PLANET_NAMES}
 
-# Mass-weighted eccentricities (default set)
+# Mass-weighted eccentricities, on the observed J2000 values
+# (plan 07 R6: XI_BASE — the same on the retired K law's base — is gone with it)
 XI = {p: xi(p) for p in PLANET_NAMES}
-
-# Mass-weighted base eccentricities
-XI_BASE = {p: xi_base(p) for p in PLANET_NAMES}
 
 
 # ═══════════════════════════════════════════════════════════════════════════

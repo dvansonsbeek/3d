@@ -109,8 +109,8 @@ const eccentricityAmplitude = modelParams.earth.eccentricityAmplitude;
 // calibration input) remain as constants.
 const eccentricityBaseDerived = ASTRO_REFERENCE.earthEccentricityJ2000
   / (1 + Math.cos((ASTRO_REFERENCE.earthPerihelionLongitudeJ2000 - ASTRO_REFERENCE.earthInclinationCycleAnchor) * Math.PI / 180) / 2);
-// K derived at runtime from Earth (see section after PSI below)
-let eccentricityAmplitudeK;  // assigned after massFraction is computed
+// (plan 07 R6: eccentricityAmplitudeK — K inverted from Earth's calibration —
+// went with the eccentricity law.)
 const perihelionRefJD = ASTRO_REFERENCE.perihelionPassageJ2000_JD;
 
 
@@ -150,8 +150,9 @@ for (const [key, mp] of Object.entries(modelParams.planets)) {
   planets[key] = {
     // Model parameters (from model-parameters.json)
     name: mp.name,
-    // orbitalEccentricityBase, orbitalEccentricityAmplitude, eccentricityPhaseJ2000
-    // are derived at runtime from balanced-year phase + K (see below)
+    // (plan 07 R6: orbitalEccentricityBase / Amplitude / eccentricityPhaseJ2000
+    // were derived here from the balanced-year phase + K; the law is retired
+    // and the chain carries the eccentricity of date.)
     eocFraction: mp.eocFraction,
     startpos: mp.startpos,
     angleCorrection: mp.angleCorrection,
@@ -482,53 +483,26 @@ for (const [key, p] of Object.entries(planets)) {
   }
 }
 
-// K derived from Earth: K = e_amp × √m / (sin(meanObliquity) × √d)
-// Symmetric with PSI: eccentricity amplitude = K × sin(meanObliquity) × √d / (√m × a^1.5)
-eccentricityAmplitudeK = FL.computeKConstant({
-  eccentricityAmplitude,
-  massEarthAlone: GM_EARTH_ALONE / G_CONSTANT, massSun: M_SUN,
-  earthTiltMeanDeg: earthtiltMean,
-});
-
-// Compute model mean obliquity, K-derived eccentricity amplitudes, and phase-derived
-// base eccentricities for each planet. Closes the loop:
-// PSI → incl amp → mean tilt → K → ecc amp → phase from eccentricity anchor → base
-// Anchor = balancedYear - systemResetN × H  (n=0: balancedYear, n=7: System Reset)
-const eccentricityAnchor = balancedYear - systemResetN * H;
-const t2000 = 2000 - eccentricityAnchor;
+// Plan 07 R6: the K relation and the System-Reset eccentricity construction
+// are gone — the loop that closed
+//   PSI → incl amp → mean tilt → K → ecc amp → phase from the anchor → base
+// now closes only as far as the obliquity. A planet's eccentricity of date
+// has one home, the N-body chain; its base, amplitude and J2000 phase were a
+// construction nothing read (plan 07 §9e).
+//
+// The DERIVED J2000 obliquity stays: it is the spin channel's reading (the
+// IAU pole against the chain's J2000 plane, acute form), not a device value,
+// and the fixtures pin it.
 for (const [key, p] of Object.entries(planets)) {
   if (!p.fibonacciD || !massFraction[key]) continue;
-  // The K law's obliquity input: the spin channel's DERIVED J2000 obliquity
-  // (the IAU pole against the chain's J2000 plane; acute — the law reads
-  // sin|ε|). Plan 06 Phase 7 commit 2: replaces the device's snapshot
-  // "mean obliquity" on its retired obliquity-cycle fraction.
-  {
-    const A = CHAIN_DATA.j2000AnchorElements[key];
-    const eps = computeObliquityJ2000Deg({
-      spin: astroRef.planetSpinPhysical[key],
-      anchorInclEclipticDeg: A.inclEclipticDeg,
-      anchorAscNodeEclipticDeg: A.ascNodeEclipticDeg,
-      obliquityJ2000Deg: ASTRO_REFERENCE.obliquityJ2000_deg,
-    });
-    p.obliquityMean = Math.min(eps, 180 - eps);
-  }
-  // K law — the shared implementation (8.3 L2). The old no-wobblePeriod
-  // `else` branch was DEAD code (this loop is fibonacciD-guarded and all
-  // seven carriers have wobble periods) and is dropped — the fixtures
-  // adjudicate.
-  const el = FL.computeEccentricityLaw({
-    fibonacciD: p.fibonacciD, massFrac: massFraction[key],
-    solarYearInput: p.solarYearInput,
-    orbitalEccentricityJ2000: p.orbitalEccentricityJ2000,
-    antiPhase: p.antiPhase,
-  }, {
-    kConstant: eccentricityAmplitudeK, obliquityMeanDeg: p.obliquityMean,
-    wobblePeriodYears: p.wobblePeriod, t2000,
-    meanSolarYearDays,
+  const A = CHAIN_DATA.j2000AnchorElements[key];
+  const eps = computeObliquityJ2000Deg({
+    spin: astroRef.planetSpinPhysical[key],
+    anchorInclEclipticDeg: A.inclEclipticDeg,
+    anchorAscNodeEclipticDeg: A.ascNodeEclipticDeg,
+    obliquityJ2000Deg: ASTRO_REFERENCE.obliquityJ2000_deg,
   });
-  p.orbitalEccentricityAmplitude = el.amplitude;
-  p.orbitalEccentricityBase = el.base;
-  p.eccentricityPhaseJ2000 = el.phaseJ2000;
+  p.obliquityMean = Math.min(eps, 180 - eps);
 }
 
 
@@ -552,7 +526,10 @@ function computePlanetDerived(key) {
   const g = derivePlanetGeometry({
     key, type: p.type,
     solarYearInput: p.solarYearInput,
-    orbitalEccentricityBase: p.orbitalEccentricityBase,
+    // Plan 07 R6: the scene's ellipse geometry read the K law's System-Reset
+    // base; with the law retired it reads the OBSERVED J2000 eccentricity,
+    // the value the chain is anchored on.
+    orbitalEccentricityBase: p.orbitalEccentricityJ2000,
     longitudePerihelion: p.longitudePerihelion,
     ascendingNode: p.ascendingNode,
   }, _GEOM_ENV);
@@ -672,7 +649,6 @@ module.exports = {
   eccentricityBase,
   eccentricityBaseDerived,
   eccentricityAmplitude,
-  eccentricityAmplitudeK,
   perihelionRefJD,
 
   // Moon inputs
@@ -711,7 +687,6 @@ module.exports = {
   cardinalPointAnchorsAtGrid,
   yearsFromBalancedToJ2000,
   systemResetN,
-  eccentricityAnchor,
   meanSiderealYearDays,
   meanSiderealYearDaysKinematic,
   meanLengthOfDay,

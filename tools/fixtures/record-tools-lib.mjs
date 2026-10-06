@@ -168,10 +168,11 @@ function measure() {
       if (typeof val === 'number') v[`planetDerived.${k}.${n}`] = val;
     }
     const p = C.planets[k];
+    // Plan 07 R6: eccAmp and eccBase left with the K law (14 rows). The psi
+    // pair stays until R5; wobblePeriod is the chain's g-mode beat, not a law
+    // output, and obliquityMean is the spin channel's derived J2000 value.
     v[`planetLaw.${k}.inclAmp`] = p.invPlaneInclinationAmplitude;
     v[`planetLaw.${k}.inclMean`] = p.invPlaneInclinationMean;
-    v[`planetLaw.${k}.eccAmp`] = p.orbitalEccentricityAmplitude;
-    v[`planetLaw.${k}.eccBase`] = p.orbitalEccentricityBase;
     v[`planetLaw.${k}.wobblePeriod`] = p.wobblePeriod;
     v[`planetLaw.${k}.obliquityMean`] = p.obliquityMean;
   }

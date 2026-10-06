@@ -440,45 +440,17 @@ const newEarth = {
 };
 
 // ═══════════════════════════════════════════════════════════════════════════
-// 9a. Eccentricity J2000 conformance — base vs observed for all planets
+// 9a. Eccentricity J2000 conformance — RETIRED at plan 07 R6
 // ═══════════════════════════════════════════════════════════════════════════
-console.log('\n═══ Step 9a: Eccentricity J2000 conformance ═══');
-
-const eccPlanets = ['mercury', 'venus', 'earth', 'mars', 'jupiter', 'saturn', 'uranus', 'neptune'];
-console.log('  Planet      │ e_base       │ e_J2000      │ Diff%    │ Amp        │ Reachable │ Mode');
-console.log('  ────────────┼──────────────┼──────────────┼──────────┼────────────┼───────────┼──────────');
-
-for (const p of eccPlanets) {
-  let base, amp, j2000;
-  if (p === 'earth') {
-    base = C.eccentricityBase;
-    amp = C.eccentricityAmplitude;
-    j2000 = C.eccJ2000.earth;
-  } else {
-    base = C.planets[p].orbitalEccentricityBase;
-    amp = C.planets[p].orbitalEccentricityAmplitude;
-    j2000 = C.planets[p].orbitalEccentricityJ2000 || base;
-  }
-  const diff = j2000 - base;
-  const pct = (diff / j2000 * 100);
-  const eMin = Math.abs(base - amp);
-  const eMax = base + amp;
-  const reachable = (j2000 >= eMin - 1e-12 && j2000 <= eMax + 1e-12);
-  const mode = 'phase';  // all bases derived from balanced-year phase
-  console.log(
-    '  ' + p.padEnd(12) + '│ ' +
-    base.toFixed(8).padStart(12) + ' │ ' +
-    j2000.toFixed(8).padStart(12) + ' │ ' +
-    ((pct >= 0 ? '+' : '') + pct.toFixed(3) + '%').padStart(8) + ' │ ' +
-    amp.toExponential(2).padStart(10) + ' │ ' +
-    (reachable ? '  YES    ' : '  NO     ') + ' │ ' +
-    mode
-  );
-}
-
-console.log('');
-console.log('  All bases derived from balanced-year phase, amplitudes from K.');
-console.log('  Reachable: J2000 eccentricity within [base-amp, base+amp] range\n');
+// The table printed each planet's K-law base against the observed J2000
+// eccentricity and asked whether the observation was "reachable" inside
+// [base − amp, base + amp]. Both inputs were the K law's, which is retired:
+// the planets' eccentricity of date is the N-body chain's, and the chain is
+// anchored ON the J2000 observation, so the conformance question answers
+// itself. Earth's base and amplitude survive on the Earth side and are
+// checked where they are used.
+console.log('\n═══ Step 9a: Eccentricity J2000 conformance — RETIRED (plan 07 R6) ═══');
+console.log('  The planets ride the N-body chain, anchored on the J2000 observation.\n');
 
 // (Step 9b — correction-stack validation — retired with the K5 legacy-chain
 // excision: the planet-correction layers are gone, and MOON_CORRECTION

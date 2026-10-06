@@ -67,8 +67,7 @@ const FL = require('./fibonacci-laws.cjs');
  * @property {number} earthEccentricityJ2000
  * @property {number} earthPerihelionLongitudeJ2000Deg
  * @property {{ earthInvPlaneInclinationAmplitude: number,
- *   massEarthAlone: number, massSun: number,
- *   eccentricityAmplitude: number, earthTiltMeanDeg: number }} calibration
+ *   massEarthAlone: number, massSun: number }} calibration
  * @property {Record<string, number>} massFractions
  */
 
@@ -78,9 +77,6 @@ const FL = require('./fibonacci-laws.cjs');
  * @property {number} [invPlaneInclinationMean]
  * @property {number} [wobblePeriodYears]
  * @property {number} [obliquityMeanDeg]
- * @property {number} [eccentricityAmplitude]
- * @property {number} [eccentricityBase]
- * @property {number} [eccentricityPhaseJ2000Deg]
  * @property {ReturnType<typeof derivePlanetGeometry>} geometry
  */
 
@@ -91,8 +87,7 @@ const FL = require('./fibonacci-laws.cjs');
  * @param {Record<string, PlanetModelBody>} bodies - keyed by body name
  *   (the key selects the body-unique geometry branches: mercury, pluto,
  *   halleys, ceres)
- * @returns {{ psiConstant: number, kConstant: number,
- *   eccentricityAnchor: number, t2000: number,
+ * @returns {{ psiConstant: number,
  *   bodies: Record<string, PlanetModelRecord> }}
  */
 function createPlanetModel(env, bodies) {
@@ -101,15 +96,9 @@ function createPlanetModel(env, bodies) {
     massEarthAlone: env.calibration.massEarthAlone,
     massSun: env.calibration.massSun,
   });
-  const kConstant = FL.computeKConstant({
-    eccentricityAmplitude: env.calibration.eccentricityAmplitude,
-    massEarthAlone: env.calibration.massEarthAlone,
-    massSun: env.calibration.massSun,
-    earthTiltMeanDeg: env.calibration.earthTiltMeanDeg,
-  });
-  // Anchor = balancedYear − systemResetN·H (n=7: the System Reset state).
-  const eccentricityAnchor = env.balancedYear - env.systemResetN * env.holisticYears;
-  const t2000 = 2000 - eccentricityAnchor;
+  // Plan 07 R6: kConstant, the System-Reset eccentricityAnchor
+  // (balancedYear − systemResetN·H) and the t2000 phase it fed went with the
+  // eccentricity law.
 
   const geomEnv = {
     holisticYears: env.holisticYears,
@@ -146,27 +135,18 @@ function createPlanetModel(env, bodies) {
     if (b.wobblePeriodYears !== undefined) rec.wobblePeriodYears = b.wobblePeriodYears;
     if (b.obliquityMeanDeg !== undefined) rec.obliquityMeanDeg = b.obliquityMeanDeg;
 
-    if (b.fibonacciD && massFrac) {
-      const el = FL.computeEccentricityLaw({
-        fibonacciD: b.fibonacciD, massFrac,
-        solarYearInput: b.solarYearInput,
-        orbitalEccentricityJ2000: /** @type {number} */ (b.orbitalEccentricityJ2000),
-        antiPhase: /** @type {boolean} */ (b.antiPhase),
-      }, {
-        kConstant, obliquityMeanDeg: /** @type {number} */ (rec.obliquityMeanDeg),
-        wobblePeriodYears: /** @type {number} */ (rec.wobblePeriodYears), t2000,
-        meanSolarYearDays: env.meanSolarYearDays,
-      });
-      rec.eccentricityAmplitude = el.amplitude;
-      rec.eccentricityBase = el.base;
-      rec.eccentricityPhaseJ2000Deg = el.phaseJ2000;
-    }
+    // Plan 07 R6: the K law's eccentricityAmplitude / eccentricityBase /
+    // eccentricityPhaseJ2000Deg stood here. With the law gone, the ellipse
+    // geometry below reads the OBSERVED J2000 eccentricity where it used to
+    // read the law's System-Reset base — the observation the chain is
+    // anchored on, not a construction. The stored base survives only for the
+    // additional bodies, which carry theirs in model-parameters.json.
 
     rec.geometry = derivePlanetGeometry({
       key, type: b.type,
       solarYearInput: b.solarYearInput,
-      orbitalEccentricityBase: rec.eccentricityBase !== undefined
-        ? rec.eccentricityBase : b.orbitalEccentricityBase,
+      orbitalEccentricityBase: b.orbitalEccentricityBase !== undefined
+        ? b.orbitalEccentricityBase : b.orbitalEccentricityJ2000,
       longitudePerihelion: b.longitudePerihelion,
       ascendingNode: b.ascendingNode,
       rotationPeriodDays: b.rotationPeriodDays,
@@ -176,7 +156,7 @@ function createPlanetModel(env, bodies) {
     out[key] = rec;
   }
 
-  return { psiConstant, kConstant, eccentricityAnchor, t2000, bodies: out };
+  return { psiConstant, bodies: out };
 }
 
 module.exports = { createPlanetModel };

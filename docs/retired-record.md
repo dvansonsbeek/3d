@@ -338,6 +338,28 @@ the K law's System-Reset output; the two inclination-side scripts read the ψ
 law's amplitude and mean and the device's divisor periods. With the laws
 deleted there is nothing for them to compute.
 
+**The Python half of the same suite** (`scripts/`): `fibonacci_311_analysis`,
+`fibonacci_311_deep`, `fibonacci_amd_structure`, `fibonacci_eccentricity_scale`,
+`fibonacci_eccentricity_structure`, `fibonacci_j2000_eccentricity`,
+`fibonacci_law4_balance_search`, `fibonacci_significance`,
+`fibonacci_trappist1_deep`, `test_fibonacci_significance`,
+`mass_uncertainty_monte_carlo` (the Law-5 residual's mass-uncertainty Monte
+Carlo), `predict_tilt_from_eccentricity` (a Law-4 prediction product, doc 27)
+and `planet_nine_analysis` (the Planet-Nine screening, doc 15). All read the
+K law's base, amplitude and phase through `tools/lib/python/constants_scripts.py`.
+The shared bridge keeps `ECC_J2000` — the observed values the chain is anchored
+on — and its `ECCENTRICITIES`/`ECC` aliases now point there instead of at the
+retired base; `predictive_formula.calc_planet_eccentricity` went too.
+
+A detail that belongs in this record. `constants_scripts.py` had been
+**unimportable since plan 06 Phase 7 commit 2**: that commit retired the
+planets' `obliquityCycle`, and the module's `OBLIQUITY_CYCLE` dict raised
+`KeyError` on import from then on. Every script importing it — the thirteen
+above and the live ones beside them — had been unrunnable for months and
+nothing reported it, because no gate runs Python analyses. The bridge is
+repaired at R6 rather than left broken, but the episode is the clearest
+evidence for the retirement: an instrument nothing runs cannot be a check.
+
 One measurement is worth keeping, because it is part of why the construction
 was retired rather than repaired: the Law-5 balance recomputed from the live
 device at retirement read **99.8717 %** (or 99.8704 % on the Kepler axis),

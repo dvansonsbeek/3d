@@ -1835,7 +1835,13 @@ export const VALUES = {
       psiFormula: { get: () => 'd_E × amp_E × √m_E (from Earth)', render: (v) => String(v), note: 'structural formula label (Law 3)' },
       psiValue:   { get: () => C.PSI, render: (v) => `${(v * 1e3).toFixed(4)} × 10⁻³` },
       psiDecimal: { get: () => C.PSI, render: (v) => Number(v).toFixed(6) },
-      kValue:     { get: () => C.eccentricityAmplitudeK, render: (v) => `${(v * 1e6).toFixed(4)} × 10⁻⁶`, note: 'Law 4 K — reference value 3.4143e-6' },
+      // Plan 07 R6: K was inverted from Earth's calibration at load; the law
+      // is retired, so there is nothing live to read. The value is FROZEN
+      // here as the retired construction's recorded constant — docs 20 and 72
+      // cite it as the historical Law-4 K, and the registry's job for a
+      // retired device is to record what it was, not to pretend it still
+      // derives. See docs/retired-record.md.
+      kValue:     { get: () => 3.4143e-6, render: (v) => `${(v * 1e6).toFixed(4)} × 10⁻⁶`, note: 'Law 4 K — RETIRED (plan 07 R6); the recorded value of the retired construction, no longer derived' },
       invPlaneAscNode: { get: () => astro.ascendingNodesSouamiSouchay.invariablePlaneOnEclipticDeg, render: (v) => String(v), unit: '°', note: 'the invariable plane\'s node on the ecliptic (Souami & Souchay 2012)' },
       mainstreamAxialPrec:  { get: () => astro.knownValues.mainstreamAxialPrecKyr, render: (v) => `~${v}k`, unit: 'yr' },
       mainstreamPeriPrec:   { get: () => astro.knownValues.mainstreamPeriPrecKyr, render: (v) => `~${v}k`, unit: 'yr' },

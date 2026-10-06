@@ -41,8 +41,6 @@ export type PlanetModelEnv = {
         earthInvPlaneInclinationAmplitude: number;
         massEarthAlone: number;
         massSun: number;
-        eccentricityAmplitude: number;
-        earthTiltMeanDeg: number;
     };
     massFractions: Record<string, number>;
 };
@@ -51,9 +49,6 @@ export type PlanetModelRecord = {
     invPlaneInclinationMean?: number | undefined;
     wobblePeriodYears?: number | undefined;
     obliquityMeanDeg?: number | undefined;
-    eccentricityAmplitude?: number | undefined;
-    eccentricityBase?: number | undefined;
-    eccentricityPhaseJ2000Deg?: number | undefined;
     geometry: ReturnType<typeof derivePlanetGeometry>;
 };
 /**
@@ -86,8 +81,7 @@ export type PlanetModelRecord = {
  * @property {number} earthEccentricityJ2000
  * @property {number} earthPerihelionLongitudeJ2000Deg
  * @property {{ earthInvPlaneInclinationAmplitude: number,
- *   massEarthAlone: number, massSun: number,
- *   eccentricityAmplitude: number, earthTiltMeanDeg: number }} calibration
+ *   massEarthAlone: number, massSun: number }} calibration
  * @property {Record<string, number>} massFractions
  */
 /**
@@ -96,9 +90,6 @@ export type PlanetModelRecord = {
  * @property {number} [invPlaneInclinationMean]
  * @property {number} [wobblePeriodYears]
  * @property {number} [obliquityMeanDeg]
- * @property {number} [eccentricityAmplitude]
- * @property {number} [eccentricityBase]
- * @property {number} [eccentricityPhaseJ2000Deg]
  * @property {ReturnType<typeof derivePlanetGeometry>} geometry
  */
 /**
@@ -108,15 +99,11 @@ export type PlanetModelRecord = {
  * @param {Record<string, PlanetModelBody>} bodies - keyed by body name
  *   (the key selects the body-unique geometry branches: mercury, pluto,
  *   halleys, ceres)
- * @returns {{ psiConstant: number, kConstant: number,
- *   eccentricityAnchor: number, t2000: number,
+ * @returns {{ psiConstant: number,
  *   bodies: Record<string, PlanetModelRecord> }}
  */
 export function createPlanetModel(env: PlanetModelEnv, bodies: Record<string, PlanetModelBody>): {
     psiConstant: number;
-    kConstant: number;
-    eccentricityAnchor: number;
-    t2000: number;
     bodies: Record<string, PlanetModelRecord>;
 };
 import { derivePlanetGeometry } from "./geometry.cjs";

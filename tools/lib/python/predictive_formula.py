@@ -38,7 +38,6 @@ from constants_scripts import (
     _MEAN_LENGTH_OF_DAY, _MEAN_ANOM_YEAR_DAYS, _ECCENTRICITY_DERIVED_MEAN,
     TROPICAL_YEAR_HARMONICS, SIDEREAL_YEAR_HARMONICS, ANOMALISTIC_YEAR_HARMONICS,
     INCL_MEAN, INCL_AMP, INCL_CYCLE_ANCHOR, INCL_PERIOD, OMEGA_J2000, INCL_ECLIPTIC,
-    ECC_BASE, ECC_AMPLITUDE, ECC_PHASE_J2000,
     AXIAL_TILT, LONGITUDE_PERIHELION, PERIHELION_ECLIPTIC_YEARS,
     OBLIQUITY_CYCLE, EARTH_RA_ANGLE, BALANCED_JD,
     _START_MODEL_JD, JUNE_SOLSTICE_2000_JD, SOLSTICE_JD_HARMONICS,
@@ -414,29 +413,13 @@ def calc_planet_inclination(planet: str, year: int) -> float:
     return mean + sign * amp * math.cos(math.radians(peri - phase))
 
 
-def calc_planet_eccentricity(planet: str, year: int) -> float:
-    """
-    Calculate planet's orbital eccentricity at given year.
-
-    Formula: e(t) = e_base + e_amp × cos(2π(year - 2000) / (H/16) + φ_J2000)
-
-    All planets oscillate at period H/16 = 20,957 years.
-    Earth uses a different formula (calc_eccentricity) with derived mean.
-
-    Args:
-        planet: Planet name (e.g. 'Mercury')
-        year: Calendar year
-
-    Returns: Eccentricity (dimensionless)
-    """
-    if planet == "Earth":
-        return calc_eccentricity(year)
-    base = ECC_BASE[planet]
-    amp = ECC_AMPLITUDE[planet]
-    phase_j2000 = math.radians(ECC_PHASE_J2000[planet])
-    t = year - J2000
-    period = H / 16
-    return base + amp * math.cos(2 * math.pi * t / period + phase_j2000)
+# Plan 07 R6: calc_planet_eccentricity stood here — the Python mirror of the
+# retired K law, e(t) = base + amp·cos(2π(t−2000)/(H/16) + φ_J2000). It had no
+# caller but this module's own demo, and it carried a defect the JS side had
+# already fixed: it ran EVERY planet at H/16 rather than the planet's own
+# wobble beat (the 8.3-1 S-P1 correction, 1.3–6.7× wrong away from the
+# anchor). A planet's eccentricity of date is the N-body chain's.
+# Earth's own eccentricity is unaffected: calc_eccentricity(year).
 
 
 def calc_planet_obliquity(planet: str, year: int) -> float:
@@ -1639,9 +1622,7 @@ if __name__ == "__main__":
         node = calc_planet_ascending_node(planet, 2000)
         incl_val = calc_planet_inclination(planet, 2000)
         mean_val = INCL_MEAN[planet]
-        ecc_val = calc_planet_eccentricity(planet, 2000)
-        base_val = ECC_BASE[planet]
-        print(f"  {planet:<10} {node:>8.4f}° {incl_val:>10.6f}° {mean_val:>10.6f}° {ecc_val:>14.8f} {base_val:>12.8f}")
+        print(f"  {planet:<10} {node:>8.4f}° {incl_val:>10.6f}° {mean_val:>10.6f}°")
 
     print(f"\n{'Planet':<10} {'Year':>6} {'Asc.Node':>10} {'Inclination':>12} {'Eccentricity':>14}")
     print("-" * 56)
@@ -1649,7 +1630,6 @@ if __name__ == "__main__":
         for year in [2000, 5000, 10000, -5000]:
             node = calc_planet_ascending_node(planet, year)
             incl_val = calc_planet_inclination(planet, year)
-            ecc_val = calc_planet_eccentricity(planet, year)
-            print(f"  {planet:<10} {year:>6} {node:>8.4f}° {incl_val:>10.6f}° {ecc_val:>14.8f}")
+            print(f"  {planet:<10} {year:>6} {node:>8.4f}° {incl_val:>10.6f}°")
 
     print("\nSystem ready.")

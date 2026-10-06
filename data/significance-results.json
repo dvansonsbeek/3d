@@ -1,4 +1,5 @@
 {
+  "_description": "FROZEN RECORD of the lattice-significance permutation test (1e6 seeded trials, git-sha stamped). Its generator, scripts/fibonacci_significance.py, was deleted at plan 07 R6 with the psi/K laws it read, so this file is no longer regenerable and is no longer ledgered. It is KEPT because the registry publishes its headline statistics (headlineP, headlineSigma and the joint/Stouffer/Fisher family) and because the result it records — that the lattice labels sit at chance level — is part of the evidence FOR the retirement, not a casualty of it. See docs/retired-record.md.",
   "generated": "2026-08-23T12:20:32.465813+00:00",
   "trials": 1000000,
   "seed": 42,

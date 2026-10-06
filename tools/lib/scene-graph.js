@@ -1045,10 +1045,11 @@ function buildSceneGraph() {
     if (periRefMap[key]) {
       const periPrecRate = Math.PI * 2 / pd.perihelionEclipticYears;
       const pos_peri = (periRefMap[key] - C.startmodelJD) / C.meanSolarYearDays;
-      // Type III: per-planet EoC fraction to correct for double-counting with geometric offset
-      planetDef.eccentricity = pd.p.orbitalEccentricityJ2000 * (pd.p.eocFraction ?? 0.5);
-      planetDef._eccentricityKey = key;
-      planetDef._eocFraction = pd.p.eocFraction ?? 0.5;
+      // Plan 07 R6: the per-planet EoC fraction and the _eccentricityKey that
+      // re-evaluated it each frame are retired with the K law — the chain
+      // places the planets and overwrites the wheel's Kepler motion. This is
+      // the OBSERVED J2000 eccentricity, inert, mirroring src/script.js.
+      planetDef.eccentricity = pd.p.orbitalEccentricityJ2000;
       // Use absolute planet speed for perihelion phase (script.js uses positive speed)
       const absPlanetSpeed = Math.PI * 2 / (H / pd.d.solarYearCount);
       planetDef.perihelionPhaseJ2000 = -pd.p.startpos * d2r
@@ -1189,18 +1190,12 @@ function moveModel(graph, pos) {
   // needs only the remaining half of its EoC (split below) and the FQ-3
   // corrector closes it exactly on the same realized offset.
   graph.earthPeriPrec2.container.px = -dynEcc.earth * 100;
-  for (const [key, p] of Object.entries(C.planets)) {
-    if (p.eccentricityPhaseJ2000 !== undefined) {
-      // 8.3-1 S-P1: the oscillation rides each planet's OWN wobble period
-      // (the browser's certified form — anchor and period from the same
-      // beat). This mirror used H/16 for every planet: exact at the anchor
-      // by construction, wrong by the wobble/H16 ratio (1.3–6.7×) away from
-      // it — invisible to the modern-window RMS gate, divergent at depth.
-      // Node already computed p.wobblePeriod and simply didn't use it.
-      const refYear = 2000 - (p.eccentricityPhaseJ2000 / 360) * p.wobblePeriod;
-      dynEcc[key] = OE.computeEccentricity(currentYear, refYear, p.wobblePeriod, p.orbitalEccentricityBase, p.orbitalEccentricityAmplitude);
-    }
-  }
+  // Plan 07 R6: the planets' dynamic eccentricity was the K law's oscillation
+  // about its base, on each planet's own wobble beat. It is retired here as it
+  // is in the browser — the planets are placed from the N-body chain, which
+  // overwrites the wheels' Kepler motion entirely (measured: a 0.25 shift in
+  // every eocFraction moved no position at any epoch). `dynEcc` now carries
+  // Earth alone, which is what the lines above it actually consume.
 
   // Update each "animated" object: orbit.ry = θ for circular, pivot.position for ellipse
   function animateObject(nodes, def) {
