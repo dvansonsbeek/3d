@@ -9324,7 +9324,11 @@ neptune._dtPerihelionAnchor  = STARTMODEL_YEAR_SI;
 //*************************************************************
 // ADD CONSTANTS
 //*************************************************************
-const planetObjects = [startingPoint, earthWobbleCenter, earth, earthInclinationPrecession, earthEclipticPrecession, earthObliquityPrecession, earthPerihelionPrecession1, earthPerihelionPrecession2, barycenterEarthAndSun, earthPerihelionFromEarth, mercuryPerihelionFromEarth, venusPerihelionFromEarth, marsPerihelionFromEarth, jupiterPerihelionFromEarth, saturnPerihelionFromEarth, uranusPerihelionFromEarth, neptunePerihelionFromEarth, plutoPerihelionFromEarth, halleysPerihelionFromEarth, erosPerihelionFromEarth, sun, moonApsidalPrecession, moonApsidalNodalPrecession1, moonApsidalNodalPrecession2, moonLunarLevelingCyclePrecession, moonNodalPrecession, moon, mercuryPerihelionDurationEcliptic1, venusPerihelionDurationEcliptic1, marsPerihelionDurationEcliptic1, jupiterPerihelionDurationEcliptic1, saturnPerihelionDurationEcliptic1, uranusPerihelionDurationEcliptic1, neptunePerihelionDurationEcliptic1, plutoPerihelionDurationEcliptic1, halleysPerihelionDurationEcliptic1, erosPerihelionDurationEcliptic1, mercuryPerihelionDurationEcliptic2, mercuryRealPerihelionAtSun, mercury, mercuryFixedPerihelionAtSun, venusPerihelionDurationEcliptic2, venusRealPerihelionAtSun, venus, venusFixedPerihelionAtSun, marsPerihelionDurationEcliptic2, marsRealPerihelionAtSun, mars, marsFixedPerihelionAtSun, jupiterPerihelionDurationEcliptic2, jupiterRealPerihelionAtSun, jupiter, jupiterFixedPerihelionAtSun, saturnPerihelionDurationEcliptic2, saturnRealPerihelionAtSun, saturn, saturnFixedPerihelionAtSun, uranusPerihelionDurationEcliptic2, uranusRealPerihelionAtSun, uranus, uranusFixedPerihelionAtSun, neptunePerihelionDurationEcliptic2, neptuneRealPerihelionAtSun, neptune, neptuneFixedPerihelionAtSun, plutoPerihelionDurationEcliptic2, plutoRealPerihelionAtSun, pluto, plutoFixedPerihelionAtSun, halleysPerihelionDurationEcliptic2, halleysRealPerihelionAtSun, halleys, halleysFixedPerihelionAtSun, erosPerihelionDurationEcliptic2, erosRealPerihelionAtSun, eros, erosFixedPerihelionAtSun, mercuryWobbleCenter, venusWobbleCenter, marsWobbleCenter, jupiterWobbleCenter, saturnWobbleCenter, uranusWobbleCenter, neptuneWobbleCenter]
+// R7: the seven chain planets' *PerihelionDurationEcliptic1/2 wheels are out
+// of the animation list — nothing drives them, nothing hangs off them and
+// nothing reads them. The no-chain bodies (Pluto, Halley, Eros) keep theirs,
+// which is still how their perihelion direction is carried.
+const planetObjects = [startingPoint, earthWobbleCenter, earth, earthInclinationPrecession, earthEclipticPrecession, earthObliquityPrecession, earthPerihelionPrecession1, earthPerihelionPrecession2, barycenterEarthAndSun, earthPerihelionFromEarth, mercuryPerihelionFromEarth, venusPerihelionFromEarth, marsPerihelionFromEarth, jupiterPerihelionFromEarth, saturnPerihelionFromEarth, uranusPerihelionFromEarth, neptunePerihelionFromEarth, plutoPerihelionFromEarth, halleysPerihelionFromEarth, erosPerihelionFromEarth, sun, moonApsidalPrecession, moonApsidalNodalPrecession1, moonApsidalNodalPrecession2, moonLunarLevelingCyclePrecession, moonNodalPrecession, moon, plutoPerihelionDurationEcliptic1, halleysPerihelionDurationEcliptic1, erosPerihelionDurationEcliptic1, mercuryRealPerihelionAtSun, mercury, mercuryFixedPerihelionAtSun, venusRealPerihelionAtSun, venus, venusFixedPerihelionAtSun, marsRealPerihelionAtSun, mars, marsFixedPerihelionAtSun, jupiterRealPerihelionAtSun, jupiter, jupiterFixedPerihelionAtSun, saturnRealPerihelionAtSun, saturn, saturnFixedPerihelionAtSun, uranusRealPerihelionAtSun, uranus, uranusFixedPerihelionAtSun, neptuneRealPerihelionAtSun, neptune, neptuneFixedPerihelionAtSun, plutoPerihelionDurationEcliptic2, plutoRealPerihelionAtSun, pluto, plutoFixedPerihelionAtSun, halleysPerihelionDurationEcliptic2, halleysRealPerihelionAtSun, halleys, halleysFixedPerihelionAtSun, erosPerihelionDurationEcliptic2, erosRealPerihelionAtSun, eros, erosFixedPerihelionAtSun, mercuryWobbleCenter, venusWobbleCenter, marsWobbleCenter, jupiterWobbleCenter, saturnWobbleCenter, uranusWobbleCenter, neptuneWobbleCenter]
 
 const tracePlanets = [earthWobbleCenter, earthPerihelionFromEarth, mercuryPerihelionFromEarth, venusPerihelionFromEarth, marsPerihelionFromEarth, jupiterPerihelionFromEarth, saturnPerihelionFromEarth, uranusPerihelionFromEarth, neptunePerihelionFromEarth, plutoPerihelionFromEarth, halleysPerihelionFromEarth, erosPerihelionFromEarth, sun, moon, mercury, venus, mars, jupiter, saturn, uranus, neptune, pluto, halleys, eros]
 
@@ -10254,67 +10258,59 @@ moonApsidalNodalPrecession2.pivotObj.add(moonLunarLevelingCyclePrecession.contai
 moonLunarLevelingCyclePrecession.pivotObj.add(moonNodalPrecession.containerObj);
 moonNodalPrecession.pivotObj.add(moon.containerObj);
 
-barycenterEarthAndSun.pivotObj.add(mercuryPerihelionDurationEcliptic1.containerObj);
-mercuryPerihelionDurationEcliptic1.pivotObj.add(mercuryPerihelionFromEarth.containerObj);
-mercuryPerihelionFromEarth.pivotObj.add(mercuryPerihelionDurationEcliptic2.containerObj);
-mercuryPerihelionDurationEcliptic2.pivotObj.add(mercuryRealPerihelionAtSun.containerObj);
+// R7: the E1/E2 wheel pair is bypassed. It was equal-and-opposite by
+// construction — "net rotation passed to mercury is ZERO" — so removing both
+// leaves everything below it unchanged, and the perihelion marker above it is
+// positioned from the chain's ϖ explicitly (_kcPerihelionEclLonDeg), not from
+// the parent's rotation. The wheels carried no translation, so the anchor the
+// marker reads off its parent is the same barycenter either way.
+barycenterEarthAndSun.pivotObj.add(mercuryPerihelionFromEarth.containerObj);
+mercuryPerihelionFromEarth.pivotObj.add(mercuryRealPerihelionAtSun.containerObj);
 mercuryRealPerihelionAtSun.pivotObj.add(mercury.containerObj);
 
-mercuryPerihelionDurationEcliptic2.pivotObj.add(mercuryFixedPerihelionAtSun.containerObj);
+mercuryPerihelionFromEarth.pivotObj.add(mercuryFixedPerihelionAtSun.containerObj);
 mercury.pivotObj.add(mercuryWobbleCenter.containerObj);
 
-barycenterEarthAndSun.pivotObj.add(venusPerihelionDurationEcliptic1.containerObj);
-venusPerihelionDurationEcliptic1.pivotObj.add(venusPerihelionFromEarth.containerObj);
-venusPerihelionFromEarth.pivotObj.add(venusPerihelionDurationEcliptic2.containerObj);
-venusPerihelionDurationEcliptic2.pivotObj.add(venusRealPerihelionAtSun.containerObj);
+barycenterEarthAndSun.pivotObj.add(venusPerihelionFromEarth.containerObj);
+venusPerihelionFromEarth.pivotObj.add(venusRealPerihelionAtSun.containerObj);
 venusRealPerihelionAtSun.pivotObj.add(venus.containerObj);
 
-venusPerihelionDurationEcliptic2.pivotObj.add(venusFixedPerihelionAtSun.containerObj);
+venusPerihelionFromEarth.pivotObj.add(venusFixedPerihelionAtSun.containerObj);
 venus.pivotObj.add(venusWobbleCenter.containerObj);
 
-barycenterEarthAndSun.pivotObj.add(marsPerihelionDurationEcliptic1.containerObj);
-marsPerihelionDurationEcliptic1.pivotObj.add(marsPerihelionFromEarth.containerObj);
-marsPerihelionFromEarth.pivotObj.add(marsPerihelionDurationEcliptic2.containerObj);
-marsPerihelionDurationEcliptic2.pivotObj.add(marsRealPerihelionAtSun.containerObj);
+barycenterEarthAndSun.pivotObj.add(marsPerihelionFromEarth.containerObj);
+marsPerihelionFromEarth.pivotObj.add(marsRealPerihelionAtSun.containerObj);
 marsRealPerihelionAtSun.pivotObj.add(mars.containerObj);
 
-marsPerihelionDurationEcliptic2.pivotObj.add(marsFixedPerihelionAtSun.containerObj);
+marsPerihelionFromEarth.pivotObj.add(marsFixedPerihelionAtSun.containerObj);
 mars.pivotObj.add(marsWobbleCenter.containerObj);
 
-barycenterEarthAndSun.pivotObj.add(jupiterPerihelionDurationEcliptic1.containerObj);
-jupiterPerihelionDurationEcliptic1.pivotObj.add(jupiterPerihelionFromEarth.containerObj);
-jupiterPerihelionFromEarth.pivotObj.add(jupiterPerihelionDurationEcliptic2.containerObj);
-jupiterPerihelionDurationEcliptic2.pivotObj.add(jupiterRealPerihelionAtSun.containerObj);
+barycenterEarthAndSun.pivotObj.add(jupiterPerihelionFromEarth.containerObj);
+jupiterPerihelionFromEarth.pivotObj.add(jupiterRealPerihelionAtSun.containerObj);
 jupiterRealPerihelionAtSun.pivotObj.add(jupiter.containerObj);
 
-jupiterPerihelionDurationEcliptic2.pivotObj.add(jupiterFixedPerihelionAtSun.containerObj);
+jupiterPerihelionFromEarth.pivotObj.add(jupiterFixedPerihelionAtSun.containerObj);
 jupiter.pivotObj.add(jupiterWobbleCenter.containerObj);
 
-barycenterEarthAndSun.pivotObj.add(saturnPerihelionDurationEcliptic1.containerObj);
-saturnPerihelionDurationEcliptic1.pivotObj.add(saturnPerihelionFromEarth.containerObj);
-saturnPerihelionFromEarth.pivotObj.add(saturnPerihelionDurationEcliptic2.containerObj);
-saturnPerihelionDurationEcliptic2.pivotObj.add(saturnRealPerihelionAtSun.containerObj);
+barycenterEarthAndSun.pivotObj.add(saturnPerihelionFromEarth.containerObj);
+saturnPerihelionFromEarth.pivotObj.add(saturnRealPerihelionAtSun.containerObj);
 saturnRealPerihelionAtSun.pivotObj.add(saturn.containerObj);
 
-saturnPerihelionDurationEcliptic2.pivotObj.add(saturnFixedPerihelionAtSun.containerObj);
+saturnPerihelionFromEarth.pivotObj.add(saturnFixedPerihelionAtSun.containerObj);
 saturn.pivotObj.add(saturnWobbleCenter.containerObj);
 
-barycenterEarthAndSun.pivotObj.add(uranusPerihelionDurationEcliptic1.containerObj);
-uranusPerihelionDurationEcliptic1.pivotObj.add(uranusPerihelionFromEarth.containerObj);
-uranusPerihelionFromEarth.pivotObj.add(uranusPerihelionDurationEcliptic2.containerObj);
-uranusPerihelionDurationEcliptic2.pivotObj.add(uranusRealPerihelionAtSun.containerObj);
+barycenterEarthAndSun.pivotObj.add(uranusPerihelionFromEarth.containerObj);
+uranusPerihelionFromEarth.pivotObj.add(uranusRealPerihelionAtSun.containerObj);
 uranusRealPerihelionAtSun.pivotObj.add(uranus.containerObj);
 
-uranusPerihelionDurationEcliptic2.pivotObj.add(uranusFixedPerihelionAtSun.containerObj);
+uranusPerihelionFromEarth.pivotObj.add(uranusFixedPerihelionAtSun.containerObj);
 uranus.pivotObj.add(uranusWobbleCenter.containerObj);
 
-barycenterEarthAndSun.pivotObj.add(neptunePerihelionDurationEcliptic1.containerObj);
-neptunePerihelionDurationEcliptic1.pivotObj.add(neptunePerihelionFromEarth.containerObj);
-neptunePerihelionFromEarth.pivotObj.add(neptunePerihelionDurationEcliptic2.containerObj);
-neptunePerihelionDurationEcliptic2.pivotObj.add(neptuneRealPerihelionAtSun.containerObj);
+barycenterEarthAndSun.pivotObj.add(neptunePerihelionFromEarth.containerObj);
+neptunePerihelionFromEarth.pivotObj.add(neptuneRealPerihelionAtSun.containerObj);
 neptuneRealPerihelionAtSun.pivotObj.add(neptune.containerObj);
 
-neptunePerihelionDurationEcliptic2.pivotObj.add(neptuneFixedPerihelionAtSun.containerObj);
+neptunePerihelionFromEarth.pivotObj.add(neptuneFixedPerihelionAtSun.containerObj);
 neptune.pivotObj.add(neptuneWobbleCenter.containerObj);
 
 barycenterEarthAndSun.pivotObj.add(plutoPerihelionDurationEcliptic1.containerObj);
