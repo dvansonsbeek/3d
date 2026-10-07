@@ -1,6 +1,6 @@
 ---
 docVersion: 1.0
-modelVersion: v18.0
+modelVersion: v19.0
 coefficients: sha256:96f7a2194ea29f0e
 status: current
 ---
@@ -220,25 +220,10 @@ The anchor is the unit of the correction bases and of the frozen era clock; it w
 | Inclination Cycle Anchor | `earthInclinationCycleAnchor` | 21.77 deg | ICRF perihelion longitude where Earth reaches MAX inclination (anchor for the oscillation) |
 | Perihelion Ref JD | `perihelionRefJD` | <!--v:perihelionPassageJD-->2451547.042<!--/v--> | JD of Earth perihelion 2000 (Jan 3.542) |
 
-## Legacy Divisor Assignments (retired framing — no-chain scaffolding record)
-
-The per-planet *d*-assignments below belong to the retired integer-law
-framing (the planet chains moved to the orbital dynamics engine; doc 10 Status + doc 109 carry
-the re-evaluation). They are kept because the constants still exist in the
-legacy scene scaffolding (device anchors, no-chain bodies).
-
-| Planet | Divisor (d) | Phase Group | Mirror Pair | EoC Type |
-|--------|----------------------|-------------|-------------|----------|
-| Mercury | 21 | In-phase (<!--v:mercuryInclCycleAnchor-->234.52<!--/v-->°) | Uranus | I |
-| Venus | 34 | In-phase (<!--v:venusInclCycleAnchor-->218.64<!--/v-->°) | Neptune | I |
-| Earth | 3 | In-phase (21.77°) | Saturn | — |
-| Mars | 5 | In-phase (<!--v:marsInclCycleAnchor-->236.07<!--/v-->°) | Jupiter | II |
-| Jupiter | 5 | In-phase (<!--v:jupiterInclCycleAnchor-->287.06<!--/v-->°) | Mars | III |
-| Saturn | 3 | Anti-phase (<!--v:saturnInclCycleAnchor-->116.26<!--/v-->°) | Earth | III |
-| Uranus | 21 | In-phase (21.33°) | Mercury | III |
-| Neptune | 34 | In-phase (<!--v:neptuneInclCycleAnchor-->174.04<!--/v-->°) | Venus | III |
-
-Phase angles are anchored to balanced year n=7 (≈ -<!--v:systemResetYearBC-->2,649,854 BC<!--/v-->). See [10-fibonacci-laws.md § Phase Groups](10-fibonacci-laws.md#phase-groups) and [31-no-chain-body-elements.md § Per-Planet Cycle Anchors](31-no-chain-body-elements.md#per-planet-cycle-anchors).
+(The per-planet divisor, phase-group and mirror-pair table of the retired
+integer-law framing stood here. Its inputs left `model-parameters.json` at
+plan 07 R8 and nothing in the model reads them; [doc 10](10-fibonacci-laws.md)
+and [doc 31](31-no-chain-body-elements.md) are the historical records.)
 
 ## Model Start & Alignment
 
@@ -396,18 +381,22 @@ of the law is [doc 10](10-fibonacci-laws.md) and `docs/retired-record.md`
 (its verification instruments, `inclination-optimization` and
 `inclination-verification`, went at plan 07 R6).
 
-| Planet | Mean (deg) | Amplitude (deg) | Range (deg) | Phase Angle | ICRF Period |
-|--------|----------|---------------|-----------|-------------|-------------|
-| Mercury | <!--v:mercuryInclMean-->6.690356<!--/v--> | <!--v:mercuryInclAmp-->5.414244<!--/v--> | 6.32 - 7.09 | <!--v:mercuryInclCycleAnchor-->234.52<!--/v-->° | <!--v:mercuryPeriPeriodICRF-->232,437<!--/v--> yr |
-| Venus | <!--v:venusInclMean-->1.538007<!--/v--> | 0.062165 | 2.09 - 2.21 | <!--v:venusInclCycleAnchor-->218.64<!--/v-->° | <!--v:venusPeriPeriodICRF-->174,997<!--/v--> yr |
-| Earth | <!--v:earthInclMean-->1.48113<!--/v--> | <!--v:earthInclAmp-->0.63607<!--/v--> | 0.85 - 2.12 | <!--v:earthInclCycleAnchor-->21.77<!--/v-->° | H/3 ≈ <!--v:earthPeriPeriodICRF-->111,635<!--/v--> yr |
-| Mars | <!--v:marsInclMean-->4.205751<!--/v--> | <!--v:marsInclAmp-->3.368563<!--/v--> | 0.67 - 3.00 | <!--v:marsInclCycleAnchor-->236.07<!--/v-->° | <!--v:marsPeriPeriodICRF-->72,335<!--/v--> yr |
-| Jupiter | <!--v:jupiterInclMean-->0.362180<!--/v--> | <!--v:jupiterInclAmp-->0.137944<!--/v--> | 0.30 - 0.34 | <!--v:jupiterInclCycleAnchor-->287.06<!--/v-->° | <!--v:jupiterPeriPeriodICRF-->304,456<!--/v--> yr |
-| Saturn | <!--v:saturnInclMean-->0.891047<!--/v--> | <!--v:saturnInclAmp-->0.273630<!--/v--> | 0.92 - 1.05 | <!--v:saturnInclCycleAnchor-->116.26<!--/v-->° (anti-phase) | <!--v:saturnPeriPeriodICRF-->45,883<!--/v--> yr |
-| Uranus | <!--v:uranusInclMean-->1.019370<!--/v--> | <!--v:uranusInclAmp-->0.146147<!--/v--> | 0.99 - 1.04 | 21.33° | H/10 ≈ <!--v:uranusPeriPeriodICRF-->330,515<!--/v--> yr |
-| Neptune | <!--v:neptuneInclMean-->0.668278<!--/v--> | <!--v:neptuneInclAmp-->0.201769<!--/v--> | 0.73 - 0.76 | <!--v:neptuneInclCycleAnchor-->174.04<!--/v-->° | 2H/25 ≈ <!--v:neptunePeriPeriodICRF-->2,136,796<!--/v--> yr |
+| Planet | Mean (deg) | Half-range (deg) | Range (deg) | Inertial apsidal period |
+|--------|----------|---------------|-----------|-------------|
+| Mercury | <!--v:mercuryInclMean-->6.690356<!--/v--> | <!--v:mercuryInclAmp-->5.414244<!--/v--> | 6.32 - 7.09 | <!--v:mercuryPeriPeriodICRF-->232,437<!--/v--> yr |
+| Venus | <!--v:venusInclMean-->1.538007<!--/v--> | 0.062165 | 2.09 - 2.21 | <!--v:venusPeriPeriodICRF-->174,997<!--/v--> yr |
+| Earth | <!--v:earthInclMean-->1.48113<!--/v--> | <!--v:earthInclAmp-->0.63607<!--/v--> | 0.85 - 2.12 | <!--v:earthPeriPeriodICRF-->111,635<!--/v--> yr |
+| Mars | <!--v:marsInclMean-->4.205751<!--/v--> | <!--v:marsInclAmp-->3.368563<!--/v--> | 0.67 - 3.00 | <!--v:marsPeriPeriodICRF-->72,335<!--/v--> yr |
+| Jupiter | <!--v:jupiterInclMean-->0.362180<!--/v--> | <!--v:jupiterInclAmp-->0.137944<!--/v--> | 0.30 - 0.34 | <!--v:jupiterPeriPeriodICRF-->304,456<!--/v--> yr |
+| Saturn | <!--v:saturnInclMean-->0.891047<!--/v--> | <!--v:saturnInclAmp-->0.273630<!--/v--> | 0.92 - 1.05 | <!--v:saturnPeriPeriodICRF-->45,883<!--/v--> yr |
+| Uranus | <!--v:uranusInclMean-->1.019370<!--/v--> | <!--v:uranusInclAmp-->0.146147<!--/v--> | 0.99 - 1.04 | <!--v:uranusPeriPeriodICRF-->330,515<!--/v--> yr |
+| Neptune | <!--v:neptuneInclMean-->0.668278<!--/v--> | <!--v:neptuneInclAmp-->0.201769<!--/v--> | 0.73 - 0.76 | <!--v:neptunePeriPeriodICRF-->2,136,796<!--/v--> yr |
 
-**Formula**: `i(t) = mean + amplitude × cos(ω̃_ICRF(t) - cycleAnchor)` (Saturn: sign flipped, anti-phase)
+The mean and half-range are the chain's over the banked ±10-Myr series; the
+period is the chain's 1,296,000/|g| (Earth: the one-family route). The
+retired law's per-planet phase anchors (`inclinationCycleAnchor`, the
+`i(t) = mean + amplitude × cos(ω̃_ICRF(t) − anchor)` form, Saturn anti-phase)
+left `model-parameters.json` at plan 07 R8; doc 31 records their values.
 
 ## Planet Orbital Distances & Periods
 
@@ -747,24 +736,16 @@ Theoretical orbital inclination ranges from secular perturbation theory.
 
 **Source**: [Farside physics textbook (Brouwer & van Woerkom)](https://farside.ph.utexas.edu/teaching/celestial/Celestial/node91.html)
 
-### Inclination Cycle Anchors
+### Inclination Cycle Anchors — retired (plan 07 R8)
 
-Each planet has a per-planet cycle anchor (ICRF perihelion longitude where the planet reaches MAX inclination, evaluated at one of the eight balanced-year anchors). The seven fitted planets share anchor n=7 (≈ -<!--v:systemResetYearBC-->2,649,854 BC<!--/v-->, the start of the current eight-unit interval of the anchor — the retired System-Reset convention); Earth is locked to its IAU-derived n=0 reference.
-
-| Planet | Cycle Anchor | Balanced Year | Notes |
-|--------|-------------|--------|-------|
-| Mercury | <!--v:mercuryInclCycleAnchor-->234.52<!--/v-->° | n=7 | |
-| Venus | <!--v:venusInclCycleAnchor-->218.64<!--/v-->° | n=7 | |
-| Earth | 21.77° | n=0 | locked, IAU reference |
-| Mars | <!--v:marsInclCycleAnchor-->236.07<!--/v-->° | n=7 | |
-| Jupiter | <!--v:jupiterInclCycleAnchor-->287.06<!--/v-->° | n=7* | |
-| Saturn | <!--v:saturnInclCycleAnchor-->116.26<!--/v-->° | n=7* | anti-phase |
-| Uranus | 21.33° | n=7* | |
-| Neptune | <!--v:neptuneInclCycleAnchor-->174.04<!--/v-->° | n=7 | |
-
-\* Jupiter, Saturn, and Uranus have ICRF periods that divide H exactly; their phase at n=7 numerically coincides with their phase at n=0 (and any other anchor).
-
-The eigenmode-cluster claim from earlier model versions (cycle anchors ≈ Laplace-Lagrange γ₁–γ₈) no longer holds in detail under the n=7 anchor — the alignment was specific to the n=0 anchor set. See [10-fibonacci-laws.md § Phase Groups](10-fibonacci-laws.md#phase-groups).
+The per-planet cycle anchors (the ψ law's phase inputs, `inclinationCycleAnchor`,
+and the System-Reset n=7 convention they were evaluated at) left
+`model-parameters.json` with the law; nothing in the model reads them. Earth's
+anchor (21.77°, `earthInclinationCycleAnchor` in astro-reference) is a different
+quantity — it phases the eccentricity channel and is plan 07 R10's subject.
+[Doc 31](31-no-chain-body-elements.md) records the retired values; the
+eigenmode-cluster claim of earlier versions is withdrawn with them
+([doc 10](10-fibonacci-laws.md)).
 
 The `EIGENMODE_PHASES` array in `script.js` provides Laplace-Lagrange reference values:
 
@@ -950,9 +931,11 @@ plan 06 R8** ([retired record](retired-record.md)): the arrays reproduced the
 right-ascension rate of the perihelion marker in the retired geometric scene,
 a regression of the simulator against itself, and the planets now render from
 the N-body chain. What remains of the same quantities: the planets' J2000
-perihelion longitudes (`longitudePerihelion`, §4) and their ecliptic perihelion
-periods (`perihelionEclipticYears`, §4) give the lattice rate
-1,296,000/period × 100 ″/cy per planet (`<p>ModelBaseline` in the registry);
+perihelion longitudes (`longitudePerihelion`, §4) and their inertial apsidal
+periods (`perihelionEclipticYears` — since plan 07 R1 the chain's 1,296,000/g,
+no longer a lattice fraction) give the secular rate 1,296,000/period × 100 ″/cy
+per planet (`<p>PeriRateEclipticArcsecCy` in the registry; `<p>ModelBaseline`
+is the chain's era window rate);
 the Earth-frame right-ascension rate of that motion is its equatorial
 projection (doc 13 §1.8 — one formula, no fitted constants).
 

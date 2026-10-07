@@ -1,6 +1,6 @@
 ---
 docVersion: 1.0
-modelVersion: v18.0
+modelVersion: v19.0
 coefficients: sha256:96f7a2194ea29f0e
 status: current
 ---
@@ -242,7 +242,8 @@ Drawn under CYCLES for Earth and each chain planet
 
 For Mercury through Neptune the perihelion rate is shown in two coordinates
 (doc 13 §1.8), every term computed live by `perihelionFrameBreakdown()`:
-the lattice ecliptic rate (1,296,000/`perihelionEclipticYears` × 100 ″/cy),
+the chain's Newtonian era-window rate (the `lattice` property, a name kept for
+its callers — the H·num/den lattice it once held left at plan 07 R1),
 the equatorial projection excess and obliquity-rate term at the IAU J2000
 perihelion longitude, and — plan 06 R8 — the Earth-frame right-ascension rate
 as their sum (a kinematic identity; the chain's dynamical rate of date is a

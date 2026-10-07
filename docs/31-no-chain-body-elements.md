@@ -1,6 +1,6 @@
 ---
 docVersion: 1.0
-modelVersion: v18.0
+modelVersion: v19.0
 coefficients: sha256:96f7a2194ea29f0e
 status: current
 ---
@@ -94,14 +94,14 @@ the eight anchors in the current eight-unit interval:
 
 | Planet | Cycle Anchor | Balance Group | n | Balanced Year | ICRF Direction | Incl. Trend at J2000 |
 |--------|-------------|---------------|----------|-------------|----------------|----------------------|
-| Mercury | <!--v:mercuryInclCycleAnchor-->234.52<!--/v-->° | In-phase | n=7 | -<!--v:systemResetYearPlain-->2,649,854<!--/v--> | Retrograde | Decreasing |
-| Venus | <!--v:venusInclCycleAnchor-->218.64<!--/v-->° | In-phase | n=7 | -<!--v:systemResetYearPlain-->2,649,854<!--/v--> | Retrograde | Decreasing |
+| Mercury | 234.52° | In-phase | n=7 | -<!--v:systemResetYearPlain-->2,649,854<!--/v--> | Retrograde | Decreasing |
+| Venus | 218.64° | In-phase | n=7 | -<!--v:systemResetYearPlain-->2,649,854<!--/v--> | Retrograde | Decreasing |
 | Earth | 21.77° | In-phase | n=0 (locked) | <!--v:balancedYear-->-302,635<!--/v--> | Prograde | Decreasing |
-| Mars | <!--v:marsInclCycleAnchor-->236.07<!--/v-->° | In-phase | n=7 | -<!--v:systemResetYearPlain-->2,649,854<!--/v--> | Retrograde | Decreasing |
-| Jupiter | <!--v:jupiterInclCycleAnchor-->287.06<!--/v-->° | In-phase | n=7 (= n=0)* | -<!--v:systemResetYearPlain-->2,649,854<!--/v--> | Retrograde | Decreasing |
-| **Saturn** | **<!--v:saturnInclCycleAnchor-->116.26<!--/v-->°** | **Anti-phase** | n=7 (= n=0)* | -<!--v:systemResetYearPlain-->2,649,854<!--/v--> | **Retrograde** | **Increasing** |
+| Mars | 236.07° | In-phase | n=7 | -<!--v:systemResetYearPlain-->2,649,854<!--/v--> | Retrograde | Decreasing |
+| Jupiter | 287.06° | In-phase | n=7 (= n=0)* | -<!--v:systemResetYearPlain-->2,649,854<!--/v--> | Retrograde | Decreasing |
+| **Saturn** | **116.26°** | **Anti-phase** | n=7 (= n=0)* | -<!--v:systemResetYearPlain-->2,649,854<!--/v--> | **Retrograde** | **Increasing** |
 | Uranus | 21.33° | In-phase | n=7 (= n=0)* | -<!--v:systemResetYearPlain-->2,649,854<!--/v--> | Retrograde | Decreasing |
-| Neptune | <!--v:neptuneInclCycleAnchor-->174.04<!--/v-->° | In-phase | n=7 | -<!--v:systemResetYearPlain-->2,649,854<!--/v--> | Retrograde | Decreasing |
+| Neptune | 174.04° | In-phase | n=7 | -<!--v:systemResetYearPlain-->2,649,854<!--/v--> | Retrograde | Decreasing |
 
 \* Uranus's ICRF perihelion period (H/10) divides H exactly, so its n=7 phase coincides with n=0; Jupiter and Saturn carry non-integer cycles per anchor interval, so their per-anchor phases differ.
 

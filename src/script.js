@@ -285,31 +285,19 @@ const BOND_TAPER_TOTAL_HALFWIDTH_YR = K.deepTime.dtStackTaperTotalHalfwidthYr;  
 
 const planets = {};
 
-/**
- * H-lattice period in years from the JSON integer pair [numerator, denominator]:
- * [8, 11] -> 8H/11, [-4, 3] -> -4H/3, [610, 1] -> 610H.
- *
- * These were hand-written arithmetic (`-holisticyearLength*8/65`) while the
- * fractions they encode already lived in model-parameters.json. Verified
- * bit-identical to every expression it replaces — all 21 pairs, 7 planets x
- * {perihelion, axial precession, obliquity} — so the lattice values do not move.
- *
- * Evaluated once at module load, like the literals it replaces. The epoch path
- * (recomputePlanetCyclesForEpoch) rescales the J2000 snapshots taken from these.
- *
- * @param {number[]|null|undefined} frac
- * @returns {number|undefined} undefined when the JSON pair is null (Venus and
- *   Neptune obliquity, which is derived from |ICRF| further down instead)
- */
-const latticeYears = (frac) => (frac ? holisticyearLength * frac[0] / frac[1] : undefined);
+// (Plan 07 R1/R8: latticeYears — the H·num/den period from the JSON integer
+// pairs — is gone with the pairs. The planets' perihelion period is the
+// chain's 1,296,000/g, read from the governed artifact below.)
 
 // Mercury
-// The derived member perihelionEclipticYears deliberately stays as arithmetic.
-// It encodes the fraction the JSON stores as an integer pair — [8,11] is
-// written here as H/(1+3/8) = 8H/11 — so importing it would change the
-// expression's form, not merely its source. (The axial and obliquity-cycle
-// fractions retired with plan 06 Phase 7 commit 2: the planets' spin rides
-// the spin channel, @essrt/physics/planets/spin-channel.)
+// Plan 07 R1/R8: perihelionEclipticYears is the N-body chain's inertial
+// apsidal period, 1,296,000/g yr (g the leading secular apsidal
+// eigenfrequency of the governed artifact — the value the API and the
+// registry publish; Mercury 232,437 yr). The H·num/den lattice fraction the
+// JSON stored (8H/11 = 243,867 yr) is gone with the device's other inputs
+// (fibonacciD, inclinationCycleAnchor, antiPhase). (The axial and
+// obliquity-cycle fractions retired with plan 06 Phase 7 commit 2: the
+// planets' spin rides the spin channel, @essrt/physics/planets/spin-channel.)
 planets.mercury = {
   // Astro references (astro-reference.json -> planetOrbitalElements.mercury)
   solarYearInput: K.planetOrbitalElements.mercury.solarYearInput,
@@ -323,13 +311,11 @@ planets.mercury = {
   trueAnomaly: K.planetOrbitalElements.mercury.trueAnomaly,
   // Model parameters (model-parameters.json -> planets.mercury)
   angleCorrection: K.planets.mercury.angleCorrection,
-  perihelionEclipticYears: latticeYears(K.planets.mercury.perihelionEclipticFraction),
+  perihelionEclipticYears: 1296000 / CHAIN_ARTIFACT.g.mercury.arcsecPerYr,
   startpos: K.planets.mercury.startpos,
   eocFraction: K.planets.mercury.eocFraction,
   perihelionRef_JD: K.perihelionPassageRef.mercury,
   ascendingNodeInvPlane: K.planets.mercury.ascendingNodeInvPlane,
-  inclinationCycleAnchor: K.planets.mercury.inclinationCycleAnchor,
-  antiPhase: K.planets.mercury.antiPhase,
   ascendingNodeCyclesIn8H: K.planets.mercury.ascendingNodeCyclesIn8H,
 };
 
@@ -347,13 +333,11 @@ planets.venus = {
   trueAnomaly: K.planetOrbitalElements.venus.trueAnomaly,
   // Model parameters (model-parameters.json -> planets.venus)
   angleCorrection: K.planets.venus.angleCorrection,
-  perihelionEclipticYears: latticeYears(K.planets.venus.perihelionEclipticFraction),
+  perihelionEclipticYears: 1296000 / CHAIN_ARTIFACT.g.venus.arcsecPerYr,
   startpos: K.planets.venus.startpos,
   eocFraction: K.planets.venus.eocFraction,
   perihelionRef_JD: K.perihelionPassageRef.venus,
   ascendingNodeInvPlane: K.planets.venus.ascendingNodeInvPlane,
-  inclinationCycleAnchor: K.planets.venus.inclinationCycleAnchor,
-  antiPhase: K.planets.venus.antiPhase,
   ascendingNodeCyclesIn8H: K.planets.venus.ascendingNodeCyclesIn8H,
 };
 
@@ -371,13 +355,11 @@ planets.mars = {
   trueAnomaly: K.planetOrbitalElements.mars.trueAnomaly,
   // Model parameters (model-parameters.json -> planets.mars)
   angleCorrection: K.planets.mars.angleCorrection,
-  perihelionEclipticYears: latticeYears(K.planets.mars.perihelionEclipticFraction),
+  perihelionEclipticYears: 1296000 / CHAIN_ARTIFACT.g.mars.arcsecPerYr,
   startpos: K.planets.mars.startpos,
   eocFraction: K.planets.mars.eocFraction,
   perihelionRef_JD: K.perihelionPassageRef.mars,
   ascendingNodeInvPlane: K.planets.mars.ascendingNodeInvPlane,
-  inclinationCycleAnchor: K.planets.mars.inclinationCycleAnchor,
-  antiPhase: K.planets.mars.antiPhase,
   ascendingNodeCyclesIn8H: K.planets.mars.ascendingNodeCyclesIn8H,
 };
 
@@ -395,13 +377,11 @@ planets.jupiter = {
   trueAnomaly: K.planetOrbitalElements.jupiter.trueAnomaly,
   // Model parameters (model-parameters.json -> planets.jupiter)
   angleCorrection: K.planets.jupiter.angleCorrection,
-  perihelionEclipticYears: latticeYears(K.planets.jupiter.perihelionEclipticFraction),
+  perihelionEclipticYears: 1296000 / CHAIN_ARTIFACT.g.jupiter.arcsecPerYr,
   startpos: K.planets.jupiter.startpos,
   eocFraction: K.planets.jupiter.eocFraction,
   perihelionRef_JD: K.perihelionPassageRef.jupiter,
   ascendingNodeInvPlane: K.planets.jupiter.ascendingNodeInvPlane,
-  inclinationCycleAnchor: K.planets.jupiter.inclinationCycleAnchor,
-  antiPhase: K.planets.jupiter.antiPhase,
   ascendingNodeCyclesIn8H: K.planets.jupiter.ascendingNodeCyclesIn8H,
 };
 
@@ -419,13 +399,11 @@ planets.saturn = {
   trueAnomaly: K.planetOrbitalElements.saturn.trueAnomaly,
   // Model parameters (model-parameters.json -> planets.saturn)
   angleCorrection: K.planets.saturn.angleCorrection,
-  perihelionEclipticYears: latticeYears(K.planets.saturn.perihelionEclipticFraction),
+  perihelionEclipticYears: 1296000 / CHAIN_ARTIFACT.g.saturn.arcsecPerYr,
   startpos: K.planets.saturn.startpos,
   eocFraction: K.planets.saturn.eocFraction,
   perihelionRef_JD: K.perihelionPassageRef.saturn,
   ascendingNodeInvPlane: K.planets.saturn.ascendingNodeInvPlane,
-  inclinationCycleAnchor: K.planets.saturn.inclinationCycleAnchor,
-  antiPhase: K.planets.saturn.antiPhase,
   ascendingNodeCyclesIn8H: K.planets.saturn.ascendingNodeCyclesIn8H,
 };
 
@@ -443,13 +421,11 @@ planets.uranus = {
   trueAnomaly: K.planetOrbitalElements.uranus.trueAnomaly,
   // Model parameters (model-parameters.json -> planets.uranus)
   angleCorrection: K.planets.uranus.angleCorrection,
-  perihelionEclipticYears: latticeYears(K.planets.uranus.perihelionEclipticFraction),
+  perihelionEclipticYears: 1296000 / CHAIN_ARTIFACT.g.uranus.arcsecPerYr,
   startpos: K.planets.uranus.startpos,
   eocFraction: K.planets.uranus.eocFraction,
   perihelionRef_JD: K.perihelionPassageRef.uranus,
   ascendingNodeInvPlane: K.planets.uranus.ascendingNodeInvPlane,
-  inclinationCycleAnchor: K.planets.uranus.inclinationCycleAnchor,
-  antiPhase: K.planets.uranus.antiPhase,
   ascendingNodeCyclesIn8H: K.planets.uranus.ascendingNodeCyclesIn8H,
 };
 
@@ -467,13 +443,11 @@ planets.neptune = {
   trueAnomaly: K.planetOrbitalElements.neptune.trueAnomaly,
   // Model parameters (model-parameters.json -> planets.neptune)
   angleCorrection: K.planets.neptune.angleCorrection,
-  perihelionEclipticYears: latticeYears(K.planets.neptune.perihelionEclipticFraction),
+  perihelionEclipticYears: 1296000 / CHAIN_ARTIFACT.g.neptune.arcsecPerYr,
   startpos: K.planets.neptune.startpos,
   eocFraction: K.planets.neptune.eocFraction,
   perihelionRef_JD: K.perihelionPassageRef.neptune,
   ascendingNodeInvPlane: K.planets.neptune.ascendingNodeInvPlane,
-  inclinationCycleAnchor: K.planets.neptune.inclinationCycleAnchor,
-  antiPhase: K.planets.neptune.antiPhase,
   ascendingNodeCyclesIn8H: K.planets.neptune.ascendingNodeCyclesIn8H,
 };
 
@@ -495,10 +469,8 @@ planets.pluto = {
   // latticeYears returns H*1/1, which is H exactly.
   orbitalEccentricityBase: K.additionalBodies.pluto.orbitalEccentricityBase,
   angleCorrection: K.additionalBodies.pluto.angleCorrection,
-  perihelionEclipticYears: latticeYears(K.additionalBodies.pluto.perihelionEclipticFraction),
   startpos: K.additionalBodies.pluto.startpos,
   ascendingNodeInvPlane: K.additionalBodies.pluto.ascendingNodeInvPlane,
-  inclinationCycleAnchor: K.additionalBodies.pluto.inclinationCycleAnchor,
   invPlaneInclinationMean: K.additionalBodies.pluto.invPlaneInclinationMean, invPlaneInclinationAmplitude: K.additionalBodies.pluto.invPlaneInclinationAmplitude,
 };
 
@@ -516,10 +488,8 @@ planets.halleys = {
   // Model parameters (from model-parameters.json)
   orbitalEccentricityBase: K.additionalBodies.halleys.orbitalEccentricityBase,
   angleCorrection: K.additionalBodies.halleys.angleCorrection,
-  perihelionEclipticYears: latticeYears(K.additionalBodies.halleys.perihelionEclipticFraction),
   startpos: K.additionalBodies.halleys.startpos,
   ascendingNodeInvPlane: K.additionalBodies.halleys.ascendingNodeInvPlane,
-  inclinationCycleAnchor: K.additionalBodies.halleys.inclinationCycleAnchor,
   invPlaneInclinationMean: K.additionalBodies.halleys.invPlaneInclinationMean, invPlaneInclinationAmplitude: K.additionalBodies.halleys.invPlaneInclinationAmplitude,
 };
 
@@ -537,10 +507,8 @@ planets.eros = {
   // Model parameters (from model-parameters.json)
   orbitalEccentricityBase: K.additionalBodies.eros.orbitalEccentricityBase,
   angleCorrection: K.additionalBodies.eros.angleCorrection,
-  perihelionEclipticYears: latticeYears(K.additionalBodies.eros.perihelionEclipticFraction),
   startpos: K.additionalBodies.eros.startpos,
   ascendingNodeInvPlane: K.additionalBodies.eros.ascendingNodeInvPlane,
-  inclinationCycleAnchor: K.additionalBodies.eros.inclinationCycleAnchor,
   invPlaneInclinationMean: K.additionalBodies.eros.invPlaneInclinationMean, invPlaneInclinationAmplitude: K.additionalBodies.eros.invPlaneInclinationAmplitude,
 };
 
@@ -558,7 +526,6 @@ planets.ceres = {
   // Model parameters (from model-parameters.json)
   orbitalEccentricityBase: K.additionalBodies.ceres.orbitalEccentricityBase,
   angleCorrection: K.additionalBodies.ceres.angleCorrection,
-  perihelionEclipticYears: latticeYears(K.additionalBodies.ceres.perihelionEclipticFraction),
   startpos: K.additionalBodies.ceres.startpos,
   orbitDistance: K.additionalBodies.ceres.orbitDistanceOverride,
   // BUG FIX via migration: this read 10.36 — verbatim Eros's ascending node from
@@ -569,7 +536,6 @@ planets.ceres = {
   // name-matching is disabled, and 80.89 does occur in the file — under the
   // other name.
   ascendingNodeInvPlane: K.additionalBodies.ceres.ascendingNodeInvPlane,
-  inclinationCycleAnchor: K.additionalBodies.ceres.inclinationCycleAnchor,
   invPlaneInclinationMean: K.additionalBodies.ceres.invPlaneInclinationMean, invPlaneInclinationAmplitude: K.additionalBodies.ceres.invPlaneInclinationAmplitude,
 };
 
@@ -1016,15 +982,9 @@ let   meansiderealyearlengthinDays = ASTRO_REFERENCE.siderealYearJ2000;  // Phas
 // meanlengthofday derives structurally to 86399.99968 s via the
 // T_axial = H/13 identity — no shim needed.
 let   meansiderealyearlengthinSeconds = ASTRO_REFERENCE.siderealYearJ2000 * 86400; // (Phase 1: mutable for deep-time mode)
-// Triple synodic period (Jupiter-Saturn conjunction + perihelion precession H/5, -H/8)
-// Uses exact orbital periods from integer orbit counts: H / round(H*meanSolarYear/solarYearInput)
-const tripleSynodicYears = (() => {
-  const _Tj = holisticyearLength / Math.round(holisticyearLength * meansolaryearlengthinDays / planets.jupiter.solarYearInput);
-  const _Ts = holisticyearLength / Math.round(holisticyearLength * meansolaryearlengthinDays / planets.saturn.solarYearInput);
-  const _nJe = 360 / _Tj + 360 / planets.jupiter.perihelionEclipticYears;
-  const _nSe = 360 / _Ts + 360 / planets.saturn.perihelionEclipticYears;
-  return 3 * 360 / (_nJe - _nSe);
-})();
+// (Plan 07 R1: tripleSynodicYears — the Jupiter–Saturn triple synodic period
+// on the device's lattice perihelion rates — had no reader; gone with the
+// lattice.)
 // The sidereal year in days by the lattice route at J2000 — T_sid = T_trop × H / (H − 13),
 // the T_axial = H/13 identity; the framework's own MEAN, independent of the IAU
 // reference — used to anchor meanlengthofday. A J2000 CONSTANT, not an epoch
@@ -1418,7 +1378,7 @@ const GM_EROS = M_EROS * G_CONSTANT;                 // ~4.46 × 10⁻⁴ km³/s
 // ─── E2c. Derived planet inclination parameters (retired law framework — doc 72; device/no-chain path only) ────────
 // PSI = d_Earth × inclAmp_Earth × √m_Earth — universal inclination amplitude constant
 // Amplitude = PSI / (d × √m), Mean from J2000 constraint: mean = inclJ2000 - amp × cos(Ω - φ)
-// fibonacciD values: Mercury=21, Venus=34, Earth=3, Mars=5, Jupiter=5, Saturn=3, Uranus=21, Neptune=34
+// (The per-planet divisor table the law read left the JSON at plan 07 R8.)
 //
 // SYSTEM/ALONE mass convention (intentional asymmetry):
 //   • PSI calibration uses M_EARTH_ALONE — the Moon's contribution to Earth's
@@ -2521,24 +2481,14 @@ const SATURN_PERIOD_J2000_S  = planets.saturn.solarYearInput  * 86400;
 const URANUS_PERIOD_J2000_S  = planets.uranus.solarYearInput  * 86400;
 const NEPTUNE_PERIOD_J2000_S = planets.neptune.solarYearInput * 86400;
 
-// Per-planet cycle-period anchors (frozen at module load — Phase 5 mutates
-// the live `planets[k].perihelionEclipticYears` at deep time so the scene-graph
-// + cached helpers can re-derive correctly. The mean*AtAge() functions are
-// H-driven and do NOT read these snapshots, but having them as `const` makes
-// recompute trivial: period(t) = period_J2000 × (H_t / H_J2000).
 // Plan 06 Phase 7 commit 2: the axial and obliquity-cycle anchors are GONE —
 // the planets' spin rides the spin channel and the K eccentricity law's period
-// is the chain's g-mode beat (both constant in the epoch recompute).
+// is the chain's g-mode beat. Plan 07 R1: the PERIHELION_ECLIPTIC_YEARS_J2000
+// snapshots and their deep-time H-scaling (recomputePlanetCyclesForEpoch) are
+// gone too — the planets' perihelion period is the chain's 1,296,000/g, a
+// quantity of the governed artifact that scales with the solar mass (Driver
+// 2), not with H; the chain evaluator carries the date.
 const PLANET_KEYS = ['mercury','venus','mars','jupiter','saturn','uranus','neptune'];
-const PERIHELION_ECLIPTIC_YEARS_J2000 = {
-  mercury: planets.mercury.perihelionEclipticYears,   // = +8H/11
-  venus:   planets.venus.perihelionEclipticYears,     // = -8H/6  (retro)
-  mars:    planets.mars.perihelionEclipticYears,      // = +8H/36
-  jupiter: planets.jupiter.perihelionEclipticYears,   // = +8H/39
-  saturn:  planets.saturn.perihelionEclipticYears,    // = -8H/65 (retro)
-  uranus:  planets.uranus.perihelionEclipticYears,    // = +H/3 = 8H/24
-  neptune: planets.neptune.perihelionEclipticYears,   // = +2H  = 8H/4
-};
 // Lunar precession period anchors at J2000 — pre-computed once so the
 // per-call functions don't re-evaluate them every frame.
 // Under Option C+ (2026-06), apsidal/nodal periods come directly from
@@ -5003,7 +4953,7 @@ const ECCENTRICITY_ANCHOR_J2000_FIXED = BALANCED_YEAR_J2000_FIXED - systemResetN
 
 // DELETED: EARTH_ECC_DIVISOR_N = 16 (Earth perihelion cycle, H/16). Declared and
 // never referenced. The live H/16 relationship is carried by
-// perihelionCycleLength and by the perihelionEclipticFraction pairs in the JSON.
+// perihelionCycleLength (the planets' lattice pairs left the JSON at plan 07 R8).
 
 // ───── PHASE 6.7 — Simulation time units (sDay/sYear/sMonth/sWeek/sHour/sMinute/sSecond) ─────
 // Re-derives the 7 time-unit conversion factors from the now-mutable
@@ -5190,46 +5140,18 @@ function recomputeMoonAndAuForEpoch(t_Ma) {
   return true;
 }
 
-// ───── PHASE 5 — Per-planet cycle-period scaling (perihelion, axial, obliquity, wobble) ─────
-// Per doc 99 ESSRT, every planet cycle is structurally `8H/N` (or `H/N`) for
-// a structural integer N. The integers stay invariant; absolute periods scale
-// as `period(t) = period_J2000 × (H_t / H_J2000)`. This function mutates:
-//   • planets[k].perihelionEclipticYears   (element 1)
-// (Plan 06 Phase 7 commit 2: the axial and obliquity-cycle elements, the
-// device wobble periods and the obliquity means no longer live here — the
-// spin channel and the chain's g-mode beat are constants of the artifacts.)
-//
-// Elements 2 (perihelion ICRF) and 5 (ascending-node inv-plane) are derived
-// quantities that AUTO-update because their formulas reference the mutated
-// planets.X.* and H values directly:
-//   • Perihelion ICRF = `1/(1/peri_ecliptic - 13/H)` — recomputed inline by callers
-//   • Ascending-node = `8H/N_ascending` where N stays invariant — only 8H scales
-//
-// Currently dormant: nothing calls this yet. Phase 4 setEpochByAge() chains
-// it in after recomputePlanetCountsForEpoch.
+// ───── PHASE 5 — Per-planet cycle-period scaling — RETIRED (plan 07 R1) ─────
+// recomputePlanetCyclesForEpoch stood here: it rescaled the device's
+// `8H/N` perihelion periods as `period(t) = period_J2000 × (H_t / H_J2000)`.
+// The planets' perihelion period is now the chain's 1,296,000/g — a quantity
+// of the governed artifact that scales with the solar mass (Driver 2), not
+// with H — so there is nothing to rescale; the chain evaluator carries the
+// date. (Plan 06 Phase 7 commit 2 had already moved the axial and
+// obliquity-cycle elements to the spin channel and the g-mode beat.)
 function recomputePlanetCyclesForEpoch(t_Ma) {
-  const H_t = meanHAtAge(t_Ma);
-  if (H_t === null) {
-    console.warn(`recomputePlanetCyclesForEpoch(${t_Ma}): past tidal-lock asymptote — cycles unchanged`);
-    return false;
-  }
-  const r = H_t / HOLISTIC_YEAR_J2000;
-
-  // Mutate the planets.X.* config fields. Downstream code that reads from
-  // planets.X.perihelionEclipticYears will see the epoch-correct value.
-  // Plan 06 Phase 7 commit 2: the axial and obliquity-cycle fields are gone
-  // (the spin channel carries the planets' spin); the K law's cycle period
-  // (the chain's g-mode beat) and obliquity input (the derived J2000
-  // obliquity) are constants here — the g-modes scale only with the solar
-  // mass (Driver 2), not with H.
-  for (const k of PLANET_KEYS) {
-    planets[k].perihelionEclipticYears = PERIHELION_ECLIPTIC_YEARS_J2000[k] * r;
-  }
-
-  // (The predictive-formula feature-template cache that was invalidated here
-  // left with the planet predict device — plan 06 R8.)
-
-  return true;
+  // Kept as a no-op so the three epoch orchestrators keep their call order;
+  // returns true like the other recompute steps.
+  return Number.isFinite(t_Ma);
 }
 
 // ───── PHASE 3 (safe subset) — Earth, Moon, and Earth-precession object updaters ─────
@@ -5374,14 +5296,13 @@ function updateSafeObjectsForEpoch() {
 // epoch — see "Why we keep both paths" in
 // docs/archive/old-documents/IP-planet-deep-time-scene-graph.md.
 //
-// PERIHELION RATE — ESSRT 8H/N scaling.
-//   `perihelionPrecessionRate` scales with H: per doc 99 each planet's
-//   perihelion ecliptic period is 8H/N for a fixed integer N (Mercury 11,
-//   Venus 6, Mars 36, Jupiter 39, Saturn 65, Uranus 24, Neptune 4). Since
-//   the JSON `planets.X.perihelionEclipticYears` value is already 8H_J2000/N,
-//   we get the live rate at any epoch by multiplying the J2000 rate by
-//   (H_J2000 / H_t). No let-conversion of `planets.X.perihelionEclipticYears`
-//   is required.
+// PERIHELION RATE — the chain's (plan 07 R1).
+//   `perihelionPrecessionRate` is 2π / the chain's inertial apsidal period
+//   (1,296,000/g, a quantity of the governed artifact that scales with the
+//   solar mass, not with H — the former 8H/N lattice and its H_J2000/H_t
+//   factor are gone). The seven chain planets' wheels render nothing since
+//   K5 (positions are the chain's); the rate is kept for the wheel objects'
+//   own consistency.
 //
 // LIMITATIONS (known, deferred):
 //   - `rotationSpeed` is NOT updated; it depends on `*RotationPeriod` const
@@ -5395,15 +5316,11 @@ function updateSafeObjectsForEpoch() {
 // Currently dormant: nothing calls these. Phase 4 will chain them after
 // recomputePlanetCountsForEpoch() inside setEpoch().
 
-// H_J2000 / H(t) factor for ESSRT perihelion-rate scaling. At t_Ma=0 → 1.0.
-function _hRatioJ2000OverNow() { return HOLISTIC_YEAR_J2000 / holisticyearLength; }
-
 function updateMercuryForEpoch() {
   mercury.speed       = Math.PI * 2 / (holisticyearLength / mercurySolarYearCount);
   mercury.orbitRadius = mercuryOrbitDistance * 100;
   mercury.size        = (diameters.mercuryDiameter / 2 / currentAUDistance) * 100;
-  mercury.perihelionPrecessionRate =
-    (Math.PI * 2 / planets.mercury.perihelionEclipticYears) * _hRatioJ2000OverNow();
+  mercury.perihelionPrecessionRate = Math.PI * 2 / planets.mercury.perihelionEclipticYears;
   // Phase 3.5: Mercury 3:2 spin-orbit lock (Pettengill & Dyce 1965). The lock
   // is enforced tidally — 3 sidereal rotations per 2 orbits — so the rotation
   // period mutates with the orbital period at deep time. All three live values
@@ -5417,43 +5334,37 @@ function updateVenusForEpoch() {
   venus.speed         = Math.PI * 2 / (holisticyearLength / venusSolarYearCount);
   venus.orbitRadius   = venusOrbitDistance * 100;
   venus.size          = (diameters.venusDiameter / 2 / currentAUDistance) * 100;
-  venus.perihelionPrecessionRate =
-    (Math.PI * 2 / planets.venus.perihelionEclipticYears) * _hRatioJ2000OverNow();
+  venus.perihelionPrecessionRate = Math.PI * 2 / planets.venus.perihelionEclipticYears;
 }
 function updateMarsForEpoch() {
   mars.speed          = Math.PI * 2 / (holisticyearLength / marsSolarYearCount);
   mars.orbitRadius    = marsOrbitDistance * 100;
   mars.size           = (diameters.marsDiameter / 2 / currentAUDistance) * 100;
-  mars.perihelionPrecessionRate =
-    (Math.PI * 2 / planets.mars.perihelionEclipticYears) * _hRatioJ2000OverNow();
+  mars.perihelionPrecessionRate = Math.PI * 2 / planets.mars.perihelionEclipticYears;
 }
 function updateJupiterForEpoch() {
   jupiter.speed       = Math.PI * 2 / (holisticyearLength / jupiterSolarYearCount);
   jupiter.orbitRadius = jupiterOrbitDistance * 100;
   jupiter.size        = (diameters.jupiterDiameter / 2 / currentAUDistance) * 100;
-  jupiter.perihelionPrecessionRate =
-    (Math.PI * 2 / planets.jupiter.perihelionEclipticYears) * _hRatioJ2000OverNow();
+  jupiter.perihelionPrecessionRate = Math.PI * 2 / planets.jupiter.perihelionEclipticYears;
 }
 function updateSaturnForEpoch() {
   saturn.speed        = Math.PI * 2 / (holisticyearLength / saturnSolarYearCount);
   saturn.orbitRadius  = saturnOrbitDistance * 100;
   saturn.size         = (diameters.saturnDiameter / 2 / currentAUDistance) * 100;
-  saturn.perihelionPrecessionRate =
-    (Math.PI * 2 / planets.saturn.perihelionEclipticYears) * _hRatioJ2000OverNow();
+  saturn.perihelionPrecessionRate = Math.PI * 2 / planets.saturn.perihelionEclipticYears;
 }
 function updateUranusForEpoch() {
   uranus.speed        = Math.PI * 2 / (holisticyearLength / uranusSolarYearCount);
   uranus.orbitRadius  = uranusOrbitDistance * 100;
   uranus.size         = (diameters.uranusDiameter / 2 / currentAUDistance) * 100;
-  uranus.perihelionPrecessionRate =
-    (Math.PI * 2 / planets.uranus.perihelionEclipticYears) * _hRatioJ2000OverNow();
+  uranus.perihelionPrecessionRate = Math.PI * 2 / planets.uranus.perihelionEclipticYears;
 }
 function updateNeptuneForEpoch() {
   neptune.speed       = Math.PI * 2 / (holisticyearLength / neptuneSolarYearCount);
   neptune.orbitRadius = neptuneOrbitDistance * 100;
   neptune.size        = (diameters.neptuneDiameter / 2 / currentAUDistance) * 100;
-  neptune.perihelionPrecessionRate =
-    (Math.PI * 2 / planets.neptune.perihelionEclipticYears) * _hRatioJ2000OverNow();
+  neptune.perihelionPrecessionRate = Math.PI * 2 / planets.neptune.perihelionEclipticYears;
 }
 
 /** Full Phase 3 orchestrator: safe subset + all 7 outer planets. */
@@ -14362,7 +14273,7 @@ function wgcRenderPlanet(planetKey) {
 // The model curve drawn against WebGeoCalc's ϖ(t) — shared by the on-screen
 // explorer and the paper export so both carry the same overlay:
 //   ϖ = λ₀ + (projectedRa/360000)·(y − 2000)
-// i.e. the lattice advance (360°/perihelionEclipticYears, ecliptic) plus the
+// i.e. the chain's inertial apsidal advance (360°/perihelionEclipticYears, 1,296,000/g; plan 07 R1) plus the
 // equatorial projection excess (dα/dλ − 1 at the perihelion's longitude) —
 // Mercury 531.44 + 42.71 = 574.14, the model's account of the relativistic
 // advance (42.98 from the same constants). Owner decision; the derivation,
@@ -14370,15 +14281,8 @@ function wgcRenderPlanet(planetKey) {
 // planet by the same rule. The Earth-frame RA rate (the equatorial projection
 // of the lattice motion, perihelionFrameBreakdown) is a different coordinate
 // and stays on the Cycles tab, not here.
-// Period label for a planet's ecliptic-frame perihelion motion, for the explorer
-// text (plan 06 Phase 4d: the former "8H/N" lattice label is retired; the period
-// is the device's own value, stated in years).
-function wgcLatticeLabel(planetKey) {
-  const p = planets[planetKey.toLowerCase()];
-  if (!p || !p.perihelionEclipticYears) return 'ecliptic-frame period';
-  const yrs = Math.round(Math.abs(p.perihelionEclipticYears)).toLocaleString('en-US');
-  return `${yrs}-yr ecliptic perihelion period${p.perihelionEclipticYears < 0 ? ', retrograde' : ''}`;
-}
+// (Plan 07 R1: wgcLatticeLabel — the explorer's "N-yr ecliptic perihelion
+// period" label for the device's lattice period — had no caller; gone.)
 
 // |s₃|, ″/yr — the dominant nodal mode of Earth's orbit on the invariable plane
 // (the engine's deep secular modes; the obliquity beat's partner). Plan 06 S6:
@@ -45908,7 +45812,7 @@ function loadTexture( url, onLoad ) {
 // helpers — computing at module load throws TDZ. First render happens at J2000
 // state (before any setEpoch), so lazy computation captures the J2000 value.
 // ── Perihelion rate in its two coordinates (doc 13 §1.8; gate tools/verify/perihelion-projection-closure.js) ──
-// (a) ecliptic longitude — what observers publish: the lattice rate 360°/perihelionEclipticYears.
+// (a) ecliptic longitude — what observers publish: the chain's inertial rate 360°/perihelionEclipticYears (1,296,000/g).
 // (b) right ascension in the scene's equator (which co-moves with its stars) — what the
 //     Earth-frame export and the predict basis produce; no observer publishes it:
 //        rate_RA = rate_ecl · dα/dλ(λ, ε) + ∂α/∂ε(λ, ε) · ε̇

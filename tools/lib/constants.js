@@ -137,11 +137,15 @@ const moonStartposMoon = modelParams.moon.moonStartposMoon;
 // Per-planet constants for the 7 non-Earth planets.
 // ═══════════════════════════════════════════════════════════════════════════
 
-// Helper: convert fraction [num, den] to H * num / den
-function fractionToYears(frac) {
-  if (frac === null) return null;
-  return H * frac[0] / frac[1];
-}
+// Plan 07 R1/R8: the planets' perihelion period is the N-body chain's
+// inertial apsidal period, 1,296,000/g yr (g the leading secular apsidal
+// eigenfrequency of the governed artifact, ″/yr — the quantity the API and
+// the registry publish; Mercury 232,437 yr). The H·num/den lattice
+// fractions (model-parameters perihelionEclipticFraction, the former
+// fractionToYears helper; Mercury 8H/11 = 243,867 yr) are gone with the
+// other device inputs (fibonacciD, inclinationCycleAnchor, antiPhase).
+const CHAIN_DATA = JSON.parse(fs.readFileSync(
+  path.resolve(__dirname, '..', '..', 'data', 'nbody-secular-frequencies.json'), 'utf8'));
 
 const planetAstro = astroRef.planetOrbitalElements;
 const planets = {};
@@ -156,13 +160,10 @@ for (const [key, mp] of Object.entries(modelParams.planets)) {
     eocFraction: mp.eocFraction,
     startpos: mp.startpos,
     angleCorrection: mp.angleCorrection,
-    perihelionEclipticYears: fractionToYears(mp.perihelionEclipticFraction),
+    perihelionEclipticYears: 1296000 / CHAIN_DATA.g[key].arcsecPerYr,   // the chain's inertial apsidal period (R1)
     type: mp.type,
     mirrorPair: mp.mirrorPair,
-    fibonacciD: mp.fibonacciD,
     ascendingNodeInvPlane: mp.ascendingNodeInvPlane,
-    inclinationCycleAnchor: mp.inclinationCycleAnchor,
-    antiPhase: mp.antiPhase || false,
     ascendingNodeCyclesIn8H: mp.ascendingNodeCyclesIn8H,
     ascendingNodePeriod: mp.ascendingNodeCyclesIn8H ? -(8 * H) / mp.ascendingNodeCyclesIn8H : null,
     // (axialPrecessionYears / obliquityCycle — the K device's integer
@@ -298,15 +299,9 @@ const j2000JD = 2451545.0;
 const julianCenturyDays = 36525;
 const tropicalCenturyDays = 100 * meanSolarYearDays;
 
-// Triple synodic period (Jupiter-Saturn conjunction cycle with perihelion precession)
-// Uses exact orbital periods from integer orbit counts: H / round(totalDaysInH / solarYearInput)
-const _jupCount = Math.round(totalDaysInH / planets.jupiter.solarYearInput);
-const _satCount = Math.round(totalDaysInH / planets.saturn.solarYearInput);
-const _Tj = H / _jupCount;  // exact Jupiter period in tropical years
-const _Ts = H / _satCount;  // exact Saturn period in tropical years
-const _nJeff = 360 / _Tj + 360 / planets.jupiter.perihelionEclipticYears;
-const _nSeff = 360 / _Ts + 360 / planets.saturn.perihelionEclipticYears;
-const tripleSynodicYears = 3 * 360 / (_nJeff - _nSeff);
+// (Plan 07 R1: tripleSynodicYears — the Jupiter–Saturn triple synodic period
+// on the device's lattice perihelion rates — had no reader; gone with the
+// lattice.)
 
 // Equation of center eccentricity — derived, not a free parameter. The wheel's
 // split: the geometry supplies base'·sin M, the EoC term the rest — so the
@@ -456,8 +451,8 @@ const fibonacci = [1, 1, 2, 3, 5, 8, 13, 21, 34, 55, 89, 144];
 // twins read the same artifact, so both wobble wheels turn on one period.
 const { computeSecularShape } = require('@essrt/physics/planets/secular-shape');
 const { computeObliquityJ2000Deg } = require('@essrt/physics/planets/spin-channel');
-const CHAIN_DATA = JSON.parse(fs.readFileSync(
-  path.resolve(__dirname, '..', '..', 'data', 'nbody-secular-frequencies.json'), 'utf8'));
+// (CHAIN_DATA — the governed artifact — is loaded above the planet records,
+// which read their perihelion period from it since plan 07 R1.)
 for (const [key, p] of Object.entries(planets)) {
   if (CHAIN_DATA.secularModes && CHAIN_DATA.secularModes[key]) {
     p.wobblePeriod = computeSecularShape(CHAIN_DATA, key).beatYears;
@@ -475,7 +470,7 @@ for (const [key, p] of Object.entries(planets)) {
 // IAU pole against the chain's J2000 plane, acute form), not a device value,
 // and the fixtures pin it.
 for (const [key, p] of Object.entries(planets)) {
-  if (!p.fibonacciD || !massFraction[key]) continue;
+  if (!massFraction[key]) continue;   // the seven carriers (R8: the fibonacciD guard went with the divisor)
   const A = CHAIN_DATA.j2000AnchorElements[key];
   const eps = computeObliquityJ2000Deg({
     spin: astroRef.planetSpinPhysical[key],
@@ -680,7 +675,6 @@ module.exports = {
   j2000JD,
   julianCenturyDays,
   tropicalCenturyDays,
-  tripleSynodicYears,
   eocEccentricity,
   perihelionPhaseOffset,
   TROPICAL_YEAR_HARMONICS: fitted.TROPICAL_YEAR_HARMONICS,

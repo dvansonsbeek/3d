@@ -429,7 +429,7 @@
       "packages/physics/src/eclipse/besselian.cjs": "sha256:f731968aa72105b31ca578f14644a5afcf228bb3a1103359414171de38baaf52",
       "packages/physics/src/eclipse/finders.cjs": "sha256:168755d5e01397b7f63f2ffa49101afe0da0046e5fbd9e7ef6d04be6d7f5d330",
       "packages/physics/src/eclipse/sun-planetary-completion.cjs": "sha256:a916875afc4dee4267e0bfeb4c23070a397fc2779cdceaf98ad7222196495708",
-      "packages/physics/src/model.js": "sha256:c49cbdec308573fe34b0011932e0bc46e91d537a8cb2c17d9aefdd929c5cedfd",
+      "packages/physics/src/model.js": "sha256:e191a86c3edbe937795be8163ad4366a530d732b07aaad9f96fff001ca3641fc",
       "packages/physics/src/moon/apparent.cjs": "sha256:5a63a95cf8d26c4d44e7b7acd4308cbd7240aa2bcee70d04c70b273413090335",
       "packages/physics/src/moon/ecc-channel.cjs": "sha256:e986b8ca3dbfdaa8508f49f315bc81718503b91eb56298d9ad4d7c29186fc691",
       "packages/physics/src/moon/series-extension.cjs": "sha256:d295a78eaedb0246ff142ed726c57ec2353d183c0ccbd3d767157f19623c6461",
@@ -438,10 +438,10 @@
       "public/input/fitted-coefficients.json": "sha256:64b475ba9ee5d08101165f981e07f059ebe86f22a9a98deefa6450338525eba1",
       "public/input/lunar-eclipses-nasa.json": "sha256:2b0f6d1b4dab2d1e8a432a812b027631cfecde9714ce0600f030da5e2a2a792e",
       "public/input/lunar-eclipses-stephenson-2016.json": "sha256:ed8040ef4d688023ca38c1c8eac83b40bc36f75edb0894ba46dd04f2aed32fe6",
-      "public/input/model-parameters.json": "sha256:1c015fb70b5673e56846f82291a20e6f76efd99231d94f1e12904c0f57d9a8a9",
+      "public/input/model-parameters.json": "sha256:070b793fffd90fb1d5582e1e90241504cbe9baa5faa3ddf71406fe9ef78ed9f2",
       "public/input/solar-eclipse-centerlines-nasa.json": "sha256:995d1b38879e6bd1983a1f2895c1269b9f8f4fa917ccb047bfc7b0be3da5985c",
       "public/input/solar-eclipses-stephenson-2016.json": "sha256:5356d24641c27b456fb27ac2c3b6dfab1538dd9fa8e609d7abb5bb9132f18794",
-      "tools/lib/scene-graph.js": "sha256:d87b5dcdc50de0c92f31d72c25a527603fc4d700f112974555b8dc94619cc3a4",
+      "tools/lib/scene-graph.js": "sha256:a8e8f90a040e807fd370bff813fcace08d3410adee257f93039acc4a8c822251",
       "tools/verify/eclipse-audit.js": "sha256:ef0c42cbf469662415faad63c825075cba662576d9ebff17160f1794cff4336f"
     }
   }

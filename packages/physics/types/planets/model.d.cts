@@ -4,12 +4,8 @@ export type PlanetModelBody = {
      */
     type?: string | undefined;
     solarYearInput: number;
-    fibonacciD?: number | undefined;
     invPlaneInclinationJ2000?: number | undefined;
     longitudePerihelion?: number | undefined;
-    inclinationCycleAnchor?: number | undefined;
-    antiPhase?: boolean | undefined;
-    perihelionEclipticYears?: number | undefined;
     /**
      * - carriers: the chain's g-mode beat (input since Phase 7 commit 2)
      */
@@ -47,12 +43,8 @@ export type PlanetModelRecord = {
  * @typedef {Object} PlanetModelBody
  * @property {string} [type] - geometry type branch ('I' | 'II' | 'III')
  * @property {number} solarYearInput
- * @property {number} [fibonacciD]
  * @property {number} [invPlaneInclinationJ2000]
  * @property {number} [longitudePerihelion]
- * @property {number} [inclinationCycleAnchor]
- * @property {boolean} [antiPhase]
- * @property {number} [perihelionEclipticYears]
  * @property {number} [wobblePeriodYears] - carriers: the chain's g-mode beat (input since Phase 7 commit 2)
  * @property {number} [obliquityMeanDeg] - carriers: the derived J2000 obliquity (input since Phase 7 commit 2)
  * @property {number} [axialTiltJ2000]

@@ -293,43 +293,11 @@ function calcERD(year) {
   return erd;
 }
 
-/**
- * Compute any planet's perihelion longitude (simple linear precession).
- * Source: script.js calcPlanetPerihelionLong() ~line 33473
- *
- * @param {number} theta0 - perihelion longitude at J2000 (degrees)
- * @param {number} period - precession period in years
- * @param {number} year - decimal year
- * @returns {number} longitude in degrees [0, 360)
- */
-function calcPlanetPerihelionLong(theta0, period, year) {
-  // 8.3 L9: the linear form lives in @essrt/physics/planets/predict.
-  return _req('@essrt/physics/planets/predict').calcPlanetPerihelionLongDeg(theta0, period, year);
-}
-
-/**
- * Compute ICRF perihelion longitude for a planet.
- * ICRF = ecliptic minus general precession (H/13).
- * For Earth: uses H/3 period directly.
- * For planets: icrfPeriod = 1 / (1/perihelionEclipticYears - 1/(H/13))
- *
- * @param {string} planetName - planet key
- * @param {number} year - decimal year
- * @returns {number} ICRF longitude in degrees [0, 360)
- */
-function calcPerihelionLongICRF(planetName, year) {
-  const genPrecRate = 1 / (C.H / 13);
-  if (planetName === 'earth') {
-    const eclipticLong = calcEarthPerihelionPredictive(year);
-    const generalPrecession = 360 * (year - 2000) * genPrecRate;
-    return ((eclipticLong - generalPrecession) % 360 + 360) % 360;
-  }
-  const p = C.planets[planetName];
-  if (!p) return 0;
-  const icrfPeriod = 1 / (1 / p.perihelionEclipticYears - genPrecRate);
-  const icrfRate = 360 / icrfPeriod;
-  return ((p.longitudePerihelion + icrfRate * (year - 2000)) % 360 + 360) % 360;
-}
+// (Plan 07 R1: calcPlanetPerihelionLong and calcPerihelionLongICRF — the
+// device's linear perihelion advance on the lattice period, delegating to
+// the planets/predict module retired at plan 06 R8 — had no caller; gone.
+// A planet's ϖ of date is the chain's: packages/physics model.js
+// planetPerihelionDeg / src/script.js _kcPerihelionEclLonDeg.)
 
 // ═══════════════════════════════════════════════════════════════════════════
 // PRECESSION
@@ -369,19 +337,8 @@ function computePerihelionPrecession(anomalisticYearSec, solarYearSec) {
   return anomalisticYearSec / (anomalisticYearSec - solarYearSec);
 }
 
-/**
- * Compute the apsidal precession period vs the fixed stars (in years) — historically "inclination precession"; the identifier keeps the old name.
- * For Earth: H/3 = 111,772 yr. For planets: perihelionEclipticYears.
- * Source: constants — this is a fixed period per planet.
- *
- * @param {string} planetName - planet key or 'earth'
- * @returns {number} apsidal precession period in years
- */
-function computeInclinationPrecessionPeriod(planetName) {
-  if (planetName === 'earth') return C.H / 3;
-  const p = C.planets[planetName];
-  return p ? Math.abs(p.perihelionEclipticYears) : 0;
-}
+// (Plan 07 R1: computeInclinationPrecessionPeriod — Earth's H/3 and the
+// planets' lattice apsidal period — had no caller; gone with the lattice.)
 
 /**
  * Compute obliquity precession period (in years).
@@ -786,8 +743,6 @@ module.exports = {
   // Longitude of Perihelion
   calcEarthPerihelionPredictive,
   calcERD,
-  calcPlanetPerihelionLong,
-  calcPerihelionLongICRF,
 
   // (Inclination — Earth's H/3 cosine, the ψ-law planet oscillation and the
   // two-normal ecliptic inclinations — left at plan 07 R5.)
@@ -795,7 +750,6 @@ module.exports = {
   // Precession
   computeAxialPrecessionYears,
   computePerihelionPrecession,
-  computeInclinationPrecessionPeriod,
   computeObliquityPrecession,
   computeEclipticPrecession,
 

@@ -1,6 +1,6 @@
 ---
 docVersion: 1.0
-modelVersion: v18.0
+modelVersion: v19.0
 coefficients: sha256:96f7a2194ea29f0e
 status: current
 ---
@@ -400,6 +400,39 @@ the unreachable tail. The K device CONSTANTS stay — `earthtiltMean`,
 are the scene's J2000 pose (the wheel geometry `_kcFrameR` reads once and
 `_applyEngineEarthFrame` supersedes of date), not a law; the registry freezes
 `psiValue` as the recorded constant, as it does `kValue`.
+
+**The retired laws' inputs and the lattice perihelion period** (plan 07
+R1/R8, model v19.0). Deleted from `public/input/model-parameters.json`: the
+per-planet H·num/den perihelion fractions (`perihelionEclipticFraction` —
+Mercury 8H/11, Venus −8H/6, Mars 8H/36, Jupiter 8H/39, Saturn −8H/65, Uranus
+H/3, Neptune 2H; the four additional bodies' [1,1] placeholders), the divisor
+table (`fibonacciD` — 21, 34, 5, 5, 3, 21, 34), the ψ law's phase anchors
+(`inclinationCycleAnchor`) and Saturn's `antiPhase` flag. With them: the
+browser's `latticeYears`, `PERIHELION_ECLIPTIC_YEARS_J2000`, the deep-time
+H-scaling of the lattice period (`recomputePlanetCyclesForEpoch`, now a
+no-op kept for the orchestrators' call order), `_hRatioJ2000OverNow`,
+`tripleSynodicYears`, `wgcLatticeLabel`; the Node engine's `fractionToYears`,
+`tripleSynodicYears`, the dead `calcPlanetPerihelionLong` /
+`calcPerihelionLongICRF` / `computeInclinationPrecessionPeriod`; the package's
+internal `PLANET_RECORDS`; the registry's seven `<p>InclCycleAnchor` keys
+(doc 31 keeps the values as literals); the Python bridge's `D`/`D_INCL`,
+`INCL_CYCLE_ANCHOR`, `PERIOD_FRAC` and the balance-law functions still
+reading `D`.
+
+What replaced the period: `perihelionEclipticYears` is the N-body chain's
+inertial apsidal period in every runtime, 1,296,000/g yr from the governed
+artifact (g the leading secular apsidal eigenfrequency; the value the API and
+the registry already published) — Mercury 232,437 yr where the lattice read
+243,867, Jupiter 304,456 where it read 68,783, Neptune 2,136,796 where it read
+670,634; all prograde, where the lattice gave Venus and Saturn retrograde
+signs. It does not scale with H: g scales with the solar mass only, and the
+chain evaluator carries the date. Measured before the change: no rendered
+position reads the period (the seven planets' wheels have been rendered-dead
+since K5), so the browser goldens move by nothing but the probes that read
+the record; the Node goldens by nothing. Saturn's anti-phase sign in the scene
+scaffolding is now spelled as the scene convention it always was
+(`key === 'saturn'`). The literals gate carries a ratchet: any of the four keys
+returning to the JSON fails `check-literals`, fail-proven by a plant.
 
 One measurement is worth keeping, because it is part of why the construction
 was retired rather than repaired: the Law-5 balance recomputed from the live

@@ -1148,14 +1148,14 @@
   "meta": {
     "script": "milankovitch_climate_formula.py",
     "doc": "docs/92-climate-formula.md",
-    "runtime_sec": 1.0974795818328857
+    "runtime_sec": 0.6654183864593506
   },
   "inputs": {
     "generator": "python3 scripts/milankovitch_climate_formula.py",
     "files": {
       "data/cenco2pip-100kyr-bayesian.csv": "sha256:24d8ae22e0d4165595029adc32e37f9af691edfbab4e94f0173f59cd44dd257f",
       "data/epica-co2-bereiter2015.txt": "sha256:de57b3967758725b9650717a71bd665ebc87e23d41d3d3ad05c9095a6e7e393f",
-      "data/l1-physical-lines.json": "sha256:e318444fbb1de3a38854a038bfe5b4bf06b9b10cec107ed5759ef8c1d1ac01c2",
+      "data/l1-physical-lines.json": "sha256:624ade7698a5405e48b6fdefc510bae8bea5de91f07a7b69344f8194c0a2be21",
       "data/lr04-stack.txt": "sha256:7d1a6ca7ffc033e45e20fb76a7f39c8d99df87baa1094260f9dbdc09f0bb8945",
       "data/westerhold2020-cenogrid.tab": "sha256:c149bacb6b0f14b0dc3c7c5204306350df177c8b30221d7f4efa55d35324d2a3",
       "scripts/milankovitch_climate_formula.py": "sha256:bfb5b1436169ee44301f24cddd8cf74d55818e3fd9fbe0a4e062bf7f7e610d75"

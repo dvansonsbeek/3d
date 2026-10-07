@@ -765,9 +765,11 @@ function getPlanetSceneData(key) {
     realPeriStartPos = p.startpos * 2;
   }
 
-  // Elliptic orbit radius — sign differs for anti-phase planets (negative in script.js)
+  // Elliptic orbit radius — negated for Saturn, the scene's anti-phase
+  // convention (negative in script.js). Plan 07 R8: the `antiPhase` JSON flag
+  // left with the ψ law's inputs; the scene convention is spelled here.
   let elipticOrbitRadius = d.elipticOrbit;
-  if (p.antiPhase) elipticOrbitRadius = -elipticOrbitRadius;
+  if (key === 'saturn') elipticOrbitRadius = -elipticOrbitRadius;
 
   // Planet orbital speed (Mars is negative, all others positive)
   const planetSpeed = (key === 'mars')
@@ -1322,7 +1324,7 @@ function moveModel(graph, pos) {
       const planetPeriEcl = ((planetPrecAngle + pm.sceneData.p.longitudePerihelion * d2r) % (2 * Math.PI) + 2 * Math.PI) % (2 * Math.PI);
       const dw = earthPeriEcl - planetPeriEcl;
       let eo = 2 * dynEcc.earth * 100 * Math.sin(dw);
-      if (pm.sceneData.p.antiPhase) eo = -eo;
+      if (key === 'saturn') eo = -eo;   // the scene's anti-phase convention (R8: the JSON flag is gone)
       if (pm.sceneData.p.type === 'II') {
         // Type II: Mars orbit center offset + half Earth geocentric correction
         const eccDist = (dynEcc[key] || pm.sceneData.p.orbitalEccentricityJ2000) * pm.sceneData.d.orbitDistance * 100;

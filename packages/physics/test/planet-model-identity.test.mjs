@@ -53,12 +53,10 @@ const env = {
 const pickInputs = (b) => ({
   type: b.type,
   solarYearInput: b.solarYearInput,
-  fibonacciD: b.fibonacciD,
   invPlaneInclinationJ2000: b.invPlaneInclinationJ2000,
   longitudePerihelion: b.longitudePerihelion,
-  inclinationCycleAnchor: b.inclinationCycleAnchor,
-  antiPhase: b.antiPhase,
-  perihelionEclipticYears: b.perihelionEclipticYears,
+  // (plan 07 R8: fibonacciD, inclinationCycleAnchor, antiPhase and the lattice
+  // perihelionEclipticYears left the record with the ψ/K laws' inputs)
   // Plan 06 Phase 7 commit 2: the K law's cycle period (the chain's g-mode
   // beat) and obliquity input (the derived J2000 obliquity) are INPUTS of the
   // record, computed by the load-time chain from the governed artifacts.

@@ -6,7 +6,7 @@ Provides the six fundamental periods per planet plus all pairwise beat
 frequencies (sum and difference). All derived from JSON — no hardcoded values.
 
 The six fundamental periods per planet:
-  1. T_ecl   — Ecliptic perihelion period (from perihelionEclipticFraction)
+  1. T_ecl   — Inertial apsidal period (the chain's 1,296,000/g, via perihelionEclipticYears)
   2. T_ICRF  — ICRF perihelion period (= ecliptic − Earth's axial precession H/13)
   3. T_obliq — Obliquity cycle period (from obliquityCycleFraction)
   4. T_asc   — Ascending node period (from ascendingNodeCyclesIn8H → 8H/N)

@@ -1,6 +1,6 @@
 ---
 docVersion: 1.0
-modelVersion: v18.0
+modelVersion: v19.0
 coefficients: sha256:96f7a2194ea29f0e
 status: current
 ---
@@ -226,8 +226,9 @@ don't disagree qualitatively. But it fails where frame matters:
 **The model tracks both frames explicitly.** For every
 planet the model stores:
 
-- `perihelionEclipticYears` — rate of perihelion motion in the ecliptic-
-  of-date (what WebGeoCalc measures)
+- `perihelionEclipticYears` — the chain's inertial apsidal period,
+  1,296,000/g yr in the J2000 ecliptic (plan 07 R1; the H·num/den lattice
+  period it replaced sat in the same slot)
 - Derived ICRF period: `T_ICRF = (T_peri · T_H13) / (T_H13 − T_peri)` —
   the rate in the inertial frame after subtracting general precession
 

@@ -2543,8 +2543,9 @@ export const VALUES = {
       out[`${planet}InclMean`] = { get: () => chainInclStats(planet).mean, render: (v) => Number(v).toFixed(6), unit: '°', note: 'mean inclination to the invariable plane over the banked ±10-Myr series (plan 07; was the ψ law’s mean)' };
       out[`${planet}InclAmp`] = { get: () => chainInclStats(planet).half, render: (v) => Number(v).toFixed(6), unit: '°', note: 'HALF-RANGE of the inclination to the invariable plane over ±10 Myr — a multi-mode quantity, not a single amplitude (plan 07; was ψ/(d·√m))' };
       out[`${planet}OmegaJ2000`] = { get: () => physModel().planets.ascendingNodeInvPlaneDeg(planet, 2000), render: (v) => Number(v).toFixed(2), unit: '°', note: 'the chain’s J2000 ascending node on the invariable plane, S&S origin (plan 07; was the device’s verified node)' };
-      // the device INPUT the retired ψ law was phased on — still in model-parameters.json until plan 07 R8 deletes the inputs; docs 20/31 document it as such
-      out[`${planet}InclCycleAnchor`] = { get: () => model.planets[planet].inclinationCycleAnchor, render: (v) => Number(v).toFixed(2), unit: '°', note: 'RETIRED-DEVICE INPUT (the ψ inclination law’s phase anchor), kept while the input exists; no live surface reads it (plan 07 R8 deletes it)' };
+      // (plan 07 R8: `<p>InclCycleAnchor` — the ψ law's phase anchor, a device
+      // INPUT — left with model-parameters inclinationCycleAnchor; doc 31
+      // keeps the recorded values as literals)
       out[`${planet}InclJ2000`] = { get: () => astro.planetOrbitalElements[planet].invPlaneInclinationJ2000, render: (v) => String(v), unit: '°', note: 'Souami & Souchay 2012 — the reference beside the chain anchor' };
     }
     return out;

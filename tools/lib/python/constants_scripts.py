@@ -257,14 +257,9 @@ ECC = ECCENTRICITIES
 # FIBONACCI DIVISORS (pure Fibonacci, mirror-symmetric)
 # ═══════════════════════════════════════════════════════════════════════════
 
-# Pure Fibonacci divisor assignments — Config #1, the unique mirror-symmetric
-# configuration from exhaustive search of 7,558,272 candidates (755 achieve
-# balance above 99.994%; this is the only one with exact mirror symmetry).
-D = {p['name']: p['fibonacciD'] for p in _C['planets'].values()}
-D["Earth"] = 3  # F_4 (Earth is the observer, not in planets object)
-
-# Alias for backwards compatibility
-D_INCL = D
+# (Plan 07 R8: D / D_INCL — the per-planet divisor assignments of the retired
+# ψ/K laws (model-parameters fibonacciD) — left with the laws' inputs; the
+# JSON no longer carries them.)
 
 # Mirror pairs across the asteroid belt
 MIRROR_PAIRS = [
@@ -337,9 +332,10 @@ OMEGA_J2000["Earth"] = _C['earthAscendingNodeInvPlane']  # 284.51
 # (INCL_MEAN — the ψ law's per-planet mean inclinations, read from
 # constants.js invPlaneInclinationMean — left with the law at plan 07 R5.)
 
-# Cycle anchor for inclination oscillation (from constants.js inclinationCycleAnchor)
-INCL_CYCLE_ANCHOR = {p['name']: p['inclinationCycleAnchor'] for p in _C['planets'].values()}
-INCL_CYCLE_ANCHOR["Earth"] = EARTH_INCL_CYCLE_ANCHOR  # 21.77
+# (Plan 07 R8: INCL_CYCLE_ANCHOR — the per-planet phase anchors of the retired
+# ψ inclination law (model-parameters inclinationCycleAnchor) — left with the
+# law's inputs. Earth's anchor, EARTH_INCL_CYCLE_ANCHOR, stays: it phases the
+# eccentricity channel and is R10's subject.)
 
 # J2000 orbital inclination to ecliptic (from constants.js eclipticInclinationJ2000)
 INCL_ECLIPTIC = {p['name']: round(p['eclipticInclinationJ2000'], 3) for p in _C['planets'].values()}
@@ -355,29 +351,13 @@ INCL_PERIOD = {p['name']: abs(round(p['perihelionEclipticYears']))
 INCL_PERIOD["Earth"] = round(H / 3)  # Earth uses ICRF period here (H/3) not ecliptic (H/16)
 
 # ═══════════════════════════════════════════════════════════════════════════
-# OSCILLATION PERIOD FRACTIONS (T_osc / H = a / b)
-# Loaded directly from model-parameters.json perihelionEclipticFraction.
+# (OSCILLATION PERIOD FRACTIONS — RETIRED, plan 07 R1/R8)
+# PERIOD_FRAC read model-parameters perihelionEclipticFraction directly — the
+# H·num/den lattice periods of the retired device. The JSON no longer carries
+# the pairs; a planet's perihelion period is the N-body chain's inertial
+# apsidal period, 1,296,000/g yr, which PERIHELION_ECLIPTIC_YEARS / INCL_PERIOD
+# above now carry through the bridge.
 # ═══════════════════════════════════════════════════════════════════════════
-
-import json as _json
-from pathlib import Path as _Path
-
-_MODEL_PARAMS_PATH = _Path(__file__).resolve().parent.parent.parent.parent / 'public' / 'input' / 'model-parameters.json'
-with open(_MODEL_PARAMS_PATH) as _f:
-    _MODEL_PARAMS = _json.load(_f)
-
-def _frac_to_tuple(planet_key):
-    """Get perihelionEclipticFraction from JSON as (|num|, |den|) tuple."""
-    frac = _MODEL_PARAMS['planets'][planet_key].get('perihelionEclipticFraction')
-    if frac is None:
-        return (1, 1)
-    return (abs(frac[0]), abs(frac[1]))
-
-PERIOD_FRAC = {
-    _MODEL_PARAMS['planets'][k]['name']: _frac_to_tuple(k)
-    for k in _MODEL_PARAMS['planets']
-}
-PERIOD_FRAC["Earth"] = (1, 3)  # Earth: H/3 (matches INCL_PERIOD convention)
 
 # E–J–S period denominators (used in ψ formula)
 FIBONACCI_SLOTS = {"Earth": 3, "Jupiter": 5, "Saturn": 8}
@@ -492,56 +472,12 @@ XI = {p: xi(p) for p in PLANET_NAMES}
 
 
 # ═══════════════════════════════════════════════════════════════════════════
-# LAW VERIFICATION FUNCTIONS
+# (LAW VERIFICATION FUNCTIONS — RETIRED, plan 07 R6/R8)
+# inclination_weight, eccentricity_weight, verify_law2, verify_law3 and
+# predict_saturn_eccentricity — the balance-law instruments on the divisor
+# table D — stood here. The laws went at R6, the divisor at R8; doc 109 is the
+# evidence record and docs/retired-record.md the record.
 # ═══════════════════════════════════════════════════════════════════════════
-
-def inclination_weight(planet):
-    """Law 3 structural weight: w_j = √(m × a × (1-e²)) / d"""
-    m = MASS[planet]
-    a = SMA[planet]
-    e = ECC[planet]
-    d = D[planet]
-    return math.sqrt(m * a * (1 - e**2)) / d
-
-
-def eccentricity_weight(planet):
-    """Law 5 eccentricity weight: v_j = √m × a^(3/2) × e / √d"""
-    m = MASS[planet]
-    a = SMA[planet]
-    e = ECC[planet]
-    d = D[planet]
-    return math.sqrt(m) * a**1.5 * e / math.sqrt(d)
-
-
-def verify_law2():
-    """Verify Law 3: inclination balance between in-phase and anti-phase groups.
-    Returns (sum_pro, sum_anti, balance_pct).
-    """
-    sum_pro = sum(inclination_weight(p) for p in GROUP_IN_PHASE)
-    sum_anti = sum(inclination_weight(p) for p in GROUP_ANTI)
-    balance = 1 - abs(sum_pro - sum_anti) / (sum_pro + sum_anti)
-    return sum_pro, sum_anti, balance * 100
-
-
-def verify_law3():
-    """Verify Law 5: eccentricity balance between in-phase and anti-phase groups.
-    Returns (sum_pro, sum_anti, balance_pct).
-    """
-    sum_pro = sum(eccentricity_weight(p) for p in GROUP_IN_PHASE)
-    sum_anti = sum(eccentricity_weight(p) for p in GROUP_ANTI)
-    balance = 1 - abs(sum_pro - sum_anti) / (sum_pro + sum_anti)
-    return sum_pro, sum_anti, balance * 100
-
-
-def predict_saturn_eccentricity():
-    """Finding 4: predict Saturn's eccentricity from eccentricity balance.
-    Returns (predicted_e, actual_e, error_pct).
-    """
-    sum_pro = sum(eccentricity_weight(p) for p in GROUP_IN_PHASE)
-    coeff = math.sqrt(MASS["Saturn"]) * SMA["Saturn"]**1.5 / math.sqrt(D["Saturn"])
-    predicted = sum_pro / coeff
-    actual = ECC["Saturn"]
-    return predicted, actual, pct_err(predicted, actual)
 
 
 # (compute_mean_inclination(planet) — the ψ law's J2000 constraint,

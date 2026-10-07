@@ -499,7 +499,6 @@ function getParamAccessors(target) {
     ascendingNode:          { get: () => p.ascendingNode,           set: v => { p.ascendingNode = v; } },
     eclipticInclinationJ2000: { get: () => p.eclipticInclinationJ2000, set: v => { p.eclipticInclinationJ2000 = v; } },
     orbitalEccentricityBase:    { get: () => p.orbitalEccentricityBase,    set: v => { p.orbitalEccentricityBase = v; } },
-    perihelionEclipticYears:{ get: () => p.perihelionEclipticYears, set: v => { p.perihelionEclipticYears = v; } },
     eocFraction:            { get: () => p.eocFraction,            set: v => { p.eocFraction = v; } },
     perihelionRef_JD:       { get: () => C.ASTRO_REFERENCE[target + 'PerihelionRef_JD'], set: v => { C.ASTRO_REFERENCE[target + 'PerihelionRef_JD'] = v; } },
   };

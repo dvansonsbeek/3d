@@ -354,7 +354,18 @@ display reach was zero; its only gated reach was 28 golden probes. The
 K device CONSTANTS (`earthtiltMean`, `earthInvPlaneInclinationAmplitude`,
 `earthRAAngle`, `earthInvPlaneInclinationMean`) stay: they are the scene's
 J2000 pose (the wheel geometry `_kcFrameR` reads once), not a law. `psiValue`
-is frozen in the registry like `kValue`. **The planet chains moved to engine-D elements (the P5 flip,
+is frozen in the registry like `kValue`. **Plan 07 R1/R8 (model v19.0,
+physics MAJOR 15, model-values MAJOR 14): the retired laws' INPUTS left
+`model-parameters.json`** — `perihelionEclipticFraction`, the per-planet
+divisor key, `inclinationCycleAnchor`, `antiPhase` (planets and additional
+bodies); the
+literals gate FAILS if any returns (fail-proven via `ESSRT_LITERALS_PLANT=1`).
+`perihelionEclipticYears` is the chain's inertial apsidal period
+1,296,000/g in every runtime (Mercury 232,437 yr; the lattice read 243,867),
+with no deep-time H-scaling — g scales with the solar mass only, and
+`recomputePlanetCyclesForEpoch` is a no-op kept for call order. Saturn's
+anti-phase sign in the scene scaffolding is the scene convention
+`key === 'saturn'`, not a JSON flag. **The planet chains moved to engine-D elements (the P5 flip,
 9aa91a6), and the legacy geometric planet path was EXCISED (K5,
 c0399f6): the chain is the ONLY planet path** — the simulator renders
 the seven planets, their orbit rings, traces, perihelion markers, panels

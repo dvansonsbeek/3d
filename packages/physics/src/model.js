@@ -25,7 +25,6 @@ import { createPhaseMachinery } from './phase/index.cjs';
 import { createYearLengths, ONE_FAMILY_WINDOW_YEARS } from './earth/year-lengths.cjs';
 import { createDeepOrbitalHistory } from './earth/deep-orbital-history.cjs';
 import { CHAIN_ARTIFACT } from './planets/chain-artifact.js';
-import { computeSecularShape } from './planets/secular-shape.cjs';
 import { createPlanetSpinChannelFromArtifacts, computeObliquityJ2000Deg } from './planets/spin-channel.cjs';
 import { createDeltaTCycles } from './deltat/cycles.cjs';
 import { createDeepTimeLod } from './deltat/deep-time.cjs';
@@ -716,24 +715,21 @@ export function assembleModel(C, F, laws = {}, secularSeriesArtifact = /** @type
   // inclination law it fed went the same way. systemResetN is kept where
   // other consumers read it.)
 
-  /** @param {[number, number]|null} frac @returns {number|null} */
-  const fractionToYears = (frac) => (frac === null ? null : (H * frac[0]) / frac[1]);
-
-  /** @type {Record<string, Record<string, any>>} */
-  const PLANET_RECORDS = {};              // internal: the fitters read the device fields
+  // Plan 07 R1/R8: the internal PLANET_RECORDS — the device record the
+  // fitters once read (the H·num/den perihelion period from
+  // perihelionEclipticFraction, fibonacciD, antiPhase, inclinationCycleAnchor,
+  // the −8H/N node period) — had no reader left after R6/R5 and is gone with
+  // its JSON inputs. What remains is the PUBLISHED record below.
   /** @type {Record<string, Record<string, any>>} */
   const PUBLISHED_PLANET_RECORDS = {};    // what model.planets.record() serves (R8)
   for (const k of PLANET_KEYS) {
     const mp = C.planets[k];
     const ar = C.planetOrbitalElements[k];
-    const ecl = /** @type {number} */ (fractionToYears(mp.perihelionEclipticFraction));
     // Plan 06 Phase 7 commit 2: the K device's integer axial and obliquity
-    // fractions are retired. The eccentricity law's cycle period is the
-    // chain's OWN g-mode beat (the dominant mode × largest companion of the
-    // planet's eccentricity vector), its obliquity input the DERIVED J2000
-    // obliquity of the spin channel (the IAU pole against the chain's J2000
-    // plane, acute form) — both from the governed artifacts, no fractions.
-    const wobble = computeSecularShape(/** @type {any} */ (CHAIN_ARTIFACT), k).beatYears;
+    // fractions are retired; the obliquity is the DERIVED J2000 obliquity of
+    // the spin channel (the IAU pole against the chain's J2000 plane, acute
+    // form) — from the governed artifacts, no fractions. (The g-mode beat the
+    // K law's period rode left with the internal record at plan 07 R1/R8.)
     const obliquityDerived = computeObliquityJ2000Deg({
       spin: C.planetSpinPhysical[k],
       anchorInclEclipticDeg: /** @type {any} */ (CHAIN_ARTIFACT).j2000AnchorElements[k].inclEclipticDeg,
@@ -741,30 +737,11 @@ export function assembleModel(C, F, laws = {}, secularSeriesArtifact = /** @type
       obliquityJ2000Deg: C.earthOrbital.obliquityJ2000_deg,
     });
     const obliquityMean = Math.min(obliquityDerived, 180 - obliquityDerived);   // acute form of the derived J2000 obliquity
-    PLANET_RECORDS[k] = Object.freeze({
-      name: mp.name,
-      perihelionEclipticYears: ecl,
-      longitudePerihelion: ar.longitudePerihelion,
-      ascendingNodeCyclesIn8H: mp.ascendingNodeCyclesIn8H,
-      ascendingNodePeriod: -(8 * H) / mp.ascendingNodeCyclesIn8H,
-      wobblePeriod: wobble,
-      fibonacciD: mp.fibonacciD,
-      antiPhase: mp.antiPhase || false,
-      ascendingNodeInvPlane: mp.ascendingNodeInvPlane,
-      inclinationCycleAnchor: mp.inclinationCycleAnchor,
-      invPlaneInclinationJ2000: ar.invPlaneInclinationJ2000,
-      obliquityMean,
-      orbitalEccentricityJ2000: ar.orbitalEccentricityJ2000,
-      solarYearInput: ar.solarYearInput,
-      axialTiltJ2000: ar.axialTiltJ2000,
-    });
-    // R8 (plan 07): what `model.planets.record()` PUBLISHES is not the record
-    // above. The internal record kept the ψ/K law outputs for the fitting
-    // pipeline; at R6 the K half and both fitter steps that read it went, at
-    // R5 the ψ half (invPlaneInclinationAmplitude/Mean) — what remains above
-    // is the structural inputs and the derived J2000 obliquity.
-    // The separation stands for the same reason it was made —
-    // but nothing outside needs the device, and serving it made /v1/bodies
+    // R8 (plan 07): what `model.planets.record()` PUBLISHES is the structural
+    // record, not the device. The internal record that kept the ψ/K law
+    // outputs for the fitting pipeline went piecewise: the K half at R6, the ψ
+    // half at R5, the lattice inputs at R1/R8 (nothing read it by then).
+    // Nothing outside needs the device, and serving it made /v1/bodies
     // contradict the model's own chain on the SAME quantities: Mercury's node
     // cycle 298,060 yr against the chain's 232,001, Jupiter's perihelion period
     // 68,783 against 304,456, Neptune's 670,634 against 2,136,796. The two

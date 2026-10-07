@@ -2,14 +2,14 @@
 // Gives the TypeScript website full type safety at the boundary (§2g) while
 // packages/physics stays JavaScript.
 
-export declare const CONSTANTS_HASH: "726b10e23d8ace09";
+export declare const CONSTANTS_HASH: "5ce921f2efa2e845";
 
 export declare const MODEL_VERSION: string;
 
 export declare const PREPRINT_DOI: string;
 
 export declare const DEFAULT_CONSTANTS: {
-  readonly hash: "726b10e23d8ace09";
+  readonly hash: "5ce921f2efa2e845";
   readonly additionalBodies: {
     "pluto": {
       "name": string;
@@ -17,9 +17,7 @@ export declare const DEFAULT_CONSTANTS: {
       "type": string;
       "angleCorrection": number;
       "startpos": number;
-      "perihelionEclipticFraction": [number, number];
       "ascendingNodeInvPlane": number;
-      "inclinationCycleAnchor": number;
       "invPlaneInclinationMean": number;
       "invPlaneInclinationAmplitude": number;
     };
@@ -29,9 +27,7 @@ export declare const DEFAULT_CONSTANTS: {
       "type": string;
       "angleCorrection": number;
       "startpos": number;
-      "perihelionEclipticFraction": [number, number];
       "ascendingNodeInvPlane": number;
-      "inclinationCycleAnchor": number;
       "invPlaneInclinationMean": number;
       "invPlaneInclinationAmplitude": number;
     };
@@ -41,9 +37,7 @@ export declare const DEFAULT_CONSTANTS: {
       "type": string;
       "angleCorrection": number;
       "startpos": number;
-      "perihelionEclipticFraction": [number, number];
       "ascendingNodeInvPlane": number;
-      "inclinationCycleAnchor": number;
       "invPlaneInclinationMean": number;
       "invPlaneInclinationAmplitude": number;
     };
@@ -53,9 +47,7 @@ export declare const DEFAULT_CONSTANTS: {
       "orbitDistanceOverride": number;
       "angleCorrection": number;
       "startpos": number;
-      "perihelionEclipticFraction": [number, number];
       "ascendingNodeInvPlane": number;
-      "inclinationCycleAnchor": number;
       "invPlaneInclinationMean": number;
       "invPlaneInclinationAmplitude": number;
     };
@@ -486,13 +478,9 @@ export declare const DEFAULT_CONSTANTS: {
       "eocFraction": number;
       "startpos": number;
       "angleCorrection": number;
-      "perihelionEclipticFraction": [number, number];
       "type": string;
       "mirrorPair": string;
-      "fibonacciD": number;
       "ascendingNodeInvPlane": number;
-      "inclinationCycleAnchor": number;
-      "antiPhase": boolean;
       "ascendingNodeCyclesIn8H": number;
     };
     "venus": {
@@ -500,13 +488,9 @@ export declare const DEFAULT_CONSTANTS: {
       "eocFraction": number;
       "startpos": number;
       "angleCorrection": number;
-      "perihelionEclipticFraction": [number, number];
       "type": string;
       "mirrorPair": string;
-      "fibonacciD": number;
       "ascendingNodeInvPlane": number;
-      "inclinationCycleAnchor": number;
-      "antiPhase": boolean;
       "ascendingNodeCyclesIn8H": number;
     };
     "mars": {
@@ -514,13 +498,9 @@ export declare const DEFAULT_CONSTANTS: {
       "eocFraction": number;
       "startpos": number;
       "angleCorrection": number;
-      "perihelionEclipticFraction": [number, number];
       "type": string;
       "mirrorPair": string;
-      "fibonacciD": number;
       "ascendingNodeInvPlane": number;
-      "inclinationCycleAnchor": number;
-      "antiPhase": boolean;
       "ascendingNodeCyclesIn8H": number;
     };
     "jupiter": {
@@ -528,13 +508,9 @@ export declare const DEFAULT_CONSTANTS: {
       "eocFraction": number;
       "startpos": number;
       "angleCorrection": number;
-      "perihelionEclipticFraction": [number, number];
       "type": string;
       "mirrorPair": string;
-      "fibonacciD": number;
       "ascendingNodeInvPlane": number;
-      "inclinationCycleAnchor": number;
-      "antiPhase": boolean;
       "ascendingNodeCyclesIn8H": number;
     };
     "saturn": {
@@ -542,13 +518,9 @@ export declare const DEFAULT_CONSTANTS: {
       "eocFraction": number;
       "startpos": number;
       "angleCorrection": number;
-      "perihelionEclipticFraction": [number, number];
       "type": string;
       "mirrorPair": string;
-      "fibonacciD": number;
       "ascendingNodeInvPlane": number;
-      "inclinationCycleAnchor": number;
-      "antiPhase": boolean;
       "ascendingNodeCyclesIn8H": number;
     };
     "uranus": {
@@ -556,13 +528,9 @@ export declare const DEFAULT_CONSTANTS: {
       "eocFraction": number;
       "startpos": number;
       "angleCorrection": number;
-      "perihelionEclipticFraction": [number, number];
       "type": string;
       "mirrorPair": string;
-      "fibonacciD": number;
       "ascendingNodeInvPlane": number;
-      "inclinationCycleAnchor": number;
-      "antiPhase": boolean;
       "ascendingNodeCyclesIn8H": number;
     };
     "neptune": {
@@ -570,13 +538,9 @@ export declare const DEFAULT_CONSTANTS: {
       "eocFraction": number;
       "startpos": number;
       "angleCorrection": number;
-      "perihelionEclipticFraction": [number, number];
       "type": string;
       "mirrorPair": string;
-      "fibonacciD": number;
       "ascendingNodeInvPlane": number;
-      "inclinationCycleAnchor": number;
-      "antiPhase": boolean;
       "ascendingNodeCyclesIn8H": number;
     };
   };

@@ -33,17 +33,17 @@
  * carry it so a counterfactual is reproducible (§2d).
  * @type {string}
  */
-export const CONSTANTS_HASH = "726b10e23d8ace09";
+export const CONSTANTS_HASH = "5ce921f2efa2e845";
 
 /** Model version label — single source: public/input/model-version.json (§10 two-axis scheme). */
-export const MODEL_VERSION = "v18.0";
+export const MODEL_VERSION = "v19.0";
 
 /** Canonical preprint DOI — single source: public/input/model-version.json. */
 export const PREPRINT_DOI = "10.21203/rs.3.rs-8758810/v4";
 
 /** @type {Readonly<Record<string, unknown>>} */
 export const DEFAULT_CONSTANTS = Object.freeze({
-  hash: "726b10e23d8ace09",
+  hash: "5ce921f2efa2e845",
   additionalBodies: {
     "pluto": {
       "name": "Pluto",
@@ -51,12 +51,7 @@ export const DEFAULT_CONSTANTS = Object.freeze({
       "type": "I",
       "angleCorrection": 2.469281,
       "startpos": 71.555,
-      "perihelionEclipticFraction": [
-        1,
-        1
-      ],
       "ascendingNodeInvPlane": 101.06,
-      "inclinationCycleAnchor": 203.32,
       "invPlaneInclinationMean": 15.7162,
       "invPlaneInclinationAmplitude": 0.717024
     },
@@ -66,12 +61,7 @@ export const DEFAULT_CONSTANTS = Object.freeze({
       "type": "III",
       "angleCorrection": -1.619816,
       "startpos": 80,
-      "perihelionEclipticFraction": [
-        1,
-        1
-      ],
       "ascendingNodeInvPlane": 59.56,
-      "inclinationCycleAnchor": 23.3195,
       "invPlaneInclinationMean": 150,
       "invPlaneInclinationAmplitude": 0.1
     },
@@ -81,12 +71,7 @@ export const DEFAULT_CONSTANTS = Object.freeze({
       "type": "II",
       "angleCorrection": 0.047888,
       "startpos": 57.402,
-      "perihelionEclipticFraction": [
-        1,
-        1
-      ],
       "ascendingNodeInvPlane": 10.36,
-      "inclinationCycleAnchor": 203.3195,
       "invPlaneInclinationMean": 9.25,
       "invPlaneInclinationAmplitude": 0.5
     },
@@ -96,12 +81,7 @@ export const DEFAULT_CONSTANTS = Object.freeze({
       "orbitDistanceOverride": 2.76596,
       "angleCorrection": 0,
       "startpos": 0,
-      "perihelionEclipticFraction": [
-        1,
-        1
-      ],
       "ascendingNodeInvPlane": 80.89,
-      "inclinationCycleAnchor": 203.3195,
       "invPlaneInclinationMean": 0.43,
       "invPlaneInclinationAmplitude": 0.05
     }
@@ -647,16 +627,9 @@ export const DEFAULT_CONSTANTS = Object.freeze({
       "eocFraction": -0.527,
       "startpos": 83.64651142941864,
       "angleCorrection": 0.9727205912043573,
-      "perihelionEclipticFraction": [
-        8,
-        11
-      ],
       "type": "I",
       "mirrorPair": "uranus",
-      "fibonacciD": 21,
       "ascendingNodeInvPlane": 32.83,
-      "inclinationCycleAnchor": 234.52,
-      "antiPhase": false,
       "ascendingNodeCyclesIn8H": 9
     },
     "venus": {
@@ -664,16 +637,9 @@ export const DEFAULT_CONSTANTS = Object.freeze({
       "eocFraction": 0.436,
       "startpos": 249.28769121856186,
       "angleCorrection": -2.789778861448692,
-      "perihelionEclipticFraction": [
-        -8,
-        6
-      ],
       "type": "I",
       "mirrorPair": "neptune",
-      "fibonacciD": 34,
       "ascendingNodeInvPlane": 54.7,
-      "inclinationCycleAnchor": 218.64,
-      "antiPhase": false,
       "ascendingNodeCyclesIn8H": 1
     },
     "mars": {
@@ -681,16 +647,9 @@ export const DEFAULT_CONSTANTS = Object.freeze({
       "eocFraction": -0.066224,
       "startpos": 121.4634461571797,
       "angleCorrection": -2.104652936098656,
-      "perihelionEclipticFraction": [
-        8,
-        36
-      ],
       "type": "II",
       "mirrorPair": "jupiter",
-      "fibonacciD": 5,
       "ascendingNodeInvPlane": 354.87,
-      "inclinationCycleAnchor": 236.07,
-      "antiPhase": false,
       "ascendingNodeCyclesIn8H": 64
     },
     "jupiter": {
@@ -698,16 +657,9 @@ export const DEFAULT_CONSTANTS = Object.freeze({
       "eocFraction": 0.495,
       "startpos": 13.887946755371052,
       "angleCorrection": 0.9333205235053406,
-      "perihelionEclipticFraction": [
-        8,
-        39
-      ],
       "type": "III",
       "mirrorPair": "mars",
-      "fibonacciD": 5,
       "ascendingNodeInvPlane": 312.89,
-      "inclinationCycleAnchor": 287.06,
-      "antiPhase": false,
       "ascendingNodeCyclesIn8H": 36
     },
     "saturn": {
@@ -715,16 +667,9 @@ export const DEFAULT_CONSTANTS = Object.freeze({
       "eocFraction": 0.54,
       "startpos": 11.279308392461772,
       "angleCorrection": -0.1784695052193328,
-      "perihelionEclipticFraction": [
-        -8,
-        65
-      ],
       "type": "III",
       "mirrorPair": "earth",
-      "fibonacciD": 3,
       "ascendingNodeInvPlane": 118.81,
-      "inclinationCycleAnchor": 116.26,
-      "antiPhase": true,
       "ascendingNodeCyclesIn8H": 36
     },
     "uranus": {
@@ -732,16 +677,9 @@ export const DEFAULT_CONSTANTS = Object.freeze({
       "eocFraction": 0.53,
       "startpos": 44.900388945775106,
       "angleCorrection": -0.7343433510960402,
-      "perihelionEclipticFraction": [
-        1,
-        3
-      ],
       "type": "III",
       "mirrorPair": "mercury",
-      "fibonacciD": 21,
       "ascendingNodeInvPlane": 307.8,
-      "inclinationCycleAnchor": 21.33,
-      "antiPhase": false,
       "ascendingNodeCyclesIn8H": 11
     },
     "neptune": {
@@ -749,16 +687,9 @@ export const DEFAULT_CONSTANTS = Object.freeze({
       "eocFraction": 0.585,
       "startpos": 47.9552024382285,
       "angleCorrection": 2.3327665835675617,
-      "perihelionEclipticFraction": [
-        2,
-        1
-      ],
       "type": "III",
       "mirrorPair": "venus",
-      "fibonacciD": 34,
       "ascendingNodeInvPlane": 192.04,
-      "inclinationCycleAnchor": 174.04,
-      "antiPhase": false,
       "ascendingNodeCyclesIn8H": 3
     }
   },

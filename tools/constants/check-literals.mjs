@@ -159,12 +159,10 @@ const MIGRATED = [
 
   // Phase 5f block 8 — all seven planets, both sources, plus the perihelion
   // passage reference JDs. Prefixes are safe here: every leaf under these three
-  // roots is migrated.
-  //
-  // NOT migrated: perihelionEclipticYears. It encodes the fraction the JSON
-  // stores as an integer pair ([8,11] written as H/(1+3/8)), so importing it
-  // would change the expression's form rather than its source. (The axial and
-  // obliquity-cycle fractions retired with plan 06 Phase 7 commit 2.)
+  // roots is migrated. (perihelionEclipticYears is no longer a JSON-derived
+  // value at all: since plan 07 R1 it is the chain's 1,296,000/g, read from the
+  // governed artifact; the axial and obliquity-cycle fractions retired with
+  // plan 06 Phase 7 commit 2 and the perihelion fraction with plan 07 R8.)
   'model.planets',
   'astro.planetOrbitalElements',
   'model.perihelionPassageRef',
@@ -198,12 +196,8 @@ const MIGRATED = [
   'astro.earthOrbital.earthEccentricityDotJ2000',
   'model.additionalBodies',
 
-  // Phase 5f block 10 — the H-lattice fraction pairs. script.js wrote these as
-  // hand-rolled arithmetic (`-holisticyearLength*8/65`) while the integer pairs
-  // sat in the JSON; latticeYears() now derives them. Verified bit-identical for
-  // all 21 (7 planets x peri/axial/obliquity) before the change.
-  'model.planets.mercury.perihelionEclipticFraction',
-  'model.planets.venus.perihelionEclipticFraction',
+  // (Phase 5f block 10 — the H-lattice fraction pairs — stood here. The pairs
+  // left the JSON at plan 07 R8; RETIRED_JSON_KEYS below fails if they return.)
 
   // Phase 5f block 11 — masses that had NO JSON source until now. The
   // planet-ALONE ratios, Pluto (system and alone, 10.85% apart because of
@@ -234,10 +228,9 @@ const MIGRATED = [
   'astro.earthOrbital.earthEccentricityDotDotJ2000',
   'astro.earthOrbital.earthPerihelionLongitudeJ2000',
 
-  // Phase 5f block 14 — the last three per additional body: angleCorrection,
-  // startpos and the perihelionEclipticFraction [1,1]. All four bodies now go
-  // through latticeYears() like the seven planets, so no hand-written lattice
-  // arithmetic remains anywhere in script.js.
+  // Phase 5f block 14 — the last two per additional body: angleCorrection and
+  // startpos. (The perihelionEclipticFraction [1,1] placeholders left with the
+  // lattice at plan 07 R8.)
   'model.additionalBodies.pluto.angleCorrection',
   'model.additionalBodies.pluto.startpos',
   'model.additionalBodies.halleys.angleCorrection',
@@ -528,10 +521,33 @@ for (const r of masked) {
   console.log('    different value under the same name. Remove the allowlist entry.');
 }
 
-const bad = divergent.length + missing.length + stillLiteral.length + masked.length;
+// ── retired JSON inputs (plan 07 R8) — a ratchet on their RETURN ──────────────
+// The retired laws' inputs left public/input/model-parameters.json: the H·num/den
+// perihelion fractions, the divisor table, the ψ phase anchors and the anti-phase
+// flag. Nothing in the code reads them any more; a key that reappears under a
+// planet or additional body is a device input re-entering the source of truth
+// and FAILS here. Fail-proven: ESSRT_LITERALS_PLANT=1 adds one phantom key.
+const RETIRED_JSON_KEYS = ['perihelionEclipticFraction', 'fibonacciD', 'inclinationCycleAnchor', 'antiPhase'];
+const retiredHits = [];
+{
+  const mp = read('model-parameters.json');
+  for (const root of ['planets', 'additionalBodies']) {
+    for (const [body, rec] of Object.entries(mp[root] ?? {})) {
+      if (body.startsWith('_') || !rec || typeof rec !== 'object') continue;
+      for (const k of RETIRED_JSON_KEYS) if (k in rec) retiredHits.push(`model.${root}.${body}.${k}`);
+    }
+  }
+  if (process.env.ESSRT_LITERALS_PLANT === '1') retiredHits.push('model.planets.mercury.fibonacciD (PLANTED)');
+}
+for (const p of retiredHits) {
+  console.log(`\n  RETIRED INPUT RETURNED  ${p}`);
+  console.log('    this key left the JSON at plan 07 R8 with the ψ/K laws; the chain carries the quantity now.');
+}
+
+const bad = divergent.length + missing.length + stillLiteral.length + masked.length + retiredHits.length;
 console.log(`\n${'='.repeat(78)}`);
 if (bad) {
-  console.log(`FAIL — ${divergent.length} divergent, ${missing.length} missing, ${stillLiteral.length} falsely migrated.`);
+  console.log(`FAIL — ${divergent.length} divergent, ${missing.length} missing, ${stillLiteral.length} falsely migrated, ${retiredHits.length} retired input(s) returned.`);
   process.exit(1);
 }
 console.log('PASS — every duplicated JSON value agrees with script.js.');
