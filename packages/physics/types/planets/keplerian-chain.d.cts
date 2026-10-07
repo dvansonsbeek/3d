@@ -51,6 +51,7 @@ export type KcPeriodicTerms = {
     windowAffine?: {
         [x: string]: KcAffine;
     };
+    windowAffineSpanYr?: number;
     mlonArcsec?: KcCosSinTerm[];
     aPpm?: KcCosSinTerm[];
     z?: KcComplexTerm[];

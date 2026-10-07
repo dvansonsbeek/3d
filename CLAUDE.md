@@ -365,7 +365,22 @@ literals gate FAILS if any returns (fail-proven via `ESSRT_LITERALS_PLANT=1`).
 with no deep-time H-scaling — g scales with the solar mass only, and
 `recomputePlanetCyclesForEpoch` is a no-op kept for call order. Saturn's
 anti-phase sign in the scene scaffolding is the scene convention
-`key === 'saturn'`, not a JSON flag. **The planet chains moved to engine-D elements (the P5 flip,
+`key === 'saturn'`, not a JSON flag. **Plan 07, the `windowAffine` bound
+(model v20.0, physics MAJOR 16): the chain's era affine is BOUNDED at its
+fit window.** The K4.5 periodic layer's `windowAffine` (off + slope·dt on
+λ̄/a/k/h/q/p, the k45e era solve over ±2,500 yr) was the chain's one
+unbounded term; the evaluator now holds the slope's argument at
+±`meta.periodicTermsSpanYr` (carried onto every chain by
+`buildPlanetChainsFromArtifactData`; a span-less affine is refused).
+Bit-identical inside the window; beyond it the multi-mode skeleton carries
+the chain alone. Measured: unclamped, the slope alone moved Saturn's λ̄ 430°
+and Neptune's a 1,342 ppm by ±100 kyr; the series handover boundaries read
+Jupiter 1344/854, Saturn 442/604, Neptune 432/432 kyr (were 138/86, 222/88,
+134/358 — the affine's extrapolation, not the skeleton's). The series
+verdict now hashes the evaluator and the chain artifact its handover rows
+run on; 21 registry keys (the planets' `InclMean`/`InclAmp`/`InclMin`/`InclMax`
+over ±10 Myr, the Uranus/Neptune fluctuation rows) moved with it — Saturn's
+half-range 0.274 → 0.126° was the affine's drift. **The planet chains moved to engine-D elements (the P5 flip,
 9aa91a6), and the legacy geometric planet path was EXCISED (K5,
 c0399f6): the chain is the ONLY planet path** — the simulator renders
 the seven planets, their orbit rings, traces, perihelion markers, panels

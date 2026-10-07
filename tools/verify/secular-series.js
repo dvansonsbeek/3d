@@ -583,21 +583,25 @@ const forkRows = [-500, -100, -50, -10, -1, 1, 10, 50, 100, 500].map((tMa) => ({
 // the certified chain stays the evaluator.
 // MEASURED ON THE SKELETON PLUS THE ERA AFFINE (plan 07): the chain's K4.5
 // periodic layer carries the era-typed window affine (`windowAffine`: off +
-// slope·dt on k/h, q/p, a, λ̄), fitted over 1800–2100 — the one UNBOUNDED
-// part of the chain (the no-polynomial trap: Saturn's ζ slopes ~1e-9/yr
-// reach 0.2° of inclination per Myr, its k/h slopes 2e-8/yr 0.02 in e). The
-// skeleton alone omits it, so the former boundaries let the evaluated chain
-// run to Jupiter Ω 176° against the series' 118° at −3.2 Myr (i_inv 1.64°
-// vs 0.44°) and Uranus i_inv 0.27° vs 1.05° at +140 kyr, INSIDE their
-// boundaries. The bounded periodic terms (the great inequality and its
-// kin, deliberately smoothed out of the series) are left out of the
-// comparison — including them counts their amplitude as divergence from the
-// first step (measured: every outer planet "departs" within ±8 kyr).
+// slope·dt on k/h, q/p, a, λ̄), fitted over ±meta.periodicTermsSpanYr around
+// the anchor — formerly the one UNBOUNDED part of the chain (the
+// no-polynomial trap: Saturn's ζ slopes ~1e-9/yr reach 0.2° of inclination
+// per Myr, its k/h slopes 2e-8/yr 0.02 in e), now BOUNDED by the evaluator
+// (the slope's argument is held at the fit-window edge beyond it; plan 07).
+// The skeleton alone omits it, so the former boundaries let the evaluated
+// chain run to Jupiter Ω 176° against the series' 118° at −3.2 Myr (i_inv
+// 1.64° vs 0.44°) and Uranus i_inv 0.27° vs 1.05° at +140 kyr, INSIDE their
+// boundaries; the unbounded affine then pulled them in to 20–358 kyr. The
+// bounded periodic terms (the great inequality and its kin, deliberately
+// smoothed out of the series) are left out of the comparison — including
+// them counts their amplitude as divergence from the first step (measured:
+// every outer planet "departs" within ±8 kyr). The affine rides with its
+// span, as the runtime chain carries it.
 const skeletonBase = phys.buildPlanetChainsFromArtifactData(CHAIN, { skeletonOnly: true });
 /** @type {Record<string, any>} */ const skeleton = {};
 for (const [k, ch] of Object.entries(skeletonBase)) {
   const wa = CHAIN.periodicTerms && CHAIN.periodicTerms[k] && CHAIN.periodicTerms[k].windowAffine;
-  skeleton[k] = wa ? { ...ch, periodicTerms: { windowAffine: wa } } : ch;
+  skeleton[k] = wa ? { ...ch, periodicTerms: { windowAffine: wa, windowAffineSpanYr: CHAIN.meta.periodicTermsSpanYr } } : ch;
 }
 const planetHandover = {};
 let handoverMinKyr = Infinity;
@@ -761,6 +765,12 @@ const artifact = {
     'packages/physics/src/earth/precession-composed.cjs',
     'tools/lib/deep-time.js',
     'data/nbody-deep-secular-modes.json',
+    // plan 07 (measured): the D5 handover boundaries run on the chain
+    // EVALUATOR and the governed chain artifact (skeleton + era affine). They
+    // were not inputs, so the evaluator's affine bound would have moved the
+    // banked boundaries (Jupiter 138/86 → 1344/854 kyr) unseen.
+    'packages/physics/src/planets/keplerian-chain.cjs',
+    'data/nbody-secular-frequencies.json',
   ]),
 };
 fs.writeFileSync(OUT, JSON.stringify(artifact));

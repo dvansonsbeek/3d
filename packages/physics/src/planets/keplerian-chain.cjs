@@ -37,7 +37,7 @@
 /** @typedef {{comps:Array<{planet:string,sLam?:number,sPom?:number}>,cos:number,sin:number}} KcPoissonCosSinTerm */
 /** @typedef {{comps:Array<{planet:string,sLam?:number,sPom?:number}>,re:number,im:number}} KcPoissonComplexTerm */
 /** @typedef {{off:number,slope?:number}} KcAffine */
-/** @typedef {{windowAffine?:Object<string,KcAffine>,mlonArcsec?:KcCosSinTerm[],aPpm?:KcCosSinTerm[],
+/** @typedef {{windowAffine?:Object<string,KcAffine>,windowAffineSpanYr?:number,mlonArcsec?:KcCosSinTerm[],aPpm?:KcCosSinTerm[],
  *             z?:KcComplexTerm[],zeta?:KcComplexTerm[],
  *             poissonMlonArcsec?:KcPoissonCosSinTerm[],poissonZ?:KcPoissonComplexTerm[]}} KcPeriodicTerms */
 /** @typedef {{anchor:KcElements,periRateArcsecCy:number,meanMotionDegPerYr:(number|null),
@@ -217,6 +217,22 @@ function computePlanetElementsAtYear(year, planetChain, allChains) {
   const P = planetChain.periodicTerms;
   if (P) {
     const w = P.windowAffine || {};
+    // plan 07 — THE BOUND on the era affine, the chain's one unbounded term.
+    // `off + slope·dt` is era-typed WINDOW content (anchor snapshot vs the
+    // ±span fit, k45e SPAN_YR banked as meta.periodicTermsSpanYr), not a
+    // secular law: the slope's argument is held at the fit-window edge
+    // beyond it (hard clamp) — bit-identical inside the window, and the
+    // multi-mode skeleton carries the chain outward alone. Measured
+    // unclamped at ±100 kyr: Saturn λ̄ 430° and Neptune a 1342 ppm off the
+    // skeleton, Mercury |Δζ| 0.019; the series handover boundaries sat at
+    // 20–358 kyr and read Jupiter 1344/854, Saturn 442/604, Neptune 432/432
+    // kyr once clamped (the no-polynomial rule, measured on the chain). A
+    // windowAffine without its span is an unbounded polynomial — refused.
+    const span = P.windowAffineSpanYr;
+    if (P.windowAffine && !(typeof span === 'number' && span > 0)) {
+      throw new Error('windowAffine without windowAffineSpanYr — build the chains via buildPlanetChainsFromArtifactData (the bound is part of the evaluation form)');
+    }
+    const dtAff = P.windowAffine && span !== undefined ? Math.max(-span, Math.min(span, dt)) : 0;
     // K4.7b — the semi-major-axis channel: heliocentric osculating elements
     // slosh TOGETHER at the synodic periods (largely the Sun's giant-planet
     // reflex, physical on both sides of any comparison); fitting λ̄/z wobbles
@@ -224,11 +240,11 @@ function computePlanetElementsAtYear(year, planetChain, allChains) {
     // reconstructed position needs all channels or none (measured: U/N δa/a
     // residual 3000–3800 ppm at the J/S synodics, k47b spectrum).
     if (P.aPpm || w.a) {
-      let dA = w.a ? w.a.off + (w.a.slope || 0) * dt : 0;
+      let dA = w.a ? w.a.off + (w.a.slope || 0) * dtAff : 0;
       for (const tm of P.aPpm || []) dA += tm.cos * Math.cos(tm.omegaRadPerYr * dt) + tm.sin * Math.sin(tm.omegaRadPerYr * dt);
       out.aAU = a.aAU * (1 + dA * 1e-6);
     }
-    let dMlon = w.mlon ? w.mlon.off + (w.mlon.slope || 0) * dt : 0;
+    let dMlon = w.mlon ? w.mlon.off + (w.mlon.slope || 0) * dtAff : 0;
     for (const tm of P.mlonArcsec || []) dMlon += tm.cos * Math.cos(tm.omegaRadPerYr * dt) + tm.sin * Math.sin(tm.omegaRadPerYr * dt);
     // K4.7b — Poisson-argument terms (record only; none currently exported)
     for (const tm of P.poissonMlonArcsec || []) {
@@ -236,8 +252,8 @@ function computePlanetElementsAtYear(year, planetChain, allChains) {
       dMlon += tm.cos * Math.cos(th) + tm.sin * Math.sin(th);
     }
     out.meanLonEclipticDeg = wrap(out.meanLonEclipticDeg + dMlon / 3600);
-    let k0 = out.e * Math.cos(out.lonPeriEclipticDeg * D2R) + (w.k ? w.k.off + (w.k.slope || 0) * dt : 0);
-    let h0 = out.e * Math.sin(out.lonPeriEclipticDeg * D2R) + (w.h ? w.h.off + (w.h.slope || 0) * dt : 0);
+    let k0 = out.e * Math.cos(out.lonPeriEclipticDeg * D2R) + (w.k ? w.k.off + (w.k.slope || 0) * dtAff : 0);
+    let h0 = out.e * Math.sin(out.lonPeriEclipticDeg * D2R) + (w.h ? w.h.off + (w.h.slope || 0) * dtAff : 0);
     for (const tm of P.z || []) {
       const c = Math.cos(tm.omegaRadPerYr * dt), s = Math.sin(tm.omegaRadPerYr * dt);
       k0 += tm.re * c - tm.im * s; h0 += tm.re * s + tm.im * c;
@@ -251,8 +267,8 @@ function computePlanetElementsAtYear(year, planetChain, allChains) {
     out.lonPeriEclipticDeg = wrap(Math.atan2(h0, k0) / D2R);
     // K4.5c — the out-of-plane channel: ζ = q + i·p = sin(i/2)·e^{iΩ}
     if (P.zeta || w.q || w.p) {
-      let q0 = Math.sin(out.inclEclipticDeg / 2 * D2R) * Math.cos(out.ascNodeEclipticDeg * D2R) + (w.q ? w.q.off + (w.q.slope || 0) * dt : 0);
-      let p0 = Math.sin(out.inclEclipticDeg / 2 * D2R) * Math.sin(out.ascNodeEclipticDeg * D2R) + (w.p ? w.p.off + (w.p.slope || 0) * dt : 0);
+      let q0 = Math.sin(out.inclEclipticDeg / 2 * D2R) * Math.cos(out.ascNodeEclipticDeg * D2R) + (w.q ? w.q.off + (w.q.slope || 0) * dtAff : 0);
+      let p0 = Math.sin(out.inclEclipticDeg / 2 * D2R) * Math.sin(out.ascNodeEclipticDeg * D2R) + (w.p ? w.p.off + (w.p.slope || 0) * dtAff : 0);
       for (const tm of P.zeta || []) {
         const c = Math.cos(tm.omegaRadPerYr * dt), s = Math.sin(tm.omegaRadPerYr * dt);
         q0 += tm.re * c - tm.im * s; p0 += tm.re * s + tm.im * c;
@@ -314,7 +330,10 @@ function buildPlanetChainsFromArtifactData(art, opts = {}) {
       invariablePlane: art.invariablePlane || undefined,               // K5c s-frame definition (shared)
     };
     if (!opts.skeletonOnly && art.periodicTerms && art.periodicTerms[key]) {
-      chains[key].periodicTerms = art.periodicTerms[key];
+      // The era affine's fit span rides WITH the terms (plan 07): the
+      // evaluator bounds the slope at it, so a chain without the span is
+      // refused there. ONE home: the artifact meta the generator writes.
+      chains[key].periodicTerms = { ...art.periodicTerms[key], windowAffineSpanYr: art.meta && art.meta.periodicTermsSpanYr };
     }
   }
   return chains;

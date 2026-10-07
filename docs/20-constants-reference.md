@@ -1,6 +1,6 @@
 ---
 docVersion: 1.0
-modelVersion: v19.0
+modelVersion: v20.0
 coefficients: sha256:96f7a2194ea29f0e
 status: current
 ---
@@ -383,14 +383,14 @@ of the law is [doc 10](10-fibonacci-laws.md) and `docs/retired-record.md`
 
 | Planet | Mean (deg) | Half-range (deg) | Range (deg) | Inertial apsidal period |
 |--------|----------|---------------|-----------|-------------|
-| Mercury | <!--v:mercuryInclMean-->6.690356<!--/v--> | <!--v:mercuryInclAmp-->5.414244<!--/v--> | 6.32 - 7.09 | <!--v:mercuryPeriPeriodICRF-->232,437<!--/v--> yr |
-| Venus | <!--v:venusInclMean-->1.538007<!--/v--> | 0.062165 | 2.09 - 2.21 | <!--v:venusPeriPeriodICRF-->174,997<!--/v--> yr |
+| Mercury | <!--v:mercuryInclMean-->6.690391<!--/v--> | <!--v:mercuryInclAmp-->5.414244<!--/v--> | 6.32 - 7.09 | <!--v:mercuryPeriPeriodICRF-->232,437<!--/v--> yr |
+| Venus | <!--v:venusInclMean-->1.538475<!--/v--> | 0.062165 | 2.09 - 2.21 | <!--v:venusPeriPeriodICRF-->174,997<!--/v--> yr |
 | Earth | <!--v:earthInclMean-->1.48113<!--/v--> | <!--v:earthInclAmp-->0.63607<!--/v--> | 0.85 - 2.12 | <!--v:earthPeriPeriodICRF-->111,635<!--/v--> yr |
-| Mars | <!--v:marsInclMean-->4.205751<!--/v--> | <!--v:marsInclAmp-->3.368563<!--/v--> | 0.67 - 3.00 | <!--v:marsPeriPeriodICRF-->72,335<!--/v--> yr |
-| Jupiter | <!--v:jupiterInclMean-->0.362180<!--/v--> | <!--v:jupiterInclAmp-->0.137944<!--/v--> | 0.30 - 0.34 | <!--v:jupiterPeriPeriodICRF-->304,456<!--/v--> yr |
-| Saturn | <!--v:saturnInclMean-->0.891047<!--/v--> | <!--v:saturnInclAmp-->0.273630<!--/v--> | 0.92 - 1.05 | <!--v:saturnPeriPeriodICRF-->45,883<!--/v--> yr |
-| Uranus | <!--v:uranusInclMean-->1.019370<!--/v--> | <!--v:uranusInclAmp-->0.146147<!--/v--> | 0.99 - 1.04 | <!--v:uranusPeriPeriodICRF-->330,515<!--/v--> yr |
-| Neptune | <!--v:neptuneInclMean-->0.668278<!--/v--> | <!--v:neptuneInclAmp-->0.201769<!--/v--> | 0.73 - 0.76 | <!--v:neptunePeriPeriodICRF-->2,136,796<!--/v--> yr |
+| Mars | <!--v:marsInclMean-->4.205698<!--/v--> | <!--v:marsInclAmp-->3.368563<!--/v--> | 0.67 - 3.00 | <!--v:marsPeriPeriodICRF-->72,335<!--/v--> yr |
+| Jupiter | <!--v:jupiterInclMean-->0.362449<!--/v--> | <!--v:jupiterInclAmp-->0.144018<!--/v--> | 0.30 - 0.34 | <!--v:jupiterPeriPeriodICRF-->304,456<!--/v--> yr |
+| Saturn | <!--v:saturnInclMean-->0.891489<!--/v--> | <!--v:saturnInclAmp-->0.125937<!--/v--> | 0.92 - 1.05 | <!--v:saturnPeriPeriodICRF-->45,883<!--/v--> yr |
+| Uranus | <!--v:uranusInclMean-->1.019406<!--/v--> | <!--v:uranusInclAmp-->0.142289<!--/v--> | 0.99 - 1.04 | <!--v:uranusPeriPeriodICRF-->330,515<!--/v--> yr |
+| Neptune | <!--v:neptuneInclMean-->0.668880<!--/v--> | <!--v:neptuneInclAmp-->0.180752<!--/v--> | 0.73 - 0.76 | <!--v:neptunePeriPeriodICRF-->2,136,796<!--/v--> yr |
 
 The mean and half-range are the chain's over the banked ±10-Myr series; the
 period is the chain's 1,296,000/|g| (Earth: the one-family route). The

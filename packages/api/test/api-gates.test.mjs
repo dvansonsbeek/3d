@@ -166,13 +166,15 @@ for (const url of SAMPLE_REQUESTS) {
   // v16.2: the elements ride the N-body chain (the path the simulator renders), not the record's linear
   // rates. Pins: Mercury's J2000 row is the chain's anchor (ϖ 77.457 — IAU 77.456; i to the invariable
   // plane 6.3446; node from the S&S origin 32.49 — S&S 2012 32.22), a deep row is the chain moving
-  // (Mars ϖ at −3000: 313.53 against 336.01 at J2000), and the frames block names the source.
+  // (Mars ϖ at −3000: 313.23 against 336.01 at J2000 — the BOUNDED chain, v20.0: −3000 is outside
+  // the ±2,500-yr affine window, where the unbounded slope had read 313.53), and the frames block
+  // names the source.
   if (Math.abs(merc.at[0].perihelionLongitudeDeg - 77.457) > 0.01) failures.push(`mercury ϖ(2000) off the chain anchor: ${merc.at[0].perihelionLongitudeDeg}`);
   if (Math.abs(merc.at[0].invPlaneInclinationDeg - 6.3446) > 0.001) failures.push(`mercury i_inv(2000) off the chain anchor: ${merc.at[0].invPlaneInclinationDeg}`);
   if (Math.abs(merc.at[0].ascendingNodeInvPlaneDeg - 32.49) > 0.05) failures.push(`mercury Ω_inv(2000) off the chain anchor (S&S origin): ${merc.at[0].ascendingNodeInvPlaneDeg}`);
   if (!merc.frames || !/chain/.test(merc.frames.source)) failures.push('bodies/mercury: frames block must name the chain as the source');
   const marsDeep = dataOf('/v1/bodies/mars?year=-3000').at[0];
-  if (Math.abs(marsDeep.perihelionLongitudeDeg - 313.53) > 0.05) failures.push(`mars ϖ(−3000) not the chain's: ${marsDeep.perihelionLongitudeDeg}`);
+  if (Math.abs(marsDeep.perihelionLongitudeDeg - 313.23) > 0.05) failures.push(`mars ϖ(−3000) not the chain's: ${marsDeep.perihelionLongitudeDeg}`);
   // Plan 07 R5/R9: Earth's invariable-plane elements are the ONE-SOURCE reading
   // (the engine Earth-orbit normal of date against the banked plane, the
   // simulator's inclInvPlaneModel / ascNodeInvPlaneModel), not the K device's
