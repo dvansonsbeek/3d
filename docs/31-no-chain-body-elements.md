@@ -1,19 +1,33 @@
 ---
 docVersion: 1.0
-modelVersion: v17.0
+modelVersion: v18.0
 coefficients: sha256:96f7a2194ea29f0e
 status: current
 ---
 
-# Geometric Orbital Elements — the No-Chain Bodies
+# Geometric Orbital Elements — the Retired Device (record)
+
+> **Status (plan 07 R5): the device this document describes is DELETED.**
+> The inclination oscillation (`computePlanetInvPlaneInclinationDynamic`, the
+> ψ law's `mean + s·A·cos(ϖ_ICRF − anchor)`), the tilt-derived ecliptic node
+> (`calculateDynamicAscendingNodeFromTilts`, the `dΩ/dε = −sin Ω / tan i`
+> segment integrator and its `@essrt/physics/planets/asc-node-integrator`
+> home), the two-normal ecliptic inclination on the device's linear nodes,
+> Earth's H/3 inclination cosine and −H/5 node, and the Node mirrors in
+> `tools/lib/orbital-engine.js` are gone from the code. The seven chain planets
+> and Earth read nodes, inclinations and heights from the engine-D element
+> chain and the one-source Earth-orbit normal ([doc 04](04-dynamic-elements-overview.md),
+> [doc 05](05-invariable-plane-overview.md)); `docs/retired-record.md` is the
+> record of the retirement. The text below is kept as the description of
+> what the device was, with its calibration tables.
 
 The seven chain planets and Earth read their displayed and
 machinery-consumed elements (nodes, inclinations, heights) from the
 engine-D element chain — the element set of date against the engine's own
 banked invariable plane ([doc 04](04-dynamic-elements-overview.md),
-[doc 05](05-invariable-plane-overview.md)). This document describes the
-**geometric-elements device** that remains in the code for everything the
-chain does not serve:
+[doc 05](05-invariable-plane-overview.md)). This document described the
+**geometric-elements device** that remained in the code for everything the
+chain did not serve:
 
 - **Ceres**, which carries S&S-style node constants as reference data (it is
   a force-only perturber in the N-body run, never a rendered body);
@@ -284,14 +298,14 @@ Pluto 17.14175°.
 
 ## Code Locations
 
-| Component | Location |
+| Component | Location (as it was; deleted at plan 07 R5) |
 |-----------|----------|
-| Inclination oscillation | `computePlanetInvPlaneInclinationDynamic()` in `src/script.js` |
-| Ecliptic inclination (two normals) | `updateDynamicInclinations()` in `src/script.js`; `computeEclipticInclination()` in `tools/lib/orbital-engine.js` |
-| Ecliptic node (tilt-derived) | `calculateDynamicAscendingNodeFromTilts()` in `src/script.js` and `tools/lib/orbital-engine.js` |
-| Invariable-plane node (linear) | `computeAscendingNodeInvPlane()` in `tools/lib/orbital-engine.js` |
-| Frame updates | `updateAscendingNodes()`, `updateOrbitalPlaneRotations()` in `src/script.js`; `moveModel()` in `tools/lib/scene-graph.js` |
-| Constants | `public/input/model-parameters.json` (`ascendingNodeCyclesIn8H`, means/amplitudes/anchors) |
+| Inclination oscillation | `computePlanetInvPlaneInclinationDynamic()` in `src/script.js` — deleted; the chain's `inclInvPlaneDeg` |
+| Ecliptic inclination (two normals) | `updateDynamicInclinations()` in `src/script.js` — now ONE value, the chain plane vs the engine Earth normal; `computeEclipticInclination()` in `tools/lib/orbital-engine.js` — deleted |
+| Ecliptic node (tilt-derived) | `calculateDynamicAscendingNodeFromTilts()` in `src/script.js` and `tools/lib/orbital-engine.js` — deleted; the chain's `ascNodeEclipticDeg` |
+| Invariable-plane node (linear) | `computeAscendingNodeInvPlane()` in `tools/lib/orbital-engine.js` — deleted; the chain's `ascNodeInvPlaneDeg` |
+| Frame updates | `updateAscendingNodes()`, `updateOrbitalPlaneRotations()` in `src/script.js` (chain-fed); `moveModel()` in `tools/lib/scene-graph.js` (container tilt block deleted) |
+| Constants | `public/input/model-parameters.json` (`ascendingNodeCyclesIn8H`, anchors — plan 07 R8 inputs; the ψ means/amplitudes are no longer derived) |
 
 Verification scripts: [inclination-verification.js](../tools/verify/inclination-verification.js), [ascending-node-verification.js](../tools/verify/ascending-node-verification.js), [ascending-node-souami-souchay.js](../tools/verify/ascending-node-souami-souchay.js), [analytical-ascending-nodes.js](../tools/verify/analytical-ascending-nodes.js).
 

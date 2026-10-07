@@ -165,14 +165,12 @@ console.log(`  ✓ YEAR_LENGTH harmonics: all 3 types match\n`);
 // 8. Verify planet derived values (orbitTilt, invPlaneInclination)
 // ═══════════════════════════════════════════════════════════════════════════
 console.log('═══ Step 8: Derived planet values ═══');
-const mp = JSON.parse(fs.readFileSync(
-  path.resolve(ROOT, 'public', 'input', 'model-parameters.json'), 'utf8'));
+// (model-parameters.json was read here for the ψ re-derivation — plan 07 R5.)
 const ar = JSON.parse(fs.readFileSync(
   path.resolve(ROOT, 'public', 'input', 'astro-reference.json'), 'utf8'));
 
 for (const [key, p] of Object.entries(C.planets)) {
   const arP = ar.planetOrbitalElements[key];
-  const mpP = mp.planets[key];
 
   // Verify orbitTilt derived correctly
   const utils = require(path.join(TOOLS_LIB, 'constants', 'utils.js'));
@@ -180,18 +178,9 @@ for (const [key, p] of Object.entries(C.planets)) {
   check(`${key}.orbitTilta`, p.orbitTilta, tilt.orbitTilta, 1e-7);
   check(`${key}.orbitTiltb`, p.orbitTiltb, tilt.orbitTiltb, 1e-7);
 
-  // Verify invPlaneInclinationMean derived correctly
-  const amp = utils.computeInvPlaneInclinationAmplitude(C.PSI, mpP.fibonacciD, C.massFraction[key]);
-  const isAntiPhase = mpP.antiPhase || false;
-  const mean = utils.computeInvPlaneInclinationMean(arP.invPlaneInclinationJ2000, amp, mpP.longitudePerihelion, mpP.inclinationCycleAnchor, isAntiPhase);
-  check(`${key}.invPlaneInclinationAmplitude`, p.invPlaneInclinationAmplitude, amp, 1e-7);
-  check(`${key}.invPlaneInclinationMean`, p.invPlaneInclinationMean, mean, 1e-7);
-
-  // Verify J2000 reconstruction (using perihelion longitude, ICRF reference)
-  const cosPhase = Math.cos((mpP.longitudePerihelion - mpP.inclinationCycleAnchor) * Math.PI / 180);
-  const antiSign = isAntiPhase ? -1 : 1;
-  const reconstructed = mean + antiSign * amp * cosPhase;
-  check(`${key}.inclJ2000 reconstructed`, reconstructed, arP.invPlaneInclinationJ2000, 1e-6);
+  // (Plan 07 R5: the ψ re-derivation — invPlaneInclinationAmplitude /
+  // invPlaneInclinationMean against C.PSI, and the J2000 reconstruction
+  // mean + s·amp·cos(ϖ − anchor) = i_J2000 — left with the law.)
 }
 console.log(`  ✓ All derived planet values verified\n`);
 

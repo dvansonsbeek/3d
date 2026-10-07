@@ -61,7 +61,6 @@ python devonian_cross_check.py
 |--------|-------------|-------------|
 | `fibonacci_eccentricity_scale.py` | Laws 4, 5 | The solar system as an eccentricity balance scale — K constant + per-planet breakdowns |
 | `fibonacci_eccentricity_structure.py` | Laws 4, 5 | Two-component decomposition (base + amplitude), mirror pair conservation |
-| `fibonacci_psi_amd.py` | Law 2 | AMD interpretation of ψ — mass cancellation, amplitude budget |
 | `predict_tilt_from_eccentricity.py` | Law 4 | K amplitude constant — universality, tilt prediction, K-ψ relations |
 
 Plus `fibonacci_amd_structure.py` and `fibonacci_law4_balance_search.py` for systematic AMD-based and single-balance-equation investigations.

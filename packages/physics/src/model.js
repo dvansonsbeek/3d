@@ -18,7 +18,6 @@
  * which itself mirrors tools/lib/constants.js §9.
  */
 import { deriveEpochParams } from './layer0/derive-params.js';
-import * as FL from './planets/fibonacci-laws.cjs';
 import { buildPlanetChainsFromArtifactData, computePlanetElementsAtYear } from './planets/keplerian-chain.cjs';
 import { createSecularSeriesOverride } from './planets/secular-series.cjs';
 import { computeEquatorNodeOriginSFrameDeg, convertNodeSFrameToEquatorOriginDeg } from './planets/inv-plane-frame.cjs';
@@ -97,14 +96,12 @@ export function assembleModel(C, F, laws = {}, secularSeriesArtifact = /** @type
   const meanAnomalisticYearDays = (meanSolarYearDays * (H / 16)) / (H / 16 - 1);
   const meanTropicalYearJ2000Seconds = meanSolarYearDays * meanLengthOfDay;
 
-  const earthInclAmplitude = C.earth.earthInvPlaneInclinationAmplitude;
-  // Plan 07 R6: `earthtiltMean` and `eccentricityAmplitude` were read here
-  // ONLY to invert the K constant from Earth's calibration. With the K law
-  // retired nothing in this module reads either — they remain on C.earth for
-  // the Earth-side devices (R9) and the registry.
-  const earthInclMean = C.earthOrbital.earthInclinationJ2000_deg
-    - earthInclAmplitude * Math.cos(((C.earthOrbital.earthPerihelionLongitudeJ2000
-      - C.earthOrbital.earthInclinationCycleAnchor) * Math.PI) / 180);
+  // Plan 07 R5/R6/R9: `earthtiltMean`, `earthInvPlaneInclinationAmplitude`
+  // and `eccentricityAmplitude` were read here only to invert the K and ψ
+  // constants from Earth's calibration and to build the H/3 inclination
+  // device. With both laws retired nothing in this module reads them — they
+  // remain on C.earth as the K device's J2000 pose inputs (the scene's wheel
+  // geometry at the chain anchor epoch) and for the registry's record keys.
   const solsticeObliquityMean = F.SOLSTICE_OBLIQUITY_MEAN_FITTED;
 
   const G_CONSTANT = C.physicalConstants.G_CONSTANT;
@@ -429,14 +426,9 @@ export function assembleModel(C, F, laws = {}, secularSeriesArtifact = /** @type
   /** de/dyear of the Sun's e — the cardinal braid's equation-of-centre
    *  derivative rides it (±0.5-yr central difference; the constant offset
    *  cancels). @param {number} year @returns {number} */
-  /** @param {number} year @returns {number} */
-  const inclinationDeg = (year) => earthInclMean
-    - earthInclAmplitude * Math.cos(phaseRadians(balancedYear, year, 3));
-  /** @param {number} year @returns {number} */
-  const ascendingNodeDeg = (year) => {
-    const period = -H / 5;
-    return (((C.earthOrbital.earthAscendingNodeInvPlane + (360.0 * (year - 2000)) / period) % 360) + 360) % 360;
-  };
+  // (Plan 07 R5/R9: Earth's H/3 inclination cosine and −H/5 linear node — the
+  // K device — stood here; `inclinationDeg`/`ascendingNodeDeg` are now the
+  // one-source construction defined with the planets' chain evaluators below.)
 
   // ── Year/day lengths ──────────────────────────────────────────────────────
   /** @param {number} year @param {number} base @param {Array<[number, number, number]>} harmonics @returns {number} */
@@ -617,6 +609,8 @@ export function assembleModel(C, F, laws = {}, secularSeriesArtifact = /** @type
     });
     return {
       yearLengths,
+      /** The one-source sample at a decimal year (the engine year) — ε, e, ϖ of date, the Earth-orbit normal (the fields the frame of date and the invariable-plane elements read). @param {number} year */
+      sampleAt,
       /** EXPERIMENT accessors: the series' e and equinox-referenced ϖ of date. @param {number} year @returns {number} */
       eAt: (year) => sampleAt(year).e,
       /** @param {number} year @returns {number} */
@@ -716,14 +710,11 @@ export function assembleModel(C, F, laws = {}, secularSeriesArtifact = /** @type
   for (const k of PLANET_KEYS) massFraction[k] = 1 / C.physicalConstants.massRatioDE440[k];
   massFraction.earth = massEarthAlone / M_SUN;
 
-  const PSI = FL.computePsiConstant({
-    earthInvPlaneInclinationAmplitude: earthInclAmplitude,
-    massEarthAlone,
-    massSun: M_SUN,
-  });
   // (plan 07 R6: eccentricityAmplitudeK — the K constant inverted from
   // Earth's calibration — and the t2000 phase offset it fed went with the
-  // eccentricity law. systemResetN is kept where other consumers read it.)
+  // eccentricity law; plan 07 R5: PSI — ψ = 3·A_earth·√(m_E/m_☉) — and the
+  // inclination law it fed went the same way. systemResetN is kept where
+  // other consumers read it.)
 
   /** @param {[number, number]|null} frac @returns {number|null} */
   const fractionToYears = (frac) => (frac === null ? null : (H * frac[0]) / frac[1]);
@@ -743,14 +734,6 @@ export function assembleModel(C, F, laws = {}, secularSeriesArtifact = /** @type
     // obliquity of the spin channel (the IAU pole against the chain's J2000
     // plane, acute form) — both from the governed artifacts, no fractions.
     const wobble = computeSecularShape(/** @type {any} */ (CHAIN_ARTIFACT), k).beatYears;
-    const il = FL.computeInclinationLaw({
-      fibonacciD: mp.fibonacciD,
-      massFrac: massFraction[k],
-      invPlaneInclinationJ2000: ar.invPlaneInclinationJ2000,
-      longitudePerihelion: ar.longitudePerihelion,
-      inclinationCycleAnchor: mp.inclinationCycleAnchor,
-      antiPhase: mp.antiPhase || false,
-    }, PSI);
     const obliquityDerived = computeObliquityJ2000Deg({
       spin: C.planetSpinPhysical[k],
       anchorInclEclipticDeg: /** @type {any} */ (CHAIN_ARTIFACT).j2000AnchorElements[k].inclEclipticDeg,
@@ -770,8 +753,6 @@ export function assembleModel(C, F, laws = {}, secularSeriesArtifact = /** @type
       ascendingNodeInvPlane: mp.ascendingNodeInvPlane,
       inclinationCycleAnchor: mp.inclinationCycleAnchor,
       invPlaneInclinationJ2000: ar.invPlaneInclinationJ2000,
-      invPlaneInclinationAmplitude: il.amplitude,
-      invPlaneInclinationMean: il.mean,
       obliquityMean,
       orbitalEccentricityJ2000: ar.orbitalEccentricityJ2000,
       solarYearInput: ar.solarYearInput,
@@ -779,8 +760,9 @@ export function assembleModel(C, F, laws = {}, secularSeriesArtifact = /** @type
     });
     // R8 (plan 07): what `model.planets.record()` PUBLISHES is not the record
     // above. The internal record kept the ψ/K law outputs for the fitting
-    // pipeline; at R6 the K half and both fitter steps that read it are gone,
-    // so what remains above is the ψ half (until R5) and the structural inputs.
+    // pipeline; at R6 the K half and both fitter steps that read it went, at
+    // R5 the ψ half (invPlaneInclinationAmplitude/Mean) — what remains above
+    // is the structural inputs and the derived J2000 obliquity.
     // The separation stands for the same reason it was made —
     // but nothing outside needs the device, and serving it made /v1/bodies
     // contradict the model's own chain on the SAME quantities: Mercury's node
@@ -878,13 +860,15 @@ export function assembleModel(C, F, laws = {}, secularSeriesArtifact = /** @type
   };
   /** Ecliptic longitude of perihelion, J2000 ecliptic and equinox (the chain's ϖ). @param {string} k @param {number} year @returns {number} */
   const planetPerihelionDeg = (k, year) => planetChainElementsAt(k, year).lonPeriEclipticDeg;
-  /** Ascending node on the model's invariable plane, from the plane's ascending node on the ICRF equator (the Souami & Souchay 2012 origin; derived conversion, inv-plane-frame). @param {string} k @param {number} year @returns {number} */
-  const planetAscNodeDeg = (k, year) => {
+  /** The S&S longitude origin as an s-frame longitude (J2000-fixed, derived). @returns {number} */
+  const nodeOriginSSDeg = () => {
     if (planetNodeOriginSSDeg === null) {
       planetNodeOriginSSDeg = computeEquatorNodeOriginSFrameDeg(/** @type {any} */ (CHAIN_ARTIFACT).invariablePlane, C.earthOrbital.obliquityJ2000_deg);
     }
-    return convertNodeSFrameToEquatorOriginDeg(planetChainElementsAt(k, year).ascNodeInvPlaneDeg, planetNodeOriginSSDeg);
+    return planetNodeOriginSSDeg;
   };
+  /** Ascending node on the model's invariable plane, from the plane's ascending node on the ICRF equator (the Souami & Souchay 2012 origin; derived conversion, inv-plane-frame). @param {string} k @param {number} year @returns {number} */
+  const planetAscNodeDeg = (k, year) => convertNodeSFrameToEquatorOriginDeg(planetChainElementsAt(k, year).ascNodeInvPlaneDeg, nodeOriginSSDeg());
   /** Inclination to the model's invariable plane (exact orbit-normal rotation). @param {string} k @param {number} year @returns {number} */
   const planetInclinationDeg = (k, year) => planetChainElementsAt(k, year).inclInvPlaneDeg;
   /** Orbital eccentricity of date, from the same chain elements (R8): the
@@ -892,6 +876,52 @@ export function assembleModel(C, F, laws = {}, secularSeriesArtifact = /** @type
    *  triple, which presumed a single oscillation the chain's multi-mode
    *  e-vector does not have. @param {string} k @param {number} year @returns {number} */
   const planetEccentricity = (k, year) => planetChainElementsAt(k, year).e;
+
+  // ── Earth's invariable-plane elements of date (plan 07 R5/R9) ─────────────
+  // ONE published i_inv / Ω_inv everywhere — the mirror of the browser's
+  // inclInvPlaneModel / ascNodeInvPlaneModel (identical ops): the engine's
+  // own Earth-orbit normal of date (the one-source sampler — the banked
+  // secular series inside ±10 Myr, the mode tail beyond) against the
+  // artifact's invariable plane, the node expressed in the Souami & Souchay
+  // longitude origin through the same derived conversion the planets' node
+  // takes. The H/3 cosine on the fixed apsidal carrier and the −H/5 linear
+  // node that served here until R5 were the K device: 1.578677° against
+  // 1.578422° at J2000, 1.24° against 1.91° at −100 kyr, and 112° against
+  // 94° of node there. Doc 05 banks the one-source reading at rms 0.003°
+  // vs La2010 over −500 kyr. Argument: the engine year (dynamical time,
+  // Julian from J2000 TT — the sampler's own coordinate, as the chain's).
+  const invPlaneGeometry = (() => {
+    const ip = /** @type {{ inclEclipticDeg: number, ascNodeEclipticDeg: number }} */ (/** @type {any} */ (CHAIN_ARTIFACT).invariablePlane);
+    const D2R = Math.PI / 180;
+    const si = Math.sin(ip.inclEclipticDeg * D2R), ci = Math.cos(ip.inclEclipticDeg * D2R);
+    const nInv = [si * Math.sin(ip.ascNodeEclipticDeg * D2R), -si * Math.cos(ip.ascNodeEclipticDeg * D2R), ci];
+    const xIp = [Math.cos(ip.ascNodeEclipticDeg * D2R), Math.sin(ip.ascNodeEclipticDeg * D2R), 0];
+    const yIp = [nInv[1] * xIp[2] - nInv[2] * xIp[1], nInv[2] * xIp[0] - nInv[0] * xIp[2], nInv[0] * xIp[1] - nInv[1] * xIp[0]];
+    return { ascNodeEclipticDeg: ip.ascNodeEclipticDeg, nInv, xIp, yIp };
+  })();
+  /** The engine Earth-orbit normal of date, J2000 ecliptic frame. @param {number} year @returns {number[]} */
+  const earthOrbitNormalJ2000At = (year) => {
+    const s = oneSourceM.sampleAt(year);
+    return [s.orbitNormalX, s.orbitNormalY, Math.sqrt(Math.max(0, 1 - s.orbitNormalX * s.orbitNormalX - s.orbitNormalY * s.orbitNormalY))];
+  };
+  /** Earth's inclination of date to the model's invariable plane, degrees. @param {number} year @returns {number} */
+  const inclinationDeg = (year) => {
+    const nE = earthOrbitNormalJ2000At(year), nInv = invPlaneGeometry.nInv;
+    const d = nE[0] * nInv[0] + nE[1] * nInv[1] + nE[2] * nInv[2];
+    return Math.acos(Math.min(1, Math.max(-1, d))) / (Math.PI / 180);
+  };
+  /** Earth's ascending node of date on the invariable plane, S&S origin, degrees in [0, 360). @param {number} year @returns {number} */
+  const ascendingNodeDeg = (year) => {
+    const D2R = Math.PI / 180;
+    const { ascNodeEclipticDeg, nInv, xIp, yIp } = invPlaneGeometry;
+    const nE = earthOrbitNormalJ2000At(year);
+    let N = [nInv[1] * nE[2] - nInv[2] * nE[1], nInv[2] * nE[0] - nInv[0] * nE[2], nInv[0] * nE[1] - nInv[1] * nE[0]];
+    const L = Math.hypot(N[0], N[1], N[2]);
+    N = [N[0] / L, N[1] / L, N[2] / L];
+    const sFrameDeg = ((Math.atan2(N[0] * yIp[0] + N[1] * yIp[1] + N[2] * yIp[2],
+      N[0] * xIp[0] + N[1] * xIp[1] + N[2] * xIp[2]) / D2R + ascNodeEclipticDeg) % 360 + 360) % 360;
+    return convertNodeSFrameToEquatorOriginDeg(sFrameDeg, nodeOriginSSDeg());
+  };
 
   // ── Time axis: exact JD ↔ model-year conversion ───────────────────────────
   // The model's `year` inputs live on the SI axis (the axis the fits were

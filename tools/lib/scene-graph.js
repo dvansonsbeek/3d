@@ -9,7 +9,8 @@
 // ═══════════════════════════════════════════════════════════════════════════
 
 const C = require('./constants');
-const OE = require('./orbital-engine');
+// (orbital-engine is no longer required here: its last reader, the planet
+// containers' device tilt in moveModel, left at plan 07 R5.)
 const DT = require('./deep-time');
 // perf: cached lazy requirer. A bare `require()` inside a per-call function
 // re-runs module RESOLUTION every call (~30 µs: internalModuleStat +
@@ -1081,28 +1082,11 @@ function buildSceneGraph() {
   };
 }
 
-// ═══════════════════════════════════════════════════════════════════════════
-// DYNAMIC ECLIPTIC INCLINATION — From invariable plane dynamics
-// ═══════════════════════════════════════════════════════════════════════════
-
-/**
- * Compute the dynamic ecliptic inclination for a planet at a given time.
- *
- * Replicates the logic from script.js:
- *   computeInclinationEarth() — Earth's inv. plane inclination oscillation
- *   computePlanetInvPlaneInclinationDynamic() — planet's inv. plane oscillation
- *   updateDynamicInclinations() — normal vector dot product → ecliptic inclination
- *
- * @param {string} key — planet key (e.g. 'saturn')
- * @param {number} yearsSinceBalanced — years since the balanced year epoch
- * @returns {number} ecliptic inclination in degrees
- */
-function computeDynamicEclipticInclination(key, yearsSinceBalanced) {
-  // 8.3-1 S-P4: one Ω anchor — the canonical form now lives in
-  // orbital-engine (computeEclipticInclinationFromBalanced); this body was
-  // moved there VERBATIM and this mirror delegates with its exact argument.
-  return OE.computeEclipticInclinationFromBalanced(key, yearsSinceBalanced);
-}
+// (Plan 07 R5: computeDynamicEclipticInclination — the balanced-year
+// two-normal device form (orbital-engine computeEclipticInclinationFromBalanced)
+// — stood here. It fed only the planet containers' tilt in moveModel, which
+// the K5 excision left rendered-dead: Node planet positions are
+// sun + 100·R·_kcHelioAU, never a container rotation. Deleted with the law.)
 
 // ═══════════════════════════════════════════════════════════════════════════
 // MOVE MODEL — Update all rotations/positions for a given pos
@@ -1321,12 +1305,9 @@ function moveModel(graph, pos) {
   const earthPeriPrec1Angle = graph.earthPeriPrec1.orbit.ry;
   const earthPeriEcl = ((earthPeriPrec1Angle + C.ASTRO_REFERENCE.earthPerihelionLongitudeJ2000 * d2r) % (2 * Math.PI) + 2 * Math.PI) % (2 * Math.PI);
 
-  // Compute yearsSinceBalanced for dynamic ecliptic inclination.
-  // Uses _epochCache.mSY for pos→jd round-trip; yearsSinceBalanced then
-  // uses the same mSY so the year count is epoch-consistent with the
-  // caller's JD input.
+  // The frame's JD (pos→jd round-trip through _epochCache.mSY) — the engine
+  // frame placement below takes it.
   const currentJD = _jdFromPosTools(pos);
-  const yearsSinceBalanced = (currentJD - C.balancedJD) / _epochCache.mSY;
 
   // Planets
   for (const key of Object.keys(graph.planetNodeMap)) {
@@ -1351,18 +1332,10 @@ function moveModel(graph, pos) {
       pm.realPeri.rotAxis.px = eo;
     }
 
-    // Dynamic orbital plane: update planet container tilt from dynamic ecliptic inclination
-    // Uses dynamic ascending node (matching script.js updateOrbitalPlaneRotations)
-    if (pm.sceneData && pm.sceneData.p.ascendingNodeInvPlane !== undefined) {
-      const dynamicIncl = computeDynamicEclipticInclination(key, yearsSinceBalanced);
-      const currentYear = C.startmodelYear + (currentJD - C.startmodelJD) / _epochCache.mSY;
-      const dynamicAscNode = OE.calculateDynamicAscendingNodeFromTilts(
-        pm.sceneData.p.orbitTilta, pm.sceneData.p.orbitTiltb, currentYear, key);
-      const correctedAscNode = dynamicAscNode + (ascNodeToolCorrection[key] || 0);
-      const angle = (-90 - correctedAscNode) * d2r;
-      pm.planet.container.rx = Math.cos(angle) * -dynamicIncl * d2r;
-      pm.planet.container.rz = Math.sin(angle) * -dynamicIncl * d2r;
-    }
+    // (Plan 07 R5: the per-frame planet-container tilt — the device's
+    // two-normal ecliptic inclination with the integrated ascending node —
+    // stood here. Rendered-dead since K5 (positions are sun + 100·R·helio);
+    // deleted with the law.)
 
     animateObject(pm.realPeri, pm.realPeri.def);
     animateObject(pm.planet, pm.planet.def);

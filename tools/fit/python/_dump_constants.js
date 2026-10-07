@@ -31,7 +31,7 @@ const output = {
   earthAscendingNodeInvPlane: C.earthAscendingNodeInvPlane,
   eccentricityBase: C.eccentricityBase,
   eccentricityAmplitude: C.eccentricityAmplitude,
-  eccentricityAmplitudeK: C.eccentricityAmplitudeK,
+  // (eccentricityAmplitudeK — the K constant — left with the law at plan 07 R6.)
   perihelionRefJD: C.perihelionRefJD,
 
   // Derived values

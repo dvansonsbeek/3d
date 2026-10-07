@@ -1,6 +1,6 @@
 ---
 docVersion: 1.0
-modelVersion: v17.0
+modelVersion: v18.0
 coefficients: sha256:96f7a2194ea29f0e
 status: current
 ---
@@ -359,6 +359,47 @@ above and the live ones beside them — had been unrunnable for months and
 nothing reported it, because no gate runs Python analyses. The bridge is
 repaired at R6 rather than left broken, but the episode is the clearest
 evidence for the retirement: an instrument nothing runs cannot be a check.
+
+**The ψ inclination law and the geometric-elements device** (plan 07
+R5/R9, model v18.0; doc 31 is the record of what the device was). Deleted
+from the code: `@essrt/physics/planets/fibonacci-laws` (ψ = 3·A_earth·√(m_E/m_☉)
+and the per-planet amplitude ψ/(d·√m) with the mean from the J2000
+constraint), `planets/orientation` (the ICRF-perihelion-linked inclination
+oscillation, the linear year-2000 node, the balanced-year two-normal ecliptic
+inclination), `planets/asc-node-integrator` (dΩ/dε = −sin Ω / tan i,
+integrated over the obliquity history with sign flips at the obliquity extrema
+and Earth-inclination crossovers), the browser's `calculateDynamicAscendingNodeFromTilts`,
+`getEarthInclinationAtYear`, the crossing finders, `getEclipticInclinationAtYear`,
+`computeInclinationEarth`, `computePlanetInvPlaneInclinationDynamic`,
+`buildObliquityChart` and the unreachable legacy tail of the heights
+function; the Node mirrors in `tools/lib/orbital-engine.js` (the obliquity
+extrema table, `computeAscendingNodeInvPlane`, `computeEclipticInclination`,
+`computeEclipticInclinationFromBalanced`, `computeEarthOrbitalElements`) and
+the rendered-dead container tilt in `scene-graph.js`; Earth's H/3 inclination
+cosine and −H/5 linear node in `model.js`; the Python bridge's `PSI`,
+`INCL_AMP`, `INCL_MEAN`, `eta`/`ETA`, `compute_mean_inclination`,
+`calc_planet_inclination` and Earth's `calc_inclination`; the
+`fibonacci_psi_amd.py` analysis and the `anchor-and-ascnode-audit` sweep.
+
+What replaced them was already in the code: the seven planets' inclination
+and node of date are the N-body chain's elements (`_kcElementsOfDate` /
+`model.planets.inclinationDeg`, `ascendingNodeInvPlaneDeg`), and Earth's are
+the one-source engine Earth-orbit normal against the banked invariable plane
+(`inclInvPlaneModel` / `ascNodeInvPlaneModel` in the simulator; now also
+`model.earth.inclinationDeg` / `ascendingNodeDeg` in the package, identical
+ops, pinned by the API gate). Measured before deletion: the device's Earth
+inclination read 1.578677° against the one-source 1.578422° at J2000 and
+1.24° against 1.91° at −100 kyr, its node 112° against 94° there; the
+integrator's seven browser writes had been overwritten by the chain block
+every frame since K5b (display reach zero — its only gated reach was 28
+golden probes, now recording the chain's node); and the device's Souami &
+Souchay twin of the ecliptic inclination had computed with Earth's node at
+0° since the no-chain bodies went, because the only writer of that key was
+the unreachable tail. The K device CONSTANTS stay — `earthtiltMean`,
+`earthInvPlaneInclinationAmplitude`, `earthRAAngle`, `earthInvPlaneInclinationMean`
+are the scene's J2000 pose (the wheel geometry `_kcFrameR` reads once and
+`_applyEngineEarthFrame` supersedes of date), not a law; the registry freezes
+`psiValue` as the recorded constant, as it does `kValue`.
 
 One measurement is worth keeping, because it is part of why the construction
 was retired rather than repaired: the Law-5 balance recomputed from the live

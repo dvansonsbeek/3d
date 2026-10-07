@@ -12,7 +12,8 @@ Data sources:
   - Masses: JPL DE440 (solar mass units)
   - J2000 eccentricities: NASA Planetary Fact Sheet
   - Base eccentricities: the model's midpoint predictions
-  - Inclination amplitudes: Computed from ψ/(d×√m) with pure Fibonacci divisors
+  - Inclination amplitudes: RETIRED with the ψ law (plan 07 R5) — the
+    N-body chain carries a planet's inclination of date
   - Semi-major axes: NASA Planetary Fact Sheet (AU)
   - Orbital periods: Derived from semi-major axes (years)
   - Oscillation period fractions: the model's (T_osc/H = a/b)
@@ -292,28 +293,17 @@ GROUP_203 = GROUP_IN_PHASE  # legacy alias
 GROUP_23 = GROUP_ANTI
 
 # ═══════════════════════════════════════════════════════════════════════════
-# ψ-CONSTANT (single, universal)
+# (ψ-CONSTANT and INCLINATION AMPLITUDES — RETIRED, plan 07 R5)
+# PSI = 3 × amp_Earth × √m_Earth, its PSI1/PSI1_THEORY aliases, and the
+# per-planet INCL_AMP = PSI/(d×√m) (alias INCLINATION_AMPS) stood here — the
+# Python mirror of the ψ inclination law. Deleted with the law: a planet's
+# inclination of date has one home, the N-body chain (@essrt/physics
+# model.planets.inclinationDeg). docs/retired-record.md is the record.
 # ═══════════════════════════════════════════════════════════════════════════
 
-# Fibonacci numbers used in the formula
+# Fibonacci numbers (the retired divisor vocabulary; kept for the scripts that
+# still read FIB as a plain list)
 FIB = [0, 1, 1, 2, 3, 5, 8, 13, 21, 34, 55, 89, 144, 233, 377, 610, 987, 1597]
-
-# ψ derived from Earth's fitted inclination amplitude: PSI = d_Earth × amp_Earth × √m_Earth
-PSI = 3 * EARTH_INCLINATION_AMPLITUDE * math.sqrt(MASS["Earth"])
-
-# Backwards compatibility aliases
-PSI1 = PSI
-PSI1_THEORY = PSI
-
-# ═══════════════════════════════════════════════════════════════════════════
-# INCLINATION AMPLITUDES (computed from ψ/(d×√m), degrees)
-# ═══════════════════════════════════════════════════════════════════════════
-
-# Amplitudes are derived quantities, not input data
-INCL_AMP = {p: PSI / (D[p] * SQRT_M[p]) for p in PLANET_NAMES}
-
-# Alias used in some scripts
-INCLINATION_AMPS = INCL_AMP
 
 # ═══════════════════════════════════════════════════════════════════════════
 # ORBITAL PROPERTIES
@@ -344,9 +334,8 @@ INCL_J2000["Earth"] = 1.5787  # Souami & Souchay 2012
 OMEGA_J2000 = {p['name']: p['ascendingNodeInvPlane'] for p in _C['planets'].values()}
 OMEGA_J2000["Earth"] = _C['earthAscendingNodeInvPlane']  # 284.51
 
-# Mean inclinations to invariable plane (from constants.js invPlaneInclinationMean)
-INCL_MEAN = {p['name']: p['invPlaneInclinationMean'] for p in _C['planets'].values()}
-INCL_MEAN["Earth"] = EARTH_INCLINATION_MEAN
+# (INCL_MEAN — the ψ law's per-planet mean inclinations, read from
+# constants.js invPlaneInclinationMean — left with the law at plan 07 R5.)
 
 # Cycle anchor for inclination oscillation (from constants.js inclinationCycleAnchor)
 INCL_CYCLE_ANCHOR = {p['name']: p['inclinationCycleAnchor'] for p in _C['planets'].values()}
@@ -424,9 +413,8 @@ FIB_SET = set(FIB_MATCH)
 # HELPER FUNCTIONS
 # ═══════════════════════════════════════════════════════════════════════════
 
-def eta(planet):
-    """Mass-weighted inclination amplitude: η = amp × √m"""
-    return INCL_AMP[planet] * SQRT_M[planet]
+# (eta(planet) — the mass-weighted ψ amplitude η = amp × √m — left with the
+# ψ law at plan 07 R5.)
 
 
 def xi(planet, use_j2000=True):
@@ -496,8 +484,7 @@ def pisano_period(m):
 # PRECOMPUTED MASS-WEIGHTED PARAMETERS
 # ═══════════════════════════════════════════════════════════════════════════
 
-# Mass-weighted inclination amplitudes
-ETA = {p: eta(p) for p in PLANET_NAMES}
+# (ETA — the mass-weighted ψ amplitudes — left with the ψ law at plan 07 R5.)
 
 # Mass-weighted eccentricities, on the observed J2000 values
 # (plan 07 R6: XI_BASE — the same on the retired K law's base — is gone with it)
@@ -557,14 +544,5 @@ def predict_saturn_eccentricity():
     return predicted, actual, pct_err(predicted, actual)
 
 
-def compute_mean_inclination(planet):
-    """Compute mean inclination from J2000 constraint.
-    mean = i_J2000 - amp × cos(ω̃_J2000 - phaseAngle)
-    """
-    amp = INCL_AMP[planet]
-    i_j2000 = INCL_J2000[planet]
-    peri_long = LONGITUDE_PERIHELION[planet]
-    phase = INCL_CYCLE_ANCHOR[planet]
-    sign = -1 if planet == 'Saturn' else 1
-    mean = i_j2000 - sign * amp * math.cos(math.radians(peri_long - phase))
-    return mean
+# (compute_mean_inclination(planet) — the ψ law's J2000 constraint,
+# mean = i_J2000 − s·amp·cos(ϖ_J2000 − anchor) — left with the law at plan 07 R5.)

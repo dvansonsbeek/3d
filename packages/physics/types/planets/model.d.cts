@@ -37,16 +37,8 @@ export type PlanetModelEnv = {
     currentAUDistanceKm: number;
     earthEccentricityJ2000: number;
     earthPerihelionLongitudeJ2000Deg: number;
-    calibration: {
-        earthInvPlaneInclinationAmplitude: number;
-        massEarthAlone: number;
-        massSun: number;
-    };
-    massFractions: Record<string, number>;
 };
 export type PlanetModelRecord = {
-    invPlaneInclinationAmplitude?: number | undefined;
-    invPlaneInclinationMean?: number | undefined;
     wobblePeriodYears?: number | undefined;
     obliquityMeanDeg?: number | undefined;
     geometry: ReturnType<typeof derivePlanetGeometry>;
@@ -80,14 +72,9 @@ export type PlanetModelRecord = {
  * @property {number} currentAUDistanceKm
  * @property {number} earthEccentricityJ2000
  * @property {number} earthPerihelionLongitudeJ2000Deg
- * @property {{ earthInvPlaneInclinationAmplitude: number,
- *   massEarthAlone: number, massSun: number }} calibration
- * @property {Record<string, number>} massFractions
  */
 /**
  * @typedef {Object} PlanetModelRecord
- * @property {number} [invPlaneInclinationAmplitude]
- * @property {number} [invPlaneInclinationMean]
  * @property {number} [wobblePeriodYears]
  * @property {number} [obliquityMeanDeg]
  * @property {ReturnType<typeof derivePlanetGeometry>} geometry
@@ -99,11 +86,9 @@ export type PlanetModelRecord = {
  * @param {Record<string, PlanetModelBody>} bodies - keyed by body name
  *   (the key selects the body-unique geometry branches: mercury, pluto,
  *   halleys, ceres)
- * @returns {{ psiConstant: number,
- *   bodies: Record<string, PlanetModelRecord> }}
+ * @returns {{ bodies: Record<string, PlanetModelRecord> }}
  */
 export function createPlanetModel(env: PlanetModelEnv, bodies: Record<string, PlanetModelBody>): {
-    psiConstant: number;
     bodies: Record<string, PlanetModelRecord>;
 };
 import { derivePlanetGeometry } from "./geometry.cjs";

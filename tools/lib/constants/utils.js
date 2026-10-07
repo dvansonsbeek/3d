@@ -110,17 +110,10 @@ function computeOrbitTilt(ascendingNode, eclipticInclinationJ2000) {
   };
 }
 
-/**
- * Compute invariable plane inclination amplitude from Fibonacci law.
- * Formula: amplitude = PSI / (fibonacciD × √massFraction)
- * @param {number} PSI - Universal inclination amplitude constant (derived from Earth)
- * @param {number} fibonacciD - Fibonacci quantum number for the planet
- * @param {number} massFraction - Planet mass as fraction of Sun mass
- * @returns {number} Amplitude in degrees
- */
-function computeInvPlaneInclinationAmplitude(PSI, fibonacciD, massFraction) {
-  return PSI / (fibonacciD * Math.sqrt(massFraction));
-}
+// (Plan 07 R5: computeInvPlaneInclinationAmplitude — the ψ law's amplitude,
+// PSI / (d × √m) — is deleted with the law. computeInvPlaneInclinationMean
+// below survives for EARTH only: earthInvPlaneInclinationMean is a K device
+// input of the scene's J2000 pose, read by constants.js and the Python bridge.)
 
 /**
  * Compute invariable plane inclination mean from J2000 constraint.
@@ -155,7 +148,6 @@ module.exports = {
   createDateUtils,
   pad, padLeft, fmt, fmtInt, printTable,
   computeOrbitTilt,
-  computeInvPlaneInclinationAmplitude,
   computeInvPlaneInclinationMean,
   computeEarthRAAngle,
 };

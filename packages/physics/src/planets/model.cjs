@@ -2,31 +2,29 @@
  * createPlanetModel — the planet composition front door (Phase 8.3, L10).
  *
  * ONE law set, N body records: this factory binds an environment once and
- * runs the certified derivation chain over every body record, in the order
- * the chain requires (each step feeds the next):
+ * runs the certified derivation chain over every body record:
  *
- *   ψ constant → inclination law (amplitude, mean)
- *             → wobble period (beat of |axial| and |ICRF|)
- *   K constant → obliquity mean (snapshot form) → eccentricity law
- *             (amplitude, base, J2000 phase)
- *   geometry   (the type-branched ellipse family — the law-derived
- *              eccentricity base feeds geometry for the seven carriers;
- *              minor bodies use their record's base)
+ *   inputs     the chain's g-mode beat (wobble) and the spin channel's
+ *              derived J2000 obliquity, carried on the record since plan 06
+ *              Phase 7 commit 2
+ *   geometry   (the type-branched ellipse family on the OBSERVED J2000
+ *              eccentricity; minor bodies use their record's base)
+ *
+ * The ψ and K amplitude laws that opened this chain (ψ constant →
+ * inclination amplitude/mean; K constant → eccentricity amplitude/base/
+ * phase) are DELETED — K at plan 07 R6, ψ at plan 07 R5. A planet's
+ * inclination and eccentricity of date have one home, the N-body chain
+ * (model.js planetChainElementsAt); docs/retired-record.md is the record.
  *
  * THIN BY DESIGN. This is the composition surface, not a rewiring: both
- * engines keep their existing direct call sites into the law modules, and
- * the runtime channels (eccentricity-at-year, orientation, the ascending-
- * node integrator, predictive precession) stay direct module calls because
- * they consume engine-owned state (scene JD, epoch machinery, fitted
- * tables). What this factory adds is the seam future bodies plug into:
- * a new body is a record + (at most) one new geometry branch — see the
- * minor-body placeholder note in geometry.cjs (Phase 18 perturbation
- * types land the same way).
+ * engines keep their existing direct call sites, and the runtime channels
+ * stay direct module calls because they consume engine-owned state (scene
+ * JD, epoch machinery, fitted tables). What this factory adds is the seam
+ * future bodies plug into: a new body is a record + (at most) one new
+ * geometry branch — see the minor-body placeholder note in geometry.cjs
+ * (Phase 18 perturbation types land the same way).
  *
- * Guard semantics mirror tools/lib/constants.js verbatim: the law steps
- * run only where the record carries the required fields (fibonacciD +
- * mass fraction for the ψ/K families, perihelion + axial periods for
- * wobble); geometry runs for every body. The identity gate
+ * Geometry runs for every body. The identity gate
  * (test/planet-model-identity.test.mjs) holds this factory bit-exact
  * against the shipped Node derivation.
  */
@@ -34,7 +32,6 @@
 'use strict';
 
 const { derivePlanetGeometry } = require('./geometry.cjs');
-const FL = require('./fibonacci-laws.cjs');
 
 /**
  * @typedef {Object} PlanetModelBody
@@ -66,15 +63,10 @@ const FL = require('./fibonacci-laws.cjs');
  * @property {number} currentAUDistanceKm
  * @property {number} earthEccentricityJ2000
  * @property {number} earthPerihelionLongitudeJ2000Deg
- * @property {{ earthInvPlaneInclinationAmplitude: number,
- *   massEarthAlone: number, massSun: number }} calibration
- * @property {Record<string, number>} massFractions
  */
 
 /**
  * @typedef {Object} PlanetModelRecord
- * @property {number} [invPlaneInclinationAmplitude]
- * @property {number} [invPlaneInclinationMean]
  * @property {number} [wobblePeriodYears]
  * @property {number} [obliquityMeanDeg]
  * @property {ReturnType<typeof derivePlanetGeometry>} geometry
@@ -87,18 +79,13 @@ const FL = require('./fibonacci-laws.cjs');
  * @param {Record<string, PlanetModelBody>} bodies - keyed by body name
  *   (the key selects the body-unique geometry branches: mercury, pluto,
  *   halleys, ceres)
- * @returns {{ psiConstant: number,
- *   bodies: Record<string, PlanetModelRecord> }}
+ * @returns {{ bodies: Record<string, PlanetModelRecord> }}
  */
 function createPlanetModel(env, bodies) {
-  const psiConstant = FL.computePsiConstant({
-    earthInvPlaneInclinationAmplitude: env.calibration.earthInvPlaneInclinationAmplitude,
-    massEarthAlone: env.calibration.massEarthAlone,
-    massSun: env.calibration.massSun,
-  });
   // Plan 07 R6: kConstant, the System-Reset eccentricityAnchor
   // (balancedYear − systemResetN·H) and the t2000 phase it fed went with the
-  // eccentricity law.
+  // eccentricity law; plan 07 R5: psiConstant (ψ = 3·A_earth·√(m_E/m_☉),
+  // from env.calibration) went with the inclination law.
 
   const geomEnv = {
     holisticYears: env.holisticYears,
@@ -111,21 +98,8 @@ function createPlanetModel(env, bodies) {
   /** @type {Record<string, PlanetModelRecord>} */
   const out = {};
   for (const [key, b] of Object.entries(bodies)) {
-    const massFrac = env.massFractions[key];
     /** @type {PlanetModelRecord} */
     const rec = /** @type {PlanetModelRecord} */ ({});
-
-    if (b.fibonacciD && massFrac && b.invPlaneInclinationJ2000 !== undefined) {
-      const il = FL.computeInclinationLaw({
-        fibonacciD: b.fibonacciD, massFrac,
-        invPlaneInclinationJ2000: b.invPlaneInclinationJ2000,
-        longitudePerihelion: /** @type {number} */ (b.longitudePerihelion),
-        inclinationCycleAnchor: /** @type {number} */ (b.inclinationCycleAnchor),
-        antiPhase: /** @type {boolean} */ (b.antiPhase),
-      }, psiConstant);
-      rec.invPlaneInclinationAmplitude = il.amplitude;
-      rec.invPlaneInclinationMean = il.mean;
-    }
 
     // Plan 06 Phase 7 commit 2: the K law's cycle period and obliquity input
     // are INPUTS of the record now — the chain's own g-mode beat
@@ -156,7 +130,7 @@ function createPlanetModel(env, bodies) {
     out[key] = rec;
   }
 
-  return { psiConstant, bodies: out };
+  return { bodies: out };
 }
 
 module.exports = { createPlanetModel };

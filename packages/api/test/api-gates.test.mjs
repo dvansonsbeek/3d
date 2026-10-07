@@ -173,6 +173,17 @@ for (const url of SAMPLE_REQUESTS) {
   if (!merc.frames || !/chain/.test(merc.frames.source)) failures.push('bodies/mercury: frames block must name the chain as the source');
   const marsDeep = dataOf('/v1/bodies/mars?year=-3000').at[0];
   if (Math.abs(marsDeep.perihelionLongitudeDeg - 313.53) > 0.05) failures.push(`mars ϖ(−3000) not the chain's: ${marsDeep.perihelionLongitudeDeg}`);
+  // Plan 07 R5/R9: Earth's invariable-plane elements are the ONE-SOURCE reading
+  // (the engine Earth-orbit normal of date against the banked plane, the
+  // simulator's inclInvPlaneModel / ascNodeInvPlaneModel), not the K device's
+  // H/3 cosine and −H/5 line. Pins: J2000 (device 1.5787 / 284.51 vs one-source
+  // 1.5784 / 284.03) and a deep row the device cannot produce (−100 kyr:
+  // device 1.236°, one-source 1.906°).
+  const earth2000 = dataOf('/v1/earth?year=2000').years[0];
+  if (Math.abs(earth2000.inclinationDeg - 1.5784) > 0.001) failures.push(`earth i_inv(2000) off the one-source reading: ${earth2000.inclinationDeg}`);
+  if (Math.abs(earth2000.ascendingNodeDeg - 284.03) > 0.05) failures.push(`earth Ω_inv(2000) off the one-source reading (S&S origin): ${earth2000.ascendingNodeDeg}`);
+  const earthDeep = dataOf('/v1/earth?year=-100000').years[0];
+  if (Math.abs(earthDeep.inclinationDeg - 1.906) > 0.01) failures.push(`earth i_inv(−100000) not the one-source reading: ${earthDeep.inclinationDeg}`);
   if (!merc.accuracy || !merc.accuracy.statement) failures.push('bodies/mercury: missing accuracy statement');
   // JD input equivalence: same instant via jd= and via year= must agree.
   const viaJd = dataOf('/v1/earth?jd=2451545').years[0];

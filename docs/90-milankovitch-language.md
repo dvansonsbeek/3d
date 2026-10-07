@@ -1,6 +1,6 @@
 ---
 docVersion: 1.0
-modelVersion: v17.0
+modelVersion: v18.0
 coefficients: sha256:96f7a2194ea29f0e
 status: current
 ---
@@ -15,7 +15,7 @@ status: current
 
 **Related documents:**
 - [10 — The six relations (historical record)](10-fibonacci-laws.md)
-- [31 — Geometric Orbital Elements](31-no-chain-body-elements.md)
+- [31 — Geometric Orbital Elements (the retired device, record)](31-no-chain-body-elements.md)
 - [99 — Expanding Solar System Resonance Theory (ESSRT)](99-expanding-solar-system-resonance-theory.md) — Deep-time scaling of H(t); how Milankovitch periods evolve under Drivers 1 and 2
 - Website: [model/eigenfrequencies](https://www.holisticuniverse.com/en/model/eigenfrequencies) — full eigenfrequency / divisor / Berger comparison
 - Website: [model/supporting-evidence](https://www.holisticuniverse.com/en/model/supporting-evidence) §1 (100-kyr problem) and §12 (eigenfrequency convergence)

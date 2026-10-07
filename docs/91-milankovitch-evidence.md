@@ -1,6 +1,6 @@
 ---
 docVersion: 1.0
-modelVersion: v17.0
+modelVersion: v18.0
 coefficients: sha256:96f7a2194ea29f0e
 status: current
 ---
@@ -1526,7 +1526,7 @@ python3 scripts/milankovitch_climate_formula.py
 
 - [doc 10 — The Six Fibonacci Relations](10-fibonacci-laws.md) — derivation of H and the Fibonacci-divisor structure
 - [doc 90 — Milankovitch Language](90-milankovitch-language.md) — model's predictions (companion to this document)
-- [doc 31 — Geometric Orbital Elements](31-no-chain-body-elements.md) — Earth's inclination oscillation (the engine-K device)
+- [doc 31 — Geometric Orbital Elements (the retired device, record)](31-no-chain-body-elements.md) — Earth's H/3 inclination oscillation was the engine-K device, deleted at plan 07 R5/R9; the published inclination is the one-source engine reading ([doc 05](05-invariable-plane-overview.md))
 - [doc 99 — Expanding Solar System Resonance Theory (ESSRT)](99-expanding-solar-system-resonance-theory.md) — Deep-time scaling of H(t); per-driver Δ-H formulas relevant for the 67-Myr CENOGRID context and the 13H ≈ 4.36 Myr Boulila comparison
 - Website: `model/supporting-evidence.mdx` §1 (100-kyr problem) and §6 (climate mechanism)
 - Website: `model/eigenfrequencies.mdx` (Berger spectrum match details)

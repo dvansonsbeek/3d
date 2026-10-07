@@ -14,9 +14,11 @@
  *   node packages/physics/test/planet-model-identity.test.mjs
  *   node packages/physics/test/planet-model-identity.test.mjs --plant
  *
- * --plant perturbs the Sun mass by 1 ULP and EXPECTS mismatches — the proof
- * this gate fails on a violation (CLAUDE.md: every gate must be shown to
- * fail on a planted violation, not merely pass on clean code).
+ * --plant perturbs the AU by 1 ULP and EXPECTS mismatches — the proof this
+ * gate fails on a violation (CLAUDE.md: every gate must be shown to fail on
+ * a planted violation, not merely pass on clean code). Until plan 07 R5 the
+ * plant rode the Sun mass through the ψ law; with the ψ/K laws deleted the
+ * factory's only derivation is the geometry, whose environment the AU enters.
  */
 import { createRequire } from 'node:module';
 import { createPlanetModel } from '../src/planets/model.cjs';
@@ -35,19 +37,13 @@ const env = {
   meanSolarYearDays: C.meanSolarYearDays,
   balancedYear: C.balancedYear,
   systemResetN: C.systemResetN,
-  currentAUDistanceKm: C.currentAUDistance,
+  // The planted violation: 1 ULP on the AU must surface as mismatches in the
+  // geometry outputs of every body. (Plan 07 R6/R5: the K and ψ families are
+  // retired, so the calibration block — amplitude, tilt, the two masses — and
+  // the mass fractions are no longer part of this env.)
+  currentAUDistanceKm: plant ? C.currentAUDistance * (1 + 2.3e-16) : C.currentAUDistance,
   earthEccentricityJ2000: C.ASTRO_REFERENCE.earthEccentricityJ2000,
   earthPerihelionLongitudeJ2000Deg: C.ASTRO_REFERENCE.earthPerihelionLongitudeJ2000,
-  calibration: {
-    earthInvPlaneInclinationAmplitude: C.earthInvPlaneInclinationAmplitude,
-    massEarthAlone: C.GM_EARTH_ALONE / C.G_CONSTANT,
-    // The planted violation: 1 ULP on the Sun mass must surface as mismatches
-    // in the ψ-family outputs across every carrier. (Plan 07 R6: the K family
-    // is retired, so eccentricityAmplitude and earthTiltMeanDeg — its two
-    // calibration inputs — are no longer part of this env.)
-    massSun: plant ? C.M_SUN * (1 + 2.3e-16) : C.M_SUN,
-  },
-  massFractions: C.massFraction,
 };
 
 // INPUT fields only. C.planets records are mutated in place by the load-time
@@ -110,13 +106,11 @@ const cmp = (label, expected, actual) => {
 
 for (const [key, p] of Object.entries(C.planets)) {
   const rec = model.bodies[key];
-  cmp(`${key}.invPlaneInclinationAmplitude`, p.invPlaneInclinationAmplitude, rec.invPlaneInclinationAmplitude);
-  cmp(`${key}.invPlaneInclinationMean`, p.invPlaneInclinationMean, rec.invPlaneInclinationMean);
   cmp(`${key}.wobblePeriod`, p.wobblePeriod, rec.wobblePeriodYears);
   cmp(`${key}.obliquityMean`, p.obliquityMean, rec.obliquityMeanDeg);
   // (Plan 07 R6: the eccAmplitude / eccBase / eccPhaseJ2000 triple went with
-  // the K law. The ψ pair above still crosses the twins, and the 1-ULP plant
-  // still surfaces through it.)
+  // the K law; plan 07 R5: the invPlaneInclinationAmplitude / Mean pair went
+  // with the ψ law. The 1-ULP plant now surfaces through the geometry.)
   const d = C.derived[key];
   cmp(`${key}.solarYearCount`, d.solarYearCount, rec.geometry.solarYearCount);
   cmp(`${key}.orbitDistance`, d.orbitDistance, rec.geometry.orbitDistance);
@@ -140,7 +134,7 @@ for (const [key] of Object.entries(C.additionalBodies)) {
 
 if (plant) {
   if (fails > 0) {
-    console.log(`PLANT — ${fails}/${checks} mismatches under a 1-ULP Sun-mass perturbation.`);
+    console.log(`PLANT — ${fails}/${checks} mismatches under a 1-ULP AU perturbation.`);
     console.log('PASS — the gate fails on a planted violation.');
     process.exit(0);
   }

@@ -1027,11 +1027,12 @@ export const VALUES = {
 
   // ── Cycle timing (phase-dependent scans) ────────────────────────────────
   // These ask WHEN, not how much — extremum searches over the runtime
-  // evaluators. The obliquity/inclination evaluators were probed pointwise
-  // against the website's before adding (22.5147 at year 13664; inclination
-  // max near −23204), so the scans agree end-to-end.
+  // evaluators: the hybrid obliquity and (plan 07 R5/R9) the one-source
+  // inclination — the two published quantities, not the K device's cosines
+  // (the device's inclination maximum near −23204 was its H/3 phase; the
+  // one-source route puts the last maximum where the engine's Earth-orbit
+  // normal does).
   ...(() => {
-    const oe = () => require(join(ROOT, 'tools', 'lib', 'orbital-engine.js'));
     let obliqScan, inclScan;
     const nextObliqMin = () => {
       if (!obliqScan) {
@@ -1047,7 +1048,12 @@ export const VALUES = {
     };
     const lastInclMax = () => {
       if (!inclScan) {
-        const f = oe().computeInclinationEarth;
+        // Plan 07 R5/R9: the ONE published i_inv — the one-source engine
+        // Earth-orbit normal against the banked invariable plane (the package
+        // model's earth.inclinationDeg, ≡ the simulator's inclInvPlaneModel);
+        // the K device's H/3 cosine (orbital-engine computeInclinationEarth)
+        // that was scanned here is deleted.
+        const f = (y) => physModel().earth.inclinationDeg(y);
         let mx = -Infinity, mxYr = 0;
         for (let y = 2000; y >= -120000; y--) {
           const i = f(y);
@@ -1228,16 +1234,20 @@ export const VALUES = {
   })(),
 
   // ── Earth invariable-plane inclination family (11-2o) ───────────────────
-  // The MEAN is DERIVED in both runtimes — J2000 inclination minus
-  // amplitude·cos(perihelionLong − cycleAnchor), the engine's
-  // earthInvPlaneInclinationMean (the website types the result, 1.48113, as
-  // a literal). Amplitude from model-parameters; J2000 / node / anchor from
-  // astro-reference earthOrbital (the node is the Souami & Souchay value).
+  // Plan 07 R5/R9: these are the K DEVICE's inclination constants — the
+  // mean DERIVED as J2000 inclination minus amplitude·cos(perihelionLong −
+  // cycleAnchor), the amplitude from model-parameters, the H/3 divisor — the
+  // RECORD of the retired H/3 inclination law (docs 20 and 22 cite them as
+  // such). The published i_inv of date is the one-source engine reading
+  // (inclinationLastMaxYear above; the API's earth.inclinationDeg). The
+  // amplitude itself survives as a device input of the scene's J2000 pose.
+  // J2000 / node / anchor from astro-reference earthOrbital (the node is the
+  // Souami & Souchay value).
   earthInclMean: {
     get: () => C.earthInvPlaneInclinationMean,
     render: (v) => Number(v).toFixed(5),
     unit: '°',
-    note: 'derived: earthInclinationJ2000 − amplitude·cos(perihelionLongJ2000 − cycleAnchor)',
+    note: 'retired device (plan 07 R5/R9): earthInclinationJ2000 − amplitude·cos(perihelionLongJ2000 − cycleAnchor) — the H/3 law\'s mean; the published i_inv is the one-source reading',
   },
   earthInclAmplitude: {
     get: () => C.earthInvPlaneInclinationAmplitude,
@@ -1253,7 +1263,7 @@ export const VALUES = {
   earthInclD: {
     get: () => 3,
     render: (v) => String(v),
-    note: 'H-lattice divisor of the inclination cycle (H/3) — structural integer',
+    note: 'H-lattice divisor of the retired H/3 inclination device (plan 07 R5/R9) — a record integer, not a law',
   },
   earthInclMin: {
     get: () => C.earthInvPlaneInclinationMean - C.earthInvPlaneInclinationAmplitude,
@@ -1832,9 +1842,14 @@ export const VALUES = {
       ipoCircumference: { get: () => 2 * Math.PI * ipoRadius(), render: (v) => thousands(v, 2), unit: 'km' },
       ipoSpeed:         { get: () => (2 * Math.PI * ipoRadius()) / ((C.H / 3) * 24 * 365.25), render: (v) => thousands(v, 10), unit: 'km/h', note: 'perihelion-point speed over the H/3 inclination cycle' },
       ipoSpeedKmYear:   { get: () => (2 * Math.PI * ipoRadius()) / (C.H / 3), render: (v) => thousands(v, 0), unit: 'km/yr' },
-      psiFormula: { get: () => 'd_E × amp_E × √m_E (from Earth)', render: (v) => String(v), note: 'structural formula label (Law 3)' },
-      psiValue:   { get: () => C.PSI, render: (v) => `${(v * 1e3).toFixed(4)} × 10⁻³` },
-      psiDecimal: { get: () => C.PSI, render: (v) => Number(v).toFixed(6) },
+      // Plan 07 R5: ψ was inverted from Earth's calibration at load
+      // (3·A_earth·√(m_E/m_☉)); the inclination law is retired, so there is
+      // nothing live to read. FROZEN here as the retired construction's
+      // recorded constant, exactly as kValue below — docs 20 and 72 cite it
+      // as the historical Law-2/3 ψ. See docs/retired-record.md.
+      psiFormula: { get: () => 'd_E × amp_E × √m_E (from Earth)', render: (v) => String(v), note: 'structural formula label (Law 3) — RETIRED (plan 07 R5)' },
+      psiValue:   { get: () => 0.0033070432499942154, render: (v) => `${(v * 1e3).toFixed(4)} × 10⁻³`, note: 'ψ — RETIRED (plan 07 R5); the recorded value of the retired construction, no longer derived' },
+      psiDecimal: { get: () => 0.0033070432499942154, render: (v) => Number(v).toFixed(6), note: 'ψ — RETIRED (plan 07 R5); the recorded value, no longer derived' },
       // Plan 07 R6: K was inverted from Earth's calibration at load; the law
       // is retired, so there is nothing live to read. The value is FROZEN
       // here as the retired construction's recorded constant — docs 20 and 72

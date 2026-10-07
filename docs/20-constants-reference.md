@@ -1,6 +1,6 @@
 ---
 docVersion: 1.0
-modelVersion: v17.0
+modelVersion: v18.0
 coefficients: sha256:96f7a2194ea29f0e
 status: current
 ---
@@ -367,7 +367,7 @@ massFraction.earth = (GM_Earth / G) / M_Sun
 
 | Constant | Formula | Value |
 |----------|---------|-------|
-| ψ (psi) | d_E × amp_E × √m_E (from Earth) | <!--v:psiValue-->3.3070 × 10⁻³<!--/v--> |
+| ψ (psi) — RETIRED (plan 07 R5), the recorded value | d_E × amp_E × √m_E (from Earth) | <!--v:psiValue-->3.3070 × 10⁻³<!--/v--> |
 | K | e_amp_E × √m_E / (sin(tilt_E) × √d_E) (from Earth) | <!--v:kValue-->3.4143 × 10⁻⁶<!--/v--> |
 
 ### J2000 Eccentricities (eccJ2000)
@@ -385,14 +385,16 @@ All 8 planets, combining inner planet J2000 values with outer planet pre-dual-ba
 | Uranus | <!--v:uranusEccJ2000Full-->0.04725744<!--/v--> | J2000 (base derived from phase) |
 | Neptune | <!--v:neptuneEccJ2000Full-->0.00859048<!--/v--> | J2000 (base derived from phase) |
 
-## Planet Inclination Parameters (legacy ψ formula — retired framing)
+## Planet Inclination Parameters (the ψ law — RETIRED, plan 07 R5)
 
-Amplitudes from the retired law framing: `amp = ψ / (d × √m)`. Means from
-the J2000 constraint. These values survive in the legacy scene scaffolding
-only (the planet chains ride the orbital dynamics engine); the historical record is
-[doc 10](10-fibonacci-laws.md), verified at the time by
-[Inclination Optimization](../tools/verify/inclination-optimization.js) and
-[Inclination Verification](../tools/verify/inclination-verification.js).
+The ψ law — amplitudes `amp = ψ / (d × √m)`, means from the J2000 constraint
+— is DELETED from the code (the ψ/K law module of `@essrt/physics`, the
+`tools/lib/constants.js` loop, the browser's `_FL` loop and the Python bridge's
+`INCL_AMP`/`INCL_MEAN`). The per-planet mean and amplitude below are now the
+CHAIN's series range (the registry's `chainInclStats`); the historical record
+of the law is [doc 10](10-fibonacci-laws.md) and `docs/retired-record.md`
+(its verification instruments, `inclination-optimization` and
+`inclination-verification`, went at plan 07 R6).
 
 | Planet | Mean (deg) | Amplitude (deg) | Range (deg) | Phase Angle | ICRF Period |
 |--------|----------|---------------|-----------|-------------|-------------|

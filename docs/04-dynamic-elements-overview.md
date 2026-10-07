@@ -1,6 +1,6 @@
 ---
 docVersion: 1.0
-modelVersion: v17.0
+modelVersion: v18.0
 coefficients: sha256:96f7a2194ea29f0e
 status: current
 ---
@@ -20,9 +20,10 @@ three tiers, and knowing which body sits on which tier answers most
    certified historical-era devices: Earth's spin/tides/H(t) machinery
    and the Moon's 3D precession hierarchy. This is the two-engine
    interface; the historical gate suite is calibrated on it.
-3. **The geometric elements device.** What is left of it after the no-chain
-   bodies went: Ceres's reference constants and Earth's engine-K devices,
-   documented in [doc 31](31-no-chain-body-elements.md).
+3. **The geometric elements device — DELETED (plan 07 R5).** Ceres's
+   reference constants remain as data; Earth's inclination and node of date
+   are the one-source engine reading ([doc 05](05-invariable-plane-overview.md)).
+   [Doc 31](31-no-chain-body-elements.md) is the record of what the device was.
 
 ---
 
@@ -86,9 +87,11 @@ documented where it lives: [doc 11](11-length-day-year-formulas.md)
 [doc 99](99-expanding-solar-system-resonance-theory.md) (ESSRT).
 
 Earth's engine-K orbital-plane devices (the H/3 inclination oscillation
-and −H/5 node regression) are part of the geometric device of
-[doc 31](31-no-chain-body-elements.md); Earth's *displayed* invariable-
-plane values come from the chain like the planets'.
+and −H/5 node regression) were deleted at plan 07 R5/R9 with the geometric
+device of [doc 31](31-no-chain-body-elements.md); Earth's invariable-plane
+inclination and node of date are the one-source engine reading on every
+surface (the panel, the API's `earth.inclinationDeg`/`ascendingNodeDeg`,
+the registry).
 
 ### The Moon
 
@@ -128,10 +131,11 @@ four published a single 27,943-yr period for four unrelated orbits (Pluto's
 true apsidal period is of order 3.7 Myr). Nothing gated them and nothing
 published them.
 
-What the device still carries is documented in
+What the device carried is recorded in
 [doc 31](31-no-chain-body-elements.md): Ceres's reference constants — it is
 a force-only perturber in the N-body run — Earth's engine-K devices, and the
-probe-pinned reference implementations. Pluto's observed mass and node also
+probe-pinned reference implementations; the device itself was deleted at
+plan 07 R5. Pluto's observed mass and node also
 survive as INPUTS to the invariable-plane angular-momentum sum, which follows
 Souami & Souchay's ten-body convention.
 

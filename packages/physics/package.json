@@ -1,9 +1,9 @@
 {
   "name": "@essrt/physics",
-  "version": "13.0.0",
+  "version": "14.0.0",
   "description": "ESSRT (Expanding Solar System Resonance Theory) physics core — pure, injectable-constants, no I/O, no globals, no DOM. The complete model incl. fitted coefficients; every published version immutably ships one recorded model identity.",
   "essrt": {
-    "modelVersion": "v17.0",
+    "modelVersion": "v18.0",
     "_note": "The model identity this package version ships (IP-unified-architecture §10: package semver tracks the API axis; the model version + CONSTANTS_HASH/COEFFICIENTS_HASH in src/constants/ carry the scientific identity). The version-pinning gate enforces this pairing against public/input/model-version.json."
   },
   "type": "module",
@@ -50,10 +50,7 @@
     "./moon/series-extension": { "types": "./types/moon/series-extension.d.cts", "default": "./src/moon/series-extension.cjs" },
     "./moon/apparent": { "types": "./types/moon/apparent.d.cts", "default": "./src/moon/apparent.cjs" },
     "./planets/geometry": { "types": "./types/planets/geometry.d.cts", "default": "./src/planets/geometry.cjs" },
-    "./planets/fibonacci-laws": { "types": "./types/planets/fibonacci-laws.d.cts", "default": "./src/planets/fibonacci-laws.cjs" },
     "./planets/ecc-channel": { "types": "./types/planets/ecc-channel.d.cts", "default": "./src/planets/ecc-channel.cjs" },
-    "./planets/orientation": { "types": "./types/planets/orientation.d.cts", "default": "./src/planets/orientation.cjs" },
-    "./planets/asc-node-integrator": { "types": "./types/planets/asc-node-integrator.d.cts", "default": "./src/planets/asc-node-integrator.cjs" },
     "./planets/orbit-chain": { "types": "./types/planets/orbit-chain.d.cts", "default": "./src/planets/orbit-chain.cjs" },
     "./planets/keplerian-chain": { "types": "./types/planets/keplerian-chain.d.cts", "default": "./src/planets/keplerian-chain.cjs" },
     "./planets/spin-channel": { "types": "./types/planets/spin-channel.d.cts", "default": "./src/planets/spin-channel.cjs" },

@@ -1,6 +1,6 @@
 ---
 docVersion: 1.0
-modelVersion: v17.0
+modelVersion: v18.0
 coefficients: sha256:96f7a2194ea29f0e
 status: current
 ---
@@ -13,7 +13,7 @@ This document provides a complete reference for all orbital calculation function
 
 **Related Documents:**
 - [Dynamic Orbital Elements Overview](04-dynamic-elements-overview.md) - How dynamic systems work together
-- [Geometric Orbital Elements — the No-Chain Bodies](31-no-chain-body-elements.md) - Inclination oscillation (ICRF perihelion approach) and node shifts with obliquity
+- [Geometric Orbital Elements — the retired device (record)](31-no-chain-body-elements.md) - The inclination-oscillation and node-integration device, deleted at plan 07 R5
 
 ---
 
@@ -1448,19 +1448,19 @@ For current values, see [Constants Reference](20-constants-reference.md).
 
 | Planet | Eccentricity | Inclination (inv) | Semi-major (AU) | Period (days) |
 |--------|--------------|-------------------|-----------------|---------------|
-| Mercury | `orbitalEccentricityBase` | `invPlaneInclinationMean` | derived | `solarYearInput` |
-| Venus | `orbitalEccentricityBase` | `invPlaneInclinationMean` | derived | `solarYearInput` |
-| Earth | dynamic | dynamic | 1.000 | `meanSolarYearDays` |
-| Mars | `orbitalEccentricityBase` | `invPlaneInclinationMean` | derived | `solarYearInput` |
-| Jupiter | `orbitalEccentricityBase` | `invPlaneInclinationMean` | derived | `solarYearInput` |
-| Saturn | `orbitalEccentricityBase` | `invPlaneInclinationMean` | derived | `solarYearInput` |
-| Uranus | `orbitalEccentricityBase` | `invPlaneInclinationMean` | derived | `solarYearInput` |
-| Neptune | `orbitalEccentricityBase` | `invPlaneInclinationMean` | derived | `solarYearInput` |
-| Pluto | `orbitalEccentricityBase` | `invPlaneInclinationMean` | derived | `solarYearInput` |
+| Mercury | chain, of date | chain, of date | derived | `solarYearInput` |
+| Venus | chain, of date | chain, of date | derived | `solarYearInput` |
+| Earth | one-source series | one-source engine normal | 1.000 | `meanSolarYearDays` |
+| Mars | chain, of date | chain, of date | derived | `solarYearInput` |
+| Jupiter | chain, of date | chain, of date | derived | `solarYearInput` |
+| Saturn | chain, of date | chain, of date | derived | `solarYearInput` |
+| Uranus | chain, of date | chain, of date | derived | `solarYearInput` |
+| Neptune | chain, of date | chain, of date | derived | `solarYearInput` |
+| Pluto | `orbitalEccentricityBase` (JSON input) | `invPlaneInclinationMean` (JSON input) | derived | `solarYearInput` |
 
 **How values are sourced:**
-- **Eccentricity**: Derived at runtime from balanced-year phase (`planets.{name}.orbitalEccentricityBase`)
-- **Inclination (inv)**: Derived from the retired ψ formula (see [doc 10, the six relations — historical record](10-fibonacci-laws.md))
+- **Eccentricity**: the chain's element of date (`_kcElementsOfDate(k, jd).e`; the K base/amplitude/phase law was retired at plan 07 R6)
+- **Inclination (inv)**: the chain's element of date (`.inclInvPlaneDeg`; the ψ mean/amplitude law was retired at plan 07 R5 — [doc 10, the six relations — historical record](10-fibonacci-laws.md))
 - **Semi-major axis**: Derived from period via Kepler's 3rd Law: `a = (H / solarYearCount)^(2/3)` where `solarYearCount = round(H × meanSolarYearDays / solarYearInput)` — the integer number of orbits in one H (doc 20 § Quantization)
 - **Period**: Input constant per planet (`planets.{name}.solarYearInput`)
 

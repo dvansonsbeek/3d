@@ -114,17 +114,14 @@ const measured = await s.page.evaluate(({ YEARS, EPOCHS_MA, MOON_JDS, MOON_DEEP_
   }
   v['periFrames.mercury.grAdvance'] = T.relativisticPerihelionAdvanceArcsecCy('mercury');
 
-  // The DYNAMIC ascending node (asc-node-integrator, dΩ/dε = −sin Ω / tan i
-  // with sign flips at the obliquity extrema). The smoke surface has exposed
-  // this probe since 8.3 S-P5 — "pins the sampling+bisection critical-point
-  // path" — but nothing recorded it, so the path was gated by nothing at all
-  // and a twin split rode it unseen: the browser fed the integrator the
-  // RETIRED two-cosine obliquity while Node fed it the published 16-harmonic
-  // (measured 222″ apart at −20,000). Recorded here so the law is pinned on
-  // both sides; cross-engine compares the same keys.
+  // The planets' ECLIPTIC ascending node of date — the chain's element
+  // (plan 07 R5: the asc-node integrator these keys pinned as
+  // `planetAscNodeDyn`, dΩ/dε = −sin Ω / tan i on the K device's tilts, is
+  // deleted; the value updateAscendingNodes writes is the chain's, and it was
+  // already — the integrator's writes were overwritten every frame).
   for (const p of ['mercury', 'venus', 'mars', 'jupiter', 'saturn', 'uranus', 'neptune']) {
     for (const y of [-20000, -5000, 2000, 10000]) {
-      v[`planetAscNodeDyn.${p}@${y}`] = T.planetAscNodeDynAt(p, y);
+      v[`planetAscNodeEcl.${p}@${y}`] = T.planetAscNodeEclAt(p, y);
     }
   }
 
@@ -212,11 +209,8 @@ const measured = await s.page.evaluate(({ YEARS, EPOCHS_MA, MOON_JDS, MOON_DEEP_
   for (const k of P_ALL) {
     for (const [n, val] of Object.entries(T.planetDerived(k))) v[`planet.${k}.${n}`] = val;
   }
-  for (const k of [...P7, 'ceres']) {
-    for (const [n, val] of Object.entries(T.planetLaws(k))) {
-      if (val !== undefined) v[`planetLaw.${k}.${n}`] = val;
-    }
-  }
+  // (Plan 07 R6/R5: the planetLaw.* rows — the K law's eccAmp/eccBase/
+  // eccPhase and the ψ law's inclAmp/inclMean — left with the laws.)
   for (const k of P7) {
     const w = T.planetWobble(k);
     v[`planetWobble.${k}`] = w[0];

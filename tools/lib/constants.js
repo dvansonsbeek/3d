@@ -429,13 +429,11 @@ const GM_SUN = GM_SUN_PLUS_EARTH - GM_EARTH_ALONE;
 const M_SUN = GM_SUN / G_CONSTANT;
 massFraction.earth = (GM_EARTH_ALONE / G_CONSTANT) / M_SUN;
 
-// PSI derived from Earth's fitted inclination amplitude: PSI = d_Earth × amp_Earth × √m_Earth
-// Phase 8.3 L2: the Fibonacci laws live ONCE in @essrt/physics/planets/fibonacci-laws.
-const FL = require('@essrt/physics/planets/fibonacci-laws');
-const PSI = FL.computePsiConstant({
-  earthInvPlaneInclinationAmplitude,
-  massEarthAlone: GM_EARTH_ALONE / G_CONSTANT, massSun: M_SUN,
-});
+// (Plan 07 R5: PSI — ψ = 3·A_earth·√(m_E/m_☉), the inclination-amplitude
+// constant inverted from Earth's calibration — and the per-planet ψ loop
+// below it (invPlaneInclinationAmplitude / invPlaneInclinationMean) are
+// DELETED with @essrt/physics/planets/fibonacci-laws. A planet's inclination
+// of date has one home, the N-body chain; docs/retired-record.md.)
 
 const eccJ2000 = {
   mercury: planets.mercury.orbitalEccentricityJ2000,
@@ -449,23 +447,6 @@ const eccJ2000 = {
 };
 
 const fibonacci = [1, 1, 2, 3, 5, 8, 13, 21, 34, 55, 89, 144];
-
-// Derive invPlaneInclinationAmplitude and invPlaneInclinationMean for each planet
-// Amplitude = PSI / (d × √m), Mean = inclJ2000 - amplitude × cos(ω̃ - φ)
-// Uses perihelion longitude (ICRF reference) instead of ascending node
-for (const [key, p] of Object.entries(planets)) {
-  if (p.fibonacciD && massFraction[key] && p.invPlaneInclinationJ2000 !== undefined) {
-    const il = FL.computeInclinationLaw({
-      fibonacciD: p.fibonacciD, massFrac: massFraction[key],
-      invPlaneInclinationJ2000: p.invPlaneInclinationJ2000,
-      longitudePerihelion: p.longitudePerihelion,
-      inclinationCycleAnchor: p.inclinationCycleAnchor,
-      antiPhase: p.antiPhase,
-    }, PSI);
-    p.invPlaneInclinationAmplitude = il.amplitude;
-    p.invPlaneInclinationMean = il.mean;
-  }
-}
 
 // The K eccentricity law's cycle period for each carrier: the chain's OWN
 // g-mode beat (dominant mode × largest companion of the planet's eccentricity
@@ -483,12 +464,12 @@ for (const [key, p] of Object.entries(planets)) {
   }
 }
 
-// Plan 07 R6: the K relation and the System-Reset eccentricity construction
-// are gone — the loop that closed
+// Plan 07 R6/R5: the K relation, the System-Reset eccentricity construction
+// and the ψ inclination law are gone — the loop that closed
 //   PSI → incl amp → mean tilt → K → ecc amp → phase from the anchor → base
-// now closes only as far as the obliquity. A planet's eccentricity of date
-// has one home, the N-body chain; its base, amplitude and J2000 phase were a
-// construction nothing read (plan 07 §9e).
+// no longer opens. A planet's eccentricity and inclination of date have one
+// home, the N-body chain; the base/amplitude/phase and mean/amplitude
+// triples were constructions nothing rendered read (plan 07 §9e).
 //
 // The DERIVED J2000 obliquity stays: it is the spin channel's reading (the
 // IAU pole against the chain's J2000 plane, acute form), not a device value,
@@ -737,7 +718,6 @@ module.exports = {
   GM_MOON_ALONE,
   GM_EARTH_MOON_SYSTEM,
   massFraction,
-  PSI,
   eccJ2000,
   fibonacci,
 

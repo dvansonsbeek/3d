@@ -7,9 +7,13 @@
 // as functions of time. They do NOT compute scene graph positions.
 //
 // Organized by category:
-//   OBLIQUITY → ECCENTRICITY → ASCENDING NODE → ARGUMENT OF PERIHELION →
-//   LONGITUDE OF PERIHELION → INCLINATION → PRECESSION →
-//   YEAR LENGTH → DAY LENGTH → COMPOSITE
+//   OBLIQUITY → ECCENTRICITY → ARGUMENT OF PERIHELION →
+//   LONGITUDE OF PERIHELION → PRECESSION → YEAR LENGTH → DAY LENGTH
+// (The ASCENDING NODE and INCLINATION sections — the node integrator, the
+// linear year-2000 node, Earth's H/3 inclination cosine, the ψ-law planet
+// oscillation and the two-normal ecliptic inclinations — and the COMPOSITE
+// computeEarthOrbitalElements left at plan 07 R5: the planets' elements of
+// date have one home, the N-body chain; docs/retired-record.md.)
 //
 // Primary consumer: tools/optimize.js (the dashboard exporter that also
 // consumed it is retired — docs/retired-record.md)
@@ -20,74 +24,6 @@ const C = require('./constants');
 // `require()` re-runs module resolution (~30 µs each); lazy order preserved.
 const _modCache = Object.create(null);
 const _req = (p) => _modCache[p] || (_modCache[p] = require(p));
-
-// ═══════════════════════════════════════════════════════════════════════════
-// PRECOMPUTED OBLIQUITY EXTREMA
-// Obliquity is a sum of 16 harmonics (shortest period ~10,469 yr).
-// Extrema occur only ~5 times per 25,000 years. Precompute once at module
-// load so calculateDynamicAscendingNodeFromTilts() can look them up via
-// binary search instead of scanning + binary searching each call.
-// ═══════════════════════════════════════════════════════════════════════════
-
-const _OBLIQUITY_EXTREMA_RANGE = [-50000, 50000]; // year range to precompute
-let _obliquityExtrema = null; // lazily computed on first use
-
-function _precomputeObliquityExtrema() {
-  if (_obliquityExtrema) return _obliquityExtrema;
-  const [rangeStart, rangeEnd] = _OBLIQUITY_EXTREMA_RANGE;
-  const sampleStep = 500; // years — well below half the shortest period (~5235 yr)
-  const extrema = [];
-
-  let prevObl = computeObliquityEarth(rangeStart);
-  let prevDir = 0;
-
-  for (let y = rangeStart + sampleStep; y <= rangeEnd; y += sampleStep) {
-    const obl = computeObliquityEarth(y);
-    const curDir = obl > prevObl ? 1 : (obl < prevObl ? -1 : 0);
-
-    if (prevDir !== 0 && curDir !== 0 && prevDir !== curDir) {
-      // Binary search for exact extremum
-      let lo = y - sampleStep, hi = y;
-      for (let iter = 0; iter < 30; iter++) {
-        const mid = (lo + hi) / 2;
-        const oblLo = computeObliquityEarth(lo);
-        const oblMid = computeObliquityEarth(mid);
-        const oblHi = computeObliquityEarth(hi);
-        if ((oblMid > oblLo && oblMid > oblHi) || (oblMid < oblLo && oblMid < oblHi)) {
-          extrema.push(mid);
-          break;
-        } else if ((oblMid - oblLo) * prevDir > 0) {
-          lo = mid;
-        } else {
-          hi = mid;
-        }
-      }
-    }
-    if (curDir !== 0) prevDir = curDir;
-    prevObl = obl;
-  }
-
-  _obliquityExtrema = extrema.sort((a, b) => a - b);
-  return _obliquityExtrema;
-}
-
-/**
- * Get obliquity extrema within a year range via binary search on precomputed array.
- */
-function _getObliquityExtremaInRange(yearMin, yearMax) {
-  const all = _precomputeObliquityExtrema();
-  // Binary search for first extremum >= yearMin
-  let lo = 0, hi = all.length;
-  while (lo < hi) {
-    const mid = (lo + hi) >> 1;
-    if (all[mid] < yearMin) lo = mid + 1; else hi = mid;
-  }
-  const result = [];
-  for (let i = lo; i < all.length && all[i] <= yearMax; i++) {
-    result.push(all[i]);
-  }
-  return result;
-}
 
 // ═══════════════════════════════════════════════════════════════════════════
 // OBLIQUITY
@@ -288,107 +224,6 @@ function computePerihelionAphelionDistance(eccentricity, semiMajorAxis = 1.0) {
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
-// ASCENDING NODE — Rate-based integration
-// Source: script.js calculateDynamicAscendingNodeFromTilts() ~line 31709
-// ═══════════════════════════════════════════════════════════════════════════
-
-/**
- * Find ALL years when Earth's inclination equals a target value within a range.
- * Source: script.js findAllInclinationCrossings() ~line 31653
- *
- * @param {number} targetInclination - Target inclination in degrees
- * @param {number} startYear - Start of search range
- * @param {number} endYear - End of search range
- * @returns {number[]} Array of years where crossings occur
- */
-function findAllInclinationCrossings(targetInclination, startYear, endYear) {
-  const minIncl = C.earthInvPlaneInclinationMean - C.earthInvPlaneInclinationAmplitude;
-  const maxIncl = C.earthInvPlaneInclinationMean + C.earthInvPlaneInclinationAmplitude;
-
-  if (targetInclination < minIncl || targetInclination > maxIncl) {
-    return [];
-  }
-
-  // Analytical solution: Earth inclination is a simple cosine
-  //   I(t) = mean - amp * cos(2π * (t - balancedYear) / (H/3))
-  //   target = mean - amp * cos(θ)  →  cos(θ) = (mean - target) / amp
-  const cosTheta = (C.earthInvPlaneInclinationMean - targetInclination) / C.earthInvPlaneInclinationAmplitude;
-  if (Math.abs(cosTheta) > 1) return [];
-
-  const period = C.H / 3;
-  const baseTheta = Math.acos(cosTheta); // 0..π
-  const crossings = [];
-  const yMin = Math.min(startYear, endYear);
-  const yMax = Math.max(startYear, endYear);
-
-  // Two crossings per cycle at θ = ±baseTheta + 2πn
-  // θ = 2π * (year - balancedYear) / period  →  year = balancedYear + θ * period / (2π)
-  const thetaToYear = (theta) => C.balancedYear + theta * period / (2 * Math.PI);
-
-  // Find the range of n values we need
-  const nMin = Math.floor((yMin - C.balancedYear) / period - 1);
-  const nMax = Math.ceil((yMax - C.balancedYear) / period + 1);
-
-  for (let n = nMin; n <= nMax; n++) {
-    const y1 = thetaToYear(baseTheta + 2 * Math.PI * n);
-    const y2 = thetaToYear(-baseTheta + 2 * Math.PI * n);
-    if (y1 >= yMin && y1 <= yMax) crossings.push(y1);
-    if (y2 >= yMin && y2 <= yMax && Math.abs(y2 - y1) > 0.1) crossings.push(y2);
-  }
-
-  return crossings.sort((a, b) => a - b);
-}
-
-/**
- * Calculate dynamic ascending node using rate-based integration.
- * Properly handles obliquity direction changes and inclination crossovers.
- * Source: script.js calculateDynamicAscendingNodeFromTilts() ~line 31709
- *
- * @param {number} orbitTilta - Encodes sin(Ω)*i in degrees
- * @param {number} orbitTiltb - Encodes cos(Ω)*i in degrees
- * @param {number} currentYear - Current year
- * @returns {number} Dynamic ascending node longitude (0-360°)
- */
-function calculateDynamicAscendingNodeFromTilts(orbitTilta, orbitTiltb, currentYear, planetName) {
-  // Phase 8.3 L5: the segment integration lives ONCE in
-  // @essrt/physics/planets/asc-node-integrator. The Tychosium orbitTilt
-  // decomposition stays HERE (§2h — the scheme names never enter the
-  // package); the engine's evaluators are injected per call. The browser's
-  // 6-arg variant (S-P5) remains engine-side pending probes — recorded
-  // follow-up for the factory pass.
-  const RAD2DEG = 180 / Math.PI;
-  const staticOmegaDeg = Math.atan2(orbitTilta, orbitTiltb) * RAD2DEG;
-  const ascendingNodeDeg = ((staticOmegaDeg % 360) + 360) % 360;
-  const inclinationDeg = Math.sqrt(orbitTilta * orbitTilta + orbitTiltb * orbitTiltb);
-
-  return _req('@essrt/physics/planets/asc-node-integrator').integrateAscendingNode(
-    { ascendingNodeDeg, inclinationDeg }, currentYear, {
-      obliquityAt: computeObliquityEarth,
-      earthInclinationAt: computeInclinationEarth,
-      obliquityExtremaInRange: _getObliquityExtremaInRange,
-      inclinationCrossingsInRange: findAllInclinationCrossings,
-      eclipticInclinationAt: planetName ? (year) => computeEclipticInclination(planetName, year) : null,
-      earthInclinationMeanDeg: C.earthInvPlaneInclinationMean,
-      earthInclinationAmplitudeDeg: C.earthInvPlaneInclinationAmplitude,
-    });
-}
-
-/**
- * Compute ascending node on the invariable plane (linear precession).
- * The ascending node precesses at the same rate as the perihelion ecliptic period.
- *
- * @param {string} planetName - planet key
- * @param {number} year - decimal year
- * @returns {number} ascending node longitude on invariable plane (0-360°)
- */
-function computeAscendingNodeInvPlane(planetName, year) {
-  const p = C.planets[planetName];
-  if (!p) return 0;
-  // 8.3 L4: the linear year-2000 node convention lives in @essrt/physics.
-  return _req('@essrt/physics/planets/orientation').ascendingNodeInvPlaneLinearAt(p, year);
-}
-
-// ═══════════════════════════════════════════════════════════════════════════
 // ARGUMENT OF PERIHELION
 // ═══════════════════════════════════════════════════════════════════════════
 
@@ -494,115 +329,6 @@ function calcPerihelionLongICRF(planetName, year) {
   const icrfPeriod = 1 / (1 / p.perihelionEclipticYears - genPrecRate);
   const icrfRate = 360 / icrfPeriod;
   return ((p.longitudePerihelion + icrfRate * (year - 2000)) % 360 + 360) % 360;
-}
-
-// ═══════════════════════════════════════════════════════════════════════════
-// INCLINATION
-// ═══════════════════════════════════════════════════════════════════════════
-
-/**
- * Compute Earth's ecliptic inclination for a given year.
- * Single cosine with H/3 cycle.
- * Source: script.js computeInclinationEarth() ~line 33423
- *
- * @param {number} currentYear - decimal year
- * @returns {number} inclination in degrees
- */
-function computeInclinationEarth(currentYear) {
-  const degrees = ((currentYear - C.balancedYear) / (C.H / 3)) * 360;
-  const radians = degrees * Math.PI / 180;
-  return C.earthInvPlaneInclinationMean
-    + (-C.earthInvPlaneInclinationAmplitude * Math.cos(radians));
-}
-
-/**
- * Compute dynamic invariable-plane inclination for a planet.
- * Uses ICRF perihelion-based oscillation with mean-centered cosine.
- * Source: script.js computePlanetInvPlaneInclinationDynamic()
- *
- * @param {string} planetName - e.g. 'mercury', 'mars'
- * @param {number} currentYear - decimal year
- * @param {number} [julianDay] - optional JD (if not provided, computed from year)
- * @returns {number} inclination in degrees
- */
-function computePlanetInvPlaneInclinationDynamic(planetName, currentYear, julianDay) {
-  const p = C.planets[planetName];
-  if (!p) return 0;
-
-  // 8.3 L4: the ICRF-linked oscillation lives in @essrt/physics (this engine
-  // honors its year/JD argument; the browser wrapper keeps its historical
-  // scene-JD coupling — see the module header).
-  const jd = julianDay || C.yearToJD(currentYear);
-  const yearsSinceBalanced = (jd - C.balancedJD) / C.meanSolarYearDays;
-  return _req('@essrt/physics/planets/orientation').invPlaneInclinationAt({
-    isEarth: planetName === 'earth',
-    invPlaneInclinationJ2000: p.invPlaneInclinationJ2000,
-    invPlaneInclinationMean: p.invPlaneInclinationMean,
-    invPlaneInclinationAmplitude: p.invPlaneInclinationAmplitude,
-    inclinationCycleAnchor: p.inclinationCycleAnchor,
-    longitudePerihelion: p.longitudePerihelion,
-    perihelionEclipticYears: p.perihelionEclipticYears,
-    antiPhase: p.antiPhase,
-  }, yearsSinceBalanced, { H: C.H, yearsFromBalancedToJ2000: C.yearsFromBalancedToJ2000 });
-}
-
-/**
- * Compute a planet's inclination to the ecliptic (Earth's orbital plane).
- * Derived from spherical geometry: the angle between two planes (planet and Earth)
- * both tilted relative to the invariable plane.
- *
- * Formula: cos(i_ecl) = cos(i_p)·cos(i_e) + sin(i_p)·sin(i_e)·cos(Ω_p - Ω_e)
- * where i = inv. plane inclination, Ω = ascending node on inv. plane.
- *
- * Validated at J2000: matches JPL ecliptic inclinations within 2 arcmin for all planets.
- *
- * @param {string} planetName - e.g. 'mercury', 'mars'
- * @param {number} currentYear - calendar year
- * @returns {number} ecliptic inclination in degrees
- */
-function computeEclipticInclination(planetName, currentYear) {
-  // 8.3-1 S-P4 RESOLUTION: this is NOT a duplicate of the scene form — it is
-  // the NODE-INTEGRATOR convention (mirror of src/script.js
-  // getEclipticInclinationAtYear, which calculateDynamicAscendingNodeFromTilts
-  // consumes for its segment midpoints). The scene tilt is the OTHER quantity
-  // (computeEclipticInclinationFromBalanced below — balanced-year anchor,
-  // −8H/N node rate). Two conventions for two purposes, DELIBERATELY — the
-  // dual-β pattern. A first unification attempt was measured to move the
-  // positions ~5e-8 rad through the node integrator and reverted.
-  const DEG = Math.PI / 180;
-
-  // Planet inclination and ascending node on invariable plane
-  const i_p = computePlanetInvPlaneInclinationDynamic(planetName, currentYear) * DEG;
-  const omega_p = computeAscendingNodeInvPlane(planetName, currentYear) * DEG;
-
-  // Earth inclination and ascending node on invariable plane
-  // Earth's node regresses at -H/5 (ecliptic precession rate), inclination oscillates with ICRF perihelion
-  const i_e = computeInclinationEarth(currentYear) * DEG;
-  const omega_e = (C.earthAscendingNodeInvPlane + 360 * (currentYear - 2000) / (-C.H / 5)) * DEG;
-
-  const cosIncl = Math.cos(i_p) * Math.cos(i_e) + Math.sin(i_p) * Math.sin(i_e) * Math.cos(omega_p - omega_e);
-  return Math.acos(Math.max(-1, Math.min(1, cosIncl))) / DEG;
-}
-
-/** Canonical ecliptic inclination — normal-vector dot product, balanced-year
- *  anchoring, planet Ω on the −8H/N assignment (NOT the ecliptic perihelion
- *  period), inclination oscillation on the ICRF perihelion rate. This is the
- *  form the scene positions run on (scene-graph delegates here); it is the
- *  mirror of src/script.js updateDynamicInclinations.
- *  @param {string} key @param {number} yearsSinceBalanced
- *  @returns {number} degrees */
-function computeEclipticInclinationFromBalanced(key, yearsSinceBalanced) {
-  // 8.3 L4: the canonical dot-product form lives in @essrt/physics
-  // (moved VERBATIM; scene-graph keeps delegating here, so positions ride
-  // one implementation end to end).
-  return _req('@essrt/physics/planets/orientation').eclipticInclinationFromBalanced(
-    C.planets[key], {
-      invPlanePrecessionYears: C.ASTRO_REFERENCE.earthInvPlanePrecessionYears,
-      inclinationMean: C.earthInvPlaneInclinationMean,
-      inclinationAmplitude: C.earthInvPlaneInclinationAmplitude,
-      ascendingNodeInvPlane: C.ASTRO_REFERENCE.earthAscendingNodeInvPlane,
-    }, yearsSinceBalanced,
-    { H: C.H, yearsFromBalancedToJ2000: C.yearsFromBalancedToJ2000 });
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
@@ -1038,61 +764,6 @@ function computeSolsticeYearLength(year, type) { return _cardinalPkg().cardinal.
 // tools/docs/model-values.mjs predictiveMachinery and the browser's
 // perihelionFrameBreakdown, identical ops. docs/retired-record.md.)
 
-// ═══════════════════════════════════════════════════════════════════════════
-// COMPOSITE: Compute all orbital elements for a given year
-// ═══════════════════════════════════════════════════════════════════════════
-
-/**
- * Compute all Earth orbital elements at a given year.
- * Convenience function that calls all individual computations.
- *
- * @param {number} year - decimal year
- * @returns {object} all orbital elements
- */
-function computeEarthOrbitalElements(year) {
-  // Deep-time t_Ma (millions of years before J2000). Positive = past.
-  // Used to evolve LOD, H, year-length anchors via ESSRT chain (deep-time.js).
-  const t_Ma = (2000 - year) / 1e6;
-
-  const eccentricity = computeEccentricityEarth(year);
-  const obliquity = computeObliquityEarth(year);
-  const inclination = computeInclinationEarth(year);
-  const solarYearDays = computeLengthOfSolarYear(year);
-  const siderealYearDays = computeLengthOfSiderealYear(year);
-
-  // Deep-time anchors + Fourier-varying year lengths
-  const lengthOfDay = computeLengthOfDay(t_Ma);
-  const siderealYearSec = siderealYearDays * lengthOfDay;
-  const precession = computeAxialPrecessionYears(siderealYearSec, solarYearDays, lengthOfDay);
-  const perihelionLong = calcEarthPerihelionPredictive(year);
-  const erd = calcERD(year);
-
-  // Day length values — deep-time aware
-  const solarYearSec = solarYearDays * lengthOfDay;
-  const siderealDay = computeSiderealDay(t_Ma);
-  const stellarDay = computeStellarDay(t_Ma);
-  const raDayOffsetMs = computeRADayOffset(year);
-  const measuredSolarDay = computeMeasuredSolarDay(lengthOfDay, raDayOffsetMs);
-
-  return {
-    year,
-    eccentricity,
-    obliquity,
-    inclination,
-    solarYearDays,
-    siderealYearDays,
-    siderealYearSec,
-    precession,
-    perihelionLong,
-    erd,
-    lengthOfDay,
-    siderealDay,
-    stellarDay,
-    raDayOffsetMs,
-    measuredSolarDay,
-  };
-}
-
 module.exports = {
   // Obliquity
   computeObliquityEarth,
@@ -1105,10 +776,8 @@ module.exports = {
   computeSemiMajorAxis,
   computePerihelionAphelionDistance,
 
-  // Ascending Node
-  calculateDynamicAscendingNodeFromTilts,
-  findAllInclinationCrossings,
-  computeAscendingNodeInvPlane,
+  // (Ascending Node — the node integrator, the crossing finder and the linear
+  // year-2000 node — left at plan 07 R5.)
 
   // Argument of Perihelion
   computeArgumentOfPerihelion,
@@ -1120,11 +789,8 @@ module.exports = {
   calcPlanetPerihelionLong,
   calcPerihelionLongICRF,
 
-  // Inclination
-  computeInclinationEarth,
-  computePlanetInvPlaneInclinationDynamic,
-  computeEclipticInclination,
-  computeEclipticInclinationFromBalanced,   // 8.3-1 S-P4: the canonical balanced-year form (scene-graph delegates here)
+  // (Inclination — Earth's H/3 cosine, the ψ-law planet oscillation and the
+  // two-normal ecliptic inclinations — left at plan 07 R5.)
 
   // Precession
   computeAxialPrecessionYears,
@@ -1155,7 +821,4 @@ module.exports = {
   computeSolsticeRA,
   computeSolsticeJD,
   computeSolsticeYearLength,
-
-  // Composite
-  computeEarthOrbitalElements,
 };

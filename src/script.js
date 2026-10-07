@@ -11,7 +11,7 @@ import { Pane } from 'tweakpane';
 //
 // Generated at build time, not fetched at runtime — `holisticyearLength` is read
 // at module scope below, and Phase 15 requires offline === hosted.
-import { computeObliquityJ2000Deg, computeSecularShape, DEFAULT_CONSTANTS as K, REFERENCE_DATA as R, FITTED_COEFFICIENTS as FIT, CONSTANTS_HASH, COEFFICIENTS_HASH, MODEL_VERSION, PREPRINT_DOI, createEpochPrimitives, createPhaseMachinery, createDeepCalendar, createMoonEccChannel, createDeepEccChannel, DEEP_MODES_ARTIFACT, createDeepOrbitalHistory, createYearLengths, createMoonMonthChain, createChainCycleIntegrator, createMoonArguments, createMoonSeries, createMoonApparent, derivePlanetGeometry, planetFibonacciLaws as _FL, computeEccentricityIntegrated, planetOrientation as _PO, planetOrbitChain as _POC, integrateAscendingNode, createDeltaTCycles, createDeepTimeLod, createMoonRecessionHistory, createSolarChannelBudget, deltaTEspenakMeeusCanonSeconds, evalClimateL1OrbitalPermil, createAlphaGiaChannel, computeSolarTorqueShare, createEclipseFinders, createSunLongitudeCorrection, createModel, buildPlanetChainsFromArtifactData, computePlanetElementsAtYear as kcComputePlanetElementsAtYear, computeHeliocentricEclipticFromElements as kcComputeHeliocentricEclipticFromElements, computeEquatorNodeOriginSFrameDeg, convertNodeSFrameToEquatorOriginDeg, createSecularSeriesOverride, CHAIN_ARTIFACT, ANCHOR_EPOCH_YEAR as KC_ANCHOR_EPOCH_YEAR, ANCHOR_EPOCH_JD as KC_ANCHOR_EPOCH_JD, computeEarthFrameOfDate, solveWheelAngleForLongitude } from '@essrt/physics';
+import { computeObliquityJ2000Deg, computeSecularShape, DEFAULT_CONSTANTS as K, REFERENCE_DATA as R, FITTED_COEFFICIENTS as FIT, CONSTANTS_HASH, COEFFICIENTS_HASH, MODEL_VERSION, PREPRINT_DOI, createEpochPrimitives, createPhaseMachinery, createDeepCalendar, createMoonEccChannel, createDeepEccChannel, DEEP_MODES_ARTIFACT, createDeepOrbitalHistory, createYearLengths, createMoonMonthChain, createChainCycleIntegrator, createMoonArguments, createMoonSeries, createMoonApparent, derivePlanetGeometry, computeEccentricityIntegrated, planetOrbitChain as _POC, createDeltaTCycles, createDeepTimeLod, createMoonRecessionHistory, createSolarChannelBudget, deltaTEspenakMeeusCanonSeconds, evalClimateL1OrbitalPermil, createAlphaGiaChannel, computeSolarTorqueShare, createEclipseFinders, createSunLongitudeCorrection, createModel, buildPlanetChainsFromArtifactData, computePlanetElementsAtYear as kcComputePlanetElementsAtYear, computeHeliocentricEclipticFromElements as kcComputeHeliocentricEclipticFromElements, computeEquatorNodeOriginSFrameDeg, convertNodeSFrameToEquatorOriginDeg, createSecularSeriesOverride, CHAIN_ARTIFACT, ANCHOR_EPOCH_YEAR as KC_ANCHOR_EPOCH_YEAR, ANCHOR_EPOCH_JD as KC_ANCHOR_EPOCH_JD, computeEarthFrameOfDate, solveWheelAngleForLongitude } from '@essrt/physics';
 // K8 — the reference package: ONE-WAY imports (comparison only;
 // @essrt/reference is private-by-construction and nothing in the model
 // chain depends on it). publishedCurves migrated here from
@@ -1436,34 +1436,13 @@ const GM_EROS = M_EROS * G_CONSTANT;                 // ~4.46 × 10⁻⁴ km³/s
 // outputs the same. The current convention preserves the fitted model state
 // and is empirically valid; both conventions are calibration-equivalent. See
 // docs/24-moon-kepler-derivation.md for the SYSTEM/ALONE distinction.
-const _fibD = {
-  mercury: K.planets.mercury.fibonacciD, venus: K.planets.venus.fibonacciD,
-  mars: K.planets.mars.fibonacciD, jupiter: K.planets.jupiter.fibonacciD,
-  saturn: K.planets.saturn.fibonacciD, uranus: K.planets.uranus.fibonacciD,
-  neptune: K.planets.neptune.fibonacciD,
-};
-const _massFrac = {
-  mercury: M_MERCURY_SYSTEM / M_SUN, venus: M_VENUS_SYSTEM / M_SUN, mars: M_MARS_SYSTEM / M_SUN,
-  jupiter: M_JUPITER_SYSTEM / M_SUN, saturn: M_SATURN_SYSTEM / M_SUN, uranus: M_URANUS_SYSTEM / M_SUN, neptune: M_NEPTUNE_SYSTEM / M_SUN,
-};
-// Phase 8.3 L2: the ψ law lives ONCE in @essrt/physics/planets/fibonacci-laws.
-const psiConstant = _FL.computePsiConstant({
-  earthInvPlaneInclinationAmplitude, massEarthAlone: M_EARTH_ALONE, massSun: M_SUN,
-});
-for (const key of ['mercury','venus','mars','jupiter','saturn','uranus','neptune']) {
-  const p = planets[key];
-  if (p && _fibD[key] && _massFrac[key]) {
-    const _il = _FL.computeInclinationLaw({
-      fibonacciD: _fibD[key], massFrac: _massFrac[key],
-      invPlaneInclinationJ2000: p.invPlaneInclinationJ2000,
-      longitudePerihelion: p.longitudePerihelion,
-      inclinationCycleAnchor: p.inclinationCycleAnchor,
-      antiPhase: p.antiPhase,
-    }, psiConstant);
-    p.invPlaneInclinationAmplitude = _il.amplitude;
-    p.invPlaneInclinationMean = _il.mean;
-  }
-}
+// (The _fibD divisor table and the _massFrac SYSTEM-mass fractions the ψ
+// loop read left with it; the convention essay above is kept as the record.)
+// (Plan 07 R5: the ψ law — psiConstant = 3·A_earth·√(m_E/m_☉) and the
+// per-planet invPlaneInclinationAmplitude / invPlaneInclinationMean loop
+// (@essrt/physics/planets/fibonacci-laws) — is DELETED. A planet's
+// inclination of date has one home, the N-body chain (_kcElementsOfDate);
+// docs/retired-record.md.)
 
 // ─── E2d. Wobble periods, obliquity cycles, and K-derived eccentricity ──
 // Moved here (before scene geometry) so orbitalEccentricityBase is available
@@ -6043,14 +6022,8 @@ if (typeof window !== 'undefined') {
       pluto:   { N: plutoSolarYearCount, a: plutoOrbitDistance, elip: plutoElipticOrbit, peri: plutoPerihelionDistance, rot: plutoRotationPeriod },
       halleys: { N: halleysSolarYearCount, a: halleysOrbitDistance, elip: halleysElipticOrbit, peri: halleysPerihelionDistance, rot: halleysRotationPeriod },
     })[k],
-    planetLaws: (k) => {
-      const p = planets[k];
-      return {
-        // Plan 07 R6: eccAmp / eccBase / eccPhase left with the K law; only
-        // the psi law's pair remains (until R5).
-        inclAmp: p.invPlaneInclinationAmplitude, inclMean: p.invPlaneInclinationMean,
-      };
-    },
+    // (Plan 07 R6/R5: the planetLaws hook — the K law's eccAmp/eccBase/eccPhase
+    // and the ψ law's inclAmp/inclMean — left with the laws.)
     planetWobble: (k) => ({
       mercury: [mercuryWobblePeriod, mercuryObliquityMean],
       venus: [venusWobblePeriod, venusObliquityMean],
@@ -6066,27 +6039,21 @@ if (typeof window !== 'undefined') {
     // _kcElementsOfDate resolves the engine year (true TT) internally (R4b).
     planetEccAt: (k, year) => _kcElementsOfDate(k, yearToJD(year)).e,
     planetObliquityAt: (k, year) => computePlanetObliquity(k, year),
-    planetInvPlaneInclAt: (k, year) => computePlanetInvPlaneInclinationDynamic(k, year),
+    // Plan 07 R5: the chain's inclination of date to the engine's own
+    // invariable plane (was the ψ-law oscillation).
+    planetInvPlaneInclAt: (k, year) => _kcElementsOfDate(k, yearToJD(year)).inclInvPlaneDeg,
     planetCyclesBetween: (k, yearA, yearB) => ({
       mercury: meanMercuryOrbitalCyclesBetween, venus: meanVenusOrbitalCyclesBetween,
       mars: meanMarsOrbitalCyclesBetween, jupiter: meanJupiterOrbitalCyclesBetween,
       saturn: meanSaturnOrbitalCyclesBetween, uranus: meanUranusOrbitalCyclesBetween,
       neptune: meanNeptuneOrbitalCyclesBetween,
     })[k](yearA, yearB),
-    // 8.3 L9: the predictive-precession path through the shared feature basis.
-    // 8.3 S-P5: the browser 6-arg dynamic ascending node, with the scene's
-    // live tilt objects — pins the sampling+bisection critical-point path.
-    planetAscNodeDynAt: (k, year) => {
-      const t = ({
-        mercury: mercuryRealPerihelionAtSun, venus: venusRealPerihelionAtSun,
-        mars: marsRealPerihelionAtSun, jupiter: jupiterRealPerihelionAtSun,
-        saturn: saturnRealPerihelionAtSun, uranus: uranusRealPerihelionAtSun,
-        neptune: neptuneRealPerihelionAtSun,
-      })[k];
-      return calculateDynamicAscendingNodeFromTilts(
-        t.orbitTilta, t.orbitTiltb, o.obliquityEarth, o.earthInvPlaneInclinationDynamic, year, k,
-      );
-    },
+    // Plan 07 R5: the planet's ecliptic ascending node of date is the chain's
+    // element (the ζ-vector secular skeleton + derived terms, J2000 ecliptic)
+    // — the value updateAscendingNodes writes to o.<planet>AscendingNode. The
+    // asc-node integrator (dΩ/dε = −sin Ω / tan i on the K device's tilts,
+    // the 8.3 S-P5 probe) is deleted with the ψ law; docs/retired-record.md.
+    planetAscNodeEclAt: (k, year) => _kcElementsOfDate(k, yearToJD(year)).ascNodeEclipticDeg,
     // ── Phase 8.4-0 ΔT/LOD surface ───────────────────────────────────────────
     // Pins CURRENT behaviour before the climate/ΔT extraction — including the
     // browser flag gates and taper wiring, and the _eclDeltaT year convention
@@ -8708,7 +8675,6 @@ let o = {
   'Polar line': false,
   polarLineLength: 1,
   Performance: false,
-  debugAscendingNode: false,
   camX: 0,
   camY: 0,
   camZ: 0,
@@ -8878,17 +8844,9 @@ let o = {
 
   // ICRF perihelion longitude (J2000 epoch coordinates, linear precession at ICRF rate)
 
-  // Dynamic ascending nodes on invariable plane - Souami & Souchay (2012) values (for comparison, precess over time)
-  mercuryAscendingNodeInvPlaneSouamiSouchay: 0,
-  venusAscendingNodeInvPlaneSouamiSouchay: 0,
-  marsAscendingNodeInvPlaneSouamiSouchay: 0,
-  jupiterAscendingNodeInvPlaneSouamiSouchay: 0,
-  saturnAscendingNodeInvPlaneSouamiSouchay: 0,
-  uranusAscendingNodeInvPlaneSouamiSouchay: 0,
-  neptuneAscendingNodeInvPlaneSouamiSouchay: 0,
-  plutoAscendingNodeInvPlaneSouamiSouchay: 0,
-  halleysAscendingNodeInvPlaneSouamiSouchay: 0,
-  erosAscendingNodeInvPlaneSouamiSouchay: 0,
+  // (Plan 07 R5: the <body>AscendingNodeInvPlaneSouamiSouchay keys — the
+  // device's linearly-precessing S&S nodes — left with the law; the
+  // published S&S-origin node is _kcAscNodeInvPlaneSSDeg, from the chain.)
 
   // Dynamic ascending nodes on invariable plane in ECLIPTIC coords (for height calculation)
   // Uses apparent precession rate (holisticyearLength/16 for Earth)
@@ -8904,8 +8862,11 @@ let o = {
   halleysAscendingNodeInvPlaneEcliptic: 0,
   erosAscendingNodeInvPlaneEcliptic: 0,
 
-  // Dynamic ecliptic inclination using J2000-verified ascending nodes
-  // These match J2000 reference values exactly at year 2000
+  // Ecliptic inclination OF DATE — the chain's orbit plane against the engine
+  // Earth-orbit normal of date (updateDynamicInclinations; the visual
+  // orbital-plane tilt groups read it). Equals the chain's inclEclipticDeg
+  // at J2000. (Plan 07 R5: the Souami & Souchay twin keys — a second normal
+  // built on the device's linear S&S nodes — left with the law.)
   mercuryEclipticInclinationDynamic: 0,
   venusEclipticInclinationDynamic: 0,
   marsEclipticInclinationDynamic: 0,
@@ -8913,16 +8874,6 @@ let o = {
   saturnEclipticInclinationDynamic: 0,
   uranusEclipticInclinationDynamic: 0,
   neptuneEclipticInclinationDynamic: 0,
-
-  // Dynamic ecliptic inclination using Souami & Souchay (2012) ascending nodes
-  // For comparison with original published data
-  mercuryEclipticInclinationSouamiSouchayDynamic: 0,
-  venusEclipticInclinationSouamiSouchayDynamic: 0,
-  marsEclipticInclinationSouamiSouchayDynamic: 0,
-  jupiterEclipticInclinationSouamiSouchayDynamic: 0,
-  saturnEclipticInclinationSouamiSouchayDynamic: 0,
-  uranusEclipticInclinationSouamiSouchayDynamic: 0,
-  neptuneEclipticInclinationSouamiSouchayDynamic: 0,
 
   // Fibonacci Balance (dynamic, updated each frame)
 
@@ -11248,11 +11199,10 @@ function updateSunCenteredInvPlane() {
   // s-frame angle (its origin is the equinox projected into the plane —
   // exactly the scene's angular reference), so this is label-only. This
   // surface had been missed by the K5c published-surface sweep and
-  // showed the internal s-frame number (Earth 287.6°). The no-chain
-  // trio labels its legacy S&S-dynamic variant.
-  const ascSSDeg = _KC_IP_BODY_KEYS.has(planetData.key)
-    ? _kcAscNodeInvPlaneSSDeg(planetData.key, o.julianDay)
-    : ((o[planetData.key + 'AscendingNodeInvPlaneSouamiSouchay'] ?? ascNodeDeg) % 360 + 360) % 360;
+  // showed the internal s-frame number (Earth 287.6°). (Plan 07 R5: every
+  // body here is a chain body — the no-chain trio's legacy S&S-dynamic
+  // fallback left with the device.)
+  const ascSSDeg = _kcAscNodeInvPlaneSSDeg(planetData.key, o.julianDay);
   ascLabelDiv.innerHTML = `<span style="font-size:18px;">☊</span><br><span style="font-size:11px;">ASC NODE</span><br><span style="font-size:10px;color:#88ddff;">Ω: ${ascSSDeg.toFixed(2)}°</span>`;
 
   // Descending node = ascending + 180°, same convention
@@ -11597,9 +11547,9 @@ const _elEarthPos = new THREE.Vector3();
 const _elTargetPos = new THREE.Vector3();
 
 // Pooled vectors for dynamic inclination calculations
-const _eclipticNormalVerified = new THREE.Vector3();
-const _eclipticNormalSS = new THREE.Vector3();
-const _planetNormal = new THREE.Vector3();
+// (Plan 07 R5: the three THREE.Vector3 normals of the device's two-normal
+// ecliptic inclination left with it — updateDynamicInclinations now dots
+// plain [x, y, z] triples in the J2000 ecliptic frame.)
 
 const world = new THREE.Vector3();
 const ndc   = new THREE.Vector3();
@@ -14048,10 +13998,9 @@ function closeHierarchyInspector() {
 // Config-# row — left with the K8b-2 three-ledger restatement. The search
 // record stays in data/balance-presets.json + docs 10/109 + git history.
 
-// Earth J2000 inclination (not stored as a named constant — computed here)
-const earthInvPlaneInclJ2000 = earthInvPlaneInclinationMean +
-  earthInvPlaneInclinationAmplitude *
-  Math.cos((ASTRO_REFERENCE.perihelionLongitudeJ2000_deg - earthInclinationCycleAnchor) * Math.PI / 180);
+// (Plan 07 R5: earthInvPlaneInclJ2000 — the device's J2000 inclination
+// reconstructed from mean + amplitude·cos(ϖ − anchor) — had no reader left;
+// the observed value is ASTRO_REFERENCE.earthInclinationJ2000_deg.)
 
 // (K5 excision) The Fibonacci Balance Explorer, the Eccentricity Balance
 // Scale and the Solar System Resonance Cycle period table lived here —
@@ -34952,19 +34901,8 @@ function setupGUI() {
   cameraFolder.addBinding(o, 'worldCamDecDisplay', { label: 'Dec', readonly: true });
   cameraFolder.addBinding(o, 'worldCamDistDisplay', { label: 'Distance', readonly: true });
 
-  /* --- Debug --------------------------------------------------------------- */
-  if (debugOn) {
-    const debugFolder = toolsFolder.addFolder({ title: 'Debug' });
-    debugFolder.addBinding(o, 'debugAscendingNode', { label: 'Log Ascending Nodes' })
-      .on('change', ({ value }) => {
-        _debugAscendingNodeLogEnabled = value;
-        if (value) {
-          console.log('Ascending Node debugging ENABLED - check console for logs every second');
-        } else {
-          console.log('Ascending Node debugging DISABLED');
-        }
-      });
-  }
+  // (Plan 07 R5: the Debug folder's "Log Ascending Nodes" toggle left with
+  // the asc-node integrator it instrumented.)
 
   addWidthToggle(gui);
 }  
@@ -42713,7 +42651,7 @@ async function analyzeSolarDayMultiEpoch() {
     if (result) {
       const offsetA = (result.methodA.mean - meanlengthofday) * 1000;  // ms
       const obliquity = computeObliquityEarth(epochYear);   // R9: the 16-harmonic law, not the retired two-cosine device
-      const inclination = getEarthInclinationAtYear(epochYear);
+      const inclination = inclInvPlaneModel(epochYear);   // R5: the one-source i_inv (was the H/3 device cosine)
       const eclipticInclination = obliquity - inclination;
       const ecc = computeEccentricityEarthAtYear(epochYear);  // the ONE law (unification)
       const tropicalYearDays = computeSolarYearDaysFromCardinals(epochYear);
@@ -46994,9 +46932,6 @@ const planetStats = {
       {label : () => `Ecliptic Inclination (i)`,
        value : [ { v: () => _kcElementsOfDate('mercury', o.julianDay).inclEclipticDeg, dec:6, sep:',' },{ small: 'degrees (°)' }],
        hover : [`The chain's inclination of date to the ecliptic (J2000 ≈ 7.00°) — from the N-body element set the scene renders. Highest of the eight planets`]},
-      {label : () => `<small>Ecliptic Inclination (i) Souami&Souchay</small>`,
-       value : [ { small: { v: () => o.mercuryEclipticInclinationSouamiSouchayDynamic, dec:6, sep:',' } },{ small: 'degrees (°)' }],
-       hidden: true},
       {label : () => `Inclination to Inv. plane (I)`,
        value : [ { v: () => _kcElementsOfDate('mercury', o.julianDay).inclInvPlaneDeg, dec:6, sep:',' },{ small: 'degrees (°)' }],
        hover : [`The chain's inclination of date to the engine's own invariable plane (the system's total-angular-momentum plane) — from the N-body element set the scene renders`]},
@@ -47304,9 +47239,6 @@ const planetStats = {
       {label : () => `Ecliptic Inclination (i)`,
        value : [ { v: () => _kcElementsOfDate('venus', o.julianDay).inclEclipticDeg, dec:6, sep:',' },{ small: 'degrees (°)' }],
        hover : [`The chain's inclination of date to the ecliptic (J2000 ≈ 3.39°) — from the N-body element set the scene renders`]},
-      {label : () => `<small>Ecliptic Inclination (i) Souami&Souchay</small>`,
-       value : [ { small: { v: () => o.venusEclipticInclinationSouamiSouchayDynamic, dec:6, sep:',' } },{ small: 'degrees (°)' }],
-       hidden: true},
       {label : () => `Inclination to Inv. plane (I)`,
        value : [ { v: () => _kcElementsOfDate('venus', o.julianDay).inclInvPlaneDeg, dec:6, sep:',' },{ small: 'degrees (°)' }],
        hover : [`The chain's inclination of date to the engine's own invariable plane (the system's total-angular-momentum plane) — from the N-body element set the scene renders`]},
@@ -47617,9 +47549,6 @@ const planetStats = {
       {label : () => `Ecliptic Inclination (i)`,
        value : [ { v: () => _kcElementsOfDate('mars', o.julianDay).inclEclipticDeg, dec:6, sep:',' },{ small: 'degrees (°)' }],
        hover : [`The chain's inclination of date to the ecliptic (J2000 ≈ 1.85°) — from the N-body element set the scene renders`]},
-      {label : () => `<small>Ecliptic Inclination (i) Souami&Souchay</small>`,
-       value : [ { small: { v: () => o.marsEclipticInclinationSouamiSouchayDynamic, dec:6, sep:',' } },{ small: 'degrees (°)' }],
-       hidden: true},
       {label : () => `Inclination to Inv. plane (I)`,
        value : [ { v: () => _kcElementsOfDate('mars', o.julianDay).inclInvPlaneDeg, dec:6, sep:',' },{ small: 'degrees (°)' }],
        hover : [`The chain's inclination of date to the engine's own invariable plane (the system's total-angular-momentum plane) — from the N-body element set the scene renders`]},
@@ -47934,9 +47863,6 @@ const planetStats = {
       {label : () => `Ecliptic Inclination (i)`,
        value : [ { v: () => _kcElementsOfDate('jupiter', o.julianDay).inclEclipticDeg, dec:6, sep:',' },{ small: 'degrees (°)' }],
        hover : [`The chain's inclination of date to the ecliptic (J2000 ≈ 1.30°) — from the N-body element set the scene renders`]},
-      {label : () => `<small>Ecliptic Inclination (i) Souami&Souchay</small>`,
-       value : [ { small: { v: () => o.jupiterEclipticInclinationSouamiSouchayDynamic, dec:6, sep:',' } },{ small: 'degrees (°)' }],
-       hidden: true},
       {label : () => `Inclination to Inv. plane (I)`,
        value : [ { v: () => _kcElementsOfDate('jupiter', o.julianDay).inclInvPlaneDeg, dec:6, sep:',' },{ small: 'degrees (°)' }],
        hover : [`The chain's inclination of date to the engine's own invariable plane (the system's total-angular-momentum plane) — Jupiter dominates the plane, lowest inclination of all planets`]},
@@ -48246,9 +48172,6 @@ const planetStats = {
       {label : () => `Ecliptic Inclination (i)`,
        value : [ { v: () => _kcElementsOfDate('saturn', o.julianDay).inclEclipticDeg, dec:6, sep:',' },{ small: 'degrees (°)' }],
        hover : [`The chain's inclination of date to the ecliptic (J2000 ≈ 2.49°) — from the N-body element set the scene renders`]},
-      {label : () => `<small>Ecliptic Inclination (i) Souami&Souchay</small>`,
-       value : [ { small: { v: () => o.saturnEclipticInclinationSouamiSouchayDynamic, dec:6, sep:',' } },{ small: 'degrees (°)' }],
-       hidden: true},
       {label : () => `Inclination to Inv. plane (I)`,
        value : [ { v: () => _kcElementsOfDate('saturn', o.julianDay).inclInvPlaneDeg, dec:6, sep:',' },{ small: 'degrees (°)' }],
        hover : [`The chain's inclination of date to the engine's own invariable plane (the system's total-angular-momentum plane) — from the N-body element set the scene renders`]},
@@ -48559,9 +48482,6 @@ const planetStats = {
       {label : () => `Ecliptic Inclination (i)`,
        value : [ { v: () => _kcElementsOfDate('uranus', o.julianDay).inclEclipticDeg, dec:6, sep:',' },{ small: 'degrees (°)' }],
        hover : [`The chain's inclination of date to the ecliptic (J2000 ≈ 0.77°) — from the N-body element set the scene renders. Lowest of the outer planets`]},
-      {label : () => `<small>Ecliptic Inclination (i) Souami&Souchay</small>`,
-       value : [ { small: { v: () => o.uranusEclipticInclinationSouamiSouchayDynamic, dec:6, sep:',' } },{ small: 'degrees (°)' }],
-       hidden: true},
       {label : () => `Inclination to Inv. plane (I)`,
        value : [ { v: () => _kcElementsOfDate('uranus', o.julianDay).inclInvPlaneDeg, dec:6, sep:',' },{ small: 'degrees (°)' }],
        hover : [`The chain's inclination of date to the engine's own invariable plane (the system's total-angular-momentum plane) — from the N-body element set the scene renders`]},
@@ -48872,9 +48792,6 @@ const planetStats = {
       {label : () => `Ecliptic Inclination (i)`,
        value : [ { v: () => _kcElementsOfDate('neptune', o.julianDay).inclEclipticDeg, dec:6, sep:',' },{ small: 'degrees (°)' }],
        hover : [`The chain's inclination of date to the ecliptic (J2000 ≈ 1.77°) — from the N-body element set the scene renders`]},
-      {label : () => `<small>Ecliptic Inclination (i) Souami&Souchay</small>`,
-       value : [ { small: { v: () => o.neptuneEclipticInclinationSouamiSouchayDynamic, dec:6, sep:',' } },{ small: 'degrees (°)' }],
-       hidden: true},
       {label : () => `Inclination to Inv. plane (I)`,
        value : [ { v: () => _kcElementsOfDate('neptune', o.julianDay).inclInvPlaneDeg, dec:6, sep:',' },{ small: 'degrees (°)' }],
        hover : [`The chain's inclination of date to the engine's own invariable plane (the system's total-angular-momentum plane) — from the N-body element set the scene renders`]},
@@ -49572,219 +49489,11 @@ function buildSunSSBChart(currentYear) {
   </div>`;
 }
 
-function buildObliquityChart(currentYear) {
-  const H   = holisticyearLength;
-  const A   = earthInvPlaneInclinationAmplitude;
-  const mid = earthtiltMean;
-  const c3  = H / 3;   // inclination cycle
-  const c8  = H / 8;   // combined obliquity cycle period
-  const W   = 320;      // SVG width
-  const Ht  = 90;       // SVG height
-  const pad = { top: 8, bot: 14, left: 36, right: 20 };
-  const pw  = W - pad.left - pad.right;
-  const ph  = Ht - pad.top - pad.bot;
-
-  const maxObl = mid + 2 * A;
-  const minObl = mid - 2 * A;
-  const range  = maxObl - minObl;
-
-  const toX = t => pad.left + (t / H) * pw;
-  const toY = v => pad.top + (1 - (v - minObl) / range) * ph;
-
-  const steps = 400;
-  let pathCombined = '', pathAxial = '', pathIncl = '';
-  const tRef = (currentYear || startmodelYear) - balancedYear;
-
-  // Determine which cycle window to show (nearest balanced year as start)
-  const cycleIndex = Math.floor(tRef / H);
-  const ysbStart = cycleIndex * H;
-
-  for (let i = 0; i <= steps; i++) {
-    const t = (i / steps) * H;
-    const tAbs = ysbStart + t;
-    const axial = -A * Math.cos(2 * Math.PI * tAbs / c3);
-    const incl  =  A * Math.cos(2 * Math.PI * tAbs / c8);
-    const combined = mid + axial + incl;
-    const cmd = i === 0 ? 'M' : 'L';
-    const x = toX(t).toFixed(1);
-    pathCombined += `${cmd}${x},${toY(combined).toFixed(1)}`;
-    pathAxial    += `${cmd}${x},${toY(mid + axial).toFixed(1)}`;
-    pathIncl     += `${cmd}${x},${toY(mid + incl).toFixed(1)}`;
-  }
-
-  // Current time marker within current window
-  const tNow = tRef - ysbStart;
-  const axNow  = -A * Math.cos(2 * Math.PI * tRef / c3);
-  const inNow  =  A * Math.cos(2 * Math.PI * tRef / c8);
-  const oblNow = mid + axNow + inNow;
-  const cx = toX(tNow).toFixed(1);
-  const cy = toY(oblNow).toFixed(1);
-  const ascNodeNow = ((o.earthAscendingNodeInvPlane || 0) % 360 + 360) % 360;
-  const periLongNowEarth = ((ASTRO_REFERENCE.perihelionLongitudeJ2000_deg + (360 / earthPerihelionICRFYears) * ((currentYear || startmodelYear) - 2000)) % 360 + 360) % 360;
-
-  const gridClr  = 'rgba(255,255,255,0.08)';
-  const textClr  = 'rgba(255,255,255,0.45)';
-  const fundClr  = 'rgba(86,180,233,0.35)';
-  const meanClr  = 'rgba(255,255,255,0.20)';
-  const mainClr  = '#EFC04A';
-  const dotClr   = '#fff';
-
-  // Y-axis labels
-  const maxLabel = maxObl.toFixed(1) + '°';
-  const midLabel = mid.toFixed(1) + '°';
-  const minLabel = minObl.toFixed(1) + '°';
-
-  // Year formatting helper (not hardcoded)
-  const fmtYr = y => y < 0
-    ? fmtNum(-y, 0, ',') + ' BC'
-    : fmtNum(y, 0, ',') + ' AD';
-  const startYear = Math.round(balancedYear + ysbStart);
-  const endYear   = Math.round(balancedYear + ysbStart + H);
-  const curYear   = Math.round(currentYear || startmodelYear);
-
-  // Phase angle markers at inclination tilt peaks (3 per Earth Fundamental Cycle)
-  const phaseLabel = earthInclinationCycleAnchor.toFixed(1) + '°';
-  const peakAxialVal = mid + A;  // inclination tilt curve value at peak
-  const peakTs = [c3 / 2, 3 * c3 / 2, 5 * c3 / 2];
-  const peakMarkers = peakTs.map(t => {
-    const tAbs = ysbStart + t;
-    const inAtPeak = A * Math.cos(2 * Math.PI * tAbs / c8);
-    const oblAtPeak = mid + A + inAtPeak;
-    const peakYear = Math.round(balancedYear + tAbs);
-    return {
-      x: toX(t).toFixed(1),
-      yAxial: toY(peakAxialVal).toFixed(1),
-      tip: `Phase group: ${phaseLabel}\n` +
-           `Year: ${fmtYr(peakYear)}\n` +
-           `Incl. tilt at peak: +${A.toFixed(3)}°\n` +
-           `Combined obliquity: ${oblAtPeak.toFixed(4)}°\n` +
-           `Ascending node = phase offset at this point\n` +
-           `These peaks mark Glacial Maximum points — when Earth's inclination tilt amplitude is greatest`,
-    };
-  });
-
-  // Anti-phase markers at inclination tilt troughs (between peaks, excluding balanced years at 0 and H)
-  const troughLabel = ((earthInclinationCycleAnchor + 180) % 360).toFixed(1) + '°';
-  const troughAxialVal = mid - A;  // inclination tilt curve value at trough
-  const troughTs = [c3, 2 * c3];  // H/3 and 2H/3
-  const troughMarkers = troughTs.map(t => {
-    const tAbs = ysbStart + t;
-    const inAtTrough = A * Math.cos(2 * Math.PI * tAbs / c8);
-    const oblAtTrough = mid - A + inAtTrough;
-    const troughYear = Math.round(balancedYear + tAbs);
-    return {
-      x: toX(t).toFixed(1),
-      yAxial: toY(troughAxialVal).toFixed(1),
-      tip: `Phase group: ${troughLabel}\n` +
-           `Year: ${fmtYr(troughYear)}\n` +
-           `Incl. tilt at trough: −${A.toFixed(3)}°\n` +
-           `Combined obliquity: ${oblAtTrough.toFixed(4)}°\n` +
-           `Ascending node = phase offset + 180° at this point`,
-    };
-  });
-
-  // Balanced-year hover: both amplitudes = A, they cancel → mean obliquity
-  const balancedTip = yr =>
-    `Balanced Year: ${fmtYr(yr)}\n` +
-    `Inclination tilt amplitude: ${A.toFixed(3)}°\n` +
-    `Axial tilt amplitude: ${A.toFixed(3)}°\n` +
-    `Both amplitudes are equal and cancel out\n` +
-    `Combined obliquity: ${mid.toFixed(5)}° (mean)`;
-
-  // Fixed reference marker at model start year (2000.5)
-  const tFixedAbs = startmodelYear - balancedYear;
-  const tFixed    = tFixedAbs - ysbStart;
-  const axFixed  = -A * Math.cos(2 * Math.PI * tFixedAbs / c3);
-  const inFixed  =  A * Math.cos(2 * Math.PI * tFixedAbs / c8);
-  const oblFixed = mid + axFixed + inFixed;
-  const fxX      = toX(tFixed).toFixed(1);
-  const fxY      = toY(oblFixed).toFixed(1);
-  const earthAscRate = 360 / (-holisticyearLength / 5);  // ascending node regression rate
-  const earthPeriRate = 360 / earthPerihelionICRFYears;   // ICRF perihelion rate
-  const ascNodeFixed = ((earthAscendingNodeInvPlaneVerified + earthAscRate * (startmodelYear - 2000)) % 360 + 360) % 360;
-  const periLongFixed = ((ASTRO_REFERENCE.perihelionLongitudeJ2000_deg + earthPeriRate * (startmodelYear - 2000)) % 360 + 360) % 360;
-  const fixedTip =
-    `Reference year: ${fmtYr(Math.round(startmodelYear))}\n` +
-    `Obliquity: ${oblFixed.toFixed(4)}°\n` +
-    `Inclination component: ${axFixed >= 0 ? '+' : ''}${axFixed.toFixed(3)}°\n` +
-    `Axial component: ${inFixed >= 0 ? '+' : ''}${inFixed.toFixed(3)}°\n` +
-    `Ascending node (Ω): ${ascNodeFixed.toFixed(2)}°\n` +
-    `ICRF perihelion (ω̃): ${periLongFixed.toFixed(2)}°`;
-
-  // Simulation position hover (moves with play)
-  const simTip =
-    `Simulation year: ${fmtYr(curYear)}\n` +
-    `Obliquity: ${oblNow.toFixed(4)}°\n` +
-    `Inclination component: ${axNow >= 0 ? '+' : ''}${axNow.toFixed(3)}°\n` +
-    `Axial component: ${inNow >= 0 ? '+' : ''}${inNow.toFixed(3)}°\n` +
-    `Ascending node (Ω): ${ascNodeNow.toFixed(2)}°\n` +
-    `ICRF perihelion (ω̃): ${periLongNowEarth.toFixed(2)}°`;
-
-  // Hover zone dimensions
-  const hzW = 20;  // hover zone width in SVG units
-
-  return `<div class="pl-prec-viz" style="grid-column:1/-1; padding:4px 2px 2px;">
-    <svg viewBox="0 0 ${W} ${Ht}" width="100%" style="display:block;overflow:visible;">
-      <!-- grid lines -->
-      <line x1="${pad.left}" y1="${toY(maxObl).toFixed(1)}" x2="${W-pad.right}" y2="${toY(maxObl).toFixed(1)}" stroke="${gridClr}" stroke-width="0.5"/>
-      <line x1="${pad.left}" y1="${toY(mid).toFixed(1)}" x2="${W-pad.right}" y2="${toY(mid).toFixed(1)}" stroke="${meanClr}" stroke-width="0.5" stroke-dasharray="3,2"/>
-      <line x1="${pad.left}" y1="${toY(minObl).toFixed(1)}" x2="${W-pad.right}" y2="${toY(minObl).toFixed(1)}" stroke="${gridClr}" stroke-width="0.5"/>
-      <!-- Y labels -->
-      <text x="${pad.left-2}" y="${toY(maxObl).toFixed(1)}" fill="${textClr}" font-size="7" text-anchor="end" dominant-baseline="middle">${maxLabel}</text>
-      <text x="${pad.left-2}" y="${toY(mid).toFixed(1)}" fill="${textClr}" font-size="7" text-anchor="end" dominant-baseline="middle">${midLabel}</text>
-      <text x="${pad.left-2}" y="${toY(minObl).toFixed(1)}" fill="${textClr}" font-size="7" text-anchor="end" dominant-baseline="middle">${minLabel}</text>
-      <!-- component curves (faint) -->
-      <path d="${pathAxial}" fill="none" stroke="${fundClr}" stroke-width="0.7"/>
-      <path d="${pathIncl}" fill="none" stroke="${fundClr}" stroke-width="0.7"/>
-      <!-- combined obliquity (bold) -->
-      <path d="${pathCombined}" fill="none" stroke="${mainClr}" stroke-width="1.3"/>
-      <!-- phase group markers at inclination tilt peaks -->
-      ${peakMarkers.map(pk => `<g style="cursor:help"><title>${pk.tip}</title>
-        <line x1="${pk.x}" y1="${pad.top}" x2="${pk.x}" y2="${Ht-pad.bot}" stroke="${textClr}" stroke-width="0.4" stroke-dasharray="2,2"/>
-        <circle cx="${pk.x}" cy="${pk.yAxial}" r="1.8" fill="${dotClr}" fill-opacity="0.5" stroke="${dotClr}" stroke-width="0.4" stroke-opacity="0.3"/>
-        <text x="${pk.x}" y="${pad.top - 2}" fill="${textClr}" font-size="6" text-anchor="middle">${phaseLabel}</text>
-        <circle cx="${pk.x}" cy="${pk.yAxial}" r="8" fill="transparent"/>
-      </g>`).join('\n      ')}
-      <!-- phase group markers at inclination tilt troughs (fainter) -->
-      ${troughMarkers.map(tr => `<g style="cursor:help"><title>${tr.tip}</title>
-        <line x1="${tr.x}" y1="${pad.top}" x2="${tr.x}" y2="${Ht-pad.bot}" stroke="${textClr}" stroke-width="0.3" stroke-dasharray="2,3" opacity="0.5"/>
-        <circle cx="${tr.x}" cy="${tr.yAxial}" r="1.5" fill="${dotClr}" fill-opacity="0.3" stroke="${dotClr}" stroke-width="0.3" stroke-opacity="0.2"/>
-        <text x="${tr.x}" y="${pad.top - 2}" fill="${textClr}" font-size="5.5" text-anchor="middle" opacity="0.5">${troughLabel}</text>
-        <circle cx="${tr.x}" cy="${tr.yAxial}" r="8" fill="transparent"/>
-      </g>`).join('\n      ')}
-      <!-- fixed reference marker (only if in current window) -->
-      ${(tFixed >= 0 && tFixed <= H) ? `<g style="cursor:help"><title>${fixedTip}</title>
-        <circle cx="${fxX}" cy="${fxY}" r="1.8" fill="${dotClr}" fill-opacity="0.5" stroke="${dotClr}" stroke-width="0.4" stroke-opacity="0.3"/>
-        <circle cx="${fxX}" cy="${fxY}" r="8" fill="transparent"/>
-      </g>` : ''}
-      <!-- simulation position (moves with play) -->
-      <line x1="${cx}" y1="${pad.top}" x2="${cx}" y2="${Ht-pad.bot}" stroke="rgba(235,100,100,0.5)" stroke-width="0.8"/>
-      <g style="cursor:pointer"><title>${simTip}</title>
-        <circle cx="${cx}" cy="${cy}" r="3" fill="rgba(235,100,100,0.9)" stroke="${dotClr}" stroke-width="0.8"/>
-        <circle cx="${cx}" cy="${cy}" r="8" fill="transparent"/>
-      </g>
-      <!-- start balanced year marker + trough label -->
-      <line x1="${toX(0).toFixed(1)}" y1="${pad.top}" x2="${toX(0).toFixed(1)}" y2="${Ht-pad.bot}" stroke="${textClr}" stroke-width="0.3" stroke-dasharray="2,3" opacity="0.5"/>
-      <text x="${toX(0).toFixed(1)}" y="${pad.top - 5.5}" fill="${textClr}" font-size="5.5" text-anchor="middle" opacity="0.5">${troughLabel}</text>
-      <g style="cursor:help"><title>${balancedTip(startYear)}</title>
-        <circle cx="${toX(0).toFixed(1)}" cy="${toY(mid).toFixed(1)}" r="1.8" fill="${dotClr}" fill-opacity="0.5" stroke="${dotClr}" stroke-width="0.4" stroke-opacity="0.3"/>
-        <circle cx="${toX(0).toFixed(1)}" cy="${toY(mid).toFixed(1)}" r="8" fill="transparent"/>
-      </g>
-      <!-- end balanced year marker + trough label -->
-      <line x1="${toX(H).toFixed(1)}" y1="${pad.top}" x2="${toX(H).toFixed(1)}" y2="${Ht-pad.bot}" stroke="${textClr}" stroke-width="0.3" stroke-dasharray="2,3" opacity="0.5"/>
-      <text x="${toX(H).toFixed(1)}" y="${pad.top - 5.5}" fill="${textClr}" font-size="5.5" text-anchor="middle" opacity="0.5">${troughLabel}</text>
-      <g style="cursor:help"><title>${balancedTip(endYear)}</title>
-        <circle cx="${toX(H).toFixed(1)}" cy="${toY(mid).toFixed(1)}" r="1.8" fill="${dotClr}" fill-opacity="0.5" stroke="${dotClr}" stroke-width="0.4" stroke-opacity="0.3"/>
-        <circle cx="${toX(H).toFixed(1)}" cy="${toY(mid).toFixed(1)}" r="8" fill="transparent"/>
-      </g>
-      <!-- X labels -->
-      <text x="${pad.left}" y="${Ht-2}" fill="${textClr}" font-size="6" text-anchor="middle">${fmtYr(startYear)}</text>
-      <text x="${toX(H/2).toFixed(1)}" y="${Ht-2}" fill="#E69F00" font-size="7" text-anchor="middle">${fmtNum(H,0,',')} years</text>
-      <text x="${W-pad.right}" y="${Ht-2}" fill="${textClr}" font-size="6" text-anchor="middle">${fmtYr(endYear)}</text>
-      <text x="${(+cx + (+cx > W * 0.7 ? -5 : 5)).toFixed(1)}" y="${(+cy - 5).toFixed(1)}" fill="rgba(235,100,100,0.85)" font-size="5.5" text-anchor="${+cx > W * 0.7 ? 'end' : 'start'}">Ω=${ascNodeNow.toFixed(1)}° ω̃=${periLongNowEarth.toFixed(1)}°</text>
-    </svg>
-  </div>`;
-}
+// (Plan 07 R5/R9: buildObliquityChart — the two-cosine device obliquity
+// (earthtiltMean − A·cos H/3 + A·cos H/8) drawn with the −H/5 node and the
+// H/3 "glacial maximum" phase markers — stood here. No panel row carried its
+// viz key any more; deleted with the device. The published obliquity is the
+// hybrid, charted by the Earth drawer.)
 
 const _periChartCache = {};   // per-planet sampled cycle window {k, yrs, incl, ecl, iMin, iMax}
 function buildPerihelionChart(planetKey, currentYear) {
@@ -50434,7 +50143,6 @@ function updateDomLabel () {
       const grpKey = activeTab + '-' + grpIdx;
       if (!_openGroups[grpKey]) continue;
       if (row.viz === 'precession-tree')   nextHTML += buildPrecessionViz();
-      if (row.viz === 'obliquity-chart')   nextHTML += buildObliquityChart(o.currentYear);
       if (row.viz === 'perihelion-chart')  nextHTML += buildPerihelionChart(row.planet, o.currentYear);
       if (row.viz === 'sun-ssb-trajectory') nextHTML += buildSunSSBChart(o.currentYear);
       continue;
@@ -53371,380 +53079,31 @@ function updatePerihelion() {
 // ================================================================
 
 
-/**
- * Compute Earth's inclination at a specific year.
- * Inclination formula: i = mean - A*cos(phase3)
- *
- * @param {number} year - Year to compute for
- * @returns {number} Earth inclination in degrees
- */
-function getEarthInclinationAtYear(year) {
-  // Phase 9.10c: delegate to the canonical computeInclinationEarth (Phase 8.5
-  // J2000-anchored cycle math). Pre-migration this used live balancedYear +
-  // holisticyearLength snapshot phase, which drifts under deep-time scrubbing
-  // when `recomputeDerivedAnchorsForEpoch` mutates `balancedYear`. The canonical
-  // function uses BALANCED_YEAR_J2000_FIXED + cyclesBetweenYears (Phase 9.10b
-  // drift-corrected). At J2000 the two are bit-identical; at deep time the
-  // canonical form is the calibrated reference.
-  return computeInclinationEarth(year, null, null, earthInvPlaneInclinationMean, earthInvPlaneInclinationAmplitude);
-}
-
-// R9 (plan 07): `getObliquityAtYear` stood here — the retired two-cosine
-// device form, earthtiltMean − A·cos(phase3) + A·cos(phase8). Its own comment
-// said the structure was "deliberately preserved" because the callers in
-// `integrateEffect` relied on the clean H/3+H/8 extremum structure; that was
-// the stated blocker on retiring earthtiltMean. Those callers now read
-// `computeObliquityEarth`, the same law the Node twin injects, and the
-// sampling search uses the twin's 500-yr step — so the structure is no longer
-// relied on by anything and the function is gone. The device constants it
-// read survive elsewhere (R9 is only half-done: ψ is still DEFINED from
-// earthInvPlaneInclinationAmplitude via computePsiConstant, so that constant
-// cannot go until R5 lands).
+// ─── Plan 07 R5 — the geometric-elements device is gone ───────────────────
+// Deleted here: getEarthInclinationAtYear (the H/3 cosine on the fixed
+// apsidal carrier — i_inv of the K device), findInclinationCrossingYear /
+// findAllInclinationCrossings (its crossing finders), getEclipticInclination-
+// AtYear (the two-normal ecliptic inclination on the device's linear nodes),
+// calculateDynamicAscendingNodeFromTilts (the dΩ/dε = −sin Ω / tan i
+// segment integrator on the K wheels' orbitTilta/b, the 8.3 S-P5 probe) and
+// its legacy 4-arg wrapper, the ascending-node debug logger, and the seven
+// integrator writes that opened updateAscendingNodes — writes the P5/K5b
+// chain block below overwrote every frame, so the integrator's display reach
+// was already zero. Earth's i_inv/Ω of date are inclInvPlaneModel /
+// ascNodeInvPlaneModel (the one-source engine normal; R9); the planets' are
+// the chain's elements of date. docs/retired-record.md is the record.
 
 /**
- * Find the year when Earth's inclination equals a target value.
- * Solves: earthInvPlaneInclinationMean - A*cos(phase3) = targetInclination
- *
- * @param {number} targetInclination - Target inclination in degrees
- * @param {number} startYear - Start of search range
- * @param {number} endYear - End of search range
- * @param {boolean} findFirst - If true, find first crossing; if false, find last
- * @returns {number|null} Year of crossing, or null if not found
+ * Update all planet ascending nodes and arguments of periapsis from the
+ * chain's elements of date. Called each frame before updateHierarchyLiveData().
  */
-function findInclinationCrossingYear(targetInclination, startYear, endYear, findFirst = true) {
-  // Check if target is within Earth's inclination range
-  const minIncl = earthInvPlaneInclinationMean - earthInvPlaneInclinationAmplitude;
-  const maxIncl = earthInvPlaneInclinationMean + earthInvPlaneInclinationAmplitude;
-
-  if (targetInclination < minIncl || targetInclination > maxIncl) {
-    return null; // Target outside Earth's range
-  }
-
-  // Binary search for crossing
-  const steps = 1000;
-  const stepSize = (endYear - startYear) / steps;
-
-  let prevIncl = getEarthInclinationAtYear(startYear);
-  let crossings = [];
-
-  for (let i = 1; i <= steps; i++) {
-    const year = startYear + i * stepSize;
-    const incl = getEarthInclinationAtYear(year);
-
-    // Check if we crossed the target
-    if ((prevIncl < targetInclination && incl >= targetInclination) ||
-        (prevIncl > targetInclination && incl <= targetInclination)) {
-      // Refine with interpolation
-      const fraction = (targetInclination - prevIncl) / (incl - prevIncl);
-      crossings.push(year - stepSize + fraction * stepSize);
-    }
-    prevIncl = incl;
-  }
-
-  if (crossings.length === 0) return null;
-  return findFirst ? crossings[0] : crossings[crossings.length - 1];
-}
-
-/**
- * Find ALL years when Earth's inclination equals a target value within a range.
- * Used for proper segment handling in ascending node calculation.
- *
- * @param {number} targetInclination - Target inclination in degrees
- * @param {number} startYear - Start of search range
- * @param {number} endYear - End of search range
- * @returns {number[]} Array of years where crossings occur
- */
-function findAllInclinationCrossings(targetInclination, startYear, endYear) {
-  // Check if target is within Earth's inclination range
-  const minIncl = earthInvPlaneInclinationMean - earthInvPlaneInclinationAmplitude;
-  const maxIncl = earthInvPlaneInclinationMean + earthInvPlaneInclinationAmplitude;
-
-  if (targetInclination < minIncl || targetInclination > maxIncl) {
-    return []; // Target outside Earth's range
-  }
-
-  // Use enough steps to catch all crossings
-  // There are 2 crossings per holisticyearLength/3 cycle, so ensure we have enough resolution
-  const yearSpan = Math.abs(endYear - startYear);
-  const cycleLength = holisticyearLength / 3;  // Apsidal precession cycle (H/3)
-  const expectedCrossings = Math.ceil(yearSpan / cycleLength) * 2 + 4;
-  const steps = Math.max(1000, expectedCrossings * 50);  // At least 50 samples per expected crossing
-  const stepSize = (endYear - startYear) / steps;
-
-  let prevIncl = getEarthInclinationAtYear(startYear);
-  let crossings = [];
-
-  for (let i = 1; i <= steps; i++) {
-    const year = startYear + i * stepSize;
-    const incl = getEarthInclinationAtYear(year);
-
-    // Check if we crossed the target
-    if ((prevIncl < targetInclination && incl >= targetInclination) ||
-        (prevIncl > targetInclination && incl <= targetInclination)) {
-      // Refine with interpolation
-      const fraction = (targetInclination - prevIncl) / (incl - prevIncl);
-      crossings.push(year - stepSize + fraction * stepSize);
-    }
-    prevIncl = incl;
-  }
-
-  return crossings;
-}
-
-/**
- * Compute the dynamic ecliptic inclination for a planet at a given year.
- * Uses dot product of planet and Earth normal vectors on the invariable plane.
- *
- * @param {string} planetName - lowercase planet key (e.g., 'mercury')
- * @param {number} year - decimal year
- * @returns {number} ecliptic inclination in degrees
- */
-function getEclipticInclinationAtYear(planetName, year) {
-  const DEG2RAD = Math.PI / 180;
-  const p = planets[planetName];
-  if (!p || !p.invPlaneInclinationMean || !p.perihelionEclipticYears) return null;
-
-  // Planet inclination and ascending node on invariable plane
-  const planetI = computePlanetInvPlaneInclinationDynamic(planetName, year) * DEG2RAD;
-  const planetRate = 360 / p.perihelionEclipticYears;
-  const planetOmega = (p.ascendingNodeInvPlane + planetRate * (year - startmodelyearwithCorrection)) * DEG2RAD;
-
-  // Earth inclination and ascending node on invariable plane
-  const earthI = getEarthInclinationAtYear(year) * DEG2RAD;
-  const earthRate = 360 / earthPerihelionICRFYears;
-  const earthOmega = (earthAscendingNodeInvPlaneVerified + earthRate * (year - startmodelyearwithCorrection)) * DEG2RAD;
-
-  const cosIncl = Math.cos(planetI) * Math.cos(earthI)
-    + Math.sin(planetI) * Math.sin(earthI) * Math.cos(planetOmega - earthOmega);
-  return Math.acos(Math.max(-1, Math.min(1, cosIncl))) / DEG2RAD;
-}
-
-/**
- * Calculate the dynamic ascending node longitude using a RATE-BASED approach.
- *
- * This properly handles:
- *   1. Obliquity direction changes (effect reverses when obliquity changes direction)
- *   2. Inclination crossovers (effect reverses when Earth incl crosses planet incl)
- *
- * The effect on ascending node depends on:
- *   - dΩ/dε = -sin(Ω) / tan(i)  (base perturbation rate)
- *   - Sign depends on whether Earth incl > or < planet incl
- *   - Effect accumulates based on obliquity CHANGE, respecting direction reversals
- *
- * @param {number} orbitTilta - Encodes sin(Ω)*i in degrees
- * @param {number} orbitTiltb - Encodes cos(Ω)*i in degrees
- * @param {number} currentObliquity - Current Earth obliquity (degrees)
- * @param {number} earthInclination - Current Earth ecliptic inclination (degrees)
- * @param {number} currentYear - Current year (needed for rate-based calculation)
- * @param {string} [planetName] - Optional planet key for dynamic inclination
- * @returns {number} Dynamic ascending node longitude (degrees, 0-360)
- */
-function calculateDynamicAscendingNodeFromTilts(orbitTilta, orbitTiltb, currentObliquity, earthInclination, currentYear, planetName) {
-  // 8.3 S-P5: the segment-integration law (dΩ/dε = −sin Ω / tan i, with
-  // sign flips at obliquity extrema and Earth-inclination crossovers) lives
-  // in @essrt/physics/planets/asc-node-integrator — L5 delegated the Node
-  // mirror; this browser 6-arg variant now delegates too. What stays HERE:
-  // the Tychosium orbitTilta/orbitTiltb decomposition (§2h — those names
-  // never enter the package), the `|| planetInclination` fallbacks (folded
-  // into the injected closure), and the sampling+bisection obliquity-extrema
-  // search — this engine's critical-point discovery method (the Node engine
-  // injects its precomputed extrema table instead): same law, engine-owned
-  // critical points. currentObliquity/earthInclination are unused (kept for
-  // the caller signature, as before).
-  const RAD2DEG = 180 / Math.PI;
-  const staticOmegaDeg = Math.atan2(orbitTilta, orbitTiltb) * RAD2DEG;
-  const planetInclination = Math.sqrt(orbitTilta * orbitTilta + orbitTiltb * orbitTiltb);
-
-  return integrateAscendingNode(
-    { ascendingNodeDeg: staticOmegaDeg, inclinationDeg: planetInclination },
-    currentYear,
-    {
-      // R9 prerequisite: the integrator reads the SAME obliquity as its Node
-      // twin (orbital-engine injects computeObliquityEarth). It used to read
-      // getObliquityAtYear — the retired two-cosine device form — so the two
-      // engines ran one law on two different obliquities: equal at J2000 by
-      // construction and parting with distance (measured 7.5″ at −5,000, 55″
-      // at −10,000, 222″ at −20,000, 156″ at +20,000), which dΩ/dε carried
-      // straight into the integrated node. Nothing gated it: the smoke
-      // surface's probe was never recorded until now.
-      obliquityAt: computeObliquityEarth,
-      earthInclinationAt: getEarthInclinationAtYear,
-      obliquityExtremaInRange: (yearMin, yearMax) => {
-        // Sample to find obliquity direction changes, bisect to the extremum.
-        // The 500-yr step is the Node twin's, for its reason: well below half
-        // the shortest period (~5,235 yr), so the search finds the law's own
-        // turning points and not sampling artefacts.
-        const extrema = [];
-        const sampleStep = Math.min(500, (yearMax - yearMin) / 100);
-        if (sampleStep > 0) {
-          let prevObl = computeObliquityEarth(yearMin);
-          let prevDir = 0;
-
-          for (let y = yearMin + sampleStep; y <= yearMax; y += sampleStep) {
-            const obl = computeObliquityEarth(y);
-            const curDir = obl > prevObl ? 1 : (obl < prevObl ? -1 : 0);
-
-            if (prevDir !== 0 && curDir !== 0 && prevDir !== curDir) {
-              // Direction changed - refine to find extremum
-              let lo = y - sampleStep;
-              let hi = y;
-              for (let iter = 0; iter < 20; iter++) {
-                const mid = (lo + hi) / 2;
-                const oblLo = computeObliquityEarth(lo);
-                const oblMid = computeObliquityEarth(mid);
-                const oblHi = computeObliquityEarth(hi);
-
-                if ((oblMid > oblLo && oblMid > oblHi) || (oblMid < oblLo && oblMid < oblHi)) {
-                  extrema.push(mid);
-                  break;
-                } else if ((oblMid - oblLo) * prevDir > 0) {
-                  lo = mid;
-                } else {
-                  hi = mid;
-                }
-              }
-            }
-
-            if (curDir !== 0) prevDir = curDir;
-            prevObl = obl;
-          }
-        }
-        return extrema;
-      },
-      inclinationCrossingsInRange: (crossIncl, yearMin, yearMax) => findAllInclinationCrossings(crossIncl, yearMin, yearMax),
-      eclipticInclinationAt: planetName
-        ? (y) => getEclipticInclinationAtYear(planetName, y) || planetInclination
-        : null,
-      earthInclinationMeanDeg: earthInvPlaneInclinationMean,
-      earthInclinationAmplitudeDeg: earthInvPlaneInclinationAmplitude,
-    },
-  );
-}
-
-/**
- * Legacy function - kept for reference but no longer used.
- * Use calculateDynamicAscendingNodeFromTilts instead.
- */
-function calculateDynamicAscendingNode(staticOmega, staticInclination, currentObliquity, referenceObliquity = earthtiltMean) {
-  // Convert static values to tilt format
-  const DEG2RAD = Math.PI / 180;
-  const OmegaRad = staticOmega * DEG2RAD;
-  // orbitTilta = sin(Ω) * i, orbitTiltb = cos(Ω) * i
-  const orbitTilta = Math.sin(OmegaRad) * staticInclination;
-  const orbitTiltb = Math.cos(OmegaRad) * staticInclination;
-
-  return calculateDynamicAscendingNodeFromTilts(orbitTilta, orbitTiltb, currentObliquity, referenceObliquity);
-}
-
-
-/**
- * Update all planet ascending nodes based on current obliquity.
- * Uses the ACTUAL orbitTilta and orbitTiltb values from the planet data objects,
- * which encode both inclination AND the direction of tilt.
- * Also calculates the Argument of Periapsis for each planet.
- * This function should be called each frame before updateHierarchyLiveData().
- *
- * The calculation uses a RATE-BASED approach that properly handles:
- *   1. Obliquity direction changes (effect reverses when obliquity changes direction)
- *   2. Inclination crossovers (effect reverses when Earth incl crosses planet incl)
- */
-// Debug flag for ascending node logging - set to true to enable console output
-let _debugAscendingNodeLogEnabled = false;
-let _debugAscendingNodeLastLog = 0;
-const _debugAscendingNodeInterval = 1000; // Log at most every 1 second
-
-// Expose debug toggle globally for console access
-// Usage in browser console: window.enableAscNodeDebug(true) or window.enableAscNodeDebug(false)
-window.enableAscNodeDebug = (enabled) => {
-  _debugAscendingNodeLogEnabled = enabled;
-  o.debugAscendingNode = enabled;
-  console.log(`🔍 Ascending Node debugging ${enabled ? 'ENABLED' : 'DISABLED'}`);
-  if (enabled) {
-    console.log('   Logs will appear every second showing:');
-    console.log('   - Current year and obliquity');
-    console.log('   - Static orbitTilt values');
-    console.log('   - Calculated dynamic ascending node');
-    console.log('   - Visual rotation values applied');
-  }
-};
-
 function updateAscendingNodes() {
-  const currentObliquity = o.obliquityEarth;
-  const earthInclination = o.earthInvPlaneInclinationDynamic;
-  const currentYear = o.currentYear;
-
-  // Mercury - use actual tilt values from planet data
-  o.mercuryAscendingNode = calculateDynamicAscendingNodeFromTilts(
-    mercuryRealPerihelionAtSun.orbitTilta, mercuryRealPerihelionAtSun.orbitTiltb, currentObliquity, earthInclination, currentYear, 'mercury'
-  );
-  o.mercuryArgumentOfPeriapsis = ((o.mercuryPerihelion - o.mercuryAscendingNode) % 360 + 360) % 360;
-
-  // DEBUG: Log ascending node calculation details (simplified)
-  const now = Date.now();
-  if (_debugAscendingNodeLogEnabled && (now - _debugAscendingNodeLastLog > _debugAscendingNodeInterval)) {
-    _debugAscendingNodeLastLog = now;
-    console.log(`🔍 Ascending Node: Year ${currentYear.toFixed(2)}, Mercury Ω = ${o.mercuryAscendingNode.toFixed(2)}° (static: ${planets.mercury.ascendingNode}°, diff: ${(o.mercuryAscendingNode - planets.mercury.ascendingNode).toFixed(2)}°)`);
-    console.log(`🌍 DEBUG TEST v2 - code updated check`);
-
-    // Earth Invariable Plane debug
-    try {
-      const sunLongDeg = (sun && sun.ra !== undefined) ? sun.ra * 180 / Math.PI : 0;
-      const earthHelioLong = (sunLongDeg + 180 + 360) % 360;
-      const yearsSinceJ2000 = currentYear - startmodelyearwithCorrection;
-      const earthPrecRate = 360 / earthPerihelionICRFYears;
-      const earthAscNodeDyn = (earthAscendingNodeInvPlaneVerified + earthPrecRate * yearsSinceJ2000 + 360) % 360;
-      const angleFromAscNode = (earthHelioLong - earthAscNodeDyn + 360) % 360;
-      console.log(`🌍 EARTH INV PLANE: sun.ra=${sunLongDeg.toFixed(2)}°, earthHelioLong=${earthHelioLong.toFixed(2)}°`);
-      console.log(`   ascNodeJ2000=${earthAscendingNodeInvPlaneVerified}°, ascNodeDyn=${earthAscNodeDyn.toFixed(4)}°, angleFromNode=${angleFromAscNode.toFixed(2)}°`);
-      console.log(`   o.earthAscendingNodeInvPlane=${o.earthAscendingNodeInvPlane?.toFixed(4)}°, height=${o.earthHeightAboveInvPlane?.toFixed(6)} AU`);
-    } catch (e) {
-      console.log(`🌍 EARTH INV PLANE DEBUG ERROR: ${e.message}`);
-    }
-  }
-
-  // Venus
-  o.venusAscendingNode = calculateDynamicAscendingNodeFromTilts(
-    venusRealPerihelionAtSun.orbitTilta, venusRealPerihelionAtSun.orbitTiltb, currentObliquity, earthInclination, currentYear, 'venus'
-  );
-  o.venusArgumentOfPeriapsis = ((o.venusPerihelion - o.venusAscendingNode) % 360 + 360) % 360;
-
-  // Mars - NOTE: Mars (1.85°) is within Earth's inclination range and will experience crossover
-  o.marsAscendingNode = calculateDynamicAscendingNodeFromTilts(
-    marsRealPerihelionAtSun.orbitTilta, marsRealPerihelionAtSun.orbitTiltb, currentObliquity, earthInclination, currentYear, 'mars'
-  );
-  o.marsArgumentOfPeriapsis = ((o.marsPerihelion - o.marsAscendingNode) % 360 + 360) % 360;
-
-  // Jupiter - NOTE: Jupiter (1.30°) is within Earth's inclination range and will experience crossover
-  o.jupiterAscendingNode = calculateDynamicAscendingNodeFromTilts(
-    jupiterRealPerihelionAtSun.orbitTilta, jupiterRealPerihelionAtSun.orbitTiltb, currentObliquity, earthInclination, currentYear, 'jupiter'
-  );
-  o.jupiterArgumentOfPeriapsis = ((o.jupiterPerihelion - o.jupiterAscendingNode) % 360 + 360) % 360;
-
-  // Saturn
-  o.saturnAscendingNode = calculateDynamicAscendingNodeFromTilts(
-    saturnRealPerihelionAtSun.orbitTilta, saturnRealPerihelionAtSun.orbitTiltb, currentObliquity, earthInclination, currentYear, 'saturn'
-  );
-  o.saturnArgumentOfPeriapsis = ((o.saturnPerihelion - o.saturnAscendingNode) % 360 + 360) % 360;
-
-  // Uranus
-  o.uranusAscendingNode = calculateDynamicAscendingNodeFromTilts(
-    uranusRealPerihelionAtSun.orbitTilta, uranusRealPerihelionAtSun.orbitTiltb, currentObliquity, earthInclination, currentYear, 'uranus'
-  );
-  o.uranusArgumentOfPeriapsis = ((o.uranusPerihelion - o.uranusAscendingNode) % 360 + 360) % 360;
-
-  // Neptune
-  o.neptuneAscendingNode = calculateDynamicAscendingNodeFromTilts(
-    neptuneRealPerihelionAtSun.orbitTilta, neptuneRealPerihelionAtSun.orbitTiltb, currentObliquity, earthInclination, currentYear, 'neptune'
-  );
-  o.neptuneArgumentOfPeriapsis = ((o.neptunePerihelion - o.neptuneAscendingNode) % 360 + 360) % 360;
-
   // P5/K5b — the SEVEN PLANETS' nodes ride the chain's elements-of-date:
   // Ω(t) from the ζ-vector secular skeleton + derived terms, ω = ϖ − Ω
-  // from the SAME element set (proper ecliptic arguments — the legacy
-  // line above mixed the RA-channel ϖ with an ecliptic Ω).
-  // Pluto/Halleys/Eros have no chain and keep the legacy tilt
-  // integration. Placed BEFORE updateOrbitalPlaneRotations so the
-  // VISUAL orbital planes follow the same Ω.
+  // from the SAME element set (proper ecliptic arguments — the retired
+  // device mixed the RA-channel ϖ with an ecliptic Ω). Placed BEFORE
+  // updateOrbitalPlaneRotations so the VISUAL orbital planes follow the
+  // same Ω.
   {
     for (const _p of ['mercury', 'venus', 'mars', 'jupiter', 'saturn', 'uranus', 'neptune']) {
       const _el = _kcElementsOfDate(_p, o.julianDay);
@@ -54118,39 +53477,20 @@ function updateMoonOrbitalElements() {
 function updatePlanetInvariablePlaneHeights() {
   const DEG2RAD = Math.PI / 180;
 
-  // Years since balancedYear - using balancedYear as epoch ensures perfect synchronization
-  // over complete Earth Fundamental Cycles (ascending nodes return to exact same values)
-  // Calculate from JD directly using mean solar year length to avoid calendar-based drift
-  const yearsSinceBalanced = (o.julianDay - balancedJD) / meansolaryearlengthinDays;
+  // Plan 07 R5: every body here is a chain body (the eight of
+  // _KC_IP_BODY_KEYS). The device's per-body config — the linearly-precessing
+  // S&S / verified / ecliptic-rate nodes on ascendingNodeCyclesIn8H and the
+  // −H/5 Earth line — and the sin(i)·sin(u)·r construction it fed left with
+  // the law; that tail had been unreachable since the no-chain trio went.
+  const planetConfigs = ['mercury', 'venus', 'earth', 'mars', 'jupiter', 'saturn', 'uranus', 'neptune'];
 
-  // yearsFromBalancedToJ2000 is a pre-computed constant (defined near line 434)
-
-  // Planet configuration for invariable plane calculations
-  // Each entry includes: key, planetObj, inclToInvPlane, ascNodeAtJ2000 (Souami & Souchay), ascNodeJ2000Verified, precessionPeriodYears
-  // Ascending node periods: from ascendingNodeCyclesIn8H in model-parameters.json (all retrograde)
-  // Earth: -H/5 (La2010). Minor bodies: use ecliptic perihelion period as fallback.
-  const _8H = 8 * holisticyearLength;
-  const _ascP = (k) => planets[k].ascendingNodeCyclesIn8H ? -_8H / planets[k].ascendingNodeCyclesIn8H : planets[k].perihelionEclipticYears;
-  const planetConfigs = [
-    { key: 'mercury', obj: mercury, getIncl: () => o.mercuryInvPlaneInclinationDynamic || planets.mercury.invPlaneInclinationJ2000, ascNodeJ2000: mercuryAscendingNodeInvPlaneSouamiSouchay, ascNodeJ2000Verified: planets.mercury.ascendingNodeInvPlane, precessionYears: _ascP('mercury') },
-    { key: 'venus',   obj: venus,   getIncl: () => o.venusInvPlaneInclinationDynamic   || planets.venus.invPlaneInclinationJ2000,   ascNodeJ2000: venusAscendingNodeInvPlaneSouamiSouchay,   ascNodeJ2000Verified: planets.venus.ascendingNodeInvPlane,   precessionYears: _ascP('venus') },
-    { key: 'earth',   obj: null,    getIncl: () => o.earthInvPlaneInclinationDynamic   || earthInvPlaneInclinationJ2000,             ascNodeJ2000: earthAscendingNodeInvPlaneSouamiSouchay,   ascNodeJ2000Verified: earthAscendingNodeInvPlaneVerified,   precessionYears: -holisticyearLength / 5 },  // -H/5 (La2010)
-    { key: 'mars',    obj: mars,    getIncl: () => o.marsInvPlaneInclinationDynamic    || planets.mars.invPlaneInclinationJ2000,    ascNodeJ2000: marsAscendingNodeInvPlaneSouamiSouchay,    ascNodeJ2000Verified: planets.mars.ascendingNodeInvPlane,    precessionYears: _ascP('mars') },
-    { key: 'jupiter', obj: jupiter, getIncl: () => o.jupiterInvPlaneInclinationDynamic || planets.jupiter.invPlaneInclinationJ2000, ascNodeJ2000: jupiterAscendingNodeInvPlaneSouamiSouchay, ascNodeJ2000Verified: planets.jupiter.ascendingNodeInvPlane, precessionYears: _ascP('jupiter') },
-    { key: 'saturn',  obj: saturn,  getIncl: () => o.saturnInvPlaneInclinationDynamic  || planets.saturn.invPlaneInclinationJ2000,  ascNodeJ2000: saturnAscendingNodeInvPlaneSouamiSouchay,  ascNodeJ2000Verified: planets.saturn.ascendingNodeInvPlane,  precessionYears: _ascP('saturn') },
-    { key: 'uranus',  obj: uranus,  getIncl: () => o.uranusInvPlaneInclinationDynamic  || planets.uranus.invPlaneInclinationJ2000,  ascNodeJ2000: uranusAscendingNodeInvPlaneSouamiSouchay,  ascNodeJ2000Verified: planets.uranus.ascendingNodeInvPlane,  precessionYears: _ascP('uranus') },
-    { key: 'neptune', obj: neptune, getIncl: () => o.neptuneInvPlaneInclinationDynamic || planets.neptune.invPlaneInclinationJ2000, ascNodeJ2000: neptuneAscendingNodeInvPlaneSouamiSouchay, ascNodeJ2000Verified: planets.neptune.ascendingNodeInvPlane, precessionYears: _ascP('neptune') },
-  ];
-
-  for (const { key, obj, getIncl, ascNodeJ2000, ascNodeJ2000Verified, precessionYears } of planetConfigs) {
+  for (const key of planetConfigs) {
     // K5 excision — the planet-family bodies read the CHAIN: the node ON the
     // engine's own invariable plane (K5c s-frame) and the ecliptic node come
     // from the element set of date, and the height is the exact projection
     // h = r⃗ · ẑ_inv of the chain's heliocentric vector — no per-frame
-    // reconstruction from legacy anomaly/node/inclination readouts. The
-    // linear-precession construction below remains only for the no-chain
-    // bodies (Pluto, Halley, Eros).
-    if (_KC_IP_BODY_KEYS.has(key)) {
+    // reconstruction from legacy anomaly/node/inclination readouts.
+    {
       const el = _kcElementsOfDate(key, o.julianDay);
       o[key + 'AscendingNodeInvPlane'] = el.ascNodeInvPlaneDeg;
       o[key + 'AscendingNodeInvPlaneEcliptic'] = el.ascNodeEclipticDeg;
@@ -54186,113 +53526,8 @@ function updatePlanetInvariablePlaneHeights() {
         dt2.periodEl.textContent = (_Tn >= 0 ? '+' : '−') + (isFinite(_Tn) ? Math.abs(_Tn).toFixed(0) : '∞') + ' yr';
         dt2.periodEl.style.color = _Tn >= 0 ? 'hsla(140, 65%, 55%, 1)' : 'hsla(0, 70%, 60%, 1)';
       }
-      continue;
-    }
-    let eclipticLongitude;
-    let distanceAU;
-    let inclToInvPlane;
-
-    // Calculate dynamic ascending node on invariable plane in ICRF (precesses over time)
-    // Precession rate = 360° / precessionYears (degrees per year) - this is the ICRF rate for visual markers
-    const precessionRateICRF = 360 / precessionYears;
-
-    // Back-calculate ascending node at balancedYear from J2000 values
-    // Formula: ascNodeAtBalanced = ascNodeJ2000 - rate * yearsFromBalancedToJ2000
-    const ascNodeAtBalancedSS = ascNodeJ2000 - precessionRateICRF * yearsFromBalancedToJ2000;
-    const ascNodeAtBalancedVerified = ascNodeJ2000Verified - precessionRateICRF * yearsFromBalancedToJ2000;
-
-    // Calculate current ascending node from balancedYear reference
-    // This ensures perfect cycle synchronization over complete Earth Fundamental Cycles
-    const rawSS = ascNodeAtBalancedSS + precessionRateICRF * yearsSinceBalanced;
-    const rawVerified = ascNodeAtBalancedVerified + precessionRateICRF * yearsSinceBalanced;
-    const ascNodeDynamicSS = ((rawSS % 360) + 360) % 360;
-    const ascNodeDynamicVerified = ((rawVerified % 360) + 360) % 360;
-
-    // Calculate ascending node in ECLIPTIC coords (for height calculation)
-    // Each planet needs its own ecliptic rate, derived from:
-    // - Planet's ICRF precession rate (precessionYears)
-    // - General precession of ecliptic coordinate system (holisticyearLength/13)
-    // Formula: 1/eclipticPeriod = 1/icrfPeriod + 1/generalPrecession
-    // The rates ADD because both the orbital plane precession and ecliptic precession
-    // contribute to the apparent motion of the ascending node in ecliptic coordinates.
-    const generalPrecessionYears = holisticyearLength / 13;  // Axial precession cycle
-    const icrfRate = 1 / precessionYears;  // rate in cycles/year
-    const generalRate = 1 / generalPrecessionYears;  // rate in cycles/year
-    const eclipticRate = icrfRate + generalRate;  // combined rate (rates add)
-    const precessionRateEcliptic = eclipticRate * 360;  // convert to degrees/year
-
-    // Back-calculate ecliptic ascending node at balancedYear
-    const ascNodeAtBalancedEcliptic = ascNodeJ2000Verified - precessionRateEcliptic * yearsFromBalancedToJ2000;
-    const rawEcliptic = ascNodeAtBalancedEcliptic + precessionRateEcliptic * yearsSinceBalanced;
-    const ascNodeDynamicEcliptic = ((rawEcliptic % 360) + 360) % 360;
-
-    // Store the dynamic ascending nodes for reference
-    // Primary value uses J2000-verified ascending nodes (matches J2000 ecliptic inclinations) - ICRF rate for visuals
-    o[key + 'AscendingNodeInvPlane'] = ascNodeDynamicVerified;
-    // Also store Souami & Souchay value for comparison (including Earth)
-    o[key + 'AscendingNodeInvPlaneSouamiSouchay'] = ascNodeDynamicSS;
-    // Store ecliptic-rate ascending node for height calculations
-    o[key + 'AscendingNodeInvPlaneEcliptic'] = ascNodeDynamicEcliptic;
-
-    // Get dynamic inclination to invariable plane (with J2000 fallback)
-    inclToInvPlane = getIncl();
-
-    // (The chain branch above handles the planet-family bodies, Earth
-    // included — only the no-chain trio reaches this construction.)
-    {
-      // Get planet's true anomaly (already calculated in updatePlanetAnomalies)
-      const trueAnomaly = o[key + 'TrueAnomaly'] || 0;
-
-      // Get argument of periapsis (already calculated in updateOrbitOrientations)
-      const argPeriapsisEcliptic = o[key + 'ArgumentOfPeriapsis'] || 0;
-
-      // Get ascending node on ecliptic (dynamic value)
-      const ascNodeEcliptic = o[key + 'AscendingNode'] || 0;
-
-      // Get distance from Sun (in AU)
-      if (obj && obj.sunDistAU !== undefined) {
-        distanceAU = obj.sunDistAU;
-      } else {
-        distanceAU = 1.0; // Fallback
-      }
-
-      // Calculate the planet's ecliptic longitude
-      // Ecliptic longitude = Ascending node (ecliptic) + Argument of periapsis + True anomaly
-      eclipticLongitude = (ascNodeEcliptic + argPeriapsisEcliptic + trueAnomaly) % 360;
     }
 
-    // Calculate angle from the ascending node on the invariable plane
-    // This is the ecliptic longitude minus the dynamic ascending node on invariable plane
-    // Using ECLIPTIC-rate ascending node (matches the coordinate system of eclipticLongitude)
-    let angleFromInvAscNode = (eclipticLongitude - ascNodeDynamicEcliptic + 360) % 360;
-
-    // Convert to radians for sine calculation
-    const angleRad = angleFromInvAscNode * DEG2RAD;
-    const inclRad = inclToInvPlane * DEG2RAD;
-
-    // Calculate height above invariable plane
-    // Height = sin(inclination) * sin(angle from ascending node) * distance
-    const height = Math.sin(inclRad) * Math.sin(angleRad) * distanceAU;
-
-    // Store results in o object
-    o[key + 'HeightAboveInvPlane'] = height;
-    o[key + 'AboveInvPlane'] = height > 0;
-
-    // Update centered gauge bar with directional color
-    const gaugeKey = key + 'HeightAboveInvPlane';
-    const el = invPlaneGaugeEls[gaugeKey];
-    if (el && invPlaneMaxes[gaugeKey]) {
-      setInvGaugeProps(el, height, invPlaneMaxes[gaugeKey]);
-    }
-    // Update expandable detail values (always update so values are correct when revealed)
-    const dt = invPlaneTooltipEls[gaugeKey];
-    if (dt) {
-      dt.nodeEl.textContent = _kcAscNodeInvPlaneSSDeg(key, o.julianDay).toFixed(2) + '\u00B0';
-      dt.inclEl.textContent = (o[key + 'InvPlaneInclinationDynamic'] || 0).toFixed(4) + '\u00B0';
-      // (Legacy phase-rule coloring retired with the Peri (ICRF) row; this
-      // path is unreachable for panel rows — only the eight chain planets
-      // carry detail rows and they take the chain branch above.)
-    }
   }
 }
 
@@ -54556,8 +53791,8 @@ function calculateInvariablePlaneFromAngularMomentum() {
  * and dynamic values (o.<planet>AscendingNodeInvPlane) for precessing ascending nodes.
  *
  * Output:
- * - o.<planet>EclipticInclinationDynamic: using J2000-verified ascending nodes (matches J2000 exactly)
- * - o.<planet>EclipticInclinationSouamiSouchayDynamic: using original Souami & Souchay (2012) ascending nodes
+ * - o.<planet>EclipticInclinationDynamic: the chain's orbit plane against the engine Earth normal of date
+ *   (plan 07 R5; the Souami & Souchay twin left with the device)
  */
 function updateDynamicInclinations() {
   const DEG2RAD = Math.PI / 180;
@@ -54610,65 +53845,28 @@ function updateDynamicInclinations() {
   // rework: the panel's detail rows now speak the chain's inv-plane
   // geometry of date, their only consumer.)
 
-  // Get Earth's current orbital plane normals (ecliptic normals)
-  // We need TWO ecliptic normals: one for S&S calculations, one for Verified calculations
-  // Normal vector formula: n = (sin(i)*sin(Ω), sin(i)*cos(Ω), cos(i))
-  const earthI = o.earthInvPlaneInclinationDynamic * DEG2RAD;
-
-  // Ecliptic normal using S&S Earth ascending node (for EclipticInclinationSouamiSouchayDynamic)
-  const earthOmegaSS = o.earthAscendingNodeInvPlaneSouamiSouchay * DEG2RAD;
-  _eclipticNormalSS.set(
-    Math.sin(earthI) * Math.sin(earthOmegaSS),
-    Math.sin(earthI) * Math.cos(earthOmegaSS),
-    Math.cos(earthI)
-  );
-
-  // Ecliptic normal using Verified Earth ascending node (for EclipticInclinationDynamic)
-  const earthOmegaVerified = o.earthAscendingNodeInvPlane * DEG2RAD;
-  _eclipticNormalVerified.set(
-    Math.sin(earthI) * Math.sin(earthOmegaVerified),
-    Math.sin(earthI) * Math.cos(earthOmegaVerified),
-    Math.cos(earthI)
-  );
-
-  // Planet configuration
-  // incl = DYNAMIC inclinations to invariable plane (now oscillating like Earth's)
-  // ascNodeSS = Souami & Souchay (2012) ascending nodes (dynamic, precessing)
-  // ascNodeVerified = J2000-verified ascending nodes (dynamic, precessing) - now the primary value
-  const planetConfigs = [
-    { key: 'mercury', incl: o.mercuryInvPlaneInclinationDynamic, ascNodeSS: o.mercuryAscendingNodeInvPlaneSouamiSouchay, ascNodeVerified: o.mercuryAscendingNodeInvPlane },
-    { key: 'venus',   incl: o.venusInvPlaneInclinationDynamic,   ascNodeSS: o.venusAscendingNodeInvPlaneSouamiSouchay,   ascNodeVerified: o.venusAscendingNodeInvPlane },
-    { key: 'mars',    incl: o.marsInvPlaneInclinationDynamic,    ascNodeSS: o.marsAscendingNodeInvPlaneSouamiSouchay,    ascNodeVerified: o.marsAscendingNodeInvPlane },
-    { key: 'jupiter', incl: o.jupiterInvPlaneInclinationDynamic, ascNodeSS: o.jupiterAscendingNodeInvPlaneSouamiSouchay, ascNodeVerified: o.jupiterAscendingNodeInvPlane },
-    { key: 'saturn',  incl: o.saturnInvPlaneInclinationDynamic,  ascNodeSS: o.saturnAscendingNodeInvPlaneSouamiSouchay,  ascNodeVerified: o.saturnAscendingNodeInvPlane },
-    { key: 'uranus',  incl: o.uranusInvPlaneInclinationDynamic,  ascNodeSS: o.uranusAscendingNodeInvPlaneSouamiSouchay,  ascNodeVerified: o.uranusAscendingNodeInvPlane },
-    { key: 'neptune', incl: o.neptuneInvPlaneInclinationDynamic, ascNodeSS: o.neptuneAscendingNodeInvPlaneSouamiSouchay, ascNodeVerified: o.neptuneAscendingNodeInvPlane }
-  ];
-
-  for (const { key, incl, ascNodeSS, ascNodeVerified } of planetConfigs) {
-    const pI = incl * DEG2RAD;
-
-    // Calculate using Souami & Souchay ascending node AND S&S ecliptic normal
-    const pOmegaSS = ascNodeSS * DEG2RAD;
-    _planetNormal.set(
-      Math.sin(pI) * Math.sin(pOmegaSS),
-      Math.sin(pI) * Math.cos(pOmegaSS),
-      Math.cos(pI)
-    );
-    const cosAngleSS = _planetNormal.dot(_eclipticNormalSS);
-    const apparentInclSS = Math.acos(Math.max(-1, Math.min(1, cosAngleSS))) * RAD2DEG;
-    o[key + 'EclipticInclinationSouamiSouchayDynamic'] = apparentInclSS;
-
-    // Calculate using J2000-verified ascending node AND Verified ecliptic normal
-    const pOmegaVerified = ascNodeVerified * DEG2RAD;
-    _planetNormal.set(
-      Math.sin(pI) * Math.sin(pOmegaVerified),
-      Math.sin(pI) * Math.cos(pOmegaVerified),
-      Math.cos(pI)
-    );
-    const cosAngleVerified = _planetNormal.dot(_eclipticNormalVerified);
-    const apparentInclVerified = Math.acos(Math.max(-1, Math.min(1, cosAngleVerified))) * RAD2DEG;
-    o[key + 'EclipticInclinationDynamic'] = apparentInclVerified;
+  // Plan 07 R5 — ONE ecliptic inclination of date per planet, frame-
+  // consistent: the chain's own orbit plane (inclEclipticDeg,
+  // ascNodeEclipticDeg — the J2000 ecliptic element set the scene renders)
+  // against the engine Earth-orbit normal of date
+  // (_kcEarthEngineOrbitNormalJ2000, the one-source normal the Earth
+  // panel's i_inv reads), both in the J2000 ecliptic frame. At J2000 the
+  // Earth normal is the J2000 pole and the value is the chain's
+  // inclEclipticDeg; away from it this is the mutual inclination of the two
+  // planes of date. The retired device built the same dot product from the
+  // inv-plane s-frame nodes with Earth's node from TWO sources (the chain
+  // skeleton for the "verified" twin, and a Souami & Souchay twin whose
+  // Earth node was never written and read 0°); the visual orbital-plane
+  // tilt groups (updateOrbitalPlaneRotations) read the one value left.
+  const nE = _kcEarthEngineOrbitNormalJ2000(_engineYearOfSceneYear(o.currentYear));
+  for (const key of ['mercury', 'venus', 'mars', 'jupiter', 'saturn', 'uranus', 'neptune']) {
+    const el = _kcElementsOfDate(key, o.julianDay);
+    const i = el.inclEclipticDeg * DEG2RAD, Om = el.ascNodeEclipticDeg * DEG2RAD;
+    // the orbit normal in the J2000 ecliptic frame, the engine's convention
+    // (the same form as the Earth normal: [sin i sin Ω, −sin i cos Ω, cos i])
+    const nP = [Math.sin(i) * Math.sin(Om), -Math.sin(i) * Math.cos(Om), Math.cos(i)];
+    const d = nP[0] * nE[0] + nP[1] * nE[1] + nP[2] * nE[2];
+    o[key + 'EclipticInclinationDynamic'] = Math.acos(Math.max(-1, Math.min(1, d))) * RAD2DEG;
   }
 }
 
@@ -56111,35 +55309,11 @@ function computeSolsticeYearLength(currentYear, type) {
   return _tierModelB().cardinal.yearLengthDays(currentYear, type);
 }
 
-/**
- * Compute Earth’s ecliptic inclination for a given year.
- *
- * @param {number} currentYear                   – the year you want to compute for
- * @param {number} balancedYear                  – the reference (“balanced”) year
- * @param {number} holisticyearLength            – length of the holistic cycle (in years)
- * @param {number} earthInvPlaneInclinationMean          – the mean inclination (in degrees)
- * @param {number} earthInvPlaneInclinationAmplitude   – amplitude of the tilt & inclination variation (in degrees)
- * @returns {number} the computed inclination (in degrees)
- */
-function computeInclinationEarth(
-  currentYear,
-  _balancedYear_ignored_Phase85,
-  _holisticyearLength_ignored_Phase85,
-  earthInvPlaneInclinationMean,
-  earthInvPlaneInclinationAmplitude
-  ) {
-  // Phase 8.5: integrated phase using J2000-fixed anchor + N=3 (H/3 cycle).
-  // Args 2-3 kept for backward-compat with the 4 existing callers but ignored.
-  try {
-    const cycles = cyclesBetweenYears(BALANCED_YEAR_J2000_FIXED, currentYear, 3);
-    if (cycles === null) return earthInvPlaneInclinationMean;
-    const radians = cycles * 2 * Math.PI;
-    return earthInvPlaneInclinationMean + (-earthInvPlaneInclinationAmplitude * Math.cos(radians));
-  } catch (e) {
-    // Module-load TDZ fallback (no current caller does this, but defensive)
-    return earthInvPlaneInclinationMean;
-  }
-}
+// (Plan 07 R5/R9: computeInclinationEarth — Earth's inclination to the
+// invariable plane as the K device's H/3 cosine on the fixed apsidal
+// carrier, mean − A·cos(2π·cycles₃) — stood here. Its readers were the
+// asc-node integrator's crossing finders, deleted with it; the published
+// i_inv is inclInvPlaneModel, the one-source engine normal.)
 
 // =============================================================================
 // PREDICTIVE FORMULA SYSTEM — Ported from scripts/predictive_formula.py
@@ -56200,147 +55374,12 @@ function calcERD(year) {
 // projection of the lattice motion, perihelionFrameBreakdown. docs/retired-record.md.)
 
 
-/**
- * Compute a planet's dynamic inclination to the invariable plane.
- *
- * CALIBRATION APPROACH:
- * The inclination phase is derived from the ascending node position on the invariable
- * plane, since both are aspects of the same orbital plane precession. This creates a
- * physically consistent relationship between nodal precession and inclination oscillation.
- *
- * Formula: i(t) = i_J2000 + A × [cos(phase(t)) - cos(phase_J2000)]
- * Where: phase = Ω_invPlane + baseOffset + planetAdjust
- *
- * This ensures that at t=2000, the function returns exactly i_J2000.
- *
- * Scientific basis: Laplace-Lagrange secular theory
- * References:
- * - Farside physics textbook (Table 10.4): https://farside.ph.utexas.edu/teaching/celestial/Celestial/node91.html
- * - Murray & Dermott "Solar System Dynamics" (Chapter 7)
- *
- * @param {string} planet - Planet name (e.g., 'saturn')
- * @param {number} currentYear - Current simulation year
- * @returns {number} Dynamic inclination in degrees
- */
-function computePlanetInvPlaneInclinationDynamic(planet, currentYear) {
-  // Planet J2000 inclinations (Souami & Souchay 2012) - calibration targets
-  const j2000Inclinations = {
-    mercury: planets.mercury.invPlaneInclinationJ2000,
-    venus: planets.venus.invPlaneInclinationJ2000,
-    mars: planets.mars.invPlaneInclinationJ2000,
-    jupiter: planets.jupiter.invPlaneInclinationJ2000,
-    saturn: planets.saturn.invPlaneInclinationJ2000,
-    uranus: planets.uranus.invPlaneInclinationJ2000,
-    neptune: planets.neptune.invPlaneInclinationJ2000,
-    pluto: planets.pluto.invPlaneInclinationJ2000,
-    halleys: planets.halleys.invPlaneInclinationJ2000,
-    eros: planets.eros.invPlaneInclinationJ2000,
-    ceres: planets.ceres.invPlaneInclinationJ2000,
-  };
-
-  // Mean inclinations (midpoint of Laplace-Lagrange bounds)
-  // These are the CENTER of the oscillation
-  const meanInclinations = {
-    mercury: planets.mercury.invPlaneInclinationMean,
-    venus: planets.venus.invPlaneInclinationMean,
-    mars: planets.mars.invPlaneInclinationMean,
-    jupiter: planets.jupiter.invPlaneInclinationMean,
-    saturn: planets.saturn.invPlaneInclinationMean,
-    uranus: planets.uranus.invPlaneInclinationMean,
-    neptune: planets.neptune.invPlaneInclinationMean,
-    pluto: planets.pluto.invPlaneInclinationMean,
-    halleys: planets.halleys.invPlaneInclinationMean,
-    eros: planets.eros.invPlaneInclinationMean,
-    ceres: planets.ceres.invPlaneInclinationMean
-  };
-
-  // Planet inclination oscillation amplitudes (from Laplace-Lagrange secular theory)
-  const amplitudes = {
-    mercury: planets.mercury.invPlaneInclinationAmplitude,
-    venus: planets.venus.invPlaneInclinationAmplitude,
-    mars: planets.mars.invPlaneInclinationAmplitude,
-    jupiter: planets.jupiter.invPlaneInclinationAmplitude,
-    saturn: planets.saturn.invPlaneInclinationAmplitude,
-    uranus: planets.uranus.invPlaneInclinationAmplitude,
-    neptune: planets.neptune.invPlaneInclinationAmplitude,
-    pluto: planets.pluto.invPlaneInclinationAmplitude,
-    halleys: planets.halleys.invPlaneInclinationAmplitude,
-    eros: planets.eros.invPlaneInclinationAmplitude,
-    ceres: planets.ceres.invPlaneInclinationAmplitude
-  };
-
-  // Inclination oscillation periods: |ICRF perihelion period| per planet
-  // ICRF rate = ecliptic rate - general precession (H/13)
-  // Earth is special: ICRF period = H/3 directly (eclP in script.js is already earthPerihelionICRFYears)
-  const _genPrecRate = 1 / (holisticyearLength / 13);
-  const icrfPeriods = {};
-  for (const k of ['mercury','venus','mars','jupiter','saturn','uranus','neptune','pluto','halleys','eros','ceres']) {
-    icrfPeriods[k] = 1 / (1 / planets[k].perihelionEclipticYears - _genPrecRate);
-  }
-  icrfPeriods.earth = holisticyearLength / 3; // Earth: ICRF = H/3 directly
-
-  // J2000 perihelion longitudes (ICRF reference for inclination oscillation)
-  const periLongsJ2000 = {};
-  for (const k of ['mercury','venus','mars','jupiter','saturn','uranus','neptune','pluto','halleys','eros','ceres']) {
-    periLongsJ2000[k] = planets[k].longitudePerihelion;
-  }
-  periLongsJ2000.earth = ASTRO_REFERENCE.perihelionLongitudeJ2000_deg;
-
-  // Phase offsets: ω̃_ICRF at max inclination (from balanced year derivation)
-  const phaseOffsets = {
-    mercury: planets.mercury.inclinationCycleAnchor,
-    venus: planets.venus.inclinationCycleAnchor,
-    mars: planets.mars.inclinationCycleAnchor,
-    jupiter: planets.jupiter.inclinationCycleAnchor,
-    saturn: planets.saturn.inclinationCycleAnchor,
-    uranus: planets.uranus.inclinationCycleAnchor,
-    neptune: planets.neptune.inclinationCycleAnchor,
-    pluto: planets.pluto.inclinationCycleAnchor,
-    halleys: planets.halleys.inclinationCycleAnchor,
-    eros: planets.eros.inclinationCycleAnchor,
-    ceres: planets.ceres.inclinationCycleAnchor
-  };
-
-  const i_J2000 = j2000Inclinations[planet];
-  const i_mean = meanInclinations[planet];
-  const amplitude = amplitudes[planet];
-  const icrfPeriod = icrfPeriods[planet];
-  const periLongJ2000 = periLongsJ2000[planet];
-  const phaseOffset = phaseOffsets[planet];
-
-  if (i_J2000 === undefined || amplitude === undefined || icrfPeriod === undefined) {
-    console.warn(`computePlanetInvPlaneInclinationDynamic: Unknown planet '${planet}'`);
-    return i_J2000 || 0;
-  }
-
-  // For zero amplitude (e.g., Venus), just return the J2000 value
-  if (amplitude === 0) {
-    return i_J2000;
-  }
-
-  // Phase 8.3 L4: the ICRF-linked oscillation law lives ONCE in
-  // @essrt/physics/planets/orientation.
-  // 8.3-13: currentYear is HONOURED (measured change). Historically it was
-  // shadowed by the live scene JD, so any query at a non-scene year got the
-  // scene-year value — in particular the asc-node integrator's mid-segment
-  // inclination samples all collapsed to "now", diverging from the Node
-  // engine, which honours its year argument. Same year→JD convention as
-  // Node's yearToJD. Measured deltas: inclination ≤1.33° at ±25 kyr,
-  // ascending node ≤38.3° at −5 kyr; the affected browser fixtures were
-  // re-recorded deliberately with this change.
-  const _jdAtYear = startmodelJD + (currentYear - startmodelYear) * meansolaryearlengthinDays;
-  const yearsSinceBalanced = (_jdAtYear - balancedJD) / meansolaryearlengthinDays;
-  return _PO.invPlaneInclinationAt({
-    isEarth: planet === 'earth',
-    invPlaneInclinationJ2000: i_J2000,
-    invPlaneInclinationMean: i_mean,
-    invPlaneInclinationAmplitude: amplitude,
-    inclinationCycleAnchor: phaseOffset,
-    longitudePerihelion: periLongJ2000,
-    perihelionEclipticYears: planets[planet] ? planets[planet].perihelionEclipticYears : 0,
-    antiPhase: !!(planets[planet] && planets[planet].antiPhase),
-  }, yearsSinceBalanced, { H: holisticyearLength, yearsFromBalancedToJ2000 });
-}
+// (Plan 07 R5: computePlanetInvPlaneInclinationDynamic — the ψ-law
+// oscillation i(t) = mean + s·A·cos(ϖ_ICRF(t) − anchor) on the device's
+// linear ICRF perihelion rate (@essrt/physics/planets/orientation) — stood
+// here. Its readers were the asc-node integrator's ecliptic-inclination
+// closure and the planetInvIncl probe; a planet's inclination of date to the
+// invariable plane is the chain's inclInvPlaneDeg (_kcElementsOfDate).)
 
 /**
  * Calculate the offset into the current 1/16-cycle.

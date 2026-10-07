@@ -337,7 +337,24 @@ engine's long-term mean eccentricities (99.8636 % was the tuned-inputs figure
 read 99.8717 % at retirement, because upstream inputs moved after the last
 search run and nothing re-recorded the preset, since no gate and no published
 surface read it). `data/balance-presets.json` stays as the frozen search
-record that docs 10/109 cite; it is no longer regenerable. **The planet chains moved to engine-D elements (the P5 flip,
+record that docs 10/109 cite; it is no longer regenerable. **Plan 07 R5/R9
+(model v18.0, physics MAJOR 14): the ψ inclination law and the
+geometric-elements device are DELETED** — the ψ/K law module,
+`orientation.cjs`, `asc-node-integrator.cjs`, the browser's
+`calculateDynamicAscendingNodeFromTilts` / `computePlanetInvPlaneInclinationDynamic`
+/ `computeInclinationEarth`, the Node mirrors in `orbital-engine.js`, and
+Earth's H/3 inclination cosine and −H/5 node in the package. A planet's
+inclination and node of date are the chain's elements; Earth's are the
+ONE-SOURCE engine normal against the banked invariable plane
+(`model.earth.inclinationDeg/ascendingNodeDeg` ≡ the browser's
+`inclInvPlaneModel`/`ascNodeInvPlaneModel`, pinned by the API gate; the
+device read 1.24° vs 1.91° at −100 kyr). The integrator's seven browser
+writes had been overwritten by the chain every frame since K5b — its
+display reach was zero; its only gated reach was 28 golden probes. The
+K device CONSTANTS (`earthtiltMean`, `earthInvPlaneInclinationAmplitude`,
+`earthRAAngle`, `earthInvPlaneInclinationMean`) stay: they are the scene's
+J2000 pose (the wheel geometry `_kcFrameR` reads once), not a law. `psiValue`
+is frozen in the registry like `kValue`. **The planet chains moved to engine-D elements (the P5 flip,
 9aa91a6), and the legacy geometric planet path was EXCISED (K5,
 c0399f6): the chain is the ONLY planet path** — the simulator renders
 the seven planets, their orbit rings, traces, perihelion markers, panels

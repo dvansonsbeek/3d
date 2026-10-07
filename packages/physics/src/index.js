@@ -122,12 +122,13 @@ export { createMoonApparent } from './moon/apparent.cjs';
 // sample) and the offset-circle wheel-angle solver: the scene twins' one placement.
 export { computeEarthFrameOfDate, solveWheelAngleForLongitude } from './earth/frame-of-date.cjs';
 // Phase 8.3 — the planet machinery, extracted by LAW over body records
-// (survey order: geometry → Fibonacci laws → channels → chains).
+// (survey order: geometry → channels → chains). The ψ/K amplitude laws
+// (planets/fibonacci-laws), the record-based orientation forms
+// (planets/orientation) and the ascending-node integrator
+// (planets/asc-node-integrator) are DELETED at plan 07 R5/R6: the planets'
+// elements of date have one home, the N-body chain; docs/retired-record.md.
 export { derivePlanetGeometry } from './planets/geometry.cjs';
-export * as planetFibonacciLaws from './planets/fibonacci-laws.cjs';
 export { eccentricityFromCycles, computeEccentricityIntegrated } from './planets/ecc-channel.cjs';
-export * as planetOrientation from './planets/orientation.cjs';
-export { integrateAscendingNode } from './planets/asc-node-integrator.cjs';
 export * as planetOrbitChain from './planets/orbit-chain.cjs';
 // P5/K4.6c — the engine-D Keplerian chain (pure evaluator + the embedded
 // governed artifact; the browser flag path consumes exactly these).

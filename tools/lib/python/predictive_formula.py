@@ -33,11 +33,11 @@ from typing import List, Tuple, Dict
 
 from constants_scripts import (
     H, BALANCE_YEAR, EARTH_BASE_ECCENTRICITY, EARTH_ECCENTRICITY_AMPLITUDE,
-    EARTH_OBLIQUITY_MEAN, EARTH_INCLINATION_MEAN, EARTH_INCLINATION_AMPLITUDE,
+    EARTH_OBLIQUITY_MEAN, EARTH_INCLINATION_AMPLITUDE,
     _SIDEREAL_YEAR_S, _MEAN_SOLAR_YEAR_DAYS, _MEAN_SIDEREAL_YEAR_DAYS,
     _MEAN_LENGTH_OF_DAY, _MEAN_ANOM_YEAR_DAYS, _ECCENTRICITY_DERIVED_MEAN,
     TROPICAL_YEAR_HARMONICS, SIDEREAL_YEAR_HARMONICS, ANOMALISTIC_YEAR_HARMONICS,
-    INCL_MEAN, INCL_AMP, INCL_CYCLE_ANCHOR, INCL_PERIOD, OMEGA_J2000, INCL_ECLIPTIC,
+    INCL_CYCLE_ANCHOR, INCL_PERIOD, OMEGA_J2000, INCL_ECLIPTIC,
     AXIAL_TILT, LONGITUDE_PERIHELION, PERIHELION_ECLIPTIC_YEARS,
     OBLIQUITY_CYCLE, EARTH_RA_ANGLE, BALANCED_JD,
     _START_MODEL_JD, JUNE_SOLSTICE_2000_JD, SOLSTICE_JD_HARMONICS,
@@ -82,7 +82,8 @@ SIDEREAL_YEAR_MEAN = _MEAN_SIDEREAL_YEAR_DAYS
 ANOMALISTIC_YEAR_MEAN = _MEAN_ANOM_YEAR_DAYS
 
 # --- Earth parameters (from constants_scripts) ---
-EARTH_INCLIN_MEAN = EARTH_INCLINATION_MEAN
+# (EARTH_INCLIN_MEAN left with calc_inclination, the H/3 device, at plan 07 R5/R9;
+# the amplitude survives as the retired cardinal-RA device's input below.)
 EARTH_INCLIN_AMPL = EARTH_INCLINATION_AMPLITUDE
 
 # =============================================================================
@@ -310,20 +311,11 @@ def calc_eccentricity(year: int) -> float:
     return EARTH_ECC_MEAN * (1 + cos_theta / 2)
 
 
-def calc_inclination(year: int) -> float:
-    """
-    Calculate Earth's orbital inclination to the invariable plane (degrees).
-
-    Formula: I(t) = I₀ - A·cos(2πt / T_I)
-
-    The inclination and obliquity share the same amplitude (A = 0.634°) because
-    they are geometrically coupled — as Earth's orbital plane tilts relative to
-    the invariable plane, the obliquity changes by the same amount.
-    """
-    t = time_offset(year)
-    return EARTH_INCLIN_MEAN - EARTH_INCLIN_AMPL * math.cos(
-        2 * math.pi * t / INCLIN_CYCLE
-    )
+# (Plan 07 R5/R9: calc_inclination(year) — Earth's inclination to the
+# invariable plane as the K device's H/3 cosine, I₀ − A·cos(2πt/T_I) — stood
+# here. Deleted with the device: the published i_inv is the one-source engine
+# reading (@essrt/physics model.earth.inclinationDeg; the simulator's
+# inclInvPlaneModel), which Python does not mirror.)
 
 
 def calc_ascending_node(year: int) -> float:
@@ -390,27 +382,10 @@ def calc_planet_perihelion_icrf(planet: str, year: int) -> float:
     return (peri0 + 360.0 * (year - J2000) / period) % 360
 
 
-def calc_planet_inclination(planet: str, year: int) -> float:
-    """
-    Calculate planet's inclination to the invariable plane (degrees).
-
-    Formula: i(t) = mean + sign × amplitude × cos(ω̃_ICRF(t) - phaseAngle)
-
-    The inclination oscillates with the ICRF perihelion longitude.
-    Saturn is anti-phase (sign = -1). Amplitude is derived from ψ/(d×√m).
-
-    Args:
-        planet: Planet name (e.g. 'Mercury')
-        year: Calendar year
-
-    Returns: Inclination in degrees
-    """
-    peri = calc_planet_perihelion_icrf(planet, year)
-    mean = INCL_MEAN[planet]
-    amp = INCL_AMP[planet]
-    phase = INCL_CYCLE_ANCHOR[planet]
-    sign = -1 if planet == 'Saturn' else 1
-    return mean + sign * amp * math.cos(math.radians(peri - phase))
+# (Plan 07 R5: calc_planet_inclination(planet, year) — the ψ law's
+# oscillation i(t) = mean + s·amp·cos(ϖ_ICRF(t) − anchor) — stood here.
+# Deleted with the law; a planet's inclination of date is the N-body chain's
+# (@essrt/physics model.planets.inclinationDeg), which Python does not mirror.)
 
 
 # Plan 07 R6: calc_planet_eccentricity stood here — the Python mirror of the
@@ -440,14 +415,11 @@ def calc_planet_obliquity(planet: str, year: int) -> float:
     """
     if planet == "Earth":
         return calc_obliquity(year)
-    cycle = OBLIQUITY_CYCLE.get(planet)
-    tilt_j2000 = AXIAL_TILT[planet]
-    if cycle is None:
-        return tilt_j2000
-    # Anchor to J2000 via inclination oscillation
-    incl_j2000 = calc_planet_inclination(planet, J2000)
-    incl_now = calc_planet_inclination(planet, year)
-    return tilt_j2000 + (incl_now - incl_j2000)
+    # The planets' obliquity cycles left with plan 06 Phase 7 commit 2 (the
+    # spin channel carries them); the ψ-law anchoring that followed here
+    # (tilt_J2000 + Δ inclination) left with the law at plan 07 R5. The J2000
+    # tilt is what this mirror can still state.
+    return AXIAL_TILT[planet]
 
 
 # =============================================================================
@@ -1555,16 +1527,15 @@ if __name__ == "__main__":
 
     # --- Section C: Earth — Orbital Elements ---
     print("\n--- Section C: Earth — Orbital Elements ---")
-    print(f"{'Year':>8} {'Perihelion':>12} {'ERD':>14} {'Obliquity':>12} {'Eccentricity':>14} {'Inclination':>12} {'Asc.Node':>10}")
-    print("-" * 88)
+    print(f"{'Year':>8} {'Perihelion':>12} {'ERD':>14} {'Obliquity':>12} {'Eccentricity':>14} {'Asc.Node':>10}")
+    print("-" * 76)
     for year in [2000, 2022, 2100]:
         peri = calc_earth_perihelion(year)
         erd = calc_erd(year)
         obliq = calc_obliquity(year)
         ecc = calc_eccentricity(year)
-        inclin = calc_inclination(year)
         asc_node = calc_ascending_node(year)
-        print(f"{year:>8} {peri:>12.4f}° {erd:>14.8f} {obliq:>12.4f}° {ecc:>14.6f} {inclin:>12.4f}° {asc_node:>8.4f}°")
+        print(f"{year:>8} {peri:>12.4f}° {erd:>14.8f} {obliq:>12.4f}° {ecc:>14.6f} {asc_node:>8.4f}°")
 
     # --- Section D: Planet perihelions ---
     print("\n--- Section D: Planet Perihelion Longitudes (2022) ---")
@@ -1613,23 +1584,15 @@ if __name__ == "__main__":
         incl = calc_inclination_precession(year)
         print(f"{year:>8} {ax:>16.2f} {peri:>16.2f} {incl:>18.2f}")
 
-    # --- Section D2: All Planets — Orbital Elements ---
-    print("\n--- Section D2: All Planets — Orbital Elements (2000) ---")
-    print(f"{'Planet':<10} {'Asc.Node':>10} {'Inclination':>12} {'Incl.Mean':>10} {'Eccentricity':>14} {'Ecc.Base':>12}")
-    print("-" * 72)
+    # --- Section D2: All Planets — Ascending nodes (the device's linear rate) ---
+    # (Plan 07 R5: the inclination and mean-inclination columns — the ψ law's
+    # outputs — left with the law.)
+    print("\n--- Section D2: All Planets — Ascending Node (2000) ---")
+    print(f"{'Planet':<10} {'Asc.Node':>10}")
+    print("-" * 22)
     from constants_scripts import PLANET_NAMES as _PN
     for planet in _PN:
         node = calc_planet_ascending_node(planet, 2000)
-        incl_val = calc_planet_inclination(planet, 2000)
-        mean_val = INCL_MEAN[planet]
-        print(f"  {planet:<10} {node:>8.4f}° {incl_val:>10.6f}° {mean_val:>10.6f}°")
-
-    print(f"\n{'Planet':<10} {'Year':>6} {'Asc.Node':>10} {'Inclination':>12} {'Eccentricity':>14}")
-    print("-" * 56)
-    for planet in ["Mercury", "Earth", "Jupiter", "Saturn"]:
-        for year in [2000, 5000, 10000, -5000]:
-            node = calc_planet_ascending_node(planet, year)
-            incl_val = calc_planet_inclination(planet, year)
-            print(f"  {planet:<10} {year:>6} {node:>8.4f}° {incl_val:>10.6f}°")
+        print(f"  {planet:<10} {node:>8.4f}°")
 
     print("\nSystem ready.")

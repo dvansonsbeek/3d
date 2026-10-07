@@ -1,6 +1,6 @@
 ---
 docVersion: 1.0
-modelVersion: v17.0
+modelVersion: v18.0
 coefficients: sha256:96f7a2194ea29f0e
 status: current
 ---
@@ -263,23 +263,21 @@ i_app = arccos(n_ecl · n_planet)
 
 **Implementation (`src/script.js`):**
 - Function: `updateDynamicInclinations()`
-- Two versions calculated:
-  - `o.{planet}EclipticInclinationDynamic` (J2000-verified nodes)
-  - `o.{planet}EclipticInclinationSouamiSouchayDynamic` (original S&S nodes)
+- One value per planet (plan 07 R5): `o.{planet}EclipticInclinationDynamic` — the chain's own orbit plane (`inclEclipticDeg`, `ascNodeEclipticDeg`) against the engine Earth-orbit normal of date (`_kcEarthEngineOrbitNormalJ2000`), both in the J2000 ecliptic frame. At J2000 it equals the chain's `inclEclipticDeg`; away from it, it is the mutual inclination of the two planes of date. (The former second version on the Souami & Souchay device nodes left with the device.)
 
 ### 3.3 Earth Inclination to the Invariable Plane
 
-Earth's orbital inclination to the invariable plane oscillates on the orbit's own apsidal period (the device law). (Axial tilt — obliquity — is a separate quantity; see `computeObliquityEarth()`.)
+Earth's inclination to the invariable plane is the **one-source engine reading** (plan 07 R5/R9): the engine's own Earth-orbit normal of date (the banked secular series inside ±10 Myr, the mode tail beyond) against the artifact's invariable plane — it matches La2010 at rms 0.003° over −500 kyr ([doc 05](05-invariable-plane-overview.md)). (Axial tilt — obliquity — is a separate quantity; see `computeObliquityEarth()`.)
 
 **Formula:**
 ```
-i = i_mean - A × cos(phase)
+i_inv = acos(n̂_Earth(t) · n̂_inv)
 ```
 
-**Range:** ~0.85° to ~2.12° (inclination to invariable plane)
+**Range:** ~0.85° to ~2.46° over the last 100 kyr (the device's `i_mean − A·cos(phase)` with its ~0.85°–2.12° range is retired; `docs/retired-record.md`)
 
 **Implementation:**
-- Function: `computeInclinationEarth()` in `src/script.js`
+- Function: `inclInvPlaneModel()` in `src/script.js`; `model.earth.inclinationDeg` in `@essrt/physics` (identical ops)
 - Related: `computeObliquityEarth()` for axial tilt
 
 ---
