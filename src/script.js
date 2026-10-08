@@ -24131,7 +24131,7 @@ function setupGUI() {
     const precColor = precYears >= 0 ? 'hsla(140, 65%, 55%, 1)' : 'hsla(0, 70%, 60%, 1)';
     const precSign = precYears >= 0 ? '+' : '\u2212';
     const detail = document.createElement('div');
-    detail.className = 'inv-detail';
+    detail.className = 'inv-detail inv-detail--pairs';   // four items, 2 \u00D7 2 (style.css)
     detail.style.display = 'none';
     detail.innerHTML =
       '<span class="inv-detail-item">' +
@@ -24147,6 +24147,13 @@ function setupGUI() {
       '<span class="inv-detail-item">' +
         '<span class="inv-detail-label">Prec.</span>' +
         '<span class="inv-detail-val" data-prec="1" style="color:' + precColor + '">' + precSign + Math.abs(precYears).toFixed(0) + ' yr</span>' +
+      '</span>' +
+      // Plan 07 §9k item 5 (owner-reviewed): the scene's of-date period above
+      // and the SECULAR period here are both shown, named — the second wraps
+      // to a line of its own (style.css .inv-detail flex-wrap).
+      '<span class="inv-detail-item">' +
+        '<span class="inv-detail-label">Secular (±1 kyr)</span>' +
+        '<span class="inv-detail-val" data-prec-sec="1" style="color:' + precColor + '">' + precSign + Math.abs(precYears).toFixed(0) + ' yr</span>' +
       '</span>';
     b._detailEl = detail;
     periDetailEls[geoKey] = {
@@ -24154,10 +24161,12 @@ function setupGUI() {
       bladeEl: b.element,
       ascEl: ascKey ? detail.querySelector('[data-key="' + ascKey + '"]') : null,
       argEl: detail.querySelector('[data-key="' + argKey + '"]'),
-      // P5/K5b: the Prec. cell goes DYNAMIC under the Keplerian flag (the
-      // secular apsidal period from the chain); the static divisor value
-      // above is the initial text and the flag-off display.
+      // P5/K5b: both cells go DYNAMIC under the Keplerian flag — Prec. is the
+      // SCENE's of-date period (the osculating perihelion the marker follows),
+      // Secular the series tier's; the static chain period above is the
+      // initial text and the flag-off display.
       precEl: detail.querySelector('[data-prec]'),
+      precSecEl: detail.querySelector('[data-prec-sec]'),
       planetKey: planetKey,
       ascKey: ascKey,
       argKey: argKey
@@ -47119,9 +47128,12 @@ const planetStats = {
        value : [ { v: () => '—' }],
        hover : [`The smaller modes of the table summed: base + companion + these account for 100 % of the summed mode amplitudes. Each turns at its own frequency, so no single rate applies to the group`],
        static: true},
+      {label : () => `├ Perihelion rate of date (scene, osculating, ±150 yr)`,
+       value : [ { v: () => 129600000 / _kcApsidalPeriodYearsScene('mercury', o.julianDay), dec:1, sep:',' },{ small: '″/100yr' }],
+       hover : _kcSceneRateHover},
       {label : () => `└ Perihelion rate of date (secular tier, ±1,000 yr)`,
        value : [ { v: () => 129600000 / _kcApsidalPeriodYears('mercury', o.julianDay), dec:1, sep:',' },{ small: '″/100yr' }],
-       hover : [`The secular apsidal rate at the current scene date: central difference of the series tier's ϖ over ±1,000 yr — the same evaluator and stencil as the Framework Verification "Perihelion precession" form, so the two read one number. Signed (negative = retrograde). The osculating apse jitters around this on the synodic lines (the chain's periodic layer), which a rate row must not quote as precession. The same quantity the tweakpane Prec row shows`]},
+       hover : [`The secular apsidal rate at the current scene date: central difference of the series tier's ϖ over ±1,000 yr — the same evaluator and stencil as the Framework Verification "Perihelion precession" form, so the two read one number. Signed (negative = retrograde). The row above shows what the scene's perihelion marker does NOW instead — the osculating apse, which for Jupiter and Saturn carries the Great-Inequality phase (Saturn regresses in the current centuries) and for the near-circular giants is the apse's jitter on the synodic lines`]},
     ],
     venus: [
     {header : '—  General Characteristics —' },
@@ -47419,9 +47431,12 @@ const planetStats = {
        value : [ { v: () => '—' }],
        hover : [`The smaller modes of the table summed: base + companion + these account for 100 % of the summed mode amplitudes. Each turns at its own frequency, so no single rate applies to the group`],
        static: true},
+      {label : () => `├ Perihelion rate of date (scene, osculating, ±150 yr)`,
+       value : [ { v: () => 129600000 / _kcApsidalPeriodYearsScene('venus', o.julianDay), dec:1, sep:',' },{ small: '″/100yr' }],
+       hover : _kcSceneRateHover},
       {label : () => `└ Perihelion rate of date (secular tier, ±1,000 yr)`,
        value : [ { v: () => 129600000 / _kcApsidalPeriodYears('venus', o.julianDay), dec:1, sep:',' },{ small: '″/100yr' }],
-       hover : [`The secular apsidal rate at the current scene date: central difference of the series tier's ϖ over ±1,000 yr — the same evaluator and stencil as the Framework Verification "Perihelion precession" form, so the two read one number. Signed (negative = retrograde). The osculating apse jitters around this on the synodic lines (the chain's periodic layer), which a rate row must not quote as precession. The same quantity the tweakpane Prec row shows`]},
+       hover : [`The secular apsidal rate at the current scene date: central difference of the series tier's ϖ over ±1,000 yr — the same evaluator and stencil as the Framework Verification "Perihelion precession" form, so the two read one number. Signed (negative = retrograde). The row above shows what the scene's perihelion marker does NOW instead — the osculating apse, which for Jupiter and Saturn carries the Great-Inequality phase (Saturn regresses in the current centuries) and for the near-circular giants is the apse's jitter on the synodic lines`]},
 
     ],
 
@@ -47733,9 +47748,12 @@ const planetStats = {
        value : [ { v: () => '—' }],
        hover : [`The smaller modes of the table summed: base + companion + these account for 100 % of the summed mode amplitudes. Each turns at its own frequency, so no single rate applies to the group`],
        static: true},
+      {label : () => `├ Perihelion rate of date (scene, osculating, ±150 yr)`,
+       value : [ { v: () => 129600000 / _kcApsidalPeriodYearsScene('mars', o.julianDay), dec:1, sep:',' },{ small: '″/100yr' }],
+       hover : _kcSceneRateHover},
       {label : () => `└ Perihelion rate of date (secular tier, ±1,000 yr)`,
        value : [ { v: () => 129600000 / _kcApsidalPeriodYears('mars', o.julianDay), dec:1, sep:',' },{ small: '″/100yr' }],
-       hover : [`The secular apsidal rate at the current scene date: central difference of the series tier's ϖ over ±1,000 yr — the same evaluator and stencil as the Framework Verification "Perihelion precession" form, so the two read one number. Signed (negative = retrograde). The osculating apse jitters around this on the synodic lines (the chain's periodic layer), which a rate row must not quote as precession. The same quantity the tweakpane Prec row shows`]},
+       hover : [`The secular apsidal rate at the current scene date: central difference of the series tier's ϖ over ±1,000 yr — the same evaluator and stencil as the Framework Verification "Perihelion precession" form, so the two read one number. Signed (negative = retrograde). The row above shows what the scene's perihelion marker does NOW instead — the osculating apse, which for Jupiter and Saturn carries the Great-Inequality phase (Saturn regresses in the current centuries) and for the near-circular giants is the apse's jitter on the synodic lines`]},
 
     ],
 
@@ -48042,9 +48060,12 @@ const planetStats = {
        value : [ { v: () => '—' }],
        hover : [`The smaller modes of the table summed: base + companion + these account for 100 % of the summed mode amplitudes. Each turns at its own frequency, so no single rate applies to the group`],
        static: true},
+      {label : () => `├ Perihelion rate of date (scene, osculating, ±150 yr)`,
+       value : [ { v: () => 129600000 / _kcApsidalPeriodYearsScene('jupiter', o.julianDay), dec:1, sep:',' },{ small: '″/100yr' }],
+       hover : _kcSceneRateHover},
       {label : () => `└ Perihelion rate of date (secular tier, ±1,000 yr)`,
        value : [ { v: () => 129600000 / _kcApsidalPeriodYears('jupiter', o.julianDay), dec:1, sep:',' },{ small: '″/100yr' }],
-       hover : [`The secular apsidal rate at the current scene date: central difference of the series tier's ϖ over ±1,000 yr — the same evaluator and stencil as the Framework Verification "Perihelion precession" form, so the two read one number. Signed (negative = retrograde). The osculating apse jitters around this on the synodic lines (the chain's periodic layer), which a rate row must not quote as precession. The same quantity the tweakpane Prec row shows`]},
+       hover : [`The secular apsidal rate at the current scene date: central difference of the series tier's ϖ over ±1,000 yr — the same evaluator and stencil as the Framework Verification "Perihelion precession" form, so the two read one number. Signed (negative = retrograde). The row above shows what the scene's perihelion marker does NOW instead — the osculating apse, which for Jupiter and Saturn carries the Great-Inequality phase (Saturn regresses in the current centuries) and for the near-circular giants is the apse's jitter on the synodic lines`]},
 
     ],
 
@@ -48352,9 +48373,12 @@ const planetStats = {
        value : [ { v: () => '—' }],
        hover : [`The smaller modes of the table summed: base + companion + these account for 100 % of the summed mode amplitudes. Each turns at its own frequency, so no single rate applies to the group`],
        static: true},
+      {label : () => `├ Perihelion rate of date (scene, osculating, ±150 yr)`,
+       value : [ { v: () => 129600000 / _kcApsidalPeriodYearsScene('saturn', o.julianDay), dec:1, sep:',' },{ small: '″/100yr' }],
+       hover : _kcSceneRateHover},
       {label : () => `└ Perihelion rate of date (secular tier, ±1,000 yr)`,
        value : [ { v: () => 129600000 / _kcApsidalPeriodYears('saturn', o.julianDay), dec:1, sep:',' },{ small: '″/100yr' }],
-       hover : [`The secular apsidal rate at the current scene date: central difference of the series tier's ϖ over ±1,000 yr — the same evaluator and stencil as the Framework Verification "Perihelion precession" form, so the two read one number. Signed (negative = retrograde). The osculating apse jitters around this on the synodic lines (the chain's periodic layer), which a rate row must not quote as precession. The same quantity the tweakpane Prec row shows`]},
+       hover : [`The secular apsidal rate at the current scene date: central difference of the series tier's ϖ over ±1,000 yr — the same evaluator and stencil as the Framework Verification "Perihelion precession" form, so the two read one number. Signed (negative = retrograde). The row above shows what the scene's perihelion marker does NOW instead — the osculating apse, which for Jupiter and Saturn carries the Great-Inequality phase (Saturn regresses in the current centuries) and for the near-circular giants is the apse's jitter on the synodic lines`]},
 
     ],
 
@@ -48662,9 +48686,12 @@ const planetStats = {
        value : [ { v: () => '—' }],
        hover : [`The smaller modes of the table summed: base + companion + these account for 100 % of the summed mode amplitudes. Each turns at its own frequency, so no single rate applies to the group`],
        static: true},
+      {label : () => `├ Perihelion rate of date (scene, osculating, ±150 yr)`,
+       value : [ { v: () => 129600000 / _kcApsidalPeriodYearsScene('uranus', o.julianDay), dec:1, sep:',' },{ small: '″/100yr' }],
+       hover : _kcSceneRateHover},
       {label : () => `└ Perihelion rate of date (secular tier, ±1,000 yr)`,
        value : [ { v: () => 129600000 / _kcApsidalPeriodYears('uranus', o.julianDay), dec:1, sep:',' },{ small: '″/100yr' }],
-       hover : [`The secular apsidal rate at the current scene date: central difference of the series tier's ϖ over ±1,000 yr — the same evaluator and stencil as the Framework Verification "Perihelion precession" form, so the two read one number. Signed (negative = retrograde). The osculating apse jitters around this on the synodic lines (the chain's periodic layer), which a rate row must not quote as precession. The same quantity the tweakpane Prec row shows`]},
+       hover : [`The secular apsidal rate at the current scene date: central difference of the series tier's ϖ over ±1,000 yr — the same evaluator and stencil as the Framework Verification "Perihelion precession" form, so the two read one number. Signed (negative = retrograde). The row above shows what the scene's perihelion marker does NOW instead — the osculating apse, which for Jupiter and Saturn carries the Great-Inequality phase (Saturn regresses in the current centuries) and for the near-circular giants is the apse's jitter on the synodic lines`]},
 
     ],
 
@@ -48972,9 +48999,12 @@ const planetStats = {
        value : [ { v: () => '—' }],
        hover : [`The smaller modes of the table summed: base + companion + these account for 100 % of the summed mode amplitudes. Each turns at its own frequency, so no single rate applies to the group`],
        static: true},
+      {label : () => `├ Perihelion rate of date (scene, osculating, ±150 yr)`,
+       value : [ { v: () => 129600000 / _kcApsidalPeriodYearsScene('neptune', o.julianDay), dec:1, sep:',' },{ small: '″/100yr' }],
+       hover : _kcSceneRateHover},
       {label : () => `└ Perihelion rate of date (secular tier, ±1,000 yr)`,
        value : [ { v: () => 129600000 / _kcApsidalPeriodYears('neptune', o.julianDay), dec:1, sep:',' },{ small: '″/100yr' }],
-       hover : [`The secular apsidal rate at the current scene date: central difference of the series tier's ϖ over ±1,000 yr — the same evaluator and stencil as the Framework Verification "Perihelion precession" form, so the two read one number. Signed (negative = retrograde). The osculating apse jitters around this on the synodic lines (the chain's periodic layer), which a rate row must not quote as precession. The same quantity the tweakpane Prec row shows`]},
+       hover : [`The secular apsidal rate at the current scene date: central difference of the series tier's ϖ over ±1,000 yr — the same evaluator and stencil as the Framework Verification "Perihelion precession" form, so the two read one number. Signed (negative = retrograde). The row above shows what the scene's perihelion marker does NOW instead — the osculating apse, which for Jupiter and Saturn carries the Great-Inequality phase (Saturn regresses in the current centuries) and for the near-circular giants is the apse's jitter on the synodic lines`]},
 
     ],
 };
@@ -50933,13 +50963,35 @@ const _KC_ANCHOR = new THREE.Vector3();   // scratch for the device origin
 // secular tier moved a few ″/cy per century. Signed: a negative period is a
 // retrograde apse (Venus's secular ϖ turns slowly; a near-zero rate is the
 // e → 0 polar singularity, not physics — the form's caption says the same).
+const _kcWrapPeriod = (d, D) => {
+  while (d > 180) d -= 360;
+  while (d < -180) d += 360;
+  return d === 0 ? Infinity : 360 * (2 * D) / d;
+};
+// The SCENE's apsidal period of date — the osculating perihelion the marker
+// follows: ±150-yr central difference of ϖ on the FULL chain, periodic terms
+// in. Kept beside the secular family (owner, plan 07 §9k item 5): for Saturn
+// and Jupiter it carries the Great-Inequality phase — Saturn's perihelion
+// really regresses in the current centuries (JPL 1900–2100: −1,577 ″/cy),
+// which the secular mean hides; for the near-circular giants it is the
+// osculating apse's jitter on the synodic lines (Neptune swings tens of
+// thousands of ″/cy century to century) and must be read as such — the
+// hovers say which. Earth: its one movement (the same as the secular row).
+function _kcSceneRateHover() {   // hoisted — the planet panels' row objects are built before this point in the file
+  return ['What the scene’s perihelion marker does NOW: central difference of ϖ over ±150 yr on the FULL chain, periodic terms included (the osculating apse). Signed — Saturn’s perihelion regresses in the current centuries because the Jupiter–Saturn great inequality is in that phase (JPL 1900–2100: −1,577 ″/cy), which the secular row below averages away. For the near-circular giants (Uranus, Neptune) this is the apse’s jitter on the synodic lines, tens of thousands of ″/cy swinging sign century to century — the polar coordinate near e → 0, not a precession; read the secular row for the precession.'];
+}
+function _kcApsidalPeriodYearsScene(nameLower, jd) {
+  if (nameLower === 'earth') return _kcApsidalPeriodYears('earth', jd);
+  const year = _engineYearTT(jd);
+  if (!_kcChains) _kcChains = buildPlanetChainsFromArtifactData(CHAIN_ARTIFACT);
+  const D = 150;
+  const w1 = kcComputePlanetElementsAtYear(year - D, _kcChains[nameLower], _kcChains).lonPeriEclipticDeg;
+  const w2 = kcComputePlanetElementsAtYear(year + D, _kcChains[nameLower], _kcChains).lonPeriEclipticDeg;
+  return _kcWrapPeriod(w2 - w1, D);
+}
 function _kcApsidalPeriodYears(nameLower, jd) {
   const year = _engineYearTT(jd);   // R9: the engine year (true TT), as _kcElementsOfDate
-  const wrapPeriod = (d, D) => {
-    while (d > 180) d -= 360;
-    while (d < -180) d += 360;
-    return d === 0 ? Infinity : 360 * (2 * D) / d;
-  };
+  const wrapPeriod = _kcWrapPeriod;
   if (nameLower === 'earth') {
     // EARTH rides the ONE movement (the scene's apsidal wheel turns with the
     // series' ϖ of date): the one family's anom/(anom − sid), ≡ 360°/its
@@ -53262,24 +53314,34 @@ function updatePlanetAnomalies() {
     if (dt) {
       if (dt.ascEl) dt.ascEl.textContent = (o[dt.ascKey] || 0).toFixed(2) + '\u00B0';
       if (dt.argEl) dt.argEl.textContent = (o[dt.argKey] || 0).toFixed(2) + '\u00B0';
-      // P5/K5b \u2014 the Prec. period is DYNAMIC under the flag: the SECULAR
-      // apsidal period of date (the series tier, \u00b11,000-yr stencil \u2014
-      // _kcApsidalPeriodYears, one family with the VFP form; signed). Earth
-      // included (option A, owner-ruled): in-window it reads \u2248 the H/3
-      // law (+111.5k vs +111,772 yr \u2014 the epoch-local tangent),
-      // wandering at deep time.
+      // P5/K5b + plan 07 \u00A79k item 5 (owner-reviewed) \u2014 two periods of
+      // date, both DYNAMIC under the flag and both named: Prec. is the SCENE's
+      // osculating apsidal period (\u00B1150-yr tangent on the full chain \u2014
+      // what the perihelion marker does now; Saturn regresses in the current
+      // centuries on the Great-Inequality phase), Secular the series tier's
+      // (\u00B11,000-yr stencil \u2014 _kcApsidalPeriodYears, one family with the
+      // VFP form). Earth: its one movement in both (option A, owner-ruled).
+      const _fmtT = (_T) => (_T >= 0 ? '+' : '\u2212') + (isFinite(_T) ? Math.abs(_T).toFixed(0) : '\u221E') + ' yr';
+      const _colT = (_T) => (_T >= 0 ? 'hsla(140, 65%, 55%, 1)' : 'hsla(0, 70%, 60%, 1)');
       if (dt.precEl) {
-        const _T = _kcApsidalPeriodYears(dt.planetKey, o.julianDay);
-        dt.precEl.textContent = (_T >= 0 ? '+' : '\u2212') + (isFinite(_T) ? Math.abs(_T).toFixed(0) : '\u221E') + ' yr';
-        dt.precEl.style.color = _T >= 0 ? 'hsla(140, 65%, 55%, 1)' : 'hsla(0, 70%, 60%, 1)';
-        // Hover: the rate convention + the STABLE dominant apsidal g-mode
-        // (owner-requested; the same pair the CYCLES Duration row carries).
-        // Set once \u2014 the chain globals are live here, never at UI build.
-        if (!dt.precTitleSet) {
-          const _s = _kcSecularShape(dt.planetKey);
-          dt.precEl.title = 'Secular tangent of date (\u00B11,000-yr central difference of the series tier\u2019s ecliptic \u03D6) \u2014 the same evaluator as the planetStats CYCLES \u201CPerihelion Precession Duration\u201D row and the Framework Verification \u201CPerihelion precession\u201D form (all three read identically and move together). Stable deep-time base: the dominant secular mode ' + _s.dom.g[0] + ', ' + Math.round(1296000 / _s.dom.arcsecPerYr).toLocaleString('en-US') + ' yr (nearest-Laskar name \u2014 a label, never an input).';
-          dt.precTitleSet = true;
-        }
+        const _T = _kcApsidalPeriodYearsScene(dt.planetKey, o.julianDay);
+        dt.precEl.textContent = _fmtT(_T);
+        dt.precEl.style.color = _colT(_T);
+      }
+      if (dt.precSecEl) {
+        const _Ts = _kcApsidalPeriodYears(dt.planetKey, o.julianDay);
+        dt.precSecEl.textContent = _fmtT(_Ts);
+        dt.precSecEl.style.color = _colT(_Ts);
+      }
+      // Hovers: the two conventions + the STABLE dominant apsidal g-mode
+      // (owner-requested; the same pair the CYCLES Duration row carries).
+      // Set once \u2014 the chain globals are live here, never at UI build.
+      if (!dt.precTitleSet && dt.precEl) {
+        const _s = _kcSecularShape(dt.planetKey);
+        const _base = ' Stable deep-time base: the dominant secular mode ' + _s.dom.g[0] + ', ' + Math.round(1296000 / _s.dom.arcsecPerYr).toLocaleString('en-US') + ' yr (nearest-Laskar name \u2014 a label, never an input).';
+        dt.precEl.title = 'The scene\u2019s apsidal period of date: \u00B1150-yr central difference of the chain\u2019s ecliptic \u03D6, periodic terms in \u2014 what the perihelion marker does now (the osculating apse; Saturn regresses in the current centuries on the Jupiter\u2013Saturn great inequality; for Uranus and Neptune this is the apse\u2019s jitter on the synodic lines near e \u2192 0, not a precession). Same as the planetStats CYCLES \u201Cscene, osculating\u201D row.' + _base;
+        if (dt.precSecEl) dt.precSecEl.title = 'The secular apsidal period of date: \u00B11,000-yr central difference of the series tier\u2019s ecliptic \u03D6 \u2014 the precession proper, the same evaluator as the planetStats CYCLES \u201CPerihelion Precession Duration\u201D row and the Framework Verification \u201CPerihelion precession\u201D form (all three read identically and move together).' + _base;
+        dt.precTitleSet = true;
       }
     }
   }

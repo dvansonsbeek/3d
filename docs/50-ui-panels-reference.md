@@ -187,7 +187,13 @@ Duration and angular-velocity rows read the SECULAR tier's tangent of date
 Framework Verification "Perihelion precession" form, one home; plan 07 §9k:
 the former ±150-yr full-chain window was the osculating apse's jitter for
 the giants, not a precession rate), with the dominant secular g-mode in
-hover; Earth's rows stay on its own one-family apsidal period; the Long-Period
+hover. The rate row comes in two named readings: "scene, osculating,
+±150 yr" — what the perihelion marker does NOW on the full chain, which for
+Jupiter and Saturn carries the Great-Inequality phase (Saturn's perihelion
+regresses in the current centuries, as JPL's 1900–2100 fit also reads) and
+for the near-circular giants is the apse's jitter on the synodic lines — and
+"secular tier, ±1,000 yr", the precession proper. Earth's rows stay on its
+own one-family apsidal period; the Long-Period
 Cycles section carries the axial row, the Eccentricity Cycle (the beat
 of the two largest modes), and the Obliquity Cycle, which survives only
 as an *observed* row (Mercury ~895 kyr Bills 2005; Mars ~125 kyr) —

@@ -517,6 +517,7 @@ canvas {
 /* Expandable detail row (asc. node + inclination side by side) */
 #gui .inv-detail {
   display: flex;
+  flex-wrap: wrap;   /* a fourth item (the secular apsidal period) wraps to a second line — the 350-px pane fits three on one */
   gap: 12px;
   padding: 2px 8px 4px;
   background: hsla(220, 25%, 12%, 0.4);
@@ -527,6 +528,13 @@ canvas {
   display: flex;
   gap: 4px;
   align-items: baseline;
+}
+/* The perihelion folder's four-item detail line reads 2 × 2 (owner, plan 07
+   §9k item 5): Asc. Node + Arg. Per. on the first line, the scene's Prec.
+   and the secular period side by side on the second. Half the row minus
+   half the 12-px gap. */
+#gui .inv-detail--pairs .inv-detail-item {
+  flex: 0 0 calc(50% - 6px);
 }
 #gui .inv-detail-label {
   font-family: 'Inter', sans-serif;
