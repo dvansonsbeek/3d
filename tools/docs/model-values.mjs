@@ -2474,12 +2474,13 @@ export const VALUES = {
     return out;
   })(),
 
-  // ── ICRF perihelion periods (11-2aa) ────────────────────────────────────
-  // Structural identity, verified against all eight site divisors: the ICRF
-  // perihelion rate is the ecliptic rate minus the H/13 axial frame term —
-  // in eighths-of-8H, n8_ICRF = n8_ecliptic − 104. Derives entirely from the
-  // stored perihelionEclipticFraction (Earth from its structural H/16
-  // effective period, n8 = 128 → 8H/24 = H/3); no new data.
+  // ── Inertial (ICRF) perihelion periods ──────────────────────────────────
+  // Plan 07: the planets' inertial perihelion period is the chain's secular
+  // apsidal mode, 1,296,000/|g| yr, read from the governed artifact — the
+  // same number every runtime's `perihelionEclipticYears` carries (R1).
+  // (The retired device derived these from `perihelionEclipticFraction` by
+  // the "n8_ICRF = n8_ecliptic − 104" frame identity; that construction and
+  // its inputs are gone — docs/retired-record.md.)
   ...(() => {
     // Plan 07: the planets' inertial (vs the stars) perihelion period is the
     // chain's secular mode, 1,296,000/|g| yr — the retired device's

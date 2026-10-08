@@ -31,7 +31,7 @@ const { H: holisticyearLength, planets } = require("../lib/constants");
 // ═══════════════════════════════════════════════════════════════════════════
 
 // Mercury's perihelion precession period (ecliptic frame) — from model-parameters.json
-const mercuryPerihelionEclipticYears = planets.mercury.perihelionEclipticYears;  // H × 8/11 ~ 243,867
+const mercuryPerihelionEclipticYears = planets.mercury.perihelionEclipticYears;  // the chain's 1,296,000/g₁ ≈ 232,437 (plan 07 R1; the lattice read 243,867)
 
 // Ecliptic precession rate: 129,600,000 / period_years arcsec/century
 // This is the formula used in script.js OrbitalFormulas.precessionRateFromPeriod()
@@ -129,8 +129,9 @@ console.log('        └── earthInclinationPrecession      ← 111,772 year 
 console.log('              └── earthEclipticPrecession   ← 67,063 year cycle');
 console.log('                    └── earthObliquityPrecession');
 console.log('                          └── earthPerihelionPrecession1');
-console.log('                                └── mercuryPerihelionDurationEcliptic1');
-console.log('                                      └── mercury');
+console.log('                                └── mercuryPerihelionFromEarth        ← (plan 07 R7: the apsidal wheels are gone; the chain places Mercury)');
+console.log('                                      └── mercuryRealPerihelionAtSun');
+console.log('                                            └── mercury');
 console.log('');
 
 console.log('═══════════════════════════════════════════════════════════════════════════');

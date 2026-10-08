@@ -980,16 +980,16 @@ function buildSceneGraph() {
     const pd = getPlanetSceneData(key);
     if (!pd) continue;
 
-    // Layer 1: PerihelionDurationEcliptic1
-    const eclip1 = makePrecessionNode(key + 'PerihelionDurationEcliptic1', {
-      orbitRadius: 0, orbitCentera: 0, orbitCenterb: 0, orbitCenterc: 0,
-      orbitTilta: 0, orbitTiltb: 0, tilt: 0,
-      startPos: 0,
-      speed: Math.PI * 2 / pd.perihelionEclipticYears,
-    });
-    barycenter.pivot.addChild(eclip1.container);
+    // Plan 07 R7 (Node half): the two apsidal wheels that bracketed this
+    // layer — `<p>PerihelionDurationEcliptic1/2`, counter-rotating at the
+    // device's perihelion period — are deleted, as the browser's were
+    // (3d 149b439d…82747168). They were dead for positions (the chain places
+    // the planets: computePlanetPosition = sun + 100·R·helio) and their last
+    // reader, the Type III EoC fitter, went with R6. The chain is now
+    // barycenter → PerihelionFromEarth → RealPerihelionAtSun → planet, the
+    // browser's exact wiring.
 
-    // Layer 2: PerihelionFromEarth
+    // Layer 1: PerihelionFromEarth
     const periFromE = makePrecessionNode(key + 'PerihelionFromEarth', {
       orbitRadius: 0,
       orbitCentera: pd.periFromEarthA, orbitCenterb: pd.periFromEarthB, orbitCenterc: 0,
@@ -997,18 +997,9 @@ function buildSceneGraph() {
       startPos: 0,
       speed: Math.PI * 2,
     });
-    eclip1.pivot.addChild(periFromE.container);
+    barycenter.pivot.addChild(periFromE.container);
 
-    // Layer 3: PerihelionDurationEcliptic2
-    const eclip2 = makePrecessionNode(key + 'PerihelionDurationEcliptic2', {
-      orbitRadius: 0, orbitCentera: 0, orbitCenterb: 0, orbitCenterc: 0,
-      orbitTilta: 0, orbitTiltb: 0, tilt: 0,
-      startPos: 0,
-      speed: -Math.PI * 2 / pd.perihelionEclipticYears,
-    });
-    periFromE.pivot.addChild(eclip2.container);
-
-    // Layer 4: RealPerihelionAtSun
+    // Layer 2: RealPerihelionAtSun
     // NOTE: Orbital plane tilt is applied at the PLANET container level (below the
     // annual rotation), not here. Placing it here causes the tilt's latitude effect
     // to oscillate annually in the tilted frame; at opposition dates (which recur at
@@ -1023,7 +1014,7 @@ function buildSceneGraph() {
       startPos: pd.realPeriStartPos,
       speed: pd.realPeriSpeed,
     });
-    eclip2.pivot.addChild(realPeri.container);
+    periFromE.pivot.addChild(realPeri.container);
 
     // Planet itself — orbital plane tilt applied here (below annual rotation)
     const planetDef = {
@@ -1068,7 +1059,7 @@ function buildSceneGraph() {
     realPeri.pivot.addChild(planetNodes.container);
 
     planetNodeMap[key] = {
-      eclip1, periFromE, eclip2, realPeri,
+      periFromE, realPeri,
       planet: planetNodes,
       sceneData: pd,
     };
@@ -1303,10 +1294,6 @@ function moveModel(graph, pos) {
   for (const nodes of moonLayers) animateObject(nodes, nodes.def);
   animateObject(graph.moonNodes, graph.moonNodes.def);
 
-  // Dynamic Earth ecliptic perihelion longitude (for geocentric elipticOrbit)
-  const earthPeriPrec1Angle = graph.earthPeriPrec1.orbit.ry;
-  const earthPeriEcl = ((earthPeriPrec1Angle + C.ASTRO_REFERENCE.earthPerihelionLongitudeJ2000 * d2r) % (2 * Math.PI) + 2 * Math.PI) % (2 * Math.PI);
-
   // The frame's JD (pos→jd round-trip through _epochCache.mSY) — the engine
   // frame placement below takes it.
   const currentJD = _jdFromPosTools(pos);
@@ -1314,25 +1301,14 @@ function moveModel(graph, pos) {
   // Planets
   for (const key of Object.keys(graph.planetNodeMap)) {
     const pm = graph.planetNodeMap[key];
-    animateObject(pm.eclip1, pm.eclip1.def);
     animateObject(pm.periFromE, pm.periFromE.def);
-    animateObject(pm.eclip2, pm.eclip2.def);
 
-    // Dynamic geocentric elipticOrbit for Type II + III planets
-    if (pm.sceneData && (pm.sceneData.p.type === 'III' || pm.sceneData.p.type === 'II')) {
-      const planetPrecAngle = pm.eclip1.orbit.ry;
-      const planetPeriEcl = ((planetPrecAngle + pm.sceneData.p.longitudePerihelion * d2r) % (2 * Math.PI) + 2 * Math.PI) % (2 * Math.PI);
-      const dw = earthPeriEcl - planetPeriEcl;
-      let eo = 2 * dynEcc.earth * 100 * Math.sin(dw);
-      if (key === 'saturn') eo = -eo;   // the scene's anti-phase convention (R8: the JSON flag is gone)
-      if (pm.sceneData.p.type === 'II') {
-        // Type II: Mars orbit center offset + half Earth geocentric correction
-        const eccDist = (dynEcc[key] || pm.sceneData.p.orbitalEccentricityJ2000) * pm.sceneData.d.orbitDistance * 100;
-        eo = eccDist / 2 - eo / 2;
-      }
-      pm.realPeri.pivot.px = eo;
-      pm.realPeri.rotAxis.px = eo;
-    }
+    // (Plan 07 R7, Node half: the "dynamic geocentric elipticOrbit" offset
+    // for Type II/III planets — the RealPerihelionAtSun pivot pushed by
+    // 2·e_E·sin(ϖ_E − ϖ_p) read off the deleted Ecliptic1 wheel — stood
+    // here. Its browser twin has been dead since R7 (nothing assigns
+    // `eclipticPrecLayer`, so that branch never runs); deleted with the
+    // wheel. Rendered-dead either way: positions are sun + 100·R·helio.)
 
     // (Plan 07 R5: the per-frame planet-container tilt — the device's
     // two-normal ecliptic inclination with the integrated ascending node —

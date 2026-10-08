@@ -450,39 +450,30 @@ RA/Dec override).
 
 ## Part 9: Outer Planet Hierarchy
 
-All planets from Mercury to Neptune (plus Pluto, Halley's Comet, and Eros) are **siblings** of the Sun under `barycenterEarthAndSun`, not children of the Sun.
+All seven planets, Mercury to Neptune, are **siblings** of the Sun under `barycenterEarthAndSun`, not children of the Sun. (Pluto, Halley's Comet and Eros left the scene with plan 07 — `docs/retired-record.md`.)
 
 ```
 barycenterEarthAndSun.pivotObj
 ├── sun.containerObj                                           ← sibling
 ├── earthPerihelionFromEarth.containerObj                      ← sibling
-├── [Planet]PerihelionDurationEcliptic1.containerObj            ← sibling (one per planet)
-│     └── [Planet]PerihelionFromEarth.containerObj
-│           └── [Planet]PerihelionDurationEcliptic2.containerObj    ← Reverse precession
-│                 ├── [Planet]RealPerihelionAtSun.containerObj
-│                 │     └── [planet].containerObj → orbitObj → [pivotObj, rotationAxis → planetObj]
-│                 └── [Planet]FixedPerihelionAtSun.containerObj     ← sibling
-├── [Next Planet]PerihelionDurationEcliptic1.containerObj       ← sibling
+├── [Planet]PerihelionFromEarth.containerObj                   ← sibling (one per planet)
+│     ├── [Planet]RealPerihelionAtSun.containerObj
+│     │     └── [planet].containerObj → orbitObj → [pivotObj, rotationAxis → planetObj]
+│     └── [Planet]FixedPerihelionAtSun.containerObj            ← sibling
+├── [Next Planet]PerihelionFromEarth.containerObj              ← sibling
 │     └── ...
 ```
 
 ### 9.1 Planet Perihelion Precession Pattern
 
-Each planet has a 4-layer precession structure with forward and reverse components (similar to Earth's perihelion layers).
-
-For current computed values, see [Constants Reference](20-constants-reference.md).
-
-| Planet | H Formula | Direction |
-|--------|-----------|-----------|
-| Mercury | H / (1+3/8) | Prograde |
-| Venus | −8Y / 6 | **Retrograde** |
-| Mars | 8Y / 36 | Prograde |
-| Jupiter | 8Y / 39 | Prograde |
-| Saturn | −8Y / 65 | **Retrograde** |
-| Uranus | H / 3 | Prograde |
-| Neptune | H × 2 | Prograde |
-
-**Note:** Negative values indicate retrograde precession (clockwise motion in the ecliptic frame).
+The two counter-rotating apsidal wheels that bracketed `PerihelionFromEarth`
+(`PerihelionDurationEcliptic1/2`, turning at the retired device's perihelion
+period) are deleted in both runtimes (plan 07 R7; the Node twin
+`tools/lib/scene-graph.js` mirrors this wiring). The remaining layers are scene
+scaffolding: since the K5 excision the planet meshes, the orbit rings and the
+perihelion markers are placed every frame from the N-body chain, and each
+planet's perihelion period is the chain's inertial apsidal period
+1,296,000/g — the values are in [Constants Reference](20-constants-reference.md).
 
 ---
 

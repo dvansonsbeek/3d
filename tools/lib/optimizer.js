@@ -698,14 +698,13 @@ function decomposeLayerPositions(target, jd) {
       makeEntry('sun.pivot', graph.sunNodes.pivot, earthWP),
     ];
   } else {
-    // Planet chain: barycenter → eclip1 → periFromE → eclip2 → realPeri → planet
+    // Planet chain: barycenter → periFromE → realPeri → planet (plan 07 R7:
+    // the two apsidal wheels that bracketed periFromE are deleted)
     const pm = graph.planetNodeMap[target];
     layers = [
       makeEntry('sun.pivot', graph.sunNodes.pivot, sunWP),
       makeEntry('barycenter.pivot', graph.barycenter.pivot, sunWP),
-      makeEntry('eclip1.pivot', pm.eclip1.pivot, sunWP),
       makeEntry('periFromE.pivot', pm.periFromE.pivot, sunWP),
-      makeEntry('eclip2.pivot', pm.eclip2.pivot, sunWP),
       makeEntry('realPeri.pivot', pm.realPeri.pivot, sunWP),
       makeEntry(target + '.pivot', pm.planet.pivot, sunWP),
       makeEntry('earth.rotAxis', graph.earthNodes.rotAxis, sunWP),
