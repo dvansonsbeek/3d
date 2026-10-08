@@ -425,10 +425,6 @@ export const VALUES = {
     render: (v) => thousands(v),
     note: 'Solar System Resonance Cycle, 8H',
   },
-  grandHolisticOctaveFormula: {
-    get: () => C.H,
-    render: (v) => `8 × ${thousands(v)}`,
-  },
   // S6 (plan 06): Earth's cycle periods are the model's OWN J2000 dynamical values, never fractions
   // of the fitted anchor — H/3, H/5, H/8, H/16 read +0.18 %, −2.5 %, +1.7 %, +0.10 % off them (the
   // same class as the H/13 case of S5). Key names kept (P4); the *Formula keys (consumed by the
@@ -484,13 +480,16 @@ export const VALUES = {
     unit: 'yr',
   },
   // Bare divisors and multiples of H, rounded to whole years.
-  ...Object.fromEntries([2, 3, 5, 8, 16, 21, 34].map((d) => [`hDiv${d}`, {
+  // (plan 07 sweep: `hDiv21`, `hDiv34`, `twoH`, `grandHolisticOctaveFormula`
+  // and the per-epoch `eightHAt*` rows are deleted — H-multiple keys of the
+  // retired lattice framing that nothing quoted.)
+  ...Object.fromEntries([2, 3, 5, 8, 16].map((d) => [`hDiv${d}`, {
     get: () => C.H / d,
     render: (v) => thousands(Math.round(v)),
     unit: 'yr',
     note: `H/${d}`,
   }])),
-  ...Object.fromEntries([['twoH', 2], ['threeH', 3], ['eightH', 8], ['thirteenH', 13]]
+  ...Object.fromEntries([['threeH', 3], ['eightH', 8], ['thirteenH', 13]]
     .map(([name, m]) => [name, {
       get: () => m * C.H,
       render: (v) => thousands(v),
@@ -894,21 +893,11 @@ export const VALUES = {
       render: (v) => Number(v).toFixed(5),
       note: 'JPL observed',
     }])),
-  earthEccBase: {
-    get: () => model.earth.eccentricityBase,
-    render: (v) => Number(v).toFixed(5),
-  },
-  earthEccVsJ2000: {
-    get: () => (model.earth.eccentricityBase / astro.earthOrbital.earthEccentricityJ2000 - 1) * 100,
-    render: (v) => fmtSignedPct(v, 1),
-    unit: '%',
-  },
-  earthEccJ2000VsBasePct: {
-    get: () => (astro.earthOrbital.earthEccentricityJ2000 / model.earth.eccentricityBase - 1) * 100,
-    render: (v) => Number(v).toFixed(1),
-    unit: '%',
-    note: 'how far the J2000 observation sits above the oscillation midpoint',
-  },
+  // (plan 07 sweep: `earthEccBase`, `earthEccVsJ2000`, `earthEccJ2000VsBasePct`
+  // — the era device's eccentricity-line midpoint and its J2000 offsets —
+  // are deleted; the published e(t) is the N-body series, and nothing
+  // quoted them. The clock stack's own `eccentricityBase` input stays
+  // documented under the calibration inputs.)
 
   // ── Per-planet inclinations and ascending nodes ─────────────────────────
   // InclEcl: the J2000 ecliptic inclination (composed constants).
@@ -967,22 +956,10 @@ export const VALUES = {
   // "pythagorean" on the site). Min/max are the envelope of the full series
   // over one H (10,000 samples, same as the website's _obliqEnvelope — the
   // series is H-periodic, so the phase origin cancels in the extrema).
-  pythagoreanMeanObliquity: {
-    get: () => C.SOLSTICE_OBLIQUITY_MEAN,
-    render: (v) => Number(v).toFixed(3),
-    unit: '°',
-  },
-  meanObliquityVsJ2000Diff: {
-    get: () => Math.abs(astro.earthOrbital.obliquityJ2000_deg - model.earth.earthtiltMean),
-    render: (v) => Number(v).toFixed(3),
-    unit: '°',
-  },
-  obliquityAmplitude: {
-    get: () => 2 * model.earth.earthInvPlaneInclinationAmplitude,
-    render: (v) => Number(v).toFixed(5),
-    unit: '°',
-    note: 'peak-to-peak of the inclination-driven component, 2A',
-  },
+  // (plan 07 sweep: `pythagoreanMeanObliquity`, `meanObliquityVsJ2000Diff`,
+  // `obliquityAmplitude`, `axialTiltMin/Max` — the device obliquity law's
+  // mean ± amplitude readings — are deleted; the published obliquity is the
+  // hybrid, and nothing quoted them.)
   ...(() => {
     const envelope = () => {
       const steps = 10000;
@@ -1014,16 +991,6 @@ export const VALUES = {
       },
     };
   })(),
-  axialTiltMin: {
-    get: () => model.earth.earthtiltMean - model.earth.earthInvPlaneInclinationAmplitude,
-    render: (v) => Number(v).toFixed(2),
-    unit: '°',
-  },
-  axialTiltMax: {
-    get: () => model.earth.earthtiltMean + model.earth.earthInvPlaneInclinationAmplitude,
-    render: (v) => Number(v).toFixed(2),
-    unit: '°',
-  },
 
   // ── Cycle timing (phase-dependent scans) ────────────────────────────────
   // These ask WHEN, not how much — extremum searches over the runtime
@@ -1033,7 +1000,7 @@ export const VALUES = {
   // one-source route puts the last maximum where the engine's Earth-orbit
   // normal does).
   ...(() => {
-    let obliqScan, inclScan;
+    let obliqScan;
     const nextObliqMin = () => {
       if (!obliqScan) {
         const f = oneEps;   // the published obliquity (the hybrid), plan 06 Phase 3 S3b
@@ -1046,31 +1013,12 @@ export const VALUES = {
       }
       return obliqScan;
     };
-    const lastInclMax = () => {
-      if (!inclScan) {
-        // Plan 07 R5/R9: the ONE published i_inv — the one-source engine
-        // Earth-orbit normal against the banked invariable plane (the package
-        // model's earth.inclinationDeg, ≡ the simulator's inclInvPlaneModel);
-        // the K device's H/3 cosine (orbital-engine computeInclinationEarth)
-        // that was scanned here is deleted.
-        const f = (y) => physModel().earth.inclinationDeg(y);
-        let mx = -Infinity, mxYr = 0;
-        for (let y = 2000; y >= -120000; y--) {
-          const i = f(y);
-          if (i > mx) { mx = i; mxYr = y; }
-        }
-        inclScan = { mx, mxYr };
-      }
-      return inclScan;
-    };
     return {
       obliquityNextMin: { get: () => nextObliqMin().mn, render: (v) => Number(v).toFixed(2), unit: '°' },
       obliquityNextMinYear: { get: () => nextObliqMin().mnYr, render: (v) => thousands(v) },
-      inclinationLastMaxYear: {
-        get: () => lastInclMax().mxYr,
-        render: (v) => (v < 0 ? `${thousands(-v)} BC` : thousands(v)),
-        note: 'most recent past maximum of Earth\'s invariable-plane inclination',
-      },
+      // (plan 07 sweep: `inclinationLastMaxYear` — the year of the one-source
+      // inclination's last maximum, a 122-kyr scan — is deleted; nothing
+      // quoted it.)
     };
   })(),
   // ── Precession family (11-2m) — the formerly deferred scan keys ─────────
@@ -1130,11 +1078,10 @@ export const VALUES = {
       axialPrecCycleMax:  { get: () => cycleScan().aMx, render: wholeYears, unit: 'yr' },
       periPrecCycleMin:   { get: () => cycleScan().pMn, render: wholeYears, unit: 'yr' },
       periPrecCycleMax:   { get: () => cycleScan().pMx, render: wholeYears, unit: 'yr' },
-      inclPrecCycleMin:   { get: () => cycleScan().iMn, render: wholeYears, unit: 'yr' },
-      inclPrecCycleMax:   { get: () => cycleScan().iMx, render: wholeYears, unit: 'yr' },
+      // (plan 07 sweep: `inclPrecCycleMin/Max` and `inclPrecJ2000` — the device
+      // inclination-precession period scan — are deleted; nothing quoted them.)
       axialPrecJ2000:     { get: () => precAt(2000).a, render: wholeYears, unit: 'yr', note: 'instantaneous J2000 axial precession period — the one-family route (B), the published family (plan 06 Phase 3 S2)' },
       periPrecJ2000:      { get: () => precAt(2000).p, render: wholeYears, unit: 'yr' },
-      inclPrecJ2000:      { get: () => precAt(2000).i, render: wholeYears, unit: 'yr' },
     };
   })(),
 
@@ -1260,11 +1207,6 @@ export const VALUES = {
     unit: '°',
     note: 'alias of earthInclAmplitude (both shipped by the website)',
   },
-  earthInclD: {
-    get: () => 3,
-    render: (v) => String(v),
-    note: 'H-lattice divisor of the retired H/3 inclination device (plan 07 R5/R9) — a record integer, not a law',
-  },
   earthInclMin: {
     get: () => C.earthInvPlaneInclinationMean - C.earthInvPlaneInclinationAmplitude,
     render: (v) => Number(v).toFixed(3),
@@ -1286,11 +1228,9 @@ export const VALUES = {
     unit: '°',
     note: 'Souami & Souchay invariable-plane ascending node',
   },
-  earthInclCycleAnchor: {
-    get: () => astro.earthOrbital.earthInclinationCycleAnchor,
-    render: (v) => Number(v).toFixed(2),
-    unit: '°',
-  },
+  // (plan 07 sweep: `earthInclCycleAnchor` (a duplicate of
+  // `inclinationCycleAnchorEarth`) and `earthInclD` (the retired H/3 divisor)
+  // are deleted; nothing quoted them.)
 
   // ── Year/day-length family (11-2p) — the unit-trap tier ─────────────────
   // Every quantity pinned to its exact browser twin. MEAN family: the
@@ -1320,7 +1260,6 @@ export const VALUES = {
       meanSolarYearDays:     { get: () => C.meanSolarYearDays, render: (v) => thousands(v, 7), unit: 'd' },
       meanSolarYearDaysFull: { get: () => C.meanSolarYearDays, render: (v) => thousands(v, 12), unit: 'd', note: 'full-precision form for derivation contexts' },
       inputSolarYearDays:    { get: () => model.foundational.inputmeanlengthsolaryearindays, render: (v) => String(v), unit: 'd', note: 'the mean-tropical-year INPUT parameter' },
-      daysPerPeriPrec:       { get: () => Math.round((C.H / 16) * C.meanSolarYearDays), render: (v) => thousands(v), note: 'days per perihelion-precession cycle, (H/16)·mSY' },
       // Plan 06 Phase 3 S2: the J2000 year lengths of date are the one-family route (B) — SI seconds, SI days.
       solarYearJ2000Days:    { get: () => oneYL().tropicalYearSecondsAtYear(2000) / 86400, render: (v) => thousands(v, 7), unit: 'd', note: 'the one-family tropical year of date at J2000, SI days (tweakpane predictions.solarYearDays)' },
       solarYearJ2000Seconds: { get: () => oneYL().tropicalYearSecondsAtYear(2000), render: (v) => thousands(v, 2), unit: 's', note: 'tweakpane predictions.solarYearSeconds — the one-family tropical year of date at J2000' },
@@ -1662,8 +1601,12 @@ export const VALUES = {
         unit: 's',
       },
       oneAU: { get: () => C.currentAUDistance, render: (v) => thousands(v, 6), unit: 'km', note: 'the model-derived AU' },
+      // (plan 07 sweep: `balancedYearBC`, `balancedYearOffset`,
+      // `anchorYearOffset` and `eccPrevMin` — the phase origin quoted as a
+      // date or a year count — are deleted; the site and the docs quote t₀ as
+      // a fitted phase. `balancedYear` stays as the code variable's value
+      // while `nextBalancedYear` / `systemResetYear*` still have readers.)
       balancedYear:     { get: () => C.balancedYear, render: (v) => thousands(v) },
-      balancedYearBC:   { get: () => Math.abs(C.balancedYear), render: (v) => thousands(v) + ' BC' },
       periAlignYear:    { get: () => C.perihelionalignmentYear, render: (v) => String(v), note: 'the device\'s phase anchor — Meeus\'s mean-element root of ϖ_of-date = 90° (1246.1); the model\'s own series crosses later: periAlignYearSeries' },
       // the model's OWN perihelion–solstice alignment: the year the published
       // (series) longitude of perihelion of date crosses 90° — 2.3 yr after the
@@ -1674,12 +1617,9 @@ export const VALUES = {
       periAlignJD:      { get: () => C.perihelionalignmentJD, render: (v) => thousands(v), unit: 'JD' },
       // (eccNextMax / eccNextMin / eccPrevMinBC — the single-line eccentricity
       // law's extreme epochs — are retired: the published e is the N-body series)
-      eccPrevMin:  { get: () => Math.round(Math.abs(C.perihelionalignmentYear - HDIV16() / 2)), render: (v) => thousands(v) },
       eccPrevMinJD: { get: () => C.perihelionalignmentJD - (HDIV16() * C.meanSolarYearDays / 2), render: (v) => thousands(v, 1), unit: 'JD' },
       nextBalancedYear: { get: () => C.balancedYear + C.H, render: (v) => thousands(v) },
       tempGraphMostLikely: { get: () => C.temperatureGraphMostLikely, render: (v) => String(v), note: 'temperature-graph phase pick (14.5 H/16 cycles)' },
-      balancedYearOffset: { get: () => Math.round(C.temperatureGraphMostLikely * HDIV16()), render: (v) => thousands(v), unit: 'yr' },
-      anchorYearOffset:   { get: () => Math.abs(C.balancedYear), render: (v) => thousands(v), unit: 'yr' },
       systemResetYearBC:  { get: () => Math.abs(C.balancedYear - 7 * C.H), render: (v) => thousands(v) + ' BC', note: 'balancedYear − 7H (the System Reset anchor)' },
       systemResetYearPlain: { get: () => Math.abs(C.balancedYear - 7 * C.H), render: (v) => thousands(v), note: 'systemResetYearBC without the BC suffix (for signed prose)' },
       preprintDoi: { get: () => versionInfo.preprintDoi, render: (v) => String(v), note: 'canonical preprint DOI — single source: model-version.json' },
@@ -1706,8 +1646,9 @@ export const VALUES = {
     const nApsidal = () => Math.round(8 * TOTAL_DAYS() / C.moonApsidalPrecessionDaysInputICRF) / 8;
     const nNodal = () => Math.round(8 * TOTAL_DAYS() / C.moonNodalPrecessionDaysInputICRF) / 8;
     return {
-      wobbleCenterKm:    { get: () => Math.round(model.earth.eccentricityAmplitude * C.currentAUDistance), render: (v) => thousands(v), unit: 'km', note: 'Law-4 A × model AU — the wobble-centre marker distance (the 1246 triangle closure); not an e(t) mechanism' },
-      perihelionPointKm: { get: () => Math.round(model.earth.eccentricityBase * C.currentAUDistance), render: (v) => thousands(v), unit: 'km', note: 'eccentricity base × model AU' },
+      // (plan 07 sweep: `wobbleCenterKm` and `perihelionPointKm` — the
+      // wobble-centre marker distances on the retired Law-4 amplitude and the
+      // eccentricity base — are deleted with the wobble centres (R6).)
       fullMoonCycleEarth:      { get: () => C.moonFullMoonCycleEarth, render: (v) => thousands(v, 2), unit: 'd', note: 'observed supermoon cycle' },
       fullMoonCycleEarthExact: { get: () => C.moonFullMoonCycleEarth, render: (v) => thousands(v, 10), unit: 'd' },
       draconicYearICRF:  { get: () => C.moonDraconicYearICRF, render: (v) => thousands(v, 10), unit: 'd', note: 'H/13-frame lattice partner' },
@@ -1812,17 +1753,14 @@ export const VALUES = {
   // per H/13 axial cycle.
   ...(() => {
     const APR = () => (180 * 3600) / Math.PI;
-    const apoRadius = () => model.earth.eccentricityAmplitude * C.currentAUDistance;
+    // (plan 07 sweep: the apo family — the wobble-circle radius, diameter,
+    // circumference and speeds on the Law-4 amplitude — is deleted with the
+    // wobble centres; nothing quoted it.)
     return {
       arcsecPerRadian:    { get: APR, render: (v) => thousands(v, 9), note: 'structural: 180·3600/π' },
       arcsecDisplacement: { get: () => astro.physicalConstants.arcsecDisplacementKm, render: (v) => thousands(v, 12), unit: 'km', note: '1-arcsec displacement at 1 AU — the historical parallax-chain primitive' },
       oneParsec:          { get: () => C.currentAUDistance * APR(), render: (v) => thousands(v, 1), unit: 'km' },
       solarParallax:      { get: () => astro.physicalConstants.solarParallaxArcsec, render: (v) => String(v), unit: '″', note: 'IAU 1976 defining constant' },
-      apoRadius:        { get: apoRadius, render: (v) => thousands(v, 2), unit: 'km' },
-      apoDiameter:      { get: () => 2 * apoRadius(), render: (v) => thousands(v, 2), unit: 'km' },
-      apoCircumference: { get: () => 2 * Math.PI * apoRadius(), render: (v) => thousands(v, 2), unit: 'km' },
-      apoSpeed:         { get: () => (2 * Math.PI * apoRadius()) / (oneYL().axialPrecessionYearsAtYear(2000) * 24 * 365.25), render: (v) => thousands(v, 10), unit: 'km/h', note: 'wobble-circle speed over one axial precession period at J2000 (Julian-year hours; S5: the of-date period, not H/13)' },
-      apoSpeedKmYear:   { get: () => (2 * Math.PI * apoRadius()) / oneYL().axialPrecessionYearsAtYear(2000), render: (v) => thousands(v, 0), unit: 'km/yr' },
     };
   })(),
 
@@ -1835,21 +1773,17 @@ export const VALUES = {
   // knownValues; the invariable plane's own ecliptic node joins the Souami
   // block.
   ...(() => {
-    const ipoRadius = () => model.earth.eccentricityBase * C.currentAUDistance;
+    // (plan 07 sweep: the ipo family — the perihelion-point circle on the
+    // retired eccentricity base and the H/3 inclination cycle — is deleted;
+    // nothing quoted it. `psiFormula` / `psiDecimal` go with it; `psiValue`
+    // stays as the frozen record.)
     return {
-      ipoRadius:        { get: ipoRadius, render: (v) => thousands(v, 2), unit: 'km' },
-      ipoDiameter:      { get: () => 2 * ipoRadius(), render: (v) => thousands(v, 2), unit: 'km' },
-      ipoCircumference: { get: () => 2 * Math.PI * ipoRadius(), render: (v) => thousands(v, 2), unit: 'km' },
-      ipoSpeed:         { get: () => (2 * Math.PI * ipoRadius()) / ((C.H / 3) * 24 * 365.25), render: (v) => thousands(v, 10), unit: 'km/h', note: 'perihelion-point speed over the H/3 inclination cycle' },
-      ipoSpeedKmYear:   { get: () => (2 * Math.PI * ipoRadius()) / (C.H / 3), render: (v) => thousands(v, 0), unit: 'km/yr' },
       // Plan 07 R5: ψ was inverted from Earth's calibration at load
       // (3·A_earth·√(m_E/m_☉)); the inclination law is retired, so there is
       // nothing live to read. FROZEN here as the retired construction's
       // recorded constant, exactly as kValue below — docs 20 and 72 cite it
       // as the historical Law-2/3 ψ. See docs/retired-record.md.
-      psiFormula: { get: () => 'd_E × amp_E × √m_E (from Earth)', render: (v) => String(v), note: 'structural formula label (Law 3) — RETIRED (plan 07 R5)' },
       psiValue:   { get: () => 0.0033070432499942154, render: (v) => `${(v * 1e3).toFixed(4)} × 10⁻³`, note: 'ψ — RETIRED (plan 07 R5); the recorded value of the retired construction, no longer derived' },
-      psiDecimal: { get: () => 0.0033070432499942154, render: (v) => Number(v).toFixed(6), note: 'ψ — RETIRED (plan 07 R5); the recorded value, no longer derived' },
       // Plan 07 R6: K was inverted from Earth's calibration at load; the law
       // is retired, so there is nothing live to read. The value is FROZEN
       // here as the retired construction's recorded constant — docs 20 and 72
@@ -2514,7 +2448,7 @@ export const VALUES = {
   // a = (T_planet / mSY)^(2/3), T from the tracked per-planet solarYearInput
   // (the model's quantized orbital period in days); Earth 1.0 by definition.
   ...(() => {
-    const out = { earthSemiMajor: { get: () => 1, render: (v) => Number(v).toFixed(4), unit: 'AU', note: 'by definition' } };
+    const out = {};   // (plan 07 sweep: `earthSemiMajor` = 1 by definition is gone; nothing quoted it)
     for (const planet of ['mercury', 'venus', 'mars', 'jupiter', 'saturn', 'uranus', 'neptune']) {
       out[`${planet}SemiMajor`] = {
         get: () => Math.pow(C.planets[planet].solarYearInput / C.meanSolarYearDays, 2 / 3),
@@ -2563,12 +2497,9 @@ export const VALUES = {
   // loudly if H ever changes.
   ...(() => {
     const pl = () => model.additionalBodies.pluto;
-    const inclOf = (planet) => (planet === 'pluto'
-      ? { mean: pl().invPlaneInclinationMean, amp: pl().invPlaneInclinationAmplitude }
-      : { mean: chainInclStats(planet).mean, amp: chainInclStats(planet).half });   // plan 07: the chain's series range
+    const inclOf = (planet) => ({ mean: chainInclStats(planet).mean, amp: chainInclStats(planet).half });   // plan 07: the chain's series range
     const j2000Of = (planet) => {
       if (planet === 'earth') return astro.earthOrbital.earthInclinationJ2000_deg;
-      if (planet === 'pluto') return astro.additionalBodiesReference.pluto.invPlaneInclinationJ2000;
       return astro.planetOrbitalElements[planet].invPlaneInclinationJ2000;
     };
     const out = {
@@ -2591,11 +2522,13 @@ export const VALUES = {
         note: 'derived prime factorization of H — the ΔT-stack gcd rules ride on these primes',
       },
     };
-    for (const planet of ['mercury', 'venus', 'mars', 'jupiter', 'saturn', 'uranus', 'neptune', 'pluto']) {
+    // (plan 07 sweep: Pluto's rows — a device mean ± amplitude for a body the
+    // scene no longer carries — are out of both loops; nothing quoted them.)
+    for (const planet of ['mercury', 'venus', 'mars', 'jupiter', 'saturn', 'uranus', 'neptune']) {
       out[`${planet}InclMin`] = { get: () => inclOf(planet).mean - inclOf(planet).amp, render: (v) => Number(v).toFixed(2), unit: '°' };
       out[`${planet}InclMax`] = { get: () => inclOf(planet).mean + inclOf(planet).amp, render: (v) => Number(v).toFixed(2), unit: '°' };
     }
-    for (const planet of ['mercury', 'venus', 'earth', 'mars', 'jupiter', 'saturn', 'uranus', 'neptune', 'pluto']) {
+    for (const planet of ['mercury', 'venus', 'earth', 'mars', 'jupiter', 'saturn', 'uranus', 'neptune']) {
       out[`${planet}InclJ2000Round`] = { get: () => j2000Of(planet), render: (v) => Number(v).toFixed(3), unit: '°' };
     }
     return out;
@@ -2641,7 +2574,6 @@ export const VALUES = {
     const mercuryFluctuation2000 = () => predictiveMachinery().fluct(2000, 'mercury');
     const kv = () => astro.knownValues;
     return {
-      ascNodeJointRms: { get: () => kv().ascNodeJointRmsArcsec, render: (v) => String(v), unit: '″', note: 'asc-node fit run RMS — recorded snapshot, fitter prints it live' },
       mercuryNewtonian:    { get: () => kv().mercuryNewtonianArcsecCy, render: (v) => thousands(v), unit: '″/cy', note: 'textbook Newtonian rate — citation' },
       mercuryObservedICRF: { get: () => kv().mercuryObservedICRFArcsecCy, render: (v) => thousands(v), unit: '″/cy', note: 'textbook 532 + 43 chain' },
       mercuryPark2017Rate: { get: () => kv().mercuryPark2017RateArcsecCy, render: (v) => String(v), unit: '″/cy', note: 'Park 2017 MESSENGER-era determination' },
@@ -2722,19 +2654,14 @@ export const VALUES = {
       return scans;
     };
     const fmtSignedInt = (v) => `${v >= 0 ? '+' : '-'}${thousands(Math.abs(Math.round(v)))}`;
-    const fmtSigned2 = (v) => `${v >= 0 ? '+' : '-'}${thousands(Math.abs(v), 2)}`;
-    const mercBaseline = () => 1296000 / ((C.H * 8) / 11) * 100;
     const out = {
       mercuryOscillationPeriod: { get: () => Math.round(C.H / 45), render: (v) => thousands(v), unit: 'yr', note: 'H/45 — beat of H/3 and H/5' },
       equinoxDriftRate: { get: () => astro.knownValues.generalPrecessionArcsecCy, render: (v) => thousands(v, 1), unit: '″/cy', note: 'IAU general precession — citation' },
       mercuryFluctuationMin: { get: () => scan().mercury.mn, render: fmtSignedInt, unit: '″/cy' },
       mercuryFluctuationMax: { get: () => scan().mercury.mx, render: fmtSignedInt, unit: '″/cy' },
-      mercuryFluctuationMinYear: { get: () => scan().mercury.mnY, render: (v) => thousands(v) },
-      mercuryFluctuationMaxYear: { get: () => scan().mercury.mxY, render: (v) => thousands(v) },
-      mercuryFluctuationMinPrecise: { get: () => scan().mercury.mn, render: fmtSigned2, unit: '″/cy' },
-      mercuryFluctuationMaxPrecise: { get: () => scan().mercury.mx, render: fmtSigned2, unit: '″/cy' },
-      mercuryHelioAtMin: { get: () => mercBaseline() + scan().mercury.mn, render: (v) => thousands(v, 2), unit: '″/cy' },
-      mercuryHelioAtMax: { get: () => mercBaseline() + scan().mercury.mx, render: (v) => thousands(v, 2), unit: '″/cy' },
+      // (plan 07 sweep: the Mercury extremum rows — `mercuryFluctuationMin/MaxYear`,
+      // `…Min/MaxPrecise`, `mercuryHelioAtMin/Max` on the lattice baseline
+      // 8H/11 — are deleted; nothing quoted them.)
       earthFluctuationMin: { get: () => scan().earth.mn, render: fmtSignedInt, unit: '″/cy', note: 'Earth Rate Deviation × 360,000' },
       earthFluctuationMax: { get: () => scan().earth.mx, render: fmtSignedInt, unit: '″/cy' },
     };
@@ -2842,8 +2769,9 @@ export const VALUES = {
       out[`${p}PeriRaSlopeJ2000`] = { get: () => raSlope(lamA(), epsJ2000()), render: (v) => Number(v).toFixed(5), note: 'dα/dλ at the chain’s J2000 perihelion longitude, IAU 2006 obliquity (plan 07; was the IAU J2000 input)' };
       out[`${p}PeriRateRaProjectedJ2000`] = { get: () => eclRate(p) * raSlope(lamA(), epsJ2000()), render: (v) => thousands(v, 2), unit: '″/cy' };
       out[`${p}PeriProjectionExcessJ2000`] = { get: () => eclRate(p) * (raSlope(lamA(), epsJ2000()) - 1), render: (v) => thousands(v, 2), unit: '″/cy', note: 'reading A: the projected rate minus the ecliptic rate' };
-      out[`${p}PeriRaSlopeMarkerJ2000`] = { get: () => raSlope(lamB(), epsJ2000()), render: (v) => Number(v).toFixed(5), note: 'reading B: at the scene marker longitude (IAU λ + angleCorrection)' };
-      out[`${p}PeriProjectionExcessMarkerJ2000`] = { get: () => eclRate(p) * (raSlope(lamB(), epsJ2000()) - 1), render: (v) => thousands(v, 2), unit: '″/cy' };
+      // (plan 07 sweep: the "reading B at the scene marker" pair,
+      // `<p>PeriRaSlopeMarkerJ2000` / `<p>PeriProjectionExcessMarkerJ2000`,
+      // is deleted — no doc, page or paper quoted them.)
       out[`${p}PeriObliquityRateTermJ2000`] = { get: () => eclRate(p) === 0 ? 0 : dAlphaDeps(lamB(), epsJ2000()) * epsRateArcsecCy(), render: (v) => thousands(v, 2), unit: '″/cy', note: '∂α/∂ε · ε̇ at J2000 (shipped obliquity law, ±50 yr)' };
       out[`${p}PeriRateEarthFrameMeasuredJ2000`] = { get: () => pm().totalPrecession(2000, p), render: (v) => thousands(v, 2), unit: '″/cy', note: 'the export/predict Earth-frame rate (RA) at J2000' };
       out[`${p}PeriAnomalyGrArcsecCy`] = { get: () => grAdvance(p), render: (v) => Number(v).toFixed(2), unit: '″/cy', note: 'general-relativistic advance from the model constants (GM_SUN, c, a from the period, e)' };
@@ -3145,18 +3073,17 @@ export const VALUES = {
   // 8H cycle counts from the engine (Earth = −H/5, the ecliptic precession).
   ...(() => {
     const planets7 = ['mercury', 'venus', 'mars', 'jupiter', 'saturn', 'uranus', 'neptune'];
-    const out = {
-      earthEccPhaseJ2000: { get: () => astro.earthOrbital.earthPerihelionLongitudeJ2000 + 90, render: (v) => Number(v).toFixed(2), unit: '°', note: 'perihelion longitude + 90° — the e_E-line phase convention' },
-      earthAscNodePeriod: { get: () => -C.H / 5, render: (v) => thousands(Math.round(v)), unit: 'yr', note: '−H/5, the ecliptic precession' },
-      earthAscNodeN: { get: () => Math.round(-8 * C.H / (-C.H / 5)), render: (v) => String(v) },
-    };
+    // (plan 07 sweep: `earthEccPhaseJ2000`, `earthAscNodePeriod` (−H/5),
+    // `earthAscNodeN` and the per-planet `<p>AscNodePeriod` / `<p>AscNodeN`
+    // (the device's 8H/N node cycles) are deleted — retired framing with no
+    // reader; the nodes of date are the chain's, `<p>AscNodeCycleYears` is
+    // the inertial 1,296,000/|s|.)
+    const out = {};
     for (const p of planets7) {
       out[`${p}EccCycle`] = { get: () => C.planets[p].wobblePeriod, render: (v) => thousands(Math.round(v)), unit: 'yr', note: 'since Phase 7 commit 2 the chain\'s OWN g-mode beat (dominant mode × largest companion of the eccentricity vector — the panel\'s "Eccentricity Cycle (g-mode beat)" row), the period the K law rides; the device beat of its integer fractions is retired' };
       // (plan 07 R6: `<p>EccPhaseJ2000` was the K law's J2000 phase angle,
       // 360·t2000/wobble + 90° (270° anti-phase). It goes with the law —
       // no consumer, and the chain's eccentricity has no single phase.)
-      out[`${p}AscNodePeriod`] = { get: () => C.planets[p].ascendingNodePeriod, render: (v) => thousands(Math.round(v)), unit: 'yr' };
-      out[`${p}AscNodeN`] = { get: () => Math.round(-8 * C.H / C.planets[p].ascendingNodePeriod), render: (v) => String(v) };
     }
     return out;
   })(),
@@ -3257,7 +3184,6 @@ export const VALUES = {
     for (const [key, tOf] of Object.entries(epochs)) {
       out[`hAt${key}`] = { get: () => dtl().meanHAtAge(tOf()), render: (v) => thousands(Math.round(v)), unit: 'yr' };
       out[`lodAt${key}Hr`] = { get: () => dtl().meanLodSecondsAtAge(tOf()) / 3600, render: (v) => Number(v).toFixed(2), unit: 'hr' };
-      out[`eightHAt${key}`] = { get: () => 8 * dtl().meanHAtAge(tOf()) / 1e6, render: (v) => Number(v).toFixed(3), unit: 'Myr' };
       out[`moonDistanceAt${key}`] = { get: () => rawMoonKm(tOf()), render: (v) => thousands(Math.round(v)), unit: 'km' };
       out[`axialPrecAt${key}`] = { get: () => dtl().meanLunisolarPrecessionPeriodYearsAtAge(tOf()), render: (v) => thousands(Math.round(v)), unit: 'yr', note: 'the composed lunisolar precession period at this epoch (S5; was H(t)/13, 0.086 % slow)' };
       if (key !== '200MyrFuture') {

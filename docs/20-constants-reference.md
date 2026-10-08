@@ -122,9 +122,12 @@ The correction combs' divisors and the era clock's counters are devices
 of the fitted machinery — bounded harmonic bases on the anchor's unit (plan
 06 P3) — not degrees of freedom and not laws; what the three pre-registered
 falsification legs test is the physics: the composed precession clock, the
-obliquity beat, the two-expansions μ-consistency. The balanced year
-(−<!--v:anchorYearOffset-->302,635<!--/v-->) stays derived from the anchor
-+ 1246 AD. Earth's eccentricity is not a parameter: e(J2000) is an observed
+obliquity beat, the two-expansions μ-consistency. The correction bases'
+phase origin t₀ is a fitted convention, not a date — exact arithmetic from
+the anchor unit and the 1246 AD alignment, the beat count chosen so the
+bases reproduce the J2000 values (plan 07 §3c/§3d: no calendar year is
+quoted for it; the perihelion-of-date period it is counted in is itself a
+function of epoch). Earth's eccentricity is not a parameter: e(J2000) is an observed
 calibration input, and the eccentricity law's mean is derived from it and
 the shared anchor.
 
@@ -283,7 +286,7 @@ These are computed from foundational constants. The formula is the definition; t
 | Mean Length of Day | `meanLengthOfDay` | meanSiderealYearSeconds / meanSiderealYearDays | ~86,400.0 s |
 | Mean Sidereal Day | `meanSiderealDay` | (meanSolarYearDays/(meanSolarYearDays+1)) × meanLengthOfDay | <!--v:meanSiderealDaySeconds-->86,164.0902182<!--/v--> s |
 | Mean Stellar Day | `meanStellarDay` | (meanSiderealDay/T_p) / (meanSolarYearDays+1) · cos ε + meanSiderealDay — T_p the certified J2000 precession period, not the counter H/13 | <!--v:meanStellarDaySeconds-->86,164.0985929<!--/v--> s |
-| Balanced Year | `balancedYear` | perihelionalignmentYear - (14.5 × H/16) | <!--v:balancedYear-->-302,635<!--/v--> |
+| Phase origin t₀ of the correction bases | `balancedYear` | perihelionalignmentYear - (14.5 × H/16) | a fitted phase, not a date (the code carries it as a year number; plan 07 §3c) |
 | Perihelion Alignment JD | `perihelionalignmentJD` | startmodelJD - meanSolarYearDays × (startModelYearWithCorrection - perihelionalignmentYear) | ~<!--v:periAlignJD-->2,176,153<!--/v--> |
 | Perihelion Cycle Length | `perihelionCycleLength` | H / 16 | <!--v:periPrecYears-->~20,938<!--/v--> years |
 | Total Days in H | `totalDaysInH` | H × meanSolarYearDays | ~<!--v:totalDaysInH-->122,471,920<!--/v--> days |
@@ -291,7 +294,7 @@ These are computed from foundational constants. The formula is the definition; t
 | Julian century | `julianCenturyDays` | 36525 (100 × 365.25) | 36,525 days (IAU Julian century) |
 | Earth rotations/year | `meanEarthRotationsPerYear` | meanSolarYearDays + 1 | 366.2422 |
 | Start year corrected | `startModelYearWithCorrection` | startmodelYear + correctionDays / meanSolarYearDays | ~2000.4977 |
-| Years balanced→J2000 | `yearsFromBalancedToJ2000` | (startmodelJD - balancedJD) / meanSolarYearDays | ~<!--v:anchorYearOffset-->302,635<!--/v--> |
+| Years from t₀ to J2000 | `yearsFromBalancedToJ2000` | (startmodelJD - balancedJD) / meanSolarYearDays | 14.5 perihelion-of-date beats (a phase span, not quoted as a year count) |
 
 Input constants used in the formulas above:
 
@@ -834,26 +837,11 @@ These values result from the retired optimization campaign; the campaign write-u
 
 Stored in `astro-reference.json`. These start from the JPL solar-year periods and carry small pipeline refinements (see [doc 68](68-orbital-period-calibration.md)).
 
-## Planet Orbital Eccentricities (Base)
+## Planet Orbital Eccentricities (Base) — RETIRED (plan 07 R6)
 
-Base eccentricities represent the long-term oscillation midpoint. They are derived at runtime from the balanced-year phase (same principle as Earth). The eccentricity balance (Law 5) emerges naturally at ~99.9%.
+The base-eccentricity construction (the System-Reset midpoint from the balanced-year phase) was the K law's; it is deleted with the law. A planet's eccentricity of date has one home, the N-body chain ([Constants: Planet J2000 Orbital Elements](#planet-j2000-orbital-elements) carries the observed J2000 values the chains are anchored on). Record: [retired record](retired-record.md).
 
-Note: these values are computed at runtime by constants.js — not stored in JSON.
-
-## Planet Eccentricity Amplitudes & Coupling Constant
-
-Eccentricity oscillation amplitudes from the tilt formula: `e_amp = K × sin(tilt) × √d / (√m × a^(3/2))` — the retired Law-4 construction; these constants survive only in the legacy scene scaffolding (device anchors, the no-chain bodies). The derivation doc (36) is archived — see [the retired record](retired-record.md).
-
-| Constant | Formula | Value | Description |
-|----------|---------|-------|-------------|
-| K | e_amp × √m × a^1.5 / (sin(tiltMean) × √d) | <!--v:kValue-->3.4143 × 10⁻⁶<!--/v--> | Universal eccentricity amplitude constant (from Earth) |
-
-All 8 planet amplitudes are derived at runtime from K using model mean obliquity:
-`e_amp = K × sin(meanObliquity) × √d / (√m × a^1.5)`. See [The Closed Loop](72-the-closed-loop.md).
-
-## Planet Eccentricity Phase Constants (J2000)
-
-Phase angles for the planets' eccentricity oscillations are derived at runtime from the balanced-year phase: `phase = (2000 - balancedYear) / wobblePeriod × 360°`. Earth is not in this family: its published e(t) is the N-body series (the one-source movement; the lunar chain reads the ±10-Myr mode table anchored at J2000), so nothing solves an Earth eccentricity phase. The phases are not stored in JSON — they are computed by constants.js and script.js.
+With it went the Law-4 amplitude construction `e_amp = K × sin(tilt) × √d / (√m × a^(3/2))` and the planets' eccentricity phase constants on the balanced-year phase — nothing in the shipped code derives them any more. The recorded K value stays frozen in the [ψ/K section](#universal-coupling-constant-ψ) above (plan 07: `kValue` is a record, not a derivation).
 
 ## Per-Planet EoC Fractions (legacy scaffolding since the K5 excision)
 
