@@ -1601,12 +1601,13 @@ export const VALUES = {
         unit: 's',
       },
       oneAU: { get: () => C.currentAUDistance, render: (v) => thousands(v, 6), unit: 'km', note: 'the model-derived AU' },
-      // (plan 07 sweep: `balancedYearBC`, `balancedYearOffset`,
-      // `anchorYearOffset` and `eccPrevMin` — the phase origin quoted as a
-      // date or a year count — are deleted; the site and the docs quote t₀ as
-      // a fitted phase. `balancedYear` stays as the code variable's value
-      // while `nextBalancedYear` / `systemResetYear*` still have readers.)
-      balancedYear:     { get: () => C.balancedYear, render: (v) => thousands(v) },
+      // (plan 07 sweep: `balancedYear`, `balancedYearBC`, `balancedYearOffset`,
+      // `anchorYearOffset`, `eccPrevMin`, `nextBalancedYear` and
+      // `systemResetYearBC/Plain` — the phase origin and its multiples quoted
+      // as dates or year counts — are deleted; every surface quotes t₀ as a
+      // fitted phase (§3c/§3d). The code variable C.balancedYear stays, as the
+      // combs' phase origin; `periAlignYear*` and `tempGraphMostLikely` are
+      // its disclosed inputs.)
       periAlignYear:    { get: () => C.perihelionalignmentYear, render: (v) => String(v), note: 'the device\'s phase anchor — Meeus\'s mean-element root of ϖ_of-date = 90° (1246.1); the model\'s own series crosses later: periAlignYearSeries' },
       // the model's OWN perihelion–solstice alignment: the year the published
       // (series) longitude of perihelion of date crosses 90° — 2.3 yr after the
@@ -1618,10 +1619,7 @@ export const VALUES = {
       // (eccNextMax / eccNextMin / eccPrevMinBC — the single-line eccentricity
       // law's extreme epochs — are retired: the published e is the N-body series)
       eccPrevMinJD: { get: () => C.perihelionalignmentJD - (HDIV16() * C.meanSolarYearDays / 2), render: (v) => thousands(v, 1), unit: 'JD' },
-      nextBalancedYear: { get: () => C.balancedYear + C.H, render: (v) => thousands(v) },
       tempGraphMostLikely: { get: () => C.temperatureGraphMostLikely, render: (v) => String(v), note: 'temperature-graph phase pick (14.5 H/16 cycles)' },
-      systemResetYearBC:  { get: () => Math.abs(C.balancedYear - 7 * C.H), render: (v) => thousands(v) + ' BC', note: 'balancedYear − 7H (the System Reset anchor)' },
-      systemResetYearPlain: { get: () => Math.abs(C.balancedYear - 7 * C.H), render: (v) => thousands(v), note: 'systemResetYearBC without the BC suffix (for signed prose)' },
       preprintDoi: { get: () => versionInfo.preprintDoi, render: (v) => String(v), note: 'canonical preprint DOI — single source: model-version.json' },
       moonDiameter:       { get: () => astro.bodyDiametersKm.moon, render: (v) => thousands(v, 1), unit: 'km' },
       moonOrbitalRadius:  { get: () => C.moonDistance, render: (v) => thousands(v, 2), unit: 'km' },

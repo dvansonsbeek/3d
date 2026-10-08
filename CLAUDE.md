@@ -7,7 +7,7 @@ across ±500 Myr. [Preprint](https://doi.org/10.21203/rs.3.rs-8758810/v4) ·
 
 **Scale:** `src/script.js` ~60,000 lines · `tools/` ~240 tracked JS scripts
 across 9 directories (~360 on disk with the untracked local archives) · ~245 Python files · 45 docs (26 retired-machinery docs archived out of the tree — `docs/retired-record.md` is the public record; `docs/archive/retired/`, gitignored, holds the files — and the strip-and-restructure pass merged five more into their live homes) · one web UI (the simulator; the Data Explorer dashboard is retired — `docs/retired-record.md`).
-**`npm run check` enforces a twenty-four-step gate chain; CI runs it plus a
+**`npm run check` enforces a twenty-six-step gate chain; CI runs it plus a
 headless-browser job and auto-deploys the simulator to GitHub Pages on
 green main.**
 Golden masters live in `packages/fixtures/`. Of the 24 scripts in `tools/verify/`,
@@ -236,7 +236,13 @@ sweep worklist, `--root DIR` adds the website's EN pages), `check:artifacts` (ge
 campaign artifacts vs their recorded input hashes — fails naming the exact
 regeneration command), `check:data` (every tracked dataset manifest-covered
 in PROVENANCE.md), `values:package` (the published @essrt/model-values ≡
-the live registry), `test:verify` (the model gates).
+the live registry), `test:verify` (the model gates), `test:py-smoke` (the
+Python IMPORT smoke: every `.py` parses, the bridge
+`tools/lib/python/constants_scripts.py` imports, and every `scripts/*.py`
+imports as a module — born from the bridge sitting UNIMPORTABLE for months
+on a KeyError that no gate ran into, plan 07 §9f/§9k; stage C needs
+numpy/scipy and reports SKIP on CI's runner; fail-proven via
+`ESSRT_PY_SMOKE_PLANT=1`).
 Every gate has been shown to **fail on a planted violation**, not merely to pass
 on clean code — the two fixture gates on a 1-ULP change, ~1.6e-16 relative. Lint
 and typecheck cover `packages/` and `test/`; `src/script.js` and `tools/` are

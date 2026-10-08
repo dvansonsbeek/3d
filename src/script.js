@@ -19301,10 +19301,12 @@ const VFP_CATEGORIES = [
     // eight including Earth, each planet in two readings — with relativity
     // (1PN, solid) and Newtonian (dashed) — over the four standard windows,
     // in either frame (against the stars / against the equinox of date).
-    // The rate is the SECULAR family on a named ±1,000-yr stencil, NOT the
-    // Prec. cells' ±150-yr window rate: see the block comment at
-    // renderVFPPlanetPerihelion for why a deep-time window forces that
-    // choice, and for the e → 0 conditioning the faint stretches mark.
+    // The rate is the SECULAR family on a named ±1,000-yr stencil — the same
+    // family and stencil the planet panels' Prec. cells ride since plan 07
+    // §9k item 5 (they used to show a ±150-yr full-chain window rate): see
+    // the block comment at renderVFPPlanetPerihelion for why a deep-time
+    // window forces that choice, and for the e → 0 conditioning the faint
+    // stretches mark.
     id: 'planet-perihelion', group: 'All planets', label: 'Perihelion precession',
     customRender: () => renderVFPPlanetPerihelion(),
     afterRender: (el) => _vfpPPAfterRender(el),
@@ -20214,15 +20216,17 @@ function _vfpPEAfterRender(bodyEl) {
 // planet's perihelion turns, arcsec/century, against epoch, for all eight.
 //
 // WHICH RATE FAMILY (the load-bearing choice — a displayed rate must name its
-// window). The planet panels' "Prec." cells show the WINDOW rate: a ±150-yr
-// central difference on the FULL chain (_kcApsidalPeriodYears), which keeps the
-// Great-Inequality local slope on purpose. That family cannot be sampled across
-// a deep-time window: its ~900-yr content aliases at kyr steps into noise (the
-// v16.2 running-mean lesson). So this panel rides the SECULAR tier — the smooth
-// series evaluator the two sibling panels already use (_kcChartElementsOfDate,
-// handover forced to 0) — differenced over a NAMED ±1000-yr stencil. The two
-// surfaces therefore quote different windows of one physical rate BY DESIGN;
-// the caption says so, so the numbers are never mistaken for each other.
+// window). This panel rides the SECULAR tier — the smooth series evaluator the
+// two sibling panels already use (_kcChartElementsOfDate, handover forced to
+// 0) — differenced over a NAMED ±1000-yr stencil. The planet panels' "Prec."
+// cells and CYCLES Duration rows ride the SAME family and stencil
+// (_kcApsidalPeriodYears, plan 07 §9k item 5), so the two surfaces agree by
+// construction. They used to show a ±150-yr central difference on the FULL
+// chain, periodic terms in — that family cannot be sampled across a deep-time
+// window (its ~900-yr content aliases at kyr steps into noise, the v16.2
+// running-mean lesson), and measured at the scene's own dates it was the
+// osculating apse's jitter for the giants (Neptune −59,242 ″/cy at J2000,
+// +28,871 a century later), not a precession rate.
 // EARTH rides its own one family (the year-length factory's apsidal/perihelion
 // periods — the same number the Prec. cell, the anomalistic year and the API
 // carry), never the planet-series override, mirroring the twins' Earth route.
@@ -20511,7 +20515,7 @@ function _vfpPPNoteParts(on, core) {
     _VFPPP_STENCIL_YR.toLocaleString('en-US') + '-yr central difference of the perihelion ANGLE' +
     (on.earth ? ', with Earth on its own one-family apsidal period (the number its Prec. cell, the anomalistic year and the API all carry)' : '') +
     '. Dashed: that rate minus the analytic 1PN advance of date, 6πGM/(c²a(1−e²)) per orbit on the elements of date — a DERIVED supplement, not a second integration; the engine’s measured 1PN-on minus 1PN-off difference for Mercury is 42.985 ″/cy against the analytic 42.981, which is the gate on this construction. ' +
-    'This is the SECULAR family: the planet panels’ “Prec.” cells show the ±150-yr WINDOW rate on the full chain instead, which keeps the Great-Inequality local slope and so reads a different number for the same physical motion — that family cannot be sampled across a deep-time window without aliasing its ~900-yr content. ' +
+    'This is the SECULAR family, and the planet panels’ “Prec.” cells and CYCLES Duration rows ride the same evaluator and stencil, so the two surfaces read one number. (They used to show a ±150-yr window rate on the full chain, periodic terms in; measured at the scene’s own dates that was the osculating apse’s jitter on the synodic lines — Neptune −59,242 ″/cy at J2000 and +28,871 a century later — not a precession rate, and it cannot be sampled across a deep-time window without aliasing its ~900-yr content.) ' +
     'As e → 0 the perihelion direction stops being defined and the rate diverges — a singularity of the polar coordinate, not physics. Mercury (e 0.21) reads 571.6 ″/cy at every stencil from ±500 to ±4,000 yr, while Venus at J2000 (e 0.0067) reads 31.2 / 29.5 / 23.4 / −0.9 and even changes sign. The faint test is planet-relative because an absolute floor misses it: Saturn’s e falls to 0.0103 at +14,000 and its rate rises to 10,170 ″/cy, 3.6× its own g₆, and Earth reaches 5,407 ″/cy at +23,000 on e = 0.0030. Those stretches are drawn for shape only, and the axis is scaled to the 2nd–98th percentile of the well-conditioned samples — a robust range, so an approach to the singularity cannot crush the rest.' +
     (core.clipped ? ' At this window a singular excursion runs off the axis.' : '');
   return { frame, references, reading: reading + ' ' + physics };
@@ -47084,7 +47088,7 @@ const planetStats = {
     {header : '—  Perihelion Precession (apsidal · g) —' },
       {label : () => `Perihelion Precession Duration against Ecliptic`,
        value : [ { v: () => _kcApsidalPeriodYears('mercury', o.julianDay), dec:2, sep:',', infinity: 1e9 },{ small: 'years' }],
-       hover : () => { const _s = _kcSecularShape('mercury'); return [`Period for Mercury's perihelion to complete one revolution against the ecliptic — the OF-DATE TANGENT of the chain's elements of date (±150-yr central difference; the SAME evaluator as the Prec. cell under Perihelion Longitudes, so the two read identically and move together). Negative = retrograde. Stable deep-time base: the dominant secular mode ${_s.dom.g[0]}, ${Math.round(1296000/_s.dom.arcsecPerYr).toLocaleString('en-US')} yr (the model's own N-body mode table; the Laskar name is a label, never an input).`]; },
+       hover : () => { const _s = _kcSecularShape('mercury'); return [`Period for Mercury's perihelion to complete one revolution against the ecliptic — the SECULAR tier's tangent of date (the series evaluator, ±1,000-yr central difference; the SAME evaluator as the Prec. cell under Perihelion Longitudes and the Framework Verification "Perihelion precession" form, so all three read identically and move together). Negative = retrograde. Stable deep-time base: the dominant secular mode ${_s.dom.g[0]}, ${Math.round(1296000/_s.dom.arcsecPerYr).toLocaleString('en-US')} yr (the model's own N-body mode table; the Laskar name is a label, never an input).`]; },
        highlight: true},
     null,
     {header : '—  Long-Period Cycles —' },
@@ -47115,9 +47119,9 @@ const planetStats = {
        value : [ { v: () => '—' }],
        hover : [`The smaller modes of the table summed: base + companion + these account for 100 % of the summed mode amplitudes. Each turns at its own frequency, so no single rate applies to the group`],
        static: true},
-      {label : () => `└ Perihelion rate of date (full chain)`,
+      {label : () => `└ Perihelion rate of date (secular tier, ±1,000 yr)`,
        value : [ { v: () => 129600000 / _kcApsidalPeriodYears('mercury', o.julianDay), dec:1, sep:',' },{ small: '″/100yr' }],
-       hover : [`The chain's apsidal rate at the current scene date: central difference of ϖ over ±150 yr on the full chain, periodic terms included. Signed — Saturn reads retrograde in the current era. The same quantity the tweakpane Prec row shows`]},
+       hover : [`The secular apsidal rate at the current scene date: central difference of the series tier's ϖ over ±1,000 yr — the same evaluator and stencil as the Framework Verification "Perihelion precession" form, so the two read one number. Signed (negative = retrograde). The osculating apse jitters around this on the synodic lines (the chain's periodic layer), which a rate row must not quote as precession. The same quantity the tweakpane Prec row shows`]},
     ],
     venus: [
     {header : '—  General Characteristics —' },
@@ -47391,7 +47395,7 @@ const planetStats = {
     {header : '—  Perihelion Precession (apsidal · g) —' },
       {label : () => `Perihelion Precession Duration against Ecliptic`,
        value : [ { v: () => _kcApsidalPeriodYears('venus', o.julianDay), dec:2, sep:',', infinity: 1e9 },{ small: 'years' }],
-       hover : () => { const _s = _kcSecularShape('venus'); return [`Period for Venus's perihelion to complete one revolution against the ecliptic — the OF-DATE TANGENT of the chain's elements of date (±150-yr central difference; the SAME evaluator as the Prec. cell under Perihelion Longitudes, so the two read identically and move together). Negative = retrograde. Stable deep-time base: the dominant secular mode ${_s.dom.g[0]}, ${Math.round(1296000/_s.dom.arcsecPerYr).toLocaleString('en-US')} yr (the model's own N-body mode table; the Laskar name is a label, never an input).`]; },
+       hover : () => { const _s = _kcSecularShape('venus'); return [`Period for Venus's perihelion to complete one revolution against the ecliptic — the SECULAR tier's tangent of date (the series evaluator, ±1,000-yr central difference; the SAME evaluator as the Prec. cell under Perihelion Longitudes and the Framework Verification "Perihelion precession" form, so all three read identically and move together). Negative = retrograde. Stable deep-time base: the dominant secular mode ${_s.dom.g[0]}, ${Math.round(1296000/_s.dom.arcsecPerYr).toLocaleString('en-US')} yr (the model's own N-body mode table; the Laskar name is a label, never an input).`]; },
        highlight: true},
     null,
     {header : '—  Long-Period Cycles —' },
@@ -47415,9 +47419,9 @@ const planetStats = {
        value : [ { v: () => '—' }],
        hover : [`The smaller modes of the table summed: base + companion + these account for 100 % of the summed mode amplitudes. Each turns at its own frequency, so no single rate applies to the group`],
        static: true},
-      {label : () => `└ Perihelion rate of date (full chain)`,
+      {label : () => `└ Perihelion rate of date (secular tier, ±1,000 yr)`,
        value : [ { v: () => 129600000 / _kcApsidalPeriodYears('venus', o.julianDay), dec:1, sep:',' },{ small: '″/100yr' }],
-       hover : [`The chain's apsidal rate at the current scene date: central difference of ϖ over ±150 yr on the full chain, periodic terms included. Signed — Saturn reads retrograde in the current era. The same quantity the tweakpane Prec row shows`]},
+       hover : [`The secular apsidal rate at the current scene date: central difference of the series tier's ϖ over ±1,000 yr — the same evaluator and stencil as the Framework Verification "Perihelion precession" form, so the two read one number. Signed (negative = retrograde). The osculating apse jitters around this on the synodic lines (the chain's periodic layer), which a rate row must not quote as precession. The same quantity the tweakpane Prec row shows`]},
 
     ],
 
@@ -47701,7 +47705,7 @@ const planetStats = {
     {header : '—  Perihelion Precession (apsidal · g) —' },
       {label : () => `Perihelion Precession Duration against Ecliptic`,
        value : [ { v: () => _kcApsidalPeriodYears('mars', o.julianDay), dec:2, sep:',', infinity: 1e9 },{ small: 'years' }],
-       hover : () => { const _s = _kcSecularShape('mars'); return [`Period for Mars's perihelion to complete one revolution against the ecliptic — the OF-DATE TANGENT of the chain's elements of date (±150-yr central difference; the SAME evaluator as the Prec. cell under Perihelion Longitudes, so the two read identically and move together). Negative = retrograde. Stable deep-time base: the dominant secular mode ${_s.dom.g[0]}, ${Math.round(1296000/_s.dom.arcsecPerYr).toLocaleString('en-US')} yr (the model's own N-body mode table; the Laskar name is a label, never an input).`]; },
+       hover : () => { const _s = _kcSecularShape('mars'); return [`Period for Mars's perihelion to complete one revolution against the ecliptic — the SECULAR tier's tangent of date (the series evaluator, ±1,000-yr central difference; the SAME evaluator as the Prec. cell under Perihelion Longitudes and the Framework Verification "Perihelion precession" form, so all three read identically and move together). Negative = retrograde. Stable deep-time base: the dominant secular mode ${_s.dom.g[0]}, ${Math.round(1296000/_s.dom.arcsecPerYr).toLocaleString('en-US')} yr (the model's own N-body mode table; the Laskar name is a label, never an input).`]; },
        highlight: true},
     null,
     {header : '—  Long-Period Cycles —' },
@@ -47729,9 +47733,9 @@ const planetStats = {
        value : [ { v: () => '—' }],
        hover : [`The smaller modes of the table summed: base + companion + these account for 100 % of the summed mode amplitudes. Each turns at its own frequency, so no single rate applies to the group`],
        static: true},
-      {label : () => `└ Perihelion rate of date (full chain)`,
+      {label : () => `└ Perihelion rate of date (secular tier, ±1,000 yr)`,
        value : [ { v: () => 129600000 / _kcApsidalPeriodYears('mars', o.julianDay), dec:1, sep:',' },{ small: '″/100yr' }],
-       hover : [`The chain's apsidal rate at the current scene date: central difference of ϖ over ±150 yr on the full chain, periodic terms included. Signed — Saturn reads retrograde in the current era. The same quantity the tweakpane Prec row shows`]},
+       hover : [`The secular apsidal rate at the current scene date: central difference of the series tier's ϖ over ±1,000 yr — the same evaluator and stencil as the Framework Verification "Perihelion precession" form, so the two read one number. Signed (negative = retrograde). The osculating apse jitters around this on the synodic lines (the chain's periodic layer), which a rate row must not quote as precession. The same quantity the tweakpane Prec row shows`]},
 
     ],
 
@@ -48014,7 +48018,7 @@ const planetStats = {
     {header : '—  Perihelion Precession (apsidal · g) —' },
       {label : () => `Perihelion Precession Duration against Ecliptic`,
        value : [ { v: () => _kcApsidalPeriodYears('jupiter', o.julianDay), dec:2, sep:',', infinity: 1e9 },{ small: 'years' }],
-       hover : () => { const _s = _kcSecularShape('jupiter'); return [`Period for Jupiter's perihelion to complete one revolution against the ecliptic — the OF-DATE TANGENT of the chain's elements of date (±150-yr central difference; the SAME evaluator as the Prec. cell under Perihelion Longitudes, so the two read identically and move together). Negative = retrograde. Stable deep-time base: the dominant secular mode ${_s.dom.g[0]}, ${Math.round(1296000/_s.dom.arcsecPerYr).toLocaleString('en-US')} yr (the model's own N-body mode table; the Laskar name is a label, never an input).`]; },
+       hover : () => { const _s = _kcSecularShape('jupiter'); return [`Period for Jupiter's perihelion to complete one revolution against the ecliptic — the SECULAR tier's tangent of date (the series evaluator, ±1,000-yr central difference; the SAME evaluator as the Prec. cell under Perihelion Longitudes and the Framework Verification "Perihelion precession" form, so all three read identically and move together). Negative = retrograde. Stable deep-time base: the dominant secular mode ${_s.dom.g[0]}, ${Math.round(1296000/_s.dom.arcsecPerYr).toLocaleString('en-US')} yr (the model's own N-body mode table; the Laskar name is a label, never an input).`]; },
        highlight: true},
     null,
     {header : '—  Long-Period Cycles —' },
@@ -48038,9 +48042,9 @@ const planetStats = {
        value : [ { v: () => '—' }],
        hover : [`The smaller modes of the table summed: base + companion + these account for 100 % of the summed mode amplitudes. Each turns at its own frequency, so no single rate applies to the group`],
        static: true},
-      {label : () => `└ Perihelion rate of date (full chain)`,
+      {label : () => `└ Perihelion rate of date (secular tier, ±1,000 yr)`,
        value : [ { v: () => 129600000 / _kcApsidalPeriodYears('jupiter', o.julianDay), dec:1, sep:',' },{ small: '″/100yr' }],
-       hover : [`The chain's apsidal rate at the current scene date: central difference of ϖ over ±150 yr on the full chain, periodic terms included. Signed — Saturn reads retrograde in the current era. The same quantity the tweakpane Prec row shows`]},
+       hover : [`The secular apsidal rate at the current scene date: central difference of the series tier's ϖ over ±1,000 yr — the same evaluator and stencil as the Framework Verification "Perihelion precession" form, so the two read one number. Signed (negative = retrograde). The osculating apse jitters around this on the synodic lines (the chain's periodic layer), which a rate row must not quote as precession. The same quantity the tweakpane Prec row shows`]},
 
     ],
 
@@ -48324,7 +48328,7 @@ const planetStats = {
     {header : '—  Perihelion Precession (apsidal · g) —' },
       {label : () => `Perihelion Precession Duration against Ecliptic`,
        value : [ { v: () => _kcApsidalPeriodYears('saturn', o.julianDay), dec:2, sep:',', infinity: 1e9 },{ small: 'years' }],
-       hover : () => { const _s = _kcSecularShape('saturn'); return [`Period for Saturn's perihelion to complete one revolution against the ecliptic — the OF-DATE TANGENT of the chain's elements of date (±150-yr central difference; the SAME evaluator as the Prec. cell under Perihelion Longitudes, so the two read identically and move together). Negative = retrograde. Stable deep-time base: the dominant secular mode ${_s.dom.g[0]}, ${Math.round(1296000/_s.dom.arcsecPerYr).toLocaleString('en-US')} yr (the model's own N-body mode table; the Laskar name is a label, never an input).`]; },
+       hover : () => { const _s = _kcSecularShape('saturn'); return [`Period for Saturn's perihelion to complete one revolution against the ecliptic — the SECULAR tier's tangent of date (the series evaluator, ±1,000-yr central difference; the SAME evaluator as the Prec. cell under Perihelion Longitudes and the Framework Verification "Perihelion precession" form, so all three read identically and move together). Negative = retrograde. Stable deep-time base: the dominant secular mode ${_s.dom.g[0]}, ${Math.round(1296000/_s.dom.arcsecPerYr).toLocaleString('en-US')} yr (the model's own N-body mode table; the Laskar name is a label, never an input).`]; },
        highlight: true},
     null,
     {header : '—  Long-Period Cycles —' },
@@ -48348,9 +48352,9 @@ const planetStats = {
        value : [ { v: () => '—' }],
        hover : [`The smaller modes of the table summed: base + companion + these account for 100 % of the summed mode amplitudes. Each turns at its own frequency, so no single rate applies to the group`],
        static: true},
-      {label : () => `└ Perihelion rate of date (full chain)`,
+      {label : () => `└ Perihelion rate of date (secular tier, ±1,000 yr)`,
        value : [ { v: () => 129600000 / _kcApsidalPeriodYears('saturn', o.julianDay), dec:1, sep:',' },{ small: '″/100yr' }],
-       hover : [`The chain's apsidal rate at the current scene date: central difference of ϖ over ±150 yr on the full chain, periodic terms included. Signed — Saturn reads retrograde in the current era. The same quantity the tweakpane Prec row shows`]},
+       hover : [`The secular apsidal rate at the current scene date: central difference of the series tier's ϖ over ±1,000 yr — the same evaluator and stencil as the Framework Verification "Perihelion precession" form, so the two read one number. Signed (negative = retrograde). The osculating apse jitters around this on the synodic lines (the chain's periodic layer), which a rate row must not quote as precession. The same quantity the tweakpane Prec row shows`]},
 
     ],
 
@@ -48634,7 +48638,7 @@ const planetStats = {
     {header : '—  Perihelion Precession (apsidal · g) —' },
       {label : () => `Perihelion Precession Duration against Ecliptic`,
        value : [ { v: () => _kcApsidalPeriodYears('uranus', o.julianDay), dec:2, sep:',', infinity: 1e9 },{ small: 'years' }],
-       hover : () => { const _s = _kcSecularShape('uranus'); return [`Period for Uranus's perihelion to complete one revolution against the ecliptic — the OF-DATE TANGENT of the chain's elements of date (±150-yr central difference; the SAME evaluator as the Prec. cell under Perihelion Longitudes, so the two read identically and move together). Negative = retrograde. Stable deep-time base: the dominant secular mode ${_s.dom.g[0]}, ${Math.round(1296000/_s.dom.arcsecPerYr).toLocaleString('en-US')} yr (the model's own N-body mode table; the Laskar name is a label, never an input).`]; },
+       hover : () => { const _s = _kcSecularShape('uranus'); return [`Period for Uranus's perihelion to complete one revolution against the ecliptic — the SECULAR tier's tangent of date (the series evaluator, ±1,000-yr central difference; the SAME evaluator as the Prec. cell under Perihelion Longitudes and the Framework Verification "Perihelion precession" form, so all three read identically and move together). Negative = retrograde. Stable deep-time base: the dominant secular mode ${_s.dom.g[0]}, ${Math.round(1296000/_s.dom.arcsecPerYr).toLocaleString('en-US')} yr (the model's own N-body mode table; the Laskar name is a label, never an input).`]; },
        highlight: true},
     null,
     {header : '—  Long-Period Cycles —' },
@@ -48658,9 +48662,9 @@ const planetStats = {
        value : [ { v: () => '—' }],
        hover : [`The smaller modes of the table summed: base + companion + these account for 100 % of the summed mode amplitudes. Each turns at its own frequency, so no single rate applies to the group`],
        static: true},
-      {label : () => `└ Perihelion rate of date (full chain)`,
+      {label : () => `└ Perihelion rate of date (secular tier, ±1,000 yr)`,
        value : [ { v: () => 129600000 / _kcApsidalPeriodYears('uranus', o.julianDay), dec:1, sep:',' },{ small: '″/100yr' }],
-       hover : [`The chain's apsidal rate at the current scene date: central difference of ϖ over ±150 yr on the full chain, periodic terms included. Signed — Saturn reads retrograde in the current era. The same quantity the tweakpane Prec row shows`]},
+       hover : [`The secular apsidal rate at the current scene date: central difference of the series tier's ϖ over ±1,000 yr — the same evaluator and stencil as the Framework Verification "Perihelion precession" form, so the two read one number. Signed (negative = retrograde). The osculating apse jitters around this on the synodic lines (the chain's periodic layer), which a rate row must not quote as precession. The same quantity the tweakpane Prec row shows`]},
 
     ],
 
@@ -48944,7 +48948,7 @@ const planetStats = {
     {header : '—  Perihelion Precession (apsidal · g) —' },
       {label : () => `Perihelion Precession Duration against Ecliptic`,
        value : [ { v: () => _kcApsidalPeriodYears('neptune', o.julianDay), dec:2, sep:',', infinity: 1e9 },{ small: 'years' }],
-       hover : () => { const _s = _kcSecularShape('neptune'); return [`Period for Neptune's perihelion to complete one revolution against the ecliptic — the OF-DATE TANGENT of the chain's elements of date (±150-yr central difference; the SAME evaluator as the Prec. cell under Perihelion Longitudes, so the two read identically and move together). Negative = retrograde. Stable deep-time base: the dominant secular mode ${_s.dom.g[0]}, ${Math.round(1296000/_s.dom.arcsecPerYr).toLocaleString('en-US')} yr (the model's own N-body mode table; the Laskar name is a label, never an input).`]; },
+       hover : () => { const _s = _kcSecularShape('neptune'); return [`Period for Neptune's perihelion to complete one revolution against the ecliptic — the SECULAR tier's tangent of date (the series evaluator, ±1,000-yr central difference; the SAME evaluator as the Prec. cell under Perihelion Longitudes and the Framework Verification "Perihelion precession" form, so all three read identically and move together). Negative = retrograde. Stable deep-time base: the dominant secular mode ${_s.dom.g[0]}, ${Math.round(1296000/_s.dom.arcsecPerYr).toLocaleString('en-US')} yr (the model's own N-body mode table; the Laskar name is a label, never an input).`]; },
        highlight: true},
     null,
     {header : '—  Long-Period Cycles —' },
@@ -48968,9 +48972,9 @@ const planetStats = {
        value : [ { v: () => '—' }],
        hover : [`The smaller modes of the table summed: base + companion + these account for 100 % of the summed mode amplitudes. Each turns at its own frequency, so no single rate applies to the group`],
        static: true},
-      {label : () => `└ Perihelion rate of date (full chain)`,
+      {label : () => `└ Perihelion rate of date (secular tier, ±1,000 yr)`,
        value : [ { v: () => 129600000 / _kcApsidalPeriodYears('neptune', o.julianDay), dec:1, sep:',' },{ small: '″/100yr' }],
-       hover : [`The chain's apsidal rate at the current scene date: central difference of ϖ over ±150 yr on the full chain, periodic terms included. Signed — Saturn reads retrograde in the current era. The same quantity the tweakpane Prec row shows`]},
+       hover : [`The secular apsidal rate at the current scene date: central difference of the series tier's ϖ over ±1,000 yr — the same evaluator and stencil as the Framework Verification "Perihelion precession" form, so the two read one number. Signed (negative = retrograde). The osculating apse jitters around this on the synodic lines (the chain's periodic layer), which a rate row must not quote as precession. The same quantity the tweakpane Prec row shows`]},
 
     ],
 };
@@ -50914,31 +50918,47 @@ const _KC_PERI_MARKERS = {
   'PERIHELION NEPTUNE': 'neptune', 'PERIHELION-OF-EARTH': 'earth',
 };
 const _KC_ANCHOR = new THREE.Vector3();   // scratch for the device origin
-// The WINDOW apsidal period of date: ±150-yr central difference of ϖ on the
-// FULL chain. The baseline is load-bearing: short synodic terms (≲60-yr
-// periods) average out across 300 yr, while the Great-Inequality terms
-// (~900–1000 yr) keep their local slope — this is the window-rate family of
-// doc 109 §9 (the quantity the old static labels approximated), now
-// evaluated at the scrubbed date. Signed: Saturn reads RETROGRADE in the
-// current window because the GI dynamics put it there; a very large value
-// means the apse is near-stationary at that date (physical, not an error).
+// The apsidal period of date the planet panels quote — the SECULAR tier
+// (plan 07 §9k item 5, measured): the smooth series evaluator the VFP
+// Perihelion-precession form rides (_kcChartElementsOfDate, handover 0),
+// differenced over the form's named ±1,000-yr stencil (_VFPPP_STENCIL_YR),
+// so the two surfaces read one family by construction. The former family —
+// a ±150-yr central difference on the FULL chain, periodic terms in — was
+// the osculating apse's jitter, not a precession rate: its comment claimed
+// the synodic lines average out across 300 yr, and for the giants they do
+// not (the 171-yr Uranus–Neptune line alone defeats it). Measured at J2000,
+// ″/cy, ±150-yr full chain vs the secular tier: Saturn −2,044 vs 1,915,
+// Uranus 6,716 vs 347, Neptune −59,242 vs 100; scrubbing 1800 → 2200 the
+// Neptune cell read −8,684 / 21,004 / −59,242 / 28,871 / −14,332 while the
+// secular tier moved a few ″/cy per century. Signed: a negative period is a
+// retrograde apse (Venus's secular ϖ turns slowly; a near-zero rate is the
+// e → 0 polar singularity, not physics — the form's caption says the same).
 function _kcApsidalPeriodYears(nameLower, jd) {
   const year = _engineYearTT(jd);   // R9: the engine year (true TT), as _kcElementsOfDate
-  // EARTH rides the ONE movement (the scene's apsidal wheel turns with the
-  // series' ϖ of date): the one family's anom/(anom − sid), ≡ 360°/its
-  // apsidal rate of date — the same number the anomalistic year, the
-  // Predictions beat and the API's lunisolar surface carry (owner, 2026-09:
-  // all calculations match what the scene measures). The chain stencil
-  // below stays the planets' evaluator.
-  if (nameLower === 'earth' && _hybridSpinActive()) return _yearLengthsM().inclinationPrecessionYearsAtYear(year);
-  if (!_kcChains) _kcChains = buildPlanetChainsFromArtifactData(CHAIN_ARTIFACT);
-  const D = 150;
-  const w1 = kcComputePlanetElementsAtYear(year - D, _kcChains[nameLower], _kcChains).lonPeriEclipticDeg;
-  const w2 = kcComputePlanetElementsAtYear(year + D, _kcChains[nameLower], _kcChains).lonPeriEclipticDeg;
-  let d = w2 - w1;
-  while (d > 180) d -= 360;
-  while (d < -180) d += 360;
-  return d === 0 ? Infinity : 360 * (2 * D) / d;
+  const wrapPeriod = (d, D) => {
+    while (d > 180) d -= 360;
+    while (d < -180) d += 360;
+    return d === 0 ? Infinity : 360 * (2 * D) / d;
+  };
+  if (nameLower === 'earth') {
+    // EARTH rides the ONE movement (the scene's apsidal wheel turns with the
+    // series' ϖ of date): the one family's anom/(anom − sid), ≡ 360°/its
+    // apsidal rate of date — the same number the anomalistic year, the
+    // Predictions beat and the API's lunisolar surface carry (owner, 2026-09:
+    // all calculations match what the scene measures). Flag off (the legacy
+    // ?hybridSpin=0 page): the chain's own ±150-yr tangent, as before — Earth's
+    // chain carries no periodic layer, so that tangent IS its secular rate.
+    if (_hybridSpinActive()) return _yearLengthsM().inclinationPrecessionYearsAtYear(year);
+    if (!_kcChains) _kcChains = buildPlanetChainsFromArtifactData(CHAIN_ARTIFACT);
+    const D = 150;
+    const w1 = kcComputePlanetElementsAtYear(year - D, _kcChains.earth, _kcChains).lonPeriEclipticDeg;
+    const w2 = kcComputePlanetElementsAtYear(year + D, _kcChains.earth, _kcChains).lonPeriEclipticDeg;
+    return wrapPeriod(w2 - w1, D);
+  }
+  const D = _VFPPP_STENCIL_YR;
+  const w1 = _kcChartElementsOfDate(nameLower, _vfpPPYrToJd(year - D)).lonPeriEclipticDeg;
+  const w2 = _kcChartElementsOfDate(nameLower, _vfpPPYrToJd(year + D)).lonPeriEclipticDeg;
+  return wrapPeriod(w2 - w1, D);
 }
 // The OF-DATE TANGENT of the orbit's ascending node ON the invariable
 // plane — the same ±150-yr central stencil the apsidal Prec. cells use,
@@ -53242,11 +53262,12 @@ function updatePlanetAnomalies() {
     if (dt) {
       if (dt.ascEl) dt.ascEl.textContent = (o[dt.ascKey] || 0).toFixed(2) + '\u00B0';
       if (dt.argEl) dt.argEl.textContent = (o[dt.argKey] || 0).toFixed(2) + '\u00B0';
-      // P5/K5b \u2014 the Prec. period is DYNAMIC under the flag: the window
-      // apsidal period of date from the chain (signed \u2014 Saturn reads
-      // retrograde in the current window). Earth included (option A,
-      // owner-ruled): in-window it reads \u2248 the H/3 law (+111.5k vs
-      // +111,772 yr \u2014 the epoch-local tangent), wandering at deep time.
+      // P5/K5b \u2014 the Prec. period is DYNAMIC under the flag: the SECULAR
+      // apsidal period of date (the series tier, \u00b11,000-yr stencil \u2014
+      // _kcApsidalPeriodYears, one family with the VFP form; signed). Earth
+      // included (option A, owner-ruled): in-window it reads \u2248 the H/3
+      // law (+111.5k vs +111,772 yr \u2014 the epoch-local tangent),
+      // wandering at deep time.
       if (dt.precEl) {
         const _T = _kcApsidalPeriodYears(dt.planetKey, o.julianDay);
         dt.precEl.textContent = (_T >= 0 ? '+' : '\u2212') + (isFinite(_T) ? Math.abs(_T).toFixed(0) : '\u221E') + ' yr';
@@ -53256,7 +53277,7 @@ function updatePlanetAnomalies() {
         // Set once \u2014 the chain globals are live here, never at UI build.
         if (!dt.precTitleSet) {
           const _s = _kcSecularShape(dt.planetKey);
-          dt.precEl.title = 'Of-date tangent (\u00B1150 yr central difference) of the chain\u2019s ecliptic \u03D6 \u2014 the same evaluator as the planetStats CYCLES \u201CPerihelion Precession Duration\u201D row (the two read identically and move together). Stable deep-time base: the dominant secular mode ' + _s.dom.g[0] + ', ' + Math.round(1296000 / _s.dom.arcsecPerYr).toLocaleString('en-US') + ' yr (nearest-Laskar name \u2014 a label, never an input).';
+          dt.precEl.title = 'Secular tangent of date (\u00B11,000-yr central difference of the series tier\u2019s ecliptic \u03D6) \u2014 the same evaluator as the planetStats CYCLES \u201CPerihelion Precession Duration\u201D row and the Framework Verification \u201CPerihelion precession\u201D form (all three read identically and move together). Stable deep-time base: the dominant secular mode ' + _s.dom.g[0] + ', ' + Math.round(1296000 / _s.dom.arcsecPerYr).toLocaleString('en-US') + ' yr (nearest-Laskar name \u2014 a label, never an input).';
           dt.precTitleSet = true;
         }
       }

@@ -90,6 +90,15 @@ jobs:
       - name: Python physics boundary (§2f)
         run: npm run test:py-physics
 
+      # Plan 07 §9k: the Python bridge (constants_scripts) had been
+      # UNIMPORTABLE for months — a KeyError on a retired key — and no gate
+      # imported anything, so every analysis script was unrunnable unseen.
+      # Stages A (syntax) and B (the bridge) are stdlib-only and run here;
+      # stage C (import every scripts/*.py) needs numpy/scipy and reports
+      # SKIP on this runner — it runs in the local `npm run check`.
+      - name: Python import smoke (the bridge and the analysis scripts)
+        run: npm run test:py-smoke
+
       # §10 — every `status: current` doc must carry the CURRENT coefficients
       # hash, so a refit cannot silently leave the prose describing an older
       # model. This was not wired up, and the IAU 2006 refit duly left all 67

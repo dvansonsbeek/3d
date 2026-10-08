@@ -1,8 +1,8 @@
-# Fibonacci Laws — Investigation & Verification Scripts
+# Analysis Scripts — Investigation & Verification
 
 Python (and a few JavaScript) scripts for investigating, verifying, and reproducing the results of the [Expanding Solar System Resonance Theory (ESSRT)](https://www.holisticuniverse.com).
 
-These scripts were used during the research to discover and verify the six Fibonacci Laws that connect planetary orbital tilts, eccentricities, and precession rates to the Earth Fundamental Cycle timescale (H; see [Constants Reference](../docs/20-constants-reference.md)).
+Part of this collection is the research record of the RETIRED integer-relation framing (the former "six Fibonacci Laws" — plan 07 R5/R6 deleted the ψ and K laws, `docs/retired-record.md` is the record; the `fibonacci_*` scripts and their result files are kept as the frozen evidence of that investigation, not as live claims). The rest are the live analyses: the climate formula, the LOD/ΔT stack, the paleo anchors, the lattice null tests. Every script imports the model through the §2f bridge below, and `npm run test:py-smoke` imports each one so the collection cannot rot unseen again. The research originally sought relations that connect planetary orbital tilts, eccentricities, and precession rates to the Earth Fundamental Cycle timescale (H; see [Constants Reference](../docs/20-constants-reference.md)).
 
 > **§2f — analysis only, and it is enforced.** Python here may **read** the
 > model: import from [`tools/lib/python/constants_scripts.py`](../tools/lib/python/constants_scripts.py),
@@ -55,9 +55,9 @@ python devonian_cross_check.py
 | `fibonacci_significance.py` | Statistical significance of the Fibonacci Laws. 11 tests across 3 null distributions (permutation, log-uniform Monte Carlo, uniform Monte Carlo). Headline combined p spans 1.4 × 10⁻⁴ to 6.8 × 10⁻⁶ (3.6σ–4.4σ). Output: `data/significance-results.json` |
 | `test_fibonacci_significance.py` | Regression test: locks in the 11 observed test statistics to guard against silent drift when underlying constants change. |
 
-### The Six Laws
+### The retired integer relations (record only — plan 07 R5/R6)
 
-| Script | Laws tested | Description |
+| Script | Laws tested (retired) | Description |
 |--------|-------------|-------------|
 | `fibonacci_eccentricity_scale.py` | Laws 4, 5 | The solar system as an eccentricity balance scale — K constant + per-planet breakdowns |
 | `fibonacci_eccentricity_structure.py` | Laws 4, 5 | Two-component decomposition (base + amplitude), mirror pair conservation |

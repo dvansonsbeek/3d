@@ -578,17 +578,18 @@ Reproducer: `scripts/milankovitch_8h_closure_test.py`; results in `data/milankov
 
 ## 8. Background — the Plio-Pleistocene observation
 
-A striking pattern in the late Cenozoic geological time-scale: the Pliocene and Pleistocene epochs are each ~ 2.6–2.8 Myr long, both close to 1 × 8H = 2.682536 Myr. Anchored at the Plio-Pleistocene boundary (2.58 Ma), the consecutive 8H cycles align approximately with the standard ICS chronostratigraphic boundaries:
+A striking pattern in the late Cenozoic geological time-scale: the Pliocene and Pleistocene epochs are each ~ 2.6–2.8 Myr long, both close to 1 × 8H = 2.682536 Myr. Counted from the ICS Plio-Pleistocene boundary (2.58 Ma), consecutive 8H intervals align approximately with the standard chronostratigraphic boundaries:
 
-| Cycle | Start | End | Duration | Match to 1 × 8H |
-|---|---:|---:|---:|---:|
-| Pliocene 8H cycle (Cycle −2) | 5,332,390 BC | <!--v:systemResetYearBC-->2,649,854 BC<!--/v--> | <!--v:eightH-->2,682,536<!--/v--> yr | exact (anchored) |
-| Pleistocene 8H cycle (Cycle −1) | <!--v:systemResetYearBC-->2,649,854 BC<!--/v--> | <!--v:nextBalancedYear-->32,682<!--/v--> AD | <!--v:eightH-->2,682,536<!--/v--> yr | exact (anchored) |
-| **Next cycle (Cycle 0) — see §15 for naming** | **<!--v:nextBalancedYear-->32,682<!--/v--> AD** | **2,715,218 AD** | <!--v:eightH-->2,682,536<!--/v--> yr | exact by construction |
+| Interval (ICS) | Duration | 1 × 8H |
+|---|---:|---:|
+| Pliocene (5.333 → 2.58 Ma) | 2.75 Myr | <!--v:eightH-->2,682,536<!--/v--> yr |
+| Pleistocene (2.58 Ma → present) | 2.58 Myr so far | <!--v:eightH-->2,682,536<!--/v--> yr |
 
-The Holocene (≈ last 11,700 yr) is a sub-feature of the current Pleistocene cycle — a brief interglacial near the end of Cycle −1.
+(The former version of this table anchored the intervals on the model's balanced-year date and quoted calendar years for their ends, including a "next cycle" start; that date is retired with the phase-origin concept — plan 07 §3c/§3d — so the comparison now rests on the ICS boundaries alone.)
 
-The question §§8–11 ask is whether this pattern reflects a real *physical pacing mechanism* (with biospheric / climatic events tracking integer multiples of 8H deep into the geological record) or whether it is a coincidence specific to the last two epochs. (The narrative anchor for the resulting cycle-naming convention — Pleistocene Cycle, Exocene Cycle — is collected in §15 below.)
+The Holocene (≈ last 11,700 yr) is a sub-feature of the current Pleistocene interval — a brief interglacial near its end.
+
+The question §§8–11 ask is whether this pattern reflects a real *physical pacing mechanism* (with biospheric / climatic events tracking integer multiples of 8H deep into the geological record) or whether it is a coincidence specific to the last two epochs.
 
 ---
 
@@ -1369,42 +1370,9 @@ The super-cycle null result (§§8–11) appropriately bounds the framework's cl
 
 ---
 
-## 15. Naming convention for 8H cycles
+## 15. Naming convention for 8H cycles — RETIRED (plan 07 §3c/§3d)
 
-Independent of the super-cycle deep-time question, it remains useful to refer to specific 8H intervals in the recent past and near future. The framework introduces a numerical convention for internal use, anchored at the Plio-Pleistocene boundary at 2.58 Ma:
-
-- **Resonance Cycle −2** = Pliocene 8H Cycle: 5,332,390 BC → <!--v:systemResetYearBC-->2,649,854 BC<!--/v-->
-- **Resonance Cycle −1** = Pleistocene 8H Cycle: <!--v:systemResetYearBC-->2,649,854 BC<!--/v--> → <!--v:nextBalancedYear-->32,682<!--/v--> AD ← **we are here** (in its final ~30,000 years)
-- **Resonance Cycle 0** = **Exocene 8H Cycle**: <!--v:nextBalancedYear-->32,682<!--/v--> AD → 2,715,218 AD ← **next cycle**
-- **Resonance Cycle +1**: 2,715,218 AD → 5,397,754 AD
-- (and so on)
-
-### 15.1 The "Exocene" name
-
-The proposed name for **Resonance Cycle 0** (starting <!--v:nextBalancedYear-->32,682<!--/v--> AD) is **Exocene**, from Greek ἔξω (*exō*) = "outside, beyond" + the standard -cene suffix used throughout the Cenozoic (Holocene, Pleistocene, Pliocene, Miocene, Oligocene, Eocene, Paleocene).
-
-The name captures three converging themes that characterize the era starting from the present:
-
-1. **Future-defining**: ἔξω explicitly signals movement *outside* and *beyond* — naming the age for the act of leaving Earth rather than what is left behind. The "exo-" prefix is already established in modern scientific vocabulary for exactly this: **exoplanet**, **exobiology**, **exosphere**, **exomoon**, **exo-Earth**.
-2. **Scientific knowledge**: the science of "outside" — exoplanetary astronomy, exobiology, the comparative cosmology of other systems — is the frontier discipline of the age. Humans of the Exocene are characterized by their accumulated scientific knowledge of cosmic structure beyond Earth.
-3. **Human expansion**: the central act of the Exocene is humanity leaving Earth to inhabit, explore, or extend awareness beyond our home planet — the species that mastered Earth in the Pleistocene becomes the species that goes beyond it in the Exocene.
-
-### 15.2 Why "Exocene" (rationale)
-
-- *Astrocene* (star-age) was considered but is narrower than space generally — "outside" includes interplanetary, interstellar, and any "beyond Earth" expansion
-- *Mellocene* (future-age) was considered but is too generic — every age is the future of its predecessors
-- *Anthropocene* is already proposed for the *current* human-influenced era (Crutzen 2000), so cannot be reused
-- *Heliocene* (sun-age) implies the Sun is special to this age, but humans of the Exocene may move beyond our solar system entirely
-- *Kosmocene* (cosmos-age) overlaps with Exocene but is broader still; *exo-* is more precise for "going outside"
-
-### 15.3 Usage
-
-In docs and the simulation, refer to:
-- **Exocene 8H Cycle** (or "Exocene cycle") for the specific 8H interval starting <!--v:nextBalancedYear-->32,682<!--/v--> AD
-- **Resonance Cycle 0** (or "Cycle 0") as the numerical internal-model reference
-- Future cycles increment (Resonance Cycle +1, +2, …); past cycles count backward (Cycle −1 for Pleistocene, Cycle −2 for Pliocene)
-
-The Holocene (≈ last 11,700 yr) remains a *sub-feature* of the current Pleistocene 8H Cycle, not a separate cycle — it is the brief interglacial warm period at the close of Cycle −1.
+This section proposed a numbered convention for 8H intervals (Resonance Cycle −2, −1, 0, +1 …) and the name **"Exocene"** for the next one, with each interval's calendar years derived from the model's balanced-year date (the next interval opening at that date plus one anchor unit, "in its final ~30,000 years"). The balanced year is retired as a date — it is a fitted phase of the correction bases, uncertain by more than 200,000 years when the perihelion-of-date period it is counted in is let vary — so the numbering has no calendar anchor and the convention is withdrawn from the docs and the simulation. The observation of §8 stands on the ICS boundaries alone; the super-cycle null result of §§9–14 is unaffected (it never used the dates). The name proposal and its rationale are kept in this section's git history.
 
 ---
 

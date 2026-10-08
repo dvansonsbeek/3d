@@ -181,9 +181,13 @@ compose with the chain period; the one deliberate exception is "Period
 (Kepler verification)", which stays on the device inputs because its
 purpose is the model's GM↔AU closure (doc 24), not the ephemeris. The
 precession-cycles rows follow the same one-family rule: the apsidal
-Duration and angular-velocity rows read the chain's OF-DATE TANGENT
-(`computeApsidalSecularDegPerYr` — the same evaluator as the Prec. cell,
-one home), with the dominant secular g-mode in hover; the Long-Period
+Duration and angular-velocity rows read the SECULAR tier's tangent of date
+(the series evaluator over the named ±1,000-yr stencil —
+`_kcApsidalPeriodYears`, the same evaluator as the Prec. cell and the
+Framework Verification "Perihelion precession" form, one home; plan 07 §9k:
+the former ±150-yr full-chain window was the osculating apse's jitter for
+the giants, not a precession rate), with the dominant secular g-mode in
+hover; Earth's rows stay on its own one-family apsidal period; the Long-Period
 Cycles section carries the axial row, the Eccentricity Cycle (the beat
 of the two largest modes), and the Obliquity Cycle, which survives only
 as an *observed* row (Mercury ~895 kyr Bills 2005; Mars ~125 kyr) —
@@ -246,8 +250,8 @@ the chain's Newtonian era-window rate (the `lattice` property, a name kept for
 its callers — the H·num/den lattice it once held left at plan 07 R1),
 the equatorial projection excess and obliquity-rate term at the IAU J2000
 perihelion longitude, and — plan 06 R8 — the Earth-frame right-ascension rate
-as their sum (a kinematic identity; the chain's dynamical rate of date is a
-window rate and lives on the planet panel's chain rows). Mercury adds the
+as their sum (a kinematic identity; the chain's secular rate of date lives
+on the planet panel's chain rows — the series tier over ±1,000 yr). Mercury adds the
 general-relativistic advance derived from the model constants
 (`relativisticPerihelionAdvanceArcsecCy`). The former "Missing advance of
 perihelion" / "Perihelion precession (Geocentric)" rows and the "Missing

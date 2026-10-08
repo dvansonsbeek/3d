@@ -2,7 +2,7 @@
 docVersion: 1.0
 modelVersion: v20.0
 coefficients: sha256:96f7a2194ea29f0e
-status: current
+status: historical
 ---
 
 # Geometric Orbital Elements — the Retired Device (record)
@@ -88,20 +88,22 @@ function computePlanetInvPlaneInclinationDynamic(planet, currentYear) {
 
 ### Per-Planet Cycle Anchors
 
-All seven fitted planets share the same balanced-year anchor — **n=7,
-year ≈ -<!--v:systemResetYearPlain-->2,649,854<!--/v-->**, the oldest of
-the eight anchors in the current eight-unit interval:
+All seven fitted planets shared the same phase anchor — the device's
+"System Reset", n=7, the oldest of the eight anchors in its eight-unit
+interval. (The anchors were phases of the retired device; plan 07 §3c/§3d
+retired quoting them as calendar years, so the dated column of the former
+table is gone — the record keeps the angles and the signs.)
 
-| Planet | Cycle Anchor | Balance Group | n | Balanced Year | ICRF Direction | Incl. Trend at J2000 |
-|--------|-------------|---------------|----------|-------------|----------------|----------------------|
-| Mercury | 234.52° | In-phase | n=7 | -<!--v:systemResetYearPlain-->2,649,854<!--/v--> | Retrograde | Decreasing |
-| Venus | 218.64° | In-phase | n=7 | -<!--v:systemResetYearPlain-->2,649,854<!--/v--> | Retrograde | Decreasing |
-| Earth | 21.77° | In-phase | n=0 (locked) | <!--v:balancedYear-->-302,635<!--/v--> | Prograde | Decreasing |
-| Mars | 236.07° | In-phase | n=7 | -<!--v:systemResetYearPlain-->2,649,854<!--/v--> | Retrograde | Decreasing |
-| Jupiter | 287.06° | In-phase | n=7 (= n=0)* | -<!--v:systemResetYearPlain-->2,649,854<!--/v--> | Retrograde | Decreasing |
-| **Saturn** | **116.26°** | **Anti-phase** | n=7 (= n=0)* | -<!--v:systemResetYearPlain-->2,649,854<!--/v--> | **Retrograde** | **Increasing** |
-| Uranus | 21.33° | In-phase | n=7 (= n=0)* | -<!--v:systemResetYearPlain-->2,649,854<!--/v--> | Retrograde | Decreasing |
-| Neptune | 174.04° | In-phase | n=7 | -<!--v:systemResetYearPlain-->2,649,854<!--/v--> | Retrograde | Decreasing |
+| Planet | Cycle Anchor | Balance Group | n | ICRF Direction | Incl. Trend at J2000 |
+|--------|-------------|---------------|----------|----------------|----------------------|
+| Mercury | 234.52° | In-phase | n=7 | Retrograde | Decreasing |
+| Venus | 218.64° | In-phase | n=7 | Retrograde | Decreasing |
+| Earth | 21.77° | In-phase | n=0 (locked) | Prograde | Decreasing |
+| Mars | 236.07° | In-phase | n=7 | Retrograde | Decreasing |
+| Jupiter | 287.06° | In-phase | n=7 (= n=0)* | Retrograde | Decreasing |
+| **Saturn** | **116.26°** | **Anti-phase** | n=7 (= n=0)* | **Retrograde** | **Increasing** |
+| Uranus | 21.33° | In-phase | n=7 (= n=0)* | Retrograde | Decreasing |
+| Neptune | 174.04° | In-phase | n=7 | Retrograde | Decreasing |
 
 \* Uranus's ICRF perihelion period (H/10) divides H exactly, so its n=7 phase coincides with n=0; Jupiter and Saturn carry non-integer cycles per anchor interval, so their per-anchor phases differ.
 

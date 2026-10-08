@@ -61,6 +61,12 @@ const HISTORICAL = new Set([
   // planets' periods, inclinations and nodes moved onto the N-body chain; the
   // doc describes the retired laws and must not track the live registry.
   '10-fibonacci-laws.md',
+  // Plan 07 R5/R9 + §9k: the geometric-elements device's record — the device
+  // is deleted (its evaluators, the ψ law, the node integrator), the doc keeps
+  // the description and calibration tables of what it was. Its remaining
+  // value markers are observed catalogue and chain values that still resolve;
+  // the dated anchor column is gone with the balanced-year date (§3c/§3d).
+  '31-no-chain-body-elements.md',
 ]);
 // No doc is superseded today (§10a survey: zero point forward to a successor).
 const SUPERSEDED = new Set([]);
