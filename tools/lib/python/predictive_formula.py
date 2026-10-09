@@ -32,7 +32,7 @@ import math
 from typing import List, Tuple, Dict
 
 from constants_scripts import (
-    H, BALANCE_YEAR, EARTH_BASE_ECCENTRICITY, EARTH_ECCENTRICITY_AMPLITUDE,
+    H, BALANCE_YEAR, K_DEVICE_WHEEL_PHASE_J2000_CYCLES, EARTH_BASE_ECCENTRICITY, EARTH_ECCENTRICITY_AMPLITUDE,
     EARTH_OBLIQUITY_MEAN, EARTH_INCLINATION_AMPLITUDE,
     _SIDEREAL_YEAR_S, _MEAN_SOLAR_YEAR_DAYS, _MEAN_SIDEREAL_YEAR_DAYS,
     _MEAN_LENGTH_OF_DAY, _MEAN_ANOM_YEAR_DAYS, _ECCENTRICITY_DERIVED_MEAN,
@@ -50,7 +50,7 @@ from constants_scripts import (
 # SECTION A: FUNDAMENTAL CONSTANTS
 # =============================================================================
 
-ANCHOR_YEAR = BALANCE_YEAR      # from constants_scripts (1246 - 14.5*(H/16))
+ANCHOR_YEAR = BALANCE_YEAR      # from constants_scripts — 2000 since plan 07 R10 (the combs' phase origin is J2000)
 J2000 = 2000                    # J2000 epoch (perihelion reference)
 
 # --- Day & Year constants (all derived in constants_scripts; J2000-anchored) ---
@@ -252,7 +252,9 @@ def calc_earth_perihelion(year: int) -> float:
     """Calculate Earth's perihelion longitude at given year (degrees)."""
     t = time_offset(year)
     mean_rate = 360.0 / EARTH_PERI_PERIOD
-    longitude = 270.0 + mean_rate * t
+    # Plan 07 R10: the 270° convention is the device's perihelion wheel at the
+    # retired origin; at J2000 it stands 16 × the device phase on.
+    longitude = 270.0 + 360.0 * 16 * K_DEVICE_WHEEL_PHASE_J2000_CYCLES + mean_rate * t
 
     for period, sin_c, cos_c in PERI_HARMONICS:
         phase = 2 * math.pi * t / period

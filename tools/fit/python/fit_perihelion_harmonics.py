@@ -31,7 +31,10 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 from load_constants import C
 
 H = C['H']
-BALANCE_YEAR = C['balancedYear']
+BALANCE_YEAR = C['balancedYear']   # plan 07 R10: 2000 — the combs' phase origin is J2000
+# Plan 07 R10: the 270° convention is the device's perihelion wheel at the retired
+# origin; at J2000 it stands 16 × this (anchor-unit cycles) on.
+PERI_MEAN_AT_ORIGIN_DEG = 270.0 + 360.0 * 16 * C['kDeviceWheelPhaseAtJ2000Cycles']
 PERI_PERIOD = H / 16  # perihelion precession cycle in years
 
 EXCEL_PATH = Path(__file__).resolve().parent.parent.parent.parent / 'data' / '01-holistic-year-objects-data.xlsx'
@@ -86,7 +89,7 @@ def fit_harmonics(years, peri, divisors):
 
     # Linear trend: 270° + mean_rate × t
     mean_rate = 360.0 / PERI_PERIOD
-    linear = 270.0 + mean_rate * t
+    linear = PERI_MEAN_AT_ORIGIN_DEG + mean_rate * t
 
     # Residuals from linear trend
     residuals = peri - linear
@@ -125,7 +128,7 @@ def greedy_select(years, peri, base_divisors, max_harmonics, candidate_range=100
     n = len(years)
     t = years - BALANCE_YEAR
     mean_rate = 360.0 / PERI_PERIOD
-    residuals = peri - (270.0 + mean_rate * t)
+    residuals = peri - (PERI_MEAN_AT_ORIGIN_DEG + mean_rate * t)
 
     # Pre-compute sin/cos for all candidate divisors
     candidates = list(range(2, candidate_range + 1))
@@ -219,7 +222,7 @@ def main():
 
     # J2000 prediction
     t_2000 = 2000 - BALANCE_YEAR
-    pred_2000 = 270.0 + 360.0 / PERI_PERIOD * t_2000 + offset
+    pred_2000 = PERI_MEAN_AT_ORIGIN_DEG + 360.0 / PERI_PERIOD * t_2000 + offset
     for div, sc, cc in harmonics:
         phase = 2 * math.pi * t_2000 / (H / div)
         pred_2000 += sc * math.sin(phase) + cc * math.cos(phase)
@@ -233,7 +236,7 @@ def main():
     )
 
     # J2000 prediction with greedy
-    pred_2000g = 270.0 + 360.0 / PERI_PERIOD * t_2000 + greedy_offset
+    pred_2000g = PERI_MEAN_AT_ORIGIN_DEG + 360.0 / PERI_PERIOD * t_2000 + greedy_offset
     for div, sc, cc in greedy_harm:
         phase = 2 * math.pi * t_2000 / (H / div)
         pred_2000g += sc * math.sin(phase) + cc * math.cos(phase)

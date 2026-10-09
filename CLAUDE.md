@@ -236,7 +236,13 @@ sweep worklist, `--root DIR` adds the website's EN pages), `check:artifacts` (ge
 campaign artifacts vs their recorded input hashes — fails naming the exact
 regeneration command), `check:data` (every tracked dataset manifest-covered
 in PROVENANCE.md), `values:package` (the published @essrt/model-values ≡
-the live registry), `test:verify` (the model gates), `test:py-smoke` (the
+the live registry, plus PLAUSIBILITY rows — a published value against the
+reference it is published beside: born from model-values 16.0.0 shipping
+`periLongModel2000AD` 167° off through a private copy of the perihelion
+convention that missed the R10 re-origin, while every page's hand-typed
+"+0.010°" delta column still read agreement — the deltas are registry keys
+now, `periLongDelta*AD`; fail-proven via `ESSRT_VALUES_PLANT=1`),
+`test:verify` (the model gates), `test:py-smoke` (the
 Python IMPORT smoke: every `.py` parses, the bridge
 `tools/lib/python/constants_scripts.py` imports, and every `scripts/*.py`
 imports as a module — born from the bridge sitting UNIMPORTABLE for months

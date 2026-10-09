@@ -31,6 +31,24 @@ const coeffSrc = readFileSync(
 const coefficients = `sha256:${coeffSrc.match(/COEFFICIENTS_HASH = "([0-9a-f]{16})"/)[1]}`;
 
 const resolved = resolveAll();
+
+// Plausibility rows — a published value against the reference it is published
+// beside. The identity check below proves only package ≡ registry: model-values
+// 16.0.0 shipped periLongModel2000AD 167° off (a private copy of the perihelion
+// convention missed the R10 re-origin) while every page's hand-typed "+0.010°"
+// delta still read agreement. Keys resolve to rendered strings; compare as numbers.
+const PLAUSIBILITY = [
+  ['periLongModel2000AD', 'periLongJ2000', 0.02, '° — the model\'s J2000 perihelion vs the IAU mean element'],
+];
+const asNumber = (s) => Number(String(s).replace(/[,  \s]/g, '').replace(/[−–]/g, '-'));
+// fail-proof: ESSRT_VALUES_PLANT=1 re-injects the 16.0.0 offset on the first row.
+const plant = process.env.ESSRT_VALUES_PLANT === '1' ? 167.048 : 0;
+const implausible = PLAUSIBILITY.filter(([k, ref, tol], i) => !(Math.abs(asNumber(resolved.get(k)) + (i === 0 ? plant : 0) - asNumber(resolved.get(ref))) <= tol));
+if (implausible.length) {
+  for (const [k, ref, tol, what] of implausible) console.error(`FAIL — implausible registry value: ${k} = ${resolved.get(k)} vs ${ref} = ${resolved.get(ref)} (tolerance ${tol}${what})`);
+  process.exit(1);
+}
+
 const values = Object.fromEntries([...resolved.entries()].sort(([a], [b]) => a.localeCompare(b)));
 const doc = {
   _meta: {

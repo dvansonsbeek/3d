@@ -160,7 +160,11 @@ function predictiveMachinery() {
   const calcEarthPerihelionDeg = (year) => {
     const mc = dtl().cyclesBetweenYears(C.balancedYear, year, 16);
     if (mc === null) return 270.0;
-    let L = 270.0 + 360.0 * mc;
+    // Plan 07 R10: the 270° convention is the device's perihelion wheel at the
+    // retired origin; at J2000 the wheel stands 16 × kDeviceWheelPhaseAtJ2000Cycles
+    // turns on (the same term as the engine's calcEarthPerihelionPredictive —
+    // this private copy shipped 167.048° off in model-values 16.0.0).
+    let L = 270.0 + 360.0 * 16 * C.kDeviceWheelPhaseAtJ2000Cycles + 360.0 * mc;
     for (const [period, sinC, cosC] of C.PERI_HARMONICS) {
       const ph = phaseAt(year, C.H / period);
       if (ph === null) continue;
@@ -3010,6 +3014,10 @@ export const VALUES = {
     for (const [year, key] of [[1000, '1000AD'], [1246, '1246AD'], [2000, '2000AD'], [2500, '2500AD'], [3000, '3000AD']]) {
       out[`periLongModel${key}`] = { get: () => predictiveMachinery().calcEarthPerihelionDeg(year), render: (v) => Number(v).toFixed(3), unit: '°' };
       out[`periLongMeeus${key}`] = { get: () => astro.knownValues[`meeusPeriLong${key}`], render: (v) => Number(v).toFixed(3), unit: '°', note: 'Meeus (1998) citation' };
+      // The signed difference model − Meeus, so no surface carries the delta as
+      // a literal (model-values 16.0.0 shipped the model 167° off while every
+      // page's hand-typed "+0.010°" column still read agreement).
+      out[`periLongDelta${key}`] = { get: () => { const d = predictiveMachinery().calcEarthPerihelionDeg(year) - astro.knownValues[`meeusPeriLong${key}`]; return ((d + 540) % 360) - 180; }, render: (v) => (Number(v) >= 0 ? '+' : '') + Number(v).toFixed(3), unit: '°', note: 'model − Meeus (1998), wrapped to ±180°' };
     }
     for (const [year, key] of [[2000, '2000AD'], [3000, '3000AD'], [5000, '5000AD'], [10000, '10000AD'], [11725, '11725AD'], [12000, '12000AD'], [15000, '15000AD'], [27000, '27000AD']]) {
       out[`eccModel${key}`] = { get: () => oeEcc(year), render: (v) => Number(v).toFixed(5) };

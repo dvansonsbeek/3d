@@ -46,7 +46,10 @@ from load_constants import C as _C
 H = _C['H']
 PHI = (1 + math.sqrt(5)) / 2  # Golden ratio ≈ 1.618034
 J2000_YEAR = 2000
-BALANCE_YEAR = _C['balancedYear']
+BALANCE_YEAR = _C['balancedYear']   # plan 07 R10: 2000 — the combs' phase origin is J2000
+# Plan 07 R10: the K device's perihelion wheel stands 16 × this (anchor-unit
+# cycles) on at J2000 — the "270° at the origin" convention's J2000 phase.
+K_DEVICE_WHEEL_PHASE_J2000_CYCLES = _C['kDeviceWheelPhaseAtJ2000Cycles']
 
 # Model reference point
 _START_MODEL_JD = _C['startmodelJD']
