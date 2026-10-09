@@ -622,7 +622,8 @@ const OBLIQUITY_MEAN = FIT.SOLSTICE_OBLIQUITY_MEAN_FITTED;
 // the CURRENT family the epoch's REAL LOD of date (lodReal — the pane's Solar
 // Day row, the report's "real" column, the Formula Verification panel; owner:
 // one day for the three. The package's siderealDaySeconds and the published
-// registry values ride the kinematic day — a named split).
+// registry's *Physical keys ride LOD_real too; the IAU inputs ride the
+// 86,400-s day — the named split).
 // The obliquity must follow the same choice:
 //   MEAN family    (meanSiderealday → meanStellarday)  → OBLIQUITY_MEAN
 //   CURRENT family (siderealDayReal, the report rows)  → the obliquity of date
@@ -18683,8 +18684,8 @@ const _vfpTropicalYearDaysOfDate = (() => {
 /** Mean sidereal day of date in SI seconds: the solar day of date times
  *  Y/(Y + 1), Y the mean tropical year in days of date — one more rotation
  *  against the equinox than there are solar days in a year (the Days &
- *  Years row's expression on the Solar Day panel's day; that row rides the
- *  kinematic day, hence the J2000 split the panel's reading names). The
+ *  Years row's expression on the Solar Day panel's day, LOD_real; the IAU
+ *  values ride the 86,400-s day, hence the J2000 split the panel's reading names). The
  *  second argument swaps the day in (the long-term mean, a witness). */
 function _vfpSiderealDaySecondsOfDate(year, solarDaySeconds = _vfpSolarDaySecondsOfDate(year)) {
   if (solarDaySeconds === null || !Number.isFinite(solarDaySeconds)) return null;
@@ -19000,7 +19001,7 @@ const VFP_CATEGORIES = [
     id: 'sidereal-stellar-day', group: 'Earth clock', label: 'Sidereal & Stellar Day', unit: ' s', precision: 6,
     defaultRef: 'This model — stellar day',   // the model's own line is the baseline (no external witness — owner)
     frame: 'Mean sidereal day and mean stellar day (SI seconds), of date — on the Solar Day panel’s mean solar day of date',
-    reading: 'Sidereal day = solar day of date × Y/(Y + 1): one rotation more against the equinox than there are solar days in a year. Stellar day = sidereal day × (1 + cos ε / (T_p · (Y + 1))): the equinox’s daily regression projected onto the equator, the ~8.4 ms the Days & Years rows show (the hover prints that split of date). Here Y is the mean tropical year of date in days (the Tropical Year panel’s line), ε the obliquity of the ecliptic of date (the Obliquity panel’s line) and T_p the axial precession period of date in years — the secular composed lunisolar period the Days & Years rows use, equal at J2000 to the instantaneous period the Axial Precession Period panel plots. Both days ride the Solar Day panel’s day-length stack, so at J2000 they sit above the IAU values by that day’s excess over 86,400 s — the IAU values, like the Days & Years rows, rest on the 86,400-s kinematic day.',
+    reading: 'Sidereal day = solar day of date × Y/(Y + 1): one rotation more against the equinox than there are solar days in a year. Stellar day = sidereal day × (1 + cos ε / (T_p · (Y + 1))): the equinox’s daily regression projected onto the equator, the ~8.4 ms the Days & Years rows show (the hover prints that split of date). Here Y is the mean tropical year of date in days (the Tropical Year panel’s line), ε the obliquity of the ecliptic of date (the Obliquity panel’s line) and T_p the axial precession period of date in years — the secular composed lunisolar period the Days & Years rows use, equal at J2000 to the instantaneous period the Axial Precession Period panel plots. Both days ride the Solar Day panel’s day-length stack, so at J2000 they sit above the IAU values by that day’s excess over 86,400 s — the IAU values rest on the day of exactly 86,400 s; the registry and the website show the same two days on both that day and LOD_real.',
     yLabel: 'seconds',
     residualLabel: 'milliseconds', residualScale: 1000,
     paperTitle: 'Sidereal and Stellar Day Comparison',
@@ -54018,9 +54019,9 @@ function updatePredictions() {
   // they are DEFINED on the nominal 86,400-s day — while the Solar Day row
   // read 86400.0018, two days in one folder (the "name its window" class).
   // The IAU values stay the comparison in the panel's J2000 table; the
-  // published registry values (siderealDayJ2000 / stellarDayJ2000 in
-  // model-values, the package's siderealDaySeconds) still ride the
-  // kinematic day — a named split, not an oversight.
+  // published registry values (siderealDayJ2000Physical / stellarDayJ2000Physical
+  // in model-values, the package's siderealDaySeconds) ride LOD_real with
+  // this row; the IAU inputs ride the 86,400-s day — a named split, not an oversight.
   const _lodRealForDays = computeLodRealSecondsAtEpoch(yearForFormula);
   predictions.siderealDayReal = o.siderealDayReal = (o.solarYearDays*_lodRealForDays)/(o.solarYearDays+1);
   // CURRENT family: o.siderealDayReal uses this epoch's real LOD, so the
