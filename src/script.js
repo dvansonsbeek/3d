@@ -43290,6 +43290,9 @@ const _sceneUmbraEarth   = new THREE.Vector3();
 const _sceneUmbraMoonGeo = new THREE.Vector3();
 const _sceneUmbraSunGeo  = new THREE.Vector3();
 const _sceneUmbraDir     = new THREE.Vector3();
+const _sceneUmbraPole    = new THREE.Vector3();   // the ecliptic pole of date, world frame (the aberration axis)
+const _sceneUmbraProjS   = new THREE.Vector3();
+const _sceneUmbraProjM   = new THREE.Vector3();
 const _sceneUmbraHit     = new THREE.Vector3();
 const _sceneUmbraLocal   = new THREE.Vector3();
 const _sceneUmbraQuat    = new THREE.Quaternion();
@@ -43302,7 +43305,11 @@ const _sceneUmbraQuatInv = new THREE.Quaternion();
  * (per public/Earth.jpg, which is Pacific-centered). */
 /** B1: solar annual aberration for the SCENE shadow machinery — the apparent
  *  Sun lags the geometric scene Sun by κ/r along the ecliptic (κ = 20.4955″;
- *  rotation about world Y, the ecliptic pole; the −sign measured against JPL
+ *  a rotation about the ecliptic pole OF DATE, built in the rotation-axis
+ *  frame from the obliquity of date — it used to rotate about world Y, the
+ *  scaffold's pole, which is the J2000 ecliptic pole only to the pose's
+ *  ~1e-4 rad (plan 07 R10 measured 0.45″ when the pose tilted 1.25°) and
+ *  parts from the pole of date by ~47″/cy; the −sign measured against JPL
  *  apparent RA at 2024-04-08 18:42). Since U2/U3 the CERTIFIED umbra is the
  *  tier delegation above; this function serves only umbraNASAConventionAtJd
  *  (the scene-relative γ diagnostic). The Node twin that mirrored it was
@@ -43336,6 +43343,12 @@ function _applySolarAberration(sunGeoVec, jd, moonGeoVec) {
       rS * Math.cos(decS) * Math.cos(raS),
     ).applyQuaternion(_sceneUmbraQuat);
     sunGeoVec.copy(_sceneUmbraLocal);
+    // The aberration axis — the ecliptic pole OF DATE: in the rotation-axis
+    // local equatorial frame (x = cos δ sin α, y = sin δ, z = cos δ cos α) the
+    // pole sits at δ = 90° − ε, α = −90°, i.e. (−sin ε, cos ε, 0), taken to
+    // the world frame by the same quaternion that placed the Sun. The former
+    // world-Y rotation assumed the scaffold's pole was this pole.
+    _sceneUmbraPole.set(-Math.sin(eps), Math.cos(eps), 0).applyQuaternion(_sceneUmbraQuat);
   }
   // B1 generalized (round 3): ANNUAL ABERRATION FOR BOTH BODIES. The
   // observer-velocity (v/c) apparent shift is distance-independent:
@@ -43346,20 +43359,18 @@ function _applySolarAberration(sunGeoVec, jd, moonGeoVec) {
   // exactly κ (+20″ elongation error at all five modern events).
   const rAu = sunGeoVec.length() / 100;
   const a = -(K.physicalConstants.aberrationConstantArcsec / 3600) * (Math.PI / 180) / rAu;
-  const _lamS0 = Math.atan2(sunGeoVec.x, sunGeoVec.z);
-  const c = Math.cos(a), s = Math.sin(a);
-  const x = c * sunGeoVec.x + s * sunGeoVec.z;
-  sunGeoVec.z = -s * sunGeoVec.x + c * sunGeoVec.z;
-  sunGeoVec.x = x;
   if (moonGeoVec) {
-    const lamM = Math.atan2(moonGeoVec.x, moonGeoVec.z);
-    const betM = Math.asin(moonGeoVec.y / moonGeoVec.length());
-    const aM = a * Math.cos(lamM - _lamS0) / Math.cos(betM);
-    const cM = Math.cos(aM), sM = Math.sin(aM);
-    const xM = cM * moonGeoVec.x + sM * moonGeoVec.z;
-    moonGeoVec.z = -sM * moonGeoVec.x + cM * moonGeoVec.z;
-    moonGeoVec.x = xM;
+    // λ_M − λ_S and β_M in the ecliptic frame of date: the latitude from the
+    // pole component, the elongation between the two vectors projected onto
+    // the plane ⟂ the pole — measured BEFORE the Sun is rotated.
+    const betM = Math.asin(moonGeoVec.dot(_sceneUmbraPole) / moonGeoVec.length());
+    _sceneUmbraProjS.copy(sunGeoVec).addScaledVector(_sceneUmbraPole, -sunGeoVec.dot(_sceneUmbraPole));
+    _sceneUmbraProjM.copy(moonGeoVec).addScaledVector(_sceneUmbraPole, -moonGeoVec.dot(_sceneUmbraPole));
+    const cosElong = _sceneUmbraProjS.dot(_sceneUmbraProjM) / (_sceneUmbraProjS.length() * _sceneUmbraProjM.length());
+    const aM = a * cosElong / Math.cos(betM);
+    moonGeoVec.applyAxisAngle(_sceneUmbraPole, aM);
   }
+  sunGeoVec.applyAxisAngle(_sceneUmbraPole, a);
   // (The 20.3c solstitial dec law and the round-3 λ law — modern-measured
   // calibrations of the SCAFFOLD sun against JPL — are RETIRED by the
   // series injection above: it supplies directly the of-date truth those

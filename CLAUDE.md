@@ -381,8 +381,11 @@ identity) and the NASA-convention umbra diagnostic — which rotates the
 aberration about WORLD Y as the ecliptic pole — moved 0.45″ while every
 observable stayed bit-close (the engine places the Earth frame, the Sun and
 the Moon stack over the scaffold). The pose is a recorded constant, so it
-stays as c0; any new world-axis reader in `src/script.js` inherits the same
-assumption. `cyclesBetweenYears(2000, Y, N)` is the integrated form from
+stays as c0; the diagnostic now rotates the aberration about the ecliptic
+pole OF DATE built in the rotation-axis frame (the NASA rows moved ≤0.19″
+at the ancient events — the ~47″/cy tilt of the ecliptic the world-Y form
+ignored), and any new world-axis reader in `src/script.js` must do the
+same. `cyclesBetweenYears(2000, Y, N)` is the integrated form from
 J2000 (the R3 call-shape rule's `driftRefYear` is the model start, not 2000). **Plan 07 R1/R8 (model v19.0,
 physics MAJOR 15, model-values MAJOR 14): the retired laws' INPUTS left
 `model-parameters.json`** — `perihelionEclipticFraction`, the per-planet

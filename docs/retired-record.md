@@ -476,8 +476,11 @@ law. Measured on the way: without it the whole scaffold tilted 1.25° (the
 bit-close — the engine places the Earth frame, the Sun and the Moon stack
 over the scaffold — except the NASA-convention umbra diagnostic, which
 rotates the annual aberration about WORLD Y as the ecliptic pole and moved
-0.45″ = κ·sin 1.25°. That world-axis assumption is now documented
-(CLAUDE.md), not fixed.
+0.45″ = κ·sin 1.25°. That world-axis assumption has since been removed: the
+diagnostic rotates the aberration about the ecliptic pole of date, built
+in the rotation-axis frame from the obliquity of date (the NASA rows moved
+≤0.19″ at the ancient events, the ecliptic's ~47″/cy tilt the world-Y form
+ignored; the certified umbra was never involved).
 
 ## What this does NOT retire
 
