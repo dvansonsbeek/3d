@@ -100,7 +100,7 @@ behind fail-proven gates. None is a free parameter:
 | Solar torque of date | derived at runtime | 1 + f_S·([(1 − e²)/(1 − e₀²)]^(−3/2) − 1) | the solar share's own (1 − e²)^(−3/2) evaluated at the one-source eccentricity of date (`earth/deep-orbital-history`); +<!--v:precOfDateSolarTorqueMeanLastMyrPct-->0.032<!--/v--> % on the million-year mean |
 | Solar mass loss | cited | luminosity/c² + wind | published constants (`deriveEpochParams`) — the Driver-2 stretch of every heliocentric period; the μ(t) the two-expansions consistency leg tests |
 
-#### The frozen era clock — the certified time machinery (4 constants + the bases)
+#### The frozen era clock — the certified time machinery (5 constants + the bases)
 
 These are the constants of the FROZEN ERA DEVICE (plan 06 D8), still
 load-bearing for the certified time-domain machinery the gate suite is
@@ -114,20 +114,21 @@ relabel, not re-base.
 | # | Constant | Variable | Value | Anchored by |
 |---|-----------|----------|-------|-------------|
 | 1 | The fitted timing anchor — the unit of the correction bases and the era clock; it scales with the precession period at deep time (anchor/T_p = 13.011, a fit constant — not a period, plan 06 S5) | `holisticyearLength` | <!--v:H-->335,317<!--/v--> years | 1246 AD perihelion–solstice alignment + J2000 longitude of perihelion |
-| 2 | Mean obliquity — the K comb's mean; the published obliquity is the hybrid (Ledger 1) | `earthtiltMean` | <!--v:meanObliquity-->23.41353<!--/v-->° | observed obliquity range |
-| 3 | Inclination amplitude — the K inclination law's; the published inclination is the chain's (Ledger 1) | `earthInvPlaneInclinationAmplitude` | <!--v:earthInclAmp-->0.63607<!--/v-->° | observed obliquity range |
-| 4 | Inclination-cycle anchor — phases the Sun's eccentricity law and the Moon eccentricity channel's anchor form | `earthInclinationCycleAnchor` | 21.77° | the System-Reset convention — the one free assumption in its chain; the anchor arithmetic itself is exact |
+| 2 | Mean obliquity — the K comb's mean, and the scene's J2000 pose; the published obliquity is the hybrid (Ledger 1) | `earthtiltMean` | <!--v:meanObliquity-->23.41353<!--/v-->° | observed obliquity range |
+| 3 | Inclination amplitude — a constant of the scene's J2000 pose (the K inclination law it once fed is retired, plan 07 R5/R9); the published inclination is the chain's (Ledger 1) | `earthInvPlaneInclinationAmplitude` | <!--v:earthInclAmp-->0.63607<!--/v-->° | observed obliquity range |
+| 4 | The eccentricity line's phase anchor — phases the scene Sun's eccentricity law and the Moon eccentricity channel's anchor form | `earthInclinationCycleAnchor` | 21.77° | the recorded J2000 phase of the correction bases (plan 07 R10: the former fitted origin t₀ was rotated out of every coefficient exactly); the anchor arithmetic itself is exact |
+| 5 | The K wheels' phase at J2000 — the scene scaffolding's recorded pose (N × this per H/N wheel), not a law; no observable rides it | `kDeviceWheelPhaseAtJ2000Cycles` | 0.908498525 anchor units | numerically the retired origin's (2000 − t₀)/H, kept with the pose (plan 07 R10) |
 
 The correction combs' divisors and the era clock's counters are devices
 of the fitted machinery — bounded harmonic bases on the anchor's unit (plan
 06 P3) — not degrees of freedom and not laws; what the three pre-registered
 falsification legs test is the physics: the composed precession clock, the
-obliquity beat, the two-expansions μ-consistency. The correction bases'
-phase origin t₀ is a fitted convention, not a date — exact arithmetic from
-the anchor unit and the 1246 AD alignment, the beat count chosen so the
-bases reproduce the J2000 values (plan 07 §3c/§3d: no calendar year is
-quoted for it; the perihelion-of-date period it is counted in is itself a
-function of epoch). Earth's eccentricity is not a parameter: e(J2000) is an observed
+obliquity beat, the two-expansions μ-consistency. The correction bases
+measure their phase from J2000 (plan 07 R10): they were fitted against an
+origin t₀ counted back from the 1246 AD alignment by 14.5 perihelion-of-date
+beats, and that origin was rotated out of every coefficient exactly — no
+refit, no published value moved — so neither the beat count nor any earlier
+epoch is an input of the model. Earth's eccentricity is not a parameter: e(J2000) is an observed
 calibration input, and the eccentricity law's mean is derived from it and
 the shared anchor.
 

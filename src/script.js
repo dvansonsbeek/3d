@@ -23487,7 +23487,7 @@ function setupGUI() {
   // 6-DOF/Config-7 framing lives in git + docs 10/109) ---
   {
     const paFolder = aboutFolder.addFolder({ title: 'Parameter Accounting', expanded: false });
-    addFolderTooltip(paFolder, 'Two engines, three ledgers \u2014 zero free parameters where the dynamics live; the lunisolar channel\u2019s constants are derived or cited, with two measured histories behind fail-proven gates; the frozen era clock\u2019s four constants and the correction bases are identifiers of the certified time machinery; every fitted coefficient gated and hashed. No single headline count: the ledgers are the accounting.');
+    addFolderTooltip(paFolder, 'Two engines, three ledgers \u2014 zero free parameters where the dynamics live; the lunisolar channel\u2019s constants are derived or cited, with two measured histories behind fail-proven gates; the frozen era clock\u2019s five constants and the correction bases are identifiers of the certified time machinery; every fitted coefficient gated and hashed. No single headline count: the ledgers are the accounting.');
     const c = paFolder.element.querySelector('.tp-fldv_c');
     const head = (t) => {
       const d = document.createElement('div');
@@ -23523,17 +23523,19 @@ function setupGUI() {
       'The polar moment\u2019s lagged response to the climate formula\u2019s ice proxy: the coupling k is derived at runtime from the Cox & Chao 2002 dJ\u2082/dt; the relaxation time is measured against the historical \u0394T record.');
     row('Solar mass loss \u00B7 cited',
       'Luminosity/c\u00B2 plus wind, from published constants \u2014 the Driver-2 stretch of every heliocentric period, and the \u03BC(t) the two-expansions consistency leg tests.');
-    head('The frozen era clock \u2014 the certified time machinery (4 constants + the bases)');
+    head('The frozen era clock \u2014 the certified time machinery (5 constants + the bases)');
     row('Fitted timing anchor \u00B7 holisticyearLength = ' + String(holisticyearLength) + ' yr',
       'Fitted to the 1246 AD perihelion\u2013solstice alignment + the J2000 longitude of perihelion. The unit of the correction bases and the era clock \u2014 the cardinal-point and year-length harmonics, the \u0394T stack\u2019s flags and the deep calendar all ride it; it scales with the precession period at deep time (anchor/T_p = 13.011, a fit constant \u2014 not a period).');
     row('Mean obliquity \u00B7 ' + earthtiltMean + '\u00B0',
-      'The K comb\u2019s mean, fitted to the observed obliquity range. A device constant: the published obliquity is the hybrid (Ledger 1); the comb still carries the cardinal-point model, the kinematic-day stack\u2019s RA projection, the lunar arguments\u2019 obliquity carrier and the scene\u2019s K geometry.');
+      'The K comb\u2019s mean, fitted to the observed obliquity range, and the scene\u2019s J2000 pose. A device constant: the published obliquity is the hybrid (Ledger 1); the comb still carries the cardinal-point model, the kinematic-day stack\u2019s RA projection, the lunar arguments\u2019 obliquity carrier and the scene\u2019s K geometry.');
     row('Inclination amplitude \u00B7 ' + earthInvPlaneInclinationAmplitude + '\u00B0',
-      'The K inclination law\u2019s amplitude, fitted to the observed obliquity range. A device constant: the published inclination is the chain\u2019s (Ledger 1).');
-    row('Inclination-cycle anchor \u00B7 ' + earthInclinationCycleAnchor + '\u00B0',
-      'The System-Reset convention \u2014 the one free assumption in its chain; the anchor arithmetic itself is exact. Phases the browser scene Sun\u2019s eccentricity law (the physics package\u2019s eclipse Sun no longer reads it) and the Moon eccentricity channel\u2019s anchor form.');
+      'A constant of the scene\u2019s J2000 pose, fitted to the observed obliquity range; the K inclination law it once fed is retired (plan 07 R5/R9). The published inclination is the chain\u2019s (Ledger 1).');
+    row('The eccentricity line\u2019s phase anchor \u00B7 ' + earthInclinationCycleAnchor + '\u00B0',
+      'The recorded J2000 phase of the correction bases (plan 07 R10: the former fitted origin t\u2080 was rotated out of every coefficient exactly); the anchor arithmetic itself is exact. Phases the browser scene Sun\u2019s eccentricity law (the physics package\u2019s eclipse Sun no longer reads it) and the Moon eccentricity channel\u2019s anchor form.');
+    row('K wheel phase at J2000 \u00B7 ' + kDeviceWheelPhaseAtJ2000Cycles.toFixed(6) + ' anchor units',
+      'The scene scaffolding\u2019s recorded pose \u2014 each H/N wheel stands N \u00D7 this on at J2000 \u2014 not a law: no observable rides it (the engine places the Earth frame, the Sun and the Moon stack over the scaffold). Numerically the retired origin\u2019s (2000 \u2212 t\u2080)/H, kept with the pose (plan 07 R10).');
     row('Correction-basis divisors \u00B7 device tier',
-      'The correction combs\u2019 divisors and the era clock\u2019s counters are identifiers of the fitted machinery \u2014 bounded harmonic bases on the anchor\u2019s unit \u2014 not parameters and not laws; the three pre-registered falsification legs test the physics (the composed precession clock, the obliquity beat, the two-expansions \u03BC-consistency). The balanced year is derived (anchor + 1246 AD); Earth\u2019s e(J2000) is an observed calibration input, and the eccentricity law\u2019s mean derives from it.');
+      'The correction combs\u2019 divisors and the era clock\u2019s counters are identifiers of the fitted machinery \u2014 bounded harmonic bases on the anchor\u2019s unit \u2014 not parameters and not laws; the three pre-registered falsification legs test the physics (the composed precession clock, the obliquity beat, the two-expansions \u03BC-consistency). The combs measure their phase from J2000 (plan 07 R10 \u2014 the former fitted origin, the 1246 AD alignment minus 14.5 perihelion-of-date beats, was rotated out exactly); Earth\u2019s e(J2000) is an observed calibration input, and the eccentricity law\u2019s mean derives from it.');
     head('Ledger 3 \u00B7 The fitted correction stack (gated, hashed)');
     row('Year-length, perihelion and solstice-obliquity harmonics \u00B7 cardinal-point families \u00B7 Sun-longitude harmonics \u00B7 Moon corrections \u00B7 per-planet geocentric-precession projections',
       'Fitter-owned coefficient arrays under the coefficients hash (Model Identity above); the \u0394T/LOD stack, the recession knots and the GIA \u03C4 sit under the constants hash. Every gate is fail-proven. The year-length and cardinal-point families are the frozen era clock\u2019s basis, not the published year lengths, which ride the one-family route. None of these touch the planetary dynamics.');
