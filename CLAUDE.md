@@ -358,9 +358,26 @@ device read 1.24° vs 1.91° at −100 kyr). The integrator's seven browser
 writes had been overwritten by the chain every frame since K5b — its
 display reach was zero; its only gated reach was 28 golden probes. The
 K device CONSTANTS (`earthtiltMean`, `earthInvPlaneInclinationAmplitude`,
-`earthRAAngle`, `earthInvPlaneInclinationMean`) stay: they are the scene's
+`earthRAAngle`, `earthInvPlaneInclinationMean`, and since R10 the wheels'
+J2000 phase `kDeviceWheelPhaseAtJ2000Cycles`) stay: they are the scene's
 J2000 pose (the wheel geometry `_kcFrameR` reads once), not a law. `psiValue`
-is frozen in the registry like `kValue`. **Plan 07 R1/R8 (model v19.0,
+is frozen in the registry like `kValue`. **Plan 07 R10 (model v21.0,
+physics MAJOR 17, model-values MAJOR 16): the combs' phase origin is J2000.**
+The fitted origin t₀ (`perihelionalignmentYear` − `temperatureGraphMostLikely`
+× H/16 = −302,635, the "balanced year") was rotated out of every (sin, cos)
+pair EXACTLY — no refit, `tools/fit/reorigin-combs-j2000.mjs`, c0 = (2000 −
+t₀)/H = 0.908498525276082 anchor units, bit-identical on every package
+surface over ±300 kyr — and its two inputs left the JSON (literals gate
+ratchet). The RA day offset's cosine literals became the fitted family
+`RA_DAY_OFFSET_MS`. Trap measured on the way: the K-device wheels were posed
+on t₀ too; moving them to J2000 tilted the whole scaffold 1.25° (R left the
+identity) and the NASA-convention umbra diagnostic — which rotates the
+aberration about WORLD Y as the ecliptic pole — moved 0.45″ while every
+observable stayed bit-close (the engine places the Earth frame, the Sun and
+the Moon stack over the scaffold). The pose is a recorded constant, so it
+stays as c0; any new world-axis reader in `src/script.js` inherits the same
+assumption. `cyclesBetweenYears(2000, Y, N)` is the integrated form from
+J2000 (the R3 call-shape rule's `driftRefYear` is the model start, not 2000). **Plan 07 R1/R8 (model v19.0,
 physics MAJOR 15, model-values MAJOR 14): the retired laws' INPUTS left
 `model-parameters.json`** — `perihelionEclipticFraction`, the per-planet
 divisor key, `inclinationCycleAnchor`, `antiPhase` (planets and additional

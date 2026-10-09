@@ -1,7 +1,7 @@
 ---
 docVersion: 1.0
-modelVersion: v20.0
-coefficients: sha256:96f7a2194ea29f0e
+modelVersion: v21.0
+coefficients: sha256:7258a9b469c8b95e
 status: current
 ---
 
@@ -444,6 +444,40 @@ the preset, because no gate and no published surface read the live
 construction — the reference number had quietly stopped reproducing. The
 engine-input re-evaluation that superseded all of this is doc 109; what
 survives as an observation, not a law, is in doc 10.
+
+**The fitted phase origin t₀ — the "balanced year"** (plan 07 R10, model
+v21.0). Every correction comb measured its phase from t₀ =
+`perihelionalignmentYear` − `temperatureGraphMostLikely` × H/16 = 1246.03125
+− 14.5 × 20,957 = −302,635 — a fitted phase disguised as a date (docs/20
+listed it as "obliquity cycle position 14.5 of 16"), with a second input
+`systemResetN` (= 7, the "System Reset" eccentricity anchor
+t₀ − 7H = −2,649,854) that had had no reader since R6. Both inputs are
+deleted from `public/input/model-parameters.json` (the literals gate carries
+the ratchet). Nothing was refitted: the origin was moved to J2000 by rotating
+every fitted (sin, cos) pair exactly, φ_old = φ_new + 2π·d·c0 with c0 =
+(2000 − t₀)/H = 0.908498525276082 anchor units (`tools/fit/reorigin-combs-
+j2000.mjs`; the cardinal eccentricity terms by order·δ₁₆, the §10g joint
+sidebands by −δ_div, the derived H-slope intercept h0 → h0 + h1·c0) —
+measured bit-identical on every package surface over ±300 kyr before the
+write. The RA day offset's two cosine literals (−5.640 cos φ₁₆ − 1.684 cos
+φ₈ ms/day, hard-coded in three runtimes and the website) became the fitted
+family `RA_DAY_OFFSET_MS` on the J2000 phase. With the origin went the
+Phase 9.11 "balanced-year navigation" (the k-th H-balanced event from t₀,
+its two test buttons, the last/next-H readouts), the per-frame
+`juliandaysbalancedJD` / `perihelionprecessioncycleYear` counters and the
+registry key `tempGraphMostLikely`.
+
+What is NOT retired with it: the scene scaffolding's K-device wheels were
+posed on t₀ too, and their phase at J2000 (N × c0 turns per H/N wheel) is
+part of the scene's recorded J2000 pose — it stays as the constant
+`kDeviceWheelPhaseAtJ2000Cycles` (= c0), like `earthtiltMean` a pose, not a
+law. Measured on the way: without it the whole scaffold tilted 1.25° (the
+`_kcFrameR` bridge left the identity) while every observable stayed
+bit-close — the engine places the Earth frame, the Sun and the Moon stack
+over the scaffold — except the NASA-convention umbra diagnostic, which
+rotates the annual aberration about WORLD Y as the ecliptic pole and moved
+0.45″ = κ·sin 1.25°. That world-axis assumption is now documented
+(CLAUDE.md), not fixed.
 
 ## What this does NOT retire
 

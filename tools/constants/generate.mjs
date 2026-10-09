@@ -71,6 +71,9 @@ const COEFFICIENT_KEYS = [
   'PERI_HARMONICS_RAW',
   'SOLSTICE_OBLIQUITY_HARMONICS',
   'SUN_LONGITUDE_HARMONICS',
+  // Plan 07 R10: the RA day offset's two lines ({mean, terms: [div, sin, cos]},
+  // phase from J2000) — the former cosine literals of three runtimes + the site.
+  'RA_DAY_OFFSET_MS',
 
   // (The Moon RA/Dec patches MOON_CORRECTION / MOON_CORRECTION_RESIDUAL were
   // retired at plan 06 R3 item 1 — moon/apparent.cjs carries the record.)

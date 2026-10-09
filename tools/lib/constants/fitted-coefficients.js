@@ -98,6 +98,7 @@ module.exports = {
   CARDINAL_POINT_ANCHORS_ADJUSTED,
   CARDINAL_POINT_ECC_TERMS,
   CARDINAL_POINT_DERIVED,
+  RA_DAY_OFFSET_MS: data.RA_DAY_OFFSET_MS,   // plan 07 R10: the RA day offset's lines, phase from J2000 (were literals)
   CARDINAL_POINT_JOINT_TERMS,
   SOLSTICE_JD_HARMONICS,
 

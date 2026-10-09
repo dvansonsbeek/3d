@@ -1,7 +1,7 @@
 ---
 docVersion: 1.0
-modelVersion: v20.0
-coefficients: sha256:96f7a2194ea29f0e
+modelVersion: v21.0
+coefficients: sha256:7258a9b469c8b95e
 status: current
 ---
 
@@ -271,14 +271,17 @@ H/3 wobble cycle that also drives Earth's inclination, expressed in
 eccentricity form with nothing solved and nothing fitted:
 
     e(t) = eccentricityBase · (1 + cos θ(t) / 2)
-    θ(t) = 3 · (t − balancedYear) / H · 360° − 180°
+    θ(t) = θ(J2000) + 3 · (t − 2000) / H · 360°,   θ(J2000) = 81.178°
 
 Mean = Law 5's base, amplitude = base/2, and the phase is pure lattice
-arithmetic: the inclination minimum falls exactly on the balanced year (the
-System Reset convention), which fixes θ(J2000) = 81.178°. In anchor form
-this is θ = ϖ_ICRF − 21.77°, and 21.77° is itself derived — the perihelion
-longitude cancels out of the channel phase entirely. Inputs: base,
-balancedYear, H. Everything observational becomes a prediction:
+arithmetic: under the retired origin convention the inclination minimum fell
+exactly on the balanced year t₀ = −302,635 (the System Reset convention),
+which fixed θ(J2000) = 3·(2000 − t₀)/H·360° − 180° = 81.178°; since plan 07
+R10 the phase is measured from J2000 and 81.178° is the recorded anchor (the
+same number, the origin rotated out). In anchor form this is θ = ϖ_ICRF −
+21.77°, and 21.77° is itself derived — the perihelion longitude cancels out
+of the channel phase entirely. Inputs: base, θ(J2000), H. Everything
+observational becomes a prediction:
 
 - e(J2000) = 0.016566 (observed 0.0167102; −0.86%)
 - ė(J2000) = −4.273e-5/cy (secular theory −4.204e-5; +1.7%)
@@ -328,7 +331,7 @@ tensions live in the node/phase sector while all magnitudes are stiff:
 inclinations moves Earth's invariable-plane node by −1.23° (i_E moves only
 +3″); (2) the channel's value-exact phase sits at 80.09° vs the derived
 81.18°; (3) equivalently, the inclination minimum displaced +339 yr from
-the balanced year. Same size, same sector — possibly one cause. If it
+t₀ = −302,635 (the retired phase origin). Same size, same sector — possibly one cause. If it
 resolves structurally, the channel's e(J2000) prediction snaps exact.
 
 ### 1.1 Longitude Series (Table 47.A, 60 terms + 3 additional)

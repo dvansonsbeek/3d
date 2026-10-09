@@ -1,7 +1,7 @@
 ---
 docVersion: 1.0
-modelVersion: v20.0
-coefficients: sha256:96f7a2194ea29f0e
+modelVersion: v21.0
+coefficients: sha256:7258a9b469c8b95e
 status: current
 ---
 
@@ -210,7 +210,7 @@ The Earth object itself represents **Axial Precession**:
 | Property | Value | Meaning |
 |----------|-------|---------|
 | speed | +2π / (H/3) | Counter-clockwise |
-| startPos | Calculated from balanced year | Phase alignment |
+| startPos | Cycles from the model start to J2000 minus the device's recorded J2000 wheel phase (3 × `kDeviceWheelPhaseAtJ2000Cycles`; plan 07 R10, Part 6) | Phase alignment |
 
 **Purpose:** Opposes Earth's axial precession motion. The inclination precession and axial precession are "balancing out in both ways" - they have opposite directions.
 
@@ -279,22 +279,26 @@ realized offset.
 
 ---
 
-## Part 6: The Balanced Year
+## Part 6: The Balanced Year (retired as an input — plan 07 R10)
 
-The **Balanced Year** is a critical concept for understanding the model's phase alignments.
+The **balanced year** was the fitted phase origin of the model's correction
+combs and of the precession layers' `startPos` values:
+`perihelionalignmentYear − 14.5 × H/16` = −302,635, the 14.5-cycle offset that
+positioned the obliquity fluctuation against the paleoclimate record. It is no
+longer an input. Every comb measures its phase from J2000 (the coefficients
+were rotated exactly, `tools/fit/reorigin-combs-j2000.mjs`), and the
+precession layers keep their J2000 pose through one recorded device constant,
+`kDeviceWheelPhaseAtJ2000Cycles` = (2000 − t₀)/H = 0.9085 anchor units: each
+H/N wheel stands N × that on at J2000, and its `startPos` is the wheel's
+cycles from the model start to J2000 minus that phase.
 
-**Value:** Derived from `perihelionalignmentYear - (14.5 × H/16)`. See [Constants Reference](20-constants-reference.md) for current value.
-
-**Definition:** The moment when all tilt and inclination parameters aligned oppositely yet symmetrically.
-
-**Calculation:**
-```
-balancedYear = perihelionAlignmentYear - (14.5 × holisticyearLength/16)
-```
-
-This 14.5-cycle offset positions the obliquity fluctuation to correctly explain paleoclimate temperature cycles.
-
-**Why it matters:** All `startPos` values for precession layers are calculated relative to this balanced year, ensuring the cycles are properly phased.
+**Why it matters:** the K-device wheels are the scene's scaffold, not a law —
+the engine places the Earth frame, the Sun and the Moon stack over them (the
+`_kcFrameR` bridge reads the pose once) — but the scene's world frame and
+every world-axis reader see their pose. Measured: dropping the constant tilted
+the scaffold 1.25° and moved the NASA-convention umbra diagnostic, which
+rotates the annual aberration about world Y as the ecliptic pole, by 0.45″
+while every observable stayed bit-close.
 
 ---
 

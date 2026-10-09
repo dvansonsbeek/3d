@@ -8,18 +8,18 @@
     "startmodelYear": 2000.5,
     "correctionDays": -0.828832119703292,
     "correctionSun": 0.4971540149655503,
-    "temperatureGraphMostLikely": 14.5,
     "startAngleModel": 89.91949879,
     "useVariableSpeed": true,
-    "systemResetN": 7,
     "_psiNote": "PSI is derived in constants.js from earthInvPlaneInclinationAmplitude: PSI = 3 × amp × √m_Earth",
-    "_systemResetNNote": "Eccentricity anchor offset (0..7) in units of H. 0 = balancedYear (n=0), 7 = System Reset. Shifts all eccentricity phase calculations."
+    "_phaseOriginNote": "Plan 07 R10: the correction combs measure their phase from J2000. The former phase origin (perihelionalignmentYear − temperatureGraphMostLikely 14.5 × H/16 = −302,635, the 'balanced year') and the System-Reset offset (systemResetN 7, in anchor units) were rotated out of the fitted coefficients exactly (tools/fit/reorigin-combs-j2000.mjs) and are no longer inputs; the literals gate fails if either key returns."
   },
   "earth": {
     "earthtiltMean": 23.413526608469965,
     "earthInvPlaneInclinationAmplitude": 0.636069722432876,
     "eccentricityBase": 0.015386009686374918,
-    "eccentricityAmplitude": 0.0013559440307290061
+    "eccentricityAmplitude": 0.0013559440307290061,
+    "kDeviceWheelPhaseAtJ2000Cycles": 0.908498525276082,
+    "_kDeviceWheelPhaseNote": "Plan 07 R10: the scene scaffolding's K-device wheel phase at J2000 in anchor-unit cycles — each H/N wheel (H/3, H/5, H/8, the H/16 pair, the H/13 wobble marker, the perihelion wheel's 270° convention) stands N × this on at J2000. Numerically the retired phase origin's (2000 − t₀)/H; kept as the device's RECORDED J2000 pose like earthtiltMean (the wheel geometry _kcFrameR bridges once), not a law. No observable rides it — the engine places the Earth frame, the Sun and the Moon stack over it — but the scene's world frame and every world-axis reader (the NASA-convention umbra diagnostic's aberration about world Y) do; measured: dropping it tilted the K pose 1.25° and moved that diagnostic 0.45″."
   },
   "moon": {
     "moonStartposApsidal": 347.5476,

@@ -1,7 +1,7 @@
 ---
 docVersion: 1.0
-modelVersion: v20.0
-coefficients: sha256:96f7a2194ea29f0e
+modelVersion: v21.0
+coefficients: sha256:7258a9b469c8b95e
 status: current
 ---
 
@@ -206,7 +206,8 @@ These constants define the model. Changing any of them changes the theory.
 |----------|----------|-------|
 | The fitted timing anchor | `holisticyearLength` | **<!--v:H-->335,317<!--/v-->** years |
 | Perihelion alignment year | `perihelionalignmentYear` | <!--v:periAlignYear-->1246.03125<!--/v--> AD |
-| Obliquity cycle position | `temperatureGraphMostLikely` | 14.5 (of 16) |
+
+(Plan 07 R10: the former "obliquity cycle position" input `temperatureGraphMostLikely` = 14.5, which with the alignment year defined the correction bases' phase origin t₀, left the JSON — the combs measure their phase from J2000 and t₀ was rotated out of every fitted coefficient exactly, `tools/fit/reorigin-combs-j2000.mjs`.)
 
 The anchor is the unit of the correction bases and of the frozen era clock; it was fitted on the 1246 AD perihelion–solstice alignment of the IAU mean elements (Meeus); the model's own series crosses two years later, at 1247.7 AD. It is not a period: Earth's precession periods are the dynamical values of [Part 2 — Derived Constants](#part-2--derived-constants) — the axial precession period is <!--v:axialPrecExact-->25,771.40<!--/v--> years, of which the anchor is 13.011, a fit constant (plan 06 S5). The former presentation of the anchor as a "master cycle divided by small integers" is retired ([retired record](retired-record.md)).
 
@@ -286,7 +287,7 @@ These are computed from foundational constants. The formula is the definition; t
 | Mean Length of Day | `meanLengthOfDay` | meanSiderealYearSeconds / meanSiderealYearDays | ~86,400.0 s |
 | Mean Sidereal Day | `meanSiderealDay` | (meanSolarYearDays/(meanSolarYearDays+1)) × meanLengthOfDay | <!--v:meanSiderealDaySeconds-->86,164.0902182<!--/v--> s |
 | Mean Stellar Day | `meanStellarDay` | (meanSiderealDay/T_p) / (meanSolarYearDays+1) · cos ε + meanSiderealDay — T_p the certified J2000 precession period, not the counter H/13 | <!--v:meanStellarDaySeconds-->86,164.0985929<!--/v--> s |
-| Phase origin t₀ of the correction bases | `balancedYear` | perihelionalignmentYear - (14.5 × H/16) | a fitted phase, not a date (the code carries it as a year number; plan 07 §3c) |
+| Phase origin of the correction bases | `balancedYear` | 2000 (J2000, by construction — plan 07 R10) | the former fitted origin perihelionalignmentYear − 14.5 × H/16 was rotated out of every coefficient exactly; the name stays as the code's phase-origin variable |
 | Perihelion Alignment JD | `perihelionalignmentJD` | startmodelJD - meanSolarYearDays × (startModelYearWithCorrection - perihelionalignmentYear) | ~<!--v:periAlignJD-->2,176,153<!--/v--> |
 | Perihelion Cycle Length | `perihelionCycleLength` | H / 16 | <!--v:periPrecYears-->~20,938<!--/v--> years |
 | Total Days in H | `totalDaysInH` | H × meanSolarYearDays | ~<!--v:totalDaysInH-->122,471,920<!--/v--> days |
@@ -294,7 +295,7 @@ These are computed from foundational constants. The formula is the definition; t
 | Julian century | `julianCenturyDays` | 36525 (100 × 365.25) | 36,525 days (IAU Julian century) |
 | Earth rotations/year | `meanEarthRotationsPerYear` | meanSolarYearDays + 1 | 366.2422 |
 | Start year corrected | `startModelYearWithCorrection` | startmodelYear + correctionDays / meanSolarYearDays | ~2000.4977 |
-| Years from t₀ to J2000 | `yearsFromBalancedToJ2000` | (startmodelJD - balancedJD) / meanSolarYearDays | 14.5 perihelion-of-date beats (a phase span, not quoted as a year count) |
+| Years from the phase origin to J2000 | `yearsFromBalancedToJ2000` | (startmodelJD - balancedJD) / meanSolarYearDays | ≈ 0 since plan 07 R10 (the origin is J2000; kept as a code variable) |
 
 Input constants used in the formulas above:
 

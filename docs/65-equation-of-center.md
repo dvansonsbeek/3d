@@ -1,7 +1,7 @@
 ---
 docVersion: 1.0
-modelVersion: v20.0
-coefficients: sha256:96f7a2194ea29f0e
+modelVersion: v21.0
+coefficients: sha256:7258a9b469c8b95e
 status: current
 ---
 
@@ -96,7 +96,7 @@ introduces no residual.
 ### perihelionPhaseOffset
 
 ```
-perihelionPhaseOffset = ((startModelYear - balancedYear) / (H/16) * 360
+perihelionPhaseOffset = (((startModelYear - 2000) / (H/16) + 16 × kDeviceWheelPhaseAtJ2000Cycles) * 360   // plan 07 R10: J2000 origin + the device's recorded J2000 wheel phase
                         + correctionSun
                         + 360 * (startmodelJD - perihelionRefJD) / yearDays) % 360
 ```
@@ -270,7 +270,7 @@ around J2000 (smart J2000-anchored):
 
 ```
 λ_corrected = λ_kinematic − Δλ(t)
-Δλ(t) = SUN_LONGITUDE_MEAN + Σₙ [Aₙ·sin(φₙ) + Bₙ·cos(φₙ)],   φₙ = 2π·(year − balancedYear)/(H/nₙ)
+Δλ(t) = SUN_LONGITUDE_MEAN + Σₙ [Aₙ·sin(φₙ) + Bₙ·cos(φₙ)],   φₙ = 2π·(year − 2000)/(H/nₙ)   (plan 07 R10: phase from J2000)
 ```
 
 Active terms after the runtime divisor-whitelist filter (year-multiple divisors,

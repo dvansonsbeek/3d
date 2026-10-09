@@ -61,10 +61,10 @@ const startmodelJD = modelParams.foundational.startmodelJD;
 const startmodelYear = modelParams.foundational.startmodelYear;
 const correctionDays = modelParams.foundational.correctionDays;
 const correctionSun = modelParams.foundational.correctionSun;
-const temperatureGraphMostLikely = modelParams.foundational.temperatureGraphMostLikely;
 const startAngleModel = modelParams.foundational.startAngleModel;
 const useVariableSpeed = modelParams.foundational.useVariableSpeed;
-const systemResetN = modelParams.foundational.systemResetN || 0;  // 0..7: eccentricity anchor offset in units of H
+// (Plan 07 R10: temperatureGraphMostLikely and systemResetN — the phase
+// origin's inputs — left the JSON; the combs' phase is measured from J2000.)
 
 
 // ═══════════════════════════════════════════════════════════════════════════
@@ -91,6 +91,9 @@ const perihelionalignmentYear = astroRef.earthOrbital.perihelionalignmentYear;
 
 const earthtiltMean = modelParams.earth.earthtiltMean;
 const earthInvPlaneInclinationAmplitude = modelParams.earth.earthInvPlaneInclinationAmplitude;
+// Plan 07 R10: the K device's J2000 wheel phase (anchor-unit cycles) — the
+// scene scaffolding's recorded pose, N × this per H/N wheel; not a law.
+const kDeviceWheelPhaseAtJ2000Cycles = modelParams.earth.kDeviceWheelPhaseAtJ2000Cycles;
 // Derived: 2A − A²/ε — two tilt layers (H/3 + H/5) minus second-order equatorial projection
 const earthRAAngle = utils.computeEarthRAAngle(earthInvPlaneInclinationAmplitude, earthtiltMean);
 // Derived: inclJ2000 − amplitude × cos(ω̃_J2000 − phaseAngle) — using perihelion longitude (ICRF)
@@ -212,7 +215,13 @@ const perihelionCycleLength = H / 16;
 const meanSolarYearDays = Math.round(inputMeanSolarYear * (H / 8)) / (H / 8);
 const meanEarthRotationsPerYear = meanSolarYearDays + 1;
 const startModelYearWithCorrection = startmodelYear + (correctionDays / meanSolarYearDays);
-const balancedYear = perihelionalignmentYear - (temperatureGraphMostLikely * (H / 16));
+// Plan 07 R10: the correction combs measure their phase from J2000. The former
+// origin — perihelionalignmentYear − 14.5 × H/16 = −302,635, the "balanced
+// year" — was rotated out of every fitted (sin, cos) pair exactly
+// (tools/fit/reorigin-combs-j2000.mjs, measured bit-identical on every
+// surface over ±300 kyr) and is no longer an input. The name stays as the
+// code's phase-origin variable; it is 2000 by construction.
+const balancedYear = 2000;
 const perihelionalignmentJD = Math.round(startmodelJD - (meanSolarYearDays * (startModelYearWithCorrection - perihelionalignmentYear)));
 const balancedJD = startmodelJD - (meanSolarYearDays * (startModelYearWithCorrection - balancedYear));
 const yearsFromBalancedToJ2000 = (startmodelJD - balancedJD) / meanSolarYearDays;
@@ -313,7 +322,9 @@ const tropicalCenturyDays = 100 * meanSolarYearDays;
 const eocEccentricity = ASTRO_REFERENCE.earthEccentricityJ2000 / 2;
 
 // Perihelion phase offset — derived from geometric perihelion direction vs reference perihelion date.
-const perihelionPhaseOffset = (((startModelYearWithCorrection - balancedYear) / (H / 16) * 360
+// (plan 07 R10: the perihelion wheel's phase at the model start = its advance
+// from J2000 plus the device's recorded J2000 wheel phase, 16 × the constant)
+const perihelionPhaseOffset = ((((startModelYearWithCorrection - balancedYear) / (H / 16) + 16 * kDeviceWheelPhaseAtJ2000Cycles) * 360
   + correctionSun + 360 * (startmodelJD - perihelionRefJD) / meanSolarYearDays) % 360 + 360) % 360;
 
 
@@ -586,7 +597,6 @@ module.exports = {
   startmodelYear,
   correctionDays,
   correctionSun,
-  temperatureGraphMostLikely,
   startAngleModel,
   useVariableSpeed,
 
@@ -653,6 +663,7 @@ module.exports = {
   meanEarthRotationsPerYear,
   startModelYearWithCorrection,
   balancedYear,
+  kDeviceWheelPhaseAtJ2000Cycles,
   balancedJD,
   stepYears,
   pickStepYears,
@@ -662,7 +673,6 @@ module.exports = {
   iauObliquityAtGrid,
   cardinalPointAnchorsAtGrid,
   yearsFromBalancedToJ2000,
-  systemResetN,
   meanSiderealYearDays,
   meanSiderealYearDaysKinematic,
   meanLengthOfDay,

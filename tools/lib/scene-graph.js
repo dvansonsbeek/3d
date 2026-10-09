@@ -45,6 +45,13 @@ function _phaseCycles(year, divisor_N) {
   return (year - C.balancedYear) * divisor_N / C.H;
 }
 
+// Plan 07 R10: the K-device wheels' integrated phase from J2000 plus the
+// device's recorded J2000 wheel phase (N × kDeviceWheelPhaseAtJ2000Cycles —
+// the retired origin's (2000 − t₀)/H, kept as the scene's pose constant).
+function _deviceWheelCycles(cyclesFromJ2000, divisor_N) {
+  return cyclesFromJ2000 === null ? null : cyclesFromJ2000 + divisor_N * C.kDeviceWheelPhaseAtJ2000Cycles;
+}
+
 // (R4: the analytic twin _frameworkSunLon — the K-law Sun the E5 δ block fell
 // back on — is retired with the δ block; the scene Sun is the certified
 // longitude placed on the wheel, _applyEngineEarthFrame.)
@@ -829,7 +836,7 @@ function buildSceneGraph() {
     orbitRadius: 0, orbitTilta: 0, orbitTiltb: 0,
     orbitCentera: 0, orbitCenterb: 0, orbitCenterc: 0,
     tilt: 0,
-    startPos: (C.balancedYear - startModelYearWithCorrection) / (H / 3) * 360,
+    startPos: ((C.balancedYear - startModelYearWithCorrection) / (H / 3) - 3 * C.kDeviceWheelPhaseAtJ2000Cycles) * 360,   // plan 07 R10: − the device's J2000 wheel phase
     speed: Math.PI * 2 / (H / 3),
     _dtCycleN: 3, _dtCycleSign: +1,   // Phase 9.12: H/3 apsidal precession (historical name: inclination), prograde
   });
@@ -839,7 +846,7 @@ function buildSceneGraph() {
     orbitRadius: 0, orbitCentera: 0, orbitCenterb: 0, orbitCenterc: 0,
     orbitTilta: 0, orbitTiltb: -C.earthInvPlaneInclinationAmplitude,
     tilt: 0,
-    startPos: (C.balancedYear - startModelYearWithCorrection) / (H / 5) * 360,
+    startPos: ((C.balancedYear - startModelYearWithCorrection) / (H / 5) - 5 * C.kDeviceWheelPhaseAtJ2000Cycles) * 360,
     speed: Math.PI * 2 / (H / 5),
     _dtCycleN: 5, _dtCycleSign: +1,   // Phase 9.12: H/5 ecliptic precession, prograde
   });
@@ -849,7 +856,7 @@ function buildSceneGraph() {
     orbitRadius: 0, orbitCentera: 0, orbitCenterb: 0, orbitCenterc: 0,
     orbitTilta: 0, orbitTiltb: C.earthInvPlaneInclinationAmplitude,
     tilt: 0,
-    startPos: -((C.balancedYear - startModelYearWithCorrection) / (H / 8) * 360),
+    startPos: -(((C.balancedYear - startModelYearWithCorrection) / (H / 8) - 8 * C.kDeviceWheelPhaseAtJ2000Cycles) * 360),
     speed: -Math.PI * 2 / (H / 8),
     _dtCycleN: 8, _dtCycleSign: -1,   // Phase 9.12: H/8 obliquity precession, retrograde
   });
@@ -859,7 +866,7 @@ function buildSceneGraph() {
     orbitRadius: 0, orbitCentera: 0, orbitCenterb: 0, orbitCenterc: 0,
     orbitTilta: -C.earthRAAngle, orbitTiltb: 0,
     tilt: 0,
-    startPos: (C.balancedYear - startModelYearWithCorrection) / (H / 16) * 360,
+    startPos: ((C.balancedYear - startModelYearWithCorrection) / (H / 16) - 16 * C.kDeviceWheelPhaseAtJ2000Cycles) * 360,
     speed: Math.PI * 2 / (H / 16),
     _dtCycleN: 16, _dtCycleSign: +1,   // Phase 9.12: H/16 perihelion precession outer, prograde
   });
@@ -870,7 +877,7 @@ function buildSceneGraph() {
     orbitCentera: -C.eccentricityBaseDerived * 100, orbitCenterb: 0, orbitCenterc: 0,   // the one law's mean offset base' (unification)
     orbitTilta: 0, orbitTiltb: 0,
     tilt: 0,
-    startPos: -((C.balancedYear - startModelYearWithCorrection) / (H / 16) * 360),
+    startPos: -(((C.balancedYear - startModelYearWithCorrection) / (H / 16) - 16 * C.kDeviceWheelPhaseAtJ2000Cycles) * 360),
     speed: -Math.PI * 2 / (H / 16),
     _dtCycleN: 16, _dtCycleSign: -1,   // Phase 9.12: H/16 perihelion precession inner, retrograde
 
@@ -1183,7 +1190,7 @@ function moveModel(graph, pos) {
     // J2000-snapshot form θ = speed × pos - startPos.
     // Mirrors src/script.js:48326-48337.
     if (DEEP_TIME_ENABLED && Number.isFinite(def._dtCycleN)) {
-      const cycles = DT.cyclesBetweenYears(C.balancedYear, currentYear, def._dtCycleN);
+      const cycles = _deviceWheelCycles(DT.cyclesBetweenYears(C.balancedYear, currentYear, def._dtCycleN), def._dtCycleN);
       θ = (cycles !== null ? cycles : 0) * 2 * Math.PI * def._dtCycleSign;
     } else if (DEEP_TIME_ENABLED && def._dtMoonIntegrator) {
       // Phase 9.13 mirror (previously MISSING in tools — the moon layers ran
@@ -1749,7 +1756,7 @@ function computeSunPositionFast(jd) {
     // integrated phase ∫1/H(t')dt' under deep-time. See animateObject in
     // moveModel() for the identical branch.
     if (DEEP_TIME_ENABLED && Number.isFinite(def._dtCycleN)) {
-      const cycles = DT.cyclesBetweenYears(C.balancedYear, currentYear, def._dtCycleN);
+      const cycles = _deviceWheelCycles(DT.cyclesBetweenYears(C.balancedYear, currentYear, def._dtCycleN), def._dtCycleN);
       θ = (cycles !== null ? cycles : 0) * 2 * Math.PI * def._dtCycleSign;
     } else {
       θ = def.speed * pos - def.startPos * d2r;

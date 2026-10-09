@@ -1,7 +1,7 @@
 ---
 docVersion: 1.0
-modelVersion: v20.0
-coefficients: sha256:96f7a2194ea29f0e
+modelVersion: v21.0
+coefficients: sha256:7258a9b469c8b95e
 status: current
 ---
 
@@ -674,10 +674,13 @@ absolute dates. The scene's panel rows are a third path (5.4).
 | the out-of-domain fallback | N·(B − A)/H_J2000 (the snapshot count) when the table is undefined (past the tidal-lock asymptote) | **U** | `model.js` 305–308 |
 | **the balanced year** | `perihelionalignmentYear` 1246.03125 − `temperatureGraphMostLikely` 14.5 × H/16 = **−302,635** — the phase origin of EVERY comb: the obliquity 16 lines, the year-length 26, the cardinal 92 sinusoids + 8 equation-of-centre orders + 26 joint sidebands, the RA-day-offset 2, the inclination line, the H/3 eccentricity line | **L** (an origin expressed as 14.5 perihelion-of-date cycles before the 1246 alignment — half-integer, so the θ₁₆ phase at 1246 is π) | `model.js` 90–91; `script.js` 1029, 1035 (`BALANCED_YEAR_J2000_FIXED`) |
 
-The balanced year is part of the matched pair: every fitted coefficient was
-produced against this origin, so moving it re-phases all of them. docs/20
-lists it as "Obliquity cycle position 14.5 (of 16)"; the registry key is
-`balancedYear`.
+Plan 07 R10: the phase origin is J2000. The former origin (the "balanced
+year", −302,635 = the 1246 AD alignment minus 14.5 × H/16) was part of the
+matched pair — every fitted coefficient was produced against it — and
+moving it re-phases all of them; it was moved by rotating every (sin, cos)
+pair exactly (`tools/fit/reorigin-combs-j2000.mjs`, measured bit-identical
+on every surface over ±300 kyr), not by refitting. Its two inputs left the
+JSON; nothing in the shipped model reads a phase origin other than J2000.
 
 ### 5.2 The frozen era clock — the §10 derived form (RETIRED from the runtime, plan 06 R1 — kept as the record)
 
@@ -742,10 +745,10 @@ Constants and anchors of the frozen device:
 <!-- generated:calcmap-cardinal-anchors -->
 | quantity | value | what it is | H-role |
 |---|---|---|---|
-| balanced year (phase origin of EVERY comb) | -302635.00000 | `perihelionalignmentYear` 1246.03125 − `temperatureGraphMostLikely` 14.5 × H/16 — 14.5 perihelion-of-date cycles before the 1246 alignment ("obliquity cycle position 14.5 of 16", docs/20) | **L** (the offset is counted in H/16 units) |
+| phase origin of EVERY comb | 2000 (J2000) | plan 07 R10: the former fitted origin — `perihelionalignmentYear` 1246.03125 − 14.5 × H/16 = −302,635, "obliquity cycle position 14.5 of 16" — was rotated out of every (sin, cos) pair exactly (c0 = 0.908498525276082 anchor units, `tools/fit/reorigin-combs-j2000.mjs`); its inputs left the JSON | — (no offset counted) |
 | meanSolarYearDays | 365.242203646102 | the whole-days snap of chain 3.1 | **L** |
 | lincoef (d/yr) | 365.24218961601 | the fitted linear term of ΣT_trop — used VERBATIM (recomputing it from the 1-yr anchor injects a −12,276 s ramp) | — (fitted) |
-| h0, h1 | 335292.3561, 27.571083 | H inside the Ih integral as h0 + h1·c (c = cycles since the balanced year): the fit's own linear H(c) | **P** |
+| h0, h1 | 335317.4044, 27.571083 | H inside the Ih integral as h0 + h1·c (c = cycles since J2000; h0 absorbed h1·c0 at the re-origin): the fit's own linear H(c) | **P** |
 | harmonic divisors (per point, 23 lines each) | 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 17, 18, 19, 22, 23, 24, 29, 40, 48 | δ_X sinusoids on 2π·div·c | **C** |
 | equation-of-centre orders | 1, 2 (phase 2π·16·c; e(t) from the H/3 law) | e(t)ⁿ·[sin, cos](n·θ₁₆) — the braid; ~1.78 d amplitude | **L** (the perihelion-of-date phase counted as H/16) |
 | joint sidebands (shared by the four points) | 26 terms, orders 1, 2 × divisors 20, 21, 25, 26, 27, 28, 30, 31, 33, 34, 35, 36, 37 | phase order·λ_X − 2π·div·c, λ_X = SS 0°, AE 90°, WS 180°, VE 270°; COUNTER-rotating (the load-bearing minus sign) | **C** |
@@ -767,14 +770,14 @@ device first):
 <!-- generated:calcmap-cardinal-decomposition -->
 | year | lincoef·(Y−2000) (d) | drift Simpson (d) | Ih (d) | Σ sinusoids − δ(2000) (d) | equation-of-centre orders (d) | joint sidebands (d) | JD_SS − anchor (d) | cycles since the balanced year, integrated | linear (Y − bY)/H |
 |---|---|---|---|---|---|---|---|---|---|
-| -10000 | -4382906.2754 | 0.02155 | -2.17476 | -0.15117 | 0.14919 | 0.00306 | -4382914.79199 | 0.8727114 | 0.8727115 |
-| -2584 | -1674270.1972 | 0.00702 | -0.38503 | -0.06334 | 2.45885 | -0.00072 | -1674269.15455 | 0.8948279 | 0.8948279 |
-| -584 | -943785.8180 | 0.00378 | -0.12539 | -0.01218 | 1.53588 | 0.00051 | -943784.72000 | 0.9007924 | 0.9007924 |
-| 0 | -730484.3792 | 0.00288 | -0.07549 | -0.00315 | 1.19327 | 0.00055 | -730483.44934 | 0.9025340 | 0.9025340 |
-| 1246 | -275392.6110 | 0.00105 | -0.01081 | 0.00396 | 0.43630 | 0.00027 | -275392.21156 | 0.9062499 | 0.9062499 |
-| 2000 | 0.0000 | 0.00000 | 0.00000 | -0.00000 | -0.00000 | 0.00000 | 0.00014 | 0.9084985 | 0.9084985 |
-| 5000 | 1095726.5688 | -0.00379 | -0.16868 | -0.05919 | -1.11617 | -0.00006 | 1095724.72616 | 0.9174453 | 0.9174453 |
-| 10000 | 2921937.5169 | -0.00868 | -1.08615 | -0.13416 | -0.10746 | 0.00041 | 2921932.91118 | 0.9323565 | 0.9323565 |
+| -10000 | -4382906.2754 | 0.02155 | -2.17476 | -0.15117 | 0.14919 | 0.00306 | -4382914.79199 | -0.0357871 | -0.0357870 |
+| -2584 | -1674270.1972 | 0.00702 | -0.38503 | -0.06334 | 2.45885 | -0.00072 | -1674269.15455 | -0.0136707 | -0.0136706 |
+| -584 | -943785.8180 | 0.00378 | -0.12539 | -0.01218 | 1.53588 | 0.00051 | -943784.72000 | -0.0077061 | -0.0077061 |
+| 0 | -730484.3792 | 0.00288 | -0.07549 | -0.00315 | 1.19327 | 0.00055 | -730483.44934 | -0.0059645 | -0.0059645 |
+| 1246 | -275392.6110 | 0.00105 | -0.01081 | 0.00396 | 0.43630 | 0.00027 | -275392.21156 | -0.0022486 | -0.0022486 |
+| 2000 | 0.0000 | 0.00000 | 0.00000 | -0.00000 | -0.00000 | 0.00000 | 0.00014 | 0.0000000 | 0.0000000 |
+| 5000 | 1095726.5688 | -0.00379 | -0.16868 | -0.05919 | -1.11617 | -0.00006 | 1095724.72616 | 0.0089468 | 0.0089468 |
+| 10000 | 2921937.5169 | -0.00868 | -1.08615 | -0.13416 | -0.10746 | 0.00041 | 2921932.91118 | 0.0238580 | 0.0238580 |
 
 
 | year | retired device − shipped crossing (min): VE · SS · AE · WS |
@@ -820,16 +823,17 @@ The e(t)-spread by both devices, the anomalistic year, the RA:
 | 5000 | 218.1 · 471.9 · -195.9 · -117.6 | 44.2 · -15.0 · -45.0 · 15.8 | 31558440.74 | 0.0000 | 0.01533 |
 | 10000 | 221.0 · -169.4 · -732.6 · -347.3 | 12.8 · 37.7 · -12.2 · -38.2 | 31558460.72 | 0.0000 | 0.01261 |
 
-Retired device's RA formula constants (the record; since R1 the shipped RA is the target longitude by construction): raMean = base − earthRAAngle/sin ε̄ = base − 3.157955°, amplitude A/sin ε̄ = 1.600721° on −sin(2π·3·c) + sin(2π·8·c) (base 0/90/180/270° for VE/SS/AE/WS). Balanced year used by both devices: -302635.00000.
+Retired device's RA formula constants (the record; since R1 the shipped RA is the target longitude by construction): raMean = base − earthRAAngle/sin ε̄ = base − 3.157955°, amplitude A/sin ε̄ = 1.600721° on −sin(2π·3·c) + sin(2π·8·c) (base 0/90/180/270° for VE/SS/AE/WS). Balanced year used by both devices: 2000.00000.
 <!-- /generated:calcmap-cardinal-spread -->
 
 ### 5.6 Findings from this chain (to act on)
 
-1. **The balanced year is −302,635, not 1246.** Every comb's phase origin
-   sits 14.5 perihelion-of-date cycles (14.5 × H/16 = 303,881 yr) before
-   the alignment year; docs/20 names it only as "obliquity cycle position
-   14.5 (of 16)". It is a convention the coefficients were fitted under
-   (matched pair), and a role-L item for plan 06: state it as a phase
+1. **The balanced year was −302,635, not 1246 — RESOLVED by plan 07 R10.**
+   Every comb's phase origin sat 14.5 perihelion-of-date cycles (14.5 ×
+   H/16 = 303,881 yr) before the alignment year; docs/20 named it only as
+   "obliquity cycle position 14.5 (of 16)". It was a convention the
+   coefficients were fitted under (matched pair); the origin is now J2000,
+   the coefficients rotated exactly. The finding as first written: state it as a phase
    origin, not as a position in a structural cycle.
 2. **Two anchor sets live in the coefficients file.** The shipped
    `CARDINAL_POINT_ANCHORS_ADJUSTED` matches the USNO 2000 instants to the

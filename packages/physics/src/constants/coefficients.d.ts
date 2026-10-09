@@ -2,7 +2,7 @@
 // The fitted coefficients' shapes for TypeScript consumers (§2g); values live
 // in coefficients.js, emitted VERBATIM from fitted-coefficients.json.
 
-export declare const COEFFICIENTS_HASH: "96f7a2194ea29f0e";
+export declare const COEFFICIENTS_HASH: "7258a9b469c8b95e";
 
 export declare const FITTED_COEFFICIENTS: {
   readonly ANOMALISTIC_YEAR_HARMONICS: Array<[number, number, number]>;
@@ -636,6 +636,11 @@ export declare const FITTED_COEFFICIENTS: {
   readonly MEEUS_LONGITUDE_TERMS: Array<number[]>;
   readonly PERI_HARMONICS_RAW: Array<[number, number, number]>;
   readonly PERI_OFFSET: number;
+  readonly RA_DAY_OFFSET_MS: {
+    "mean": number;
+    "terms": Array<[number, number, number]>;
+    "note": string;
+  };
   readonly SIDEREAL_YEAR_HARMONICS: Array<[number, number, number]>;
   readonly SOLSTICE_OBLIQUITY_HARMONICS: Array<[number, number, number]>;
   readonly SOLSTICE_OBLIQUITY_MEAN_FITTED: number;

@@ -1619,7 +1619,6 @@ export const VALUES = {
       // (eccNextMax / eccNextMin / eccPrevMinBC — the single-line eccentricity
       // law's extreme epochs — are retired: the published e is the N-body series)
       eccPrevMinJD: { get: () => C.perihelionalignmentJD - (HDIV16() * C.meanSolarYearDays / 2), render: (v) => thousands(v, 1), unit: 'JD' },
-      tempGraphMostLikely: { get: () => C.temperatureGraphMostLikely, render: (v) => String(v), note: 'temperature-graph phase pick (14.5 H/16 cycles)' },
       preprintDoi: { get: () => versionInfo.preprintDoi, render: (v) => String(v), note: 'canonical preprint DOI — single source: model-version.json' },
       moonDiameter:       { get: () => astro.bodyDiametersKm.moon, render: (v) => thousands(v, 1), unit: 'km' },
       moonOrbitalRadius:  { get: () => C.moonDistance, render: (v) => thousands(v, 2), unit: 'km' },

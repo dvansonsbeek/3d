@@ -71,9 +71,9 @@ const startmodelJD = K.foundational.startmodelJD;         // June 21, 2000 00:00
 const startmodelYear = K.foundational.startmodelYear;     // Fractional year of model start
 const correctionDays = K.foundational.correctionDays;     // Fine timing correction (optimizer-derived)
 const correctionSun = K.foundational.correctionSun;       // Sun position correction angle (optimizer Step 1)
-const temperatureGraphMostLikely = K.foundational.temperatureGraphMostLikely;  // Position in obliquity cycle (0–16)
 const startAngleModel = K.foundational.startAngleModel;   // Start angle at 2000-06-21 00:00 UTC
-const systemResetN = K.foundational.systemResetN;         // Eccentricity anchor offset (H-units): 0=balancedYear, 7=System Reset
+// (Plan 07 R10: temperatureGraphMostLikely and systemResetN — the phase
+// origin's inputs — left the JSON; the combs' phase is measured from J2000.)
 
 // ─── A5. Research toggles ────────────────────────────────────────────────
 // Six user-facing feature flags, canonical defaults. Full rationale for each
@@ -97,6 +97,9 @@ let   MOON_ARGS_FRAMEWORK_NATIVE = true;       // Framework-native lunar argumen
 // ─── A2. Earth parameters ────────────────────────────────────────────────
 const earthtiltMean = K.earth.earthtiltMean;              // Scene-geometry solved: obliquity at J2000 = IAU 2006 23.4392794°
 const earthInvPlaneInclinationAmplitude = K.earth.earthInvPlaneInclinationAmplitude; // Scene-geometry solved: obliquity rate = IAU -46.836769"/cy
+// Plan 07 R10: the K device's J2000 wheel phase (anchor-unit cycles) — the
+// scene scaffolding's recorded pose, N × this per H/N wheel; not a law.
+const kDeviceWheelPhaseAtJ2000Cycles = K.earth.kDeviceWheelPhaseAtJ2000Cycles;
 // The optimizer must NEVER touch this — it is set by the Law 5 balance constraint.
 const eccentricityBase = K.earth.eccentricityBase;        // Law 5 balance-locked (v11 constant; Earth's weight in the balance is 0.05%)
 const eccentricityAmplitude = K.earth.eccentricityAmplitude;  // v11 H/16 amplitude — RETAINED ONLY as the Law-4 K calibration input (unification, decision D2)
@@ -956,13 +959,20 @@ const inclinationPathZodiacOffsetDeg = 360 - startAngleModel - (ASTRO_REFERENCE.
 // --- 9a. Time units & year lengths ---
 let   meanearthRotationsinDays = meansolaryearlengthinDays+1;  // Phase 6: mutable (Tier 2)
 const startmodelyearwithCorrection = startmodelYear+(correctionDays/meansolaryearlengthinDays);
-let   balancedYear = perihelionalignmentYear-(temperatureGraphMostLikely*(holisticyearLength/16));  // Phase 6: mutable (Tier 1 — eccentricity phase anchor)
-// Phase 8.5 J2000-fixed anchor — immutable snapshot of `balancedYear`. Relocated here
-// from its original spot near the integrated-phase math (later in the file) so it's
-// available for any computation that must remain stable under deep-time scrubbing
-// (e.g. `perihelionPhaseOffset` below). Same numeric value as `balancedYear` at
-// module load: same numeric value as `balancedYear` (14.5 perihelion cycles before 1246 AD).
-const BALANCED_YEAR_J2000_FIXED = perihelionalignmentYear - 14.5 * (holisticyearLength / 16);
+// Plan 07 R10: the correction combs measure their phase from J2000. The former
+// origin — perihelionalignmentYear − 14.5 × H/16 = −302,635, the "balanced
+// year" — was rotated out of every fitted (sin, cos) pair exactly
+// (tools/fit/reorigin-combs-j2000.mjs; measured bit-identical on every surface
+// over ±300 kyr) and is no longer an input. The variable name stays as the
+// code's phase-origin; it is 2000 by construction, in all four runtimes.
+let   balancedYear = 2000;   // Phase 6: mutable in name only — the dormant epoch updater re-sets it to 2000
+const BALANCED_YEAR_J2000_FIXED = 2000;
+// The K device's own H/3 and H/8 wheel phases at J2000 (2π·d × the device's
+// recorded wheel phase, kDeviceWheelPhaseAtJ2000Cycles), read by the
+// Verify-Earth-Parameters diagnostics that describe the device's two-cosine
+// obliquity law. Not an input of any shipped surface.
+const DEVICE_PHASE_H3_J2000_RAD = 2 * Math.PI * 3 * kDeviceWheelPhaseAtJ2000Cycles;
+const DEVICE_PHASE_H8_J2000_RAD = 2 * Math.PI * 8 * kDeviceWheelPhaseAtJ2000Cycles;
 const balancedJD = startmodelJD-(meansolaryearlengthinDays*(startmodelyearwithCorrection-balancedYear));
 const perihelionalignmentJD = Math.round(startmodelJD - (meansolaryearlengthinDays * (startmodelyearwithCorrection - perihelionalignmentYear)));
 // Perihelion-calendar walk-start hint (shared by dayToPerihelionCalendarDate
@@ -1098,7 +1108,9 @@ const eocEccentricity = K.earthOrbital.earthEccentricityJ2000 / 2;
 // Aligns the EoC perihelion with the geometric perihelion set by the EP1 precession phase at J2000.
 // Phase 9.10c: uses `BALANCED_YEAR_J2000_FIXED` (immutable) instead of `balancedYear` (mutable
 // under deep-time scrubbing), so this reference phase stays anchored at J2000.
-let   perihelionPhaseOffset = (((startmodelyearwithCorrection - BALANCED_YEAR_J2000_FIXED) / (holisticyearLength / 16) * 360
+// (plan 07 R10: the wheel's phase at the model start = its advance from J2000
+// plus the device's recorded J2000 wheel phase, 16 × kDeviceWheelPhaseAtJ2000Cycles)
+let   perihelionPhaseOffset = ((((startmodelyearwithCorrection - BALANCED_YEAR_J2000_FIXED) / (holisticyearLength / 16) + 16 * kDeviceWheelPhaseAtJ2000Cycles) * 360
   + correctionSun + 360 * (startmodelJD - ASTRO_REFERENCE.perihelionPassageJ2000_JD) / meansolaryearlengthinDays) % 360 + 360) % 360;  // Phase 6: mutable (Tier 1 — Earth perihelion phase reference)
 
 // Ascending node frame corrections for planet-level tilt placement (degrees).
@@ -4476,11 +4488,11 @@ function recomputeEpochAnchors(t_Ma) {
 function recomputeDerivedAnchorsForEpoch(t_Ma) {
   // Tier 1 — math-critical (ordered by dependency)
   perihelionCycleLength = holisticyearLength / 16;
-  balancedYear          = perihelionalignmentYear - (temperatureGraphMostLikely * perihelionCycleLength);
+  balancedYear          = 2000;   // plan 07 R10: J2000 by construction
   // Phase 9.10c: uses BALANCED_YEAR_J2000_FIXED + PERIHELION_CYCLE_LENGTH_J2000_FIXED so the
   // reference phase stays anchored at J2000 even when this dormant updater is activated and
   // mutates `balancedYear` / `perihelionCycleLength` for other consumers.
-  perihelionPhaseOffset = (((startmodelyearwithCorrection - BALANCED_YEAR_J2000_FIXED) / PERIHELION_CYCLE_LENGTH_J2000_FIXED * 360
+  perihelionPhaseOffset = ((((startmodelyearwithCorrection - BALANCED_YEAR_J2000_FIXED) / PERIHELION_CYCLE_LENGTH_J2000_FIXED + 16 * kDeviceWheelPhaseAtJ2000Cycles) * 360
     + correctionSun
     + 360 * (startmodelJD - ASTRO_REFERENCE.perihelionPassageJ2000_JD) / meansolaryearlengthinDays) % 360 + 360) % 360;
 
@@ -4590,71 +4602,11 @@ function integralInverseHFromYears(yearA, yearB, _N_unused = 1000) {
   return _phase().integralBetween(yearA, yearB);
 }
 
-// ───── Phase 9.11: Balanced-year navigation helpers ─────
-// Inverse of _cumulIntegralAtYear: find the year Y such that the cumulative
-// integral ∫_{J2000}^{Y} 1/H(t)dt equals `targetCumul`. Used by
-// `findBalancedYearAtCycle` to step through the H-cycle lattice under
-// deep-time. Binary search on the monotonically increasing table, then
-// linear-interpolate between adjacent cells. Returns null if `targetCumul`
-// is outside the table's value range.
-function _yearAtCumulIntegral(targetCumul) { return _phase().yearAtCumul(targetCumul); }
-
-/** Find the calendar year of the k-th H-balanced event relative to
- *  `BALANCED_YEAR_J2000_FIXED` (which is cycle k=0). Negative k = past,
- *  positive k = future. Returns null if outside table domain.
- *
- *  Phase 9.12.8: Targets the year that, AFTER the navigation JD round-trip,
- *  lands at corrected integer cycle. The chain is:
- *    Y_target → yearToJD(Y_target) → o.julianDay → julianDateToDecimalYear(JD)
- *           → Y_julian = o.currentYear
- *  We want cyclesBetweenYears(BALANCED, Y_julian, 1) = cycleOffset (so scene
- *  renders e_min at every navigated balanced JD).
- *
- *  The round-trip changes Y by the deep-time vs Julian-365.25 convention
- *  difference — up to ~130 yr at -6 Myr. Without compensation, the scene
- *  ends up at Y_julian slightly off from corrected integer, so e is
- *  ~0.01403068 instead of e_min = 0.01402961.
- *
- *  Algorithm: 1D root-finding on Y_target via Newton-like iteration.
- *  Convergence: 3-5 iterations to <1e-12 cycle precision. */
-// Phase 9.12.11: TRUE-integral year for a given cycle offset from BALANCED.
-//   Returns Y such that ∫_{BALANCED}^{Y} 1/H(t) dt = cycleOffset exactly.
-// Unlike `findBalancedYearAtCycle`, this skips the JD-round-trip + drift
-// correction — so (Y_next - Y_last) is the harmonic mean of H(t) over the
-// bracket interval. Used by the H period / 8H period readouts so the
-// displayed period reflects the actual time-averaged H, not the calibrated
-// cycle math that pins the scene to e_min at navigated balanced JDs.
-function trueYearAtCycle(cycleOffset) {
-  if (cycleOffset === 0) return BALANCED_YEAR_J2000_FIXED;
-  const refCumul = _cumulIntegralAtYear(BALANCED_YEAR_J2000_FIXED);
-  if (refCumul === null) return null;
-  return _yearAtCumulIntegral(refCumul + cycleOffset);
-}
-
-function findBalancedYearAtCycle(cycleOffset) {
-  // Note: no cycleOffset===0 short-circuit — returning BAL directly skips the
-  // JD round-trip iteration below, so the scene misses the exact integer-cycle
-  // JD by ~0.5 day and gives ~21″ obliquity drift + ~3e-9 e drift at the "Jump
-  // to Last H" button when the button targets cycle 0. Letting the iteration
-  // run finds a Y_target that survives the round-trip and lands at exact
-  // integer cycle 0 (like every other N).
-  //
-  // Round-trip uses `_jdToSIyear` (SI tropical year, 365.2422 days), NOT
-  // `julianDateToDecimalYear` (calendar year, 365/366-day mix). Reason: the
-  // scene's Phase 9.12 Option B rotations at moveModel (line ~53806) integrate
-  // via `cyclesBetweenYears(_dtAnchor, _jdToSIyear(o.julianDay), N)`. If this
-  // function uses the CALENDAR convention, the button targets a JD where
-  // calendar-year delta = H_J2000 exactly, but SI-year delta ≠ H_J2000 (differs
-  // by ~6.7 SI years per H). That mismatch drives a ~0.1° earth rotation shift
-  // per Prev-H click → visible drift in the earth/wobble-center/perihelion
-  // 3-point alignment at deep past. Using SI here makes the button target JDs
-  // where SI-year delta IS exactly N·H_J2000, so scene rotations return to
-  // integer × 2π every click.
-  // ONE implementation (the deep calendar, @essrt/physics): the Newton step
-  // uses H at J2000 where this body once stepped with the live
-  // holisticyearLength — the iteration converges to 1e-12 cycles either way.
-  return _deepCal().balancedYearAtCycle(cycleOffset);
-}
+// (Plan 07 R10: the Phase 9.11 balanced-year navigation helpers —
+// `_yearAtCumulIntegral`, `trueYearAtCycle`, `findBalancedYearAtCycle`, the
+// k-th "H-balanced event" from t₀ — are gone with the phase origin and the
+// readouts they fed. The deep calendar keeps its event function in the
+// package, counting anchor units from J2000.)
 
 // ───── The deep-time calendar — ONE home (year/day collapse) ─────
 // year → JD by the ∫ daysPerYear dt table on the phase grid, the SI-year
@@ -4922,10 +4874,9 @@ function phaseAdvanceSnapshot(yearAnchor, year, divisor_N) {
 const PERIHELION_CYCLE_LENGTH_J2000_FIXED = HOLISTIC_YEAR_J2000 / 16;
 // = 20,955.9375 yr — Earth's perihelion cycle at J2000 (used as J2000-fixed
 // arg for `computeEccentricityEarth` under Phase 8 integrated mode)
-const ECCENTRICITY_ANCHOR_J2000_FIXED = BALANCED_YEAR_J2000_FIXED - systemResetN * HOLISTIC_YEAR_J2000;
-// = -2,649,854 — n=7 system-reset eccentricity anchor. Used by Phase 8's
-// `calcObliquityMean` as the J2000-fixed reference for ICRF + obliquity
-// cycle phase advance.
+// (Plan 07 R10: ECCENTRICITY_ANCHOR_J2000_FIXED — the n=7 System-Reset
+// eccentricity anchor, BALANCED − systemResetN·H — had no reader left since
+// R6 and is gone with the phase origin.)
 
 // Per-planet eccentricity wobble anchors. Plan 06 Phase 7 commit 2: the
 // wobble cycle period is the chain's OWN g-mode beat (calcWobblePeriod → the
@@ -5250,10 +5201,13 @@ function updateEarthPrecessionObjectsForEpoch() {
   // Computed by integrating cycles between J2000-fixed anchors → the answer
   // is frame-independent (same at any observation epoch).
   // `speed` stays epoch-aware (uses live holisticyearLength).
-  const cycles_H3  = cyclesBetweenYears(startmodelyearwithCorrection, BALANCED_YEAR_J2000_FIXED, 3)  ?? 0;
-  const cycles_H5  = cyclesBetweenYears(startmodelyearwithCorrection, BALANCED_YEAR_J2000_FIXED, 5)  ?? 0;
-  const cycles_H8  = cyclesBetweenYears(startmodelyearwithCorrection, BALANCED_YEAR_J2000_FIXED, 8)  ?? 0;
-  const cycles_H16 = cyclesBetweenYears(startmodelyearwithCorrection, BALANCED_YEAR_J2000_FIXED, 16) ?? 0;
+  // Plan 07 R10: each wheel's start position = its cycles from the model
+  // start to J2000 minus the device's recorded J2000 wheel phase (N × the
+  // constant) — the same pose the module-load literals below set.
+  const cycles_H3  = (cyclesBetweenYears(startmodelyearwithCorrection, BALANCED_YEAR_J2000_FIXED, 3)  ?? 0) - 3  * kDeviceWheelPhaseAtJ2000Cycles;
+  const cycles_H5  = (cyclesBetweenYears(startmodelyearwithCorrection, BALANCED_YEAR_J2000_FIXED, 5)  ?? 0) - 5  * kDeviceWheelPhaseAtJ2000Cycles;
+  const cycles_H8  = (cyclesBetweenYears(startmodelyearwithCorrection, BALANCED_YEAR_J2000_FIXED, 8)  ?? 0) - 8  * kDeviceWheelPhaseAtJ2000Cycles;
+  const cycles_H16 = (cyclesBetweenYears(startmodelyearwithCorrection, BALANCED_YEAR_J2000_FIXED, 16) ?? 0) - 16 * kDeviceWheelPhaseAtJ2000Cycles;
   // Apsidal precession (H/3, prograde; historical name: inclination precession)
   earthInclinationPrecession.startPos =  cycles_H3 * 360;
   earthInclinationPrecession.speed    =  Math.PI * 2 / (holisticyearLength / 3);
@@ -6832,7 +6786,8 @@ const earthInclinationPrecession = {
   // Without this, the literal arithmetic gives snapshot-form value while update*ForEpoch
   // gives integral-form value (under DEEP_TIME=true), introducing a ~5″ obliquity drift
   // after the first navigation. Single source of truth → no drift.
-  startPos: cyclesBetweenYears(startmodelyearwithCorrection, BALANCED_YEAR_J2000_FIXED, 3) * 360,
+  // Plan 07 R10: minus the device's recorded J2000 wheel phase (3 × the constant).
+  startPos: (cyclesBetweenYears(startmodelyearwithCorrection, BALANCED_YEAR_J2000_FIXED, 3) - 3 * kDeviceWheelPhaseAtJ2000Cycles) * 360,
   speed: Math.PI*2/(holisticyearLength/3),
   tilt: 0,
   orbitRadius: 0,
@@ -6855,7 +6810,7 @@ const earthInclinationPrecession = {
 const earthEclipticPrecession = {
   name: "Earth Ecliptic Precession",
   // See earthInclinationPrecession header for alignment rationale.
-  startPos: cyclesBetweenYears(startmodelyearwithCorrection, BALANCED_YEAR_J2000_FIXED, 5) * 360,
+  startPos: (cyclesBetweenYears(startmodelyearwithCorrection, BALANCED_YEAR_J2000_FIXED, 5) - 5 * kDeviceWheelPhaseAtJ2000Cycles) * 360,
   speed: Math.PI*2/(holisticyearLength/5),
   tilt: 0,
   orbitRadius: 0,
@@ -6878,7 +6833,7 @@ const earthEclipticPrecession = {
 const earthObliquityPrecession = {
   name: "Earth Obliquity Precession",
   // See earthInclinationPrecession header for alignment rationale. Negated for retrograde (H/8).
-  startPos: -cyclesBetweenYears(startmodelyearwithCorrection, BALANCED_YEAR_J2000_FIXED, 8) * 360,
+  startPos: -(cyclesBetweenYears(startmodelyearwithCorrection, BALANCED_YEAR_J2000_FIXED, 8) - 8 * kDeviceWheelPhaseAtJ2000Cycles) * 360,
   speed: -Math.PI*2/(holisticyearLength/8),
   tilt: 0,
   orbitRadius: 0,
@@ -6901,7 +6856,7 @@ const earthObliquityPrecession = {
 const earthPerihelionPrecession1 = {
   name: "Earth Perihelion Precession1",
   // See earthInclinationPrecession header for alignment rationale.
-  startPos: cyclesBetweenYears(startmodelyearwithCorrection, BALANCED_YEAR_J2000_FIXED, 16) * 360,
+  startPos: (cyclesBetweenYears(startmodelyearwithCorrection, BALANCED_YEAR_J2000_FIXED, 16) - 16 * kDeviceWheelPhaseAtJ2000Cycles) * 360,
   speed: Math.PI*2/(holisticyearLength/16),
   tilt: 0,
   orbitRadius: 0,
@@ -6924,7 +6879,7 @@ const earthPerihelionPrecession1 = {
 const earthPerihelionPrecession2 = {
   name: "Earth Perihelion Precession2",
   // See earthInclinationPrecession header for alignment rationale. Negated for retrograde.
-  startPos: -cyclesBetweenYears(startmodelyearwithCorrection, BALANCED_YEAR_J2000_FIXED, 16) * 360,
+  startPos: -(cyclesBetweenYears(startmodelyearwithCorrection, BALANCED_YEAR_J2000_FIXED, 16) - 16 * kDeviceWheelPhaseAtJ2000Cycles) * 360,
   speed: -Math.PI*2/(holisticyearLength/16),
   tilt: 0,
   orbitRadius: 0,
@@ -8570,7 +8525,6 @@ let o = {
 
   Day: "",
   julianDay: "",
-  juliandaysbalancedJD: 0,
   pos : 0,
   sun : {pivotObj: new THREE.Object3D()},
   earth : {pivotObj: new THREE.Object3D()},
@@ -8875,14 +8829,9 @@ let o = {
 const params = { sizeBoost: 0 }; 
 
 let predictions = {
-  juliandaysbalancedJD: 0,
-  // Phase 9.11 — Balanced-year navigation (H and 8H lattices)
-  lastBalancedJD_H: 0,
-  nextBalancedJD_H: 0,
-  lastBalancedJD_8H: 0,
-  nextBalancedJD_8H: 0,
-  balancedPeriod_H_years: 0,
-  balancedPeriod_8H_years: 0,
+  // (Plan 07 R10: `juliandaysbalancedJD` and the Phase 9.11 balanced-year
+  // navigation fields — last/next H and 8H event JDs and periods — were
+  // written every frame and bound to no row; gone with the phase origin.)
   lodReal: 0,
   solarDayLayer1: 0,   // Tidal Mean + H/5 (live per-frame value)
   solarDayLayer2: 0,   // + GIA + H/5 (live per-frame value)
@@ -25402,15 +25351,8 @@ function setupGUI() {
   addTestButton('Investigate Parameters', investigateParameterEffects,
     'Explore how changing orbital parameters affects year length and precession.');
 
-  // Balanced Year
-  const firstBalancedBtn = addTestButton('Verify Balanced-Year Navigation', runBalancedYearNavigationTest,
-    'Check the balanced-year math of the frozen clock’s unit and eight-unit intervals: cycle identity, round-trip, JD conversion, ' +
-    'and the expected harmonic-mean vs instantaneous-J2000 deviation of the unit.');
-  addTestButton('Diagnose Balanced-Year State', runBalancedYearStateDiagnostic,
-    'Diagnose the current scene state vs balanced-year math: integer-cycle distance, ' +
-    'cyclesBetweenYears with correction, drift(BALANCED), formula vs scene eccentricity, ' +
-    'and obliquity. Run AT a balanced JD (enter the JD in the Julian Day input) to see whether ' +
-    'the navigation landed correctly and whether formula/scene values match expectation.');
+  // (Plan 07 R10: the two "Balanced Year" test buttons — the H / 8H event
+  // navigation checks of the retired phase-origin convention — are gone.)
   // ────────────────────────────────────────────────────────────────────────
   // NASA Five Millennium Catalog cross-check. For canonical solar eclipses
   // from NASA's authoritative reference, compare our model's conjunction
@@ -34798,7 +34740,6 @@ function setupGUI() {
   insertGroupLabel('Year Length', firstYearBtn);
   insertGroupLabel('Day Length', firstDayBtn);
   insertGroupLabel('Calibration', firstCalibBtn);
-  insertGroupLabel('Balanced Year', firstBalancedBtn);
   insertGroupLabel('Historical Eclipses & ΔT', firstEclipseBtn);
   // Subgroups within Historical Eclipses & ΔT (Foundation is implicit before first sub-label)
   insertSubGroupLabel('Per-event validation tests',  firstPerEventEclipseBtn);
@@ -35039,9 +34980,9 @@ function render(now) {
       }
     }
 
-    o.perihelionprecessioncycleYear = yearInCycle(o.currentYear, balancedYear, holisticyearLength);
-
-    o.juliandaysbalancedJD = o.julianDay - balancedJD;
+    // (Plan 07 R10: o.perihelionprecessioncycleYear — the year within the
+    // H/16 cycle counted from t₀ — and o.juliandaysbalancedJD were written
+    // here and bound to no row; gone with the phase origin.)
     // Easter egg/ Can be added later
     //     if (isPerihelionCycle(o.periheliondate, 'perihelionday', ) && !eggTriggered) {
     //       eggTriggered = true;
@@ -37264,8 +37205,7 @@ async function runObliquityCalibrationTest() {
   console.log(`earthtiltMean                    = ${earthtiltMean}°`);
   console.log(`earthInvPlaneInclinationAmplitude = ${earthInvPlaneInclinationAmplitude}°`);
   console.log(`earthRAAngle                     = ${earthRAAngle}°`);
-  console.log(`temperatureGraphMostLikely       = ${temperatureGraphMostLikely}`);
-  console.log(`balancedYear                     = ${balancedYear}`);
+  console.log(`balancedYear (phase origin)      = ${balancedYear}  (J2000 by construction — plan 07 R10)`);
   console.log('');
 
   // TEST 2: Scene object tilts at model start
@@ -37424,400 +37364,11 @@ async function runObliquityCalibrationTest() {
   return { solsticeResults, netTilt, rateResults, modelRate, iauRate: IAU_RATE };
 }
 
-/** Phase 9.11: Verify the balanced-year navigation math.
- * Validates: (a) the cycle-0 identity, (b) integral round-trip, (c) year→JD
- * round-trip, (d) the expected harmonic-mean H deviation from H_J2000. */
-async function runBalancedYearNavigationTest() {
-  console.log('╔══════════════════════════════════════════════════════════════════════════╗');
-  console.log('║           BALANCED-YEAR NAVIGATION VERIFICATION                          ║');
-  console.log('╚══════════════════════════════════════════════════════════════════════════╝');
-  console.log('');
+// (Plan 07 R10: `runBalancedYearNavigationTest` and
+// `runBalancedYearStateDiagnostic` — the console checks of the retired
+// phase-origin convention's H / 8H event navigation — are gone with their
+// Tools buttons and the navigation they tested.)
 
-  // ─── TEST 1: Cycle identity ───
-  console.log('═══════════════════════════════════════════════════════════════════════════');
-  console.log('TEST 1: Cycle-0 identity');
-  console.log('═══════════════════════════════════════════════════════════════════════════');
-  const cycle0_yr = findBalancedYearAtCycle(0);
-  const balRef = BALANCED_YEAR_J2000_FIXED;
-  console.log(`findBalancedYearAtCycle(0) = ${cycle0_yr}`);
-  console.log(`BALANCED_YEAR_J2000_FIXED   = ${balRef}`);
-  console.log(`Match: ${Math.abs(cycle0_yr - balRef) < 1e-9 ? 'PASS ✓' : 'FAIL ✗'}`);
-  console.log('');
-
-  // ─── TEST 2: Integral round-trip ───
-  console.log('═══════════════════════════════════════════════════════════════════════════');
-  console.log('TEST 2: Integral round-trip (should be exactly N cycles)');
-  console.log('═══════════════════════════════════════════════════════════════════════════');
-  console.log('  N │      year at cycle N      │   integral(BAL → year)   │   Δ from N');
-  console.log('  ──┼───────────────────────────┼──────────────────────────┼──────────');
-  for (const N of [-7, -1, 0, 1, 8]) {
-    const yr = findBalancedYearAtCycle(N);
-    if (yr === null) { console.log(`  ${String(N).padStart(2)} │  (out of table domain)`); continue; }
-    const intg = integralInverseHFromYears(balRef, yr);
-    const delta = intg - N;
-    console.log(`  ${String(N).padStart(2)} │ ${yr.toFixed(2).padStart(25)} │ ${intg.toFixed(12).padStart(24)} │ ${delta.toExponential(2)}`);
-  }
-  console.log('');
-
-  // ─── TEST 3: Year → JD round-trip ───
-  console.log('═══════════════════════════════════════════════════════════════════════════');
-  console.log('TEST 3: yearToJD anchor (startmodelYear should map to startmodelJD)');
-  console.log('═══════════════════════════════════════════════════════════════════════════');
-  const jdAtStart = yearToJD(startmodelYear);
-  console.log(`yearToJD(startmodelYear=${startmodelYear})  = ${jdAtStart}`);
-  console.log(`startmodelJD                                = ${startmodelJD}`);
-  console.log(`Difference (days)                           = ${(jdAtStart - startmodelJD).toFixed(6)}`);
-  console.log(`Match: ${Math.abs(jdAtStart - startmodelJD) < 1.0 ? 'PASS ✓ (< 1 day)' : 'FAIL ✗'}`);
-  console.log('');
-
-  // ─── TEST 4: Compare with existing balancedJD ───
-  console.log('═══════════════════════════════════════════════════════════════════════════');
-  console.log('TEST 4: yearToJD(BALANCED_YEAR_J2000_FIXED) vs existing balancedJD constant');
-  console.log('═══════════════════════════════════════════════════════════════════════════');
-  const jdAtBal_yearToJD = yearToJD(BALANCED_YEAR_J2000_FIXED);
-  console.log(`yearToJD(BALANCED_YEAR_J2000_FIXED)  = ${jdAtBal_yearToJD.toFixed(2)}`);
-  console.log(`balancedJD (legacy const)            = ${balancedJD.toFixed(2)}`);
-  console.log(`Difference (days)                    = ${(jdAtBal_yearToJD - balancedJD).toFixed(2)}`);
-  console.log('NOTE: difference reflects deep-time days-per-year evolution.');
-  console.log('      Legacy `balancedJD` uses constant days/year; new yearToJD uses variable.');
-  console.log('      Over 305 kyr the difference is a few minutes per Myr of integration.');
-  console.log('');
-
-  // ─── TEST 5: H_avg deviation from H_J2000 ───
-  console.log('═══════════════════════════════════════════════════════════════════════════');
-  console.log('TEST 5: Why the displayed H period ≠ H_J2000');
-  console.log('═══════════════════════════════════════════════════════════════════════════');
-  const lastH_yr  = findBalancedYearAtCycle(0);
-  const nextH_yr  = findBalancedYearAtCycle(1);
-  const last8H_yr = findBalancedYearAtCycle(-7);
-  const next8H_yr = findBalancedYearAtCycle(1);
-  const H_period  = nextH_yr - lastH_yr;
-  const H8_period = next8H_yr - last8H_yr;
-  console.log(`H_J2000 (instantaneous)              = ${HOLISTIC_YEAR_J2000} yr`);
-  console.log(`Last H year (cycle 0)                = ${lastH_yr.toFixed(2)}`);
-  console.log(`Next H year (cycle 1)                = ${nextH_yr.toFixed(2)}`);
-  console.log(`H period (calendar yr)               = ${H_period.toFixed(2)}`);
-  console.log(`Δ vs H_J2000                         = ${(H_period - HOLISTIC_YEAR_J2000).toFixed(2)} yr (${((H_period - HOLISTIC_YEAR_J2000) / HOLISTIC_YEAR_J2000 * 1e6).toFixed(1)} ppm)`);
-  console.log('');
-  console.log(`eight-unit interval at J2000 (8 × anchor) = ${8 * HOLISTIC_YEAR_J2000} yr`);
-  console.log(`Last eight-unit year (cycle −7)      = ${last8H_yr.toFixed(2)}`);
-  console.log(`Next eight-unit year (cycle 1)       = ${next8H_yr.toFixed(2)}`);
-  console.log(`eight-unit period (calendar yr)      = ${H8_period.toFixed(2)}`);
-  console.log(`Δ vs 8 × H_J2000                     = ${(H8_period - 8 * HOLISTIC_YEAR_J2000).toFixed(2)} yr (${((H8_period - 8 * HOLISTIC_YEAR_J2000) / (8 * HOLISTIC_YEAR_J2000) * 1e6).toFixed(1)} ppm)`);
-  console.log('');
-  console.log('Interpretation: the displayed periods are time-averaged harmonic-mean H over');
-  console.log('the displayed cycle interval. Both intervals span deep into the past where');
-  console.log('H was smaller (LOD shorter, Moon closer), so H_avg < H_J2000 → period shorter.');
-  console.log('The eight-unit interval is ~99% in the past → larger deviation than the unit interval.');
-  console.log('');
-
-  // ─── TEST 6: Sanity check — at J2000, next unit event ≡ next eight-unit event ───
-  console.log('═══════════════════════════════════════════════════════════════════════════');
-  console.log('TEST 6: At J2000, the next unit and next eight-unit events should match exactly (cycle +1 in both)');
-  console.log('═══════════════════════════════════════════════════════════════════════════');
-  const nextH_jd  = yearToJD(nextH_yr);
-  const next8H_jd = yearToJD(next8H_yr);
-  console.log(`Next H JD                            = ${nextH_jd.toFixed(2)}`);
-  console.log(`Next eight-unit JD                   = ${next8H_jd.toFixed(2)}`);
-  console.log(`Match: ${Math.abs(nextH_jd - next8H_jd) < 1 ? 'PASS ✓' : 'FAIL ✗'}`);
-  console.log('');
-
-  console.log('═══════════════════════════════════════════════════════════════════════════');
-  console.log('TEST COMPLETE');
-  console.log('═══════════════════════════════════════════════════════════════════════════');
-  return { lastH_yr, nextH_yr, last8H_yr, next8H_yr, H_period, H8_period };
-}
-
-/** Phase 9.11.x: Diagnose the current scene state vs balanced-year math.
- *  Run AT a navigated balanced JD (after clicking Last H / Next H) to see whether
- *  the navigation landed correctly and whether formula vs scene values match. */
-async function runBalancedYearStateDiagnostic() {
-  console.log('╔══════════════════════════════════════════════════════════════════════════╗');
-  console.log('║         BALANCED-YEAR STATE DIAGNOSTIC                                   ║');
-  console.log('║         Run AT a navigated balanced JD to inspect current state          ║');
-  console.log('╚══════════════════════════════════════════════════════════════════════════╝');
-  console.log('');
-
-  // Unification: the one law's extremes are base′·(1 ∓ ½); the balanced
-  // year is NOT an eccentricity extreme any more (θ₃ ≠ 0 there — the law's
-  // last maximum is ≈ −23,200, last minimum ≈ −79,100).
-  const e_min = eccentricityDerivedMean * 0.5;
-  const e_max = eccentricityDerivedMean * 1.5;
-  const e_bal = computeEccentricityEarthAtYear(BALANCED_YEAR_J2000_FIXED);   // the law's value AT the balanced year
-  const oblExpectedAtBalanced = (() => {
-    let v = OBLIQUITY_MEAN;
-    for (const [, , cosC] of OBLIQUITY_HARMONICS) v += cosC;
-    return v;
-  })();
-
-  console.log('═══════════════════════════════════════════════════════════════════════════');
-  console.log('SECTION 1: Current scene location');
-  console.log('═══════════════════════════════════════════════════════════════════════════');
-  console.log(`  o.currentYear:           ${o.currentYear}`);
-  console.log(`  o.julianDay:             ${o.julianDay}`);
-  console.log(`  o.Date / o.Time:         ${o.Date} ${o.Time}`);
-  console.log(`  BALANCED_YEAR_J2000_FIXED: ${BALANCED_YEAR_J2000_FIXED}`);
-  console.log('');
-
-  console.log('═══════════════════════════════════════════════════════════════════════════');
-  console.log('SECTION 2: Integral / cycle math (raw + corrected)');
-  console.log('═══════════════════════════════════════════════════════════════════════════');
-  const rawIntegral = integralInverseHFromYears(BALANCED_YEAR_J2000_FIXED, o.currentYear);
-  const driftBALANCED = _getJ2000Drift(BALANCED_YEAR_J2000_FIXED);
-  const driftCurrent  = _getJ2000Drift(o.currentYear);
-  const cyclesH16     = cyclesBetweenYears(BALANCED_YEAR_J2000_FIXED, o.currentYear, 16);
-  const cyclesH1      = cyclesBetweenYears(BALANCED_YEAR_J2000_FIXED, o.currentYear, 1);
-  const distFromIntegerH1 = (cyclesH1 !== null) ? cyclesH1 - Math.round(cyclesH1) : null;
-  const distFromIntegerRaw = (rawIntegral !== null) ? rawIntegral - Math.round(rawIntegral) : null;
-  console.log(`  rawIntegral (no correction):              ${rawIntegral?.toFixed(8) ?? 'null'}`);
-  console.log(`  Distance from nearest integer (raw):      ${distFromIntegerRaw?.toExponential(3) ?? 'null'}`);
-  console.log(`    (should be ~0 if at exact balanced year — proves navigation landed correctly)`);
-  console.log(`  cyclesBetweenYears(BALANCED, cy, 1):      ${cyclesH1?.toFixed(8) ?? 'null'}`);
-  console.log(`  Distance from nearest integer (corrected):${distFromIntegerH1?.toExponential(3) ?? 'null'}`);
-  console.log(`  cyclesBetweenYears(BALANCED, cy, 16):     ${cyclesH16?.toFixed(6) ?? 'null'}`);
-  console.log(`  drift(BALANCED) = ${driftBALANCED?.toExponential(3) ?? 'null'}    (J2000 anchor — small)`);
-  console.log(`  drift(currentYear) = ${driftCurrent?.toExponential(3) ?? 'null'}    (deep-past drift — grows with depth)`);
-  console.log(`  Phase 9.10b heuristic active branch:      ${(() => {
-    const dA = Math.abs(BALANCED_YEAR_J2000_FIXED - startmodelyearwithCorrection);
-    const dB = Math.abs(o.currentYear - startmodelyearwithCorrection);
-    return (dA >= dB) ? 'drift(yearA=BALANCED)' : '-drift(yearB=currentYear)';
-  })()}`);
-  console.log('');
-
-  console.log('═══════════════════════════════════════════════════════════════════════════');
-  console.log('SECTION 3: FORMULA values (via computeEccentricityEarth, computeObliquityEarth)');
-  console.log('═══════════════════════════════════════════════════════════════════════════');
-  const formula_e = computeEccentricityEarthAtYear(o.currentYear);
-  const formula_obl = computeObliquityEarth(_formulaYearFromJD(o.julianDay));
-  console.log(`  computeEccentricityEarth:  ${formula_e?.toFixed(8) ?? 'null'}`);
-  console.log(`    Expected if AT balanced year: ${e_bal.toFixed(8)} (the one law's e(balanced year); range [${e_min.toFixed(6)}, ${e_max.toFixed(6)}])`);
-  console.log(`    Drift from e(balanced): ${formula_e !== null ? (formula_e - e_bal).toExponential(3) : 'null'}`);
-  console.log('');
-  console.log(`  computeObliquityEarth:     ${formula_obl?.toFixed(6) ?? 'null'}°`);
-  console.log(`    Expected if AT balanced year: ${oblExpectedAtBalanced.toFixed(6)}° (= OBLIQUITY_MEAN + Σ cosC)`);
-  console.log(`    Drift from expected: ${formula_obl !== null ? (formula_obl - oblExpectedAtBalanced).toFixed(6) : 'null'}° = ${formula_obl !== null ? ((formula_obl - oblExpectedAtBalanced) * 3600).toFixed(1) : 'null'}″`);
-  console.log('');
-
-  console.log('═══════════════════════════════════════════════════════════════════════════');
-  console.log('SECTION 4: SCENE values (via scene-graph geometry)');
-  console.log('═══════════════════════════════════════════════════════════════════════════');
-  console.log(`  o.eccentricityEarth (predictions, formula):  ${o.eccentricityEarth?.toFixed(8) ?? 'undef'}`);
-  console.log(`  earthPerihelionFromEarth.distAU (SCENE):     ${(typeof earthPerihelionFromEarth !== 'undefined' && earthPerihelionFromEarth.distAU) ? earthPerihelionFromEarth.distAU.toFixed(12) : 'undef'}`);
-  console.log(`  o.obliquityEarth (predictions, formula):     ${o.obliquityEarth?.toFixed(6) ?? 'undef'}°`);
-  console.log(`  o.earthInvPlaneInclinationDynamic:           ${o.earthInvPlaneInclinationDynamic?.toFixed(6) ?? 'undef'}°`);
-  console.log(`    Expected at balanced year: ${(earthInvPlaneInclinationMean - earthInvPlaneInclinationAmplitude).toFixed(6)}° (= MIN)`);
-  console.log('');
-
-  // Scene-graph WORLD positions of the 3-alignment points (extended precision)
-  try {
-    const _V = new THREE.Vector3();
-    const _positions = {};
-    const _log = (label, obj) => {
-      if (typeof obj !== 'undefined' && obj.planetObj) {
-        obj.planetObj.updateMatrixWorld(true);
-        obj.planetObj.getWorldPosition(_V);
-        _positions[label] = { x: _V.x, y: _V.y, z: _V.z };
-        console.log(`  ${label.padEnd(28)} world = (${_V.x.toFixed(12)}, ${_V.y.toFixed(12)}, ${_V.z.toFixed(12)})`);
-      }
-    };
-    console.log('  ── World positions (scene units, 1 AU = 100 units) ──');
-    _log('earth',                    typeof earth !== 'undefined' ? earth : null);
-    _log('earthWobbleCenter',        typeof earthWobbleCenter !== 'undefined' ? earthWobbleCenter : null);
-    _log('barycenterEarthAndSun',    typeof barycenterEarthAndSun !== 'undefined' ? barycenterEarthAndSun : null);
-    _log('earthPerihelionFromEarth', typeof earthPerihelionFromEarth !== 'undefined' ? earthPerihelionFromEarth : null);
-
-    // Distance and 3-point angle (deviation from collinearity)
-    if (_positions.earth && _positions.earthWobbleCenter && _positions.earthPerihelionFromEarth) {
-      const E  = _positions.earth;
-      const W  = _positions.earthWobbleCenter;
-      const P  = _positions.earthPerihelionFromEarth;
-      const dEW = { x: W.x - E.x, y: W.y - E.y, z: W.z - E.z };
-      const dEP = { x: P.x - E.x, y: P.y - E.y, z: P.z - E.z };
-      const dot = dEW.x*dEP.x + dEW.y*dEP.y + dEW.z*dEP.z;
-      const mEW = Math.hypot(dEW.x, dEW.y, dEW.z);
-      const mEP = Math.hypot(dEP.x, dEP.y, dEP.z);
-      const cosA = dot / (mEW * mEP);
-      const angRad = Math.acos(Math.max(-1, Math.min(1, cosA)));
-      const angDeg = angRad * 180 / Math.PI;
-      const angArcsec = angDeg * 3600;
-      console.log(`  ── Earth-to-WobbleCenter distance   = ${mEW.toFixed(12)} scene units (${(mEW/100).toFixed(12)} AU)`);
-      console.log(`  ── Earth-to-Perihelion   distance   = ${mEP.toFixed(12)} scene units (${(mEP/100).toFixed(12)} AU)`);
-      console.log(`  ── Angle (Wobble)-Earth-(Perihelion) = ${angDeg.toFixed(9)}° = ${angArcsec.toFixed(6)}″`);
-      console.log('     (0° = collinear/aligned, drift shows how far from ideal alignment)');
-    }
-  } catch (e) {
-    console.log(`  (World-position logging failed: ${e.message})`);
-  }
-  console.log('');
-
-  console.log('═══════════════════════════════════════════════════════════════════════════');
-  console.log('SECTION 5: Interpretation');
-  console.log('═══════════════════════════════════════════════════════════════════════════');
-  // Phase 9.11.x: use CORRECTED cycles distance for interpretation, not raw.
-  // The raw integral differs from the corrected cycles by the Phase 9.10b
-  // drift correction, which matters most at deep past. Navigation lands at
-  // raw-integer cycles, but the harmonic formulas use corrected cycles —
-  // round-trip noise pushes raw away from integer while corrected stays
-  // near integer (the round-trip + drift correction cancel by design).
-  const distToCheck = distFromIntegerH1 !== null ? distFromIntegerH1 : distFromIntegerRaw;
-  if (distToCheck !== null && Math.abs(distToCheck) < 1e-3) {
-    console.log('  ✓ Scene IS at a corrected-integer cycle (navigation landed correctly)');
-    if (formula_e !== null && Math.abs(formula_e - e_bal) < 0.0001) {
-      console.log('  ✓ Formula eccentricity ≈ e(balanced year) (the one law, integrated H/3 phase)');
-    } else {
-      console.log('  ✗ Formula eccentricity DRIFTED');
-      console.log(`    Diff: ${(formula_e - e_bal).toExponential(3)}`);
-    }
-    const sceneE = (typeof earthPerihelionFromEarth !== 'undefined') ? earthPerihelionFromEarth.distAU : null;
-    if (sceneE !== null && Math.abs(sceneE - e_bal) < 0.0001) {
-      console.log('  ✓ Scene eccentricity ≈ e(balanced year) (the per-frame e(t) offset — unification)');
-    } else if (sceneE !== null) {
-      const diff = sceneE - e_bal;
-      console.log(`  ✗ Scene eccentricity off e(balanced) by ${diff.toFixed(8)} (${Math.abs(diff/e_bal*100).toFixed(2)}%)`);
-      console.log('    If diff > 0.0001: likely a planet wobble-center or other H-cycle scene object missing Phase 9.12 tag');
-    }
-  } else {
-    console.log('  ✗ Scene is NOT at an integer cycle (corrected)');
-    console.log(`    Distance from nearest integer (corrected): ${distToCheck}`);
-    console.log('    Either navigation didn\'t land correctly, or user navigated via JD input');
-  }
-  console.log('');
-  console.log('═══════════════════════════════════════════════════════════════════════════');
-  console.log('SECTION 6: Cycle scan N = -3 … +3 — what "Jump to Prev/Next H" would target');
-  console.log('═══════════════════════════════════════════════════════════════════════════');
-  console.log('  For each N, computes the button-target year + JD via both paths, then');
-  console.log('  shows the JD → year round-trip result and computes formula eccentricity /');
-  console.log('  obliquity at that landing year. Use this to spot which N drift is symmetric');
-  console.log('  vs asymmetric between forward/backward.');
-  console.log('');
-  const H_J2000 = HOLISTIC_YEAR_J2000;
-  const BAL = BALANCED_YEAR_J2000_FIXED;
-  const fmtN = (v, d) => Number.isFinite(v) ? v.toFixed(d) : '   -   ';
-  const fmtE = (v, d) => Number.isFinite(v) ? v.toExponential(d) : '   -    ';
-
-  console.log('  ── DT path (findBalancedYearAtCycle + yearToJD, current production) ──');
-  console.log('   N |   Y_target       →      JD           → Y_scene       | ΔY_rt      | Δ(cyc−N)  |   e            e−e_min    |  obliquity');
-  for (let N = -3; N <= 3; N++) {
-    const Y = DEEP_TIME_MODE_ENABLED
-      ? findBalancedYearAtCycle(N)
-      : (BAL + N * H_J2000);
-    if (Y === null) {
-      console.log(`  ${N >= 0 ? ' ' : ''}${N} | (past tidal-lock asymptote — no data)`);
-      continue;
-    }
-    const jd = DEEP_TIME_MODE_ENABLED ? yearToJD(Y) : yearToJDApprox(Y);
-    const Y_rt = (jd !== null) ? julianDateToDecimalYear(jd) : null;
-    const cyc = (Y_rt !== null) ? cyclesBetweenYears(BAL, Y_rt, 1) : null;
-    const e_at = (Y_rt !== null) ? computeEccentricityEarthAtYear(Y_rt) : null;
-    const ob_at = (jd !== null) ? computeObliquityEarth(_formulaYearFromJD(jd)) : null;
-    console.log(
-      `  ${N >= 0 ? ' ' : ''}${N} | ${fmtN(Y, 3).padStart(13)} → ${fmtN(jd, 2).padStart(17)} → ${fmtN(Y_rt, 3).padStart(13)} `
-      + `| ${fmtN(Y_rt - Y, 6).padStart(10)} | ${fmtE(cyc !== null ? cyc - N : NaN, 3).padStart(9)} `
-      + `| ${fmtN(e_at, 10).padStart(13)}  ${fmtE(e_at !== null ? e_at - e_min : NaN, 3).padStart(11)} `
-      + `| ${fmtN(ob_at, 6).padStart(11)}°`
-    );
-  }
-  console.log('');
-  console.log('  ── Snapshot form (BAL + N·H_J2000 + yearToJDApprox — Option 2 alternative) ──');
-  console.log('   N |   Y_target       →      JD           → Y_scene       | ΔY_rt      | Δ(cyc−N)  |   e            e−e_min    |  obliquity');
-  for (let N = -3; N <= 3; N++) {
-    const Y = BAL + N * H_J2000;
-    const jd = yearToJDApprox(Y);
-    const Y_rt = julianDateToDecimalYear(jd);
-    const cyc = cyclesBetweenYears(BAL, Y_rt, 1);
-    const e_at = computeEccentricityEarthAtYear(Y_rt);
-    const ob_at = computeObliquityEarth(_formulaYearFromJD(jd));
-    console.log(
-      `  ${N >= 0 ? ' ' : ''}${N} | ${fmtN(Y, 3).padStart(13)} → ${fmtN(jd, 2).padStart(17)} → ${fmtN(Y_rt, 3).padStart(13)} `
-      + `| ${fmtN(Y_rt - Y, 6).padStart(10)} | ${fmtE(cyc !== null ? cyc - N : NaN, 3).padStart(9)} `
-      + `| ${fmtN(e_at, 10).padStart(13)}  ${fmtE(e_at !== null ? e_at - e_min : NaN, 3).padStart(11)} `
-      + `| ${fmtN(ob_at, 6).padStart(11)}°`
-    );
-  }
-  console.log('');
-  console.log('  Interpret:');
-  console.log('    • ΔY_rt        = round-trip loss in Y after yearToJD(Y) → julianDateToDecimalYear(JD).');
-  console.log('    • Δ(cyc−N)     = phase offset from integer cycle N (drives e drift from e_min).');
-  console.log('    • e − e_min    = actual eccentricity offset at the landing year.');
-  console.log('    • Compare forward N=+1,+2,+3 vs backward N=-1,-2,-3: symmetric or asymmetric?');
-  console.log('    • Compare the DT and Snapshot tables: which path minimises Δ(cyc−N)?');
-  console.log('');
-
-  console.log('═══════════════════════════════════════════════════════════════════════════');
-  console.log('SECTION 7: LIVE mutable state (what changed since last click?)');
-  console.log('═══════════════════════════════════════════════════════════════════════════');
-  console.log('  Run this button AFTER each Prev H / Next H click and compare with the');
-  console.log('  previous run — any value that differs between clicks is a "leaking"');
-  console.log('  state that the button chain reads on subsequent presses.');
-  console.log('');
-  console.log('  Time-unit globals (recomputeTimeUnitsForEpoch mutates these):');
-  console.log(`    holisticyearLength (live H)            = ${holisticyearLength}    (H_J2000 = ${HOLISTIC_YEAR_J2000})`);
-  console.log(`    meanlengthofday (live LOD)             = ${meanlengthofday}`);
-  console.log(`    meansolaryearlengthinDays              = ${meansolaryearlengthinDays}`);
-  console.log(`    meansiderealyearlengthinDays           = ${meansiderealyearlengthinDays}`);
-  console.log(`    meansiderealyearlengthinSeconds        = ${meansiderealyearlengthinSeconds}`);
-  console.log(`    sDay (scene time unit)                 = ${sDay}`);
-  console.log(`    ΔH from J2000: live H − H_J2000        = ${(holisticyearLength - HOLISTIC_YEAR_J2000).toExponential(4)}`);
-  console.log('');
-  console.log('  Live cumulative-integral tables (should be null-then-frozen after 1st touch):');
-  console.log(`    phase table (@essrt/physics/phase)       = ${_phaseM !== null ? 'BUILT (' + _cumulIntegralLength() + ' entries)' : 'null'}`);
-  console.log(`    deep calendar days table               = ${_deepCalM !== null && _deepCal().cumulDaysTableLength() !== null ? 'BUILT (' + _deepCal().cumulDaysTableLength() + ' entries)' : 'null'}`);
-  console.log(`    _J2000_DRIFT_CACHE.size                = ${_J2000_DRIFT_CACHE.size}`);
-  console.log('');
-  console.log('  Sim position/time globals:');
-  console.log(`    o.pos                                  = ${o.pos}`);
-  console.log(`    o.Day                                  = ${o.Day}`);
-  console.log(`    o.julianDay                            = ${o.julianDay}`);
-  console.log(`    o.currentYear                          = ${o.currentYear}`);
-  console.log(`    o.Date / o.Time                        = ${o.Date} ${o.Time}`);
-  console.log(`    posToDays(o.pos) round-trip            = ${(typeof posToDays === 'function') ? posToDays(o.pos) : 'n/a'}   (should ≈ o.Day)`);
-  console.log('');
-  console.log('  Button targets (what "Jump to Last/Next H" reads right now):');
-  console.log(`    o.lastBalancedJD_H                     = ${o.lastBalancedJD_H}`);
-  console.log(`    o.nextBalancedJD_H                     = ${o.nextBalancedJD_H}`);
-  const lastYr = Number.isFinite(o.lastBalancedJD_H) ? julianDateToDecimalYear(o.lastBalancedJD_H) : null;
-  const nextYr = Number.isFinite(o.nextBalancedJD_H) ? julianDateToDecimalYear(o.nextBalancedJD_H) : null;
-  console.log(`    julianDateToDecimalYear(lastBalancedJD_H) = ${lastYr}`);
-  console.log(`    julianDateToDecimalYear(nextBalancedJD_H) = ${nextYr}`);
-  if (lastYr !== null) {
-    const e_at_last = computeEccentricityEarthAtYear(lastYr);
-    const ob_at_last = computeObliquityEarth(_formulaYearFromJD(o.lastBalancedJD_H));
-    console.log(`    → e at that year                       = ${e_at_last}   (Δ from e_min: ${(e_at_last - e_min).toExponential(3)})`);
-    console.log(`    → obliquity at that year               = ${ob_at_last}°   (Δ: ${((ob_at_last - oblExpectedAtBalanced) * 3600).toFixed(2)}″)`);
-  }
-  console.log('');
-  console.log('  Live findBalancedYearAtCycle probe (N = current lastH cycle):');
-  const n_now_probe = cyclesBetweenYears(BAL, o.currentYear, 1);
-  const lastH_probe = (n_now_probe !== null && Math.abs(n_now_probe - Math.round(n_now_probe)) < 1e-3)
-    ? Math.round(n_now_probe) - 1
-    : Math.floor(n_now_probe ?? 0);
-  console.log(`    n_now (cycles from BAL)                = ${n_now_probe}`);
-  console.log(`    Deduced lastH cycle offset             = ${lastH_probe}`);
-  const Y_via_dt = DEEP_TIME_MODE_ENABLED ? findBalancedYearAtCycle(lastH_probe) : (BAL + lastH_probe * H_J2000);
-  const jd_via_dt = (Y_via_dt !== null && DEEP_TIME_MODE_ENABLED) ? yearToJD(Y_via_dt) : null;
-  console.log(`    findBalancedYearAtCycle(${lastH_probe})           = ${Y_via_dt}`);
-  console.log(`    yearToJD(that)                         = ${jd_via_dt}`);
-  console.log(`    Math.round(jd)                         = ${jd_via_dt !== null ? Math.round(jd_via_dt) : null}   ← what o.lastBalancedJD_H should be`);
-  console.log(`    Match with o.lastBalancedJD_H?         = ${jd_via_dt !== null && Math.abs(Math.round(jd_via_dt) - o.lastBalancedJD_H) < 1 ? 'YES ✓' : 'NO ✗ — stale'}`);
-  console.log('');
-  console.log('  ⇒ Instructions: run this diagnostic (a) at J2000 initial state, then (b) after');
-  console.log('    each Prev H click. Compare Section 7 across runs. Any live value that changes');
-  console.log('    with each click is a "leaking" state that could cause backward drift.');
-  console.log('');
-  console.log('═══════════════════════════════════════════════════════════════════════════');
-  console.log('DIAGNOSTIC COMPLETE');
-  console.log('═══════════════════════════════════════════════════════════════════════════');
-
-  return {
-    currentYear: o.currentYear,
-    rawIntegral, cyclesH1, cyclesH16,
-    distFromIntegerRaw, distFromIntegerH1,
-    driftBALANCED, driftCurrent,
-    formula_e, formula_obl,
-    scene_e: (typeof earthPerihelionFromEarth !== 'undefined') ? earthPerihelionFromEarth.distAU : null,
-    e_min, oblExpectedAtBalanced,
-  };
-}
 
 // (The "Verify 8H Configuration" check — the per-planet System-Reset claim of the
 // retired Config-#7 framing — was removed with its panel controls in plan 06
@@ -37936,9 +37487,10 @@ async function verifyEarthParameters() {
   // inclination = earthInvPlaneInclinationMean - earthInvPlaneInclinationAmplitude * cos(phase3)
   // Model epoch is at year 2000.469 (171.5 days after Jan 1)
   const modelEpochYear = 2000 + ASTRO_REFERENCE.modelEpochOffsetDays / 365.25;
-  const inclT_modelEpoch = modelEpochYear - balancedYear;
+  // Plan 07 R10: the device's H/3 phase is the recorded J2000 phase plus the
+  // advance since J2000 (the former `year − balancedYear` form, t₀ rotated out).
   const inclCycle3 = holisticyearLength / 3;
-  const inclPhase3_modelEpoch = (inclT_modelEpoch / inclCycle3) * 2 * Math.PI;
+  const inclPhase3_modelEpoch = DEVICE_PHASE_H3_J2000_RAD + ((modelEpochYear - 2000) / inclCycle3) * 2 * Math.PI;
   const modelInclinationAtEpoch = earthInvPlaneInclinationMean - earthInvPlaneInclinationAmplitude * Math.cos(inclPhase3_modelEpoch);
 
   const IAU_inclination_modelEpoch = ASTRO_REFERENCE.earthInclinationModelEpoch_deg;
@@ -38188,12 +37740,12 @@ async function verifyEarthParameters() {
   // - Changing earthtiltMean by Δ changes obliquity by Δ (direct 1:1)
   // - Changing amplitude affects both obliquity value AND rate
 
-  // Phase values at J2000 (from balanced year)
-  const t_J2000 = 2000 - balancedYear;
+  // Phase values at J2000 — the device's recorded H/3 and H/8 phases (plan 07
+  // R10: the combs' origin is J2000; the device's phases at J2000 are constants)
   const cycle3 = holisticyearLength / 3;
   const cycle8 = holisticyearLength / 8;
-  const phase3 = (t_J2000 / cycle3) * 2 * Math.PI;
-  const phase8 = (t_J2000 / cycle8) * 2 * Math.PI;
+  const phase3 = DEVICE_PHASE_H3_J2000_RAD;
+  const phase8 = DEVICE_PHASE_H8_J2000_RAD;
 
   const cos3 = Math.cos(phase3);
   const cos8 = Math.cos(phase8);
@@ -52283,7 +51835,10 @@ function moveModel(pos) {
     }
     if (DEEP_TIME_MODE_ENABLED && Number.isFinite(obj._dtCycleN)) {
       const _dtAnchor = Number.isFinite(obj._dtCycleAnchor) ? obj._dtCycleAnchor : BALANCED_YEAR_J2000_FIXED;
-      const _dtCycles = cyclesBetweenYears(_dtAnchor, _currentYearSI, obj._dtCycleN);
+      let _dtCycles = cyclesBetweenYears(_dtAnchor, _currentYearSI, obj._dtCycleN);
+      // Plan 07 R10: the J2000-anchored K-device wheels carry the device's
+      // recorded J2000 wheel phase (N × kDeviceWheelPhaseAtJ2000Cycles).
+      if (_dtCycles !== null && !Number.isFinite(obj._dtCycleAnchor)) _dtCycles += obj._dtCycleN * kDeviceWheelPhaseAtJ2000Cycles;
       θ = (_dtCycles !== null ? _dtCycles : 0) * 2 * Math.PI * obj._dtCycleSign;
     } else if (DEEP_TIME_MODE_ENABLED && obj._dtMoonIntegrator) {
       // Phase 9.13: Moon-chain integral form. Replaces snapshot
@@ -52505,7 +52060,8 @@ function moveModel(pos) {
       if (DEEP_TIME_MODE_ENABLED && Number.isFinite(obj._dtRotN)) {
         // Phase 9.15: use SI tropical year for integrator input (NOT calendar).
         const _rotYearSI = _jdToSIyear(o.julianDay);
-        const _dtCycles = cyclesBetweenYears(BALANCED_YEAR_J2000_FIXED, _rotYearSI, obj._dtRotN);
+        const _c = cyclesBetweenYears(BALANCED_YEAR_J2000_FIXED, _rotYearSI, obj._dtRotN);
+        const _dtCycles = _c === null ? null : _c + obj._dtRotN * kDeviceWheelPhaseAtJ2000Cycles;   // plan 07 R10: + the device's J2000 wheel phase
         obj.planetObj.rotation.y = (_dtCycles !== null ? _dtCycles : 0) * 2 * Math.PI * obj._dtRotSign;
       } else {
         // Earth day-night spin uses the constant-J2000-rate model
@@ -54269,138 +53825,10 @@ function updatePredictions() {
   predictions.obliquityEarth = o.obliquityEarth = _sceneEpsTargetDeg(engineYear);
   predictions.eccentricityEarth = o.eccentricityEarth = _sceneEccTargetAt(engineYear);
 
-  // Phase 9.11: Balanced-year navigation — past/future H and 8H balanced events.
-  // H lattice cycles 0, ±1, ±2, ... anchored at BALANCED_YEAR_J2000_FIXED.
-  // 8H lattice cycles are at H-cycle indices (−systemResetN + 8m) — i.e. the
-  // J2000-era H event (cycle 0) is NOT on the 8H lattice; cycle +1 IS.
-  //
-  // Edge-case handling: after the user clicks "Next H" and navigates to a
-  // balanced JD, the resulting `o.currentYear` is NOT exactly at integer
-  // cycles because of round-trip noise — `yearToJD` uses deep-time
-  // days/year while `julianDateToDecimalYear` uses Julian-calendar
-  // 365.25 days/year. The discrepancy is ~1e-6 H-cycles over modern
-  // epochs. Use an EPS tolerance to detect "at a balanced event": when
-  // currently AT a cycle, "Last H" = previous cycle, "Next H" = next
-  // cycle (proper forward navigation), instead of both bracketing the
-  // current cycle and getting stuck.
-  {
-    // Phase 9.12.4: Use CORRECTED cycles (via cyclesBetweenYears) for the EPS
-    // check, consistent with findBalancedYearAtCycle which also targets corrected
-    // cycles (Phase 9.12.1). Previously this used RAW integral (integralInverseHFromYears),
-    // which caused a mismatch: at deep past, raw vs corrected differ by ~0.01
-    // cycles (drift), so the EPS could say "not at integer" while the corrected
-    // version was AT integer → buttons targeted current year → Next H "stalled".
-    const n_now = cyclesBetweenYears(BALANCED_YEAR_J2000_FIXED, o.currentYear, 1);
-    if (n_now !== null) {
-      const EPS_CYCLE = 1e-3;   // tolerance in H-cycle units (~335 calendar yr)
-      const offset = -systemResetN;  // 8H lattice anchor in H-cycle units
-
-      const n_int = Math.round(n_now);
-      const isAtH = Math.abs(n_now - n_int) < EPS_CYCLE;
-      const isOn8HLattice = isAtH && (((n_int - offset) % 8) === 0);
-
-      const lastH = isAtH ? (n_int - 1) : Math.floor(n_now);
-      const nextH = isAtH ? (n_int + 1) : (lastH + 1);
-
-      const m_now = (n_now - offset) / 8;
-      const last8H = isOn8HLattice ? (n_int - 8) : (offset + 8 * Math.floor(m_now));
-      const next8H = isOn8HLattice ? (n_int + 8) : (last8H + 8);
-
-      // Phase 9.12.9: normalize period by the number of cycles in the span.
-      // When isAtH=true (at integer cycle), lastH = N−1 and nextH = N+1 (span
-      // is 2 H cycles, not 1). Similarly for 8H lattice. Display ONE-cycle
-      // period regardless of state.
-      const H_periods_in_span  = nextH - lastH;          // 1 (between) or 2 (at cycle)
-      const eH_periods_in_span = (next8H - last8H) / 8;  // 1 (between) or 2 (at 8H lattice)
-
-      // Deep-time toggle gating: the helper functions `findBalancedYearAtCycle`,
-      // `yearToJD`, and `trueYearAtCycle` are pure integral-form / deep-time tools
-      // (always use the cumulative integral table). When DEEP_TIME is OFF the user
-      // expects static H = HOLISTIC_YEAR_J2000 values across all four readouts, so
-      // we branch here and use snapshot arithmetic. Snapshot JD conversion uses
-      // the Julian-Meeus 365.25 d/yr identity (round-trip clean with
-      // julianDateToDecimalYear).
-      let lastH_yr, nextH_yr, last8H_yr, next8H_yr;
-      let lastH_jd, nextH_jd, last8H_jd, next8H_jd;
-      let period_H_yr, period_8H_yr;
-
-      if (DEEP_TIME_MODE_ENABLED) {
-        lastH_yr  = findBalancedYearAtCycle(lastH);
-        nextH_yr  = findBalancedYearAtCycle(nextH);
-        last8H_yr = findBalancedYearAtCycle(last8H);
-        next8H_yr = findBalancedYearAtCycle(next8H);
-
-        lastH_jd  = (lastH_yr  !== null) ? yearToJD(lastH_yr)  : null;
-        nextH_jd  = (nextH_yr  !== null) ? yearToJD(nextH_yr)  : null;
-        last8H_jd = (last8H_yr !== null) ? yearToJD(last8H_yr) : null;
-        next8H_jd = (next8H_yr !== null) ? yearToJD(next8H_yr) : null;
-
-        // Phase 9.12.11: TRUE-integral year span (∫1/H dt = N cycles, no
-        // JD-round-trip / drift correction) — displays the actual harmonic
-        // mean of H(t) over the bracket; < 335,317 in deep past.
-        const lastH_yr_true  = trueYearAtCycle(lastH);
-        const nextH_yr_true  = trueYearAtCycle(nextH);
-        const last8H_yr_true = trueYearAtCycle(last8H);
-        const next8H_yr_true = trueYearAtCycle(next8H);
-        period_H_yr  = (lastH_yr_true  !== null && nextH_yr_true  !== null)
-          ? (nextH_yr_true  - lastH_yr_true)  / H_periods_in_span  : NaN;
-        period_8H_yr = (last8H_yr_true !== null && next8H_yr_true !== null)
-          ? (next8H_yr_true - last8H_yr_true) / eH_periods_in_span : NaN;
-      } else {
-        // Snapshot form: integer-cycle distance × H_J2000 from the J2000-fixed anchor.
-        lastH_yr  = BALANCED_YEAR_J2000_FIXED + lastH  * HOLISTIC_YEAR_J2000;
-        nextH_yr  = BALANCED_YEAR_J2000_FIXED + nextH  * HOLISTIC_YEAR_J2000;
-        last8H_yr = BALANCED_YEAR_J2000_FIXED + last8H * HOLISTIC_YEAR_J2000;
-        next8H_yr = BALANCED_YEAR_J2000_FIXED + next8H * HOLISTIC_YEAR_J2000;
-
-        // JD conversion uses `meansolaryearlengthinDays` — this matches the
-        // scene's pos↔JD ratio (`pos = sDay × o.Day` with `sDay = 1/meansol`
-        // under DEEP_TIME=false). Navigating to one of these JDs lands the
-        // scene at pos = (Y − startmodelyearwithCorrection), which is an
-        // integer number of H cycles from BALANCED → the 5 Earth precession
-        // objects all rotate by integer cycles → scene eccentricity = e_min
-        // at every navigated balanced JD. This is the **snapshot-mode analog
-        // of Phase 9.12.8** (the DEEP_TIME=true round-trip-aware fix): same
-        // scene-correctness goal, different conversion math because the
-        // snapshot path's pos↔JD ratio is fixed at `meansol`.
-        //
-        // Using Julian-Meeus 365.25 here would clean up the year-display
-        // round-trip via `julianDateToDecimalYear` but introduce a ~21 ppm
-        // mismatch with the scene's `meansol`-based pos. That accumulates to
-        // ~0.123° of perihelion direction per H cycle (≈ 2° at cycle −17 /
-        // year −6 Myr), producing the visible eccentricity drift the user
-        // reported at deep past balanced JDs.
-        lastH_jd  = startmodelJD + (lastH_yr  - startmodelyearwithCorrection) * meansolaryearlengthinDays;
-        nextH_jd  = startmodelJD + (nextH_yr  - startmodelyearwithCorrection) * meansolaryearlengthinDays;
-        last8H_jd = startmodelJD + (last8H_yr - startmodelyearwithCorrection) * meansolaryearlengthinDays;
-        next8H_jd = startmodelJD + (next8H_yr - startmodelyearwithCorrection) * meansolaryearlengthinDays;
-
-        // Period is exactly H_J2000 (snapshot form gives constant cycle length).
-        period_H_yr  = HOLISTIC_YEAR_J2000;
-        period_8H_yr = 8 * HOLISTIC_YEAR_J2000;
-      }
-
-      // Keep FRACTIONAL JD (do NOT Math.round) so navigation lands on the
-      // exact yearToJD-inverse — the balanced year the DT integrator says is
-      // BAL + N·H. Math.round was losing up to ±0.5 day → ~3.5e-9 residual in
-      // cyclesBetweenYears → ~2e-7 rad rotation-off in the Phase 9.12 Option B
-      // scene-graph rotations for the 5 Earth-precession objects → visible
-      // slow drift in the earth/wobble-center/perihelion-of-earth 3-point
-      // alignment at deep-past balanced years. Fractional JD collapses this
-      // to machine-precision. Tweakpane display formatter (fmtJdOrDash uses
-      // toFixed(0)) still shows integer JD — user-facing display unchanged.
-      predictions.lastBalancedJD_H  = o.lastBalancedJD_H  = (lastH_jd  !== null) ? lastH_jd  : NaN;
-      predictions.nextBalancedJD_H  = o.nextBalancedJD_H  = (nextH_jd  !== null) ? nextH_jd  : NaN;
-      predictions.lastBalancedJD_8H = o.lastBalancedJD_8H = (last8H_jd !== null) ? last8H_jd : NaN;
-      predictions.nextBalancedJD_8H = o.nextBalancedJD_8H = (next8H_jd !== null) ? next8H_jd : NaN;
-      predictions.balancedPeriod_H_years  = period_H_yr;
-      predictions.balancedPeriod_8H_years = period_8H_yr;
-    } else {
-      predictions.lastBalancedJD_H = predictions.nextBalancedJD_H = NaN;
-      predictions.lastBalancedJD_8H = predictions.nextBalancedJD_8H = NaN;
-      predictions.balancedPeriod_H_years = predictions.balancedPeriod_8H_years = NaN;
-    }
-  }
+  // (Plan 07 R10: the Phase 9.11 balanced-year navigation — last/next H and
+  // 8H event JDs and periods counted from t₀, written every frame and bound to
+  // no row — is gone with the phase origin. The deep calendar's event function
+  // stays in @essrt/physics, counting anchor units from J2000.)
 
   // The seven per-planet o.eccentricity<P>/predictions.eccentricity<P>
   // writes + the computeDynamicFibonacciBalance() call — REMOVED (the
@@ -55315,7 +54743,9 @@ function calcEarthPerihelionPredictive(year) {
   // we use PERI_HARMONICS_J2000_PERIODS[i] to derive the J2000-fixed divisor.
   const meanCycles = cyclesBetweenYears(BALANCED_YEAR_J2000_FIXED, year, 16);
   if (meanCycles === null) return 270.0;
-  let longitude = 270.0 + 360.0 * meanCycles;
+  // Plan 07 R10: the 270° convention is the device's perihelion wheel at the
+  // retired origin; at J2000 the wheel stands 16 × kDeviceWheelPhaseAtJ2000Cycles turns on.
+  let longitude = 270.0 + 360.0 * (meanCycles + 16 * kDeviceWheelPhaseAtJ2000Cycles);
   for (let i = 0; i < PERI_HARMONICS.length; i++) {
     const sinC = PERI_HARMONICS[i][1], cosC = PERI_HARMONICS[i][2];
     const div = HOLISTIC_YEAR_J2000 / PERI_HARMONICS_J2000_PERIODS[i];
@@ -55367,21 +54797,6 @@ function calcERD(year) {
 // here. Its readers were the asc-node integrator's ecliptic-inclination
 // closure and the planetInvIncl probe; a planet's inclination of date to the
 // invariable plane is the chain's inclInvPlaneDeg (_kcElementsOfDate).)
-
-/**
- * Calculate the offset into the current 1/16-cycle.
- *
- * @param {number} currentYear               – e.g. your decimal year from JD
- * @param {number} balancedYear              – reference “start” of the cycle
- * @param {number} holisticyearLength        – full cycle length in years
- * @returns {number}  A value in [0, holisticyearLength/16)
- */
-function yearInCycle(currentYear, balancedYear, holisticyearLength) {
-  const delta       = currentYear - balancedYear;
-  // Excel’s ROUNDDOWN(...,0) is truncation toward zero
-  const wholeCycles = Math.trunc(delta / perihelionCycleLength);
-  return delta - wholeCycles * perihelionCycleLength;
-}
 
 /**
  * Convert an astronomical Julian Date to a decimal year, using

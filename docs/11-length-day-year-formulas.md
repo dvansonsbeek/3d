@@ -1,7 +1,7 @@
 ---
 docVersion: 1.0
-modelVersion: v20.0
-coefficients: sha256:96f7a2194ea29f0e
+modelVersion: v21.0
+coefficients: sha256:7258a9b469c8b95e
 status: current
 ---
 
@@ -36,7 +36,7 @@ inputmeanlengthsolaryearindays = 365.2422
         │    Y(t) = mean + Σ [sᵢ·sin(2πt/Tᵢ) + cᵢ·cos(2πt/Tᵢ)]
         │
         └──► Anomalistic year: Fourier harmonics (8 terms)
-             where t = year − balancedYear
+             where t = year − 2000 (plan 07 R10: the phase origin is J2000)
         │
         ▼  Derived quantities
   ┌─────────────────────────────────────────────────────┐
@@ -381,7 +381,7 @@ The sidereal and anomalistic years use the simpler Fourier evaluator:
 
 ```javascript
 function evalYearFourier(currentYear, mean, harmonics) {
-  const t = currentYear - balancedYear;
+  const t = currentYear - balancedYear;   // balancedYear = 2000 since plan 07 R10 (the phase origin is J2000)
   let result = mean;
   for (const [div, sinC, cosC] of harmonics) {
     const phase = 2 * Math.PI * t / (holisticyearLength / div);

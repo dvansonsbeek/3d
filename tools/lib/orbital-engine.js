@@ -265,7 +265,9 @@ function computeArgumentOfPerihelionInvPlane(lonPerihelion, ascNodeInvPlane) {
 function calcEarthPerihelionPredictive(year) {
   const t = year - C.balancedYear;
   const meanRate = 360.0 / C.perihelionCycleLength;
-  let longitude = 270.0 + meanRate * t;
+  // Plan 07 R10: the 270° convention is the device's perihelion wheel at the
+  // retired origin; at J2000 the wheel stands 16 × kDeviceWheelPhaseAtJ2000Cycles turns on.
+  let longitude = 270.0 + 360 * 16 * C.kDeviceWheelPhaseAtJ2000Cycles + meanRate * t;
   for (let i = 0; i < C.PERI_HARMONICS.length; i++) {
     const [period, sinC, cosC] = C.PERI_HARMONICS[i];
     const phase = 2 * Math.PI * t / period;
@@ -587,18 +589,23 @@ function computeStellarDay(t_Ma) {
 
 /**
  * Compute RA Day Offset in milliseconds.
- * Two-harmonic cosine: −14.194 − 5.640·cos(H/16) − 1.684·cos(H/8)
- * Confirmed by 65-epoch multiepoch test (R²=0.994, RMS=0.324 ms).
- * Source: script.js ~line 33218
+ * Two lines on the H/16 (eccentricity) and H/8 (obliquity) coin rotations,
+ * mean −14.194 ms/day. Confirmed by 65-epoch multiepoch test (R²=0.994,
+ * RMS=0.324 ms). Plan 07 R10: the lines ride fitted-coefficients.json's
+ * RA_DAY_OFFSET_MS ([div, sin, cos], phase from J2000 — the former cosine
+ * literals on the t₀ phase, rotated), ONE home with the package.
  *
  * @param {number} year - calendar year
  * @returns {number} RA day offset in milliseconds
  */
 function computeRADayOffset(year) {
   const t = year - C.balancedYear;
-  return -14.194
-    - 5.640 * Math.cos(2 * Math.PI * t / (C.H / 16))
-    - 1.684 * Math.cos(2 * Math.PI * t / (C.H / 8));
+  let ms = C.RA_DAY_OFFSET_MS.mean;
+  for (const [div, sinC, cosC] of C.RA_DAY_OFFSET_MS.terms) {
+    const phase = 2 * Math.PI * t / (C.H / div);
+    ms += sinC * Math.sin(phase) + cosC * Math.cos(phase);
+  }
+  return ms;
 }
 
 /**

@@ -1,7 +1,7 @@
 ---
 docVersion: 1.0
-modelVersion: v20.0
-coefficients: sha256:96f7a2194ea29f0e
+modelVersion: v21.0
+coefficients: sha256:7258a9b469c8b95e
 status: current
 ---
 
@@ -437,9 +437,11 @@ Clairaut-amplified apsidal sensitivity; constant across the T²/T³ orders —
 an independent check; the lab-derived physical exponents are 0.867/2.479,
 the 2.407/1.018 pair being their frame-effective Meeus-convention form). e_E(t) is the FULLY-DERIVED framework H/3 fluctuation —
 e(t) = eccentricityBase·(1 + cos θ(t)/2) with
-θ(t) = 3·(t − balancedYear)/H·360° − 180° — one movement (the same H/3
-wobble that drives Earth's inclination, whose minimum falls on the balanced
-year), inputs base/balancedYear/H only; the observed J2000 eccentricity
+θ(t) = θ(J2000) + 3·(cycles from J2000)·360°, θ(J2000) = 81.178° (the
+retired origin's 3·(2000 − t₀)/H·360° − 180°, kept as the recorded anchor;
+plan 07 R10 — the phase is measured from J2000, t₀ is no longer an input) — one
+movement (the same H/3 wobble that drove the retired device's inclination),
+inputs base/anchor angle/H only; the observed J2000 eccentricity
 (−0.9%) and its rate (+1.7%) are predictions (derivation record and
 experiment log: doc 66 §1). The modulation is bounded at every epoch
 (e ∈ [0.0077, 0.0231]: perigee within ±0.1%, node within ±0.04%), so the

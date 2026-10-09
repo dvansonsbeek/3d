@@ -33,17 +33,17 @@
  * carry it so a counterfactual is reproducible (§2d).
  * @type {string}
  */
-export const CONSTANTS_HASH = "5ce921f2efa2e845";
+export const CONSTANTS_HASH = "ef4d278e74f4f3ad";
 
 /** Model version label — single source: public/input/model-version.json (§10 two-axis scheme). */
-export const MODEL_VERSION = "v20.0";
+export const MODEL_VERSION = "v21.0";
 
 /** Canonical preprint DOI — single source: public/input/model-version.json. */
 export const PREPRINT_DOI = "10.21203/rs.3.rs-8758810/v4";
 
 /** @type {Readonly<Record<string, unknown>>} */
 export const DEFAULT_CONSTANTS = Object.freeze({
-  hash: "5ce921f2efa2e845",
+  hash: "ef4d278e74f4f3ad",
   additionalBodies: {
     "pluto": {
       "name": "Pluto",
@@ -193,7 +193,8 @@ export const DEFAULT_CONSTANTS = Object.freeze({
     "earthtiltMean": 23.413526608469965,
     "earthInvPlaneInclinationAmplitude": 0.636069722432876,
     "eccentricityBase": 0.015386009686374918,
-    "eccentricityAmplitude": 0.0013559440307290061
+    "eccentricityAmplitude": 0.0013559440307290061,
+    "kDeviceWheelPhaseAtJ2000Cycles": 0.908498525276082
   },
   earthOrbital: {
     "j2000EpochYear": 2000,
@@ -222,10 +223,8 @@ export const DEFAULT_CONSTANTS = Object.freeze({
     "startmodelYear": 2000.5,
     "correctionDays": -0.828832119703292,
     "correctionSun": 0.4971540149655503,
-    "temperatureGraphMostLikely": 14.5,
     "startAngleModel": 89.91949879,
-    "useVariableSpeed": true,
-    "systemResetN": 7
+    "useVariableSpeed": true
   },
   moon: {
     "moonStartposApsidal": 347.5476,

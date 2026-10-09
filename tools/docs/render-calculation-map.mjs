@@ -308,7 +308,7 @@ function cardinalRebuilds() {
   const { createCardinalModel } = require(join(ROOT, 'packages/physics/src/cardinal/index.cjs'));
   const H = K.foundational.holisticyearLength;
   const mSY = Math.round(K.foundational.inputmeanlengthsolaryearindays * (H / 8)) / (H / 8);
-  const balancedYear = K.earthOrbital.perihelionalignmentYear - K.foundational.temperatureGraphMostLikely * (H / 16);
+  const balancedYear = 2000;   // plan 07 R10: the combs' phase origin is J2000 (the former t₀ was rotated out of the coefficients)
   const A = K.earth.earthInvPlaneInclinationAmplitude, tilt = K.earth.earthtiltMean;
   const EMPTY = { SS: [], WS: [], VE: [], AE: [] };
   /** @param {Partial<{harmonics: any, eccTerms: any, jointTerms: any, tropicalHarmonics: any}>} o */
@@ -363,10 +363,10 @@ function blockCardinalAnchors() {
   const rows = [
     '| quantity | value | what it is | H-role |',
     '|---|---|---|---|',
-    `| balanced year (phase origin of EVERY comb) | ${f(R.balancedYear, 5)} | \`perihelionalignmentYear\` ${K.earthOrbital.perihelionalignmentYear} − \`temperatureGraphMostLikely\` ${K.foundational.temperatureGraphMostLikely} × H/16 — 14.5 perihelion-of-date cycles before the 1246 alignment ("obliquity cycle position 14.5 of 16", docs/20) | **L** (the offset is counted in H/16 units) |`,
+    `| phase origin of EVERY comb | ${f(R.balancedYear, 0)} (J2000) | plan 07 R10: the former fitted origin — \`perihelionalignmentYear\` ${K.earthOrbital.perihelionalignmentYear} − 14.5 × H/16 = −302,635, "obliquity cycle position 14.5 of 16" — was rotated out of every (sin, cos) pair exactly (c0 = ${f(K.earth.kDeviceWheelPhaseAtJ2000Cycles, 15)} anchor units, \`tools/fit/reorigin-combs-j2000.mjs\`); its inputs left the JSON | — (no offset counted) |`,
     `| meanSolarYearDays | ${f(R.mSY, 12)} | the whole-days snap of chain 3.1 | **L** |`,
     `| lincoef (d/yr) | ${f(D.lincoef, 11)} | the fitted linear term of ΣT_trop — used VERBATIM (recomputing it from the 1-yr anchor injects a −12,276 s ramp) | — (fitted) |`,
-    `| h0, h1 | ${f(D.h0, 4)}, ${f(D.h1, 6)} | H inside the Ih integral as h0 + h1·c (c = cycles since the balanced year): the fit's own linear H(c) | **P** |`,
+    `| h0, h1 | ${f(D.h0, 4)}, ${f(D.h1, 6)} | H inside the Ih integral as h0 + h1·c (c = cycles since J2000; h0 absorbed h1·c0 at the re-origin): the fit's own linear H(c) | **P** |`,
     `| harmonic divisors (per point, 23 lines each) | ${FC.CARDINAL_POINT_HARMONICS.SS.map((r) => r[0]).join(', ')} | δ_X sinusoids on 2π·div·c | **C** |`,
     `| equation-of-centre orders | ${FC.CARDINAL_POINT_ECC_TERMS.SS.map((t) => t.order).join(', ')} (phase 2π·16·c; e(t) from the H/3 law) | e(t)ⁿ·[sin, cos](n·θ₁₆) — the braid; ~1.78 d amplitude | **L** (the perihelion-of-date phase counted as H/16) |`,
     `| joint sidebands (shared by the four points) | ${FC.CARDINAL_POINT_JOINT_TERMS.terms.length} terms, orders ${[...new Set(FC.CARDINAL_POINT_JOINT_TERMS.terms.map((t) => t.order))].join(', ')} × divisors ${[...new Set(FC.CARDINAL_POINT_JOINT_TERMS.terms.map((t) => t.div))].join(', ')} | phase order·λ_X − 2π·div·c, λ_X = ${Object.entries(FC.CARDINAL_POINT_JOINT_TERMS.quadratureDeg).map(([k, v]) => `${k} ${v}°`).join(', ')}; COUNTER-rotating (the load-bearing minus sign) | **C** |`,

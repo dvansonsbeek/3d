@@ -53,9 +53,9 @@ const MIGRATED = [
   'model.foundational.startmodelYear',
   'model.foundational.correctionDays',
   'model.foundational.correctionSun',
-  'model.foundational.temperatureGraphMostLikely',
   'model.foundational.startAngleModel',
-  'model.foundational.systemResetN',
+  // (plan 07 R10: temperatureGraphMostLikely and systemResetN — the retired
+  // phase origin's inputs — left the JSON; their return fails this gate below.)
 
   // Phase 5f block 2 — model.earth (eccentricityAmplitudeK is Node-side, see
   // NOT_IN_SCRIPT).
@@ -63,6 +63,7 @@ const MIGRATED = [
   'model.earth.earthInvPlaneInclinationAmplitude',
   'model.earth.eccentricityBase',
   'model.earth.eccentricityAmplitude',
+  'model.earth.kDeviceWheelPhaseAtJ2000Cycles',   // plan 07 R10: the K wheels' recorded J2000 phase
 
   // Phase 5f block 3 — model.moon. This block also CORRECTED a drift:
   // script.js held moonMeeusLpCorrection = 0.010525 against the JSON's
@@ -538,6 +539,11 @@ const retiredHits = [];
     }
   }
   if (process.env.ESSRT_LITERALS_PLANT === '1') retiredHits.push('model.planets.mercury.fibonacciD (PLANTED)');
+  // Plan 07 R10: the phase origin's two inputs left `foundational` — the combs
+  // measure their phase from J2000, the former origin was rotated out of the
+  // fitted coefficients exactly. Either key returning is the retired phase
+  // convention re-entering the source of truth.
+  for (const k of ['temperatureGraphMostLikely', 'systemResetN']) if (k in (mp.foundational ?? {})) retiredHits.push(`model.foundational.${k}`);
 }
 for (const p of retiredHits) {
   console.log(`\n  RETIRED INPUT RETURNED  ${p}`);

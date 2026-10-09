@@ -254,20 +254,22 @@ if (ssFoundJD) {
   console.log(`  June solstice 2000: JD ${ssFoundJD.toFixed(6)} (ref: ${ssTargetJD}, diff: ${ssDiffMin >= 0 ? '+' : ''}${ssDiffMin.toFixed(2)} min)`);
 }
 
-// Eccentricity at J2000 (from analytical formula, same as script.js)
-const ePhase = 2 * Math.PI * (2000 - C.balancedYear) / (C.H / 16);
-const eMean = Math.sqrt(C.eccentricityBase ** 2 + C.eccentricityAmplitude ** 2);
-const h1 = eMean - C.eccentricityBase;
-const eJ2000 = eMean + (-C.eccentricityAmplitude - h1 * Math.cos(ePhase)) * Math.cos(ePhase);
+// Eccentricity at J2000 — the ONE shipped law (the H/3 channel through the
+// Node engine). Plan 07 R10: this block used to re-evaluate the retired
+// two-cosine K law on the retired phase origin — a private copy of a deleted
+// law that read 0.0027 off once the origin moved.
+const eJ2000 = require(path.join(TOOLS_LIB, 'orbital-engine.js')).computeEccentricityEarth(2000);
 const eTarget = C.ASTRO_REFERENCE.earthEccentricityJ2000;
 const eError = Math.abs(eJ2000 - eTarget);
-check('e(J2000) vs IAU', eError, 0, 1e-4); // note: analytical formula differs from scene-graph bisection
+check('e(J2000) vs IAU', eError, 0, 1e-4);
 console.log(`  e(J2000): ${eJ2000.toFixed(10)} (IAU: ${eTarget}, diff: ${eError.toExponential(2)})`);
 
 // Perihelion longitude at J2000 (from raw harmonic formula)
 const PERI_PERIOD = C.H / 16;
 const t2000 = 2000 - C.balancedYear;
-let periLonJ2000 = 270.0 + (360.0 / PERI_PERIOD) * t2000 + fitted.PERI_OFFSET;
+// Plan 07 R10: the 270° convention is the device's perihelion wheel at the
+// retired origin; at J2000 the wheel stands 16 × kDeviceWheelPhaseAtJ2000Cycles turns on.
+let periLonJ2000 = 270.0 + 360 * 16 * C.kDeviceWheelPhaseAtJ2000Cycles + (360.0 / PERI_PERIOD) * t2000 + fitted.PERI_OFFSET;
 for (const [div, sinC, cosC] of fitted.PERI_HARMONICS_RAW) {
   const phase = 2 * Math.PI * t2000 / (C.H / div);
   periLonJ2000 += sinC * Math.sin(phase) + cosC * Math.cos(phase);

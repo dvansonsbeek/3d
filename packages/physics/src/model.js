@@ -47,9 +47,9 @@ import { driver2PeriodSecondsAtAge } from './planets/orbit-chain.cjs';
  * engine too — packaging them into FITTED_COEFFICIENTS is the remaining
  * §7a-step-1b move; until then this is their single packaged home.
  */
-const RA_DAY_OFFSET_MEAN_MS = -14.194;
-const RA_DAY_OFFSET_ECC_MS = -5.64;
-const RA_DAY_OFFSET_OBLIQ_MS = -1.684;
+// (Plan 07 R10: the RA day offset's two cosine amplitudes left here as
+// literals; they ride F.RA_DAY_OFFSET_MS now — [div, sin, cos] on the J2000
+// phase, ONE home for the three runtimes and the website.)
 
 /**
  * Moon-channel eccentricity sensitivities (perigee/node), the [g/g₀]^s
@@ -85,8 +85,12 @@ export function assembleModel(C, F, laws = {}, secularSeriesArtifact = /** @type
   const startmodelYear = C.foundational.startmodelYear;
   const startmodelJD = C.foundational.startmodelJD;
   const startModelYearWithCorrection = startmodelYear + C.foundational.correctionDays / meanSolarYearDays;
-  const balancedYear = C.earthOrbital.perihelionalignmentYear
-    - C.foundational.temperatureGraphMostLikely * (H / 16);
+  // Plan 07 R10: the correction combs measure their phase from J2000. The
+  // former origin — perihelionalignmentYear − temperatureGraphMostLikely ×
+  // H/16 = −302,635, the "balanced year" — was rotated out of every fitted
+  // (sin, cos) pair exactly (tools/fit/reorigin-combs-j2000.mjs; measured
+  // bit-identical on every surface over ±300 kyr); it is no longer an input.
+  const balancedYear = 2000;
 
   const meanSiderealYearDays = C.yearLengthRef.siderealYear;
   const meanSiderealYearSeconds = meanSiderealYearDays * 86400;
@@ -491,9 +495,14 @@ export function assembleModel(C, F, laws = {}, secularSeriesArtifact = /** @type
   /** Kinematic LOD (Layer 0). @param {number} year @returns {number} */
   const dayLengthSeconds = (year) => deepLod.siderealYearSecondsAtAge(yearToTMa(year)) / siderealYearDays(year);
   /** @param {number} year @returns {number} */
-  const raDayOffsetMs = (year) => RA_DAY_OFFSET_MEAN_MS
-    + RA_DAY_OFFSET_ECC_MS * Math.cos(phaseRadians(balancedYear, year, 16))
-    + RA_DAY_OFFSET_OBLIQ_MS * Math.cos(phaseRadians(balancedYear, year, 8));
+  const raDayOffsetMs = (year) => {
+    let ms = F.RA_DAY_OFFSET_MS.mean;
+    for (const [div, sinC, cosC] of F.RA_DAY_OFFSET_MS.terms) {
+      const ph = phaseRadians(balancedYear, year, div);
+      ms += sinC * Math.sin(ph) + cosC * Math.cos(ph);
+    }
+    return ms;
+  };
 
   // ── Cardinal points (the fitted model retired, R1)──────────────────────────────────────────────────
   // Plan 06 R1: the fitted cardinal-point model (CARDINAL_POINT_* — the §10

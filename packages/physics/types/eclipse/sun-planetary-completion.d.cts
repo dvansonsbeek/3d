@@ -66,8 +66,12 @@ export function eccVectorOfDateEmbedded(bodyIndex: number, T: number): [number, 
 /** sha256/16 of JSON.stringify(FITTED_COEFFICIENTS.SUN_LONGITUDE_HARMONICS)
  *  at derivation time — the matched-pair fingerprint asserted by test:model.
  *  Unchanged from v1/v2: SUN_HARMONICS did not move in the D2 or N3
- *  landings. */
-export const PAIRED_SUN_HARMONICS_SHA256: "cbc189cea1c20292";
+ *  landings. Plan 07 R10 moved the hash WITHOUT a refit: the three (sin, cos)
+ *  pairs were rotated exactly from the t₀ phase origin to J2000
+ *  (tools/fit/reorigin-combs-j2000.mjs), the finder Sun is bit-identical, so
+ *  the residual this table was derived from is unchanged — the table stands
+ *  (fidelity 0.616″, 70 terms), only the fingerprint is re-recorded. */
+export const PAIRED_SUN_HARMONICS_SHA256: "53530a28a60b3c4a";
 /** sha256/16 of JSON.stringify([...planets, moonElongation]) — the seven
  *  full-precision carrier rates (deg/cy TT) the tables pair with: since plan
  *  06 I3 the model's own banked J2000 sidereal mean motions for the planets

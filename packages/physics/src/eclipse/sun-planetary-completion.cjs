@@ -396,8 +396,12 @@ function createSunPlanetaryCompletion({ embWobbleArcsec, carrierRatesDegPerCy, e
 /** sha256/16 of JSON.stringify(FITTED_COEFFICIENTS.SUN_LONGITUDE_HARMONICS)
  *  at derivation time — the matched-pair fingerprint asserted by test:model.
  *  Unchanged from v1/v2: SUN_HARMONICS did not move in the D2 or N3
- *  landings. */
-const PAIRED_SUN_HARMONICS_SHA256 = 'cbc189cea1c20292';   // eccentricity unification: Step-0 refit → N2/N3 re-derived (fidelity 0.616″, 70 terms)
+ *  landings. Plan 07 R10 moved the hash WITHOUT a refit: the three (sin, cos)
+ *  pairs were rotated exactly from the t₀ phase origin to J2000
+ *  (tools/fit/reorigin-combs-j2000.mjs), the finder Sun is bit-identical, so
+ *  the residual this table was derived from is unchanged — the table stands
+ *  (fidelity 0.616″, 70 terms), only the fingerprint is re-recorded. */
+const PAIRED_SUN_HARMONICS_SHA256 = '53530a28a60b3c4a';   // was cbc189cea1c20292 (eccentricity unification: Step-0 refit → N2/N3 re-derived); R10 rotation, same Sun
 
 /** sha256/16 of JSON.stringify([...planets, moonElongation]) — the seven
  *  full-precision carrier rates (deg/cy TT) the tables pair with: since plan
