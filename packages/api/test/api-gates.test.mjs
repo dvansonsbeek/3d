@@ -117,6 +117,12 @@ for (const url of SAMPLE_REQUESTS) {
   const dataOf = (url) => { const { path, query } = parseUrl(url); return JSON.parse(handle({ method: 'GET', path, query }).body).data; };
   const ep = dataOf('/v1/epoch?year=2000').epochs[0];
   if (Math.abs(ep.h - 335317) > 1e-6) failures.push(`epoch H@2000: ${ep.h}`);
+  // The 'lod' section's two named bases (plan 08 storyline sweep): LOD_real,
+  // the observable (= the registry's lodRealPhysical, the simulator's Solar
+  // Day), and the Layer-2 tidal + GIA mean day; 1.78 ms apart at J2000.
+  if (Math.abs(ep.lodRealSeconds - 86400.00178) > 1e-4) failures.push(`epoch lodRealSeconds@2000: ${ep.lodRealSeconds}`);
+  if (Math.abs(ep.lodMeanSeconds - 86399.99968) > 1e-4) failures.push(`epoch lodMeanSeconds@2000: ${ep.lodMeanSeconds}`);
+  if ('lodSeconds' in ep) failures.push('epoch still serves the unnamed lodSeconds');
   const dev = dataOf('/v1/epoch?year=-379998000').epochs[0];
   // plan 06 Phase 3: H(t) is the UNIT = 13 composed lunisolar precession periods (282,329 at −380 Ma);
   // the pre-Phase-3 spin-only clock H₀·LOD/LOD₀ read 306,189 there (now the frozen era clock's counter).

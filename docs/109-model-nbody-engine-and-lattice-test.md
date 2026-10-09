@@ -156,10 +156,11 @@ node column must be read in the invariable plane, as above.
 `naff-frequencies.mjs` (Laskar's NAFF on z = e·e^{iϖ} and ζ = sin(i/2)·e^{iΩ},
 with a least-squares amplitude refit and a merge of frequencies closer than
 the resolution) returns the secular frequencies of the solar system from the
-model's own Newtonian system: Jupiter g₅ = 4.2562 ″/yr (Laskar 4.2575),
-Saturn g₆ = 28.2453 (28.2455), Mars g₄ = 17.903 (17.916), s₆ = −26.3477
-(−26.3475), s₇ = −3.000 (−2.993). With the 1PN term on, Mercury's g₁ moves
-from 5.103 to 5.576 ″/yr (Laskar 5.5965): the omitted term raises Mercury's
+model's own Newtonian system: Jupiter g₅ = 4.2562 ″/yr (La2004 4.2575),
+Saturn g₆ = 28.2453 (28.2450), Mars g₄ = 17.903 (17.916), s₆ = −26.3477
+(−26.3479), s₇ = −3.000 (−2.9925) — La2004 as tabulated in Laskar et al.
+2011 Table 6. With the 1PN term on, Mercury's g₁ moves
+from 5.103 to 5.576 ″/yr (La2004 5.59): the omitted term raises Mercury's
 long-term apsidal frequency by 0.473 ″/yr = 47 ″/cy — the 43 of the present
 epoch seen at the quantity-A level. Theory-vs-theory throughout; the value
 of this section is that the model's engine is now shown to be the standard

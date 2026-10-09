@@ -85,7 +85,9 @@ const SUF = DELTA === 0.01 ? '' : `-d${Math.round(DELTA * 1e4)}`;   // dump suff
 const T_RAMP0 = 4.0e6 * YR, T_RAMP1 = 4.5e6 * YR, T_END = 8.5e6 * YR;
 const CADENCE_YR = 200;
 const D2R = Math.PI / 180;
-const LASKAR_G = { g1: 5.5965, g2: 7.4555, g3: 17.3711, g4: 17.9159, g5: 4.2575, g6: 28.2455, g7: 3.0876, g8: 0.6730 };
+// La2004 as tabulated in Laskar et al. (2011) A&A 532, A89, Table 6 — labels only
+// (the former set here, g2 7.4555 / g1 5.5965 …, had no traceable source).
+const LASKAR_G = { g1: 5.59, g2: 7.452, g3: 17.368, g4: 17.916, g5: 4.257452, g6: 28.2450, g7: 3.087951, g8: 0.673021 };
 
 const smoother = (x) => (x <= 0 ? 0 : x >= 1 ? 1 : x * x * x * (x * (6 * x - 15) + 10));
 const gmSunOfT = (tSec) => GM_SUN * (1 - DELTA * smoother((tSec - T_RAMP0) / (T_RAMP1 - T_RAMP0)));

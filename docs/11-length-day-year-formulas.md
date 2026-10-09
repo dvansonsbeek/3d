@@ -206,8 +206,8 @@ The rate that matters here is precession in **right ascension** (along the equat
 |----------|-------------|-----------|
 | Mean solar day — **LOD_mean** (H/13 identity) | <!--v:meanSolarDaySeconds-->86,399.999676<!--/v--> s | — (kinematic) |
 | Mean solar day — **LOD_real** (Layer 4: + the ecliptic term + DT cycles + swing, physical) | <!--v:lodRealPhysical-->86,400.001780<!--/v--> s | USNO joint-optimum target <!--v:usnoLodJ2000-->86,400.0021<!--/v--> s (fit's measured-day basis — the declared scene day; <!--v:dayBasisSpreadMs-->0.32<!--/v--> ms basis spread) |
-| Sidereal day | 86164.091 s | 86164.091 s (IAU) |
-| Stellar day | 86164.099 s | 86164.099 s (IAU) |
+| Sidereal day — on LOD_real of J2000 (the simulator readout) | <!--v:siderealDayJ2000Physical-->86,164.092307<!--/v--> s | <!--v:siderealDayInputSeconds-->86,164.090531<!--/v--> s (IAU, on the 86,400-s day — the two differ by the day's excess, <!--v:lodRealJ2000ExcessMs-->1.78<!--/v--> ms) |
+| Stellar day — on LOD_real of J2000 | <!--v:stellarDayJ2000Physical-->86,164.100683<!--/v--> s | <!--v:stellarDayInputSeconds-->86,164.098904<!--/v--> s (IAU 2000A, on the 86,400-s day) |
 
 See § "The ecliptic missing-motion LOD Correction" below for the distinction between the two mean solar day values.
 
@@ -286,8 +286,8 @@ The coin rotation paradox manifests at every timescale:
 | Anomalistic year | 365.259633 days | <!--v:anomalisticYearInputDays-->365.259636<!--/v--> days (IAU) |
 | LOD_mean (kinematic, H/13 identity) | <!--v:meanSolarDaySeconds-->86,399.999676<!--/v--> s | — |
 | LOD_real (Layer 4: physical, + the ecliptic term + DT cycles + swing) | <!--v:lodRealPhysical-->86,400.001780<!--/v--> s | USNO joint-optimum target <!--v:usnoLodJ2000-->86,400.0021<!--/v--> s (fit's measured-day basis) |
-| Sidereal day | 86164.091 s | 86164.091 s (IAU) |
-| Stellar day | 86164.099 s | 86164.099 s (IAU) |
+| Sidereal day — on LOD_real of J2000 (the simulator readout) | <!--v:siderealDayJ2000Physical-->86,164.092307<!--/v--> s | <!--v:siderealDayInputSeconds-->86,164.090531<!--/v--> s (IAU, on the 86,400-s day — the two differ by the day's excess, <!--v:lodRealJ2000ExcessMs-->1.78<!--/v--> ms) |
+| Stellar day — on LOD_real of J2000 | <!--v:stellarDayJ2000Physical-->86,164.100683<!--/v--> s | <!--v:stellarDayInputSeconds-->86,164.098904<!--/v--> s (IAU 2000A, on the 86,400-s day) |
 | Axial precession | <!--v:axialPrecJ2000-->25,771<!--/v--> yr | <!--v:axialPrecJ2000-->25,771<!--/v--> yr (instantaneous J2000 rate) |
 
 

@@ -36,7 +36,11 @@ documented where it belongs, in doc 66.
 
 Instruments: `tools/explore/fq7s-ecc-consistency.mjs`,
 `fq7s-orbit-vector-vs-laskar.mjs`, `fq7s-laplace-lagrange-e.mjs`,
-`fq7s-nbody-g.mjs`, `fq7s-annual-channel.mjs`.
+`fq7s-nbody-g.mjs`, `fq7s-annual-channel.mjs`. (They evaluate the
+artifact-less `createModel()` — Earth's elements from the 18-term mode table,
+the model of the FQ-7 era; the shipped e(t), ϖ(t) and ε(t) are the governed
+secular series since the S3 tier unification, which these records predate.
+Re-running them today means passing `secularSeriesArtifact`.)
 
 ---
 
@@ -92,12 +96,12 @@ constants.
 
 | eigenfrequency | derived (″/yr) | Laskar 2004 | period (kyr) | 8H/n |
 |---|---:|---:|---:|---:|
-| g2 | 7.35 | 7.4555 | 176 | 15.2 |
-| g3 | 17.34 | 17.3711 | 75 | 35.9 |
-| g4 | 18.02 | 17.9159 | 72 | 37.3 |
-| g1 | 5.46 | 5.5965 | 237 | 11.3 |
-| g8 | 0.64 | 0.6730 | 2009 | 1.3 |
-| g5 | 3.74 (first order) → **4.224 (framework N-body)** | 4.2575 | 304 | 8.75 |
+| g2 | 7.35 | 7.452 | 176 | 15.2 |
+| g3 | 17.34 | 17.368 | 75 | 35.9 |
+| g4 | 18.02 | 17.916 | 72 | 37.3 |
+| g1 | 5.46 | 5.59 | 237 | 11.3 |
+| g8 | 0.64 | 0.673021 | 2009 | 1.3 |
+| g5 | 3.74 (first order) → **4.224 (framework N-body)** | 4.257452 | 304 | 8.75 |
 | g7 | 2.73 | 3.0876 | 474 | 5.7 |
 
 First-order theory places g5 12% low — the Jupiter–Saturn 5:2

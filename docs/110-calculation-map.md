@@ -194,8 +194,8 @@ per 25,771.4 Julian years; the tropical year absorbed the 26 ms).
 | **(B) the one-family route** — `model.yearLengths.axialPrecessionYearsAtYear` ("THE ONE HOME for the of-date year lengths") | the D6 λ̇ channel: massLossLaw(y)/lamDotRel(y), the engine's own banked mean-longitude drift (each node the least-squares quadratic slope of the run's unwrapped L over ±5 kyr) | 1/T_trop = 1/T_sid + p(y)/(360°·365.25 d) with p(y) the year-over-year retrograde advance of the hybrid's equinox in its GENERAL-PRECESSION longitude — the broken angle through the node of the ecliptic of date on the J2000 ecliptic (the p_A of the literature; the projected longitude atan2(g_y, g_x) parts from it with the square of the ecliptic's tilt: 0.05 s of year at ±4 kyr, ~1 s beyond 100 kyr, 5.9″ of Sun at −3000) — the lunisolar α-integration of ŝ against the engine's n̂(t), self-anchored so the realized J2000 rate equals 360/T_p,J2000 per Julian year exactly; the beat T_sid·T_trop/((T_sid − T_trop)·365.25 d) is quoted in Julian years, the unit of that rate | — | `earth/year-lengths.cjs`; `earth/sidereal-year-channel.cjs`; `earth/deep-orbital-history.cjs` (`generalPrecessionLonDeg`) |
 | the hybrid's own α(t) — the precession constant of date | — | — | **P**: α(t) = ψ̇(t)/cos ε₀ with ψ̇(t) = 2π/(T_p,J2000 · H(t)/H₀) — H(t)/H₀ ≡ T_p,composed(t)/T_p,J2000 (Phase 3; since S5 the composed clock's p₀ IS this same T_p,J2000) — **times the two factors of date** (2.3): the solar torque at the eccentricity of date and J₂(t)/J₂₀ from the GIA channel, both exactly 1 at J2000 | `model.js` (the `oneSourceM` wiring); `deep-orbital-history.cjs` (`alphaAtGeneral`); `climate/l1-orbital.cjs` (`j2RatioAt`) |
 
-At J2000 both read 25,771.40 yr = 50.2883 ″/yr — the IAU value (50.2879)
-to 8×10⁻⁶. This is the model's ONE J2000 precession reading (S5): the
+At J2000 both read 25,771.40 yr = 50.2883 ″/yr — the IAU 2006 value (50.2880,
+P03's 5,028.796195″/cy) to 8×10⁻⁶. This is the model's ONE J2000 precession reading (S5): the
 composed clock's anchor p₀, the hybrid's self-anchor target and every
 published face (`lunisolar`, the registry, the panels) read it. H/13 reads
 25,793.6 yr = 50.2450 ″/yr — the fit anchor's reading, retired as a period
@@ -246,7 +246,7 @@ J₂(t)/J₂₀ stays within ±<!--v:precOfDateEllipticityAmpLastMyrPct-->0.02<!
 | solar torque factor | 3.965677e-14 km³/s²/km³ | GM☉/AU³ · (1 − e_E²)^(−3/2), e_E = 0.01671022 (IAU J2000) |
 | lunar torque factor | 8.565827e-14 | GM_M/a_M³ · (1 − e_M²)^(−3/2) · (1 − 1.5 sin² i_M), a_M = 384399.07 km, e_M = 0.054900489, i_M = 5.1573° |
 | **f_S, the solar share** | **31.65 %** | sol/(sol + lun) — literature ≈ 31.6 % |
-| p₀, the composition's J2000 anchor | 50.2883 ″/yr | 1,296,000 / T_p(J2000), the certified of-date year laws' beat at 2000 (route B, table 2.4) — the model's ONE J2000 reading (plan 06 S5; IAU 50.2879 to 8×10⁻⁶). The former 1,296,000/(H/13) = 50.2450 was the fit anchor's reading, 0.086 % slow |
+| p₀, the composition's J2000 anchor | 50.2883 ″/yr | 1,296,000 / T_p(J2000), the certified of-date year laws' beat at 2000 (route B, table 2.4) — the model's ONE J2000 reading (plan 06 S5; IAU 2006 50.2880 to 8×10⁻⁶). The former 1,296,000/(H/13) = 50.2450 was the fit anchor's reading, 0.086 % slow |
 | α = p₀ / cos ε₀ | 54.811 ″/yr | the hybrid's precession constant (ε₀ = 23.439279444444445°); literature ≈ 54.9 |
 <!-- /generated:calcmap-torque-split -->
 
@@ -290,7 +290,7 @@ one-source movement):
 ### 2.5 Findings from this chain (to act on)
 
 1. **Three J2000 precession rates coexist**, and the map now shows all
-   three: IAU 50.2879 ″/yr (input), the of-date year-length beat
+   three: IAU 2006 50.2880 ″/yr (input), the of-date year-length beat
    50.2883 (the dynamical value, table 2.4), and H/13 = 50.2450 (the
    structural clock AND the composition's anchor p₀). The 0.086 % gap
    (plan 06 test T3) has its attribution here: H_J2000 was fitted on the
@@ -363,7 +363,7 @@ clock device (the spin-and-tides side) except where the one-family route
 | **meanSolarYearDays** | 365.242203646102 | round(input · H/8) / (H/8) — snapped so H/8 = 41914.625 yr holds a WHOLE number of days (15,308,990) | **L** (the whole-days-per-cycle constraint of the H fit) |
 | sidereal year (days, IAU) | 365.256363004 | `yearLengthRef.siderealYear` (astro-reference) | — |
 | kinematic sidereal year (days) | 365.256364373822 | meanSolarYearDays · H/(H − 13) — one calendar turn per H/13, the unit's convention (S5: a device identity, 0.086 % from one turn per the published T_p) | **U/L** (the 13, device) |
-| **LOD_mean** (the kinematic day, s) | 86399.999675974 | sidereal seconds / kinematic sidereal days — the FIRST of the three day lengths (SI 86,400 · LOD_mean · LOD_real 86,400.0014) | — |
+| **LOD_mean** (the kinematic day, s) | 86399.999675974 | sidereal seconds / kinematic sidereal days — the FIRST of the three day lengths (SI 86,400 · LOD_mean · LOD_real, registry lodRealPhysical) | — |
 | anomalistic year (days) | 365.2596323900 | meanSolarYearDays · (H/16)/(H/16 − 1) — one perihelion-of-date beat per H/16 | **L** (the 16) |
 | **total days in H** | 122,471,920 | H · meanSolarYearDays — an INTEGER by construction of the snap above; the day-count invariant of doc 99 | **U** |
 <!-- /generated:calcmap-j2000-identities -->
@@ -418,14 +418,14 @@ Comb divisors (the H-divisor harmonics each (A) family adds to its tidal-chain b
 <!-- generated:calcmap-day-lengths -->
 | year | LOD kinematic of date (s) | measured solar day (s) | RA day offset (ms) | sidereal day (s) | stellar day (s) | LOD tidal mean (s) | LOD actual (s) |
 |---|---|---|---|---|---|---|---|
-| -10000 | 86399.76319 | 86399.74183 | -21.358 | 86163.8552 | 86163.8636 | 86399.76311 | 86399.76352 |
-| -2584 | 86399.92002 | 86399.90722 | -12.796 | 86164.0111 | 86164.0195 | 86399.91964 | 86399.92034 |
+| -10000 | 86399.76319 | 86399.74183 | -21.358 | 86163.8574 | 86163.8657 | 86399.76311 | 86399.76352 |
+| -2584 | 86399.92002 | 86399.90722 | -12.796 | 86164.0137 | 86164.0220 | 86399.91964 | 86399.92034 |
 | -584 | 86399.95515 | 86399.94531 | -9.838 | 86164.0460 | 86164.0544 | 86399.95473 | 86399.95547 |
-| 0 | 86399.96525 | 86399.95599 | -9.256 | 86164.0560 | 86164.0644 | 86399.96482 | 86399.96557 |
-| 1246 | 86399.98686 | 86399.97831 | -8.554 | 86164.0775 | 86164.0859 | 86399.98643 | 86399.98718 |
-| 2000 | 86400.00011 | 86399.99160 | -8.508 | 86164.0906 | 86164.0990 | 86399.99968 | 86400.00043 |
-| 5000 | 86400.05536 | 86400.04449 | -10.866 | 86164.1455 | 86164.1539 | 86400.05497 | 86400.05568 |
-| 10000 | 86400.15827 | 86400.14080 | -17.469 | 86164.2477 | 86164.2561 | 86400.15807 | 86400.15859 |
+| 0 | 86399.96525 | 86399.95599 | -9.256 | 86164.0626 | 86164.0710 | 86399.96482 | 86399.96557 |
+| 1246 | 86399.98686 | 86399.97831 | -8.554 | 86164.0857 | 86164.0940 | 86399.98643 | 86399.98718 |
+| 2000 | 86400.00011 | 86399.99160 | -8.508 | 86164.0923 | 86164.1007 | 86399.99968 | 86400.00043 |
+| 5000 | 86400.05536 | 86400.04449 | -10.866 | 86164.1439 | 86164.1523 | 86400.05497 | 86400.05568 |
+| 10000 | 86400.15827 | 86400.14080 | -17.469 | 86164.2557 | 86164.2641 | 86400.15807 | 86400.15859 |
 <!-- /generated:calcmap-day-lengths -->
 
 ### 3.4 Findings from this chain (to act on)

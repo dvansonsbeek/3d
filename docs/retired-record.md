@@ -108,8 +108,8 @@ precession reading. H₀ = 335,317 was fitted on the 1246 AD
 perihelion–solstice alignment plus the J2000 longitude of perihelion, the
 perihelion-of-date beat, not on the axial rate; H₀/13 = 25,793.6 yr is
 therefore the fit anchor's reading, 0.086 % slower than the model's own
-J2000 period, 25,771.4 yr (the certified of-date year laws' beat, IAU
-50.2879 ″/yr to 8×10⁻⁶), and is not a period of anything the model
+J2000 period, 25,771.4 yr (the certified of-date year laws' beat, IAU 2006
+50.2880 ″/yr to 8×10⁻⁶), and is not a period of anything the model
 computes — nor a window mean (the published period averages 25,598 yr
 over ±26 kyr, 25,641 over one unit around the balanced year). The composed
 clock's anchor p₀, the hybrid's self-anchor and every published face (the

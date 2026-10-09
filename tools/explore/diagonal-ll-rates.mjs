@@ -57,7 +57,7 @@ const TRIALS = parseInt(KV.trials || '50000', 10);
 
 // external reference values (cited, not model-derivable): Laskar 2004 g/s —
 // the free-universe eigenfrequencies our own NAFF reproduces to 0.1–1 % (doc 109 §5)
-const EIGEN_G = { mercury: 5.5965, venus: 7.4555, earth: 17.3711, mars: 17.9159, jupiter: 4.2575, saturn: 28.2455, uranus: 3.0876, neptune: 0.673 };
+const EIGEN_G = { mercury: 5.59, venus: 7.452, earth: 17.368, mars: 17.916, jupiter: 4.257452, saturn: 28.2450, uranus: 3.087951, neptune: 0.673021 };   // La2004, Laskar et al. 2011 Table 6
 const EIGEN_S = { mercury: -5.6197, venus: -7.0797, earth: -18.8506, mars: -17.7553, jupiter: -26.3475, saturn: -26.3475, uranus: -2.9927, neptune: -0.6919 };
 
 const OSC = Object.fromEntries(NAMES.map((p) => [p, osculAt(p)]));

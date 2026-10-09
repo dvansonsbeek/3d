@@ -1256,10 +1256,10 @@ export const VALUES = {
       const d = meanSiderealDaySeconds();
       return (d / dtl().certifiedAxialPrecessionJ2000Years()) / (C.meanSolarYearDays + 1) * raProjMean + d;
     };
-    const siderealDayJ2000Seconds = () => {
-      const sol = dtl().computeSolarYearDaysDirect(2000);
-      return (sol * dtl().computeLodKinematicSecondsAtEpoch(2000)) / (sol + 1);
-    };
+    // (siderealDayJ2000 / stellarDayJ2000 — the two days on the KINEMATIC day
+    // of J2000 — were deleted 2026-10-09: a "J2000 day" needs its day basis
+    // named, and the published bases are the SI day (the IAU inputs) and
+    // LOD_real (the *Physical keys below); model-values MAJOR 17.)
     return {
       meanSolarYearDays:     { get: () => C.meanSolarYearDays, render: (v) => thousands(v, 7), unit: 'd' },
       meanSolarYearDaysFull: { get: () => C.meanSolarYearDays, render: (v) => thousands(v, 12), unit: 'd', note: 'full-precision form for derivation contexts' },
@@ -1302,18 +1302,38 @@ export const VALUES = {
         unit: 'ms',
         note: 'UNPROJECTED ecliptic-frame count — one extra sidereal day per precession period T_p (S5: the certified J2000 reading, not the counter H/13) — deliberately not the 8.37 ms projected offset',
       },
-      siderealDayJ2000: { get: siderealDayJ2000Seconds, render: (v) => thousands(v, 6), unit: 's' },
-      stellarDayJ2000: {
+      // The two days on the model's PHYSICAL day of J2000 — LOD_real, the
+      // tweakpane Solar Day row's day — which the simulator's Days & Years rows
+      // and its Framework Verification panel read since 2026-10-03. The
+      // published bases are two (owner, 2026-10-09): the SI day of exactly
+      // 86,400 s (the IAU inputs siderealDayInputSeconds / stellarDayInputSeconds)
+      // and LOD_real (these); the stellar day's RA projection reads the
+      // published hybrid ε of date (Layer A, plan 06), not the K comb.
+      siderealDayJ2000Physical: {
         get: () => {
           const sol = dtl().computeSolarYearDaysDirect(2000);
-          const d = siderealDayJ2000Seconds();
-          // Layer A (plan 06): the published ε (the one-source hybrid), not the K comb.
+          return (sol * dtl().computeLodRealSecondsAtEpoch(2000)) / (sol + 1);
+        },
+        render: (v) => thousands(v, 6),
+        unit: 's',
+        note: 'sidereal day on LOD_real of J2000 — the simulator readout basis (solar day of date × Y/(Y + 1))',
+      },
+      stellarDayJ2000Physical: {
+        get: () => {
+          const sol = dtl().computeSolarYearDaysDirect(2000);
+          const d = (sol * dtl().computeLodRealSecondsAtEpoch(2000)) / (sol + 1);
           const raProj = Math.cos((oneEps(2000) * Math.PI) / 180);
           return (d / dtl().certifiedAxialPrecessionJ2000Years()) / (sol + 1) * raProj + d;
         },
         render: (v) => thousands(v, 6),
         unit: 's',
-        note: 'OF-DATE obliquity projection at 2000 (the published hybrid ε) — the simulator readout',
+        note: 'stellar day on LOD_real of J2000 — the simulator readout basis (sidereal × (1 + cos ε/(T_p·(Y + 1))), of-date ε)',
+      },
+      lodRealJ2000ExcessMs: {
+        get: () => (dtl().computeLodRealSecondsAtEpoch(2000) - 86400) * 1000,
+        render: (v) => Number(v).toFixed(2),
+        unit: 'ms',
+        note: 'LOD_real of J2000 minus the SI day of 86,400 s — the split between the IAU day constants and the simulator\'s sidereal/stellar day readouts',
       },
     };
   })(),
@@ -1893,9 +1913,9 @@ export const VALUES = {
     const out = {
       earthPrecSolarShareJ2000Pct: { get: () => 100 * dtl().PRECESSION_SOLAR_SHARE_J2000, render: (v) => Number(v).toFixed(1), unit: '%', note: 'solar fraction of Earth’s J2000 precession torque, derived from the shared constants (the W3 split; the lunar part is the rest)' },
       // Four decimals, not one: the published comparison against IAU 2006's
-      // 50.2875 ″/yr turns on a 0.003 % difference, which 50.3 cannot carry —
+      // 50.2880 ″/yr (5,028.796195″/cy, P03) turns on a 0.0007 % difference, which 50.3 cannot carry —
       // the website had to hard-code the rate to state it at all.
-      earthPrecRateJ2000ArcsecPerYr: { get: () => dtl().precessionRateJ2000ArcsecPerYr(), render: (v) => Number(v).toFixed(4), unit: '″/yr', note: 'the model’s J2000 axial-precession rate — 1,296,000/T_p(J2000), the certified year laws’ beat at 2000 (S5; IAU 50.2879)' },
+      earthPrecRateJ2000ArcsecPerYr: { get: () => dtl().precessionRateJ2000ArcsecPerYr(), render: (v) => Number(v).toFixed(4), unit: '″/yr', note: 'the model’s J2000 axial-precession rate — 1,296,000/T_p(J2000), the certified year laws’ beat at 2000 (S5; IAU 2006 50.2880)' },
       earthPrecSolarJ2000ArcsecPerYr: { get: () => dtl().precessionRateJ2000ArcsecPerYr() * dtl().PRECESSION_SOLAR_SHARE_J2000, render: (v) => Number(v).toFixed(4), unit: '″/yr',note: 'the solar torque’s share of the J2000 rate, f_S · ψ̇₀ (S5 — replaces the hand split 16.8/33.4 of doc 99)' },
       earthPrecLunarJ2000ArcsecPerYr: { get: () => dtl().precessionRateJ2000ArcsecPerYr() * (1 - dtl().PRECESSION_SOLAR_SHARE_J2000), render: (v) => Number(v).toFixed(4), unit: '″/yr',note: 'the lunar torque’s share of the J2000 rate, (1 − f_S) · ψ̇₀' },
     };

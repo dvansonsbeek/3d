@@ -33,7 +33,7 @@ const CLONES = parseInt(KV.clones || '6', 10);
 const TERMS = KV.terms || '8';
 const ARCSEC_PER_RAD = 648000 / Math.PI;
 // Laskar 2004 Table 3 — reference labels only.
-const LG = { g1: 5.5965, g2: 7.4555, g3: 17.3711, g4: 17.9159, g5: 4.2575 };
+const LG = { g1: 5.59, g2: 7.452, g3: 17.368, g4: 17.916, g5: 4.257452 };   // La2004, Laskar et al. 2011 Table 6 (labels only)
 
 const lead = (modes, ref) => {
   // the mode nearest the reference frequency (clone mode tables list by amplitude)

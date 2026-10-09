@@ -17,6 +17,13 @@
  * under a unit's name — attribute it, never absorb it.
  *
  * Fail-proven: ESSRT_PLAN06_PLANT=1 perturbs one value by 1 ULP.
+ *
+ * The bare `createModel()` here is DELIBERATE (artifact-less createModel audit,
+ * 2026-10): the fixture pins the package's own closed-form surfaces and, inside
+ * the wander window, the one-source movement this file builds itself; Earth's
+ * elements away from J2000 therefore come from the 18-term mode table, not the
+ * governed series — a behaviour pin, not a published value (the registry, API,
+ * MCP and simulator pass the series).
  */
 
 import { createRequire } from 'node:module';

@@ -113,6 +113,22 @@ if (model.identity.counterfactual !== false) failures.push('identity: default as
   if (!(Math.abs(nearMid - jdSS) < 1e-6)) failures.push(`jdNearUT(mid-year 2000,'SS') off: ${nearMid - jdSS} d`);
 }
 
+// Day lengths on LOD_real (plan 08 storyline sweep): the package's Layer-4
+// solar day is the engine's computeLodRealSecondsAtEpoch twin, and the
+// sidereal/stellar days ride it — the simulator's readout basis, the registry's
+// siderealDayJ2000Physical / stellarDayJ2000Physical (they rode the kinematic
+// day before, 1.7 ms below the simulator at J2000).
+{
+  for (const y of [2000, -3000, 1500, 2100]) {
+    check('lengths.lodRealSeconds', y, model.lengths.lodRealSeconds(y), dt.computeLodRealSecondsAtEpoch(y), 1e-9);
+  }
+  const sol = dt.computeSolarYearDaysDirect(2000);
+  const sidPhys = (sol * dt.computeLodRealSecondsAtEpoch(2000)) / (sol + 1);
+  check('lengths.siderealDaySeconds (LOD_real basis)', 2000, model.lengths.siderealDaySeconds(2000), sidPhys, 1e-6);
+  const gapMs = (model.lengths.stellarDaySeconds(2000) - model.lengths.siderealDaySeconds(2000)) * 1000;
+  if (!(Math.abs(gapMs - 8.376) < 0.02)) failures.push(`stellar − sidereal gap @2000: ${gapMs} ms (expected ~8.376)`);
+}
+
 // Lunar chain (slice-2b): the package assembly vs the engine's series probe
 // and ΔT-on-JD convention. Same shared factories, same wiring — the expected
 // agreement is BIT-EXACT (tolerance 0); any drift means the wiring diverged.

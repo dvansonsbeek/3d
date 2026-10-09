@@ -646,11 +646,30 @@ export function assembleModel(C, F, laws = {}, secularSeriesArtifact = /** @type
   /** @param {number} year @returns {number} */
   const tropicalYearDirectDays = (year) => evalYearFourier(year, tropicalYearDaysBase(year), F.TROPICAL_YEAR_HARMONICS);
 
-  /** @param {number} year @returns {number} */
-  const solarYearSeconds = (year) => tropicalYearDays(year) * dayLengthSeconds(year);
-  /** @param {number} year @returns {number} */
-  const siderealDaySeconds = (year) => solarYearSeconds(year) / (tropicalYearDays(year) + 1);
-  /** @param {number} year @returns {number} */
+  /** Layer-4 solar day of date in SI seconds — LOD_real, the shipped
+   *  observable (the tweakpane Solar Day row, the registry's lodRealPhysical,
+   *  the Framework Verification panel's day): the kinematic day of date + the
+   *  ecliptic missing-motion term on the nodal period + the calibrated ΔT
+   *  cycle stack incl. the core-mantle swing. Twin of tools/lib
+   *  computeLodRealSecondsAtEpoch and the browser's _vfpSolarDaySecondsOfDate
+   *  (86,400.001780 s at 2000). @param {number} year @returns {number} */
+  const lodRealSeconds = (year) =>
+    dayLengthSeconds(year)
+    + (deepLod.eclipticLodCorrectionSecondsAtAge(yearToTMa(year)) ?? 0)
+    + dtCycleLodCorrectionSum(year);
+  /** Mean sidereal day of date in SI seconds — on LOD_real (plan 08 storyline
+   *  sweep, 2026-10-09: the published day bases are the SI day of exactly
+   *  86,400 s, the IAU constants, and LOD_real; this rode the KINEMATIC day
+   *  before, 1.7 ms below the simulator's readout at J2000). One rotation
+   *  more against the equinox than there are solar days in a year.
+   *  @param {number} year @returns {number} */
+  const siderealDaySeconds = (year) => {
+    const Y = tropicalYearDays(year);
+    return (lodRealSeconds(year) * Y) / (Y + 1);
+  };
+  /** Mean stellar day of date in SI seconds — the sidereal day plus the
+   *  equinox's daily regression projected onto the equator (on LOD_real, like
+   *  the sidereal day). @param {number} year @returns {number} */
   const stellarDaySeconds = (year) => {
     const tMa = yearToTMa(year);
     // S5 (plan 06): one equinox turn per T_p(t) — the composed lunisolar
@@ -658,13 +677,12 @@ export function assembleModel(C, F, laws = {}, secularSeriesArtifact = /** @type
     // unit's counter H(t)/13 (0.086 % slow; 7 µs on the 8.37 ms offset).
     const TpRaw = deepLod.lunisolarPrecessionPeriodYearsAtAge(tMa);
     const Tp = TpRaw === null ? certifiedAxialPrecessionJ2000Years() : TpRaw;
-    const syS = solarYearSeconds(year);
     const syD = tropicalYearDays(year);
     const sidDay = siderealDaySeconds(year);
     // Layer A (plan 06): the RA projection reads the published ε (the one-source
     // hybrid), not the K comb — the browser's _sceneEpsTargetDeg twin; 1e-8 s.
     const raProjection = Math.cos((oneSourceM.epsAt(year) * Math.PI) / 180);
-    return (syS / (syD + 1) / Tp / (syD + 1)) * raProjection + sidDay;
+    return (sidDay / Tp / (syD + 1)) * raProjection + sidDay;
   };
   /** @param {number} year @returns {number} */
   const measuredSolarDaySeconds = (year) => dayLengthSeconds(year) + raDayOffsetMs(year) / 1000;
@@ -1488,7 +1506,15 @@ export function assembleModel(C, F, laws = {}, secularSeriesArtifact = /** @type
     epoch: Object.freeze({
       yearToTMa,
       hAtYear: /** @param {number} year @returns {number|null} */ (year) => deepLod.hAtAge(yearToTMa(year)),
+      // The Layer-2 mean day of date — the tidal + GIA base the deep-time law
+      // gives at any age (86,399.9997 s at J2000): the day the paleo anchors
+      // and the ΔT integrand ride. NOT the observable solar day of date —
+      // that is lodRealSecondsAtYear below (plan 08 storyline sweep).
       lodSecondsAtYear: /** @param {number} year @returns {number|null} */ (year) => deepLod.lodSecondsAtAge(yearToTMa(year)),
+      // LOD_real of date — the Layer-4 observable (the simulator's Solar Day,
+      // the registry's lodRealPhysical): the kinematic day + the ecliptic term
+      // + the calibrated ΔT cycle stack. 86,400.001780 s at J2000.
+      lodRealSecondsAtYear: /** @param {number} year @returns {number} */ (year) => lodRealSeconds(year),
       alphaAtYear: /** @param {number} year @returns {number} */ (year) => earthMoiFactorAtAge(yearToTMa(year)),
       moonDistanceKmAtYear: /** @param {number} year @returns {number} */ (year) => moonDistanceMetresAtAge(yearToTMa(year)) / 1000,
       // D6: OF-DATE — mass-loss law / the banked planetary λ̇ ratio
@@ -1600,6 +1626,7 @@ export function assembleModel(C, F, laws = {}, secularSeriesArtifact = /** @type
       siderealYearDays,
       anomalisticYearDays,
       dayLengthSeconds,
+      lodRealSeconds,
       siderealDaySeconds,
       stellarDaySeconds,
       measuredSolarDaySeconds,

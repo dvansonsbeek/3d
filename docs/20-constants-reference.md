@@ -184,8 +184,8 @@ they anchor per-planet geometry but carry no model freedom.
 | June Solstice 2000 JD | `juneSolstice2000_JD` | <!--v:juneSolstice2000JD-->2451716.575<!--/v--> |
 | Cardinal instants 2000 (VE / SS / AE / WS, UTC) | `cardinalPointAnchors` | <!--v:cardinalAnchorVE2000JD-->2451623.816<!--/v--> / <!--v:cardinalAnchorSS2000JD-->2451716.575<!--/v--> / <!--v:cardinalAnchorAE2000JD-->2451810.2271<!--/v--> / <!--v:cardinalAnchorWS2000JD-->2451900.0674<!--/v--> |
 | Solar day (J2000) | `solarDayJ2000` | 86400.0 s |
-| Sidereal day (J2000) | `siderealDayJ2000` | <!--v:siderealDayInputSeconds-->86,164.090531<!--/v--> s |
-| Stellar day (J2000) | `stellarDayJ2000` | <!--v:stellarDayInputSeconds-->86,164.098904<!--/v--> s |
+| Sidereal day (IAU, on the SI day of 86,400 s) | `siderealDayJ2000` | <!--v:siderealDayInputSeconds-->86,164.090531<!--/v--> s |
+| Stellar day (IAU 2000A, on the SI day of 86,400 s) | `stellarDayJ2000` | <!--v:stellarDayInputSeconds-->86,164.098904<!--/v--> s |
 | Perihelion passage JD | `perihelionPassageJ2000_JD` | <!--v:perihelionPassageJD-->2451547.042<!--/v--> |
 | Moon mean anomaly (J2000) | `moonMeanAnomalyJ2000_deg` | <!--v:moonMeanAnomalyJ2000Deg-->134.9634<!--/v-->° |
 | Moon mean anomaly rate | `moonMeanAnomalyRate_degPerDay` | <!--v:moonMeanAnomalyRateDegPerDay-->13.06499295<!--/v-->°/day |

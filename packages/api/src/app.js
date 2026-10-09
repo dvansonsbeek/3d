@@ -143,7 +143,16 @@ export function createApi() {
     /** @type {Record<string, unknown>} */
     const rec = { year, jd: model.time.jdFromYear(year) };
     if (sections.includes('h')) rec.h = model.epoch.hAtYear(year);
-    if (sections.includes('lod')) rec.lodSeconds = model.epoch.lodSecondsAtYear(year);
+    // The 'lod' section names its day bases (plan 08 storyline sweep): the
+    // OBSERVABLE solar day of date LOD_real (the simulator's Solar Day row,
+    // the registry's lodRealPhysical) and the Layer-2 tidal + GIA mean day the
+    // deep-time law gives (the paleo anchors' and the ΔT integrand's day).
+    // The former single `lodSeconds` served the Layer-2 base under an
+    // unnamed basis — 1.78 ms below the observable at J2000.
+    if (sections.includes('lod')) {
+      rec.lodRealSeconds = model.epoch.lodRealSecondsAtYear(year);
+      rec.lodMeanSeconds = model.epoch.lodSecondsAtYear(year);
+    }
     if (sections.includes('alpha')) rec.alpha = model.epoch.alphaAtYear(year);
     if (sections.includes('deltaT')) rec.deltaTSeconds = model.epoch.deltaTSecondsAtYear(year);
     if (sections.includes('siderealYearSeconds')) rec.siderealYearSeconds = model.epoch.siderealYearSecondsAtYear(year);
@@ -419,7 +428,7 @@ export function createApi() {
         overrides,
         year,
         latticePeriodsYears: cf.computeLatticePeriodsYears(),
-        epoch: { h: cf.epoch.hAtYear(year), lodSeconds: cf.epoch.lodSecondsAtYear(year), deltaTSeconds: cf.epoch.deltaTSecondsAtYear(year) },
+        epoch: { h: cf.epoch.hAtYear(year), lodRealSeconds: cf.epoch.lodRealSecondsAtYear(year), lodMeanSeconds: cf.epoch.lodSecondsAtYear(year), deltaTSeconds: cf.epoch.deltaTSecondsAtYear(year) },
         earth: { obliquityDeg: cf.earth.obliquityDeg(year), eccentricity: cf.earth.eccentricity(year), inclinationDeg: cf.earth.inclinationDeg(year) },
       };
       const res = envelope({ identity: cf.identity, inputEcho: { path, overrides, year }, data });

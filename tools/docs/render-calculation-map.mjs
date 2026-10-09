@@ -125,7 +125,7 @@ function blockTorqueSplit() {
     `| solar torque factor | ${e(s.sol, 6)} km³/s²/km³ | GM☉/AU³ · (1 − e_E²)^(−3/2), e_E = ${s.eE} (IAU J2000) |`,
     `| lunar torque factor | ${e(s.lun, 6)} | GM_M/a_M³ · (1 − e_M²)^(−3/2) · (1 − 1.5 sin² i_M), a_M = ${C.moonDistance} km, e_M = ${C.moonOrbitalEccentricity}, i_M = ${C.moonEclipticInclinationJ2000}° |`,
     `| **f_S, the solar share** | **${(100 * s.fS).toFixed(2)} %** | sol/(sol + lun) — literature ≈ 31.6 % |`,
-    `| p₀, the composition's J2000 anchor | ${s.p0.toFixed(4)} ″/yr | 1,296,000 / T_p(J2000), the certified of-date year laws' beat at 2000 (route B, table 2.4) — the model's ONE J2000 reading (plan 06 S5; IAU 50.2879 to 8×10⁻⁶). The former 1,296,000/(H/13) = 50.2450 was the fit anchor's reading, 0.086 % slow |`,
+    `| p₀, the composition's J2000 anchor | ${s.p0.toFixed(4)} ″/yr | 1,296,000 / T_p(J2000), the certified of-date year laws' beat at 2000 (route B, table 2.4) — the model's ONE J2000 reading (plan 06 S5; IAU 2006 50.2880 to 8×10⁻⁶). The former 1,296,000/(H/13) = 50.2450 was the fit anchor's reading, 0.086 % slow |`,
     `| α = p₀ / cos ε₀ | ${s.alpha.toFixed(3)} ″/yr | the hybrid's precession constant (ε₀ = ${s.eps0}°); literature ≈ 54.9 |`,
   ].join('\n');
 }
@@ -186,7 +186,7 @@ function blockJ2000Identities() {
     `| **meanSolarYearDays** | ${msy.toFixed(12)} | round(input · H/8) / (H/8) — snapped so H/8 = ${(H / 8).toFixed(3)} yr holds a WHOLE number of days (${Math.round(inp * (H / 8)).toLocaleString('en-US')}) | **L** (the whole-days-per-cycle constraint of the H fit) |`,
     `| sidereal year (days, IAU) | ${sidD} | \`yearLengthRef.siderealYear\` (astro-reference) | — |`,
     `| kinematic sidereal year (days) | ${sidKin.toFixed(12)} | meanSolarYearDays · H/(H − 13) — one calendar turn per H/13, the unit's convention (S5: a device identity, 0.086 % from one turn per the published T_p) | **U/L** (the 13, device) |`,
-    `| **LOD_mean** (the kinematic day, s) | ${lod.toFixed(9)} | sidereal seconds / kinematic sidereal days — the FIRST of the three day lengths (SI 86,400 · LOD_mean · LOD_real 86,400.0014) | — |`,
+    `| **LOD_mean** (the kinematic day, s) | ${lod.toFixed(9)} | sidereal seconds / kinematic sidereal days — the FIRST of the three day lengths (SI 86,400 · LOD_mean · LOD_real, registry lodRealPhysical) | — |`,
     `| anomalistic year (days) | ${anom.toFixed(10)} | meanSolarYearDays · (H/16)/(H/16 − 1) — one perihelion-of-date beat per H/16 | **L** (the 16) |`,
     `| **total days in H** | ${(H * msy).toLocaleString('en-US')} | H · meanSolarYearDays — an INTEGER by construction of the snap above; the day-count invariant of doc 99 | **U** |`,
   ].join('\n');

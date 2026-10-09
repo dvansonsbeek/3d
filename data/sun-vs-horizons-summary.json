@@ -857,7 +857,7 @@
       "packages/physics/src/earth/year-lengths.cjs": "sha256:c93061fd40a0dfcafcac65e00eaf74638094aafe7a858361aae14e92f1e7d077",
       "packages/physics/src/eclipse/finders.cjs": "sha256:168755d5e01397b7f63f2ffa49101afe0da0046e5fbd9e7ef6d04be6d7f5d330",
       "packages/physics/src/eclipse/sun-planetary-completion.cjs": "sha256:e65948004087f1f550a1f3a06b16aa20e9dd151bb04a4194811bbff5d499db41",
-      "packages/physics/src/model.js": "sha256:61781e792b0e46a6e5d2bbb5c4c15a97e68d4104596bf5995b6d18495ab45fa1",
+      "packages/physics/src/model.js": "sha256:8e18f9ddc7c45b3a3691ad66890357a58a71e2226caffd257c2b204e3cdbe6ca",
       "packages/physics/src/moon/arguments.cjs": "sha256:d40f15e0ced6311754bc1350a66854a917112a58a6995250b110fddca4073e3b",
       "packages/physics/src/moon/deep-ecc-channel.cjs": "sha256:7ce15d1c4f61f2ea730d7673d705a1eb2a31bff20b720cd00d8f1d34a3e85220",
       "packages/physics/src/moon/deep-modes-artifact.cjs": "sha256:f54c0a58816f7407d8527275c75dc268223d13ae75c8cfb0b1895b541f09c973",

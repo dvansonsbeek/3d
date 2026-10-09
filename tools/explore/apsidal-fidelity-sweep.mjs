@@ -265,10 +265,11 @@ if (YEARS >= 400000) {
   const naff = (zr0, zi0, nt) => { const out = []; const zr = Float64Array.from(zr0), zi = Float64Array.from(zi0); const dw = 2 * Math.PI / (4 * span), wcap = 2 * Math.PI / 5000; for (let k = 0; k < nt; k++) { let best = { w: 0, a: -1 }; for (let w = -wcap; w <= wcap; w += dw) { const a = amp(zr, zi, w); if (a > best.a) best = { w, a }; } const w = refine(zr, zi, best.w, dw); let ar = 0, ai = 0; for (let i = 0; i < N; i++) { const ph = -w * t[i], c = Math.cos(ph), s = Math.sin(ph); ar += win[i] * (zr[i] * c - zi[i] * s); ai += win[i] * (zr[i] * s + zi[i] * c); } ar /= wsum; ai /= wsum; for (let i = 0; i < N; i++) { const c = Math.cos(w * t[i]), s = Math.sin(w * t[i]); zr[i] -= ar * c - ai * s; zi[i] -= ar * s + ai * c; } out.push({ asy: w / D2R * 3600, ampl: Math.hypot(ar, ai) }); } return out; };
   console.log('\n  coarse NAFF (resolution ~' + (1296000 / span / 3600 * 2 * Math.PI).toFixed(2) + ' ″/yr class — the fine g2 verdict needs the 20-Myr re-run):');
   const eM = naff(S.eq, S.ep, 5), vM = naff(S.vq, S.vp, 5);
-  const near = (asy) => { const L = { g1: 5.5965, g2: 7.4555, g3: 17.3711, g4: 17.9159, g5: 4.2575 }; let b = null; for (const [k, v] of Object.entries(L)) if (b === null || Math.abs(v - asy) < Math.abs(L[b] - asy)) b = k; return b; };
+  // the label set is La2004 as tabulated in Laskar et al. 2011 Table 6 (labels only)
+  const near = (asy) => { const L = { g1: 5.59, g2: 7.452, g3: 17.368, g4: 17.916, g5: 4.257452 }; let b = null; for (const [k, v] of Object.entries(L)) if (b === null || Math.abs(v - asy) < Math.abs(L[b] - asy)) b = k; return b; };
   console.log('  Earth z:  ' + eM.map((m) => `${m.asy.toFixed(3)}″/yr(${near(m.asy)},a${m.ampl.toFixed(4)})`).join(' '));
   console.log('  Venus z:  ' + vM.map((m) => `${m.asy.toFixed(3)}″/yr(${near(m.asy)},a${m.ampl.toFixed(4)})`).join(' '));
-  const g2e = vM.map((m) => m.asy).find((a) => Math.abs(a - 7.4555) < 1) ?? null;
-  const g5e = eM.map((m) => m.asy).find((a) => Math.abs(a - 4.2575) < 1) ?? null;
+  const g2e = vM.map((m) => m.asy).find((a) => Math.abs(a - 7.452) < 1) ?? null;
+  const g5e = eM.map((m) => m.asy).find((a) => Math.abs(a - 4.257452) < 1) ?? null;
   if (g2e !== null && g5e !== null) console.log(`  g2−g5 beat: ${(1296000 / (g2e - g5e) / 1000).toFixed(1)} kyr (La2004: 405.7)`);
 }

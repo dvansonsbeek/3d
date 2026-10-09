@@ -28,6 +28,7 @@ export function assembleModel(C: Readonly<Record<string, any>>, F: Readonly<Reco
         yearToTMa: (year: number) => number;
         hAtYear: (year: number) => number | null;
         lodSecondsAtYear: (year: number) => number | null;
+        lodRealSecondsAtYear: (year: number) => number;
         alphaAtYear: (year: number) => number;
         moonDistanceKmAtYear: (year: number) => number;
         siderealYearSecondsAtYear: (year: number) => number;
@@ -86,6 +87,7 @@ export function assembleModel(C: Readonly<Record<string, any>>, F: Readonly<Reco
         siderealYearDays: (year: number) => number;
         anomalisticYearDays: (year: number) => number;
         dayLengthSeconds: (year: number) => number;
+        lodRealSeconds: (year: number) => number;
         siderealDaySeconds: (year: number) => number;
         stellarDaySeconds: (year: number) => number;
         measuredSolarDaySeconds: (year: number) => number;
