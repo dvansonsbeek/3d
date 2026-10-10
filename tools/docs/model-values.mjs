@@ -2631,7 +2631,6 @@ export const VALUES = {
   // _perihelionRatesNote). (`predTermsApprox` / `predTermsRange` — the
   // retired device's term counts — are gone.)
   ...(() => {
-    const mercuryFluctuation2000 = () => predictiveMachinery().fluct(2000, 'mercury');
     const kv = () => astro.knownValues;
     return {
       mercuryNewtonian:    { get: () => kv().mercuryNewtonianArcsecCy, render: (v) => thousands(v), unit: '″/cy', note: 'textbook Newtonian rate — citation' },
@@ -2644,8 +2643,6 @@ export const VALUES = {
         unit: '″/cy',
         note: 'textbook Newtonian vs the chain’s Newtonian era window rate (plan 07; was the lattice baseline)',
       },
-      mercuryAnomalyJ2000:    { get: mercuryFluctuation2000, render: (v) => thousands(v, 0), unit: '″/cy', note: 'LEGACY name — the Earth-frame RA rate minus the chain’s Newtonian sidereal rate at J2000 (the equatorial projection terms, R8); not the relativistic anomaly (that is mercuryPeriAnomalyGrArcsecCy)' },
-      mercuryEpoch2000Offset: { get: mercuryFluctuation2000, render: (v) => thousands(v, 1), unit: '″/cy' },
       mercuryObservedRate: { get: () => kv().mercuryObservedRateArcsecCy, render: (v) => thousands(v), unit: '″/cy', note: 'WebGeocalc 1900–2000 heliocentric trend' },
       venusObservedRate:   { get: () => kv().venusObservedRateArcsecCy, render: (v) => thousands(v), unit: '″/cy', note: '~0 — flips sign across sub-windows' },
       earthObservedRate:   { get: () => kv().earthObservedRateArcsecCy, render: (v) => thousands(v), unit: '″/cy', note: 'geocentric, wrt moving equinox' },
@@ -2895,9 +2892,7 @@ export const VALUES = {
     out.earthPeriProjectionExcessJ2000 = { get: () => earthOfDateArcsecCy() * (raSlope(astro.earthOrbital.earthPerihelionLongitudeJ2000, epsJ2000()) - 1), render: (v) => thousands(v, 2), unit: '″/cy' };
     out.obliquityRateJ2000ArcsecCy = { get: epsRateArcsecCy, render: (v) => thousands(v, 1), unit: '″/cy', note: 'shipped obliquity law, central difference 1950–2050' };
     for (const y of [1800, 1900, 2000, 2100]) {
-      out[`mercuryHelio${y}`] = { get: () => pm().totalPrecession(y, 'mercury'), render: (v) => thousands(v, 2), unit: '″/cy', note: 'LEGACY name (not heliocentric) — Earth-frame RA rate, frame (b); use mercuryEarthFrameRa{y}' };
       out[`mercuryEarthFrameRa${y}`] = { get: () => pm().totalPrecession(y, 'mercury'), render: (v) => thousands(v, 2), unit: '″/cy', note: 'Earth-frame RA rate (scene equator co-moving with its stars); not an observable' };
-      out[`mercuryAnomaly${y}`] = { get: () => pm().fluct(y, 'mercury'), render: (v) => thousands(v, 2), unit: '″/cy', note: 'LEGACY name — Earth-frame RA fluctuation (projection + obliquity-rate term), NOT the longitude anomaly; use mercuryEarthFrameExcess{y}' };
       out[`mercuryEarthFrameExcess${y}`] = { get: () => pm().fluct(y, 'mercury'), render: (v) => thousands(v, 2), unit: '″/cy', note: 'Earth-frame RA rate minus the lattice rate' };
     }
     // Ecliptic longitude OF DATE (frame a), both reduction systems — doc 13 §1.8 / tools/explore/mercury-perihelion-frames.mjs
