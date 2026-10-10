@@ -27,7 +27,7 @@ For current values, see [Constants Reference](20-constants-reference.md).
 | Variable | Description |
 |----------|-------------|
 | `holisticyearLength` | The fitted timing anchor (the correction bases' unit; not a period), Earth solar years |
-| `meansolaryearlengthinDays` | Mean solar year in days (rounded to H/8 precision) |
+| `meansolaryearlengthinDays` | Mean solar year in days (rounded to the precision of an eighth of the anchor, the comb's unit) |
 | `meansiderealyearlengthinSeconds` | Mean sidereal year in seconds (derived: `siderealYearJ2000 × 86400`) |
 | `meanlengthofday` | Mean solar day in SI seconds |
 | `meanSiderealday` | Mean sidereal day in SI seconds (derived) |
@@ -37,7 +37,7 @@ For current values, see [Constants Reference](20-constants-reference.md).
 | `currentAUDistance` / `o.lengthofAU` | Astronomical Unit in km (dynamic) |
 | `lightYear` | Light year in km (derived) |
 
-> **ESSRT epoch dependence.** The variables above (`holisticyearLength`, `meansolaryearlengthinDays`, `meansiderealyearlengthinSeconds`, `meanlengthofday`, `meanSiderealday`, `meanStellarday`, `meanAnomalisticYearinDays`) hold **J2000-anchored values** — the model's primary calibration anchor. Under the [Expanding Solar System Resonance Theory (Doc 99)](99-expanding-solar-system-resonance-theory.md), each of these is epoch-dependent: H(t) grows under Driver 1 (Earth-Moon tidal evolution → LOD growth) and the sidereal year in seconds shifts under Driver 2 (solar mass loss → Kepler's 3rd law). For deep-time / Phanerozoic / Hadean work, replace these globals with the corresponding `mean*AtAge(t_Ma)` helpers in `src/script.js` (`meanHAtAge`, `meanLodSecondsAtAge`, `meanSiderealYearSecondsAtAge`, `meanTropicalYearSecondsAtAge`, etc.) — see [Doc 20 § "ESSRT epoch dependence"](20-constants-reference.md#essrt-epoch-dependence--most-tabulated-values-are-j2000-anchored) for the complete J2000-constant → helper map.
+> **ESSRT epoch dependence.** The variables above (`holisticyearLength`, `meansolaryearlengthinDays`, `meansiderealyearlengthinSeconds`, `meanlengthofday`, `meanSiderealday`, `meanStellarday`, `meanAnomalisticYearinDays`) hold **J2000-anchored values** — the model's primary calibration anchor. Under the [Expanding Solar System Resonance Theory (Doc 99)](99-expanding-solar-system-resonance-theory.md), each of these is epoch-dependent: the anchor unit scales with the precession period under Driver 1 (Earth-Moon tidal evolution → LOD growth) and the sidereal year in seconds shifts under Driver 2 (solar mass loss → Kepler's 3rd law). For deep-time / Phanerozoic / Hadean work, replace these globals with the corresponding `mean*AtAge(t_Ma)` helpers in `src/script.js` (`meanHAtAge`, `meanLodSecondsAtAge`, `meanSiderealYearSecondsAtAge`, `meanTropicalYearSecondsAtAge`, etc.) — see [Doc 20 § "ESSRT epoch dependence"](20-constants-reference.md#essrt-epoch-dependence--most-tabulated-values-are-j2000-anchored) for the complete J2000-constant → helper map.
 
 #### 1.1.2 Mathematical Constants
 
@@ -101,25 +101,22 @@ For each planet (Mercury, Venus, Mars, Jupiter, Saturn, Uranus, Neptune):
 
 For current values, see [Constants Reference](20-constants-reference.md).
 
+The seven planets' live elements of date come from the N-body chain (`_kcElementsOfDate`), not from these constants. The constants are the J2000 catalogue inputs the chain is anchored on, the scene scaffolding's device parameters, and derived display values.
+
 | Variable Pattern | Description |
 |------------------|-------------|
-| `{planet}SolarYearInput` | Orbital period input (days) |
-| `{planet}OrbitalEccentricity` | Eccentricity (e) |
-| `{planet}InvPlaneInclinationMean` | Mean inclination to invariable plane (Laplace-Lagrange midpoint) |
-| `{planet}InvPlaneInclinationAmplitude` | Inclination oscillation amplitude (half of L-L range) |
-| `{planet}InclinationCycleAnchor` | Cycle anchor for inclination oscillation (ICRF perihelion longitude where MAX inclination occurs, evaluated at the balanced year) |
-| `{planet}EclipticInclinationJ2000` | J2000 orbital inclination to ecliptic |
+| `{planet}SolarYearInput` | Orbital period input (days; `astro-reference.json`) |
+| `{planet}OrbitalEccentricity` | J2000 eccentricity (catalogue input; the chain's eccentricity of date is the live value) |
+| `{planet}EclipticInclinationJ2000` | J2000 orbital inclination to the ecliptic (catalogue input) |
 | `{planet}OrbitDistance` | Semi-major axis (a) in AU (derived) |
 | `{planet}PerihelionDistance` | Distance at perihelion |
 | `{planet}Speed` | Mean orbital velocity (km/h) |
-| `{planet}SolarYearCount` | Number of orbits in one anchor interval (derived; a device count) |
-| `{planet}PerihelionEcliptic` | Perihelion precession period |
-| `{planet}PerihelionEclipticYears` | Perihelion precession cycle length against ecliptic |
-| `{planet}AngleCorrection` | Alignment correction angle |
+| `{planet}SolarYearCount` | Number of orbits in one anchor interval (derived; a device count of the scene scaffolding) |
+| `{planet}PerihelionEcliptic` | The chain's inertial apsidal period, 1,296,000/g (years) |
 | `{planet}Tilt` | Axial tilt |
 | `{planet}RotationPeriod` | Sidereal rotation period (hours) |
-| `{planet}AscendingNodeInvPlaneVerified` | J2000-calibrated ascending node to invariable plane |
-| `{planet}AscendingNodeInvPlaneSouamiSouchay` | Original Souami & Souchay (2012) ascending node |
+| `planets.{planet}.ascendingNodeInvPlane` | The closed-form J2000 node on the invariable plane (`model-parameters.json`); read by the no-chain scaffolding — the chain planets' node of date is the chain's ([doc 20 § Ascending Nodes](20-constants-reference.md#ascending-nodes-on-the-invariable-plane-at-j2000)) |
+| `planets.{planet}.startpos`, `.angleCorrection`, `.eocFraction` | Scene scaffolding parameters (`model-parameters.json`) |
 | `diameters.{planet}Diameter` | Planet diameter (km) |
 
 ### 1.3 Per-Planet Live/Dynamic Variables (accessible via `o.`)
@@ -141,13 +138,11 @@ For current values, see [Constants Reference](20-constants-reference.md).
 
 | Variable Pattern | Example | Description | Updates |
 |------------------|---------|-------------|---------|
-| `o.{planet}AscendingNodeInvPlane` | `o.mercuryAscendingNodeInvPlane` | Dynamic ascending node to invariable plane (J2000-verified) | Live |
-| `o.{planet}AscendingNodeInvPlaneSouamiSouchay` | `o.mercuryAscendingNodeInvPlaneSouamiSouchay` | Dynamic ascending node (original S&S values) | Live |
-| `o.{planet}HeightAboveInvPlane` | `o.mercuryHeightAboveInvPlane` | Current height above/below invariable plane (AU) | Live |
-| `o.{planet}AboveInvPlane` | `o.mercuryAboveInvPlane` | Boolean: is planet currently above invariable plane | Live |
-| `o.{planet}EclipticInclinationDynamic` | `o.mercuryEclipticInclinationDynamic` | Dynamic ecliptic inclination to ecliptic | Live |
-| `o.{planet}EclipticInclinationSouamiSouchayDynamic` | `o.mercuryEclipticInclinationSouamiSouchayDynamic` | Ecliptic inclination using S&S ascending nodes | Live |
-| `o.{planet}InvPlaneInclinationDynamic` | `o.mercuryInvPlaneInclinationDynamic` | Dynamic inclination to invariable plane (oscillates with Ω) | Live |
+| `o.{planet}AscendingNodeInvPlane` | `o.mercuryAscendingNodeInvPlane` | The chain's ascending node of date on the invariable plane | Live |
+| `o.{planet}HeightAboveInvPlane` | `o.mercuryHeightAboveInvPlane` | Current height above/below the invariable plane (AU) — the exact projection of the chain's heliocentric vector | Live |
+| `o.{planet}AboveInvPlane` | `o.mercuryAboveInvPlane` | Boolean: is the planet currently above the invariable plane | Live |
+| `o.{planet}EclipticInclinationDynamic` | `o.mercuryEclipticInclinationDynamic` | The chain's inclination of date to the ecliptic | Live |
+| `o.{planet}InvPlaneInclinationDynamic` | `o.mercuryInvPlaneInclinationDynamic` | The chain's inclination of date to the invariable plane | Live |
 
 #### 1.3.3 Distance Variables
 
@@ -164,9 +159,7 @@ For current values, see [Constants Reference](20-constants-reference.md).
 | Variable | Description |
 |----------|-------------|
 | `moonSiderealMonthInput` | Sidereal month (days) |
-| `moonAnomalisticMonthInput` | Anomalistic month (days) |
-| `moonNodalMonthInput` | Nodal/Draconic month (days) |
-| `moonSynodicMonth` | Synodic month (derived) |
+| `moonSynodicMonth` | Synodic month (derived; the anomalistic and draconic months come from the lunar month chain, `@essrt/physics/moon/month-chain`) |
 | `moonTropicalMonth` | Tropical month, used for orbital speed (derived) |
 | `moonDistance` | Mean Earth-Moon distance (km) |
 | `moonEclipticInclinationJ2000` | Orbital inclination to ecliptic |
@@ -205,12 +198,10 @@ For current values, see [Constants Reference](20-constants-reference.md).
 
 | Variable | Description |
 |----------|-------------|
-| `earthtiltMean` | Mean obliquity |
-| `earthInvPlaneInclinationMean` | Mean orbital inclination to invariable plane |
-| `earthInvPlaneInclinationAmplitude` | Amplitude of inclination oscillation |
-| `eccentricityBase` | Base eccentricity |
-| `eccentricityAmplitude` | Earth's eccentricity amplitude |
-| `earthPerihelionICRFYears` | Earth's orbital plane precession against ICRF (H/3) |
+| `earthtiltMean` | Mean obliquity — the K comb's mean and the scene's J2000 pose (the published obliquity is the hybrid) |
+| `earthInvPlaneInclinationMean`, `earthInvPlaneInclinationAmplitude` | Constants of the scene's J2000 pose (the published inclination is the engine's one-source normal) |
+| `eccentricityBase`, `eccentricityAmplitude` | The scene Sun's eccentricity-law base and the K calibration input (legacy scaffolding; the published eccentricity is the N-body series) |
+| `earthPerihelionICRFYears` | The scene scaffolding's K-wheel period, a third of the anchor (the published apsidal period is the chain's, `inclPrecYears`) |
 
 #### 1.5.2 Dynamic Orbital Parameters
 
@@ -226,12 +217,12 @@ For current values, see [Constants Reference](20-constants-reference.md).
 
 #### 1.5.3 Dynamic Time Variables (Length of Day dependent)
 
-Naming taxonomy: `_Kinematic` = framework kinematic day units; `_Real` = physical LOD (with H/5 ecliptic missing-motion + DT cyclic corrections).
+Naming taxonomy: `lodKinematic` = the framework's kinematic day (the year laws' identity day); `lodReal` = the physical LOD on the tidal history with the ΔT stack (`computeLodRealSecondsAtEpoch`). The three day bases are named in [doc 11 §Day bases](11-length-day-year-formulas.md#day-types).
 
 | Variable | Description |
 |----------|-------------|
 | `o.lodKinematic` | Current epoch-specific kinematic day (SI seconds), = IAU_sid_sec / Fourier sid_days = <!--v:lodKinematicFourierJ2000Seconds-->86,400.000107<!--/v--> s at J2000 (the panel *seconds* basis; the scene's measured-day basis is <!--v:measuredMeanSolarDayJ2000Seconds-->86,400.000427<!--/v--> s; see [doc 11 §Day bases](11-length-day-year-formulas.md#day-types)) |
-| `predictions.lodReal` | Physical LOD (Layer 4): `o.lodKinematic + h5Correction + dtCycleLodCorrectionSum`. Displayed as "Solar Day = REAL" in the Predictions panel. |
+| `predictions.lodReal` | Physical LOD: `computeLodRealSecondsAtEpoch(year)` — the tidal history with the ΔT stack. Displayed as the solar day in the Predictions panel. |
 | `o.siderealDayReal` | Current sidereal day length (SI seconds) |
 | `o.stellarDayReal` | Current stellar day length (SI seconds) |
 | `o.solarYearDays` | Current solar year length (days) |
@@ -246,11 +237,11 @@ Naming taxonomy: `_Kinematic` = framework kinematic day units; `_Real` = physica
 
 | Variable | Description |
 |----------|-------------|
-| `o.axialPrecession` | Current axial precession cycle (years) — framework identity: H/13 |
-| `o.inclinationPrecession` | Apsidal precession beat of date (years) — framework identity: H/3 (the identifier keeps the historical name) |
-| `o.perihelionPrecession` | Internal kinematic perihelion beat (years) — framework identity: H/16. The DISPLAYED of-date value is the one-source family's beat (`predictions.perihelionPrecession`) |
-| `o.obliquityPrecession` | Current obliquity precession cycle (years) — framework identity: H/8 |
-| `o.eclipticPrecession` | Current ecliptic precession cycle (years) — framework identity: H/5 |
+| `o.axialPrecession` | The clock of date: the beat of the sidereal and tropical year laws (`computeAxialPrecessionYears`) |
+| `o.inclinationPrecession` | The apsidal beat of the year laws, anomalistic/(anomalistic − sidereal) (years; the identifier keeps the historical name) |
+| `o.perihelionPrecession` | The kinematic perihelion-of-date beat, anomalistic/(anomalistic − solar) (years). The DISPLAYED of-date value is the one-source family's beat (`predictions.perihelionPrecession`) |
+| `o.obliquityPrecession` | An eighth of the anchor — the frozen era clock's device counter, not the published obliquity period (the beat of the clock against the nodal mode, `obliqBeatJ2000Kyr`; [doc 110](110-calculation-map.md)) |
+| `o.eclipticPrecession` | A fifth of the anchor — the era clock's device counter; the displayed nodal period of date is the chain's (`predictions.eclipticPrecession` = `_kcNodeInvPlanePeriodYears('earth', jd)`) |
 
 #### 1.5.5 Perihelion/Aphelion Dates
 
@@ -424,13 +415,12 @@ These formulas handle precession calculations and secular perturbation theory.
 | `precessionPeriodFromRate(arcsec_per_century)` | Period = 129,600,000 / Rate | Convert rate to full-cycle period (years) |
 | `precessionEclipticToICRF(ecliptic_years, ref_years)` | ICRF = (ecl × ref)/(ref - ecl) | Transform ecliptic to ICRF frame |
 | `precessionICRFToEcliptic(ICRF_years, ref_years)` | ecl = (ICRF × ref)/(ICRF + ref) | Transform ICRF to ecliptic frame |
-| `holisticPrecessionRatio(prec_period, holistic_year)` | ratio = H / period | Ratio showing resonance structure |
-| `precessionFromHolisticRatio(holistic_year, ratio)` | period = H / n | Period from integer ratio |
 | `precessionAngularVelocity(arcsec_per_century)` | ω = (rate/100) × (π/648000) | Angular velocity (rad/year) |
 | `perturbationStrength(a_p, a_pert, m_pert, M_sun)` | strength = (m/M) × (a_ratio)² | Relative influence of perturbing planet |
 | `precessionRatio(rate1_arcsec, rate2_arcsec)` | ratio = rate₁ / rate₂ | Ratio between two precession rates |
 | `precessionDecomposition(total, ecliptic)` | {total, ecliptic, perturbations} | Decompose precession into components |
-| `holisticRatioDescription(ratio)` | string | Format ratio as readable fraction (e.g., "anchor interval / 4") |
+
+(`holisticPrecessionRatio`, `precessionFromHolisticRatio` and `holisticRatioDescription` — the anchor-ratio helpers of the retired integer framing — are still defined in the helper object but have no caller.)
 
 ---
 
@@ -1091,8 +1081,6 @@ This section documents the perihelion precession formulas - purely Newtonian mec
 | `precessionPeriodFromRate` | — |
 | `precessionEclipticToICRF` | ✅ |
 | `precessionICRFToEcliptic` | — |
-| `holisticPrecessionRatio` | ✅ |
-| `precessionFromHolisticRatio` | — |
 | `precessionAngularVelocity` | ✅ |
 | `perturbationStrength` | — |
 | `precessionDecomposition` | — |
@@ -1124,7 +1112,7 @@ precessionRateFromPeriod: (period_years) => {
 }
 ```
 
-**Example Values:** For current precession periods and their H-based formulas, see [Constants Reference — Perihelion Precession Periods](20-constants-reference.md#perihelion-precession-periods-ecliptic). Rates are computed as `129,600,000 / period`.
+**Example Values:** For the current precession periods — the chain's — see [Constants Reference — Perihelion Precession Periods](20-constants-reference.md#perihelion-precession-periods-ecliptic). Rates are computed as `129,600,000 / period`.
 
 #### 10.1.2 Precession Period from Rate
 
@@ -1150,7 +1138,7 @@ precessionPeriodFromRate: (arcsec_per_century) => {
 
 **Where:**
 - `ecliptic_period` = precession period against the ecliptic
-- `reference_period` = nodal precession period (H/13)
+- `reference_period` = the axial precession period (the clock)
 
 **Physical Meaning:** Converts precession measured against the moving ecliptic to precession against the fixed ICRF (International Celestial Reference Frame).
 
@@ -1182,52 +1170,6 @@ precessionICRFToEcliptic: (ICRF_years, reference_years) => {
   const sum = ICRF_years + reference_years;
   if (sum === 0) return Infinity;
   return (ICRF_years * reference_years) / sum;
-}
-```
-
-### 10.3 Earth Fundamental Cycle Relationships
-
-#### 10.3.1 Precession Ratio to Earth Fundamental Cycle
-
-**Formula:** `ratio = holisticyearLength / precession_period`
-
-**Physical Meaning:** Shows how precession periods relate to the Earth Fundamental Cycle (H).
-
-**Observed Patterns:**
-| Planet | Ratio | Expression |
-|--------|-------|------------|
-| Mercury | 1.375 | holisticyearLength / (1+3/8) |
-| Venus | -0.75 | -holisticyearLength × 8/6 (retrograde) |
-| Earth | 16 | holisticyearLength / 16 |
-| Mars | 4.5 | holisticyearLength / (4+4/8) |
-| Jupiter | 4.875 | holisticyearLength / (4+7/8) |
-| Saturn | -8.125 | -holisticyearLength / (8+1/8) (retrograde) |
-| Uranus | 3 | holisticyearLength / 3 |
-| Neptune | ~0.5 | holisticyearLength * 2 |
-
-**Implementation:**
-```javascript
-// Ratio of Earth Fundamental Cycle to precession period
-// Shows resonance structure in Newtonian precession
-holisticPrecessionRatio: (precession_period, holistic_year) => {
-  if (precession_period === 0) return Infinity;
-  return holistic_year / precession_period;
-}
-```
-
-#### 10.3.2 Precession Period from Holistic Ratio
-
-**Formula:** `precession_period = holisticyearLength / n`
-
-**Where:** `n` is the ratio (positive for prograde, negative for retrograde)
-
-**Implementation:**
-```javascript
-// Precession period from Earth Fundamental Cycle ratio
-// period = holisticyearLength / n
-precessionFromHolisticRatio: (holistic_year, ratio) => {
-  if (ratio === 0) return Infinity;
-  return holistic_year / ratio;
 }
 ```
 
@@ -1334,20 +1276,20 @@ precessionRatio: (rate1_arcsec, rate2_arcsec) => {
 
 ### 10.6 Current Precession Values (Implemented)
 
-For current computed values, see [Constants Reference](20-constants-reference.md).
+The periods are the N-body chain's J2000 readings: the inertial (ICRF) period is 1,296,000/g on the chain's leading secular eigenfrequency, the ecliptic-frame period its transform through the clock (§10.2). Negative = retrograde.
 
-| Planet | Ecliptic Period | ICRF Period | Holistic Ratio |
-|--------|-----------------|-------------|----------------|
-| **Mercury** | `mercuryPerihelionEcliptic` | derived | 8Y / 11 (Y = the anchor interval; device) |
-| **Venus** | `venusPerihelionEcliptic` | derived | −8Y / 6 (retrograde) |
-| **Earth** | H/16 | derived | 16 |
-| **Mars** | `marsPerihelionEcliptic` | derived | 8Y / 36 |
-| **Jupiter** | `jupiterPerihelionEcliptic` | derived | 8Y / 39 |
-| **Saturn** | `saturnPerihelionEcliptic` | derived | −8Y / 65 (retrograde) |
-| **Uranus** | `uranusPerihelionEcliptic` | derived | H / 3 |
-| **Neptune** | `neptunePerihelionEcliptic` | derived | H × 2 |
+| Planet | Ecliptic Period (yr) | ICRF Period (yr) |
+|--------|---------------------:|-----------------:|
+| **Mercury** | <!--v:mercuryPeriPeriod-->23,199<!--/v--> | −<!--v:mercuryPeriPeriodICRF-->232,437<!--/v--> |
+| **Venus** | −<!--v:venusPeriPeriod-->22,463<!--/v--> | −<!--v:venusPeriPeriodICRF-->174,997<!--/v--> |
+| **Earth** | <!--v:periPrecYears-->~20,938<!--/v--> | +<!--v:earthPeriPeriodICRF-->111,635<!--/v--> |
+| **Mars** | <!--v:marsPeriPeriod-->19,002<!--/v--> | −<!--v:marsPeriPeriodICRF-->72,335<!--/v--> |
+| **Jupiter** | <!--v:jupiterPeriPeriod-->23,760<!--/v--> | −<!--v:jupiterPeriPeriodICRF-->304,456<!--/v--> |
+| **Saturn** | −<!--v:saturnPeriPeriod-->16,502<!--/v--> | −<!--v:saturnPeriPeriodICRF-->45,883<!--/v--> |
+| **Uranus** | <!--v:uranusPeriPeriod-->23,907<!--/v--> | −<!--v:uranusPeriPeriodICRF-->330,515<!--/v--> |
+| **Neptune** | <!--v:neptunePeriPeriod-->25,464<!--/v--> | −<!--v:neptunePeriPeriodICRF-->2,136,796<!--/v--> |
 
-**Note:** Venus and Saturn both precess retrograde in the ecliptic frame (opposite to orbital motion).
+**Note:** Venus and Saturn precess retrograde in the ecliptic frame; Saturn's window retrograde is the Great-Inequality phase of its own chain ([doc 109](109-model-nbody-engine-and-lattice-test.md)). The registry's live values and their window are in [doc 20](20-constants-reference.md#perihelion-precession-periods-ecliptic).
 
 ### 10.7 Formula Quick Reference
 
@@ -1356,13 +1298,9 @@ Precession Conversions:
 Rate = 129,600,000 / Period_years          arcsec/century from period
 Period = 129,600,000 / Rate                years from arcsec/century
 
-Reference Frame Transformation:
+Reference Frame Transformation (Reference = the axial precession period):
 ICRF = (Ecliptic × Reference) / (Ecliptic - Reference)
 Ecliptic = (ICRF × Reference) / (ICRF + Reference)
-
-Holistic Relationships:
-Period = holisticyearLength / n            where n is integer ratio
-Ratio = holisticyearLength / Period        holistic resonance
 
 Angular Velocity:
 ω = (arcsec/century / 100) × (π / 648000)  rad/year from arcsec/century
@@ -1420,22 +1358,7 @@ z_max = sin(i_inv)          Mean maximum height above invariable plane (AU)
 β = arcsin(sin(i_inv)·sin(u)) Heliocentric latitude
 ```
 
-### Inclination Oscillation (ICRF perihelion approach)
-```
-i(t) = mean + A·cos(ω̃_ICRF(t) - cycleAnchor)   Dynamic inclination to invariable plane
-
-Where:
-  mean        = <planet>InvPlaneInclinationMean      Laplace-Lagrange midpoint
-  A           = <planet>InclinationAmplitude          Half of oscillation range
-  ω̃_ICRF(t)  = Current ICRF perihelion longitude (ecliptic rate - general precession H/13)
-  cycleAnchor = <planet>InclinationCycleAnchor        ICRF perihelion where MAX occurs (at balanced year)
-
-Mean derivation:
-  mean = i_J2000 - A·cos(ω̃_J2000 - cycleAnchor)    From known J2000 constraint
-
-Note: Saturn is anti-phase (cos sign flipped): MAX inclination at balanced year,
-      while all other planets are at MIN.
-```
+The inclination of date to the invariable plane is the chain's element (`_kcElementsOfDate(k, jd).inclInvPlaneDeg`) for the seven planets and the engine's one-source orbit normal for Earth; there is no inclination law.
 
 ---
 
@@ -1460,7 +1383,7 @@ For current values, see [Constants Reference](20-constants-reference.md).
 **How values are sourced:**
 - **Eccentricity**: the chain's element of date (`_kcElementsOfDate(k, jd).e`; the K base/amplitude/phase law was retired at plan 07 R6)
 - **Inclination (inv)**: the chain's element of date (`.inclInvPlaneDeg`; the ψ mean/amplitude law was retired at plan 07 R5)
-- **Semi-major axis**: Derived from period via Kepler's 3rd Law: `a = (H / solarYearCount)^(2/3)` where `solarYearCount = round(H × meanSolarYearDays / solarYearInput)` — the integer number of orbits in one H (doc 20 § Quantization)
+- **Semi-major axis**: the chain's element of date for the seven planets; for the no-chain bodies derived from the period via Kepler's third law on the scaffolding's integer orbit count per anchor interval (`solarYearCount`)
 - **Period**: Input constant per planet (`planets.{name}.solarYearInput`)
 
 > **Display note (post-K5).** These device constants remain the scene-scaffold
@@ -1470,7 +1393,7 @@ For current values, see [Constants Reference](20-constants-reference.md).
 > deg per Julian year, window 1800–2100) — P = 360°/n, synodic =
 > 360°/|n_planet − n_Earth|, orbits-per-H a derived non-integer. The integer
 > orbit counts survive only for Pluto/Halley/Eros, where the geometric device
-> is the model path (doc 31).
+> is the model path (the archived doc 31).
 
 ### Live Variables Summary
 
@@ -1482,13 +1405,11 @@ All planets have these `o.{planet}` variables:
 - `MeanAnomaly` - Mean anomaly (M)
 - `TrueAnomaly` - True anomaly (ν)
 - `Elongation` - Elongation from Sun
-- `AscendingNodeInvPlane` - Ascending node on invariable plane (verified)
-- `AscendingNodeInvPlaneSouamiSouchay` - Ascending node on invariable plane (S&S)
-- `HeightAboveInvPlane` - Height above invariable plane (AU)
-- `AboveInvPlane` - Boolean: above invariable plane
-- `EclipticInclinationDynamic` - Ecliptic inclination to ecliptic
-- `EclipticInclinationSouamiSouchayDynamic` - Ecliptic inclination (S&S method)
-- `InvPlaneInclinationDynamic` - Dynamic inclination to invariable plane (oscillates)
+- `AscendingNodeInvPlane` - The chain's ascending node of date on the invariable plane
+- `HeightAboveInvPlane` - Height above the invariable plane (AU)
+- `AboveInvPlane` - Boolean: above the invariable plane
+- `EclipticInclinationDynamic` - The chain's inclination of date to the ecliptic
+- `InvPlaneInclinationDynamic` - The chain's inclination of date to the invariable plane
 
 Plus `{planet}.sunDistAU` for current heliocentric distance.
 
