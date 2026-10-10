@@ -360,7 +360,7 @@ massFraction.earth = (GM_Earth / G) / M_Sun
 
 ### J2000 Eccentricities (eccJ2000)
 
-All 8 planets, combining inner planet J2000 values with outer planet pre-dual-balance values:
+All 8 planets — the observed J2000 values the chains' eccentricity of date is anchored on:
 
 | Planet | `eccJ2000` | Source |
 |--------|-----------|--------|
@@ -631,22 +631,20 @@ The per-day rates are used for EoC phase computation; the per-century rates are 
 
 ### Ecliptic Inclination Trend Rates
 
-JPL publishes these trends in the **J2000-fixed** ecliptic frame ("mean ecliptic and equinox of J2000"). The model error column below is the difference between the model's J2000-fixed-frame trend and JPL's catalog value, under the fitted `ascendingNodeCyclesIn8H` integers and the n=7 phase anchor.
+JPL publishes these trends in the **J2000-fixed** ecliptic frame ("mean ecliptic and equinox of J2000"). They are the catalogue's values, kept here as the reference beside the chain: the rendered planets' inclination of date is the N-body chain's element, gated against Horizons over 1800–2100 ([doc 109](109-model-nbody-engine-and-lattice-test.md)).
 
-| Planet | Rate (deg/century) | Direction | Model Error |
-|--------|------------------|-----------|-------------|
-| Mercury | <!--v:mercuryEclInclTrendDegPerCy-->-0.00595<!--/v--> | Decreasing | ~0.4"/cy |
-| Venus | <!--v:venusEclInclTrendDegPerCy-->-0.00079<!--/v--> | Decreasing | ~1.7"/cy |
-| Mars | <!--v:marsEclInclTrendDegPerCy-->-0.00813<!--/v--> | Decreasing | ~0.4"/cy |
-| Jupiter | <!--v:jupiterEclInclTrendDegPerCy-->-0.00184<!--/v--> | Decreasing | ~0.0"/cy |
-| Saturn | **+<!--v:saturnEclInclTrendDegPerCy-->0.00194<!--/v-->** | **Increasing** | ~1.7"/cy |
-| Uranus | <!--v:uranusEclInclTrendDegPerCy-->-0.00243<!--/v--> | Decreasing | ~0.1"/cy |
-| Neptune | **+<!--v:neptuneEclInclTrendDegPerCy-->0.00035<!--/v-->** | **Increasing** | ~0.0"/cy |
-| Pluto | -0.00100 | Decreasing | (not fitted) |
+| Planet | Rate (deg/century) | Direction |
+|--------|------------------|-----------|
+| Mercury | <!--v:mercuryEclInclTrendDegPerCy-->-0.00595<!--/v--> | Decreasing |
+| Venus | <!--v:venusEclInclTrendDegPerCy-->-0.00079<!--/v--> | Decreasing |
+| Mars | <!--v:marsEclInclTrendDegPerCy-->-0.00813<!--/v--> | Decreasing |
+| Jupiter | <!--v:jupiterEclInclTrendDegPerCy-->-0.00184<!--/v--> | Decreasing |
+| Saturn | **+<!--v:saturnEclInclTrendDegPerCy-->0.00194<!--/v-->** | **Increasing** |
+| Uranus | <!--v:uranusEclInclTrendDegPerCy-->-0.00243<!--/v--> | Decreasing |
+| Neptune | **+<!--v:neptuneEclInclTrendDegPerCy-->0.00035<!--/v-->** | **Increasing** |
+| Pluto | -0.00100 | Decreasing |
 
-**Source**: [JPL Approximate Positions of the Planets](https://ssd.jpl.nasa.gov/planets/approx_pos.html)
-
-**Note**: All 7 fitted planets now match JPL trend direction in the J2000-fixed frame. Total trend error is ~4.3″/century across the 7 planets. See [doc 05 § Two frames](05-invariable-plane-overview.md#two-frames-two-node-values--dont-conflate) for the frame distinction.
+**Source**: [JPL Approximate Positions of the Planets](https://ssd.jpl.nasa.gov/planets/approx_pos.html). See [doc 05 § Two frames](05-invariable-plane-overview.md#two-frames-two-node-values--dont-conflate) for why a trend quoted against the ecliptic of date can flip sign.
 
 ### Mean & True Anomaly at J2000
 

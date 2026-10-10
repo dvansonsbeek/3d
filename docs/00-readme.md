@@ -113,14 +113,11 @@ their diffs), and the sections below give the intended reading order instead.
 | [analytical-ascending-nodes.js](../tools/verify/analytical-ascending-nodes.js) | Analytical (closed-form) calculation using spherical trigonometry |
 | [ascending-node-verification.js](../tools/verify/ascending-node-verification.js) | Verifies J2000-verified values produce correct ecliptic inclinations |
 | [ascending-node-souami-souchay.js](../tools/verify/ascending-node-souami-souchay.js) | Compares Souami & Souchay original vs verified ascending node accuracy |
-| [inclination-optimization.js](../tools/verify/inclination-optimization.js) | Computes the derived inclination amplitudes and means with balance verification |
-| [inclination-verification.js](../tools/verify/inclination-verification.js) | Verifies inclination parameters against J2000 and JPL trends |
 | [mercury-precession-centuries.js](../tools/verify/mercury-precession-centuries.js) | Mercury perihelion precession analysis by century |
-| [balance-search.js](../tools/verify/balance-search.js) | Exhaustive search + deep analysis: five-stage pipeline with per-config optimised anchor, ascending nodes, and base eccentricities; generates data/balance-presets.json |
-| [verify-laws.js](../tools/verify/verify-laws.js) | Narrative-class record of the retired law suite's checks and findings |
-| [configuration-analysis.js](../tools/verify/configuration-analysis.js) | Historical: four-filter intersection analysis of 7.56M configs (superseded by the sequential pipeline in balance-search.js) |
-| [eccentricity-balance.js](../tools/verify/eccentricity-balance.js) | Pair decomposition, Law 5 sensitivity analysis |
-| [epoch-independence.js](../tools/verify/epoch-independence.js) | AMD exchange across mirror pairs, balance stability across Saturn's secular cycle |
+| [measure-rms-historical-vs-jpl.js](../tools/verify/measure-rms-historical-vs-jpl.js) | The model against the independent historical observations (Tier 1) and against JPL/IMCCE at the same epochs (Tier 2) — [doc 23](23-verification-data-reference.md) |
+| [moon-deltat-comparison.js](../tools/verify/moon-deltat-comparison.js) | The Moon's timing against the ΔT stack |
+
+The five gates and the twelve artifact generators are the rest of the 24; `npm run test:verify:list` prints the classification with each script's note.
 
 > **Note:** `ascending-node-optimization.js` and `analytical-ascending-nodes.js` calculate the same ascending node values using different methods (numerical vs analytical). Both produce identical results, proving the geometric validity of the approach.
 

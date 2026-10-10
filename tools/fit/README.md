@@ -233,18 +233,14 @@ then `npm run constants:generate` (Step 9).
 
 | Script | Produces | Data source |
 |--------|----------|-------------|
-| `derive-eccentricity-amplitudes.js` | Verification only (no output) | Verifies K-derived amplitudes match runtime |
 | `export-solar-measurements.js` | `data/02-solar-measurements-window.csv` via `npm run fit:6a2` (the full-period `data/02-solar-measurements.csv` is retired; written only on demand) | Scene-graph simulation (1-year steps, single pass) |
 | `sun-longitude-harmonics.js` | `SUN_LONGITUDE_MEAN`, `SUN_LONGITUDE_HARMONICS` (anchor-divisor harmonic terms; **see design rule above** — only divisors n where anchor/n maps to a known physical cycle are allowed) | Scene-graph Sun vs Meeus Ch.25 (computed in-script, no CSV). **Status 2026-06 (Phase Z-B): ENABLED** — Sun-only application with runtime divisor-whitelist filter (skips legacy [168] term automatically). Closes ~96% of the framework's 200" Sun-vs-Meeus residual. **2026-08 (FQ-3): retired from the moveModel display path** (exact-Kepler corrector, doc 65); still consumed by the Step-6a instrument + the legacy A/B path, and still fitter-owned here. |
 | `sun-planetary-completion-fit.js` | NOTHING (read-only, the Step-0 companion — 20.3h, SUPERSEDED by Stage D2) | JPL Horizons live (960 all-phase + 179 syzygy epochs, network required — so it can never be a gate). Was the dev record behind the v1 fitted 10-term table; the shipped table is now the DERIVED 70-term extraction on FRAMEWORK-native carriers (FQ-5 N3: `tools/explore/d2-derived-sun.mjs` → `n2-sun-framework-carriers.mjs` → `n3-carrier-swap-preview.mjs`; the carrier rates are injected live from the planet records by `model.js`), so its coefficient-drift part no longer applies — its syzygy + NASA-centerline scoreboards remain valid verification. After ANY Step-0 refit OR planet-record period change, re-run the N3 extraction chain and re-embed the table + its `PAIRED_SUN_HARMONICS_SHA256` by hand — the test:model fingerprint gate enforces the pairing. |
-| `eoc-fractions.js` | Per-planet `eocFraction` | `data/reference-data.json` |
 | `ascnode-correction.js` | `ascNodeTiltCorrection`, `startpos` | `data/reference-data.json` |
 | `moon-eclipse-optimizer.js` | NOTHING (RETIRED at plan 06 R3 item 1 — kept as the record) | Formerly `moonMeeusLpCorrection` + `MOON_CORRECTION` against 58 solar eclipses (2000–2025) + a JPL baseline. Both are retired: measured against Horizons' apparent Moon the series needs no anchor (−1.0″ ± 1.5″, 1970–2049), the +32.75″ was the eclipse tier's mean Sun compensated (κ + the I2 long inequality + the trend-ΔT offset), and the RA/Dec patches were fitted around the retired D5 aberration layer (docs/66 §1.4). `moonStartpos*` values are J2000-element anchored via the in-sim meters (docs/66 §4) and are NO LONGER fitted |
 | `python/fit_perihelion_harmonics.py` | `PERI_HARMONICS_RAW`, `PERI_OFFSET` | `data/01-holistic-year-objects-data.xlsx` |
 | `python/verify_perihelion_erd.py` | pass/fail verification (exits 0=pass, 1=fail) | `data/01-holistic-year-objects-data.xlsx` |
-| (`python/train_precession_physical.py`, `train_observed.py`, `greedy_features_physical.py` — the planet predict device's trainers — RETIRED at plan 06 R8) | nothing | — |
 | `python/planet_eccentricity_jpl.py` | Planet `orbitalEccentricityBase` values | JPL Horizons (cached in `data/`) |
-| `../../scripts/fibonacci_significance.py` | `data/significance-results.json` (combined p + sigma via Stouffer's Z with correlation correction; Fisher's reported for transparency; 11 tests × 3 null distributions) | `tools/lib/python/constants_scripts.py` |
 | `dt-corrections-fit.js` | `data/deltaT-4flag-fit.json` — cascaded LSQ fit of the 4-flag ΔT correction stack (Bond n=1830 · 1466 yr, Hallstatt n=1104 · 2430 yr, Jose5 n=2989 · 897 yr, Jose4 n=3749 · 716 yr — n the divisor of the anchor's eight-unit interval, an identifier: the periods are what the stack carries) against the Stephenson 2016 residual. Sole authoritative source of the shipped `BOND_/HALLSTATT_/JOSE5_/JOSE4_ COS_/SIN_COEFF_S` constants. See "Phase 8" below. **JOINT WORLD (since 2026-07-23): `--joint` is the AUTHORITATIVE fit** — 4 flags + Core-mantle swing in one equality-constrained solve (hard USNO closure row, amplitude caps, resonator phases locked as unit shapes, free intercept = trend anchor). `--joint --write` ships the coefficients + anchors atomically (current joint optimum: USNO 86,400.0017, deltaTStart 55.85, Espenak fit-target RMS 12.60 s, full-window 31.27 s — read the live values from `data/deltaT-4flag-fit.json → optimum` and the stage-3 validation artifact, never from this sentence). The legacy single-shot cascade remains as a stage-wise diagnostic — **its `fit_metrics.stage_*` entries in `deltaT-4flag-fit.json` rank the flags differently from the shipped fit and must not be used to judge whether a flag earns its place** (worked example and the correct method in [doc 105](../../docs/105-dt-stack-flag-audit.md)); the resonator is default-ON runtime-wide (opt-out `DT_RESONATOR_DISABLED=1`; `DT_CORRECTIONS_DISABLED=1` alone still yields the fully-raw fitting residual via the integrator master-gate). | Stephenson 2016 spline (`public/input/stephenson-2016-deltaT-polynomial.json`) − pure-tidal framework model (`tools/lib/deep-time.js`, bypassed via `DT_CORRECTIONS_DISABLED=1`) |
 | `../../scripts/lattice_harmonic_scan.py` | `data/lattice-scan-<tag>.json` — universal harmonic-divisor scan across multiple paleoclimate archives (Steinhilber solar Φ, Stephenson ΔT, Cheng speleothem δ18O, EPICA CO2, LR04 δ18O). Enumerates gcd-compliant divisors in a period band, fits each candidate against each dataset, ranks by cross-dataset consistency. Used to identify Jose4 (4×Jose 715 yr) as the 4th flag with cross-archive coherence. | Multiple paleoclimate proxies in `data/` and `public/input/` |
 | `data/core-mantle-resonator-stage1.json` (artifact — no shipped generator) | the **Core-mantle swing (Resonator driver)** shipped block: a 2-kick EPISODE (windowed damped oscillation, T₀ = (eight-unit interval)/`RES_T0_LATTICE_N` ≈ 3,916 yr, divisor-labeled, Q, kick epochs/coefficients, phase-locked drive tone). Selection rule: pinned-lattice-T₀ guard-passers first (guard-aware solver — modern-window δLOD penalty rows). **Regeneration in the joint world: amplitudes refit automatically via `--joint --write` (tone menu derives from the active flags — generic over flag count). The episode CONVENTION (T₀ ≈ 3,916 yr = the eight-unit interval/685, Q = 1.8, epochs −1600/+1600, impulse-consistent shapes) is a DOCUMENTED CONVENTION, not a build-time derivation — it is not re-derivable from anything in this repo. Its evidence is the tracked result JSONs (`data/core-mantle-resonator-*.json`) plus the docs/104 narrative; the stage-1/stage-3/impulse scripts that originally established it ran against the pre-joint world, cannot reproduce today's numbers, and are deliberately not shipped.** Kick epochs are a documented CONVENTION, not data-pinned — see the stage-3 stability artifact before moving them. | Stephenson residual after the shipped stack (node bridge to `tools/lib/deep-time.js`) + `data/deltaT-4flag-fit.json` (parents' phases for the locked tones) |
@@ -367,8 +363,6 @@ Step 0:  SUN_HARMONICS_DISABLED=1 node tools/fit/sun-longitude-harmonics.js --wr
                reference reformulation.
              · `SUN_HARMONICS_ENABLED` toggle between framework-native
                and Meeus-parity modes.
-           (Same "stable across normal refits" pattern as
-           fibonacci_significance.py / Step 7e.)
          - MATCHED-PAIR DOWNSTREAM (20.3h → Stage D2): the package
            location tier's Sun planetary completion
            (packages/physics/src/eclipse/sun-planetary-completion.cjs)
@@ -533,8 +527,6 @@ RA/Dec path they fitted no longer exists. The id 5c is kept — this
 numbering is shared vocabulary.)
 
          Optional diagnostics (skip in standard refit):
-         • eoc-fractions.js — scans EoC fraction for Type III planets. No --write.
-           Only re-run if planet orbital elements or EoC architecture changes.
          • ascnode-correction.js — scans ascNodeTiltCorrection. No --write.
            Step 2 already optimizes startpos/angleCorrection.
 
@@ -735,19 +727,11 @@ Step 6f legacy reference — see Step 0 above. The sun-longitude-harmonics
 
 ── Phase 5b: Eccentricity amplitudes & balance law verification ──
 
-Step 7a: derive-eccentricity-amplitudes.js    → verification only (no output)
-         Verifies that K-derived eccentricity amplitudes from constants.js
-         are internally consistent. All values are now computed at runtime:
-         - K from Earth: K = e_amp × √m × a^1.5 / (sin(meanObliquity) × √d)
-         - All 7 planet amplitudes from K using model mean obliquity
-         - All bases from balanced-year phase
-         - All phases from the eccentricity cycle timing
-         No --write option. Run to verify after Earth parameter changes.
-
-Step 7b: balance-search.js                    → balance-presets.json
-         Exhaustive search for configs with ≥99.994% inclination balance.
-         Writes data/balance-presets.json (synced to script.js by Step 9).
-         Count changes when eccentricity values change (affects w = √(m·a(1-e²))/d).
+Steps 7a, 7b, 7d, 7e: deleted with the integer laws (plan 07 R6) — the
+         K-derived amplitude check, the balance search, the law verifier and
+         the significance test. `data/balance-presets.json` and
+         `data/significance-results.json` stay as frozen records that no
+         step regenerates.
 
 Step 7c: DT_CORRECTIONS_DISABLED=1 dt-corrections-fit.js --joint --write
          → data/deltaT-4flag-fit.json + data/core-mantle-resonator-stage1.json
@@ -766,36 +750,6 @@ Step 7c: DT_CORRECTIONS_DISABLED=1 dt-corrections-fit.js --joint --write
          Only re-run when H or the tidal LOD anchor changes (H change
          shifts the framework model ΔT curve, altering the residual to fit).
          Automated in the pipeline as of 2026-07-15.
-
-Step 7d: verify-laws.js                       → pass/fail
-         Verifies Laws 2 (inclination amplitude), 3 (inclination balance),
-         and 5 (eccentricity balance). All must pass.
-         Key targets:
-         - Inclination balance (Law 3) — natural phase-derived value ≈99.9975%
-         - Eccentricity balance (Law 5) — natural phase-derived value ≈99.8632%
-         - All 8 planet inclination amplitudes match ψ/(d×√m) (Law 2)
-         - All eccentricities consistent with J2000 observed values
-         eccentricity-balance.js              → convergence report
-         Laws 4 and 5 independently predict Saturn's eccentricity.
-         For per-planet sensitivity decomposition of the residual balance
-         gaps, see tools/verify/dual-balance-optimizer.js and doc 19.
-
-Step 7e: fibonacci_significance.py            → data/significance-results.json
-         Monte Carlo + permutation significance test for the historical integer-ratio structure (retired framing; kept as the record).
-         11 tests across 3 null distributions (permutation, log-uniform MC,
-         uniform MC); 100,000 trials per MC null. Of the 11 tests, 7 are
-         structural (5 multiset-invariant under permutation + 2 tautological —
-         Laws 2 and 4 are internally consistent by construction) and 4 are
-         empirical (Laws 3, 5; Findings 4 and 6). Computes Stouffer's Z
-         combined p-value with Brown-style correlation correction (variance
-         inflation factor 2.5 for the shared v_j dependency) + sigma
-         equivalents across all three null distributions. Fisher's combined
-         also reported for transparency.
-         Run-time: ~2-3 minutes (single threaded).
-         Stable across normal refits — only re-run before publication or when
-         the significance test definitions themselves change.
-         **Required by the model-values registry** — the website combined p-values,
-         sigma range, and test counts all derive from this output.
 
 Steps 7f-7i: campaign-artifact generators     → data/*.json (inputs-stamped)
          The §12h anti-staleness generators. Each owns a campaign artifact,
@@ -842,10 +796,9 @@ Step 9:  npm run constants:generate           → generated constants module
 Publish: the website consumes the published packages — after Step 9, run
          `npm run values:package:write`, bump versions per the two-axis
          contract, and `npm publish` both packages (full commands in
-         "Publishing to the website (Phase-14 flow)" above). Requires the
-         Step 7b and 7e artifacts (data/balance-presets.json,
-         data/significance-results.json) — the model-values registry reads
-         both.
+         "Publishing to the website (Phase-14 flow)" above). The registry
+         also reads the frozen records data/balance-presets.json and
+         data/significance-results.json, which no step regenerates.
 
 ── Phase 7: (retired) ─────────────────────────────────────────────
 
@@ -1082,7 +1035,6 @@ python3 tools/fit/python/verify_perihelion_erd.py                            # S
 # (Steps 4c–4d — the planet predict trainers — retired at plan 06 R8)
 
 # Phase 4: Moon (Steps 5a-5b retired — K5 excision)
-# node tools/fit/eoc-fractions.js              # optional diagnostic
 # node tools/fit/ascnode-correction.js          # optional diagnostic
 node tools/fit/moon-eclipse-optimizer.js --write                             # Step 5c
 
@@ -1096,11 +1048,8 @@ npm run check:csv-smoke                                                      # t
 # (Sun longitude harmonics moved to Phase 0 — see top of this block.
 # It does NOT need to re-run here as part of routine refits.)
 
-# Phase 5b: Balance law verification
-node tools/verify/balance-search.js                                          # Step 7b (balance presets)
-node tools/verify/verify-laws.js                                             # Step 7d (must pass)
-node tools/verify/eccentricity-balance.js                                    # Step 7d (convergence report)
-python3 scripts/fibonacci_significance.py --trials 100000                    # Step 7e (~2-3 min; feeds the model-values registry)
+# (Phase 5b, the balance-law verification — Steps 7a/7b/7d/7e — is deleted
+# with the integer laws, plan 07 R6.)
 
 # Phase 6: Verify & sync
 node tools/fit/verify-pipeline.js                                            # Step 8 (must pass)
@@ -1184,8 +1133,6 @@ Fitting scripts write to JSON, then `constants:generate` (Step 9) regenerates th
     fit_perihelion_harmonics.py  → fitted-coefficients.json  (Step 4a)
     moon-eclipse-optimizer.js    → model-parameters.json     (Step 5c)
     optimize.js                  → model-parameters.json       (Steps 1, 2)
-    balance-search.js            → data/balance-presets.json    (Step 7b)
-    fibonacci_significance.py    → data/significance-results.json (Step 7d)
 ```
 
 ## Correction Stack (RETIRED — K5 excision)
