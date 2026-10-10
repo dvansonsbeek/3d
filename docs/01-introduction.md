@@ -9,138 +9,83 @@ status: current
 
 ## What is ESSRT?
 
-The Expanding Solar System Resonance Theory (ESSRT) — a holistic view of our universe — is a geo-heliocentric framework that describes planetary and lunar movements through two interacting forces. Rather than treating astronomical phenomena as isolated events, the model unifies precession cycles, climate patterns, and timekeeping variations into a single coherent system.
+The Expanding Solar System Resonance Theory (ESSRT) is one integrated account of the solar system: one cited J2000 state, one derived clock and one codebase produce the planets' orbits, Earth's precession, obliquity, eccentricity and timekeeping, the eclipse geometry and the orbital climate lines together — and the chain's evolution through geological time is gated by the rock record.
 
-> "Simple is hard and complex is easy." - The model's guiding principle
-
-The solar system is remarkably complex, yet its primary movements can be modeled by simulating just two counter-rotating forces:
-- **Axial precession** moves clockwise
-- **Apsidal precession** moves counter-clockwise
-
-These opposing movements generate all the observable dynamics of Earth, the Moon, planets, and the Sun.
+The physics composed here is standard: Newtonian N-body integration with the first-order relativistic correction, the averaged precession equation, tidal dissipation, secular perturbation theory. What is new is the integration. Because the chain is closed end to end, one input constant can be perturbed and the whole system re-run, which is what turns an integration into a source of testable consequences — and those consequences, at geological time, are the part that can be wrong.
 
 ---
 
-## The Two Gravitational Control Points
+## One Seed, One Clock
 
-The model introduces two key gravitational centers that govern all observed precession movements:
+The model has two engines and one clock.
 
-### EARTH-WOBBLE-CENTER
+**The N-body engine — the planets.** Standard Newtonian gravity with the first-order relativistic correction, integrated from one cited J2000 heliocentric state (JPL Horizons vectors, DE440 mass ratios) with zero fitted constants. It supplies every planet's orbit of date, the secular modes, the <!--v:earthDeepBeatPeriodKyr-->405.6<!--/v-->-kyr eccentricity metronome, and Earth's own eccentricity, inclination, node and perihelion of date ([doc 04](04-dynamic-elements-overview.md), [doc 109](109-model-nbody-engine-and-lattice-test.md)).
 
-This point simulates **axial precession** - Earth's historical "precession of the equinoxes."
+**The clock — Earth's spin and time.** The mean lunisolar precession period, <!--v:lunisolarPeriodJ2000Yr-->25,771.4<!--/v--> years at J2000, is derived from the model's own sidereal and tropical year laws ([doc 11](11-length-day-year-formulas.md)) and agrees with the IAU value to eight parts in a million. Earth's other spin-side periods are read against it as ratios of periods, and it lengthens through geological time as tides slow the spin.
 
-- Earth orbits this center in a **clockwise** direction
-- One complete orbit takes approximately **<!--v:axialPrecRound-->~25,771<!--/v--> years** — the axial precession period at J2000 (see [Constants Reference](20-constants-reference.md))
-- This is what causes the equinox to move westward through the zodiac
-- The mechanism involves tidal forces from the Sun and Moon acting on Earth's equatorial bulge
+Two of Earth's precession motions rotate in **opposite directions**, so their frequencies add:
 
-In the 3D simulation, this point is visualized as "The Death Star."
+| Motion | Direction | Period at J2000 | In precession periods |
+|--------|-----------|-----------------|-----------------------|
+| Axial precession (the clock) | Clockwise | <!--v:axialPrecRound-->~25,771<!--/v--> yr | 1 |
+| Apsidal precession (the orbit's own motion, a J2000 reading) | Counter-clockwise | <!--v:inclPrecYears-->~111,635<!--/v--> yr | <!--v:lunisolarApsidalPerPrecessionJ2000-->4.332<!--/v--> |
+| Perihelion-of-date (their beat, 1/T_peri = 1/T_p + 1/T_aps) | — | <!--v:periPrecYears-->~20,938<!--/v--> yr | <!--v:lunisolarPeriOfDatePerPrecessionJ2000-->0.8124<!--/v--> |
 
-### PERIHELION-OF-EARTH
+The ratios are J2000 readings, not laws: the apsidal ratio wanders between <!--v:lunisolarApsidalPerPrecessionWanderMin-->1.08<!--/v--> and <!--v:lunisolarApsidalPerPrecessionWanderMax-->9.81<!--/v--> across ±26 kyr, as the simulator's Lunisolar Clock panel shows live. The perihelion-of-date beat is the carrier of the climatic-precession band; the obliquity band is the beat of the clock against the orbit's own nodal mode, <!--v:obliqCycleYears-->~41,224<!--/v--> years today.
 
-This point determines Earth's varying distance to the Sun throughout the year (perihelion around January 3rd, aphelion around July 4th).
-
-- It orbits **counter-clockwise** around the EARTH-WOBBLE-CENTER
-- One complete orbit takes approximately **<!--v:inclPrecYears-->~111,635<!--/v--> years** (apsidal precession; see [Constants Reference](20-constants-reference.md))
-- This slowly changes Earth's argument of periapsis relative to the fixed stars
-
-In the 3D simulation, this appears as a white dot.
-
-### Opposing Rotations Create Balance
-
-The two movements interact:
-- Earth moves clockwise around EARTH-WOBBLE-CENTER (one axial precession period, <!--v:axialPrecRound-->~25,771<!--/v--> years)
-- PERIHELION-OF-EARTH moves counter-clockwise (one apsidal period, <!--v:inclPrecYears-->~111,635<!--/v--> years)
-- They meet and realign every **<!--v:periPrecYears-->~20,938<!--/v--> years** — the perihelion-of-date cycle, because the two rates add
-
-The solstice–perihelion alignment moves around the zodiac on that cycle. The simulator's Lunisolar Clock panel shows the live ratio of the two periods: <!--v:lunisolarApsidalPerPrecessionJ2000-->4.332<!--/v--> today, wandering between <!--v:lunisolarApsidalPerPrecessionWanderMin-->1.08<!--/v--> and <!--v:lunisolarApsidalPerPrecessionWanderMax-->9.81<!--/v--> across ±26 kyr.
+**The anchor.** A third layer is a fitted timing anchor of <!--v:holisticYear-->335,317<!--/v--> years, calibrated on the perihelion–solstice alignment of the IAU mean elements in early 1246 AD (JD <!--v:periAlignJD-->2,176,153<!--/v-->; the model's own orbital series crosses at <!--v:periAlignYearSeries-->1247.2<!--/v--> AD, the mean-element and secular-element conventions labelled). It is the unit of the small periodic corrections that bring the time-domain machinery onto the observed cardinal points, day lengths and eclipses — bookkeeping, not a cycle: it scales with the precession period at deep time and is not a period of anything the model computes. The parameter accounting is three ledgers: zero fitted constants on the planetary side, the derived clock, and five named device constants of the frozen era machinery ([Constants Reference](20-constants-reference.md)). Nothing is tuned per phenomenon.
 
 ---
 
-## The lunisolar precession clock
+## How the Scene Shows It
 
-Earth's spin tier runs on one clock: the mean lunisolar precession period, <!--v:lunisolarPeriodJ2000Yr-->25,771.4<!--/v--> years at J2000 — the period of the composed torque rate, Earth's spin carrying the solar and lunar torques on its equatorial bulge. Earth's other long cycles are read against it as ratios of periods:
+The simulator is a geo-heliocentric orrery: the Sun is the centre of the solar system, and the scene is viewed from Earth's perspective so that the two counter-rotating motions are visible. Two markers carry them:
 
-| Cycle | Period at J2000 | In precession periods |
-|-------|-----------------|-----------------------|
-| Axial precession | <!--v:axialPrecRound-->~25,771<!--/v--> yr | 1 |
-| Apsidal precession | <!--v:inclPrecYears-->~111,635<!--/v--> yr | <!--v:lunisolarApsidalPerPrecessionJ2000-->4.332<!--/v--> |
-| Perihelion-of-date | <!--v:periPrecYears-->~20,938<!--/v--> yr | <!--v:lunisolarPeriOfDatePerPrecessionJ2000-->0.8124<!--/v--> |
+- **EARTH-WOBBLE-CENTER** — Earth circles it clockwise in one axial precession period; this is the precession of the equinoxes, the equinox moving westward through the zodiac under the solar and lunar torques on Earth's equatorial bulge.
+- **PERIHELION-OF-EARTH** — the point that sets Earth's varying distance to the Sun through the year; it moves counter-clockwise around the wobble centre in one apsidal period, carrying Earth's perihelion against the fixed stars.
 
-The ratios are J2000 readings, not laws — the apsidal ratio wanders across ±26 kyr as the table above the panel shows. The model's earlier presentation, one "master cycle" divided by the small integers 13, 3 and 16, is retired; the fitted timing anchor that presentation was built on remains a Ledger-2 constant of the [Constants Reference](20-constants-reference.md).
-
-### Reference Point: JD 2176153.5 (1245-12-26) / early 1246 AD
-
-This date marks the perihelion alignment epoch — when the perihelion longitude was closest to the winter solstice direction. It serves as the reference point for:
-- Mean solar year length
-- Mean sidereal year length
-- Baseline calculations for all precession cycles
+The two meet every perihelion-of-date cycle, and the solstice–perihelion alignment moves around the zodiac on that cycle. They are reference points placed from the engine, not forces: Earth's frame is placed from the engine's own elements of date ([doc 41](41-scene-graph-hierarchy.md)), the seven planets follow their own N-body element chains, and the Sun and the Moon stack over that frame. The view is geocentric; the predictions are those of a heliocentric model.
 
 ---
 
-## Key Oscillating Parameters
+## What Follows From It
 
-Several Earth parameters oscillate over long timescales:
+- **Obliquity, inclination and the nodes.** The obliquity is integrated under the composed precession rate against the orbit normal of date; Earth's inclination and node on the invariable plane are the engine's own, the planets' are the chain's ([doc 05](05-invariable-plane-overview.md), [doc 22](22-coordinate-frames.md)).
+- **Day and year lengths.** The kinematic day and the year laws, with the three day bases named ([doc 11](11-length-day-year-formulas.md)).
+- **Timekeeping.** The ΔT stack on the pure-tidal length-of-day history, validated against the historical eclipse record with zero parameters fitted to eclipse data ([doc 102](102-gia-alpha-lunar-validation.md), [doc 105](105-dt-stack-flag-audit.md)).
+- **The Sun, the Moon and the planets.** The derived Sun and the framework-native lunar theory ([doc 65](65-equation-of-center.md), [doc 66](66-moon-meeus-corrections.md)), the planets' perihelion motion with Mercury's relativistic share emerging inside the measured advance ([doc 13](13-mercury-precession-breakdown.md)).
+- **Climate.** The orbital-forcing formula rides the engine's own lines — the beats of the chain's secular modes with the precession clock, plus the 405.6-kyr family ([doc 92](92-climate-formula.md), [doc 94](94-insolation-null-test.md)).
+- **Deep time.** The clock lengthens on the tidal history (Driver 1) and every orbit expands on the solar-mass history (Driver 2); the axial precession period was <!--v:axialPrecAtDevonian-->21,699<!--/v--> years in the Devonian. The theory, its predictions and the three pre-registered falsification legs are in [doc 99](99-expanding-solar-system-resonance-theory.md); the evidence is assembled in [doc 106](106-deep-time-validation-dossier.md).
 
-### Obliquity (Axial Tilt)
-
-Earth's axial tilt is not constant but oscillates over approximately <!--v:obliqCycleYears-->~41,224<!--/v--> years — the beat of the axial precession against the orbit's inclination mode. The orbital eccentricity and inclination to the invariable plane also oscillate, on the orbit's own apsidal and nodal periods. See [Constants Reference](20-constants-reference.md) for all current values (mean, amplitude, and range for each parameter).
+Every published quantity is traced to its inputs, formula, code and live value in [doc 110 — the calculation map](110-calculation-map.md).
 
 ---
 
-## What Makes This Model Unique
+## How It Is Checked
 
-### 1. Unified Framework
-
-A single model explains:
-- Precession of the equinoxes
-- Climate cycles (Milankovitch cycles)
-- Timekeeping variations (Delta-T)
-- Variations in day and year lengths
-
-### 2. Verifiable Through Simulation
-
-The 3D Solar System Simulation allows you to:
-- Observe all movements in real-time
-- Verify celestial positions against external planetariums
-- Watch cycles unfold over thousands of years
-- Explore the geometric relationships
-
-### 3. Invariable Plane Extension
-
-This documentation extends the model with calculations based on Souami & Souchay (2012):
-- Planet positions relative to the invariable plane
-- Dynamic inclination oscillations
-- Ascending node precession
-- Height above/below the invariable plane
-
-### 4. Geo-Heliocentric Perspective
-
-The model is **heliocentric** (Earth orbits the Sun) but viewed from a **geocentric perspective** (Earth at the visual center). This produces identical predictions to standard heliocentric models while providing intuitive visualization of how things appear from Earth.
-
-### 5. Deep-Time Extension (ESSRT)
-
-The model also extends across geological time through the **Expanding Solar System Resonance Theory (ESSRT)**. The periods shown throughout this documentation are J2000 values; at deep time they evolve through two physically independent drivers — Earth-Moon tidal evolution (Driver 1, lengthens the day) and solar mass loss (Driver 2, expands every orbit via Kepler's third law). See [Doc 99 — ESSRT](99-expanding-solar-system-resonance-theory.md) for the full framework.
+The model is verified, not asserted. `npm run check` runs a gate chain on every push — golden masters that detect a one-ULP change, artifact freshness against recorded input hashes, the historical gate suite, the deep-time paleo anchors where an unexplained improvement fails too — and the simulator deploys only from a green run. The independent-observation record (transits, oppositions, Tycho's Mars) is in [doc 23](23-verification-data-reference.md); the full ledger, including what does not validate, is [doc 106](106-deep-time-validation-dossier.md).
 
 ---
 
 ## Getting Started
 
-1. **Try the Simulation**: Visit https://3d.holisticuniverse.com
-2. **Read the User Guide**: [02-user-guide.md](02-user-guide.md) explains all controls and features
-3. **Learn the Terms**: [03-glossary.md](03-glossary.md) defines essential vocabulary
+1. **Try the simulation**: https://3d.holisticuniverse.com
+2. **Read the User Guide**: [02-user-guide.md](02-user-guide.md) explains the controls and panels
+3. **Learn the terms**: [03-glossary.md](03-glossary.md) defines the vocabulary
+4. **Read the code map**: [40-architecture.md](40-architecture.md) and the [Constants Reference](20-constants-reference.md) are the contributors' starting points
 
 ---
 
 ## Further Reading
 
-For the complete scientific background:
+The scientific background lives on the website:
 
-- [How it Works](https://www.holisticuniverse.com/en/model/how-it-works) - Detailed explanation of the model
-- [Precession](https://www.holisticuniverse.com/en/model/precession) - Complete precession theory
-- [Obliquity & Inclination](https://www.holisticuniverse.com/en/model/obliquity) - Earth's tilt variations
-- [Full Glossary](https://www.holisticuniverse.com/en/reference/glossary) - Terms defined
+- [How it Works](https://www.holisticuniverse.com/en/model/how-it-works) — the derivation methodology
+- [Earth's Clock](https://www.holisticuniverse.com/en/model/earths-clock) — the lunisolar precession clock
+- [Moon & Planets](https://www.holisticuniverse.com/en/model/moon-and-planets) — the N-body chain and the derived Moon
+- [Expanding Resonance](https://www.holisticuniverse.com/en/model/expanding-resonance) — the deep-time evolution
+- [Supporting Evidence](https://www.holisticuniverse.com/en/model/supporting-evidence) — what aligns with and where the model differs from current science
 
 ---
 
-**Next**: [User Guide](02-user-guide.md) - Learn how to use the 3D simulation
+**Next**: [User Guide](02-user-guide.md) — how to use the 3D simulation
