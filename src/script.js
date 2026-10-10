@@ -31,8 +31,8 @@ import { vsop87AstrometricGeoEclipticAU, vsop87GeoEclipticAU, vsop87HelioEclipti
   Holmqvist, released under the GNU General Public License. Substantially
   modified. See NOTICE.
 
-  Commercial scope: the model — formulas, H lattice, deep-time engine,
-  coefficients — may be licensed separately. THIS FILE may not: its scene-graph
+  Commercial scope: the model — formulas, the N-body chain, the precession
+  clock, the deep-time engine, coefficients — may be licensed separately. THIS FILE may not: its scene-graph
   construction uses the inherited TYCHOSIUM idiom and stays AGPL-3.0.
 
   <https://www.gnu.org/licenses/>
@@ -86,7 +86,7 @@ const debugOn                    = false;  // Debug button flag (developer only)
 let   DEEP_TIME_MODE_ENABLED     = true;   // H/LOD/mSY evolve with age — see setEpochByAge
 // (R4: the Sun-display research toggles SUN_HARMONICS_ENABLED, E5_WHEEL_SUN_ENABLED and
 // FQ3_EXACT_SUN_ENABLED are retired — the wheel Sun IS the certified Sun, placed by
-// _applyEngineEarthFrame; docs/retired-record.md)
+// _applyEngineEarthFrame)
 let   BOND_DT_CORRECTION_ENABLED = true;  // Bond 1,466-yr ΔT correction (Option B research toggle) — rationale + constants at the BOND_PERIOD_YR block
 let   HALLSTATT_DT_CORRECTION_ENABLED = true;  // Hallstatt 2,430-yr ΔT correction (research toggle) — rationale + constants at the HALLSTATT_PERIOD_YR block
 let   JOSE5_DT_CORRECTION_ENABLED = true;  // Jose5 897-yr ΔT correction (5×Jose period) — rationale + constants at the JOSE5_PERIOD_YR block
@@ -564,7 +564,7 @@ const ANOMALISTIC_YEAR_HARMONICS = FIT.ANOMALISTIC_YEAR_HARMONICS;
 // calcERD). The planet "predictive formula system" that used to sit here
 // (PREDICT_PLANETS / PREDICT_COEFFS_PHYSICAL, ~2,421 fitted terms per planet
 // reproducing the RETIRED geometric scene's Earth-frame perihelion-RA rate)
-// left at plan 06 R8 — docs/retired-record.md; the Earth-frame rate is now
+// left at plan 06 R8; the Earth-frame rate is now
 // the equatorial projection of the lattice motion (perihelionFrameBreakdown).
 // ─────────────────────────────────────────────────────────────────────────
 let   H = holisticyearLength;  // Phase 6.5: mutable alias; kept in sync inside recomputeEpochAnchors
@@ -590,7 +590,7 @@ const PERI_OFFSET = FIT.PERI_OFFSET;
 // remainder) left fitted-coefficients.json: the rendered Moon is the geometric
 // series Moon with the derived extension, measured −1.0″ ± 1.5″ against
 // Horizons' apparent Moon over 1970–2049 with no patch — the record is in
-// @essrt/physics moon/apparent.cjs and docs/retired-record.md.
+// @essrt/physics moon/apparent.cjs.
 
 // ─── B4. Obliquity harmonics (fitted) ────────────────────────────────────
 // Source: public/input/fitted-coefficients.json
@@ -1414,8 +1414,7 @@ const GM_EROS = M_EROS * G_CONSTANT;                 // ~4.46 × 10⁻⁴ km³/s
 // (Plan 07 R5: the ψ law — psiConstant = 3·A_earth·√(m_E/m_☉) and the
 // per-planet invPlaneInclinationAmplitude / invPlaneInclinationMean loop
 // (@essrt/physics/planets/fibonacci-laws) — is DELETED. A planet's
-// inclination of date has one home, the N-body chain (_kcElementsOfDate);
-// docs/retired-record.md.)
+// inclination of date has one home, the N-body chain (_kcElementsOfDate).)
 
 // ─── E2d. Wobble periods, obliquity cycles, and K-derived eccentricity ──
 // Moved here (before scene geometry) so orbitalEccentricityBase is available
@@ -5918,7 +5917,7 @@ if (typeof window !== 'undefined') {
     // element (the ζ-vector secular skeleton + derived terms, J2000 ecliptic)
     // — the value updateAscendingNodes writes to o.<planet>AscendingNode. The
     // asc-node integrator (dΩ/dε = −sin Ω / tan i on the K device's tilts,
-    // the 8.3 S-P5 probe) is deleted with the ψ law; docs/retired-record.md.
+    // the 8.3 S-P5 probe) is deleted with the ψ law.
     planetAscNodeEclAt: (k, year) => _kcElementsOfDate(k, yearToJD(year)).ascNodeEclipticDeg,
     // ── Phase 8.4-0 ΔT/LOD surface ───────────────────────────────────────────
     // Pins CURRENT behaviour before the climate/ΔT extraction — including the
@@ -18556,7 +18555,7 @@ function _hybridSpinActive() { return HYBRID_SPIN_REQUESTED && _zetaSeriesData !
 // R4 (plan 06 "one Earth frame"): the D4c apsidal-wheel delta and the
 // D4d/D4d-rev equinox-azimuth flip with its J2000 pure-K anchor capture are
 // RETIRED with the tilt wrapper — the frame is placed from the engine
-// (_applyEngineEarthFrame); docs/41 and docs/retired-record.md carry the record.
+// (_applyEngineEarthFrame); docs/41 carries the measured reasons.
 /** The scene's ε target (deg) at a decimal year — THE one source under the
  *  flag: the series-hybrid inside the banked span, the K device outside it
  *  and whenever the flag is off/pending. Every ε surface (the visual tilt
@@ -24588,7 +24587,7 @@ function setupGUI() {
   // their periods and jump buttons) is REMOVED from Predictions for Earth — it
   // showed the device's phase counter as if it were a prediction, and the
   // eight-unit rows implemented the retired Config-#7 / System-Reset claim
-  // (docs/retired-record.md, doc 109). The state fields (predictions.*_H,
+  // (doc 109 is the record). The state fields (predictions.*_H,
   // *_8H) stay computed for the balanced-year navigation diagnostics.
 
   const daysFolder = astroFolder.addFolder({ title: 'Day Lengths' });
@@ -37375,7 +37374,7 @@ async function runObliquityCalibrationTest() {
 
 // (The "Verify 8H Configuration" check — the per-planet System-Reset claim of the
 // retired Config-#7 framing — was removed with its panel controls in plan 06
-// Phase 4d; docs/retired-record.md and doc 109 carry the record.)
+// Phase 4d; doc 109 carries the record.)
 
 /** Verify Earth parameters against astronomical references.
  *
@@ -43515,7 +43514,7 @@ function subSolarFromSceneAtJd(jd) {
 // the four events on the RENDERED scene (Newton on the equinox zero-crossing,
 // parabolic vertex on the solstice extremum, ~50 light scene updates per
 // year) plus a per-type J2000 anchor offset against the ADJUSTED anchor set —
-// is RETIRED (docs/retired-record.md). After R4 the rendered Sun IS the
+// is RETIRED. After R4 the rendered Sun IS the
 // certified Sun, so the solve measured the package's own GEOMETRIC crossing
 // and the frozen offset carried the 2000 nutation phase into every other
 // year. The panel rows now read the ONE home (`createModel().cardinal.jdNearUT`
@@ -45403,7 +45402,7 @@ function loadTexture( url, onLoad ) {
 // constants; twin: tools/docs/model-values.mjs predictiveMachinery, identical ops). The retired
 // device (PREDICT_COEFFS_PHYSICAL, ~2,421 fitted terms per planet reproducing the RETIRED
 // geometric scene's exported RA rate) and its residual rows (κ ≤ 1.4″/cy, the angleCorrection
-// marker offset) are gone — docs/retired-record.md. The chain's DYNAMICAL rate of date is a
+// marker offset) are gone. The chain's DYNAMICAL rate of date is a
 // different quantity (a window rate; the outer planets' are great-inequality-dominated and
 // Neptune's ϖ swings ~16°/cy on its near-zero e) and lives on the planet panel's chain rows,
 // never under a lattice label.
@@ -46676,7 +46675,7 @@ const planetStats = {
        hover : [`|e| wobble period = the beat of the two largest secular modes of Mercury's eccentricity vector (base mode × largest companion — the two rows below; the model's own N-body mode table, doc 109 §11). Replaces the retired law-loop beat of the device axial and ICRF periods.`]},
       {label : () => `Obliquity Cycle (observed)`,
        value : [ { v: () => 895000, dec:0, sep:',' },{ small: 'years' }],
-       hover : [`Published observed obliquity-oscillation period for Mercury (~895,000 yr, Bills 2005). Shown as an observation — the retired integer-decomposition prediction is archived (retired record; doc 109 §9).`],
+       hover : [`Published observed obliquity-oscillation period for Mercury (~895,000 yr, Bills 2005). Shown as an observation — the retired integer-decomposition prediction is archived (doc 109 §9).`],
        observed: true},    null,
     null,
       { viz: 'perihelion-chart', planet: 'mercury' },
@@ -47296,7 +47295,7 @@ const planetStats = {
        hover : [`|e| wobble period = the beat of the two largest secular modes of Mars's eccentricity vector (base mode × largest companion — the two rows below; the model's own N-body mode table, doc 109 §11). Replaces the retired law-loop beat of the device axial and ICRF periods.`]},
       {label : () => `Obliquity Cycle (observed)`,
        value : [ { v: () => 124800, dec:0, sep:',' },{ small: 'years' }],
-       hover : [`Published observed obliquity-oscillation period for Mars (~124,800 yr class). Shown as an observation — the retired integer-decomposition prediction is archived (retired record; doc 109 §9).`],
+       hover : [`Published observed obliquity-oscillation period for Mars (~124,800 yr class). Shown as an observation — the retired integer-decomposition prediction is archived (doc 109 §9).`],
        observed: true},    null,
     null,
       { viz: 'perihelion-chart', planet: 'mars' },
@@ -51274,7 +51273,7 @@ function _k8UpdateStandardOverlayInner() {
 
 // (R4: the C-3/D4d tilt-and-azimuth correction _applyHybridTiltCorrB on the
 // wrapper Group is RETIRED — the axis takes its world rotation from the engine
-// frame in _applyEngineEarthFrame; docs/41, docs/retired-record.md.)
+// frame in _applyEngineEarthFrame; docs/41.)
 
 function updatePositions() {
   // Derive the frame rotation BEFORE the anchor reads (the triad
@@ -52637,7 +52636,7 @@ function updatePerihelion() {
 // chain block below overwrote every frame, so the integrator's display reach
 // was already zero. Earth's i_inv/Ω of date are inclInvPlaneModel /
 // ascNodeInvPlaneModel (the one-source engine normal; R9); the planets' are
-// the chain's elements of date. docs/retired-record.md is the record.
+// the chain's elements of date.
 
 /**
  * Update all planet ascending nodes and arguments of periapsis from the
@@ -53873,7 +53872,7 @@ function updatePredictions() {
   // 4-mean; after R4 the rendered Sun IS the certified Sun whose mean
   // longitude integrates this family, so "measured" and "analytic" were one
   // evaluator read two ways (they agreed to sub-0.5 s) — the measurement
-  // instrument is retired with the D4b solver (docs/retired-record.md).
+  // instrument is retired with the D4b solver.
   o.solarYearDays = _hybridSpinActive()
     ? _cardinalYearSeconds(yearForFormula, 'MEAN') / 86400
     : computeSolarYearDaysDirect(yearForFormula);
@@ -54145,8 +54144,8 @@ function updatePredictions() {
   // The rows are therefore seeded by a JD — the calendar year's midpoint —
   // and each is the crossing nearest it (unique within ±½ tropical year), so
   // the displayed year's own events show at every epoch. (2) The D4b scene
-  // re-solve with its frozen J2000 anchor offset is RETIRED
-  // (docs/retired-record.md): after R4 the rendered Sun IS the certified Sun,
+  // re-solve with its frozen J2000 anchor offset is RETIRED:
+  // after R4 the rendered Sun IS the certified Sun,
   // so the scene solve measured the package's own GEOMETRIC crossing (14 min
   // before the apparent instant) and bridged it to the retired-device anchors
   // with the 2000 nutation phase frozen in — against USNO 2000 the panel read
@@ -54802,7 +54801,7 @@ function calcERD(year) {
 // predict feature basis, PREDICT_COEFFS_PHYSICAL and predictGeocentricPrecession
 // — left this engine at plan 06 R8: it reproduced the RETIRED geometric
 // scene's exported Earth-frame RA rate; the rate is now the equatorial
-// projection of the lattice motion, perihelionFrameBreakdown. docs/retired-record.md.)
+// projection of the lattice motion, perihelionFrameBreakdown.)
 
 
 // (Plan 07 R5: computePlanetInvPlaneInclinationDynamic — the ψ-law
