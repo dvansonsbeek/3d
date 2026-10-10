@@ -1,7 +1,6 @@
 {
   "_comment": "Generator attribution for tracked data/*.json artifacts that predate self-describing meta/inputs blocks (Phase 12). Every tracked JSON under data/ must either carry a meta/_meta/inputs/_description/generated_by field or appear here — enforced by tools/verify/data-provenance.js. New artifacts must be self-describing; this ledger is closed legacy inventory (mined by grep, multi-candidate rows resolved by hand).",
   "files": {
-    "N-scaling-refinements.json": "tools/explore/refine-N-scaling-formulas.js",
     "cenogrid-mtm-ftest.json": "scripts/cenogrid_mtm_ftest.py",
     "climate-ecs-boron.json": "scripts/climate_ecs_boron.py",
     "climate-ecs-cross-proxy.json": "scripts/climate_ecs_cross_proxy.py",
@@ -13,7 +12,6 @@
     "climate-ecs-tight.json": "scripts/climate_ecs_tight.py",
     "eight-h-history.json": "scripts/eight_h_history.py",
     "evolving-8h-test.json": "scripts/test_evolving_8h_climate_formula.py",
-    "h5-scan-results.json": "tools/explore/scan-h5-lod.js",
     "h8-subband-stability.json": "scripts/h8_subband_scan.py",
     "insolation-extension-results.json": "scripts/milankovitch_insolation_extension.py",
     "insolation-laskar-check-results.json": "scripts/milankovitch_insolation_laskar_check.py",
@@ -31,17 +29,10 @@
     "l1-vs-laskar-eigenmodes.json": "scripts/l1_vs_laskar_eigenmodes.py",
     "milankovitch-8h-cenogrid-spectral.json": "scripts/milankovitch_8h_cenogrid_spectral.py",
     "milankovitch-8h-cenogrid-windowed.json": "scripts/milankovitch_8h_cenogrid_windowed.py",
-    "moon-elements-solve-for-fixed-N.json": "tools/explore/solve-moon-elements-for-fixed-N.js",
     "moon-months-audit.json": "tools/explore/audit-moon-months.js",
-    "moon-precession-deep-time.json": "tools/explore/derive-moon-precession-deep-time.js",
     "paleo-l1-renumbering.json": "scripts/paleo_l1_renumbering.py",
     "planet_eccentricity_cache.json": "tools/fit/python/planet_eccentricity_jpl.py",
-    "scaling-N-proposal.json": "tools/explore/explore-scaling-N-proposal.js",
     "solar-8H-lattice-test.json": "scripts/solar_8H_lattice_test.py",
-    "v4-a2-multiplet-18000yr.json": "tools/explore/v4-a2-multiplet.js",
-    "v4-a2-multiplet-2000yr.json": "tools/explore/v4-a2-multiplet.js",
-    "v4-a2-multiplet-6000yr.json": "tools/explore/v4-a2-multiplet.js",
-    "v4-sensitivity.json": "tools/explore/v4-sensitivity-scan.js",
     "webgeocalc-cache.json": "tools/lib/webgeocalc-client.js"
   }
 }

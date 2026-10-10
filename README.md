@@ -49,7 +49,7 @@ The same machinery, checked against independent records across six orders of mag
 | Cardinal points (equinoxes and solstices) | JPL Horizons, −3000 to +2000 | <!--v:cardinalVsHorizonsMeanMin-->−0.71<!--/v--> min mean |
 | Solar eclipses | <!--v:solarAudit26Total-->26<!--/v-->-event documented audit, −762 to 2026 CE | <!--v:solarAudit26ScanReach-->21<!--/v-->/<!--v:solarAudit26Total-->26<!--/v--> with the umbra reaching the observation site |
 | Lunar eclipse timings | Stephenson 2016, <!--v:lunarEventsTotal-->267<!--/v-->-event set | <!--v:lunarResidualMinutes-->20.2<!--/v--> min mean \|residual\|, with zero parameters fitted to eclipse data |
-| Earth's obliquity | La2004 | <!--v:epsHybridEraRms13KyrArcsec-->50<!--/v-->″ rms over 13 kyr |
+| Earth's obliquity | La2004 (theory) | <!--v:obliqVsLa2004RmsLast100KyrArcsec-->1.2<!--/v-->″ rms over the last 100 kyr; <!--v:obliqVsLa2004RmsLastMyrArcsec-->13.1<!--/v-->″ rms over the last 1 Myr |
 | Climate record | CenCO2PIP, 0–66 Ma | R² = <!--v:canonCenco2pipTotal-->0.692<!--/v--> |
 | Devonian day count | Wells 1963 coral growth bands, 380 Ma | <!--v:anchorWellsFlagship380Pred-->399.96<!--/v--> days per year predicted against the paleontological 400 (<!--v:anchorWellsFlagship380DeltaPct-->−0.01<!--/v--> %) |
 | Deep-time precession | Dated Precambrian sections | gated at 1.4 and 2.46 Ga |

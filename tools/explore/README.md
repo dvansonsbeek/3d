@@ -1,18 +1,20 @@
 # `tools/explore` — frozen research one-offs
 
-**Status: FROZEN.** ~150 single-purpose investigation scripts kept as the
+**Status: FROZEN.** 135 single-purpose investigation scripts kept as the
 provenance behind findings that are written up in `docs/`. They are not
-production code, not a library, and not maintained. Closed-campaign
-scripts whose findings are fully written up move to the untracked
-`archive/` subdirectory (gitignored; git history is the record) — the
-2026-09 sweep moved 63 there.
+production code, not a library, and not maintained. A script stays here
+while something names it — a live doc, shipped code citing it as a
+derivation's record, a governed artifact's generator or inputs block, or a
+script that is itself kept. Everything else moves to the untracked
+`archive/` subdirectory (gitignored; git history is the record).
 
 ## What that means concretely
 
 - **Nothing imports them.** Measured, not assumed: there are zero
   `require()` / `import` edges from anywhere else in the repo into this
-  directory. Fourteen of the scripts require each other; those edges stay
-  inside the folder.
+  directory (the generators in `tools/verify/` spawn a few of these as
+  labs by path). A few dozen of the scripts require each other; those
+  edges stay inside the folder.
 - **Exempt from lint, typecheck and CI** by policy (§2e). `eslint.config.mjs`
   ignores `tools/**`, and the CI check job's scope is `packages/` only.
 - **Read-only against the model.** They consume `tools/lib` and the JSON

@@ -5,8 +5,8 @@ System Resonance Theory (ESSRT). The model is analytic and parametric, valid
 across ±500 Myr. [Preprint](https://doi.org/10.21203/rs.3.rs-8758810/v4) ·
 [Live demo](https://3d.holisticuniverse.com)
 
-**Scale:** `src/script.js` ~60,000 lines · `tools/` ~240 tracked JS scripts
-across 9 directories (~360 on disk with the untracked local archives) · ~245 Python files · 35 docs (37 retired docs archived out of the tree to `docs/archive/retired/`, gitignored — git history carries their diffs — and the strip-and-restructure pass merged five more into their live homes) · one web UI (the simulator; the Data Explorer dashboard is retired).
+**Scale:** `src/script.js` ~60,000 lines · `tools/` ~225 tracked scripts
+across 14 directories (~395 on disk with the untracked local archives) · ~80 Python files · 35 docs (37 retired docs archived out of the tree to `docs/archive/retired/`, gitignored — git history carries their diffs — and the strip-and-restructure pass merged five more into their live homes) · one web UI (the simulator; the Data Explorer dashboard is retired).
 **`npm run check` enforces a twenty-six-step gate chain; CI runs it plus a
 headless-browser job and auto-deploys the simulator to GitHub Pages on
 green main.**
@@ -494,7 +494,7 @@ what actually made corrections stick here.
 | `tools/fit/` | CLI shims for the fitting pipeline — implementations live in `packages/fitting/src` |
 | `tools/verify/` | 24 scripts: 5 gate · 1 liftable · 6 narrative · 12 generator (`npm run test:verify:list`) |
 | `packages/physics`, `packages/model-values` | the published npm packages (@essrt scope) — the website and world consume these; refits reach them via `values:package:write` + republish |
-| `tools/explore/` | ~200 research one-offs — findings live in `docs/` |
+| `tools/explore/` | 135 frozen research one-offs — findings live in `docs/`; a script stays only while something names it (its README states the rule) |
 | `public/input/fitted-coefficients.json` | single source of truth for fitted values |
 | `docs/` | 75 numbered docs; `40-architecture`, `99-essrt` are cross-referenced |
 
