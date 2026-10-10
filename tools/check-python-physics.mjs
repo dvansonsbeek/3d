@@ -65,21 +65,14 @@ const GUARDED = [
  * Remove an entry when its file starts importing from constants_scripts.
  */
 const LEDGER = {
-  'scripts/action_closure_test.py': 'frozen analysis — pins H at run time',
-  'scripts/eight_h_derivation_test.py': 'frozen analysis — derives 8H from H',
   'scripts/eight_h_history.py': 'frozen analysis — H_NOW is the anchor of a history plot',
-  'scripts/framework_vs_laskar_models.py': 'frozen comparison against Laskar',
-  'scripts/h_multiple_scan.py': 'frozen scan over H multiples',
   'scripts/hallstatt_cheng_speleothem.py': 'frozen archive comparison',
   'scripts/hallstatt_epica_co2.py': 'frozen archive comparison',
   'scripts/hallstatt_steinhilber_amplitude.py': 'frozen archive comparison',
-  'scripts/laplace_lagrange_first_principles.py': 'frozen LL derivation',
   'scripts/lattice_harmonic_scan.py': 'pipeline-adjacent scan; H annotated with its factorisation',
-  'scripts/lod_oscillation_signature_test.py': 'frozen signature test',
   'scripts/lod_residual_lattice_fit.py': 'frozen residual fit',
   'scripts/paleo_l1_renumbering.py': 'frozen L1 renumbering',
   'scripts/paleo_lod_comparison.py': 'frozen paleo comparison',
-  'scripts/precession_band_disambiguation.py': 'frozen band disambiguation',
   'scripts/test_evolving_8h_climate_formula.py': 'frozen climate-formula test',
   // predict_tilt_from_eccentricity.py was here until its label was made
   // dynamic — this gate's drift rule caught it pinned at 23.41357 after the

@@ -2,7 +2,7 @@
 Full 8H integer-divisor scan against the Stephenson ΔT residual, with
 Jupiter-Saturn-Earth (J-S-E) resonance interpretation for each top divisor.
 
-Analogous to milankovitch_8h_divisor_spectrum.py (which scans against
+Analogous to the archived milankovitch_8h_divisor_spectrum.py (which scans against
 LR04 paleoclimate), but scans against the L-5b eclipse-timing residual
 instead. Reports the top divisors that reduce the medieval bump, and
 cross-references each with the closest J-S-E orbital/synodic count.

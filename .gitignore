@@ -26,6 +26,7 @@ tools/explore/archive/
 tools/fit/archive/
 tools/archive/
 scripts/archive/
+data/archive/
 tools/results/pipeline.log
 web-bundles/
 tools/cardinal-points-training.json

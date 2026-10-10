@@ -197,15 +197,7 @@ Run in dependency order when model parameters change. See [`tools/fit/README.md`
 
 ### `scripts/` — Python Analysis
 
-Statistical analysis and verification scripts. Install dependencies with `pip install -r requirements.txt`.
-
-| File | Description |
-|------|-------------|
-| `fibonacci_significance.py` | Monte Carlo + permutation significance analysis for the historical integer-ratio structure (retired framing; 11 tests across 3 null distributions, Stouffer's Z combining with correlation correction) |
-| `fibonacci_exoplanet_test.py` | TRAPPIST-1 exoplanet integer-ratio test (historical) |
-| `fibonacci_eccentricity_scale.py` | Eccentricity balance scale: weight formula, per-planet breakdowns, offset ratios |
-| `fibonacci_eccentricity_structure.py` | Structural decomposition, mirror pair conservation, 10-direction exploration, statistical tests |
-| `predict_tilt_from_eccentricity.py` | K amplitude constant (Law 4) investigation |
+The analysis and verification scripts: the climate formula and its tests, the ΔT/LOD stack, the eclipse data pipeline, the deep-time cross-check and the browser-modal exports. Install dependencies with `pip install -r requirements.txt`; the [Python Scripts README](../scripts/README.md) is the index.
 
 > The shared Python library (`constants_scripts.py`, `predictive_formula.py` — Earth's perihelion/ERD/obliquity helpers — and `planet_beats.py`) lives in [`tools/lib/python/`](../tools/lib/python/README.md).
 

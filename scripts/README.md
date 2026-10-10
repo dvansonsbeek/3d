@@ -1,8 +1,6 @@
 # Analysis Scripts — Investigation & Verification
 
-Python (and a few JavaScript) scripts for investigating, verifying, and reproducing the results of the [Expanding Solar System Resonance Theory (ESSRT)](https://www.holisticuniverse.com).
-
-Part of this collection is the research record of the RETIRED integer-relation framing (the former "six Fibonacci Laws" — plan 07 R5/R6 deleted the ψ and K laws; the `fibonacci_*` scripts and their result files are kept as the frozen evidence of that investigation, not as live claims). The rest are the live analyses: the climate formula, the LOD/ΔT stack, the paleo anchors, the lattice null tests. Every script imports the model through the §2f bridge below, and `npm run test:py-smoke` imports each one so the collection cannot rot unseen again. The research originally sought relations that connect planetary orbital tilts, eccentricities, and precession rates to the Earth Fundamental Cycle timescale (H; see [Constants Reference](../docs/20-constants-reference.md)).
+Python (and a few JavaScript) scripts for investigating, verifying, and reproducing the results of the [Expanding Solar System Resonance Theory (ESSRT)](https://www.holisticuniverse.com): the climate formula and its tests, the ΔT/LOD stack, the eclipse data pipeline, the deep-time cross-check and the browser-modal exports. Every script imports the model through the §2f bridge below, and `npm run test:py-smoke` imports each one so the collection cannot rot unseen.
 
 > **§2f — analysis only, and it is enforced.** Python here may **read** the
 > model: import from [`tools/lib/python/constants_scripts.py`](../tools/lib/python/constants_scripts.py),
@@ -14,187 +12,131 @@ Part of this collection is the research record of the RETIRED integer-relation f
 >
 > A *frozen* analysis may pin the value it ran at — that is provenance, not a
 > fork — but the pin goes on the gate's ledger, and the gate then asserts the
-> pin still matches the live model. Sixteen scripts currently pin
-> `H = 335317`; the day H is recalibrated they all go red at once, which is
-> the intended behaviour. New work should import from `constants_scripts`
-> rather than add a ledger entry.
+> pin still matches the live model. Nine scripts currently pin the anchor;
+> the day it is recalibrated they all go red at once, which is the intended
+> behaviour. New work should import from `constants_scripts` rather than add
+> a ledger entry.
 
-> **How this README is organized.** Each section lists the **canonical entry-point script(s)** for a given topic with a short description, followed by a one-line note pointing at the supporting scripts in the same folder (and the doc that catalogs them per test). This README is intentionally curated — for the full per-test mapping, see the corresponding doc. Browse the folder directly for the supporting scripts.
+> **Shared library** (`constants_scripts.py`, `predictive_formula.py` — Earth's perihelion/ERD/obliquity helpers — and `planet_beats.py`) lives in [`tools/lib/python/`](../tools/lib/python/README.md). All scripts here load it via `sys.path` at startup.
+
+Finished investigations leave this folder for `scripts/archive/` (gitignored; git history carries the files) together with their result files (`data/archive/`). A script stays here when a gate runs it, a governed artifact names it as generator, a live document cites it, or another script imports it.
 
 ---
 
 ## Quick Start
 
 ```bash
-# Run the statistical significance test (~2–3 min, 100k MC trials)
-python fibonacci_significance.py
-# → writes data/significance-results.json (consumed by the model-values registry → @essrt/model-values)
+# The canonical climate formula fit — the governed generator of
+# data/milankovitch-climate-formula.json
+python3 milankovitch_climate_formula.py
 
-# Verify J2000 eccentricity formation constraints
-python fibonacci_j2000_eccentricity.py
-
-# Run the canonical 32-component climate formula fit
-python milankovitch_climate_formula.py
-# → writes data/milankovitch-climate-formula.json
-#   (consumed by src/script.js Orbital Forcing Formula Explorer)
-
-# Run the deep-time Architecture α canonical 9-step chain at Devonian
-python devonian_cross_check.py
+# The deep-time chain cross-check at the Devonian (t = 380 Ma)
+python3 devonian_cross_check.py
 ```
 
 ---
 
-## Script Overview
+## Governed generators
 
-> **Shared library** (`constants_scripts.py`, `predictive_formula.py` — Earth's perihelion/ERD/obliquity helpers — and `planet_beats.py`) lives in [`tools/lib/python/`](../tools/lib/python/README.md). All scripts here load it via `sys.path` at startup.
+These write artifacts that `npm run check` re-checks against their recorded input hashes (`check:artifacts`) or renders into the docs (`docs:tables`).
 
-### Statistical Significance
+| Script | Produces |
+|--------|----------|
+| `milankovitch_climate_formula.py` | `data/milankovitch-climate-formula.json` — the canonical L1 + L2 + L3 climate formula, fit per regime with sequential ridge regression; the Earth Climate Analysis modal's coefficients |
+| `l1_physical_lines.py` | `data/l1-physical-lines.json` — **the one home** of the climate formula's orbital line list (the beats of the engine's secular modes and the precession clock, plus the 405.6-kyr family) |
+| `t1_beat_model_vs_comb.py` | `data/t1-beat-model-vs-comb.json` — pre-registered test T1: the L1 lattice against the physical beat model |
+| `t5_dt_stack_lattice_null.py` | `data/t5-dt-stack-lattice-null.json` — pre-registered test T5: the ΔT-stack cycles against a random-comb null |
+| `t7_fixed_phase_l1.py` | `data/t7-fixed-phase-l1.json`, `data/t7-model-orbital-histories.json` — pre-registered test T7: the fixed-phase L1 |
+| `jupiter92_isolated_refit.py` | `data/jupiter92-isolated-refit.json` — the Jose-5 phase-isolation refit against the Stephenson ΔT residual |
+| `generate_doc97_tables.py` | the generated table blocks of [doc 92](../docs/92-climate-formula.md) (`npm run docs:tables`; `--check` in the gate chain) |
 
-| Script | Description |
-|--------|-------------|
-| `fibonacci_significance.py` | Statistical significance of the Fibonacci Laws. 11 tests across 3 null distributions (permutation, log-uniform Monte Carlo, uniform Monte Carlo). Headline combined p spans 1.4 × 10⁻⁴ to 6.8 × 10⁻⁶ (3.6σ–4.4σ). Output: `data/significance-results.json` |
-| `test_fibonacci_significance.py` | Regression test: locks in the 11 observed test statistics to guard against silent drift when underlying constants change. |
+---
 
-### The retired integer relations (record only — plan 07 R5/R6)
-
-| Script | Laws tested (retired) | Description |
-|--------|-------------|-------------|
-| `fibonacci_eccentricity_scale.py` | Laws 4, 5 | The solar system as an eccentricity balance scale — K constant + per-planet breakdowns |
-| `fibonacci_eccentricity_structure.py` | Laws 4, 5 | Two-component decomposition (base + amplitude), mirror pair conservation |
-| `predict_tilt_from_eccentricity.py` | Law 4 | K amplitude constant — universality, tilt prediction, K-ψ relations |
-
-Plus `fibonacci_amd_structure.py` and `fibonacci_law4_balance_search.py` for systematic AMD-based and single-balance-equation investigations.
-
-### Formation & Exoplanet Tests
+## The climate formula — tests and diagnostics ([doc 92](../docs/92-climate-formula.md), [doc 94](../docs/94-insolation-null-test.md))
 
 | Script | Description |
 |--------|-------------|
-| `fibonacci_j2000_eccentricity.py` | J2000 eccentricities as formation-epoch Fibonacci constraints (p < 10⁻⁵) |
-| `fibonacci_trappist1_deep.py` | TRAPPIST-1: Fibonacci period ratios, super-period = 311 × P_b, additive triads |
-| `fibonacci_311_deep.py` | Deep investigation of R = 311 as a Fibonacci primitive root prime |
+| `milankovitch_8h_all_integer_mtm.py` | All-integer MTM F-test scan across the comb (doc 92 §2) |
+| `milankovitch_8h_cheng_chronology_validation.py` | Independent-chronology validation on the Cheng 2016 speleothem record (doc 92 §4) |
+| `fit_methodology_diagnostics.py` | Diagnostics on the L1 design matrix: collinearity, ridge path, per-regime conditioning (doc 92 §8) |
+| `milankovitch_insolation_extension.py` | Does adding Berger insolation features to the formula buy cross-window-stable gain? (doc 94) |
+| `milankovitch_insolation_laskar_check.py` | The same test hardened on La2004/La2010 orbital features (doc 94) |
+| `milankovitch_insolation_stability.py` | Cross-window stability of the insolation extension (doc 94) |
+| `extract_insolation_features.js` | Extracts the Berger insolation features at the LR04 sample times (`data/insolation-features.csv`) |
+| `extract_insolation_features_deep.js` | The deep-source feature set — hybrid obliquity, deep orbital history, the physical climatic precession of date (`data/insolation-features-deep.csv`) |
+| `milankovitch_l1_n24_attribution.py` | Attribution of the pre-iNHG eccentricity gain (doc 94) |
+| `milankovitch_l1_divisor_audit.py` | Every shipped line on the same footing, per regime (doc 94) |
+| `milankovitch_ecc_period_scan.py` | Which period the climate record prefers for Earth's eccentricity line (doc 94) |
+| `climate_formula_mwp_check.py` | Does the formula coincidentally place a peak at the Medieval Warm Period? |
 
-Plus `fibonacci_311_analysis.py` (R = ψ/ξ_V = 311 factor analysis) and `fibonacci_exoplanet_test.py` (broader TRAPPIST-1 + Kepler-90 tests).
+**The variance-budget record** — the comb-era decomposition that led to the physical line set (doc 92 §§1–8; its result files feed the registry and the doc 92 tables; the rest of the comb-era test ledger is in `scripts/archive/`): `milankovitch_8h_variance_budget.py` (Tier A) and `milankovitch_8h_variance_budget_tier_b.py`, `milankovitch_8h_variance_budget_tier_b_r2.py`, `milankovitch_8h_variance_budget_tier_b_r3.py` (Tier B rounds 1–3); `milankovitch_8h_cenogrid_spectral.py`, `milankovitch_8h_cenogrid_windowed.py` and `cenogrid_mtm_ftest.py` (the CENOGRID spectral evidence, [doc 106](../docs/106-deep-time-validation-dossier.md)).
 
-### Milankovitch & Paleoclimate (Docs 90–95)
+**Framework vs Laskar and N-body** — `l1_vs_laskar_eigenmodes.py` (do the lines correspond to Laskar 2004 eigenmode beats — the module the attribution scripts import), `l1_vs_laskar_50myr.py` and `l1_vs_laskar_published_50myr.py` (the match across −50 Myr, forward-integrated and published LA2004), `nbody_50myr_backward.py` (the backward N-body ground truth; needs `rebound`, see [data/PROVENANCE.md](../data/PROVENANCE.md)), `l1_invariant_test.py` and `equilibrium_libration_test.py` (invariant-manifold and libration hypotheses), `h8_subband_scan.py` and `l1_fibonacci_stability_test.py` (sub-band and stability scans read by the doc 92 tables), `solar_8H_lattice_test.py` (the cross-domain test in solar-activity records), `eight_h_history.py`, `paleo_l1_renumbering.py` and `test_evolving_8h_climate_formula.py` (the lines under the evolving clock — [doc 99](../docs/99-expanding-solar-system-resonance-theory.md); the last is a NULL result at the Phanerozoic).
 
-Empirical tests on LR04 + Cheng 2016 + EPICA + CENOGRID paleoclimate records, building toward the canonical 32-component 8H integer-divisor climate formula (L1 + L2 + L3, sequential ridge fit per regime).
+---
 
-**Main pipeline** (produces the formula + per-planet attribution):
+## Climate sensitivity (ECS) — record
 
-| Script | Description |
-|--------|-------------|
-| `milankovitch_climate_formula.py` | **The headline result.** Canonical three-layer climate formula — 32 L1 integers + 3 L2 thermostat lines + 6 L3 Heaviside step transitions, fit per regime with sequential ridge regression. Per-regime R²: post-MPT = 0.87, EPICA CO₂ = 0.85, CenCO2PIP 0–66 Ma = 0.76. Forward-projects 250 kyr (next natural glaciation peak ~58 kyr ahead). Output: `data/milankovitch-climate-formula.json` — also consumed by `src/script.js` (Orbital Forcing Formula Explorer modal). |
-| `milankovitch_8h_divisor_spectrum.py` | Single-component OLS amplitude scan over all integer divisors of 8H = 2,682.536 kyr. Source of the §2.2 integer table. |
-| `milankovitch_8h_closure_test.py` | **8H integer-lattice closure test** (doc 91 §7.3). Fits all 200 divisors jointly to LR04 (R² = 0.443) and scans residuals at non-integer positions. No orphan peaks land in empty regions of the lattice. |
-| `milankovitch_8h_beat_decomposition.py` | Enumerates physical interpretations (climatic-precession k+g_j, obliquity k+s_j, eccentricity g_j−g_k, etc.) using Laskar 2004 secular eigenfrequencies. |
-| `milankovitch_planet_climate_match.py` | Per-planet match counts: cross-references LR04 peaks against the doc 55 8H/n period table (8 planets × 6 cycle types). |
+Charney-ECS decomposition across paleoclimate eras on the L1 lines, cross-validated on LR04, EPICA, Snyder GAST and boron-isotope CO₂ reconstructions. The write-up is archived; the datasets and their rows stay in [data/PROVENANCE.md](../data/PROVENANCE.md).
 
-**Spectral / supporting tests** (~4 scripts): `milankovitch_spectral_tests.py` (Lomb-Scargle + multitaper + Hinich bispectrum; 405-kyr absence + LR04-vs-Cheng chronology-bias), `milankovitch_candidate_amplitudes.py` (Berger candidates vs Holistic H-divisors head-to-head), `milankovitch_temporal_structure.py` (non-stationarity diagnostics), `mpt_transition_analysis.py` (pre-MPT vs post-MPT amplitude growth).
+`climate_ecs_tight.py` (the entry point: frequency-dependent ice fraction, regime-conditional kernels), `climate_ecs_cross_proxy.py`, `climate_ecs_boron.py`, `climate_ecs_full_forcing.py`, `climate_ecs_monte_carlo.py`, `climate_ecs_per_regime.py`, `climate_ecs_snyder.py`, `climate_ecs_phase_lag.py`.
 
-**Pre-registered Tests A–N + 8H super-cycle** (doc 91 §10 + §12): ~17 scripts including `milankovitch_8h_super_cycle_test.py` (NULL result), `milankovitch_8h_cenogrid_spectral.py`, `milankovitch_8h_cenogrid_windowed.py`, plus one script per test (`milankovitch_8h_13h_boulila_check.py` for Test A, `milankovitch_8h_cheng_*.py` for Test B0/B1/B2/B3, `milankovitch_8h_random_period_null.py` for Test C, etc. through Test N). The per-test mapping (doc 91 §12) is archived.
+---
 
-**405-kyr investigation** (doc 92 §6): 7 scripts `milankovitch_8h_405k_*.py` characterizing the 405-kyr line as a carbon-cycle internal resonance rather than a Venus-Jupiter beat (404.5 kyr line centre, 2.59× amplitude decline from Paleocene to Pliocene, δ¹³C/δ¹⁸O ratio 1.53× at 405 kyr). See [doc 92](../docs/92-climate-formula.md) §6.
-
-**Variance budget + follow-ups** (doc 92): ~10 scripts including the variance-budget cluster (`milankovitch_8h_variance_budget*.py` Tier A/B rounds 1-3), `milankovitch_inclination_test.py`, `milankovitch_insolation_extension.py`, `milankovitch_insolation_laskar_check.py`, `milankovitch_l1_dual_attribution.py`, `milankovitch_late_pliocene_analogue.py`, `milankovitch_timing_offset_diagnosis.py`, `fit_methodology_diagnostics.py`, plus `climate_formula_mwp_check.py` (Medieval Warm Period climate-formula check).
-
-### Paleoclimate ECS Decomposition (Doc 97)
-
-Climate sensitivity (Charney ECS) decomposition across paleoclimate eras using the 8H L1 lattice. Cross-proxy validation on LR04, EPICA, Snyder GAST, and multiple boron-isotope CO₂ reconstructions (0–67 Ma). (Write-up archived.)
+## The ΔT / LOD stack ([doc 102](../docs/102-gia-alpha-lunar-validation.md), [doc 104](../docs/104-millennial-rotation-swing.md), [doc 105](../docs/105-dt-stack-flag-audit.md))
 
 | Script | Description |
 |--------|-------------|
-| `climate_ecs_tight.py` | **Tightened ECS** — frequency-dependent ice fraction (replaces constant f_ice=0.6), regime-conditional forcing kernels, refined error budget. Recommended entry point. |
-| `climate_ecs_cross_proxy.py` | Cross-proxy validation of L1 amplitude structure across δ¹⁸O / CO₂ / GAST. |
+| `lattice_harmonic_scan.py` | Universal harmonic-divisor scan across the paleoclimate and solar archives — the companion of the ΔT fitter `tools/fit/dt-corrections-fit.js` (`data/lattice-scan-*.json`) |
+| `lod_residual_lattice_fit.py` | Sub-kyr harmonic fit to the Stephenson ΔT residual — the module the residual scripts import |
+| `lod_residual_lattice_cv.py` | Out-of-sample cross-validation of that fit |
+| `lod_residual_shipped_stack_cv.py` | Out-of-sample cross-validation of the SHIPPED 4-flag ΔT stack (doc 105) |
+| `lod_residual_divisor_scan_jse.py` | Full divisor scan against the residual with the Jose cycles |
+| `lod_residual_quad_fit.py`, `lod_residual_triple_bond_hallstatt_jose5.py`, `lod_residual_bond_plus_hallstatt.py`, `lod_residual_1851_refit.py` | The joint-fit variants whose results are `data/deltaT-*-fit.json` |
+| `export_bond_cycle_residual_fit.py` | Exports the validated Bond-cycle fit to the residual (`data/deltaT-bond-cycle-residual-fit.json`) |
+| `hallstatt_cheng_speleothem.py`, `hallstatt_epica_co2.py`, `hallstatt_steinhilber_amplitude.py` | The Hallstatt-cycle tests on the Cheng 2016, EPICA CO₂ and Steinhilber archives (`data/hallstatt-*-fit.json`) |
+| `paleo_lod_comparison.py` | Paleo-LOD evidence: the framework's length-of-day history against the mainstream reconstructions (doc 99) |
+| `stephenson_observation_density.py` | Observation-density analysis across the Stephenson 2016 tables — which centuries are well observed |
+| `parse_stephenson_deltaT_polynomial.py` | Parses the Stephenson 2016 piecewise ΔT polynomial → `public/input/stephenson-2016-deltaT-polynomial.json` |
 
-Plus 8 supporting scripts: `climate_ecs_boron.py` (boron-isotope CO₂ reconstructions), `climate_ecs_full_forcing.py` (CO₂ + ice-albedo + GHGs), `climate_ecs_monte_carlo.py`, `climate_ecs_per_regime.py`, `climate_ecs_phase_lag.py`, `climate_ecs_snyder.py`, `cenogrid_l1_lattice_extension.py`, `cenogrid_mtm_ftest.py`.
+---
 
-### Lattice Mechanism (Doc 98)
-
-Physical mechanism behind the 8H lattice: action-angle closure, Chirikov resonance overlap, commensurability. (Write-up in the retired integer-label framing, archived.)
-
-| Script | Description |
-|--------|-------------|
-| `action_closure_test.py` | **Experiment A** — Action-angle closure test for the 8H period. Tests whether all 32 L1 integers' action vectors close on themselves modulo 8H. |
-| `chirikov_resonance_test.py` | **Experiment B** — Chirikov resonance overlap criterion at each L1 integer. |
-| `eight_h_derivation_test.py` | **Experiment 1** — derives 8H from Laskar eigenfrequency / LA2004 spectral data, validating the closure period. |
-
-Plus mechanism follow-ups + sub-lattice + stability scans (~12 scripts): `laplace_lagrange_first_principles.py` (Laplace-Lagrange secular eigenfrequencies from first principles), `solar_8H_lattice_test.py` (cross-domain test in solar-activity records), `equilibrium_libration_test.py`, `lod_oscillation_signature_test.py`, `paleo_lod_comparison.py`, `paleo_l1_renumbering.py`, `eight_h_history.py`, `h8_subband_scan.py`, `h_multiple_scan.py`, `l1_invariant_test.py`, `l1_fibonacci_stability_test.py`, `stability_sublattice_full_scan.py`, `precession_band_disambiguation.py`.
-
-### Deep-Time Architecture α (Doc 99)
-
-The deep-time extension framework — canonical 9-step chain from `t_Ma` through LOD, H, AU, M_Sun, Kepler year, Moon distance, Moon period, anomalistic year, stellar/sidereal days, planet orbital + synodic periods. See [doc 99 — Expanding Solar System Resonance Theory (ESSRT)](../docs/99-expanding-solar-system-resonance-theory.md).
+## Eclipse data pipeline ([doc 102](../docs/102-gia-alpha-lunar-validation.md), [doc 103](../docs/103-135-babylonian-case-study.md))
 
 | Script | Description |
 |--------|-------------|
-| `devonian_cross_check.py` | **Canonical 9-step chain verification at Devonian (t = 380 Ma).** All J2000 values match IAU to ppb precision; produces deep-time predictions for LOD (79,204 s), H (307,391 yr), Moon distance (370,402 km), Moon synodic month, anomalistic year, stellar/sidereal days, and planet orbital periods. Single source of truth for Architecture α numerics. |
-| `test_evolving_8h_climate_formula.py` | Tests whether time-evolving 8H(t) improves the climate formula vs constant 8H_now. **Result: NULL** at Phanerozoic (ΔR² < 0.002). |
+| `fetch_nasa_lunar_canon.py` | Scrapes NASA's 5-Millennium Canon of Lunar Eclipses (12,064 events) → `public/input/lunar-eclipses-nasa.json` |
+| `fetch_nasa_historical_lunar.py` | Parses NASA's "Lunar Eclipses of Historical Interest" |
+| `parse_stephenson_lunar.py` | Parses the Stephenson, Morrison & Hohenkerk 2016 timed-lunar tables → `public/input/lunar-eclipses-stephenson-2016.json` |
+| `parse_stephenson_solar.py` | Parses the Stephenson 2016 timed-solar tables → `public/input/solar-eclipses-stephenson-2016.json` |
 
-### Eclipse Data Pipeline (Docs 100–103)
+---
 
-Scripts that fetch and parse the historical eclipse datasets used by the ΔT validation work in [doc 102](../docs/102-gia-alpha-lunar-validation.md) and [doc 103](../docs/103-135-babylonian-case-study.md):
-
-| Script | Description |
-|--------|-------------|
-| `fetch_nasa_lunar_canon.py` | Scrapes NASA 5-Millennium Canon of Lunar Eclipses (12,064 events, −1999 BCE to +3000 CE) → `public/input/lunar-eclipses-nasa.json`. |
-| `fetch_nasa_historical_lunar.py` | Parses NASA "Lunar Eclipses of Historical Interest" (28 famous events). |
-| `parse_stephenson_lunar.py` | Parses Stephenson, Morrison & Hohenkerk 2016 timed-lunar supplementary tables (270 observations across S01/S02/S04/S05/S07/S09) → `public/input/lunar-eclipses-stephenson-2016.json`. |
-| `parse_stephenson_solar.py` | Parses Stephenson 2016 timed-solar tables (89 observations across S03/S06/S08) → `public/input/solar-eclipses-stephenson-2016.json`. |
-| `parse_stephenson_deltaT_polynomial.py` | Parses Stephenson 2016 piecewise ΔT polynomial for direct comparison against the framework's pure-tidal + α(t) ΔT. |
-| `stephenson_observation_density.py` | Observation-density analysis across Stephenson 2016 tables for diagnostic context (which centuries are well-observed, which are sparse). |
-
-### Framework vs Laskar / N-body comparisons
-
-Direct head-to-head tests against Laskar 2004 secular eigenmode theory + tidal-dissipation models.
+## Deep time ([doc 99](../docs/99-expanding-solar-system-resonance-theory.md))
 
 | Script | Description |
 |--------|-------------|
-| `framework_vs_laskar_models.py` | Direct comparison: framework's bounded-oscillator models vs LA2004's secular-eigenmode + tidal-dissipation models. |
-| `l1_vs_laskar_eigenmodes.py` | Tests whether the 8H L1 integers correspond to Laskar 2004 secular eigenmode beats — discriminates between framework interpretations. |
-| `nbody_50myr_backward.py` | Extends the in-repo 10-Myr forward N-body integration backward to −50 Myr — independent ground truth against the framework's L1 lattice. |
+| `devonian_cross_check.py` | The deep-time chain verified at the Devonian (t = 380 Ma): J2000 values against IAU, then the predicted day length, Moon distance, months, years and planet periods at depth |
 
-Plus `l1_vs_laskar_50myr.py` and `l1_vs_laskar_published_50myr.py` for forward-integrated and published-LA2004 50-Myr validations.
+---
 
-### Falsifiable Predictions
+## Browser-modal data exports
 
-| Script | Description |
-|--------|-------------|
-| `planet_nine_analysis.py` | Planet Nine prediction — falsifiable test from the Fibonacci balance laws. Two-tier structure (Law-4 compliance pre-check + full 7.5M-config v-balance search) confirms rejection of a major 9th planet at ETNO distances. (Prediction withdrawn with the Law framework; write-up archived.) |
-| `tno_balance_test.py` | TNO contribution to Law 5 balance — population-summed and individual approaches. |
-| `tno_obliquity_prediction.py` | Law-4 TNO obliquity predictions — derives expected TNO axial tilts from the K amplitude constant. |
-
-### Browser-Modal Data Exports
-
-One-shot utilities that prepare data for the in-app modals. Outputs are committed; no re-runs expected unless source data updates.
+One-shot utilities that prepare data for the in-app modals. Outputs are committed under `public/input/`; no re-runs expected unless source data updates.
 
 | Script | Description |
 |--------|-------------|
-| `export_climate_formula_browser.py` | Climate Formula coefficients → `public/input/climate-formula-data.json` (Orbital Forcing Formula Explorer modal). |
-| `export_cenogrid_browser.py` | Westerhold 2020 CENOGRID (δ¹⁸O + δ¹³C, 67-Myr) → `public/input/cenogrid-data.json`. |
-| `export_cenco2pip_browser.py` | CenCO2PIP atmospheric CO₂ proxy → `public/input/cenco2pip-data.json`. |
-| `export_epica_browser.py` | EPICA Dome C atmospheric CO₂ (Bereiter 2015) → `public/input/epica-co2-data.json`. |
-| `extract_insolation_features.js` | Extracts Berger 1978 insolation features (obliquity ε(t), eccentricity e(t), climatic-precession e·sin(ϖ) / e·cos(ϖ)) for the L1+L2+L3-vs-insolation tests (doc 94). |
-| `mass_uncertainty_monte_carlo.py` | Monte Carlo over planetary mass uncertainties → marginalized Law 5 balance distribution. |
+| `export_climate_formula_browser.py` | Climate-formula coefficients → `public/input/climate-formula-data.json` (the Earth Climate Analysis modal) |
+| `export_cenogrid_browser.py` | Westerhold 2020 CENOGRID (δ¹⁸O + δ¹³C, 67 Myr) → `public/input/cenogrid-data.json` |
+| `export_cenco2pip_browser.py` | CenCO2PIP atmospheric CO₂ proxy → `public/input/cenco2pip-data.json` |
+| `export_epica_browser.py` | EPICA Dome C CO₂ (Bereiter 2015) → `public/input/epica-co2-data.json` |
+| `process_climate_proxy.js` | The LR04 climate proxy → `public/input/climate-proxy.json` |
 
-### Bond cycle (deferred research artifacts)
+---
 
-The 8H/1825 = 1,469.88 yr "Bond cycle" lattice harmonic was investigated as a candidate explanation for the residual after α(t) GIA correction in doc 102. It fits the Holocene ΔT residual extremely well (cross-validation R² = +0.97 BCE-from-CE) but its integration into the live LOD chain was deferred because it broke the J2000 LOD anchor. The following research scripts are preserved as artifacts:
+## Utilities
 
-`export_bond_cycle_residual_fit.py`, `lod_residual_lattice_fit.py`, `lod_residual_lattice_cv.py`, `lod_residual_bond_devries_cv.py`. See [doc 102](../docs/102-gia-alpha-lunar-validation.md) §"Bond cycle" for the status discussion.
-
-### Utility scripts
-
-`test_phase0_inline.js` and `verify_cumul_integral.js` — JavaScript test/verification utilities for the deep-time chain's cumulative-integral implementation.
-
-### Completed searches — not shipped
-
-These finished their job and are not part of the repo. Their conclusions are
-recorded here so the negative results are not lost, and their successors are
-named where one exists:
-
-- R² pair reformulation search — concluded: all forms at noise level. Live successor: `fibonacci_law4_balance_search.py`
-- R² pair constraint verification — superseded by Law 4 = K constant
-- early 8-candidate multi-component amplitude fit — superseded by `milankovitch_candidate_amplitudes.py` and `milankovitch_climate_formula.py`
-- one-shot `data/lr04-stack.txt` → `public/input/lr04-data.json` converter — output is committed, no re-runs expected
+`test_phase0_inline.js` — validates the deep-time chain's cumulative-integral implementation against its own mirrored copies.
 
 ---
 
@@ -202,22 +144,24 @@ named where one exists:
 
 | File | Description |
 |------|-------------|
-| [`../data/01-holistic-year-objects-data.xlsx`](../data/01-holistic-year-objects-data.xlsx) | Excel data file with planet perihelions, fluctuations, Earth eccentricity/obliquity. All Fibonacci-Law scripts read from this via `constants_scripts.py`. |
 | [`../data/lr04-stack.txt`](../data/lr04-stack.txt) | LR04 benthic δ¹⁸O stack (Lisiecki & Raymo 2005, *Paleoceanography* 20, PA1003) — 5.3 Myr orbitally-tuned marine climate record. |
 | [`../data/cheng2016-speleothem.txt`](../data/cheng2016-speleothem.txt) | Cheng 2016 U-Th-dated Asian Monsoon speleothem record (*Science* 352, 343) — 640-kyr non-tuned chronology bias control. |
 | [`../data/epica-co2-bereiter2015.txt`](../data/epica-co2-bereiter2015.txt) | Bereiter et al. 2015 (*GRL* 42, 542) EPICA Dome C composite atmospheric CO₂ record — 0–800 kyr BP, Antarctic ice cores. |
 | [`../data/westerhold2020-cenogrid.tab`](../data/westerhold2020-cenogrid.tab) | Westerhold et al. 2020 (*Science* 369, 1383) CENOGRID — 67-Myr astronomically tuned benthic δ¹⁸O+δ¹³C reference splice. |
+
+Every dataset's source, citation and licence is in [data/PROVENANCE.md](../data/PROVENANCE.md); two datasets are not ours to redistribute and must be fetched separately (the download steps are there).
 
 ---
 
 ## Dependencies
 
 - **Python** 3.8+
-- **numpy** — numerical computations
+- **numpy**, **scipy** — numerical computations
 - **pandas** — data manipulation
 - **openpyxl** — Excel file reading
+- **astropy** — where a script converts calendar dates
 
-All dependencies are standard scientific Python packages.
+`pip install -r requirements.txt` in the repository root installs them.
 
 ---
 
@@ -231,4 +175,4 @@ All dependencies are standard scientific Python packages.
 
 ## License
 
-These scripts are part of the [Interactive 3D Solar System Simulation](https://github.com/dvansonsbeek/3d) project and are released under the [GNU General Public License v3.0](../../LICENSE).
+These scripts are part of the [Interactive 3D Solar System Simulation](https://github.com/dvansonsbeek/3d) project and are released under the [GNU Affero General Public License v3.0](../LICENSE).

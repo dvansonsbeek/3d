@@ -3,14 +3,14 @@
 MILANKOVITCH 8H FRAMEWORK — CHENG 2016 INDEPENDENT-CHRONOLOGY VALIDATION
 =========================================================================
 
-Companion to milankovitch_8h_cheng_closure_test.py (doc 91 §12.2). The closure
+Companion to the archived milankovitch_8h_cheng_closure_test.py (doc 91 §12.2). The closure
 test is blocked by Rayleigh resolution (T_Cheng = 640 kyr < 8H = 2682 kyr).
 This script tests the SAME framework predictions on Cheng using methods that
 do NOT require resolving adjacent integer divisors:
 
   B1 — Multi-band centroid agreement (LR04 vs Cheng across 100k/41k/23k bands).
-       Extends the §7.1 single-band chronology-bias test from
-       milankovitch_spectral_tests.py to multiple bands. If LR04 (orbitally-
+       Extends the §7.1 single-band chronology-bias test (the archived
+       milankovitch_spectral_tests.py) to multiple bands. If LR04 (orbitally-
        tuned) and Cheng (U-Th-dated absolute chronology) put the band
        centroids at the same period, the centroid is real (not a tuning
        artifact).

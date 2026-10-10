@@ -59,7 +59,7 @@ for f in sorted(os.listdir(SCRIPTS)):
     name = f[:-3]
     buf = io.StringIO()
     try:
-        if os.environ.get('ESSRT_PY_SMOKE_PLANT') == '1' and name == 'action_closure_test':
+        if os.environ.get('ESSRT_PY_SMOKE_PLANT') == '1' and name == 'devonian_cross_check':
             raise KeyError('planted: a retired JSON key read at import')
         with contextlib.redirect_stdout(buf), contextlib.redirect_stderr(buf):
             spec = importlib.util.spec_from_file_location(name, os.path.join(SCRIPTS, f))

@@ -71,9 +71,8 @@ The climate formula's orbital lines against the Cenozoic isotope record (the com
 
 - **Cenogrid spectral evidence** — MTM F-tests and windowed spectra of the
   Westerhold 2020 CENOGRID stack against the comb-era line set:
-  the archived doc 91, with generated artifacts
-  (`data/milankovitch-8h-cenogrid-*.json`, `data/cenogrid-mtm-ftest.json`)
-  under `check:artifacts` freshness.
+  the archived doc 91, with its result files kept as frozen records
+  (`data/milankovitch-8h-cenogrid-*.json`, `data/cenogrid-mtm-ftest.json`).
 - **Devonian obliquity beat** — the composed clock's beat 2π/(ψ̇ − |s₃|)
   reads 31.7 kyr at 380 Ma (vs 41.2 today), consistent with Berger, Loutre &
   Laskar 1992's deep-time solution (29 kyr at 500 Ma) and with the Devonian
