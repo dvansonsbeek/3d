@@ -329,8 +329,7 @@ The per-planet `eocFraction` constants (the same half-eccentricity split
 principle applied to each planet's wheel) remain in the legacy scene
 scaffolding as device anchors. The planets' displayed positions and
 accuracy are owned by the Keplerian chain ([doc 04](04-dynamic-elements-overview.md));
-the per-planet EoC write-ups of the retired geometric path are archived
-([retired record](retired-record.md)).
+the per-planet EoC write-ups of the retired geometric path are archived.
 
 ---
 

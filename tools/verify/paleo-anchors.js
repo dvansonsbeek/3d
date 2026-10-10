@@ -44,7 +44,7 @@ const PREDICT = {
   // Leg 1 (plan 06 D6/Phase 3): Earth's axial-precession rate is the COMPOSED
   // lunisolar rate = 1,296,000·13/H(t) on the unit; the frozen era clock's
   // counter H_era (pure spin scaling) fails these rows (~35 % low at 2.46 Ga)
-  // — that is the fail-proof (docs/retired-record.md).
+  // — that is the fail-proof.
   precArcsecPerYr: (ageMa) => dt.meanLunisolarPrecessionRateArcsecPerYrAtAge(ageMa),
 };
 

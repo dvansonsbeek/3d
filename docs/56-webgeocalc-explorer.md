@@ -41,11 +41,11 @@ Collapsed by default so the primary `ϖ` chart gets full attention. The model's 
 
 ### 3. Argument of Periapsis — `ω` (collapsible)
 
-The angle from the ascending node to the perihelion, measured within the orbital plane. `ω = ϖ − Ω`. Its time derivative is the argument-of-periapsis rate. Standish Table 1 (1800–2050) and Table 2a (3000 BC–3000 AD) disagree on the *sign* of `ω̇` for Saturn — the ecliptic-retrograde phenomenon the model predicts. See [docs/10-fibonacci-laws.md § Law 6](10-fibonacci-laws.md#law-6-saturn-jupiter-earth-resonance) for the details.
+The angle from the ascending node to the perihelion, measured within the orbital plane. `ω = ϖ − Ω`. Its time derivative is the argument-of-periapsis rate. Standish Table 1 (1800–2050) and Table 2a (3000 BC–3000 AD) disagree on the *sign* of `ω̇` for Saturn — the ecliptic-retrograde phenomenon the model's N-body chain reproduces ([doc 109](109-model-nbody-engine-and-lattice-test.md)).
 
 ## Observed rates at a glance
 
-The WebGeoCalc trends extracted by the Explorer for the 1900–2026 window are summarized here (the per-planet lattice-period discussion is archived — [retired record](retired-record.md); the chains + doc 109 carry the current planetary rates):
+The WebGeoCalc trends extracted by the Explorer for the 1900–2026 window are summarized here (the chains + doc 109 carry the current planetary rates):
 
 | Planet | WebGeoCalc observed (ϖ̇) | Trend resolvability | device ecliptic-period descriptor (″/cy at J2000; the former integer label) |
 |--------|-------------------------|---------------------|---------------------------------------|
@@ -150,7 +150,7 @@ The red and blue curves tracking each other over 1900–2026 is the visual valid
 ## Related documentation
 
 - [Mercury Precession Breakdown](13-mercury-precession-breakdown.md) — First-order Laplace-Lagrange analysis, reference-frame discussion, why the model's two-frame treatment matches WebGeoCalc where ecliptic-only L-L fails; also the quantities and methods used inside the simulation for computing perihelion longitude and precession.
-- [109 - The Model's Own N-body](109-model-nbody-engine-and-lattice-test.md) — the measured planetary frequencies and the per-planet quantity types the Explorer's comparisons rest on (the per-planet cycle tabulations are archived — [retired record](retired-record.md)).
+- [109 - The Model's Own N-body](109-model-nbody-engine-and-lattice-test.md) — the measured planetary frequencies and the per-planet quantity types the Explorer's comparisons rest on.
 - [Constants Reference § Observed trend rates](20-constants-reference.md) — The constants block that feeds the display.
 - [Expanding Solar System Resonance Theory](99-expanding-solar-system-resonance-theory.md) — Deep-time scaling of H(t) for the literal rates the Explorer compares.
 

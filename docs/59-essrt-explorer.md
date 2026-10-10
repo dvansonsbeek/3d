@@ -180,7 +180,6 @@ Full per-anchor agreement table + statistical summary at [doc 99 §"Validation a
 
 - [doc 99 — Expanding Solar System Resonance Theory (ESSRT)](99-expanding-solar-system-resonance-theory.md) — complete theoretical framework, Driver 1 + 2 derivations, per-anchor validation tables, deep-time L1 predictions, falsifiable claims
 - [doc 92 — Climate Formula](92-climate-formula.md) — the L1 integer-divisor lattice that stays invariant under H(t) scaling
-- [doc 10 — the six relations (historical record)](10-fibonacci-laws.md) — the retired integer identities; the modal scales the dynamical periods (the composed precession period and the obliquity beat)
 - [doc 58 — Earth Climate Analysis](58-climate-formula-explorer.md) — sibling Tools-menu modal (companion to Earth–Moon Genesis Analysis)
 - [doc 57 — Framework Verification](57-formula-verification.md) — sibling Tools-menu modal comparing model vs published celestial-mechanics formulas across ±12 kyr
 - [doc 56 — Perihelion of Planets Verification](56-webgeocalc-explorer.md) — sibling Tools-menu modal showing observed perihelion-precession history (JPL NAIF, 1900–2026)

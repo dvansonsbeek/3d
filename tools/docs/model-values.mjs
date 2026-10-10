@@ -124,7 +124,7 @@ function predictiveMachinery() {
   // device that stood here — createPredictivePrecession × PREDICT_COEFFS_PHYSICAL,
   // ~2,421 fitted terms per planet reproducing the RETIRED geometric scene's
   // exported RA rate (which the identity closed to a κ ≤ 1.4″/cy residual) — is
-  // recorded in docs/retired-record.md; the function keeps its name for its
+  // retired; the function keeps its name for its
   // callers. The chain's DYNAMICAL rate of date is a different quantity (a
   // window rate; the outer planets' are great-inequality-dominated, Neptune's
   // ϖ swings ~16°/cy on its near-zero e) and never rides a lattice key.
@@ -928,6 +928,18 @@ export const VALUES = {
       const s = chainCache.KC.computePlanetElementsAtYear(2000, chainCache.chains[p], chainCache.chains).ascNodeInvPlaneDeg;
       return (((s - chainCache.origin) % 360) + 360) % 360;
     };
+    // The spherical-triangle identity cos i_ecl = cos i_P cos i_E + sin i_P sin i_E cos(Ω_P − Ω_E)
+    // — the closed-form node calibration (tools/verify/analytical-ascending-nodes.js) run
+    // forward. Three node sets are closed against JPL's J2000 ecliptic inclination: S&S 2012
+    // as published, the closed-form VERIFIED node (model-parameters ascendingNodeInvPlane,
+    // solved to close this identity — the no-chain scaffolding's data), and the chain's own
+    // J2000 (i, Ω) pairs on the banked plane, Earth's included (the origin cancels in ΔΩ).
+    const D = Math.PI / 180;
+    const iEclDeg = (ip, Wp, ie, We) => Math.acos(Math.cos(ip * D) * Math.cos(ie * D) + Math.sin(ip * D) * Math.sin(ie * D) * Math.cos((Wp - We) * D)) / D;
+    const closureArcsec = (p, omegaDeg) => (iEclDeg(astro.planetOrbitalElements[p].invPlaneInclinationJ2000, omegaDeg,
+      astro.earthOrbital.earthInclinationJ2000_deg, astro.earthOrbital.earthAscendingNodeInvPlane)
+      - astro.planetOrbitalElements[p].eclipticInclinationJ2000) * 3600;
+    const chainEl = (p) => { chainNodeSS(p === 'earth' ? 'mercury' : p); return chainCache.KC.computePlanetElementsAtYear(2000, chainCache.chains[p], chainCache.chains); };
     return Object.fromEntries(['mercury', 'venus', 'mars', 'jupiter', 'saturn', 'uranus', 'neptune']
       .flatMap((p) => [
         [`${p}InclEcl`, {
@@ -949,6 +961,33 @@ export const VALUES = {
           render: (v) => fmtSignedPct(v, 2),
           unit: '°',
           note: 'chain node (S&S convention, derived conversion) minus S&S 2012 — element class (of-date vs mean elements)',
+        }],
+        [`${p}OmegaVerified`, {
+          get: () => C.planets[p].ascendingNodeInvPlane,
+          render: (v) => Number(v).toFixed(2),
+          unit: '°',
+          note: 'closed-form J2000 node: Ω solved from the spherical triangle (JPL J2000 ecliptic inclination, S&S invariable-plane inclination, Earth’s S&S inclination and node) — model-parameters ascendingNodeInvPlane, the no-chain scaffolding’s data; S&S origin',
+        }],
+        [`${p}EclInclSSClosureArcsec`, {
+          get: () => closureArcsec(p, astro.ascendingNodesSouamiSouchay[p]),
+          render: (v) => fmtSignedPct(v, 1),
+          unit: '″',
+          note: 'ecliptic inclination from the spherical triangle on the S&S 2012 node, minus JPL J2000 (arcsec)',
+        }],
+        [`${p}EclInclVerifiedClosureArcsec`, {
+          get: () => closureArcsec(p, C.planets[p].ascendingNodeInvPlane),
+          render: (v) => fmtSignedPct(v, 1),
+          unit: '″',
+          note: 'ecliptic inclination from the spherical triangle on the closed-form verified node, minus JPL J2000 (arcsec; zero by construction up to the stored node’s 2-dp rounding)',
+        }],
+        [`${p}EclInclChainClosureArcsec`, {
+          get: () => {
+            const e = chainEl(p), E = chainEl('earth');
+            return (iEclDeg(e.inclInvPlaneDeg, e.ascNodeInvPlaneDeg, E.inclInvPlaneDeg, E.ascNodeInvPlaneDeg) - astro.planetOrbitalElements[p].eclipticInclinationJ2000) * 3600;
+          },
+          render: (v) => fmtSignedPct(v, 1),
+          unit: '″',
+          note: 'the same identity on the chain’s own J2000 (i, Ω) pairs — planet and Earth on the banked invariable plane — minus JPL J2000 (arcsec): the chain’s J2000 ecliptic inclination against the catalog',
         }],
       ]));
   })(),
@@ -1802,15 +1841,15 @@ export const VALUES = {
       // Plan 07 R5: ψ was inverted from Earth's calibration at load
       // (3·A_earth·√(m_E/m_☉)); the inclination law is retired, so there is
       // nothing live to read. FROZEN here as the retired construction's
-      // recorded constant, exactly as kValue below — docs 20 and 72 cite it
-      // as the historical Law-2/3 ψ. See docs/retired-record.md.
+      // recorded constant, exactly as kValue below — doc 20 cites it
+      // as the historical Law-2/3 ψ.
       psiValue:   { get: () => 0.0033070432499942154, render: (v) => `${(v * 1e3).toFixed(4)} × 10⁻³`, note: 'ψ — RETIRED (plan 07 R5); the recorded value of the retired construction, no longer derived' },
       // Plan 07 R6: K was inverted from Earth's calibration at load; the law
       // is retired, so there is nothing live to read. The value is FROZEN
-      // here as the retired construction's recorded constant — docs 20 and 72
-      // cite it as the historical Law-4 K, and the registry's job for a
+      // here as the retired construction's recorded constant — doc 20
+      // cites it as the historical Law-4 K, and the registry's job for a
       // retired device is to record what it was, not to pretend it still
-      // derives. See docs/retired-record.md.
+      // derives.
       kValue:     { get: () => 3.4143e-6, render: (v) => `${(v * 1e6).toFixed(4)} × 10⁻⁶`, note: 'Law 4 K — RETIRED (plan 07 R6); the recorded value of the retired construction, no longer derived' },
       invPlaneAscNode: { get: () => astro.ascendingNodesSouamiSouchay.invariablePlaneOnEclipticDeg, render: (v) => String(v), unit: '°', note: 'the invariable plane\'s node on the ecliptic (Souami & Souchay 2012)' },
       mainstreamAxialPrec:  { get: () => astro.knownValues.mainstreamAxialPrecKyr, render: (v) => `~${v}k`, unit: 'yr' },
@@ -1858,8 +1897,8 @@ export const VALUES = {
     // (The doc-109 §9 typing of the retired 8H/N descriptors — "type A long-term
     // mean · B present-epoch rate · C window-epoch value" — and the H/den label
     // builder stood here, kept alive by a `void` so lint would pass. Dead code is
-    // not a record: docs/retired-record.md and git history carry what the device
-    // published, and the live notes below say what each key is now.)
+    // not a record: git history carries what the device published, and the
+    // live notes below say what each key is now.)
     for (const planet of ['mercury', 'venus', 'mars', 'jupiter', 'saturn', 'uranus', 'neptune']) {
       const ofDateArcsecPerYr = () => chainG(planet) + pAJ2000ArcsecPerYr();
       out[`${planet}PeriPeriod`] = {
@@ -1905,8 +1944,8 @@ export const VALUES = {
   // composed inside the deep-time factory, read here through the Node
   // engine (tools/lib/deep-time.js), the same evaluator the hybrid precesses
   // on and the paleo-anchors gate's precArcsecPerYr rows check. The former
-  // "structural H(t)/13" reading is the frozen era clock's counter and lives
-  // in docs/retired-record.md, not here. Instrument twin:
+  // "structural H(t)/13" reading is the frozen era clock's counter, retired
+  // as a precession claim, not published here. Instrument twin:
   // tools/explore/w3-precession-crosscoupling.mjs.
   ...(() => {
     const composedAt = (ageMa) => dtl().meanLunisolarPrecessionRateArcsecPerYrAtAge(ageMa);
@@ -2435,7 +2474,7 @@ export const VALUES = {
   // same number every runtime's `perihelionEclipticYears` carries (R1).
   // (The retired device derived these from `perihelionEclipticFraction` by
   // the "n8_ICRF = n8_ecliptic − 104" frame identity; that construction and
-  // its inputs are gone — docs/retired-record.md.)
+  // its inputs are gone, plan 07 R8.)
   ...(() => {
     // Plan 07: the planets' inertial (vs the stars) perihelion period is the
     // chain's secular mode, 1,296,000/|g| yr — the retired device's
@@ -3477,7 +3516,7 @@ export const VALUES = {
   // now derive from one source). (The `<p>PredR2/PredRmse/PredTerms` and
   // `<p>ObsR2/ObsRmse/ObsTerms` keys that shared this block — the retired
   // planet predict device's self-fit statistics against the RETIRED scene's
-  // export — are gone with the device, plan 06 R8; docs/retired-record.md.)
+  // export — are gone with the device, plan 06 R8.)
   ...(() => ({
     solarOrbitalSpeed: {
       get: () => 2 * Math.PI * C.currentAUDistance / C.meanSiderealYearSeconds * 3600,

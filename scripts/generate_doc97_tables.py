@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Generate the numeric tables of doc 92 (doc 97 is archived — docs/retired-record.md) from their
+Generate the numeric tables of doc 92 (doc 97 is archived) from their
 artifacts. The doc's prose is hand-written; every table that reports a
 measurement lives between
 
@@ -293,9 +293,8 @@ def apply(doc, B, check):
 def main():
     check = "--check" in sys.argv
     stale = []
-    # Doc 97 was archived in the 2026-09 doc retirement (docs/retired-record.md;
-    # the file lives frozen in docs/archive/retired/) — only doc 92's generated
-    # blocks remain in the tree.
+    # Doc 97 is archived (the file lives frozen in docs/archive/retired/) —
+    # only doc 92's generated blocks remain in the tree.
     for doc, B in ((DOC92, blocks92()),):
         changed = apply(doc, B, check)
         if check:

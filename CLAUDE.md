@@ -6,7 +6,7 @@ across ±500 Myr. [Preprint](https://doi.org/10.21203/rs.3.rs-8758810/v4) ·
 [Live demo](https://3d.holisticuniverse.com)
 
 **Scale:** `src/script.js` ~60,000 lines · `tools/` ~240 tracked JS scripts
-across 9 directories (~360 on disk with the untracked local archives) · ~245 Python files · 45 docs (26 retired-machinery docs archived out of the tree — `docs/retired-record.md` is the public record; `docs/archive/retired/`, gitignored, holds the files — and the strip-and-restructure pass merged five more into their live homes) · one web UI (the simulator; the Data Explorer dashboard is retired — `docs/retired-record.md`).
+across 9 directories (~360 on disk with the untracked local archives) · ~245 Python files · 35 docs (37 retired docs archived out of the tree to `docs/archive/retired/`, gitignored — git history carries their diffs — and the strip-and-restructure pass merged five more into their live homes) · one web UI (the simulator; the Data Explorer dashboard is retired).
 **`npm run check` enforces a twenty-six-step gate chain; CI runs it plus a
 headless-browser job and auto-deploys the simulator to GitHub Pages on
 green main.**
@@ -341,8 +341,8 @@ instruments that computed them are now DELETED with the ψ/K laws they read
 (`verify-laws`, `balance-search`, `config1-proof`, `configuration-analysis`,
 `dual-balance-optimizer`, `eccentricity-balance`, `epoch-independence`,
 `inclination-verification`, `inclination-optimization`, plus
-`tools/explore/balance-with-dynamical-nodes.mjs`). `docs/retired-record.md` is
-the record. What survives as a documented observation: under the retired
+`tools/explore/balance-with-dynamical-nodes.mjs`). What survives as a
+documented observation: under the retired
 integer weights the 8-planet eccentricity balance holds to ~98 % with the
 engine's long-term mean eccentricities (99.8636 % was the tuned-inputs figure
 — and note that figure had quietly stopped reproducing: the live construction
@@ -420,7 +420,7 @@ and the invariable-plane machinery (heights, mass gauge, Sun-SSB) from
 the model's own N-body chain (`@essrt/physics/planets/keplerian-chain` +
 the governed artifact). The fitted correction stack (parallax /
 gravitation / elongation — keys, evaluators, fitters ex-Steps 2/5a-5b)
-is deleted; docs/retired-record.md + git history carry its record. The Law-4/Law-5
+is deleted; git history carries its record. The Law-4/Law-5
 constants (`K = 3.4143e-6`; base eccentricities from the balance
 construction) survive only in the legacy scene scaffolding (device
 anchors, the no-chain bodies Pluto/Halley/Eros, and the o.fib*
@@ -448,7 +448,7 @@ registry keys `obliqBeat*Kyr` / `obliqH8Scaled*Kyr` (name kept), doc 109
 year-length comb family and the ∫dt/H phase table ride their own fitted
 convention `eraClockHAtAge` = H₀·LOD/LOD₀ (pure spin scaling, the
 pre-Phase-3 "H/13 identity", shipped with their coefficients as a device
-constant — `docs/retired-record.md` carries the retired claim: it read
+constant — as a precession claim it is retired: it read
 ~35 % low against Lantink 2022 at 2.46 Ga); never call it H(t). The
 long-eccentricity band stays at its modern class (scaled
 only by the measured solar-mass history); every newly dated Precambrian

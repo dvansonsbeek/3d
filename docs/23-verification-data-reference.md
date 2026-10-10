@@ -321,9 +321,9 @@ When measured against JPL Horizons across 1400-2400 AD, the model's RMS grows sy
 
 **2. Phase A′/A″ — Against INDEPENDENT observations, the model holds up**
 
-The V-shape against JPL turned out to be a red herring. At the epochs where direct historical observations exist (independent of any modern ephemeris), the model matches them as well as or better than JPL DE441 / IMCCE INPOP19 do at the same epochs:
+The V-shape against JPL is not reflected in the direct observations that exist at those epochs. READ THE COLUMNS AS THE SCRIPT DEFINES THEM: Tier 1 is the MODEL's residual against the independent observations; Tier 2 is the MODEL's residual against JPL/IMCCE-derived positions at the same epochs. Neither column is JPL's error against the observations — the ephemerides were not scored against the historical record here, so the table says nothing about whether the model is closer to the sky than they are (the paper carried that misreading until 2026-10-10; corrected):
 
-| Planet | Tier 1 (indep. observations) median dec error | Tier 2 (JPL/IMCCE) median dec error | T1/T2 ratio |
+| Planet | Tier 1 — model vs indep. observations, median dec error | Tier 2 — model vs JPL/IMCCE at the same epochs, median dec error | T1/T2 ratio |
 |---|---:|---:|---:|
 | Mercury | 0.013° (n=23 transits) | 0.159° | **0.11×** |
 | Jupiter | 0.013° (n=28 occultations) | 0.281° | **0.11×** |
@@ -337,11 +337,11 @@ The V-shape against JPL turned out to be a red herring. At the epochs where dire
 
 The Mars row (Tycho 1572-1601, post-cleanup) is the most robust: **913 pre-telescopic naked-eye observations matched at median 0.18° dec error** — fully comparable to IMCCE INPOP19 at the same epoch, on a sample large enough to be statistically meaningful.
 
-For five of seven planets, the model fits independent observations 5-11× better than JPL/IMCCE does at the same epochs. The remaining two (Venus, Mars) are essentially even.
+For five of seven planets the model's residual against the independent observations is 5-11× smaller than its residual against JPL/IMCCE at the same epochs — but those five rows are transit and occultation events (n = 2–29), whose declinations are fixed by the event geometry rather than by the planet's free motion, so a small Tier-1 residual there is not evidence about the planet's position. Only Mars (n = 913 Tycho declinations) is a free-motion sample, and there the two residuals are even.
 
 ### Defensible conclusion
 
-> *Validation against direct historical observations (Tycho 1572-1601, NASA/Espenak transit catalogs, mutual-occultation catalogs) shows the model matches these observations as accurately as or more accurately than JPL DE441 / IMCCE INPOP19 ephemerides do at the same epochs, across the data range tested. This is consistent with the model's residuals against JPL Horizons at extended ranges reflecting **divergent extrapolation behavior between the two models**, not a fitness deficit in this one.*
+> *At the epochs where direct historical observations exist (Tycho 1572-1601, NASA/Espenak transit catalogs, mutual-occultation catalogs), the model's residual against them is no larger than its residual against JPL DE441 / IMCCE INPOP19 at the same epochs; on the one statistically meaningful free-motion sample (Tycho's Mars) the two are even. The model's growing residual against JPL outside 1800–2100 is therefore not reflected in the direct observations that exist there. NO claim is made that the model is closer to the sky than the ephemerides: they were not scored against the historical record in this comparison.*
 
 ### Bounds on the claim
 

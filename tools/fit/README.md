@@ -23,7 +23,7 @@ Output values are stored in `public/input/fitted-coefficients.json`.
 > the arrays were trained on the Step-3 workbook exported 2026-08-28 —
 > BEFORE the P5 flip and the K5 excision — and reproduced the retired
 > geometric scene's exported Earth-frame RA rate, a self-fit of the
-> simulator (`docs/retired-record.md`). The Earth-frame rate is now the
+> simulator. The Earth-frame rate is now the
 > equatorial projection of the lattice motion (doc 13 §1.8, zero fitted
 > constants). Earth, Moon and Sun fitting is unaffected; it remains the
 > shipped path.
@@ -78,8 +78,8 @@ the wheel from the engine's frame of date (`_applyEngineEarthFrame`), and
 `computeSunPositionFast` rides the same frame (it had been the bare K wheel
 Sun, 8–18″ from the scene Sun in 2000). The `FQ3_EXACT_SUN` / `E5_WHEEL_SUN`
 / `SUN_HARMONICS_ENABLED` toggles are gone with the corrections they gated;
-the registry constants and this fitter remain as the record
-(`docs/retired-record.md`). Re-running Step 0 against the fast Sun would fit
+the registry constants and this fitter remain as the record.
+Re-running Step 0 against the fast Sun would fit
 the certified Sun's own residual against its target and is not meaningful.
 
 **Status 2026-07-15:** Sun harmonic whitelist further tightened. Previously
@@ -522,7 +522,7 @@ Note: eocEccentricity and perihelionPhaseOffset are derived analytically in cons
 — were RETIRED at plan 06 R8 together with their `PREDICT_COEFFS_*` keys and
 `tools/lib/python/coefficients/`: they fitted the RETIRED geometric scene's
 exported Earth-frame RA rate against the simulator's own export. The ids are
-kept as shared vocabulary; `docs/retired-record.md` carries the record.)
+kept as shared vocabulary.)
 
 ── Phase 4: Moon ───────────────────────────────────────────────────
 
@@ -849,8 +849,8 @@ Publish: the website consumes the published packages — after Step 9, run
 
 ── Phase 7: (retired) ─────────────────────────────────────────────
 
-Step 10 was the Data Explorer dashboard export; the dashboard is retired
-         (docs/retired-record.md). The rule it carried still holds: when
+Step 10 was the Data Explorer dashboard export; the dashboard is retired.
+         The rule it carried still holds: when
          updating src/script.js mean*AtAge functions, the equivalent in
          tools/lib/deep-time.js MUST be updated in parallel — they are
          the same chain in two locations.
@@ -1196,8 +1196,7 @@ managed by a `correction-stack` registry with `prepareForFitting()`. That
 whole stack retired with the K5 legacy-chain excision — the planets render
 from the engine-D Keplerian chain, which has no fitted display corrections.
 The Moon Meeus layer (`MOON_CORRECTION`, Step 5c) is unaffected.
-docs/71 — Correction Stack Architecture (archived — docs/retired-record.md)
-remains as the historical record.
+The Correction Stack Architecture record (doc 71) is archived.
 
 ## ΔT stack diagnostic hooks (dt-corrections-fit.js)
 
@@ -1242,7 +1241,7 @@ constants) for fitting efficiency. This gives the same RMSE as the full dataset 
 
 ## Related documentation
 
-- [Solstice Prediction](../../docs/14-solstice-prediction.md) — Cardinal point harmonics, obliquity formula derivation
+- The cardinal instants ride the certified Sun (`createModel().cardinal`); the retired cardinal-point combs' record (doc 14) is archived
 - [Equation of Center](../../docs/65-equation-of-center.md) — EoC derivation and constants
-- Parallax Corrections — archived (docs/retired-record.md); the fitted parallax layer was deleted in the K5 excision
-- Correction Stack Architecture — archived (docs/retired-record.md); the layer-ordering + prepareForFitting() record lives in git history
+- Parallax Corrections — archived; the fitted parallax layer was deleted in the K5 excision
+- Correction Stack Architecture — archived; the layer-ordering + prepareForFitting() record lives in git history

@@ -67,7 +67,7 @@ Earth's spin tier runs on one clock: the mean lunisolar precession period, <!--v
 | Apsidal precession | <!--v:inclPrecYears-->~111,635<!--/v--> yr | <!--v:lunisolarApsidalPerPrecessionJ2000-->4.332<!--/v--> |
 | Perihelion-of-date | <!--v:periPrecYears-->~20,938<!--/v--> yr | <!--v:lunisolarPeriOfDatePerPrecessionJ2000-->0.8124<!--/v--> |
 
-The ratios are J2000 readings, not laws — the apsidal ratio wanders across ±26 kyr as the table above the panel shows. The model's earlier presentation, one "master cycle" divided by the small integers 13, 3 and 16, is retired ([retired record](retired-record.md)); the fitted timing anchor that presentation was built on remains a Ledger-2 constant of the [Constants Reference](20-constants-reference.md), and [doc 10](10-fibonacci-laws.md) keeps the historical derivation.
+The ratios are J2000 readings, not laws — the apsidal ratio wanders across ±26 kyr as the table above the panel shows. The model's earlier presentation, one "master cycle" divided by the small integers 13, 3 and 16, is retired; the fitted timing anchor that presentation was built on remains a Ledger-2 constant of the [Constants Reference](20-constants-reference.md).
 
 ### Reference Point: JD 2176153.5 (1245-12-26) / early 1246 AD
 

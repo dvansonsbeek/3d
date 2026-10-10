@@ -14,7 +14,7 @@
  * inclination amplitude/mean; K constant → eccentricity amplitude/base/
  * phase) are DELETED — K at plan 07 R6, ψ at plan 07 R5. A planet's
  * inclination and eccentricity of date have one home, the N-body chain
- * (model.js planetChainElementsAt); docs/retired-record.md is the record.
+ * (model.js planetChainElementsAt).
  *
  * THIN BY DESIGN. This is the composition surface, not a rewiring: both
  * engines keep their existing direct call sites, and the runtime channels

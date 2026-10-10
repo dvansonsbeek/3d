@@ -129,20 +129,16 @@ Re-running scripts only needed after dataset updates or refit changes — see [d
 
 ## Scope and limitations
 
-1. **Earth only.** All proxies measure Earth's climate state (δ¹⁸O temperature proxy, δ¹³C carbon proxy, CO₂ atmospheric concentration). Per-planet contributions to the L1 lattice are documented in [doc 91 §3](91-milankovitch-evidence.md) and doc 93 (comb-era attribution record, archived — [retired record](retired-record.md)), not in this modal.
+1. **Earth only.** All proxies measure Earth's climate state (δ¹⁸O temperature proxy, δ¹³C carbon proxy, CO₂ atmospheric concentration). Per-planet contributions to the L1 lattice are in the archived comb-era records (docs 91 and 93), not in this modal.
 2. **Regime-aware fits, not free-floating.** The formula has different L1 amplitudes in each of the 8 regimes (`lr04-post-mpt`, `lr04-inhg-mpt`, `lr04-pre-inhg`, `lr04-full`, `cenogrid-d18o`, `cenogrid-d13c`, `epica-co2`, `cenco2pip`) — they are not the same global coefficients. The modal handles regime stitching automatically. **Forward prediction across regime boundaries fails catastrophically** (R² = −0.87 across the MPT in Tier B Round 3 R3-3 of doc 92); the framework is descriptive within regimes, not predictive across boundary-condition shifts.
-3. **L1 = 33 integers** (25 canonical + 6 MTM sidebands + n=141 Berger-quintet completion + the regime-admitted n=24 Earth H/3 line). Component list catalogued in [doc 92 §2.3](92-climate-formula.md#23-the-33-lattice-integers--per-line-identities) with per-line identities and Berger / Holistic dual attribution (doc 93 (comb-era attribution record, archived — [retired record](retired-record.md))).
+3. **L1 = 33 integers** (25 canonical + 6 MTM sidebands + n=141 Berger-quintet completion + the regime-admitted n=24 Earth H/3 line). Component list catalogued in [doc 92 §2.3](92-climate-formula.md#23-the-33-lattice-integers--per-line-identities) with per-line identities and Berger / Holistic dual attribution (doc 93, the archived comb-era attribution record).
 4. **Read-only.** The modal has no "edit formula" feature; coefficients are baked at bundle time from the Python fit pipeline.
 5. **Coefficient updates require re-running the pipeline.** See the data-pipeline section above.
 
 ## Related documentation
 
-- [doc 90 — Milankovitch language](90-milankovitch-language.md) — terminology primer (g_j, s_j, k, eigenmode beats)
-- [doc 91 — Milankovitch evidence](91-milankovitch-evidence.md) — empirical 33-integer L1 fit, per-planet contributions, 14 hypothesis tests, 405-kyr off-lattice characterization
 - [doc 92 — Climate Formula architecture](92-climate-formula.md) — complete L1+L2+L3 derivation, per-regime ridge-fit R² values, variance-decomposition Tier A / B analyses, forward-projection limits
-- doc 93 — L1 attribution reference (comb-era record, archived: [retired record](retired-record.md)) — the shipped lines carry their attribution by construction (doc 92 §2)
 - [doc 94 — Insolation null test](94-insolation-null-test.md) — empirical anchor for the "lines subsume Berger insolation" claim (no cross-window-stable gain)
-- [doc 95 — Climate summary](95-climate-summary.md) — the synthesis statement the modal visualizes
 - [doc 99 — Expanding Solar System Resonance Theory (ESSRT)](99-expanding-solar-system-resonance-theory.md) — deep-time scaling of the precession-band lines on the composed clock
 - [doc 59 — Earth–Moon Genesis Analysis](59-essrt-explorer.md) — sibling Tools-menu modal for the deep-time clock/LOD/year evolution
 - [doc 57 — Framework Verification](57-formula-verification.md) — sibling Tools-menu modal comparing model vs published celestial-mechanics formulas

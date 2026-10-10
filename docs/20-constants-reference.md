@@ -47,7 +47,7 @@ Per the [Expanding Solar System Resonance Theory (Doc 99)](99-expanding-solar-sy
 
 H(t) evolves under two physically independent drivers: **Driver 1** = Earth-Moon tidal evolution (LOD grows, Moon recedes); **Driver 2** = solar mass loss (every planet's orbit slowly expands via Kepler's 3rd law). At Devonian (380 Ma) H ≈ <!--v:hAtDevonian-->282,329<!--/v--> yr; at J2000 H = <!--v:H-->335,317<!--/v--> yr; at +200 Myr H ≈ <!--v:hAt200MyrFuture-->367,019<!--/v--> yr. The integer divisors above are unchanged at every epoch — only the per-cycle period in years (or seconds) scales.
 
-For the canonical derivation chain from `t_Ma` through LOD, the composed precession period, AU, M_Sun, Kepler year, Moon distance, Moon period, anomalistic year, stellar/sidereal days, and planet orbital + synodic periods, see [Doc 99 — ESSRT](99-expanding-solar-system-resonance-theory.md) and the `mean*AtAge` family in `tools/lib/deep-time.js`. (The per-planet integer-label tabulation on the anchor's eight-unit interval is archived — [retired record](retired-record.md).)
+For the canonical derivation chain from `t_Ma` through LOD, the composed precession period, AU, M_Sun, Kepler year, Moon distance, Moon period, anomalistic year, stellar/sidereal days, and planet orbital + synodic periods, see [Doc 99 — ESSRT](99-expanding-solar-system-resonance-theory.md) and the `mean*AtAge` family in `tools/lib/deep-time.js`. (The per-planet integer-label tabulation on the anchor's eight-unit interval is archived.)
 
 ---
 
@@ -58,9 +58,8 @@ engines, and its numbers fall into three ledgers. No single "N free
 parameters" headline is published — the ledgers are the accounting. Other
 documents (and the simulator's About panel) should reference this section
 rather than carrying their own counts. (The former "6 DOF / Config #7"
-accounting is retired; the search record lives in
-[doc 10](10-fibonacci-laws.md) and [doc 109](109-model-nbody-engine-and-lattice-test.md),
-and git history carries the old section.)
+accounting is retired; [doc 109](109-model-nbody-engine-and-lattice-test.md)
+is the evidence record, and git history carries the old section.)
 
 ### Ledger 1 — the orbital dynamics engine's inputs (the planets — cited, not fitted)
 
@@ -210,7 +209,7 @@ These constants define the model. Changing any of them changes the theory.
 
 (Plan 07 R10: the former "obliquity cycle position" input `temperatureGraphMostLikely` = 14.5, which with the alignment year defined the correction bases' phase origin t₀, left the JSON — the combs measure their phase from J2000 and t₀ was rotated out of every fitted coefficient exactly, `tools/fit/reorigin-combs-j2000.mjs`.)
 
-The anchor is the unit of the correction bases and of the frozen era clock; it was fitted on the 1246 AD perihelion–solstice alignment of the IAU mean elements (Meeus); the model's own series crosses two years later, at 1247.7 AD. It is not a period: Earth's precession periods are the dynamical values of [Part 2 — Derived Constants](#part-2--derived-constants) — the axial precession period is <!--v:axialPrecExact-->25,771.40<!--/v--> years, of which the anchor is 13.011, a fit constant (plan 06 S5). The former presentation of the anchor as a "master cycle divided by small integers" is retired ([retired record](retired-record.md)).
+The anchor is the unit of the correction bases and of the frozen era clock; it was fitted on the 1246 AD perihelion–solstice alignment of the IAU mean elements (Meeus); the model's own series crosses two years later, at 1247.7 AD. It is not a period: Earth's precession periods are the dynamical values of [Part 2 — Derived Constants](#part-2--derived-constants) — the axial precession period is <!--v:axialPrecExact-->25,771.40<!--/v--> years, of which the anchor is 13.011, a fit constant (plan 06 S5). The former presentation of the anchor as a "master cycle divided by small integers" is retired.
 
 ## Earth Parameters
 
@@ -227,8 +226,7 @@ The anchor is the unit of the correction bases and of the frozen era clock; it w
 
 (The per-planet divisor, phase-group and mirror-pair table of the retired
 integer-law framing stood here. Its inputs left `model-parameters.json` at
-plan 07 R8 and nothing in the model reads them; [doc 10](10-fibonacci-laws.md)
-and [doc 31](31-no-chain-body-elements.md) are the historical records.)
+plan 07 R8 and nothing in the model reads them.)
 
 ## Model Start & Alignment
 
@@ -381,10 +379,9 @@ The ψ law — amplitudes `amp = ψ / (d × √m)`, means from the J2000 constra
 — is DELETED from the code (the ψ/K law module of `@essrt/physics`, the
 `tools/lib/constants.js` loop, the browser's `_FL` loop and the Python bridge's
 `INCL_AMP`/`INCL_MEAN`). The per-planet mean and amplitude below are now the
-CHAIN's series range (the registry's `chainInclStats`); the historical record
-of the law is [doc 10](10-fibonacci-laws.md) and `docs/retired-record.md`
-(its verification instruments, `inclination-optimization` and
-`inclination-verification`, went at plan 07 R6).
+CHAIN's series range (the registry's `chainInclStats`); the law's
+verification instruments, `inclination-optimization` and
+`inclination-verification`, went at plan 07 R6.
 
 | Planet | Mean (deg) | Half-range (deg) | Range (deg) | Inertial apsidal period |
 |--------|----------|---------------|-----------|-------------|
@@ -503,7 +500,7 @@ the δ overlay):
 
 | Constant | Value | Description |
 |----------|-------|-------------|
-| `SUN_LONGITUDE_HARMONICS` | 3-term array | Fitted sun-longitude harmonics, ~279″ annual span. RETIRED from every scene path (FQ-3 took it off the display Sun; plan 06 R4 took it off the Step-6a instrument too — the fast Sun rides the engine Earth frame with the certified longitude, `docs/retired-record.md`); registry entry retained — Step 0 remains its fitter as the record and the D2 completion's PAIRED hash fingerprints it |
+| `SUN_LONGITUDE_HARMONICS` | 3-term array | Fitted sun-longitude harmonics, ~279″ annual span. RETIRED from every scene path (FQ-3 took it off the display Sun; plan 06 R4 took it off the Step-6a instrument too — the fast Sun rides the engine Earth frame with the certified longitude); registry entry retained — Step 0 remains its fitter as the record and the D2 completion's PAIRED hash fingerprints it |
 | `SUN_LONGITUDE_MEAN` | −0.0018807° | Fitted mean offset (~−6.8″) |
 
 ## Earth Perihelion Harmonics
@@ -649,7 +646,7 @@ JPL publishes these trends in the **J2000-fixed** ecliptic frame ("mean ecliptic
 
 **Source**: [JPL Approximate Positions of the Planets](https://ssd.jpl.nasa.gov/planets/approx_pos.html)
 
-**Note**: All 7 fitted planets now match JPL trend direction in the J2000-fixed frame. Total trend error is ~4.3″/century across the 7 planets. See [31-no-chain-body-elements.md § Two Frames](31-no-chain-body-elements.md#two-frames--be-careful-which-one-you-mean) for the frame distinction. Model errors verified by [Inclination Verification](../tools/verify/inclination-verification.js).
+**Note**: All 7 fitted planets now match JPL trend direction in the J2000-fixed frame. Total trend error is ~4.3″/century across the 7 planets. See [doc 05 § Two frames](05-invariable-plane-overview.md#two-frames-two-node-values--dont-conflate) for the frame distinction.
 
 ### Mean & True Anomaly at J2000
 
@@ -748,9 +745,8 @@ and the System-Reset n=7 convention they were evaluated at) left
 `model-parameters.json` with the law; nothing in the model reads them. Earth's
 anchor (21.77°, `earthInclinationCycleAnchor` in astro-reference) is a different
 quantity — it phases the eccentricity channel and is plan 07 R10's subject.
-[Doc 31](31-no-chain-body-elements.md) records the retired values; the
-eigenmode-cluster claim of earlier versions is withdrawn with them
-([doc 10](10-fibonacci-laws.md)).
+The retired values are archived; the eigenmode-cluster claim of earlier
+versions is withdrawn with them.
 
 The `EIGENMODE_PHASES` array in `script.js` provides Laplace-Lagrange reference values:
 
@@ -817,7 +813,7 @@ f₅ = 0 (invariable plane, no evolution) is excluded — 7 active Laplace-Lagra
 
 # Part 4 — Tuned/Optimized Parameters
 
-These values result from the retired optimization campaign; the campaign write-ups are archived ([retired record](retired-record.md)).
+These values result from the retired optimization campaign; the campaign write-ups are archived.
 
 ## Sun / Earth Tuned Parameters
 
@@ -837,11 +833,11 @@ These values result from the retired optimization campaign; the campaign write-u
 | Uranus | `solarYearInput` | <!--v:uranusOrbitalPeriodInputDays-->30586<!--/v--> |
 | Neptune | `solarYearInput` | <!--v:neptuneOrbitalPeriodInputDays-->59800<!--/v--> |
 
-Stored in `astro-reference.json`. These start from the JPL solar-year periods and carry small pipeline refinements (see [doc 68](68-orbital-period-calibration.md)).
+Stored in `astro-reference.json`. These start from the JPL solar-year periods and carry small pipeline refinements (the calibration record, doc 68, is archived).
 
 ## Planet Orbital Eccentricities (Base) — RETIRED (plan 07 R6)
 
-The base-eccentricity construction (the System-Reset midpoint from the balanced-year phase) was the K law's; it is deleted with the law. A planet's eccentricity of date has one home, the N-body chain ([Constants: Planet J2000 Orbital Elements](#planet-j2000-orbital-elements) carries the observed J2000 values the chains are anchored on). Record: [retired record](retired-record.md).
+The base-eccentricity construction (the System-Reset midpoint from the balanced-year phase) was the K law's; it is deleted with the law. A planet's eccentricity of date has one home, the N-body chain ([Constants: Planet J2000 Orbital Elements](#planet-j2000-orbital-elements) carries the observed J2000 values the chains are anchored on).
 
 With it went the Law-4 amplitude construction `e_amp = K × sin(tilt) × √d / (√m × a^(3/2))` and the planets' eccentricity phase constants on the balanced-year phase — nothing in the shipped code derives them any more. The recorded K value stays frozen in the [ψ/K section](#universal-coupling-constant-ψ) above (plan 07: `kValue` is a record, not a derivation).
 
@@ -873,24 +869,27 @@ These were the retired pipeline Step 2's fitted scene angles. Since the K5 legac
 | Uranus | <!--v:uranusAngleCorrectionDeg-->-0.734343<!--/v--> | <!--v:uranusStartPosDeg-->44.90<!--/v--> |
 | Neptune | <!--v:neptuneAngleCorrectionDeg-->2.332767<!--/v--> | <!--v:neptuneStartPosDeg-->47.96<!--/v--> |
 
-## J2000-Verified Ascending Nodes (Optimized)
+## Ascending Nodes on the Invariable Plane at J2000
 
-Calibrated to reproduce exact J2000 ecliptic inclinations (optimized by [Ascending Node Optimization](../tools/verify/ascending-node-optimization.js)):
+Three node sets coexist, all in the Souami & Souchay longitude origin (the plane's ascending node on the ICRF equator), and all closed against the same observation — JPL's J2000 ecliptic inclination — through the spherical-triangle identity `cos i_ecl = cos i_P · cos i_E + sin i_P · sin i_E · cos(Ω_P − Ω_E)`:
 
-| Planet | `ascendingNodeInvPlane` | Delta from S&S |
-|--------|------------------------|--------------|
-| Earth | <!--v:earthAscNodeJ2000-->284.51<!--/v--> | 0.00 deg (S&S 2012) |
-| Mercury | 32.83 | +0.61 deg |
-| Venus | 54.70 | +2.39 deg |
-| Mars | <!--v:marsOmegaJ2000-->353.10<!--/v--> | +1.92 deg |
-| Jupiter | <!--v:jupiterOmegaJ2000-->313.59<!--/v--> | +5.97 deg |
-| Saturn | <!--v:saturnOmegaJ2000-->120.39<!--/v--> | -3.46 deg |
-| Uranus | <!--v:uranusOmegaJ2000-->308.62<!--/v--> | -0.64 deg |
-| Neptune | <!--v:neptuneOmegaJ2000-->191.35<!--/v--> | +2.76 deg |
-| Pluto | <!--v:plutoOmegaJ2000-->101.06<!--/v--> | -6.00 deg |
+- **S&S 2012** — the published nodes (`ascendingNodesSouamiSouchay` in `astro-reference.json`), mean-element values that miss the J2000 ecliptic inclinations by tens of arcseconds to a few arcminutes.
+- **Closed-form verified** — Ω solved from the identity with JPL's `i_ecl`, the S&S `i_P` and Earth's S&S `(i_E, Ω_E)`; `ascendingNodeInvPlane` in `model-parameters.json`. Read by the no-chain scaffolding (Pluto, Halley, Eros, Ceres). Derived by [ascending-node-optimization.js](../tools/verify/ascending-node-optimization.js) (numerical) and [analytical-ascending-nodes.js](../tools/verify/analytical-ascending-nodes.js) (closed form); checked by [ascending-node-verification.js](../tools/verify/ascending-node-verification.js) and [ascending-node-souami-souchay.js](../tools/verify/ascending-node-souami-souchay.js).
+- **Chain J2000** — the N-body chain's node of date at 2000 on the model's own banked plane, converted to the S&S origin by the derived conversion ([doc 05](05-invariable-plane-overview.md)); the value every rendered planet, the API and the registry's `<planet>OmegaJ2000` read. Its closure runs the identity on the chain's own `(i, Ω)` pairs, Earth's chain node included, so it is the chain's J2000 ecliptic inclination against the catalog.
 
-The calibration methodology (the closed-form Ω solution against the JPL J2000 ecliptic inclinations) is in [doc 31 §Verified J2000 node anchors](31-no-chain-body-elements.md#verified-j2000-node-anchors).
-**Verification**: [Ascending Node Verification](../tools/verify/ascending-node-verification.js) verifies correct J2000 ecliptic inclinations. [Ascending Node Souami-Souchay](../tools/verify/ascending-node-souami-souchay.js) compares S&S vs Verified values.
+| Planet | S&S 2012 | closure (″) | Closed-form verified | closure (″) | Chain J2000 | closure (″) |
+|--------|---------:|------------:|---------------------:|------------:|------------:|------------:|
+| Earth | <!--v:earthAscNodeJ2000-->284.51<!--/v--> | (reference) | <!--v:earthAscNodeJ2000-->284.51<!--/v--> | (reference) | <!--v:earthChainAscNodeInvSSJ2000Deg-->284.0401<!--/v--> | (reference) |
+| Mercury | <!--v:mercuryOmegaSS-->32.22<!--/v--> | <!--v:mercuryEclInclSSClosureArcsec-->-52.0<!--/v--> | <!--v:mercuryOmegaVerified-->32.83<!--/v--> | <!--v:mercuryEclInclVerifiedClosureArcsec-->+0.2<!--/v--> | <!--v:mercuryOmegaJ2000-->32.49<!--/v--> | <!--v:mercuryEclInclChainClosureArcsec-->+1.6<!--/v--> |
+| Venus | <!--v:venusOmegaSS-->52.31<!--/v--> | <!--v:venusEclInclSSClosureArcsec-->-117.6<!--/v--> | <!--v:venusOmegaVerified-->54.70<!--/v--> | <!--v:venusEclInclVerifiedClosureArcsec-->-0.1<!--/v--> | <!--v:venusOmegaJ2000-->51.49<!--/v--> | <!--v:venusEclInclChainClosureArcsec-->+2.0<!--/v--> |
+| Mars | <!--v:marsOmegaSS-->352.95<!--/v--> | <!--v:marsEclInclSSClosureArcsec-->-159.1<!--/v--> | <!--v:marsOmegaVerified-->354.87<!--/v--> | <!--v:marsEclInclVerifiedClosureArcsec-->< 0.1<!--/v--> | <!--v:marsOmegaJ2000-->353.10<!--/v--> | <!--v:marsEclInclChainClosureArcsec-->-5.4<!--/v--> |
+| Jupiter | <!--v:jupiterOmegaSS-->306.92<!--/v--> | <!--v:jupiterEclInclSSClosureArcsec-->-63.0<!--/v--> | <!--v:jupiterOmegaVerified-->312.89<!--/v--> | <!--v:jupiterEclInclVerifiedClosureArcsec-->+0.1<!--/v--> | <!--v:jupiterOmegaJ2000-->313.59<!--/v--> | <!--v:jupiterEclInclChainClosureArcsec-->-0.5<!--/v--> |
+| Saturn | <!--v:saturnOmegaSS-->122.27<!--/v--> | <!--v:saturnEclInclSSClosureArcsec-->-35.3<!--/v--> | <!--v:saturnOmegaVerified-->118.81<!--/v--> | <!--v:saturnEclInclVerifiedClosureArcsec-->< 0.1<!--/v--> | <!--v:saturnOmegaJ2000-->120.39<!--/v--> | <!--v:saturnEclInclChainClosureArcsec-->-4.8<!--/v--> |
+| Uranus | <!--v:uranusOmegaSS-->308.44<!--/v--> | <!--v:uranusEclInclSSClosureArcsec-->+32.5<!--/v--> | <!--v:uranusOmegaVerified-->307.80<!--/v--> | <!--v:uranusEclInclVerifiedClosureArcsec-->< 0.1<!--/v--> | <!--v:uranusOmegaJ2000-->308.62<!--/v--> | <!--v:uranusEclInclChainClosureArcsec-->+0.4<!--/v--> |
+| Neptune | <!--v:neptuneOmegaSS-->189.28<!--/v--> | <!--v:neptuneEclInclSSClosureArcsec-->+112.5<!--/v--> | <!--v:neptuneOmegaVerified-->192.04<!--/v--> | <!--v:neptuneEclInclVerifiedClosureArcsec-->< 0.1<!--/v--> | <!--v:neptuneOmegaJ2000-->191.35<!--/v--> | <!--v:neptuneEclInclChainClosureArcsec-->-7.8<!--/v--> |
+| Pluto | <!--v:plutoOmegaSS-->107.06<!--/v--> | — | <!--v:plutoOmegaJ2000-->101.06<!--/v--> | (script) | — (no-chain body) | — |
+
+The verified and chain nodes are different constructions and differ by up to a few degrees: the closed form solves for Ω from the inclination alone (hence a sign ambiguity, resolved toward S&S) on S&S's Earth, while the chain carries JPL's full J2000 element set, node included, rotated into the model's own banked plane — Earth's chain node differs from the S&S value by the same construction. Pluto's closure is reported by the verification script, not the registry.
 
 ## Planet Perihelion Reference Dates (Phase-Optimized)
 
@@ -917,7 +916,7 @@ The calibration methodology (the closed-form Ω solution against the JPL J2000 e
 The per-planet **predictive formula system** — `PREDICT_PLANETS` (device
 period, θ₀, lattice baseline per planet), the normalization constants and the
 `PREDICT_COEFFS_*` arrays (~2,421 fitted terms per planet) — was **retired at
-plan 06 R8** ([retired record](retired-record.md)): the arrays reproduced the
+plan 06 R8**: the arrays reproduced the
 right-ascension rate of the perihelion marker in the retired geometric scene,
 a regression of the simulator against itself, and the planets now render from
 the N-body chain. What remains of the same quantities: the planets' J2000

@@ -45,9 +45,8 @@ const MANIFEST = [
   // inclination-optimization on the inclination side. Each read the retired
   // construction directly (orbitalEccentricityBase — the K law's System-Reset
   // output — or the psi law's amplitude and mean), so with the laws gone
-  // there is nothing for them to compute. docs/retired-record.md is the
-  // record; doc 109 is the engine-input re-evaluation that superseded them,
-  // and doc 10 carries what survives as an observation rather than a law.
+  // there is nothing for them to compute. Doc 109 is the engine-input
+  // re-evaluation that superseded them.
   // The model's falsifiability rests on the three-falsifier criterion
   // (CLAUDE.md §Verification), which never depended on these.
   //

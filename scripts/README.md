@@ -2,7 +2,7 @@
 
 Python (and a few JavaScript) scripts for investigating, verifying, and reproducing the results of the [Expanding Solar System Resonance Theory (ESSRT)](https://www.holisticuniverse.com).
 
-Part of this collection is the research record of the RETIRED integer-relation framing (the former "six Fibonacci Laws" — plan 07 R5/R6 deleted the ψ and K laws, `docs/retired-record.md` is the record; the `fibonacci_*` scripts and their result files are kept as the frozen evidence of that investigation, not as live claims). The rest are the live analyses: the climate formula, the LOD/ΔT stack, the paleo anchors, the lattice null tests. Every script imports the model through the §2f bridge below, and `npm run test:py-smoke` imports each one so the collection cannot rot unseen again. The research originally sought relations that connect planetary orbital tilts, eccentricities, and precession rates to the Earth Fundamental Cycle timescale (H; see [Constants Reference](../docs/20-constants-reference.md)).
+Part of this collection is the research record of the RETIRED integer-relation framing (the former "six Fibonacci Laws" — plan 07 R5/R6 deleted the ψ and K laws; the `fibonacci_*` scripts and their result files are kept as the frozen evidence of that investigation, not as live claims). The rest are the live analyses: the climate formula, the LOD/ΔT stack, the paleo anchors, the lattice null tests. Every script imports the model through the §2f bridge below, and `npm run test:py-smoke` imports each one so the collection cannot rot unseen again. The research originally sought relations that connect planetary orbital tilts, eccentricities, and precession rates to the Earth Fundamental Cycle timescale (H; see [Constants Reference](../docs/20-constants-reference.md)).
 
 > **§2f — analysis only, and it is enforced.** Python here may **read** the
 > model: import from [`tools/lib/python/constants_scripts.py`](../tools/lib/python/constants_scripts.py),
@@ -91,7 +91,7 @@ Empirical tests on LR04 + Cheng 2016 + EPICA + CENOGRID paleoclimate records, bu
 
 **Spectral / supporting tests** (~4 scripts): `milankovitch_spectral_tests.py` (Lomb-Scargle + multitaper + Hinich bispectrum; 405-kyr absence + LR04-vs-Cheng chronology-bias), `milankovitch_candidate_amplitudes.py` (Berger candidates vs Holistic H-divisors head-to-head), `milankovitch_temporal_structure.py` (non-stationarity diagnostics), `mpt_transition_analysis.py` (pre-MPT vs post-MPT amplitude growth).
 
-**Pre-registered Tests A–N + 8H super-cycle** (doc 91 §10 + §12): ~17 scripts including `milankovitch_8h_super_cycle_test.py` (NULL result), `milankovitch_8h_cenogrid_spectral.py`, `milankovitch_8h_cenogrid_windowed.py`, plus one script per test (`milankovitch_8h_13h_boulila_check.py` for Test A, `milankovitch_8h_cheng_*.py` for Test B0/B1/B2/B3, `milankovitch_8h_random_period_null.py` for Test C, etc. through Test N). See [doc 91](../docs/91-milankovitch-evidence.md) §12 for the per-test mapping.
+**Pre-registered Tests A–N + 8H super-cycle** (doc 91 §10 + §12): ~17 scripts including `milankovitch_8h_super_cycle_test.py` (NULL result), `milankovitch_8h_cenogrid_spectral.py`, `milankovitch_8h_cenogrid_windowed.py`, plus one script per test (`milankovitch_8h_13h_boulila_check.py` for Test A, `milankovitch_8h_cheng_*.py` for Test B0/B1/B2/B3, `milankovitch_8h_random_period_null.py` for Test C, etc. through Test N). The per-test mapping (doc 91 §12) is archived.
 
 **405-kyr investigation** (doc 92 §6): 7 scripts `milankovitch_8h_405k_*.py` characterizing the 405-kyr line as a carbon-cycle internal resonance rather than a Venus-Jupiter beat (404.5 kyr line centre, 2.59× amplitude decline from Paleocene to Pliocene, δ¹³C/δ¹⁸O ratio 1.53× at 405 kyr). See [doc 92](../docs/92-climate-formula.md) §6.
 
@@ -99,7 +99,7 @@ Empirical tests on LR04 + Cheng 2016 + EPICA + CENOGRID paleoclimate records, bu
 
 ### Paleoclimate ECS Decomposition (Doc 97)
 
-Climate sensitivity (Charney ECS) decomposition across paleoclimate eras using the 8H L1 lattice. Cross-proxy validation on LR04, EPICA, Snyder GAST, and multiple boron-isotope CO₂ reconstructions (0–67 Ma). (Write-up archived — see ../docs/retired-record.md.)
+Climate sensitivity (Charney ECS) decomposition across paleoclimate eras using the 8H L1 lattice. Cross-proxy validation on LR04, EPICA, Snyder GAST, and multiple boron-isotope CO₂ reconstructions (0–67 Ma). (Write-up archived.)
 
 | Script | Description |
 |--------|-------------|
@@ -110,7 +110,7 @@ Plus 8 supporting scripts: `climate_ecs_boron.py` (boron-isotope CO₂ reconstru
 
 ### Lattice Mechanism (Doc 98)
 
-Physical mechanism behind the 8H lattice: action-angle closure, Chirikov resonance overlap, commensurability. See [doc 98](../docs/98-lattice-mechanism.md).
+Physical mechanism behind the 8H lattice: action-angle closure, Chirikov resonance overlap, commensurability. (Write-up in the retired integer-label framing, archived.)
 
 | Script | Description |
 |--------|-------------|
@@ -158,7 +158,7 @@ Plus `l1_vs_laskar_50myr.py` and `l1_vs_laskar_published_50myr.py` for forward-i
 
 | Script | Description |
 |--------|-------------|
-| `planet_nine_analysis.py` | Planet Nine prediction — falsifiable test from the Fibonacci balance laws. Two-tier structure (Law-4 compliance pre-check + full 7.5M-config v-balance search) confirms rejection of a major 9th planet at ETNO distances. (Prediction withdrawn with the Law framework; write-up archived — see ../docs/retired-record.md.) |
+| `planet_nine_analysis.py` | Planet Nine prediction — falsifiable test from the Fibonacci balance laws. Two-tier structure (Law-4 compliance pre-check + full 7.5M-config v-balance search) confirms rejection of a major 9th planet at ETNO distances. (Prediction withdrawn with the Law framework; write-up archived.) |
 | `tno_balance_test.py` | TNO contribution to Law 5 balance — population-summed and individual approaches. |
 | `tno_obliquity_prediction.py` | Law-4 TNO obliquity predictions — derives expected TNO axial tilts from the K amplitude constant. |
 

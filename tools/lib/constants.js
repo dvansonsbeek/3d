@@ -439,7 +439,7 @@ massFraction.earth = (GM_EARTH_ALONE / G_CONSTANT) / M_SUN;
 // constant inverted from Earth's calibration — and the per-planet ψ loop
 // below it (invPlaneInclinationAmplitude / invPlaneInclinationMean) are
 // DELETED with @essrt/physics/planets/fibonacci-laws. A planet's inclination
-// of date has one home, the N-body chain; docs/retired-record.md.)
+// of date has one home, the N-body chain.)
 
 const eccJ2000 = {
   mercury: planets.mercury.orbitalEccentricityJ2000,

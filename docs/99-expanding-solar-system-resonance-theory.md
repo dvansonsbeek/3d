@@ -30,7 +30,7 @@ ESSRT's clock is the structure of the FIRST:
   108.6 ± 8.5 ″/yr at Joffre; <!--v:anchorXiamalingPrec1400Pred-->86.60<!--/v-->
   vs Meyers & Malinverno 2018's 85.79 ± 2.72 ″/yr at Xiamaling — gate
   rows). The spin-only clock the model carried before is retired
-  (`docs/retired-record.md`) and survives only as the frozen era clock's
+  and survives only as the frozen era clock's
   named phase convention; the model's internal unit scales with the
   composed period and is not 13 of them. Earth's apsidal and
   perihelion-of-date laws are exact **epoch-local** laws of the present
@@ -56,7 +56,7 @@ precession clock; its eccentricity-band lines are planetary g-beats and do
 NOT scale — the 405-kyr family is measured stable while the precession band
 moves, and that split IS the two-tier structure, confirmed at 1.4 and
 2.46 Ga. (The former integer LABELS of those lines were retired by the
-pre-registered tests T1/T5 of plan 06 — `docs/retired-record.md`.)
+pre-registered tests T1/T5 of plan 06.)
 
 > **In the past, the precession period was shorter (~<!--v:axialPrecAtDevonian-->21,699<!--/v--> yr at 380 Ma vs <!--v:axialPrecRound-->~25,771<!--/v--> yr today).**
 > **In the future, it will be longer (~<!--v:axialPrecAt200MyrFuture-->28,208<!--/v--> yr in 200 Myr, growing asymptotically toward the tidal-lock limit).**
@@ -174,7 +174,7 @@ factory, the evaluator the obliquity hybrid precesses on and the
 paleo-anchors gate checks. The model's earlier deep-time clock — H scaling
 with the day length alone, H₀·LOD(t)/LOD₀, which missed the lunar 1/a³
 torque growth and read 9 ″/yr low at 650 Ma, 24 % low at 1.4 Ga and 35 %
-low at 2.46 Ga — is retired (`docs/retired-record.md`); it survives only
+low at 2.46 Ga — is retired; it survives only
 as the frozen era clock's named phase convention, shipped with that
 device's coefficients. Labels: both model columns are theory; Wu's rate is inferred from
 cyclostratigraphy through an assumed astronomical model (see "Structural vs
@@ -222,6 +222,22 @@ every epoch by construction; likewise 8 = 5 + 3. What is epoch-local is
 that the addends land on their J2000 values. The relations' FORM is permanent;
 their integer VALUES were the J2000 configuration — whether coincidence
 or selection is open, and the model claims no mechanism.
+
+The four identities in rate form (only the first two are independent; the
+other two follow algebraically). They hold for any precessing axis over a
+precessing orbital plane, at every epoch; the right-hand column is what
+they read as when the five periods were taken as integer fractions of the
+fitted anchor — rounded readings that happened to add, not locked periods:
+
+| Physical identity | Rate form (1/T) | J2000 integer reading (retired as structure) |
+|---|---|---|
+| f_obliquity = f_axial − f_nodal | 1/T_obl = 1/T_p − 1/T_nodal | 13 − 5 = 8 |
+| f_perihelion = f_axial + f_apsidal | 1/T_peri = 1/T_p + 1/T_aps | 13 + 3 = 16 |
+| f_apsidal = f_obliquity − f_nodal | 1/T_aps = 1/T_obl − 1/T_nodal | 8 − 5 = 3 |
+| f_nodal = f_axial − f_obliquity | 1/T_nodal = 1/T_p − 1/T_obl | 13 − 8 = 5 |
+
+The obliquity row is the one beat the model predicts at deep time
+(2π/(ψ̇ − |s₃|), falsification leg 1).
 
 ### The path to one engine
 
@@ -277,7 +293,7 @@ The eccentricity-band lines |g_i − g_j| do NOT scale — MEASURED: the 405-kyr
 405 from gravity, doc 109 §12). The former "view 2" (all L1 scale) is
 RETIRED by measurement; "view 1" (ψ̇-involving only) is the theory. The
 former integer labels of the lines are retired with the T1/T5 tests
-(plan 06; docs/retired-record.md): the lines are the engine's own
+(plan 06): the lines are the engine's own
 Berger/Laskar-style beats (data/l1-physical-lines.json).
 ```
 
@@ -955,7 +971,7 @@ days/yr  = tropical_year_s(t) / LOD(t)
 | −500 | 21.31 | 20,521 | 411.37 | 364,994 | 29.25 | Late Cambrian |
 | −620 | 20.71 | 19,382 | 423.11 | 360,135 | 26.99 | Ediacaran (Williams 2000) |
 
-T_p(t) = 1,296,000/ψ̇(t) with ψ̇(t) = [ω(t)/ω₀]·p₀·[f_S + (1 − f_S)(a₀/a_M(t))³] — Earth's spin (angular-momentum conservation on the recession history) carrying the solar and lunar torques, the lunar torque growing as the Moon was closer; p₀ = 50.2883 ″/yr, the model's derived J2000 rate (T_p = 25,771.4 yr; plan 06 S5). The obliquity beat is 1,296,000/(ψ̇ − |s₃|) with |s₃| = 18.8506 ″/yr, the dominant nodal mode of Earth's orbit (the engine's deep secular modes; μ = 1). The spin-only clock the model carried before (H₀·LOD/LOD₀ ÷ 13) read 23,553 yr at the Devonian where the composed clock reads 21,699 — retired, `docs/retired-record.md`.
+T_p(t) = 1,296,000/ψ̇(t) with ψ̇(t) = [ω(t)/ω₀]·p₀·[f_S + (1 − f_S)(a₀/a_M(t))³] — Earth's spin (angular-momentum conservation on the recession history) carrying the solar and lunar torques, the lunar torque growing as the Moon was closer; p₀ = 50.2883 ″/yr, the model's derived J2000 rate (T_p = 25,771.4 yr; plan 06 S5). The obliquity beat is 1,296,000/(ψ̇ − |s₃|) with |s₃| = 18.8506 ″/yr, the dominant nodal mode of Earth's orbit (the engine's deep secular modes; μ = 1). The spin-only clock the model carried before (H₀·LOD/LOD₀ ÷ 13) read 23,553 yr at the Devonian where the composed clock reads 21,699 — retired.
 <!-- /generated:doc99-clock-through-time -->
 
 **The precession of date.** The table is the secular law. The movement of
@@ -1083,7 +1099,7 @@ For the framework: this is an honest limitation of using a single smooth polynom
 
 ### Structural vs physical axial precession at deep time
 
-> **Status (plan 06 D6 → S5).** The "structural" reading below — H(t)/13 as the axial precession period — is retired, on both counts: its deep-time scaling (spin-only; D6, `docs/retired-record.md`) and its J2000 value (H₀/13 = 25,793.6 yr was the fit anchor's reading, 0.086 % slow; the model's one J2000 precession reading is the of-date year laws' beat, <!--v:axialPrecExact-->25,771.40<!--/v--> yr — S5). The **physical** rate below is the shipped clock, with its J2000 anchor on that derived value and its modern split derived from the constants (solar share <!--v:earthPrecSolarShareJ2000Pct-->31.6<!--/v--> %). The reconciliation that follows is kept as the record of why.
+> **Status (plan 06 D6 → S5).** The "structural" reading below — H(t)/13 as the axial precession period — is retired, on both counts: its deep-time scaling (spin-only; D6) and its J2000 value (H₀/13 = 25,793.6 yr was the fit anchor's reading, 0.086 % slow; the model's one J2000 precession reading is the of-date year laws' beat, <!--v:axialPrecExact-->25,771.40<!--/v--> yr — S5). The **physical** rate below is the shipped clock, with its J2000 anchor on that derived value and its modern split derived from the constants (solar share <!--v:earthPrecSolarShareJ2000Pct-->31.6<!--/v--> %). The reconciliation that follows is kept as the record of why.
 
 Wu et al. 2024 also report axial precession frequencies inferred from cyclostratigraphy: **51.25 ″/yr (present) → 67.64 ″/yr at 650 Ma** — a +32 % increase.
 
@@ -2432,8 +2448,8 @@ All values written by the engine (`npm run docs:doc99:write`). The frozen era cl
 - `scripts/eight_h_history.py` — paleo-H computation from LOD evolution
 - `scripts/paleo_l1_renumbering.py` — paleo L1 beat prediction (note: under "view 1" naming for k-involving beats; same formulas apply to view 2 if extended to all L1)
 - `scripts/paleo_lod_comparison.py` — LOD model comparison
-- Test C series (validation in deep time) — the first-pass ECS decomposition is archived ([retired record](retired-record.md)); docs 92/95 carry the current climate results
-- `docs/98-lattice-mechanism.md` — action-angle closure as the underlying mechanism
+- Test C series (validation in deep time) — the first-pass ECS decomposition is archived; doc 92 carries the current climate results
+- Doc 98 (action-angle closure as the underlying mechanism, written in the retired integer-label framing) — archived
 
 ## Key references
 

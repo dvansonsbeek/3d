@@ -48,26 +48,10 @@ const HOLISTIC = process.argv.includes('--holistic');
 
 // ── The HISTORICAL docs — explicit, justified, nothing by pattern ───────────
 // (Phase 3 survey + read-based classification; everything else is current.)
-// The 2026-09 aggressive archival (owner decision) moved the whole prior
-// HISTORICAL set plus twelve retired-concept docs (the H/8H family
-// scaffolding: Law-4 Δa derivations, balance constructions, planet
-// lattice-period tables, Planet Nine screening) out of the tree entirely —
-// docs/archive/retired/ (gitignored) holds the files, git history the
-// diffs, docs/retired-record.md the public record. A doc that genuinely
-// freezes IN the tree is listed here.
-const HISTORICAL = new Set([
-  // Plan 07 (planet channel migration): the six Fibonacci relations' record —
-  // its value markers were frozen to the retired device's numbers when the
-  // planets' periods, inclinations and nodes moved onto the N-body chain; the
-  // doc describes the retired laws and must not track the live registry.
-  '10-fibonacci-laws.md',
-  // Plan 07 R5/R9 + §9k: the geometric-elements device's record — the device
-  // is deleted (its evaluators, the ψ law, the node integrator), the doc keeps
-  // the description and calibration tables of what it was. Its remaining
-  // value markers are observed catalogue and chain values that still resolve;
-  // the dated anchor column is gone with the balanced-year date (§3c/§3d).
-  '31-no-chain-body-elements.md',
-]);
+// Retired docs leave the tree entirely — docs/archive/retired/ (gitignored)
+// holds the files, git history the diffs. A doc that genuinely freezes IN
+// the tree is listed here; today none does.
+const HISTORICAL = new Set([]);
 // No doc is superseded today (§10a survey: zero point forward to a successor).
 const SUPERSEDED = new Set([]);
 

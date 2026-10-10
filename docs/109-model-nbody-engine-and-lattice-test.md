@@ -793,7 +793,7 @@ Malinverno 2018's 85.79 ± 2.72 ″/yr at 1.4 Ga,
 2022's 108.6 ± 8.5 ″/yr at 2.46 Ga — both paleo-anchors gate rows). The
 model's earlier deep-time reading, the spin-only clock
 13·1,296,000/(H₀·LOD/LOD₀), fails both rows (24 % and 35 % low) and is
-retired to `docs/retired-record.md`; it survives only as the frozen era
+retired; it survives only as the frozen era
 clock's named phase convention. The registry keys `obliqBeat*Kyr` (the
 beat) / `obliqH8Scaled*Kyr` (name kept: the pure precession-scaling
 reading "obliquity period ∝ T_p" — the J2000 beat held proportional to
@@ -913,8 +913,8 @@ stood at the static J2000 tilt); the K eccentricity law's cycle period is
 the chain's own g-mode beat (`computeSecularShape`) and its obliquity input
 the derived J2000 obliquity — both constants of the artifacts, no fractions;
 the two-component device obliquity law, the `*ObliquityCycle` aliases, the
-wobble-beat of the fractions and the snapshot "mean obliquity" are gone
-(docs/retired-record.md). The registry keys `<planet>ObliqCycle` are
+wobble-beat of the fractions and the snapshot "mean obliquity" are gone.
+The registry keys `<planet>ObliqCycle` are
 removed (no obliquity cycle is claimed); `<planet>AxialPeriod` reads the
 channel (Mercury: the chain's node period) and `<planet>EccCycle` the
 g-mode beat.
@@ -1029,6 +1029,6 @@ reference the model itself provides, with the JPL-era cross-checks
 ## Related documents
 
 - [13-mercury-precession-breakdown.md](13-mercury-precession-breakdown.md) — §1.8: the projection identity, the transit test, the candidate slot
-- [108-derived-earth-orbit-vector.md](108-derived-earth-orbit-vector.md) — the first-order derivation this doc supersedes with the model's own engine
-- the 8H/N period table the restatement applies to is archived ([retired record](retired-record.md))
+- Doc 108 — the first-order Laplace–Lagrange derivation this doc supersedes with the model's own engine (archived)
+- the 8H/N period table the restatement applies to is archived
 - [99-expanding-solar-system-resonance-theory.md](99-expanding-solar-system-resonance-theory.md) — ESSRT

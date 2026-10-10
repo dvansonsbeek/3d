@@ -13,10 +13,10 @@
 // linear year-2000 node, Earth's H/3 inclination cosine, the ψ-law planet
 // oscillation and the two-normal ecliptic inclinations — and the COMPOSITE
 // computeEarthOrbitalElements left at plan 07 R5: the planets' elements of
-// date have one home, the N-body chain; docs/retired-record.md.)
+// date have one home, the N-body chain.)
 //
 // Primary consumer: tools/optimize.js (the dashboard exporter that also
-// consumed it is retired — docs/retired-record.md)
+// consumed it is retired)
 // ═══════════════════════════════════════════════════════════════════════════
 
 const C = require('./constants');
@@ -726,7 +726,7 @@ function computeSolsticeYearLength(year, type) { return _cardinalPkg().cardinal.
 // reproduced the RETIRED geometric scene's exported Earth-frame RA rate. The
 // rate is now the equatorial projection of the lattice motion —
 // tools/docs/model-values.mjs predictiveMachinery and the browser's
-// perihelionFrameBreakdown, identical ops. docs/retired-record.md.)
+// perihelionFrameBreakdown, identical ops.)
 
 module.exports = {
   // Obliquity

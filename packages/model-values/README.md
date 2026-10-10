@@ -13,8 +13,8 @@ installed ship in `MODEL_VALUES_META`.
 ```js
 import { MODEL_VALUES, MODEL_VALUES_META } from '@essrt/model-values';
 
-MODEL_VALUES.usnoLodJ2000;      // "86,400.0017"
-MODEL_VALUES_META.modelVersion; // the shipped model identity, e.g. "v11.0"
+MODEL_VALUES.usnoLodJ2000;      // "86,400.0021"
+MODEL_VALUES_META.modelVersion; // the shipped model identity, e.g. "v21.0"
 MODEL_VALUES_META.keyCount;     // how many keys this version publishes
 ```
 

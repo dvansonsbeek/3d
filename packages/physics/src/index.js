@@ -126,7 +126,7 @@ export { computeEarthFrameOfDate, solveWheelAngleForLongitude } from './earth/fr
 // (planets/fibonacci-laws), the record-based orientation forms
 // (planets/orientation) and the ascending-node integrator
 // (planets/asc-node-integrator) are DELETED at plan 07 R5/R6: the planets'
-// elements of date have one home, the N-body chain; docs/retired-record.md.
+// elements of date have one home, the N-body chain.
 export { derivePlanetGeometry } from './planets/geometry.cjs';
 export { eccentricityFromCycles, computeEccentricityIntegrated } from './planets/ecc-channel.cjs';
 export * as planetOrbitChain from './planets/orbit-chain.cjs';
@@ -156,7 +156,7 @@ export { createYearLengths, ONE_FAMILY_WINDOW_YEARS } from './earth/year-lengths
 // leg-1's physical rate; the structural H(t)/13 clock is its named diagnostic.
 export { computeSolarTorqueShare, createComposedPrecession } from './earth/precession-composed.cjs';
 // (planets/predict.cjs — the planet predictive-precession feature basis — was
-// retired at plan 06 R8 with PREDICT_COEFFS_PHYSICAL; docs/retired-record.md.)
+// retired at plan 06 R8 with PREDICT_COEFFS_PHYSICAL.)
 // L10 — the composition front door: one law set, N body records. Thin by
 // design; engines keep their direct call sites (see planets/model.cjs).
 export { createPlanetModel } from './planets/model.cjs';

@@ -50,8 +50,7 @@ The Interactive 3D Solar System Simulation is a sophisticated WebGL-based astron
   K5 legacy-chain excision; the geometric planet chains described in this
   document survive only as scene scaffolding and for the no-chain bodies,
   and their fitted corrections are deleted — see doc 41's engine-D
-  rendering note; the correction-stack records are archived
-  ([retired record](retired-record.md)))
+  rendering note; the correction-stack records are archived)
 - Long-term precession cycles (axial, perihelion, inclination)
 - The standard-model reference overlay (K8): VSOP87A ghost bodies for the
   Sun + seven planets with a live per-body Δ readout — one-way reference,
@@ -573,8 +572,7 @@ Features:
 The former **predictive formula system** (`buildPredictiveFeatures` /
 `PREDICT_COEFFS` / `predictGeocentricPrecession`, ~2,421 fitted terms per
 planet ported from Python) was retired at plan 06 R8: it reproduced the
-right-ascension rate of the perihelion marker in the retired geometric scene
-([retired record](retired-record.md)).
+right-ascension rate of the perihelion marker in the retired geometric scene.
 
 ### Celestial Bodies
 
@@ -782,7 +780,7 @@ eccentricAnomaly: (M_deg, e) => {
 
 ### True Anomaly (`updatePlanetAnomalies`, line ~26774)
 
-True anomaly is computed geometrically from world-space positions using `atan2`, not from the eccentric anomaly. The function reads each planet's 3D position relative to the Sun and computes the angular position directly. (Planet *mean* anomaly, by contrast, is the textbook `M = M₀ + n·Δt` with a Kepler-equation solve — the position-based alternative was rejected; doc 30 (archived — see [the retired record](retired-record.md)) carries that design's record. The Moon keeps the geometric method.)
+True anomaly is computed geometrically from world-space positions using `atan2`, not from the eccentric anomaly. The function reads each planet's 3D position relative to the Sun and computes the angular position directly. (Planet *mean* anomaly, by contrast, is the textbook `M = M₀ + n·Δt` with a Kepler-equation solve — the position-based alternative was rejected. The Moon keeps the geometric method.)
 
 ### Height Above Invariable Plane (`updatePlanetInvariablePlaneHeights`)
 

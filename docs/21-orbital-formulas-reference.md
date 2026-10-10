@@ -13,7 +13,6 @@ This document provides a complete reference for all orbital calculation function
 
 **Related Documents:**
 - [Dynamic Orbital Elements Overview](04-dynamic-elements-overview.md) - How dynamic systems work together
-- [Geometric Orbital Elements — the retired device (record)](31-no-chain-body-elements.md) - The inclination-oscillation and node-integration device, deleted at plan 07 R5
 
 ---
 
@@ -1460,7 +1459,7 @@ For current values, see [Constants Reference](20-constants-reference.md).
 
 **How values are sourced:**
 - **Eccentricity**: the chain's element of date (`_kcElementsOfDate(k, jd).e`; the K base/amplitude/phase law was retired at plan 07 R6)
-- **Inclination (inv)**: the chain's element of date (`.inclInvPlaneDeg`; the ψ mean/amplitude law was retired at plan 07 R5 — [doc 10, the six relations — historical record](10-fibonacci-laws.md))
+- **Inclination (inv)**: the chain's element of date (`.inclInvPlaneDeg`; the ψ mean/amplitude law was retired at plan 07 R5)
 - **Semi-major axis**: Derived from period via Kepler's 3rd Law: `a = (H / solarYearCount)^(2/3)` where `solarYearCount = round(H × meanSolarYearDays / solarYearInput)` — the integer number of orbits in one H (doc 20 § Quantization)
 - **Period**: Input constant per planet (`planets.{name}.solarYearInput`)
 

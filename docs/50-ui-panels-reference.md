@@ -21,9 +21,6 @@ The simulation includes several interactive panels for inspecting planetary data
 | **PlanetStats Panel** | Per-planet data display with collapsible groups, charts, and dynamic rows |
 | **Invariable Plane Analysis** | View planet heights above/below the invariable plane |
 | **Balance Trend Analysis** | Track mass-weighted balance over time |
-| ~~Invariable Plane Balance Explorer~~ | REMOVED (integer-law retirement; code excised with the legacy chains) — doc 53 (archived — [retired record](retired-record.md)) is the record |
-| ~~Eccentricity Balance Scale~~ | REMOVED (integer-law retirement; code excised with the legacy chains) — doc 38 (archived — [retired record](retired-record.md)) is the record |
-| ~~Solar System Resonance Cycle~~ | REMOVED (integer-law retirement; code excised with the legacy chains) — the period table is archived ([retired record](retired-record.md)) |
 | **Standard Model (VSOP87 · MPP02)** | K8 reference overlay: pale-blue ghost bodies (Sun, Moon + seven planets) at the standard theory's positions + live per-body Δ readout (″, astrometric both sides). Planets/Sun: truncated VSOP87A, measured 0.3–3.6″ RMS vs JPL 1600–2400; Moon: ELP/MPP02, measured 0.22″ RMS over the observed-ΔT era. One-way reference — nothing in the model consumes it |
 | **Perihelion of Planets Verification** | Observed perihelion-precession history from JPL WebGeoCalc (1900–2026) per planet — see [doc 56](56-webgeocalc-explorer.md) |
 | **Earth Climate Analysis** | L1+L2+L3 climate formula visualized across LR04 / CENOGRID / EPICA / CenCO2PIP, multiple time windows — see [doc 58](58-climate-formula-explorer.md) |
@@ -263,8 +260,7 @@ general-relativistic advance derived from the model constants
 perihelion" / "Perihelion precession (Geocentric)" rows and the "Missing
 advance around 1900 AD" pair read the retired predictive formula
 (`predictGeocentricPrecession`, ~2,400 fitted coefficients per planet
-reproducing the retired geometric scene's exported rate) — see the
-[retired record](retired-record.md).
+reproducing the retired geometric scene's exported rate).
 
 ### Code Locations
 
@@ -347,7 +343,7 @@ Where:
 
 ### Coordinate System Notes
 
-For the chain bodies (Mercury–Neptune, Earth) the height is the **exact projection** `h = r⃗ · ẑ_inv` of the chain's heliocentric vector, and the displayed nodes come from the element set of date (K5c s-frame — see [doc 05](05-invariable-plane-overview.md)). The linear-precession node construction with **ecliptic-rate ascending nodes** (rather than ICRF-rate) survives only for the no-chain bodies Pluto, Halley and Eros ([doc 31](31-no-chain-body-elements.md)) — necessary there because Earth's position (`sun.ra`) is measured in precessing ecliptic coordinates.
+For the chain bodies (Mercury–Neptune, Earth) the height is the **exact projection** `h = r⃗ · ẑ_inv` of the chain's heliocentric vector, and the displayed nodes come from the element set of date (K5c s-frame — see [doc 05](05-invariable-plane-overview.md)). The linear-precession node construction with **ecliptic-rate ascending nodes** (rather than ICRF-rate) survives only for the no-chain bodies Pluto, Halley and Eros — necessary there because Earth's position (`sun.ra`) is measured in precessing ecliptic coordinates.
 
 ---
 
@@ -423,7 +419,7 @@ o.balanceMaxSeen = 0;                // Maximum observed
 ## Removed panels (integer-law retirement → K5 excision)
 
 Three interactive panels were REMOVED from the Tools menu with the
-integer-law retirement (the model restatement — doc 10 Status carries
+integer-law retirement (the model restatement — doc 109 carries
 the measured verdicts) and their code was excised wholesale in the K5
 legacy-chain excision:
 
@@ -431,7 +427,7 @@ legacy-chain excision:
 |---|---|---|
 | **Invariable Plane Balance Explorer** | Interactive testing of planetary group assignments and integer divisors against the balance relations | doc 53 (archived) |
 | **Eccentricity Balance Scale** | Waterfall chart + buildup table of the Law-5 balance per target planet | doc 38 (archived) |
-| **The planetary integer-label period table** | 8 planets × 6 cycle types as integer divisors of the anchor's eight-unit interval, with Years / divisor toggle and paper-SVG export | archived ([retired record](retired-record.md)) |
+| **The planetary integer-label period table** | 8 planets × 6 cycle types as integer divisors of the anchor's eight-unit interval, with Years / divisor toggle and paper-SVG export | doc 55 (archived) |
 
 ---
 
@@ -666,11 +662,8 @@ This 99.994% agreement validates that our orbital elements are consistent with p
 | Document | Purpose |
 |----------|---------|
 | [51 - Planet Orbit Analysis Reference](51-planet-inspector-reference.md) | Planet inspector calculations |
-| 53 - Balance Explorer Reference (archived — [retired record](retired-record.md)) | Balance explorer calculations and controls |
 | [05 - The Invariable Plane](05-invariable-plane-overview.md) | Height calculation formulas |
 | [20 - Constants Reference](20-constants-reference.md) | Planet masses and orbital elements |
-| 38 - Eccentricity Balance Scale (archived — [retired record](retired-record.md)) | Law 5 balance math; Saturn eccentricity prediction |
-| 55 - the planetary integer-label period table (archived — [retired record](retired-record.md)) | the retired per-planet integer tabulation |
 | [56 - Perihelion of Planets Verification](56-webgeocalc-explorer.md) | Observed perihelion-precession (JPL NAIF, 1900–2026) |
 | [57 - Framework Verification](57-formula-verification.md) | Model vs published celestial-mechanics formulas (±12 k yr) |
 | [58 - Earth Climate Analysis](58-climate-formula-explorer.md) | Dedicated panel reference for the Earth Climate Analysis modal |

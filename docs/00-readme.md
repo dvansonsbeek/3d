@@ -10,15 +10,13 @@ status: current
 This is the technical documentation for the [3D Solar System Simulation](https://3d.holisticuniverse.com). It covers the theory, calculations, architecture, and tooling behind the model. If you're looking for the scientific background, visit [holisticuniverse.com](https://holisticuniverse.com).
 
 **Who is this for?**
-- **Curious readers** — start with the [Introduction](01-introduction.md) and [the Six Relations](10-fibonacci-laws.md)
+- **Curious readers** — start with the [Introduction](01-introduction.md) and [ESSRT](99-expanding-solar-system-resonance-theory.md)
 - **Users of the simulation** — see the [User Guide](02-user-guide.md)
 - **Contributors & developers** — the [Architecture](40-architecture.md) and [Constants Reference](20-constants-reference.md) are your starting points
 
 Document **numbers are stable identifiers**, not a reading order — the
-archival of retired-machinery docs left gaps in the numbering, and the
-sections below give the intended reading order instead.
-[The retired record](retired-record.md) says what was archived, where,
-and why.
+archival of retired docs left gaps in the numbering (git history carries
+their diffs), and the sections below give the intended reading order instead.
 
 ---
 
@@ -37,18 +35,14 @@ and why.
 | # | Document | Description |
 |---|----------|-------------|
 | 99 | [Expanding Solar System Resonance Theory (ESSRT)](99-expanding-solar-system-resonance-theory.md) | The theory: the two expansions — Earth's spin tier on the tidal history (the composed lunisolar precession clock: the day lengthens, the Moon recedes, the precession period grows), every orbit on the solar-mass history; the two-tier scaling split (the precession band moves with the clock, the 405-kyr metronome does not) confirmed at 1.4 and 2.46 Ga; the deep-time predictions and the falsification criteria |
-| 10 | [The Six Relations](10-fibonacci-laws.md) | The six historical relations (retired framing, kept as the record) with per-relation measured statuses — precession cycles, inclination and eccentricity constants, balance observations, resonance |
-| 108 | [The derived Earth-orbit vector](108-derived-earth-orbit-vector.md) | Earth's eccentricity and perihelion as one rotating vector: e is frame-invariant, H/16 belongs to ϖ_of-date (13 + 3 = 16), and the model's H/16 and H/3 laws are LOCAL J2000 rates of that vector; a zero-fitted-constant Laplace–Lagrange e(t) on the framework's own planets reproduces La2004 (corr 0.967 over 250 kyr) — standard secular dynamics, not lattice evidence |
 | 109 | [The model's own N-body: audit, engine, frequencies, lattice test](109-model-nbody-engine-and-lattice-test.md) | The re-evaluation record: the Wisdom–Holman engine reproduces every planet's rates from Newton + the measured masses (Mercury's −43″/cy closed by the 1PN term alone); the secular g/s to 0.1–1%; the lattice tested at its own quantity type (divisors retyped as means / present-epoch / window values); the bound experiments (§12) that left H/3 as the epoch-local tangent of Earth's free eccentricity vector |
 | 110 | [The calculation map](110-calculation-map.md) | The audit's instrument: every published quantity traced to its inputs, formula, engine/type, code location and LIVE value (script-written, freshness-gated) with an H-role column (unit / physics-by-proxy / comb basis / lattice claim) — the spreadsheet-checkable statement of what the model computes; chain 1 = Earth's eccentricity into the lunar chain |
-| 98 | [The lattice mechanism (historical framing)](98-lattice-mechanism.md) | Research doc written in the retired integer-label framing, kept as the record: the action-angle-closure argument for the climate formula's lines; the labels themselves were retired by plan 06 T1/T5 |
 
 ### Earth: time & motion
 
 | # | Document | Description |
 |---|----------|-------------|
 | 11 | [Day & Year Length Formulas](11-length-day-year-formulas.md) | Tropical year and day length: measurement methods, validation, the frozen-era laws and the one-source year lengths |
-| 14 | [Solstice Prediction](14-solstice-prediction.md) | Record of the retired fitted cardinal-point model (harmonic combs on the frozen era clock; its RA formula was the device's own axis frame) — the cardinal instants now ride the certified Sun (`createModel().cardinal`) |
 | 65 | [Equation of Center](65-equation-of-center.md) | The Sun wheel's variable-speed construction: the geometric/analytic split, the derived exact-Kepler corrector (default path), the certified-Sun δ overlay, and the registry-resident legacy harmonic layer |
 | 13 | [Perihelion Precession](13-mercury-precession-breakdown.md) | The two perihelion coordinates and their methods, the Earth-frame projection account (§1.8, gate-pinned for all seven planets), and the Laplace–Lagrange comparison |
 
@@ -58,9 +52,6 @@ and why.
 |---|----------|-------------|
 | 04 | [Orbital Elements: the Chain and the Devices](04-dynamic-elements-overview.md) | The three tiers: the Keplerian chain (THE planet path — source-of-truth doctrine, elements of date, secular shapes), the engine-K hierarchy (Earth/Moon/Sun), and the no-chain bodies |
 | 05 | [The Invariable Plane](05-invariable-plane-overview.md) | The plane the model banks from its own chain artifact (K5c s-frame + derived Souami & Souchay origin conversion), heights, nodes, crossings, and the two live self-checks |
-| 31 | [Geometric Orbital Elements — the retired device (record)](31-no-chain-body-elements.md) | The inclination-oscillation and node-integration device, deleted at plan 07 R5 — kept as the record of what it was, with its calibration tables |
-| 68 | [Orbital Period Calibration](68-orbital-period-calibration.md) | The legacy device-chain period calibration against ancient observations (the rendered planets read the chain) |
-| 72 | [The Closed Loop](72-the-closed-loop.md) | How PSI and K derive the orbital-oscillation amplitudes from Earth alone — the retired law framework's construction record |
 
 ### The Moon
 
@@ -84,11 +75,8 @@ and why.
 
 | # | Document | Description |
 |---|----------|-------------|
-| 90 | [Milankovitch Language of the Model](90-milankovitch-language.md) | The model's Milankovitch framework: five H-divisor periods closed by beat algebra; all six Berger 1978 climatic-precession peaks matched within 0.7% |
-| 91 | [Milankovitch Evidence & Hypothesis Tests](91-milankovitch-evidence.md) | Empirical tests on LR04 + Cheng 2016 + EPICA + CENOGRID: the climate formula, per-planet contributions, pre-registered super-cycle nulls, fourteen falsifiable follow-up tests, and the 405-kyr off-lattice characterization |
 | 92 | [Climate Formula — Architecture, Variance Decomposition & Implementation](92-climate-formula.md) | The canonical L1 + L2 + L3 climate formula: per-regime ridge-fit architecture, five-layer variance decomposition, LR04 R² = 0.87 post-MPT (0.93 stitched), EPICA CO₂ cross-proxy R² = 0.84, and the reproducing pipeline |
 | 94 | [Insolation Extension Test (no fourth layer)](94-insolation-null-test.md) | Adding classical Berger insolation features to the climate formula yields no cross-window-stable gain — measured on the shipped model with the model's own orbit and with La2004/La2010; the lines already carry the insolation-relevant variance |
-| 95 | [Climate Summary — Gravitational Coupling, Not Insolation](95-climate-summary.md) | Capstone synthesis of docs 90–94 |
 
 ### Reference
 
@@ -113,17 +101,11 @@ and why.
 | 58 | [Earth Climate Analysis](58-climate-formula-explorer.md) | Tools-menu modal visualizing the climate formula against LR04 / CENOGRID / EPICA / CenCO2PIP |
 | 59 | [Earth–Moon Genesis Analysis](59-essrt-explorer.md) | Tools-menu modal for the deep-time evolution of the clock, LOD, year length and Moon distance under ESSRT |
 
-### The record
-
-| Document | Description |
-|---|-------------|
-| [Retired record](retired-record.md) | What was archived out of this tree, by family — the fitted correction stack, the balance constructions, the withdrawn predictions, the planet lattice-period claims — with the honest-withdrawal statements |
-
 ---
 
 ## Appendices
 
-**Verification scripts** — standalone Node.js scripts that verify, compute, or analyze model parameters. Run with `node tools/verify/<filename>`. (`npm run test:verify:list` classifies all 31: 6 gate · 3 liftable · 12 narrative · 10 generator.)
+**Verification scripts** — standalone Node.js scripts that verify, compute, or analyze model parameters. Run with `node tools/verify/<filename>`. (`npm run test:verify:list` classifies all 24: 5 gate · 1 liftable · 6 narrative · 12 generator.)
 
 | Script | Description |
 |--------|-------------|
@@ -178,7 +160,7 @@ node tools/optimize.js <command> <target>
 The planet-facing optimization programme is retired (the planets render
 from the engine-D element chain, which is not fitted per planet); the
 tool remains for Moon-side steps and chain-vs-JPL diagnostics. The full
-programme documentation is archived — see [the retired record](retired-record.md).
+programme documentation is archived.
 
 ### `tools/pipeline/` — Reference Data Pipeline
 

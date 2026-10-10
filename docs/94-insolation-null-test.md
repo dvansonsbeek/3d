@@ -236,7 +236,7 @@ Berger's secular theory derives ε(t) and e(t) as sums of beats among
 Laskar's fundamental frequencies (g₁..g₈, s₁..s₈). Those beats are L1's
 lines — the engine's own |gᵢ − gⱼ|, p + sᵢ and p + gᵢ combinations
 ([doc 92 §2](92-climate-formula.md); the comb-era attribution record, doc 93,
-is archived — [retired record](retired-record.md)). Once L1 is in the formula, adding the
+is archived). Once L1 is in the formula, adding the
 literally-derived quantities is double-counting at the linear level.
 
 ### 5.2 Classical insolation has very low standalone explanatory power for LR04
@@ -247,12 +247,12 @@ the four linear features alone explain about a quarter of post-MPT LR04,
 against <!--v:insolExtR2L1PostMpt-->0.779<!--/v--> for the lines alone. LR04 records
 **ice volume**, an integrated response, not the summer-day insolation at 65°N;
 the lines, each with its fitted amplitude and phase, carry that integrated
-response and the four features do not. (See [doc 91](91-milankovitch-evidence.md)
-for the comb-era mapping of LR04 spectral peaks.)
+response and the four features do not. (The comb-era mapping of LR04
+spectral peaks, doc 91, is archived.)
 
-### 5.3 This sets up [doc 95](95-climate-summary.md): climate is determined by our solar system
+### 5.3 The synthesis: climate is determined by our solar system
 
-The null finding here is the empirical backing for the doc 95 synthesis
+The null finding here is the empirical backing for the synthesis
 statement: **climate is determined by the solar system's gravitational
 rhythm — not by solar insolation directly.** Insolation is one channel
 through which gravitational coupling reaches Earth, but the rhythm itself
@@ -487,7 +487,7 @@ Output: [`data/insolation-stability-results.json`](../data/insolation-stability-
 
 ## 10. L1 attribution — the gain is the lattice line n = 24 (comb-era record)
 
-> **Retired record.** This section was measured on the integer-label comb as
+> **Retired measurement.** This section was measured on the integer-label comb as
 > L1 and the single-line e(t) as the model's eccentricity — both since retired
 > (plan 06 T1; the eccentricity is the N-body series). Its markers read the
 > frozen `data/l1-n24-attribution-results.json`; the script refuses to re-run
@@ -577,7 +577,7 @@ cross-validated value as *non-stationary amplitude across the window* — doc
 
 **Admitted.** n = 24 joins L1 as its <!--v:l1DivisorCount-->33<!--/v-->rd divisor on
 the regime clause of the admission rule stated in
-[doc 91 §1](91-milankovitch-evidence.md) (≥ 1.5× median *and* cross-validated
+doc 91 §1 (archived) (≥ 1.5× median *and* cross-validated
 positive in a named regime — the same basis as the six pre-MPT-only members).
 Consequence for the LOD chain: the deep-time α(t) reads the post-MPT L1 layer,
 so the admission refit moved it; `alphaClimateScalePerMille` was recalibrated
@@ -623,9 +623,5 @@ Outputs: [`data/l1-n24-attribution-results.json`](../data/l1-n24-attribution-res
 
 ## Related documents
 
-- [Doc 90 — Milankovitch language](90-milankovitch-language.md) — terminology primer
-- [Doc 91 — Milankovitch evidence](91-milankovitch-evidence.md) — orbital forcing → climate mapping
 - [Doc 92 — Climate formula](92-climate-formula.md) — canonical L1+L2+L3 architecture (the formula tested here)
-- Doc 93 — L1 attribution reference (comb-era record, archived: [retired record](retired-record.md)) — the shipped lines carry their Berger/Laskar attribution by construction (doc 92 §2)
-- [Doc 95 — Climate summary](95-climate-summary.md) — the synthesis statement this doc empirically defends
 - [Doc 99 — Expanding Solar System Resonance Theory (ESSRT)](99-expanding-solar-system-resonance-theory.md) — Deep-time scaling of H(t)

@@ -5,7 +5,8 @@ as implemented by the [ESSRT simulator](https://3d.holisticuniverse.com)
 ([source, AGPL-3.0](https://github.com/dvansonsbeek/3d)). Pure computation:
 no I/O, no globals, no DOM, constants injected. The package ships the
 **complete model**, including the fitted coefficients, so an installed copy
-reproduces the hosted simulator bit-for-bit on the shared golden masters.
+reproduces the simulator's engine on the shared golden masters (bit-exact in
+Node; the browser build is held to a measured cross-runtime tolerance).
 
 ## Versioning — two axes, deliberately
 
@@ -39,10 +40,13 @@ subpath export) generated from the sources' JSDoc — `import` from
 `@essrt/physics` or any subpath is fully typed; no ambient shim needed.
 
 See the `exports` map in `package.json` for the full surface: moon
-(arguments/series/apparent/ecc-channel/month-chain), planets (geometry,
-corrections, predict, model, fibonacci-laws, …), deltat (cycles, deep-time,
-historical), cardinal points, phase, chain-cycles, sun, climate, eclipse
-finders, and the published reference curves.
+(arguments, series, series-extension, apparent, ecc-channel,
+deep-ecc-channel, month-chain), earth (year-lengths, precession-composed,
+frame-of-date, sidereal-year-channel, deep-orbital-history), planets
+(keplerian-chain, orbit-chain, secular-shape, secular-series,
+inv-plane-frame, spin-channel, ecc-channel, geometry, model), deltat
+(cycles, deep-time, recession-history, historical), cardinal points, phase,
+chain-cycles, sun, climate and eclipse finders.
 
 For rendered display values (day/year lengths, precession rates, orbital
 elements as preformatted strings), see
@@ -57,10 +61,11 @@ The canonical assembly, wired once inside the package:
 import { createModel, DEFAULT_CONSTANTS } from '@essrt/physics';
 
 const model = createModel();
-model.identity.modelVersion;          // the shipped model identity (e.g. 'v11.0') + both content hashes
-model.epoch.hAtYear(2000 - 380e6);    // 306189 — Devonian H (the Wells 1963 match)
+model.identity.modelVersion;          // the shipped model identity (e.g. 'v21.0') + both content hashes
+model.lunisolar.meanPeriodYearsAtYear(2000 - 380e6); // 21699 — the Devonian precession period
+model.epoch.lodSecondsAtYear(2000 - 380e6);          // 78895 — the Devonian day (Wells 1963's coral count)
 model.earth.obliquityDeg(2000);       // 23.4393
-model.cardinal.jd(2000, 'SS');        // 2451716.5736 — June solstice 2000, the apparent Sun's crossing (USNO 2451716.575: the 2-min gap is the mean-longitude anchor convention, labelled)
+model.cardinal.jd(2000, 'SS');        // 2451716.5751 — June solstice 2000, the apparent Sun's crossing (USNO 2451716.575)
 model.lengths.tropicalYearDays(2000); // 365.24219
 
 // Counterfactual (§2d): inject different constants, get a different solar
@@ -69,22 +74,27 @@ const cf = createModel({
   ...DEFAULT_CONSTANTS,
   foundational: { ...DEFAULT_CONSTANTS.foundational, holisticyearLength: 400000 },
 });
-cf.epoch.hAtYear(2000);               // 400000
+cf.epoch.hAtYear(2000);               // 400000 — the anchor unit (a fit constant, not a period)
 cf.identity.counterfactual;           // true
 ```
 
 The surface groups: `time` (exact JD ↔ model-year conversion on the SI
 axis the fits were anchored on — callers holding a JD convert here, never
 with their own formula), `identity` (version + hashes + citation DOI), `epoch`
-(H, LOD, α, ΔT, deep-time quantities at any year ±500 Myr), `earth`
+(the internal unit, LOD, α, ΔT, the precession period and the deep-time
+quantities at any year ±500 Myr), `lunisolar` (the mean lunisolar precession
+period and rate at any year, its solar/lunar torque split, the nodal mode
+and the obliquity beat, the apsidal and perihelion-of-date periods and their
+ratios over the published window), `earth`
 (obliquity, eccentricity, inclination, perihelion), `lengths` (year and
 day lengths), `cardinal` (solstice/equinox JD, RA, year length), `moon`
 (distance and months at epoch, plus the apparent-position chain on the
 JD(UT) axis — ecliptic longitude, latitude and distance from the shared
 Meeus series over framework-native arguments), `eclipse` (geocentric
 solar/lunar eclipse search over a JD window, greatest-eclipse convention),
-`climate` (the L1 orbital-forcing formula) and `planets` (the retired integer-law
-records and orientation at epoch). Validation targets are refused as
+`climate` (the L1 orbital-forcing formula) and `planets` (the N-body chain's
+elements of date — perihelion longitude, node and inclination on the
+invariable plane, eccentricity — and spin). Validation targets are refused as
 inputs — a counterfactual cannot move the goalposts it is judged by.
 
 ### The series artifact
@@ -105,7 +115,7 @@ createModel().earth.eccentricity(2000 - 100000);   // 0.03374 — the mode table
 Without the artifact `createModel()` evaluates the embedded 18-term mode
 table at every epoch: exact at J2000, a compact approximation away from it
 (RMS 3.6·10⁻³ in e against La2010a over the last 500 kyr, where the series
-reads 2.5·10⁻⁵). The hosted API, the MCP server and the simulator always
+reads 2.5·10⁻⁵). The API handler, the MCP server and the simulator always
 pass the artifact.
 
 ## Underneath: a parts library

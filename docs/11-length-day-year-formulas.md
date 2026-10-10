@@ -420,5 +420,4 @@ Training data (the frozen fit's basis): the full-period solar-measurements expor
 
 ## Related
 
-- [Solstice Prediction](14-solstice-prediction.md) — record of the retired cardinal-point harmonic formulas
 - **Solar Day Report** (browser: Reports > Solar Day) — measures 365 noon-to-noon intervals from 6 starting points, visualizes the analemma and equation-of-time bias by starting angle

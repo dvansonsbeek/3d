@@ -29,7 +29,7 @@ All constants originate from `tools/lib/constants.js` (the single source of trut
 > the per-planet `coefficients/` modules and `PREDICTIVE_FORMULA_GUIDE.mdx`
 > — was **retired at plan 06 R8**: it fitted the RETIRED geometric scene's
 > exported Earth-frame perihelion-RA rate against the simulator's own export.
-> The record is `docs/retired-record.md`; the Earth-frame rate is now the
+> The Earth-frame rate is now the
 > equatorial projection of the lattice motion (doc 13 §1.8).
 
 ---

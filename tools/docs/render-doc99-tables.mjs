@@ -72,7 +72,7 @@ function blockClockThroughTime() {
     rows.push(`| ${b(ageLabel(t))} | ${b(f(lodHr(t), 2))} | ${b(th(Tp(t)))} | ${b(f(daysPerYr(t), 2))} | ${b(th(moonKm(t)))} | ${b(f(beatKyr(t), 2))} | ${ERA[String(t)] ?? ''} |`);
   }
   rows.push('');
-  rows.push(`T_p(t) = 1,296,000/ψ̇(t) with ψ̇(t) = [ω(t)/ω₀]·p₀·[f_S + (1 − f_S)(a₀/a_M(t))³] — Earth's spin (angular-momentum conservation on the recession history) carrying the solar and lunar torques, the lunar torque growing as the Moon was closer; p₀ = ${f(p0, 4)} ″/yr, the model's derived J2000 rate (T_p = ${th(Tp(0), 1)} yr; plan 06 S5). The obliquity beat is 1,296,000/(ψ̇ − |s₃|) with |s₃| = ${f(s3, 4)} ″/yr, the dominant nodal mode of Earth's orbit (the engine's deep secular modes; μ = 1). The spin-only clock the model carried before (H₀·LOD/LOD₀ ÷ 13) read ${th(DT.eraClockHAtAge(380) / 13)} yr at the Devonian where the composed clock reads ${th(Tp(380))} — retired, \`docs/retired-record.md\`.`);
+  rows.push(`T_p(t) = 1,296,000/ψ̇(t) with ψ̇(t) = [ω(t)/ω₀]·p₀·[f_S + (1 − f_S)(a₀/a_M(t))³] — Earth's spin (angular-momentum conservation on the recession history) carrying the solar and lunar torques, the lunar torque growing as the Moon was closer; p₀ = ${f(p0, 4)} ″/yr, the model's derived J2000 rate (T_p = ${th(Tp(0), 1)} yr; plan 06 S5). The obliquity beat is 1,296,000/(ψ̇ − |s₃|) with |s₃| = ${f(s3, 4)} ″/yr, the dominant nodal mode of Earth's orbit (the engine's deep secular modes; μ = 1). The spin-only clock the model carried before (H₀·LOD/LOD₀ ÷ 13) read ${th(DT.eraClockHAtAge(380) / 13)} yr at the Devonian where the composed clock reads ${th(Tp(380))} — retired.`);
   return rows.join('\n');
 }
 

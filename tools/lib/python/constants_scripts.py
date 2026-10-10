@@ -296,7 +296,7 @@ GROUP_23 = GROUP_ANTI
 # per-planet INCL_AMP = PSI/(d×√m) (alias INCLINATION_AMPS) stood here — the
 # Python mirror of the ψ inclination law. Deleted with the law: a planet's
 # inclination of date has one home, the N-body chain (@essrt/physics
-# model.planets.inclinationDeg). docs/retired-record.md is the record.
+# model.planets.inclinationDeg).
 # ═══════════════════════════════════════════════════════════════════════════
 
 # Fibonacci numbers (the retired divisor vocabulary; kept for the scripts that
@@ -479,7 +479,7 @@ XI = {p: xi(p) for p in PLANET_NAMES}
 # inclination_weight, eccentricity_weight, verify_law2, verify_law3 and
 # predict_saturn_eccentricity — the balance-law instruments on the divisor
 # table D — stood here. The laws went at R6, the divisor at R8; doc 109 is the
-# evidence record and docs/retired-record.md the record.
+# evidence record.
 # ═══════════════════════════════════════════════════════════════════════════
 
 

@@ -61,7 +61,7 @@ ecliptic value. Two implementations exist:
   <!--v:mercuryEarthFrameRa1900-->576.17<!--/v--> ″/cy at 1900,
   <!--v:mercuryEarthFrameRa2000-->576.19<!--/v--> ″/cy at 2000. (The former
   "predict basis" — ~2,421 fitted terms per planet trained on the retired
-  geometric scene's export — is in the [retired record](retired-record.md).)
+  geometric scene's export — is archived.)
 
 | Metric | Mercury |
 |--------|-----------------|
@@ -252,7 +252,7 @@ Great-Inequality oscillation (~900-yr period) and will reverse within
 permanently retrograde at `−3,140 ″/cy` (the device's ecliptic-period value) because that's the correct
 date-frame expression of the stable ICRF structure. Long-baseline JPL
 DE441 integrations (13 000 BC → 17 000 AD) can in principle distinguish
-these. See [docs/10-fibonacci-laws.md §Law 6](10-fibonacci-laws.md#law-6-saturn-jupiter-earth-resonance) for the full discussion.
+these. Saturn's window retrograde is the chain's own reading ([doc 109](109-model-nbody-engine-and-lattice-test.md)).
 
 ---
 
@@ -263,7 +263,7 @@ longitude (§1.8, <!--v:mercuryPeriProjectionExcessJ2000-->42.51<!--/v-->″/cy)
 with the general-relativistic advance derived from the model's own constants
 (<!--v:mercuryPeriAnomalyGrArcsecCy-->42.98<!--/v-->″/cy). The former
 "Missing advance around 1900 AD (Model)" row read the retired predictive
-formula at 1900 (the [retired record](retired-record.md)); §1.8 carries the
+formula at 1900 (retired); §1.8 carries the
 measured verdict on the projection.
 
 ### 1.7 Historical Context
@@ -505,7 +505,6 @@ subject of §1.8's projection analysis and transit test.
 
 ## Related Documents
 
-- [10-fibonacci-laws.md](10-fibonacci-laws.md) — the six relations (Saturn's ecliptic-retrograde perihelion is covered under Law 6)
 - [109-model-nbody-engine-and-lattice-test.md](109-model-nbody-engine-and-lattice-test.md) — the model's own N-body: audit, engine, frequencies, the lattice at its own quantity type, divisor restatement
 - [56-webgeocalc-explorer.md](56-webgeocalc-explorer.md) — the observed-rate explorer this document's comparisons cite
 - [41-scene-graph-hierarchy.md](41-scene-graph-hierarchy.md) — why Earth-frame measurements inherit the precession layers

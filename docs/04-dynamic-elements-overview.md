@@ -23,7 +23,6 @@ three tiers, and knowing which body sits on which tier answers most
 3. **The geometric elements device — DELETED (plan 07 R5).** Ceres's
    reference constants remain as data; Earth's inclination and node of date
    are the one-source engine reading ([doc 05](05-invariable-plane-overview.md)).
-   [Doc 31](31-no-chain-body-elements.md) is the record of what the device was.
 
 ---
 
@@ -72,8 +71,7 @@ artifact — terms and evaluation form ship together. The epoch anchor is
 J2000.0 (JD 2451545.0, TT); calendar mapping goes through the model's own
 JD→year machinery (a half-day slip is 2° of Mercury mean longitude).
 
-The re-evaluation records: [doc 108](108-derived-earth-orbit-vector.md)
-(the derived Earth-orbit vector), [doc 109](109-model-nbody-engine-and-lattice-test.md)
+The re-evaluation record: [doc 109](109-model-nbody-engine-and-lattice-test.md)
 (the model's own N-body engine, the measured planetary frequencies, and
 the lattice tested at its own quantity type).
 
@@ -82,13 +80,13 @@ the lattice tested at its own quantity type).
 Earth's own motion — spin, precession devices, tides, H(t), the cardinal
 points, the one-source movement — stays on the engine-K hierarchy and is
 documented where it lives: [doc 11](11-length-day-year-formulas.md)
-(years and days), [doc 14](14-solstice-prediction.md) (the retired cardinal-point combs, kept as the record),
+(years and days), [doc 65](65-equation-of-center.md) (the Sun wheel),
 [doc 40](40-architecture.md) (the one-source movement),
 [doc 99](99-expanding-solar-system-resonance-theory.md) (ESSRT).
 
 Earth's engine-K orbital-plane devices (the H/3 inclination oscillation
 and −H/5 node regression) were deleted at plan 07 R5/R9 with the geometric
-device of [doc 31](31-no-chain-body-elements.md); Earth's invariable-plane
+device; Earth's invariable-plane
 inclination and node of date are the one-source engine reading on every
 surface (the panel, the API's `earth.inclinationDeg`/`ascendingNodeDeg`,
 the registry).
@@ -131,8 +129,7 @@ four published a single 27,943-yr period for four unrelated orbits (Pluto's
 true apsidal period is of order 3.7 Myr). Nothing gated them and nothing
 published them.
 
-What the device carried is recorded in
-[doc 31](31-no-chain-body-elements.md): Ceres's reference constants — it is
+What the device carried: Ceres's reference constants — it is
 a force-only perturber in the N-body run — Earth's engine-K devices, and the
 probe-pinned reference implementations; the device itself was deleted at
 plan 07 R5. Pluto's observed mass and node also
@@ -149,7 +146,7 @@ Two rules keep element comparisons honest across all three tiers:
   the mean ecliptic of J2000, a fixed plane; the ecliptic of date moves
   (~0.01°/cy) — enough to flip several planets' apparent inclination-trend
   signs. Compare in the J2000-fixed frame
-  ([doc 31 §Two Frames](31-no-chain-body-elements.md#two-frames--be-careful-which-one-you-mean)).
+  ([doc 05 §Two frames](05-invariable-plane-overview.md#two-frames-two-node-values--dont-conflate)).
 - **Equinox vs ICRF.** An ecliptic rate of date and an inertial (ICRF)
   rate differ by the general precession (H/13); the scene's equatorial
   frame co-moves with its star field, so scene measurements cannot
@@ -169,8 +166,7 @@ Two rules keep element comparisons honest across all three tiers:
 
 ## References
 
-1. [31 - Geometric Orbital Elements — the No-Chain Bodies](31-no-chain-body-elements.md)
-2. [05 - The Invariable Plane](05-invariable-plane-overview.md)
-3. [108 - The Derived Earth-Orbit Vector](108-derived-earth-orbit-vector.md) · [109 - The Model's Own N-body](109-model-nbody-engine-and-lattice-test.md)
-4. [20 - Constants Reference](20-constants-reference.md)
+1. [05 - The Invariable Plane](05-invariable-plane-overview.md)
+2. [109 - The Model's Own N-body](109-model-nbody-engine-and-lattice-test.md)
+3. [20 - Constants Reference](20-constants-reference.md)
 5. Souami, D. & Souchay, J. (2012), "The solar system's invariable plane", A&A 543, A133

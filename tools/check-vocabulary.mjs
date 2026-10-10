@@ -42,9 +42,7 @@ const TERMS = [
 
 /** Historical records keep the old vocabulary by design. */
 const ALLOW = [
-  /^docs\/10-fibonacci-laws\.md$/,
   /^docs\/109-/,
-  /^docs\/retired-record\.md$/,
   /^docs\/archive\//,
   /^docs\/1[0-9]-.*(kirkwood|sun-ssb)/,
 ];

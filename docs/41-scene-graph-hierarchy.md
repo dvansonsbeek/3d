@@ -9,7 +9,7 @@ status: current
 
 This document describes the Three.js scene graph hierarchy used in the ESSRT simulation. Understanding this nested structure is essential because **all astronomical motions are implemented through composed rotations** of parent-child relationships.
 
-**Engine-D rendering (the ONLY planet path since the K5 legacy-chain excision):** the seven planets' rendered positions, orbit rings, traces, perihelion markers, panels and the invariable-plane machinery (heights, mass gauge, Sun-SSB) are computed from the model's own N-body chain (`@essrt/physics/planets/keplerian-chain` + the governed artifact `data/nbody-secular-frequencies.json`); Earth, the Moon and the Sun stay on the hierarchy (the two-engine interface — the Sun's chain hangs from the perihelion-of-Earth construction and every historical gate is calibrated on it). The geometric hierarchy below still exists and rotates, but serves only as anchor scaffolding for the display devices and as the rendering path for the no-chain bodies (Pluto, Halley, Eros); its fitted corrections were deleted with the excision (the records are archived — [retired record](retired-record.md)), and the `?keplerChains=0` opt-out is gone. The `Mid-Eccentricity Orbit` node (the one law's base′ reference circle) was removed with the flip.
+**Engine-D rendering (the ONLY planet path since the K5 legacy-chain excision):** the seven planets' rendered positions, orbit rings, traces, perihelion markers, panels and the invariable-plane machinery (heights, mass gauge, Sun-SSB) are computed from the model's own N-body chain (`@essrt/physics/planets/keplerian-chain` + the governed artifact `data/nbody-secular-frequencies.json`); Earth, the Moon and the Sun stay on the hierarchy (the two-engine interface — the Sun's chain hangs from the perihelion-of-Earth construction and every historical gate is calibrated on it). The geometric hierarchy below still exists and rotates, but serves only as anchor scaffolding for the display devices and as the rendering path for the no-chain bodies (Pluto, Halley, Eros); its fitted corrections were deleted with the excision, and the `?keplerChains=0` opt-out is gone. The `Mid-Eccentricity Orbit` node (the one law's base′ reference circle) was removed with the flip.
 
 **Related Documents:**
 - [13 - Perihelion Precession](13-mercury-precession-breakdown.md) - How precession affects apparent measurements
@@ -153,7 +153,7 @@ Each nesting layer applies its rotation to all children, creating composite prec
 > identical ops; the J2000 pose of the K device is the bridge everything is
 > placed relative to. Four relative corrections that used to sit on the K
 > geometry (tilt, equinox azimuth, apsidal delta, the δ Newton read) are gone
-> — `docs/retired-record.md` carries the record and the measured reasons: the
+> — the measured reasons: the
 > K sun plane and the RA frame's ecliptic parted by 20.5″ at J2000 and 10′ at
 > −3000, the rendered Sun −19″/+19″ in declination against Horizons at the
 > 2000 equinoxes (−0.28″/+0.19″ after). The engine sampler's time coordinate
@@ -454,7 +454,7 @@ RA/Dec override).
 
 ## Part 9: Outer Planet Hierarchy
 
-All seven planets, Mercury to Neptune, are **siblings** of the Sun under `barycenterEarthAndSun`, not children of the Sun. (Pluto, Halley's Comet and Eros left the scene with plan 07 — `docs/retired-record.md`.)
+All seven planets, Mercury to Neptune, are **siblings** of the Sun under `barycenterEarthAndSun`, not children of the Sun. (Pluto, Halley's Comet and Eros left the scene with plan 07.)
 
 ```
 barycenterEarthAndSun.pivotObj

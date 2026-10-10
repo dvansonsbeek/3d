@@ -274,7 +274,7 @@ Earth's inclination to the invariable plane is the **one-source engine reading**
 i_inv = acos(n̂_Earth(t) · n̂_inv)
 ```
 
-**Range:** ~0.85° to ~2.46° over the last 100 kyr (the device's `i_mean − A·cos(phase)` with its ~0.85°–2.12° range is retired; `docs/retired-record.md`)
+**Range:** ~0.85° to ~2.46° over the last 100 kyr (the device's `i_mean − A·cos(phase)` with its ~0.85°–2.12° range is retired)
 
 **Implementation:**
 - Function: `inclInvPlaneModel()` in `src/script.js`; `model.earth.inclinationDeg` in `@essrt/physics` (identical ops)

@@ -252,7 +252,7 @@ All functions support JD chaining (`prevJD`) for efficient sequential-year searc
 
 ### Related
 
-The cardinal instants the tools export are the apparent crossings of the certified Sun (`createModel().cardinal`); the retired fitted cardinal-point combs are recorded in [14 — Solstice Prediction](14-solstice-prediction.md).
+The cardinal instants the tools export are the apparent crossings of the certified Sun (`createModel().cardinal`).
 
 ---
 

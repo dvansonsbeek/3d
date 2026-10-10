@@ -19,7 +19,6 @@ inspector is computed on its own path.
 
 **Related documentation:**
 - [41 — Scene graph hierarchy](41-scene-graph-hierarchy.md) — the engine frame of date and the chain placement
-- [31 — Geometric orbital elements, the retired device (record)](31-no-chain-body-elements.md) — the inclination-oscillation and node-integration device, deleted at plan 07 R5 (Pluto, Halley and Eros had been removed before it)
 - [52 — Analysis and export tools](52-analysis-export-tools.md) — the position report
 
 ---

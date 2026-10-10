@@ -71,7 +71,7 @@ The climate formula's orbital lines against the Cenozoic isotope record (the com
 
 - **Cenogrid spectral evidence** — MTM F-tests and windowed spectra of the
   Westerhold 2020 CENOGRID stack against the comb-era line set:
-  [doc 91](91-milankovitch-evidence.md) with generated artifacts
+  the archived doc 91, with generated artifacts
   (`data/milankovitch-8h-cenogrid-*.json`, `data/cenogrid-mtm-ftest.json`)
   under `check:artifacts` freshness.
 - **Devonian obliquity beat** — the composed clock's beat 2π/(ψ̇ − |s₃|)
@@ -84,12 +84,13 @@ The climate formula's orbital lines against the Cenozoic isotope record (the com
 - **The 405-kyr caveat, stated plainly** — the Laskar g₂−g₅ eccentricity
   eigenbeat was *off* the comb-era grid (it is a line of the shipped physical set); the record's 405-kyr power is
   carbon-cycle amplified and is not claimed for the lattice (the comb-era
-  attribution record, doc 93, is archived — [retired record](retired-record.md)).
+  attribution record, doc 93, is archived).
 - **Discriminating power, stated plainly** — the 66-Ma record cannot
   distinguish a fixed lattice from an H(t)-rescaled one (2.4σ):
-  [doc 98](98-lattice-mechanism.md). The LOD-climate correlation fails its
-  null tests and is recorded as **open correspondence, not validation**:
-  [doc 95](95-climate-summary.md), [doc 94](94-insolation-null-test.md).
+  the archived doc 98. The LOD-climate
+  correlation fails its null tests and is recorded as **open
+  correspondence, not validation**: [doc 94](94-insolation-null-test.md)
+  (the capstone doc 95 is archived).
 
 ## C. Historical era — gate- and artifact-backed
 
@@ -159,8 +160,8 @@ The climate formula's orbital lines against the Cenozoic isotope record (the com
 | The thermal-tide pump mechanism (Driver 1½) | the mid-Precambrian window is now MATCHED by the shipped regime-aware history (§A), but the pump mechanism stays contested in the literature: Mitchell–Kirscher 2023 argue a resonance-held stall, Zhou 2024 argue the Lamb resonance is unlikely. The fit lets the data decide (partial pump, zero disfavoured ~2.4σ; the factor×window product is the constrained quantity). The pre-regime quartic's −26%/−37% divergences are preserved in git history and in the probe script | [doc 99 §mid-Precambrian window](99-expanding-solar-system-resonance-theory.md#the-mid-precambrian-window-135-ga--the-regime-aware-recession-history-driver-1), `tools/explore/farhat-divergence-probe.js` |
 | Wu 2024 Pangea interval (200–500 Ma Moon rows) | the smooth Farhat polynomial cannot capture the supercontinent-era high-dissipation recession; deviations asserted as bands | [doc 99 §Pangea](99-expanding-solar-system-resonance-theory.md#the-pangea-high-tidal-dissipation-interval-the-mid-range-mismatch) |
 | Saturn Laplace–Lagrange bound | the model's documented physical-constraint failure (verify-laws 44/45; `allPass: false`) — distinct from the Config-7 mirror uniqueness, which holds | `tools/verify/verify-laws.js`, CLAUDE.md §falsification |
-| LOD–climate correlation | fails every null test → open correspondence, not validation | [doc 95](95-climate-summary.md) |
-| Lattice vs H(t) discrimination | 2.4σ — the 66-Ma record cannot decide | [doc 98](98-lattice-mechanism.md) |
+| LOD–climate correlation | fails every null test → open correspondence, not validation | [doc 94](94-insolation-null-test.md) |
+| Lattice vs H(t) discrimination | 2.4σ — the 66-Ma record cannot decide | doc 98 (archived) |
 | Uniform secular solar drift | bounded at r = −0.13 ± 0.09 ms/cy; a uniform −0.5 is disfavoured ~4σ | fit-anchor documentation |
 | The former Config-#7 falsification criterion | RETIRED with the integer-law restatement (checks 46–50 of verify-laws are narrative class — the record, no longer a gate). The current criterion stands on three legs: the deep-time scaling split, historical-era exactness, and two-expansions μ-consistency | CLAUDE.md §falsification, [doc 109](109-model-nbody-engine-and-lattice-test.md) |
 

@@ -206,7 +206,7 @@ const STEPS = [
   { id: '9',  phase: 2, name: 'Regenerate constants module',
     cmd: 'node tools/constants/generate.mjs --write' },
   // (Step 10, the Data Explorer dashboard export, retired with the
-  // dashboard — docs/retired-record.md.)
+  // dashboard.)
 ];
 
 // ─── Filter steps ───────────────────────────────────────────────────────────
