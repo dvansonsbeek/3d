@@ -58,7 +58,7 @@ These write artifacts that `npm run check` re-checks against their recorded inpu
 |--------|-------------|
 | `milankovitch_8h_all_integer_mtm.py` | All-integer MTM F-test scan across the comb (doc 92 §2) |
 | `milankovitch_8h_cheng_chronology_validation.py` | Independent-chronology validation on the Cheng 2016 speleothem record (doc 92 §4) |
-| `fit_methodology_diagnostics.py` | Diagnostics on the L1 design matrix: collinearity, ridge path, per-regime conditioning (doc 92 §8) |
+| `fit_methodology_diagnostics.py` | Diagnostics on the L1 design matrix of the shipped lines: conditioning, Rayleigh groups, VIF, forward-projection growth, the OLS / ridge / thinned ladder (doc 92 §9.5; `data/fit-methodology-diagnostics.json`) |
 | `milankovitch_insolation_extension.py` | Does adding Berger insolation features to the formula buy cross-window-stable gain? (doc 94) |
 | `milankovitch_insolation_laskar_check.py` | The same test hardened on La2004/La2010 orbital features (doc 94) |
 | `milankovitch_insolation_stability.py` | Cross-window stability of the insolation extension (doc 94) |

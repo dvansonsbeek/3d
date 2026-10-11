@@ -12,6 +12,7 @@
     "climate-ecs-tight.json": "scripts/climate_ecs_tight.py",
     "eight-h-history.json": "scripts/eight_h_history.py",
     "evolving-clock-test.json": "scripts/test_evolving_clock_climate_formula.py",
+    "fit-methodology-diagnostics.json": "scripts/fit_methodology_diagnostics.py",
     "h8-subband-stability.json": "scripts/h8_subband_scan.py",
     "insolation-extension-results.json": "scripts/milankovitch_insolation_extension.py",
     "insolation-laskar-check-results.json": "scripts/milankovitch_insolation_laskar_check.py",

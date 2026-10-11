@@ -1,0 +1,917 @@
+{
+  "metadata": {
+    "script": "fit_methodology_diagnostics.py",
+    "n_lines": 28,
+    "lines": [
+      {
+        "period_kyr": 19.001447325297764,
+        "label": "climatic precession p+g2"
+      },
+      {
+        "period_kyr": 19.155372483100056,
+        "label": "climatic precession p+g3"
+      },
+      {
+        "period_kyr": 22.445158803235106,
+        "label": "climatic precession p+g1"
+      },
+      {
+        "period_kyr": 23.193145239083524,
+        "label": "climatic precession p+g4"
+      },
+      {
+        "period_kyr": 23.75990527269503,
+        "label": "climatic precession p+g0"
+      },
+      {
+        "period_kyr": 27.401948921129186,
+        "label": "obliquity p+s12"
+      },
+      {
+        "period_kyr": 28.991297596280972,
+        "label": "obliquity p+s1"
+      },
+      {
+        "period_kyr": 29.155358974399498,
+        "label": "obliquity p+s14"
+      },
+      {
+        "period_kyr": 29.77423626384929,
+        "label": "obliquity p+s9"
+      },
+      {
+        "period_kyr": 29.96822664834997,
+        "label": "obliquity p+s3"
+      },
+      {
+        "period_kyr": 39.836645758160245,
+        "label": "obliquity p+s2"
+      },
+      {
+        "period_kyr": 40.51952419741089,
+        "label": "obliquity p+s4"
+      },
+      {
+        "period_kyr": 41.224350938248435,
+        "label": "obliquity p+s0"
+      },
+      {
+        "period_kyr": 41.95568251678215,
+        "label": "obliquity p+s7"
+      },
+      {
+        "period_kyr": 54.134327711463335,
+        "label": "obliquity p+s10"
+      },
+      {
+        "period_kyr": 94.8779191670953,
+        "label": "eccentricity g0\u2212g2"
+      },
+      {
+        "period_kyr": 96.84902648762181,
+        "label": "eccentricity g0\u2212g6"
+      },
+      {
+        "period_kyr": 98.8438689567201,
+        "label": "eccentricity g0\u2212g3"
+      },
+      {
+        "period_kyr": 101.00506143827943,
+        "label": "eccentricity g0\u2212g5"
+      },
+      {
+        "period_kyr": 103.12379754572216,
+        "label": "eccentricity g0\u2212g7"
+      },
+      {
+        "period_kyr": 105.13718703798536,
+        "label": "eccentricity g2\u2212g4"
+      },
+      {
+        "period_kyr": 110.0293064910417,
+        "label": "eccentricity g3\u2212g4"
+      },
+      {
+        "period_kyr": 123.8461774280429,
+        "label": "eccentricity g1\u2212g2"
+      },
+      {
+        "period_kyr": 130.69097366197656,
+        "label": "eccentricity g1\u2212g3"
+      },
+      {
+        "period_kyr": 134.49598078775747,
+        "label": "eccentricity g1\u2212g5"
+      },
+      {
+        "period_kyr": 405.6256163323513,
+        "label": "eccentricity fundamental g\u2082\u2212g\u2085"
+      },
+      {
+        "period_kyr": 202.81280816617564,
+        "label": "climate-internal harmonic (g\u2082\u2212g\u2085)/2"
+      },
+      {
+        "period_kyr": 135.20853877745043,
+        "label": "climate-internal harmonic (g\u2082\u2212g\u2085)/3"
+      }
+    ],
+    "shipped_ridge_lambda": 1.0,
+    "ladder_lambdas": [
+      0.1,
+      1.0,
+      10.0
+    ],
+    "forward_grid_kyr": [
+      -250.0,
+      0.0,
+      0.5
+    ],
+    "runtime_sec": 1.7317454814910889
+  },
+  "regimes": {
+    "post-mpt": {
+      "window_kyr": [
+        0,
+        1000
+      ],
+      "conditioning": {
+        "n_samples": 1001,
+        "n_cols": 56,
+        "rank_at_1e10_ratio": 56,
+        "singular_max": 46.59102478206651,
+        "singular_min": 2.6088685736347092e-05,
+        "condition_number": 1785870.9040737648
+      },
+      "rayleigh": {
+        "T_kyr": 1000.0,
+        "rayleigh_df_per_kyr": 0.001,
+        "unresolved_groups": [
+          [
+            {
+              "period_kyr": 123.8461774280429,
+              "label": "eccentricity g1\u2212g2"
+            },
+            {
+              "period_kyr": 130.69097366197656,
+              "label": "eccentricity g1\u2212g3"
+            },
+            {
+              "period_kyr": 134.49598078775747,
+              "label": "eccentricity g1\u2212g5"
+            },
+            {
+              "period_kyr": 135.20853877745043,
+              "label": "climate-internal harmonic (g\u2082\u2212g\u2085)/3"
+            }
+          ],
+          [
+            {
+              "period_kyr": 94.8779191670953,
+              "label": "eccentricity g0\u2212g2"
+            },
+            {
+              "period_kyr": 96.84902648762181,
+              "label": "eccentricity g0\u2212g6"
+            },
+            {
+              "period_kyr": 98.8438689567201,
+              "label": "eccentricity g0\u2212g3"
+            },
+            {
+              "period_kyr": 101.00506143827943,
+              "label": "eccentricity g0\u2212g5"
+            },
+            {
+              "period_kyr": 103.12379754572216,
+              "label": "eccentricity g0\u2212g7"
+            },
+            {
+              "period_kyr": 105.13718703798536,
+              "label": "eccentricity g2\u2212g4"
+            },
+            {
+              "period_kyr": 110.0293064910417,
+              "label": "eccentricity g3\u2212g4"
+            }
+          ],
+          [
+            {
+              "period_kyr": 39.836645758160245,
+              "label": "obliquity p+s2"
+            },
+            {
+              "period_kyr": 40.51952419741089,
+              "label": "obliquity p+s4"
+            },
+            {
+              "period_kyr": 41.224350938248435,
+              "label": "obliquity p+s0"
+            },
+            {
+              "period_kyr": 41.95568251678215,
+              "label": "obliquity p+s7"
+            }
+          ],
+          [
+            {
+              "period_kyr": 28.991297596280972,
+              "label": "obliquity p+s1"
+            },
+            {
+              "period_kyr": 29.155358974399498,
+              "label": "obliquity p+s14"
+            },
+            {
+              "period_kyr": 29.77423626384929,
+              "label": "obliquity p+s9"
+            },
+            {
+              "period_kyr": 29.96822664834997,
+              "label": "obliquity p+s3"
+            }
+          ],
+          [
+            {
+              "period_kyr": 19.001447325297764,
+              "label": "climatic precession p+g2"
+            },
+            {
+              "period_kyr": 19.155372483100056,
+              "label": "climatic precession p+g3"
+            }
+          ]
+        ],
+        "n_unresolved_groups": 5,
+        "n_lines_in_unresolved_groups": 21
+      },
+      "vif": {
+        "max_vif": 277042299912.063,
+        "max_vif_column": "sin 101.0",
+        "n_columns_vif_over_10": 38,
+        "n_columns_vif_over_100": 24
+      },
+      "ols": {
+        "method": "OLS",
+        "lambda": 0.0,
+        "n_lines": 28,
+        "r2_l1": 0.8262244304318749,
+        "max_amp": 80514.71167235306,
+        "max_amp_line": "eccentricity g0\u2212g7",
+        "forward_min": -1663.6227508650768,
+        "forward_max": 752.2841076241436,
+        "forward_ptp": 2415.90685848922,
+        "in_sample_ptp": 5.261169473112391
+      },
+      "ridge_shipped": {
+        "method": "ridge \u03bb=1.0",
+        "lambda": 1.0,
+        "n_lines": 28,
+        "r2_l1": 0.7788098688349251,
+        "max_amp": 2.208029549402273,
+        "max_amp_line": "eccentricity g0\u2212g2",
+        "forward_min": -5.046654086307927,
+        "forward_max": 4.364746000400493,
+        "forward_ptp": 9.41140008670842,
+        "in_sample_ptp": 4.417617197108805
+      },
+      "shipped_fit_forward_growth": {
+        "in_sample": {
+          "all": {
+            "min": -2.5098952197817983,
+            "max": 1.9077219773270067,
+            "ptp": 4.417617197108805,
+            "std": 0.8649355813962948
+          },
+          "l1": {
+            "min": -2.5030361484939645,
+            "max": 1.9145810486148405,
+            "ptp": 4.417617197108805,
+            "std": 0.8649355813962949
+          },
+          "l3": {
+            "min": 0.0,
+            "max": 0.0,
+            "ptp": 0.0,
+            "std": 0.0
+          }
+        },
+        "forward": {
+          "all": {
+            "min": -5.046654086307928,
+            "max": 4.364746000400491,
+            "ptp": 9.411400086708419,
+            "std": 2.1402562041135087
+          },
+          "l1": {
+            "min": -5.039795015020095,
+            "max": 4.371605071688326,
+            "ptp": 9.411400086708422,
+            "std": 2.1402562041135087
+          },
+          "l3": {
+            "min": 0.0,
+            "max": 0.0,
+            "ptp": 0.0,
+            "std": 0.0
+          }
+        },
+        "growth_ratio_total_ptp": 2.1304245403761763,
+        "growth_ratio_l1_ptp": 2.1304245403761772
+      }
+    },
+    "inhg-mpt": {
+      "window_kyr": [
+        1000,
+        2700
+      ],
+      "conditioning": {
+        "n_samples": 1701,
+        "n_cols": 56,
+        "rank_at_1e10_ratio": 56,
+        "singular_max": 48.86223847469663,
+        "singular_min": 0.015208913050070254,
+        "condition_number": 3212.737051874389
+      },
+      "rayleigh": {
+        "T_kyr": 1700.0,
+        "rayleigh_df_per_kyr": 0.000588235294117647,
+        "unresolved_groups": [
+          [
+            {
+              "period_kyr": 123.8461774280429,
+              "label": "eccentricity g1\u2212g2"
+            },
+            {
+              "period_kyr": 130.69097366197656,
+              "label": "eccentricity g1\u2212g3"
+            },
+            {
+              "period_kyr": 134.49598078775747,
+              "label": "eccentricity g1\u2212g5"
+            },
+            {
+              "period_kyr": 135.20853877745043,
+              "label": "climate-internal harmonic (g\u2082\u2212g\u2085)/3"
+            }
+          ],
+          [
+            {
+              "period_kyr": 94.8779191670953,
+              "label": "eccentricity g0\u2212g2"
+            },
+            {
+              "period_kyr": 96.84902648762181,
+              "label": "eccentricity g0\u2212g6"
+            },
+            {
+              "period_kyr": 98.8438689567201,
+              "label": "eccentricity g0\u2212g3"
+            },
+            {
+              "period_kyr": 101.00506143827943,
+              "label": "eccentricity g0\u2212g5"
+            },
+            {
+              "period_kyr": 103.12379754572216,
+              "label": "eccentricity g0\u2212g7"
+            },
+            {
+              "period_kyr": 105.13718703798536,
+              "label": "eccentricity g2\u2212g4"
+            },
+            {
+              "period_kyr": 110.0293064910417,
+              "label": "eccentricity g3\u2212g4"
+            }
+          ],
+          [
+            {
+              "period_kyr": 39.836645758160245,
+              "label": "obliquity p+s2"
+            },
+            {
+              "period_kyr": 40.51952419741089,
+              "label": "obliquity p+s4"
+            },
+            {
+              "period_kyr": 41.224350938248435,
+              "label": "obliquity p+s0"
+            },
+            {
+              "period_kyr": 41.95568251678215,
+              "label": "obliquity p+s7"
+            }
+          ],
+          [
+            {
+              "period_kyr": 29.77423626384929,
+              "label": "obliquity p+s9"
+            },
+            {
+              "period_kyr": 29.96822664834997,
+              "label": "obliquity p+s3"
+            }
+          ],
+          [
+            {
+              "period_kyr": 28.991297596280972,
+              "label": "obliquity p+s1"
+            },
+            {
+              "period_kyr": 29.155358974399498,
+              "label": "obliquity p+s14"
+            }
+          ],
+          [
+            {
+              "period_kyr": 19.001447325297764,
+              "label": "climatic precession p+g2"
+            },
+            {
+              "period_kyr": 19.155372483100056,
+              "label": "climatic precession p+g3"
+            }
+          ]
+        ],
+        "n_unresolved_groups": 6,
+        "n_lines_in_unresolved_groups": 21
+      },
+      "vif": {
+        "max_vif": 1457895.5482423974,
+        "max_vif_column": "cos 101.0",
+        "n_columns_vif_over_10": 22,
+        "n_columns_vif_over_100": 22
+      },
+      "ols": {
+        "method": "OLS",
+        "lambda": 0.0,
+        "n_lines": 28,
+        "r2_l1": 0.6329947310460975,
+        "max_amp": 242.13189754276175,
+        "max_amp_line": "eccentricity g0\u2212g5",
+        "forward_min": -703.8111340505004,
+        "forward_max": 667.531036802116,
+        "forward_ptp": 1371.3421708526164,
+        "in_sample_ptp": 4.167495419002432
+      },
+      "ridge_shipped": {
+        "method": "ridge \u03bb=1.0",
+        "lambda": 1.0,
+        "n_lines": 28,
+        "r2_l1": 0.5910872212657867,
+        "max_amp": 1.4975440389690875,
+        "max_amp_line": "eccentricity g0\u2212g3",
+        "forward_min": -3.974968115914095,
+        "forward_max": 4.479619396969673,
+        "forward_ptp": 8.454587512883768,
+        "in_sample_ptp": 3.5867880414591298
+      },
+      "shipped_fit_forward_growth": {
+        "in_sample": {
+          "all": {
+            "min": -1.8698193131926593,
+            "max": 1.7169687282664698,
+            "ptp": 3.586788041459129,
+            "std": 0.7624766174627386
+          },
+          "l1": {
+            "min": -1.8700561943637617,
+            "max": 1.7167318470953674,
+            "ptp": 3.586788041459129,
+            "std": 0.7624766174627386
+          },
+          "l3": {
+            "min": 0.0,
+            "max": 0.0,
+            "ptp": 0.0,
+            "std": 0.0
+          }
+        },
+        "forward": {
+          "all": {
+            "min": -3.9749681159140957,
+            "max": 4.479619396969674,
+            "ptp": 8.45458751288377,
+            "std": 2.3484583659532836
+          },
+          "l1": {
+            "min": -3.9752049970851973,
+            "max": 4.479382515798572,
+            "ptp": 8.45458751288377,
+            "std": 2.3484583659532836
+          },
+          "l3": {
+            "min": 0.0,
+            "max": 0.0,
+            "ptp": 0.0,
+            "std": 0.0
+          }
+        },
+        "growth_ratio_total_ptp": 2.357147234561535,
+        "growth_ratio_l1_ptp": 2.357147234561535
+      }
+    },
+    "pre-inhg": {
+      "window_kyr": [
+        2700,
+        5320
+      ],
+      "conditioning": {
+        "n_samples": 2621,
+        "n_cols": 56,
+        "rank_at_1e10_ratio": 56,
+        "singular_max": 55.89758337338179,
+        "singular_min": 0.9477449632656245,
+        "condition_number": 58.97956258271918
+      },
+      "rayleigh": {
+        "T_kyr": 2620.0,
+        "rayleigh_df_per_kyr": 0.0003816793893129771,
+        "unresolved_groups": [
+          [
+            {
+              "period_kyr": 130.69097366197656,
+              "label": "eccentricity g1\u2212g3"
+            },
+            {
+              "period_kyr": 134.49598078775747,
+              "label": "eccentricity g1\u2212g5"
+            },
+            {
+              "period_kyr": 135.20853877745043,
+              "label": "climate-internal harmonic (g\u2082\u2212g\u2085)/3"
+            }
+          ],
+          [
+            {
+              "period_kyr": 94.8779191670953,
+              "label": "eccentricity g0\u2212g2"
+            },
+            {
+              "period_kyr": 96.84902648762181,
+              "label": "eccentricity g0\u2212g6"
+            },
+            {
+              "period_kyr": 98.8438689567201,
+              "label": "eccentricity g0\u2212g3"
+            },
+            {
+              "period_kyr": 101.00506143827943,
+              "label": "eccentricity g0\u2212g5"
+            },
+            {
+              "period_kyr": 103.12379754572216,
+              "label": "eccentricity g0\u2212g7"
+            },
+            {
+              "period_kyr": 105.13718703798536,
+              "label": "eccentricity g2\u2212g4"
+            }
+          ],
+          [
+            {
+              "period_kyr": 29.77423626384929,
+              "label": "obliquity p+s9"
+            },
+            {
+              "period_kyr": 29.96822664834997,
+              "label": "obliquity p+s3"
+            }
+          ],
+          [
+            {
+              "period_kyr": 28.991297596280972,
+              "label": "obliquity p+s1"
+            },
+            {
+              "period_kyr": 29.155358974399498,
+              "label": "obliquity p+s14"
+            }
+          ]
+        ],
+        "n_unresolved_groups": 4,
+        "n_lines_in_unresolved_groups": 13
+      },
+      "vif": {
+        "max_vif": 434.14828142837996,
+        "max_vif_column": "cos 101.0",
+        "n_columns_vif_over_10": 16,
+        "n_columns_vif_over_100": 12
+      },
+      "ols": {
+        "method": "OLS",
+        "lambda": 0.0,
+        "n_lines": 28,
+        "r2_l1": 0.3795553064879519,
+        "max_amp": 4.500507876683786,
+        "max_amp_line": "eccentricity g0\u2212g5",
+        "forward_min": -3.320974426961587,
+        "forward_max": 3.6646443494580785,
+        "forward_ptp": 6.985618776419665,
+        "in_sample_ptp": 4.647312378725834
+      },
+      "ridge_shipped": {
+        "method": "ridge \u03bb=1.0",
+        "lambda": 1.0,
+        "n_lines": 28,
+        "r2_l1": 0.37358507286059195,
+        "max_amp": 2.3691384122602837,
+        "max_amp_line": "eccentricity g0\u2212g5",
+        "forward_min": -1.9500716594988254,
+        "forward_max": 1.9543389635807087,
+        "forward_ptp": 3.904410623079534,
+        "in_sample_ptp": 4.217462644127414
+      },
+      "shipped_fit_forward_growth": {
+        "in_sample": {
+          "all": {
+            "min": -1.852501697600308,
+            "max": 2.3649609465271064,
+            "ptp": 4.217462644127414,
+            "std": 0.5986790219021823
+          },
+          "l1": {
+            "min": -1.8310750031706364,
+            "max": 2.3863876409567775,
+            "ptp": 4.217462644127414,
+            "std": 0.5986790219021823
+          },
+          "l3": {
+            "min": 0.0,
+            "max": 0.0,
+            "ptp": 0.0,
+            "std": 0.0
+          }
+        },
+        "forward": {
+          "all": {
+            "min": -1.9500716594988254,
+            "max": 1.9543389635807087,
+            "ptp": 3.904410623079534,
+            "std": 1.1553508510149257
+          },
+          "l1": {
+            "min": -1.9286449650691544,
+            "max": 1.9757656580103802,
+            "ptp": 3.9044106230795346,
+            "std": 1.1553508510149257
+          },
+          "l3": {
+            "min": 0.0,
+            "max": 0.0,
+            "ptp": 0.0,
+            "std": 0.0
+          }
+        },
+        "growth_ratio_total_ptp": 0.9257724258722747,
+        "growth_ratio_l1_ptp": 0.9257724258722748
+      }
+    },
+    "lr04-full": {
+      "window_kyr": [
+        0,
+        5320
+      ],
+      "conditioning": {
+        "n_samples": 5321,
+        "n_cols": 56,
+        "rank_at_1e10_ratio": 56,
+        "singular_max": 73.25739613554262,
+        "singular_min": 13.105115209500882,
+        "condition_number": 5.589984900127611
+      },
+      "rayleigh": {
+        "T_kyr": 5320.0,
+        "rayleigh_df_per_kyr": 0.00018796992481203009,
+        "unresolved_groups": [
+          [
+            {
+              "period_kyr": 134.49598078775747,
+              "label": "eccentricity g1\u2212g5"
+            },
+            {
+              "period_kyr": 135.20853877745043,
+              "label": "climate-internal harmonic (g\u2082\u2212g\u2085)/3"
+            }
+          ],
+          [
+            {
+              "period_kyr": 103.12379754572216,
+              "label": "eccentricity g0\u2212g7"
+            },
+            {
+              "period_kyr": 105.13718703798536,
+              "label": "eccentricity g2\u2212g4"
+            }
+          ]
+        ],
+        "n_unresolved_groups": 2,
+        "n_lines_in_unresolved_groups": 4
+      },
+      "vif": {
+        "max_vif": 8.063052085977635,
+        "max_vif_column": "sin 135.2",
+        "n_columns_vif_over_10": 0,
+        "n_columns_vif_over_100": 0
+      },
+      "ols": {
+        "method": "OLS",
+        "lambda": 0.0,
+        "n_lines": 28,
+        "r2_l1": 0.19279686418943565,
+        "max_amp": 0.3071873010344054,
+        "max_amp_line": "obliquity p+s0",
+        "forward_min": -0.7367489025910053,
+        "forward_max": 0.5132841390577617,
+        "forward_ptp": 1.250033041648767,
+        "in_sample_ptp": 2.5778760097188256
+      },
+      "ridge_shipped": {
+        "method": "ridge \u03bb=1.0",
+        "lambda": 1.0,
+        "n_lines": 28,
+        "r2_l1": 0.19279680670929522,
+        "max_amp": 0.3070708127320832,
+        "max_amp_line": "obliquity p+s0",
+        "forward_min": -0.7364182673295371,
+        "forward_max": 0.512594312493054,
+        "forward_ptp": 1.249012579822591,
+        "in_sample_ptp": 2.576412856972336
+      },
+      "shipped_fit_forward_growth": {
+        "in_sample": {
+          "all": {
+            "min": -1.3373443815682635,
+            "max": 1.3198354055820467,
+            "ptp": 2.6571797871503104,
+            "std": 0.44585296099930705
+          },
+          "l1": {
+            "min": -1.2541546636977388,
+            "max": 1.3222581932745967,
+            "ptp": 2.5764128569723352,
+            "std": 0.43892829713288917
+          },
+          "l3": {
+            "min": -0.10664812281751687,
+            "max": 0.07674260710642206,
+            "ptp": 0.18339072992393893,
+            "std": 0.0818492676082241
+          }
+        },
+        "forward": {
+          "all": {
+            "min": -0.736418267329537,
+            "max": 0.5125943124930541,
+            "ptp": 1.249012579822591,
+            "std": 0.35262139648438706
+          },
+          "l1": {
+            "min": -0.7339954796369867,
+            "max": 0.5150171001856045,
+            "ptp": 1.2490125798225913,
+            "std": 0.35262139648438706
+          },
+          "l3": {
+            "min": 0.0,
+            "max": 0.0,
+            "ptp": 0.0,
+            "std": 0.0
+          }
+        },
+        "growth_ratio_total_ptp": 0.47005196481721445,
+        "growth_ratio_l1_ptp": 0.4847874347632177
+      }
+    }
+  },
+  "ladder_post_mpt": {
+    "rows": [
+      {
+        "method": "OLS",
+        "lambda": 0.0,
+        "n_lines": 28,
+        "r2_l1": 0.8262244304318749,
+        "max_amp": 80514.71167235306,
+        "max_amp_line": "eccentricity g0\u2212g7",
+        "forward_min": -1663.6227508650768,
+        "forward_max": 752.2841076241436,
+        "forward_ptp": 2415.90685848922,
+        "in_sample_ptp": 5.261169473112391
+      },
+      {
+        "method": "ridge \u03bb=0.1",
+        "lambda": 0.1,
+        "n_lines": 28,
+        "r2_l1": 0.7949159029865565,
+        "max_amp": 3.901165227200077,
+        "max_amp_line": "eccentricity g0\u2212g2",
+        "forward_min": -7.7009846619329805,
+        "forward_max": 7.370114063753594,
+        "forward_ptp": 15.071098725686575,
+        "in_sample_ptp": 4.396762989124833
+      },
+      {
+        "method": "ridge \u03bb=1.0",
+        "lambda": 1.0,
+        "n_lines": 28,
+        "r2_l1": 0.7788098688349251,
+        "max_amp": 2.208029549402273,
+        "max_amp_line": "eccentricity g0\u2212g2",
+        "forward_min": -5.046654086307927,
+        "forward_max": 4.364746000400493,
+        "forward_ptp": 9.41140008670842,
+        "in_sample_ptp": 4.417617197108805
+      },
+      {
+        "method": "ridge \u03bb=10.0",
+        "lambda": 10.0,
+        "n_lines": 28,
+        "r2_l1": 0.7419956396082228,
+        "max_amp": 0.9972274230350362,
+        "max_amp_line": "eccentricity g0\u2212g2",
+        "forward_min": -1.9232980069866792,
+        "forward_max": 2.611875944886462,
+        "forward_ptp": 4.535173951873141,
+        "in_sample_ptp": 4.111212046666484
+      },
+      {
+        "method": "Rayleigh-thinned (15/28 lines, OLS)",
+        "lambda": 0.0,
+        "n_lines": 15,
+        "r2_l1": 0.40975464537077055,
+        "max_amp": 0.5980494497397246,
+        "max_amp_line": "eccentricity g0\u2212g3",
+        "forward_min": -1.1206771340861965,
+        "forward_max": 1.13285677587702,
+        "forward_ptp": 2.253533909963217,
+        "in_sample_ptp": 3.314627953965438,
+        "kept_lines": [
+          {
+            "period_kyr": 19.155372483100056,
+            "label": "climatic precession p+g3"
+          },
+          {
+            "period_kyr": 22.445158803235106,
+            "label": "climatic precession p+g1"
+          },
+          {
+            "period_kyr": 23.193145239083524,
+            "label": "climatic precession p+g4"
+          },
+          {
+            "period_kyr": 23.75990527269503,
+            "label": "climatic precession p+g0"
+          },
+          {
+            "period_kyr": 27.401948921129186,
+            "label": "obliquity p+s12"
+          },
+          {
+            "period_kyr": 28.991297596280972,
+            "label": "obliquity p+s1"
+          },
+          {
+            "period_kyr": 29.96822664834997,
+            "label": "obliquity p+s3"
+          },
+          {
+            "period_kyr": 39.836645758160245,
+            "label": "obliquity p+s2"
+          },
+          {
+            "period_kyr": 41.95568251678215,
+            "label": "obliquity p+s7"
+          },
+          {
+            "period_kyr": 54.134327711463335,
+            "label": "obliquity p+s10"
+          },
+          {
+            "period_kyr": 98.8438689567201,
+            "label": "eccentricity g0\u2212g3"
+          },
+          {
+            "period_kyr": 110.0293064910417,
+            "label": "eccentricity g3\u2212g4"
+          },
+          {
+            "period_kyr": 135.20853877745043,
+            "label": "climate-internal harmonic (g\u2082\u2212g\u2085)/3"
+          },
+          {
+            "period_kyr": 202.81280816617564,
+            "label": "climate-internal harmonic (g\u2082\u2212g\u2085)/2"
+          },
+          {
+            "period_kyr": 405.6256163323513,
+            "label": "eccentricity fundamental g\u2082\u2212g\u2085"
+          }
+        ]
+      }
+    ],
+    "ridge_minus_ols_r2": -0.04741456159694979,
+    "ols_over_ridge_max_amp": 36464.508228229504,
+    "thinned_minus_ridge_r2": -0.36905522346415454
+  }
+}

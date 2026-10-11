@@ -839,6 +839,35 @@ export const VALUES = {
     out.evolvingClockGainAfterPreferredPMax = { get: () => clk().verdict.max_clock_gain_after_preferred_dp, render: signed5, note: 'largest gain of the composed clock (k = 1) on top of the preferred δp over all windows' };
     out.evolvingClockPreferredDeltaPMinLr04 = { get: () => clk().verdict.preferred_dp_lr04_min, render: (v) => (v >= 0 ? '+' : '−') + Math.abs(Number(v)).toFixed(2), unit: '″/yr', note: 'smallest preferred δp over the four LR04 windows' };
     out.evolvingClockPreferredDeltaPMaxLr04 = { get: () => clk().verdict.preferred_dp_lr04_max, render: (v) => (v >= 0 ? '+' : '−') + Math.abs(Number(v)).toFixed(2), unit: '″/yr', note: 'largest preferred δp over the four LR04 windows' };
+    // Fit-methodology diagnostics on the shipped lines (scripts/fit_methodology_diagnostics.py, doc 92 §9.5)
+    const fdg = () => rd('data/fit-methodology-diagnostics.json');
+    const g3 = (v) => Number(v).toPrecision(3);
+    const f3s = (v) => Number(v).toFixed(3);
+    out.fitDiagLineCount = { get: () => fdg().metadata.n_lines, render: (v) => String(v), note: 'shipped L1 lines in the design matrix' };
+    for (const [key, reg] of [['PostMpt', 'post-mpt'], ['InhgMpt', 'inhg-mpt'], ['PreInhg', 'pre-inhg'], ['Lr04Full', 'lr04-full']]) {
+      out[`fitDiagCond${key}`] = { get: () => fdg().regimes[reg].conditioning.condition_number, render: g3, note: `condition number of the centred L1 design matrix, ${reg}` };
+      out[`fitDiagMaxVif${key}`] = { get: () => fdg().regimes[reg].vif.max_vif, render: g3, note: `largest variance inflation factor among the L1 columns, ${reg}` };
+      out[`fitDiagUnresolvedGroups${key}`] = { get: () => fdg().regimes[reg].rayleigh.n_unresolved_groups, render: (v) => String(v), note: `groups of lines closer than one Rayleigh element (1/T) of the window, ${reg}` };
+      out[`fitDiagUnresolvedLines${key}`] = { get: () => fdg().regimes[reg].rayleigh.n_lines_in_unresolved_groups, render: (v) => String(v), note: `lines inside those groups, ${reg}` };
+      out[`fitDiagOlsR2${key}`] = { get: () => fdg().regimes[reg].ols.r2_l1, render: (v) => Number(v).toFixed(4), note: `L1-layer R² of plain OLS on normalized data, ${reg}` };
+      out[`fitDiagRidgeR2${key}`] = { get: () => fdg().regimes[reg].ridge_shipped.r2_l1, render: (v) => Number(v).toFixed(4), note: `L1-layer R² of the shipped ridge (λ = L1_RIDGE_LAMBDA), ${reg}` };
+      out[`fitDiagOlsMaxAmp${key}`] = { get: () => fdg().regimes[reg].ols.max_amp, render: f3s, note: `largest L1 amplitude under OLS (normalized units), ${reg}` };
+      out[`fitDiagRidgeMaxAmp${key}`] = { get: () => fdg().regimes[reg].ridge_shipped.max_amp, render: f3s, note: `largest L1 amplitude under the shipped ridge (normalized units), ${reg}` };
+      out[`fitDiagForwardGrowth${key}`] = { get: () => fdg().regimes[reg].shipped_fit_forward_growth.growth_ratio_total_ptp, render: (v) => Number(v).toFixed(2), unit: '×', note: `shipped fit (L1 ridge + L3): forward-grid ptp over in-sample ptp, ${reg}` };
+    }
+    const lad = () => fdg().ladder_post_mpt;
+    const ladRow = (lambda) => lad().rows.find((r) => r.lambda === lambda && !r.kept_lines);
+    out.fitDiagLadderOlsForwardMin = { get: () => ladRow(0).forward_min, render: (v) => Number(v).toFixed(2), note: 'post-MPT OLS L1 layer, forward-grid minimum (normalized units)' };
+    out.fitDiagLadderOlsForwardMax = { get: () => ladRow(0).forward_max, render: (v) => Number(v).toFixed(2), note: 'post-MPT OLS L1 layer, forward-grid maximum' };
+    out.fitDiagLadderOlsForwardPtp = { get: () => ladRow(0).forward_ptp, render: (v) => Number(v).toFixed(2), note: 'post-MPT OLS L1 layer, forward-grid peak-to-peak' };
+    out.fitDiagLadderOlsInSamplePtp = { get: () => ladRow(0).in_sample_ptp, render: (v) => Number(v).toFixed(2), note: 'post-MPT OLS L1 layer, in-sample peak-to-peak' };
+    out.fitDiagLadderRidgeForwardMin = { get: () => ladRow(1).forward_min, render: (v) => Number(v).toFixed(2), note: 'post-MPT ridge λ = 1 L1 layer, forward-grid minimum' };
+    out.fitDiagLadderRidgeForwardMax = { get: () => ladRow(1).forward_max, render: (v) => Number(v).toFixed(2), note: 'post-MPT ridge λ = 1 L1 layer, forward-grid maximum' };
+    out.fitDiagLadderRidgeForwardPtp = { get: () => ladRow(1).forward_ptp, render: (v) => Number(v).toFixed(2), note: 'post-MPT ridge λ = 1 L1 layer, forward-grid peak-to-peak' };
+    out.fitDiagLadderRidgeMinusOlsR2 = { get: () => lad().ridge_minus_ols_r2, render: sdr, note: 'post-MPT L1-layer R², ridge λ = 1 minus OLS' };
+    out.fitDiagLadderOlsOverRidgeMaxAmp = { get: () => lad().ols_over_ridge_max_amp, render: (v) => Number(v).toFixed(1), unit: '×', note: 'post-MPT largest L1 amplitude, OLS over ridge λ = 1' };
+    out.fitDiagLadderThinnedLines = { get: () => lad().rows.find((r) => r.kept_lines).n_lines, render: (v) => String(v), note: 'lines kept by the Rayleigh-spacing thin, post-MPT' };
+    out.fitDiagLadderThinnedMinusRidgeR2 = { get: () => lad().thinned_minus_ridge_r2, render: sdr, note: 'post-MPT L1-layer R², Rayleigh-thinned OLS minus ridge λ = 1' };
     out.evolvingClockMaxDeltaR2Total = { get: () => clk().verdict.max_delta_r2_total, render: signed5, note: 'largest total ΔR² of the clock-of-date fit over all windows' };
     out.evolvingClockMaterialThreshold = { get: () => clk().verdict.material_threshold, render: (v) => String(v), note: 'the pre-stated ΔR² a clock-of-date gain must exceed to count as material' };
     for (const [key, reg] of [['PostMpt', 'post-mpt'], ['InhgMpt', 'inhg-mpt'], ['PreInhg', 'pre-inhg'], ['Lr04Full', 'lr04-full']]) {

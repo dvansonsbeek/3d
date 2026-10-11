@@ -991,50 +991,65 @@ Each CENOGRID window fitted independently using `regime="neogene"` / `"post-eot"
 
 These are not curve-fitted noise — they independently recover textbook Cenozoic climate history from the fit alone.
 
-### 9.5 Under-determined L1 & ridge regularization (comb-era measurement; the ridge is kept on the 28 lines)
+### 9.5 Under-determined L1 & ridge regularization
 
-The comb-era L1 layer had 33 sinusoid pairs (the shipped L1 has 28 lines, several within one Rayleigh element of each other in the 100-kyr band — the same class of problem). Whether L1 is well-determined depends on the **fit-window length** vs the **line spacing**; the analysis below was measured on the comb and its conclusion — regularize where the window cannot resolve neighbouring lines — carries over to the shipped set:
+Whether L1 is well-determined depends on the **fit-window length** against
+the **line spacing**. The shipped set has <!--v:fitDiagLineCount-->28<!--/v-->
+lines and its families cluster: seven eccentricity beats between 94.9 and
+110.0 kyr, four obliquity lines between 39.8 and 42.0 kyr, four more between
+29.0 and 30.0 kyr. Lines closer than one Rayleigh element (1/T) of the window
+cannot be told apart inside it. Measured on the shipped lines
+(`scripts/fit_methodology_diagnostics.py`,
+[`data/fit-methodology-diagnostics.json`](../data/fit-methodology-diagnostics.json);
+amplitudes in units of the record's standard deviation, L1 layer alone):
 
-| Quantity | Value | Meaning |
-|---|---:|---|
-| Lattice integer spacing | Δf_lat = 1/8H = **3.73 × 10⁻⁴ kyr⁻¹** | Frequency gap between consecutive ns |
-| Rayleigh resolution (post-MPT) | Δf_R = 1/1000 = **1.00 × 10⁻³ kyr⁻¹** | Smallest frequency a 1000-kyr window can resolve |
-| Ratio | **2.68** | ~3 lattice integers fall inside one Rayleigh element |
+| Regime | Window | Rayleigh groups (lines) | Condition # | Max VIF | OLS R² | Ridge λ=1 R² | OLS max\|amp\| | Ridge max\|amp\| |
+|---|---|---:|---:|---:|---:|---:|---:|---:|
+| **post-MPT** | 0–1 Ma | <!--v:fitDiagUnresolvedGroupsPostMpt-->5<!--/v--> (<!--v:fitDiagUnresolvedLinesPostMpt-->21<!--/v-->) | <!--v:fitDiagCondPostMpt-->1.79e+6<!--/v--> | <!--v:fitDiagMaxVifPostMpt-->2.77e+11<!--/v--> | <!--v:fitDiagOlsR2PostMpt-->0.8262<!--/v--> | <!--v:fitDiagRidgeR2PostMpt-->0.7788<!--/v--> | <!--v:fitDiagOlsMaxAmpPostMpt-->80514.712<!--/v--> | <!--v:fitDiagRidgeMaxAmpPostMpt-->2.208<!--/v--> |
+| iNHG-MPT | 1.0–2.7 Ma | <!--v:fitDiagUnresolvedGroupsInhgMpt-->6<!--/v--> (<!--v:fitDiagUnresolvedLinesInhgMpt-->21<!--/v-->) | <!--v:fitDiagCondInhgMpt-->3.21e+3<!--/v--> | <!--v:fitDiagMaxVifInhgMpt-->1.46e+6<!--/v--> | <!--v:fitDiagOlsR2InhgMpt-->0.6330<!--/v--> | <!--v:fitDiagRidgeR2InhgMpt-->0.5911<!--/v--> | <!--v:fitDiagOlsMaxAmpInhgMpt-->242.132<!--/v--> | <!--v:fitDiagRidgeMaxAmpInhgMpt-->1.498<!--/v--> |
+| pre-iNHG | 2.7–5.3 Ma | <!--v:fitDiagUnresolvedGroupsPreInhg-->4<!--/v--> (<!--v:fitDiagUnresolvedLinesPreInhg-->13<!--/v-->) | <!--v:fitDiagCondPreInhg-->59.0<!--/v--> | <!--v:fitDiagMaxVifPreInhg-->434<!--/v--> | <!--v:fitDiagOlsR2PreInhg-->0.3796<!--/v--> | <!--v:fitDiagRidgeR2PreInhg-->0.3736<!--/v--> | <!--v:fitDiagOlsMaxAmpPreInhg-->4.501<!--/v--> | <!--v:fitDiagRidgeMaxAmpPreInhg-->2.369<!--/v--> |
+| lr04-full | 0–5.3 Ma | <!--v:fitDiagUnresolvedGroupsLr04Full-->2<!--/v--> (<!--v:fitDiagUnresolvedLinesLr04Full-->4<!--/v-->) | <!--v:fitDiagCondLr04Full-->5.59<!--/v--> | <!--v:fitDiagMaxVifLr04Full-->8.06<!--/v--> | <!--v:fitDiagOlsR2Lr04Full-->0.1928<!--/v--> | <!--v:fitDiagRidgeR2Lr04Full-->0.1928<!--/v--> | <!--v:fitDiagOlsMaxAmpLr04Full-->0.307<!--/v--> | <!--v:fitDiagRidgeMaxAmpLr04Full-->0.307<!--/v--> |
 
-The post-MPT window therefore cannot uniquely separate adjacent lattice integers — five groups of unresolvable integers exist, the worst being **{n = 12, 14, 16, 18, 20, 21, 22}** (seven integers, periods 121.9 → 223.5 kyr, all in the 100-kyr glacial band).
+In a 1-Myr window the whole 95–110-kyr eccentricity cluster, the 40–42-kyr
+obliquity quartet, the 29–30-kyr quartet, the 19-kyr precession pair and the
+124–135-kyr group are each one Rayleigh element wide. Plain OLS there finds
+degenerate cancelling coefficients — amplitudes of tens of thousands of
+standard deviations that cancel *inside* the window and **break under
+extrapolation**: the L1 layer's forward projection (−250…0 kyr) spans
+<!--v:fitDiagLadderOlsForwardPtp-->2415.91<!--/v--> against
+<!--v:fitDiagLadderOlsInSamplePtp-->5.26<!--/v--> in sample. The 1.7-Myr
+iNHG-MPT window has the same pathology less severely; only the full record
+resolves every line.
 
-**Diagnostics on the L1 design matrix** (`scripts/fit_methodology_diagnostics.py`):
+**The shipped remedy: ridge regression on L1** (λ = 1, intercept un-penalized,
+normalized data, in the module's SVD-based augmented least-squares form). It shrinks
+the under-determined directions and leaves the resolved ones alone. The
+post-MPT ladder:
 
-| Regime | Window | Condition # | Max VIF | OLS max\|amp\| | Forward ptp |
-|---|---|---:|---:|---:|---:|
-| **post-mpt** | 0–1 Ma | **632** | **7 × 10⁴** | **17.78** | **23.7** (in-sample 2.1; **11× growth**) |
-| inhg-mpt | 1.0–2.7 Ma | 3.0 | 17 | 0.16 | 0.84 |
-| pre-inhg | 2.7–5.3 Ma | 1.24 | 4 | 0.05 | 0.30 |
-| lr04-full | 0–5.3 Ma | 1.09 | 1.5 | 0.07 | 0.43 |
-
-Plain OLS on post-MPT finds degenerate cancelling coefficients (e.g. n=21 amplitude +17.78 paired with n=20 amplitude −13.03). They cancel *inside* the window (giving R² = 0.8762 with the 32-integer lattice) but **break under extrapolation**: forward projection peak-to-peak grows 11× over in-sample.
-
-**Fix: ridge regression on L1 (intercept un-penalized).** Solve `(XᵀX + λI) β = Xᵀy` with λ=1 on normalized data. This shrinks the under-determined directions while leaving well-determined ones intact. Comparison on post-MPT:
-
-| Method | R² total | Max\|amp\| | Forward range | Forward ptp |
+| Method | R² L1 | Max\|amp\| | Forward range | Forward ptp |
 |---|---:|---:|---|---:|
-| **OLS (broken)** | 0.8736 | **17.78** | [−12.28, +11.44] | 23.72 |
-| **Ridge λ=1 (canonical)** | 0.8676 | **0.32** | [−1.19, +1.04] | 2.23 |
+| OLS | <!--v:fitDiagOlsR2PostMpt-->0.8262<!--/v--> | <!--v:fitDiagOlsMaxAmpPostMpt-->80514.712<!--/v--> | [<!--v:fitDiagLadderOlsForwardMin-->-1663.62<!--/v-->, <!--v:fitDiagLadderOlsForwardMax-->752.28<!--/v-->] | <!--v:fitDiagLadderOlsForwardPtp-->2415.91<!--/v--> |
+| **Ridge λ=1 (shipped)** | <!--v:fitDiagRidgeR2PostMpt-->0.7788<!--/v--> | <!--v:fitDiagRidgeMaxAmpPostMpt-->2.208<!--/v--> | [<!--v:fitDiagLadderRidgeForwardMin-->-5.05<!--/v-->, <!--v:fitDiagLadderRidgeForwardMax-->4.36<!--/v-->] | <!--v:fitDiagLadderRidgeForwardPtp-->9.41<!--/v--> |
 
-R² cost: 0.006 absolute / 0.7% relative. Coefficient magnitude shrinks **~56×**. Forward extrapolation becomes physically reasonable.
+The ridge costs <!--v:fitDiagLadderRidgeMinusOlsR2-->−0.0474<!--/v--> on the
+L1 layer's R² post-MPT and shrinks the largest amplitude
+<!--v:fitDiagLadderOlsOverRidgeMaxAmp-->36464.5<!--/v-->×; the shipped fit
+(L1 ridge + L3) then projects forward at
+<!--v:fitDiagForwardGrowthPostMpt-->2.13<!--/v-->× its in-sample
+peak-to-peak. Across regimes the ridge acts where the window leaves lines
+unresolved — post-MPT and iNHG-MPT — and does nothing on the full record,
+where OLS and ridge coincide. The one constant λ = 1 is kept across regimes:
+it is the window, not the line set, that decides whether it acts.
 
-**Cross-regime sensitivity** (ridge has no effect where the lattice is already well-resolved):
-
-| Regime | OLS R² | Ridge R² | OLS max\|amp\| | Ridge max\|amp\| |
-|---|---:|---:|---:|---:|
-| post-mpt | 0.8736 | 0.8676 | 17.78 | 0.32 |
-| inhg-mpt | 0.7231 | 0.7231 | 0.16 | 0.16 |
-| pre-inhg | 0.4290 | 0.4290 | 0.05 | 0.05 |
-| lr04-full | 0.2459 | 0.2459 | 0.07 | 0.07 |
-
-This is the principled outcome: ridge shrinks only where the data lacks information to constrain individual lattice members. The single regularization constant λ=1 is therefore safe to apply uniformly across all regimes.
-
-Why not thin the line set? An equal-Rayleigh-spacing greedy thin loses **~0.13 in R²** (post-MPT drops below 0.75, measured on the comb). Ridge is preferred because it keeps the full line set — today the 28 physical lines, each with its independent justification in the engine's own spectrum (§2) — while neutralizing the extrapolation pathology.
+Why not thin the line set? A greedy keep-one-per-Rayleigh-element thin keeps
+<!--v:fitDiagLadderThinnedLines-->15<!--/v--> of the 28 lines post-MPT and
+loses <!--v:fitDiagLadderThinnedMinusRidgeR2-->−0.3691<!--/v--> in R² against
+the ridge. Ridge is preferred because it keeps the full set — each line with
+its justification in the engine's own spectrum (§2) — while neutralizing the
+extrapolation pathology. The cost is larger than it was on the retired comb,
+whose integers sat farther apart than the derived beats do: inside a 1-Myr
+window the 95–110-kyr beats and the 40–42-kyr obliquity lines are read as
+bands, not as lines (the per-line instruments of doc 94 §9 say the same).
 
 ### 9.6 API
 
