@@ -29,44 +29,12 @@ const _req = (p) => _modCache[p] || (_modCache[p] = require(p));
 // OBLIQUITY
 // ═══════════════════════════════════════════════════════════════════════════
 
-/**
- * Compute Earth's obliquity (axial tilt) for a given year.
- * 16-harmonic fit with J2000 smart anchor (exact IAU obliquity at year 2000).
- * RMSE: 0.004 arcsec over full H.
- * For H/3 vs H/8 component decomposition, use computeObliquityIntegrals().
- *
- * @param {number} currentYear - decimal year
- * @returns {number} obliquity in degrees
- */
-function computeObliquityEarth(currentYear) {
-  const t = currentYear - C.balancedYear;
-  let obliq = C.SOLSTICE_OBLIQUITY_MEAN;
-  for (const [div, sinC, cosC] of C.SOLSTICE_OBLIQUITY_HARMONICS) {
-    const phase = 2 * Math.PI * t / (C.H / div);
-    obliq += sinC * Math.sin(phase) + cosC * Math.cos(phase);
-  }
-  return obliq;
-}
-
-/**
- * Compute obliquity deviation components from mean.
- * Returns separate H/3 (inclination) and H/8 (axial) components.
- * Source: script.js computeObliquityIntegrals() ~line 31543
- *
- * @param {number} currentYear - decimal year
- * @returns {object} { component3, component8, sin3, sin8 }
- */
-function computeObliquityIntegrals(currentYear) {
-  const t = currentYear - C.balancedYear;
-  const phase3 = (t / (C.H / 3)) * 2 * Math.PI;
-  const phase8 = (t / (C.H / 8)) * 2 * Math.PI;
-  return {
-    component3: -C.earthInvPlaneInclinationAmplitude * Math.cos(phase3),
-    component8: C.earthInvPlaneInclinationAmplitude * Math.cos(phase8),
-    sin3: Math.sin(phase3),
-    sin8: Math.sin(phase8),
-  };
-}
+// Plan 09 (2026-10-11): the 16-harmonic obliquity comb (computeObliquityEarth)
+// and its H/3–H/8 decomposition (computeObliquityIntegrals) left this engine.
+// The published obliquity of date is the hybrid ε(t) of the one-source
+// movement (deep-orbital-history.js createOneSourceMovement().epsDeg —
+// scene-graph injects it); the comb was the frozen era record, measured
+// 0.23″ off the hybrid at J2000 and 4,938″ at −26 kyr (era-device-readers).
 
 // Plan 06 Phase 7 commit 2 — the planets' obliquity rides the spin channel
 // (ONE home @essrt/physics/planets/spin-channel, the same construction the
@@ -730,8 +698,6 @@ function computeSolsticeYearLength(year, type) { return _cardinalPkg().cardinal.
 
 module.exports = {
   // Obliquity
-  computeObliquityEarth,
-  computeObliquityIntegrals,
   computePlanetObliquity,
 
   // Eccentricity

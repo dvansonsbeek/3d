@@ -593,12 +593,9 @@ const PERI_OFFSET = FIT.PERI_OFFSET;
 // @essrt/physics moon/apparent.cjs.
 
 // ─── B4. Obliquity harmonics (fitted) ────────────────────────────────────
-// Source: public/input/fitted-coefficients.json
-// Data-derived solstice mean (more accurate than Pythagorean time-average)
-// Mean term of the OBLIQUITY_HARMONICS series. JSON key is
-// SOLSTICE_OBLIQUITY_MEAN_FITTED — the local name drops the prefix, matching
-// OBLIQUITY_HARMONICS <- SOLSTICE_OBLIQUITY_HARMONICS.
-const OBLIQUITY_MEAN = FIT.SOLSTICE_OBLIQUITY_MEAN_FITTED;
+// Plan 09: the 16-harmonic obliquity comb (SOLSTICE_OBLIQUITY_MEAN_FITTED /
+// SOLSTICE_OBLIQUITY_HARMONICS, the frozen era record) left the bundle — the
+// obliquity of date is the scene's one-source ε (_sceneEpsTargetDeg, the hybrid).
 
 // Projection from precession in LONGITUDE (along the ecliptic — the H/13 rate)
 // to precession in RIGHT ASCENSION (along the equator), which is what the
@@ -631,7 +628,7 @@ const OBLIQUITY_MEAN = FIT.SOLSTICE_OBLIQUITY_MEAN_FITTED;
 // deep-time obliquity range (~22.0°–24.5°) the offset runs 8.46 → 8.30 ms, so a
 // deep-time run must track the epoch's own obliquity.
 const stellarDayRaProjection = (obliquityDeg) => Math.cos(obliquityDeg * Math.PI / 180);
-const STELLAR_DAY_RA_PROJECTION = stellarDayRaProjection(OBLIQUITY_MEAN);   // MEAN family
+const STELLAR_DAY_RA_PROJECTION = stellarDayRaProjection(K.earthOrbital.obliquityJ2000_deg);   // MEAN family — plan 09: the IAU ε₀ input (the comb's fitted mean, 0.03° lower, is retired; 2e-11 of the stellar day)
 
 // PRECISION FIX, and the worst of the three. The 6-decimal copy above wrote
 // term 32 as [0.000000, -0.000001] against a true [2.0058e-7, -9.1111e-7] — the
@@ -640,8 +637,7 @@ const STELLAR_DAY_RA_PROJECTION = stellarDayRaProjection(OBLIQUITY_MEAN);   // M
 // 0.00641" out-of-sample. The browser was running on coefficients materially
 // worse than the ones tools/lib reads from the same JSON.
 //
-// JSON key is SOLSTICE_OBLIQUITY_HARMONICS; the local name drops the prefix.
-const OBLIQUITY_HARMONICS = FIT.SOLSTICE_OBLIQUITY_HARMONICS;
+// (plan 09: SOLSTICE_OBLIQUITY_HARMONICS retired with the comb — see above)
 
 // ─── B4b. Sun longitude harmonics (fitted) ───────────────────────────────
 // Source: public/input/fitted-coefficients.json (tools/fit/sun-longitude-harmonics.js)
@@ -18385,6 +18381,12 @@ let _zetaSeriesEndYr = 0;
         // (browser ≡ Node Moon after this: the 0.27″ / 6″ / 100″ split at
         // 0 / ±100 kyr / −5.34 Myr was exactly this; see _moonArgsM.reset).
         _moonArgsM.reset();
+        // Plan 09: the scene's ε reads the hybrid at every epoch — before the
+        // series landed it ran on the deep mode table; rebuild the one-source
+        // history and drop its samplers so every ε read is the series hybrid.
+        _deepHistSeriesM = null;
+        _epsSeriesSamplers.clear();
+        _epsSeriesDeepRangeYr = 0;
         // (R4: the J2000 pose bridge _kcR is read from the deterministic K
         // device — nothing to re-derive when the artifact lands)
         // Perf (measured, the Play-start wait): the rebuilt tier model's
@@ -18559,12 +18561,13 @@ function _hybridSpinActive() { return HYBRID_SPIN_REQUESTED && _zetaSeriesData !
  *  and whenever the flag is off/pending. Every ε surface (the visual tilt
  *  correction, o.obliquityEarth, the panel row) reads THIS. */
 function _sceneEpsTargetDeg(year) {
-  // D1-revised (owner): the hybrid speaks at EVERY epoch under the flag —
-  // the banked series inside ±10 Myr, the α(H(t))-coupled integration on
-  // the ζ mode tail beyond it. The K device remains only the flag-off path
-  // (and the VFP comparison curve — the rendered leg-1 fork).
-  if (_hybridSpinActive()) return _epsHybridSeriesAt(year);
-  return computeObliquityEarth(year);
+  // D1-revised (owner): the hybrid speaks at EVERY epoch — the banked series
+  // inside ±10 Myr, the α(H(t))-coupled integration on the ζ mode tail
+  // beyond it. Plan 09: the 16-harmonic K comb that served as the flag-off
+  // fallback is retired (0.23″ off the hybrid at J2000, 4,938″ at −26 kyr);
+  // before the series lands the hybrid runs on the deep mode table, and the
+  // samplers are rebuilt when it lands (the series-load handler).
+  return _epsHybridSeriesAt(year);
 }
 /** C-4a: the scene's e target at a decimal year — same one-source pattern:
  *  the banked z series inside the span (read directly — e = |z|; no
@@ -36705,7 +36708,7 @@ async function runYearAnalysisExport(years) {
     // below section 5's values. axialPrec here is the MEASURED beat, and the
     // inputs are analysis-period means, so the obliquity is taken at the period
     // midpoint rather than OBLIQUITY_MEAN.
-    ['Mean Stellar Day = siderealDay × (1 + cos(ε) / (axialPrecession × rotationsPerYear))', (() => { const measuredLOD = meansiderealyearlengthinSeconds / meanSiderealYear; const tropSec = meanTropicalYear * measuredLOD; const sidDay = tropSec / (tropSec / 86400 + 1); const axialPrec = meanSiderealYear / (meanSiderealYear - meanTropicalYear); const rotPerYear = meanTropicalYear + 1; const raProj = stellarDayRaProjection(computeObliquityEarth((startYear + endYear) / 2)); return (sidDay * (1 + raProj / (axialPrec * rotPerYear))).toFixed(6); })()],
+    ['Mean Stellar Day = siderealDay × (1 + cos(ε) / (axialPrecession × rotationsPerYear))', (() => { const measuredLOD = meansiderealyearlengthinSeconds / meanSiderealYear; const tropSec = meanTropicalYear * measuredLOD; const sidDay = tropSec / (tropSec / 86400 + 1); const axialPrec = meanSiderealYear / (meanSiderealYear - meanTropicalYear); const rotPerYear = meanTropicalYear + 1; const raProj = stellarDayRaProjection(_sceneEpsTargetDeg((startYear + endYear) / 2)); return (sidDay * (1 + raProj / (axialPrec * rotPerYear))).toFixed(6); })()],
     ['The solar-day row above is ANCHORED AT 86400 by construction:'],
     ['siderealYearSeconds is the IAU sidereal year × 86400 SI seconds, so the row'],
     ['reads exactly 86400 whenever the scene reproduces the IAU sidereal year.'],
@@ -42119,7 +42122,7 @@ async function analyzeSolarDayMultiEpoch() {
 
     if (result) {
       const offsetA = (result.methodA.mean - meanlengthofday) * 1000;  // ms
-      const obliquity = computeObliquityEarth(epochYear);   // R9: the 16-harmonic law, not the retired two-cosine device
+      const obliquity = _sceneEpsTargetDeg(epochYear);   // plan 09: the scene's one-source ε (the hybrid), not the retired 16-harmonic comb
       const inclination = inclInvPlaneModel(epochYear);   // R5: the one-source i_inv (was the H/3 device cosine)
       const eclipticInclination = obliquity - inclination;
       const ecc = computeEccentricityEarthAtYear(epochYear);  // the ONE law (unification)
@@ -42667,7 +42670,7 @@ function compareSceneVsSceneGraph() {
   console.log('  LONGITUDE SPACE — where the difference actually lives');
   console.log('  ' + '─'.repeat(92));
   console.log('  label   Δlon (")   Δ currentYear    Δ ecc          Δ sunCorr (")');
-  const eps = OBLIQUITY_MEAN * Math.PI / 180;
+  const eps = K.earthOrbital.obliquityJ2000_deg * Math.PI / 180;   // plan 09: the IAU ε₀ input, not the retired comb's mean
   for (const r of REF) {
     jumpToJulianDay(r.jd);
     forceSceneUpdate();
@@ -54625,18 +54628,8 @@ function computePlanetObliquity(planetName, engineYear) {
 ------------------------------------------------------------------ */
 
 // Obliquity and cardinal point functions (data now in section B4/B5)
-/** Compute Earth's obliquity (axial tilt) at a given year.
- *  16-harmonic formula, RMSE: 0.005 arcsec. */
-function computeObliquityEarth(currentYear) {
-  // Phase 8.5: integrated phase (frame-independent)
-  let obliq = OBLIQUITY_MEAN;
-  for (const [div, sinC, cosC] of OBLIQUITY_HARMONICS) {
-    const phase = phaseAdvanceRadians(BALANCED_YEAR_J2000_FIXED, currentYear, div);
-    if (phase === null) continue;
-    obliq += sinC * Math.sin(phase) + cosC * Math.cos(phase);
-  }
-  return obliq;
-}
+// Plan 09: computeObliquityEarth (the 16-harmonic K comb on the frozen era
+// clock) is retired — every ε surface reads _sceneEpsTargetDeg (the hybrid).
 
 // Phase 7.2 — the entire §10/§10g cardinal family lives in
 // @essrt/physics/cardinal (ONE implementation for every engine; the Node

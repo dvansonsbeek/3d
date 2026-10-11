@@ -1,7 +1,7 @@
 ---
 docVersion: 1.0
 modelVersion: v23.0
-coefficients: sha256:82c86b078b32fff8
+coefficients: sha256:90a0f37a51074bdb
 status: current
 ---
 
@@ -755,7 +755,7 @@ quarter-percent. Second, **the H/8 identity is derived, not asserted**:
 the dominant obliquity beat emerges as |ψ̇| − |s₃| ≈ 41 kyr — the
 lattice's spin-side reading produced natively by the dynamics. Third,
 **the fidelity ladder** (vs La2004, a theory reference): the era
-ζ-slice beats the shipped 16-harmonic fitted law by an order of
+ζ-slice beat the former 16-harmonic fitted law (deleted at plan 09) by an order of
 magnitude in the 13-kyr insolation window, and the full deep ζ-table
 holds a flat ~0.1° error profile with correlation ≈ 0.99 across the
 entire megayear, where the fitted law decorrelates beyond ~50 kyr. The

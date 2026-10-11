@@ -19,8 +19,8 @@ const SIDEREAL_YEAR_HARMONICS = data.SIDEREAL_YEAR_HARMONICS;
 const ANOMALISTIC_YEAR_HARMONICS = data.ANOMALISTIC_YEAR_HARMONICS;
 const PERI_HARMONICS_RAW = data.PERI_HARMONICS_RAW;
 const PERI_OFFSET = data.PERI_OFFSET;
-const SOLSTICE_OBLIQUITY_MEAN_FITTED = data.SOLSTICE_OBLIQUITY_MEAN_FITTED;
-const SOLSTICE_OBLIQUITY_HARMONICS = data.SOLSTICE_OBLIQUITY_HARMONICS;
+// (plan 09: SOLSTICE_OBLIQUITY_MEAN_FITTED / SOLSTICE_OBLIQUITY_HARMONICS retired —
+// the obliquity of date is the hybrid ε of the one-source movement)
 const SUN_LONGITUDE_MEAN = data.SUN_LONGITUDE_MEAN;
 const SUN_LONGITUDE_HARMONICS = data.SUN_LONGITUDE_HARMONICS;
 const CARDINAL_POINT_HARMONICS = data.CARDINAL_POINT_HARMONICS;
@@ -46,52 +46,27 @@ const SOLSTICE_JD_HARMONICS = CARDINAL_POINT_HARMONICS.SS;  // Legacy alias
  * Build fitted coefficients that depend on model parameters.
  * @param {object} params - { earthtiltMean, earthInvPlaneInclinationAmplitude,
  *                            earthRAAngle, earthInvPlaneInclinationMean, planets, H }
- * @returns {{ SOLSTICE_OBLIQUITY_MEAN: number, PERI_HARMONICS: Array }}
+ * @returns {{ PERI_HARMONICS: Array }}
  */
 function buildFittedCoefficients(params) {
-  // Pythagorean obliquity mean — derived from 3D geometry (zero fitting)
-  const N = 100000;
-  let sum = 0;
-  for (let i = 0; i < N; i++) {
-    const t = i / N;
-    const p3 = 2 * Math.PI * t * 3, p5 = 2 * Math.PI * t * 5;
-    const p8 = 2 * Math.PI * t * 8, p16 = 2 * Math.PI * t * 16;
-    const e = params.earthtiltMean
-      - params.earthInvPlaneInclinationAmplitude * Math.cos(p3)
-      + params.earthInvPlaneInclinationAmplitude * Math.cos(p8);
-    const pa = params.earthRAAngle * Math.cos(p16);
-    const pb = params.earthInvPlaneInclinationMean * Math.sin(p5);
-    sum += Math.sqrt(e * e + pa * pa + pb * pb);
-  }
-  // Use data-derived solstice mean (more accurate than Pythagorean time-average),
-  // fall back to Pythagorean mean if the fitted constant hasn't been generated yet.
-  const SOLSTICE_OBLIQUITY_MEAN = typeof SOLSTICE_OBLIQUITY_MEAN_FITTED !== 'undefined'
-    ? SOLSTICE_OBLIQUITY_MEAN_FITTED
-    : sum / N;
-
-  // (The per-planet prediction configs and the PREDICT_COEFFS_* arrays —
-  // the planet predict device — were retired at plan 06 R8.)
+  // (Plan 09: the solstice-obliquity mean — the fitted comb's mean term, with
+  // its Pythagorean fallback on the K pose — left with the comb; the obliquity
+  // of date is the hybrid ε. The per-planet predict device left at plan 06 R8.)
 
   // Perihelion harmonics — expand divisors to actual periods using H
   const PERI_HARMONICS = PERI_HARMONICS_RAW.map(([div, s, c]) => [params.H / div, s, c]);
 
-  return { SOLSTICE_OBLIQUITY_MEAN, PERI_HARMONICS };
+  return { PERI_HARMONICS };
 }
 
 
 module.exports = {
-  // Fitted solstice-obliquity mean, exported raw so early constants (the stellar
-  // day's cos(ε) equator projection) can reach it before buildFittedCoefficients
-  // runs. Same value that comes back as SOLSTICE_OBLIQUITY_MEAN.
-  SOLSTICE_OBLIQUITY_MEAN_FITTED: data.SOLSTICE_OBLIQUITY_MEAN_FITTED,
-
   // Static fitted arrays
   TROPICAL_YEAR_HARMONICS,
   SIDEREAL_YEAR_HARMONICS,
   ANOMALISTIC_YEAR_HARMONICS,
   PERI_HARMONICS_RAW,
   PERI_OFFSET,
-  SOLSTICE_OBLIQUITY_HARMONICS,
   SUN_LONGITUDE_MEAN,
   SUN_LONGITUDE_HARMONICS,
   CARDINAL_POINT_HARMONICS,

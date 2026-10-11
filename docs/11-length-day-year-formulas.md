@@ -1,7 +1,7 @@
 ---
 docVersion: 1.0
 modelVersion: v23.0
-coefficients: sha256:82c86b078b32fff8
+coefficients: sha256:90a0f37a51074bdb
 status: current
 ---
 
@@ -351,7 +351,7 @@ T_p is the physical period in both identities, not the frozen clock's counter (t
 
 **This was confirmed by measurement, not asserted.** The "Analyze Stellar Day" tool's Method D tracks Earth's rotation about its own spin axis against ICRF — using no precession period at all, since the spin axis precesses on the precession cone and the projection plane tilts with it — and reproduces the IAU stellar day to ~0.02 ms. Methods A and B, which reference the ecliptic normal instead of the spin axis, overshoot by ~0.79 and ~0.47 ms respectively; that ~23.44° of axis difference *is* the cos ε.
 
-The obliquity used follows the family of the sidereal day it is applied to: `OBLIQUITY_MEAN` for the H-cycle mean values, `computeObliquityEarth(year)` for epoch-specific ones. At J2000 the choice is worth 0.0008 ms, but across the deep-time obliquity range (~22.0°–24.5°) the offset runs 8.46 → 8.30 ms.
+The obliquity used follows the family of the sidereal day it is applied to: the IAU J2000 obliquity input for the mean values, the hybrid obliquity of date (`_sceneEpsTargetDeg(year)`) for epoch-specific ones. At J2000 the choice is worth 0.0008 ms, but across the deep-time obliquity range (~22.0°–24.5°) the offset runs 8.46 → 8.30 ms.
 
 
 ## Implementation

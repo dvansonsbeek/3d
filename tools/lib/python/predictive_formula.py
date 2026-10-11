@@ -9,15 +9,15 @@ from a single input: YEAR. No observations required.
 SECTIONS:
   A. Fundamental Constants & Derived Periods
   B. Planet Configurations
-  C. Earth — Orbital Elements (obliquity, eccentricity, inclination,
+  C. Earth — Orbital Elements (eccentricity, inclination,
      ascending node, perihelion longitude, ERD)
   D. Planet Perihelion Calculation
   D2. All Planets — Orbital Elements (ascending node, inclination, eccentricity)
   E. Earth — Time Periods (solar year, sidereal year, day length,
      sidereal day, stellar day)
   F. Earth — Precession Periods (axial, perihelion, inclination)
-  G. Unified Feature Matrix (429-term precession prediction)
-  H. Prediction Functions
+  (G/H — the 429-term feature matrix and prediction functions of the retired
+   planet predict device — deleted at plan 09; git history carries them)
 
 Adding new formula categories:
   - Insert a new lettered section between existing ones
@@ -42,9 +42,11 @@ from constants_scripts import (
     OBLIQUITY_CYCLE, EARTH_RA_ANGLE, BALANCED_JD,
     _START_MODEL_JD, JUNE_SOLSTICE_2000_JD, SOLSTICE_JD_HARMONICS,
     CARDINAL_POINT_ANCHORS, CARDINAL_POINT_HARMONICS,
-    SOLSTICE_OBLIQUITY_MEAN, SOLSTICE_OBLIQUITY_HARMONICS,
     PERI_HARMONICS, PERI_OFFSET,
 )
+# (plan 09: SOLSTICE_OBLIQUITY_MEAN / _HARMONICS — the 16-harmonic obliquity
+# comb — are deleted; this mirror carries no obliquity of date. The model's
+# obliquity is the hybrid ε of @essrt/physics `model.earth.obliquityDeg`.)
 
 # =============================================================================
 # SECTION A: FUNDAMENTAL CONSTANTS
@@ -210,8 +212,7 @@ PLANETS = {
         'period': abs(PERIHELION_ECLIPTIC_YEARS['Saturn']),  # retrograde (negative in constants)
         'theta0': LONGITUDE_PERIHELION['Saturn'],
         'baseline': 1296000 / PERIHELION_ECLIPTIC_YEARS['Saturn'] * 100,
-        # Note: Saturn's period equals the obliquity cycle, creating strong
-        # coupling with Earth's obliquity/eccentricity variations (GROUP 15)
+        # Note: Saturn's period equals the device's obliquity cycle (H/8)
     },
     'uranus': {
         'name': 'Uranus',
@@ -283,16 +284,7 @@ def calc_erd(year: int) -> float:
     return erd
 
 
-def calc_obliquity(year: int) -> float:
-    """Calculate Earth's obliquity at given year (degrees).
-    Primary formula: 12-harmonic fit, RMSE 1.45 arcsec over full H."""
-    t = time_offset(year)
-    obliq = SOLSTICE_OBLIQUITY_MEAN
-    for div, sin_c, cos_c in SOLSTICE_OBLIQUITY_HARMONICS:
-        phase = 2 * math.pi * t / (H / div)
-        obliq += sin_c * math.sin(phase) + cos_c * math.cos(phase)
-    return obliq
-
+# (calc_obliquity — the 16-harmonic comb mirror — deleted at plan 09.)
 
 
 
@@ -416,7 +408,7 @@ def calc_planet_obliquity(planet: str, year: int) -> float:
     Returns: Obliquity in degrees
     """
     if planet == "Earth":
-        return calc_obliquity(year)
+        return AXIAL_TILT["Earth"]   # plan 09: the J2000 tilt; the obliquity of date is the package hybrid
     # The planets' obliquity cycles left with plan 06 Phase 7 commit 2 (the
     # spin channel carries them); the ψ-law anchoring that followed here
     # (tilt_J2000 + Δ inclination) left with the law at plan 07 R5. The J2000
@@ -698,10 +690,6 @@ def calc_solstice_year_length(year: int, cp_type: str = 'SS') -> float:
     return length
 
 
-# Legacy alias for backward compatibility
-calc_solstice_obliquity = calc_obliquity
-
-
 # =============================================================================
 # SECTION F: PRECESSION DURATIONS
 # Axial, perihelion, and inclination precession periods — all derived
@@ -752,760 +740,11 @@ def calc_inclination_precession(year: int) -> float:
 
 
 # =============================================================================
-# SECTION G: UNIFIED FEATURE MATRIX (429 terms)
+# SECTIONS G/H — the 429-term unified feature matrix (`build_features`) and
+# the prediction functions of the retired planet predict device — DELETED at
+# plan 09: their last live input was the obliquity comb. Git history carries
+# them (the untracked local archive keeps a copy).
 # =============================================================================
-
-def build_features(year: int, planet_period: float, planet_theta0: float) -> List[float]:
-    """
-    Build unified 429-term feature matrix for any planet.
-
-    This is the SAME structure for all 7 planets. Only the planet_period
-    and planet_theta0 parameters vary.
-
-    Feature groups:
-    - Angle terms (diff, sum, harmonics): 18 terms
-    - Obliquity/Eccentricity terms: 6 terms
-    - ERD terms (linear, quadratic, cubic): 12 terms
-    - Periodic terms (11 periods × 2): 22 terms
-    - ERD × Periodic (11 periods × 2): 22 terms
-    - ERD² × Periodic (6 periods × 2): 12 terms
-    - Periodic × Angle (6 periods × 4): 24 terms
-    - ERD × Periodic × Angle (4 periods × 4): 16 terms
-    - Periodic × 2δ (4 periods × 4): 16 terms
-    - Periodic × Periodic (6 pairs × 2): 12 terms
-    - Constant: 1 term
-    - ERD × Sum-angle: 4 terms
-    - Extended harmonics (3δ, beats, sum-angle): 60 terms
-    - Venus periodic terms (H/80, H/21, periodic×3δ): 16 terms
-    - Time-varying obliq/ecc interactions: 12 terms (critical for Saturn)
-    - Venus fine-tuning (H/78, H/94, H/77, H/55): 20 terms
-    - Greedy-selected: H/60 simple, H/24×angle, H/45×angle, H/9×2δ: 14 terms
-    - Greedy round-2: H/110, H/60×angle, H/75, H/41×angle, H/56, H/45 simple: 16 terms
-    - Greedy round-3: H/56×angle, H/41×2δ, ERD×H/110, ERD×6δ, H/39×angle: 16 terms
-    - Greedy round-4: H/60×2δ, H/112×angle, H/39×2δ, H/96×angle, H/37: 18 terms
-    - Greedy round-5: H/96×2δ, H/7+angle, H/18, H/37×2δ, H/38×2δ, ERD×6δ: 22 terms
-    - Greedy round-6: H/31 bundle: 10 terms
-    - Greedy round-7: H/128 bundle, H/42 bundle: 20 terms
-
-    Total: 429 terms
-    """
-    # Time offset for periodic terms
-    t = time_offset(year)
-
-    # Calculate all inputs from formulas
-    theta_E = calc_earth_perihelion(year)
-    theta_P = calc_planet_perihelion(planet_theta0, planet_period, year)
-    erd = calc_erd(year)
-    obliq = calc_obliquity(year)
-    ecc = calc_eccentricity(year)
-
-    # Convert to radians
-    theta_E_rad = math.radians(theta_E)
-    theta_P_rad = math.radians(theta_P)
-
-    # Derived angles
-    diff = theta_E_rad - theta_P_rad      # Difference angle
-    sum_angle = theta_E_rad + theta_P_rad  # Sum angle
-
-    # Normalized Earth parameters
-    obliq_norm = obliq - SOLSTICE_OBLIQUITY_MEAN
-    ecc_norm = ecc - EARTH_ECC_MEAN
-
-    # ERD powers
-    erd2 = erd * erd
-    erd3 = erd2 * erd
-
-    features = []
-
-    # =========================================================================
-    # GROUP 1: ANGLE TERMS (0-17) - 18 terms
-    # =========================================================================
-
-    # Difference angle harmonics (n=1,2,3,4)
-    for n in [1, 2, 3, 4]:
-        features.append(math.cos(n * diff))
-        features.append(math.sin(n * diff))
-
-    # Sum angle
-    features.append(math.cos(sum_angle))
-    features.append(math.sin(sum_angle))
-
-    # Earth angle harmonics (n=1,2)
-    for n in [1, 2]:
-        features.append(math.cos(n * theta_E_rad))
-        features.append(math.sin(n * theta_E_rad))
-
-    # Planet angle harmonics (n=1,2)
-    for n in [1, 2]:
-        features.append(math.cos(n * theta_P_rad))
-        features.append(math.sin(n * theta_P_rad))
-
-    # =========================================================================
-    # GROUP 2: OBLIQUITY & ECCENTRICITY TERMS (18-23) - 6 terms
-    # =========================================================================
-
-    features.append(obliq_norm)
-    features.append(ecc_norm)
-    features.append(obliq_norm * math.cos(diff))
-    features.append(obliq_norm * math.sin(diff))
-    features.append(ecc_norm * math.cos(diff))
-    features.append(ecc_norm * math.sin(diff))
-
-    # =========================================================================
-    # GROUP 3: ERD TERMS (24-35) - 12 terms
-    # =========================================================================
-
-    features.append(erd)
-    features.append(erd2)
-    features.append(erd * math.cos(diff))
-    features.append(erd * math.sin(diff))
-    features.append(erd * math.cos(2 * diff))
-    features.append(erd * math.sin(2 * diff))
-    features.append(erd * math.cos(sum_angle))
-    features.append(erd * math.sin(sum_angle))
-    features.append(erd2 * math.cos(diff))
-    features.append(erd2 * math.sin(diff))
-    features.append(erd3)
-    features.append(erd2 * math.cos(2 * diff))
-
-    # =========================================================================
-    # GROUP 4: PERIODIC TERMS (36-57) - 22 terms
-    # =========================================================================
-
-    periods = [
-        planet_period,      # Planet's own period
-        H,                  # Master cycle
-        EARTH_PERI_PERIOD,  # Earth perihelion (H/16)
-        EARTH_PERI_2,       # 2nd harmonic (H/32)
-        EARTH_PERI_3,       # 3rd harmonic (H/48)
-        OBLIQ_CYCLE,        # Obliquity (H/8)
-        INCLIN_CYCLE,       # Inclination (H/3)
-        H_DIV_4,            # H/4
-        H_DIV_5,            # H/5
-        H_DIV_12,           # H/12
-        H_DIV_13,           # H/13 (axial precession)
-    ]
-
-    for p in periods:
-        phase = 2 * math.pi * t / p
-        features.append(math.sin(phase))
-        features.append(math.cos(phase))
-
-    # =========================================================================
-    # GROUP 5: ERD × PERIODIC (58-79) - 22 terms
-    # =========================================================================
-
-    for p in periods:
-        phase = 2 * math.pi * t / p
-        features.append(erd * math.sin(phase))
-        features.append(erd * math.cos(phase))
-
-    # =========================================================================
-    # GROUP 6: ERD² × PERIODIC (80-91) - 12 terms
-    # =========================================================================
-
-    erd2_periods = [planet_period, H, EARTH_PERI_PERIOD, OBLIQ_CYCLE, INCLIN_CYCLE, H_DIV_5]
-    for p in erd2_periods:
-        phase = 2 * math.pi * t / p
-        features.append(erd2 * math.sin(phase))
-        features.append(erd2 * math.cos(phase))
-
-    # =========================================================================
-    # GROUP 7: PERIODIC × ANGLE (92-115) - 24 terms
-    # =========================================================================
-
-    angle_periods = [EARTH_PERI_PERIOD, EARTH_PERI_2, OBLIQ_CYCLE, INCLIN_CYCLE, planet_period, H_DIV_5]
-    for p in angle_periods:
-        phase = 2 * math.pi * t / p
-        sin_p, cos_p = math.sin(phase), math.cos(phase)
-        features.append(sin_p * math.cos(diff))
-        features.append(sin_p * math.sin(diff))
-        features.append(cos_p * math.cos(diff))
-        features.append(cos_p * math.sin(diff))
-
-    # =========================================================================
-    # GROUP 8: ERD × PERIODIC × ANGLE (116-131) - 16 terms
-    # =========================================================================
-
-    for p in [EARTH_PERI_PERIOD, EARTH_PERI_2, planet_period, H]:
-        phase = 2 * math.pi * t / p
-        sin_p, cos_p = math.sin(phase), math.cos(phase)
-        features.append(erd * sin_p * math.cos(diff))
-        features.append(erd * sin_p * math.sin(diff))
-        features.append(erd * cos_p * math.cos(diff))
-        features.append(erd * cos_p * math.sin(diff))
-
-    # =========================================================================
-    # GROUP 9: PERIODIC × 2δ (132-147) - 16 terms
-    # =========================================================================
-
-    for p in [EARTH_PERI_PERIOD, EARTH_PERI_2, planet_period, H]:
-        phase = 2 * math.pi * t / p
-        sin_p, cos_p = math.sin(phase), math.cos(phase)
-        features.append(sin_p * math.cos(2 * diff))
-        features.append(sin_p * math.sin(2 * diff))
-        features.append(cos_p * math.cos(2 * diff))
-        features.append(cos_p * math.sin(2 * diff))
-
-    # =========================================================================
-    # GROUP 10: PERIODIC × PERIODIC (148-159) - 12 terms
-    # =========================================================================
-
-    period_pairs = [
-        (EARTH_PERI_PERIOD, planet_period),
-        (EARTH_PERI_PERIOD, OBLIQ_CYCLE),
-        (OBLIQ_CYCLE, planet_period),
-        (OBLIQ_CYCLE, INCLIN_CYCLE),
-        (planet_period, INCLIN_CYCLE),
-        (EARTH_PERI_PERIOD, INCLIN_CYCLE),
-    ]
-    for p1, p2 in period_pairs:
-        ph1 = 2 * math.pi * t / p1
-        ph2 = 2 * math.pi * t / p2
-        features.append(math.sin(ph1) * math.sin(ph2))
-        features.append(math.cos(ph1) * math.cos(ph2))
-
-    # =========================================================================
-    # GROUP 11: CONSTANT (160) - 1 term
-    # =========================================================================
-
-    features.append(1.0)
-
-    # =========================================================================
-    # GROUP 12: ERD × SUM-ANGLE (161-164) - 4 terms
-    # =========================================================================
-
-    features.append(erd * math.cos(2 * sum_angle))
-    features.append(erd * math.sin(2 * sum_angle))
-    features.append(erd2 * math.cos(sum_angle))
-    features.append(erd2 * math.sin(sum_angle))
-
-    # =========================================================================
-    # GROUP 13: EXTENDED HARMONICS (165-224) - 60 terms
-    # =========================================================================
-
-    # 3δ terms (4)
-    features.append(math.cos(3 * diff))
-    features.append(math.sin(3 * diff))
-    features.append(erd * math.cos(3 * diff))
-    features.append(erd * math.sin(3 * diff))
-
-    # Beat frequencies (12)
-    beat_pairs = [
-        (EARTH_PERI_PERIOD, planet_period),
-        (OBLIQ_CYCLE, planet_period),
-        (INCLIN_CYCLE, planet_period),
-    ]
-    for p1, p2 in beat_pairs:
-        if p1 != p2:
-            beat = abs(p1 - p2)
-            sumf = (p1 * p2) / (p1 + p2)
-        else:
-            beat = H
-            sumf = p1 / 2
-        for bp in [beat, sumf]:
-            phase = 2 * math.pi * t / bp
-            features.append(math.sin(phase))
-            features.append(math.cos(phase))
-
-    # EARTH_PERI_3 × angle (4)
-    phase = 2 * math.pi * t / EARTH_PERI_3
-    sin_p, cos_p = math.sin(phase), math.cos(phase)
-    features.append(sin_p * math.cos(diff))
-    features.append(sin_p * math.sin(diff))
-    features.append(cos_p * math.cos(diff))
-    features.append(cos_p * math.sin(diff))
-
-    # H/4 × angle (4)
-    phase = 2 * math.pi * t / H_DIV_4
-    sin_p, cos_p = math.sin(phase), math.cos(phase)
-    features.append(sin_p * math.cos(diff))
-    features.append(sin_p * math.sin(diff))
-    features.append(cos_p * math.cos(diff))
-    features.append(cos_p * math.sin(diff))
-
-    # H/13 × angle (4)
-    phase = 2 * math.pi * t / H_DIV_13
-    sin_p, cos_p = math.sin(phase), math.cos(phase)
-    features.append(sin_p * math.cos(diff))
-    features.append(sin_p * math.sin(diff))
-    features.append(cos_p * math.cos(diff))
-    features.append(cos_p * math.sin(diff))
-
-    # Sum angle combinations (16)
-    for p in [EARTH_PERI_PERIOD, OBLIQ_CYCLE, planet_period, H]:
-        phase = 2 * math.pi * t / p
-        sin_p, cos_p = math.sin(phase), math.cos(phase)
-        features.append(sin_p * math.cos(sum_angle))
-        features.append(sin_p * math.sin(sum_angle))
-        features.append(cos_p * math.cos(sum_angle))
-        features.append(cos_p * math.sin(sum_angle))
-
-    # ERD³ × angle (4)
-    features.append(erd3 * math.cos(diff))
-    features.append(erd3 * math.sin(diff))
-    features.append(erd3 * math.cos(2 * diff))
-    features.append(erd3 * math.sin(2 * diff))
-
-    # ERD² × periodic × angle (12)
-    for p in [EARTH_PERI_PERIOD, planet_period, OBLIQ_CYCLE]:
-        phase = 2 * math.pi * t / p
-        sin_p, cos_p = math.sin(phase), math.cos(phase)
-        features.append(erd2 * sin_p * math.cos(diff))
-        features.append(erd2 * sin_p * math.sin(diff))
-        features.append(erd2 * cos_p * math.cos(diff))
-        features.append(erd2 * cos_p * math.sin(diff))
-
-    # =========================================================================
-    # GROUP 14: VENUS PERIODIC TERMS (225-240) - 16 terms
-    # =========================================================================
-
-    # H/80 periodic terms (2)
-    phase = 2 * math.pi * t / H_DIV_80
-    features.append(math.sin(phase))
-    features.append(math.cos(phase))
-
-    # H/21 periodic terms (2)
-    phase = 2 * math.pi * t / H_DIV_21
-    features.append(math.sin(phase))
-    features.append(math.cos(phase))
-
-    # H/80 × angle (4)
-    phase = 2 * math.pi * t / H_DIV_80
-    sin_p, cos_p = math.sin(phase), math.cos(phase)
-    features.append(sin_p * math.cos(diff))
-    features.append(sin_p * math.sin(diff))
-    features.append(cos_p * math.cos(diff))
-    features.append(cos_p * math.sin(diff))
-
-    # Periodic × 3δ for planet_period and EARTH_PERI_PERIOD (8)
-    # Venus has strong 3δ × periodic interactions
-    for p in [planet_period, EARTH_PERI_PERIOD]:
-        phase = 2 * math.pi * t / p
-        sin_p, cos_p = math.sin(phase), math.cos(phase)
-        features.append(sin_p * math.cos(3 * diff))
-        features.append(sin_p * math.sin(3 * diff))
-        features.append(cos_p * math.cos(3 * diff))
-        features.append(cos_p * math.sin(3 * diff))
-
-    # =========================================================================
-    # GROUP 15: TIME-VARYING OBLIQ/ECC INTERACTIONS (241-252) - 12 terms
-    # These terms are critical for Saturn's accuracy. Saturn's retrograde
-    # precession (period = H/8 = obliquity cycle) creates strong coupling
-    # between obliquity/eccentricity variations and precession fluctuations.
-    # Without these terms, Saturn RMSE was 2.32; with them it drops to 0.29.
-    # =========================================================================
-
-    # Obliquity × ERD × angle (4)
-    features.append(obliq_norm * erd * math.cos(diff))
-    features.append(obliq_norm * erd * math.sin(diff))
-    features.append(obliq_norm * erd * math.cos(2 * diff))
-    features.append(obliq_norm * erd * math.sin(2 * diff))
-
-    # Eccentricity × ERD × angle (4)
-    features.append(ecc_norm * erd * math.cos(diff))
-    features.append(ecc_norm * erd * math.sin(diff))
-    features.append(ecc_norm * erd * math.cos(2 * diff))
-    features.append(ecc_norm * erd * math.sin(2 * diff))
-
-    # Obliquity × periodic (2)
-    phase = 2 * math.pi * t / EARTH_PERI_PERIOD
-    features.append(obliq_norm * math.sin(phase))
-    features.append(obliq_norm * math.cos(phase))
-
-    # Eccentricity × periodic (2)
-    features.append(ecc_norm * math.sin(phase))
-    features.append(ecc_norm * math.cos(phase))
-
-    # =========================================================================
-    # GROUP 16: VENUS FINE-TUNING (253-272) - 20 terms
-    # =========================================================================
-
-    # H/78 periodic terms (2)
-    phase = 2 * math.pi * t / H_DIV_78
-    features.append(math.sin(phase))
-    features.append(math.cos(phase))
-
-    # H/94 periodic terms (2)
-    phase = 2 * math.pi * t / H_DIV_94
-    features.append(math.sin(phase))
-    features.append(math.cos(phase))
-
-    # H/77 periodic terms (2)
-    phase = 2 * math.pi * t / H_DIV_77
-    features.append(math.sin(phase))
-    features.append(math.cos(phase))
-
-    # H/55 periodic terms (2)
-    phase = 2 * math.pi * t / H_DIV_55
-    features.append(math.sin(phase))
-    features.append(math.cos(phase))
-
-    # H/78 × angle (4)
-    phase = 2 * math.pi * t / H_DIV_78
-    sin_p, cos_p = math.sin(phase), math.cos(phase)
-    features.append(sin_p * math.cos(diff))
-    features.append(sin_p * math.sin(diff))
-    features.append(cos_p * math.cos(diff))
-    features.append(cos_p * math.sin(diff))
-
-    # H/94 × angle (4)
-    phase = 2 * math.pi * t / H_DIV_94
-    sin_p, cos_p = math.sin(phase), math.cos(phase)
-    features.append(sin_p * math.cos(diff))
-    features.append(sin_p * math.sin(diff))
-    features.append(cos_p * math.cos(diff))
-    features.append(cos_p * math.sin(diff))
-
-    # ERD × H/78 (2)
-    phase = 2 * math.pi * t / H_DIV_78
-    features.append(erd * math.sin(phase))
-    features.append(erd * math.cos(phase))
-
-    # ERD × H/94 (2)
-    phase = 2 * math.pi * t / H_DIV_94
-    features.append(erd * math.sin(phase))
-    features.append(erd * math.cos(phase))
-
-    # =========================================================================
-    # GROUP 17: GREEDY-SELECTED TERMS (273-286) - 14 terms
-    # Found by greedy forward feature selection (greedy_features.py).
-    # H/60 is the dominant missing signal for Venus (saves 4.45 "/cy RMSE).
-    # H/24×angle is dominant for Mercury (saves 0.93 "/cy RMSE).
-    # H/45×angle is secondary for Venus.
-    # H/9×2δ is secondary for Mercury.
-    # =========================================================================
-
-    # H/60 simple (2) — primary Venus improvement
-    phase = 2 * math.pi * t / H_DIV_60
-    features.append(math.sin(phase))
-    features.append(math.cos(phase))
-
-    # H/24 × angle (4) — primary Mercury improvement
-    phase = 2 * math.pi * t / H_DIV_24
-    sin_p, cos_p = math.sin(phase), math.cos(phase)
-    features.append(sin_p * math.cos(diff))
-    features.append(sin_p * math.sin(diff))
-    features.append(cos_p * math.cos(diff))
-    features.append(cos_p * math.sin(diff))
-
-    # H/45 × angle (4) — secondary Venus improvement
-    phase = 2 * math.pi * t / H_DIV_45
-    sin_p, cos_p = math.sin(phase), math.cos(phase)
-    features.append(sin_p * math.cos(diff))
-    features.append(sin_p * math.sin(diff))
-    features.append(cos_p * math.cos(diff))
-    features.append(cos_p * math.sin(diff))
-
-    # H/9 × 2δ (4) — secondary Mercury improvement
-    phase = 2 * math.pi * t / H_DIV_9
-    sin_p, cos_p = math.sin(phase), math.cos(phase)
-    features.append(sin_p * math.cos(2 * diff))
-    features.append(sin_p * math.sin(2 * diff))
-    features.append(cos_p * math.cos(2 * diff))
-    features.append(cos_p * math.sin(2 * diff))
-
-    # =========================================================================
-    # GROUP 18: GREEDY ROUND-2 TERMS (287-302) - 16 terms
-    # Found by second round of greedy_features.py on updated residuals.
-    # H/110 is the strongest new Venus signal (-1.40 "/cy RMSE each round).
-    # H/60×angle expands the GROUP 17 H/60 to include cross-angle terms.
-    # H/75 helps Venus and Jupiter.
-    # H/41×angle is primary new Mercury term.
-    # H/56 and H/45 simple complete round-2 improvements.
-    # =========================================================================
-
-    # H/110 simple (2) — Venus primary round-2
-    phase = 2 * math.pi * t / H_DIV_110
-    features.append(math.sin(phase))
-    features.append(math.cos(phase))
-
-    # H/60 × angle (4) — Venus secondary (H/60 simple already in GROUP 17)
-    phase = 2 * math.pi * t / H_DIV_60
-    sin_p, cos_p = math.sin(phase), math.cos(phase)
-    features.append(sin_p * math.cos(diff))
-    features.append(sin_p * math.sin(diff))
-    features.append(cos_p * math.cos(diff))
-    features.append(cos_p * math.sin(diff))
-
-    # H/75 simple (2) — Venus/Jupiter
-    phase = 2 * math.pi * t / H_DIV_75
-    features.append(math.sin(phase))
-    features.append(math.cos(phase))
-
-    # H/41 × angle (4) — Mercury primary round-2
-    phase = 2 * math.pi * t / H_DIV_41
-    sin_p, cos_p = math.sin(phase), math.cos(phase)
-    features.append(sin_p * math.cos(diff))
-    features.append(sin_p * math.sin(diff))
-    features.append(cos_p * math.cos(diff))
-    features.append(cos_p * math.sin(diff))
-
-    # H/56 simple (2) — Mercury secondary round-2
-    phase = 2 * math.pi * t / H_DIV_56
-    features.append(math.sin(phase))
-    features.append(math.cos(phase))
-
-    # H/45 simple (2) — Neptune (H/45 was in GROUP 17 only as ×angle)
-    phase = 2 * math.pi * t / H_DIV_45
-    features.append(math.sin(phase))
-    features.append(math.cos(phase))
-
-    # =========================================================================
-    # GROUP 19: GREEDY ROUND-3 TERMS (303-318) - 16 terms
-    # H/56×angle is Mercury's strongest round-3 signal, also Neptune.
-    # H/41×2δ completes Mercury's H/41 (×angle was in GROUP 18).
-    # ERD×H/110 is Venus's strongest new signal (simple was in GROUP 18).
-    # ERD×6δ is Venus's second strongest residual correlator.
-    # H/39×angle helps both Mercury and Venus.
-    # =========================================================================
-
-    # H/56 × angle (4) — Mercury primary round-3, Neptune secondary
-    phase = 2 * math.pi * t / H_DIV_56
-    sin_p, cos_p = math.sin(phase), math.cos(phase)
-    features.append(sin_p * math.cos(diff))
-    features.append(sin_p * math.sin(diff))
-    features.append(cos_p * math.cos(diff))
-    features.append(cos_p * math.sin(diff))
-
-    # H/41 × 2δ (4) — Mercury secondary round-3 (×angle already in G18)
-    phase = 2 * math.pi * t / H_DIV_41
-    sin_p, cos_p = math.sin(phase), math.cos(phase)
-    features.append(sin_p * math.cos(2 * diff))
-    features.append(sin_p * math.sin(2 * diff))
-    features.append(cos_p * math.cos(2 * diff))
-    features.append(cos_p * math.sin(2 * diff))
-
-    # ERD × H/110 (2) — Venus primary round-3 (simple already in G18)
-    phase = 2 * math.pi * t / H_DIV_110
-    features.append(erd * math.sin(phase))
-    features.append(erd * math.cos(phase))
-
-    # ERD × 6δ (2) — Venus secondary round-3
-    features.append(erd * math.sin(6 * diff))
-    features.append(erd * math.cos(6 * diff))
-
-    # H/39 × angle (4) — Mercury/Venus tertiary round-3
-    phase = 2 * math.pi * t / H_DIV_39
-    sin_p, cos_p = math.sin(phase), math.cos(phase)
-    features.append(sin_p * math.cos(diff))
-    features.append(sin_p * math.sin(diff))
-    features.append(cos_p * math.cos(diff))
-    features.append(cos_p * math.sin(diff))
-
-    # =========================================================================
-    # GROUP 20: GREEDY ROUND-4 TERMS (319-336) - 18 terms
-    # H/60×2δ is Venus's strongest round-4 signal.
-    # H/112×angle is Venus's second (7th harmonic of Earth perihelion).
-    # H/39×2δ completes Venus/Mercury H/39 (×angle was in GROUP 19).
-    # H/96×angle is Venus's fourth (6th harmonic of Earth perihelion).
-    # H/37 simple is Mercury's strongest new period signal.
-    # =========================================================================
-
-    # H/60 × 2δ (4) — Venus primary round-4
-    phase = 2 * math.pi * t / H_DIV_60
-    sin_p, cos_p = math.sin(phase), math.cos(phase)
-    features.append(sin_p * math.cos(2 * diff))
-    features.append(sin_p * math.sin(2 * diff))
-    features.append(cos_p * math.cos(2 * diff))
-    features.append(cos_p * math.sin(2 * diff))
-
-    # H/112 × angle (4) — Venus secondary round-4
-    phase = 2 * math.pi * t / H_DIV_112
-    sin_p, cos_p = math.sin(phase), math.cos(phase)
-    features.append(sin_p * math.cos(diff))
-    features.append(sin_p * math.sin(diff))
-    features.append(cos_p * math.cos(diff))
-    features.append(cos_p * math.sin(diff))
-
-    # H/39 × 2δ (4) — Venus/Mercury tertiary round-4
-    phase = 2 * math.pi * t / H_DIV_39
-    sin_p, cos_p = math.sin(phase), math.cos(phase)
-    features.append(sin_p * math.cos(2 * diff))
-    features.append(sin_p * math.sin(2 * diff))
-    features.append(cos_p * math.cos(2 * diff))
-    features.append(cos_p * math.sin(2 * diff))
-
-    # H/96 × angle (4) — Venus quaternary round-4
-    phase = 2 * math.pi * t / H_DIV_96
-    sin_p, cos_p = math.sin(phase), math.cos(phase)
-    features.append(sin_p * math.cos(diff))
-    features.append(sin_p * math.sin(diff))
-    features.append(cos_p * math.cos(diff))
-    features.append(cos_p * math.sin(diff))
-
-    # H/37 simple (2) — Mercury primary round-4
-    phase = 2 * math.pi * t / H_DIV_37
-    features.append(math.sin(phase))
-    features.append(math.cos(phase))
-
-    # =========================================================================
-    # GROUP 21: GREEDY ROUND-5 TERMS (337-358) - 22 terms
-    # H/96×2δ is Venus's dominant round-5 signal (ΔRMSE -0.50).
-    # H/7×angle and H/18 simple help Jupiter.
-    # H/37×2δ completes Mercury's H/37 (simple was in GROUP 20).
-    # H/38×2δ helps Mercury and Saturn.
-    # ERD×6δ extends the 6δ pattern for Venus.
-    # =========================================================================
-
-    # H/96 × 2δ (4) — Venus dominant round-5
-    phase = 2 * math.pi * t / H_DIV_96
-    sin_p, cos_p = math.sin(phase), math.cos(phase)
-    features.append(sin_p * math.cos(2 * diff))
-    features.append(sin_p * math.sin(2 * diff))
-    features.append(cos_p * math.cos(2 * diff))
-    features.append(cos_p * math.sin(2 * diff))
-
-    # H/7 simple + ×angle (6) — Jupiter primary round-5
-    phase = 2 * math.pi * t / H_DIV_7
-    sin_p, cos_p = math.sin(phase), math.cos(phase)
-    features.append(sin_p)
-    features.append(cos_p)
-    features.append(sin_p * math.cos(diff))
-    features.append(sin_p * math.sin(diff))
-    features.append(cos_p * math.cos(diff))
-    features.append(cos_p * math.sin(diff))
-
-    # H/18 simple (2) — Jupiter secondary round-5
-    phase = 2 * math.pi * t / H_DIV_18
-    features.append(math.sin(phase))
-    features.append(math.cos(phase))
-
-    # H/37 × 2δ (4) — Mercury round-5
-    phase = 2 * math.pi * t / H_DIV_37
-    sin_p, cos_p = math.sin(phase), math.cos(phase)
-    features.append(sin_p * math.cos(2 * diff))
-    features.append(sin_p * math.sin(2 * diff))
-    features.append(cos_p * math.cos(2 * diff))
-    features.append(cos_p * math.sin(2 * diff))
-
-    # H/38 × 2δ (4) — Mercury/Saturn round-5
-    phase = 2 * math.pi * t / H_DIV_38
-    sin_p, cos_p = math.sin(phase), math.cos(phase)
-    features.append(sin_p * math.cos(2 * diff))
-    features.append(sin_p * math.sin(2 * diff))
-    features.append(cos_p * math.cos(2 * diff))
-    features.append(cos_p * math.sin(2 * diff))
-
-    # ERD × 6δ (2) — Venus round-5
-    features.append(erd * math.cos(6 * diff))
-    features.append(erd * math.sin(6 * diff))
-
-    # =========================================================================
-    # GROUP 22: GREEDY ROUND-6 TERMS (359-368) - 10 terms
-    # H/31 bundle is Venus's dominant round-6 signal (ΔRMSE -1.55).
-    # =========================================================================
-
-    # H/31 simple + ×angle + ×2δ (10) — Venus dominant round-6
-    phase = 2 * math.pi * t / H_DIV_31
-    sin_p, cos_p = math.sin(phase), math.cos(phase)
-    features.append(sin_p)
-    features.append(cos_p)
-    features.append(sin_p * math.cos(diff))
-    features.append(sin_p * math.sin(diff))
-    features.append(cos_p * math.cos(diff))
-    features.append(cos_p * math.sin(diff))
-    features.append(sin_p * math.cos(2 * diff))
-    features.append(sin_p * math.sin(2 * diff))
-    features.append(cos_p * math.cos(2 * diff))
-    features.append(cos_p * math.sin(2 * diff))
-
-    # =========================================================================
-    # GROUP 23: GREEDY ROUND-7 TERMS (369-388) - 20 terms
-    # H/128 is Venus's primary round-7 signal (8th harmonic of perihelion).
-    # H/42 is Venus's secondary round-7 signal.
-    # =========================================================================
-
-    # H/128 simple + ×angle + ×2δ (10) — Venus primary round-7
-    phase = 2 * math.pi * t / H_DIV_128
-    sin_p, cos_p = math.sin(phase), math.cos(phase)
-    features.append(sin_p)
-    features.append(cos_p)
-    features.append(sin_p * math.cos(diff))
-    features.append(sin_p * math.sin(diff))
-    features.append(cos_p * math.cos(diff))
-    features.append(cos_p * math.sin(diff))
-    features.append(sin_p * math.cos(2 * diff))
-    features.append(sin_p * math.sin(2 * diff))
-    features.append(cos_p * math.cos(2 * diff))
-    features.append(cos_p * math.sin(2 * diff))
-
-    # H/42 simple + ×angle + ×2δ (10) — Venus secondary round-7
-    phase = 2 * math.pi * t / H_DIV_42
-    sin_p, cos_p = math.sin(phase), math.cos(phase)
-    features.append(sin_p)
-    features.append(cos_p)
-    features.append(sin_p * math.cos(diff))
-    features.append(sin_p * math.sin(diff))
-    features.append(cos_p * math.cos(diff))
-    features.append(cos_p * math.sin(diff))
-    features.append(sin_p * math.cos(2 * diff))
-    features.append(sin_p * math.sin(2 * diff))
-    features.append(cos_p * math.cos(2 * diff))
-    features.append(cos_p * math.sin(2 * diff))
-
-    # =========================================================================
-    # GROUP 24: SATURN HIGH-FREQUENCY HARMONICS (389-406) - 18 terms
-    # H/(8×34×n) harmonic series for n=1..9
-    # Fundamental H/272 connects Saturn precession (H/8) with Fibonacci-34.
-    # Dominates Saturn/Jupiter residuals; helps all planets except Venus.
-    # =========================================================================
-
-    for p in [H_DIV_272, H_DIV_544, H_DIV_816, H_DIV_1088,
-              H_DIV_1360, H_DIV_1632, H_DIV_1904, H_DIV_2176, H_DIV_2448]:
-        phase = 2 * math.pi * t / p
-        features.append(math.sin(phase))
-        features.append(math.cos(phase))
-
-    # =========================================================================
-    # GROUP 25: VENUS HIGH-FREQUENCY TRIPLETS (429-428) - 22 terms
-    # Carrier signals near H/141 (~2376 yr) with ±16 sidebands from Earth
-    # perihelion modulation. Three triplets: H/{125,141,157}, H/{124,140,156},
-    # H/{126,142,158}, plus cluster members H/129, H/139, H/143.
-    # =========================================================================
-
-    for p in [H_DIV_124, H_DIV_125, H_DIV_126, H_DIV_129, H_DIV_139,
-              H_DIV_140, H_DIV_141, H_DIV_142, H_DIV_143, H_DIV_157, H_DIV_158]:
-        phase = 2 * math.pi * t / p
-        features.append(math.sin(phase))
-        features.append(math.cos(phase))
-
-    return features
-
-
-# =============================================================================
-# SECTION H: PREDICTION FUNCTIONS
-# =============================================================================
-
-def predict_fluctuation(year: int, planet_key: str, coefficients: List[float]) -> float:
-    """
-    Predict precession fluctuation for a planet at given year.
-
-    Args:
-        year: Calendar year
-        planet_key: Planet identifier ('mercury', 'venus', etc.)
-        coefficients: Trained coefficient array (429 values)
-
-    Returns:
-        Precession fluctuation in arcsec/century
-    """
-    planet = PLANETS[planet_key]
-    features = build_features(year, planet['period'], planet['theta0'])
-
-    return sum(c * f for c, f in zip(coefficients, features))
-
-
-def predict_total_precession(year: int, planet_key: str, coefficients: List[float]) -> float:
-    """
-    Predict total precession rate (baseline + fluctuation).
-
-    Returns:
-        Total precession in arcsec/century
-    """
-    planet = PLANETS[planet_key]
-    fluctuation = predict_fluctuation(year, planet_key, coefficients)
-    return planet['baseline'] + fluctuation
-
 
 # =============================================================================
 # VERIFICATION
@@ -1516,10 +755,6 @@ if __name__ == "__main__":
     print("ESSRT — PREDICTIVE FORMULA SYSTEM")
     print("=" * 70)
 
-    # Verify feature count
-    test_features = build_features(2022, PLANETS['mars']['period'], PLANETS['mars']['theta0'])
-    print(f"\nFeature matrix size: {len(test_features)} terms")
-
     # --- Section B: Planet configurations ---
     print("\n--- Section B: Planet Configurations ---")
     print(f"{'Planet':<10} {'Period':>12} {'Theta0':>12} {'Baseline':>12}")
@@ -1529,15 +764,14 @@ if __name__ == "__main__":
 
     # --- Section C: Earth — Orbital Elements ---
     print("\n--- Section C: Earth — Orbital Elements ---")
-    print(f"{'Year':>8} {'Perihelion':>12} {'ERD':>14} {'Obliquity':>12} {'Eccentricity':>14} {'Asc.Node':>10}")
-    print("-" * 76)
+    print(f"{'Year':>8} {'Perihelion':>12} {'ERD':>14} {'Eccentricity':>14} {'Asc.Node':>10}")
+    print("-" * 64)
     for year in [2000, 2022, 2100]:
         peri = calc_earth_perihelion(year)
         erd = calc_erd(year)
-        obliq = calc_obliquity(year)
         ecc = calc_eccentricity(year)
         asc_node = calc_ascending_node(year)
-        print(f"{year:>8} {peri:>12.4f}° {erd:>14.8f} {obliq:>12.4f}° {ecc:>14.6f} {asc_node:>8.4f}°")
+        print(f"{year:>8} {peri:>12.4f}° {erd:>14.8f} {ecc:>14.6f} {asc_node:>8.4f}°")
 
     # --- Section D: Planet perihelions ---
     print("\n--- Section D: Planet Perihelion Longitudes (2022) ---")

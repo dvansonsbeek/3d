@@ -74,8 +74,8 @@ CARDINAL_POINT_HARMONICS = {
 SOLSTICE_JD_HARMONICS = CARDINAL_POINT_HARMONICS['SS']
 
 # Obliquity formula (fitted, from constants.js)
-SOLSTICE_OBLIQUITY_MEAN = _C['SOLSTICE_OBLIQUITY_MEAN']
-SOLSTICE_OBLIQUITY_HARMONICS = [tuple(h) for h in _C['SOLSTICE_OBLIQUITY_HARMONICS']]
+# (plan 09: SOLSTICE_OBLIQUITY_MEAN / SOLSTICE_OBLIQUITY_HARMONICS retired — the
+# obliquity of date is the hybrid ε of the one-source movement, not a comb)
 
 # Earth perihelion harmonics (fitted, from fitted-coefficients.js via constants.js)
 # PERI_HARMONICS: list of (period_years, sin_coeff, cos_coeff)

@@ -1,7 +1,7 @@
 ---
 docVersion: 1.0
 modelVersion: v23.0
-coefficients: sha256:82c86b078b32fff8
+coefficients: sha256:90a0f37a51074bdb
 status: current
 ---
 
@@ -449,38 +449,36 @@ Comb divisors (the H-divisor harmonics each (A) family adds to its tidal-chain b
 
 ## Chain 4 — the obliquity
 
-Two devices compute ε(t) and both are live. The **K law** is a fitted
-16-harmonic comb on divisors of H (the spin-and-tides side's certified era
-device; the flag-off scene path and several direct callers). The **hybrid**
-integrates one torque law on the dynamical orbit plane of the N-body chain
-(the default scene target since D1-revised; zero fitted constants). The
-scene itself carries a third, geometric construction — two tilted wheels —
-that the K comb was fitted to.
+One evaluator computes ε(t): the **hybrid** integrates one torque law on
+the dynamical orbit plane of the N-body chain (zero fitted constants). The
+scene itself carries a geometric construction — two tilted wheels — that
+pose the Earth frame; the engine places the frame from the hybrid (R4).
 
-### 4.1 The K law — a fitted comb on divisors of H
+### 4.1 The K law — deleted (plan 09)
 
-| item | formula / value | H-role | code |
-|---|---|---|---|
-| ε(y) | ε̄ + Σₖ [s_k·sin φ_k + c_k·cos φ_k], 16 lines | **C** | `model.js` 326–334 (`obliquityDeg`); `script.js` 57964 (`computeObliquityEarth`) |
-| phase φ_k | integrated: 2π·div_k × (cycles since the balanced year), H(t)-aware through `cyclesBetweenYears`; snapshot twin: 2π·t/(H/div_k) on the linear count (`obliquitySnapshotDeg`, the form the chain certification used) | **P** (H(t) in the count) + **L** (the divisors) | `model.js` 853–860 |
-| ε̄ | `SOLSTICE_OBLIQUITY_MEAN_FITTED` = 23.453384071928113° | — (fitted) | `fitted-coefficients.json` |
-| divisors | 2, 3, 5, 6, 8, 9, 11, 13, 14, 16, 17, 19, 22, 24, 27, 32 (`SOLSTICE_OBLIQUITY_HARMONICS`, rows [div, sin, cos]) | **L** | `fitted-coefficients.json` — Ledger 3 |
-| what it was fitted to | the scene's own solstice Sun declination (4.2), RMSE 0.005″ — a fit of a comb to the scene's wheel geometry, not to an external record | — | `script.js` 57962 (header comment) |
+The 16-harmonic solstice-obliquity comb on divisors of H (ε̄ +
+Σₖ [s_k·sin φ_k + c_k·cos φ_k]; `SOLSTICE_OBLIQUITY_MEAN_FITTED` /
+`SOLSTICE_OBLIQUITY_HARMONICS`, Ledger 3) was the frozen era device's
+obliquity — a comb fitted to the scene's own solstice Sun declination
+(4.2), RMSE 0.005″ to the wheel geometry and 1.27° off La2004 at −20 kyr.
+Plan 09 routed every reader to the hybrid and deleted the record: the
+browser's `computeObliquityEarth` and `OBLIQUITY_MEAN`, the Node engine's
+`computeObliquityEarth`, the package's `obliquityCombDeg` and the eclipse
+tier's `obliquityDegAt` (the besselian read the comb), the Python mirror's
+`calc_obliquity`, and the two JSON keys. The stellar day's RA projection
+(chain 3.3) now takes the IAU J2000 obliquity input (the comb's fitted mean
+sat 0.014° lower — 2e-11 of the day). Git history carries the comb.
 
 Phase 3 S3b routed the geometry callers that bypassed the scene target —
 the eclipse sub-solar point, the conjunction tier, the shadow machinery's
 RA/Dec conversions, the apparent Moon's RA/Dec, the RA-projection panel
 and the cardinal panel's solstice-obliquity row — through
-`_sceneEpsTargetDeg`, which returns the hybrid whenever the series has
-loaded and the K comb only as the pre-load fallback (plan 06 D5: the
-`?hybridSpin=0` opt-out is gone). What still reads the comb by design is
-the DEVICE tier: the kinematic-day stack (the stellar day's RA projection,
-chain 3.3), the lunar ARGUMENTS' obliquity-rate term (a device-anchored
-matched triple), the hybrid's own J2000 anchor ε₀, and the console
-diagnostics that name the formula. In the package the same split is
-`model.earth.obliquityDeg` (the hybrid — the API's earth route and
-cross-validation curves, the registry's obliquity keys)
-versus `model.earth.obliquityCombDeg` (the device).
+`_sceneEpsTargetDeg`, which is the hybrid at every epoch (the series
+loader rebuilds the one-source history and drops the ε samplers, so the
+deep mode table serves only until the series lands). In the package the
+one surface is `model.earth.obliquityDeg` (the API's earth route and
+cross-validation curves, the registry's obliquity keys, the lunar
+arguments' obliquity-rate term and the eclipse tier).
 
 ### 4.2 The scene's tilt geometry — the device the comb was fitted to
 
@@ -492,10 +490,10 @@ by **−earthRAAngle**, with
 
     earthRAAngle = 2A − A²/ε̄      (`model.js` 106; `script.js` 1019 — derived, not adjustable)
 
-The Sun's declination at the June solstice is the scene's ε; the K comb
-(4.1) reproduces that declination to 0.005″, which is why its 8 and 16
-lines are the wheels' own fundamentals and the other fourteen are the
-wheel composition's overtones. The in-browser "Verify Earth Parameters"
+The Sun's declination at the June solstice is the scene's ε; the deleted K
+comb (4.1) reproduced that declination to 0.005″, which is why its 8 and 16
+lines were the wheels' own fundamentals and the other fourteen the wheel
+composition's overtones. The in-browser "Verify Earth Parameters"
 test (39218) searches the A that best matches the IAU tropical-year
 references — the A-solve is a calibration of this geometry against IAU,
 performed once, not a runtime loop. H-role: **L** (the 8 and 16 wheels are
@@ -550,24 +548,24 @@ Obliquity by the three routes, ±50 kyr (La2004 on its 1-kyr grid; the
 hybrid and the K law at the exact years):
 
 <!-- generated:calcmap-obliquity-values -->
-| year | ε hybrid (°) | ε K law (°) | ε La2004 (°) | hybrid − K law (″) | hybrid − La2004 (″) | K law − La2004 (″) |
-|---|---|---|---|---|---|---|
-| -48000 | 24.41102 | 24.14159 | 24.41134 | 970 | -1 | -971 |
-| -28000 | 22.23039 | 23.47788 | 22.22990 | -4491 | 2 | 4493 |
-| -20000 | 22.80511 | 24.07349 | 22.80525 | -4566 | -1 | 4566 |
-| -10000 | 24.15888 | 24.52945 | 24.15921 | -1334 | -1 | 1333 |
-| -2584 | 23.98229 | 24.01380 | — | -113 | — | — |
-| -584 | 23.76559 | 23.77333 | — | -28 | — | — |
-| 0 | 23.69481 | 23.69908 | 23.69494 | -15 | -0 | 15 |
-| 1246 | 23.53705 | 23.53762 | — | -2 | — | — |
-| 2000 | 23.43928 | 23.43934 | 23.43929 | -0 | -0 | 0 |
-| 5000 | 23.06397 | 23.06503 | 23.06390 | -4 | 0 | 4 |
-| 10000 | 22.65351 | 22.61823 | 22.65342 | 127 | 0 | -127 |
-| 20000 | 23.06278 | 22.76933 | 23.06303 | 1056 | -1 | -1057 |
-| 30000 | 23.90872 | 23.41005 | 23.90927 | 1795 | -2 | -1797 |
-| 50000 | 22.60694 | 22.55623 | 22.60721 | 183 | -1 | -184 |
+| year | ε hybrid (°) | ε La2004 (°) | hybrid − La2004 (″) |
+|---|---|---|---|
+| -48000 | 24.41102 | 24.41134 | -1 |
+| -28000 | 22.23039 | 22.22990 | 2 |
+| -20000 | 22.80511 | 22.80525 | -1 |
+| -10000 | 24.15888 | 24.15921 | -1 |
+| -2584 | 23.98229 | — | — |
+| -584 | 23.76559 | — | — |
+| 0 | 23.69481 | 23.69494 | -0 |
+| 1246 | 23.53705 | — | — |
+| 2000 | 23.43928 | 23.43929 | -0 |
+| 5000 | 23.06397 | 23.06390 | 0 |
+| 10000 | 22.65351 | 22.65342 | 0 |
+| 20000 | 23.06278 | 23.06303 | -1 |
+| 30000 | 23.90872 | 23.90927 | -2 |
+| 50000 | 22.60694 | 22.60721 | -1 |
 
-dε/dt at J2000 (″/cy): hybrid series -46.79 (the published ε, S3b) · K law -46.82 (the device) · IAU 2006 -46.84 · banked verdict integrations: era-tier ζ -48.00, full-tier ζ -38.91 (data/obliquity-hybrid-verdict.json).
+dε/dt at J2000 (″/cy): hybrid series -46.79 (the published ε, S3b) · IAU 2006 -46.84 · banked verdict integrations: era-tier ζ -48.00, full-tier ζ -38.91 (data/obliquity-hybrid-verdict.json).
 α at J2000 (″/yr): p₀/cos ε₀ = 54.811 with p₀ = 1,296,000/(H/13) (the form the registry and the shipped hybrid use) · 54.811 in the verdict artifact (ψ̇ = the of-date beat 50.288 ″/yr) — the two J2000 precession readings of chain 2, finding 2.
 Banked window rms vs La2004 (″), hybrid / fitted K law: ±13 kyr 50 / 530 · ±50 kyr 427 / 389 · ±130 kyr 488 / 381 · ±270 kyr 490 / 453 (era-tier ζ). La2004 is a THEORY reference, not an observation.
 <!-- /generated:calcmap-obliquity-values -->
@@ -589,20 +587,22 @@ s₃ = the dominant Earth ζ mode of data/nbody-deep-secular-modes.json = -18.85
 ### 4.6 Findings from this chain (to act on)
 
 1. **The hybrid reproduces La2004 to ≤ 4″ over ±50 kyr with zero fitted
-   constants; the K law departs by up to 1.27° (−4564″ at −20 kyr).**
-   Inside ±2.6 kyr the K comb stays within 113″ — it is an era device, and
-   its extrapolation is not obliquity physics. This is the numeric case for
-   plan 06 Phase 3's retirement of the K obliquity device: the hybrid IS the
-   model's obliquity; the comb is a bounded Fourier fit to the scene's wheel
-   geometry (4.2), and "on the lattice" describes the basis, not the sky.
-   (La2004 is another theory; the agreement proves the calculation, not the
-   physics — the falsifiable content is 4.4.)
+   constants; the K law departed by up to 1.27° (−4564″ at −20 kyr).**
+   Inside ±2.6 kyr the K comb stayed within 113″ — it was an era device, and
+   its extrapolation was not obliquity physics. This was the numeric case for
+   plan 06 Phase 3's retirement of the K obliquity device, and plan 09
+   deleted it (4.1): the hybrid IS the model's obliquity; the comb was a
+   bounded Fourier fit to the scene's wheel geometry (4.2), and "on the
+   lattice" described the basis, not the sky. (La2004 is another theory; the
+   agreement proves the calculation, not the physics — the falsifiable
+   content is 4.4.)
 2. **Four caller sites bypass the hybrid flag — RESOLVED (Phase 3 S3b).**
    The geometry callers (eclipse sub-solar point, conjunction tier, the
    shadow machinery, the apparent Moon's RA/Dec, the RA-projection panel,
    the solstice-obliquity row) now read `_sceneEpsTargetDeg`; the
-   stellar-day RA projection stays on the comb as part of the kinematic-day
-   device. In-era the change is ≤ 15″ at year 0 (≈ 0.5 km of sub-solar
+   stellar-day RA projection rode the comb's fitted mean as part of the
+   kinematic-day device until plan 09 moved it to the IAU J2000 obliquity
+   input. In-era the change is ≤ 15″ at year 0 (≈ 0.5 km of sub-solar
    latitude), 33″ across the eclipse era (measured over the audit's 14,579
    obliquity calls) and 113″ at −2584; at deep time it is degrees. Measured
    before switching: the eclipse audit's recorded values do not depend on
@@ -625,8 +625,8 @@ s₃ = the dominant Earth ζ mode of data/nbody-deep-secular-modes.json = -18.85
    in-era values are untouched (the hybrid's period factor moves 0.02 % at
    ±1 Myr, 0.1 % at ±5 Myr).
 4. **The J2000 obliquity rate depends on the ζ representation**: banked
-   series −46.79, era-tier integration −48.00, full-tier −38.91, K law
-   −46.82, IAU −46.84 ″/cy. The shipped series matches IAU to 0.04 ″/cy; the
+   series −46.79, era-tier integration −48.00, full-tier −38.91 (the
+   deleted K law read −46.82), IAU −46.84 ″/cy. The shipped series matches IAU to 0.04 ″/cy; the
    direct integrations do not — a note for anyone re-deriving the rate from
    the artifact rather than the series.
 5. **The scene's obliquity is a geometric composition of two H-divisor

@@ -55,7 +55,8 @@ const rot = (s, c, d) => [s * Math.cos(d) - c * Math.sin(d), s * Math.sin(d) + c
 let pairs = 0;
 const rotTriplets = (arr) => { for (const t of arr) { const [s2, c2] = rot(t[1], t[2], delta(t[0])); t[1] = s2; t[2] = c2; pairs++; } };
 
-for (const k of ['TROPICAL_YEAR_HARMONICS', 'SIDEREAL_YEAR_HARMONICS', 'ANOMALISTIC_YEAR_HARMONICS', 'PERI_HARMONICS_RAW', 'SOLSTICE_OBLIQUITY_HARMONICS', 'SUN_LONGITUDE_HARMONICS']) {
+// (SOLSTICE_OBLIQUITY_HARMONICS was in this list when the rotation ran; deleted at plan 09)
+for (const k of ['TROPICAL_YEAR_HARMONICS', 'SIDEREAL_YEAR_HARMONICS', 'ANOMALISTIC_YEAR_HARMONICS', 'PERI_HARMONICS_RAW', 'SUN_LONGITUDE_HARMONICS']) {
   if (!Array.isArray(fc[k])) { console.error(`REFUSING: ${k} missing`); process.exit(1); }
   rotTriplets(fc[k]);
 }

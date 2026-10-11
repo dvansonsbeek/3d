@@ -241,7 +241,7 @@ const meanSiderealDay = (meanSolarYearDays / (meanSolarYearDays + 1)) * meanLeng
 // ASCENSION (along the equator), and m = p·cos(ε). MEAN family, so the mean
 // obliquity. Mirrors STELLAR_DAY_RA_PROJECTION in src/script.js — keep in sync.
 const STELLAR_DAY_RA_PROJECTION =
-  Math.cos(fitted.SOLSTICE_OBLIQUITY_MEAN_FITTED * Math.PI / 180);
+  Math.cos(ASTRO_REFERENCE.obliquityJ2000_deg * Math.PI / 180);   // plan 09: the IAU ε₀ input (the retired comb's fitted mean sat 0.03° lower; 2e-11 of the stellar day)
 const meanStellarDay = (meanSiderealDay / (H / 13)) / (meanSolarYearDays + 1)
   * STELLAR_DAY_RA_PROJECTION + meanSiderealDay;
 const meanAnomalisticYearDays = (meanSolarYearDays / (perihelionCycleLength - 1)) + meanSolarYearDays;
@@ -577,7 +577,7 @@ for (const key of Object.keys(additionalBodies)) {
 const { jdToYear, yearToJD } = utils.createDateUtils({ startmodelYear, startmodelJD, meanSolarYearDays });
 
 // Fitted coefficients that depend on model parameters
-const { SOLSTICE_OBLIQUITY_MEAN, PERI_HARMONICS } = fitted.buildFittedCoefficients({
+const { PERI_HARMONICS } = fitted.buildFittedCoefficients({
   earthtiltMean, earthInvPlaneInclinationAmplitude, earthRAAngle,
   earthInvPlaneInclinationMean, planets, H,
 });
@@ -747,8 +747,6 @@ module.exports = {
   // Predictive formula (from fitted-coefficients.js)
   PERI_HARMONICS,
   SOLSTICE_JD_HARMONICS: fitted.SOLSTICE_JD_HARMONICS,
-  SOLSTICE_OBLIQUITY_MEAN,
-  SOLSTICE_OBLIQUITY_HARMONICS: fitted.SOLSTICE_OBLIQUITY_HARMONICS,
   SUN_LONGITUDE_MEAN: fitted.SUN_LONGITUDE_MEAN,
   SUN_LONGITUDE_HARMONICS: fitted.SUN_LONGITUDE_HARMONICS,
   CARDINAL_POINT_HARMONICS: fitted.CARDINAL_POINT_HARMONICS,

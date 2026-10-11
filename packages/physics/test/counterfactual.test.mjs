@@ -34,46 +34,47 @@ console.log('='.repeat(74));
 
 // ── the default path ─────────────────────────────────────────────────────────
 const base = createModel();
-const baseLattice = base.computeLatticePeriodsYears();
-const H = /** @type {any} */ (DEFAULT_CONSTANTS).foundational.holisticyearLength;
+// Plan 09: the probe is the obliquity anchor read THROUGH the assembly — the
+// hybrid's J2000 initial condition is the context's IAU obliquity input, and
+// earth.obliquityDeg(2000) returns it by construction (the device's lattice
+// identities H/13, H/3, H/16 that served here before left the surface).
+const EPS0 = /** @type {any} */ (DEFAULT_CONSTANTS).earthOrbital.obliquityJ2000_deg;
+const baseEps = base.earth.obliquityDeg(2000);
 
 check('default hash is the generated hash', base.hash === CONSTANTS_HASH, base.hash);
 check('context is frozen', Object.isFrozen(base.constants));
-check('lattice derives from the context',
-  baseLattice.axialPrecessionPeriodYears === H / 13,
-  `H/13 = ${baseLattice.axialPrecessionPeriodYears.toFixed(4)} yr`);
+check('the obliquity anchor derives from the context',
+  Math.abs(baseEps - EPS0) < 1e-9,
+  `ε(2000) = ${baseEps.toFixed(6)}° (input ${EPS0})`);
 
 // ── the counterfactual ───────────────────────────────────────────────────────
-// A different H is the sharpest probe: the entire lattice hangs off it.
-const H_CF = 335000;
+// A different J2000 obliquity: the assembly must carry it to the published ε.
+const EPS_CF = 23.5;
 const mk = () => createModel({
   ...DEFAULT_CONSTANTS,
-  foundational: { .../** @type {any} */ (DEFAULT_CONSTANTS).foundational, holisticyearLength: H_CF },
+  earthOrbital: { .../** @type {any} */ (DEFAULT_CONSTANTS).earthOrbital, obliquityJ2000_deg: EPS_CF },
 });
 
 const cf = mk();
-const cfLattice = cf.computeLatticePeriodsYears();
+const cfEps = cf.earth.obliquityDeg(2000);
 
 check('counterfactual hash differs from default', cf.hash !== base.hash, cf.hash);
 check('counterfactual hash is marked as derived', cf.hash.startsWith('cf-'));
 check('RESULT changed, not just the hash',
-  cfLattice.axialPrecessionPeriodYears !== baseLattice.axialPrecessionPeriodYears,
-  `${baseLattice.axialPrecessionPeriodYears.toFixed(4)} -> ${cfLattice.axialPrecessionPeriodYears.toFixed(4)} yr`);
-check('changed result is the CORRECT value',
-  cfLattice.axialPrecessionPeriodYears === H_CF / 13 &&
-  cfLattice.inclinationPrecessionPeriodYears === H_CF / 3 &&
-  cfLattice.perihelionPrecessionPeriodYears === H_CF / 16);
+  cfEps !== baseEps,
+  `${baseEps.toFixed(6)} -> ${cfEps.toFixed(6)}°`);
+check('changed result is the CORRECT value', Math.abs(cfEps - EPS_CF) < 1e-9, `ε(2000) = ${cfEps.toFixed(6)}°`);
 
 // ── reproducibility ──────────────────────────────────────────────────────────
 const cf2 = mk();
 check('same counterfactual reproduces the hash', cf2.hash === cf.hash);
 check('same counterfactual reproduces the value',
-  cf2.computeLatticePeriodsYears().axialPrecessionPeriodYears === cfLattice.axialPrecessionPeriodYears);
+  cf2.earth.obliquityDeg(2000) === cfEps);
 
 // Key order must not change identity: {...D, x} and {x, ...D} are the same set.
 const reordered = createModel({
-  foundational: { .../** @type {any} */ (DEFAULT_CONSTANTS).foundational, holisticyearLength: H_CF },
-  ...Object.fromEntries(Object.entries(DEFAULT_CONSTANTS).filter(([k]) => k !== 'foundational')),
+  earthOrbital: { .../** @type {any} */ (DEFAULT_CONSTANTS).earthOrbital, obliquityJ2000_deg: EPS_CF },
+  ...Object.fromEntries(Object.entries(DEFAULT_CONSTANTS).filter(([k]) => k !== 'earthOrbital')),
 });
 check('hash is independent of key order', reordered.hash === cf.hash);
 

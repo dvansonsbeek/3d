@@ -148,9 +148,9 @@ let   meanSiderealday           = (meansolaryearlengthinDays / (meansolaryearlen
 // in src/script.js and tools/lib/constants.js — MEAN family, mean obliquity.
 // Literal inlined per this harness's convention (it mirrors script.js globals in
 // isolation, cf. holisticyearLength / eccentricityBase above). SOURCE OF TRUTH:
-// public/input/fitted-coefficients.json → SOLSTICE_OBLIQUITY_MEAN_FITTED, which
-// script.js exposes as OBLIQUITY_MEAN. Re-sync this literal if that value moves.
-const STELLAR_DAY_RA_PROJECTION = Math.cos(23.453393232636596 * Math.PI / 180);
+// public/input/astro-reference.json → obliquityJ2000_deg (plan 09: the IAU ε₀
+// input; the retired comb's fitted mean sat here before). Re-sync if it moves.
+const STELLAR_DAY_RA_PROJECTION = Math.cos(23.439279444444445 * Math.PI / 180);
 let   meanStellarday            = (meanSiderealday / (holisticyearLength / 13)) / (meansolaryearlengthinDays + 1) * STELLAR_DAY_RA_PROJECTION + meanSiderealday;
 let   perihelionCoinRotationMs  = (meanlengthofday / (holisticyearLength / 16)) / meansolaryearlengthinDays * 1000;
 let   perihelionCoinRotationYearlySeconds = perihelionCoinRotationMs * meansolaryearlengthinDays / 1000;

@@ -1,7 +1,7 @@
 ---
 docVersion: 1.0
 modelVersion: v23.0
-coefficients: sha256:82c86b078b32fff8
+coefficients: sha256:90a0f37a51074bdb
 status: current
 ---
 
@@ -198,7 +198,7 @@ For current values, see [Constants Reference](20-constants-reference.md).
 
 | Variable | Description |
 |----------|-------------|
-| `earthtiltMean` | Mean obliquity — the K comb's mean and the scene's J2000 pose (the published obliquity is the hybrid) |
+| `earthtiltMean` | Mean obliquity — a constant of the scene's J2000 pose (the published obliquity is the hybrid) |
 | `earthInvPlaneInclinationMean`, `earthInvPlaneInclinationAmplitude` | Constants of the scene's J2000 pose (the published inclination is the engine's one-source normal) |
 | `eccentricityBase`, `eccentricityAmplitude` | The scene Sun's eccentricity-law base and the K calibration input (legacy scaffolding; the published eccentricity is the N-body series) |
 | `earthPerihelionICRFYears` | The scene scaffolding's K-wheel period, a third of the anchor (the published apsidal period is the chain's, `inclPrecYears`) |

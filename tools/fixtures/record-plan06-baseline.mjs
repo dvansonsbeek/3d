@@ -96,9 +96,9 @@ function measure() {
     v[`${tag}.eDeepModes`] = num(deep.eccAt(year - 2000));
     v[`${tag}.eLawH3`] = num(m.earth.eccentricity(year));
     v[`${tag}.eOneSource`] = oneSource && inWindow ? num(oneSource.e(year)) : null;
-    // obliquity — the one-source hybrid and the K law, named
+    // obliquity — the one-source hybrid (plan 09: the K comb row `epsLawDeg`
+    // left with the frozen era device; the published ε is the hybrid)
     v[`${tag}.epsOneSourceDeg`] = oneSource && inWindow ? num(oneSource.epsDeg(year)) : null;
-    v[`${tag}.epsLawDeg`] = num(m.earth.obliquityCombDeg(year));   // the K comb (device) — the published ε is the hybrid since S3b
     v[`${tag}.perihelionLongitudeDeg`] = num(m.earth.perihelionLongitudeDeg(year));
     // plan 06 Phase 7 — the planets' spin channel (own torques on the own ζ
     // plane history; null beyond ±10 Myr, so the deep anchors record null)

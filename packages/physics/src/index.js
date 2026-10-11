@@ -54,7 +54,6 @@ const NEVER_INJECTABLE = Object.keys(REFERENCE_DATA);
  * @typedef {{
  *   constants: Constants,
  *   hash: string,
- *   computeLatticePeriodsYears: () => {axialPrecessionPeriodYears: number, inclinationPrecessionPeriodYears: number, perihelionPrecessionPeriodYears: number},
  *   eccentricity: (year: number) => number,
  *   identity: ModelIdentity,
  * } & ModelSurfaces} Model
@@ -243,36 +242,11 @@ export const createModel = (constants = GENERATED, opts = {}) => {
     constants: ctx,
     hash,
 
-    /**
-     * The fit-era lattice identities H/13, H/3, H/16, in years — DEVICE tier.
-     *
-     * PURE ALGEBRA OVER THE CONTEXT. No epoch, no formula, no fit. They exist
-     * here for one reason: a hash-only counterfactual test would still pass if
-     * `createModel` ignored its argument entirely. Something has to READ the
-     * context and return a number for injection to be demonstrated end to end.
-     *
-     * These are NOT the published periods (plan 06 S5): the axial precession
-     * period is `epoch.axialPrecessionYearsAtYear` (25,771.4 yr at J2000, the
-     * of-date year laws' beat); H/13 = 25,793.6 is the fit anchor's reading,
-     * 0.086 % slow — H₀ was fitted on the perihelion-of-date beat. Likewise
-     * H/3 and H/16 against the chain's apsidal and perihelion-of-date periods.
-     * The property names keep their historical form (plan 06 P4).
-     *
-     * `divisor` and `period` are never interchangeable (CLAUDE.md): 13 is the
-     * divisor, H/13 years is the identity's value. The names say which.
-     *
-     * @returns {{axialPrecessionPeriodYears: number, inclinationPrecessionPeriodYears: number, perihelionPrecessionPeriodYears: number}}
-     */
-    computeLatticePeriodsYears: () => {
-      const H = /** @type {{holisticyearLength: number}} */ (
-        /** @type {Record<string, unknown>} */ (ctx).foundational
-      ).holisticyearLength;
-      return {
-        axialPrecessionPeriodYears: H / 13,
-        inclinationPrecessionPeriodYears: H / 3,
-        perihelionPrecessionPeriodYears: H / 16,
-      };
-    },
+    // Plan 09: the fit-era lattice identities H/13, H/3, H/16
+    // (`computeLatticePeriodsYears`, DEVICE tier) left this surface — the
+    // published periods are `epoch.axialPrecessionYearsAtYear` and the
+    // lunisolar surface's apsidal and perihelion-of-date periods; the
+    // counterfactual gate now reads the obliquity anchor through the assembly.
 
     /**
      * Earth eccentricity at a year — the Phase-6 promise, fulfilled by the

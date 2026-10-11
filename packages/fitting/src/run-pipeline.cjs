@@ -145,11 +145,10 @@ const STEPS = [
   { id: '6a2', phase: 2, name: 'Export solar measurements — the window CSV (~25 min)',
     cmd: 'node tools/fit/export-solar-measurements.js --start -4000 --end 4000 --output data/02-solar-measurements-window.csv', timeout: 60 * 60 * 1000 },
   // (Step 6b — the obliquity-harmonics fit — RETIRED with the one-source
-  // movement, D1-revised: SOLSTICE_OBLIQUITY_HARMONICS are frozen at their
-  // last K-scene fit; re-fitting against a one-source CSV would be a
-  // cross-family fit. Script retired — git history 16d7c87f carries it
-  // (the untracked local archive keeps a copy). The id 6b is
-  // never reused — README numbering is shared vocabulary.)
+  // movement, D1-revised, and its coefficients DELETED at plan 09 (the
+  // obliquity of date is the hybrid). Script retired — git history 16d7c87f
+  // carries it. The id 6b is never reused — README numbering is shared
+  // vocabulary.)
   // (Steps 6c/6d — the year-length and cardinal-point harmonic fits —
   // RETIRED with 6b (option A, C-4b adjudication): the shipped coefficients
   // are FROZEN as the certified K-era clock. A harmonic re-fit against the

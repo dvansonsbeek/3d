@@ -7,7 +7,7 @@
 //   (T −21.35) · the INDUCED TABLE ERROR Σ|amp·Δarg| per carrier.
 // Framework sources (all model-native, zero external literals):
 //   planet sidereal periods  planets.record(k).solarYearInput (solar yr)
-//   equinox precession       computeLatticePeriodsYears().axialPrecession
+//   equinox precession       epoch.axialPrecessionYearsAtYear(2000)
 //   tropical/sidereal years  the framework year chain
 //   lunar months             moonSiderealMonthInput + the framework
 //                            apsidal/nodal precession day counts
@@ -53,8 +53,8 @@ const AMPSUM = {
 };
 
 // ── framework-native rates ───────────────────────────────────────────────
-const lat = model.computeLatticePeriodsYears();
-const EQ_YR = lat.axialPrecessionPeriodYears;             // framework equinox precession (yr)
+// (plan 09: `computeLatticePeriodsYears().axialPrecessionPeriodYears` — the H/13 counter — left the surface)
+const EQ_YR = model.epoch.axialPrecessionYearsAtYear(2000);   // framework equinox precession (yr)
 // the framework year chain: tropical (mean solar) + sidereal year in days
 const meanSolarYearDays = C.earthCalendar?.meanSolarYearDays ?? C.physicalConstants?.meanSolarYearDays ?? null;
 const meanSiderealYearSeconds = C.physicalConstants?.meanSiderealYearSeconds ?? null;

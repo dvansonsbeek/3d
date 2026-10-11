@@ -61,8 +61,8 @@ TOTAL_DAYS_IN_H = C['totalDaysInH']
 ECCENTRICITY_DERIVED_MEAN = C['eccentricityDerivedMean']
 
 # Fitted coefficients
-SOLSTICE_OBLIQUITY_MEAN = C['SOLSTICE_OBLIQUITY_MEAN']
-SOLSTICE_OBLIQUITY_HARMONICS = [tuple(h) for h in C['SOLSTICE_OBLIQUITY_HARMONICS']]
+# (plan 09: SOLSTICE_OBLIQUITY_MEAN / SOLSTICE_OBLIQUITY_HARMONICS retired — the
+# obliquity of date is the hybrid ε of the one-source movement, not a comb)
 CARDINAL_POINT_ANCHORS = C['CARDINAL_POINT_ANCHORS']
 CARDINAL_POINT_HARMONICS = {
     k: [tuple(h) for h in v] for k, v in C['CARDINAL_POINT_HARMONICS'].items()
@@ -81,8 +81,6 @@ if __name__ == '__main__':
     print(f"BALANCE_YEAR = {BALANCE_YEAR}")
     print(f"EARTH_OBLIQUITY_MEAN = {EARTH_OBLIQUITY_MEAN}")
     print(f"EARTH_RA_ANGLE = {EARTH_RA_ANGLE:.6f}")
-    print(f"SOLSTICE_OBLIQUITY_MEAN = {SOLSTICE_OBLIQUITY_MEAN:.6f}")
     print(f"MEAN_SOLAR_YEAR_DAYS = {MEAN_SOLAR_YEAR_DAYS}")
     print(f"Planets: {list(PLANETS.keys())}")
-    print(f"OBLIQUITY_HARMONICS: {len(SOLSTICE_OBLIQUITY_HARMONICS)} entries")
     print(f"CARDINAL_POINT_HARMONICS: {list(CARDINAL_POINT_HARMONICS.keys())}")

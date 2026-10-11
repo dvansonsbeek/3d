@@ -50,11 +50,6 @@ export type ModelIdentity = {
 export type Model = {
     constants: Constants;
     hash: string;
-    computeLatticePeriodsYears: () => {
-        axialPrecessionPeriodYears: number;
-        inclinationPrecessionPeriodYears: number;
-        perihelionPrecessionPeriodYears: number;
-    };
     eccentricity: (year: number) => number;
     identity: ModelIdentity;
 } & ModelSurfaces;

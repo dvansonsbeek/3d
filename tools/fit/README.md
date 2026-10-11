@@ -317,10 +317,10 @@ When model parameters change, refit in this order. The logic:
    from a single scene-graph pass at 1-year steps (depends on everything above).
    Fitting scripts downsample by `stepYears` for efficiency.
 7. Tropical year is derived from cardinal point harmonics (no separate step)
-8. `SOLSTICE_OBLIQUITY_MEAN_FITTED` still feeds the scene graph's K device,
-   but its fitter is retired — coefficients frozen (see "The frozen era
-   clock"), so the old circular dependency (second full pipeline pass,
-   ~1.5" effect) is closed.
+8. The solstice-obliquity comb (`SOLSTICE_OBLIQUITY_MEAN_FITTED` /
+   `_HARMONICS`) is deleted (plan 09): the obliquity of date is the hybrid
+   everywhere, so the old circular dependency (second full pipeline pass,
+   ~1.5" effect) is gone with it.
 9. The Sun T² polynomial correction (Meeus Ch.25 +0.0003032°/T²) that
    formerly paired with the Sun harmonics has been **REMOVED 2026-06**
    per the bounded-basis design rule (polynomial-in-T terms grow without
@@ -595,7 +595,8 @@ Step 6a2 (owner, 2026-09-16): `npm run fit:6a2`
 
 ## The frozen era clock
 
-The shipped harmonic-clock coefficients — SOLSTICE_OBLIQUITY_HARMONICS,
+The shipped harmonic-clock coefficients — (SOLSTICE_OBLIQUITY_HARMONICS,
+deleted at plan 09: the obliquity rides the hybrid),
 TROPICAL/SIDEREAL/ANOMALISTIC_YEAR_HARMONICS, YEAR_LENGTH_J2000_ANCHOR and
 the CARDINAL_POINT_* family — are FROZEN at their last K-movement fit
 (cardinal interior RMSE 0.23-0.37 min, tropical 0.002 s class): THE

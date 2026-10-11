@@ -111,7 +111,9 @@ export function assembleModel(C, F, laws = {}, secularSeriesArtifact = /** @type
   // device. With both laws retired nothing in this module reads them — they
   // remain on C.earth as the K device's J2000 pose inputs (the scene's wheel
   // geometry at the chain anchor epoch) and for the registry's record keys.
-  const solsticeObliquityMean = F.SOLSTICE_OBLIQUITY_MEAN_FITTED;
+  // (Plan 09: the 16-harmonic solstice-obliquity comb — SOLSTICE_OBLIQUITY_
+  // MEAN_FITTED / _HARMONICS, the frozen era record — is deleted; the model's
+  // ONE obliquity of date is the one-source hybrid, `oneSourceM.epsAt`.)
 
   const G_CONSTANT = C.physicalConstants.G_CONSTANT;
   const MASS_RATIO_EARTH_MOON = C.physicalConstants.MASS_RATIO_EARTH_MOON;
@@ -404,15 +406,10 @@ export function assembleModel(C, F, laws = {}, secularSeriesArtifact = /** @type
   const SUN_OFF = F.EARTH_OSCULATING_MEAN_OFFSET;
   /** The eclipse Sun's ϖ of date (mean elements). @param {number} year @returns {number} */
   const sunPerihelionDegAt = laws.perihelionLongitudeDegAt ?? ((year) => oneSourceM.periOfDateDegAt(year) + SUN_OFF.dPomArcsec / 3600);
+  // Plan 09: the obliquity of date is the one-source hybrid everywhere — the
+  // eclipse tier (besselian deps) read the retired 16-harmonic comb here.
   /** @param {number} year @returns {number} */
-  const obliquityDeg = (year) => {
-    let obliq = solsticeObliquityMean;
-    for (const [div, sinC, cosC] of F.SOLSTICE_OBLIQUITY_HARMONICS) {
-      const ph = phaseRadians(balancedYear, year, div);
-      obliq += sinC * Math.sin(ph) + cosC * Math.cos(ph);
-    }
-    return obliq;
-  };
+  const obliquityDeg = (year) => oneSourceM.epsAt(year);
   // ECCENTRICITY UNIFICATION — ONE law for the whole model (plan
   // IP-eccentricity-unification, decision D1 = form (e)). Earth's orbital
   // eccentricity is the magnitude of a vector sum, e = |v₁ + v₂|: v₁ of
@@ -1686,12 +1683,10 @@ export function assembleModel(C, F, laws = {}, secularSeriesArtifact = /** @type
       // Plan 06 Phase 3 S3b: THE published obliquity is the hybrid — one
       // torque law integrated on the dynamical orbit plane of the N-body
       // chain, zero fitted constants (≡ La2004 to ≤ 4″ over ±50 kyr). The
-      // fitted 16-harmonic K comb, a device fitted to the scene's own
-      // wheel geometry (0.005″ to it, 1.27° off La2004 at −20 kyr), keeps
-      // its name below as the frozen era clock's device: it anchors the
-      // hybrid at J2000, the kinematic-day stack and the lunar arguments.
+      // fitted 16-harmonic K comb that sat beside it as `obliquityCombDeg`
+      // (a device fitted to the scene's own wheel geometry, 1.27° off
+      // La2004 at −20 kyr) is deleted with the frozen era device (plan 09).
       obliquityDeg: /** @param {number} year @returns {number} */ (year) => oneSourceM.epsAt(year),
-      obliquityCombDeg: obliquityDeg,
       eccentricity: eccentricityAt,
       inclinationDeg,
       ascendingNodeDeg,

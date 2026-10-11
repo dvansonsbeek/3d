@@ -68,8 +68,9 @@ const oneMovement = () => {
 };
 const oneYL = () => oneMovement().yearLengths;
 // Plan 06 Phase 3 S3b: THE published obliquity is the hybrid (the one-source
-// movement's ε); the K comb (orbital-engine computeObliquityEarth) is the
-// frozen era clock's device and feeds only the kinematic-day keys.
+// movement's ε). Plan 09: the K comb (the former orbital-engine
+// computeObliquityEarth) is deleted; the kinematic-day keys' mean-ε RA
+// projection rides the IAU J2000 obliquity input (STELLAR_DAY_RA_PROJECTION).
 const oneEps = (y) => oneMovement().epsDeg(y);
 
 /** The SHIPPED predictive-precession basis, browser-true: the shared
@@ -1087,27 +1088,19 @@ export const VALUES = {
   })(),
 
   // ── Obliquity family ────────────────────────────────────────────────────
-  // Two distinct means, per the model's taxonomy: earthtiltMean (the solved
-  // scene parameter, "axial tilt" family) and SOLSTICE_OBLIQUITY_MEAN (the
-  // fitted Fourier mean of the 16-term solstice-obliquity series,
-  // "pythagorean" on the site). Min/max are the envelope of the full series
-  // over one H (10,000 samples, same as the website's _obliqEnvelope — the
-  // series is H-periodic, so the phase origin cancels in the extrema).
-  // (plan 07 sweep: `pythagoreanMeanObliquity`, `meanObliquityVsJ2000Diff`,
-  // `obliquityAmplitude`, `axialTiltMin/Max` — the device obliquity law's
-  // mean ± amplitude readings — are deleted; the published obliquity is the
-  // hybrid, and nothing quoted them.)
+  // Min/max are the envelope of the PUBLISHED obliquity — the hybrid — over
+  // the last million years (100-yr samples; the La2004 comparison window,
+  // doc 109 §18). Plan 09: the envelope rode the deleted 16-term solstice-
+  // obliquity comb over one H before (a device fitted to the scene's wheel
+  // geometry, 1.27° off La2004 at −20 kyr); the published band is the
+  // hybrid's. (plan 07 sweep: `pythagoreanMeanObliquity`,
+  // `meanObliquityVsJ2000Diff`, `obliquityAmplitude`, `axialTiltMin/Max` —
+  // the device obliquity law's mean ± amplitude readings — are deleted.)
   ...(() => {
     const envelope = () => {
-      const steps = 10000;
       let min = Infinity, max = -Infinity;
-      for (let i = 0; i < steps; i++) {
-        const c = i / steps;
-        let obliq = C.SOLSTICE_OBLIQUITY_MEAN;
-        for (const [div, sinC, cosC] of C.SOLSTICE_OBLIQUITY_HARMONICS) {
-          const phase = 2 * Math.PI * c * div;
-          obliq += sinC * Math.sin(phase) + cosC * Math.cos(phase);
-        }
+      for (let y = -1_000_000; y <= 2000; y += 100) {
+        const obliq = oneEps(y);
         if (obliq < min) min = obliq;
         if (obliq > max) max = obliq;
       }
@@ -1385,7 +1378,7 @@ export const VALUES = {
     // S5: the stellar-day offset counts one equinox turn per T_p (the certified
     // J2000 precession, 25,771.4 yr), never the counter H/13 (7 µs slow).
     const meanStellarDaySeconds = () => {
-      const raProjMean = Math.cos((C.SOLSTICE_OBLIQUITY_MEAN * Math.PI) / 180);
+      const raProjMean = C.STELLAR_DAY_RA_PROJECTION;   // cos ε₀ on the IAU J2000 input (plan 09; the comb's fitted mean before)
       const d = meanSiderealDaySeconds();
       return (d / dtl().certifiedAxialPrecessionJ2000Years()) / (C.meanSolarYearDays + 1) * raProjMean + d;
     };
@@ -1752,7 +1745,7 @@ export const VALUES = {
       stellarDay: {
         get: () => {
           const d = (C.meanSolarYearDays / (C.meanSolarYearDays + 1)) * C.meanLengthOfDay;
-          return (d / dtl().certifiedAxialPrecessionJ2000Years()) / (C.meanSolarYearDays + 1) * Math.cos((C.SOLSTICE_OBLIQUITY_MEAN * Math.PI) / 180) + d;
+          return (d / dtl().certifiedAxialPrecessionJ2000Years()) / (C.meanSolarYearDays + 1) * C.STELLAR_DAY_RA_PROJECTION + d;
         },
         render: (v) => '~' + thousands(v, 2),
         unit: 's',

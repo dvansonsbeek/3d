@@ -722,7 +722,9 @@ async function main() {
   let diverged = 0;
   for (const [k, was] of rec) {
     const v = now.has(k) ? now.get(k) : '(missing)';
-    const same = Object.is(was, v);
+    // JSON cannot record a negative zero, so a computed −0 (a residual that
+    // rounds to zero from below) must compare equal to the recorded 0.
+    const same = Object.is(was, v) || (was === 0 && v === 0);
     if (!same) { diverged += 1; console.log('  DIVERGED   %s: recorded %s, computed %s', k, was, v); }
   }
   for (const k of now.keys()) if (!rec.has(k)) { diverged += 1; console.log('  NEW KEY    %s (not in recording)', k); }

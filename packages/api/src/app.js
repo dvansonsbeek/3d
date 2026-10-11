@@ -427,7 +427,13 @@ export function createApi() {
       const data = {
         overrides,
         year,
-        latticePeriodsYears: cf.computeLatticePeriodsYears(),
+        // Plan 09: the fit-era lattice identities (H/13, H/3, H/16) left the
+        // Model surface; the counterfactual reports the PHYSICAL periods of date.
+        periodsYears: {
+          axialPrecession: cf.epoch.axialPrecessionYearsAtYear(year),
+          apsidal: cf.lunisolar.apsidalPeriodYearsAtYear(year),
+          perihelionOfDate: cf.lunisolar.periOfDatePeriodYearsAtYear(year),
+        },
         epoch: { h: cf.epoch.hAtYear(year), lodRealSeconds: cf.epoch.lodRealSecondsAtYear(year), lodMeanSeconds: cf.epoch.lodSecondsAtYear(year), deltaTSeconds: cf.epoch.deltaTSecondsAtYear(year) },
         earth: { obliquityDeg: cf.earth.obliquityDeg(year), eccentricity: cf.earth.eccentricity(year), inclinationDeg: cf.earth.inclinationDeg(year) },
       };

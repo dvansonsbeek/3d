@@ -1,7 +1,7 @@
 ---
 docVersion: 1.0
 modelVersion: v23.0
-coefficients: sha256:82c86b078b32fff8
+coefficients: sha256:90a0f37a51074bdb
 status: current
 ---
 
@@ -113,7 +113,7 @@ relabel, not re-base.
 | # | Constant | Variable | Value | Anchored by |
 |---|-----------|----------|-------|-------------|
 | 1 | The fitted timing anchor — the unit of the correction bases and the era clock; it scales with the precession period at deep time (anchor/T_p = 13.011, a fit constant — not a period, plan 06 S5) | `holisticyearLength` | <!--v:H-->335,317<!--/v--> years | 1246 AD perihelion–solstice alignment + J2000 longitude of perihelion |
-| 2 | Mean obliquity — the K comb's mean, and the scene's J2000 pose; the published obliquity is the hybrid (Ledger 1) | `earthtiltMean` | <!--v:meanObliquity-->23.41353<!--/v-->° | observed obliquity range |
+| 2 | Mean obliquity — a constant of the scene's J2000 pose (the wheel geometry); the published obliquity is the hybrid (Ledger 1) | `earthtiltMean` | <!--v:meanObliquity-->23.41353<!--/v-->° | observed obliquity range |
 | 3 | Inclination amplitude — a constant of the scene's J2000 pose (the K inclination law it once fed is retired, plan 07 R5/R9); the published inclination is the chain's (Ledger 1) | `earthInvPlaneInclinationAmplitude` | <!--v:earthInclAmp-->0.63607<!--/v-->° | observed obliquity range |
 | 4 | The eccentricity line's phase anchor — phases the scene Sun's eccentricity law and the Moon eccentricity channel's anchor form | `earthInclinationCycleAnchor` | 21.77° | the recorded J2000 phase of the correction bases (plan 07 R10: the former fitted origin t₀ was rotated out of every coefficient exactly); the anchor arithmetic itself is exact |
 | 5 | The K wheels' phase at J2000 — the scene scaffolding's recorded pose (N × this per H/N wheel), not a law; no observable rides it | `kDeviceWheelPhaseAtJ2000Cycles` | 0.908498525 anchor units | numerically the retired origin's (2000 − t₀)/H, kept with the pose (plan 07 R10) |
@@ -135,8 +135,7 @@ the shared anchor.
 
 The fitted-coefficient arrays under the coefficients hash (shown in the
 simulator's About → Model Identity): the year-length harmonics (tropical,
-sidereal, anomalistic), the perihelion harmonics, the solstice-obliquity
-mean and harmonics (the K comb), the five cardinal-point families
+sidereal, anomalistic), the perihelion harmonics, the five cardinal-point families
 (harmonics, anchors, eccentricity, joint and derived terms), the
 Sun-longitude harmonics, the Moon corrections, and the per-planet
 geocentric-precession projection coefficients (a chart-layer readout). The
@@ -285,7 +284,7 @@ These are computed from foundational constants. The formula is the definition; t
 | Mean Anomalistic Year | `meanAnomalisticYearDays` | meanSolarYearDays / (H/16 - 1) + meanSolarYearDays | <!--v:anomalisticYearDaysFull-->365.259632390<!--/v--> days |
 | Mean Length of Day | `meanLengthOfDay` | meanSiderealYearSeconds / meanSiderealYearDays | ~86,400.0 s |
 | Mean Sidereal Day | `meanSiderealDay` | (meanSolarYearDays/(meanSolarYearDays+1)) × meanLengthOfDay | <!--v:meanSiderealDaySeconds-->86,164.0902182<!--/v--> s |
-| Mean Stellar Day | `meanStellarDay` | (meanSiderealDay/T_p) / (meanSolarYearDays+1) · cos ε + meanSiderealDay — T_p the certified J2000 precession period, not the counter H/13 | <!--v:meanStellarDaySeconds-->86,164.0985929<!--/v--> s |
+| Mean Stellar Day | `meanStellarDay` | (meanSiderealDay/T_p) / (meanSolarYearDays+1) · cos ε + meanSiderealDay — T_p the certified J2000 precession period, not the counter H/13 | <!--v:meanStellarDaySeconds-->86,164.0985938<!--/v--> s |
 | Phase origin of the correction bases | `balancedYear` | 2000 (J2000, by construction — plan 07 R10) | the former fitted origin perihelionalignmentYear − 14.5 × H/16 was rotated out of every coefficient exactly; the name stays as the code's phase-origin variable |
 | Perihelion Alignment JD | `perihelionalignmentJD` | startmodelJD - meanSolarYearDays × (startModelYearWithCorrection - perihelionalignmentYear) | ~<!--v:periAlignJD-->2,176,153<!--/v--> |
 | Perihelion Cycle Length | `perihelionCycleLength` | H / 16 | <!--v:periPrecYears-->~20,938<!--/v--> years |
