@@ -14660,9 +14660,11 @@ function closeWGCPanel() {
 
 // ═══════════════════════════════════════════════════════════════════
 // CLIMATE FORMULA EXPLORER (.cfm-)
-// Modular L1 (orbital) + L2 (carbon-cycle thermostat) + L3 (boundary
-// steps) climate formula overlaid on LR04 δ¹⁸O and CENOGRID δ¹⁸O/δ¹³C
-// proxies. See docs/92-climate-formula.md.
+// The climate formula — L1 (the engine's 28 orbital lines, the 405-kyr
+// family among them) + L3 (boundary-condition steps) — overlaid on LR04
+// δ¹⁸O and CENOGRID δ¹⁸O/δ¹³C proxies. The coefficient file still carries
+// an L2 array (empty since the 405-kyr family moved into L1); the evaluator
+// reads it under 'all', no UI offers it. See docs/92-climate-formula.md.
 //
 // Coefficients are embedded as CLIMATE_FORMULA_COEFFS below (same pattern
 // as PREDICT_COEFFS / BALANCE_PRESETS). Proxy data arrays stay as runtime
@@ -14686,16 +14688,13 @@ let cfmEpicaData = null;                 // public/input/epica-co2-data.json
 let cfmCenco2pipData = null;             // public/input/cenco2pip-data.json
 let cfmSelectedTab = 'full';
 let cfmSelectedProxy = 'd18o';          // only relevant for CENOGRID tab; 'd18o' or 'd13c'
-// Layer toggles. Each "alone" line shows the formula with ONLY that layer
-// enabled (see cfmEvalRaw), so the 405-kyr L2 thermostat pattern is
-// readable separately rather than hidden inside L1 wiggles. There is no
-// L3 toggle — its contribution is visible as the gap between Total and
-// the L1/L2 alone lines.
+// Layer toggles. The "L1 alone" line shows the formula with only its orbital
+// lines enabled (see cfmEvalRaw). There is no L3 toggle — its contribution
+// is visible as the gap between Total and the L1 alone line.
 let cfmLayerVisibility = {
   data:  true,   // the proxy record under the formula (off = the formula alone)
   total: true,
   l1:    true,
-  l2:    true,
 };
 
 // Per-tab → regime + proxy mapping
@@ -14805,8 +14804,7 @@ async function loadCenco2pipData() {
  * follows the L3 step structure and the user can see the layer's
  * unique wiggles overlaid on the regime story:
  *   layer='l1'  → baseline + L1 + L3   (orbital wiggles on regime baseline)
- *   layer='l2'  → baseline + L2 + L3   (405-kyr beat on regime baseline)
- *   layer='all' → baseline + L1 + L2 + L3   (= Total)
+ *   layer='all' → baseline + L1 + L2 + L3   (= Total; L2 is empty in the shipped file)
  * L3 is included in every line because it defines the per-period climate
  * regime — without it, layer lines float on the smooth linear trend and
  * fail to track the visible step structure in the data. */
@@ -14820,7 +14818,7 @@ function cfmEvalRaw(t_kyr_BP, regimeKey, layer) {
       C += c.a * Math.cos(omega * t_kyr_BP) + c.b * Math.sin(omega * t_kyr_BP);
     }
   }
-  if (layer === 'l2' || layer === 'all') {
+  if (layer === 'all') {
     for (const c of r.L2) {
       const omega = 2 * Math.PI / c.p_kyr;
       C += c.a * Math.cos(omega * t_kyr_BP) + c.b * Math.sin(omega * t_kyr_BP);
@@ -14837,7 +14835,7 @@ function cfmEvalRaw(t_kyr_BP, regimeKey, layer) {
 /** Find local maxima or minima in [t, vals] arrays.
  *  type: 'max' (glacial) or 'min' (interglacial); prominence in proxy units.
  *  halfWidth = sample radius for peak detection AND baseline computation;
- *    pick large enough that 8H/2-cycle peaks (~10 kyr each side) are flat
+ *    pick large enough that half-cycle peaks (~10 kyr each side) are flat
  *    enough to register as extrema. Default 8 works for short-window views
  *    where dtGrid is sub-kyr; tune up (e.g. 32) for cycle-scale searches. */
 function cfmFindExtrema(t, vals, type, prominence, halfWidth = 8) {
@@ -14859,7 +14857,7 @@ function cfmFindExtrema(t, vals, type, prominence, halfWidth = 8) {
 
 /** Render the multi-layer climate-formula overlay chart for a chosen tab.
  *  tabKey: 'past200' | 'postMPT' | 'postMPText' | 'full' | 'cenogrid' | 'epica' | 'future'
- *  Respects cfmLayerVisibility (total/l1/l2/l3) and cfmSelectedProxy (for CENOGRID). */
+ *  Respects cfmLayerVisibility (data/total/l1) and cfmSelectedProxy (for CENOGRID). */
 function cfmRenderChart(tabKey) {
   const needsLR04 = tabKey !== 'cenogrid' && tabKey !== 'epica' && tabKey !== 'cenco2pip';
   if (needsLR04 && !cfmLR04Data) {
@@ -14965,7 +14963,7 @@ function cfmRenderChart(tabKey) {
   const nSamples = (tabKey === 'cenogrid' || tabKey === 'cenco2pip') ? 3000 : 1000;
   const dtGrid = (t_hi - t_lo) / nSamples;
   const fT = [];
-  const totalV = [], l1V = [], l2V = [], l3V = [];
+  const totalV = [], l1V = [], l3V = [];
   // Tabs that span a regime boundary use stitched fits so each segment
   // matches its data amplitude:
   //   full + postMPText → LR04 regime stitching only
@@ -14982,7 +14980,6 @@ function cfmRenderChart(tabKey) {
     fT.push(t);
     totalV.push(evalAt(t, 'all'));
     l1V.push(evalAt(t, 'l1'));
-    l2V.push(evalAt(t, 'l2'));
     l3V.push(evalAt(t, 'l3'));
   }
 
@@ -14995,10 +14992,9 @@ function cfmRenderChart(tabKey) {
   // CO₂ tabs (EPICA, CenCO2PIP) use a standard (non-inverted) y-axis.
   const isCo2 = isEpica || isCenco2pip;
 
-  // y-range: locked to data + Total so the scale doesn't jump when L1/L2
-  // toggles are flipped. L1 and L2 lines stay inside this range because
-  // they only differ from Total by the L2 (or L1) wiggles respectively —
-  // which are small relative to the data + Total spread.
+  // y-range: locked to data + Total so the scale doesn't jump when the L1
+  // toggle is flipped. The L1 line stays inside this range because it only
+  // differs from Total by the L3 steps — small relative to the data + Total spread.
   const allV = [...dV, ...totalV];
   const finiteV = allV.filter(v => Number.isFinite(v));
   const ymin = finiteV.length ? Math.min(...finiteV) : -1;
@@ -15033,7 +15029,6 @@ function cfmRenderChart(tabKey) {
   const dataPath  = buildPath(dT, dV);
   const totalPath = buildPath(fT, totalV);
   const l1Path    = buildPath(fT, l1V);
-  const l2Path    = buildPath(fT, l2V);
   const l3Path    = buildPath(fT, l3V);
 
   // Y-axis ticks
@@ -15234,7 +15229,6 @@ function cfmRenderChart(tabKey) {
       const r = CLIMATE_FORMULA_COEFFS.regimes[s.key].r2;
       return `<tr><td>${s.label} <span class="cfm-r2-regime">${s.key}</span></td>` +
              `<td>${r.l1_only.toFixed(4)}</td>` +
-             `<td>${(r.delta_l2 >= 0 ? '+' : '')}${r.delta_l2.toFixed(4)}</td>` +
              `<td>${(r.delta_l3 >= 0 ? '+' : '')}${r.delta_l3.toFixed(4)}</td>` +
              `<td><b>${r.l1_l2_l3.toFixed(4)}</b></td></tr>`;
     }).join('');
@@ -15245,9 +15239,9 @@ function cfmRenderChart(tabKey) {
       <details class="cfm-r2-panel">
         <summary class="cfm-r2-summary">Stitched fit R² = ${stitchedR2.toFixed(4)} (curve shown vs data)</summary>
         <table class="cfm-r2-table">
-          <thead><tr><th>Regime</th><th>R² L1</th><th>ΔR² L2</th><th>ΔR² L3</th><th>Total</th></tr></thead>
+          <thead><tr><th>Regime</th><th>R² L1</th><th>ΔR² L3</th><th>Total</th></tr></thead>
           <tbody>${rows}
-            <tr><td colspan="4"><b>Stitched curve vs ${windowDesc}</b></td><td><b>${stitchedR2.toFixed(4)}</b></td></tr>
+            <tr><td colspan="3"><b>Stitched curve vs ${windowDesc}</b></td><td><b>${stitchedR2.toFixed(4)}</b></td></tr>
           </tbody>
         </table>
       </details>
@@ -15261,8 +15255,7 @@ function cfmRenderChart(tabKey) {
         <table class="cfm-r2-table">
           <thead><tr><th>Layer</th><th>R² (cumulative)</th><th>ΔR² (unique)</th><th>Notes</th></tr></thead>
           <tbody>
-            <tr><td>L1 orbital (${regime.L1.length} engine beat lines)</td><td>${r2.l1_only.toFixed(4)}</td><td>${r2.l1_only.toFixed(4)}</td><td>Σ aᵢ cos(2πt/Tᵢ) + bᵢ sin(2πt/Tᵢ)</td></tr>
-            <tr><td>+ L2 carbon thermostat (3 lines: 405k, 202k, 135k)</td><td>${r2.l1_l2.toFixed(4)}</td><td>${(r2.delta_l2 >= 0 ? '+' : '')}${r2.delta_l2.toFixed(4)}</td><td>silicate-weathering family</td></tr>
+            <tr><td>L1 orbital (${regime.L1.length} engine beat lines, the 405-kyr family among them)</td><td>${r2.l1_only.toFixed(4)}</td><td>${r2.l1_only.toFixed(4)}</td><td>Σ aᵢ cos(2πt/Tᵢ) + bᵢ sin(2πt/Tᵢ)</td></tr>
             <tr><td>+ L3 boundary steps (${nL3} transition${nL3 === 1 ? '' : 's'} in window)</td><td>${r2.l1_l2_l3.toFixed(4)}</td><td>${(r2.delta_l3 >= 0 ? '+' : '')}${r2.delta_l3.toFixed(4)}</td><td>Heaviside steps at named events</td></tr>
           </tbody>
         </table>
@@ -15310,7 +15303,7 @@ function cfmRenderChart(tabKey) {
 
   // EPICA carbon-amplification ratios — for each L1 line, the ratio of
   // EPICA-fitted amplitude to LR04 post-MPT-fitted amplitude. Identifies
-  // which lattice lines manifest primarily through carbon-cycle dynamics
+  // which L1 lines manifest primarily through carbon-cycle dynamics
   // (high ratio) vs ice volume (low ratio).
   let epicaAmpTable = '';
   if (tabKey === 'epica') {
@@ -15340,9 +15333,8 @@ function cfmRenderChart(tabKey) {
   // markers (MPT, iNHG, today, etc.) never collide with the legend box.
   const legendItems = [];
   if (cfmLayerVisibility.data)  legendItems.push({ color: '#8cb4ff', label: proxyLabel, kind: 'data' });
-  if (cfmLayerVisibility.total) legendItems.push({ color: '#ffffff', label: 'Total (L1+L2+L3)', kind: 'total' });
+  if (cfmLayerVisibility.total) legendItems.push({ color: '#ffffff', label: 'Total (L1+L3)', kind: 'total' });
   if (cfmLayerVisibility.l1)    legendItems.push({ color: '#ffe066', label: 'L1 alone (orbital)', kind: 'l1' });
-  if (cfmLayerVisibility.l2)    legendItems.push({ color: '#66e0a0', label: 'L2 alone (carbon thermostat)', kind: 'l2' });
   const legendHtml = `
     <div class="cfm-legend">
       ${legendItems.map(item => {
@@ -15356,17 +15348,16 @@ function cfmRenderChart(tabKey) {
   `;
 
   // Render layer polylines based on visibility flags
-  // Order matters for layering: L1/L2/L3 below, Total on top, data on top of all
+  // Order matters for layering: L1 below, Total on top, data on top of all
   let layerPaths = '';
   if (cfmLayerVisibility.l1) layerPaths += `<path d="${l1Path}" fill="none" stroke="#ff5252" stroke-width="1.2" opacity="0.85"/>`;
-  if (cfmLayerVisibility.l2) layerPaths += `<path d="${l2Path}" fill="none" stroke="#66e0a0" stroke-width="1.2" opacity="0.85"/>`;
   if (cfmLayerVisibility.total) layerPaths += `<path d="${totalPath}" fill="none" stroke="#ffffff" stroke-width="1.6" opacity="0.95"/>`;
 
   // Per-tab info note (neutral styling). Short, says what you're looking at.
   const tabNotes = {
     full:       `<b>Three regimes, stitched.</b> The formula curve is routed per-t through the three regime fits (Post-MPT 0–1 Ma · iNHG–MPT 1.0–2.7 Ma · Pre-iNHG 2.7–5.3 Ma), so each section's amplitude matches its regime instead of being diluted by a single 5.3-Myr joint fit. Discontinuities at iNHG (2.7 Ma) and MPT (1.0 Ma) visualize the climate-sensitivity shifts that L3 step terms encode.`,
     postMPText: `<b>Across the MPT transition.</b> A per-regime stitched fit: post-MPT (0–1 Ma) uses the 100-kyr-band amplitudes; iNHG–MPT (1.0–1.2 Ma here) uses the 41-kyr-band amplitudes. The visible discontinuity at MPT is the climate-sensitivity step — the same change that the L3 step term encodes globally.`,
-    postMPT:    `<b>The formula's best-fit regime (R² = ${CLIMATE_FORMULA_COEFFS.regimes['lr04-post-mpt'].r2.l1_l2_l3.toFixed(2)}).</b> Seven glacial-interglacial cycles. L1 is dominated by the 100-kyr eccentricity-modulated band; L2 carbon thermostat adds little; no L3 transitions inside the window.`,
+    postMPT:    `<b>The formula's best-fit regime (R² = ${CLIMATE_FORMULA_COEFFS.regimes['lr04-post-mpt'].r2.l1_l2_l3.toFixed(2)}).</b> Seven glacial-interglacial cycles. L1 is dominated by the 100-kyr eccentricity-modulated band; the 405-kyr family contributes little inside a 1-Myr window; no L3 transitions inside the window.`,
     past200:    `<b>Current glacial cycle in detail.</b> Termination I ended the LGM (~20 kyr BP); MIS 6 was the previous deep glacial; we are at the Holocene warm peak (~3.1 ‰ δ¹⁸O).`,
     cenogrid:   `<b>Stitched Cenozoic view.</b> The δ¹⁸O curve routes through the LR04 regime fits for the last 5.3 Myr (so Quaternary amplitudes aren't diluted by the 67-Myr joint fit) and the cenogrid-d18o fit for older times. L3 step terms carry the deep-time variance — PETM, EOT, Mi-1, MMCT, iNHG, MPT. δ¹³C uses the cenogrid-d13c fit only (no LR04 δ¹³C stack exists).`,
     epica:      `<b>Cross-proxy validation.</b> The same ${CLIMATE_FORMULA_COEFFS.config.L1_lines.length} physical L1 lines fitted to <i>atmospheric CO₂</i> from Antarctic ice cores (an independent recording mechanism, independent age model, different physics from benthic δ¹⁸O). R² L1 alone = <b>${CLIMATE_FORMULA_COEFFS.regimes['epica-co2'].r2.l1_only.toFixed(2)}</b>: the same orbital structure that drives ice volume also drives carbon-cycle dynamics. The amplification-ratio table below identifies which L1 lines manifest <i>primarily</i> through carbon-cycle response (high ratio) vs ice-volume response (low ratio).`,
@@ -15405,7 +15396,7 @@ function cfmRenderChart(tabKey) {
 //
 // opts.includeData   default true   — overlay the proxy data line
 // opts.layers        default ['total'] — which formula layers to draw
-//                                     subset of ['l1','l2','total']
+//                                     subset of ['l1','total']
 // ───────────────────────────────────────────────────────────────────
 function cfmRenderPaperChart(tabKey, opts) {
   opts = opts || {};
@@ -15472,21 +15463,19 @@ function cfmRenderPaperChart(tabKey, opts) {
     : useLR04Stitch
     ? (t, layer) => cfmEvalStitched(t, layer)
     : (t, layer) => cfmEvalRaw(t, regimeKey, layer);
-  const fT = [], totalV = [], l1V = [], l2V = [];
+  const fT = [], totalV = [], l1V = [];
   for (let t = t_lo; t <= t_hi + 1e-9; t += dtGrid) {
     fT.push(t);
     totalV.push(evalAt(t, 'all'));
     l1V.push(evalAt(t, 'l1'));
-    l2V.push(evalAt(t, 'l2'));
   }
 
   // The standard export page: title + legend rows above a 370-px plot,
   // the credit strip under the axis label (the R² caption reads in the panel)
   const legendItems = [];
   if (includeData)              legendItems.push({ name: proxyLabel,                    color: '#1f2937' });
-  if (layers.includes('total')) legendItems.push({ name: 'Total formula (L1+L2+L3)',    color: '#dc2626', bold: true });
+  if (layers.includes('total')) legendItems.push({ name: 'Total formula (L1+L3)',       color: '#dc2626', bold: true });
   if (layers.includes('l1'))    legendItems.push({ name: 'L1 only (orbital lines)',     color: '#b45309' });
-  if (layers.includes('l2'))    legendItems.push({ name: 'L2 only (carbon thermostat)', color: '#15803d' });
   const W = 1000;
   const head = chartExportHeader(title, legendItems, W);
   const PAD = { l: 80, r: 30, t: head.bottom + 14, b: 70 };
@@ -15499,7 +15488,6 @@ function cfmRenderPaperChart(tabKey, opts) {
   if (includeData) allV.push(...dV);
   if (layers.includes('total')) allV.push(...totalV);
   if (layers.includes('l1'))    allV.push(...l1V);
-  if (layers.includes('l2'))    allV.push(...l2V);
   const finiteV = allV.filter(v => Number.isFinite(v));
   const ymin = finiteV.length ? Math.min(...finiteV) : -1;
   const ymax = finiteV.length ? Math.max(...finiteV) : 1;
@@ -15543,7 +15531,6 @@ function cfmRenderPaperChart(tabKey, opts) {
     data:     '#1f2937',  // slate-800 (near-black, conventional ground truth)
     total:    '#dc2626',  // red-600 (bold model curve)
     l1:       '#b45309',  // amber-700
-    l2:       '#15803d',  // green-700
     today:    '#7c3aed',  // violet-600 (distinct from formula red)
     event:    '#9ca3af',  // gray-400
     trans:    '#b45309',  // amber-700
@@ -15669,9 +15656,6 @@ function cfmRenderPaperChart(tabKey, opts) {
   if (layers.includes('l1')) {
     curvePaths += `<path d="${buildPath(fT, l1V)}" fill="none" stroke="${colors.l1}" stroke-width="1.6" clip-path="url(#cfm-paper-clip)"/>`;
   }
-  if (layers.includes('l2')) {
-    curvePaths += `<path d="${buildPath(fT, l2V)}" fill="none" stroke="${colors.l2}" stroke-width="1.6" clip-path="url(#cfm-paper-clip)"/>`;
-  }
   if (layers.includes('total')) {
     curvePaths += `<path d="${buildPath(fT, totalV)}" fill="none" stroke="${colors.total}" stroke-width="2.2" clip-path="url(#cfm-paper-clip)"/>`;
   }
@@ -15754,13 +15738,13 @@ async function createClimateFormulaPanel() {
     <div class="cfm-layer-toggles">
       <span class="cfm-layer-toggles-label">Layers:</span>
       <label class="cfm-layer-check" title="The proxy record under the formula (LR04, CENOGRID, EPICA or CenCO2PIP per tab). Off = the formula alone — the Export prints what is on screen."><input type="checkbox" data-layer="data" ${cfmLayerVisibility.data ? 'checked' : ''}> Proxy data</label>
-      <label class="cfm-layer-check" title="Total formula = baseline + L1 + L2 + L3 (the complete prediction at each timestamp). The L1/L2/L3 toggles below show the same formula evaluated cumulatively — each one ADDS the next layer to the previous, so toggling them on in sequence builds up to the Total."><input type="checkbox" data-layer="total" ${cfmLayerVisibility.total ? 'checked' : ''}/><span class="cfm-swatch cfm-swatch-total"></span>Total</label>
+      <label class="cfm-layer-check" title="Total formula = baseline + L1 + L3 (the complete prediction at each timestamp). The L1 toggle shows the formula with only its orbital lines; the gap to Total is the L3 boundary-condition steps."><input type="checkbox" data-layer="total" ${cfmLayerVisibility.total ? 'checked' : ''}/><span class="cfm-swatch cfm-swatch-total"></span>Total</label>
       <label class="cfm-layer-check" title="L1 only — Orbital forcing applied to the baseline.
 Displayed curve = baseline + L1 contributions (the formula's prediction with ONLY L1 enabled).
 
 Structural claim: every L1 line is one of the engine's OWN secular beats — the periods are computed from the model's N-body secular modes (gᵢ apsidal, sᵢ nodal) and its composed precession rate p, never fitted. Only the amplitudes (a, b) are fitted. If the data demanded peaks the engine's beats cannot supply, the formula would be falsified.
 
-Three classic Berger peaks fall out of the beats:
+Three classic Berger peaks fall out of the beats (Laskar's mode numbering; the engine's own labels appear in the line list):
  • 94.9 kyr  g₄−g₅ Mars-Jupiter eccentricity
  • 41.2 kyr  p+s₃ Earth obliquity
  • 23.8 kyr  p+g₅ Jupiter climatic precession
@@ -15773,13 +15757,9 @@ Composition (28 lines, doc 92 §2 — the engine-written list):
 
 Fitted via sequential ridge regression — see doc 92 §9.
 
-Description, not prediction (T7, doc 92 §2): the per-line amplitudes AND phases are fitted inside each regime window, so the per-regime R² shown here describes the record; fitted on one half of a window the same lines have no skill on the other half. The model's own e(t), ε(t), e·sin ϖ(t) with one coefficient each and a ~6-kyr climate lag keep about half the in-window R² out of sample (post-MPT, iNHG–MPT) — the transferable part; the 100-kyr band is what the fitted lines describe and the linear response cannot generate."><input type="checkbox" data-layer="l1" ${cfmLayerVisibility.l1 ? 'checked' : ''}/><span class="cfm-swatch cfm-swatch-l1"></span>L1 alone</label>
-      <label class="cfm-layer-check" title="L2 alone — formula evaluated with ONLY the carbon thermostat enabled.
-Displayed curve = baseline + L2 contributions.
+Description, not prediction (T7, doc 92 §2): the per-line amplitudes AND phases are fitted inside each regime window, so the per-regime R² shown here describes the record; fitted on one half of a window the same lines have no skill on the other half. The model's own e(t), ε(t), e·sin ϖ(t) with one coefficient each and a ~6-kyr climate lag keep about half the in-window R² out of sample (post-MPT, iNHG–MPT) — the transferable part; the 100-kyr band is what the fitted lines describe and the linear response cannot generate.
 
-L2 family: 405-kyr fundamental (the g₂−g₅ eccentricity beat) + 202-kyr 2nd harmonic + 135-kyr 3rd harmonic. The natural silicate-weathering carbon-cycle response to eccentricity forcing. In the shipped coefficient file this family rides INSIDE L1 (doc 92 §2 lines 26–28) and the separate L2 layer is empty, so this curve coincides with the baseline.
-
-Note: L1, L2, and Total each carry the baseline once — they do NOT visually sum to Total. Read per-layer variance contributions from the R² panel below."><input type="checkbox" data-layer="l2" ${cfmLayerVisibility.l2 ? 'checked' : ''}/><span class="cfm-swatch cfm-swatch-l2"></span>L2 alone</label>
+Note: L1 and Total each carry the baseline once — they do NOT visually sum. Read per-layer variance contributions from the R² panel below."><input type="checkbox" data-layer="l1" ${cfmLayerVisibility.l1 ? 'checked' : ''}/><span class="cfm-swatch cfm-swatch-l1"></span>L1 alone</label>
     </div>
   `;
 
@@ -15788,7 +15768,7 @@ Note: L1, L2, and Total each carry the baseline once — they do NOT visually su
     <div class="cfm-container">
       <div class="cfm-header">
         <div class="cfm-title">Earth Climate Analysis</div>
-        <div class="cfm-subtitle">The climate formula vs the proxy records — orbital (L1) + carbon-cycle (L2) + boundary-condition (L3) layers, fitted per regime</div>
+        <div class="cfm-subtitle">The climate formula vs the proxy records — the engine's 28 orbital lines (L1, the 405-kyr family among them) plus boundary-condition steps (L3), fitted per regime</div>
         <button class="cfm-export-btn" data-cfm-export title="Export the current tab with the layers toggled on screen as a picture (PNG or SVG download)">Export</button>
         <div class="cfm-close" title="Close"></div>
       </div>
@@ -15859,7 +15839,7 @@ Note: L1, L2, and Total each carry the baseline once — they do NOT visually su
   const exportBtn = panel.querySelector('[data-cfm-export]');
   if (exportBtn) exportBtn.addEventListener('click', () => exportCfmPaper({
     includeData: cfmLayerVisibility.data,
-    layers: ['total', 'l1', 'l2'].filter((k) => cfmLayerVisibility[k]),
+    layers: ['total', 'l1'].filter((k) => cfmLayerVisibility[k]),
   }));
 
   document.body.appendChild(panel);
