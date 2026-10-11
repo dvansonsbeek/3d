@@ -44,7 +44,7 @@ warnings.filterwarnings("ignore", category=UserWarning)
 SCRIPTS_DIR = Path(__file__).parent
 sys.path.insert(0, str(SCRIPTS_DIR))
 from milankovitch_climate_formula import (
-    ClimateFormula, EIGHT_H, L1_LATTICE_INTEGERS,
+    ClimateFormula, L1_LABELS, L1_PERIODS_KYR,
     load_lr04, preprocess,
 )
 
@@ -176,10 +176,10 @@ def fit_amps(t, y, regime):
     f = ClimateFormula()
     f.fit(t, y, regime=regime, normalize=True)
     std = f._fit_y_std
-    return {n: {
-        "amp": math.hypot(f._l1_a.get(n, 0.0), f._l1_b.get(n, 0.0)) * std,
-        "phase": math.atan2(f._l1_b.get(n, 0.0), f._l1_a.get(n, 0.0)),
-    } for n in L1_LATTICE_INTEGERS}
+    return {P: {
+        "amp": math.hypot(f._l1_a.get(P, 0.0), f._l1_b.get(P, 0.0)) * std,
+        "phase": math.atan2(f._l1_b.get(P, 0.0), f._l1_a.get(P, 0.0)),
+    } for P in L1_PERIODS_KYR}
 
 
 def block_idx(n, block_n, rng):
@@ -192,17 +192,17 @@ def block_idx(n, block_n, rng):
 def boot_amps(t, y, regime, block_kyr, n_boot, rng):
     dt = float(np.median(np.diff(t)))
     block_n = max(1, int(round(block_kyr / dt)))
-    out = {n: {"amp": [], "phase": []} for n in L1_LATTICE_INTEGERS}
+    out = {P: {"amp": [], "phase": []} for P in L1_PERIODS_KYR}
     for _ in range(n_boot):
         idx = block_idx(len(t), block_n, rng)
         try:
             f = ClimateFormula()
             f.fit(t, y[idx], regime=regime, normalize=True)
             std = f._fit_y_std
-            for n in L1_LATTICE_INTEGERS:
-                a = f._l1_a.get(n, 0.0); b = f._l1_b.get(n, 0.0)
-                out[n]["amp"].append(math.hypot(a, b) * std)
-                out[n]["phase"].append(math.atan2(b, a))
+            for P in L1_PERIODS_KYR:
+                a = f._l1_a.get(P, 0.0); b = f._l1_b.get(P, 0.0)
+                out[P]["amp"].append(math.hypot(a, b) * std)
+                out[P]["phase"].append(math.atan2(b, a))
         except Exception:
             continue
     return out
@@ -230,13 +230,13 @@ def compute_freq_ice_fraction(t_lr, y_lr, t_sl, y_sl, win):
     amps_lr = fit_amps(tg_l, yg_l, win)
     amps_sl = fit_amps(tg_s, yg_s, win)
     f_ice = {}
-    for n in L1_LATTICE_INTEGERS:
-        a_lr = amps_lr[n]["amp"]
-        a_sl = amps_sl[n]["amp"]
+    for P in L1_PERIODS_KYR:
+        a_lr = amps_lr[P]["amp"]
+        a_sl = amps_sl[P]["amp"]
         if a_lr <= 1e-6:
-            f_ice[n] = 0.5
+            f_ice[P] = 0.5
             continue
-        f_ice[n] = float(max(0.0, min(1.5, (a_sl / SL_PER_PERMIL) / a_lr)))
+        f_ice[P] = float(max(0.0, min(1.5, (a_sl / SL_PER_PERMIL) / a_lr)))
     return f_ice
 
 
@@ -270,9 +270,9 @@ def analyze_regime(label, t_snyder, y_snyder, t_lr, y_lr,
     if use_snyder_T:
         base_S = fit_amps(tg_s, yg_s, sub_win)
     else:
-        base_S = {n: {"amp": base_L[n]["amp"] * T_PER_PERMIL_LR04,
-                      "phase": base_L[n]["phase"] + math.pi}
-                   for n in L1_LATTICE_INTEGERS}
+        base_S = {P: {"amp": base_L[P]["amp"] * T_PER_PERMIL_LR04,
+                      "phase": base_L[P]["phase"] + math.pi}
+                   for P in L1_PERIODS_KYR}
 
     # Bootstrap
     boot_L = boot_amps(tg_l, yg_l, win, BLOCK_KYR, N_BOOT, rng)
@@ -280,22 +280,22 @@ def analyze_regime(label, t_snyder, y_snyder, t_lr, y_lr,
     if use_snyder_T:
         boot_S = boot_amps(tg_s, yg_s, sub_win, BLOCK_KYR, N_BOOT, rng)
     else:
-        boot_S = {n: {
-            "amp": [a * T_PER_PERMIL_LR04 for a in boot_L[n]["amp"]],
-            "phase": [p + math.pi for p in boot_L[n]["phase"]],
-        } for n in L1_LATTICE_INTEGERS}
+        boot_S = {P: {
+            "amp": [a * T_PER_PERMIL_LR04 for a in boot_L[P]["amp"]],
+            "phase": [p + math.pi for p in boot_L[P]["phase"]],
+        } for P in L1_PERIODS_KYR}
 
     # Per-line ECS
     spectrum = []
-    for n in L1_LATTICE_INTEGERS:
-        aS = base_S[n]["amp"]; pS = base_S[n]["phase"]
-        aL = base_L[n]["amp"]
-        aC = base_C[n]["amp"]; pC = base_C[n]["phase"]
+    for P in L1_PERIODS_KYR:
+        aS = base_S[P]["amp"]; pS = base_S[P]["phase"]
+        aL = base_L[P]["amp"]
+        aC = base_C[P]["amp"]; pC = base_C[P]["phase"]
         if aS <= 0 or aL <= 0 or aC <= 0: continue
         sep = math.degrees(min(abs(wrap_pi(pC - pS)), math.pi))
         if sep > 90: continue
 
-        f_ice = f_ice_per_line.get(n, 0.5)
+        f_ice = f_ice_per_line.get(P, 0.5)
         dF_co2 = co2_forcing(aC, co2_ref)
         dF_ghg = GHG_MULT * dF_co2
         dF_ice = aL * f_ice * SL_PER_PERMIL * F_PER_M_SL
@@ -304,7 +304,7 @@ def analyze_regime(label, t_snyder, y_snyder, t_lr, y_lr,
         ecs = aS * F_2X / dF_tot
 
         boot_ecs = []
-        for at, al, ac in zip(boot_S[n]["amp"], boot_L[n]["amp"], boot_C[n]["amp"]):
+        for at, al, ac in zip(boot_S[P]["amp"], boot_L[P]["amp"], boot_C[P]["amp"]):
             if at <= 0 or al <= 0 or ac <= 0: continue
             dFc = co2_forcing(ac, co2_ref)
             dFi = al * f_ice * SL_PER_PERMIL * F_PER_M_SL
@@ -314,8 +314,8 @@ def analyze_regime(label, t_snyder, y_snyder, t_lr, y_lr,
             if 0 < v < 50: boot_ecs.append(v)
 
         spectrum.append({
-            "n": n,
-            "period_kyr": EIGHT_H / n,
+            "line": L1_LABELS[P],
+            "period_kyr": P,
             "amp_T_K": aS,
             "amp_LR04_permil": aL,
             "amp_CO2_ppm": aC,
@@ -462,26 +462,26 @@ def main():
 
     # ── Cross-regime + cross-source comparison ──
     print("\n" + "=" * 100)
-    print("  COMPARISON: boron vs CenCO2PIP per-regime ECS (post §4.7 tightened values)")
+    print("  COMPARISON: boron vs CenCO2PIP per-regime ECS (the tightened analysis, data/climate-ecs-tight.json)")
     print("=" * 100)
-    cenco2pip_results = {
-        # From data/climate-ecs-tight.json
-        "post_mpt": {
-            "obliquity (35-50)": {"ECS": 2.44, "ice": 65, "ΔCO2": "EPICA"},
-            "100-kyr band (75-130)": {"ECS": 3.65, "ice": 59, "ΔCO2": "EPICA"},
-            "precession (18-26)": {"ECS": 2.76, "ice": 64, "ΔCO2": "EPICA"},
-        },
-        "inhg_mpt_cenco2pip": {
-            "obliquity (35-50)": {"ECS": 6.38, "ice": 95},
-            "100-kyr band (75-130)": {"ECS": 5.04, "ice": 57},
-            "precession (18-26)": {"ECS": 10.13, "ice": 95},
-        },
-        "pre_inhg_cenco2pip": {
-            "obliquity (35-50)": {"ECS": 2.82, "ice": 95},
-            "100-kyr band (75-130)": {"ECS": 2.91, "ice": 78},
-            "precession (18-26)": {"ECS": 3.12, "ice": 92},
-        },
-    }
+    # The CenCO2PIP reference is READ from the tightened analysis's artifact
+    # (climate_ecs_tight.py runs first), never hand-copied — a copy goes stale
+    # on every re-bank.
+    cenco2pip_results = {}
+    tight_path = REPO / "data/climate-ecs-tight.json"
+    if tight_path.exists():
+        tight = json.loads(tight_path.read_text())
+        for ref_key, reg_key in (("post_mpt", "post_mpt"),
+                                 ("inhg_mpt_cenco2pip", "inhg_mpt"),
+                                 ("pre_inhg_cenco2pip", "pre_inhg")):
+            by_band = tight["regimes"][reg_key]["by_band"]
+            cenco2pip_results[ref_key] = {
+                bname: {"ECS": round(s["ecs_weighted_K"], 2),
+                        "ice": round(100 * s["ice_share_weighted"])}
+                for bname, s in by_band.items() if s
+            }
+    else:
+        print(f"  (no {tight_path.name} — run climate_ecs_tight.py first for the reference column)")
 
     print()
     print(f"  {'Regime/Band':<35}{'CenCO2PIP':>20}{'BORON':>20}{'Δ ECS':>14}")
@@ -518,7 +518,7 @@ def main():
             "forcing_per_m_sl_Wm2_per_m": F_PER_M_SL,
             "t_per_permil_lr04_K": T_PER_PERMIL_LR04,
         },
-        "freq_dep_ice_fraction": {str(n): f_ice[n] for n in L1_LATTICE_INTEGERS},
+        "freq_dep_ice_fraction": {f"{P:.4f}": f_ice[P] for P in L1_PERIODS_KYR},
         "regimes": {
             "post_mpt_chalk":       {"window_kyr": [0, 800],
                                      "by_band": bands_post_c, "spectrum": spec_post_c},

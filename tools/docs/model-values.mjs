@@ -778,29 +778,69 @@ export const VALUES = {
     out.l1N24R2CanonPreInhg = { get: () => pre().r2_l1_l2_l3, render: f4, note: 'R² of the canonical 32-divisor fit, pre-iNHG' };
     out.l1N24R2WithLinePreInhg = { get: () => pre().lattice_plus_line.r2_l1_l2_l3, render: f4, note: 'R² of the canonical fit with 24 added (33 divisors), pre-iNHG' };
     out.l1N24AdmissionRule = { get: () => n24().summary.admission_rule_x_median, render: (v) => `${Number(v)}×`, note: 'the doc 91 lattice admission rule: amplitude ≥ this × the median, full LR04' };
-    // L1 divisor audit (every shipped divisor on the doc-94 footing) and the eccentricity period scan
-    const aud = () => rd('data/l1-divisor-audit-results.json');
+    // L1 line audit (every shipped physical line on the doc-94 footing) and the ~100-kyr band period scan
+    const aud = () => rd('data/l1-line-audit-results.json');
     const scn = () => rd('data/ecc-period-scan-results.json');
-    out.l1DivisorCount = { get: () => aud().metadata.n_divisors, render: (v) => String(v), note: 'number of shipped L1 lattice divisors' };
-    out.l1AuditN24RankCvPreInhg = { get: () => aud().regime_results['pre-inhg'].rows['24'].rank_cv, render: (v) => String(v), note: 'rank of n = 24 among the shipped divisors by cross-validated pair ΔR², pre-iNHG' };
-    out.l1AuditN24RankInPreInhg = { get: () => aud().regime_results['pre-inhg'].rows['24'].rank_in, render: (v) => String(v), note: 'rank of n = 24 by in-sample leave-one-out R² loss, pre-iNHG' };
-    out.l1AuditN24RankCvLr04Full = { get: () => aud().regime_results['lr04-full'].rows['24'].rank_cv, render: (v) => String(v), note: 'rank of n = 24 by cross-validated pair ΔR² on the full LR04 record' };
-    out.l1AuditCvPositiveLr04Full = { get: () => aud().regime_results['lr04-full'].n_cv_positive, render: (v) => String(v), note: 'shipped divisors with a positive cross-validated pair ΔR² on the full record' };
-    out.l1AuditCvPositivePreInhg = { get: () => aud().regime_results['pre-inhg'].n_cv_positive, render: (v) => String(v), note: 'shipped divisors with a positive cross-validated pair ΔR², pre-iNHG' };
-    for (const n of [96, 107, 110, 134, 152, 185]) {
-      out[`l1AuditSidebandMaxLooIn${n}`] = { get: () => Math.max(...['post-mpt', 'inhg-mpt', 'pre-inhg', 'lr04-full'].map((r) => aud().regime_results[r].rows[String(n)].loo_in)), render: sdr, note: `largest in-sample leave-one-out R² loss of the MTM sideband n = ${n} across the four regimes` };
+    const kyr1 = (v) => Number(v).toFixed(1);
+    const signedPct1 = (v) => (v >= 0 ? '+' : '−') + Math.abs(Number(v)).toFixed(1);
+    out.l1LineCount = { get: () => aud().metadata.n_lines, render: (v) => String(v), note: 'number of shipped L1 lines (data/l1-physical-lines.json)' };
+    for (const [key, reg] of [['PostMpt', 'post-mpt'], ['InhgMpt', 'inhg-mpt'], ['PreInhg', 'pre-inhg'], ['Lr04Full', 'lr04-full']]) {
+      out[`l1AuditR2${key}`] = { get: () => aud().regime_results[reg].r2_l1_l2_l3, render: (v) => Number(v).toFixed(4), note: `R² of the shipped L1+L2+L3 fit, regime ${reg}` };
+      out[`l1AuditCvPositive${key}`] = { get: () => aud().regime_results[reg].n_cv_positive, render: (v) => String(v), note: `shipped lines with a positive cross-validated pair ΔR² (dropped, refitted, re-added as a free-phase pair, split-half CV), regime ${reg}` };
+      out[`l1AuditBestCvLine${key}`] = { get: () => aud().regime_results[reg].best_cv_line.label, render: (v) => String(v), note: `the line with the largest cross-validated pair ΔR², regime ${reg}` };
+      out[`l1AuditBestCvLineKyr${key}`] = { get: () => aud().regime_results[reg].best_cv_line.period_kyr, render: kyr1, unit: 'kyr', note: `that line's period, regime ${reg}` };
+      out[`l1AuditBestCvDeltaR2${key}`] = { get: () => aud().regime_results[reg].best_cv_line.pair_cv, render: sdr, note: `that line's cross-validated pair ΔR², regime ${reg}` };
+      out[`l1AuditLargestLooLine${key}`] = { get: () => aud().regime_results[reg].largest_loo_line.label, render: (v) => String(v), note: `the line whose removal costs the most in-sample R², regime ${reg}` };
+      out[`l1AuditLargestLooDeltaR2${key}`] = { get: () => aud().regime_results[reg].largest_loo_line.loo_in, render: sdr, note: `that leave-one-out R² loss, regime ${reg}` };
     }
-    out.eccScanPreInhgCvBestKyr = { get: () => scn().summary.pre_inhg_cv_best_kyr_open, render: (v) => Number(v).toFixed(1), note: 'pre-iNHG cross-validated best free period for Earth\'s eccentricity line (band-open baseline), kyr' };
-    out.eccScanPreInhgCvBestN = { get: () => scn().summary.pre_inhg_cv_best_n_open, render: (v) => Number(v).toFixed(2), note: 'the same as a lattice index n = 8H/period' };
-    out.eccScanPreInhgCvHalfmaxLoKyr = { get: () => scn().summary.pre_inhg_cv_halfmax_kyr_open[0], render: (v) => Number(v).toFixed(1), note: 'lower edge of the CV half-max band, kyr' };
-    out.eccScanPreInhgCvHalfmaxHiKyr = { get: () => scn().summary.pre_inhg_cv_halfmax_kyr_open[1], render: (v) => Number(v).toFixed(1), note: 'upper edge of the CV half-max band, kyr' };
-    out.eccScanOffsetFromModelPct = { get: () => scn().summary.offset_from_model_pct, render: (v) => (v >= 0 ? '+' : '−') + Math.abs(Number(v)).toFixed(1), note: 'record\'s best period vs the model\'s 8H/24, percent' };
-    out.eccScanPreInhgCvAt23 = { get: () => scn().summary.pre_inhg_cv_at_23_open, render: sdr, note: 'CV ΔR² of a free-phase 8H/23 line, pre-iNHG, band-open baseline' };
-    out.eccScanPreInhgCvAt24 = { get: () => scn().summary.pre_inhg_cv_at_24_open, render: sdr, note: 'CV ΔR² of a free-phase 8H/24 line, pre-iNHG, band-open baseline' };
-    out.eccScanPreInhgCvAt25 = { get: () => scn().summary.pre_inhg_cv_at_25_open, render: sdr, note: 'CV ΔR² of a free-phase 8H/25 line, pre-iNHG, band-open baseline' };
-    out.eccScanPreInhgInBestKyr = { get: () => scn().regime_results['pre-inhg'].open.argmax_in_kyr, render: (v) => Number(v).toFixed(1), note: 'pre-iNHG IN-SAMPLE best free period (the non-stationary ~100-kyr power), kyr' };
-    out.eccScanPreInhgInBestCv = { get: () => scn().regime_results['pre-inhg'].open.at_integer_n['27'].cv, render: sdr, note: 'CV ΔR² at the in-sample power peak (n = 27), pre-iNHG — negative: not phase-stable' };
-    out.eccScanPostMptCvBestKyr = { get: () => scn().regime_results['post-mpt'].open.argmax_cv_kyr, render: (v) => Number(v).toFixed(1), note: 'post-MPT cross-validated best free period in the band (band-open baseline), kyr' };
+    const scnOpen = (reg) => scn().regime_results[reg].open;
+    const cvAtNearest = (reg) => { const o = scnOpen(reg); return o.at_lines[Number(o.nearest_line_to_cv_peak.period_kyr).toFixed(4)].cv; };
+    out.eccScanBandLines = { get: () => scn().metadata.band_lines_removed_for_open.length, render: (v) => String(v), note: 'shipped L1 lines inside the 75–130-kyr band, removed for the band-open baseline' };
+    out.eccScanPreInhgCvBestKyr = { get: () => scn().summary.pre_inhg_cv_best_kyr_open, render: kyr1, unit: 'kyr', note: 'pre-iNHG cross-validated best free period in the ~100-kyr band (band-open baseline)' };
+    out.eccScanPreInhgMaxCv = { get: () => scn().summary.pre_inhg_max_cv_open, render: sdr, note: 'its cross-validated ΔR²' };
+    out.eccScanPreInhgCvHalfmaxLoKyr = { get: () => scn().summary.pre_inhg_cv_halfmax_kyr_open[0], render: kyr1, unit: 'kyr', note: 'lower edge of the CV half-max band' };
+    out.eccScanPreInhgCvHalfmaxHiKyr = { get: () => scn().summary.pre_inhg_cv_halfmax_kyr_open[1], render: kyr1, unit: 'kyr', note: 'upper edge of the CV half-max band' };
+    out.eccScanPreInhgNearestLineLabel = { get: () => scn().summary.pre_inhg_nearest_line_open.label, render: (v) => String(v), note: 'the shipped line nearest the pre-iNHG CV peak' };
+    out.eccScanPreInhgNearestLineKyr = { get: () => scn().summary.pre_inhg_nearest_line_open.period_kyr, render: kyr1, unit: 'kyr', note: 'its period' };
+    out.eccScanPreInhgOffsetFromNearestLinePct = { get: () => scn().summary.pre_inhg_nearest_line_open.offset_pct, render: signedPct1, unit: '%', note: 'the pre-iNHG CV peak relative to that line' };
+    out.eccScanPreInhgCvAtNearestLine = { get: () => scn().summary.pre_inhg_cv_at_nearest_line_open, render: sdr, note: 'CV ΔR² of a free-phase pair at that line\'s own period, pre-iNHG, band-open baseline' };
+    out.eccScanPreInhgInBestKyr = { get: () => scnOpen('pre-inhg').argmax_in_kyr, render: kyr1, unit: 'kyr', note: 'pre-iNHG IN-SAMPLE best free period (the non-stationary ~100-kyr power)' };
+    out.eccScanPreInhgInBestCv = { get: () => scnOpen('pre-inhg').cv_at_in_peak, render: sdr, note: 'CV ΔR² at the in-sample power peak, pre-iNHG — negative: not phase-stable' };
+    out.eccScanPreInhgBestCvShippedLineLabel = { get: () => scnOpen('pre-inhg').best_cv_shipped_line.label, render: (v) => String(v), note: 'the shipped band line with the largest CV ΔR² at its own period, pre-iNHG' };
+    out.eccScanPreInhgBestCvShippedLineCv = { get: () => scnOpen('pre-inhg').best_cv_shipped_line.cv, render: sdr, note: 'that CV ΔR²' };
+    out.eccScanPostMptCvBestKyr = { get: () => scnOpen('post-mpt').argmax_cv_kyr, render: kyr1, unit: 'kyr', note: 'post-MPT cross-validated best free period in the band (band-open baseline)' };
+    out.eccScanPostMptNearestLineLabel = { get: () => scnOpen('post-mpt').nearest_line_to_cv_peak.label, render: (v) => String(v), note: 'the shipped line nearest the post-MPT CV peak' };
+    out.eccScanPostMptNearestLineKyr = { get: () => scnOpen('post-mpt').nearest_line_to_cv_peak.period_kyr, render: kyr1, unit: 'kyr', note: 'its period' };
+    out.eccScanPostMptOffsetFromNearestLinePct = { get: () => scnOpen('post-mpt').nearest_line_to_cv_peak.offset_pct, render: signedPct1, unit: '%', note: 'the post-MPT CV peak relative to that line' };
+    out.eccScanPostMptCvAtNearestLine = { get: () => cvAtNearest('post-mpt'), render: sdr, note: 'CV ΔR² of a free-phase pair at that line\'s own period, post-MPT, band-open baseline' };
+    // The clock-of-date test (scripts/test_evolving_clock_climate_formula.py): the p-carrying lines on the composed clock
+    const clk = () => rd('data/evolving-clock-test.json');
+    const signed5 = (v) => (v >= 0 ? '+' : '−') + Math.abs(Number(v)).toFixed(5);
+    out.evolvingClockTpJ2000Yr = { get: () => clk().clock_source.T_p_2000_yr, render: (v) => Number(v).toFixed(0), unit: 'yr', note: 'the composed precession period at J2000 the clock test is anchored on' };
+    for (const [key, w] of [['PostMpt', 'post-mpt'], ['Pleistocene', 'pleistocene'], ['Lr04Full', 'lr04-full'], ['Epica', 'epica'], ['InhgMpt', 'inhg-mpt'], ['Cenogrid', 'cenogrid'], ['Mesozoic', 'mesozoic'], ['Phanerozoic', 'phanerozoic']]) {
+      out[`evolvingClockMeanRatio${key}`] = { get: () => clk().clock_window_means[w].mean_period_ratio, render: (v) => Number(v).toFixed(5), note: `window mean of T_p(t)/T_p(2000) on the composed clock, ${w}` };
+      out[`evolvingClockPeriodCorrectionPct${key}`] = { get: () => clk().clock_window_means[w].period_correction_pct, render: (v) => (v >= 0 ? '+' : '−') + Math.abs(Number(v)).toFixed(2), unit: '%', note: `the p-lines' mean period over the window relative to J2000, ${w}` };
+      out[`evolvingClockExtraCycles${key}`] = { get: () => clk().clock_window_means[w].extra_cycles_over_window, render: (v) => Number(v).toFixed(2), note: `extra precession cycles accumulated over the window, ${w}` };
+    }
+    for (const [key, reg] of [['PostMpt', 'post-mpt'], ['InhgMpt', 'inhg-mpt'], ['PreInhg', 'pre-inhg'], ['Lr04Full', 'lr04-full'], ['Cenogrid', 'cenogrid'], ['Cheng', 'cheng']]) {
+      out[`evolvingClockDeltaR2L1${key}`] = { get: () => clk().results[reg].delta_r2_l1, render: signed5, note: `ΔR² (L1 only) of the clock-of-date fit against the J2000-period fit, ${reg}` };
+      out[`evolvingClockDeltaR2Total${key}`] = { get: () => clk().results[reg].delta_r2_total, render: signed5, note: `ΔR² (L1+L2+L3) of the clock-of-date fit against the J2000-period fit, ${reg}` };
+      out[`evolvingClockMaxShiftKyr${key}`] = { get: () => clk().results[reg].max_shift_kyr, render: kyr1, unit: 'kyr', note: `largest line-time shift at the window end (the longest p-line), ${reg}` };
+      out[`evolvingClockBestScale${key}`] = { get: () => clk().results[reg].scale_scan.best_scale, render: (v) => (v >= 0 ? '+' : '−') + Math.abs(Number(v)).toFixed(1), note: `the warp scale k the record prefers (k = 1 the model's clock, 0 the shipped fit), ${reg}` };
+      out[`evolvingClockDeltaR2AtScaleMinusOne${key}`] = { get: () => clk().results[reg].scale_scan.at_minus_one, render: signed5, note: `ΔR² total with the counter-rotating warp (k = −1) — the sign control, ${reg}` };
+      out[`evolvingClockHalfADeltaR2${key}`] = { get: () => clk().results[reg].halves_delta_r2_total_at_one[0], render: signed5, note: `ΔR² total at k = 1 on the younger half of the window, fitted alone, ${reg}` };
+      out[`evolvingClockHalfBDeltaR2${key}`] = { get: () => clk().results[reg].halves_delta_r2_total_at_one[1], render: signed5, note: `ΔR² total at k = 1 on the older half of the window, fitted alone, ${reg}` };
+      out[`evolvingClockPreferredDeltaP${key}`] = { get: () => clk().results[reg].dp_scan.best_dp_arcsec_per_yr, render: (v) => (v >= 0 ? '+' : '−') + Math.abs(Number(v)).toFixed(2), unit: '″/yr', note: `the constant frequency offset on the p-lines the record prefers (k = 0), ${reg}` };
+      out[`evolvingClockPreferredP${key}`] = { get: () => clk().results[reg].dp_scan.implied_p_arcsec_per_yr, render: (v) => Number(v).toFixed(2), unit: '″/yr', note: `the precession rate implied by that offset (artifact p + δp), ${reg}` };
+      out[`evolvingClockDeltaR2AtPreferredP${key}`] = { get: () => clk().results[reg].dp_scan.best_delta_r2_total, render: signed5, note: `ΔR² total at the preferred δp, k = 0, ${reg}` };
+      out[`evolvingClockGainAtPreferredP${key}`] = { get: () => clk().results[reg].dp_scan.clock_gain_at_best_dp, render: signed5, note: `the composed clock's own gain (k = 1) on top of the preferred δp, ${reg}` };
+    }
+    out.evolvingClockArtifactPArcsecPerYr = { get: () => clk().p_artifact_arcsec_per_yr, render: (v) => Number(v).toFixed(3), unit: '″/yr', note: 'the precession rate the L1 line artifact was derived with (data/l1-physical-lines.json config.pArcsecPerYr)' };
+    out.evolvingClockGainAfterPreferredPMax = { get: () => clk().verdict.max_clock_gain_after_preferred_dp, render: signed5, note: 'largest gain of the composed clock (k = 1) on top of the preferred δp over all windows' };
+    out.evolvingClockPreferredDeltaPMinLr04 = { get: () => clk().verdict.preferred_dp_lr04_min, render: (v) => (v >= 0 ? '+' : '−') + Math.abs(Number(v)).toFixed(2), unit: '″/yr', note: 'smallest preferred δp over the four LR04 windows' };
+    out.evolvingClockPreferredDeltaPMaxLr04 = { get: () => clk().verdict.preferred_dp_lr04_max, render: (v) => (v >= 0 ? '+' : '−') + Math.abs(Number(v)).toFixed(2), unit: '″/yr', note: 'largest preferred δp over the four LR04 windows' };
+    out.evolvingClockMaxDeltaR2Total = { get: () => clk().verdict.max_delta_r2_total, render: signed5, note: 'largest total ΔR² of the clock-of-date fit over all windows' };
+    out.evolvingClockMaterialThreshold = { get: () => clk().verdict.material_threshold, render: (v) => String(v), note: 'the pre-stated ΔR² a clock-of-date gain must exceed to count as material' };
     for (const [key, reg] of [['PostMpt', 'post-mpt'], ['InhgMpt', 'inhg-mpt'], ['PreInhg', 'pre-inhg'], ['Lr04Full', 'lr04-full']]) {
       out[`insolExtInsolOnlyR2${key}`] = { get: () => ext().regime_results._insol_only_r2[reg], render: (v) => Number(v).toFixed(4), note: `R² of the four classical insolation features ALONE (no L1/L2/L3), regime ${reg}` };
       out[`insolExtR2L1${key}`] = { get: () => ext().regime_results[reg].r2_l1, render: (v) => Number(v).toFixed(3), note: `R² of L1 alone, regime ${reg}` };
@@ -2754,7 +2794,6 @@ export const VALUES = {
         render: (v) => thousands(v, 2),
         unit: '″/cy',
       },
-      earthJ2000Rate: { get: () => astro.knownValues.earthObservedRateHelioArcsecCy, render: (v) => thousands(v), unit: '″/cy', note: 'observed heliocentric citation — Earth has its own apsidal derivation' },
     };
     // FRAME NOTE (doc 13 §1.8). Two coordinates carry a perihelion rate:
     //   (a) ecliptic longitude — what observers publish (sidereal: the lattice
@@ -2767,7 +2806,6 @@ export const VALUES = {
     // legacy). The *EarthFrameRa* names below are the same getters, correctly
     // named; the legacy names stay for the Dutch pages.
     for (const p of ['mercury', 'venus', 'mars', 'jupiter', 'saturn', 'uranus', 'neptune']) {
-      out[`${p}J2000Rate`] = { get: () => pm().totalPrecession(2000, p), render: (v) => thousands(Math.round(v)), unit: '″/cy', note: 'LEGACY name — Earth-frame RA rate at J2000 (frame b); use <p>EarthFrameRaJ2000' };
       out[`${p}EarthFrameRaJ2000`] = { get: () => pm().totalPrecession(2000, p), render: (v) => thousands(Math.round(v)), unit: '″/cy', note: 'Earth-frame RA rate at J2000 (lattice + predict fluctuation) — the scene equator co-moves with its stars; not an observable' };
       out[`${p}J2000Fluct`] = { get: () => pm().fluct(2000, p), render: fmtSignedInt, unit: '″/cy', note: 'Earth-frame RA fluctuation at J2000 = projection excess + obliquity-rate term (+κ); not a longitude anomaly' };
     }
@@ -3353,14 +3391,13 @@ export const VALUES = {
       iceAlbedoShareObliquity:  { get: () => share('post_mpt', 'obliquity (35-50)'), render: (v) => String(Math.round(v)), unit: '%' },
       iceAlbedoSharePrecession: { get: () => share('post_mpt', 'precession (18-26)'), render: (v) => String(Math.round(v)), unit: '%' },
       iceAlbedoShareLong: { get: () => kv().iceAlbedoShareLongPct, render: (v) => String(v), unit: '%', note: 'doc 97 table — the per-regime artifact carries only the sub-130-kyr bands' },
-      mptObliquityIceSharePre:  { get: () => share('inhg_mpt', 'obliquity (35-50)'), render: (v) => String(Math.round(v)), unit: '%' },
+      // No iNHG-MPT obliquity-band share: on the shipped lines that band has no
+      // phase-concordant line in the 1–2 Myr window (four obliquity lines within
+      // 2 kyr of each other, below the window's resolution) — the per-line
+      // instrument cannot read it. The two bands it does resolve there:
       mptObliquityIceSharePost: { get: () => share('post_mpt', 'obliquity (35-50)'), render: (v) => String(Math.round(v)), unit: '%' },
-      mptObliquityShiftPP: {
-        get: () => Math.round(share('inhg_mpt', 'obliquity (35-50)')) - Math.round(share('post_mpt', 'obliquity (35-50)')),
-        render: (v) => `+${v}`,
-        unit: 'pp',
-        note: 'derived from the artifact pre/post shares',
-      },
+      mptHundredIceSharePre:    { get: () => share('inhg_mpt', '100-kyr band (75-130)'), render: (v) => String(Math.round(v)), unit: '%', note: 'iNHG-MPT 100-kyr-band ice-albedo share of total forcing (climate-ecs-per-regime)' },
+      mptPrecessionIceSharePre: { get: () => share('inhg_mpt', 'precession (18-26)'), render: (v) => String(Math.round(v)), unit: '%', note: 'iNHG-MPT precession-band ice-albedo share of total forcing (climate-ecs-per-regime)' },
       // doc 92 Tier A/B prose values (tables generated by scripts/generate_doc97_tables.py)
       ...(() => {
         const vb = () => rd('data/milankovitch-8h-variance-budget.json');
@@ -3460,21 +3497,30 @@ export const VALUES = {
         o.t7AlphaProxyHookParityFull = { get: () => t7p().verdict.hook_parity_shipped_minus_baseline_s.full, render: f2, unit: 's', note: 'T7/WP2: the table hook\'s parity — shipped proxy through the hook minus the unpatched fitter, full-window RMS' };
         return o;
       })(),
-      // doc 97 prose values (the tables themselves are generated by scripts/generate_doc97_tables.py)
-      ecsInhgObliquityK: { get: () => reg().inhg_mpt.by_band['obliquity (35-50)'].ecs_weighted_K, render: (v) => Number(v).toFixed(2), unit: 'K', note: 'iNHG-MPT obliquity-band ECS, CenCO2PIP CO₂ (climate-ecs-per-regime)' },
+      // The ECS family (scripts/climate_ecs_*.py on the shipped physical lines; doc 97 is archived).
+      // No iNHG-MPT obliquity-band key: on the shipped set that band has no
+      // phase-concordant line in a 1-Myr window (its four obliquity lines sit
+      // within 2 kyr of each other, below the window's resolution).
       ecsInhgHundredK: { get: () => reg().inhg_mpt.by_band['100-kyr band (75-130)'].ecs_weighted_K, render: (v) => Number(v).toFixed(2), unit: 'K', note: 'iNHG-MPT 100-kyr-band ECS, CenCO2PIP CO₂' },
       ecsFullForcingHundredK: { get: () => rd('data/climate-ecs-full-forcing.json').by_band['100-kyr band (75-130)'].full.weighted_mean_K, render: (v) => Number(v).toFixed(2), unit: 'K', note: 'post-MPT 100-kyr-band full-forcing ECS with constant f_ice' },
       ecsTightPostHundredK: { get: () => rd('data/climate-ecs-tight.json').regimes.post_mpt.by_band['100-kyr band (75-130)'].ecs_weighted_K, render: (v) => Number(v).toFixed(2), unit: 'K', note: 'post-MPT 100-kyr-band ECS with frequency-dependent f_ice' },
-      ecsTightInhgObliquityK: { get: () => rd('data/climate-ecs-tight.json').regimes.inhg_mpt.by_band['obliquity (35-50)'].ecs_weighted_K, render: (v) => Number(v).toFixed(2), unit: 'K', note: 'iNHG-MPT obliquity-band ECS, tightened analysis (CenCO2PIP)' },
       ecsBoronInhgObliquityK: { get: () => rd('data/climate-ecs-boron.json').regimes.inhg_mpt_dyez.by_band['obliquity (35-50)'].ecs_weighted_K, render: (v) => Number(v).toFixed(2), unit: 'K', note: 'iNHG-MPT obliquity-band ECS with boron-isotope CO₂ (Dyez 2018)' },
       ecsBoronPreObliquityDyezK: { get: () => rd('data/climate-ecs-boron.json').regimes.pre_inhg_dyez.by_band['obliquity (35-50)'].ecs_weighted_K, render: (v) => Number(v).toFixed(2), unit: 'K', note: 'pre-iNHG obliquity-band ECS, Dyez 2018 boron CO₂' },
       ecsBoronMbObliquityK: { get: () => rd('data/climate-ecs-boron.json').regimes.inhg_boundary_mb.by_band['obliquity (35-50)'].ecs_weighted_K, render: (v) => Number(v).toFixed(2), unit: 'K', note: 'iNHG-boundary obliquity-band ECS, Martinez-Boti 2015 boron CO₂' },
       ecsBoronPreObliquityDelavegaK: { get: () => rd('data/climate-ecs-boron.json').regimes.pre_inhg_delavega.by_band['obliquity (35-50)'].ecs_weighted_K, render: (v) => Number(v).toFixed(2), unit: 'K', note: 'pre-iNHG obliquity-band ECS, de la Vega 2020 boron CO₂' },
+      // The boron-vs-ice-core cross-check, band by band (tightened analysis vs climate_ecs_boron.py)
+      ecsTightPostObliquityK: { get: () => rd('data/climate-ecs-tight.json').regimes.post_mpt.by_band['obliquity (35-50)'].ecs_weighted_K, render: (v) => Number(v).toFixed(2), unit: 'K', note: 'post-MPT obliquity-band ECS, tightened analysis (EPICA CO₂)' },
+      ecsTightPostPrecessionK: { get: () => rd('data/climate-ecs-tight.json').regimes.post_mpt.by_band['precession (18-26)'].ecs_weighted_K, render: (v) => Number(v).toFixed(2), unit: 'K', note: 'post-MPT precession-band ECS, tightened analysis (EPICA CO₂)' },
+      ecsTightInhgHundredK: { get: () => rd('data/climate-ecs-tight.json').regimes.inhg_mpt.by_band['100-kyr band (75-130)'].ecs_weighted_K, render: (v) => Number(v).toFixed(2), unit: 'K', note: 'iNHG-MPT 100-kyr-band ECS, tightened analysis (CenCO2PIP, 100-kyr-smoothed)' },
+      ecsBoronPostObliquityK: { get: () => rd('data/climate-ecs-boron.json').regimes.post_mpt_chalk.by_band['obliquity (35-50)'].ecs_weighted_K, render: (v) => Number(v).toFixed(2), unit: 'K', note: 'post-MPT obliquity-band ECS with boron-isotope CO₂ (Chalk 2017)' },
+      ecsBoronPostHundredK: { get: () => rd('data/climate-ecs-boron.json').regimes.post_mpt_chalk.by_band['100-kyr band (75-130)'].ecs_weighted_K, render: (v) => Number(v).toFixed(2), unit: 'K', note: 'post-MPT 100-kyr-band ECS with boron-isotope CO₂ (Chalk 2017)' },
+      ecsBoronPostPrecessionK: { get: () => rd('data/climate-ecs-boron.json').regimes.post_mpt_chalk.by_band['precession (18-26)'].ecs_weighted_K, render: (v) => Number(v).toFixed(2), unit: 'K', note: 'post-MPT precession-band ECS with boron-isotope CO₂ (Chalk 2017)' },
+      ecsBoronInhgHundredK: { get: () => rd('data/climate-ecs-boron.json').regimes.inhg_mpt_dyez.by_band['100-kyr band (75-130)'].ecs_weighted_K, render: (v) => Number(v).toFixed(2), unit: 'K', note: 'iNHG-MPT 100-kyr-band ECS with boron-isotope CO₂ (Dyez 2018)' },
       tightFiceObliquity: { get: () => rd('data/climate-ecs-tight.json').band_f_ice['obliquity (35-50)'].f_ice, render: (v) => Number(v).toFixed(2), note: 'frequency-dependent ice fraction, obliquity band' },
       tightFiceHundred: { get: () => rd('data/climate-ecs-tight.json').band_f_ice['100-kyr band (75-130)'].f_ice, render: (v) => Number(v).toFixed(2), note: 'frequency-dependent ice fraction, 100-kyr band' },
       tightFicePrecession: { get: () => rd('data/climate-ecs-tight.json').band_f_ice['precession (18-26)'].f_ice, render: (v) => Number(v).toFixed(2), note: 'frequency-dependent ice fraction, precession band' },
-      // Re-run campaign artifacts (33-divisor lattice) — bound to their generators, not snapshots.
-      chengR2: { get: () => rd('data/climate-ecs-cross-proxy.json').cheng_R2_L1, render: (v) => Number(v).toFixed(2), note: 'full L1 lattice fitted to Cheng 2016 Asian-monsoon δ¹⁸O (climate_ecs_cross_proxy.py)' },
+      // Re-run campaign artifacts (the shipped physical lines) — bound to their generators, not snapshots.
+      chengR2: { get: () => rd('data/climate-ecs-cross-proxy.json').cheng_R2_L1, render: (v) => Number(v).toFixed(2), note: 'the full L1 line set fitted to Cheng 2016 Asian-monsoon δ¹⁸O, R² L1-only over 0–640 kyr (climate_ecs_cross_proxy.py)' },
       testAObliquityLagPercentile: { get: () => kv().testAObliquityLagPercentile, render: (v) => String(v), unit: '%' },
       testAObliquityPeakMatch: { get: () => kv().testAObliquityPeakMatch, render: (v) => String(v) },
       testAEccentricityNull: { get: () => kv().testAEccentricityNullPct, render: (v) => String(v), unit: '%' },

@@ -40,7 +40,7 @@ warnings.filterwarnings("ignore", category=UserWarning)
 SCRIPTS_DIR = Path(__file__).parent
 sys.path.insert(0, str(SCRIPTS_DIR))
 from milankovitch_climate_formula import (
-    ClimateFormula, EIGHT_H, L1_LATTICE_INTEGERS,
+    ClimateFormula, L1_LABELS, L1_PERIODS_KYR,
     load_lr04, load_epica_co2, load_cenco2pip, preprocess,
 )
 
@@ -115,10 +115,10 @@ def fit_amps(t, y, regime):
     f = ClimateFormula()
     f.fit(t, y, regime=regime, normalize=True)
     std = f._fit_y_std
-    return {n: {
-        "amp": math.hypot(f._l1_a.get(n, 0.0), f._l1_b.get(n, 0.0)) * std,
-        "phase": math.atan2(f._l1_b.get(n, 0.0), f._l1_a.get(n, 0.0)),
-    } for n in L1_LATTICE_INTEGERS}
+    return {P: {
+        "amp": math.hypot(f._l1_a.get(P, 0.0), f._l1_b.get(P, 0.0)) * std,
+        "phase": math.atan2(f._l1_b.get(P, 0.0), f._l1_a.get(P, 0.0)),
+    } for P in L1_PERIODS_KYR}
 
 
 def block_idx(n, block_n, rng):
@@ -132,17 +132,17 @@ def boot_amps(t, y, regime, block_kyr, n_boot, rng):
     """Block bootstrap → per-L1 amplitude/phase distributions."""
     dt = float(np.median(np.diff(t)))
     block_n = max(1, int(round(block_kyr / dt)))
-    out = {n: {"amp": [], "phase": []} for n in L1_LATTICE_INTEGERS}
+    out = {P: {"amp": [], "phase": []} for P in L1_PERIODS_KYR}
     for _ in range(n_boot):
         idx = block_idx(len(t), block_n, rng)
         try:
             f = ClimateFormula()
             f.fit(t, y[idx], regime=regime, normalize=True)
             std = f._fit_y_std
-            for n in L1_LATTICE_INTEGERS:
-                a = f._l1_a.get(n, 0.0); b = f._l1_b.get(n, 0.0)
-                out[n]["amp"].append(math.hypot(a, b) * std)
-                out[n]["phase"].append(math.atan2(b, a))
+            for P in L1_PERIODS_KYR:
+                a = f._l1_a.get(P, 0.0); b = f._l1_b.get(P, 0.0)
+                out[P]["amp"].append(math.hypot(a, b) * std)
+                out[P]["phase"].append(math.atan2(b, a))
         except Exception:
             continue
     return out
@@ -176,17 +176,17 @@ def compute_freq_ice_fraction(t_lr, y_lr, t_sl, y_sl, win):
     amps_sl = fit_amps(tg_s, yg_s, win)
 
     f_ice = {}
-    for n in L1_LATTICE_INTEGERS:
-        a_lr = amps_lr[n]["amp"]      # ‰
-        a_sl = amps_sl[n]["amp"]      # m
+    for P in L1_PERIODS_KYR:
+        a_lr = amps_lr[P]["amp"]      # ‰
+        a_sl = amps_sl[P]["amp"]      # m
         if a_lr <= 1e-6:
-            f_ice[n] = 0.5             # fallback
+            f_ice[P] = 0.5             # fallback
             continue
         # Convert SL amplitude to "δ¹⁸O ice-equivalent" using SL_PER_PERMIL
         a_sl_in_permil = a_sl / SL_PER_PERMIL
         f = a_sl_in_permil / a_lr
         # Clamp: f physically in [0, 1]; small > 1 likely from low-SNR LR04 line
-        f_ice[n] = float(max(0.0, min(1.5, f)))
+        f_ice[P] = float(max(0.0, min(1.5, f)))
     return f_ice, amps_lr, amps_sl
 
 
@@ -222,9 +222,9 @@ def analyze_regime(label, snyder_t, snyder_y, lr_t, lr_y, co2_t, co2_y, win,
         base_S = fit_amps(tg_s, yg_s, sub_win)
     else:
         # Use LR04 amplitude × κ as ΔT proxy
-        base_S = {n: {"amp": base_L[n]["amp"] * T_PER_PERMIL_LR04,
-                      "phase": base_L[n]["phase"] + math.pi}  # invert: δ¹⁸O↑ → T↓
-                   for n in L1_LATTICE_INTEGERS}
+        base_S = {P: {"amp": base_L[P]["amp"] * T_PER_PERMIL_LR04,
+                      "phase": base_L[P]["phase"] + math.pi}  # invert: δ¹⁸O↑ → T↓
+                   for P in L1_PERIODS_KYR}
 
     # Bootstrap each fit
     boot_L = boot_amps(tg_l, yg_l, win, BLOCK_KYR, N_BOOT, rng)
@@ -233,24 +233,24 @@ def analyze_regime(label, snyder_t, snyder_y, lr_t, lr_y, co2_t, co2_y, win,
         boot_S = boot_amps(tg_s, yg_s, sub_win, BLOCK_KYR, N_BOOT, rng)
     else:
         # Derive T bootstrap from LR04 bootstrap
-        boot_S = {n: {
-            "amp": [a * T_PER_PERMIL_LR04 for a in boot_L[n]["amp"]],
-            "phase": [p + math.pi for p in boot_L[n]["phase"]],
-        } for n in L1_LATTICE_INTEGERS}
+        boot_S = {P: {
+            "amp": [a * T_PER_PERMIL_LR04 for a in boot_L[P]["amp"]],
+            "phase": [p + math.pi for p in boot_L[P]["phase"]],
+        } for P in L1_PERIODS_KYR}
 
     # Per-line ECS with bootstrap CI
     spectrum = []
-    for n in L1_LATTICE_INTEGERS:
-        aS = base_S[n]["amp"]; pS = base_S[n]["phase"]
-        aL = base_L[n]["amp"]
-        aC = base_C[n]["amp"]; pC = base_C[n]["phase"]
+    for P in L1_PERIODS_KYR:
+        aS = base_S[P]["amp"]; pS = base_S[P]["phase"]
+        aL = base_L[P]["amp"]
+        aC = base_C[P]["amp"]; pC = base_C[P]["phase"]
         if aS <= 0 or aL <= 0 or aC <= 0: continue
         # Phase concordance — Snyder/CO₂ both rise together
         # For LR04-derived T: it's already been inverted (φ + π), so check same way
         sep = math.degrees(min(abs(wrap_pi(pC - pS)), math.pi))
         if sep > 90: continue
 
-        f_ice = f_ice_per_line.get(n, 0.5)
+        f_ice = f_ice_per_line.get(P, 0.5)
         dF_co2 = co2_forcing(aC, co2_ref)
         dF_ghg = GHG_MULT * dF_co2
         dF_ice = aL * f_ice * SL_PER_PERMIL * F_PER_M_SL
@@ -260,7 +260,7 @@ def analyze_regime(label, snyder_t, snyder_y, lr_t, lr_y, co2_t, co2_y, win,
 
         # Bootstrap ECS
         boot_ecs = []
-        for at, al, ac in zip(boot_S[n]["amp"], boot_L[n]["amp"], boot_C[n]["amp"]):
+        for at, al, ac in zip(boot_S[P]["amp"], boot_L[P]["amp"], boot_C[P]["amp"]):
             if at <= 0 or al <= 0 or ac <= 0: continue
             dFc = co2_forcing(ac, co2_ref)
             dFi = al * f_ice * SL_PER_PERMIL * F_PER_M_SL
@@ -270,8 +270,8 @@ def analyze_regime(label, snyder_t, snyder_y, lr_t, lr_y, co2_t, co2_y, win,
             if 0 < v < 50: boot_ecs.append(v)
 
         spectrum.append({
-            "n": n,
-            "period_kyr": EIGHT_H / n,
+            "line": L1_LABELS[P],
+            "period_kyr": P,
             "amp_T_K": aS,
             "amp_LR04_permil": aL,
             "amp_CO2_ppm": aC,
@@ -349,28 +349,28 @@ def main():
     f_ice_per_line, amps_lr_sl, amps_sl_sl = compute_freq_ice_fraction(
         t_lr, y_lr, t_sl, y_sl, (0, 798)
     )
-    print(f"   {'n':>4}{'P (kyr)':>9}"
+    print(f"   {'line':<28}{'P (kyr)':>9}"
           f"{'LR04 (‰)':>11}{'SL (m)':>10}{'f_ice':>8}")
     # Print most relevant lines: top by LR04 amplitude in obliquity/100k/precession bands
     band_lines_show = sorted(
-        [(n, amps_lr_sl[n]["amp"]) for n in L1_LATTICE_INTEGERS
-         if 18 <= EIGHT_H/n <= 130],
+        [(P, amps_lr_sl[P]["amp"]) for P in L1_PERIODS_KYR
+         if 18 <= P <= 130],
         key=lambda x: -x[1]
     )[:10]
-    for n, _ in band_lines_show:
-        aL = amps_lr_sl[n]["amp"]
-        aS = amps_sl_sl[n]["amp"]
-        fi = f_ice_per_line[n]
-        print(f"   {n:>4}{EIGHT_H/n:>9.1f}{aL:>11.4f}{aS:>10.3f}{fi:>8.2f}")
+    for P, _ in band_lines_show:
+        aL = amps_lr_sl[P]["amp"]
+        aS = amps_sl_sl[P]["amp"]
+        fi = f_ice_per_line[P]
+        print(f"   {L1_LABELS[P]:<28}{P:>9.1f}{aL:>11.4f}{aS:>10.3f}{fi:>8.2f}")
 
     # Show per-band mean f_ice (also written to the artifact — doc 97 §4.7 reads it)
     print()
     band_f_ice = {}
     for bname, ranges in BANDS.items():
-        in_band = [(n, f_ice_per_line[n], amps_lr_sl[n]["amp"])
-                   for n in L1_LATTICE_INTEGERS
-                   if any(lo <= EIGHT_H/n <= hi for lo, hi in ranges)
-                   and amps_lr_sl[n]["amp"] > 0.01]   # threshold low-SNR lines
+        in_band = [(P, f_ice_per_line[P], amps_lr_sl[P]["amp"])
+                   for P in L1_PERIODS_KYR
+                   if any(lo <= P <= hi for lo, hi in ranges)
+                   and amps_lr_sl[P]["amp"] > 0.01]   # threshold low-SNR lines
         if in_band:
             fs = [x[1] for x in in_band]
             ws = [x[2] for x in in_band]
@@ -452,7 +452,7 @@ def main():
             "forcing_per_m_sl_Wm2_per_m": F_PER_M_SL,
             "t_per_permil_lr04_K": T_PER_PERMIL_LR04,
         },
-        "freq_dep_ice_fraction": {str(n): f_ice_per_line[n] for n in L1_LATTICE_INTEGERS},
+        "freq_dep_ice_fraction": {f"{P:.4f}": f_ice_per_line[P] for P in L1_PERIODS_KYR},
         "band_f_ice": band_f_ice,
         "regimes": {
             "post_mpt": {"window_kyr": [0, 800], "by_band": bands_post, "spectrum": spec_post},

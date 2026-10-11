@@ -46,8 +46,8 @@ SCRIPTS_DIR = Path(__file__).parent
 sys.path.insert(0, str(SCRIPTS_DIR))
 from milankovitch_climate_formula import (   # noqa: E402
     ClimateFormula,
-    EIGHT_H,
-    L1_LATTICE_INTEGERS,
+    L1_LABELS,
+    L1_PERIODS_KYR,
     REGIME_WINDOWS,
     load_lr04,
     load_cenogrid,
@@ -118,12 +118,12 @@ def bootstrap_l1_coeffs(t: np.ndarray, y: np.ndarray, regime: str,
                         rng: np.random.Generator) -> Dict:
     """Block-bootstrap; collect L1 amplitude (physical units) and phase per line.
 
-    Returns: {n: {"amplitudes": [...], "phases": [...]}}
+    Returns: {P: {"amplitudes": [...], "phases": [...]}} keyed by the line's period (kyr)
     """
     dt = float(np.median(np.diff(t)))
     block_n = max(1, int(round(block_kyr / dt)))
 
-    result = {n: {"amplitudes": [], "phases": []} for n in L1_LATTICE_INTEGERS}
+    result = {P: {"amplitudes": [], "phases": []} for P in L1_PERIODS_KYR}
     n_fail = 0
     for i in range(n_boot):
         idx = block_bootstrap_indices(len(t), block_n, rng)
@@ -136,13 +136,13 @@ def bootstrap_l1_coeffs(t: np.ndarray, y: np.ndarray, regime: str,
         except Exception:
             n_fail += 1
             continue
-        for n in L1_LATTICE_INTEGERS:
-            an = a.get(n, 0.0)
-            bn = b.get(n, 0.0)
+        for P in L1_PERIODS_KYR:
+            an = a.get(P, 0.0)
+            bn = b.get(P, 0.0)
             amp = math.hypot(an, bn) * std
             phase = math.atan2(bn, an)
-            result[n]["amplitudes"].append(amp)
-            result[n]["phases"].append(phase)
+            result[P]["amplitudes"].append(amp)
+            result[P]["phases"].append(phase)
     if n_fail:
         print(f"  ({n_fail} bootstrap fits failed)", file=sys.stderr)
     return result
@@ -152,11 +152,11 @@ def baseline_l1(t: np.ndarray, y: np.ndarray, regime: str) -> Dict:
     """Single fit on full data; return per-L1-line (amplitude, phase, intercept-info)."""
     a, b, std = fit_and_extract(t, y, regime)
     return {
-        n: {
-            "amp": math.hypot(a.get(n, 0.0), b.get(n, 0.0)) * std,
-            "phase": math.atan2(b.get(n, 0.0), a.get(n, 0.0)),
+        P: {
+            "amp": math.hypot(a.get(P, 0.0), b.get(P, 0.0)) * std,
+            "phase": math.atan2(b.get(P, 0.0), a.get(P, 0.0)),
         }
-        for n in L1_LATTICE_INTEGERS
+        for P in L1_PERIODS_KYR
     }
 
 
@@ -241,12 +241,12 @@ def analyze_pair(t_regime: str, f_regime: str,
 
     # ── per-L1-line ECS with CI ──
     spectrum = []
-    for n in L1_LATTICE_INTEGERS:
+    for P in L1_PERIODS_KYR:
         # Baseline amplitudes & phases
-        amp_T0 = base_T[n]["amp"]
-        amp_F0 = base_F[n]["amp"]
-        ph_T0  = base_T[n]["phase"]
-        ph_F0  = base_F[n]["phase"]
+        amp_T0 = base_T[P]["amp"]
+        amp_F0 = base_F[P]["amp"]
+        ph_T0  = base_T[P]["phase"]
+        ph_F0  = base_F[P]["phase"]
         if amp_F0 <= 0 or amp_T0 <= 0:
             continue
 
@@ -254,17 +254,17 @@ def analyze_pair(t_regime: str, f_regime: str,
         ph_T_eff = wrap_pi(ph_T0 + math.pi)
         # Signed phase lag — positive = CO₂ peaks AFTER T (CO₂ lags T)
         phase_diff = wrap_pi(ph_T_eff - ph_F0)
-        period_kyr = EIGHT_H / n
+        period_kyr = P
         lag_kyr = phase_diff * period_kyr / (2 * math.pi)
         # Phase separation in raw frame (concordance check)
         sep_rad = abs(wrap_pi(ph_F0 - ph_T0))
         sep_deg = math.degrees(min(sep_rad, math.pi))
 
         # Bootstrap CI on ECS
-        amp_T_boot = boot_T[n]["amplitudes"]
-        amp_F_boot = boot_F[n]["amplitudes"]
-        ph_T_boot  = boot_T[n]["phases"]
-        ph_F_boot  = boot_F[n]["phases"]
+        amp_T_boot = boot_T[P]["amplitudes"]
+        amp_F_boot = boot_F[P]["amplitudes"]
+        ph_T_boot  = boot_T[P]["phases"]
+        ph_F_boot  = boot_F[P]["phases"]
 
         ecs_boot = []
         lag_boot = []
@@ -297,7 +297,7 @@ def analyze_pair(t_regime: str, f_regime: str,
         _, ph_F_circ_std = circ_stats(ph_F_boot)
 
         spectrum.append({
-            "n": n,
+            "line": L1_LABELS[P],
             "period_kyr": period_kyr,
             "amp_T_permil": amp_T0,
             "amp_T_p5":  pct(amp_T_boot, 5),
@@ -358,7 +358,7 @@ def analyze_pair(t_regime: str, f_regime: str,
 
     # ── per-line table ──
     print()
-    print(f"   {'n':>4}{'P (kyr)':>9}"
+    print(f"   {'line':<28}{'P (kyr)':>9}"
           f"{'ΔT (K)':>9}{'ΔF (W/m²)':>11}"
           f"{'ECS [5-95]':>16}"
           f"{'lag [5-95] (kyr)':>20}{'Δφ':>7}{'?':>3}")
@@ -366,7 +366,7 @@ def analyze_pair(t_regime: str, f_regime: str,
         ok = "✓" if r["phase_concordant"] else "✗"
         ecs_str = f"{r['ecs_K']:>5.2f} [{r['ecs_p5_K']:.1f}-{r['ecs_p95_K']:.1f}]"
         lag_str = f"{r['lag_kyr']:+5.1f} [{r['lag_p5_kyr']:+.1f}-{r['lag_p95_kyr']:+.1f}]"
-        print(f"   {r['n']:>4}{r['period_kyr']:>9.1f}"
+        print(f"   {r['line']:<28}{r['period_kyr']:>9.1f}"
               f"{r['delta_T_K']:>9.3f}{r['delta_F_Wm2']:>11.4f}"
               f"{ecs_str:>16}"
               f"{lag_str:>20}{r['phase_sep_deg']:>7.0f}{ok:>3}")
@@ -420,7 +420,7 @@ def main():
     output = {
         "method": (
             "Block-bootstrap of canonical climate formula L1 amplitudes. "
-            "ECS(n) = ΔT(n) × ΔF₂ₓ / ΔF(n); ΔT = A_d18o × κ; "
+            "ECS(P) = ΔT(P) × ΔF₂ₓ / ΔF(P) per L1 line of period P; ΔT = A_d18o × κ; "
             "ΔF = 5.35 ln(1 + A_co2/CO₂_ref). Signed lag from phase difference "
             "(positive = CO₂ lags T). ESS→Charney via Charney = ESS × (1 - α_slow)."
         ),
@@ -474,9 +474,9 @@ def analyze_pair_silent(t_regime, f_regime, t_loader, f_loader,
     raw_mask_f = (t_raw_f >= REGIME_WINDOWS[f_regime][0]) & (t_raw_f <= REGIME_WINDOWS[f_regime][1])
     co2_ref = float(np.mean(y_raw_f[raw_mask_f]))
     spectrum = []
-    for n in L1_LATTICE_INTEGERS:
-        a_T = base_T[n]["amp"]; a_F = base_F[n]["amp"]
-        p_T = base_T[n]["phase"]; p_F = base_F[n]["phase"]
+    for P in L1_PERIODS_KYR:
+        a_T = base_T[P]["amp"]; a_F = base_F[P]["amp"]
+        p_T = base_T[P]["phase"]; p_F = base_F[P]["phase"]
         if a_F <= 0 or a_T <= 0:
             continue
         dT = a_T * kappa; dF = co2_forcing(a_F, co2_ref)
@@ -486,7 +486,7 @@ def analyze_pair_silent(t_regime, f_regime, t_loader, f_loader,
         spectrum.append({
             "ecs_K": dT * F_2X / dF, "delta_T_K": dT,
             "phase_concordant": sep >= 90,
-            "period_kyr": EIGHT_H / n,
+            "period_kyr": P,
         })
     valid = [r for r in spectrum if 0 < r["ecs_K"] < 25]
     concordant = [r for r in valid if r["phase_concordant"]]

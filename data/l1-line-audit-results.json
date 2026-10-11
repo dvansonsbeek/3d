@@ -1,0 +1,1329 @@
+{
+  "metadata": {
+    "script": "milankovitch_l1_line_audit.py",
+    "lines": [
+      {
+        "period_kyr": 19.001447325297764,
+        "label": "climatic precession p+g2"
+      },
+      {
+        "period_kyr": 19.155372483100056,
+        "label": "climatic precession p+g3"
+      },
+      {
+        "period_kyr": 22.445158803235106,
+        "label": "climatic precession p+g1"
+      },
+      {
+        "period_kyr": 23.193145239083524,
+        "label": "climatic precession p+g4"
+      },
+      {
+        "period_kyr": 23.75990527269503,
+        "label": "climatic precession p+g0"
+      },
+      {
+        "period_kyr": 27.401948921129186,
+        "label": "obliquity p+s12"
+      },
+      {
+        "period_kyr": 28.991297596280972,
+        "label": "obliquity p+s1"
+      },
+      {
+        "period_kyr": 29.155358974399498,
+        "label": "obliquity p+s14"
+      },
+      {
+        "period_kyr": 29.77423626384929,
+        "label": "obliquity p+s9"
+      },
+      {
+        "period_kyr": 29.96822664834997,
+        "label": "obliquity p+s3"
+      },
+      {
+        "period_kyr": 39.836645758160245,
+        "label": "obliquity p+s2"
+      },
+      {
+        "period_kyr": 40.51952419741089,
+        "label": "obliquity p+s4"
+      },
+      {
+        "period_kyr": 41.224350938248435,
+        "label": "obliquity p+s0"
+      },
+      {
+        "period_kyr": 41.95568251678215,
+        "label": "obliquity p+s7"
+      },
+      {
+        "period_kyr": 54.134327711463335,
+        "label": "obliquity p+s10"
+      },
+      {
+        "period_kyr": 94.8779191670953,
+        "label": "eccentricity g0\u2212g2"
+      },
+      {
+        "period_kyr": 96.84902648762181,
+        "label": "eccentricity g0\u2212g6"
+      },
+      {
+        "period_kyr": 98.8438689567201,
+        "label": "eccentricity g0\u2212g3"
+      },
+      {
+        "period_kyr": 101.00506143827943,
+        "label": "eccentricity g0\u2212g5"
+      },
+      {
+        "period_kyr": 103.12379754572216,
+        "label": "eccentricity g0\u2212g7"
+      },
+      {
+        "period_kyr": 105.13718703798536,
+        "label": "eccentricity g2\u2212g4"
+      },
+      {
+        "period_kyr": 110.0293064910417,
+        "label": "eccentricity g3\u2212g4"
+      },
+      {
+        "period_kyr": 123.8461774280429,
+        "label": "eccentricity g1\u2212g2"
+      },
+      {
+        "period_kyr": 130.69097366197656,
+        "label": "eccentricity g1\u2212g3"
+      },
+      {
+        "period_kyr": 134.49598078775747,
+        "label": "eccentricity g1\u2212g5"
+      },
+      {
+        "period_kyr": 405.6256163323513,
+        "label": "eccentricity fundamental g\u2082\u2212g\u2085"
+      },
+      {
+        "period_kyr": 202.81280816617564,
+        "label": "climate-internal harmonic (g\u2082\u2212g\u2085)/2"
+      },
+      {
+        "period_kyr": 135.20853877745043,
+        "label": "climate-internal harmonic (g\u2082\u2212g\u2085)/3"
+      }
+    ],
+    "n_lines": 28,
+    "ridge_lambda": 0.01,
+    "cv": "split-half, both directions, canonical baseline (without the line) fitted on the full regime",
+    "runtime_sec": 2.339139223098755
+  },
+  "regime_results": {
+    "post-mpt": {
+      "window_kyr": [
+        0,
+        1000
+      ],
+      "r2_l1_l2_l3": 0.7788098688349251,
+      "n_cv_positive": 4,
+      "n_loo_positive": 28,
+      "best_cv_line": {
+        "label": "climatic precession p+g0",
+        "period_kyr": 23.75990527269503,
+        "pair_cv": 0.013738986775062838
+      },
+      "largest_loo_line": {
+        "label": "eccentricity g0\u2212g2",
+        "period_kyr": 94.8779191670953,
+        "loo_in": 0.028432544633824608
+      },
+      "rows": {
+        "19.0014": {
+          "label": "climatic precession p+g2",
+          "period_kyr": 19.001447325297764,
+          "amp_over_median": 0.3857779635630075,
+          "loo_in": 0.005947451792287617,
+          "pair_in": 0.002695736347114508,
+          "pair_cv": -0.002875298555654873,
+          "rank_cv": 18,
+          "rank_in": 8
+        },
+        "19.1554": {
+          "label": "climatic precession p+g3",
+          "period_kyr": 19.155372483100056,
+          "amp_over_median": 0.1629561581704635,
+          "loo_in": 0.001208413504270367,
+          "pair_in": 0.0004822763526359797,
+          "pair_cv": -0.00020188969258346564,
+          "rank_cv": 5,
+          "rank_in": 22
+        },
+        "22.4452": {
+          "label": "climatic precession p+g1",
+          "period_kyr": 22.445158803235106,
+          "amp_over_median": 0.41461154135452244,
+          "loo_in": 0.013256450519212759,
+          "pair_in": 0.012460478180208012,
+          "pair_cv": 0.009604579521617687,
+          "rank_cv": 2,
+          "rank_in": 4
+        },
+        "23.1931": {
+          "label": "climatic precession p+g4",
+          "period_kyr": 23.193145239083524,
+          "amp_over_median": 0.2941085598042393,
+          "loo_in": 0.006751082921870433,
+          "pair_in": 0.006400877610065692,
+          "pair_cv": 0.002385747971552105,
+          "rank_cv": 4,
+          "rank_in": 7
+        },
+        "23.7599": {
+          "label": "climatic precession p+g0",
+          "period_kyr": 23.75990527269503,
+          "amp_over_median": 0.47874627388415725,
+          "loo_in": 0.017918476285198603,
+          "pair_in": 0.018114797095935442,
+          "pair_cv": 0.013738986775062838,
+          "rank_cv": 1,
+          "rank_in": 2
+        },
+        "27.4019": {
+          "label": "obliquity p+s12",
+          "period_kyr": 27.401948921129186,
+          "amp_over_median": 0.09809316865042017,
+          "loo_in": 0.0005468359677864854,
+          "pair_in": 0.000624762979007043,
+          "pair_cv": -0.0016609847023198508,
+          "rank_cv": 13,
+          "rank_in": 26
+        },
+        "28.9913": {
+          "label": "obliquity p+s1",
+          "period_kyr": 28.991297596280972,
+          "amp_over_median": 1.1171714132330401,
+          "loo_in": 0.0027631055666810234,
+          "pair_in": 5.2710842325831564e-05,
+          "pair_cv": -0.005194698777600747,
+          "rank_cv": 24,
+          "rank_in": 17
+        },
+        "29.1554": {
+          "label": "obliquity p+s14",
+          "period_kyr": 29.155358974399498,
+          "amp_over_median": 1.0491850298974725,
+          "loo_in": 0.0016216008906316803,
+          "pair_in": 1.96478554388424e-05,
+          "pair_cv": -0.0024832907478317687,
+          "rank_cv": 15,
+          "rank_in": 20
+        },
+        "29.7742": {
+          "label": "obliquity p+s9",
+          "period_kyr": 29.77423626384929,
+          "amp_over_median": 0.9243294478383685,
+          "loo_in": 0.0019261409786244243,
+          "pair_in": 2.3026016936600335e-05,
+          "pair_cv": -0.0026021509377554134,
+          "rank_cv": 16,
+          "rank_in": 18
+        },
+        "29.9682": {
+          "label": "obliquity p+s3",
+          "period_kyr": 29.96822664834997,
+          "amp_over_median": 0.9666162558246969,
+          "loo_in": 0.0027883602472011937,
+          "pair_in": 6.928579142051472e-05,
+          "pair_cv": -0.00515325857318604,
+          "rank_cv": 23,
+          "rank_in": 16
+        },
+        "39.8366": {
+          "label": "obliquity p+s2",
+          "period_kyr": 39.836645758160245,
+          "amp_over_median": 0.326277013189295,
+          "loo_in": 0.0010765249049738967,
+          "pair_in": 6.327649477999575e-05,
+          "pair_cv": -0.0013224954186556773,
+          "rank_cv": 7,
+          "rank_in": 23
+        },
+        "40.5195": {
+          "label": "obliquity p+s4",
+          "period_kyr": 40.51952419741089,
+          "amp_over_median": 1.5848005980272553,
+          "loo_in": 0.005025677733736744,
+          "pair_in": 9.15103160622488e-05,
+          "pair_cv": -0.0009151711701662326,
+          "rank_cv": 6,
+          "rank_in": 10
+        },
+        "41.2244": {
+          "label": "obliquity p+s0",
+          "period_kyr": 41.224350938248435,
+          "amp_over_median": 1.8284226880383267,
+          "loo_in": 0.005906719063372923,
+          "pair_in": 0.00012835509079278662,
+          "pair_cv": -0.003601781481067821,
+          "rank_cv": 19,
+          "rank_in": 9
+        },
+        "41.9557": {
+          "label": "obliquity p+s7",
+          "period_kyr": 41.95568251678215,
+          "amp_over_median": 1.2057782640876222,
+          "loo_in": 0.010062095077225996,
+          "pair_in": 0.0008888856716594562,
+          "pair_cv": -0.005621483952480785,
+          "rank_cv": 25,
+          "rank_in": 5
+        },
+        "54.1343": {
+          "label": "obliquity p+s10",
+          "period_kyr": 54.134327711463335,
+          "amp_over_median": 0.20950385401596092,
+          "loo_in": 0.003271948619605669,
+          "pair_in": 0.00340154785504021,
+          "pair_cv": -0.009955618618384364,
+          "rank_cv": 26,
+          "rank_in": 15
+        },
+        "94.8779": {
+          "label": "eccentricity g0\u2212g2",
+          "period_kyr": 94.8779191670953,
+          "amp_over_median": 5.389712921663692,
+          "loo_in": 0.028432544633824608,
+          "pair_in": 0.0004292532092036172,
+          "pair_cv": -0.019113011636985547,
+          "rank_cv": 27,
+          "rank_in": 1
+        },
+        "96.8490": {
+          "label": "eccentricity g0\u2212g6",
+          "period_kyr": 96.84902648762181,
+          "amp_over_median": 3.1869284371060305,
+          "loo_in": 0.0036063266660675275,
+          "pair_in": 9.832225454253773e-06,
+          "pair_cv": -0.002625304908501363,
+          "rank_cv": 17,
+          "rank_in": 14
+        },
+        "98.8439": {
+          "label": "eccentricity g0\u2212g3",
+          "period_kyr": 98.8438689567201,
+          "amp_over_median": 3.0243816800820826,
+          "loo_in": 0.0018029830840292638,
+          "pair_in": 8.664902107713424e-06,
+          "pair_cv": -0.0018149289959253577,
+          "rank_cv": 14,
+          "rank_in": 19
+        },
+        "101.0051": {
+          "label": "eccentricity g0\u2212g5",
+          "period_kyr": 101.00506143827943,
+          "amp_over_median": 0.6040412649847586,
+          "loo_in": 0.0001726999798021822,
+          "pair_in": 2.7486143194810353e-07,
+          "pair_cv": -0.0014549183959575033,
+          "rank_cv": 9,
+          "rank_in": 27
+        },
+        "103.1238": {
+          "label": "eccentricity g0\u2212g7",
+          "period_kyr": 103.12379754572216,
+          "amp_over_median": 2.622784220625134,
+          "loo_in": 0.0016138397512327485,
+          "pair_in": 5.805226691246723e-06,
+          "pair_cv": -0.0014340979830230868,
+          "rank_cv": 8,
+          "rank_in": 21
+        },
+        "105.1372": {
+          "label": "eccentricity g2\u2212g4",
+          "period_kyr": 105.13718703798536,
+          "amp_over_median": 2.451130209908465,
+          "loo_in": 0.0006087337835699591,
+          "pair_in": 6.272059421608134e-06,
+          "pair_cv": -0.001457334337352077,
+          "rank_cv": 10,
+          "rank_in": 25
+        },
+        "110.0293": {
+          "label": "eccentricity g3\u2212g4",
+          "period_kyr": 110.0293064910417,
+          "amp_over_median": 2.529071974103627,
+          "loo_in": 0.008185200177276752,
+          "pair_in": 9.739003675535152e-05,
+          "pair_cv": -0.0016488073244299239,
+          "rank_cv": 12,
+          "rank_in": 6
+        },
+        "123.8462": {
+          "label": "eccentricity g1\u2212g2",
+          "period_kyr": 123.8461774280429,
+          "amp_over_median": 1.0333837441753033,
+          "loo_in": 0.004213464327449401,
+          "pair_in": 2.3688442725267045e-05,
+          "pair_cv": -0.0015741519520400737,
+          "rank_cv": 11,
+          "rank_in": 11
+        },
+        "130.6910": {
+          "label": "eccentricity g1\u2212g3",
+          "period_kyr": 130.69097366197656,
+          "amp_over_median": 2.568003140051372,
+          "loo_in": 0.003650023451717277,
+          "pair_in": 1.31844453323815e-05,
+          "pair_cv": -0.004111068855801705,
+          "rank_cv": 21,
+          "rank_in": 13
+        },
+        "134.4960": {
+          "label": "eccentricity g1\u2212g5",
+          "period_kyr": 134.49598078775747,
+          "amp_over_median": 0.6360814707316411,
+          "loo_in": 1.627275555970975e-06,
+          "pair_in": 3.850533205618234e-07,
+          "pair_cv": -0.003915144750050754,
+          "rank_cv": 20,
+          "rank_in": 28
+        },
+        "405.6256": {
+          "label": "eccentricity fundamental g\u2082\u2212g\u2085",
+          "period_kyr": 405.6256163323513,
+          "amp_over_median": 0.22705343594881733,
+          "loo_in": 0.0040005673985936685,
+          "pair_in": 0.003686629363215954,
+          "pair_cv": -0.051757140068822205,
+          "rank_cv": 28,
+          "rank_in": 12
+        },
+        "202.8128": {
+          "label": "climate-internal harmonic (g\u2082\u2212g\u2085)/2",
+          "period_kyr": 202.81280816617564,
+          "amp_over_median": 0.4431760645377412,
+          "loo_in": 0.01571528502511288,
+          "pair_in": 0.013153416851164001,
+          "pair_cv": 0.0032709066175710608,
+          "rank_cv": 3,
+          "rank_in": 3
+        },
+        "135.2085": {
+          "label": "climate-internal harmonic (g\u2082\u2212g\u2085)/3",
+          "period_kyr": 135.20853877745043,
+          "amp_over_median": 1.7191330086583445,
+          "loo_in": 0.0008350260891496486,
+          "pair_in": 4.821817752187485e-06,
+          "pair_cv": -0.005089873645383438,
+          "rank_cv": 22,
+          "rank_in": 24
+        }
+      }
+    },
+    "inhg-mpt": {
+      "window_kyr": [
+        1000,
+        2700
+      ],
+      "r2_l1_l2_l3": 0.5910872212657867,
+      "n_cv_positive": 6,
+      "n_loo_positive": 28,
+      "best_cv_line": {
+        "label": "obliquity p+s0",
+        "period_kyr": 41.224350938248435,
+        "pair_cv": 0.0500590674921456
+      },
+      "largest_loo_line": {
+        "label": "obliquity p+s0",
+        "period_kyr": 41.224350938248435,
+        "loo_in": 0.10017981460618608
+      },
+      "rows": {
+        "19.0014": {
+          "label": "climatic precession p+g2",
+          "period_kyr": 19.001447325297764,
+          "amp_over_median": 0.573987964141048,
+          "loo_in": 0.004821156093845702,
+          "pair_in": 0.0042217538602595805,
+          "pair_cv": 0.0007919272391654571,
+          "rank_cv": 6,
+          "rank_in": 14
+        },
+        "19.1554": {
+          "label": "climatic precession p+g3",
+          "period_kyr": 19.155372483100056,
+          "amp_over_median": 0.41507783169488077,
+          "loo_in": 0.0025940567273883275,
+          "pair_in": 0.0022224494583722443,
+          "pair_cv": -0.0006263466298891391,
+          "rank_cv": 9,
+          "rank_in": 21
+        },
+        "22.4452": {
+          "label": "climatic precession p+g1",
+          "period_kyr": 22.445158803235106,
+          "amp_over_median": 0.7333632944703107,
+          "loo_in": 0.008680363380337508,
+          "pair_in": 0.008513479701072302,
+          "pair_cv": 0.006920987138443484,
+          "rank_cv": 4,
+          "rank_in": 10
+        },
+        "23.1931": {
+          "label": "climatic precession p+g4",
+          "period_kyr": 23.193145239083524,
+          "amp_over_median": 0.46256410768668915,
+          "loo_in": 0.0034170705901921394,
+          "pair_in": 0.0032824996729070577,
+          "pair_cv": -0.0009934781346979194,
+          "rank_cv": 10,
+          "rank_in": 17
+        },
+        "23.7599": {
+          "label": "climatic precession p+g0",
+          "period_kyr": 23.75990527269503,
+          "amp_over_median": 0.6901984508584326,
+          "loo_in": 0.007621170679648515,
+          "pair_in": 0.007485544751753781,
+          "pair_cv": -0.009930476651598663,
+          "rank_cv": 24,
+          "rank_in": 11
+        },
+        "27.4019": {
+          "label": "obliquity p+s12",
+          "period_kyr": 27.401948921129186,
+          "amp_over_median": 0.1524904981373324,
+          "loo_in": 0.00041189604039448824,
+          "pair_in": 0.0003698851142659443,
+          "pair_cv": -1.8657692575583872e-05,
+          "rank_cv": 7,
+          "rank_in": 26
+        },
+        "28.9913": {
+          "label": "obliquity p+s1",
+          "period_kyr": 28.991297596280972,
+          "amp_over_median": 0.9037838385072983,
+          "loo_in": 0.0032982430268180263,
+          "pair_in": 0.0006990649063605137,
+          "pair_cv": -0.0051662720662895775,
+          "rank_cv": 20,
+          "rank_in": 18
+        },
+        "29.1554": {
+          "label": "obliquity p+s14",
+          "period_kyr": 29.155358974399498,
+          "amp_over_median": 0.8009974689865742,
+          "loo_in": 0.002695819205807304,
+          "pair_in": 0.0005997733521356796,
+          "pair_cv": -0.004310433261353428,
+          "rank_cv": 18,
+          "rank_in": 20
+        },
+        "29.7742": {
+          "label": "obliquity p+s9",
+          "period_kyr": 29.77423626384929,
+          "amp_over_median": 1.3517042825118095,
+          "loo_in": 0.008893492953452098,
+          "pair_in": 0.0024917758561795456,
+          "pair_cv": -0.007028408191428185,
+          "rank_cv": 21,
+          "rank_in": 9
+        },
+        "29.9682": {
+          "label": "obliquity p+s3",
+          "period_kyr": 29.96822664834997,
+          "amp_over_median": 1.4604021666805458,
+          "loo_in": 0.009845996166958582,
+          "pair_in": 0.0026454263982946813,
+          "pair_cv": -0.011248792929634271,
+          "rank_cv": 25,
+          "rank_in": 8
+        },
+        "39.8366": {
+          "label": "obliquity p+s2",
+          "period_kyr": 39.836645758160245,
+          "amp_over_median": 2.030720173820404,
+          "loo_in": 0.042544295379493,
+          "pair_in": 0.026979403200624752,
+          "pair_cv": -0.00037830625879459537,
+          "rank_cv": 8,
+          "rank_in": 2
+        },
+        "40.5195": {
+          "label": "obliquity p+s4",
+          "period_kyr": 40.51952419741089,
+          "amp_over_median": 2.1783706306615125,
+          "loo_in": 0.039682899796165794,
+          "pair_in": 0.020584656520620803,
+          "pair_cv": 0.02087538999773987,
+          "rank_cv": 2,
+          "rank_in": 3
+        },
+        "41.2244": {
+          "label": "obliquity p+s0",
+          "period_kyr": 41.224350938248435,
+          "amp_over_median": 3.4616072562342675,
+          "loo_in": 0.10017981460618608,
+          "pair_in": 0.05121823033245276,
+          "pair_cv": 0.0500590674921456,
+          "rank_cv": 1,
+          "rank_in": 1
+        },
+        "41.9557": {
+          "label": "obliquity p+s7",
+          "period_kyr": 41.95568251678215,
+          "amp_over_median": 1.136110034847242,
+          "loo_in": 0.012911016596935943,
+          "pair_in": 0.00817373752317696,
+          "pair_cv": 0.0017636476341658575,
+          "rank_cv": 5,
+          "rank_in": 7
+        },
+        "54.1343": {
+          "label": "obliquity p+s10",
+          "period_kyr": 54.134327711463335,
+          "amp_over_median": 0.9181397015136044,
+          "loo_in": 0.013718202107075417,
+          "pair_in": 0.013520205981075284,
+          "pair_cv": -0.05646070926093007,
+          "rank_cv": 28,
+          "rank_in": 6
+        },
+        "94.8779": {
+          "label": "eccentricity g0\u2212g2",
+          "period_kyr": 94.8779191670953,
+          "amp_over_median": 0.8327878339380127,
+          "loo_in": 0.0014324516555028755,
+          "pair_in": 9.79821752133958e-06,
+          "pair_cv": -0.014522298280226522,
+          "rank_cv": 27,
+          "rank_in": 23
+        },
+        "96.8490": {
+          "label": "eccentricity g0\u2212g6",
+          "period_kyr": 96.84902648762181,
+          "amp_over_median": 7.188584953812561,
+          "loo_in": 0.00643640941548318,
+          "pair_in": 1.426069948706754e-05,
+          "pair_cv": -0.007404579987751115,
+          "rank_cv": 22,
+          "rank_in": 12
+        },
+        "98.8439": {
+          "label": "eccentricity g0\u2212g3",
+          "period_kyr": 98.8438689567201,
+          "amp_over_median": 8.229238580163306,
+          "loo_in": 0.004515609316569025,
+          "pair_in": 7.5457667552125685e-06,
+          "pair_cv": -0.005033424793253149,
+          "rank_cv": 19,
+          "rank_in": 15
+        },
+        "101.0051": {
+          "label": "eccentricity g0\u2212g5",
+          "period_kyr": 101.00506143827943,
+          "amp_over_median": 1.052292389881631,
+          "loo_in": 2.2645414255118013e-05,
+          "pair_in": 1.4814397419904424e-07,
+          "pair_cv": -0.0039749690539683195,
+          "rank_cv": 17,
+          "rank_in": 28
+        },
+        "103.1238": {
+          "label": "eccentricity g0\u2212g7",
+          "period_kyr": 103.12379754572216,
+          "amp_over_median": 7.403890772356277,
+          "loo_in": 0.0032262956095391315,
+          "pair_in": 5.009301260350263e-06,
+          "pair_cv": -0.0032322654783206897,
+          "rank_cv": 16,
+          "rank_in": 19
+        },
+        "105.1372": {
+          "label": "eccentricity g2\u2212g4",
+          "period_kyr": 105.13718703798536,
+          "amp_over_median": 4.436238651568125,
+          "loo_in": 0.0041361134015388545,
+          "pair_in": 1.4806783771970089e-05,
+          "pair_cv": -0.0027064602154342515,
+          "rank_cv": 15,
+          "rank_in": 16
+        },
+        "110.0293": {
+          "label": "eccentricity g3\u2212g4",
+          "period_kyr": 110.0293064910417,
+          "amp_over_median": 1.3708932739451767,
+          "loo_in": 0.005720267998385098,
+          "pair_in": 0.0006894470825103971,
+          "pair_cv": -0.008961332734393437,
+          "rank_cv": 23,
+          "rank_in": 13
+        },
+        "123.8462": {
+          "label": "eccentricity g1\u2212g2",
+          "period_kyr": 123.8461774280429,
+          "amp_over_median": 0.6157774083942708,
+          "loo_in": 0.002137557681385349,
+          "pair_in": 0.0006127404152340699,
+          "pair_cv": -0.002296782996246317,
+          "rank_cv": 14,
+          "rank_in": 22
+        },
+        "130.6910": {
+          "label": "eccentricity g1\u2212g3",
+          "period_kyr": 130.69097366197656,
+          "amp_over_median": 0.41289541636610055,
+          "loo_in": 6.572231572876674e-05,
+          "pair_in": 4.146733780019396e-06,
+          "pair_cv": -0.001780142196048238,
+          "rank_cv": 13,
+          "rank_in": 27
+        },
+        "134.4960": {
+          "label": "eccentricity g1\u2212g5",
+          "period_kyr": 134.49598078775747,
+          "amp_over_median": 2.8286101668244084,
+          "loo_in": 0.0004381480861793685,
+          "pair_in": 6.601176124609864e-07,
+          "pair_cv": -0.001553906148528737,
+          "rank_cv": 12,
+          "rank_in": 25
+        },
+        "405.6256": {
+          "label": "eccentricity fundamental g\u2082\u2212g\u2085",
+          "period_kyr": 405.6256163323513,
+          "amp_over_median": 0.9082424848615616,
+          "loo_in": 0.014385847483717074,
+          "pair_in": 0.013430794662778078,
+          "pair_cv": 0.009548736515999981,
+          "rank_cv": 3,
+          "rank_in": 4
+        },
+        "202.8128": {
+          "label": "climate-internal harmonic (g\u2082\u2212g\u2085)/2",
+          "period_kyr": 202.81280816617564,
+          "amp_over_median": 0.9477076101183689,
+          "loo_in": 0.013765273743082451,
+          "pair_in": 0.013203688210887354,
+          "pair_cv": -0.012888732429242683,
+          "rank_cv": 26,
+          "rank_in": 5
+        },
+        "135.2085": {
+          "label": "climate-internal harmonic (g\u2082\u2212g\u2085)/3",
+          "period_kyr": 135.20853877745043,
+          "amp_over_median": 3.397166607819436,
+          "loo_in": 0.000752344291448992,
+          "pair_in": 1.9826360728725234e-06,
+          "pair_cv": -0.0014551232139990147,
+          "rank_cv": 11,
+          "rank_in": 24
+        }
+      }
+    },
+    "pre-inhg": {
+      "window_kyr": [
+        2700,
+        5320
+      ],
+      "r2_l1_l2_l3": 0.37358507286059195,
+      "n_cv_positive": 5,
+      "n_loo_positive": 27,
+      "best_cv_line": {
+        "label": "obliquity p+s0",
+        "period_kyr": 41.224350938248435,
+        "pair_cv": 0.03836208672868922
+      },
+      "largest_loo_line": {
+        "label": "obliquity p+s0",
+        "period_kyr": 41.224350938248435,
+        "loo_in": 0.09125437133704739
+      },
+      "rows": {
+        "19.0014": {
+          "label": "climatic precession p+g2",
+          "period_kyr": 19.001447325297764,
+          "amp_over_median": 0.24868426843873068,
+          "loo_in": 0.0006130050449865143,
+          "pair_in": 0.0006096970419580128,
+          "pair_cv": -0.0006221683407588461,
+          "rank_cv": 6,
+          "rank_in": 23
+        },
+        "19.1554": {
+          "label": "climatic precession p+g3",
+          "period_kyr": 19.155372483100056,
+          "amp_over_median": 0.2648139418393456,
+          "loo_in": 0.000710659762791277,
+          "pair_in": 0.0006908233647181516,
+          "pair_cv": 0.00047662882349008644,
+          "rank_cv": 4,
+          "rank_in": 21
+        },
+        "22.4452": {
+          "label": "climatic precession p+g1",
+          "period_kyr": 22.445158803235106,
+          "amp_over_median": 0.4204159258118299,
+          "loo_in": 0.0017274717688279262,
+          "pair_in": 0.001749168834630388,
+          "pair_cv": -0.022110714577267997,
+          "rank_cv": 24,
+          "rank_in": 19
+        },
+        "23.1931": {
+          "label": "climatic precession p+g4",
+          "period_kyr": 23.193145239083524,
+          "amp_over_median": 0.2590021459755904,
+          "loo_in": 0.0006537721416634001,
+          "pair_in": 0.0006539274856277588,
+          "pair_cv": -0.0009916159238349744,
+          "rank_cv": 7,
+          "rank_in": 22
+        },
+        "23.7599": {
+          "label": "climatic precession p+g0",
+          "period_kyr": 23.75990527269503,
+          "amp_over_median": 0.34980296638899977,
+          "loo_in": 0.0011879273084323128,
+          "pair_in": 0.0011923785731566827,
+          "pair_cv": -0.008700828957052115,
+          "rank_cv": 20,
+          "rank_in": 20
+        },
+        "27.4019": {
+          "label": "obliquity p+s12",
+          "period_kyr": 27.401948921129186,
+          "amp_over_median": 0.04742503531821154,
+          "loo_in": 2.6167601740456625e-05,
+          "pair_in": 2.223989361849199e-05,
+          "pair_cv": -0.00150179353513449,
+          "rank_cv": 9,
+          "rank_in": 27
+        },
+        "28.9913": {
+          "label": "obliquity p+s1",
+          "period_kyr": 28.991297596280972,
+          "amp_over_median": 0.17310178233756934,
+          "loo_in": 0.00018754260435449588,
+          "pair_in": 8.908582234479212e-05,
+          "pair_cv": -0.0019993505921910887,
+          "rank_cv": 11,
+          "rank_in": 26
+        },
+        "29.1554": {
+          "label": "obliquity p+s14",
+          "period_kyr": 29.155358974399498,
+          "amp_over_median": 0.31754249221725134,
+          "loo_in": 0.0005676077978078453,
+          "pair_in": 0.00028374731897073957,
+          "pair_cv": 0.00023256937593230695,
+          "rank_cv": 5,
+          "rank_in": 24
+        },
+        "29.7742": {
+          "label": "obliquity p+s9",
+          "period_kyr": 29.77423626384929,
+          "amp_over_median": 0.6319691635957139,
+          "loo_in": 0.002479012641480538,
+          "pair_in": 0.0014915326658074823,
+          "pair_cv": -0.002701189668544544,
+          "rank_cv": 12,
+          "rank_in": 18
+        },
+        "29.9682": {
+          "label": "obliquity p+s3",
+          "period_kyr": 29.96822664834997,
+          "amp_over_median": 0.2469148361986773,
+          "loo_in": 0.00043029524835669353,
+          "pair_in": 0.00024475477358809616,
+          "pair_cv": -0.001715428489536366,
+          "rank_cv": 10,
+          "rank_in": 25
+        },
+        "39.8366": {
+          "label": "obliquity p+s2",
+          "period_kyr": 39.836645758160245,
+          "amp_over_median": 1.1221672114021353,
+          "loo_in": 0.012445472556096848,
+          "pair_in": 0.01210287829203871,
+          "pair_cv": -0.054113014890675784,
+          "rank_cv": 26,
+          "rank_in": 9
+        },
+        "40.5195": {
+          "label": "obliquity p+s4",
+          "period_kyr": 40.51952419741089,
+          "amp_over_median": 1.4614282628116053,
+          "loo_in": 0.021180063993211373,
+          "pair_in": 0.02045505775177936,
+          "pair_cv": -0.007144124706462,
+          "rank_cv": 17,
+          "rank_in": 3
+        },
+        "41.2244": {
+          "label": "obliquity p+s0",
+          "period_kyr": 41.224350938248435,
+          "amp_over_median": 3.0573441542447184,
+          "loo_in": 0.09125437133704739,
+          "pair_in": 0.0895862933295889,
+          "pair_cv": 0.03836208672868922,
+          "rank_cv": 1,
+          "rank_in": 1
+        },
+        "41.9557": {
+          "label": "obliquity p+s7",
+          "period_kyr": 41.95568251678215,
+          "amp_over_median": 0.877832788597865,
+          "loo_in": 0.0073262453631598445,
+          "pair_in": 0.007409070973232179,
+          "pair_cv": -0.057834069443942315,
+          "rank_cv": 27,
+          "rank_in": 14
+        },
+        "54.1343": {
+          "label": "obliquity p+s10",
+          "period_kyr": 54.134327711463335,
+          "amp_over_median": 0.6342902099530335,
+          "loo_in": 0.004252283801308487,
+          "pair_in": 0.004009716448068024,
+          "pair_cv": -0.08136163193142135,
+          "rank_cv": 28,
+          "rank_in": 16
+        },
+        "94.8779": {
+          "label": "eccentricity g0\u2212g2",
+          "period_kyr": 94.8779191670953,
+          "amp_over_median": 1.6007895758144142,
+          "loo_in": 0.005276363211398238,
+          "pair_in": 0.00020557333688320245,
+          "pair_cv": -0.014436764985766196,
+          "rank_cv": 22,
+          "rank_in": 15
+        },
+        "96.8490": {
+          "label": "eccentricity g0\u2212g6",
+          "period_kyr": 96.84902648762181,
+          "amp_over_median": 7.186436139485892,
+          "loo_in": 0.011841508746094132,
+          "pair_in": 0.0001109760328342757,
+          "pair_cv": -0.0057971592469409985,
+          "rank_cv": 16,
+          "rank_in": 11
+        },
+        "98.8439": {
+          "label": "eccentricity g0\u2212g3",
+          "period_kyr": 98.8438689567201,
+          "amp_over_median": 14.012124160685635,
+          "loo_in": 0.016652665518033904,
+          "pair_in": 7.177967448945832e-05,
+          "pair_cv": -0.005362225091607269,
+          "rank_cv": 15,
+          "rank_in": 7
+        },
+        "101.0051": {
+          "label": "eccentricity g0\u2212g5",
+          "period_kyr": 101.00506143827943,
+          "amp_over_median": 16.724276344989637,
+          "loo_in": 0.019075036614676133,
+          "pair_in": 6.47906223807393e-05,
+          "pair_cv": -0.004154470374333686,
+          "rank_cv": 14,
+          "rank_in": 5
+        },
+        "103.1238": {
+          "label": "eccentricity g0\u2212g7",
+          "period_kyr": 103.12379754572216,
+          "amp_over_median": 13.927967638476103,
+          "loo_in": 0.019960281975767047,
+          "pair_in": 0.00010743252330092101,
+          "pair_cv": -0.0035940016019831017,
+          "rank_cv": 13,
+          "rank_in": 4
+        },
+        "105.1372": {
+          "label": "eccentricity g2\u2212g4",
+          "period_kyr": 105.13718703798536,
+          "amp_over_median": 5.918071014393308,
+          "loo_in": 0.017144873303733266,
+          "pair_in": 0.000468638066049909,
+          "pair_cv": -0.008640814440520266,
+          "rank_cv": 18,
+          "rank_in": 6
+        },
+        "110.0293": {
+          "label": "eccentricity g3\u2212g4",
+          "period_kyr": 110.0293064910417,
+          "amp_over_median": 1.5808979479403733,
+          "loo_in": 0.014279184971795589,
+          "pair_in": 0.006144813370165592,
+          "pair_cv": 0.00615492190976385,
+          "rank_cv": 2,
+          "rank_in": 8
+        },
+        "123.8462": {
+          "label": "eccentricity g1\u2212g2",
+          "period_kyr": 123.8461774280429,
+          "amp_over_median": 0.33958108598943276,
+          "loo_in": -2.5957361451944827e-05,
+          "pair_in": 0.0006169050204148929,
+          "pair_cv": -0.0014928253323620447,
+          "rank_cv": 8,
+          "rank_in": 28
+        },
+        "130.6910": {
+          "label": "eccentricity g1\u2212g3",
+          "period_kyr": 130.69097366197656,
+          "amp_over_median": 2.3418014660256454,
+          "loo_in": 0.011991029103029627,
+          "pair_in": 0.0014551634296415816,
+          "pair_cv": 0.0008206315032204226,
+          "rank_cv": 3,
+          "rank_in": 10
+        },
+        "134.4960": {
+          "label": "eccentricity g1\u2212g5",
+          "period_kyr": 134.49598078775747,
+          "amp_over_median": 10.840458941229798,
+          "loo_in": 0.010266595060525185,
+          "pair_in": 4.80311125341526e-05,
+          "pair_cv": -0.012060354573314065,
+          "rank_cv": 21,
+          "rank_in": 12
+        },
+        "405.6256": {
+          "label": "eccentricity fundamental g\u2082\u2212g\u2085",
+          "period_kyr": 405.6256163323513,
+          "amp_over_median": 2.122654303330272,
+          "loo_in": 0.04518215368300227,
+          "pair_in": 0.04361187293490976,
+          "pair_cv": -0.051714699625616006,
+          "rank_cv": 25,
+          "rank_in": 2
+        },
+        "202.8128": {
+          "label": "climate-internal harmonic (g\u2082\u2212g\u2085)/2",
+          "period_kyr": 202.81280816617564,
+          "amp_over_median": 0.5315826530833185,
+          "loo_in": 0.0031506979660917978,
+          "pair_in": 0.0026458444890684607,
+          "pair_cv": -0.008645476645731396,
+          "rank_cv": 19,
+          "rank_in": 17
+        },
+        "135.2085": {
+          "label": "climate-internal harmonic (g\u2082\u2212g\u2085)/3",
+          "period_kyr": 135.20853877745043,
+          "amp_over_median": 9.269276879378113,
+          "loo_in": 0.008843192111627762,
+          "pair_in": 5.1735891950399626e-05,
+          "pair_cv": -0.01558390268686418,
+          "rank_cv": 23,
+          "rank_in": 13
+        }
+      }
+    },
+    "lr04-full": {
+      "window_kyr": [
+        0,
+        5320
+      ],
+      "r2_l1_l2_l3": 0.2002808914476425,
+      "n_cv_positive": 1,
+      "n_loo_positive": 28,
+      "best_cv_line": {
+        "label": "eccentricity fundamental g\u2082\u2212g\u2085",
+        "period_kyr": 405.6256163323513,
+        "pair_cv": 0.0094183123422366
+      },
+      "largest_loo_line": {
+        "label": "obliquity p+s0",
+        "period_kyr": 41.224350938248435,
+        "loo_in": 0.0459372945052573
+      },
+      "rows": {
+        "19.0014": {
+          "label": "climatic precession p+g2",
+          "period_kyr": 19.001447325297764,
+          "amp_over_median": 0.901963811506953,
+          "loo_in": 0.002186205837246935,
+          "pair_in": 0.0021630789564038855,
+          "pair_cv": -0.01381467548130894,
+          "rank_cv": 15,
+          "rank_in": 14
+        },
+        "19.1554": {
+          "label": "climatic precession p+g3",
+          "period_kyr": 19.155372483100056,
+          "amp_over_median": 0.16172364023388036,
+          "loo_in": 7.207272827192135e-05,
+          "pair_in": 7.165987305035593e-05,
+          "pair_cv": -0.000275304244836545,
+          "rank_cv": 3,
+          "rank_in": 28
+        },
+        "22.4452": {
+          "label": "climatic precession p+g1",
+          "period_kyr": 22.445158803235106,
+          "amp_over_median": 1.117406711108154,
+          "loo_in": 0.003383507233454486,
+          "pair_in": 0.0033800871324214388,
+          "pair_cv": -0.02303376833692311,
+          "rank_cv": 19,
+          "rank_in": 9
+        },
+        "23.1931": {
+          "label": "climatic precession p+g4",
+          "period_kyr": 23.193145239083524,
+          "amp_over_median": 0.9186035241931765,
+          "loo_in": 0.0023097919396805056,
+          "pair_in": 0.0022916969949320354,
+          "pair_cv": -0.013746918013936743,
+          "rank_cv": 14,
+          "rank_in": 13
+        },
+        "23.7599": {
+          "label": "climatic precession p+g0",
+          "period_kyr": 23.75990527269503,
+          "amp_over_median": 1.088518412649125,
+          "loo_in": 0.0032215112631054366,
+          "pair_in": 0.003211482202024385,
+          "pair_cv": -0.026553236891965284,
+          "rank_cv": 20,
+          "rank_in": 11
+        },
+        "27.4019": {
+          "label": "obliquity p+s12",
+          "period_kyr": 27.401948921129186,
+          "amp_over_median": 0.30617779229522973,
+          "loo_in": 0.00026068567653958485,
+          "pair_in": 0.00026077956928127755,
+          "pair_cv": -0.0004372667756365894,
+          "rank_cv": 4,
+          "rank_in": 26
+        },
+        "28.9913": {
+          "label": "obliquity p+s1",
+          "period_kyr": 28.991297596280972,
+          "amp_over_median": 0.741401789740128,
+          "loo_in": 0.0014748151483072736,
+          "pair_in": 0.001464333151024233,
+          "pair_cv": -0.006198668569416505,
+          "rank_cv": 10,
+          "rank_in": 19
+        },
+        "29.1554": {
+          "label": "obliquity p+s14",
+          "period_kyr": 29.155358974399498,
+          "amp_over_median": 0.5252303753897989,
+          "loo_in": 0.0007486086882538823,
+          "pair_in": 0.000741202403330643,
+          "pair_cv": -0.007821117440069178,
+          "rank_cv": 11,
+          "rank_in": 25
+        },
+        "29.7742": {
+          "label": "obliquity p+s9",
+          "period_kyr": 29.77423626384929,
+          "amp_over_median": 0.7012267181036569,
+          "loo_in": 0.0013065250977244425,
+          "pair_in": 0.001284213532743106,
+          "pair_cv": -0.0018382390953763472,
+          "rank_cv": 5,
+          "rank_in": 20
+        },
+        "29.9682": {
+          "label": "obliquity p+s3",
+          "period_kyr": 29.96822664834997,
+          "amp_over_median": 0.6233530217216755,
+          "loo_in": 0.0010207384774986172,
+          "pair_in": 0.0009985772581343477,
+          "pair_cv": -0.004439490030745706,
+          "rank_cv": 8,
+          "rank_in": 24
+        },
+        "39.8366": {
+          "label": "obliquity p+s2",
+          "period_kyr": 39.836645758160245,
+          "amp_over_median": 0.6709395909655786,
+          "loo_in": 0.0011962574569654993,
+          "pair_in": 0.0011723445332761928,
+          "pair_cv": -0.009251028229145607,
+          "rank_cv": 12,
+          "rank_in": 23
+        },
+        "40.5195": {
+          "label": "obliquity p+s4",
+          "period_kyr": 40.51952419741089,
+          "amp_over_median": 0.7427508746970398,
+          "loo_in": 0.0014758773101932743,
+          "pair_in": 0.0014387080343427616,
+          "pair_cv": -0.00011368255425142816,
+          "rank_cv": 2,
+          "rank_in": 18
+        },
+        "41.2244": {
+          "label": "obliquity p+s0",
+          "period_kyr": 41.224350938248435,
+          "amp_over_median": 4.157836070027022,
+          "loo_in": 0.0459372945052573,
+          "pair_in": 0.04489045374128553,
+          "pair_cv": -0.6083287520025433,
+          "rank_cv": 28,
+          "rank_in": 1
+        },
+        "41.9557": {
+          "label": "obliquity p+s7",
+          "period_kyr": 41.95568251678215,
+          "amp_over_median": 0.30604577977087205,
+          "loo_in": 0.0002542714146861469,
+          "pair_in": 0.00025004283875196265,
+          "pair_cv": -0.016593457488998046,
+          "rank_cv": 16,
+          "rank_in": 27
+        },
+        "54.1343": {
+          "label": "obliquity p+s10",
+          "period_kyr": 54.134327711463335,
+          "amp_over_median": 0.7358041554705153,
+          "loo_in": 0.0015211780023551835,
+          "pair_in": 0.001527821480264202,
+          "pair_cv": -0.01340220271481486,
+          "rank_cv": 13,
+          "rank_in": 17
+        },
+        "94.8779": {
+          "label": "eccentricity g0\u2212g2",
+          "period_kyr": 94.8779191670953,
+          "amp_over_median": 3.7436764574968837,
+          "loo_in": 0.03725683916252187,
+          "pair_in": 0.03602694397102335,
+          "pair_cv": -0.11534325171014573,
+          "rank_cv": 27,
+          "rank_in": 2
+        },
+        "96.8490": {
+          "label": "eccentricity g0\u2212g6",
+          "period_kyr": 96.84902648762181,
+          "amp_over_median": 1.0813964758068233,
+          "loo_in": 0.0029761251343992656,
+          "pair_in": 0.002888596839270563,
+          "pair_cv": -0.07152589532513161,
+          "rank_cv": 24,
+          "rank_in": 12
+        },
+        "98.8439": {
+          "label": "eccentricity g0\u2212g3",
+          "period_kyr": 98.8438689567201,
+          "amp_over_median": 2.3742316537743235,
+          "loo_in": 0.01495570574493632,
+          "pair_in": 0.014401848954684326,
+          "pair_cv": -0.0708724723709682,
+          "rank_cv": 23,
+          "rank_in": 3
+        },
+        "101.0051": {
+          "label": "eccentricity g0\u2212g5",
+          "period_kyr": 101.00506143827943,
+          "amp_over_median": 1.3551141912973292,
+          "loo_in": 0.004801187616332636,
+          "pair_in": 0.00464973068101926,
+          "pair_cv": -0.08166420470774118,
+          "rank_cv": 25,
+          "rank_in": 8
+        },
+        "103.1238": {
+          "label": "eccentricity g0\u2212g7",
+          "period_kyr": 103.12379754572216,
+          "amp_over_median": 1.5856207056822471,
+          "loo_in": 0.006881486967188932,
+          "pair_in": 0.006730454127527263,
+          "pair_cv": -0.030668710036145522,
+          "rank_cv": 21,
+          "rank_in": 5
+        },
+        "105.1372": {
+          "label": "eccentricity g2\u2212g4",
+          "period_kyr": 105.13718703798536,
+          "amp_over_median": 1.4220469983085966,
+          "loo_in": 0.005344353916474698,
+          "pair_in": 0.005219090228393286,
+          "pair_cv": -0.1030775741500514,
+          "rank_cv": 26,
+          "rank_in": 7
+        },
+        "110.0293": {
+          "label": "eccentricity g3\u2212g4",
+          "period_kyr": 110.0293064910417,
+          "amp_over_median": 0.7637713151748412,
+          "loo_in": 0.0015889882699856583,
+          "pair_in": 0.001561305768785437,
+          "pair_cv": -0.018662606289946464,
+          "rank_cv": 17,
+          "rank_in": 16
+        },
+        "123.8462": {
+          "label": "eccentricity g1\u2212g2",
+          "period_kyr": 123.8461774280429,
+          "amp_over_median": 1.9690017697545015,
+          "loo_in": 0.010126923593553716,
+          "pair_in": 0.009914960116420457,
+          "pair_cv": -0.03705845117842173,
+          "rank_cv": 22,
+          "rank_in": 4
+        },
+        "130.6910": {
+          "label": "eccentricity g1\u2212g3",
+          "period_kyr": 130.69097366197656,
+          "amp_over_median": 1.161601742927504,
+          "loo_in": 0.003374450726549516,
+          "pair_in": 0.003013642982857223,
+          "pair_cv": -0.004957232229062142,
+          "rank_cv": 9,
+          "rank_in": 10
+        },
+        "134.4960": {
+          "label": "eccentricity g1\u2212g5",
+          "period_kyr": 134.49598078775747,
+          "amp_over_median": 1.8661000902049485,
+          "loo_in": 0.0012064413124709406,
+          "pair_in": 0.00020010756507160554,
+          "pair_cv": -0.0027343697452802095,
+          "rank_cv": 7,
+          "rank_in": 21
+        },
+        "405.6256": {
+          "label": "eccentricity fundamental g\u2082\u2212g\u2085",
+          "period_kyr": 405.6256163323513,
+          "amp_over_median": 1.4151953489790297,
+          "loo_in": 0.005851740446698228,
+          "pair_in": 0.005905287228450851,
+          "pair_cv": 0.0094183123422366,
+          "rank_cv": 1,
+          "rank_in": 6
+        },
+        "202.8128": {
+          "label": "climate-internal harmonic (g\u2082\u2212g\u2085)/2",
+          "period_kyr": 202.81280816617564,
+          "amp_over_median": 0.8440619722169196,
+          "loo_in": 0.0018249516646826613,
+          "pair_in": 0.001839326142540787,
+          "pair_cv": -0.022109491108381493,
+          "rank_cv": 18,
+          "rank_in": 15
+        },
+        "135.2085": {
+          "label": "climate-internal harmonic (g\u2082\u2212g\u2085)/3",
+          "period_kyr": 135.20853877745043,
+          "amp_over_median": 1.9078099335795116,
+          "loo_in": 0.0011989965924560364,
+          "pair_in": 0.00014675863511171006,
+          "pair_cv": -0.002242203788065495,
+          "rank_cv": 6,
+          "rank_in": 22
+        }
+      }
+    }
+  }
+}

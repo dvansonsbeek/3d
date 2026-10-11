@@ -73,7 +73,6 @@ const LEDGER = {
   'scripts/lod_residual_lattice_fit.py': 'frozen residual fit',
   'scripts/paleo_l1_renumbering.py': 'frozen L1 renumbering',
   'scripts/paleo_lod_comparison.py': 'frozen paleo comparison',
-  'scripts/test_evolving_8h_climate_formula.py': 'frozen climate-formula test',
   // predict_tilt_from_eccentricity.py was here until its label was made
   // dynamic — this gate's drift rule caught it pinned at 23.41357 after the
   // IAU 2006 refit moved earthtiltMean to 23.41353. First live catch.

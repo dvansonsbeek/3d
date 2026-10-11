@@ -38,7 +38,7 @@ warnings.filterwarnings("ignore", category=UserWarning)
 SCRIPTS_DIR = Path(__file__).parent
 sys.path.insert(0, str(SCRIPTS_DIR))
 from milankovitch_climate_formula import (
-    ClimateFormula, EIGHT_H, L1_LATTICE_INTEGERS,
+    ClimateFormula, L1_LABELS, L1_PERIODS_KYR,
     load_lr04, load_epica_co2, load_cenco2pip, preprocess,
 )
 
@@ -84,9 +84,9 @@ def fit_amps(t, y, regime):
     f.fit(t, y, regime=regime, normalize=True)
     std = f._fit_y_std
     out = {}
-    for n in L1_LATTICE_INTEGERS:
-        a = f._l1_a.get(n, 0.0); b = f._l1_b.get(n, 0.0)
-        out[n] = {
+    for P in L1_PERIODS_KYR:
+        a = f._l1_a.get(P, 0.0); b = f._l1_b.get(P, 0.0)
+        out[P] = {
             "amp": math.hypot(a, b) * std,
             "phase": math.atan2(b, a),
         }
@@ -114,10 +114,10 @@ def analyze_regime(label, t_snyder, y_snyder, t_lr, y_lr, t_co2, y_co2, win, co2
     print(f"\n  ── {label} ─────────────────────────────────────────────────")
     print(f"     window: {win} kyr,  CO₂_ref: {co2_ref:.1f} ppm{co2_caveat}")
     spectrum = []
-    for n in L1_LATTICE_INTEGERS:
-        aS = amps_S[n]["amp"]; pS = amps_S[n]["phase"]
-        aL = amps_L[n]["amp"]
-        aE = amps_E[n]["amp"]; pE = amps_E[n]["phase"]
+    for P in L1_PERIODS_KYR:
+        aS = amps_S[P]["amp"]; pS = amps_S[P]["phase"]
+        aL = amps_L[P]["amp"]
+        aE = amps_E[P]["amp"]; pE = amps_E[P]["phase"]
         if aS <= 0 or aE <= 0 or aL <= 0: continue
         sep = math.degrees(min(abs(wrap_pi(pE - pS)), math.pi))
         if sep > 90: continue  # require concordance
@@ -131,7 +131,7 @@ def analyze_regime(label, t_snyder, y_snyder, t_lr, y_lr, t_co2, y_co2, win, co2
         ecs_full = aS * F_2X / dF_tot
         ice_share = dF_ice / dF_tot
         spectrum.append({
-            "n": n, "period_kyr": EIGHT_H / n,
+            "line": L1_LABELS[P], "period_kyr": P,
             "amp_T_K": aS, "amp_LR04": aL, "amp_CO2": aE,
             "dF_co2": dF_co2, "dF_ice": dF_ice, "dF_total": dF_tot,
             "ice_share": ice_share, "ecs_full_K": ecs_full,

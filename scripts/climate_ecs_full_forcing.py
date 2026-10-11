@@ -59,7 +59,7 @@ warnings.filterwarnings("ignore", category=UserWarning)
 SCRIPTS_DIR = Path(__file__).parent
 sys.path.insert(0, str(SCRIPTS_DIR))
 from milankovitch_climate_formula import (   # noqa
-    ClimateFormula, EIGHT_H, L1_LATTICE_INTEGERS,
+    ClimateFormula, L1_LABELS, L1_PERIODS_KYR,
     REGIME_WINDOWS, load_lr04, load_epica_co2, preprocess,
 )
 
@@ -129,26 +129,26 @@ def block_idx(n, block_n, rng):
 def boot_l1(t, y, regime, block_kyr, n_boot, rng):
     dt = float(np.median(np.diff(t)))
     block_n = max(1, int(round(block_kyr / dt)))
-    out = {n: {"amp": [], "phase": []} for n in L1_LATTICE_INTEGERS}
+    out = {P: {"amp": [], "phase": []} for P in L1_PERIODS_KYR}
     for _ in range(n_boot):
         idx = block_idx(len(t), block_n, rng)
         try:
             a, b, std = fit_extract(t, y[idx], regime)
         except Exception:
             continue
-        for n in L1_LATTICE_INTEGERS:
-            an, bn = a.get(n, 0.0), b.get(n, 0.0)
-            out[n]["amp"].append(math.hypot(an, bn) * std)
-            out[n]["phase"].append(math.atan2(bn, an))
+        for P in L1_PERIODS_KYR:
+            an, bn = a.get(P, 0.0), b.get(P, 0.0)
+            out[P]["amp"].append(math.hypot(an, bn) * std)
+            out[P]["phase"].append(math.atan2(bn, an))
     return out
 
 
 def baseline(t, y, regime):
     a, b, std = fit_extract(t, y, regime)
-    return {n: {
-        "amp": math.hypot(a.get(n, 0.0), b.get(n, 0.0)) * std,
-        "phase": math.atan2(b.get(n, 0.0), a.get(n, 0.0)),
-    } for n in L1_LATTICE_INTEGERS}
+    return {P: {
+        "amp": math.hypot(a.get(P, 0.0), b.get(P, 0.0)) * std,
+        "phase": math.atan2(b.get(P, 0.0), a.get(P, 0.0)),
+    } for P in L1_PERIODS_KYR}
 
 
 def wrap_pi(a):
@@ -210,10 +210,10 @@ def main():
 
     # Per-line: compute ECS under CO₂-only vs full forcing
     spectrum = []
-    for n in L1_LATTICE_INTEGERS:
-        aS = base_S[n]["amp"];  pS = base_S[n]["phase"]   # K
-        aL = base_L[n]["amp"]                              # ‰
-        aE = base_E[n]["amp"];  pE = base_E[n]["phase"]   # ppm
+    for P in L1_PERIODS_KYR:
+        aS = base_S[P]["amp"];  pS = base_S[P]["phase"]   # K
+        aL = base_L[P]["amp"]                              # ‰
+        aE = base_E[P]["amp"];  pE = base_E[P]["phase"]   # ppm
         if aS <= 0 or aE <= 0: continue
 
         # Forcings
@@ -232,7 +232,7 @@ def main():
         # Bootstrap full-forcing ECS
         ecs_full_boot = []
         ecs_co2_boot  = []
-        for at, al, af in zip(boot_S[n]["amp"], boot_L[n]["amp"], boot_E[n]["amp"]):
+        for at, al, af in zip(boot_S[P]["amp"], boot_L[P]["amp"], boot_E[P]["amp"]):
             if at <= 0 or af <= 0: continue
             dFc = co2_forcing(af, co2_ref)
             dFi = ice_albedo_forcing(al)
@@ -241,11 +241,11 @@ def main():
             ecs_full_boot.append(at * F_2X / dFt)
             ecs_co2_boot.append(at * F_2X / dFc)
 
-        period = EIGHT_H / n
+        period = P
         sep_deg = math.degrees(min(abs(wrap_pi(pE - pS)), math.pi))
 
         spectrum.append({
-            "n": n,
+            "line": L1_LABELS[P],
             "period_kyr": period,
             "amp_T_K": aS,
             "amp_lr04_permil": aL,
@@ -269,7 +269,7 @@ def main():
     print()
     print("   Per L1 line:  ΔF decomposition + ECS comparison")
     print("   " + "─" * 92)
-    print(f"   {'n':>4}{'P (kyr)':>9}"
+    print(f"   {'line':<28}{'P (kyr)':>9}"
           f"{'ΔT (K)':>9}"
           f"{'F_CO₂':>9}{'F_GHG':>9}{'F_ice':>9}{'F_tot':>9}"
           f"{'ice %':>8}"
@@ -277,7 +277,7 @@ def main():
     for r in sorted(spectrum, key=lambda x: x["period_kyr"]):
         if not r["phase_concordant"]: continue
         ice_pct = 100 * r["ice_share_of_dF"]
-        print(f"   {r['n']:>4}{r['period_kyr']:>9.1f}"
+        print(f"   {r['line']:<28}{r['period_kyr']:>9.1f}"
               f"{r['amp_T_K']:>9.4f}"
               f"{r['dF_co2_Wm2']:>9.3f}{r['dF_otherGHG_Wm2']:>9.3f}"
               f"{r['dF_ice_Wm2']:>9.3f}{r['dF_total_Wm2']:>9.3f}"
@@ -290,14 +290,15 @@ def main():
     def stats(rows, key):
         if not rows: return None
         v = np.array([r[key] for r in rows])
-        v = v[(v > 0) & (v < 50)]   # filter outliers
+        w = np.array([r["amp_T_K"] for r in rows])
+        keep = (v > 0) & (v < 50)   # filter outliers — ONE mask for values and weights
+        v, w = v[keep], w[keep]
         if len(v) == 0: return None
-        w = np.array([r["amp_T_K"] for r in rows])[: len(v)]
         return {
             "n_lines": len(v),
             "mean_K": float(np.mean(v)),
             "median_K": float(np.median(v)),
-            "weighted_mean_K": float(np.average(v, weights=w[:len(v)])),
+            "weighted_mean_K": float(np.average(v, weights=w)),
             "p5_K": float(np.percentile(v, 5)),
             "p95_K": float(np.percentile(v, 95)),
         }

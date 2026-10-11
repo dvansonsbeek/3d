@@ -2156,50 +2156,82 @@ mechanism) with a single scalar free parameter.
 
 ## Why the climate formula keeps its J2000 line periods — measured
 
-The climate formula evaluates its precession-band lines at their J2000 periods. For deep-time fits the clock over the data window was slightly faster (this measurement used the retired spin-only scaling ∝ LOD; the composed clock differs from it by the lunar term, below 0.1 % over 5 Myr — the conclusion is unchanged):
+Two of the three L1 line families carry the precession rate p: the obliquity
+lines (p + s_i) and the climatic-precession lines (p + g_i). On the composed
+lunisolar clock p was faster in the past — Earth spun faster and the Moon was
+closer — so a p-line's phase accumulates extra cycles,
+Δ(t) = ∫₀ᵗ (1/T_p(t′) − 1/T_p(2000)) dt′, the same count for every p-line. The
+eccentricity lines (g_i − g_j) and the 405-kyr family carry no p and ride the
+solar-mass tier. The window means of T_p(t)/T_p(2000) on the composed clock
+(`createModel().lunisolar.meanPeriodYearsAtYear`):
 
-| Climate window | Years (Myr) | Avg clock/clock_now | period correction |
-|:---|---:|:---|:---|
-| Post-MPT (LR04) | 0-1.0 | 0.99991 | **+0.01%** (negligible) |
-| Pleistocene | 0-3.0 | 0.99973 | +0.03% (negligible) |
-| LR04 full | 0-5.3 | ~0.9995 | +0.05% (negligible) |
-| EPICA CO₂ | 0-0.8 | 0.99993 | <0.01% (negligible) |
-| iNHG-MPT | 1.0-2.7 | ~0.9998 | +0.02% (negligible) |
-| **CENOGRID Cenozoic** | **0-66** | **0.99411** | **+0.59%** (modest) |
-| Mesozoic | 0-250 | 0.97768 | +2.23% (significant) |
-| Phanerozoic | 0-540 | 0.94829 | +5.17% (substantial) |
+| Climate window | kyr | mean T_p(t)/T_p(2000) | period correction | extra precession cycles |
+|:---|---:|---:|---:|---:|
+| post-MPT (LR04) | 0–1,000 | <!--v:evolvingClockMeanRatioPostMpt-->0.99978<!--/v--> | <!--v:evolvingClockPeriodCorrectionPctPostMpt-->−0.02<!--/v--> % | <!--v:evolvingClockExtraCyclesPostMpt-->0.01<!--/v--> |
+| Pleistocene | 0–3,000 | <!--v:evolvingClockMeanRatioPleistocene-->0.99933<!--/v--> | <!--v:evolvingClockPeriodCorrectionPctPleistocene-->−0.07<!--/v--> % | <!--v:evolvingClockExtraCyclesPleistocene-->0.08<!--/v--> |
+| LR04 full | 0–5,320 | <!--v:evolvingClockMeanRatioLr04Full-->0.99881<!--/v--> | <!--v:evolvingClockPeriodCorrectionPctLr04Full-->−0.12<!--/v--> % | <!--v:evolvingClockExtraCyclesLr04Full-->0.25<!--/v--> |
+| EPICA CO₂ | 0–800 | <!--v:evolvingClockMeanRatioEpica-->0.99982<!--/v--> | <!--v:evolvingClockPeriodCorrectionPctEpica-->−0.02<!--/v--> % | <!--v:evolvingClockExtraCyclesEpica-->0.01<!--/v--> |
+| iNHG-MPT | 1,000–2,700 | <!--v:evolvingClockMeanRatioInhgMpt-->0.99917<!--/v--> | <!--v:evolvingClockPeriodCorrectionPctInhgMpt-->−0.08<!--/v--> % | <!--v:evolvingClockExtraCyclesInhgMpt-->0.05<!--/v--> |
+| CENOGRID Cenozoic | 0–66,000 | <!--v:evolvingClockMeanRatioCenogrid-->0.98532<!--/v--> | <!--v:evolvingClockPeriodCorrectionPctCenogrid-->−1.47<!--/v--> % | <!--v:evolvingClockExtraCyclesCenogrid-->38.35<!--/v--> |
+| Mesozoic | 0–250,000 | <!--v:evolvingClockMeanRatioMesozoic-->0.94583<!--/v--> | <!--v:evolvingClockPeriodCorrectionPctMesozoic-->−5.42<!--/v--> % | <!--v:evolvingClockExtraCyclesMesozoic-->566.43<!--/v--> |
+| Phanerozoic (the model's domain) | 0–500,000 | <!--v:evolvingClockMeanRatioPhanerozoic-->0.89503<!--/v--> | <!--v:evolvingClockPeriodCorrectionPctPhanerozoic-->−10.50<!--/v--> % | <!--v:evolvingClockExtraCyclesPhanerozoic-->2368.92<!--/v--> |
 
-**For Quaternary fits (LR04, EPICA): correction is negligible (<0.1%).** The current climate formula is essentially correct for these timescales.
+Over LR04 the correction is a tenth of a percent — a quarter of a precession
+cycle at 5.3 Myr; over CENOGRID 1.5 % and 38 cycles; at the Phanerozoic 10 %.
+Anyone fitting pre-Cenozoic spectra with the formula evaluates the p-lines on
+the composed clock per epoch.
 
-**For CENOGRID (0-66 Myr): correction is ~0.6%.** Modest but worth implementing for highest-precision fits. The current formula uses the J2000 line periods for all 66 Myr; the actual average should be 0.59% lower.
+### The measured verdict — the clock buys nothing; the records resolve p instead
 
-**For deeper time fits (Mesozoic+, Phanerozoic-scale): correction becomes significant.** If anyone uses the framework to fit pre-Cenozoic climate spectra, they should evaluate the precession-band lines on ψ̇(t) per epoch (the generated tables above).
+`scripts/test_evolving_clock_climate_formula.py` fits each window twice with
+the shipped fitter — every line at its J2000 period, and the p-carrying lines
+on their own warped time τ = t + Δ(t)·P — and runs three controls: the warp
+scaled by k (k = 1 the model's clock, k = −1 the counter-rotating sign), the
+two halves of each window fitted alone, and a constant frequency offset δp on
+the p-lines ("which p does the record want?"), with the clock's gain
+re-measured on top of the preferred δp.
 
-### The measured verdict — a time-evolving clock buys nothing
+| Window | ΔR² total, clock alone | sign control (k = −1) | preferred δp | ΔR² at that δp | clock on top of it |
+|:---|---:|---:|---:|---:|---:|
+| LR04 post-MPT (0–1 Myr) | <!--v:evolvingClockDeltaR2TotalPostMpt-->+0.00035<!--/v--> | <!--v:evolvingClockDeltaR2AtScaleMinusOnePostMpt-->−0.00037<!--/v--> | <!--v:evolvingClockPreferredDeltaPPostMpt-->+0.24<!--/v--> ″/yr | <!--v:evolvingClockDeltaR2AtPreferredPPostMpt-->+0.00457<!--/v--> | <!--v:evolvingClockGainAtPreferredPPostMpt-->−0.00009<!--/v--> |
+| LR04 iNHG-MPT (1–2.7 Myr) | <!--v:evolvingClockDeltaR2TotalInhgMpt-->+0.00464<!--/v--> | <!--v:evolvingClockDeltaR2AtScaleMinusOneInhgMpt-->−0.00502<!--/v--> | <!--v:evolvingClockPreferredDeltaPInhgMpt-->+0.22<!--/v--> ″/yr | <!--v:evolvingClockDeltaR2AtPreferredPInhgMpt-->+0.01421<!--/v--> | <!--v:evolvingClockGainAtPreferredPInhgMpt-->−0.00038<!--/v--> |
+| LR04 pre-iNHG (2.7–5.3 Myr) | <!--v:evolvingClockDeltaR2TotalPreInhg-->+0.02796<!--/v--> | <!--v:evolvingClockDeltaR2AtScaleMinusOnePreInhg-->−0.00084<!--/v--> | <!--v:evolvingClockPreferredDeltaPPreInhg-->+0.30<!--/v--> ″/yr | <!--v:evolvingClockDeltaR2AtPreferredPPreInhg-->+0.09539<!--/v--> | <!--v:evolvingClockGainAtPreferredPPreInhg-->−0.01136<!--/v--> |
+| LR04 full (0–5.3 Myr) | <!--v:evolvingClockDeltaR2TotalLr04Full-->+0.02798<!--/v--> | <!--v:evolvingClockDeltaR2AtScaleMinusOneLr04Full-->−0.00675<!--/v--> | <!--v:evolvingClockPreferredDeltaPLr04Full-->+0.20<!--/v--> ″/yr | <!--v:evolvingClockDeltaR2AtPreferredPLr04Full-->+0.14387<!--/v--> | <!--v:evolvingClockGainAtPreferredPLr04Full-->−0.00961<!--/v--> |
+| CENOGRID (0–66 Myr) | <!--v:evolvingClockDeltaR2TotalCenogrid-->−0.00006<!--/v--> | <!--v:evolvingClockDeltaR2AtScaleMinusOneCenogrid-->−0.00006<!--/v--> | <!--v:evolvingClockPreferredDeltaPCenogrid-->+0.30<!--/v--> ″/yr | <!--v:evolvingClockDeltaR2AtPreferredPCenogrid-->+0.00036<!--/v--> | <!--v:evolvingClockGainAtPreferredPCenogrid-->−0.00055<!--/v--> |
+| Cheng 2016 (0–640 kyr, U-Th, untuned) | <!--v:evolvingClockDeltaR2TotalCheng-->+0.00026<!--/v--> | <!--v:evolvingClockDeltaR2AtScaleMinusOneCheng-->−0.00027<!--/v--> | <!--v:evolvingClockPreferredDeltaPCheng-->+0.42<!--/v--> ″/yr | <!--v:evolvingClockDeltaR2AtPreferredPCheng-->+0.00947<!--/v--> | <!--v:evolvingClockGainAtPreferredPCheng-->−0.00013<!--/v--> |
 
-The structurally-correct alternative — evaluating the L1 sum on periods
-scaled by `LOD_paleo(t) / LOD_now` instead of the J2000 constants —
-is measured directly (`scripts/test_evolving_8h_climate_formula.py`,
-constant vs phase-warped fits on actual data):
+Reading:
 
-| Regime | ΔR² L1 | ΔR² total | Max phase shift |
-|:---|---:|---:|---:|
-| LR04 post-MPT (0-1 Myr) | +0.00001 | +0.00043 | 0.02 kyr |
-| LR04 iNHG-MPT (1-2.7 Myr) | +0.00003 | +0.00141 | 0.13 kyr |
-| LR04 pre-iNHG (2.7-5.3 Myr) | +0.00041 | +0.00032 | 0.44 kyr |
-| LR04 full (0-5.3 Myr) | +0.00010 | +0.00002 | 0.59 kyr |
-| **CENOGRID (0-66 Myr)** | **+0.00013** | **-0.00003** | **159.9 kyr** |
+1. **The clock alone looks like a gain** in the older LR04 regimes, with the
+   right sign (the counter-rotating warp loses) and in both halves of each
+   window — but the warp-scale scan does not peak at the model's clock: it
+   keeps rising past k = 3. The record wants far more phase drift than the
+   composed clock carries.
+2. **A constant frequency offset explains it.** With the p-lines evaluated at
+   p + δp, every LR04 window prefers δp =
+   <!--v:evolvingClockPreferredDeltaPMinLr04-->+0.20<!--/v-->…<!--v:evolvingClockPreferredDeltaPMaxLr04-->+0.30<!--/v--> ″/yr,
+   and on top of that offset the clock of date subtracts in every window
+   (largest gain <!--v:evolvingClockGainAfterPreferredPMax-->−0.00009<!--/v-->).
+   The "clock gain" was a frequency offset in disguise: inside one window a
+   phase drift and a frequency offset both raise a line's mean frequency.
+3. **The offset is not the tuning target alone.** LR04 is tuned to La2004,
+   whose precession constant (50.476 ″/yr) sits 0.19 ″/yr above the p the line
+   artifact was derived with
+   (<!--v:evolvingClockArtifactPArcsecPerYr-->50.288<!--/v--> ″/yr — the
+   model's J2000 precession reading, 1,296,000 ″ over
+   <!--v:evolvingClockTpJ2000Yr-->25771<!--/v--> yr, the general precession in
+   longitude). The U-Th-dated Cheng 2016 record carries no orbital tuning and
+   asks for the same direction, with a broad optimum over its 640 kyr.
 
-**Result: a time-evolving clock does NOT materially improve R²** — all improvements are below 0.002, mostly below 0.001. For CENOGRID (the longest window where the phase shift is most significant at 160 kyr), R² actually decreases slightly.
-
-**Why doesn't it help in practice?**
-1. **LR04 timescale**: the clock's variation over 5 Myr is sub-0.5 kyr — invisible compared to L1 sinusoid wavelengths (14.5-298 kyr).
-2. **CENOGRID timescale**: 160 kyr phase shift over 66 Myr exists, but L1 free amplitudes (cos and sin per integer) absorb small phase shifts through coefficient adjustment. L3 step transitions dominate CENOGRID variance anyway.
-3. **The framework is "self-correcting"**: with 32 × 2 = 64 free L1 coefficients, the formula has enough flexibility to absorb small frequency drift.
-
-**Conclusion: keep the J2000 line periods for the current climate formula.** A time-evolving clock is structurally correct but provides no measurable empirical benefit. The current implementation is essentially optimal for available climate datasets.
-
-This is itself an interesting result: it validates that the **framework's free-amplitude L1 fitting is robust to small phase drift**. Implementations don't need to track the clock's evolution explicitly; the fitting absorbs it.
+**Conclusion.** The composed clock's drift is below what any available
+record resolves — the formula keeps its J2000 line periods, now measured on
+the right physics (only the p-carrying lines warp). What the records do
+resolve is the p those lines carry: both prefer a rate 0.2–0.4 ″/yr above
+the general precession in longitude — the range of the spin-axis precession
+conventions (the luni-solar rate 50.388 ″/yr; Laskar 2004's precession
+constant 50.476 ″/yr). Which rate the obliquity and climatic-precession line
+construction should carry is an open question of the line derivation
+(doc 92), recorded here with its measurement.
 
 ---
 

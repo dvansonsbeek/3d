@@ -29,7 +29,7 @@ warnings.filterwarnings("ignore", category=UserWarning)
 SCRIPTS_DIR = Path(__file__).parent
 sys.path.insert(0, str(SCRIPTS_DIR))
 from milankovitch_climate_formula import (
-    ClimateFormula, EIGHT_H, L1_LATTICE_INTEGERS, REGIME_WINDOWS,
+    ClimateFormula, L1_LABELS, L1_PERIODS_KYR, REGIME_WINDOWS,
     load_lr04, load_epica_co2, preprocess,
 )
 
@@ -79,9 +79,9 @@ def fit_amps(t, y, regime):
     f.fit(t, y, regime=regime, normalize=True)
     std = f._fit_y_std
     out = {}
-    for n in L1_LATTICE_INTEGERS:
-        a = f._l1_a.get(n, 0.0); b = f._l1_b.get(n, 0.0)
-        out[n] = {
+    for P in L1_PERIODS_KYR:
+        a = f._l1_a.get(P, 0.0); b = f._l1_b.get(P, 0.0)
+        out[P] = {
             "amp": math.hypot(a, b) * std,
             "phase": math.atan2(b, a),
         }
@@ -122,13 +122,14 @@ def main():
 
     # Pre-compute per-line phase concordance (independent of calibration)
     line_meta = {}
-    for n in L1_LATTICE_INTEGERS:
-        aS = amps_S[n]["amp"]; aL = amps_L[n]["amp"]; aE = amps_E[n]["amp"]
+    for P in L1_PERIODS_KYR:
+        aS = amps_S[P]["amp"]; aL = amps_L[P]["amp"]; aE = amps_E[P]["amp"]
         if aS <= 0 or aE <= 0 or aL <= 0: continue
-        pS = amps_S[n]["phase"]; pE = amps_E[n]["phase"]
+        pS = amps_S[P]["phase"]; pE = amps_E[P]["phase"]
         sep = math.degrees(min(abs(wrap_pi(pE - pS)), math.pi))
-        line_meta[n] = {
-            "period_kyr": EIGHT_H / n,
+        line_meta[P] = {
+            "line": L1_LABELS[P],
+            "period_kyr": P,
             "amp_T_K": aS,
             "amp_LR04": aL,
             "amp_CO2": aE,
@@ -153,8 +154,8 @@ def main():
         ghg_m = draws["other_ghg_mult"][draw_i]
 
         # Per-line ECS for this draw
-        line_ecs = {}    # n -> ecs
-        for n, m in line_meta.items():
+        line_ecs = {}    # P (period, kyr) -> ecs
+        for P, m in line_meta.items():
             if not m["phase_concordant"]: continue
             dF_co2 = ALPHA * math.log(1 + m["amp_CO2"] / co2_ref)
             dF_ghg = ghg_m * dF_co2
@@ -163,13 +164,13 @@ def main():
             if dF_tot < 1e-9: continue
             ecs = m["amp_T_K"] * F_2X / dF_tot
             if not (0 < ecs < 50): continue
-            line_ecs[n] = ecs
+            line_ecs[P] = ecs
 
         # Aggregate per band (ΔT-weighted)
         for bname, ranges in BANDS.items():
-            rows_in_band = [(line_meta[n]["amp_T_K"], ecs)
-                            for n, ecs in line_ecs.items()
-                            if any(lo <= line_meta[n]["period_kyr"] <= hi
+            rows_in_band = [(line_meta[P]["amp_T_K"], ecs)
+                            for P, ecs in line_ecs.items()
+                            if any(lo <= line_meta[P]["period_kyr"] <= hi
                                    for lo, hi in ranges)]
             if rows_in_band:
                 ws = np.array([w for w, _ in rows_in_band])
@@ -178,7 +179,7 @@ def main():
 
         # Overall (all concordant lines)
         if line_ecs:
-            ws = np.array([line_meta[n]["amp_T_K"] for n in line_ecs])
+            ws = np.array([line_meta[P]["amp_T_K"] for P in line_ecs])
             es = np.array(list(line_ecs.values()))
             overall_ecs.append(float(np.average(es, weights=ws)))
 

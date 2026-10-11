@@ -483,6 +483,75 @@ Reading:
 
 Output: [`data/insolation-stability-results.json`](../data/insolation-stability-results.json).
 
+### 9.1 Every shipped line on the same footing
+
+[`scripts/milankovitch_l1_line_audit.py`](../scripts/milankovitch_l1_line_audit.py)
+puts each of the <!--v:l1LineCount-->28<!--/v--> shipped lines through the same
+instrument per regime: drop the line, refit the canonical formula on the full
+regime, re-add it as a free-phase pair on the residual (ridge, split-half
+cross-validated), and record the in-sample R² the full fit loses without it.
+Read a negative cross-validated value as *non-stationary amplitude across the
+two halves* — the regime thesis — not as "spurious".
+
+| Regime | R² | lines CV-positive | best CV line (ΔR²) | largest leave-one-out loss (ΔR²) |
+|---|---:|---:|---|---|
+| post-MPT | <!--v:l1AuditR2PostMpt-->0.7788<!--/v--> | <!--v:l1AuditCvPositivePostMpt-->4<!--/v--> | <!--v:l1AuditBestCvLinePostMpt-->climatic precession p+g0<!--/v--> (<!--v:l1AuditBestCvDeltaR2PostMpt-->+0.0137<!--/v-->) | <!--v:l1AuditLargestLooLinePostMpt-->eccentricity g0−g2<!--/v--> (<!--v:l1AuditLargestLooDeltaR2PostMpt-->+0.0284<!--/v-->) |
+| iNHG-MPT | <!--v:l1AuditR2InhgMpt-->0.5911<!--/v--> | <!--v:l1AuditCvPositiveInhgMpt-->6<!--/v--> | <!--v:l1AuditBestCvLineInhgMpt-->obliquity p+s0<!--/v--> (<!--v:l1AuditBestCvDeltaR2InhgMpt-->+0.0501<!--/v-->) | <!--v:l1AuditLargestLooLineInhgMpt-->obliquity p+s0<!--/v--> (<!--v:l1AuditLargestLooDeltaR2InhgMpt-->+0.1002<!--/v-->) |
+| pre-iNHG | <!--v:l1AuditR2PreInhg-->0.3736<!--/v--> | <!--v:l1AuditCvPositivePreInhg-->5<!--/v--> | <!--v:l1AuditBestCvLinePreInhg-->obliquity p+s0<!--/v--> (<!--v:l1AuditBestCvDeltaR2PreInhg-->+0.0384<!--/v-->) | <!--v:l1AuditLargestLooLinePreInhg-->obliquity p+s0<!--/v--> (<!--v:l1AuditLargestLooDeltaR2PreInhg-->+0.0913<!--/v-->) |
+| lr04-full | <!--v:l1AuditR2Lr04Full-->0.2003<!--/v--> | <!--v:l1AuditCvPositiveLr04Full-->1<!--/v--> | <!--v:l1AuditBestCvLineLr04Full-->eccentricity fundamental g₂−g₅<!--/v--> (<!--v:l1AuditBestCvDeltaR2Lr04Full-->+0.0094<!--/v-->) | <!--v:l1AuditLargestLooLineLr04Full-->obliquity p+s0<!--/v--> (<!--v:l1AuditLargestLooDeltaR2Lr04Full-->+0.0459<!--/v-->) |
+
+Reading: the 41-kyr obliquity line carries both older regimes out of sample
+and is the largest single loss on the full record — where its cross-validated
+value is deeply negative, the regime split made visible by one line. The
+eccentricity cluster at 95–105 kyr dominates amplitude but cross-validates
+negative inside every window: the band is carried by several near-degenerate
+beats whose per-line phases do not hold across a half-window.
+
+### 9.2 Which period does the ~100-kyr band want?
+
+[`scripts/milankovitch_ecc_period_scan.py`](../scripts/milankovitch_ecc_period_scan.py)
+scans a free-phase line over 79–149 kyr in 0.25-kyr steps against the raw
+record and the canonical residual with the band's
+<!--v:eccScanBandLines-->8<!--/v--> shipped lines (75–130 kyr) removed — band
+open, so the scan does not look into a hole where a shipped line sits — and,
+on that open residual, evaluates the same pair at each shipped band line's own
+period. The cross-validated argmax is the phase-stable line; the in-sample
+argmax follows the power.
+
+- **Pre-iNHG, band open:** the stationary line is at
+  <!--v:eccScanPreInhgCvBestKyr-->112.8<!--/v--> kyr (CV ΔR²
+  <!--v:eccScanPreInhgMaxCv-->+0.0296<!--/v-->, half-max
+  <!--v:eccScanPreInhgCvHalfmaxLoKyr-->112.0<!--/v-->–<!--v:eccScanPreInhgCvHalfmaxHiKyr-->113.3<!--/v--> kyr).
+  The nearest shipped line is <!--v:eccScanPreInhgNearestLineLabel-->eccentricity g3−g4<!--/v-->
+  at <!--v:eccScanPreInhgNearestLineKyr-->110.0<!--/v--> kyr,
+  <!--v:eccScanPreInhgOffsetFromNearestLinePct-->+2.5<!--/v--> % away, and at its
+  own period the pair does not cross-validate
+  (<!--v:eccScanPreInhgCvAtNearestLine-->−0.1170<!--/v-->): over 2,600 kyr a
+  2.5 % period offset is 0.6 cycle of phase, enough to decorrelate. No shipped
+  band line reads positive out of sample there (the best,
+  <!--v:eccScanPreInhgBestCvShippedLineLabel-->eccentricity g1−g2<!--/v-->, is
+  <!--v:eccScanPreInhgBestCvShippedLineCv-->−0.0060<!--/v-->). The in-sample
+  power peak sits at <!--v:eccScanPreInhgInBestKyr-->98.5<!--/v--> kyr (the
+  classical ~100k) and does not cross-validate
+  (<!--v:eccScanPreInhgInBestCv-->−0.0134<!--/v-->).
+- **Post-MPT, band open:** the stationary line is at
+  <!--v:eccScanPostMptCvBestKyr-->93.5<!--/v--> kyr,
+  <!--v:eccScanPostMptOffsetFromNearestLinePct-->−1.5<!--/v--> % from
+  <!--v:eccScanPostMptNearestLineLabel-->eccentricity g0−g2<!--/v-->
+  (<!--v:eccScanPostMptNearestLineKyr-->94.9<!--/v--> kyr), which does
+  cross-validate at its own period
+  (<!--v:eccScanPostMptCvAtNearestLine-->+0.0862<!--/v-->).
+
+So the pre-iNHG record carries a stationary ~112.7-kyr line that the derived
+set does not contain: the secular beats bracket it (110.0 and 123.8 kyr) and
+neither holds its phase across the window. The comb-era reading of this
+measurement (§10.4) put it on the retired single-line e(t); on the shipped
+model it is an open residual line of the pre-iNHG regime — recorded, not
+explained.
+
+Outputs: [`data/l1-line-audit-results.json`](../data/l1-line-audit-results.json),
+[`data/ecc-period-scan-results.json`](../data/ecc-period-scan-results.json).
+
 ---
 
 ## 10. L1 attribution — the gain is the lattice line n = 24 (comb-era record)
@@ -552,72 +621,25 @@ Refitting the canonical formula with 24 added (33 divisors):
 
 ### 10.3 Every divisor on the same footing — the audit that decided admission
 
-Before admitting n = 24, every shipped divisor was put through the same
-instrument ([`scripts/milankovitch_l1_divisor_audit.py`](../scripts/milankovitch_l1_divisor_audit.py)):
-drop the divisor, refit the canonical formula on the full regime, and re-add
-it as a free-phase pair on the residual, in-sample and split-half
-cross-validated. (A naive half-window leave-one-out of the whole 33-term
-formula is numerically ill-conditioned and was discarded.) Read a negative
-cross-validated value as *non-stationary amplitude across the window* — doc
-91's regime thesis — not as "spurious".
-
-- **Pre-iNHG**, the regime where the line lives, n = 24 ranks
-  <!--v:l1AuditN24RankCvPreInhg-->3<!--/v--> of <!--v:l1DivisorCount-->33<!--/v--> by
-  cross-validated gain and <!--v:l1AuditN24RankInPreInhg-->6<!--/v--> by in-sample
-  leave-one-out loss — ahead of most of the shipped lattice there.
-- **Full record**, it is one of only <!--v:l1AuditCvPositiveLr04Full-->8<!--/v-->
-  divisors with a positive cross-validated gain
-  (rank <!--v:l1AuditN24RankCvLr04Full-->5<!--/v-->), while remaining
-  subthreshold in amplitude (<!--v:l1N24AmpOverMedianLr04Full-->0.79<!--/v-->× median).
-- The six MTM-enrichment sidebands (96, 107, 110, 134, 152, 185) explain no
-  variance in any regime (largest leave-one-out loss
-  <!--v:l1AuditSidebandMaxLooIn96-->+0.0068<!--/v--> for n = 96, the rest ≤
-  <!--v:l1AuditSidebandMaxLooIn107-->+0.0034<!--/v-->); they are spectral-criterion
-  members (Test L) and this variance audit neither admits nor retires them.
-
-**Admitted.** n = 24 joins L1 as its <!--v:l1DivisorCount-->33<!--/v-->rd divisor on
-the regime clause of the admission rule stated in
-doc 91 §1 (archived) (≥ 1.5× median *and* cross-validated
-positive in a named regime — the same basis as the six pre-MPT-only members).
-Consequence for the LOD chain: the deep-time α(t) reads the post-MPT L1 layer,
-so the admission refit moved it; `alphaClimateScalePerMille` was recalibrated
-to hold dα/dt(J2000) at the Cox–Chao target and the ΔT stack re-closed
-(Step 7c), see [doc 104](104-millennial-rotation-swing.md).
+Before admitting n = 24, every comb divisor was put through the drop-refit-
+re-add instrument of §9.1; on the comb, n = 24 ranked among the top three
+pre-iNHG divisors by cross-validated gain and was admitted on the regime
+clause of the comb's admission rule (doc 91, archived). That admission refit
+moved the post-MPT L1 layer the deep-time α(t) reads, so
+`alphaClimateScalePerMille` was recalibrated to hold dα/dt(J2000) at the
+Cox–Chao target and the ΔT stack re-closed (Step 7c), see
+[doc 104](104-millennial-rotation-swing.md). The comb-era readings of the
+audit are not kept; the same instrument on the shipped lines is §9.1.
 
 ### 10.4 Turned around — which period does the record want?
 
-[`scripts/milankovitch_ecc_period_scan.py`](../scripts/milankovitch_ecc_period_scan.py)
-scans a free-phase line over n = 18…34 (149 → 79 kyr) in 0.05 steps against
-the raw record, the canonical residual with the 100-kyr band members
-22/24/25/28 removed (band open — the line under test must be out, or the scan
-looks at its own hole), and the pre-admission lattice (every divisor but 24).
-The cross-validated argmax is the phase-stable line; the in-sample argmax just
-follows the power.
+The free-period scan is §9.2. The pre-iNHG stationary line it finds
+(~112.7 kyr) is a property of the record, not of the comb: the comb-era
+reading put it on 8H/24 = H/3 (0.8 % away) and bounded "Earth's eccentricity
+line" to 112.7 ± 0.6 kyr; on the shipped model it is an open residual line of
+the pre-iNHG regime, 2.5 % from the nearest derived beat.
 
-- **Pre-iNHG, band open:** the stationary line is at
-  <!--v:eccScanPreInhgCvBestKyr-->112.7<!--/v--> kyr
-  (n = <!--v:eccScanPreInhgCvBestN-->23.80<!--/v-->), CV half-max
-  <!--v:eccScanPreInhgCvHalfmaxLoKyr-->112.0<!--/v-->–<!--v:eccScanPreInhgCvHalfmaxHiKyr-->113.2<!--/v--> kyr —
-  <!--v:eccScanOffsetFromModelPct-->+0.8<!--/v-->% from the model's 8H/24, inside the
-  ~1% orbital-tuning uncertainty of LR04's Pliocene chronology and far inside
-  the Rayleigh resolution (Δn ≈ 1). The neighbouring lattice integers are
-  rejected out of sample: 8H/23 <!--v:eccScanPreInhgCvAt23-->−0.0587<!--/v-->,
-  8H/25 <!--v:eccScanPreInhgCvAt25-->−0.0155<!--/v--> (8H/24
-  <!--v:eccScanPreInhgCvAt24-->+0.0064<!--/v-->).
-- The in-sample power peak sits at <!--v:eccScanPreInhgInBestKyr-->98.4<!--/v--> kyr
-  (the classical ~100k) but does not cross-validate
-  (<!--v:eccScanPreInhgInBestCv-->−0.0164<!--/v-->); post-MPT the band's stationary
-  line is at <!--v:eccScanPostMptCvBestKyr-->102.0<!--/v--> kyr — the multi-planet
-  beat band of doc 91, not Earth's line.
-
-So the answer to "8H/24 or 8H/23 or something else" is 8H/24: on the lattice
-only 24 survives; off the lattice the record's best is 0.8% away with no fitted
-phase needed. The pre-iNHG record thereby bounds Earth's eccentricity line to
-112.7 ± ~0.6 kyr, consistent with H/3; H/3 ± 4% is excluded.
-
-Outputs: [`data/l1-n24-attribution-results.json`](../data/l1-n24-attribution-results.json),
-[`data/l1-divisor-audit-results.json`](../data/l1-divisor-audit-results.json),
-[`data/ecc-period-scan-results.json`](../data/ecc-period-scan-results.json).
+Output: [`data/l1-n24-attribution-results.json`](../data/l1-n24-attribution-results.json).
 
 ---
 

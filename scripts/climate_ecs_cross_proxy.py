@@ -51,7 +51,7 @@ import numpy as np
 SCRIPTS_DIR = Path(__file__).parent
 sys.path.insert(0, str(SCRIPTS_DIR))
 from milankovitch_climate_formula import (   # noqa
-    ClimateFormula, EIGHT_H, L1_LATTICE_INTEGERS,
+    ClimateFormula, L1_LABELS, L1_PERIODS_KYR,
     REGIME_WINDOWS, load_lr04, load_epica_co2, preprocess,
 )
 
@@ -90,17 +90,17 @@ def fit_and_amps(t, y, regime):
     summary = f.fit(t, y, regime=regime, normalize=True)
     std = f._fit_y_std
     return ({
-        n: {
-            "amp": math.hypot(f._l1_a.get(n, 0.0), f._l1_b.get(n, 0.0)) * std,
-            "phase": math.atan2(f._l1_b.get(n, 0.0), f._l1_a.get(n, 0.0)),
+        P: {
+            "amp": math.hypot(f._l1_a.get(P, 0.0), f._l1_b.get(P, 0.0)) * std,
+            "phase": math.atan2(f._l1_b.get(P, 0.0), f._l1_a.get(P, 0.0)),
         }
-        for n in L1_LATTICE_INTEGERS
+        for P in L1_PERIODS_KYR
     }, summary)
 
 
 def main():
     print("=" * 90)
-    print("  Cross-proxy validation of L1 lattice + obliquity-band ECS")
+    print("  Cross-proxy validation of the L1 line set + obliquity-band ECS")
     print("=" * 90)
 
     # ── 1. Fit Cheng 2016 in 0-640 kyr (max Cheng coverage) ──
@@ -143,22 +143,22 @@ def main():
     print()
     print("  L1 amplitudes per proxy (physical units), top 12 by max amplitude")
     print("  " + "─" * 88)
-    print(f"  {'n':>4}{'P (kyr)':>9}"
+    print(f"  {'line':<28}{'P (kyr)':>9}"
           f"{'LR04 (‰)':>11}{'Cheng (‰)':>12}{'EPICA (ppm)':>14}"
           f"{'ratio C/LR':>12}{'Δφ(C-LR)':>11}")
     rows = []
-    for n in L1_LATTICE_INTEGERS:
-        a_l = amps_lr04[n]["amp"]
-        a_c = amps_cheng[n]["amp"]
-        a_e = amps_epica[n]["amp"]
+    for P in L1_PERIODS_KYR:
+        a_l = amps_lr04[P]["amp"]
+        a_c = amps_cheng[P]["amp"]
+        a_e = amps_epica[P]["amp"]
         ratio = a_c / a_l if a_l > 0 else float("inf")
         dphi = math.degrees(
-            ((amps_cheng[n]["phase"] - amps_lr04[n]["phase"]) + math.pi) % (2 * math.pi)
+            ((amps_cheng[P]["phase"] - amps_lr04[P]["phase"]) + math.pi) % (2 * math.pi)
             - math.pi
         )
         rows.append({
-            "n": n,
-            "period_kyr": EIGHT_H / n,
+            "line": L1_LABELS[P],
+            "period_kyr": P,
             "amp_lr04_permil": a_l,
             "amp_cheng_permil": a_c,
             "amp_epica_ppm": a_e,
@@ -167,13 +167,13 @@ def main():
         })
     rows_sorted = sorted(rows, key=lambda r: -max(r["amp_lr04_permil"], r["amp_cheng_permil"]))[:12]
     for r in rows_sorted:
-        print(f"  {r['n']:>4}{r['period_kyr']:>9.1f}"
+        print(f"  {r['line']:<28}{r['period_kyr']:>9.1f}"
               f"{r['amp_lr04_permil']:>11.4f}{r['amp_cheng_permil']:>12.4f}"
               f"{r['amp_epica_ppm']:>14.4f}"
               f"{r['ratio_cheng_lr04']:>12.2f}{r['phase_diff_deg']:>+11.1f}")
 
     # ── 5. Dominant-line agreement check (Spearman rank corr) ──
-    all_l1 = [(amps_lr04[n]["amp"], amps_cheng[n]["amp"]) for n in L1_LATTICE_INTEGERS]
+    all_l1 = [(amps_lr04[P]["amp"], amps_cheng[P]["amp"]) for P in L1_PERIODS_KYR]
     arr_l = np.array([x[0] for x in all_l1])
     arr_c = np.array([x[1] for x in all_l1])
     rank_l = arr_l.argsort().argsort()
@@ -185,17 +185,17 @@ def main():
     # Identify dominant lines: top-5 amplitudes per proxy
     top_l_idx = list(arr_l.argsort()[-5:])
     top_c_idx = list(arr_c.argsort()[-5:])
-    top_l_n = {L1_LATTICE_INTEGERS[int(i)] for i in top_l_idx}
-    top_c_n = {L1_LATTICE_INTEGERS[int(i)] for i in top_c_idx}
+    top_l = {L1_LABELS[L1_PERIODS_KYR[int(i)]] for i in top_l_idx}
+    top_c = {L1_LABELS[L1_PERIODS_KYR[int(i)]] for i in top_c_idx}
 
     print()
     print("  Cross-proxy agreement (LR04 vs Cheng L1 amplitudes)")
     print(f"    Pearson r           : {pearson:+.3f}")
     print(f"    Spearman ρ          : {spearman:+.3f}")
-    print(f"    Top-5 LR04 lines    : n ∈ {sorted(top_l_n)}")
-    print(f"    Top-5 Cheng lines   : n ∈ {sorted(top_c_n)}")
-    print(f"    Shared top-5        : n ∈ {sorted(top_l_n & top_c_n)}  "
-          f"({len(top_l_n & top_c_n)}/5)")
+    print(f"    Top-5 LR04 lines    : {sorted(top_l)}")
+    print(f"    Top-5 Cheng lines   : {sorted(top_c)}")
+    print(f"    Shared top-5        : {sorted(top_l & top_c)}  "
+          f"({len(top_l & top_c)}/5)")
 
     # ── 6. Obliquity-band ECS — Cheng version (assuming Asian Monsoon κ) ──
     #
@@ -206,17 +206,16 @@ def main():
     # larger swings than benthic δ¹⁸O).
     ALPHA = 5.35
     F_2X = ALPHA * math.log(2)
-    obliq_lines = [n for n in L1_LATTICE_INTEGERS
-                   if 35 <= EIGHT_H / n <= 50]
+    obliq_lines = [P for P in L1_PERIODS_KYR if 35 <= P <= 50]
 
     print()
-    print("  Obliquity-band ECS (n where 35-50 kyr): Cheng-vs-LR04, ΔT-weighted")
-    print(f"  {'n':>4}{'P (kyr)':>9}"
+    print("  Obliquity-band ECS (lines with 35-50 kyr): Cheng-vs-LR04, ΔT-weighted")
+    print(f"  {'line':<28}{'P (kyr)':>9}"
           f"{'ECS_LR04 [κ=2.5]':>20}{'ECS_Cheng [κ=1.5]':>21}")
-    for n in obliq_lines:
-        a_l = amps_lr04[n]["amp"]   # ‰ benthic
-        a_c = amps_cheng[n]["amp"]   # ‰ monsoon
-        a_e = amps_epica[n]["amp"]   # ppm
+    for P in obliq_lines:
+        a_l = amps_lr04[P]["amp"]   # ‰ benthic
+        a_c = amps_cheng[P]["amp"]   # ‰ monsoon
+        a_e = amps_epica[P]["amp"]   # ppm
         if a_e <= 0:
             continue
         dF = ALPHA * math.log(1 + a_e / co2_ref)
@@ -224,17 +223,17 @@ def main():
             continue
         ecs_l = a_l * 2.5 * F_2X / dF      # κ=2.5 for benthic
         ecs_c = a_c * 1.5 * F_2X / dF      # κ=1.5 for monsoon (lit value)
-        print(f"  {n:>4}{EIGHT_H/n:>9.1f}"
+        print(f"  {L1_LABELS[P]:<28}{P:>9.1f}"
               f"{ecs_l:>20.2f}{ecs_c:>21.2f}")
 
     # ── 7. Output ──
     result = {
         "method": (
-            "Cross-proxy check on L1 lattice structure. LR04 (benthic δ¹⁸O) "
+            "Cross-proxy check on the L1 line set. LR04 (benthic δ¹⁸O) "
             "and Cheng 2016 (Asian Monsoon δ¹⁸O, U-Th dated, independent chronology) "
-            "are fit with the same L1 lattice over a matched 0-640 kyr window. "
-            "If both proxies show the same dominant L1 integers with consistent "
-            "relative amplitudes, the lattice structure is real climate behaviour."
+            "are fit with the same L1 lines over a matched 0-640 kyr window. "
+            "If both proxies show the same dominant lines with consistent "
+            "relative amplitudes, the line structure is real climate behaviour."
         ),
         "window_kyr": window_cheng,
         "lr04_R2_L1": float(sum_lr04.r2_l1_only),
@@ -242,7 +241,7 @@ def main():
         "epica_R2_L1": float(sum_epica.r2_l1_only),
         "pearson_correlation": pearson,
         "spearman_correlation": spearman,
-        "shared_top5_n": sorted(top_l_n & top_c_n),
+        "shared_top5_lines": sorted(top_l & top_c),
         "per_line_amplitudes": rows,
         "snyder_available": SNYDER_FILE.exists(),
         "snyder_note": (
@@ -258,11 +257,11 @@ def main():
     print("  Interpretation")
     print("=" * 90)
     if pearson > 0.5:
-        verdict = "STRONG cross-proxy agreement — L1 lattice is mechanism-independent."
+        verdict = "STRONG cross-proxy agreement — the L1 line set is mechanism-independent."
     elif pearson > 0.3:
         verdict = "MODERATE agreement — formula structure validated; some proxy-specific scaling."
     else:
-        verdict = "WEAK agreement — lattice may be partially proxy-specific."
+        verdict = "WEAK agreement — the line set may be partially proxy-specific."
     print(f"  Verdict (Pearson r = {pearson:+.2f}): {verdict}")
     print()
     if SNYDER_FILE.exists():
@@ -271,7 +270,7 @@ def main():
         print(f"  Snyder 2016 not present. To enable direct-SAT ECS cross-check:")
         print(f"    1. Download nature19798 SI from a Nature subscription (≈900 KB xlsx)")
         print(f"    2. Save as {SNYDER_FILE}")
-        print(f"    3. Re-run scripts/climate_ecs_full.py — it will auto-add a third pair.")
+        print(f"    3. Re-run scripts/climate_ecs_snyder.py — the direct-GAST analysis.")
     print()
     print(f"  Wrote: {OUTPUT}")
 

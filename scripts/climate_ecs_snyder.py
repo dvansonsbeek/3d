@@ -7,7 +7,7 @@ Replaces the δ¹⁸O × κ pathway with Snyder 2016's direct GAST reconstructio
 
 What this answers
 -----------------
-The LR04+EPICA analysis (climate_ecs_full.py) gave obliquity-band Charney
+The LR04+EPICA analysis (climate_ecs_phase_lag.py) gave obliquity-band Charney
 sensitivity = 4.06 K [3.85–5.03] under κ=2.5 K/‰. The κ calibration was the
 dominant systematic — under reasonable κ ∈ [1.5, 4.0] the answer spans
 3.0–8.9 K.
@@ -50,7 +50,7 @@ warnings.filterwarnings("ignore", category=UserWarning)
 SCRIPTS_DIR = Path(__file__).parent
 sys.path.insert(0, str(SCRIPTS_DIR))
 from milankovitch_climate_formula import (   # noqa
-    ClimateFormula, EIGHT_H, L1_LATTICE_INTEGERS,
+    ClimateFormula, L1_LABELS, L1_PERIODS_KYR,
     REGIME_WINDOWS, load_epica_co2, preprocess,
 )
 
@@ -104,7 +104,7 @@ def load_snyder_gast():
             np.asarray(t_lo), np.asarray(t_hi))
 
 
-# ── Bootstrap helpers (copied from climate_ecs_full.py) ──────────────────────
+# ── Bootstrap helpers (shared with climate_ecs_phase_lag.py) ─────────────────
 def fit_and_extract(t, y, regime):
     f = ClimateFormula()
     f.fit(t, y, regime=regime, normalize=True)
@@ -123,26 +123,26 @@ def block_bootstrap_indices(n, block_n, rng):
 def bootstrap_l1(t, y, regime, block_kyr, n_boot, rng):
     dt = float(np.median(np.diff(t)))
     block_n = max(1, int(round(block_kyr / dt)))
-    result = {n: {"amplitudes": [], "phases": []} for n in L1_LATTICE_INTEGERS}
+    result = {P: {"amplitudes": [], "phases": []} for P in L1_PERIODS_KYR}
     for _ in range(n_boot):
         idx = block_bootstrap_indices(len(t), block_n, rng)
         try:
             a, b, std = fit_and_extract(t, y[idx], regime)
         except Exception:
             continue
-        for n in L1_LATTICE_INTEGERS:
-            an = a.get(n, 0.0); bn = b.get(n, 0.0)
-            result[n]["amplitudes"].append(math.hypot(an, bn) * std)
-            result[n]["phases"].append(math.atan2(bn, an))
+        for P in L1_PERIODS_KYR:
+            an = a.get(P, 0.0); bn = b.get(P, 0.0)
+            result[P]["amplitudes"].append(math.hypot(an, bn) * std)
+            result[P]["phases"].append(math.atan2(bn, an))
     return result
 
 
 def baseline_l1(t, y, regime):
     a, b, std = fit_and_extract(t, y, regime)
-    return {n: {
-        "amp": math.hypot(a.get(n, 0.0), b.get(n, 0.0)) * std,
-        "phase": math.atan2(b.get(n, 0.0), a.get(n, 0.0)),
-    } for n in L1_LATTICE_INTEGERS}
+    return {P: {
+        "amp": math.hypot(a.get(P, 0.0), b.get(P, 0.0)) * std,
+        "phase": math.atan2(b.get(P, 0.0), a.get(P, 0.0)),
+    } for P in L1_PERIODS_KYR}
 
 
 def wrap_pi(angle):
@@ -212,21 +212,21 @@ def main():
 
     # ── Per-line ECS ──
     spectrum = []
-    for n in L1_LATTICE_INTEGERS:
-        amp_T0 = base_T[n]["amp"]   # K
-        amp_F0 = base_F[n]["amp"]   # ppm
+    for P in L1_PERIODS_KYR:
+        amp_T0 = base_T[P]["amp"]   # K
+        amp_F0 = base_F[P]["amp"]   # ppm
         if amp_T0 <= 0 or amp_F0 <= 0:
             continue
 
-        ph_T0 = base_T[n]["phase"]
-        ph_F0 = base_F[n]["phase"]
+        ph_T0 = base_T[P]["phase"]
+        ph_F0 = base_F[P]["phase"]
         # GAST is POSITIVE temperature anomaly (warmer = higher value); CO₂ is
         # also positive (more = higher). So they're expected to be IN-PHASE for
         # orbital-coupled cycles. Concordant if phase separation ≤ 90°.
         sep_rad = abs(wrap_pi(ph_F0 - ph_T0))
         sep_deg = math.degrees(min(sep_rad, math.pi))
         # Signed lag — positive = CO₂ peaks AFTER T (CO₂ lags T)
-        period_kyr = EIGHT_H / n
+        period_kyr = P
         phase_diff = wrap_pi(ph_T0 - ph_F0)
         lag_kyr = phase_diff * period_kyr / (2 * math.pi)
 
@@ -236,8 +236,8 @@ def main():
         # Bootstrap CI on ECS, lag
         ecs_boot = []
         lag_boot = []
-        for at, af, pt, pf in zip(boot_T[n]["amplitudes"], boot_F[n]["amplitudes"],
-                                   boot_T[n]["phases"], boot_F[n]["phases"]):
+        for at, af, pt, pf in zip(boot_T[P]["amplitudes"], boot_F[P]["amplitudes"],
+                                   boot_T[P]["phases"], boot_F[P]["phases"]):
             if at <= 0 or af <= 0: continue
             dF = co2_forcing(af, co2_ref)
             if dF <= 1e-9: continue
@@ -246,7 +246,7 @@ def main():
             lag_boot.append(pd * period_kyr / (2 * math.pi))
 
         spectrum.append({
-            "n": n,
+            "line": L1_LABELS[P],
             "period_kyr": period_kyr,
             "amp_T_K": amp_T0,
             "amp_F_ppm": amp_F0,
@@ -263,7 +263,7 @@ def main():
 
     # ── Print per-line table ──
     print()
-    print(f"   {'n':>4}{'P (kyr)':>9}"
+    print(f"   {'line':<28}{'P (kyr)':>9}"
           f"{'ΔT (K)':>9}{'ΔF (W/m²)':>11}"
           f"{'ECS [5-95]':>18}"
           f"{'lag [5-95]':>22}{'Δφ':>6}{'?':>3}")
@@ -271,7 +271,7 @@ def main():
         ok = "✓" if r["phase_concordant"] else "✗"
         ecs_s = f"{r['ecs_K']:>5.2f} [{r['ecs_p5_K']:.1f}-{r['ecs_p95_K']:.1f}]"
         lag_s = f"{r['lag_kyr']:+5.1f} [{r['lag_p5_kyr']:+.1f}-{r['lag_p95_kyr']:+.1f}]"
-        print(f"   {r['n']:>4}{r['period_kyr']:>9.1f}"
+        print(f"   {r['line']:<28}{r['period_kyr']:>9.1f}"
               f"{r['amp_T_K']:>9.4f}{r['delta_F_Wm2']:>11.4f}"
               f"{ecs_s:>18}{lag_s:>22}{r['phase_sep_deg']:>6.0f}{ok:>3}")
 
@@ -338,30 +338,38 @@ def main():
         for alpha in SLOW_FEEDBACK_FRACTIONS:
             print(f"   Charney @ α_slow={alpha}        = {ess * (1 - alpha):.2f} K")
 
-    # Comparison to LR04+EPICA
+    # Comparison to the LR04 × κ + EPICA result — READ from the phase-lag
+    # artifact's Pleistocene pair (climate_ecs_phase_lag.py), never hand-copied.
     print()
     print("=" * 92)
-    print("  COMPARISON to LR04+EPICA result (climate_ecs_full.py)")
+    print("  COMPARISON to LR04+EPICA result (data/climate-ecs-phase-lag.json, Pleistocene pair)")
     print("=" * 92)
     print()
-    print("                              LR04+EPICA (κ=2.5)    Snyder GAST (direct)")
-    if band_stats.get("obliquity (35-50 kyr)") and band_stats["obliquity (35-50 kyr)"]:
-        obliq = band_stats["obliquity (35-50 kyr)"]
-        print(f"  Obliquity-band ECS    :   4.06 K [3.85-5.03]   "
-              f"{obliq['weighted_mean_K']:>4.2f} K [{obliq['p5_K']:.2f}-{obliq['p95_K']:.2f}]")
-    if band_stats.get("100-kyr band (75-130)") and band_stats["100-kyr band (75-130)"]:
-        hk = band_stats["100-kyr band (75-130)"]
-        print(f"  100-kyr-band ESS      :   11.07 K [4.49-18.64]  "
-              f"{hk['weighted_mean_K']:>5.2f} K [{hk['p5_K']:.2f}-{hk['p95_K']:.2f}]")
-    if band_stats.get("precession (18-26)") and band_stats["precession (18-26)"]:
-        pr = band_stats["precession (18-26)"]
-        print(f"  Precession-band ESS   :   13.22 K [5.38-20.14]  "
-              f"{pr['weighted_mean_K']:>5.2f} K [{pr['p5_K']:.2f}-{pr['p95_K']:.2f}]")
+    pl_path = REPO / "data/climate-ecs-phase-lag.json"
+    pl = json.loads(pl_path.read_text())["pairs"][0] if pl_path.exists() else None
+
+    def _ref_band(band):
+        s = pl["by_band"].get(band) if pl else None
+        return (f"{s['weighted_mean_K']:>5.2f} K [{s['p5_K']:.2f}-{s['p95_K']:.2f}]"
+                if s else "—")
+
+    print("                              LR04+EPICA (κ=2.5)       Snyder GAST (direct)")
+    for label, ours, ref_band in (
+        ("Obliquity-band ECS", "obliquity (35-50 kyr)", "obliquity (40 kyr)"),
+        ("100-kyr-band ESS", "100-kyr band (75-130)", "100-kyr band"),
+        ("Precession-band ESS", "precession (18-26)", "precession (20-25)"),
+    ):
+        s = band_stats.get(ours)
+        if s:
+            print(f"  {label:<22}:   {_ref_band(ref_band):<24}"
+                  f"{s['weighted_mean_K']:>5.2f} K [{s['p5_K']:.2f}-{s['p95_K']:.2f}]")
     if conc:
-        print(f"  Total ΔT-weighted ESS :    8.41 K               "
-              f"{conc['weighted_mean_K']:>4.2f} K")
-        print(f"  Charney @ α_slow=0.4  :    5.05 K               "
-              f"{conc['weighted_mean_K'] * 0.6:>4.2f} K")
+        ref_tot = (pl["concordant_only"]["weighted_mean_K"]
+                   if pl and pl.get("concordant_only") else None)
+        ref_s = f"{ref_tot:>5.2f} K" if ref_tot is not None else "—"
+        ref_c = f"{ref_tot * 0.6:>5.2f} K" if ref_tot is not None else "—"
+        print(f"  {'Total ΔT-weighted ESS':<22}:   {ref_s:<24}{conc['weighted_mean_K']:>5.2f} K")
+        print(f"  {'Charney @ α_slow=0.4':<22}:   {ref_c:<24}{conc['weighted_mean_K'] * 0.6:>5.2f} K")
 
     print()
     print("=" * 92)
