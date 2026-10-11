@@ -60,7 +60,17 @@ export function assembleModel(C: Readonly<Record<string, any>>, F: Readonly<Reco
         nodalModeS3ArcsecPerYr: number;
         /** The ecliptic (nodal) precession period 1,296,000/|s₃|, years (68,751) — an orbital quantity, fixed at every epoch at the two-body level. */
         nodalPeriodYears: number;
-        /** The obliquity beat 2π/(ψ̇(t) − |s₃|), years — the SHIPPED deep-time obliquity period (falsification leg 1; 41,224 at J2000, on the composed rate). @param {number} year @returns {number} */
+        /** THE SPIN AXIS'S INERTIAL PRECESSION RATE OF DATE, ″/yr — the composed rate scaled by the
+         *  hybrid's self-anchor factor (the inertial-to-general ratio at J2000, the multiplicative form
+         *  the obliquity integration itself applies): 50.385 at J2000 (series-driven). The obliquity beat and the
+         *  obliquity lines ride THIS rate; the general precession (meanRateArcsecPerYrAtYear) is the
+         *  equinox along the ecliptic of date. @param {number} year @returns {number} */
+        spinAxisInertialRateArcsecPerYrAtYear: (year: number) => number;
+        /** The obliquity beat 2π/(ψ̇ᵢₙ(t) − |s₃|), years — the SHIPPED deep-time obliquity period (falsification
+         *  leg 1; 41,098 at J2000 ≡ the climate formula's p+s₀ line; La2004 reads 40,980 on its own precession
+         *  frequency 50.476). ψ̇ᵢₙ is the spin axis's INERTIAL rate (above): the equator against the ecliptic's
+         *  nodal mode in the inertial frame, the rate the hybrid obliquity integration self-anchors on — not
+         *  the general precession, which reads the beat 0.3 % long (41,224). @param {number} year @returns {number} */
         obliquityBeatYearsAtYear: (year: number) => number;
         /** The apsidal (perihelion vs the stars) period of date, JULIAN years — the ONE movement's own apsidal rate (the scene's perihelion; anom/(anom − sid) of the one family, ≡ 360°/apsidalRateFixedArcsecPerJulianYr), inside the published window only; null beyond. Before 2026-09 this rode the planet chain's secular tangent, which parted from the scene's perihelion passages by seconds of anomalistic year within a few millennia (year-lengths.cjs). @param {number} year @returns {number|null} */
         apsidalPeriodYearsAtYear: (year: number) => number | null;
@@ -72,6 +82,18 @@ export function assembleModel(C: Readonly<Record<string, any>>, F: Readonly<Reco
         periOfDatePerPrecessionAtYear: (year: number) => number | null;
         /** The published of-date window, years from 2000. */
         publishedWindowYears: 2000000;
+        /** THE SPIN AXIS'S INERTIAL PRECESSION PERIOD at J2000, years (25,722 in the shipped,
+         *  series-driven configuration) — the rate the hybrid obliquity integration self-anchors
+         *  ŝ on (earth/deep-orbital-history, D4e): the general-precession anchor p₀ PLUS the
+         *  planetary mean the N-body ecliptic's own motion carries (+0.097 ″/yr ≡ IAU's planetary
+         *  precession ψ_A − p_A; the bare 18-mode table anchors 0.18 — the g₂-gap trap: pass the
+         *  secular series). Two rates, two uses — the obliquity line frequencies p + s_i (the
+         *  spin axis against the ecliptic's nodal modes, in the inertial frame) carry THIS
+         *  rate; the climatic-precession lines p + g_i (the perihelion from the equinox along
+         *  the ecliptic of date) carry p₀. */
+        spinAxisInertialPeriodYearsJ2000: number;
+        /** The same as a rate, ″/yr (50.385 at J2000 with the series; p₀ = 50.288 is the general precession). */
+        spinAxisInertialRateArcsecPerYrJ2000: number;
     }>;
     earth: Readonly<{
         perihelionLongitudeDeg: (year: number) => number;

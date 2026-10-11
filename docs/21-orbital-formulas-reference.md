@@ -1,7 +1,7 @@
 ---
 docVersion: 1.0
-modelVersion: v21.0
-coefficients: sha256:7258a9b469c8b95e
+modelVersion: v22.0
+coefficients: sha256:922e0e84e8122f69
 status: current
 ---
 

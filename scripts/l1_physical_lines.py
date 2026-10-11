@@ -7,12 +7,22 @@ L1 physical lines — THE ONE HOME of the climate formula's orbital line list
     python3 scripts/l1_physical_lines.py --write    write data/l1-physical-lines.json (inputs-stamped)
 
 Every line is DERIVED from the engine's own spectrum (data/t1-engine-frequencies.json:
-Earth's z and ζ secular modes from the 20-Myr deep mode table, and the of-date
-precession rate p at J2000 from createModel). Berger/Laskar-style combinations:
+Earth's z and ζ secular modes from the 20-Myr deep mode table, and the engine's two
+J2000 precession rates from createModel). Berger/Laskar-style combinations:
 
-    eccentricity          |g_i − g_j|      amplitude A_i·A_j
-    obliquity             p + s_i          amplitude A_i
-    climatic precession   p + g_i          amplitude A_i
+    eccentricity          |g_i − g_j|           amplitude A_i·A_j
+    obliquity             p_inertial + s_i      amplitude A_i
+    climatic precession   p + g_i               amplitude A_i
+
+Two rates, two uses (measured 2026-10, doc 99 "the records resolve p"): an
+obliquity line is the spin axis precessing in the INERTIAL frame against one of
+the ecliptic's nodal modes, so it carries the spin axis's inertial rate
+p_inertial (the self-anchored rate the hybrid obliquity integrates on — the
+general precession plus the planetary mean the N-body ecliptic's motion carries,
+50.385 ″/yr at J2000 in the shipped series-driven configuration; the +0.097 is
+IAU's planetary precession ψ_A − p_A); a climatic-precession line is the
+perihelion measured from the equinox along the ecliptic of date, so it carries
+the general precession in longitude p (50.288 ″/yr).
 
 Selection rule (one threshold, stated): relative amplitude within its family
 ≥ REL_THRESHOLD, period inside BAND_KYR, lines closer than DEDUPE are one line.
@@ -48,7 +58,8 @@ BAND_KYR = (14.0, 300.0)
 DEDUPE = 0.005
 
 FREQ = json.loads((ROOT / FREQ_REL).read_text())
-p = FREQ['pArcsecPerYr']
+p = FREQ['pArcsecPerYr']                      # general precession in longitude — the climatic-precession lines
+p_inertial = FREQ['pInertialArcsecPerYr']     # the spin axis's inertial rate — the obliquity lines
 z, zeta = FREQ['z'], FREQ['zeta']
 
 
@@ -64,7 +75,7 @@ def candidates():
             if abs(f) > 1e-9:
                 c.append(dict(family='eccentricity', label=f'g{i}−g{j}', arcsecPerYr=abs(f), amp=z[i]['amp'] * z[j]['amp']))
     for i, m in enumerate(zeta):
-        c.append(dict(family='obliquity', label=f'p+s{i}', arcsecPerYr=p + m['arcsecPerYr'], amp=m['amp']))
+        c.append(dict(family='obliquity', label=f'p+s{i}', arcsecPerYr=p_inertial + m['arcsecPerYr'], amp=m['amp']))
     for i, m in enumerate(z):
         c.append(dict(family='climatic precession', label=f'p+g{i}', arcsecPerYr=p + m['arcsecPerYr'], amp=m['amp']))
     for x in c:
@@ -105,14 +116,17 @@ def main():
     counts = {}
     for x in orbital:
         counts[x['family']] = counts.get(x['family'], 0) + 1
-    print(f'L1 physical lines — threshold rel ≥ {REL_THRESHOLD}, band {BAND_KYR[0]:.0f}–{BAND_KYR[1]:.0f} kyr, dedupe {DEDUPE*100:.1f} % · p = {p:.4f} ″/yr')
+    print(f'L1 physical lines — threshold rel ≥ {REL_THRESHOLD}, band {BAND_KYR[0]:.0f}–{BAND_KYR[1]:.0f} kyr, dedupe {DEDUPE*100:.1f} % · p = {p:.4f} ″/yr (climatic precession) · p_inertial = {p_inertial:.4f} ″/yr (obliquity)')
     print(f'  {len(orbital)} orbital lines {counts} + {len(fam)} in the 405-kyr family = {len(lines)}')
     for x in lines:
         print(f"  {x['periodKyr']:8.2f} kyr  {x['family']:26s} {x['label']:10s}" + (f"  rel {x['relAmp']:.3f}" if 'relAmp' in x else f"  {x['note']}"))
     if '--write' in sys.argv:
         out = dict(
             _description=__doc__.strip(),
-            config=dict(relThreshold=REL_THRESHOLD, bandKyr=list(BAND_KYR), dedupeFrac=DEDUPE, pArcsecPerYr=p, source=FREQ_REL),
+            config=dict(relThreshold=REL_THRESHOLD, bandKyr=list(BAND_KYR), dedupeFrac=DEDUPE,
+                        pArcsecPerYr=p, pInertialArcsecPerYr=p_inertial,
+                        rates='p (general precession in longitude) for the climatic-precession lines; pInertial (the spin axis’s inertial rate) for the obliquity lines',
+                        source=FREQ_REL),
             lines=[{k: v for k, v in x.items() if k != 'amp'} for x in lines],
             periodsKyr=[x['periodKyr'] for x in lines],
             meta=dict(script=SELF_REL, doc='docs/92-climate-formula.md (T1 disposition, plan 06)', runtime_sec=time.time() - t0, environment=dict(python=platform.python_version())),

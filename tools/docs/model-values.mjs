@@ -448,12 +448,12 @@ export const VALUES = {
   },
   eclPrecFormula: { get: () => 1296000 / s3ArcsecPerYr(), render: () => 'the N-body chain’s dominant nodal mode s₃, 1,296,000/|s₃|' },
   obliqCycleYears: {
-    get: () => 1296000 / (1296000 / oneYL().axialPrecessionYearsAtYear(2000) - s3ArcsecPerYr()),
+    get: () => 1296000 / (physModel().lunisolar.spinAxisInertialRateArcsecPerYrJ2000 - s3ArcsecPerYr()),
     render: (v) => `~${thousands(Math.round(v))}`,
     unit: 'yr',
-    note: 'obliquity cycle at J2000 — the beat 2π/(ψ̇ − |s₃|) of the axial precession against the nodal mode (≡ obliqBeatJ2000Kyr; falsification leg 1). S6: was H/8 = 41,915',
+    note: 'obliquity cycle at J2000 — the beat 2π/(ψ̇ᵢₙ − |s₃|) of the spin axis\'s INERTIAL precession rate (the self-anchored rate the hybrid integrates on: the general precession plus the planetary mean, 50.385 ″/yr — IAU\'s ψ_A − p_A) against the nodal mode (≡ obliqBeatJ2000Kyr ≡ the climate formula\'s p+s₀ line; falsification leg 1; La2004 reads 40,980 on its precession frequency 50.476). On the general precession alone it read 41,224. S6: was H/8 = 41,915',
   },
-  obliqCycleFormula: { get: () => 1296000 / (1296000 / oneYL().axialPrecessionYearsAtYear(2000) - s3ArcsecPerYr()), render: () => 'the beat of the axial precession against the nodal mode s₃, 1,296,000/(ψ̇ − |s₃|)' },
+  obliqCycleFormula: { get: () => 1296000 / (physModel().lunisolar.spinAxisInertialRateArcsecPerYrJ2000 - s3ArcsecPerYr()), render: () => 'the beat of the spin axis\'s inertial precession against the nodal mode s₃, 1,296,000/(ψ̇ᵢₙ − |s₃|)' },
   // S5 (plan 06): the axial precession period is the model's ONE J2000 reading — the certified
   // year laws' beat at 2000 (route B, 25,771.4 yr ≈ IAU 25,771.6) — never H/13 (25,793.6, the fit
   // anchor's reading; H₀ was fitted on the perihelion-of-date beat). Key names kept (P4).
@@ -839,11 +839,12 @@ export const VALUES = {
       out[`evolvingClockPreferredDeltaPPrecession${key}`] = { get: () => clk().results[reg].dp_scan_by_family['climatic precession'].best_dp_arcsec_per_yr, render: (v) => (v >= 0 ? '+' : '−') + Math.abs(Number(v)).toFixed(2), unit: '″/yr', note: `the preferred constant offset on the CLIMATIC-PRECESSION lines alone (the obliquity lines at their shipped periods), ${reg}` };
       out[`evolvingClockDeltaR2AtPreferredPPrecession${key}`] = { get: () => clk().results[reg].dp_scan_by_family['climatic precession'].best_delta_r2_total, render: signed5, note: `ΔR² total at that precession-only offset, ${reg}` };
     }
-    const oblAt = (reg, dp) => { const s = clk().results[reg].dp_scan_by_family['obliquity']; const i = s.dp_arcsec_per_yr.reduce((b, v, j) => (Math.abs(v - dp) < Math.abs(s.dp_arcsec_per_yr[b] - dp) ? j : b), 0); return s.delta_r2_total[i]; };
-    for (const [key, reg] of [['InhgMpt', 'inhg-mpt'], ['PreInhg', 'pre-inhg'], ['Lr04Full', 'lr04-full']]) {
-      out[`evolvingClockObliquityDeltaR2AtLunisolar${key}`] = { get: () => oblAt(reg, 0.10), render: signed5, note: `ΔR² total with the obliquity lines alone shifted by +0.10 ″/yr (the engine's lunisolar-minus-general precession offset at J2000, nearest scan point), ${reg}` };
-    }
-    out.evolvingClockArtifactPArcsecPerYr = { get: () => clk().p_artifact_arcsec_per_yr, render: (v) => Number(v).toFixed(3), unit: '″/yr', note: 'the precession rate the L1 line artifact was derived with (data/l1-physical-lines.json config.pArcsecPerYr)' };
+    out.evolvingClockArtifactPArcsecPerYr = { get: () => clk().p_artifact_arcsec_per_yr, render: (v) => Number(v).toFixed(3), unit: '″/yr', note: 'the general precession in longitude the climatic-precession lines were derived with (data/l1-physical-lines.json config.pArcsecPerYr)' };
+    out.evolvingClockArtifactPInertialArcsecPerYr = { get: () => clk().p_inertial_artifact_arcsec_per_yr, render: (v) => Number(v).toFixed(3), unit: '″/yr', note: 'the spin axis\'s inertial precession rate the obliquity lines were derived with (data/l1-physical-lines.json config.pInertialArcsecPerYr)' };
+    // The two J2000 precession rates of the model surface — ONE home for the line derivation's inputs
+    out.spinAxisInertialRateArcsecPerYrJ2000 = { get: () => physModel().lunisolar.spinAxisInertialRateArcsecPerYrJ2000, render: (v) => Number(v).toFixed(3), unit: '″/yr', note: 'the spin axis\'s INERTIAL precession rate at J2000 — the self-anchored rate the hybrid obliquity integrates on (the general precession plus the planetary mean the N-body ecliptic\'s motion carries, +0.097 ≡ IAU\'s planetary precession ψ_A − p_A); the obliquity lines p + sᵢ carry it. La2004\'s precession frequency (50.476) sits 0.09 above it.' };
+    out.spinAxisInertialPeriodYearsJ2000 = { get: () => physModel().lunisolar.spinAxisInertialPeriodYearsJ2000, render: (v) => thousands(v, 0), unit: 'yr', note: 'the same as a period' };
+    out.spinAxisInertialMinusGeneralArcsecPerYr = { get: () => physModel().lunisolar.spinAxisInertialRateArcsecPerYrJ2000 - physModel().lunisolar.meanRateArcsecPerYrAtYear(2000), render: (v) => (v >= 0 ? '+' : '−') + Math.abs(Number(v)).toFixed(3), unit: '″/yr', note: 'the planetary mean: the inertial spin-axis rate minus the general precession in longitude at J2000' };
     out.evolvingClockGainAfterPreferredPMax = { get: () => clk().verdict.max_clock_gain_after_preferred_dp, render: signed5, note: 'largest gain of the composed clock (k = 1) on top of the preferred δp over all windows' };
     out.evolvingClockPreferredDeltaPMinLr04 = { get: () => clk().verdict.preferred_dp_lr04_min, render: (v) => (v >= 0 ? '+' : '−') + Math.abs(Number(v)).toFixed(2), unit: '″/yr', note: 'smallest preferred δp over the four LR04 windows' };
     out.evolvingClockPreferredDeltaPMaxLr04 = { get: () => clk().verdict.preferred_dp_lr04_max, render: (v) => (v >= 0 ? '+' : '−') + Math.abs(Number(v)).toFixed(2), unit: '″/yr', note: 'largest preferred δp over the four LR04 windows' };
@@ -2414,11 +2415,14 @@ export const VALUES = {
     };
     // T_p(t) = the composed lunisolar period on the derived J2000 anchor (S5) — ONE home
     const axialYr = (tMa) => DT().meanLunisolarPrecessionPeriodYearsAtAge(tMa);
-    const beatKyr = (tMa) => 1296000 / (1296000 / axialYr(tMa) - s3()) / 1000;
+    // The beat rides the spin axis's INERTIAL rate: the composed rate × the hybrid's self-anchor
+    // factor (inertial/general at J2000, the multiplicative form the obliquity integration applies).
+    const kInertial = () => physModel().epoch.axialPrecessionYearsAtYear(2000) / physModel().lunisolar.spinAxisInertialPeriodYearsJ2000;
+    const beatKyr = (tMa) => 1296000 / ((1296000 / axialYr(tMa)) * kInertial() - s3()) / 1000;
     // "obliquity period ∝ T_p": the J2000 beat held proportional to T_p(t) (≡ the beat at J2000)
     const h8Kyr = (tMa) => beatKyr(0.000001) * axialYr(tMa) / axialYr(0.000001);
     const mk = (name, tMa, label) => ({
-      [`obliqBeat${name}Kyr`]: { get: () => beatKyr(tMa), render: (v) => Number(v).toFixed(1), unit: 'kyr', note: `the obliquity band as the BEAT 2π/(ψ̇ − |s₃|) at ${label} — ψ̇ the composed lunisolar rate on the derived J2000 anchor (plan 06 D6/Phase 3/S5), s₃ dynamical under measured μ (the adopted leg-1 form)` },
+      [`obliqBeat${name}Kyr`]: { get: () => beatKyr(tMa), render: (v) => Number(v).toFixed(1), unit: 'kyr', note: `the obliquity band as the BEAT 2π/(ψ̇ᵢₙ − |s₃|) at ${label} — ψ̇ᵢₙ the spin axis's inertial rate (the composed lunisolar rate on the derived J2000 anchor, plan 06 D6/Phase 3/S5, times the hybrid's self-anchor factor), s₃ dynamical under measured μ (the adopted leg-1 form)` },
       [`obliqH8Scaled${name}Kyr`]: { get: () => h8Kyr(tMa), render: (v) => Number(v).toFixed(1), unit: 'kyr', note: `the pure precession-scaling reading "obliquity period ∝ T_p" (the J2000 beat × T_p(t)/T_p(J2000)) at ${label} — identical to the beat at J2000, the discriminated alternative at depth (identifier keeps its historical H/8 name; S5 retired the T_p·13/8 form)` },
     });
     return {

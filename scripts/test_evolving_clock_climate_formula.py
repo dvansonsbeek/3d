@@ -67,7 +67,8 @@ WARP_SCALES = np.round(np.arange(-1.0, 6.0001, 0.1), 2)
 # frequency inside one window; only the pair of scans tells them apart.
 DP_SCAN_ARCSEC = np.round(np.arange(-0.30, 0.6001, 0.02), 3)
 ARCSEC_PER_CYCLE = 1_296_000.0
-P_ARTIFACT_ARCSEC = float(mcf._L1_ART["config"]["pArcsecPerYr"])   # the p the line artifact was derived with
+P_ARTIFACT_ARCSEC = float(mcf._L1_ART["config"]["pArcsecPerYr"])   # the general precession the climatic-precession lines carry
+P_INERTIAL_ARTIFACT_ARCSEC = float(mcf._L1_ART["config"].get("pInertialArcsecPerYr", P_ARTIFACT_ARCSEC))   # the inertial rate the obliquity lines carry
 
 NODE_CLOCK = """
 import { createModel } from %s;
@@ -264,7 +265,8 @@ def main():
               f"{r['scale_scan']['best_scale']:>+8.1f}{r['scale_scan']['at_minus_one']:>+10.5f}"
               f"{h[0]:>+11.5f}{h[1]:>+11.5f}{dp['best_dp_arcsec_per_yr']:>+9.2f}{dp['implied_p_arcsec_per_yr']:>8.3f}"
               f"{dp['clock_gain_at_best_dp']:>+10.5f}")
-    print(f"\n  (the line artifact's p = {P_ARTIFACT_ARCSEC:.3f} ″/yr; δp is the constant offset the record prefers on the p-lines)")
+    print(f"\n  (the line artifact's rates: p = {P_ARTIFACT_ARCSEC:.3f} ″/yr on the climatic-precession lines, "
+          f"p_inertial = {P_INERTIAL_ARTIFACT_ARCSEC:.3f} ″/yr on the obliquity lines; δp is the constant offset the record prefers on top)")
     print(f"\n  Clock alone (k = 1): max ΔR² total {max_total:+.5f}"
           f"{' — material' if any_material else ' — not material'} (threshold {MATERIAL_DELTA_R2}).")
     print(f"  Clock on top of the preferred δp: max {max_clock_after_dp:+.5f}"
@@ -294,6 +296,7 @@ def main():
                      "dp_scan_by_family": "the same δp scan on one family at a time (obliquity lines only; "
                                           "climatic-precession lines only), the other family at its shipped periods"},
         "p_artifact_arcsec_per_yr": P_ARTIFACT_ARCSEC,
+        "p_inertial_artifact_arcsec_per_yr": P_INERTIAL_ARTIFACT_ARCSEC,
         "clock_window_means": means,
         "results": results,
         "verdict": {"max_delta_r2_total": max_total, "material_threshold": MATERIAL_DELTA_R2,

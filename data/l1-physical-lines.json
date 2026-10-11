@@ -1,5 +1,5 @@
 {
- "_description": "L1 physical lines \u2014 THE ONE HOME of the climate formula's orbital line list\n(holisticuniverse plan 06, T1 disposition; owner 2026-09-20).\n\n    python3 scripts/l1_physical_lines.py            print the list\n    python3 scripts/l1_physical_lines.py --write    write data/l1-physical-lines.json (inputs-stamped)\n\nEvery line is DERIVED from the engine's own spectrum (data/t1-engine-frequencies.json:\nEarth's z and \u03b6 secular modes from the 20-Myr deep mode table, and the of-date\nprecession rate p at J2000 from createModel). Berger/Laskar-style combinations:\n\n    eccentricity          |g_i \u2212 g_j|      amplitude A_i\u00b7A_j\n    obliquity             p + s_i          amplitude A_i\n    climatic precession   p + g_i          amplitude A_i\n\nSelection rule (one threshold, stated): relative amplitude within its family\n\u2265 REL_THRESHOLD, period inside BAND_KYR, lines closer than DEDUPE are one line.\nT1 measured this rule against a same-size random null: the physical set beats\nthe null in every LR04 regime up to ~25 lines and stops doing so beyond \u2014 the\nthreshold 0.1 gives the largest defensible set (25 lines: 10 ecc, 10 obl, 5 prec).\n\nPlus the 405-kyr family: the g\u2082 \u2212 g\u2085 eccentricity fundamental (the engine's\n20-Myr value, 405.6 kyr; the 1-Myr-window readings 388\u2013425 kyr are inside that\nwindow's Rayleigh uncertainty of \u00b1164 kyr and are NOT distinct periods) and its\n2nd / 3rd harmonics \u2014 the carbon-thermostat family of doc 92 \u00a73, labelled\nclimate-internal, folded from the former L2 layer.\n\nConsumers (the campaign moves them here one by one): scripts/milankovitch_\nclimate_formula.py, the constants generator, the runtime evaluators.",
+ "_description": "L1 physical lines \u2014 THE ONE HOME of the climate formula's orbital line list\n(holisticuniverse plan 06, T1 disposition; owner 2026-09-20).\n\n    python3 scripts/l1_physical_lines.py            print the list\n    python3 scripts/l1_physical_lines.py --write    write data/l1-physical-lines.json (inputs-stamped)\n\nEvery line is DERIVED from the engine's own spectrum (data/t1-engine-frequencies.json:\nEarth's z and \u03b6 secular modes from the 20-Myr deep mode table, and the engine's two\nJ2000 precession rates from createModel). Berger/Laskar-style combinations:\n\n    eccentricity          |g_i \u2212 g_j|           amplitude A_i\u00b7A_j\n    obliquity             p_inertial + s_i      amplitude A_i\n    climatic precession   p + g_i               amplitude A_i\n\nTwo rates, two uses (measured 2026-10, doc 99 \"the records resolve p\"): an\nobliquity line is the spin axis precessing in the INERTIAL frame against one of\nthe ecliptic's nodal modes, so it carries the spin axis's inertial rate\np_inertial (the self-anchored rate the hybrid obliquity integrates on \u2014 the\ngeneral precession plus the planetary mean the N-body ecliptic's motion carries,\n50.385 \u2033/yr at J2000 in the shipped series-driven configuration; the +0.097 is\nIAU's planetary precession \u03c8_A \u2212 p_A); a climatic-precession line is the\nperihelion measured from the equinox along the ecliptic of date, so it carries\nthe general precession in longitude p (50.288 \u2033/yr).\n\nSelection rule (one threshold, stated): relative amplitude within its family\n\u2265 REL_THRESHOLD, period inside BAND_KYR, lines closer than DEDUPE are one line.\nT1 measured this rule against a same-size random null: the physical set beats\nthe null in every LR04 regime up to ~25 lines and stops doing so beyond \u2014 the\nthreshold 0.1 gives the largest defensible set (25 lines: 10 ecc, 10 obl, 5 prec).\n\nPlus the 405-kyr family: the g\u2082 \u2212 g\u2085 eccentricity fundamental (the engine's\n20-Myr value, 405.6 kyr; the 1-Myr-window readings 388\u2013425 kyr are inside that\nwindow's Rayleigh uncertainty of \u00b1164 kyr and are NOT distinct periods) and its\n2nd / 3rd harmonics \u2014 the carbon-thermostat family of doc 92 \u00a73, labelled\nclimate-internal, folded from the former L2 layer.\n\nConsumers (the campaign moves them here one by one): scripts/milankovitch_\nclimate_formula.py, the constants generator, the runtime evaluators.",
  "config": {
   "relThreshold": 0.1,
   "bandKyr": [
@@ -7,113 +7,115 @@
    300.0
   ],
   "dedupeFrac": 0.005,
-  "pArcsecPerYr": 50.28831266926504,
+  "pArcsecPerYr": 50.28831076155945,
+  "pInertialArcsecPerYr": 50.384902887297564,
+  "rates": "p (general precession in longitude) for the climatic-precession lines; pInertial (the spin axis\u2019s inertial rate) for the obliquity lines",
   "source": "data/t1-engine-frequencies.json"
  },
  "lines": [
   {
    "family": "climatic precession",
    "label": "p+g2",
-   "arcsecPerYr": 68.20533077364888,
-   "periodKyr": 19.001447325297764,
+   "arcsecPerYr": 68.20532886594329,
+   "periodKyr": 19.00144785676896,
    "relAmp": 0.6717464199951804
   },
   {
    "family": "climatic precession",
    "label": "p+g3",
-   "arcsecPerYr": 67.65725913935654,
-   "periodKyr": 19.155372483100056,
+   "arcsecPerYr": 67.65725723165096,
+   "periodKyr": 19.155373023216704,
    "relAmp": 0.460782442830978
   },
   {
    "family": "climatic precession",
    "label": "p+g1",
-   "arcsecPerYr": 57.74073649294932,
-   "periodKyr": 22.445158803235106,
+   "arcsecPerYr": 57.74073458524373,
+   "periodKyr": 22.445159544804383,
    "relAmp": 0.8620464713605362
   },
   {
    "family": "climatic precession",
    "label": "p+g4",
-   "arcsecPerYr": 55.87857906464829,
-   "periodKyr": 23.193145239083524,
+   "arcsecPerYr": 55.878577156942704,
+   "periodKyr": 23.193146030902057,
    "relAmp": 0.19921489972571554
   },
   {
    "family": "climatic precession",
    "label": "p+g0",
-   "arcsecPerYr": 54.545672010290716,
-   "periodKyr": 23.75990527269503,
+   "arcsecPerYr": 54.545670102585134,
+   "periodKyr": 23.759906103684983,
    "relAmp": 1.0
   },
   {
    "family": "obliquity",
    "label": "p+s12",
-   "arcsecPerYr": 47.295905985748185,
-   "periodKyr": 27.401948921129186,
+   "arcsecPerYr": 47.39249620378071,
+   "periodKyr": 27.346101256776855,
    "relAmp": 0.10427252954025028
   },
   {
    "family": "obliquity",
    "label": "p+s1",
-   "arcsecPerYr": 44.70306979865061,
-   "periodKyr": 28.991297596280972,
+   "arcsecPerYr": 44.799660016683134,
+   "periodKyr": 28.92879096665861,
    "relAmp": 0.5416339451073867
   },
   {
    "family": "obliquity",
    "label": "p+s14",
-   "arcsecPerYr": 44.45151922629323,
-   "periodKyr": 29.155358974399498,
+   "arcsecPerYr": 44.54810944432575,
+   "periodKyr": 29.092143665932294,
    "relAmp": 0.14236226024182447
   },
   {
    "family": "obliquity",
    "label": "p+s9",
-   "arcsecPerYr": 43.52756485557792,
-   "periodKyr": 29.77423626384929,
+   "arcsecPerYr": 43.624155073610446,
+   "periodKyr": 29.708311778489644,
    "relAmp": 0.1009465170347195
   },
   {
    "family": "obliquity",
    "label": "p+s3",
-   "arcsecPerYr": 43.24580213595511,
-   "periodKyr": 29.96822664834997,
+   "arcsecPerYr": 43.342392353987634,
+   "periodKyr": 29.90144128213458,
    "relAmp": 0.47895780932341964
   },
   {
    "family": "obliquity",
    "label": "p+s2",
-   "arcsecPerYr": 32.5328595150239,
-   "periodKyr": 39.836645758160245,
+   "arcsecPerYr": 32.629449733056425,
+   "periodKyr": 39.718720683390536,
    "relAmp": 0.4849220480959469
   },
   {
    "family": "obliquity",
    "label": "p+s4",
-   "arcsecPerYr": 31.984580906870857,
-   "periodKyr": 40.51952419741089,
+   "arcsecPerYr": 32.08117112490338,
+   "periodKyr": 40.39752772597398,
    "relAmp": 0.3238058217329259
   },
   {
    "family": "obliquity",
    "label": "p+s0",
-   "arcsecPerYr": 31.43772965501213,
-   "periodKyr": 41.224350938248435,
+   "arcsecPerYr": 31.534319873044655,
+   "periodKyr": 41.09807997184087,
    "relAmp": 1.0
   },
   {
    "family": "obliquity",
    "label": "p+s7",
-   "arcsecPerYr": 30.889737033394795,
-   "periodKyr": 41.95568251678215,
+   "arcsecPerYr": 30.98632725142732,
+   "periodKyr": 41.824898752410306,
    "relAmp": 0.17878079100604266
   },
   {
    "family": "obliquity",
    "label": "p+s10",
-   "arcsecPerYr": 23.940446936141825,
-   "periodKyr": 54.134327711463335,
+   "arcsecPerYr": 24.03703715417435,
+   "periodKyr": 53.91679480659006,
    "relAmp": 0.16050040214935987
   },
   {
@@ -207,21 +209,21 @@
   }
  ],
  "periodsKyr": [
-  19.001447325297764,
-  19.155372483100056,
-  22.445158803235106,
-  23.193145239083524,
-  23.75990527269503,
-  27.401948921129186,
-  28.991297596280972,
-  29.155358974399498,
-  29.77423626384929,
-  29.96822664834997,
-  39.836645758160245,
-  40.51952419741089,
-  41.224350938248435,
-  41.95568251678215,
-  54.134327711463335,
+  19.00144785676896,
+  19.155373023216704,
+  22.445159544804383,
+  23.193146030902057,
+  23.759906103684983,
+  27.346101256776855,
+  28.92879096665861,
+  29.092143665932294,
+  29.708311778489644,
+  29.90144128213458,
+  39.718720683390536,
+  40.39752772597398,
+  41.09807997184087,
+  41.824898752410306,
+  53.91679480659006,
   94.8779191670953,
   96.84902648762181,
   98.8438689567201,
@@ -239,7 +241,7 @@
  "meta": {
   "script": "scripts/l1_physical_lines.py",
   "doc": "docs/92-climate-formula.md (T1 disposition, plan 06)",
-  "runtime_sec": 0.0006749629974365234,
+  "runtime_sec": 0.0004112720489501953,
   "environment": {
    "python": "3.12.3"
   }
@@ -247,8 +249,8 @@
  "inputs": {
   "generator": "python3 scripts/l1_physical_lines.py --write",
   "files": {
-   "data/t1-engine-frequencies.json": "sha256:8c82fa437481fa9fbf71d48037c70faaa0364859c3ddf733b9733de219b0f588",
-   "scripts/l1_physical_lines.py": "sha256:98f298a22ee6bdb22a294bdf08f08787b6a4bbd6b7c9aed46de4adea28bc88f6"
+   "data/t1-engine-frequencies.json": "sha256:f2698db70ba99a155b0d76f8b4ce9736489d1c978503eabd99142fef17f567c3",
+   "scripts/l1_physical_lines.py": "sha256:1d28a2ab204b3d430ae9efff00ddd2f26c6fd52a53d2fed6b533554b4219d390"
   }
  }
 }

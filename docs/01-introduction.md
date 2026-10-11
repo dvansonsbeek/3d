@@ -1,7 +1,7 @@
 ---
 docVersion: 1.0
-modelVersion: v21.0
-coefficients: sha256:7258a9b469c8b95e
+modelVersion: v22.0
+coefficients: sha256:922e0e84e8122f69
 status: current
 ---
 
@@ -31,7 +31,7 @@ Two of Earth's precession motions rotate in **opposite directions**, so their fr
 | Apsidal precession (the orbit's own motion, a J2000 reading) | Counter-clockwise | <!--v:inclPrecYears-->~111,635<!--/v--> yr | <!--v:lunisolarApsidalPerPrecessionJ2000-->4.332<!--/v--> |
 | Perihelion-of-date (their beat, 1/T_peri = 1/T_p + 1/T_aps) | — | <!--v:periPrecYears-->~20,938<!--/v--> yr | <!--v:lunisolarPeriOfDatePerPrecessionJ2000-->0.8124<!--/v--> |
 
-The ratios are J2000 readings, not laws: the apsidal ratio wanders between <!--v:lunisolarApsidalPerPrecessionWanderMin-->1.08<!--/v--> and <!--v:lunisolarApsidalPerPrecessionWanderMax-->9.81<!--/v--> across ±26 kyr, as the simulator's Lunisolar Clock panel shows live. The perihelion-of-date beat is the carrier of the climatic-precession band; the obliquity band is the beat of the clock against the orbit's own nodal mode, <!--v:obliqCycleYears-->~41,224<!--/v--> years today.
+The ratios are J2000 readings, not laws: the apsidal ratio wanders between <!--v:lunisolarApsidalPerPrecessionWanderMin-->1.08<!--/v--> and <!--v:lunisolarApsidalPerPrecessionWanderMax-->9.81<!--/v--> across ±26 kyr, as the simulator's Lunisolar Clock panel shows live. The perihelion-of-date beat is the carrier of the climatic-precession band; the obliquity band is the beat of the clock against the orbit's own nodal mode, <!--v:obliqCycleYears-->~41,098<!--/v--> years today.
 
 **The anchor.** A third layer is a fitted timing anchor of <!--v:holisticYear-->335,317<!--/v--> years, calibrated on the perihelion–solstice alignment of the IAU mean elements in early 1246 AD (JD <!--v:periAlignJD-->2,176,153<!--/v-->; the model's own orbital series crosses at <!--v:periAlignYearSeries-->1247.2<!--/v--> AD, the mean-element and secular-element conventions labelled). It is the unit of the small periodic corrections that bring the time-domain machinery onto the observed cardinal points, day lengths and eclipses — bookkeeping, not a cycle: it scales with the precession period at deep time and is not a period of anything the model computes. The parameter accounting is three ledgers: zero fitted constants on the planetary side, the derived clock, and five named device constants of the frozen era machinery ([Constants Reference](20-constants-reference.md)). Nothing is tuned per phenomenon.
 

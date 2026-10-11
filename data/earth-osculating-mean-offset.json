@@ -17,7 +17,7 @@
   "inputs": {
     "generator": "node tools/verify/earth-osculating-offset.js --write",
     "files": {
-      "packages/physics/src/planets/chain-artifact.js": "sha256:54a01f7e44aa2a0d7324a40c98551c9e93406a5473581b81aff2415da61714fd",
+      "packages/physics/src/planets/chain-artifact.js": "sha256:ab5f7a035dc55a64eb5678716f46b78dda9244707aa1ff44613b40578f4be409",
       "tools/explore/derive-planetary-lunar-terms.js": "sha256:5447da632df4ed74c671fc6d72a55c47f4cc80dfbffe9c36ece4c6e5f4d9057a",
       "tools/explore/j2000-state.mjs": "sha256:af2361cdca688cb8f5850229be97db8f70464824e20648e7e8a26ea6edb5ca5a",
       "tools/lib/keplerian-chain.js": "sha256:620299515d5520bb3a03fba5affafc7a036fb151fca3457a5194e8771cc97fb8",

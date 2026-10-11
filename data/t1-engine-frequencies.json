@@ -1,7 +1,9 @@
 {
- "_description": "T1 inputs — the engine’s own p (of-date precession beat at J2000, createModel().epoch.axialPrecessionYearsAtYear) and Earth’s z / ζ secular modes (deep mode table). Consumed by scripts/t1_beat_model_vs_comb.py, which builds the Berger/Laskar-style beat lines |g_i − g_j|, p + s_i, p + g_i from them.",
- "pArcsecPerYr": 50.28831266926504,
- "precessionPeriodYr": 25771.395602861077,
+ "_description": "T1 inputs — the engine’s own two J2000 precession rates and Earth’s z / ζ secular modes (deep mode table). p = the general precession in longitude (the of-date precession beat at J2000, createModel().epoch.axialPrecessionYearsAtYear): the equinox along the ecliptic of date, the rate the climatic-precession lines p + g_i carry. pInertial = the spin axis’s inertial precession rate (createModel().lunisolar.spinAxisInertialRateArcsecPerYrJ2000, the self-anchored rate the hybrid obliquity integrates on: p plus the planetary mean): the rate the obliquity lines pInertial + s_i carry. Consumed by scripts/l1_physical_lines.py and scripts/t1_beat_model_vs_comb.py.",
+ "pArcsecPerYr": 50.28831076155945,
+ "precessionPeriodYr": 25771.39658050846,
+ "pInertialArcsecPerYr": 50.384902887297564,
+ "inertialPrecessionPeriodYr": 25721.99063078341,
  "z": [
   {
    "arcsecPerYr": 4.25735934102568,
@@ -142,8 +144,9 @@
   "generator": "node tools/explore/t1-export-engine-frequencies.mjs --write",
   "files": {
    "data/nbody-deep-secular-modes.json": "sha256:7633dd8f434fd6fc1ddaf07fd3ec3623e91e09322002ec08d53b8a12e6883fb7",
+   "data/nbody-secular-series.json": "sha256:e398dbeec974c786458a62f811f553f864597825ad99af2eee3d52e4afe15b0e",
    "public/input/model-parameters.json": "sha256:19d16cc2582d2130fd5c891cca0a36529104501d0b678e9b37dbf2bfb9969ced",
-   "tools/explore/t1-export-engine-frequencies.mjs": "sha256:58b0bfc170e664d54a66b2787200ed8c323cf898385bab756378410fa0a600bf"
+   "tools/explore/t1-export-engine-frequencies.mjs": "sha256:9352d387d1a41362fa581de1038f95f1858e00f0b0ffee4d91a058450042ae92"
   }
  }
 }

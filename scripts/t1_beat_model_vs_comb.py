@@ -11,8 +11,9 @@ hardened ridge solver, same L2/L3 layers, same NUMBER of L1 lines. Only the
 L1 frequencies differ:
 
   shipped-comb   the 33 lattice integers, periods 8H/n
-  beat-A         the ENGINE'S OWN lines — |g_i − g_j| (eccentricity), p + s_i
-                 (obliquity), p + g_i (climatic precession) from
+  beat-A         the ENGINE'S OWN lines — |g_i − g_j| (eccentricity), p_in + s_i
+                 (obliquity, on the spin axis's inertial rate), p + g_i
+                 (climatic precession, on the general precession) from
                  data/t1-engine-frequencies.json — ranked by relative mode
                  amplitude, top 33 inside the comb's own band
   beat-B/C       the same with equal family quotas / a 4 % resolution dedupe
@@ -64,7 +65,8 @@ RNG = np.random.default_rng(20260919)
 MATCH_TOL = 0.03
 LONG_N = [9, 12, 14, 16, 18]
 
-p = FREQ['pArcsecPerYr']
+p = FREQ['pArcsecPerYr']                   # the general precession — the climatic-precession lines p + g_i
+p_in = FREQ['pInertialArcsecPerYr']        # the spin axis's inertial rate — the obliquity lines p_in + s_i (v22.0)
 z, zeta = FREQ['z'], FREQ['zeta']
 
 
@@ -80,7 +82,7 @@ for i in range(len(z)):
         if abs(f) > 1e-9:
             cands.append(dict(family='ecc', label=f'g{i}-g{j}', f=abs(f), amp=z[i]['amp'] * z[j]['amp']))
 for i, m in enumerate(zeta):
-    cands.append(dict(family='obl', label=f'p+s{i}', f=p + m['arcsecPerYr'], amp=m['amp']))
+    cands.append(dict(family='obl', label=f'p+s{i}', f=p_in + m['arcsecPerYr'], amp=m['amp']))
 for i, m in enumerate(z):
     cands.append(dict(family='prec', label=f'p+g{i}', f=p + m['arcsecPerYr'], amp=m['amp']))
 for c in cands:
@@ -234,7 +236,7 @@ def main():
     if '--write' in sys.argv:
         out = dict(
             _description=__doc__.strip(),
-            config=dict(p_arcsec_per_yr=p, precession_period_yr=FREQ['precessionPeriodYr'], band_kyr=list(BAND_KYR), n_lines=N_LINES,
+            config=dict(p_arcsec_per_yr=p, p_inertial_arcsec_per_yr=p_in, precession_period_yr=FREQ['precessionPeriodYr'], band_kyr=list(BAND_KYR), n_lines=N_LINES,
                         n_null=N_NULL, rng_seed=20260919, match_tolerance=MATCH_TOL, long_period_lines=LONG_N,
                         ridge_lambda=mcf.L1_RIDGE_LAMBDA, regimes=REGIMES_LR04 + REGIMES_CGD),
             lines={name: (spec if kind == 'int' else [round(P, 6) for P in spec]) for name, (kind, spec) in MODELS.items()},

@@ -153,7 +153,10 @@ for (const url of SAMPLE_REQUESTS) {
   // derivative bias, so the reading is the series' own slope, 11.609 ″/yr = 111,634 yr. The tolerance stays 60 yr
   // where the smooth quantities keep 5 — tight enough to catch the family split (chain tangent vs series, ~90 yr)
   // the "name its window" trap records.)
-  for (const [q, expect, tol] of /** @type {Array<[string, number, number]>} */ ([['inclinationPrecession', 111634, 60], ['perihelionPrecession', 20936, 5], ['eclipticPrecession', 68751, 5], ['obliquityCycle', 41224, 5]])) {
+  // obliquityCycle: v22.0 moved the beat onto the spin axis's INERTIAL precession rate (the hybrid's
+  // self-anchor, 50.385 ″/yr at J2000 in the series-driven configuration) — 41,098 yr, ≡ the climate
+  // formula's p+s₀ line; on the general precession alone it read 41,224 (La2004: 40,980).
+  for (const [q, expect, tol] of /** @type {Array<[string, number, number]>} */ ([['inclinationPrecession', 111634, 60], ['perihelionPrecession', 20936, 5], ['eclipticPrecession', 68751, 5], ['obliquityCycle', 41098, 5]])) {
     const d = dataOf(`/v1/derivations/${q}`);
     if (typeof d.periodYears !== 'number' || Math.abs(d.periodYears - expect) > tol) failures.push(`derivations/${q} period: ${d.periodYears} (expected ≈ ${expect})`);
     if (d.status !== 'current') failures.push(`derivations/${q} status: ${d.status}`);

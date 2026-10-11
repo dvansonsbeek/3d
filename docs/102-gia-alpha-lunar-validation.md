@@ -1,7 +1,7 @@
 ---
 docVersion: 1.0
-modelVersion: v21.0
-coefficients: sha256:7258a9b469c8b95e
+modelVersion: v22.0
+coefficients: sha256:922e0e84e8122f69
 status: current
 ---
 
@@ -502,7 +502,7 @@ property of the framework, not regional observational bias.
 
 The deepest, hardest-to-fit observations — the cuneiform tablets
 from Babylon, -800 to -300 BCE — are reproduced per century to within
-<!--v:lunarCenturyResidualMinMinutes-->1<!--/v-->–<!--v:lunarCenturyResidualMaxMinutes-->13<!--/v--> minutes
+<!--v:lunarCenturyResidualMinMinutes-->0<!--/v-->–<!--v:lunarCenturyResidualMaxMinutes-->13<!--/v--> minutes
 of an observed ΔT signal of 4–6 **hours** (0.5–5% relative). The table
 is CI-pinned by the `lunar-alignment` gate
 (`data/lunar-alignment-summary.json` §dtBandsByCentury) — a silent
@@ -510,7 +510,7 @@ drift in either direction fails the chain:
 
 | Century | n | obs ΔT (hr) | model ΔT (hr) | residual |
 |---|---:|---:|---:|---:|
-| -800…-701 | <!--v:lunarCentury800N-->2<!--/v--> | <!--v:lunarCentury800ObsHours-->5.69<!--/v--> | <!--v:lunarCentury800FrameworkHours-->5.68<!--/v--> | <!--v:lunarCentury800ResidualHours-->−0.01<!--/v--> hr |
+| -800…-701 | <!--v:lunarCentury800N-->2<!--/v--> | <!--v:lunarCentury800ObsHours-->5.69<!--/v--> | <!--v:lunarCentury800FrameworkHours-->5.68<!--/v--> | <!--v:lunarCentury800ResidualHours-->0.00<!--/v--> hr |
 | -700…-601 | <!--v:lunarCentury700N-->8<!--/v--> | <!--v:lunarCentury700ObsHours-->5.42<!--/v--> | <!--v:lunarCentury700FrameworkHours-->5.34<!--/v--> | <!--v:lunarCentury700ResidualHours-->−0.08<!--/v--> hr |
 | -600…-501 | <!--v:lunarCentury600N-->21<!--/v--> | <!--v:lunarCentury600ObsHours-->5.03<!--/v--> | <!--v:lunarCentury600FrameworkHours-->4.94<!--/v--> | <!--v:lunarCentury600ResidualHours-->−0.09<!--/v--> hr |
 | -500…-401 | <!--v:lunarCentury500N-->17<!--/v--> | <!--v:lunarCentury500ObsHours-->4.55<!--/v--> | <!--v:lunarCentury500FrameworkHours-->4.37<!--/v--> | <!--v:lunarCentury500ResidualHours-->−0.18<!--/v--> hr |
@@ -524,7 +524,7 @@ the tablet reductions there) is recorded and gated rather than tuned
 away; the reductions carry the Stephenson team's conversion assumptions,
 and the assumption-light cross-check agrees with the framework — the
 untimed-bounds section of the same gate places the framework ΔT at −135
-(<!--v:lunarDtBoundsBabylon135FrameworkSeconds-->12,028<!--/v--> s) inside the
+(<!--v:lunarDtBoundsBabylon135FrameworkSeconds-->12,029<!--/v--> s) inside the
 tablet's published totality window
 [<!--v:lunarDtBoundsBabylon135LowSeconds-->11,220<!--/v-->, <!--v:lunarDtBoundsBabylon135HighSeconds-->12,140<!--/v-->] s.
 
@@ -546,7 +546,7 @@ the one-sided residual column above into sign-mixed, noise-class scatter:
 
 | Century | residual today | **pre-registered** residual after framework re-reduction |
 |---|---:|---:|
-| -800…-701 | <!--v:lunarCentury800ResidualHours-->−0.01<!--/v--> hr | <!--v:lunarPredictedReduced800Minutes-->+2.4<!--/v--> min |
+| -800…-701 | <!--v:lunarCentury800ResidualHours-->0.00<!--/v--> hr | <!--v:lunarPredictedReduced800Minutes-->+3.0<!--/v--> min |
 | -700…-601 | <!--v:lunarCentury700ResidualHours-->−0.08<!--/v--> hr | <!--v:lunarPredictedReduced700Minutes-->−2.6<!--/v--> min |
 | -600…-501 | <!--v:lunarCentury600ResidualHours-->−0.09<!--/v--> hr | <!--v:lunarPredictedReduced600Minutes-->−2.6<!--/v--> min |
 | -500…-401 | <!--v:lunarCentury500ResidualHours-->−0.18<!--/v--> hr | <!--v:lunarPredictedReduced500Minutes-->−8.5<!--/v--> min |

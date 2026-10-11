@@ -1,7 +1,7 @@
 ---
 docVersion: 1.0
-modelVersion: v21.0
-coefficients: sha256:7258a9b469c8b95e
+modelVersion: v22.0
+coefficients: sha256:922e0e84e8122f69
 status: current
 ---
 
@@ -272,7 +272,7 @@ These are computed from foundational constants. The formula is the definition; t
 |-------|---------|----------------|-----------|
 | Apsidal Precession | H / 3 | <!--v:inclPrecYears-->~111,635<!--/v--> | Counter-clockwise |
 | Ecliptic Precession | H / 5 | <!--v:eclPrecYears-->~68,751<!--/v--> | Counter-clockwise |
-| Obliquity Cycle | H / 8 | <!--v:obliqCycleYears-->~41,224<!--/v--> | Clockwise (negative) |
+| Obliquity Cycle | H / 8 | <!--v:obliqCycleYears-->~41,098<!--/v--> | Clockwise (negative) |
 | Axial Precession | the of-date year laws' beat at J2000 (route B; the fit-era label H/13 read 25,794, retired as a period — plan 06 S5) | <!--v:axialPrecRound-->~25,771<!--/v--> | Clockwise (negative) |
 | Perihelion Precession | H / 16 | <!--v:periPrecYears-->~20,938<!--/v--> | Both directions |
 
@@ -516,7 +516,7 @@ The `PERI_HARMONICS` array models Earth's perihelion longitude with 25 Fourier t
 
 | Constant | Variable | Value | Description |
 |----------|----------|-------|-------------|
-| Initial Delta-T | `deltaTStart` | <!--v:deltaTStart-->54.55<!--/v--> s | Long-term ΔT trend value at J2000 (paired with `usno_target_lod_s` = <!--v:usnoLodJ2000-->86,400.0021<!--/v--> at the joint optimum against Espenak). Not the IERS instantaneous observation (63.63 s at J2000) — the trend value passing through J2000, which excludes industrial-era Earth-rotation acceleration our cyclic model doesn't capture. |
+| Initial Delta-T | `deltaTStart` | <!--v:deltaTStart-->53.94<!--/v--> s | Long-term ΔT trend value at J2000 (paired with `usno_target_lod_s` = <!--v:usnoLodJ2000-->86,400.0021<!--/v--> at the joint optimum against Espenak). Not the IERS instantaneous observation (63.63 s at J2000) — the trend value passing through J2000, which excludes industrial-era Earth-rotation acceleration our cyclic model doesn't capture. |
 
 ---
 

@@ -220,6 +220,26 @@ would silently churn a structural claim for a rounding-level gain.
   recipe gave 0.70 and 0.73 against the documented 0.77; the script's own
   recipe (stored since) reproduces it exactly. Docs 92/97 result tables are
   now generated blocks (`npm run docs:tables`) for the same reason.
+- **Two precession rates, two uses — name which one a line carries.** The
+  general precession in longitude p₀ (50.288 ″/yr, the equinox along the
+  ecliptic of date — the tropical year, the climatic-precession lines p + gᵢ)
+  and the spin axis's inertial rate ψ̇ᵢₙ (50.385 in the shipped series-driven
+  configuration: the general rate plus the planetary mean the N-body
+  ecliptic's motion carries, +0.097 ≡ IAU's ψ_A − p_A — the hybrid obliquity
+  integration's self-anchor, the obliquity lines p + sᵢ, the obliquity beat;
+  La2004's precession frequency 50.476 sits 0.09 above it). The climate
+  lines carried p₀ for both families; the records flagged it (every LR04
+  window wanted +0.2…+0.3 ″/yr, all of it in the obliquity family), the
+  engine's own self-anchor said the same, and the fix moved ten obliquity
+  periods 0.3 % (41.22 → 41.10 kyr). TRAP measured on the way: a bare
+  `createModel()` (the 18-mode table) anchors the spin axis 0.18 ″/yr above
+  p₀ where the shipped series-driven model anchors 0.097 — derive line rates
+  from the shipped configuration (pass `secularSeriesArtifact`), the g₂-gap
+  trap in a new coat. Also measured: a clock-of-date "gain" that is really a
+  frequency offset (test with a constant-offset scan before believing a
+  drift), and a 0.3 % period shift compounding to a different α(t) phase a
+  million years out (the ΔT stack's GIA term by tens of percent at deep time;
+  the stack re-closed, Step 7c).
 
 ---
 
@@ -440,7 +460,12 @@ WITH this period but is NOT 13 of them** (H₀/T_p = 13.011: H₀ was fitted on
 the perihelion-of-date beat, so H/13 = 25,793.6 was the fit anchor's
 reading, 0.086 % slow, never a period; `hAtAge` in `deltat/deep-time.cjs`,
 plan 06 D6/Phase 3/S5), **the obliquity band must follow the beat
-2π/(ψ̇(t) − |s₃|)** (s₃ at its dynamical value under the measured
+2π/(ψ̇ᵢₙ(t) − |s₃|)** — ψ̇ᵢₙ the spin axis's INERTIAL rate, the composed
+rate × the hybrid's self-anchor factor (model v22.0: 50.385 ″/yr at J2000
+in the shipped series-driven configuration, where the general precession p₀
+reads 50.288 — the +0.097 is IAU's planetary precession ψ_A − p_A; the beat
+41,098 yr ≡ the climate formula's p+s₀ line, where the general rate read
+41,224 and La2004 reads 40,980 on its own 50.476) — (s₃ at its dynamical value under the measured
 solar-mass history — degenerate today with the pure precession-scaling
 reading "obliquity period ∝ T_p", roughly a factor two apart at 2.46 Ga;
 registry keys `obliqBeat*Kyr` / `obliqH8Scaled*Kyr` (name kept), doc 109

@@ -14235,8 +14235,13 @@ function wgcRenderPlanet(planetKey) {
 
 // |s₃|, ″/yr — the dominant nodal mode of Earth's orbit on the invariable plane
 // (the engine's deep secular modes; the obliquity beat's partner). Plan 06 S6:
-// the obliquity cycle is the BEAT 2π/(ψ̇ − |s₃|) of the composed lunisolar
-// precession against this mode — falsification leg 1 — not H/8.
+// the obliquity cycle is the BEAT 2π/(ψ̇ᵢₙ − |s₃|) of the spin axis's INERTIAL
+// precession rate against this mode — falsification leg 1 — not H/8. v22.0:
+// ψ̇ᵢₙ is the composed rate × the hybrid's self-anchor factor (the general
+// precession plus the planetary mean the N-body ecliptic's motion carries,
+// +0.097 ″/yr at J2000 ≡ IAU's ψ_A − p_A), the rate the obliquity integration
+// itself precesses ŝ on; the beat is 41,098 yr at J2000 ≡ the climate
+// formula's p+s₀ line (the general rate alone read 41,224).
 let _s3ArcsecPerYrMemo = null;
 function _s3ArcsecPerYr() {
   if (_s3ArcsecPerYrMemo === null) {
@@ -14247,10 +14252,17 @@ function _s3ArcsecPerYr() {
   }
   return _s3ArcsecPerYrMemo;
 }
-/** The obliquity beat period at age t_Ma, years (null past the tidal chain's domain). */
+/** The hybrid's self-anchor factor — the spin axis's inertial rate over the general precession at
+ *  J2000 (1.0019 with the series; the factory's own diagnostics, ONE home). 1 until the series-driven
+ *  hybrid exists (the deep-time pane and the Framework Verification charts build it first). */
+function _spinAxisInertialFactor() {
+  const h = _deepHistSeriesM;
+  return h && h.alphaArcsecPerYr > 0 ? h.alphaLunisolarArcsecPerYr / h.alphaArcsecPerYr : 1;
+}
+/** The obliquity beat period at age t_Ma, years — on the spin axis's INERTIAL rate (null past the tidal chain's domain). */
 function _obliqBeatYearsAtAge(t_Ma) {
   const Tp = _deepLod().lunisolarPrecessionPeriodYearsAtAge(t_Ma);
-  return Tp === null ? null : 1296000 / (1296000 / Tp - _s3ArcsecPerYr());
+  return Tp === null ? null : 1296000 / ((1296000 / Tp) * _spinAxisInertialFactor() - _s3ArcsecPerYr());
 }
 
 function wgcModelCurves(planetKey, d) {
@@ -15958,7 +15970,7 @@ const ESSRT_QTY_SPECS = {
   },
   obliqCycle: {
     title:    'Obliquity Cycle Period (the beat)',
-    subtitle: 'The beat 2π/(ψ̇ − |s₃|) of the composed lunisolar precession against the orbit’s dominant nodal mode — 41.2 kyr today; the pre-registered deep-time prediction of falsification leg 1. The obliquity itself oscillates ±1° around ~23.4° on this period — what evolves at deep time is the period, not the mean.',
+    subtitle: 'The beat 2π/(ψ̇ᵢₙ − |s₃|) of the spin axis’s inertial precession rate (the composed lunisolar rate plus the planetary mean) against the orbit’s dominant nodal mode — 41.1 kyr today; the pre-registered deep-time prediction of falsification leg 1. The obliquity itself oscillates ±1° around ~23.4° on this period — what evolves at deep time is the period, not the mean.',
     yLabel:   'Period (years)',
     compute:  (t_Ma) => _obliqBeatYearsAtAge(t_Ma),
     yFmt:     (v) => Math.round(v).toLocaleString('en-US') + ' yr',
@@ -16361,7 +16373,7 @@ function essrtRenderChart(qtyKey, rangeKey) {
     lod:        '<strong>Driver 1</strong> — Earth-Moon tidal recession (Layer-2 angular-momentum conservation, Farhat 2022 polynomial fit).',
     year:       '<strong>Drivers 1+2</strong> — days/year = (tropical year_s) / LOD. Driver 2 sets year-in-seconds (Kepler dT/T = −2 dM/M); Driver 1 sets day-in-seconds (Farhat 2022). The model’s day-count near-invariant couples the two. Wu et al. days/year are derived from their LOD: at 400 Ma → ~403 days/yr (matches Wells 1963 coral bands).',
     axial:      '<strong>Driver 1</strong> — the composed lunisolar precession period: Earth’s spin (Layer-2 angular momentum, Farhat 2022 recession) carrying the solar and lunar torques, the lunar torque growing on the Moon’s distance; anchored on the model’s J2000 period (25,771 yr).',
-    obliqCycle: '<strong>Driver 1</strong> — the obliquity beat 2π/(ψ̇ − |s₃|): the composed precession against the orbit’s dominant nodal mode (s₃ at its dynamical value under the solar-mass history).',
+    obliqCycle: '<strong>Driver 1</strong> — the obliquity beat 2π/(ψ̇ᵢₙ − |s₃|): the spin axis’s inertial precession rate (the composed rate × the hybrid’s self-anchor factor) against the orbit’s dominant nodal mode (s₃ at its dynamical value under the solar-mass history).',
     au:         '<strong>Driver 2</strong> — solar mass loss: a × M = const (Kepler dT/T = −2 dM/M, ~9.3×10⁻¹⁴ /yr).',
     moon:       '<strong>Driver 1</strong> — tidal recession via the Farhat 2022 LSQ polynomial fit a(t)/a_now = 1 + α₁t + α₃t³ + α₄t⁴.',
   }[qtyKey] || 'Drivers 1+2';
@@ -45807,8 +45819,8 @@ const planetStats = {
        hover : [`Retrograde (the equinox regresses — hence the minus): the beat of the one-source sidereal and tropical years in Julian years, sid·trop/((sid − trop)·365.25 d) — the same dynamical of-date value the Predictions panel shows (≈25,771.4 at J2000, matching IAU; the same number as 360° over the frame's precession rate per Julian year).`],
        tpLink: true},
       {label : () => `Obliquity cycle (derived beat)`,
-       value : [ { v: () => 1296000 / (1296000 / predictions.axialPrecession - Math.abs(CHAIN_ARTIFACT.s.earth.arcsecPerYr)), dec:0, sep:',' },{ small: 'years' }],
-       hover : [`The model's DERIVED obliquity period: 2π/(ψ̇ − |s₃|) — the beat of the one-source axial precession rate of date against the engine's own dominant nodal mode s₃ (−18.396″/yr; the Laskar reference s₃ −18.851 would read ≈41.2 kyr — a label, never an input). Matches the observed Milankovitch obliquity band (~41 kyr) and is gate-pinned in 40–42.5 kyr (the obliquity-hybrid verdict); doc 109 §18 carries the deep-time prediction split (registry obliqBeat*Kyr).`]},
+       value : [ { v: () => 1296000 / ((1296000 / predictions.axialPrecession) * _spinAxisInertialFactor() - _s3ArcsecPerYr()), dec:0, sep:',' },{ small: 'years' }],
+       hover : [`The model's DERIVED obliquity period: 2π/(ψ̇ᵢₙ − |s₃|) — the beat of the spin axis's INERTIAL precession rate of date (the one-source axial rate × the hybrid's self-anchor factor: the general precession plus the planetary mean the N-body ecliptic's motion carries, +0.097″/yr at J2000) against the engine's own dominant nodal mode s₃ (the banked deep secular modes, −18.851″/yr — the same partner the published obliqCycleYears and the Framework Verification chart use; the chain's of-date node tangent in the row below is a different, windowed quantity). 41,098 yr at J2000 ≡ the climate formula's p+s₀ line; the general rate alone read 41,224. Matches the observed Milankovitch obliquity band (~41 kyr) and is gate-pinned in 40–42.5 kyr (the obliquity-hybrid verdict); doc 109 §18 carries the deep-time prediction split (registry obliqBeat*Kyr).`]},
       {label : () => `Apsidal meets Axial (Perihelion precession)`,
        value : [ { v: () => predictions.perihelionPrecession, dec:2, sep:',' },{ small: 'years' }],
        hover : [`The two counter-rotations meet: the prograde apsidal motion (the Duration row above) and the retrograde axial precession close on each other, so the rates ADD — 1/T = 1/T_axial + 1/T_apsidal ≈ 20.9 kyr, the climatic-precession beat that paces the Milankovitch precession band. Computed as the beat of the ONE-SOURCE anomalistic and tropical years — the same value the Predictions panel shows.`],

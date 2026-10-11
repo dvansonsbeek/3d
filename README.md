@@ -32,7 +32,7 @@ Two of Earth's precession motions rotate in **opposite directions**, so their fr
 | Axial precession (the clock) | Clockwise | <!--v:axialPrecRound-->~25,771<!--/v--> years |
 | Apsidal precession (the orbit's own motion, a J2000 reading) | Counter-clockwise | <!--v:inclPrecYears-->~111,635<!--/v--> years |
 
-Their beat is the perihelion-of-date cycle, <!--v:periPrecYears-->~20,938<!--/v--> years (1/T_peri = 1/T_p + 1/T_aps), the carrier of the climatic-precession band. The apsidal period is <!--v:lunisolarApsidalPerPrecessionJ2000-->4.332<!--/v--> precession periods today and wanders between <!--v:lunisolarApsidalPerPrecessionWanderMin-->1.08<!--/v--> and <!--v:lunisolarApsidalPerPrecessionWanderMax-->9.81<!--/v--> across ±26 kyr: the ratio is a reading of two different clocks, not a gearing between them. The obliquity band is the beat of the clock against the orbit's own nodal mode, <!--v:obliqBeatJ2000Kyr-->41.2<!--/v--> kyr today. The simulator's Lunisolar Clock panel shows the live ratios.
+Their beat is the perihelion-of-date cycle, <!--v:periPrecYears-->~20,938<!--/v--> years (1/T_peri = 1/T_p + 1/T_aps), the carrier of the climatic-precession band. The apsidal period is <!--v:lunisolarApsidalPerPrecessionJ2000-->4.332<!--/v--> precession periods today and wanders between <!--v:lunisolarApsidalPerPrecessionWanderMin-->1.08<!--/v--> and <!--v:lunisolarApsidalPerPrecessionWanderMax-->9.81<!--/v--> across ±26 kyr: the ratio is a reading of two different clocks, not a gearing between them. The obliquity band is the beat of the clock against the orbit's own nodal mode, <!--v:obliqBeatJ2000Kyr-->41.1<!--/v--> kyr today. The simulator's Lunisolar Clock panel shows the live ratios.
 
 A third layer — a fitted timing anchor of <!--v:holisticYear-->335,317<!--/v--> years, calibrated on the 1246 AD perihelion–solstice alignment — is the unit of the small periodic corrections that bring the time-domain machinery onto the observed cardinal points, day lengths and eclipses. It is bookkeeping, not a cycle: it scales with the precession period at deep time and is not a period of anything the model computes. The full parameter accounting is three ledgers — zero fitted constants on the planetary side, the derived clock, and five named device constants of the frozen era machinery — in the [Constants Reference](docs/20-constants-reference.md). **Nothing is tuned per phenomenon**: move the anchor by a few years and the cardinal points, the day lengths and the eclipses stop matching the record together.
 
@@ -46,10 +46,10 @@ The same machinery, checked against independent records across six orders of mag
 |---|---|---|
 | Position of the Sun | JPL Horizons | <!--v:frameworkSunVsJplRms-->1.03<!--/v-->″ RMS — the Meeus Ch. 25 reference reads <!--v:meeusCh25SunVsJplRms-->1.02<!--/v-->″ |
 | Positions of the seven planets | JPL Horizons, 2000–2099 | <!--v:jupiterChainVsJplRms2000sArcsec-->10.3<!--/v-->″ (Jupiter) to <!--v:marsChainVsJplRms2000sArcsec-->35.7<!--/v-->″ (Mars); every target inside 0.012° across 1800–2100 |
-| Cardinal points (equinoxes and solstices) | JPL Horizons, −3000 to +2000 | <!--v:cardinalVsHorizonsMeanMin-->−0.71<!--/v--> min mean |
+| Cardinal points (equinoxes and solstices) | JPL Horizons, −3000 to +2000 | <!--v:cardinalVsHorizonsMeanMin-->−0.72<!--/v--> min mean |
 | Solar eclipses | <!--v:solarAudit26Total-->26<!--/v-->-event documented audit, −762 to 2026 CE | <!--v:solarAudit26ScanReach-->21<!--/v-->/<!--v:solarAudit26Total-->26<!--/v--> with the umbra reaching the observation site |
 | Lunar eclipse timings | Stephenson 2016, <!--v:lunarEventsTotal-->267<!--/v-->-event set | <!--v:lunarResidualMinutes-->20.2<!--/v--> min mean \|residual\|, with zero parameters fitted to eclipse data |
-| Earth's obliquity | La2004 (theory) | <!--v:obliqVsLa2004RmsLast100KyrArcsec-->1.2<!--/v-->″ rms over the last 100 kyr; <!--v:obliqVsLa2004RmsLastMyrArcsec-->13.1<!--/v-->″ rms over the last 1 Myr |
+| Earth's obliquity | La2004 (theory) | <!--v:obliqVsLa2004RmsLast100KyrArcsec-->1.2<!--/v-->″ rms over the last 100 kyr; <!--v:obliqVsLa2004RmsLastMyrArcsec-->13.6<!--/v-->″ rms over the last 1 Myr |
 | Climate record | CenCO2PIP, 0–66 Ma | R² = <!--v:canonCenco2pipTotal-->0.692<!--/v--> |
 | Devonian day count | Wells 1963 coral growth bands, 380 Ma | <!--v:anchorWellsFlagship380Pred-->399.96<!--/v--> days per year predicted against the paleontological 400 (<!--v:anchorWellsFlagship380DeltaPct-->−0.01<!--/v--> %) |
 | Deep-time precession | Dated Precambrian sections | gated at 1.4 and 2.46 Ga |
@@ -268,7 +268,7 @@ The cardinal points (solstices and equinoxes) are **derived, not independently f
 - **Axial precession**: <!--v:axialPrecRound-->~25,771<!--/v--> years
 - **Apsidal precession**: <!--v:inclPrecYears-->~111,635<!--/v--> years, a J2000 reading of the orbit's own motion
 - **Perihelion precession**: <!--v:periPrecYears-->~20,938<!--/v--> years — the beat of the two, 1/T_peri = 1/T_p + 1/T_aps
-- **Obliquity band**: <!--v:obliqBeatJ2000Kyr-->41.2<!--/v--> kyr — the beat of the clock against the orbit's nodal mode
+- **Obliquity band**: <!--v:obliqBeatJ2000Kyr-->41.1<!--/v--> kyr — the beat of the clock against the orbit's nodal mode
 - **Model parameters**: two engines, three ledgers — zero fitted constants on the planetary side, the derived clock, and five named device constants of the frozen era machinery; everything else is derived or anchored to observation ([Constants Reference](docs/20-constants-reference.md))
 
 ---

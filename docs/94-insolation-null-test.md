@@ -1,7 +1,7 @@
 ---
 docVersion: 1.0
-modelVersion: v21.0
-coefficients: sha256:7258a9b469c8b95e
+modelVersion: v22.0
+coefficients: sha256:922e0e84e8122f69
 status: current
 ---
 
@@ -16,10 +16,10 @@ status: current
 > layer only on a cross-window-stable gain above 0.02, and no window reaches it.
 > Every regime window is negative out of sample; the full 5.3-Myr record is the
 > one window with an out-of-sample gain —
-> <!--v:insolStabModelCvLr04Full-->+0.0174<!--/v--> with the model's own features,
-> <!--v:insolStabLaskarCvLr04Full-->+0.0130<!--/v--> with La2004's — inside the
+> <!--v:insolStabModelCvLr04Full-->−0.1183<!--/v--> with the model's own features,
+> <!--v:insolStabLaskarCvLr04Full-->−0.1227<!--/v--> with La2004's — inside the
 > tentative band (0.005–0.02), below the bar; its in-sample reading of
-> <!--v:insolExtDeltaR2Lr04Full-->+0.0568<!--/v--> does not hold out of sample (§9).
+> <!--v:insolExtDeltaR2Lr04Full-->+0.0261<!--/v--> does not hold out of sample (§9).
 > On 0–500 kyr the independent La2010a elements add
 > <!--v:insolLaskarV2DeltaR2Lr04-->+0.00758<!--/v--> on LR04 and
 > <!--v:insolLaskarV2DeltaR2Epica-->+0.00794<!--/v--> on EPICA CO₂ in sample (§8), the
@@ -36,7 +36,7 @@ status: current
 > comb-era measurement's pre-iNHG sensitivity to the *model's* e(t), attributed
 > there to a missing lattice line n = 24, was a property of the retired
 > single-line eccentricity law against the retired integer comb; on the shipped
-> model the pre-iNHG window reads <!--v:insolStabModelCvPreInhg-->−0.0197<!--/v-->
+> model the pre-iNHG window reads <!--v:insolStabModelCvPreInhg-->−0.0526<!--/v-->
 > out of sample. §10 keeps that attribution as the record.
 
 > **Scope note (ESSRT).** The line periods and the climate-test windows (LR04 0–5320 kyr, EPICA 0–800 kyr, La2010 0–500 kyr) are J2000-evaluated; the orbital lines' deep-time drift over the 5.3-Myr record is at the sub-percent level (the solar-mass law, [doc 109](109-model-nbody-engine-and-lattice-test.md)). The linear-algebra reading of §5.1 — the four features are projections of the same secular modes the lines enumerate — is epoch-invariant.
@@ -138,13 +138,13 @@ The same procedure was repeated for four LR04 regimes plus EPICA CO₂.
 
 | Regime | Window (kyr) | L1 | L1+L2+L3 | + L_insol | **ΔR²** |
 |--------|-------------:|------:|---------:|----------:|--------:|
-| post-MPT  | 0–1000  | <!--v:insolExtR2L1PostMpt-->0.779<!--/v--> | **<!--v:insolExtR2CanonPostMpt-->0.7788<!--/v-->** | **<!--v:insolExtR2FullPostMpt-->0.7803<!--/v-->** | **<!--v:insolExtDeltaR2PostMpt-->+0.0015<!--/v-->** |
-| iNHG-MPT  | 1000–2700 | <!--v:insolExtR2L1InhgMpt-->0.591<!--/v--> | **<!--v:insolExtR2CanonInhgMpt-->0.5911<!--/v-->** | **<!--v:insolExtR2FullInhgMpt-->0.5918<!--/v-->** | **<!--v:insolExtDeltaR2InhgMpt-->+0.0008<!--/v-->** |
-| pre-iNHG  | 2700–5320 | <!--v:insolExtR2L1PreInhg-->0.374<!--/v--> | **<!--v:insolExtR2CanonPreInhg-->0.3736<!--/v-->** | **<!--v:insolExtR2FullPreInhg-->0.3888<!--/v-->** | **<!--v:insolExtDeltaR2PreInhg-->+0.0152<!--/v-->** |
-| lr04-full | 0–5320  | <!--v:insolExtR2L1Lr04Full-->0.193<!--/v--> | **<!--v:insolExtR2CanonLr04Full-->0.2003<!--/v-->** | **<!--v:insolExtR2FullLr04Full-->0.2571<!--/v-->** | **<!--v:insolExtDeltaR2Lr04Full-->+0.0568<!--/v-->** |
-| EPICA CO₂ | 0–800   | —     | **<!--v:insolExtR2CanonEpicaCo2-->0.7301<!--/v-->** | **<!--v:insolExtR2FullEpicaCo2-->0.7305<!--/v-->** | **<!--v:insolExtDeltaR2EpicaCo2-->+0.0004<!--/v-->** |
+| post-MPT  | 0–1000  | <!--v:insolExtR2L1PostMpt-->0.779<!--/v--> | **<!--v:insolExtR2CanonPostMpt-->0.7790<!--/v-->** | **<!--v:insolExtR2FullPostMpt-->0.7806<!--/v-->** | **<!--v:insolExtDeltaR2PostMpt-->+0.0015<!--/v-->** |
+| iNHG-MPT  | 1000–2700 | <!--v:insolExtR2L1InhgMpt-->0.601<!--/v--> | **<!--v:insolExtR2CanonInhgMpt-->0.6007<!--/v-->** | **<!--v:insolExtR2FullInhgMpt-->0.6013<!--/v-->** | **<!--v:insolExtDeltaR2InhgMpt-->+0.0006<!--/v-->** |
+| pre-iNHG  | 2700–5320 | <!--v:insolExtR2L1PreInhg-->0.404<!--/v--> | **<!--v:insolExtR2CanonPreInhg-->0.4038<!--/v-->** | **<!--v:insolExtR2FullPreInhg-->0.4112<!--/v-->** | **<!--v:insolExtDeltaR2PreInhg-->+0.0073<!--/v-->** |
+| lr04-full | 0–5320  | <!--v:insolExtR2L1Lr04Full-->0.260<!--/v--> | **<!--v:insolExtR2CanonLr04Full-->0.2673<!--/v-->** | **<!--v:insolExtR2FullLr04Full-->0.2934<!--/v-->** | **<!--v:insolExtDeltaR2Lr04Full-->+0.0261<!--/v-->** |
+| EPICA CO₂ | 0–800   | —     | **<!--v:insolExtR2CanonEpicaCo2-->0.7275<!--/v-->** | **<!--v:insolExtR2FullEpicaCo2-->0.7279<!--/v-->** | **<!--v:insolExtDeltaR2EpicaCo2-->+0.0005<!--/v-->** |
 
-**Max ΔR² = <!--v:insolExtMaxDeltaR2-->+0.0568<!--/v-->** (the full record) — inside the pre-registered POSITIVE band (§2.3) in sample, which is why the cross-window stability check of §9 decides the verdict (§4).
+**Max ΔR² = <!--v:insolExtMaxDeltaR2-->+0.0261<!--/v-->** (the full record) — inside the pre-registered POSITIVE band (§2.3) in sample, which is why the cross-window stability check of §9 decides the verdict (§4).
 
 ### 3.2 L_insol coefficients (post-MPT)
 
@@ -153,10 +153,10 @@ canonical-residual are:
 
 | Coefficient | Value | Feature |
 |-------------|------:|---------|
-| γ ε−23.45° | <!--v:insolExtGammaEpsPostMpt-->−0.0075<!--/v--> | obliquity anomaly |
-| γ e | <!--v:insolExtGammaEccPostMpt-->−0.0346<!--/v--> | eccentricity |
-| γ e·sin(ϖ) | <!--v:insolExtGammaESinPostMpt-->+0.0058<!--/v--> | climatic precession (sin) |
-| γ e·cos(ϖ) | <!--v:insolExtGammaECosPostMpt-->−0.0139<!--/v--> | climatic precession (cos) |
+| γ ε−23.45° | <!--v:insolExtGammaEpsPostMpt-->−0.0049<!--/v--> | obliquity anomaly |
+| γ e | <!--v:insolExtGammaEccPostMpt-->−0.0363<!--/v--> | eccentricity |
+| γ e·sin(ϖ) | <!--v:insolExtGammaESinPostMpt-->+0.0059<!--/v--> | climatic precession (sin) |
+| γ e·cos(ϖ) | <!--v:insolExtGammaECosPostMpt-->−0.0138<!--/v--> | climatic precession (cos) |
 
 All four coefficients are small. Eccentricity has the largest residual
 coefficient; together the four add the post-MPT ΔR² of §3.1.
@@ -178,9 +178,9 @@ no L2, no L3), we ran a pure 4-feature regression against the LR04 stack:
 | Regime | R²_L1 | R²_insol_only | L1 / insol ratio |
 |--------|------:|--------------:|----------------:|
 | post-MPT | <!--v:insolExtR2L1PostMpt-->0.779<!--/v--> | <!--v:insolExtInsolOnlyR2PostMpt-->0.2362<!--/v--> | **<!--v:insolExtL1OverInsolPostMpt-->3×<!--/v-->** |
-| iNHG-MPT | <!--v:insolExtR2L1InhgMpt-->0.591<!--/v--> | <!--v:insolExtInsolOnlyR2InhgMpt-->0.1665<!--/v--> | **<!--v:insolExtL1OverInsolInhgMpt-->4×<!--/v-->** |
-| pre-iNHG | <!--v:insolExtR2L1PreInhg-->0.374<!--/v--> | <!--v:insolExtInsolOnlyR2PreInhg-->0.0939<!--/v--> | **<!--v:insolExtL1OverInsolPreInhg-->4×<!--/v-->** |
-| lr04-full | <!--v:insolExtR2L1Lr04Full-->0.193<!--/v--> | <!--v:insolExtInsolOnlyR2Lr04Full-->0.1167<!--/v--> | **<!--v:insolExtL1OverInsolLr04Full-->2×<!--/v-->** |
+| iNHG-MPT | <!--v:insolExtR2L1InhgMpt-->0.601<!--/v--> | <!--v:insolExtInsolOnlyR2InhgMpt-->0.1665<!--/v--> | **<!--v:insolExtL1OverInsolInhgMpt-->4×<!--/v-->** |
+| pre-iNHG | <!--v:insolExtR2L1PreInhg-->0.404<!--/v--> | <!--v:insolExtInsolOnlyR2PreInhg-->0.0939<!--/v--> | **<!--v:insolExtL1OverInsolPreInhg-->4×<!--/v-->** |
+| lr04-full | <!--v:insolExtR2L1Lr04Full-->0.260<!--/v--> | <!--v:insolExtInsolOnlyR2Lr04Full-->0.1167<!--/v--> | **<!--v:insolExtL1OverInsolLr04Full-->2×<!--/v-->** |
 
 The orbital lines (L1) carry **several times the explanatory power of the
 classical insolation features** at every LR04 time window tested (the ratio
@@ -191,9 +191,9 @@ column).
 ## 4. Verdict — no fourth layer
 
 ```
-Max ΔR² (model features, in-sample)               = <!--v:insolExtMaxDeltaR2-->+0.0568<!--/v-->   full record → POSITIVE band in sample; §9 decides
-Cross-validated, full record, model features      = <!--v:insolStabModelCvLr04Full-->+0.0174<!--/v-->   (TENTATIVE band, below the 0.02 bar)
-Cross-validated, full record, La2004 features     = <!--v:insolStabLaskarCvLr04Full-->+0.0130<!--/v-->   (same reading)
+Max ΔR² (model features, in-sample)               = <!--v:insolExtMaxDeltaR2-->+0.0261<!--/v-->   full record → POSITIVE band in sample; §9 decides
+Cross-validated, full record, model features      = <!--v:insolStabModelCvLr04Full-->−0.1183<!--/v-->   (TENTATIVE band, below the 0.02 bar)
+Cross-validated, full record, La2004 features     = <!--v:insolStabLaskarCvLr04Full-->−0.1227<!--/v-->   (same reading)
 Cross-validated, every regime window, either set  < 0
 ```
 
@@ -201,7 +201,7 @@ Read with §8 and §9, the statistic makes two statements:
 
 1. **No cross-window-stable gain — no fourth layer.** The one out-of-sample
    gain is on the full 5.3-Myr record, where the canonical fit is weakest
-   (R² = <!--v:insolExtR2CanonLr04Full-->0.2003<!--/v-->) and the in-sample
+   (R² = <!--v:insolExtR2CanonLr04Full-->0.2673<!--/v-->) and the in-sample
    reading is largest; it stays inside the tentative band. Every regime window
    is negative out of sample. On 0–500 kyr (§8) the independent La2010a
    elements add <!--v:insolLaskarV2DeltaR2Lr04-->+0.00758<!--/v--> (LR04) and
@@ -215,8 +215,8 @@ Read with §8 and §9, the statistic makes two statements:
    window was sensitive to the *model's* e(t) alone (§10, the record): that
    sensitivity belonged to the retired single-line eccentricity law, not to
    the orbit. On the shipped model pre-iNHG reads
-   <!--v:insolStabModelCvPreInhg-->−0.0197<!--/v--> (model) and
-   <!--v:insolStabLaskarCvPreInhg-->−0.0155<!--/v--> (La2004) out of sample.
+   <!--v:insolStabModelCvPreInhg-->−0.0526<!--/v--> (model) and
+   <!--v:insolStabLaskarCvPreInhg-->−0.0484<!--/v--> (La2004) out of sample.
 
 The canonical formula `C(t) = c₀ + L1(t) + L2(t) + L3(t)` stands.
 
@@ -290,11 +290,11 @@ linear Milankovitch features (ε, e, e·sin ϖ, e·cos ϖ) because:
 ### 6.3 Window/regime dependence
 
 In-sample ΔR² is largest where L1+L2+L3 alone is weakest — the full record
-(R² <!--v:insolExtR2CanonLr04Full-->0.2003<!--/v-->, ΔR²
-<!--v:insolExtDeltaR2Lr04Full-->+0.0568<!--/v-->) — and smallest in the well-fitted
+(R² <!--v:insolExtR2CanonLr04Full-->0.2673<!--/v-->, ΔR²
+<!--v:insolExtDeltaR2Lr04Full-->+0.0261<!--/v-->) — and smallest in the well-fitted
 post-MPT window. That is the expected headroom effect, and it is why the
 in-sample statistic alone cannot decide: the full-record gain shrinks to
-<!--v:insolStabModelCvLr04Full-->+0.0174<!--/v--> out of sample (§9).
+<!--v:insolStabModelCvLr04Full-->−0.1183<!--/v--> out of sample (§9).
 
 ---
 
@@ -453,23 +453,23 @@ of the shipped formula out of sample?*
 
 | Regime | Window (kyr) | ΔR² model (in-sample) | ΔR² La2004 (in-sample) | CV ΔR² model | CV ΔR² La2004 |
 |--------|-------------:|----------------------:|-----------------------:|-------------:|--------------:|
-| post-MPT  | 0–1000    | <!--v:insolExtDeltaR2PostMpt-->+0.0015<!--/v--> | <!--v:insolStabLaskarDeltaR2PostMpt-->+0.0015<!--/v--> | <!--v:insolStabModelCvPostMpt-->−0.0059<!--/v--> | <!--v:insolStabLaskarCvPostMpt-->−0.0057<!--/v--> |
-| iNHG-MPT  | 1000–2700 | <!--v:insolExtDeltaR2InhgMpt-->+0.0008<!--/v--> | <!--v:insolStabLaskarDeltaR2InhgMpt-->+0.0009<!--/v--> | <!--v:insolStabModelCvInhgMpt-->−0.0142<!--/v--> | <!--v:insolStabLaskarCvInhgMpt-->−0.0134<!--/v--> |
-| pre-iNHG  | 2700–5320 | **<!--v:insolExtDeltaR2PreInhg-->+0.0152<!--/v-->** | <!--v:insolStabLaskarDeltaR2PreInhg-->+0.0158<!--/v--> | **<!--v:insolStabModelCvPreInhg-->−0.0197<!--/v-->** | <!--v:insolStabLaskarCvPreInhg-->−0.0155<!--/v--> |
-| lr04-full | 0–5320    | <!--v:insolExtDeltaR2Lr04Full-->+0.0568<!--/v--> | <!--v:insolStabLaskarDeltaR2Lr04Full-->+0.0558<!--/v--> | <!--v:insolStabModelCvLr04Full-->+0.0174<!--/v--> | <!--v:insolStabLaskarCvLr04Full-->+0.0130<!--/v--> |
+| post-MPT  | 0–1000    | <!--v:insolExtDeltaR2PostMpt-->+0.0015<!--/v--> | <!--v:insolStabLaskarDeltaR2PostMpt-->+0.0016<!--/v--> | <!--v:insolStabModelCvPostMpt-->−0.0060<!--/v--> | <!--v:insolStabLaskarCvPostMpt-->−0.0059<!--/v--> |
+| iNHG-MPT  | 1000–2700 | <!--v:insolExtDeltaR2InhgMpt-->+0.0006<!--/v--> | <!--v:insolStabLaskarDeltaR2InhgMpt-->+0.0007<!--/v--> | <!--v:insolStabModelCvInhgMpt-->−0.0139<!--/v--> | <!--v:insolStabLaskarCvInhgMpt-->−0.0132<!--/v--> |
+| pre-iNHG  | 2700–5320 | **<!--v:insolExtDeltaR2PreInhg-->+0.0073<!--/v-->** | <!--v:insolStabLaskarDeltaR2PreInhg-->+0.0080<!--/v--> | **<!--v:insolStabModelCvPreInhg-->−0.0526<!--/v-->** | <!--v:insolStabLaskarCvPreInhg-->−0.0484<!--/v--> |
+| lr04-full | 0–5320    | <!--v:insolExtDeltaR2Lr04Full-->+0.0261<!--/v--> | <!--v:insolStabLaskarDeltaR2Lr04Full-->+0.0251<!--/v--> | <!--v:insolStabModelCvLr04Full-->−0.1183<!--/v--> | <!--v:insolStabLaskarCvLr04Full-->−0.1227<!--/v--> |
 
 Reading:
 
 - **Neither feature set passes the stability bar.** The only positive
   out-of-sample readings are on the full record —
-  <!--v:insolStabModelCvLr04Full-->+0.0174<!--/v--> (model) and
-  <!--v:insolStabLaskarCvLr04Full-->+0.0130<!--/v--> (La2004) — inside the
+  <!--v:insolStabModelCvLr04Full-->−0.1183<!--/v--> (model) and
+  <!--v:insolStabLaskarCvLr04Full-->−0.1227<!--/v--> (La2004) — inside the
   tentative band, below 0.02; the in-sample
-  <!--v:insolExtDeltaR2Lr04Full-->+0.0568<!--/v--> /
-  <!--v:insolStabLaskarDeltaR2Lr04Full-->+0.0558<!--/v--> there does not hold.
+  <!--v:insolExtDeltaR2Lr04Full-->+0.0261<!--/v--> /
+  <!--v:insolStabLaskarDeltaR2Lr04Full-->+0.0251<!--/v--> there does not hold.
   Every regime window is negative for both sets. Maximum cross-validated gain
-  anywhere: <!--v:insolStabMaxModelCv-->+0.0174<!--/v--> (model),
-  <!--v:insolStabMaxLaskarCv-->+0.0130<!--/v--> (La2004) — the §4 verdict.
+  anywhere: <!--v:insolStabMaxModelCv-->−0.0060<!--/v--> (model),
+  <!--v:insolStabMaxLaskarCv-->−0.0059<!--/v--> (La2004) — the §4 verdict.
 - **The two feature sets agree.** In sample they read alike to the third
   decimal in every regime; out of sample within 0.005. The model's e(t) spans
   <!--v:insolStabEccMinModel-->0.0006<!--/v-->–<!--v:insolStabEccMaxModel-->0.0578<!--/v-->
@@ -478,8 +478,8 @@ Reading:
   — the same multi-mode envelope. The comb-era pre-iNHG reading (a gain for
   the model's features only, §10) was a property of the retired single-line
   e(t): on the shipped model pre-iNHG reads
-  <!--v:insolStabModelCvPreInhg-->−0.0197<!--/v--> (model) and
-  <!--v:insolStabLaskarCvPreInhg-->−0.0155<!--/v--> (La2004).
+  <!--v:insolStabModelCvPreInhg-->−0.0526<!--/v--> (model) and
+  <!--v:insolStabLaskarCvPreInhg-->−0.0484<!--/v--> (La2004).
 
 Output: [`data/insolation-stability-results.json`](../data/insolation-stability-results.json).
 
@@ -495,10 +495,10 @@ two halves* — the regime thesis — not as "spurious".
 
 | Regime | R² | lines CV-positive | best CV line (ΔR²) | largest leave-one-out loss (ΔR²) |
 |---|---:|---:|---|---|
-| post-MPT | <!--v:l1AuditR2PostMpt-->0.7788<!--/v--> | <!--v:l1AuditCvPositivePostMpt-->4<!--/v--> | <!--v:l1AuditBestCvLinePostMpt-->climatic precession p+g0<!--/v--> (<!--v:l1AuditBestCvDeltaR2PostMpt-->+0.0137<!--/v-->) | <!--v:l1AuditLargestLooLinePostMpt-->eccentricity g0−g2<!--/v--> (<!--v:l1AuditLargestLooDeltaR2PostMpt-->+0.0284<!--/v-->) |
-| iNHG-MPT | <!--v:l1AuditR2InhgMpt-->0.5911<!--/v--> | <!--v:l1AuditCvPositiveInhgMpt-->6<!--/v--> | <!--v:l1AuditBestCvLineInhgMpt-->obliquity p+s0<!--/v--> (<!--v:l1AuditBestCvDeltaR2InhgMpt-->+0.0501<!--/v-->) | <!--v:l1AuditLargestLooLineInhgMpt-->obliquity p+s0<!--/v--> (<!--v:l1AuditLargestLooDeltaR2InhgMpt-->+0.1002<!--/v-->) |
-| pre-iNHG | <!--v:l1AuditR2PreInhg-->0.3736<!--/v--> | <!--v:l1AuditCvPositivePreInhg-->5<!--/v--> | <!--v:l1AuditBestCvLinePreInhg-->obliquity p+s0<!--/v--> (<!--v:l1AuditBestCvDeltaR2PreInhg-->+0.0384<!--/v-->) | <!--v:l1AuditLargestLooLinePreInhg-->obliquity p+s0<!--/v--> (<!--v:l1AuditLargestLooDeltaR2PreInhg-->+0.0913<!--/v-->) |
-| lr04-full | <!--v:l1AuditR2Lr04Full-->0.2003<!--/v--> | <!--v:l1AuditCvPositiveLr04Full-->1<!--/v--> | <!--v:l1AuditBestCvLineLr04Full-->eccentricity fundamental g₂−g₅<!--/v--> (<!--v:l1AuditBestCvDeltaR2Lr04Full-->+0.0094<!--/v-->) | <!--v:l1AuditLargestLooLineLr04Full-->obliquity p+s0<!--/v--> (<!--v:l1AuditLargestLooDeltaR2Lr04Full-->+0.0459<!--/v-->) |
+| post-MPT | <!--v:l1AuditR2PostMpt-->0.7790<!--/v--> | <!--v:l1AuditCvPositivePostMpt-->4<!--/v--> | <!--v:l1AuditBestCvLinePostMpt-->climatic precession p+g0<!--/v--> (<!--v:l1AuditBestCvDeltaR2PostMpt-->+0.0139<!--/v-->) | <!--v:l1AuditLargestLooLinePostMpt-->eccentricity g0−g2<!--/v--> (<!--v:l1AuditLargestLooDeltaR2PostMpt-->+0.0281<!--/v-->) |
+| iNHG-MPT | <!--v:l1AuditR2InhgMpt-->0.6007<!--/v--> | <!--v:l1AuditCvPositiveInhgMpt-->7<!--/v--> | <!--v:l1AuditBestCvLineInhgMpt-->obliquity p+s0<!--/v--> (<!--v:l1AuditBestCvDeltaR2InhgMpt-->+0.0689<!--/v-->) | <!--v:l1AuditLargestLooLineInhgMpt-->obliquity p+s0<!--/v--> (<!--v:l1AuditLargestLooDeltaR2InhgMpt-->+0.1389<!--/v-->) |
+| pre-iNHG | <!--v:l1AuditR2PreInhg-->0.4038<!--/v--> | <!--v:l1AuditCvPositivePreInhg-->4<!--/v--> | <!--v:l1AuditBestCvLinePreInhg-->obliquity p+s0<!--/v--> (<!--v:l1AuditBestCvDeltaR2PreInhg-->+0.0849<!--/v-->) | <!--v:l1AuditLargestLooLinePreInhg-->obliquity p+s0<!--/v--> (<!--v:l1AuditLargestLooDeltaR2PreInhg-->+0.1259<!--/v-->) |
+| lr04-full | <!--v:l1AuditR2Lr04Full-->0.2673<!--/v--> | <!--v:l1AuditCvPositiveLr04Full-->2<!--/v--> | <!--v:l1AuditBestCvLineLr04Full-->eccentricity fundamental g₂−g₅<!--/v--> (<!--v:l1AuditBestCvDeltaR2Lr04Full-->+0.0092<!--/v-->) | <!--v:l1AuditLargestLooLineLr04Full-->obliquity p+s0<!--/v--> (<!--v:l1AuditLargestLooDeltaR2Lr04Full-->+0.1027<!--/v-->) |
 
 Reading: the 41-kyr obliquity line carries both older regimes out of sample
 and is the largest single loss on the full record — where its cross-validated
@@ -520,27 +520,27 @@ argmax follows the power.
 
 - **Pre-iNHG, band open:** the stationary line is at
   <!--v:eccScanPreInhgCvBestKyr-->112.8<!--/v--> kyr (CV ΔR²
-  <!--v:eccScanPreInhgMaxCv-->+0.0296<!--/v-->, half-max
+  <!--v:eccScanPreInhgMaxCv-->+0.0295<!--/v-->, half-max
   <!--v:eccScanPreInhgCvHalfmaxLoKyr-->112.0<!--/v-->–<!--v:eccScanPreInhgCvHalfmaxHiKyr-->113.3<!--/v--> kyr).
   The nearest shipped line is <!--v:eccScanPreInhgNearestLineLabel-->eccentricity g3−g4<!--/v-->
   at <!--v:eccScanPreInhgNearestLineKyr-->110.0<!--/v--> kyr,
   <!--v:eccScanPreInhgOffsetFromNearestLinePct-->+2.5<!--/v--> % away, and at its
   own period the pair does not cross-validate
-  (<!--v:eccScanPreInhgCvAtNearestLine-->−0.1170<!--/v-->): over 2,600 kyr a
+  (<!--v:eccScanPreInhgCvAtNearestLine-->−0.1172<!--/v-->): over 2,600 kyr a
   2.5 % period offset is 0.6 cycle of phase, enough to decorrelate. No shipped
   band line reads positive out of sample there (the best,
   <!--v:eccScanPreInhgBestCvShippedLineLabel-->eccentricity g1−g2<!--/v-->, is
-  <!--v:eccScanPreInhgBestCvShippedLineCv-->−0.0060<!--/v-->). The in-sample
+  <!--v:eccScanPreInhgBestCvShippedLineCv-->−0.0057<!--/v-->). The in-sample
   power peak sits at <!--v:eccScanPreInhgInBestKyr-->98.5<!--/v--> kyr (the
   classical ~100k) and does not cross-validate
-  (<!--v:eccScanPreInhgInBestCv-->−0.0134<!--/v-->).
+  (<!--v:eccScanPreInhgInBestCv-->−0.0117<!--/v-->).
 - **Post-MPT, band open:** the stationary line is at
   <!--v:eccScanPostMptCvBestKyr-->93.5<!--/v--> kyr,
   <!--v:eccScanPostMptOffsetFromNearestLinePct-->−1.5<!--/v--> % from
   <!--v:eccScanPostMptNearestLineLabel-->eccentricity g0−g2<!--/v-->
   (<!--v:eccScanPostMptNearestLineKyr-->94.9<!--/v--> kyr), which does
   cross-validate at its own period
-  (<!--v:eccScanPostMptCvAtNearestLine-->+0.0862<!--/v-->).
+  (<!--v:eccScanPostMptCvAtNearestLine-->+0.0873<!--/v-->).
 
 So the pre-iNHG record carries a stationary ~112.7-kyr line that the derived
 set does not contain: the secular beats bracket it (110.0 and 123.8 kyr) and
@@ -577,7 +577,7 @@ separates them on the same canonical residual, ridge and split-half CV as §9.
 
 | Regressor on the L1+L2+L3 residual | in-sample ΔR² | CV ΔR² |
 |---|---:|---:|
-| all four model features (§9) | <!--v:insolExtDeltaR2PreInhg-->+0.0152<!--/v--> | <!--v:insolStabModelCvPreInhg-->−0.0197<!--/v--> |
+| all four model features (§9) | <!--v:insolExtDeltaR2PreInhg-->+0.0073<!--/v--> | <!--v:insolStabModelCvPreInhg-->−0.0526<!--/v--> |
 | model e(t) alone — fixed H/3 phase, one parameter | <!--v:l1N24EccInSamplePreInhg-->+0.0187<!--/v--> | <!--v:l1N24EccCvPreInhg-->+0.0144<!--/v--> |
 | pure lattice pair cos/sin(2π·24·t/8H) — free phase | <!--v:l1N24LineInSamplePreInhg-->+0.0191<!--/v--> | **<!--v:l1N24LineCvPreInhg-->+0.0144<!--/v-->** |
 | e·sin ϖ, e·cos ϖ pair alone | — | <!--v:l1N24PeriPairCvPreInhg-->−0.0062<!--/v--> |

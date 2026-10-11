@@ -1,23 +1,23 @@
 ---
 docVersion: 1.0
-modelVersion: v21.0
-coefficients: sha256:7258a9b469c8b95e
+modelVersion: v22.0
+coefficients: sha256:922e0e84e8122f69
 status: current
 ---
 
 # Climate Formula — Architecture, Variance Decomposition & Implementation
 
-> **TL;DR.** The canonical climate formula's orbital layer (L1) is **the engine's own physical line set** — 25 Berger/Laskar-style beats of Earth's secular modes (|g_i − g_j| eccentricity, p + s_i obliquity, p + g_i climatic precession, at relative mode amplitude ≥ 0.1) **plus the 405.6-kyr g₂ − g₅ fundamental and its 2nd/3rd harmonics** (the former L2 carbon-thermostat family, folded in) — read from `data/l1-physical-lines.json`, one home (plan 06 T1; §2's generated table), **+ up to 6 Heaviside step terms** (L3), fitted per regime with sequential ridge regression. The **33-integer comb (periods as integer fractions of an eight-unit base) that §§1–8 analyse is the variance-decomposition RECORD** that led there; the pre-registered test T1 measured the comb against the physical lines and retired the labels. Per-regime fits reach **R² = <!--v:canonR2PostMpt-->0.7788<!--/v--> post-MPT**, **R² = <!--v:canonR2Epica-->0.7301<!--/v--> EPICA CO₂**, **R² = 0.7626 CenCO2PIP 0–66 Ma**; the full-LR04 fit is **R² = <!--v:canonR2Full-->0.2003<!--/v-->** (L1+L2+L3). This doc decomposes the residual into a layered taxonomy — **(L1) orbital lattice**, **(L2) climate-system internal periodic** (canonical: 405-kyr silicate-weathering thermostat + its 202 / 135 kyr harmonics; investigated but not deployed: 13H Boulila libration, 9-Myr long-period carbon resonance), **(L3) boundary-condition shifts** (MPT regime change, iNHG, Cenozoic secular trend, tectonic gateways), **(L4) chronology**, **(L5) stochastic residual** — and reports measured ΔR² for each addition.
+> **TL;DR.** The canonical climate formula's orbital layer (L1) is **the engine's own physical line set** — 25 Berger/Laskar-style beats of Earth's secular modes (|g_i − g_j| eccentricity, p + s_i obliquity, p + g_i climatic precession, at relative mode amplitude ≥ 0.1) **plus the 405.6-kyr g₂ − g₅ fundamental and its 2nd/3rd harmonics** (the former L2 carbon-thermostat family, folded in) — read from `data/l1-physical-lines.json`, one home (plan 06 T1; §2's generated table), **+ up to 6 Heaviside step terms** (L3), fitted per regime with sequential ridge regression. The **33-integer comb (periods as integer fractions of an eight-unit base) that §§1–8 analyse is the variance-decomposition RECORD** that led there; the pre-registered test T1 measured the comb against the physical lines and retired the labels. Per-regime fits reach **R² = <!--v:canonR2PostMpt-->0.7790<!--/v--> post-MPT**, **R² = <!--v:canonR2Epica-->0.7275<!--/v--> EPICA CO₂**, **R² = 0.7626 CenCO2PIP 0–66 Ma**; the full-LR04 fit is **R² = <!--v:canonR2Full-->0.2673<!--/v-->** (L1+L2+L3). This doc decomposes the residual into a layered taxonomy — **(L1) orbital lattice**, **(L2) climate-system internal periodic** (canonical: 405-kyr silicate-weathering thermostat + its 202 / 135 kyr harmonics; investigated but not deployed: 13H Boulila libration, 9-Myr long-period carbon resonance), **(L3) boundary-condition shifts** (MPT regime change, iNHG, Cenozoic secular trend, tectonic gateways), **(L4) chronology**, **(L5) stochastic residual** — and reports measured ΔR² for each addition.
 
 > **Scope note (ESSRT).** The L1 lines are the engine's own secular beats, and the layered taxonomy (L1 orbital lines / L2 carbon / L3 boundary shifts) holds at any epoch. The eccentricity lines |g_i − g_j| are fixed at every epoch (planetary g-modes, ∝ 1/μ under the solar-mass history only); the obliquity and climatic-precession lines p + s_i and p + g_i ride the composed precession rate ψ̇(t) at deep time — sub-percent over the LR04 5.3-Myr window covered by the post-MPT / iNHG-MPT / pre-iNHG ridge fits, modest over the 67-Myr CENOGRID window ([doc 99](99-expanding-solar-system-resonance-theory.md)'s generated tables give the lines at each age). The comb-era literal counts quoted in §§1–8 (8H = <!--v:eightH-->2,682,536<!--/v--> yr; 13H = <!--v:thirteenH-->4,359,121<!--/v--> yr) are the record's own numbers.
 >
 > **Canonical formula measurements** (`scripts/milankovitch_climate_formula.py`, the 28-line L1 — 25 orbital lines + the 405-kyr family — + up to 6 L3 steps, sequential ridge λ=1):
-> - **LR04 regime split is the biggest single jump**: pre-iNHG (2.7–5.32 Ma) R² = **<!--v:canonR2PreInhg-->0.3736<!--/v-->**, iNHG-MPT (1.0–2.7 Ma) R² = **<!--v:canonR2InhgMpt-->0.5911<!--/v-->**, post-MPT (0–1.0 Ma) R² = **<!--v:canonR2PostMpt-->0.7788<!--/v-->** — the lines explain ~78% of post-MPT LR04 variance once the MPT regime change is removed.
+> - **LR04 regime split is the biggest single jump**: pre-iNHG (2.7–5.32 Ma) R² = **<!--v:canonR2PreInhg-->0.4038<!--/v-->**, iNHG-MPT (1.0–2.7 Ma) R² = **<!--v:canonR2InhgMpt-->0.6007<!--/v-->**, post-MPT (0–1.0 Ma) R² = **<!--v:canonR2PostMpt-->0.7790<!--/v-->** — the lines explain ~78% of post-MPT LR04 variance once the MPT regime change is removed.
 > - **CENOGRID δ¹⁸O** (0–67 Ma) R² = **0.6177** (L1+L2+L3); δ¹³C R² = **0.3514**. L3 step components carry the dominant CENOGRID variance (Cenozoic secular cooling captured by 6 Heavisides at PETM/EOT/Mi-1/MMCT/iNHG/MPT).
 >
 > **Tier A variance budget — comb-era record (§§1–8)** (`scripts/milankovitch_8h_variance_budget.py`, plain OLS for layer-by-layer accounting on the 33-integer comb):
 > - Full LR04: baseline 25 → <!--v:tierALatticeCount-->33<!--/v--> integers (6 sidebands, n=141, n=24) lifts R² <!--v:tierA0R2Full-->0.2321<!--/v--> → **<!--v:tierA1R2Full-->0.2417<!--/v-->**; adding deployed-L2 405-kyr → <!--v:tierA2R2Full-->0.2474<!--/v-->.
-> - Post-MPT regime: <!--v:tierALatticeCount-->33<!--/v-->-integer L1 alone → **<!--v:tierA1R2PostMpt-->0.8803<!--/v-->**; adding the full investigated L2 stack (405-kyr + 13H + 9-Myr) → <!--v:tierA4R2PostMpt-->0.9024<!--/v-->. The canonical formula caps at <!--v:canonR2PostMpt-->0.7788<!--/v--> because 13H and 9-Myr are rejected by R3-4 cross-window stability tests.
+> - Post-MPT regime: <!--v:tierALatticeCount-->33<!--/v-->-integer L1 alone → **<!--v:tierA1R2PostMpt-->0.8803<!--/v-->**; adding the full investigated L2 stack (405-kyr + 13H + 9-Myr) → <!--v:tierA4R2PostMpt-->0.9024<!--/v-->. The canonical formula caps at <!--v:canonR2PostMpt-->0.7790<!--/v--> because 13H and 9-Myr are rejected by R3-4 cross-window stability tests.
 >
 > **Tier B Round 1 measurements — comb-era record** (`scripts/milankovitch_8h_variance_budget_tier_b.py`):
 > - **B4 — CENOGRID L3 detrend matters**: piecewise-linear at 6 known transitions lifts δ¹⁸O R² from <!--v:tierB4D18oLinear-->0.027<!--/v--> → **<!--v:tierB4D18oPiecewise-->0.066<!--/v--> (<!--v:tierB4D18oGain-->2.4×<!--/v-->)**; polynomial degree-10 lifts δ¹³C R² to **<!--v:tierB4D13cPoly10-->0.137<!--/v--> (<!--v:tierB4D13cGain-->1.5×<!--/v-->)**.
@@ -28,14 +28,14 @@ status: current
 > **Tier B Round 2 measurements — comb-era record** (`scripts/milankovitch_8h_variance_budget_tier_b_r2.py`):
 > - **B5 — Step components are the dominant CENOGRID variance carrier**: adding 6 Heaviside step covariates at PETM/EOT/Mi-1/MMCT/iNHG/MPT lifts δ¹⁸O R² from <!--v:tierB5D18oBase-->0.027<!--/v--> → **<!--v:tierB5D18oSteps-->0.676<!--/v--> (<!--v:tierB5D18oGain-->25×<!--/v-->)** and δ¹³C from <!--v:tierB5D13cBase-->0.089<!--/v--> → **<!--v:tierB5D13cSteps-->0.426<!--/v--> (<!--v:tierB5D13cGain-->4.8×<!--/v-->)**. The fitted step amplitudes independently recover canonical Cenozoic climate history (PETM +1.94, EOT −1.73, etc.).
 > - **C2 — Cross-record phase coherence: only 405-kyr is cross-proxy coherent**. All other L2 lines (202-kyr, 135-kyr harmonics, 13H, 9-Myr) show ~half-cycle phase lag between δ¹⁸O and δ¹³C — temperature-driven L1 forcing + carbon-feedback delay (now classified **L2-feedback** vs **L2-direct**).
-> - **C10 — EPICA CO₂ R² = <!--v:canonR2Epica-->0.7301<!--/v-->** (canonical formula); obliquity-band carbon amplification (8H/66 = 41 kyr ratio <!--v:tierC10TopRatio-->18.67<!--/v-->) reveals a SECOND L2 mechanism (Pleistocene glacial-CO₂ coupling) distinct from silicate-weathering.
+> - **C10 — EPICA CO₂ R² = <!--v:canonR2Epica-->0.7275<!--/v-->** (canonical formula); obliquity-band carbon amplification (8H/66 = 41 kyr ratio <!--v:tierC10TopRatio-->18.67<!--/v-->) reveals a SECOND L2 mechanism (Pleistocene glacial-CO₂ coupling) distinct from silicate-weathering.
 > - **C5 — Forward prediction fails catastrophically across the MPT** (R² = <!--v:tierC5PredictPost-->-2.12<!--/v-->). **The framework is descriptive within regimes, NOT predictive across regime boundaries.**
 > - **D1 — Proxy-aware separation**: pure L1 components contribute ~0 to either proxy on CENOGRID; L2 dominates variance at deep-time scales.
 >
 > **Tier B Round 3 measurements — comb-era record** (`scripts/milankovitch_8h_variance_budget_tier_b_r3.py`) — **the predictive limits exposed**:
 > - **R3-1 — Sliding-window amplitudes are real and substantial**: per-window R² = <!--v:tierR31WindowR2Min-->0.69<!--/v-->–<!--v:tierR31WindowR2Max-->0.88<!--/v--> across all 11 LR04 windows; individual amplitudes vary 4-6× across windows; boundary-condition correlations flip sign between LR04 and CENOGRID (the MPT regime change signature).
 > - **R3-2 — Honest negative: L2 lines are NOT linear responses to L1 drivers** (|r| < 0.4 for all tested pairs). Simple ODE models won't capture L2 mechanisms — they are nonlinear (threshold / hysteresis / saturating).
-> - **R3-3 — Honest negative: step components do NOT fix forward prediction.** Three-regime split with canonical formula: pre-iNHG R² = <!--v:canonR2PreInhg-->0.3736<!--/v-->, iNHG-MPT R² = <!--v:canonR2InhgMpt-->0.5911<!--/v-->, post-MPT R² = <!--v:canonR2PostMpt-->0.7788<!--/v-->. Forward predictions with and without step covariates give IDENTICAL (failing) R². The regime non-stationarity is in **amplitudes**, not baselines.
+> - **R3-3 — Honest negative: step components do NOT fix forward prediction.** Three-regime split with canonical formula: pre-iNHG R² = <!--v:canonR2PreInhg-->0.4038<!--/v-->, iNHG-MPT R² = <!--v:canonR2InhgMpt-->0.6007<!--/v-->, post-MPT R² = <!--v:canonR2PostMpt-->0.7790<!--/v-->. Forward predictions with and without step covariates give IDENTICAL (failing) R². The regime non-stationarity is in **amplitudes**, not baselines.
 > - **R3-4 — Honest negative: 13H Boulila libration is not a stable single eigenmode**: amp CV <!--v:tierR34AmpCvD18o-->42<!--/v-->–<!--v:tierR34AmpCvD13c-->50<!--/v-->%, δ¹⁸O phase circular std <!--v:tierR34PhaseStdD18o-->97.9<!--/v-->° (≈ uniform random). The Boulila-match amplitude signature is real; interpretation as a single coherent oscillator is not supported.
 >
 > **All numbers reproducible**:
@@ -71,7 +71,7 @@ Mixing them in one residual conflates the spectrum, makes the model look weaker 
 
 | Layer | Type | Examples | Spectral signature | Quantification status |
 |-------|------|----------|-------------------|----------------------|
-| **L1** | Orbital lattice (8H/N) | Earth obliquity (k+s₃), Mars apsidal, eigenmode beats g_i−g_j and s_i−s_j, Berger climatic precession k+g_i | Sharp lines at exact integer divisors of 8H | Quantified — canonical: **33 active integers, post-MPT R² = <!--v:canonR2PostMpt-->0.7788<!--/v-->, full-LR04 R² = <!--v:canonR2Full-->0.2003<!--/v-->** (§2.3, §9.5) |
+| **L1** | Orbital lattice (8H/N) | Earth obliquity (k+s₃), Mars apsidal, eigenmode beats g_i−g_j and s_i−s_j, Berger climatic precession k+g_i | Sharp lines at exact integer divisors of 8H | Quantified — canonical: **33 active integers, post-MPT R² = <!--v:canonR2PostMpt-->0.7790<!--/v-->, full-LR04 R² = <!--v:canonR2Full-->0.2673<!--/v-->** (§2.3, §9.5) |
 | **L2** | Climate-system internal periodic | 405-kyr silicate-weathering thermostat + its 202 / 135 kyr harmonics (off-lattice); investigated: 13H = 4.36-Myr Boulila libration, 9-Myr long-period carbon resonance | Sharp lines off the lattice OR on-lattice with anomalously high δ¹³C/δ¹⁸O ratio | Quantified — canonical (3 lines: 405-kyr family): post-MPT ΔR² = +0.003, pre-iNHG ΔR² = +0.049, EPICA CO₂ ΔR² = +0.012 (§3, §9.3, §10) |
 | **L3** | Boundary-condition shifts | MPT (~1 Ma), iNHG (~2.7 Ma), late-Pleistocene cooling trend, tectonic gateways (Panama ~3 Ma, Drake ~30 Ma, EOT ~34 Ma), PETM (~56 Ma) | Step changes, secular drifts — broadband not narrow-line | Quantified — 6 Heaviside steps (PETM/EOT/Mi-1/MMCT/iNHG/MPT) lift CENOGRID δ¹⁸O ΔR² = +0.61 / δ¹³C ΔR² = +0.34 / CenCO2PIP CO₂ ΔR² = +0.60; fitted amplitudes recover canonical Cenozoic climate history (§8.3 B5, §9.4, §11.3) |
 | **L4** | Chronology / methodology | Orbital tuning bias, stratigraphic sampling density, age-model uncertainty | Broadband noise + position uncertainty | Bounded (Cheng2016 validation: k=6 same FFT bin = chronology bias is small) |
@@ -102,16 +102,16 @@ Decomposition strategy: add components in this order — L1 (lattice fit) → L2
 | 3 | climatic precession | p+g1 | 22.45 | 0.862 | rides the composed precession rate ψ̇(t) at deep time (doc 99) |
 | 4 | climatic precession | p+g4 | 23.19 | 0.199 | rides the composed precession rate ψ̇(t) at deep time (doc 99) |
 | 5 | climatic precession | p+g0 | 23.76 | 1.000 | rides the composed precession rate ψ̇(t) at deep time (doc 99) |
-| 6 | obliquity | p+s12 | 27.40 | 0.104 | rides the composed precession rate ψ̇(t) at deep time (doc 99) |
-| 7 | obliquity | p+s1 | 28.99 | 0.542 | rides the composed precession rate ψ̇(t) at deep time (doc 99) |
-| 8 | obliquity | p+s14 | 29.16 | 0.142 | rides the composed precession rate ψ̇(t) at deep time (doc 99) |
-| 9 | obliquity | p+s9 | 29.77 | 0.101 | rides the composed precession rate ψ̇(t) at deep time (doc 99) |
-| 10 | obliquity | p+s3 | 29.97 | 0.479 | rides the composed precession rate ψ̇(t) at deep time (doc 99) |
-| 11 | obliquity | p+s2 | 39.84 | 0.485 | rides the composed precession rate ψ̇(t) at deep time (doc 99) |
-| 12 | obliquity | p+s4 | 40.52 | 0.324 | rides the composed precession rate ψ̇(t) at deep time (doc 99) |
-| 13 | obliquity | p+s0 | 41.22 | 1.000 | rides the composed precession rate ψ̇(t) at deep time (doc 99) |
-| 14 | obliquity | p+s7 | 41.96 | 0.179 | rides the composed precession rate ψ̇(t) at deep time (doc 99) |
-| 15 | obliquity | p+s10 | 54.13 | 0.161 | rides the composed precession rate ψ̇(t) at deep time (doc 99) |
+| 6 | obliquity | p+s12 | 27.35 | 0.104 | rides the composed precession rate ψ̇(t) at deep time (doc 99) |
+| 7 | obliquity | p+s1 | 28.93 | 0.542 | rides the composed precession rate ψ̇(t) at deep time (doc 99) |
+| 8 | obliquity | p+s14 | 29.09 | 0.142 | rides the composed precession rate ψ̇(t) at deep time (doc 99) |
+| 9 | obliquity | p+s9 | 29.71 | 0.101 | rides the composed precession rate ψ̇(t) at deep time (doc 99) |
+| 10 | obliquity | p+s3 | 29.90 | 0.479 | rides the composed precession rate ψ̇(t) at deep time (doc 99) |
+| 11 | obliquity | p+s2 | 39.72 | 0.485 | rides the composed precession rate ψ̇(t) at deep time (doc 99) |
+| 12 | obliquity | p+s4 | 40.40 | 0.324 | rides the composed precession rate ψ̇(t) at deep time (doc 99) |
+| 13 | obliquity | p+s0 | 41.10 | 1.000 | rides the composed precession rate ψ̇(t) at deep time (doc 99) |
+| 14 | obliquity | p+s7 | 41.82 | 0.179 | rides the composed precession rate ψ̇(t) at deep time (doc 99) |
+| 15 | obliquity | p+s10 | 53.92 | 0.161 | rides the composed precession rate ψ̇(t) at deep time (doc 99) |
 | 16 | eccentricity | g0−g2 | 94.88 | 0.779 | planetary g-beat — does not scale with Earth's spin |
 | 17 | eccentricity | g0−g6 | 96.85 | 0.110 | planetary g-beat — does not scale with Earth's spin |
 | 18 | eccentricity | g0−g3 | 98.84 | 0.535 | planetary g-beat — does not scale with Earth's spin |
@@ -126,12 +126,12 @@ Decomposition strategy: add components in this order — L1 (lattice fit) → L2
 | 27 | climate-internal harmonic | (g₂−g₅)/2 | 202.81 | — | carbon-thermostat 2nd harmonic (doc 92 §3), not orbital forcing |
 | 28 | climate-internal harmonic | (g₂−g₅)/3 | 135.21 | — | carbon-thermostat 3rd harmonic (doc 92 §3), not orbital forcing |
 
-25 orbital lines (5 climatic precession, 10 obliquity, 10 eccentricity) at relative mode amplitude ≥ 0.1 within the family, inside 14–300 kyr, lines closer than 0.5 % merged; plus the 3-line 405-kyr family. Built on the engine's own spectrum (`data/t1-engine-frequencies.json`: Earth's z and ζ secular modes from the 20-Myr deep mode table; p = 50.2883 ″/yr the of-date precession rate at J2000). The shipped coefficient file (`public/input/climate-formula-coefficients.json`) carries exactly these 28 periods in every regime — asserted by this renderer. No integer base, no lattice label.
+25 orbital lines (5 climatic precession, 10 obliquity, 10 eccentricity) at relative mode amplitude ≥ 0.1 within the family, inside 14–300 kyr, lines closer than 0.5 % merged; plus the 3-line 405-kyr family. Built on the engine's own spectrum (`data/t1-engine-frequencies.json`: Earth's z and ζ secular modes from the 20-Myr deep mode table) and its two J2000 precession rates: the climatic-precession lines p + gᵢ carry the general precession in longitude p = 50.2883 ″/yr (the perihelion from the equinox along the ecliptic of date); the obliquity lines pᵢₙ + sᵢ carry the spin axis's inertial rate pᵢₙ = 50.3849 ″/yr (the self-anchored rate the hybrid obliquity integrates on — the general precession plus the planetary mean the N-body ecliptic's motion carries, IAU's ψ_A − p_A). The shipped coefficient file (`public/input/climate-formula-coefficients.json`) carries exactly these 28 periods in every regime — asserted by this renderer. No integer base, no lattice label.
 <!-- /generated:doc92-l1-physical-lines -->
 
 The pre-registered test T1 (`scripts/t1_beat_model_vs_comb.py`, `data/t1-beat-model-vs-comb.json`) fitted this beat model and the 33-integer comb below on the same data, preprocessing, regimes, solver and line count: the physical set matches or beats the comb in every LR04 regime up to ~25 lines and beats a same-size random null, and the comb's short-window edge was carried entirely by its 16 lines without an Earth-forcing counterpart. The labels were retired on that measurement; the per-regime R² of the shipped formula (§9) is the honest price of the split. **§§2.1–2.3 below are the comb-era record.**
 
-**T7 — the fixed-phase test: description vs prediction (pre-registered in plan 06 §4, run on LR04; `scripts/t7_fixed_phase_l1.py`, `data/t7-fixed-phase-l1.json`; the model's own histories from `tools/explore/t7-export-orbital-histories.mjs` → `data/t7-model-orbital-histories.json`).** The 28 lines above ride the engine's own frequencies, but their cos/sin pairs are FITTED per regime — a free amplitude and a free phase per line, 56 numbers — and the GIA α(t) channel (doc 102) inherits those phases. T7 replaced the 56 numbers by the model's own e(t), ε(t) and e·sin ϖ(t) (the one-source movement the scene renders, built at 1 kyr over 0–5.4 Ma) with one coefficient each and ONE climate lag, and scored each LR04 regime out of sample (fit one half of the window, score the other, both orders). Both pre-registered outcomes hold. In-window the fixed-phase model reads R² <!--v:t7FixedR2PostMpt-->0.378<!--/v--> / <!--v:t7FixedR2InhgMpt-->0.458<!--/v--> / <!--v:t7FixedR2PreInhg-->0.225<!--/v--> (post-MPT / iNHG–MPT / pre-iNHG) — below the free fit's <!--v:t7FreeR2PostMpt-->0.779<!--/v--> / <!--v:t7FreeR2InhgMpt-->0.591<!--/v--> / <!--v:t7FreeR2PreInhg-->0.374<!--/v-->, as a constrained subset must, and above the 95th percentile of the phase-randomised null (the same regressors with random Fourier phases: <!--v:t7NullP95PostMpt-->0.257<!--/v--> / <!--v:t7NullP95InhgMpt-->0.380<!--/v--> / <!--v:t7NullP95PreInhg-->0.112<!--/v-->). Out of sample the fixed-phase model keeps <!--v:t7FixedHoldoutPostMpt-->0.357<!--/v--> / <!--v:t7FixedHoldoutInhgMpt-->0.445<!--/v--> / <!--v:t7FixedHoldoutPreInhg-->0.163<!--/v--> — while the shipped free-phase L1 has no hold-out skill at half-regime windows at any ridge strength (<!--v:t7FreeHoldoutPostMpt-->−4.90<!--/v--> / <!--v:t7FreeHoldoutInhgMpt-->−7.79<!--/v--> / <!--v:t7FreeHoldoutPreInhg-->−8.54<!--/v--> at the shipped λ = 1; the best any λ reaches is <!--v:t7FreeBestHoldoutPostMpt-->+0.02<!--/v--> / <!--v:t7FreeBestHoldoutInhgMpt-->−0.00<!--/v--> / <!--v:t7FreeBestHoldoutPreInhg-->−0.11<!--/v-->, at a λ that also halves its in-window R²). Under 4-block cross-validation the fixed-phase skill is robust in post-MPT (<!--v:t7FixedBlockCvPostMpt-->+0.340<!--/v-->) and iNHG–MPT (<!--v:t7FixedBlockCvInhgMpt-->+0.450<!--/v-->) and MARGINAL in pre-iNHG (<!--v:t7FixedBlockCvPreInhg-->−0.015<!--/v-->) — the claim is two regimes, not three. What the free fit adds inside the window is ONE band: post-MPT LR04 carries <!--v:t7Record100kSharePostMpt-->0.41<!--/v--> of its variance at 85–135 kyr, the fixed-phase model leaves <!--v:t7Fixed100kLeftPostMpt-->0.21<!--/v--> of it unexplained while matching the precession and obliquity bands nearly as well as the free fit — the 100-kyr band is not generated by a linear response to e, ε, e·sin ϖ, and the Imbrie & Imbrie ice-volume response to the model's own 65°N insolation (variant c) does not recover it either (0.133 in-window). The fitted climate lag is <!--v:t7LagKyrPostMpt-->5.5<!--/v--> / <!--v:t7LagKyrInhgMpt-->6.5<!--/v--> / <!--v:t7LagKyrPreInhg-->6.5<!--/v--> kyr but loosely constrained (half-height range <!--v:t7LagHalfHeightLoPostMpt-->1<!--/v-->–<!--v:t7LagHalfHeightHiPostMpt-->12<!--/v--> kyr post-MPT) — consistent with the 6-kyr GIA relaxation τ measured independently on the historical ΔT record (plan 06 D7; doc 102), not a sharp confirmation of it. La2004's e, ε, ϖ̄ give the same model <!--v:t7La2004R2PostMpt-->0.380<!--/v--> / <!--v:t7La2004R2InhgMpt-->0.458<!--/v--> / <!--v:t7La2004R2PreInhg-->0.220<!--/v--> in-window — the model's histories and Laskar's are interchangeable here (≤ 0.005). READING: the per-regime R² this document quotes are in-window DESCRIPTIONS of the record; the model's own orbital histories carry the transferable part — the model's PREDICTION — at roughly half the in-window R² and with real out-of-sample skill in the two younger regimes. The two are different jobs. For the α(t) hindcast (doc 102), what matters is fidelity to the actual ice history over the last ~30 kyr, where the in-window description is the closer proxy (local R² <!--v:t7Local30kR2Free-->0.92<!--/v--> vs <!--v:t7Local30kR2Fixed-->0.58<!--/v-->, same shape); the two forcings put the α peak at the same <!--v:t7AlphaPeakKyrShipped-->8.5<!--/v--> kyr BP and agree to a few percent to 10 kyr BP, yet the small early difference integrates to a historical ΔT shift of <!--v:t7DeltaTShift2700-->−107<!--/v--> s at 2700 BP before any stack refit — so any move of α(t) is a matched-pair campaign decided on the eclipse-era ΔT (plan 06 §9 item 12). MEASURED (WP2, `tools/explore/t7-alpha-proxy-dt-fit.cjs` → `data/t7-alpha-proxy-dt-fit.json`; the ΔT joint fitter in report mode with α(t) on each proxy, nothing shipped): the shipped L1 reads Espenak RMS <!--v:t7AlphaProxyShippedEspenakRms-->13.46<!--/v--> s / full-window <!--v:t7AlphaProxyShippedFullRms-->28.87<!--/v--> s (the table hook's parity against the unpatched fitter is <!--v:t7AlphaProxyHookParityFull-->0.12<!--/v--> s), the fixed-phase forcing <!--v:t7AlphaProxyFixedEspenakRms-->14.47<!--/v--> / <!--v:t7AlphaProxyFixedFullRms-->38.77<!--/v--> s, the LR04 record itself <!--v:t7AlphaProxyLr04EspenakRms-->37.46<!--/v--> / <!--v:t7AlphaProxyLr04FullRms-->64.38<!--/v--> s — by the pre-registered rule α(t) keeps the shipped L1 (doc 102). DISPOSITION: reframe, not replace — description and prediction are both published, the runtime form is unchanged. CENOGRID waits for the doc 108 §6 secular solution (the mode-table tail beyond ±10 Myr has no trustworthy phases).
+**T7 — the fixed-phase test: description vs prediction (pre-registered in plan 06 §4, run on LR04; `scripts/t7_fixed_phase_l1.py`, `data/t7-fixed-phase-l1.json`; the model's own histories from `tools/explore/t7-export-orbital-histories.mjs` → `data/t7-model-orbital-histories.json`).** The 28 lines above ride the engine's own frequencies, but their cos/sin pairs are FITTED per regime — a free amplitude and a free phase per line, 56 numbers — and the GIA α(t) channel (doc 102) inherits those phases. T7 replaced the 56 numbers by the model's own e(t), ε(t) and e·sin ϖ(t) (the one-source movement the scene renders, built at 1 kyr over 0–5.4 Ma) with one coefficient each and ONE climate lag, and scored each LR04 regime out of sample (fit one half of the window, score the other, both orders). Both pre-registered outcomes hold. In-window the fixed-phase model reads R² <!--v:t7FixedR2PostMpt-->0.378<!--/v--> / <!--v:t7FixedR2InhgMpt-->0.458<!--/v--> / <!--v:t7FixedR2PreInhg-->0.225<!--/v--> (post-MPT / iNHG–MPT / pre-iNHG) — below the free fit's <!--v:t7FreeR2PostMpt-->0.779<!--/v--> / <!--v:t7FreeR2InhgMpt-->0.601<!--/v--> / <!--v:t7FreeR2PreInhg-->0.404<!--/v-->, as a constrained subset must, and above the 95th percentile of the phase-randomised null (the same regressors with random Fourier phases: <!--v:t7NullP95PostMpt-->0.257<!--/v--> / <!--v:t7NullP95InhgMpt-->0.380<!--/v--> / <!--v:t7NullP95PreInhg-->0.112<!--/v-->). Out of sample the fixed-phase model keeps <!--v:t7FixedHoldoutPostMpt-->0.357<!--/v--> / <!--v:t7FixedHoldoutInhgMpt-->0.445<!--/v--> / <!--v:t7FixedHoldoutPreInhg-->0.163<!--/v--> — while the shipped free-phase L1 has no hold-out skill at half-regime windows at any ridge strength (<!--v:t7FreeHoldoutPostMpt-->−4.75<!--/v--> / <!--v:t7FreeHoldoutInhgMpt-->−7.29<!--/v--> / <!--v:t7FreeHoldoutPreInhg-->−7.94<!--/v--> at the shipped λ = 1; the best any λ reaches is <!--v:t7FreeBestHoldoutPostMpt-->+0.02<!--/v--> / <!--v:t7FreeBestHoldoutInhgMpt-->+0.02<!--/v--> / <!--v:t7FreeBestHoldoutPreInhg-->−0.06<!--/v-->, at a λ that also halves its in-window R²). Under 4-block cross-validation the fixed-phase skill is robust in post-MPT (<!--v:t7FixedBlockCvPostMpt-->+0.340<!--/v-->) and iNHG–MPT (<!--v:t7FixedBlockCvInhgMpt-->+0.450<!--/v-->) and MARGINAL in pre-iNHG (<!--v:t7FixedBlockCvPreInhg-->−0.015<!--/v-->) — the claim is two regimes, not three. What the free fit adds inside the window is ONE band: post-MPT LR04 carries <!--v:t7Record100kSharePostMpt-->0.41<!--/v--> of its variance at 85–135 kyr, the fixed-phase model leaves <!--v:t7Fixed100kLeftPostMpt-->0.21<!--/v--> of it unexplained while matching the precession and obliquity bands nearly as well as the free fit — the 100-kyr band is not generated by a linear response to e, ε, e·sin ϖ, and the Imbrie & Imbrie ice-volume response to the model's own 65°N insolation (variant c) does not recover it either (0.133 in-window). The fitted climate lag is <!--v:t7LagKyrPostMpt-->5.5<!--/v--> / <!--v:t7LagKyrInhgMpt-->6.5<!--/v--> / <!--v:t7LagKyrPreInhg-->6.5<!--/v--> kyr but loosely constrained (half-height range <!--v:t7LagHalfHeightLoPostMpt-->1<!--/v-->–<!--v:t7LagHalfHeightHiPostMpt-->12<!--/v--> kyr post-MPT) — consistent with the 6-kyr GIA relaxation τ measured independently on the historical ΔT record (plan 06 D7; doc 102), not a sharp confirmation of it. La2004's e, ε, ϖ̄ give the same model <!--v:t7La2004R2PostMpt-->0.380<!--/v--> / <!--v:t7La2004R2InhgMpt-->0.458<!--/v--> / <!--v:t7La2004R2PreInhg-->0.220<!--/v--> in-window — the model's histories and Laskar's are interchangeable here (≤ 0.005). READING: the per-regime R² this document quotes are in-window DESCRIPTIONS of the record; the model's own orbital histories carry the transferable part — the model's PREDICTION — at roughly half the in-window R² and with real out-of-sample skill in the two younger regimes. The two are different jobs. For the α(t) hindcast (doc 102), what matters is fidelity to the actual ice history over the last ~30 kyr, where the in-window description is the closer proxy (local R² <!--v:t7Local30kR2Free-->0.92<!--/v--> vs <!--v:t7Local30kR2Fixed-->0.58<!--/v-->, same shape); the two forcings put the α peak at the same <!--v:t7AlphaPeakKyrShipped-->8.4<!--/v--> kyr BP and agree to a few percent to 10 kyr BP, yet the small early difference integrates to a historical ΔT shift of <!--v:t7DeltaTShift2700-->−83<!--/v--> s at 2700 BP before any stack refit — so any move of α(t) is a matched-pair campaign decided on the eclipse-era ΔT (plan 06 §9 item 12). MEASURED (WP2, `tools/explore/t7-alpha-proxy-dt-fit.cjs` → `data/t7-alpha-proxy-dt-fit.json`; the ΔT joint fitter in report mode with α(t) on each proxy, nothing shipped): the shipped L1 reads Espenak RMS <!--v:t7AlphaProxyShippedEspenakRms-->13.46<!--/v--> s / full-window <!--v:t7AlphaProxyShippedFullRms-->28.87<!--/v--> s (the table hook's parity against the unpatched fitter is <!--v:t7AlphaProxyHookParityFull-->0.12<!--/v--> s), the fixed-phase forcing <!--v:t7AlphaProxyFixedEspenakRms-->14.47<!--/v--> / <!--v:t7AlphaProxyFixedFullRms-->38.77<!--/v--> s, the LR04 record itself <!--v:t7AlphaProxyLr04EspenakRms-->37.46<!--/v--> / <!--v:t7AlphaProxyLr04FullRms-->64.38<!--/v--> s — by the pre-registered rule α(t) keeps the shipped L1 (doc 102). DISPOSITION: reframe, not replace — description and prediction are both published, the runtime form is unchanged. CENOGRID waits for the doc 108 §6 secular solution (the mode-table tail beyond ±10 Myr has no trustworthy phases).
 
 ### 2.1 Sub-dominant precession sidebands (Tier A1) — comb-era record
 
@@ -361,7 +361,7 @@ Doc 91 §5.4 documents post/pre Mid-Pleistocene Transition amplitude ratios:
 | 23.7-kyr climatic precession | 2.19× | grew |
 | 405-kyr off-lattice | 0.34× | shrank |
 
-These are not consistent with a stationary process. The single-fit R² = <!--v:canonR2Full-->0.2003<!--/v--> on the full 5.3-Myr record forces a compromise between two regimes; an honest decomposition fits each regime independently.
+These are not consistent with a stationary process. The single-fit R² = <!--v:canonR2Full-->0.2673<!--/v--> on the full 5.3-Myr record forces a compromise between two regimes; an honest decomposition fits each regime independently.
 
 Fit strategy:
 - **Pre-MPT**: 1,200 – 3,000 kyr BP (1.8 Myr window, captures the obliquity-dominated regime)
@@ -374,9 +374,9 @@ Fit strategy:
 > **Tier A5 result (post-MPT, <!--v:tierALatticeCount-->33<!--/v--> components)**: R² = **<!--v:tierA1R2PostMpt-->0.8803<!--/v-->** → ΔR² = <!--v:tierA1DeltaR2PostMpt-->+0.0150<!--/v--> vs 25-comp post-MPT.
 > **Tier A5 result (post-MPT, <!--v:tierALatticeCount-->33<!--/v--> + L2 lines)**: R² = **<!--v:tierA4R2PostMpt-->0.9024<!--/v-->** (with 405k + 13H + 9-Myr added; condition warnings as expected at short window).
 
-**Interpretation — the biggest finding in this doc**: the regime split is the biggest single improvement in the entire decomposition. Post-MPT R² = **<!--v:canonR2PostMpt-->0.7788<!--/v-->** means **the 8H lattice captures ~87% of post-MPT LR04 variance** in the well-resolved 0–1 Myr window — a dramatically sharper story than the conflated full-record R² = <!--v:canonR2Full-->0.2003<!--/v-->.
+**Interpretation — the biggest finding in this doc**: the regime split is the biggest single improvement in the entire decomposition. Post-MPT R² = **<!--v:canonR2PostMpt-->0.7790<!--/v-->** means **the 8H lattice captures ~87% of post-MPT LR04 variance** in the well-resolved 0–1 Myr window — a dramatically sharper story than the conflated full-record R² = <!--v:canonR2Full-->0.2673<!--/v-->.
 
-The iNHG-MPT R² = <!--v:canonR2InhgMpt-->0.5911<!--/v--> is also far above the full-record value. The MPT itself is the L3 mechanism whose presence inflates the residual when the two regimes are conflated. Implication: **the framework's headline figure for LR04 should be R² = <!--v:canonR2PostMpt-->0.7788<!--/v--> (post-MPT) / R² = <!--v:canonR2InhgMpt-->0.5911<!--/v--> (iNHG-MPT) / R² = <!--v:canonR2PreInhg-->0.3736<!--/v--> (pre-iNHG) — not R² = <!--v:canonR2Full-->0.2003<!--/v--> (conflated)**. The conflated number underestimates the framework's explanatory power by ~3.4×.
+The iNHG-MPT R² = <!--v:canonR2InhgMpt-->0.6007<!--/v--> is also far above the full-record value. The MPT itself is the L3 mechanism whose presence inflates the residual when the two regimes are conflated. Implication: **the framework's headline figure for LR04 should be R² = <!--v:canonR2PostMpt-->0.7790<!--/v--> (post-MPT) / R² = <!--v:canonR2InhgMpt-->0.6007<!--/v--> (iNHG-MPT) / R² = <!--v:canonR2PreInhg-->0.4038<!--/v--> (pre-iNHG) — not R² = <!--v:canonR2Full-->0.2673<!--/v--> (conflated)**. The conflated number underestimates the framework's explanatory power by ~3.4×.
 
 Why this works:
 - Pre-MPT is dominated by the 41-kyr obliquity rhythm (n = 65 amplitude is largest)
@@ -388,7 +388,7 @@ Why this works:
 
 Before iNHG, LR04 is dominated by 41-kyr obliquity with smaller amplitude. After iNHG, ice volume grows secularly and amplitude ramps up. The §4.1 two-window cut (pre-MPT 1.2–3 Ma / post-MPT 0–1 Ma) straddles iNHG.
 
-The sharper three-regime split — **pre-iNHG (2.7–5.3 Ma) / iNHG-to-MPT (1.0–2.7 Ma) / post-MPT (0–1.0 Ma)** — is **now the canonical fit** (§9.3): R² = <!--v:canonR2PreInhg-->0.3736<!--/v--> / <!--v:canonR2InhgMpt-->0.5911<!--/v--> / <!--v:canonR2PostMpt-->0.7788<!--/v--> respectively. The pre-iNHG R² is genuinely lower than the broader pre-MPT 0.72 because the pre-iNHG regime has no Northern Hemisphere ice sheets and therefore weaker orbital amplification — see §8.4 R3-3.
+The sharper three-regime split — **pre-iNHG (2.7–5.3 Ma) / iNHG-to-MPT (1.0–2.7 Ma) / post-MPT (0–1.0 Ma)** — is **now the canonical fit** (§9.3): R² = <!--v:canonR2PreInhg-->0.4038<!--/v--> / <!--v:canonR2InhgMpt-->0.6007<!--/v--> / <!--v:canonR2PostMpt-->0.7790<!--/v--> respectively. The pre-iNHG R² is genuinely lower than the broader pre-MPT 0.72 because the pre-iNHG regime has no Northern Hemisphere ice sheets and therefore weaker orbital amplification — see §8.4 R3-3.
 
 ### 4.3 Cenozoic secular trend (CENOGRID only)
 
@@ -465,18 +465,18 @@ This L5 floor includes:
 | pre-iNHG (2.7–5.32 Ma) L1+L2+L3 | **0.3736** |
 <!-- /generated:canonical-r2 -->
 
-The canonical post-MPT R² (<!--v:canonR2PostMpt-->0.7788<!--/v-->) sits below the Tier-A "post-MPT + full L2 stack" (<!--v:tierA4R2PostMpt-->0.9024<!--/v-->) because the canonical formula deploys only the 3-line 405-kyr family in L2; the 13H and 9-Myr lines that lifted Tier A to <!--v:tierA4R2PostMpt-->0.9024<!--/v--> were rejected by the R3-4 cross-window stability test (13H amp CV 42–50%, phase std 97.9°) and are not in the deployed formula.
+The canonical post-MPT R² (<!--v:canonR2PostMpt-->0.7790<!--/v-->) sits below the Tier-A "post-MPT + full L2 stack" (<!--v:tierA4R2PostMpt-->0.9024<!--/v-->) because the canonical formula deploys only the 3-line 405-kyr family in L2; the 13H and 9-Myr lines that lifted Tier A to <!--v:tierA4R2PostMpt-->0.9024<!--/v--> were rejected by the R3-4 cross-window stability test (13H amp CV 42–50%, phase std 97.9°) and are not in the deployed formula.
 
 ### 6.2 Reachable ceiling — and what it does NOT mean (Tier B Round 2 reality check)
 
 Per-regime fits with the canonical 33-integer L1 + 3-line L2 + 6-step L3 pipeline:
-- **Post-MPT (0–1 Myr) R² = <!--v:canonR2PostMpt-->0.7788<!--/v-->** (L1+L2+L3; L1-only <!--v:canonR2L1PostMpt-->0.7788<!--/v-->)
-- **iNHG-MPT (1.0–2.7 Ma) R² = <!--v:canonR2InhgMpt-->0.5911<!--/v-->**
-- **Pre-iNHG (2.7–5.32 Ma) R² = <!--v:canonR2PreInhg-->0.3736<!--/v-->**
-- **EPICA CO₂ (0–806 kyr) R² = <!--v:canonR2Epica-->0.7301<!--/v-->**
+- **Post-MPT (0–1 Myr) R² = <!--v:canonR2PostMpt-->0.7790<!--/v-->** (L1+L2+L3; L1-only <!--v:canonR2L1PostMpt-->0.7790<!--/v-->)
+- **iNHG-MPT (1.0–2.7 Ma) R² = <!--v:canonR2InhgMpt-->0.6007<!--/v-->**
+- **Pre-iNHG (2.7–5.32 Ma) R² = <!--v:canonR2PreInhg-->0.4038<!--/v-->**
+- **EPICA CO₂ (0–806 kyr) R² = <!--v:canonR2Epica-->0.7275<!--/v-->**
 - **CenCO2PIP (0–66 Ma) R² = 0.7626**
 
-Headline interpretation: **the framework captures ~87% of post-MPT LR04 variance** with the canonical L1 lattice + 405-kyr L2 thermostat family applied within the post-MPT regime alone. The full-record R² = <!--v:canonR2Full-->0.2003<!--/v--> suppresses the framework's actual explanatory power by ~3.4× because forcing one set of component amplitudes to fit physically distinct climate regimes (pre-MPT obliquity-dominated, post-MPT 100-kyr-dominated) is over-constrained.
+Headline interpretation: **the framework captures ~87% of post-MPT LR04 variance** with the canonical L1 lattice + 405-kyr L2 thermostat family applied within the post-MPT regime alone. The full-record R² = <!--v:canonR2Full-->0.2673<!--/v--> suppresses the framework's actual explanatory power by ~3.4× because forcing one set of component amplitudes to fit physically distinct climate regimes (pre-MPT obliquity-dominated, post-MPT 100-kyr-dominated) is over-constrained.
 
 **Critical caveat from Tier B Round 2 (C5 forward-prediction validation)**: **the high R² numbers are DESCRIPTIVE within each regime, NOT PREDICTIVE across regimes.** A formula trained on pre-MPT data and applied to post-MPT timestamps achieves R² = **−0.87** (worse than predicting the mean). The reverse direction blows up numerically (R² = −10¹⁰).
 
@@ -493,7 +493,7 @@ The framework's predictive power requires modeling how line amplitudes/phases ev
 
 ### 6.3 What the L5 floor implies
 
-The post-MPT L5 floor of ~<!--v:canonL5FloorPostMpt-->22<!--/v-->% (1 − <!--v:canonR2PostMpt-->0.7788<!--/v-->) sets a fundamental ceiling on any orbital-forcing model of LR04 within this regime. Unless one includes proxies that resolve sub-LR04-resolution physics (high-resolution ice-core proxies for Heinrich/D-O, ENSO reconstructions for tropical Pacific decadal-to-millennial variability), no integer-divisor formula will exceed R² ≈ 0.87 in the post-MPT window — the remaining variance is true climate stochastic, sub-LR04-resolution events, and dating noise.
+The post-MPT L5 floor of ~<!--v:canonL5FloorPostMpt-->22<!--/v-->% (1 − <!--v:canonR2PostMpt-->0.7790<!--/v-->) sets a fundamental ceiling on any orbital-forcing model of LR04 within this regime. Unless one includes proxies that resolve sub-LR04-resolution physics (high-resolution ice-core proxies for Heinrich/D-O, ENSO reconstructions for tropical Pacific decadal-to-millennial variability), no integer-divisor formula will exceed R² ≈ 0.87 in the post-MPT window — the remaining variance is true climate stochastic, sub-LR04-resolution events, and dating noise.
 
 Pre-MPT L5 floor is larger (~24%), reflecting older record with more chronology uncertainty and a weaker forcing regime (obliquity-only dominance with less amplification).
 
@@ -583,9 +583,9 @@ The step-component approach is preferred for downstream work — it preserves th
 ✓ **A2**: 405-kyr explicit line. ΔR² LR04 = +0.0059; CENOGRID δ¹³C = +0.0077 with **carbon-amplification ratio 2.2** — Layer-2 confirmed.
 ✓ **A3**: 13H = 4.36 Myr explicit line. ΔR² LR04 = +0.0747 (largely residual-trend absorption at 1.25 cycles); CENOGRID δ¹⁸O = +0.0036 — small per-cycle, *not* carbon-amplified at variance level (ratio 0.58) despite doc 91 §13's high amplitude-ratio finding.
 ✓ **A4**: 9-Myr candidate. ΔR² CENOGRID δ¹³C = **+0.078 with carbon-amplification ratio 4.2** — the strongest L2 signature in the original Tier-A suite. **Investigated, not deployed** (rejected by R3-4 stability test for variance attribution, though pattern is real).
-✓ **A5**: regime-split LR04 (canonical 33-integer L1 + 3-line L2 + 6-step L3) — **pre-iNHG R² = <!--v:canonR2PreInhg-->0.3736<!--/v-->, iNHG-MPT R² = <!--v:canonR2InhgMpt-->0.5911<!--/v-->, post-MPT R² = <!--v:canonR2PostMpt-->0.7788<!--/v-->** — biggest single jump in the entire decomposition.
+✓ **A5**: regime-split LR04 (canonical 33-integer L1 + 3-line L2 + 6-step L3) — **pre-iNHG R² = <!--v:canonR2PreInhg-->0.4038<!--/v-->, iNHG-MPT R² = <!--v:canonR2InhgMpt-->0.6007<!--/v-->, post-MPT R² = <!--v:canonR2PostMpt-->0.7790<!--/v-->** — biggest single jump in the entire decomposition.
 
-**Headline rewrite for the framework**: LR04 R² is **<!--v:canonR2PostMpt-->0.7788<!--/v--> (post-MPT) / <!--v:canonR2InhgMpt-->0.5911<!--/v--> (iNHG-MPT) / <!--v:canonR2PreInhg-->0.3736<!--/v--> (pre-iNHG) — not <!--v:canonR2Full-->0.2003<!--/v--> (full conflated)**. The framework explains a near-complete fraction of post-MPT LR04 variance once the MPT regime change is treated explicitly.
+**Headline rewrite for the framework**: LR04 R² is **<!--v:canonR2PostMpt-->0.7790<!--/v--> (post-MPT) / <!--v:canonR2InhgMpt-->0.6007<!--/v--> (iNHG-MPT) / <!--v:canonR2PreInhg-->0.4038<!--/v--> (pre-iNHG) — not <!--v:canonR2Full-->0.2673<!--/v--> (full conflated)**. The framework explains a near-complete fraction of post-MPT LR04 variance once the MPT regime change is treated explicitly.
 
 ### 8.2 Tier B Round 1 measurements (COMPLETE)
 
@@ -679,8 +679,8 @@ Applied the canonical 33-integer + 405-kyr family (3 lines) pipeline to EPICA Be
 
 | Record | R² (canonical formula) |
 |--------|------------------------|
-| EPICA CO₂ | **<!--v:canonR2Epica-->0.7301<!--/v-->** |
-| LR04 (post-MPT 0–1 Myr) | **<!--v:canonR2PostMpt-->0.7788<!--/v-->** |
+| EPICA CO₂ | **<!--v:canonR2Epica-->0.7275<!--/v-->** |
+| LR04 (post-MPT 0–1 Myr) | **<!--v:canonR2PostMpt-->0.7790<!--/v-->** |
 
 **Both records are explained at R² ≈ 0.85–0.87 by the canonical lattice fit alone in this short window** — confirming the post-MPT regime-split finding (§4.1) holds for an independent record at an independent proxy.
 
@@ -855,7 +855,7 @@ The Boulila 2018 match (4.36 Myr vs 4.5 Myr ≈ 3% difference) and the strong δ
 3. **L1/L2 dichotomy is empirical, not architectural**: ratio classification works at the per-line level
 4. **Step components at known transitions add huge δ¹⁸O variance on CENOGRID** (B5, R² 0.03 → 0.68)
 5. **MPT is a true regime change**: line amplitudes don't transfer across it
-6. **Per-regime R² is high** (post-MPT <!--v:canonR2PostMpt-->0.7788<!--/v-->, iNHG-MPT 0.73, pre-iNHG 0.45, EPICA CO₂ <!--v:canonR2Epica-->0.7301<!--/v-->)
+6. **Per-regime R² is high** (post-MPT <!--v:canonR2PostMpt-->0.7790<!--/v-->, iNHG-MPT 0.73, pre-iNHG 0.45, EPICA CO₂ <!--v:canonR2Epica-->0.7275<!--/v-->)
 
 **Cautioned findings**:
 1. **L2 lines are not linear responses to L1**: simple ODE models don't apply (R3-2)
@@ -871,7 +871,7 @@ The Boulila 2018 match (4.36 Myr vs 4.5 Myr ≈ 3% difference) and the strong δ
 
 ### 8.6 Tier C (sub-LR04 resolution, out of scope)
 
-Sub-LR04-resolution components (ENSO ~2–7 yr, solar cycles ~11/100/210 yr, Heinrich ~7 kyr, Dansgaard–Oeschger ~1.5 kyr) require non-LR04 proxies (high-resolution ice cores, tree rings, speleothems) and are not part of the LR04 / CENOGRID variance budget. The LR04 ceiling of R² = <!--v:canonR2PostMpt-->0.7788<!--/v--> (post-MPT) already approaches what the 1-kyr binning permits — pursuing these would require swapping the proxy, not extending the framework.
+Sub-LR04-resolution components (ENSO ~2–7 yr, solar cycles ~11/100/210 yr, Heinrich ~7 kyr, Dansgaard–Oeschger ~1.5 kyr) require non-LR04 proxies (high-resolution ice cores, tree rings, speleothems) and are not part of the LR04 / CENOGRID variance budget. The LR04 ceiling of R² = <!--v:canonR2PostMpt-->0.7790<!--/v--> (post-MPT) already approaches what the 1-kyr binning permits — pursuing these would require swapping the proxy, not extending the framework.
 
 ---
 
@@ -881,7 +881,7 @@ The variance-decomposition findings of Tiers A and B Rounds 1-3 are crystallized
 into a canonical, deployable formula at
 [`scripts/milankovitch_climate_formula.py`](../scripts/milankovitch_climate_formula.py).
 
-> **Why the §9 numbers differ slightly from §§3–8.** §§3–8 (variance-budget research) use **joint OLS** on each fit and report per-component ΔR² — useful for *attribution* of variance to individual lines. §9 (canonical formula) uses **sequential ridge regression** (L1 → residual → L2 → residual → L3) with λ=1 on L1. Sequential ridge trades ~0.6% absolute R² for **forward-projection stability** (§9.5 ridge analysis, measured on the comb: post-MPT OLS max amplitude 17.78 vs ridge 0.32 — ~56× shrinkage of degenerate coefficients). The headline drift to look out for: §4.1 Tier A5 joint-OLS post-MPT R² = 0.8975 (comb) vs the sequential-ridge post-MPT total of the shipped 28-line formula, R² = <!--v:canonR2PostMpt-->0.7788<!--/v--> (§9.3; the comb-era ridge figure was 0.868). Both are correct; they answer different questions (variance attribution vs deployable prediction) on different line sets.
+> **Why the §9 numbers differ slightly from §§3–8.** §§3–8 (variance-budget research) use **joint OLS** on each fit and report per-component ΔR² — useful for *attribution* of variance to individual lines. §9 (canonical formula) uses **sequential ridge regression** (L1 → residual → L2 → residual → L3) with λ=1 on L1. Sequential ridge trades ~0.6% absolute R² for **forward-projection stability** (§9.5 ridge analysis, measured on the comb: post-MPT OLS max amplitude 17.78 vs ridge 0.32 — ~56× shrinkage of degenerate coefficients). The headline drift to look out for: §4.1 Tier A5 joint-OLS post-MPT R² = 0.8975 (comb) vs the sequential-ridge post-MPT total of the shipped 28-line formula, R² = <!--v:canonR2PostMpt-->0.7790<!--/v--> (§9.3; the comb-era ridge figure was 0.868). Both are correct; they answer different questions (variance attribution vs deployable prediction) on different line sets.
 
 ### Inclusion / exclusion summary
 
@@ -1005,10 +1005,10 @@ amplitudes in units of the record's standard deviation, L1 layer alone):
 
 | Regime | Window | Rayleigh groups (lines) | Condition # | Max VIF | OLS R² | Ridge λ=1 R² | OLS max\|amp\| | Ridge max\|amp\| |
 |---|---|---:|---:|---:|---:|---:|---:|---:|
-| **post-MPT** | 0–1 Ma | <!--v:fitDiagUnresolvedGroupsPostMpt-->5<!--/v--> (<!--v:fitDiagUnresolvedLinesPostMpt-->21<!--/v-->) | <!--v:fitDiagCondPostMpt-->1.79e+6<!--/v--> | <!--v:fitDiagMaxVifPostMpt-->2.77e+11<!--/v--> | <!--v:fitDiagOlsR2PostMpt-->0.8262<!--/v--> | <!--v:fitDiagRidgeR2PostMpt-->0.7788<!--/v--> | <!--v:fitDiagOlsMaxAmpPostMpt-->80514.712<!--/v--> | <!--v:fitDiagRidgeMaxAmpPostMpt-->2.208<!--/v--> |
-| iNHG-MPT | 1.0–2.7 Ma | <!--v:fitDiagUnresolvedGroupsInhgMpt-->6<!--/v--> (<!--v:fitDiagUnresolvedLinesInhgMpt-->21<!--/v-->) | <!--v:fitDiagCondInhgMpt-->3.21e+3<!--/v--> | <!--v:fitDiagMaxVifInhgMpt-->1.46e+6<!--/v--> | <!--v:fitDiagOlsR2InhgMpt-->0.6330<!--/v--> | <!--v:fitDiagRidgeR2InhgMpt-->0.5911<!--/v--> | <!--v:fitDiagOlsMaxAmpInhgMpt-->242.132<!--/v--> | <!--v:fitDiagRidgeMaxAmpInhgMpt-->1.498<!--/v--> |
-| pre-iNHG | 2.7–5.3 Ma | <!--v:fitDiagUnresolvedGroupsPreInhg-->4<!--/v--> (<!--v:fitDiagUnresolvedLinesPreInhg-->13<!--/v-->) | <!--v:fitDiagCondPreInhg-->59.0<!--/v--> | <!--v:fitDiagMaxVifPreInhg-->434<!--/v--> | <!--v:fitDiagOlsR2PreInhg-->0.3796<!--/v--> | <!--v:fitDiagRidgeR2PreInhg-->0.3736<!--/v--> | <!--v:fitDiagOlsMaxAmpPreInhg-->4.501<!--/v--> | <!--v:fitDiagRidgeMaxAmpPreInhg-->2.369<!--/v--> |
-| lr04-full | 0–5.3 Ma | <!--v:fitDiagUnresolvedGroupsLr04Full-->2<!--/v--> (<!--v:fitDiagUnresolvedLinesLr04Full-->4<!--/v-->) | <!--v:fitDiagCondLr04Full-->5.59<!--/v--> | <!--v:fitDiagMaxVifLr04Full-->8.06<!--/v--> | <!--v:fitDiagOlsR2Lr04Full-->0.1928<!--/v--> | <!--v:fitDiagRidgeR2Lr04Full-->0.1928<!--/v--> | <!--v:fitDiagOlsMaxAmpLr04Full-->0.307<!--/v--> | <!--v:fitDiagRidgeMaxAmpLr04Full-->0.307<!--/v--> |
+| **post-MPT** | 0–1 Ma | <!--v:fitDiagUnresolvedGroupsPostMpt-->5<!--/v--> (<!--v:fitDiagUnresolvedLinesPostMpt-->21<!--/v-->) | <!--v:fitDiagCondPostMpt-->1.78e+6<!--/v--> | <!--v:fitDiagMaxVifPostMpt-->2.75e+11<!--/v--> | <!--v:fitDiagOlsR2PostMpt-->0.8248<!--/v--> | <!--v:fitDiagRidgeR2PostMpt-->0.7790<!--/v--> | <!--v:fitDiagOlsMaxAmpPostMpt-->77316.329<!--/v--> | <!--v:fitDiagRidgeMaxAmpPostMpt-->2.205<!--/v--> |
+| iNHG-MPT | 1.0–2.7 Ma | <!--v:fitDiagUnresolvedGroupsInhgMpt-->6<!--/v--> (<!--v:fitDiagUnresolvedLinesInhgMpt-->21<!--/v-->) | <!--v:fitDiagCondInhgMpt-->3.21e+3<!--/v--> | <!--v:fitDiagMaxVifInhgMpt-->1.45e+6<!--/v--> | <!--v:fitDiagOlsR2InhgMpt-->0.6424<!--/v--> | <!--v:fitDiagRidgeR2InhgMpt-->0.6007<!--/v--> | <!--v:fitDiagOlsMaxAmpInhgMpt-->240.440<!--/v--> | <!--v:fitDiagRidgeMaxAmpInhgMpt-->1.500<!--/v--> |
+| pre-iNHG | 2.7–5.3 Ma | <!--v:fitDiagUnresolvedGroupsPreInhg-->4<!--/v--> (<!--v:fitDiagUnresolvedLinesPreInhg-->13<!--/v-->) | <!--v:fitDiagCondPreInhg-->59.0<!--/v--> | <!--v:fitDiagMaxVifPreInhg-->434<!--/v--> | <!--v:fitDiagOlsR2PreInhg-->0.4097<!--/v--> | <!--v:fitDiagRidgeR2PreInhg-->0.4038<!--/v--> | <!--v:fitDiagOlsMaxAmpPreInhg-->4.473<!--/v--> | <!--v:fitDiagRidgeMaxAmpPreInhg-->2.363<!--/v--> |
+| lr04-full | 0–5.3 Ma | <!--v:fitDiagUnresolvedGroupsLr04Full-->2<!--/v--> (<!--v:fitDiagUnresolvedLinesLr04Full-->4<!--/v-->) | <!--v:fitDiagCondLr04Full-->5.59<!--/v--> | <!--v:fitDiagMaxVifLr04Full-->8.06<!--/v--> | <!--v:fitDiagOlsR2Lr04Full-->0.2598<!--/v--> | <!--v:fitDiagRidgeR2Lr04Full-->0.2598<!--/v--> | <!--v:fitDiagOlsMaxAmpLr04Full-->0.459<!--/v--> | <!--v:fitDiagRidgeMaxAmpLr04Full-->0.459<!--/v--> |
 
 In a 1-Myr window the whole 95–110-kyr eccentricity cluster, the 40–42-kyr
 obliquity quartet, the 29–30-kyr quartet, the 19-kyr precession pair and the
@@ -1016,8 +1016,8 @@ obliquity quartet, the 29–30-kyr quartet, the 19-kyr precession pair and the
 degenerate cancelling coefficients — amplitudes of tens of thousands of
 standard deviations that cancel *inside* the window and **break under
 extrapolation**: the L1 layer's forward projection (−250…0 kyr) spans
-<!--v:fitDiagLadderOlsForwardPtp-->2415.91<!--/v--> against
-<!--v:fitDiagLadderOlsInSamplePtp-->5.26<!--/v--> in sample. The 1.7-Myr
+<!--v:fitDiagLadderOlsForwardPtp-->2294.44<!--/v--> against
+<!--v:fitDiagLadderOlsInSamplePtp-->5.24<!--/v--> in sample. The 1.7-Myr
 iNHG-MPT window has the same pathology less severely; only the full record
 resolves every line.
 
@@ -1028,14 +1028,14 @@ post-MPT ladder:
 
 | Method | R² L1 | Max\|amp\| | Forward range | Forward ptp |
 |---|---:|---:|---|---:|
-| OLS | <!--v:fitDiagOlsR2PostMpt-->0.8262<!--/v--> | <!--v:fitDiagOlsMaxAmpPostMpt-->80514.712<!--/v--> | [<!--v:fitDiagLadderOlsForwardMin-->-1663.62<!--/v-->, <!--v:fitDiagLadderOlsForwardMax-->752.28<!--/v-->] | <!--v:fitDiagLadderOlsForwardPtp-->2415.91<!--/v--> |
-| **Ridge λ=1 (shipped)** | <!--v:fitDiagRidgeR2PostMpt-->0.7788<!--/v--> | <!--v:fitDiagRidgeMaxAmpPostMpt-->2.208<!--/v--> | [<!--v:fitDiagLadderRidgeForwardMin-->-5.05<!--/v-->, <!--v:fitDiagLadderRidgeForwardMax-->4.36<!--/v-->] | <!--v:fitDiagLadderRidgeForwardPtp-->9.41<!--/v--> |
+| OLS | <!--v:fitDiagOlsR2PostMpt-->0.8248<!--/v--> | <!--v:fitDiagOlsMaxAmpPostMpt-->77316.329<!--/v--> | [<!--v:fitDiagLadderOlsForwardMin-->-1580.89<!--/v-->, <!--v:fitDiagLadderOlsForwardMax-->713.54<!--/v-->] | <!--v:fitDiagLadderOlsForwardPtp-->2294.44<!--/v--> |
+| **Ridge λ=1 (shipped)** | <!--v:fitDiagRidgeR2PostMpt-->0.7790<!--/v--> | <!--v:fitDiagRidgeMaxAmpPostMpt-->2.205<!--/v--> | [<!--v:fitDiagLadderRidgeForwardMin-->-5.43<!--/v-->, <!--v:fitDiagLadderRidgeForwardMax-->4.37<!--/v-->] | <!--v:fitDiagLadderRidgeForwardPtp-->9.80<!--/v--> |
 
-The ridge costs <!--v:fitDiagLadderRidgeMinusOlsR2-->−0.0474<!--/v--> on the
+The ridge costs <!--v:fitDiagLadderRidgeMinusOlsR2-->−0.0458<!--/v--> on the
 L1 layer's R² post-MPT and shrinks the largest amplitude
-<!--v:fitDiagLadderOlsOverRidgeMaxAmp-->36464.5<!--/v-->×; the shipped fit
+<!--v:fitDiagLadderOlsOverRidgeMaxAmp-->35063.1<!--/v-->×; the shipped fit
 (L1 ridge + L3) then projects forward at
-<!--v:fitDiagForwardGrowthPostMpt-->2.13<!--/v-->× its in-sample
+<!--v:fitDiagForwardGrowthPostMpt-->2.24<!--/v-->× its in-sample
 peak-to-peak. Across regimes the ridge acts where the window leaves lines
 unresolved — post-MPT and iNHG-MPT — and does nothing on the full record,
 where OLS and ridge coincide. The one constant λ = 1 is kept across regimes:
@@ -1043,7 +1043,7 @@ it is the window, not the line set, that decides whether it acts.
 
 Why not thin the line set? A greedy keep-one-per-Rayleigh-element thin keeps
 <!--v:fitDiagLadderThinnedLines-->15<!--/v--> of the 28 lines post-MPT and
-loses <!--v:fitDiagLadderThinnedMinusRidgeR2-->−0.3691<!--/v--> in R² against
+loses <!--v:fitDiagLadderThinnedMinusRidgeR2-->−0.3672<!--/v--> in R² against
 the ridge. Ridge is preferred because it keeps the full set — each line with
 its justification in the engine's own spectrum (§2) — while neutralizing the
 extrapolation pathology. The cost is larger than it was on the retired comb,
@@ -1160,7 +1160,7 @@ Sequential ridge regression on detrended + normalized CO₂ over 0–800 kyr:
 | + L3 (no transition inside window; MPT at 1000 kyr is the boundary) | 0.8452 | 0.0000 |
 | **Total** | **0.8452** | |
 
-(32-integer-stage decomposition; the current canonical EPICA total is <!--v:canonR2Epica-->0.7301<!--/v-->.)
+(32-integer-stage decomposition; the current canonical EPICA total is <!--v:canonR2Epica-->0.7275<!--/v-->.)
 
 L1 alone explains **83 %** of CO₂ variance over 800 kyr — strong cross-proxy validation. The same orbital lattice that drives ice volume also drives atmospheric carbon-cycle dynamics.
 
@@ -1243,7 +1243,7 @@ The structural claim of doc 92 — that the **same L1 line set + L2 thermostat +
 | EPICA (Bereiter 2015) | 0–800 kyr | atmospheric CO₂ | L1 = 0.8336, +L2 = +0.0115, +L3 = +0 | **0.8452** |
 | CenCO2PIP (Consortium 2023) | 0–66 Ma | atmospheric CO₂ (multi-proxy) | L1 = 0.1611, +L2 = +0.0000, +L3 = +0.6016 | **0.7626** |
 
-(Breakdowns are the 32-integer-stage fit reports; current canonical totals: post-MPT <!--v:canonR2PostMpt-->0.7788<!--/v-->, EPICA <!--v:canonR2Epica-->0.7301<!--/v-->, CenCO2PIP 0.7626 — the generated canonical-r2 block in §9.)
+(Breakdowns are the 32-integer-stage fit reports; current canonical totals: post-MPT <!--v:canonR2PostMpt-->0.7790<!--/v-->, EPICA <!--v:canonR2Epica-->0.7275<!--/v-->, CenCO2PIP 0.7626 — the generated canonical-r2 block in §9.)
 
 The Quaternary fits (LR04 + EPICA) emphasize L1; the Cenozoic-scale fit (CenCO2PIP) emphasizes L3. The lattice is the same in all three.
 
@@ -1401,7 +1401,7 @@ python3 scripts/milankovitch_8h_variance_budget_tier_b_r3.py
 **Tier B Round 2 JSON contains:**
 - B5 — 6-step Heaviside component fit at PETM/EOT/Mi-1/MMCT/iNHG/MPT (δ¹⁸O R² 0.03 → 0.68, the biggest Tier B finding)
 - C2 — phase coherence per L2 line and selected lattice integers (LR04 ↔ CENOGRID δ¹⁸O ↔ CENOGRID δ¹³C)
-- C10 — EPICA CO₂ pipeline (R² = <!--v:canonR2Epica-->0.7301<!--/v--> canonical), per-component CO₂/LR04 amp ratios
+- C10 — EPICA CO₂ pipeline (R² = <!--v:canonR2Epica-->0.7275<!--/v--> canonical), per-component CO₂/LR04 amp ratios
 - C5 — forward-prediction validation (pre↔post MPT, both directions); catastrophic generalization failure
 - D1 — proxy-aware component separation with L1/mixed/L2 classification
 

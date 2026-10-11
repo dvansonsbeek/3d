@@ -1,7 +1,7 @@
 ---
 docVersion: 1.0
-modelVersion: v21.0
-coefficients: sha256:7258a9b469c8b95e
+modelVersion: v22.0
+coefficients: sha256:922e0e84e8122f69
 status: current
 ---
 
@@ -152,13 +152,13 @@ The Phanerozoic window, both clocks against the published inferences (written by
 <!-- generated:doc99-phanerozoic-comparison -->
 | Age (Ma) | ψ̇ composed (″/yr) | ψ̇ spin-only, retired (″/yr) | published inference (″/yr) | Δ composed | Δ spin-only | obliquity beat composed (kyr) | beat implied by the inference (kyr) |
 |---:|---:|---:|---:|---:|---:|---:|---:|
-| 100 | **52.60** | 51.53 | Wu 2024: 53.00 ± 1.0 | -0.8 % | -2.8 % | 38.40 | 37.95 |
-| 200 | **55.02** | 52.78 | Wu 2024: 54.36 ± 1.0 | 1.2 % | -2.9 % | 35.83 | 36.50 |
-| 300 | **57.58** | 54.04 | Wu 2024: 59.50 ± 0.5 | -3.2 % | -9.2 % | 33.47 | 31.88 |
-| 400 | **60.28** | 55.33 | Wu 2024: 61.50 ± 0.5 | -2.0 % | -10.0 % | 31.28 | 30.39 |
-| 500 | **63.16** | 56.65 | Wu 2024: 64.50 ± 0.5 | -2.1 % | -12.2 % | 29.25 | 28.39 |
-| 650 | **67.85** | 58.68 | Wu 2024: 67.64 ± 0.3 | 0.3 % | -13.3 % | 26.45 | 26.56 |
-| 500 | **63.16** | 56.65 | Berger, Loutre & Laskar 1992: 61 (theory) | 3.5 % | -7.1 % | 29.25 | 29 (their obliquity main period) |
+| 100 | **52.60** | 51.53 | Wu 2024: 53.00 ± 1.0 | -0.8 % | -2.8 % | 38.29 | 37.95 |
+| 200 | **55.02** | 52.78 | Wu 2024: 54.36 ± 1.0 | 1.2 % | -2.9 % | 35.72 | 36.50 |
+| 300 | **57.58** | 54.04 | Wu 2024: 59.50 ± 0.5 | -3.2 % | -9.2 % | 33.37 | 31.88 |
+| 400 | **60.28** | 55.33 | Wu 2024: 61.50 ± 0.5 | -2.0 % | -10.0 % | 31.19 | 30.39 |
+| 500 | **63.15** | 56.65 | Wu 2024: 64.50 ± 0.5 | -2.1 % | -12.2 % | 29.17 | 28.39 |
+| 650 | **67.85** | 58.68 | Wu 2024: 67.64 ± 0.3 | 0.3 % | -13.3 % | 26.38 | 26.56 |
+| 500 | **63.15** | 56.65 | Berger, Loutre & Laskar 1992: 61 (theory) | 3.5 % | -7.1 % | 29.17 | 29 (their obliquity main period) |
 
 The composed clock sits within 3 % of every published Phanerozoic precession constant and reads 2–3 % LOW across 300–500 Ma (the Pangea window, where Wu's Moon-distance anchors are closer than the shipped recession polynomial — the documented Pangea offset); the retired spin-only clock reads 9–13 % low there. Beats via 1,296,000/(ψ̇ − |s₃|), |s₃| = 18.85 ″/yr. Wu's constants carry the astronomical model of their inversion; Berger 1992 is theory — neither is a measurement, and the table is labelled accordingly.
 <!-- /generated:doc99-phanerozoic-comparison -->
@@ -284,7 +284,7 @@ The composed precession rate ψ̇ = [ω/ω₀]·p₀·[f_S + (1 − f_S)(a₀/a_
 The mean lunisolar precession period T_p = 2π/ψ̇ lengthens
     (25,771 yr now, 21,699 yr Devonian, 28,208 yr in 200 Myr — generated table below)
     ↓
-The obliquity beat 2π/(ψ̇ − |s₃|) lengthens with it (41.2 kyr now, 31.7 Devonian, 47.8 in 200 Myr)
+The obliquity beat 2π/(ψ̇ᵢₙ − |s₃|) lengthens with it (<!--v:obliqBeatJ2000Kyr-->41.1<!--/v--> kyr now, <!--v:obliqBeatDevonianKyr-->31.6<!--/v--> Devonian, <!--v:obliqBeat200MyrFutureKyr-->47.7<!--/v--> in 200 Myr; ψ̇ᵢₙ the spin axis's inertial rate)
     ↓
 The climate formula's precession-band lines p + g_i and p + s_i scale with ψ̇(t).
 The eccentricity-band lines |g_i − g_j| do NOT scale — MEASURED: the 405-kyr
@@ -332,7 +332,7 @@ The same epoch-dependent scaling applies to multiple system parameters. All valu
 | Quantity | J2000 | −380 Ma (Devonian) | +200 Myr | Scales with |
 |:---|---:|---:|---:|:---|
 | Mean lunisolar precession period T_p (yr) | 25,771 | **21,699** | **28,208** | the composed clock (spin × torque term) |
-| Obliquity beat 2π/(ψ̇ − \|s₃\|) (kyr) | 41.22 | **31.71** | **47.83** | the clock (s₃ fixed under μ = 1) |
+| Obliquity beat 2π/(ψ̇ − \|s₃\|) (kyr) | 41.10 | **31.62** | **47.68** | the clock (s₃ fixed under μ = 1) |
 | Climatic-precession line p + g₀ (kyr) | 23.76 | **20.26** | **25.82** | the clock |
 | Long-eccentricity metronome g₂ − g₅ (kyr) | 405.6 | 405.6 | 405.6 | does NOT scale (planetary g-modes; ∝ 1/μ only) |
 | Short-eccentricity line g₀ − g₂ (kyr) | 94.88 | 94.88 | 94.88 | does NOT scale |
@@ -612,9 +612,9 @@ L(t) = L₀ + mean tropical rate · t + D(t)          (mean longitude)
    the IAU/Laskar drift expression to 0.1 s over −1000..+3000. THE
    OBSERVATION-CLASS CHECK (plan 06 I1, JPL Horizons' apparent Sun on a
    10-day TT grid over ±3000 yr, <!--v:sunVsHorizonsN-->219,152<!--/v--> instants): the model's apparent
-   Sun sits <!--v:sunVsHorizonsMeanArcsec-->1.74<!--/v-->″ from Horizons on average with sd <!--v:sunVsHorizonsSdArcsec-->2.08<!--/v-->″ over the whole
+   Sun sits <!--v:sunVsHorizonsMeanArcsec-->1.77<!--/v-->″ from Horizons on average with sd <!--v:sunVsHorizonsSdArcsec-->2.07<!--/v-->″ over the whole
    span — near zero in 1000–3000 (<!--v:sunVsHorizonsMeanP1000Arcsec-->1.8<!--/v--> / <!--v:sunVsHorizonsMeanP2000Arcsec-->−0.8<!--/v-->″),
-   <!--v:sunVsHorizonsMeanM2000Arcsec-->2.3<!--/v-->″ at −2000..−1000 (the size of the difference between the model's
+   <!--v:sunVsHorizonsMeanM2000Arcsec-->2.4<!--/v-->″ at −2000..−1000 (the size of the difference between the model's
    equinox of date and Horizons' of-date frame) — and <!--v:sunVsHorizonsModernSdArcsec-->0.78<!--/v-->″ scatter in
    1970–2049 (mean offset <!--v:sunVsHorizonsModernMeanArcsec-->0.84<!--/v-->″, the L0 anchor and aberration conventions).
 
@@ -626,7 +626,7 @@ carries no equinox-referenced period; the perihelion longitude does. The
 cardinal instants are the APPARENT crossings of this Sun (aberration and
 the leading nutation terms applied, both derived) — the former fitted
 cardinal-point model left with R1 (doc 110 chain 5); against Horizons' own
-crossings the instants are <!--v:cardinalVsHorizonsMeanMin-->−0.71<!--/v--> min on average over ±3000 yr, within a
+crossings the instants are <!--v:cardinalVsHorizonsMeanMin-->−0.72<!--/v--> min on average over ±3000 yr, within a
 minute in 1000–3000.
 
 **Accuracy**: <!--v:frameworkSunVsJplRms-->1.03<!--/v-->″ RMS vs JPL over the modern window 1970–2049
@@ -752,10 +752,10 @@ Only H/5 provides the correct reference-frame kinematic correction for the Sun's
 
 The raw H/5 kinematic prediction (<!--v:lodH5Only-->86,400.003548<!--/v--> s, display basis) overshoots the physical solar day by ~2.14 ms — a basis-independent statement, since the stack sum Σ is additive. The framework does not treat this as a defect of the raw physics — the raw H/5 term is a clean, parameter-free geometric statement about the ecliptic frame. Instead, the residual is absorbed by the framework's calibrated cyclic ΔT stack + Core-mantle swing:
 
-- **`usno_target_lod_s` = <!--v:usnoLodJ2000-->86,400.0021<!--/v--> s** — the joint fit's hard-equality J2000 LOD closure target (expressed in the fit's measured-day basis — see "The two J2000 day bases"), itself the composite optimum over Espenak history (Espenak RMS ≈ <!--v:deltaTEspenakRmsSeconds-->13.4<!--/v--> s across 20 reference years 1650–2017, subject to full-window Stephenson RMS ≤ 40 s), within ~0.1 ms of the observed EO value ~86400.0016 s.
-- **deltaTStart = <!--v:deltaTStart-->54.55<!--/v--> s** — the ΔT trend anchor at J2000. This is the long-term trend value the calibrated stack rides through the epoch, distinct from the IERS instantaneous observation of ΔT_J2000 ≈ 63.63 s (the trend line does not pass through the middle of an intra-decadal noise band).
+- **`usno_target_lod_s` = <!--v:usnoLodJ2000-->86,400.0021<!--/v--> s** — the joint fit's hard-equality J2000 LOD closure target (expressed in the fit's measured-day basis — see "The two J2000 day bases"), itself the composite optimum over Espenak history (Espenak RMS ≈ <!--v:deltaTEspenakRmsSeconds-->13.7<!--/v--> s across 20 reference years 1650–2017, subject to full-window Stephenson RMS ≤ 40 s), within ~0.1 ms of the observed EO value ~86400.0016 s.
+- **deltaTStart = <!--v:deltaTStart-->53.94<!--/v--> s** — the ΔT trend anchor at J2000. This is the long-term trend value the calibrated stack rides through the epoch, distinct from the IERS instantaneous observation of ΔT_J2000 ≈ 63.63 s (the trend line does not pass through the middle of an intra-decadal noise band).
 
-Both are propagated from `public/input/astro-reference.json` via Step 9 (`npm run constants:generate`). The fit itself is run by `tools/fit/dt-corrections-fit.js --joint --write` (Step 7c of the pipeline — the README numbering is the authority): 4 flags + the Core-mantle swing in one equality-constrained solve with the USNO closure as a hard anchor row. The calibrated components collectively contribute **<!--v:stackNetLodJ2000Ms-->-1.77<!--/v--> ms at J2000** (per current shipped fit — see `data/deltaT-4flag-fit.json` → `usno_anchor.shipped_sum_lod_at_j2000_s`) plus a ~<!--v:deltaTEspenakRmsSeconds-->13.4<!--/v--> s Espenak RMS envelope over 1650–2017 (full-window Stephenson RMS ≈ 31 s); the anchor triplet (USNO, deltaTStart, coefficients) moves atomically with each fit configuration.
+Both are propagated from `public/input/astro-reference.json` via Step 9 (`npm run constants:generate`). The fit itself is run by `tools/fit/dt-corrections-fit.js --joint --write` (Step 7c of the pipeline — the README numbering is the authority): 4 flags + the Core-mantle swing in one equality-constrained solve with the USNO closure as a hard anchor row. The calibrated components collectively contribute **<!--v:stackNetLodJ2000Ms-->-1.77<!--/v--> ms at J2000** (per current shipped fit — see `data/deltaT-4flag-fit.json` → `usno_anchor.shipped_sum_lod_at_j2000_s`) plus a ~<!--v:deltaTEspenakRmsSeconds-->13.7<!--/v--> s Espenak RMS envelope over 1650–2017 (full-window Stephenson RMS ≈ 31 s); the anchor triplet (USNO, deltaTStart, coefficients) moves atomically with each fit configuration.
 
 ### Two internal LOD conventions
 
@@ -809,7 +809,7 @@ The framework exposes four LOD values in the tweakpane **Day Lengths → Solar D
 |:---|:---|:---|---:|
 | **Layer 1 (Tidal Mean)** | pure-tidal chain (Farhat 2022, LLR α₁) + H/5 kinematic, with α held at long-term L1-climate MEAN value | Isolates Moon-recession tidal drift from the glacial-cycle α oscillation. Sits ABOVE Layer 2 at J2000 because J2000 is near a Holocene interglacial (L1 minimum → α at J2000 < α at climate mean) | **86400.110143 s** |
 | **Layer 2 (+ GIA)** | Layer 1 with α(t) applied at the current epoch (at J2000 this is EARTH_MOI_FACTOR exactly) | Adds the GIA channel via the L1-orbital-coupled α(t) curve — the physics baseline used by year-length derivations | **<!--v:solarDayLayer2J2000-->86,400.003108<!--/v--> s** |
-| **Layer 3 (+ Cycles)** | Layer 2 + Σ Bond/Hallstatt/Jose5/Jose4 cyclic δLOD stack (flags only) | Cyclic sub-Milankovitch modulation WITHOUT the Core-mantle swing | **<!--v:solarDayLayer3J2000-->86,400.001035<!--/v--> s** |
+| **Layer 3 (+ Cycles)** | Layer 2 + Σ Bond/Hallstatt/Jose5/Jose4 cyclic δLOD stack (flags only) | Cyclic sub-Milankovitch modulation WITHOUT the Core-mantle swing | **<!--v:solarDayLayer3J2000-->86,400.001053<!--/v--> s** |
 | **Layer 4 (REAL LOD)** | Layer 3 + Core-mantle swing (Resonator episode) | Physical length of one solar day — the shipped observable. Closes on the USNO target <!--v:usnoLodJ2000-->86,400.0021<!--/v--> s in the fit's measured-day basis by construction of the joint fit (0.32 ms basis spread — see "The two J2000 day bases") | **<!--v:lodRealPhysical-->86,400.001780<!--/v--> s** |
 
 **Layer 1 − Layer 2 gap (~107 ms at J2000)** — the effect of using α at climate-mean vs α at J2000:
@@ -957,19 +957,19 @@ days/yr  = tropical_year_s(t) / LOD(t)
 <!-- generated:doc99-clock-through-time -->
 | Age (Myr) | LOD (hr) | T_p (yr) — the composed precession period | days/yr (tropical) | Moon distance (km) | obliquity beat (kyr) | Era |
 |---:|---:|---:|---:|---:|---:|:---|
-| **+200 (future)** | **25.24** | **28,208** | **347.35** | **392,059** | **47.83** | Future (projection) |
-| +100 (future) | 24.60 | 26,958 | 356.29 | 388,222 | 44.35 | Future |
-| +50 (future) | 24.30 | 26,357 | 360.76 | 386,309 | 42.74 | Future |
-| **0 (J2000)** | **24.00** | **25,771** | **365.24** | **384,399** | **41.22** | Modern (IERS anchor) |
-| −10 | 23.94 | 25,656 | 366.14 | 384,017 | 40.93 | Miocene |
-| −50 | 23.71 | 25,199 | 369.73 | 382,489 | 39.78 | Eocene/Oligocene |
-| −90 | 23.48 | 24,750 | 373.33 | 380,959 | 38.67 | Late Cretaceous (Pannella) |
-| −180 | 22.98 | 23,767 | 381.49 | 377,509 | 36.32 | Jurassic (Scrutton) |
-| −290 | 22.38 | 22,612 | 391.57 | 373,261 | 33.69 | Permian (Mazzullo) |
-| **−380** | **21.92** | **21,699** | **399.96** | **369,749** | **31.71** | Devonian (Wells 1963) |
-| −440 | 21.61 | 21,105 | 405.63 | 367,383 | 30.45 | Silurian (Wells) |
-| −500 | 21.31 | 20,521 | 411.37 | 364,994 | 29.25 | Late Cambrian |
-| −620 | 20.71 | 19,382 | 423.11 | 360,135 | 26.99 | Ediacaran (Williams 2000) |
+| **+200 (future)** | **25.24** | **28,208** | **347.35** | **392,059** | **47.68** | Future (projection) |
+| +100 (future) | 24.60 | 26,958 | 356.29 | 388,222 | 44.21 | Future |
+| +50 (future) | 24.30 | 26,357 | 360.76 | 386,309 | 42.61 | Future |
+| **0 (J2000)** | **24.00** | **25,771** | **365.24** | **384,399** | **41.10** | Modern (IERS anchor) |
+| −10 | 23.94 | 25,656 | 366.14 | 384,017 | 40.80 | Miocene |
+| −50 | 23.71 | 25,199 | 369.73 | 382,489 | 39.66 | Eocene/Oligocene |
+| −90 | 23.48 | 24,750 | 373.33 | 380,959 | 38.56 | Late Cretaceous (Pannella) |
+| −180 | 22.98 | 23,767 | 381.49 | 377,509 | 36.22 | Jurassic (Scrutton) |
+| −290 | 22.38 | 22,612 | 391.57 | 373,261 | 33.60 | Permian (Mazzullo) |
+| **−380** | **21.92** | **21,699** | **399.96** | **369,749** | **31.62** | Devonian (Wells 1963) |
+| −440 | 21.61 | 21,105 | 405.63 | 367,383 | 30.37 | Silurian (Wells) |
+| −500 | 21.31 | 20,521 | 411.37 | 364,994 | 29.17 | Late Cambrian |
+| −620 | 20.71 | 19,382 | 423.11 | 360,135 | 26.92 | Ediacaran (Williams 2000) |
 
 T_p(t) = 1,296,000/ψ̇(t) with ψ̇(t) = [ω(t)/ω₀]·p₀·[f_S + (1 − f_S)(a₀/a_M(t))³] — Earth's spin (angular-momentum conservation on the recession history) carrying the solar and lunar torques, the lunar torque growing as the Moon was closer; p₀ = 50.2883 ″/yr, the model's derived J2000 rate (T_p = 25,771.4 yr; plan 06 S5). The obliquity beat is 1,296,000/(ψ̇ − |s₃|) with |s₃| = 18.8506 ″/yr, the dominant nodal mode of Earth's orbit (the engine's deep secular modes; μ = 1). The spin-only clock the model carried before (H₀·LOD/LOD₀ ÷ 13) read 23,553 yr at the Devonian where the composed clock reads 21,699 — retired.
 <!-- /generated:doc99-clock-through-time -->
@@ -985,8 +985,8 @@ ice-age mass redistribution that changes the polar moment (the α(t) of the
 length-of-day stack) changes it too; the channel is scaled on the observed
 dJ₂/dt (<!--v:j2RateJ2000Per1e11Yr-->−2.7<!--/v--> ×10⁻¹¹ /yr, Cox & Chao 2002) and is bounded, ±<!--v:precOfDateEllipticityAmpLastMyrPct-->0.02<!--/v--> %, with
 no secular part. Theory against theory: the equinox of date holds
-<!--v:equinoxVsVondrakMaxAbsArcsec-->5.8<!--/v-->″ of Vondrák et al. (2011) over ±3000 yr where the secular law alone
-reads <!--v:equinoxSecularOnlyMaxAbsArcsec-->26.4<!--/v-->″, and the obliquity holds <!--v:obliqVsLa2004RmsLastMyrArcsec-->13.1<!--/v-->″ rms of La2004 over the last
+<!--v:equinoxVsVondrakMaxAbsArcsec-->6.0<!--/v-->″ of Vondrák et al. (2011) over ±3000 yr where the secular law alone
+reads <!--v:equinoxSecularOnlyMaxAbsArcsec-->26.4<!--/v-->″, and the obliquity holds <!--v:obliqVsLa2004RmsLastMyrArcsec-->13.6<!--/v-->″ rms of La2004 over the last
 million years where the secular law alone reads <!--v:obliqSecularOnlyVsLa2004RmsLastMyrArcsec-->78.9<!--/v-->″
 ([doc 110 §2.3](110-calculation-map.md) carries the formulas). The deep-time
 rows above, the precession gates at 1.4 and 2.46 Ga and the obliquity beat
@@ -1178,22 +1178,22 @@ This is one of the strongest empirical validations of the framework's structural
 Periods in **kyr**, written by the engine. The lines are the climate formula's PHYSICAL obliquity lines p + s_i (plan 06 T1; `data/l1-physical-lines.json`): Earth's composed precession rate ψ̇(t) beating against the orbit's nodal modes s_i. Only ψ̇(t) scales; the nodal frequencies are fixed (μ = 1). The main line p + s₀ is the obliquity beat of falsification leg 1. (The former integer-label tables are retired.)
 
 <!-- generated:doc99-l1-obliquity-lines -->
-| Age (Myr) | ψ̇ (″/yr) | p+s12 (27.40 kyr today, rel. amp 0.10) | p+s1 (28.99 kyr today, rel. amp 0.54) | p+s14 (29.16 kyr today, rel. amp 0.14) | p+s9 (29.77 kyr today, rel. amp 0.10) | p+s3 (29.97 kyr today, rel. amp 0.48) | p+s2 (39.84 kyr today, rel. amp 0.48) | p+s4 (40.52 kyr today, rel. amp 0.32) | p+s0 (41.22 kyr today, rel. amp 1.00) | p+s7 (41.96 kyr today, rel. amp 0.18) | p+s10 (54.13 kyr today, rel. amp 0.16) |
+| Age (Myr) | ψ̇ (″/yr) | p+s12 (27.35 kyr today, rel. amp 0.10) | p+s1 (28.93 kyr today, rel. amp 0.54) | p+s14 (29.09 kyr today, rel. amp 0.14) | p+s9 (29.71 kyr today, rel. amp 0.10) | p+s3 (29.90 kyr today, rel. amp 0.48) | p+s2 (39.72 kyr today, rel. amp 0.48) | p+s4 (40.40 kyr today, rel. amp 0.32) | p+s0 (41.10 kyr today, rel. amp 1.00) | p+s7 (41.82 kyr today, rel. amp 0.18) | p+s10 (53.92 kyr today, rel. amp 0.16) |
 |---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|
-| +200 (future) | 45.94 | 30.17 | 32.11 | 32.31 | 33.07 | 33.31 | 45.98 | 46.89 | 47.83 | 48.82 | 66.13 |
-| **0 (J2000)** | **50.29** | **27.40** | **28.99** | **29.16** | **29.77** | **29.97** | **39.84** | **40.52** | **41.22** | **41.96** | **54.13** |
-| −50 | 51.43 | 26.76 | 28.27 | 28.42 | 29.01 | 29.20 | 38.49 | 39.12 | 39.78 | 40.46 | 51.67 |
-| −90 | 52.36 | 26.25 | 27.71 | 27.85 | 28.42 | 28.60 | 37.45 | 38.05 | 38.67 | 39.31 | 49.82 |
-| −180 | 54.53 | 25.15 | 26.48 | 26.62 | 27.13 | 27.29 | 35.24 | 35.78 | 36.32 | 36.89 | 45.99 |
-| −290 | 57.32 | 23.86 | 25.05 | 25.18 | 25.64 | 25.78 | 32.76 | 33.22 | 33.69 | 34.18 | 41.85 |
-| **−380** | **59.73** | **22.84** | **23.94** | **24.05** | **24.47** | **24.60** | **30.88** | **31.29** | **31.71** | **32.14** | **38.83** |
-| −440 | 61.41 | 22.19 | 23.22 | 23.32 | 23.72 | 23.84 | 29.69 | 30.07 | 30.45 | 30.85 | 36.96 |
-| −620 | 66.87 | 20.29 | 21.15 | 21.24 | 21.56 | 21.66 | 26.39 | 26.69 | 26.99 | 27.30 | 31.98 |
+| +200 (future) | 45.94 | 30.11 | 32.04 | 32.24 | 33.00 | 33.24 | 45.83 | 46.74 | 47.68 | 48.66 | 65.84 |
+| **0 (J2000)** | **50.29** | **27.35** | **28.93** | **29.09** | **29.71** | **29.90** | **39.72** | **40.40** | **41.10** | **41.82** | **53.92** |
+| −50 | 51.43 | 26.70 | 28.21 | 28.36 | 28.95 | 29.13 | 38.37 | 39.01 | 39.66 | 40.33 | 51.47 |
+| −90 | 52.36 | 26.20 | 27.65 | 27.79 | 28.36 | 28.53 | 37.34 | 37.94 | 38.56 | 39.19 | 49.62 |
+| −180 | 54.53 | 25.10 | 26.42 | 26.56 | 27.07 | 27.23 | 35.14 | 35.67 | 36.22 | 36.78 | 45.82 |
+| −290 | 57.32 | 23.81 | 25.00 | 25.12 | 25.58 | 25.72 | 32.67 | 33.13 | 33.60 | 34.08 | 41.70 |
+| **−380** | **59.73** | **22.80** | **23.89** | **24.00** | **24.42** | **24.55** | **30.79** | **31.20** | **31.62** | **32.05** | **38.69** |
+| −440 | 61.41 | 22.14 | 23.17 | 23.27 | 23.66 | 23.79 | 29.61 | 29.98 | 30.37 | 30.76 | 36.84 |
+| −620 | 66.87 | 20.25 | 21.10 | 21.19 | 21.52 | 21.62 | 26.32 | 26.62 | 26.92 | 27.23 | 31.88 |
 
-Obliquity band: each line's period is 1,296,000/(ψ̇(t) + f_i) kyr with f_i the line's orbital frequency (fixed, μ = 1) and ψ̇(t) the composed precession rate — the 10 lines are the physical L1 set of plan 06 T1 (`data/l1-physical-lines.json`, relative amplitude ≥ 0.1 within the family), not integer labels.
+Obliquity band: each line's period is 1,296,000/(ψ̇(t) + f_i) kyr with f_i the line's orbital frequency (fixed, μ = 1) and ψ̇(t) the precession rate of date the family carries — the composed general precession (the column) for the climatic-precession lines, the spin axis's inertial rate (the column times the hybrid's self-anchor factor 1.00192, 50.385 ″/yr at J2000) for the obliquity lines — the 10 lines are the physical L1 set of plan 06 T1 (`data/l1-physical-lines.json`, relative amplitude ≥ 0.1 within the family), not integer labels.
 <!-- /generated:doc99-l1-obliquity-lines -->
 
-**Key prediction**: the Devonian (380 Ma) obliquity beat p + s₀ reads **31.7 kyr** (modern 41.2 kyr; generated table above — the lunar torque adds to the spin scaling). This is what the deep-time astronomical literature has long said: Berger, Loutre & Laskar 1992 shorten the obliquity main period from 41 to 29 kyr over 500 Myr while the precession constant rises from 50 to 61 ″/yr (the composed clock reads 29.25 kyr and 63.2 ″/yr at 500 Ma), and the Devonian cyclostratigraphic work of the De Vleeschouwer / Da Silva / Zeeden line uses obliquity near 29.5 kyr and precession of 16.1–19.4 kyr at ~372 Ma. Wu et al. 2024's inferred precession constants at 300–500 Ma (59.5–64.5 ″/yr) sit 2–3 % above the composed clock (Phanerozoic comparison block, § "The composition is what nature measures"); the residual has a named candidate — the Moon-distance history in the Pangea window, where Wu's anchors put the Moon closer than the smooth recession polynomial (reproducing a 29.5-kyr beat at 372 Ma needs the Moon at 56.7 R_E where the chain has 58.1). **The old text's "36–38 kyr observed (Meyers 2008, Boulila 2018)" was a mis-citation**: Meyers, Sageman & Pagani 2008 is the Cenomanian (~94 Ma) Bridge Creek record and Boulila et al. 2018 the middle Eocene (~40 Ma) timescale — epochs whose obliquity periods ARE 37–40 kyr — and the retired spin-only clock (37.7 kyr here) "matched" them by that error.
+**Key prediction**: the Devonian (380 Ma) obliquity beat p + s₀ reads **<!--v:obliqBeatDevonianKyr-->31.6<!--/v--> kyr** (modern <!--v:obliqBeatJ2000Kyr-->41.1<!--/v--> kyr; generated table above — the lunar torque adds to the spin scaling). This is what the deep-time astronomical literature has long said: Berger, Loutre & Laskar 1992 shorten the obliquity main period from 41 to 29 kyr over 500 Myr while the precession constant rises from 50 to 61 ″/yr (the generated Phanerozoic block above carries the composed clock's own reading at 500 Ma), and the Devonian cyclostratigraphic work of the De Vleeschouwer / Da Silva / Zeeden line uses obliquity near 29.5 kyr and precession of 16.1–19.4 kyr at ~372 Ma. Wu et al. 2024's inferred precession constants at 300–500 Ma (59.5–64.5 ″/yr) sit 2–3 % above the composed clock (Phanerozoic comparison block, § "The composition is what nature measures"); the residual has a named candidate — the Moon-distance history in the Pangea window, where Wu's anchors put the Moon closer than the smooth recession polynomial (reproducing a 29.5-kyr beat at 372 Ma needs the Moon at 56.7 R_E where the chain has 58.1). **The old text's "36–38 kyr observed (Meyers 2008, Boulila 2018)" was a mis-citation**: Meyers, Sageman & Pagani 2008 is the Cenomanian (~94 Ma) Bridge Creek record and Boulila et al. 2018 the middle Eocene (~40 Ma) timescale — epochs whose obliquity periods ARE 37–40 kyr — and the retired spin-only clock (37.7 kyr here) "matched" them by that error.
 
 ---
 
@@ -1214,7 +1214,7 @@ The physical climatic-precession lines p + g_i (ψ̇(t) beating against the orbi
 | −440 | 61.41 | 16.34 | 16.45 | 18.82 | 19.34 | 19.74 |
 | −620 | 66.87 | 15.29 | 15.39 | 17.44 | 17.89 | 18.22 |
 
-Climatic-precession band: each line's period is 1,296,000/(ψ̇(t) + f_i) kyr with f_i the line's orbital frequency (fixed, μ = 1) and ψ̇(t) the composed precession rate — the 5 lines are the physical L1 set of plan 06 T1 (`data/l1-physical-lines.json`, relative amplitude ≥ 0.1 within the family), not integer labels.
+Climatic-precession band: each line's period is 1,296,000/(ψ̇(t) + f_i) kyr with f_i the line's orbital frequency (fixed, μ = 1) and ψ̇(t) the precession rate of date the family carries — the composed general precession (the column) for the climatic-precession lines, the spin axis's inertial rate (the column times the hybrid's self-anchor factor 1.00192, 50.385 ″/yr at J2000) for the obliquity lines — the 5 lines are the physical L1 set of plan 06 T1 (`data/l1-physical-lines.json`, relative amplitude ≥ 0.1 within the family), not integer labels.
 <!-- /generated:doc99-l1-precession-lines -->
 
 **Key prediction**: the Devonian climatic-precession lines span **16.7–20.3 kyr** (modern 19.0–23.8 kyr; generated table above). Meyers 2008 reports ~17.7 kyr — inside the predicted band.
@@ -1401,12 +1401,12 @@ The shipped chain (Driver 1½ regime-aware history), written by the engine — L
 | **4.498 (genesis, rigid Roche)** | 4.62 | 9,440 | 0 | — (ψ̇ ≫ \|s₃\|: the beat ≈ T_p) |
 | **4.42 (Farhat Moon-formation)** | 5.67 | 47,233 | 17 | — (ψ̇ ≫ \|s₃\|: the beat ≈ T_p) |
 | 3.25 | 14.87 | 295,649 | 8,777 | — (ψ̇ ≫ \|s₃\|: the beat ≈ T_p) |
-| 2.50 | 16.98 | 322,160 | 12,336 | 15.03 |
-| 1.00 | 18.92 | 343,784 | 15,972 | 20.81 |
-| 0.60 | 20.81 | 360,953 | 19,569 | 27.36 |
-| 0.35 | 22.07 | 370,924 | 22,000 | 32.35 |
-| **0 (Modern)** | 24.00 | 384,399 | 25,771 | 41.22 |
-| +0.2 (future) | 25.24 | 392,059 | 28,208 | 47.83 |
+| 2.50 | 16.98 | 322,160 | 12,336 | 15.00 |
+| 1.00 | 18.92 | 343,784 | 15,972 | 20.75 |
+| 0.60 | 20.81 | 360,953 | 19,569 | 27.28 |
+| 0.35 | 22.07 | 370,924 | 22,000 | 32.26 |
+| **0 (Modern)** | 24.00 | 384,399 | 25,771 | 41.10 |
+| +0.2 (future) | 25.24 | 392,059 | 28,208 | 47.68 |
 
 Near genesis the Moon's torque dominates by orders of magnitude ((a₀/a_M)³ ≈ 539 at 4.42 Ga), so the precession period collapses to decades — a statement of the composition law at the edge of the tidal chain's domain, not a calibrated prediction (the recession history there is the Driver-1½ regime knots to the Roche crossing).
 <!-- /generated:doc99-genesis-table -->
@@ -1421,8 +1421,8 @@ The clock's current growth rate, written by the engine from the shipped chain:
 | Rate at J2000 | Value |
 |:---|---:|
 | dT_p/dt (the precession period) | +11.6 yr per Myr = +0.0449 % per Myr |
-| d(beat)/dt (the obliquity beat) | +29.6 yr per Myr = +0.0719 % per Myr |
-| dLOD/dt (the tidal chain) | +21.22 s per Myr = +2.12 ms per century |
+| d(beat)/dt (the obliquity beat) | +29.5 yr per Myr = +0.0718 % per Myr |
+| dLOD/dt (the tidal chain) | +21.23 s per Myr = +2.12 ms per century |
 
 Central differences of the shipped chain at ±1 Myr. The precession period grows faster than the day length alone would make it, because the lunar torque falls as the Moon recedes: the composition law, not spin-scaling.
 <!-- /generated:doc99-growth-rate -->
@@ -1505,14 +1505,14 @@ A single smooth two-layer formula. Past 4.5 Gyr the smooth base matches Farhat 2
 <!-- generated:doc99-key-epochs -->
 | Age (Ma) | LOD (s) | LOD (hr) | Moon distance (km) | T_p (yr) | obliquity beat (kyr) |
 |---:|---:|---:|---:|---:|---:|
-| 0 (Modern) | 86,400.0 | 24.000 | 384,399 | 25,771 | 41.22 |
-| 380 (Devonian) | 78,894.7 | 21.915 | 369,749 | 21,699 | 31.71 |
-| 550 (Cambrian) | 75,809.6 | 21.058 | 362,983 | 20,042 | 28.29 |
-| 1,000 (Mesoproterozoic) | 68,112.9 | 18.920 | 343,784 | 15,972 | 20.81 |
-| 2,500 (Archean) | 61,111.5 | 16.975 | 322,160 | 12,336 | 15.03 |
+| 0 (Modern) | 86,400.0 | 24.000 | 384,399 | 25,771 | 41.10 |
+| 380 (Devonian) | 78,894.7 | 21.915 | 369,749 | 21,699 | 31.62 |
+| 550 (Cambrian) | 75,809.6 | 21.058 | 362,983 | 20,042 | 28.21 |
+| 1,000 (Mesoproterozoic) | 68,112.9 | 18.920 | 343,784 | 15,972 | 20.75 |
+| 2,500 (Archean) | 61,111.6 | 16.975 | 322,160 | 12,336 | 15.00 |
 | 4,498 (Earth-Moon genesis, rigid Roche) | 16,648.8 | 4.625 | 9,440 | 0 | — |
-| **−200 (+200 Ma future)** | 90,853.3 | 25.237 | 392,059 | 28,208 | 47.83 |
-| **−1,000 (+1 Gyr future)** | 116,015.9 | 32.227 | 425,119 | 42,109 | 108.67 |
+| **−200 (+200 Ma future)** | 90,853.3 | 25.237 | 392,059 | 28,208 | 47.68 |
+| **−1,000 (+1 Gyr future)** | 116,016.0 | 32.227 | 425,119 | 42,109 | 108.13 |
 | **−3,000 (+3 Gyr future)** | — | — | — | — | beyond tidal lock |
 <!-- /generated:doc99-key-epochs -->
 
@@ -2193,12 +2193,12 @@ re-measured on top of the preferred δp.
 
 | Window | ΔR² total, clock alone | sign control (k = −1) | preferred δp | ΔR² at that δp | clock on top of it |
 |:---|---:|---:|---:|---:|---:|
-| LR04 post-MPT (0–1 Myr) | <!--v:evolvingClockDeltaR2TotalPostMpt-->+0.00035<!--/v--> | <!--v:evolvingClockDeltaR2AtScaleMinusOnePostMpt-->−0.00037<!--/v--> | <!--v:evolvingClockPreferredDeltaPPostMpt-->+0.24<!--/v--> ″/yr | <!--v:evolvingClockDeltaR2AtPreferredPPostMpt-->+0.00457<!--/v--> | <!--v:evolvingClockGainAtPreferredPPostMpt-->−0.00009<!--/v--> |
-| LR04 iNHG-MPT (1–2.7 Myr) | <!--v:evolvingClockDeltaR2TotalInhgMpt-->+0.00464<!--/v--> | <!--v:evolvingClockDeltaR2AtScaleMinusOneInhgMpt-->−0.00502<!--/v--> | <!--v:evolvingClockPreferredDeltaPInhgMpt-->+0.22<!--/v--> ″/yr | <!--v:evolvingClockDeltaR2AtPreferredPInhgMpt-->+0.01421<!--/v--> | <!--v:evolvingClockGainAtPreferredPInhgMpt-->−0.00038<!--/v--> |
-| LR04 pre-iNHG (2.7–5.3 Myr) | <!--v:evolvingClockDeltaR2TotalPreInhg-->+0.02796<!--/v--> | <!--v:evolvingClockDeltaR2AtScaleMinusOnePreInhg-->−0.00084<!--/v--> | <!--v:evolvingClockPreferredDeltaPPreInhg-->+0.30<!--/v--> ″/yr | <!--v:evolvingClockDeltaR2AtPreferredPPreInhg-->+0.09539<!--/v--> | <!--v:evolvingClockGainAtPreferredPPreInhg-->−0.01136<!--/v--> |
-| LR04 full (0–5.3 Myr) | <!--v:evolvingClockDeltaR2TotalLr04Full-->+0.02798<!--/v--> | <!--v:evolvingClockDeltaR2AtScaleMinusOneLr04Full-->−0.00675<!--/v--> | <!--v:evolvingClockPreferredDeltaPLr04Full-->+0.20<!--/v--> ″/yr | <!--v:evolvingClockDeltaR2AtPreferredPLr04Full-->+0.14387<!--/v--> | <!--v:evolvingClockGainAtPreferredPLr04Full-->−0.00961<!--/v--> |
-| CENOGRID (0–66 Myr) | <!--v:evolvingClockDeltaR2TotalCenogrid-->−0.00006<!--/v--> | <!--v:evolvingClockDeltaR2AtScaleMinusOneCenogrid-->−0.00006<!--/v--> | <!--v:evolvingClockPreferredDeltaPCenogrid-->+0.30<!--/v--> ″/yr | <!--v:evolvingClockDeltaR2AtPreferredPCenogrid-->+0.00036<!--/v--> | <!--v:evolvingClockGainAtPreferredPCenogrid-->−0.00055<!--/v--> |
-| Cheng 2016 (0–640 kyr, U-Th, untuned) | <!--v:evolvingClockDeltaR2TotalCheng-->+0.00026<!--/v--> | <!--v:evolvingClockDeltaR2AtScaleMinusOneCheng-->−0.00027<!--/v--> | <!--v:evolvingClockPreferredDeltaPCheng-->+0.42<!--/v--> ″/yr | <!--v:evolvingClockDeltaR2AtPreferredPCheng-->+0.00947<!--/v--> | <!--v:evolvingClockGainAtPreferredPCheng-->−0.00013<!--/v--> |
+| LR04 post-MPT (0–1 Myr) | <!--v:evolvingClockDeltaR2TotalPostMpt-->+0.00043<!--/v--> | <!--v:evolvingClockDeltaR2AtScaleMinusOnePostMpt-->−0.00045<!--/v--> | <!--v:evolvingClockPreferredDeltaPPostMpt-->+0.24<!--/v--> ″/yr | <!--v:evolvingClockDeltaR2AtPreferredPPostMpt-->+0.00556<!--/v--> | <!--v:evolvingClockGainAtPreferredPPostMpt-->−0.00009<!--/v--> |
+| LR04 iNHG-MPT (1–2.7 Myr) | <!--v:evolvingClockDeltaR2TotalInhgMpt-->+0.00367<!--/v--> | <!--v:evolvingClockDeltaR2AtScaleMinusOneInhgMpt-->−0.00453<!--/v--> | <!--v:evolvingClockPreferredDeltaPInhgMpt-->+0.14<!--/v--> ″/yr | <!--v:evolvingClockDeltaR2AtPreferredPInhgMpt-->+0.00719<!--/v--> | <!--v:evolvingClockGainAtPreferredPInhgMpt-->−0.00026<!--/v--> |
+| LR04 pre-iNHG (2.7–5.3 Myr) | <!--v:evolvingClockDeltaR2TotalPreInhg-->+0.03797<!--/v--> | <!--v:evolvingClockDeltaR2AtScaleMinusOnePreInhg-->−0.02831<!--/v--> | <!--v:evolvingClockPreferredDeltaPPreInhg-->+0.22<!--/v--> ″/yr | <!--v:evolvingClockDeltaR2AtPreferredPPreInhg-->+0.06226<!--/v--> | <!--v:evolvingClockGainAtPreferredPPreInhg-->−0.01454<!--/v--> |
+| LR04 full (0–5.3 Myr) | <!--v:evolvingClockDeltaR2TotalLr04Full-->+0.05323<!--/v--> | <!--v:evolvingClockDeltaR2AtScaleMinusOneLr04Full-->−0.03925<!--/v--> | <!--v:evolvingClockPreferredDeltaPLr04Full-->+0.12<!--/v--> ″/yr | <!--v:evolvingClockDeltaR2AtPreferredPLr04Full-->+0.07397<!--/v--> | <!--v:evolvingClockGainAtPreferredPLr04Full-->−0.01986<!--/v--> |
+| CENOGRID (0–66 Myr) | <!--v:evolvingClockDeltaR2TotalCenogrid-->+0.00031<!--/v--> | <!--v:evolvingClockDeltaR2AtScaleMinusOneCenogrid-->+0.00016<!--/v--> | <!--v:evolvingClockPreferredDeltaPCenogrid-->+0.20<!--/v--> ″/yr | <!--v:evolvingClockDeltaR2AtPreferredPCenogrid-->+0.00040<!--/v--> | <!--v:evolvingClockGainAtPreferredPCenogrid-->−0.00048<!--/v--> |
+| Cheng 2016 (0–640 kyr, U-Th, untuned) | <!--v:evolvingClockDeltaR2TotalCheng-->+0.00025<!--/v--> | <!--v:evolvingClockDeltaR2AtScaleMinusOneCheng-->−0.00026<!--/v--> | <!--v:evolvingClockPreferredDeltaPCheng-->+0.42<!--/v--> ″/yr | <!--v:evolvingClockDeltaR2AtPreferredPCheng-->+0.00877<!--/v--> | <!--v:evolvingClockGainAtPreferredPCheng-->−0.00014<!--/v--> |
 
 Reading:
 
@@ -2209,60 +2209,51 @@ Reading:
    composed clock carries.
 2. **A constant frequency offset explains it.** With the p-lines evaluated at
    p + δp, every LR04 window prefers δp =
-   <!--v:evolvingClockPreferredDeltaPMinLr04-->+0.20<!--/v-->…<!--v:evolvingClockPreferredDeltaPMaxLr04-->+0.30<!--/v--> ″/yr,
+   <!--v:evolvingClockPreferredDeltaPMinLr04-->+0.12<!--/v-->…<!--v:evolvingClockPreferredDeltaPMaxLr04-->+0.24<!--/v--> ″/yr,
    and on top of that offset the clock of date subtracts in every window
    (largest gain <!--v:evolvingClockGainAfterPreferredPMax-->−0.00009<!--/v-->).
    The "clock gain" was a frequency offset in disguise: inside one window a
    phase drift and a frequency offset both raise a line's mean frequency.
-3. **The offset lives in the obliquity lines.** Scanned one family at a
-   time, the obliquity lines alone want δp =
-   <!--v:evolvingClockPreferredDeltaPObliquityInhgMpt-->+0.28<!--/v--> ″/yr
-   (iNHG-MPT), <!--v:evolvingClockPreferredDeltaPObliquityPreInhg-->+0.30<!--/v-->
-   (pre-iNHG) and <!--v:evolvingClockPreferredDeltaPObliquityLr04Full-->+0.20<!--/v-->
-   (full record), carrying almost the whole gain (ΔR²
-   <!--v:evolvingClockDeltaR2AtPreferredPObliquityInhgMpt-->+0.01845<!--/v-->,
-   <!--v:evolvingClockDeltaR2AtPreferredPObliquityPreInhg-->+0.08949<!--/v-->,
-   <!--v:evolvingClockDeltaR2AtPreferredPObliquityLr04Full-->+0.13647<!--/v-->);
+3. **Two rates, two families — and the residual per family.** An obliquity
+   line p + s_i is the spin axis precessing in the inertial frame against one
+   of the ecliptic's nodal modes, so it carries the spin axis's inertial rate
+   (<!--v:evolvingClockArtifactPInertialArcsecPerYr-->50.385<!--/v--> ″/yr — the
+   self-anchored rate the hybrid obliquity integration runs on, the general
+   precession plus the planetary mean the N-body ecliptic's motion carries);
+   a climatic-precession line p + g_i is the perihelion measured from the
+   equinox along the ecliptic of date, so it carries the general precession
+   in longitude (<!--v:evolvingClockArtifactPArcsecPerYr-->50.288<!--/v--> ″/yr,
+   the model's J2000 precession reading, 1,296,000 ″ over
+   <!--v:evolvingClockTpJ2000Yr-->25771<!--/v--> yr). The shipped lines carry
+   those rates (model v22.0). Scanned one family at a time on them, the
+   obliquity lines alone want δp =
+   <!--v:evolvingClockPreferredDeltaPObliquityInhgMpt-->+0.18<!--/v--> ″/yr
+   (iNHG-MPT), <!--v:evolvingClockPreferredDeltaPObliquityPreInhg-->+0.20<!--/v-->
+   (pre-iNHG) and <!--v:evolvingClockPreferredDeltaPObliquityLr04Full-->+0.12<!--/v-->
+   (full record) for gains of
+   <!--v:evolvingClockDeltaR2AtPreferredPObliquityInhgMpt-->+0.00880<!--/v-->,
+   <!--v:evolvingClockDeltaR2AtPreferredPObliquityPreInhg-->+0.05924<!--/v-->,
+   <!--v:evolvingClockDeltaR2AtPreferredPObliquityLr04Full-->+0.06916<!--/v-->;
    the climatic-precession lines alone want
    <!--v:evolvingClockPreferredDeltaPPrecessionInhgMpt-->+0.02<!--/v--> ″/yr in
    the one window that resolves them (iNHG-MPT, ΔR²
    <!--v:evolvingClockDeltaR2AtPreferredPPrecessionInhgMpt-->+0.00005<!--/v-->)
-   and small, poorly determined offsets elsewhere.
-4. **That is a convention split, and the engine already knows it.** An
-   obliquity line p + s_i is the spin axis precessing in the inertial frame
-   against one of the ecliptic's nodal modes — the lunisolar precession rate.
-   A climatic-precession line p + g_i is the perihelion measured from the
-   equinox along the ecliptic of date — the general precession in longitude
-   p_A. The line artifact uses p_A
-   (<!--v:evolvingClockArtifactPArcsecPerYr-->50.288<!--/v--> ″/yr — the model's
-   J2000 precession reading, 1,296,000 ″ over
-   <!--v:evolvingClockTpJ2000Yr-->25771<!--/v--> yr) for both families. The
-   engine's own obliquity integration does not: its spin axis is self-anchored
-   at the lunisolar rate, measured 0.0966 ″/yr above p_A at J2000
-   (`@essrt/physics` `earth/deep-orbital-history`, the D4e self-anchor —
-   integrating at the general rate double-counted the planetary mean). So the
-   artifact's ten obliquity lines sit 0.097 ″/yr (0.2 %, 41.22 → 41.10 kyr for
-   p+s₀) slow against the engine's own ε(t). At that offset alone the
-   obliquity-only scan already reads ΔR²
-   <!--v:evolvingClockObliquityDeltaR2AtLunisolarInhgMpt-->+0.00996<!--/v-->
-   (iNHG-MPT), <!--v:evolvingClockObliquityDeltaR2AtLunisolarPreInhg-->+0.03167<!--/v-->
-   (pre-iNHG), <!--v:evolvingClockObliquityDeltaR2AtLunisolarLr04Full-->+0.07017<!--/v-->
-   (full record). The further +0.1…+0.2 ″/yr the LR04 windows ask for
-   coincides with La2004's precession frequency (50.476 ″/yr, 0.09 above the
-   lunisolar rate) — the tuning target of LR04's chronology; the U-Th-dated
-   Cheng 2016 record asks for the same direction but cannot separate the two
-   over 640 kyr.
+   and small, poorly determined offsets elsewhere. The residual one to two
+   tenths of an arcsecond per year is the size of the gap to La2004's precession frequency
+   (50.476 ″/yr, 0.09 above the engine's inertial rate — the tuning target of
+   LR04's chronology) and of what a 640-kyr untuned record can resolve; the
+   engine's +0.097 above the general precession is IAU's planetary precession
+   ψ_A − p_A. (Before v22.0 both families
+   carried the general precession; the same scan then read +0.2…+0.3 ″/yr
+   with gains up to 0.14, all of it in the obliquity family — the measurement
+   that led to the derivation fix; the v22.0 version note carries it.)
 
 **Conclusion.** The composed clock's drift is below what any available
-record resolves — the formula keeps its J2000 line periods, now measured on
-the right physics (only the p-carrying lines warp). The climatic-precession
-lines carry the right rate. The obliquity lines should carry the lunisolar
-rate the engine's own obliquity integration uses, not the general precession:
-a derivation fix of the line artifact (doc 92 §2, `scripts/l1_physical_lines.py`,
-which needs the engine to export that rate beside p_A), 0.2 % on ten periods,
-that the records support in direction and in part in size. Whether the
-records' remaining +0.1…+0.2 ″/yr is physics or La2004's imprint on LR04's
-chronology, these records cannot say.
+record resolves — the formula keeps its J2000 line periods, measured on the
+right physics (only the p-carrying lines warp). Each family carries the rate
+its physics names, and the obliquity lines and the published obliquity beat
+2π/(ψ̇ᵢₙ − |s₃|) are one quantity:
+<!--v:obliqBeatJ2000Kyr-->41.1<!--/v--> kyr at J2000.
 
 ---
 
@@ -2342,10 +2333,10 @@ Proper-physics formula's bounded future projections:
 <!-- generated:doc99-future-table -->
 | Time from now | LOD (hr) | Moon distance (km) | T_p (yr) | obliquity beat (kyr) | Status |
 |:---|---:|---:|---:|---:|:---|
-| Modern | 24.00 | 384,399 | 25,771 | 41.22 | anchor |
-| +200 Myr | 25.24 | 392,059 | 28,208 | 47.83 | within the tidal chain |
-| +500 Myr | 27.38 | 403,811 | 32,443 | 61.43 | within the tidal chain |
-| +1,000 Myr | 32.23 | 425,119 | 42,109 | 108.67 | within the tidal chain |
+| Modern | 24.00 | 384,399 | 25,771 | 41.10 | anchor |
+| +200 Myr | 25.24 | 392,059 | 28,208 | 47.68 | within the tidal chain |
+| +500 Myr | 27.38 | 403,811 | 32,443 | 61.21 | within the tidal chain |
+| +1,000 Myr | 32.23 | 425,119 | 42,109 | 108.13 | within the tidal chain |
 | +2,000 Myr | 58.34 | 481,375 | 94,270 | — (ψ̇ < \|s₃\|) | within the tidal chain |
 | +3 Gyr | beyond a_lock | — | — | — | formula horizon |
 
@@ -2376,7 +2367,7 @@ A: **Never** with the Moon present. The bounded tidal-lock equilibrium has Earth
 > **The clock has a beginning, a middle (us), and an end.**
 >
 > - **Genesis**: Moon at the rigid Roche limit (~1.5 R_E) at **<!--v:moonGenesisAgeGa-->4.498<!--/v--> Gyr ago** (between Patterson's 4.54 Pb-Pb Earth age and Farhat's 4.42 Hf-W formation epoch); the precession period was decades long under the near Moon's torque.
-> - **Modern (now)**: the mean lunisolar precession period is <!--v:lunisolarPeriodJ2000Yr-->25,771.4<!--/v--> yr; the obliquity beat <!--v:obliqBeatJ2000Kyr-->41.2<!--/v--> kyr.
+> - **Modern (now)**: the mean lunisolar precession period is <!--v:lunisolarPeriodJ2000Yr-->25,771.4<!--/v--> yr; the obliquity beat <!--v:obliqBeatJ2000Kyr-->41.1<!--/v--> kyr.
 > - **The spin–orbit crossover**: the precession rate falls to the nodal mode's rate about 1.7 Gyr ahead (the generated future table gives the epoch) — the obliquity beat diverges there.
 > - **Formula horizon**: Moon reaches tidal-lock asymptote at +3 Gyr.
 > - **Effective endpoint**: Sun's red giant phase at +5 Gyr — inner solar system unlikely to survive.
@@ -2445,7 +2436,7 @@ In 200 Myr, Earth's ~41-kyr obliquity beat should be ~47.8 kyr (+16 %; generated
 The former prediction (the Law-6 identity holds in all epochs) is RETIRED with view 2: the planetary g-modes do not scale with H, so the identity is an exact Earth-frame statement at J2000, not an eternal lock (see the Law 6 restatement above).
 **Replacement prediction (the two-tier split itself, already twice confirmed and forward-testable)**: every newly dated Precambrian cyclostratigraphic section must show the precession band at the H(t)-predicted period (spin tier scales) while the long-eccentricity band stays at its modern class scaled only by 1/μ (mass tier) — the Kuruman count-bracket already reads μ(2.48 Ga) = 1.00 ± 0.07. A section violating either half falsifies the corresponding tier.
 
-**The obliquity band, sharpened (the two tiers meeting in one observable)**: the obliquity band is the beat of the two tiers — **2π/(ψ̇(t) − |s₃|)**, with the spin precession ψ̇ the composed lunisolar rate of the table above (plan 06 D6) and s₃ at its dynamical value under the measured μ (doc 109 §18: the hybrid derives exactly this structure). Today the beat and pure H/8-scaling are degenerate (ψ̇ ≫ |s₃| — <!--v:obliqBeatJ2000Kyr-->41.2<!--/v--> vs <!--v:obliqH8ScaledJ2000Kyr-->41.2<!--/v--> kyr, which is why "H/8" has always fit); at 2.46 Ga they split to <!--v:obliqBeat2460MaKyr-->15.1<!--/v--> vs <!--v:obliqH8Scaled2460MaKyr-->19.8<!--/v--> kyr (the latter now read as "obliquity period ∝ T_p", the pure precession-scaling alternative; H(t) being the unit, 13·T_p) — a level cyclostratigraphy can discriminate. The existing confirmations are precession-band/LOD anchors; the deep-time obliquity PERIOD itself is undiscriminated, so this beat form is the pre-registered prediction, stated before any such measurement is compared. A precisely dated Precambrian obliquity band tests it head-on.
+**The obliquity band, sharpened (the two tiers meeting in one observable)**: the obliquity band is the beat of the two tiers — **2π/(ψ̇(t) − |s₃|)**, with the spin precession ψ̇ the composed lunisolar rate of the table above (plan 06 D6) and s₃ at its dynamical value under the measured μ (doc 109 §18: the hybrid derives exactly this structure). Today the beat and pure H/8-scaling are degenerate (ψ̇ ≫ |s₃| — <!--v:obliqBeatJ2000Kyr-->41.1<!--/v--> vs <!--v:obliqH8ScaledJ2000Kyr-->41.1<!--/v--> kyr, which is why "H/8" has always fit); at 2.46 Ga they split to <!--v:obliqBeat2460MaKyr-->15.1<!--/v--> vs <!--v:obliqH8Scaled2460MaKyr-->19.8<!--/v--> kyr (the latter now read as "obliquity period ∝ T_p", the pure precession-scaling alternative; H(t) being the unit, 13·T_p) — a level cyclostratigraphy can discriminate. The existing confirmations are precession-band/LOD anchors; the deep-time obliquity PERIOD itself is undiscriminated, so this beat form is the pre-registered prediction, stated before any such measurement is compared. A precisely dated Precambrian obliquity band tests it head-on.
 
 ### 6. Earth-Moon genesis at the rigid Roche limit at the giant-impact age
 The proper-physics formula, run backwards, crosses the rigid Roche limit at **<!--v:moonDistanceAtHadean-->9,471<!--/v--> km ≈ 1.49 R_E** at ~4.498 Ga — the canonical giant-impact Moon-formation age (~4.5 Ga, isotope-dated), ~40 Myr after Patterson's Pb-Pb Earth age of 4.54 Gyr. The fluid Roche zone (~2.9 R_E) is crossed at ~4.44 Ga. No Hadean constraint was used in the fit.
@@ -2495,7 +2486,7 @@ All values written by the engine (`npm run docs:doc99:write`). The frozen era cl
 | days/year (tropical) | **365.24** | 381.49 | 399.96 | **347.35** |
 | Moon distance (km) | **384,399** | 377,509 | 369,749 | **392,059** |
 | Mean lunisolar precession period T_p (yr) | **25,771** | 23,767 | 21,699 | **28,208** |
-| Obliquity beat 2π/(ψ̇ − \|s₃\|) (kyr) | **41.22** | 36.32 | 31.71 | **47.83** |
+| Obliquity beat 2π/(ψ̇ − \|s₃\|) (kyr) | **41.10** | 36.22 | 31.62 | **47.68** |
 | Climatic-precession line p + g₀ (kyr) | **23.76** | 22.05 | 20.26 | **25.82** |
 | Long-eccentricity metronome g₂ − g₅ (kyr, NOT scaled) | **405.6** | 405.6 | 405.6 | **405.6** |
 | Short-eccentricity line g₀ − g₂ (kyr, NOT scaled) | **94.88** | 94.88 | 94.88 | **94.88** |
