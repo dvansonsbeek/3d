@@ -88,6 +88,14 @@ const INPUT_FILES = [
   'data/deltaT-4flag-fit.json',
   'data/core-mantle-resonator-stage1.json',
   'public/input/astro-reference.json',
+  // v23.0 (measured): the model this campaign runs on is the SERIES-driven one
+  // (createModel with data/nbody-secular-series.json) and its ΔT stack reads
+  // the climate formula's post-MPT layer (tools/lib/deep-time.js → the GIA
+  // α(t) channel) — neither was hashed, so a series re-stamp and a coefficient
+  // refit moved the canon-geometry residuals by 0.6 s and the residual means
+  // by 1e-9 s unseen, and the recording went stale for a ring.
+  'data/nbody-secular-series.json',
+  'public/input/climate-formula-coefficients.json',
 ];
 
 // Deep-inside-region observer cities for the visibility section. Chosen well

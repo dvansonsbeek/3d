@@ -354,7 +354,7 @@
   "files": {
    "data/la2004-earth-51myr-back.asc": "sha256:3f13b9f8e69085baf40bc67a2669e6f6af4148fef9218ed2158772aa91e35f8c",
    "data/nbody-deep-secular-modes.json": "sha256:7633dd8f434fd6fc1ddaf07fd3ec3623e91e09322002ec08d53b8a12e6883fb7",
-   "data/nbody-secular-series.json": "sha256:aad67f81e7040ad9eeffbbefd76f9d85c997f781fb83f1c5034ec34f5b4ba101",
+   "data/nbody-secular-series.json": "sha256:c27d1f6f93d87e04967223d7a66d0974bfc71464e437622fb37f598e4a586995",
    "packages/physics/src/climate/l1-orbital.cjs": "sha256:4c24e53d536e253b4991cbf397545f765964852281ed5b6870046875a3e8d2b1",
    "packages/physics/src/deltat/deep-time.cjs": "sha256:42334b8c071a8d320312ad8f116c95360501f055757cbf1888d4822f708ace47",
    "packages/physics/src/earth/deep-orbital-history.cjs": "sha256:84b18c22798d2c7017bbf7ddffe485a8bb23754335dde8383152af7009e80730",
@@ -362,7 +362,7 @@
    "packages/physics/src/earth/precession-composed.cjs": "sha256:7f30ac5597b745a88b453c54bb47da39e5ec3c8bb8b349e34e8a15752c04a208",
    "packages/reference/src/published-curves.cjs": "sha256:2cbc57757926f893fccf5df42ad52e76ee6d14c5b5cf0cc30daf5ce9d63ec318",
    "public/input/astro-reference.json": "sha256:c348c732552ebb6757dd6aab14395cfbf0b827f08b8a1d728ab16e7596545e7f",
-   "public/input/climate-formula-coefficients.json": "sha256:56f2dea6bb638323041f8fd48afd9dd8d327b5ff242c8517d5b05c1081acc1e3",
+   "public/input/climate-formula-coefficients.json": "sha256:247b73c722901e92a33f172b3fbbfced112576365d7b4a70c30f9afdbb0b1070",
    "public/input/model-parameters.json": "sha256:19d16cc2582d2130fd5c891cca0a36529104501d0b678e9b37dbf2bfb9969ced",
    "tools/lib/deep-orbital-history.js": "sha256:4ab865aa315bc89f843461411de1ae05dc5ca5870b1170cc1c5faa663ac31b5a",
    "tools/lib/deep-time.js": "sha256:954cc8bf006f133fee14bdefb738f7947623f676e695b43cb6c8b57585627f61",

@@ -154,8 +154,10 @@ for (const url of SAMPLE_REQUESTS) {
   // where the smooth quantities keep 5 — tight enough to catch the family split (chain tangent vs series, ~90 yr)
   // the "name its window" trap records.)
   // obliquityCycle: v22.0 moved the beat onto the spin axis's INERTIAL precession rate (the hybrid's
-  // self-anchor, 50.385 ″/yr at J2000 in the series-driven configuration) — 41,098 yr, ≡ the climate
-  // formula's p+s₀ line; on the general precession alone it read 41,224 (La2004: 40,980).
+  // self-anchor, 50.385 ″/yr at J2000 in the series-driven configuration) — 41,098 yr at the J2000
+  // instant; on the general precession alone it read 41,224. v23.0: the climate formula's p+s₀ line
+  // carries the pole rate's mean over the LR04 record instead (40,927 yr, registry obliqCycleRealized*),
+  // which this J2000 derivation is the instantaneous limit of.
   for (const [q, expect, tol] of /** @type {Array<[string, number, number]>} */ ([['inclinationPrecession', 111634, 60], ['perihelionPrecession', 20936, 5], ['eclipticPrecession', 68751, 5], ['obliquityCycle', 41098, 5]])) {
     const d = dataOf(`/v1/derivations/${q}`);
     if (typeof d.periodYears !== 'number' || Math.abs(d.periodYears - expect) > tol) failures.push(`derivations/${q} period: ${d.periodYears} (expected ≈ ${expect})`);

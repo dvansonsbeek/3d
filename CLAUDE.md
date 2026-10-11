@@ -215,6 +215,15 @@ would silently churn a structural claim for a rounding-level gain.
   table". When a structural set changes, grep for the **literal list**, not
   for imports; a registry key carrying a "kept for X" exception IS the stale
   value — fix the key, not its consumers.
+- **The records run on the EMBEDDED coefficients, not the JSON.** Step 7c
+  writes `data/deltaT-4flag-fit.json`; every createModel consumer (eclipse-
+  audit, lunar-alignment, Sun-vs-Horizons, the hybrid verdict, the series
+  verdict) reads `packages/physics/src/constants/coefficients.js`. Measured
+  (v23.0): records recorded between a 7c write and the next
+  `npm run constants:generate` sat 0.6 s off the shipped physics with the
+  freshness gate green (it hashes the JSON). After ANY fitter write:
+  `constants:generate` FIRST, then the records. `test:constants` catches
+  the stale embed; it does not catch a record recorded on it.
 - **A number a doc cannot reproduce from an artifact gets written BY the
   script**, not re-derived in a generator. Two guesses at the §4.7 f_ice
   recipe gave 0.70 and 0.73 against the documented 0.77; the script's own
@@ -368,7 +377,10 @@ run a generator as a test** — `nbody-secular.js` rewrites
 `data/nbody-secular-frequencies.json`, `deep-secular-modes.js` rewrites
 `data/nbody-deep-secular-modes.json`, `secular-series.js` rewrites
 `data/nbody-secular-series.json`, `obliquity-hybrid.js` rewrites
-`data/obliquity-hybrid-verdict.json`, `measure-rms-by-epoch.js` rewrites
+`data/obliquity-hybrid-verdict.json` (and since v23.0 REFUSES if the
+shipped ε(t)'s realized obliquity period parts from the window-mean
+prediction by 0.1 % — fail-proven via `ESSRT_OBLIQ_REALIZED_PLANT=1`),
+`measure-rms-by-epoch.js` rewrites
 `data/chain-vs-jpl-rms.json` under `--write` (a plain run only prints),
 `equinox-vs-vondrak.js` rewrites `data/equinox-vs-vondrak.json` under
 `--write` (and REFUSES if a precession-of-date factor is missing), and

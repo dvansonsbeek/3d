@@ -451,7 +451,7 @@ export const VALUES = {
     get: () => 1296000 / (physModel().lunisolar.spinAxisInertialRateArcsecPerYrJ2000 - s3ArcsecPerYr()),
     render: (v) => `~${thousands(Math.round(v))}`,
     unit: 'yr',
-    note: 'obliquity cycle at J2000 — the beat 2π/(ψ̇ᵢₙ − |s₃|) of the spin axis\'s INERTIAL precession rate (the self-anchored rate the hybrid integrates on: the general precession plus the planetary mean, 50.385 ″/yr — IAU\'s ψ_A − p_A) against the nodal mode (≡ obliqBeatJ2000Kyr ≡ the climate formula\'s p+s₀ line; falsification leg 1; La2004 reads 40,980 on its precession frequency 50.476). On the general precession alone it read 41,224. S6: was H/8 = 41,915',
+    note: 'obliquity cycle at J2000 — the beat 2π/(ψ̇ᵢₙ − |s₃|) of the spin axis\'s INERTIAL precession rate (the self-anchored rate the hybrid integrates on: the general precession plus the planetary mean, 50.385 ″/yr — IAU\'s ψ_A − p_A) against the nodal mode (≡ obliqBeatJ2000Kyr; falsification leg 1) — the INSTANTANEOUS limit: a dated record sees the beat of the pole rate\'s mean over its own window (obliqCycleRealized*Years; 40,927 over the LR04 record, the climate formula\'s p+s₀ line since v23.0; La2004\'s own series reads 40,900 on the same window — compare realized with realized, never this instant with Laskar\'s long-window precession frequency 50.476). On the general precession alone it read 41,224. S6: was H/8 = 41,915',
   },
   obliqCycleFormula: { get: () => 1296000 / (physModel().lunisolar.spinAxisInertialRateArcsecPerYrJ2000 - s3ArcsecPerYr()), render: () => 'the beat of the spin axis\'s inertial precession against the nodal mode s₃, 1,296,000/(ψ̇ᵢₙ − |s₃|)' },
   // v23.0 — THE REALIZED OBLIQUITY PERIOD: what a record spanning a window sees — the window mean of the

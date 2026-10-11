@@ -151,6 +151,13 @@ const INPUT_FILES = [
   'public/input/astro-reference.json',
   'public/input/model-parameters.json',
   'public/input/fitted-coefficients.json',
+  // v23.0 (measured): the tiers run on the SERIES-driven model (createModel with
+  // data/nbody-secular-series.json) and the ΔT stack reads the climate
+  // formula's post-MPT layer (tools/lib/deep-time.js → the GIA α(t) channel);
+  // neither was hashed, and a series re-stamp plus a coefficient refit moved a
+  // centerline reading 3.3 → 3.4″ and the residual means by 1e-9 s unseen.
+  'data/nbody-secular-series.json',
+  'public/input/climate-formula-coefficients.json',
 ];
 
 function rd(rel) {

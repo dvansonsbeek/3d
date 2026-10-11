@@ -43,7 +43,7 @@ These write artifacts that `npm run check` re-checks against their recorded inpu
 | Script | Produces |
 |--------|----------|
 | `milankovitch_climate_formula.py` | `data/milankovitch-climate-formula.json` — the canonical L1 + L2 + L3 climate formula, fit per regime with sequential ridge regression; the Earth Climate Analysis modal's coefficients |
-| `l1_physical_lines.py` | `data/l1-physical-lines.json` — **the one home** of the climate formula's orbital line list (the beats of the engine's secular modes and the precession clock, plus the 405.6-kyr family) |
+| `l1_physical_lines.py` | `data/l1-physical-lines.json` — **the one home** of the climate formula's orbital line list (the beats of the engine's secular modes and its precession rates, plus the 405.6-kyr family). Two rates, two families: the climatic-precession lines p + gᵢ carry the general precession in longitude at J2000; the obliquity lines p + sᵢ carry the pole rate's mean over the LR04 window on the orbital forcing alone (v23.0 — a record sees the window mean, not the J2000 instant; the T1 exporter `tools/explore/t1-export-engine-frequencies.mjs` writes both) |
 | `t1_beat_model_vs_comb.py` | `data/t1-beat-model-vs-comb.json` — pre-registered test T1: the L1 lattice against the physical beat model |
 | `t5_dt_stack_lattice_null.py` | `data/t5-dt-stack-lattice-null.json` — pre-registered test T5: the ΔT-stack cycles against a random-comb null |
 | `t7_fixed_phase_l1.py` | `data/t7-fixed-phase-l1.json`, `data/t7-model-orbital-histories.json` — pre-registered test T7: the fixed-phase L1 |

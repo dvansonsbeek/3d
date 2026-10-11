@@ -74,11 +74,14 @@ export function assembleModel(C: Readonly<Record<string, any>>, F: Readonly<Reco
          *  obliquity lines ride THIS rate; the general precession (meanRateArcsecPerYrAtYear) is the
          *  equinox along the ecliptic of date. @param {number} year @returns {number} */
         spinAxisInertialRateArcsecPerYrAtYear: (year: number) => number;
-        /** The obliquity beat 2π/(ψ̇ᵢₙ(t) − |s₃|), years — the SHIPPED deep-time obliquity period (falsification
-         *  leg 1; 41,098 at J2000 ≡ the climate formula's p+s₀ line; La2004 reads 40,980 on its own precession
-         *  frequency 50.476). ψ̇ᵢₙ is the spin axis's INERTIAL rate (above): the equator against the ecliptic's
-         *  nodal mode in the inertial frame, the rate the hybrid obliquity integration self-anchors on — not
-         *  the general precession, which reads the beat 0.3 % long (41,224). @param {number} year @returns {number} */
+        /** The obliquity beat 2π/(ψ̇ᵢₙ(t) − |s₃|), years — the SHIPPED deep-time obliquity period at an INSTANT
+         *  (falsification leg 1; 41,098 at J2000). ψ̇ᵢₙ is the spin axis's INERTIAL rate (above): the equator
+         *  against the ecliptic's nodal mode in the inertial frame, the rate the hybrid obliquity integration
+         *  self-anchors on — not the general precession, which reads the beat 0.3 % long (41,224). v23.0: a
+         *  dated record sees the beat of the pole rate's mean over its own window, with the pole's of-date
+         *  factors (obliquityPeriodRealizedYears below: 40,927 over the LR04 record, the climate formula's p+s₀
+         *  line; La2004's own series reads 40,900 on the same window — compare realized with realized, never
+         *  this instant with Laskar's long-window precession frequency 50.476). @param {number} year @returns {number} */
         obliquityBeatYearsAtYear: (year: number) => number;
         /** THE REALIZED POLE RATE OVER A WINDOW, ″/yr — see the one home above (the mean of the inertial rate of
          *  date with its three of-date factors); the rate the obliquity lines of a record spanning the window carry. */

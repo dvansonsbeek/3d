@@ -14240,8 +14240,13 @@ function wgcRenderPlanet(planetKey) {
 // ψ̇ᵢₙ is the composed rate × the hybrid's self-anchor factor (the general
 // precession plus the planetary mean the N-body ecliptic's motion carries,
 // +0.097 ″/yr at J2000 ≡ IAU's ψ_A − p_A), the rate the obliquity integration
-// itself precesses ŝ on; the beat is 41,098 yr at J2000 ≡ the climate
-// formula's p+s₀ line (the general rate alone read 41,224).
+// itself precesses ŝ on; the beat is 41,098 yr at J2000 (the general rate
+// alone read 41,224). v23.0: that is the INSTANTANEOUS limit — a dated record
+// sees the beat of the pole rate's mean over its own window, with the pole's
+// of-date factors (faster spin, lower mean obliquity, higher mean eccentricity
+// in the past): 40,927 yr over the LR04 record, the climate formula's p+s₀
+// line (createModel().lunisolar.obliquityPeriodRealizedYears, the one home;
+// the pane row here shows the J2000 beat).
 let _s3ArcsecPerYrMemo = null;
 function _s3ArcsecPerYr() {
   if (_s3ArcsecPerYrMemo === null) {
@@ -45820,7 +45825,7 @@ const planetStats = {
        tpLink: true},
       {label : () => `Obliquity cycle (derived beat)`,
        value : [ { v: () => 1296000 / ((1296000 / predictions.axialPrecession) * _spinAxisInertialFactor() - _s3ArcsecPerYr()), dec:0, sep:',' },{ small: 'years' }],
-       hover : [`The model's DERIVED obliquity period: 2π/(ψ̇ᵢₙ − |s₃|) — the beat of the spin axis's INERTIAL precession rate of date (the one-source axial rate × the hybrid's self-anchor factor: the general precession plus the planetary mean the N-body ecliptic's motion carries, +0.097″/yr at J2000) against the engine's own dominant nodal mode s₃ (the banked deep secular modes, −18.851″/yr — the same partner the published obliqCycleYears and the Framework Verification chart use; the chain's of-date node tangent in the row below is a different, windowed quantity). 41,098 yr at J2000 ≡ the climate formula's p+s₀ line; the general rate alone read 41,224. Matches the observed Milankovitch obliquity band (~41 kyr) and is gate-pinned in 40–42.5 kyr (the obliquity-hybrid verdict); doc 109 §18 carries the deep-time prediction split (registry obliqBeat*Kyr).`]},
+       hover : [`The model's DERIVED obliquity period: 2π/(ψ̇ᵢₙ − |s₃|) — the beat of the spin axis's INERTIAL precession rate of date (the one-source axial rate × the hybrid's self-anchor factor: the general precession plus the planetary mean the N-body ecliptic's motion carries, +0.097″/yr at J2000) against the engine's own dominant nodal mode s₃ (the banked deep secular modes, −18.851″/yr — the same partner the published obliqCycleYears and the Framework Verification chart use; the chain's of-date node tangent in the row below is a different, windowed quantity). 41,098 yr at J2000, the instantaneous limit — a dated record sees the beat of the pole rate's mean over its own window (faster spin, lower mean obliquity, higher mean eccentricity in the past): 40,927 yr over the LR04 record, the climate formula's p+s₀ line (registry obliqCycleRealized*Years); the general rate alone read 41,224. Matches the observed Milankovitch obliquity band (~41 kyr) and is gate-pinned in 40–42.5 kyr (the obliquity-hybrid verdict); doc 109 §18 carries the deep-time prediction split (registry obliqBeat*Kyr).`]},
       {label : () => `Apsidal meets Axial (Perihelion precession)`,
        value : [ { v: () => predictions.perihelionPrecession, dec:2, sep:',' },{ small: 'years' }],
        hover : [`The two counter-rotations meet: the prograde apsidal motion (the Duration row above) and the retrograde axial precession close on each other, so the rates ADD — 1/T = 1/T_axial + 1/T_apsidal ≈ 20.9 kyr, the climatic-precession beat that paces the Milankovitch precession band. Computed as the beat of the ONE-SOURCE anomalistic and tropical years — the same value the Predictions panel shows.`],

@@ -1,7 +1,7 @@
 ---
 docVersion: 1.0
 modelVersion: v23.0
-coefficients: sha256:49147a1d09bdaabc
+coefficients: sha256:82c86b078b32fff8
 status: current
 ---
 
@@ -761,7 +761,17 @@ holds a flat ~0.1° error profile with correlation ≈ 0.99 across the
 entire megayear, where the fitted law decorrelates beyond ~50 kyr. The
 two-tier structure (era slice vs deep table) is the same measured
 era-local/deep-global tension the eccentricity story showed, resolved
-the same way. Also derived en route, from shared constants alone: the
+the same way. Fourth (v23.0), **the realized period is gated**: the
+shipped model's own ε(t) over the LR04 record, fitted with the full line
+set p + sᵢ and one free p, reads
+<!--v:obliqCycleRealizedFitLr04Years-->~40,919<!--/v--> yr against the
+one-home prediction from the window mean of the pole rate with its
+of-date factors, <!--v:obliqCycleRealizedLr04Years-->~40,927<!--/v--> yr
+(`createModel().lunisolar.obliquityPeriodRealizedYears`; the generator
+REFUSES beyond 0.1 %, fail-proven), with La2004's series on the same fit
+at <!--v:obliqCycleLa2004FitLr04Years-->~40,900<!--/v--> yr — the J2000
+beat <!--v:obliqBeatJ2000Kyr-->41.1<!--/v--> kyr is the instantaneous
+limit a dated record never sees whole. Also derived en route, from shared constants alone: the
 solar fraction of the precession torque, f_S ≈ 0.316 (the literature
 value). The convention catch worth recording: the J2000 celestial pole
 sits at ecliptic longitude +90°; the −90° choice produces a perfect
