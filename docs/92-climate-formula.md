@@ -459,10 +459,10 @@ This L5 floor includes:
 <!-- generated:canonical-r2 -->
 | Regime / record | R² |
 |---|---:|
-| full LR04 (L1+L2+L3) | **0.2003** |
-| post-MPT (0–1 Myr) L1+L2+L3 | **0.7788** |
-| iNHG-MPT (1.0–2.7 Ma) L1+L2+L3 | **0.5911** |
-| pre-iNHG (2.7–5.32 Ma) L1+L2+L3 | **0.3736** |
+| full LR04 (L1+L2+L3) | **0.2673** |
+| post-MPT (0–1 Myr) L1+L2+L3 | **0.7790** |
+| iNHG-MPT (1.0–2.7 Ma) L1+L2+L3 | **0.6007** |
+| pre-iNHG (2.7–5.32 Ma) L1+L2+L3 | **0.4038** |
 <!-- /generated:canonical-r2 -->
 
 The canonical post-MPT R² (<!--v:canonR2PostMpt-->0.7790<!--/v-->) sits below the Tier-A "post-MPT + full L2 stack" (<!--v:tierA4R2PostMpt-->0.9024<!--/v-->) because the canonical formula deploys only the 3-line 405-kyr family in L2; the 13H and 9-Myr lines that lifted Tier A to <!--v:tierA4R2PostMpt-->0.9024<!--/v--> were rejected by the R3-4 cross-window stability test (13H amp CV 42–50%, phase std 97.9°) and are not in the deployed formula.

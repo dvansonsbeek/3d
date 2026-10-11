@@ -223,21 +223,28 @@ that the addends land on their J2000 values. The relations' FORM is permanent;
 their integer VALUES were the J2000 configuration — whether coincidence
 or selection is open, and the model claims no mechanism.
 
-The four identities in rate form (only the first two are independent; the
-other two follow algebraically). They hold for any precessing axis over a
+The identities in rate form (two are independent; the nodal row is the
+obliquity row rearranged). They hold for any precessing axis over a
 precessing orbital plane, at every epoch; the right-hand column is what
 they read as when the five periods were taken as integer fractions of the
-fitted anchor — rounded readings that happened to add, not locked periods:
+fitted anchor — rounded readings that happened to add, not locked periods.
+Two precession rates enter: the obliquity and nodal rows take f_axial as
+the spin axis's INERTIAL rate ψ̇ᵢₙ (period
+<!--v:spinAxisInertialPeriodYearsJ2000-->25,722<!--/v--> yr at J2000), the
+perihelion row — a rate along the ecliptic of date — the general precession
+T_p (<!--v:axialPrecRound-->~25,771<!--/v--> yr):
 
 | Physical identity | Rate form (1/T) | J2000 integer reading (retired as structure) |
 |---|---|---|
-| f_obliquity = f_axial − f_nodal | 1/T_obl = 1/T_p − 1/T_nodal | 13 − 5 = 8 |
+| f_obliquity = f_axial − f_nodal | 1/T_obl = 1/T_ψ̇ᵢₙ − 1/T_nodal | 13 − 5 = 8 |
 | f_perihelion = f_axial + f_apsidal | 1/T_peri = 1/T_p + 1/T_aps | 13 + 3 = 16 |
-| f_apsidal = f_obliquity − f_nodal | 1/T_aps = 1/T_obl − 1/T_nodal | 8 − 5 = 3 |
-| f_nodal = f_axial − f_obliquity | 1/T_nodal = 1/T_p − 1/T_obl | 13 − 8 = 5 |
+| f_nodal = f_axial − f_obliquity | 1/T_nodal = 1/T_ψ̇ᵢₙ − 1/T_obl | 13 − 8 = 5 |
 
-The obliquity row is the one beat the model predicts at deep time
-(2π/(ψ̇ − |s₃|), falsification leg 1).
+The integer table also read "8 − 5 = 3" as f_apsidal = f_obliquity −
+f_nodal; that is not an identity (at J2000 it gives 102 kyr against the
+apsidal period's 111.6 kyr) — it was the integer coincidence, retired with
+the rest. The obliquity row is the one beat the model predicts at deep time
+(2π/(ψ̇ᵢₙ − |s₃|), falsification leg 1).
 
 ### The path to one engine
 
