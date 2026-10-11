@@ -3012,89 +3012,25 @@ export const VALUES = {
     return out;
   })(),
 
-  // ── Lattice-significance statistics (11-2ai) ────────────────────────────
-  // All from the tracked campaign artifact data/significance-results.json
-  // (1e6 trials, seeded, git-sha stamped — a generator-owned result file).
-  // Headline = the direct joint permutation test; Stouffer (measured-r
-  // corrected) and Fisher (floor-clamp sensitive) are supporting/legacy;
-  // fisherP/fisherSigma/fisherPermP/fisherUniformP are the site's
-  // backward-compatible aliases of headline/Stouffer. Porting surfaced
-  // website defect #10 (double-rounding): its correlationFactor literal
-  // 1.85 re-rounded to '1.9' where the artifact's exact 1.8478 renders
-  // '1.8' — site now carries full precision.
-  ...(() => {
-    let sigM = null;
-    const sig = () => { if (!sigM) sigM = rd('data/significance-results.json'); return sigM; };
-    const sci1 = (v) => fmtSci(v, 1);
-    const r1 = (v) => Number(v).toFixed(1);
-    const r2 = (v) => Number(v).toFixed(2);
-    const r3 = (v) => Number(v).toFixed(3);
-    return {
-      headlineP:     { get: () => sig().headline_p, render: sci1, note: 'direct joint permutation test — the citable number' },
-      headlineSigma: { get: () => sig().headline_sigma, render: r1 },
-      jointPermP:    { get: () => sig().joint_combined.permutation.p, render: sci1 },
-      jointLogUnifP: { get: () => sig().joint_combined.log_uniform.p, render: sci1 },
-      jointUnifP:    { get: () => sig().joint_combined.uniform.p, render: sci1 },
-      jointSigmaPerm:    { get: () => sig().joint_combined.permutation.sigma, render: r2 },
-      jointSigmaLogUnif: { get: () => sig().joint_combined.log_uniform.sigma, render: r2 },
-      jointSigmaUnif:    { get: () => sig().joint_combined.uniform.sigma, render: r2 },
-      empiricalRPerm:    { get: () => sig().method.empirical_correlation_permutation, render: r3 },
-      empiricalRLogUnif: { get: () => sig().method.empirical_correlation_log_uniform, render: r3 },
-      empiricalRUnif:    { get: () => sig().method.empirical_correlation_uniform, render: r3 },
-      fisherP:        { get: () => sig().headline_p, render: sci1, note: 'backward-compatible alias of headlineP' },
-      fisherSigma:    { get: () => sig().headline_sigma, render: r1 },
-      fisherPermP:    { get: () => sig().stouffer_combined_corrected.permutation, render: sci1, note: 'alias of the corrected Stouffer p' },
-      fisherUniformP: { get: () => sig().stouffer_combined_corrected.uniform, render: sci1 },
-      stoufferPermP:    { get: () => sig().stouffer_combined_corrected.permutation, render: sci1 },
-      stoufferLogUnifP: { get: () => sig().stouffer_combined_corrected.log_uniform, render: sci1 },
-      stoufferUnifP:    { get: () => sig().stouffer_combined_corrected.uniform, render: sci1 },
-      stoufferSigmaPerm:    { get: () => sig().stouffer_sigma_corrected.permutation, render: r1 },
-      stoufferSigmaLogUnif: { get: () => sig().stouffer_sigma_corrected.log_uniform, render: r1 },
-      stoufferSigmaUnif:    { get: () => sig().stouffer_sigma_corrected.uniform, render: r1 },
-      fisherLegacyPermP:    { get: () => sig().fisher_combined.permutation, render: sci1 },
-      fisherLegacyLogUnifP: { get: () => sig().fisher_combined.log_uniform, render: sci1 },
-      fisherLegacyUnifP:    { get: () => sig().fisher_combined.uniform, render: sci1 },
-      sigTestCount:         { get: () => sig().counts.total, render: (v) => String(v) },
-      sigLawCount:          { get: () => sig().counts.lawCount, render: (v) => String(v) },
-      sigEmpiricalCount:    { get: () => sig().counts.empirical, render: (v) => String(v) },
-      sigMcCombinableCount: { get: () => sig().counts.mc_combinable, render: (v) => String(v) },
-      sigStructuralCount:   { get: () => sig().counts.structural, render: (v) => String(v) },
-      sigCorrelationFactor: { get: () => sig().method.correlation_factor, render: r1, note: '1 + (k−1)·r̄ at full precision (the 2-dp site literal double-rounded to 1.9)' },
-    };
-  })(),
-
-  // ── Law 2/3/5 balance + AMD partition + ecc weights (11-2aj) ────────────
-  // Balance percentages from the tracked data/balance-presets.json
-  // currentConfig (the falsification-criterion artifact — Law 5 uses BASE
-  // eccentricity, per the CLAUDE.md reference values); presetCount is the
-  // JSON's `count` (767 threshold-passers — its `presetCount` field is the
-  // 15 deep survivors, a different quantity). AMD shares derive as √a/d²
-  // over the eight planets; ecc weights as √m·a^1.5/√d·e_base (in-phase =
-  // seven non-Saturn planets vs Saturn anti-phase alone). The AMD α-scan
-  // spreads and the LL residual are campaign snapshots in knownValues
-  // (scripts/fibonacci_amd_structure.py, Law 3 verification).
-  ...(() => {
-    const { bal } = balanceMachinery();
-    // Plan 07 R5/R6: the keys COMPUTED from the device left with it — the AMD
-    // shares (√a/d², on the retired integer divisors) and the eccentricity
-    // weights (√m·a^1.5/√d · e_base, on the K law's base). Both were
-    // consumer-less, and neither quantity survives the laws that defined its
-    // weighting. What stays below reads `data/balance-presets.json`, the
-    // RECORDED campaign artifact, which outlives the live device: those rows
-    // are the retired framing's evidence record, not a live derivation.
-    const out = {
-      // (amdAlpha* removed earlier: the α-scan claim was retired as numerology.)
-      laplaceLagrangeResidualDeg: { get: () => astro.knownValues.laplaceLagrangeResidualDeg, render: (v) => String(v), unit: '°', note: 'Σ(i_amp·√m) vs the LL amplitude-sum prediction — Law 3 verification snapshot' },
-      balanceInclPct:     { get: () => bal().currentConfig.inclBalance, render: (v) => Number(v).toFixed(4) + '%', note: 'Law 3' },
-      balanceEccPct:      { get: () => bal().currentConfig.eccBalance, render: (v) => Number(v).toFixed(4) + '%', note: 'Law 5, BASE eccentricity — the 99.8636 reference value' },
-      balanceEccResidualPct: { get: () => 100 - bal().currentConfig.eccBalance, render: (v) => Number(v).toFixed(2) + '%' },
-      balanceEccJ2000Pct: { get: () => bal().currentConfig.eccBalanceJ2000, render: (v) => Number(v).toFixed(4) + '%' },
-      saturnPredErr:      { get: () => Math.abs(bal().currentConfig.saturnPredErrPct), render: (v) => Number(v).toFixed(2) + '%', note: 'Finding 4 — Saturn e predicted vs observed' },
-      balanceThreshold:   { get: () => bal().threshold, render: (v) => Number(v).toFixed(3) + '%' },
-      balancePresetCount: { get: () => bal().count, render: (v) => String(v), note: 'threshold-passing configs (the JSON presetCount field is the 15 deep survivors)' },
-    };
-    return out;
-  })(),
+  // The lattice-significance statistics (11-2ai) and the Law 2/3/5 balance
+  // rows (11-2aj) were retired from the registry: 38 keys — headline*, joint*,
+  // empiricalR*, fisher*, fisherLegacy*, stouffer*, sig{Test,Law,Empirical,
+  // McCombinable,Structural}Count, sigCorrelationFactor, balance*,
+  // laplaceLagrangeResidualDeg, saturnPredErr.
+  //
+  // They measured the significance of the integer-lattice and Fibonacci-Law
+  // claims, which this project has retired, and not one of the 38 was read by
+  // any surface — not the site, not the paper, not a live doc span. This block
+  // already said the right thing about its own rows: they "are the retired
+  // framing's evidence record, not a live derivation". A record belongs in the
+  // tracked artifact, which is where it stays.
+  //
+  // data/significance-results.json and data/balance-presets.json are both
+  // still tracked, so nothing is lost. balance-presets.json keeps live readers
+  // in packages/fitting and tools/verify; significance-results.json now has
+  // none, by design — it is the archive of a closed campaign.
+  // (amdAlpha* went earlier for the same reason: the α-scan claim was retired
+  // as numerology.)
 
   // ── Saturn prediction + Sci weights + Config #N + start inputs (11-2ak) ─
   // Saturn's predicted eccentricity = in-phase total / Saturn's coefficient
