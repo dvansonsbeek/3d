@@ -163,7 +163,7 @@ def halves(t, y, window, clock, warped):
     return out
 
 
-def compare(t, y, regime, label, clock, warped):
+def compare(t, y, regime, label, clock, warped, families):
     extra_at = extra_cycles_fn(clock)
     f_const = ClimateFormula()
     s_const = f_const.fit(t, y, regime=regime, normalize=True)
@@ -188,6 +188,11 @@ def compare(t, y, regime, label, clock, warped):
     row["scale_scan"] = scale_scan(t, y, regime, clock, warped)
     row["halves_delta_r2_total_at_one"] = halves(t, y, (lo, hi), clock, warped)
     row["dp_scan"] = dp_scan(t, y, regime, clock, warped)
+    # Control 3: the same offset scan on ONE family at a time — a convention
+    # split (the obliquity lines carrying a different rate than the
+    # climatic-precession lines) shows as an offset in one family only.
+    row["dp_scan_by_family"] = {fam: dp_scan(t, y, regime, clock, lines)
+                                for fam, lines in families.items()}
     ss, dp = row["scale_scan"], row["dp_scan"]
     print(f"    warp-scale scan: best k = {ss['best_scale']:+.1f} (ΔR² {ss['best_delta_r2_total']:+.5f}); "
           f"k = −1 {ss['at_minus_one']:+.5f}, k = 1 {ss['at_one']:+.5f}, k = 2 {ss['at_two']:+.5f}")
@@ -195,6 +200,8 @@ def compare(t, y, regime, label, clock, warped):
           f"second {row['halves_delta_r2_total_at_one'][1]:+.5f}")
     print(f"    δp scan (k = 0): best δp = {dp['best_dp_arcsec_per_yr']:+.2f} ″/yr → p = {dp['implied_p_arcsec_per_yr']:.3f} ″/yr "
           f"(ΔR² {dp['best_delta_r2_total']:+.5f}); the clock (k = 1) on top of it: {dp['clock_gain_at_best_dp']:+.5f}")
+    for fam, d in row["dp_scan_by_family"].items():
+        print(f"    δp scan, {fam} lines only: best δp = {d['best_dp_arcsec_per_yr']:+.2f} ″/yr (ΔR² {d['best_delta_r2_total']:+.5f})")
     return row
 
 
@@ -215,6 +222,7 @@ def main():
     clock = read_clock()
     warped = [float(x["periodKyr"]) for x in L1_LINES if x["family"] in WARPED_FAMILIES]
     unwarped = [float(x["periodKyr"]) for x in L1_LINES if x["family"] not in WARPED_FAMILIES]
+    families = {fam: [float(x["periodKyr"]) for x in L1_LINES if x["family"] == fam] for fam in WARPED_FAMILIES}
     print("=" * 92)
     print("  TEST: do the p-carrying L1 lines need the clock of date?")
     print("=" * 92)
@@ -231,13 +239,13 @@ def main():
     ages, vals = load_lr04()
     for regime in LR04_REGIMES:
         t, y = preprocess(ages, vals, REGIME_WINDOWS[regime])
-        results[regime] = compare(t, y, regime, f"LR04 {regime}", clock, warped)
+        results[regime] = compare(t, y, regime, f"LR04 {regime}", clock, warped, families)
     ages_c, _d13c, d18o = load_cenogrid()
     t, y = preprocess(ages_c, d18o, CENOGRID_WINDOW)
-    results["cenogrid"] = compare(t, y, CENOGRID_WINDOW, "CENOGRID 0-66 Myr", clock, warped)
+    results["cenogrid"] = compare(t, y, CENOGRID_WINDOW, "CENOGRID 0-66 Myr", clock, warped, families)
     ages_ch, y_ch = load_cheng2016()
     t, y = preprocess(ages_ch, y_ch, CHENG_WINDOW)
-    results["cheng"] = compare(t, y, CHENG_WINDOW, "Cheng 2016 0-640 kyr", clock, warped)
+    results["cheng"] = compare(t, y, CHENG_WINDOW, "Cheng 2016 0-640 kyr", clock, warped, families)
 
     max_total = max(r["delta_r2_total"] for r in results.values())
     any_material = any(r["delta_r2_total"] > MATERIAL_DELTA_R2 for r in results.values())
@@ -282,7 +290,9 @@ def main():
                      "halves": "ΔR² total at k = 1 on each half of the window, fitted independently",
                      "dp_scan": "ΔR² total against the shipped fit with a constant frequency offset δp (″/yr) "
                                 f"on the p-lines over [{DP_SCAN_ARCSEC[0]}, {DP_SCAN_ARCSEC[-1]}] step 0.02 at k = 0; "
-                                "the preferred δp, the implied p, and the clock's gain (k = 1) on top of it"},
+                                "the preferred δp, the implied p, and the clock's gain (k = 1) on top of it",
+                     "dp_scan_by_family": "the same δp scan on one family at a time (obliquity lines only; "
+                                          "climatic-precession lines only), the other family at its shipped periods"},
         "p_artifact_arcsec_per_yr": P_ARTIFACT_ARCSEC,
         "clock_window_means": means,
         "results": results,

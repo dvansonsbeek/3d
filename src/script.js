@@ -14661,7 +14661,8 @@ function closeWGCPanel() {
 // ═══════════════════════════════════════════════════════════════════
 // CLIMATE FORMULA EXPLORER (.cfm-)
 // The climate formula — L1 (the engine's 28 orbital lines, the 405-kyr
-// family among them) + L3 (boundary-condition steps) — overlaid on LR04
+// family among them) + L3 (regime steps: a baseline shift at each dated
+// climate-regime transition) — overlaid on LR04
 // δ¹⁸O and CENOGRID δ¹⁸O/δ¹³C proxies. The coefficient file still carries
 // an L2 array (empty since the 405-kyr family moved into L1); the evaluator
 // reads it under 'all', no UI offers it. See docs/92-climate-formula.md.
@@ -15768,7 +15769,7 @@ Note: L1 and Total each carry the baseline once — they do NOT visually sum. Re
     <div class="cfm-container">
       <div class="cfm-header">
         <div class="cfm-title">Earth Climate Analysis</div>
-        <div class="cfm-subtitle">The climate formula vs the proxy records — the engine's 28 orbital lines (L1, the 405-kyr family among them) plus boundary-condition steps (L3), fitted per regime</div>
+        <div class="cfm-subtitle">The climate formula vs the proxy records — the engine's 28 orbital lines (L1, the 405-kyr family among them) plus regime steps (L3, a baseline shift at each dated climate-regime transition), fitted per regime</div>
         <button class="cfm-export-btn" data-cfm-export title="Export the current tab with the layers toggled on screen as a picture (PNG or SVG download)">Export</button>
         <div class="cfm-close" title="Close"></div>
       </div>

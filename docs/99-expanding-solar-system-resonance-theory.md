@@ -2214,24 +2214,55 @@ Reading:
    (largest gain <!--v:evolvingClockGainAfterPreferredPMax-->−0.00009<!--/v-->).
    The "clock gain" was a frequency offset in disguise: inside one window a
    phase drift and a frequency offset both raise a line's mean frequency.
-3. **The offset is not the tuning target alone.** LR04 is tuned to La2004,
-   whose precession constant (50.476 ″/yr) sits 0.19 ″/yr above the p the line
-   artifact was derived with
-   (<!--v:evolvingClockArtifactPArcsecPerYr-->50.288<!--/v--> ″/yr — the
-   model's J2000 precession reading, 1,296,000 ″ over
-   <!--v:evolvingClockTpJ2000Yr-->25771<!--/v--> yr, the general precession in
-   longitude). The U-Th-dated Cheng 2016 record carries no orbital tuning and
-   asks for the same direction, with a broad optimum over its 640 kyr.
+3. **The offset lives in the obliquity lines.** Scanned one family at a
+   time, the obliquity lines alone want δp =
+   <!--v:evolvingClockPreferredDeltaPObliquityInhgMpt-->+0.28<!--/v--> ″/yr
+   (iNHG-MPT), <!--v:evolvingClockPreferredDeltaPObliquityPreInhg-->+0.30<!--/v-->
+   (pre-iNHG) and <!--v:evolvingClockPreferredDeltaPObliquityLr04Full-->+0.20<!--/v-->
+   (full record), carrying almost the whole gain (ΔR²
+   <!--v:evolvingClockDeltaR2AtPreferredPObliquityInhgMpt-->+0.01845<!--/v-->,
+   <!--v:evolvingClockDeltaR2AtPreferredPObliquityPreInhg-->+0.08949<!--/v-->,
+   <!--v:evolvingClockDeltaR2AtPreferredPObliquityLr04Full-->+0.13647<!--/v-->);
+   the climatic-precession lines alone want
+   <!--v:evolvingClockPreferredDeltaPPrecessionInhgMpt-->+0.02<!--/v--> ″/yr in
+   the one window that resolves them (iNHG-MPT, ΔR²
+   <!--v:evolvingClockDeltaR2AtPreferredPPrecessionInhgMpt-->+0.00005<!--/v-->)
+   and small, poorly determined offsets elsewhere.
+4. **That is a convention split, and the engine already knows it.** An
+   obliquity line p + s_i is the spin axis precessing in the inertial frame
+   against one of the ecliptic's nodal modes — the lunisolar precession rate.
+   A climatic-precession line p + g_i is the perihelion measured from the
+   equinox along the ecliptic of date — the general precession in longitude
+   p_A. The line artifact uses p_A
+   (<!--v:evolvingClockArtifactPArcsecPerYr-->50.288<!--/v--> ″/yr — the model's
+   J2000 precession reading, 1,296,000 ″ over
+   <!--v:evolvingClockTpJ2000Yr-->25771<!--/v--> yr) for both families. The
+   engine's own obliquity integration does not: its spin axis is self-anchored
+   at the lunisolar rate, measured 0.0966 ″/yr above p_A at J2000
+   (`@essrt/physics` `earth/deep-orbital-history`, the D4e self-anchor —
+   integrating at the general rate double-counted the planetary mean). So the
+   artifact's ten obliquity lines sit 0.097 ″/yr (0.2 %, 41.22 → 41.10 kyr for
+   p+s₀) slow against the engine's own ε(t). At that offset alone the
+   obliquity-only scan already reads ΔR²
+   <!--v:evolvingClockObliquityDeltaR2AtLunisolarInhgMpt-->+0.00996<!--/v-->
+   (iNHG-MPT), <!--v:evolvingClockObliquityDeltaR2AtLunisolarPreInhg-->+0.03167<!--/v-->
+   (pre-iNHG), <!--v:evolvingClockObliquityDeltaR2AtLunisolarLr04Full-->+0.07017<!--/v-->
+   (full record). The further +0.1…+0.2 ″/yr the LR04 windows ask for
+   coincides with La2004's precession frequency (50.476 ″/yr, 0.09 above the
+   lunisolar rate) — the tuning target of LR04's chronology; the U-Th-dated
+   Cheng 2016 record asks for the same direction but cannot separate the two
+   over 640 kyr.
 
 **Conclusion.** The composed clock's drift is below what any available
 record resolves — the formula keeps its J2000 line periods, now measured on
-the right physics (only the p-carrying lines warp). What the records do
-resolve is the p those lines carry: both prefer a rate 0.2–0.4 ″/yr above
-the general precession in longitude — the range of the spin-axis precession
-conventions (the luni-solar rate 50.388 ″/yr; Laskar 2004's precession
-constant 50.476 ″/yr). Which rate the obliquity and climatic-precession line
-construction should carry is an open question of the line derivation
-(doc 92), recorded here with its measurement.
+the right physics (only the p-carrying lines warp). The climatic-precession
+lines carry the right rate. The obliquity lines should carry the lunisolar
+rate the engine's own obliquity integration uses, not the general precession:
+a derivation fix of the line artifact (doc 92 §2, `scripts/l1_physical_lines.py`,
+which needs the engine to export that rate beside p_A), 0.2 % on ten periods,
+that the records support in direction and in part in size. Whether the
+records' remaining +0.1…+0.2 ″/yr is physics or La2004's imprint on LR04's
+chronology, these records cannot say.
 
 ---
 
