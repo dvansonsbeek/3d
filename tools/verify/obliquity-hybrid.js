@@ -79,7 +79,19 @@ if (!Number.isFinite(seriesRate) || Math.abs(seriesRate - iauRate) > Math.abs(ia
   process.exit(1);
 }
 if (!(lab.beatKyr >= 40 && lab.beatKyr <= 42.5)) {
-  console.error(`REFUSING: derived H/8 beat ${lab.beatKyr.toFixed(1)} kyr outside 40–42.5`);
+  console.error(`REFUSING: derived obliquity beat ${lab.beatKyr.toFixed(1)} kyr outside 40–42.5`);
+  process.exit(1);
+}
+// v23.0 — the REALIZED obliquity period: the model's own ε(t) over the LR04 window, fitted
+// (the full line set, one free p), must sit on the one-home prediction (the window mean of
+// the pole rate with its of-date factors, minus |s₃|) within 0.1 % — the self-consistency
+// gate between the integration and the law the climate lines ride. Fail-proven via
+// ESSRT_OBLIQ_REALIZED_PLANT=1 (perturbs the prediction by 0.5 %).
+const rz = lab.realized;
+const predicted = rz.modelPredicted.periodYr * (process.env.ESSRT_OBLIQ_REALIZED_PLANT ? 1.005 : 1);
+const realizedRel = Math.abs(rz.modelFit.periodYr - predicted) / predicted;
+if (!(realizedRel <= 1e-3)) {
+  console.error(`REFUSING: realized obliquity period — ε(t) fit ${rz.modelFit.periodYr.toFixed(0)} yr vs the window-mean prediction ${predicted.toFixed(0)} yr (${(realizedRel * 100).toFixed(3)} %, limit 0.1 %)`);
   process.exit(1);
 }
 const era13 = lab.windowsEra['13'];
@@ -97,7 +109,8 @@ const art = {
     rateFullArcsecPerCy: lab.rateFullArcsecPerCy,   // reported only — ill-conditioned truncation slope
     rateEraArcsecPerCy: lab.rateEraArcsecPerCy,     // reported only — ill-conditioned truncation slope
     iauRateArcsecPerCy: iauRate,
-    beatKyr: lab.beatKyr,
+    beatKyr: lab.beatKyr,   // v22.0: the J2000 beat on the spin axis's inertial rate (the shipped model's one home)
+    realized: lab.realized,  // v23.0: the realized obliquity period over the LR04 window — model ε(t) fit, the window-mean prediction, La2004's fit (theory label)
     zetaTermsFull: lab.zetaTermsFull,
     zetaTermsEra: lab.zetaTermsEra,
     windowsFull: lab.windowsFull,
@@ -109,6 +122,8 @@ const art = {
     'data/nbody-deep-secular-modes.json',
     'data/nbody-secular-series.json',
     'data/la2004-earth-51myr-back.asc',
+    'data/lr04-stack.txt',   // v23.0: the realized window is the record's span
+    'packages/physics/src/model.js',   // v23.0: the one-home window-mean pole rate the verdict gates on
     // R4 (measured): the verdict runs the hybrid on these evaluators; they
     // were not inputs, so the banked verdict had gone stale unseen (the
     // fitted-law rows 711″ → 529″, the deep fork rows) until an unrelated
@@ -120,4 +135,4 @@ const art = {
   ]),
 };
 fs.writeFileSync(OUT, JSON.stringify(art, null, 1) + '\n');
-console.log(`✓ wrote data/obliquity-hybrid-verdict.json — gated series rate ${seriesRate.toFixed(2)} ″/cy (IAU ${iauRate}), beat ${lab.beatKyr.toFixed(1)} kyr, era 13-kyr ${era13.hybridRmsArcsec.toFixed(0)}″ vs law ${era13.fittedLawRmsArcsec.toFixed(0)}″ (NAFF-tier slopes reported: era ${lab.rateEraArcsecPerCy.toFixed(2)} / full ${lab.rateFullArcsecPerCy.toFixed(2)})`);
+console.log(`✓ wrote data/obliquity-hybrid-verdict.json — gated series rate ${seriesRate.toFixed(2)} ″/cy (IAU ${iauRate}), J2000 beat ${lab.beatKyr.toFixed(2)} kyr, realized ${rz.modelFit.periodYr.toFixed(0)} yr (predicted ${rz.modelPredicted.periodYr.toFixed(0)}, La2004 ${rz.la2004Fit.periodYr.toFixed(0)}), era 13-kyr ${era13.hybridRmsArcsec.toFixed(0)}″ vs law ${era13.fittedLawRmsArcsec.toFixed(0)}″ (NAFF-tier slopes reported: era ${lab.rateEraArcsecPerCy.toFixed(2)} / full ${lab.rateFullArcsecPerCy.toFixed(2)})`);

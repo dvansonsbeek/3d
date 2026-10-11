@@ -1,5 +1,5 @@
 {
- "_description": "L1 physical lines \u2014 THE ONE HOME of the climate formula's orbital line list\n(holisticuniverse plan 06, T1 disposition; owner 2026-09-20).\n\n    python3 scripts/l1_physical_lines.py            print the list\n    python3 scripts/l1_physical_lines.py --write    write data/l1-physical-lines.json (inputs-stamped)\n\nEvery line is DERIVED from the engine's own spectrum (data/t1-engine-frequencies.json:\nEarth's z and \u03b6 secular modes from the 20-Myr deep mode table, and the engine's two\nJ2000 precession rates from createModel). Berger/Laskar-style combinations:\n\n    eccentricity          |g_i \u2212 g_j|           amplitude A_i\u00b7A_j\n    obliquity             p_inertial + s_i      amplitude A_i\n    climatic precession   p + g_i               amplitude A_i\n\nTwo rates, two uses (measured 2026-10, doc 99 \"the records resolve p\"): an\nobliquity line is the spin axis precessing in the INERTIAL frame against one of\nthe ecliptic's nodal modes, so it carries the spin axis's inertial rate\np_inertial (the self-anchored rate the hybrid obliquity integrates on \u2014 the\ngeneral precession plus the planetary mean the N-body ecliptic's motion carries,\n50.385 \u2033/yr at J2000 in the shipped series-driven configuration; the +0.097 is\nIAU's planetary precession \u03c8_A \u2212 p_A); a climatic-precession line is the\nperihelion measured from the equinox along the ecliptic of date, so it carries\nthe general precession in longitude p (50.288 \u2033/yr).\n\nSelection rule (one threshold, stated): relative amplitude within its family\n\u2265 REL_THRESHOLD, period inside BAND_KYR, lines closer than DEDUPE are one line.\nT1 measured this rule against a same-size random null: the physical set beats\nthe null in every LR04 regime up to ~25 lines and stops doing so beyond \u2014 the\nthreshold 0.1 gives the largest defensible set (25 lines: 10 ecc, 10 obl, 5 prec).\n\nPlus the 405-kyr family: the g\u2082 \u2212 g\u2085 eccentricity fundamental (the engine's\n20-Myr value, 405.6 kyr; the 1-Myr-window readings 388\u2013425 kyr are inside that\nwindow's Rayleigh uncertainty of \u00b1164 kyr and are NOT distinct periods) and its\n2nd / 3rd harmonics \u2014 the carbon-thermostat family of doc 92 \u00a73, labelled\nclimate-internal, folded from the former L2 layer.\n\nConsumers (the campaign moves them here one by one): scripts/milankovitch_\nclimate_formula.py, the constants generator, the runtime evaluators.",
+ "_description": "L1 physical lines \u2014 THE ONE HOME of the climate formula's orbital line list\n(holisticuniverse plan 06, T1 disposition; owner 2026-09-20).\n\n    python3 scripts/l1_physical_lines.py            print the list\n    python3 scripts/l1_physical_lines.py --write    write data/l1-physical-lines.json (inputs-stamped)\n\nEvery line is DERIVED from the engine's own spectrum (data/t1-engine-frequencies.json:\nEarth's z and \u03b6 secular modes from the 20-Myr deep mode table, and the engine's two\nJ2000 precession rates from createModel). Berger/Laskar-style combinations:\n\n    eccentricity          |g_i \u2212 g_j|           amplitude A_i\u00b7A_j\n    obliquity             p_obl + s_i           amplitude A_i\n    climatic precession   p + g_i               amplitude A_i\n\nTwo rates, two uses (measured 2026-10, doc 99 \"the records resolve p\"): an\nobliquity line is the spin axis precessing in the INERTIAL frame against one of\nthe ecliptic's nodal modes, so it carries the spin axis's inertial rate \u2014 and a\nRECORD sees that rate's mean over its own window, not the J2000 instant: p_obl\nis the realized pole rate over the LR04 window on the ORBITAL FORCING ALONE (the\ninertial rate of date \u00d7 the solar torque at e(t) \u00d7 cos \u03b5(t)/cos \u03b5\u2080 with \u03b5(t)\nintegrated without the ice-driven J\u2082(t) factor, averaged over 0\u20135.32 Ma:\n50.519 \u2033/yr, where the J2000 instant reads 50.385 \u2014 the pole turned faster in\nthe past; measured on the model's own \u03b5(t), on La2004's series and on the\nrecords' own preferred offset, doc 99). The J\u2082(t) factor is left out because it\nrides the climate formula's own post-MPT layer: a forcing line must not contain\nthe climate response (and the derivation must not depend on its own fit); the\npublished realized period keeps the full physics, 2\u20133 yr of period apart. A climatic-precession line is the\nperihelion measured from the equinox along the ecliptic of date, so it carries\nthe general precession in longitude p (50.288 \u2033/yr at J2000; the records resolve\nno offset there).\n\nSelection rule (one threshold, stated): relative amplitude within its family\n\u2265 REL_THRESHOLD, period inside BAND_KYR, lines closer than DEDUPE are one line.\nT1 measured this rule against a same-size random null: the physical set beats\nthe null in every LR04 regime up to ~25 lines and stops doing so beyond \u2014 the\nthreshold 0.1 gives the largest defensible set (25 lines: 10 ecc, 10 obl, 5 prec).\n\nPlus the 405-kyr family: the g\u2082 \u2212 g\u2085 eccentricity fundamental (the engine's\n20-Myr value, 405.6 kyr; the 1-Myr-window readings 388\u2013425 kyr are inside that\nwindow's Rayleigh uncertainty of \u00b1164 kyr and are NOT distinct periods) and its\n2nd / 3rd harmonics \u2014 the carbon-thermostat family of doc 92 \u00a73, labelled\nclimate-internal, folded from the former L2 layer.\n\nConsumers (the campaign moves them here one by one): scripts/milankovitch_\nclimate_formula.py, the constants generator, the runtime evaluators.",
  "config": {
   "relThreshold": 0.1,
   "bandKyr": [
@@ -7,115 +7,120 @@
    300.0
   ],
   "dedupeFrac": 0.005,
-  "pArcsecPerYr": 50.28831076155945,
+  "pArcsecPerYr": 50.288310761253456,
   "pInertialArcsecPerYr": 50.384902887297564,
-  "rates": "p (general precession in longitude) for the climatic-precession lines; pInertial (the spin axis\u2019s inertial rate) for the obliquity lines",
+  "pObliquityArcsecPerYr": 50.51914395549386,
+  "obliquityRateWindowKyr": [
+   0,
+   5320
+  ],
+  "rates": "p (general precession in longitude, J2000) for the climatic-precession lines; pObliquity (the realized pole rate \u2014 the spin axis\u2019s inertial rate of date with its of-date factors, averaged over the LR04 window obliquityRateWindowKyr) for the obliquity lines; pInertial is the J2000 instant, kept for reference",
   "source": "data/t1-engine-frequencies.json"
  },
  "lines": [
   {
    "family": "climatic precession",
    "label": "p+g2",
-   "arcsecPerYr": 68.20532886594329,
-   "periodKyr": 19.00144785676896,
+   "arcsecPerYr": 68.20532886563728,
+   "periodKyr": 19.001447856854206,
    "relAmp": 0.6717464199951804
   },
   {
    "family": "climatic precession",
    "label": "p+g3",
-   "arcsecPerYr": 67.65725723165096,
-   "periodKyr": 19.155373023216704,
+   "arcsecPerYr": 67.65725723134496,
+   "periodKyr": 19.155373023303337,
    "relAmp": 0.460782442830978
   },
   {
    "family": "climatic precession",
    "label": "p+g1",
-   "arcsecPerYr": 57.74073458524373,
-   "periodKyr": 22.445159544804383,
+   "arcsecPerYr": 57.740734584937734,
+   "periodKyr": 22.44515954492333,
    "relAmp": 0.8620464713605362
   },
   {
    "family": "climatic precession",
    "label": "p+g4",
-   "arcsecPerYr": 55.878577156942704,
-   "periodKyr": 23.193146030902057,
+   "arcsecPerYr": 55.87857715663671,
+   "periodKyr": 23.193146031029062,
    "relAmp": 0.19921489972571554
   },
   {
    "family": "climatic precession",
    "label": "p+g0",
-   "arcsecPerYr": 54.545670102585134,
-   "periodKyr": 23.759906103684983,
+   "arcsecPerYr": 54.54567010227913,
+   "periodKyr": 23.759906103818278,
    "relAmp": 1.0
   },
   {
    "family": "obliquity",
    "label": "p+s12",
-   "arcsecPerYr": 47.39249620378071,
-   "periodKyr": 27.346101256776855,
+   "arcsecPerYr": 47.526737271977005,
+   "periodKyr": 27.26886115879356,
    "relAmp": 0.10427252954025028
   },
   {
    "family": "obliquity",
    "label": "p+s1",
-   "arcsecPerYr": 44.799660016683134,
-   "periodKyr": 28.92879096665861,
+   "arcsecPerYr": 44.93390108487943,
+   "periodKyr": 28.842365534919313,
    "relAmp": 0.5416339451073867
   },
   {
    "family": "obliquity",
    "label": "p+s14",
-   "arcsecPerYr": 44.54810944432575,
-   "periodKyr": 29.092143665932294,
+   "arcsecPerYr": 44.68235051252205,
+   "periodKyr": 29.00474091300996,
    "relAmp": 0.14236226024182447
   },
   {
    "family": "obliquity",
    "label": "p+s9",
-   "arcsecPerYr": 43.624155073610446,
-   "periodKyr": 29.708311778489644,
+   "arcsecPerYr": 43.75839614180674,
+   "periodKyr": 29.6171732574495,
    "relAmp": 0.1009465170347195
   },
   {
    "family": "obliquity",
    "label": "p+s3",
-   "arcsecPerYr": 43.342392353987634,
-   "periodKyr": 29.90144128213458,
+   "arcsecPerYr": 43.47663342218393,
+   "periodKyr": 29.809115793651046,
    "relAmp": 0.47895780932341964
   },
   {
    "family": "obliquity",
    "label": "p+s2",
-   "arcsecPerYr": 32.629449733056425,
-   "periodKyr": 39.718720683390536,
+   "arcsecPerYr": 32.76369080125272,
+   "periodKyr": 39.5559831113547,
    "relAmp": 0.4849220480959469
   },
   {
    "family": "obliquity",
    "label": "p+s4",
-   "arcsecPerYr": 32.08117112490338,
-   "periodKyr": 40.39752772597398,
+   "arcsecPerYr": 32.21541219309968,
+   "periodKyr": 40.22919192316261,
    "relAmp": 0.3238058217329259
   },
   {
    "family": "obliquity",
    "label": "p+s0",
-   "arcsecPerYr": 31.534319873044655,
-   "periodKyr": 41.09807997184087,
+   "arcsecPerYr": 31.66856094124095,
+   "periodKyr": 40.92386775656297,
    "relAmp": 1.0
   },
   {
    "family": "obliquity",
    "label": "p+s7",
-   "arcsecPerYr": 30.98632725142732,
-   "periodKyr": 41.824898752410306,
+   "arcsecPerYr": 31.120568319623615,
+   "periodKyr": 41.64448369610219,
    "relAmp": 0.17878079100604266
   },
   {
    "family": "obliquity",
    "label": "p+s10",
-   "arcsecPerYr": 24.03703715417435,
-   "periodKyr": 53.91679480659006,
+   "arcsecPerYr": 24.171278222370645,
+   "periodKyr": 53.61735478269184,
    "relAmp": 0.16050040214935987
   },
   {
@@ -209,21 +214,21 @@
   }
  ],
  "periodsKyr": [
-  19.00144785676896,
-  19.155373023216704,
-  22.445159544804383,
-  23.193146030902057,
-  23.759906103684983,
-  27.346101256776855,
-  28.92879096665861,
-  29.092143665932294,
-  29.708311778489644,
-  29.90144128213458,
-  39.718720683390536,
-  40.39752772597398,
-  41.09807997184087,
-  41.824898752410306,
-  53.91679480659006,
+  19.001447856854206,
+  19.155373023303337,
+  22.44515954492333,
+  23.193146031029062,
+  23.759906103818278,
+  27.26886115879356,
+  28.842365534919313,
+  29.00474091300996,
+  29.6171732574495,
+  29.809115793651046,
+  39.5559831113547,
+  40.22919192316261,
+  40.92386775656297,
+  41.64448369610219,
+  53.61735478269184,
   94.8779191670953,
   96.84902648762181,
   98.8438689567201,
@@ -241,7 +246,7 @@
  "meta": {
   "script": "scripts/l1_physical_lines.py",
   "doc": "docs/92-climate-formula.md (T1 disposition, plan 06)",
-  "runtime_sec": 0.0004112720489501953,
+  "runtime_sec": 0.0003910064697265625,
   "environment": {
    "python": "3.12.3"
   }
@@ -249,8 +254,8 @@
  "inputs": {
   "generator": "python3 scripts/l1_physical_lines.py --write",
   "files": {
-   "data/t1-engine-frequencies.json": "sha256:f2698db70ba99a155b0d76f8b4ce9736489d1c978503eabd99142fef17f567c3",
-   "scripts/l1_physical_lines.py": "sha256:1d28a2ab204b3d430ae9efff00ddd2f26c6fd52a53d2fed6b533554b4219d390"
+   "data/t1-engine-frequencies.json": "sha256:a764692de06d7cee2124c6fdaa955fd9d8de5728a1275f4ab40ddaec14dc54f7",
+   "scripts/l1_physical_lines.py": "sha256:870aaf32a811b365317b9c0f24a1cc4a77ca655580ca3b95119f427ed21a3e13"
   }
  }
 }

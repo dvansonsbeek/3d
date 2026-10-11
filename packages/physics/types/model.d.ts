@@ -12,13 +12,21 @@
  *   {} = the shipped laws, bit-identical to before this parameter existed. Not a
  *   counterfactual in the §2d sense (no hash change) — callers must say when
  *   they used it; the generators refuse to --write under an override.
+ * @param {{ giaEllipticityOfDate?: boolean }} [options]
+ *   `giaEllipticityOfDate: false` builds the one-source history WITHOUT the J₂(t)/J₂₀ factor of date
+ *   (the ice-driven GIA channel, which rides the climate formula's own post-MPT layer): the orbital
+ *   FORCING alone. The T1 exporter derives the climate lines' obliquity rate on it, so the lines
+ *   cannot depend on their own fit (v23.0; measured 3e-5 of the rate, 2–3 yr of period). Default true =
+ *   the shipped physics (v15.0), bit-identical to before this parameter existed.
  * @returns the assembled surfaces (epoch, earth, lengths, cardinal, moon) — type inferred so ReturnType stays precise
  */
 export function assembleModel(C: Readonly<Record<string, any>>, F: Readonly<Record<string, any>>, laws?: {
     eccentricityAt?: (year: number) => number;
     eccentricityRateAt?: (year: number) => number;
     perihelionLongitudeDegAt?: (year: number) => number;
-}, secularSeriesArtifact?: any): Readonly<{
+}, secularSeriesArtifact?: any, options?: {
+    giaEllipticityOfDate?: boolean;
+}): Readonly<{
     time: Readonly<{
         yearFromJD: (jd: number) => number;
         jdFromYear: (year: number) => number;
@@ -72,6 +80,16 @@ export function assembleModel(C: Readonly<Record<string, any>>, F: Readonly<Reco
          *  nodal mode in the inertial frame, the rate the hybrid obliquity integration self-anchors on — not
          *  the general precession, which reads the beat 0.3 % long (41,224). @param {number} year @returns {number} */
         obliquityBeatYearsAtYear: (year: number) => number;
+        /** THE REALIZED POLE RATE OVER A WINDOW, ″/yr — see the one home above (the mean of the inertial rate of
+         *  date with its three of-date factors); the rate the obliquity lines of a record spanning the window carry. */
+        spinAxisInertialRateMeanArcsecPerYr: (yearFrom: number, yearTo: number, stepYears?: number, opts?: {
+            ellipticity?: boolean;
+        }) => number;
+        /** THE REALIZED OBLIQUITY PERIOD OVER A WINDOW, years — 1,296,000/(⟨ψ̇ᵢₙ⟩_window − |s₃|): the period a record
+         *  spanning [yearFrom, yearTo] sees (40,930 over the LR04 record 0–5.32 Ma, 41,018 over the last Myr); the
+         *  J2000 beat (obliquityBeatYearsAtYear) is its instantaneous limit.
+         *  @param {number} yearFrom @param {number} yearTo @returns {number} */
+        obliquityPeriodRealizedYears: (yearFrom: number, yearTo: number) => number;
         /** The apsidal (perihelion vs the stars) period of date, JULIAN years — the ONE movement's own apsidal rate (the scene's perihelion; anom/(anom − sid) of the one family, ≡ 360°/apsidalRateFixedArcsecPerJulianYr), inside the published window only; null beyond. Before 2026-09 this rode the planet chain's secular tangent, which parted from the scene's perihelion passages by seconds of anomalistic year within a few millennia (year-lengths.cjs). @param {number} year @returns {number|null} */
         apsidalPeriodYearsAtYear: (year: number) => number | null;
         /** T_aps(t) / T_p(t) — the apsidal period in of-date precession periods (4.33 at J2000, a reading; 0.84 … 9.9 across ±26 kyr, measured); null beyond the published window. @param {number} year @returns {number|null} */

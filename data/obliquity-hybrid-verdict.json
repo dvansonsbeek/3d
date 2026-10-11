@@ -7,83 +7,113 @@
   "rateFullArcsecPerCy": -38.91379242264463,
   "rateEraArcsecPerCy": -47.99890774472928,
   "iauRateArcsecPerCy": -46.836769,
-  "beatKyr": 41.22435093824844,
+  "beatKyr": 41.09807997184088,
+  "realized": {
+   "windowYears": [
+    -5318000,
+    2000
+   ],
+   "sModesArcsecPerYr": [
+    -18.850583014252912,
+    -5.585242870614428,
+    -17.75545315424114,
+    -7.042510533309932,
+    -18.303731762394182,
+    -5.460229128938108
+   ],
+   "modelFit": {
+    "pArcsecPerYr": 50.52300000000018,
+    "periodYr": 40918.8853690328,
+    "rmsArcsec": 718.8319323797052
+   },
+   "modelPredicted": {
+    "pMeanArcsecPerYr": 50.51662736686797,
+    "periodYr": 40927.12009016602
+   },
+   "la2004Fit": {
+    "pArcsecPerYr": 50.53800000000019,
+    "periodYr": 40899.51543172261,
+    "rmsArcsec": 757.567065799689
+   },
+   "j2000BeatYr": 41098.07997184088,
+   "j2000InertialRateArcsecPerYr": 50.384902887297564
+  },
   "zetaTermsFull": 16,
   "zetaTermsEra": 8,
   "windowsFull": {
    "13": {
     "hybridRmsArcsec": 529.2713161680445,
     "hybridCorr": 0.9948651054702462,
-    "fittedLawRmsArcsec": 529.6641437985797,
-    "fittedLawCorr": 0.994819516702823
+    "fittedLawRmsArcsec": 529.660095237436,
+    "fittedLawCorr": 0.9948200285290599
    },
    "50": {
     "hybridRmsArcsec": 388.52871616462585,
     "hybridCorr": 0.9981285425802966,
-    "fittedLawRmsArcsec": 388.8414721856585,
-    "fittedLawCorr": 0.9981055984894208
+    "fittedLawRmsArcsec": 388.8308805178919,
+    "fittedLawCorr": 0.9981055088649844
    },
    "130": {
     "hybridRmsArcsec": 380.019595407789,
     "hybridCorr": 0.996173749692772,
-    "fittedLawRmsArcsec": 381.1674641689243,
-    "fittedLawCorr": 0.9960878898841347
+    "fittedLawRmsArcsec": 381.1377682355269,
+    "fittedLawCorr": 0.9960865992723964
    },
    "270": {
     "hybridRmsArcsec": 429.68936064970273,
     "hybridCorr": 0.9924328058189807,
-    "fittedLawRmsArcsec": 452.98376920314246,
-    "fittedLawCorr": 0.9908705718928994
+    "fittedLawRmsArcsec": 453.00998414008535,
+    "fittedLawCorr": 0.9908657987298076
    },
    "600": {
     "hybridRmsArcsec": 587.416255944484,
     "hybridCorr": 0.9731785529465661,
-    "fittedLawRmsArcsec": 646.0598992897267,
-    "fittedLawCorr": 0.9662373497228826
+    "fittedLawRmsArcsec": 646.1963381062735,
+    "fittedLawCorr": 0.9662169093718397
    },
    "1000": {
     "hybridRmsArcsec": 687.2949095431939,
     "hybridCorr": 0.9481038129063416,
-    "fittedLawRmsArcsec": 769.080487930276,
-    "fittedLawCorr": 0.9326468086608052
+    "fittedLawRmsArcsec": 769.2515844857741,
+    "fittedLawCorr": 0.9326063022250611
    }
   },
   "windowsEra": {
    "13": {
     "hybridRmsArcsec": 49.96516385050455,
     "hybridCorr": 0.9998294196417337,
-    "fittedLawRmsArcsec": 529.6641437985797,
-    "fittedLawCorr": 0.994819516702823
+    "fittedLawRmsArcsec": 529.660095237436,
+    "fittedLawCorr": 0.9948200285290599
    },
    "50": {
     "hybridRmsArcsec": 426.7062801313648,
     "hybridCorr": 0.9905757425369925,
-    "fittedLawRmsArcsec": 388.8414721856585,
-    "fittedLawCorr": 0.9981055984894208
+    "fittedLawRmsArcsec": 388.8308805178919,
+    "fittedLawCorr": 0.9981055088649844
    },
    "130": {
     "hybridRmsArcsec": 488.406410276667,
     "hybridCorr": 0.9820422947175481,
-    "fittedLawRmsArcsec": 381.1674641689243,
-    "fittedLawCorr": 0.9960878898841347
+    "fittedLawRmsArcsec": 381.1377682355269,
+    "fittedLawCorr": 0.9960865992723964
    },
    "270": {
     "hybridRmsArcsec": 489.89340712978634,
     "hybridCorr": 0.982110983196137,
-    "fittedLawRmsArcsec": 452.98376920314246,
-    "fittedLawCorr": 0.9908705718928994
+    "fittedLawRmsArcsec": 453.00998414008535,
+    "fittedLawCorr": 0.9908657987298076
    },
    "600": {
     "hybridRmsArcsec": 548.2813054176148,
     "hybridCorr": 0.9724064695872137,
-    "fittedLawRmsArcsec": 646.0598992897267,
-    "fittedLawCorr": 0.9662373497228826
+    "fittedLawRmsArcsec": 646.1963381062735,
+    "fittedLawCorr": 0.9662169093718397
    },
    "1000": {
     "hybridRmsArcsec": 644.444974667402,
     "hybridCorr": 0.9495619191574651,
-    "fittedLawRmsArcsec": 769.080487930276,
-    "fittedLawCorr": 0.9326468086608052
+    "fittedLawRmsArcsec": 769.2515844857741,
+    "fittedLawCorr": 0.9326063022250611
    }
   }
  },
@@ -91,14 +121,16 @@
   "generator": "node tools/verify/obliquity-hybrid.js --write",
   "files": {
    "data/la2004-earth-51myr-back.asc": "sha256:3f13b9f8e69085baf40bc67a2669e6f6af4148fef9218ed2158772aa91e35f8c",
+   "data/lr04-stack.txt": "sha256:7d1a6ca7ffc033e45e20fb76a7f39c8d99df87baa1094260f9dbdc09f0bb8945",
    "data/nbody-deep-secular-modes.json": "sha256:7633dd8f434fd6fc1ddaf07fd3ec3623e91e09322002ec08d53b8a12e6883fb7",
-   "data/nbody-secular-series.json": "sha256:e398dbeec974c786458a62f811f553f864597825ad99af2eee3d52e4afe15b0e",
+   "data/nbody-secular-series.json": "sha256:aad67f81e7040ad9eeffbbefd76f9d85c997f781fb83f1c5034ec34f5b4ba101",
    "packages/physics/src/deltat/deep-time.cjs": "sha256:42334b8c071a8d320312ad8f116c95360501f055757cbf1888d4822f708ace47",
    "packages/physics/src/earth/deep-orbital-history.cjs": "sha256:84b18c22798d2c7017bbf7ddffe485a8bb23754335dde8383152af7009e80730",
    "packages/physics/src/earth/precession-composed.cjs": "sha256:7f30ac5597b745a88b453c54bb47da39e5ec3c8bb8b349e34e8a15752c04a208",
-   "tools/explore/stage-c-obliquity-hybrid.mjs": "sha256:383891c893099b818dfa1b03053ea1c255e0e6b156cd025efe2e445599f0d44b",
+   "packages/physics/src/model.js": "sha256:eeb17e99deb6b43d22677cf923a78040eaf12c63563a79024b09a26004426b2a",
+   "tools/explore/stage-c-obliquity-hybrid.mjs": "sha256:b49549b48eb52e673bcf633b27daabc2a2d9196d3b3e2964c3a21605385443f4",
    "tools/lib/deep-time.js": "sha256:954cc8bf006f133fee14bdefb738f7947623f676e695b43cb6c8b57585627f61",
-   "tools/verify/obliquity-hybrid.js": "sha256:25116ae143e66f2daaf0fed88c8d18c01010b1ece8f590a1c979736d275d49db"
+   "tools/verify/obliquity-hybrid.js": "sha256:aa55e294850d75db8ca12e8b7bdcdcdc1195a81406ec2f7dbdbf535a0e3290fe"
   }
  }
 }

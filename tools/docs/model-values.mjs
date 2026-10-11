@@ -454,6 +454,22 @@ export const VALUES = {
     note: 'obliquity cycle at J2000 — the beat 2π/(ψ̇ᵢₙ − |s₃|) of the spin axis\'s INERTIAL precession rate (the self-anchored rate the hybrid integrates on: the general precession plus the planetary mean, 50.385 ″/yr — IAU\'s ψ_A − p_A) against the nodal mode (≡ obliqBeatJ2000Kyr ≡ the climate formula\'s p+s₀ line; falsification leg 1; La2004 reads 40,980 on its precession frequency 50.476). On the general precession alone it read 41,224. S6: was H/8 = 41,915',
   },
   obliqCycleFormula: { get: () => 1296000 / (physModel().lunisolar.spinAxisInertialRateArcsecPerYrJ2000 - s3ArcsecPerYr()), render: () => 'the beat of the spin axis\'s inertial precession against the nodal mode s₃, 1,296,000/(ψ̇ᵢₙ − |s₃|)' },
+  // v23.0 — THE REALIZED OBLIQUITY PERIOD: what a record spanning a window sees — the window mean of the
+  // pole rate (the inertial rate of date × solar torque at e(t) × J₂(t)/J₂₀ × cos ε(t)/cos ε₀) minus |s₃|.
+  // ONE home createModel().lunisolar.obliquityPeriodRealizedYears; the windows are the climate formula's
+  // regimes (data/milankovitch-climate-formula.json regime_fits.*.window_kyr, kyr BP). The J2000 beat
+  // (obliqCycleYears) is the instantaneous limit. Measured on the model's own ε(t) and on La2004
+  // (obliquity-hybrid-verdict.json realized.*): 40,922 / 40,900 over 0–5.32 Ma, the prediction 40,930.
+  ...Object.fromEntries(Object.entries({ Lr04: 'lr04-full', PostMpt: 'post-mpt', InhgMpt: 'inhg-mpt', PreInhg: 'pre-inhg' }).flatMap(([key, reg]) => {
+    const win = () => { const w = rd('data/milankovitch-climate-formula.json').regime_fits[reg].window_kyr; return [2000 - w[1] * 1000, 2000 - w[0] * 1000]; };
+    return [
+      [`obliqCycleRealized${key}Years`, { get: () => physModel().lunisolar.obliquityPeriodRealizedYears(...win()), render: (v) => `~${thousands(Math.round(v))}`, unit: 'yr', note: `the realized obliquity period over the ${reg} window — the window mean of the pole rate minus |s₃| (what the record sees; the J2000 beat is the instantaneous limit)` }],
+      [`spinAxisInertialRateMean${key}ArcsecPerYr`, { get: () => physModel().lunisolar.spinAxisInertialRateMeanArcsecPerYr(...win()), render: (v) => Number(v).toFixed(3), unit: '″/yr', note: `the realized pole rate over the ${reg} window — the inertial rate of date with its three of-date factors, averaged (the rate the window's obliquity lines carry)` }],
+    ];
+  })),
+  obliqCycleRealizedFitLr04Years: { get: () => rd('data/obliquity-hybrid-verdict.json').verdict.realized.modelFit.periodYr, render: (v) => `~${thousands(Math.round(v))}`, unit: 'yr', note: 'the dominant obliquity line of the model\'s OWN ε(t) over the LR04 window, fitted with the full line set and one free p (obliquity-hybrid-verdict.json) — gated to the window-mean prediction within 0.1 %' },
+  obliqCycleLa2004FitLr04Years: { get: () => rd('data/obliquity-hybrid-verdict.json').verdict.realized.la2004Fit.periodYr, render: (v) => `~${thousands(Math.round(v))}`, unit: 'yr', note: 'La2004\'s own obliquity series on the same fit over the same window — a THEORY reference label, never an input' },
+  obliqCycleRealizedVsLa2004Pct: { get: () => 100 * (rd('data/obliquity-hybrid-verdict.json').verdict.realized.modelFit.periodYr / rd('data/obliquity-hybrid-verdict.json').verdict.realized.la2004Fit.periodYr - 1), render: (v) => (v >= 0 ? '+' : '−') + Math.abs(Number(v)).toFixed(2), unit: '%', note: 'the model\'s realized obliquity period against La2004\'s on the same window and fit — the convergence statement, like for like' },
   // S5 (plan 06): the axial precession period is the model's ONE J2000 reading — the certified
   // year laws' beat at 2000 (route B, 25,771.4 yr ≈ IAU 25,771.6) — never H/13 (25,793.6, the fit
   // anchor's reading; H₀ was fitted on the perihelion-of-date beat). Key names kept (P4).
@@ -840,7 +856,7 @@ export const VALUES = {
       out[`evolvingClockDeltaR2AtPreferredPPrecession${key}`] = { get: () => clk().results[reg].dp_scan_by_family['climatic precession'].best_delta_r2_total, render: signed5, note: `ΔR² total at that precession-only offset, ${reg}` };
     }
     out.evolvingClockArtifactPArcsecPerYr = { get: () => clk().p_artifact_arcsec_per_yr, render: (v) => Number(v).toFixed(3), unit: '″/yr', note: 'the general precession in longitude the climatic-precession lines were derived with (data/l1-physical-lines.json config.pArcsecPerYr)' };
-    out.evolvingClockArtifactPInertialArcsecPerYr = { get: () => clk().p_inertial_artifact_arcsec_per_yr, render: (v) => Number(v).toFixed(3), unit: '″/yr', note: 'the spin axis\'s inertial precession rate the obliquity lines were derived with (data/l1-physical-lines.json config.pInertialArcsecPerYr)' };
+    out.evolvingClockArtifactPInertialArcsecPerYr = { get: () => clk().p_inertial_artifact_arcsec_per_yr, render: (v) => Number(v).toFixed(3), unit: '″/yr', note: 'the rate the obliquity lines were derived with (data/l1-physical-lines.json config.pObliquityArcsecPerYr): v23.0 the realized pole rate over the LR04 window — the spin axis\'s inertial rate of date with its of-date factors, averaged; v22.0 took the J2000 instant (50.385)' };
     // The two J2000 precession rates of the model surface — ONE home for the line derivation's inputs
     out.spinAxisInertialRateArcsecPerYrJ2000 = { get: () => physModel().lunisolar.spinAxisInertialRateArcsecPerYrJ2000, render: (v) => Number(v).toFixed(3), unit: '″/yr', note: 'the spin axis\'s INERTIAL precession rate at J2000 — the self-anchored rate the hybrid obliquity integrates on (the general precession plus the planetary mean the N-body ecliptic\'s motion carries, +0.097 ≡ IAU\'s planetary precession ψ_A − p_A); the obliquity lines p + sᵢ carry it. La2004\'s precession frequency (50.476) sits 0.09 above it.' };
     out.spinAxisInertialPeriodYearsJ2000 = { get: () => physModel().lunisolar.spinAxisInertialPeriodYearsJ2000, render: (v) => thousands(v, 0), unit: 'yr', note: 'the same as a period' };

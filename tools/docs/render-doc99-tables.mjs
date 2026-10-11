@@ -35,7 +35,8 @@ const FREQ = JSON.parse(readFileSync(join(ROOT, 'data/t1-engine-frequencies.json
 // |s₃| — the dominant nodal mode of Earth's orbit (the obliquity beat's partner), ″/yr
 const s3 = Math.abs([...FREQ.zeta].sort((a, b) => b.amp - a.amp)[0].arcsecPerYr);
 const p0 = FREQ.pArcsecPerYr;             // the general precession in longitude at J2000 — the climatic-precession lines' rate
-const pIn = FREQ.pInertialArcsecPerYr;   // the spin axis's inertial rate at J2000 — the obliquity lines' and the beat's rate
+const pIn = FREQ.pInertialArcsecPerYr;   // the spin axis's inertial rate at J2000 — the beat's rate (the instantaneous limit)
+const pObl = FREQ.pInertialMeanLr04ArcsecPerYr;   // v23.0: the realized pole rate over the LR04 window — the obliquity lines' rate (a record sees the window mean)
 const kIn = pIn / p0;                     // the hybrid's self-anchor factor (multiplicative, as the obliquity integration applies it)
 
 const psiDot = (t) => DT.meanLunisolarPrecessionRateArcsecPerYrAtAge(t);           // ″/yr, composed (general-anchored)
@@ -48,10 +49,11 @@ const daysPerYr = (t) => DT.meanYearInDaysAtAge(t);
 /** The obliquity beat, kyr — on the INERTIAL rate; null where ψ̇ᵢₙ ≤ |s₃| (the beat diverges: the spin–orbit crossover). */
 const beatKyr = (t) => { const p = psiDotIn(t); return p === null || p <= s3 ? null : 1296000 / (p - s3) / 1000; };
 /** A p-carrying physical line's period at age t, kyr: 1,296,000/(ψ̇(t) + f_i), f_i the line's orbital frequency —
- *  an obliquity line on the inertial rate (f_i = line rate − pᵢₙ), a climatic-precession line on the general rate (f_i = line rate − p₀). */
+ *  an obliquity line on the inertial rate of date (f_i = line rate − p_obl, the window-mean rate it was derived on),
+ *  a climatic-precession line on the general rate (f_i = line rate − p₀). */
 const lineKyr = (line, t) => {
   const p = line.family === 'obliquity' ? psiDotIn(t) : psiDot(t);
-  const base = line.family === 'obliquity' ? pIn : p0;
+  const base = line.family === 'obliquity' ? pObl : p0;
   return p === null ? null : 1296000 / (p + (line.arcsecPerYr - base)) / 1000;
 };
 
@@ -74,7 +76,8 @@ for (const l of [...obl, ...cpr]) {
 // configuration split two orders below anything a table here shows, so the check tolerates it.
 if (Math.abs(psiDot(0) - p0) > 1e-5) throw new Error(`the engine's J2000 rate ${psiDot(0)} ≠ the physical lines' p₀ ${p0} — regenerate data/t1-engine-frequencies.json`);
 if (!(pIn > p0)) throw new Error('the frequencies artifact carries no inertial rate above p₀ — regenerate data/t1-engine-frequencies.json');
-if (Math.abs(1296000 / (pIn - s3) / 1000 - obl.find((l) => l.label === 'p+s0').periodKyr) > 1e-6) throw new Error('the obliquity beat (on the inertial rate) ≠ the p+s0 physical line at J2000');
+if (!(pObl > pIn)) throw new Error('the frequencies artifact carries no realized (window-mean) pole rate above the J2000 inertial rate — regenerate data/t1-engine-frequencies.json');
+if (Math.abs(1296000 / (pObl - s3) / 1000 - obl.find((l) => l.label === 'p+s0').periodKyr) > 1e-6) throw new Error('the realized obliquity period (on the window-mean pole rate) ≠ the p+s0 physical line');
 
 const ERA = { '-200': 'Future (projection)', '-100': 'Future', '-50': 'Future', '0': 'Modern (IERS anchor)', '10': 'Miocene', '50': 'Eocene/Oligocene', '90': 'Late Cretaceous (Pannella)', '180': 'Jurassic (Scrutton)', '290': 'Permian (Mazzullo)', '380': 'Devonian (Wells 1963)', '440': 'Silurian (Wells)', '500': 'Late Cambrian', '620': 'Ediacaran (Williams 2000)' };
 

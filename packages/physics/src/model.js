@@ -76,9 +76,15 @@ const MOON_ECC_SENSITIVITY_NODE = 1.018;
  *   {} = the shipped laws, bit-identical to before this parameter existed. Not a
  *   counterfactual in the §2d sense (no hash change) — callers must say when
  *   they used it; the generators refuse to --write under an override.
+ * @param {{ giaEllipticityOfDate?: boolean }} [options]
+ *   `giaEllipticityOfDate: false` builds the one-source history WITHOUT the J₂(t)/J₂₀ factor of date
+ *   (the ice-driven GIA channel, which rides the climate formula's own post-MPT layer): the orbital
+ *   FORCING alone. The T1 exporter derives the climate lines' obliquity rate on it, so the lines
+ *   cannot depend on their own fit (v23.0; measured 3e-5 of the rate, 2–3 yr of period). Default true =
+ *   the shipped physics (v15.0), bit-identical to before this parameter existed.
  * @returns the assembled surfaces (epoch, earth, lengths, cardinal, moon) — type inferred so ReturnType stays precise
  */
-export function assembleModel(C, F, laws = {}, secularSeriesArtifact = /** @type {any} */ (null)) {
+export function assembleModel(C, F, laws = {}, secularSeriesArtifact = /** @type {any} */ (null), options = {}) {
   // ── Derived constants (constants.js §9 order) ─────────────────────────────
   const H = C.foundational.holisticyearLength;
   const meanSolarYearDays = Math.round(C.foundational.inputmeanlengthsolaryearindays * (H / 8)) / (H / 8);
@@ -279,6 +285,38 @@ export function assembleModel(C, F, laws = {}, secularSeriesArtifact = /** @type
       .sort((a, b) => Math.hypot(b.re, b.im) - Math.hypot(a.re, a.im))[0];
     return Math.abs((z.omegaRadPerYr * 180) / Math.PI) * 3600;
   })();
+
+  /** THE REALIZED POLE RATE OVER A WINDOW, ″/yr — the mean over [yearFrom, yearTo] of the rate the spin
+   *  integration actually turns the pole at: the inertial secular rate of date × the solar-torque factor at
+   *  e(t) × J₂(t)/J₂₀ × cos ε(t)/cos ε₀ (ds/dt = α (ŝ·n̂)(ŝ×n̂): the azimuthal rate about n̂ is α cos ε).
+   *  Measured (2026-10): the dominant obliquity line of the model's own ε(t) over the last 5 Myr sits at
+   *  this mean minus |s₃| (40,938 fitted vs 40,936 predicted), NOT at the J2000 beat (41,098) — the pole
+   *  turned faster in the past (spin +0.06 ″/yr over 5 Myr, lower mean obliquity +0.05, higher mean
+   *  eccentricity +0.015); La2004's own series reads the same (40,917). The climate records' preferred
+   *  "+0.12…+0.20 ″/yr on the obliquity lines" is this window mean (50.515 over the LR04 record).
+   *  Calls the one-source history and the deep-time LOD declared below (evaluated at call time).
+   *  `ellipticity: false` leaves the J₂(t)/J₂₀ factor out: that factor is the ice-driven GIA channel, which
+   *  rides the climate formula's own post-MPT layer — the one piece that would make the climate LINES
+   *  depend on their own fit (measured: its LR04-window mean moved 1 − 3e-5 → 1 across one refit,
+   *  1.4e-3 ″/yr, 1 yr of period). The line derivation (the T1 exporter) excludes it; the published
+   *  realized period and the hybrid verdict's gate keep the full rate.
+   *  @param {number} yearFrom @param {number} yearTo @param {number} [stepYears=500]
+   *  @param {{ellipticity?: boolean}} [opts] @returns {number} */
+  const spinAxisInertialRateMeanArcsecPerYr = (yearFrom, yearTo, stepYears = 500, opts = {}) => {
+    const useEllipticity = opts.ellipticity !== false;
+    const lo = Math.min(yearFrom, yearTo), hi = Math.max(yearFrom, yearTo);
+    const cosEps0 = Math.cos(oneSourceM.epsAt(2000) * Math.PI / 180);
+    const kInertial = certifiedAxialPrecessionJ2000Years() / oneSourceM.axialPrecessionYearsLunisolarJ2000;
+    let sum = 0, n = 0;
+    for (let y = lo; y <= hi; y += stepYears) {
+      const r = deepLod.lunisolarPrecessionRateArcsecPerYrAtAge(yearToTMa(y));
+      const psiDot = (r === null ? 1296000 / certifiedAxialPrecessionJ2000Years() : r) * kInertial;
+      const f = oneSourceM.precessionOfDateFactorsAt(y);
+      sum += psiDot * f.solarTorque * (useEllipticity ? f.ellipticity : 1) * Math.cos(oneSourceM.epsAt(y) * Math.PI / 180) / cosEps0;
+      n++;
+    }
+    return sum / n;
+  };
 
   const deepLod = createDeepTimeLod({
     constants: {
@@ -585,7 +623,8 @@ export function assembleModel(C, F, laws = {}, secularSeriesArtifact = /** @type
       // read PURE (alphaGia, not the lattice-pin-aware earthMoiFactorAtAge):
       // the samplers are cached, their values must be pure in year.
       solarTorqueShareJ2000: EPOCH_PARAMS.precessionSolarShareJ2000,
-      dynamicalEllipticityRatioAtYearFn: alphaGia.j2RatioAt,
+      // options.giaEllipticityOfDate === false: the orbital forcing alone (the T1 line derivation).
+      dynamicalEllipticityRatioAtYearFn: options.giaEllipticityOfDate === false ? undefined : alphaGia.j2RatioAt,
     });
     // PER-TIER ROUTING (the anomalistic-contamination fix): one sampler PER
     // grid tier, built on first entry and KEPT — a query always reads the
@@ -1597,6 +1636,14 @@ export function assembleModel(C, F, laws = {}, secularSeriesArtifact = /** @type
         const psiDotInertial = psiDot * (certifiedAxialPrecessionJ2000Years() / oneSourceM.axialPrecessionYearsLunisolarJ2000);
         return 1296000 / (psiDotInertial - s3ArcsecPerYr);
       },
+      /** THE REALIZED POLE RATE OVER A WINDOW, ″/yr — see the one home above (the mean of the inertial rate of
+       *  date with its three of-date factors); the rate the obliquity lines of a record spanning the window carry. */
+      spinAxisInertialRateMeanArcsecPerYr,
+      /** THE REALIZED OBLIQUITY PERIOD OVER A WINDOW, years — 1,296,000/(⟨ψ̇ᵢₙ⟩_window − |s₃|): the period a record
+       *  spanning [yearFrom, yearTo] sees (40,930 over the LR04 record 0–5.32 Ma, 41,018 over the last Myr); the
+       *  J2000 beat (obliquityBeatYearsAtYear) is its instantaneous limit.
+       *  @param {number} yearFrom @param {number} yearTo @returns {number} */
+      obliquityPeriodRealizedYears: (yearFrom, yearTo) => 1296000 / (spinAxisInertialRateMeanArcsecPerYr(yearFrom, yearTo) - s3ArcsecPerYr),
       /** The apsidal (perihelion vs the stars) period of date, JULIAN years — the ONE movement's own apsidal rate (the scene's perihelion; anom/(anom − sid) of the one family, ≡ 360°/apsidalRateFixedArcsecPerJulianYr), inside the published window only; null beyond. Before 2026-09 this rode the planet chain's secular tangent, which parted from the scene's perihelion passages by seconds of anomalistic year within a few millennia (year-lengths.cjs). @param {number} year @returns {number|null} */
       apsidalPeriodYearsAtYear: (year) => (Math.abs(year - 2000) <= ONE_FAMILY_WINDOW_YEARS ? yearLengthsM.inclinationPrecessionYearsAtYear(year) : null),
       /** T_aps(t) / T_p(t) — the apsidal period in of-date precession periods (4.33 at J2000, a reading; 0.84 … 9.9 across ±26 kyr, measured); null beyond the published window. @param {number} year @returns {number|null} */

@@ -1,9 +1,15 @@
 {
- "_description": "T1 inputs — the engine’s own two J2000 precession rates and Earth’s z / ζ secular modes (deep mode table). p = the general precession in longitude (the of-date precession beat at J2000, createModel().epoch.axialPrecessionYearsAtYear): the equinox along the ecliptic of date, the rate the climatic-precession lines p + g_i carry. pInertial = the spin axis’s inertial precession rate (createModel().lunisolar.spinAxisInertialRateArcsecPerYrJ2000, the self-anchored rate the hybrid obliquity integrates on: p plus the planetary mean): the rate the obliquity lines pInertial + s_i carry. Consumed by scripts/l1_physical_lines.py and scripts/t1_beat_model_vs_comb.py.",
- "pArcsecPerYr": 50.28831076155945,
- "precessionPeriodYr": 25771.39658050846,
+ "_description": "T1 inputs — the engine’s own precession rates and Earth’s z / ζ secular modes (deep mode table). p = the general precession in longitude (the of-date precession beat at J2000, createModel().epoch.axialPrecessionYearsAtYear): the equinox along the ecliptic of date, the rate the climatic-precession lines p + g_i carry. pInertial = the spin axis’s inertial precession rate at J2000 (createModel().lunisolar.spinAxisInertialRateArcsecPerYrJ2000, the self-anchored rate the hybrid obliquity integrates on: p plus the planetary mean). pInertialMeanLr04 = the REALIZED pole rate over the LR04 record window (createModel().lunisolar.spinAxisInertialRateMeanArcsecPerYr over lr04WindowKyr with ellipticity:false — the inertial rate of date × solar torque at e(t) × cos ε(t)/cos ε₀, averaged; the ice-driven J₂(t)/J₂₀ factor is left out because it rides the climate formula’s own fit, 3e-5 of the rate): the rate the obliquity lines pInertialMeanLr04 + s_i carry — a record sees the window mean, not the J2000 instant. Consumed by scripts/l1_physical_lines.py and scripts/t1_beat_model_vs_comb.py.",
+ "pArcsecPerYr": 50.288310761253456,
+ "precessionPeriodYr": 25771.396580665274,
  "pInertialArcsecPerYr": 50.384902887297564,
  "inertialPrecessionPeriodYr": 25721.99063078341,
+ "pInertialMeanLr04ArcsecPerYr": 50.51914395549386,
+ "inertialPrecessionPeriodMeanLr04Yr": 25653.641343205352,
+ "lr04WindowKyr": [
+  0,
+  5320
+ ],
  "z": [
   {
    "arcsecPerYr": 4.25735934102568,
@@ -143,10 +149,11 @@
  "inputs": {
   "generator": "node tools/explore/t1-export-engine-frequencies.mjs --write",
   "files": {
+   "data/lr04-stack.txt": "sha256:7d1a6ca7ffc033e45e20fb76a7f39c8d99df87baa1094260f9dbdc09f0bb8945",
    "data/nbody-deep-secular-modes.json": "sha256:7633dd8f434fd6fc1ddaf07fd3ec3623e91e09322002ec08d53b8a12e6883fb7",
-   "data/nbody-secular-series.json": "sha256:e398dbeec974c786458a62f811f553f864597825ad99af2eee3d52e4afe15b0e",
+   "data/nbody-secular-series.json": "sha256:aad67f81e7040ad9eeffbbefd76f9d85c997f781fb83f1c5034ec34f5b4ba101",
    "public/input/model-parameters.json": "sha256:19d16cc2582d2130fd5c891cca0a36529104501d0b678e9b37dbf2bfb9969ced",
-   "tools/explore/t1-export-engine-frequencies.mjs": "sha256:9352d387d1a41362fa581de1038f95f1858e00f0b0ffee4d91a058450042ae92"
+   "tools/explore/t1-export-engine-frequencies.mjs": "sha256:ef449c101ee5a0c13fab009da9304f3f605783926d28d515e3eef4933921c3de"
   }
  }
 }

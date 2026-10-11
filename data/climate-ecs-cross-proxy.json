@@ -4,264 +4,264 @@
     0,
     640
   ],
-  "lr04_R2_L1": 0.8432485819023645,
-  "cheng_R2_L1": 0.6355789617642043,
-  "epica_R2_L1": 0.7463506323878696,
-  "pearson_correlation": -0.0837187092201392,
-  "spearman_correlation": -0.0005473453749316182,
+  "lr04_R2_L1": 0.8426169495433005,
+  "cheng_R2_L1": 0.637477767655535,
+  "epica_R2_L1": 0.7418585887623548,
+  "pearson_correlation": -0.016094846145463828,
+  "spearman_correlation": 0.08812260536398464,
   "shared_top5_lines": [],
   "per_line_amplitudes": [
     {
       "line": "climatic precession p+g2",
-      "period_kyr": 19.00144785676896,
-      "amp_lr04_permil": 0.07285650415363365,
-      "amp_cheng_permil": 0.5734253379530792,
-      "amp_epica_ppm": 0.39067284341344477,
-      "ratio_cheng_lr04": 7.870612852133122,
-      "phase_diff_deg": 31.484868478423756
+      "period_kyr": 19.001447856939453,
+      "amp_lr04_permil": 0.07315045734463901,
+      "amp_cheng_permil": 0.5714979889980081,
+      "amp_epica_ppm": 0.37992611295004897,
+      "ratio_cheng_lr04": 7.812637264938324,
+      "phase_diff_deg": 31.731193725525586
     },
     {
       "line": "climatic precession p+g3",
-      "period_kyr": 19.155373023216704,
-      "amp_lr04_permil": 0.02368924757484693,
-      "amp_cheng_permil": 0.11631633804547489,
-      "amp_epica_ppm": 1.3447246582942993,
-      "ratio_cheng_lr04": 4.91009001775889,
-      "phase_diff_deg": 92.40821007357707
+      "period_kyr": 19.155373023389973,
+      "amp_lr04_permil": 0.024158560712433743,
+      "amp_cheng_permil": 0.11571623603221981,
+      "amp_epica_ppm": 1.3403834307955529,
+      "ratio_cheng_lr04": 4.7898646533468305,
+      "phase_diff_deg": 92.92134664343496
     },
     {
       "line": "climatic precession p+g1",
-      "period_kyr": 22.445159544804383,
-      "amp_lr04_permil": 0.08047860786414983,
-      "amp_cheng_permil": 0.7553584924147285,
-      "amp_epica_ppm": 2.4739898501712676,
-      "ratio_cheng_lr04": 9.385829507510804,
-      "phase_diff_deg": 17.14337963440456
+      "period_kyr": 22.44515954504228,
+      "amp_lr04_permil": 0.08004249582662087,
+      "amp_cheng_permil": 0.7517920828513911,
+      "amp_epica_ppm": 2.4896140543354255,
+      "ratio_cheng_lr04": 9.392411806846194,
+      "phase_diff_deg": 17.05483368519479
     },
     {
       "line": "climatic precession p+g4",
-      "period_kyr": 23.193146030902057,
-      "amp_lr04_permil": 0.0742678895841561,
-      "amp_cheng_permil": 0.1576570605543608,
-      "amp_epica_ppm": 4.3543655335111415,
-      "ratio_cheng_lr04": 2.122815949626694,
-      "phase_diff_deg": 76.07846281778266
+      "period_kyr": 23.19314603115607,
+      "amp_lr04_permil": 0.07416667643742124,
+      "amp_cheng_permil": 0.15051848774055757,
+      "amp_epica_ppm": 4.290800172961846,
+      "ratio_cheng_lr04": 2.029462488690036,
+      "phase_diff_deg": 75.66336738611861
     },
     {
       "line": "climatic precession p+g0",
-      "period_kyr": 23.759906103684983,
-      "amp_lr04_permil": 0.06474845856041633,
-      "amp_cheng_permil": 0.5541025139654548,
-      "amp_epica_ppm": 2.7684643335044776,
-      "ratio_cheng_lr04": 8.557771509702052,
-      "phase_diff_deg": 14.935797734449396
+      "period_kyr": 23.75990610395156,
+      "amp_lr04_permil": 0.0655033114137152,
+      "amp_cheng_permil": 0.5608594654319536,
+      "amp_epica_ppm": 2.8387419920804344,
+      "ratio_cheng_lr04": 8.56230705482349,
+      "phase_diff_deg": 14.827117920682205
     },
     {
       "line": "obliquity p+s12",
-      "period_kyr": 27.346101256776855,
-      "amp_lr04_permil": 0.0076120652520411235,
-      "amp_cheng_permil": 0.1913741216070251,
-      "amp_epica_ppm": 1.7705120162260932,
-      "ratio_cheng_lr04": 25.14089347246589,
-      "phase_diff_deg": 68.17915680717873
+      "period_kyr": 27.268861001477575,
+      "amp_lr04_permil": 0.0071097859160166865,
+      "amp_cheng_permil": 0.19982622711809717,
+      "amp_epica_ppm": 1.732216291319264,
+      "ratio_cheng_lr04": 28.10580086074538,
+      "phase_diff_deg": 74.9114340553478
     },
     {
       "line": "obliquity p+s1",
-      "period_kyr": 28.92879096665861,
-      "amp_lr04_permil": 0.028425422314242096,
-      "amp_cheng_permil": 0.9261792087598251,
-      "amp_epica_ppm": 1.243120308069316,
-      "ratio_cheng_lr04": 32.58277743496455,
-      "phase_diff_deg": -108.82849046175821
+      "period_kyr": 28.842365358924194,
+      "amp_lr04_permil": 0.009510251976035364,
+      "amp_cheng_permil": 0.923581727856546,
+      "amp_epica_ppm": 1.4367597128923042,
+      "ratio_cheng_lr04": 97.11432779950053,
+      "phase_diff_deg": -178.70037885892847
     },
     {
       "line": "obliquity p+s14",
-      "period_kyr": 29.092143665932294,
-      "amp_lr04_permil": 0.08746793203330992,
-      "amp_cheng_permil": 0.8651283821976071,
-      "amp_epica_ppm": 2.8835897126108003,
-      "ratio_cheng_lr04": 9.890806402832814,
-      "phase_diff_deg": 88.48916921946788
+      "period_kyr": 29.004740735027653,
+      "amp_lr04_permil": 0.10162099241956107,
+      "amp_cheng_permil": 0.8409134373525018,
+      "amp_epica_ppm": 2.6572764464914997,
+      "ratio_cheng_lr04": 8.2749972946597,
+      "phase_diff_deg": 97.61482916678948
     },
     {
       "line": "obliquity p+s9",
-      "period_kyr": 29.708311778489644,
-      "amp_lr04_permil": 0.026977800888335627,
-      "amp_cheng_permil": 0.6556686449967405,
-      "amp_epica_ppm": 6.093529266512184,
-      "ratio_cheng_lr04": 24.304006383271645,
-      "phase_diff_deg": -80.34133631112466
+      "period_kyr": 29.617173071871676,
+      "amp_lr04_permil": 0.02710570494602254,
+      "amp_cheng_permil": 0.7078741287885236,
+      "amp_epica_ppm": 6.7183499302493415,
+      "ratio_cheng_lr04": 26.11531890419977,
+      "phase_diff_deg": 106.82428979904883
     },
     {
       "line": "obliquity p+s3",
-      "period_kyr": 29.90144128213458,
-      "amp_lr04_permil": 0.060238809329398124,
-      "amp_cheng_permil": 0.8270297062653943,
-      "amp_epica_ppm": 8.252273477017527,
-      "ratio_cheng_lr04": 13.729184150088804,
-      "phase_diff_deg": 173.3587422232595
+      "period_kyr": 29.809115605660047,
+      "amp_lr04_permil": 0.08639360633110653,
+      "amp_cheng_permil": 0.8611411991439226,
+      "amp_epica_ppm": 8.358149068132715,
+      "ratio_cheng_lr04": 9.967649641150166,
+      "phase_diff_deg": 150.32401295675518
     },
     {
       "line": "obliquity p+s2",
-      "period_kyr": 39.718720683390536,
-      "amp_lr04_permil": 0.23700405852845152,
-      "amp_cheng_permil": 0.25951207351537947,
-      "amp_epica_ppm": 14.912781511349149,
-      "ratio_cheng_lr04": 1.0949689010672614,
-      "phase_diff_deg": -129.0545419343235
+      "period_kyr": 39.555982780327845,
+      "amp_lr04_permil": 0.2529221407003215,
+      "amp_cheng_permil": 0.3196975093608227,
+      "amp_epica_ppm": 14.72727064623288,
+      "ratio_cheng_lr04": 1.2640155127408201,
+      "phase_diff_deg": -125.49406864512571
     },
     {
       "line": "obliquity p+s4",
-      "period_kyr": 40.39752772597398,
-      "amp_lr04_permil": 0.4657465553818991,
-      "amp_cheng_permil": 0.49843719828450184,
-      "amp_epica_ppm": 21.864176077319463,
-      "ratio_cheng_lr04": 1.070189768501449,
-      "phase_diff_deg": -104.76125277744354
+      "period_kyr": 40.22919158077229,
+      "amp_lr04_permil": 0.4217886199295734,
+      "amp_cheng_permil": 0.5751608836567426,
+      "amp_epica_ppm": 18.518251152778262,
+      "ratio_cheng_lr04": 1.363623522495173,
+      "phase_diff_deg": -112.57192362242907
     },
     {
       "line": "obliquity p+s0",
-      "period_kyr": 41.09807997184087,
-      "amp_lr04_permil": 0.06923130150519505,
-      "amp_cheng_permil": 0.8257009560936704,
-      "amp_epica_ppm": 6.9014327832075075,
-      "ratio_cheng_lr04": 11.926699890680384,
-      "phase_diff_deg": -50.98889243255865
+      "period_kyr": 40.92386740224579,
+      "amp_lr04_permil": 0.10910311306227474,
+      "amp_cheng_permil": 0.8862941719246432,
+      "amp_epica_ppm": 8.587163974163259,
+      "ratio_cheng_lr04": 8.123454473922822,
+      "phase_diff_deg": -18.52203396711507
     },
     {
       "line": "obliquity p+s7",
-      "period_kyr": 41.824898752410306,
-      "amp_lr04_permil": 0.12143794257858843,
-      "amp_cheng_permil": 0.44507078912027737,
-      "amp_epica_ppm": 7.97953217238126,
-      "ratio_cheng_lr04": 3.665006007757833,
-      "phase_diff_deg": -41.88401872198433
+      "period_kyr": 41.64448332919702,
+      "amp_lr04_permil": 0.1294100662941141,
+      "amp_cheng_permil": 0.4154794151532924,
+      "amp_epica_ppm": 8.527961301334702,
+      "ratio_cheng_lr04": 3.2105648892028227,
+      "phase_diff_deg": -44.10132943193988
     },
     {
       "line": "obliquity p+s10",
-      "period_kyr": 53.91679480659006,
-      "amp_lr04_permil": 0.04398895704291513,
-      "amp_cheng_permil": 0.2207936097068198,
-      "amp_epica_ppm": 4.389685772446835,
-      "ratio_cheng_lr04": 5.0192963086489195,
-      "phase_diff_deg": -115.20627694001456
+      "period_kyr": 53.617354174487346,
+      "amp_lr04_permil": 0.033459382145162586,
+      "amp_cheng_permil": 0.22627774400161893,
+      "amp_epica_ppm": 3.5441448938006497,
+      "ratio_cheng_lr04": 6.762759187241394,
+      "phase_diff_deg": -110.71465964009793
     },
     {
       "line": "eccentricity g0\u2212g2",
       "period_kyr": 94.8779191670953,
-      "amp_lr04_permil": 0.5603843873082761,
-      "amp_cheng_permil": 0.36735421623476644,
-      "amp_epica_ppm": 42.69791822766257,
-      "ratio_cheng_lr04": 0.6555397055212375,
-      "phase_diff_deg": -143.1866180077277
+      "amp_lr04_permil": 0.5635192377239763,
+      "amp_cheng_permil": 0.3977268391091137,
+      "amp_epica_ppm": 42.827455193561335,
+      "ratio_cheng_lr04": 0.7057910581997359,
+      "phase_diff_deg": -144.1575964768998
     },
     {
       "line": "eccentricity g0\u2212g6",
       "period_kyr": 96.84902648762181,
-      "amp_lr04_permil": 0.041582280879546046,
-      "amp_cheng_permil": 0.18343899687076415,
-      "amp_epica_ppm": 4.74558503049604,
-      "ratio_cheng_lr04": 4.411470294333858,
-      "phase_diff_deg": -144.93572768297392
+      "amp_lr04_permil": 0.04181271736174349,
+      "amp_cheng_permil": 0.18900049844846037,
+      "amp_epica_ppm": 4.9007703195477985,
+      "ratio_cheng_lr04": 4.520167795202572,
+      "phase_diff_deg": -143.43170770889776
     },
     {
       "line": "eccentricity g0\u2212g3",
       "period_kyr": 98.8438689567201,
-      "amp_lr04_permil": 0.23566899901652363,
-      "amp_cheng_permil": 0.19197280731252847,
-      "amp_epica_ppm": 20.266323673637906,
-      "ratio_cheng_lr04": 0.81458659439152,
-      "phase_diff_deg": -157.0447071004309
+      "amp_lr04_permil": 0.23762254264536062,
+      "amp_cheng_permil": 0.21591398892443267,
+      "amp_epica_ppm": 20.428467679062745,
+      "ratio_cheng_lr04": 0.9086427008176289,
+      "phase_diff_deg": -158.55323283135934
     },
     {
       "line": "eccentricity g0\u2212g5",
       "period_kyr": 101.00506143827943,
-      "amp_lr04_permil": 0.21968305545914116,
-      "amp_cheng_permil": 0.17138611798010683,
-      "amp_epica_ppm": 15.572280205831728,
-      "ratio_cheng_lr04": 0.7801517400689236,
-      "phase_diff_deg": 128.92905964753572
+      "amp_lr04_permil": 0.21916123098242196,
+      "amp_cheng_permil": 0.18933376801879676,
+      "amp_epica_ppm": 15.583820917493309,
+      "ratio_cheng_lr04": 0.8639017364981969,
+      "phase_diff_deg": 133.01990993472134
     },
     {
       "line": "eccentricity g0\u2212g7",
       "period_kyr": 103.12379754572216,
-      "amp_lr04_permil": 0.11738196173193656,
-      "amp_cheng_permil": 0.17937525494847997,
-      "amp_epica_ppm": 3.0722397284017093,
-      "ratio_cheng_lr04": 1.5281330478878568,
-      "phase_diff_deg": 44.40398740456142
+      "amp_lr04_permil": 0.11614679879568189,
+      "amp_cheng_permil": 0.1834036759793506,
+      "amp_epica_ppm": 3.0112872689646593,
+      "ratio_cheng_lr04": 1.5790678510389489,
+      "phase_diff_deg": 45.20001250408872
     },
     {
       "line": "eccentricity g2\u2212g4",
       "period_kyr": 105.13718703798536,
-      "amp_lr04_permil": 0.1099208252736161,
-      "amp_cheng_permil": 0.16696858691322453,
-      "amp_epica_ppm": 12.07992180370651,
-      "ratio_cheng_lr04": 1.5189895681514811,
-      "phase_diff_deg": -89.13421758084748
+      "amp_lr04_permil": 0.1132767843761528,
+      "amp_cheng_permil": 0.17905495895202014,
+      "amp_epica_ppm": 12.277735045485507,
+      "ratio_cheng_lr04": 1.5806853976136974,
+      "phase_diff_deg": -91.19100183580008
     },
     {
       "line": "eccentricity g3\u2212g4",
       "period_kyr": 110.0293064910417,
-      "amp_lr04_permil": 0.2837466997178576,
-      "amp_cheng_permil": 0.4742221908104339,
-      "amp_epica_ppm": 24.64874557236396,
-      "ratio_cheng_lr04": 1.6712870714689363,
-      "phase_diff_deg": 115.87939867700659
+      "amp_lr04_permil": 0.2829324271282006,
+      "amp_cheng_permil": 0.4988778590174786,
+      "amp_epica_ppm": 24.673352026459707,
+      "ratio_cheng_lr04": 1.7632403046944851,
+      "phase_diff_deg": 119.61269716921777
     },
     {
       "line": "eccentricity g1\u2212g2",
       "period_kyr": 123.8461774280429,
-      "amp_lr04_permil": 0.07016871242791257,
-      "amp_cheng_permil": 0.4356531420759359,
-      "amp_epica_ppm": 19.173588342029348,
-      "ratio_cheng_lr04": 6.208652360886651,
-      "phase_diff_deg": -79.51090147884254
+      "amp_lr04_permil": 0.07083090579035349,
+      "amp_cheng_permil": 0.45674222169616985,
+      "amp_epica_ppm": 19.413461593841838,
+      "ratio_cheng_lr04": 6.448346475309001,
+      "phase_diff_deg": -81.47455096244937
     },
     {
       "line": "eccentricity g1\u2212g3",
       "period_kyr": 130.69097366197656,
-      "amp_lr04_permil": 0.07958304035025392,
-      "amp_cheng_permil": 0.4949007250688754,
-      "amp_epica_ppm": 8.258849154552678,
-      "ratio_cheng_lr04": 6.218670748073479,
-      "phase_diff_deg": 20.35167520164675
+      "amp_lr04_permil": 0.07785503431912862,
+      "amp_cheng_permil": 0.5033647661683364,
+      "amp_epica_ppm": 8.281428136252462,
+      "ratio_cheng_lr04": 6.465410625920976,
+      "phase_diff_deg": 20.98399861691904
     },
     {
       "line": "eccentricity g1\u2212g5",
       "period_kyr": 134.49598078775747,
-      "amp_lr04_permil": 0.08225623849039466,
-      "amp_cheng_permil": 0.27625943965172106,
-      "amp_epica_ppm": 8.071601615037347,
-      "ratio_cheng_lr04": 3.358522644868824,
-      "phase_diff_deg": -14.645422461037654
+      "amp_lr04_permil": 0.08078061334335797,
+      "amp_cheng_permil": 0.2837442546075017,
+      "amp_epica_ppm": 8.1170540021925,
+      "ratio_cheng_lr04": 3.5125290940964615,
+      "phase_diff_deg": -13.891279934866107
     },
     {
       "line": "eccentricity fundamental g\u2082\u2212g\u2085",
       "period_kyr": 405.6256163323513,
-      "amp_lr04_permil": 0.06207698875357186,
-      "amp_cheng_permil": 0.1427057774042122,
-      "amp_epica_ppm": 7.339117029611003,
-      "ratio_cheng_lr04": 2.29885147893874,
-      "phase_diff_deg": 165.79794250619568
+      "amp_lr04_permil": 0.06201057237327451,
+      "amp_cheng_permil": 0.1428183691103054,
+      "amp_epica_ppm": 7.340996176637725,
+      "ratio_cheng_lr04": 2.303129347857103,
+      "phase_diff_deg": 165.71055528912066
     },
     {
       "line": "climate-internal harmonic (g\u2082\u2212g\u2085)/2",
       "period_kyr": 202.81280816617564,
-      "amp_lr04_permil": 0.03864289124788371,
-      "amp_cheng_permil": 0.2239707311640049,
-      "amp_epica_ppm": 4.235455991451281,
-      "ratio_cheng_lr04": 5.795910293753465,
-      "phase_diff_deg": 60.54232914952065
+      "amp_lr04_permil": 0.03865839372766594,
+      "amp_cheng_permil": 0.22289681396827266,
+      "amp_epica_ppm": 4.253461239457987,
+      "ratio_cheng_lr04": 5.765806399989046,
+      "phase_diff_deg": 59.11749421893676
     },
     {
       "line": "climate-internal harmonic (g\u2082\u2212g\u2085)/3",
       "period_kyr": 135.20853877745043,
-      "amp_lr04_permil": 0.12484845103574985,
-      "amp_cheng_permil": 0.48059141702152686,
-      "amp_epica_ppm": 11.926728778940074,
-      "ratio_cheng_lr04": 3.84939831479296,
-      "phase_diff_deg": -11.697050514720054
+      "amp_lr04_permil": 0.12298512880717188,
+      "amp_cheng_permil": 0.49089380568262597,
+      "amp_epica_ppm": 11.987822877035407,
+      "ratio_cheng_lr04": 3.9914891372947805,
+      "phase_diff_deg": -11.008909631354214
     }
   ],
   "snyder_available": false,

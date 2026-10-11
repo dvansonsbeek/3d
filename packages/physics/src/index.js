@@ -185,7 +185,7 @@ export { createSunLongitudeCorrection } from './sun/longitude-correction.cjs';
  * even though the body is empty.
  *
  * @param {Constants} [constants]
- * @param {{ laws?: { eccentricityAt?: (year: number) => number, eccentricityRateAt?: (year: number) => number, perihelionLongitudeDegAt?: (year: number) => number }, secularSeriesArtifact?: any }} [opts]
+ * @param {{ laws?: { eccentricityAt?: (year: number) => number, eccentricityRateAt?: (year: number) => number, perihelionLongitudeDegAt?: (year: number) => number }, secularSeriesArtifact?: any, giaEllipticityOfDate?: boolean }} [opts]
  *   `laws` — research overrides for Earth's orbit laws (doc 109 §7); absent = the shipped laws, bit-identical. Not part of the hash.
  * @returns {Model}
  */
@@ -233,7 +233,11 @@ export const createModel = (constants = GENERATED, opts = {}) => {
   // exactly like the browser; absent (the bare npm package) the mode
   // tail serves every epoch. Never part of the hash: it is the governed
   // artifact, not a parameter.
-  const surfaces = assembleModel(ctx, FITTED, opts.laws ?? {}, opts.secularSeriesArtifact ?? null);
+  // opts.giaEllipticityOfDate — false builds the one-source history on the
+  // orbital forcing alone (no ice-driven J₂(t) factor): the T1 line derivation
+  // (see assembleModel). Default true = the shipped physics. Never part of the hash.
+  const surfaces = assembleModel(ctx, FITTED, opts.laws ?? {}, opts.secularSeriesArtifact ?? null,
+    { giaEllipticityOfDate: opts.giaEllipticityOfDate !== false });
 
   return {
     constants: ctx,

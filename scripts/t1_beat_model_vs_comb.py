@@ -66,7 +66,7 @@ MATCH_TOL = 0.03
 LONG_N = [9, 12, 14, 16, 18]
 
 p = FREQ['pArcsecPerYr']                   # the general precession — the climatic-precession lines p + g_i
-p_in = FREQ['pInertialArcsecPerYr']        # the spin axis's inertial rate — the obliquity lines p_in + s_i (v22.0)
+p_in = FREQ['pInertialMeanLr04ArcsecPerYr']   # the realized pole rate over the LR04 window — the obliquity lines p_in + s_i (v23.0; v22.0 took the J2000 instant)
 z, zeta = FREQ['z'], FREQ['zeta']
 
 
@@ -236,7 +236,7 @@ def main():
     if '--write' in sys.argv:
         out = dict(
             _description=__doc__.strip(),
-            config=dict(p_arcsec_per_yr=p, p_inertial_arcsec_per_yr=p_in, precession_period_yr=FREQ['precessionPeriodYr'], band_kyr=list(BAND_KYR), n_lines=N_LINES,
+            config=dict(p_arcsec_per_yr=p, p_obliquity_arcsec_per_yr=p_in, p_inertial_j2000_arcsec_per_yr=FREQ['pInertialArcsecPerYr'], precession_period_yr=FREQ['precessionPeriodYr'], band_kyr=list(BAND_KYR), n_lines=N_LINES,
                         n_null=N_NULL, rng_seed=20260919, match_tolerance=MATCH_TOL, long_period_lines=LONG_N,
                         ridge_lambda=mcf.L1_RIDGE_LAMBDA, regimes=REGIMES_LR04 + REGIMES_CGD),
             lines={name: (spec if kind == 'int' else [round(P, 6) for P in spec]) for name, (kind, spec) in MODELS.items()},

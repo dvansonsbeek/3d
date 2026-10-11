@@ -239,7 +239,31 @@ would silently churn a structural claim for a rounding-level gain.
   frequency offset (test with a constant-offset scan before believing a
   drift), and a 0.3 % period shift compounding to a different α(t) phase a
   million years out (the ΔT stack's GIA term by tens of percent at deep time;
-  the stack re-closed, Step 7c).
+  the stack re-closed, Step 7c). **Second measurement (v23.0): a RECORD sees
+  the pole rate's mean over its own window, not the J2000 instant.** The
+  dominant obliquity line of the model's own ε(t) over the LR04 window sits
+  at 40,922 yr (La2004's series: 40,900; the two agree at every window), not
+  at the J2000 beat 41,098: the pole turned faster in the past (tidal spin
+  +0.06 ″/yr over 5 Myr, lower mean obliquity +0.05, higher mean
+  eccentricity +0.015 — the three of-date factors the spin integration
+  already multiplies), and the window mean 50.515 predicts the fitted
+  period to 0.02 % (40,930). The records' "+0.12…+0.20 ″/yr on the obliquity lines"
+  was this mean. ONE home `lunisolar.spinAxisInertialRateMeanArcsecPerYr` /
+  `obliquityPeriodRealizedYears`; the obliquity lines ride the LR04-window
+  mean (the stack's span is the window's one home); the J2000 beat stays as
+  the instantaneous limit; the hybrid verdict REFUSES if the ε(t) fit parts
+  from the window-mean prediction by 0.1 %. Compare like with like: a
+  realized period against a realized period (model vs La2004 0.05 %), never
+  a J2000 beat against Laskar's long-window precession frequency 50.476.
+  Measurement discipline: a single-line periodogram or phase track inside a
+  1–2 Myr window blends s₃ with its −18.30 ″/yr side line (Rayleigh) and
+  reads 0.3 % short — fit the full line set with ONE free p, and use ≥ 3 Myr.
+  LOOP TRAP (measured): the J₂(t)/J₂₀ factor is the ice-driven GIA channel,
+  which rides the climate formula's own post-MPT layer — a line rate that
+  includes it depends on its own fit (its window mean moved 1.4e-3 ″/yr
+  across one refit, a loop the freshness gate cannot close). The T1 exporter
+  derives the LINE rate with `ellipticity: false`; the published realized
+  period and the hybrid gate keep the full rate (1 yr of period apart).
 
 ---
 
@@ -464,8 +488,11 @@ plan 06 D6/Phase 3/S5), **the obliquity band must follow the beat
 rate × the hybrid's self-anchor factor (model v22.0: 50.385 ″/yr at J2000
 in the shipped series-driven configuration, where the general precession p₀
 reads 50.288 — the +0.097 is IAU's planetary precession ψ_A − p_A; the beat
-41,098 yr ≡ the climate formula's p+s₀ line, where the general rate read
-41,224 and La2004 reads 40,980 on its own 50.476) — (s₃ at its dynamical value under the measured
+41,098 yr the instantaneous limit; a record sees the WINDOW MEAN of ψ̇ᵢₙ
+with its of-date factors — 40,927 over the LR04 record, the climate
+formula's p+s₀ line on the orbital forcing alone 40,924, La2004's own
+series 40,900 on the same window; the general rate read 41,224) — (s₃ at
+its dynamical value under the measured
 solar-mass history — degenerate today with the pure precession-scaling
 reading "obliquity period ∝ T_p", roughly a factor two apart at 2.46 Ga;
 registry keys `obliqBeat*Kyr` / `obliqH8Scaled*Kyr` (name kept), doc 109

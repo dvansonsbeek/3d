@@ -1,7 +1,7 @@
 ---
 docVersion: 1.0
-modelVersion: v22.0
-coefficients: sha256:922e0e84e8122f69
+modelVersion: v23.0
+coefficients: sha256:49147a1d09bdaabc
 status: current
 ---
 
@@ -156,9 +156,9 @@ The Phanerozoic window, both clocks against the published inferences (written by
 | 200 | **55.02** | 52.78 | Wu 2024: 54.36 ± 1.0 | 1.2 % | -2.9 % | 35.72 | 36.50 |
 | 300 | **57.58** | 54.04 | Wu 2024: 59.50 ± 0.5 | -3.2 % | -9.2 % | 33.37 | 31.88 |
 | 400 | **60.28** | 55.33 | Wu 2024: 61.50 ± 0.5 | -2.0 % | -10.0 % | 31.19 | 30.39 |
-| 500 | **63.15** | 56.65 | Wu 2024: 64.50 ± 0.5 | -2.1 % | -12.2 % | 29.17 | 28.39 |
+| 500 | **63.16** | 56.65 | Wu 2024: 64.50 ± 0.5 | -2.1 % | -12.2 % | 29.17 | 28.39 |
 | 650 | **67.85** | 58.68 | Wu 2024: 67.64 ± 0.3 | 0.3 % | -13.3 % | 26.38 | 26.56 |
-| 500 | **63.15** | 56.65 | Berger, Loutre & Laskar 1992: 61 (theory) | 3.5 % | -7.1 % | 29.17 | 29 (their obliquity main period) |
+| 500 | **63.16** | 56.65 | Berger, Loutre & Laskar 1992: 61 (theory) | 3.5 % | -7.1 % | 29.17 | 29 (their obliquity main period) |
 
 The composed clock sits within 3 % of every published Phanerozoic precession constant and reads 2–3 % LOW across 300–500 Ma (the Pangea window, where Wu's Moon-distance anchors are closer than the shipped recession polynomial — the documented Pangea offset); the retired spin-only clock reads 9–13 % low there. Beats via 1,296,000/(ψ̇ − |s₃|), |s₃| = 18.85 ″/yr. Wu's constants carry the astronomical model of their inversion; Berger 1992 is theory — neither is a measurement, and the table is labelled accordingly.
 <!-- /generated:doc99-phanerozoic-comparison -->
@@ -291,7 +291,7 @@ The composed precession rate ψ̇ = [ω/ω₀]·p₀·[f_S + (1 − f_S)(a₀/a_
 The mean lunisolar precession period T_p = 2π/ψ̇ lengthens
     (25,771 yr now, 21,699 yr Devonian, 28,208 yr in 200 Myr — generated table below)
     ↓
-The obliquity beat 2π/(ψ̇ᵢₙ − |s₃|) lengthens with it (<!--v:obliqBeatJ2000Kyr-->41.1<!--/v--> kyr now, <!--v:obliqBeatDevonianKyr-->31.6<!--/v--> Devonian, <!--v:obliqBeat200MyrFutureKyr-->47.7<!--/v--> in 200 Myr; ψ̇ᵢₙ the spin axis's inertial rate)
+The obliquity beat 2π/(ψ̇ᵢₙ − |s₃|) lengthens with it (<!--v:obliqBeatJ2000Kyr-->41.1<!--/v--> kyr now, <!--v:obliqBeatDevonianKyr-->31.6<!--/v--> Devonian, <!--v:obliqBeat200MyrFutureKyr-->47.7<!--/v--> in 200 Myr; ψ̇ᵢₙ the spin axis's inertial rate — a record sees its WINDOW MEAN, with the pole's of-date factors: <!--v:obliqCycleRealizedLr04Years-->~40,927<!--/v--> yr over the LR04 record, measured on the model's own ε(t) and on La2004's)
     ↓
 The climate formula's precession-band lines p + g_i and p + s_i scale with ψ̇(t).
 The eccentricity-band lines |g_i − g_j| do NOT scale — MEASURED: the 405-kyr
@@ -619,9 +619,9 @@ L(t) = L₀ + mean tropical rate · t + D(t)          (mean longitude)
    the IAU/Laskar drift expression to 0.1 s over −1000..+3000. THE
    OBSERVATION-CLASS CHECK (plan 06 I1, JPL Horizons' apparent Sun on a
    10-day TT grid over ±3000 yr, <!--v:sunVsHorizonsN-->219,152<!--/v--> instants): the model's apparent
-   Sun sits <!--v:sunVsHorizonsMeanArcsec-->1.77<!--/v-->″ from Horizons on average with sd <!--v:sunVsHorizonsSdArcsec-->2.07<!--/v-->″ over the whole
+   Sun sits <!--v:sunVsHorizonsMeanArcsec-->1.81<!--/v-->″ from Horizons on average with sd <!--v:sunVsHorizonsSdArcsec-->2.06<!--/v-->″ over the whole
    span — near zero in 1000–3000 (<!--v:sunVsHorizonsMeanP1000Arcsec-->1.8<!--/v--> / <!--v:sunVsHorizonsMeanP2000Arcsec-->−0.8<!--/v-->″),
-   <!--v:sunVsHorizonsMeanM2000Arcsec-->2.4<!--/v-->″ at −2000..−1000 (the size of the difference between the model's
+   <!--v:sunVsHorizonsMeanM2000Arcsec-->2.5<!--/v-->″ at −2000..−1000 (the size of the difference between the model's
    equinox of date and Horizons' of-date frame) — and <!--v:sunVsHorizonsModernSdArcsec-->0.78<!--/v-->″ scatter in
    1970–2049 (mean offset <!--v:sunVsHorizonsModernMeanArcsec-->0.84<!--/v-->″, the L0 anchor and aberration conventions).
 
@@ -633,7 +633,7 @@ carries no equinox-referenced period; the perihelion longitude does. The
 cardinal instants are the APPARENT crossings of this Sun (aberration and
 the leading nutation terms applied, both derived) — the former fitted
 cardinal-point model left with R1 (doc 110 chain 5); against Horizons' own
-crossings the instants are <!--v:cardinalVsHorizonsMeanMin-->−0.72<!--/v--> min on average over ±3000 yr, within a
+crossings the instants are <!--v:cardinalVsHorizonsMeanMin-->−0.74<!--/v--> min on average over ±3000 yr, within a
 minute in 1000–3000.
 
 **Accuracy**: <!--v:frameworkSunVsJplRms-->1.03<!--/v-->″ RMS vs JPL over the modern window 1970–2049
@@ -681,9 +681,9 @@ measured and rejected — it double-counts the wheel's geometric-split ellipse
 Two structural relations sit between the framework's kinematic mean LOD and the observed physical LOD (USNO Earth Orientation Center measurement):
 
 1. **Raw H/5 kinematic correction** — captures the "missing motion" from the ecliptic reference frame's precession over the H/5 cycle. First-principles, no free parameters. Contribution at J2000: **+<!--v:h5LodCorrectionMs-->3.441<!--/v--> ms**.
-2. **Calibrated cyclic ΔT stack + Core-mantle swing** (Bond/Hallstatt/Jose5/Jose4 + the Resonator episode; the Core-mantle swing is the framework's model of the documented millennial core–mantle LOD oscillation — a damped core-eigenmode episode, full derivation in doc 104). Jointly fitted — see "The calibrated ΔT stack's role" below. Net LOD contribution at J2000: **<!--v:stackNetLodJ2000Ms-->-1.77<!--/v--> ms**.
+2. **Calibrated cyclic ΔT stack + Core-mantle swing** (Bond/Hallstatt/Jose5/Jose4 + the Resonator episode; the Core-mantle swing is the framework's model of the documented millennial core–mantle LOD oscillation — a damped core-eigenmode episode, full derivation in doc 104). Jointly fitted — see "The calibrated ΔT stack's role" below. Net LOD contribution at J2000: **<!--v:stackNetLodJ2000Ms-->-1.67<!--/v--> ms**.
 
-Their sum closes the Layer 4 composite `LOD_real` onto the joint fit's USNO closure target — <!--v:usnoLodJ2000-->86,400.0021<!--/v--> s — exactly at J2000 by construction of the fit, *in the fit's measured-day basis*. The displayed composite (Fourier-day basis — the tweakpane readout and every layer table below) reads <!--v:lodRealPhysical-->86,400.001780<!--/v--> s, 0.32 ms below; the two bases and the spread between them are defined in "The two J2000 day bases" below.
+Their sum closes the Layer 4 composite `LOD_real` onto the joint fit's USNO closure target — <!--v:usnoLodJ2000-->86,400.0022<!--/v--> s — exactly at J2000 by construction of the fit, *in the fit's measured-day basis*. The displayed composite (Fourier-day basis — the tweakpane readout and every layer table below) reads <!--v:lodRealPhysical-->86,400.001880<!--/v--> s, 0.32 ms below; the two bases and the spread between them are defined in "The two J2000 day bases" below.
 
 ### The identity
 
@@ -711,7 +711,7 @@ raw H/5 kinematic sum  = lod_kinematic + raw H/5 correction
 LOD_real (Layer 4)     = 86400.001480 s    (physical LOD readout — the shipped observable)
 ```
 
-In the fit's measured-day basis (lod_kinematic = IAU_sid_sec / the cardinal-point MEASURED sidereal days at 2000 = 86400.000427 s) the same sum lands exactly on the USNO closure target <!--v:usnoLodJ2000-->86,400.0021<!--/v--> s (Earth Orientation Center J2000 joint-fit optimum vs Espenak history, auto-swept; within ~0.2 ms of the observed EO value ~86400.0016 s), by construction of the joint fit.
+In the fit's measured-day basis (lod_kinematic = IAU_sid_sec / the cardinal-point MEASURED sidereal days at 2000 = 86400.000427 s) the same sum lands exactly on the USNO closure target <!--v:usnoLodJ2000-->86,400.0022<!--/v--> s (Earth Orientation Center J2000 joint-fit optimum vs Espenak history, auto-swept; within ~0.2 ms of the observed EO value ~86400.0016 s), by construction of the joint fit.
 
 The raw H/5 correction is a first-order additive expansion of the multiplicative form `LOD_mean × (1 + 1/((H/5)·mSY))`; higher-order terms are ~10⁻¹⁶ s and are ignored.
 
@@ -724,7 +724,7 @@ The raw H/5 correction is a first-order additive expansion of the multiplicative
 | **Fourier-direct** (display) | 365.2563630 (Step 6d harmonics evaluated at 2000) | 86399.99999487 s | tweakpane, website, every layer table in this doc |
 | **Measured-anchor** (fit) | 365.2563617 (cardinal-point CSV measurement, `YEAR_LENGTH_J2000_ANCHOR.sidereal`) | 86400.00031536 s | the joint fit's USNO closure row |
 
-The two counts differ by 1.35 × 10⁻⁶ days — the 6d Fourier fit's residual at year 2000 against the raw measurement, a fit-quality statement rather than a physical parameter — which maps to 0.32 ms of LOD. The cycle-stack sum Σ is additive and therefore **basis-independent**; only the absolute anchoring differs. Display-basis Layer 4 (<!--v:lodRealPhysical-->86,400.001780<!--/v--> s) plus the 0.32 ms basis spread lands exactly on the fit target (<!--v:usnoLodJ2000-->86,400.0021<!--/v--> s) — an identity enforced to 10⁻⁸ s on every docs build by the basis-consistency gate inside the model-values registry (`lodRealPhysical`), so the engine, the year-length anchor and the ΔT joint fit cannot drift apart silently.
+The two counts differ by 1.35 × 10⁻⁶ days — the 6d Fourier fit's residual at year 2000 against the raw measurement, a fit-quality statement rather than a physical parameter — which maps to 0.32 ms of LOD. The cycle-stack sum Σ is additive and therefore **basis-independent**; only the absolute anchoring differs. Display-basis Layer 4 (<!--v:lodRealPhysical-->86,400.001880<!--/v--> s) plus the 0.32 ms basis spread lands exactly on the fit target (<!--v:usnoLodJ2000-->86,400.0022<!--/v--> s) — an identity enforced to 10⁻⁸ s on every docs build by the basis-consistency gate inside the model-values registry (`lodRealPhysical`), so the engine, the year-length anchor and the ΔT joint fit cannot drift apart silently.
 
 ### Physical derivation of the raw H/5 term
 
@@ -759,10 +759,10 @@ Only H/5 provides the correct reference-frame kinematic correction for the Sun's
 
 The raw H/5 kinematic prediction (<!--v:lodH5Only-->86,400.003548<!--/v--> s, display basis) overshoots the physical solar day by ~2.14 ms — a basis-independent statement, since the stack sum Σ is additive. The framework does not treat this as a defect of the raw physics — the raw H/5 term is a clean, parameter-free geometric statement about the ecliptic frame. Instead, the residual is absorbed by the framework's calibrated cyclic ΔT stack + Core-mantle swing:
 
-- **`usno_target_lod_s` = <!--v:usnoLodJ2000-->86,400.0021<!--/v--> s** — the joint fit's hard-equality J2000 LOD closure target (expressed in the fit's measured-day basis — see "The two J2000 day bases"), itself the composite optimum over Espenak history (Espenak RMS ≈ <!--v:deltaTEspenakRmsSeconds-->13.7<!--/v--> s across 20 reference years 1650–2017, subject to full-window Stephenson RMS ≤ 40 s), within ~0.1 ms of the observed EO value ~86400.0016 s.
-- **deltaTStart = <!--v:deltaTStart-->53.94<!--/v--> s** — the ΔT trend anchor at J2000. This is the long-term trend value the calibrated stack rides through the epoch, distinct from the IERS instantaneous observation of ΔT_J2000 ≈ 63.63 s (the trend line does not pass through the middle of an intra-decadal noise band).
+- **`usno_target_lod_s` = <!--v:usnoLodJ2000-->86,400.0022<!--/v--> s** — the joint fit's hard-equality J2000 LOD closure target (expressed in the fit's measured-day basis — see "The two J2000 day bases"), itself the composite optimum over Espenak history (Espenak RMS ≈ <!--v:deltaTEspenakRmsSeconds-->14.1<!--/v--> s across 20 reference years 1650–2017, subject to full-window Stephenson RMS ≤ 40 s), within ~0.1 ms of the observed EO value ~86400.0016 s.
+- **deltaTStart = <!--v:deltaTStart-->55.64<!--/v--> s** — the ΔT trend anchor at J2000. This is the long-term trend value the calibrated stack rides through the epoch, distinct from the IERS instantaneous observation of ΔT_J2000 ≈ 63.63 s (the trend line does not pass through the middle of an intra-decadal noise band).
 
-Both are propagated from `public/input/astro-reference.json` via Step 9 (`npm run constants:generate`). The fit itself is run by `tools/fit/dt-corrections-fit.js --joint --write` (Step 7c of the pipeline — the README numbering is the authority): 4 flags + the Core-mantle swing in one equality-constrained solve with the USNO closure as a hard anchor row. The calibrated components collectively contribute **<!--v:stackNetLodJ2000Ms-->-1.77<!--/v--> ms at J2000** (per current shipped fit — see `data/deltaT-4flag-fit.json` → `usno_anchor.shipped_sum_lod_at_j2000_s`) plus a ~<!--v:deltaTEspenakRmsSeconds-->13.7<!--/v--> s Espenak RMS envelope over 1650–2017 (full-window Stephenson RMS ≈ 31 s); the anchor triplet (USNO, deltaTStart, coefficients) moves atomically with each fit configuration.
+Both are propagated from `public/input/astro-reference.json` via Step 9 (`npm run constants:generate`). The fit itself is run by `tools/fit/dt-corrections-fit.js --joint --write` (Step 7c of the pipeline — the README numbering is the authority): 4 flags + the Core-mantle swing in one equality-constrained solve with the USNO closure as a hard anchor row. The calibrated components collectively contribute **<!--v:stackNetLodJ2000Ms-->-1.67<!--/v--> ms at J2000** (per current shipped fit — see `data/deltaT-4flag-fit.json` → `usno_anchor.shipped_sum_lod_at_j2000_s`) plus a ~<!--v:deltaTEspenakRmsSeconds-->14.1<!--/v--> s Espenak RMS envelope over 1650–2017 (full-window Stephenson RMS ≈ 31 s); the anchor triplet (USNO, deltaTStart, coefficients) moves atomically with each fit configuration.
 
 ### Two internal LOD conventions
 
@@ -770,7 +770,7 @@ Both are propagated from `public/input/astro-reference.json` via Step 9 (`npm ru
 |:---|:---|:---|
 | **LOD_mean** (framework kinematic baseline) | `LOD_mean = T_sid_sec / (mSY × H/(H−13))` — H/13 identity, no H/5 correction, no ΔT-cycle contribution | `meanDeltaTSecondsAtAge` integrand + Bond/Hallstatt/Jose5/Jose4 cyclic stack → calibrated ΔT for Meeus geometry, eclipse code, live accumulator, tweakpane "ΔT correction" |
 | **raw H/5 kinematic** | `lod_kinematic + lod_kinematic/((H/5)·mSY)` — H/5 correction only, no ΔT cycles | Intermediate scalar shown as the calibrated stack's raw-physics baseline (`pureH5DeltaTAtAge`); reported alongside LOD_real for transparency |
-| **LOD_real** (Layer 4 composite, physical) | `lod_kinematic + lod_kinematic/((H/5)·mSY) + Σ δ_LOD,i + δ_LOD,swing` — H/5 correction PLUS calibrated ΔT cycles PLUS Core-mantle swing | Physical LOD readout — tweakpane Solar Day decomposition, J2000 tables, USNO comparison. Displays <!--v:lodRealPhysical-->86,400.001780<!--/v--> s; closes on the USNO target in the fit's measured-day basis by construction of the joint fit. |
+| **LOD_real** (Layer 4 composite, physical) | `lod_kinematic + lod_kinematic/((H/5)·mSY) + Σ δ_LOD,i + δ_LOD,swing` — H/5 correction PLUS calibrated ΔT cycles PLUS Core-mantle swing | Physical LOD readout — tweakpane Solar Day decomposition, J2000 tables, USNO comparison. Displays <!--v:lodRealPhysical-->86,400.001880<!--/v--> s; closes on the USNO target in the fit's measured-day basis by construction of the joint fit. |
 
 ### Deep-time behaviour
 
@@ -804,7 +804,7 @@ What IS constant is the **fractional correction** `δ_LOD_H5 / LOD_mean ≈ 5 / 
 | Planetary adiabatic invariant | `a × M_Sun = const` (per planet) | Driver 2 | Structural (definitional) |
 | Lunar Precession Invariant | `T_apsidal × H = const`, `T_nodal × H = const` | Driver 1 + Brown m² | Structural (0 ppm across epochs) |
 | **Raw H/5 LOD kinematic correction** | **`δ_LOD_H5 = LOD_mean/((H/5)·mSY)`** | **Driver 1 + ecliptic precession** | **Structural (parameter-free geometry); fractional correction 4.08 × 10⁻⁸, absolute 3.527 ms at J2000** |
-| **LOD_real (Layer 4 composite)** | **`LOD_real = lod_kinematic + raw H/5 + Σ calibrated ΔT δ_LOD + δ_LOD,swing`** | **raw H/5 + calibrated Bond/Hallstatt/Jose5/Jose4 stack + Core-mantle swing** | **Displays <!--v:lodRealPhysical-->86,400.001780<!--/v--> s; closes on the USNO target <!--v:usnoLodJ2000-->86,400.0021<!--/v--> s in the fit's measured-day basis, by construction of the joint fit** |
+| **LOD_real (Layer 4 composite)** | **`LOD_real = lod_kinematic + raw H/5 + Σ calibrated ΔT δ_LOD + δ_LOD,swing`** | **raw H/5 + calibrated Bond/Hallstatt/Jose5/Jose4 stack + Core-mantle swing** | **Displays <!--v:lodRealPhysical-->86,400.001880<!--/v--> s; closes on the USNO target <!--v:usnoLodJ2000-->86,400.0022<!--/v--> s in the fit's measured-day basis, by construction of the joint fit** |
 
 Cross-references: `pureH5DeltaTAtAge` in `src/script.js` (browser, raw H/5 baseline) and `meanDeltaTSecondsAtAge` in `tools/lib/deep-time.js` (Node lib mirror, calibrated stack); tweakpane bindings under Orbital → "ΔT (TT − UT1)" (raw H/5 curve), "ΔT correction (rel. J2000)" (calibrated stack) and the Solar Day decomposition sub-folder (Layer 1–4); chart config for `id: 'delta-t'`; component-breakdown diagnostic in Tools > Console Tests "ΔT Breakdown (H/5 physics vs Bond stack)".
 
@@ -816,8 +816,8 @@ The framework exposes four LOD values in the tweakpane **Day Lengths → Solar D
 |:---|:---|:---|---:|
 | **Layer 1 (Tidal Mean)** | pure-tidal chain (Farhat 2022, LLR α₁) + H/5 kinematic, with α held at long-term L1-climate MEAN value | Isolates Moon-recession tidal drift from the glacial-cycle α oscillation. Sits ABOVE Layer 2 at J2000 because J2000 is near a Holocene interglacial (L1 minimum → α at J2000 < α at climate mean) | **86400.110143 s** |
 | **Layer 2 (+ GIA)** | Layer 1 with α(t) applied at the current epoch (at J2000 this is EARTH_MOI_FACTOR exactly) | Adds the GIA channel via the L1-orbital-coupled α(t) curve — the physics baseline used by year-length derivations | **<!--v:solarDayLayer2J2000-->86,400.003108<!--/v--> s** |
-| **Layer 3 (+ Cycles)** | Layer 2 + Σ Bond/Hallstatt/Jose5/Jose4 cyclic δLOD stack (flags only) | Cyclic sub-Milankovitch modulation WITHOUT the Core-mantle swing | **<!--v:solarDayLayer3J2000-->86,400.001053<!--/v--> s** |
-| **Layer 4 (REAL LOD)** | Layer 3 + Core-mantle swing (Resonator episode) | Physical length of one solar day — the shipped observable. Closes on the USNO target <!--v:usnoLodJ2000-->86,400.0021<!--/v--> s in the fit's measured-day basis by construction of the joint fit (0.32 ms basis spread — see "The two J2000 day bases") | **<!--v:lodRealPhysical-->86,400.001780<!--/v--> s** |
+| **Layer 3 (+ Cycles)** | Layer 2 + Σ Bond/Hallstatt/Jose5/Jose4 cyclic δLOD stack (flags only) | Cyclic sub-Milankovitch modulation WITHOUT the Core-mantle swing | **<!--v:solarDayLayer3J2000-->86,400.001175<!--/v--> s** |
+| **Layer 4 (REAL LOD)** | Layer 3 + Core-mantle swing (Resonator episode) | Physical length of one solar day — the shipped observable. Closes on the USNO target <!--v:usnoLodJ2000-->86,400.0022<!--/v--> s in the fit's measured-day basis by construction of the joint fit (0.32 ms basis spread — see "The two J2000 day bases") | **<!--v:lodRealPhysical-->86,400.001880<!--/v--> s** |
 
 **Layer 1 − Layer 2 gap (~107 ms at J2000)** — the effect of using α at climate-mean vs α at J2000:
 
@@ -830,11 +830,11 @@ Layer 1 − Layer 2 = LOD × Δα / α
 
 This gap is not fixed — it oscillates with the glacial cycle. Over the ~100 kyr Milankovitch period, Layer 1 and Layer 2 cross whenever the epoch's L1(year) equals the L1 climate mean; the gap is largest at interglacial/glacial extrema.
 
-**Layer 2 − Layer 4 gap (<!--v:layer2MinusLayer4GapMs-->1.33<!--/v--> ms at J2000)** — the contribution of the 4-flag ΔT stack + Core-mantle swing, absorbing the residual between the Layer 2 physics baseline and the physical solar day. The full contribution at J2000 recorded in `data/deltaT-4flag-fit.json` → `usno_anchor.shipped_sum_lod_at_j2000_s` is **<!--v:stackNetLodJ2000Ms-->-1.77<!--/v--> ms**; the ~0.33 ms difference between the fit sum and the display gap is the numerical spread between `LOD_mean` (H/13 identity, <!--v:meanSolarDaySeconds-->86,399.999676<!--/v--> s — the value the Solar Day display uses as the Layer 2 physics baseline) and the display-basis `lod_kinematic` (IAU sidereal seconds / Fourier-direct sidereal days, 86399.999995 s — the Layer 3/4 baseline). Both paths agree at Layer 4 within numerical precision.
+**Layer 2 − Layer 4 gap (<!--v:layer2MinusLayer4GapMs-->1.23<!--/v--> ms at J2000)** — the contribution of the 4-flag ΔT stack + Core-mantle swing, absorbing the residual between the Layer 2 physics baseline and the physical solar day. The full contribution at J2000 recorded in `data/deltaT-4flag-fit.json` → `usno_anchor.shipped_sum_lod_at_j2000_s` is **<!--v:stackNetLodJ2000Ms-->-1.67<!--/v--> ms**; the ~0.33 ms difference between the fit sum and the display gap is the numerical spread between `LOD_mean` (H/13 identity, <!--v:meanSolarDaySeconds-->86,399.999676<!--/v--> s — the value the Solar Day display uses as the Layer 2 physics baseline) and the display-basis `lod_kinematic` (IAU sidereal seconds / Fourier-direct sidereal days, 86399.999995 s — the Layer 3/4 baseline). Both paths agree at Layer 4 within numerical precision.
 
 Cross-references: `meanLodSecondsAtAgeMeanAlpha` in `src/script.js` (Layer 1 tidal chain with climate-mean α), `meanLodSecondsAtAge` (Layer 2 tidal + GIA at α(t)), `dtCycleLodCorrectionSum` (cycles + swing sum), `resonatorSwingLodCorrection` (the Layer-4 addition), predictions bindings `solarDayLayer1` / `solarDayLayer2` / `solarDayLayer3` / `lodReal`.
 
-**Sidereal / stellar day source.** The simulator's live rows `siderealDayReal` and `stellarDayReal` (the Predictions pane, the Days & Years report and the Formula Verification panel — one day for the three) are derived from `lodReal`, the real solar day of date (the kinematic day plus the ecliptic-precession term and the cyclic corrections), so they sit above the IAU constants — which rest on the nominal 86,400-s day — by the real day's excess over 86,400 s (~1.8 ms at J2000); the stellar day's precession turn rides T_p (S5), not the counter. The registry publishes the two days on both bases: on LOD_real of J2000 (the simulator readout) <!--v:siderealDayJ2000Physical-->86,164.092307<!--/v--> s (sidereal) and <!--v:stellarDayJ2000Physical-->86,164.100683<!--/v--> s (stellar, of-date-obliquity RA projection), and on the SI day of exactly 86,400 s the IAU inputs <!--v:siderealDayInputSeconds-->86,164.090531<!--/v--> / <!--v:stellarDayInputSeconds-->86,164.098904<!--/v--> s — the two columns apart by the day's excess, <!--v:lodRealJ2000ExcessMs-->1.78<!--/v--> ms. The kinematic day `o.lodKinematic` (the IAU-anchored baseline; the package's `lengths.siderealDaySeconds` / `stellarDaySeconds` moved onto LOD_real with physics 18, `lengths.lodRealSeconds`) stays the INTERNAL identity basis — it preserves the round-trip `siderealYearDays × o.lodKinematic = meansiderealyearlengthinSeconds = 31,558,149.7635 s` at every epoch — but its J2000 sidereal/stellar day values are no longer published (the former registry keys `siderealDayJ2000` / `stellarDayJ2000` were deleted 2026-10-09: a "J2000 day" needs its day basis named).
+**Sidereal / stellar day source.** The simulator's live rows `siderealDayReal` and `stellarDayReal` (the Predictions pane, the Days & Years report and the Formula Verification panel — one day for the three) are derived from `lodReal`, the real solar day of date (the kinematic day plus the ecliptic-precession term and the cyclic corrections), so they sit above the IAU constants — which rest on the nominal 86,400-s day — by the real day's excess over 86,400 s (~1.8 ms at J2000); the stellar day's precession turn rides T_p (S5), not the counter. The registry publishes the two days on both bases: on LOD_real of J2000 (the simulator readout) <!--v:siderealDayJ2000Physical-->86,164.092407<!--/v--> s (sidereal) and <!--v:stellarDayJ2000Physical-->86,164.100782<!--/v--> s (stellar, of-date-obliquity RA projection), and on the SI day of exactly 86,400 s the IAU inputs <!--v:siderealDayInputSeconds-->86,164.090531<!--/v--> / <!--v:stellarDayInputSeconds-->86,164.098904<!--/v--> s — the two columns apart by the day's excess, <!--v:lodRealJ2000ExcessMs-->1.88<!--/v--> ms. The kinematic day `o.lodKinematic` (the IAU-anchored baseline; the package's `lengths.siderealDaySeconds` / `stellarDaySeconds` moved onto LOD_real with physics 18, `lengths.lodRealSeconds`) stays the INTERNAL identity basis — it preserves the round-trip `siderealYearDays × o.lodKinematic = meansiderealyearlengthinSeconds = 31,558,149.7635 s` at every epoch — but its J2000 sidereal/stellar day values are no longer published (the former registry keys `siderealDayJ2000` / `stellarDayJ2000` were deleted 2026-10-09: a "J2000 day" needs its day basis named).
 
 ### dLOD/dt decomposition at J2000
 
@@ -872,7 +872,7 @@ The IERS observed rate is the physical Earth-rotation slowdown, integrating tida
 
 #### Cyclic rate on top of the secular baseline
 
-The Tidal + GIA rate (+1.77 ms/cy at J2000) captures the Milankovitch-scale physics. The four sub-Milankovitch lattice cycles — Bond (1466 yr), Hallstatt (2430 yr), Jose5 (897 yr), Jose4 (716 yr) — add cyclic modulation on top, and the Core-mantle swing (Resonator episode) is the fourth dLOD/dt driver. The components are jointly anchored so that the cumulative δLOD **value** at J2000 closes the raw H/5 kinematic onto the physical solar day (net <!--v:stackNetLodJ2000Ms-->-1.77<!--/v--> ms, by construction against the USNO closure target <!--v:usnoLodJ2000-->86,400.0021<!--/v--> s in the fit's measured-day basis); the cumulative **derivative** at J2000 is not zero: cycles contribute −1.90 ms/cy (descending phase) and the swing +0.05 ms/cy. The full observable rate at J2000 is therefore Tidal + GIA + cycles + swing = +1.77 − 1.90 + 0.05 = **−0.08 ms/century** — marginally negative, a descending-phase episode since ~1980, consistent in sign with the observed post-2020 spin-up.
+The Tidal + GIA rate (+1.77 ms/cy at J2000) captures the Milankovitch-scale physics. The four sub-Milankovitch lattice cycles — Bond (1466 yr), Hallstatt (2430 yr), Jose5 (897 yr), Jose4 (716 yr) — add cyclic modulation on top, and the Core-mantle swing (Resonator episode) is the fourth dLOD/dt driver. The components are jointly anchored so that the cumulative δLOD **value** at J2000 closes the raw H/5 kinematic onto the physical solar day (net <!--v:stackNetLodJ2000Ms-->-1.67<!--/v--> ms, by construction against the USNO closure target <!--v:usnoLodJ2000-->86,400.0022<!--/v--> s in the fit's measured-day basis); the cumulative **derivative** at J2000 is not zero: cycles contribute −1.90 ms/cy (descending phase) and the swing +0.05 ms/cy. The full observable rate at J2000 is therefore Tidal + GIA + cycles + swing = +1.77 − 1.90 + 0.05 = **−0.08 ms/century** — marginally negative, a descending-phase episode since ~1980, consistent in sign with the observed post-2020 spin-up.
 
 ```
 full rate = Tidal + GIA + Σ d(cycles)/dt + d(swing)/dt
@@ -992,8 +992,8 @@ ice-age mass redistribution that changes the polar moment (the α(t) of the
 length-of-day stack) changes it too; the channel is scaled on the observed
 dJ₂/dt (<!--v:j2RateJ2000Per1e11Yr-->−2.7<!--/v--> ×10⁻¹¹ /yr, Cox & Chao 2002) and is bounded, ±<!--v:precOfDateEllipticityAmpLastMyrPct-->0.02<!--/v--> %, with
 no secular part. Theory against theory: the equinox of date holds
-<!--v:equinoxVsVondrakMaxAbsArcsec-->6.0<!--/v-->″ of Vondrák et al. (2011) over ±3000 yr where the secular law alone
-reads <!--v:equinoxSecularOnlyMaxAbsArcsec-->26.4<!--/v-->″, and the obliquity holds <!--v:obliqVsLa2004RmsLastMyrArcsec-->13.6<!--/v-->″ rms of La2004 over the last
+<!--v:equinoxVsVondrakMaxAbsArcsec-->6.1<!--/v-->″ of Vondrák et al. (2011) over ±3000 yr where the secular law alone
+reads <!--v:equinoxSecularOnlyMaxAbsArcsec-->26.4<!--/v-->″, and the obliquity holds <!--v:obliqVsLa2004RmsLastMyrArcsec-->13.5<!--/v-->″ rms of La2004 over the last
 million years where the secular law alone reads <!--v:obliqSecularOnlyVsLa2004RmsLastMyrArcsec-->78.9<!--/v-->″
 ([doc 110 §2.3](110-calculation-map.md) carries the formulas). The deep-time
 rows above, the precession gates at 1.4 and 2.46 Ga and the obliquity beat
@@ -1185,7 +1185,7 @@ This is one of the strongest empirical validations of the framework's structural
 Periods in **kyr**, written by the engine. The lines are the climate formula's PHYSICAL obliquity lines p + s_i (plan 06 T1; `data/l1-physical-lines.json`): Earth's composed precession rate ψ̇(t) beating against the orbit's nodal modes s_i. Only ψ̇(t) scales; the nodal frequencies are fixed (μ = 1). The main line p + s₀ is the obliquity beat of falsification leg 1. (The former integer-label tables are retired.)
 
 <!-- generated:doc99-l1-obliquity-lines -->
-| Age (Myr) | ψ̇ (″/yr) | p+s12 (27.35 kyr today, rel. amp 0.10) | p+s1 (28.93 kyr today, rel. amp 0.54) | p+s14 (29.09 kyr today, rel. amp 0.14) | p+s9 (29.71 kyr today, rel. amp 0.10) | p+s3 (29.90 kyr today, rel. amp 0.48) | p+s2 (39.72 kyr today, rel. amp 0.48) | p+s4 (40.40 kyr today, rel. amp 0.32) | p+s0 (41.10 kyr today, rel. amp 1.00) | p+s7 (41.82 kyr today, rel. amp 0.18) | p+s10 (53.92 kyr today, rel. amp 0.16) |
+| Age (Myr) | ψ̇ (″/yr) | p+s12 (27.27 kyr today, rel. amp 0.10) | p+s1 (28.84 kyr today, rel. amp 0.54) | p+s14 (29.00 kyr today, rel. amp 0.14) | p+s9 (29.62 kyr today, rel. amp 0.10) | p+s3 (29.81 kyr today, rel. amp 0.48) | p+s2 (39.56 kyr today, rel. amp 0.48) | p+s4 (40.23 kyr today, rel. amp 0.32) | p+s0 (40.92 kyr today, rel. amp 1.00) | p+s7 (41.64 kyr today, rel. amp 0.18) | p+s10 (53.62 kyr today, rel. amp 0.16) |
 |---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|
 | +200 (future) | 45.94 | 30.11 | 32.04 | 32.24 | 33.00 | 33.24 | 45.83 | 46.74 | 47.68 | 48.66 | 65.84 |
 | **0 (J2000)** | **50.29** | **27.35** | **28.93** | **29.09** | **29.71** | **29.90** | **39.72** | **40.40** | **41.10** | **41.82** | **53.92** |
@@ -1427,9 +1427,9 @@ The clock's current growth rate, written by the engine from the shipped chain:
 <!-- generated:doc99-growth-rate -->
 | Rate at J2000 | Value |
 |:---|---:|
-| dT_p/dt (the precession period) | +11.6 yr per Myr = +0.0449 % per Myr |
+| dT_p/dt (the precession period) | +11.6 yr per Myr = +0.0450 % per Myr |
 | d(beat)/dt (the obliquity beat) | +29.5 yr per Myr = +0.0718 % per Myr |
-| dLOD/dt (the tidal chain) | +21.23 s per Myr = +2.12 ms per century |
+| dLOD/dt (the tidal chain) | +21.24 s per Myr = +2.12 ms per century |
 
 Central differences of the shipped chain at ±1 Myr. The precession period grows faster than the day length alone would make it, because the lunar torque falls as the Moon recedes: the composition law, not spin-scaling.
 <!-- /generated:doc99-growth-rate -->
@@ -1516,10 +1516,10 @@ A single smooth two-layer formula. Past 4.5 Gyr the smooth base matches Farhat 2
 | 380 (Devonian) | 78,894.7 | 21.915 | 369,749 | 21,699 | 31.62 |
 | 550 (Cambrian) | 75,809.6 | 21.058 | 362,983 | 20,042 | 28.21 |
 | 1,000 (Mesoproterozoic) | 68,112.9 | 18.920 | 343,784 | 15,972 | 20.75 |
-| 2,500 (Archean) | 61,111.6 | 16.975 | 322,160 | 12,336 | 15.00 |
+| 2,500 (Archean) | 61,111.5 | 16.975 | 322,160 | 12,336 | 15.00 |
 | 4,498 (Earth-Moon genesis, rigid Roche) | 16,648.8 | 4.625 | 9,440 | 0 | — |
 | **−200 (+200 Ma future)** | 90,853.3 | 25.237 | 392,059 | 28,208 | 47.68 |
-| **−1,000 (+1 Gyr future)** | 116,016.0 | 32.227 | 425,119 | 42,109 | 108.13 |
+| **−1,000 (+1 Gyr future)** | 116,015.9 | 32.227 | 425,119 | 42,109 | 108.13 |
 | **−3,000 (+3 Gyr future)** | — | — | — | — | beyond tidal lock |
 <!-- /generated:doc99-key-epochs -->
 
@@ -2200,12 +2200,12 @@ re-measured on top of the preferred δp.
 
 | Window | ΔR² total, clock alone | sign control (k = −1) | preferred δp | ΔR² at that δp | clock on top of it |
 |:---|---:|---:|---:|---:|---:|
-| LR04 post-MPT (0–1 Myr) | <!--v:evolvingClockDeltaR2TotalPostMpt-->+0.00043<!--/v--> | <!--v:evolvingClockDeltaR2AtScaleMinusOnePostMpt-->−0.00045<!--/v--> | <!--v:evolvingClockPreferredDeltaPPostMpt-->+0.24<!--/v--> ″/yr | <!--v:evolvingClockDeltaR2AtPreferredPPostMpt-->+0.00556<!--/v--> | <!--v:evolvingClockGainAtPreferredPPostMpt-->−0.00009<!--/v--> |
-| LR04 iNHG-MPT (1–2.7 Myr) | <!--v:evolvingClockDeltaR2TotalInhgMpt-->+0.00367<!--/v--> | <!--v:evolvingClockDeltaR2AtScaleMinusOneInhgMpt-->−0.00453<!--/v--> | <!--v:evolvingClockPreferredDeltaPInhgMpt-->+0.14<!--/v--> ″/yr | <!--v:evolvingClockDeltaR2AtPreferredPInhgMpt-->+0.00719<!--/v--> | <!--v:evolvingClockGainAtPreferredPInhgMpt-->−0.00026<!--/v--> |
-| LR04 pre-iNHG (2.7–5.3 Myr) | <!--v:evolvingClockDeltaR2TotalPreInhg-->+0.03797<!--/v--> | <!--v:evolvingClockDeltaR2AtScaleMinusOnePreInhg-->−0.02831<!--/v--> | <!--v:evolvingClockPreferredDeltaPPreInhg-->+0.22<!--/v--> ″/yr | <!--v:evolvingClockDeltaR2AtPreferredPPreInhg-->+0.06226<!--/v--> | <!--v:evolvingClockGainAtPreferredPPreInhg-->−0.01454<!--/v--> |
-| LR04 full (0–5.3 Myr) | <!--v:evolvingClockDeltaR2TotalLr04Full-->+0.05323<!--/v--> | <!--v:evolvingClockDeltaR2AtScaleMinusOneLr04Full-->−0.03925<!--/v--> | <!--v:evolvingClockPreferredDeltaPLr04Full-->+0.12<!--/v--> ″/yr | <!--v:evolvingClockDeltaR2AtPreferredPLr04Full-->+0.07397<!--/v--> | <!--v:evolvingClockGainAtPreferredPLr04Full-->−0.01986<!--/v--> |
-| CENOGRID (0–66 Myr) | <!--v:evolvingClockDeltaR2TotalCenogrid-->+0.00031<!--/v--> | <!--v:evolvingClockDeltaR2AtScaleMinusOneCenogrid-->+0.00016<!--/v--> | <!--v:evolvingClockPreferredDeltaPCenogrid-->+0.20<!--/v--> ″/yr | <!--v:evolvingClockDeltaR2AtPreferredPCenogrid-->+0.00040<!--/v--> | <!--v:evolvingClockGainAtPreferredPCenogrid-->−0.00048<!--/v--> |
-| Cheng 2016 (0–640 kyr, U-Th, untuned) | <!--v:evolvingClockDeltaR2TotalCheng-->+0.00025<!--/v--> | <!--v:evolvingClockDeltaR2AtScaleMinusOneCheng-->−0.00026<!--/v--> | <!--v:evolvingClockPreferredDeltaPCheng-->+0.42<!--/v--> ″/yr | <!--v:evolvingClockDeltaR2AtPreferredPCheng-->+0.00877<!--/v--> | <!--v:evolvingClockGainAtPreferredPCheng-->−0.00014<!--/v--> |
+| LR04 post-MPT (0–1 Myr) | <!--v:evolvingClockDeltaR2TotalPostMpt-->+0.00049<!--/v--> | <!--v:evolvingClockDeltaR2AtScaleMinusOnePostMpt-->−0.00052<!--/v--> | <!--v:evolvingClockPreferredDeltaPPostMpt-->+0.22<!--/v--> ″/yr | <!--v:evolvingClockDeltaR2AtPreferredPPostMpt-->+0.00564<!--/v--> | <!--v:evolvingClockGainAtPreferredPPostMpt-->−0.00010<!--/v--> |
+| LR04 iNHG-MPT (1–2.7 Myr) | <!--v:evolvingClockDeltaR2TotalInhgMpt-->+0.00085<!--/v--> | <!--v:evolvingClockDeltaR2AtScaleMinusOneInhgMpt-->−0.00207<!--/v--> | <!--v:evolvingClockPreferredDeltaPInhgMpt-->+0.04<!--/v--> ″/yr | <!--v:evolvingClockDeltaR2AtPreferredPInhgMpt-->+0.00060<!--/v--> | <!--v:evolvingClockGainAtPreferredPInhgMpt-->−0.00032<!--/v--> |
+| LR04 pre-iNHG (2.7–5.3 Myr) | <!--v:evolvingClockDeltaR2TotalPreInhg-->+0.00862<!--/v--> | <!--v:evolvingClockDeltaR2AtScaleMinusOnePreInhg-->−0.03141<!--/v--> | <!--v:evolvingClockPreferredDeltaPPreInhg-->+0.08<!--/v--> ″/yr | <!--v:evolvingClockDeltaR2AtPreferredPPreInhg-->+0.00856<!--/v--> | <!--v:evolvingClockGainAtPreferredPPreInhg-->−0.01389<!--/v--> |
+| LR04 full (0–5.3 Myr) | <!--v:evolvingClockDeltaR2TotalLr04Full-->−0.03114<!--/v--> | <!--v:evolvingClockDeltaR2AtScaleMinusOneLr04Full-->−0.01302<!--/v--> | <!--v:evolvingClockPreferredDeltaPLr04Full-->−0.02<!--/v--> ″/yr | <!--v:evolvingClockDeltaR2AtPreferredPLr04Full-->+0.00332<!--/v--> | <!--v:evolvingClockGainAtPreferredPLr04Full-->−0.01735<!--/v--> |
+| CENOGRID (0–66 Myr) | <!--v:evolvingClockDeltaR2TotalCenogrid-->+0.00055<!--/v--> | <!--v:evolvingClockDeltaR2AtScaleMinusOneCenogrid-->−0.00008<!--/v--> | <!--v:evolvingClockPreferredDeltaPCenogrid-->+0.04<!--/v--> ″/yr | <!--v:evolvingClockDeltaR2AtPreferredPCenogrid-->+0.00028<!--/v--> | <!--v:evolvingClockGainAtPreferredPCenogrid-->−0.00054<!--/v--> |
+| Cheng 2016 (0–640 kyr, U-Th, untuned) | <!--v:evolvingClockDeltaR2TotalCheng-->+0.00023<!--/v--> | <!--v:evolvingClockDeltaR2AtScaleMinusOneCheng-->−0.00024<!--/v--> | <!--v:evolvingClockPreferredDeltaPCheng-->+0.40<!--/v--> ″/yr | <!--v:evolvingClockDeltaR2AtPreferredPCheng-->+0.00791<!--/v--> | <!--v:evolvingClockGainAtPreferredPCheng-->−0.00013<!--/v--> |
 
 Reading:
 
@@ -2216,51 +2216,79 @@ Reading:
    composed clock carries.
 2. **A constant frequency offset explains it.** With the p-lines evaluated at
    p + δp, every LR04 window prefers δp =
-   <!--v:evolvingClockPreferredDeltaPMinLr04-->+0.12<!--/v-->…<!--v:evolvingClockPreferredDeltaPMaxLr04-->+0.24<!--/v--> ″/yr,
+   <!--v:evolvingClockPreferredDeltaPMinLr04-->−0.02<!--/v-->…<!--v:evolvingClockPreferredDeltaPMaxLr04-->+0.22<!--/v--> ″/yr,
    and on top of that offset the clock of date subtracts in every window
-   (largest gain <!--v:evolvingClockGainAfterPreferredPMax-->−0.00009<!--/v-->).
+   (largest gain <!--v:evolvingClockGainAfterPreferredPMax-->−0.00010<!--/v-->).
    The "clock gain" was a frequency offset in disguise: inside one window a
    phase drift and a frequency offset both raise a line's mean frequency.
-3. **Two rates, two families — and the residual per family.** An obliquity
-   line p + s_i is the spin axis precessing in the inertial frame against one
-   of the ecliptic's nodal modes, so it carries the spin axis's inertial rate
-   (<!--v:evolvingClockArtifactPInertialArcsecPerYr-->50.385<!--/v--> ″/yr — the
-   self-anchored rate the hybrid obliquity integration runs on, the general
-   precession plus the planetary mean the N-body ecliptic's motion carries);
-   a climatic-precession line p + g_i is the perihelion measured from the
-   equinox along the ecliptic of date, so it carries the general precession
-   in longitude (<!--v:evolvingClockArtifactPArcsecPerYr-->50.288<!--/v--> ″/yr,
+3. **Two rates, two families.** An obliquity line p + s_i is the spin axis
+   precessing in the inertial frame against one of the ecliptic's nodal
+   modes, so it carries the spin axis's inertial rate (the self-anchored rate
+   the hybrid obliquity integration runs on — the general precession plus the
+   planetary mean the N-body ecliptic's motion carries,
+   <!--v:spinAxisInertialRateArcsecPerYrJ2000-->50.385<!--/v--> ″/yr at J2000;
+   the +0.097 above the general precession is IAU's planetary precession
+   ψ_A − p_A); a climatic-precession line p + g_i is the perihelion measured
+   from the equinox along the ecliptic of date, so it carries the general
+   precession in longitude (<!--v:evolvingClockArtifactPArcsecPerYr-->50.288<!--/v--> ″/yr,
    the model's J2000 precession reading, 1,296,000 ″ over
-   <!--v:evolvingClockTpJ2000Yr-->25771<!--/v--> yr). The shipped lines carry
-   those rates (model v22.0). Scanned one family at a time on them, the
-   obliquity lines alone want δp =
-   <!--v:evolvingClockPreferredDeltaPObliquityInhgMpt-->+0.18<!--/v--> ″/yr
-   (iNHG-MPT), <!--v:evolvingClockPreferredDeltaPObliquityPreInhg-->+0.20<!--/v-->
-   (pre-iNHG) and <!--v:evolvingClockPreferredDeltaPObliquityLr04Full-->+0.12<!--/v-->
+   <!--v:evolvingClockTpJ2000Yr-->25771<!--/v--> yr). With the obliquity lines
+   on the J2000 inertial rate (model v22.0) the per-family scan still wanted
+   +0.12…+0.20 ″/yr on the obliquity family alone, nothing resolvable on the
+   precession family.
+4. **A record sees the window mean, not the J2000 instant.** The spin
+   integration turns the pole at α(t)·cos ε(t) with the solar torque at the
+   eccentricity of date and J₂(t) from the GIA channel — three factors of
+   date, each 1 at J2000, each larger in the past (faster spin, lower mean
+   obliquity, higher mean eccentricity). Averaged over the LR04 record that
+   rate reads <!--v:spinAxisInertialRateMeanLr04ArcsecPerYr-->50.517<!--/v--> ″/yr
+   (the realized pole rate; one home
+   `createModel().lunisolar.spinAxisInertialRateMeanArcsecPerYr`), and the
+   dominant obliquity line of the model's OWN ε(t) fitted over the record
+   sits exactly there: <!--v:obliqCycleRealizedFitLr04Years-->~40,919<!--/v--> yr
+   against the window-mean prediction
+   <!--v:obliqCycleRealizedLr04Years-->~40,927<!--/v--> (gated to 0.1 % in the
+   obliquity-hybrid verdict), with La2004's own series on the same fit at
+   <!--v:obliqCycleLa2004FitLr04Years-->~40,900<!--/v-->
+   (<!--v:obliqCycleRealizedVsLa2004Pct-->+0.05<!--/v--> %) — and the J2000
+   beat 2π/(ψ̇ᵢₙ − |s₃|) = <!--v:obliqBeatJ2000Kyr-->41.1<!--/v--> kyr is the
+   instantaneous limit of that mean. The records' preferred offset WAS this
+   mean. The shipped obliquity lines now carry it — on the orbital forcing
+   alone (model v23.0:
+   <!--v:evolvingClockArtifactPInertialArcsecPerYr-->50.519<!--/v--> ″/yr, the
+   same mean without the ice-driven J₂(t) factor, because that factor rides
+   the climate formula's own post-MPT layer and a forcing line must not
+   contain the climate response; 2–3 yr of period from the full physics), and
+   scanned one family at a time on them the obliquity lines want δp =
+   <!--v:evolvingClockPreferredDeltaPObliquityInhgMpt-->+0.04<!--/v--> ″/yr
+   (iNHG-MPT), <!--v:evolvingClockPreferredDeltaPObliquityPreInhg-->+0.06<!--/v-->
+   (pre-iNHG) and <!--v:evolvingClockPreferredDeltaPObliquityLr04Full-->−0.02<!--/v-->
    (full record) for gains of
-   <!--v:evolvingClockDeltaR2AtPreferredPObliquityInhgMpt-->+0.00880<!--/v-->,
-   <!--v:evolvingClockDeltaR2AtPreferredPObliquityPreInhg-->+0.05924<!--/v-->,
-   <!--v:evolvingClockDeltaR2AtPreferredPObliquityLr04Full-->+0.06916<!--/v-->;
-   the climatic-precession lines alone want
+   <!--v:evolvingClockDeltaR2AtPreferredPObliquityInhgMpt-->+0.00057<!--/v-->,
+   <!--v:evolvingClockDeltaR2AtPreferredPObliquityPreInhg-->+0.00828<!--/v-->,
+   <!--v:evolvingClockDeltaR2AtPreferredPObliquityLr04Full-->+0.00414<!--/v-->
+   (were +0.009 / +0.059 / +0.069 on the J2000 rate); the pre-iNHG remainder
+   is the regime's own window mean sitting
+   above the record-wide one
+   (<!--v:spinAxisInertialRateMeanPreInhgArcsecPerYr-->50.563<!--/v--> ″/yr —
+   a per-regime line set would carry it; the shipped set carries ONE window,
+   the record's, the rule "derive over the window the rows are used in"). The
+   climatic-precession lines alone want
    <!--v:evolvingClockPreferredDeltaPPrecessionInhgMpt-->+0.02<!--/v--> ″/yr in
    the one window that resolves them (iNHG-MPT, ΔR²
-   <!--v:evolvingClockDeltaR2AtPreferredPPrecessionInhgMpt-->+0.00005<!--/v-->)
-   and small, poorly determined offsets elsewhere. The residual one to two
-   tenths of an arcsecond per year is the size of the gap to La2004's precession frequency
-   (50.476 ″/yr, 0.09 above the engine's inertial rate — the tuning target of
-   LR04's chronology) and of what a 640-kyr untuned record can resolve; the
-   engine's +0.097 above the general precession is IAU's planetary precession
-   ψ_A − p_A. (Before v22.0 both families
-   carried the general precession; the same scan then read +0.2…+0.3 ″/yr
-   with gains up to 0.14, all of it in the obliquity family — the measurement
-   that led to the derivation fix; the v22.0 version note carries it.)
+   <!--v:evolvingClockDeltaR2AtPreferredPPrecessionInhgMpt-->+0.00004<!--/v-->)
+   and poorly determined offsets elsewhere. Laskar's precession frequency
+   (50.476 ″/yr) is a long-window frequency of his solution, not a J2000
+   rate: compare a realized period with a realized period, never a J2000
+   beat with it.
 
 **Conclusion.** The composed clock's drift is below what any available
-record resolves — the formula keeps its J2000 line periods, measured on the
-right physics (only the p-carrying lines warp). Each family carries the rate
-its physics names, and the obliquity lines and the published obliquity beat
-2π/(ψ̇ᵢₙ − |s₃|) are one quantity:
-<!--v:obliqBeatJ2000Kyr-->41.1<!--/v--> kyr at J2000.
+record resolves — the formula keeps fixed line periods, measured on the
+right physics (only the p-carrying lines warp) — and the obliquity lines
+carry the window mean of the pole rate over the record they are fitted to,
+<!--v:obliqCycleRealizedLr04Years-->~40,927<!--/v--> yr for the p+s₀ line,
+with the published J2000 beat <!--v:obliqBeatJ2000Kyr-->41.1<!--/v--> kyr as its
+instantaneous limit.
 
 ---
 
@@ -2443,7 +2471,7 @@ In 200 Myr, Earth's ~41-kyr obliquity beat should be ~47.8 kyr (+16 %; generated
 The former prediction (the Law-6 identity holds in all epochs) is RETIRED with view 2: the planetary g-modes do not scale with H, so the identity is an exact Earth-frame statement at J2000, not an eternal lock (see the Law 6 restatement above).
 **Replacement prediction (the two-tier split itself, already twice confirmed and forward-testable)**: every newly dated Precambrian cyclostratigraphic section must show the precession band at the H(t)-predicted period (spin tier scales) while the long-eccentricity band stays at its modern class scaled only by 1/μ (mass tier) — the Kuruman count-bracket already reads μ(2.48 Ga) = 1.00 ± 0.07. A section violating either half falsifies the corresponding tier.
 
-**The obliquity band, sharpened (the two tiers meeting in one observable)**: the obliquity band is the beat of the two tiers — **2π/(ψ̇(t) − |s₃|)**, with the spin precession ψ̇ the composed lunisolar rate of the table above (plan 06 D6) and s₃ at its dynamical value under the measured μ (doc 109 §18: the hybrid derives exactly this structure). Today the beat and pure H/8-scaling are degenerate (ψ̇ ≫ |s₃| — <!--v:obliqBeatJ2000Kyr-->41.1<!--/v--> vs <!--v:obliqH8ScaledJ2000Kyr-->41.1<!--/v--> kyr, which is why "H/8" has always fit); at 2.46 Ga they split to <!--v:obliqBeat2460MaKyr-->15.1<!--/v--> vs <!--v:obliqH8Scaled2460MaKyr-->19.8<!--/v--> kyr (the latter now read as "obliquity period ∝ T_p", the pure precession-scaling alternative; H(t) being the unit, 13·T_p) — a level cyclostratigraphy can discriminate. The existing confirmations are precession-band/LOD anchors; the deep-time obliquity PERIOD itself is undiscriminated, so this beat form is the pre-registered prediction, stated before any such measurement is compared. A precisely dated Precambrian obliquity band tests it head-on.
+**The obliquity band, sharpened (the two tiers meeting in one observable)**: the obliquity band is the beat of the two tiers — **2π/(ψ̇(t) − |s₃|)**, with the spin precession ψ̇ the composed lunisolar rate of the table above (plan 06 D6) and s₃ at its dynamical value under the measured μ (doc 109 §18: the hybrid derives exactly this structure). Today the beat and pure H/8-scaling are degenerate (ψ̇ ≫ |s₃| — <!--v:obliqBeatJ2000Kyr-->41.1<!--/v--> vs <!--v:obliqH8ScaledJ2000Kyr-->41.1<!--/v--> kyr, which is why "H/8" has always fit; a dated section reads the beat of the WINDOW-MEAN pole rate, not the instant — the pole's tidal spin, obliquity and eccentricity of date all enter, and over the LR04 record that mean reads <!--v:obliqCycleRealizedLr04Years-->~40,927<!--/v--> yr where the J2000 instant reads 41,098: the model's own ε(t) fitted over the record gives <!--v:obliqCycleRealizedFitLr04Years-->~40,919<!--/v-->, La2004's series on the same fit <!--v:obliqCycleLa2004FitLr04Years-->~40,900<!--/v-->, agreeing to <!--v:obliqCycleRealizedVsLa2004Pct-->+0.05<!--/v--> %); at 2.46 Ga they split to <!--v:obliqBeat2460MaKyr-->15.1<!--/v--> vs <!--v:obliqH8Scaled2460MaKyr-->19.8<!--/v--> kyr (the latter now read as "obliquity period ∝ T_p", the pure precession-scaling alternative; H(t) being the unit, 13·T_p) — a level cyclostratigraphy can discriminate. The existing confirmations are precession-band/LOD anchors; the deep-time obliquity PERIOD itself is undiscriminated, so this beat form is the pre-registered prediction, stated before any such measurement is compared. A precisely dated Precambrian obliquity band tests it head-on.
 
 ### 6. Earth-Moon genesis at the rigid Roche limit at the giant-impact age
 The proper-physics formula, run backwards, crosses the rigid Roche limit at **<!--v:moonDistanceAtHadean-->9,471<!--/v--> km ≈ 1.49 R_E** at ~4.498 Ga — the canonical giant-impact Moon-formation age (~4.5 Ga, isotope-dated), ~40 Myr after Patterson's Pb-Pb Earth age of 4.54 Gyr. The fluid Roche zone (~2.9 R_E) is crossed at ~4.44 Ga. No Hadean constraint was used in the fit.

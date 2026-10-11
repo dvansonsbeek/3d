@@ -142,7 +142,7 @@ for (const url of SAMPLE_REQUESTS) {
   const ss = dataOf('/v1/cardinal-points?year=2000&types=SS').years[0].points.SS;
   if (Math.abs(ss.jd - 2451716.575) > 0.1) failures.push(`SS 2000 JD: ${ss.jd}`);
   const val = dataOf('/v1/values/usnoLodJ2000');
-  if (val.value !== '86,400.0021') failures.push(`values/usnoLodJ2000: ${val.value}`);   // plan 06 T2 item: the ecliptic missing-motion term on the nodal period (3.527 → 3.441 ms) re-closed the joint optimum at 0021 (history: 0018 after the ecc-unification 7c re-close → 0020 → 0019 with the lagged GIA channel)
+  if (val.value !== '86,400.0022') failures.push(`values/usnoLodJ2000: ${val.value}`);   // v23.0: the obliquity lines on the realized pole rate moved the GIA α(t) channel and the joint re-close's optimum to 0022 (history: 0018 after the ecc-unification 7c re-close → 0020 → 0019 with the lagged GIA channel → 0021 with the ecliptic missing-motion term on the nodal period, plan 06 T2, held through v22.0)
   const deriv = dataOf('/v1/derivations/axialPrecession');
   if (deriv.latticeDivisor !== 13) failures.push(`derivations/axialPrecession divisor: ${deriv.latticeDivisor}`);
   if (Math.abs(deriv.periodYears - 25771.4) > 0.5) failures.push(`derivations/axialPrecession period: ${deriv.periodYears}`);

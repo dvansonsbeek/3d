@@ -33,17 +33,17 @@
  * carry it so a counterfactual is reproducible (§2d).
  * @type {string}
  */
-export const CONSTANTS_HASH = "1ce3efce1fc4ebfd";
+export const CONSTANTS_HASH = "6c2beb70bb3d5000";
 
 /** Model version label — single source: public/input/model-version.json (§10 two-axis scheme). */
-export const MODEL_VERSION = "v22.0";
+export const MODEL_VERSION = "v23.0";
 
 /** Canonical preprint DOI — single source: public/input/model-version.json. */
 export const PREPRINT_DOI = "10.21203/rs.3.rs-8758810/v4";
 
 /** @type {Readonly<Record<string, unknown>>} */
 export const DEFAULT_CONSTANTS = Object.freeze({
-  hash: "1ce3efce1fc4ebfd",
+  hash: "6c2beb70bb3d5000",
   additionalBodies: {
     "pluto": {
       "name": "Pluto",
@@ -212,7 +212,7 @@ export const DEFAULT_CONSTANTS = Object.freeze({
     "perihelionPassageJ2000_JD": 2451547.042,
     "earthInclinationJ2000_deg": 1.57869,
     "earthInclinationRate_arcsecPerCentury": -18,
-    "deltaTStart": 53.94227683682997,
+    "deltaTStart": 55.63860600148356,
     "sunTilt": 7.155
   },
   foundational: {

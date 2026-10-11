@@ -1,7 +1,7 @@
 ---
 docVersion: 1.0
-modelVersion: v22.0
-coefficients: sha256:922e0e84e8122f69
+modelVersion: v23.0
+coefficients: sha256:49147a1d09bdaabc
 status: current
 ---
 
@@ -170,7 +170,7 @@ Separately (physical/USNO branch — does NOT feed the derivation chain above):
 **Solar day** — the time for the Sun to return to the same local meridian (noon to noon). The solar day varies throughout the year due to orbital eccentricity and obliquity (equation of time). The framework maintains **two mean-LOD values**:
 
 - **LOD_mean** = `siderealYearSeconds / siderealYear(days_kinematic)` ≈ <!--v:meanSolarDaySeconds-->86,399.999676<!--/v--> s at J2000 — the kinematic baseline used inside all sidereal↔tropical conversions and the calibrated ΔT correction stack.
-- **LOD_real** = lod_kinematic + lod_kinematic/(T_s₃ × mSY) + DT cycle sum = <!--v:lodRealPhysical-->86,400.001780<!--/v--> s at J2000 — Layer 4: adds the ecliptic missing-motion correction on the nodal period (~<!--v:h5LodCorrectionMs-->3.441<!--/v--> ms) + the Bond/Hallstatt/Jose5/Jose4 cyclic δLOD (Layer 3) + the Core-mantle swing. Closes on the USNO target <!--v:usnoLodJ2000-->86,400.0021<!--/v--> s in the fit's measured-day basis (doc 99 § "The two J2000 day bases"). Used in the user-facing physical LOD display. NOTE the baseline is `o.lodKinematic` (Fourier-direct), NOT LOD_mean — the two differ by the day-basis spread (<!--v:dayBasisSpreadMs-->0.32<!--/v--> ms at J2000; see the declared scene day basis below).
+- **LOD_real** = lod_kinematic + lod_kinematic/(T_s₃ × mSY) + DT cycle sum = <!--v:lodRealPhysical-->86,400.001880<!--/v--> s at J2000 — Layer 4: adds the ecliptic missing-motion correction on the nodal period (~<!--v:h5LodCorrectionMs-->3.441<!--/v--> ms) + the Bond/Hallstatt/Jose5/Jose4 cyclic δLOD (Layer 3) + the Core-mantle swing. Closes on the USNO target <!--v:usnoLodJ2000-->86,400.0022<!--/v--> s in the fit's measured-day basis (doc 99 § "The two J2000 day bases"). Used in the user-facing physical LOD display. NOTE the baseline is `o.lodKinematic` (Fourier-direct), NOT LOD_mean — the two differ by the day-basis spread (<!--v:dayBasisSpreadMs-->0.32<!--/v--> ms at J2000; see the declared scene day basis below).
 
 Both fluctuate over millennia as the sidereal year in days changes. See § "The ecliptic missing-motion LOD Correction" below.
 
@@ -186,7 +186,7 @@ It is derived in place from the 6c anchor (no stored copy — it cannot detach f
 | LOD_mean (H/13 identity) | <!--v:meanSolarDaySeconds-->86,399.999676<!--/v--> s | kinematic baseline (kinematic sidereal days) |
 | Fourier-kinematic day (`o.lodKinematic`) | <!--v:lodKinematicFourierJ2000Seconds-->86,400.000107<!--/v--> s | the panel *seconds* column — pins the sidereal year to IAU seconds by construction |
 | **measured mean solar day — the DECLARED scene basis** | <!--v:measuredMeanSolarDayJ2000Seconds-->86,400.000427<!--/v--> s | the day the scene's measured year lengths are counted in |
-| LOD_real (physical observable) | <!--v:lodRealPhysical-->86,400.001780<!--/v--> s | Layer-4 display (adds the ecliptic term + ΔT cycles + swing) |
+| LOD_real (physical observable) | <!--v:lodRealPhysical-->86,400.001880<!--/v--> s | Layer-4 display (adds the ecliptic term + ΔT cycles + swing) |
 
 One day basis cannot close all three year types: pinning sidereal leaves tropical <!--v:yearResidualTropicalSecPerYr-->+0.027<!--/v--> s/yr and anomalistic <!--v:yearResidualAnomalisticSecPerYr-->+0.065<!--/v--> s/yr against IAU (per-type closing days <!--v:closingDayTropicalSeconds-->86,400.000353<!--/v--> / <!--v:closingDaySiderealSeconds-->86,400.000427<!--/v--> / <!--v:closingDayAnomalisticSeconds-->86,400.000250<!--/v--> s) — recorded model-vs-IAU structure, not a unit artifact.
 
@@ -205,9 +205,9 @@ The rate that matters here is precession in **right ascension** (along the equat
 | Quantity | Model value | Reference |
 |----------|-------------|-----------|
 | Mean solar day — **LOD_mean** (H/13 identity) | <!--v:meanSolarDaySeconds-->86,399.999676<!--/v--> s | — (kinematic) |
-| Mean solar day — **LOD_real** (Layer 4: + the ecliptic term + DT cycles + swing, physical) | <!--v:lodRealPhysical-->86,400.001780<!--/v--> s | USNO joint-optimum target <!--v:usnoLodJ2000-->86,400.0021<!--/v--> s (fit's measured-day basis — the declared scene day; <!--v:dayBasisSpreadMs-->0.32<!--/v--> ms basis spread) |
-| Sidereal day — on LOD_real of J2000 (the simulator readout) | <!--v:siderealDayJ2000Physical-->86,164.092307<!--/v--> s | <!--v:siderealDayInputSeconds-->86,164.090531<!--/v--> s (IAU, on the 86,400-s day — the two differ by the day's excess, <!--v:lodRealJ2000ExcessMs-->1.78<!--/v--> ms) |
-| Stellar day — on LOD_real of J2000 | <!--v:stellarDayJ2000Physical-->86,164.100683<!--/v--> s | <!--v:stellarDayInputSeconds-->86,164.098904<!--/v--> s (IAU 2000A, on the 86,400-s day) |
+| Mean solar day — **LOD_real** (Layer 4: + the ecliptic term + DT cycles + swing, physical) | <!--v:lodRealPhysical-->86,400.001880<!--/v--> s | USNO joint-optimum target <!--v:usnoLodJ2000-->86,400.0022<!--/v--> s (fit's measured-day basis — the declared scene day; <!--v:dayBasisSpreadMs-->0.32<!--/v--> ms basis spread) |
+| Sidereal day — on LOD_real of J2000 (the simulator readout) | <!--v:siderealDayJ2000Physical-->86,164.092407<!--/v--> s | <!--v:siderealDayInputSeconds-->86,164.090531<!--/v--> s (IAU, on the 86,400-s day — the two differ by the day's excess, <!--v:lodRealJ2000ExcessMs-->1.88<!--/v--> ms) |
+| Stellar day — on LOD_real of J2000 | <!--v:stellarDayJ2000Physical-->86,164.100782<!--/v--> s | <!--v:stellarDayInputSeconds-->86,164.098904<!--/v--> s (IAU 2000A, on the 86,400-s day) |
 
 See § "The ecliptic missing-motion LOD Correction" below for the distinction between the two mean solar day values.
 
@@ -262,7 +262,7 @@ All precession periods emerge from ratios of year lengths:
 | Axial | `Y_sid / (Y_sid − Y_trop)` | T_p = <!--v:earthAxialPeriod-->25,771<!--/v--> yr |
 | Perihelion | `Y_anom(s) / (Y_anom(s) − Y_trop(s))` | H/16 ≈ <!--v:earthPeriPeriod-->20,938<!--/v--> yr |
 | Inclination | `Y_anom(s) / (Y_anom(s) − Y_sid(s))` | H/3 ≈ <!--v:earthPeriPeriodICRF-->111,635<!--/v--> yr |
-| Obliquity | the beat of the clock against the nodal mode: 1/(1/T_p − 1/T_s₃) (the retired label H/8 read <!--v:hDiv8-->41,915<!--/v--> yr) | <!--v:obliqCycleYears-->~41,098<!--/v--> yr |
+| Obliquity | the beat of the spin axis's inertial precession against the nodal mode: 1/(1/T_ψ̇ᵢₙ − 1/T_s₃) with T_ψ̇ᵢₙ = <!--v:spinAxisInertialPeriodYearsJ2000-->25,722<!--/v--> yr (the pole's period, 0.097 ″/yr above the equinox clock T_p — IAU's planetary precession; the retired label H/8 read <!--v:hDiv8-->41,915<!--/v--> yr). A record sees the window mean of the pole rate, not the J2000 instant: <!--v:obliqCycleRealizedLr04Years-->~40,927<!--/v--> yr over the LR04 record | <!--v:obliqCycleYears-->~41,098<!--/v--> yr at J2000 |
 | Ecliptic (nodal) | the N-body chain's dominant nodal mode s₃: 1,296,000/\|s₃\| (the retired label H/5 read <!--v:hDiv5-->67,063<!--/v--> yr) | <!--v:eclPrecYears-->~68,751<!--/v--> yr |
 
 These are time-varying — each uses the instantaneous year lengths at the given epoch, so precession periods themselves oscillate slightly.
@@ -285,9 +285,9 @@ The coin rotation paradox manifests at every timescale:
 | Sidereal year | 365.256363 days | 365.256363 days (IAU) |
 | Anomalistic year | 365.259633 days | <!--v:anomalisticYearInputDays-->365.259636<!--/v--> days (IAU) |
 | LOD_mean (kinematic, H/13 identity) | <!--v:meanSolarDaySeconds-->86,399.999676<!--/v--> s | — |
-| LOD_real (Layer 4: physical, + the ecliptic term + DT cycles + swing) | <!--v:lodRealPhysical-->86,400.001780<!--/v--> s | USNO joint-optimum target <!--v:usnoLodJ2000-->86,400.0021<!--/v--> s (fit's measured-day basis) |
-| Sidereal day — on LOD_real of J2000 (the simulator readout) | <!--v:siderealDayJ2000Physical-->86,164.092307<!--/v--> s | <!--v:siderealDayInputSeconds-->86,164.090531<!--/v--> s (IAU, on the 86,400-s day — the two differ by the day's excess, <!--v:lodRealJ2000ExcessMs-->1.78<!--/v--> ms) |
-| Stellar day — on LOD_real of J2000 | <!--v:stellarDayJ2000Physical-->86,164.100683<!--/v--> s | <!--v:stellarDayInputSeconds-->86,164.098904<!--/v--> s (IAU 2000A, on the 86,400-s day) |
+| LOD_real (Layer 4: physical, + the ecliptic term + DT cycles + swing) | <!--v:lodRealPhysical-->86,400.001880<!--/v--> s | USNO joint-optimum target <!--v:usnoLodJ2000-->86,400.0022<!--/v--> s (fit's measured-day basis) |
+| Sidereal day — on LOD_real of J2000 (the simulator readout) | <!--v:siderealDayJ2000Physical-->86,164.092407<!--/v--> s | <!--v:siderealDayInputSeconds-->86,164.090531<!--/v--> s (IAU, on the 86,400-s day — the two differ by the day's excess, <!--v:lodRealJ2000ExcessMs-->1.88<!--/v--> ms) |
+| Stellar day — on LOD_real of J2000 | <!--v:stellarDayJ2000Physical-->86,164.100782<!--/v--> s | <!--v:stellarDayInputSeconds-->86,164.098904<!--/v--> s (IAU 2000A, on the 86,400-s day) |
 | Axial precession | <!--v:axialPrecJ2000-->25,771<!--/v--> yr | <!--v:axialPrecJ2000-->25,771<!--/v--> yr (instantaneous J2000 rate) |
 
 

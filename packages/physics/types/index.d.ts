@@ -31,6 +31,7 @@ export function createModel(constants?: Constants, opts?: {
         perihelionLongitudeDegAt?: (year: number) => number;
     };
     secularSeriesArtifact?: any;
+    giaEllipticityOfDate?: boolean;
 }): Model;
 export type Constants = Record<string, unknown> & {
     hash?: string;
