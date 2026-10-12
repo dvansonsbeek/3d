@@ -135,7 +135,9 @@ const deltaTStart = K.earthOrbital.deltaTStart;                       // Delta-T
 
 
 // ─── E1. Early derived (needed before ASTRO_REFERENCE) ───────────────────
-let   perihelionCycleLength = holisticyearLength / 16;  // Phase 6: mutable (Tier 1 — math-critical, used by computeEccentricityEarth every frame)
+// (plan 09 step 4b: perihelionCycleLength = H/16 — the device's perihelion
+// period — is deleted; the perihelion-of-date period is the lunisolar
+// surface's T_peri, _periOfDatePeriodYearsJ2000() / lunisolar.periOfDatePeriodYearsAtYear)
 // Plan 09: the IAU J2000 mean tropical year (the calendar's year axis); the era
 // device's rounding of the input onto 1/(H/8) of a day (+1.2 s) is deleted.
 let   meansolaryearlengthinDays = K.yearLengthRef.tropicalYearMean;  // Phase 1: mutable for deep-time mode
@@ -1012,8 +1014,9 @@ let   meanSiderealday = (meansolaryearlengthinDays/(meansolaryearlengthinDays+1)
 let   meanStellarday = NaN;  // Phase 6: mutable (Tier 2) — set by recomputeDerivedAnchorsForEpoch on the certified precession period (the Direct laws are not initialised at this line; no consumer reads it before that call)
 // --- Coin rotation offsets (derived from day/year lengths and precession cycles) ---
 // Perihelion coin rotation: 1 extra solar day over H/16 cycle
-let   perihelionCoinRotationMs = (meanlengthofday / (holisticyearLength / 16)) / meansolaryearlengthinDays * 1000;  // Phase 6: mutable (Tier 2)
-let   perihelionCoinRotationYearlySeconds = perihelionCoinRotationMs * meansolaryearlengthinDays / 1000;  // Phase 6: mutable (Tier 2)
+// (plan 09 step 4b: perihelionCoinRotationMs / …YearlySeconds on H/16 are
+// deleted; the solar-day scan derives the perihelion coin rotation from the
+// displayed perihelion-of-date period, predictions.perihelionPrecession)
 // Axial coin rotation: 1 extra sidereal day per precession period T_p (S5: the
 // composed clock, not the counter H/13). Set by recomputeDerivedAnchorsForEpoch —
 // the Direct laws are not initialised at this line; no consumer reads it before.
@@ -1107,7 +1110,8 @@ const ascNodeTiltCorrection = {
 
 // --- 9c. Speeds & distances ---
 const speedofSuninKM = (currentAUDistance*2*Math.PI)/(meansiderealyearlengthinSeconds/60/60);
-let   earthPerihelionICRFYears = holisticyearLength/3;  // Phase 6: mutable (Tier 2)
+// (plan 09 step 4b: earthPerihelionICRFYears = H/3 is deleted; the perihelion
+// gauge's Earth row reads the J2000 apsidal period, _apsidalPeriodYearsJ2000())
 
 // Deep-time mode helpers. When DEEP_TIME_MODE_ENABLED is OFF (production parity),
 // cardinal-scan approxJDs and the sidereal-day-LOD factor revert to pre-Phase-9
@@ -2760,6 +2764,25 @@ function dLodDtDecompositionAtAge(t_Ma) {
 // retired year combs' beat at 2000 (25,771.395) is gone with the combs.
 function _certifiedAxialPrecessionJ2000Years() {
   return 1296000 / K.earthOrbital.generalPrecessionJ2000_arcsecPerYr;
+}
+/** The J2000 apsidal period T_aps (the perihelion against the stars), Julian
+ *  years, as the IAU J2000 year INPUTS state it: the beat of the anomalistic
+ *  and sidereal years, anom·sid/((anom − sid)·365.25 d) ≈ 111,600 yr (plan 09
+ *  step 4b — the device's H/3 = 111,772 read it 0.15 % high; the one-family's
+ *  apsidal line of date at 2000 reads 111,634, 0.03 % off — that of-date
+ *  family is the Predictions panel's Apsidal row). Built from constants only,
+ *  so the load-time GUI tables may read it (the package model is not). */
+function _apsidalPeriodYearsJ2000() {
+  const a = K.yearLengthRef.anomalisticYear, s = K.yearLengthRef.siderealYear;
+  return a * s / ((a - s) * 365.25);
+}
+/** The J2000 perihelion-of-date period T_peri = 1/(1/T_p + 1/T_aps), Julian
+ *  years, on the IAU inputs above and the certified p_A period (plan 09 step
+ *  4b — the device's H/16 = 20,957 read this quantity 0.1 % high). Search
+ *  priors, the perihelion calendar and the diagnostics tables read it; the
+ *  of-date value is the Predictions panel's Perihelion row. */
+function _periOfDatePeriodYearsJ2000() {
+  return 1 / (1 / _certifiedAxialPrecessionJ2000Years() + 1 / _apsidalPeriodYearsJ2000());
 }
 /** Axial-precession period at age t_Ma, years: the composed lunisolar clock
  *  (ONE home, @essrt/physics precession-composed via the factory); its J2000
@@ -4444,12 +4467,12 @@ function recomputeEpochAnchors(t_Ma) {
 // Re-derives 13 Earth-cycle anchors that downstream code (notably
 // `computeEccentricityEarth` called every frame) reads as identifiers.
 //
-// Tier 1 (math-critical): perihelionCycleLength, balancedYear,
-//   perihelionPhaseOffset (plan 07 R6: _eccentricityAnchor — the K law's
-//   System-Reset anchor — went with that law)
-// Tier 2 (display): meanearthRotationsinDays, earthPerihelionICRFYears,
-//   meanSiderealday, meanStellarday, perihelionCoinRotationMs(+Yearly),
-//   axialCoinRotationMs(+Yearly), meanAnomalisticYearinDays
+// Tier 1 (math-critical): balancedYear, perihelionPhaseOffset (plan 07 R6:
+//   _eccentricityAnchor — the K law's System-Reset anchor — went with that
+//   law; plan 09 step 4b: perihelionCycleLength, the device's H/16, went too)
+// Tier 2 (display): meanearthRotationsinDays, meanSiderealday, meanStellarday,
+//   axialCoinRotationMs(+Yearly) (plan 09: earthPerihelionICRFYears,
+//   perihelionCoinRotationMs(+Yearly) and the H/16 anomalistic identity left)
 //
 // All assignments are pure derivations from already-mutable anchors
 // (holisticyearLength, meansolaryearlengthinDays, meanlengthofday) plus
@@ -4462,7 +4485,6 @@ function recomputeEpochAnchors(t_Ma) {
 // until setEpochByAge wires it in.
 function recomputeDerivedAnchorsForEpoch(t_Ma) {
   // Tier 1 — math-critical (ordered by dependency)
-  perihelionCycleLength = holisticyearLength / 16;
   balancedYear          = 2000;   // plan 07 R10: J2000 by construction
   // Phase 9.10c: uses BALANCED_YEAR_J2000_FIXED + PERIHELION_CYCLE_LENGTH_J2000_FIXED so the
   // reference phase stays anchored at J2000 even when this dormant updater is activated and
@@ -4473,13 +4495,10 @@ function recomputeDerivedAnchorsForEpoch(t_Ma) {
 
   // Tier 2 — display-only re-derivations
   meanearthRotationsinDays  = meansolaryearlengthinDays + 1;
-  earthPerihelionICRFYears  = holisticyearLength / 3;
   meanSiderealday           = (meansolaryearlengthinDays / (meansolaryearlengthinDays + 1)) * meanlengthofday;
   // S5: the equinox regresses one turn per T_p(t) — the composed lunisolar period
   // (its J2000 anchor 25,771.4 yr), NOT the counter H/13 (0.086 % slow; 7 µs here).
   meanStellarday            = (meanSiderealday / _axialPrecessionPeriodYearsAtAge(t_Ma)) / (meansolaryearlengthinDays + 1) * STELLAR_DAY_RA_PROJECTION + meanSiderealday;
-  perihelionCoinRotationMs  = (meanlengthofday / (holisticyearLength / 16)) / meansolaryearlengthinDays * 1000;
-  perihelionCoinRotationYearlySeconds = perihelionCoinRotationMs * meansolaryearlengthinDays / 1000;
   // NOT projected by STELLAR_DAY_RA_PROJECTION, unlike meanStellarday above:
   // this counts one extra sidereal day per axial precession cycle, a structural
   // count on the ecliptic lattice, so the H/13 longitude rate is the right one.
@@ -8809,6 +8828,7 @@ let predictions = {
   dLodDtNetL4_msCy: 0,     // Layer 4 net = tidal + gia + stack + resonator (= L3 when resonator OFF)
   siderealDayReal: 0,
   stellarDayReal: 0,
+  eclipticPrecession: 0,   // the Predictions pane binds this key at setup — it needs a number before the first update
   predictedDeltat: 0,
   predictedDeltatPerYear: 0,
   solarYearDays: 0,
@@ -8828,8 +8848,6 @@ let predictions = {
   lunisolarApsidalPerPrecession: 0,
   lunisolarPeriOfDatePerPrecession: 0,
   inclinationPrecession: 0,
-  obliquityPrecession: 0,
-  eclipticPrecession: 0,
   eccentricityEarth: 0,
   obliquityEarth: 0,
   earthInvPlaneInclinationDynamic: 0,
@@ -15945,7 +15963,7 @@ const ESSRT_QTY_SPECS = {
     yFmt:     (v) => Math.round(v).toLocaleString('en-US') + ' yr',
     yMin: 0, yMax: 65000,
     hasWu:    false,
-    footnote: 'Note: Earth\'s axial tilt oscillates between approximately 22.4° and 24.5° around a stable mean ~23.4°. The cycle period (shown here, ∝ H) evolves with deep time; the mean stays essentially fixed.',
+    footnote: 'Note: Earth\'s axial tilt oscillates between approximately 22.4° and 24.5° around a stable mean ~23.4°. The cycle period (shown here — the beat of the spin axis\'s inertial rate against the dominant nodal mode) evolves with deep time; the mean stays essentially fixed.',
   },
   au: {
     title:    'Earth-Sun Distance',
@@ -24011,7 +24029,7 @@ function setupGUI() {
   const periPlanets = [
     ['mercury', 'mercuryPerihelionEcliptic', 'Mercury', planets.mercury.perihelionEclipticYears],
     ['venus', 'venusPerihelionEcliptic', 'Venus', planets.venus.perihelionEclipticYears],
-    ['earth', 'earthPerihelionEcliptic', 'Earth', earthPerihelionICRFYears],
+    ['earth', 'earthPerihelionEcliptic', 'Earth', _apsidalPeriodYearsJ2000()],   // plan 09 step 4b: the J2000 apsidal period (was the device's H/3)
     ['mars', 'marsPerihelionEcliptic', 'Mars', planets.mars.perihelionEclipticYears],
     ['jupiter', 'jupiterPerihelionEcliptic', 'Jupiter', planets.jupiter.perihelionEclipticYears],
     ['saturn', 'saturnPerihelionEcliptic', 'Saturn', planets.saturn.perihelionEclipticYears],
@@ -24664,7 +24682,7 @@ function setupGUI() {
   const fmt2 = v => v.toFixed(2);
   addTooltip(precessionFolder.addBinding(predictions, 'perihelionPrecession', {
     label: 'Perihelion (yrs)', readonly: true, format: fmt2
-  }), 'Time for Earth\'s perihelion direction to complete one revolution vs the equinox. Beat of the DISPLAYED year rows: anom_sec / (anom_sec \u2212 tropical_sec) \u2014 one-source (dynamical, of date) when the movement is on. Frozen-clock counter: ' + Math.round(holisticyearLength / 16).toLocaleString('en-US') + ' yr.');
+  }), 'Time for Earth\'s perihelion direction to complete one revolution vs the equinox. Beat of the DISPLAYED year rows: anom_sec / (anom_sec \u2212 tropical_sec) \u2014 one-source (dynamical, of date) when the movement is on.');
   // SIGN CONVENTION (panel-wide, owner-ruled): prograde positive,
   // retrograde negative. The axial/equinox precession is RETROGRADE, so
   // it DISPLAYS negative (format-level negation only \u2014 the internal
@@ -24672,16 +24690,16 @@ function setupGUI() {
   // derived-beat row and the CYCLES axial row consume it).
   addTooltip(precessionFolder.addBinding(predictions, 'axialPrecession', {
     label: 'Axial (yrs)', readonly: true, format: (v) => fmt2(-v)
-  }), 'Time for Earth\'s rotation axis to trace one full cone (precession of the equinoxes). Negative = RETROGRADE (the equinox regresses) \u2014 the panel-wide sign convention: prograde +, retrograde \u2212. Beat of the DISPLAYED year rows: sid_sec / (sid_sec \u2212 tropical_sec) \u2014 one-source (matches the Axial Precession chart, \u2248 25,771.4 at J2000). Frozen-clock counter: ' + Math.round(holisticyearLength / 13).toLocaleString('en-US') + ' yr (the anchor ratio, not a period).');
+  }), 'Time for Earth\'s rotation axis to trace one full cone (precession of the equinoxes). Negative = RETROGRADE (the equinox regresses) \u2014 the panel-wide sign convention: prograde +, retrograde \u2212. Beat of the DISPLAYED year rows: sid_sec / (sid_sec \u2212 tropical_sec) \u2014 one-source (matches the Axial Precession chart, \u2248 25,771.6 at J2000 \u2014 the IAU 2006 p_A period).');
   // The obliquity row (H/8 structural constant, 41,914.63 yr) was removed
   // from the panel (owner, panel review): a fixed lattice identity, not a
   // measured prediction \u2014 it lives in the Reports charts and the registry.
   addTooltip(precessionFolder.addBinding(predictions, 'inclinationPrecession', {
     label: 'Apsidal (yrs)', readonly: true, format: fmt2
-  }), 'APSIDAL precession \u2014 time for Earth\'s perihelion to complete one revolution against the fixed stars. Beat of the DISPLAYED year rows: anom_sec / (anom_sec \u2212 sid_sec) \u2014 one-source (dynamical, of date; hypersensitive: \u00b11 s of year length moves this \u2248 400 yr). The one law\'s fixed apsidal carrier (' + Math.round(holisticyearLength / 3).toLocaleString('en-US') + ' yr) is the second route. (The historical label "inclination precession" came from the retired assumption tying the inclination cycle to this period \u2014 the orbital PLANE\'s precession is the separate nodal story, the CYCLES-tab chart.)');
+  }), 'APSIDAL precession \u2014 time for Earth\'s perihelion to complete one revolution against the fixed stars. Beat of the DISPLAYED year rows: anom_sec / (anom_sec \u2212 sid_sec) \u2014 one-source (dynamical, of date; hypersensitive: \u00b11 s of year length moves this \u2248 400 yr). (The historical label "inclination precession" came from the retired assumption tying the inclination cycle to this period \u2014 the orbital PLANE\'s precession is the separate nodal story, the CYCLES-tab chart.)');
   addTooltip(precessionFolder.addBinding(predictions, 'eclipticPrecession', {
     label: 'Ecliptic Cycle (yrs)', readonly: true, format: fmt2
-  }), 'NODAL precession \u2014 the engine\u2019s of-date tangent of Earth\u2019s orbital-plane node ON the invariable plane (\u00b1150-yr central difference of the chain\u2019s node of date; the same evaluator as the Positions-panel Period cell). Negative = retrograde regression. Stable deep-time base: the dominant nodal mode s\u2083, ' + Math.round(1296000 / CHAIN_ARTIFACT.s.earth.arcsecPerYr).toLocaleString('en-US') + ' yr (nearest-Laskar label, never an input). The frozen clock\u2019s fixed nodal counter (' + Math.round(holisticyearLength / 5).toLocaleString('en-US') + ' yr) is the second route.');
+  }), 'NODAL precession \u2014 the engine\u2019s of-date tangent of Earth\u2019s orbital-plane node ON the invariable plane (\u00b1150-yr central difference of the chain\u2019s node of date; the same evaluator as the Positions-panel Period cell). Negative = retrograde regression. Stable deep-time base: the dominant nodal mode s\u2083, ' + Math.round(1296000 / CHAIN_ARTIFACT.s.earth.arcsecPerYr).toLocaleString('en-US') + ' yr (nearest-Laskar label, never an input).');
 
   // Plan 06 Phase 3 S3 — the lunisolar clock as a first-class panel surface.
   const lunisolarFolder = astroFolder.addFolder({ title: 'Lunisolar Clock', expanded: false });
@@ -32991,11 +33009,13 @@ function setupGUI() {
       const SATURN_PERIOD    = 29.4570;
       const J_S_SYNODIC      = 1.0 / (1.0/JUPITER_PERIOD - 1.0/SATURN_PERIOD);  // ≈ 19.85 yr
       const GREAT_CONJ_TRIGON = 3 * J_S_SYNODIC;   // ≈ 59.55 yr
-      const EARTH_PERI_ICRF  = H_YR / 16.0;         // H/16 perihelion cycle
-      const EARTH_PERI_ECL   = EIGHT_H_YR / 11.0;   // 8H/11 Mercury perihelion ecl.
-      const JUPITER_PERI_ECL = EIGHT_H_YR / 39.0;   // 8H/39 Jupiter perihelion ecl.
-      const SATURN_PERI_ECL  = EIGHT_H_YR / 65.0;   // 8H/65 Saturn perihelion ecl. (retrograde)
-      const AXIAL_PREC       = H_YR / 13.0;         // H/13 axial precession
+      // plan 09 step 4b: the physical periods, not the device's H/N lines
+      // (H/16, 8H/11, 8H/39, 8H/65, H/13 read them 0.09…2 % off)
+      const EARTH_PERI_OF_DATE = _periOfDatePeriodYearsJ2000();                 // T_peri, the perihelion against the equinox
+      const MERCURY_PERI_ECL = planets.mercury.perihelionEclipticYears;         // the chain's inertial apsidal period 1,296,000/g
+      const JUPITER_PERI_ECL = Math.abs(planets.jupiter.perihelionEclipticYears);
+      const SATURN_PERI_ECL  = Math.abs(planets.saturn.perihelionEclipticYears); // (retrograde)
+      const AXIAL_PREC       = _certifiedAxialPrecessionJ2000Years();          // T_p, the IAU p_A period
 
       const INTERPRETATIONS = [
         ['Jupiter orbit',                       JUPITER_PERIOD],
@@ -33006,9 +33026,9 @@ function setupGUI() {
         ['Jose 179',                            179.0],
         ['de Vries 210',                        210.0],
         ['Bond 1470',                           1470.0],
-        ['Earth ICRF perihelion (H/16)',        EARTH_PERI_ICRF],
-        ['Earth axial precession (H/13)',       AXIAL_PREC],
-        ['Earth ecliptic perihelion',   EARTH_PERI_ECL],
+        ['Earth perihelion of date (T_peri)',   EARTH_PERI_OF_DATE],
+        ['Earth axial precession (T_p)',        AXIAL_PREC],
+        ['Mercury ecliptic perihelion', MERCURY_PERI_ECL],
         ['Jupiter ecliptic perihelion', JUPITER_PERI_ECL],
         ['Saturn ecliptic perihelion',  SATURN_PERI_ECL],
       ];
@@ -35706,7 +35726,7 @@ function perihelionForYear(year, debug = false, prevPerihelionJD = null) {
     // First search: estimate perihelion position accounting for precession
     // At perihelionalignmentYear (1246), perihelion is in early January (~0.03 into year)
     // Perihelion precesses through the year over H/16 years
-    const perihelionCycle = holisticyearLength / 16;  // H/16 years
+    const perihelionCycle = _periOfDatePeriodYearsJ2000();  // the perihelion-of-date period T_peri (plan 09 step 4b; was H/16)
     const perihelionAtReference = 0.03;  // Fraction of year (early January at 1246)
 
     // Calculate how much perihelion has shifted from reference year
@@ -35844,7 +35864,7 @@ function perihelionForYearMethodB(year, debug = false, prevPerihelionJD = null) 
     // First search: estimate perihelion position accounting for precession
     // At perihelionalignmentYear (1246), perihelion is in early January (~0.03 into year)
     // Perihelion precesses through the year over H/16 years
-    const perihelionCycle = holisticyearLength / 16;  // H/16 years
+    const perihelionCycle = _periOfDatePeriodYearsJ2000();  // the perihelion-of-date period T_peri (plan 09 step 4b; was H/16)
     const perihelionAtReference = 0.03;  // Fraction of year (early January at 1246)
 
     // Calculate how much perihelion has shifted from reference year
@@ -35945,7 +35965,7 @@ function aphelionForYearMethodB(year, debug = false, prevAphelionJD = null) {
     // First search: estimate aphelion position accounting for precession
     // Aphelion is 180° (0.5 year) opposite to perihelion
     // At perihelionalignmentYear (1246), perihelion is at ~0.03 into year, so aphelion is at ~0.53
-    const perihelionCycle = holisticyearLength / 16;  // H/16 years
+    const perihelionCycle = _periOfDatePeriodYearsJ2000();  // the perihelion-of-date period T_peri (plan 09 step 4b; was H/16)
     const aphelionAtReference = 0.53;  // Fraction of year (early July at 1246)
 
     // Calculate how much aphelion has shifted from reference year
@@ -36048,7 +36068,7 @@ function aphelionForYear(year, debug = false, prevAphelionJD = null) {
   } else {
     // First search: estimate aphelion position accounting for precession
     // At perihelionalignmentYear (1246), perihelion is at ~0.03 into year, so aphelion is at ~0.53
-    const perihelionCycle = holisticyearLength / 16;  // H/16 years
+    const perihelionCycle = _periOfDatePeriodYearsJ2000();  // the perihelion-of-date period T_peri (plan 09 step 4b; was H/16)
     const aphelionAtReference = 0.53;  // Fraction of year (early July at 1246)
 
     // Calculate how much aphelion has shifted from reference year
@@ -36865,13 +36885,15 @@ async function runYearAnalysisExport(years) {
     // year, in the same three steps the tweakpane uses:
     //   kinematic  = IAU sidereal-year seconds / epoch sidereal-year days
     //                (identical to o.lodKinematic, but evaluated per row)
-    //   + H/5      = the kinematic H/5 term
+    //   + nodal    = h5Correction(year), the ecliptic-turn term on the nodal
+    //                period 1,296,000/|s₃| (plan 06 T2; plan 09 step 4b routed
+    //                this row to it — its private H/5 copy sat 3.5 ms off the pane)
     //   real       = + the 4-flag ΔT stack and core-mantle swing
     //                (dtCycleLodCorrectionSum) — the production value, i.e.
     //                what the tweakpane shows as Solar Day = REAL.
     const derivedDayLength  = _lodKinematicSecondsOfDate(year);   // plan 09: the Layer-0 tidal mean (ω₀ at J2000)
     const lodRealRow        = derivedDayLength +
-      derivedDayLength / ((holisticyearLength / 5) * meansolaryearlengthinDays) +
+      h5Correction(year) +
       dtCycleLodCorrectionSum(year);
     // Sidereal and stellar day use the SAME formulas as the tweakpane
     // (predictions.siderealDayReal / stellarDayReal), evaluated at this row's
@@ -38748,8 +38770,9 @@ async function analyzeAnoministicYear(startYear, endYear) {
 
   const iauAnomalistic = ASTRO_REFERENCE.anomalisticYearJ2000;
 
-  // Calculate theoretical anomalistic year from perihelion precession rate
-  const perihelionPrecessionYears = holisticyearLength / 16;  // H/16 years
+  // Theoretical anomalistic year from the J2000 perihelion-of-date period
+  // T_peri (plan 09 step 4b; the device's H/16 read it 0.09 % high, 0.3 s of year)
+  const perihelionPrecessionYears = _periOfDatePeriodYearsJ2000();
   const theoreticalAnomalistic = meansolaryearlengthinDays * perihelionPrecessionYears / (perihelionPrecessionYears - 1);
 
   console.log('');
@@ -38774,10 +38797,10 @@ async function analyzeAnoministicYear(startYear, endYear) {
   console.log('╠═══════════════════════════════════════════════════════════════════════════════════════════════════════╣');
   console.log(`║ IAU anomalistic year (J2000)                    │ ${iauAnomalistic.toFixed(9)}    │ (reference)                    ║`);
   console.log('╠═══════════════════════════════════════════════════════════════════════════════════════════════════════╣');
-  console.log('║ THEORETICAL (HY/16 Formula)                                                                           ║');
+  console.log('║ THEORETICAL (T_peri formula)                                                                          ║');
   console.log('╠═══════════════════════════════════════════════════════════════════════════════════════════════════════╣');
   const theorDiff = (theoreticalAnomalistic - iauAnomalistic) * 86400;
-  console.log(`║ Formula (HY/16 = ${perihelionPrecessionYears} yrs)                   │ ${theoreticalAnomalistic.toFixed(9)}    │ ${theorDiff >= 0 ? '+' : ''}${theorDiff.toFixed(2)} seconds               ║`);
+  console.log(`║ Formula (T_peri = ${perihelionPrecessionYears.toFixed(1)} yr)              │ ${theoreticalAnomalistic.toFixed(9)}    │ ${theorDiff >= 0 ? '+' : ''}${theorDiff.toFixed(2)} seconds               ║`);
   console.log('╠═══════════════════════════════════════════════════════════════════════════════════════════════════════╣');
   console.log('║ FRAME COMPARISON                                                                                      ║');
   console.log('╠═══════════════════════════════════════════════════════════════════════════════════════════════════════╣');
@@ -38786,7 +38809,7 @@ async function analyzeAnoministicYear(startYear, endYear) {
   console.log(`║ Perihelion: Earth-Frame - WobbleCenter          │ ${periMethodDiff >= 0 ? '+' : ''}${periMethodDiff.toFixed(2)} seconds                                          ║`);
   console.log(`║ Aphelion:   Earth-Frame - WobbleCenter          │ ${apheMethodDiff >= 0 ? '+' : ''}${apheMethodDiff.toFixed(2)} seconds                                          ║`);
   console.log(`║ (Negative = Earth wobble shifts detection EARLIER than inertial frame)                               ║`);
-  console.log(`║ This offset oscillates over the H/13 (${Math.round(holisticyearLength/13).toLocaleString('en-US')}) year axial precession cycle.                              ║`);
+  console.log(`║ This offset oscillates over the axial precession cycle T_p (${Math.round(_certifiedAxialPrecessionJ2000Years()).toLocaleString('en-US')} yr).                              ║`);
   console.log('╚═══════════════════════════════════════════════════════════════════════════════════════════════════════╝');
 
   // Debug output suppressed - first 3 JD values available in returned object
@@ -42061,8 +42084,10 @@ async function analyzeSolarDayMultiEpoch() {
 
   for (let i = 0; i < numPoints; i++) {
     const epochYear = Math.round(startEpoch + i * stepYears);
-    const periPhase = ((epochYear - perihelionalignmentYear) % (holisticyearLength / 16)) / (holisticyearLength / 16);
-    // Normalize phase to [-0.5, 0.5]
+    // Perihelion phase (plan 09 step 4b): the series' ϖ of date against the
+    // December solstice (270° — the 1246 AD alignment), in cycles, normalized
+    // to [-0.5, 0.5] (was the elapsed count on the device's H/16 since 1246).
+    const periPhase = ((_hybridSeriesSampleAt(epochYear).periOfDateDeg - 270) / 360) % 1;
     const normalizedPhase = periPhase > 0.5 ? periPhase - 1 : (periPhase < -0.5 ? periPhase + 1 : periPhase);
 
     console.log(`═══════════════════════════════════════════════════════════════════════════`);
@@ -42145,23 +42170,26 @@ async function analyzeSolarDayMultiEpoch() {
     console.log('');
 
     // Predicted values
+    // plan 09 step 4b: the coin rotations ride the DISPLAYED periods — the
+    // engine's nodal period (Ecliptic Cycle row, retrograde: |T|) and the
+    // perihelion-of-date beat (Perihelion row) — not the device's H/5, H/16.
     const predictedAxial = axialCoinRotationMs;
-    const predictedEcliptic = (meanlengthofday / (holisticyearLength / 5)) / meansolaryearlengthinDays * 1000;
+    const predictedEcliptic = (meanlengthofday / Math.abs(predictions.eclipticPrecession)) / meansolaryearlengthinDays * 1000;
     const predictedTotal = predictedAxial + predictedEcliptic;
-    const predictedPerihelion = perihelionCoinRotationMs;
+    const predictedPerihelion = (meanlengthofday / predictions.perihelionPrecession) / meansolaryearlengthinDays * 1000;
 
     console.log('═══════════════════════════════════════════════════════════════════════════');
     console.log('THEORETICAL DECOMPOSITION');
     console.log('═══════════════════════════════════════════════════════════════════════════');
-    console.log(`  Axial coin rotation (H/13):      ${predictedAxial.toFixed(3)} ms/day`);
-    console.log(`  Ecliptic coin rotation (H/5):    ${predictedEcliptic.toFixed(3)} ms/day`);
+    console.log(`  Axial coin rotation (T_p):       ${predictedAxial.toFixed(3)} ms/day`);
+    console.log(`  Ecliptic coin rotation (nodal):  ${predictedEcliptic.toFixed(3)} ms/day`);
     console.log(`  Predicted mean (axial+ecliptic): -${predictedTotal.toFixed(3)} ms/day`);
     console.log(`  Measured mean (Method A):        ${meanOffsetA.toFixed(3)} ms/day`);
     console.log(`  Difference (measured-predicted):  ${(meanOffsetA + predictedTotal).toFixed(3)} ms/day`);
     console.log('');
-    console.log(`  Perihelion coin rotation (H/16): ${predictedPerihelion.toFixed(3)} ms/day`);
+    console.log(`  Perihelion coin rotation (T_peri): ${predictedPerihelion.toFixed(3)} ms/day`);
     console.log(`  Note: perihelion effect should appear as sinusoidal modulation`);
-    console.log(`  with period H/16 and cancel out in the mean over a full H.`);
+    console.log(`  with period T_peri and cancel out in the mean over the scan.`);
 
     // Accumulation
     const meanOffsetSecondsPerYear = meanOffsetA * meansolaryearlengthinDays / 1000;
@@ -42172,7 +42200,7 @@ async function analyzeSolarDayMultiEpoch() {
     console.log(`  Mean offset:    ${meanOffsetA.toFixed(3)} ms/day`);
     console.log(`  Per year:       ${meanOffsetSecondsPerYear.toFixed(4)} s/year`);
     console.log(`  Over H years:   ${(meanOffsetSecondsPerYear * holisticyearLength / 86400).toFixed(3)} days`);
-    console.log(`  Over H/13:      ${(meanOffsetSecondsPerYear * (holisticyearLength / 13) / 86400).toFixed(3)} days`);
+    console.log(`  Over T_p:       ${(meanOffsetSecondsPerYear * _certifiedAxialPrecessionJ2000Years() / 86400).toFixed(3)} days`);
     console.log('═══════════════════════════════════════════════════════════════════════════');
   }
 
@@ -42472,9 +42500,9 @@ function stellarNoonMethodD(startJD, debug = false) {
  * where precession_factor accounts for the equinox drift
  */
 function stellarDayMethodC_Derived(siderealDaySeconds) {
-  // Precession period in years (from model constant)
-  // Earth's axial precession period is holisticyearLength/13
-  const precessionPeriodYears = holisticyearLength / 13;
+  // Precession period in years: the certified J2000 axial precession period
+  // T_p = 1,296,000/p_A (plan 09 step 4b; the device's H/13 read 25,794, 0.086 % high)
+  const precessionPeriodYears = _certifiedAxialPrecessionJ2000Years();
 
   // How much shorter is stellar day than sidereal day?
   // In one precession cycle, the equinox shifts by 360°
@@ -45768,7 +45796,7 @@ const planetStats = {
     {header : '—  Perihelion Precession (apsidal · g) —' },
       {label : () => `Perihelion Precession Duration against Ecliptic`,
        value : [ { v: () => _kcApsidalPeriodYears('earth', o.julianDay), dec:2, sep:',', infinity: 1e9 },{ small: 'years' }],
-       hover : () => { const _s = _kcSecularShape('earth'); return [`Period for Earth's perihelion to complete one revolution against the fixed stars — the ONE movement's own apsidal rate of date (the scene's apsidal wheel; the year-over-year advance of the series' ϖ, the same family as the anomalistic year, so anom/(anom − sid) reproduces this number exactly; the SAME evaluator as the Prec. cell under Perihelion Longitudes). Julian years. The one law's fixed apsidal carrier (${fmtNum(holisticyearLength/3,0,',')} yr) is the second route: the ~0.15% gap between the two is a measured tension, kept visible and anchored to neither. Stable deep-time base: the dominant secular mode ${_s.dom.g[0]} (borrowed from Jupiter), ${Math.round(1296000/_s.dom.arcsecPerYr).toLocaleString('en-US')} yr.`]; },
+       hover : () => { const _s = _kcSecularShape('earth'); return [`Period for Earth's perihelion to complete one revolution against the fixed stars — the ONE movement's own apsidal rate of date (the scene's apsidal wheel; the year-over-year advance of the series' ϖ, the same family as the anomalistic year, so anom/(anom − sid) reproduces this number exactly; the SAME evaluator as the Prec. cell under Perihelion Longitudes). Julian years. Stable deep-time base: the dominant secular mode ${_s.dom.g[0]} (borrowed from Jupiter), ${Math.round(1296000/_s.dom.arcsecPerYr).toLocaleString('en-US')} yr.`]; },
        highlight: true},
       {label : () => `Axial precession period`,
        value : [ { v: () => -predictions.axialPrecession, dec:2, sep:',' },{ small: 'years' }],
@@ -45794,7 +45822,7 @@ const planetStats = {
        hover : [`The third eccentricity beat from the SAME T5-gated deep verdict — the classical ~95-kyr line of the Milankovitch short-eccentricity band. With the 124-kyr companion above it composes the ~100-kyr eccentricity envelope around the 405.6-kyr metronome.`]},
       {label : () => `Nodal Precession Period`,
        value : [ { v: () => _kcNodeInvPlanePeriodYears('earth', o.julianDay), dec:2, sep:',', infinity: 1e9 },{ small: 'years' }],
-       hover : () => { const _s = CHAIN_ARTIFACT.s.earth; return [`The engine's of-date tangent of Earth's orbital-plane node ON the invariable plane (±150-yr central difference of the chain's node of date — the same evaluator as the Predictions panel's Ecliptic Cycle row and the Positions-panel Period cell). Negative = retrograde regression (the panel-wide sign convention: prograde +, retrograde −). Stable deep-time base: the dominant nodal mode ${_s.nearestLaskar.mode}, ${Math.round(1296000/_s.arcsecPerYr).toLocaleString('en-US')} yr — the cycle the chart below draws. The frozen clock's fixed nodal counter (${fmtNum(holisticyearLength/5,0,',')} yr) is the second route.`]; }},    null,
+       hover : () => { const _s = CHAIN_ARTIFACT.s.earth; return [`The engine's of-date tangent of Earth's orbital-plane node ON the invariable plane (±150-yr central difference of the chain's node of date — the same evaluator as the Predictions panel's Ecliptic Cycle row and the Positions-panel Period cell). Negative = retrograde regression (the panel-wide sign convention: prograde +, retrograde −). Stable deep-time base: the dominant nodal mode ${_s.nearestLaskar.mode}, ${Math.round(1296000/_s.arcsecPerYr).toLocaleString('en-US')} yr — the cycle the chart below draws.`]; }},    null,
     null,
       { viz: 'perihelion-chart', planet: 'earth' },
     null,
@@ -54009,16 +54037,14 @@ function updatePredictions() {
   predictions.inclinationPrecession = _hybridSpinActive()
     ? predictions.anomalisticYearSeconds * predictions.siderealYearSeconds / ((predictions.anomalisticYearSeconds - predictions.siderealYearSeconds) * _JY_S)
     : o.inclinationPrecession;
-  // Obliquity — pure H-lattice framework value (H/8), NOT axial × 13/8
-  // (the ratio form would inherit Fourier ripple from axialPrecession).
-  predictions.obliquityPrecession = o.obliquityPrecession = holisticyearLength / 8;
+  // (plan 09 step 4b: the device's obliquity period H/8 (41,915) and nodal
+  // counter H/5 (67,063) left the o.*/predictions machinery — no panel row
+  // read them; the obliquity beat of date is the Reports chart's
+  // _obliqBeatYearsAtAge / the package's lunisolar.obliquityBeatYearsAtYear.)
   // Ecliptic Cycle DISPLAY (owner-ruled 2026-09-15): the ENGINE's nodal
   // route — the of-date tangent of Earth's orbital-plane node ON the
   // invariable plane (±150-yr central difference; the same evaluator as
   // the Positions-panel Period cell; ≈ −79,560 at J2000, retrograde).
-  // The H/5 structural identity (67,063) stays the o.* machinery value
-  // and lives in the hover as the second route.
-  o.eclipticPrecession = holisticyearLength / 5;
   predictions.eclipticPrecession = _kcNodeInvPlanePeriodYears('earth', o.julianDay);
   
   // Note: obliquityEarth and eccentricityEarth are computed earlier (before solarYearDays/siderealYearDays) as they're needed for year length calculations.
@@ -55508,10 +55534,10 @@ function longitudeToDateTime(lonDeg, currentYear) {
  *
  * @param {number} day           — input day count (JD if julianday, or perihelion-day)
  * @param {'julianday'|'perihelionday'} inputKind
- * @param {number} cycleYears    — length of one cycle in Perihelion years (default 19122)
+ * @param {number} cycleYears    — length of one cycle in Perihelion years (default: the J2000 perihelion-of-date period T_peri; plan 09 step 4b, was H/16)
  * @returns {boolean}
  */
-function isPerihelionCycle(day, inputKind, cycleYears = (holisticyearLength/16)) {
+function isPerihelionCycle(day, inputKind, cycleYears = _periOfDatePeriodYearsJ2000()) {
   // 1) get the Perihelion‐calendar date
   const p = dayToDateNew(day, inputKind, 'perihelion-calendar');
   // p.date is "YYYY-MM-DD" or "-YYYY-MM-DD"
