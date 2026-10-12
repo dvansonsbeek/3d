@@ -212,7 +212,17 @@ const measured = {};
 if (M) {
   const YL = M.yearLengths;
   const lodS = (y) => DT.meanLodSecondsAtAge((2000 - y) / 1e6);
-  measured['kinematic-year-family'] = { unit: 's of year (device − law: tropical / sidereal / anomalistic)', rows: EPOCHS.map((y) => { const k = DT.computeYearDaysDirectAll(y), L = lodS(y); return { year: y, tropical: k.tropical * L - YL.tropicalYearSecondsAtYear(y), sidereal: k.sidereal * L - YL.siderealYearSecondsAtYear(y), anomalistic: k.anomalistic * L - YL.anomalisticYearSecondsAtYear(y) }; }) };
+  // plan 09 step 3: the year combs are deleted — FROZEN record of the last measurement before deletion
+  // (device − law, s of year), kept so the artifact still states what the routing moved.
+  void lodS; void YL;
+  measured['kinematic-year-family'] = { unit: 's of year (device − law: tropical / sidereal / anomalistic) — recorded before the combs\' deletion at plan 09 step 3; the combs no longer evaluate', rows: [
+    { year: 2000, tropical: -0.18364283442497253, sidereal: -0.15741310641169548, anomalistic: -0.31728624179959297 },
+    { year: -4000, tropical: -9.711671400815248, sidereal: 0.4510342739522457, anomalistic: 17.732564590871334 },
+    { year: 10000, tropical: 10.76361058279872, sidereal: -0.7273695729672909, anomalistic: -28.574370343238115 },
+    { year: -26000, tropical: 45.73209993541241, sidereal: 1.0313979387283325, anomalistic: 153.2601317949593 },
+    { year: -270000, tropical: 44.74587011709809, sidereal: 0.6040267795324326, anomalistic: 314.1274871490896 },
+    { year: -1000000, tropical: -8.379667393863201, sidereal: 4.573813807219267, anomalistic: 129.21708285063505 },
+  ] };
   // plan 09 step 2: the comb is deleted, so this row is the FROZEN record of the
   // last measurement before deletion (the comb against the hybrid, ″), kept so
   // the artifact still states what the routing moved.
@@ -227,7 +237,8 @@ if (M) {
   const integ = (f, a, b) => { const step = Math.max(50, Math.abs(b - a) / 4000); let s = 0; for (let y = Math.min(a, b); y < Math.max(a, b); y += step) { const h = Math.min(step, Math.max(a, b) - y); s += 0.5 * (f(y) + f(y + h)) * h; } return s; };
   measured['era-counter'] = { unit: 'H/16 comb phase, ° (frozen counter − composed clock, integrated from J2000)', rows: EPOCHS.filter((y) => y !== 2000).map((y) => ({ year: y, deg: 16 * 360 * (integ((t) => 1 / Hera(t), 2000, y) - integ((t) => 1 / Hc(t), 2000, y)), ratioMinus1: Hera(y) / Hc(y) - 1 })) };
   measured['deep-calendar'] = { unit: 'days per year (era clock − composed)', rows: EPOCHS.map((y) => { const t = (2000 - y) / 1e6; const a = DT.eraClockYearInDaysAtAge(t), b = DT.meanYearInDaysAtAge(t); return { year: y, days: (a === null || b === null) ? null : a - b }; }) };
-  measured['lunar-counter'] = { unit: 's of month (device-quantized − IAU input)', rows: [{ year: 2000, sidereal: (CC.moonSiderealMonth - CC.moonSiderealMonthInput) * 86400 }] };
+  // plan 09 step 3: the 8H counts are deleted (the months are the IAU inputs) — FROZEN record of the last measurement
+  measured['lunar-counter'] = { unit: 's of month (device-quantized − IAU input) — recorded before the counts\' deletion at plan 09 step 3', rows: [{ year: 2000, sidereal: 0.007823650412319694 }] };
 }
 
 // the comb families that ride H as their unit (every row a matched pair with its runtime form)

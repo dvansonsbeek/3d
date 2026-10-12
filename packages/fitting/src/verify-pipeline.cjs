@@ -123,17 +123,8 @@ console.log(`  ✓ CARDINAL_POINT_HARMONICS: all 4 types match\n`);
 // ═══════════════════════════════════════════════════════════════════════════
 // 6. Verify YEAR_LENGTH harmonics
 // ═══════════════════════════════════════════════════════════════════════════
-console.log('═══ Step 6: YEAR_LENGTH harmonics consistency ═══');
-for (const name of ['TROPICAL_YEAR_HARMONICS', 'SIDEREAL_YEAR_HARMONICS', 'ANOMALISTIC_YEAR_HARMONICS']) {
-  const s = stored[name];
-  const f = fitted[name];
-  check(`${name} count`, f.length, s.length);
-  for (let i = 0; i < s.length; i++) {
-    check(`${name}[${i}] div`, f[i][0], s[i][0]);
-    check(`${name}[${i}] sin`, f[i][1], s[i][1]);
-    check(`${name}[${i}] cos`, f[i][2], s[i][2]);
-  }
-}
+console.log('═══ Step 6: YEAR_LENGTH harmonics — the combs deleted (plan 09); the year lengths of date are the one-family laws ═══');
+console.log('  ✓ YEAR_LENGTH: no combs to verify\n');
 console.log(`  ✓ YEAR_LENGTH harmonics: all 3 types match\n`);
 
 // (Step 7 — PARALLAX corrections consistency — retired with the K5
@@ -275,17 +266,6 @@ const astroRef = JSON.parse(fs.readFileSync(
   path.resolve(ROOT, 'public', 'input', 'astro-reference.json'), 'utf8'));
 const ylRef = astroRef.yearLengthRef;
 
-// Helper: evaluate Fourier series (same as script.js evalYearFourier)
-function evalFourier(year, mean, harmonics) {
-  const t = year - C.balancedYear;
-  let result = mean;
-  for (const [div, sinC, cosC] of harmonics) {
-    const phase = 2 * Math.PI * t / (C.H / div);
-    result += sinC * Math.sin(phase) + cosC * Math.cos(phase);
-  }
-  return result;
-}
-
 // Helpers: cardinal point year length and JD — the RUNTIME evaluators
 // themselves, not local mirrors. The previous hand-rolled snapshot forms here
 // drifted from the engines twice (pre-§10 sinusoid derivative, then the
@@ -328,19 +308,8 @@ console.log(`    RA=90° (SS): ${tropSS.toFixed(9)} d (IAU: ${ylRef.tropicalYear
 console.log(`    RA=180°(AE): ${tropAE.toFixed(9)} d (IAU: ${ylRef.tropicalYearAE} d, diff: ${((tropAE - ylRef.tropicalYearAE)*86400).toFixed(2)}s)`);
 console.log(`    RA=270°(WS): ${tropWS.toFixed(9)} d (IAU: ${ylRef.tropicalYearWS} d, diff: ${((tropWS - ylRef.tropicalYearWS)*86400).toFixed(2)}s)`);
 
-// ── Sidereal year at J2000 (from Fourier harmonics) ──
-const sidJ2000 = evalFourier(2000, C.meanSiderealYearDays, fitted.SIDEREAL_YEAR_HARMONICS || []);
-const sidDiffSec = (sidJ2000 - ylRef.siderealYear) * 86400;
-check('Sidereal year at J2000', Math.abs(sidDiffSec), 0, 1.0);
-console.log(`  Sidereal year at J2000: ${sidJ2000.toFixed(9)} d (IAU: ${ylRef.siderealYear} d, diff: ${sidDiffSec >= 0 ? '+' : ''}${sidDiffSec.toFixed(3)}s)`);
-
-// ── Anomalistic year at J2000 (from Fourier harmonics) ──
-const anomJ2000 = evalFourier(2000, C.meanAnomalisticYearDays, fitted.ANOMALISTIC_YEAR_HARMONICS || []);
-const anomDiffSec = (anomJ2000 - ylRef.anomalisticYear) * 86400;
-// Tolerance: 5s. Anomalistic year at J2000 depends on the H/16 perihelion cycle
-// harmonic; a 1-2s Fourier ripple at J2000 is a framework property, not a regression.
-check('Anomalistic year at J2000', Math.abs(anomDiffSec), 0, 5.0);
-console.log(`  Anomalistic year at J2000: ${anomJ2000.toFixed(9)} d (IAU: ${ylRef.anomalisticYear} d, diff: ${anomDiffSec >= 0 ? '+' : ''}${anomDiffSec.toFixed(3)}s)`);
+// (Plan 09: the sidereal and anomalistic J2000 rows read the retired year
+// combs; the J2000 sidereal and anomalistic years are the IAU inputs now.)
 
 // ── Cardinal point JDs at J2000 (informational) ──
 // Reference: the registry's `cardinalPointAnchors` — the USNO "Earth's
@@ -360,10 +329,6 @@ for (const type of ['SS', 'WS', 'VE', 'AE']) {
 console.log(`  Perihelion harmonics: ${C.PERI_HARMONICS.length} terms`);
 console.log(`  Cardinal points: SS=${C.CARDINAL_POINT_HARMONICS.SS.length}, WS=${C.CARDINAL_POINT_HARMONICS.WS.length}, VE=${C.CARDINAL_POINT_HARMONICS.VE.length}, AE=${C.CARDINAL_POINT_HARMONICS.AE.length} terms`);
 
-const tropTerms = fitted.TROPICAL_YEAR_HARMONICS?.length || 0;
-const sidTerms = fitted.SIDEREAL_YEAR_HARMONICS?.length || 0;
-const anomTerms = fitted.ANOMALISTIC_YEAR_HARMONICS?.length || 0;
-console.log(`  Year-length harmonics: tropical=${tropTerms}, sidereal=${sidTerms}, anomalistic=${anomTerms} terms`);
 
 // Compare against stored Earth baselines
 const storedBaselinesEarly = JSON.parse(fs.readFileSync(
@@ -394,8 +359,7 @@ const newEarth = {
   erdJ2000_degPerYr: Math.round(erdJ2000DegPerYr * 1000000) / 1000000,
   meanPrecessionRate_degPerYr: Math.round(meanRate * 1000000) / 1000000,
   tropicalYearJ2000_diff_sec: Math.round(tropDiffSec * 1000) / 1000,
-  siderealYearJ2000_diff_sec: Math.round(sidDiffSec * 1000) / 1000,
-  anomalisticYearJ2000_diff_sec: Math.round(anomDiffSec * 1000) / 1000,
+  // (plan 09: the sidereal/anomalistic J2000 diffs read the retired year combs)
   perihelionHarmonics_terms: C.PERI_HARMONICS.length,
   cardinalPoints_terms: {
     SS: C.CARDINAL_POINT_HARMONICS.SS.length,
@@ -403,7 +367,6 @@ const newEarth = {
     VE: C.CARDINAL_POINT_HARMONICS.VE.length,
     AE: C.CARDINAL_POINT_HARMONICS.AE.length,
   },
-  yearLengthHarmonics_terms: { tropical: tropTerms, sidereal: sidTerms, anomalistic: anomTerms },
 };
 
 // ═══════════════════════════════════════════════════════════════════════════

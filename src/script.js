@@ -136,7 +136,9 @@ const deltaTStart = K.earthOrbital.deltaTStart;                       // Delta-T
 
 // ─── E1. Early derived (needed before ASTRO_REFERENCE) ───────────────────
 let   perihelionCycleLength = holisticyearLength / 16;  // Phase 6: mutable (Tier 1 — math-critical, used by computeEccentricityEarth every frame)
-let   meansolaryearlengthinDays = Math.round(inputmeanlengthsolaryearindays * (holisticyearLength / 8)) / (holisticyearLength / 8);  // Phase 1: mutable for deep-time mode
+// Plan 09: the IAU J2000 mean tropical year (the calendar's year axis); the era
+// device's rounding of the input onto 1/(H/8) of a day (+1.2 s) is deleted.
+let   meansolaryearlengthinDays = K.yearLengthRef.tropicalYearMean;  // Phase 1: mutable for deep-time mode
 const _kcWinN = (k) => CHAIN_ARTIFACT.windowElementRates[k].meanMotionDegPerYr;  // the chain's fitted era-window mean motion (deg per Julian year; engine-D, 1800–2100) — the era evaluator's element rate. NOT the panels' period source since C1: a 300-yr window fit absorbs local inequality slope into this term (Neptune −497 ppm vs the secular rate); the period rows ride the banked λ̇ channel (_kcNOfDate), and this remains only its stale-artifact fallback
 // ORBIT-tab element accessor (plan 02 §11 item 2): the chain's osculating
 // elements of date, memoized per (planet, JD) so one panel refresh
@@ -554,9 +556,9 @@ planets.ceres = {
 // ─── B1. Year-length harmonics ───────────────────────────────────────────
 // Each entry: [period_divisor, sin_coeff, cos_coeff] — period = H / divisor
 // Imported at FULL DOUBLE PRECISION from the generated coefficients module.
-const TROPICAL_YEAR_HARMONICS = FIT.TROPICAL_YEAR_HARMONICS;
-const SIDEREAL_YEAR_HARMONICS = FIT.SIDEREAL_YEAR_HARMONICS;
-const ANOMALISTIC_YEAR_HARMONICS = FIT.ANOMALISTIC_YEAR_HARMONICS;
+// (Plan 09: the three year-length combs TROPICAL/SIDEREAL/ANOMALISTIC_YEAR_
+// HARMONICS are deleted — the year lengths of date are the one-family laws
+// over the kinematic day of date: tropicalYearDaysOfDate & co.)
 
 // ─── B2. Earth's perihelion device (PERI_HARMONICS) ──────────────────────
 // PERI_HARMONICS (perihelion longitude Fourier terms) + PERI_OFFSET — the
@@ -978,36 +980,33 @@ const perihelionalignmentJD = Math.round(startmodelJD - (meansolaryearlengthinDa
 // declarations run (the C1 hover-TDZ class).
 let _periCalHintYear = 0, _periCalHintDays = 0;
 const yearsFromBalancedToJ2000 = (startmodelJD - balancedJD) / meansolaryearlengthinDays;
-// Sidereal year in days at J2000 — IAU anchor (365.256363004). Used as the
-// Fourier baseline for SIDEREAL_YEAR_HARMONICS. The framework's own H-lattice
-// mean sidereal year (meansiderealyearlengthinDays_kinematic below) is
-// computed separately from the T_axial = H/13 identity.
+// Sidereal year in days at J2000 — the IAU input (365.256363004). Plan 09:
+// the same value as meansiderealyearlengthinDays_kinematic below (the
+// device's H/13 identity and the sidereal comb this was the baseline of are
+// deleted).
 let   meansiderealyearlengthinDays = ASTRO_REFERENCE.siderealYearJ2000;  // Phase 1: mutable for deep-time mode
-// Sidereal year in seconds at J2000 — pure IAU × 86400 (SI). Supersedes
-// Method B (× 86400.00001), which was a hand-tuned shim. Under the
-// current H=335,317 anchor with inputmeanlengthsolaryearindays=365.2422,
-// meanlengthofday derives structurally to 86399.99968 s via the
-// T_axial = H/13 identity — no shim needed.
+// Sidereal year in seconds at J2000 — pure IAU × 86400 (SI; the J2000 day is
+// the SI day, plan 09). Supersedes Method B (× 86400.00001), a hand-tuned shim.
 let   meansiderealyearlengthinSeconds = ASTRO_REFERENCE.siderealYearJ2000 * 86400; // (Phase 1: mutable for deep-time mode)
 // (Plan 07 R1: tripleSynodicYears — the Jupiter–Saturn triple synodic period
 // on the device's lattice perihelion rates — had no reader; gone with the
 // lattice.)
-// The sidereal year in days by the lattice route at J2000 — T_sid = T_trop × H / (H − 13),
-// the T_axial = H/13 identity; the framework's own MEAN, independent of the IAU
-// reference — used to anchor meanlengthofday. A J2000 CONSTANT, not an epoch
-// global: "kinematic" is not a code path but f(2000) (year/day plan §2c; Layer 1's
-// `siderealYearDaysViaLattice`). At any other epoch the same quantity is
-// `meansiderealyearlengthinDays`, which recomputeEpochAnchors fills from Layer 0.
-const meansiderealyearlengthinDays_kinematic = meansolaryearlengthinDays * holisticyearLength / (holisticyearLength - 13);
-// MEAN LOD at J2000: 86399.99968 s under H=335,317 (from H/13 identity).
-// Supersedes Method B (which used the IAU tautology denominator + × 86400.00001).
-let   meanlengthofday = meansiderealyearlengthinSeconds/meansiderealyearlengthinDays_kinematic;  // Phase 1: mutable for deep-time mode
+// The sidereal year in days at J2000 — plan 09: the IAU input; the device's
+// H/13 lattice route (meanSolarYearDays × H/(H − 13), 1 µd above IAU) is
+// deleted. A J2000 CONSTANT, not an epoch global: "kinematic" is not a code
+// path but f(2000) (year/day plan §2c). At any other epoch the same quantity
+// is `meansiderealyearlengthinDays`, which recomputeEpochAnchors fills from
+// Layer 0. The identifier keeps its name for its readers.
+const meansiderealyearlengthinDays_kinematic = ASTRO_REFERENCE.siderealYearJ2000;
+// Plan 09: the J2000 day length ω₀ is the SI day (an input, 86,400 s); the
+// device's H/13 identity read 86,399.99968 s. Twins: tools/lib constants.js
+// meanLengthOfDay, model.js.
+let   meanlengthofday = K.yearLengthRef.solarDay;  // Phase 1: mutable for deep-time mode
 
-// The sidereal Fourier BASELINE — the J2000 lattice-route value.
-// SIDEREAL_YEAR_HARMONICS were fitted around this constant; a formula baseline
-// that moves with scene state is exactly the transparency violation (f(Y) must
-// depend on Y alone — plan §5c). Kept as its own name so the formula sites read
-// as "the fit baseline", not "a year length".
+// The J2000 sidereal-year constant under its formula-site name (plan 09: the
+// sidereal comb this was the baseline of is deleted; the one reader is the
+// chart fallback's T_sid·(1 − 1/P)). A baseline that moves with scene state
+// is the transparency violation (f(Y) must depend on Y alone — plan §5c).
 const SIDEREAL_YEAR_DAYS_KINEMATIC_J2000 = meansiderealyearlengthinDays_kinematic;
 
 // Module-load values of the seven epoch globals — what resetEpochToJ2000
@@ -1034,7 +1033,7 @@ let   perihelionCoinRotationYearlySeconds = perihelionCoinRotationMs * meansolar
 let   axialCoinRotationMs = NaN;  // Phase 6: mutable (Tier 2)
 let   axialCoinRotationYearlySeconds = NaN;  // Phase 6: mutable (Tier 2)
 
-let   meanAnomalisticYearinDays = ((meansolaryearlengthinDays)/(perihelionCycleLength-1))+meansolaryearlengthinDays;  // Phase 6: mutable (Tier 2)
+let   meanAnomalisticYearinDays = ASTRO_REFERENCE.anomalisticYearJ2000;  // plan 09: the IAU value (was the device's H/16 identity, 0.3 s low). Phase 6: mutable (Tier 2)
 
 // ═══════════════════════════════════════════════════════════════════════════
 // CANONICAL MEAN/REAL YEAR & DAY VARIABLES (Phase-1 rename target)
@@ -1045,41 +1044,34 @@ let   meanAnomalisticYearinDays = ((meansolaryearlengthinDays)/(perihelionCycleL
 //   3. Time domain: year-invariant (MEAN)  vs  year-dependent (REAL, functions)
 //
 // Convention:
-//   • MEAN_*_SEC = long-term structural constant in SI seconds (H-lattice invariant).
+//   • MEAN_*_SEC = the J2000 constant in SI seconds (the IAU input × 86400).
 //   • MEAN_*_86400DAYS = MEAN_*_SEC / 86400 (SI-day count, IAU convention).
-//   • MEAN_*_MEANLODDAYS = MEAN_*_SEC / MEAN_LOD_SEC (framework-day count).
-//   • real*Sec(year) = MEAN_*_SEC + Fourier ripple at year (SI seconds).
+//   • MEAN_*_MEANLODDAYS = MEAN_*_SEC / MEAN_LOD_SEC — ≡ the 86400DAYS form since
+//     plan 09 (MEAN_LOD_SEC is the SI day); kept for its readers.
 //   • real*86400Days(year), real*RealLodDays(year) = derived by division.
 //   • realLodSec(year) = MEAN_LOD_SEC + tidal + GIA + ΔT residual (Bond+Hallstat).
 //
 // At J2000:
-//   • MEAN_LOD_SEC              ≈ 86400.00279   (H/13 identity: sid_sec / sid_mean_lod_days)
-//   • MEAN_TROPICAL_YEAR_SEC    = 31,556,925.19 (= inputMeanSolarDays × 86400)
+//   • MEAN_LOD_SEC              = 86,400 s (IAU sec / IAU days — plan 09, ONE J2000 day)
+//   • MEAN_TROPICAL_YEAR_SEC    = 31,556,925.19 (= the IAU tropical mean × 86400)
 //   • MEAN_SIDEREAL_YEAR_SEC    = 31,558,149.7635 (IAU × 86400, physical orbital period)
-//   • MEAN_SIDEREAL_YEAR_86400DAYS = 365.256363 (matches IAU)
-//   • MEAN_SIDEREAL_YEAR_MEANLODDAYS = 365.256351 (framework kinematic H/13 identity)
+//   • MEAN_SIDEREAL_YEAR_86400DAYS = 365.256363 (IAU)
 // ═══════════════════════════════════════════════════════════════════════════
 
-// Two philosophically distinct definitions of MEAN_SIDEREAL_YEAR_SEC:
-//   • Framework structural: = MEAN_TROPICAL_YEAR_SEC × H/(H-13) — internally consistent, but
-//     ~1 s below IAU because the framework's H/13 axial period (25,791.92 yr) differs from
-//     IAU's precession (~25,772 yr) by ~20 yr (framework's H is a Solar System Resonance
-//     Cycle divisor, not a pure IAU precession match).
-//   • IAU physical:       = ASTRO_REFERENCE.siderealYearJ2000 × 86400 = 31,558,149.7635 s.
-//
-// Historically the framework anchors MEAN_LOD_SEC via IAU_sid_sec / kinematic_sid_days —
-// a HYBRID (IAU sec / framework days). This gives MEAN_LOD_SEC ≈ 86400.00279. We keep
-// that convention for backward compatibility; MEAN_SIDEREAL_YEAR_SEC therefore uses the
-// IAU anchor (the "physical" definition).
-const MEAN_TROPICAL_YEAR_SEC = meansolaryearlengthinDays * 86400;                             // = 31,556,925.19 s (matches inputMeanSolarDays × 86400)
+// Plan 09: MEAN_SIDEREAL_YEAR_SEC is the IAU input × 86400 in every runtime;
+// the device's structural form MEAN_TROPICAL_YEAR_SEC × H/(H − 13) (~1 s
+// below IAU: the H/13 period 25,791.92 yr vs IAU's ~25,772) is deleted, and
+// MEAN_LOD_SEC — formerly the HYBRID IAU-seconds / framework-days quotient
+// (86400.00279 under an earlier H) — is IAU seconds over IAU days = 86,400 s.
+const MEAN_TROPICAL_YEAR_SEC = meansolaryearlengthinDays * 86400;                             // = 31,556,925.19 s (the IAU tropical mean × 86400)
 const MEAN_SIDEREAL_YEAR_SEC = ASTRO_REFERENCE.siderealYearJ2000 * 86400;                    // = 31,558,149.7635 s (IAU physical)
 const MEAN_ANOMALISTIC_YEAR_SEC = ASTRO_REFERENCE.anomalisticYearJ2000 * 86400;               // (IAU physical)
-const MEAN_LOD_SEC = MEAN_SIDEREAL_YEAR_SEC / meansiderealyearlengthinDays_kinematic;         // = 86400.00279 (hybrid: IAU sec / framework days)
+const MEAN_LOD_SEC = MEAN_SIDEREAL_YEAR_SEC / meansiderealyearlengthinDays_kinematic;         // = 86,400 s (IAU sec / IAU days, plan 09)
 
-const MEAN_TROPICAL_YEAR_86400DAYS = MEAN_TROPICAL_YEAR_SEC / 86400;                          // = inputMeanSolarDays
-const MEAN_TROPICAL_YEAR_MEANLODDAYS = MEAN_TROPICAL_YEAR_SEC / MEAN_LOD_SEC;                 // ≈ 365.242179
+const MEAN_TROPICAL_YEAR_86400DAYS = MEAN_TROPICAL_YEAR_SEC / 86400;                          // = the IAU tropical mean
+const MEAN_TROPICAL_YEAR_MEANLODDAYS = MEAN_TROPICAL_YEAR_SEC / MEAN_LOD_SEC;                 // ≡ MEAN_TROPICAL_YEAR_86400DAYS (plan 09)
 const MEAN_SIDEREAL_YEAR_86400DAYS = MEAN_SIDEREAL_YEAR_SEC / 86400;                          // ≈ 365.256363 (IAU)
-const MEAN_SIDEREAL_YEAR_MEANLODDAYS = MEAN_SIDEREAL_YEAR_SEC / MEAN_LOD_SEC;                 // ≈ 365.256351 (framework kinematic)
+const MEAN_SIDEREAL_YEAR_MEANLODDAYS = MEAN_SIDEREAL_YEAR_SEC / MEAN_LOD_SEC;                 // ≡ MEAN_SIDEREAL_YEAR_86400DAYS (plan 09)
 const MEAN_ANOMALISTIC_YEAR_86400DAYS = MEAN_ANOMALISTIC_YEAR_SEC / 86400;
 const MEAN_ANOMALISTIC_YEAR_MEANLODDAYS = MEAN_ANOMALISTIC_YEAR_SEC / MEAN_LOD_SEC;
 
@@ -1189,31 +1181,45 @@ const milkywayOrbitPeriod = (lightYear*greatattractorDistance*Math.PI*2)/(milkyw
 // 0.485 (worst case); on 8H its period is honored to 112 s instead of
 // 3,572 s. All count identities (±13, −H, …) add integers and survive
 // unchanged. Derivation record: docs/66 §1.
-const N_sid_J2000      = Math.round(8*(holisticyearLength*meansolaryearlengthinDays)/moonSiderealMonthInput)/8;           // 35,860,753 per 8H
-const N_apsidalI_J2000 = Math.round(8*(holisticyearLength*meansolaryearlengthinDays)/moonApsidalPrecessionDaysInputICRF)/8; // 303,196 per 8H
-const N_apsidalE_J2000 = N_apsidalI_J2000 - 13;
-const N_nodalI_J2000   = Math.round(8*(holisticyearLength*meansolaryearlengthinDays)/moonNodalPrecessionDaysInputICRF)/8;   // 144,119 per 8H
-const N_nodalE_J2000   = N_nodalI_J2000 + 13;
-
-let   moonSiderealMonth = (holisticyearLength*meansolaryearlengthinDays)/N_sid_J2000;  // Phase 2: mutable
+// Plan 09: the Moon's J2000 periods on the IAU inputs (astro-reference
+// moonReference): the sidereal month and the EQUINOX-OF-DATE apsidal and nodal
+// precession periods (the legacy-'ICRF' input names); the star-referenced
+// periods remove the equinox's own precession, 1/T_E = 1/T_I ∓ 1/T_p (perigee
+// advances, node regresses), T_p the J2000 precession anchor in days. The era
+// device counted these as eighth-integers per 8H (N_sid 35,860,753; N_apsidalI
+// 303,196; N_nodalI 144,119 — the ∓13 was H/13 cycles per H) and read every
+// period back as totalDaysInH/N (7.8 ms above the IAU month); those counts are
+// deleted (docs/66 §1 keeps the derivation record). Twins: tools/lib
+// constants.js, model.js.
+const AXIAL_PRECESSION_J2000_DAYS = (1296000 / K.earthOrbital.generalPrecessionJ2000_arcsecPerYr) * 365.25;
+let   moonSiderealMonth = moonSiderealMonthInput;  // Phase 2: mutable
+let   moonApsidalPrecessionindaysICRF = moonApsidalPrecessionDaysInputICRF;  // Phase 6.5: mutable (equinox of date)
+let   moonNodalPrecessionindaysICRF = moonNodalPrecessionDaysInputICRF;  // Phase 6.5: mutable (equinox of date)
+let   moonApsidalPrecessionindaysEarth = 1 / (1 / moonApsidalPrecessionindaysICRF - 1 / AXIAL_PRECESSION_J2000_DAYS);  // Phase 2: mutable (star-referenced)
+let   moonNodalPrecessionindaysEarth = 1 / (1 / moonNodalPrecessionindaysICRF + 1 / AXIAL_PRECESSION_J2000_DAYS);  // Phase 2: mutable (star-referenced)
 // Anomalistic & nodal months: KINEMATIC consequences of sidereal + precession,
 // not independent inputs.  1/T_ano = 1/T_M − 1/T_apsidalE  (perigee advances)
 // 1/T_nod_month = 1/T_M + 1/T_nodalE  (node regresses)
-let   moonAnomalisticMonth = (holisticyearLength*meansolaryearlengthinDays)/(N_sid_J2000 - N_apsidalE_J2000);  // Phase 2: mutable
-let   moonNodalMonth = (holisticyearLength*meansolaryearlengthinDays)/(N_sid_J2000 + N_nodalE_J2000);  // Phase 2: mutable
-
-let   moonSynodicMonth = (holisticyearLength*meansolaryearlengthinDays)/(N_sid_J2000+13-holisticyearLength);  // Phase 2: mutable — N_syn = N_trop − H = N_sid − (H−13); legacy −1 removed 2026-07-24 (0.70→0.08 s vs IAU)
-let   moonTropicalMonth = (holisticyearLength*meansolaryearlengthinDays)/(N_sid_J2000+13);  // Phase 2: mutable — N_trop = N_sid + 13 (13 axial-precession cycles per H); legacy −1 removed 2026-07-24
+let   moonAnomalisticMonth = 1 / (1 / moonSiderealMonth - 1 / moonApsidalPrecessionindaysEarth);  // Phase 2: mutable
+let   moonNodalMonth = 1 / (1 / moonSiderealMonth + 1 / moonNodalPrecessionindaysEarth);  // Phase 2: mutable
+// Synodic month: the beat of the sidereal month with the sidereal year;
+// tropical month: the sidereal month seen from the precessing equinox.
+let   moonSynodicMonth = moonSiderealMonth * meansiderealyearlengthinDays_kinematic / (meansiderealyearlengthinDays_kinematic - moonSiderealMonth);  // Phase 2: mutable
+let   moonTropicalMonth = 1 / (1 / moonSiderealMonth + 1 / AXIAL_PRECESSION_J2000_DAYS);  // Phase 2: mutable
 let   moonFullMoonCycleEarth = (moonSynodicMonth/(moonSynodicMonth-moonAnomalisticMonth))*moonAnomalisticMonth;  // Phase 6.5: mutable
-let   moonFullMoonCycleICRF = (holisticyearLength*meansolaryearlengthinDays)/(((holisticyearLength*meansolaryearlengthinDays)/moonFullMoonCycleEarth)+13);  // Phase 6.5: mutable — H/13-frame lattice partner (411.767 d; the OBSERVED supermoon cycle is the Earth-named 411.784 d)
-let   moonNodalPrecessionindaysEarth = (holisticyearLength*meansolaryearlengthinDays)/N_nodalE_J2000;  // Phase 2: mutable
-let   moonNodalPrecessionindaysICRF = (holisticyearLength*meansolaryearlengthinDays)/N_nodalI_J2000;  // Phase 6.5: mutable
-let   moonApsidalPrecessionindaysEarth = (holisticyearLength*meansolaryearlengthinDays)/N_apsidalE_J2000;  // Phase 2: mutable
-let   moonApsidalPrecessionindaysICRF = (holisticyearLength*meansolaryearlengthinDays)/N_apsidalI_J2000;  // Phase 6.5: mutable
+let   moonFullMoonCycleICRF = 1 / (1 / moonFullMoonCycleEarth + 1 / AXIAL_PRECESSION_J2000_DAYS);  // Phase 6.5: mutable — the precessing-frame partner (the OBSERVED supermoon cycle is the Earth-named 411.784 d)
 let   moonApsidalMeetsNodalindays = ((moonNodalMonth/(moonAnomalisticMonth-moonNodalMonth))*moonAnomalisticMonth);  // Phase 6.5: mutable
 let   moonLunarLevelingCycleindays = (moonNodalPrecessionindaysEarth/(moonNodalPrecessionindaysEarth-moonApsidalPrecessionindaysEarth)*(moonApsidalPrecessionindaysEarth/meansolaryearlengthinDays))*meansolaryearlengthinDays;  // Phase 6.5: mutable
-let   moonDraconicYearICRF = 1/((1/meansolaryearlengthinDays)+(1/moonNodalPrecessionindaysEarth));  // Phase 6.5: mutable — H/13-frame lattice partner (346.607 d; NOT the observable)
-let   moonDraconicYearEarth = (holisticyearLength*meansolaryearlengthinDays)/(((holisticyearLength*meansolaryearlengthinDays)/moonDraconicYearICRF)-13);  // Phase 6.5: mutable — THE OBSERVED ECLIPSE YEAR (346.620 d; the −13 exactly compensates the mixed-frame intermediate above: ≡ tropical⊕of-date ≡ sidereal⊕star-referenced)
+let   moonDraconicYearICRF = 1/((1/meansolaryearlengthinDays)+(1/moonNodalPrecessionindaysEarth));  // Phase 6.5: mutable — the mixed-frame partner (346.607 d; NOT the observable)
+let   moonDraconicYearEarth = 1 / (1 / moonDraconicYearICRF - 1 / AXIAL_PRECESSION_J2000_DAYS);  // Phase 6.5: mutable — THE OBSERVED ECLIPSE YEAR (346.620 d; removing one equinox turn compensates the mixed-frame intermediate above: ≡ tropical⊕of-date ≡ sidereal⊕star-referenced)
+// Of-date cycles per anchor interval, REAL-valued (the month chain's H²
+// counter scales its of-date periods on them until the counter is
+// re-expressed; the Model Identity table and the "orbits" row read them).
+const N_sid_J2000      = (holisticyearLength*meansolaryearlengthinDays)/moonSiderealMonth;
+const N_apsidalI_J2000 = (holisticyearLength*meansolaryearlengthinDays)/moonApsidalPrecessionindaysICRF;
+const N_nodalI_J2000   = (holisticyearLength*meansolaryearlengthinDays)/moonNodalPrecessionindaysICRF;
+const N_apsidalE_J2000 = (holisticyearLength*meansolaryearlengthinDays)/moonApsidalPrecessionindaysEarth;   // star-referenced (the month rows' hover identities)
+const N_nodalE_J2000   = (holisticyearLength*meansolaryearlengthinDays)/moonNodalPrecessionindaysEarth;
 let   moonSpeed = (moonDistance*Math.PI*2)/(meansolaryearlengthinDays*(1/(meansolaryearlengthinDays/moonSiderealMonth)))/24;  // Phase 6.5: mutable
 
 // ─── E2. Mass calculations ──────────────────────────────────────────────
@@ -2653,7 +2659,6 @@ function _deepLod() {
         holisticYearJ2000: HOLISTIC_YEAR_J2000, lodNowH13Seconds: LOD_NOW_H13_S,
         meanSiderealYearJ2000Seconds: MEAN_SIDEREAL_YEAR_J2000_S,
         solarMassLossFracPerYear: SOLAR_MASS_LOSS_FRAC_PER_YR,
-        siderealYearDaysKinematicJ2000: SIDEREAL_YEAR_DAYS_KINEMATIC_J2000,
         precessionSolarShareJ2000: PRECESSION_SOLAR_SHARE_J2000,
       },
       moonDistanceMetresAtAge: (t_Ma) => meanMoonDistanceMetresAtAge(t_Ma),
@@ -2667,18 +2672,6 @@ function _deepLod() {
       // the nodal period 1,296,000/|s₃| (orbital), not the spin unit's H/5.
       nodalPeriodYearsFn: () => 1296000 / _s3ArcsecPerYr(),
       lEmAtAgeKgm2S: _solarBudget().lEmAtAgeKgm2S,
-      // The IAU-base integrated-phase Fourier ripple (mirrors the Node
-      // engine's _evalSiderealYearFourierIAU — the Phase D matched pair).
-      siderealYearDaysFourierAt: (year) => {
-        let result = ASTRO_REFERENCE.siderealYearJ2000;
-        const cyc = cyclesBetweenYears(balancedYear, year, 1);
-        if (cyc === null) return result;
-        for (const [div, sinC, cosC] of SIDEREAL_YEAR_HARMONICS) {
-          const phase = 2 * Math.PI * cyc * div;
-          result += sinC * Math.sin(phase) + cosC * Math.cos(phase);
-        }
-        return result;
-      },
       cycleLodSumAt: (year) => dtCycleLodCorrectionSum(year),
       swingLodAt: (year) => resonatorSwingLodCorrection(year),
       swingLodRateAt: (year) => resonatorSwingLodRate(year),
@@ -2754,15 +2747,8 @@ function dLodDtDecompositionAtAge(t_Ma) {
  *  computeSiderealYearDaysDirect(2000)` — the simulator tweakpane readout.
  *  For deep time, tidal LOD growth (mean) is modulated by the small Fourier
  *  ripple in the sidereal-year daycount at year_at_t = 2000 − t_Ma × 1e6. */
-function meanLodSecondsAtAgeActual(t_Ma) {
-  // 8.4-3 S-D2 (measured change): shared module, which divides by the
-  // IAU-base Fourier RIPPLE evaluator with FIXED bases — the deep-time
-  // drift is already in mean(t). This browser copy historically divided by
-  // computeSiderealYearDaysDirect, the epoch-aware f(Y) evaluator, which
-  // double-counted the drift (12% at −400 Ma; zero production consumers).
-  // The 9 dtAge.meanLodSecondsActual fixtures were re-recorded deliberately.
-  return _deepLod().lodSecondsActualAtAge(t_Ma);
-}
+// (Plan 09: meanLodSecondsAtAgeActual — the tidal mean × the retired
+// sidereal-year comb's ripple — is deleted with the comb.)
 
 /**
  * "Ecliptic missing motion" LOD correction (~3.441 ms at J2000).
@@ -2785,13 +2771,12 @@ function meanLodSecondsAtAgeActual(t_Ma) {
 // certifiedAxialPrecessionJ2000Years (identical ops). Never H/13 (25,793.6 is
 // the frozen clock's counter — the fit anchor's reading, 0.086 % slow, not a
 // period). Lazy + memoized: the Direct laws read the factory's bases.
-let _certifiedAxial0Memo = null;
+// Plan 09: THE J2000 precession anchor p₀ is the IAU 2006 general precession
+// in longitude (astro-reference.json earthOrbital.generalPrecessionJ2000_
+// arcsecPerYr), as the period 1,296,000/p_A = 25,771.575 Julian years; the
+// retired year combs' beat at 2000 (25,771.395) is gone with the combs.
 function _certifiedAxialPrecessionJ2000Years() {
-  if (_certifiedAxial0Memo === null) {
-    const sid = computeSiderealYearDaysDirect(2000), sol = computeSolarYearDaysDirect(2000);
-    _certifiedAxial0Memo = sid / (sid - sol);
-  }
-  return _certifiedAxial0Memo;
+  return 1296000 / K.earthOrbital.generalPrecessionJ2000_arcsecPerYr;
 }
 /** Axial-precession period at age t_Ma, years: the composed lunisolar clock
  *  (ONE home, @essrt/physics precession-composed via the factory); its J2000
@@ -2823,8 +2808,16 @@ function _siderealYearSecondsPure(year) {
  *  stack incl. Core-mantle swing (dtCycleLodCorrectionSum). Engine twin
  *  (bit-exact): tools/lib/deep-time.js computeLodRealSecondsAtEpoch. */
 function computeLodRealSecondsAtEpoch(year) {
-  const lodKin = _siderealYearSecondsPure(year) / computeSiderealYearDaysDirect(year);
-  return lodKin + h5Correction(year) + dtCycleLodCorrectionSum(year);
+  return _lodKinematicSecondsOfDate(year) + h5Correction(year) + dtCycleLodCorrectionSum(year);
+}
+
+/** The kinematic day of date, SI seconds (plan 09): the Layer-0 tidal mean
+ *  LOD — exactly ω₀ (the SI day) at J2000; the J2000 day in snapshot mode or
+ *  past the tidal-lock asymptote. The former "sidereal seconds over comb
+ *  days" carried the sidereal year's λ̇ ripple as a day-length ripple. Engine
+ *  twin: tools/lib deep-time.js computeLodKinematicSecondsAtEpoch. */
+function _lodKinematicSecondsOfDate(year) {
+  return (DEEP_TIME_MODE_ENABLED ? _L0.lodSeconds(year) : null) ?? _EPOCH_SEEDS_J2000.meanlengthofday;
 }
 
 // ───── STEP 2 — Earth Fundamental Cycle H(t) ─────
@@ -3623,11 +3616,6 @@ const _moonArgsM = (() => {
         constants: {
           j2000JD, julianCenturyDays,
           holisticYearJ2000: HOLISTIC_YEAR_J2000,
-          balancedYearJ2000: BALANCED_YEAR_J2000_FIXED,
-          meanSolarYearDays: meansolaryearlengthinDays,
-          meanAnomalisticYearDays: meanAnomalisticYearinDays,
-          tropicalYearHarmonics: TROPICAL_YEAR_HARMONICS,
-          anomalisticYearHarmonics: ANOMALISTIC_YEAR_HARMONICS,
           eccentricityJ2000: ASTRO_REFERENCE.eccentricityJ2000,
           eccentricityDotJ2000: ASTRO_REFERENCE.eccentricityDotJ2000,
           eccentricityDotDotJ2000: ASTRO_REFERENCE.eccentricityDotDotJ2000,
@@ -3646,20 +3634,28 @@ const _moonArgsM = (() => {
           // (_oneSourceM().epsDeg). Measured before the move: carrier −13″ at
           // −700, −111″ at −3000; the gates re-baselined with the commit.
           computeObliquityEarth: (y) => _sceneEpsTargetDeg(y),
+          // Plan 09: the arguments' Sun is the ONE certified Sun — the
+          // package tier model's mean longitude (unwrapped) and mean
+          // perihelion of date (wrapped; the arguments wrap M) — the same
+          // surface model.js and the Node scene twin wire; rebuilt on the
+          // shipped series when it lands. The "model timeline" Sun on the
+          // retired year combs sat 0.2° behind the IAU mean Sun at −2000.
+          // TT Julian-year axis.
+          sunMeanLonDegAtJdTT: (jdTT) => _tierModelB().sun.meanLongitudeDegAt(2000 + (jdTT - j2000JD) / 365.25),
+          sunPerihelionLonDegAtJdTT: (jdTT) => _tierModelB().sun.perihelionLongitudeDegAt(2000 + (jdTT - j2000JD) / 365.25),
           jdToSIyear: (jd) => _jdToSIyear(jd),
           tropicalOrbitsBetween: meanMoonOrbitsBetweenYears,
           apsidalOfDateCyclesBetween: meanMoonApsidalOfDateCyclesBetween,
           nodalOfDateCyclesBetween: meanMoonNodalOfDateCyclesBetween,
-          cyclesBetween: cyclesBetweenYears,
           isDeepTime: () => DEEP_TIME_MODE_ENABLED,
           isFrameworkNative: () => MOON_ARGS_FRAMEWORK_NATIVE,
           // (d′) of-date rate completion — MATCHED TRIPLE with model.js and
-          // tools-lib: dynamical (tweakpane day-form) + kinematic beats.
-          pDynDegPerYearAt: (year) => {
-            const sid = computeSiderealYearDaysDirect(year);
-            const sol = computeSolarYearDaysDirect(year);
-            return 360 * (sid - sol) / sid;
-          },
+          // tools-lib. Plan 09: the dynamical rate is the published precession
+          // period's (the one-family beat once the series has landed, the
+          // composed clock before/beyond; degrees per Julian year).
+          pDynDegPerYearAt: (year) => 360 / (_hybridSpinActive() && Math.abs(year - 2000) <= 2000000
+            ? _yearLengthsM().axialPrecessionYearsAtYear(year)
+            : _axialPrecessionPeriodYearsAtAge((2000 - year) / 1e6)),
           pKinDegPerYearAt: (year) => {
             const t = (J2000_CALENDAR_YEAR - year) / 1e6;
             const sid = meanSiderealYearSecondsAtAge(t);
@@ -3688,7 +3684,7 @@ const _moonArgsM = (() => {
   return get;
 })();
 
-function _fwSunSecularDeviations(jd_tt) { return _moonArgsM().sunSecularDeviations(jd_tt); }
+// (plan 09: _fwSunSecularDeviations — the retired year combs' Sun integrals — is gone; the arguments' Sun is the certified Sun)
 
 // ═════════════════════════════════════════════════════════════════════════════
 // Framework-native lunar fundamental arguments
@@ -5670,7 +5666,7 @@ if (typeof window !== 'undefined') {
     wgcModelCurves, wgcRenderChart, wgcPaperChartPanel,
     // f(Y) — the plan §5a "year lengths" row
     computeSolarYearDaysFromCardinals,
-    computeSiderealYearDaysDirect,
+    siderealYearDaysOfDate,
     computeSolsticeYearLength,
     // JD form too — its equation-of-centre path NaN'd for two phases with no
     // probe noticing (the year-length probes never touch it).
@@ -5678,8 +5674,8 @@ if (typeof window !== 'undefined') {
     computeSolsticeRA,
     // Epoch-consistency gate (test/browser/epoch-consistency.test.mjs): the
     // pure f(Y) evaluators must track the epoch-anchor chain.
-    computeSolarYearDaysDirect,
-    computeAnomalisticYearDaysDirect: (y) => computeAnomalisticYearSecFromDaysFourier(y, 1),
+    tropicalYearDaysOfDate,
+    anomalisticYearDaysOfDate,
     // Delegation gate (Phase 20.2): the ONE Layer-4 composite, pure.
     computeLodRealSecondsAtEpoch,
     // The six globals recomputeEpochAnchors mutates, read live (the former
@@ -5940,7 +5936,6 @@ if (typeof window !== 'undefined') {
       pureH5DeltaT: pureH5DeltaTAtAge(t_Ma),
       meanLodSeconds: meanLodSecondsAtAge(t_Ma),
       meanLodSecondsMeanAlpha: meanLodSecondsAtAgeMeanAlpha(t_Ma),
-      meanLodSecondsActual: meanLodSecondsAtAgeActual(t_Ma),
       meanLodSecondsWithCorrections: meanLodSecondsWithCorrectionsAtAge(t_Ma),
     }),
     dtDecompositionAtAge: (t_Ma) => dLodDtDecompositionAtAge(t_Ma),
@@ -18488,7 +18483,6 @@ function _seasonDurationDays(year, season) {
 let _deepHistSeriesM = null;
 function _deepHistSeries() {
   if (!_deepHistSeriesM) {
-    const sid = computeSiderealYearDaysDirect(2000), sol = computeSolarYearDaysDirect(2000);
     _deepHistSeriesM = createDeepOrbitalHistory({
       zModes: DEEP_MODES_ARTIFACT.earthZ,
       zetaModes: DEEP_MODES_ARTIFACT.earthZeta,
@@ -18498,7 +18492,7 @@ function _deepHistSeries() {
       anchorPeriEclipticDeg: DEEP_MODES_ARTIFACT.anchorPeriEclipticDeg,
       anchorInclEclipticDeg: DEEP_MODES_ARTIFACT.anchorInclEclipticDeg,
       anchorAscNodeEclipticDeg: DEEP_MODES_ARTIFACT.anchorAscNodeEclipticDeg,
-      axialPrecessionYearsJ2000: sid / (sid - sol),
+      axialPrecessionYearsJ2000: _certifiedAxialPrecessionJ2000Years(),   // plan 09: the IAU p_A anchor (was the retired year combs' beat at 2000)
       obliquityJ2000Deg: ASTRO_REFERENCE.obliquityJ2000_deg,
       // D6 → Phase 3 (plan 06): the SECULAR coupling period(t) = period₀·
       // H(t)/H₀ on the UNIT H(t) = 13·T_p,composed (spin from the tidal
@@ -18510,7 +18504,7 @@ function _deepHistSeries() {
       // measured 0.14°/1.05° distortions).
       axialPrecessionYearsAtYearFn: ((axial0, H0) =>
         (yr) => axial0 * meanHAtAge((2000 - yr) / 1e6) / H0
-      )(sid / (sid - sol), meanHAtAge(0)),
+      )(_certifiedAxialPrecessionJ2000Years(), meanHAtAge(0)),
       // THE PRECESSION OF DATE (plan 06 §9 item 10): the solar torque at the
       // eccentricity of date and the oblateness of date from the GIA channel
       // (read PURE — never the lattice-α pin; the samplers are cached) — both
@@ -18647,11 +18641,10 @@ function _vfpSolarDaySecondsOfDate(year) {
   const t_Ma = (startmodelYear - year) / 1e6;
   const layer3 = meanLodSecondsWithCorrectionsAtAge(t_Ma);
   if (layer3 === null) return null;
-  // Kinematic offset (recomputed here — cheap; keeps the formula self-documenting).
-  const kinAt2000 = meansiderealyearlengthinSeconds / computeSiderealYearDaysDirect(2000);
-  const physAt2000 = meanLodSecondsAtAge(0);
-  const kinematicOffset = kinAt2000 - physAt2000;
-  return layer3 + h5Correction(year) + kinematicOffset;
+  // Plan 09: the kinematic day of date IS the Layer-0 tidal mean (ω₀ at
+  // J2000), so the former "kinematic offset" (the comb's J2000 ripple above
+  // the tidal mean) is identically zero.
+  return layer3 + h5Correction(year);
 }
 /** The Solar Day panel's dashed "long-term mean" line — the tidal mean with
  *  α at its climate mean, plus the nodal-period term (no cycle stack). */
@@ -18668,10 +18661,7 @@ const _vfpTropicalYearDaysOfDate = (() => {
   let a = null;
   return (year) => {
     if (_hybridSpinActive()) return _yearLengthsM().tropicalYearSecondsAtYear(year) / 86400;
-    if (!a) {
-      const sid = computeSiderealYearDaysDirect(2000), sol = computeSolarYearDaysDirect(2000);
-      a = { axial0: sid / (sid - sol), H0: meanHAtAge(0) };
-    }
+    if (!a) a = { axial0: _certifiedAxialPrecessionJ2000Years(), H0: meanHAtAge(0) };
     // Plan 06 Phase 3: the secular precession period axial0·H(t)/H₀ on
     // the UNIT H(t) = 13·T_p,composed — the same scaling the hybrid
     // precesses on (not the frozen era clock's H_era).
@@ -18919,7 +18909,7 @@ const VFP_CATEGORIES = [
     // paper annotation for the Quaternary window (the y range follows the screen)
     paperAlt: {
       refLines: [
-        { value: () => computeSolarYearDaysDirect(2000),
+        { value: () => tropicalYearDaysOfDate(2000),
           label: 'Mean tropical year at J2000', color: '#888', dash: true, yOffset: 0 },
       ],
     },
@@ -19058,9 +19048,9 @@ const VFP_CATEGORIES = [
     // Falls back to mass-loss only when the artifact (or the lamDotRel
     // field) is absent or the one-source movement is opted out.
     //
-    // A Fourier-ripple variant was tried here but rejected: the
-    // SIDEREAL_YEAR_HARMONICS fit captures only periodic H/8 obliquity
-    // ripples and MISSES the secular mass-loss slope (wrong direction).
+    // (A Fourier-ripple variant on the retired sidereal comb was tried and
+    // rejected: it captured only periodic ripple and MISSED the secular
+    // mass-loss slope; the comb itself is deleted at plan 09.)
     model: { name: 'This model', color: '#f0b040',
       fn: year => {
         if (_hybridSpinActive()) {
@@ -19128,16 +19118,10 @@ const VFP_CATEGORIES = [
     // rms, up to 745 yr at −21000 — the era harmonics are certified for
     // era year lengths, and the P ratio amplifies year-length residue
     // ~20× per second, so extrapolating them this deep is outside their
-    // certification). Falls back to the frozen era-clock form when the
-    // series is not loaded / opted out:
-    //   • sid_days  = SIDEREAL_YEAR_DAYS_KINEMATIC_J2000 + Σ SIDEREAL_YEAR_HARMONICS(year)
-    //                 (framework-native H/13 identity baseline — NOT the
-    //                  IAU ASTRO_REFERENCE.siderealYearJ2000, which differs by
-    //                  1.37 μdays and produces a ~2.5 yr axialPrec shift due
-    //                  to the sid/(sid−sol) formula's high sensitivity).
-    //   • sol_days  = MEAN_SOLAR_YEAR_J2000_DAYS + Σ TROPICAL_YEAR_HARMONICS(year)
-    //   • lod       = MEAN_SIDEREAL_YEAR_J2000_S / sid_days   (kinematic; cancels
-    //                                                          in the precession ratio)
+    // certification). Before the series lands the fallback is the composed
+    // lunisolar clock on the same J2000 anchor (plan 09; the frozen
+    // era-clock comb form that served here — the sidereal and tropical
+    // combs' day-form beat — is deleted).
     model: { name: 'This model', color: '#f0b040',
       fn: (() => {
         // S5 call-site convergence: the one family's axial beat —
@@ -19147,14 +19131,9 @@ const VFP_CATEGORIES = [
         // beat column.
         return (year) => {
           if (_hybridSpinActive()) return _yearLengthsM().axialPrecessionYearsAtYear(year);
-          // Chart x-axis is a JULIAN year shared with the reference curves;
-          // the fitted harmonics live on the SI axis. Convert so model and
-          // literature are sampled at the same instant (see _formulaYearFromJD).
-          const yF = _formulaYearFromJD(yearToJDApprox(year));
-          const sidDays = evalYearFourier(yF, SIDEREAL_YEAR_DAYS_KINEMATIC_J2000, SIDEREAL_YEAR_HARMONICS);
-          const solYear = evalYearFourier(yF, MEAN_SOLAR_YEAR_J2000_DAYS,      TROPICAL_YEAR_HARMONICS);
-          const lod = MEAN_SIDEREAL_YEAR_J2000_S / sidDays;
-          return computeAxialPrecessionYears(MEAN_SIDEREAL_YEAR_J2000_S, solYear, lod);
+          // Plan 09: before the series lands, the composed lunisolar clock
+          // (the retired year combs' day-form beat served here).
+          return _axialPrecessionPeriodYearsAtAge((2000 - year) / 1e6);
         };
       })() },
     references: [
@@ -36918,7 +36897,7 @@ async function runYearAnalysisExport(years) {
     //   real       = + the 4-flag ΔT stack and core-mantle swing
     //                (dtCycleLodCorrectionSum) — the production value, i.e.
     //                what the tweakpane shows as Solar Day = REAL.
-    const derivedDayLength  = meansiderealyearlengthinSeconds / computeSiderealYearDaysDirect(year);
+    const derivedDayLength  = _lodKinematicSecondsOfDate(year);   // plan 09: the Layer-0 tidal mean (ω₀ at J2000)
     const lodRealRow        = derivedDayLength +
       derivedDayLength / ((holisticyearLength / 5) * meansolaryearlengthinDays) +
       dtCycleLodCorrectionSum(year);
@@ -36936,7 +36915,7 @@ async function runYearAnalysisExport(years) {
     // the panel's J2000 table, not this column's basis.
     // solY is computeSolarYearDaysDirect — the same source as o.solarYearDays —
     // NOT the cardinal-measured year used for the year columns.
-    const solarYearDaysRow = computeSolarYearDaysDirect(year);
+    const solarYearDaysRow = tropicalYearDaysOfDate(year);   // plan 09: the one-family tropical year over the kinematic day of date
     const siderealDayRow = (solarYearDaysRow * lodRealRow) / (solarYearDaysRow + 1);
     // CURRENT family: siderealDayRow is built from this row's own real LOD,
     // so the projection must use this row's own obliquity, not OBLIQUITY_MEAN.
@@ -42127,9 +42106,8 @@ async function analyzeSolarDayMultiEpoch() {
       const eclipticInclination = obliquity - inclination;
       const ecc = computeEccentricityEarthAtYear(epochYear);  // the ONE law (unification)
       const tropicalYearDays = computeSolarYearDaysFromCardinals(epochYear);
-      const siderealYearDays = computeSiderealYearDaysDirect(epochYear);
-      const anomalisticYearDays = evalYearFourier(epochYear,
-        _epochYearDaysBase('anomalistic', epochYear) ?? meanAnomalisticYearinDays, ANOMALISTIC_YEAR_HARMONICS);
+      const siderealYearDays = siderealYearDaysOfDate(epochYear);
+      const anomalisticYearDays = anomalisticYearDaysOfDate(epochYear);
       results.push({
         epoch: epochYear,
         index: i,
@@ -44882,8 +44860,7 @@ function resetDeltaTForJump() {
       const subYear    = y + i / SUBSTEPS_PER_YEAR;
       const sourceYear = subYear - 1;
 
-      const siderealYear = computeSiderealYearDaysDirect(sourceYear);
-      const lod = meansiderealyearlengthinSeconds / siderealYear;
+      const lod = _lodKinematicSecondsOfDate(sourceYear);   // plan 09: the Layer-0 tidal mean (was IAU seconds over the retired comb's days)
 
       const solarYear = computeSolarYearDaysFromCardinals(sourceYear);
 
@@ -44908,8 +44885,7 @@ function resetDeltaTForJump() {
       const subYear    = y + i / SUBSTEPS_PER_YEAR;
       const sourceYear = subYear - 1;
 
-      const siderealYear = computeSiderealYearDaysDirect(sourceYear);
-      const lod = meansiderealyearlengthinSeconds / siderealYear;
+      const lod = _lodKinematicSecondsOfDate(sourceYear);   // plan 09: the Layer-0 tidal mean
 
       const solarYear = computeSolarYearDaysFromCardinals(sourceYear);
 
@@ -45549,7 +45525,7 @@ const planetStats = {
        value : [ { v: () => o.solarYearDays/meansolaryearlengthinDays, dec:6, sep:',' },{ small : 'years' }],
        hover : [`Ratio of current solar year to mean solar year. P = 1.0 when year length equals mean of ~365.2422 days`]},
       {label : () => `Orbital period (solar)`,
-       value : [ { v: () => { const s = _cardinalYearSeconds(o.currentYear, 'MEAN'); return Number.isFinite(s) ? s / 86400 : computeSolarYearDaysDirect(o.currentYear); }, dec:8, sep:',' },{ small : 'days' }],
+       value : [ { v: () => { const s = _cardinalYearSeconds(o.currentYear, 'MEAN'); return Number.isFinite(s) ? s / 86400 : tropicalYearDaysOfDate(o.currentYear); }, dec:8, sep:',' },{ small : 'days' }],
        hover : () => [`Earth's mean tropical year OF DATE in SI days — the one-source evaluator, the SAME family the Predictions panel rides (so the two surfaces read one value by construction). The equinox-to-equinox interval of a single year wobbles ±minutes about this mean. Scene-measured this year: ${fmtNum(o.solarYearDays,8,',')} d in the scene day basis (the measured mean solar day, doc 11 §Day bases) — the ~0.5-s split is of-date drift + measurement route + day basis, kept visible here.`],
        tpLink: true},
       {label : () => `Orbital period (sidereal)`,
@@ -53852,16 +53828,10 @@ function updatePredictions() {
   // _eccentricityInline (the Sun EoC + the no-chain trio + the probe)
   // computes it directly from the year — it never read these fields.
 
-  // Year lengths from Fourier harmonics (fitted over ±25,000 years).
-  // Use yearForFormula (SI-tropical under DT-ON) so cycle phases match the scene renderer
-  // at balanced clicks — otherwise leaks per-harmonic drift back in time (commit 27db4cc pattern).
-  //
-  // Tropical year uses computeSolarYearDaysDirect (TROPICAL_YEAR_HARMONICS,
-  // Step 6d direct year-length fit). Since the edge-trimmed 2026-08 refit the
-  // fit no longer interpolates the raw CSV year-2000 measurement exactly —
-  // Fourier(2000) sits ~1.4e-6 d above YEAR_LENGTH_J2000_ANCHOR (the fit's
-  // year-2000 residual; doc 99 § "The two J2000 day bases").
-  // Consistent with sidereal + anomalistic displays (also Step 6d).
+  // Year lengths of date (plan 09: the one-source family over the kinematic
+  // day of date; the three Fourier combs are deleted). yearForFormula
+  // (SI-tropical under DT-ON) keeps the phases consistent with the scene
+  // renderer at balanced clicks (commit 27db4cc pattern).
   // D4d: under the one-source movement the model's solar year IS the
   // scene-measured mean of the four cardinal intervals (the D4b panel's own
   // event solves; Σδ_X cancels the EoC spread in the mean) — the panel, the
@@ -53876,21 +53846,17 @@ function updatePredictions() {
   // instrument is retired with the D4b solver.
   o.solarYearDays = _hybridSpinActive()
     ? _cardinalYearSeconds(yearForFormula, 'MEAN') / 86400
-    : computeSolarYearDaysDirect(yearForFormula);
+    : tropicalYearDaysOfDate(yearForFormula);   // plan 09: the tidal-chain mean before the series lands (was the retired comb)
   predictions.solarYearDays = o.solarYearDays;   // provisional; refined to the one-source family below
-  o.siderealYearDays = computeSiderealYearDaysDirect(yearForFormula);
+  // Plan 09: the published SI sidereal year of date over the kinematic day of
+  // date (the retired comb carried the λ̇ ripple as a day-length ripple).
+  o.siderealYearDays = siderealYearDaysOfDate(yearForFormula);
   // o.lodKinematic MUST be assigned BEFORE any downstream calc that uses it.
-  // o.lodKinematic = epoch-specific kinematic = sidYear_s(Y) / Fourier_sid_days ≈ 86400.000000 at J2000.
-  // The numerator is PURE (_siderealYearSecondsPure): Layer-0 Driver-2-aware
-  // sidereal-year seconds in deep-time mode (≡ the IAU 31,558,149.7635 s at
-  // J2000 exactly, ×(1−Δm)² away from it), the frozen J2000 seed in snapshot
-  // mode — replacing the mutable meansiderealyearlengthinSeconds global read
-  // (same value when the anchor cache is fresh; no scene-state dependence).
-  // (86400.000312 is the SCENE-MEASURED route — IAU_sid_sec / the cardinal-point
-  //  measured sidereal year — which the Days & Years report shows in section 4.
-  //  It is a different quantity; do not use it to sanity-check this line.)
-  // (includes SIDEREAL_YEAR_HARMONICS Fourier ripple).
-  o.lodKinematic = _siderealYearSecondsPure(yearForFormula) / o.siderealYearDays;
+  // o.lodKinematic = the Layer-0 tidal mean length of day of date — PURE in
+  // year (no scene-state read), exactly ω₀ = 86,400 s at J2000 (plan 09; the
+  // former IAU-seconds / comb-days quotient and the scene-measured
+  // 86400.000312 route are gone — ONE J2000 day basis).
+  o.lodKinematic = _lodKinematicSecondsOfDate(yearForFormula);
   // Sidereal year in seconds = MEASURED days × o.lodKinematic (round-trip identity → = sidYear_s(year); = the IAU 31,558,149.7635 s at J2000 only).
   o.siderealYearSeconds = o.siderealYearDays * o.lodKinematic;
   // DISPLAY (D6, panel review): the one-source sidereal year OF DATE in SI
@@ -54041,8 +54007,7 @@ function updatePredictions() {
   // Anomalistic year in days = MEASURED (Fourier-fitted) directly, no round-trip.
   // Anomalistic year in seconds = MEASURED days × meanlengthofday (framework kinematic day unit).
   {
-    const _anomDaysFourier = evalYearFourier(yearForFormula,
-      _epochYearDaysBase('anomalistic', yearForFormula) ?? meanAnomalisticYearinDays, ANOMALISTIC_YEAR_HARMONICS);
+    const _anomDaysFourier = anomalisticYearDaysOfDate(yearForFormula);   // plan 09: the one-family anomalistic year over the kinematic day of date (was the retired comb)
     o.anomalisticYearSeconds = _anomDaysFourier * o.lodKinematic;
     o.anomalisticYearDays = _anomDaysFourier;
     // DISPLAY (D6): the one-source anomalistic of date — the SAME cardinal-
@@ -54201,99 +54166,30 @@ function updatePredictions() {
 
 }
 
-/**
- * Evaluate a Fourier harmonic series for year-length prediction.
- *
- * @param {number} currentYear – the calendar year
- * @param {number} mean – the mean year length (days)
- * @param {Array} harmonics – array of [period_divisor, sin_coeff, cos_coeff]
- * @returns {number} year length in days
- */
-function analyticYearDaysAt(kind, year) {
-  // the comb family's analytic bases ride the frozen era clock's counter (plan 06 D8)
-  const t_Ma = (J2000_CALENDAR_YEAR - year) / 1e6;
-  const sidSec = meanSiderealYearSecondsAtAge(t_Ma);
-  const Ht = eraClockHAtAge(t_Ma);
-  if (sidSec === null || Ht === null || !Number.isFinite(sidSec) || !Number.isFinite(Ht)) return null;
-  const sid = sidSec / 86400;
-  if (kind === 'sidereal')    return sid;
-  if (kind === 'tropical')    return sid * (1 - 13 / Ht);
-  if (kind === 'anomalistic') return sid * (1 + 3 / Ht);
-  return null;
+// ── The year lengths of date in DAYS of the epoch (plan 09) ──────────────
+// The three year-length combs (TROPICAL/SIDEREAL/ANOMALISTIC_YEAR_HARMONICS on
+// the frozen era clock's bases — evalYearFourier, _epochYearDaysBase, the
+// analytic shapes, compute*YearDaysDirect) are deleted. The published SI year
+// lengths of date (the one-family laws once the series has landed; the
+// tidal-chain means before) over the kinematic day of date. Engine twins:
+// tools/lib deep-time.js *YearDaysOfDate.
+function tropicalYearDaysOfDate(year) {
+  const s = _hybridSpinActive() && Math.abs(year - 2000) <= 2000000
+    ? _yearLengthsM().tropicalYearSecondsAtYear(year)
+    : meanTropicalYearSecondsAtAge((J2000_CALENDAR_YEAR - year) / 1e6);
+  return s / _lodKinematicSecondsOfDate(year);
 }
-
-/** Deviation of the analytic curve from its value at the fit anchor (year 2000).
- *  Zero at the anchor by construction, so it composes with the J2000-anchored
- *  harmonic basis without disturbing the anchor identity. Returns 0 when `kind`
- *  is absent or deep time is off — both mean "no shape". */
-function analyticYearShape(kind, year) {
-  if (!kind || !DEEP_TIME_MODE_ENABLED) return 0;
-  const a = analyticYearDaysAt(kind, year);
-  const a0 = analyticYearDaysAt(kind, 2000);
-  return (a === null || a0 === null) ? 0 : (a - a0);
+function siderealYearDaysOfDate(year) {
+  const s = _hybridSpinActive() && Math.abs(year - 2000) <= 2000000
+    ? _yearLengthsM().siderealYearSecondsAtYear(year)
+    : _siderealYearSecondsPure(year);
+  return s / _lodKinematicSecondsOfDate(year);
 }
-
-function evalYearFourier(currentYear, mean, harmonics, kind) {
-  // Phase 8.5: integrated phase using J2000-fixed anchor (frame-independent).
-  // Replaces the snapshot form `phase = 2π × (year − balancedYear) × div / H`
-  // with `phase = phaseAdvanceRadians(BALANCED_YEAR_J2000_FIXED, year, div)`.
-  //
-  // `kind` selects the analytic deep-time shape (Step 6d fits with the shape
-  // SUBTRACTED). Deliberately unset at the secondary Fourier readout call
-  // sites (§10g): their means carry epoch state in mismatched units, and
-  // passing kind there double-counts the trend. The authoritative tropical
-  // year is the cardinal-point path.
-  let result = mean + analyticYearShape(kind, currentYear);
-  for (const [div, sinC, cosC] of harmonics) {
-    const phase = phaseAdvanceRadians(BALANCED_YEAR_J2000_FIXED, currentYear, div);
-    if (phase === null) continue;
-    result += sinC * Math.sin(phase) + cosC * Math.cos(phase);
-  }
-  return result;
-}
-
-/**
- * Compute the length of the tropical (solar) year (in days) using Fourier harmonics.
- *
- * Fitted from 491 data points spanning ±25,000 years. Dominant periods: H/8 (obliquity
- * cycle, 41,912 yr) and H/3 (inclination cycle, 111,765 yr). RMS residual: 0.003 s.
- *
- * @param {number} currentYear – the calendar year
- * @returns {number} solarYearDays (in days)
- */
-// ── Epoch-aware Fourier baselines — pure f(Y) over Layer 0 ────────────────
-// Phase B froze computeSiderealYearDaysDirect's baseline to the J2000 const
-// to fix R16 (the mutable-global read made f(Y) depend on scene state), but
-// the pure replacement was never wired in: under deep time the baseline must
-// track the epoch. These are recomputeEpochAnchors' own recipes (and Node's
-// anomalisticYearDaysBase), evaluated AT Y instead of read from scene
-// globals — pure, so the transparency gate holds. Without this the whole
-// solar-day panel froze at J2000: LOD_real at +9001 read 86400.006 where the
-// model says 86400.156, ΔT rate 2.2 s/yr vs 57 s/yr. The
-// epoch-consistency gate (test/browser/epoch-consistency.test.mjs) fails on
-// that state. base(2000) ≡ the J2000 consts to 1e-13 (Layer 0 reproduces
-// the seeds).
-function _epochYearDaysBase(kind, year) {
-  if (!DEEP_TIME_MODE_ENABLED) return null;      // snapshot mode: J2000 consts
-  // The comb family's bases ride the FROZEN era clock's counter H_era (plan
-  // 06 D8) — the combs were fitted on them; the unit H(t) is the physics.
-  const H_t = _L0.eraClockH(year);
-  const LOD_s = _L0.lodSeconds(year);
-  const T_trop_s = _L0.eraClockTropicalYearSeconds(year);
-  if (H_t === null || LOD_s === null || T_trop_s === null) return null;  // past asymptote
-  const tropDays = T_trop_s / LOD_s;
-  if (kind === 'tropical')    return tropDays;
-  if (kind === 'sidereal')    return tropDays * H_t / (H_t - 13);            // recomputeEpochAnchors' _kinematic recipe
-  if (kind === 'anomalistic') return tropDays * (H_t / 16) / (H_t / 16 - 1); // Node's anomalisticYearDaysBase
-  return null;
-}
-
-function computeSolarYearDaysDirect(currentYear) {
-  // Epoch-aware base; the J2000 const fallback replaces the previous read of
-  // the MUTABLE meansolaryearlengthinDays global (a latent R16 impurity that
-  // escaped the transparency gate because this function is not probed).
-  const base = _epochYearDaysBase('tropical', currentYear) ?? MEAN_SOLAR_YEAR_J2000_DAYS;
-  return evalYearFourier(currentYear, base, TROPICAL_YEAR_HARMONICS);
+function anomalisticYearDaysOfDate(year) {
+  const s = _hybridSpinActive() && Math.abs(year - 2000) <= 2000000
+    ? _yearLengthsM().anomalisticYearSecondsAtYear(year)
+    : NaN;
+  return s / _lodKinematicSecondsOfDate(year);
 }
 
 function computeSolarYearDaysFromCardinals(currentYear) {
@@ -54303,61 +54199,6 @@ function computeSolarYearDaysFromCardinals(currentYear) {
           computeSolsticeYearLength(currentYear, 'AE')) / 4;
 }
 
-/**
- * Compute the length of the sidereal year (in days) using Fourier harmonics.
- *
- * Fitted from 491 data points spanning ±25,000 years. Dominant periods: H/8 and H/3.
- * RMS residual: 0.0002 s.
- *
- * @param {number} currentYear – the calendar year
- * @returns {number} siderealYearDays (in days)
- */
-function computeSiderealYearDaysDirect(currentYear) {
-  // Use the framework's H/13-derived MEAN sidereal year in days as Fourier
-  // baseline (matches CSV measurement mean over full H exactly, by the
-  // T_axial = H/13 identity). Under H=335,317 this is 365.256364.
-  //
-  // Why not IAU 365.256363: that value is derived from IAU sidereal_seconds /
-  // 86400 SI, a tautological "days" count using the SI second definition. The
-  // framework's own MEAN LOD is 86399.999676 (H/13-anchored, kinematic), so its
-  // sidereal year in framework days is 365.256364 — 1 μd above IAU. CSV
-  // measurements from Step 6a average to this framework mean, confirming the
-  // H/13 identity as internally consistent.
-  //
-  // Fourier harmonics represent year-to-year variation around this mean; they
-  // have zero DC by construction, so changing the base doesn't require refit —
-  // just shifts the reported value by the base difference. Downstream LOD
-  // derivation (sec / sid_days) then lands at ~86399.999676 at J2000
-  // (matching the CSV-measured mean over full H). The physical LOD_real
-  // (closing the USNO 86400.0021 joint-world anchor) adds the ecliptic-precession
-  // correction separately in the display layer — see doc 11 § "The ecliptic missing-motion LOD Correction".
-  //
-  // Uses SIDEREAL_YEAR_DAYS_KINEMATIC_J2000 — the genuinely frozen module-load
-  // baseline the harmonics were fitted around. This comment used to claim the
-  // `_kinematic` GLOBAL was immutable while recomputeEpochAnchors overwrote it
-  // (the 2026-07-17 deep-time fix) — which made f(Y) depend on scene-epoch
-  // state, the exact violation the transparency gate tracks (plan §5c, R16).
-  // Deep-time displays read the mutable global; this formula reads the const.
-  const base = _epochYearDaysBase('sidereal', currentYear) ?? SIDEREAL_YEAR_DAYS_KINEMATIC_J2000;
-  return evalYearFourier(currentYear, base, SIDEREAL_YEAR_HARMONICS);
-}
-
-/**
- * Compute the length of the anomalistic year (in seconds) with Real LOD.
- *
- * Uses Fourier harmonics fitted from 491 data points. The anomalistic year has
- * four significant periods: H/8, H/3, H/16, and H/24 (beat frequency of H/3 and H/8).
- * RMS residual: 0.002 s.
- *
- * @param {number} currentYear – the calendar year
- * @param {number} lengthofDay – the current length of day (in seconds)
- * @returns {number} anomalisticYearSeconds (in seconds)
- */
-function computeAnomalisticYearSecFromDaysFourier(currentYear, lengthofDay) {
-  const anomDays = evalYearFourier(currentYear,
-    _epochYearDaysBase('anomalistic', currentYear) ?? meanAnomalisticYearinDays, ANOMALISTIC_YEAR_HARMONICS);
-  return anomDays * lengthofDay;
-}
 
 // ═══════════════════════════════════════════════════════════════════════════
 // LOD taxonomy — layered structure (per user's design):

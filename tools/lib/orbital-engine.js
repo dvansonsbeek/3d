@@ -338,89 +338,18 @@ function computeEclipticPrecession(axialPrecession) {
 // YEAR LENGTH (Earth only)
 // ═══════════════════════════════════════════════════════════════════════════
 
-/**
- * Evaluate a Fourier harmonic series for year-length prediction.
- * Source: script.js evalYearFourier() ~line 33264
- *
- * @param {number} year - calendar year
- * @param {number} mean - mean year length (days)
- * @param {Array} harmonics - array of [period_divisor, sin_coeff, cos_coeff]
- * @returns {number} year length in days
- */
 // Lazy, memoised deep-time accessor. This module is required by deep-time's
 // own dependency chain, so a top-level require would be circular — the existing
 // inline `dtm()` calls exist for the same reason.
 let _dtMod = null;
 const dtm = () => (_dtMod || (_dtMod = require('./deep-time')));   // perf: the ONE lazy resolution of deep-time (every in-function use goes through dtm())
-const deepTimeOn = () => process.env.SG_DEEP_TIME !== '0';
 
-// ─── §10 / §5c-ii-g — analytic deep-time year shape ──────────────────────
-// EXACT mirror of src/script.js analyticYearShape and of the retired 6c
-// fitter's analyticShape (tools/fit/archive/year-length-harmonics.cjs —
-// coefficients frozen as the certified K-era clock). Step 6d SUBTRACTED this
-// before fitting, so it MUST be added back — a deep-time year length carries a
-// secular trend a Fourier basis on H-divisors provably cannot represent, worth
-// ~0.93 s (measured 1.03 / 0.98 / 0.97 s without it, vs 0.008 / 0.002 / 0.018
-// with it). Amplitude is FIXED AT 1: §5d-t measured the mass-loss amplitude at
-// 1.0000 ± 5e-4 from two independent observables.
-//
-// Zero new constants — one quantity plus framework lattice integers:
-//   T_sid  = meanSiderealYearSecondsAtAge / 86400
-//   T_trop = T_sid · (1 − 13/H)   axial precession       H/13 =  25,794 yr
-//   T_anom = T_sid · (1 +  3/H)   perihelion inertial    H/3  = 111,772 yr
-// with 13 + 3 = 16: the climatic precession H/16 is their SUM, which is why the
-// cardinal points braid on H/16.
-function analyticYearDaysAt(kind, year) {
-  // The comb family's analytic bases ride the FROZEN era clock's counter
-  // H_era (plan 06 D8) — the combs were fitted on them; not the unit H(t).
-  const t_Ma = (C.startmodelYear - year) / 1e6;
-  const sidSec = dtm().meanSiderealYearSecondsAtAge(t_Ma);
-  const Ht = dtm().eraClockHAtAge(t_Ma);
-  if (sidSec === null || Ht === null) return null;
-  const sid = sidSec / 86400;
-  if (kind === 'sidereal')    return sid;
-  if (kind === 'tropical')    return sid * (1 - 13 / Ht);
-  if (kind === 'anomalistic') return sid * (1 + 3 / Ht);
-  return null;
-}
-
-function analyticYearShape(kind, year) {
-  if (!kind || !deepTimeOn()) return 0;
-  const a = analyticYearDaysAt(kind, year);
-  const a0 = analyticYearDaysAt(kind, 2000);
-  return (a === null || a0 === null) ? 0 : (a - a0);
-}
-
-function evalYearFourier(year, mean, harmonics, kind) {
-  // Phase is INTEGRATED (∫ div/H(t) dt), not the snapshot 2π·t·div/H this used
-  // to compute. H is not fixed — it runs 335,292 → 335,320 across the Step 6a
-  // window — and the fits are on the integrated axis, so the runtime must match
-  // or it evaluates coefficients against a different model than they were
-  // fitted against.
-  let result = mean + analyticYearShape(kind, year);
-  const c0 = dtm().cyclesBetweenYears(C.balancedYear, 2000, 1);
-  const cY = dtm().cyclesBetweenYears(C.balancedYear, year, 1);
-  if (c0 === null || cY === null) return result;
-  for (const [div, sinC, cosC] of harmonics) {
-    const th = 2 * Math.PI * div * cY, th0 = 2 * Math.PI * div * c0;
-    result += sinC * (Math.sin(th) - Math.sin(th0))
-            + cosC * (Math.cos(th) - Math.cos(th0));
-  }
-  return result;
-}
-
-/** Compute simplified tropical year length in days — Fourier harmonics around
- *  an EPOCH-AWARE base (T_trop_s/LOD_s at year, via deep-time). Mirrors the
- *  browser's computeSolarYearDaysDirect: a frozen J2000 base loses the secular
- *  LOD term entirely (the epoch-consistency gate class — the browser display
- *  froze at J2000 until the matching fix). Falls back to the J2000 constant in
- *  snapshot mode or past the tidal-lock asymptote. */
-function computeLengthOfSimplifiedSolarYear(year) {
-  const base = (deepTimeOn()
-    ? dtm().meanYearInDaysAtAge((2000 - year) / 1e6)
-    : null) ?? C.meanSolarYearDays;
-  return evalYearFourier(year, base, C.TROPICAL_YEAR_HARMONICS);
-}
+// (Plan 09: the analytic deep-time year shapes, the difference-form Fourier
+// evaluator and the comb-based year-length functions —
+// computeLengthOfSimplifiedSolarYear, computeLengthOfSiderealYear,
+// computeAnomalisticYearSecondsAtDayLength, computeLengthOfAnomalisticYearDays
+// — are deleted with the three year-length combs. The year lengths of date in
+// days are deep-time.js *YearDaysOfDate; the cardinal 4-mean below stays.)
 
 /** Compute tropical year length in days as mean of 4 cardinal point year lengths.
  *  This is the physically correct definition: the mean return time to solstices/equinoxes. */
@@ -429,48 +358,6 @@ function computeLengthOfSolarYear(year) {
           computeSolsticeYearLength(year, 'WS') +
           computeSolsticeYearLength(year, 'VE') +
           computeSolsticeYearLength(year, 'AE')) / 4;
-}
-
-/** Compute sidereal year length in days.
- *  Deep-time base = T_sid_s(t_Ma) / LOD_s(t_Ma) — real-LOD days at year Y,
- *  matching the simulator's tweakpane (which sees meansiderealyearlengthinDays
- *  mutated by recomputeEpochAnchors). Falls back to the J2000 constant past
- *  the tidal-lock asymptote. */
-function computeLengthOfSiderealYear(year) {
-  const t_Ma = (2000 - year) / 1e6;
-  const dt = dtm();
-  const T_sid_s = dt.meanSiderealYearSecondsAtAge(t_Ma);
-  const LOD_s   = dt.meanLodSecondsAtAge(t_Ma);
-  const base    = (LOD_s === null) ? C.meanSiderealYearDays : (T_sid_s / LOD_s);
-  return evalYearFourier(year, base, C.SIDEREAL_YEAR_HARMONICS);
-}
-
-/** Deep-time anomalistic-year base in real-LOD days at year Y.
- *  Anomalistic year is set by perihelion precession (H/16 cycle); with H
- *  evolving under Driver 1, the anom/trop ratio shifts too. Uses the same
- *  identity as J2000 form: anom = trop × (H/16) / (H/16 − 1). Matches the
- *  website's anomalisticYearDaysBase (Holistic .../dayYear.ts). Falls back
- *  to the J2000 constant past the tidal-lock asymptote. */
-function anomalisticYearDaysBase(year) {
-  const t_Ma = (2000 - year) / 1e6;
-  const dt = dtm();
-  const Ht    = dt.meanHAtAge(t_Ma);
-  const tropD = dt.meanYearInDaysAtAge(t_Ma);
-  if (Ht === null || tropD === null) return C.meanAnomalisticYearDays;
-  return (tropD * (Ht / 16)) / (Ht / 16 - 1);
-}
-
-/** Anomalistic year length in seconds at a given day length — the days
- *  evaluator × the day length the caller picks (year/day plan §2c: the unit
- *  is the argument, not a function variant; formerly "…RealLOD"). */
-function computeAnomalisticYearSecondsAtDayLength(year, lengthOfDay) {
-  const anomDays = evalYearFourier(year, anomalisticYearDaysBase(year), C.ANOMALISTIC_YEAR_HARMONICS);
-  return anomDays * lengthOfDay;
-}
-
-/** Compute anomalistic year length in days. */
-function computeLengthOfAnomalisticYearDays(year) {
-  return evalYearFourier(year, anomalisticYearDaysBase(year), C.ANOMALISTIC_YEAR_HARMONICS);
 }
 
 /**
@@ -726,13 +613,9 @@ module.exports = {
   computeObliquityPrecession,
   computeEclipticPrecession,
 
-  // Year Length
-  evalYearFourier,
+  // Year Length (plan 09: the comb-based evaluators are deleted; deep-time.js
+  // *YearDaysOfDate carry the year lengths of date in days)
   computeLengthOfSolarYear,
-  computeLengthOfSimplifiedSolarYear,
-  computeLengthOfSiderealYear,
-  computeAnomalisticYearSecondsAtDayLength,
-  computeLengthOfAnomalisticYearDays,
   computeLengthOfSolarYearSec,
   computeLengthOfSiderealYearSec,
 

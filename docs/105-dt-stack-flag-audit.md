@@ -1,7 +1,7 @@
 ---
 docVersion: 1.0
 modelVersion: v23.0
-coefficients: sha256:90a0f37a51074bdb
+coefficients: sha256:e0bf442540ee02b7
 status: current
 ---
 
@@ -31,7 +31,7 @@ The trap is concrete. The stage metrics show stage_d — adding Jose4 — *raisi
 `rms_post` from 19.75 s to 21.21 s, which reads as Jose4 not earning its place.
 Measured through `--joint`, which re-optimises the USNO/deltaTStart anchors
 together with the coefficients, Jose4 is the single largest contributor:
-Espenak RMS 34.89 → <!--v:deltaTEspenakRmsSeconds-->14.1<!--/v--> s.
+Espenak RMS 34.89 → <!--v:deltaTEspenakRmsSeconds-->12.5<!--/v--> s.
 
 To compare configurations, use `DT_FLAGS` with `--joint` (§5). Never the stage
 metrics.
@@ -67,7 +67,7 @@ Full −720…2017 window, `--joint`, anchors free to move:
 | bond + hallstatt | 33.49 s | 72.70 s |
 | bond + hallstatt + jose5 | 34.89 s | 45.00 s |
 | bond + hallstatt + jose4 (jose5 removed) | 26.07 s | 74.81 s |
-| **all four (shipped)** | **<!--v:deltaTEspenakRmsSeconds-->14.1<!--/v--> s** | **<!--v:stephensonFullWindowRmsSeconds-->28.75<!--/v--> s** |
+| **all four (shipped)** | **<!--v:deltaTEspenakRmsSeconds-->12.5<!--/v--> s** | **<!--v:stephensonFullWindowRmsSeconds-->28.75<!--/v--> s** |
 
 ## 4. Configuration sweep — out-of-sample
 

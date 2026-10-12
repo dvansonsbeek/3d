@@ -29,7 +29,7 @@ import { computeSolarTorqueShare } from '../earth/precession-composed.cjs';
  * @property {number} alpha4PerMa4
  * @property {number} holisticYearJ2000         H
  * @property {number} meanSiderealYearSeconds
- * @property {number} meanSiderealYearDaysKinematic
+ * @property {number} lodJ2000Seconds              ω₀: the J2000 day length, SI seconds (the SI day since plan 09)
  * @property {number} sunMassKg                 M_SUN
  * @property {number} gmEarthAloneKm3S2
  * @property {number} gmMoonAloneKm3S2
@@ -54,8 +54,10 @@ export const deriveEpochParams = (raw) => {
   const cSiMPerS = raw.speedOfLightKmPerS ? raw.speedOfLightKmPerS * 1000 : 299792458;
   const dmDtTotalKgS = raw.solarLuminosityW / (cSiMPerS * cSiMPerS) + raw.solarWindKgPerS;
 
-  // J2000 anchors derived from framework constants
-  const lodNowH13Seconds = raw.meanSiderealYearSeconds / raw.meanSiderealYearDaysKinematic;
+  // J2000 anchors. Plan 09: ω₀ is the SI day (an input, 86,400 s); the
+  // identifier keeps its historical name — the H/13 kinematic-day
+  // construction it once named (86,399.99968 s) is deleted.
+  const lodNowH13Seconds = raw.lodJ2000Seconds;
   const solarMassLossFracPerYear = dmDtTotalKgS * raw.meanSiderealYearSeconds / raw.sunMassKg;
 
   // Earth mass, moments

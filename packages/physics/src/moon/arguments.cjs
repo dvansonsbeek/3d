@@ -3,15 +3,19 @@
  * (Phase 8.2-5). The measured argument-decomposition recipe of doc 66 §1:
  * {Lp, D, M, Mp, F} in degrees, of-date, Meeus Ch. 47 convention.
  *
- * Extracted VERBATIM from src/script.js (_FW_MOON, _FW_SUN_SEC,
- * _fwSunSecularDeviations, the two bounded Lp carriers, _fwMoonArgsDeep,
- * _fwMoonArgs, and the pure-Meeus reference polynomials), which
- * tools/lib/scene-graph.js mirrored. Mirror gaps closed here:
+ * Extracted VERBATIM from src/script.js (_FW_MOON, the two bounded Lp
+ * carriers, _fwMoonArgsDeep, _fwMoonArgs, and the pure-Meeus reference
+ * polynomials), which tools/lib/scene-graph.js mirrored. Plan 09: the Sun's
+ * mean longitude and perihelion of date are INJECTED from the ONE certified
+ * Sun (sunMeanLonDegAtJdTT / sunPerihelionLonDegAtJdTT); the former
+ * _FW_SUN_SEC / _fwSunSecularDeviations (the retired year combs' Sun
+ * integrals, −695″ against the IAU mean Sun at −2000) are deleted. Mirror
+ * gaps closed at extraction:
  *
- *  - S3: the Sun secular deviations' year coordinate. The browser used the
- *    full Julian/Gregorian calendar conversion; the tools mirror used a
+ *  - S3: the (then) Sun secular deviations' year coordinate. The browser used
+ *    the full Julian/Gregorian calendar conversion; the tools mirror used a
  *    linear approximation. The calendar conversion is EMBEDDED here as a
- *    private helper, so both engines now evaluate the same coordinate.
+ *    private helper, so both engines evaluate the same coordinate.
  *  - S9: ϖ/Ω composition order in the deep branch (wrapper-composed vs
  *    use-site subtraction) — one form now, the browser's.
  *  - S10: P_DEGCY was derived from the browser's MUTABLE holisticyearLength
@@ -76,11 +80,6 @@ function jdToDecimalYear(jd) {
  *     j2000JD: number,
  *     julianCenturyDays: number,
  *     holisticYearJ2000: number,
- *     balancedYearJ2000: number,
- *     meanSolarYearDays: number,
- *     meanAnomalisticYearDays: number,
- *     tropicalYearHarmonics: Array<[number, number, number]>,
- *     anomalisticYearHarmonics: Array<[number, number, number]>,
  *     eccentricityJ2000: number,
  *     eccentricityDotJ2000: number,
  *     eccentricityDotDotJ2000: number,
@@ -92,11 +91,12 @@ function jdToDecimalYear(jd) {
  *     eccAt: (tYr: number) => number,
  *     channelIntegral: (T: number, s: number) => number,
  *     computeObliquityEarth: (year: number) => number,
+ *     sunMeanLonDegAtJdTT: (jdTT: number) => number,
+ *     sunPerihelionLonDegAtJdTT: (jdTT: number) => number,
  *     jdToSIyear: (jd: number) => number,
  *     tropicalOrbitsBetween: (yearA: number, yearB: number) => (number | null),
  *     apsidalOfDateCyclesBetween: (yearA: number, yearB: number) => (number | null),
  *     nodalOfDateCyclesBetween: (yearA: number, yearB: number) => (number | null),
- *     cyclesBetween: (yearA: number, yearB: number, divisorN: number) => (number | null),
  *     isDeepTime: () => boolean,
  *     isFrameworkNative: () => boolean,
  *     pDynDegPerYearAt?: (year: number) => number,
@@ -110,20 +110,28 @@ function jdToDecimalYear(jd) {
  *   evaluators — the tweakpane identity, real at J2000, epoch-valid);
  *   pKin = the KINEMATIC pair's beat (the H/13-family mean the chains
  *   embed). Absent ⇒ the completion is disabled (pre-(d′) behaviour).
+ *   Plan 09: the Sun of the arguments is the engine's ONE certified Sun —
+ *   sunMeanLonDegAtJdTT (the mean longitude that integrates the one-family
+ *   tropical year, unwrapped) and sunPerihelionLonDegAtJdTT (the mean
+ *   perihelion of date, wrapped — the arguments wrap M, and the rate anchors
+ *   difference it over ±25 days wrapped to ±180°). The former "model timeline" Sun — 360° per mean solar
+ *   year plus the closed-form integrals of the retired year-length combs,
+ *   the perihelion on the H/16 chain count — sat 0.2° behind the IAU mean
+ *   Sun at −2000 (the combs could not carry the tropical year's secular
+ *   drift); measured against Meeus L0 before the move.
  */
 function createMoonArguments({ constants, fns }) {
   const {
-    j2000JD, julianCenturyDays, holisticYearJ2000, balancedYearJ2000,
-    meanSolarYearDays, meanAnomalisticYearDays,
-    tropicalYearHarmonics, anomalisticYearHarmonics,
+    j2000JD, julianCenturyDays, holisticYearJ2000,
     eccentricityJ2000, eccentricityDotJ2000, eccentricityDotDotJ2000,
     elpEarthFigureJ2ArcsecPerCy2, elpGeneralPrecessionPA_T2ArcsecPerCy2,
     eccE0,
   } = constants;
   const {
     eccAt, channelIntegral, computeObliquityEarth, jdToSIyear,
+    sunMeanLonDegAtJdTT, sunPerihelionLonDegAtJdTT,
     tropicalOrbitsBetween, apsidalOfDateCyclesBetween, nodalOfDateCyclesBetween,
-    cyclesBetween, isDeepTime, isFrameworkNative,
+    isDeepTime, isFrameworkNative,
     pDynDegPerYearAt, pKinDegPerYearAt,
   } = fns;
 
@@ -157,49 +165,9 @@ function createMoonArguments({ constants, fns }) {
     return { LP0, D0, M0, MP0, F0, LPR, DR, MR, P_DEGCY, WDOT, NDOT, T2_W, T2_N, T3_W, T3_N, T2_LP, T2_LP_TIDAL, S_W, S_N };
   })();
 
-  // ── Sun secular deviations: closed-form year-length-harmonic integrals ───
-  // Normalized to value 0 AND slope 0 at J2000. KL/KA/KS capture the J2000
-  // mean-year values at construction by design; phases use the fixed J2000
-  // lattice (the documented snapshot approximation).
-  const sunSec = (() => {
-    const trop = tropicalYearHarmonics, anom = anomalisticYearHarmonics;
-    const PBAR = meanSolarYearDays, ABAR = meanAnomalisticYearDays, DBAR = ABAR - PBAR;
-    const KL = -(360 / PBAR);
-    const wbar = 360 * DBAR / ABAR;
-    const KA = wbar * PBAR / (ABAR * DBAR);
-    const KS = -wbar / DBAR;
-    /** @param {number} y @param {Array<[number, number, number]>} set */
-    const dP = (y, set) => {
-      const t = y - balancedYearJ2000; let s = 0;
-      for (const [d, sc, cc] of set) {
-        const w = 2 * Math.PI / (holisticYearJ2000 / d);
-        s += sc * Math.sin(w * t) + cc * Math.cos(w * t);
-      } return s;
-    };
-    /** @param {number} y @param {Array<[number, number, number]>} set */
-    const intdP = (y, set) => {
-      const t = y - balancedYearJ2000; let s = 0;
-      for (const [d, sc, cc] of set) {
-        const w = 2 * Math.PI / (holisticYearJ2000 / d);
-        s += (-sc * Math.cos(w * t) + cc * Math.sin(w * t)) / w;
-      } return s;
-    };
-    return { int0T: intdP(2000, trop), int0A: intdP(2000, anom),
-             slope0L: KL * dP(2000, trop),
-             slope0P: KA * dP(2000, anom) + KS * dP(2000, trop),
-             KL, KA, KS, intdP, trop, anom };
-  })();
-
-  /** @param {number} jdTT @returns {{dLs: number, dPeri: number}} */
-  function sunSecularDeviations(jdTT) {
-    const y = jdToDecimalYear(jdTT);   // S3: the calendar coordinate, both engines
-    const S = sunSec;
-    const iT = S.intdP(y, S.trop) - S.int0T, iA = S.intdP(y, S.anom) - S.int0A;
-    return {
-      dLs: S.KL * iT - S.slope0L * (y - 2000),
-      dPeri: S.KA * iA + S.KS * iT - S.slope0P * (y - 2000),
-    };
-  }
+  // (Plan 09: the "Sun secular deviations" — closed-form integrals of the
+  // retired year-length combs on the calendar coordinate — are gone; the
+  // Sun is injected, see the header.)
 
   // ── Bounded Lp carriers (K_PL / C_OBL derived lazily — zero new constants)
   /** @type {number | null} */
@@ -403,6 +371,8 @@ function createMoonArguments({ constants, fns }) {
     return dy / 2 + (Tq / (2 * Math.PI)) * Math.sin(Math.PI * dy / Tq);
   }
 
+  /** Wrap a degree difference to (−180, 180]. @param {number} d */
+  const w180 = (d) => ((d + 540) % 360 + 360) % 360 - 180;
   /** @type {{ok: boolean, Lp: number, w: number, om: number, Lsun: number, ws: number, Tq: number} | null} */
   let rcAnchors = null;
   function anchorsInit() {
@@ -430,7 +400,7 @@ function createMoonArguments({ constants, fns }) {
       w: B.WDOT * k - (b.w - a.w) / span,
       om: B.NDOT * k - (b.om - a.om) / span,
       Lsun: (B.LPR - B.DR) * k - (b.Lsun - a.Lsun) / span,
-      ws: (B.LPR - B.DR - B.MR) * k - (b.ws - a.ws) / span,
+      ws: (B.LPR - B.DR - B.MR) * k - w180(b.ws - a.ws) / span,   // ws is wrapped; ±25 days of perihelion motion is far inside ±180°
       Tq: holisticYearJ2000 / 12,
     };
     return rcAnchors;
@@ -447,9 +417,7 @@ function createMoonArguments({ constants, fns }) {
     const Ntrop = tropicalOrbitsBetween(argsY0, y);
     const Naps = apsidalOfDateCyclesBetween(argsY0, y);
     const Nnod = nodalOfDateCyclesBetween(argsY0, y);
-    const Nperi = cyclesBetween(argsY0, y, 16);
-    if (Ntrop === null || Naps === null || Nnod === null || Nperi === null) return null;   // tidal-lock guard
-    const dev = sunSecularDeviations(jd);
+    if (Ntrop === null || Naps === null || Nnod === null) return null;   // tidal-lock guard
     const Tj = (jd - j2000JD) / julianCenturyDays;
     const dy = y - argsY0;
     // pFix rides Lp ONLY: the obliquity carrier's PA reduction compensates
@@ -464,8 +432,9 @@ function createMoonArguments({ constants, fns }) {
       + lpSecularCompletion(Tj) + pF;
     const w = (A.LP0 - A.MP0) + 360 * Naps;                      // perigee ϖ (of-date, advance)
     const om = (A.LP0 - A.F0) - 360 * Nnod;                      // node Ω (of-date, regression)
-    const Lsun = (A.LP0 - A.D0) + 360 * dy + dev.dLs;            // mean Sun (model timeline)
-    const ws = (A.LP0 - A.D0 - A.M0) + 360 * Nperi + dev.dPeri;  // Sun perihelion (H/16 chain)
+    const Lsun = sunMeanLonDegAtJdTT(jd);          // the certified Sun's mean longitude (unwrapped)
+    const ws = sunPerihelionLonDegAtJdTT(jd) + 180;   // the Sun's perihelion = Earth's mean ϖ of date + 180° (wrapped; M wraps)
+    void A;
     return { Lp, w, om, Lsun, ws, dy };
   }
 
@@ -510,9 +479,8 @@ function createMoonArguments({ constants, fns }) {
     const Lp = A.LP0 + A.LPR * T + A.T2_LP * Tc2 + Tc3 / 538841 - Tc4 / 65194000;
     const w = (A.LP0 - A.MP0) + A.WDOT * (T + channelIntegral(T, A.S_W));   // perigee ϖ (of-date)
     const om = (A.LP0 - A.F0) + A.NDOT * (T + channelIntegral(T, A.S_N));   // node Ω (of-date)
-    const dev = sunSecularDeviations(jdTT);
-    const Lsun = (A.LP0 - A.D0) + (A.LPR - A.DR) * T + dev.dLs;                  // of-date mean Sun
-    const ws = (A.LP0 - A.D0 - A.M0) + (A.LPR - A.DR - A.MR) * T + dev.dPeri;    // of-date Sun perihelion
+    const Lsun = sunMeanLonDegAtJdTT(jdTT);               // the certified Sun's mean longitude of date
+    const ws = sunPerihelionLonDegAtJdTT(jdTT) + 180;     // the Sun's perihelion of date
     return {
       Lp: wrap(Lp), D: wrap(Lp - Lsun), M: wrap(Lsun - ws),
       Mp: wrap(Lp - w), F: wrap(Lp - om),
@@ -543,7 +511,7 @@ function createMoonArguments({ constants, fns }) {
 
   // _rateCompletion: probe hook (instruments/verification) — the (d′) state:
   // whether the completion is live, its measured ṗΔ, and the five anchors.
-  return { argsAt, fwArgs, fwArgsDeep, pureMeeusArgs, sunSecularDeviations, planetaryCarrier, obliquityCarrier, lpSecularCompletion, bundle,
+  return { argsAt, fwArgs, fwArgsDeep, pureMeeusArgs, planetaryCarrier, obliquityCarrier, lpSecularCompletion, bundle,
     _rateCompletion: () => ({ rc: rateCompInit(), anchors: anchorsInit() }) };
 }
 

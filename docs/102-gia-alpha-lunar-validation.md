@@ -1,7 +1,7 @@
 ---
 docVersion: 1.0
 modelVersion: v23.0
-coefficients: sha256:90a0f37a51074bdb
+coefficients: sha256:e0bf442540ee02b7
 status: current
 ---
 
@@ -433,7 +433,7 @@ The framework's independent validation is the 26-event solar-eclipse
 alignment audit (current certified-chain run): 16/26 with the umbra
 reaching the observation site (3 confirmed at greatest moment + 13
 off-peak alignments — including −135 Babylon at BestGap
-<!--v:babylon135BestGapKm-->170<!--/v--> km and −708 Lu at 9 km),
+<!--v:babylon135BestGapKm-->153<!--/v--> km and −708 Lu at 9 km),
 5/26 regional (framework umbra in same continental band
 but off site), 0/26 with residual ΔT-signal — the framework agrees
 with the documented UT on every event — and 5/26 geographic-class
@@ -502,7 +502,7 @@ property of the framework, not regional observational bias.
 
 The deepest, hardest-to-fit observations — the cuneiform tablets
 from Babylon, -800 to -300 BCE — are reproduced per century to within
-<!--v:lunarCenturyResidualMinMinutes-->0<!--/v-->–<!--v:lunarCenturyResidualMaxMinutes-->13<!--/v--> minutes
+<!--v:lunarCenturyResidualMinMinutes-->1<!--/v-->–<!--v:lunarCenturyResidualMaxMinutes-->14<!--/v--> minutes
 of an observed ΔT signal of 4–6 **hours** (0.5–5% relative). The table
 is CI-pinned by the `lunar-alignment` gate
 (`data/lunar-alignment-summary.json` §dtBandsByCentury) — a silent
@@ -510,11 +510,11 @@ drift in either direction fails the chain:
 
 | Century | n | obs ΔT (hr) | model ΔT (hr) | residual |
 |---|---:|---:|---:|---:|
-| -800…-701 | <!--v:lunarCentury800N-->2<!--/v--> | <!--v:lunarCentury800ObsHours-->5.69<!--/v--> | <!--v:lunarCentury800FrameworkHours-->5.69<!--/v--> | <!--v:lunarCentury800ResidualHours-->0.00<!--/v--> hr |
-| -700…-601 | <!--v:lunarCentury700N-->8<!--/v--> | <!--v:lunarCentury700ObsHours-->5.42<!--/v--> | <!--v:lunarCentury700FrameworkHours-->5.35<!--/v--> | <!--v:lunarCentury700ResidualHours-->−0.08<!--/v--> hr |
-| -600…-501 | <!--v:lunarCentury600N-->21<!--/v--> | <!--v:lunarCentury600ObsHours-->5.03<!--/v--> | <!--v:lunarCentury600FrameworkHours-->4.94<!--/v--> | <!--v:lunarCentury600ResidualHours-->−0.08<!--/v--> hr |
-| -500…-401 | <!--v:lunarCentury500N-->17<!--/v--> | <!--v:lunarCentury500ObsHours-->4.55<!--/v--> | <!--v:lunarCentury500FrameworkHours-->4.37<!--/v--> | <!--v:lunarCentury500ResidualHours-->−0.18<!--/v--> hr |
-| -400…-301 | <!--v:lunarCentury400N-->27<!--/v--> | <!--v:lunarCentury400ObsHours-->4.33<!--/v--> | <!--v:lunarCentury400FrameworkHours-->4.11<!--/v--> | <!--v:lunarCentury400ResidualHours-->−0.22<!--/v--> hr |
+| -800…-701 | <!--v:lunarCentury800N-->2<!--/v--> | <!--v:lunarCentury800ObsHours-->5.69<!--/v--> | <!--v:lunarCentury800FrameworkHours-->5.67<!--/v--> | <!--v:lunarCentury800ResidualHours-->−0.02<!--/v--> hr |
+| -700…-601 | <!--v:lunarCentury700N-->8<!--/v--> | <!--v:lunarCentury700ObsHours-->5.42<!--/v--> | <!--v:lunarCentury700FrameworkHours-->5.33<!--/v--> | <!--v:lunarCentury700ResidualHours-->−0.09<!--/v--> hr |
+| -600…-501 | <!--v:lunarCentury600N-->21<!--/v--> | <!--v:lunarCentury600ObsHours-->5.03<!--/v--> | <!--v:lunarCentury600FrameworkHours-->4.93<!--/v--> | <!--v:lunarCentury600ResidualHours-->−0.10<!--/v--> hr |
+| -500…-401 | <!--v:lunarCentury500N-->17<!--/v--> | <!--v:lunarCentury500ObsHours-->4.55<!--/v--> | <!--v:lunarCentury500FrameworkHours-->4.36<!--/v--> | <!--v:lunarCentury500ResidualHours-->−0.19<!--/v--> hr |
+| -400…-301 | <!--v:lunarCentury400N-->27<!--/v--> | <!--v:lunarCentury400ObsHours-->4.33<!--/v--> | <!--v:lunarCentury400FrameworkHours-->4.10<!--/v--> | <!--v:lunarCentury400ResidualHours-->−0.23<!--/v--> hr |
 
 Three thousand years deep, observations from clay tablets, reproduced
 by a model whose every physical constant comes from independent
@@ -524,7 +524,7 @@ the tablet reductions there) is recorded and gated rather than tuned
 away; the reductions carry the Stephenson team's conversion assumptions,
 and the assumption-light cross-check agrees with the framework — the
 untimed-bounds section of the same gate places the framework ΔT at −135
-(<!--v:lunarDtBoundsBabylon135FrameworkSeconds-->12,029<!--/v--> s) inside the
+(<!--v:lunarDtBoundsBabylon135FrameworkSeconds-->11,982<!--/v--> s) inside the
 tablet's published totality window
 [<!--v:lunarDtBoundsBabylon135LowSeconds-->11,220<!--/v-->, <!--v:lunarDtBoundsBabylon135HighSeconds-->12,140<!--/v-->] s.
 
@@ -537,20 +537,20 @@ month evolution is chain-integrated on the model's own recession history. The `t
 section of the same gate measures the difference directly, on the TT axis
 (framework opposition vs the NASA canon's greatest-eclipse instant, era
 bins ±40 yr, modern definitional baseline subtracted): a smooth secular
-drift reaching <!--v:lunarDrift800Minutes-->−3.0<!--/v--> min at the −750 era
+drift reaching <!--v:lunarDrift800Minutes-->−2.7<!--/v--> min at the −750 era
 and vanishing toward the present — an effective
-Δṅ ≈ <!--v:lunarTheoryDriftDeltaNdot-->0.24<!--/v--> ″/cy² between the two
+Δṅ ≈ <!--v:lunarTheoryDriftDeltaNdot-->0.22<!--/v--> ″/cy² between the two
 theories. A re-reduction of the tablets with the framework's own Moon
 shifts each century's implied ΔT by exactly that drift, which converts
 the one-sided residual column above into sign-mixed, noise-class scatter:
 
 | Century | residual today | **pre-registered** residual after framework re-reduction |
 |---|---:|---:|
-| -800…-701 | <!--v:lunarCentury800ResidualHours-->0.00<!--/v--> hr | <!--v:lunarPredictedReduced800Minutes-->+3.0<!--/v--> min |
-| -700…-601 | <!--v:lunarCentury700ResidualHours-->−0.08<!--/v--> hr | <!--v:lunarPredictedReduced700Minutes-->−2.6<!--/v--> min |
-| -600…-501 | <!--v:lunarCentury600ResidualHours-->−0.08<!--/v--> hr | <!--v:lunarPredictedReduced600Minutes-->−2.0<!--/v--> min |
-| -500…-401 | <!--v:lunarCentury500ResidualHours-->−0.18<!--/v--> hr | <!--v:lunarPredictedReduced500Minutes-->−8.5<!--/v--> min |
-| -400…-301 | <!--v:lunarCentury400ResidualHours-->−0.22<!--/v--> hr | <!--v:lunarPredictedReduced400Minutes-->−11.5<!--/v--> min |
+| -800…-701 | <!--v:lunarCentury800ResidualHours-->−0.02<!--/v--> hr | <!--v:lunarPredictedReduced800Minutes-->+1.5<!--/v--> min |
+| -700…-601 | <!--v:lunarCentury700ResidualHours-->−0.09<!--/v--> hr | <!--v:lunarPredictedReduced700Minutes-->−3.4<!--/v--> min |
+| -600…-501 | <!--v:lunarCentury600ResidualHours-->−0.10<!--/v--> hr | <!--v:lunarPredictedReduced600Minutes-->−3.4<!--/v--> min |
+| -500…-401 | <!--v:lunarCentury500ResidualHours-->−0.19<!--/v--> hr | <!--v:lunarPredictedReduced500Minutes-->−9.3<!--/v--> min |
+| -400…-301 | <!--v:lunarCentury400ResidualHours-->−0.23<!--/v--> hr | <!--v:lunarPredictedReduced400Minutes-->−12.2<!--/v--> min |
 
 These predictions are recorded in the gate BEFORE the contact-time
 re-reduction machinery exists — first-order only (contacts assumed to
@@ -1660,9 +1660,10 @@ close the residual.
 ### Diagnostic 2 (§15): does the J2000 LOD anchor value explain the drift?
 
 > *(Run in the pre-joint world with anchor 86400.00001 s. The shipped joint
-> fit — 4-flag stack + Core-mantle swing, doc 104 — closes on the USNO
-> 86,400.0017 s measured-day basis instead; see doc 99 § "The two J2000 day
-> bases". The verdict below is unchanged: the anchor value is not the drift
+> fit — 4-flag stack + Core-mantle swing, doc 104 — closes on the joint
+> fit's USNO target instead (<!--v:usnoLodJ2000-->86,400.0012<!--/v--> s on
+> the one J2000 day basis since plan 09; see doc 99 § "The J2000 day
+> basis"). The verdict below is unchanged: the anchor value is not the drift
 > source.)*
 
 Tests whether the residual drift is attributable to a mismatch in the

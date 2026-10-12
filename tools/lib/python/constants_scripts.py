@@ -117,25 +117,16 @@ _TOTAL_DAYS_IN_H = _C['totalDaysInH']
 _MEAN_ANOM_YEAR_DAYS = _C['meanAnomalisticYearDays']
 _ECCENTRICITY_DERIVED_MEAN = _C['eccentricityDerivedMean']
 
-# Year-length harmonics (fitted, from constants.js — periods use H, not hardcoded)
-TROPICAL_YEAR_HARMONICS = [
-    (H / h[0], h[1], h[2]) for h in _C['TROPICAL_YEAR_HARMONICS']
-]
-SIDEREAL_YEAR_HARMONICS = [
-    (H / h[0], h[1], h[2]) for h in _C['SIDEREAL_YEAR_HARMONICS']
-]
-ANOMALISTIC_YEAR_HARMONICS = [
-    (H / h[0], h[1], h[2]) for h in _C['ANOMALISTIC_YEAR_HARMONICS']
-]
+# (plan 09: the three year-length combs TROPICAL/SIDEREAL/ANOMALISTIC_YEAR_
+# HARMONICS are deleted — the year lengths of date are the one-family laws of
+# @essrt/physics; this mirror carries the J2000 IAU values only.)
+# The J2000 precession anchor p0 as a period (the IAU 2006 p_A), Julian years.
+AXIAL_PRECESSION_J2000_YEARS = _C['axialPrecessionJ2000Years']
 
-# Moon sidereal month (matches constants.js line 271 / script.js line 3347:
-# integer orbit count via Math.round, then total-days-in-H divided by count).
-# round() in Python uses banker's rounding which diverges from JS Math.round
-# at exact .5 boundaries; for these inputs the fractional part is ~0.14, so
-# round() matches Math.round() exactly.
-_MOON_SIDEREAL_MONTH = _TOTAL_DAYS_IN_H / round(
-    _TOTAL_DAYS_IN_H / _MOON_SIDEREAL_MONTH_INPUT
-)
+# Moon sidereal month: the IAU input itself (plan 09 — the era device's
+# integer-count read-back, totalDaysInH / round(totalDaysInH / input), was
+# 7.8 ms long and is deleted; matches constants.js / script.js).
+_MOON_SIDEREAL_MONTH = _MOON_SIDEREAL_MONTH_INPUT
 
 # GM_SUN from Kepler's 3rd law
 _GM_SUN = (4 * math.pi**2 * _AU_KM**3) / _SIDEREAL_YEAR_S**2

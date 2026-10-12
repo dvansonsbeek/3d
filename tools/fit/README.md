@@ -174,13 +174,14 @@ published package constants.
 
 Both the simulator's `meansiderealyearlengthinDays` and the website's
 `SIDEREAL_YEAR_J2000_DAYS` are anchored at the IAU J2000 value
-`365.25636308 d`. The earlier kinematic form
-`meansolaryearlengthinDays × (H/13) / ((H/13) − 1)` gave
-~365.256361 d — 150 ms/yr short of IAU — and caused a ~4 μs drift in
-the runtime-derived `meanlengthofday` off the Method B anchor. Under
-deep-time mode both bases are overwritten by `T_sid_s / LOD_s`, which
-naturally recovers the IAU anchor at J2000, so the fix only touches
-deep-time-OFF behaviour.
+`365.25636308 d`, and since plan 09 so is every runtime's J2000 sidereal
+year: the device's kinematic form
+`meansolaryearlengthinDays × (H/13) / ((H/13) − 1)` (~365.256361 d — 150
+ms/yr short of IAU, and the source of a ~4 μs drift in the derived
+`meanlengthofday`) is deleted, the J2000 day is the SI day, and under deep
+time the year lengths of date are the one-source family over the Layer-0
+tidal mean day (`T_sid_s(t) / LOD_s(t)`), which is the IAU value at J2000
+exactly.
 
 ## When does a coefficient re-fit actually need to run?
 
@@ -595,20 +596,22 @@ Step 6a2 (owner, 2026-09-16): `npm run fit:6a2`
 
 ## The frozen era clock
 
-The shipped harmonic-clock coefficients — (SOLSTICE_OBLIQUITY_HARMONICS,
-deleted at plan 09: the obliquity rides the hybrid),
-TROPICAL/SIDEREAL/ANOMALISTIC_YEAR_HARMONICS, YEAR_LENGTH_J2000_ANCHOR and
-the CARDINAL_POINT_* family — are FROZEN at their last K-movement fit
+The harmonic-clock coefficients were FROZEN at their last K-movement fit
 (cardinal interior RMSE 0.23-0.37 min, tropical 0.002 s class): THE
-CERTIFIED ERA CLOCK. They NEVER re-fit. Plan 06 R1 (measured): the
+CERTIFIED ERA CLOCK. They NEVER re-fit, and plan 09 deletes them family
+by family: SOLSTICE_OBLIQUITY_* (the obliquity rides the hybrid),
+TROPICAL/SIDEREAL/ANOMALISTIC_YEAR_HARMONICS with YEAR_LENGTH_J2000_ANCHOR
+(the J2000 year lengths are the IAU inputs on the SI day, the year lengths
+of date the one-source family); the CARDINAL_POINT_* family stays in the
+coefficients file as the record of the §5.2 derived form (doc 110), read
+only by that record's render. Plan 06 R1 (measured): the
 CARDINAL_POINT_* family and the comb-based Sun drift left the runtime —
 the cardinal instants are the apparent crossings of the one certified Sun
 whose mean longitude integrates the one-source tropical year (against JPL
 Horizons' own crossings over ±3000 yr the shipped instants are within a
 minute in 1000–3000 and about two minutes in the ancient era, where the fitted device
 sat hours — `tools/verify/sun-vs-horizons.js`; the era-clock year carried
-no secular drift). The constants stay in the coefficients file as the
-record until the cleanup phase. A harmonic re-fit
+no secular drift). A harmonic re-fit
 against the one-source CSV is a CROSS-FAMILY fit, and it was MEASURED
 (2026-09): cardinal interior RMS 8.8-16 min (30-60×), equinox J2000
 anchors ±2 h off IAU, day-scale amplitudes chasing the engine's

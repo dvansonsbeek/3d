@@ -35,7 +35,7 @@ const result = await s.page.evaluate(
     const T = window.__test__;
     const probes = {
       solar: (y) => T.computeSolarYearDaysFromCardinals(y),
-      sidereal: (y) => T.computeSiderealYearDaysDirect(y),
+      sidereal: (y) => T.siderealYearDaysOfDate(y),
       solsticeSS: (y) => T.computeSolsticeYearLength(y, 'SS'),
       solsticeWS: (y) => T.computeSolsticeYearLength(y, 'WS'),
     };

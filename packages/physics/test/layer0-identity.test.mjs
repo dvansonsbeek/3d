@@ -110,7 +110,7 @@ const derivedParams = deriveEpochParams({
   alpha4PerMa4: C.ALPHA_4,
   holisticYearJ2000: C.H,
   meanSiderealYearSeconds: C.meanSiderealYearSeconds,
-  meanSiderealYearDaysKinematic: C.meanSiderealYearDaysKinematic,
+  lodJ2000Seconds: C.meanLengthOfDay,   // plan 09: ω₀ = the SI day
   sunMassKg: C.M_SUN,
   gmEarthAloneKm3S2: C.GM_EARTH_ALONE,
   gmMoonAloneKm3S2: C.GM_MOON_ALONE,

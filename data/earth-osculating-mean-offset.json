@@ -7,18 +7,18 @@
     "dtDays": 0.1,
     "sampleDays": 1
   },
-  "dPomArcsec": 70.07583630940354,
-  "dE": 0.000005809952284235912,
+  "dPomArcsec": 70.07583603113207,
+  "dE": 0.000005809952271883168,
   "samples": 80355,
   "anchorCheckAtJ2000": {
     "dPomArcsec": 1.6248122847173363e-7,
-    "dE": 0
+    "dE": -3.469446951953614e-18
   },
   "inputs": {
     "generator": "node tools/verify/earth-osculating-offset.js --write",
     "files": {
-      "packages/physics/src/planets/chain-artifact.js": "sha256:4b08a8463d172a6d30d95d137df9fd4b81b4e8e5d4c25d038b06d31ce04593d5",
-      "tools/explore/derive-planetary-lunar-terms.js": "sha256:5447da632df4ed74c671fc6d72a55c47f4cc80dfbffe9c36ece4c6e5f4d9057a",
+      "packages/physics/src/planets/chain-artifact.js": "sha256:f2fda393800fc6d245c1ff0cf1bdbcfe96bf77fdc4ca378538fdf5c39f5547ce",
+      "tools/explore/derive-planetary-lunar-terms.js": "sha256:537f090345823c3515cb11f95c5c8256262e5bb4e3d54cfeb5cca3adb7057624",
       "tools/explore/j2000-state.mjs": "sha256:af2361cdca688cb8f5850229be97db8f70464824e20648e7e8a26ea6edb5ca5a",
       "tools/lib/keplerian-chain.js": "sha256:620299515d5520bb3a03fba5affafc7a036fb151fca3457a5194e8771cc97fb8",
       "tools/verify/earth-osculating-offset.js": "sha256:be71773da948d4be1390eb1fcd9d0462efdc7ba33bf82232e0377cbca98e34cd"

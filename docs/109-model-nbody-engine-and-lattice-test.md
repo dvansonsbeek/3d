@@ -1,7 +1,7 @@
 ---
 docVersion: 1.0
 modelVersion: v23.0
-coefficients: sha256:90a0f37a51074bdb
+coefficients: sha256:e0bf442540ee02b7
 status: current
 ---
 
@@ -764,9 +764,9 @@ era-local/deep-global tension the eccentricity story showed, resolved
 the same way. Fourth (v23.0), **the realized period is gated**: the
 shipped model's own ε(t) over the LR04 record, fitted with the full line
 set p + sᵢ and one free p, reads
-<!--v:obliqCycleRealizedFitLr04Years-->~40,919<!--/v--> yr against the
+<!--v:obliqCycleRealizedFitLr04Years-->~40,920<!--/v--> yr against the
 one-home prediction from the window mean of the pole rate with its
-of-date factors, <!--v:obliqCycleRealizedLr04Years-->~40,927<!--/v--> yr
+of-date factors, <!--v:obliqCycleRealizedLr04Years-->~40,928<!--/v--> yr
 (`createModel().lunisolar.obliquityPeriodRealizedYears`; the generator
 REFUSES beyond 0.1 %, fail-proven), with La2004's series on the same fit
 at <!--v:obliqCycleLa2004FitLr04Years-->~40,900<!--/v--> yr — the J2000

@@ -212,7 +212,12 @@ for (const [key, body] of Object.entries(modelParams.additionalBodies)) {
 // ═══════════════════════════════════════════════════════════════════════════
 
 const perihelionCycleLength = H / 16;
-const meanSolarYearDays = Math.round(inputMeanSolarYear * (H / 8)) / (H / 8);
+// Plan 09: the model's mean solar year in days is the IAU J2000 mean tropical
+// year (astro-reference.json yearLengthRef.tropicalYearMean) — the calendar's
+// year axis. The retired era device rounded the input 365.2422 onto 1/(H/8)
+// of a day (365.24220365, 1.2 s above the IAU value); that construction is
+// deleted. `inputMeanSolarYear` stays as the recorded foundational input.
+const meanSolarYearDays = astroRef.yearLengthRef.tropicalYearMean;
 const meanEarthRotationsPerYear = meanSolarYearDays + 1;
 const startModelYearWithCorrection = startmodelYear + (correctionDays / meanSolarYearDays);
 // Plan 07 R10: the correction combs measure their phase from J2000. The former
@@ -225,16 +230,21 @@ const balancedYear = 2000;
 const perihelionalignmentJD = Math.round(startmodelJD - (meanSolarYearDays * (startModelYearWithCorrection - perihelionalignmentYear)));
 const balancedJD = startmodelJD - (meanSolarYearDays * (startModelYearWithCorrection - balancedYear));
 const yearsFromBalancedToJ2000 = (startmodelJD - balancedJD) / meanSolarYearDays;
-// IAU sidereal-year J2000 anchor (365.256363004 d) — used as the Fourier
-// baseline for SIDEREAL_YEAR_HARMONICS. Do not change.
+// IAU sidereal-year J2000 anchor (365.256363004 d).
 const meanSiderealYearDays = astroRef.yearLengthRef.siderealYear;
-// Framework's H-lattice sidereal year in days, derived from the T_axial = H/13
-// identity: T_sid = T_trop × H / (H − 13). This is the framework's own MEAN
-// prediction, independent of the IAU reference — used to anchor meanLengthOfDay.
-const meanSiderealYearDaysKinematic = meanSolarYearDays * H / (H - 13);
-// MEAN LOD at J2000: 86399.99968 s under H=335,317 (from H/13 identity).
-// Supersedes Method B (which anchored to 86400.00001 via a hand-tuned shim).
-const meanLengthOfDay = meanSiderealYearSeconds / meanSiderealYearDaysKinematic;
+// Plan 09: the J2000 day length ω₀ is the SI day (86,400 s — the IAU day the
+// year inputs are stated in), an input in astro-reference.json. The retired
+// era device anchored it on its H/13 identity instead (meanSolarYearDays ×
+// H/(H − 13) "kinematic" sidereal days → 86,399.99968 s, 0.32 ms below the
+// SI day); that construction is deleted.
+const meanLengthOfDay = astroRef.yearLengthRef.solarDay;
+// Plan 09: THE J2000 precession anchor p₀ is the IAU 2006 general precession
+// in longitude (astro-reference.json), stated as the period 1,296,000/p_A =
+// 25,771.575 Julian years. Before plan 09 it was the retired year combs' beat
+// at 2000 (25,771.395 yr). ONE home: the composed clock, the hybrid's
+// self-anchor, the registry and the browser read this export.
+const axialPrecessionJ2000Years = 1296000 / astroRef.earthOrbital.generalPrecessionJ2000_arcsecPerYr;
+const axialPrecessionJ2000Days = axialPrecessionJ2000Years * 365.25;
 const meanSiderealDay = (meanSolarYearDays / (meanSolarYearDays + 1)) * meanLengthOfDay;
 // Stellar day: the H/13 precession rate is precession in LONGITUDE (along the
 // ecliptic); the sidereal→stellar offset depends on precession in RIGHT
@@ -244,7 +254,9 @@ const STELLAR_DAY_RA_PROJECTION =
   Math.cos(ASTRO_REFERENCE.obliquityJ2000_deg * Math.PI / 180);   // plan 09: the IAU ε₀ input (the retired comb's fitted mean sat 0.03° lower; 2e-11 of the stellar day)
 const meanStellarDay = (meanSiderealDay / (H / 13)) / (meanSolarYearDays + 1)
   * STELLAR_DAY_RA_PROJECTION + meanSiderealDay;
-const meanAnomalisticYearDays = (meanSolarYearDays / (perihelionCycleLength - 1)) + meanSolarYearDays;
+// Plan 09: the IAU anomalistic year (365.259636 d, astro-reference.json) — was
+// meanSolarYearDays × (H/16)/(H/16 − 1), the device's H/16 identity (0.3 s low).
+const meanAnomalisticYearDays = astroRef.yearLengthRef.anomalisticYear;
 // Unification: the mean of the one law IS base' (formerly the H/16 beat's
 // geometric mean √(base² + A²) = 0.01545).
 const eccentricityDerivedMean = eccentricityBaseDerived;
@@ -332,48 +344,44 @@ const perihelionPhaseOffset = ((((startModelYearWithCorrection - balancedYear) /
 // 7. MOON DERIVED CYCLES
 // ═══════════════════════════════════════════════════════════════════════════
 
-// ───── Option C+ derivation chain (2026-06) ─────
-// J2000 cycle counts per H (from the three observational anchors):
-//   N_sid       — sidereal months per H
-//   N_apsidalI  — apsidal cycles per H ("I" = of-date input convention;
-//                 legacy-'ICRF' naming — the input periods are equinox-of-date)
-//   N_apsidalE  — apsidal cycles per H = N_apsidalI − 13 → the STAR-REFERENCED
-//                 (inertial) period 3232.60 d
-//   N_nodalI    — nodal cycles per H (of-date input convention)
-//   N_nodalE    — nodal cycles per H = N_nodalI + 13 → star-referenced 6793.48 d
-// The ∓13 is the Earth-axial-precession offset (H/13 cycles per H); the
-// star-referenced periods are reproduced by the planetary laboratory at ±1e-4.
-// Lunar counts are INTEGER PER 8H (Solar System Resonance Cycle) → eighth-
-// integers per H. Mirrors src/script.js (measured basis + derivation record:
-// docs/66 §1).
-const N_sid      = Math.round(8 * totalDaysInH / moonSiderealMonthInput) / 8;             // 35,860,753 per 8H
-const N_apsidalI = Math.round(8 * totalDaysInH / moonApsidalPrecessionDaysInputICRF) / 8;  // 303,196 per 8H
-const N_apsidalE = N_apsidalI - 13;
-const N_nodalI   = Math.round(8 * totalDaysInH / moonNodalPrecessionDaysInputICRF) / 8;    // 144,119 per 8H
-const N_nodalE   = N_nodalI + 13;
-
-const moonSiderealMonth = totalDaysInH / N_sid;
+// ───── The Moon's J2000 periods on the IAU inputs (plan 09) ─────
+// Three observational anchors (astro-reference.json moonReference): the
+// sidereal month and the of-date apsidal and nodal precession periods (the
+// legacy-'ICRF' input names hold EQUINOX-OF-DATE periods, 3231.50 d /
+// 6798.38 d). The star-referenced (inertial) periods follow by removing the
+// equinox's own precession: 1/T_E = 1/T_I ∓ 1/T_p (perigee advances, node
+// regresses), T_p = the J2000 precession anchor in days (Julian years).
+// The retired era device counted these cycles as eighth-integers per 8H
+// (N_sid 35,860,753; N_apsidalI 303,196; N_nodalI 144,119 — the ∓13 was
+// H/13 cycles per H) and read every period back as totalDaysInH/N — 7.8 ms
+// above the IAU sidereal month; those counts are deleted (docs/66 §1 keeps
+// the derivation record). Mirrors src/script.js.
+const moonSiderealMonth = moonSiderealMonthInput;
+const moonApsidalPrecessionDaysICRF = moonApsidalPrecessionDaysInputICRF;
+const moonNodalPrecessionDaysICRF = moonNodalPrecessionDaysInputICRF;
+const moonApsidalPrecessionDaysEarth = 1 / (1 / moonApsidalPrecessionDaysICRF - 1 / axialPrecessionJ2000Days);
+const moonNodalPrecessionDaysEarth = 1 / (1 / moonNodalPrecessionDaysICRF + 1 / axialPrecessionJ2000Days);
 // Anomalistic and nodal months: KINEMATIC consequences of sidereal + precession,
-// not independent inputs. Reason: 1/T_ano = 1/T_M − 1/T_apsidalE (perigee advances)
+// not independent inputs. 1/T_ano = 1/T_M − 1/T_apsidalE (perigee advances)
 // and 1/T_nod_month = 1/T_M + 1/T_nodalE (node regresses).
-const moonAnomalisticMonth = totalDaysInH / (N_sid - N_apsidalE);
-const moonNodalMonth = totalDaysInH / (N_sid + N_nodalE);
-
-const moonSynodicMonth = totalDaysInH / (N_sid + 13 - H);  // N_syn = N_trop − H; legacy −1 removed 2026-07-24 (matches src/script.js)
-const moonTropicalMonth = totalDaysInH / (N_sid + 13);  // N_trop = N_sid + 13; legacy −1 removed 2026-07-24 (matches src/script.js)
+const moonAnomalisticMonth = 1 / (1 / moonSiderealMonth - 1 / moonApsidalPrecessionDaysEarth);
+const moonNodalMonth = 1 / (1 / moonSiderealMonth + 1 / moonNodalPrecessionDaysEarth);
+// Synodic month: the beat of the sidereal month with the sidereal year;
+// tropical month: the sidereal month seen from the precessing equinox.
+const moonSynodicMonth = moonSiderealMonth * meanSiderealYearDays / (meanSiderealYearDays - moonSiderealMonth);
+const moonTropicalMonth = 1 / (1 / moonSiderealMonth + 1 / axialPrecessionJ2000Days);
 
 const moonFullMoonCycleEarth = (moonSynodicMonth / (moonSynodicMonth - moonAnomalisticMonth)) * moonAnomalisticMonth;
-const moonFullMoonCycleICRF = totalDaysInH / ((totalDaysInH / moonFullMoonCycleEarth) + 13);
-
-const moonApsidalPrecessionDaysEarth = totalDaysInH / N_apsidalE;
-const moonApsidalPrecessionDaysICRF = totalDaysInH / N_apsidalI;
-const moonNodalPrecessionDaysEarth = totalDaysInH / N_nodalE;
-const moonNodalPrecessionDaysICRF = totalDaysInH / N_nodalI;
+const moonFullMoonCycleICRF = 1 / (1 / moonFullMoonCycleEarth + 1 / axialPrecessionJ2000Days);
+// Of-date cycles per anchor interval, REAL-valued — the Step-0 Sun fitter's
+// lunar-precession divisor candidates (H/N = the period in years); no rounding.
+const N_apsidalI = totalDaysInH / moonApsidalPrecessionDaysICRF;
+const N_nodalI = totalDaysInH / moonNodalPrecessionDaysICRF;
 
 const moonApsidalMeetsNodalDays = (moonNodalMonth / (moonAnomalisticMonth - moonNodalMonth)) * moonAnomalisticMonth;
 const moonLunarLevelingCycleDays = (moonNodalPrecessionDaysEarth / (moonNodalPrecessionDaysEarth - moonApsidalPrecessionDaysEarth) * (moonApsidalPrecessionDaysEarth / meanSolarYearDays)) * meanSolarYearDays;
 const moonDraconicYearICRF = 1 / ((1 / meanSolarYearDays) + (1 / moonNodalPrecessionDaysEarth));
-const moonDraconicYearEarth = totalDaysInH / ((totalDaysInH / moonDraconicYearICRF) - 13);
+const moonDraconicYearEarth = 1 / (1 / moonDraconicYearICRF - 1 / axialPrecessionJ2000Days);
 
 
 // ═══════════════════════════════════════════════════════════════════════════
@@ -641,8 +649,8 @@ module.exports = {
   moonSiderealMonthInput,
   moonApsidalPrecessionDaysInputICRF,
   moonNodalPrecessionDaysInputICRF,
+  N_apsidalI, N_nodalI,
   // Cycle counts per H (J2000 anchors; deep-time scales as H(t)²/H(today)²)
-  N_sid, N_apsidalI, N_apsidalE, N_nodalI, N_nodalE,
   moonDistance,
   moonEclipticInclinationJ2000,
   moonMeeusLpCorrection,
@@ -674,8 +682,9 @@ module.exports = {
   cardinalPointAnchorsAtGrid,
   yearsFromBalancedToJ2000,
   meanSiderealYearDays,
-  meanSiderealYearDaysKinematic,
   meanLengthOfDay,
+  axialPrecessionJ2000Years,
+  axialPrecessionJ2000Days,
   meanSiderealDay,
   meanStellarDay,
   STELLAR_DAY_RA_PROJECTION,
@@ -687,9 +696,6 @@ module.exports = {
   tropicalCenturyDays,
   eocEccentricity,
   perihelionPhaseOffset,
-  TROPICAL_YEAR_HARMONICS: fitted.TROPICAL_YEAR_HARMONICS,
-  SIDEREAL_YEAR_HARMONICS: fitted.SIDEREAL_YEAR_HARMONICS,
-  ANOMALISTIC_YEAR_HARMONICS: fitted.ANOMALISTIC_YEAR_HARMONICS,
 
   // Moon derived
   moonSiderealMonth,

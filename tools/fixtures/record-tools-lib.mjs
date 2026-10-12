@@ -45,7 +45,6 @@ function measure() {
   //   SI 86400 (definition) · LOD_mean (H/13 identity) · LOD_real (physical)
   v['lod.meanKinematicSeconds'] = DT.LOD_NOW_H13_S;
   v['lod.meanAtAge0'] = DT.meanLodSecondsAtAge(0);
-  v['lod.realAtAge0'] = DT.meanLodSecondsAtAgeActual(0);
 
   // Deep-time behaviour away from the anchor — the anchor alone is a tautology.
   for (const t of AGES_MA) {
@@ -202,7 +201,6 @@ function measure() {
   for (const t of DT_AGES_84) {
     v[`dtAge.meanDeltaTSecondsAtAge@${t}Ma`] = DT.meanDeltaTSecondsAtAge(t);
     v[`dtAge.meanLodSecondsAtAge@${t}Ma`] = DT.meanLodSecondsAtAge(t);
-    v[`dtAge.meanLodSecondsAtAgeActual@${t}Ma`] = DT.meanLodSecondsAtAgeActual(t);
     v[`dtAge.meanLodSecondsWithCorrectionsAtAge@${t}Ma`] = DT.meanLodSecondsWithCorrectionsAtAge(t);
     for (const [ch, val] of Object.entries(DT.dLodDtDecompositionAtAge(t))) {
       if (typeof val === 'number') v[`dtDecomp.${ch}@${t}Ma`] = val;

@@ -48,7 +48,7 @@ const MR = C.MASS_RATIO_EARTH_MOON;
 const GM_E = GM_EM * MR / (MR + 1);
 const GM_M = GM_EM / (MR + 1);
 const eS = C.ASTRO_REFERENCE.earthEccentricityJ2000;
-const EPS_J2000 = OE.computeObliquityEarth(2000) * d2r;    // framework J2000 obliquity
+const EPS_J2000 = C.ASTRO_REFERENCE.obliquityJ2000_deg * d2r;    // the J2000 obliquity input (plan 09: the 16-harmonic comb's reading at 2000, 0.1″ off it, is deleted)
 
 // Observed dynamics constants — source of truth: astro-reference.json
 // physicalConstants (massRatioDE440 / earthJ2 / earthEquatorialRadiusKm),

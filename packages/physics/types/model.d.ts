@@ -32,6 +32,12 @@ export function assembleModel(C: Readonly<Record<string, any>>, F: Readonly<Reco
         jdFromYear: (year: number) => number;
         siTropicalYearDays: number;
     }>;
+    sun: Readonly<{
+        /** Mean longitude of date, degrees, unwrapped — L0 + 360·∫dt/T_trop (the one-family tropical year). @param {number} year @returns {number} */
+        meanLongitudeDegAt: (year: number) => number;
+        /** The Sun's mean perihelion longitude of date (Earth's ϖ, mean elements), degrees, wrapped to [0, 360). @param {number} year @returns {number} */
+        perihelionLongitudeDegAt: (year: number) => number;
+    }>;
     epoch: Readonly<{
         yearToTMa: (year: number) => number;
         hAtYear: (year: number) => number | null;
@@ -125,7 +131,6 @@ export function assembleModel(C: Readonly<Record<string, any>>, F: Readonly<Reco
     }>;
     lengths: Readonly<{
         tropicalYearDays: (year: number) => number;
-        tropicalYearDirectDays: (year: number) => number;
         siderealYearDays: (year: number) => number;
         anomalisticYearDays: (year: number) => number;
         dayLengthSeconds: (year: number) => number;

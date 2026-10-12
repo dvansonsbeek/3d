@@ -76,7 +76,6 @@ function measure() {
     v[`${tag}.tropicalYearOneFamilyS`] = inWindow ? num(m.yearLengths.tropicalYearSecondsAtYear(year)) : null;
     v[`${tag}.anomalisticYearOneFamilyS`] = inWindow ? num(m.yearLengths.anomalisticYearSecondsAtYear(year)) : null;
     v[`${tag}.siderealYearFourierD`] = num(m.lengths.siderealYearDays(year));
-    v[`${tag}.tropicalYearFourierD`] = num(m.lengths.tropicalYearDirectDays(year));
     v[`${tag}.tropicalYearCardinalD`] = num(m.lengths.tropicalYearDays(year));
     v[`${tag}.anomalisticYearFourierD`] = num(m.lengths.anomalisticYearDays(year));
     v[`${tag}.dayLengthKinematicS`] = num(m.lengths.dayLengthSeconds(year));

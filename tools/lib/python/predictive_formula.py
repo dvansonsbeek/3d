@@ -36,7 +36,7 @@ from constants_scripts import (
     EARTH_OBLIQUITY_MEAN, EARTH_INCLINATION_AMPLITUDE,
     _SIDEREAL_YEAR_S, _MEAN_SOLAR_YEAR_DAYS, _MEAN_SIDEREAL_YEAR_DAYS,
     _MEAN_LENGTH_OF_DAY, _MEAN_ANOM_YEAR_DAYS, _ECCENTRICITY_DERIVED_MEAN,
-    TROPICAL_YEAR_HARMONICS, SIDEREAL_YEAR_HARMONICS, ANOMALISTIC_YEAR_HARMONICS,
+    AXIAL_PRECESSION_J2000_YEARS,
     INCL_PERIOD, OMEGA_J2000, INCL_ECLIPTIC,
     AXIAL_TILT, LONGITUDE_PERIHELION, PERIHELION_ECLIPTIC_YEARS,
     OBLIQUITY_CYCLE, EARTH_RA_ANGLE, BALANCED_JD,
@@ -75,10 +75,9 @@ RA_SOLAR_DAY_OFFSET_MEAN_MS  = -14.194   # ms/day, unknown cause
 RA_SOLAR_DAY_OFFSET_ECC_MS   =  -5.640   # ms/day amplitude at period H/16 (eccentricity)
 RA_SOLAR_DAY_OFFSET_OBLIQ_MS =  -1.684   # ms/day amplitude at period H/8  (obliquity)
 
-# --- Year-length Fourier means (derived, not fitted) ---
-# tropical = round(input × H/16) / (H/16)
-# sidereal = tropical × H / (H - 13)
-# anomalistic = tropical × H / (H - 16)
+# --- Year lengths at J2000 (plan 09: the IAU inputs; the era device's
+# H/8, H/13 and H/16 constructions and the fitted year-length combs are
+# deleted — this mirror is J2000-scoped) ---
 TROPICAL_YEAR_MEAN = _MEAN_SOLAR_YEAR_DAYS
 SIDEREAL_YEAR_MEAN = _MEAN_SIDEREAL_YEAR_DAYS
 ANOMALISTIC_YEAR_MEAN = _MEAN_ANOM_YEAR_DAYS
@@ -434,32 +433,22 @@ def _eval_fourier(t: float, mean: float,
 
 def calc_solar_year(year: int) -> float:
     """
-    Calculate the length of the solar (tropical) year in days.
-
-    Fourier harmonic formula (March 2026):
-      Y_solar(t) = mean + Σ harmonics at H/8, H/3, H/16
-      where t = year - ANCHOR_YEAR
-
-    Fitted from 491 data points spanning the full Earth Fundamental Cycle.
-    RMS = 0.003 seconds.  Dominant term: H/8 (obliquity cycle, 1.82s).
+    The solar (tropical) year in days — the IAU J2000 value (plan 09: the
+    fitted year-length comb of the retired era device is deleted; this
+    mirror is J2000-scoped, the year lengths of date live in @essrt/physics
+    `epoch.tropicalYearSecondsAtYear`).
     """
-    t = time_offset(year)
-    return _eval_fourier(t, TROPICAL_YEAR_MEAN, TROPICAL_YEAR_HARMONICS)
+    del year
+    return TROPICAL_YEAR_MEAN
 
 
 def calc_sidereal_year(year: int) -> float:
     """
-    Calculate the length of the sidereal year in days.
-
-    Fourier harmonic formula (March 2026):
-      Y_sid(t) = mean + Σ harmonics at H/8, H/3
-      where t = year - ANCHOR_YEAR
-
-    Fitted from 491 data points spanning the full Earth Fundamental Cycle.
-    RMS = 0.0002 seconds.  Both terms ~0.09s amplitude.
+    The sidereal year in days — the IAU J2000 value (plan 09; the year of
+    date is @essrt/physics `epoch.siderealYearSecondsAtYear`).
     """
-    t = time_offset(year)
-    return _eval_fourier(t, SIDEREAL_YEAR_MEAN, SIDEREAL_YEAR_HARMONICS)
+    del year
+    return SIDEREAL_YEAR_MEAN
 
 
 def calc_day_length(year: int) -> float:
@@ -540,18 +529,11 @@ def calc_sidereal_year_seconds(year: int) -> float:
 
 def calc_anomalistic_year(year: int) -> float:
     """
-    Calculate the length of the anomalistic year in days.
-
-    Fourier harmonic formula (March 2026):
-      Y_anom(t) = mean + Σ harmonics at H/8, H/3, H/16, H/24
-      where t = year - ANCHOR_YEAR
-
-    Fitted from 491 data points spanning the full Earth Fundamental Cycle.
-    RMS = 0.002 seconds.  Dominant term: H/3 (inclination cycle, 0.17s).
-    H/24 = H/(3×8) is the beat frequency between H/3 and H/8.
+    The anomalistic year in days — the IAU J2000 value (plan 09; the year of
+    date is @essrt/physics `lunisolar`/`lengths`).
     """
-    t = time_offset(year)
-    return _eval_fourier(t, ANOMALISTIC_YEAR_MEAN, ANOMALISTIC_YEAR_HARMONICS)
+    del year
+    return ANOMALISTIC_YEAR_MEAN
 
 
 def calc_anomalistic_year_seconds(year: int) -> float:
@@ -585,16 +567,17 @@ def calc_stellar_day(year: int) -> float:
     """
     Calculate the length of the stellar day in SI seconds.
 
-    Formula: D_star = ((Y_solar(s) / (Y_solar(days) + 1)) / (H/13))
+    Formula: D_star = ((Y_solar(s) / (Y_solar(days) + 1)) / T_p)
                       / (Y_solar(days) + 1) + D_sid
 
-    Based on 86400-second solar days. The stellar day accounts for
-    the additional precession correction beyond the sidereal day.
+    Based on 86400-second solar days. The stellar day accounts for the
+    additional precession correction beyond the sidereal day; T_p is the
+    J2000 precession anchor (plan 09: the IAU p_A as a period, not H/13).
     """
     sy_s = calc_solar_year_seconds(year)
     sy_d = calc_solar_year(year)
     sid_day = calc_sidereal_day(year)
-    return ((sy_s / (sy_d + 1)) / (H / 13)) / (sy_d + 1) + sid_day
+    return ((sy_s / (sy_d + 1)) / AXIAL_PRECESSION_J2000_YEARS) / (sy_d + 1) + sid_day
 
 
 # =============================================================================

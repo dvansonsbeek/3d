@@ -2,10 +2,9 @@
 // The fitted coefficients' shapes for TypeScript consumers (§2g); values live
 // in coefficients.js, emitted VERBATIM from fitted-coefficients.json.
 
-export declare const COEFFICIENTS_HASH: "90a0f37a51074bdb";
+export declare const COEFFICIENTS_HASH: "e0bf442540ee02b7";
 
 export declare const FITTED_COEFFICIENTS: {
-  readonly ANOMALISTIC_YEAR_HARMONICS: Array<[number, number, number]>;
   readonly BALANCE_PRESETS: Array<Array<number | string>>;
   readonly CARDINAL_POINT_ANCHORS: {
     "SS": number;
@@ -303,105 +302,105 @@ export declare const FITTED_COEFFICIENTS: {
           "delta_l3": number;
         };
         "carbon_amplification_ratios": {
-          "19.0014": {
+          "19.0015": {
             "period_kyr": number;
             "lr04_post_mpt_amp": number;
             "epica_amp": number;
             "ratio": number;
             "label": string;
           };
-          "19.1554": {
+          "19.1555": {
             "period_kyr": number;
             "lr04_post_mpt_amp": number;
             "epica_amp": number;
             "ratio": number;
             "label": string;
           };
-          "22.4452": {
+          "22.4453": {
             "period_kyr": number;
             "lr04_post_mpt_amp": number;
             "epica_amp": number;
             "ratio": number;
             "label": string;
           };
-          "23.1931": {
+          "23.1933": {
             "period_kyr": number;
             "lr04_post_mpt_amp": number;
             "epica_amp": number;
             "ratio": number;
             "label": string;
           };
-          "23.7599": {
+          "23.7601": {
             "period_kyr": number;
             "lr04_post_mpt_amp": number;
             "epica_amp": number;
             "ratio": number;
             "label": string;
           };
-          "27.2689": {
+          "27.2691": {
             "period_kyr": number;
             "lr04_post_mpt_amp": number;
             "epica_amp": number;
             "ratio": number;
             "label": string;
           };
-          "28.8424": {
+          "28.8426": {
             "period_kyr": number;
             "lr04_post_mpt_amp": number;
             "epica_amp": number;
             "ratio": number;
             "label": string;
           };
-          "29.0047": {
+          "29.0050": {
             "period_kyr": number;
             "lr04_post_mpt_amp": number;
             "epica_amp": number;
             "ratio": number;
             "label": string;
           };
-          "29.6172": {
+          "29.6174": {
             "period_kyr": number;
             "lr04_post_mpt_amp": number;
             "epica_amp": number;
             "ratio": number;
             "label": string;
           };
-          "29.8091": {
+          "29.8094": {
             "period_kyr": number;
             "lr04_post_mpt_amp": number;
             "epica_amp": number;
             "ratio": number;
             "label": string;
           };
-          "39.5560": {
+          "39.5564": {
             "period_kyr": number;
             "lr04_post_mpt_amp": number;
             "epica_amp": number;
             "ratio": number;
             "label": string;
           };
-          "40.2292": {
+          "40.2297": {
             "period_kyr": number;
             "lr04_post_mpt_amp": number;
             "epica_amp": number;
             "ratio": number;
             "label": string;
           };
-          "40.9239": {
+          "40.9244": {
             "period_kyr": number;
             "lr04_post_mpt_amp": number;
             "epica_amp": number;
             "ratio": number;
             "label": string;
           };
-          "41.6445": {
+          "41.6450": {
             "period_kyr": number;
             "lr04_post_mpt_amp": number;
             "epica_amp": number;
             "ratio": number;
             "label": string;
           };
-          "53.6174": {
+          "53.6182": {
             "period_kyr": number;
             "lr04_post_mpt_amp": number;
             "epica_amp": number;
@@ -641,8 +640,6 @@ export declare const FITTED_COEFFICIENTS: {
     "terms": Array<[number, number, number]>;
     "note": string;
   };
-  readonly SIDEREAL_YEAR_HARMONICS: Array<[number, number, number]>;
   readonly SUN_LONGITUDE_HARMONICS: Array<[number, number, number]>;
   readonly SUN_LONGITUDE_MEAN: number;
-  readonly TROPICAL_YEAR_HARMONICS: Array<[number, number, number]>;
 };

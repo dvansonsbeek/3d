@@ -106,6 +106,9 @@ const MIGRATED = [
   // derived deg × 3600, no second literal).
   'astro.earthOrbital.obliquityJ2000_deg',
   'astro.earthOrbital.obliquityRate_arcsecPerCentury',
+  // plan 09: THE J2000 precession anchor p₀ (IAU 2006 p_A) — read as
+  // K.earthOrbital.generalPrecessionJ2000_arcsecPerYr, never a literal.
+  'astro.earthOrbital.generalPrecessionJ2000_arcsecPerYr',
   'astro.earthOrbital.earthInclinationJ2000_deg',
   'astro.earthOrbital.sunMeanLongitudeJ2000_deg',
   'astro.earthOrbital.perihelionPassageJ2000_JD',

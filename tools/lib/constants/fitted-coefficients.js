@@ -14,9 +14,9 @@ const data = JSON.parse(fs.readFileSync(
   path.resolve(__dirname, '..', '..', '..', 'public', 'input', 'fitted-coefficients.json'), 'utf8'));
 
 // Static fitted arrays (from JSON)
-const TROPICAL_YEAR_HARMONICS = data.TROPICAL_YEAR_HARMONICS;
-const SIDEREAL_YEAR_HARMONICS = data.SIDEREAL_YEAR_HARMONICS;
-const ANOMALISTIC_YEAR_HARMONICS = data.ANOMALISTIC_YEAR_HARMONICS;
+// (plan 09: the three year-length combs TROPICAL/SIDEREAL/ANOMALISTIC_YEAR_
+// HARMONICS and YEAR_LENGTH_J2000_ANCHOR are deleted — the year lengths of
+// date are the one-family laws over the kinematic day of date)
 const PERI_HARMONICS_RAW = data.PERI_HARMONICS_RAW;
 const PERI_OFFSET = data.PERI_OFFSET;
 // (plan 09: SOLSTICE_OBLIQUITY_MEAN_FITTED / SOLSTICE_OBLIQUITY_HARMONICS retired —
@@ -62,9 +62,6 @@ function buildFittedCoefficients(params) {
 
 module.exports = {
   // Static fitted arrays
-  TROPICAL_YEAR_HARMONICS,
-  SIDEREAL_YEAR_HARMONICS,
-  ANOMALISTIC_YEAR_HARMONICS,
   PERI_HARMONICS_RAW,
   PERI_OFFSET,
   SUN_LONGITUDE_MEAN,

@@ -32,8 +32,8 @@ function createDeepOrbitalHistory() {
   const C = require('./constants.js');
 
   const AE = CHAIN_ARTIFACT.j2000AnchorElements.earth;
-  const sidDays = DT.computeSiderealYearDaysDirect(2000);
-  const solDays = DT.computeSolarYearDaysDirect(2000);
+  // Plan 09: the J2000 precession anchor is the IAU p_A (ONE home, deep-time.js)
+  const axial0 = DT.certifiedAxialPrecessionJ2000Years();
 
   return factory({
     zModes: ART.modes.earth.z,
@@ -42,7 +42,7 @@ function createDeepOrbitalHistory() {
     anchorPeriEclipticDeg: AE.lonPeriEclipticDeg,
     anchorInclEclipticDeg: AE.inclEclipticDeg,
     anchorAscNodeEclipticDeg: AE.ascNodeEclipticDeg,
-    axialPrecessionYearsJ2000: sidDays / (sidDays - solDays),
+    axialPrecessionYearsJ2000: axial0,
     obliquityJ2000Deg: C.ASTRO_REFERENCE.obliquityJ2000_deg,
   });
 }
@@ -77,9 +77,7 @@ function createOneSourceMovement() {
   const C = require('./constants.js');
 
   const AE = CHAIN_ARTIFACT.j2000AnchorElements.earth;
-  const sidDays = DT.computeSiderealYearDaysDirect(2000);
-  const solDays = DT.computeSolarYearDaysDirect(2000);
-  const axial0 = sidDays / (sidDays - solDays);
+  const axial0 = DT.certifiedAxialPrecessionJ2000Years();   // plan 09: the IAU p_A anchor
   const H0 = DT.meanHAtAge(0);
   const eb = seriesArt.bodies.earth;
 

@@ -30,10 +30,13 @@
  * 1993, which carries no J₂ rate) — no observation resolves 20″ at −2500.
  *
  * GATES UNDER --write (the adoption's result, so a dropped term cannot ship
- * unseen): |Δequinox| ≤ 8″ over ±3000 yr (measured max 6.5; the secular law
- * alone reads 27), ≤ 0.5″ inside −500…+2500 (measured 0.3); the obliquity
- * within 20″ rms of La2004 over the last Myr (measured 13.7; the secular law
- * alone 79.5).
+ * unseen): |Δequinox| ≤ 10″ over ±3000 yr (measured max 7.9 with p₀ = the
+ * IAU 2006 p_A — plan 09; 6.5 on the retired year combs' derived beat, which
+ * sat 8 ppm above p_A and absorbed that much of the model's growth into the
+ * past against both referees; the secular law alone reads 28), ≤ 1.0″ inside
+ * −500…+2500 (measured 0.62 on p_A; 0.3 before); the obliquity within 20″ rms
+ * of La2004 over the last Myr (measured 15.0 on p_A, 13.7 before; the secular
+ * law alone 80).
  *
  * Reproduction check: a plain run recomputes and compares (1e-6″).
  */
@@ -84,8 +87,7 @@ if (!movement) { console.error('REFUSING: data/nbody-secular-series.json is abse
 const seriesArt = JSON.parse(fs.readFileSync(path.join(ROOT, 'data', 'nbody-secular-series.json'), 'utf8'));
 const ART = JSON.parse(fs.readFileSync(path.join(ROOT, 'data', 'nbody-deep-secular-modes.json'), 'utf8'));
 const AE = CHAIN_ARTIFACT.j2000AnchorElements.earth, eb = seriesArt.bodies.earth;
-const sid = DT.computeSiderealYearDaysDirect(2000), sol = DT.computeSolarYearDaysDirect(2000);
-const axial0 = sid / (sid - sol), H0 = DT.meanHAtAge(0);
+const axial0 = DT.certifiedAxialPrecessionJ2000Years(), H0 = DT.meanHAtAge(0);   // plan 09: the IAU p_A anchor (was the retired year combs' beat at 2000)
 const factory = (deps) => createDeepOrbitalHistory({
   zModes: ART.modes.earth.z, zetaModes: ART.modes.earth.zeta,
   zetaSeries: { t0Yr: seriesArt.t0Yr, stepYr: eb.stepYr, q: eb.zetaQ, p: eb.zetaP },
@@ -165,8 +167,8 @@ console.log(`  factors over the last Myr (mean − 1): solar torque ${factors.la
 
 const gate = (ok, msg) => { if (!ok) { console.error('REFUSING: ' + msg); process.exit(1); } };
 if (WRITE) {
-  gate(equinox.maxAbsArcsec <= 8, `max |Δequinox| ${equinox.maxAbsArcsec}″ over ±3000 yr exceeds 8″ — a precession-of-date term is missing or changed`);
-  gate(equinox.maxAbsInnerArcsec <= 0.5, `max |Δequinox| ${equinox.maxAbsInnerArcsec}″ inside −500…+2500 exceeds 0.5″`);
+  gate(equinox.maxAbsArcsec <= 10, `max |Δequinox| ${equinox.maxAbsArcsec}″ over ±3000 yr exceeds 10″ — a precession-of-date term is missing or changed`);
+  gate(equinox.maxAbsInnerArcsec <= 1.0, `max |Δequinox| ${equinox.maxAbsInnerArcsec}″ inside −500…+2500 exceeds 1.0″`);
   gate(lastMyr.modelRmsArcsec <= 20, `obliquity vs La2004 over the last Myr ${lastMyr.modelRmsArcsec}″ rms exceeds 20″ — the eccentricity factor is missing or changed`);
   fs.writeFileSync(OUT, JSON.stringify(art, null, 1) + '\n');
   console.log('✓ wrote data/equinox-vs-vondrak.json');

@@ -14,11 +14,6 @@ export type MoonArgsDeg = {
  *     j2000JD: number,
  *     julianCenturyDays: number,
  *     holisticYearJ2000: number,
- *     balancedYearJ2000: number,
- *     meanSolarYearDays: number,
- *     meanAnomalisticYearDays: number,
- *     tropicalYearHarmonics: Array<[number, number, number]>,
- *     anomalisticYearHarmonics: Array<[number, number, number]>,
  *     eccentricityJ2000: number,
  *     eccentricityDotJ2000: number,
  *     eccentricityDotDotJ2000: number,
@@ -30,11 +25,12 @@ export type MoonArgsDeg = {
  *     eccAt: (tYr: number) => number,
  *     channelIntegral: (T: number, s: number) => number,
  *     computeObliquityEarth: (year: number) => number,
+ *     sunMeanLonDegAtJdTT: (jdTT: number) => number,
+ *     sunPerihelionLonDegAtJdTT: (jdTT: number) => number,
  *     jdToSIyear: (jd: number) => number,
  *     tropicalOrbitsBetween: (yearA: number, yearB: number) => (number | null),
  *     apsidalOfDateCyclesBetween: (yearA: number, yearB: number) => (number | null),
  *     nodalOfDateCyclesBetween: (yearA: number, yearB: number) => (number | null),
- *     cyclesBetween: (yearA: number, yearB: number, divisorN: number) => (number | null),
  *     isDeepTime: () => boolean,
  *     isFrameworkNative: () => boolean,
  *     pDynDegPerYearAt?: (year: number) => number,
@@ -48,17 +44,21 @@ export type MoonArgsDeg = {
  *   evaluators — the tweakpane identity, real at J2000, epoch-valid);
  *   pKin = the KINEMATIC pair's beat (the H/13-family mean the chains
  *   embed). Absent ⇒ the completion is disabled (pre-(d′) behaviour).
+ *   Plan 09: the Sun of the arguments is the engine's ONE certified Sun —
+ *   sunMeanLonDegAtJdTT (the mean longitude that integrates the one-family
+ *   tropical year, unwrapped) and sunPerihelionLonDegAtJdTT (the mean
+ *   perihelion of date, wrapped — the arguments wrap M, and the rate anchors
+ *   difference it over ±25 days wrapped to ±180°). The former "model timeline" Sun — 360° per mean solar
+ *   year plus the closed-form integrals of the retired year-length combs,
+ *   the perihelion on the H/16 chain count — sat 0.2° behind the IAU mean
+ *   Sun at −2000 (the combs could not carry the tropical year's secular
+ *   drift); measured against Meeus L0 before the move.
  */
 export function createMoonArguments({ constants, fns }: {
     constants: {
         j2000JD: number;
         julianCenturyDays: number;
         holisticYearJ2000: number;
-        balancedYearJ2000: number;
-        meanSolarYearDays: number;
-        meanAnomalisticYearDays: number;
-        tropicalYearHarmonics: Array<[number, number, number]>;
-        anomalisticYearHarmonics: Array<[number, number, number]>;
         eccentricityJ2000: number;
         eccentricityDotJ2000: number;
         eccentricityDotDotJ2000: number;
@@ -70,11 +70,12 @@ export function createMoonArguments({ constants, fns }: {
         eccAt: (tYr: number) => number;
         channelIntegral: (T: number, s: number) => number;
         computeObliquityEarth: (year: number) => number;
+        sunMeanLonDegAtJdTT: (jdTT: number) => number;
+        sunPerihelionLonDegAtJdTT: (jdTT: number) => number;
         jdToSIyear: (jd: number) => number;
         tropicalOrbitsBetween: (yearA: number, yearB: number) => (number | null);
         apsidalOfDateCyclesBetween: (yearA: number, yearB: number) => (number | null);
         nodalOfDateCyclesBetween: (yearA: number, yearB: number) => (number | null);
-        cyclesBetween: (yearA: number, yearB: number, divisorN: number) => (number | null);
         isDeepTime: () => boolean;
         isFrameworkNative: () => boolean;
         pDynDegPerYearAt?: (year: number) => number;
@@ -85,10 +86,6 @@ export function createMoonArguments({ constants, fns }: {
     fwArgs: (jdTT: number) => MoonArgsDeg;
     fwArgsDeep: (jd: number) => MoonArgsDeg | null;
     pureMeeusArgs: (jdTT: number) => MoonArgsDeg;
-    sunSecularDeviations: (jdTT: number) => {
-        dLs: number;
-        dPeri: number;
-    };
     planetaryCarrier: (T: number) => number;
     obliquityCarrier: (T: number) => number;
     lpSecularCompletion: (T: number) => number;

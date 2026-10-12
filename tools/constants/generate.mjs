@@ -65,9 +65,10 @@ const OUT_COEFFS_DTS = join(ROOT, 'packages/physics/src/constants/coefficients.d
  * divisor n -> period H/n) happens THERE, visibly, not in a formatter here.
  */
 const COEFFICIENT_KEYS = [
-  'TROPICAL_YEAR_HARMONICS',
-  'SIDEREAL_YEAR_HARMONICS',
-  'ANOMALISTIC_YEAR_HARMONICS',
+  // (plan 09: TROPICAL/SIDEREAL/ANOMALISTIC_YEAR_HARMONICS and
+  // YEAR_LENGTH_J2000_ANCHOR — the frozen era clock's year-length combs and
+  // their measured J2000 anchor — are deleted; the year lengths of date are
+  // the one-family laws over the kinematic day of date)
   'PERI_HARMONICS_RAW',
   // (plan 09: SOLSTICE_OBLIQUITY_HARMONICS retired — the obliquity of date is the hybrid ε)
   'SUN_LONGITUDE_HARMONICS',

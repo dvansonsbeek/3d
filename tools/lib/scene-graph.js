@@ -58,7 +58,7 @@ function _deviceWheelCycles(cyclesFromJ2000, divisor_N) {
 
 // ═══════════════════════════════════════════════════════════════════════════
 // Framework-native lunar fundamental arguments — mirror of src/script.js
-// (_FW_MOON / _fwMoonArgs / _fwSunSecularDeviations / _moonArgsAt). One
+// (_FW_MOON / _fwMoonArgs / _moonArgsAt). One
 // argument source everywhere: the fitting/verification world now runs the
 // same skeleton as production (docs/66 §1). Pure-Meeus A/B reference via
 // env MOON_ARGS_PURE_MEEUS=1 (matches the browser console flag flip).
@@ -105,11 +105,6 @@ function _moonArgsM() {
       constants: {
         j2000JD: C.j2000JD, julianCenturyDays: 36525,
         holisticYearJ2000: C.H,
-        balancedYearJ2000: C.balancedYear,
-        meanSolarYearDays: C.meanSolarYearDays,
-        meanAnomalisticYearDays: C.meanAnomalisticYearDays,
-        tropicalYearHarmonics: C.TROPICAL_YEAR_HARMONICS,
-        anomalisticYearHarmonics: C.ANOMALISTIC_YEAR_HARMONICS,
         eccentricityJ2000: AR.earthEccentricityJ2000,
         eccentricityDotJ2000: AR.earthEccentricityDotJ2000,
         eccentricityDotDotJ2000: AR.earthEccentricityDotDotJ2000,
@@ -125,20 +120,25 @@ function _moonArgsM() {
         // PUBLISHED ε (the one-source movement), not the K comb — the browser's
         // _sceneEpsTargetDeg / model.js oneSourceM.epsAt twin.
         computeObliquityEarth: (y) => _oneSourceM().epsDeg(y),
+        // Plan 09: the arguments' Sun is the ONE certified Sun — the package
+        // model's mean longitude (unwrapped) and mean perihelion of date
+        // (wrapped; the arguments wrap M) — the same surface model.js wires;
+        // the "model timeline" Sun on the retired year combs is gone. TT
+        // Julian-year axis.
+        sunMeanLonDegAtJdTT: /** @param {number} jdTT */ (jdTT) => _e5Tier().sun.meanLongitudeDegAt(2000 + (jdTT - C.j2000JD) / 365.25),
+        sunPerihelionLonDegAtJdTT: /** @param {number} jdTT */ (jdTT) => _e5Tier().sun.perihelionLongitudeDegAt(2000 + (jdTT - C.j2000JD) / 365.25),
         jdToSIyear: _jdToSIyearTools,
         tropicalOrbitsBetween: _mcTropical,
         apsidalOfDateCyclesBetween: _mcApsidalOfDate,
         nodalOfDateCyclesBetween: _mcNodalOfDate,
-        cyclesBetween: DTmod.cyclesBetweenYears,
         isDeepTime: () => DEEP_TIME_ENABLED,
         isFrameworkNative: () => MOON_ARGS_FRAMEWORK_NATIVE,
         // (d′) of-date rate completion — MATCHED TRIPLE with model.js and
-        // the browser: dynamical (tweakpane day-form) + kinematic beats.
-        pDynDegPerYearAt: /** @param {number} year */ (year) => {
-          const sid = DTmod.computeSiderealYearDaysDirect(year);
-          const sol = DTmod.computeSolarYearDaysDirect(year);
-          return 360 * (sid - sol) / sid;
-        },
+        // the browser. Plan 09: the dynamical rate is the published
+        // precession period's (the one-family beat inside its window, the
+        // composed clock beyond; degrees per Julian year) — the retired year
+        // combs' day-form beat read 60 % of the secular drift.
+        pDynDegPerYearAt: /** @param {number} year */ (year) => 360 / _e5Tier().epoch.axialPrecessionYearsAtYear(year),
         pKinDegPerYearAt: /** @param {number} year */ (year) => {
           const t = (C.startmodelYear - year) / 1e6;
           const sid = DTmod.meanSiderealYearSecondsAtAge(t);
@@ -160,10 +160,8 @@ function _fwChannelIntegralTools(T, s) {
   return DT._deepEcc().channelIntegral(T, s);   // decision (ii): the ONE deep e
 }
 
-// S3 closed: the shared module evaluates the Sun secular deviations on the
-// browser's CALENDAR year coordinate (this mirror used the linear
-// 2000 + d/inputMeanSolarYear approximation).
-function _fwSunSecularDeviations(jd_tt) { return _moonArgsM().sunSecularDeviations(jd_tt); }
+// (Plan 09: the Sun secular deviations — the closed-form integrals of the
+// retired year combs — are gone; the arguments' Sun is the certified Sun.)
 
 // ── Stage B deep-time branch (mirror of src/script.js _fwMoonArgsDeep) ─────
 // Always-chains: secular phases from the factored-law month/precession chains

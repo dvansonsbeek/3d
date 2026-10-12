@@ -119,9 +119,11 @@ for (const url of SAMPLE_REQUESTS) {
   if (Math.abs(ep.h - 335317) > 1e-6) failures.push(`epoch H@2000: ${ep.h}`);
   // The 'lod' section's two named bases (plan 08 storyline sweep): LOD_real,
   // the observable (= the registry's lodRealPhysical, the simulator's Solar
-  // Day), and the Layer-2 tidal + GIA mean day; 1.78 ms apart at J2000.
-  if (Math.abs(ep.lodRealSeconds - 86400.00178) > 1e-4) failures.push(`epoch lodRealSeconds@2000: ${ep.lodRealSeconds}`);
-  if (Math.abs(ep.lodMeanSeconds - 86399.99968) > 1e-4) failures.push(`epoch lodMeanSeconds@2000: ${ep.lodMeanSeconds}`);
+  // Day), and the Layer-2 tidal + GIA mean day; 1.20 ms apart at J2000 (plan 09:
+  // the mean day is the SI day ω₀, LOD_real at J2000 the joint fit's USNO trend value; was 1.78 ms).
+  if (Math.abs(ep.lodRealSeconds - 86400.0012) > 1e-4) failures.push(`epoch lodRealSeconds@2000: ${ep.lodRealSeconds}`);
+  // plan 09: the J2000 day length ω₀ is the SI day (was the H/13 identity's 86,399.99968)
+  if (Math.abs(ep.lodMeanSeconds - 86400) > 1e-4) failures.push(`epoch lodMeanSeconds@2000: ${ep.lodMeanSeconds}`);
   if ('lodSeconds' in ep) failures.push('epoch still serves the unnamed lodSeconds');
   const dev = dataOf('/v1/epoch?year=-379998000').epochs[0];
   // plan 06 Phase 3: H(t) is the UNIT = 13 composed lunisolar precession periods (282,329 at −380 Ma);
@@ -131,9 +133,9 @@ for (const url of SAMPLE_REQUESTS) {
   // (≈ IAU 25,771 yr at J2000), the composed lunisolar period on the SAME derived anchor beyond
   // (the Devonian record). S5 retired "axial ≡ H/13": the unit and the clock scale together, so the
   // invariant is the RATIO — T_p(Dev)/T_p(2000) ≡ H(Dev)/H(2000) — while T_p(Dev) ≠ H(Dev)/13 (0.086 %).
-  // Tolerance 1e-6: the J2000 value is route B's REALIZED beat, 3e-8 from the anchor (the hybrid
-  // self-anchor's one fixed-point step); the retired H/13 reading would miss by 8.6e-4.
-  if (Math.abs(ep.axialPrecessionYears - 25771.4) > 0.5) failures.push(`epoch axialPrecessionYears@2000: ${ep.axialPrecessionYears}`);
+  // Tolerance 1e-6 on the ratio; the J2000 value is 1,296,000/p_A, the IAU 2006 general precession
+  // input (plan 09; the retired year combs' beat read 25,771.4); the retired H/13 reading would miss by 8.6e-4.
+  if (Math.abs(ep.axialPrecessionYears - 25771.575) > 0.5) failures.push(`epoch axialPrecessionYears@2000: ${ep.axialPrecessionYears}`);
   if (Math.abs(ep.tropicalYearSeconds - 31556925.2) > 1) failures.push(`epoch tropicalYearSeconds@2000: ${ep.tropicalYearSeconds}`);
   if (Math.abs(dev.axialPrecessionYears / ep.axialPrecessionYears - dev.h / ep.h) > 1e-6) failures.push(`epoch axialPrecessionYears@Devonian must scale with the unit: ${dev.axialPrecessionYears / ep.axialPrecessionYears} vs ${dev.h / ep.h}`);
   if (Math.abs(dev.axialPrecessionYears - dev.h / 13) < 1) failures.push(`epoch axialPrecessionYears@Devonian still reads the retired H/13: ${dev.axialPrecessionYears}`);
@@ -142,10 +144,10 @@ for (const url of SAMPLE_REQUESTS) {
   const ss = dataOf('/v1/cardinal-points?year=2000&types=SS').years[0].points.SS;
   if (Math.abs(ss.jd - 2451716.575) > 0.1) failures.push(`SS 2000 JD: ${ss.jd}`);
   const val = dataOf('/v1/values/usnoLodJ2000');
-  if (val.value !== '86,400.0022') failures.push(`values/usnoLodJ2000: ${val.value}`);   // v23.0: the obliquity lines on the realized pole rate moved the GIA α(t) channel and the joint re-close's optimum to 0022 (history: 0018 after the ecc-unification 7c re-close → 0020 → 0019 with the lagged GIA channel → 0021 with the ecliptic missing-motion term on the nodal period, plan 06 T2, held through v22.0)
+  if (val.value !== '86,400.0012') failures.push(`values/usnoLodJ2000: ${val.value}`);   // plan 09: ω₀ = the SI day removed the H/13 day's +0.32 ms/day bias from the raw ΔT integrand; the joint re-close's optimum moved 0022 → 0012 (Espenak RMS 14.06 → 12.45 s). v23.0: the obliquity lines on the realized pole rate moved the GIA α(t) channel and the joint re-close's optimum to 0022 (history: 0018 after the ecc-unification 7c re-close → 0020 → 0019 with the lagged GIA channel → 0021 with the ecliptic missing-motion term on the nodal period, plan 06 T2, held through v22.0)
   const deriv = dataOf('/v1/derivations/axialPrecession');
   if (deriv.latticeDivisor !== 13) failures.push(`derivations/axialPrecession divisor: ${deriv.latticeDivisor}`);
-  if (Math.abs(deriv.periodYears - 25771.4) > 0.5) failures.push(`derivations/axialPrecession period: ${deriv.periodYears}`);
+  if (Math.abs(deriv.periodYears - 25771.575) > 0.5) failures.push(`derivations/axialPrecession period: ${deriv.periodYears}`);
   // S6: the Earth-cycle rows carry the DYNAMICAL periods (the registry's values), never the device H/n.
   // (inclinationPrecession ≈ 111,634: the movement's own apsidal rate of date since 2026-09 — was the chain tangent's
   // 111,570, then 111,580 on the point-sampled series; the running-mean re-bank (v16.2) removed the sampling alias

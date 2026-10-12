@@ -151,8 +151,8 @@ export const DEEP_MODES_ARTIFACT: Readonly<{
             im: number;
         }[];
     };
-    anchorE: 0.016702435651957018;
-    anchorPeriEclipticDeg: 462.9179213996577;
+    anchorE: 0.016702435651957125;
+    anchorPeriEclipticDeg: 462.9179213996576;
     anchorInclEclipticDeg: 0.00010345820355474172;
     anchorAscNodeEclipticDeg: 140.29217988414328;
     anchorZDotPerYr: number[];

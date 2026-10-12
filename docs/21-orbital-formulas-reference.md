@@ -1,7 +1,7 @@
 ---
 docVersion: 1.0
 modelVersion: v23.0
-coefficients: sha256:90a0f37a51074bdb
+coefficients: sha256:e0bf442540ee02b7
 status: current
 ---
 
@@ -217,11 +217,11 @@ For current values, see [Constants Reference](20-constants-reference.md).
 
 #### 1.5.3 Dynamic Time Variables (Length of Day dependent)
 
-Naming taxonomy: `lodKinematic` = the framework's kinematic day (the year laws' identity day); `lodReal` = the physical LOD on the tidal history with the ΔT stack (`computeLodRealSecondsAtEpoch`). The three day bases are named in [doc 11 §Day bases](11-length-day-year-formulas.md#day-types).
+Naming taxonomy: `lodKinematic` = the kinematic day of date (the Layer-0 tidal mean length of day, the year laws' denominator in days); `lodReal` = the physical LOD on the tidal history with the ΔT stack (`computeLodRealSecondsAtEpoch`). The day bases are named in [doc 11 §Day bases](11-length-day-year-formulas.md#day-types).
 
 | Variable | Description |
 |----------|-------------|
-| `o.lodKinematic` | Current epoch-specific kinematic day (SI seconds), = IAU_sid_sec / Fourier sid_days = <!--v:lodKinematicFourierJ2000Seconds-->86,400.000107<!--/v--> s at J2000 (the panel *seconds* basis; the scene's measured-day basis is <!--v:measuredMeanSolarDayJ2000Seconds-->86,400.000427<!--/v--> s; see [doc 11 §Day bases](11-length-day-year-formulas.md#day-types)) |
+| `o.lodKinematic` | Current epoch-specific kinematic day (SI seconds), the Layer-0 tidal mean LOD of date = <!--v:lodKinematicFourierJ2000Seconds-->86,400.000000<!--/v--> s at J2000 — ω₀, the SI day (plan 09: ONE J2000 day basis; the scene's day basis <!--v:measuredMeanSolarDayJ2000Seconds-->86,400.000000<!--/v--> s is the same day; see [doc 11 §Day bases](11-length-day-year-formulas.md#day-types)) |
 | `predictions.lodReal` | Physical LOD: `computeLodRealSecondsAtEpoch(year)` — the tidal history with the ΔT stack. Displayed as the solar day in the Predictions panel. |
 | `o.siderealDayReal` | Current sidereal day length (SI seconds) |
 | `o.stellarDayReal` | Current stellar day length (SI seconds) |
@@ -1155,7 +1155,7 @@ precessionEclipticToICRF: (ecliptic_years, reference_years) => {
 
 **Example for Mercury:**
 - Ecliptic period: ~<!--v:mercuryPeriPeriod-->23,199<!--/v--> years
-- Reference (the J2000 axial precession period): <!--v:axialPrecRound-->~25,771<!--/v--> years
+- Reference (the J2000 axial precession period): <!--v:axialPrecRound-->~25,772<!--/v--> years
 - ICRF period: ~<!--v:mercuryPeriPeriodICRF-->232,437<!--/v--> years
 
 #### 10.2.2 ICRF to Ecliptic Transformation
@@ -1285,9 +1285,9 @@ The periods are the N-body chain's J2000 readings: the inertial (ICRF) period is
 | **Earth** | <!--v:periPrecYears-->~20,938<!--/v--> | +<!--v:earthPeriPeriodICRF-->111,635<!--/v--> |
 | **Mars** | <!--v:marsPeriPeriod-->19,002<!--/v--> | −<!--v:marsPeriPeriodICRF-->72,335<!--/v--> |
 | **Jupiter** | <!--v:jupiterPeriPeriod-->23,760<!--/v--> | −<!--v:jupiterPeriPeriodICRF-->304,456<!--/v--> |
-| **Saturn** | −<!--v:saturnPeriPeriod-->16,502<!--/v--> | −<!--v:saturnPeriPeriodICRF-->45,883<!--/v--> |
+| **Saturn** | −<!--v:saturnPeriPeriod-->16,503<!--/v--> | −<!--v:saturnPeriPeriodICRF-->45,883<!--/v--> |
 | **Uranus** | <!--v:uranusPeriPeriod-->23,907<!--/v--> | −<!--v:uranusPeriPeriodICRF-->330,515<!--/v--> |
-| **Neptune** | <!--v:neptunePeriPeriod-->25,464<!--/v--> | −<!--v:neptunePeriPeriodICRF-->2,136,796<!--/v--> |
+| **Neptune** | <!--v:neptunePeriPeriod-->25,464<!--/v--> | −<!--v:neptunePeriPeriodICRF-->2,136,797<!--/v--> |
 
 **Note:** Venus and Saturn precess retrograde in the ecliptic frame; Saturn's window retrograde is the Great-Inequality phase of its own chain ([doc 109](109-model-nbody-engine-and-lattice-test.md)). The registry's live values and their window are in [doc 20](20-constants-reference.md#perihelion-precession-periods-ecliptic).
 

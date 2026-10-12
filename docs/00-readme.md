@@ -1,7 +1,7 @@
 ---
 docVersion: 1.0
 modelVersion: v23.0
-coefficients: sha256:90a0f37a51074bdb
+coefficients: sha256:e0bf442540ee02b7
 status: current
 ---
 
@@ -67,8 +67,8 @@ their diffs), and the sections below give the intended reading order instead.
 | 106 | [Deep-Time Validation Dossier](106-deep-time-validation-dossier.md) | The single entry point for "how well does the model match the geological and historical record, and how would we know if it stopped?" Four evidence classes, gate-backed (41 paleo anchors, Phanerozoic MAD <!--v:paleoMadPhanPct-->0.18<!--/v-->%), including **the honesty ledger** — documented deviations asserted as bands so an unexplained improvement fails CI too |
 | 102 | [Pure-tidal + GIA α(t) vs the historical lunar record](102-gia-alpha-lunar-validation.md) | 267 primary-source lunar observations (Stephenson 2016): framework mean \|residual\| **20.2 min** vs NASA's fitted polynomial at 20.0 min — a 2-s excess over Stephenson's own fit, with zero ΔT-polynomial fitting; the α(t) GIA channel from independent satellite gravimetry; the 4-flag ΔT stack; the full hypothesis-testing and residual-decomposition record |
 | 104 | [The Millennial Rotation Swing](104-millennial-rotation-swing.md) | The core–mantle identification of the post-stack residual: one aperiodic swing, independently confirmed against archeomagnetic core-flow ΔLOD (r = +0.91), the lattice closed under difference tones, and the low-Q Magneto-Coriolis eigenmode reading |
-| 105 | [ΔT stack: what each flag buys](105-dt-stack-flag-audit.md) | Audit of the four ΔT correction flags under pre-fixed criteria: the shipped set is optimal in- and out-of-sample (Espenak RMS <!--v:deltaTEspenakRmsSeconds-->14.1<!--/v--> s); the two measurement traps (stage_* metrics rank backwards; Jose5/Jose4 are a coupled pair) |
-| 103 | [-135 Babylonian solar eclipse case study](103-135-babylonian-case-study.md) | The flagship ancient event: BestGap <!--v:babylon135BestGapKm-->170<!--/v--> km (off-peak verdict), documented UT matched to 9 minutes, local magnitude 0.988, the ΔT-free cascade selecting the traditional date uniquely — plus the component decomposition and the α(t) sensitivity proof |
+| 105 | [ΔT stack: what each flag buys](105-dt-stack-flag-audit.md) | Audit of the four ΔT correction flags under pre-fixed criteria: the shipped set is optimal in- and out-of-sample (Espenak RMS <!--v:deltaTEspenakRmsSeconds-->12.5<!--/v--> s); the two measurement traps (stage_* metrics rank backwards; Jose5/Jose4 are a coupled pair) |
+| 103 | [-135 Babylonian solar eclipse case study](103-135-babylonian-case-study.md) | The flagship ancient event: BestGap <!--v:babylon135BestGapKm-->153<!--/v--> km (off-peak verdict), documented UT matched to 9 minutes, local magnitude 0.988, the ΔT-free cascade selecting the traditional date uniquely — plus the component decomposition and the α(t) sensitivity proof |
 | 107 | [Ancient-record review — identification adjudication](107-ancient-record-review.md) | Local-circumstance re-testing of the audit's ancient rows: every first-hand record validates at its traditional date; the "geographic" verdicts are identification errors in second-hand chains; the Lu −708 record identified uniquely by the chronology-free ganzhi filter |
 
 ### Climate
@@ -206,8 +206,8 @@ See the [Python Scripts README](../scripts/README.md) for details.
 
 | Concept | Value | Description |
 |---------|-------|-------------|
-| The clock | <!--v:lunisolarPeriodJ2000Yr-->25,771.4<!--/v--> years | The mean lunisolar precession period at J2000 — Earth's spin clock; the other cycles are read against it as ratios |
-| Axial Precession | <!--v:axialPrecRound-->~25,771<!--/v--> yr | Earth's wobble around the EARTH-WOBBLE-CENTER |
+| The clock | <!--v:lunisolarPeriodJ2000Yr-->25,771.6<!--/v--> years | The mean lunisolar precession period at J2000 — Earth's spin clock; the other cycles are read against it as ratios |
+| Axial Precession | <!--v:axialPrecRound-->~25,772<!--/v--> yr | Earth's wobble around the EARTH-WOBBLE-CENTER |
 | Apsidal Precession | <!--v:inclPrecYears-->~111,635<!--/v--> yr | PERIHELION-OF-EARTH orbit period against the stars (<!--v:lunisolarApsidalPerPrecessionJ2000-->4.332<!--/v--> precession periods today) |
 | Perihelion Precession | <!--v:periPrecYears-->~20,938<!--/v--> yr | The perihelion-of-date cycle: the axial and apsidal rates add |
 | Obliquity Range | ~22.1° – ~24.5° | Earth's axial tilt oscillation |

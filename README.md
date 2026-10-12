@@ -23,13 +23,13 @@ This repository is the simulator and the model behind the **Expanding Solar Syst
 The model has two engines and one clock.
 
 - **The N-body engine — the planets.** Standard Newtonian gravity with the first-order relativistic correction, integrated from one cited J2000 heliocentric state (JPL Horizons vectors, DE440 mass ratios) with **zero fitted constants**. It supplies every planet's orbit of date, the secular modes, the <!--v:earthDeepBeatPeriodKyr-->405.6<!--/v-->-kyr eccentricity metronome, and Earth's own eccentricity, inclination, node and perihelion of date. Mercury's relativistic perihelion share emerges as derived physics inside its measured advance.
-- **The clock — Earth's spin and time.** The mean lunisolar precession period, <!--v:lunisolarPeriodJ2000Yr-->25,771.4<!--/v--> years at J2000, is derived from the model's own sidereal and tropical year laws and agrees with the IAU value to eight parts in a million. Earth's other spin-side periods are read against it as ratios of periods, and the clock lengthens through geological time as tides slow the spin.
+- **The clock — Earth's spin and time.** The mean lunisolar precession period, <!--v:lunisolarPeriodJ2000Yr-->25,771.6<!--/v--> years at J2000, is derived from the model's own sidereal and tropical year laws and agrees with the IAU value to eight parts in a million. Earth's other spin-side periods are read against it as ratios of periods, and the clock lengthens through geological time as tides slow the spin.
 
 Two of Earth's precession motions rotate in **opposite directions**, so their frequencies add:
 
 | Motion | Direction | Period at J2000 |
 |--------|-----------|-----------------|
-| Axial precession (the clock) | Clockwise | <!--v:axialPrecRound-->~25,771<!--/v--> years |
+| Axial precession (the clock) | Clockwise | <!--v:axialPrecRound-->~25,772<!--/v--> years |
 | Apsidal precession (the orbit's own motion, a J2000 reading) | Counter-clockwise | <!--v:inclPrecYears-->~111,635<!--/v--> years |
 
 Their beat is the perihelion-of-date cycle, <!--v:periPrecYears-->~20,938<!--/v--> years (1/T_peri = 1/T_p + 1/T_aps), the carrier of the climatic-precession band. The apsidal period is <!--v:lunisolarApsidalPerPrecessionJ2000-->4.332<!--/v--> precession periods today and wanders between <!--v:lunisolarApsidalPerPrecessionWanderMin-->1.08<!--/v--> and <!--v:lunisolarApsidalPerPrecessionWanderMax-->9.81<!--/v--> across ±26 kyr: the ratio is a reading of two different clocks, not a gearing between them. The obliquity band is the beat of the clock against the orbit's own nodal mode, <!--v:obliqBeatJ2000Kyr-->41.1<!--/v--> kyr today. The simulator's Lunisolar Clock panel shows the live ratios.
@@ -45,11 +45,11 @@ The same machinery, checked against independent records across six orders of mag
 | Surface | Reference | Agreement |
 |---|---|---|
 | Position of the Sun | JPL Horizons | <!--v:frameworkSunVsJplRms-->1.03<!--/v-->″ RMS — the Meeus Ch. 25 reference reads <!--v:meeusCh25SunVsJplRms-->1.02<!--/v-->″ |
-| Positions of the seven planets | JPL Horizons, 2000–2099 | <!--v:jupiterChainVsJplRms2000sArcsec-->10.3<!--/v-->″ (Jupiter) to <!--v:marsChainVsJplRms2000sArcsec-->35.7<!--/v-->″ (Mars); every target inside 0.012° across 1800–2100 |
-| Cardinal points (equinoxes and solstices) | JPL Horizons, −3000 to +2000 | <!--v:cardinalVsHorizonsMeanMin-->−0.74<!--/v--> min mean |
+| Positions of the seven planets | JPL Horizons, 2000–2099 | <!--v:jupiterChainVsJplRms2000sArcsec-->10.2<!--/v-->″ (Jupiter) to <!--v:marsChainVsJplRms2000sArcsec-->35.7<!--/v-->″ (Mars); every target inside 0.012° across 1800–2100 |
+| Cardinal points (equinoxes and solstices) | JPL Horizons, −3000 to +2000 | <!--v:cardinalVsHorizonsMeanMin-->−1.02<!--/v--> min mean |
 | Solar eclipses | <!--v:solarAudit26Total-->26<!--/v-->-event documented audit, −762 to 2026 CE | <!--v:solarAudit26ScanReach-->21<!--/v-->/<!--v:solarAudit26Total-->26<!--/v--> with the umbra reaching the observation site |
 | Lunar eclipse timings | Stephenson 2016, <!--v:lunarEventsTotal-->267<!--/v-->-event set | <!--v:lunarResidualMinutes-->20.2<!--/v--> min mean \|residual\|, with zero parameters fitted to eclipse data |
-| Earth's obliquity | La2004 (theory) | <!--v:obliqVsLa2004RmsLast100KyrArcsec-->1.2<!--/v-->″ rms over the last 100 kyr; <!--v:obliqVsLa2004RmsLastMyrArcsec-->13.5<!--/v-->″ rms over the last 1 Myr |
+| Earth's obliquity | La2004 (theory) | <!--v:obliqVsLa2004RmsLast100KyrArcsec-->1.3<!--/v-->″ rms over the last 100 kyr; <!--v:obliqVsLa2004RmsLastMyrArcsec-->15.0<!--/v-->″ rms over the last 1 Myr |
 | Climate record | CenCO2PIP, 0–66 Ma | R² = <!--v:canonCenco2pipTotal-->0.692<!--/v--> |
 | Devonian day count | Wells 1963 coral growth bands, 380 Ma | <!--v:anchorWellsFlagship380Pred-->399.96<!--/v--> days per year predicted against the paleontological 400 (<!--v:anchorWellsFlagship380DeltaPct-->−0.01<!--/v--> %) |
 | Deep-time precession | Dated Precambrian sections | gated at 1.4 and 2.46 Ga |
@@ -62,7 +62,7 @@ The numbers were derived from measurement, not theorized, and the same engine pr
 
 The clock is not fixed. Two physically independent drivers stretch the model's periods across geological time:
 
-- **Driver 1 — Earth–Moon tidal evolution.** The day lengthens, the Moon recedes, and the mean lunisolar precession period follows the composed torque rate — Earth's spin carrying the solar and lunar torques, the lunar torque growing as the Moon was closer. The axial precession period was <!--v:axialPrecAtDevonian-->21,699<!--/v--> years in the Devonian, is <!--v:axialPrecRound-->~25,771<!--/v--> years today and reaches <!--v:axialPrecAt200MyrFuture-->28,208<!--/v--> years in 200 Myr; the obliquity band follows the beat of that precession against the orbit's nodal mode.
+- **Driver 1 — Earth–Moon tidal evolution.** The day lengthens, the Moon recedes, and the mean lunisolar precession period follows the composed torque rate — Earth's spin carrying the solar and lunar torques, the lunar torque growing as the Moon was closer. The axial precession period was <!--v:axialPrecAtDevonian-->21,699<!--/v--> years in the Devonian, is <!--v:axialPrecRound-->~25,772<!--/v--> years today and reaches <!--v:axialPrecAt200MyrFuture-->28,208<!--/v--> years in 200 Myr; the obliquity band follows the beat of that precession against the orbit's nodal mode.
 - **Driver 2 — solar mass loss.** Every orbit slowly expands by Kepler's third law. The long-eccentricity band stays at its modern class, scaled only by the measured solar-mass history.
 
 The climate formula rides the engine's own orbital lines — the beats of the N-body chain's secular modes with the precession clock, together with the 405.6-kyr eccentricity family ([Doc 92](docs/92-climate-formula.md)). Their *periods* are what the model commits to: a significant climate peak that is none of them would falsify the orbital-forcing layer. The deep-time theory, its predictions and the Earth–Moon genesis epoch are in [Doc 99 — ESSRT](docs/99-expanding-solar-system-resonance-theory.md).
@@ -79,7 +79,7 @@ The climate formula rides the engine's own orbital lines — the beats of the N-
 
 The Sun is still the centre of the solar system. The scene uses a geo-heliocentric frame — viewing from Earth's perspective — to make the two counter-rotating precession motions visible:
 
-- **Earth's wobble centre** circles Earth clockwise in <!--v:axialPrecRound-->~25,771<!--/v--> years — axial precession.
+- **Earth's wobble centre** circles Earth clockwise in <!--v:axialPrecRound-->~25,772<!--/v--> years — axial precession.
 - **Earth's perihelion point** wobbles counter-clockwise around the Sun in <!--v:inclPrecYears-->~111,635<!--/v--> years — apsidal precession.
 - The two motions **meet every <!--v:periPrecYears-->~20,938<!--/v--> years** — perihelion precession.
 - Earth orbits its perihelion point in one solar year; the seven planets follow their own N-body element chains, Kepler ellipses of date.
@@ -237,7 +237,7 @@ Detailed documentation is in the [`/docs`](docs/00-readme.md) folder, organized 
 **Investigation & Verification:**
 - [Python Scripts](scripts/) — the climate formula and its spectral tests, the LOD/ΔT stack, the paleo anchors and the null tests
 - [Climate Formula (Doc 92)](docs/92-climate-formula.md) — spectral analysis of five paleoclimate records (LR04, Cheng 2016, CENOGRID, EPICA CO₂, CenCO2PIP) and the canonical **climate formula** on the engine's own orbital lines, with its in-app Explorer modal and reproducing pipeline; [Doc 94](docs/94-insolation-null-test.md) is the insolation null test
-- [Historical Eclipse Validation (Docs 102–103)](docs/102-gia-alpha-lunar-validation.md) — the model's ΔT formula, with **zero parameters fitted to eclipse data in the α(t) machinery**, tested on two independent tracks: a <!--v:solarAudit26Total-->26<!--/v-->-event solar-eclipse audit spanning −762 BCE to 2026 CE (see the website's [Solar Eclipse Validation](https://holisticuniverse.com/model/historical-eclipse-validation)) and a <!--v:lunarEventsTotal-->267<!--/v-->-event primary-source lunar timing test — **<!--v:lunarResidualMinutes-->20.2<!--/v-->-min mean \|residual\|**, with **<!--v:lunarEventsBeatingNasa-->121<!--/v-->/267 events (<!--v:lunarBeatingNasaPct-->45.3<!--/v-->%) closer to observation than NASA Espenak/Meeus's polynomial**. [Doc 103](docs/103-135-babylonian-case-study.md) is the −135 Babylonian case study: predicted UT within 9 minutes of the documented time, umbra centreline <!--v:babylon135BestGapKm-->170<!--/v--> km from Babylon within the scan window
+- [Historical Eclipse Validation (Docs 102–103)](docs/102-gia-alpha-lunar-validation.md) — the model's ΔT formula, with **zero parameters fitted to eclipse data in the α(t) machinery**, tested on two independent tracks: a <!--v:solarAudit26Total-->26<!--/v-->-event solar-eclipse audit spanning −762 BCE to 2026 CE (see the website's [Solar Eclipse Validation](https://holisticuniverse.com/model/historical-eclipse-validation)) and a <!--v:lunarEventsTotal-->267<!--/v-->-event primary-source lunar timing test — **<!--v:lunarResidualMinutes-->20.2<!--/v-->-min mean \|residual\|**, with **<!--v:lunarEventsBeatingNasa-->117<!--/v-->/267 events (<!--v:lunarBeatingNasaPct-->43.8<!--/v-->%) closer to observation than NASA Espenak/Meeus's polynomial**. [Doc 103](docs/103-135-babylonian-case-study.md) is the −135 Babylonian case study: predicted UT within 9 minutes of the documented time, umbra centreline <!--v:babylon135BestGapKm-->153<!--/v--> km from Babylon within the scan window
 - [The Derived Moon — Doc 66](docs/66-moon-meeus-corrections.md) — the framework's lunar theory: Meeus Ch. 47 with every constant derived, attributed or anchored by design, certified statistically indistinguishable from the pure-Meeus polynomials across the 12,064-event NASA lunar canon while remaining bounded at deep time
 - [Fitting Pipeline](tools/fit/README.md) — the Sun optimizer, Earth perihelion harmonics, the solar-measurements window export and the obliquity, cardinal-point and year-length harmonics
 
@@ -264,8 +264,8 @@ The cardinal points (solstices and equinoxes) are **derived, not independently f
 
 ## Quick Facts
 
-- **The clock**: the mean lunisolar precession period, <!--v:lunisolarPeriodJ2000Yr-->25,771.4<!--/v--> years at J2000, lengthening under tidal evolution
-- **Axial precession**: <!--v:axialPrecRound-->~25,771<!--/v--> years
+- **The clock**: the mean lunisolar precession period, <!--v:lunisolarPeriodJ2000Yr-->25,771.6<!--/v--> years at J2000, lengthening under tidal evolution
+- **Axial precession**: <!--v:axialPrecRound-->~25,772<!--/v--> years
 - **Apsidal precession**: <!--v:inclPrecYears-->~111,635<!--/v--> years, a J2000 reading of the orbit's own motion
 - **Perihelion precession**: <!--v:periPrecYears-->~20,938<!--/v--> years — the beat of the two, 1/T_peri = 1/T_p + 1/T_aps
 - **Obliquity band**: <!--v:obliqBeatJ2000Kyr-->41.1<!--/v--> kyr — the beat of the clock against the orbit's nodal mode

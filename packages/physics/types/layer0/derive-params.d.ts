@@ -20,7 +20,10 @@ export type RawEpochConstants = {
      */
     holisticYearJ2000: number;
     meanSiderealYearSeconds: number;
-    meanSiderealYearDaysKinematic: number;
+    /**
+     * ω₀: the J2000 day length, SI seconds (the SI day since plan 09)
+     */
+    lodJ2000Seconds: number;
     /**
      * M_SUN
      */

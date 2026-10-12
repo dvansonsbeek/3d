@@ -417,15 +417,15 @@ function resonatorLodAtJ2000() {
 //   dtCycleLodCorrectionSum(2000) = USNO − o.lodKinematic − h5Correction(2000)
 // which is exactly the anchor target for this fit.
 function computeUsnoTargetOffset(usnoTargetLodS) {
-  // Load the current fitted sidereal-year anchor from fitted-coefficients.json —
-  // this is what o.siderealYearDays evaluates to at year 2000 in the runtime.
-  const fc = JSON.parse(fs.readFileSync(
-    path.join(ROOT, 'public', 'input', 'fitted-coefficients.json'), 'utf8'));
-  const sidDays2000 = fc.YEAR_LENGTH_J2000_ANCHOR
-    ? fc.YEAR_LENGTH_J2000_ANCHOR.sidereal
-    : C.meanSiderealYearDays;  // fallback for pre-anchor world
-  const iauSiderealSec = C.meanSiderealYearDays * 86400;
-  const lodKinematic = iauSiderealSec / sidDays2000;
+  // Plan 09: the kinematic day at J2000 is the model's ω₀ — the SI day
+  // (C.meanLengthOfDay = 86,400 s). The runtime's kinematic day of date is the
+  // Layer-0 tidal mean LOD, exactly ω₀ at J2000, so the closure target and the
+  // runtime composite share ONE basis. (Before plan 09 the fitter read the
+  // retired year comb's measured anchor YEAR_LENGTH_J2000_ANCHOR.sidereal —
+  // 86,400.00032 s — while the runtime rode the comb's own 86,400.00011: the
+  // two-J2000-day-bases spread of doc 99, closed here.)
+  const sidDays2000 = C.meanSiderealYearDays;
+  const lodKinematic = C.meanLengthOfDay;
 
   // The solar day's ecliptic missing-motion term at 2000 — read from the ONE
   // runtime home (tools/lib deep-time → the shared factory), so the closure

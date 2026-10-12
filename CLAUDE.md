@@ -224,6 +224,23 @@ would silently churn a structural claim for a rounding-level gain.
   freshness gate green (it hashes the JSON). After ANY fitter write:
   `constants:generate` FIRST, then the records. `test:constants` catches
   the stale embed; it does not catch a record recorded on it.
+- **A comb on H-divisors cannot carry a secular drift — and a comb-built
+  timeline hides its error inside a fitted chain.** (plan 09 step 3,
+  measured) The lunar arguments built their Sun from 360° per mean solar
+  year plus the closed-form integrals of the year-length combs; that Sun
+  sat 0.2° behind the IAU mean Sun at −2000 (the comb's curvature is 60 %
+  of the tropical year's real drift, which the one-family law reproduces to
+  0.1 s), and the Moon's elongation argument carried it as tens of
+  arcseconds of ancient residual. The arguments now read the ONE certified
+  Sun (`model.sun.meanLongitudeDegAt`, the series' unwrapped perihelion) —
+  D within 15″ of Meeus at −2000, was 656″. Rule: a timeline is the
+  integral of the published rate of date, never a comb; and when a fitted
+  chain agrees with the record while one of its inputs is wrong, the other
+  inputs are compensating — check each input against its own referee.
+  Also measured on the way: the J2000 day length ω₀ is the SI day (86,400 s,
+  the day the IAU year inputs are stated in); the retired H/13 identity's
+  86,399.99968 s put a +0.32 ms/day bias into the raw ΔT integrand that the
+  fitted stack had to absorb (Espenak RMS 13.4 → 12.45 s once removed).
 - **A number a doc cannot reproduce from an artifact gets written BY the
   script**, not re-derived in a generator. Two guesses at the §4.7 f_ice
   recipe gave 0.70 and 0.73 against the documented 0.77; the script's own
@@ -490,8 +507,13 @@ precession must follow the COMPOSED lunisolar rate
 ψ̇(t) = [ω(t)/ω₀]·p₀·[f_S + (1 − f_S)(a₀/a_M(t))³] (spin from the recession
 history, the lunar torque growing on the Moon's distance; ONE home
 `@essrt/physics/earth/precession-composed`; its J2000 anchor p₀ is the
-model's ONE J2000 precession reading, the certified year laws' beat at 2000
-= 25,771.4 yr ≈ IAU — plan 06 S5; **H(t) is the internal UNIT that scales
+model's ONE J2000 precession reading — since plan 09 the IAU 2006 general
+precession p_A = 50.28796195 ″/yr, an INPUT (astro-reference
+`generalPrecessionJ2000_arcsecPerYr`, T_p = 25,771.575 yr); before plan 09
+it was the retired year combs' beat at 2000, 25,771.395 yr (plan 06 S5),
+8 ppm faster, and that 8 ppm was absorbing a sidereal-year-input mismatch
+against DE441 (Sun vs Horizons gained +1″ per millennium on p_A) — a
+sidereal-year finding, parked; **H(t) is the internal UNIT that scales
 WITH this period but is NOT 13 of them** (H₀/T_p = 13.011: H₀ was fitted on
 the perihelion-of-date beat, so H/13 = 25,793.6 was the fit anchor's
 reading, 0.086 % slow, never a period; `hAtAge` in `deltat/deep-time.cjs`,
@@ -508,8 +530,9 @@ its dynamical value under the measured
 solar-mass history — degenerate today with the pure precession-scaling
 reading "obliquity period ∝ T_p", roughly a factor two apart at 2.46 Ga;
 registry keys `obliqBeat*Kyr` / `obliqH8Scaled*Kyr` (name kept), doc 109
-§18). **Two named counters** (plan 06 D8): the FROZEN era clock, the
-year-length comb family and the ∫dt/H phase table ride their own fitted
+§18). **Two named counters** (plan 06 D8): the FROZEN era clock — the
+remaining combs (perihelion, cardinal record, RA day offset) and the ∫dt/H
+phase table; the year-length combs are deleted (plan 09) — rides its own fitted
 convention `eraClockHAtAge` = H₀·LOD/LOD₀ (pure spin scaling, the
 pre-Phase-3 "H/13 identity", shipped with their coefficients as a device
 constant — as a precession claim it is retired: it read

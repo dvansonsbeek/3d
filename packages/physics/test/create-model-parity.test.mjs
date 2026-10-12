@@ -122,7 +122,7 @@ if (model.identity.counterfactual !== false) failures.push('identity: default as
   for (const y of [2000, -3000, 1500, 2100]) {
     check('lengths.lodRealSeconds', y, model.lengths.lodRealSeconds(y), dt.computeLodRealSecondsAtEpoch(y), 1e-9);
   }
-  const sol = dt.computeSolarYearDaysDirect(2000);
+  const sol = dt.tropicalYearDaysOfDate(2000);   // plan 09: the one-family tropical year over the kinematic day of date
   const sidPhys = (sol * dt.computeLodRealSecondsAtEpoch(2000)) / (sol + 1);
   check('lengths.siderealDaySeconds (LOD_real basis)', 2000, model.lengths.siderealDaySeconds(2000), sidPhys, 1e-6);
   const gapMs = (model.lengths.stellarDaySeconds(2000) - model.lengths.siderealDaySeconds(2000)) * 1000;

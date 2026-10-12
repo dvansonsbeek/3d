@@ -1,7 +1,7 @@
 ---
 docVersion: 1.0
 modelVersion: v23.0
-coefficients: sha256:90a0f37a51074bdb
+coefficients: sha256:e0bf442540ee02b7
 status: current
 ---
 
@@ -107,7 +107,7 @@ The display shows:
 
 ### EARTH-WOBBLE-CENTER ("The Death Star")
 
-This small grey marker rides Earth's precession frame: it circles Earth once per precession period (<!--v:axialPrecRound-->~25,771<!--/v--> years at J2000) at a fixed display distance, marking the solstice direction — the direction Earth's axis leans within the sun plane. It is a display marker, not a physics node: every instrument measures from Earth itself.
+This small grey marker rides Earth's precession frame: it circles Earth once per precession period (<!--v:axialPrecRound-->~25,772<!--/v--> years at J2000) at a fixed display distance, marking the solstice direction — the direction Earth's axis leans within the sun plane. It is a display marker, not a physics node: every instrument measures from Earth itself.
 
 **To observe**: focus on Earth, enable Tracing › Wobble, speed up time to 1,000+ years per second and watch it draw its circle around Earth.
 
@@ -240,7 +240,7 @@ When the Planet Orbit Analysis panel is open:
 
 ## Common Exploration Tasks
 
-### Watch Axial Precession (≈ <!--v:axialPrecRound-->~25,771<!--/v--> years)
+### Watch Axial Precession (≈ <!--v:axialPrecRound-->~25,772<!--/v--> years)
 
 1. Set time speed to **10,000 years per second**
 2. Enable the **Polar Line**

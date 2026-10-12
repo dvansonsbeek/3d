@@ -33,10 +33,6 @@ export type DeepTimeLodConstants = {
     meanSiderealYearJ2000Seconds: number;
     solarMassLossFracPerYear: number;
     /**
-     * - Actual-LOD numerator
-     */
-    siderealYearDaysKinematicJ2000: number;
-    /**
      * - f_S, the solar fraction of the J2000
      * precession torque (derive-params) — the unit H(t) = 13·T_p,composed needs it
      */
@@ -49,7 +45,6 @@ export type DeepTimeLodDeps = {
      * - GIA α(t)
      */
     moiFactorAtAge: (tMa: number) => number;
-    siderealYearDaysFourierAt: (year: number) => number;
     /**
      * - gated δLOD sum (incl. swing)
      */
@@ -105,7 +100,6 @@ export type DeepTimeLodDeps = {
  * @property {number} lodNowH13Seconds - the H/13-identity mean LOD at J2000
  * @property {number} meanSiderealYearJ2000Seconds
  * @property {number} solarMassLossFracPerYear
- * @property {number} siderealYearDaysKinematicJ2000 - Actual-LOD numerator
  * @property {number} precessionSolarShareJ2000 - f_S, the solar fraction of the J2000
  *   precession torque (derive-params) — the unit H(t) = 13·T_p,composed needs it
  */
@@ -114,7 +108,6 @@ export type DeepTimeLodDeps = {
  * @property {DeepTimeLodConstants} constants
  * @property {(tMa: number) => number} moonDistanceMetresAtAge
  * @property {(tMa: number) => number} moiFactorAtAge - GIA α(t)
- * @property {(year: number) => number} siderealYearDaysFourierAt
  * @property {(year: number) => number} cycleLodSumAt - gated δLOD sum (incl. swing)
  * @property {(year: number) => number} swingLodAt - gated swing δLOD alone
  * @property {(year: number) => number} swingLodRateAt - gated analytic swing rate
@@ -153,7 +146,6 @@ export function createDeepTimeLod(deps: DeepTimeLodDeps): {
     yearInDaysAtAge: (t_Ma: number) => number | null;
     deltaTRawSecondsAtAge: (t_Ma: number) => number;
     lodSecondsWithCorrectionsAtAge: (t_Ma: number) => number | null;
-    lodSecondsActualAtAge: (t_Ma: number) => number | null;
     dLodDtDecompositionAtAge: (t_Ma: number) => {
         tidal: number | null;
         gia: number | null;

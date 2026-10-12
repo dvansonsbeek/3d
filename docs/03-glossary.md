@@ -1,7 +1,7 @@
 ---
 docVersion: 1.0
 modelVersion: v23.0
-coefficients: sha256:90a0f37a51074bdb
+coefficients: sha256:e0bf442540ee02b7
 status: current
 ---
 
@@ -20,13 +20,13 @@ The Expanding Solar System Resonance Theory as one integrated account of the sol
 The planets' orbits of date, from a Newtonian N-body integration with the first-order relativistic correction of one cited J2000 state (JPL Horizons vectors, DE440 mass ratios) with zero fitted constants. It supplies every planet's elements of date, the secular modes, the <!--v:earthDeepBeatPeriodKyr-->405.6<!--/v-->-kyr eccentricity metronome, and Earth's own eccentricity, inclination, node and perihelion of date ([doc 04](04-dynamic-elements-overview.md), [doc 109](109-model-nbody-engine-and-lattice-test.md)).
 
 ### The lunisolar precession clock
-The mean lunisolar precession period — Earth's spin clock, <!--v:lunisolarPeriodJ2000Yr-->25,771.4<!--/v--> years at J2000: the period of the composed torque rate, Earth's spin carrying the solar and lunar torques, derived as the beat of the model's own sidereal and tropical year laws. Earth's other long cycles are stated as periods and ratios against it (the simulator's Lunisolar Clock panel shows them live; the ratios are J2000 readings that wander, not laws). Under [ESSRT](#expanding-solar-system-resonance-theory-essrt) the period evolves at deep time with the tidal history.
+The mean lunisolar precession period — Earth's spin clock, <!--v:lunisolarPeriodJ2000Yr-->25,771.6<!--/v--> years at J2000: the period of the composed torque rate, Earth's spin carrying the solar and lunar torques, derived as the beat of the model's own sidereal and tropical year laws. Earth's other long cycles are stated as periods and ratios against it (the simulator's Lunisolar Clock panel shows them live; the ratios are J2000 readings that wander, not laws). Under [ESSRT](#expanding-solar-system-resonance-theory-essrt) the period evolves at deep time with the tidal history.
 
 ### The fitted timing anchor
 A Ledger-2 constant of <!--v:holisticYear-->335,317<!--/v--> years, calibrated on the 1246 AD perihelion–solstice alignment of the IAU mean elements. It is the unit of the correction bases that bring the time-domain machinery onto the observed cardinal points, day lengths and eclipses — bookkeeping, not a cycle: it scales with the precession period at deep time and is not a period of anything the model computes ([Constants Reference](20-constants-reference.md)).
 
 ### EARTH-WOBBLE-CENTER
-The scene's reference point for axial precession: Earth circles it clockwise in one axial precession period (<!--v:axialPrecRound-->~25,771<!--/v--> years), which is the precession of the equinoxes. A reference point placed from the engine, not a force.
+The scene's reference point for axial precession: Earth circles it clockwise in one axial precession period (<!--v:axialPrecRound-->~25,772<!--/v--> years), which is the precession of the equinoxes. A reference point placed from the engine, not a force.
 
 ### PERIHELION-OF-EARTH
 The scene's reference point for Earth's perihelion. It orbits counter-clockwise around the EARTH-WOBBLE-CENTER in one apsidal period (<!--v:inclPrecYears-->~111,635<!--/v--> years at J2000) and sets Earth's varying distance to the Sun through the year.
@@ -39,7 +39,7 @@ A reference frame that is heliocentric (Earth orbits the Sun) but viewed from Ea
 ## Precession Types
 
 ### Axial Precession
-The slow wobble of Earth's rotational axis, causing the celestial poles to trace circles against the stars. Period: the clock, <!--v:axialPrecExact-->25,771.40<!--/v--> years at J2000 in the model.
+The slow wobble of Earth's rotational axis, causing the celestial poles to trace circles against the stars. Period: the clock, <!--v:axialPrecExact-->25,771.58<!--/v--> years at J2000 in the model.
 
 ### Apsidal Precession
 The perihelion's revolution against the fixed stars — in the scene, the rotation of PERIHELION-OF-EARTH around the EARTH-WOBBLE-CENTER. Period at J2000: <!--v:inclPrecYears-->~111,635<!--/v--> years, <!--v:lunisolarApsidalPerPrecessionJ2000-->4.332<!--/v--> precession periods, a reading of the orbit's own motion that wanders. Scene nodes and code identifiers keep the historical name "inclination precession".
@@ -152,7 +152,7 @@ The angle between Earth's rotational axis and the perpendicular to its orbital p
 ## Scientific References
 
 ### Expanding Solar System Resonance Theory (ESSRT)
-The deep-time framework: two physically independent drivers stretch the model's periods across geological time. **Driver 1** — Earth–Moon tidal evolution (the day lengthens, the Moon recedes; the mean lunisolar precession period follows the composed torque rate). **Driver 2** — solar mass loss (every orbit slowly expands via Kepler's third law). The axial precession period was <!--v:axialPrecAtDevonian-->21,699<!--/v--> yr at the Devonian (380 Ma), is <!--v:axialPrecRound-->~25,771<!--/v--> yr today and reaches <!--v:axialPrecAt200MyrFuture-->28,208<!--/v--> yr at +200 Myr; the climate formula's precession-band lines ride it, its eccentricity-band lines are planetary beats that do not. Validated against Wells 1963 (Devonian coral growth bands), Wu et al. 2024 (650-Myr cyclostratigraphy) and the Earth–Moon genesis epoch. Full theory: [Doc 99](99-expanding-solar-system-resonance-theory.md).
+The deep-time framework: two physically independent drivers stretch the model's periods across geological time. **Driver 1** — Earth–Moon tidal evolution (the day lengthens, the Moon recedes; the mean lunisolar precession period follows the composed torque rate). **Driver 2** — solar mass loss (every orbit slowly expands via Kepler's third law). The axial precession period was <!--v:axialPrecAtDevonian-->21,699<!--/v--> yr at the Devonian (380 Ma), is <!--v:axialPrecRound-->~25,772<!--/v--> yr today and reaches <!--v:axialPrecAt200MyrFuture-->28,208<!--/v--> yr at +200 Myr; the climate formula's precession-band lines ride it, its eccentricity-band lines are planetary beats that do not. Validated against Wells 1963 (Devonian coral growth bands), Wu et al. 2024 (650-Myr cyclostratigraphy) and the Earth–Moon genesis epoch. Full theory: [Doc 99](99-expanding-solar-system-resonance-theory.md).
 
 ### The two device-tier invariants
 The shipped era devices — the year-length combs, the ΔT phase table and the lunar precession scaling — ride a frozen counter of their own, the anchor unit under pure spin scaling, distinct from the physical clock. Two relations are held on that counter: the **day-count near-invariant** (the counter times the days per year is a constant at J2000 by construction, drifting smoothly at deep time) and the **lunar precession invariant** (the Moon's apsidal and nodal periods times the counter are constants, held exact at every epoch; the J2000 values are anchored on the observed <!--v:moonApsidalPeriodYr-->8.848<!--/v-->-yr and <!--v:moonNodalPeriodYr-->18.613<!--/v-->-yr periods). They are device conventions, not physical claims; what the falsification legs test is the physics. [Doc 99 §day-count invariant](99-expanding-solar-system-resonance-theory.md#the-frozen-era-clocks-day-count-invariant-device-tier), [Doc 99 §Lunar Precession Invariant](99-expanding-solar-system-resonance-theory.md#the-lunar-precession-invariant).

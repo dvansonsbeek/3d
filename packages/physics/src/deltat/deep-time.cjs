@@ -12,11 +12,6 @@
  *    factory wiring).
  *  - moiFactorAtAge — the L1-orbital-coupled GIA α(t). The lattice-α pin
  *    machinery (_withLatticeAlpha) is ENGINE STATE and stays there.
- *  - siderealYearDaysFourierAt — the IAU-base integrated-phase Fourier
- *    evaluator (Phase D matched pair). 8.4-1 S-D2: the browser's old Actual
- *    divided by its epoch-aware f(Y) evaluator instead, double-counting the
- *    deep-time drift already in mean(t) — 12% wrong at −400 Ma. Both engines
- *    now inject the ripple-form evaluator.
  *  - cycleLodSumAt / swingLodAt / swingLodRateAt — the engine-GATED
  *    cycle-stack sums (flags are engine dispatch).
  *
@@ -54,7 +49,6 @@ const { createComposedPrecession } = require('../earth/precession-composed.cjs')
  * @property {number} lodNowH13Seconds - the H/13-identity mean LOD at J2000
  * @property {number} meanSiderealYearJ2000Seconds
  * @property {number} solarMassLossFracPerYear
- * @property {number} siderealYearDaysKinematicJ2000 - Actual-LOD numerator
  * @property {number} precessionSolarShareJ2000 - f_S, the solar fraction of the J2000
  *   precession torque (derive-params) — the unit H(t) = 13·T_p,composed needs it
  */
@@ -64,7 +58,6 @@ const { createComposedPrecession } = require('../earth/precession-composed.cjs')
  * @property {DeepTimeLodConstants} constants
  * @property {(tMa: number) => number} moonDistanceMetresAtAge
  * @property {(tMa: number) => number} moiFactorAtAge - GIA α(t)
- * @property {(year: number) => number} siderealYearDaysFourierAt
  * @property {(year: number) => number} cycleLodSumAt - gated δLOD sum (incl. swing)
  * @property {(year: number) => number} swingLodAt - gated swing δLOD alone
  * @property {(year: number) => number} swingLodRateAt - gated analytic swing rate
@@ -323,17 +316,9 @@ function createDeepTimeLod(deps) {
     return tidal + deps.cycleLodSumAt(year);
   }
 
-  /** ACTUAL LOD: tidal mean × Fourier ripple —
-   *  actual(t) = mean(t) × Y_days_kinematic_J2000 / Y_days_fourier(year).
-   *  Fixed bases (the ripple isolates year-to-year variation; the deep-time
-   *  drift is already in mean(t)). @param {number} t_Ma @returns {number|null} */
-  function lodSecondsActualAtAge(t_Ma) {
-    const mean_t = lodSecondsAtAge(t_Ma);
-    if (mean_t === null) return null;
-    const year_at_t = 2000 - t_Ma * 1e6;
-    const Y_days_fourier = deps.siderealYearDaysFourierAt(year_at_t);
-    return mean_t * K.siderealYearDaysKinematicJ2000 / Y_days_fourier;
-  }
+  // (Plan 09: the "Actual LOD" — the tidal mean × the retired sidereal-year
+  // comb's ripple — is deleted with the comb; the ripple was the sidereal
+  // year's λ̇ variation misattributed to the day length.)
 
   /**
    * dLOD/dt driver decomposition, ms/century per channel.
@@ -410,7 +395,7 @@ function createDeepTimeLod(deps) {
     // the solar day's ecliptic missing-motion term on the nodal period (plan 06 T2 item; one home)
     eclipticLodCorrectionSecondsAtAge,
     yearInDaysAtAge, deltaTRawSecondsAtAge, lodSecondsWithCorrectionsAtAge,
-    lodSecondsActualAtAge, dLodDtDecompositionAtAge,
+    dLodDtDecompositionAtAge,
     // the frozen era clock's named counter and bases (device tier, plan 06 D8)
     eraClockHAtAge, eraClockTropicalYearSecondsAtAge, eraClockYearInDaysAtAge,
   };

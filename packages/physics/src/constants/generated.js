@@ -33,7 +33,7 @@
  * carry it so a counterfactual is reproducible (§2d).
  * @type {string}
  */
-export const CONSTANTS_HASH = "6c2beb70bb3d5000";
+export const CONSTANTS_HASH = "963e82ab2646dae6";
 
 /** Model version label — single source: public/input/model-version.json (§10 two-axis scheme). */
 export const MODEL_VERSION = "v23.0";
@@ -43,7 +43,7 @@ export const PREPRINT_DOI = "10.21203/rs.3.rs-8758810/v4";
 
 /** @type {Readonly<Record<string, unknown>>} */
 export const DEFAULT_CONSTANTS = Object.freeze({
-  hash: "6c2beb70bb3d5000",
+  hash: "963e82ab2646dae6",
   additionalBodies: {
     "pluto": {
       "name": "Pluto",
@@ -202,6 +202,7 @@ export const DEFAULT_CONSTANTS = Object.freeze({
     "juneSolstice2000_JD": 2451716.575,
     "obliquityJ2000_deg": 23.439279444444445,
     "obliquityRate_arcsecPerCentury": -46.836769,
+    "generalPrecessionJ2000_arcsecPerYr": 50.28796195,
     "earthEccentricityJ2000": 0.01671022,
     "earthEccentricityDotJ2000": -0.000042037,
     "earthEccentricityDotDotJ2000": -2.534e-7,
@@ -212,7 +213,7 @@ export const DEFAULT_CONSTANTS = Object.freeze({
     "perihelionPassageJ2000_JD": 2451547.042,
     "earthInclinationJ2000_deg": 1.57869,
     "earthInclinationRate_arcsecPerCentury": -18,
-    "deltaTStart": 55.63860600148356,
+    "deltaTStart": 56.07959388286052,
     "sunTilt": 7.155
   },
   foundational: {

@@ -50,9 +50,11 @@ const rows = await s.page.evaluate(({ EPOCHS_MA }) => {
       solAnchor: a.meansolaryearlengthinDays,
       anomAnchor: a.meansolaryearlengthinDays * (H_t / 16) / (H_t / 16 - 1),
       // What the pure f(Y) evaluators say at the same year, J2000 scene state.
-      sidEval: T.computeSiderealYearDaysDirect(year),
-      solEval: T.computeSolarYearDaysDirect(year),
-      anomEval: T.computeAnomalisticYearDaysDirect(year),
+      // plan 09: the year lengths of date in days of the epoch (the published
+      // SI year lengths over the kinematic day of date; the retired combs are gone)
+      sidEval: T.siderealYearDaysOfDate(year),
+      solEval: T.tropicalYearDaysOfDate(year),
+      anomEval: T.anomalisticYearDaysOfDate(year),
       // ...and again at J2000 scene state — must be bit-equal (purity).
       lodRealPure: T.computeLodRealSecondsAtEpoch(year),
       lodRealMutated,
@@ -74,6 +76,15 @@ for (const r of rows) {
     ['tropical', r.solEval, r.solAnchor],
     ['anomalistic', r.anomEval, r.anomAnchor],
   ]) {
+    // Plan 09: beyond the one-family window (±2 Myr) the model publishes no
+    // anomalistic year of date (the movement's apsidal line is unresolved
+    // there; the evaluator returns NaN, the lunisolar surface null) — the
+    // anchor chain's H/16 identity is the retired device's, not a published
+    // value, so there is nothing to pin.
+    if (label === 'anomalistic' && !Number.isFinite(evalV) && Math.abs(r.t) > 2) {
+      console.log(`  n/a  ${String(r.t).padStart(4)} Ma  ${label.padEnd(22)} no published anomalistic year beyond the one-family window`);
+      continue;
+    }
     const d = evalV - anchorV;
     const ok = Number.isFinite(d) && Math.abs(d) <= TOL_DAYS;
     if (!ok) fail++;

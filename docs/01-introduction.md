@@ -1,7 +1,7 @@
 ---
 docVersion: 1.0
 modelVersion: v23.0
-coefficients: sha256:90a0f37a51074bdb
+coefficients: sha256:e0bf442540ee02b7
 status: current
 ---
 
@@ -21,19 +21,19 @@ The model has two engines and one clock.
 
 **The N-body engine — the planets.** Standard Newtonian gravity with the first-order relativistic correction, integrated from one cited J2000 heliocentric state (JPL Horizons vectors, DE440 mass ratios) with zero fitted constants. It supplies every planet's orbit of date, the secular modes, the <!--v:earthDeepBeatPeriodKyr-->405.6<!--/v-->-kyr eccentricity metronome, and Earth's own eccentricity, inclination, node and perihelion of date ([doc 04](04-dynamic-elements-overview.md), [doc 109](109-model-nbody-engine-and-lattice-test.md)).
 
-**The clock — Earth's spin and time.** The mean lunisolar precession period, <!--v:lunisolarPeriodJ2000Yr-->25,771.4<!--/v--> years at J2000, is derived from the model's own sidereal and tropical year laws ([doc 11](11-length-day-year-formulas.md)) and agrees with the IAU value to eight parts in a million. Earth's other spin-side periods are read against it as ratios of periods, and it lengthens through geological time as tides slow the spin.
+**The clock — Earth's spin and time.** The mean lunisolar precession period, <!--v:lunisolarPeriodJ2000Yr-->25,771.6<!--/v--> years at J2000, is derived from the model's own sidereal and tropical year laws ([doc 11](11-length-day-year-formulas.md)) and agrees with the IAU value to eight parts in a million. Earth's other spin-side periods are read against it as ratios of periods, and it lengthens through geological time as tides slow the spin.
 
 Two of Earth's precession motions rotate in **opposite directions**, so their frequencies add:
 
 | Motion | Direction | Period at J2000 | In precession periods |
 |--------|-----------|-----------------|-----------------------|
-| Axial precession (the clock) | Clockwise | <!--v:axialPrecRound-->~25,771<!--/v--> yr | 1 |
+| Axial precession (the clock) | Clockwise | <!--v:axialPrecRound-->~25,772<!--/v--> yr | 1 |
 | Apsidal precession (the orbit's own motion, a J2000 reading) | Counter-clockwise | <!--v:inclPrecYears-->~111,635<!--/v--> yr | <!--v:lunisolarApsidalPerPrecessionJ2000-->4.332<!--/v--> |
 | Perihelion-of-date (their beat, 1/T_peri = 1/T_p + 1/T_aps) | — | <!--v:periPrecYears-->~20,938<!--/v--> yr | <!--v:lunisolarPeriOfDatePerPrecessionJ2000-->0.8124<!--/v--> |
 
-The ratios are J2000 readings, not laws: the apsidal ratio wanders between <!--v:lunisolarApsidalPerPrecessionWanderMin-->1.08<!--/v--> and <!--v:lunisolarApsidalPerPrecessionWanderMax-->9.81<!--/v--> across ±26 kyr, as the simulator's Lunisolar Clock panel shows live. The perihelion-of-date beat is the carrier of the climatic-precession band; the obliquity band is the beat of the clock against the orbit's own nodal mode, <!--v:obliqCycleYears-->~41,098<!--/v--> years today.
+The ratios are J2000 readings, not laws: the apsidal ratio wanders between <!--v:lunisolarApsidalPerPrecessionWanderMin-->1.08<!--/v--> and <!--v:lunisolarApsidalPerPrecessionWanderMax-->9.81<!--/v--> across ±26 kyr, as the simulator's Lunisolar Clock panel shows live. The perihelion-of-date beat is the carrier of the climatic-precession band; the obliquity band is the beat of the clock against the orbit's own nodal mode, <!--v:obliqCycleYears-->~41,099<!--/v--> years today.
 
-**The anchor.** A third layer is a fitted timing anchor of <!--v:holisticYear-->335,317<!--/v--> years, calibrated on the perihelion–solstice alignment of the IAU mean elements in early 1246 AD (JD <!--v:periAlignJD-->2,176,153<!--/v-->; the model's own orbital series crosses at <!--v:periAlignYearSeries-->1247.2<!--/v--> AD, the mean-element and secular-element conventions labelled). It is the unit of the small periodic corrections that bring the time-domain machinery onto the observed cardinal points, day lengths and eclipses — bookkeeping, not a cycle: it scales with the precession period at deep time and is not a period of anything the model computes. The parameter accounting is three ledgers: zero fitted constants on the planetary side, the derived clock, and five named device constants of the frozen era machinery ([Constants Reference](20-constants-reference.md)). Nothing is tuned per phenomenon.
+**The anchor.** A third layer is a fitted timing anchor of <!--v:holisticYear-->335,317<!--/v--> years, calibrated on the perihelion–solstice alignment of the IAU mean elements in early 1246 AD (JD <!--v:periAlignJD-->2,176,154<!--/v-->; the model's own orbital series crosses at <!--v:periAlignYearSeries-->1247.2<!--/v--> AD, the mean-element and secular-element conventions labelled). It is the unit of the small periodic corrections that bring the time-domain machinery onto the observed cardinal points, day lengths and eclipses — bookkeeping, not a cycle: it scales with the precession period at deep time and is not a period of anything the model computes. The parameter accounting is three ledgers: zero fitted constants on the planetary side, the derived clock, and five named device constants of the frozen era machinery ([Constants Reference](20-constants-reference.md)). Nothing is tuned per phenomenon.
 
 ---
 

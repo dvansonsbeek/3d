@@ -1,7 +1,7 @@
 ---
 docVersion: 1.0
 modelVersion: v23.0
-coefficients: sha256:90a0f37a51074bdb
+coefficients: sha256:e0bf442540ee02b7
 status: current
 ---
 
@@ -21,9 +21,9 @@ The shared tools module `tools/lib/constants.js` mirrors these with its own 14-s
 
 ### How other documents should reference constants
 
-- **Rule A — Registry keys stay, hand-computed numbers go.** Write a registry value tag (the `v:` marker with the key name) or the named quantity, never a hand-derived year count. (Plan 06 S5: "H/13" is no longer a period — the axial precession period is the of-date year laws' beat, registry `axialPrecYears`.)
+- **Rule A — Registry keys stay, hand-computed numbers go.** Write a registry value tag (the `v:` marker with the key name) or the named quantity, never a hand-derived year count. (Plan 06 S5: "H/13" is no longer a period; since plan 09 the J2000 axial precession period is 1,296,000/p_A on the IAU 2006 input, registry `axialPrecYears`.)
 - **Rule B — Device integers stay inline where they are devices.** The correction combs' divisors and the frozen clock's counters are identifiers of the fitted machinery; they are not stated as periods or laws on presentation surfaces (plan 06 D3/P6).
-- **Rule C — Approximate values for readability.** Use "the axial precession period (<!--v:axialPrecRound-->~25,771<!--/v--> years; see [Constants Reference](20-constants-reference.md))" when a number aids understanding.
+- **Rule C — Approximate values for readability.** Use "the axial precession period (<!--v:axialPrecRound-->~25,772<!--/v--> years; see [Constants Reference](20-constants-reference.md))" when a number aids understanding.
 - **Rule D — Tables reference this document.** If a doc repeats planet parameters, add: "For current values see [Constants Reference](20-constants-reference.md)."
 
 ---
@@ -91,7 +91,7 @@ behind fail-proven gates. None is a free parameter:
 
 | Constant | Status | Value | Source |
 |---|---|---|---|
-| Precession anchor p₀ | derived | <!--v:axialPrecExact-->25,771.40<!--/v--> yr | the certified J2000 year laws' beat, sidereal/(sidereal − tropical) (plan 06 S5). The deep-time rate composes ψ̇(t) = [ω(t)/ω₀]·p₀·[f_S + (1 − f_S)(a₀/a_M(t))³] |
+| Precession anchor p₀ | cited input | <!--v:axialPrecExact-->25,771.58<!--/v--> yr | 1,296,000 / p_A with p_A the IAU 2006 general precession in longitude, 50.28796195 ″/yr (`generalPrecessionJ2000_arcsecPerYr`; plan 09 — before it, the retired year combs' beat at 2000, 25,771.395 yr, 8 ppm faster). The deep-time rate composes ψ̇(t) = [ω(t)/ω₀]·p₀·[f_S + (1 − f_S)(a₀/a_M(t))³] |
 | Solar torque share f_S | derived at runtime | <!--v:earthPrecSolarShareJ2000Pct-->31.6<!--/v--> % | GM☉, the lunar constants and the J2000 obliquity (`precession-composed` `computeSolarTorqueShare`) |
 | Lunar recession history | LLR-anchored + paleo-gated | `alpha1PerMa`, `alpha3PerMa3`, `alpha4PerMa4`, `recessionRegime` | the linear term is the LLR rate <!--v:modernLLRRecessionCmYr-->3.82<!--/v--> cm/yr (Dickey 1994 / Chapront 2002, cited); the deep-time terms are the Farhat 2022 LSQ fit and the regime knots fitted to 11 published anchors, all within 1.3σ (`tools/explore/fit-regime-recession.js`); the 41-anchor paleo gate fails on an unexplained improvement too |
 | GIA channel | k derived, τ measured | τ = <!--v:alphaGiaRelaxationKyr-->6<!--/v--> kyr | the polar moment's lagged response to the climate formula's L1 ice proxy: k derived at runtime from the Cox & Chao 2002 dJ₂/dt; τ measured against the historical ΔT record through the joint fitter (plan 06 D7) |
@@ -134,8 +134,7 @@ the shared anchor.
 ### Ledger 3 — the fitted correction stack (named, gated, hashed)
 
 The fitted-coefficient arrays under the coefficients hash (shown in the
-simulator's About → Model Identity): the year-length harmonics (tropical,
-sidereal, anomalistic), the perihelion harmonics, the five cardinal-point families
+simulator's About → Model Identity): the perihelion harmonics, the five cardinal-point families
 (harmonics, anchors, eccentricity, joint and derived terms), the
 Sun-longitude harmonics, the Moon corrections, and the per-planet
 geocentric-precession projection coefficients (a chart-layer readout). The
@@ -208,7 +207,7 @@ These constants define the model. Changing any of them changes the theory.
 
 (Plan 07 R10: the former "obliquity cycle position" input `temperatureGraphMostLikely` = 14.5, which with the alignment year defined the correction bases' phase origin t₀, left the JSON — the combs measure their phase from J2000 and t₀ was rotated out of every fitted coefficient exactly, `tools/fit/reorigin-combs-j2000.mjs`.)
 
-The anchor is the unit of the correction bases and of the frozen era clock; it was fitted on the 1246 AD perihelion–solstice alignment of the IAU mean elements (Meeus); the model's own series crosses two years later, at 1247.7 AD. It is not a period: Earth's precession periods are the dynamical values of [Part 2 — Derived Constants](#part-2--derived-constants) — the axial precession period is <!--v:axialPrecExact-->25,771.40<!--/v--> years, of which the anchor is 13.011, a fit constant (plan 06 S5). The former presentation of the anchor as a "master cycle divided by small integers" is retired.
+The anchor is the unit of the correction bases and of the frozen era clock; it was fitted on the 1246 AD perihelion–solstice alignment of the IAU mean elements (Meeus); the model's own series crosses two years later, at 1247.7 AD. It is not a period: Earth's precession periods are the dynamical values of [Part 2 — Derived Constants](#part-2--derived-constants) — the axial precession period is <!--v:axialPrecExact-->25,771.58<!--/v--> years, of which the anchor is 13.011, a fit constant (plan 06 S5). The former presentation of the anchor as a "master cycle divided by small integers" is retired.
 
 ## Earth Parameters
 
@@ -271,24 +270,24 @@ These are computed from foundational constants. The formula is the definition; t
 |-------|---------|----------------|-----------|
 | Apsidal Precession | H / 3 | <!--v:inclPrecYears-->~111,635<!--/v--> | Counter-clockwise |
 | Ecliptic Precession | H / 5 | <!--v:eclPrecYears-->~68,751<!--/v--> | Counter-clockwise |
-| Obliquity Cycle | H / 8 | <!--v:obliqCycleYears-->~41,098<!--/v--> | Clockwise (negative) |
-| Axial Precession | the of-date year laws' beat at J2000 (route B; the fit-era label H/13 read 25,794, retired as a period — plan 06 S5) | <!--v:axialPrecRound-->~25,771<!--/v--> | Clockwise (negative) |
+| Obliquity Cycle | H / 8 | <!--v:obliqCycleYears-->~41,099<!--/v--> | Clockwise (negative) |
+| Axial Precession | 1,296,000 / p_A — the IAU 2006 general precession input (plan 09; the fit-era label H/13 read 25,794 and the retired year combs' beat read 25,771.4) | <!--v:axialPrecRound-->~25,772<!--/v--> | Clockwise (negative) |
 | Perihelion Precession | H / 16 | <!--v:periPrecYears-->~20,938<!--/v--> | Both directions |
 
 ## Time Constants
 
 | Constant | Variable | Formula | Value |
 |----------|----------|---------|-------|
-| Mean Solar Year | `meanSolarYearDays` | round(inputMeanSolarYear × H/8) / (H/8) | <!--v:meanSolarYearDaysFull-->365.242203646102<!--/v--> days |
-| Mean Sidereal Year | `meanSiderealYearDays` | meanSolarYearDays × (H/13) / ((H/13) - 1) | <!--v:meanSiderealYearDaysFull-->365.256364374<!--/v--> days |
-| Mean Anomalistic Year | `meanAnomalisticYearDays` | meanSolarYearDays / (H/16 - 1) + meanSolarYearDays | <!--v:anomalisticYearDaysFull-->365.259632390<!--/v--> days |
-| Mean Length of Day | `meanLengthOfDay` | meanSiderealYearSeconds / meanSiderealYearDays | ~86,400.0 s |
-| Mean Sidereal Day | `meanSiderealDay` | (meanSolarYearDays/(meanSolarYearDays+1)) × meanLengthOfDay | <!--v:meanSiderealDaySeconds-->86,164.0902182<!--/v--> s |
-| Mean Stellar Day | `meanStellarDay` | (meanSiderealDay/T_p) / (meanSolarYearDays+1) · cos ε + meanSiderealDay — T_p the certified J2000 precession period, not the counter H/13 | <!--v:meanStellarDaySeconds-->86,164.0985938<!--/v--> s |
+| Mean Solar Year | `meanSolarYearDays` | the IAU J2000 mean tropical year, `yearLengthRef.tropicalYearMean` (plan 09; was round(inputMeanSolarYear × H/8)/(H/8), +1.2 s) | <!--v:meanSolarYearDaysFull-->365.242189700000<!--/v--> days |
+| Mean Sidereal Year | `meanSiderealYearDays` | the IAU sidereal year, `yearLengthRef.siderealYear` (plan 09; the H/13 construction meanSolarYearDays × (H/13)/((H/13) − 1), 1 µd above it, is deleted) | <!--v:meanSiderealYearDaysFull-->365.256363004<!--/v--> days |
+| Mean Anomalistic Year | `meanAnomalisticYearDays` | the IAU anomalistic year, `yearLengthRef.anomalisticYear` (plan 09; was meanSolarYearDays × (H/16)/(H/16 − 1), 0.3 s low) | <!--v:anomalisticYearDaysFull-->365.259636000<!--/v--> days |
+| Mean Length of Day | `meanLengthOfDay` | the SI day ω₀, `yearLengthRef.solarDay` (plan 09; was meanSiderealYearSeconds over the H/13 sidereal days, 86,399.99968 s) | ~86,400.0 s |
+| Mean Sidereal Day | `meanSiderealDay` | (meanSolarYearDays/(meanSolarYearDays+1)) × meanLengthOfDay | <!--v:meanSiderealDaySeconds-->86,164.0905324<!--/v--> s |
+| Mean Stellar Day | `meanStellarDay` | (meanSiderealDay/T_p) / (meanSolarYearDays+1) · cos ε + meanSiderealDay — T_p the certified J2000 precession period, not the counter H/13 | <!--v:meanStellarDaySeconds-->86,164.0989079<!--/v--> s |
 | Phase origin of the correction bases | `balancedYear` | 2000 (J2000, by construction — plan 07 R10) | the former fitted origin perihelionalignmentYear − 14.5 × H/16 was rotated out of every coefficient exactly; the name stays as the code's phase-origin variable |
-| Perihelion Alignment JD | `perihelionalignmentJD` | startmodelJD - meanSolarYearDays × (startModelYearWithCorrection - perihelionalignmentYear) | ~<!--v:periAlignJD-->2,176,153<!--/v--> |
+| Perihelion Alignment JD | `perihelionalignmentJD` | startmodelJD - meanSolarYearDays × (startModelYearWithCorrection - perihelionalignmentYear) | ~<!--v:periAlignJD-->2,176,154<!--/v--> |
 | Perihelion Cycle Length | `perihelionCycleLength` | H / 16 | <!--v:periPrecYears-->~20,938<!--/v--> years |
-| Total Days in H | `totalDaysInH` | H × meanSolarYearDays | ~<!--v:totalDaysInH-->122,471,920<!--/v--> days |
+| Total Days in H | `totalDaysInH` | H × meanSolarYearDays | ~<!--v:totalDaysInH-->122,471,915<!--/v--> days |
 | J2000.0 epoch JD | `j2000JD` | startmodelJD - (startmodelYear - 2000) × meanSolarYearDays | ~2451545.0 |
 | Julian century | `julianCenturyDays` | 36525 (100 × 365.25) | 36,525 days (IAU Julian century) |
 | Earth rotations/year | `meanEarthRotationsPerYear` | meanSolarYearDays + 1 | 366.2422 |
@@ -391,7 +390,7 @@ verification instruments, `inclination-optimization` and
 | Jupiter | <!--v:jupiterInclMean-->0.362449<!--/v--> | <!--v:jupiterInclAmp-->0.144018<!--/v--> | 0.30 - 0.34 | <!--v:jupiterPeriPeriodICRF-->304,456<!--/v--> yr |
 | Saturn | <!--v:saturnInclMean-->0.891489<!--/v--> | <!--v:saturnInclAmp-->0.125937<!--/v--> | 0.92 - 1.05 | <!--v:saturnPeriPeriodICRF-->45,883<!--/v--> yr |
 | Uranus | <!--v:uranusInclMean-->1.019406<!--/v--> | <!--v:uranusInclAmp-->0.142289<!--/v--> | 0.99 - 1.04 | <!--v:uranusPeriPeriodICRF-->330,515<!--/v--> yr |
-| Neptune | <!--v:neptuneInclMean-->0.668880<!--/v--> | <!--v:neptuneInclAmp-->0.180752<!--/v--> | 0.73 - 0.76 | <!--v:neptunePeriPeriodICRF-->2,136,796<!--/v--> yr |
+| Neptune | <!--v:neptuneInclMean-->0.668880<!--/v--> | <!--v:neptuneInclAmp-->0.180752<!--/v--> | 0.73 - 0.76 | <!--v:neptunePeriPeriodICRF-->2,136,797<!--/v--> yr |
 
 The mean and half-range are the chain's over the banked ±10-Myr series; the
 period is the chain's 1,296,000/|g| (Earth: the one-family route). The
@@ -420,7 +419,7 @@ left `model-parameters.json` at plan 07 R8; doc 31 records their values.
 | Earth | the perihelion-of-date beat (the of-date year laws; the device's Y/16 read 20,957) | <!--v:periPrecYears-->~20,938<!--/v--> |
 | Mars | Y × 8/36 | ~<!--v:marsPeriPeriod-->19,002<!--/v--> |
 | Jupiter | 8Y / 39 | ~<!--v:jupiterPeriPeriod-->23,760<!--/v--> |
-| Saturn | −8Y / 65 | ~-<!--v:saturnPeriPeriod-->16,502<!--/v--> (retrograde) |
+| Saturn | −8Y / 65 | ~-<!--v:saturnPeriPeriod-->16,503<!--/v--> (retrograde) |
 | Uranus | Y / 3 | ~<!--v:uranusPeriPeriod-->23,907<!--/v--> |
 | Neptune | Y × 2 | ~<!--v:neptunePeriPeriod-->25,464<!--/v--> |
 
@@ -435,15 +434,17 @@ derived relativistic supplement:
 
 ## Moon Derived Cycles
 
-All Moon cycles are derived from the 3 input months (sidereal, anomalistic, nodal) and the anchor interval (`holisticyearLength`). Integer rounding to `totalDaysInH` = anchor × meanSolarYearDays ensures exact cycle closure over the anchor interval — a device convention of the lunar chain, not an observed period.
+All Moon cycles derive from the IAU inputs — the sidereal month and the two equinox-of-date precession periods (apsidal, nodal) — and the certified J2000 precession period T_p (plan 09). The retired era device rounded the months onto whole counts over eight anchor intervals (`totalDaysInH / ceil(totalDaysInH / input)`, "exact cycle closure over the anchor interval") and counted the precession periods as eighth-integers over the same span; those counts are gone, and the counts a fitter still needs (the Step-0 Sun harmonics' lunar divisors) are real-valued.
 
 | Cycle | Variable | Formula | Value (days) |
 |-------|----------|---------|-------------|
-| Sidereal Month | `moonSiderealMonth` | totalDaysInH / ceil(totalDaysInH / input) | ~27.3217 |
-| Anomalistic Month | `moonAnomalisticMonth` | totalDaysInH / ceil(totalDaysInH / input) | ~27.5545 |
-| Nodal Month | `moonNodalMonth` | totalDaysInH / ceil(totalDaysInH / input) | ~27.2122 |
-| Synodic Month | `moonSynodicMonth` | (from sidereal count - 1 + 13 - H) | ~29.5306 |
-| Tropical Month | `moonTropicalMonth` | (from sidereal count - 1 + 13) | ~27.3216 |
+| Sidereal Month | `moonSiderealMonth` | the input `moonSiderealMonthInput` | ~27.3217 |
+| Apsidal precession, star-referenced | `moonApsidalPrecessionDaysEarth` | 1/(1/T_apsidal,of-date − 1/T_p) | ~3,232.6 |
+| Nodal precession, star-referenced | `moonNodalPrecessionDaysEarth` | 1/(1/T_nodal,of-date + 1/T_p) | ~6,793.4 |
+| Anomalistic Month | `moonAnomalisticMonth` | 1/(1/T_sid − 1/T_apsidal,star) | ~27.5545 |
+| Nodal Month | `moonNodalMonth` | 1/(1/T_sid + 1/T_nodal,star) | ~27.2122 |
+| Synodic Month | `moonSynodicMonth` | T_sid·T_yr/(T_yr − T_sid), T_yr the sidereal year | ~29.5306 |
+| Tropical Month | `moonTropicalMonth` | 1/(1/T_sid + 1/T_p,days) | ~27.3216 |
 
 | Cycle | Variable | Value (days) | Value (years) |
 |-------|----------|-------------|--------------|
@@ -462,19 +463,9 @@ All Moon cycles are derived from the 3 input months (sidereal, anomalistic, noda
 
 Eclipse cycles (from derived months): Saros = 223 synodic ≈ 6585.32 days, Exeligmos = 3 × Saros, Callippic = 940 synodic ≈ 76 solar years.
 
-## Year-Length Fourier Harmonics
+## Year-Length Harmonics (retired)
 
-Year-length variations are modelled with Fourier harmonics. The **means are derived** from `inputmeanlengthsolaryearindays` via `round(input × H/8) / (H/8)` and the standard sidereal/anomalistic ratios. Only the harmonic coefficients are fitted (from data spanning full H at 1-year steps, 335,318 rows).
-
-Each array entry: `[period_divisor, sin_coeff, cos_coeff]` — period = H / divisor.
-
-| Array | Terms | RMS | Dominant term |
-|-------|-------|-----|---------------|
-| `TROPICAL_YEAR_HARMONICS` | 12 | 0.002 s | H/8 (obliquity) |
-| `SIDEREAL_YEAR_HARMONICS` | 6 | 0.001 s | H/8 + H/3 |
-| `ANOMALISTIC_YEAR_HARMONICS` | 8 | 0.002 s | H/18 |
-
-Note: `TROPICAL_YEAR_HARMONICS` via `computeSolarYearDaysDirect` (Step 6c) is the **frozen era-clock law** — the certified era device, the internal kinematic chain and the `?hybridSpin=0` opt-out display. The displayed/served of-date tropical year is the one-source family (`createYearLengths` in `@essrt/physics`; doc 11's Status banner). The `CARDINAL_POINT_HARMONICS` derivative route (23 harmonics per type + ECC/JOINT/DERIVED families) is kept for chart consistency in cardinal-point report paths.
+The three year-length Fourier combs (`TROPICAL_YEAR_HARMONICS` 12 terms, `SIDEREAL_YEAR_HARMONICS` 6, `ANOMALISTIC_YEAR_HARMONICS` 8 — `[period_divisor, sin, cos]` rows on divisors of the unit H, fitted to the 335,318-row full-period export) and their J2000 anchor `YEAR_LENGTH_J2000_ANCHOR` are deleted at plan 09, together with the means they rode (the input mean solar year rounded onto 1/(H/8) and the H/(H−13), H/(H−16) ratios): the J2000 year lengths are the IAU inputs, the year lengths of date are the one-source family (`createYearLengths` in `@essrt/physics`; doc 11 § "Year Lengths of Date"). The `CARDINAL_POINT_HARMONICS` derivative route (23 harmonics per type + ECC/JOINT/DERIVED families) is kept for chart consistency in cardinal-point report paths.
 
 ## Sun Longitude — the certified chain and the legacy harmonics
 
@@ -515,7 +506,7 @@ The `PERI_HARMONICS` array models Earth's perihelion longitude with 25 Fourier t
 
 | Constant | Variable | Value | Description |
 |----------|----------|-------|-------------|
-| Initial Delta-T | `deltaTStart` | <!--v:deltaTStart-->55.64<!--/v--> s | Long-term ΔT trend value at J2000 (paired with `usno_target_lod_s` = <!--v:usnoLodJ2000-->86,400.0022<!--/v--> at the joint optimum against Espenak). Not the IERS instantaneous observation (63.63 s at J2000) — the trend value passing through J2000, which excludes industrial-era Earth-rotation acceleration our cyclic model doesn't capture. |
+| Initial Delta-T | `deltaTStart` | <!--v:deltaTStart-->56.08<!--/v--> s | Long-term ΔT trend value at J2000 (paired with `usno_target_lod_s` = <!--v:usnoLodJ2000-->86,400.0012<!--/v--> at the joint optimum against Espenak). Not the IERS instantaneous observation (63.63 s at J2000) — the trend value passing through J2000, which excludes industrial-era Earth-rotation acceleration our cyclic model doesn't capture. |
 
 ---
 
@@ -552,7 +543,7 @@ These come from external astronomical sources and do not change with the model.
 | Anomalistic year | `anomalisticYearJ2000` | <!--v:anomalisticYearInputDays-->365.259636<!--/v--> days | JPL Horizons |
 | Sidereal year | `siderealYearJ2000` | <!--v:siderealYearInputDays-->365.256363004<!--/v--> days | JPL Horizons (adjusted for LOD=86400) |
 | Solar day | `solarDayJ2000` | 86400.0 s | SI definition |
-| Measured mean solar day (the declared scene basis) | `measuredMeanSolarDayJ2000Seconds` | <!--v:measuredMeanSolarDayJ2000Seconds-->86,400.000427<!--/v--> s | Derived in place: IAU sidereal seconds / the Step-6c measured sidereal year — the day the scene's measured year lengths are counted in. Five day bases coexist (SI · LOD_mean · Fourier-kinematic <!--v:lodKinematicFourierJ2000Seconds-->86,400.000107<!--/v--> · measured · LOD_real); see [doc 11 §Day bases](11-length-day-year-formulas.md#day-types) |
+| Scene day basis at J2000 | `measuredMeanSolarDayJ2000Seconds` | <!--v:measuredMeanSolarDayJ2000Seconds-->86,400.000000<!--/v--> s | The SI day ω₀ — ONE J2000 day basis since plan 09 (the comb-era "measured mean solar day", IAU sidereal seconds over the retired Step-6c sidereal anchor, 86,400.00032 s, is retired with the comb) measured year lengths are counted in. ONE J2000 basis: LOD_mean, the scene basis and `o.lodKinematic` at J2000 (<!--v:lodKinematicFourierJ2000Seconds-->86,400.000000<!--/v--> s) are all ω₀; LOD_real is the Layer-4 observable; see [doc 11 §Day bases](11-length-day-year-formulas.md#day-types) |
 | Sidereal day | `siderealDayJ2000` | 86164.09053083288 s (~23h 56m 4.0905s) | IERS |
 | Stellar day | `stellarDayJ2000` | 86164.0989036905 s (~23h 56m 4.0989s) | IERS |
 
@@ -569,15 +560,15 @@ These offsets arise from the coin rotation paradox — precessing reference fram
 
 **Perihelion Coin Rotation**: Theoretical value derived from 1 extra solar day per H/16 cycle.
 
-**Axial Coin Rotation**: Axial precession (H/13) accumulates exactly 1 extra sidereal day over one axial precession cycle — 9.12 ms per sidereal day. This is a count on the **ecliptic** lattice and is deliberately *not* projected. It is **not** the physical stellar−sidereal day offset, which is the same rate projected onto the **equator** (precession in right ascension, m = p·cos ε) and is therefore ~8.37 ms. See [Year and Day Length Formulas](11-length-day-year-formulas.md) for details.
+**Axial Coin Rotation**: Axial precession (one turn per T_p) accumulates exactly 1 extra sidereal day over one axial precession cycle — 9.12 ms per sidereal day. This is a count on the **ecliptic** lattice and is deliberately *not* projected. It is **not** the physical stellar−sidereal day offset, which is the same rate projected onto the **equator** (precession in right ascension, m = p·cos ε) and is therefore ~8.37 ms. See [Year and Day Length Formulas](11-length-day-year-formulas.md) for details.
 
 ## Moon Constants (External)
 
 | Constant | Variable | Value | Description |
 |----------|----------|-------|-------------|
 | Sidereal Month | `moonSiderealMonthInput` | <!--v:moonSiderealMonthInput-->27.32166156<!--/v--> days | Return to same star |
-| Anomalistic Month | `moonAnomalisticMonth` | 27.55454988 days | Perigee to perigee — DERIVED: `totalDaysInH / (N_sid − N_apsidalE)`, not an input |
-| Nodal Month | `moonNodalMonth` | 27.21222082 days | Node to node — DERIVED: `totalDaysInH / (N_sid + N_nodalE)`, not an input |
+| Anomalistic Month | `moonAnomalisticMonth` | 27.55454988 days | Perigee to perigee — DERIVED from the sidereal month and the star-referenced apsidal period (§ Moon Derived Cycles), not an input |
+| Nodal Month | `moonNodalMonth` | 27.21222082 days | Node to node — DERIVED from the sidereal month and the star-referenced nodal period, not an input |
 | Mean Distance | `moonDistance` | <!--v:moonOrbitalRadius-->384,399.07<!--/v--> km | Mean Earth-Moon distance |
 | Orbital Eccentricity | `moonOrbitalEccentricity` | <!--v:moonOrbitalEccentricityFull-->0.054900489<!--/v--> | |
 | Ecliptic Inclination | `moonEclipticInclinationJ2000` | <!--v:moonEclipticInclination-->5.1573<!--/v--> deg | Dynamical mean osculating inclination (v4 E3c); the Brown/ELP theory constant <!--v:moonInclinationConstantBrownELP-->5.1453964<!--/v--> (latitude sinF normalization) is kept as `moonInclinationConstantBrownELP` |

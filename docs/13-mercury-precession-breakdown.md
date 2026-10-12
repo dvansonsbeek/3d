@@ -1,7 +1,7 @@
 ---
 docVersion: 1.0
 modelVersion: v23.0
-coefficients: sha256:90a0f37a51074bdb
+coefficients: sha256:e0bf442540ee02b7
 status: current
 ---
 
@@ -193,7 +193,7 @@ frame. The theory assumes this frame is a stable inertial reference.
 **But the ecliptic is not a stable inertial frame.** Two things move relative
 to the ICRF (true inertial):
 
-1. **General precession (H/13 ≈ <!--v:earthAxialPeriod-->25,771<!--/v--> yr)** — Earth's axial precession
+1. **General precession (H/13 ≈ <!--v:earthAxialPeriod-->25,772<!--/v--> yr)** — Earth's axial precession
    carries the equinox westward through the inertial sky at ~50 ″/yr. The
    "ecliptic-of-date" frame rotates at this rate relative to the ICRF.
 2. **Ecliptic precession (H/5 ≈ <!--v:hDiv5-->67,063<!--/v--> yr)** — Earth's orbital plane itself
@@ -381,7 +381,7 @@ are Mercury −0.004 ± 0.005, Venus +0.024 ± 0.033, Earth +0.006 ± 0.007,
 Mars −0.007 ± 0.007 ″/cy — the inertial excesses equal 42.98 / 8.62 / 3.84 /
 1.35 ″/cy to those precisions, and the projection values are excluded as
 their cause by three orders of magnitude for Venus and Mars. Earth's own perihelion of
-date (H/16, <!--v:earthPeriRateEclipticOfDateArcsecCy-->6,189.76<!--/v--> ″/cy)
+date (H/16, <!--v:earthPeriRateEclipticOfDateArcsecCy-->6,189.73<!--/v--> ″/cy)
 projects with an excess of <!--v:earthPeriProjectionExcessJ2000-->493.64<!--/v--> ″/cy
 against a GR advance of 3.84. This table is the pre-registered test of the
 statement "the Mercury anomaly is the equatorial projection of the ecliptic

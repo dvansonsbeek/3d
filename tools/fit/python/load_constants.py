@@ -67,9 +67,9 @@ CARDINAL_POINT_ANCHORS = C['CARDINAL_POINT_ANCHORS']
 CARDINAL_POINT_HARMONICS = {
     k: [tuple(h) for h in v] for k, v in C['CARDINAL_POINT_HARMONICS'].items()
 }
-TROPICAL_YEAR_HARMONICS = [tuple(h) for h in C['TROPICAL_YEAR_HARMONICS']]
-SIDEREAL_YEAR_HARMONICS = [tuple(h) for h in C['SIDEREAL_YEAR_HARMONICS']]
-ANOMALISTIC_YEAR_HARMONICS = [tuple(h) for h in C['ANOMALISTIC_YEAR_HARMONICS']]
+# (plan 09: the three year-length combs are deleted; the J2000 precession
+# anchor is the IAU p_A, as a period)
+AXIAL_PRECESSION_J2000_YEARS = C['axialPrecessionJ2000Years']
 
 # Planet data
 PLANETS = C['planets']

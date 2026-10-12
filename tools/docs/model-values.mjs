@@ -303,13 +303,12 @@ export const VALUES = {
   },
   // ── Layer-4 solar-day family (§12h) — engine twins of the tweakpane ─────
   // Website contract: lodRealPhysical / lodH5Only / stackNetLodJ2000Ms in
-  // model-values.compute.ts (the dayLength.ts port). All in the DISPLAY basis
-  // (lodKinematic = IAU sidereal seconds / FOURIER sidereal days at 2000);
-  // the fit's closure target `usnoLodJ2000` is expressed in the MEASURED-
-  // anchor basis (IAU seconds / fc.YEAR_LENGTH_J2000_ANCHOR.sidereal). The
-  // two bases differ by 0.32 ms at J2000 — the measured-vs-Fourier sidereal-
-  // length spread, not an error — and the gate inside lodRealPhysical holds
-  // that identity to 1e-8 s on every docs build.
+  // model-values.compute.ts (the dayLength.ts port). Plan 09: ONE J2000 day
+  // basis — the kinematic day of date is the Layer-0 tidal mean, exactly ω₀
+  // (the SI day) at J2000, and the ΔT joint fit closes on that same day; the
+  // former "measured-anchor" basis (IAU seconds over the retired year comb's
+  // measured sidereal year, 0.32 ms apart) is gone with the comb. The gate
+  // inside lodRealPhysical holds the closure to 1e-8 s on every docs build.
   lodRealPhysical: {
     get: () => {
       const v = dtl().computeLodRealSecondsAtEpoch(2000);
@@ -321,40 +320,31 @@ export const VALUES = {
       // linear-algebra Σ vs the runtime Σ (measured ~8e-10 s). Assumes the
       // shipped flag set: running docs under DT_*_DISABLED= envs fails here
       // by design — the doc numbers assert the shipped world.
-      const fc = rd('public/input/fitted-coefficients.json');
-      const lodKinMeasured = C.meanSiderealYearSeconds / fc.YEAR_LENGTH_J2000_ANCHOR.sidereal;
-      const lodKinFourier = dtl().computeLodKinematicSecondsAtEpoch(2000);
-      const closes = v + (lodKinMeasured - lodKinFourier);
+      // Plan 09: ONE J2000 day basis — the kinematic day of date is the
+      // Layer-0 tidal mean, exactly ω₀ (the SI day) at J2000, and the ΔT
+      // joint fit closes on that same day; the former "measured-anchor"
+      // basis spread (0.32 ms, the retired year comb's sidereal anchor) is gone.
       const target = dtFit.optimum.usno_target_lod_s;
-      if (Math.abs(closes - target) > 1e-8) {
+      if (Math.abs(v - target) > 1e-8) {
         throw new Error('model-values: lodRealPhysical basis-consistency gate FAILED: '
-          + `display composite ${v} + basis spread ${lodKinMeasured - lodKinFourier} `
-          + `= ${closes}, but the joint fit's USNO closure target is ${target}. `
-          + 'The engine, the 6d year-length anchor and the ΔT joint fit have desynced.');
+          + `composite ${v}, but the joint fit's USNO closure target is ${target}. `
+          + 'The engine and the ΔT joint fit have desynced (run Step 7c, then constants:generate).');
       }
       return v;
     },
     render: (v) => thousands(v, 6),
     unit: 's',
-    note: 'Layer-4 physical solar day at J2000 (tweakpane Solar Day, display basis) — closes on usnoLodJ2000 in the fit\'s measured-day basis',
+    note: 'Layer-4 physical solar day at J2000 (tweakpane Solar Day) — closes on usnoLodJ2000, the one J2000 day basis',
   },
   measuredMeanSolarDayJ2000Seconds: {
-    // D8 (ecc-unification Phase 3b, owner decision): THE DECLARED SCENE DAY
-    // BASIS — the measured mean solar day, sidereal-pinned: IAU sidereal
-    // seconds over the Step-6c measured sidereal year
-    // (YEAR_LENGTH_J2000_ANCHOR.sidereal). Derived in place from the anchor —
-    // no stored copy, so it cannot detach from the fit that defines it; the
-    // lodRealPhysical gate above ties the same family to the ΔT joint fit.
-    // Scene year-length DAYS are counted in this basis; the panel SECONDS
-    // column uses the Fourier twin (computeLodKinematicSecondsAtEpoch). One
-    // basis cannot close all three year types: pinning sidereal leaves
-    // tropical +0.03 s/yr and anomalistic +0.06 s/yr vs IAU — recorded model
-    // structure, not a unit artifact (per-type closing days
-    // 86400.000346 / .000427 / .000250 s). See docs/11 "Day bases".
-    get: () => C.meanSiderealYearSeconds / rd('public/input/fitted-coefficients.json').YEAR_LENGTH_J2000_ANCHOR.sidereal,
+    // Plan 09: ONE J2000 day basis — the SI day ω₀. The former "declared
+    // scene day basis" (D8: the measured mean solar day pinned on the retired
+    // year comb's sidereal anchor, 86,400.00032 s, with its per-type closing
+    // days) is gone with the comb. The key stays for its readers.
+    get: () => C.meanLengthOfDay,
     render: (v) => thousands(v, 6),
     unit: 's',
-    note: 'the declared scene day basis — measured mean solar day (sidereal-pinned, J2000) = IAU sidereal seconds / the Step-6c measured sidereal year',
+    note: 'the scene day basis at J2000 — the SI day ω₀ (plan 09: one J2000 day basis; the comb-era measured day 86,400.00032 s is retired)',
   },
   lodH5Only: {
     get: () => dtl().computeLodKinematicSecondsAtEpoch(2000) + dtl().h5Correction(2000),
@@ -674,48 +664,13 @@ export const VALUES = {
     render: (v) => thousands(v), unit: 'AD',
     note: 'alignment year the closure would force if A were 5% too large',
   },
-  closingDayTropicalSeconds: {
-    get: () => 86400 * astro.yearLengthRef.tropicalYearMean / rd('public/input/fitted-coefficients.json').YEAR_LENGTH_J2000_ANCHOR.tropical,
-    render: (v) => thousands(v, 6), unit: 's',
-    note: 'the day length that closes the measured tropical year on the IAU value',
-  },
-  closingDaySiderealSeconds: {
-    get: () => 86400 * C.meanSiderealYearDays / rd('public/input/fitted-coefficients.json').YEAR_LENGTH_J2000_ANCHOR.sidereal,
-    render: (v) => thousands(v, 6), unit: 's',
-    note: 'the day length that closes the measured sidereal year (= the declared measured mean solar day)',
-  },
-  closingDayAnomalisticSeconds: {
-    get: () => 86400 * C.meanAnomalisticYearDays / rd('public/input/fitted-coefficients.json').YEAR_LENGTH_J2000_ANCHOR.anomalistic,
-    render: (v) => thousands(v, 6), unit: 's',
-    note: 'the day length that closes the measured anomalistic year',
-  },
-  yearResidualTropicalSecPerYr: {
-    get: () => {
-      const fc = rd('public/input/fitted-coefficients.json').YEAR_LENGTH_J2000_ANCHOR;
-      const sid = 86400 * C.meanSiderealYearDays / fc.sidereal, trop = 86400 * astro.yearLengthRef.tropicalYearMean / fc.tropical;
-      return (sid - trop) * astro.yearLengthRef.tropicalYearMean;
-    },
-    render: (v) => (v >= 0 ? '+' : '') + Number(v).toFixed(3), unit: 's/yr',
-    note: 'tropical-year residual vs IAU after pinning the sidereal year (one day basis cannot close all three)',
-  },
-  yearResidualAnomalisticSecPerYr: {
-    get: () => {
-      const fc = rd('public/input/fitted-coefficients.json').YEAR_LENGTH_J2000_ANCHOR;
-      const sid = 86400 * C.meanSiderealYearDays / fc.sidereal, anom = 86400 * C.meanAnomalisticYearDays / fc.anomalistic;
-      return (sid - anom) * C.meanAnomalisticYearDays;
-    },
-    render: (v) => (v >= 0 ? '+' : '') + Number(v).toFixed(3), unit: 's/yr',
-    note: 'anomalistic-year residual vs IAU after pinning the sidereal year',
-  },
+  // (plan 09: the closingDay* / yearResidual* / dayBasisSpreadMs keys — the
+  // retired year comb's measured-anchor day basis and its per-type closing
+  // days — are deleted; ONE J2000 day basis, the SI day.)
   lodKinematicFourierJ2000Seconds: {
     get: () => dtl().computeLodKinematicSecondsAtEpoch(2000),
     render: (v) => thousands(v, 6), unit: 's',
-    note: 'o.lodKinematic at J2000: IAU sidereal seconds / the Fourier sidereal-year days (the panel seconds basis)',
-  },
-  dayBasisSpreadMs: {
-    get: () => (C.meanSiderealYearSeconds / rd('public/input/fitted-coefficients.json').YEAR_LENGTH_J2000_ANCHOR.sidereal - dtl().computeLodKinematicSecondsAtEpoch(2000)) * 1000,
-    render: (v) => Number(v).toFixed(2), unit: 'ms',
-    note: 'the §12h day-basis spread: measured day − Fourier-kinematic day at J2000',
+    note: 'o.lodKinematic at J2000: the kinematic day of date (the Layer-0 tidal mean) at J2000 = ω₀, the SI day (plan 09; the key name is historical)',
   },
 
   // ── Earth–Sun distances and insolation (from the AU chain + eccentricity) ─
@@ -1393,8 +1348,8 @@ export const VALUES = {
       // Plan 06 Phase 3 S2: the J2000 year lengths of date are the one-family route (B) — SI seconds, SI days.
       solarYearJ2000Days:    { get: () => oneYL().tropicalYearSecondsAtYear(2000) / 86400, render: (v) => thousands(v, 7), unit: 'd', note: 'the one-family tropical year of date at J2000, SI days (tweakpane predictions.solarYearDays)' },
       solarYearJ2000Seconds: { get: () => oneYL().tropicalYearSecondsAtYear(2000), render: (v) => thousands(v, 2), unit: 's', note: 'tweakpane predictions.solarYearSeconds — the one-family tropical year of date at J2000' },
-      meanSiderealYearDays:  { get: () => C.meanSiderealYearDaysKinematic, render: (v) => thousands(v, 7), unit: 'd', note: 'framework H/13-kinematic mean — NOT the IAU 365.256363004 Fourier baseline' },
-      meanSiderealYearDaysFull: { get: () => C.meanSiderealYearDaysKinematic, render: (v) => v.toFixed(9), unit: 'd', note: '9-dp render of meanSiderealYearDays' },
+      meanSiderealYearDays:  { get: () => C.meanSiderealYearDays, render: (v) => thousands(v, 7), unit: 'd', note: 'the IAU sidereal year in days (plan 09: the H/13 kinematic construction, 1 µd above it, is deleted)' },
+      meanSiderealYearDaysFull: { get: () => C.meanSiderealYearDays, render: (v) => v.toFixed(9), unit: 'd', note: '9-dp render of meanSiderealYearDays' },
       siderealYearSeconds:   { get: () => C.meanSiderealYearSeconds, render: (v) => thousands(v, 2), unit: 's', note: 'IAU sidereal year in SI seconds (31,558,149.7635)' },
       siderealYearJ2000Days: { get: () => oneYL().siderealYearSecondsAtYear(2000) / 86400, render: (v) => thousands(v, 8), unit: 'd', note: 'the one-family sidereal year of date at J2000 (the λ̇ channel), SI days' },
       anomalisticYearDays:   { get: () => C.meanAnomalisticYearDays, render: (v) => thousands(v, 7), unit: 'd' },
@@ -1409,7 +1364,7 @@ export const VALUES = {
         note: 'sidereal − tropical year at J2000, the one-family route, SI seconds',
       },
       siderealSolarMeanDiffSeconds: {
-        get: () => (C.meanSiderealYearDaysKinematic - C.meanSolarYearDays) * C.meanLengthOfDay,
+        get: () => (C.meanSiderealYearDays - C.meanSolarYearDays) * C.meanLengthOfDay,
         render: (v) => thousands(v, 2),
         unit: 's',
       },
@@ -1437,7 +1392,7 @@ export const VALUES = {
       // published hybrid ε of date (Layer A, plan 06), not the K comb.
       siderealDayJ2000Physical: {
         get: () => {
-          const sol = dtl().computeSolarYearDaysDirect(2000);
+          const sol = dtl().tropicalYearDaysOfDate(2000);   // plan 09: the one-family tropical year over the kinematic day of date
           return (sol * dtl().computeLodRealSecondsAtEpoch(2000)) / (sol + 1);
         },
         render: (v) => thousands(v, 6),
@@ -1446,7 +1401,7 @@ export const VALUES = {
       },
       stellarDayJ2000Physical: {
         get: () => {
-          const sol = dtl().computeSolarYearDaysDirect(2000);
+          const sol = dtl().tropicalYearDaysOfDate(2000);
           const d = (sol * dtl().computeLodRealSecondsAtEpoch(2000)) / (sol + 1);
           const raProj = Math.cos((oneEps(2000) * Math.PI) / 180);
           return (d / dtl().certifiedAxialPrecessionJ2000Years()) / (sol + 1) * raProj + d;
@@ -1497,7 +1452,7 @@ export const VALUES = {
       },
       eclipticSiderealDayJ2000: {
         get: () => {
-          const sol = dtl().computeSolarYearDaysDirect(2000);
+          const sol = dtl().tropicalYearDaysOfDate(2000);
           const sidDay = (sol * dtl().computeLodKinematicSecondsAtEpoch(2000)) / (sol + 1);
           const meanSidDay = (C.meanSolarYearDays / (C.meanSolarYearDays + 1)) * C.meanLengthOfDay;
           const axialCoinMs = (meanSidDay / dtl().certifiedAxialPrecessionJ2000Years()) / (C.meanSolarYearDays + 1) * 1000;

@@ -127,7 +127,7 @@ const measured = await s.page.evaluate(({ YEARS, EPOCHS_MA, MOON_JDS, MOON_DEEP_
 
   for (const y of YEARS) {
     v[`solarYearDays@${y}`] = T.computeSolarYearDaysFromCardinals(y);
-    v[`siderealYearDays@${y}`] = T.computeSiderealYearDaysDirect(y);
+    v[`siderealYearDays@${y}`] = T.siderealYearDaysOfDate(y);
     v[`solsticeSS@${y}`] = T.computeSolsticeYearLength(y, 'SS');
     v[`solsticeWS@${y}`] = T.computeSolsticeYearLength(y, 'WS');
     v[`solsticeVE@${y}`] = T.computeSolsticeYearLength(y, 'VE');
