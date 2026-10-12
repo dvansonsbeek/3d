@@ -51,8 +51,6 @@ const output = {
   CARDINAL_POINT_ANCHORS: C.CARDINAL_POINT_ANCHORS,
   CARDINAL_POINT_HARMONICS: C.CARDINAL_POINT_HARMONICS,
   axialPrecessionJ2000Years: C.axialPrecessionJ2000Years,   // plan 09: the IAU p_A anchor as a period
-  PERI_HARMONICS: C.PERI_HARMONICS,
-  PERI_OFFSET: C.PERI_OFFSET,
 
   // Physical & astronomical constants
   currentAUDistance: C.currentAUDistance,

@@ -584,11 +584,9 @@ for (const key of Object.keys(additionalBodies)) {
 // Date utilities (jdToYear/yearToJD need model constants)
 const { jdToYear, yearToJD } = utils.createDateUtils({ startmodelYear, startmodelJD, meanSolarYearDays });
 
-// Fitted coefficients that depend on model parameters
-const { PERI_HARMONICS } = fitted.buildFittedCoefficients({
-  earthtiltMean, earthInvPlaneInclinationAmplitude, earthRAAngle,
-  earthInvPlaneInclinationMean, planets, H,
-});
+// (plan 09 step 4: PERI_HARMONICS — the perihelion comb on H-divisors — is
+// deleted; Earth's perihelion of date is the series' ϖ,
+// createModel().earth.perihelionLongitudeDeg)
 
 
 // ═══════════════════════════════════════════════════════════════════════════
@@ -750,8 +748,7 @@ module.exports = {
   yearLengthRef,
   knownValues,
 
-  // Predictive formula (from fitted-coefficients.js)
-  PERI_HARMONICS,
+  // Fitted record (from fitted-coefficients.js)
   SOLSTICE_JD_HARMONICS: fitted.SOLSTICE_JD_HARMONICS,
   SUN_LONGITUDE_MEAN: fitted.SUN_LONGITUDE_MEAN,
   SUN_LONGITUDE_HARMONICS: fitted.SUN_LONGITUDE_HARMONICS,
@@ -760,8 +757,8 @@ module.exports = {
   CARDINAL_POINT_DERIVED: fitted.CARDINAL_POINT_DERIVED,
   CARDINAL_POINT_JOINT_TERMS: fitted.CARDINAL_POINT_JOINT_TERMS,
   CARDINAL_POINT_ANCHORS: fitted.CARDINAL_POINT_ANCHORS_ADJUSTED || ASTRO_REFERENCE.cardinalPointAnchors,
-  PERI_OFFSET: fitted.PERI_OFFSET,
-  // (PREDICT_PLANETS / PREDICT_COEFFS — the planet predict device — retired at plan 06 R8)
+  // (PREDICT_PLANETS / PREDICT_COEFFS — the planet predict device — retired at plan 06 R8;
+  //  PERI_HARMONICS / PERI_OFFSET — the perihelion comb — at plan 09 step 4)
 
   // Date utilities
   jdToCalendar: utils.jdToCalendar,

@@ -20,7 +20,7 @@ All constants originate from `tools/lib/constants.js` (the single source of trut
 
 | File | Description |
 |------|-------------|
-| `predictive_formula.py` | Earth's perihelion / ERD / eccentricity helpers (`calc_earth_perihelion`, `calc_erd`, `calc_eccentricity`) used by `verify_perihelion_erd.py` (Step 4b) and the doc-14 cardinal helpers. (`calc_obliquity` — the obliquity comb mirror — and the 429-term `build_features` of the retired planet predict device were deleted at plan 09; the obliquity of date is the package hybrid.) |
+| `predictive_formula.py` | Earth's eccentricity / year-length / cardinal helpers (`calc_eccentricity`, the doc-14 cardinal helpers). (`calc_earth_perihelion` / `calc_erd` — the perihelion comb mirror — were deleted at plan 09 step 4 with `fit_perihelion_harmonics.py` / `verify_perihelion_erd.py`; `calc_obliquity` — the obliquity comb mirror — and the 429-term `build_features` of the retired planet predict device at plan 09 step 2. The perihelion and obliquity of date are the package's series ϖ and hybrid ε.) |
 | `planet_beats.py` | Derives the six fundamental periods per planet (ecl, icrf, obliq, asc, axial, wobble) plus all pairwise internal and Earth-cross beat frequencies. |
 
 > The planet **predictive-precession device** that lived here —
@@ -58,7 +58,7 @@ from predictive_formula_physical import build_features_physical
 
 ```python
 from constants_scripts import H, PHI
-from predictive_formula import calc_earth_perihelion, calc_erd
+from predictive_formula import calc_eccentricity
 ```
 
 ---

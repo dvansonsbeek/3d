@@ -41,10 +41,13 @@
 import { readFileSync } from 'node:fs';
 import { createRequire } from 'node:module';
 import { fileURLToPath } from 'node:url';
+import { createModel } from '@essrt/physics';
 const ROOT = fileURLToPath(new URL('../../', import.meta.url));
 const require = createRequire(ROOT + 'package.json');
 const OE = require(ROOT + 'tools/lib/orbital-engine.js');
 const TL = require(ROOT + 'tools/lib/constants.js');
+// plan 09 step 4: the perihelion comb (OE.calcEarthPerihelionPredictive) is deleted — the shipped ϖ of date is the series'
+const PMODEL = createModel(undefined, { secularSeriesArtifact: JSON.parse(readFileSync(ROOT + 'data/nbody-secular-series.json', 'utf8')) });
 const KV = Object.fromEntries(process.argv.slice(2).filter((a) => a.includes('=')).map((a) => { const i = a.indexOf('='); return [a.slice(0, i), a.slice(i + 1)]; }));
 const MODES = JSON.parse(readFileSync(KV.modes || ROOT + 'tools/explore/naff-modes-ecliptic-1000000-gr.local.json', 'utf8'));
 const FROM = parseFloat(KV.from || '-3000'), TO = parseFloat(KV.to || '2100');
@@ -56,7 +59,7 @@ const zAt = (t) => { let re = 0, im = 0; for (const m of E.z) { const c = Math.c
 const pAspy = 1296000 / (TL.H / 13);
 const derived = (year) => { const t = year - 2000; const [re, im] = zAt(t); return { e: Math.hypot(re, im), w: ((Math.atan2(im, re) * R2D + pAspy * t / AS) % 360 + 360) % 360 }; };
 // shipped laws (the same the package chain uses): H/3 line for e, the perihelion law for ϖ of date
-const shipped = (year) => ({ e: OE.computeEccentricityEarth(year), w: OE.calcEarthPerihelionPredictive(year) });
+const shipped = (year) => ({ e: OE.computeEccentricityEarth(year), w: PMODEL.earth.perihelionLongitudeDeg(year) });
 const wrap = (d) => ((((d + 540) % 360) + 360) % 360) - 180;
 // J2000-ANCHORED comparison (mode=anchored, default): a truncated mode table has
 // its own level/slope error at J2000 (the 1-Myr table reads e 0.015985 where the

@@ -239,8 +239,7 @@ then `npm run constants:generate` (Step 9).
 | `sun-planetary-completion-fit.js` | NOTHING (read-only, the Step-0 companion — 20.3h, SUPERSEDED by Stage D2) | JPL Horizons live (960 all-phase + 179 syzygy epochs, network required — so it can never be a gate). Was the dev record behind the v1 fitted 10-term table; the shipped table is now the DERIVED 70-term extraction on FRAMEWORK-native carriers (FQ-5 N3: `tools/explore/d2-derived-sun.mjs` → `n2-sun-framework-carriers.mjs` → `n3-carrier-swap-preview.mjs`; the carrier rates are injected live from the planet records by `model.js`), so its coefficient-drift part no longer applies — its syzygy + NASA-centerline scoreboards remain valid verification. After ANY Step-0 refit OR planet-record period change, re-run the N3 extraction chain and re-embed the table + its `PAIRED_SUN_HARMONICS_SHA256` by hand — the test:model fingerprint gate enforces the pairing. |
 | `ascnode-correction.js` | `ascNodeTiltCorrection`, `startpos` | `data/reference-data.json` |
 | `moon-eclipse-optimizer.js` | NOTHING (RETIRED at plan 06 R3 item 1 — kept as the record) | Formerly `moonMeeusLpCorrection` + `MOON_CORRECTION` against 58 solar eclipses (2000–2025) + a JPL baseline. Both are retired: measured against Horizons' apparent Moon the series needs no anchor (−1.0″ ± 1.5″, 1970–2049), the +32.75″ was the eclipse tier's mean Sun compensated (κ + the I2 long inequality + the trend-ΔT offset), and the RA/Dec patches were fitted around the retired D5 aberration layer (docs/66 §1.4). `moonStartpos*` values are J2000-element anchored via the in-sim meters (docs/66 §4) and are NO LONGER fitted |
-| `python/fit_perihelion_harmonics.py` | `PERI_HARMONICS_RAW`, `PERI_OFFSET` | `data/01-holistic-year-objects-data.xlsx` |
-| `python/verify_perihelion_erd.py` | pass/fail verification (exits 0=pass, 1=fail) | `data/01-holistic-year-objects-data.xlsx` |
+| (`python/fit_perihelion_harmonics.py` / `python/verify_perihelion_erd.py`) | DELETED at plan 09 step 4 with `PERI_HARMONICS_RAW` / `PERI_OFFSET` — Earth's perihelion of date is the series' ϖ (`createModel().earth.perihelionLongitudeDeg`) | — |
 | `python/planet_eccentricity_jpl.py` | Planet `orbitalEccentricityBase` values | JPL Horizons (cached in `data/`) |
 | `dt-corrections-fit.js` | `data/deltaT-4flag-fit.json` — cascaded LSQ fit of the 4-flag ΔT correction stack (Bond n=1830 · 1466 yr, Hallstatt n=1104 · 2430 yr, Jose5 n=2989 · 897 yr, Jose4 n=3749 · 716 yr — n the divisor of the anchor's eight-unit interval, an identifier: the periods are what the stack carries) against the Stephenson 2016 residual. Sole authoritative source of the shipped `BOND_/HALLSTATT_/JOSE5_/JOSE4_ COS_/SIN_COEFF_S` constants. See "Phase 8" below. **JOINT WORLD (since 2026-07-23): `--joint` is the AUTHORITATIVE fit** — 4 flags + Core-mantle swing in one equality-constrained solve (hard USNO closure row, amplitude caps, resonator phases locked as unit shapes, free intercept = trend anchor). `--joint --write` ships the coefficients + anchors atomically (current joint optimum: USNO 86,400.0017, deltaTStart 55.85, Espenak fit-target RMS 12.60 s, full-window 31.27 s — read the live values from `data/deltaT-4flag-fit.json → optimum` and the stage-3 validation artifact, never from this sentence). The legacy single-shot cascade remains as a stage-wise diagnostic — **its `fit_metrics.stage_*` entries in `deltaT-4flag-fit.json` rank the flags differently from the shipped fit and must not be used to judge whether a flag earns its place** (worked example and the correct method in [doc 105](../../docs/105-dt-stack-flag-audit.md)); the resonator is default-ON runtime-wide (opt-out `DT_RESONATOR_DISABLED=1`; `DT_CORRECTIONS_DISABLED=1` alone still yields the fully-raw fitting residual via the integrator master-gate). | Stephenson 2016 spline (`public/input/stephenson-2016-deltaT-polynomial.json`) − pure-tidal framework model (`tools/lib/deep-time.js`, bypassed via `DT_CORRECTIONS_DISABLED=1`) |
 | `../../scripts/lattice_harmonic_scan.py` | `data/lattice-scan-<tag>.json` — universal harmonic-divisor scan across multiple paleoclimate archives (Steinhilber solar Φ, Stephenson ΔT, Cheng speleothem δ18O, EPICA CO2, LR04 δ18O). Enumerates gcd-compliant divisors in a period band, fits each candidate against each dataset, ranks by cross-dataset consistency. Used to identify Jose4 (4×Jose 715 yr) as the 4th flag with cross-archive coherence. | Multiple paleoclimate proxies in `data/` and `public/input/` |
@@ -488,25 +487,18 @@ Step 3:  Export from browser GUI              → data/01-holistic-year-objects-
 
 ── Phase 3: Earth perihelion & ML training ────────────────────────
 
-Step 4a: python/fit_perihelion_harmonics.py   → PERI_HARMONICS_RAW, PERI_OFFSET
-         (Earth perihelion longitude & ERD from file 01)
-         Downsampled by stepYears for efficiency.
-         The export column `Earth Perihelion ICRF` is the perihelion
-         direction's RIGHT ASCENSION in the of-date equatorial frame; the
-         script converts it to ecliptic longitude of date with the export's
-         own obliquity column (β = 0, tan λ = tan α / cos ε) before fitting,
-         because every consumer of PERI_HARMONICS (framework Sun, cardinal
-         points, ERD) treats ϖ as ecliptic longitude. Fitting the RA
-         directly carries a tan²(ε/2)·sin 2λ wave (2.47° at H/32) and an 8%
-         rate error at J2000 (66.7″/yr vs the H/16 mean 61.8″/yr).
-         Fits and writes the SHIPPED divisor set (read from
-         fitted-coefficients.json); the greedy search is printed as a
-         diagnostic only and is never written.
-         Updates: fitted-coefficients.json (auto-updated by script)
-
-Step 4b: python/verify_perihelion_erd.py      → pass/fail verification
-         (RMSE, max error, J2000 accuracy, ERD analytical vs numerical)
-         Must pass before proceeding — ERD errors propagate into all planet ML predictions.
+Steps 4a/4b (python/fit_perihelion_harmonics.py → PERI_HARMONICS_RAW,
+         PERI_OFFSET; python/verify_perihelion_erd.py): DELETED at plan 09
+         step 4. The 25-term perihelion comb on H-divisors was fitted to the
+         file-01 export's `Earth Perihelion ICRF` column (an RA, converted to
+         ecliptic longitude of date before fitting — git history carries the
+         script and the trap: fitting the RA directly carried a
+         tan²(ε/2)·sin 2λ wave, 2.47° at H/32). Earth's perihelion of date is
+         the series' ϖ (`createModel().earth.perihelionLongitudeDeg`); the
+         scene's perihelion has followed it since v16.0, and the registry's
+         plausibility row periLongModel2000AD vs periLongJ2000 (0.02°) gates
+         the published value. Measured before deletion, comb − series: 0.03°
+         at 2000, −1.6° at −4000, −20° at −26 kyr (data/era-device-readers.json).
 
 Note: eocEccentricity and perihelionPhaseOffset are derived analytically in constants.js
       from correctionSun and the eccentricity constants — no pipeline step needed.
@@ -989,7 +981,6 @@ Step 3 (browser export) is always manual — the runner checks the data file exi
 
 **Observed timings (2026-07-15 H=335,317 recalibration):**
 - Phase 1 (Step 1): **~15 s** (the Sun optimizer; first run needs `baseline sun` JPL cache refresh. Was ~2 min with the retired per-planet Step 2)
-- Step 4a (Perihelion harmonics): **~7 min**
 - Steps 4b-d (ML training): **~10 min combined**
 - Step 5c (Moon): **~1 min** (5a-5b retired — K5 excision)
 - **Step 6a2 (window CSV export): ~25 min** — the pipeline's longest step since the full-period Step 6a (~2 hours) was retired.
@@ -1034,9 +1025,8 @@ npm run constants:generate && npm run build                                  # S
 #  toggle off — all Node/Python steps are J2000-locked by construction.)
 
 # Phase 3: Earth perihelion & ML training
-python3 tools/fit/python/fit_perihelion_harmonics.py --write                 # Step 4a
-python3 tools/fit/python/verify_perihelion_erd.py                            # Step 4b (must pass)
-# (Steps 4c–4d — the planet predict trainers — retired at plan 06 R8)
+# (Steps 4a–4b — the perihelion comb fitter and verifier — deleted at plan 09 step 4;
+#  Steps 4c–4d — the planet predict trainers — retired at plan 06 R8)
 
 # Phase 4: Moon (Steps 5a-5b retired — K5 excision)
 # node tools/fit/ascnode-correction.js          # optional diagnostic
@@ -1134,7 +1124,6 @@ public/input/ (single source of truth)
                                 generated at build time, not fetched at runtime)
 
 Fitting scripts write to JSON, then `constants:generate` (Step 9) regenerates the module:
-    fit_perihelion_harmonics.py  → fitted-coefficients.json  (Step 4a)
     moon-eclipse-optimizer.js    → model-parameters.json     (Step 5c)
     optimize.js                  → model-parameters.json       (Steps 1, 2)
 ```

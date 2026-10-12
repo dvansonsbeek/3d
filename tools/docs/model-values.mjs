@@ -98,22 +98,23 @@ function balanceMachinery() {
 let _predictHelpersM = null;
 function predictiveMachinery() {
   if (_predictHelpersM) return _predictHelpersM;
-  const phaseAt = (year, div) => {
-    const c = dtl().cyclesBetweenYears(C.balancedYear, year, div);
-    return c === null ? null : c * 2 * Math.PI;
-  };
-  const erdBrowserForm = (year) => {
-    const H_at = dtl().meanHAtAge((C.startmodelYear - year) / 1e6);
-    if (H_at === null) return 0;
-    let erd = 0;
-    for (const [period, sinC, cosC] of C.PERI_HARMONICS) {
-      const div = C.H / period;
-      const omega = 2 * Math.PI * div / H_at;
-      const ph = phaseAt(year, div);
-      if (ph === null) continue;
-      erd += sinC * omega * Math.cos(ph) - cosC * omega * Math.sin(ph);
-    }
-    return erd;
+  // Plan 09 step 4: the perihelion comb (PERI_HARMONICS — the browser's ERD
+  // form and this file's private copy of the longitude) is deleted. The
+  // PUBLISHED perihelion of date is the Sun channel's — the series' ϖ plus the
+  // MEASURED osculating-mean offset EARTH_OSCULATING_MEAN_OFFSET.dPomArcsec
+  // (createModel().sun.perihelionLongitudeDegAt, ecliptic of date): the
+  // osculating-mean apsidal direction that Meeus's and Standish's mean
+  // elements tabulate and that the eclipses and the cardinal points ride.
+  // Measured: it matches Meeus at 1000/1246/2000/2500/3000 AD within 0.001°;
+  // the bare series mean (createModel().earth.perihelionLongitudeDeg, the
+  // N-body secular mean) sits a constant 0.0195° below it. The rate is the
+  // ±50-yr central difference in ″/cy — the quantity the retired "ERD ×
+  // 360,000" approximated with the comb's derivative (a constant offset
+  // does not enter it).
+  const earthPeriOfDateDeg = (year) => physModel().sun.perihelionLongitudeDegAt(year);
+  const earthPeriOfDateRateArcsecCy = (year) => {
+    const d = earthPeriOfDateDeg(year + 50) - earthPeriOfDateDeg(year - 50);
+    return (((d + 540) % 360) - 180) * 3600;   // ° per century → ″/cy
   };
   // Plan 06 R8 — the Earth-frame RA rate of a planet's perihelion motion IS the
   // equatorial projection of the lattice motion (doc 13 §1.8, the kinematic
@@ -158,22 +159,7 @@ function predictiveMachinery() {
   };
   const fluct = chainFluct;
   const totalPrecession = (y, p) => chainBaseline(p) + chainFluct(y, p);   // the Earth-frame RA rate, frame (b)
-  const calcEarthPerihelionDeg = (year) => {
-    const mc = dtl().cyclesBetweenYears(C.balancedYear, year, 16);
-    if (mc === null) return 270.0;
-    // Plan 07 R10: the 270° convention is the device's perihelion wheel at the
-    // retired origin; at J2000 the wheel stands 16 × kDeviceWheelPhaseAtJ2000Cycles
-    // turns on (the same term as the engine's calcEarthPerihelionPredictive —
-    // this private copy shipped 167.048° off in model-values 16.0.0).
-    let L = 270.0 + 360.0 * 16 * C.kDeviceWheelPhaseAtJ2000Cycles + 360.0 * mc;
-    for (const [period, sinC, cosC] of C.PERI_HARMONICS) {
-      const ph = phaseAt(year, C.H / period);
-      if (ph === null) continue;
-      L += sinC * Math.sin(ph) + cosC * Math.cos(ph);
-    }
-    return ((L + C.PERI_OFFSET) % 360 + 360) % 360;
-  };
-  _predictHelpersM = { fluct, chainFluct, erdBrowserForm, totalPrecession, chainBaseline, calcEarthPerihelionDeg };
+  _predictHelpersM = { fluct, chainFluct, earthPeriOfDateDeg, earthPeriOfDateRateArcsecCy, totalPrecession, chainBaseline };
   return _predictHelpersM;
 }
 const model = rd('public/input/model-parameters.json');
@@ -2714,7 +2700,7 @@ export const VALUES = {
   // Geocentric chain = ICRF citations + the general-precession equinox drift
   // (knownValues).
   ...(() => {
-    const { chainFluct, erdBrowserForm } = predictiveMachinery();
+    const { chainFluct, earthPeriOfDateRateArcsecCy } = predictiveMachinery();
     let scans = null;
     const scan = () => {
       if (!scans) {
@@ -2744,12 +2730,17 @@ export const VALUES = {
           scans[p] = { mn, mx };
         }
         {
+          // Earth (plan 09 step 4): the series' perihelion-of-date rate minus
+          // its mean over one perihelion-of-date period T_peri centred on
+          // J2000 — inside the one-family window — the analogue of the
+          // planets' scan over one secular period (was the comb's ERD scan
+          // over −350k..+50k).
+          const T = physModel().lunisolar.periOfDatePeriodYearsAtYear(2000);
+          const rates = [];
+          for (let y = Math.round(2000 - T / 2); y <= 2000 + T / 2; y += 10) rates.push(earthPeriOfDateRateArcsecCy(y));
+          const mean = rates.reduce((a, b) => a + b, 0) / rates.length;
           let mn = Infinity, mx = -Infinity;
-          for (let y = -350000; y <= 50000; y += 100) {
-            const f = erdBrowserForm(y) * 360000;
-            if (f < mn) mn = f;
-            if (f > mx) mx = f;
-          }
+          for (const r of rates) { const f = r - mean; if (f < mn) mn = f; if (f > mx) mx = f; }
           scans.earth = { mn, mx };
         }
       }
@@ -2764,8 +2755,8 @@ export const VALUES = {
       // (plan 07 sweep: the Mercury extremum rows — `mercuryFluctuationMin/MaxYear`,
       // `…Min/MaxPrecise`, `mercuryHelioAtMin/Max` on the lattice baseline
       // 8H/11 — are deleted; nothing quoted them.)
-      earthFluctuationMin: { get: () => scan().earth.mn, render: fmtSignedInt, unit: '″/cy', note: 'Earth Rate Deviation × 360,000' },
-      earthFluctuationMax: { get: () => scan().earth.mx, render: fmtSignedInt, unit: '″/cy' },
+      earthFluctuationMin: { get: () => scan().earth.mn, render: fmtSignedInt, unit: '″/cy', note: 'the series\' perihelion-of-date rate minus its mean over one T_peri centred on J2000 (plan 09 step 4; was the comb\'s ERD × 360,000)' },
+      earthFluctuationMax: { get: () => scan().earth.mx, render: fmtSignedInt, unit: '″/cy', note: 'as earthFluctuationMin' },
     };
     for (const p of ['venus', 'mars', 'jupiter', 'saturn', 'uranus', 'neptune']) {
       out[`${p}FluctuationMin`] = { get: () => scan()[p].mn, render: fmtSignedInt, unit: '″/cy' };
@@ -3045,12 +3036,12 @@ export const VALUES = {
       periLongShift1246to2000: { get: () => astro.earthOrbital.earthPerihelionLongitudeJ2000 - 90, render: (v) => Number(v).toFixed(3), unit: '°', note: 'derived: J2000 longitude − the 90° alignment value' },
     };
     for (const [year, key] of [[1000, '1000AD'], [1246, '1246AD'], [2000, '2000AD'], [2500, '2500AD'], [3000, '3000AD']]) {
-      out[`periLongModel${key}`] = { get: () => predictiveMachinery().calcEarthPerihelionDeg(year), render: (v) => Number(v).toFixed(3), unit: '°' };
+      out[`periLongModel${key}`] = { get: () => predictiveMachinery().earthPeriOfDateDeg(year), render: (v) => Number(v).toFixed(3), unit: '°', note: 'the model\'s perihelion longitude of date, ecliptic of date — the series\' ϖ plus the measured osculating-mean offset, the Sun channel\'s value (plan 09 step 4; was the 25-term comb)' };
       out[`periLongMeeus${key}`] = { get: () => astro.knownValues[`meeusPeriLong${key}`], render: (v) => Number(v).toFixed(3), unit: '°', note: 'Meeus (1998) citation' };
       // The signed difference model − Meeus, so no surface carries the delta as
       // a literal (model-values 16.0.0 shipped the model 167° off while every
       // page's hand-typed "+0.010°" column still read agreement).
-      out[`periLongDelta${key}`] = { get: () => { const d = predictiveMachinery().calcEarthPerihelionDeg(year) - astro.knownValues[`meeusPeriLong${key}`]; return ((d + 540) % 360) - 180; }, render: (v) => (Number(v) >= 0 ? '+' : '') + Number(v).toFixed(3), unit: '°', note: 'model − Meeus (1998), wrapped to ±180°' };
+      out[`periLongDelta${key}`] = { get: () => { const d = predictiveMachinery().earthPeriOfDateDeg(year) - astro.knownValues[`meeusPeriLong${key}`]; return ((d + 540) % 360) - 180; }, render: (v) => (Number(v) >= 0 ? '+' : '') + Number(v).toFixed(3), unit: '°', note: 'model − Meeus (1998), wrapped to ±180°' };
     }
     for (const [year, key] of [[2000, '2000AD'], [3000, '3000AD'], [5000, '5000AD'], [10000, '10000AD'], [11725, '11725AD'], [12000, '12000AD'], [15000, '15000AD'], [27000, '27000AD']]) {
       out[`eccModel${key}`] = { get: () => oeEcc(year), render: (v) => Number(v).toFixed(5) };

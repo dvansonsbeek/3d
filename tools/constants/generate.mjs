@@ -61,15 +61,16 @@ const OUT_COEFFS_DTS = join(ROOT, 'packages/physics/src/constants/coefficients.d
  * were rounded to exactly zero. Emitting the JSON unchanged removes the whole
  * class of error.
  *
- * Any rename or reshape script.js wants (PERI_HARMONICS_RAW -> PERI_HARMONICS,
- * divisor n -> period H/n) happens THERE, visibly, not in a formatter here.
+ * Any rename or reshape script.js wants (divisor n -> period H/n) happens
+ * THERE, visibly, not in a formatter here.
  */
 const COEFFICIENT_KEYS = [
   // (plan 09: TROPICAL/SIDEREAL/ANOMALISTIC_YEAR_HARMONICS and
   // YEAR_LENGTH_J2000_ANCHOR — the frozen era clock's year-length combs and
   // their measured J2000 anchor — are deleted; the year lengths of date are
-  // the one-family laws over the kinematic day of date)
-  'PERI_HARMONICS_RAW',
+  // the one-family laws over the kinematic day of date. Step 4: the
+  // perihelion comb PERI_HARMONICS_RAW + PERI_OFFSET is deleted — Earth's
+  // perihelion of date is the series' ϖ, createModel().earth.perihelionLongitudeDeg)
   // (plan 09: SOLSTICE_OBLIQUITY_HARMONICS retired — the obliquity of date is the hybrid ε)
   'SUN_LONGITUDE_HARMONICS',
   // Plan 07 R10: the RA day offset's two lines ({mean, terms: [div, sin, cos]},
@@ -102,11 +103,9 @@ const COEFFICIENT_KEYS = [
   // The mean/offset SCALARS that pair with the harmonic arrays above — each
   // series is `mean + sum(harmonics)`, so shipping one from the JSON and the
   // other as a literal would split a single fitted quantity across two sources.
-  //   PERI_OFFSET                    <-> PERI_HARMONICS
   //   SUN_LONGITUDE_MEAN             <-> SUN_LONGITUDE_HARMONICS
   // They went through replaceConst, which never formatted, so all were
   // already full precision — an incomplete migration rather than a defect.
-  'PERI_OFFSET',
   'SUN_LONGITUDE_MEAN',
 ];
 

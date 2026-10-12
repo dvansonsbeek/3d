@@ -77,11 +77,9 @@ SOLSTICE_JD_HARMONICS = CARDINAL_POINT_HARMONICS['SS']
 # (plan 09: SOLSTICE_OBLIQUITY_MEAN / SOLSTICE_OBLIQUITY_HARMONICS retired — the
 # obliquity of date is the hybrid ε of the one-source movement, not a comb)
 
-# Earth perihelion harmonics (fitted, from fitted-coefficients.js via constants.js)
-# PERI_HARMONICS: list of (period_years, sin_coeff, cos_coeff)
-# PERI_OFFSET: DC offset in degrees
-PERI_HARMONICS = [tuple(h) for h in _C['PERI_HARMONICS']]
-PERI_OFFSET = _C['PERI_OFFSET']
+# (plan 09 step 4: PERI_HARMONICS / PERI_OFFSET — the perihelion comb — are
+# deleted; Earth's perihelion of date is the series' ϖ in @essrt/physics,
+# createModel().earth.perihelionLongitudeDeg)
 
 # Earth inclination cycle anchor: ω̃_ICRF at max inclination (from balanced year)
 EARTH_INCL_CYCLE_ANCHOR = 21.77  # degrees (was 203.3195 in ascending-node-based model)

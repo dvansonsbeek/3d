@@ -49,7 +49,6 @@ try {
   C = require(path.join(TOOLS_LIB, 'constants.js'));
   check('H', C.H, 335317);
   check('planets count', Object.keys(C.planets).length, 7);
-  check('PERI_HARMONICS terms', C.PERI_HARMONICS.length, stored.PERI_HARMONICS_RAW.length);
   console.log('  ✓ Constants loaded OK\n');
 } catch (e) {
   console.log(`  ✗ Constants failed to load: ${e.message}\n`);
@@ -80,19 +79,11 @@ try {
 // ═══════════════════════════════════════════════════════════════════════════
 // 3. Verify PERI_HARMONICS (compare stored JSON values with what's loaded)
 // ═══════════════════════════════════════════════════════════════════════════
-console.log('═══ Step 3: PERI_HARMONICS consistency ═══');
+// (plan 09 step 4: the PERI_HARMONICS / PERI_OFFSET consistency rows left with
+// the perihelion comb — Earth's perihelion of date is the series' ϖ; the
+// registry plausibility row periLongModel2000AD vs periLongJ2000 gates it.)
+console.log('═══ Step 3: (the perihelion comb is deleted — plan 09 step 4) ═══\n');
 if (!C) C = require(path.join(TOOLS_LIB, 'constants.js'));
-const fitted = require(path.join(TOOLS_LIB, 'constants', 'fitted-coefficients.js'));
-
-check('PERI_OFFSET', fitted.PERI_OFFSET, stored.PERI_OFFSET);
-for (let i = 0; i < stored.PERI_HARMONICS_RAW.length; i++) {
-  const s = stored.PERI_HARMONICS_RAW[i];
-  const f = fitted.PERI_HARMONICS_RAW[i];
-  check(`PERI[${i}] div`, f[0], s[0]);
-  check(`PERI[${i}] sin`, f[1], s[1]);
-  check(`PERI[${i}] cos`, f[2], s[2]);
-}
-console.log(`  ✓ PERI_HARMONICS: ${stored.PERI_HARMONICS_RAW.length} terms match\n`);
 
 // ═══════════════════════════════════════════════════════════════════════════
 // 4. Verify OBLIQUITY harmonics
@@ -233,33 +224,10 @@ const eError = Math.abs(eJ2000 - eTarget);
 check('e(J2000) vs IAU', eError, 0, 1e-4);
 console.log(`  e(J2000): ${eJ2000.toFixed(10)} (IAU: ${eTarget}, diff: ${eError.toExponential(2)})`);
 
-// Perihelion longitude at J2000 (from raw harmonic formula)
-const PERI_PERIOD = C.H / 16;
-const t2000 = 2000 - C.balancedYear;
-// Plan 07 R10: the 270° convention is the device's perihelion wheel at the
-// retired origin; at J2000 the wheel stands 16 × kDeviceWheelPhaseAtJ2000Cycles turns on.
-let periLonJ2000 = 270.0 + 360 * 16 * C.kDeviceWheelPhaseAtJ2000Cycles + (360.0 / PERI_PERIOD) * t2000 + fitted.PERI_OFFSET;
-for (const [div, sinC, cosC] of fitted.PERI_HARMONICS_RAW) {
-  const phase = 2 * Math.PI * t2000 / (C.H / div);
-  periLonJ2000 += sinC * Math.sin(phase) + cosC * Math.cos(phase);
-}
-periLonJ2000 = ((periLonJ2000 % 360) + 360) % 360;
-const periLonTarget = C.ASTRO_REFERENCE.earthPerihelionLongitudeJ2000;
-const periLonError = Math.abs(periLonJ2000 - periLonTarget);
-check('Perihelion longitude at J2000', periLonError, 0, 0.01); // within 0.01°
-console.log(`  Perihelion longitude at J2000: ${periLonJ2000.toFixed(4)}° (ref: ${periLonTarget}°, error: ${periLonError.toFixed(4)}°)`);
-
-// ERD at J2000 (analytical derivative of perihelion harmonics)
-// Coefficients are in degrees, derivative gives °/yr directly
-const meanRate = 360.0 / PERI_PERIOD; // °/yr
-let erdJ2000DegPerYr = 0; // deviation from mean rate
-for (const [div, sinC, cosC] of fitted.PERI_HARMONICS_RAW) {
-  const omega = 2 * Math.PI / (C.H / div); // 1/yr
-  const phase = omega * t2000;
-  erdJ2000DegPerYr += omega * (sinC * Math.cos(phase) - cosC * Math.sin(phase));
-}
-console.log(`  Mean precession rate: ${meanRate.toFixed(6)}°/yr`);
-console.log(`  ERD at J2000: ${(erdJ2000DegPerYr >= 0 ? '+' : '')}${erdJ2000DegPerYr.toFixed(6)}°/yr (deviation from mean)`);
+// (plan 09 step 4: the "perihelion longitude at J2000 from the raw harmonic
+// formula" and "ERD at J2000" rows left with the perihelion comb; the series'
+// ϖ of date against the IAU mean element is the registry plausibility row
+// periLongModel2000AD vs periLongJ2000, 0.02°.)
 
 // Year lengths at J2000 vs IAU references
 const astroRef = JSON.parse(fs.readFileSync(
@@ -326,7 +294,6 @@ for (const type of ['SS', 'WS', 'VE', 'AE']) {
 }
 
 // Harmonic term counts
-console.log(`  Perihelion harmonics: ${C.PERI_HARMONICS.length} terms`);
 console.log(`  Cardinal points: SS=${C.CARDINAL_POINT_HARMONICS.SS.length}, WS=${C.CARDINAL_POINT_HARMONICS.WS.length}, VE=${C.CARDINAL_POINT_HARMONICS.VE.length}, AE=${C.CARDINAL_POINT_HARMONICS.AE.length} terms`);
 
 
@@ -343,11 +310,7 @@ if (prevEarth) {
     console.log(`  WARNING: Obliquity rate error regressed: ${prevEarth.obliquityRate_error_arcsec.toFixed(4)}" → ${rateError.toFixed(4)}"`);
     totalErrors++;
   }
-  if (prevEarth.perihelionLonJ2000_error_deg !== undefined &&
-      periLonError > prevEarth.perihelionLonJ2000_error_deg + 0.005) {
-    console.log(`  WARNING: Perihelion longitude error regressed: ${prevEarth.perihelionLonJ2000_error_deg.toFixed(4)}° → ${periLonError.toFixed(4)}°`);
-    totalErrors++;
-  }
+  // (plan 09 step 4: the perihelion-longitude regression row left with the comb)
 }
 console.log(`  ✓ Earth geometry verified\n`);
 
@@ -355,12 +318,8 @@ console.log(`  ✓ Earth geometry verified\n`);
 const newEarth = {
   obliquityJ2000_error_arcsec: Math.round(obliqError * 10000) / 10000,
   obliquityRate_error_arcsec: Math.round(rateError * 10000) / 10000,
-  perihelionLonJ2000_error_deg: Math.round(periLonError * 10000) / 10000,
-  erdJ2000_degPerYr: Math.round(erdJ2000DegPerYr * 1000000) / 1000000,
-  meanPrecessionRate_degPerYr: Math.round(meanRate * 1000000) / 1000000,
   tropicalYearJ2000_diff_sec: Math.round(tropDiffSec * 1000) / 1000,
   // (plan 09: the sidereal/anomalistic J2000 diffs read the retired year combs)
-  perihelionHarmonics_terms: C.PERI_HARMONICS.length,
   cardinalPoints_terms: {
     SS: C.CARDINAL_POINT_HARMONICS.SS.length,
     WS: C.CARDINAL_POINT_HARMONICS.WS.length,

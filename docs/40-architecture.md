@@ -1,7 +1,7 @@
 ---
 docVersion: 1.0
 modelVersion: v23.0
-coefficients: sha256:e0bf442540ee02b7
+coefficients: sha256:c71f29ad6041c1bb
 status: current
 ---
 
@@ -560,9 +560,9 @@ Features:
 ### Earth's perihelion device and the planets' Earth-frame rate
 
 ```
-├── PERI_HARMONICS (25 terms) + PERI_OFFSET → Earth perihelion longitude device
-├── calcEarthPerihelionPredictive(year) → Earth perihelion at any year (K device)
-├── calcERD(year) → Earth Rate Deviation (derivative)
+├── (plan 09 step 4: PERI_HARMONICS + PERI_OFFSET, calcEarthPerihelionPredictive and
+│    calcERD — the Earth perihelion comb — are deleted; Earth's perihelion of date is
+│    the series' ϖ, createModel().earth.perihelionLongitudeDeg)
 └── perihelionFrameBreakdown(planetKey, year) → the planet's perihelion rate in two
     coordinates: the lattice ecliptic rate, its equatorial projection at the IAU
     J2000 longitude, and the Earth-frame RA rate as their sum

@@ -17,8 +17,9 @@ const data = JSON.parse(fs.readFileSync(
 // (plan 09: the three year-length combs TROPICAL/SIDEREAL/ANOMALISTIC_YEAR_
 // HARMONICS and YEAR_LENGTH_J2000_ANCHOR are deleted — the year lengths of
 // date are the one-family laws over the kinematic day of date)
-const PERI_HARMONICS_RAW = data.PERI_HARMONICS_RAW;
-const PERI_OFFSET = data.PERI_OFFSET;
+// (plan 09 step 4: PERI_HARMONICS_RAW / PERI_OFFSET — the 25-term perihelion
+// comb on H-divisors — are deleted; Earth's perihelion of date is the series'
+// ϖ, createModel().earth.perihelionLongitudeDeg)
 // (plan 09: SOLSTICE_OBLIQUITY_MEAN_FITTED / SOLSTICE_OBLIQUITY_HARMONICS retired —
 // the obliquity of date is the hybrid ε of the one-source movement)
 const SUN_LONGITUDE_MEAN = data.SUN_LONGITUDE_MEAN;
@@ -39,31 +40,13 @@ const CARDINAL_POINT_JOINT_TERMS = data.CARDINAL_POINT_JOINT_TERMS || null;
 const SOLSTICE_JD_HARMONICS = CARDINAL_POINT_HARMONICS.SS;  // Legacy alias
 
 
-// ─── Dynamic fitted values ───────────────────────────────────────────────
-// These depend on model parameters and are built at require-time.
-
-/**
- * Build fitted coefficients that depend on model parameters.
- * @param {object} params - { earthtiltMean, earthInvPlaneInclinationAmplitude,
- *                            earthRAAngle, earthInvPlaneInclinationMean, planets, H }
- * @returns {{ PERI_HARMONICS: Array }}
- */
-function buildFittedCoefficients(params) {
-  // (Plan 09: the solstice-obliquity mean — the fitted comb's mean term, with
-  // its Pythagorean fallback on the K pose — left with the comb; the obliquity
-  // of date is the hybrid ε. The per-planet predict device left at plan 06 R8.)
-
-  // Perihelion harmonics — expand divisors to actual periods using H
-  const PERI_HARMONICS = PERI_HARMONICS_RAW.map(([div, s, c]) => [params.H / div, s, c]);
-
-  return { PERI_HARMONICS };
-}
+// (The require-time factory `buildFittedCoefficients` — the perihelion comb's
+// divisor-to-period expansion on H, and before plan 09 the solstice-obliquity
+// mean — left with the combs. Nothing fitted depends on the model parameters.)
 
 
 module.exports = {
   // Static fitted arrays
-  PERI_HARMONICS_RAW,
-  PERI_OFFSET,
   SUN_LONGITUDE_MEAN,
   SUN_LONGITUDE_HARMONICS,
   CARDINAL_POINT_HARMONICS,
@@ -73,7 +56,4 @@ module.exports = {
   RA_DAY_OFFSET_MS: data.RA_DAY_OFFSET_MS,   // plan 07 R10: the RA day offset's lines, phase from J2000 (were literals)
   CARDINAL_POINT_JOINT_TERMS,
   SOLSTICE_JD_HARMONICS,
-
-  // Factory for dynamic values
-  buildFittedCoefficients,
 };

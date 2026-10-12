@@ -42,7 +42,6 @@ from constants_scripts import (
     OBLIQUITY_CYCLE, EARTH_RA_ANGLE, BALANCED_JD,
     _START_MODEL_JD, JUNE_SOLSTICE_2000_JD, SOLSTICE_JD_HARMONICS,
     CARDINAL_POINT_ANCHORS, CARDINAL_POINT_HARMONICS,
-    PERI_HARMONICS, PERI_OFFSET,
 )
 # (plan 09: SOLSTICE_OBLIQUITY_MEAN / _HARMONICS — the 16-harmonic obliquity
 # comb — are deleted; this mirror carries no obliquity of date. The model's
@@ -233,10 +232,9 @@ EARTH_ECC_BASE = EARTH_BASE_ECCENTRICITY
 EARTH_ECC_AMP  = EARTH_ECCENTRICITY_AMPLITUDE
 EARTH_ECC_MEAN = _ECCENTRICITY_DERIVED_MEAN
 
-# Earth perihelion harmonics — loaded from fitted-coefficients.js via constants chain.
-# Updated automatically when fit_perihelion_harmonics.py reruns.
-# PERI_HARMONICS: list of (period_years, sin_coeff, cos_coeff)
-# PERI_OFFSET: DC offset in degrees
+# (plan 09 step 4: the perihelion comb — PERI_HARMONICS / PERI_OFFSET,
+# calc_earth_perihelion, calc_erd — is deleted; Earth's perihelion of date is
+# the series' ϖ in @essrt/physics, createModel().earth.perihelionLongitudeDeg.)
 
 # =============================================================================
 # SECTION C: EARTH ORBITAL PARAMETERS
@@ -246,41 +244,6 @@ EARTH_ECC_MEAN = _ECCENTRICITY_DERIVED_MEAN
 def time_offset(year: int) -> float:
     """Time relative to ANCHOR_YEAR (for periodic terms)."""
     return year - ANCHOR_YEAR
-
-
-def calc_earth_perihelion(year: int) -> float:
-    """Calculate Earth's perihelion longitude at given year (degrees)."""
-    t = time_offset(year)
-    mean_rate = 360.0 / EARTH_PERI_PERIOD
-    # Plan 07 R10: the 270° convention is the device's perihelion wheel at the
-    # retired origin; at J2000 it stands 16 × the device phase on.
-    longitude = 270.0 + 360.0 * 16 * K_DEVICE_WHEEL_PHASE_J2000_CYCLES + mean_rate * t
-
-    for period, sin_c, cos_c in PERI_HARMONICS:
-        phase = 2 * math.pi * t / period
-        longitude += sin_c * math.sin(phase) + cos_c * math.cos(phase)
-
-    return (longitude + PERI_OFFSET) % 360
-
-
-def calc_erd(year: int) -> float:
-    """
-    Calculate Earth Rate Deviation (analytical derivative of perihelion).
-
-    For harmonic A*sin(ωt) + B*cos(ωt), derivative is:
-        A*ω*cos(ωt) - B*ω*sin(ωt)
-
-    Returns: ERD in degrees/year
-    """
-    t = time_offset(year)
-    erd = 0.0
-
-    for period, sin_c, cos_c in PERI_HARMONICS:
-        omega = 2 * math.pi / period
-        phase = omega * t
-        erd += sin_c * omega * math.cos(phase) - cos_c * omega * math.sin(phase)
-
-    return erd
 
 
 # (calc_obliquity — the 16-harmonic comb mirror — deleted at plan 09.)
@@ -747,14 +710,12 @@ if __name__ == "__main__":
 
     # --- Section C: Earth — Orbital Elements ---
     print("\n--- Section C: Earth — Orbital Elements ---")
-    print(f"{'Year':>8} {'Perihelion':>12} {'ERD':>14} {'Eccentricity':>14} {'Asc.Node':>10}")
-    print("-" * 64)
+    print(f"{'Year':>8} {'Eccentricity':>14} {'Asc.Node':>10}")
+    print("-" * 36)
     for year in [2000, 2022, 2100]:
-        peri = calc_earth_perihelion(year)
-        erd = calc_erd(year)
         ecc = calc_eccentricity(year)
         asc_node = calc_ascending_node(year)
-        print(f"{year:>8} {peri:>12.4f}° {erd:>14.8f} {ecc:>14.6f} {asc_node:>8.4f}°")
+        print(f"{year:>8} {ecc:>14.6f} {asc_node:>8.4f}°")
 
     # --- Section D: Planet perihelions ---
     print("\n--- Section D: Planet Perihelion Longitudes (2022) ---")

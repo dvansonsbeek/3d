@@ -531,7 +531,7 @@ solar-mass history — degenerate today with the pure precession-scaling
 reading "obliquity period ∝ T_p", roughly a factor two apart at 2.46 Ga;
 registry keys `obliqBeat*Kyr` / `obliqH8Scaled*Kyr` (name kept), doc 109
 §18). **Two named counters** (plan 06 D8): the FROZEN era clock — the
-remaining combs (perihelion, cardinal record, RA day offset) and the ∫dt/H
+remaining combs (cardinal record, RA day offset; the perihelion comb left at step 4) and the ∫dt/H
 phase table; the year-length combs are deleted (plan 09) — rides its own fitted
 convention `eraClockHAtAge` = H₀·LOD/LOD₀ (pure spin scaling, the
 pre-Phase-3 "H/13 identity", shipped with their coefficients as a device

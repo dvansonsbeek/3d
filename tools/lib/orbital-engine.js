@@ -223,45 +223,14 @@ function computeArgumentOfPerihelionInvPlane(lonPerihelion, ascNodeInvPlane) {
 // LONGITUDE OF PERIHELION
 // ═══════════════════════════════════════════════════════════════════════════
 
-/**
- * Compute Earth's perihelion longitude using 21-harmonic predictive formula.
- * Source: script.js calcEarthPerihelionPredictive() ~line 33449
- *
- * @param {number} year - decimal year
- * @returns {number} longitude in degrees [0, 360)
- */
-function calcEarthPerihelionPredictive(year) {
-  const t = year - C.balancedYear;
-  const meanRate = 360.0 / C.perihelionCycleLength;
-  // Plan 07 R10: the 270° convention is the device's perihelion wheel at the
-  // retired origin; at J2000 the wheel stands 16 × kDeviceWheelPhaseAtJ2000Cycles turns on.
-  let longitude = 270.0 + 360 * 16 * C.kDeviceWheelPhaseAtJ2000Cycles + meanRate * t;
-  for (let i = 0; i < C.PERI_HARMONICS.length; i++) {
-    const [period, sinC, cosC] = C.PERI_HARMONICS[i];
-    const phase = 2 * Math.PI * t / period;
-    longitude += sinC * Math.sin(phase) + cosC * Math.cos(phase);
-  }
-  return ((longitude + C.PERI_OFFSET) % 360 + 360) % 360;
-}
-
-/**
- * Compute Earth Rate of Deviation (ERD) — derivative of harmonic perturbations.
- * Source: script.js calcERD() ~line 33461
- *
- * @param {number} year - decimal year
- * @returns {number} ERD value (degrees/year)
- */
-function calcERD(year) {
-  const t = year - C.balancedYear;
-  let erd = 0;
-  for (let i = 0; i < C.PERI_HARMONICS.length; i++) {
-    const [period, sinC, cosC] = C.PERI_HARMONICS[i];
-    const omega = 2 * Math.PI / period;
-    const phase = omega * t;
-    erd += sinC * omega * Math.cos(phase) - cosC * omega * Math.sin(phase);
-  }
-  return erd;
-}
+// (Plan 09 step 4: calcEarthPerihelionPredictive — the 25-term perihelion comb
+// on H-divisors, 270° + the device wheel's J2000 phase + the H/16 mean rate +
+// PERI_HARMONICS + PERI_OFFSET — and calcERD, its derivative, are deleted.
+// Earth's perihelion of date is the series' ϖ in @essrt/physics,
+// createModel().earth.perihelionLongitudeDeg (ecliptic of date); the scene's
+// perihelion has followed the series since v16.0. Measured before deletion,
+// comb − series: 0.03° at 2000, −1.6° at −4000, −20° at −26 kyr, −87° at
+// −270 kyr — data/era-device-readers.json.)
 
 // (Plan 07 R1: calcPlanetPerihelionLong and calcPerihelionLongICRF — the
 // device's linear perihelion advance on the lattice period, delegating to
@@ -600,9 +569,8 @@ module.exports = {
   computeArgumentOfPerihelion,
   computeArgumentOfPerihelionInvPlane,
 
-  // Longitude of Perihelion
-  calcEarthPerihelionPredictive,
-  calcERD,
+  // (Longitude of Perihelion — calcEarthPerihelionPredictive / calcERD, the
+  // perihelion comb — left at plan 09 step 4.)
 
   // (Inclination — Earth's H/3 cosine, the ψ-law planet oscillation and the
   // two-normal ecliptic inclinations — left at plan 07 R5.)

@@ -230,7 +230,11 @@ if (M) {
     { year: 2000, arcsec: 0.23314361143746964 }, { year: -4000, arcsec: 225.34364759740555 }, { year: 10000, arcsec: -126.97930614437638 },
     { year: -26000, arcsec: 4938.090393386764 }, { year: -270000, arcsec: 4592.334305779067 }, { year: -1000000, arcsec: -1776.8762516478005 },
   ] };
-  measured['perihelion-comb'] = { unit: '° (predictive comb − the series\' ϖ of date; frames differ by the equinox convention — read the DRIFT across epochs, not the offset)', rows: EPOCHS.map((y) => ({ year: y, deg: w180(OE.calcEarthPerihelionPredictive(y) - M.periOfDateDeg(y)) })) };
+  // plan 09 step 4: the perihelion comb is deleted — FROZEN record of the last measurement (the comb no longer evaluates)
+  measured['perihelion-comb'] = { unit: '° (predictive comb − the series\' ϖ of date; frames differ by the equinox convention — read the DRIFT across epochs, not the offset) — recorded before the comb\'s deletion at plan 09 step 4', rows: [
+    { year: 2000, deg: 0.0290786002965433 }, { year: -4000, deg: -1.585318413795676 }, { year: 10000, deg: -2.938993674087442 },
+    { year: -26000, deg: -19.99716160398134 }, { year: -270000, deg: -86.88308327267453 }, { year: -1000000, deg: -87.79076041849305 },
+  ] };
   const Tp0 = PM.lunisolar.meanPeriodYearsAtYear(2000), H0 = CC.H;
   const Hc = (y) => H0 * PM.lunisolar.meanPeriodYearsAtYear(y) / Tp0;
   const Hera = (y) => DT.eraClockHAtAge((2000 - y) / 1e6);

@@ -1,7 +1,7 @@
 ---
 docVersion: 1.0
 modelVersion: v23.0
-coefficients: sha256:e0bf442540ee02b7
+coefficients: sha256:c71f29ad6041c1bb
 status: current
 ---
 
@@ -134,7 +134,7 @@ the shared anchor.
 ### Ledger 3 — the fitted correction stack (named, gated, hashed)
 
 The fitted-coefficient arrays under the coefficients hash (shown in the
-simulator's About → Model Identity): the perihelion harmonics, the five cardinal-point families
+simulator's About → Model Identity): the five cardinal-point families
 (harmonics, anchors, eccentricity, joint and derived terms), the
 Sun-longitude harmonics, the Moon corrections, and the per-planet
 geocentric-precession projection coefficients (a chart-layer readout). The
@@ -493,14 +493,9 @@ the δ overlay):
 | `SUN_LONGITUDE_HARMONICS` | 3-term array | Fitted sun-longitude harmonics, ~279″ annual span. RETIRED from every scene path (FQ-3 took it off the display Sun; plan 06 R4 took it off the Step-6a instrument too — the fast Sun rides the engine Earth frame with the certified longitude); registry entry retained — Step 0 remains its fitter as the record and the D2 completion's PAIRED hash fingerprints it |
 | `SUN_LONGITUDE_MEAN` | −0.0018807° | Fitted mean offset (~−6.8″) |
 
-## Earth Perihelion Harmonics
+## Earth Perihelion Harmonics (retired)
 
-The `PERI_HARMONICS` array models Earth's perihelion longitude with 25 Fourier terms (RMSE 0.0006°, J2000 exact). Since plan 06 layer B it serves the browser's SCENE Sun only (`calcEarthPerihelionPredictive`); the physics package's eclipse Sun and the published Earth ϖ of date ride the banked series (doc 110 chain 1.1).
-
-| Constant | Value | Description |
-|----------|-------|-------------|
-| `PERI_HARMONICS` | 25-term array | `[period, sin_coeff, cos_coeff]` per term |
-| `PERI_OFFSET` | ~-0.260 deg | Global offset correction (J2000-anchored) |
+The 25-term Fourier comb `PERI_HARMONICS` + `PERI_OFFSET` (Earth's perihelion longitude on divisors of the unit H, RMSE 0.0006° against the file-01 export, J2000 exact) is deleted at plan 09 step 4. Earth's perihelion of date is the series' ϖ in every runtime (doc 110 chain 1.1) — the scene's perihelion had followed it since v16.0, and the comb's last live readers were the browser's device-tier `o.longitudePerihelion`, the registry's `periLongModel*` rows and the Python mirror. Two readings of the one series, named: the PUBLISHED perihelion of date (the registry rows, the eclipses, the cardinal points) is the Sun channel's `createModel().sun.perihelionLongitudeDegAt` — the series' secular mean plus the measured osculating-mean offset `EARTH_OSCULATING_MEAN_OFFSET.dPomArcsec`, the osculating-mean apsidal direction that Meeus's and Standish's mean elements tabulate (within 0.001° of Meeus at 1000–3000 AD); the bare series mean `createModel().earth.perihelionLongitudeDeg` sits a constant 0.0195° below it. Measured before deletion, comb − bare series: 0.03° at 2000, −1.6° at −4000, −20° at −26 kyr, −87° at −270 kyr (`data/era-device-readers.json`).
 
 ## Delta-T
 

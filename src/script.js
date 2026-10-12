@@ -561,28 +561,15 @@ planets.ceres = {
 // over the kinematic day of date: tropicalYearDaysOfDate & co.)
 
 // ─── B2. Earth's perihelion device (PERI_HARMONICS) ──────────────────────
-// PERI_HARMONICS (perihelion longitude Fourier terms) + PERI_OFFSET — the
-// K predictive device for Earth's perihelion (calcEarthPerihelionPredictive,
-// calcERD). The planet "predictive formula system" that used to sit here
-// (PREDICT_PLANETS / PREDICT_COEFFS_PHYSICAL, ~2,421 fitted terms per planet
-// reproducing the RETIRED geometric scene's Earth-frame perihelion-RA rate)
-// left at plan 06 R8; the Earth-frame rate is now
-// the equatorial projection of the lattice motion (perihelionFrameBreakdown).
+// (Plan 09 step 4: PERI_HARMONICS + PERI_OFFSET — the K predictive comb for
+// Earth's perihelion, calcEarthPerihelionPredictive / calcERD — are deleted.
+// Earth's perihelion of date is the chain's ecliptic ϖ OF DATE,
+// earthPerihelionEclipticOfDateDeg, on every surface. The planet "predictive
+// formula system" that used to sit here (PREDICT_PLANETS /
+// PREDICT_COEFFS_PHYSICAL) left at plan 06 R8; the Earth-frame rate is the
+// equatorial projection of the lattice motion, perihelionFrameBreakdown.)
 // ─────────────────────────────────────────────────────────────────────────
 let   H = holisticyearLength;  // Phase 6.5: mutable alias; kept in sync inside recomputeEpochAnchors
-// PRECISION FIX. This was a 6-decimal copy: -0.13181204608039468 was written as
-// -0.131812, and one coefficient rounded to exactly zero. Measured cost against
-// the JSON the Node engine reads — RSS 0.0076", worst case 0.0359" — versus a
-// fit that targets 0.00641" out-of-sample. Now imported at full precision.
-//
-// The JSON stores [divisor, cos, sin]; script.js wants the PERIOD H/divisor, the
-// same divisor-to-period step latticeYears() does for the planet cycles.
-// Evaluated once at load, as the literal array was.
-const PERI_HARMONICS = FIT.PERI_HARMONICS_RAW.map(([n, c, s]) => [H / n, c, s]);
-// The constant term of the same series as PERI_HARMONICS above: the perihelion
-// longitude is offset + sum(harmonics). Sourced together, or a refit could move
-// one and leave the other behind.
-const PERI_OFFSET = FIT.PERI_OFFSET;
 
 // ─── B3. (The fitted planet-path corrections — parallax, gravitation,
 // elongation — were EXCISED with the legacy planet chains, K5.) ──────────
@@ -2479,11 +2466,7 @@ const SATURN_ORBIT_DISTANCE_J2000  = saturnOrbitDistance;    // ≈ 9.582
 const URANUS_ORBIT_DISTANCE_J2000  = uranusOrbitDistance;    // ≈ 19.229
 const NEPTUNE_ORBIT_DISTANCE_J2000 = neptuneOrbitDistance;   // ≈ 30.103
 
-// Phase 6.5 — PERI_HARMONICS J2000-period snapshot (28 entries). PERI_HARMONICS
-// is `const` (array reference is immutable) but its rows are mutable arrays;
-// rebuildPeriHarmonicsForEpoch() rewrites each row[0] (period) by multiplying
-// the J2000 snapshot by H_t/H_J2000. sin/cos amplitudes stay (snapshot model).
-const PERI_HARMONICS_J2000_PERIODS = PERI_HARMONICS.map(row => row[0]);
+// (Phase 6.5's PERI_HARMONICS J2000-period snapshot left with the comb, plan 09 step 4.)
 
 // Per-planet J2000 orbital period in seconds — used as input to
 // meanPlanetOrbitalPeriodAtAge() and to recomputePlanetCountsForEpoch().
@@ -4502,7 +4485,9 @@ function recomputeDerivedAnchorsForEpoch(t_Ma) {
   // count on the ecliptic lattice, so the H/13 longitude rate is the right one.
   axialCoinRotationMs       = (meanSiderealday / _axialPrecessionPeriodYearsAtAge(t_Ma)) / (meansolaryearlengthinDays + 1) * 1000;
   axialCoinRotationYearlySeconds = axialCoinRotationMs * (meansolaryearlengthinDays + 1) / 1000;
-  meanAnomalisticYearinDays = (meansolaryearlengthinDays / (perihelionCycleLength - 1)) + meansolaryearlengthinDays;
+  // (plan 09: meanAnomalisticYearinDays is the IAU input — the device's H/16
+  // identity that re-derived it here at every epoch reset is deleted; step 3
+  // had left this line, which overwrote the load value at frame zero, 0.3 s low)
   return true;
 }
 
@@ -5027,18 +5012,8 @@ function recomputeMoonDerivedForEpoch(t_Ma) {
   return true;
 }
 
-// ───── PHASE 6.5 — PERI_HARMONICS table rebuild ─────
-// In-place rewrite of each row's period to H_t/N. Sin/cos amplitudes stay
-// (snapshot model — Phase 8 will revisit). `calcEarthPerihelionPredictive`
-// reads PERI_HARMONICS every frame, so this keeps the Earth perihelion
-// longitude prediction accurate at any epoch.
-function rebuildPeriHarmonicsForEpoch(t_Ma) {
-  const r = holisticyearLength / HOLISTIC_YEAR_J2000;
-  for (let i = 0; i < PERI_HARMONICS.length; i++) {
-    PERI_HARMONICS[i][0] = PERI_HARMONICS_J2000_PERIODS[i] * r;
-  }
-  return true;
-}
+// (PHASE 6.5's PERI_HARMONICS table rebuild — rebuildPeriHarmonicsForEpoch —
+// left with the comb, plan 09 step 4.)
 
 // ───── PHASE 2 — Mutate Moon + AU anchors to the deep-time epoch ─────
 // Reassigns the 11 Moon/AU globals (`let`s from Phase 2) to their epoch-t
@@ -5585,7 +5560,6 @@ function setEpochByAge(t_Ma) {
   recomputeMoonDerivedForEpoch(t_Ma);     // Phase 6.5: 9 Moon ICRF/harmonic helpers
   recomputePlanetCountsForEpoch(t_Ma);
   recomputePlanetCyclesForEpoch(t_Ma);   // Phase 5: per-planet 8H/N cycle anchors
-  rebuildPeriHarmonicsForEpoch(t_Ma);     // Phase 6.5: 28 Earth perihelion harmonic periods
   updateAllObjectsForEpoch();
   _invalidateUiCachesForEpoch();         // Option A: unfreeze panels + tweakpane
   currentEpoch_t_Ma = t_Ma;
@@ -5623,7 +5597,6 @@ function resetEpochToJ2000() {
   recomputeMoonDerivedForEpoch(0);
   recomputePlanetCountsForEpoch(0);
   recomputePlanetCyclesForEpoch(0);
-  rebuildPeriHarmonicsForEpoch(0);
   updateAllObjectsForEpoch();
   _invalidateUiCachesForEpoch();
   currentEpoch_t_Ma = 0;
@@ -35150,7 +35123,6 @@ recomputeMoonAndAuForEpoch(0);
 recomputeMoonDerivedForEpoch(0);
 recomputePlanetCountsForEpoch(0);
 recomputePlanetCyclesForEpoch(0);
-rebuildPeriHarmonicsForEpoch(0);
 updateAllObjectsForEpoch();
 requestAnimationFrame(render);
 
@@ -54059,17 +54031,16 @@ function updatePredictions() {
   // apsidal carrier) read 1.578677 vs 1.578422 here at J2000, 1.24 vs 1.91
   // at −100 kyr; it stays device machinery for the H/3 crossing finders.
   predictions.earthInvPlaneInclinationDynamic = o.earthInvPlaneInclinationDynamic = inclInvPlaneModel(o.currentYear);
-  // MACHINERY: the K perihelion law stays on o.longitudePerihelion — the
-  // true-solar-longitude routine (solarLongitudeDegLong) and the debug
-  // snapshot consume it (11-harmonic Fourier formula from
-  // predictive_formula.py — SI-tropical convention matches scene at
-  // balanced clicks).
-  o.longitudePerihelion = calcEarthPerihelionPredictive(yearForFormula);   // K device (H/16 counter) — its own coordinate, deliberately not the engine year
-  // DISPLAY (owner-ruled 2026-09-15): the chain's ecliptic ϖ OF DATE —
-  // the same expression as the Earth panel's ϖ/ω rows and the perihelion
-  // gauge, so every displayed ϖ reads one value (the K law had shown
-  // 102.9556 where the chain read 102.9260 at the same date).
-  predictions.longitudePerihelion = earthPerihelionEclipticOfDateDeg(o.julianDay, o.currentYear);
+  // ONE ϖ (plan 09 step 4): the chain's ecliptic ϖ OF DATE — the same
+  // expression as the Earth panel's ϖ/ω rows and the perihelion gauge — on
+  // o.longitudePerihelion too, so the true-solar-longitude routine
+  // (solarLongitudeDegLong) and the debug snapshot read the displayed value.
+  // The K perihelion comb (calcEarthPerihelionPredictive, 25 harmonics on the
+  // H/16 counter) that o.longitudePerihelion carried is deleted; measured
+  // before deletion, comb − series 0.03° at 2000, −1.6° at −4000, −20° at
+  // −26 kyr (the K law had shown 102.9556 where the chain read 102.9260).
+  o.longitudePerihelion = earthPerihelionEclipticOfDateDeg(o.julianDay, o.currentYear);
+  predictions.longitudePerihelion = o.longitudePerihelion;
   
   predictions.longitudePerihelionDatePer = o.longitudePerihelionDatePer = longitudeToDateTime((((earthPerihelionFromEarth.ra * 180 / Math.PI + 360) % 360)-earthRAAngle-180), o.currentYear)
   predictions.longitudePerihelionDateAp = o.longitudePerihelionDateAp = longitudeToDateTime(((earthPerihelionFromEarth.ra * 180 / Math.PI + 360)-earthRAAngle % 360), o.currentYear)
@@ -54576,58 +54547,13 @@ function computeSolsticeYearLength(currentYear, type) {
 // i_inv is inclInvPlaneModel, the one-source engine normal.)
 
 // =============================================================================
-// PREDICTIVE FORMULA SYSTEM — Ported from scripts/predictive_formula.py
-// Calculates geocentric precession rate for any planet at any year
+// (PREDICTIVE FORMULA SYSTEM — the Earth perihelion comb ported from
+// predictive_formula.py: calcEarthPerihelionPredictive, 270° + the device
+// wheel's J2000 phase + 360 × the H/16 counter's cycles + 25 harmonics on the
+// frozen era clock + PERI_OFFSET, and calcERD, its derivative — DELETED at plan
+// 09 step 4. Earth's perihelion of date is the chain's ecliptic ϖ OF DATE,
+// earthPerihelionEclipticOfDateDeg; o.longitudePerihelion carries it.)
 // =============================================================================
-
-function calcEarthPerihelionPredictive(year) {
-  // Phase 8.5: integrated phase (frame-independent). meanRate × t becomes
-  // 360 × cyclesBetweenYears (the linear cycle count from anchor to year).
-  // Per-harmonic phase replaced with `phaseAdvanceRadians(anchor, year, div)`.
-  // Note PERI_HARMONICS row[0] is the (mutable) period from Phase 6.5 rebuild;
-  // we use PERI_HARMONICS_J2000_PERIODS[i] to derive the J2000-fixed divisor.
-  const meanCycles = cyclesBetweenYears(BALANCED_YEAR_J2000_FIXED, year, 16);
-  if (meanCycles === null) return 270.0;
-  // Plan 07 R10: the 270° convention is the device's perihelion wheel at the
-  // retired origin; at J2000 the wheel stands 16 × kDeviceWheelPhaseAtJ2000Cycles turns on.
-  let longitude = 270.0 + 360.0 * (meanCycles + 16 * kDeviceWheelPhaseAtJ2000Cycles);
-  for (let i = 0; i < PERI_HARMONICS.length; i++) {
-    const sinC = PERI_HARMONICS[i][1], cosC = PERI_HARMONICS[i][2];
-    const div = HOLISTIC_YEAR_J2000 / PERI_HARMONICS_J2000_PERIODS[i];
-    const phase = phaseAdvanceRadians(BALANCED_YEAR_J2000_FIXED, year, div);
-    if (phase === null) continue;
-    longitude += sinC * Math.sin(phase) + cosC * Math.cos(phase);
-  }
-  return ((longitude + PERI_OFFSET) % 360 + 360) % 360;
-}
-
-function calcERD(year) {
-  // Phase 8.5: derivative of perihelion longitude at `year`. Integrated phase
-  // for the cosine/sine argument (toggle-gated through phaseAdvanceRadians →
-  // cyclesBetweenYears); omega = 2π × div / H. Under DEEP_TIME_MODE_ENABLED=true,
-  // H is the time-varying meanHAtAge(t_Ma); under false, H is the J2000-fixed
-  // HOLISTIC_YEAR_J2000 — restores pre-Phase-8.5 snapshot behavior. Matches the
-  // gating pattern in cyclesBetweenYears.
-  let erd = 0;
-  let H_at_year;
-  if (DEEP_TIME_MODE_ENABLED) {
-    // a fitted comb device: its ω = 2π·div/H rides the frozen era clock's counter (plan 06 D8)
-    const t_Ma = (J2000_CALENDAR_YEAR - year) / 1e6;
-    H_at_year = eraClockHAtAge(t_Ma);
-    if (H_at_year === null) return 0;
-  } else {
-    H_at_year = HOLISTIC_YEAR_J2000;
-  }
-  for (let i = 0; i < PERI_HARMONICS.length; i++) {
-    const sinC = PERI_HARMONICS[i][1], cosC = PERI_HARMONICS[i][2];
-    const div = HOLISTIC_YEAR_J2000 / PERI_HARMONICS_J2000_PERIODS[i];
-    const omega_at_year = 2 * Math.PI * div / H_at_year;
-    const phase = phaseAdvanceRadians(BALANCED_YEAR_J2000_FIXED, year, div);
-    if (phase === null) continue;
-    erd += sinC * omega_at_year * Math.cos(phase) - cosC * omega_at_year * Math.sin(phase);
-  }
-  return erd;
-}
 
 // (The planet predictive-precession device — the @essrt/physics/planets/
 // predict feature basis, PREDICT_COEFFS_PHYSICAL and predictGeocentricPrecession

@@ -17,7 +17,7 @@ Python (and a few JavaScript) scripts for investigating, verifying, and reproduc
 > behaviour. New work should import from `constants_scripts` rather than add
 > a ledger entry.
 
-> **Shared library** (`constants_scripts.py`, `predictive_formula.py` — Earth's perihelion/ERD/obliquity helpers — and `planet_beats.py`) lives in [`tools/lib/python/`](../tools/lib/python/README.md). All scripts here load it via `sys.path` at startup.
+> **Shared library** (`constants_scripts.py`, `predictive_formula.py` — Earth's eccentricity / year-length helpers — and `planet_beats.py`) lives in [`tools/lib/python/`](../tools/lib/python/README.md). All scripts here load it via `sys.path` at startup.
 
 Finished investigations leave this folder for `scripts/archive/` (gitignored; git history carries the files) together with their result files (`data/archive/`). A script stays here when a gate runs it, a governed artifact names it as generator, a live document cites it, or another script imports it.
 
