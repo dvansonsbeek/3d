@@ -47,7 +47,6 @@ export function assembleModel(C: Readonly<Record<string, any>>, F: Readonly<Reco
         moonDistanceKmAtYear: (year: number) => number;
         siderealYearSecondsAtYear: (year: number) => number;
         deltaTSecondsAtYear: (year: number) => number;
-        cyclesBetween: (yearA: number, yearB: number, divisorN: number) => number;
         axialPrecessionYearsAtYear: (year: number) => number;
         tropicalYearSecondsAtYear: (year: number) => number;
     }>;

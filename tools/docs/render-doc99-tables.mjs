@@ -88,7 +88,7 @@ function blockClockThroughTime() {
     rows.push(`| ${b(ageLabel(t))} | ${b(f(lodHr(t), 2))} | ${b(th(Tp(t)))} | ${b(f(daysPerYr(t), 2))} | ${b(th(moonKm(t)))} | ${b(f(beatKyr(t), 2))} | ${ERA[String(t)] ?? ''} |`);
   }
   rows.push('');
-  rows.push(`T_p(t) = 1,296,000/ψ̇(t) with ψ̇(t) = [ω(t)/ω₀]·p₀·[f_S + (1 − f_S)(a₀/a_M(t))³] — Earth's spin (angular-momentum conservation on the recession history) carrying the solar and lunar torques, the lunar torque growing as the Moon was closer; p₀ = ${f(p0, 4)} ″/yr, the model's derived J2000 rate (T_p = ${th(Tp(0), 1)} yr; plan 06 S5). The obliquity beat is 1,296,000/(ψ̇ − |s₃|) with |s₃| = ${f(s3, 4)} ″/yr, the dominant nodal mode of Earth's orbit (the engine's deep secular modes; μ = 1). The spin-only clock the model carried before (H₀·LOD/LOD₀ ÷ 13) read ${th(DT.eraClockHAtAge(380) / 13)} yr at the Devonian where the composed clock reads ${th(Tp(380))} — retired.`);
+  rows.push(`T_p(t) = 1,296,000/ψ̇(t) with ψ̇(t) = [ω(t)/ω₀]·p₀·[f_S + (1 − f_S)(a₀/a_M(t))³] — Earth's spin (angular-momentum conservation on the recession history) carrying the solar and lunar torques, the lunar torque growing as the Moon was closer; p₀ = ${f(p0, 4)} ″/yr, the model's derived J2000 rate (T_p = ${th(Tp(0), 1)} yr; plan 06 S5). The obliquity beat is 1,296,000/(ψ̇ − |s₃|) with |s₃| = ${f(s3, 4)} ″/yr, the dominant nodal mode of Earth's orbit (the engine's deep secular modes; μ = 1). The spin-only clock the model carried before (H₀·LOD/LOD₀ ÷ 13) read 23,553 yr at the Devonian where the composed clock reads ${th(Tp(380))} — retired, and its counter deleted at plan 09 step 7a (the 23,553 is the last recorded value).`);
   return rows.join('\n');
 }
 
@@ -208,7 +208,7 @@ function blockSummary() {
   line('Climatic-precession line p + g₀ (kyr)', (t) => f(lineKyr(g0, t), 2));
   line('Long-eccentricity metronome g₂ − g₅ (kyr, NOT scaled)', () => f(fam[0].periodKyr, 1));
   line('Short-eccentricity line g₀ − g₂ (kyr, NOT scaled)', () => f(ecc[0].periodKyr, 2));
-  line('Frozen era clock\'s day count H_era × days/yr (device)', (t) => { const H = DT.eraClockHAtAge(t), d = daysPerYr(t); return H === null || d === null ? '—' : th(H * d); });
+  // (plan 09 step 7a: the frozen era clock's day-count row H_era × days/yr left with the counter)
   return rows.join('\n');
 }
 

@@ -1,7 +1,7 @@
 ---
 docVersion: 1.0
 modelVersion: v23.0
-coefficients: sha256:3cfb8d04a94ddc3a
+coefficients: sha256:91e2d041c7b6e038
 status: current
 ---
 
@@ -286,8 +286,8 @@ The **balanced year** was the fitted phase origin of the model's correction
 combs and of the precession layers' `startPos` values:
 `perihelionalignmentYear − 14.5 × H/16` = −302,635, the 14.5-cycle offset that
 positioned the obliquity fluctuation against the paleoclimate record. It is no
-longer an input. Every comb measures its phase from J2000 (the coefficients
-were rotated exactly, `tools/fit/reorigin-combs-j2000.mjs`), and the
+longer an input. The combs are deleted (plan 09; from R10 to their deletion
+they measured their phase from J2000, the coefficients rotated exactly), and the
 precession layers keep their J2000 pose through one recorded device constant,
 `kDeviceWheelPhaseAtJ2000Cycles` = (2000 − t₀)/H = 0.9085 anchor units: each
 H/N wheel stands N × that on at J2000, and its `startPos` is the wheel's

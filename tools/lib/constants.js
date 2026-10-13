@@ -4,17 +4,16 @@
 // All input data loaded from JSON files in public/input/:
 //   model-parameters.json       — Model theory parameters
 //   astro-reference.json        — IAU/JPL/Meeus reference data
-//   fitted-coefficients.json    — Fitting pipeline output (via fitted-coefficients.js)
+//   (fitted-coefficients.json — the fitting pipeline's comb output — carries no
+//    coefficient block since plan 09 step 7a; its loader module is deleted)
 //
 // Sub-modules:
-//   constants/fitted-coefficients.js — Loads fitted data + buildFittedCoefficients()
 //   constants/utils.js              — Date conversion, formatting, derivation helpers
 //
 // All consumers: const C = require('./lib/constants');
 // ═══════════════════════════════════════════════════════════════════════════
 
 // ─── Sub-modules & JSON data ─────────────────────────────────────────────
-const fitted = require('./constants/fitted-coefficients');
 const utils = require('./constants/utils');
 const path = require('path');
 const fs = require('fs');
@@ -759,14 +758,10 @@ module.exports = {
   yearLengthRef,
   knownValues,
 
-  // Fitted record (from fitted-coefficients.js)
-  SOLSTICE_JD_HARMONICS: fitted.SOLSTICE_JD_HARMONICS,
-  CARDINAL_POINT_HARMONICS: fitted.CARDINAL_POINT_HARMONICS,
-  CARDINAL_POINT_ECC_TERMS: fitted.CARDINAL_POINT_ECC_TERMS,
-  CARDINAL_POINT_DERIVED: fitted.CARDINAL_POINT_DERIVED,
-  CARDINAL_POINT_JOINT_TERMS: fitted.CARDINAL_POINT_JOINT_TERMS,
-  CARDINAL_POINT_ANCHORS: fitted.CARDINAL_POINT_ANCHORS_ADJUSTED || ASTRO_REFERENCE.cardinalPointAnchors,
-  // (PREDICT_PLANETS / PREDICT_COEFFS — the planet predict device — retired at plan 06 R8;
+  // (The fitted record — SOLSTICE_JD_HARMONICS / CARDINAL_POINT_* — left at plan 09
+  //  step 7a with the frozen cardinal evaluator; the observed USNO 2000 instants
+  //  stay in ASTRO_REFERENCE.cardinalPointAnchors.
+  //  PREDICT_PLANETS / PREDICT_COEFFS — the planet predict device — retired at plan 06 R8;
   //  PERI_HARMONICS / PERI_OFFSET — the perihelion comb — at plan 09 step 4)
 
   // Date utilities

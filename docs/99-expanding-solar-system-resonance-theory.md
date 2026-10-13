@@ -1,7 +1,7 @@
 ---
 docVersion: 1.0
 modelVersion: v23.0
-coefficients: sha256:3cfb8d04a94ddc3a
+coefficients: sha256:91e2d041c7b6e038
 status: current
 ---
 
@@ -327,9 +327,9 @@ The two drivers act independently in physics — tidal coupling cares about Eart
 
 - Earth's *rotation* slows (Driver 1) → fewer day-rotations per year_s
 - Earth's *orbit period* shrinks toward past (Driver 2) → fewer year_s in absolute time
-- Their ratio `H_era × days/year` stays anchored to the J2000 day-count (<!--v:totalDaysInH-->122,471,916<!--/v-->) to ~70 ppm at Devonian, ~850 ppm at Hadean
+- Their ratio `H_era × days/year` stayed anchored to the J2000 day-count (<!--v:totalDaysInH-->122,471,916<!--/v-->) to ~70 ppm at Devonian, ~850 ppm at Hadean (measured before the counter's deletion)
 
-So both drivers reshape the clocks; the device identity constrains how they trade off. (The internal unit H(t) itself carries the lunar-torque factor since plan 06 Phase 3 and is NOT day-count invariant — the identity is the era counter's.)
+So both drivers reshape the clocks; the device identity constrained how they trade off. (The internal unit H(t) itself carries the lunar-torque factor since plan 06 Phase 3 and is NOT day-count invariant — the identity was the era counter's, and the era counter was deleted with the last comb at plan 09 step 7a; this passage is its record.)
 
 ## Comparable parallel scalings
 
@@ -349,7 +349,7 @@ Moon distance moves with the tidal chain (Layer 2, Farhat-anchored): 384,399 km 
 
 ---
 
-## The frozen era clock's day-count invariant (device tier)
+## The frozen era clock's day-count invariant (device tier — the counter is DELETED, plan 09 step 7a; this section is its record)
 
 A near-identity of the frozen era clock: **the total number of Earth rotations (solar days) in one interval of its counter H_era is near-invariant** across all epochs, with small drift from solar mass loss at deep time. H_era = H₀·LOD(t)/LOD₀ is the device counter the correction combs and the cardinal clock were fitted against (plan 06 D8: two named counters); it is not the physical precession clock, which carries the lunar-torque factor (§ Driver 1) and is NOT day-count invariant. The relation below is therefore a property of the fitted machinery, kept because the paleontological day counts test it directly.
 
@@ -926,7 +926,7 @@ days/yr  = tropical_year_s(t) / LOD(t)
 | −500 | 21.31 | 20,521 | 411.37 | 364,994 | 29.17 | Late Cambrian |
 | −620 | 20.71 | 19,382 | 423.11 | 360,135 | 26.92 | Ediacaran (Williams 2000) |
 
-T_p(t) = 1,296,000/ψ̇(t) with ψ̇(t) = [ω(t)/ω₀]·p₀·[f_S + (1 − f_S)(a₀/a_M(t))³] — Earth's spin (angular-momentum conservation on the recession history) carrying the solar and lunar torques, the lunar torque growing as the Moon was closer; p₀ = 50.2880 ″/yr, the model's derived J2000 rate (T_p = 25,771.6 yr; plan 06 S5). The obliquity beat is 1,296,000/(ψ̇ − |s₃|) with |s₃| = 18.8506 ″/yr, the dominant nodal mode of Earth's orbit (the engine's deep secular modes; μ = 1). The spin-only clock the model carried before (H₀·LOD/LOD₀ ÷ 13) read 23,553 yr at the Devonian where the composed clock reads 21,699 — retired.
+T_p(t) = 1,296,000/ψ̇(t) with ψ̇(t) = [ω(t)/ω₀]·p₀·[f_S + (1 − f_S)(a₀/a_M(t))³] — Earth's spin (angular-momentum conservation on the recession history) carrying the solar and lunar torques, the lunar torque growing as the Moon was closer; p₀ = 50.2880 ″/yr, the model's derived J2000 rate (T_p = 25,771.6 yr; plan 06 S5). The obliquity beat is 1,296,000/(ψ̇ − |s₃|) with |s₃| = 18.8506 ″/yr, the dominant nodal mode of Earth's orbit (the engine's deep secular modes; μ = 1). The spin-only clock the model carried before (H₀·LOD/LOD₀ ÷ 13) read 23,553 yr at the Devonian where the composed clock reads 21,699 — retired, and its counter deleted at plan 09 step 7a (the 23,553 is the last recorded value).
 <!-- /generated:doc99-clock-through-time -->
 
 **The precession of date.** The table is the secular law. The movement of
@@ -1534,7 +1534,7 @@ The framework reveals not just *that* the Moon drifts away, but *why it must*.
 
 ### The structural cause
 
-The framework's structural near-invariant `U × days/yr ≈ TOTAL_DAYS_IN_H = 122,471,920` — U the era-clock counter, pure spin scaling U = U₀·LOD(t)/LOD₀, not the unit H(t), which carries the lunar-torque term as well (exact at J2000; drifting from Driver 2 / solar mass loss alone — <!--v:driftAtDevonianPpm-->−74<!--/v--> ppm and <!--v:driftAtHadeanPpm-->−999<!--/v--> ppm total) is preserved at the modern epoch and varies smoothly with geological time. This requires:
+The framework's structural near-invariant `U × days/yr ≈ TOTAL_DAYS_IN_H = 122,471,920` — U the era-clock counter, pure spin scaling U = U₀·LOD(t)/LOD₀, not the unit H(t), which carries the lunar-torque term as well (exact at J2000; drifting from Driver 2 / solar mass loss alone — measured −74 ppm at the Devonian and −999 ppm at the Hadean before the counter was deleted with the last comb at plan 09 step 7a; the derivation below is the retired device's record) was preserved at the modern epoch and varied smoothly with geological time. This requires:
 - Earth's rotation rate (LOD) must slowly change
 - The orbital year length (in seconds) must stay fixed
 - Therefore `days/yr = year_seconds / LOD` must change inversely with LOD
@@ -2473,7 +2473,6 @@ All values written by the engine (`npm run docs:doc99:write`). The frozen era cl
 | Climatic-precession line p + g₀ (kyr) | **23.76** | 22.05 | 20.26 | **25.82** |
 | Long-eccentricity metronome g₂ − g₅ (kyr, NOT scaled) | **405.6** | 405.6 | 405.6 | **405.6** |
 | Short-eccentricity line g₀ − g₂ (kyr, NOT scaled) | **94.88** | 94.88 | 94.88 | **94.88** |
-| Frozen era clock's day count H_era × days/yr (device) | **122,471,916** | 122,467,415 | 122,462,369 | **122,476,882** |
 <!-- /generated:doc99-summary-table -->
 
 **Key observation**: the spin-tier rows (the precession period, the obliquity beat, the climatic-precession line) lengthen together with the clock, reflecting Driver 1 (tidal evolution); the eccentricity-band rows do not scale (planetary g-beats — see the restated core thesis), and the 405-kyr metronome never scaled. The frozen era clock's day count `H_era × days/year ≈ TOTAL_DAYS_IN_H` drifts smoothly with t_Ma under Driver 2 (solar mass loss): −35 ppm at Jurassic, −74 ppm at Devonian, +39 ppm at +200 Myr future (year_s shifts longer in future because Sun has lost more mass). The drift is monotonic and small but real — about 5 ppm per 50 Ma. The two-tier split plus the tracked Driver-2 drift is ESSRT's deepest self-consistency check.

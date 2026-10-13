@@ -17,9 +17,8 @@ const path = require('path');
 const ROOT = path.resolve(__dirname, '..', '..', '..');
 const TOOLS_LIB = path.join(ROOT, 'tools', 'lib');
 const TOOLS_RESULTS = path.join(ROOT, 'tools', 'results');
-
-const JSON_PATH = path.resolve(ROOT, 'public', 'input', 'fitted-coefficients.json');
-const stored = JSON.parse(fs.readFileSync(JSON_PATH, 'utf8'));
+// (plan 09 step 7a: the stored-vs-loaded comb comparison against
+//  fitted-coefficients.json left with the last comb, the cardinal record)
 
 let totalChecks = 0, totalErrors = 0;
 
@@ -96,20 +95,11 @@ console.log('═══ Step 4: OBLIQUITY — the comb retired (plan 09); the obl
 console.log('  ✓ OBLIQUITY: no comb to verify\n');
 
 // ═══════════════════════════════════════════════════════════════════════════
-// 5. Verify CARDINAL_POINT_HARMONICS
+// 5. CARDINAL_POINT_HARMONICS — DELETED at plan 09 step 7a (the frozen cardinal
+//    record left the coefficients file with its evaluator; the instants are
+//    createModel().cardinal, checked against USNO 2000 below)
 // ═══════════════════════════════════════════════════════════════════════════
-console.log('═══ Step 5: CARDINAL_POINT_HARMONICS consistency ═══');
-for (const type of ['SS', 'WS', 'VE', 'AE']) {
-  const s = stored.CARDINAL_POINT_HARMONICS[type];
-  const f = C.CARDINAL_POINT_HARMONICS[type];
-  check(`${type} term count`, f.length, s.length);
-  for (let i = 0; i < s.length; i++) {
-    check(`${type}[${i}] div`, f[i][0], s[i][0]);
-    check(`${type}[${i}] sin`, f[i][1], s[i][1]);
-    check(`${type}[${i}] cos`, f[i][2], s[i][2]);
-  }
-}
-console.log(`  ✓ CARDINAL_POINT_HARMONICS: all 4 types match\n`);
+console.log('═══ Step 5: CARDINAL_POINT_HARMONICS — no comb to verify (plan 09 step 7a) ═══\n');
 
 // ═══════════════════════════════════════════════════════════════════════════
 // 6. Verify YEAR_LENGTH harmonics
@@ -293,8 +283,7 @@ for (const type of ['SS', 'WS', 'VE', 'AE']) {
   console.log(`    ${type}: JD ${jd.toFixed(6)} (${jdToDate(jd)})  USNO: ${usnoCP2000[type].toFixed(4)}  diff: ${diffMin >= 0 ? '+' : ''}${diffMin.toFixed(2)} min`);
 }
 
-// Harmonic term counts
-console.log(`  Cardinal points: SS=${C.CARDINAL_POINT_HARMONICS.SS.length}, WS=${C.CARDINAL_POINT_HARMONICS.WS.length}, VE=${C.CARDINAL_POINT_HARMONICS.VE.length}, AE=${C.CARDINAL_POINT_HARMONICS.AE.length} terms`);
+// (plan 09 step 7a: the harmonic term-count row left with the cardinal record)
 
 
 // Compare against stored Earth baselines
@@ -319,13 +308,8 @@ const newEarth = {
   obliquityJ2000_error_arcsec: Math.round(obliqError * 10000) / 10000,
   obliquityRate_error_arcsec: Math.round(rateError * 10000) / 10000,
   tropicalYearJ2000_diff_sec: Math.round(tropDiffSec * 1000) / 1000,
-  // (plan 09: the sidereal/anomalistic J2000 diffs read the retired year combs)
-  cardinalPoints_terms: {
-    SS: C.CARDINAL_POINT_HARMONICS.SS.length,
-    WS: C.CARDINAL_POINT_HARMONICS.WS.length,
-    VE: C.CARDINAL_POINT_HARMONICS.VE.length,
-    AE: C.CARDINAL_POINT_HARMONICS.AE.length,
-  },
+  // (plan 09: the sidereal/anomalistic J2000 diffs read the retired year combs;
+  //  step 7a: the cardinalPoints_terms counts read the deleted cardinal record)
 };
 
 // ═══════════════════════════════════════════════════════════════════════════

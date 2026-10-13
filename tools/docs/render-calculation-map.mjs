@@ -133,24 +133,24 @@ function blockTorqueSplit() {
 function blockTidalClock() {
   const s = torqueSplit();
   const rows = [
-    '| age (Ma) | a_M (km) | LOD (h) | ω/ω₀ = LOD₀/LOD | α (I/MR²) | H_era(t) = H₀·LOD/LOD₀ (yr) — the frozen era clock’s counter | (a₀/a)³ | **H(t), the unit (yr)** | **T_p = 1,296,000/ψ̇ (yr)** | ψ̇ (″/yr) | H(t)/T_p |',
-    '|---|---|---|---|---|---|---|---|---|---|---|',
+    '| age (Ma) | a_M (km) | LOD (h) | ω/ω₀ = LOD₀/LOD | α (I/MR²) | (a₀/a)³ | **H(t), the unit (yr)** | **T_p = 1,296,000/ψ̇ (yr)** | ψ̇ (″/yr) | H(t)/T_p |',
+    '|---|---|---|---|---|---|---|---|---|---|',
   ];
   const H0 = DT.meanHAtAge(0), Tp0 = DT.meanLunisolarPrecessionPeriodYearsAtAge(0), ratio0 = H0 / Tp0;
   if (Math.abs(Tp0 - DT.certifiedAxialPrecessionJ2000Years()) > 1e-9) throw new Error(`T_p(J2000) ≠ the certified anchor: ${Tp0}`);
   for (const t of [0, 0.01, 0.1, 1, 10, 100, 380, 650, 1400, 2460]) {
     const a = DT.meanMoonDistanceMetresAtAge(t), lod = DT.meanLodSecondsAtAge(t), al = DT.earthMoiFactorAtAge(t);
-    const H = DT.meanHAtAge(t), Hera = DT.eraClockHAtAge(t);
+    const H = DT.meanHAtAge(t);
     const w = DT.LOD_NOW_H13_S / lod, lf = Math.pow(DT.A_MOON_NOW_M / a, 3);
     const pc = DT.meanLunisolarPrecessionRateArcsecPerYrAtAge(t);   // the ONE home's value
     const Tp = DT.meanLunisolarPrecessionPeriodYearsAtAge(t);
     if (Math.abs(pc - w * s.p0 * (s.fS + (1 - s.fS) * lf)) > 1e-9) throw new Error(`composed ψ̇ twin diverged at ${t} Ma`);
     // S5: the unit scales WITH the period — the ratio is the invariant, and it is NOT 13
     if (Math.abs(H / Tp - ratio0) > 1e-9) throw new Error(`H(t)/T_p(t) not invariant at ${t} Ma: ${H / Tp} vs ${ratio0}`);
-    rows.push(`| ${t} | ${f(a / 1000, 0)} | ${f(lod / 3600, 3)} | ${f(w, 5)} | ${f(al, 6)} | ${f(Hera, 0)} | ${f(lf, 4)} | **${f(H, 0)}** | **${f(Tp, 1)}** | ${f(pc, 2)} | ${f(H / Tp, 5)} |`);
+    rows.push(`| ${t} | ${f(a / 1000, 0)} | ${f(lod / 3600, 3)} | ${f(w, 5)} | ${f(al, 6)} | ${f(lf, 4)} | **${f(H, 0)}** | **${f(Tp, 1)}** | ${f(pc, 2)} | ${f(H / Tp, 5)} |`);
   }
   rows.push('');
-  rows.push(`T_p(t) is the composed lunisolar precession period on the model’s ONE J2000 reading — 1,296,000/ψ̇ with p₀ = 1,296,000/T_p(J2000) = ${f(s.p0, 4)} ″/yr, T_p(J2000) = 1,296,000/p_A on the IAU 2006 general precession input (plan 09; S5 had the retired year combs’ beat at 2000, 8 ppm faster) — \`@essrt/physics/earth/precession-composed\` built inside \`deltat/deep-time.cjs\`, one home: the hybrid precesses on it, the paleo-anchors gate checks the ψ̇ column. H(t) = H_era/[f_S + (1 − f_S)(a₀/a)³] is the internal UNIT (identifier \`hAtAge\`, plan 06 P4): it scales WITH T_p — the last column is constant, ${f(ratio0, 5)} — but is NOT 13 periods: H₀ was fitted on the 1246 AD perihelion–solstice alignment (the perihelion-of-date beat), so H₀/13 = ${f(H0 / 13, 1)} yr was the fit anchor’s reading, 0.086 % slow, and is not a period of anything the model computes (the "H = 13·T_p" claim is retired). H_era is the FROZEN era clock’s own phase convention (pure spin scaling), shipped with the frozen coefficients as a named device constant (D8: two named counters), not a physical claim. External readings for the ψ̇ column: IAU J2000 50.288 ″/yr (measured); Wu et al. 2024 at 650 Ma 67.64 ″/yr; Meyers & Malinverno 2018 at 1400 Ma 85.79 ± 2.72 ″/yr; Lantink et al. 2022 at 2460 Ma 108.6 ± 8.5 ″/yr (all three cyclostratigraphic inferences through an assumed astronomical model — theory-vs-inference, doc 99; the last two are gate rows \`xiamaling-prec-1400\` / \`lantink-prec-2460\`).`);
+  rows.push(`T_p(t) is the composed lunisolar precession period on the model’s ONE J2000 reading — 1,296,000/ψ̇ with p₀ = 1,296,000/T_p(J2000) = ${f(s.p0, 4)} ″/yr, T_p(J2000) = 1,296,000/p_A on the IAU 2006 general precession input (plan 09; S5 had the retired year combs’ beat at 2000, 8 ppm faster) — \`@essrt/physics/earth/precession-composed\` built inside \`deltat/deep-time.cjs\`, one home: the hybrid precesses on it, the paleo-anchors gate checks the ψ̇ column. H(t) = H₀·(ω₀/ω)/[f_S + (1 − f_S)(a₀/a)³] is the internal UNIT (identifier \`hAtAge\`, plan 06 P4): it scales WITH T_p — the last column is constant, ${f(ratio0, 5)} — but is NOT 13 periods: H₀ was fitted on the 1246 AD perihelion–solstice alignment (the perihelion-of-date beat), so H₀/13 = ${f(H0 / 13, 1)} yr was the fit anchor’s reading, 0.086 % slow, and is not a period of anything the model computes (the "H = 13·T_p" claim is retired). (The pure spin-scaling H_era = H₀·LOD/LOD₀ was the FROZEN era clock’s own phase convention, D8’s second named counter; it left with the last comb at plan 09 step 7a.) External readings for the ψ̇ column: IAU J2000 50.288 ″/yr (measured); Wu et al. 2024 at 650 Ma 67.64 ″/yr; Meyers & Malinverno 2018 at 1400 Ma 85.79 ± 2.72 ″/yr; Lantink et al. 2022 at 2460 Ma 108.6 ± 8.5 ″/yr (all three cyclostratigraphic inferences through an assumed astronomical model — theory-vs-inference, doc 99; the last two are gate rows \`xiamaling-prec-1400\` / \`lantink-prec-2460\`).`);
   return rows.join('\n');
 }
 
@@ -262,8 +262,8 @@ function blockObliquityBeat() {
     .filter((x) => Math.abs(x.omegaRadPerYr) > 1e-9).sort((a, b) => Math.hypot(b.re, b.im) - Math.hypot(a.re, a.im))[0];
   const s3 = Math.abs(z.omegaRadPerYr * 180 / Math.PI) * 3600;
   const rows = [
-    '| age (Ma) | **T_p(t) = 1,296,000/ψ̇, the composed period (yr)** | the deep chain’s year beat T_sid/(T_sid − T_trop) — T_p counted in sidereal years, + 1 (plan 09 step 5d; it was the unit’s H(t)/13, 0.086 % apart) | ψ̇ (″/yr) | H_era(t)/13 (yr) — the frozen clock’s counter, for the record | beat 2π/(ψ̇ − \\|s₃\\|) (kyr) — the SHIPPED `obliqBeat*Kyr` form | beat(J2000)·T_p(t)/T_p(J2000) (kyr) — "obliquity period ∝ T_p", `obliqH8Scaled*Kyr` |',
-    '|---|---|---|---|---|---|---|',
+    '| age (Ma) | **T_p(t) = 1,296,000/ψ̇, the composed period (yr)** | the deep chain’s year beat T_sid/(T_sid − T_trop) — T_p counted in sidereal years, + 1 (plan 09 step 5d; it was the unit’s H(t)/13, 0.086 % apart) | ψ̇ (″/yr) | beat 2π/(ψ̇ − \\|s₃\\|) (kyr) — the SHIPPED `obliqBeat*Kyr` form | beat(J2000)·T_p(t)/T_p(J2000) (kyr) — "obliquity period ∝ T_p", `obliqH8Scaled*Kyr` |',
+    '|---|---|---|---|---|---|',
   ];
   const Tp0 = DT.meanLunisolarPrecessionPeriodYearsAtAge(0), pc0 = DT.meanLunisolarPrecessionRateArcsecPerYrAtAge(0), beat0 = 1296000 / (pc0 - s3);
   for (const t of [0, 380, 650, 1400, 2460]) {
@@ -273,10 +273,10 @@ function blockObliquityBeat() {
     // plan 09 step 5d: the chain's tropical year is one equinox turn per T_p(t) (Julian years), so the
     // sidereal/tropical beat is T_p·(Julian year/sidereal year) + 1 — the unit-count form of 2.1 step 4c
     if (Math.abs(TpPair - (Tp * 365.25 * 86400 / sid + 1)) > 1e-6 * Tp) throw new Error(`the deep chain's year beat ≠ T_p(t) in sidereal years at ${t} Ma`);
-    rows.push(`| ${t} | **${f(Tp, 3)}** | ${f(TpPair, 3)} | ${f(pc, 3)} | ${f(DT.eraClockHAtAge(t) / 13, 3)} | ${f(1296000 / (pc - s3) / 1000, 2)} | ${f(beat0 * Tp / Tp0 / 1000, 2)} |`);
+    rows.push(`| ${t} | **${f(Tp, 3)}** | ${f(TpPair, 3)} | ${f(pc, 3)} | ${f(1296000 / (pc - s3) / 1000, 2)} | ${f(beat0 * Tp / Tp0 / 1000, 2)} |`);
   }
   rows.push('');
-  rows.push(`s₃ = the dominant Earth ζ mode of data/nbody-deep-secular-modes.json = ${f(-s3, 4)} ″/yr (amplitude ${f(Math.hypot(z.re, z.im), 5)}); beat = 1,296,000/(ψ̇ᵢₙ − |s₃|) yr at an instant, ψ̇ᵢₙ the spin axis’s inertial rate; a RECORD sees the window mean of the pole rate with its of-date factors (createModel().lunisolar.spinAxisInertialRateMeanArcsecPerYr / obliquityPeriodRealizedYears — the obliquity lines ride the LR04-window mean, v23.0). Plan 06 D6 → Phase 3 → S5: ψ̇(t) is the composed lunisolar rate on the model’s one J2000 reading (T_p(J2000) = ${f(Tp0, 1)} yr, 1,296,000/p_A on the IAU 2006 input since plan 09). The unit’s tidal-mean year pair still beats at H(t)/13 (third column) — that 13/H is the unit’s CALENDAR convention (the kinematic day/year identities, the deep JD↔year calendar), kept unchanged in S5 so nothing certified moves; it is not a precession claim (plan-06 D2 decided: that tier stays a named device — beyond ±2 Myr the calendar beat sits a constant 0.086 % above the composed period, the anchor ratio, so a re-base would buy nothing physical). Registry keys \`obliqBeatJ2000Kyr\`/\`obliqBeat1400MaKyr\`/\`obliqBeat2460MaKyr\` are the sixth column; \`obliqH8Scaled*Kyr\` (name kept) is the seventh, the pure precession-scaling alternative "obliquity period ∝ T_p" — the J2000 beat held proportional to T_p(t), identical to the beat today and the discriminated alternative at depth (D8 iii; S5 retired its former T_p·13/8 = H/8 form). The pre-Phase-3 "structural" beat on H_era/13 is retired.`);
+  rows.push(`s₃ = the dominant Earth ζ mode of data/nbody-deep-secular-modes.json = ${f(-s3, 4)} ″/yr (amplitude ${f(Math.hypot(z.re, z.im), 5)}); beat = 1,296,000/(ψ̇ᵢₙ − |s₃|) yr at an instant, ψ̇ᵢₙ the spin axis’s inertial rate; a RECORD sees the window mean of the pole rate with its of-date factors (createModel().lunisolar.spinAxisInertialRateMeanArcsecPerYr / obliquityPeriodRealizedYears — the obliquity lines ride the LR04-window mean, v23.0). Plan 06 D6 → Phase 3 → S5: ψ̇(t) is the composed lunisolar rate on the model’s one J2000 reading (T_p(J2000) = ${f(Tp0, 1)} yr, 1,296,000/p_A on the IAU 2006 input since plan 09). The unit’s tidal-mean year pair still beats at H(t)/13 (third column) — that 13/H is the unit’s CALENDAR convention (the kinematic day/year identities, the deep JD↔year calendar), kept unchanged in S5 so nothing certified moves; it is not a precession claim (plan-06 D2 decided: that tier stays a named device — beyond ±2 Myr the calendar beat sits a constant 0.086 % above the composed period, the anchor ratio, so a re-base would buy nothing physical). Registry keys \`obliqBeatJ2000Kyr\`/\`obliqBeat1400MaKyr\`/\`obliqBeat2460MaKyr\` are the fifth column; \`obliqH8Scaled*Kyr\` (name kept) is the sixth, the pure precession-scaling alternative "obliquity period ∝ T_p" — the J2000 beat held proportional to T_p(t), identical to the beat today and the discriminated alternative at depth (D8 iii; S5 retired its former T_p·13/8 = H/8 form). The pre-Phase-3 "structural" beat on H_era/13 is retired.`);
   return rows.join('\n');
 }
 
@@ -285,9 +285,12 @@ const BLOCKS_CHAIN4 = {
   'calcmap-obliquity-beat': blockObliquityBeat,
 };
 
-// ── Chain 5 — the cardinal points and the clock ──────────────────────────────
-const FC = require(join(ROOT, 'packages/physics/src/constants/coefficients.js')).FITTED_COEFFICIENTS;
-const AR_CARDINAL_2000 = require(join(ROOT, 'public/input/astro-reference.json')).cardinalPointAnchors;   // the USNO 2000 instants (R4d)
+// ── Chain 5 — the cardinal points ────────────────────────────────────────────
+// (Plan 09 step 7a: the frozen cardinal record's rebuild — `cardinalRebuilds`
+// on createCardinalModel with the CARDINAL_POINT_* coefficients, knocked out
+// term group by term group, and its two blocks `calcmap-cardinal-anchors` /
+// `calcmap-cardinal-decomposition` — is deleted with the evaluator and the
+// coefficients; doc 110 §5.5 keeps the last render as static text.)
 const CP_TYPES = /** @type {const} */ (['VE', 'SS', 'AE', 'WS']);
 
 /** Julian Day → 'YYYY-MM-DD hh:mm' — PROLEPTIC Gregorian at every epoch (Meeus
@@ -307,112 +310,6 @@ function jdToDateString(jd) {
   return `${year} ${p2(month)}-${p2(day)} ${p2(hh)}:${p2(mm)}`;
 }
 
-/** The model's OWN cardinal factory, rebuilt with term groups knocked out so
- *  each group's contribution can be written down. The full rebuild is
- *  asserted bit-identical to m.cardinal.jd — otherwise the decomposition
- *  would describe a different device than the one that ships. */
-function cardinalRebuilds() {
-  const { createCardinalModel } = require(join(ROOT, 'packages/physics/src/cardinal/index.cjs'));
-  const H = K.foundational.holisticyearLength;
-  const mSY = Math.round(K.foundational.inputmeanlengthsolaryearindays * (H / 8)) / (H / 8);
-  const balancedYear = 2000;   // plan 07 R10: the combs' phase origin is J2000 (the former t₀ was rotated out of the coefficients)
-  const A = K.earth.earthInvPlaneInclinationAmplitude, tilt = K.earth.earthtiltMean;
-  const EMPTY = { SS: [], WS: [], VE: [], AE: [] };
-  /** @param {Partial<{harmonics: any, eccTerms: any, jointTerms: any, tropicalHarmonics: any}>} o */
-  const build = (o = {}) => createCardinalModel({
-    isDeepTime: () => true,
-    constants: {
-      anchors: FC.CARDINAL_POINT_ANCHORS_ADJUSTED,
-      harmonics: 'harmonics' in o ? o.harmonics : FC.CARDINAL_POINT_HARMONICS,
-      eccTerms: 'eccTerms' in o ? o.eccTerms : FC.CARDINAL_POINT_ECC_TERMS,
-      jointTerms: 'jointTerms' in o ? o.jointTerms : FC.CARDINAL_POINT_JOINT_TERMS,
-      derived: FC.CARDINAL_POINT_DERIVED,
-      tropicalHarmonics: 'tropicalHarmonics' in o ? o.tropicalHarmonics : [],   // plan 09: the tropical comb is deleted (this retired device renders without it)
-      balancedYear, meanSolarYearDays: mSY, hJ2000: H, tiltMeanDeg: tilt, raAngleDeg: 2 * A - A * A / tilt, inclAmplitudeDeg: A,
-    },
-    fns: {
-      cyclesBetween: (/** @type {number} */ a, /** @type {number} */ b, /** @type {number} */ n) => m.epoch.cyclesBetween(a, b, n),
-      // the frozen era clock's deps ride ITS counter H_era (plan 06 D8) — as model.js injects them
-      analyticTropicalDays: (/** @type {number} */ year) => {
-        const tMa = (2000.5 - year) / 1e6, Ht = DT.eraClockHAtAge(tMa);
-        return Number.isFinite(Ht) ? (DT.meanSiderealYearSecondsAtAge(tMa) / 86400) * (1 - 13 / Ht) : null;
-      },
-      meanHAtAgeMa: (/** @type {number} */ tMa) => DT.eraClockHAtAge(tMa),
-      meanYearRealLodDays: () => null,
-      eccentricityAt: (/** @type {number} */ y) => m.earth.eccentricity(y),
-      eccentricityRateAt: () => 0,
-    },
-  });
-  const full = build();
-  // Plan 06 R1: the rebuild is the RETIRED device (the record); the shipped
-  // instants are the apparent crossings of the one Sun. The gap between the
-  // two is measured here and written into the tables, never asserted away.
-  /** @type {Record<string, Record<string, number>>} retired device − shipped crossing, minutes */
-  const vsShipping = {};
-  for (const y of [-10000, -2584, -584, 0, 1246, 2000, 5000, 10000]) {
-    vsShipping[y] = {};
-    for (const t of CP_TYPES) vsShipping[y][t] = (full.computeSolsticeJD(y, t) - m.cardinal.jd(y, t)) * 1440;
-  }
-  return {
-    balancedYear, mSY,
-    full, vsShipping,
-    noDelta: build({ harmonics: EMPTY, eccTerms: null, jointTerms: null }),
-    noDeltaNoIh: build({ harmonics: EMPTY, eccTerms: null, jointTerms: null, tropicalHarmonics: [] }),
-    harmOnly: build({ eccTerms: null, jointTerms: null }),
-    eccOnly: build({ harmonics: EMPTY, jointTerms: null }),
-    jointOnly: build({ harmonics: EMPTY, eccTerms: null }),
-  };
-}
-
-function blockCardinalAnchors() {
-  const R = cardinalRebuilds();
-  const D = FC.CARDINAL_POINT_DERIVED;
-  const rows = [
-    '| quantity | value | what it is | H-role |',
-    '|---|---|---|---|',
-    `| phase origin of EVERY comb | ${f(R.balancedYear, 0)} (J2000) | plan 07 R10: the former fitted origin — \`perihelionalignmentYear\` ${K.earthOrbital.perihelionalignmentYear} − 14.5 × H/16 = −302,635, "obliquity cycle position 14.5 of 16" — was rotated out of every (sin, cos) pair exactly (c0 = ${f(K.earth.kDeviceWheelPhaseAtJ2000Cycles, 15)} anchor units, \`tools/fit/reorigin-combs-j2000.mjs\`); its inputs left the JSON | — (no offset counted) |`,
-    `| meanSolarYearDays | ${f(R.mSY, 12)} | the whole-days snap of chain 3.1 | **L** |`,
-    `| lincoef (d/yr) | ${f(D.lincoef, 11)} | the fitted linear term of ΣT_trop — used VERBATIM (recomputing it from the 1-yr anchor injects a −12,276 s ramp) | — (fitted) |`,
-    `| h0, h1 | ${f(D.h0, 4)}, ${f(D.h1, 6)} | H inside the Ih integral as h0 + h1·c (c = cycles since J2000; h0 absorbed h1·c0 at the re-origin): the fit's own linear H(c) | **P** |`,
-    `| harmonic divisors (per point, 23 lines each) | ${FC.CARDINAL_POINT_HARMONICS.SS.map((r) => r[0]).join(', ')} | δ_X sinusoids on 2π·div·c | **C** |`,
-    `| equation-of-centre orders | ${FC.CARDINAL_POINT_ECC_TERMS.SS.map((t) => t.order).join(', ')} (phase 2π·16·c; e(t) from the H/3 law) | e(t)ⁿ·[sin, cos](n·θ₁₆) — the braid; ~1.78 d amplitude | **L** (the perihelion-of-date phase counted as H/16) |`,
-    `| joint sidebands (shared by the four points) | ${FC.CARDINAL_POINT_JOINT_TERMS.terms.length} terms, orders ${[...new Set(FC.CARDINAL_POINT_JOINT_TERMS.terms.map((t) => t.order))].join(', ')} × divisors ${[...new Set(FC.CARDINAL_POINT_JOINT_TERMS.terms.map((t) => t.div))].join(', ')} | phase order·λ_X − 2π·div·c, λ_X = ${Object.entries(FC.CARDINAL_POINT_JOINT_TERMS.quadratureDeg).map(([k, v]) => `${k} ${v}°`).join(', ')}; COUNTER-rotating (the load-bearing minus sign) | **C** |`,
-    '',
-    '| point | shipped anchor `CARDINAL_POINT_ANCHORS_ADJUSTED` (JD, date) | legacy base key `CARDINAL_POINT_ANCHORS` (JD, date) | shipped − legacy (h) |',
-    '|---|---|---|---|',
-  ];
-  for (const t of CP_TYPES) {
-    const b = FC.CARDINAL_POINT_ANCHORS_ADJUSTED[t], a = FC.CARDINAL_POINT_ANCHORS[t];
-    rows.push(`| ${t} | ${f(b, 6)} (${jdToDateString(b)}) | ${f(a, 6)} (${jdToDateString(a)}) | ${f((b - a) * 24, 3)} |`);
-  }
-  rows.push('');
-  rows.push(`USNO 2000 instants for comparison (UTC, minute precision — the registry \`cardinalPointAnchors\`, astro-reference, ONE home since R4d): ${CP_TYPES.map((t) => `${t} ${f(AR_CARDINAL_2000[t], 4)} (${jdToDateString(AR_CARDINAL_2000[t])})`).join(' · ')}. Plan 06 R1: NO runtime reads either fitted anchor set any more — the shipped instants are the apparent crossings of the one Sun (\`createModel().cardinal\`, delegated to by script.js and tools/lib); both fitted keys stay in the coefficients file as the retired device's record until the cleanup phase. (R4c closed the last reader: the simulator's cardinal panel had re-solved the events on the rendered scene and bridged them to the ADJUSTED set with a J2000 offset; it now reads \`cardinal.jdNearUT\` seeded at the displayed calendar year's midpoint — the model year and the calendar year part by 0.0078 d/yr, 114 yr at −5.34 Myr. R4d: the registry's VE/AE entries had been retired-device anchors 112 min off the USNO instants; corrected.)`);
-  return rows.join('\n');
-}
-
-function blockCardinalDecomposition() {
-  const R = cardinalRebuilds();
-  const D = FC.CARDINAL_POINT_DERIVED, a = FC.CARDINAL_POINT_ANCHORS_ADJUSTED.SS;
-  const rows = [
-    '| year | lincoef·(Y−2000) (d) | drift Simpson (d) | Ih (d) | Σ sinusoids − δ(2000) (d) | equation-of-centre orders (d) | joint sidebands (d) | JD_SS − anchor (d) | cycles since the balanced year, integrated | linear (Y − bY)/H |',
-    '|---|---|---|---|---|---|---|---|---|---|',
-  ];
-  for (const y of [-10000, -2584, -584, 0, 1246, 2000, 5000, 10000]) {
-    const lin = D.lincoef * (y - 2000);
-    const base2 = R.noDeltaNoIh.computeSolsticeJD(y, 'SS') - a, base = R.noDelta.computeSolsticeJD(y, 'SS') - a;
-    const nd = R.noDelta.computeSolsticeJD(y, 'SS');
-    rows.push(`| ${y} | ${f(lin, 4)} | ${f(base2 - lin, 5)} | ${f(base - base2, 5)} | ${f(R.harmOnly.computeSolsticeJD(y, 'SS') - nd, 5)} | ${f(R.eccOnly.computeSolsticeJD(y, 'SS') - nd, 5)} | ${f(R.jointOnly.computeSolsticeJD(y, 'SS') - nd, 5)} | ${f(m.cardinal.jd(y, 'SS') - a, 5)} | ${f(m.epoch.cyclesBetween(R.balancedYear, y, 1), 7)} | ${f((y - R.balancedYear) / K.foundational.holisticyearLength, 7)} |`);
-  }
-  rows.push('');
-  rows.push('');
-  rows.push('| year | retired device − shipped crossing (min): VE · SS · AE · WS |');
-  rows.push('|---|---|');
-  for (const y of [-10000, -2584, -584, 0, 1246, 2000, 5000, 10000]) rows.push(`| ${y} | ${CP_TYPES.map((t) => f(R.vsShipping[y][t], 1)).join(' · ')} |`);
-  rows.push('');
-  rows.push('Plan 06 R1: this decomposition is the RETIRED device\'s (the record — its coefficients stay in the file); the shipped `cardinal.jd` is the apparent crossing of the one Sun, and the second table is the measured gap between the two (the 2000 row is the anchor convention: the device was pinned to the USNO instants, the crossing carries the mean-longitude anchor L0 and aberration/nutation derived). The six component columns sum to the eighth exactly. Every term is zero at 2000 by construction — the self-correction δ_X(2000) pins the anchor.');
-  return rows.join('\n');
-}
-
 function blockCardinalEvents() {
   const rows = [
     '| year | VE | SS | AE | WS | SS→SS interval (d) | `yearLengthDays(SS)` (d, the crossing interval — the same quantity since R1) | mean of four (d) | one-family mean tropical year (s) | e |',
@@ -428,7 +325,6 @@ function blockCardinalEvents() {
 }
 
 function blockCardinalSpread() {
-  const R = cardinalRebuilds();
   const rows = [
     '| year | crossing intervals: T_X − mean (s) VE · SS · AE · WS | one-source structure: T_X − mean (s) VE · SS · AE · WS | structure anomalistic year (s) | RA of VE (°) — the target by construction since R1 | e |',
     '|---|---|---|---|---|---|',
@@ -441,13 +337,13 @@ function blockCardinalSpread() {
   }
   const sinE = Math.sin(K.earth.earthtiltMean * Math.PI / 180), A = K.earth.earthInvPlaneInclinationAmplitude;
   rows.push('');
-  rows.push(`Retired device's RA formula constants (the record; since R1 the shipped RA is the target longitude by construction): raMean = base − earthRAAngle/sin ε̄ = base − ${f((2 * A - A * A / K.earth.earthtiltMean) / sinE, 6)}°, amplitude A/sin ε̄ = ${f(A / sinE, 6)}° on −sin(2π·3·c) + sin(2π·8·c) (base 0/90/180/270° for VE/SS/AE/WS). Balanced year used by both devices: ${f(R.balancedYear, 5)}.`);
+  rows.push(`Retired device's RA formula constants (the record; since R1 the shipped RA is the target longitude by construction): raMean = base − earthRAAngle/sin ε̄ = base − ${f((2 * A - A * A / K.earth.earthtiltMean) / sinE, 6)}°, amplitude A/sin ε̄ = ${f(A / sinE, 6)}° on −sin(2π·3·c) + sin(2π·8·c) (base 0/90/180/270° for VE/SS/AE/WS); c counted from J2000 since plan 07 R10 (the device itself is deleted, plan 09 step 7a).`);
   return rows.join('\n');
 }
 
 const BLOCKS_CHAIN5 = {
-  'calcmap-cardinal-anchors': blockCardinalAnchors,
-  'calcmap-cardinal-decomposition': blockCardinalDecomposition,
+  // (calcmap-cardinal-anchors / calcmap-cardinal-decomposition: the frozen
+  //  record's blocks — deleted at plan 09 step 7a; doc 110 §5.5 keeps the last render)
   'calcmap-cardinal-events': blockCardinalEvents,
   'calcmap-cardinal-spread': blockCardinalSpread,
 };

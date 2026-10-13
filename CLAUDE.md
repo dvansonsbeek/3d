@@ -464,7 +464,8 @@ is frozen in the registry like `kValue`. **Plan 07 R10 (model v21.0,
 physics MAJOR 17, model-values MAJOR 16): the combs' phase origin is J2000.**
 The fitted origin t₀ (`perihelionalignmentYear` − `temperatureGraphMostLikely`
 × H/16 = −302,635, the "balanced year") was rotated out of every (sin, cos)
-pair EXACTLY — no refit, `tools/fit/reorigin-combs-j2000.mjs`, c0 = (2000 −
+pair EXACTLY — no refit, `tools/fit/reorigin-combs-j2000.mjs` (deleted with
+the last comb at plan 09 step 7a), c0 = (2000 −
 t₀)/H = 0.908498525276082 anchor units, bit-identical on every package
 surface over ±300 kyr — and its two inputs left the JSON (literals gate
 ratchet). The RA day offset's cosine literals became the fitted family
@@ -480,9 +481,10 @@ stays as c0; the diagnostic now rotates the aberration about the ecliptic
 pole OF DATE built in the rotation-axis frame (the NASA rows moved ≤0.19″
 at the ancient events — the ~47″/cy tilt of the ecliptic the world-Y form
 ignored), and any new world-axis reader in `src/script.js` must do the
-same. `cyclesBetweenYears(2000, Y, N)` is the integrated form from
-J2000 (the R3 call-shape rule's `driftRefYear` is the model start, not 2000);
-since plan 09 step 5c the K-device wheels no longer ride it — they turn
+same. `cyclesBetweenYears(2000, Y, N)` was the integrated form from
+J2000 (the R3 call-shape rule's `driftRefYear` the model start, not 2000);
+since plan 09 step 5c the K-device wheels no longer ride it (the counter
+itself is deleted at step 7a) — they turn
 uniformly at their recorded J2000 rates from the recorded J2000 phase (the
 engine frame is placed over them, R4). **Plan 07 R1/R8 (model v19.0,
 physics MAJOR 15, model-values MAJOR 14): the retired laws' INPUTS left
@@ -557,13 +559,15 @@ its dynamical value under the measured
 solar-mass history — degenerate today with the pure precession-scaling
 reading "obliquity period ∝ T_p", roughly a factor two apart at 2.46 Ga;
 registry keys `obliqBeat*Kyr` / `obliqH8Scaled*Kyr` (name kept), doc 109
-§18). **Two named counters** (plan 06 D8): the FROZEN era clock — the
-remaining comb (the cardinal record; the perihelion comb left at step 4, the RA day offset at step 5b) and the ∫dt/H
-phase table; the year-length combs are deleted (plan 09) — rides its own fitted
-convention `eraClockHAtAge` = H₀·LOD/LOD₀ (pure spin scaling, the
-pre-Phase-3 "H/13 identity", shipped with their coefficients as a device
-constant — as a precession claim it is retired: it read
-~35 % low against Lantink 2022 at 2.46 Ga); never call it H(t). The
+§18). **Two named counters** (plan 06 D8) — the second DELETED at plan 09
+step 7a: the FROZEN era clock (the combs and the ∫dt/H phase table) rode its
+own fitted convention `eraClockHAtAge` = H₀·LOD/LOD₀ (pure spin scaling, the
+pre-Phase-3 "H/13 identity", shipped with the coefficients as a device
+constant — as a precession claim retired: it read ~35 % low against Lantink
+2022 at 2.46 Ga); plan 09 deleted the combs family by family (steps 2–6) and
+then the counter itself (`createPhaseMachinery`, `cyclesBetweenYears`,
+`eraClockHAtAge`, the cardinal record evaluator, the CSV `Cycle` column);
+the spin-scaling factor survives only INSIDE the unit's `hAtAge`. The
 long-eccentricity band stays at its modern class (scaled
 only by the measured solar-mass history); every newly dated Precambrian
 cyclostratigraphic section tests these halves (the precession side is

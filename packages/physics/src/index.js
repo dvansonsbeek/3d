@@ -94,19 +94,20 @@ export { FITTED_COEFFICIENTS, COEFFICIENTS_HASH } from './constants/index.js';
 export { createEpochPrimitives } from './layer0/index.js';
 export { deriveEpochParams } from './layer0/derive-params.js';
 export { createDerivedViews } from './layer1/index.js';
-// Phase 7 — the shared integrated-phase and cardinal-point machinery (CJS on
-// purpose: tools/lib requires the same files via the exports-map subpaths;
-// re-exported here so bundled ESM consumers need only the package root).
-export { createPhaseMachinery } from './phase/index.cjs';
-// The deep-time calendar (year ↔ JD under the drifting year length, the
-// H-balanced event finder) — ONE implementation for both engines since the
-// year/day collapse (formerly the PHASE-B-DUPLICATE family).
+// (Plan 09 step 7a: the Phase 7 integrated-phase machinery `createPhaseMachinery`
+// — the ∫dt/H_era table and the cycle counters every comb read — and the
+// frozen cardinal record evaluator `createCardinalModel` (the §10 derived
+// form on the deleted CARDINAL_POINT_* coefficients) are DELETED; the
+// cardinal instants are createModel().cardinal, the one Sun's crossings.)
+// The deep-time calendar (year ↔ JD under the drifting year length) — ONE
+// implementation for both engines since the year/day collapse (formerly the
+// PHASE-B-DUPLICATE family). CJS on purpose: tools/lib requires the same
+// file via the exports-map subpath; re-exported here so bundled ESM
+// consumers need only the package root.
 export { createDeepCalendar } from './phase/deep-calendar.cjs';
-export { createCardinalModel } from './cardinal/index.cjs';
 // D4b: the one-source cardinal structure — the EoC layer (year lengths,
 // crossing offsets, the e(t)-proportional spread) on the movement's own
-// e(t)/ϖ(t). Absolute dates deliberately excluded (per-renderer mean chain);
-// the frozen createCardinalModel stays the certified era device.
+// e(t)/ϖ(t). Absolute dates deliberately excluded (per-renderer mean chain).
 export { createCardinalStructure } from './cardinal/one-source-structure.cjs';
 // Phase 8.2 — the lunar machinery, extracted layer by layer (survey order:
 // eccentricity channel → month chain → cycle tables → arguments → series →

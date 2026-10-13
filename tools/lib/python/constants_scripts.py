@@ -66,12 +66,9 @@ EARTH_INCLINATION_MEAN = _C['earthInvPlaneInclinationMean']
 EARTH_INCLINATION_AMPLITUDE = _C['earthInvPlaneInclinationAmplitude']
 EARTH_RA_ANGLE = _C['earthRAAngle']
 
-# Cardinal Point JD harmonics (fitted, from constants.js)
-CARDINAL_POINT_ANCHORS = {k: v for k, v in _C['CARDINAL_POINT_ANCHORS'].items()}
-CARDINAL_POINT_HARMONICS = {
-    k: [tuple(h) for h in v] for k, v in _C['CARDINAL_POINT_HARMONICS'].items()
-}
-SOLSTICE_JD_HARMONICS = CARDINAL_POINT_HARMONICS['SS']
+# (plan 09 step 7a: CARDINAL_POINT_ANCHORS / CARDINAL_POINT_HARMONICS /
+# SOLSTICE_JD_HARMONICS — the frozen cardinal record — are deleted with the
+# coefficients; no script imported them)
 
 # Obliquity formula (fitted, from constants.js)
 # (plan 09: SOLSTICE_OBLIQUITY_MEAN / SOLSTICE_OBLIQUITY_HARMONICS retired — the

@@ -11,7 +11,7 @@ import { Pane } from 'tweakpane';
 //
 // Generated at build time, not fetched at runtime — `holisticyearLength` is read
 // at module scope below, and Phase 15 requires offline === hosted.
-import { computeObliquityJ2000Deg, computeSecularShape, DEFAULT_CONSTANTS as K, REFERENCE_DATA as R, FITTED_COEFFICIENTS as FIT, CONSTANTS_HASH, COEFFICIENTS_HASH, MODEL_VERSION, PREPRINT_DOI, createEpochPrimitives, createPhaseMachinery, createDeepCalendar, createDeepEccChannel, DEEP_MODES_ARTIFACT, createDeepOrbitalHistory, createYearLengths, computeMeanTropicalYearJ2000Days, createMoonMonthChain, createChainCycleIntegrator, createMoonArguments, createMoonSeries, createMoonApparent, derivePlanetGeometry, planetOrbitChain as _POC, createDeltaTCycles, createDeepTimeLod, createMoonRecessionHistory, createSolarChannelBudget, deltaTEspenakMeeusCanonSeconds, evalClimateL1OrbitalPermil, createAlphaGiaChannel, computeSolarTorqueShare, createEclipseFinders, createModel, buildPlanetChainsFromArtifactData, computePlanetElementsAtYear as kcComputePlanetElementsAtYear, computeHeliocentricEclipticFromElements as kcComputeHeliocentricEclipticFromElements, computeEquatorNodeOriginSFrameDeg, convertNodeSFrameToEquatorOriginDeg, createSecularSeriesOverride, CHAIN_ARTIFACT, ANCHOR_EPOCH_YEAR as KC_ANCHOR_EPOCH_YEAR, ANCHOR_EPOCH_JD as KC_ANCHOR_EPOCH_JD, computeEarthFrameOfDate, solveWheelAngleForLongitude } from '@essrt/physics';
+import { computeObliquityJ2000Deg, computeSecularShape, DEFAULT_CONSTANTS as K, REFERENCE_DATA as R, FITTED_COEFFICIENTS as FIT, CONSTANTS_HASH, COEFFICIENTS_HASH, MODEL_VERSION, PREPRINT_DOI, createEpochPrimitives, createDeepCalendar, createDeepEccChannel, DEEP_MODES_ARTIFACT, createDeepOrbitalHistory, createYearLengths, computeMeanTropicalYearJ2000Days, createMoonMonthChain, createChainCycleIntegrator, createMoonArguments, createMoonSeries, createMoonApparent, derivePlanetGeometry, planetOrbitChain as _POC, createDeltaTCycles, createDeepTimeLod, createMoonRecessionHistory, createSolarChannelBudget, deltaTEspenakMeeusCanonSeconds, evalClimateL1OrbitalPermil, createAlphaGiaChannel, computeSolarTorqueShare, createEclipseFinders, createModel, buildPlanetChainsFromArtifactData, computePlanetElementsAtYear as kcComputePlanetElementsAtYear, computeHeliocentricEclipticFromElements as kcComputeHeliocentricEclipticFromElements, computeEquatorNodeOriginSFrameDeg, convertNodeSFrameToEquatorOriginDeg, createSecularSeriesOverride, CHAIN_ARTIFACT, ANCHOR_EPOCH_YEAR as KC_ANCHOR_EPOCH_YEAR, ANCHOR_EPOCH_JD as KC_ANCHOR_EPOCH_JD, computeEarthFrameOfDate, solveWheelAngleForLongitude } from '@essrt/physics';
 // K8 — the reference package: ONE-WAY imports (comparison only;
 // @essrt/reference is private-by-construction and nothing in the model
 // chain depends on it). publishedCurves migrated here from
@@ -656,23 +656,13 @@ const STELLAR_DAY_RA_PROJECTION = stellarDayRaProjection(K.earthOrbital.obliquit
 // Earth frame — and nothing but a probe surface and a diagnostic column read
 // it since.)
 
-// ─── B5. Cardinal point harmonics (fitted) ───────────────────────────────
-// Source: public/input/fitted-coefficients.json
-// (CARDINAL_POINT_ANCHORS — the ADJUSTED J2000 anchor set — left this file at
-// plan 06 R4c with the D4b panel solver, its last reader; both anchor keys
-// stay in the coefficients file as the retired device's record.)
-const CARDINAL_POINT_HARMONICS = FIT.CARDINAL_POINT_HARMONICS;
-// §10 — equation-of-centre braiding terms ({order, sin, cos}, deliberately NOT
-// the [div, sin, cos] harmonic shape: these are e(t)^n·sin(nM) with e(t) the
-// LAW OF COSINES — reading them as H/16 and H/32 sinusoids would be wrong by
-// the whole braid, ~1.78 d) and the fit-calibrated lincoef + H(c) model the
-// runtime must reuse VERBATIM, never recompute (§10c, §10e-quinquies).
-const CARDINAL_POINT_ECC_TERMS = FIT.CARDINAL_POINT_ECC_TERMS;
-const CARDINAL_POINT_DERIVED = FIT.CARDINAL_POINT_DERIVED;
-// §10g — quadrature-locked joint sidebands: coefficients SHARED across the
-// four cardinal points, phase = order·λ_X − 2π·div·cycles (COUNTER-rotating —
-// the sign is load-bearing; see the fitter).
-const CARDINAL_POINT_JOINT_TERMS = FIT.CARDINAL_POINT_JOINT_TERMS;
+// ─── B5. Cardinal point harmonics — DELETED (plan 09 step 7a) ──────────────
+// The frozen cardinal record (CARDINAL_POINT_HARMONICS / _ECC_TERMS / _DERIVED
+// / _JOINT_TERMS, the §10 derived form on the era clock's counter; the two
+// anchor keys left at plan 06 R4c) is gone from the coefficients file with its
+// package evaluator; the cardinal instants are the one Sun's apparent
+// crossings, createModel().cardinal (plan 06 R1). Git history carries the
+// coefficients; doc 110 §5.2/§5.5 the frozen record.
 
 // ─── D. MOON MEEUS TABLES (source: public/input/meeus-lunar-tables.json) ─
 // Meeus Ch. 47, Tables 47.A (longitude, 60 terms) and 47.B (latitude, 60 terms)
@@ -2799,13 +2789,10 @@ function _lodKinematicSecondsOfDate(year) {
 // ───── STEP 2 — Earth Fundamental Cycle H(t) ─────
 /** H(t) in years. Returns HOLISTIC_YEAR_J2000 (335,317) exactly at t_Ma = 0. */
 function meanHAtAge(t_Ma) { return _deepLod().hAtAge(t_Ma); }
-// The FROZEN era clock's own counter and bases (plan 06 D8: two named
-// counters). H_era = H₀·LOD/LOD₀ is the pre-Phase-3 "H/13 identity" — the
-// ∫dt/H phase table, the cardinal era clock, the year-length comb family and
-// the perihelion-harmonics device were fitted against it and ride it; the
-// unit H(t) = 13·T_p,composed (meanHAtAge) is what the physics publishes.
-function eraClockHAtAge(t_Ma) { return _deepLod().eraClockHAtAge(t_Ma); }
-function eraClockYearInDaysAtAge(t_Ma) { return _deepLod().eraClockYearInDaysAtAge(t_Ma); }
+// (Plan 09 step 7a: the FROZEN era clock's own counter and bases — H_era =
+// H₀·LOD/LOD₀, plan 06 D8's second named counter, which the ∫dt/H phase
+// table, the cardinal era clock, the year-length combs and the perihelion
+// device were fitted against — are deleted with the last comb.)
 
 // ───── Driver 2 — AU and year_s ─────
 /** Earth semi-major axis in km at given epoch (adiabatic a × M = const).
@@ -4433,68 +4420,31 @@ function recomputeDerivedAnchorsForEpoch(t_Ma) {
 // Future range ±500 Myr symmetric (was +1 Myr with a stale "+700 kyr
 // tidal-lock asymptote" note — measured: the H/LOD/month chains are smooth
 // and physical to +500 Myr, LOD 24→27.4 hr, month 27.32→29.42 d; the true
-// lock asymptote is ~Gyr-scale). The old +1 Myr cutoff made
-// cyclesBetweenYears return null past +1 Myr, silently dropping the Moon
-// arguments to the Meeus polynomial skeleton whose fitted T⁴ tail cancels
-// the lunar mean motion at year ~1,989,000 and REVERSES it beyond
-// (user-visible: Moon stationary at +2.0 Myr, retrograde at +2.1 Myr).
+// lock asymptote is ~Gyr-scale). The old +1 Myr cutoff silently dropped the
+// Moon arguments to the Meeus polynomial skeleton past +1 Myr, whose fitted
+// T⁴ tail cancels the lunar mean motion at year ~1,989,000 and REVERSES it
+// beyond (user-visible: Moon stationary at +2.0 Myr, retrograde at +2.1 Myr).
+// The grid is the deep-time grid of the days/pos tables and the deep calendar.
 const _CUMUL_INTEGRAL_YEAR_MIN = -500e6;
 const _CUMUL_INTEGRAL_YEAR_MAX = 500e6;
 const _CUMUL_INTEGRAL_STEP     = 10000;
-// Phase 7.1 — the table arithmetic lives in @essrt/physics/phase (ONE
-// implementation for every engine; the Node port of this very code delegated
-// first, fixtures bit-identical). This engine keeps its grid CONFIG
-// (injected above) and its OWN meanHAtAge twin as the integrand — the twins
-// dissolve into Layer 0 at Phase 8. R2 is honoured at construction:
-// ensureTable() runs under _withLatticeAlpha, so every invH evaluation sees
-// the constant MOI.
-let _phaseM = null;
-function _phase() {
-  if (_phaseM !== null) return _phaseM;
-  _phaseM = createPhaseMachinery({
-    // the frozen era clock's counter H_era (plan 06 D8), NOT the unit H(t)
-    holisticHAtAgeMa: (t_Ma) => eraClockHAtAge(t_Ma),
-    tableAnchorYear: startmodelYear,
-    driftRefYear: startmodelyearwithCorrection,
-    hJ2000: HOLISTIC_YEAR_J2000,
-    yearMin: _CUMUL_INTEGRAL_YEAR_MIN,
-    yearMax: _CUMUL_INTEGRAL_YEAR_MAX,
-    stepYears: _CUMUL_INTEGRAL_STEP,
-  });
-  _withLatticeAlpha(() => _phaseM.ensureTable());   // R2: lattice tables pin α
-  return _phaseM;
-}
-function _ensureCumulIntegralTable() { _phase(); }
-// Grid geometry for the days/pos tables below (they share this grid but keep
-// their own integrands until Phase 8 moves them).
-function _cumulIntegralJ2000IdxGet() { return _phase().grid().j2000Idx; }
-function _cumulIntegralLength() { return _phase().grid().length; }
-
-// Phase 7.1 — one-line delegates to @essrt/physics/phase (arithmetic + the R3
-// comments moved into the package verbatim; R2 pin honoured in _phase()).
-function _cumulIntegralAtYear(year) { return _phase().cumulAtYear(year); }
-
-/** ∫_{yearA}^{yearB} 1/H(t') dt' via cumulative-table lookup. Years are calendar
- *  years (J2000 = 2000.5). Returns null if either endpoint is outside the
- *  precomputed range (±500 Myr symmetric).
- *  The `_N_unused` arg is kept for backward-compat with old callers. */
-function integralInverseHFromYears(yearA, yearB, _N_unused = 1000) {
-  return _phase().integralBetween(yearA, yearB);
-}
-
-// (Plan 07 R10: the Phase 9.11 balanced-year navigation helpers —
-// `_yearAtCumulIntegral`, `trueYearAtCycle`, `findBalancedYearAtCycle`, the
-// k-th "H-balanced event" from t₀ — are gone with the phase origin and the
-// readouts they fed. The deep calendar keeps its event function in the
-// package, counting anchor units from J2000.)
+// Grid geometry for the pos table below (the deep calendar computes the same
+// two numbers for its own table). Plan 09 step 7a: until then the grid was
+// the ∫dt/H_era phase table's (`@essrt/physics/phase`, Phase 7.1) — the
+// frozen era clock's counter `cyclesBetweenYears` / `integralInverseHFromYears`
+// / `_getJ2000Drift` / `phaseAdvanceSnapshot`, which every comb read and
+// nothing read since step 5c; deleted with the last comb. (Plan 07 R10: the
+// Phase 9.11 balanced-year navigation helpers left with the phase origin.)
+function _cumulIntegralJ2000IdxGet() { return Math.round((startmodelYear - _CUMUL_INTEGRAL_YEAR_MIN) / _CUMUL_INTEGRAL_STEP); }
+function _cumulIntegralLength() { return Math.ceil((_CUMUL_INTEGRAL_YEAR_MAX - _CUMUL_INTEGRAL_YEAR_MIN) / _CUMUL_INTEGRAL_STEP) + 1; }
 
 // ───── The deep-time calendar — ONE home (year/day collapse) ─────
-// year → JD by the ∫ daysPerYear dt table on the phase grid, the SI-year
-// label, and the balanced-event finder: `@essrt/physics/phase/deep-calendar`,
-// extracted verbatim from the bodies that stood here (and their Node twins
-// in tools/lib/deep-time.js — the PHASE-B-DUPLICATE family). Built lazily
-// from this engine's phase machinery, days-per-year source and lattice-α
-// pin; the table itself is built on first use, under the lattice α (R2).
+// year → JD by the ∫ daysPerYear dt table on the deep-time grid and the
+// SI-year label: `@essrt/physics/phase/deep-calendar`, extracted verbatim
+// from the bodies that stood here (and their Node twins in
+// tools/lib/deep-time.js — the PHASE-B-DUPLICATE family). Built lazily from
+// this engine's grid, days-per-year source and lattice-α pin; the table
+// itself is built on first use, under the lattice α (R2).
 //
 // History kept with the code: 9.12.5 / 9.12.7 attempted Julian linear 365.25
 // to make `yearToJD ↔ jdToYearLinear` a round-trip identity (which would fix
@@ -4507,13 +4457,15 @@ let _deepCalM = null;
 function _deepCal() {
   if (_deepCalM !== null) return _deepCalM;
   _deepCalM = createDeepCalendar({
-    phase: _phase,
     meanYearInDaysAtAgeMa: meanYearInDaysAtAge,
     withLatticeAlpha: _withLatticeAlpha,
     startModelJD: startmodelJD,
     startModelYear: startmodelYear,
     startModelYearWithCorrection: startmodelyearwithCorrection,
     siTropicalYearDays: SI_TROPICAL_YEAR_DAYS,
+    yearMin: _CUMUL_INTEGRAL_YEAR_MIN,
+    yearMax: _CUMUL_INTEGRAL_YEAR_MAX,
+    stepYears: _CUMUL_INTEGRAL_STEP,
     // (plan 09 step 5d: the H-balanced event finder and its counter deps are gone)
   });
   return _deepCalM;
@@ -4554,8 +4506,7 @@ function _posAnchorDy() { _posAnchorLoIdx(); return _posAnchorDy0; }
 
 function _ensureCumulPosTable() {
   if (_cumulPosTable !== null) return;
-  _ensureCumulIntegralTable();                  // grid geometry
-  const N = _cumulIntegralLength();
+  const N = _cumulIntegralLength();             // grid geometry
   const j2000Idx = _cumulIntegralJ2000IdxGet();
   _cumulPosTable = new Float64Array(N);
 
@@ -4685,50 +4636,13 @@ function posFromDateTime(dateStr, timeStr) {
 // correction is a constant shift relative to integral form — slightly less
 // physically accurate than raw integral, but the harmonics weren't fit for deep
 // time anyway, and this makes DEEP_TIME=true and DEEP_TIME=false agree at J2000.
-// (Cache removed: it was keyed by year, and cyclesBetweenYears feeds it the
-// MOVING endpoint whenever that endpoint is farther from J2000 — during a
-// canon scan that is a unique year per evaluation, so the Map grew without
-// bound and hit V8's ~16.7M-entry cap ("Map maximum size exceeded") ~44
-// chunks into L-4. The computation is two cumulative-table lookups — cheaper
-// than the cache ever was.)
-function _getJ2000Drift(yearA) { return _phase().j2000Drift(yearA); }
-
-/** Total cycles between two years for a cycle of period H/divisor_N (in years).
- *  E.g. Earth perihelion ecliptic cycle = H/16 → divisor_N = 16.
- *  Mercury wobble = 4H → divisor_N = 1/4.
- *
- *  Deep-time ON → cumulative ∫1/H(t)dt form, with Phase 9.10b pattern correction
- *  subtracting the J2000 integral-vs-snapshot drift at anchor yearA so that
- *  snapshot-form-fitted harmonics produce calibration-matched values.
- *  Deep-time OFF → snapshot formula `cycles = divisor_N × (yearB − yearA) / H_live`
- *  (matches pre-Phase-8 production behavior). All 20+ Phase 8 / 8.5 callers funnel
- *  through this single function. */
-function cyclesBetweenYears(yearA, yearB, divisor_N) {
-  if (DEEP_TIME_MODE_ENABLED) {
-    // Integrated form + R3 call-shape anchor rule — delegated to
-    // @essrt/physics/phase (the comments moved there verbatim).
-    return _phase().cyclesBetween(yearA, yearB, divisor_N);
-  }
-  // Snapshot branch stays engine-local: it reads the LIVE mutated H
-  // (pre-Phase-8 production behavior when deep time is off).
-  return divisor_N * (yearB - yearA) / holisticyearLength;
-}
-
-// (plan 09 step 5c: `phaseAdvanceRadians` — 2π × cyclesBetweenYears — left
-// with the wheel drive; no reader remained.)
-
-/** Snapshot-form phase in radians — the convention used during harmonic
- *  fitting. Steps 4a, 6b, 6c, 6d all fit against scene-graph CSVs produced by
- *  `tools/lib/scene-graph.js`, which has zero deep-time references (pure
- *  snapshot kinematics using H = HOLISTIC_YEAR_J2000). Use this helper for
- *  every runtime formula that consumes fitted harmonics. The integrated form
- *  (cyclesBetweenYears) diverges from snapshot at years far from J2000 —
- *  formula-vs-data mismatches up to hours at year 10, days at −10 kyr, larger
- *  at deep time. Formulas that consume snapshot-fitted harmonics must NOT use
- *  that path. */
-function phaseAdvanceSnapshot(yearAnchor, year, divisor_N) {
-  return 2 * Math.PI * divisor_N * (year - yearAnchor) / HOLISTIC_YEAR_J2000;
-}
+// (Plan 09 step 7a: the cycle counters `_getJ2000Drift` / `cyclesBetweenYears`
+// — the ∫dt/H_era form with the Phase 9.10b J2000 drift correction under deep
+// time, N·(yearB − yearA)/H_live in snapshot mode — and the snapshot-form
+// `phaseAdvanceSnapshot` (2π·N·Δyear/H₀, the convention the retired combs
+// were fitted in) are DELETED: the combs and devices that read them are gone
+// (steps 2–6), the wheels are uniform rotations (5c), the Moon rides its
+// chain. Step 5c: `phaseAdvanceRadians` left with the wheel drive.)
 
 // ───── Fixed J2000 anchors (computed once at module load) ─────
 // These are the historical reference years for the eccentricity-oscillation
@@ -5217,7 +5131,7 @@ function updateAllObjectsForEpoch() {
 //
 // Gating: DEEP_TIME_MODE_ENABLED is the single master switch that controls:
 //   1. Animation-loop auto-sync from o.currentYear to setEpoch (line ~30847)
-//   2. Phase 8 integrated ∫1/H(t)dt math in cyclesBetweenYears (line ~4982)
+//   2. (the Phase 8 integrated ∫1/H(t)dt counter `cyclesBetweenYears` — deleted at plan 09 step 7a)
 //   3. Phase 9 SI-anchored sDay + cardinal-scan approxJDs + siderealDayRow LOD
 //      factor (helpers `_phase9YearToJDDays` / `_phase9SiderealDayLODFactor`)
 // When OFF the model matches pre-deep-time production behavior across all
@@ -5228,7 +5142,7 @@ function updateAllObjectsForEpoch() {
 const J2000_CALENDAR_YEAR = startmodelYear;   // 2000.5
 
 // ───── Phase 9.15: SI-tropical-year conversion (fixes Step 4 + Moon unit bug) ─────
-// The scene-graph integrators (cyclesBetweenYears, _moonChainCycles) expect
+// The scene-graph integrators (_moonChainCycles; until plan 09 step 7a also cyclesBetweenYears) expect
 // their year-difference input in SI tropical years (matching the H constant
 // which is defined in SI tropical years). Previously the call sites passed
 // `o.currentYear` from `julianDateToDecimalYear` which returns Gregorian/Julian
@@ -5245,9 +5159,9 @@ const J2000_CALENDAR_YEAR = startmodelYear;   // 2000.5
 // alternative anchor (2000.0 at j2000JD) is also a valid SI-tropical-year
 // labeling, but it produces a constant 0.0281-year offset relative to the
 // calendar-year coordinate used elsewhere in the deep-time chain
-// (BALANCED_YEAR_J2000_FIXED in calendar yr, `_getJ2000Drift` reference =
-// startmodelyearwithCorrection in calendar yr). With the J2000-epoch anchor,
-// `cyclesBetweenYears(BALANCED, _currentYearSI, N)` accumulates a constant
+// (BALANCED_YEAR_J2000_FIXED in calendar yr, the deleted counter's drift
+// reference = startmodelyearwithCorrection in calendar yr). With the
+// J2000-epoch anchor, the counter accumulated a constant
 // ~N × 0.0281 / H cycle offset — visible as ~1.74" shift in Earth perihelion
 // display under DEEP_TIME=true. Anchoring at startmodelyearwithCorrection
 // aligns all year coordinates consistently and eliminates that shift.
@@ -5286,7 +5200,7 @@ function _engineYearOfSceneYear(sceneYear) {
   return _engineYearTT(jd0 + (sceneYear - y) * (jd1 - jd0));
 }
 // = startmodelyearwithCorrection by construction (≈ 2000.4977 at the
-// canonical startmodelJD = 2451716.5). All cyclesBetweenYears callers that
+// canonical startmodelJD = 2451716.5). All chain-cycle callers that
 // reference STARTMODEL_YEAR_SI as anchor are automatically consistent with
 // the calendar-year drift correction.
 
@@ -5294,7 +5208,7 @@ function _engineYearOfSceneYear(sceneYear) {
  *
  *  Step 6b/6c/6d fit their harmonics against the scene-graph CSV on the SI-year
  *  axis, because that is the axis the scene's precession rotations run on
- *  (`moveModel` integrates `cyclesBetweenYears(_dtAnchor, _jdToSIyear(...), N)`)
+ *  (`moveModel` integrated `cyclesBetweenYears(_dtAnchor, _jdToSIyear(...), N)` — the counter is deleted, plan 09 step 7a; the wheels turn uniformly since 5c)
  *  and therefore the axis on which the measured signal is actually periodic.
  *
  *  Feeding these formulas a CALENDAR year instead is silently wrong at deep
@@ -7903,7 +7817,7 @@ const neptune = {
 // break the snapshot path at any non-J2000 epoch.
 //
 // DO NOT TAG planet orbital objects with _dtCycleN (the Phase 9.14 mistake) —
-// _dtCycleN uses cyclesBetweenYears(yA, yB, N) which integrates H(τ)-scaling
+// _dtCycleN used cyclesBetweenYears(yA, yB, N) (deleted, plan 09 step 7a) which integrated H(τ)-scaling
 // cycles. Planet orbital periods follow Kepler/Driver-2, NOT H-scaling, so the
 // correct integrator is _dtPlanetIntegrator (using _moonChainCycles with
 // meanPlanetOrbitalPeriodAtAge). See "The math problem" section of the IP doc.
@@ -8009,7 +7923,7 @@ neptune._dtPlanetSign       = Math.sign(neptune.speed);
 // For Mercury (prograde): baseSign = +1 → E1 = +1, E2 = -1. Matches the existing
 // snapshot speeds (mercuryPerihelionDurationEcliptic1.speed > 0, *Ecliptic2.speed < 0).
 //
-// DIVISOR CONVENTION (CRITICAL): cyclesBetweenYears(yA, yB, divisor_N) integrates
+// DIVISOR CONVENTION (CRITICAL; the counter cyclesBetweenYears is deleted since plan 09 step 7a): cyclesBetweenYears(yA, yB, divisor_N) integrated
 // cycles of period H/divisor_N. The Law-6 perihelion ecliptic period is 8H/N (where
 // N is the integer in `_planetPerihelionDivisors`). So the H-form divisor is N/8,
 // NOT N. Initial P-C tagging used N and was off by factor 8 — caught when P-D
@@ -36112,7 +36026,7 @@ async function runYearAnalysisExport(years) {
   //
   // Source of the residual:
   //   • This report runs with DEEP_TIME_MODE_ENABLED = true — planet θ uses
-  //     `cyclesBetweenYears(anchor, currentYearSI, N)` (cumulative-integral
+  //     `cyclesBetweenYears(anchor, currentYearSI, N)` (cumulative-integral; the counter is deleted, plan 09 step 7a
   //     table lookup) and _phase9YearToJDDays() returns SI_TROPICAL_YEAR_DAYS
   //     (365.2422 exact).
   //   • Step 6a runs tools/lib/scene-graph.js with SG_DEEP_TIME unset —
@@ -53595,7 +53509,7 @@ function updatePredictions() {
 
   // Scene-aligned year for the cycle-phase formulas below. Under DEEP_TIME=true
   // the scene uses integral-form rendering (Phase 9.12 Option B render-loop
-  // override at moveModel line ~53806) which integrates `cyclesBetweenYears(
+  // override at moveModel line ~53806) which integrated `cyclesBetweenYears(
   // BAL, _jdToSIyear(o.julianDay), N)`. `findBalancedYearAtCycle` also uses
   // `_jdToSIyear` for its round-trip. For the formula obliquity/eccentricity to
   // agree with the scene state at every balanced click, this MUST use the same
@@ -54247,13 +54161,11 @@ function computePlanetObliquity(planetName, engineYear) {
 // Plan 09: computeObliquityEarth (the 16-harmonic K comb on the frozen era
 // clock) is retired — every ε surface reads _sceneEpsTargetDeg (the hybrid).
 
-// Phase 7.2 — the entire §10/§10g cardinal family lives in
-// @essrt/physics/cardinal (ONE implementation for every engine; the Node
-// engine delegated first, fixtures bit-identical). This engine injects its
-// constants and its own twins; the public functions below are one-line
-// delegates. The R11 self-correction, drift Simpson, Ih closed form, joint
-// sidebands and the exact derivative — with every load-bearing comment —
-// live in the package.
+// (Phase 7.2 moved the §10/§10g cardinal family into the package's
+// createCardinalModel — ONE implementation, both engines delegating; plan 06
+// R1 retired it from the runtime and plan 09 step 7a deleted it with its
+// coefficients. The public functions below delegate to the one Sun's
+// crossings, createModel().cardinal.)
 // Plan 06 R1: the fitted cardinal-point model (CARDINAL_POINT_* on the frozen
 // era clock, fitted to the retired K scene's events) left the engines. The
 // cardinal instants are the APPARENT crossings of the one Sun the package
@@ -54290,10 +54202,9 @@ function computeSolsticeRA(currentYear, type) { return _tierModelB().cardinal.ra
 // (_cpAnalyticTropDays — the retired cardinal model's injected integrand base
 // on H_era — left with the model, plan 06 R1.)
 
-// Phase 7.2 — drift Simpson, Ih closed form, σ_tropical: see
-// @essrt/physics/cardinal (the implementation, with its measured-cost
-// comments, moved into the package verbatim; _cpAnalyticTropDays above stays
-// as the injected integrand base).
+// (Phase 7.2 moved the drift Simpson, the Ih closed form and σ_tropical into
+// the package's cardinal evaluator; plan 09 step 7a deleted that evaluator
+// with its coefficients — doc 110 §5.2/§5.5 keep the record.)
 
 function computeSolsticeJD(currentYear, type) {
   // §10 — DERIVED form. The cardinal-point date is the year-length model

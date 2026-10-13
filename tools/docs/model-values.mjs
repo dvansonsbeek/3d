@@ -3124,13 +3124,12 @@ export const VALUES = {
     };
     const genesisMa = () => astro.knownValues.moonGenesisAgeGa * 1000;
     const totalDays0 = () => C.H * C.meanSolarYearDays;
-    // The day-count near-invariant is defined on the ERA-CLOCK COUNTER U(t)
-    // (U = U_0 · LOD(t)/LOD_0 — pure spin scaling), not on H(t): H carries the
-    // lunar-torque term as well, so H × days/yr is a different quantity and
-    // drifts ~1000× further. Pairing meanHAtAge with meanYearInDaysAtAge read
-    // −214,009 ppm at 1 Gyr against the invariant's actual −196 ppm, and pinned
-    // at −1,000,179 ppm (−100%) at the Roche crossing where meanHAtAge → 0.
-    const driftPpm = (tMa) => (dtl().eraClockHAtAge(tMa) * dtl().eraClockYearInDaysAtAge(tMa) / totalDays0() - 1) * 1e6;
+    // (Plan 09 step 7a: the `driftAt*Ppm` keys — the day-count near-invariant
+    // U × days/yr on the ERA-CLOCK COUNTER U = U₀·LOD/LOD₀, measured −74 ppm at
+    // the Devonian and −999 ppm at the Hadean before the counter's deletion —
+    // left with `eraClockHAtAge`. On the unit H(t) the same product is a
+    // different quantity: it carries the lunar-torque term and read −214,009
+    // ppm at 1 Gyr, −100 % at the Roche crossing.)
     const lockLodSeconds = () => {
       const p = P();
       return 2 * Math.PI * Math.sqrt(p.moonLockDistanceM ** 3 / p.gmEarthMoonM3S2);
@@ -3203,9 +3202,6 @@ export const VALUES = {
       out[`lodAt${key}Hr`] = { get: () => dtl().meanLodSecondsAtAge(tOf()) / 3600, render: (v) => Number(v).toFixed(2), unit: 'hr' };
       out[`moonDistanceAt${key}`] = { get: () => rawMoonKm(tOf()), render: (v) => thousands(Math.round(v)), unit: 'km' };
       out[`axialPrecAt${key}`] = { get: () => dtl().meanLunisolarPrecessionPeriodYearsAtAge(tOf()), render: (v) => thousands(Math.round(v)), unit: 'yr', note: 'the composed lunisolar precession period at this epoch (S5; was H(t)/13, 0.086 % slow)' };
-      if (key !== '200MyrFuture') {
-        out[`driftAt${key}Ppm`] = { get: () => driftPpm(tOf()), render: (v) => `−${Math.abs(Math.round(v))}`, unit: 'ppm' };
-      }
     }
     // The clock at ±1 Gyr (the website's deep-time phase table; the composed period, S5 — the
     // old table quoted H/13 there). Forward: the recession polynomial's extrapolation region.

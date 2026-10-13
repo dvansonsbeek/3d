@@ -358,15 +358,11 @@ function meanHAtAge(t_Ma) { return _deepLod().hAtAge(t_Ma); }
 // @essrt/physics/earth/precession-composed, built inside the deep-time
 // factory), p₀ the derived J2000 rate (S5: 25,771.4 yr, NOT H₀/13 —
 // the unit scales with the period, H(t)/T_p(t) = 13.011, a fit constant).
-// The frozen era clock's counter H_era = H₀·LOD/LOD₀ (pure spin scaling —
-// the pre-Phase-3 reading) is exported under its own name for the devices
-// fitted against it (the ∫dt/H phase table, the cardinal era clock, the
-// year-length comb family): two named counters (D8), never one name.
+// (Plan 09 step 7a: the frozen era clock's counter H_era = H₀·LOD/LOD₀ and
+// its year twins — plan 06 D8's second named counter, exported for the
+// devices fitted against it — are deleted with the last comb.)
 function meanLunisolarPrecessionRateArcsecPerYrAtAge(t_Ma) { return _deepLod().lunisolarPrecessionRateArcsecPerYrAtAge(t_Ma); }
 function meanLunisolarPrecessionPeriodYearsAtAge(t_Ma) { return _deepLod().lunisolarPrecessionPeriodYearsAtAge(t_Ma); }
-function eraClockHAtAge(t_Ma) { return _deepLod().eraClockHAtAge(t_Ma); }
-function eraClockTropicalYearSecondsAtAge(t_Ma) { return _deepLod().eraClockTropicalYearSecondsAtAge(t_Ma); }
-function eraClockYearInDaysAtAge(t_Ma) { return _deepLod().eraClockYearInDaysAtAge(t_Ma); }
 
 // ─── Driver 2 — AU and year_s ─────────────────────────────────────────────
 function meanAuAtAge(t_Ma) {
@@ -942,67 +938,25 @@ const meanUranusSemiMajorAxisAtAge  = t => meanPlanetSemiMajorAxisAtAge('uranus'
 const meanNeptuneSemiMajorAxisAtAge = t => meanPlanetSemiMajorAxisAtAge('neptune', t);
 
 // ═══════════════════════════════════════════════════════════════════════════
-// INTEGRATED PHASE — cumulative ∫1/H(t')dt' machinery
-// Port of src/script.js lines 5752-6017. Used for Phase 9.12
-// integrated-phase rendering of Earth H-cycle precession objects.
+// THE DEEP-TIME GRID — the pos table's and the deep calendar's (matches browser)
 // ═══════════════════════════════════════════════════════════════════════════
 
 const _CUMUL_INTEGRAL_YEAR_MIN = -500e6;   // -500 Myr
 const _CUMUL_INTEGRAL_YEAR_MAX =  500e6;   // +500 Myr (symmetric with past; was +1 Myr —
-                                           // the asymmetry made cyclesBetweenYears null past
-                                           // +1 Myr, dropping the Moon args to the Meeus
-                                           // polynomial whose T⁴ tail reverses lunar motion
-                                           // at year ~1.99e6; physics functions are already
-                                           // exercised to ±1 Gyr by the paper figures)
+                                           // the asymmetry dropped the Moon args to the Meeus
+                                           // polynomial past +1 Myr, whose T⁴ tail reverses
+                                           // lunar motion at year ~1.99e6; physics functions
+                                           // are already exercised to ±1 Gyr by the paper figures)
 const _CUMUL_INTEGRAL_STEP     = 10000;    // 10 kyr per cell (matches browser)
 
-// Phase 7.1 — the table arithmetic lives in @essrt/physics/phase (ONE
-// implementation for every engine; extracted verbatim from this file). This
-// engine keeps only its CONFIG (the grid constants above, injected) and its
-// OWN H(t) twin as the integrand — the twins dissolve into Layer 0 at
-// Phase 8. R2 is honoured at construction: ensureTable() runs under
-// _withLatticeAlpha, so every invH evaluation sees the constant MOI.
-const { createPhaseMachinery } = _req('@essrt/physics/phase');
-let _phaseM = null;
-function _phase() {
-  if (_phaseM !== null) return _phaseM;
-  _phaseM = createPhaseMachinery({
-    // the FROZEN era clock's own counter H_era = H₀·LOD/LOD₀ (plan 06 D8: two
-    // named counters) — the combs were fitted against it; NOT the unit H(t)
-    holisticHAtAgeMa: (t_Ma) => eraClockHAtAge(t_Ma),
-    tableAnchorYear: C.startmodelYear,
-    driftRefYear: C.startModelYearWithCorrection,
-    hJ2000: HOLISTIC_YEAR_J2000,
-    yearMin: _CUMUL_INTEGRAL_YEAR_MIN,
-    yearMax: _CUMUL_INTEGRAL_YEAR_MAX,
-    stepYears: _CUMUL_INTEGRAL_STEP,
-  });
-  _withLatticeAlpha(() => _phaseM.ensureTable());   // R2: lattice tables pin α
-  return _phaseM;
-}
-function _ensureCumulIntegralTable() { _phase(); }
-// Grid geometry for the days/pos tables below (they share this grid but keep
-// their own integrands until Phase 8 moves them).
-function _cumulIntegralJ2000IdxGet() { return _phase().grid().j2000Idx; }
-function _cumulIntegralLength() { return _phase().grid().length; }
-
-// Phase 7.1 — the four functions below are one-line delegates to
-// @essrt/physics/phase; their arithmetic (trapezoid convention, R3 call-shape
-// anchor rule, the drift correction, and every comment that used to sit here)
-// moved into the package verbatim. The R2 α-pin is honoured at construction
-// (see _phase() above).
-function _cumulIntegralAtYear(year) { return _phase().cumulAtYear(year); }
-
-/** ∫_{yearA}^{yearB} 1/H(t') dt'. Returns null if either endpoint is outside
- *  the precomputed range (±500 Myr symmetric). */
-function integralInverseHFromYears(yearA, yearB) { return _phase().integralBetween(yearA, yearB); }
-
-function _getJ2000Drift(yearA) { return _phase().j2000Drift(yearA); }
-
-/** Total cycles between two years for a cycle of period H/divisor_N.
- *  Integrated form always (toggle at caller). R3 call-shape anchor rule
- *  (see @essrt/physics/phase). Returns null past tidal-lock asymptote. */
-function cyclesBetweenYears(yearA, yearB, divisor_N) { return _phase().cyclesBetween(yearA, yearB, divisor_N); }
+// Grid geometry for the pos table below (the deep calendar computes the same
+// two numbers). Plan 09 step 7a: until then the grid was the ∫dt/H_era phase
+// table's (`@essrt/physics/phase`, Phase 7.1 — the port of the browser's
+// integrated-phase machinery) and this engine exported the frozen era clock's
+// counters `cyclesBetweenYears` / `integralInverseHFromYears`; the combs that
+// read them are gone, the counters with them.
+function _cumulIntegralJ2000IdxGet() { return Math.round((C.startmodelYear - _CUMUL_INTEGRAL_YEAR_MIN) / _CUMUL_INTEGRAL_STEP); }
+function _cumulIntegralLength() { return Math.ceil((_CUMUL_INTEGRAL_YEAR_MAX - _CUMUL_INTEGRAL_YEAR_MIN) / _CUMUL_INTEGRAL_STEP) + 1; }
 
 /**
  * The Layer 0 parameter bundle (PHASE-B).
@@ -1049,23 +1003,24 @@ const EPOCH_PARAMS = Object.freeze({
 //
 // ONE implementation, `@essrt/physics/phase/deep-calendar` (the year/day
 // collapse — formerly the PHASE-B-DUPLICATE family hand-mirrored from
-// `src/script.js`). Both engines build the calendar from their own phase
-// machinery, days-per-year source and lattice-α pin, and delegate. (Plan 09
-// step 5d: the H-balanced event finder left; Step 6a reports a plain year
-// window. Its `Cycle` column still rides `cyclesBetweenYears` until the
-// counters go.)
+// `src/script.js`). Both engines build the calendar from their own grid,
+// days-per-year source and lattice-α pin, and delegate. (Plan 09 step 5d:
+// the H-balanced event finder left; Step 6a reports a plain year window.
+// Step 7a: its `Cycle` column left with the counters.)
 const { createDeepCalendar } = _req('@essrt/physics/phase/deep-calendar');
 let _deepCalM = null;
 function _deepCal() {
   if (_deepCalM !== null) return _deepCalM;
   _deepCalM = createDeepCalendar({
-    phase: _phase,
     meanYearInDaysAtAgeMa: meanYearInDaysAtAge,
     withLatticeAlpha: _withLatticeAlpha,
     startModelJD: C.startmodelJD,
     startModelYear: C.startmodelYear,
     startModelYearWithCorrection: C.startModelYearWithCorrection,
     siTropicalYearDays: SI_TROPICAL_YEAR_DAYS,
+    yearMin: _CUMUL_INTEGRAL_YEAR_MIN,
+    yearMax: _CUMUL_INTEGRAL_YEAR_MAX,
+    stepYears: _CUMUL_INTEGRAL_STEP,
   });
   return _deepCalM;
 }
@@ -1123,8 +1078,7 @@ function _posAnchorDy() { _posAnchorLoIdx(); return _posAnchorDy0; }
 
 function _ensureCumulPosTable() {
   if (_cumulPosTable !== null) return;
-  _ensureCumulIntegralTable();                  // grid geometry
-  const N = _cumulIntegralLength();
+  const N = _cumulIntegralLength();             // grid geometry
   const j2000Idx = _cumulIntegralJ2000IdxGet();
   _cumulPosTable = new Float64Array(N);
 
@@ -1271,10 +1225,9 @@ module.exports = {
   meanLodSecondsAtAge, meanLodHoursAtAge,
   // Step 2
   meanHAtAge,
-  // The lunisolar precession clock (plan 06 Phase 3): the unit's rate/period, and the
-  // frozen era clock's named counter + bases (device tier, D8)
+  // The lunisolar precession clock (plan 06 Phase 3): the unit's rate/period
+  // (plan 09 step 7a: the frozen era clock's counter + bases left with the last comb)
   meanLunisolarPrecessionRateArcsecPerYrAtAge, meanLunisolarPrecessionPeriodYearsAtAge,
-  eraClockHAtAge, eraClockTropicalYearSecondsAtAge, eraClockYearInDaysAtAge,
   PRECESSION_SOLAR_SHARE_J2000, precessionRateJ2000ArcsecPerYr, certifiedAxialPrecessionJ2000Years,
   j2RatioAtYear,
   // Driver 2
@@ -1313,6 +1266,6 @@ module.exports = {
   meanEarthSemiMajorAxisAtAge,   meanMarsSemiMajorAxisAtAge,
   meanJupiterSemiMajorAxisAtAge, meanSaturnSemiMajorAxisAtAge,
   meanUranusSemiMajorAxisAtAge,  meanNeptuneSemiMajorAxisAtAge,
-  // Integrated phase (Phase 9.12)
-  integralInverseHFromYears, cyclesBetweenYears,
+  // (plan 09 step 7a: the integrated-phase counters integralInverseHFromYears /
+  //  cyclesBetweenYears — Phase 9.12 — are deleted with the last comb)
 };

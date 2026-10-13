@@ -21,7 +21,6 @@ import { deriveEpochParams } from './layer0/derive-params.js';
 import { buildPlanetChainsFromArtifactData, computePlanetElementsAtYear } from './planets/keplerian-chain.cjs';
 import { createSecularSeriesOverride } from './planets/secular-series.cjs';
 import { computeEquatorNodeOriginSFrameDeg, convertNodeSFrameToEquatorOriginDeg } from './planets/inv-plane-frame.cjs';
-import { createPhaseMachinery } from './phase/index.cjs';
 import { createYearLengths, computeMeanTropicalYearJ2000Days, ONE_FAMILY_WINDOW_YEARS } from './earth/year-lengths.cjs';
 import { createDeepOrbitalHistory } from './earth/deep-orbital-history.cjs';
 import { CHAIN_ARTIFACT } from './planets/chain-artifact.js';
@@ -170,15 +169,14 @@ export function assembleModel(C, F, laws = {}, secularSeriesArtifact = /** @type
     j2J2000: C.physicalConstants.earthJ2,
   });
 
-  let latticeAlphaPin = false;
   // Exact-argument memo (mirrors src/script.js + tools/lib/deep-time.js —
-  // the round-5 perf campaign): same tMa → bit-identical value; the pin
-  // branch bypasses the memo; bounded by wholesale clear.
+  // the round-5 perf campaign): same tMa → bit-identical value; bounded by
+  // wholesale clear. (Plan 09 step 7a: the lattice-α pin branch left with
+  // the ∫dt/H_era phase table, the one table this model built under it.)
   /** @type {Map<number, number>} */
   const alphaMemo = new Map();
   /** @param {number} tMa @returns {number} */
   const earthMoiFactorAtAge = (tMa) => {
-    if (latticeAlphaPin) return earthMoiFactorJ2000;
     let v = alphaMemo.get(tMa);
     if (v === undefined) {
       v = alphaGia.alphaAt(2000 - tMa * 1e6);
@@ -363,36 +361,12 @@ export function assembleModel(C, F, laws = {}, secularSeriesArtifact = /** @type
     lEmAtAgeKgm2S: solarBudget.lEmAtAgeKgm2S,
   });
 
-  // ── Integrated ∫1/H(t)dt phase (R2 α-pin honoured while building) ─────────
-  // The phase counter every FROZEN comb reads rides the frozen era clock's
-  // own convention H_era = H₀·LOD/LOD₀ (plan 06 D8: two named counters — the
-  // coefficients were fitted against this counter and ship with it), NOT the
-  // unit H(t) = 13·T_p,composed that the physics publishes.
-  const phaseM = createPhaseMachinery({
-    holisticHAtAgeMa: (tMa) => deepLod.eraClockHAtAge(tMa),
-    tableAnchorYear: startmodelYear,
-    driftRefYear: startModelYearWithCorrection,
-    hJ2000: H,
-    yearMin: -500e6,
-    yearMax: 500e6,
-    stepYears: 10000,
-  });
-  let phaseTableBuilt = false;
-  const phase = () => {
-    if (!phaseTableBuilt) {
-      latticeAlphaPin = true;
-      try { phaseM.ensureTable(); } finally { latticeAlphaPin = false; }
-      phaseTableBuilt = true;
-    }
-    return phaseM;
-  };
-  /** @param {number} yearA @param {number} yearB @param {number} divisorN @returns {number} */
-  const cyclesBetween = (yearA, yearB, divisorN) => {
-    const cyc = phase().cyclesBetween(yearA, yearB, divisorN);
-    return cyc === null ? (divisorN * (yearB - yearA)) / H : cyc;
-  };
-  // Plan 09 step 5b: `phaseRadians` (2π · cyclesBetween) left with its last
-  // reader, the RA day offset comb.
+  // (Plan 09 step 7a: the integrated ∫dt/H_era phase table and its counter
+  // `cyclesBetween` — the frozen era clock's own convention H_era =
+  // H₀·LOD/LOD₀, plan 06 D8's second named counter, which every FROZEN comb
+  // read — are DELETED with the last comb; `epoch.cyclesBetween` left the
+  // surface with them, no reader remained. Step 5b: `phaseRadians` left with
+  // the RA day offset comb.)
 
   /** @param {number} year @returns {number} */
   const yearToTMa = (year) => (2000 - year) / 1e6;
@@ -1567,7 +1541,6 @@ export function assembleModel(C, F, laws = {}, secularSeriesArtifact = /** @type
       // (identical at J2000 where the ratio ≡ 1 by construction)
       siderealYearSecondsAtYear: /** @param {number} year @returns {number} */ (year) => yearLengthsM.siderealYearSecondsAtYear(year),
       deltaTSecondsAtYear: deltaTSeconds,
-      cyclesBetween,
       // Plan 06 Phase 3 S2 — THE published of-date precession period is the
       // one-family route (B): the hybrid's own equinox regression against
       // the λ̇-corrected sidereal year (~25,771 yr at J2000 ≈ IAU), inside

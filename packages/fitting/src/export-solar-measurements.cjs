@@ -310,22 +310,11 @@ const DT = require(path.join(TOOLS_LIB, 'deep-time.js'));
   }
 }
 
-// ─── Integrated-phase `Cycle` column (R15) ─────────────────────────────────
-// H-cycles from C.balancedYear to this row's OWN event JD. `Model Year` cannot
-// serve as the phase variable: it is a chaining-step COUNTER, and one step is a
-// tropical year for SS/WS/VE/AE but an ANOMALISTIC year for PERI/APH — so the
-// same label denotes different instants per type, diverging ~16 events across a
-// full-H window. Computed in the same convention the scene integrates
-// (`cyclesBetweenYears(anchor, _jdToSIyear(jd), N)` at moveModel), so a fit on
-// `Cycle × div` matches the runtime by construction rather than by calibration.
-// Under SG_DEEP_TIME=0 it falls back to the snapshot form so each mode stays
-// self-consistent.
-const cycleOf = (process.env.SG_DEEP_TIME === '0')
-  ? (jd) => (C.jdToYear(jd) - C.balancedYear) / C.H
-  : (jd) => {
-    const c = DT.cyclesBetweenYears(C.balancedYear, DT._jdToSIyear(jd), 1);
-    return c === null ? NaN : c;
-  };
+// (Plan 09 step 7a: the integrated-phase `Cycle` column (R15) — the unit's
+// cycles from the balanced year to each row's event JD, the phase variable the
+// retired comb fitters read (`Model Year` is a chaining-step counter: a
+// tropical year for SS/WS/VE/AE, an anomalistic one for PERI/APH) — is
+// deleted with the counter `cyclesBetweenYears`; no fitter reads this CSV.)
 
 console.error(`Solar measurements export: 1-year steps, ${startYear} to ${endYear}`);
 console.error(`Total: ${totalYears} years × 6 types = ~${totalYears * 6} rows`);
@@ -460,7 +449,7 @@ for (const type of allTypes) {
 }
 
 // ─── Write CSV ───────────────────────────────────────────────────────────────
-const csvHeader = 'Type,Model Year,JD,RA (deg),Obliquity (deg),World Angle (deg),Distance (AU),Cycle';
+const csvHeader = 'Type,Model Year,JD,RA (deg),Obliquity (deg),World Angle (deg),Distance (AU)';
 const csvLines = [csvHeader];
 for (const r of allRows) {
   csvLines.push([
@@ -485,8 +474,6 @@ for (const r of allRows) {
     r.obliqDeg !== null ? r.obliqDeg.toFixed(6) : '',
     r.worldAngle.toFixed(9),
     r.distAU.toFixed(6),
-    // 12 dp: one cycle spans 335,317 yr, so the LSB is ~1e-5 s of event time.
-    cycleOf(r.jd).toFixed(12),
   ].join(','));
 }
 fs.writeFileSync(OUTPUT_CSV, csvLines.join('\n') + '\n');
@@ -501,16 +488,5 @@ console.error(`Total rows: ${allRows.length}`);
 for (const [type, cnt] of Object.entries(typeCounts)) {
   console.error(`  ${type}: ${cnt} rows`);
 }
-
-// Achieved cycle span per type. These diverge at deep time by design: SS/WS/
-// VE/AE chain on the tropical year, PERI/APH on the anomalistic one. A run
-// that brackets the balanced events spans exactly 1.000000 for the cardinals.
-console.error('');
-console.error('Achieved cycle span (balanced bracket = 1.000000):');
-for (const type of allTypes) {
-  const rows = allRows.filter(r => r.type === type);
-  if (!rows.length) continue;
-  const c0 = cycleOf(rows[0].jd), c1 = cycleOf(rows[rows.length - 1].jd);
-  console.error(`  ${type.padEnd(4)}: ${c0.toFixed(6)} → ${c1.toFixed(6)}  span ${(c1 - c0).toFixed(6)}`);
-}
+// (plan 09 step 7a: the per-type "achieved cycle span" report left with the Cycle column)
 console.error(`CSV: ${OUTPUT_CSV}`);

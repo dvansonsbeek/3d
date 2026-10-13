@@ -2,72 +2,10 @@
 // The fitted coefficients' shapes for TypeScript consumers (§2g); values live
 // in coefficients.js, emitted VERBATIM from fitted-coefficients.json.
 
-export declare const COEFFICIENTS_HASH: "3cfb8d04a94ddc3a";
+export declare const COEFFICIENTS_HASH: "91e2d041c7b6e038";
 
 export declare const FITTED_COEFFICIENTS: {
   readonly BALANCE_PRESETS: Array<Array<number | string>>;
-  readonly CARDINAL_POINT_ANCHORS: {
-    "SS": number;
-    "WS": number;
-    "VE": number;
-    "AE": number;
-  };
-  readonly CARDINAL_POINT_ANCHORS_ADJUSTED: {
-    "SS": number;
-    "WS": number;
-    "VE": number;
-    "AE": number;
-  };
-  readonly CARDINAL_POINT_DERIVED: {
-    "lincoef": number;
-    "h0": number;
-    "h1": number;
-    "eccOrderDivisors": [number, number];
-    "note": string;
-  };
-  readonly CARDINAL_POINT_ECC_TERMS: {
-    "SS": Array<{
-      "order": number;
-      "sin": number;
-      "cos": number;
-    }>;
-    "WS": Array<{
-      "order": number;
-      "sin": number;
-      "cos": number;
-    }>;
-    "VE": Array<{
-      "order": number;
-      "sin": number;
-      "cos": number;
-    }>;
-    "AE": Array<{
-      "order": number;
-      "sin": number;
-      "cos": number;
-    }>;
-  };
-  readonly CARDINAL_POINT_HARMONICS: {
-    "SS": Array<[number, number, number]>;
-    "WS": Array<[number, number, number]>;
-    "VE": Array<[number, number, number]>;
-    "AE": Array<[number, number, number]>;
-  };
-  readonly CARDINAL_POINT_JOINT_TERMS: {
-    "quadratureDeg": {
-      "SS": number;
-      "AE": number;
-      "WS": number;
-      "VE": number;
-    };
-    "terms": Array<{
-      "order": number;
-      "div": number;
-      "sin": number;
-      "cos": number;
-    }>;
-    "note": string;
-  };
   readonly CLIMATE_FORMULA_COEFFS: {
     "config": {
       "L1_lines": Array<{

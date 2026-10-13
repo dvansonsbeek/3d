@@ -31,8 +31,9 @@
  * DELIBERATELY NOT HERE: absolute event dates. They need a mean-sun
  * crossing chain, which is a per-renderer concern (the measured ±2–13 min
  * twin-stack split between the browser scene and the Step-6a instrument);
- * the era-certified absolute dates remain the frozen harmonic device
- * (createCardinalModel — the certified era clock).
+ * the shipped absolute dates are the one Sun's apparent crossings,
+ * createModel().cardinal (plan 06 R1; the frozen harmonic device
+ * createCardinalModel that certified the era was deleted at plan 09 step 7a).
  *
  * Pure factory: no artifact reads, no registry reads — the caller injects
  * the one-source sampler and the movement's mean tropical year, exactly

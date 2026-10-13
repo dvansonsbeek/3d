@@ -46,9 +46,8 @@ const output = {
   eocEccentricity: C.eocEccentricity,
   perihelionPhaseOffset: C.perihelionPhaseOffset,
 
-  // Fitted coefficients
-  CARDINAL_POINT_ANCHORS: C.CARDINAL_POINT_ANCHORS,
-  CARDINAL_POINT_HARMONICS: C.CARDINAL_POINT_HARMONICS,
+  // (plan 09 step 7a: the fitted cardinal record CARDINAL_POINT_ANCHORS /
+  //  CARDINAL_POINT_HARMONICS is deleted)
   axialPrecessionJ2000Years: C.axialPrecessionJ2000Years,   // plan 09: the IAU p_A anchor as a period
 
   // Physical & astronomical constants

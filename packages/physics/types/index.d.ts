@@ -1,9 +1,7 @@
 export { createEpochPrimitives } from "./layer0/index.js";
 export { deriveEpochParams } from "./layer0/derive-params.js";
 export { createDerivedViews } from "./layer1/index.js";
-export { createPhaseMachinery } from "./phase/index.cjs";
 export { createDeepCalendar } from "./phase/deep-calendar.cjs";
-export { createCardinalModel } from "./cardinal/index.cjs";
 export { createCardinalStructure } from "./cardinal/one-source-structure.cjs";
 export { createMoonMonthChain } from "./moon/month-chain.cjs";
 export { createChainCycleIntegrator } from "./chain-cycles/index.cjs";

@@ -59,12 +59,4 @@ export type EpochPrimitives = {
      * sidereal less one equinox turn per T_p(t) (the composed precession period)
      */
     tropicalYearSeconds: (year: number) => number;
-    /**
-     * the frozen era clock's phase convention H₀·LOD/LOD₀ (device tier)
-     */
-    eraClockH: (year: number) => number | null;
-    /**
-     * T_sid·(1 − 13/H_era) — the frozen comb family's base
-     */
-    eraClockTropicalYearSeconds: (year: number) => number;
 };

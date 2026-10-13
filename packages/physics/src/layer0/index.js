@@ -59,8 +59,6 @@
  * @property {(year: number) => number|null} holisticH               the UNIT: 13 × the composed lunisolar precession period
  * @property {(year: number) => number} siderealYearSeconds
  * @property {(year: number) => number} tropicalYearSeconds      sidereal less one equinox turn per T_p(t) (the composed precession period)
- * @property {(year: number) => number|null} eraClockH               the frozen era clock's phase convention H₀·LOD/LOD₀ (device tier)
- * @property {(year: number) => number} eraClockTropicalYearSeconds  T_sid·(1 − 13/H_era) — the frozen comb family's base
  */
 
 /**
@@ -101,11 +99,10 @@ export const createEpochPrimitives = ({ params: p, alphaAtAgeMa }) => {
   };
 
   /**
-   * The frozen era clock's phase convention: H_era(t) = H₀·LOD(t)/LOD₀ —
-   * pure spin scaling. This is the counter the FROZEN devices (the cardinal
-   * era clock, the year-length comb family) were fitted against; it ships
-   * with their coefficients as a named device constant (plan 06 Phase 3,
-   * D8), never as "H(t)".
+   * The unit's spin-scaling factor H₀·LOD(t)/LOD₀ — internal to holisticHCore.
+   * (Plan 09 step 7a: until then also the frozen era clock's own counter,
+   * published as `eraClockH` for the devices fitted against it — deleted with
+   * the last comb; the unit itself leaves at step 7b.)
    * @param {number} t age in Ma
    * @returns {number|null} years
    */
@@ -176,12 +173,7 @@ export const createEpochPrimitives = ({ params: p, alphaAtAgeMa }) => {
     return 1 / (1 / sid + rate / (1296000 * 365.25 * 86400));
   };
 
-  /** The frozen comb family's tropical base: T_sid·(1 − 13/H_era). @param {number} t */
-  const eraClockTropicalYearSecondsCore = (t) => {
-    const sid = siderealYearSecondsCore(t);
-    const H = eraClockHCore(t);
-    return H === null ? sid * (1 - 13 / p.holisticYearJ2000) : sid * (1 - 13 / H);
-  };
+  // (plan 09 step 7a: the frozen comb family's tropical base T_sid·(1 − 13/H_era) is deleted)
 
   return Object.freeze({
     tMa,
@@ -190,7 +182,5 @@ export const createEpochPrimitives = ({ params: p, alphaAtAgeMa }) => {
     holisticH: (year) => holisticHCore(tMa(year)),
     siderealYearSeconds: (year) => siderealYearSecondsCore(tMa(year)),
     tropicalYearSeconds: (year) => tropicalYearSecondsCore(tMa(year)),
-    eraClockH: (year) => eraClockHCore(tMa(year)),
-    eraClockTropicalYearSeconds: (year) => eraClockTropicalYearSecondsCore(tMa(year)),
   });
 };

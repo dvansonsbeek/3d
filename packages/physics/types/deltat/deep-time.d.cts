@@ -155,7 +155,4 @@ export function createDeepTimeLod(deps: DeepTimeLodDeps): {
         net_L3: number | null;
         net_L4: number | null;
     };
-    eraClockHAtAge: (t_Ma: number) => number | null;
-    eraClockTropicalYearSecondsAtAge: (t_Ma: number) => number;
-    eraClockYearInDaysAtAge: (t_Ma: number) => number | null;
 };

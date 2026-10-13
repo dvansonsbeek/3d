@@ -82,22 +82,12 @@ const COEFFICIENT_KEYS = [
   // (The Moon RA/Dec patches MOON_CORRECTION / MOON_CORRECTION_RESIDUAL were
   // retired at plan 06 R3 item 1 — moon/apparent.cjs carries the record.)
 
-  // script.js's CARDINAL_POINT_ANCHORS is the ADJUSTED set, not the base one.
-  // Both are emitted under their JSON names; the consumer picks.
-  'CARDINAL_POINT_ANCHORS',
-  'CARDINAL_POINT_ANCHORS_ADJUSTED',
-
-  // Also 6-decimal rounded on the way into script.js, and the largest such error
-  // found: RSS 0.0149, worst case 0.1360 in coefficient units across 96 terms.
-  // Missed by the first audit because it is an object-of-arrays rather than a
-  // plain array.
-  'CARDINAL_POINT_HARMONICS',
-  // §10 (Phase D) — the equation-of-centre braiding terms ({order, sin, cos},
-  // deliberately NOT the [div, sin, cos] shape) and the fit-calibrated
-  // lincoef + H(c) model the runtime must reuse VERBATIM, never recompute.
-  'CARDINAL_POINT_ECC_TERMS',
-  'CARDINAL_POINT_JOINT_TERMS',
-  'CARDINAL_POINT_DERIVED',
+  // (plan 09 step 7a: the frozen cardinal record — CARDINAL_POINT_ANCHORS /
+  //  _ANCHORS_ADJUSTED, _HARMONICS (the 6-decimal-rounding case the first audit
+  //  missed: RSS 0.0149, worst 0.1360 across 96 terms), the §10 _ECC_TERMS /
+  //  _JOINT_TERMS / _DERIVED the runtime reused verbatim — is deleted with its
+  //  package evaluator; the cardinal instants are createModel().cardinal.
+  //  fitted-coefficients.json carries no coefficient block since.)
 
   // (PREDICT_COEFFS_PHYSICAL — 16,919 values of the planet predict device —
   // was emitted here until plan 06 R8 retired the device and its arrays.)

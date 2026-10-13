@@ -1,7 +1,7 @@
 ---
 docVersion: 1.0
 modelVersion: v23.0
-coefficients: sha256:3cfb8d04a94ddc3a
+coefficients: sha256:91e2d041c7b6e038
 status: current
 ---
 
@@ -154,8 +154,8 @@ Earth's spin × the solar + lunar torques on the recession history).
 | 2 | Earth's moment-of-inertia factor α(t) | α_J2000 − alphaClimateScale·(L1(t) − L1(2000)) — the climate-lattice (GIA) modulation of I/MR²; α_J2000 = 0.330695 | the L1 climate formula | **C** (the L1 comb evaluates its integer-divisor lines) | `model.js` 156–166 (twins: `tools/lib/deep-time.js` 186–199) |
 | 3 | day length LOD(t) | 2π·I(t) / (L_EM(t) − L_M(t)), I = α·M_E·R_E², L_M = m_M·√(GM_EM·a_M)·√(1 − e_M²) — angular-momentum conservation in the Earth–Moon system; L_EM constant inside the gated era, time-dependent beyond (the ocean-leak/thermal-pump solar channels) | steps 1–2; L_EM from Layer 0 (chain 1's √(1 − e_M²) factor) | — | `deltat/deep-time.cjs` 80–86; L_EM `layer0/derive-params.js` 63–64 |
 | 4 | spin rate ω(t) | 2π / LOD(t) | step 3 | — | (implicit) |
-| 5 | the frozen era clock's counter H_era(t) | **H_J2000 · LOD(t)/LOD_J2000** — pure spin scaling, the pre-Phase-3 "H/13 identity" | H_J2000 = 335,317 (the fitted primitive), LOD_J2000 = ω₀ = 86,400 s (the SI day — plan 09; the device's kinematic day read 86,399.99968) | **L** — a DEVICE convention: the ∫dt/H phase table and the cardinal era clock were fitted against it and ship with it (plan 06 D8: two named counters; the year-length comb family that also rode it is deleted at plan 09) | `deltat/deep-time.cjs` `eraClockHAtAge` |
-| 6 | **H(t), the unit** | **H_era(t) / [f_S + (1 − f_S)·(a₀/a_M(t))³]** — the internal unit, scaling WITH the composed lunisolar precession period: H(t)/T_p(t) = H₀/T_p(J2000) = 13.011 at every epoch — NOT 13 of them (S5); ψ̇(t) = p₀·[ω/ω₀]·[f_S + (1 − f_S)(a₀/a_M)³], p₀ = 1,296,000/T_p(J2000) | step 5; a_M(t) (step 1); f_S = 0.3165 from the shared constants (`derive-params`); T_p(J2000) = 25,771.575 yr = 1,296,000/p_A, the IAU 2006 general precession input (plan 09; S5 had anchored it on the certified year combs' beat, 25,771.4) | **U** (the unit) on the composed physics of 2.3 | `deltat/deep-time.cjs` `hAtAge` (one formula home: `earth/precession-composed`) |
+| 5 | the spin-scaling factor H₀·LOD(t)/LOD₀ | **H_J2000 · LOD(t)/LOD_J2000** — pure spin scaling | H_J2000 = 335,317 (the fitted primitive), LOD_J2000 = ω₀ = 86,400 s (the SI day — plan 09; the device's kinematic day read 86,399.99968) | **U** — internal to step 6. (Until plan 09 step 7a this was ALSO the frozen era clock's own counter H_era, `eraClockHAtAge`: the ∫dt/H phase table and the cardinal era clock were fitted against it — plan 06 D8's second named counter; deleted with the last comb.) | `deltat/deep-time.cjs` `eraClockHFromLod` (internal) |
+| 6 | **H(t), the unit** | **[H₀·LOD/LOD₀] / [f_S + (1 − f_S)·(a₀/a_M(t))³]** — the internal unit, scaling WITH the composed lunisolar precession period: H(t)/T_p(t) = H₀/T_p(J2000) = 13.011 at every epoch — NOT 13 of them (S5); ψ̇(t) = p₀·[ω/ω₀]·[f_S + (1 − f_S)(a₀/a_M)³], p₀ = 1,296,000/T_p(J2000) | step 5; a_M(t) (step 1); f_S = 0.3165 from the shared constants (`derive-params`); T_p(J2000) = 25,771.575 yr = 1,296,000/p_A, the IAU 2006 general precession input (plan 09; S5 had anchored it on the certified year combs' beat, 25,771.4) | **U** (the unit) on the composed physics of 2.3 | `deltat/deep-time.cjs` `hAtAge` (one formula home: `earth/precession-composed`) |
 | 7 | tropical year of age | 1/T_trop = 1/T_sid(t) + ψ̇(t)/(1,296,000″ · 365.25 d) — the sidereal year less one equinox turn per the composed precession period T_p(t) (plan 09 step 5d; it was the unit's calendar convention T_sid·(1 − 13/H(t)), 0.086 % slow on the equinox term — 1.0 s of year at J2000, 1.1 h of the deep JD↔year calendar at ±4 kyr — which plan 06 D2 had kept as a named device). At J2000 it is the derived mean tropical year of 2.1 step 4c to 5 ns. The deep JD↔year calendar integrates this over the day of date | step 6's ψ̇(t) (ω₀/ω, f_S, a₀/a_M); T_sid(t) = T₀(1 − Δm)² (Driver 2) | **P** (no H) | `deltat/deep-time.cjs` `tropicalYearSecondsFromLod`; layer-0 twin `tropicalYearSecondsCore` (bit-identical, the layer0 gate); the frozen clock's device twin on H_era: `eraClockTropicalYearSecondsAtAge` (the cardinal record's render only) |
 
 Plan 06 Phase 3 made the unit follow the composed physics of 2.3, and
@@ -258,20 +258,20 @@ J₂(t)/J₂₀ stays within ±<!--v:precOfDateEllipticityAmpLastMyrPct-->0.02<!
 The mean tidal clock and the composition, by age:
 
 <!-- generated:calcmap-tidal-clock -->
-| age (Ma) | a_M (km) | LOD (h) | ω/ω₀ = LOD₀/LOD | α (I/MR²) | H_era(t) = H₀·LOD/LOD₀ (yr) — the frozen era clock’s counter | (a₀/a)³ | **H(t), the unit (yr)** | **T_p = 1,296,000/ψ̇ (yr)** | ψ̇ (″/yr) | H(t)/T_p |
-|---|---|---|---|---|---|---|---|---|---|---|
-| 0 | 384399 | 24.000 | 1.00000 | 0.330695 | 335317 | 1.0000 | **335317** | **25771.6** | 50.29 | 13.01112 |
-| 0.01 | 384399 | 24.000 | 1.00000 | 0.330695 | 335316 | 1.0000 | **335316** | **25771.5** | 50.29 | 13.01112 |
-| 0.1 | 384395 | 23.999 | 1.00002 | 0.330695 | 335309 | 1.0000 | **335302** | **25770.4** | 50.29 | 13.01112 |
-| 1 | 384361 | 23.994 | 1.00025 | 0.330695 | 335235 | 1.0003 | **335166** | **25760.0** | 50.31 | 13.01112 |
-| 10 | 384017 | 23.941 | 1.00246 | 0.330695 | 334495 | 1.0030 | **333813** | **25656.0** | 50.51 | 13.01112 |
-| 100 | 380577 | 23.423 | 1.02464 | 0.330695 | 327252 | 1.0304 | **320583** | **24639.2** | 52.60 | 13.01112 |
-| 380 | 369749 | 21.915 | 1.09513 | 0.330695 | 306189 | 1.1236 | **282329** | **21699.0** | 59.73 | 13.01112 |
-| 650 | 358901 | 20.569 | 1.16679 | 0.330695 | 287384 | 1.2286 | **248541** | **19102.2** | 67.85 | 13.01112 |
-| 1400 | 337532 | 18.482 | 1.29853 | 0.330695 | 258228 | 1.4771 | **194727** | **14966.2** | 86.60 | 13.01112 |
-| 2460 | 322504 | 17.007 | 1.41122 | 0.330695 | 237607 | 1.6933 | **161207** | **12390.0** | 104.60 | 13.01112 |
+| age (Ma) | a_M (km) | LOD (h) | ω/ω₀ = LOD₀/LOD | α (I/MR²) | (a₀/a)³ | **H(t), the unit (yr)** | **T_p = 1,296,000/ψ̇ (yr)** | ψ̇ (″/yr) | H(t)/T_p |
+|---|---|---|---|---|---|---|---|---|---|
+| 0 | 384399 | 24.000 | 1.00000 | 0.330695 | 1.0000 | **335317** | **25771.6** | 50.29 | 13.01112 |
+| 0.01 | 384399 | 24.000 | 1.00000 | 0.330695 | 1.0000 | **335316** | **25771.5** | 50.29 | 13.01112 |
+| 0.1 | 384395 | 23.999 | 1.00002 | 0.330695 | 1.0000 | **335302** | **25770.4** | 50.29 | 13.01112 |
+| 1 | 384361 | 23.994 | 1.00025 | 0.330695 | 1.0003 | **335166** | **25760.0** | 50.31 | 13.01112 |
+| 10 | 384017 | 23.941 | 1.00246 | 0.330695 | 1.0030 | **333813** | **25656.0** | 50.51 | 13.01112 |
+| 100 | 380577 | 23.423 | 1.02464 | 0.330695 | 1.0304 | **320583** | **24639.2** | 52.60 | 13.01112 |
+| 380 | 369749 | 21.915 | 1.09513 | 0.330695 | 1.1236 | **282329** | **21699.0** | 59.73 | 13.01112 |
+| 650 | 358901 | 20.569 | 1.16679 | 0.330695 | 1.2286 | **248541** | **19102.2** | 67.85 | 13.01112 |
+| 1400 | 337532 | 18.482 | 1.29853 | 0.330695 | 1.4771 | **194727** | **14966.2** | 86.60 | 13.01112 |
+| 2460 | 322504 | 17.007 | 1.41122 | 0.330695 | 1.6933 | **161207** | **12390.0** | 104.60 | 13.01112 |
 
-T_p(t) is the composed lunisolar precession period on the model’s ONE J2000 reading — 1,296,000/ψ̇ with p₀ = 1,296,000/T_p(J2000) = 50.2880 ″/yr, T_p(J2000) = 1,296,000/p_A on the IAU 2006 general precession input (plan 09; S5 had the retired year combs’ beat at 2000, 8 ppm faster) — `@essrt/physics/earth/precession-composed` built inside `deltat/deep-time.cjs`, one home: the hybrid precesses on it, the paleo-anchors gate checks the ψ̇ column. H(t) = H_era/[f_S + (1 − f_S)(a₀/a)³] is the internal UNIT (identifier `hAtAge`, plan 06 P4): it scales WITH T_p — the last column is constant, 13.01112 — but is NOT 13 periods: H₀ was fitted on the 1246 AD perihelion–solstice alignment (the perihelion-of-date beat), so H₀/13 = 25793.6 yr was the fit anchor’s reading, 0.086 % slow, and is not a period of anything the model computes (the "H = 13·T_p" claim is retired). H_era is the FROZEN era clock’s own phase convention (pure spin scaling), shipped with the frozen coefficients as a named device constant (D8: two named counters), not a physical claim. External readings for the ψ̇ column: IAU J2000 50.288 ″/yr (measured); Wu et al. 2024 at 650 Ma 67.64 ″/yr; Meyers & Malinverno 2018 at 1400 Ma 85.79 ± 2.72 ″/yr; Lantink et al. 2022 at 2460 Ma 108.6 ± 8.5 ″/yr (all three cyclostratigraphic inferences through an assumed astronomical model — theory-vs-inference, doc 99; the last two are gate rows `xiamaling-prec-1400` / `lantink-prec-2460`).
+T_p(t) is the composed lunisolar precession period on the model’s ONE J2000 reading — 1,296,000/ψ̇ with p₀ = 1,296,000/T_p(J2000) = 50.2880 ″/yr, T_p(J2000) = 1,296,000/p_A on the IAU 2006 general precession input (plan 09; S5 had the retired year combs’ beat at 2000, 8 ppm faster) — `@essrt/physics/earth/precession-composed` built inside `deltat/deep-time.cjs`, one home: the hybrid precesses on it, the paleo-anchors gate checks the ψ̇ column. H(t) = H₀·(ω₀/ω)/[f_S + (1 − f_S)(a₀/a)³] is the internal UNIT (identifier `hAtAge`, plan 06 P4): it scales WITH T_p — the last column is constant, 13.01112 — but is NOT 13 periods: H₀ was fitted on the 1246 AD perihelion–solstice alignment (the perihelion-of-date beat), so H₀/13 = 25793.6 yr was the fit anchor’s reading, 0.086 % slow, and is not a period of anything the model computes (the "H = 13·T_p" claim is retired). (The pure spin-scaling H_era = H₀·LOD/LOD₀ was the FROZEN era clock’s own phase convention, D8’s second named counter; it left with the last comb at plan 09 step 7a.) External readings for the ψ̇ column: IAU J2000 50.288 ″/yr (measured); Wu et al. 2024 at 650 Ma 67.64 ″/yr; Meyers & Malinverno 2018 at 1400 Ma 85.79 ± 2.72 ″/yr; Lantink et al. 2022 at 2460 Ma 108.6 ± 8.5 ″/yr (all three cyclostratigraphic inferences through an assumed astronomical model — theory-vs-inference, doc 99; the last two are gate rows `xiamaling-prec-1400` / `lantink-prec-2460`).
 <!-- /generated:calcmap-tidal-clock -->
 
 The of-date precession, by year (the hybrid's ε alongside, from the
@@ -332,9 +332,10 @@ one-source movement):
    (Phase 3).** The former clock scaled with the day length only; the
    composition adds the lunar 1/a³ term, and at 650 Ma that is the
    difference between 58.6 and 67.8 ″/yr against Wu's 67.64. The unit is
-   now 13 composed periods (2.1 step 6); the spin-only form survives as
+   now 13 composed periods (2.1 step 6); the spin-only form survived as
    the frozen era clock's counter `eraClockHAtAge` (2.1 step 5), a device
-   convention with its own name. Every "spin-family period scales with H(t)"
+   convention with its own name, until plan 09 step 7a deleted it with the
+   last comb. Every "spin-family period scales with H(t)"
    statement now means "scales with the composed precession period".
 4. **The α(t) step carries a comb** (2.1 step 2, role C): the
    moment-of-inertia modulation evaluates the L1 climate formula's
@@ -589,15 +590,15 @@ Banked window rms vs La2004 (″), hybrid / fitted K law: ±13 kyr 50 / 530 · �
 The beat at the deep anchors, both ψ̇ readings:
 
 <!-- generated:calcmap-obliquity-beat -->
-| age (Ma) | **T_p(t) = 1,296,000/ψ̇, the composed period (yr)** | the deep chain’s year beat T_sid/(T_sid − T_trop) — T_p counted in sidereal years, + 1 (plan 09 step 5d; it was the unit’s H(t)/13, 0.086 % apart) | ψ̇ (″/yr) | H_era(t)/13 (yr) — the frozen clock’s counter, for the record | beat 2π/(ψ̇ − \|s₃\|) (kyr) — the SHIPPED `obliqBeat*Kyr` form | beat(J2000)·T_p(t)/T_p(J2000) (kyr) — "obliquity period ∝ T_p", `obliqH8Scaled*Kyr` |
-|---|---|---|---|---|---|---|
-| 0 | **25771.575** | 25772.126 | 50.288 | 25793.615 | 41.22 | 41.22 |
-| 380 | **21699.048** | 21701.204 | 59.726 | 23553.016 | 31.71 | 34.71 |
-| 650 | **19102.207** | 19105.183 | 67.846 | 22106.453 | 26.45 | 30.56 |
-| 1400 | **14966.219** | 14970.856 | 86.595 | 19863.696 | 19.13 | 23.94 |
-| 2460 | **12389.980** | 12396.435 | 104.601 | 18277.485 | 15.11 | 19.82 |
+| age (Ma) | **T_p(t) = 1,296,000/ψ̇, the composed period (yr)** | the deep chain’s year beat T_sid/(T_sid − T_trop) — T_p counted in sidereal years, + 1 (plan 09 step 5d; it was the unit’s H(t)/13, 0.086 % apart) | ψ̇ (″/yr) | beat 2π/(ψ̇ − \|s₃\|) (kyr) — the SHIPPED `obliqBeat*Kyr` form | beat(J2000)·T_p(t)/T_p(J2000) (kyr) — "obliquity period ∝ T_p", `obliqH8Scaled*Kyr` |
+|---|---|---|---|---|---|
+| 0 | **25771.575** | 25772.126 | 50.288 | 41.22 | 41.22 |
+| 380 | **21699.048** | 21701.204 | 59.726 | 31.71 | 34.71 |
+| 650 | **19102.207** | 19105.183 | 67.846 | 26.45 | 30.56 |
+| 1400 | **14966.219** | 14970.856 | 86.595 | 19.13 | 23.94 |
+| 2460 | **12389.980** | 12396.435 | 104.601 | 15.11 | 19.82 |
 
-s₃ = the dominant Earth ζ mode of data/nbody-deep-secular-modes.json = -18.8506 ″/yr (amplitude 0.00832); beat = 1,296,000/(ψ̇ᵢₙ − |s₃|) yr at an instant, ψ̇ᵢₙ the spin axis’s inertial rate; a RECORD sees the window mean of the pole rate with its of-date factors (createModel().lunisolar.spinAxisInertialRateMeanArcsecPerYr / obliquityPeriodRealizedYears — the obliquity lines ride the LR04-window mean, v23.0). Plan 06 D6 → Phase 3 → S5: ψ̇(t) is the composed lunisolar rate on the model’s one J2000 reading (T_p(J2000) = 25771.6 yr, 1,296,000/p_A on the IAU 2006 input since plan 09). The unit’s tidal-mean year pair still beats at H(t)/13 (third column) — that 13/H is the unit’s CALENDAR convention (the kinematic day/year identities, the deep JD↔year calendar), kept unchanged in S5 so nothing certified moves; it is not a precession claim (plan-06 D2 decided: that tier stays a named device — beyond ±2 Myr the calendar beat sits a constant 0.086 % above the composed period, the anchor ratio, so a re-base would buy nothing physical). Registry keys `obliqBeatJ2000Kyr`/`obliqBeat1400MaKyr`/`obliqBeat2460MaKyr` are the sixth column; `obliqH8Scaled*Kyr` (name kept) is the seventh, the pure precession-scaling alternative "obliquity period ∝ T_p" — the J2000 beat held proportional to T_p(t), identical to the beat today and the discriminated alternative at depth (D8 iii; S5 retired its former T_p·13/8 = H/8 form). The pre-Phase-3 "structural" beat on H_era/13 is retired.
+s₃ = the dominant Earth ζ mode of data/nbody-deep-secular-modes.json = -18.8506 ″/yr (amplitude 0.00832); beat = 1,296,000/(ψ̇ᵢₙ − |s₃|) yr at an instant, ψ̇ᵢₙ the spin axis’s inertial rate; a RECORD sees the window mean of the pole rate with its of-date factors (createModel().lunisolar.spinAxisInertialRateMeanArcsecPerYr / obliquityPeriodRealizedYears — the obliquity lines ride the LR04-window mean, v23.0). Plan 06 D6 → Phase 3 → S5: ψ̇(t) is the composed lunisolar rate on the model’s one J2000 reading (T_p(J2000) = 25771.6 yr, 1,296,000/p_A on the IAU 2006 input since plan 09). The unit’s tidal-mean year pair still beats at H(t)/13 (third column) — that 13/H is the unit’s CALENDAR convention (the kinematic day/year identities, the deep JD↔year calendar), kept unchanged in S5 so nothing certified moves; it is not a precession claim (plan-06 D2 decided: that tier stays a named device — beyond ±2 Myr the calendar beat sits a constant 0.086 % above the composed period, the anchor ratio, so a re-base would buy nothing physical). Registry keys `obliqBeatJ2000Kyr`/`obliqBeat1400MaKyr`/`obliqBeat2460MaKyr` are the fifth column; `obliqH8Scaled*Kyr` (name kept) is the sixth, the pure precession-scaling alternative "obliquity period ∝ T_p" — the J2000 beat held proportional to T_p(t), identical to the beat today and the discriminated alternative at depth (D8 iii; S5 retired its former T_p·13/8 = H/8 form). The pre-Phase-3 "structural" beat on H_era/13 is retired.
 <!-- /generated:calcmap-obliquity-beat -->
 
 ### 4.6 Findings from this chain (to act on)
@@ -662,9 +663,10 @@ are the APPARENT crossings of the one certified Sun (`createModel().cardinal`
 — Newton on λ_apparent = 0/90/180/270, aberration and the leading nutation
 terms derived; the Sun's mean longitude integrates the one-source tropical
 year, chain 1.1). The former device, the **frozen era clock**
-(`createCardinalModel`, the §10 derived form in §5.2 below, kept as the
-record), returned event JDs from fitted coefficients frozen at the last
-spin-and-tides-side fit (the fitters are retired, git 16d7c87f). THE
+(`createCardinalModel`, the §10 derived form in §5.2 below — DELETED with
+its coefficients at plan 09 step 7a; §5.2 and §5.5 are its record), returned
+event JDs from fitted coefficients frozen at the last spin-and-tides-side fit
+(the fitters are retired, git 16d7c87f). THE
 OBSERVATION-CLASS VERDICT (plan 06 I1, `tools/verify/sun-vs-horizons.js`
 against JPL Horizons' own crossings over ±3000 yr, TT): the shipped instants
 sit <!--v:cardinalVsHorizonsMeanMin-->−1.02<!--/v--> min from Horizons on average (sd <!--v:cardinalVsHorizonsSdMin-->1.01<!--/v--> min), within
@@ -680,24 +682,33 @@ offsets, the e(t)-spread, the anomalistic year — from the N-body movement's
 own e(t) and ϖ(t) with zero fitted constants; it deliberately carries no
 absolute dates. The scene's panel rows are a third path (5.4).
 
-### 5.1 The clock — the phase counter every comb reads
+### 5.1 The clock — the phase counter every comb read (DELETED, plan 09 step 7a — the record)
 
-| item | definition | H-role | code |
+The frozen era clock's counter was deleted with the last comb that read it
+(the cardinal record, below). What it was, for the record:
+
+| item | definition | H-role | code (last revision, git history) |
 |---|---|---|---|
-| the ∫dt/H(t) table | cumulative ∫1/H over 10-kyr cells, TRAPEZOID rule, LINEAR interpolation, ±500 Myr; H(t) under the constant-moment-of-inertia α (the climate-modulated α integrates into a linear phase drift — measured ~18 s of cardinal JD); table zero at the cell nearest `startmodelYear` 2000.5; drift reference `startModelYearWithCorrection` = 2000.5 + correctionDays/mSY = 2000.4977 (two constants half a day apart — do not unify) | **P** (H(t) stands for ω(t)) + **U** | `phase/index.cjs` 55–100; `model.js` 285–300 |
-| cyclesBetween(A, B, N) | N × (∫_A^B dt/H − j2000Drift), j2000Drift = ∫_A^{ref} dt/H − (ref − A)/H_J2000; the anchor is identified by CALL SHAPE (R3): (anchor, movingYear, N) or (J2000, anchor, N) — the correction depends on the FIXED endpoint only, so the integrated count equals the snapshot count at J2000 and keeps its shape at depth | **U** (the count) | `phase/index.cjs` 130–152 |
-| the out-of-domain fallback | N·(B − A)/H_J2000 (the snapshot count) when the table is undefined (past the tidal-lock asymptote) | **U** | `model.js` 305–308 |
-| **the balanced year** | `perihelionalignmentYear` 1246.03125 − `temperatureGraphMostLikely` 14.5 × H/16 = **−302,635** — the phase origin of EVERY comb: the obliquity 16 lines, the year-length 26, the cardinal 92 sinusoids + 8 equation-of-centre orders + 26 joint sidebands, the RA-day-offset 2, the inclination line, the H/3 eccentricity line | **L** (an origin expressed as 14.5 perihelion-of-date cycles before the 1246 alignment — half-integer, so the θ₁₆ phase at 1246 is π) | `model.js` 90–91; `script.js` 1029, 1035 (`BALANCED_YEAR_J2000_FIXED`) |
+| the ∫dt/H_era table | cumulative ∫1/H_era over 10-kyr cells, TRAPEZOID rule, LINEAR interpolation, ±500 Myr, H_era = H₀·LOD/LOD₀ under the constant-moment-of-inertia α (the climate-modulated α integrates into a linear phase drift — measured ~18 s of cardinal JD); table zero at the cell nearest `startmodelYear` 2000.5; drift reference `startModelYearWithCorrection` = 2000.5 + correctionDays/mSY = 2000.4977 (two constants half a day apart). The grid survives as the deep calendar's and the pos table's (`phase/deep-calendar.cjs`). | **P** (H_era stands for ω(t)) + **U** | `phase/index.cjs` `createPhaseMachinery` |
+| cyclesBetween(A, B, N) | N × (∫_A^B dt/H_era − j2000Drift), j2000Drift = ∫_A^{ref} dt/H_era − (ref − A)/H_J2000; the anchor identified by CALL SHAPE (R3): (anchor, movingYear, N) or (J2000, anchor, N) — the correction depends on the FIXED endpoint only, so the integrated count equalled the snapshot count at J2000 and kept its shape at depth | **U** (the count) | `phase/index.cjs`; the engines' `cyclesBetweenYears`, `model.js` `epoch.cyclesBetween` |
+| the out-of-domain fallback | N·(B − A)/H_J2000 (the snapshot count) when the table was undefined (past the tidal-lock asymptote) | **U** | `model.js` |
+| **the balanced year** | `perihelionalignmentYear` 1246.03125 − `temperatureGraphMostLikely` 14.5 × H/16 = **−302,635** — the phase origin of EVERY comb until plan 07 R10: the obliquity 16 lines, the year-length 26, the cardinal 92 sinusoids + 8 equation-of-centre orders + 26 joint sidebands, the RA-day-offset 2, the inclination line, the H/3 eccentricity line | **L** (an origin expressed as 14.5 perihelion-of-date cycles before the 1246 alignment — half-integer, so the θ₁₆ phase at 1246 is π) | `script.js` `BALANCED_YEAR_J2000_FIXED` (a scaffold pose anchor since) |
 
-Plan 07 R10: the phase origin is J2000. The former origin (the "balanced
-year", −302,635 = the 1246 AD alignment minus 14.5 × H/16) was part of the
-matched pair — every fitted coefficient was produced against it — and
-moving it re-phases all of them; it was moved by rotating every (sin, cos)
-pair exactly (`tools/fit/reorigin-combs-j2000.mjs`, measured bit-identical
-on every surface over ±300 kyr), not by refitting. Its two inputs left the
-JSON; nothing in the shipped model reads a phase origin other than J2000.
+Plan 07 R10 had moved the phase origin to J2000: the former origin (the
+"balanced year", −302,635) was part of the matched pair — every fitted
+coefficient was produced against it — and it was moved by rotating every
+(sin, cos) pair exactly (`tools/fit/reorigin-combs-j2000.mjs`, measured
+bit-identical on every surface over ±300 kyr, deleted at step 7a with the
+last comb), not by refitting. Plan 09 then deleted the combs family by
+family (steps 2–6) and the counter itself at step 7a: `createPhaseMachinery`,
+the engines' `cyclesBetweenYears` / `integralInverseHFromYears` /
+`phaseAdvanceSnapshot`, `epoch.cyclesBetween`, the era clock's
+`eraClockHAtAge` and its year twins, and the exporter's `Cycle` column. The
+movement counts nothing in anchor units: the wheels turn uniformly at
+recorded J2000 rates (step 5c), the Moon rides its chain, the calendar
+integrates the tropical year of date (step 5d).
 
-### 5.2 The frozen era clock — the §10 derived form (RETIRED from the runtime, plan 06 R1 — kept as the record)
+### 5.2 The frozen era clock — the §10 derived form (RETIRED from the runtime at plan 06 R1, DELETED with its coefficients at plan 09 step 7a — kept as the record; code columns name the last revision, git history)
 
     JD_X(Y)  = anchor_X + ΣT_trop(Y) + δ_X(Y) − δ_X(2000)
     ΣT_trop  = lincoef·(Y − 2000) + drift(Y) + Ih(Y)
@@ -755,9 +766,10 @@ closed form does not carry). **No H enters this device anywhere.**
 
 ### 5.5 Live values — the spreadsheet check
 
-Constants and anchors of the frozen device:
+Constants and anchors of the frozen device — the LAST RENDER before the
+device and its coefficients were deleted (plan 09 step 7a), kept as static
+text; the two tables below no longer regenerate:
 
-<!-- generated:calcmap-cardinal-anchors -->
 | quantity | value | what it is | H-role |
 |---|---|---|---|
 | phase origin of EVERY comb | 2000 (J2000) | plan 07 R10: the former fitted origin — `perihelionalignmentYear` 1246.03125 − 14.5 × H/16 = −302,635, "obliquity cycle position 14.5 of 16" — was rotated out of every (sin, cos) pair exactly (c0 = 0.908498525276082 anchor units, `tools/fit/reorigin-combs-j2000.mjs`); its inputs left the JSON | — (no offset counted) |
@@ -776,13 +788,11 @@ Constants and anchors of the frozen device:
 | WS | 2451900.065845 (2000 12-21 13:35) | 2451900.067346 (2000 12-21 13:37) | -0.036 |
 
 USNO 2000 instants for comparison (UTC, minute precision — the registry `cardinalPointAnchors`, astro-reference, ONE home since R4d): VE 2451623.8160 (2000 03-20 07:35) · SS 2451716.5750 (2000 06-21 01:48) · AE 2451810.2271 (2000 09-22 17:27) · WS 2451900.0674 (2000 12-21 13:37). Plan 06 R1: NO runtime reads either fitted anchor set any more — the shipped instants are the apparent crossings of the one Sun (`createModel().cardinal`, delegated to by script.js and tools/lib); both fitted keys stay in the coefficients file as the retired device's record until the cleanup phase. (R4c closed the last reader: the simulator's cardinal panel had re-solved the events on the rendered scene and bridged them to the ADJUSTED set with a J2000 offset; it now reads `cardinal.jdNearUT` seeded at the displayed calendar year's midpoint — the model year and the calendar year part by 0.0078 d/yr, 114 yr at −5.34 Myr. R4d: the registry's VE/AE entries had been retired-device anchors 112 min off the USNO instants; corrected.)
-<!-- /generated:calcmap-cardinal-anchors -->
 
-The June-solstice JD decomposed term group by term group (the rebuild
-that produces these columns is asserted bit-identical to the shipped
-device first):
+The June-solstice JD decomposed term group by term group (the rebuild that
+produced these columns was asserted bit-identical to the retired device
+first; last render, static since step 7a):
 
-<!-- generated:calcmap-cardinal-decomposition -->
 | year | lincoef·(Y−2000) (d) | drift Simpson (d) | Ih (d) | Σ sinusoids − δ(2000) (d) | equation-of-centre orders (d) | joint sidebands (d) | JD_SS − anchor (d) | cycles since the balanced year, integrated | linear (Y − bY)/H |
 |---|---|---|---|---|---|---|---|---|---|
 | -10000 | -4382906.2754 | 0.02155 | 0.00000 | -0.15117 | 0.14919 | 0.00306 | -4382914.80512 | -0.0357871 | -0.0357870 |
@@ -807,9 +817,8 @@ device first):
 | 10000 | 6055.1 · 6268.6 · 6566.0 · 6335.0 |
 
 Plan 06 R1: this decomposition is the RETIRED device's (the record — its coefficients stay in the file); the shipped `cardinal.jd` is the apparent crossing of the one Sun, and the second table is the measured gap between the two (the 2000 row is the anchor convention: the device was pinned to the USNO instants, the crossing carries the mean-longitude anchor L0 and aberration/nutation derived). The six component columns sum to the eighth exactly. Every term is zero at 2000 by construction — the self-correction δ_X(2000) pins the anchor.
-<!-- /generated:calcmap-cardinal-decomposition -->
 
-The four events and the year lengths:
+The four events and the year lengths (live, generated):
 
 <!-- generated:calcmap-cardinal-events -->
 | year | VE | SS | AE | WS | SS→SS interval (d) | `yearLengthDays(SS)` (d, the crossing interval — the same quantity since R1) | mean of four (d) | one-family mean tropical year (s) | e |
@@ -838,7 +847,7 @@ The e(t)-spread by both devices, the anomalistic year, the RA:
 | 5000 | 218.1 · 472.1 · -195.4 · -117.3 | 44.2 · -15.0 · -45.0 · 15.8 | 31558440.74 | 0.0000 | 0.01533 |
 | 10000 | 223.6 · -167.1 · -731.2 · -348.8 | 12.8 · 37.7 · -12.2 · -38.2 | 31558460.72 | 0.0000 | 0.01261 |
 
-Retired device's RA formula constants (the record; since R1 the shipped RA is the target longitude by construction): raMean = base − earthRAAngle/sin ε̄ = base − 3.157955°, amplitude A/sin ε̄ = 1.600721° on −sin(2π·3·c) + sin(2π·8·c) (base 0/90/180/270° for VE/SS/AE/WS). Balanced year used by both devices: 2000.00000.
+Retired device's RA formula constants (the record; since R1 the shipped RA is the target longitude by construction): raMean = base − earthRAAngle/sin ε̄ = base − 3.157955°, amplitude A/sin ε̄ = 1.600721° on −sin(2π·3·c) + sin(2π·8·c) (base 0/90/180/270° for VE/SS/AE/WS); c counted from J2000 since plan 07 R10 (the device itself is deleted, plan 09 step 7a).
 <!-- /generated:calcmap-cardinal-spread -->
 
 ### 5.6 Findings from this chain (to act on)

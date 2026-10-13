@@ -126,7 +126,9 @@ Runtime evaluation **must use this same snapshot form**. The earlier
 across ±12 kyr because integrated phase and snapshot phase only agree at
 the anchor year, not at every epoch. Both `computeSolsticeRA/JD/YearLength`
 (simulator) and `calcCardinalPointRA/JD/YearLen` + `calcSolarYear` (website
-adapter over the package's `createCardinalModel`) use snapshot phase.
+adapter over the package's `createCardinalModel`) used snapshot phase. (The
+record of the retired fit; the device and its coefficients were deleted at
+plan 09 step 7a — the cardinal instants are the one Sun's crossings.)
 
 ### Option B — Deep-time mSY drift
 
@@ -594,9 +596,11 @@ CERTIFIED ERA CLOCK. They NEVER re-fit, and plan 09 deletes them family
 by family: SOLSTICE_OBLIQUITY_* (the obliquity rides the hybrid),
 TROPICAL/SIDEREAL/ANOMALISTIC_YEAR_HARMONICS with YEAR_LENGTH_J2000_ANCHOR
 (the J2000 year lengths are the IAU inputs on the SI day, the year lengths
-of date the one-source family); the CARDINAL_POINT_* family stays in the
-coefficients file as the record of the §5.2 derived form (doc 110), read
-only by that record's render. Plan 06 R1 (measured): the
+of date the one-source family); and last, at step 7a, the CARDINAL_POINT_*
+family with its package evaluator and the clock's own counter (the ∫dt/H_era
+phase table, `cyclesBetweenYears`, `eraClockHAtAge`) — doc 110 §5.2/§5.5
+keep the last render as a static record, and fitted-coefficients.json
+carries no coefficient block since. Plan 06 R1 (measured): the
 CARDINAL_POINT_* family and the comb-based Sun drift left the runtime —
 the cardinal instants are the apparent crossings of the one certified Sun
 whose mean longitude integrates the one-source tropical year (against JPL
@@ -1035,8 +1039,8 @@ npm run fit:6a2                                                              # S
 npm run check:csv-smoke                                                      # the bit-exact window compare
 # (The full-period Step 6a export is retired as a kept file — see Step 6a;
 # `node tools/fit/export-solar-measurements.js` still writes one on demand, ~2 h.)
-# (The obliquity / year-length / cardinal harmonic fits are retired —
-# coefficients frozen; see "The frozen era clock". Nothing runs after 6a2.)
+# (The obliquity / year-length / cardinal harmonic fits are retired and their
+# coefficients deleted, plan 09; see "The frozen era clock". Nothing runs after 6a2.)
 # (Sun longitude harmonics moved to Phase 0 — see top of this block.
 # It does NOT need to re-run here as part of routine refits.)
 

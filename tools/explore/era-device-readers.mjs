@@ -198,16 +198,13 @@ for (const h of hits) { const t = twinOf(h); if (t) h.twin = t; }
 const twinReaders = {};
 for (const h of hits) if (h.twin) { ((twinReaders[h.twin] ??= {})[h.runtime] ??= 0); twinReaders[h.twin][h.runtime]++; }
 
-// measurements — the device against its twin, at a fixed epoch set
-const EPOCHS = [2000, -4000, 10000, -26000, -270000, -1000000];
+// measurements — the device against its twin, at the fixed epoch set
+// 2000, −4000, 10000, −26000, −270000, −1000000 (every row a FROZEN record since
+// plan 09 step 7a deleted the last live device; the package model, the
+// constants module and the Node orbital engine were read only by those twins)
 const DT = require(join(ROOT, 'tools/lib/deep-time.js'));
-const OE = require(join(ROOT, 'tools/lib/orbital-engine.js'));
-const CC = require(join(ROOT, 'tools/lib/constants.js'));
 const DOH = require(join(ROOT, 'tools/lib/deep-orbital-history.js'));
 const M = DOH.createOneSourceMovement();
-const { createModel } = await import(join(ROOT, 'packages/physics/src/index.js'));
-const PM = createModel(undefined, { secularSeriesArtifact: JSON.parse(readFileSync(join(ROOT, 'data/nbody-secular-series.json'), 'utf8')) });
-const w180 = (d) => ((d + 540) % 360 + 360) % 360 - 180;
 const measured = {};
 if (M) {
   const YL = M.yearLengths;
@@ -235,12 +232,17 @@ if (M) {
     { year: 2000, deg: 0.0290786002965433 }, { year: -4000, deg: -1.585318413795676 }, { year: 10000, deg: -2.938993674087442 },
     { year: -26000, deg: -19.99716160398134 }, { year: -270000, deg: -86.88308327267453 }, { year: -1000000, deg: -87.79076041849305 },
   ] };
-  const Tp0 = PM.lunisolar.meanPeriodYearsAtYear(2000), H0 = CC.H;
-  const Hc = (y) => H0 * PM.lunisolar.meanPeriodYearsAtYear(y) / Tp0;
-  const Hera = (y) => DT.eraClockHAtAge((2000 - y) / 1e6);
-  const integ = (f, a, b) => { const step = Math.max(50, Math.abs(b - a) / 4000); let s = 0; for (let y = Math.min(a, b); y < Math.max(a, b); y += step) { const h = Math.min(step, Math.max(a, b) - y); s += 0.5 * (f(y) + f(y + h)) * h; } return s; };
-  measured['era-counter'] = { unit: 'H/16 comb phase, ° (frozen counter − composed clock, integrated from J2000)', rows: EPOCHS.filter((y) => y !== 2000).map((y) => ({ year: y, deg: 16 * 360 * (integ((t) => 1 / Hera(t), 2000, y) - integ((t) => 1 / Hc(t), 2000, y)), ratioMinus1: Hera(y) / Hc(y) - 1 })) };
-  measured['deep-calendar'] = { unit: 'days per year (era clock − composed)', rows: EPOCHS.map((y) => { const t = (2000 - y) / 1e6; const a = DT.eraClockYearInDaysAtAge(t), b = DT.meanYearInDaysAtAge(t); return { year: y, days: (a === null || b === null) ? null : a - b }; }) };
+  // plan 09 step 7a: the frozen era clock's counter (eraClockHAtAge and its year twins) is deleted — FROZEN
+  // records of the last measurement before deletion (the counter no longer evaluates)
+  measured['era-counter'] = { unit: 'H/16 comb phase, ° (frozen counter − composed clock, integrated from J2000) — recorded before the counter\'s deletion at plan 09 step 7a', rows: [
+    { year: -4000, deg: -0.00006300986318708013, ratioMinus1: 0.0000012227007812892765 }, { year: 10000, deg: 0.00011201710319319602, ratioMinus1: -0.0000016302631730136241 },
+    { year: -26000, deg: -0.0013722240174551814, ratioMinus1: 0.000005705961931168346 }, { year: -270000, deg: -0.12950250287623533, ratioMinus1: 0.000055432032930013975 },
+    { year: -1000000, deg: -1.757801139671642, ratioMinus1: 0.0002042314715116067 },
+  ] };
+  measured['deep-calendar'] = { unit: 'days per year (era clock − composed) — recorded before the counter\'s deletion at plan 09 step 7a', rows: [
+    { year: 2000, days: 0.000011807327439328219 }, { year: -4000, days: 0.000011824668206372735 }, { year: 10000, days: 0.000011784202513354103 },
+    { year: -26000, days: 0.000011888280823768582 }, { year: -270000, days: 0.000012593842711794423 }, { year: -1000000, days: 0.000014706149158882909 },
+  ] };
   // plan 09 step 3: the 8H counts are deleted (the months are the IAU inputs) — FROZEN record of the last measurement
   measured['lunar-counter'] = { unit: 's of month (device-quantized − IAU input) — recorded before the counts\' deletion at plan 09 step 3', rows: [{ year: 2000, sidereal: 0.007823650412319694 }] };
 }

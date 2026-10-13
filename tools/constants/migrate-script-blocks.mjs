@@ -43,13 +43,10 @@ const BLOCKS = [
   // (MOON_CORRECTION / MOON_CORRECTION_RESIDUAL: migrated here, then retired
   // at plan 06 R3 item 1 — no block remains in script.js. CARDINAL_POINT_ANCHORS
   // — the ADJUSTED set under the base name — likewise: migrated, then retired at
-  // plan 06 R4c with the D4b panel solver, its last reader.)
-  {
-    name: 'CARDINAL_POINT_HARMONICS',
-    expected: (fit) => fit.CARDINAL_POINT_HARMONICS,
-    expr: 'FIT.CARDINAL_POINT_HARMONICS',
-    note: 'EXPECT REFUSAL — embedded copy is 6-decimal rounded (RSS 0.0149, worst 0.1360)',
-  },
+  // plan 06 R4c with the D4b panel solver, its last reader. CARDINAL_POINT_HARMONICS
+  // — the block whose embedded copy was 6-decimal rounded, RSS 0.0149, worst
+  // 0.1360 — migrated, then deleted with the frozen cardinal record at plan 09
+  // step 7a.)
   // (PREDICT_COEFFS: migrated here, then retired with the planet predict device
   // at plan 06 R8 — no block remains in script.js.)
   {

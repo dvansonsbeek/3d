@@ -46,8 +46,7 @@ const PROBES = [
   { name: 'moonDistanceMetres', mine: L0.moonDistanceMetres, theirs: DT.meanMoonDistanceMetresAtAge },
   { name: 'lodSeconds', mine: L0.lodSeconds, theirs: DT.meanLodSecondsAtAge },
   { name: 'holisticH', mine: L0.holisticH, theirs: DT.meanHAtAge },
-  { name: 'eraClockH', mine: L0.eraClockH, theirs: DT.eraClockHAtAge },
-  { name: 'eraClockTropicalYearSeconds', mine: L0.eraClockTropicalYearSeconds, theirs: DT.eraClockTropicalYearSecondsAtAge },
+  // (plan 09 step 7a: the eraClockH / eraClockTropicalYearSeconds twins — the frozen era clock's counter and base — are deleted)
   { name: 'siderealYearSeconds', mine: L0.siderealYearSeconds, theirs: DT.meanSiderealYearSecondsAtAge },
   { name: 'tropicalYearSeconds', mine: L0.tropicalYearSeconds, theirs: DT.meanTropicalYearSecondsAtAge },
   // (plan 09 step 5d: the anomalisticYearSeconds twins — the H/16 device identity — are deleted)

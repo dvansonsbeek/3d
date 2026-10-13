@@ -26,9 +26,9 @@
  * composed period — H(t)/T_p(t) = H₀/axial0 = 13.011 at every epoch — but
  * is not 13 of them; the 13 is a fit-era label that leaves the physics.
  * The pre-Phase-3 structural clock 13·1,296,000/H_era(t) (pure ω-scaling,
- * H_era = H₀·LOD/LOD₀) survives only as the FROZEN ERA CLOCK's named phase
- * convention (eraClockHAtAge) and in docs/retired-record.md, with its
- * record: it read 70.9 ″/yr against Lantink et al. 2022's 108.6 ± 8.5 at
+ * H_era = H₀·LOD/LOD₀) survived as the FROZEN ERA CLOCK's named phase
+ * convention (eraClockHAtAge) until plan 09 step 7a deleted it with the last
+ * comb; its record (doc 110 chain 2, the paleo-anchors gate rows): it read 70.9 ″/yr against Lantink et al. 2022's 108.6 ± 8.5 at
  * 2.46 Ga and 65.2 against Meyers & Malinverno 2018's 85.79 ± 2.72 at
  * 1.4 Ga, where the composed rate reads 104.6 and 86.6.
  *

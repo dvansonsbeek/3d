@@ -31,9 +31,7 @@
   ],
   "exports": {
     ".": { "types": "./types/index.d.ts", "default": "./src/index.js" },
-    "./phase": { "types": "./types/phase/index.d.cts", "default": "./src/phase/index.cjs" },
     "./phase/deep-calendar": { "types": "./types/phase/deep-calendar.d.cts", "default": "./src/phase/deep-calendar.cjs" },
-    "./cardinal": { "types": "./types/cardinal/index.d.cts", "default": "./src/cardinal/index.cjs" },
     "./cardinal/one-source-structure": { "types": "./types/cardinal/one-source-structure.d.cts", "default": "./src/cardinal/one-source-structure.cjs" },
     "./moon/deep-ecc-channel": { "types": "./types/moon/deep-ecc-channel.d.cts", "default": "./src/moon/deep-ecc-channel.cjs" },
     "./moon/deep-modes-artifact": { "types": "./types/moon/deep-modes-artifact.d.cts", "default": "./src/moon/deep-modes-artifact.cjs" },

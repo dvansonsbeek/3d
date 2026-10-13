@@ -110,22 +110,18 @@ function createDeepTimeLod(deps) {
     return (s === null) ? null : s / 3600;
   }
 
-  /** The FROZEN ERA CLOCK's phase convention: H_era(t) = H_J2000 · LOD(t)/LOD_J2000
-   * (pure spin scaling — the pre-Phase-3 "H/13 identity"). The frozen devices
-   * (the cardinal era clock, the year-length comb family, the ∫dt/H phase
-   * table) were fitted against THIS counter; it ships with their coefficients
-   * as a named device constant (plan 06 D8: two named counters). It is NOT
-   * the unit H(t) below.
-   * @param {number} t_Ma @returns {number|null} */
-  function eraClockHAtAge(t_Ma) {
-    return eraClockHFromLod(lodSecondsAtAge(t_Ma));
-  }
+  // (Plan 09 step 7a: the FROZEN ERA CLOCK's public counter `eraClockHAtAge`
+  // — H_era(t) = H₀·LOD(t)/LOD₀, pure spin scaling, plan 06 D8's second named
+  // counter — and its year twins `eraClockTropicalYearSecondsAtAge` /
+  // `eraClockYearInDaysAtAge` are DELETED with the last comb and the ∫dt/H_era
+  // phase table. The spin-scaling helper below stays INTERNAL to hAtAge, the
+  // unit's own law, until the unit leaves at step 7b.)
   // The `…FromLod` twins take an ALREADY-COMPUTED LOD(t): the Simpson ΔT
   // integrand below evaluated the LOD four times and the tropical year twice
   // per node through these helpers (measured 8.8 → 4.8 ms per cardinal panel
   // year with the model's ΔT memo). Same operations, same inputs — every
   // value bit-identical (11,958-value sweep, 0 differences).
-  /** @param {number|null} LOD_s @returns {number|null} */
+  /** The spin-scaling factor of the unit: H₀·LOD(t)/LOD₀. @param {number|null} LOD_s @returns {number|null} */
   function eraClockHFromLod(LOD_s) {
     if (LOD_s === null) return null;
     return K.holisticYearJ2000 * LOD_s / K.lodNowH13Seconds;
@@ -230,25 +226,9 @@ function createDeepTimeLod(deps) {
     return tropicalYearSecondsAtAge(t_Ma) / LOD_s;
   }
 
-  // ── The frozen era clock's twins (device tier) ──────────────────────────
-  // The same forms on H_era — the bases the frozen cardinal clock (its drift
-  // integrand and real-LOD convention) and the year-length comb family were
-  // fitted against. Bit-identical to the pre-Phase-3 tropicalYearSecondsAtAge /
-  // yearInDaysAtAge; the physical (unit) forms above are what the model
-  // publishes.
-  /** @param {number} t_Ma @returns {number} */
-  function eraClockTropicalYearSecondsAtAge(t_Ma) {
-    const sidSec = siderealYearSecondsAtAge(t_Ma);
-    const Ht = eraClockHAtAge(t_Ma);
-    if (Ht === null) return sidSec * (1 - 13 / K.holisticYearJ2000);
-    return sidSec * (1 - 13 / Ht);
-  }
-  /** @param {number} t_Ma @returns {number|null} */
-  function eraClockYearInDaysAtAge(t_Ma) {
-    const LOD_s = lodSecondsAtAge(t_Ma);
-    if (LOD_s === null) return null;
-    return eraClockTropicalYearSecondsAtAge(t_Ma) / LOD_s;
-  }
+  // (Plan 09 step 7a: the frozen era clock's year twins on H_era —
+  // T_sid·(1 − 13/H_era) and its day count, the bases the deleted cardinal
+  // record and year-length combs were fitted against — are deleted.)
 
   /**
    * The solar day's "ecliptic missing motion" correction, seconds: the mean
@@ -396,8 +376,7 @@ function createDeepTimeLod(deps) {
     eclipticLodCorrectionSecondsAtAge,
     yearInDaysAtAge, deltaTRawSecondsAtAge, lodSecondsWithCorrectionsAtAge,
     dLodDtDecompositionAtAge,
-    // the frozen era clock's named counter and bases (device tier, plan 06 D8)
-    eraClockHAtAge, eraClockTropicalYearSecondsAtAge, eraClockYearInDaysAtAge,
+    // (plan 09 step 7a: the frozen era clock's counter and bases left with the last comb)
   };
 }
 

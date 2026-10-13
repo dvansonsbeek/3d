@@ -354,18 +354,18 @@
   "files": {
    "data/la2004-earth-51myr-back.asc": "sha256:3f13b9f8e69085baf40bc67a2669e6f6af4148fef9218ed2158772aa91e35f8c",
    "data/nbody-deep-secular-modes.json": "sha256:7633dd8f434fd6fc1ddaf07fd3ec3623e91e09322002ec08d53b8a12e6883fb7",
-   "data/nbody-secular-series.json": "sha256:6a01ff136333ef698110d10b1b2c83b99d498c36f6699585b2405bf4c4176721",
+   "data/nbody-secular-series.json": "sha256:13fc12eb36ab88f492e15397669c68dc62dcc43606c1749a6db0607fa57962f6",
    "packages/physics/src/climate/l1-orbital.cjs": "sha256:4c24e53d536e253b4991cbf397545f765964852281ed5b6870046875a3e8d2b1",
-   "packages/physics/src/deltat/deep-time.cjs": "sha256:687cfb6965004a58db8b69fddd6c5a0d00374130791007c129c3e78498917282",
+   "packages/physics/src/deltat/deep-time.cjs": "sha256:acbc2647d15d2cb705f7152716ad7427e1162b4ec1ea0d3dfc0ce1254058f43c",
    "packages/physics/src/earth/deep-orbital-history.cjs": "sha256:84b18c22798d2c7017bbf7ddffe485a8bb23754335dde8383152af7009e80730",
    "packages/physics/src/earth/frame-of-date.cjs": "sha256:f92981c65d7d7dce7fed7bfa858e2a4405f278ad761e703cfafd0cf4d8792431",
-   "packages/physics/src/earth/precession-composed.cjs": "sha256:7f30ac5597b745a88b453c54bb47da39e5ec3c8bb8b349e34e8a15752c04a208",
+   "packages/physics/src/earth/precession-composed.cjs": "sha256:0b2904e81b5a15a45ef416502f971b5333da385005d1a5be175d4c6178bd3a6e",
    "packages/reference/src/published-curves.cjs": "sha256:2cbc57757926f893fccf5df42ad52e76ee6d14c5b5cf0cc30daf5ce9d63ec318",
    "public/input/astro-reference.json": "sha256:a967a72ecdac487f628c0cb6ba07ae7cc771d07fa3eeaacc7b9949273e933fd7",
    "public/input/climate-formula-coefficients.json": "sha256:b19d9fc5e20721d484f4c67e88102361e906a0c9eeb6018a71e4f09b5f37a7c9",
    "public/input/model-parameters.json": "sha256:a1fa1237f5164cc7ced7fde8782abdf2170e38fdbfc1c79d34966daa3dd7296c",
    "tools/lib/deep-orbital-history.js": "sha256:9f713a177edb5eb8e795b5cbf40d49f658668fdce6f20c75d010c4fbecfcbab2",
-   "tools/lib/deep-time.js": "sha256:1a4f059f4eef7f5d3b59134187146aa62b0929f66ba05b354883d17fc3338ace",
+   "tools/lib/deep-time.js": "sha256:74dae861632f0beb110361008a035fbbce07803d2fc371784043509371919492",
    "tools/verify/equinox-vs-vondrak.js": "sha256:27cc94debae06240161708b02ff1fc770a79561e9f03871baba452d526f0d092"
   }
  }

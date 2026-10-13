@@ -10,9 +10,11 @@
  * VERBATIM from the browser copy — operation for operation — so the numerics
  * are the shipped ones:
  *
- *  - the days-per-year integral rides the phase machinery's grid (10-kyr
- *    cells, trapezoid rule, linear interpolation between cells) — the same
- *    discretization the fitted coefficients were produced against; the
+ *  - the days-per-year integral rides the engines' deep-time grid (10-kyr
+ *    cells over ±500 Myr, trapezoid rule, linear interpolation between
+ *    cells — the discretization every year-keyed golden was produced
+ *    against; until plan 09 step 7a the grid was the ∫dt/H phase table's,
+ *    deleted with the unit's counting); the
  *    integrand is the tropical year of date over the day of date — since plan
  *    09 step 5d one equinox turn per the composed precession period T_p(t),
  *    a movement, not the unit's count (the calendar's year is a tropical year);
@@ -37,12 +39,6 @@
 'use strict';
 
 /**
- * @typedef {Object} PhaseMachinery
- * @property {() => void} ensureTable
- * @property {() => {yearMin: number, yearMax: number, stepYears: number, j2000Idx: number, length: number}} grid
- */
-
-/**
  * @typedef {Object} DeepCalendar
  * @property {(jd: number) => number} jdToSIyear SI-tropical-year label for a
  *   JD, anchored at startModelYearWithCorrection — NOT a calendar year (the
@@ -62,30 +58,37 @@
 
 /**
  * @param {{
- *   phase: () => PhaseMachinery,
  *   meanYearInDaysAtAgeMa: (tMa: number) => (number | null),
  *   withLatticeAlpha: (build: () => void) => void,
  *   startModelJD: number,
  *   startModelYear: number,
  *   startModelYearWithCorrection: number,
  *   siTropicalYearDays: number,
- * }} deps — `phase` is the engine's (lazily built) phase machinery, whose
- *   grid the days table shares; `meanYearInDaysAtAgeMa` the engine's
- *   days-per-year source (the LOD channel's `yearInDaysAtAge`);
- *   `withLatticeAlpha` the engine's R2 pin; `startModelYear` is the table
- *   zero (2000.5) and `startModelYearWithCorrection` the SI-axis anchor
- *   (≈ 2000.4977) — two different constants, do not unify.
+ *   yearMin?: number,
+ *   yearMax?: number,
+ *   stepYears?: number,
+ * }} deps — `meanYearInDaysAtAgeMa` is the engine's days-per-year source
+ *   (the LOD channel's `yearInDaysAtAge`); `withLatticeAlpha` the engine's
+ *   R2 pin; `startModelYear` is the table zero (2000.5) and
+ *   `startModelYearWithCorrection` the SI-axis anchor (≈ 2000.4977) — two
+ *   different constants, do not unify; the grid (±500 Myr, 10-kyr cells)
+ *   is the engines' deep-time grid — the table zero sits at the cell
+ *   nearest `startModelYear`.
  * @returns {DeepCalendar}
  */
 function createDeepCalendar({
-  phase,
   meanYearInDaysAtAgeMa,
   withLatticeAlpha,
   startModelJD,
   startModelYear,
   startModelYearWithCorrection,
   siTropicalYearDays,
+  yearMin = -500e6,
+  yearMax = 500e6,
+  stepYears = 10000,
 }) {
+  const j2000Idx = Math.round((startModelYear - yearMin) / stepYears);
+  const N = Math.ceil((yearMax - yearMin) / stepYears) + 1;
   /** @type {(jd: number) => number} */
   const jdToSIyear = (jd) => startModelYearWithCorrection + (jd - startModelJD) / siTropicalYearDays;
   /** The exact inverse: SI-year label → JD (the Moon layers' argument clock
@@ -93,7 +96,7 @@ function createDeepCalendar({
    *  @type {(ySI: number) => number} */
   const siYearToJD = (ySI) => startModelJD + (ySI - startModelYearWithCorrection) * siTropicalYearDays;
 
-  /** ∫ daysPerYear dt from startModelYear, on the phase grid. @type {Float64Array | null} */
+  /** ∫ daysPerYear dt from startModelYear, on the deep-time grid. @type {Float64Array | null} */
   let cumulDaysTable = null;
 
   function ensureCumulDaysTable() {
@@ -102,9 +105,6 @@ function createDeepCalendar({
   }
 
   function buildCumulDaysTable() {
-    const P = phase();
-    P.ensureTable();
-    const { yearMin, stepYears, j2000Idx, length: N } = P.grid();
     const table = new Float64Array(N);
 
     /** @type {(year: number) => (number | null)} */
@@ -140,7 +140,6 @@ function createDeepCalendar({
     if (!Number.isFinite(year)) return null;
     ensureCumulDaysTable();
     const table = /** @type {Float64Array} */ (cumulDaysTable);
-    const { yearMin, yearMax, stepYears } = phase().grid();
     if (year < yearMin || year > yearMax) return null;
     const idx_f = (year - yearMin) / stepYears;
     const idx_lo = Math.floor(idx_f);

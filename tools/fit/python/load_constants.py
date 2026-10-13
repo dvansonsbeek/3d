@@ -61,11 +61,9 @@ ECCENTRICITY_DERIVED_MEAN = C['eccentricityDerivedMean']
 
 # Fitted coefficients
 # (plan 09: SOLSTICE_OBLIQUITY_MEAN / SOLSTICE_OBLIQUITY_HARMONICS retired — the
-# obliquity of date is the hybrid ε of the one-source movement, not a comb)
-CARDINAL_POINT_ANCHORS = C['CARDINAL_POINT_ANCHORS']
-CARDINAL_POINT_HARMONICS = {
-    k: [tuple(h) for h in v] for k, v in C['CARDINAL_POINT_HARMONICS'].items()
-}
+# obliquity of date is the hybrid ε of the one-source movement, not a comb;
+# step 7a: CARDINAL_POINT_ANCHORS / CARDINAL_POINT_HARMONICS — the frozen
+# cardinal record — deleted with the coefficients)
 # (plan 09: the three year-length combs are deleted; the J2000 precession
 # anchor is the IAU p_A, as a period)
 AXIAL_PRECESSION_J2000_YEARS = C['axialPrecessionJ2000Years']
@@ -82,4 +80,3 @@ if __name__ == '__main__':
     print(f"EARTH_RA_ANGLE = {EARTH_RA_ANGLE:.6f}")
     print(f"MEAN_SOLAR_YEAR_DAYS = {MEAN_SOLAR_YEAR_DAYS}")
     print(f"Planets: {list(PLANETS.keys())}")
-    print(f"CARDINAL_POINT_HARMONICS: {list(CARDINAL_POINT_HARMONICS.keys())}")

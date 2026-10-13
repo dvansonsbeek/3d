@@ -1,13 +1,3 @@
-export type PhaseMachinery = {
-    ensureTable: () => void;
-    grid: () => {
-        yearMin: number;
-        yearMax: number;
-        stepYears: number;
-        j2000Idx: number;
-        length: number;
-    };
-};
 export type DeepCalendar = {
     /**
      * SI-tropical-year label for a
@@ -40,11 +30,6 @@ export type DeepCalendar = {
     cumulDaysTableLength: () => (number | null);
 };
 /**
- * @typedef {Object} PhaseMachinery
- * @property {() => void} ensureTable
- * @property {() => {yearMin: number, yearMax: number, stepYears: number, j2000Idx: number, length: number}} grid
- */
-/**
  * @typedef {Object} DeepCalendar
  * @property {(jd: number) => number} jdToSIyear SI-tropical-year label for a
  *   JD, anchored at startModelYearWithCorrection — NOT a calendar year (the
@@ -63,27 +48,32 @@ export type DeepCalendar = {
  */
 /**
  * @param {{
- *   phase: () => PhaseMachinery,
  *   meanYearInDaysAtAgeMa: (tMa: number) => (number | null),
  *   withLatticeAlpha: (build: () => void) => void,
  *   startModelJD: number,
  *   startModelYear: number,
  *   startModelYearWithCorrection: number,
  *   siTropicalYearDays: number,
- * }} deps — `phase` is the engine's (lazily built) phase machinery, whose
- *   grid the days table shares; `meanYearInDaysAtAgeMa` the engine's
- *   days-per-year source (the LOD channel's `yearInDaysAtAge`);
- *   `withLatticeAlpha` the engine's R2 pin; `startModelYear` is the table
- *   zero (2000.5) and `startModelYearWithCorrection` the SI-axis anchor
- *   (≈ 2000.4977) — two different constants, do not unify.
+ *   yearMin?: number,
+ *   yearMax?: number,
+ *   stepYears?: number,
+ * }} deps — `meanYearInDaysAtAgeMa` is the engine's days-per-year source
+ *   (the LOD channel's `yearInDaysAtAge`); `withLatticeAlpha` the engine's
+ *   R2 pin; `startModelYear` is the table zero (2000.5) and
+ *   `startModelYearWithCorrection` the SI-axis anchor (≈ 2000.4977) — two
+ *   different constants, do not unify; the grid (±500 Myr, 10-kyr cells)
+ *   is the engines' deep-time grid — the table zero sits at the cell
+ *   nearest `startModelYear`.
  * @returns {DeepCalendar}
  */
-export function createDeepCalendar({ phase, meanYearInDaysAtAgeMa, withLatticeAlpha, startModelJD, startModelYear, startModelYearWithCorrection, siTropicalYearDays, }: {
-    phase: () => PhaseMachinery;
+export function createDeepCalendar({ meanYearInDaysAtAgeMa, withLatticeAlpha, startModelJD, startModelYear, startModelYearWithCorrection, siTropicalYearDays, yearMin, yearMax, stepYears, }: {
     meanYearInDaysAtAgeMa: (tMa: number) => (number | null);
     withLatticeAlpha: (build: () => void) => void;
     startModelJD: number;
     startModelYear: number;
     startModelYearWithCorrection: number;
     siTropicalYearDays: number;
+    yearMin?: number;
+    yearMax?: number;
+    stepYears?: number;
 }): DeepCalendar;

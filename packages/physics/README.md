@@ -45,8 +45,8 @@ deep-ecc-channel, month-chain), earth (year-lengths, precession-composed,
 frame-of-date, sidereal-year-channel, deep-orbital-history), planets
 (keplerian-chain, orbit-chain, secular-shape, secular-series,
 inv-plane-frame, spin-channel, ecc-channel, geometry, model), deltat
-(cycles, deep-time, recession-history, historical), cardinal points, phase,
-chain-cycles, sun, climate and eclipse finders.
+(cycles, deep-time, recession-history, historical), the cardinal structure,
+the deep calendar, chain-cycles, sun, climate and eclipse finders.
 
 For rendered display values (day/year lengths, precession rates, orbital
 elements as preformatted strings), see

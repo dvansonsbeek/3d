@@ -1,7 +1,7 @@
 ---
 docVersion: 1.0
 modelVersion: v23.0
-coefficients: sha256:3cfb8d04a94ddc3a
+coefficients: sha256:91e2d041c7b6e038
 status: current
 ---
 
@@ -143,13 +143,13 @@ geocentric-precession projection coefficients (a chart-layer readout). The
 fitter-owned, provenance-tracked, and behind fail-proven gates; the
 paleo-anchors gate fails on an unexplained *improvement* too. These correct
 the certified time-domain machinery; none of them touch the planetary
-dynamics (Ledger 1). The year-length harmonics and the cardinal-point family are
-the FROZEN era clock's basis — a device, not the published year lengths
-(plan 06 Phase 3 S2): the published tropical, sidereal and anomalistic
-years of date and the precession periods ride the one-family route
-(`model.yearLengths`, doc 110 chain 3.2 route B); the combs feed the
-kinematic-day stack (doc 110 chain 3.3) and the era clock only, on their
-own counter `eraClockHAtAge`.
+dynamics (Ledger 1). The year-length harmonics and the cardinal-point family
+were the FROZEN era clock's basis — a device, not the published year lengths
+(plan 06 Phase 3 S2) — and plan 09 deleted them family by family, the
+cardinal record last with the clock's own counter `eraClockHAtAge` (step
+7a): the published tropical, sidereal and anomalistic years of date and the
+precession periods ride the one-family route (`model.yearLengths`, doc 110
+chain 3.2 route B).
 
 ### Core Calibration Inputs (28 — Earth, Sun & Moon)
 

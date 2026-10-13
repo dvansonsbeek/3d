@@ -407,13 +407,10 @@ function computeStellarSiderealOffset(stellarDay, siderealDay) {
 // Anchored at IAU J2000 values. Self-correcting: exact at year 2000.
 // See docs/14-solstice-prediction.md
 
-// Phase 7.2 — the entire §10/§10g cardinal family lives in
-// @essrt/physics/cardinal (ONE implementation for every engine; extracted
-// verbatim from this file). This engine injects its constants and its own
-// twins; the four public functions below are one-line delegates. The
-// self-correction (R11), the drift Simpson, the Ih closed form, the joint
-// sidebands, the exact derivative — and every load-bearing comment that
-// used to sit here — moved into the package.
+// (Phase 7.2 moved the §10/§10g cardinal family — extracted verbatim from
+// this file — into the package's createCardinalModel, ONE implementation for
+// every engine; plan 06 R1 retired it from the runtime and plan 09 step 7a
+// deleted it with its coefficients. Doc 110 §5.2/§5.5 keep the record.)
 // Plan 06 R1: the fitted cardinal-point model (CARDINAL_POINT_* on the frozen
 // era clock) left the engines. The cardinal instants are the APPARENT
 // crossings of the one Sun the package certifies and the scene renders —
