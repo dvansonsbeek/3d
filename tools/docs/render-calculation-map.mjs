@@ -262,7 +262,7 @@ function blockObliquityBeat() {
     .filter((x) => Math.abs(x.omegaRadPerYr) > 1e-9).sort((a, b) => Math.hypot(b.re, b.im) - Math.hypot(a.re, a.im))[0];
   const s3 = Math.abs(z.omegaRadPerYr * 180 / Math.PI) * 3600;
   const rows = [
-    '| age (Ma) | **T_p(t) = 1,296,000/ψ̇, the composed period (yr)** | H(t)/13 (yr) — the unit’s calendar beat (device; 0.086 % apart, S5) | ψ̇ (″/yr) | H_era(t)/13 (yr) — the frozen clock’s counter, for the record | beat 2π/(ψ̇ − \\|s₃\\|) (kyr) — the SHIPPED `obliqBeat*Kyr` form | beat(J2000)·T_p(t)/T_p(J2000) (kyr) — "obliquity period ∝ T_p", `obliqH8Scaled*Kyr` |',
+    '| age (Ma) | **T_p(t) = 1,296,000/ψ̇, the composed period (yr)** | the deep chain’s year beat T_sid/(T_sid − T_trop) — T_p counted in sidereal years, + 1 (plan 09 step 5d; it was the unit’s H(t)/13, 0.086 % apart) | ψ̇ (″/yr) | H_era(t)/13 (yr) — the frozen clock’s counter, for the record | beat 2π/(ψ̇ − \\|s₃\\|) (kyr) — the SHIPPED `obliqBeat*Kyr` form | beat(J2000)·T_p(t)/T_p(J2000) (kyr) — "obliquity period ∝ T_p", `obliqH8Scaled*Kyr` |',
     '|---|---|---|---|---|---|---|',
   ];
   const Tp0 = DT.meanLunisolarPrecessionPeriodYearsAtAge(0), pc0 = DT.meanLunisolarPrecessionRateArcsecPerYrAtAge(0), beat0 = 1296000 / (pc0 - s3);
@@ -270,7 +270,9 @@ function blockObliquityBeat() {
     const sid = DT.meanSiderealYearSecondsAtAge(t), trop = DT.meanTropicalYearSecondsAtAge(t);
     const TpPair = sid / (sid - trop), Tp = DT.meanLunisolarPrecessionPeriodYearsAtAge(t), pc = DT.meanLunisolarPrecessionRateArcsecPerYrAtAge(t);
     if (Math.abs(pc - 1296000 / Tp) > 1e-9) throw new Error(`T_p twins diverged at ${t} Ma`);
-    if (Math.abs(TpPair - DT.meanHAtAge(t) / 13) > 1e-6) throw new Error(`the unit's calendar beat ≠ H(t)/13 at ${t} Ma`);
+    // plan 09 step 5d: the chain's tropical year is one equinox turn per T_p(t) (Julian years), so the
+    // sidereal/tropical beat is T_p·(Julian year/sidereal year) + 1 — the unit-count form of 2.1 step 4c
+    if (Math.abs(TpPair - (Tp * 365.25 * 86400 / sid + 1)) > 1e-6 * Tp) throw new Error(`the deep chain's year beat ≠ T_p(t) in sidereal years at ${t} Ma`);
     rows.push(`| ${t} | **${f(Tp, 3)}** | ${f(TpPair, 3)} | ${f(pc, 3)} | ${f(DT.eraClockHAtAge(t) / 13, 3)} | ${f(1296000 / (pc - s3) / 1000, 2)} | ${f(beat0 * Tp / Tp0 / 1000, 2)} |`);
   }
   rows.push('');

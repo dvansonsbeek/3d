@@ -38,10 +38,9 @@ const MAPPING = [
   { global: 'meansiderealyearlengthinSeconds', view: L0.siderealYearSeconds },
   { global: 'meansiderealyearlengthinDays', view: L1.siderealYearDays },
   { global: 'meansolaryearlengthinDays', view: L1.tropicalYearDays },
-  // The lattice route (`siderealYearDaysViaLattice`) no longer has a browser
-  // global to compare against: `meansiderealyearlengthinDays_kinematic` is a
-  // J2000 constant since the year/day collapse. Its equality with the direct
-  // route is measured below (the 2-ULP check), not asserted.
+  // (plan 09 step 5d: the lattice route `siderealYearDaysViaLattice` — the
+  // tropical year inverted through H/(H − 13) — left with the identity; the
+  // tropical year of date is one equinox turn per T_p(t).)
 ];
 
 // t = 0 is EXCLUDED, deliberately. Since B.3b, resetEpochToJ2000 restores the
@@ -71,31 +70,6 @@ for (const t of EPOCHS_MA) {
   }
 }
 
-// The claim layer1 makes in prose, checked as arithmetic rather than trusted:
-// the lattice route and the direct route are the same quantity.
-//
-// Tolerance is 2 ULP, not exact — deliberately, and measured rather than
-// assumed. The two routes cancel algebraically but multiply and divide in a
-// different ORDER, so the last bit is not guaranteed. Across this grid they are
-// identical at six of seven epochs and 0.7 ULP apart at +0.3 Ma. The BROWSER
-// splits at exactly the same single epoch, which is the evidence that this is
-// float ordering rather than a porting error. An exact check here would fail
-// for a reason that has nothing to do with the model.
-const ULP_TOL = 2;
-/** @type {{t: number, direct: number|null, lattice: number|null, ulp: number}[]} */
-const routeMismatch = [];
-for (const t of EPOCHS_MA) {
-  const year = DT.EPOCH_PARAMS.epochYear - t * 1e6;
-  const direct = L1.siderealYearDays(year);
-  const lattice = L1.siderealYearDaysViaLattice(year);
-  if (direct === null || lattice === null) {
-    if (direct !== lattice) routeMismatch.push({ t, direct, lattice, ulp: NaN });
-    continue;
-  }
-  const ulp = Math.abs(lattice - direct) / (Math.abs(direct) * Number.EPSILON);
-  if (ulp > ULP_TOL) routeMismatch.push({ t, direct, lattice, ulp });
-}
-
 console.log('LAYER 1 — vs the browser-recorded epoch globals');
 console.log('='.repeat(74));
 console.log(`  ${checked} comparisons across ${EPOCHS_MA.length} epochs`);
@@ -108,14 +82,8 @@ for (const d of drift) {
   console.log(`    layer1  ${d.got}`);
   console.log(`    delta   ${got - d.want}  (${rel.toExponential(3)} relative)`);
 }
-for (const m of routeMismatch) {
-  console.log(`\n  ROUTE  sidereal days disagree at ${m.t} Ma by ${m.ulp.toFixed(1)} ULP (tolerance ${ULP_TOL})`);
-  console.log(`    direct  ${m.direct}`);
-  console.log(`    lattice ${m.lattice}`);
-}
-
-if (drift.length || routeMismatch.length) {
-  console.log(`\nFAIL — ${drift.length} drifted, ${routeMismatch.length} route mismatch(es).`);
+if (drift.length) {
+  console.log(`\nFAIL — ${drift.length} drifted.`);
   process.exit(1);
 }
-console.log(`\nPASS — layer1 reproduces the browser globals exactly; both sidereal routes within ${ULP_TOL} ULP.`);
+console.log('\nPASS — layer1 reproduces the browser globals exactly.');

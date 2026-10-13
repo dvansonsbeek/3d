@@ -2498,6 +2498,9 @@ const _L0 = createEpochPrimitives({
     earthMassKg: M_EARTH_ALONE, earthRadiusM: R_EARTH_M,
     holisticYearJ2000: HOLISTIC_YEAR_J2000,
     lodNowH13Seconds: LOD_NOW_H13_S,
+    // p₀ — the tropical year of date's equinox term (plan 09 step 5d); the SAME
+    // expression the deep-time factory's composed module resolves (bit-identical twins)
+    precessionRateJ2000ArcsecPerYr: 1296000 / _certifiedAxialPrecessionJ2000Years(),
     siderealYearJ2000Seconds: MEAN_SIDEREAL_YEAR_J2000_S,
     solarMassLossFracPerYear: SOLAR_MASS_LOSS_FRAC_PER_YR,
     precessionSolarShareJ2000: PRECESSION_SOLAR_SHARE_J2000,
@@ -4582,9 +4585,7 @@ function _deepCal() {
     startModelYear: startmodelYear,
     startModelYearWithCorrection: startmodelyearwithCorrection,
     siTropicalYearDays: SI_TROPICAL_YEAR_DAYS,
-    balancedYear: BALANCED_YEAR_J2000_FIXED,
-    hJ2000: HOLISTIC_YEAR_J2000,
-    cyclesBetween: cyclesBetweenYears,   // this engine's toggle-aware form
+    // (plan 09 step 5d: the H-balanced event finder and its counter deps are gone)
   });
   return _deepCalM;
 }

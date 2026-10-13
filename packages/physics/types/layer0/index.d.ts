@@ -41,6 +41,10 @@ export type EpochParams = {
      * f_S, the solar fraction of the J2000 precession torque
      */
     precessionSolarShareJ2000: number;
+    /**
+     * p₀, the composed precession rate's J2000 anchor (1,296,000/axial0)
+     */
+    precessionRateJ2000ArcsecPerYr: number;
 };
 export type EpochPrimitives = {
     tMa: (year: number) => number;
@@ -51,8 +55,10 @@ export type EpochPrimitives = {
      */
     holisticH: (year: number) => number | null;
     siderealYearSeconds: (year: number) => number;
+    /**
+     * sidereal less one equinox turn per T_p(t) (the composed precession period)
+     */
     tropicalYearSeconds: (year: number) => number;
-    anomalisticYearSeconds: (year: number) => number | null;
     /**
      * the frozen era clock's phase convention H₀·LOD/LOD₀ (device tier)
      */

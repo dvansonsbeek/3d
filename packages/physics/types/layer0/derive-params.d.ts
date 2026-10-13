@@ -46,4 +46,8 @@ export type RawEpochConstants = {
     astronomicalUnitKm: number;
     earthOrbitalEccentricityJ2000: number;
     moonEclipticInclinationJ2000Deg: number;
+    /**
+     * the model's ONE J2000 precession reading (1,296,000/p_A; plan 09)
+     */
+    axialPrecessionJ2000Years: number;
 };

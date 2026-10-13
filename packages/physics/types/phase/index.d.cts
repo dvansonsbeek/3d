@@ -27,7 +27,6 @@ export function createPhaseMachinery({ holisticHAtAgeMa, tableAnchorYear, driftR
     integralBetween: (yearA: number, yearB: number) => number | null;
     j2000Drift: (yearA: number) => number;
     cyclesBetween: (yearA: number, yearB: number, divisorN: number) => number | null;
-    yearAtCumul: (targetCumul: number) => number | null;
     grid: () => {
         yearMin: number;
         yearMax: number;

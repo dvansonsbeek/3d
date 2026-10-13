@@ -176,9 +176,9 @@ Each nesting layer applies its rotation to all children, creating composite prec
 > rendered Moon converted with an ε 0.16° from the axis it was placed in. After:
 > the two surfaces agree to 0.0000″ at that epoch, browser ≡ Node for the
 > planets to ≤0.004″ at every probed epoch out to −5.34 Myr. The K-device
-> wheels (uniform at their recorded J2000 rates since plan 09 step 5c) and the
-> balanced-year formulas keep their own SI coordinate — they are not engine
-> reads. The
+> wheels (uniform at their recorded J2000 rates since plan 09 step 5c) keep
+> their own SI coordinate — they are not engine reads (the balanced-year
+> formulas that shared it left at step 5d). The
 > Moon-argument obliquity CARRIER (C·∫(ε−ε₀) inside the lunar chain) samples
 > ε at `2000 + t·100` with t in Julian centuries of TT from J2000 — the
 > engine-year axis already (verified R5 follow-up; an earlier note here

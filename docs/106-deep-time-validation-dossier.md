@@ -94,7 +94,7 @@ The climate formula's orbital lines against the Cenozoic isotope record (the com
 ## C. Historical era — gate- and artifact-backed
 
 - **Babylonian eclipse case study (−135)** — the framework places the
-  totality path <!--v:babylon135BestGapKm-->154<!--/v--> km from Babylon at
+  totality path <!--v:babylon135BestGapKm-->156<!--/v--> km from Babylon at
   ΔUT <!--v:babylon135BestDeltaUT-->-0h52<!--/v--> (framework
   <!--v:babylon135FrameworkUT-->06:06<!--/v--> vs documented
   <!--v:babylon135DocumentedUT-->06:14<!--/v-->):
@@ -118,7 +118,7 @@ The climate formula's orbital lines against the Cenozoic isotope record (the com
   both directions); the −746 Feb 6 Babylonian partial (magnitude
   <!--v:lunarBabylon746MagnitudeUmbral-->0.915<!--/v--> vs canon
   <!--v:lunarBabylon746CanonMagnitudeUmbral-->0.920<!--/v-->, visible from
-  Babylon at <!--v:lunarBabylon746AltitudeDeg-->35.2<!--/v-->°); the
+  Babylon at <!--v:lunarBabylon746AltitudeDeg-->35.3<!--/v-->°); the
   <!--v:lunarDtBandsN-->267<!--/v--> raw Stephenson-2016 timing reductions
   (framework ΔT mean abs <!--v:lunarDtBandsFrameworkMeanAbsSeconds-->1,214<!--/v--> s —
   statistically identical to Stephenson's own fitted spline at
@@ -130,7 +130,7 @@ The climate formula's orbital lines against the Cenozoic isotope record (the com
   <!--v:lunarDtBoundsBabylon135HighSeconds-->12,140<!--/v-->] s contains the
   framework's <!--v:lunarDtBoundsBabylon135FrameworkSeconds-->11,982<!--/v--> s);
   and the measured framework-vs-ELP lunar-theory drift
-  (Δṅ ≈ <!--v:lunarTheoryDriftDeltaNdot-->0.22<!--/v--> ″/cy²) with the
+  (Δṅ ≈ <!--v:lunarTheoryDriftDeltaNdot-->0.26<!--/v--> ″/cy²) with the
   PRE-REGISTERED re-reduction prediction pinned before the contact-time
   machinery existed — and now MEASURED against it: the Phase C
   differential re-reduction (69/75 Babylonian observations identified)
@@ -145,7 +145,7 @@ The climate formula's orbital lines against the Cenozoic isotope record (the com
   all three runtimes. Against JPL Horizons over ±3000 yr it reads
   <!--v:sunVsHorizonsMeanArcsec-->2.50<!--/v-->″ mean / <!--v:sunVsHorizonsSdArcsec-->2.26<!--/v-->″ sd
   (modern sd <!--v:sunVsHorizonsModernSdArcsec-->0.78<!--/v-->″); the Babylon −135 umbra
-  track sits <!--v:babylon135BestGapKm-->154<!--/v--> km from the documented
+  track sits <!--v:babylon135BestGapKm-->156<!--/v--> km from the documented
   station — [doc 103](103-135-babylonian-case-study.md). The era-device
   Sun assembly this bullet once described (the H/16 eccentricity
   channel, the H/3 coupling and the cos-ε torque term on the

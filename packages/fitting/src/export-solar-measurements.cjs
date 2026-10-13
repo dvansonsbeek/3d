@@ -332,18 +332,14 @@ console.error(`Total: ${totalYears} years × 6 types = ~${totalYears * 6} rows`)
 console.error(`Output: ${OUTPUT_CSV}`);
 
 // ─── Window report ─────────────────────────────────────────────────────────
-// The physically meaningful window is between two consecutive H-balanced
-// events, where obliquity and eccentricity each close exactly one cycle
-// whatever H(t) does. `startYear`/`endYear` cannot express that directly —
-// they are chaining-step counts, not instants — so report the cycle span the
-// run will actually achieve and let the `Cycle` column carry the truth.
+// A plain year window (plan 09 step 5d; the former "H-balanced bracket" —
+// the span between two integer-phase events of the retired unit — is gone).
+// `startYear`/`endYear` are chaining-step counts, not instants; the calendar
+// JDs of the window's ends are reported for the record.
 {
-  const b0 = DT.balancedYearAtCycle(0), b1 = DT.balancedYearAtCycle(1);
-  if (b0 !== null && b1 !== null) {
-    console.error(`Balanced bracket: cycle 0 at year ${b0.toFixed(3)} (JD ${DT.yearToJDDeepTime(b0).toFixed(3)})`);
-    console.error(`                  cycle 1 at year ${b1.toFixed(3)} (JD ${DT.yearToJDDeepTime(b1).toFixed(3)})`);
-    console.error(`Requested window: ${startYear} → ${endYear} = ${totalYears} chaining steps`);
-  }
+  const jd0 = DT.yearToJDDeepTime(startYear), jd1 = DT.yearToJDDeepTime(endYear);
+  console.error(`Window: ${startYear} → ${endYear} = ${totalYears} chaining steps`
+    + (jd0 !== null && jd1 !== null ? ` (calendar JD ${jd0.toFixed(3)} → ${jd1.toFixed(3)})` : ''));
 }
 console.error('');
 

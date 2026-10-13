@@ -43,6 +43,7 @@ import { computeSolarTorqueShare } from '../earth/precession-composed.cjs';
  * @property {number} astronomicalUnitKm         1 AU (km)
  * @property {number} earthOrbitalEccentricityJ2000
  * @property {number} moonEclipticInclinationJ2000Deg
+ * @property {number} axialPrecessionJ2000Years    the model's ONE J2000 precession reading (1,296,000/p_A; plan 09)
  */
 
 /**
@@ -100,5 +101,9 @@ export const deriveEpochParams = (raw) => {
     siderealYearJ2000Seconds: raw.meanSiderealYearSeconds,
     solarMassLossFracPerYear,
     precessionSolarShareJ2000,
+    // p₀, the composed precession rate's J2000 anchor — the tropical year of
+    // date's equinox term (plan 09 step 5d; the same expression the deep-time
+    // factory's composed module resolves, so the twins stay bit-identical)
+    precessionRateJ2000ArcsecPerYr: 1296000 / raw.axialPrecessionJ2000Years,
   });
 };

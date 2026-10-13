@@ -196,25 +196,25 @@ function createDeepTimeLod(deps) {
     return K.meanSiderealYearJ2000Seconds * (1 - mass_loss_fraction) * (1 - mass_loss_fraction);
   }
 
-  /** @param {number} t_Ma @returns {number} tropical = sidereal · (1 − 13/H(t)).
-   * The 13/H(t) here is the unit's CALENDAR convention (one turn per H₀/13
-   * of the unit — the kinematic day/year identities on H/(H − 13) and the
-   * deep JD↔year calendar ride it), NOT a precession claim: the published
-   * precession period is the composed T_p (S5), 0.086 % apart. Kept
-   * unchanged in S5 so nothing certified moves (calendar, goldens, CSV);
-   * plan-06 D2 DECIDED: relabel, not re-base — the 0.086 % is the fit
-   * anchor's convention (H₀/T_p = 13.011, constant at every epoch beyond
-   * ±2 Myr, measured), and re-basing would move every comb coefficient
-   * for a rounding-level gain. This tier stays a named device. */
+  /** Tropical year of date, seconds — the sidereal year less the equinox's
+   * own motion over one year: one turn per the composed lunisolar precession
+   * period T_p(t), 1/T_trop = 1/T_sid + ψ̇(t)/(1,296,000″ · Julian-year s).
+   * Plan 09 step 5d: it was the unit's calendar convention sid·(1 − 13/H(t))
+   * — plan 06 D2 had kept it as a named device — 0.086 % slow on the equinox
+   * term (1.0 s of year at J2000), and the deep JD↔year calendar integrates
+   * THIS. The SAME operations as layer0's tropicalYearSecondsCore (the
+   * layer0 gate holds the twins bit-identical). Past the tidal chain's domain
+   * the J2000 rate stands in. @param {number} t_Ma @returns {number} */
   function tropicalYearSecondsAtAge(t_Ma) {
     return tropicalYearSecondsFromLod(t_Ma, lodSecondsAtAge(t_Ma));
   }
   /** @param {number} t_Ma @param {number|null} LOD_s @returns {number} */
   function tropicalYearSecondsFromLod(t_Ma, LOD_s) {
     const sidSec = siderealYearSecondsAtAge(t_Ma);
-    const Ht = hFromLod(t_Ma, LOD_s);
-    if (Ht === null) return sidSec * (1 - 13 / K.holisticYearJ2000);
-    return sidSec * (1 - 13 / Ht);
+    const term = composed.torqueTermAtAge(t_Ma);
+    const p0 = composed.p0ArcsecPerYr;
+    const rate = (LOD_s === null || !(LOD_s > 0) || term === null) ? p0 : (K.lodNowH13Seconds / LOD_s) * p0 * term;
+    return 1 / (1 / sidSec + rate / (1296000 * 365.25 * 86400));
   }
 
   /** @param {number} t_Ma @returns {number|null} */

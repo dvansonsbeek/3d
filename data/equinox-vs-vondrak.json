@@ -354,9 +354,9 @@
   "files": {
    "data/la2004-earth-51myr-back.asc": "sha256:3f13b9f8e69085baf40bc67a2669e6f6af4148fef9218ed2158772aa91e35f8c",
    "data/nbody-deep-secular-modes.json": "sha256:7633dd8f434fd6fc1ddaf07fd3ec3623e91e09322002ec08d53b8a12e6883fb7",
-   "data/nbody-secular-series.json": "sha256:d5a243471d336eaa922b8b5c3f8d6a67ec93b676726a4f2abe4004c31cc7db18",
+   "data/nbody-secular-series.json": "sha256:5d065575e7a552b6039c237417932f29ed947bfe630395c88a8c2e71653438ff",
    "packages/physics/src/climate/l1-orbital.cjs": "sha256:4c24e53d536e253b4991cbf397545f765964852281ed5b6870046875a3e8d2b1",
-   "packages/physics/src/deltat/deep-time.cjs": "sha256:9773648076ff0815a8c26144eaacfcf9096df13023212169dd4b98cf8a606107",
+   "packages/physics/src/deltat/deep-time.cjs": "sha256:687cfb6965004a58db8b69fddd6c5a0d00374130791007c129c3e78498917282",
    "packages/physics/src/earth/deep-orbital-history.cjs": "sha256:84b18c22798d2c7017bbf7ddffe485a8bb23754335dde8383152af7009e80730",
    "packages/physics/src/earth/frame-of-date.cjs": "sha256:f92981c65d7d7dce7fed7bfa858e2a4405f278ad761e703cfafd0cf4d8792431",
    "packages/physics/src/earth/precession-composed.cjs": "sha256:7f30ac5597b745a88b453c54bb47da39e5ec3c8bb8b349e34e8a15752c04a208",
@@ -365,7 +365,7 @@
    "public/input/climate-formula-coefficients.json": "sha256:b19d9fc5e20721d484f4c67e88102361e906a0c9eeb6018a71e4f09b5f37a7c9",
    "public/input/model-parameters.json": "sha256:19d16cc2582d2130fd5c891cca0a36529104501d0b678e9b37dbf2bfb9969ced",
    "tools/lib/deep-orbital-history.js": "sha256:9f713a177edb5eb8e795b5cbf40d49f658668fdce6f20c75d010c4fbecfcbab2",
-   "tools/lib/deep-time.js": "sha256:76e5020dd19109b58476136f22c8b0c8a49ceb10b94fa6247dcad33b160a8227",
+   "tools/lib/deep-time.js": "sha256:bd001f57c6947ef874a2ac92f0c258f1a89f229f5b02f1ad888daf2efefb5a9a",
    "tools/verify/equinox-vs-vondrak.js": "sha256:27cc94debae06240161708b02ff1fc770a79561e9f03871baba452d526f0d092"
   }
  }

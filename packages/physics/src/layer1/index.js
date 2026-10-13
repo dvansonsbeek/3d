@@ -21,8 +21,6 @@
  * @typedef {Object} DerivedViews
  * @property {(year: number) => number|null} tropicalYearDays
  * @property {(year: number) => number|null} siderealYearDays
- * @property {(year: number) => number|null} anomalisticYearDays
- * @property {(year: number) => number|null} siderealYearDaysViaLattice
  */
 
 /**
@@ -44,45 +42,16 @@ export const createDerivedViews = ({ primitives: L0 }) => {
 
   const tropicalYearDays = perDay(L0.tropicalYearSeconds);
   const siderealYearDays = perDay(L0.siderealYearSeconds);
-  const anomalisticYearDays = perDay(L0.anomalisticYearSeconds);
 
-  /**
-   * The sidereal year in days, reached the long way — from the tropical year
-   * through the H/13 lattice identity instead of from sidereal seconds.
-   *
-   * ALGEBRAICALLY THE SAME NUMBER. `T_trop = T_sid·(H−13)/H`, so
-   * `(T_trop/LOD)·H/(H−13)` cancels to `T_sid/LOD` — but the operation ORDER
-   * differs, so it is not bit-identical everywhere. Measured across the fixture
-   * grid: identical at six of seven epochs, 0.7 ULP apart at +0.3 Ma. The
-   * browser shows exactly the same one-epoch split, which is how we know the
-   * port is faithful rather than merely close.
-   *
-   * It exists because `src/script.js` carried BOTH as separate mutable globals
-   * — `meansiderealyearlengthinDays` and `meansiderealyearlengthinDays_kinematic`
-   * — holding the same value at every epoch once `recomputeEpochAnchors` had
-   * run, diverging only at module load, where one is the IAU anchor
-   * (365.256363004) and the other lattice-derived: the 118 ms of R16.
-   *
-   * So the "kinematic" variant was never a different quantity, only a
-   * different arrival route with a different starting constant. The year/day
-   * collapse retired the mutable global: `meansiderealyearlengthinDays_kinematic`
-   * is now a J2000 CONSTANT in the browser (this route at f(2000)), and the
-   * epoch value is read from `meansiderealyearlengthinDays`. This view stays
-   * so the equality is measured, not asserted.
-   *
-   * @param {number} year
-   * @returns {number|null}
-   */
-  const siderealYearDaysViaLattice = (year) => {
-    const trop = tropicalYearDays(year);
-    const H = L0.holisticH(year);
-    return (trop === null || H === null) ? null : trop * H / (H - 13);
-  };
+  // (Plan 09 step 5d: `anomalisticYearDays` — the H/16 device identity — and
+  // `siderealYearDaysViaLattice` — the tropical year inverted through the
+  // H/(H − 13) identity, kept to measure the browser's former two sidereal
+  // globals against each other — left with the identities: the tropical year
+  // of date is one equinox turn per T_p(t), and the anomalistic year of date
+  // is published from the series' apsidal rate inside the one-family window.)
 
   return Object.freeze({
     tropicalYearDays,
     siderealYearDays,
-    anomalisticYearDays,
-    siderealYearDaysViaLattice,
   });
 };

@@ -13,49 +13,44 @@ status: current
 
 ## Architecture
 
-All year and day lengths are derived from a single input constant plus Fourier harmonic corrections. The means are **derived**, not fitted — only the harmonic coefficients are empirical.
+The year lengths are movements, not counts (plan 09). Two J2000 anchors are
+inputs — the IAU sidereal year and the IAU general precession p_A — and
+everything else is derived from them and from the model's own motions:
 
 ```
-inputmeanlengthsolaryearindays = 365.2422
+siderealYearJ2000 = 365.256363004 d (IAU)      p_A = 50.28796195 ″/yr (IAU 2006)
+        │                                            │
+        ▼                                            ▼
+  ┌──────────────────────────────────────────────────────────────────────┐
+  │ J2000 tropical year:  1/T_trop = 1/T_sid + p_A/(1,296,000″·365.25 d)   │ 365.242190469 d
+  │ J2000 anomalistic year: the one-family law of date at 2000 — the      │ 365.259634985 d
+  │   sidereal year and the series' own apsidal rate ϖ̇ (11.609 ″/yr)      │
+  └──────────────────────────────────────────────────────────────────────┘
         │
-        ▼
-  ┌─────────────────────────────────────────────────────┐
-  │ meanSolarYear = round(input × H/8) / (H/8)         │  Tropical year mean
-  │ meanSiderealYear = meanSolarYear × H / (H − 13)    │  Sidereal year mean
-  │ meanAnomalisticYear = meanSolarYear × H / (H − 16) │  Anomalistic year mean
-  └─────────────────────────────────────────────────────┘
+        ├──► OF DATE, inside the one-family window (±2 Myr) — the published family
+        │    (`model.yearLengths`, the scene's own rates, gated by the Node scene twin):
+        │      sidereal:    the λ̇ channel on the mass-loss law
+        │      tropical:    1/T_trop = 1/T_sid + p(t)/(360°·365.25 d), p(t) the general precession of date
+        │      anomalistic: 1/T_anom = 1/T_trop − ϖ̇_eq(t)/(360°·365.25 d)
         │
-        ├──► Tropical year (runtime):
-        │    Mean of 4 cardinal point derivatives
-        │    (CARDINAL_POINT_HARMONICS, 23 harmonics per
-        │    type + ECC/JOINT/DERIVED term families)
-        │    Measured at solstices (max/min dec) and
-        │    equinoxes (dec=0 crossing)
+        └──► OF DATE, the deep chain (Layer 0, every epoch to the tidal-lock asymptote —
+             what the deep JD↔year calendar integrates):
+               sidereal:  T₀·(1 − Δm)²                         (Driver 2, solar mass loss)
+               tropical:  1/T_trop = 1/T_sid + ψ̇(t)/(1,296,000″·365.25 d),
+                          ψ̇(t) = [ω₀/ω(t)]⁻¹… = (LOD₀/LOD(t))·p₀·[f_S + (1 − f_S)(a₀/a_M(t))³]
+                          — one equinox turn per the composed precession period T_p(t)
+               (no deep anomalistic year: the apsidal line is not resolved beyond the window)
         │
-        ├──► Sidereal year: Fourier harmonics (6 terms)
-        │    Y(t) = mean + Σ [sᵢ·sin(2πt/Tᵢ) + cᵢ·cos(2πt/Tᵢ)]
-        │
-        └──► Anomalistic year: Fourier harmonics (8 terms)
-             where t = year − 2000 (plan 07 R10: the phase origin is J2000)
-        │
-        ▼  Derived quantities
-  ┌─────────────────────────────────────────────────────┐
-  │ dayLength = siderealYearSeconds / siderealYear(days)│
-  │ solarYearSec = solarYear(days) × dayLength          │
-  │ anomYearSec = anomYear(days) × dayLength            │
-  │ siderealDay = solarYearSec / (solarYearSec/86400+1)│
-  └─────────────────────────────────────────────────────┘
+        ▼  Days of the epoch
+  ┌──────────────────────────────────────────────────────────────────────┐
+  │ yearDays = yearSeconds / LOD(t)        LOD(t) the kinematic day of date │
+  │ siderealDay = T_sid/(T_sid/LOD + 1 + 1/T_p(t))                           │
+  └──────────────────────────────────────────────────────────────────────┘
 ```
 
 ### Key Principle
 
-The **sidereal year in SI seconds is derived** from the IAU sidereal year reference:
-
-```
-meansiderealyearlengthinSeconds = siderealYearJ2000 × 86400
-```
-
-where `siderealYearJ2000 = 365.25636301` days (from `astro-reference.json`). As orbital elements change over millennia, the sidereal year in *days* changes (via Fourier harmonics), which means the *day length* changes, which in turn affects how many seconds are in a tropical year.
+The **sidereal year in SI seconds is an input** (the IAU value, `astro-reference.json`), and the tropical year is derived from it and the precession — at J2000 from p_A, at every other epoch from the composed precession rate of date. The retired era device derived the three means from one input mean solar year and its unit H (the tropical mean rounded onto 1/(H/8), the sidereal × H/(H − 13), the anomalistic × H/(H − 16)) and carried the tropical year of date as "one turn per H/13", 0.086 % slow on the equinox term; the combs that modulated them are deleted (plan 09 steps 3, 4c, 4d, 5d).
 
 
 ## Mean Year Lengths (Inputs)

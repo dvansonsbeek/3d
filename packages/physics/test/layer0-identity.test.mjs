@@ -50,7 +50,7 @@ const PROBES = [
   { name: 'eraClockTropicalYearSeconds', mine: L0.eraClockTropicalYearSeconds, theirs: DT.eraClockTropicalYearSecondsAtAge },
   { name: 'siderealYearSeconds', mine: L0.siderealYearSeconds, theirs: DT.meanSiderealYearSecondsAtAge },
   { name: 'tropicalYearSeconds', mine: L0.tropicalYearSeconds, theirs: DT.meanTropicalYearSecondsAtAge },
-  { name: 'anomalisticYearSeconds', mine: L0.anomalisticYearSeconds, theirs: DT.meanAnomalisticYearSecondsAtAge },
+  // (plan 09 step 5d: the anomalisticYearSeconds twins — the H/16 device identity — are deleted)
 ];
 
 let checked = 0;
@@ -122,6 +122,7 @@ const derivedParams = deriveEpochParams({
   gmEarthMoonSystemKm3S2: C.GM_EARTH_MOON_SYSTEM,
   gmSunKm3S2: C.GM_SUN,
   astronomicalUnitKm: C.currentAUDistance,
+  axialPrecessionJ2000Years: C.axialPrecessionJ2000Years,   // plan 09 step 5d: p₀ for the tropical year of date
   earthOrbitalEccentricityJ2000: C.ASTRO_REFERENCE.earthEccentricityJ2000,
   moonEclipticInclinationJ2000Deg: C.moonEclipticInclinationJ2000,
 });

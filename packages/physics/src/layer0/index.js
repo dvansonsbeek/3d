@@ -48,6 +48,7 @@
  * @property {number} siderealYearJ2000Seconds
  * @property {number} solarMassLossFracPerYear
  * @property {number} precessionSolarShareJ2000  f_S, the solar fraction of the J2000 precession torque
+ * @property {number} precessionRateJ2000ArcsecPerYr  p₀, the composed precession rate's J2000 anchor (1,296,000/axial0)
  */
 
 /**
@@ -57,8 +58,7 @@
  * @property {(year: number) => number|null} lodSeconds
  * @property {(year: number) => number|null} holisticH               the UNIT: 13 × the composed lunisolar precession period
  * @property {(year: number) => number} siderealYearSeconds
- * @property {(year: number) => number} tropicalYearSeconds
- * @property {(year: number) => number|null} anomalisticYearSeconds
+ * @property {(year: number) => number} tropicalYearSeconds      sidereal less one equinox turn per T_p(t) (the composed precession period)
  * @property {(year: number) => number|null} eraClockH               the frozen era clock's phase convention H₀·LOD/LOD₀ (device tier)
  * @property {(year: number) => number} eraClockTropicalYearSeconds  T_sid·(1 − 13/H_era) — the frozen comb family's base
  */
@@ -149,39 +149,31 @@ export const createEpochPrimitives = ({ params: p, alphaAtAgeMa }) => {
   };
 
   /**
-   * Tropical year — sidereal less one calendar turn of the unit, 13/H(t): the
-   * unit's CALENDAR convention (plan 06 S5 — a device identity, 0.086 % from
-   * one turn per the published precession period; D2 decided: it stays a
-   * named device, never re-based).
-   * Falls back to the J2000 H past the asymptote, matching the shipped chain.
+   * Tropical year of date — the sidereal year less the equinox's own motion
+   * over one year: one turn per the composed lunisolar precession period
+   * T_p(t), i.e. 1/T_trop = 1/T_sid + ψ̇(t)/(1,296,000″ · Julian-year s) with
+   * ψ̇(t) = [ω₀/ω(t)]⁻¹… spelled as (LOD₀/LOD(t))·p₀·[f_S + (1 − f_S)(a₀/a_M)³].
+   * Plan 09 step 5d: it was the unit's calendar convention sid·(1 − 13/H(t))
+   * (plan 06 D2 kept it as a named device), 0.086 % slow on the equinox term
+   * — 1.0 s of year at J2000, integrated by the deep JD↔year calendar. The
+   * SAME operations as deltat/deep-time.cjs tropicalYearSecondsFromLod (the
+   * layer0 gate holds the twins bit-identical). Past the tidal chain's
+   * domain the J2000 rate stands in.
+   * (The former anomalistic identity T_sid·(H − 13)/(H − 16) left with it:
+   * the model publishes the anomalistic year of date inside the one-family
+   * window only, from the series' own apsidal rate.)
    * @param {number} t age in Ma
    * @returns {number} seconds
    */
   const tropicalYearSecondsCore = (t) => {
     const sid = siderealYearSecondsCore(t);
-    const H = holisticHCore(t);
-    return H === null ? sid * (1 - 13 / p.holisticYearJ2000) : sid * (1 - 13 / H);
-  };
-
-  /**
-   * Anomalistic year.
-   *
-   * NOT `T_sid * (1 + 3/H)`. That is the FIRST-ORDER form and the plan quotes
-   * it, but the shipped chain composes the lattice steps exactly: tropical is
-   * `(H-13)/H` of sidereal, then anomalistic is `H/(H-16)` of tropical, giving
-   * `T_sid * (H-13)/(H-16)`. The two differ by `48/H^2 * T_sid` ~ 13.5 ms —
-   * comparable to 6d's own 0.0178 s anomalistic RMSE, so adopting the
-   * first-order form would move a shipped value for no reason. Exact
-   * composition it is; the identity 13 + 3 = 16 still holds to first order.
-   *
-   * @param {number} t age in Ma
-   * @returns {number|null} seconds
-   */
-  const anomalisticYearSecondsCore = (t) => {
-    const H = holisticHCore(t);
-    if (H === null) return null;
-    const sid = siderealYearSecondsCore(t);
-    return sid * (H - 13) / H * H / (H - 16);
+    const lod = lodSecondsCore(t);
+    const a = moonDistanceMetresCore(t);
+    const lf = (a === null || !(a > 0)) ? null : Math.pow(p.moonDistanceNowM / a, 3);
+    const term = lf === null ? null : p.precessionSolarShareJ2000 + (1 - p.precessionSolarShareJ2000) * lf;
+    const p0 = p.precessionRateJ2000ArcsecPerYr;
+    const rate = (lod === null || !(lod > 0) || term === null) ? p0 : (p.lodNowH13Seconds / lod) * p0 * term;
+    return 1 / (1 / sid + rate / (1296000 * 365.25 * 86400));
   };
 
   /** The frozen comb family's tropical base: T_sid·(1 − 13/H_era). @param {number} t */
@@ -198,7 +190,6 @@ export const createEpochPrimitives = ({ params: p, alphaAtAgeMa }) => {
     holisticH: (year) => holisticHCore(tMa(year)),
     siderealYearSeconds: (year) => siderealYearSecondsCore(tMa(year)),
     tropicalYearSeconds: (year) => tropicalYearSecondsCore(tMa(year)),
-    anomalisticYearSeconds: (year) => anomalisticYearSecondsCore(tMa(year)),
     eraClockH: (year) => eraClockHCore(tMa(year)),
     eraClockTropicalYearSeconds: (year) => eraClockTropicalYearSecondsCore(tMa(year)),
   });

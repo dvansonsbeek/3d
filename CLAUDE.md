@@ -252,6 +252,15 @@ would silently churn a structural claim for a rounding-level gain.
   of-date perigee/node are the count compositions of the inertial chain.
   Rule: `13/H`, `H/13`, `N·(H/H₀)²` in a physics formula is a device
   identity standing in for 1/T_p(t) — read the composed period directly.
+  **Third instance (step 5d):** the deep chain's tropical year of date was
+  T_sid·(1 − 13/H(t)) — 1.04 s/yr slow at J2000 — and it was BOTH the deep
+  JD↔year calendar's integrand AND the lunar chain-cycle integrator's
+  seconds-per-year weight, so every lunar count carried a 3.2e-8 J2000 bias
+  (15° of deep Moon per 100 kyr, absorbed inside the rate anchors' taper,
+  visible beyond). The epoch-consistency gate's 0.002-d tolerance hid the
+  1 s/yr gap between the anchor chain and the one-family law; on T_p(t) the
+  two agree to 1e-11 d. A tolerance wide enough to pass a known device gap
+  is a gate that cannot see the gap closing — note what a tolerance covers.
 - **A number a doc cannot reproduce from an artifact gets written BY the
   script**, not re-derived in a generator. Two guesses at the §4.7 f_ice
   recipe gave 0.70 and 0.73 against the documented 0.77; the script's own

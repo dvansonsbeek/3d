@@ -213,6 +213,8 @@ export function assembleModel(C, F, laws = {}, secularSeriesArtifact = /** @type
     astronomicalUnitKm: currentAUDistance,
     earthOrbitalEccentricityJ2000: C.earthOrbital.earthEccentricityJ2000,
     moonEclipticInclinationJ2000Deg: C.moonReference.moonEclipticInclinationJ2000,
+    // p₀'s period — the tropical year of date's equinox term (plan 09 step 5d)
+    axialPrecessionJ2000Years: certifiedAxialPrecessionJ2000Years(),
   });
 
   // ── Driver 1½: regime-aware recession history + the solar channels ────────

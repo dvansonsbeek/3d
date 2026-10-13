@@ -934,13 +934,10 @@ function meanApsidalMeetsNodalAtAge(t_Ma) { return _moonChain().apsidalMeetsNoda
 
 function meanLunarLevelingCycleAtAge(t_Ma) { return _moonChain().lunarLevelingSecondsAtAge(t_Ma); }
 
-// ─── Anomalistic year + stellar/sidereal days ────────────────────────────
-function meanAnomalisticYearSecondsAtAge(t_Ma) {
-  const H_t      = meanHAtAge(t_Ma);
-  const T_sid_s  = meanSiderealYearSecondsAtAge(t_Ma);
-  const T_trop_s = T_sid_s * (H_t - 13) / H_t;
-  return T_trop_s * H_t / (H_t - 16);
-}
+// ─── Stellar/sidereal days ───────────────────────────────────────────────
+// (Plan 09 step 5d: `meanAnomalisticYearSecondsAtAge` — the H/16 device
+// identity T_sid·(H − 13)/(H − 16) — is deleted; the anomalistic year of
+// date is the one-family law `yearLengths.anomalisticYearSecondsAtYear`.)
 
 // Stellar day = sidereal day + the precession offset, PROJECTED onto the equator.
 // NOTE the parametrisation here differs from src/script.js: there the sidereal day
@@ -1093,6 +1090,9 @@ const EPOCH_PARAMS = Object.freeze({
   siderealYearJ2000Seconds: MEAN_SIDEREAL_YEAR_J2000_S,
   solarMassLossFracPerYear: SOLAR_MASS_LOSS_FRAC_PER_YR,
   precessionSolarShareJ2000: PRECESSION_SOLAR_SHARE_J2000,
+  // p₀ — the tropical year of date's equinox term (plan 09 step 5d); the SAME
+  // expression the deep-time factory's composed module resolves (bit-identical twins)
+  precessionRateJ2000ArcsecPerYr: 1296000 / certifiedAxialPrecessionJ2000Years(),
 });
 
 // The α channel is injected into Layer 0 as `earthMoiFactorAtAge` directly —
@@ -1100,16 +1100,15 @@ const EPOCH_PARAMS = Object.freeze({
 // R2 (pinning α at its J2000 reference during a lattice-table build) is a
 // Phase C change; today's behaviour is the live α(t) everywhere.
 
-// ─── Year↔JD under deep time, and the H-balanced event finder ─────────────
+// ─── Year↔JD under deep time ───────────────────────────────────────────────
 //
 // ONE implementation, `@essrt/physics/phase/deep-calendar` (the year/day
 // collapse — formerly the PHASE-B-DUPLICATE family hand-mirrored from
 // `src/script.js`). Both engines build the calendar from their own phase
-// machinery, days-per-year source and lattice-α pin, and delegate. The export
-// names below are kept: Step 6a's `Cycle` column (packages/fitting) needs
-// them, and that column is what stops `Model Year` — a chaining-step counter
-// that means a tropical year for the cardinals and an anomalistic one for the
-// apsides — from being used as a phase axis (R15).
+// machinery, days-per-year source and lattice-α pin, and delegate. (Plan 09
+// step 5d: the H-balanced event finder left; Step 6a reports a plain year
+// window. Its `Cycle` column still rides `cyclesBetweenYears` until the
+// counters go.)
 const { createDeepCalendar } = _req('@essrt/physics/phase/deep-calendar');
 let _deepCalM = null;
 function _deepCal() {
@@ -1122,9 +1121,6 @@ function _deepCal() {
     startModelYear: C.startmodelYear,
     startModelYearWithCorrection: C.startModelYearWithCorrection,
     siTropicalYearDays: SI_TROPICAL_YEAR_DAYS,
-    balancedYear: C.balancedYear,
-    hJ2000: C.H,
-    cyclesBetween: cyclesBetweenYears,
   });
   return _deepCalM;
 }
@@ -1143,13 +1139,6 @@ const _jdToSIyear = (jd) => _deepCal().jdToSIyear(jd);
 function siYearToJD(ySI) { return _deepCal().siYearToJD(ySI); }
 
 /**
- * Inverse of `_cumulIntegralAtYear` — the year at a given cumulative ∫1/H dt.
- * @param {number} targetCumul
- * @returns {number|null} null outside the table domain
- */
-function _yearAtCumulIntegral(targetCumul) { return _deepCal().yearAtCumulIntegral(targetCumul); }
-
-/**
  * Calendar year → JD, integrating days-per-year from startmodelYear.
  *
  * Named `yearToJDDeepTime` because `constants.js` already exports a SNAPSHOT
@@ -1162,15 +1151,6 @@ function _yearAtCumulIntegral(targetCumul) { return _deepCal().yearAtCumulIntegr
  * @returns {number|null} null outside the table domain
  */
 function yearToJDDeepTime(year) { return _deepCal().yearToJD(year); }
-
-/**
- * Calendar year of the k-th H-balanced event, k = 0 being `C.balancedYear`
- * (the deliberate JD round-trip: see the deep-calendar module header).
- *
- * @param {number} cycleOffset integer cycle index; negative = past
- * @returns {number|null}
- */
-function balancedYearAtCycle(cycleOffset) { return _deepCal().balancedYearAtCycle(cycleOffset); }
 
 // ─── Scene time coordinate ↔ JD (R4) ───────────────────────────────────────
 // `pos` counts tropical years since startmodelJD. Under deep time the year
@@ -1321,14 +1301,13 @@ module.exports = {
   // the pure primitives from identical numbers. Inject `earthMoiFactorAtAge`
   // (exported above) as the α channel.
   EPOCH_PARAMS,
-  // Year↔JD under deep time + the balanced-event finder (PHASE-B-DUPLICATE).
-  // Step 6a's `Cycle` column needs all four; `SI_TROPICAL_YEAR_DAYS` is the
-  // axis they share, exported so a caller cannot re-derive it differently.
+  // Year↔JD under deep time (PHASE-B-DUPLICATE). Step 6a's `Cycle` column
+  // needs the SI axis; `SI_TROPICAL_YEAR_DAYS` is exported so a caller cannot
+  // re-derive it differently. (Plan 09 step 5d: the balanced-event finder and
+  // the ∫1/H table's inverse are gone.)
   _jdToSIyear,
   siYearToJD,
-  _yearAtCumulIntegral,
   yearToJDDeepTime,
-  balancedYearAtCycle,
   SI_TROPICAL_YEAR_DAYS,
   // pos↔JD under deep time (R4) — the integrated conversion; null out of
   // domain, caller falls back to the linear form.
@@ -1387,7 +1366,6 @@ module.exports = {
   meanAnomalisticMonthAtAge, meanNodalMonthAtAge,
   meanApsidalMeetsNodalAtAge, meanLunarLevelingCycleAtAge,   // 8.2-3: gained via the shared chain (were browser-only)
   // Earth derivations
-  meanAnomalisticYearSecondsAtAge,
   meanStellarDayAtAge, meanSiderealDayAtAge,
   // Per-planet
   meanPlanetSemiMajorAxisAtAge,

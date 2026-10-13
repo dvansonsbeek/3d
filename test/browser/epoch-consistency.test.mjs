@@ -39,22 +39,21 @@ const rows = await s.page.evaluate(({ EPOCHS_MA }) => {
     // while the scene sits on the foreign epoch...
     const lodRealMutated = T.computeLodRealSecondsAtEpoch(year);
     T.resetEpochToJ2000();
-    const H_t = a.holisticyearLength;
     out.push({
       t, year,
-      // What the epoch-anchor chain says at this epoch (the mutated globals,
-      // plus the anomalistic identity anom = trop·(H/16)/(H/16−1) they imply).
+      // What the epoch-anchor chain says at this epoch (the mutated globals).
       // The sidereal anchor is the ONE remaining sidereal-year global (the
       // "kinematic" twin is a J2000 constant since the year/day collapse).
+      // (plan 09 step 5d: the anchor chain carries no anomalistic year — its
+      // H/16 identity is deleted; the anomalistic law's purity is pinned by
+      // the fifth gate and the sampler-purity gate.)
       sidKinAnchor: a.meansiderealyearlengthinDays,
       solAnchor: a.meansolaryearlengthinDays,
-      anomAnchor: a.meansolaryearlengthinDays * (H_t / 16) / (H_t / 16 - 1),
       // What the pure f(Y) evaluators say at the same year, J2000 scene state.
       // plan 09: the year lengths of date in days of the epoch (the published
       // SI year lengths over the kinematic day of date; the retired combs are gone)
       sidEval: T.siderealYearDaysOfDate(year),
       solEval: T.tropicalYearDaysOfDate(year),
-      anomEval: T.anomalisticYearDaysOfDate(year),
       // ...and again at J2000 scene state — must be bit-equal (purity).
       lodRealPure: T.computeLodRealSecondsAtEpoch(year),
       lodRealMutated,
@@ -74,17 +73,7 @@ for (const r of rows) {
   for (const [label, evalV, anchorV] of [
     ['sidereal', r.sidEval, r.sidKinAnchor],
     ['tropical', r.solEval, r.solAnchor],
-    ['anomalistic', r.anomEval, r.anomAnchor],
   ]) {
-    // Plan 09: beyond the one-family window (±2 Myr) the model publishes no
-    // anomalistic year of date (the movement's apsidal line is unresolved
-    // there; the evaluator returns NaN, the lunisolar surface null) — the
-    // anchor chain's H/16 identity is the retired device's, not a published
-    // value, so there is nothing to pin.
-    if (label === 'anomalistic' && !Number.isFinite(evalV) && Math.abs(r.t) > 2) {
-      console.log(`  n/a  ${String(r.t).padStart(4)} Ma  ${label.padEnd(22)} no published anomalistic year beyond the one-family window`);
-      continue;
-    }
     const d = evalV - anchorV;
     const ok = Number.isFinite(d) && Math.abs(d) <= TOL_DAYS;
     if (!ok) fail++;

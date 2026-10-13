@@ -11,10 +11,10 @@
     "unmatchedModel": 6,
     "unmatchedCanon": 0,
     "typeAgree": 1447,
-    "meanAbsResidualMinutes": 8.518,
-    "meanAbsResidualMinutesFull": 8.517519029204188,
+    "meanAbsResidualMinutes": 8.517,
+    "meanAbsResidualMinutesFull": 8.517496640158111,
     "rmsResidualMinutes": 9.823,
-    "rmsResidualMinutesFull": 9.823469419045507,
+    "rmsResidualMinutesFull": 9.823449512318815,
     "maxAbsResidualMinutes": 19.289
   },
   "visibility": {
@@ -141,11 +141,11 @@
     "found": true,
     "type": "Partial",
     "canonType": "Partial",
-    "magnitudeUmbral": 0.9151,
+    "magnitudeUmbral": 0.915,
     "canonMagnitudeUmbral": 0.9199,
-    "ttResidualMinutes": -4.63,
+    "ttResidualMinutes": -5.06,
     "visibleFromBabylon": true,
-    "babylonMoonAltitudeDeg": 35.24
+    "babylonMoonAltitudeDeg": 35.32
   },
   "dtBands": {
     "overall": {
@@ -284,15 +284,15 @@
     "bins": {
       "100": {
         "n": 196,
-        "signedMeanMinutes": 0
+        "signedMeanMinutes": -0.14
       },
       "500": {
         "n": 201,
-        "signedMeanMinutes": 0.33
+        "signedMeanMinutes": 0.26
       },
       "1000": {
         "n": 191,
-        "signedMeanMinutes": 0.21
+        "signedMeanMinutes": 0.19
       },
       "1500": {
         "n": 180,
@@ -308,55 +308,55 @@
       },
       "-750": {
         "n": 190,
-        "signedMeanMinutes": -2.02
+        "signedMeanMinutes": -2.45
       },
       "-650": {
         "n": 204,
-        "signedMeanMinutes": -1.25
+        "signedMeanMinutes": -1.63
       },
       "-550": {
         "n": 204,
-        "signedMeanMinutes": -1.85
+        "signedMeanMinutes": -2.19
       },
       "-450": {
         "n": 193,
-        "signedMeanMinutes": -1.39
+        "signedMeanMinutes": -1.69
       },
       "-350": {
         "n": 186,
-        "signedMeanMinutes": -0.84
+        "signedMeanMinutes": -1.1
       },
       "-250": {
         "n": 183,
-        "signedMeanMinutes": -1.53
+        "signedMeanMinutes": -1.77
       },
       "-100": {
         "n": 201,
-        "signedMeanMinutes": -0.32
+        "signedMeanMinutes": -0.51
       }
     },
     "driftVsModernMinutes": {
-      "100": -0.72,
-      "500": -0.39,
-      "1000": -0.51,
+      "100": -0.86,
+      "500": -0.46,
+      "1000": -0.53,
       "1500": -0.38,
       "1800": -0.01,
       "2000": 0.4,
-      "-750": -2.74,
-      "-650": -1.97,
-      "-550": -2.57,
-      "-450": -2.11,
-      "-350": -1.56,
-      "-250": -2.25,
-      "-100": -1.04
+      "-750": -3.17,
+      "-650": -2.35,
+      "-550": -2.91,
+      "-450": -2.41,
+      "-350": -1.82,
+      "-250": -2.49,
+      "-100": -1.23
     },
-    "effectiveDeltaNdotArcsecPerCy2": 0.22,
+    "effectiveDeltaNdotArcsecPerCy2": 0.26,
     "predictedReducedResidualMinutes": {
-      "-800": 1.5,
-      "-700": -3.4,
-      "-600": -3.4,
-      "-500": -9.3,
-      "-400": -12.2
+      "-800": 2,
+      "-700": -3,
+      "-600": -3.1,
+      "-500": -9,
+      "-400": -12
     }
   },
   "phaseC": {
@@ -368,41 +368,41 @@
     "perCentury": {
       "-800": {
         "n": 2,
-        "medianMinutes": 14.7,
+        "medianMinutes": 15.1,
         "seMinutes": 40.3,
-        "preRegisteredMinutes": 1.5,
+        "preRegisteredMinutes": 2,
         "z": 0.3
       },
       "-700": {
         "n": 6,
-        "medianMinutes": -21.8,
-        "seMinutes": 7.9,
-        "preRegisteredMinutes": -3.4,
-        "z": -2.3
+        "medianMinutes": -21.5,
+        "seMinutes": 7.8,
+        "preRegisteredMinutes": -3,
+        "z": -2.4
       },
       "-600": {
         "n": 21,
-        "medianMinutes": -12,
+        "medianMinutes": -11.7,
         "seMinutes": 5.2,
-        "preRegisteredMinutes": -3.4,
+        "preRegisteredMinutes": -3.1,
         "z": -1.6
       },
       "-500": {
         "n": 13,
-        "medianMinutes": -21.3,
+        "medianMinutes": -21,
         "seMinutes": 14.3,
-        "preRegisteredMinutes": -9.3,
+        "preRegisteredMinutes": -9,
         "z": -0.8
       },
       "-400": {
         "n": 27,
-        "medianMinutes": -11.4,
+        "medianMinutes": -11.1,
         "seMinutes": 2.4,
-        "preRegisteredMinutes": -12.2,
-        "z": 0.3
+        "preRegisteredMinutes": -12,
+        "z": 0.4
       }
     },
-    "chi2": 9.1,
+    "chi2": 9.2,
     "chi2Centuries": 5
   },
   "denseTargets": {
@@ -415,77 +415,77 @@
     "perCentury": {
       "400": {
         "n": 5,
-        "medianSeconds": -331,
+        "medianSeconds": -326,
         "seSeconds": 403
       },
       "500": {
         "n": 11,
-        "medianSeconds": -285,
-        "seSeconds": 215
+        "medianSeconds": -281,
+        "seSeconds": 216
       },
       "800": {
         "n": 5,
-        "medianSeconds": 444,
+        "medianSeconds": 446,
         "seSeconds": 294
       },
       "900": {
         "n": 17,
-        "medianSeconds": -483,
+        "medianSeconds": -481,
         "seSeconds": 245
       },
       "1000": {
         "n": 38,
-        "medianSeconds": 119,
+        "medianSeconds": 120,
         "seSeconds": 121
       },
       "1100": {
         "n": 4,
-        "medianSeconds": 850,
+        "medianSeconds": 851,
         "seSeconds": 226
       },
       "1200": {
         "n": 17,
-        "medianSeconds": 400,
+        "medianSeconds": 401,
         "seSeconds": 144
       },
       "-800": {
         "n": 2,
-        "medianSeconds": 881,
+        "medianSeconds": 906,
         "seSeconds": 2421
       },
       "-700": {
         "n": 6,
-        "medianSeconds": -1310,
-        "seSeconds": 472
+        "medianSeconds": -1288,
+        "seSeconds": 471
       },
       "-600": {
         "n": 21,
-        "medianSeconds": -722,
+        "medianSeconds": -701,
         "seSeconds": 315
       },
       "-500": {
         "n": 13,
-        "medianSeconds": -1278,
+        "medianSeconds": -1261,
         "seSeconds": 859
       },
       "-400": {
         "n": 27,
-        "medianSeconds": -682,
+        "medianSeconds": -665,
         "seSeconds": 146
       },
       "-300": {
         "n": 13,
-        "medianSeconds": -1242,
+        "medianSeconds": -1229,
         "seSeconds": 1214
       },
       "-200": {
         "n": 50,
-        "medianSeconds": -77,
+        "medianSeconds": -65,
         "seSeconds": 211
       },
       "-100": {
         "n": 15,
-        "medianSeconds": 67,
+        "medianSeconds": 78,
         "seSeconds": 401
       }
     },
@@ -505,13 +505,13 @@
       "1200"
     ],
     "ablationChi2": {
-      "fullStack": 55.6,
-      "minus_bond": 61.9,
-      "minus_hallstatt": 54.4,
-      "minus_jose5": 56.6,
-      "minus_jose4": 48.5,
-      "minus_resonator": 120.9,
-      "noCycles": 81.1
+      "fullStack": 53.8,
+      "minus_bond": 61.5,
+      "minus_hallstatt": 52.5,
+      "minus_jose5": 54.8,
+      "minus_jose4": 47,
+      "minus_resonator": 117.8,
+      "noCycles": 79.7
     }
   },
   "inputs": {
@@ -519,7 +519,7 @@
     "files": {
       "data/core-mantle-resonator-stage1.json": "sha256:4fe55acf164a17c4c3af737766cb0ae13558acf46646809665839765ead54bb4",
       "data/deltaT-4flag-fit.json": "sha256:f01d58a25aa6c9b03c14bc63803066c76d0a0de6295aeb08cd4d2aec490262d1",
-      "data/nbody-secular-series.json": "sha256:d5a243471d336eaa922b8b5c3f8d6a67ec93b676726a4f2abe4004c31cc7db18",
+      "data/nbody-secular-series.json": "sha256:5d065575e7a552b6039c237417932f29ed947bfe630395c88a8c2e71653438ff",
       "data/rspa20160404supp2/Table-S10.txt": "sha256:67a949e3a80574880b3e79338c3527fe9b7be639dd2c06080a098b75610abe7f",
       "data/rspa20160404supp2/Table-S11.txt": "sha256:19538f6ff8889df919da4ed1587296d540c9827d1155b605d9f3da0428916d2c",
       "data/rspa20160404supp2/Table-S12.txt": "sha256:f8f24b020db4af857c184cc164212e07d5109efda2a9c6da7551130022f1abc6",
@@ -531,7 +531,7 @@
       "packages/physics/src/earth/sidereal-channel-artifact.cjs": "sha256:a46f99abbf000b8c59ec31d1c048a05fb5ae6515554f5e33f208d8dcd3f5cdf8",
       "packages/physics/src/earth/year-lengths.cjs": "sha256:ad86136a5455e5d846cee9cd03f55dc66b942edab56fa5c57f51fa2923decdb2",
       "packages/physics/src/eclipse/finders.cjs": "sha256:168755d5e01397b7f63f2ffa49101afe0da0046e5fbd9e7ef6d04be6d7f5d330",
-      "packages/physics/src/model.js": "sha256:c4b72e766393dbc69ec8ce8d1d1812960a51254b489eec802dd372eb79c18917",
+      "packages/physics/src/model.js": "sha256:c3f182f192b5a1194f14e27fefae6246e8ad374a808781417919e066b1b539d5",
       "packages/physics/src/moon/apparent.cjs": "sha256:5a63a95cf8d26c4d44e7b7acd4308cbd7240aa2bcee70d04c70b273413090335",
       "packages/physics/src/moon/arguments.cjs": "sha256:1515c221a4200dff230d44e7b144ef526f5ad295656b08874d2cc3b7118d9757",
       "packages/physics/src/moon/deep-ecc-channel.cjs": "sha256:7ce15d1c4f61f2ea730d7673d705a1eb2a31bff20b720cd00d8f1d34a3e85220",
@@ -548,7 +548,7 @@
       "public/input/lunar-eclipses-stephenson-2016.json": "sha256:ed8040ef4d688023ca38c1c8eac83b40bc36f75edb0894ba46dd04f2aed32fe6",
       "public/input/model-parameters.json": "sha256:19d16cc2582d2130fd5c891cca0a36529104501d0b678e9b37dbf2bfb9969ced",
       "public/input/stephenson-2016-deltaT-polynomial.json": "sha256:e8f9611c0e6173d2e2807c46bf920673e533c085b9366e1dfc424c6fd1186df7",
-      "tools/lib/deep-time.js": "sha256:76e5020dd19109b58476136f22c8b0c8a49ceb10b94fa6247dcad33b160a8227",
+      "tools/lib/deep-time.js": "sha256:bd001f57c6947ef874a2ac92f0c258f1a89f229f5b02f1ad888daf2efefb5a9a",
       "tools/verify/lunar-alignment.js": "sha256:a0d02230e6cbfafb8fc37bd43759adb26bcf25284a990a9c8ae0687582331ffb"
     }
   }

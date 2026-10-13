@@ -151,26 +151,8 @@ function createPhaseMachinery({
     return divisorN * (integral - correction);
   }
 
-  /** Inverse of cumulAtYear — the year at a given cumulative ∫1/H (binary
-   *  search over the monotone table). null outside the table domain.
-   *  @param {number} targetCumul @returns {number | null} */
-  function yearAtCumul(targetCumul) {
-    ensureTable();
-    const t = /** @type {Float64Array} */ (table);
-    const N = t.length;
-    let lo = 0, hi = N - 1;
-    while (lo < N && Number.isNaN(t[lo])) lo++;
-    while (hi >= 0 && Number.isNaN(t[hi])) hi--;
-    if (lo >= hi) return null;
-    if (targetCumul < t[lo] || targetCumul > t[hi]) return null;
-    while (lo < hi - 1) {
-      const mid = (lo + hi) >> 1;
-      if (t[mid] <= targetCumul) lo = mid; else hi = mid;
-    }
-    const v_lo = t[lo], v_hi = t[hi];
-    const frac = (v_lo === v_hi) ? 0 : (targetCumul - v_lo) / (v_hi - v_lo);
-    return yearMin + (lo + frac) * stepYears;
-  }
+  // (Plan 09 step 5d: `yearAtCumul`, the table's inverse, left with the
+  // H-balanced event finder — its only reader.)
 
   /** Grid geometry — consumed by the engines' days/pos tables, which share
    *  this grid but keep their own integrands (they move at Phase 8). */
@@ -180,7 +162,7 @@ function createPhaseMachinery({
     return { yearMin, yearMax, stepYears, j2000Idx, length: t.length };
   }
 
-  return { ensureTable, cumulAtYear, integralBetween, j2000Drift, cyclesBetween, yearAtCumul, grid };
+  return { ensureTable, cumulAtYear, integralBetween, j2000Drift, cyclesBetween, grid };
 }
 
 module.exports = { createPhaseMachinery };
