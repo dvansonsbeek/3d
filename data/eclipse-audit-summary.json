@@ -429,7 +429,7 @@
       "packages/physics/src/earth/year-lengths.cjs": "sha256:ad86136a5455e5d846cee9cd03f55dc66b942edab56fa5c57f51fa2923decdb2",
       "packages/physics/src/eclipse/besselian.cjs": "sha256:f731968aa72105b31ca578f14644a5afcf228bb3a1103359414171de38baaf52",
       "packages/physics/src/eclipse/finders.cjs": "sha256:168755d5e01397b7f63f2ffa49101afe0da0046e5fbd9e7ef6d04be6d7f5d330",
-      "packages/physics/src/eclipse/sun-planetary-completion.cjs": "sha256:e65948004087f1f550a1f3a06b16aa20e9dd151bb04a4194811bbff5d499db41",
+      "packages/physics/src/eclipse/sun-planetary-completion.cjs": "sha256:12a67c64a8eff9461ff6146936db75e2a80a4e392a8927be3f9fd4d79bdf47c4",
       "packages/physics/src/model.js": "sha256:8e9ada545c1ff55d6f242cd8fa53973dd96d56a35be3148b36bfe1c2d137c62a",
       "packages/physics/src/moon/apparent.cjs": "sha256:5a63a95cf8d26c4d44e7b7acd4308cbd7240aa2bcee70d04c70b273413090335",
       "packages/physics/src/moon/ecc-channel.cjs": "sha256:e986b8ca3dbfdaa8508f49f315bc81718503b91eb56298d9ad4d7c29186fc691",
@@ -437,13 +437,13 @@
       "packages/physics/src/moon/series.cjs": "sha256:044185825129b0a37619882c2eaa7ded446d35b8994c5a2b6a5d0cd56d13ee4d",
       "public/input/astro-reference.json": "sha256:4759bbd9048403ac044358187a4fa908b23356112abe418afcca6b1d006782f9",
       "public/input/climate-formula-coefficients.json": "sha256:b19d9fc5e20721d484f4c67e88102361e906a0c9eeb6018a71e4f09b5f37a7c9",
-      "public/input/fitted-coefficients.json": "sha256:66f746bbea3a34a964668af3a233a3450e3bf12498cf50ad1cd882fc3f418067",
+      "public/input/fitted-coefficients.json": "sha256:71e09e1ea71888f2a1a70f6f332cebdcb0ed44afbf3b6c7ee887d818f42d12f2",
       "public/input/lunar-eclipses-nasa.json": "sha256:2b0f6d1b4dab2d1e8a432a812b027631cfecde9714ce0600f030da5e2a2a792e",
       "public/input/lunar-eclipses-stephenson-2016.json": "sha256:ed8040ef4d688023ca38c1c8eac83b40bc36f75edb0894ba46dd04f2aed32fe6",
       "public/input/model-parameters.json": "sha256:19d16cc2582d2130fd5c891cca0a36529104501d0b678e9b37dbf2bfb9969ced",
       "public/input/solar-eclipse-centerlines-nasa.json": "sha256:995d1b38879e6bd1983a1f2895c1269b9f8f4fa917ccb047bfc7b0be3da5985c",
       "public/input/solar-eclipses-stephenson-2016.json": "sha256:5356d24641c27b456fb27ac2c3b6dfab1538dd9fa8e609d7abb5bb9132f18794",
-      "tools/lib/scene-graph.js": "sha256:04310c7b34b92344cddd95f537b43e0082adcc9cc087c6bcb6ec7dd6159a545f",
+      "tools/lib/scene-graph.js": "sha256:df94075fb8df68f5452a2c2345bf92bdc31391f54c5d901aaa0ea5d8abfbee90",
       "tools/verify/eclipse-audit.js": "sha256:d6e48dc93a6a56dd7a24b603d5b606dae296e0e24f67bd82cc6c65ee094a841e"
     }
   }

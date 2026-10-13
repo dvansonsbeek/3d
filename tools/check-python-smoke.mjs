@@ -60,12 +60,12 @@ if (parse.status !== 0) {
 }
 
 // ── B: the bridge ──────────────────────────────────────────────────────────
-const bridge = spawnSync(PY, ['-c', `import sys\nsys.path[:0]=[${JSON.stringify(join(ROOT, 'tools/lib/python'))}, ${JSON.stringify(join(ROOT, 'tools/fit/python'))}]\nimport constants_scripts, planet_beats, predictive_formula\nprint(len([k for k in dir(constants_scripts) if k.isupper()]))`], { encoding: 'utf-8', cwd: ROOT });
+const bridge = spawnSync(PY, ['-c', `import sys\nsys.path[:0]=[${JSON.stringify(join(ROOT, 'tools/lib/python'))}, ${JSON.stringify(join(ROOT, 'tools/fit/python'))}]\nimport constants_scripts, planet_beats\nprint(len([k for k in dir(constants_scripts) if k.isupper()]))`], { encoding: 'utf-8', cwd: ROOT });
 if (bridge.status !== 0) {
   failures.push(`B bridge: ${bridge.stderr.trim().split('\n').slice(-1)[0]}`);
-  console.log(`  B  bridge     FAIL — constants_scripts / planet_beats / predictive_formula do not import:\n${bridge.stderr}`);
+  console.log(`  B  bridge     FAIL — constants_scripts / planet_beats do not import:\n${bridge.stderr}`);
 } else {
-  console.log(`  B  bridge     constants_scripts + planet_beats + predictive_formula import (${bridge.stdout.trim()} constants)`);
+  console.log(`  B  bridge     constants_scripts + planet_beats import (${bridge.stdout.trim()} constants; plan 09 step 5a: the kinematic mirror predictive_formula.py is retired)`);
 }
 
 // ── C: the scripts ─────────────────────────────────────────────────────────

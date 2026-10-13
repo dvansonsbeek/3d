@@ -235,7 +235,7 @@ then `npm run constants:generate` (Step 9).
 | Script | Produces | Data source |
 |--------|----------|-------------|
 | `export-solar-measurements.js` | `data/02-solar-measurements-window.csv` via `npm run fit:6a2` (the full-period `data/02-solar-measurements.csv` is retired; written only on demand) | Scene-graph simulation (1-year steps, single pass) |
-| `sun-longitude-harmonics.js` | `SUN_LONGITUDE_MEAN`, `SUN_LONGITUDE_HARMONICS` (anchor-divisor harmonic terms; **see design rule above** — only divisors n where anchor/n maps to a known physical cycle are allowed) | Scene-graph Sun vs Meeus Ch.25 (computed in-script, no CSV). **Status 2026-06 (Phase Z-B): ENABLED** — Sun-only application with runtime divisor-whitelist filter (skips legacy [168] term automatically). Closes ~96% of the framework's 200" Sun-vs-Meeus residual. **2026-08 (FQ-3): retired from the moveModel display path** (exact-Kepler corrector, doc 65); still consumed by the Step-6a instrument + the legacy A/B path, and still fitter-owned here. |
+| `sun-longitude-harmonics.js` — DELETED at plan 09 step 5a with its two keys (the comb left every Sun path at plan 06 R4) | `SUN_LONGITUDE_MEAN`, `SUN_LONGITUDE_HARMONICS` (anchor-divisor harmonic terms; **see design rule above** — only divisors n where anchor/n maps to a known physical cycle are allowed) | Scene-graph Sun vs Meeus Ch.25 (computed in-script, no CSV). **Status 2026-06 (Phase Z-B): ENABLED** — Sun-only application with runtime divisor-whitelist filter (skips legacy [168] term automatically). Closes ~96% of the framework's 200" Sun-vs-Meeus residual. **2026-08 (FQ-3): retired from the moveModel display path** (exact-Kepler corrector, doc 65); still consumed by the Step-6a instrument + the legacy A/B path, and still fitter-owned here. |
 | `sun-planetary-completion-fit.js` | NOTHING (read-only, the Step-0 companion — 20.3h, SUPERSEDED by Stage D2) | JPL Horizons live (960 all-phase + 179 syzygy epochs, network required — so it can never be a gate). Was the dev record behind the v1 fitted 10-term table; the shipped table is now the DERIVED 70-term extraction on FRAMEWORK-native carriers (FQ-5 N3: `tools/explore/d2-derived-sun.mjs` → `n2-sun-framework-carriers.mjs` → `n3-carrier-swap-preview.mjs`; the carrier rates are injected live from the planet records by `model.js`), so its coefficient-drift part no longer applies — its syzygy + NASA-centerline scoreboards remain valid verification. After ANY Step-0 refit OR planet-record period change, re-run the N3 extraction chain and re-embed the table + its `PAIRED_SUN_HARMONICS_SHA256` by hand — the test:model fingerprint gate enforces the pairing. |
 | `ascnode-correction.js` | `ascNodeTiltCorrection`, `startpos` | `data/reference-data.json` |
 | `moon-eclipse-optimizer.js` | NOTHING (RETIRED at plan 06 R3 item 1 — kept as the record) | Formerly `moonMeeusLpCorrection` + `MOON_CORRECTION` against 58 solar eclipses (2000–2025) + a JPL baseline. Both are retired: measured against Horizons' apparent Moon the series needs no anchor (−1.0″ ± 1.5″, 1970–2049), the +32.75″ was the eclipse tier's mean Sun compensated (κ + the I2 long inequality + the trend-ΔT offset), and the RA/Dec patches were fitted around the retired D5 aberration layer (docs/66 §1.4). `moonStartpos*` values are J2000-element anchored via the in-sim meters (docs/66 §4) and are NO LONGER fitted |
@@ -293,7 +293,7 @@ model change that isn't paired with a version bump.
 ## Dependency chain
 
 When model parameters change, refit in this order. The logic:
-0. **Step 0 (Sun longitude harmonics) runs FIRST as a prerequisite.** The
+0. **Step 0 (Sun longitude harmonics) — DELETED at plan 09 step 5a (the comb left every Sun path at plan 06 R4; the paragraphs below are the record).** It ran FIRST as a prerequisite. The
    harmonics capture a structural property of the framework (the ~8%
    eccentricity-definition gap between the framework's
    `eccentricityDerivedMean` and Meeus IAU). They shift the scene-graph
@@ -330,8 +330,8 @@ When model parameters change, refit in this order. The logic:
 ```
 ── Phase 0: Pre-fit Sun harmonic structure (prerequisite, run once) ──
 
-Step 0:  SUN_HARMONICS_DISABLED=1 node tools/fit/sun-longitude-harmonics.js --write
-         → SUN_LONGITUDE_MEAN, SUN_LONGITUDE_HARMONICS
+Step 0:  (DELETED at plan 09 step 5a — the script and its keys SUN_LONGITUDE_MEAN,
+         SUN_LONGITUDE_HARMONICS are gone; the text below is the record)
          Captures the STRUCTURAL Sun residual (framework
          eccentricityDerivedMean ≈ 0.01545 vs Meeus IAU 0.01671 — an ~8%
          definitional gap that propagates through 2e·sin(M) to produce a
@@ -700,9 +700,7 @@ Step 6f legacy reference — see Step 0 above. The sun-longitude-harmonics
          Updates: fitted-coefficients.json (when --write); coefficients
          are loaded by constants.js and applied automatically at runtime.
          Standalone use:
-           node tools/fit/sun-longitude-harmonics.js              # dry run, 1800-2200 (default)
-           SUN_HARMONICS_DISABLED=1 \
-             node tools/fit/sun-longitude-harmonics.js --write    # structural refit + persist
+           (sun-longitude-harmonics.js — DELETED at plan 09 step 5a; these commands are the record)
          --write REQUIRES `SUN_HARMONICS_DISABLED=1` — the script
          refuses otherwise. See Step 0 above for the rationale.
 
@@ -1117,7 +1115,7 @@ public/input/ (single source of truth)
          │         ↓ import
          │    tools/lib/python/constants_scripts.py    ← Python constants (dicts, derived values)
          │         ↓ import
-         │    tools/lib/python/predictive_formula.py   ← Earth perihelion / ERD / obliquity helpers
+         │    (tools/lib/python/predictive_formula.py — the kinematic mirror — retired at plan 09 step 5a)
          │
          └──→ npm run constants:generate
               src/script.js   ← Browser simulation (imports the generated module;

@@ -172,26 +172,12 @@ if (model.identity.counterfactual !== false) failures.push('identity: default as
   });
 }
 
-// ── Matched-pair fingerprint: sun planetary completion ↔ SUN_HARMONICS ──
-// The 20.3h completion table's amplitudes are the residual of the CURRENT
-// finder Sun vs JPL; a Step-0 SUN_HARMONICS refit changes that residual and
-// stales the table by a few arcseconds — under the api centerline gate's
-// threshold, so it needs its own check. On mismatch: re-derive with
-//   node tools/fit/sun-planetary-completion-fit.js
-// then update the table's literals AND its PAIRED_SUN_HARMONICS_SHA256.
-{
-  const { createHash } = await import('node:crypto');
-  const { FITTED_COEFFICIENTS } = await import('../src/constants/coefficients.js');
-  const { PAIRED_SUN_HARMONICS_SHA256 } = require('../src/eclipse/sun-planetary-completion.cjs');
-  const live = createHash('sha256')
-    .update(JSON.stringify(FITTED_COEFFICIENTS.SUN_LONGITUDE_HARMONICS))
-    .digest('hex').slice(0, 16);
-  if (live !== PAIRED_SUN_HARMONICS_SHA256) {
-    failures.push(`sun-completion matched pair: SUN_LONGITUDE_HARMONICS hash ${live} != paired ${PAIRED_SUN_HARMONICS_SHA256}`
-      + ' — Step 0 was refit without re-deriving eclipse/sun-planetary-completion.cjs'
-      + ' (run node tools/fit/sun-planetary-completion-fit.js, update the table + fingerprint)');
-  }
-}
+// (Plan 09 step 5a: the matched-pair fingerprint "sun planetary completion ↔
+// SUN_HARMONICS" is retired with the Step-0 comb. The completion table was
+// derived beside the comb (last fingerprint 53530a28a60b3c4a, the R10
+// rotation of a never-refit comb); the comb left every Sun path at plan 06 R4,
+// so the residual the table was derived from is the certified Sun's and no
+// coefficient remains to pair against. The carrier-rate pair below stands.)
 
 // FQ-5 N3 matched pair: the completion's TERMS were extracted under the
 // FRAMEWORK carrier rates the model wiring computes live from the planet

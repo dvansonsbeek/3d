@@ -11,7 +11,7 @@ import { Pane } from 'tweakpane';
 //
 // Generated at build time, not fetched at runtime — `holisticyearLength` is read
 // at module scope below, and Phase 15 requires offline === hosted.
-import { computeObliquityJ2000Deg, computeSecularShape, DEFAULT_CONSTANTS as K, REFERENCE_DATA as R, FITTED_COEFFICIENTS as FIT, CONSTANTS_HASH, COEFFICIENTS_HASH, MODEL_VERSION, PREPRINT_DOI, createEpochPrimitives, createPhaseMachinery, createDeepCalendar, createMoonEccChannel, createDeepEccChannel, DEEP_MODES_ARTIFACT, createDeepOrbitalHistory, createYearLengths, computeMeanTropicalYearJ2000Days, createMoonMonthChain, createChainCycleIntegrator, createMoonArguments, createMoonSeries, createMoonApparent, derivePlanetGeometry, computeEccentricityIntegrated, planetOrbitChain as _POC, createDeltaTCycles, createDeepTimeLod, createMoonRecessionHistory, createSolarChannelBudget, deltaTEspenakMeeusCanonSeconds, evalClimateL1OrbitalPermil, createAlphaGiaChannel, computeSolarTorqueShare, createEclipseFinders, createSunLongitudeCorrection, createModel, buildPlanetChainsFromArtifactData, computePlanetElementsAtYear as kcComputePlanetElementsAtYear, computeHeliocentricEclipticFromElements as kcComputeHeliocentricEclipticFromElements, computeEquatorNodeOriginSFrameDeg, convertNodeSFrameToEquatorOriginDeg, createSecularSeriesOverride, CHAIN_ARTIFACT, ANCHOR_EPOCH_YEAR as KC_ANCHOR_EPOCH_YEAR, ANCHOR_EPOCH_JD as KC_ANCHOR_EPOCH_JD, computeEarthFrameOfDate, solveWheelAngleForLongitude } from '@essrt/physics';
+import { computeObliquityJ2000Deg, computeSecularShape, DEFAULT_CONSTANTS as K, REFERENCE_DATA as R, FITTED_COEFFICIENTS as FIT, CONSTANTS_HASH, COEFFICIENTS_HASH, MODEL_VERSION, PREPRINT_DOI, createEpochPrimitives, createPhaseMachinery, createDeepCalendar, createMoonEccChannel, createDeepEccChannel, DEEP_MODES_ARTIFACT, createDeepOrbitalHistory, createYearLengths, computeMeanTropicalYearJ2000Days, createMoonMonthChain, createChainCycleIntegrator, createMoonArguments, createMoonSeries, createMoonApparent, derivePlanetGeometry, computeEccentricityIntegrated, planetOrbitChain as _POC, createDeltaTCycles, createDeepTimeLod, createMoonRecessionHistory, createSolarChannelBudget, deltaTEspenakMeeusCanonSeconds, evalClimateL1OrbitalPermil, createAlphaGiaChannel, computeSolarTorqueShare, createEclipseFinders, createModel, buildPlanetChainsFromArtifactData, computePlanetElementsAtYear as kcComputePlanetElementsAtYear, computeHeliocentricEclipticFromElements as kcComputeHeliocentricEclipticFromElements, computeEquatorNodeOriginSFrameDeg, convertNodeSFrameToEquatorOriginDeg, createSecularSeriesOverride, CHAIN_ARTIFACT, ANCHOR_EPOCH_YEAR as KC_ANCHOR_EPOCH_YEAR, ANCHOR_EPOCH_JD as KC_ANCHOR_EPOCH_JD, computeEarthFrameOfDate, solveWheelAngleForLongitude } from '@essrt/physics';
 // K8 — the reference package: ONE-WAY imports (comparison only;
 // @essrt/reference is private-by-construction and nothing in the model
 // chain depends on it). publishedCurves migrated here from
@@ -643,52 +643,13 @@ const STELLAR_DAY_RA_PROJECTION = stellarDayRaProjection(K.earthOrbital.obliquit
 // Mean term of the SUN_LONGITUDE_HARMONICS series: the correction is
 // mean + sum(harmonics). It was left behind when the array was migrated —
 // splitting one fitted quantity across a JSON import and a local literal.
-const SUN_LONGITUDE_MEAN = FIT.SUN_LONGITUDE_MEAN;
-// PRECISION FIX — third of the three arrays the 6-decimal formatter touched.
-// RSS 0.0031", worst case 0.0055". No term was zeroed here, but the rounding was
-// the same and it applied only to the browser copy.
-//
-// NOTE the first column is a PERIOD IN YEARS here (335317 = H, 670634 = 2H),
-// not a divisor as in the year-length and perihelion arrays. Same shape,
-// different meaning — a divisor and a period are never interchangeable.
-const SUN_LONGITUDE_HARMONICS = FIT.SUN_LONGITUDE_HARMONICS;
-
-// Sun ecliptic longitude correction Δλ(jd) in degrees. Add −Δλ to the Sun's
-// scene-graph angle so the corrected longitude matches Meeus high-precision
-// Sun to ~7″ over 1900-2100 (96 % closure of the 200″ raw residual). The
-// year-period harmonic captures the framework's eccentricity-definition gap
-// (eccentricityDerivedMean ≈ 0.01545 vs Meeus IAU J2000 = 0.01671).
-// Year/balancedYear convention matches the fitter (tools/fit/sun-longitude-harmonics.js):
-// year = 2000 + (jd − j2000JD)/365.25.
-//
-// Design-rule filter: applies ONLY H-lattice-compliant terms (year-multiples,
-// small precession divisors, lunar precession). The legacy [168] term is
-// skipped (gcd(168, H) = 1, design-rule violating — see lessons-learned doc).
-// Euclidean gcd — used by sunLongitudeCorrection's H-lattice filter.
-function _gcdInt(a, b) { a = Math.abs(a); b = Math.abs(b); while (b !== 0) { const t = b; b = a % b; a = t; } return a; }
-
-// 9-1 S-P8: the fitted H-lattice harmonic stack (and the lattice-filter
-// rationale) lives ONCE in @essrt/physics/sun/longitude-correction. Deps are
-// the J2000-FIXED values — the fitted convention; this browser copy
-// historically read the mutable holisticyearLength/balancedYear globals
-// (measured divergence under epoch shift: 8.2e-10 deg, aligned here).
-// var + lazy: the fixed consts below this line are read at first call.
-var _sunLonCorrM = null;
-function _sunLonCorr() {
-  if (!_sunLonCorrM) {
-    _sunLonCorrM = createSunLongitudeCorrection({
-      hYears: HOLISTIC_YEAR_J2000,
-      balancedYear: BALANCED_YEAR_J2000_FIXED,
-      j2000JD: j2000JD,
-      meanDeg: SUN_LONGITUDE_MEAN,
-      harmonics: SUN_LONGITUDE_HARMONICS,
-      nNodalJ2000: N_nodalI_J2000,
-      nApsidalJ2000: N_apsidalI_J2000,
-    });
-  }
-  return _sunLonCorrM;
-}
-function sunLongitudeCorrection(jd) { return _sunLonCorr().correctionDegAt(jd); }
+// (Plan 09 step 5a: SUN_LONGITUDE_MEAN (−6.9″, a constant offset on the Sun)
+// + SUN_LONGITUDE_HARMONICS (three lines on H, 2H, 3H — periods, not divisors)
+// and their evaluator sunLongitudeCorrection / createSunLongitudeCorrection
+// are DELETED with the Step-0 fitter. The correction left every Sun path at
+// FQ-3 / plan 06 R4 — the Sun is the certified longitude placed on the engine
+// Earth frame — and nothing but a probe surface and a diagnostic column read
+// it since.)
 
 // ─── B5. Cardinal point harmonics (fitted) ───────────────────────────────
 // Source: public/input/fitted-coefficients.json
@@ -5989,13 +5950,8 @@ if (typeof window !== 'undefined') {
       meeusMeanObliquityRad: meeusMeanObliquityRad((yearToJDApprox(year) - j2000JD) / julianCenturyDays),
     }),
     refStephensonAt: (year, poly) => stephensonDeltaT(year, poly),
-    // ── Phase 9-0 sun-harmonics surface (S-P8) ───────────────────────────────
-    // Pins the browser's H-lattice-filtered sun longitude correction before
-    // the three-copy dedup (browser fn + two Node scene-graph blocks). NOTE
-    // the browser phases against the MUTABLE holisticyearLength where Node
-    // deliberately uses fixed C.H (the fitted J2000 convention) — identical
-    // at fresh load, an S-item under epoch shift.
-    sunLonCorrectionAt: (jd) => sunLongitudeCorrection(jd),
+    // (Phase 9-0's sun-harmonics probe surface `sunLonCorrectionAt` left with the
+    // Step-0 comb at plan 09 step 5a.)
     // ── VFP "Inclination of all planets" smoke surface ───────────────────────
     // The wgcRenderChart precedent: the hermetic harness aborts external
     // fetches, so the injector lets a headless probe supply the two tracked
@@ -42677,8 +42633,7 @@ function compareSceneVsSceneGraph() {
     // The three inputs that can move longitude without touching obliquity.
     const cyScene   = (typeof o.currentYear === 'number') ? o.currentYear : NaN;
     const eccScene  = (typeof o.eccentricityEarth === 'number') ? o.eccentricityEarth : NaN;
-    const corrScene = (typeof sunLongitudeCorrection === 'function')
-                        ? sunLongitudeCorrection(r.jd) : NaN;
+    const corrScene = NaN;   // plan 09 step 5a: the Step-0 Sun comb is deleted — the column reads n/a
 
     console.log(`  ${r.label.padEnd(6)} ${dLon.toFixed(4).padStart(9)}  ` +
       `${(Number.isFinite(cyScene) ? (cyScene - r.cy).toExponential(2) : 'n/a').padStart(14)}  ` +

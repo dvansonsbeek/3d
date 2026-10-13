@@ -55,9 +55,10 @@ const rot = (s, c, d) => [s * Math.cos(d) - c * Math.sin(d), s * Math.sin(d) + c
 let pairs = 0;
 const rotTriplets = (arr) => { for (const t of arr) { const [s2, c2] = rot(t[1], t[2], delta(t[0])); t[1] = s2; t[2] = c2; pairs++; } };
 
-// (SOLSTICE_OBLIQUITY_HARMONICS, the three year-length combs and
-// PERI_HARMONICS_RAW were in this list when the rotation ran; deleted at plan 09)
-for (const k of ['SUN_LONGITUDE_HARMONICS']) {
+// (SOLSTICE_OBLIQUITY_HARMONICS, the three year-length combs, PERI_HARMONICS_RAW
+// and SUN_LONGITUDE_HARMONICS were in this list when the rotation ran; all
+// deleted at plan 09 — only the cardinal record's families remain)
+for (const k of []) {
   if (!Array.isArray(fc[k])) { console.error(`REFUSING: ${k} missing`); process.exit(1); }
   rotTriplets(fc[k]);
 }

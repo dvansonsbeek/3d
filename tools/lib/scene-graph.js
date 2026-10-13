@@ -35,8 +35,7 @@ const MEEUS_LUNAR = JSON.parse(require('fs').readFileSync(
 // In integrated mode: DT.cyclesBetweenYears (integrates ∫N/H(t)dt properly)
 // Both agree at J2000; diverge at deep time per framework's H(t) drift.
 
-// Euclidean gcd — used by the H-lattice filter in sunLongitudeCorrection.
-function _gcdInt(a, b) { a = Math.abs(a); b = Math.abs(b); while (b !== 0) { const t = b; b = a % b; a = t; } return a; }
+// (the Euclidean gcd of the Step-0 comb's H-lattice filter left with the comb, plan 09 step 5a)
 
 function _phaseCycles(year, divisor_N) {
   if (DEEP_TIME_ENABLED) {

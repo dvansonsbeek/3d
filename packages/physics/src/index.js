@@ -173,7 +173,8 @@ export { createEclipseFinders } from './eclipse/finders.cjs';
 // major — the published model package carries no comparison references;
 // the K2 one-way wall is package-structural.)
 // Phase 9 — S-P8: the fitted sun-longitude harmonic stack (three copies → one).
-export { createSunLongitudeCorrection } from './sun/longitude-correction.cjs';
+// (plan 09 step 5a: createSunLongitudeCorrection — the Step-0 Sun comb's evaluator,
+//  retired from the Sun node at plan 06 R4 — is deleted with the comb and its fitter.)
 
 /**
  * Build a model bound to a set of constants.

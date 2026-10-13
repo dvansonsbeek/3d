@@ -393,15 +393,13 @@ function createSunPlanetaryCompletion({ embWobbleArcsec, carrierRatesDegPerCy, e
   return { sunPlanetaryCompletionDeg };
 }
 
-/** sha256/16 of JSON.stringify(FITTED_COEFFICIENTS.SUN_LONGITUDE_HARMONICS)
- *  at derivation time — the matched-pair fingerprint asserted by test:model.
- *  Unchanged from v1/v2: SUN_HARMONICS did not move in the D2 or N3
- *  landings. Plan 07 R10 moved the hash WITHOUT a refit: the three (sin, cos)
- *  pairs were rotated exactly from the t₀ phase origin to J2000
- *  (tools/fit/reorigin-combs-j2000.mjs), the finder Sun is bit-identical, so
- *  the residual this table was derived from is unchanged — the table stands
- *  (fidelity 0.616″, 70 terms), only the fingerprint is re-recorded. */
-const PAIRED_SUN_HARMONICS_SHA256 = '53530a28a60b3c4a';   // was cbc189cea1c20292 (eccentricity unification: Step-0 refit → N2/N3 re-derived); R10 rotation, same Sun
+/* (Plan 09 step 5a: PAIRED_SUN_HARMONICS_SHA256 — the sha256/16 of the Step-0
+ *  SUN_LONGITUDE_HARMONICS this table was derived beside, last 53530a28a60b3c4a
+ *  (the R10 rotation of a comb never refit since the eccentricity unification)
+ *  — is retired with the comb. The comb left every Sun path at plan 06 R4, so
+ *  the residual the table was derived from is the certified Sun's; the table
+ *  stands (fidelity 0.616″, 70 terms) and the carrier-rate pair below remains
+ *  its enforced matched pair.) */
 
 /** sha256/16 of JSON.stringify([...planets, moonElongation]) — the seven
  *  full-precision carrier rates (deg/cy TT) the tables pair with: since plan
@@ -421,4 +419,4 @@ const PAIRED_SUN_HARMONICS_SHA256 = '53530a28a60b3c4a';   // was cbc189cea1c2029
  *  was the I2 record-based carrier set. */
 const PAIRED_CARRIER_RATES_SHA256 = '26552b86ad69eaf2';   // running-mean series re-bank (mean=1 dump): carriers moved in the 9th digit, LONG_PERIOD_TERMS + the 8V−13E row re-derived on them; history: 8e11456fcf8db81c (I3), 2d066e92bae955e4 (I2)
 
-module.exports = { createSunPlanetaryCompletion, computeCarrierRatesDegPerCy, eccVectorOfDateEmbedded, PAIRED_SUN_HARMONICS_SHA256, PAIRED_CARRIER_RATES_SHA256 };
+module.exports = { createSunPlanetaryCompletion, computeCarrierRatesDegPerCy, eccVectorOfDateEmbedded, PAIRED_CARRIER_RATES_SHA256 };

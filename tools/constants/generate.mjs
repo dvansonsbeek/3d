@@ -71,8 +71,9 @@ const COEFFICIENT_KEYS = [
   // the one-family laws over the kinematic day of date. Step 4: the
   // perihelion comb PERI_HARMONICS_RAW + PERI_OFFSET is deleted — Earth's
   // perihelion of date is the series' ϖ, createModel().earth.perihelionLongitudeDeg)
-  // (plan 09: SOLSTICE_OBLIQUITY_HARMONICS retired — the obliquity of date is the hybrid ε)
-  'SUN_LONGITUDE_HARMONICS',
+  // (plan 09: SOLSTICE_OBLIQUITY_HARMONICS retired — the obliquity of date is the hybrid ε;
+  //  step 5a: SUN_LONGITUDE_HARMONICS + SUN_LONGITUDE_MEAN — the Step-0 Sun comb on H, 2H, 3H,
+  //  retired from both engines at plan 06 R4 and read by nothing since — deleted with its fitter)
   // Plan 07 R10: the RA day offset's two lines ({mean, terms: [div, sin, cos]},
   // phase from J2000) — the former cosine literals of three runtimes + the site.
   'RA_DAY_OFFSET_MS',
@@ -103,10 +104,7 @@ const COEFFICIENT_KEYS = [
   // The mean/offset SCALARS that pair with the harmonic arrays above — each
   // series is `mean + sum(harmonics)`, so shipping one from the JSON and the
   // other as a literal would split a single fitted quantity across two sources.
-  //   SUN_LONGITUDE_MEAN             <-> SUN_LONGITUDE_HARMONICS
-  // They went through replaceConst, which never formatted, so all were
-  // already full precision — an incomplete migration rather than a defect.
-  'SUN_LONGITUDE_MEAN',
+  // (none remain since plan 09 step 5a; RA_DAY_OFFSET_MS carries its own mean inside the object)
 ];
 
 /**

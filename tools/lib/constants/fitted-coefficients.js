@@ -22,8 +22,8 @@ const data = JSON.parse(fs.readFileSync(
 // ϖ, createModel().earth.perihelionLongitudeDeg)
 // (plan 09: SOLSTICE_OBLIQUITY_MEAN_FITTED / SOLSTICE_OBLIQUITY_HARMONICS retired —
 // the obliquity of date is the hybrid ε of the one-source movement)
-const SUN_LONGITUDE_MEAN = data.SUN_LONGITUDE_MEAN;
-const SUN_LONGITUDE_HARMONICS = data.SUN_LONGITUDE_HARMONICS;
+// (plan 09 step 5a: SUN_LONGITUDE_MEAN / SUN_LONGITUDE_HARMONICS — the Step-0
+// Sun comb, retired from the Sun node at plan 06 R4 — are deleted with the fitter)
 const CARDINAL_POINT_HARMONICS = data.CARDINAL_POINT_HARMONICS;
 const CARDINAL_POINT_ANCHORS_ADJUSTED = data.CARDINAL_POINT_ANCHORS_ADJUSTED || null;
 // §10 (Phase D) — equation-of-centre braiding terms ({order, sin, cos}, NOT
@@ -46,9 +46,7 @@ const SOLSTICE_JD_HARMONICS = CARDINAL_POINT_HARMONICS.SS;  // Legacy alias
 
 
 module.exports = {
-  // Static fitted arrays
-  SUN_LONGITUDE_MEAN,
-  SUN_LONGITUDE_HARMONICS,
+  // Static fitted arrays (the cardinal record and the RA day offset)
   CARDINAL_POINT_HARMONICS,
   CARDINAL_POINT_ANCHORS_ADJUSTED,
   CARDINAL_POINT_ECC_TERMS,

@@ -1,7 +1,7 @@
 ---
 docVersion: 1.0
 modelVersion: v23.0
-coefficients: sha256:9fc5dba8f753f10c
+coefficients: sha256:87e04ff9fcdc04c1
 status: current
 ---
 
@@ -266,7 +266,10 @@ it.
 
 What it is: an anchor-divisor harmonic absorber of the geometric-split wheel's
 annual imperfection, fit against the Meeus Ch. 25 residual across ±100 yr
-around J2000 (smart J2000-anchored):
+around J2000 (smart J2000-anchored). **DELETED at plan 09 step 5a** — the comb
+left every Sun path at plan 06 R4 (the Sun is the certified longitude on the
+engine Earth frame) and its keys, evaluator and Step-0 fitter are gone; what
+follows is the record of what it was:
 
 ```
 λ_corrected = λ_kinematic − Δλ(t)
@@ -283,7 +286,7 @@ else silently skipped as a design-rule safeguard):
 | 670634 | ½ yr | +0.002478 ° | +0.000221 ° | ~9" |
 | <!--v:threeH-->1,005,951<!--/v--> | ⅓ yr | +0.000034 ° | +0.000008 ° | ~0.1" |
 
-with `SUN_LONGITUDE_MEAN = −0.0018807°`. On the legacy path it closes the
+with `SUN_LONGITUDE_MEAN = −0.0018807°` (a constant offset on the Sun — one of the reasons the comb could not stay). On the legacy path it closed the
 scene-vs-Meeus residual 197.77″ → 7.39″ RMS in the modern window, planet
 baselines untouched (the correction is applied to the **Sun node only** —
 the eccentricity-difference signature is Earth-Sun-specific, and a
@@ -338,8 +341,8 @@ the per-planet EoC write-ups of the retired geometric path are archived.
 - `src/script.js`: `useVariableSpeed`; `ASTRO_REFERENCE.perihelionPassageJ2000_JD`; the derived constants after `eccentricityDerivedMean`; the Sun object definition (`eccentricity: eocEccentricity`, `perihelionPhaseJ2000`); the `moveModel` sun block (EoC gate, FQ3 corrector, Z-B gate, δ overlay); flags `FQ3_EXACT_SUN_ENABLED`, `E5_WHEEL_SUN_ENABLED`, `SUN_HARMONICS_ENABLED`
 - `tools/lib/constants.js`: derived-constants block
 - `tools/lib/scene-graph.js`: Sun eccentricity in the body defs; `moveModel`; `FQ3_EXACT_SUN`; the `animateFast` mirror (used by `computeSunPositionFast`)
-- `public/input/fitted-coefficients.json`: `SUN_LONGITUDE_MEAN`, `SUN_LONGITUDE_HARMONICS`
-- `tools/fit/sun-longitude-harmonics.js` (Step 0 fitter) · `tools/explore/sun-annual-correction.js` (Z-B verification) · `tools/explore/eoc-constants.js` (numerical verification) · `tools/explore/fq3-wheel-sun-attribution.mjs` / `fq3-w1-verify.mjs` (attribution + corrector verification)
+- `public/input/fitted-coefficients.json`: `SUN_LONGITUDE_MEAN`, `SUN_LONGITUDE_HARMONICS` (DELETED at plan 09 step 5a)
+- `tools/fit/sun-longitude-harmonics.js` (Step 0 fitter — DELETED at plan 09 step 5a) · `tools/explore/sun-annual-correction.js` (Z-B verification) · `tools/explore/eoc-constants.js` (numerical verification) · `tools/explore/fq3-wheel-sun-attribution.mjs` / `fq3-w1-verify.mjs` (attribution + corrector verification)
 
 ---
 

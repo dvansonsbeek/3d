@@ -339,10 +339,9 @@ const measured = await s.page.evaluate(({ YEARS, EPOCHS_MA, MOON_JDS, MOON_DEEP_
     v[`refSteph@${y}`] = T.refStephensonAt(y, STEPH_TEST_POLY);
   }
 
-  // ── Phase 9-0: the sun-harmonics correction (S-P8, browser side) ──────────
-  for (const jd of [1355795.0, 2415020.5, 2451545.0, 2460409.262836, 2634166.0]) {
-    v[`sunLonCorr@${jd}`] = T.sunLonCorrectionAt(jd);
-  }
+  // (Phase 9-0's sun-harmonics correction probes `sunLonCorr@…` left with the
+  // Step-0 comb at plan 09 step 5a — the comb had left every Sun path at plan
+  // 06 R4; the five rows are retired from the golden, not re-recorded as drift.)
 
   // The reset must be exact, or every anchor above is measured against a
   // drifting baseline. Recorded rather than asserted so the fixture shows it.

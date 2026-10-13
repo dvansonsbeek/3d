@@ -58,7 +58,7 @@ from predictive_formula_physical import build_features_physical
 
 ```python
 from constants_scripts import H, PHI
-from predictive_formula import calc_eccentricity
+# (predictive_formula — the kinematic mirror — was retired at plan 09 step 5a)
 ```
 
 ---

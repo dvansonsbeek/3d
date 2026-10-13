@@ -23,7 +23,6 @@ export { createDeltaTCycles } from "./deltat/cycles.cjs";
 export { createDeepTimeLod } from "./deltat/deep-time.cjs";
 export { deltaTEspenakMeeusCanonSeconds } from "./deltat/historical.cjs";
 export { createEclipseFinders } from "./eclipse/finders.cjs";
-export { createSunLongitudeCorrection } from "./sun/longitude-correction.cjs";
 export function createModel(constants?: Constants, opts?: {
     laws?: {
         eccentricityAt?: (year: number) => number;

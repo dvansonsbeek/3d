@@ -64,8 +64,7 @@
     "./deltat/recession-history": { "types": "./types/deltat/recession-history.d.cts", "default": "./src/deltat/recession-history.cjs" },
     "./climate/l1-orbital": { "types": "./types/climate/l1-orbital.d.cts", "default": "./src/climate/l1-orbital.cjs" },
     "./eclipse/finders": { "types": "./types/eclipse/finders.d.cts", "default": "./src/eclipse/finders.cjs" },
-    "./eclipse/sun-planetary-completion": { "types": "./types/eclipse/sun-planetary-completion.d.cts", "default": "./src/eclipse/sun-planetary-completion.cjs" },
-    "./sun/longitude-correction": { "types": "./types/sun/longitude-correction.d.cts", "default": "./src/sun/longitude-correction.cjs" }
+    "./eclipse/sun-planetary-completion": { "types": "./types/eclipse/sun-planetary-completion.d.cts", "default": "./src/eclipse/sun-planetary-completion.cjs" }
   },
   "license": "AGPL-3.0-or-later"
 }

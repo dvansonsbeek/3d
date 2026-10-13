@@ -1,7 +1,7 @@
 ---
 docVersion: 1.0
 modelVersion: v23.0
-coefficients: sha256:9fc5dba8f753f10c
+coefficients: sha256:87e04ff9fcdc04c1
 status: current
 ---
 
@@ -489,8 +489,8 @@ the δ overlay):
 
 | Constant | Value | Description |
 |----------|-------|-------------|
-| `SUN_LONGITUDE_HARMONICS` | 3-term array | Fitted sun-longitude harmonics, ~279″ annual span. RETIRED from every scene path (FQ-3 took it off the display Sun; plan 06 R4 took it off the Step-6a instrument too — the fast Sun rides the engine Earth frame with the certified longitude); registry entry retained — Step 0 remains its fitter as the record and the D2 completion's PAIRED hash fingerprints it |
-| `SUN_LONGITUDE_MEAN` | −0.0018807° | Fitted mean offset (~−6.8″) |
+| `SUN_LONGITUDE_HARMONICS` | DELETED at plan 09 step 5a (was a 3-term comb on the periods H, 2H, 3H) | Fitted sun-longitude harmonics, ~279″ annual span. RETIRED from every scene path (FQ-3 took it off the display Sun; plan 06 R4 took it off the Step-6a instrument too — the fast Sun rides the engine Earth frame with the certified longitude); registry entry retained — Step 0 remains its fitter as the record and the D2 completion's PAIRED hash fingerprints it |
+| `SUN_LONGITUDE_MEAN` | DELETED at plan 09 step 5a (was −0.0019°) | Fitted mean offset (~−6.9″) — a constant offset on the Sun, gone with the comb and its Step-0 fitter |
 
 ## Earth Perihelion Harmonics (retired)
 
