@@ -111,7 +111,7 @@ export { createCardinalStructure } from './cardinal/one-source-structure.cjs';
 // Phase 8.2 — the lunar machinery, extracted layer by layer (survey order:
 // eccentricity channel → month chain → cycle tables → arguments → series →
 // apparent). Same CJS + root re-export convention.
-export { createMoonEccChannel } from './moon/ecc-channel.cjs';
+// (plan 09 step 6: createMoonEccChannel — the H/3 eccentricity law — is deleted; Earth's e of date is the N-body series on every path)
 export { createMoonMonthChain } from './moon/month-chain.cjs';
 export { createChainCycleIntegrator } from './chain-cycles/index.cjs';
 export { createMoonArguments } from './moon/arguments.cjs';
@@ -127,7 +127,7 @@ export { computeEarthFrameOfDate, solveWheelAngleForLongitude } from './earth/fr
 // (planets/asc-node-integrator) are DELETED at plan 07 R5/R6: the planets'
 // elements of date have one home, the N-body chain.
 export { derivePlanetGeometry } from './planets/geometry.cjs';
-export { eccentricityFromCycles, computeEccentricityIntegrated } from './planets/ecc-channel.cjs';
+// (plan 09 step 6: eccentricityFromCycles / computeEccentricityIntegrated — the H/16 law-of-cosines eccentricity — are deleted; no runtime read them)
 export * as planetOrbitChain from './planets/orbit-chain.cjs';
 // P5/K4.6c — the engine-D Keplerian chain (pure evaluator + the embedded
 // governed artifact; the browser flag path consumes exactly these).

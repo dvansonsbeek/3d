@@ -172,7 +172,7 @@ The 25 canonical integers come from Berger 1978 + Laskar 2004 eigenmode beats + 
 | 20 | 134.1 | g-beat | g₃−g₂ Earth-Venus eccentricity |
 | 21 | 127.7 | Direct | Mars obliquity / Jupiter axial = 8H/21 |
 | **22** | **121.9** | s-beat / g-beat | s₂−s₄ Venus-Mars nodal / g₄−g₂ — **highest carbon-amplification on LR04 (ratio 12.84, Round 1 C8)** |
-| **24** | **111.8** | Earth direct (H/3) | **Earth's own eccentricity line** — the one-law e(t) = base′·(1 + cos θ₃/2) on H/3; no secular-theory counterpart. Regime-admitted: <!--v:l1N24AmpOverMedianPreInhg-->1.64<!--/v-->× median and CV-positive pre-iNHG, the record's own best period 8H/23.8 ([doc 94 §10](94-insolation-null-test.md)) |
+| **24** | **111.8** | Earth direct (H/3) | **Earth's own eccentricity line** — the lattice line the retired one-law e(t) = base′·(1 + cos θ₃/2) rode (the law is deleted at plan 09 step 6; the component stays as a regime-admitted lattice line); no secular-theory counterpart. Regime-admitted: <!--v:l1N24AmpOverMedianPreInhg-->1.64<!--/v-->× median and CV-positive pre-iNHG, the record's own best period 8H/23.8 ([doc 94 §10](94-insolation-null-test.md)) |
 | **25** | **107.3** | s-beat | s₁−s₄ Mercury-Mars nodal — **the empirical 100-kyr-band centroid (doc 91 §4)** |
 | **28** | **95.8** | g-beat | g₄−g₅ Mars-Jupiter eccentricity — **Berger 1978 classic 95-kyr peak** |
 | 30 | 89.4 | g-beat | g₃−g₇ Earth-Uranus eccentricity |

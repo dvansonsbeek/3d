@@ -862,7 +862,7 @@ function buildSceneGraph() {
 
   const earthPeriPrec2 = makePrecessionNode('earthPerihelionPrecession2', {
     orbitRadius: 0,
-    orbitCentera: -C.eccentricityBaseDerived * 100, orbitCenterb: 0, orbitCenterc: 0,   // the one law's mean offset base' (unification)
+    orbitCentera: -C.eccentricityBaseDerived * 100, orbitCenterb: 0, orbitCenterc: 0,   // the perihelion wheel's offset base′ — the scaffold's pose; R4 places the arm at the series' e of date
     orbitTilta: 0, orbitTiltb: 0,
     tilt: 0,
     startPos: -(((C.balancedYear - startModelYearWithCorrection) / (H / 16) - 16 * C.kDeviceWheelPhaseAtJ2000Cycles) * 360),

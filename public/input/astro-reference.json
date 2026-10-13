@@ -73,7 +73,6 @@
     "earthPerihelionLongitudeJ2000": 102.94719,
     "sunMeanLongitudeJ2000_deg": 280.46646,
     "earthAscendingNodeInvPlane": 284.51,
-    "earthInclinationCycleAnchor": 21.77,
     "perihelionPassageJ2000_JD": 2451547.042,
     "earthInclinationJ2000_deg": 1.57869,
     "earthInclinationRate_arcsecPerCentury": -18,

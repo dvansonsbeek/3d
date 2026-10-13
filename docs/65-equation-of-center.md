@@ -38,7 +38,7 @@ residual beyond it is removed exactly by the corrector below.
 
 The model approximates the elliptical orbit as a **circular orbit with an
 offset center**: Earth sits at `e(t) × 100` units from the circle center — the
-full eccentricity of the one H/3 law, carried by the Perihelion Precession 2
+full eccentricity of date (the N-body series since plan 09 step 6), carried by the Perihelion Precession 2
 centre every frame. This reproduces the distance variation exactly, but it
 also creates apparent angular speed variation **from geometry alone**: when
 the Sun is closer, the same arc subtends a larger angle. The off-center
@@ -84,8 +84,8 @@ model constants** — not tunable.
 eoc(t) = e(t) / 2
 ```
 
-where `e(t) = base′·(1 + cos θ₃(t)/2)` is the one eccentricity law (the same
-line the Moon channel and the eclipse Sun ride), and the geometric offset
+where `e(t)` is Earth's eccentricity of date — the N-body secular series (the
+former one-law line is deleted, plan 09 step 6), and the geometric offset
 carries the full `e(t)` along the perihelion direction. At J2000:
 `eocEccentricityValue` = <!--v:eocEccentricityValue-->0.00836<!--/v--> (the
 constants seed `C.eocEccentricity`; `moveModel` supersedes it per frame with

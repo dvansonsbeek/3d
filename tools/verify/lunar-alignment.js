@@ -62,7 +62,6 @@ const INPUT_FILES = [
   'packages/physics/src/moon/series.cjs',
   // the ONE eccentricity law body (Sun EoC + E-factor flow through it;
   // Stage A′ of the engine-switch record):
-  'packages/physics/src/moon/ecc-channel.cjs',
   'packages/physics/src/moon/apparent.cjs',
   'packages/api/src/app.js',
   'public/input/model-parameters.json',

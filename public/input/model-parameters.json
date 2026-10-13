@@ -18,6 +18,8 @@
     "earthInvPlaneInclinationAmplitude": 0.636069722432876,
     "eccentricityBase": 0.015386009686374918,
     "eccentricityAmplitude": 0.0013559440307290061,
+    "kDeviceInclinationPhaseJ2000Deg": 81.17719000000001,
+    "_kDeviceInclinationPhaseNote": "Plan 09 step 6: the scene scaffolding's K-device inclination-wheel phase at J2000, degrees — the J2000 perihelion longitude (102.94719°) minus the retired eccentricity law's anchor (21.77°), written as the exact double so the pose is bit-identical. It poses earthInvPlaneInclinationMean, the inclination path's zodiac offset and the perihelion wheel's offset base′ (eccentricityBaseDerived); no published quantity rides it (the engine places the Earth frame, the Sun and the Moon stack over the scaffold). The H/3 eccentricity law it once phased is deleted — Earth's e of date is the N-body series on every path.",
     "kDeviceWheelPhaseAtJ2000Cycles": 0.908498525276082,
     "_kDeviceWheelPhaseNote": "Plan 07 R10: the scene scaffolding's K-device wheel phase at J2000 in anchor-unit cycles — each H/N wheel (H/3, H/5, H/8, the H/16 pair, the H/13 wobble marker, the perihelion wheel's 270° convention) stands N × this on at J2000. Numerically the retired phase origin's (2000 − t₀)/H; kept as the device's RECORDED J2000 pose like earthtiltMean (the wheel geometry _kcFrameR bridges once), not a law. No observable rides it — the engine places the Earth frame, the Sun and the Moon stack over it — but the scene's world frame and every world-axis reader (the NASA-convention umbra diagnostic's aberration about world Y) do; measured: dropping it tilted the K pose 1.25° and moved that diagnostic 0.45″."
   },

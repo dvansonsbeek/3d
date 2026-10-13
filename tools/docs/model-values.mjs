@@ -72,6 +72,18 @@ const oneYL = () => oneMovement().yearLengths;
 // computeObliquityEarth) is deleted; the kinematic-day keys' mean-ε RA
 // projection rides the IAU J2000 obliquity input (STELLAR_DAY_RA_PROJECTION).
 const oneEps = (y) => oneMovement().epsDeg(y);
+// The published e's range over the last Myr (the N-body series, 500-yr samples)
+// — the insolation extremes ride it (plan 09 step 6; they rode the retired
+// one-law extremes 3·base′/2 and base′/2 before).
+let _seriesERangeM = null;
+const seriesERange = () => {
+  if (!_seriesERangeM) {
+    let lo = Infinity, hi = -Infinity;
+    for (let y = -1000000; y <= 2000; y += 500) { const e = oneMovement().e(y); if (e < lo) lo = e; if (e > hi) hi = e; }
+    _seriesERangeM = { lo, hi };
+  }
+  return _seriesERangeM;
+};
 
 /** The SHIPPED predictive-precession basis, browser-true: the shared
  *  @essrt/physics predict module (snapshot planet-side phases — the basis the
@@ -619,37 +631,9 @@ export const VALUES = {
     render: (v) => thousands(v) + ' BC',
     note: 'perihelion at the June solstice, previous: the 1246 alignment − half an H/16 beat',
   },
-  aClosurePhaseDeg: {
-    get: () => 360 * (2000 - C.perihelionalignmentYear) / (C.H / 16),
-    render: (v) => Number(v).toFixed(2), unit: '°',
-    note: 'arm-to-arm phase advanced from the 1246 alignment to J2000 at the H/16 beat (the A-closure angle)',
-  },
-  aDerivedFrom1246: {
-    get: () => {
-      const base = model.earth.eccentricityBase, e0 = astro.earthOrbital.earthEccentricityJ2000;
-      const phi = 360 * (2000 - C.perihelionalignmentYear) / (C.H / 16) * Math.PI / 180;
-      const b = 2 * base * Math.cos(phi);
-      return (-b + Math.sqrt(b * b - 4 * (base * base - e0 * e0))) / 2;
-    },
-    render: (v) => Number(v).toFixed(7),
-    note: 'A from the 1246 triangle closure e(J2000)² = base² + A² + 2·base·A·cos φ — reproduces eccentricityAmplitude',
-  },
-  aClosureYearAMinus5Pct: {
-    get: () => {
-      const base = model.earth.eccentricityBase, e0 = astro.earthOrbital.earthEccentricityJ2000, A = model.earth.eccentricityAmplitude * 0.95;
-      return Math.round(2000 - Math.acos(Math.min(1, (e0 * e0 - base * base - A * A) / (2 * base * A))) / (2 * Math.PI) * (C.H / 16));
-    },
-    render: (v) => thousands(v), unit: 'AD',
-    note: 'alignment year the closure would force if A were 5% too small',
-  },
-  aClosureYearAPlus5Pct: {
-    get: () => {
-      const base = model.earth.eccentricityBase, e0 = astro.earthOrbital.earthEccentricityJ2000, A = model.earth.eccentricityAmplitude * 1.05;
-      return Math.round(2000 - Math.acos(Math.min(1, (e0 * e0 - base * base - A * A) / (2 * base * A))) / (2 * Math.PI) * (C.H / 16));
-    },
-    render: (v) => thousands(v), unit: 'AD',
-    note: 'alignment year the closure would force if A were 5% too large',
-  },
+  // (plan 09 step 6: the A-closure keys — aClosurePhaseDeg, aDerivedFrom1246,
+  //  aClosureYearAMinus5Pct / Plus5Pct, the 1246 triangle closure of the
+  //  retired K eccentricity law on the H/16 beat — are deleted with the law.)
   // (plan 09: the closingDay* / yearResidual* / dayBasisSpreadMs keys — the
   // retired year comb's measured-anchor day basis and its per-type closing
   // days — are deleted; ONE J2000 day basis, the SI day.)
@@ -884,30 +868,31 @@ export const VALUES = {
     render: (v) => Number(v).toFixed(1),
     unit: '%',
   },
-  // The insolation extremes ride the one H/3 law's extremes: e_max = 3·base′/2,
-  // e_min = base′/2 (see eccentricityMax / eccentricityMin above).
+  // The insolation extremes ride the published e's range over the last Myr —
+  // the N-body series (plan 09 step 6; before it the retired one-law extremes
+  // 3·base′/2 and base′/2).
   earthInsolationIncreaseMaxPct: {
     get: () => {
-      const e = C.eccentricityBaseDerived * 1.5;
+      const e = seriesERange().hi;
       return (1 / Math.sqrt(1 - e * e) - 1) * 100;
     },
     render: (v) => Number(v).toFixed(3),
     unit: '%',
-    note: 'orbit-averaged flux excess over circular at the one-law maximum e = 3·base′/2',
+    note: 'orbit-averaged flux excess over circular at the series’ maximum e over the last Myr',
   },
   earthInsolationIncreaseMinPct: {
     get: () => {
-      const e = C.eccentricityBaseDerived * 0.5;
+      const e = seriesERange().lo;
       return (1 / Math.sqrt(1 - e * e) - 1) * 100;
     },
     render: (v) => Number(v).toFixed(3),
     unit: '%',
-    note: 'orbit-averaged flux excess over circular at the one-law minimum e = base′/2',
+    note: 'orbit-averaged flux excess over circular at the series’ minimum e over the last Myr',
   },
   earthInsolationDifferencePct: {
     get: () => {
-      const hi = C.eccentricityBaseDerived * 1.5;
-      const lo = C.eccentricityBaseDerived * 0.5;
+      const hi = seriesERange().hi;
+      const lo = seriesERange().lo;
       return ((1 / Math.sqrt(1 - hi * hi)) - (1 / Math.sqrt(1 - lo * lo))) * 100;
     },
     render: (v) => Number(v).toFixed(3),
@@ -1804,7 +1789,6 @@ export const VALUES = {
       llrTidalGamma:         { get: () => astro.knownValues.llrTidalGammaArcsecPerCy2, render: (v) => uMinus(Number(v).toFixed(2)), unit: '″/cy²', note: 'LLR tidal acceleration (α₁ chain anchor)' },
       earthEccDotJ2000:      { get: () => astro.earthOrbital.earthEccentricityDotJ2000, render: (v) => uMinus(Number(v).toExponential()), unit: '/cy' },
       earthEccDotDotJ2000:   { get: () => astro.earthOrbital.earthEccentricityDotDotJ2000, render: (v) => uMinus(Number(v).toExponential()), unit: '/cy²' },
-      inclinationCycleAnchorEarth: { get: () => astro.earthOrbital.earthInclinationCycleAnchor, render: (v) => Number(v).toFixed(2), unit: '°', note: 'e_E line phase anchor (alias of earthInclCycleAnchor)' },
       earthPerihelionLongitudeJ2000: { get: () => astro.earthOrbital.earthPerihelionLongitudeJ2000, render: (v) => Number(v).toFixed(3), unit: '°' },
       sunMeanLongitudeJ2000: { get: () => astro.earthOrbital.sunMeanLongitudeJ2000_deg, render: (v) => String(v), unit: '°', note: 'D5 aberration anchor' },
       moonSiderealMonthInput: { get: () => C.moonSiderealMonthInput, render: (v) => Number(v).toFixed(8), unit: 'd', note: 'the one dynamical lunar input' },

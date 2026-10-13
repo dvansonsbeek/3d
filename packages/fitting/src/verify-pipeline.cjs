@@ -214,11 +214,11 @@ if (ssFoundJD) {
   console.log(`  June solstice 2000: JD ${ssFoundJD.toFixed(6)} (ref: ${ssTargetJD}, diff: ${ssDiffMin >= 0 ? '+' : ''}${ssDiffMin.toFixed(2)} min)`);
 }
 
-// Eccentricity at J2000 — the ONE shipped law (the H/3 channel through the
-// Node engine). Plan 07 R10: this block used to re-evaluate the retired
-// two-cosine K law on the retired phase origin — a private copy of a deleted
-// law that read 0.0027 off once the origin moved.
-const eJ2000 = require(path.join(TOOLS_LIB, 'orbital-engine.js')).computeEccentricityEarth(2000);
+// Eccentricity at J2000 — the ONE published e, the N-body series' secular
+// element (plan 09 step 6: the H/3 law through the Node engine left; plan 07
+// R10 before it: a private copy of the two-cosine K law on the retired phase
+// origin read 0.0027 off once the origin moved).
+const eJ2000 = require('@essrt/physics').createModel().earth.eccentricity(2000);
 const eTarget = C.ASTRO_REFERENCE.earthEccentricityJ2000;
 const eError = Math.abs(eJ2000 - eTarget);
 check('e(J2000) vs IAU', eError, 0, 1e-4);

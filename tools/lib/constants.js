@@ -35,7 +35,6 @@ const ASTRO_REFERENCE = {
   earthPerihelionLongitudeJ2000: astroRef.earthOrbital.earthPerihelionLongitudeJ2000,
   sunMeanLongitudeJ2000_deg: astroRef.earthOrbital.sunMeanLongitudeJ2000_deg,   // D5 aberration anchor
   earthAscendingNodeInvPlane: astroRef.earthOrbital.earthAscendingNodeInvPlane,
-  earthInclinationCycleAnchor: astroRef.earthOrbital.earthInclinationCycleAnchor,
   perihelionPassageJ2000_JD: astroRef.earthOrbital.perihelionPassageJ2000_JD,
   earthInclinationJ2000_deg: astroRef.earthOrbital.earthInclinationJ2000_deg,
   // Lunar Meeus coefficients
@@ -94,24 +93,26 @@ const earthInvPlaneInclinationAmplitude = modelParams.earth.earthInvPlaneInclina
 // Plan 07 R10: the K device's J2000 wheel phase (anchor-unit cycles) — the
 // scene scaffolding's recorded pose, N × this per H/N wheel; not a law.
 const kDeviceWheelPhaseAtJ2000Cycles = modelParams.earth.kDeviceWheelPhaseAtJ2000Cycles;
+// Plan 09 step 6: the K-device inclination wheel's J2000 phase, a recorded
+// POSE constant (ϖ_J2000 − the retired eccentricity law's 21.77° anchor);
+// it poses the three scaffold constants below, nothing published rides it.
+const kDeviceInclinationPhaseJ2000Deg = modelParams.earth.kDeviceInclinationPhaseJ2000Deg;
 // Derived: 2A − A²/ε — two tilt layers (H/3 + H/5) minus second-order equatorial projection
 const earthRAAngle = utils.computeEarthRAAngle(earthInvPlaneInclinationAmplitude, earthtiltMean);
-// Derived: inclJ2000 − amplitude × cos(ω̃_J2000 − phaseAngle) — using perihelion longitude (ICRF)
+// Derived: inclJ2000 − amplitude × cos(the K inclination phase at J2000)
 const earthAscendingNodeInvPlane = ASTRO_REFERENCE.earthAscendingNodeInvPlane;
 const earthInvPlaneInclinationMean = utils.computeInvPlaneInclinationMean(
-  ASTRO_REFERENCE.earthInclinationJ2000_deg, earthInvPlaneInclinationAmplitude,
-  ASTRO_REFERENCE.earthPerihelionLongitudeJ2000, ASTRO_REFERENCE.earthInclinationCycleAnchor);
+  ASTRO_REFERENCE.earthInclinationJ2000_deg, earthInvPlaneInclinationAmplitude, kDeviceInclinationPhaseJ2000Deg);
 const eccentricityBase = modelParams.earth.eccentricityBase;
 const eccentricityAmplitude = modelParams.earth.eccentricityAmplitude;
-// ECCENTRICITY UNIFICATION (plan IP-eccentricity-unification, D1 = form (e)):
-// the one law's mean base' = e(J2000) / (1 + cos θ₀/2), θ₀ = ϖ_ICRF(J2000) −
-// the inclination-cycle anchor (the System-Reset phase in anchor form) —
-// DERIVED, matched with moon/ecc-channel.cjs (which derives the same value
-// from the same inputs). eccentricityBase (Law-5 solved, v11) and
-// eccentricityAmplitude (the v11 H/16 amplitude, now only the Law-4 K
-// calibration input) remain as constants.
+// The perihelion wheel's offset base′ = e(J2000) / (1 + cos θ₀/2), θ₀ the K
+// inclination phase at J2000 — a scaffold POSE value (the engine places the
+// offset arm at the series' e of date every frame, R4). Plan 09 step 6: the
+// H/3 eccentricity law that derived its e(t) on this base′ is deleted;
+// eccentricityBase (Law-5 solved, v11) and eccentricityAmplitude (the Law-4 K
+// calibration input) remain as the scaffold's constants until step 7.
 const eccentricityBaseDerived = ASTRO_REFERENCE.earthEccentricityJ2000
-  / (1 + Math.cos((ASTRO_REFERENCE.earthPerihelionLongitudeJ2000 - ASTRO_REFERENCE.earthInclinationCycleAnchor) * Math.PI / 180) / 2);
+  / (1 + Math.cos(kDeviceInclinationPhaseJ2000Deg * Math.PI / 180) / 2);
 // (plan 07 R6: eccentricityAmplitudeK — K inverted from Earth's calibration —
 // went with the eccentricity law.)
 const perihelionRefJD = ASTRO_REFERENCE.perihelionPassageJ2000_JD;
@@ -648,6 +649,7 @@ module.exports = {
   earthInvPlaneInclinationMean,
   earthInvPlaneInclinationAmplitude,
   earthAscendingNodeInvPlane,
+  kDeviceInclinationPhaseJ2000Deg,
   eccentricityBase,
   eccentricityBaseDerived,
   eccentricityAmplitude,

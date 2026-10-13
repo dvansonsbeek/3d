@@ -115,7 +115,6 @@ function measure() {
   // phase; browser: integrated H/3). Pinned so the alignment commit shows
   // exactly these values moving, and nothing else.
   for (const tYr of [-102000, -27000, -2584, 0, 100, 30000, 102000]) {
-    v[`moonFwEcc@${tYr}`] = DT._fwEarthEcc(tYr);
   }
 
   // Mode sections — the toggles are process-env consts in the Node engine, so

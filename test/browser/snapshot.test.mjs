@@ -174,9 +174,7 @@ const measured = await s.page.evaluate(({ YEARS, EPOCHS_MA, MOON_JDS, MOON_DEEP_
   for (const [a2, b2] of MOON_CHAIN_PAIRS) {
     for (const [k, n] of Object.entries(T.moonChainCycles(a2, b2))) v[`moonChain.${k}@${a2}..${b2}`] = n;
   }
-  for (const tYr of [-102000, -27000, -2584, 0, 100, 30000, 102000]) {
-    v[`moonFwEcc@${tYr}`] = T.fwEarthEcc(tYr);
-  }
+  // (plan 09 step 6: the moonFwEcc@tYr rows — the H/3 eccentricity law — are retired)
   for (const Tc of [-30, 0, 30, 500]) {
     v[`moonChanInt.sW@${Tc}`] = T.fwChannelIntegral(Tc, 2.407);
     v[`moonChanInt.sN@${Tc}`] = T.fwChannelIntegral(Tc, 1.018);

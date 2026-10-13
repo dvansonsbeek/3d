@@ -115,7 +115,7 @@ relabel, not re-base.
 | 1 | The fitted timing anchor — the unit of the correction bases and the era clock; it scales with the precession period at deep time (anchor/T_p = 13.011, a fit constant — not a period, plan 06 S5) | `holisticyearLength` | <!--v:H-->335,317<!--/v--> years | 1246 AD perihelion–solstice alignment + J2000 longitude of perihelion |
 | 2 | Mean obliquity — a constant of the scene's J2000 pose (the wheel geometry); the published obliquity is the hybrid (Ledger 1) | `earthtiltMean` | <!--v:meanObliquity-->23.41353<!--/v-->° | observed obliquity range |
 | 3 | Inclination amplitude — a constant of the scene's J2000 pose (the K inclination law it once fed is retired, plan 07 R5/R9); the published inclination is the chain's (Ledger 1) | `earthInvPlaneInclinationAmplitude` | <!--v:earthInclAmp-->0.63607<!--/v-->° | observed obliquity range |
-| 4 | The eccentricity line's phase anchor — phases the scene Sun's eccentricity law and the Moon eccentricity channel's anchor form | `earthInclinationCycleAnchor` | 21.77° | the recorded J2000 phase of the correction bases (plan 07 R10: the former fitted origin t₀ was rotated out of every coefficient exactly); the anchor arithmetic itself is exact |
+| 4 | The K-device inclination wheel's J2000 pose (plan 09 step 6; it was the eccentricity law's 21.77° anchor as ϖ_J2000 − 21.77°) | `kDeviceInclinationPhaseJ2000Deg` | 81.17719° | a recorded scene pose: it poses the mean inclination, the inclination path and the perihelion wheel's offset base′; the eccentricity law it phased is deleted — Earth's e of date is the N-body series on every path |
 | 5 | The K wheels' phase at J2000 — the scene scaffolding's recorded pose (N × this per H/N wheel), not a law; no observable rides it | `kDeviceWheelPhaseAtJ2000Cycles` | 0.908498525 anchor units | numerically the retired origin's (2000 − t₀)/H, kept with the pose (plan 07 R10) |
 
 The correction combs' divisors and the era clock's counters are devices
@@ -212,13 +212,13 @@ The anchor is the unit of the correction bases and of the frozen era clock; it w
 
 | Constant | Variable | Value | Description |
 |----------|----------|-------|-------------|
-| Base Eccentricity | `eccentricityBase` | <!--v:eccentricityBase-->0.015386<!--/v--> | The Law-5 constant. Earth's shipped e(t) mean is the derived `eccentricityBaseDerived` = e(J2000)/(1 + cos θ₀/2) on the System-Reset anchor (the one H/3 eccentricity law) |
-| Eccentricity Amplitude | `eccentricityAmplitude` | <!--v:eccentricityAmplitude-->0.001356<!--/v--> | The Law-4 K input A — **derived, not fitted**: the 1246 triangle closure e(J2000)² = base² + A² + 2·base·A·cos φ, φ = <!--v:aClosurePhaseDeg-->12.95<!--/v-->° from the <!--v:periAlignYearRound-->1246.03<!--/v--> perihelion–solstice alignment at the H/16 beat (closure A = <!--v:aDerivedFrom1246-->0.0013559<!--/v-->; ±5% forces the alignment to <!--v:aClosureYearAPlus5Pct-->690<!--/v-->/<!--v:aClosureYearAMinus5Pct-->2,000<!--/v--> AD). A does not enter e(t) — it is the wobble-marker distance and the Law-4 calibration (see docs/10 §Law 4) |
+| Base Eccentricity | `eccentricityBase` | <!--v:eccentricityBase-->0.015386<!--/v--> | The Law-5 constant of the retired K law — a scaffold constant until plan 09 step 7. The perihelion wheel's offset base′ `eccentricityBaseDerived` = e(J2000)/(1 + cos θ₀/2) on the K inclination phase is the scene's J2000 pose; Earth's published e of date is the N-body series (the H/3 law is deleted, plan 09 step 6) |
+| Eccentricity Amplitude | `eccentricityAmplitude` | <!--v:eccentricityAmplitude-->0.001356<!--/v--> | The Law-4 K input A, a scaffold constant until plan 09 step 7 (the wobble-marker distance; the K law it calibrated is retired). Its derivation record: the 1246 triangle closure e(J2000)² = base² + A² + 2·base·A·cos φ on the H/16 beat from the <!--v:periAlignYearRound-->1246.03<!--/v--> perihelion–solstice alignment reproduced this value (the closure's registry keys — the phase, the derived A and the ±5 % alignment-year test — left with the eccentricity law at plan 09 step 6). A does not enter any e(t): Earth's eccentricity of date is the N-body series |
 | Mean Obliquity | `earthtiltMean` | <!--v:meanObliquity-->23.41353<!--/v--> deg | Mean axial tilt (derived from obliquity at J2000) |
 | RA Angle | `earthRAAngle` | ~1.254 | **Derived**: `2A − A²/ε` where A = inclination amplitude, ε = earthtiltMean |
 | Mean Inclination (inv. plane) | `earthInvPlaneInclinationMean` | <!--v:earthInclMean-->1.48113<!--/v--> deg | Mean orbital inclination to invariable plane (derived) |
 | Inclination Amplitude | `earthInvPlaneInclinationAmplitude` | <!--v:earthInclAmp-->0.63607<!--/v--> deg | Oscillation amplitude (derived from obliquity rate) |
-| Inclination Cycle Anchor | `earthInclinationCycleAnchor` | 21.77 deg | ICRF perihelion longitude where Earth reaches MAX inclination (anchor for the oscillation) |
+| Inclination Cycle Anchor | (`earthInclinationCycleAnchor` — DELETED, plan 09 step 6) | was 21.77° | the eccentricity law's phase anchor (the perihelion longitude at maximum inclination); the scene pose it also set is the recorded `kDeviceInclinationPhaseJ2000Deg` = ϖ_J2000 − 21.77° |
 | Perihelion Ref JD | `perihelionRefJD` | <!--v:perihelionPassageJD-->2451547.042<!--/v--> | JD of Earth perihelion 2000 (Jan 3.542) |
 
 (The per-planet divisor, phase-group and mirror-pair table of the retired
@@ -724,8 +724,9 @@ Theoretical orbital inclination ranges from secular perturbation theory.
 The per-planet cycle anchors (the ψ law's phase inputs, `inclinationCycleAnchor`,
 and the System-Reset n=7 convention they were evaluated at) left
 `model-parameters.json` with the law; nothing in the model reads them. Earth's
-anchor (21.77°, `earthInclinationCycleAnchor` in astro-reference) is a different
-quantity — it phases the eccentricity channel and is plan 07 R10's subject.
+anchor (21.77°) phased the eccentricity channel; it left astro-reference with
+that law at plan 09 step 6 (the scene pose it also set is the recorded
+`kDeviceInclinationPhaseJ2000Deg`).
 The retired values are archived; the eigenmode-cluster claim of earlier
 versions is withdrawn with them.
 

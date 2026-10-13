@@ -48,13 +48,13 @@ series term that carries the solar anomaly M.
 | evaluator | formula | anchor | engine · type | H-role | consumers | code |
 |---|---|---|---|---|---|---|
 | **deep-mode channel** | z(t) = Σₖ (reₖ + i·imₖ)·e^{iωₖt} + R, e = \|z\|; R = z_J2000 − Σₖ(reₖ + i·imₖ) so e(J2000) is exact by construction; 18 modes (ω, re, im) from the ±10-Myr NAFF table | e₀ = 0.0167024357, ϖ₀ = 102.918° (the JPL J2000 seed, `CHAIN_ARTIFACT.j2000AnchorElements.earth`) | D · A (beyond ~5 Myr the table is spectrum-class: the attractor, not a pointwise ephemeris) | — | **the entire lunar chain** (this chain) | `packages/physics/src/moon/deep-ecc-channel.cjs` 60–120 |
-| **H/3 line** | e(t) = base′·(1 + cos θ(t)/2), θ = θ₀ + 2π·cycles(2000→t, divisor 3), base′ = e₀/(1 + cos θ₀/2), θ₀ = ϖ_ICRF(J2000) − 21.77° | e₀ = 0.01671022 (IAU, astro-reference), ϖ_ICRF(J2000) = 102.94719°, anchor 21.77° | K · L (the epoch-local tangent, 5 % era ≈ −2,600…+2,850) | **L** (H/3 phase counter — the "3" is a J2000 reading; plan 06 restates) | RETIRED from the physics package (plan 06 layer B): the eclipse Sun's equation of centre, the Besselian Sun distance and the cardinal braid now ride the banked series plus the derived mean-element offset (next row); the browser's SCENE Sun still reads the law (`src/script.js` `_moonEcc`) until the cardinal points move | `packages/physics/src/moon/ecc-channel.cjs` 60–90 (the browser's twin) |
+| **H/3 line (deleted, plan 09 step 6)** | e(t) = base′·(1 + cos θ(t)/2), θ = θ₀ + 2π·cycles(2000→t, divisor 3), base′ = e₀/(1 + cos θ₀/2), θ₀ = ϖ_ICRF(J2000) − 21.77° | e₀ = 0.01671022 (IAU, astro-reference), ϖ_ICRF(J2000) = 102.94719°, anchor 21.77° | K · L (the epoch-local tangent, 5 % era ≈ −2,600…+2,850) | **L** (H/3 phase counter — the "3" is a J2000 reading; plan 06 restates) | RETIRED from the physics package (plan 06 layer B): the eclipse Sun's equation of centre, the Besselian Sun distance and the cardinal braid now ride the banked series plus the derived mean-element offset (next row); DELETED at plan 09 step 6: the browser's `_moonEcc`, the Node twin's `_fwEarthEcc`, the two ecc-channel modules and the 21.77° anchor are gone; the scene keeps the line's J2000 phase as a recorded pose (`kDeviceInclinationPhaseJ2000Deg`) | — (doc 66 §1 is the derivation record) |
 | **mean-element offset** | Δϖ = <!--v:sunMeanOffsetPomArcsec-->+70.08<!--/v-->″, Δe = <!--v:sunMeanOffsetE-->+5.81e-6<!--/v--> added to the series for the SUN only — the 1890–2110 mean of (osculating − secular) EMB e and ϖ from the Horizons J2000 seed integrated as a nine-body system (the lab RK4, daily samples), the chain as the secular reference | the seed vectors, the chain, the lab derivative | P (fully derived; the JPL Sun sample is a validation only: all-phase sd 3.23″ → 1.59″, the former K law 1.58″) | — | eclipse Sun equation of centre, Besselian Sun distance, cardinal braid — the mean elements of the era (Simon 1994's 102.937°, 0.0167086 reproduced to 0.2″); the published Earth surface stays the secular series | `tools/verify/earth-osculating-offset.js` → `data/earth-osculating-mean-offset.json`; `model.js` `sunPerihelionDegAt` / `sunEccentricityAt` |
 | **banked series** | e = \|z(t)\| sampled from the same N-body run (`data/nbody-secular-series.json`, 2-kyr grid inside ±10 Myr; the mode table beyond) | the run itself | D · A | — | the scene's readouts, the Eccentricity Path exhibit, the FV charts | `src/script.js` `_sceneEccTargetAt`, `tools/lib/deep-orbital-history.js` |
 
-The deep-mode channel and the H/3 line agree within ~8×10⁻⁵ across the
-historical era and diverge beyond it (0.0034 vs 0.0079 at the 28,832 AD
-minimum); the series and the mode table agree in-era and sit ~1×10⁻³ apart
+The deep-mode channel and the retired H/3 line agreed within ~8×10⁻⁵ across the
+historical era and diverged beyond it (0.0034 vs 0.0079 at the 28,832 AD
+minimum — the measured reason the line could not be the physics); the series and the mode table agree in-era and sit ~1×10⁻³ apart
 by 27 kyr (the table pins the unresolved short-period content only at
 J2000). The two J2000 anchors differ by 7.8×10⁻⁶ (JPL vector seed vs IAU
 mean element) — the reason the first row below shows two e's at 2000.
@@ -78,7 +78,7 @@ Rows are evaluated by the script from the deep channel exactly as steps 1–5
 compose them (T = (year − 2000)/100; the of-date angles wrapped to 0–360°).
 
 <!-- generated:calcmap-e-chain-values -->
-| year | T (cy) | e — deep modes | e — H/3 law | E = e/e₀ | (g/g₀)^s_ϖ | (g/g₀)^s_Ω | I(T, s_ϖ) (cy) | I(T, s_Ω) (cy) | perigee ϖ of date (°) | node Ω of date (°) |
+| year | T (cy) | e — deep modes | e — the published series | E = e/e₀ | (g/g₀)^s_ϖ | (g/g₀)^s_Ω | I(T, s_ϖ) (cy) | I(T, s_Ω) (cy) | perigee ϖ of date (°) | node Ω of date (°) |
 |---|---|---|---|---|---|---|---|---|---|---|
 | 2000 | 0.00 | 0.0167024 | 0.0167024 | 1.000000 | 1.0000000 | 1.0000000 | 0.0000e+0 | 0.0000e+0 | 83.3531 | 125.0444 |
 | 1246 | -7.54 | 0.0170163 | 0.0170119 | 1.018791 | 1.0000382 | 1.0000162 | -1.4412e-4 | -6.0953e-5 | 2.4031 | 308.5499 |
@@ -86,7 +86,7 @@ compose them (T = (year − 2000)/100; the of-date angles wrapped to 0–360°).
 | -2584 | -45.84 | 0.0185087 | 0.0183468 | 1.108142 | 1.0002297 | 1.0000972 | -5.2972e-3 | -2.2403e-3 | 18.2092 | 230.1849 |
 | -10000 | -120.00 | 0.0206932 | 0.0196358 | 1.238935 | 1.0005392 | 1.0002280 | -3.4623e-2 | -1.4641e-2 | 180.8257 | 49.7176 |
 
-Anchors the rows above use: e₀ (JPL J2000 seed, the deep channel's anchor) = 0.0167024357 · e(J2000) IAU (the H/3 law's anchor) = 0.01671022 · g₀ = (1 − e₀²)^(−3/2) = 1.0004186030 · ϖ̇₀ = LPR − MPR = 4069.0137287 °/cy · Ω̇₀ = LPR − FR = -1934.1362891 °/cy · s_ϖ = 2.407, s_Ω = 1.018.
+Anchors the rows above use: e₀ (JPL J2000 seed, the deep channel's anchor) = 0.0167024357 · e(J2000) IAU (astro-reference) = 0.01671022 · g₀ = (1 − e₀²)^(−3/2) = 1.0004186030 · ϖ̇₀ = LPR − MPR = 4069.0137287 °/cy · Ω̇₀ = LPR − FR = -1934.1362891 °/cy · s_ϖ = 2.407, s_Ω = 1.018.
 <!-- /generated:calcmap-e-chain-values -->
 
 The Δe² carrier's coefficient (step 6), derived — not a constant:
@@ -714,7 +714,7 @@ JSON; nothing in the shipped model reads a phase origin other than J2000.
 | drift | composite Simpson on 2000-yr NODE SPACING (≥ 64 nodes) + the Euler–Maclaurin endpoint term; a(t) is the tidal-tier sidereal year with the kinematic 13/H(t) precession factor | `deep-time.cjs` T_sid(t), H(t) | **P** (H(t)) + **U/L** (the 13) | 108–127; `model.js` 459–464 |
 | Ih | the tropical comb integrated with the fit's own linear H(c) = h0 + h1·c; minus the Euler–Maclaurin half-sample | `TROPICAL_YEAR_HARMONICS` (deleted at plan 09 — the record render below passes an empty comb, Ih ≡ 0), h0, h1 | **C + P** | 129–161 |
 | sinusoids | δ_X on 2π·div·c, c = cycles since the balanced year (integrated) | `CARDINAL_POINT_HARMONICS` | **C** | 205–208 |
-| equation-of-centre orders | e(t)ⁿ·[sin, cos](n·θ₁₆), e(t) the H/3 line (chain 1.1), θ₁₆ = 2π·16·c — the perihelion-OF-DATE phase the equation of centre is seen through; {order, sin, cos}, NOT sinusoids (read as H/16 + H/32 harmonics they are wrong by the whole ~1.78 d braid) | `CARDINAL_POINT_ECC_TERMS`, e(t) | **L** (the H/16 count for T_peri(t), which wanders — chain 2) | 209–217 |
+| equation-of-centre orders | e(t)ⁿ·[sin, cos](n·θ₁₆), e(t) the published series in the record's render (the fit rode the H/3 line, deleted at plan 09 step 6), θ₁₆ = 2π·16·c — the perihelion-OF-DATE phase the equation of centre is seen through; {order, sin, cos}, NOT sinusoids (read as H/16 + H/32 harmonics they are wrong by the whole ~1.78 d braid) | `CARDINAL_POINT_ECC_TERMS`, e(t) | **L** (the H/16 count for T_peri(t), which wanders — chain 2) | 209–217 |
 | joint sidebands | phase order·λ_X − 2π·div·c, λ_X = 0/90/180/270° for SS/AE/WS/VE; COUNTER-rotating — the load-bearing minus sign (the co-rotating sense captures nothing, measured) | `CARDINAL_POINT_JOINT_TERMS` | **C** | 218–227 |
 | self-correction | δ_X(2000) subtracted so JD_X(2000) ≡ anchor_X exactly | — | — | 173–196, 228 |
 | T_X(Y) | the derivative: lincoef + [mSY_realLOD(t) − mSY] + comb − ½ comb′ + Σ k·(dc/dY)·[…] with dc/dY = 1/H(t); the equation-of-centre derivative rides de/dt of the one law | `meanHAtAgeMa`, `meanYearRealLodDays`, `eccentricityRateAt` | **P** | 238–298 |

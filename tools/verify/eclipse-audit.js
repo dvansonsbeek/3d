@@ -145,7 +145,6 @@ const INPUT_FILES = [
   'packages/physics/src/moon/series.cjs',
   // the ONE eccentricity law body (Sun EoC + E-factor flow through it;
   // model.js carries only the wiring — Stage A′ of the engine-switch record):
-  'packages/physics/src/moon/ecc-channel.cjs',
   'packages/physics/src/moon/apparent.cjs',
   'public/input/solar-eclipse-centerlines-nasa.json',
   'public/input/astro-reference.json',

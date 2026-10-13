@@ -834,70 +834,15 @@ function meanTropicalMonthAtAge(t_Ma) { return _moonChain().tropicalMonthSeconds
 // (Plan 09 step 5c: the H² "cycles per H" / of-date period wrappers
 // (mean*ICRFAtAge) left with the counter law; no reader remained.)
 
-// ─── Framework Earth-eccentricity composite (A/B RESEARCH ONLY) ──
-// Mirror of src/script.js _ECOMP/_fwEarthEccComposite — SUPERSEDED as the
-// production e_E by the fully-derived H/3 fluctuation line (_FW_ECC below),
-// which carries the factored deep-time law rate(t) = [invariant mean] ×
-// [g(t)/g₀]^s, g = (1−e²)^(−3/2). Retained for comparison experiments.
-const _ECOMP = {
-  c0: 0.02814222258,
-  T:  [405000, 95804.8571, 99353.1852, 107301.44, 121933.4545, 127739.8095, 134126.8, 86533.4194, 223544.6667, 298059.5556],
-  A:  [-0.01713360824, 0.003885798879, 0.003162499557, -0.002439315342, 0.0009946933865, -0.002804779985, 0.0007349600656, 0.002378093225, -0.0007624261717, 0.0005442620468],
-  B:  [-0.0009600398502, -0.009349595921, 0.001151405217, -0.004809468603, 0.005451777722, 0.00162872882, -0.001835102032, 0.003606461969, -0.001298883291, -0.003982540754],
-};
-const _ECOMP_S_W = 2.407, _ECOMP_S_N = 1.018;   // channel sensitivities (single source: src/script.js _FW_MOON; both Meeus-effective — S_N 1.0→1.018 with the v4 frame-attribution batch)
-const _ECOMP_G0 = Math.pow(1 - _fwEarthEccComposite(0) ** 2, -1.5);   // g at the composite's OWN J2000 anchor (KKT-constrained e(0) from the La2010 fit; A/B research only — production uses _FW_ECC_G0)
-function _fwEarthEccComposite(t_yr) {
-  let e = _ECOMP.c0;
-  for (let i = 0; i < _ECOMP.T.length; i++) {
-    const w = 2 * Math.PI * t_yr / _ECOMP.T[i];
-    e += _ECOMP.A[i] * Math.cos(w) + _ECOMP.B[i] * Math.sin(w);
-  }
-  return e;
-}
+// The Moon eccentricity channel's Meeus-effective sensitivities (single source:
+// src/script.js _FW_MOON; S_N 1.0→1.018 with the v4 frame-attribution batch).
+const _ECOMP_S_W = 2.407, _ECOMP_S_N = 1.018;
 
-// ─── Framework H/3 fluctuation line (mirror of src/script.js _fwEarthEcc) ──
-// ONE movement, FULLY DERIVED, zero solved values:
-//   e(t) = eccentricityBase · (1 + cos θ_i(t) / 2)
-// The H/3 wobble cycle that drives Earth's inclination (anchor 21.77°) also
-// carries the Moon-channel eccentricity fluctuation: mean = base (Law 5),
-// amplitude = base/2, phase = ϖ_ICRF(J2000) − 21.77° = 81.18° past max.
-// Observed J2000 e (−0.86%) and ė (+1.7%) are PREDICTIONS, not inputs.
-// Supersedes the Laskar-band composite (retained for A/B) and the
-// fitted-phase line (solved φ = 78.6° hereby derived).
-// Phase 8.2-2: the line lives ONCE in @essrt/physics/moon/ecc-channel (the
-// 8.2-1 S1 alignment made the two engines bit-exact first, so this delegation
-// is provably behaviour-preserving). This engine injects its own
-// cyclesBetweenYears (always integrated here — DT has no snapshot toggle).
-const { createMoonEccChannel } = _req('@essrt/physics/moon/ecc-channel');
-let _moonEccM = null;
-function _moonEcc() {
-  if (_moonEccM === null) {
-    const AR = C.ASTRO_REFERENCE;
-    _moonEccM = createMoonEccChannel({
-      cyclesBetween: cyclesBetweenYears,
-      eccentricityBase: C.eccentricityBase,
-      perihelionLongitudeJ2000Deg: AR.earthPerihelionLongitudeJ2000,
-      inclinationCycleAnchorDeg: AR.earthInclinationCycleAnchor,
-      // ECCENTRICITY UNIFICATION: the one law — base' derived from the
-      // observed J2000 eccentricity inside the channel (matched with
-      // packages/physics model.js and src/script.js).
-      eccentricityJ2000: AR.earthEccentricityJ2000,
-    });
-  }
-  return _moonEccM;
-}
-function _fwEarthEcc(t_yr) { return _moonEcc().eccAt(t_yr); }
-/** de/dyear of the H/3 law — the cardinal braid's equation-of-centre
- *  derivative; mirrors packages/physics model.js. */
-function _fwEarthEccRate(t_yr) { return _moonEcc().eccRateAt(t_yr); }
-
-// Engine-switch decision (ii) (plan 02 §8): the ONE deep e — the engine's
-// own ±10-Myr mode table, anchored form — feeds the ENTIRE lunar chain
-// (modulation/cycle counts, arguments eccAt/channelIntegral, E-factor).
-// The Sun/clock machinery (_fwEarthEcc/_fwEarthEccRate above: scene Sun
-// offset, cardinal braid) stays on the H/3 channel — a certification
-// split, not a physics one (the two agree within 4.2e-5 in-era).
+// (Plan 09 step 6: the H/3 eccentricity law — `_moonEcc`/`_fwEarthEcc`/
+// `_fwEarthEccRate` on @essrt/physics/moon/ecc-channel — and the Laskar-band
+// research composite `_ECOMP`/`_fwEarthEccComposite` are deleted. Earth's
+// eccentricity of date is the N-body series on every path; the ONE deep e
+// below feeds the entire lunar chain, as decision (ii) placed it.)
 const { createDeepEccChannel } = _req('@essrt/physics/moon/deep-ecc-channel');
 const { DEEP_MODES_ARTIFACT } = _req('@essrt/physics/moon/deep-modes-artifact');
 let _deepEccM = null;
@@ -1287,16 +1232,11 @@ function posFromJD(jd) {
 
 // ─── Exports ──────────────────────────────────────────────────────────────
 module.exports = {
-  // Framework e_E: H/3 fluctuation line (production) + Laskar-band composite (A/B research)
-  _fwEarthEcc,
+  // The ONE deep e (the engine's own ±10-Myr mode table) — the lunar chain's
+  // eccentricity source. (Plan 09 step 6: the H/3 fluctuation line
+  // `_fwEarthEcc`/`_fwEarthEccRate`/`_moonEcc` and the Laskar-band research
+  // composite `_fwEarthEccComposite` are deleted.)
   _deepEcc,
-  _fwEarthEccRate,
-  // The shared @essrt/physics moon eccentricity channel (8.2-2) — scene-graph's
-  // E-factor and channel-integral mirrors read it from here so the anchors
-  // e0/g0 stay the channel's consts (never eccAt(0) — the R3 drift
-  // correction makes cycles(2000→2000) nonzero).
-  _moonEcc,
-  _fwEarthEccComposite,
   // Layer 0 wiring (PHASE-B): the parameter bundle, so every consumer builds
   // the pure primitives from identical numbers. Inject `earthMoiFactorAtAge`
   // (exported above) as the α channel.

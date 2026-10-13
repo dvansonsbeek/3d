@@ -28,9 +28,9 @@
   ]
  },
  "summary": {
-  "hits": 2357,
-  "codeHits": 279,
-  "files": 162,
+  "hits": 2301,
+  "codeHits": 255,
+  "files": 161,
   "excludedClasses": [
    "comment",
    "source",
@@ -52,7 +52,7 @@
      "comb": 4,
      "unclassified": 1,
      "export": 6,
-     "display": 26
+     "display": 25
     },
     "docs-tools": {
      "diagnostic": 5,
@@ -91,12 +91,12 @@
    "H / N": {
     "browser": {
      "comb": 4,
-     "comment": 202,
+     "comment": 204,
      "display": 12
     },
     "docs-tools": {
      "comment": 37,
-     "diagnostic": 62
+     "diagnostic": 55
     },
     "explore": {
      "explore": 80,
@@ -112,11 +112,11 @@
      "comb": 4
     },
     "tests": {
-     "comment": 15,
+     "comment": 16,
      "test": 1
     },
     "node-lib": {
-     "comment": 62,
+     "comment": 58,
      "plumbing": 3,
      "comb": 11
     },
@@ -129,13 +129,13 @@
      "display": 5
     },
     "package": {
-     "comment": 79
+     "comment": 71
     },
     "other": {
      "comment": 2
     },
     "source": {
-     "source": 12
+     "source": 13
     }
    },
    "/ 13": {
@@ -177,7 +177,7 @@
      "comment": 1
     },
     "package": {
-     "comment": 19
+     "comment": 18
     },
     "other": {
      "comment": 1
@@ -286,32 +286,18 @@
    },
    "earthInclinationCycleAnchor": {
     "browser": {
-     "comb": 3,
-     "plumbing": 2,
-     "scene": 1,
-     "unclassified": 1,
      "comment": 1
     },
     "docs-tools": {
-     "diagnostic": 2
+     "comment": 1
     },
     "explore": {
      "explore": 1
-    },
-    "node-lib": {
-     "plumbing": 3,
-     "unclassified": 1
-    },
-    "fitting": {
-     "unclassified": 1
-    },
-    "source": {
-     "source": 1
     }
    },
    "8H": {
     "browser": {
-     "comment": 61
+     "comment": 60
     },
     "docs-tools": {
      "diagnostic": 20,
@@ -395,9 +381,8 @@
    },
    "cyclesBetween": {
     "browser": {
-     "comb": 3,
-     "comment": 3,
-     "calendar": 1
+     "comb": 2,
+     "comment": 3
     },
     "docs-tools": {
      "diagnostic": 2
@@ -409,20 +394,19 @@
      "comment": 1
     },
     "node-lib": {
-     "comb": 3
+     "comb": 2
     },
     "package": {
-     "comment": 10,
-     "plumbing": 3,
-     "comb": 15,
+     "comment": 3,
+     "plumbing": 2,
+     "comb": 11,
      "counter": 1
     }
    },
    "cyclesBetweenYears": {
     "browser": {
-     "comment": 16,
-     "comb": 2,
-     "calendar": 1
+     "comment": 13,
+     "comb": 1
     },
     "explore": {
      "explore": 3
@@ -431,8 +415,8 @@
      "test": 1
     },
     "node-lib": {
-     "comment": 4,
-     "comb": 3,
+     "comment": 2,
+     "comb": 1,
      "plumbing": 1
     },
     "fitting": {
@@ -497,16 +481,16 @@
    }
   },
   "byClass": {
-   "comment": 980,
-   "comb": 62,
-   "plumbing": 67,
-   "scene": 110,
-   "unclassified": 7,
+   "comment": 958,
+   "comb": 50,
+   "plumbing": 61,
+   "scene": 109,
    "counter": 28,
-   "calendar": 5,
+   "calendar": 3,
+   "unclassified": 4,
    "export": 6,
-   "display": 95,
-   "diagnostic": 154,
+   "display": 94,
+   "diagnostic": 145,
    "explore": 153,
    "analysis": 649,
    "test": 13,
@@ -520,17 +504,14 @@
    "packages/physics/src/deltat/deep-time.cjs": 8,
    "packages/physics/src/layer0/index.js": 1,
    "packages/physics/src/model.js": 11,
-   "packages/physics/src/moon/ecc-channel.cjs": 4,
    "packages/physics/src/phase/index.cjs": 4,
-   "packages/physics/src/planets/ecc-channel.cjs": 1,
-   "src/script.js": 144,
+   "src/script.js": 133,
    "tools/fit/python/_dump_constants.js": 3,
    "tools/fit/python/load_constants.py": 3,
    "tools/fit/reorigin-combs-j2000.mjs": 3,
-   "tools/lib/constants.js": 18,
-   "tools/lib/deep-time.js": 14,
-   "tools/lib/optimizer.js": 23,
-   "tools/lib/orbital-engine.js": 1,
+   "tools/lib/constants.js": 15,
+   "tools/lib/deep-time.js": 11,
+   "tools/lib/optimizer.js": 22,
    "tools/lib/python/constants_scripts.py": 9,
    "tools/lib/scene-graph.js": 22,
    "tools/optimize.js": 3
@@ -796,10 +777,10 @@
   "era-counter": {
    "twin": "the composed clock T_p(t) (the unit H(t) = 13·T_p,composed, deltat/deep-time.cjs hAtAge; the counters agree within every fit window and part beyond ±1 Myr)",
    "readers": {
-    "browser": 25,
+    "browser": 21,
     "fitting": 3,
-    "node-lib": 20,
-    "package": 25
+    "node-lib": 17,
+    "package": 21
    },
    "measured": {
     "unit": "H/16 comb phase, ° (frozen counter − composed clock, integrated from J2000)",
@@ -898,7 +879,7 @@
   "scene-pose": {
    "twin": "none — the scene's J2000 pose; the R4 placement overrides every observable (plan 07 R10: dropping the pose tilted the scaffold 1.25° and moved no observable)",
    "readers": {
-    "browser": 45,
+    "browser": 44,
     "fitting": 9,
     "node-lib": 4
    },
@@ -906,11 +887,7 @@
   },
   "ecc-law-anchor": {
    "twin": "a recorded J2000 phase of the one eccentricity law, θ(J2000) = ϖ_J2000 − anchor (bit-exact re-expression, plan 09 step 4)",
-   "readers": {
-    "browser": 4,
-    "node-lib": 1,
-    "fitting": 1
-   },
+   "readers": {},
    "measured": null
   },
   "sun-longitude-legacy": {
@@ -934,11 +911,11 @@
   "plumbing": {
    "twin": "none — a constants alias, an export list or a bridge line; goes with the constant it carries",
    "readers": {
-    "browser": 17,
+    "browser": 15,
     "fitting": 8,
     "python": 12,
-    "node-lib": 22,
-    "package": 8
+    "node-lib": 19,
+    "package": 7
    },
    "measured": null
   }
@@ -1037,25 +1014,23 @@
   },
   {
    "file": "src/script.js",
-   "line": 112,
+   "line": 114,
    "runtime": "browser",
-   "token": "earthInclinationCycleAnchor",
-   "class": "comb",
-   "text": "/ (1 + Math.cos((K.earthOrbital.earthPerihelionLongitudeJ2000 - K.earthOrbital.earthInclinationCycleAnchor) * Math.PI / 180) / 2);",
-   "twin": "ecc-law-anchor"
+   "token": "H / N",
+   "class": "comment",
+   "text": "// frame); matched bit-for-bit with tools/lib/constants.js. The H/3"
   },
   {
    "file": "src/script.js",
-   "line": 122,
+   "line": 127,
    "runtime": "browser",
    "token": "earthInclinationCycleAnchor",
-   "class": "plumbing",
-   "text": "const earthInclinationCycleAnchor = K.earthOrbital.earthInclinationCycleAnchor;  // Cycle anchor: ω̃_ICRF at max inclination (from balanced year)",
-   "twin": "plumbing"
+   "class": "comment",
+   "text": "// (plan 09 step 6: earthInclinationCycleAnchor — the eccentricity law's 21.77° — left the inputs with the law)"
   },
   {
    "file": "src/script.js",
-   "line": 138,
+   "line": 143,
    "runtime": "browser",
    "token": "H / N",
    "class": "comment",
@@ -1063,7 +1038,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 142,
+   "line": 147,
    "runtime": "browser",
    "token": "H / N",
    "class": "comment",
@@ -1071,7 +1046,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 215,
+   "line": 220,
    "runtime": "browser",
    "token": "H / N",
    "class": "comment",
@@ -1079,7 +1054,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 215,
+   "line": 220,
    "runtime": "browser",
    "token": "H / N",
    "class": "comment",
@@ -1087,7 +1062,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 226,
+   "line": 231,
    "runtime": "browser",
    "token": "8H",
    "class": "comment",
@@ -1095,7 +1070,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 227,
+   "line": 232,
    "runtime": "browser",
    "token": "8H",
    "class": "comment",
@@ -1103,7 +1078,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 308,
+   "line": 313,
    "runtime": "browser",
    "token": "8H",
    "class": "comment",
@@ -1111,7 +1086,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 479,
+   "line": 484,
    "runtime": "browser",
    "token": "8H",
    "class": "comment",
@@ -1119,7 +1094,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 578,
+   "line": 583,
    "runtime": "browser",
    "token": "holisticyearLength",
    "class": "plumbing",
@@ -1128,7 +1103,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 595,
+   "line": 600,
    "runtime": "browser",
    "token": "H / N",
    "class": "comment",
@@ -1136,7 +1111,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 595,
+   "line": 600,
    "runtime": "browser",
    "token": "/ 13",
    "class": "comment",
@@ -1144,7 +1119,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 602,
+   "line": 607,
    "runtime": "browser",
    "token": "H / N",
    "class": "comment",
@@ -1152,7 +1127,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 602,
+   "line": 607,
    "runtime": "browser",
    "token": "/ 13",
    "class": "comment",
@@ -1160,7 +1135,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 603,
+   "line": 608,
    "runtime": "browser",
    "token": "H / N",
    "class": "comment",
@@ -1168,7 +1143,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 603,
+   "line": 608,
    "runtime": "browser",
    "token": "/ 13",
    "class": "comment",
@@ -1176,7 +1151,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 662,
+   "line": 667,
    "runtime": "browser",
    "token": "H / N",
    "class": "comment",
@@ -1184,7 +1159,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 662,
+   "line": 667,
    "runtime": "browser",
    "token": "H / N",
    "class": "comment",
@@ -1192,7 +1167,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 709,
+   "line": 714,
    "runtime": "browser",
    "token": "holisticyearLength",
    "class": "comment",
@@ -1200,7 +1175,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 809,
+   "line": 814,
    "runtime": "browser",
    "token": "H / N",
    "class": "comment",
@@ -1208,7 +1183,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 809,
+   "line": 814,
    "runtime": "browser",
    "token": "H / N",
    "class": "comment",
@@ -1216,7 +1191,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 810,
+   "line": 815,
    "runtime": "browser",
    "token": "H / N",
    "class": "comment",
@@ -1224,7 +1199,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 865,
+   "line": 870,
    "runtime": "browser",
    "token": "H / N",
    "class": "comment",
@@ -1232,7 +1207,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 865,
+   "line": 870,
    "runtime": "browser",
    "token": "/ 13",
    "class": "comment",
@@ -1240,7 +1215,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 905,
+   "line": 910,
    "runtime": "browser",
    "token": "H / N",
    "class": "comment",
@@ -1248,7 +1223,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 905,
+   "line": 910,
    "runtime": "browser",
    "token": "H / N",
    "class": "comment",
@@ -1256,7 +1231,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 906,
+   "line": 911,
    "runtime": "browser",
    "token": "earthtiltMean",
    "class": "scene",
@@ -1265,7 +1240,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 906,
+   "line": 911,
    "runtime": "browser",
    "token": "earthInvPlaneInclinationAmplitude",
    "class": "scene",
@@ -1274,34 +1249,16 @@
   },
   {
    "file": "src/script.js",
-   "line": 908,
+   "line": 913,
    "runtime": "browser",
    "token": "earthInvPlaneInclinationAmplitude",
    "class": "scene",
-   "text": "const earthInvPlaneInclinationMean = ASTRO_REFERENCE.earthInclinationJ2000_deg - earthInvPlaneInclinationAmplitude * Math.cos((ASTRO_REFERENCE.perihelionLongitu",
+   "text": "const earthInvPlaneInclinationMean = ASTRO_REFERENCE.earthInclinationJ2000_deg - earthInvPlaneInclinationAmplitude * Math.cos(kDeviceInclinationPhaseJ2000Deg * ",
    "twin": "scene-pose"
   },
   {
    "file": "src/script.js",
-   "line": 908,
-   "runtime": "browser",
-   "token": "earthInclinationCycleAnchor",
-   "class": "scene",
-   "text": "const earthInvPlaneInclinationMean = ASTRO_REFERENCE.earthInclinationJ2000_deg - earthInvPlaneInclinationAmplitude * Math.cos((ASTRO_REFERENCE.perihelionLongitu",
-   "twin": "scene-pose"
-  },
-  {
-   "file": "src/script.js",
-   "line": 911,
-   "runtime": "browser",
-   "token": "earthInclinationCycleAnchor",
-   "class": "unclassified",
-   "text": "const inclinationPathZodiacOffsetDeg = 360 - startAngleModel - (ASTRO_REFERENCE.perihelionLongitudeJ2000_deg - earthInclinationCycleAnchor);",
-   "twin": "ecc-law-anchor"
-  },
-  {
-   "file": "src/script.js",
-   "line": 917,
+   "line": 922,
    "runtime": "browser",
    "token": "H / N",
    "class": "comment",
@@ -1309,7 +1266,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 924,
+   "line": 929,
    "runtime": "browser",
    "token": "H / N",
    "class": "comment",
@@ -1317,7 +1274,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 924,
+   "line": 929,
    "runtime": "browser",
    "token": "H / N",
    "class": "comment",
@@ -1325,7 +1282,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 925,
+   "line": 930,
    "runtime": "browser",
    "token": "kDeviceWheelPhaseAtJ2000Cycles",
    "class": "comment",
@@ -1333,7 +1290,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 928,
+   "line": 933,
    "runtime": "browser",
    "token": "kDeviceWheelPhaseAtJ2000Cycles",
    "class": "scene",
@@ -1342,7 +1299,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 929,
+   "line": 934,
    "runtime": "browser",
    "token": "kDeviceWheelPhaseAtJ2000Cycles",
    "class": "scene",
@@ -1351,7 +1308,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 940,
+   "line": 945,
    "runtime": "browser",
    "token": "H / N",
    "class": "comment",
@@ -1359,7 +1316,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 940,
+   "line": 945,
    "runtime": "browser",
    "token": "/ 13",
    "class": "comment",
@@ -1367,7 +1324,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 950,
+   "line": 955,
    "runtime": "browser",
    "token": "H / N",
    "class": "comment",
@@ -1375,7 +1332,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 950,
+   "line": 955,
    "runtime": "browser",
    "token": "/ 13",
    "class": "comment",
@@ -1383,7 +1340,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 957,
+   "line": 962,
    "runtime": "browser",
    "token": "H / N",
    "class": "comment",
@@ -1391,7 +1348,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 957,
+   "line": 962,
    "runtime": "browser",
    "token": "/ 13",
    "class": "comment",
@@ -1399,7 +1356,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 974,
+   "line": 979,
    "runtime": "browser",
    "token": "holisticyearLength",
    "class": "plumbing",
@@ -1408,7 +1365,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 982,
+   "line": 987,
    "runtime": "browser",
    "token": "H / N",
    "class": "comment",
@@ -1416,7 +1373,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 983,
+   "line": 988,
    "runtime": "browser",
    "token": "H / N",
    "class": "comment",
@@ -1424,7 +1381,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 987,
+   "line": 992,
    "runtime": "browser",
    "token": "H / N",
    "class": "comment",
@@ -1432,7 +1389,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 987,
+   "line": 992,
    "runtime": "browser",
    "token": "/ 13",
    "class": "comment",
@@ -1440,7 +1397,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 994,
+   "line": 999,
    "runtime": "browser",
    "token": "H / N",
    "class": "comment",
@@ -1448,7 +1405,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 1022,
+   "line": 1027,
    "runtime": "browser",
    "token": "H / N",
    "class": "comment",
@@ -1456,7 +1413,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 1022,
+   "line": 1027,
    "runtime": "browser",
    "token": "/ 13",
    "class": "comment",
@@ -1464,7 +1421,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 1034,
+   "line": 1039,
    "runtime": "browser",
    "token": "H / N",
    "class": "comment",
@@ -1472,7 +1429,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 1034,
+   "line": 1039,
    "runtime": "browser",
    "token": "/ 13",
    "class": "comment",
@@ -1480,7 +1437,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 1036,
+   "line": 1041,
    "runtime": "browser",
    "token": "H / N",
    "class": "comment",
@@ -1488,7 +1445,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 1057,
+   "line": 1062,
    "runtime": "browser",
    "token": "kDeviceWheelPhaseAtJ2000Cycles",
    "class": "comment",
@@ -1496,7 +1453,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 1058,
+   "line": 1063,
    "runtime": "browser",
    "token": "holisticyearLength",
    "class": "scene",
@@ -1505,7 +1462,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 1058,
+   "line": 1063,
    "runtime": "browser",
    "token": "kDeviceWheelPhaseAtJ2000Cycles",
    "class": "scene",
@@ -1514,7 +1471,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 1079,
+   "line": 1084,
    "runtime": "browser",
    "token": "H / N",
    "class": "comment",
@@ -1522,7 +1479,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 1129,
+   "line": 1134,
    "runtime": "browser",
    "token": "8H",
    "class": "comment",
@@ -1530,7 +1487,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 1133,
+   "line": 1138,
    "runtime": "browser",
    "token": "8H",
    "class": "comment",
@@ -1538,7 +1495,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 1135,
+   "line": 1140,
    "runtime": "browser",
    "token": "8H",
    "class": "comment",
@@ -1546,7 +1503,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 1143,
+   "line": 1148,
    "runtime": "browser",
    "token": "8H",
    "class": "comment",
@@ -1554,7 +1511,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 1144,
+   "line": 1149,
    "runtime": "browser",
    "token": "H / N",
    "class": "comment",
@@ -1562,7 +1519,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 1144,
+   "line": 1149,
    "runtime": "browser",
    "token": "/ 13",
    "class": "comment",
@@ -1570,7 +1527,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 1169,
+   "line": 1174,
    "runtime": "browser",
    "token": "holisticyearLength",
    "class": "counter",
@@ -1579,7 +1536,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 1348,
+   "line": 1353,
    "runtime": "browser",
    "token": "earthInvPlaneInclinationAmplitude",
    "class": "comment",
@@ -1587,7 +1544,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 1357,
+   "line": 1362,
    "runtime": "browser",
    "token": "earthInvPlaneInclinationAmplitude",
    "class": "comment",
@@ -1595,7 +1552,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 1373,
+   "line": 1378,
    "runtime": "browser",
    "token": "H / N",
    "class": "comment",
@@ -1603,7 +1560,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 1373,
+   "line": 1378,
    "runtime": "browser",
    "token": "/ 13",
    "class": "comment",
@@ -1611,7 +1568,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 1375,
+   "line": 1380,
    "runtime": "browser",
    "token": "H / N",
    "class": "comment",
@@ -1619,7 +1576,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 1375,
+   "line": 1380,
    "runtime": "browser",
    "token": "H / N",
    "class": "comment",
@@ -1627,7 +1584,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 1376,
+   "line": 1381,
    "runtime": "browser",
    "token": "8H",
    "class": "comment",
@@ -1635,7 +1592,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 1377,
+   "line": 1382,
    "runtime": "browser",
    "token": "8H",
    "class": "comment",
@@ -1643,7 +1600,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 1377,
+   "line": 1382,
    "runtime": "browser",
    "token": "8H",
    "class": "comment",
@@ -1651,7 +1608,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 1379,
+   "line": 1384,
    "runtime": "browser",
    "token": "holisticyearLength",
    "class": "comment",
@@ -1659,7 +1616,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 1659,
+   "line": 1664,
    "runtime": "browser",
    "token": "H / N",
    "class": "comment",
@@ -1667,7 +1624,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 1659,
+   "line": 1664,
    "runtime": "browser",
    "token": "/ 13",
    "class": "comment",
@@ -1675,7 +1632,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 1795,
+   "line": 1800,
    "runtime": "browser",
    "token": "holisticyearLength",
    "class": "comment",
@@ -1683,7 +1640,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 1795,
+   "line": 1800,
    "runtime": "browser",
    "token": "/ 13",
    "class": "comment",
@@ -1691,7 +1648,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 1818,
+   "line": 1823,
    "runtime": "browser",
    "token": "holisticyearLength",
    "class": "comment",
@@ -1699,7 +1656,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 2053,
+   "line": 2058,
    "runtime": "browser",
    "token": "holisticyearLength",
    "class": "counter",
@@ -1708,7 +1665,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 2303,
+   "line": 2308,
    "runtime": "browser",
    "token": "8H",
    "class": "comment",
@@ -1716,7 +1673,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 2387,
+   "line": 2392,
    "runtime": "browser",
    "token": "H / N",
    "class": "comment",
@@ -1724,7 +1681,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 2387,
+   "line": 2392,
    "runtime": "browser",
    "token": "/ 13",
    "class": "comment",
@@ -1732,7 +1689,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 2395,
+   "line": 2400,
    "runtime": "browser",
    "token": "holisticyearLength",
    "class": "comment",
@@ -1740,7 +1697,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 2401,
+   "line": 2406,
    "runtime": "browser",
    "token": "holisticyearLength",
    "class": "plumbing",
@@ -1749,7 +1706,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 2410,
+   "line": 2415,
    "runtime": "browser",
    "token": "holisticyearLength",
    "class": "comment",
@@ -1757,7 +1714,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 2453,
+   "line": 2458,
    "runtime": "browser",
    "token": "H / N",
    "class": "comment",
@@ -1765,7 +1722,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 2453,
+   "line": 2458,
    "runtime": "browser",
    "token": "/ 13",
    "class": "comment",
@@ -1773,7 +1730,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 2459,
+   "line": 2464,
    "runtime": "browser",
    "token": "8H",
    "class": "comment",
@@ -1781,7 +1738,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 2528,
+   "line": 2533,
    "runtime": "browser",
    "token": "holisticyearLength",
    "class": "calendar",
@@ -1790,7 +1747,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 2532,
+   "line": 2537,
    "runtime": "browser",
    "token": "8H",
    "class": "comment",
@@ -1798,7 +1755,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 2615,
+   "line": 2620,
    "runtime": "browser",
    "token": "H / N",
    "class": "comment",
@@ -1806,7 +1763,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 2615,
+   "line": 2620,
    "runtime": "browser",
    "token": "/ 13",
    "class": "comment",
@@ -1814,7 +1771,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 2618,
+   "line": 2623,
    "runtime": "browser",
    "token": "H / N",
    "class": "comment",
@@ -1822,7 +1779,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 2689,
+   "line": 2694,
    "runtime": "browser",
    "token": "H / N",
    "class": "comment",
@@ -1830,7 +1787,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 2689,
+   "line": 2694,
    "runtime": "browser",
    "token": "/ 13",
    "class": "comment",
@@ -1838,7 +1795,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 2705,
+   "line": 2710,
    "runtime": "browser",
    "token": "H / N",
    "class": "comment",
@@ -1846,7 +1803,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 2709,
+   "line": 2714,
    "runtime": "browser",
    "token": "H / N",
    "class": "comment",
@@ -1854,7 +1811,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 2717,
+   "line": 2722,
    "runtime": "browser",
    "token": "H / N",
    "class": "comment",
@@ -1862,7 +1819,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 2717,
+   "line": 2722,
    "runtime": "browser",
    "token": "/ 13",
    "class": "comment",
@@ -1870,7 +1827,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 2739,
+   "line": 2744,
    "runtime": "browser",
    "token": "H / N",
    "class": "comment",
@@ -1878,7 +1835,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 2746,
+   "line": 2751,
    "runtime": "browser",
    "token": "H / N",
    "class": "comment",
@@ -1886,7 +1843,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 2755,
+   "line": 2760,
    "runtime": "browser",
    "token": "/ 13",
    "class": "comment",
@@ -1894,7 +1851,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 2763,
+   "line": 2768,
    "runtime": "browser",
    "token": "H / N",
    "class": "comment",
@@ -1902,7 +1859,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 2798,
+   "line": 2803,
    "runtime": "browser",
    "token": "H / N",
    "class": "comment",
@@ -1910,7 +1867,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 2798,
+   "line": 2803,
    "runtime": "browser",
    "token": "/ 13",
    "class": "comment",
@@ -1918,7 +1875,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 2802,
+   "line": 2807,
    "runtime": "browser",
    "token": "eraClockHAtAge",
    "class": "counter",
@@ -1927,7 +1884,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 2803,
+   "line": 2808,
    "runtime": "browser",
    "token": "eraClockYearInDaysAtAge",
    "class": "counter",
@@ -1936,7 +1893,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 2823,
+   "line": 2828,
    "runtime": "browser",
    "token": "/ 13",
    "class": "comment",
@@ -1944,7 +1901,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 2828,
+   "line": 2833,
    "runtime": "browser",
    "token": "8H",
    "class": "comment",
@@ -1952,7 +1909,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 2833,
+   "line": 2838,
    "runtime": "browser",
    "token": "8H",
    "class": "comment",
@@ -1960,7 +1917,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 2840,
+   "line": 2845,
    "runtime": "browser",
    "token": "8H",
    "class": "comment",
@@ -1968,7 +1925,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 2888,
+   "line": 2893,
    "runtime": "browser",
    "token": "8H",
    "class": "comment",
@@ -1976,39 +1933,39 @@
   },
   {
    "file": "src/script.js",
-   "line": 2966,
+   "line": 2971,
    "runtime": "browser",
    "token": "H / N",
    "class": "comment",
    "text": "// HALLSTATT CYCLE ΔT CORRECTION (research toggle) — 8H/1104 = H/138 = 2430 yr"
-  },
-  {
-   "file": "src/script.js",
-   "line": 2966,
-   "runtime": "browser",
-   "token": "8H",
-   "class": "comment",
-   "text": "// HALLSTATT CYCLE ΔT CORRECTION (research toggle) — 8H/1104 = H/138 = 2430 yr"
-  },
-  {
-   "file": "src/script.js",
-   "line": 2969,
-   "runtime": "browser",
-   "token": "H / N",
-   "class": "comment",
-   "text": "//   Period 8H/1104 = H/138 = 2429.83 yr, with 1104 = 2⁴·3·23. Shares the H"
-  },
-  {
-   "file": "src/script.js",
-   "line": 2969,
-   "runtime": "browser",
-   "token": "8H",
-   "class": "comment",
-   "text": "//   Period 8H/1104 = H/138 = 2429.83 yr, with 1104 = 2⁴·3·23. Shares the H"
   },
   {
    "file": "src/script.js",
    "line": 2971,
+   "runtime": "browser",
+   "token": "8H",
+   "class": "comment",
+   "text": "// HALLSTATT CYCLE ΔT CORRECTION (research toggle) — 8H/1104 = H/138 = 2430 yr"
+  },
+  {
+   "file": "src/script.js",
+   "line": 2974,
+   "runtime": "browser",
+   "token": "H / N",
+   "class": "comment",
+   "text": "//   Period 8H/1104 = H/138 = 2429.83 yr, with 1104 = 2⁴·3·23. Shares the H"
+  },
+  {
+   "file": "src/script.js",
+   "line": 2974,
+   "runtime": "browser",
+   "token": "8H",
+   "class": "comment",
+   "text": "//   Period 8H/1104 = H/138 = 2429.83 yr, with 1104 = 2⁴·3·23. Shares the H"
+  },
+  {
+   "file": "src/script.js",
+   "line": 2976,
    "runtime": "browser",
    "token": "H / N",
    "class": "comment",
@@ -2016,7 +1973,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 2972,
+   "line": 2977,
    "runtime": "browser",
    "token": "H / N",
    "class": "comment",
@@ -2024,7 +1981,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 2982,
+   "line": 2987,
    "runtime": "browser",
    "token": "8H",
    "class": "comment",
@@ -2032,7 +1989,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 2986,
+   "line": 2991,
    "runtime": "browser",
    "token": "8H",
    "class": "comment",
@@ -2040,7 +1997,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 2988,
+   "line": 2993,
    "runtime": "browser",
    "token": "8H",
    "class": "comment",
@@ -2048,7 +2005,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 3035,
+   "line": 3040,
    "runtime": "browser",
    "token": "8H",
    "class": "comment",
@@ -2056,7 +2013,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 3038,
+   "line": 3043,
    "runtime": "browser",
    "token": "8H",
    "class": "comment",
@@ -2064,7 +2021,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 3043,
+   "line": 3048,
    "runtime": "browser",
    "token": "8H",
    "class": "comment",
@@ -2072,7 +2029,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 3050,
+   "line": 3055,
    "runtime": "browser",
    "token": "8H",
    "class": "comment",
@@ -2080,7 +2037,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 3095,
+   "line": 3100,
    "runtime": "browser",
    "token": "8H",
    "class": "comment",
@@ -2088,7 +2045,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 3095,
+   "line": 3100,
    "runtime": "browser",
    "token": "8H",
    "class": "comment",
@@ -2096,7 +2053,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 3103,
+   "line": 3108,
    "runtime": "browser",
    "token": "8H",
    "class": "comment",
@@ -2104,7 +2061,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 3110,
+   "line": 3115,
    "runtime": "browser",
    "token": "8H",
    "class": "comment",
@@ -2112,7 +2069,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 3133,
+   "line": 3138,
    "runtime": "browser",
    "token": "8H",
    "class": "comment",
@@ -2120,7 +2077,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 3158,
+   "line": 3163,
    "runtime": "browser",
    "token": "8H",
    "class": "comment",
@@ -2128,7 +2085,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 3166,
+   "line": 3171,
    "runtime": "browser",
    "token": "8H",
    "class": "comment",
@@ -2136,7 +2093,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 3210,
+   "line": 3215,
    "runtime": "browser",
    "token": "8H",
    "class": "comment",
@@ -2144,7 +2101,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 3213,
+   "line": 3218,
    "runtime": "browser",
    "token": "8H",
    "class": "comment",
@@ -2152,7 +2109,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 3234,
+   "line": 3239,
    "runtime": "browser",
    "token": "8H",
    "class": "comment",
@@ -2160,7 +2117,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 3238,
+   "line": 3243,
    "runtime": "browser",
    "token": "8H",
    "class": "comment",
@@ -2168,7 +2125,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 3260,
+   "line": 3265,
    "runtime": "browser",
    "token": "8H",
    "class": "comment",
@@ -2176,7 +2133,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 3263,
+   "line": 3268,
    "runtime": "browser",
    "token": "8H",
    "class": "comment",
@@ -2184,7 +2141,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 3297,
+   "line": 3302,
    "runtime": "browser",
    "token": "H / N",
    "class": "comment",
@@ -2192,7 +2149,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 3380,
+   "line": 3385,
    "runtime": "browser",
    "token": "8H",
    "class": "comment",
@@ -2200,7 +2157,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 3397,
+   "line": 3402,
    "runtime": "browser",
    "token": "H / N",
    "class": "comment",
@@ -2208,7 +2165,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 3424,
+   "line": 3429,
    "runtime": "browser",
    "token": "H / N",
    "class": "comment",
@@ -2216,43 +2173,11 @@
   },
   {
    "file": "src/script.js",
-   "line": 3426,
+   "line": 3431,
    "runtime": "browser",
    "token": "H / N",
    "class": "comment",
    "text": "*  H/5 kinematic LOD physics: raw H/5 = LOD_mean × (1 + 1/((H/5)·mSY))."
-  },
-  {
-   "file": "src/script.js",
-   "line": 3426,
-   "runtime": "browser",
-   "token": "H / N",
-   "class": "comment",
-   "text": "*  H/5 kinematic LOD physics: raw H/5 = LOD_mean × (1 + 1/((H/5)·mSY))."
-  },
-  {
-   "file": "src/script.js",
-   "line": 3426,
-   "runtime": "browser",
-   "token": "H / N",
-   "class": "comment",
-   "text": "*  H/5 kinematic LOD physics: raw H/5 = LOD_mean × (1 + 1/((H/5)·mSY))."
-  },
-  {
-   "file": "src/script.js",
-   "line": 3427,
-   "runtime": "browser",
-   "token": "H / N",
-   "class": "comment",
-   "text": "*  Near J2000 raw H/5 ≈ 86400.003 s > 86400 → ΔT was smaller in past →"
-  },
-  {
-   "file": "src/script.js",
-   "line": 3429,
-   "runtime": "browser",
-   "token": "H / N",
-   "class": "comment",
-   "text": "*  few decades to a century before J2000 where the raw H/5 LOD crosses 86400)"
   },
   {
    "file": "src/script.js",
@@ -2260,7 +2185,31 @@
    "runtime": "browser",
    "token": "H / N",
    "class": "comment",
-   "text": "*  This is the \"pure H/5 physics\" baseline curve, separate from the calibrated"
+   "text": "*  H/5 kinematic LOD physics: raw H/5 = LOD_mean × (1 + 1/((H/5)·mSY))."
+  },
+  {
+   "file": "src/script.js",
+   "line": 3431,
+   "runtime": "browser",
+   "token": "H / N",
+   "class": "comment",
+   "text": "*  H/5 kinematic LOD physics: raw H/5 = LOD_mean × (1 + 1/((H/5)·mSY))."
+  },
+  {
+   "file": "src/script.js",
+   "line": 3432,
+   "runtime": "browser",
+   "token": "H / N",
+   "class": "comment",
+   "text": "*  Near J2000 raw H/5 ≈ 86400.003 s > 86400 → ΔT was smaller in past →"
+  },
+  {
+   "file": "src/script.js",
+   "line": 3434,
+   "runtime": "browser",
+   "token": "H / N",
+   "class": "comment",
+   "text": "*  few decades to a century before J2000 where the raw H/5 LOD crosses 86400)"
   },
   {
    "file": "src/script.js",
@@ -2268,11 +2217,19 @@
    "runtime": "browser",
    "token": "H / N",
    "class": "comment",
+   "text": "*  This is the \"pure H/5 physics\" baseline curve, separate from the calibrated"
+  },
+  {
+   "file": "src/script.js",
+   "line": 3441,
+   "runtime": "browser",
+   "token": "H / N",
+   "class": "comment",
    "text": "// 8.4-3: identical to the shared module's raw integral (Simpson + H/5,"
   },
   {
    "file": "src/script.js",
-   "line": 3524,
+   "line": 3529,
    "runtime": "browser",
    "token": "_phaseCycles",
    "class": "comment",
@@ -2280,7 +2237,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 3524,
+   "line": 3529,
    "runtime": "browser",
    "token": "H / N",
    "class": "comment",
@@ -2288,7 +2245,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 3530,
+   "line": 3535,
    "runtime": "browser",
    "token": "H / N",
    "class": "comment",
@@ -2296,7 +2253,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 3560,
+   "line": 3565,
    "runtime": "browser",
    "token": "H / N",
    "class": "comment",
@@ -2304,7 +2261,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 3683,
+   "line": 3688,
    "runtime": "browser",
    "token": "H / N",
    "class": "comment",
@@ -2312,7 +2269,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 3708,
+   "line": 3713,
    "runtime": "browser",
    "token": "8H",
    "class": "comment",
@@ -2320,7 +2277,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 3741,
+   "line": 3746,
    "runtime": "browser",
    "token": "H / N",
    "class": "comment",
@@ -2328,7 +2285,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 3752,
+   "line": 3757,
    "runtime": "browser",
    "token": "8H",
    "class": "comment",
@@ -2336,7 +2293,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 3755,
+   "line": 3760,
    "runtime": "browser",
    "token": "8H",
    "class": "comment",
@@ -2344,7 +2301,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 4048,
+   "line": 4053,
    "runtime": "browser",
    "token": "cyclesBetween",
    "class": "comb",
@@ -2353,106 +2310,31 @@
   },
   {
    "file": "src/script.js",
-   "line": 4082,
-   "runtime": "browser",
-   "token": "8H",
-   "class": "comment",
-   "text": "// 8H-lattice lines + the labeled OFF-lattice 405-kyr g2−g5 term (L2 taxonomy)."
-  },
-  {
-   "file": "src/script.js",
-   "line": 4090,
+   "line": 4083,
    "runtime": "browser",
    "token": "H / N",
    "class": "comment",
-   "text": "// fully-derived H/3 fluctuation line (_FW_ECC/_fwEarthEcc below), which now"
+   "text": "// (Plan 09 step 6: the H/3 eccentricity law — `_moonEcc`/`_fwEarthEcc` on"
   },
   {
    "file": "src/script.js",
-   "line": 4121,
+   "line": 4095,
    "runtime": "browser",
    "token": "H / N",
    "class": "comment",
-   "text": "*  θ₃ is the H/3 inclination-cycle phase on the System-Reset anchor"
+   "text": "*  the H/3 channel that once stood beside it is deleted (plan 09 step 6). */"
   },
   {
    "file": "src/script.js",
-   "line": 4122,
-   "runtime": "browser",
-   "token": "earthInclinationCycleAnchor",
-   "class": "comment",
-   "text": "*  (θ₃(J2000) = ϖ_ICRF(J2000) − earthInclinationCycleAnchor ≈ 81.18°), so"
-  },
-  {
-   "file": "src/script.js",
-   "line": 4130,
+   "line": 4100,
    "runtime": "browser",
    "token": "H / N",
    "class": "comment",
-   "text": "*  earthEccDotJ2000). The H/16 perihelion cycle is the DIRECTION ϖ of the"
+   "text": "// (plan 09 step 6: `computeEccentricityEarthAtYear` — the H/3 law at a decimal"
   },
   {
    "file": "src/script.js",
-   "line": 4132,
-   "runtime": "browser",
-   "token": "cyclesBetweenYears",
-   "class": "comment",
-   "text": "*  cyclesBetweenYears (integrated ∫3/H(t)dt when on)."
-  },
-  {
-   "file": "src/script.js",
-   "line": 4135,
-   "runtime": "browser",
-   "token": "cyclesBetweenYears",
-   "class": "comment",
-   "text": "*  delegates, injecting its OWN cyclesBetweenYears so the deep-time /"
-  },
-  {
-   "file": "src/script.js",
-   "line": 4143,
-   "runtime": "browser",
-   "token": "cyclesBetweenYears",
-   "class": "comb",
-   "text": "cyclesBetween: cyclesBetweenYears,",
-   "twin": "era-counter"
-  },
-  {
-   "file": "src/script.js",
-   "line": 4143,
-   "runtime": "browser",
-   "token": "cyclesBetween",
-   "class": "comb",
-   "text": "cyclesBetween: cyclesBetweenYears,",
-   "twin": "era-counter"
-  },
-  {
-   "file": "src/script.js",
-   "line": 4146,
-   "runtime": "browser",
-   "token": "earthInclinationCycleAnchor",
-   "class": "plumbing",
-   "text": "inclinationCycleAnchorDeg: earthInclinationCycleAnchor,",
-   "twin": "plumbing"
-  },
-  {
-   "file": "src/script.js",
-   "line": 4162,
-   "runtime": "browser",
-   "token": "H / N",
-   "class": "comment",
-   "text": "*  braid) stays on the H/3 channel — a certification split, not a physics"
-  },
-  {
-   "file": "src/script.js",
-   "line": 4168,
-   "runtime": "browser",
-   "token": "H / N",
-   "class": "comment",
-   "text": "/** Earth's eccentricity at a decimal year — the H/3 law (the epoch-local"
-  },
-  {
-   "file": "src/script.js",
-   "line": 4216,
+   "line": 4145,
    "runtime": "browser",
    "token": "H / N",
    "class": "comment",
@@ -2460,7 +2342,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 4216,
+   "line": 4145,
    "runtime": "browser",
    "token": "H / N",
    "class": "comment",
@@ -2468,7 +2350,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 4222,
+   "line": 4151,
    "runtime": "browser",
    "token": "H / N",
    "class": "comment",
@@ -2476,7 +2358,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 4226,
+   "line": 4155,
    "runtime": "browser",
    "token": "H / N",
    "class": "comment",
@@ -2484,7 +2366,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 4268,
+   "line": 4197,
    "runtime": "browser",
    "token": "H / N",
    "class": "comment",
@@ -2492,7 +2374,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 4411,
+   "line": 4340,
    "runtime": "browser",
    "token": "holisticyearLength",
    "class": "calendar",
@@ -2501,7 +2383,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 4427,
+   "line": 4356,
    "runtime": "browser",
    "token": "H / N",
    "class": "comment",
@@ -2509,7 +2391,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 4430,
+   "line": 4359,
    "runtime": "browser",
    "token": "H / N",
    "class": "comment",
@@ -2517,7 +2399,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 4433,
+   "line": 4362,
    "runtime": "browser",
    "token": "holisticyearLength",
    "class": "comment",
@@ -2525,7 +2407,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 4447,
+   "line": 4376,
    "runtime": "browser",
    "token": "kDeviceWheelPhaseAtJ2000Cycles",
    "class": "scene",
@@ -2534,7 +2416,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 4455,
+   "line": 4384,
    "runtime": "browser",
    "token": "H / N",
    "class": "comment",
@@ -2542,7 +2424,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 4455,
+   "line": 4384,
    "runtime": "browser",
    "token": "/ 13",
    "class": "comment",
@@ -2550,7 +2432,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 4459,
+   "line": 4388,
    "runtime": "browser",
    "token": "H / N",
    "class": "comment",
@@ -2558,7 +2440,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 4459,
+   "line": 4388,
    "runtime": "browser",
    "token": "/ 13",
    "class": "comment",
@@ -2566,7 +2448,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 4462,
+   "line": 4391,
    "runtime": "browser",
    "token": "H / N",
    "class": "comment",
@@ -2574,7 +2456,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 4508,
+   "line": 4437,
    "runtime": "browser",
    "token": "cyclesBetweenYears",
    "class": "comment",
@@ -2582,7 +2464,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 4527,
+   "line": 4456,
    "runtime": "browser",
    "token": "eraClockHAtAge",
    "class": "counter",
@@ -2591,7 +2473,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 4527,
+   "line": 4456,
    "runtime": "browser",
    "token": "holisticHAtAgeMa",
    "class": "counter",
@@ -2600,7 +2482,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 4759,
+   "line": 4688,
    "runtime": "browser",
    "token": "cyclesBetweenYears",
    "class": "comment",
@@ -2608,7 +2490,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 4768,
+   "line": 4697,
    "runtime": "browser",
    "token": "H / N",
    "class": "comment",
@@ -2616,7 +2498,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 4777,
+   "line": 4706,
    "runtime": "browser",
    "token": "cyclesBetweenYears",
    "class": "comb",
@@ -2625,7 +2507,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 4781,
+   "line": 4710,
    "runtime": "browser",
    "token": "cyclesBetween",
    "class": "comb",
@@ -2634,7 +2516,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 4785,
+   "line": 4714,
    "runtime": "browser",
    "token": "holisticyearLength",
    "class": "comb",
@@ -2643,7 +2525,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 4788,
+   "line": 4717,
    "runtime": "browser",
    "token": "cyclesBetweenYears",
    "class": "comment",
@@ -2651,7 +2533,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 4796,
+   "line": 4725,
    "runtime": "browser",
    "token": "cyclesBetweenYears",
    "class": "comment",
@@ -2659,7 +2541,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 4835,
+   "line": 4764,
    "runtime": "browser",
    "token": "8H",
    "class": "comment",
@@ -2667,7 +2549,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 4844,
+   "line": 4773,
    "runtime": "browser",
    "token": "H / N",
    "class": "comment",
@@ -2675,7 +2557,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 4845,
+   "line": 4774,
    "runtime": "browser",
    "token": "H / N",
    "class": "comment",
@@ -2683,7 +2565,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 5027,
+   "line": 4956,
    "runtime": "browser",
    "token": "8H",
    "class": "comment",
@@ -2691,7 +2573,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 5053,
+   "line": 4982,
    "runtime": "browser",
    "token": "holisticyearLength",
    "class": "counter",
@@ -2700,7 +2582,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 5053,
+   "line": 4982,
    "runtime": "browser",
    "token": "/ 13",
    "class": "counter",
@@ -2709,7 +2591,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 5137,
+   "line": 5066,
    "runtime": "browser",
    "token": "kDeviceWheelPhaseAtJ2000Cycles",
    "class": "comment",
@@ -2717,7 +2599,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 5144,
+   "line": 5073,
    "runtime": "browser",
    "token": "H / N",
    "class": "comment",
@@ -2725,7 +2607,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 5147,
+   "line": 5076,
    "runtime": "browser",
    "token": "H / N",
    "class": "comment",
@@ -2733,7 +2615,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 5150,
+   "line": 5079,
    "runtime": "browser",
    "token": "H / N",
    "class": "comment",
@@ -2741,7 +2623,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 5153,
+   "line": 5082,
    "runtime": "browser",
    "token": "H / N",
    "class": "comment",
@@ -2749,7 +2631,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 5189,
+   "line": 5118,
    "runtime": "browser",
    "token": "8H",
    "class": "comment",
@@ -2757,7 +2639,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 5207,
+   "line": 5136,
    "runtime": "browser",
    "token": "holisticyearLength",
    "class": "scene",
@@ -2766,7 +2648,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 5214,
+   "line": 5143,
    "runtime": "browser",
    "token": "holisticyearLength",
    "class": "comment",
@@ -2774,7 +2656,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 5216,
+   "line": 5145,
    "runtime": "browser",
    "token": "holisticyearLength",
    "class": "scene",
@@ -2783,7 +2665,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 5221,
+   "line": 5150,
    "runtime": "browser",
    "token": "holisticyearLength",
    "class": "scene",
@@ -2792,7 +2674,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 5227,
+   "line": 5156,
    "runtime": "browser",
    "token": "holisticyearLength",
    "class": "scene",
@@ -2801,7 +2683,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 5233,
+   "line": 5162,
    "runtime": "browser",
    "token": "holisticyearLength",
    "class": "scene",
@@ -2810,7 +2692,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 5239,
+   "line": 5168,
    "runtime": "browser",
    "token": "holisticyearLength",
    "class": "scene",
@@ -2819,7 +2701,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 5245,
+   "line": 5174,
    "runtime": "browser",
    "token": "holisticyearLength",
    "class": "scene",
@@ -2828,7 +2710,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 5251,
+   "line": 5180,
    "runtime": "browser",
    "token": "holisticyearLength",
    "class": "scene",
@@ -2837,7 +2719,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 5291,
+   "line": 5220,
    "runtime": "browser",
    "token": "cyclesBetweenYears",
    "class": "comment",
@@ -2845,7 +2727,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 5302,
+   "line": 5231,
    "runtime": "browser",
    "token": "cyclesBetweenYears",
    "class": "comment",
@@ -2853,7 +2735,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 5321,
+   "line": 5250,
    "runtime": "browser",
    "token": "cyclesBetweenYears",
    "class": "comment",
@@ -2861,7 +2743,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 5360,
+   "line": 5289,
    "runtime": "browser",
    "token": "cyclesBetweenYears",
    "class": "comment",
@@ -2869,7 +2751,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 5368,
+   "line": 5297,
    "runtime": "browser",
    "token": "cyclesBetweenYears",
    "class": "comment",
@@ -2877,7 +2759,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 5373,
+   "line": 5302,
    "runtime": "browser",
    "token": "H / N",
    "class": "comment",
@@ -2885,7 +2767,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 5376,
+   "line": 5305,
    "runtime": "browser",
    "token": "H / N",
    "class": "comment",
@@ -2893,7 +2775,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 5376,
+   "line": 5305,
    "runtime": "browser",
    "token": "H / N",
    "class": "comment",
@@ -2901,7 +2783,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 5376,
+   "line": 5305,
    "runtime": "browser",
    "token": "H / N",
    "class": "comment",
@@ -2909,7 +2791,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 5450,
+   "line": 5379,
    "runtime": "browser",
    "token": "H / N",
    "class": "comment",
@@ -2917,7 +2799,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 5527,
+   "line": 5456,
    "runtime": "browser",
    "token": "8H",
    "class": "comment",
@@ -2925,7 +2807,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 5553,
+   "line": 5482,
    "runtime": "browser",
    "token": "holisticyearLength",
    "class": "unclassified",
@@ -2934,7 +2816,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 5622,
+   "line": 5551,
    "runtime": "browser",
    "token": "holisticyearLength",
    "class": "plumbing",
@@ -2943,7 +2825,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 6589,
+   "line": 6517,
    "runtime": "browser",
    "token": "H / N",
    "class": "comment",
@@ -2951,7 +2833,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 6589,
+   "line": 6517,
    "runtime": "browser",
    "token": "/ 13",
    "class": "comment",
@@ -2959,7 +2841,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 6590,
+   "line": 6518,
    "runtime": "browser",
    "token": "H / N",
    "class": "comment",
@@ -2967,7 +2849,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 6590,
+   "line": 6518,
    "runtime": "browser",
    "token": "/ 13",
    "class": "comment",
@@ -2975,7 +2857,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 6597,
+   "line": 6525,
    "runtime": "browser",
    "token": "H / N",
    "class": "comment",
@@ -2983,7 +2865,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 6599,
+   "line": 6527,
    "runtime": "browser",
    "token": "H / N",
    "class": "comment",
@@ -2991,7 +2873,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 6604,
+   "line": 6532,
    "runtime": "browser",
    "token": "holisticyearLength",
    "class": "counter",
@@ -3000,7 +2882,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 6604,
+   "line": 6532,
    "runtime": "browser",
    "token": "/ 13",
    "class": "counter",
@@ -3009,7 +2891,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 6632,
+   "line": 6560,
    "runtime": "browser",
    "token": "holisticyearLength",
    "class": "counter",
@@ -3018,7 +2900,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 6632,
+   "line": 6560,
    "runtime": "browser",
    "token": "/ 13",
    "class": "counter",
@@ -3027,7 +2909,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 6643,
+   "line": 6571,
    "runtime": "browser",
    "token": "earthtiltMean",
    "class": "scene",
@@ -3036,7 +2918,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 6645,
+   "line": 6573,
    "runtime": "browser",
    "token": "H / N",
    "class": "comment",
@@ -3044,7 +2926,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 6645,
+   "line": 6573,
    "runtime": "browser",
    "token": "/ 13",
    "class": "comment",
@@ -3052,7 +2934,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 6674,
+   "line": 6602,
    "runtime": "browser",
    "token": "kDeviceWheelPhaseAtJ2000Cycles",
    "class": "comment",
@@ -3060,7 +2942,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 6680,
+   "line": 6608,
    "runtime": "browser",
    "token": "kDeviceWheelPhaseAtJ2000Cycles",
    "class": "scene",
@@ -3069,7 +2951,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 6718,
+   "line": 6646,
    "runtime": "browser",
    "token": "earthInvPlaneInclinationAmplitude",
    "class": "scene",
@@ -3078,7 +2960,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 6732,
+   "line": 6660,
    "runtime": "browser",
    "token": "H / N",
    "class": "comment",
@@ -3086,7 +2968,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 6741,
+   "line": 6669,
    "runtime": "browser",
    "token": "earthInvPlaneInclinationAmplitude",
    "class": "scene",
@@ -3095,7 +2977,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 6828,
+   "line": 6756,
    "runtime": "browser",
    "token": "cyclesBetween",
    "class": "comment",
@@ -3103,7 +2985,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 6832,
+   "line": 6760,
    "runtime": "browser",
    "token": "cyclesBetween",
    "class": "comment",
@@ -3111,7 +2993,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 6862,
+   "line": 6790,
    "runtime": "browser",
    "token": "H / N",
    "class": "comment",
@@ -3119,7 +3001,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 6862,
+   "line": 6790,
    "runtime": "browser",
    "token": "/ 13",
    "class": "comment",
@@ -3127,7 +3009,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 6926,
+   "line": 6854,
    "runtime": "browser",
    "token": "holisticyearLength",
    "class": "scene",
@@ -3136,7 +3018,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 6926,
+   "line": 6854,
    "runtime": "browser",
    "token": "H / N",
    "class": "comment",
@@ -3144,7 +3026,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 6942,
+   "line": 6870,
    "runtime": "browser",
    "token": "H / N",
    "class": "comment",
@@ -3152,7 +3034,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 7223,
+   "line": 7151,
    "runtime": "browser",
    "token": "holisticyearLength",
    "class": "scene",
@@ -3161,7 +3043,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 7226,
+   "line": 7154,
    "runtime": "browser",
    "token": "holisticyearLength",
    "class": "scene",
@@ -3170,7 +3052,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 7238,
+   "line": 7166,
    "runtime": "browser",
    "token": "holisticyearLength",
    "class": "scene",
@@ -3179,7 +3061,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 7331,
+   "line": 7259,
    "runtime": "browser",
    "token": "holisticyearLength",
    "class": "scene",
@@ -3188,7 +3070,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 7334,
+   "line": 7262,
    "runtime": "browser",
    "token": "holisticyearLength",
    "class": "scene",
@@ -3197,7 +3079,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 7342,
+   "line": 7270,
    "runtime": "browser",
    "token": "holisticyearLength",
    "class": "scene",
@@ -3206,7 +3088,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 7389,
+   "line": 7317,
    "runtime": "browser",
    "token": "holisticyearLength",
    "class": "scene",
@@ -3215,7 +3097,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 7418,
+   "line": 7346,
    "runtime": "browser",
    "token": "holisticyearLength",
    "class": "scene",
@@ -3224,7 +3106,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 7441,
+   "line": 7369,
    "runtime": "browser",
    "token": "holisticyearLength",
    "class": "scene",
@@ -3233,7 +3115,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 7444,
+   "line": 7372,
    "runtime": "browser",
    "token": "holisticyearLength",
    "class": "scene",
@@ -3242,7 +3124,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 7452,
+   "line": 7380,
    "runtime": "browser",
    "token": "holisticyearLength",
    "class": "scene",
@@ -3251,7 +3133,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 7549,
+   "line": 7477,
    "runtime": "browser",
    "token": "holisticyearLength",
    "class": "scene",
@@ -3260,7 +3142,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 7552,
+   "line": 7480,
    "runtime": "browser",
    "token": "holisticyearLength",
    "class": "scene",
@@ -3269,7 +3151,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 7560,
+   "line": 7488,
    "runtime": "browser",
    "token": "holisticyearLength",
    "class": "scene",
@@ -3278,7 +3160,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 7662,
+   "line": 7590,
    "runtime": "browser",
    "token": "holisticyearLength",
    "class": "scene",
@@ -3287,7 +3169,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 7665,
+   "line": 7593,
    "runtime": "browser",
    "token": "holisticyearLength",
    "class": "scene",
@@ -3296,7 +3178,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 7673,
+   "line": 7601,
    "runtime": "browser",
    "token": "holisticyearLength",
    "class": "scene",
@@ -3305,7 +3187,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 7775,
+   "line": 7703,
    "runtime": "browser",
    "token": "holisticyearLength",
    "class": "scene",
@@ -3314,7 +3196,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 7778,
+   "line": 7706,
    "runtime": "browser",
    "token": "holisticyearLength",
    "class": "scene",
@@ -3323,7 +3205,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 7786,
+   "line": 7714,
    "runtime": "browser",
    "token": "holisticyearLength",
    "class": "scene",
@@ -3332,7 +3214,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 7888,
+   "line": 7816,
    "runtime": "browser",
    "token": "holisticyearLength",
    "class": "scene",
@@ -3341,7 +3223,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 7891,
+   "line": 7819,
    "runtime": "browser",
    "token": "holisticyearLength",
    "class": "scene",
@@ -3350,7 +3232,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 7899,
+   "line": 7827,
    "runtime": "browser",
    "token": "holisticyearLength",
    "class": "scene",
@@ -3359,7 +3241,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 7978,
+   "line": 7906,
    "runtime": "browser",
    "token": "cyclesBetweenYears",
    "class": "comment",
@@ -3367,7 +3249,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 8084,
+   "line": 8012,
    "runtime": "browser",
    "token": "cyclesBetweenYears",
    "class": "comment",
@@ -3375,7 +3257,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 8085,
+   "line": 8013,
    "runtime": "browser",
    "token": "8H",
    "class": "comment",
@@ -3383,7 +3265,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 8584,
+   "line": 8512,
    "runtime": "browser",
    "token": "holisticyearLength",
    "class": "comment",
@@ -3391,7 +3273,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 8700,
+   "line": 8628,
    "runtime": "browser",
    "token": "8H",
    "class": "comment",
@@ -3399,7 +3281,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 8703,
+   "line": 8631,
    "runtime": "browser",
    "token": "H / N",
    "class": "comment",
@@ -3407,7 +3289,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 8704,
+   "line": 8632,
    "runtime": "browser",
    "token": "H / N",
    "class": "comment",
@@ -3415,7 +3297,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 8997,
+   "line": 8925,
    "runtime": "browser",
    "token": "H / N",
    "class": "comment",
@@ -3423,7 +3305,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 8997,
+   "line": 8925,
    "runtime": "browser",
    "token": "/ 13",
    "class": "comment",
@@ -3431,7 +3313,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 9576,
+   "line": 9504,
    "runtime": "browser",
    "token": "H / N",
    "class": "comment",
@@ -3439,7 +3321,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 9586,
+   "line": 9514,
    "runtime": "browser",
    "token": "holisticyearLength",
    "class": "comment",
@@ -3447,7 +3329,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 9652,
+   "line": 9580,
    "runtime": "browser",
    "token": "H / N",
    "class": "comment",
@@ -3455,7 +3337,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 9912,
+   "line": 9840,
    "runtime": "browser",
    "token": "H / N",
    "class": "comment",
@@ -3463,7 +3345,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 10436,
+   "line": 10364,
    "runtime": "browser",
    "token": "holisticyearLength",
    "class": "comment",
@@ -3471,7 +3353,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 10455,
+   "line": 10383,
    "runtime": "browser",
    "token": "H / N",
    "class": "comment",
@@ -3479,7 +3361,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 10555,
+   "line": 10483,
    "runtime": "browser",
    "token": "holisticyearLength",
    "class": "comment",
@@ -3487,7 +3369,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 10556,
+   "line": 10484,
    "runtime": "browser",
    "token": "holisticyearLength",
    "class": "comment",
@@ -3495,7 +3377,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 10773,
+   "line": 10701,
    "runtime": "browser",
    "token": "H / N",
    "class": "comment",
@@ -3503,7 +3385,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 10969,
+   "line": 10897,
    "runtime": "browser",
    "token": "holisticyearLength",
    "class": "comment",
@@ -3511,7 +3393,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 14014,
+   "line": 13942,
    "runtime": "browser",
    "token": "holisticyearLength",
    "class": "plumbing",
@@ -3520,7 +3402,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 14105,
+   "line": 14033,
    "runtime": "browser",
    "token": "H / N",
    "class": "comment",
@@ -3528,7 +3410,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 15831,
+   "line": 15759,
    "runtime": "browser",
    "token": "H / N",
    "class": "comment",
@@ -3536,7 +3418,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 15831,
+   "line": 15759,
    "runtime": "browser",
    "token": "/ 13",
    "class": "comment",
@@ -3544,7 +3426,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 15941,
+   "line": 15869,
    "runtime": "browser",
    "token": "H / N",
    "class": "comment",
@@ -3552,7 +3434,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 15941,
+   "line": 15869,
    "runtime": "browser",
    "token": "/ 13",
    "class": "comment",
@@ -3560,7 +3442,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 16720,
+   "line": 16648,
    "runtime": "browser",
    "token": "8H",
    "class": "comment",
@@ -3568,7 +3450,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 18443,
+   "line": 18371,
    "runtime": "browser",
    "token": "H / N",
    "class": "comment",
@@ -3576,7 +3458,15 @@
   },
   {
    "file": "src/script.js",
-   "line": 18455,
+   "line": 18380,
+   "runtime": "browser",
+   "token": "H / N",
+   "class": "comment",
+   "text": "return ASTRO_REFERENCE.eccentricityJ2000;   // plan 09 step 6: before the series artifact arrives, the J2000 pose (the H/3 law is deleted)"
+  },
+  {
+   "file": "src/script.js",
+   "line": 18383,
    "runtime": "browser",
    "token": "H / N",
    "class": "comment",
@@ -3584,7 +3474,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 18602,
+   "line": 18530,
    "runtime": "browser",
    "token": "H / N",
    "class": "comment",
@@ -3592,7 +3482,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 18692,
+   "line": 18620,
    "runtime": "browser",
    "token": "H / N",
    "class": "comment",
@@ -3600,7 +3490,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 18692,
+   "line": 18620,
    "runtime": "browser",
    "token": "/ 13",
    "class": "comment",
@@ -3608,7 +3498,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 18694,
+   "line": 18622,
    "runtime": "browser",
    "token": "H / N",
    "class": "comment",
@@ -3616,7 +3506,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 18695,
+   "line": 18623,
    "runtime": "browser",
    "token": "H / N",
    "class": "comment",
@@ -3624,7 +3514,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 18820,
+   "line": 18748,
    "runtime": "browser",
    "token": "H / N",
    "class": "comment",
@@ -3632,7 +3522,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 18835,
+   "line": 18763,
    "runtime": "browser",
    "token": "H / N",
    "class": "comment",
@@ -3640,7 +3530,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 18842,
+   "line": 18770,
    "runtime": "browser",
    "token": "H / N",
    "class": "comment",
@@ -3648,7 +3538,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 18847,
+   "line": 18775,
    "runtime": "browser",
    "token": "H / N",
    "class": "comment",
@@ -3656,7 +3546,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 18912,
+   "line": 18840,
    "runtime": "browser",
    "token": "H / N",
    "class": "comment",
@@ -3664,7 +3554,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 18912,
+   "line": 18840,
    "runtime": "browser",
    "token": "/ 13",
    "class": "comment",
@@ -3672,7 +3562,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 19045,
+   "line": 18973,
    "runtime": "browser",
    "token": "H / N",
    "class": "comment",
@@ -3680,7 +3570,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 19747,
+   "line": 19675,
    "runtime": "browser",
    "token": "H / N",
    "class": "comment",
@@ -3688,7 +3578,15 @@
   },
   {
    "file": "src/script.js",
-   "line": 23381,
+   "line": 19687,
+   "runtime": "browser",
+   "token": "H / N",
+   "class": "comment",
+   "text": "return ASTRO_REFERENCE.eccentricityJ2000;   // plan 09 step 6: before the series artifact arrives, the J2000 pose (the H/3 law is deleted)"
+  },
+  {
+   "file": "src/script.js",
+   "line": 23309,
    "runtime": "browser",
    "token": "holisticyearLength",
    "class": "scene",
@@ -3697,7 +3595,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 23383,
+   "line": 23311,
    "runtime": "browser",
    "token": "earthtiltMean",
    "class": "scene",
@@ -3706,7 +3604,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 23385,
+   "line": 23313,
    "runtime": "browser",
    "token": "earthInvPlaneInclinationAmplitude",
    "class": "scene",
@@ -3715,16 +3613,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 23387,
-   "runtime": "browser",
-   "token": "earthInclinationCycleAnchor",
-   "class": "comb",
-   "text": "row('The eccentricity line\\u2019s phase anchor \\u00B7 ' + earthInclinationCycleAnchor + '\\u00B0',",
-   "twin": "ecc-law-anchor"
-  },
-  {
-   "file": "src/script.js",
-   "line": 23389,
+   "line": 23317,
    "runtime": "browser",
    "token": "kDeviceWheelPhaseAtJ2000Cycles",
    "class": "scene",
@@ -3733,16 +3622,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 23420,
-   "runtime": "browser",
-   "token": "earthInclinationCycleAnchor",
-   "class": "comb",
-   "text": "ciPhaseAngle: fmtDeg(earthInclinationCycleAnchor),",
-   "twin": "ecc-law-anchor"
-  },
-  {
-   "file": "src/script.js",
-   "line": 23915,
+   "line": 23843,
    "runtime": "browser",
    "token": "H / N",
    "class": "comment",
@@ -3750,7 +3630,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 24577,
+   "line": 24505,
    "runtime": "browser",
    "token": "H / N",
    "class": "comment",
@@ -3758,7 +3638,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 24963,
+   "line": 24891,
    "runtime": "browser",
    "token": "holisticyearLength",
    "class": "export",
@@ -3766,7 +3646,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 24965,
+   "line": 24893,
    "runtime": "browser",
    "token": "holisticyearLength",
    "class": "export",
@@ -3774,7 +3654,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 24966,
+   "line": 24894,
    "runtime": "browser",
    "token": "holisticyearLength",
    "class": "export",
@@ -3782,7 +3662,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 24967,
+   "line": 24895,
    "runtime": "browser",
    "token": "holisticyearLength",
    "class": "export",
@@ -3790,7 +3670,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 24971,
+   "line": 24899,
    "runtime": "browser",
    "token": "holisticyearLength",
    "class": "export",
@@ -3798,7 +3678,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 24978,
+   "line": 24906,
    "runtime": "browser",
    "token": "holisticyearLength",
    "class": "display",
@@ -3806,7 +3686,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 25210,
+   "line": 25138,
    "runtime": "browser",
    "token": "8H",
    "class": "comment",
@@ -3814,7 +3694,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 25454,
+   "line": 25382,
    "runtime": "browser",
    "token": "H / N",
    "class": "display",
@@ -3822,7 +3702,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 25456,
+   "line": 25384,
    "runtime": "browser",
    "token": "H / N",
    "class": "display",
@@ -3830,7 +3710,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 25473,
+   "line": 25401,
    "runtime": "browser",
    "token": "H / N",
    "class": "comment",
@@ -3838,7 +3718,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 25489,
+   "line": 25417,
    "runtime": "browser",
    "token": "H / N",
    "class": "comment",
@@ -3846,7 +3726,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 25513,
+   "line": 25441,
    "runtime": "browser",
    "token": "H / N",
    "class": "display",
@@ -3854,7 +3734,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 25515,
+   "line": 25443,
    "runtime": "browser",
    "token": "H / N",
    "class": "display",
@@ -3862,7 +3742,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 26039,
+   "line": 25967,
    "runtime": "browser",
    "token": "H / N",
    "class": "comment",
@@ -3870,7 +3750,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 26208,
+   "line": 26136,
    "runtime": "browser",
    "token": "H / N",
    "class": "display",
@@ -3878,7 +3758,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 32130,
+   "line": 32058,
    "runtime": "browser",
    "token": "8H",
    "class": "comment",
@@ -3886,7 +3766,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 32891,
+   "line": 32819,
    "runtime": "browser",
    "token": "holisticyearLength",
    "class": "plumbing",
@@ -3895,7 +3775,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 32898,
+   "line": 32826,
    "runtime": "browser",
    "token": "H / N",
    "class": "comment",
@@ -3903,7 +3783,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 32898,
+   "line": 32826,
    "runtime": "browser",
    "token": "H / N",
    "class": "comment",
@@ -3911,7 +3791,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 32898,
+   "line": 32826,
    "runtime": "browser",
    "token": "8H",
    "class": "comment",
@@ -3919,7 +3799,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 32898,
+   "line": 32826,
    "runtime": "browser",
    "token": "8H",
    "class": "comment",
@@ -3927,7 +3807,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 32898,
+   "line": 32826,
    "runtime": "browser",
    "token": "8H",
    "class": "comment",
@@ -3935,7 +3815,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 32898,
+   "line": 32826,
    "runtime": "browser",
    "token": "/ 13",
    "class": "comment",
@@ -3943,7 +3823,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 33173,
+   "line": 33101,
    "runtime": "browser",
    "token": "H / N",
    "class": "comment",
@@ -3951,7 +3831,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 33173,
+   "line": 33101,
    "runtime": "browser",
    "token": "/ 13",
    "class": "comment",
@@ -3959,7 +3839,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 33729,
+   "line": 33657,
    "runtime": "browser",
    "token": "holisticyearLength",
    "class": "plumbing",
@@ -3968,7 +3848,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 33730,
+   "line": 33658,
    "runtime": "browser",
    "token": "EIGHT_H",
    "class": "unclassified",
@@ -3977,7 +3857,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 33732,
+   "line": 33660,
    "runtime": "browser",
    "token": "EIGHT_H",
    "class": "unclassified",
@@ -3986,7 +3866,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 33733,
+   "line": 33661,
    "runtime": "browser",
    "token": "EIGHT_H",
    "class": "unclassified",
@@ -3995,7 +3875,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 34555,
+   "line": 34483,
    "runtime": "browser",
    "token": "H / N",
    "class": "comb",
@@ -4004,7 +3884,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 34844,
+   "line": 34772,
    "runtime": "browser",
    "token": "H / N",
    "class": "comment",
@@ -4012,7 +3892,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 35612,
+   "line": 35540,
    "runtime": "browser",
    "token": "H / N",
    "class": "comment",
@@ -4020,7 +3900,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 35613,
+   "line": 35541,
    "runtime": "browser",
    "token": "H / N",
    "class": "comment",
@@ -4028,7 +3908,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 35730,
+   "line": 35658,
    "runtime": "browser",
    "token": "H / N",
    "class": "comment",
@@ -4036,7 +3916,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 35730,
+   "line": 35658,
    "runtime": "browser",
    "token": "/ 13",
    "class": "comment",
@@ -4044,7 +3924,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 35750,
+   "line": 35678,
    "runtime": "browser",
    "token": "H / N",
    "class": "comment",
@@ -4052,7 +3932,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 35751,
+   "line": 35679,
    "runtime": "browser",
    "token": "H / N",
    "class": "comment",
@@ -4060,7 +3940,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 35852,
+   "line": 35780,
    "runtime": "browser",
    "token": "H / N",
    "class": "comment",
@@ -4068,7 +3948,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 35955,
+   "line": 35883,
    "runtime": "browser",
    "token": "H / N",
    "class": "comment",
@@ -4076,7 +3956,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 36187,
+   "line": 36115,
    "runtime": "browser",
    "token": "cyclesBetweenYears",
    "class": "comment",
@@ -4084,7 +3964,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 36192,
+   "line": 36120,
    "runtime": "browser",
    "token": "H / N",
    "class": "comment",
@@ -4092,7 +3972,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 36485,
+   "line": 36413,
    "runtime": "browser",
    "token": "H / N",
    "class": "comment",
@@ -4100,7 +3980,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 36700,
+   "line": 36628,
    "runtime": "browser",
    "token": "H / N",
    "class": "comment",
@@ -4108,7 +3988,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 36774,
+   "line": 36702,
    "runtime": "browser",
    "token": "H / N",
    "class": "comment",
@@ -4116,7 +3996,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 37065,
+   "line": 36993,
    "runtime": "browser",
    "token": "earthtiltMean",
    "class": "display",
@@ -4124,7 +4004,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 37066,
+   "line": 36994,
    "runtime": "browser",
    "token": "earthInvPlaneInclinationAmplitude",
    "class": "display",
@@ -4132,7 +4012,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 37145,
+   "line": 37073,
    "runtime": "browser",
    "token": "earthtiltMean",
    "class": "scene",
@@ -4141,7 +4021,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 37157,
+   "line": 37085,
    "runtime": "browser",
    "token": "earthInvPlaneInclinationAmplitude",
    "class": "display",
@@ -4149,7 +4029,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 37159,
+   "line": 37087,
    "runtime": "browser",
    "token": "earthInvPlaneInclinationAmplitude",
    "class": "display",
@@ -4157,7 +4037,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 37161,
+   "line": 37089,
    "runtime": "browser",
    "token": "earthInvPlaneInclinationAmplitude",
    "class": "display",
@@ -4165,7 +4045,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 37229,
+   "line": 37157,
    "runtime": "browser",
    "token": "8H",
    "class": "comment",
@@ -4173,7 +4053,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 37233,
+   "line": 37161,
    "runtime": "browser",
    "token": "8H",
    "class": "comment",
@@ -4181,7 +4061,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 37241,
+   "line": 37169,
    "runtime": "browser",
    "token": "earthtiltMean",
    "class": "comment",
@@ -4189,7 +4069,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 37347,
+   "line": 37275,
    "runtime": "browser",
    "token": "earthInvPlaneInclinationAmplitude",
    "class": "comment",
@@ -4197,7 +4077,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 37350,
+   "line": 37278,
    "runtime": "browser",
    "token": "H / N",
    "class": "comment",
@@ -4205,7 +4085,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 37352,
+   "line": 37280,
    "runtime": "browser",
    "token": "holisticyearLength",
    "class": "comb",
@@ -4214,7 +4094,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 37354,
+   "line": 37282,
    "runtime": "browser",
    "token": "earthInvPlaneInclinationAmplitude",
    "class": "scene",
@@ -4223,7 +4103,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 37368,
+   "line": 37296,
    "runtime": "browser",
    "token": "earthInvPlaneInclinationAmplitude",
    "class": "display",
@@ -4231,7 +4111,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 37374,
+   "line": 37302,
    "runtime": "browser",
    "token": "earthInvPlaneInclinationAmplitude",
    "class": "scene",
@@ -4240,7 +4120,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 37455,
+   "line": 37383,
    "runtime": "browser",
    "token": "earthtiltMean",
    "class": "comment",
@@ -4248,7 +4128,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 37463,
+   "line": 37391,
    "runtime": "browser",
    "token": "earthtiltMean",
    "class": "display",
@@ -4256,7 +4136,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 37463,
+   "line": 37391,
    "runtime": "browser",
    "token": "earthInvPlaneInclinationAmplitude",
    "class": "display",
@@ -4264,7 +4144,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 37597,
+   "line": 37525,
    "runtime": "browser",
    "token": "earthtiltMean",
    "class": "comment",
@@ -4272,7 +4152,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 37600,
+   "line": 37528,
    "runtime": "browser",
    "token": "earthtiltMean",
    "class": "comment",
@@ -4280,7 +4160,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 37603,
+   "line": 37531,
    "runtime": "browser",
    "token": "H / N",
    "class": "comment",
@@ -4288,7 +4168,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 37603,
+   "line": 37531,
    "runtime": "browser",
    "token": "H / N",
    "class": "comment",
@@ -4296,7 +4176,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 37605,
+   "line": 37533,
    "runtime": "browser",
    "token": "holisticyearLength",
    "class": "comb",
@@ -4305,7 +4185,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 37606,
+   "line": 37534,
    "runtime": "browser",
    "token": "holisticyearLength",
    "class": "comb",
@@ -4314,7 +4194,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 37643,
+   "line": 37571,
    "runtime": "browser",
    "token": "earthtiltMean",
    "class": "comment",
@@ -4322,7 +4202,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 37657,
+   "line": 37585,
    "runtime": "browser",
    "token": "earthtiltMean",
    "class": "comment",
@@ -4330,7 +4210,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 37683,
+   "line": 37611,
    "runtime": "browser",
    "token": "earthInvPlaneInclinationAmplitude",
    "class": "scene",
@@ -4339,7 +4219,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 37684,
+   "line": 37612,
    "runtime": "browser",
    "token": "earthtiltMean",
    "class": "scene",
@@ -4348,7 +4228,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 37720,
+   "line": 37648,
    "runtime": "browser",
    "token": "earthtiltMean",
    "class": "display",
@@ -4356,7 +4236,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 37732,
+   "line": 37660,
    "runtime": "browser",
    "token": "earthtiltMean",
    "class": "display",
@@ -4364,7 +4244,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 37736,
+   "line": 37664,
    "runtime": "browser",
    "token": "earthInvPlaneInclinationAmplitude",
    "class": "display",
@@ -4372,7 +4252,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 37755,
+   "line": 37683,
    "runtime": "browser",
    "token": "earthInvPlaneInclinationAmplitude",
    "class": "display",
@@ -4380,7 +4260,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 37757,
+   "line": 37685,
    "runtime": "browser",
    "token": "earthtiltMean",
    "class": "display",
@@ -4388,7 +4268,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 37767,
+   "line": 37695,
    "runtime": "browser",
    "token": "earthtiltMean",
    "class": "display",
@@ -4396,7 +4276,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 37772,
+   "line": 37700,
    "runtime": "browser",
    "token": "earthtiltMean",
    "class": "display",
@@ -4404,7 +4284,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 37782,
+   "line": 37710,
    "runtime": "browser",
    "token": "earthtiltMean",
    "class": "display",
@@ -4412,7 +4292,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 37798,
+   "line": 37726,
    "runtime": "browser",
    "token": "earthInvPlaneInclinationAmplitude",
    "class": "plumbing",
@@ -4421,7 +4301,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 37800,
+   "line": 37728,
    "runtime": "browser",
    "token": "earthtiltMean",
    "class": "plumbing",
@@ -4430,7 +4310,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 37805,
+   "line": 37733,
    "runtime": "browser",
    "token": "earthInvPlaneInclinationAmplitude",
    "class": "scene",
@@ -4439,7 +4319,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 37807,
+   "line": 37735,
    "runtime": "browser",
    "token": "earthtiltMean",
    "class": "scene",
@@ -4448,7 +4328,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 37853,
+   "line": 37781,
    "runtime": "browser",
    "token": "earthInvPlaneInclinationAmplitude",
    "class": "plumbing",
@@ -4457,7 +4337,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 37854,
+   "line": 37782,
    "runtime": "browser",
    "token": "earthtiltMean",
    "class": "plumbing",
@@ -4466,7 +4346,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 37879,
+   "line": 37807,
    "runtime": "browser",
    "token": "earthInvPlaneInclinationAmplitude",
    "class": "display",
@@ -4474,7 +4354,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 37880,
+   "line": 37808,
    "runtime": "browser",
    "token": "earthtiltMean",
    "class": "display",
@@ -4482,7 +4362,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 37906,
+   "line": 37834,
    "runtime": "browser",
    "token": "earthtiltMean",
    "class": "comment",
@@ -4490,7 +4370,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 37907,
+   "line": 37835,
    "runtime": "browser",
    "token": "earthtiltMean",
    "class": "display",
@@ -4498,7 +4378,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 37914,
+   "line": 37842,
    "runtime": "browser",
    "token": "earthInvPlaneInclinationAmplitude",
    "class": "comment",
@@ -4506,7 +4386,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 37915,
+   "line": 37843,
    "runtime": "browser",
    "token": "earthInvPlaneInclinationAmplitude",
    "class": "display",
@@ -4514,7 +4394,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 38082,
+   "line": 38010,
    "runtime": "browser",
    "token": "earthtiltMean",
    "class": "display",
@@ -4522,7 +4402,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 38083,
+   "line": 38011,
    "runtime": "browser",
    "token": "earthInvPlaneInclinationAmplitude",
    "class": "display",
@@ -4530,7 +4410,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 38658,
+   "line": 38586,
    "runtime": "browser",
    "token": "H / N",
    "class": "comment",
@@ -4538,7 +4418,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 41134,
+   "line": 41062,
    "runtime": "browser",
    "token": "H / N",
    "class": "display",
@@ -4546,7 +4426,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 41940,
+   "line": 41868,
    "runtime": "browser",
    "token": "H / N",
    "class": "comment",
@@ -4554,7 +4434,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 41941,
+   "line": 41869,
    "runtime": "browser",
    "token": "H / N",
    "class": "comment",
@@ -4562,7 +4442,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 41950,
+   "line": 41878,
    "runtime": "browser",
    "token": "holisticyearLength",
    "class": "export",
@@ -4570,7 +4450,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 41950,
+   "line": 41878,
    "runtime": "browser",
    "token": "H / N",
    "class": "comment",
@@ -4578,7 +4458,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 41957,
+   "line": 41885,
    "runtime": "browser",
    "token": "holisticyearLength",
    "class": "display",
@@ -4586,7 +4466,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 41958,
+   "line": 41886,
    "runtime": "browser",
    "token": "H / N",
    "class": "display",
@@ -4594,7 +4474,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 41973,
+   "line": 41901,
    "runtime": "browser",
    "token": "H / N",
    "class": "comment",
@@ -4602,7 +4482,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 41986,
+   "line": 41914,
    "runtime": "browser",
    "token": "H / N",
    "class": "comment",
@@ -4610,7 +4490,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 42059,
+   "line": 41987,
    "runtime": "browser",
    "token": "H / N",
    "class": "comment",
@@ -4618,7 +4498,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 42059,
+   "line": 41987,
    "runtime": "browser",
    "token": "H / N",
    "class": "comment",
@@ -4626,7 +4506,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 42086,
+   "line": 42014,
    "runtime": "browser",
    "token": "holisticyearLength",
    "class": "display",
@@ -4634,7 +4514,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 42314,
+   "line": 42242,
    "runtime": "browser",
    "token": "H / N",
    "class": "comment",
@@ -4642,7 +4522,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 42314,
+   "line": 42242,
    "runtime": "browser",
    "token": "/ 13",
    "class": "comment",
@@ -4650,7 +4530,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 42388,
+   "line": 42316,
    "runtime": "browser",
    "token": "H / N",
    "class": "comment",
@@ -4658,7 +4538,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 42388,
+   "line": 42316,
    "runtime": "browser",
    "token": "/ 13",
    "class": "comment",
@@ -4666,7 +4546,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 42907,
+   "line": 42835,
    "runtime": "browser",
    "token": "H / N",
    "class": "display",
@@ -4674,7 +4554,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 42907,
+   "line": 42835,
    "runtime": "browser",
    "token": "/ 13",
    "class": "display",
@@ -4682,7 +4562,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 42973,
+   "line": 42901,
    "runtime": "browser",
    "token": "H / N",
    "class": "display",
@@ -4690,7 +4570,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 42973,
+   "line": 42901,
    "runtime": "browser",
    "token": "/ 13",
    "class": "display",
@@ -4698,7 +4578,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 42974,
+   "line": 42902,
    "runtime": "browser",
    "token": "H / N",
    "class": "display",
@@ -4706,7 +4586,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 42974,
+   "line": 42902,
    "runtime": "browser",
    "token": "/ 13",
    "class": "display",
@@ -4714,7 +4594,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 43010,
+   "line": 42938,
    "runtime": "browser",
    "token": "H / N",
    "class": "display",
@@ -4722,7 +4602,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 43010,
+   "line": 42938,
    "runtime": "browser",
    "token": "/ 13",
    "class": "display",
@@ -4730,7 +4610,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 43026,
+   "line": 42954,
    "runtime": "browser",
    "token": "H / N",
    "class": "display",
@@ -4738,7 +4618,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 43026,
+   "line": 42954,
    "runtime": "browser",
    "token": "/ 13",
    "class": "display",
@@ -4746,7 +4626,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 43510,
+   "line": 43438,
    "runtime": "browser",
    "token": "H / N",
    "class": "comment",
@@ -4754,7 +4634,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 43510,
+   "line": 43438,
    "runtime": "browser",
    "token": "/ 13",
    "class": "comment",
@@ -4762,7 +4642,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 44699,
+   "line": 44627,
    "runtime": "browser",
    "token": "H / N",
    "class": "comment",
@@ -4770,7 +4650,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 45244,
+   "line": 45172,
    "runtime": "browser",
    "token": "holisticyearLength",
    "class": "comment",
@@ -4778,7 +4658,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 45345,
+   "line": 45273,
    "runtime": "browser",
    "token": "holisticyearLength",
    "class": "display",
@@ -4786,7 +4666,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 45405,
+   "line": 45333,
    "runtime": "browser",
    "token": "holisticyearLength",
    "class": "display",
@@ -4794,7 +4674,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 45406,
+   "line": 45334,
    "runtime": "browser",
    "token": "holisticyearLength",
    "class": "display",
@@ -4802,7 +4682,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 45657,
+   "line": 45585,
    "runtime": "browser",
    "token": "earthtiltMean",
    "class": "scene",
@@ -4811,7 +4691,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 45658,
+   "line": 45586,
    "runtime": "browser",
    "token": "earthtiltMean",
    "class": "display",
@@ -4819,7 +4699,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 45658,
+   "line": 45586,
    "runtime": "browser",
    "token": "earthInvPlaneInclinationAmplitude",
    "class": "display",
@@ -4827,15 +4707,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 45661,
-   "runtime": "browser",
-   "token": "holisticyearLength",
-   "class": "display",
-   "text": "hover : [`Left = mean eccentricity base′ (the one law's mean, derived from e(J2000) and the System-Reset anchor). Right = current value e(t) = base′·(1 + cos θ/"
-  },
-  {
-   "file": "src/script.js",
-   "line": 45671,
+   "line": 45599,
    "runtime": "browser",
    "token": "H / N",
    "class": "comment",
@@ -4843,7 +4715,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 45671,
+   "line": 45599,
    "runtime": "browser",
    "token": "H / N",
    "class": "comment",
@@ -4851,7 +4723,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 45671,
+   "line": 45599,
    "runtime": "browser",
    "token": "H / N",
    "class": "comment",
@@ -4859,7 +4731,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 45671,
+   "line": 45599,
    "runtime": "browser",
    "token": "H / N",
    "class": "comment",
@@ -4867,7 +4739,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 45671,
+   "line": 45599,
    "runtime": "browser",
    "token": "H / N",
    "class": "comment",
@@ -4875,7 +4747,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 45671,
+   "line": 45599,
    "runtime": "browser",
    "token": "/ 13",
    "class": "comment",
@@ -4883,7 +4755,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 45799,
+   "line": 45727,
    "runtime": "browser",
    "token": "holisticyearLength",
    "class": "display",
@@ -4891,7 +4763,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 45802,
+   "line": 45730,
    "runtime": "browser",
    "token": "holisticyearLength",
    "class": "display",
@@ -4899,7 +4771,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 45806,
+   "line": 45734,
    "runtime": "browser",
    "token": "holisticyearLength",
    "class": "display",
@@ -4907,7 +4779,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 45815,
+   "line": 45743,
    "runtime": "browser",
    "token": "holisticyearLength",
    "class": "display",
@@ -4915,7 +4787,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 46309,
+   "line": 46237,
    "runtime": "browser",
    "token": "holisticyearLength",
    "class": "display",
@@ -4923,7 +4795,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 46310,
+   "line": 46238,
    "runtime": "browser",
    "token": "holisticyearLength",
    "class": "display",
@@ -4931,7 +4803,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 46505,
+   "line": 46433,
    "runtime": "browser",
    "token": "holisticyearLength",
    "class": "scene",
@@ -4940,7 +4812,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 46508,
+   "line": 46436,
    "runtime": "browser",
    "token": "holisticyearLength",
    "class": "scene",
@@ -4949,7 +4821,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 46516,
+   "line": 46444,
    "runtime": "browser",
    "token": "holisticyearLength",
    "class": "scene",
@@ -4958,7 +4830,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 46519,
+   "line": 46447,
    "runtime": "browser",
    "token": "holisticyearLength",
    "class": "scene",
@@ -4967,7 +4839,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 46619,
+   "line": 46547,
    "runtime": "browser",
    "token": "holisticyearLength",
    "class": "display",
@@ -4975,7 +4847,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 46620,
+   "line": 46548,
    "runtime": "browser",
    "token": "holisticyearLength",
    "class": "display",
@@ -4983,7 +4855,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 46815,
+   "line": 46743,
    "runtime": "browser",
    "token": "holisticyearLength",
    "class": "scene",
@@ -4992,7 +4864,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 46818,
+   "line": 46746,
    "runtime": "browser",
    "token": "holisticyearLength",
    "class": "scene",
@@ -5001,7 +4873,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 46826,
+   "line": 46754,
    "runtime": "browser",
    "token": "holisticyearLength",
    "class": "scene",
@@ -5010,7 +4882,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 46829,
+   "line": 46757,
    "runtime": "browser",
    "token": "holisticyearLength",
    "class": "scene",
@@ -5019,7 +4891,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 46932,
+   "line": 46860,
    "runtime": "browser",
    "token": "holisticyearLength",
    "class": "display",
@@ -5027,7 +4899,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 46933,
+   "line": 46861,
    "runtime": "browser",
    "token": "holisticyearLength",
    "class": "display",
@@ -5035,7 +4907,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 47128,
+   "line": 47056,
    "runtime": "browser",
    "token": "holisticyearLength",
    "class": "scene",
@@ -5044,7 +4916,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 47131,
+   "line": 47059,
    "runtime": "browser",
    "token": "holisticyearLength",
    "class": "scene",
@@ -5053,7 +4925,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 47139,
+   "line": 47067,
    "runtime": "browser",
    "token": "holisticyearLength",
    "class": "scene",
@@ -5062,7 +4934,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 47142,
+   "line": 47070,
    "runtime": "browser",
    "token": "holisticyearLength",
    "class": "scene",
@@ -5071,7 +4943,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 47249,
+   "line": 47177,
    "runtime": "browser",
    "token": "holisticyearLength",
    "class": "display",
@@ -5079,7 +4951,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 47250,
+   "line": 47178,
    "runtime": "browser",
    "token": "holisticyearLength",
    "class": "display",
@@ -5087,7 +4959,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 47444,
+   "line": 47372,
    "runtime": "browser",
    "token": "holisticyearLength",
    "class": "scene",
@@ -5096,7 +4968,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 47447,
+   "line": 47375,
    "runtime": "browser",
    "token": "holisticyearLength",
    "class": "scene",
@@ -5105,7 +4977,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 47455,
+   "line": 47383,
    "runtime": "browser",
    "token": "holisticyearLength",
    "class": "scene",
@@ -5114,7 +4986,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 47458,
+   "line": 47386,
    "runtime": "browser",
    "token": "holisticyearLength",
    "class": "scene",
@@ -5123,7 +4995,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 47561,
+   "line": 47489,
    "runtime": "browser",
    "token": "holisticyearLength",
    "class": "display",
@@ -5131,7 +5003,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 47562,
+   "line": 47490,
    "runtime": "browser",
    "token": "holisticyearLength",
    "class": "display",
@@ -5139,7 +5011,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 47757,
+   "line": 47685,
    "runtime": "browser",
    "token": "holisticyearLength",
    "class": "scene",
@@ -5148,7 +5020,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 47760,
+   "line": 47688,
    "runtime": "browser",
    "token": "holisticyearLength",
    "class": "scene",
@@ -5157,7 +5029,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 47768,
+   "line": 47696,
    "runtime": "browser",
    "token": "holisticyearLength",
    "class": "scene",
@@ -5166,7 +5038,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 47771,
+   "line": 47699,
    "runtime": "browser",
    "token": "holisticyearLength",
    "class": "scene",
@@ -5175,7 +5047,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 47874,
+   "line": 47802,
    "runtime": "browser",
    "token": "holisticyearLength",
    "class": "display",
@@ -5183,7 +5055,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 47875,
+   "line": 47803,
    "runtime": "browser",
    "token": "holisticyearLength",
    "class": "display",
@@ -5191,7 +5063,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 48070,
+   "line": 47998,
    "runtime": "browser",
    "token": "holisticyearLength",
    "class": "scene",
@@ -5200,7 +5072,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 48073,
+   "line": 48001,
    "runtime": "browser",
    "token": "holisticyearLength",
    "class": "scene",
@@ -5209,7 +5081,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 48081,
+   "line": 48009,
    "runtime": "browser",
    "token": "holisticyearLength",
    "class": "scene",
@@ -5218,7 +5090,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 48084,
+   "line": 48012,
    "runtime": "browser",
    "token": "holisticyearLength",
    "class": "scene",
@@ -5227,7 +5099,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 48187,
+   "line": 48115,
    "runtime": "browser",
    "token": "holisticyearLength",
    "class": "display",
@@ -5235,7 +5107,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 48188,
+   "line": 48116,
    "runtime": "browser",
    "token": "holisticyearLength",
    "class": "display",
@@ -5243,7 +5115,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 48383,
+   "line": 48311,
    "runtime": "browser",
    "token": "holisticyearLength",
    "class": "scene",
@@ -5252,7 +5124,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 48386,
+   "line": 48314,
    "runtime": "browser",
    "token": "holisticyearLength",
    "class": "scene",
@@ -5261,7 +5133,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 48394,
+   "line": 48322,
    "runtime": "browser",
    "token": "holisticyearLength",
    "class": "scene",
@@ -5270,7 +5142,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 48397,
+   "line": 48325,
    "runtime": "browser",
    "token": "holisticyearLength",
    "class": "scene",
@@ -5279,7 +5151,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 48856,
+   "line": 48784,
    "runtime": "browser",
    "token": "earthtiltMean",
    "class": "comment",
@@ -5287,7 +5159,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 48856,
+   "line": 48784,
    "runtime": "browser",
    "token": "H / N",
    "class": "comment",
@@ -5295,7 +5167,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 48856,
+   "line": 48784,
    "runtime": "browser",
    "token": "H / N",
    "class": "comment",
@@ -5303,7 +5175,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 48856,
+   "line": 48784,
    "runtime": "browser",
    "token": "H / N",
    "class": "comment",
@@ -5311,7 +5183,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 48857,
+   "line": 48785,
    "runtime": "browser",
    "token": "H / N",
    "class": "comment",
@@ -5319,7 +5191,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 48968,
+   "line": 48896,
    "runtime": "browser",
    "token": "H / N",
    "class": "comment",
@@ -5327,7 +5199,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 48968,
+   "line": 48896,
    "runtime": "browser",
    "token": "/ 13",
    "class": "comment",
@@ -5335,7 +5207,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 49051,
+   "line": 48979,
    "runtime": "browser",
    "token": "holisticyearLength",
    "class": "display",
@@ -5343,7 +5215,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 49060,
+   "line": 48988,
    "runtime": "browser",
    "token": "/ 13",
    "class": "counter",
@@ -5352,7 +5224,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 50243,
+   "line": 50171,
    "runtime": "browser",
    "token": "H / N",
    "class": "comment",
@@ -5360,7 +5232,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 50243,
+   "line": 50171,
    "runtime": "browser",
    "token": "/ 13",
    "class": "comment",
@@ -5368,7 +5240,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 50366,
+   "line": 50294,
    "runtime": "browser",
    "token": "H / N",
    "class": "comment",
@@ -5376,7 +5248,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 51273,
+   "line": 51201,
    "runtime": "browser",
    "token": "H / N",
    "class": "comment",
@@ -5384,7 +5256,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 51273,
+   "line": 51201,
    "runtime": "browser",
    "token": "/ 13",
    "class": "comment",
@@ -5392,7 +5264,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 51333,
+   "line": 51261,
    "runtime": "browser",
    "token": "H / N",
    "class": "comment",
@@ -5400,7 +5272,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 51333,
+   "line": 51261,
    "runtime": "browser",
    "token": "H / N",
    "class": "comment",
@@ -5408,7 +5280,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 51698,
+   "line": 51626,
    "runtime": "browser",
    "token": "cyclesBetween",
    "class": "comment",
@@ -5416,7 +5288,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 51716,
+   "line": 51644,
    "runtime": "browser",
    "token": "kDeviceWheelPhaseAtJ2000Cycles",
    "class": "comment",
@@ -5424,7 +5296,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 51717,
+   "line": 51645,
    "runtime": "browser",
    "token": "kDeviceWheelPhaseAtJ2000Cycles",
    "class": "scene",
@@ -5433,7 +5305,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 51807,
+   "line": 51735,
    "runtime": "browser",
    "token": "H / N",
    "class": "comment",
@@ -5441,7 +5313,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 51923,
+   "line": 51851,
    "runtime": "browser",
    "token": "H / N",
    "class": "comment",
@@ -5449,7 +5321,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 51923,
+   "line": 51851,
    "runtime": "browser",
    "token": "/ 13",
    "class": "comment",
@@ -5457,7 +5329,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 51931,
+   "line": 51859,
    "runtime": "browser",
    "token": "kDeviceWheelPhaseAtJ2000Cycles",
    "class": "calendar",
@@ -5466,7 +5338,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 52098,
+   "line": 52026,
    "runtime": "browser",
    "token": "H / N",
    "class": "comment",
@@ -5474,7 +5346,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 52098,
+   "line": 52026,
    "runtime": "browser",
    "token": "/ 13",
    "class": "comment",
@@ -5482,7 +5354,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 52099,
+   "line": 52027,
    "runtime": "browser",
    "token": "H / N",
    "class": "comment",
@@ -5490,7 +5362,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 52099,
+   "line": 52027,
    "runtime": "browser",
    "token": "H / N",
    "class": "comment",
@@ -5498,7 +5370,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 52442,
+   "line": 52370,
    "runtime": "browser",
    "token": "8H",
    "class": "comment",
@@ -5506,7 +5378,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 52482,
+   "line": 52410,
    "runtime": "browser",
    "token": "H / N",
    "class": "comment",
@@ -5514,7 +5386,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 52682,
+   "line": 52610,
    "runtime": "browser",
    "token": "holisticyearLength",
    "class": "scene",
@@ -5523,7 +5395,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 52893,
+   "line": 52821,
    "runtime": "browser",
    "token": "H / N",
    "class": "comment",
@@ -5531,7 +5403,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 53670,
+   "line": 53598,
    "runtime": "browser",
    "token": "cyclesBetweenYears",
    "class": "comment",
@@ -5539,7 +5411,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 53696,
+   "line": 53624,
    "runtime": "browser",
    "token": "8H",
    "class": "comment",
@@ -5547,7 +5419,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 53771,
+   "line": 53699,
    "runtime": "browser",
    "token": "H / N",
    "class": "comment",
@@ -5555,7 +5427,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 53825,
+   "line": 53753,
    "runtime": "browser",
    "token": "H / N",
    "class": "comment",
@@ -5563,7 +5435,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 53825,
+   "line": 53753,
    "runtime": "browser",
    "token": "/ 13",
    "class": "comment",
@@ -5571,7 +5443,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 53872,
+   "line": 53800,
    "runtime": "browser",
    "token": "H / N",
    "class": "comment",
@@ -5579,7 +5451,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 53872,
+   "line": 53800,
    "runtime": "browser",
    "token": "/ 13",
    "class": "comment",
@@ -5587,7 +5459,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 53917,
+   "line": 53845,
    "runtime": "browser",
    "token": "H / N",
    "class": "comment",
@@ -5595,7 +5467,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 53918,
+   "line": 53846,
    "runtime": "browser",
    "token": "H / N",
    "class": "comment",
@@ -5603,7 +5475,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 53933,
+   "line": 53861,
    "runtime": "browser",
    "token": "H / N",
    "class": "comment",
@@ -5611,7 +5483,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 53935,
+   "line": 53863,
    "runtime": "browser",
    "token": "H / N",
    "class": "comment",
@@ -5619,7 +5491,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 53942,
+   "line": 53870,
    "runtime": "browser",
    "token": "H / N",
    "class": "comment",
@@ -5627,7 +5499,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 53965,
+   "line": 53893,
    "runtime": "browser",
    "token": "H / N",
    "class": "comment",
@@ -5635,65 +5507,55 @@
   },
   {
    "file": "src/script.js",
-   "line": 54264,
+   "line": 54195,
    "runtime": "browser",
    "token": "H / N",
    "class": "comment",
-   "text": "// ECCENTRICITY UNIFICATION: Earth rides the model's ONE law — the H/3"
+   "text": "// step 6: the H/3 law and the H/16 law-of-cosines form are deleted.)"
   },
   {
    "file": "src/script.js",
-   "line": 54266,
+   "line": 54195,
    "runtime": "browser",
    "token": "H / N",
    "class": "comment",
-   "text": "// H/16 law-of-cosines form below stays for the PLANETS' wobble laws."
+   "text": "// step 6: the H/3 law and the H/16 law-of-cosines form are deleted.)"
+  },
+  {
+   "file": "src/script.js",
+   "line": 54206,
+   "runtime": "browser",
+   "token": "H / N",
+   "class": "comment",
+   "text": "// (Plan 09 step 6: the five-argument `computeEccentricityEarth` — the H/16"
+  },
+  {
+   "file": "src/script.js",
+   "line": 54265,
+   "runtime": "browser",
+   "token": "H / N",
+   "class": "comment",
+   "text": "*  RA(t) = (baseRA − earthRAAngle/sin(ε)) + (A/sin(ε)) × [−sin(H/3) + sin(H/8)]"
+  },
+  {
+   "file": "src/script.js",
+   "line": 54265,
+   "runtime": "browser",
+   "token": "H / N",
+   "class": "comment",
+   "text": "*  RA(t) = (baseRA − earthRAAngle/sin(ε)) + (A/sin(ε)) × [−sin(H/3) + sin(H/8)]"
   },
   {
    "file": "src/script.js",
    "line": 54302,
    "runtime": "browser",
-   "token": "cyclesBetweenYears",
-   "class": "comment",
-   "text": "// @essrt/physics/planets/ecc-channel; this engine's cyclesBetweenYears"
-  },
-  {
-   "file": "src/script.js",
-   "line": 54306,
-   "runtime": "browser",
-   "token": "cyclesBetweenYears",
-   "class": "calendar",
-   "text": "{ holisticYearJ2000: HOLISTIC_YEAR_J2000, cyclesBetween: cyclesBetweenYears });",
-   "twin": "era-counter"
-  },
-  {
-   "file": "src/script.js",
-   "line": 54306,
-   "runtime": "browser",
-   "token": "cyclesBetween",
-   "class": "calendar",
-   "text": "{ holisticYearJ2000: HOLISTIC_YEAR_J2000, cyclesBetween: cyclesBetweenYears });",
-   "twin": "era-counter"
-  },
-  {
-   "file": "src/script.js",
-   "line": 54364,
-   "runtime": "browser",
    "token": "H / N",
    "class": "comment",
-   "text": "*  RA(t) = (baseRA − earthRAAngle/sin(ε)) + (A/sin(ε)) × [−sin(H/3) + sin(H/8)]"
+   "text": "// The braiding is modelled by the EQUATION OF CENTRE, not by H/16 and H/32"
   },
   {
    "file": "src/script.js",
-   "line": 54364,
-   "runtime": "browser",
-   "token": "H / N",
-   "class": "comment",
-   "text": "*  RA(t) = (baseRA − earthRAAngle/sin(ε)) + (A/sin(ε)) × [−sin(H/3) + sin(H/8)]"
-  },
-  {
-   "file": "src/script.js",
-   "line": 54401,
+   "line": 54302,
    "runtime": "browser",
    "token": "H / N",
    "class": "comment",
@@ -5701,15 +5563,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 54401,
-   "runtime": "browser",
-   "token": "H / N",
-   "class": "comment",
-   "text": "// The braiding is modelled by the EQUATION OF CENTRE, not by H/16 and H/32"
-  },
-  {
-   "file": "src/script.js",
-   "line": 54410,
+   "line": 54311,
    "runtime": "browser",
    "token": "H / N",
    "class": "comment",
@@ -5717,7 +5571,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 54447,
+   "line": 54348,
    "runtime": "browser",
    "token": "H / N",
    "class": "comment",
@@ -5725,7 +5579,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 54455,
+   "line": 54356,
    "runtime": "browser",
    "token": "H / N",
    "class": "comment",
@@ -5733,7 +5587,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 55414,
+   "line": 55315,
    "runtime": "browser",
    "token": "H / N",
    "class": "comment",
@@ -5821,15 +5675,15 @@
   },
   {
    "file": "tools/constants/check-literals.mjs",
-   "line": 116,
+   "line": 117,
    "runtime": "docs-tools",
    "token": "earthInclinationCycleAnchor",
-   "class": "diagnostic",
-   "text": "'astro.earthOrbital.earthInclinationCycleAnchor',"
+   "class": "comment",
+   "text": "// (plan 09 step 6: earthInclinationCycleAnchor — the retired eccentricity law's 21.77° — left the inputs;"
   },
   {
    "file": "tools/constants/check-literals.mjs",
-   "line": 263,
+   "line": 265,
    "runtime": "docs-tools",
    "token": "/ 13",
    "class": "comment",
@@ -5885,7 +5739,7 @@
   },
   {
    "file": "tools/docs/model-values.mjs",
-   "line": 351,
+   "line": 363,
    "runtime": "docs-tools",
    "token": "H / N",
    "class": "diagnostic",
@@ -5893,7 +5747,7 @@
   },
   {
    "file": "tools/docs/model-values.mjs",
-   "line": 383,
+   "line": 395,
    "runtime": "docs-tools",
    "token": "earthtiltMean",
    "class": "diagnostic",
@@ -5901,7 +5755,7 @@
   },
   {
    "file": "tools/docs/model-values.mjs",
-   "line": 386,
+   "line": 398,
    "runtime": "docs-tools",
    "token": "earthtiltMean",
    "class": "diagnostic",
@@ -5909,7 +5763,7 @@
   },
   {
    "file": "tools/docs/model-values.mjs",
-   "line": 407,
+   "line": 419,
    "runtime": "docs-tools",
    "token": "8H",
    "class": "diagnostic",
@@ -5917,7 +5771,7 @@
   },
   {
    "file": "tools/docs/model-values.mjs",
-   "line": 410,
+   "line": 422,
    "runtime": "docs-tools",
    "token": "H / N",
    "class": "comment",
@@ -5925,7 +5779,7 @@
   },
   {
    "file": "tools/docs/model-values.mjs",
-   "line": 410,
+   "line": 422,
    "runtime": "docs-tools",
    "token": "H / N",
    "class": "comment",
@@ -5933,7 +5787,7 @@
   },
   {
    "file": "tools/docs/model-values.mjs",
-   "line": 410,
+   "line": 422,
    "runtime": "docs-tools",
    "token": "H / N",
    "class": "comment",
@@ -5941,7 +5795,7 @@
   },
   {
    "file": "tools/docs/model-values.mjs",
-   "line": 410,
+   "line": 422,
    "runtime": "docs-tools",
    "token": "H / N",
    "class": "comment",
@@ -5949,7 +5803,7 @@
   },
   {
    "file": "tools/docs/model-values.mjs",
-   "line": 411,
+   "line": 423,
    "runtime": "docs-tools",
    "token": "H / N",
    "class": "comment",
@@ -5957,7 +5811,7 @@
   },
   {
    "file": "tools/docs/model-values.mjs",
-   "line": 411,
+   "line": 423,
    "runtime": "docs-tools",
    "token": "/ 13",
    "class": "comment",
@@ -5965,7 +5819,7 @@
   },
   {
    "file": "tools/docs/model-values.mjs",
-   "line": 417,
+   "line": 429,
    "runtime": "docs-tools",
    "token": "H / N",
    "class": "diagnostic",
@@ -5973,7 +5827,7 @@
   },
   {
    "file": "tools/docs/model-values.mjs",
-   "line": 424,
+   "line": 436,
    "runtime": "docs-tools",
    "token": "H / N",
    "class": "diagnostic",
@@ -5981,7 +5835,7 @@
   },
   {
    "file": "tools/docs/model-values.mjs",
-   "line": 431,
+   "line": 443,
    "runtime": "docs-tools",
    "token": "H / N",
    "class": "diagnostic",
@@ -5989,7 +5843,7 @@
   },
   {
    "file": "tools/docs/model-values.mjs",
-   "line": 451,
+   "line": 463,
    "runtime": "docs-tools",
    "token": "H / N",
    "class": "comment",
@@ -5997,7 +5851,7 @@
   },
   {
    "file": "tools/docs/model-values.mjs",
-   "line": 451,
+   "line": 463,
    "runtime": "docs-tools",
    "token": "/ 13",
    "class": "comment",
@@ -6005,7 +5859,7 @@
   },
   {
    "file": "tools/docs/model-values.mjs",
-   "line": 459,
+   "line": 471,
    "runtime": "docs-tools",
    "token": "H / N",
    "class": "diagnostic",
@@ -6013,7 +5867,7 @@
   },
   {
    "file": "tools/docs/model-values.mjs",
-   "line": 459,
+   "line": 471,
    "runtime": "docs-tools",
    "token": "/ 13",
    "class": "diagnostic",
@@ -6021,7 +5875,7 @@
   },
   {
    "file": "tools/docs/model-values.mjs",
-   "line": 464,
+   "line": 476,
    "runtime": "docs-tools",
    "token": "H / N",
    "class": "diagnostic",
@@ -6029,7 +5883,7 @@
   },
   {
    "file": "tools/docs/model-values.mjs",
-   "line": 472,
+   "line": 484,
    "runtime": "docs-tools",
    "token": "H / N",
    "class": "diagnostic",
@@ -6037,7 +5891,7 @@
   },
   {
    "file": "tools/docs/model-values.mjs",
-   "line": 472,
+   "line": 484,
    "runtime": "docs-tools",
    "token": "/ 13",
    "class": "diagnostic",
@@ -6045,7 +5899,7 @@
   },
   {
    "file": "tools/docs/model-values.mjs",
-   "line": 475,
+   "line": 487,
    "runtime": "docs-tools",
    "token": "H / N",
    "class": "diagnostic",
@@ -6053,7 +5907,7 @@
   },
   {
    "file": "tools/docs/model-values.mjs",
-   "line": 613,
+   "line": 625,
    "runtime": "docs-tools",
    "token": "H / N",
    "class": "diagnostic",
@@ -6061,7 +5915,7 @@
   },
   {
    "file": "tools/docs/model-values.mjs",
-   "line": 615,
+   "line": 627,
    "runtime": "docs-tools",
    "token": "H / N",
    "class": "diagnostic",
@@ -6069,7 +5923,7 @@
   },
   {
    "file": "tools/docs/model-values.mjs",
-   "line": 618,
+   "line": 630,
    "runtime": "docs-tools",
    "token": "H / N",
    "class": "diagnostic",
@@ -6077,7 +5931,7 @@
   },
   {
    "file": "tools/docs/model-values.mjs",
-   "line": 620,
+   "line": 632,
    "runtime": "docs-tools",
    "token": "H / N",
    "class": "diagnostic",
@@ -6085,47 +5939,15 @@
   },
   {
    "file": "tools/docs/model-values.mjs",
-   "line": 623,
+   "line": 636,
    "runtime": "docs-tools",
    "token": "H / N",
-   "class": "diagnostic",
-   "text": "get: () => 360 * (2000 - C.perihelionalignmentYear) / (C.H / 16),"
+   "class": "comment",
+   "text": "//  retired K eccentricity law on the H/16 beat — are deleted with the law.)"
   },
   {
    "file": "tools/docs/model-values.mjs",
-   "line": 625,
-   "runtime": "docs-tools",
-   "token": "H / N",
-   "class": "diagnostic",
-   "text": "note: 'arm-to-arm phase advanced from the 1246 alignment to J2000 at the H/16 beat (the A-closure angle)',"
-  },
-  {
-   "file": "tools/docs/model-values.mjs",
-   "line": 630,
-   "runtime": "docs-tools",
-   "token": "H / N",
-   "class": "diagnostic",
-   "text": "const phi = 360 * (2000 - C.perihelionalignmentYear) / (C.H / 16) * Math.PI / 180;"
-  },
-  {
-   "file": "tools/docs/model-values.mjs",
-   "line": 640,
-   "runtime": "docs-tools",
-   "token": "H / N",
-   "class": "diagnostic",
-   "text": "return Math.round(2000 - Math.acos(Math.min(1, (e0 * e0 - base * base - A * A) / (2 * base * A))) / (2 * Math.PI) * (C.H / 16));"
-  },
-  {
-   "file": "tools/docs/model-values.mjs",
-   "line": 648,
-   "runtime": "docs-tools",
-   "token": "H / N",
-   "class": "diagnostic",
-   "text": "return Math.round(2000 - Math.acos(Math.min(1, (e0 * e0 - base * base - A * A) / (2 * base * A))) / (2 * Math.PI) * (C.H / 16));"
-  },
-  {
-   "file": "tools/docs/model-values.mjs",
-   "line": 710,
+   "line": 694,
    "runtime": "docs-tools",
    "token": "H / N",
    "class": "diagnostic",
@@ -6133,7 +5955,7 @@
   },
   {
    "file": "tools/docs/model-values.mjs",
-   "line": 710,
+   "line": 694,
    "runtime": "docs-tools",
    "token": "8H",
    "class": "diagnostic",
@@ -6141,7 +5963,7 @@
   },
   {
    "file": "tools/docs/model-values.mjs",
-   "line": 711,
+   "line": 695,
    "runtime": "docs-tools",
    "token": "8H",
    "class": "diagnostic",
@@ -6149,7 +5971,7 @@
   },
   {
    "file": "tools/docs/model-values.mjs",
-   "line": 714,
+   "line": 698,
    "runtime": "docs-tools",
    "token": "H / N",
    "class": "diagnostic",
@@ -6157,7 +5979,7 @@
   },
   {
    "file": "tools/docs/model-values.mjs",
-   "line": 716,
+   "line": 700,
    "runtime": "docs-tools",
    "token": "8H",
    "class": "diagnostic",
@@ -6165,7 +5987,7 @@
   },
   {
    "file": "tools/docs/model-values.mjs",
-   "line": 717,
+   "line": 701,
    "runtime": "docs-tools",
    "token": "8H",
    "class": "diagnostic",
@@ -6173,7 +5995,7 @@
   },
   {
    "file": "tools/docs/model-values.mjs",
-   "line": 720,
+   "line": 704,
    "runtime": "docs-tools",
    "token": "8H",
    "class": "diagnostic",
@@ -6181,7 +6003,7 @@
   },
   {
    "file": "tools/docs/model-values.mjs",
-   "line": 721,
+   "line": 705,
    "runtime": "docs-tools",
    "token": "8H",
    "class": "diagnostic",
@@ -6189,7 +6011,7 @@
   },
   {
    "file": "tools/docs/model-values.mjs",
-   "line": 722,
+   "line": 706,
    "runtime": "docs-tools",
    "token": "8H",
    "class": "diagnostic",
@@ -6197,7 +6019,7 @@
   },
   {
    "file": "tools/docs/model-values.mjs",
-   "line": 723,
+   "line": 707,
    "runtime": "docs-tools",
    "token": "8H",
    "class": "diagnostic",
@@ -6205,7 +6027,7 @@
   },
   {
    "file": "tools/docs/model-values.mjs",
-   "line": 724,
+   "line": 708,
    "runtime": "docs-tools",
    "token": "8H",
    "class": "diagnostic",
@@ -6213,7 +6035,7 @@
   },
   {
    "file": "tools/docs/model-values.mjs",
-   "line": 725,
+   "line": 709,
    "runtime": "docs-tools",
    "token": "8H",
    "class": "diagnostic",
@@ -6221,7 +6043,7 @@
   },
   {
    "file": "tools/docs/model-values.mjs",
-   "line": 726,
+   "line": 710,
    "runtime": "docs-tools",
    "token": "8H",
    "class": "diagnostic",
@@ -6229,7 +6051,7 @@
   },
   {
    "file": "tools/docs/model-values.mjs",
-   "line": 727,
+   "line": 711,
    "runtime": "docs-tools",
    "token": "H / N",
    "class": "diagnostic",
@@ -6237,7 +6059,7 @@
   },
   {
    "file": "tools/docs/model-values.mjs",
-   "line": 728,
+   "line": 712,
    "runtime": "docs-tools",
    "token": "8H",
    "class": "diagnostic",
@@ -6245,7 +6067,7 @@
   },
   {
    "file": "tools/docs/model-values.mjs",
-   "line": 729,
+   "line": 713,
    "runtime": "docs-tools",
    "token": "8H",
    "class": "diagnostic",
@@ -6253,7 +6075,7 @@
   },
   {
    "file": "tools/docs/model-values.mjs",
-   "line": 730,
+   "line": 714,
    "runtime": "docs-tools",
    "token": "8H",
    "class": "diagnostic",
@@ -6261,15 +6083,7 @@
   },
   {
    "file": "tools/docs/model-values.mjs",
-   "line": 887,
-   "runtime": "docs-tools",
-   "token": "H / N",
-   "class": "comment",
-   "text": "// The insolation extremes ride the one H/3 law's extremes: e_max = 3·base′/2,"
-  },
-  {
-   "file": "tools/docs/model-values.mjs",
-   "line": 1070,
+   "line": 1055,
    "runtime": "docs-tools",
    "token": "H / N",
    "class": "comment",
@@ -6277,7 +6091,7 @@
   },
   {
    "file": "tools/docs/model-values.mjs",
-   "line": 1257,
+   "line": 1242,
    "runtime": "docs-tools",
    "token": "H / N",
    "class": "comment",
@@ -6285,7 +6099,7 @@
   },
   {
    "file": "tools/docs/model-values.mjs",
-   "line": 1258,
+   "line": 1243,
    "runtime": "docs-tools",
    "token": "H / N",
    "class": "comment",
@@ -6293,7 +6107,7 @@
   },
   {
    "file": "tools/docs/model-values.mjs",
-   "line": 1268,
+   "line": 1253,
    "runtime": "docs-tools",
    "token": "H / N",
    "class": "diagnostic",
@@ -6301,7 +6115,7 @@
   },
   {
    "file": "tools/docs/model-values.mjs",
-   "line": 1271,
+   "line": 1256,
    "runtime": "docs-tools",
    "token": "earthInvPlaneInclinationAmplitude",
    "class": "diagnostic",
@@ -6309,7 +6123,7 @@
   },
   {
    "file": "tools/docs/model-values.mjs",
-   "line": 1276,
+   "line": 1261,
    "runtime": "docs-tools",
    "token": "earthInvPlaneInclinationAmplitude",
    "class": "diagnostic",
@@ -6317,7 +6131,7 @@
   },
   {
    "file": "tools/docs/model-values.mjs",
-   "line": 1282,
+   "line": 1267,
    "runtime": "docs-tools",
    "token": "earthInvPlaneInclinationAmplitude",
    "class": "diagnostic",
@@ -6325,7 +6139,7 @@
   },
   {
    "file": "tools/docs/model-values.mjs",
-   "line": 1287,
+   "line": 1272,
    "runtime": "docs-tools",
    "token": "earthInvPlaneInclinationAmplitude",
    "class": "diagnostic",
@@ -6333,7 +6147,7 @@
   },
   {
    "file": "tools/docs/model-values.mjs",
-   "line": 1303,
+   "line": 1288,
    "runtime": "docs-tools",
    "token": "H / N",
    "class": "comment",
@@ -6341,7 +6155,7 @@
   },
   {
    "file": "tools/docs/model-values.mjs",
-   "line": 1308,
+   "line": 1293,
    "runtime": "docs-tools",
    "token": "H / N",
    "class": "comment",
@@ -6349,7 +6163,7 @@
   },
   {
    "file": "tools/docs/model-values.mjs",
-   "line": 1308,
+   "line": 1293,
    "runtime": "docs-tools",
    "token": "/ 13",
    "class": "comment",
@@ -6357,7 +6171,7 @@
   },
   {
    "file": "tools/docs/model-values.mjs",
-   "line": 1320,
+   "line": 1305,
    "runtime": "docs-tools",
    "token": "H / N",
    "class": "comment",
@@ -6365,7 +6179,7 @@
   },
   {
    "file": "tools/docs/model-values.mjs",
-   "line": 1320,
+   "line": 1305,
    "runtime": "docs-tools",
    "token": "/ 13",
    "class": "comment",
@@ -6373,7 +6187,7 @@
   },
   {
    "file": "tools/docs/model-values.mjs",
-   "line": 1337,
+   "line": 1322,
    "runtime": "docs-tools",
    "token": "H / N",
    "class": "diagnostic",
@@ -6381,7 +6195,7 @@
   },
   {
    "file": "tools/docs/model-values.mjs",
-   "line": 1337,
+   "line": 1322,
    "runtime": "docs-tools",
    "token": "/ 13",
    "class": "diagnostic",
@@ -6389,7 +6203,7 @@
   },
   {
    "file": "tools/docs/model-values.mjs",
-   "line": 1359,
+   "line": 1344,
    "runtime": "docs-tools",
    "token": "H / N",
    "class": "diagnostic",
@@ -6397,7 +6211,7 @@
   },
   {
    "file": "tools/docs/model-values.mjs",
-   "line": 1359,
+   "line": 1344,
    "runtime": "docs-tools",
    "token": "/ 13",
    "class": "diagnostic",
@@ -6405,7 +6219,7 @@
   },
   {
    "file": "tools/docs/model-values.mjs",
-   "line": 1372,
+   "line": 1357,
    "runtime": "docs-tools",
    "token": "H / N",
    "class": "diagnostic",
@@ -6413,7 +6227,7 @@
   },
   {
    "file": "tools/docs/model-values.mjs",
-   "line": 1372,
+   "line": 1357,
    "runtime": "docs-tools",
    "token": "/ 13",
    "class": "diagnostic",
@@ -6421,7 +6235,7 @@
   },
   {
    "file": "tools/docs/model-values.mjs",
-   "line": 1458,
+   "line": 1443,
    "runtime": "docs-tools",
    "token": "H / N",
    "class": "diagnostic",
@@ -6429,7 +6243,7 @@
   },
   {
    "file": "tools/docs/model-values.mjs",
-   "line": 1463,
+   "line": 1448,
    "runtime": "docs-tools",
    "token": "8H",
    "class": "comment",
@@ -6437,7 +6251,7 @@
   },
   {
    "file": "tools/docs/model-values.mjs",
-   "line": 1468,
+   "line": 1453,
    "runtime": "docs-tools",
    "token": "8H",
    "class": "comment",
@@ -6445,7 +6259,7 @@
   },
   {
    "file": "tools/docs/model-values.mjs",
-   "line": 1568,
+   "line": 1553,
    "runtime": "docs-tools",
    "token": "8H",
    "class": "comment",
@@ -6453,7 +6267,7 @@
   },
   {
    "file": "tools/docs/model-values.mjs",
-   "line": 1681,
+   "line": 1666,
    "runtime": "docs-tools",
    "token": "H / N",
    "class": "comment",
@@ -6461,7 +6275,7 @@
   },
   {
    "file": "tools/docs/model-values.mjs",
-   "line": 1684,
+   "line": 1669,
    "runtime": "docs-tools",
    "token": "H / N",
    "class": "diagnostic",
@@ -6469,7 +6283,7 @@
   },
   {
    "file": "tools/docs/model-values.mjs",
-   "line": 1744,
+   "line": 1729,
    "runtime": "docs-tools",
    "token": "H / N",
    "class": "diagnostic",
@@ -6477,7 +6291,7 @@
   },
   {
    "file": "tools/docs/model-values.mjs",
-   "line": 1744,
+   "line": 1729,
    "runtime": "docs-tools",
    "token": "/ 13",
    "class": "diagnostic",
@@ -6485,15 +6299,7 @@
   },
   {
    "file": "tools/docs/model-values.mjs",
-   "line": 1807,
-   "runtime": "docs-tools",
-   "token": "earthInclinationCycleAnchor",
-   "class": "diagnostic",
-   "text": "inclinationCycleAnchorEarth: { get: () => astro.earthOrbital.earthInclinationCycleAnchor, render: (v) => Number(v).toFixed(2), unit: '°', note: 'e_E line phase "
-  },
-  {
-   "file": "tools/docs/model-values.mjs",
-   "line": 1843,
+   "line": 1827,
    "runtime": "docs-tools",
    "token": "H / N",
    "class": "comment",
@@ -6501,7 +6307,7 @@
   },
   {
    "file": "tools/docs/model-values.mjs",
-   "line": 1843,
+   "line": 1827,
    "runtime": "docs-tools",
    "token": "/ 13",
    "class": "comment",
@@ -6509,7 +6315,7 @@
   },
   {
    "file": "tools/docs/model-values.mjs",
-   "line": 1858,
+   "line": 1842,
    "runtime": "docs-tools",
    "token": "H / N",
    "class": "comment",
@@ -6517,7 +6323,7 @@
   },
   {
    "file": "tools/docs/model-values.mjs",
-   "line": 1859,
+   "line": 1843,
    "runtime": "docs-tools",
    "token": "H / N",
    "class": "comment",
@@ -6525,7 +6331,7 @@
   },
   {
    "file": "tools/docs/model-values.mjs",
-   "line": 1859,
+   "line": 1843,
    "runtime": "docs-tools",
    "token": "/ 13",
    "class": "comment",
@@ -6533,7 +6339,7 @@
   },
   {
    "file": "tools/docs/model-values.mjs",
-   "line": 1867,
+   "line": 1851,
    "runtime": "docs-tools",
    "token": "H / N",
    "class": "comment",
@@ -6541,7 +6347,7 @@
   },
   {
    "file": "tools/docs/model-values.mjs",
-   "line": 1921,
+   "line": 1905,
    "runtime": "docs-tools",
    "token": "8H",
    "class": "comment",
@@ -6549,7 +6355,7 @@
   },
   {
    "file": "tools/docs/model-values.mjs",
-   "line": 1927,
+   "line": 1911,
    "runtime": "docs-tools",
    "token": "8H",
    "class": "comment",
@@ -6557,7 +6363,7 @@
   },
   {
    "file": "tools/docs/model-values.mjs",
-   "line": 1940,
+   "line": 1924,
    "runtime": "docs-tools",
    "token": "8H",
    "class": "diagnostic",
@@ -6565,7 +6371,7 @@
   },
   {
    "file": "tools/docs/model-values.mjs",
-   "line": 1948,
+   "line": 1932,
    "runtime": "docs-tools",
    "token": "H / N",
    "class": "comment",
@@ -6573,7 +6379,7 @@
   },
   {
    "file": "tools/docs/model-values.mjs",
-   "line": 1949,
+   "line": 1933,
    "runtime": "docs-tools",
    "token": "H / N",
    "class": "diagnostic",
@@ -6581,7 +6387,7 @@
   },
   {
    "file": "tools/docs/model-values.mjs",
-   "line": 1950,
+   "line": 1934,
    "runtime": "docs-tools",
    "token": "H / N",
    "class": "diagnostic",
@@ -6589,7 +6395,7 @@
   },
   {
    "file": "tools/docs/model-values.mjs",
-   "line": 1977,
+   "line": 1961,
    "runtime": "docs-tools",
    "token": "/ 13",
    "class": "comment",
@@ -6597,7 +6403,7 @@
   },
   {
    "file": "tools/docs/model-values.mjs",
-   "line": 2000,
+   "line": 1984,
    "runtime": "docs-tools",
    "token": "H / N",
    "class": "comment",
@@ -6605,7 +6411,7 @@
   },
   {
    "file": "tools/docs/model-values.mjs",
-   "line": 2000,
+   "line": 1984,
    "runtime": "docs-tools",
    "token": "/ 13",
    "class": "comment",
@@ -6613,7 +6419,7 @@
   },
   {
    "file": "tools/docs/model-values.mjs",
-   "line": 2026,
+   "line": 2010,
    "runtime": "docs-tools",
    "token": "H / N",
    "class": "diagnostic",
@@ -6621,7 +6427,7 @@
   },
   {
    "file": "tools/docs/model-values.mjs",
-   "line": 2026,
+   "line": 2010,
    "runtime": "docs-tools",
    "token": "/ 13",
    "class": "diagnostic",
@@ -6629,7 +6435,7 @@
   },
   {
    "file": "tools/docs/model-values.mjs",
-   "line": 2213,
+   "line": 2197,
    "runtime": "docs-tools",
    "token": "H / N",
    "class": "comment",
@@ -6637,7 +6443,7 @@
   },
   {
    "file": "tools/docs/model-values.mjs",
-   "line": 2213,
+   "line": 2197,
    "runtime": "docs-tools",
    "token": "/ 13",
    "class": "comment",
@@ -6645,7 +6451,7 @@
   },
   {
    "file": "tools/docs/model-values.mjs",
-   "line": 2221,
+   "line": 2205,
    "runtime": "docs-tools",
    "token": "H / N",
    "class": "diagnostic",
@@ -6653,7 +6459,7 @@
   },
   {
    "file": "tools/docs/model-values.mjs",
-   "line": 2221,
+   "line": 2205,
    "runtime": "docs-tools",
    "token": "/ 13",
    "class": "diagnostic",
@@ -6661,7 +6467,7 @@
   },
   {
    "file": "tools/docs/model-values.mjs",
-   "line": 2231,
+   "line": 2215,
    "runtime": "docs-tools",
    "token": "H / N",
    "class": "diagnostic",
@@ -6669,7 +6475,7 @@
   },
   {
    "file": "tools/docs/model-values.mjs",
-   "line": 2231,
+   "line": 2215,
    "runtime": "docs-tools",
    "token": "/ 13",
    "class": "diagnostic",
@@ -6677,7 +6483,7 @@
   },
   {
    "file": "tools/docs/model-values.mjs",
-   "line": 2236,
+   "line": 2220,
    "runtime": "docs-tools",
    "token": "H / N",
    "class": "diagnostic",
@@ -6685,7 +6491,7 @@
   },
   {
    "file": "tools/docs/model-values.mjs",
-   "line": 2265,
+   "line": 2249,
    "runtime": "docs-tools",
    "token": "H / N",
    "class": "comment",
@@ -6693,7 +6499,7 @@
   },
   {
    "file": "tools/docs/model-values.mjs",
-   "line": 2277,
+   "line": 2261,
    "runtime": "docs-tools",
    "token": "H / N",
    "class": "diagnostic",
@@ -6701,7 +6507,7 @@
   },
   {
    "file": "tools/docs/model-values.mjs",
-   "line": 2359,
+   "line": 2343,
    "runtime": "docs-tools",
    "token": "H / N",
    "class": "comment",
@@ -6709,7 +6515,7 @@
   },
   {
    "file": "tools/docs/model-values.mjs",
-   "line": 2378,
+   "line": 2362,
    "runtime": "docs-tools",
    "token": "H / N",
    "class": "diagnostic",
@@ -6717,7 +6523,7 @@
   },
   {
    "file": "tools/docs/model-values.mjs",
-   "line": 2485,
+   "line": 2469,
    "runtime": "docs-tools",
    "token": "H / N",
    "class": "comment",
@@ -6725,7 +6531,7 @@
   },
   {
    "file": "tools/docs/model-values.mjs",
-   "line": 2486,
+   "line": 2470,
    "runtime": "docs-tools",
    "token": "H / N",
    "class": "comment",
@@ -6733,7 +6539,7 @@
   },
   {
    "file": "tools/docs/model-values.mjs",
-   "line": 2500,
+   "line": 2484,
    "runtime": "docs-tools",
    "token": "8H",
    "class": "diagnostic",
@@ -6741,7 +6547,7 @@
   },
   {
    "file": "tools/docs/model-values.mjs",
-   "line": 2516,
+   "line": 2500,
    "runtime": "docs-tools",
    "token": "8H",
    "class": "comment",
@@ -6749,7 +6555,7 @@
   },
   {
    "file": "tools/docs/model-values.mjs",
-   "line": 2646,
+   "line": 2630,
    "runtime": "docs-tools",
    "token": "H / N",
    "class": "diagnostic",
@@ -6757,7 +6563,7 @@
   },
   {
    "file": "tools/docs/model-values.mjs",
-   "line": 2646,
+   "line": 2630,
    "runtime": "docs-tools",
    "token": "/ 13",
    "class": "diagnostic",
@@ -6765,7 +6571,7 @@
   },
   {
    "file": "tools/docs/model-values.mjs",
-   "line": 2647,
+   "line": 2631,
    "runtime": "docs-tools",
    "token": "H / N",
    "class": "diagnostic",
@@ -6773,7 +6579,7 @@
   },
   {
    "file": "tools/docs/model-values.mjs",
-   "line": 2647,
+   "line": 2631,
    "runtime": "docs-tools",
    "token": "/ 13",
    "class": "diagnostic",
@@ -6781,7 +6587,7 @@
   },
   {
    "file": "tools/docs/model-values.mjs",
-   "line": 2755,
+   "line": 2739,
    "runtime": "docs-tools",
    "token": "H / N",
    "class": "diagnostic",
@@ -6789,7 +6595,7 @@
   },
   {
    "file": "tools/docs/model-values.mjs",
-   "line": 2755,
+   "line": 2739,
    "runtime": "docs-tools",
    "token": "H / N",
    "class": "diagnostic",
@@ -6797,7 +6603,7 @@
   },
   {
    "file": "tools/docs/model-values.mjs",
-   "line": 2755,
+   "line": 2739,
    "runtime": "docs-tools",
    "token": "H / N",
    "class": "diagnostic",
@@ -6805,7 +6611,7 @@
   },
   {
    "file": "tools/docs/model-values.mjs",
-   "line": 2755,
+   "line": 2739,
    "runtime": "docs-tools",
    "token": "H / N",
    "class": "diagnostic",
@@ -6813,7 +6619,7 @@
   },
   {
    "file": "tools/docs/model-values.mjs",
-   "line": 2761,
+   "line": 2745,
    "runtime": "docs-tools",
    "token": "8H",
    "class": "comment",
@@ -6821,7 +6627,7 @@
   },
   {
    "file": "tools/docs/model-values.mjs",
-   "line": 2885,
+   "line": 2869,
    "runtime": "docs-tools",
    "token": "H / N",
    "class": "diagnostic",
@@ -6829,7 +6635,7 @@
   },
   {
    "file": "tools/docs/model-values.mjs",
-   "line": 2927,
+   "line": 2911,
    "runtime": "docs-tools",
    "token": "H / N",
    "class": "comment",
@@ -6837,7 +6643,7 @@
   },
   {
    "file": "tools/docs/model-values.mjs",
-   "line": 2929,
+   "line": 2913,
    "runtime": "docs-tools",
    "token": "H / N",
    "class": "diagnostic",
@@ -6845,7 +6651,7 @@
   },
   {
    "file": "tools/docs/model-values.mjs",
-   "line": 3033,
+   "line": 3017,
    "runtime": "docs-tools",
    "token": "earthtiltMean",
    "class": "diagnostic",
@@ -6853,7 +6659,7 @@
   },
   {
    "file": "tools/docs/model-values.mjs",
-   "line": 3033,
+   "line": 3017,
    "runtime": "docs-tools",
    "token": "earthInvPlaneInclinationAmplitude",
    "class": "diagnostic",
@@ -6861,7 +6667,7 @@
   },
   {
    "file": "tools/docs/model-values.mjs",
-   "line": 3070,
+   "line": 3054,
    "runtime": "docs-tools",
    "token": "8H",
    "class": "comment",
@@ -6869,7 +6675,7 @@
   },
   {
    "file": "tools/docs/model-values.mjs",
-   "line": 3074,
+   "line": 3058,
    "runtime": "docs-tools",
    "token": "H / N",
    "class": "diagnostic",
@@ -6877,7 +6683,7 @@
   },
   {
    "file": "tools/docs/model-values.mjs",
-   "line": 3074,
+   "line": 3058,
    "runtime": "docs-tools",
    "token": "/ 13",
    "class": "diagnostic",
@@ -6885,7 +6691,7 @@
   },
   {
    "file": "tools/docs/model-values.mjs",
-   "line": 3075,
+   "line": 3059,
    "runtime": "docs-tools",
    "token": "H / N",
    "class": "diagnostic",
@@ -6893,7 +6699,7 @@
   },
   {
    "file": "tools/docs/model-values.mjs",
-   "line": 3106,
+   "line": 3090,
    "runtime": "docs-tools",
    "token": "H / N",
    "class": "comment",
@@ -6901,7 +6707,7 @@
   },
   {
    "file": "tools/docs/model-values.mjs",
-   "line": 3106,
+   "line": 3090,
    "runtime": "docs-tools",
    "token": "8H",
    "class": "comment",
@@ -6909,7 +6715,7 @@
   },
   {
    "file": "tools/docs/model-values.mjs",
-   "line": 3109,
+   "line": 3093,
    "runtime": "docs-tools",
    "token": "H / N",
    "class": "comment",
@@ -6917,7 +6723,7 @@
   },
   {
    "file": "tools/docs/model-values.mjs",
-   "line": 3111,
+   "line": 3095,
    "runtime": "docs-tools",
    "token": "8H",
    "class": "comment",
@@ -6925,7 +6731,7 @@
   },
   {
    "file": "tools/docs/model-values.mjs",
-   "line": 3149,
+   "line": 3133,
    "runtime": "docs-tools",
    "token": "eraClockHAtAge",
    "class": "diagnostic",
@@ -6933,7 +6739,7 @@
   },
   {
    "file": "tools/docs/model-values.mjs",
-   "line": 3149,
+   "line": 3133,
    "runtime": "docs-tools",
    "token": "eraClockYearInDaysAtAge",
    "class": "diagnostic",
@@ -6941,7 +6747,7 @@
   },
   {
    "file": "tools/docs/model-values.mjs",
-   "line": 3221,
+   "line": 3205,
    "runtime": "docs-tools",
    "token": "/ 13",
    "class": "diagnostic",
@@ -6949,7 +6755,7 @@
   },
   {
    "file": "tools/docs/model-values.mjs",
-   "line": 3227,
+   "line": 3211,
    "runtime": "docs-tools",
    "token": "H / N",
    "class": "comment",
@@ -6957,7 +6763,7 @@
   },
   {
    "file": "tools/docs/model-values.mjs",
-   "line": 3227,
+   "line": 3211,
    "runtime": "docs-tools",
    "token": "/ 13",
    "class": "comment",
@@ -6965,27 +6771,11 @@
   },
   {
    "file": "tools/docs/model-values.mjs",
-   "line": 3379,
+   "line": 3363,
    "runtime": "docs-tools",
    "token": "8H",
    "class": "diagnostic",
    "text": "o.tierC10TopRatio = { get: () => b2().c10_epica_co2.components_sorted_by_ratio[0].co2_over_lr04_amp_ratio, render: f2, note: 'C10: strongest EPICA CO₂ / LR04 am"
-  },
-  {
-   "file": "tools/docs/render-calculation-map.mjs",
-   "line": 54,
-   "runtime": "docs-tools",
-   "token": "H / N",
-   "class": "diagnostic",
-   "text": "'| year | T (cy) | e — deep modes | e — H/3 law | E = e/e₀ | (g/g₀)^s_ϖ | (g/g₀)^s_Ω | I(T, s_ϖ) (cy) | I(T, s_Ω) (cy) | perigee ϖ of date (°) | node Ω of date "
-  },
-  {
-   "file": "tools/docs/render-calculation-map.mjs",
-   "line": 63,
-   "runtime": "docs-tools",
-   "token": "H / N",
-   "class": "diagnostic",
-   "text": "rows.push(`Anchors the rows above use: e₀ (JPL J2000 seed, the deep channel's anchor) = ${deep.e0.toFixed(10)} · e(J2000) IAU (the H/3 law's anchor) = ${K.earth"
   },
   {
    "file": "tools/docs/render-calculation-map.mjs",
@@ -10294,16 +10084,7 @@
   },
   {
    "file": "tools/lib/constants.js",
-   "line": 38,
-   "runtime": "node-lib",
-   "token": "earthInclinationCycleAnchor",
-   "class": "plumbing",
-   "text": "earthInclinationCycleAnchor: astroRef.earthOrbital.earthInclinationCycleAnchor,",
-   "twin": "plumbing"
-  },
-  {
-   "file": "tools/lib/constants.js",
-   "line": 58,
+   "line": 57,
    "runtime": "node-lib",
    "token": "holisticyearLength",
    "class": "plumbing",
@@ -10312,7 +10093,7 @@
   },
   {
    "file": "tools/lib/constants.js",
-   "line": 78,
+   "line": 77,
    "runtime": "node-lib",
    "token": "H / N",
    "class": "comment",
@@ -10320,7 +10101,7 @@
   },
   {
    "file": "tools/lib/constants.js",
-   "line": 78,
+   "line": 77,
    "runtime": "node-lib",
    "token": "/ 13",
    "class": "comment",
@@ -10328,7 +10109,7 @@
   },
   {
    "file": "tools/lib/constants.js",
-   "line": 79,
+   "line": 78,
    "runtime": "node-lib",
    "token": "H / N",
    "class": "comment",
@@ -10336,7 +10117,7 @@
   },
   {
    "file": "tools/lib/constants.js",
-   "line": 79,
+   "line": 78,
    "runtime": "node-lib",
    "token": "/ 13",
    "class": "comment",
@@ -10344,7 +10125,7 @@
   },
   {
    "file": "tools/lib/constants.js",
-   "line": 92,
+   "line": 91,
    "runtime": "node-lib",
    "token": "earthtiltMean",
    "class": "plumbing",
@@ -10353,7 +10134,7 @@
   },
   {
    "file": "tools/lib/constants.js",
-   "line": 93,
+   "line": 92,
    "runtime": "node-lib",
    "token": "earthInvPlaneInclinationAmplitude",
    "class": "plumbing",
@@ -10362,7 +10143,7 @@
   },
   {
    "file": "tools/lib/constants.js",
-   "line": 96,
+   "line": 95,
    "runtime": "node-lib",
    "token": "kDeviceWheelPhaseAtJ2000Cycles",
    "class": "plumbing",
@@ -10371,7 +10152,7 @@
   },
   {
    "file": "tools/lib/constants.js",
-   "line": 97,
+   "line": 100,
    "runtime": "node-lib",
    "token": "H / N",
    "class": "comment",
@@ -10379,7 +10160,7 @@
   },
   {
    "file": "tools/lib/constants.js",
-   "line": 97,
+   "line": 100,
    "runtime": "node-lib",
    "token": "H / N",
    "class": "comment",
@@ -10387,7 +10168,7 @@
   },
   {
    "file": "tools/lib/constants.js",
-   "line": 98,
+   "line": 101,
    "runtime": "node-lib",
    "token": "earthtiltMean",
    "class": "plumbing",
@@ -10396,7 +10177,7 @@
   },
   {
    "file": "tools/lib/constants.js",
-   "line": 98,
+   "line": 101,
    "runtime": "node-lib",
    "token": "earthInvPlaneInclinationAmplitude",
    "class": "plumbing",
@@ -10405,20 +10186,11 @@
   },
   {
    "file": "tools/lib/constants.js",
-   "line": 102,
+   "line": 105,
    "runtime": "node-lib",
    "token": "earthInvPlaneInclinationAmplitude",
    "class": "plumbing",
-   "text": "ASTRO_REFERENCE.earthInclinationJ2000_deg, earthInvPlaneInclinationAmplitude,",
-   "twin": "plumbing"
-  },
-  {
-   "file": "tools/lib/constants.js",
-   "line": 103,
-   "runtime": "node-lib",
-   "token": "earthInclinationCycleAnchor",
-   "class": "plumbing",
-   "text": "ASTRO_REFERENCE.earthPerihelionLongitudeJ2000, ASTRO_REFERENCE.earthInclinationCycleAnchor);",
+   "text": "ASTRO_REFERENCE.earthInclinationJ2000_deg, earthInvPlaneInclinationAmplitude, kDeviceInclinationPhaseJ2000Deg);",
    "twin": "plumbing"
   },
   {
@@ -10427,20 +10199,11 @@
    "runtime": "node-lib",
    "token": "H / N",
    "class": "comment",
-   "text": "// eccentricityAmplitude (the v11 H/16 amplitude, now only the Law-4 K"
+   "text": "// H/3 eccentricity law that derived its e(t) on this base′ is deleted;"
   },
   {
    "file": "tools/lib/constants.js",
-   "line": 114,
-   "runtime": "node-lib",
-   "token": "earthInclinationCycleAnchor",
-   "class": "plumbing",
-   "text": "/ (1 + Math.cos((ASTRO_REFERENCE.earthPerihelionLongitudeJ2000 - ASTRO_REFERENCE.earthInclinationCycleAnchor) * Math.PI / 180) / 2);",
-   "twin": "plumbing"
-  },
-  {
-   "file": "tools/lib/constants.js",
-   "line": 148,
+   "line": 149,
    "runtime": "node-lib",
    "token": "8H",
    "class": "comment",
@@ -10448,7 +10211,7 @@
   },
   {
    "file": "tools/lib/constants.js",
-   "line": 171,
+   "line": 172,
    "runtime": "node-lib",
    "token": "N * H",
    "class": "plumbing",
@@ -10457,7 +10220,7 @@
   },
   {
    "file": "tools/lib/constants.js",
-   "line": 214,
+   "line": 215,
    "runtime": "node-lib",
    "token": "H / N",
    "class": "plumbing",
@@ -10466,7 +10229,7 @@
   },
   {
    "file": "tools/lib/constants.js",
-   "line": 222,
+   "line": 223,
    "runtime": "node-lib",
    "token": "H / N",
    "class": "comment",
@@ -10474,7 +10237,7 @@
   },
   {
    "file": "tools/lib/constants.js",
-   "line": 229,
+   "line": 230,
    "runtime": "node-lib",
    "token": "H / N",
    "class": "comment",
@@ -10482,7 +10245,7 @@
   },
   {
    "file": "tools/lib/constants.js",
-   "line": 242,
+   "line": 243,
    "runtime": "node-lib",
    "token": "H / N",
    "class": "comment",
@@ -10490,7 +10253,7 @@
   },
   {
    "file": "tools/lib/constants.js",
-   "line": 242,
+   "line": 243,
    "runtime": "node-lib",
    "token": "/ 13",
    "class": "comment",
@@ -10498,7 +10261,7 @@
   },
   {
    "file": "tools/lib/constants.js",
-   "line": 254,
+   "line": 255,
    "runtime": "node-lib",
    "token": "H / N",
    "class": "comment",
@@ -10506,7 +10269,7 @@
   },
   {
    "file": "tools/lib/constants.js",
-   "line": 254,
+   "line": 255,
    "runtime": "node-lib",
    "token": "/ 13",
    "class": "comment",
@@ -10514,7 +10277,7 @@
   },
   {
    "file": "tools/lib/constants.js",
-   "line": 261,
+   "line": 262,
    "runtime": "node-lib",
    "token": "H / N",
    "class": "comment",
@@ -10522,7 +10285,7 @@
   },
   {
    "file": "tools/lib/constants.js",
-   "line": 261,
+   "line": 262,
    "runtime": "node-lib",
    "token": "/ 13",
    "class": "comment",
@@ -10530,15 +10293,7 @@
   },
   {
    "file": "tools/lib/constants.js",
-   "line": 269,
-   "runtime": "node-lib",
-   "token": "H / N",
-   "class": "comment",
-   "text": "// step 3 it was meanSolarYearDays × (H/16)/(H/16 − 1), the device's identity.)"
-  },
-  {
-   "file": "tools/lib/constants.js",
-   "line": 269,
+   "line": 270,
    "runtime": "node-lib",
    "token": "H / N",
    "class": "comment",
@@ -10550,11 +10305,19 @@
    "runtime": "node-lib",
    "token": "H / N",
    "class": "comment",
+   "text": "// step 3 it was meanSolarYearDays × (H/16)/(H/16 − 1), the device's identity.)"
+  },
+  {
+   "file": "tools/lib/constants.js",
+   "line": 271,
+   "runtime": "node-lib",
+   "token": "H / N",
+   "class": "comment",
    "text": "// Unification: the mean of the one law IS base' (formerly the H/16 beat's"
   },
   {
    "file": "tools/lib/constants.js",
-   "line": 349,
+   "line": 350,
    "runtime": "node-lib",
    "token": "kDeviceWheelPhaseAtJ2000Cycles",
    "class": "plumbing",
@@ -10563,7 +10326,7 @@
   },
   {
    "file": "tools/lib/constants.js",
-   "line": 349,
+   "line": 350,
    "runtime": "node-lib",
    "token": "H / N",
    "class": "plumbing",
@@ -10572,7 +10335,7 @@
   },
   {
    "file": "tools/lib/constants.js",
-   "line": 364,
+   "line": 365,
    "runtime": "node-lib",
    "token": "8H",
    "class": "comment",
@@ -10580,7 +10343,7 @@
   },
   {
    "file": "tools/lib/constants.js",
-   "line": 366,
+   "line": 367,
    "runtime": "node-lib",
    "token": "H / N",
    "class": "comment",
@@ -10588,7 +10351,7 @@
   },
   {
    "file": "tools/lib/constants.js",
-   "line": 366,
+   "line": 367,
    "runtime": "node-lib",
    "token": "/ 13",
    "class": "comment",
@@ -10596,7 +10359,7 @@
   },
   {
    "file": "tools/lib/constants.js",
-   "line": 403,
+   "line": 404,
    "runtime": "node-lib",
    "token": "H / N",
    "class": "plumbing",
@@ -10605,7 +10368,7 @@
   },
   {
    "file": "tools/lib/constants.js",
-   "line": 647,
+   "line": 648,
    "runtime": "node-lib",
    "token": "earthtiltMean",
    "class": "plumbing",
@@ -10614,7 +10377,7 @@
   },
   {
    "file": "tools/lib/constants.js",
-   "line": 649,
+   "line": 650,
    "runtime": "node-lib",
    "token": "earthInvPlaneInclinationAmplitude",
    "class": "plumbing",
@@ -10623,7 +10386,7 @@
   },
   {
    "file": "tools/lib/constants.js",
-   "line": 682,
+   "line": 684,
    "runtime": "node-lib",
    "token": "kDeviceWheelPhaseAtJ2000Cycles",
    "class": "plumbing",
@@ -10803,82 +10566,15 @@
   },
   {
    "file": "tools/lib/deep-time.js",
-   "line": 839,
+   "line": 841,
    "runtime": "node-lib",
    "token": "H / N",
    "class": "comment",
-   "text": "// production e_E by the fully-derived H/3 fluctuation line (_FW_ECC below),"
+   "text": "// (Plan 09 step 6: the H/3 eccentricity law — `_moonEcc`/`_fwEarthEcc`/"
   },
   {
    "file": "tools/lib/deep-time.js",
-   "line": 859,
-   "runtime": "node-lib",
-   "token": "H / N",
-   "class": "comment",
-   "text": "// ─── Framework H/3 fluctuation line (mirror of src/script.js _fwEarthEcc) ──"
-  },
-  {
-   "file": "tools/lib/deep-time.js",
-   "line": 862,
-   "runtime": "node-lib",
-   "token": "H / N",
-   "class": "comment",
-   "text": "// The H/3 wobble cycle that drives Earth's inclination (anchor 21.77°) also"
-  },
-  {
-   "file": "tools/lib/deep-time.js",
-   "line": 871,
-   "runtime": "node-lib",
-   "token": "cyclesBetweenYears",
-   "class": "comment",
-   "text": "// cyclesBetweenYears (always integrated here — DT has no snapshot toggle)."
-  },
-  {
-   "file": "tools/lib/deep-time.js",
-   "line": 878,
-   "runtime": "node-lib",
-   "token": "cyclesBetweenYears",
-   "class": "comb",
-   "text": "cyclesBetween: cyclesBetweenYears,",
-   "twin": "era-counter"
-  },
-  {
-   "file": "tools/lib/deep-time.js",
-   "line": 878,
-   "runtime": "node-lib",
-   "token": "cyclesBetween",
-   "class": "comb",
-   "text": "cyclesBetween: cyclesBetweenYears,",
-   "twin": "era-counter"
-  },
-  {
-   "file": "tools/lib/deep-time.js",
-   "line": 881,
-   "runtime": "node-lib",
-   "token": "earthInclinationCycleAnchor",
-   "class": "unclassified",
-   "text": "inclinationCycleAnchorDeg: AR.earthInclinationCycleAnchor,",
-   "twin": "ecc-law-anchor"
-  },
-  {
-   "file": "tools/lib/deep-time.js",
-   "line": 891,
-   "runtime": "node-lib",
-   "token": "H / N",
-   "class": "comment",
-   "text": "/** de/dyear of the H/3 law — the cardinal braid's equation-of-centre"
-  },
-  {
-   "file": "tools/lib/deep-time.js",
-   "line": 899,
-   "runtime": "node-lib",
-   "token": "H / N",
-   "class": "comment",
-   "text": "// offset, cardinal braid) stays on the H/3 channel — a certification"
-  },
-  {
-   "file": "tools/lib/deep-time.js",
-   "line": 910,
+   "line": 855,
    "runtime": "node-lib",
    "token": "H / N",
    "class": "comment",
@@ -10886,7 +10582,7 @@
   },
   {
    "file": "tools/lib/deep-time.js",
-   "line": 916,
+   "line": 861,
    "runtime": "node-lib",
    "token": "H / N",
    "class": "comment",
@@ -10894,7 +10590,7 @@
   },
   {
    "file": "tools/lib/deep-time.js",
-   "line": 921,
+   "line": 866,
    "runtime": "node-lib",
    "token": "H / N",
    "class": "comment",
@@ -10902,7 +10598,7 @@
   },
   {
    "file": "tools/lib/deep-time.js",
-   "line": 938,
+   "line": 883,
    "runtime": "node-lib",
    "token": "H / N",
    "class": "comment",
@@ -10910,7 +10606,7 @@
   },
   {
    "file": "tools/lib/deep-time.js",
-   "line": 949,
+   "line": 894,
    "runtime": "node-lib",
    "token": "H / N",
    "class": "comment",
@@ -10918,7 +10614,7 @@
   },
   {
    "file": "tools/lib/deep-time.js",
-   "line": 949,
+   "line": 894,
    "runtime": "node-lib",
    "token": "/ 13",
    "class": "comment",
@@ -10926,7 +10622,7 @@
   },
   {
    "file": "tools/lib/deep-time.js",
-   "line": 955,
+   "line": 900,
    "runtime": "node-lib",
    "token": "/ 13",
    "class": "comment",
@@ -10934,7 +10630,7 @@
   },
   {
    "file": "tools/lib/deep-time.js",
-   "line": 1007,
+   "line": 952,
    "runtime": "node-lib",
    "token": "cyclesBetweenYears",
    "class": "comment",
@@ -10942,7 +10638,7 @@
   },
   {
    "file": "tools/lib/deep-time.js",
-   "line": 1027,
+   "line": 972,
    "runtime": "node-lib",
    "token": "eraClockHAtAge",
    "class": "counter",
@@ -10951,7 +10647,7 @@
   },
   {
    "file": "tools/lib/deep-time.js",
-   "line": 1027,
+   "line": 972,
    "runtime": "node-lib",
    "token": "holisticHAtAgeMa",
    "class": "counter",
@@ -10960,7 +10656,7 @@
   },
   {
    "file": "tools/lib/deep-time.js",
-   "line": 1060,
+   "line": 1005,
    "runtime": "node-lib",
    "token": "cyclesBetweenYears",
    "class": "comb",
@@ -10969,7 +10665,7 @@
   },
   {
    "file": "tools/lib/deep-time.js",
-   "line": 1060,
+   "line": 1005,
    "runtime": "node-lib",
    "token": "cyclesBetween",
    "class": "comb",
@@ -10978,7 +10674,7 @@
   },
   {
    "file": "tools/lib/deep-time.js",
-   "line": 1110,
+   "line": 1055,
    "runtime": "node-lib",
    "token": "cyclesBetweenYears",
    "class": "comment",
@@ -10986,15 +10682,15 @@
   },
   {
    "file": "tools/lib/deep-time.js",
-   "line": 1290,
+   "line": 1236,
    "runtime": "node-lib",
    "token": "H / N",
    "class": "comment",
-   "text": "// Framework e_E: H/3 fluctuation line (production) + Laskar-band composite (A/B research)"
+   "text": "// eccentricity source. (Plan 09 step 6: the H/3 fluctuation line"
   },
   {
    "file": "tools/lib/deep-time.js",
-   "line": 1337,
+   "line": 1277,
    "runtime": "node-lib",
    "token": "eraClockHAtAge",
    "class": "plumbing",
@@ -11003,7 +10699,7 @@
   },
   {
    "file": "tools/lib/deep-time.js",
-   "line": 1337,
+   "line": 1277,
    "runtime": "node-lib",
    "token": "eraClockTropicalYearSecondsAtAge",
    "class": "plumbing",
@@ -11012,7 +10708,7 @@
   },
   {
    "file": "tools/lib/deep-time.js",
-   "line": 1337,
+   "line": 1277,
    "runtime": "node-lib",
    "token": "eraClockYearInDaysAtAge",
    "class": "plumbing",
@@ -11021,7 +10717,7 @@
   },
   {
    "file": "tools/lib/deep-time.js",
-   "line": 1377,
+   "line": 1317,
    "runtime": "node-lib",
    "token": "cyclesBetweenYears",
    "class": "plumbing",
@@ -11064,16 +10760,7 @@
   },
   {
    "file": "tools/lib/optimizer.js",
-   "line": 159,
-   "runtime": "fitting",
-   "token": "earthInclinationCycleAnchor",
-   "class": "unclassified",
-   "text": "- C.ASTRO_REFERENCE.earthInclinationCycleAnchor) * Math.PI / 180);",
-   "twin": "ecc-law-anchor"
-  },
-  {
-   "file": "tools/lib/optimizer.js",
-   "line": 171,
+   "line": 170,
    "runtime": "fitting",
    "token": "kDeviceWheelPhaseAtJ2000Cycles",
    "class": "comb",
@@ -11082,7 +10769,7 @@
   },
   {
    "file": "tools/lib/optimizer.js",
-   "line": 171,
+   "line": 170,
    "runtime": "fitting",
    "token": "H / N",
    "class": "comb",
@@ -11091,7 +10778,7 @@
   },
   {
    "file": "tools/lib/optimizer.js",
-   "line": 176,
+   "line": 175,
    "runtime": "fitting",
    "token": "earthInvPlaneInclinationAmplitude",
    "class": "comment",
@@ -11099,7 +10786,7 @@
   },
   {
    "file": "tools/lib/optimizer.js",
-   "line": 189,
+   "line": 188,
    "runtime": "fitting",
    "token": "earthInvPlaneInclinationAmplitude",
    "class": "plumbing",
@@ -11108,7 +10795,7 @@
   },
   {
    "file": "tools/lib/optimizer.js",
-   "line": 190,
+   "line": 189,
    "runtime": "fitting",
    "token": "earthInvPlaneInclinationAmplitude",
    "class": "scene",
@@ -11117,7 +10804,7 @@
   },
   {
    "file": "tools/lib/optimizer.js",
-   "line": 195,
+   "line": 194,
    "runtime": "fitting",
    "token": "earthInvPlaneInclinationAmplitude",
    "class": "scene",
@@ -11126,7 +10813,7 @@
   },
   {
    "file": "tools/lib/optimizer.js",
-   "line": 216,
+   "line": 215,
    "runtime": "fitting",
    "token": "earthtiltMean",
    "class": "comment",
@@ -11134,7 +10821,7 @@
   },
   {
    "file": "tools/lib/optimizer.js",
-   "line": 219,
+   "line": 218,
    "runtime": "fitting",
    "token": "earthtiltMean",
    "class": "comment",
@@ -11142,7 +10829,7 @@
   },
   {
    "file": "tools/lib/optimizer.js",
-   "line": 226,
+   "line": 225,
    "runtime": "fitting",
    "token": "earthtiltMean",
    "class": "plumbing",
@@ -11151,7 +10838,7 @@
   },
   {
    "file": "tools/lib/optimizer.js",
-   "line": 227,
+   "line": 226,
    "runtime": "fitting",
    "token": "earthtiltMean",
    "class": "scene",
@@ -11160,7 +10847,7 @@
   },
   {
    "file": "tools/lib/optimizer.js",
-   "line": 231,
+   "line": 230,
    "runtime": "fitting",
    "token": "earthtiltMean",
    "class": "scene",
@@ -11169,7 +10856,7 @@
   },
   {
    "file": "tools/lib/optimizer.js",
-   "line": 465,
+   "line": 464,
    "runtime": "fitting",
    "token": "earthtiltMean",
    "class": "scene",
@@ -11178,7 +10865,7 @@
   },
   {
    "file": "tools/lib/optimizer.js",
-   "line": 466,
+   "line": 465,
    "runtime": "fitting",
    "token": "earthtiltMean",
    "class": "scene",
@@ -11187,7 +10874,7 @@
   },
   {
    "file": "tools/lib/optimizer.js",
-   "line": 469,
+   "line": 468,
    "runtime": "fitting",
    "token": "earthInvPlaneInclinationAmplitude",
    "class": "scene",
@@ -11196,7 +10883,7 @@
   },
   {
    "file": "tools/lib/optimizer.js",
-   "line": 470,
+   "line": 469,
    "runtime": "fitting",
    "token": "earthInvPlaneInclinationAmplitude",
    "class": "scene",
@@ -11205,7 +10892,7 @@
   },
   {
    "file": "tools/lib/optimizer.js",
-   "line": 1036,
+   "line": 1035,
    "runtime": "fitting",
    "token": "earthInvPlaneInclinationAmplitude",
    "class": "comment",
@@ -11213,7 +10900,7 @@
   },
   {
    "file": "tools/lib/optimizer.js",
-   "line": 1037,
+   "line": 1036,
    "runtime": "fitting",
    "token": "earthtiltMean",
    "class": "comment",
@@ -11221,7 +10908,7 @@
   },
   {
    "file": "tools/lib/optimizer.js",
-   "line": 1040,
+   "line": 1039,
    "runtime": "fitting",
    "token": "earthtiltMean",
    "class": "display",
@@ -11229,7 +10916,7 @@
   },
   {
    "file": "tools/lib/optimizer.js",
-   "line": 1040,
+   "line": 1039,
    "runtime": "fitting",
    "token": "earthInvPlaneInclinationAmplitude",
    "class": "display",
@@ -11237,7 +10924,7 @@
   },
   {
    "file": "tools/lib/optimizer.js",
-   "line": 1046,
+   "line": 1045,
    "runtime": "fitting",
    "token": "earthInvPlaneInclinationAmplitude",
    "class": "scene",
@@ -11246,7 +10933,7 @@
   },
   {
    "file": "tools/lib/optimizer.js",
-   "line": 1047,
+   "line": 1046,
    "runtime": "fitting",
    "token": "earthtiltMean",
    "class": "scene",
@@ -11255,7 +10942,7 @@
   },
   {
    "file": "tools/lib/optimizer.js",
-   "line": 1052,
+   "line": 1051,
    "runtime": "fitting",
    "token": "H / N",
    "class": "comment",
@@ -11263,7 +10950,7 @@
   },
   {
    "file": "tools/lib/optimizer.js",
-   "line": 1068,
+   "line": 1067,
    "runtime": "fitting",
    "token": "earthInvPlaneInclinationAmplitude",
    "class": "scene",
@@ -11272,7 +10959,7 @@
   },
   {
    "file": "tools/lib/optimizer.js",
-   "line": 1071,
+   "line": 1070,
    "runtime": "fitting",
    "token": "earthtiltMean",
    "class": "scene",
@@ -11281,7 +10968,7 @@
   },
   {
    "file": "tools/lib/optimizer.js",
-   "line": 1080,
+   "line": 1079,
    "runtime": "fitting",
    "token": "earthtiltMean",
    "class": "scene",
@@ -11290,7 +10977,7 @@
   },
   {
    "file": "tools/lib/optimizer.js",
-   "line": 1081,
+   "line": 1080,
    "runtime": "fitting",
    "token": "earthInvPlaneInclinationAmplitude",
    "class": "scene",
@@ -11299,7 +10986,7 @@
   },
   {
    "file": "tools/lib/optimizer.js",
-   "line": 1293,
+   "line": 1292,
    "runtime": "fitting",
    "token": "earthtiltMean",
    "class": "scene",
@@ -11308,7 +10995,7 @@
   },
   {
    "file": "tools/lib/optimizer.js",
-   "line": 1294,
+   "line": 1293,
    "runtime": "fitting",
    "token": "earthInvPlaneInclinationAmplitude",
    "class": "scene",
@@ -11341,40 +11028,23 @@
   },
   {
    "file": "tools/lib/orbital-engine.js",
-   "line": 118,
+   "line": 110,
    "runtime": "node-lib",
    "token": "H / N",
    "class": "comment",
-   "text": "// ECCENTRICITY UNIFICATION: Earth rides the model's ONE law — the H/3 line"
+   "text": "// (Plan 09 step 6: `computeEccentricityEarth` — the H/3 eccentricity law"
   },
   {
    "file": "tools/lib/orbital-engine.js",
-   "line": 121,
+   "line": 111,
    "runtime": "node-lib",
    "token": "H / N",
    "class": "comment",
-   "text": "// twin is script.js _fwEarthEcc). The H/16 law-of-cosines form below"
+   "text": "// through the deep-time twin — and `computeEccentricity` — the H/16"
   },
   {
    "file": "tools/lib/orbital-engine.js",
-   "line": 137,
-   "runtime": "node-lib",
-   "token": "cyclesBetweenYears",
-   "class": "comment",
-   "text": "// cyclesBetweenYears). Same quantity, two conventions, inside one scene —"
-  },
-  {
-   "file": "tools/lib/orbital-engine.js",
-   "line": 149,
-   "runtime": "node-lib",
-   "token": "cyclesBetweenYears",
-   "class": "comb",
-   "text": "const c = dtm().cyclesBetweenYears(balancedYear, currentYear, divisor_N);",
-   "twin": "era-counter"
-  },
-  {
-   "file": "tools/lib/orbital-engine.js",
-   "line": 227,
+   "line": 185,
    "runtime": "node-lib",
    "token": "H / N",
    "class": "comment",
@@ -11382,7 +11052,7 @@
   },
   {
    "file": "tools/lib/orbital-engine.js",
-   "line": 279,
+   "line": 237,
    "runtime": "node-lib",
    "token": "H / N",
    "class": "comment",
@@ -11390,7 +11060,7 @@
   },
   {
    "file": "tools/lib/orbital-engine.js",
-   "line": 395,
+   "line": 353,
    "runtime": "node-lib",
    "token": "H / N",
    "class": "comment",
@@ -11398,7 +11068,7 @@
   },
   {
    "file": "tools/lib/orbital-engine.js",
-   "line": 395,
+   "line": 353,
    "runtime": "node-lib",
    "token": "/ 13",
    "class": "comment",
@@ -11406,7 +11076,7 @@
   },
   {
    "file": "tools/lib/orbital-engine.js",
-   "line": 397,
+   "line": 355,
    "runtime": "node-lib",
    "token": "H / N",
    "class": "comment",
@@ -11414,7 +11084,7 @@
   },
   {
    "file": "tools/lib/orbital-engine.js",
-   "line": 397,
+   "line": 355,
    "runtime": "node-lib",
    "token": "/ 13",
    "class": "comment",
@@ -11422,7 +11092,7 @@
   },
   {
    "file": "tools/lib/orbital-engine.js",
-   "line": 403,
+   "line": 361,
    "runtime": "node-lib",
    "token": "/ 13",
    "class": "comment",
@@ -11430,7 +11100,7 @@
   },
   {
    "file": "tools/lib/orbital-engine.js",
-   "line": 404,
+   "line": 362,
    "runtime": "node-lib",
    "token": "H / N",
    "class": "comment",
@@ -11438,7 +11108,7 @@
   },
   {
    "file": "tools/lib/orbital-engine.js",
-   "line": 404,
+   "line": 362,
    "runtime": "node-lib",
    "token": "/ 13",
    "class": "comment",
@@ -11446,7 +11116,7 @@
   },
   {
    "file": "tools/lib/orbital-engine.js",
-   "line": 415,
+   "line": 373,
    "runtime": "node-lib",
    "token": "H / N",
    "class": "comment",
@@ -11454,7 +11124,7 @@
   },
   {
    "file": "tools/lib/orbital-engine.js",
-   "line": 415,
+   "line": 373,
    "runtime": "node-lib",
    "token": "H / N",
    "class": "comment",
@@ -11462,7 +11132,7 @@
   },
   {
    "file": "tools/lib/orbital-engine.js",
-   "line": 479,
+   "line": 437,
    "runtime": "node-lib",
    "token": "H / N",
    "class": "comment",
@@ -11470,7 +11140,7 @@
   },
   {
    "file": "tools/lib/orbital-engine.js",
-   "line": 479,
+   "line": 437,
    "runtime": "node-lib",
    "token": "H / N",
    "class": "comment",
@@ -11478,7 +11148,7 @@
   },
   {
    "file": "tools/lib/orbital-engine.js",
-   "line": 515,
+   "line": 473,
    "runtime": "node-lib",
    "token": "H / N",
    "class": "comment",
@@ -11486,7 +11156,7 @@
   },
   {
    "file": "tools/lib/orbital-engine.js",
-   "line": 551,
+   "line": 507,
    "runtime": "node-lib",
    "token": "H / N",
    "class": "comment",
@@ -12947,11 +12617,11 @@
   },
   {
    "file": "packages/fitting/src/verify-pipeline.cjs",
-   "line": 217,
+   "line": 218,
    "runtime": "fitting",
    "token": "H / N",
    "class": "comment",
-   "text": "// Eccentricity at J2000 — the ONE shipped law (the H/3 channel through the"
+   "text": "// element (plan 09 step 6: the H/3 law through the Node engine left; plan 07"
   },
   {
    "file": "packages/physics/src/cardinal/index.cjs",
@@ -13276,6 +12946,22 @@
    "token": "H / N",
    "class": "comment",
    "text": "*  (H/16 precession) close the ellipse, with the true anomaly from the"
+  },
+  {
+   "file": "packages/physics/src/index.js",
+   "line": 114,
+   "runtime": "package",
+   "token": "H / N",
+   "class": "comment",
+   "text": "// (plan 09 step 6: createMoonEccChannel — the H/3 eccentricity law — is deleted; Earth's e of date is the N-body series on every path)"
+  },
+  {
+   "file": "packages/physics/src/index.js",
+   "line": 130,
+   "runtime": "package",
+   "token": "H / N",
+   "class": "comment",
+   "text": "// (plan 09 step 6: eccentricityFromCycles / computeEccentricityIntegrated — the H/16 law-of-cosines eccentricity — are deleted; no runtime read them)"
   },
   {
    "file": "packages/physics/src/index.js",
@@ -13994,138 +13680,6 @@
    "text": "* the deep eccentricity channel) and its H/12 taper. Two gates guard"
   },
   {
-   "file": "packages/physics/src/moon/ecc-channel.cjs",
-   "line": 5,
-   "runtime": "package",
-   "token": "H / N",
-   "class": "comment",
-   "text": "* e_E\"): e(t) = eccentricityBase · (1 + cos θ(t) / 2), where θ rides the H/3"
-  },
-  {
-   "file": "packages/physics/src/moon/ecc-channel.cjs",
-   "line": 11,
-   "runtime": "package",
-   "token": "H / N",
-   "class": "comment",
-   "text": "* DOMAIN (engine-switch decision (ii) restatement, plan 02 §8): this H/3"
-  },
-  {
-   "file": "packages/physics/src/moon/ecc-channel.cjs",
-   "line": 19,
-   "runtime": "package",
-   "token": "H / N",
-   "class": "comment",
-   "text": "* frame-invariant (fixed-frame periods only); the H/16 perihelion cycle"
-  },
-  {
-   "file": "packages/physics/src/moon/ecc-channel.cjs",
-   "line": 20,
-   "runtime": "package",
-   "token": "H / N",
-   "class": "comment",
-   "text": "* (the H/3 rotation seen from the H/13 equinox, 13 + 3 = 16) belongs to"
-  },
-  {
-   "file": "packages/physics/src/moon/ecc-channel.cjs",
-   "line": 20,
-   "runtime": "package",
-   "token": "H / N",
-   "class": "comment",
-   "text": "* (the H/3 rotation seen from the H/13 equinox, 13 + 3 = 16) belongs to"
-  },
-  {
-   "file": "packages/physics/src/moon/ecc-channel.cjs",
-   "line": 20,
-   "runtime": "package",
-   "token": "/ 13",
-   "class": "comment",
-   "text": "* (the H/3 rotation seen from the H/13 equinox, 13 + 3 = 16) belongs to"
-  },
-  {
-   "file": "packages/physics/src/moon/ecc-channel.cjs",
-   "line": 30,
-   "runtime": "package",
-   "token": "cyclesBetween",
-   "class": "comment",
-   "text": "*  - The injected `cyclesBetween` is the ENGINE'S OWN integrated-phase"
-  },
-  {
-   "file": "packages/physics/src/moon/ecc-channel.cjs",
-   "line": 39,
-   "runtime": "package",
-   "token": "cyclesBetween",
-   "class": "comment",
-   "text": "*  - Past the tidal-lock asymptote (cyclesBetween → null) eccAt returns the"
-  },
-  {
-   "file": "packages/physics/src/moon/ecc-channel.cjs",
-   "line": 47,
-   "runtime": "package",
-   "token": "cyclesBetween",
-   "class": "comment",
-   "text": "*   cyclesBetween: (yearA: number, yearB: number, divisorN: number) => (number | null),"
-  },
-  {
-   "file": "packages/physics/src/moon/ecc-channel.cjs",
-   "line": 52,
-   "runtime": "package",
-   "token": "cyclesBetween",
-   "class": "comment",
-   "text": "* }} deps — cyclesBetween MUST be the engine's own H-lattice phase counter"
-  },
-  {
-   "file": "packages/physics/src/moon/ecc-channel.cjs",
-   "line": 55,
-   "runtime": "package",
-   "token": "H / N",
-   "class": "comment",
-   "text": "*   inclinationCycleAnchorDeg is the H/3 inclination anchor (21.77°)."
-  },
-  {
-   "file": "packages/physics/src/moon/ecc-channel.cjs",
-   "line": 58,
-   "runtime": "package",
-   "token": "cyclesBetween",
-   "class": "plumbing",
-   "text": "cyclesBetween,",
-   "twin": "plumbing"
-  },
-  {
-   "file": "packages/physics/src/moon/ecc-channel.cjs",
-   "line": 80,
-   "runtime": "package",
-   "token": "H / N",
-   "class": "comment",
-   "text": "/** e_E on the H/3 line at tYr years from J2000 (negative = past)."
-  },
-  {
-   "file": "packages/physics/src/moon/ecc-channel.cjs",
-   "line": 84,
-   "runtime": "package",
-   "token": "cyclesBetween",
-   "class": "comb",
-   "text": "const cycles = cyclesBetween(2000, 2000 + tYr, 3);",
-   "twin": "era-counter"
-  },
-  {
-   "file": "packages/physics/src/moon/ecc-channel.cjs",
-   "line": 131,
-   "runtime": "package",
-   "token": "cyclesBetween",
-   "class": "comb",
-   "text": "const c = cyclesBetween(2000, 2000 + tYr, 3);",
-   "twin": "era-counter"
-  },
-  {
-   "file": "packages/physics/src/moon/ecc-channel.cjs",
-   "line": 133,
-   "runtime": "package",
-   "token": "cyclesBetween",
-   "class": "comb",
-   "text": "const cp = cyclesBetween(2000, 2000 + tYr + 1, 3), cm = cyclesBetween(2000, 2000 + tYr - 1, 3);",
-   "twin": "era-counter"
-  },
-  {
    "file": "packages/physics/src/phase/index.cjs",
    "line": 22,
    "runtime": "package",
@@ -14183,63 +13737,6 @@
    "token": "cyclesBetween",
    "class": "comb",
    "text": "return { ensureTable, cumulAtYear, integralBetween, j2000Drift, cyclesBetween, grid };",
-   "twin": "era-counter"
-  },
-  {
-   "file": "packages/physics/src/planets/ecc-channel.cjs",
-   "line": 4,
-   "runtime": "package",
-   "token": "H / N",
-   "class": "comment",
-   "text": "* (Earth on H/16, each planet on its OWN wobble period — S-P1):"
-  },
-  {
-   "file": "packages/physics/src/planets/ecc-channel.cjs",
-   "line": 14,
-   "runtime": "package",
-   "token": "H / N",
-   "class": "comment",
-   "text": "* of moon/ecc-channel — but a DIFFERENT law (H/16 orbit law vs the Moon"
-  },
-  {
-   "file": "packages/physics/src/planets/ecc-channel.cjs",
-   "line": 15,
-   "runtime": "package",
-   "token": "H / N",
-   "class": "comment",
-   "text": "* channel's H/3 line; doc 66 keeps the two deliberately distinct)."
-  },
-  {
-   "file": "packages/physics/src/planets/ecc-channel.cjs",
-   "line": 18,
-   "runtime": "package",
-   "token": "cyclesBetween",
-   "class": "comment",
-   "text": "*  - the browser's cyclesBetween carries its DEEP_TIME_MODE toggle and maps"
-  },
-  {
-   "file": "packages/physics/src/planets/ecc-channel.cjs",
-   "line": 46,
-   "runtime": "package",
-   "token": "cyclesBetween",
-   "class": "comment",
-   "text": "* cyclesBetween (toggle semantics ride along), null → mean."
-  },
-  {
-   "file": "packages/physics/src/planets/ecc-channel.cjs",
-   "line": 51,
-   "runtime": "package",
-   "token": "cyclesBetween",
-   "class": "comment",
-   "text": "*   cyclesBetween: (yearA: number, yearB: number, divisorN: number) => (number | null) }} env"
-  },
-  {
-   "file": "packages/physics/src/planets/ecc-channel.cjs",
-   "line": 55,
-   "runtime": "package",
-   "token": "cyclesBetween",
-   "class": "comb",
-   "text": "const cycles = env.cyclesBetween(anchorYearJ2000, currentYear, divisorN);",
    "twin": "era-counter"
   },
   {
@@ -19843,6 +19340,14 @@
    "text": "// H/16 identity is deleted; the anomalistic law's purity is pinned by"
   },
   {
+   "file": "test/browser/snapshot.test.mjs",
+   "line": 177,
+   "runtime": "tests",
+   "token": "H / N",
+   "class": "comment",
+   "text": "// (plan 09 step 6: the moonFwEcc@tYr rows — the H/3 eccentricity law — are retired)"
+  },
+  {
    "file": "test/browser/wobble-center.test.mjs",
    "line": 5,
    "runtime": "tests",
@@ -19860,15 +19365,7 @@
   },
   {
    "file": "public/input/astro-reference.json",
-   "line": 76,
-   "runtime": "source",
-   "token": "earthInclinationCycleAnchor",
-   "class": "source",
-   "text": "\"earthInclinationCycleAnchor\": 21.77,"
-  },
-  {
-   "file": "public/input/astro-reference.json",
-   "line": 660,
+   "line": 659,
    "runtime": "source",
    "token": "8H",
    "class": "source",
@@ -19924,7 +19421,15 @@
   },
   {
    "file": "public/input/model-parameters.json",
-   "line": 21,
+   "line": 22,
+   "runtime": "source",
+   "token": "H / N",
+   "class": "source",
+   "text": "\"_kDeviceInclinationPhaseNote\": \"Plan 09 step 6: the scene scaffolding's K-device inclination-wheel phase at J2000, degrees — the J2000 perihelion longitude (10"
+  },
+  {
+   "file": "public/input/model-parameters.json",
+   "line": 23,
    "runtime": "source",
    "token": "kDeviceWheelPhaseAtJ2000Cycles",
    "class": "source",
@@ -19932,7 +19437,7 @@
   },
   {
    "file": "public/input/model-parameters.json",
-   "line": 22,
+   "line": 24,
    "runtime": "source",
    "token": "earthtiltMean",
    "class": "source",
@@ -19940,7 +19445,7 @@
   },
   {
    "file": "public/input/model-parameters.json",
-   "line": 22,
+   "line": 24,
    "runtime": "source",
    "token": "H / N",
    "class": "source",
@@ -19948,7 +19453,7 @@
   },
   {
    "file": "public/input/model-parameters.json",
-   "line": 22,
+   "line": 24,
    "runtime": "source",
    "token": "H / N",
    "class": "source",
@@ -19956,7 +19461,7 @@
   },
   {
    "file": "public/input/model-parameters.json",
-   "line": 22,
+   "line": 24,
    "runtime": "source",
    "token": "H / N",
    "class": "source",
@@ -19964,7 +19469,7 @@
   },
   {
    "file": "public/input/model-parameters.json",
-   "line": 22,
+   "line": 24,
    "runtime": "source",
    "token": "H / N",
    "class": "source",
@@ -19972,7 +19477,7 @@
   },
   {
    "file": "public/input/model-parameters.json",
-   "line": 22,
+   "line": 24,
    "runtime": "source",
    "token": "H / N",
    "class": "source",
@@ -19980,7 +19485,7 @@
   },
   {
    "file": "public/input/model-parameters.json",
-   "line": 22,
+   "line": 24,
    "runtime": "source",
    "token": "/ 13",
    "class": "source",
@@ -20090,7 +19595,7 @@
  "inputs": {
   "generator": "node tools/explore/era-device-readers.mjs --write",
   "files": {
-   "data/nbody-secular-series.json": "sha256:5d065575e7a552b6039c237417932f29ed947bfe630395c88a8c2e71653438ff",
+   "data/nbody-secular-series.json": "sha256:6a01ff136333ef698110d10b1b2c83b99d498c36f6699585b2405bf4c4176721",
    "packages/api/src/app.js": "sha256:68672632a9882fd3269088865108309acb30500c729e9b027728a5a48e05a907",
    "packages/api/src/mcp.js": "sha256:fa7f55dd2d5d8a1aa5ef58d2e548d79f6cf7c8016355852fcf51b7c8747e439e",
    "packages/api/test/api-gates.test.mjs": "sha256:f4d191aaa52ec6d7d637b5a95fe4a393260278f92a72ecd82afa20615b6195fd",
@@ -20099,7 +19604,7 @@
    "packages/fitting/src/dt-corrections-fit.cjs": "sha256:0aa33779c599d9540d4d81cf850b799a9144644eda57b7e1f9603df318c6249c",
    "packages/fitting/src/export-solar-measurements.cjs": "sha256:4868e11dc85ed2bc2d4b80028c5592d85a8ac29814c9bf33ed6d0c4c81ff7bf5",
    "packages/fitting/src/run-pipeline.cjs": "sha256:15d9b921a31c5f56849fdd3fc8d0acfeed8cfecbb8a679049de445f54c4f83fc",
-   "packages/fitting/src/verify-pipeline.cjs": "sha256:992dbbbca71fe1735b6f02ad91610e9a61173b4062ca48743cbe3ea0b56ab167",
+   "packages/fitting/src/verify-pipeline.cjs": "sha256:1197c800254aaf71d3d672bf986c4cfd53b5d7278d39d3732584df66bb21ccb8",
    "packages/physics/src/cardinal/index.cjs": "sha256:694dcb605b3150fec0042ca03691690265225cbecd0f0e13bccfd338a673f2b2",
    "packages/physics/src/chain-cycles/index.cjs": "sha256:196e23625495a28f241e81a78f06fcc2d48847bee9c58d9566dbbc68a518e180",
    "packages/physics/src/deltat/cycles.cjs": "sha256:da684bd21865005f05ceec845683f1549efc17d5b11aeac2cf362b3f8e52bf99",
@@ -20107,7 +19612,7 @@
    "packages/physics/src/earth/precession-composed.cjs": "sha256:7f30ac5597b745a88b453c54bb47da39e5ec3c8bb8b349e34e8a15752c04a208",
    "packages/physics/src/earth/year-lengths.cjs": "sha256:ad86136a5455e5d846cee9cd03f55dc66b942edab56fa5c57f51fa2923decdb2",
    "packages/physics/src/eclipse/besselian.cjs": "sha256:f731968aa72105b31ca578f14644a5afcf228bb3a1103359414171de38baaf52",
-   "packages/physics/src/index.js": "sha256:9c703366c85d18ac5d56782efa5f58c375351e571e43fd1a042e574907c72678",
+   "packages/physics/src/index.js": "sha256:d2e9af56ba611a9659dc59d805987c06d31b35460560fa127e31789ebfc8547e",
    "packages/physics/src/layer0/derive-params.js": "sha256:d6e13bd55cfd3930546e5b50bdff5b5e88f90aa95666620c4bb3a95f130e0af1",
    "packages/physics/src/layer0/index.js": "sha256:a4930a0217e739bfbafb83989872b1f70316f3fbb66e16ac14453ae10994207a",
    "packages/physics/src/layer1/index.js": "sha256:ba7a15893b0d4b38ff53521f2180384b805160b313e4711740802b356cbd4e2f",
@@ -20115,16 +19620,14 @@
    "packages/physics/src/moon/arguments.cjs": "sha256:1515c221a4200dff230d44e7b144ef526f5ad295656b08874d2cc3b7118d9757",
    "packages/physics/src/moon/deep-ecc-channel.cjs": "sha256:7ce15d1c4f61f2ea730d7673d705a1eb2a31bff20b720cd00d8f1d34a3e85220",
    "packages/physics/src/moon/deep-modes-artifact.cjs": "sha256:3b1635dd7ade4d7c1dcbeccba7bea6186e823f7105948e6fc0c3ab860bb0cf9c",
-   "packages/physics/src/moon/ecc-channel.cjs": "sha256:e986b8ca3dbfdaa8508f49f315bc81718503b91eb56298d9ad4d7c29186fc691",
    "packages/physics/src/phase/index.cjs": "sha256:2504040126b019ea5704c1b939469007dfff49f6cac879968da7fd0fc93ce033",
-   "packages/physics/src/planets/ecc-channel.cjs": "sha256:6bc228810208eedc17b380bb610a0fd7b2b7b1e0cd29ccd2b90812a1e1aad6bc",
    "packages/physics/test/counterfactual.test.mjs": "sha256:8d15fa561222e929a3b3a92ec7738f2b67323ead955820b4aa26370943a4c153",
    "packages/physics/test/create-model-parity.test.mjs": "sha256:d332850f89f4ff2e3b68104d8f3b056c1724096bafc700f89f2f7b4e65f7bfe6",
    "packages/physics/test/layer0-identity.test.mjs": "sha256:7fbd286343c304f619b8b84323f85d6d76f41bad3414985d8cc020706c067cb1",
    "packages/physics/test/layer1-identity.test.mjs": "sha256:0c6311294f9e966e486bf1a8b5b4b7a44cc12c0d074f4f9b38281704bcdc1e3f",
-   "public/input/astro-reference.json": "sha256:4759bbd9048403ac044358187a4fa908b23356112abe418afcca6b1d006782f9",
+   "public/input/astro-reference.json": "sha256:a967a72ecdac487f628c0cb6ba07ae7cc771d07fa3eeaacc7b9949273e933fd7",
    "public/input/fitted-coefficients.json": "sha256:b0832cbcf704d06c1dd2696fa51942877513d5f7d7a05383f5fab0c13fe4b88f",
-   "public/input/model-parameters.json": "sha256:19d16cc2582d2130fd5c891cca0a36529104501d0b678e9b37dbf2bfb9969ced",
+   "public/input/model-parameters.json": "sha256:a1fa1237f5164cc7ced7fde8782abdf2170e38fdbfc1c79d34966daa3dd7296c",
    "public/input/model-version.json": "sha256:5c8b7ebcd6385b757446148f2366604418d3f94a8c7ad47d9231003c77d45545",
    "scripts/cenogrid_mtm_ftest.py": "sha256:ba759f2c79ae842483b027fafc88e62477c305cffa1056189fbc32d6f65acad2",
    "scripts/climate_formula_mwp_check.py": "sha256:cccc76dd08e5dc3efeb70ab5fd17691a4651657e315ffa85d948948383e7dcde",
@@ -20167,15 +19670,16 @@
    "scripts/solar_8H_lattice_test.py": "sha256:84091842eb0b82a4770b72cf81c67e0e34ae7adff85f04b434c9e442d6a00d36",
    "scripts/t1_beat_model_vs_comb.py": "sha256:94a7c58bc29bc6ee0d6c7897b29f8d459acf4e6263042c3a651e385218d69320",
    "scripts/t5_dt_stack_lattice_null.py": "sha256:7ae1794020f5e9b0cd3790679e847888af316a7b26bd8449069be20804ae5d97",
-   "src/script.js": "sha256:08e01eb62daf7ea5091cb5b8b6977ebc73a86157d26535e864ddbcd77db49dcc",
+   "src/script.js": "sha256:c61d9c73f9eede6f49c4a096850f41e95b5674a4d0ed16b4a160876441b1f3cc",
    "test/browser/epoch-consistency.test.mjs": "sha256:027b40559844497a53c6ee39fba2e0b848949a43e3ddb0e230cff9e0478a7172",
+   "test/browser/snapshot.test.mjs": "sha256:49d1696eebdd5e112fb25bf270d7a96b0daf1408d8c9ed900ef87486146e8b87",
    "test/browser/wobble-center.test.mjs": "sha256:456521771ea752f9112407c9f316d0dc92ec21d7b4ac90fbc5110772256ae8ad",
    "tools/check-python-physics.mjs": "sha256:2e569ff8c61927185c49294173ef56e332cb0f99c28472bd1f143206e37b80c2",
    "tools/check-vocabulary.mjs": "sha256:f3d9a7b33f275877a18ddad00688c478bcf567ac2c85afc8c57b9c9b8338ce13",
-   "tools/constants/check-literals.mjs": "sha256:21644f09ac2f59ec4386612006c09e94eaf02b2e2038a2dd13a424ed135c47d2",
+   "tools/constants/check-literals.mjs": "sha256:1a766b5b864559316a72066bfdf0371c511c663ead4eeb17b7fb08eb232df770",
    "tools/constants/generate.mjs": "sha256:7813e01c603d8fc4fca1b3377d327d475becc9e7ba1a2a249a219f7c4329e3ae",
-   "tools/docs/model-values.mjs": "sha256:770f56fc93dda1f1aaf4b93060e708ddcbdd8f3d0a384d2fbc168d5fb7e545bd",
-   "tools/docs/render-calculation-map.mjs": "sha256:a2c899108c834901e1628d4c2ed0a6b302f24a11238149b2036e3e475e737dda",
+   "tools/docs/model-values.mjs": "sha256:48c62e649680819cf183b1f73f8667669686c729fcbc3b5a63437f82c9a99c8f",
+   "tools/docs/render-calculation-map.mjs": "sha256:ad00e215b76830b95eeb9442c0eb2214f9e899ce9232c852f4ea181915244bb2",
    "tools/docs/render-doc99-tables.mjs": "sha256:cc60984832a2ff0874de9509f5ad48c8838e75eb0d0c3a432cdd2625ffa75521",
    "tools/explore/audit-moon-months.js": "sha256:b4c43bc025fd8662e1d12201f1c8c19556b325843cb036426559b3425c0f5ae8",
    "tools/explore/climate-band-phase.js": "sha256:0b81487d4cf86717265d53e7583b63e6ff7b52a5f8d9d8c3e7c21ff975e9bbe3",
@@ -20235,20 +19739,20 @@
    "tools/fit/python/planet_eccentricity_jpl.py": "sha256:80f0cfbcb6f75a7cb243398eb39d53486540bfaa567a64cf714e11f2e24ada4b",
    "tools/fit/reorigin-combs-j2000.mjs": "sha256:4bb8ba61b3ad3d5a576f0af1171aac7f07ab45a14bfdc348a3c7818607aa4ea7",
    "tools/fixtures/record-plan06-baseline.mjs": "sha256:69c686557eb67e4fc7d15158062180f0079c77f88a014f61f9aa01fc23f918d5",
-   "tools/fixtures/record-tools-lib.mjs": "sha256:40fb785dd93474c217b967462b0b8dd8345d66e7f9ddc91abde6ab646aac5cdb",
-   "tools/lib/constants.js": "sha256:41cf9d3ffc214df4a73a39ae26bfbf12c1f6f9f6256b968e859c639005acc3a3",
-   "tools/lib/constants/utils.js": "sha256:07bde4fdd56b3f52cc5b0f27c8bfe7204144a6d2cee9fd153d69528d78a2b7ca",
+   "tools/fixtures/record-tools-lib.mjs": "sha256:d622b39895b2beb623fa9d6c558f318a8a233e8a35711fa404395d7a407d2647",
+   "tools/lib/constants.js": "sha256:e3ff662999c866ed7fcb372d12f161167d883240e2cf1be22f57de5c63e53a0a",
+   "tools/lib/constants/utils.js": "sha256:7f77b7ac88f83619ffe352c71600a53eb666faee5155a04fe6fe8dd8c7da9bb7",
    "tools/lib/deep-orbital-history.js": "sha256:9f713a177edb5eb8e795b5cbf40d49f658668fdce6f20c75d010c4fbecfcbab2",
-   "tools/lib/deep-time.js": "sha256:bd001f57c6947ef874a2ac92f0c258f1a89f229f5b02f1ad888daf2efefb5a9a",
-   "tools/lib/optimizer.js": "sha256:951e539012c6af79652775a691ab577201d5c11c33ae9c1f01b0e590a60af15d",
-   "tools/lib/orbital-engine.js": "sha256:7085aaa7d6ec58919a82c4403ba018cde28a12f569b36f7e81c160fce486de7b",
+   "tools/lib/deep-time.js": "sha256:1a4f059f4eef7f5d3b59134187146aa62b0929f66ba05b354883d17fc3338ace",
+   "tools/lib/optimizer.js": "sha256:f5d1eb486fb8809422a0928643913577aa80141bcb1d464a8eec143f2ad2b152",
+   "tools/lib/orbital-engine.js": "sha256:e9cdec4e98d0528576f4cb16299634869026d19b4458e119b32b4b1dfa21241a",
    "tools/lib/python/constants_scripts.py": "sha256:27da5d7501d0e0192ab004eb97e8b1f0aa4f35eaae5ade1f75034b015e7b6d75",
    "tools/lib/python/planet_beats.py": "sha256:22bea2e267c22fe9d6d173db797aea0c7a1a29971838fff140e5ecc371fc66c5",
-   "tools/lib/scene-graph.js": "sha256:2b0416bcea3b900b0257bf079d1cc18ffd5d9926d2ab13be81f7ac3d9f7535df",
+   "tools/lib/scene-graph.js": "sha256:b9995d1846fd50235f362a6707cf548f0cf8aee121e2278c2558bf25cd8d392d",
    "tools/optimize.js": "sha256:14249fc2d21d81bc469faf99dfc2b2ff291d1ff9f38b993adda88faec70b4d52",
    "tools/verify/ascending-node-souami-souchay.js": "sha256:b307eb8d71e73f262fc317b2134a1bfd906c147fc38cf5d6a0a48e0dfbaf5e0c",
    "tools/verify/deep-secular-modes.js": "sha256:1c5d69aaeccbb305ddd842a5c19d8945b9f2747fabef3e97dfe70bdd14d57e6d",
-   "tools/verify/eclipse-audit.js": "sha256:d6e48dc93a6a56dd7a24b603d5b606dae296e0e24f67bd82cc6c65ee094a841e",
+   "tools/verify/eclipse-audit.js": "sha256:6084a62d8e83aeb51b270122679363f5b788b6485bd52da7af729fb7d8305169",
    "tools/verify/mercury-precession-centuries.js": "sha256:bc9336d77a8a0a5d900bcaed1e951a3ab542cf7d6dea1c2e514bcfa4df2ec936",
    "tools/verify/moon-deltat-comparison.js": "sha256:62fd0a9a77f69014adc56e8c65e075a6ace8f0909e529fbd68d0764a322e73b3",
    "tools/verify/obliquity-hybrid.js": "sha256:aa55e294850d75db8ca12e8b7bdcdcdc1195a81406ec2f7dbdbf535a0e3290fe",

@@ -462,15 +462,7 @@ Meeus's empirical node T² to 1.8% with no fitting; the shipped 1.018 makes
 the node channel Meeus-exact) and s_ϖ = 2.407 (anchored, the
 Clairaut-amplified apsidal sensitivity; constant across the T²/T³ orders —
 an independent check; the lab-derived physical exponents are 0.867/2.479,
-the 2.407/1.018 pair being their frame-effective Meeus-convention form). e_E(t) is the FULLY-DERIVED framework H/3 fluctuation —
-e(t) = eccentricityBase·(1 + cos θ(t)/2) with
-θ(t) = θ(J2000) + 3·(cycles from J2000)·360°, θ(J2000) = 81.178° (the
-retired origin's 3·(2000 − t₀)/H·360° − 180°, kept as the recorded anchor;
-plan 07 R10 — the phase is measured from J2000, t₀ is no longer an input) — one
-movement (the same H/3 wobble that drove the retired device's inclination),
-inputs base/anchor angle/H only; the observed J2000 eccentricity
-(−0.9%) and its rate (+1.7%) are predictions (derivation record and
-experiment log: doc 66 §1). The modulation is bounded at every epoch
+the 2.407/1.018 pair being their frame-effective Meeus-convention form). e_E(t) is the model's own N-body eccentricity of date (the deep-mode channel, decision (ii) of plan 02 §8). The former H/3 fluctuation line that stood here — e(t) = base·(1 + cos θ(t)/2) on the inclination wheel's phase, whose J2000 eccentricity (−0.9 %) and rate (+1.7 %) were predictions — is deleted at plan 09 step 6; doc 66 §1 keeps its derivation record, and the scene keeps its J2000 phase as a recorded pose. The modulation is bounded at every epoch
 (e ∈ [0.0077, 0.0231]: perigee within ±0.1%, node within ±0.04%), so the
 mean is the law and the modulation a bounded oscillation about it — while
 Meeus's empirical T² polynomial, correct locally, diverges without bound at

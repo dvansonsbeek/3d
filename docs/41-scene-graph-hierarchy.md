@@ -249,10 +249,10 @@ Both layers use the same period but opposite signs:
 
 The paired inverse rotations maintain equilibrium during Earth's two counter-motions.
 
-**The one eccentricity law in the scene.** Earth's
-eccentricity is one function, e(t) = base′·(1 + cos θ₃(t)/2) on the H/3
-inclination phase (the same line the Moon channel and the eclipse Sun
-ride; base′ derived from e(J2000) and the shared anchor). The scene
+**Earth's eccentricity in the scene.** Earth's
+eccentricity is the N-body secular series on every path (plan 09 step 6: the
+former one-law e(t) = base′·(1 + cos θ₃(t)/2) on the H/3 inclination phase is
+deleted; base′ stays as the perihelion wheel's pose). The scene
 realizes it as ONE arm: Perihelion Precession 2's centre carries
 −e(t)·100 every frame (`moveModel` in both twins), pointing at the
 perihelion phase +180° — an ellipse centre, measured θ_p1 ≡ the Sun's
@@ -529,7 +529,7 @@ For current values, see [Constants Reference](20-constants-reference.md).
 | Mean obliquity | `earthtiltMean` | Earth's mean axial tilt |
 | Inclination amplitude | `earthInvPlaneInclinationAmplitude` | Earth's orbital tilt oscillation |
 | Base eccentricity | `eccentricityBase` | Earth's Law-5 balance eccentricity |
-| Mean eccentricity | `eccentricityBaseDerived` (base′) | The one law's mean, derived from e(J2000) and the shared anchor; the scene's per-frame offset carries e(t) |
+| Mean eccentricity | `eccentricityBaseDerived` (base′) | The perihelion wheel's offset base′ — the scaffold's J2000 pose, derived from e(J2000) and the recorded K inclination phase; the scene's per-frame offset carries the series' e(t) (the law is deleted, plan 09 step 6) |
 | Eccentricity amplitude | `eccentricityAmplitude` | Retained only as the Law-4 K calibration input (no longer a scene arm) |
 
 ---

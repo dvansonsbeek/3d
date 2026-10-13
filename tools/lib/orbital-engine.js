@@ -107,53 +107,11 @@ function computePlanetObliquity(planetName, year) {
 // ECCENTRICITY
 // ═══════════════════════════════════════════════════════════════════════════
 
-/**
- * Compute Earth's orbital eccentricity for a given year.
- * Source: script.js computeEccentricityEarth() ~line 33358
- *
- * @param {number} currentYear - decimal year
- * @returns {number} eccentricity at that year
- */
-function computeEccentricityEarth(currentYear) {
-  // ECCENTRICITY UNIFICATION: Earth rides the model's ONE law — the H/3 line
-  // of moon/ecc-channel.cjs with base' derived from e(J2000) (deep-time's
-  // _fwEarthEcc, the same channel instance the lunar chain uses; the browser
-  // twin is script.js _fwEarthEcc). The H/16 law-of-cosines form below
-  // (computeEccentricity) remains for the PLANETS' wobble laws (D4).
-  return dtm()._fwEarthEcc(currentYear - 2000);
-}
-
-/**
- * Generalized eccentricity formula for any planet.
- * e(t) = e₀ + (−A − (e₀ − e_base)·cos θ)·cos θ  where e₀ = √(e_base² + A²)
- * Source: script.js computeEccentricityEarth() ~line 33358
- */
-function computeEccentricity(currentYear, balancedYear, cycleLength, base, amplitude) {
-  // R6: the phase must be INTEGRATED under deep time, matching the browser's
-  // computeEccentricityEarth (phaseAdvanceRadians). This was a plain linear
-  // θ = 2π(year − anchor)/cycleLength, which made the two engines disagree on
-  // the eccentricity VALUE at deep time while already agreeing on the
-  // perihelion GEOMETRY (the scene rotates its precession objects via
-  // cyclesBetweenYears). Same quantity, two conventions, inside one scene —
-  // measured at 3e-14 at J2000, −1.10e-6 at −150 kyr, up to 7.4 s of
-  // cardinal-point timing at deep time.
-  //
-  // The snapshot branch is algebraically identical to the old linear form:
-  // (year − anchor) × (H/cycleLength) / H = (year − anchor)/cycleLength.
-  // Flag polarity matches the scene-graph default (R1: deep time ON,
-  // SG_DEEP_TIME=0 opts out into snapshot mode).
-  const divisor_N = C.H / cycleLength;
-  const snapshot = (currentYear - balancedYear) * divisor_N / C.H;
-  let cycles = snapshot;
-  if (process.env.SG_DEEP_TIME !== '0') {
-    const c = dtm().cyclesBetweenYears(balancedYear, currentYear, divisor_N);
-    if (c !== null) cycles = c;   // null past the tidal-lock asymptote → keep snapshot
-  }
-  // Phase 8.3 L3: the law of cosines lives ONCE in
-  // @essrt/physics/planets/ecc-channel (this engine keeps its documented R6
-  // snapshot-fallback dispatch above; cycles is always a number here).
-  return _req('@essrt/physics/planets/ecc-channel').eccentricityFromCycles(cycles, base, amplitude);
-}
+// (Plan 09 step 6: `computeEccentricityEarth` — the H/3 eccentricity law
+// through the deep-time twin — and `computeEccentricity` — the H/16
+// law-of-cosines form kept for the planets' wobble laws that K5 excised — are
+// deleted. Earth's eccentricity of date is the N-body series on every path:
+// `createModel().earth.eccentricity(year)`, the scene's `_kcElementsOfDate`.)
 
 /**
  * Compute perihelion and aphelion distances from eccentricity.
@@ -532,9 +490,7 @@ module.exports = {
   // Obliquity
   computePlanetObliquity,
 
-  // Eccentricity
-  computeEccentricity,
-  computeEccentricityEarth,
+  // Eccentricity (plan 09 step 6: the two law evaluators are deleted)
   computeSemiMajorAxis,
   computePerihelionAphelionDistance,
 

@@ -11,7 +11,7 @@ import { Pane } from 'tweakpane';
 //
 // Generated at build time, not fetched at runtime — `holisticyearLength` is read
 // at module scope below, and Phase 15 requires offline === hosted.
-import { computeObliquityJ2000Deg, computeSecularShape, DEFAULT_CONSTANTS as K, REFERENCE_DATA as R, FITTED_COEFFICIENTS as FIT, CONSTANTS_HASH, COEFFICIENTS_HASH, MODEL_VERSION, PREPRINT_DOI, createEpochPrimitives, createPhaseMachinery, createDeepCalendar, createMoonEccChannel, createDeepEccChannel, DEEP_MODES_ARTIFACT, createDeepOrbitalHistory, createYearLengths, computeMeanTropicalYearJ2000Days, createMoonMonthChain, createChainCycleIntegrator, createMoonArguments, createMoonSeries, createMoonApparent, derivePlanetGeometry, computeEccentricityIntegrated, planetOrbitChain as _POC, createDeltaTCycles, createDeepTimeLod, createMoonRecessionHistory, createSolarChannelBudget, deltaTEspenakMeeusCanonSeconds, evalClimateL1OrbitalPermil, createAlphaGiaChannel, computeSolarTorqueShare, createEclipseFinders, createModel, buildPlanetChainsFromArtifactData, computePlanetElementsAtYear as kcComputePlanetElementsAtYear, computeHeliocentricEclipticFromElements as kcComputeHeliocentricEclipticFromElements, computeEquatorNodeOriginSFrameDeg, convertNodeSFrameToEquatorOriginDeg, createSecularSeriesOverride, CHAIN_ARTIFACT, ANCHOR_EPOCH_YEAR as KC_ANCHOR_EPOCH_YEAR, ANCHOR_EPOCH_JD as KC_ANCHOR_EPOCH_JD, computeEarthFrameOfDate, solveWheelAngleForLongitude } from '@essrt/physics';
+import { computeObliquityJ2000Deg, computeSecularShape, DEFAULT_CONSTANTS as K, REFERENCE_DATA as R, FITTED_COEFFICIENTS as FIT, CONSTANTS_HASH, COEFFICIENTS_HASH, MODEL_VERSION, PREPRINT_DOI, createEpochPrimitives, createPhaseMachinery, createDeepCalendar, createDeepEccChannel, DEEP_MODES_ARTIFACT, createDeepOrbitalHistory, createYearLengths, computeMeanTropicalYearJ2000Days, createMoonMonthChain, createChainCycleIntegrator, createMoonArguments, createMoonSeries, createMoonApparent, derivePlanetGeometry, planetOrbitChain as _POC, createDeltaTCycles, createDeepTimeLod, createMoonRecessionHistory, createSolarChannelBudget, deltaTEspenakMeeusCanonSeconds, evalClimateL1OrbitalPermil, createAlphaGiaChannel, computeSolarTorqueShare, createEclipseFinders, createModel, buildPlanetChainsFromArtifactData, computePlanetElementsAtYear as kcComputePlanetElementsAtYear, computeHeliocentricEclipticFromElements as kcComputeHeliocentricEclipticFromElements, computeEquatorNodeOriginSFrameDeg, convertNodeSFrameToEquatorOriginDeg, createSecularSeriesOverride, CHAIN_ARTIFACT, ANCHOR_EPOCH_YEAR as KC_ANCHOR_EPOCH_YEAR, ANCHOR_EPOCH_JD as KC_ANCHOR_EPOCH_JD, computeEarthFrameOfDate, solveWheelAngleForLongitude } from '@essrt/physics';
 // K8 — the reference package: ONE-WAY imports (comparison only;
 // @essrt/reference is private-by-construction and nothing in the model
 // chain depends on it). publishedCurves migrated here from
@@ -103,13 +103,18 @@ const kDeviceWheelPhaseAtJ2000Cycles = K.earth.kDeviceWheelPhaseAtJ2000Cycles;
 // The optimizer must NEVER touch this — it is set by the Law 5 balance constraint.
 const eccentricityBase = K.earth.eccentricityBase;        // Law 5 balance-locked (v11 constant; Earth's weight in the balance is 0.05%)
 const eccentricityAmplitude = K.earth.eccentricityAmplitude;  // v11 H/16 amplitude — RETAINED ONLY as the Law-4 K calibration input (unification, decision D2)
-// ECCENTRICITY UNIFICATION (plan IP-eccentricity-unification, D1 = form (e)):
-// the one law's mean base' = e(J2000) / (1 + cos θ₀/2), θ₀ = ϖ_ICRF(J2000) −
-// the inclination-cycle anchor (the System-Reset phase in anchor form) —
-// DERIVED; matched bit-for-bit with tools/lib/constants.js and the channel
-// (moon/ecc-channel.cjs derives the same value from the same inputs).
+// Plan 09 step 6: the K-device inclination wheel's J2000 phase — a recorded
+// POSE constant (ϖ_J2000 − the retired eccentricity law's 21.77° anchor). It
+// poses earthInvPlaneInclinationMean, the inclination path's zodiac offset and
+// the perihelion wheel's offset base′ below; nothing published rides it (the
+// engine places the Earth frame, the Sun and the Moon stack over the scaffold).
+const kDeviceInclinationPhaseJ2000Deg = K.earth.kDeviceInclinationPhaseJ2000Deg;
+// The perihelion wheel's offset base′ = e(J2000) / (1 + cos θ₀/2) — the
+// scaffold's J2000 pose (R4 places the arm at the series' e of date every
+// frame); matched bit-for-bit with tools/lib/constants.js. The H/3
+// eccentricity law that evolved e(t) on it is deleted (plan 09 step 6).
 const eccentricityBaseDerived = K.earthOrbital.earthEccentricityJ2000
-  / (1 + Math.cos((K.earthOrbital.earthPerihelionLongitudeJ2000 - K.earthOrbital.earthInclinationCycleAnchor) * Math.PI / 180) / 2);
+  / (1 + Math.cos(kDeviceInclinationPhaseJ2000Deg * Math.PI / 180) / 2);
 // PSI is derived from Earth's inclination amplitude — see section E2c below
 // K is derived from Earth's eccentricity amplitude + mean obliquity — see section E2d below
 // Same NUMBER as ascendingNodesSouamiSouchay.earth, different ROLE — which is
@@ -119,7 +124,7 @@ const eccentricityBaseDerived = K.earthOrbital.earthEccentricityJ2000
 // EclipticInclinationSouamiSouchayDynamic comparison. Class 2 vs class 3 turns
 // on function, not on value, and here the two functions share a figure.
 const earthAscendingNodeInvPlaneVerified = K.earthOrbital.earthAscendingNodeInvPlane;  // Verified ascending node (Souami & Souchay 2012)
-const earthInclinationCycleAnchor = K.earthOrbital.earthInclinationCycleAnchor;  // Cycle anchor: ω̃_ICRF at max inclination (from balanced year)
+// (plan 09 step 6: earthInclinationCycleAnchor — the eccentricity law's 21.77° — left the inputs with the law)
 
 // ═══════════════════════════════════════════════════════════════════════════
 // C. ASTRO REFERENCES (source: public/input/astro-reference.json)
@@ -904,11 +909,11 @@ const ASTRO_REFERENCE = {
 // ─────────────────────────────────────────────────────────────────────────
 // Derived: 2A − A²/ε — two tilt layers (H/3 + H/5) minus second-order equatorial projection
 const earthRAAngle = 2 * earthInvPlaneInclinationAmplitude - earthInvPlaneInclinationAmplitude * earthInvPlaneInclinationAmplitude / earthtiltMean;
-// Derived: inclJ2000 − amplitude × cos(ω̃_J2000 − phaseAngle), using perihelion longitude (ICRF)
-const earthInvPlaneInclinationMean = ASTRO_REFERENCE.earthInclinationJ2000_deg - earthInvPlaneInclinationAmplitude * Math.cos((ASTRO_REFERENCE.perihelionLongitudeJ2000_deg - earthInclinationCycleAnchor) * Math.PI / 180);
+// Derived: inclJ2000 − amplitude × cos(the K inclination phase at J2000) — a scene pose constant
+const earthInvPlaneInclinationMean = ASTRO_REFERENCE.earthInclinationJ2000_deg - earthInvPlaneInclinationAmplitude * Math.cos(kDeviceInclinationPhaseJ2000Deg * Math.PI / 180);
 
-// Inclination path zodiac offset — uses perihelion longitude from ASTRO_REFERENCE
-const inclinationPathZodiacOffsetDeg = 360 - startAngleModel - (ASTRO_REFERENCE.perihelionLongitudeJ2000_deg - earthInclinationCycleAnchor);
+// Inclination path zodiac offset — the scaffold's pose on the K inclination phase at J2000
+const inclinationPathZodiacOffsetDeg = 360 - startAngleModel - kDeviceInclinationPhaseJ2000Deg;
 
 // --- 9a. Time units & year lengths ---
 let   meanearthRotationsinDays = meansolaryearlengthinDays+1;  // Phase 6: mutable (Tier 2)
@@ -4075,102 +4080,26 @@ function meanMoonApsidalOfDateCyclesBetween(yearA, yearB) {
   return (trop === null || anom === null) ? null : trop - anom;
 }
 
-// ═════════════════════════════════════════════════════════════════════════════
-// Framework Earth-eccentricity composite (deep-time e_E)
-//
-// The multi-planet secular e_E the Moon feels through the Sun's perturbation:
-// 8H-lattice lines + the labeled OFF-lattice 405-kyr g2−g5 term (L2 taxonomy).
-// Equality-constrained fit on e(0) = 0.0167024 and ė(0) = −4.204e-5/cy
-// (tools/explore/path-c-ecc-composite.js; LA2010 −500..0 kyr, ridge λ=3e-4).
-// Anchored magnitudes + structural periods — NOT zero-fit (4-flag taxonomy).
-// Beyond the fit window the claim is BOUNDEDNESS + band structure; phases
-// indicative only (same class as the L1 lattice phase-drift note).
-//
-// Status: A/B RESEARCH ONLY — SUPERSEDED as the production e_E by the
-// fully-derived H/3 fluctuation line (_FW_ECC/_fwEarthEcc below), which now
-// carries the factored deep-time law — rate(t) = [invariant mean from H(t)]
-// × [g(t)/g₀]^s, g = (1−e²)^(−3/2) — and the E-factor. The composite is
-// retained for comparison experiments only. The anchored chains carry the
-// full factored law on the derived line (the N-form "invariant mean" family
-// left at plan 09 step 5c).
-// ═════════════════════════════════════════════════════════════════════════════
-const _ECOMP = {
-  c0: 0.02814222258,
-  T:  [405000, 95804.8571, 99353.1852, 107301.44, 121933.4545, 127739.8095, 134126.8, 86533.4194, 223544.6667, 298059.5556],
-  A:  [-0.01713360824, 0.003885798879, 0.003162499557, -0.002439315342, 0.0009946933865, -0.002804779985, 0.0007349600656, 0.002378093225, -0.0007624261717, 0.0005442620468],
-  B:  [-0.0009600398502, -0.009349595921, 0.001151405217, -0.004809468603, 0.005451777722, 0.00162872882, -0.001835102032, 0.003606461969, -0.001298883291, -0.003982540754],
-};
-
-/** Framework Earth-eccentricity composite at t years relative to J2000 (negative = past). */
-function _fwEarthEccComposite(t_yr) {
-  let e = _ECOMP.c0;
-  for (let i = 0; i < _ECOMP.T.length; i++) {
-    const w = 2 * Math.PI * t_yr / _ECOMP.T[i];
-    e += _ECOMP.A[i] * Math.cos(w) + _ECOMP.B[i] * Math.sin(w);
-  }
-  return e;
-}
-const _ECOMP_G0 = Math.pow(1 - _fwEarthEccComposite(0) ** 2, -1.5);   // g at the composite's OWN J2000 anchor (its KKT-constrained e(0), from the La2010 fit — deliberately NOT astro-reference, so the composite's modulation ≡ 1 at J2000; A/B research only, production uses _FW_ECC_G0)
-
-/** Earth's eccentricity — the model's ONE law, shared by every Earth
- *  consumer (scene offset, Sun equation of centre, cardinal braid, the Moon's
- *  E-factor and rate channel, predictions, reports, charts):
- *
- *      e(t) = base′ · (1 + cos θ₃(t) / 2)
- *
- *  θ₃ is the H/3 inclination-cycle phase on the System-Reset anchor
- *  (θ₃(J2000) = ϖ_ICRF(J2000) − earthInclinationCycleAnchor ≈ 81.18°), so
- *  the eccentricity extremes coincide with the inclination's. base′ is
- *  DERIVED — e(J2000) / (1 + cos θ₀/2) — from the observed J2000 eccentricity
- *  and the shared anchor; nothing is fitted, and e(J2000) is exact by
- *  construction. Range [base′/2, 3·base′/2]; the modulation half-range is
- *  base′/2 (distinct from `eccentricityAmplitude`, the Law-4 A input that is
- *  the wobble-marker distance, not a term of this law). ė(J2000) is a
- *  prediction of the law (registry earthEccDotModelJ2000 vs the observed
- *  earthEccDotJ2000). The H/16 perihelion cycle is the DIRECTION ϖ of the
- *  offset vector e(t)·û(ϖ), never a term of |e|. Deep-time aware via
- *  cyclesBetweenYears (integrated ∫3/H(t)dt when on).
- *
- *  The law lives ONCE in @essrt/physics/moon/ecc-channel; this engine
- *  delegates, injecting its OWN cyclesBetweenYears so the deep-time /
- *  snapshot toggle semantics ride along. Anchors e0/g0 are consts inside the
- *  channel (never eccAt(0)). */
-const _moonEcc = (() => {
-  let m = null;
-  return () => {
-    if (!m) {
-      m = createMoonEccChannel({
-        cyclesBetween: cyclesBetweenYears,
-        eccentricityBase,
-        perihelionLongitudeJ2000Deg: ASTRO_REFERENCE.perihelionLongitudeJ2000_deg,
-        inclinationCycleAnchorDeg: earthInclinationCycleAnchor,
-        // ECCENTRICITY UNIFICATION: the one law — base' derived from the
-        // observed J2000 eccentricity inside the channel (matched with
-        // packages/physics model.js and tools/lib/deep-time.js).
-        eccentricityJ2000: ASTRO_REFERENCE.eccentricityJ2000,
-      });
-    }
-    return m;
-  };
-})();
-function _fwEarthEcc(t_yr) { return _moonEcc().eccAt(t_yr); }
+// (Plan 09 step 6: the H/3 eccentricity law — `_moonEcc`/`_fwEarthEcc` on
+// @essrt/physics/moon/ecc-channel, e(t) = base′·(1 + cos θ₃(t)/2) with θ₃ the
+// inclination-wheel phase and base′ = e(J2000)/(1 + cos θ₀/2) — and the
+// Laskar-band research composite `_ECOMP`/`_fwEarthEccComposite` are deleted.
+// Earth's eccentricity of date is the N-body series on every path
+// (`_sceneEccTargetAt`); doc 66 §1 keeps the line's derivation record and the
+// scene keeps its J2000 phase as the recorded pose kDeviceInclinationPhaseJ2000Deg.)
 
 /** Engine-switch decision (ii) (plan 02 §8): the ONE deep e — the engine's
  *  own ±10-Myr mode table, anchored form — feeds the ENTIRE lunar chain
  *  (modulation/cycle counts, arguments eccAt/channelIntegral, E-factor).
- *  The Sun/clock machinery (_fwEarthEcc above: scene Sun offset, cardinal
- *  braid) stays on the H/3 channel — a certification split, not a physics
- *  one (the two agree within 4.2e-5 in-era). */
+ *  The scene's Earth e of date is the N-body series (`_sceneEccTargetAt`);
+ *  the H/3 channel that once stood beside it is deleted (plan 09 step 6). */
 const _deepEcc = (() => {
   let m = null;
   return () => { if (!m) m = createDeepEccChannel(DEEP_MODES_ARTIFACT); return m; };
 })();
-/** Earth's eccentricity at a decimal year — the H/3 law (the epoch-local
- *  clock-side line): the scene, cardinal braid, predictions, reports and
- *  charts go through this; the lunar chain rides _deepEcc (decision (ii));
- *  the 5-argument `computeEccentricityEarth` below stays ONLY for the
- *  planets' wobble laws. */
-function computeEccentricityEarthAtYear(year) { return _fwEarthEcc(year - 2000); }
+// (plan 09 step 6: `computeEccentricityEarthAtYear` — the H/3 law at a decimal
+// year — is deleted; the scene, predictions, reports and charts read
+// `_sceneEccTargetAt`, the series.)
 
 /** Integral of the PHASE-AWARE channel rate: ∫₀ᵀ [(g(e(t))/g₀)^s − 1] dt′ in
  *  Julian centuries. The perigee/node rates are NOT constants — they speed up
@@ -5632,7 +5561,6 @@ if (typeof window !== 'undefined') {
     eclMoonLon: (jd) => _eclMoonLon(jd),
     eclMoonBeta: (jd) => _eclMoonBeta(jd),
     eclMoonDistance: (jd) => _eclMoonDistance(jd),
-    fwEarthEcc: (tYr) => _fwEarthEcc(tYr),
     fwChannelIntegral: (T, s) => _fwChannelIntegral(T, s),
     fwEFactor: (jdTT) => {
       const T = (jdTT - j2000JD) / julianCenturyDays;
@@ -18449,7 +18377,7 @@ function _sceneEccTargetAt(year) {
   // flag (the factory sampler: banked z series inside ±10 Myr, the deep-z
   // mode tail beyond — J2000-anchored inside the factory). K law flag-off.
   if (_hybridSpinActive()) return _hybridSeriesSampleAt(year).e;
-  return computeEccentricityEarthAtYear(year);
+  return ASTRO_REFERENCE.eccentricityJ2000;   // plan 09 step 6: before the series artifact arrives, the J2000 pose (the H/3 law is deleted)
 }
 
 /** Model ascending node on invariable plane — retrograde at -H/5 (confirmed by La2010 N-body solution) */
@@ -19756,7 +19684,7 @@ function _vfpPEEarthEcc(year) {
       return Math.hypot(li(S.q, t), li(S.p, t));
     }
   }
-  return computeEccentricityEarthAtYear(year);
+  return ASTRO_REFERENCE.eccentricityJ2000;   // plan 09 step 6: before the series artifact arrives, the J2000 pose (the H/3 law is deleted)
 }
 function _vfpPESamples(range) {
   const r = range || _vfpCurrentTabFor('planet-eccentricities').range;
@@ -23384,8 +23312,8 @@ function setupGUI() {
       'The K comb\u2019s mean, fitted to the observed obliquity range, and the scene\u2019s J2000 pose. A device constant: the published obliquity is the hybrid (Ledger 1); the comb still carries the cardinal-point model, the kinematic-day stack\u2019s RA projection, the lunar arguments\u2019 obliquity carrier and the scene\u2019s K geometry.');
     row('Inclination amplitude \u00B7 ' + earthInvPlaneInclinationAmplitude + '\u00B0',
       'A constant of the scene\u2019s J2000 pose, fitted to the observed obliquity range; the K inclination law it once fed is retired (plan 07 R5/R9). The published inclination is the chain\u2019s (Ledger 1).');
-    row('The eccentricity line\u2019s phase anchor \u00B7 ' + earthInclinationCycleAnchor + '\u00B0',
-      'The recorded J2000 phase of the correction bases (plan 07 R10: the former fitted origin t\u2080 was rotated out of every coefficient exactly); the anchor arithmetic itself is exact. Phases the browser scene Sun\u2019s eccentricity law (the physics package\u2019s eclipse Sun no longer reads it) and the Moon eccentricity channel\u2019s anchor form.');
+    row('K inclination phase at J2000 \u00B7 ' + kDeviceInclinationPhaseJ2000Deg.toFixed(5) + '\u00B0',
+      'The scene scaffolding\u2019s recorded pose of the inclination wheel at J2000 (plan 09 step 6; it was the J2000 perihelion longitude minus the retired eccentricity law\u2019s 21.77\u00B0 anchor). It poses the mean inclination, the inclination path and the perihelion wheel\u2019s offset base\u2032; no observable rides it \u2014 Earth\u2019s eccentricity of date is the N-body series on every path.');
     row('K wheel phase at J2000 \u00B7 ' + kDeviceWheelPhaseAtJ2000Cycles.toFixed(6) + ' anchor units',
       'The scene scaffolding\u2019s recorded pose \u2014 each H/N wheel stands N \u00D7 this on at J2000 \u2014 not a law: no observable rides it (the engine places the Earth frame, the Sun and the Moon stack over the scaffold). Numerically the retired origin\u2019s (2000 \u2212 t\u2080)/H, kept with the pose (plan 07 R10).');
     row('Correction-basis divisors \u00B7 device tier',
@@ -23417,7 +23345,7 @@ function setupGUI() {
       ciEarthIncl: R.earthInclinationJ2000_deg + '\u00B0',
       ciEccentricity: String(R.eccentricityJ2000),
       ciAscNode: fmtDeg(earthAscendingNodeInvPlaneVerified),
-      ciPhaseAngle: fmtDeg(earthInclinationCycleAnchor),
+      ciPhaseAngle: fmtDeg(kDeviceInclinationPhaseJ2000Deg),
       ciSiderealYearSec: meansiderealyearlengthinSeconds + ' s',
       ciSiderealYear: R.siderealYearJ2000 + ' days',
       ciTropicalYear: R.tropicalYearMeanJ2000 + ' days',
@@ -41985,7 +41913,7 @@ async function analyzeSolarDayMultiEpoch() {
       const obliquity = _sceneEpsTargetDeg(epochYear);   // plan 09: the scene's one-source ε (the hybrid), not the retired 16-harmonic comb
       const inclination = inclInvPlaneModel(epochYear);   // R5: the one-source i_inv (was the H/3 device cosine)
       const eclipticInclination = obliquity - inclination;
-      const ecc = computeEccentricityEarthAtYear(epochYear);  // the ONE law (unification)
+      const ecc = _sceneEccTargetAt(epochYear);  // the scene's one e of date (the series; plan 09 step 6)
       const tropicalYearDays = computeSolarYearDaysFromCardinals(epochYear);
       const siderealYearDays = siderealYearDaysOfDate(epochYear);
       const anomalisticYearDays = anomalisticYearDaysOfDate(epochYear);
@@ -45658,7 +45586,7 @@ const planetStats = {
        hover : [`Left = mean obliquity (base tilt). Right = current dynamic value. Full range ~${(earthtiltMean - 2*earthInvPlaneInclinationAmplitude).toFixed(2)}°–${(earthtiltMean + 2*earthInvPlaneInclinationAmplitude).toFixed(2)}° over the obliquity cycle. Obliquity cycle: ~${fmtNum(_obliqBeatYearsAtAge(0) ?? 0, 0, ',')} years at J2000 — the beat of the axial precession against the orbit’s nodal mode`]},
       {label : () => `Orbital Eccentricity`,
        value : [ { small: eccentricityDerivedMean },{ v: () => o.eccentricityEarth, dec:13, sep:',' }],
-       hover : [`Left = mean eccentricity base′ (the one law's mean, derived from e(J2000) and the System-Reset anchor). Right = current value e(t) = base′·(1 + cos θ/2) on the one law's fixed apsidal carrier: ${fmtNum(holisticyearLength / 3, 0, ',')} years (at J2000); range ${(eccentricityDerivedMean * 0.5).toFixed(6)}–${(eccentricityDerivedMean * 1.5).toFixed(6)}.`]},
+       hover : [`Left = the scene scaffold's offset base′ (the perihelion wheel's J2000 pose, derived from e(J2000) and the K inclination phase; a pose constant, not a law — plan 09 step 6). Right = Earth's eccentricity of date, the model's N-body secular series (one source on every path: the scene offset, the Sun's equation of centre, the panels).`]},
       {label : () => `Inclination to Invariable plane (degrees)`,
        value : [ { v: () => inclInvPlaneModel(o.currentYear), dec:13, sep:',' }],
        hover : [`Earth's inclination of date to the engine's own invariable plane — the one-source series route (La2010-validated)`]},
@@ -54261,12 +54189,10 @@ function computeAxialPrecessionYears(
  *  Returns undefined for an unknown key so the caller can fall back. */
 function _eccentricityInline(key, year) {
   if (key === 'eccentricityEarth') {
-    // ECCENTRICITY UNIFICATION: Earth rides the model's ONE law — the H/3
-    // line (_fwEarthEcc, the channel with base' derived from e(J2000)); the
-    // H/16 law-of-cosines form below stays for the PLANETS' wobble laws.
-    // C-4a one source: under ?hybridSpin the SAME one-source function that
-    // drives the geometric offset and the scalar also feeds the sun's
-    // equation of center — the scene's e is one value everywhere.
+    // Earth's e of date is the N-body series (one source): the SAME function
+    // that drives the geometric offset and the scalar also feeds the sun's
+    // equation of center — the scene's e is one value everywhere. (Plan 09
+    // step 6: the H/3 law and the H/16 law-of-cosines form are deleted.)
     return _sceneEccTargetAt(year);
   }
   // Plan 07 R6: the PLANET branch is gone. It evaluated the same law-of-cosines
@@ -54277,34 +54203,9 @@ function _eccentricityInline(key, year) {
   return undefined;
 }
 
-function computeEccentricityEarth(
-  currentYear,
-  anchorYearJ2000,        // J2000-FIXED anchor year for this body's eccentricity oscillation
-  cycleLengthYearsJ2000,  // J2000-FIXED cycle period in years (= H_J2000 / N for cycle = H/N)
-  eccentricityBase,
-  eccentricityAmplitude
-) {
-  // Phase 8 (integrated): phase = 2π × N × ∫_{anchor}^{year} 1/H(t') dt'
-  // The args MUST be J2000-fixed values (not the live mutated ones). Caller
-  // semantics: anchor is the historical "phase zero" year; cycleLength is the
-  // period at J2000 — the structural divisor N is derived as H_J2000 /
-  // cycleLength_J2000.
-  //
-  // For Earth: anchor = BALANCED_YEAR_J2000_FIXED = -302,615, cycleLength =
-  // HOLISTIC_YEAR_J2000/16 ≈ 20,956 → N = 16.
-  // For Mercury: anchor + cycleLength derived from planets.mercury.eccentricityPhaseJ2000
-  // and mercuryWobblePeriod (J2000 snapshot from Phase 5).
-  //
-  // At J2000 the integrated value matches the snapshot to ppm; at deep time
-  // the integrated value is the physically correct frame-independent answer
-  // (see doc 99 Phase 8 + IP doc Phase 8 detail).
-  // Phase 8.3 L3: the law-of-cosines channel lives ONCE in
-  // @essrt/physics/planets/ecc-channel; this engine's cyclesBetweenYears
-  // (deep/snapshot toggle + null → mean past tidal lock) rides along.
-  return computeEccentricityIntegrated(currentYear, anchorYearJ2000, cycleLengthYearsJ2000,
-    eccentricityBase, eccentricityAmplitude,
-    { holisticYearJ2000: HOLISTIC_YEAR_J2000, cyclesBetween: cyclesBetweenYears });
-}
+// (Plan 09 step 6: the five-argument `computeEccentricityEarth` — the H/16
+// law-of-cosines eccentricity on the integrated ∫N/H phase, kept for the
+// planets' wobble laws that K5 excised — is deleted; no caller remained.)
 
 
 

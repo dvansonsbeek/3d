@@ -104,9 +104,9 @@ classical constant:
   the embed from the banked series, through the arguments' H/12 taper (a
   bounded term of the same class as the constant remainder; doc 109 §17).
   It carries the 405-kyr-class deep spectrum a single line cannot. The
-  derived H/3 line (below) remains its epoch-local tangent and the
-  clock-side basis (eclipse Sun equation of centre, cardinal braid); the
-  two agree within 4.2e-5 across the historical era. The astro-reference
+  derived H/3 line (below; deleted at plan 09 step 6) was its epoch-local
+  tangent and the clock-side basis (eclipse Sun equation of centre, cardinal
+  braid); the two agreed within 4.2e-5 across the historical era. The astro-reference
   (e₀, ė₀, ë₀) values are the documented Taylor-check anchors.
 - **The sign paradox, dissolved.** Brown's m²-scaling predicts apsidal
   precession ACCELERATING while Meeus's M′ T² says decelerating. Both are
@@ -264,7 +264,13 @@ requires 2.479/0.867 — agreement 100.3%/101.5%. The runtime's effective
 pair absorbs the frame term and is exact vs Meeus by construction: the
 sensitivities are attributed, not fitted.
 
-**Framework-native e_E: the fully-derived H/3 fluctuation.** The clock-side
+**(Retired at plan 09 step 6.)** The H/3 line below is kept as the DERIVATION
+RECORD: the law, its 21.77° anchor and the `moon/ecc-channel` module are
+deleted; Earth's eccentricity of date is the N-body series on every path and
+the lunar chain rides the deep channel (decision (ii)). The scene keeps the
+line's J2000 phase as a recorded pose (`kDeviceInclinationPhaseJ2000Deg`).
+
+**Framework-native e_E: the fully-derived H/3 fluctuation (retired).** The clock-side
 e_E — the epoch-local tangent of the deep channel, and the line the eclipse
 Sun's equation of centre and the cardinal braid ride — is ONE movement, the
 H/3 wobble cycle that also drives Earth's inclination, expressed in

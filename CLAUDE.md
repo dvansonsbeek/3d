@@ -488,7 +488,9 @@ engine frame is placed over them, R4). **Plan 07 R1/R8 (model v19.0,
 physics MAJOR 15, model-values MAJOR 14): the retired laws' INPUTS left
 `model-parameters.json`** — `perihelionEclipticFraction`, the per-planet
 divisor key, `inclinationCycleAnchor`, `antiPhase` (planets and additional
-bodies); the
+bodies); plan 09 step 6 added Earth's `earthInclinationCycleAnchor` (the H/3
+eccentricity law's 21.77°, astro-reference) — the scene pose it also set is
+the recorded `kDeviceInclinationPhaseJ2000Deg`; the
 literals gate FAILS if any returns (fail-proven via `ESSRT_LITERALS_PLANT=1`).
 `perihelionEclipticYears` is the chain's inertial apsidal period
 1,296,000/g in every runtime (Mercury 232,437 yr; the lattice read 243,867),

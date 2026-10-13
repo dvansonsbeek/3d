@@ -33,7 +33,7 @@
  * carry it so a counterfactual is reproducible (§2d).
  * @type {string}
  */
-export const CONSTANTS_HASH = "63287cae11fbc3a5";
+export const CONSTANTS_HASH = "4d550fcd9065e7f2";
 
 /** Model version label — single source: public/input/model-version.json (§10 two-axis scheme). */
 export const MODEL_VERSION = "v23.0";
@@ -43,7 +43,7 @@ export const PREPRINT_DOI = "10.21203/rs.3.rs-8758810/v4";
 
 /** @type {Readonly<Record<string, unknown>>} */
 export const DEFAULT_CONSTANTS = Object.freeze({
-  hash: "63287cae11fbc3a5",
+  hash: "4d550fcd9065e7f2",
   additionalBodies: {
     "pluto": {
       "name": "Pluto",
@@ -194,6 +194,7 @@ export const DEFAULT_CONSTANTS = Object.freeze({
     "earthInvPlaneInclinationAmplitude": 0.636069722432876,
     "eccentricityBase": 0.015386009686374918,
     "eccentricityAmplitude": 0.0013559440307290061,
+    "kDeviceInclinationPhaseJ2000Deg": 81.17719000000001,
     "kDeviceWheelPhaseAtJ2000Cycles": 0.908498525276082
   },
   earthOrbital: {
@@ -209,7 +210,6 @@ export const DEFAULT_CONSTANTS = Object.freeze({
     "earthPerihelionLongitudeJ2000": 102.94719,
     "sunMeanLongitudeJ2000_deg": 280.46646,
     "earthAscendingNodeInvPlane": 284.51,
-    "earthInclinationCycleAnchor": 21.77,
     "perihelionPassageJ2000_JD": 2451547.042,
     "earthInclinationJ2000_deg": 1.57869,
     "earthInclinationRate_arcsecPerCentury": -18,

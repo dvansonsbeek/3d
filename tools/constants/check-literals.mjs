@@ -64,6 +64,7 @@ const MIGRATED = [
   'model.earth.eccentricityBase',
   'model.earth.eccentricityAmplitude',
   'model.earth.kDeviceWheelPhaseAtJ2000Cycles',   // plan 07 R10: the K wheels' recorded J2000 phase
+  'model.earth.kDeviceInclinationPhaseJ2000Deg',  // plan 09 step 6: the K inclination wheel's recorded J2000 phase (the eccentricity law's anchor left with the law)
 
   // Phase 5f block 3 — model.moon. This block also CORRECTED a drift:
   // script.js held moonMeeusLpCorrection = 0.010525 against the JSON's
@@ -113,7 +114,8 @@ const MIGRATED = [
   'astro.earthOrbital.sunMeanLongitudeJ2000_deg',
   'astro.earthOrbital.perihelionPassageJ2000_JD',
   'astro.earthOrbital.juneSolstice2000_JD',
-  'astro.earthOrbital.earthInclinationCycleAnchor',
+  // (plan 09 step 6: earthInclinationCycleAnchor — the retired eccentricity law's 21.77° — left the inputs;
+  //  the scene's K-device inclination phase at J2000 is the recorded pose kDeviceInclinationPhaseJ2000Deg)
   'astro.earthOrbital.deltaTStart',
   'astro.earthOrbital.sunTilt',
 

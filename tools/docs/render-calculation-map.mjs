@@ -51,7 +51,7 @@ const wrap = (x) => ((x % 360) + 360) % 360;
 
 function blockEChain() {
   const rows = [
-    '| year | T (cy) | e — deep modes | e — H/3 law | E = e/e₀ | (g/g₀)^s_ϖ | (g/g₀)^s_Ω | I(T, s_ϖ) (cy) | I(T, s_Ω) (cy) | perigee ϖ of date (°) | node Ω of date (°) |',
+    '| year | T (cy) | e — deep modes | e — the published series | E = e/e₀ | (g/g₀)^s_ϖ | (g/g₀)^s_Ω | I(T, s_ϖ) (cy) | I(T, s_Ω) (cy) | perigee ϖ of date (°) | node Ω of date (°) |',
     '|---|---|---|---|---|---|---|---|---|---|---|',
   ];
   for (const y of [2000, 1246, -584, -2584, -10000]) {
@@ -60,7 +60,7 @@ function blockEChain() {
     rows.push(`| ${y} | ${f(T, 2)} | ${f(deep.eccAt(t), 7)} | ${f(m.earth.eccentricity(y), 7)} | ${f(deep.eFactorAt(t), 6)} | ${f(deep.modulation(-t / 1e6, S_W), 7)} | ${f(deep.modulation(-t / 1e6, S_N), 7)} | ${e(iw, 4)} | ${e(inn, 4)} | ${f(wrap((LP0 - MP0) + WDOT * (T + iw)), 4)} | ${f(wrap((LP0 - F0) + NDOT * (T + inn)), 4)} |`);
   }
   rows.push('');
-  rows.push(`Anchors the rows above use: e₀ (JPL J2000 seed, the deep channel's anchor) = ${deep.e0.toFixed(10)} · e(J2000) IAU (the H/3 law's anchor) = ${K.earthOrbital.earthEccentricityJ2000} · g₀ = (1 − e₀²)^(−3/2) = ${deep.g0.toFixed(10)} · ϖ̇₀ = LPR − MPR = ${WDOT.toFixed(7)} °/cy · Ω̇₀ = LPR − FR = ${NDOT.toFixed(7)} °/cy · s_ϖ = ${S_W}, s_Ω = ${S_N}.`);
+  rows.push(`Anchors the rows above use: e₀ (JPL J2000 seed, the deep channel's anchor) = ${deep.e0.toFixed(10)} · e(J2000) IAU (astro-reference) = ${K.earthOrbital.earthEccentricityJ2000} · g₀ = (1 − e₀²)^(−3/2) = ${deep.g0.toFixed(10)} · ϖ̇₀ = LPR − MPR = ${WDOT.toFixed(7)} °/cy · Ω̇₀ = LPR − FR = ${NDOT.toFixed(7)} °/cy · s_ϖ = ${S_W}, s_Ω = ${S_N}.`);
   return rows.join('\n');
 }
 
