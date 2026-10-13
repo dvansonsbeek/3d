@@ -267,10 +267,10 @@ const tropJ2000 = (tropSS + tropWS + tropVE + tropAE) / 4;
 // year-length family (route B, SI seconds) against the IAU value; the
 // per-type intervals below stay informational.
 const oneFamilyTropDays = pipelineModel.epoch.tropicalYearSecondsAtYear(2000) / 86400;
-const tropDiffSec = (oneFamilyTropDays - ylRef.tropicalYearMean) * 86400;
+const tropDiffSec = (oneFamilyTropDays - C.meanSolarYearDays) * 86400;   // plan 09: vs the DERIVED J2000 tropical year (sidereal year + p_A), one home
 // Tolerance: 10 s (the one-family year sits +0.03 s from IAU at J2000).
 check('Tropical year at J2000', Math.abs(tropDiffSec), 0, 10.0);
-console.log(`  Tropical year at J2000 (one-family): ${oneFamilyTropDays.toFixed(9)} d (IAU: ${ylRef.tropicalYearMean} d, diff: ${tropDiffSec >= 0 ? '+' : ''}${tropDiffSec.toFixed(3)}s); 4-mean of the 2000→2001 crossing intervals: ${tropJ2000.toFixed(6)} d (informational)`);
+console.log(`  Tropical year at J2000 (one-family): ${oneFamilyTropDays.toFixed(9)} d (derived J2000: ${C.meanSolarYearDays.toFixed(9)} d, diff: ${tropDiffSec >= 0 ? '+' : ''}${tropDiffSec.toFixed(3)}s); 4-mean of the 2000→2001 crossing intervals: ${tropJ2000.toFixed(6)} d (informational)`);
 console.log(`    RA=0°  (VE): ${tropVE.toFixed(9)} d (IAU: ${ylRef.tropicalYearVE} d, diff: ${((tropVE - ylRef.tropicalYearVE)*86400).toFixed(2)}s)`);
 console.log(`    RA=90° (SS): ${tropSS.toFixed(9)} d (IAU: ${ylRef.tropicalYearSS} d, diff: ${((tropSS - ylRef.tropicalYearSS)*86400).toFixed(2)}s)`);
 console.log(`    RA=180°(AE): ${tropAE.toFixed(9)} d (IAU: ${ylRef.tropicalYearAE} d, diff: ${((tropAE - ylRef.tropicalYearAE)*86400).toFixed(2)}s)`);

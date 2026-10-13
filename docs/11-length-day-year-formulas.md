@@ -1,7 +1,7 @@
 ---
 docVersion: 1.0
 modelVersion: v23.0
-coefficients: sha256:c71f29ad6041c1bb
+coefficients: sha256:9fc5dba8f753f10c
 status: current
 ---
 
@@ -64,7 +64,7 @@ The three J2000 mean year lengths are the IAU inputs of `astro-reference.json` (
 
 | Year type | Input | Mean (days) |
 |-----------|-------|-------------|
-| Tropical | `yearLengthRef.tropicalYearMean` | <!--v:meanSolarYearDaysFull-->365.242189700000<!--/v--> |
+| Tropical | derived: the beat of the IAU sidereal year and p_A (`computeMeanTropicalYearJ2000Days`) | <!--v:meanSolarYearDaysFull-->365.242190469006<!--/v--> |
 | Sidereal | `yearLengthRef.siderealYear` | <!--v:meanSiderealYearDaysFull-->365.256363004<!--/v--> |
 | Anomalistic | `yearLengthRef.anomalisticYear` | <!--v:anomalisticYearDaysFull-->365.259636000<!--/v--> |
 

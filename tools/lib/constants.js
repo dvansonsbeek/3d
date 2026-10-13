@@ -212,12 +212,17 @@ for (const [key, body] of Object.entries(modelParams.additionalBodies)) {
 // ═══════════════════════════════════════════════════════════════════════════
 
 const perihelionCycleLength = H / 16;
-// Plan 09: the model's mean solar year in days is the IAU J2000 mean tropical
-// year (astro-reference.json yearLengthRef.tropicalYearMean) — the calendar's
-// year axis. The retired era device rounded the input 365.2422 onto 1/(H/8)
-// of a day (365.24220365, 1.2 s above the IAU value); that construction is
-// deleted. `inputMeanSolarYear` stays as the recorded foundational input.
-const meanSolarYearDays = astroRef.yearLengthRef.tropicalYearMean;
+// Plan 09: the model's mean solar year in days — the calendar's year axis —
+// is the J2000 mean tropical year DERIVED in one home from two IAU inputs,
+// the sidereal year and the general precession p_A per Julian year
+// (@essrt/physics earth/year-lengths computeMeanTropicalYearJ2000Days,
+// 365.242190469 d). The Meeus & Savoie 1992 input 365.2421897 (66 ms shorter;
+// its beat with the sidereal year read 25,770.7 yr against p_A's 25,771.6)
+// left the registry with it; before that the era device rounded the input
+// onto 1/(H/8) of a day (365.24220365, +1.2 s). `inputMeanSolarYear` stays as
+// the recorded foundational input.
+const { computeMeanTropicalYearJ2000Days } = require('@essrt/physics/earth/year-lengths');
+const meanSolarYearDays = computeMeanTropicalYearJ2000Days(astroRef.yearLengthRef.siderealYear, astroRef.earthOrbital.generalPrecessionJ2000_arcsecPerYr);
 const meanEarthRotationsPerYear = meanSolarYearDays + 1;
 const startModelYearWithCorrection = startmodelYear + (correctionDays / meanSolarYearDays);
 // Plan 07 R10: the correction combs measure their phase from J2000. The former

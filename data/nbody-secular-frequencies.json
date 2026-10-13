@@ -853,7 +853,7 @@
  "relativisticSupplementArcsecCy": {
   "mercury": 42.98142753750681,
   "venus": 8.624988679409032,
-  "earth": 3.8389650973848073,
+  "earth": 3.8389650839134437,
   "mars": 1.351069161345673,
   "jupiter": 0.06243854269534786,
   "saturn": 0.013727538363259408,
@@ -886,7 +886,7 @@
   "generator": "node tools/verify/nbody-secular.js --write",
   "files": {
    "packages/physics/src/planets/keplerian-chain.cjs": "sha256:75cdaeae146100354b883d6fefff48d16d54d6d1e363a8b9d6514c988f7760c2",
-   "public/input/astro-reference.json": "sha256:fb1fa8155a2c5c1b5139b26c518139a06d504b3e24358c24874338714fa12447",
+   "public/input/astro-reference.json": "sha256:8b85d74399c39b4777f6859b50b95739f68d1f9140166a16808455f6139a45c9",
    "tools/explore/j2000-state.mjs": "sha256:af2361cdca688cb8f5850229be97db8f70464824e20648e7e8a26ea6edb5ca5a",
    "tools/explore/k45-residual-naff.mjs": "sha256:228eb4874adca9171d61c1697ffbbaac3ce82891476a34762bf882840ccae406",
    "tools/explore/k45e-amplitude-solve.mjs": "sha256:8682a7ebd72bd98b60019b1c097f1791ec6e5ecea97d1798b929ce46b4ae1837",

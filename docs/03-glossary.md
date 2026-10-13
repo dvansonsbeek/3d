@@ -1,7 +1,7 @@
 ---
 docVersion: 1.0
 modelVersion: v23.0
-coefficients: sha256:c71f29ad6041c1bb
+coefficients: sha256:9fc5dba8f753f10c
 status: current
 ---
 
@@ -114,7 +114,7 @@ A coordinate system centered on Earth.
 ## Time Measurements
 
 ### Solar Year (Tropical Year)
-The time for the Sun to return to the same position relative to the vernal equinox, <!--v:tropicalYearMeanJ2000Days-->365.2421897<!--/v--> days at J2000. This is the year of the seasons. Under ESSRT the day-count shifts at deep time via Driver 1 (LOD growth) and the length in seconds via Driver 2 (solar mass loss).
+The time for the Sun to return to the same position relative to the vernal equinox, <!--v:tropicalYearMeanJ2000Days-->365.242190469<!--/v--> days at J2000. This is the year of the seasons. Under ESSRT the day-count shifts at deep time via Driver 1 (LOD growth) and the length in seconds via Driver 2 (solar mass loss).
 
 ### Sidereal Year
 The time for the Sun to return to the same position relative to the fixed stars, <!--v:siderealYearJ2000Days-->365.25636300<!--/v--> days at J2000 — about 20 minutes longer than the solar year because of precession. Under ESSRT its length in seconds evolves at deep time via Driver 2 and its day-count via Driver 1.

@@ -22,7 +22,7 @@ import { buildPlanetChainsFromArtifactData, computePlanetElementsAtYear } from '
 import { createSecularSeriesOverride } from './planets/secular-series.cjs';
 import { computeEquatorNodeOriginSFrameDeg, convertNodeSFrameToEquatorOriginDeg } from './planets/inv-plane-frame.cjs';
 import { createPhaseMachinery } from './phase/index.cjs';
-import { createYearLengths, ONE_FAMILY_WINDOW_YEARS } from './earth/year-lengths.cjs';
+import { createYearLengths, computeMeanTropicalYearJ2000Days, ONE_FAMILY_WINDOW_YEARS } from './earth/year-lengths.cjs';
 import { createDeepOrbitalHistory } from './earth/deep-orbital-history.cjs';
 import { CHAIN_ARTIFACT } from './planets/chain-artifact.js';
 import { createPlanetSpinChannelFromArtifacts, computeObliquityJ2000Deg } from './planets/spin-channel.cjs';
@@ -87,9 +87,11 @@ const MOON_ECC_SENSITIVITY_NODE = 1.018;
 export function assembleModel(C, F, laws = {}, secularSeriesArtifact = /** @type {any} */ (null), options = {}) {
   // ── Derived constants (constants.js §9 order) ─────────────────────────────
   const H = C.foundational.holisticyearLength;
-  // Plan 09: the mean solar year in days is the IAU J2000 mean tropical year
-  // (the calendar's year axis); the device's rounding onto 1/(H/8) is deleted.
-  const meanSolarYearDays = C.yearLengthRef.tropicalYearMean;
+  // Plan 09: the mean solar year in days (the calendar's year axis) is the
+  // J2000 mean tropical year DERIVED in one home from the IAU sidereal year
+  // and p_A per Julian year (year-lengths.cjs); the Meeus & Savoie 1992 input
+  // 365.2421897 left the registry, the device's rounding onto 1/(H/8) before it.
+  const meanSolarYearDays = computeMeanTropicalYearJ2000Days(C.yearLengthRef.siderealYear, C.earthOrbital.generalPrecessionJ2000_arcsecPerYr);
   const startmodelYear = C.foundational.startmodelYear;
   const startmodelJD = C.foundational.startmodelJD;
   const startModelYearWithCorrection = startmodelYear + C.foundational.correctionDays / meanSolarYearDays;

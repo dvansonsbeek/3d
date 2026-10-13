@@ -36,6 +36,7 @@ relation H ≈ 13 × precession period is independently corroborated.
 """
 
 import json
+import sys
 from pathlib import Path
 import numpy as np
 
@@ -44,11 +45,13 @@ REPO = Path(__file__).resolve().parents[1]
 H_NOW = 335317
 EIGHT_H_NOW = 8 * H_NOW
 LOD_NOW_S = 86400.0
-# IAU-derived: sid_days / (sid_days − trop_days) — auto-updates with IAU reference values
-_IAU_SIDEREAL_YEAR_DAYS = 365.256363004
-_IAU_TROPICAL_YEAR_DAYS = 365.2421897
-PRECESSION_NOW_YR = _IAU_SIDEREAL_YEAR_DAYS / (_IAU_SIDEREAL_YEAR_DAYS - _IAU_TROPICAL_YEAR_DAYS)
-# ≈ 25,770.7280535361 yr
+# plan 09: the J2000 precession period is the bridge's AXIAL_PRECESSION_J2000_YEARS
+# (1,296,000/p_A, IAU 2006 — 25,771.575 Julian years). The former private beat
+# of two year literals, sid/(sid − trop) on Meeus & Savoie's tropical year,
+# read 25,770.73 — 33 ppm off p_A.
+sys.path.insert(0, str(REPO / 'tools' / 'lib' / 'python'))
+from constants_scripts import AXIAL_PRECESSION_J2000_YEARS  # noqa: E402
+PRECESSION_NOW_YR = AXIAL_PRECESSION_J2000_YEARS
 ARCSEC_PER_CYCLE = 360 * 3600
 K_NOW = ARCSEC_PER_CYCLE / PRECESSION_NOW_YR  # "/yr
 

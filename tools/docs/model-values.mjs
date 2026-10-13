@@ -2405,7 +2405,7 @@ export const VALUES = {
   ...(() => {
     const y = astro.yearLengthRef;
     return {
-      tropicalYearMeanJ2000Days: { get: () => y.tropicalYearMean, render: (v) => String(v), unit: 'days', note: 'Meeus & Savoie 1992' },
+      tropicalYearMeanJ2000Days: { get: () => C.meanSolarYearDays, render: (v) => Number(v).toFixed(9), unit: 'days', note: 'derived: the beat of the IAU sidereal year and the IAU 2006 p_A per Julian year, 1/T = 1/T_sid + p_A/(1,296,000″·365.25 d) — ONE home, @essrt/physics computeMeanTropicalYearJ2000Days (plan 09; was the Meeus & Savoie 1992 input 365.2421897, 66 ms shorter)' },
       tropicalYearVEJ2000Days: { get: () => y.tropicalYearVE, render: (v) => String(v), unit: 'days', note: 'Meeus & Savoie 1992' },
       tropicalYearSSJ2000Days: { get: () => y.tropicalYearSS, render: (v) => String(v), unit: 'days', note: 'Meeus & Savoie 1992' },
       tropicalYearAEJ2000Days: { get: () => y.tropicalYearAE, render: (v) => String(v), unit: 'days', note: 'Meeus & Savoie 1992' },
@@ -2477,7 +2477,8 @@ export const VALUES = {
     for (const [cp, label] of [['VE', 'March equinox'], ['SS', 'June solstice'], ['AE', 'September equinox'], ['WS', 'December solstice']]) {
       out[`cardinalAnchor${cp}2000JD`] = { get: () => astro.cardinalPointAnchors[cp], render: (v) => String(v), unit: 'JD', note: `USNO 2000 ${label} (UTC, minute precision)` };
     }
-    out.iauPrecessionInputYears = { get: () => astro.yearLengthRef.iauPrecessionJ2000, render: (v) => thousands(v, 2), unit: 'yr', note: 'stored iauPrecessionJ2000 input — IAU 2006 rate on the model day basis' };
+    // (plan 09: `iauPrecessionInputYears` — the stored key iauPrecessionJ2000, 25,770.73, the beat of two
+    //  inconsistent year inputs misnamed "IAU" — is deleted; the J2000 precession period is axialPrecYears, 1,296,000/p_A.)
     // `earthEccCycle` stood here, publishing H/3 as "the period of Earth's |e|
     // oscillation — the one H/3 eccentricity law". That law was retired from
     // the physics on 2026-09-28: Earth's eccentricity is the engine's N-body
@@ -2938,7 +2939,7 @@ export const VALUES = {
     out.mercuryNewtonianModern = { get: () => astro.knownValues.mercuryPark2017RateArcsecCy - grAdvance('mercury'), render: (v) => thousands(v, 2), unit: '″/cy', note: 'Park 2017 ICRF total minus the GR advance derived from the model constants' };
     Object.assign(out, {
       earthOrbitalPath: { get: () => Math.round(2 * Math.PI * C.currentAUDistance / 1e7) * 1e7, render: (v) => `~${thousands(v)}`, unit: 'km' },
-      earthOrbitalPeriod: { get: () => astro.yearLengthRef.tropicalYearMean, render: (v) => `~${Number(v).toFixed(5)}`, unit: 'd', note: 'IAU mean tropical year, prose approximation' },
+      earthOrbitalPeriod: { get: () => C.meanSolarYearDays, render: (v) => `~${Number(v).toFixed(5)}`, unit: 'd', note: 'the derived J2000 mean tropical year (tropicalYearMeanJ2000Days), prose approximation' },
       earthMoonMassRatio: { get: () => C.MASS_RATIO_EARTH_MOON, render: (v) => `~${thousands(v, 1)}` },
       lunarMonthApprox: { get: () => C.moonSynodicMonth, render: (v) => `~${thousands(v, 2)}`, unit: 'd' },
       chandlerWobbleCycle: { get: () => astro.knownValues.chandlerWobbleCycleMonths, render: (v) => `~${v}`, unit: 'months', note: 'citation' },

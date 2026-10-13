@@ -11,7 +11,7 @@ import { Pane } from 'tweakpane';
 //
 // Generated at build time, not fetched at runtime — `holisticyearLength` is read
 // at module scope below, and Phase 15 requires offline === hosted.
-import { computeObliquityJ2000Deg, computeSecularShape, DEFAULT_CONSTANTS as K, REFERENCE_DATA as R, FITTED_COEFFICIENTS as FIT, CONSTANTS_HASH, COEFFICIENTS_HASH, MODEL_VERSION, PREPRINT_DOI, createEpochPrimitives, createPhaseMachinery, createDeepCalendar, createMoonEccChannel, createDeepEccChannel, DEEP_MODES_ARTIFACT, createDeepOrbitalHistory, createYearLengths, createMoonMonthChain, createChainCycleIntegrator, createMoonArguments, createMoonSeries, createMoonApparent, derivePlanetGeometry, computeEccentricityIntegrated, planetOrbitChain as _POC, createDeltaTCycles, createDeepTimeLod, createMoonRecessionHistory, createSolarChannelBudget, deltaTEspenakMeeusCanonSeconds, evalClimateL1OrbitalPermil, createAlphaGiaChannel, computeSolarTorqueShare, createEclipseFinders, createSunLongitudeCorrection, createModel, buildPlanetChainsFromArtifactData, computePlanetElementsAtYear as kcComputePlanetElementsAtYear, computeHeliocentricEclipticFromElements as kcComputeHeliocentricEclipticFromElements, computeEquatorNodeOriginSFrameDeg, convertNodeSFrameToEquatorOriginDeg, createSecularSeriesOverride, CHAIN_ARTIFACT, ANCHOR_EPOCH_YEAR as KC_ANCHOR_EPOCH_YEAR, ANCHOR_EPOCH_JD as KC_ANCHOR_EPOCH_JD, computeEarthFrameOfDate, solveWheelAngleForLongitude } from '@essrt/physics';
+import { computeObliquityJ2000Deg, computeSecularShape, DEFAULT_CONSTANTS as K, REFERENCE_DATA as R, FITTED_COEFFICIENTS as FIT, CONSTANTS_HASH, COEFFICIENTS_HASH, MODEL_VERSION, PREPRINT_DOI, createEpochPrimitives, createPhaseMachinery, createDeepCalendar, createMoonEccChannel, createDeepEccChannel, DEEP_MODES_ARTIFACT, createDeepOrbitalHistory, createYearLengths, computeMeanTropicalYearJ2000Days, createMoonMonthChain, createChainCycleIntegrator, createMoonArguments, createMoonSeries, createMoonApparent, derivePlanetGeometry, computeEccentricityIntegrated, planetOrbitChain as _POC, createDeltaTCycles, createDeepTimeLod, createMoonRecessionHistory, createSolarChannelBudget, deltaTEspenakMeeusCanonSeconds, evalClimateL1OrbitalPermil, createAlphaGiaChannel, computeSolarTorqueShare, createEclipseFinders, createSunLongitudeCorrection, createModel, buildPlanetChainsFromArtifactData, computePlanetElementsAtYear as kcComputePlanetElementsAtYear, computeHeliocentricEclipticFromElements as kcComputeHeliocentricEclipticFromElements, computeEquatorNodeOriginSFrameDeg, convertNodeSFrameToEquatorOriginDeg, createSecularSeriesOverride, CHAIN_ARTIFACT, ANCHOR_EPOCH_YEAR as KC_ANCHOR_EPOCH_YEAR, ANCHOR_EPOCH_JD as KC_ANCHOR_EPOCH_JD, computeEarthFrameOfDate, solveWheelAngleForLongitude } from '@essrt/physics';
 // K8 — the reference package: ONE-WAY imports (comparison only;
 // @essrt/reference is private-by-construction and nothing in the model
 // chain depends on it). publishedCurves migrated here from
@@ -140,7 +140,11 @@ const deltaTStart = K.earthOrbital.deltaTStart;                       // Delta-T
 // surface's T_peri, _periOfDatePeriodYearsJ2000() / lunisolar.periOfDatePeriodYearsAtYear)
 // Plan 09: the IAU J2000 mean tropical year (the calendar's year axis); the era
 // device's rounding of the input onto 1/(H/8) of a day (+1.2 s) is deleted.
-let   meansolaryearlengthinDays = K.yearLengthRef.tropicalYearMean;  // Phase 1: mutable for deep-time mode
+// Plan 09: the J2000 mean tropical year is DERIVED in one home from two IAU
+// inputs — the sidereal year and p_A per Julian year — 365.242190469 d
+// (@essrt/physics computeMeanTropicalYearJ2000Days); the Meeus & Savoie 1992
+// input 365.2421897 (66 ms shorter) left the registry.
+let   meansolaryearlengthinDays = computeMeanTropicalYearJ2000Days(K.yearLengthRef.siderealYear, K.earthOrbital.generalPrecessionJ2000_arcsecPerYr);  // Phase 1: mutable for deep-time mode
 const _kcWinN = (k) => CHAIN_ARTIFACT.windowElementRates[k].meanMotionDegPerYr;  // the chain's fitted era-window mean motion (deg per Julian year; engine-D, 1800–2100) — the era evaluator's element rate. NOT the panels' period source since C1: a 300-yr window fit absorbs local inequality slope into this term (Neptune −497 ppm vs the secular rate); the period rows ride the banked λ̇ channel (_kcNOfDate), and this remains only its stale-artifact fallback
 // ORBIT-tab element accessor (plan 02 §11 item 2): the chain's osculating
 // elements of date, memoized per (planet, JD) so one panel refresh
@@ -888,7 +892,7 @@ const ASTRO_REFERENCE = {
   tropicalYearSSJ2000: K.yearLengthRef.tropicalYearSS,        // Summer Solstice to Summer Solstice
   tropicalYearAEJ2000: K.yearLengthRef.tropicalYearAE,        // Autumnal Equinox to Autumnal Equinox
   tropicalYearWSJ2000: K.yearLengthRef.tropicalYearWS,        // Winter Solstice to Winter Solstice
-  tropicalYearMeanJ2000: K.yearLengthRef.tropicalYearMean,    // Mean tropical year at J2000.0
+  tropicalYearMeanJ2000: meansolaryearlengthinDays,           // Mean tropical year at J2000.0 — derived from the sidereal year and p_A (plan 09; the alias name stays for its readers)
   tropicalYearRateSecPerCentury: K.yearLengthRef.tropicalYearRateSecPerCentury,  // Secular change in tropical year length
   // Source: JPL Horizons
   anomalisticYearJ2000: K.yearLengthRef.anomalisticYear,      // Perihelion to perihelion
@@ -923,14 +927,13 @@ const ASTRO_REFERENCE = {
 
 };
 
-// IAU axial precession period derived from sidereal/tropical year identity:
-//   T_axial = T_sid / (T_sid − T_trop)
-// Auto-updates when either IAU year-length reference value changes.
-// ≈ 25,770.7280535361 yr (was hardcoded 25,771.57634 from IAU 2006 precession
-// model; difference reflects higher-order terms in the IAU model vs the pure
-// ratio identity — the identity is used here for internal consistency).
-ASTRO_REFERENCE.iauPrecessionJ2000 = ASTRO_REFERENCE.siderealYearJ2000
-  / (ASTRO_REFERENCE.siderealYearJ2000 - ASTRO_REFERENCE.tropicalYearMeanJ2000);
+// (plan 09: ASTRO_REFERENCE.iauPrecessionJ2000 — the beat sid/(sid − trop) of
+// the sidereal year and the Meeus & Savoie tropical year, 25,770.73, which
+// disagreed with the IAU p_A period 25,771.58 by 33 ppm — is deleted. The
+// J2000 precession period is _certifiedAxialPrecessionJ2000Years(), and the
+// tropical year is DERIVED from the sidereal year and p_A, so the identity
+// now closes by construction: sid/(sid − trop) = T_p counted in tropical
+// years, 25,772.13 — the same period as 25,771.58 Julian years.)
 
 // ─── E. DERIVED CONSTANTS ───────────────────────────────────────────────
 // Computed from foundational constants. Time units, EoC parameters,
@@ -23544,7 +23547,7 @@ function setupGUI() {
       ciTropicalWS: R.tropicalYearWSJ2000 + ' days',
       ciAnomalYear: R.anomalisticYearJ2000 + ' days',
       ciTropicalRate: R.tropicalYearRateSecPerCentury + ' s/cy',
-      ciPrecession: R.iauPrecessionJ2000.toFixed(2) + ' yr',
+      ciPrecession: _certifiedAxialPrecessionJ2000Years().toFixed(2) + ' yr',
       ciSolsticeJD: String(R.juneSolstice2000_JD),
       ciSolarDay: R.solarDayJ2000 + ' s',
       ciSiderealDay: R.siderealDayJ2000.toFixed(6) + ' s',
@@ -39218,7 +39221,7 @@ async function analyzeSiderealYear(startYear, endYear) {
   console.log('');
   console.log('Precession = Sidereal / (Sidereal - Tropical):');
   console.log('  Calculated precession:              ' + precessionCalculated.toFixed(2) + ' years');
-  console.log('  IAU J2000 precession:               ' + ASTRO_REFERENCE.iauPrecessionJ2000.toFixed(2) + ' years');
+  console.log('  IAU J2000 precession (p_A period):  ' + _certifiedAxialPrecessionJ2000Years().toFixed(2) + ' years');
   console.log('-------------------------------------------------------------------------------');
 
   // Show trend if enough data (using Method A at 90° as primary for trend)
@@ -39521,7 +39524,7 @@ async function analyzeAllAlignments(startYear, endYear) {
   console.log('');
   console.log('Precession = Sidereal / (Sidereal - Tropical):');
   console.log('  Calculated precession:              ' + precessionCalculated.toFixed(2) + ' years');
-  console.log('  IAU J2000 precession:               ' + ASTRO_REFERENCE.iauPrecessionJ2000.toFixed(2) + ' years');
+  console.log('  IAU J2000 precession (p_A period):  ' + _certifiedAxialPrecessionJ2000Years().toFixed(2) + ' years');
   console.log('-------------------------------------------------------------------------------');
 
   // ═══════════════════════════════════════════════════════════════════════════
@@ -54155,7 +54158,7 @@ function updatePredictions() {
   predictions.diffTropicalYear = (predictions.solarYearDays - ASTRO_REFERENCE.tropicalYearMeanJ2000) * 86400;
   predictions.diffSiderealYear = (predictions.siderealYearDays - ASTRO_REFERENCE.siderealYearJ2000) * 86400;
   predictions.diffAnomalisticYear = (predictions.anomalisticYearDays - ASTRO_REFERENCE.anomalisticYearJ2000) * 86400;
-  predictions.diffPrecession = predictions.axialPrecession - ASTRO_REFERENCE.iauPrecessionJ2000;
+  predictions.diffPrecession = predictions.axialPrecession - _certifiedAxialPrecessionJ2000Years();   // plan 09: vs the IAU p_A period (the stale iauPrecessionJ2000 key, 25,770.73, is deleted)
   predictions.diffEccentricity = predictions.eccentricityEarth - ASTRO_REFERENCE.eccentricityJ2000;
   predictions.iauObliquityRef = meanObliquityIAU2006(o.currentYear || 2000);
   predictions.diffObliquity = predictions.obliquityEarth - predictions.iauObliquityRef;

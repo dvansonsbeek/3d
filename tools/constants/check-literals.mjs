@@ -147,13 +147,14 @@ const MIGRATED = [
 
   // Phase 5f block 7 — astro.yearLengthRef. Local names carry a `J2000` suffix
   // the JSON keys lack, marking them as the fixed anchors as opposed to the
-  // epoch-dependent values recomputeEpochAnchors produces. iauPrecessionJ2000
-  // stays out: script.js derives it (see NOT_IN_SCRIPT).
+  // epoch-dependent values recomputeEpochAnchors produces. (plan 09:
+  // tropicalYearMean and iauPrecessionJ2000 left the registry — the J2000
+  // tropical year is DERIVED from the sidereal year and p_A in one home,
+  // @essrt/physics computeMeanTropicalYearJ2000Days.)
   'astro.yearLengthRef.tropicalYearVE',
   'astro.yearLengthRef.tropicalYearSS',
   'astro.yearLengthRef.tropicalYearAE',
   'astro.yearLengthRef.tropicalYearWS',
-  'astro.yearLengthRef.tropicalYearMean',
   'astro.yearLengthRef.tropicalYearRateSecPerCentury',
   'astro.yearLengthRef.anomalisticYear',
   'astro.yearLengthRef.siderealYear',
@@ -298,12 +299,6 @@ const NOT_IN_SCRIPT = {
     + 'no runtime reader (the cardinal instants are createModel().cardinal); quoted by the pipeline verifier\'s '
     + 'informational rows, doc 110 and the model-values registry (cardinalAnchor*2000JD). Until plan 06 R4d the '
     + 'VE/AE entries were retired-device anchors 112 min off these instants.',
-  'astro.yearLengthRef.iauPrecessionJ2000':
-    'script.js DERIVES this at :3457 from the ratio identity '
-    + 'siderealYear / (siderealYear - tropicalYear) instead of carrying the IAU catalog '
-    + 'value, and says so in a comment: the difference is higher-order terms in the IAU '
-    + 'model, and the identity is used for internal consistency. Derived, so not a '
-    + 'duplicated literal.',
   // Three entries were REMOVED from here after review — all three were wrong,
   // and all three hid a real copy in script.js:
   //   alpha1PerMa                   -> script.js ALPHA_1, identical

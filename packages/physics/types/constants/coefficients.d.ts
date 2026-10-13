@@ -2,7 +2,7 @@
 // The fitted coefficients' shapes for TypeScript consumers (§2g); values live
 // in coefficients.js, emitted VERBATIM from fitted-coefficients.json.
 
-export declare const COEFFICIENTS_HASH: "c71f29ad6041c1bb";
+export declare const COEFFICIENTS_HASH: "9fc5dba8f753f10c";
 
 export declare const FITTED_COEFFICIENTS: {
   readonly BALANCE_PRESETS: Array<Array<number | string>>;

@@ -175,7 +175,7 @@ function blockJ2000Identities() {
   // device's H/8 snap, H/13 kinematic sidereal days and H/16 anomalistic
   // identity are deleted; the J2000 precession anchor is the IAU p_A.
   const inp = K.foundational.inputmeanlengthsolaryearindays;
-  const msy = K.yearLengthRef.tropicalYearMean;
+  const msy = require(join(ROOT, 'tools/lib/constants.js')).meanSolarYearDays;   // plan 09: DERIVED (sidereal year + p_A), one home
   const sidD = K.yearLengthRef.siderealYear;
   const lod = K.yearLengthRef.solarDay;
   const anom = K.yearLengthRef.anomalisticYear;
@@ -184,7 +184,7 @@ function blockJ2000Identities() {
     '| quantity | value | formula | H-role |',
     '|---|---|---|---|',
     `| input tropical year (days) | ${inp} | \`inputmeanlengthsolaryearindays\` (model-parameters.json; the recorded foundational input of the retired H/8 snap) | — |`,
-    `| **meanSolarYearDays** | ${msy} | \`yearLengthRef.tropicalYearMean\` — the IAU J2000 mean tropical year; the calendar's year axis (plan 09: was round(input · H/8)/(H/8) = 365.242203646, +1.2 s) | — |`,
+    `| **meanSolarYearDays** | ${msy.toFixed(9)} | DERIVED in one home: 1/T = 1/T_sid + p_A/(1,296,000″·365.25 d) — the beat of \`yearLengthRef.siderealYear\` and the IAU 2006 p_A per Julian year (\`computeMeanTropicalYearJ2000Days\`); the calendar's year axis (plan 09: was the Meeus & Savoie 1992 input 365.2421897, 66 ms shorter; before it round(input · H/8)/(H/8) = 365.242203646, +1.2 s) | — |`,
     `| sidereal year (days, IAU) | ${sidD} | \`yearLengthRef.siderealYear\` (astro-reference) | — |`,
     `| **LOD_mean** (the kinematic day ω₀, s) | ${lod} | \`yearLengthRef.solarDay\` — the SI day (plan 09: was sidereal seconds over the H/13 kinematic sidereal days, 86,399.99968 s) | — |`,
     `| anomalistic year (days) | ${anom} | \`yearLengthRef.anomalisticYear\` — IAU (plan 09: was meanSolarYearDays · (H/16)/(H/16 − 1), 0.3 s low) | — |`,

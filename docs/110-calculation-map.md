@@ -1,7 +1,7 @@
 ---
 docVersion: 1.0
 modelVersion: v23.0
-coefficients: sha256:c71f29ad6041c1bb
+coefficients: sha256:9fc5dba8f753f10c
 status: current
 ---
 
@@ -371,7 +371,7 @@ record is kept below where a retired reading explains a present one.
 | quantity | value | formula | H-role |
 |---|---|---|---|
 | input tropical year (days) | 365.2422 | `inputmeanlengthsolaryearindays` (model-parameters.json; the recorded foundational input of the retired H/8 snap) | — |
-| **meanSolarYearDays** | 365.2421897 | `yearLengthRef.tropicalYearMean` — the IAU J2000 mean tropical year; the calendar's year axis (plan 09: was round(input · H/8)/(H/8) = 365.242203646, +1.2 s) | — |
+| **meanSolarYearDays** | 365.242190469 | DERIVED in one home: 1/T = 1/T_sid + p_A/(1,296,000″·365.25 d) — the beat of `yearLengthRef.siderealYear` and the IAU 2006 p_A per Julian year (`computeMeanTropicalYearJ2000Days`); the calendar's year axis (plan 09: was the Meeus & Savoie 1992 input 365.2421897, 66 ms shorter; before it round(input · H/8)/(H/8) = 365.242203646, +1.2 s) | — |
 | sidereal year (days, IAU) | 365.256363004 | `yearLengthRef.siderealYear` (astro-reference) | — |
 | **LOD_mean** (the kinematic day ω₀, s) | 86400 | `yearLengthRef.solarDay` — the SI day (plan 09: was sidereal seconds over the H/13 kinematic sidereal days, 86,399.99968 s) | — |
 | anomalistic year (days) | 365.259636 | `yearLengthRef.anomalisticYear` — IAU (plan 09: was meanSolarYearDays · (H/16)/(H/16 − 1), 0.3 s low) | — |
@@ -813,10 +813,10 @@ The four events and the year lengths:
 <!-- generated:calcmap-cardinal-events -->
 | year | VE | SS | AE | WS | SS→SS interval (d) | `yearLengthDays(SS)` (d, the crossing interval — the same quantity since R1) | mean of four (d) | one-family mean tropical year (s) | e |
 |---|---|---|---|---|---|---|---|---|---|
-| -10000 | -10000 03-19 12:23 | -10000 06-16 06:29 | -10000 09-13 14:45 | -10000 12-16 11:59 | 365.244431 | 365.244431 | 365.243550 | 31556957.03 | 0.01964 |
+| -10000 | -10000 03-19 12:23 | -10000 06-16 06:29 | -10000 09-13 14:45 | -10000 12-16 11:59 | 365.244432 | 365.244432 | 365.243550 | 31556957.03 | 0.01964 |
 | -2584 | -2584 03-21 18:02 | -2584 06-23 22:08 | -2584 09-22 04:19 | -2584 12-19 16:16 | 365.243911 | 365.243911 | 365.242785 | 31556947.70 | 0.01835 |
 | -584 | -584 03-21 04:50 | -584 06-23 08:32 | -584 09-23 08:01 | -584 12-20 20:20 | 365.241643 | 365.241643 | 365.242534 | 31556938.72 | 0.01770 |
-| 0 | 0 03-20 15:53 | 0 06-22 15:02 | 0 09-23 01:49 | 0 12-20 18:26 | 365.243502 | 365.243502 | 365.242458 | 31556935.80 | 0.01749 |
+| 0 | 0 03-20 15:53 | 0 06-22 15:02 | 0 09-23 01:49 | 0 12-20 18:26 | 365.243503 | 365.243503 | 365.242458 | 31556935.80 | 0.01749 |
 | 1246 | 1246 03-20 13:54 | 1246 06-21 20:44 | 1246 09-23 03:40 | 1246 12-21 11:33 | 365.240335 | 365.240335 | 365.242293 | 31556929.30 | 0.01701 |
 | 2000 | 2000 03-20 07:35 | 2000 06-21 01:48 | 2000 09-22 17:28 | 2000 12-21 13:37 | 365.242508 | 365.242508 | 365.242190 | 31556925.25 | 0.01670 |
 | 5000 | 5000 03-20 08:45 | 5000 06-18 19:07 | 5000 09-20 11:54 | 5000 12-21 15:35 | 365.247244 | 365.247244 | 365.241781 | 31556909.69 | 0.01533 |

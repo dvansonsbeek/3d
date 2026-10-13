@@ -77,7 +77,7 @@
     "perihelionPassageJ2000_JD": 2451547.042,
     "earthInclinationJ2000_deg": 1.57869,
     "earthInclinationRate_arcsecPerCentury": -18,
-    "deltaTStart": 56.07959388286052,
+    "deltaTStart": 56.07959443353602,
     "sunTilt": 7.155
   },
   "bodyDiametersKm": {
@@ -589,10 +589,8 @@
     "tropicalYearSS": 365.241626,
     "tropicalYearAE": 365.242018,
     "tropicalYearWS": 365.24274,
-    "tropicalYearMean": 365.2421897,
     "anomalisticYear": 365.259636,
     "siderealYear": 365.256363004,
-    "iauPrecessionJ2000": 25770.7280535361,
     "tropicalYearRateSecPerCentury": -0.53,
     "solarDay": 86400,
     "siderealDay": 86164.09053083288,

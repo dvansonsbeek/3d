@@ -111,7 +111,7 @@
     "moon": {
       "buckets": {
         "1900-1999": {
-          "rmsDeg": 0.002592,
+          "rmsDeg": 0.002591,
           "rmsArcsec": 9.3,
           "n": 3
         },
@@ -340,7 +340,7 @@
     "files": {
       "data/jpl-cache.json": "sha256:221582af7d1e956fd20e58a2b32f2c956a6d1ec1f8d17d3f24c7730a269205d1",
       "packages/physics/src/moon/ecc-channel.cjs": "sha256:e986b8ca3dbfdaa8508f49f315bc81718503b91eb56298d9ad4d7c29186fc691",
-      "packages/physics/src/planets/chain-artifact.js": "sha256:f2fda393800fc6d245c1ff0cf1bdbcfe96bf77fdc4ca378538fdf5c39f5547ce",
+      "packages/physics/src/planets/chain-artifact.js": "sha256:382a8d7534344b81a538b6f6c82f61528d4b833289a9d993cd58eb032699d5c3",
       "packages/physics/src/planets/keplerian-chain.cjs": "sha256:75cdaeae146100354b883d6fefff48d16d54d6d1e363a8b9d6514c988f7760c2",
       "tools/lib/scene-graph.js": "sha256:04310c7b34b92344cddd95f537b43e0082adcc9cc087c6bcb6ec7dd6159a545f",
       "tools/verify/measure-rms-by-epoch.js": "sha256:b19c35ca9ce42b0a69cc3226062e8184c1679016995386e5005dc9053803fa59"

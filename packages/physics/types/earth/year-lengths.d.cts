@@ -53,6 +53,18 @@ export function createYearLengths({ sampleAt, massLossSiderealSecondsAtYearFn }:
     /** The planetary λ̇ ratio (diagnostic; ≡1 at J2000). */
     planetaryRelAtYear: (year: number) => number;
 }>;
+/** The J2000 mean tropical year, DAYS — derived in ONE home from two IAU
+ *  inputs, the sidereal year and the general precession in longitude p_A
+ *  (″ per JULIAN year), in the exact rate form
+ *      1/T_trop = 1/T_sid + p_A / (1,296,000″ · 365.25 d)
+ *  — the same beat `shorterYear` evaluates of date. 365.242190469 d on the
+ *  IAU 2006 inputs. Plan 09: replaces the Meeus & Savoie 1992 input
+ *  365.2421897 (66 ms shorter, whose beat with the sidereal year read
+ *  25,770.7 yr against p_A's 25,771.6 — three inputs over-determining a
+ *  two-parameter identity). Counting p_A per tropical or sidereal year
+ *  instead moves this by 26 ms; IAU states p_A per Julian year.
+ *  @param {number} siderealYearDays @param {number} generalPrecessionArcsecPerJulianYr @returns {number} */
+export function computeMeanTropicalYearJ2000Days(siderealYearDays: number, generalPrecessionArcsecPerJulianYr: number): number;
 /**
  * The published of-date window (plan 06 Phase 3 S2): inside |year − 2000| ≤
  * this span the one-family route is THE published year-length / precession

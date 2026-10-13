@@ -33,7 +33,7 @@
  * carry it so a counterfactual is reproducible (§2d).
  * @type {string}
  */
-export const CONSTANTS_HASH = "963e82ab2646dae6";
+export const CONSTANTS_HASH = "77fb0c35321923f3";
 
 /** Model version label — single source: public/input/model-version.json (§10 two-axis scheme). */
 export const MODEL_VERSION = "v23.0";
@@ -43,7 +43,7 @@ export const PREPRINT_DOI = "10.21203/rs.3.rs-8758810/v4";
 
 /** @type {Readonly<Record<string, unknown>>} */
 export const DEFAULT_CONSTANTS = Object.freeze({
-  hash: "963e82ab2646dae6",
+  hash: "77fb0c35321923f3",
   additionalBodies: {
     "pluto": {
       "name": "Pluto",
@@ -213,7 +213,7 @@ export const DEFAULT_CONSTANTS = Object.freeze({
     "perihelionPassageJ2000_JD": 2451547.042,
     "earthInclinationJ2000_deg": 1.57869,
     "earthInclinationRate_arcsecPerCentury": -18,
-    "deltaTStart": 56.07959388286052,
+    "deltaTStart": 56.07959443353602,
     "sunTilt": 7.155
   },
   foundational: {
@@ -706,10 +706,8 @@ export const DEFAULT_CONSTANTS = Object.freeze({
     "tropicalYearSS": 365.241626,
     "tropicalYearAE": 365.242018,
     "tropicalYearWS": 365.24274,
-    "tropicalYearMean": 365.2421897,
     "anomalisticYear": 365.259636,
     "siderealYear": 365.256363004,
-    "iauPrecessionJ2000": 25770.7280535361,
     "tropicalYearRateSecPerCentury": -0.53,
     "solarDay": 86400,
     "siderealDay": 86164.09053083288,

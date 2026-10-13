@@ -68,7 +68,7 @@ export { computeEquatorNodeOriginSFrameDeg, convertNodeSFrameToEquatorOriginDeg 
 export { computePlanetPrecessionConstant, createPlanetSpinChannel, createPlanetSpinChannelFromArtifacts, computeObliquityJ2000Deg } from "./planets/spin-channel.cjs";
 export { CHAIN_ARTIFACT, CHAIN_ARTIFACT_HASH } from "./planets/chain-artifact.js";
 export { DEEP_MODES_ARTIFACT, DEEP_MODES_ARTIFACT_HASH } from "./moon/deep-modes-artifact.cjs";
-export { createYearLengths, ONE_FAMILY_WINDOW_YEARS } from "./earth/year-lengths.cjs";
+export { createYearLengths, computeMeanTropicalYearJ2000Days, ONE_FAMILY_WINDOW_YEARS } from "./earth/year-lengths.cjs";
 export { computeSolarTorqueShare, createComposedPrecession } from "./earth/precession-composed.cjs";
 export { createMoonRecessionHistory, createSolarChannelBudget } from "./deltat/recession-history.cjs";
 export { evalClimateL1OrbitalPermil, laggedL1Terms, createAlphaGiaChannel } from "./climate/l1-orbital.cjs";
