@@ -137,9 +137,18 @@ function findEquinox(type, prevJD) {
 /**
  * Find perihelion (min distance) or aphelion (max distance).
  */
+/** The anomalistic year OF DATE at a JD, days — the one-family law (plan 09
+ *  step 4d; the Simon 1994 constant is gone); the sidereal year is the fallback
+ *  outside the law's window. A SEARCH PRIOR only — the measured instants are
+ *  the finder's extrema, not this step. */
+function anomalisticYearDaysAtJD(jd) {
+  const a = DT.anomalisticYearDaysOfDate(2000 + (jd - C.j2000JD) / 365.25);
+  return Number.isFinite(a) ? a : C.meanSiderealYearDays;
+}
+
 function findDistanceExtremum(type, prevJD) {
   const isPeri = type === 'PERI';
-  const approxJD = prevJD + C.meanAnomalisticYearDays;
+  const approxJD = prevJD + anomalisticYearDaysAtJD(prevJD);
 
   let bestJD = approxJD;
   let bestDist = isPeri ? Infinity : -Infinity;
@@ -412,7 +421,7 @@ const bwdPrev = { ...seedJDs };
 for (let year = seedModelYear - 1; year >= startYear; year--) {
   for (const type of allTypes) {
     // Chain backward: prevJD - meanYear
-    const meanYear = ['PERI', 'APH'].includes(type) ? C.meanAnomalisticYearDays : C.meanSolarYearDays;
+    const meanYear = ['PERI', 'APH'].includes(type) ? anomalisticYearDaysAtJD(bwdPrev[type]) : C.meanSolarYearDays;
     const backPrevJD = bwdPrev[type] - 2 * meanYear; // shift back so finder's +meanYear lands on target
 
     const finder = (type === 'SS' || type === 'WS') ? findSolstice

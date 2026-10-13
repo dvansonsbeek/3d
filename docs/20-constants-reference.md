@@ -175,7 +175,7 @@ they anchor per-planet geometry but carry no model freedom.
 | Tropical year SS (J2000) | `tropicalYearSSJ2000` | <!--v:tropicalYearSSJ2000Days-->365.241626<!--/v--> days |
 | Tropical year AE (J2000) | `tropicalYearAEJ2000` | <!--v:tropicalYearAEJ2000Days-->365.242018<!--/v--> days |
 | Tropical year WS (J2000) | `tropicalYearWSJ2000` | 365.242740 days |
-| Anomalistic year (J2000) | `anomalisticYearJ2000` | <!--v:anomalisticYearInputDays-->365.259636<!--/v--> days |
+| Anomalistic year (J2000) | derived — the law of date at 2000 | <!--v:anomalisticYearJ2000Days-->365.2596350<!--/v--> days (the series' own apsidal rate on the sidereal year; Simon 1994's mean element <!--v:anomalisticYearSimon1994Days-->365.259636<!--/v--> is a citation, <!--v:anomalisticYearSimon1994DeltaSeconds-->-0.088<!--/v--> s) |
 | Tropical year rate | `tropicalYearRateSecPerCentury` | −0.53 s/cy |
 | June Solstice 2000 JD | `juneSolstice2000_JD` | <!--v:juneSolstice2000JD-->2451716.575<!--/v--> |
 | Cardinal instants 2000 (VE / SS / AE / WS, UTC) | `cardinalPointAnchors` | <!--v:cardinalAnchorVE2000JD-->2451623.816<!--/v--> / <!--v:cardinalAnchorSS2000JD-->2451716.575<!--/v--> / <!--v:cardinalAnchorAE2000JD-->2451810.2271<!--/v--> / <!--v:cardinalAnchorWS2000JD-->2451900.0674<!--/v--> |
@@ -279,7 +279,7 @@ These are computed from foundational constants. The formula is the definition; t
 |----------|----------|---------|-------|
 | Mean Solar Year | `meanSolarYearDays` | derived from the IAU sidereal year and p_A, `computeMeanTropicalYearJ2000Days` (plan 09; was the Meeus & Savoie input 365.2421897, 66 ms shorter, and before it round(inputMeanSolarYear × H/8)/(H/8), +1.2 s) | <!--v:meanSolarYearDaysFull-->365.242190469006<!--/v--> days |
 | Mean Sidereal Year | `meanSiderealYearDays` | the IAU sidereal year, `yearLengthRef.siderealYear` (plan 09; the H/13 construction meanSolarYearDays × (H/13)/((H/13) − 1), 1 µd above it, is deleted) | <!--v:meanSiderealYearDaysFull-->365.256363004<!--/v--> days |
-| Mean Anomalistic Year | `meanAnomalisticYearDays` | the IAU anomalistic year, `yearLengthRef.anomalisticYear` (plan 09; was meanSolarYearDays × (H/16)/(H/16 − 1), 0.3 s low) | <!--v:anomalisticYearDaysFull-->365.259636000<!--/v--> days |
+| Mean Anomalistic Year | (the law of date at 2000) | derived: the one-family anomalistic year at 2000 — the sidereal year and the series' own apsidal rate (plan 09 step 4d; before it the Simon 1994 input 365.259636, 87 ms longer; before step 3 meanSolarYearDays × (H/16)/(H/16 − 1), 0.3 s low) | <!--v:anomalisticYearDaysFull-->365.259634985<!--/v--> days |
 | Mean Length of Day | `meanLengthOfDay` | the SI day ω₀, `yearLengthRef.solarDay` (plan 09; was meanSiderealYearSeconds over the H/13 sidereal days, 86,399.99968 s) | ~86,400.0 s |
 | Mean Sidereal Day | `meanSiderealDay` | (meanSolarYearDays/(meanSolarYearDays+1)) × meanLengthOfDay | <!--v:meanSiderealDaySeconds-->86,164.0905329<!--/v--> s |
 | Mean Stellar Day | `meanStellarDay` | (meanSiderealDay/T_p) / (meanSolarYearDays+1) · cos ε + meanSiderealDay — T_p the certified J2000 precession period, not the counter H/13 | <!--v:meanStellarDaySeconds-->86,164.0989084<!--/v--> s |
@@ -533,7 +533,7 @@ These come from external astronomical sources and do not change with the model.
 | Tropical year (AE) | `tropicalYearAEJ2000` | <!--v:tropicalYearAEJ2000Days-->365.242018<!--/v--> days | Meeus & Savoie 1992 |
 | Tropical year (WS) | `tropicalYearWSJ2000` | 365.242740 days | Meeus & Savoie 1992 |
 | Tropical year rate | `tropicalYearRateSecPerCentury` | -0.53 s/cy | Meeus & Savoie 1992 |
-| Anomalistic year | `anomalisticYearJ2000` | <!--v:anomalisticYearInputDays-->365.259636<!--/v--> days | JPL Horizons |
+| Anomalistic year (mean element) | `simon1994AnomalisticYearDays` | <!--v:anomalisticYearSimon1994Days-->365.259636<!--/v--> days | Simon et al. 1994 — a citation since plan 09 step 4d; the model's J2000 value is the law of date (<!--v:anomalisticYearJ2000Days-->365.2596350<!--/v--> d) |
 | Sidereal year | `siderealYearJ2000` | <!--v:siderealYearInputDays-->365.256363004<!--/v--> days | JPL Horizons (adjusted for LOD=86400) |
 | Solar day | `solarDayJ2000` | 86400.0 s | SI definition |
 | Scene day basis at J2000 | `measuredMeanSolarDayJ2000Seconds` | <!--v:measuredMeanSolarDayJ2000Seconds-->86,400.000000<!--/v--> s | The SI day ω₀ — ONE J2000 day basis since plan 09 (the comb-era "measured mean solar day", IAU sidereal seconds over the retired Step-6c sidereal anchor, 86,400.00032 s, is retired with the comb) measured year lengths are counted in. ONE J2000 basis: LOD_mean, the scene basis and `o.lodKinematic` at J2000 (<!--v:lodKinematicFourierJ2000Seconds-->86,400.000000<!--/v--> s) are all ω₀; LOD_real is the Layer-4 observable; see [doc 11 §Day bases](11-length-day-year-formulas.md#day-types) |

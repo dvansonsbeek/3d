@@ -895,7 +895,9 @@ const ASTRO_REFERENCE = {
   tropicalYearMeanJ2000: meansolaryearlengthinDays,           // Mean tropical year at J2000.0 — derived from the sidereal year and p_A (plan 09; the alias name stays for its readers)
   tropicalYearRateSecPerCentury: K.yearLengthRef.tropicalYearRateSecPerCentury,  // Secular change in tropical year length
   // Source: JPL Horizons
-  anomalisticYearJ2000: K.yearLengthRef.anomalisticYear,      // Perihelion to perihelion
+  // (plan 09 step 4d: anomalisticYearJ2000 — the Simon 1994 mean element as a model
+  //  constant — is gone; the J2000 anomalistic year is _anomalisticYearJ2000Days(), the
+  //  law of date at 2000; the citation is K.knownValues.simon1994AnomalisticYearDays)
   siderealYearJ2000: K.yearLengthRef.siderealYear,            // Fixed star reference (one complete orbit)
   // Source: IERS Conventions / IAU definitions.
   // THREE distinct day lengths exist in this model — SI 86400 (definition),
@@ -1026,7 +1028,10 @@ let   meanStellarday = NaN;  // Phase 6: mutable (Tier 2) — set by recomputeDe
 let   axialCoinRotationMs = NaN;  // Phase 6: mutable (Tier 2)
 let   axialCoinRotationYearlySeconds = NaN;  // Phase 6: mutable (Tier 2)
 
-let   meanAnomalisticYearinDays = ASTRO_REFERENCE.anomalisticYearJ2000;  // plan 09: the IAU value (was the device's H/16 identity, 0.3 s low). Phase 6: mutable (Tier 2)
+// (plan 09 step 4d: meanAnomalisticYearinDays — the Simon 1994 mean element as a
+// J2000 constant — is deleted; the J2000 anomalistic year is the law of date at
+// 2000, _anomalisticYearJ2000Days(). Before step 3 it was the device's H/16
+// identity, 0.3 s low.)
 
 // ═══════════════════════════════════════════════════════════════════════════
 // CANONICAL MEAN/REAL YEAR & DAY VARIABLES (Phase-1 rename target)
@@ -1058,15 +1063,12 @@ let   meanAnomalisticYearinDays = ASTRO_REFERENCE.anomalisticYearJ2000;  // plan
 // (86400.00279 under an earlier H) — is IAU seconds over IAU days = 86,400 s.
 const MEAN_TROPICAL_YEAR_SEC = meansolaryearlengthinDays * 86400;                             // = 31,556,925.19 s (the IAU tropical mean × 86400)
 const MEAN_SIDEREAL_YEAR_SEC = ASTRO_REFERENCE.siderealYearJ2000 * 86400;                    // = 31,558,149.7635 s (IAU physical)
-const MEAN_ANOMALISTIC_YEAR_SEC = ASTRO_REFERENCE.anomalisticYearJ2000 * 86400;               // (IAU physical)
 const MEAN_LOD_SEC = MEAN_SIDEREAL_YEAR_SEC / meansiderealyearlengthinDays_kinematic;         // = 86,400 s (IAU sec / IAU days, plan 09)
 
 const MEAN_TROPICAL_YEAR_86400DAYS = MEAN_TROPICAL_YEAR_SEC / 86400;                          // = the IAU tropical mean
 const MEAN_TROPICAL_YEAR_MEANLODDAYS = MEAN_TROPICAL_YEAR_SEC / MEAN_LOD_SEC;                 // ≡ MEAN_TROPICAL_YEAR_86400DAYS (plan 09)
 const MEAN_SIDEREAL_YEAR_86400DAYS = MEAN_SIDEREAL_YEAR_SEC / 86400;                          // ≈ 365.256363 (IAU)
 const MEAN_SIDEREAL_YEAR_MEANLODDAYS = MEAN_SIDEREAL_YEAR_SEC / MEAN_LOD_SEC;                 // ≡ MEAN_SIDEREAL_YEAR_86400DAYS (plan 09)
-const MEAN_ANOMALISTIC_YEAR_86400DAYS = MEAN_ANOMALISTIC_YEAR_SEC / 86400;
-const MEAN_ANOMALISTIC_YEAR_MEANLODDAYS = MEAN_ANOMALISTIC_YEAR_SEC / MEAN_LOD_SEC;
 
 const MEAN_PRECESSION = MEAN_SIDEREAL_YEAR_SEC / (MEAN_SIDEREAL_YEAR_SEC - MEAN_TROPICAL_YEAR_SEC); // = H/13 exactly
 
@@ -2768,22 +2770,28 @@ function dLodDtDecompositionAtAge(t_Ma) {
 function _certifiedAxialPrecessionJ2000Years() {
   return 1296000 / K.earthOrbital.generalPrecessionJ2000_arcsecPerYr;
 }
+/** The J2000 anomalistic year, DAYS — the one-family law of date at 2000: the
+ *  sidereal year and the series' own apsidal rate (11.609 ″/yr), the movement
+ *  the scene's perihelion follows (plan 09 step 4d; Simon 1994's MEAN element
+ *  365.259636, 87 ms longer, is a citation in astro-reference knownValues /
+ *  the registry's anomalisticYearSimon1994Days — not in the constants embed
+ *  the browser reads). Lazy: reads the law, which rides the
+ *  series once it has arrived (the artifact-less law reads +2.1 s). */
+function _anomalisticYearJ2000Days() {
+  return _yearLengthsM().anomalisticYearSecondsAtYear(2000) / 86400;
+}
 /** The J2000 apsidal period T_aps (the perihelion against the stars), Julian
- *  years, as the IAU J2000 year INPUTS state it: the beat of the anomalistic
- *  and sidereal years, anom·sid/((anom − sid)·365.25 d) ≈ 111,600 yr (plan 09
- *  step 4b — the device's H/3 = 111,772 read it 0.15 % high; the one-family's
- *  apsidal line of date at 2000 reads 111,634, 0.03 % off — that of-date
- *  family is the Predictions panel's Apsidal row). Built from constants only,
- *  so the load-time GUI tables may read it (the package model is not). */
+ *  years — the one-family's apsidal line of date at 2000, 111,634 yr (plan 09
+ *  step 4d; the device's H/3 = 111,772 read it 0.12 % high; the IAU-input beat
+ *  of 4b, 111,600, left with the anomalistic input). Lazy, as above. */
 function _apsidalPeriodYearsJ2000() {
-  const a = K.yearLengthRef.anomalisticYear, s = K.yearLengthRef.siderealYear;
-  return a * s / ((a - s) * 365.25);
+  return _yearLengthsM().inclinationPrecessionYearsAtYear(2000);
 }
 /** The J2000 perihelion-of-date period T_peri = 1/(1/T_p + 1/T_aps), Julian
- *  years, on the IAU inputs above and the certified p_A period (plan 09 step
- *  4b — the device's H/16 = 20,957 read this quantity 0.1 % high). Search
- *  priors, the perihelion calendar and the diagnostics tables read it; the
- *  of-date value is the Predictions panel's Perihelion row. */
+ *  years, on the law's apsidal line above and the certified p_A period (plan 09
+ *  step 4b/4d — the device's H/16 = 20,957 read this quantity 0.1 % high).
+ *  Search priors, the perihelion calendar and the diagnostics tables read it;
+ *  the of-date value is the Predictions panel's Perihelion row. */
 function _periOfDatePeriodYearsJ2000() {
   return 1 / (1 / _certifiedAxialPrecessionJ2000Years() + 1 / _apsidalPeriodYearsJ2000());
 }
@@ -19079,10 +19087,11 @@ const VFP_CATEGORIES = [
     references: [
       { name: 'Meeus (1998), derived', color: '#4fc3f7', fn: anomalisticYearMeeusDerived, validYears: [-10000, 10000], sourceUrl: 'https://ui.adsabs.harvard.edu/abs/2003A%26A...412..567C' },
     ],
-    j2000extras: [
-      { name: 'IAU (observed)', color: '#ef5350',
-        value: () => ASTRO_REFERENCE.anomalisticYearJ2000 },
-    ],
+    // (plan 09 step 4d: the "IAU (observed)" J2000 marker — the Simon 1994 mean
+    // element — left the chart; it is a citation (registry
+    // anomalisticYearSimon1994Days), not a model value, and the constants embed
+    // carries no knownValues.)
+    j2000extras: [],
     reading: 'The anomalistic year exceeds the sidereal year by T·ϖ̇/360 — about 4.7 minutes today — and that excess follows the perihelion’s sidereal motion, so the curve swings with the eccentricity cycle: slow perihelion motion near eccentricity maxima, fast near the minima; it is the Perihelion Precession panel read in year units. The model line is the secular mean-element construction on the chain’s apsidal tangent, the same rate family the Precession Periods panel shows, λ̇-corrected. Meeus’s line is Chapront’s sidereal year with the Table 31.B perihelion rate in the J2000 ecliptic frame, the sidereal motion the definition needs.',
   },
   {
@@ -23545,7 +23554,7 @@ function setupGUI() {
       ciTropicalSS: R.tropicalYearSSJ2000 + ' days',
       ciTropicalAE: R.tropicalYearAEJ2000 + ' days',
       ciTropicalWS: R.tropicalYearWSJ2000 + ' days',
-      ciAnomalYear: R.anomalisticYearJ2000 + ' days',
+      ciAnomalYear: 'derived — the law of date at 2000 (Predictions panel, Anomalistic row); Simon 1994’s mean element is a citation in the registry',
       ciTropicalRate: R.tropicalYearRateSecPerCentury + ' s/cy',
       ciPrecession: _certifiedAxialPrecessionJ2000Years().toFixed(2) + ' yr',
       ciSolsticeJD: String(R.juneSolstice2000_JD),
@@ -35723,7 +35732,7 @@ function perihelionForYear(year, debug = false, prevPerihelionJD = null) {
 
   if (prevPerihelionJD !== null) {
     // Anomalistic year is ~365.26 days - search around that offset from previous
-    approxJD = prevPerihelionJD + ASTRO_REFERENCE.anomalisticYearJ2000;
+    approxJD = prevPerihelionJD + _anomalisticYearJ2000Days();
     searchRange = 288;  // ±6 days is enough when we have a good prior
   } else {
     // First search: estimate perihelion position accounting for precession
@@ -35861,7 +35870,7 @@ function perihelionForYearMethodB(year, debug = false, prevPerihelionJD = null) 
   let searchRange;
 
   if (prevPerihelionJD !== null) {
-    approxJD = prevPerihelionJD + ASTRO_REFERENCE.anomalisticYearJ2000;
+    approxJD = prevPerihelionJD + _anomalisticYearJ2000Days();
     searchRange = 96;  // ±2 days — matches Step 6a; see solsticeForYear rationale
   } else {
     // First search: estimate perihelion position accounting for precession
@@ -35962,7 +35971,7 @@ function aphelionForYearMethodB(year, debug = false, prevAphelionJD = null) {
   let searchRange;
 
   if (prevAphelionJD !== null) {
-    approxJD = prevAphelionJD + ASTRO_REFERENCE.anomalisticYearJ2000;
+    approxJD = prevAphelionJD + _anomalisticYearJ2000Days();
     searchRange = 96;  // ±2 days — matches Step 6a; see solsticeForYear rationale
   } else {
     // First search: estimate aphelion position accounting for precession
@@ -36066,7 +36075,7 @@ function aphelionForYear(year, debug = false, prevAphelionJD = null) {
   let searchRange;
 
   if (prevAphelionJD !== null) {
-    approxJD = prevAphelionJD + ASTRO_REFERENCE.anomalisticYearJ2000;
+    approxJD = prevAphelionJD + _anomalisticYearJ2000Days();
     searchRange = 288;  // ±6 days
   } else {
     // First search: estimate aphelion position accounting for precession
@@ -36654,7 +36663,7 @@ async function runYearAnalysisExport(years) {
     ['at Winter Solstice', siderealData.WS.mean.toFixed(9)],
     [],
     ['3. ANOMALISTIC YEAR', 'Measured (days)'],
-    ['IAU Anomalistic Year J2000', ASTRO_REFERENCE.anomalisticYearJ2000.toFixed(9)],
+    ['Anomalistic Year J2000 (the law of date)', _anomalisticYearJ2000Days().toFixed(9)],
     ['Measured Anomalistic Year (Mean in Analysis Period)', meanAnomalisticYear.toFixed(9)],
     [],
     ['3a) Anomalistic Year by Aphelion/Perihelion', 'Measured (days)'],
@@ -38771,7 +38780,7 @@ async function analyzeAnoministicYear(startYear, endYear) {
   }
   const apheMeanB = apheIntervalsB.reduce((sum, i) => sum + i.interval, 0) / apheIntervalsB.length;
 
-  const iauAnomalistic = ASTRO_REFERENCE.anomalisticYearJ2000;
+  const iauAnomalistic = _anomalisticYearJ2000Days();   // plan 09 step 4d: the law of date at 2000 (the identifier keeps its historical name)
 
   // Theoretical anomalistic year from the J2000 perihelion-of-date period
   // T_peri (plan 09 step 4b; the device's H/16 read it 0.09 % high, 0.3 s of year)
@@ -38798,7 +38807,7 @@ async function analyzeAnoministicYear(startYear, endYear) {
   console.log(`║   Perihelion Interval                           │ ${periMeanB.toFixed(9)}    │ ${periBDiff >= 0 ? '+' : ''}${periBDiff.toFixed(2)} seconds               ║`);
   console.log(`║   Aphelion Interval                             │ ${apheMeanB.toFixed(9)}    │ ${apheBDiff >= 0 ? '+' : ''}${apheBDiff.toFixed(2)} seconds               ║`);
   console.log('╠═══════════════════════════════════════════════════════════════════════════════════════════════════════╣');
-  console.log(`║ IAU anomalistic year (J2000)                    │ ${iauAnomalistic.toFixed(9)}    │ (reference)                    ║`);
+  console.log(`║ Model anomalistic year (J2000, the law)         │ ${iauAnomalistic.toFixed(9)}    │ (reference)                    ║`);
   console.log('╠═══════════════════════════════════════════════════════════════════════════════════════════════════════╣');
   console.log('║ THEORETICAL (T_peri formula)                                                                          ║');
   console.log('╠═══════════════════════════════════════════════════════════════════════════════════════════════════════╣');
@@ -39485,16 +39494,16 @@ async function analyzeAllAlignments(startYear, endYear) {
   console.log('║ MEAN TROPICAL YEAR (average of 4 cardinal points)                                     ║');
   const meanDiffSec = (meanTropicalYear - ASTRO_REFERENCE.tropicalYearMeanJ2000) * 86400;
   console.log(`║   Measured mean:     ${meanTropicalYear.toFixed(9)} days                                          ║`);
-  console.log(`║   IAU mean:          ${ASTRO_REFERENCE.tropicalYearMeanJ2000.toFixed(9)} days                                          ║`);
+  console.log(`║   Derived J2000:     ${ASTRO_REFERENCE.tropicalYearMeanJ2000.toFixed(9)} days                                          ║`);
   console.log(`║   Difference:        ${meanDiffSec >= 0 ? '+' : ''}${meanDiffSec.toFixed(2)} seconds                                                        ║`);
   console.log(`║   Model configured:  ${meansolaryearlengthinDays.toFixed(9)} days                                          ║`);
   console.log('╠═══════════════════════════════════════════════════════════════════════════════════════╣');
-  console.log('║ ANOMALISTIC YEAR                                    Measured          IAU Ref         ║');
+  console.log('║ ANOMALISTIC YEAR                                    Measured          Model J2000     ║');
   console.log('╠═══════════════════════════════════════════════════════════════════════════════════════╣');
-  const periDiffSec = (meanPerihelion - ASTRO_REFERENCE.anomalisticYearJ2000) * 86400;
-  const apheDiffSec = (meanAphelion - ASTRO_REFERENCE.anomalisticYearJ2000) * 86400;
-  console.log(`║   Perihelion to perihelion:      ${meanPerihelion.toFixed(9)}    ${ASTRO_REFERENCE.anomalisticYearJ2000.toFixed(9)}   ${periDiffSec >= 0 ? '+' : ''}${periDiffSec.toFixed(2)}s ║`);
-  console.log(`║   Aphelion to aphelion:          ${meanAphelion.toFixed(9)}    ${ASTRO_REFERENCE.anomalisticYearJ2000.toFixed(9)}   ${apheDiffSec >= 0 ? '+' : ''}${apheDiffSec.toFixed(2)}s ║`);
+  const periDiffSec = (meanPerihelion - _anomalisticYearJ2000Days()) * 86400;
+  const apheDiffSec = (meanAphelion - _anomalisticYearJ2000Days()) * 86400;
+  console.log(`║   Perihelion to perihelion:      ${meanPerihelion.toFixed(9)}    ${_anomalisticYearJ2000Days().toFixed(9)}   ${periDiffSec >= 0 ? '+' : ''}${periDiffSec.toFixed(2)}s ║`);
+  console.log(`║   Aphelion to aphelion:          ${meanAphelion.toFixed(9)}    ${_anomalisticYearJ2000Days().toFixed(9)}   ${apheDiffSec >= 0 ? '+' : ''}${apheDiffSec.toFixed(2)}s ║`);
   console.log('╠═══════════════════════════════════════════════════════════════════════════════════════╣');
   console.log('║ SIDEREAL YEAR (4-angle average: 0°, 90°, 180°, 270°)  Measured          IAU Ref       ║');
   console.log('╠═══════════════════════════════════════════════════════════════════════════════════════╣');
@@ -45767,10 +45776,10 @@ const planetStats = {
        hover : [`Left = mean sidereal year at current epoch ≈ 365.25636 days. Right = live current. ~20 min longer than tropical year due to precession. Days in the declared scene basis (doc 11 §Day bases).`]},
      null,
       {label : () => `Anomalistic year (SI seconds)`,
-       value : [ { small: () => meanAnomalisticYearinDays*meanlengthofday },{ v: () => predictions.anomalisticYearSeconds, dec:6, sep:',' }],
+       value : [ { small: () => _anomalisticYearJ2000Days()*meanlengthofday },{ v: () => predictions.anomalisticYearSeconds, dec:6, sep:',' }],
        hover : [`Left = mean anomalistic year at current epoch (in SI seconds). Right = live current. Perihelion-to-perihelion interval ≈ 31,558,433 s.`]},
       {label : () => `Anomalistic year (days)`,
-       value : [ { small: () => meanAnomalisticYearinDays },{ v: () => predictions.anomalisticYearDays, dec:11, sep:',' }],
+       value : [ { small: () => _anomalisticYearJ2000Days() },{ v: () => predictions.anomalisticYearDays, dec:11, sep:',' }],
        hover : [`Left = mean anomalistic year at current epoch ≈ 365.2596 days. Right = live current. Longest year type due to perihelion advance. Days in the declared scene basis (doc 11 §Day bases).`]},
      null,
       {label : () => `Obliquity (degrees)`,
@@ -54157,7 +54166,7 @@ function updatePredictions() {
   predictions.diffStellarDay = (predictions.stellarDayReal - ASTRO_REFERENCE.stellarDayJ2000) * 1000;
   predictions.diffTropicalYear = (predictions.solarYearDays - ASTRO_REFERENCE.tropicalYearMeanJ2000) * 86400;
   predictions.diffSiderealYear = (predictions.siderealYearDays - ASTRO_REFERENCE.siderealYearJ2000) * 86400;
-  predictions.diffAnomalisticYear = (predictions.anomalisticYearDays - ASTRO_REFERENCE.anomalisticYearJ2000) * 86400;
+  predictions.diffAnomalisticYear = (predictions.anomalisticYearDays - _anomalisticYearJ2000Days()) * 86400;   // plan 09 step 4d: vs the law's own J2000 value
   predictions.diffPrecession = predictions.axialPrecession - _certifiedAxialPrecessionJ2000Years();   // plan 09: vs the IAU p_A period (the stale iauPrecessionJ2000 key, 25,770.73, is deleted)
   predictions.diffEccentricity = predictions.eccentricityEarth - ASTRO_REFERENCE.eccentricityJ2000;
   predictions.iauObliquityRef = meanObliquityIAU2006(o.currentYear || 2000);

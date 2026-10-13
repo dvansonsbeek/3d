@@ -12,6 +12,7 @@
 
 const C = require('./constants');
 const sg = require('./scene-graph');
+const DT = require('./deep-time');
 const jpl = require('./horizons-client');
 const { j2000ToOfDate } = require('./precession');
 const fs = require('fs');
@@ -564,8 +565,12 @@ function scanOrbit(target, jdEpoch, steps = 720) {
   // Determine orbital period and reference body
   let periodDays, inputE, orbitDist, targetType;
   if (target === 'sun') {
-    // Earth-Sun: one anomalistic year
-    periodDays = C.meanAnomalisticYearDays;
+    // Earth-Sun: one anomalistic year OF DATE at the scan epoch — the one-family
+    // law (plan 09 step 4d; the Simon 1994 constant is gone); the sidereal year
+    // is the fallback outside the law's window (a scan span, not a result).
+    const scanYear = 2000 + (jd0 - C.j2000JD) / 365.25;
+    const anomOfDate = DT.anomalisticYearDaysOfDate(scanYear);
+    periodDays = Number.isFinite(anomOfDate) ? anomOfDate : C.meanSiderealYearDays;
     inputE = C.eccentricityDerivedMean; // Earth's orbital eccentricity
     orbitDist = 1.0; // AU
     targetType = 'earth-sun';

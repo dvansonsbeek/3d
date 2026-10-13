@@ -646,7 +646,7 @@ The analysis tools compare against these IAU J2000 reference values:
 | Tropical Year (AE) | <!--v:tropicalYearAEJ2000Days-->365.242018<!--/v--> days |
 | Tropical Year (WS) | 365.242740 days |
 | Tropical Year (Mean) | 365.242189 days |
-| Anomalistic Year | <!--v:anomalisticYearInputDays-->365.259636<!--/v--> days |
+| Anomalistic Year | <!--v:anomalisticYearJ2000Days-->365.2596350<!--/v--> days (the law of date at 2000; plan 09 step 4d — the Simon 1994 mean element 365.259636 is a citation) |
 | Sidereal Year | 365.256363 days |
 | IAU Precession Period | 25,771.57 years |
 

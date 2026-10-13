@@ -156,7 +156,6 @@ const MIGRATED = [
   'astro.yearLengthRef.tropicalYearAE',
   'astro.yearLengthRef.tropicalYearWS',
   'astro.yearLengthRef.tropicalYearRateSecPerCentury',
-  'astro.yearLengthRef.anomalisticYear',
   'astro.yearLengthRef.siderealYear',
   'astro.yearLengthRef.solarDay',
   'astro.yearLengthRef.siderealDay',

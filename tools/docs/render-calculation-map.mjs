@@ -178,7 +178,7 @@ function blockJ2000Identities() {
   const msy = require(join(ROOT, 'tools/lib/constants.js')).meanSolarYearDays;   // plan 09: DERIVED (sidereal year + p_A), one home
   const sidD = K.yearLengthRef.siderealYear;
   const lod = K.yearLengthRef.solarDay;
-  const anom = K.yearLengthRef.anomalisticYear;
+  const anom = m.yearLengths.anomalisticYearSecondsAtYear(2000) / 86400;   // plan 09 step 4d: the law of date at 2000 (the series' apsidal line), not an input
   const pA = K.earthOrbital.generalPrecessionJ2000_arcsecPerYr;
   return [
     '| quantity | value | formula | H-role |',
@@ -187,7 +187,7 @@ function blockJ2000Identities() {
     `| **meanSolarYearDays** | ${msy.toFixed(9)} | DERIVED in one home: 1/T = 1/T_sid + p_A/(1,296,000″·365.25 d) — the beat of \`yearLengthRef.siderealYear\` and the IAU 2006 p_A per Julian year (\`computeMeanTropicalYearJ2000Days\`); the calendar's year axis (plan 09: was the Meeus & Savoie 1992 input 365.2421897, 66 ms shorter; before it round(input · H/8)/(H/8) = 365.242203646, +1.2 s) | — |`,
     `| sidereal year (days, IAU) | ${sidD} | \`yearLengthRef.siderealYear\` (astro-reference) | — |`,
     `| **LOD_mean** (the kinematic day ω₀, s) | ${lod} | \`yearLengthRef.solarDay\` — the SI day (plan 09: was sidereal seconds over the H/13 kinematic sidereal days, 86,399.99968 s) | — |`,
-    `| anomalistic year (days) | ${anom} | \`yearLengthRef.anomalisticYear\` — IAU (plan 09: was meanSolarYearDays · (H/16)/(H/16 − 1), 0.3 s low) | — |`,
+    `| anomalistic year (days) | ${anom.toFixed(9)} | the one-family law of date at 2000 — the series' own apsidal rate 11.609 ″/yr on the sidereal year (plan 09 step 4d; the Simon 1994 mean element 365.259636 is a citation, 87 ms longer; before step 3 meanSolarYearDays · (H/16)/(H/16 − 1), 0.3 s low) | — |`,
     `| **p₀, the J2000 precession anchor** | ${pA} ″/yr (T_p = ${(1296000 / pA).toFixed(3)} yr) | \`earthOrbital.generalPrecessionJ2000_arcsecPerYr\` — IAU 2006 p_A (plan 09: was the retired year combs' beat at 2000, 25,771.395 yr) | — |`,
   ].join('\n');
 }

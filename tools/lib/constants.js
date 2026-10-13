@@ -257,11 +257,16 @@ const meanSiderealDay = (meanSolarYearDays / (meanSolarYearDays + 1)) * meanLeng
 // obliquity. Mirrors STELLAR_DAY_RA_PROJECTION in src/script.js — keep in sync.
 const STELLAR_DAY_RA_PROJECTION =
   Math.cos(ASTRO_REFERENCE.obliquityJ2000_deg * Math.PI / 180);   // plan 09: the IAU ε₀ input (the retired comb's fitted mean sat 0.03° lower; 2e-11 of the stellar day)
-const meanStellarDay = (meanSiderealDay / (H / 13)) / (meanSolarYearDays + 1)
+// Plan 09 step 4d: the equinox regresses one turn per T_p — the certified p_A
+// period (axialPrecessionJ2000Years) — not per the counter H/13 (0.086 % slow;
+// the browser twin had already moved; this line was the Node side of a split).
+const meanStellarDay = (meanSiderealDay / axialPrecessionJ2000Years) / (meanSolarYearDays + 1)
   * STELLAR_DAY_RA_PROJECTION + meanSiderealDay;
-// Plan 09: the IAU anomalistic year (365.259636 d, astro-reference.json) — was
-// meanSolarYearDays × (H/16)/(H/16 − 1), the device's H/16 identity (0.3 s low).
-const meanAnomalisticYearDays = astroRef.yearLengthRef.anomalisticYear;
+// (Plan 09 step 4d: meanAnomalisticYearDays — the Simon 1994 mean element
+// 365.259636 as a model constant — is deleted; the J2000 anomalistic year is
+// the one-family law of date at 2000, @essrt/physics yearLengths
+// .anomalisticYearSecondsAtYear(2000), the movement's own apsidal line. Before
+// step 3 it was meanSolarYearDays × (H/16)/(H/16 − 1), the device's identity.)
 // Unification: the mean of the one law IS base' (formerly the H/16 beat's
 // geometric mean √(base² + A²) = 0.01545).
 const eccentricityDerivedMean = eccentricityBaseDerived;
@@ -691,7 +696,6 @@ module.exports = {
   meanSiderealDay,
   meanStellarDay,
   STELLAR_DAY_RA_PROJECTION,
-  meanAnomalisticYearDays,
   eccentricityDerivedMean,
   totalDaysInH,
   j2000JD,

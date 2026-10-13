@@ -18,11 +18,12 @@
 import { createRequire } from 'node:module';
 const require2 = createRequire('/home/dennis/code/3d/package.json');
 const C = require2('/home/dennis/code/3d/tools/lib/constants.js');
+const DT = require2('/home/dennis/code/3d/tools/lib/deep-time.js');
 
 const Psyn = C.moonSynodicMonth;          // days
 const Pano = C.moonAnomalisticMonth;
 const Pdra = C.moonNodalMonth;
-const Pyr = C.meanAnomalisticYearDays;    // Earth perihelion recurrence
+const Pyr = DT.anomalisticYearDaysOfDate(2000);    // Earth perihelion recurrence — the law's J2000 value (plan 09 step 4d)
 const SY = C.meanSolarYearDays;
 
 const off = (T, P) => {

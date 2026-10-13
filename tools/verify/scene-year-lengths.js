@@ -98,7 +98,9 @@ const FIND = {
   PERI: (a) => extremum(a, (p) => p.wobbleDistAU, false), APH: (a) => extremum(a, (p) => p.wobbleDistAU, true),
 };
 const CARD = ['VE', 'SS', 'AE', 'WS'], TARGET = { VE: 0, SS: 90, AE: 180, WS: 270 };
-const chainYr = { VE: C.meanSolarYearDays, AE: C.meanSolarYearDays, SS: C.meanSolarYearDays, WS: C.meanSolarYearDays, PERI: C.meanAnomalisticYearDays, APH: C.meanAnomalisticYearDays };
+// plan 09 step 4d: the perihelion/aphelion chain step is the law's J2000 anomalistic year (a search prior; the Simon 1994 constant is gone)
+const ANOM_J2000_DAYS = DT.anomalisticYearDaysOfDate(2000);
+const chainYr = { VE: C.meanSolarYearDays, AE: C.meanSolarYearDays, SS: C.meanSolarYearDays, WS: C.meanSolarYearDays, PERI: ANOM_J2000_DAYS, APH: ANOM_J2000_DAYS };
 
 /** Sample all six event types over ±HALF years around an epoch. */
 function sampleEpoch(Y0) {

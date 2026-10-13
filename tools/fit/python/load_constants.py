@@ -43,7 +43,6 @@ H = C['H']
 BALANCE_YEAR = C['balancedYear']
 MEAN_SOLAR_YEAR_DAYS = C['meanSolarYearDays']
 MEAN_SIDEREAL_YEAR_DAYS = C['meanSiderealYearDays']
-MEAN_ANOMALISTIC_YEAR_DAYS = C['meanAnomalisticYearDays']
 
 # Earth parameters
 EARTH_OBLIQUITY_MEAN = C['earthtiltMean']

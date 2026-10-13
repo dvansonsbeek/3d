@@ -66,7 +66,7 @@ The three J2000 mean year lengths are the IAU inputs of `astro-reference.json` (
 |-----------|-------|-------------|
 | Tropical | derived: the beat of the IAU sidereal year and p_A (`computeMeanTropicalYearJ2000Days`) | <!--v:meanSolarYearDaysFull-->365.242190469006<!--/v--> |
 | Sidereal | `yearLengthRef.siderealYear` | <!--v:meanSiderealYearDaysFull-->365.256363004<!--/v--> |
-| Anomalistic | `yearLengthRef.anomalisticYear` | <!--v:anomalisticYearDaysFull-->365.259636000<!--/v--> |
+| Anomalistic | derived: the law of date at 2000 (the sidereal year and the series' own apsidal rate; Simon 1994's mean element is a citation) | <!--v:anomalisticYearDaysFull-->365.259634985<!--/v--> |
 
 The coin rotation paradox relates the three through the precession periods:
 - In one axial precession cycle (T_p), there is exactly **1 fewer sidereal year than tropical years** — the precessing equinox "absorbs" one full orbit
@@ -265,7 +265,7 @@ The coin rotation paradox manifests at every timescale:
 |----------|-------------|-----------|
 | Tropical year | 365.242190 days | 365.242190 days (IAU) |
 | Sidereal year | 365.256363 days | 365.256363 days (IAU) |
-| Anomalistic year | 365.259633 days | <!--v:anomalisticYearInputDays-->365.259636<!--/v--> days (IAU) |
+| Anomalistic year | 365.259633 days | <!--v:anomalisticYearSimon1994Days-->365.259636<!--/v--> days (Simon 1994 mean element; the model's law of date at 2000: <!--v:anomalisticYearJ2000Days-->365.2596350<!--/v-->) |
 | LOD_mean (kinematic, the SI day ω₀) | <!--v:meanSolarDaySeconds-->86,400.000000<!--/v--> s | — |
 | LOD_real (Layer 4: physical, + the ecliptic term + DT cycles + swing) | <!--v:lodRealPhysical-->86,400.001200<!--/v--> s | USNO joint-optimum target <!--v:usnoLodJ2000-->86,400.0012<!--/v--> s (fit's measured-day basis) |
 | Sidereal day — on LOD_real of J2000 (the simulator readout) | <!--v:siderealDayJ2000Physical-->86,164.091730<!--/v--> s | <!--v:siderealDayInputSeconds-->86,164.090531<!--/v--> s (IAU, on the 86,400-s day — the two differ by the day's excess, <!--v:lodRealJ2000ExcessMs-->1.20<!--/v--> ms) |

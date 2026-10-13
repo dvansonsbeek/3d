@@ -35,7 +35,7 @@ from constants_scripts import (
     H, BALANCE_YEAR, K_DEVICE_WHEEL_PHASE_J2000_CYCLES, EARTH_BASE_ECCENTRICITY, EARTH_ECCENTRICITY_AMPLITUDE,
     EARTH_OBLIQUITY_MEAN, EARTH_INCLINATION_AMPLITUDE,
     _SIDEREAL_YEAR_S, _MEAN_SOLAR_YEAR_DAYS, _MEAN_SIDEREAL_YEAR_DAYS,
-    _MEAN_LENGTH_OF_DAY, _MEAN_ANOM_YEAR_DAYS, _ECCENTRICITY_DERIVED_MEAN,
+    _MEAN_LENGTH_OF_DAY, _ECCENTRICITY_DERIVED_MEAN,
     AXIAL_PRECESSION_J2000_YEARS,
     INCL_PERIOD, OMEGA_J2000, INCL_ECLIPTIC,
     AXIAL_TILT, LONGITUDE_PERIHELION, PERIHELION_ECLIPTIC_YEARS,
@@ -64,7 +64,6 @@ J2000 = 2000                    # J2000 epoch (perihelion reference)
 MEAN_SOLAR_YEAR_DAYS = _MEAN_SOLAR_YEAR_DAYS
 SIDEREAL_YEAR_SECONDS = _SIDEREAL_YEAR_S        # J2000 snapshot
 MEAN_DAY_LENGTH = _MEAN_LENGTH_OF_DAY            # J2000 snapshot
-MEAN_ANOM_YEAR_DAYS = _MEAN_ANOM_YEAR_DAYS
 
 # --- RA solar day offset (measured, Fourier fit) ---
 # Confirmed by "Solar day multiepoch" test: 65 epochs spanning one full H.
@@ -79,7 +78,6 @@ RA_SOLAR_DAY_OFFSET_OBLIQ_MS =  -1.684   # ms/day amplitude at period H/8  (obli
 # deleted — this mirror is J2000-scoped) ---
 TROPICAL_YEAR_MEAN = _MEAN_SOLAR_YEAR_DAYS
 SIDEREAL_YEAR_MEAN = _MEAN_SIDEREAL_YEAR_DAYS
-ANOMALISTIC_YEAR_MEAN = _MEAN_ANOM_YEAR_DAYS
 
 # --- Earth parameters (from constants_scripts) ---
 # (EARTH_INCLIN_MEAN left with calc_inclination, the H/3 device, at plan 07 R5/R9;
@@ -490,25 +488,9 @@ def calc_sidereal_year_seconds(year: int) -> float:
     return SIDEREAL_YEAR_SECONDS
 
 
-def calc_anomalistic_year(year: int) -> float:
-    """
-    The anomalistic year in days — the IAU J2000 value (plan 09; the year of
-    date is @essrt/physics `lunisolar`/`lengths`).
-    """
-    del year
-    return ANOMALISTIC_YEAR_MEAN
-
-
-def calc_anomalistic_year_seconds(year: int) -> float:
-    """
-    Calculate the length of the anomalistic year in SI seconds.
-
-    Formula: Y_anom(s) = Y_anom(days) × D(s)
-
-    Uses the Fourier-based anomalistic year in days multiplied by the
-    current day length.
-    """
-    return calc_anomalistic_year(year) * calc_day_length(year)
+# (plan 09 step 4d: calc_anomalistic_year / _seconds — the J2000 constant — are
+# deleted; the anomalistic year of date is @essrt/physics yearLengths
+# .anomalisticYearSecondsAtYear, the movement's own apsidal line.)
 
 
 def calc_sidereal_day(year: int) -> float:
@@ -657,32 +639,10 @@ def calc_axial_precession(year: int) -> float:
     return sid / (sid - sol)
 
 
-def calc_perihelion_precession(year: int) -> float:
-    """
-    Calculate the perihelion precession period in years.
-
-    Formula: P_P = Y_anom(s) / (Y_anom(s) - Y_solar(s))
-
-    Coin rotation paradox applied to the anomalistic and solar years
-    in seconds. At the mean: H/16.
-    """
-    anom_s = calc_anomalistic_year_seconds(year)
-    sol_s = calc_solar_year_seconds(year)
-    return anom_s / (anom_s - sol_s)
-
-
-def calc_inclination_precession(year: int) -> float:
-    """
-    Calculate the inclination precession period in years.
-
-    Formula: P_I = Y_anom(s) / (Y_anom(s) - Y_sid(s))
-
-    Coin rotation paradox applied to the anomalistic and sidereal years
-    in seconds. At the mean: H/3.
-    """
-    anom_s = calc_anomalistic_year_seconds(year)
-    sid_s = calc_sidereal_year_seconds(year)
-    return anom_s / (anom_s - sid_s)
+# (plan 09 step 4d: calc_perihelion_precession / calc_inclination_precession —
+# the beats on the J2000 anomalistic constant ("at the mean: H/16, H/3") — are
+# deleted; the periods of date are @essrt/physics lunisolar
+# .periOfDatePeriodYearsAtYear / .apsidalPeriodYearsAtYear.)
 
 
 # =============================================================================
@@ -735,13 +695,12 @@ if __name__ == "__main__":
         print(f"{year:>8} {sy:>16.9f} {sid:>16.9f} {dl:>16.6f}")
 
     print()
-    print(f"{'Year':>8} {'Solar (s)':>18} {'Sidereal (s)':>18} {'Anomalistic (s)':>18}")
-    print("-" * 64)
+    print(f"{'Year':>8} {'Solar (s)':>18} {'Sidereal (s)':>18}")
+    print("-" * 46)
     for year in [2000, 2022, 2100, -10000, 10000]:
         sy_s = calc_solar_year_seconds(year)
         sid_s = calc_sidereal_year_seconds(year)
-        anom_s = calc_anomalistic_year_seconds(year)
-        print(f"{year:>8} {sy_s:>18.3f} {sid_s:>18.3f} {anom_s:>18.3f}")
+        print(f"{year:>8} {sy_s:>18.3f} {sid_s:>18.3f}")
 
     print()
     print(f"{'Year':>8} {'Day Length (s)':>18} {'Sidereal Day (s)':>18} {'Stellar Day (s)':>18} {'Measured Solar (s)':>20}")
@@ -754,15 +713,13 @@ if __name__ == "__main__":
         offset_ms = (msd - dl) * 1000   # negative = measured is shorter than meanlengthofday
         print(f"{year:>8} {dl:>18.6f} {sid_d:>18.6f} {star_d:>18.6f} {msd:>18.6f} ({offset_ms:+.3f} ms)")
 
-    # --- Section F: Earth — Precession Periods ---
-    print("\n--- Section F: Earth — Precession Periods ---")
-    print(f"{'Year':>8} {'Axial (yr)':>16} {'Perihelion (yr)':>16} {'Inclination (yr)':>18}")
-    print("-" * 62)
+    # --- Section F: Earth — Precession Period ---
+    print("\n--- Section F: Earth — Axial Precession Period ---")
+    print(f"{'Year':>8} {'Axial (yr)':>16}")
+    print("-" * 26)
     for year in [2000, 2022, 2100, -10000, 10000]:
         ax = calc_axial_precession(year)
-        peri = calc_perihelion_precession(year)
-        incl = calc_inclination_precession(year)
-        print(f"{year:>8} {ax:>16.2f} {peri:>16.2f} {incl:>18.2f}")
+        print(f"{year:>8} {ax:>16.2f}")
 
     # --- Section D2: All Planets — Ascending nodes (the device's linear rate) ---
     # (Plan 07 R5: the inclination and mean-inclination columns — the ψ law's

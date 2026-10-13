@@ -1338,9 +1338,11 @@ export const VALUES = {
       meanSiderealYearDaysFull: { get: () => C.meanSiderealYearDays, render: (v) => v.toFixed(9), unit: 'd', note: '9-dp render of meanSiderealYearDays' },
       siderealYearSeconds:   { get: () => C.meanSiderealYearSeconds, render: (v) => thousands(v, 2), unit: 's', note: 'IAU sidereal year in SI seconds (31,558,149.7635)' },
       siderealYearJ2000Days: { get: () => oneYL().siderealYearSecondsAtYear(2000) / 86400, render: (v) => thousands(v, 8), unit: 'd', note: 'the one-family sidereal year of date at J2000 (the λ̇ channel), SI days' },
-      anomalisticYearDays:   { get: () => C.meanAnomalisticYearDays, render: (v) => thousands(v, 7), unit: 'd' },
-      anomalisticYearDaysFull: { get: () => C.meanAnomalisticYearDays, render: (v) => v.toFixed(9), unit: 'd', note: '9-dp render of anomalisticYearDays' },
-      anomalisticYearSeconds: { get: () => C.meanAnomalisticYearDays * C.meanLengthOfDay, render: (v) => thousands(v, 2), unit: 's' },
+      anomalisticYearDays:   { get: () => oneYL().anomalisticYearSecondsAtYear(2000) / 86400, render: (v) => thousands(v, 7), unit: 'd' },
+      anomalisticYearDaysFull: { get: () => oneYL().anomalisticYearSecondsAtYear(2000) / 86400, render: (v) => v.toFixed(9), unit: 'd', note: '9-dp render of the J2000 anomalistic year — the one-family law of date at 2000 (plan 09 step 4d; was the Simon 1994 mean-element input 365.259636, 87 ms longer)' },
+      anomalisticYearSeconds: { get: () => oneYL().anomalisticYearSecondsAtYear(2000), render: (v) => thousands(v, 2), unit: 's', note: 'the J2000 anomalistic year, SI seconds — the law of date at 2000' },
+      anomalisticYearSimon1994Days: { get: () => astro.knownValues.simon1994AnomalisticYearDays, render: (v) => String(v), unit: 'days', note: 'Simon et al. 1994 MEAN element — a citation (apsidal rate 11.6124 ″/yr); the model derives its own' },
+      anomalisticYearSimon1994DeltaSeconds: { get: () => oneYL().anomalisticYearSecondsAtYear(2000) - astro.knownValues.simon1994AnomalisticYearDays * 86400, render: (v) => (v >= 0 ? '+' : '') + Number(v).toFixed(3), unit: 's', note: 'model (the series\' secular apsidal tangent) − Simon (mean element): the secular-vs-mean-element convention, 0.0031 ″/yr of apsidal rate' },
       anomalisticYearJ2000Days: { get: () => oneYL().anomalisticYearSecondsAtYear(2000) / 86400, render: (v) => thousands(v, 7), unit: 'd', note: 'the one-family anomalistic year of date at J2000 (the movement’s own apsidal line — the scene’s perihelion), SI days' },
       anomalisticYearJ2000Seconds: { get: () => oneYL().anomalisticYearSecondsAtYear(2000), render: (v) => thousands(v, 2), unit: 's' },
       siderealSolarDiffSeconds: {
@@ -2410,7 +2412,8 @@ export const VALUES = {
       tropicalYearSSJ2000Days: { get: () => y.tropicalYearSS, render: (v) => String(v), unit: 'days', note: 'Meeus & Savoie 1992' },
       tropicalYearAEJ2000Days: { get: () => y.tropicalYearAE, render: (v) => String(v), unit: 'days', note: 'Meeus & Savoie 1992' },
       tropicalYearWSJ2000Days: { get: () => y.tropicalYearWS, render: (v) => String(v), unit: 'days', note: 'Meeus & Savoie 1992' },
-      anomalisticYearInputDays: { get: () => y.anomalisticYear, render: (v) => String(v), unit: 'days', note: 'JPL Horizons' },
+      // (plan 09 step 4d: `anomalisticYearInputDays` — the Simon 1994 mean element as a model INPUT — is retired;
+      //  the citation is anomalisticYearSimon1994Days, the model's value anomalisticYearJ2000Days.)
       siderealDayInputSeconds: { get: () => y.siderealDay, render: (v) => thousands(v, 6), unit: 's', note: 'IERS input' },
       stellarDayInputSeconds: { get: () => y.stellarDay, render: (v) => thousands(v, 6), unit: 's', note: 'IERS input' },
       obliquityJ2000Arcsec: { get: () => astro.earthOrbital.obliquityJ2000_deg * 3600, render: (v) => v.toFixed(3), unit: 'arcsec', note: 'IAU 2006' },

@@ -51,7 +51,7 @@ function build(deep) {
       holisticYearJ2000: C.H,
       balancedYearJ2000: C.balancedYear,
       meanSolarYearDays: C.meanSolarYearDays,
-      meanAnomalisticYearDays: C.meanAnomalisticYearDays,
+      meanAnomalisticYearDays: DT.anomalisticYearDaysOfDate(2000),   // plan 09 step 4d: the law's J2000 value (the constant is gone)
       tropicalYearHarmonics: C.TROPICAL_YEAR_HARMONICS,
       anomalisticYearHarmonics: C.ANOMALISTIC_YEAR_HARMONICS,
       eccentricityJ2000: AR.earthEccentricityJ2000,

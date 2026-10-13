@@ -253,7 +253,7 @@
  "meta": {
   "script": "scripts/t5_dt_stack_lattice_null.py",
   "doc": "docs/102-gia-alpha-lunar-validation.md / docs/104 (T5, plan 06)",
-  "runtime_sec": 0.0003879070281982422,
+  "runtime_sec": 0.00040650367736816406,
   "environment": {
    "python": "3.12.3",
    "numpy": "2.4.1"

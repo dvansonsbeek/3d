@@ -38,7 +38,6 @@ const output = {
   perihelionCycleLength: C.perihelionCycleLength,
   meanSolarYearDays: C.meanSolarYearDays,
   meanSiderealYearDays: C.meanSiderealYearDays,
-  meanAnomalisticYearDays: C.meanAnomalisticYearDays,
   balancedYear: C.balancedYear,
   kDeviceWheelPhaseAtJ2000Cycles: C.kDeviceWheelPhaseAtJ2000Cycles,   // plan 07 R10: the K wheels' recorded J2000 phase
   balancedJD: C.balancedJD,

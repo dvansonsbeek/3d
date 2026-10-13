@@ -112,7 +112,9 @@ _MEAN_SIDEREAL_YEAR_DAYS = _C['meanSiderealYearDays']
 _MEAN_LENGTH_OF_DAY = _SIDEREAL_YEAR_S / _MEAN_SIDEREAL_YEAR_DAYS
 _MEAN_SIDEREAL_DAY = (_MEAN_SOLAR_YEAR_DAYS / (_MEAN_SOLAR_YEAR_DAYS + 1)) * _MEAN_LENGTH_OF_DAY
 _TOTAL_DAYS_IN_H = _C['totalDaysInH']
-_MEAN_ANOM_YEAR_DAYS = _C['meanAnomalisticYearDays']
+# (plan 09 step 4d: the J2000 anomalistic year is the one-family law of date at
+# 2000 in @essrt/physics — no constant in the bridge; Simon 1994's mean element
+# 365.259636 is a citation, astro-reference knownValues.simon1994AnomalisticYearDays)
 _ECCENTRICITY_DERIVED_MEAN = _C['eccentricityDerivedMean']
 
 # (plan 09: the three year-length combs TROPICAL/SIDEREAL/ANOMALISTIC_YEAR_

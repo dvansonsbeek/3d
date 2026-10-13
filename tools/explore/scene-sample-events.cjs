@@ -55,7 +55,8 @@ const arg = (col, isMax) => scan.reduce((b, x) => ((isMax ? x[col] > b[col] : x[
 const cross = (asc) => { let best = null; for (let i = 1; i < scan.length; i++) { const a = scan[i - 1][1], b = scan[i][1]; if (asc ? (a < 0 && b >= 0) : (a >= 0 && b < 0)) { if (best === null || Math.abs(scan[i][0] - jd0) < Math.abs(best - jd0)) best = scan[i][0]; } } return best; };
 const seed = { VE: cross(true), AE: cross(false), SS: arg(1, true), WS: arg(1, false), PERI: arg(2, false), APH: arg(2, true) };
 const rows = [];
-const yr = { VE: C.meanSolarYearDays, AE: C.meanSolarYearDays, SS: C.meanSolarYearDays, WS: C.meanSolarYearDays, PERI: C.meanAnomalisticYearDays, APH: C.meanAnomalisticYearDays };
+const ANOM_J2000_DAYS = DT.anomalisticYearDaysOfDate(2000);   // plan 09 step 4d: the law's J2000 anomalistic year (a search prior)
+const yr = { VE: C.meanSolarYearDays, AE: C.meanSolarYearDays, SS: C.meanSolarYearDays, WS: C.meanSolarYearDays, PERI: ANOM_J2000_DAYS, APH: ANOM_J2000_DAYS };
 for (const t of Object.keys(FIND)) {
   const c = FIND[t](seed[t]);
   if (c === null) { console.error(`seed failed for ${t}`); process.exit(1); }

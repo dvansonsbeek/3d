@@ -2,14 +2,14 @@
 // Gives the TypeScript website full type safety at the boundary (§2g) while
 // packages/physics stays JavaScript.
 
-export declare const CONSTANTS_HASH: "77fb0c35321923f3";
+export declare const CONSTANTS_HASH: "63287cae11fbc3a5";
 
 export declare const MODEL_VERSION: string;
 
 export declare const PREPRINT_DOI: string;
 
 export declare const DEFAULT_CONSTANTS: {
-  readonly hash: "77fb0c35321923f3";
+  readonly hash: "63287cae11fbc3a5";
   readonly additionalBodies: {
     "pluto": {
       "name": string;
@@ -557,7 +557,6 @@ export declare const DEFAULT_CONSTANTS: {
     "tropicalYearSS": number;
     "tropicalYearAE": number;
     "tropicalYearWS": number;
-    "anomalisticYear": number;
     "siderealYear": number;
     "tropicalYearRateSecPerCentury": number;
     "solarDay": number;
@@ -715,6 +714,7 @@ export declare const REFERENCE_DATA: {
     "meeusPeriLong2000AD": number;
     "meeusPeriLong2500AD": number;
     "meeusPeriLong3000AD": number;
+    "simon1994AnomalisticYearDays": number;
     "mainstreamAxialPrecKyr": number;
     "mainstreamPeriPrecKyr": number;
     "mainstreamObliqCycleKyr": number;
