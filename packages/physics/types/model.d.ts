@@ -137,8 +137,6 @@ export function assembleModel(C: Readonly<Record<string, any>>, F: Readonly<Reco
         lodRealSeconds: (year: number) => number;
         siderealDaySeconds: (year: number) => number;
         stellarDaySeconds: (year: number) => number;
-        measuredSolarDaySeconds: (year: number) => number;
-        raDayOffsetMs: (year: number) => number;
     }>;
     cardinal: Readonly<{
         jd: (year: number, type: string) => number;

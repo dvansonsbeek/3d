@@ -1,7 +1,7 @@
 ---
 docVersion: 1.0
 modelVersion: v23.0
-coefficients: sha256:87e04ff9fcdc04c1
+coefficients: sha256:3cfb8d04a94ddc3a
 status: current
 ---
 
@@ -335,6 +335,27 @@ T_p is the physical period in both identities, not the frozen clock's counter (t
 
 The obliquity used follows the family of the sidereal day it is applied to: the IAU J2000 obliquity input for the mean values, the hybrid obliquity of date (`_sceneEpsTargetDeg(year)`) for epoch-specific ones. At J2000 the choice is worth 0.0008 ms, but across the deep-time obliquity range (~22.0°–24.5°) the offset runs 8.46 → 8.30 ms.
 
+
+### The retired RA day offset (plan 09 step 5b)
+
+The model used to publish a "measured solar day" = the mean solar day plus an
+"RA day offset" — a fitted comb (`RA_DAY_OFFSET_MS`: mean −14.194 ms/day and
+two lines on the retired unit's H/16 and H/8), reproducing the Framework
+Verification instrument's 65-epoch measurement (R² 0.994, RMS 0.32 ms). It is
+deleted, because the quantity is a property of the instrument's window, not of
+the sky. The instrument counts 365 solar noons from the June solstice; 365 days
+end 0.2422 d short of the tropical year, so the equation of time has not
+returned to its start value and the mean noon-to-noon interval differs from the
+mean solar day by −(0.2422/365)·dEoT/dt at the solstice. The first-order
+equation of time, −2e·sin M + tan²(ε/2)·sin 2λ, gives at the solstice (λ = 90°,
+M = 90° − ϖ) exactly the comb's two lines: the e·cos(90° − ϖ) term on the
+perihelion-of-date cycle (5.2 ms first-order against the fitted 5.6) and the
+tan²(ε/2) term on the obliquity cycle (1.4 against 1.7), with the mean of the
+same order (first-order 18.6 ms against the fitted 14.2; the exact value depends
+on the window's first-noon convention). The physical day of date is the mean
+solar day (`dayLengthSeconds`); the equation of time is the certified Sun's; an
+observer who counts noons over an integer-day window measures this term and can
+derive it from both.
 
 ## Implementation
 

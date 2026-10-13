@@ -411,39 +411,15 @@ function computeStellarDay(t_Ma) {
   return dtm().meanStellarDayAtAge(t_Ma);
 }
 
-/**
- * Compute RA Day Offset in milliseconds.
- * Two lines on the H/16 (eccentricity) and H/8 (obliquity) coin rotations,
- * mean −14.194 ms/day. Confirmed by 65-epoch multiepoch test (R²=0.994,
- * RMS=0.324 ms). Plan 07 R10: the lines ride fitted-coefficients.json's
- * RA_DAY_OFFSET_MS ([div, sin, cos], phase from J2000 — the former cosine
- * literals on the t₀ phase, rotated), ONE home with the package.
- *
- * @param {number} year - calendar year
- * @returns {number} RA day offset in milliseconds
- */
-function computeRADayOffset(year) {
-  const t = year - C.balancedYear;
-  let ms = C.RA_DAY_OFFSET_MS.mean;
-  for (const [div, sinC, cosC] of C.RA_DAY_OFFSET_MS.terms) {
-    const phase = 2 * Math.PI * t / (C.H / div);
-    ms += sinC * Math.sin(phase) + cosC * Math.cos(phase);
-  }
-  return ms;
-}
-
-/**
- * Compute measured solar day in seconds.
- * measuredSolarDay = LOD + raDayOffset (converted from ms to s)
- * Source: script.js ~line 33224
- *
- * @param {number} lengthOfDay - length of day in seconds
- * @param {number} raDayOffsetMs - RA day offset in milliseconds
- * @returns {number} measured solar day in seconds
- */
-function computeMeasuredSolarDay(lengthOfDay, raDayOffsetMs) {
-  return lengthOfDay + raDayOffsetMs / 1000;
-}
+// (Plan 09 step 5b: computeRADayOffset — the fitted RA_DAY_OFFSET_MS comb, mean
+// −14.194 ms/day + lines on H/16 and H/8, "confirmed by the 65-epoch multiepoch
+// test" — and computeMeasuredSolarDay are deleted. The comb reproduced the
+// Framework-Verification instrument's WINDOW term: 365 solar noons counted from
+// the June solstice end 0.2422 d short of the tropical year, so the mean
+// noon-to-noon interval differs from the mean solar day by −(0.2422/365)·dEoT/dt
+// at the solstice; the two lines are that slope's e·cos(90° − ϖ) and tan²(ε/2)
+// terms on the perihelion-of-date and obliquity cycles. A property of the
+// window, not of the sky. docs/11 § "The retired RA day offset".)
 
 /**
  * Compute stellar day minus sidereal day offset in seconds.
@@ -591,8 +567,6 @@ module.exports = {
   computeLengthOfDay,
   computeSiderealDay,
   computeStellarDay,
-  computeRADayOffset,
-  computeMeasuredSolarDay,
   computeStellarSiderealOffset,
 
   // Solstice Prediction

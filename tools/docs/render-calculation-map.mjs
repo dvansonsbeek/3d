@@ -208,14 +208,16 @@ function blockYearLengthsOfDate() {
 
 function blockDayLengths() {
   const rows = [
-    '| year | LOD kinematic of date = the Layer-0 tidal mean (s) | measured solar day (s) | RA day offset (ms) | sidereal day (s) | stellar day (s) |',
-    '|---|---|---|---|---|---|',
+    '| year | LOD kinematic of date = the Layer-0 tidal mean (s) | sidereal day (s) | stellar day (s) |',
+    '|---|---|---|---|',
   ];
   // (plan 09: the "LOD actual" column — the retired sidereal comb's ripple on the
-  // tidal mean — left with the comb, and the kinematic day of date IS the tidal mean.)
+  // tidal mean — left with the comb, and the kinematic day of date IS the tidal mean;
+  // step 5b: the "measured solar day" and "RA day offset" columns left with the
+  // RA_DAY_OFFSET_MS comb — the equation of time's window term of an instrument.)
   for (const y of [-10000, -2584, -584, 0, 1246, 2000, 5000, 10000]) {
     const L = m.lengths;
-    rows.push(`| ${y} | ${f(L.dayLengthSeconds(y), 5)} | ${f(L.measuredSolarDaySeconds(y), 5)} | ${f(L.raDayOffsetMs(y), 3)} | ${f(L.siderealDaySeconds(y), 4)} | ${f(L.stellarDaySeconds(y), 4)} |`);
+    rows.push(`| ${y} | ${f(L.dayLengthSeconds(y), 5)} | ${f(L.siderealDaySeconds(y), 4)} | ${f(L.stellarDaySeconds(y), 4)} |`);
   }
   return rows.join('\n');
 }

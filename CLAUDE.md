@@ -448,7 +448,9 @@ pair EXACTLY — no refit, `tools/fit/reorigin-combs-j2000.mjs`, c0 = (2000 −
 t₀)/H = 0.908498525276082 anchor units, bit-identical on every package
 surface over ±300 kyr — and its two inputs left the JSON (literals gate
 ratchet). The RA day offset's cosine literals became the fitted family
-`RA_DAY_OFFSET_MS`. Trap measured on the way: the K-device wheels were posed
+`RA_DAY_OFFSET_MS` (deleted at plan 09 step 5b: it was the equation of time's
+window term of the Framework-Verification instrument, not a motion). Trap
+measured on the way: the K-device wheels were posed
 on t₀ too; moving them to J2000 tilted the whole scaffold 1.25° (R left the
 identity) and the NASA-convention umbra diagnostic — which rotates the
 aberration about WORLD Y as the ecliptic pole — moved 0.45″ while every
@@ -531,7 +533,7 @@ solar-mass history — degenerate today with the pure precession-scaling
 reading "obliquity period ∝ T_p", roughly a factor two apart at 2.46 Ga;
 registry keys `obliqBeat*Kyr` / `obliqH8Scaled*Kyr` (name kept), doc 109
 §18). **Two named counters** (plan 06 D8): the FROZEN era clock — the
-remaining combs (cardinal record, RA day offset; the perihelion comb left at step 4) and the ∫dt/H
+remaining comb (the cardinal record; the perihelion comb left at step 4, the RA day offset at step 5b) and the ∫dt/H
 phase table; the year-length combs are deleted (plan 09) — rides its own fitted
 convention `eraClockHAtAge` = H₀·LOD/LOD₀ (pure spin scaling, the
 pre-Phase-3 "H/13 identity", shipped with their coefficients as a device

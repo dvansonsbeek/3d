@@ -1,7 +1,7 @@
 ---
 docVersion: 1.0
 modelVersion: v23.0
-coefficients: sha256:87e04ff9fcdc04c1
+coefficients: sha256:3cfb8d04a94ddc3a
 status: current
 ---
 
@@ -1952,7 +1952,7 @@ Both NASA Espenak/Meeus and Stephenson 2016 are polynomials fit to essentially t
 | `src/script.js` (simulator) | `earthMoiFactorAtAge()`, `iEarthAtAge()`, applied inside `meanLodSecondsAtAge()` |
 | `src/lib/orbital/deepTime.ts` (holisticuniverse.com website) | Same two functions, same constants, mirrored |
 
-Downstream quantities auto-update through the calculation chain: LOD, sidereal day, stellar day, measured solar day, year-in-days, ΔT — all propagate from the single `meanLodSecondsAtAge` modification.
+Downstream quantities auto-update through the calculation chain: LOD, sidereal day, stellar day, year-in-days, ΔT — all propagate from the single `meanLodSecondsAtAge` modification.
 
 #### Full validation details
 

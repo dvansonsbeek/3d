@@ -709,22 +709,6 @@
     ],
     "note": "phase = order*lambda_X - 2*pi*div*cycles, self-corrected at 2000; counter-rotating — see plan §10g"
   },
-  "RA_DAY_OFFSET_MS": {
-    "mean": -14.194,
-    "terms": [
-      [
-        16,
-        -1.2640722169207659,
-        5.496519028476934
-      ],
-      [
-        8,
-        1.673255530300936,
-        0.1899261180494482
-      ]
-    ],
-    "note": "ms/day; the eccentricity (div 16) and obliquity (div 8) coin-rotation lines of the RA day offset, phase from J2000 (plan 07 R10 — were cosine literals on the t₀ phase in three runtimes + the website)"
-  },
   "_phaseOrigin": "J2000",
   "_phaseOriginNote": "Plan 07 R10: every comb's phase is measured from J2000. The former origin t₀ = 1246.03125 − 14.5 × H/16 = -302635 (c0 = 0.908498525276082 anchor units before J2000) was rotated out exactly by tools/fit/reorigin-combs-j2000.mjs — no coefficient was refitted; t₀ is no longer an input."
 }

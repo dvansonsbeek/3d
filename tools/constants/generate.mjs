@@ -74,9 +74,10 @@ const COEFFICIENT_KEYS = [
   // (plan 09: SOLSTICE_OBLIQUITY_HARMONICS retired — the obliquity of date is the hybrid ε;
   //  step 5a: SUN_LONGITUDE_HARMONICS + SUN_LONGITUDE_MEAN — the Step-0 Sun comb on H, 2H, 3H,
   //  retired from both engines at plan 06 R4 and read by nothing since — deleted with its fitter)
-  // Plan 07 R10: the RA day offset's two lines ({mean, terms: [div, sin, cos]},
-  // phase from J2000) — the former cosine literals of three runtimes + the site.
-  'RA_DAY_OFFSET_MS',
+  // (plan 09 step 5b: RA_DAY_OFFSET_MS — the −14.194 ms mean + two lines on H/16 and
+  //  H/8 that plan 07 R10 had made of the cosine literals — is deleted. It was the
+  //  equation of time's WINDOW term of the Framework-Verification instrument (365 noons
+  //  counted from the June solstice end 0.2422 d short of the year), not a motion.)
 
   // (The Moon RA/Dec patches MOON_CORRECTION / MOON_CORRECTION_RESIDUAL were
   // retired at plan 06 R3 item 1 — moon/apparent.cjs carries the record.)
@@ -104,7 +105,7 @@ const COEFFICIENT_KEYS = [
   // The mean/offset SCALARS that pair with the harmonic arrays above — each
   // series is `mean + sum(harmonics)`, so shipping one from the JSON and the
   // other as a literal would split a single fitted quantity across two sources.
-  // (none remain since plan 09 step 5a; RA_DAY_OFFSET_MS carries its own mean inside the object)
+  // (none remain since plan 09 steps 5a/5b)
 ];
 
 /**

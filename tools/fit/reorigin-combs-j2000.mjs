@@ -71,15 +71,10 @@ const D = fc.CARDINAL_POINT_DERIVED;
 const h0Old = D.h0;
 D.h0 = D.h0 + D.h1 * c0;
 
-// The RA day offset family — the former literals −14.194 − 5.640·cos φ₁₆ − 1.684·cos φ₈
-// (ms/day, phase from t₀) as [div, sin, cos] on the J2000 phase, ONE home.
-const RA_MEAN = -14.194, RA_ECC = -5.640, RA_OBL = -1.684;
-fc.RA_DAY_OFFSET_MS = {
-  mean: RA_MEAN,
-  terms: [[16, ...rot(0, RA_ECC, delta(16))], [8, ...rot(0, RA_OBL, delta(8))]],
-  note: 'ms/day; the eccentricity (div 16) and obliquity (div 8) coin-rotation lines of the RA day offset, phase from J2000 (plan 07 R10 — were cosine literals on the t₀ phase in three runtimes + the website)',
-};
-pairs += 2;
+// (The RA day offset family — the former literals −14.194 − 5.640·cos φ₁₆ − 1.684·cos φ₈
+// written here as RA_DAY_OFFSET_MS at R10 — was DELETED at plan 09 step 5b: it was the
+// equation of time's window term of the Framework-Verification instrument, not a motion.
+// This record tool no longer writes it.)
 fc._phaseOrigin = 'J2000';
 fc._phaseOriginNote = `Plan 07 R10: every comb's phase is measured from J2000. The former origin t₀ = ${periAlign} − ${tGML} × H/16 = ${t0} (c0 = ${c0} anchor units before J2000) was rotated out exactly by tools/fit/reorigin-combs-j2000.mjs — no coefficient was refitted; t₀ is no longer an input.`;
 

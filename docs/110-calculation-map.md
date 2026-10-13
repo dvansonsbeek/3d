@@ -1,7 +1,7 @@
 ---
 docVersion: 1.0
 modelVersion: v23.0
-coefficients: sha256:87e04ff9fcdc04c1
+coefficients: sha256:3cfb8d04a94ddc3a
 status: current
 ---
 
@@ -421,22 +421,22 @@ drifts −0.53 s/cy).
 | quantity | formula | H-role | code |
 |---|---|---|---|
 | LOD kinematic of date | the tidal mean 2πI(t)/(L_EM − L_M) (chain 2.1 step 3) — exactly ω₀ = 86,400 s at J2000 (plan 09; the retired form was the tidal-tier year in seconds over the comb-family year in days, the comb's λ̇ ripple written as a day ripple) | — (P via the tidal chain) | `model.js` `dayLengthSeconds`; `deltat/deep-time.cjs` 80–86 |
-| measured solar day | LOD kinematic + RA-day-offset(y)/1000; RA offset = −14.194 − 5.64·cos(phase₁₆) − 1.684·cos(phase₈) ms (fitted; phases on the H/16 and H/8 counters) | **C + L** | `model.js` `measuredSolarDaySeconds`, `raDayOffsetMs` |
+| (measured solar day — DELETED, plan 09 step 5b) | was LOD kinematic + RA-day-offset(y)/1000 with the fitted comb −14.194 − 5.64·cos(phase₁₆) − 1.684·cos(phase₈) ms on the H/16 and H/8 counters — the equation of time's WINDOW term of the Framework-Verification instrument (365 noons from the June solstice end 0.2422 d short of the year; the two lines are the e·cos(90° − ϖ) and tan²(ε/2) terms of dEoT/dt at the solstice), a property of the window, not of the sky — docs/11 § "The retired RA day offset" | — | (deleted) |
 | sidereal day | solar-year-seconds / (tropical-year-days + 1) | — | `model.js` `siderealDaySeconds` |
 | stellar day | sidereal day + the RA-projection term (solar-year/(days+1)/T_p(t)/(days+1))·cos ε — one extra rotation per precession turn, T_p(t) the composed lunisolar period (S5: its certified J2000 anchor past the chain's domain), not the counter H(t)/13 (7 µs slow) | **P** (rides T_p, none) | `model.js` `stellarDaySeconds` |
 | LOD with cycle corrections | tidal mean + the ΔT-stack cycle sum (Bond, Hallstatt, Jose5, Jose4 — cycles labeled as integer divisors of the eightfold unit, amplitudes fitted) | **C** | `deltat/deep-time.cjs` 187–193; `deltat/cycles.cjs` |
 
 <!-- generated:calcmap-day-lengths -->
-| year | LOD kinematic of date = the Layer-0 tidal mean (s) | measured solar day (s) | RA day offset (ms) | sidereal day (s) | stellar day (s) |
-|---|---|---|---|---|---|
-| -10000 | 86399.76263 | 86399.74127 | -21.358 | 86163.8568 | 86163.8652 |
-| -2584 | 86399.91956 | 86399.90676 | -12.796 | 86164.0136 | 86164.0219 |
-| -584 | 86399.95491 | 86399.94507 | -9.838 | 86164.0455 | 86164.0539 |
-| 0 | 86399.96506 | 86399.95580 | -9.256 | 86164.0620 | 86164.0704 |
-| 1246 | 86399.98674 | 86399.97819 | -8.554 | 86164.0853 | 86164.0936 |
-| 2000 | 86400.00000 | 86399.99149 | -8.508 | 86164.0917 | 86164.1001 |
-| 5000 | 86400.05509 | 86400.04422 | -10.866 | 86164.1432 | 86164.1516 |
-| 10000 | 86400.15740 | 86400.13993 | -17.469 | 86164.2546 | 86164.2630 |
+| year | LOD kinematic of date = the Layer-0 tidal mean (s) | sidereal day (s) | stellar day (s) |
+|---|---|---|---|
+| -10000 | 86399.76263 | 86163.8568 | 86163.8652 |
+| -2584 | 86399.91956 | 86164.0136 | 86164.0219 |
+| -584 | 86399.95491 | 86164.0455 | 86164.0539 |
+| 0 | 86399.96506 | 86164.0620 | 86164.0704 |
+| 1246 | 86399.98674 | 86164.0853 | 86164.0936 |
+| 2000 | 86400.00000 | 86164.0917 | 86164.1001 |
+| 5000 | 86400.05509 | 86164.1432 | 86164.1516 |
+| 10000 | 86400.15740 | 86164.2546 | 86164.2630 |
 <!-- /generated:calcmap-day-lengths -->
 
 ### 3.4 Findings from this chain (to act on)

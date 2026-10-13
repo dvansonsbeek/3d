@@ -47,9 +47,9 @@ import { driver2PeriodSecondsAtAge } from './planets/orbit-chain.cjs';
  * engine too — packaging them into FITTED_COEFFICIENTS is the remaining
  * §7a-step-1b move; until then this is their single packaged home.
  */
-// (Plan 07 R10: the RA day offset's two cosine amplitudes left here as
-// literals; they ride F.RA_DAY_OFFSET_MS now — [div, sin, cos] on the J2000
-// phase, ONE home for the three runtimes and the website.)
+// (Plan 07 R10 moved the RA day offset's two cosine amplitudes from literals
+// here into F.RA_DAY_OFFSET_MS; plan 09 step 5b deleted that family — it was
+// the equation of time's window term of an instrument, not a motion.)
 
 /**
  * Moon-channel eccentricity sensitivities (perigee/node), the [g/g₀]^s
@@ -100,7 +100,8 @@ export function assembleModel(C, F, laws = {}, secularSeriesArtifact = /** @type
   // H/16 = −302,635, the "balanced year" — was rotated out of every fitted
   // (sin, cos) pair exactly (tools/fit/reorigin-combs-j2000.mjs; measured
   // bit-identical on every surface over ±300 kyr); it is no longer an input.
-  const balancedYear = 2000;
+  // Plan 09 step 5b: the J2000 comb origin's last reader (the RA day offset
+  // comb) left with that device; no comb phase is evaluated here any more.
 
   const meanSiderealYearDays = C.yearLengthRef.siderealYear;
   const meanSiderealYearSeconds = meanSiderealYearDays * 86400;
@@ -388,8 +389,8 @@ export function assembleModel(C, F, laws = {}, secularSeriesArtifact = /** @type
     const cyc = phase().cyclesBetween(yearA, yearB, divisorN);
     return cyc === null ? (divisorN * (yearB - yearA)) / H : cyc;
   };
-  /** @param {number} anchorYear @param {number} year @param {number} divisorN @returns {number} */
-  const phaseRadians = (anchorYear, year, divisorN) => 2 * Math.PI * cyclesBetween(anchorYear, year, divisorN);
+  // Plan 09 step 5b: `phaseRadians` (2π · cyclesBetween) left with its last
+  // reader, the RA day offset comb.
 
   /** @param {number} year @returns {number} */
   const yearToTMa = (year) => (2000 - year) / 1e6;
@@ -508,15 +509,17 @@ export function assembleModel(C, F, laws = {}, secularSeriesArtifact = /** @type
     const s = Math.abs(year - 2000) <= ONE_FAMILY_WINDOW_YEARS ? yearLengthsM.anomalisticYearSecondsAtYear(year) : NaN;
     return s / dayLengthSeconds(year);
   };
-  /** @param {number} year @returns {number} */
-  const raDayOffsetMs = (year) => {
-    let ms = F.RA_DAY_OFFSET_MS.mean;
-    for (const [div, sinC, cosC] of F.RA_DAY_OFFSET_MS.terms) {
-      const ph = phaseRadians(balancedYear, year, div);
-      ms += sinC * Math.sin(ph) + cosC * Math.cos(ph);
-    }
-    return ms;
-  };
+  // (Plan 09 step 5b: raDayOffsetMs — the fitted RA_DAY_OFFSET_MS comb, a −14.194 ms
+  // mean + lines on H/16 and H/8 — and measuredSolarDaySeconds = dayLength + that
+  // offset are deleted. The quantity was the equation of time's window term of the
+  // Framework-Verification instrument: 365 solar noons counted from the June
+  // solstice end 0.2422 d short of the tropical year, so the mean noon-to-noon
+  // interval differs from the mean solar day by −(0.2422/365)·dEoT/dt at the
+  // solstice — the e·cos(90° − ϖ) term on the perihelion-of-date cycle (the comb's
+  // "H/16" line, 5.6 ms vs 5.2 first-order) and the tan²(ε/2) term on the obliquity
+  // cycle (the "H/8" line, 1.7 vs 1.4). A property of the window, not of the sky:
+  // the physical day of date is dayLengthSeconds; the equation of time is the
+  // certified Sun's. docs/11 § "The retired RA day offset".)
 
   // ── Cardinal points (the fitted model retired, R1)──────────────────────────────────────────────────
   // Plan 06 R1: the fitted cardinal-point model (CARDINAL_POINT_* — the §10
@@ -702,8 +705,6 @@ export function assembleModel(C, F, laws = {}, secularSeriesArtifact = /** @type
     const raProjection = Math.cos((oneSourceM.epsAt(year) * Math.PI) / 180);
     return (sidDay / Tp / (syD + 1)) * raProjection + sidDay;
   };
-  /** @param {number} year @returns {number} */
-  const measuredSolarDaySeconds = (year) => dayLengthSeconds(year) + raDayOffsetMs(year) / 1000;
 
   // ── Moon at epoch ─────────────────────────────────────────────────────────
   /** Solar-Δa-corrected Kepler month. @param {number} year @returns {number} */
@@ -1714,8 +1715,6 @@ export function assembleModel(C, F, laws = {}, secularSeriesArtifact = /** @type
       lodRealSeconds,
       siderealDaySeconds,
       stellarDaySeconds,
-      measuredSolarDaySeconds,
-      raDayOffsetMs,
     }),
     // Plan 06 R1: the instants are the crossings of the ONE Sun (the
     // certified completed Sun the scene renders), UT model-JD; the RA at a

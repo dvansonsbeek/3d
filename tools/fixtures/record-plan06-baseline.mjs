@@ -79,7 +79,8 @@ function measure() {
     v[`${tag}.tropicalYearCardinalD`] = num(m.lengths.tropicalYearDays(year));
     v[`${tag}.anomalisticYearFourierD`] = num(m.lengths.anomalisticYearDays(year));
     v[`${tag}.dayLengthKinematicS`] = num(m.lengths.dayLengthSeconds(year));
-    v[`${tag}.measuredSolarDayS`] = num(m.lengths.measuredSolarDaySeconds(year));
+    // (plan 09 step 5b: the `measuredSolarDayS` probe left with the RA_DAY_OFFSET_MS comb — the
+    //  equation of time's window term of the Framework-Verification instrument, not a model quantity)
     v[`${tag}.H`] = H;
     // S5: the composed lunisolar period on the derived J2000 anchor (the retired H/13 identity read 0.086 % slow)
     v[`${tag}.meanPrecessionPeriodYr`] = num(m.lunisolar.meanPeriodYearsAtYear(year));
