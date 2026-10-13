@@ -26,7 +26,7 @@ export type MeeusTermTable = Array<[number, number, number, number, number]>;
  *     jdToSIyear: (jd: number) => number,
  *     tropicalOrbitsBetween: (yearA: number, yearB: number) => (number | null),
  *     apsidalOfDateCyclesBetween: (yearA: number, yearB: number) => (number | null),
- *     cyclesBetween: (yearA: number, yearB: number, divisorN: number) => (number | null),
+ *     siderealOrbitsBetween: (yearA: number, yearB: number) => (number | null),
  *     jupiterOrbitsBetween: (yearA: number, yearB: number) => (number | null),
  *     isDeepTime: () => boolean,
  *     isFrameworkNative: () => boolean,
@@ -66,7 +66,7 @@ export function createMoonSeries({ constants, fns }: {
         jdToSIyear: (jd: number) => number;
         tropicalOrbitsBetween: (yearA: number, yearB: number) => (number | null);
         apsidalOfDateCyclesBetween: (yearA: number, yearB: number) => (number | null);
-        cyclesBetween: (yearA: number, yearB: number, divisorN: number) => (number | null);
+        siderealOrbitsBetween: (yearA: number, yearB: number) => (number | null);
         jupiterOrbitsBetween: (yearA: number, yearB: number) => (number | null);
         isDeepTime: () => boolean;
         isFrameworkNative: () => boolean;

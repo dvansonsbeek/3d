@@ -537,7 +537,7 @@ month evolution is chain-integrated on the model's own recession history. The `t
 section of the same gate measures the difference directly, on the TT axis
 (framework opposition vs the NASA canon's greatest-eclipse instant, era
 bins ±40 yr, modern definitional baseline subtracted): a smooth secular
-drift reaching <!--v:lunarDrift800Minutes-->−2.8<!--/v--> min at the −750 era
+drift reaching <!--v:lunarDrift800Minutes-->−2.7<!--/v--> min at the −750 era
 and vanishing toward the present — an effective
 Δṅ ≈ <!--v:lunarTheoryDriftDeltaNdot-->0.22<!--/v--> ″/cy² between the two
 theories. A re-reduction of the tablets with the framework's own Moon
@@ -546,7 +546,7 @@ the one-sided residual column above into sign-mixed, noise-class scatter:
 
 | Century | residual today | **pre-registered** residual after framework re-reduction |
 |---|---:|---:|
-| -800…-701 | <!--v:lunarCentury800ResidualHours-->−0.02<!--/v--> hr | <!--v:lunarPredictedReduced800Minutes-->+1.6<!--/v--> min |
+| -800…-701 | <!--v:lunarCentury800ResidualHours-->−0.02<!--/v--> hr | <!--v:lunarPredictedReduced800Minutes-->+1.5<!--/v--> min |
 | -700…-601 | <!--v:lunarCentury700ResidualHours-->−0.09<!--/v--> hr | <!--v:lunarPredictedReduced700Minutes-->−3.4<!--/v--> min |
 | -600…-501 | <!--v:lunarCentury600ResidualHours-->−0.10<!--/v--> hr | <!--v:lunarPredictedReduced600Minutes-->−3.4<!--/v--> min |
 | -500…-401 | <!--v:lunarCentury500ResidualHours-->−0.19<!--/v--> hr | <!--v:lunarPredictedReduced500Minutes-->−9.3<!--/v--> min |

@@ -110,7 +110,7 @@ classical constant:
   (e₀, ė₀, ë₀) values are the documented Taylor-check anchors.
 - **The sign paradox, dissolved.** Brown's m²-scaling predicts apsidal
   precession ACCELERATING while Meeus's M′ T² says decelerating. Both are
-  true at once: the Lunar Precession Invariant governs the MEAN rate
+  true at once: the inertial chain's Brown-m² mean governs the MEAN rate
   (tidal, slowly accelerating) while the eccentricity channel is a bounded
   zero-mean oscillation around it (currently in its decelerating phase
   because ė < 0). The Meeus polynomial entangles them in single

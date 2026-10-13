@@ -449,7 +449,7 @@ const mkTier = (withAxialFn) => createDeepOrbitalHistory({
   // La2004 3.5×-ed to 0.14° and ±1 Myr diverged 1.05°; the refuse-gate
   // caught it). The withAxialFn=false twin is the α₀ regression control.
   axialPrecessionYearsAtYearFn: withAxialFn
-    ? ((H0) => (yr) => axialPrecessionYearsJ2000 * model.epoch.hAtYear(yr) / H0)(model.epoch.hAtYear(2000))
+    ? (yr) => model.lunisolar.meanPeriodYearsAtYear(yr)   // plan 09 step 5c: T_p(t) directly (was period₀·H(t)/H₀, the same to 2e-16)
     : undefined,
   // THE PRECESSION OF DATE (plan 06 §9 item 10) — the shipped movement's two
   // of-date factors, from the package surface (the solar share and the GIA

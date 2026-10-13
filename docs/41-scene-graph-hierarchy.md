@@ -175,9 +175,10 @@ Each nesting layer applies its rotation to all children, creating composite prec
 > axis) against a Predictions obliquity of 22.5347° at the same instant — the
 > rendered Moon converted with an ε 0.16° from the axis it was placed in. After:
 > the two surfaces agree to 0.0000″ at that epoch, browser ≡ Node for the
-> planets to ≤0.004″ at every probed epoch out to −5.34 Myr. The K device
-> counters (`cyclesBetweenYears`, the predictive ϖ device, the balanced-year
-> formulas) keep their own SI coordinate — they are not engine reads. The
+> planets to ≤0.004″ at every probed epoch out to −5.34 Myr. The K-device
+> wheels (uniform at their recorded J2000 rates since plan 09 step 5c) and the
+> balanced-year formulas keep their own SI coordinate — they are not engine
+> reads. The
 > Moon-argument obliquity CARRIER (C·∫(ε−ε₀) inside the lunar chain) samples
 > ε at `2000 + t·100` with t in Julian centuries of TT from J2000 — the
 > engine-year axis already (verified R5 follow-up; an earlier note here
@@ -605,10 +606,10 @@ Deep-time / Phanerozoic / Hadean simulation. The same scene graph is rendered, b
 
 | Tag | Time base | Used for | Integrator |
 |---|---|---|---|
-| `_dtCycleN`, `_dtCycleSign`, `_dtCycleAnchor` | UT (`_currentYearSI`) | Earth + 5 Earth precession layers + planet perihelion ecliptic frames + planet wobble centers (all H-scaling per Law 6) | `cyclesBetweenYears(anchor, year, N)` |
+| `_dtCycleN`, `_dtCycleSign`, `_dtCycleAnchor` | UT (`_currentYearSI`) | Earth + 5 Earth precession layers + the wobble centre — the K-device scaffold the engine frame is placed over (R4) | uniform: N turns per anchor unit at the recorded J2000 rate from the anchor, + the recorded J2000 wheel phase (plan 09 step 5c; the ∫N/H_era counter is retired) |
 | `_dtMoonIntegrator`, `_dtMoonAnchor`, `_dtMoonSign` | UT (`_currentYearSI`) | Moon-chain nodes (5 nodes) | `obj._dtMoonIntegrator(anchor, year)` |
 | `_dtPlanetIntegrator`, `_dtPlanetAnchor`, `_dtPlanetSign` | TT (`_currentYearSI_TT`) | Planet orbital nodes (Mercury–Neptune, 7 nodes) | `obj._dtPlanetIntegrator(anchor, year)` |
-| `_dtPerihelionDivisor`, `_dtPerihelionAnchor` | UT for Sun, TT for planets | Equation-of-center perihelion-phase term | `cyclesBetweenYears(anchor, year, divisor)` inline |
+| (`_dtPerihelionDivisor`, `_dtPerihelionAnchor` — retired) | — | the equation-of-centre perihelion phase keeps its snapshot form for the Moon, Pluto and the no-chain bodies; the Sun's angle is the engine's (R4) | the chain planets' tags left at plan 07 R7, the Sun's at plan 09 step 5c |
 
 The asymmetric time-base treatment (Moon-chain stays on UT, planet orbitals go to TT) is principled, not arbitrary: the eclipse-visibility validation was co-developed under the Moon-chain UT convention, while planets have no analogous validation tied to the time-base choice.
 

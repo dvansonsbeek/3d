@@ -155,10 +155,8 @@ const MOON_NODAL_OFDATE_J2000_S   = C.moonNodalPrecessionDaysInputICRF * 86400;
 const MOON_APSIDAL_J2000_S = 1 / (1 / MOON_APSIDAL_OFDATE_J2000_S - 1 / (C.axialPrecessionJ2000Days * 86400));  // ≈ 8.85 yr, star-referenced
 const MOON_NODAL_J2000_S   = 1 / (1 / MOON_NODAL_OFDATE_J2000_S + 1 / (C.axialPrecessionJ2000Days * 86400));    // ≈ 18.60 yr, star-referenced
 const MOON_SIDEREAL_MONTH_J2000_S = C.moonSiderealMonth * 86400;
-// Of-date cycles per anchor interval, REAL-valued (the month chain's H² counter
-// scales its of-date periods on them until the counter is re-expressed).
-const N_apsidalI_J2000 = (C.H * C.meanSolarYearDays * 86400) / MOON_APSIDAL_OFDATE_J2000_S;
-const N_nodalI_J2000   = (C.H * C.meanSolarYearDays * 86400) / MOON_NODAL_OFDATE_J2000_S;
+// (Plan 09 step 5c: the per-H of-date cycle counts and the month chain's H²
+// scaling left; the of-date perigee/node are the chain's count compositions.)
 
 // Per-planet semi-major axes at J2000 (km). AU-ratio via Kepler 3rd law:
 // a = (T²)^(1/3) where T = H / round(H × meanSolarYear / solarYearInput).
@@ -244,21 +242,17 @@ function _moonChain() {
         gmEarthMoonM3PerS2: GM_EM_M3S2,
         massRatioEarthMoon: C.MASS_RATIO_EARTH_MOON,
         moonSiderealMonthInputDays: C.moonSiderealMonthInput,
-        holisticYearJ2000: HOLISTIC_YEAR_J2000,
         meanSiderealYearJ2000Seconds: MEAN_SIDEREAL_YEAR_J2000_S,
-        nApsidalOfDateJ2000: N_apsidalI_J2000,
-        nNodalOfDateJ2000: N_nodalI_J2000,
         moonApsidalJ2000Seconds: MOON_APSIDAL_J2000_S,
         moonNodalJ2000Seconds: MOON_NODAL_J2000_S,
-        moonApsidalOfDateJ2000Seconds: MOON_APSIDAL_OFDATE_J2000_S,
-        moonNodalOfDateJ2000Seconds: MOON_NODAL_OFDATE_J2000_S,
         moonSiderealMonthJ2000Seconds: MOON_SIDEREAL_MONTH_J2000_S,
         sPerigee: _ECOMP_S_W, sNode: _ECOMP_S_N,
       },
       fns: {
         meanLodSecondsAtAge,
         meanSiderealYearSecondsAtAge,
-        meanHAtAge,
+        // plan 09 step 5c: the tropical month's equinox turn is one per T_p(t)
+        precessionPeriodYearsAtAge: meanLunisolarPrecessionPeriodYearsAtAge,
         // Decision (ii): _eCompModulation now rides the ONE deep e
         modulation: _eCompModulation,
         distanceMetresAtAge: _recessionHistory().distanceMetresAtAge,
@@ -837,14 +831,8 @@ function meanSynodicMonthAtAge(t_Ma) { return _moonChain().synodicMonthSecondsAt
 
 function meanTropicalMonthAtAge(t_Ma) { return _moonChain().tropicalMonthSecondsAtAge(t_Ma); }
 
-// ─── Option C+ deep-time lunar precession (Brouwer-Clemence m² scaling) ──
-function meanApsidalCyclesICRFAtAge(t_Ma) { return _moonChain().apsidalCyclesOfDateAtAge(t_Ma); }
-
-function meanNodalCyclesICRFAtAge(t_Ma) { return _moonChain().nodalCyclesOfDateAtAge(t_Ma); }
-
-function meanApsidalPrecessionSecondsICRFAtAge(t_Ma) { return _moonChain().apsidalPrecessionSecondsOfDateAtAge(t_Ma); }
-
-function meanNodalPrecessionSecondsICRFAtAge(t_Ma) { return _moonChain().nodalPrecessionSecondsOfDateAtAge(t_Ma); }
+// (Plan 09 step 5c: the H² "cycles per H" / of-date period wrappers
+// (mean*ICRFAtAge) left with the counter law; no reader remained.)
 
 // ─── Framework Earth-eccentricity composite (A/B RESEARCH ONLY) ──
 // Mirror of src/script.js _ECOMP/_fwEarthEccComposite — SUPERSEDED as the
@@ -987,8 +975,9 @@ function meanSiderealDayAtAge(t_Ma) {
   const T_sid_s = meanSiderealYearSecondsAtAge(t_Ma);
   const LOD_s   = meanLodSecondsAtAge(t_Ma);
   if (LOD_s === null) return null;
-  const H_t = meanHAtAge(t_Ma);
-  return T_sid_s / (T_sid_s / LOD_s + 1 + 13 / H_t);
+  // plan 09 step 5c: the equinox's turn is one per T_p(t) (was the counter's 13/H(t), 0.086 % slow)
+  const Tp = meanLunisolarPrecessionPeriodYearsAtAge(t_Ma) ?? certifiedAxialPrecessionJ2000Years();
+  return T_sid_s / (T_sid_s / LOD_s + 1 + 1 / Tp);
 }
 
 // ─── Per-planet semi-major axes (Driver 2 — solar mass loss) ──────────────
@@ -1352,8 +1341,6 @@ module.exports = {
   LOD_NOW_H13_S,
   A_MOON_NOW_M,
   A_LOCK_M,
-  N_apsidalI_J2000,
-  N_nodalI_J2000,
   MOON_APSIDAL_J2000_S,
   MOON_NODAL_J2000_S,
   MOON_SIDEREAL_MONTH_J2000_S,
@@ -1396,8 +1383,6 @@ module.exports = {
   // Moon chain
   meanSolarDeltaAAtAge, meanMoonDistanceCorrectedAtAge,
   meanMoonSiderealMonthAtAge, meanSynodicMonthAtAge, meanTropicalMonthAtAge,
-  meanApsidalCyclesICRFAtAge, meanNodalCyclesICRFAtAge,
-  meanApsidalPrecessionSecondsICRFAtAge, meanNodalPrecessionSecondsICRFAtAge,
   meanLunarPerigeePrecessionAtAge, meanLunarNodePrecessionAtAge,
   meanAnomalisticMonthAtAge, meanNodalMonthAtAge,
   meanApsidalMeetsNodalAtAge, meanLunarLevelingCycleAtAge,   // 8.2-3: gained via the shared chain (were browser-only)

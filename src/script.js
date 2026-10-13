@@ -1122,13 +1122,10 @@ const sunOrbitPeriod = (lightYear*milkywayDistance*Math.PI*2)/(sunSpeed/60/60*me
 const milkywayOrbitPeriod = (lightYear*greatattractorDistance*Math.PI*2)/(milkywaySpeed/60/60*meanlengthofday*meansolaryearlengthinDays);
 
 // --- 9e. Moon derived cycles (Option C+ derivation, 2026-06) ---
-// J2000 cycle counts per H from the three observational anchors:
-//   N_sid_J2000      — sidereal months per H
-//   N_apsidalI_J2000 — apsidal cycles per H ("I" = of-date input convention;
-//                      legacy-'ICRF' naming — the input periods are equinox-of-date)
-//   N_nodalI_J2000   — nodal cycles per H (of-date input convention)
-// "E"-counts = I ∓ 13 (Earth axial precession at H/13) — these produce the
-// STAR-REFERENCED (inertial) periods (3232.60 d / 6793.48 d).
+// J2000 sidereal-month count per anchor unit (the Model Identity "orbits" row;
+// plan 09 step 7 retires it with the unit). The apsidal/nodal per-H counts and
+// their "E"-counts (I ∓ 13) left at plan 09 step 5c with the month chain's H²
+// scaling: the star-referenced periods are 1/T_E = 1/T_I ∓ 1/T_p (below).
 // Lunar counts are INTEGER PER 8H (the Solar System Resonance Cycle), so per H
 // they are eighth-integers. Measured
 // basis: the H-grid's 0.527-s month spacing puts the quantized sidereal month
@@ -1169,14 +1166,7 @@ let   moonApsidalMeetsNodalindays = ((moonNodalMonth/(moonAnomalisticMonth-moonN
 let   moonLunarLevelingCycleindays = (moonNodalPrecessionindaysEarth/(moonNodalPrecessionindaysEarth-moonApsidalPrecessionindaysEarth)*(moonApsidalPrecessionindaysEarth/meansolaryearlengthinDays))*meansolaryearlengthinDays;  // Phase 6.5: mutable
 let   moonDraconicYearICRF = 1/((1/meansolaryearlengthinDays)+(1/moonNodalPrecessionindaysEarth));  // Phase 6.5: mutable — the mixed-frame partner (346.607 d; NOT the observable)
 let   moonDraconicYearEarth = 1 / (1 / moonDraconicYearICRF - 1 / AXIAL_PRECESSION_J2000_DAYS);  // Phase 6.5: mutable — THE OBSERVED ECLIPSE YEAR (346.620 d; removing one equinox turn compensates the mixed-frame intermediate above: ≡ tropical⊕of-date ≡ sidereal⊕star-referenced)
-// Of-date cycles per anchor interval, REAL-valued (the month chain's H²
-// counter scales its of-date periods on them until the counter is
-// re-expressed; the Model Identity table and the "orbits" row read them).
 const N_sid_J2000      = (holisticyearLength*meansolaryearlengthinDays)/moonSiderealMonth;
-const N_apsidalI_J2000 = (holisticyearLength*meansolaryearlengthinDays)/moonApsidalPrecessionindaysICRF;
-const N_nodalI_J2000   = (holisticyearLength*meansolaryearlengthinDays)/moonNodalPrecessionindaysICRF;
-const N_apsidalE_J2000 = (holisticyearLength*meansolaryearlengthinDays)/moonApsidalPrecessionindaysEarth;   // star-referenced (the month rows' hover identities)
-const N_nodalE_J2000   = (holisticyearLength*meansolaryearlengthinDays)/moonNodalPrecessionindaysEarth;
 let   moonSpeed = (moonDistance*Math.PI*2)/(meansolaryearlengthinDays*(1/(meansolaryearlengthinDays/moonSiderealMonth)))/24;  // Phase 6.5: mutable
 
 // ─── E2. Mass calculations ──────────────────────────────────────────────
@@ -3528,15 +3518,17 @@ function _eclipse() {
 // IP-framework-native-sun-ecliptic-longitude.md.
 // ═════════════════════════════════════════════════════════════════════════════
 
-/** Mode-aware phase cycles helper.
- *  Snapshot mode (DEEP_TIME_MODE_ENABLED=false): (year - balancedYear) × N / H_J2000
- *  Integrated mode: cyclesBetweenYears (integrates ∫N/H(t)dt properly)
- *  Both agree at J2000; diverge at deep time per H(t) drift. */
-function _phaseCycles(year, divisor_N) {
-  if (DEEP_TIME_MODE_ENABLED) {
-    return cyclesBetweenYears(balancedYear, year, divisor_N);
-  }
-  return (year - balancedYear) * divisor_N / holisticyearLength;
+// (plan 09 step 5c: the mode-aware `_phaseCycles` helper — the H/16 perihelion
+// count the mean-element recipe below rode — left with the counters; the
+// perihelion is the series' ϖ of date.)
+
+/** Earth's perihelion-of-date advance between two JDs, in cycles — the series'
+ *  ϖ, wrapped to ±½ cycle (a diagnostic for spans ≪ T_peri; plan 09 step 5c,
+ *  was the H/16 counter). */
+function _periOfDateAdvanceCycles(jdA, jdB) {
+  const d = earthPerihelionEclipticOfDateDeg(jdB, julianDateToDecimalYear(jdB))
+          - earthPerihelionEclipticOfDateDeg(jdA, julianDateToDecimalYear(jdA));
+  return ((((d + 180) % 360) + 360) % 360 - 180) / 360;
 }
 
 // (R4: the analytic twin _frameworkSunLon — the K-law Sun the E5 δ block fell
@@ -3562,10 +3554,8 @@ function _fwSunMeanElements(jd_ut) {
   }
   const L0_j2000_deg = ASTRO_REFERENCE.sunMeanLongitudeJ2000_deg;   // Sun mean lon at J2000 (astro-reference.json — was a duplicated 280.46646 literal, value-identical)
   const L_deg = L0_j2000_deg + 360 * days_from_j2000 / T_tropical_days;
-  const perihelion_j2000_deg =
-    (ASTRO_REFERENCE.perihelionLongitudeJ2000_deg + 180) % 360;
-  const perihelion_deg = perihelion_j2000_deg
-    + 360 * (_phaseCycles(year, 16) - _phaseCycles(2000, 16));
+  // the Sun's perihelion = Earth's mean ϖ of date (the series) + 180° (plan 09 step 5c; was the H/16 count)
+  const perihelion_deg = (earthPerihelionEclipticOfDateDeg(jd_ut, year) + 180) % 360;
   return { L_deg, perihelion_deg, M_deg: L_deg - perihelion_deg };
 }
 
@@ -3860,7 +3850,7 @@ const _moonSeries = (() => {
           jdToSIyear: (jd) => _jdToSIyear(jd),
           tropicalOrbitsBetween: meanMoonOrbitsBetweenYears,
           apsidalOfDateCyclesBetween: meanMoonApsidalOfDateCyclesBetween,
-          cyclesBetween: cyclesBetweenYears,
+          siderealOrbitsBetween: (a, b) => _moonChainCycles(meanMoonSiderealMonthAtAge, a, b),   // the series' star-referenced A3 (plan 09 step 5c)
           jupiterOrbitsBetween: (a, b) => meanJupiterOrbitalCyclesBetween(a, b),
           isDeepTime: () => DEEP_TIME_MODE_ENABLED,
           isFrameworkNative: () => MOON_ARGS_FRAMEWORK_NATIVE,
@@ -3993,10 +3983,9 @@ function meanTropicalMonthAtAge(t_Ma) { return _moonChain().tropicalMonthSeconds
 // trail in tools/explore/ (audit-moon-months, derive-moon-precession-rates,
 // derive-moon-precession-deep-time, explore-scaling-N-proposal).
 
-/** Apsidal cycles per H at age t_Ma (of-date convention; legacy-'ICRF' name). Returns N×(H/H₀)² (real-valued, not rounded). */
-function meanApsidalCyclesICRFAtAge(t_Ma) { return _moonChain().apsidalCyclesOfDateAtAge(t_Ma); }
-/** Nodal cycles per H at age t_Ma (of-date convention; legacy-'ICRF' name). */
-function meanNodalCyclesICRFAtAge(t_Ma) { return _moonChain().nodalCyclesOfDateAtAge(t_Ma); }
+// (plan 09 step 5c: the H² "cycles per H" / of-date period wrappers
+// (mean*ICRFAtAge) left with the counter law; no reader remained. The of-date
+// perigee/node are the count compositions meanMoon*OfDateCyclesBetween below.)
 
 // NOTE: Earth-frame variants (meanApsidalCyclesEarthAtAge, meanNodalCyclesEarthAtAge,
 // meanApsidalPrecessionSecondsEarthAtAge, meanNodalPrecessionSecondsEarthAtAge)
@@ -4006,11 +3995,6 @@ function meanNodalCyclesICRFAtAge(t_Ma) { return _moonChain().nodalCyclesOfDateA
 // entire chain was orphaned. The Phase 0 ESSRT versions below
 // (meanLunarPerigeePrecessionAtAge, meanLunarNodePrecessionAtAge) use
 // Brouwer-Clemence m² scaling and are the production model.
-
-/** Apsidal precession period in seconds (of-date convention; legacy-'ICRF' name) at age t_Ma. */
-function meanApsidalPrecessionSecondsICRFAtAge(t_Ma) { return _moonChain().apsidalPrecessionSecondsOfDateAtAge(t_Ma); }
-/** Nodal precession period in seconds (of-date convention; legacy-'ICRF' name) at age t_Ma. */
-function meanNodalPrecessionSecondsICRFAtAge(t_Ma) { return _moonChain().nodalPrecessionSecondsOfDateAtAge(t_Ma); }
 
 // NOTE: meanAnomalisticMonthAtAge and meanNodalMonthAtAge are defined below
 // (~line 5503/5511) using Phase 0 ESSRT Brouwer-Clemence scaling via
@@ -4103,9 +4087,9 @@ function meanMoonApsidalOfDateCyclesBetween(yearA, yearB) {
 // fully-derived H/3 fluctuation line (_FW_ECC/_fwEarthEcc below), which now
 // carries the factored deep-time law — rate(t) = [invariant mean from H(t)]
 // × [g(t)/g₀]^s, g = (1−e²)^(−3/2) — and the E-factor. The composite is
-// retained for comparison experiments only. The N-form functions
-// (meanApsidalPrecessionSecondsICRFAtAge etc.) stay the pure invariant MEAN
-// law; the anchored chains carry the full factored law on the derived line.
+// retained for comparison experiments only. The anchored chains carry the
+// full factored law on the derived line (the N-form "invariant mean" family
+// left at plan 09 step 5c).
 // ═════════════════════════════════════════════════════════════════════════════
 const _ECOMP = {
   c0: 0.02814222258,
@@ -4254,21 +4238,17 @@ const _moonChain = (() => {
           gmEarthMoonM3PerS2: GM_EM_M3S2,
           massRatioEarthMoon: MASS_RATIO_EARTH_MOON,
           moonSiderealMonthInputDays: moonSiderealMonthInput,
-          holisticYearJ2000: HOLISTIC_YEAR_J2000,
           meanSiderealYearJ2000Seconds: MEAN_SIDEREAL_YEAR_J2000_S,
-          nApsidalOfDateJ2000: N_apsidalI_J2000,
-          nNodalOfDateJ2000: N_nodalI_J2000,
           moonApsidalJ2000Seconds: MOON_APSIDAL_J2000_S,
           moonNodalJ2000Seconds: MOON_NODAL_J2000_S,
-          moonApsidalOfDateJ2000Seconds: MOON_APSIDAL_OFDATE_J2000_S,
-          moonNodalOfDateJ2000Seconds: MOON_NODAL_OFDATE_J2000_S,
           moonSiderealMonthJ2000Seconds: MOON_SIDEREAL_MONTH_J2000_S,
           sPerigee: _moonArgsM().bundle.S_W, sNode: _moonArgsM().bundle.S_N,
         },
         fns: {
           meanLodSecondsAtAge,
           meanSiderealYearSecondsAtAge,
-          meanHAtAge,
+          // plan 09 step 5c: the tropical month's equinox turn is one per T_p(t)
+          precessionPeriodYearsAtAge: _axialPrecessionPeriodYearsAtAge,
           distanceMetresAtAge: _recessionHistory().distanceMetresAtAge,
           // Decision (ii): _eCompModulation now rides the ONE deep e
           modulation: _eCompModulation,
@@ -4325,8 +4305,8 @@ function meanSiderealDayAtAge(t_Ma) {
   const T_sid_s = meanSiderealYearSecondsAtAge(t_Ma);
   const LOD_s   = meanLodSecondsAtAge(t_Ma);
   if (LOD_s === null) return null;
-  const H_t = meanHAtAge(t_Ma);
-  return T_sid_s / (T_sid_s / LOD_s + 1 + 13 / H_t);
+  // plan 09 step 5c: the equinox's turn is one per T_p(t) (was the counter's 13/H(t), 0.086 % slow)
+  return T_sid_s / (T_sid_s / LOD_s + 1 + 1 / _axialPrecessionPeriodYearsAtAge(t_Ma));
 }
 
 // ───── Per-planet semi-major axes + Earth-planet distances (Driver 2) ─────
@@ -4804,28 +4784,18 @@ function cyclesBetweenYears(yearA, yearB, divisor_N) {
   return divisor_N * (yearB - yearA) / holisticyearLength;
 }
 
-/** Phase in radians. Routes through cyclesBetweenYears so the toggle propagates. */
-function phaseAdvanceRadians(yearAnchor, year, divisor_N) {
-  const cycles = cyclesBetweenYears(yearAnchor, year, divisor_N);
-  return cycles === null ? null : cycles * 2 * Math.PI;
-}
+// (plan 09 step 5c: `phaseAdvanceRadians` — 2π × cyclesBetweenYears — left
+// with the wheel drive; no reader remained.)
 
 /** Snapshot-form phase in radians — the convention used during harmonic
  *  fitting. Steps 4a, 6b, 6c, 6d all fit against scene-graph CSVs produced by
  *  `tools/lib/scene-graph.js`, which has zero deep-time references (pure
  *  snapshot kinematics using H = HOLISTIC_YEAR_J2000). Use this helper for
- *  every runtime formula that consumes fitted harmonics; use
- *  phaseAdvanceRadians only when the caller genuinely needs deep-time
- *  integrated phase (scene-graph startPos calibration at module load,
- *  deep-time integrator branches in moveModel, etc.).
- *
- *  Under DEEP_TIME_MODE_ENABLED=false, phaseAdvanceRadians would return the
- *  same value as this helper anyway (the toggle-off branch is snapshot).
- *  Under DEEP_TIME_MODE_ENABLED=true, phaseAdvanceRadians returns the
- *  integrated form which diverges from snapshot at years far from J2000 —
- *  producing formula-vs-data mismatches up to hours at year 10, days at
- *  −10 kyr, larger at deep time. Formulas that consume snapshot-fitted
- *  harmonics must NOT use that path. */
+ *  every runtime formula that consumes fitted harmonics. The integrated form
+ *  (cyclesBetweenYears) diverges from snapshot at years far from J2000 —
+ *  formula-vs-data mismatches up to hours at year 10, days at −10 kyr, larger
+ *  at deep time. Formulas that consume snapshot-fitted harmonics must NOT use
+ *  that path. */
 function phaseAdvanceSnapshot(yearAnchor, year, divisor_N) {
   return 2 * Math.PI * divisor_N * (year - yearAnchor) / HOLISTIC_YEAR_J2000;
 }
@@ -4981,15 +4951,17 @@ function updateAllTracesForEpoch() {
 // Moon months (moonSiderealMonth, moonAnomalisticMonth, moonNodalMonth,
 // moonSynodicMonth) and the per-epoch Earth months/year (meansolaryearlengthinDays).
 function recomputeMoonDerivedForEpoch(t_Ma) {
-  const H_t   = holisticyearLength;
   const days  = meansolaryearlengthinDays;
-  const Hdays = H_t * days;
+  // the equinox-of-date partners remove/add one equinox turn per T_p(t) — the
+  // Julian-year period in the epoch's LOD days, the unit the months above are
+  // in (plan 09 step 5c; was 13 turns per the counter H(t), 0.086 % slow)
+  const Tp_days = _axialPrecessionPeriodYearsAtAge(t_Ma) * 365.25 * 86400 / (meanLodSecondsAtAge(t_Ma) ?? 86400);
   // Earth-frame full-moon beat: beat of synodic + anomalistic
   moonFullMoonCycleEarth         = (moonSynodicMonth / (moonSynodicMonth - moonAnomalisticMonth)) * moonAnomalisticMonth;
-  // ICRF-frame variants — add/subtract 13 (general precession contribution per H cycle)
-  moonFullMoonCycleICRF          = Hdays / ((Hdays / moonFullMoonCycleEarth) + 13);
-  moonNodalPrecessionindaysICRF  = Hdays / ((Hdays / moonNodalPrecessionindaysEarth) - 13);
-  moonApsidalPrecessionindaysICRF = Hdays / ((Hdays / moonApsidalPrecessionindaysEarth) + 13);
+  // equinox-of-date variants — 1/T_E = 1/T_star ∓ 1/T_p (the full-moon cycle and the perigee advance prograde, the node regresses)
+  moonFullMoonCycleICRF          = 1 / (1 / moonFullMoonCycleEarth + 1 / Tp_days);
+  moonNodalPrecessionindaysICRF  = 1 / (1 / moonNodalPrecessionindaysEarth - 1 / Tp_days);
+  moonApsidalPrecessionindaysICRF = 1 / (1 / moonApsidalPrecessionindaysEarth + 1 / Tp_days);
   // Apsidal-meets-nodal: beat of anomalistic + nodal months
   moonApsidalMeetsNodalindays    = (moonNodalMonth / (moonAnomalisticMonth - moonNodalMonth)) * moonAnomalisticMonth;
   // Lunar leveling: beat of nodal + apsidal precessions
@@ -4997,7 +4969,7 @@ function recomputeMoonDerivedForEpoch(t_Ma) {
                                     * (moonApsidalPrecessionindaysEarth / days)) * days;
   // Draconic year: harmonic sum of year + nodal precession
   moonDraconicYearICRF           = 1 / ((1 / days) + (1 / moonNodalPrecessionindaysEarth));
-  moonDraconicYearEarth          = Hdays / ((Hdays / moonDraconicYearICRF) - 13);
+  moonDraconicYearEarth          = 1 / (1 / moonDraconicYearICRF - 1 / Tp_days);
   // Moon orbital speed in km/h
   moonSpeed                      = (moonDistance * Math.PI * 2) / (days * (1 / (days / moonSiderealMonth))) / 24;
   return true;
@@ -5158,28 +5130,30 @@ function updateEarthPrecessionObjectsForEpoch() {
   // (year 2000.498) relative to its position at BALANCED_YEAR_J2000_FIXED.
   // Computed by integrating cycles between J2000-fixed anchors → the answer
   // is frame-independent (same at any observation epoch).
-  // `speed` stays epoch-aware (uses live holisticyearLength).
-  // Plan 07 R10: each wheel's start position = its cycles from the model
-  // start to J2000 minus the device's recorded J2000 wheel phase (N × the
-  // constant) — the same pose the module-load literals below set.
-  const cycles_H3  = (cyclesBetweenYears(startmodelyearwithCorrection, BALANCED_YEAR_J2000_FIXED, 3)  ?? 0) - 3  * kDeviceWheelPhaseAtJ2000Cycles;
-  const cycles_H5  = (cyclesBetweenYears(startmodelyearwithCorrection, BALANCED_YEAR_J2000_FIXED, 5)  ?? 0) - 5  * kDeviceWheelPhaseAtJ2000Cycles;
-  const cycles_H8  = (cyclesBetweenYears(startmodelyearwithCorrection, BALANCED_YEAR_J2000_FIXED, 8)  ?? 0) - 8  * kDeviceWheelPhaseAtJ2000Cycles;
-  const cycles_H16 = (cyclesBetweenYears(startmodelyearwithCorrection, BALANCED_YEAR_J2000_FIXED, 16) ?? 0) - 16 * kDeviceWheelPhaseAtJ2000Cycles;
+  // Plan 09 step 5c: the wheels are the scene's POSE — the engine places the
+  // Earth frame, the Sun and the Moon stack over them (R4) — so each turns
+  // uniformly at its recorded J2000 rate from its recorded J2000 phase
+  // (N × kDeviceWheelPhaseAtJ2000Cycles, plan 07 R10); the ∫N/H_era(t)
+  // counter and the epoch-mutated speed are retired. The same pose the
+  // module-load literals below set; this re-apply keeps setEpoch idempotent.
+  const cycles_H3  = _deviceWheelStartCycles(3);
+  const cycles_H5  = _deviceWheelStartCycles(5);
+  const cycles_H8  = _deviceWheelStartCycles(8);
+  const cycles_H16 = _deviceWheelStartCycles(16);
   // Apsidal precession (H/3, prograde; historical name: inclination precession)
   earthInclinationPrecession.startPos =  cycles_H3 * 360;
-  earthInclinationPrecession.speed    =  Math.PI * 2 / (holisticyearLength / 3);
+  earthInclinationPrecession.speed    =  Math.PI * 2 / (HOLISTIC_YEAR_J2000 / 3);
   // Ecliptic precession (H/5, prograde)
   earthEclipticPrecession.startPos    =  cycles_H5 * 360;
-  earthEclipticPrecession.speed       =  Math.PI * 2 / (holisticyearLength / 5);
+  earthEclipticPrecession.speed       =  Math.PI * 2 / (HOLISTIC_YEAR_J2000 / 5);
   // Obliquity (H/8, retrograde)
   earthObliquityPrecession.startPos   = -cycles_H8 * 360;
-  earthObliquityPrecession.speed      = -Math.PI * 2 / (holisticyearLength / 8);
+  earthObliquityPrecession.speed      = -Math.PI * 2 / (HOLISTIC_YEAR_J2000 / 8);
   // Perihelion (H/16, prograde + retrograde pair)
   earthPerihelionPrecession1.startPos =  cycles_H16 * 360;
-  earthPerihelionPrecession1.speed    =  Math.PI * 2 / (holisticyearLength / 16);
+  earthPerihelionPrecession1.speed    =  Math.PI * 2 / (HOLISTIC_YEAR_J2000 / 16);
   earthPerihelionPrecession2.startPos = -cycles_H16 * 360;
-  earthPerihelionPrecession2.speed    = -Math.PI * 2 / (holisticyearLength / 16);
+  earthPerihelionPrecession2.speed    = -Math.PI * 2 / (HOLISTIC_YEAR_J2000 / 16);
 }
 
 /** Safe-subset Phase 3 orchestrator. Call AFTER recomputeEpochAnchors + recomputeMoonAndAuForEpoch. */
@@ -5225,8 +5199,8 @@ function updateSafeObjectsForEpoch() {
 //   - `perihelionPhaseJ2000` stays at J2000 by name and design — it is the
 //     reference phase at the J2000 epoch, not the live phase.
 //
-// Currently dormant: nothing calls these. Phase 4 will chain them after
-// recomputePlanetCountsForEpoch() inside setEpoch().
+// Currently dormant: nothing calls these (the per-epoch planet counts they
+// would follow left at plan 09 step 5c; the chain is the only planet path).
 
 function updateMercuryForEpoch() {
   mercury.speed       = Math.PI * 2 / (holisticyearLength / mercurySolarYearCount);
@@ -5472,7 +5446,7 @@ function meeusVsIntegratorDiagnostic(jd) {
 
   // ── Our integrator-derived advances from anchor (using SI tropical years) ──
   const cyc_Lp        = meanMoonOrbitsBetweenYears(yearSI_anchor, yearSI);
-  const cyc_periSun   = cyclesBetweenYears(yearSI_anchor, yearSI, 16);
+  const cyc_periSun   = _periOfDateAdvanceCycles(startmodelJD, jd);   // the series' ϖ of date (plan 09 step 5c; was the H/16 counter)
   const cyc_periMoon  = meanMoonApsidalCyclesBetween(yearSI_anchor, yearSI);
   const cyc_nodeMoon  = meanMoonNodalCyclesBetween(yearSI_anchor, yearSI);
   const adv_Lp_deg       = (cyc_Lp        ?? 0) * 360;
@@ -5549,7 +5523,6 @@ function setEpochByAge(t_Ma) {
   recomputeDerivedAnchorsForEpoch(t_Ma);  // Phase 6: 13 Earth-cycle derived anchors
   recomputeMoonAndAuForEpoch(t_Ma);
   recomputeMoonDerivedForEpoch(t_Ma);     // Phase 6.5: 9 Moon ICRF/harmonic helpers
-  recomputePlanetCountsForEpoch(t_Ma);
   recomputePlanetCyclesForEpoch(t_Ma);   // Phase 5: per-planet 8H/N cycle anchors
   updateAllObjectsForEpoch();
   _invalidateUiCachesForEpoch();         // Option A: unfreeze panels + tweakpane
@@ -5586,7 +5559,6 @@ function resetEpochToJ2000() {
   recomputeDerivedAnchorsForEpoch(0);
   recomputeMoonAndAuForEpoch(0);
   recomputeMoonDerivedForEpoch(0);
-  recomputePlanetCountsForEpoch(0);
   recomputePlanetCyclesForEpoch(0);
   updateAllObjectsForEpoch();
   _invalidateUiCachesForEpoch();
@@ -6415,44 +6387,11 @@ function _invalidateUiCachesForEpoch() {
 // DRIFT at deep time"). The AU-ratio *OrbitDistance is recomputed from the
 // updated N via the same Kepler-ratio formula used at module load.
 //
-// Currently dormant: nothing calls this yet. Phase 4 will chain it into
-// setEpoch() after recomputeEpochAnchors (since `meanlengthofday` and the
-// year-second functions it relies on must already reflect the new epoch).
-function recomputePlanetCountsForEpoch(t_Ma) {
-  const H_t      = meanHAtAge(t_Ma);
-  const T_yr_s_t = meanTropicalYearSecondsAtAge(t_Ma);
-  if (H_t === null) {
-    console.warn(`recomputePlanetCountsForEpoch(${t_Ma}): past tidal-lock asymptote — planet counts unchanged`);
-    return false;
-  }
-  // H in seconds at this epoch — the temporal length of one H cycle
-  const H_s_t = H_t * T_yr_s_t;
-
-  function _N(T_p_J2000_s) {
-    const T_p_t = meanPlanetOrbitalPeriodAtAge(t_Ma, T_p_J2000_s);
-    return Math.round(H_s_t / T_p_t);
-  }
-  function _orbitDist(N) {
-    return Math.pow(Math.pow(H_t / N, 2), 1/3);   // (H/N)^(2/3), Kepler AU ratio
-  }
-
-  mercurySolarYearCount = _N(MERCURY_PERIOD_J2000_S);
-  venusSolarYearCount   = _N(VENUS_PERIOD_J2000_S);
-  marsSolarYearCount    = _N(MARS_PERIOD_J2000_S);
-  jupiterSolarYearCount = _N(JUPITER_PERIOD_J2000_S);
-  saturnSolarYearCount  = _N(SATURN_PERIOD_J2000_S);
-  uranusSolarYearCount  = _N(URANUS_PERIOD_J2000_S);
-  neptuneSolarYearCount = _N(NEPTUNE_PERIOD_J2000_S);
-
-  mercuryOrbitDistance = _orbitDist(mercurySolarYearCount);
-  venusOrbitDistance   = _orbitDist(venusSolarYearCount);
-  marsOrbitDistance    = _orbitDist(marsSolarYearCount);
-  jupiterOrbitDistance = _orbitDist(jupiterSolarYearCount);
-  saturnOrbitDistance  = _orbitDist(saturnSolarYearCount);
-  uranusOrbitDistance  = _orbitDist(uranusSolarYearCount);
-  neptuneOrbitDistance = _orbitDist(neptuneSolarYearCount);
-  return true;
-}
+// Plan 09 step 5c: `recomputePlanetCountsForEpoch` — the per-epoch
+// round(H(t)/T_planet) counts and (H/N)^(2/3) scaffold radii — is deleted.
+// It fed the seven chain planets' wheel speeds and radii, which render
+// nothing since K5 (the chain is the only planet path); the J2000 counts and
+// radii stay as the scaffold's module-load constants until step 7.
 
 // ═════════════════════════════════════════════════════════════════
 // END DEEP-TIME CHAIN — Phase 0 + Phase 1 + Phase 2 + Phase 2.5 + Phase 3 + Phase 4 + Phase 5 + Phase 6 + Phase 6.5 + Phase 6.7
@@ -6729,16 +6668,23 @@ const earth = {
   traceOn: false,
 };
 
+/** A K-device wheel's start position, cycles: N turns per anchor unit from the
+ *  model start to J2000 at the recorded J2000 rate, minus the device's
+ *  recorded J2000 wheel phase (N × kDeviceWheelPhaseAtJ2000Cycles, plan 07
+ *  R10). ONE form for the module-load literals and
+ *  updateEarthPrecessionObjectsForEpoch (plan 09 step 5c: the wheels are a
+ *  uniformly turning pose; the ∫N/H_era counter is retired). */
+function _deviceWheelStartCycles(divisor_N) {
+  return (BALANCED_YEAR_J2000_FIXED - startmodelyearwithCorrection) * divisor_N / HOLISTIC_YEAR_J2000
+       - divisor_N * kDeviceWheelPhaseAtJ2000Cycles;
+}
+
 const earthInclinationPrecession = {
   name: "Earth Inclination Precession",
-  // Alignment with updateEarthPrecessionObjectsForEpoch (line 5347+): use the SAME
-  // cyclesBetweenYears call here so module-load state matches post-setEpoch state.
-  // Without this, the literal arithmetic gives snapshot-form value while update*ForEpoch
-  // gives integral-form value (under DEEP_TIME=true), introducing a ~5″ obliquity drift
-  // after the first navigation. Single source of truth → no drift.
-  // Plan 07 R10: minus the device's recorded J2000 wheel phase (3 × the constant).
-  startPos: (cyclesBetweenYears(startmodelyearwithCorrection, BALANCED_YEAR_J2000_FIXED, 3) - 3 * kDeviceWheelPhaseAtJ2000Cycles) * 360,
-  speed: Math.PI*2/(holisticyearLength/3),
+  // Alignment with updateEarthPrecessionObjectsForEpoch: the SAME helper here
+  // so module-load state matches post-setEpoch state (single source → no drift).
+  startPos: _deviceWheelStartCycles(3) * 360,
+  speed: Math.PI*2/(HOLISTIC_YEAR_J2000/3),
   tilt: 0,
   orbitRadius: 0,
   orbitCentera: 0,
@@ -6760,8 +6706,8 @@ const earthInclinationPrecession = {
 const earthEclipticPrecession = {
   name: "Earth Ecliptic Precession",
   // See earthInclinationPrecession header for alignment rationale.
-  startPos: (cyclesBetweenYears(startmodelyearwithCorrection, BALANCED_YEAR_J2000_FIXED, 5) - 5 * kDeviceWheelPhaseAtJ2000Cycles) * 360,
-  speed: Math.PI*2/(holisticyearLength/5),
+  startPos: _deviceWheelStartCycles(5) * 360,
+  speed: Math.PI*2/(HOLISTIC_YEAR_J2000/5),
   tilt: 0,
   orbitRadius: 0,
   orbitCentera: 0,
@@ -6783,8 +6729,8 @@ const earthEclipticPrecession = {
 const earthObliquityPrecession = {
   name: "Earth Obliquity Precession",
   // See earthInclinationPrecession header for alignment rationale. Negated for retrograde (H/8).
-  startPos: -(cyclesBetweenYears(startmodelyearwithCorrection, BALANCED_YEAR_J2000_FIXED, 8) - 8 * kDeviceWheelPhaseAtJ2000Cycles) * 360,
-  speed: -Math.PI*2/(holisticyearLength/8),
+  startPos: -_deviceWheelStartCycles(8) * 360,
+  speed: -Math.PI*2/(HOLISTIC_YEAR_J2000/8),
   tilt: 0,
   orbitRadius: 0,
   orbitCentera: 0,
@@ -6806,8 +6752,8 @@ const earthObliquityPrecession = {
 const earthPerihelionPrecession1 = {
   name: "Earth Perihelion Precession1",
   // See earthInclinationPrecession header for alignment rationale.
-  startPos: (cyclesBetweenYears(startmodelyearwithCorrection, BALANCED_YEAR_J2000_FIXED, 16) - 16 * kDeviceWheelPhaseAtJ2000Cycles) * 360,
-  speed: Math.PI*2/(holisticyearLength/16),
+  startPos: _deviceWheelStartCycles(16) * 360,
+  speed: Math.PI*2/(HOLISTIC_YEAR_J2000/16),
   tilt: 0,
   orbitRadius: 0,
   orbitCentera: 0,
@@ -6829,8 +6775,8 @@ const earthPerihelionPrecession1 = {
 const earthPerihelionPrecession2 = {
   name: "Earth Perihelion Precession2",
   // See earthInclinationPrecession header for alignment rationale. Negated for retrograde.
-  startPos: -(cyclesBetweenYears(startmodelyearwithCorrection, BALANCED_YEAR_J2000_FIXED, 16) - 16 * kDeviceWheelPhaseAtJ2000Cycles) * 360,
-  speed: -Math.PI*2/(holisticyearLength/16),
+  startPos: -_deviceWheelStartCycles(16) * 360,
+  speed: -Math.PI*2/(HOLISTIC_YEAR_J2000/16),
   tilt: 0,
   orbitRadius: 0,
   orbitCentera: -eccentricityBaseDerived*100,   // the one law's mean offset base' (unification; mirrors scene-graph.js)
@@ -6861,13 +6807,14 @@ const earthPerihelionPrecession2 = {
 //
 // Fix (Option B): when an H-cycle scene object is tagged with `_dtCycleN`
 // (orbital) or `_dtRotN` (self-rotation), the render loop replaces the
-// snapshot formula with the integral form:
-//   θ = ±2π × cyclesBetweenYears(anchor, o.currentYear, N)
+// snapshot formula with the anchored form:
+//   θ = ±2π × N × (yearSI − anchor) / H_J2000 (+ N × the recorded J2000 phase)
 // where anchor defaults to BALANCED_YEAR_J2000_FIXED (Earth cycles) but can be
-// overridden per-object via `_dtCycleAnchor` (planet wobble centers use
-// _planetSceneAnchors_J2000[planet]). Sign is +1 for prograde, −1 for retrograde.
-// The result IS the physically correct rotation at any epoch — uses the same
-// integral that `computeObliquityEarth` etc. use.
+// overridden per-object via `_dtCycleAnchor`. Sign is +1 for prograde, −1
+// for retrograde. Plan 09 step 5c: the wheels are the scene's POSE — the
+// engine places the Earth frame, the Sun and the Moon stack over them (R4,
+// _applyEngineEarthFrame) — so they turn uniformly at their recorded J2000
+// rates; the ∫N/H_era(t) counter that drove them is retired.
 //
 // Gating: the override only fires when DEEP_TIME_MODE_ENABLED is true.
 // When OFF, the scene reverts to pre-Phase-9.12 snapshot rendering.
@@ -6990,14 +6937,11 @@ const sun = {
   traceOn: false,
 };
 
-// Phase 9.14 (step 3): Sun perihelion EoC integrator tag. Replaces the
-// snapshot `perihelionPrecessionRate × pos` with the H(t)-integrated form,
-// `2π × cyclesBetweenYears(startmodel, currentYear, 16)`. Anchored at
-// startmodelyearwithCorrection so at year=startmodel cycles=0 and the
-// perihelion phase reduces to perihelionPhaseJ2000 (preserves modern
-// behavior). Divisor 16 because Sun's perihelion period = H/16 structurally.
-sun._dtPerihelionDivisor = 16;
-sun._dtPerihelionAnchor  = STARTMODEL_YEAR_SI;
+// (Plan 09 step 5c: the Sun's `_dtPerihelionDivisor = 16` equation-of-centre
+// tag — the H/16 counter for the Sun's perihelion phase — is deleted with the
+// render loop's branch that read it. The Sun's wheel angle is set from the
+// certified longitude in _applyEngineEarthFrame (R4); the snapshot EoC form
+// renders only the few pre-artifact frames.)
 
 const moonApsidalPrecession = {
   name: "Moon Apsidal Precession",
@@ -8006,22 +7950,20 @@ const neptune = {
 // ┌────────────────────────────┬─────────────────────────┬─────────────────────────┐
 // │ Tag family                 │ Physical law            │ Time base               │
 // ├────────────────────────────┼─────────────────────────┼─────────────────────────┤
-// │ _dtCycleN / _dtCycleSign   │ Law-6 H-scaling cycles  │ UT (_currentYearSI)     │
-// │ + _dtCycleAnchor (opt)     │ (Driver 1, H evolves)   │                         │
-// │   → wobble centers,        │                         │                         │
-// │     perihelion ecliptic    │                         │                         │
-// │     E1/E2 pairs            │                         │                         │
+// │ _dtCycleN / _dtCycleSign   │ K-device wheel pose:    │ UT (_currentYearSI)     │
+// │ + _dtCycleAnchor (opt)     │ N turns per anchor unit │                         │
+// │   → Earth wheels, wobble   │ at the recorded J2000   │                         │
+// │     centre (uniform; plan  │ rate (R4 places the     │                         │
+// │     09 step 5c)            │ engine frame over them) │                         │
 // ├────────────────────────────┼─────────────────────────┼─────────────────────────┤
 // │ _dtPlanetIntegrator        │ Kepler + solar mass     │ TT (_currentYearSI_TT)  │
 // │ + _dtPlanetAnchor          │ loss (Driver 2)         │                         │
 // │ + _dtPlanetSign            │                         │                         │
 // │   → planet orbital nodes   │                         │                         │
-// ├────────────────────────────┼─────────────────────────┼─────────────────────────┤
-// │ _dtPerihelionDivisor       │ Law-6 perihelion phase  │ UT (negligible UT/TT    │
-// │ + _dtPerihelionAnchor      │ for eq-of-center        │ mismatch — ~8e-7° max)  │
-// │   → planet eq-of-center    │                         │                         │
-// │     perihelionPhase term   │                         │                         │
 // └────────────────────────────┴─────────────────────────┴─────────────────────────┘
+// (the `_dtPerihelionDivisor` family — the H-counter perihelion phase of the
+//  equation of centre — is gone: the chain planets' tags at R7, the Sun's at
+//  plan 09 step 5c)
 //
 // SNAPSHOT-ALSO-MUTATED INVARIANT: even though the tagged dispatch paths above
 // supersede the snapshot `obj.speed × pos` for deep-time-mode rendering, the
@@ -8154,40 +8096,14 @@ neptune._dtPlanetSign       = Math.sign(neptune.speed);
 // them. The `_dtCycleN` MECHANISM stays — the Sun's layers and the no-chain
 // bodies still use it; only the seven chain planets' entries are gone.
 
-// ───── Phase P-D — Per-planet _dtPerihelionDivisor for eq-of-center ─────
-// docs/archive/old-documents/IP-planet-deep-time-scene-graph.md
-//
-// Re-applied 2026-06-20 with CORRECTED divisor convention (N/8, not N).
-//
-// The equation-of-center block (script.js ~line 46647) computes the planet's
-// mean anomaly M = θ - perihelionPhase. With _dtPerihelionDivisor tagged,
-// the dispatch (line ~46663) uses the integral form:
-//   perihelionPhase = perihelionPhaseJ2000 + cyclesBetween(anchor, current, divisor) × 2π
-//
-// DIVISOR (CRITICAL): cyclesBetweenYears integrates cycles of period H/divisor.
-// Planet perihelion ecliptic period = 8H/N → divisor = N/8 (NOT N).
-// Initial P-D used N and produced visible Jupiter/Saturn position regression
-// (~11-13° perihelion phase error at year 1682 → ~1° RA error). Reverted and
-// re-applied with N/8. Sun's existing sun._dtPerihelionDivisor = 16 is
-// unchanged — Sun's period is H/16 directly, not 8H/16.
-//
-// SIGNED DIVISOR: cyclesBetweenYears multiplies by divisor_N at the end
-// (script.js line 5395), so a negative divisor naturally flips the cycle
-// sign — perfect for retrograde perihelion precession (Venus, Saturn).
-// Signed H-form divisor = (N/8) × sign.
-//
-// UT vs TT (resolved): the dispatch uses _currentYearSI (UT), while planet
-// θ (P-B1+) uses _currentYearSI_TT. The mixed-coordinate M error is bounded
-// by ω_peri × ΔT, which for Mercury at year -584 is ~8e-7° — utterly
-// negligible. No conditional dispatch needed.
-// R7: the seven chain planets' _dtPerihelionDivisor / _dtPerihelionAnchor tags
-// stood here, carrying (N/8)·sign off the 8H/N grid. They are gone because the
-// branch that read them — the equation-of-centre phase in the update loop —
-// "now serves the Moon, Pluto and the no-chain bodies only" since K5 put the
-// chain planets on their own elements. MEASURED before removing: commenting
-// all fourteen moves nothing across the browser goldens. The Sun keeps its own
-// sun._dtPerihelionDivisor = 16, which is a literal and never came from the
-// Law-6 grid.
+// ───── (the Phase P-D `_dtPerihelionDivisor` equation-of-centre tags) ─────
+// docs/archive/old-documents/IP-planet-deep-time-scene-graph.md carries the
+// record. R7 (plan 07): the seven chain planets' tags went with K5 (the chain
+// planets ride their own elements; commenting all fourteen moved nothing
+// across the browser goldens). Plan 09 step 5c: the Sun's `= 16` tag and the
+// branch that read them are deleted — the Sun's wheel angle is the engine's
+// (R4); the equation of centre keeps its snapshot perihelion phase for the
+// Moon, Pluto and the no-chain bodies.
 
 //*************************************************************
 // ADD CONSTANTS
@@ -18460,9 +18376,9 @@ function _deepHistSeries() {
       // length beat: that carries the equinox wobble the hybrid's n̂(t)
       // already generates (double-count — the generator's refuse-gate
       // measured 0.14°/1.05° distortions).
-      axialPrecessionYearsAtYearFn: ((axial0, H0) =>
-        (yr) => axial0 * meanHAtAge((2000 - yr) / 1e6) / H0
-      )(_certifiedAxialPrecessionJ2000Years(), meanHAtAge(0)),
+      // Plan 09 step 5c: T_p(t) read directly (was period₀·H(t)/H₀ on the
+      // unit — the same number to 2e-16, the unit scaling with T_p).
+      axialPrecessionYearsAtYearFn: (yr) => _axialPrecessionPeriodYearsAtAge((2000 - yr) / 1e6),
       // THE PRECESSION OF DATE (plan 06 §9 item 10): the solar torque at the
       // eccentricity of date and the oblateness of date from the GIA channel
       // (read PURE — never the lattice-α pin; the samplers are cached) — both
@@ -18619,14 +18535,12 @@ const _vfpTropicalYearDaysOfDate = (() => {
   let a = null;
   return (year) => {
     if (_hybridSpinActive()) return _yearLengthsM().tropicalYearSecondsAtYear(year) / 86400;
-    if (!a) a = { axial0: _certifiedAxialPrecessionJ2000Years(), H0: meanHAtAge(0) };
-    // Plan 06 Phase 3: the secular precession period axial0·H(t)/H₀ on
-    // the UNIT H(t) = 13·T_p,composed — the same scaling the hybrid
-    // precesses on (not the frozen era clock's H_era).
+    // Plan 06 Phase 3 / plan 09 step 5c: the composed lunisolar precession
+    // period of date T_p(t) — the same scaling the hybrid precesses on (not
+    // the frozen era clock's H_era); read directly, not as axial0·H(t)/H₀.
     const tMa = (2000 - year) / 1e6;
-    const h = meanHAtAge(tMa);
     return meanSiderealYearSecondsAtAge(tMa) / 86400
-      * (1 - 1 / (a.axial0 * (h === null ? 1 : h / a.H0)));
+      * (1 - 1 / _axialPrecessionPeriodYearsAtAge(tMa));
   };
 })();
 /** Mean sidereal day of date in SI seconds: the solar day of date times
@@ -25570,9 +25484,9 @@ function setupGUI() {
           const lodMean = meanLodSecondsAtAge(tau);
           if (lodMean === null) { ok = false; break; }
           const yearS = meanTropicalYearSecondsAtAge(tau);
-          const H_l = meanHAtAge(tau);
-          const mSY = meanTropicalYearDaysAtAge(tau);
-          const lodH5Raw = lodMean + lodMean / ((H_l / 5) * mSY);
+          // the PRODUCTION integrand's ecliptic missing-motion term (one home;
+          // this mirror still read the spin unit's H/5 until plan 09 step 5c)
+          const lodH5Raw = lodMean + (_deepLod().eclipticLodCorrectionSecondsAtAge(tau) ?? 0);
           const integrand = (86400 - lodH5Raw) * yearS * 1e6 / 86400;
           const w = (i === 0 || i === n) ? 1 : (i % 2 === 1 ? 4 : 2);
           sum += w * integrand;
@@ -26116,12 +26030,14 @@ function setupGUI() {
         const lod = _lodScaledL1(tau, scale);
         if (lod === null) return NaN;
         const yearS = _tropYearScaledL1(tau, scale);
-        // Mirror the PRODUCTION integrand: raw H/5 kinematic form, not bare
-        // L1+L2 LOD — omitting the H/5 term inflates ΔT by ~2.5 ks at -135
-        // (the same integrand bug class fixed on the Holistic calculator).
-        const Ht = HOLISTIC_YEAR_J2000 * lod / LOD_NOW_H13_S;
+        // Mirror the PRODUCTION integrand: the kinematic LOD plus the ecliptic
+        // missing-motion term δLOD = LOD/(T_s₃·mSY) on the SCALED LOD — omitting
+        // the term inflates ΔT by ~2.5 ks at -135 (the same integrand bug class
+        // fixed on the Holistic calculator). Plan 09 step 5c: the divisor is the
+        // nodal period 1,296,000/|s₃| (the production term's, plan 06 T2), not
+        // the spin unit's H/5 this mirror still carried.
         const mSY_days = yearS / lod;
-        const lodH5Raw = lod + lod / ((Ht / 5) * mSY_days);
+        const lodH5Raw = lod + lod / ((1296000 / _s3ArcsecPerYr()) * mSY_days);
         const integrand = (86400 - lodH5Raw) * yearS * 1e6 / 86400;
         const w = (i === 0 || i === n) ? 1 : (i % 2 === 1 ? 4 : 2);
         sum += w * integrand;
@@ -34321,7 +34237,7 @@ function setupGUI() {
     // Our integrator: cycles per 1 SI-tropical-year (= what the integrator
     // really computes per unit of its `year` argument).
     const cyc_Lp_per_yr       = meanMoonOrbitsBetweenYears(yA, yB);
-    const cyc_periSun_per_yr  = cyclesBetweenYears(yA, yB, 16);
+    const cyc_periSun_per_yr  = _periOfDateAdvanceCycles(j2000JD, j2000JD + SI_TROPICAL_YEAR_DAYS);   // the series' ϖ of date (plan 09 step 5c)
     const cyc_periMoon_per_yr = meanMoonApsidalCyclesBetween(yA, yB);
     const cyc_nodeMoon_per_yr = meanMoonNodalCyclesBetween(yA, yB);
 
@@ -34635,7 +34551,7 @@ function setupGUI() {
 
     // ── Sun and Moon regression checks ──
     console.log('\n── REGRESSION ──');
-    note(`sun._dtPerihelionDivisor unchanged (Phase 9.x tag) = ${sun._dtPerihelionDivisor}`, sun._dtPerihelionDivisor === 16);
+    note(`sun has no _dtPerihelionDivisor tag (plan 09 step 5c: the H/16 counter left; the Sun's angle is the engine's)`, sun._dtPerihelionDivisor === undefined);
     note(`moon._dtMoonIntegrator unchanged (Phase 9.13)`, moon._dtMoonIntegrator === meanMoonOrbitsBetweenYears);
     note(`Earth precession tags intact: earth._dtCycleN === 13`, earth._dtCycleN === 13);
 
@@ -35109,7 +35025,6 @@ recomputeTimeUnitsForEpoch(0);
 recomputeDerivedAnchorsForEpoch(0);
 recomputeMoonAndAuForEpoch(0);
 recomputeMoonDerivedForEpoch(0);
-recomputePlanetCountsForEpoch(0);
 recomputePlanetCyclesForEpoch(0);
 updateAllObjectsForEpoch();
 requestAnimationFrame(render);
@@ -36563,11 +36478,11 @@ async function runYearAnalysisExport(years) {
   const _j2kLod   = meanLodSecondsAtAge(0);
   const _j2kTropS = meanTropicalYearSecondsAtAge(0);
   const _j2kSidS  = meanSiderealYearSecondsAtAge(0);
-  const _j2kH     = meanHAtAge(0);
   const _j2kTropD = _j2kTropS / _j2kLod;
   const _j2kSidD  = _j2kSidS  / _j2kLod;
-  // Same construction as recomputeEpochAnchors(): perihelionCycleLength = H/16.
-  const _j2kAnomD = (_j2kTropD / (_j2kH / 16 - 1)) + _j2kTropD;
+  // the J2000 anomalistic year is the law of date at 2000 (plan 09 step 4d; this
+  // report still carried the H/16 identity until step 5c)
+  const _j2kAnomD = _anomalisticYearJ2000Days();
   const _j2kAnomS = _j2kAnomD * _j2kLod;
   // Section 5 does the same for the Block 10 precession columns. Separate count:
   // a row with incomplete cardinal/apsidal events yields null precessions while
@@ -45890,10 +45805,10 @@ const planetStats = {
        hover : [`The Moon's phase cycle — new moon to new moon. Longer than the sidereal month because while the Moon orbits Earth, Earth also moves along its orbit around the Sun, so the Moon needs ~2.2 extra days each orbit to catch up to the same Sun-Moon alignment. Derived from the sidereal month: per anchor interval the Moon completes ${fmtNum(N_sid_J2000,3,',')} sidereal orbits (exactly ${fmtNum(8*N_sid_J2000,0,',')} per eight intervals). Synodic orbits = sidereal orbits + equinox turns − Earth years = ${fmtNum(N_sid_J2000+13-holisticyearLength,3,',')}: the Earth years (${fmtNum(holisticyearLength,0,',')}) subtract Earth's solar orbits (one fewer Moon–Sun alignment per Earth year); the equinox turns (one per axial precession period) add general precession. Period = ${fmtNum(holisticyearLength*meansolaryearlengthinDays,0,',')} / ${fmtNum(N_sid_J2000+13-holisticyearLength,3,',')} = ${fmtNum(moonSynodicMonth,10,',')} d. All derived from the 3 lunar month inputs (at J2000)`]},
       {label : () => `Anomalistic month`,
        value : [ { v: () => moonAnomalisticMonth, dec:10, sep:',' },{ small: 'days' }],
-       hover : [`Time between successive perigee passages — the closest point in the Moon's elliptical orbit around Earth. Slightly longer than the sidereal month because the perigee point itself slowly advances (apsidal precession, ~8.85 yr cycle), so the Moon needs a little extra time to reach the shifting perigee. In one anchor interval (${fmtNum(holisticyearLength*meansolaryearlengthinDays,0,',')} d), the Moon completes ${fmtNum(N_sid_J2000 - N_apsidalE_J2000,3,',')} anomalistic orbits (= N_sidereal − N_apsidal_Earth, kinematic identity; exactly ${fmtNum(8*(N_sid_J2000 - N_apsidalE_J2000),0,',')} per eight intervals). Period = ${fmtNum(holisticyearLength*meansolaryearlengthinDays,0,',')} / ${fmtNum(N_sid_J2000 - N_apsidalE_J2000,3,',')} = ${fmtNum(moonAnomalisticMonth,10,',')} d (at J2000)`]},
+       hover : [`Time between successive perigee passages — the closest point in the Moon's elliptical orbit around Earth. Slightly longer than the sidereal month because the perigee point itself slowly advances (apsidal precession, ~8.85 yr cycle), so the Moon needs a little extra time to reach the shifting perigee. Kinematic identity 1/T_anom = 1/T_sid − 1/T_apsidal,star (the perigee's star-referenced period ${fmtNum(moonApsidalPrecessionindaysEarth,4,',')} d): T_anom = ${fmtNum(moonAnomalisticMonth,10,',')} d (at J2000)`]},
       {label : () => `Draconic month (a.k.a. nodal period)`,
        value : [ { v: () => moonNodalMonth, dec:10, sep:',' },{ small: 'days' }],
-       hover : [`Time between successive crossings of the ascending node — where the Moon's orbit crosses the ecliptic plane going northward. Shorter than the sidereal month because the nodes slowly regress westward (nodal precession, ~18.6 yr cycle), so the Moon meets the retreating node a little sooner. Critical for predicting eclipses, which can only occur near the nodes. In one anchor interval (${fmtNum(holisticyearLength*meansolaryearlengthinDays,0,',')} d), the Moon completes ${fmtNum(N_sid_J2000 + N_nodalE_J2000,3,',')} draconic orbits (= N_sidereal + N_nodal_Earth, kinematic identity; exactly ${fmtNum(8*(N_sid_J2000 + N_nodalE_J2000),0,',')} per eight intervals). Period = ${fmtNum(holisticyearLength*meansolaryearlengthinDays,0,',')} / ${fmtNum(N_sid_J2000 + N_nodalE_J2000,3,',')} = ${fmtNum(moonNodalMonth,10,',')} d (at J2000)`]},
+       hover : [`Time between successive crossings of the ascending node — where the Moon's orbit crosses the ecliptic plane going northward. Shorter than the sidereal month because the nodes slowly regress westward (nodal precession, ~18.6 yr cycle), so the Moon meets the retreating node a little sooner. Critical for predicting eclipses, which can only occur near the nodes. Kinematic identity 1/T_drac = 1/T_sid + 1/T_nodal,star (the node's star-referenced period ${fmtNum(moonNodalPrecessionindaysEarth,4,',')} d): T_drac = ${fmtNum(moonNodalMonth,10,',')} d (at J2000)`]},
       {label : () => `Tropical month`,
        value : [ { v: () => moonTropicalMonth, dec:10, sep:',' },{ small: 'days' }],
        hover : [`Time for the Moon to return to the same ecliptic longitude, measured relative to the vernal equinox. Slightly shorter than the sidereal month because the vernal equinox slowly drifts westward due to axial precession, so the Moon reaches the same longitude a little sooner. Derived from the sidereal month: per anchor interval the Moon completes ${fmtNum(N_sid_J2000,3,',')} sidereal orbits (exactly ${fmtNum(8*N_sid_J2000,0,',')} per eight intervals). Tropical orbits = sidereal orbits + equinox turns = ${fmtNum(N_sid_J2000+13,3,',')}. The equinox turns account for general precession (one per axial precession period — the chain's calendar convention): the westward drift of the equinox adds one extra return to the same ecliptic longitude per precession period. Period = ${fmtNum(holisticyearLength*meansolaryearlengthinDays,0,',')} / ${fmtNum(N_sid_J2000+13,3,',')} = ${fmtNum(moonTropicalMonth,10,',')} d. All derived from the 3 lunar month inputs (at J2000)`],
@@ -51791,12 +51706,15 @@ function moveModel(pos) {
       }
     }
     if (DEEP_TIME_MODE_ENABLED && Number.isFinite(obj._dtCycleN)) {
+      // Plan 09 step 5c: the K-device wheels turn uniformly at their recorded
+      // J2000 rate (N per anchor unit) from their anchor — the pose the engine
+      // frame is placed over (R4); the ∫N/H_era counter is retired.
       const _dtAnchor = Number.isFinite(obj._dtCycleAnchor) ? obj._dtCycleAnchor : BALANCED_YEAR_J2000_FIXED;
-      let _dtCycles = cyclesBetweenYears(_dtAnchor, _currentYearSI, obj._dtCycleN);
+      let _dtCycles = obj._dtCycleN * (_currentYearSI - _dtAnchor) / HOLISTIC_YEAR_J2000;
       // Plan 07 R10: the J2000-anchored K-device wheels carry the device's
       // recorded J2000 wheel phase (N × kDeviceWheelPhaseAtJ2000Cycles).
-      if (_dtCycles !== null && !Number.isFinite(obj._dtCycleAnchor)) _dtCycles += obj._dtCycleN * kDeviceWheelPhaseAtJ2000Cycles;
-      θ = (_dtCycles !== null ? _dtCycles : 0) * 2 * Math.PI * obj._dtCycleSign;
+      if (!Number.isFinite(obj._dtCycleAnchor)) _dtCycles += obj._dtCycleN * kDeviceWheelPhaseAtJ2000Cycles;
+      θ = _dtCycles * 2 * Math.PI * obj._dtCycleSign;
     } else if (DEEP_TIME_MODE_ENABLED && obj._dtMoonIntegrator) {
       // Phase 9.13: Moon-chain integral form. Replaces snapshot
       // `obj.speed × pos` with ∫_anchor^currentYear n_moon(t) dt where
@@ -51883,20 +51801,10 @@ function moveModel(pos) {
       } else {
         e = typeof obj.eccentricity === 'number' ? obj.eccentricity : (o.eccentricityEarth || ASTRO_REFERENCE.eccentricityJ2000);
       }
-      // Phase 9.14: perihelionPrecessionRate × pos is the snapshot extrapolation
-      // of perihelion precession. For deep-time correctness over Myr scales
-      // (where H evolves), objects tagged with `_dtPerihelionDivisor` use
-      // the integral form via cyclesBetweenYears instead. Bit-equivalent to
-      // the snapshot at modern epochs.
-      let perihelionPhase;
-      if (DEEP_TIME_MODE_ENABLED && Number.isFinite(obj._dtPerihelionDivisor)) {
-        // Phase 9.15: uses STARTMODEL_YEAR_SI default + _currentYearSI from above.
-        const _pAnchor = Number.isFinite(obj._dtPerihelionAnchor) ? obj._dtPerihelionAnchor : STARTMODEL_YEAR_SI;
-        const _pCycles = cyclesBetweenYears(_pAnchor, _currentYearSI, obj._dtPerihelionDivisor);
-        perihelionPhase = obj.perihelionPhaseJ2000 + (_pCycles !== null ? _pCycles : 0) * 2 * Math.PI;
-      } else {
-        perihelionPhase = obj.perihelionPhaseJ2000 + (obj.perihelionPrecessionRate || 0) * pos;
-      }
+      // perihelionPrecessionRate × pos is the snapshot form of the perihelion
+      // phase. (Plan 09 step 5c: the `_dtPerihelionDivisor` branch — the
+      // Sun's H/16 counter — is deleted; the Sun's angle is the engine's, R4.)
+      const perihelionPhase = obj.perihelionPhaseJ2000 + (obj.perihelionPrecessionRate || 0) * pos;
       const M = θ - perihelionPhase;  // mean anomaly measured from current perihelion direction
       θ += 2 * e * Math.sin(M) + 1.25 * e * e * Math.sin(2 * M);
       obj._meanAnomaly = M; // Store for parallax correction (BR-CA terms)
@@ -52015,11 +51923,12 @@ function moveModel(pos) {
     // with the integral-form value.
     if (obj.rotationSpeed) {
       if (DEEP_TIME_MODE_ENABLED && Number.isFinite(obj._dtRotN)) {
-        // Phase 9.15: use SI tropical year for integrator input (NOT calendar).
+        // Phase 9.15: SI tropical year (NOT calendar). Plan 09 step 5c: the
+        // recorded J2000 rate from the J2000 pose (+ the device's J2000 wheel
+        // phase, plan 07 R10); the ∫N/H_era counter is retired.
         const _rotYearSI = _jdToSIyear(o.julianDay);
-        const _c = cyclesBetweenYears(BALANCED_YEAR_J2000_FIXED, _rotYearSI, obj._dtRotN);
-        const _dtCycles = _c === null ? null : _c + obj._dtRotN * kDeviceWheelPhaseAtJ2000Cycles;   // plan 07 R10: + the device's J2000 wheel phase
-        obj.planetObj.rotation.y = (_dtCycles !== null ? _dtCycles : 0) * 2 * Math.PI * obj._dtRotSign;
+        const _dtCycles = obj._dtRotN * (_rotYearSI - BALANCED_YEAR_J2000_FIXED) / HOLISTIC_YEAR_J2000 + obj._dtRotN * kDeviceWheelPhaseAtJ2000Cycles;
+        obj.planetObj.rotation.y = _dtCycles * 2 * Math.PI * obj._dtRotSign;
       } else {
         // Earth day-night spin uses the constant-J2000-rate model
         // (obj.rotationSpeed × pos), i.e. as if Earth had always spun at

@@ -18,10 +18,10 @@
  *    private helper, so both engines evaluate the same coordinate.
  *  - S9: ϖ/Ω composition order in the deep branch (wrapper-composed vs
  *    use-site subtraction) — one form now, the browser's.
- *  - S10: P_DEGCY was derived from the browser's MUTABLE holisticyearLength
- *    global (a latent epoch dependency in a J2000-frozen bundle) — it is
- *    built from the injected holisticYearJ2000 and has no consumers; kept
- *    as documentation of the frame decomposition.
+ *  - S10: P_DEGCY (the counter's 13/H general precession, no consumers) was
+ *    kept as documentation of the frame decomposition; it left with the
+ *    unit at plan 09 step 5c (the frame decomposition is WDOT = ϖ̇_ICRF + p,
+ *    NDOT = Ω̇_ICRF + p with p the IAU general precession).
  *
  * Construction (docs/66 §1, abridged): linear rates are observational J2000
  * anchors; perigee/node ride the PHASE-AWARE e_E channel integral (s_ϖ
@@ -74,12 +74,19 @@ function jdToDecimalYear(jd) {
  * @typedef {{Lp: number, D: number, M: number, Mp: number, F: number}} MoonArgsDeg
  */
 
+/** The secular-completion taper half-width, Julian years: the cos² envelope
+ *  inside which the chain's Meeus-measured rate anchors and the Lp secular
+ *  completion act (full at the anchor, zero beyond). A recorded window of the
+ *  completion, not a law — the anchors were measured with it (plan 09 step
+ *  5c: it was written as the era unit's twelfth, H/12, "lattice-derived";
+ *  the value is kept bit-identical and named for what it is). */
+const SECULAR_COMPLETION_TAPER_YEARS = 27943.083333333332;
+
 /**
  * @param {{
  *   constants: {
  *     j2000JD: number,
  *     julianCenturyDays: number,
- *     holisticYearJ2000: number,
  *     eccentricityJ2000: number,
  *     eccentricityDotJ2000: number,
  *     eccentricityDotDotJ2000: number,
@@ -122,7 +129,7 @@ function jdToDecimalYear(jd) {
  */
 function createMoonArguments({ constants, fns }) {
   const {
-    j2000JD, julianCenturyDays, holisticYearJ2000,
+    j2000JD, julianCenturyDays,
     eccentricityJ2000, eccentricityDotJ2000, eccentricityDotDotJ2000,
     elpEarthFigureJ2ArcsecPerCy2, elpGeneralPrecessionPA_T2ArcsecPerCy2,
     eccE0,
@@ -141,7 +148,6 @@ function createMoonArguments({ constants, fns }) {
           MP0 = 134.9633964, F0 = 93.2720950;
     const LPR = 481267.88123421, DR = 445267.1114034, MR = 35999.0502909,
           MPR = 477198.8675055, FR = 483202.0175233;
-    const P_DEGCY = 360 * 13 / holisticYearJ2000 * 100;   // framework general precession, deg/Julian cy (S10: J2000-frozen by injection; no consumers — documentation of the frame decomposition)
     const WDOT = LPR - MPR;   // perigee ϖ̇ of-date (+4069.0137) = ϖ̇_ICRF + p
     const NDOT = LPR - FR;    // node   Ω̇ of-date (−1934.1363) = Ω̇_ICRF + p
     // e_E channel Taylor CHECKS (documented J2000 reference values — the live
@@ -162,7 +168,7 @@ function createMoonArguments({ constants, fns }) {
     const T2_LP_TIDAL = (-25.86 / 3600) / 2;
     const T2_LP_PLANETARY = -0.0015786 - T2_LP_TIDAL;   // +7.247″/cy²
     const T2_LP = T2_LP_TIDAL + T2_LP_PLANETARY;
-    return { LP0, D0, M0, MP0, F0, LPR, DR, MR, P_DEGCY, WDOT, NDOT, T2_W, T2_N, T3_W, T3_N, T2_LP, T2_LP_TIDAL, S_W, S_N };
+    return { LP0, D0, M0, MP0, F0, LPR, DR, MR, WDOT, NDOT, T2_W, T2_N, T3_W, T3_N, T2_LP, T2_LP_TIDAL, S_W, S_N };
   })();
 
   // (Plan 09: the "Sun secular deviations" — closed-form integrals of the
@@ -240,9 +246,9 @@ function createMoonArguments({ constants, fns }) {
   // channel) through the same K_PL conversion: zero through T² by
   // construction (the certified T² normalization is untouched), < 0.001″
   // in the modern era, the derived tail across the eclipse corpus. The
-  // envelope is the H/3 quarter-period cos² taper (H/12 yr — lattice-
-  // derived, no new constant): the completion saturates there, so deep
-  // time keeps the pure H-lattice claim (no open polynomial). The
+  // envelope is the cos² taper of half-width SECULAR_COMPLETION_TAPER_YEARS
+  // (~27.9 kyr): the completion saturates there, so deep time carries no
+  // open polynomial. The
   // channel's own third-order content is not subtracted (ω³-suppressed,
   // negligible); the T⁴ secular remainder beyond the channel term stays a
   // documented deviation (D3: 40.8% derived; ≈ −7″ at −135).
@@ -260,7 +266,7 @@ function createMoonArguments({ constants, fns }) {
       /** @param {number} tCy */
       const e2 = (tCy) => { const e = eccAt(tCy * 100); return e * e; };
       const d2Ch = (e2(10) - 2 * e2(0) + e2(-10)) / 100;
-      secComp = { dd2: d2Sec - d2Ch, d3Sec, Tq: holisticYearJ2000 / 12 / 100 };
+      secComp = { dd2: d2Sec - d2Ch, d3Sec, Tq: SECULAR_COMPLETION_TAPER_YEARS / 100 };
     }
     const S = secComp;
     /** @param {number} t */
@@ -401,7 +407,7 @@ function createMoonArguments({ constants, fns }) {
       om: B.NDOT * k - (b.om - a.om) / span,
       Lsun: (B.LPR - B.DR) * k - (b.Lsun - a.Lsun) / span,
       ws: (B.LPR - B.DR - B.MR) * k - w180(b.ws - a.ws) / span,   // ws is wrapped; ±25 days of perihelion motion is far inside ±180°
-      Tq: holisticYearJ2000 / 12,
+      Tq: SECULAR_COMPLETION_TAPER_YEARS,
     };
     return rcAnchors;
   }

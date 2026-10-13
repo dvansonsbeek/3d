@@ -136,7 +136,7 @@ One-shot utilities that prepare data for the in-app modals. Outputs are committe
 
 ## Utilities
 
-`test_phase0_inline.js` — validates the deep-time chain's cumulative-integral implementation against its own mirrored copies.
+(`test_phase0_inline.js`, the deep-time chain's cumulative-integral validator against its own mirrored copies, left with the era device's counters at plan 09 step 5c.)
 
 ---
 

@@ -61,7 +61,7 @@ const { moonSeriesExtensionDeg } = require('./series-extension.cjs');
  *     jdToSIyear: (jd: number) => number,
  *     tropicalOrbitsBetween: (yearA: number, yearB: number) => (number | null),
  *     apsidalOfDateCyclesBetween: (yearA: number, yearB: number) => (number | null),
- *     cyclesBetween: (yearA: number, yearB: number, divisorN: number) => (number | null),
+ *     siderealOrbitsBetween: (yearA: number, yearB: number) => (number | null),
  *     jupiterOrbitsBetween: (yearA: number, yearB: number) => (number | null),
  *     isDeepTime: () => boolean,
  *     isFrameworkNative: () => boolean,
@@ -80,7 +80,7 @@ function createMoonSeries({ constants, fns }) {
   const {
     argsAt, eFactorForD, eFactorAtJdTT, getMoonDistanceKm, getEccentricityBase, deltaTSeconds,
     jdToSIyear, tropicalOrbitsBetween, apsidalOfDateCyclesBetween,
-    cyclesBetween, jupiterOrbitsBetween, isDeepTime, isFrameworkNative,
+    siderealOrbitsBetween, jupiterOrbitsBetween, isDeepTime, isFrameworkNative,
   } = fns;
 
   const D2R = Math.PI / 180;
@@ -97,10 +97,14 @@ function createMoonSeries({ constants, fns }) {
       const yA = jdToSIyear(j2000JD + dDaysTT);
       const nT = tropicalOrbitsBetween(yA0, yA);
       const nAps = apsidalOfDateCyclesBetween(yA0, yA);
-      const nP13 = cyclesBetween(yA0, yA, 13);
+      // A3 is the STAR-referenced lunar longitude (Meeus' rate 481,266.484 °/cy
+      // ≡ 360°/sidereal month): the chain's sidereal-orbit count directly.
+      // Plan 09 step 5c — it was the tropical count minus the counter's 13/H
+      // precession turns (0.086 % slow on the precession).
+      const nSid = siderealOrbitsBetween(yA0, yA);
       const nJ = jupiterOrbitsBetween(yA0, yA);
-      if (nT !== null && nAps !== null && nP13 !== null && nJ !== null) {
-        a3Deg = 313.45 + 360 * (nT - nP13);
+      if (nT !== null && nAps !== null && nSid !== null && nJ !== null) {
+        a3Deg = 313.45 + 360 * nSid;
         a2Deg = 53.09 + 360 * (nT + nAps - 2 * nJ);
       }
     }

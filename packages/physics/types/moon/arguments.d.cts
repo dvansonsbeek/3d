@@ -6,14 +6,10 @@ export type MoonArgsDeg = {
     F: number;
 };
 /**
- * @typedef {{Lp: number, D: number, M: number, Mp: number, F: number}} MoonArgsDeg
- */
-/**
  * @param {{
  *   constants: {
  *     j2000JD: number,
  *     julianCenturyDays: number,
- *     holisticYearJ2000: number,
  *     eccentricityJ2000: number,
  *     eccentricityDotJ2000: number,
  *     eccentricityDotDotJ2000: number,
@@ -58,7 +54,6 @@ export function createMoonArguments({ constants, fns }: {
     constants: {
         j2000JD: number;
         julianCenturyDays: number;
-        holisticYearJ2000: number;
         eccentricityJ2000: number;
         eccentricityDotJ2000: number;
         eccentricityDotDotJ2000: number;
@@ -98,7 +93,6 @@ export function createMoonArguments({ constants, fns }: {
         LPR: number;
         DR: number;
         MR: number;
-        P_DEGCY: number;
         WDOT: number;
         NDOT: number;
         T2_W: number;

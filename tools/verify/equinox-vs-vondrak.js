@@ -87,7 +87,7 @@ if (!movement) { console.error('REFUSING: data/nbody-secular-series.json is abse
 const seriesArt = JSON.parse(fs.readFileSync(path.join(ROOT, 'data', 'nbody-secular-series.json'), 'utf8'));
 const ART = JSON.parse(fs.readFileSync(path.join(ROOT, 'data', 'nbody-deep-secular-modes.json'), 'utf8'));
 const AE = CHAIN_ARTIFACT.j2000AnchorElements.earth, eb = seriesArt.bodies.earth;
-const axial0 = DT.certifiedAxialPrecessionJ2000Years(), H0 = DT.meanHAtAge(0);   // plan 09: the IAU p_A anchor (was the retired year combs' beat at 2000)
+const axial0 = DT.certifiedAxialPrecessionJ2000Years();   // plan 09: the IAU p_A anchor (was the retired year combs' beat at 2000)
 const factory = (deps) => createDeepOrbitalHistory({
   zModes: ART.modes.earth.z, zetaModes: ART.modes.earth.zeta,
   zetaSeries: { t0Yr: seriesArt.t0Yr, stepYr: eb.stepYr, q: eb.zetaQ, p: eb.zetaP },
@@ -95,7 +95,7 @@ const factory = (deps) => createDeepOrbitalHistory({
   anchorE: AE.e, anchorPeriEclipticDeg: AE.lonPeriEclipticDeg,
   anchorInclEclipticDeg: AE.inclEclipticDeg, anchorAscNodeEclipticDeg: AE.ascNodeEclipticDeg,
   axialPrecessionYearsJ2000: axial0, obliquityJ2000Deg: C.ASTRO_REFERENCE.obliquityJ2000_deg,
-  axialPrecessionYearsAtYearFn: (yr) => axial0 * DT.meanHAtAge((2000 - yr) / 1e6) / H0,
+  axialPrecessionYearsAtYearFn: (yr) => DT.meanLunisolarPrecessionPeriodYearsAtAge((2000 - yr) / 1e6) ?? axial0,   // plan 09 step 5c: T_p(t) directly (was axial0·H(t)/H₀, the same to 2e-16)
   ...deps,
 });
 const SOLAR = { solarTorqueShareJ2000: DT.PRECESSION_SOLAR_SHARE_J2000 };

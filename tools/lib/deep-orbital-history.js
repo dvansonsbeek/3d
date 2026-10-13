@@ -78,7 +78,6 @@ function createOneSourceMovement() {
 
   const AE = CHAIN_ARTIFACT.j2000AnchorElements.earth;
   const axial0 = DT.certifiedAxialPrecessionJ2000Years();   // plan 09: the IAU p_A anchor
-  const H0 = DT.meanHAtAge(0);
   const eb = seriesArt.bodies.earth;
 
   const tier = factory({
@@ -92,11 +91,12 @@ function createOneSourceMovement() {
     anchorAscNodeEclipticDeg: AE.ascNodeEclipticDeg,
     axialPrecessionYearsJ2000: axial0,
     obliquityJ2000Deg: C.ASTRO_REFERENCE.obliquityJ2000_deg,
-    // D6 → Phase 3 (plan 06): period₀·H(t)/H₀ on the UNIT H(t) = 13·T_p,
-    // composed (spin × [solar + lunar torque on the recession history]) —
-    // NOT the frozen era clock's H_era. Twins: packages/physics model.js and
-    // src/script.js _deepHistSeries.
-    axialPrecessionYearsAtYearFn: (yr) => axial0 * DT.meanHAtAge((2000 - yr) / 1e6) / H0,
+    // D6 → Phase 3 (plan 06): the composed lunisolar precession period of
+    // date T_p(t) (spin × [solar + lunar torque on the recession history]),
+    // read directly since plan 09 step 5c (was period₀·H(t)/H₀ on the unit —
+    // the same number to 2e-16) — NOT the frozen era clock's H_era. Twins:
+    // packages/physics model.js and src/script.js _deepHistSeries.
+    axialPrecessionYearsAtYearFn: (yr) => DT.meanLunisolarPrecessionPeriodYearsAtAge((2000 - yr) / 1e6) ?? axial0,
     // THE PRECESSION OF DATE (plan 06 §9 item 10): the solar torque at the
     // eccentricity of date and the oblateness of date from the GIA channel —
     // both exactly 1 at J2000. Twins: packages/physics model.js and

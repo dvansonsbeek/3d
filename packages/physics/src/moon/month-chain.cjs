@@ -11,7 +11,7 @@
  *        ▼                                              ▼
  *   (engine LOD layer, injected)              Kepler sidereal month
  *                                              ├─► synodic month (beat with sidereal year)
- *                                              ├─► tropical month (H/13 identity)
+ *                                              ├─► tropical month (one equinox turn per T_p(t))
  *                                              └─► perigee/node precession
  *                                                  (Brouwer–Clemence m² scaling ×
  *                                                   e_E-channel modulation — the
@@ -31,9 +31,12 @@
  *  - `modulation` is the shared moon eccentricity channel's [g/g₀]^s with the
  *    Meeus-EFFECTIVE sensitivities s_ϖ = 2.407 / s_Ω = 1.018 (the physical
  *    pair is 2.479/0.867 after removing the IAU frame term — doc 66 §1).
- *  - The 'OfDate' cycle/precession family carries the legacy-'ICRF' input
- *    names but holds OF-DATE observational anchors (Option C+); the
- *    star-referenced values differ by ∓13 counts per H.
+ *  - The of-date perigee/node periods are COMPOSITIONS of the inertial chain
+ *    with the precession of date (the engines' `…OfDateCyclesBetween` count
+ *    identities N_trop − N_anom and N_drac − N_trop). The former 'OfDate'
+ *    family here — N·(H(t)/H₀)² counts per anchor unit and period ∝ T_yr/H —
+ *    was the era device's counter law (doc 99's "Lunar Precession
+ *    Invariant"); it left at plan 09 step 5c with the per-H counts.
  *  - apsidalMeetsNodal / lunarLeveling existed ONLY in the browser before
  *    this move (the Node scene aliased apsidal-of-date on a cancellation
  *    argument valid for the paired scene nodes only) — the Node engine gains
@@ -52,14 +55,9 @@
  *     gmEarthMoonM3PerS2: number,
  *     massRatioEarthMoon: number,
  *     moonSiderealMonthInputDays: number,
- *     holisticYearJ2000: number,
  *     meanSiderealYearJ2000Seconds: number,
- *     nApsidalOfDateJ2000: number,
- *     nNodalOfDateJ2000: number,
  *     moonApsidalJ2000Seconds: number,
  *     moonNodalJ2000Seconds: number,
- *     moonApsidalOfDateJ2000Seconds: number,
- *     moonNodalOfDateJ2000Seconds: number,
  *     moonSiderealMonthJ2000Seconds: number,
  *     sPerigee: number,
  *     sNode: number,
@@ -67,13 +65,18 @@
  *   fns: {
  *     meanLodSecondsAtAge: (tMa: number) => (number | null),
  *     meanSiderealYearSecondsAtAge: (tMa: number) => number,
- *     meanHAtAge: (tMa: number) => (number | null),
+ *     precessionPeriodYearsAtAge: (tMa: number) => (number | null),
  *     modulation: (tMa: number, s: number) => number,
  *     distanceMetresAtAge?: (tMa: number) => number,
  *   },
  * }} deps — fns are the ENGINE'S OWN layer-0/1 evaluators and the shared
  *   eccentricity channel's modulation; constants are the engine's derived
  *   J2000 anchors (both engines derive them from the same JSON).
+ *   fns.precessionPeriodYearsAtAge is the engine's lunisolar precession period
+ *   of date T_p(t), Julian years (the composed rate's period; plan 09 step
+ *   5c — the tropical month's equinox turn, formerly the counter's 13/H(t),
+ *   0.086 % slow: the chain's J2000 tropical month sat 5.85 ms above the IAU
+ *   input, the 1/T_p form is within 0.1 ms of it).
  *   fns.distanceMetresAtAge, when present, OVERRIDES the internal quartic —
  *   the Driver-1½ regime-aware history (recession-history.cjs); absent, the
  *   internal quartic is the pure twin (bit-identical for t ≤ jointMa).
@@ -82,14 +85,12 @@ function createMoonMonthChain({ constants, fns }) {
   const {
     aMoonNowMetres, alpha1PerMa, alpha3PerMa3, alpha4PerMa4,
     gmEarthMoonM3PerS2, massRatioEarthMoon, moonSiderealMonthInputDays,
-    holisticYearJ2000, meanSiderealYearJ2000Seconds,
-    nApsidalOfDateJ2000, nNodalOfDateJ2000,
+    meanSiderealYearJ2000Seconds,
     moonApsidalJ2000Seconds, moonNodalJ2000Seconds,
-    moonApsidalOfDateJ2000Seconds, moonNodalOfDateJ2000Seconds,
     moonSiderealMonthJ2000Seconds,
     sPerigee, sNode,
   } = constants;
-  const { meanLodSecondsAtAge, meanSiderealYearSecondsAtAge, meanHAtAge, modulation } = fns;
+  const { meanLodSecondsAtAge, meanSiderealYearSecondsAtAge, precessionPeriodYearsAtAge, modulation } = fns;
 
   /** Farhat α₁/α₃/α₄ polynomial — Earth–Moon distance in metres at age t_Ma.
    *  @param {number} tMa @returns {number} */
@@ -140,55 +141,22 @@ function createMoonMonthChain({ constants, fns }) {
     return tSm * tYr / (tYr - tSm);
   }
 
-  /** Tropical month in seconds (equinox-referenced, the H/13 identity).
-   *  @param {number} tMa @returns {number | null} */
+  /** Tropical month in seconds (equinox-referenced): the sidereal month less
+   *  the equinox's own motion over one month — one turn per the precession
+   *  period of date T_p(t). (Plan 09 step 5c: formerly 13 turns per the
+   *  counter H(t), 0.086 % slow.) @param {number} tMa @returns {number | null} */
   function tropicalMonthSecondsAtAge(tMa) {
     const tSm = siderealMonthSecondsAtAge(tMa);
     if (tSm === null) return null;
     const tYr = meanSiderealYearSecondsAtAge(tMa);
-    const hT = meanHAtAge(tMa);
-    return tSm * (1 - 13 * tSm / (/** @type {number} */ (hT) * tYr));
+    const tP = precessionPeriodYearsAtAge(tMa);
+    return tSm * (1 - tSm / (/** @type {number} */ (tP) * tYr));
   }
 
-  /** Apsidal cycles per H (of-date convention; legacy-'ICRF' input name):
-   *  N × (H/H₀)², real-valued. @param {number} tMa @returns {number | null} */
-  function apsidalCyclesOfDateAtAge(tMa) {
-    const hT = meanHAtAge(tMa);
-    if (hT === null) return null;
-    return nApsidalOfDateJ2000 * Math.pow(hT / holisticYearJ2000, 2);
-  }
-
-  /** @param {number} tMa @returns {number | null} */
-  function nodalCyclesOfDateAtAge(tMa) {
-    const hT = meanHAtAge(tMa);
-    if (hT === null) return null;
-    return nNodalOfDateJ2000 * Math.pow(hT / holisticYearJ2000, 2);
-  }
-
-  /** The of-date period from the H² counter: N ∝ H² and period = H·T_yr/N
-   *  ⇒ period ∝ T_yr / H, anchored on the engine's own of-date J2000 period
-   *  (the t_Ma === 0 fast path returns it EXACTLY, as the star-referenced
-   *  anchors do). UNIT FIX: the earlier form rebuilt the period as
-   *  H × sidereal-year seconds / N while N was counted in mean-SOLAR-year
-   *  days — the sidereal/solar ratio 1.0000388 put the J2000 perigee cycle
-   *  2.9 h and the node 6.2 h above the anchors (found by the Formula
-   *  Verification Moon panels against Meeus). The year RATIO carries the
-   *  evolution; the anchor carries the unit. @param {number} tMa
-   *  @returns {number | null} */
-  function apsidalPrecessionSecondsOfDateAtAge(tMa) {
-    if (tMa === 0) return moonApsidalOfDateJ2000Seconds;
-    const hT = meanHAtAge(tMa);
-    if (hT === null) return null;
-    return moonApsidalOfDateJ2000Seconds * (meanSiderealYearSecondsAtAge(tMa) / meanSiderealYearJ2000Seconds) * (holisticYearJ2000 / hT);
-  }
-
-  /** @param {number} tMa @returns {number | null} */
-  function nodalPrecessionSecondsOfDateAtAge(tMa) {
-    if (tMa === 0) return moonNodalOfDateJ2000Seconds;
-    const hT = meanHAtAge(tMa);
-    if (hT === null) return null;
-    return moonNodalOfDateJ2000Seconds * (meanSiderealYearSecondsAtAge(tMa) / meanSiderealYearJ2000Seconds) * (holisticYearJ2000 / hT);
-  }
+  // (Plan 09 step 5c: the H² of-date family — apsidal/nodal "cycles per H"
+  // N·(H(t)/H₀)² and the of-date periods ∝ T_yr/H — is deleted with the per-H
+  // counts. The of-date perigee and node of date are the engines' count
+  // compositions of this chain's inertial periods with the tropical month.)
 
   /** Perigee precession period in seconds — Brouwer–Clemence m² scaling ×
    *  e_E-channel modulation (the factored law: period = invariant mean /
@@ -256,8 +224,6 @@ function createMoonMonthChain({ constants, fns }) {
     distanceMetresAtAge, distanceKmAtAge, solarDeltaAKmAtAge,
     distanceCorrectedKmAtAge, siderealMonthSecondsAtAge,
     synodicMonthSecondsAtAge, tropicalMonthSecondsAtAge,
-    apsidalCyclesOfDateAtAge, nodalCyclesOfDateAtAge,
-    apsidalPrecessionSecondsOfDateAtAge, nodalPrecessionSecondsOfDateAtAge,
     perigeePrecessionSecondsAtAge, nodePrecessionSecondsAtAge,
     anomalisticMonthSecondsAtAge, nodalMonthSecondsAtAge,
     apsidalMeetsNodalSecondsAtAge, lunarLevelingSecondsAtAge,

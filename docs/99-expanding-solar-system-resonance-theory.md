@@ -405,52 +405,56 @@ This is a clean device near-identity equivalent to "TOTAL_DAYS_IN_H = H₀ × <!
 | Hadean (4 Gyr) | ~122,368,520 | **−844 ppm** |
 | Earth-Moon genesis (~4.498 Gyr) | ~122,349,690 | **−998 ppm** |
 
-## The Lunar Precession Invariant
+## The Lunar Precession Invariant (retired)
 
-A second invariant falls out of the framework, this time governing the Moon's apsidal and nodal precession: **the count of apsidal (and nodal) cycles per H scales as H², so the precession period (in years) times H is structurally constant across all epochs.**
+Until plan 09 step 5c the model carried a "Lunar Precession Invariant": the
+count of the Moon's apsidal and nodal cycles per anchor unit was asserted to
+scale as the unit squared, N(t) = N₀·(H(t)/H₀)², so that the of-date
+precession periods times the unit — T_apsidal × H and T_nodal × H, in years —
+were constant at every epoch (2,966,767 yr² and 6,241,326 yr² on the J2000
+anchors). **It is retired as a device law, not a dynamical result.** The
+scaling was the counter's definition: the unit scales with the precession
+period, and a count declared to grow as H² adds nothing the inertial chain and
+the precession of date do not already state. It was also a SECOND law for the
+same quantity — the chain carried its own inertial perigee/node periods, and
+the H² of-date periods were not their composition with the equinox's motion,
+although the J2000 anchors are exactly that composition (1/T_of-date =
+1/T_inertial ± 1/T_p; `moonApsidalJ2000Seconds` in model.js). Measured at the
+retirement, the two laws parted at deep time: the of-date perigee period read
+9.689 yr under the H² law against 9.381 yr from the composed chain in the
+Devonian (−380 Ma), and 11.22 against 10.46 yr at −1 Gyr.
+
+What stands is the inertial chain and its composition with the precession of
+date:
+
+- **the inertial perigee and node periods of date** — Brown's leading m²
+  scaling in its Brouwer–Clemence period form T ∝ T_yr²/T_sm, the J2000
+  magnitude anchored on the observed periods (the Newton–Clairaut problem:
+  leading order alone gives ~17.8 yr for the perigee against the observed
+  8.85, Clairaut's m³ and higher terms doubling the rate), times the
+  e_E-channel modulation below — `meanLunarPerigeePrecessionAtAge` /
+  `meanLunarNodePrecessionAtAge`, the factored law period = invariant mean /
+  rate modulation; the seconds-frame derivation is in
+  [Moon-Kepler Derivation](24-moon-kepler-derivation.md);
+- **the of-date perigee and node** — the count compositions N_trop − N_anom
+  and N_drac − N_trop of the chain's months
+  (`meanMoonApsidalOfDateCyclesBetween`, `meanMoonNodalOfDateCyclesBetween`):
+  the inertial periods composed with one equinox turn per T_p(t), the same
+  relation the J2000 anchors are built from (star-referenced 8.8507 /
+  18.5994 yr from the of-date 8.848 /
+  <!--v:moonNodalPeriodYr-->18.613<!--/v--> yr);
+- **the tropical month** — the sidereal month less one equinox turn per
+  T_p(t). It read 13 turns per the counter H(t): the unit is 13.011
+  precession periods, so the equinox term ran 0.086 % slow and the chain's
+  J2000 tropical month sat 5.85 ms above the IAU input; on T_p(t) it is within
+  0.1 ms of it.
+
+**The factored deep-time law.** The inertial chain's Brown-m² mean governs
+the MEAN rate; the solar-perturbation strength modulates around it with
+Earth's eccentricity:
 
 ```
-T_apsidal × H = const   (apsidal — perigee advance, of-date frame, in years)
-T_nodal   × H = const   (nodal   — node regression, of-date frame, in years)
-
-Equivalently:
-N_apsidal(t) = N_apsidal,J2000 × (H(t)/H₀)²
-N_nodal(t)   = N_nodal,J2000   × (H(t)/H₀)²
-```
-
-where `N_apsidal` and `N_nodal` are the number of full lunar apsidal / nodal cycles per H cycle in the of-date (equinox-of-date) frame, and `H₀` is the J2000 anchor value of H.
-
-**J2000 anchors and derived invariant value:**
-```
-Framework structural:    H₀ = 335,317 yr    (= 23 × 61 × 239)
-Observed (Meeus/IERS):   T_apsidal,J2000 ≈ 8.848 yr,  T_nodal,J2000 ≈ 18.613 yr
-Integer cycle counts:    N_apsidal = 37,899,  N_nodal = 18,015
-                         (= round(H₀ / T_observed); anchored in src/script.js,
-                          verified in tools/explore/audit-moon-months.js)
-
-J2000-anchored invariant value (held exact at every epoch by construction):
-    T_apsidal × H = H₀² / N_apsidal = 335,317² / 37,899 = 2,966,767 yr²
-    T_nodal   × H = H₀² / N_nodal   = 335,317² / 18,015 = 6,241,326 yr²
-```
-
-The VALUE 2,966,767 yr² is **empirically anchored** (one structural H, one observed T_apsidal); it is *not* a structurally-derived integer. What is structural is the **claim** that this value is preserved at every epoch — the framework's `N(t) = N₀ × (H/H₀)²` scaling.
-
-**Frame convention (of-date vs star-referenced bookkeeping).** The J2000 anchor values
-above (8.848 yr / <!--v:moonNodalPeriodYr-->18.613<!--/v--> yr) are the OF-DATE (equinox-of-date) periods — the
-Meeus/IERS observables. The star-referenced periods differ by the general
-precession p = 360°/(H/13): apsidal 8.8507 yr, nodal 18.5994 yr (counts per H
-differ by exactly ∓13: `N_apsidalE = N_apsidalI − 13`,
-`N_nodalE = N_nodalI + 13` in src/script.js). Because p itself scales as
-1/(H/13), BOTH frames' products T × H are preserved under the framework's
-(H/H₀)² count scaling — the invariant holds in either frame with
-frame-specific constants; the constants quoted above are the of-date pair.
-
-**The factored deep-time law.** The invariant governs the MEAN
-rate; the solar-perturbation strength modulates around it with Earth's
-eccentricity:
-
-```
-rate(t) = [invariant mean from H(t)] × [g(t)/g₀]^s,   g = (1 − e_E²)^(−3/2)
+rate(t) = [Brown-m² mean of the inertial chain] × [g(t)/g₀]^s,   g = (1 − e_E²)^(−3/2)
 ```
 
 with s_Ω = 1.018 (derived — the leading-order value 1 already reproduces
@@ -468,69 +472,29 @@ inputs base/anchor angle/H only; the observed J2000 eccentricity
 (−0.9%) and its rate (+1.7%) are predictions (derivation record and
 experiment log: doc 66 §1). The modulation is bounded at every epoch
 (e ∈ [0.0077, 0.0231]: perigee within ±0.1%, node within ±0.04%), so the
-T × H product is preserved exactly as the law of the mean — while Meeus's
-empirical T² polynomial, correct locally, diverges without bound at deep
-time. (The earlier Laskar-band composite formulation is superseded and
-retained in code for A/B research only.) Implemented in the deep-time chain
-(`meanLunarPerigeePrecessionAtAge` / `meanLunarNodePrecessionAtAge` carry
-the full factored law; the N-form functions carry the pure invariant
-mean). This dissolves the historical "Brown m² wrong sign" tension: the
-invariant answers the mean-trend question while the observed present-day
-perigee deceleration (Meeus's +T² on M′) is the oscillation phase of the
-e_E channel — two channels, both real, different clocks.
-
-### Where it comes from
-
-Brown's leading m² lunar perturbation theory gives the apsidal (and analogously nodal) rate as proportional to m² × n_Moon, where m = n_Sun / n_Moon ≈ 1/13.37 is the ratio of solar to lunar mean motion:
-
-```
-ω̇_apsidal ∝ m² × n_Moon   →   T_apsidal ∝ T_sm / m² ∝ T_yr² / T_sm
-(Brown m² scaling, leading order — equivalent Brouwer-Clemence period form)
-```
-
-This sets the **scaling form**; it does not by itself fix the magnitude. Brown m² leading order alone gives T_apsidal ≈ 17.8 yr — roughly double the observed 8.85 yr. This is the historical **Newton-Clairaut problem**: Newton's leading m² calculation in the *Principia* (1687) gave half the observed perigee rate, leading him to briefly doubt his gravitational theory. Clairaut showed in 1749 that the m³ and higher terms in the expansion approximately double the rate to recover the observed value. The framework therefore anchors the J2000 *magnitude* from observation and adopts the H² *scaling form* (consistent with Brown m² leading order) to propagate to deep time, with no polynomial corrections.
-
-**Aligning, not replacing.** The Lunar Precession Invariant does not compete with Brown's lunar theory but sharpens it: the m²-leading-order scaling is adopted as a structural law, with the J2000 magnitude anchored from observation and propagated to deep time without polynomial corrections. Where Brown's expansion derives the absolute period from the underlying m-series, ESSRT treats the period as one anchored input and the (H/H₀)² evolution as the structural claim — the two views agree on the scaling form by construction.
-
-Under Driver 1, the Moon recedes; angular-momentum conservation simultaneously slows Earth's spin (LOD grows), which propagates into a proportional growth of the frozen era clock's counter H_era = H₀·LOD/LOD₀ (the lunar chain rides that device counter, plan 06 D8). T_sm and H thus co-evolve, and in the cycles-per-H formulation `N_apsidal(t) = N₀ × (H/H₀)²` (of-date-anchored; see the frame-convention note above) the product T_apsidal × H is held exact by construction.
-
-### Why it is structurally **exact** under Driver 1 (in year-units)
-
-Unlike the day-count near-invariant (`H × days/yr`), which drifts at deep time because tropical year_s evolves slowly under Driver 2 (solar mass loss), the Lunar Precession Invariant in its year-frame form (`T_apsidal_in_years × H_in_years`) is **structurally exact under Driver 1 alone** — the relation does not involve seconds, so Driver 2's effect on year_s is absent. It is therefore preserved at every epoch the framework spans, by construction in the deep-time chain:
-
-| Age (Ma) | H (yr) | N_apsidal (cyc/H) | T_apsidal (yr) | T_apsidal × H (yr²) | Drift vs J2000 |
-|---:|---:|---:|---:|---:|---:|
-| **+200** | <!--v:hAt200MyrFuture-->367,019<!--/v--> | 41,906.581 | 8.413963 | 2,966,767 | 0 ppm |
-| **+100** | 343,747 | 39,828.432 | 8.630682 | 2,966,767 | 0 ppm |
-| **0** (anchor) | **<!--v:H-->335,317<!--/v-->** | **37,899.000** | **8.847648** | **2,966,767** | **0 ppm** |
-| −100 | 327,253 | 36,098.035 | 9.065670 | 2,966,767 | 0 ppm |
-| −380 (Devonian) | <!--v:hAtDevonian-->282,329<!--/v--> | 31,600.718 | 9.689318 | 2,966,767 | 0 ppm |
-| −500 | 297,687 | 29,870.094 | 9.966058 | 2,966,767 | 0 ppm |
-| −1000 | 264,346 | 23,553.793 | 11.223060 | 2,966,767 | 0 ppm |
-| −2500 | 237,173 | 18,960.350 | 12.508880 | 2,966,767 | 0 ppm |
-
-The `T_apsidal × H` column is the **J2000-anchored value 2,966,767 yr²** (exact: H₀² / N_apsidal,J2000 = 2,966,766.68 yr²), held constant by the framework's `(H/H₀)²` scaling. N is real-valued (not rounded to integer except at the J2000 anchor). Both H (integer) and T_apsidal (6 decimals) are display-rounded, so the hand-reproduction `T × H ≈ 2,966,767` is accurate to within ±10 yr² (well below the displayed precision). Same pattern for nodal: `T_nodal × H = H₀² / N_nodal,J2000 = 6,241,326 yr²` at every age.
-
-### Physical interpretation
-
-The Moon's apsidal and nodal periods are not static anchors — they depend on Earth's spin rate and the Moon's orbit through Brown's m² perturbation physics. The framework sharpens this into a strict scaling claim: the precession period and H co-evolve such that their product is preserved.
-
-A modern observer sees the Moon's perigee advance once every ~8.85 yr; a Devonian observer would have seen it advance once every ~9.60 yr (slower because H was smaller and the Moon was closer). But measured in the framework's natural time unit, both observers count `N₀ × (H/H₀)²` lunar precession cycles per H — the same structural ratio at every epoch.
-
-> 📊 **Relation to the seconds-frame perigee/node precession.** The table above gives the of-date-anchored, year-units invariant (see the frame-convention note above — the anchors are equinox-of-date observables). The star-referenced precession periods (in seconds) used by the lunar engine — `meanLunarPerigeePrecessionAtAge(t)` and `meanLunarNodePrecessionAtAge(t)` — are computed via the equivalent Brouwer-Clemence form `T_per ∝ T_yr² / T_sm`, which folds in the year-length drift from Driver 2 (since T_yr is in seconds). The two formulations agree to <100 ppm across the Phanerozoic; the year-units form is the structurally exact statement, the seconds form is the working formula used by the lunar engine.
+mean is the law and the modulation a bounded oscillation about it — while
+Meeus's empirical T² polynomial, correct locally, diverges without bound at
+deep time. (The earlier Laskar-band composite formulation is superseded and
+retained in code for A/B research only.) This dissolves the historical
+"Brown m² wrong sign" tension: the mean answers the mean-trend question
+while the observed present-day perigee deceleration (Meeus's +T² on M′) is
+the oscillation phase of the e_E channel — two channels, both real,
+different clocks.
 
 ### Position in the framework taxonomy
 
-This is the third member of the framework's family of **deep-time invariants** — relations that are preserved across epochs under the drivers, distinct from the J2000 readings (the retired integer identities at the anchor epoch). H below is the model's internal unit (identifier `hAtAge`; it scales with the composed precession period), H_era the frozen era clock's counter:
+The framework's family of **deep-time invariants** — relations preserved
+across epochs under the drivers, distinct from the J2000 readings (the
+retired integer identities at the anchor epoch). H_era is the frozen era
+clock's counter (the unit H, identifier `hAtAge`, scales with the composed
+precession period):
 
 | Invariant | Form | Governed by | Drift at Hadean |
 |:---|:---|:---|---:|
 | Day-count near-invariant | `H_era × days/yr ≈ TOTAL_DAYS_IN_H` (<!--v:totalDaysInH-->122,471,916<!--/v--> at J2000 anchor) | Driver 1 + Driver 2 | ~−850 ppm (Driver 2 residual) |
 | Day-count invariant, exact form | `H_era × (sidYear_s/LOD) × (AU₀/AU)² = TOTAL_DAYS_IN_H × H₀/(H₀−13)` | Drivers 1+2 composed (Kepler ∘ H_era∝LOD; H_era the frozen era clock's counter — the unit H carries the lunar-torque factor, plan 06 Phase 3) | 0 ppm (algebraic identity) |
 | Planetary adiabatic invariant | `a × M_Sun = const` (per planet) | Driver 2 | 0 ppm (definitional) |
-| **Lunar Precession Invariant** | **`T_apsidal × H = const`, `T_nodal × H = const`** | **Driver 1 + Brown m²** | **0 ppm (structural)** |
-
-Cross-references: deep-time implementation in `src/script.js` (`meanApsidalCyclesICRFAtAge`, `meanNodalCyclesICRFAtAge` — legacy names; of-date convention) and `tools/lib/deep-time.js`; anchor verification in `tools/explore/audit-moon-months.js`; seconds-frame Brouwer-Clemence scaling in [Moon-Kepler Derivation](24-moon-kepler-derivation.md).
+| Lunar precession invariant | `T_apsidal × H = const`, `T_nodal × H = const` | RETIRED (plan 09 step 5c) — the counter's definition, not dynamics; the of-date periods are the inertial chain composed with T_p(t) | — |
 
 ## The cardinal-point braid law — one rotating vector, including its spectrum
 

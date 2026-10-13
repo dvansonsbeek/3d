@@ -70,7 +70,7 @@ mean element) — the reason the first row below shows two e's at 2000.
 | 5 | Meeus E-factor, bounded | E(t) = e(t)/e₀ (≡ 1 at J2000); replaces 1 − 0.002516T − 0.0000074T²; every series term carrying M is multiplied by E, terms with 2M by E² | step 1 | `model.js` 936; `series.cjs` 180–181 |
 | 6 | the L′ planetary carrier (Δe²) | K_PL · ∫₀ᵀ (e(t′)² − e₀²) dt′ with K_PL derived from the ELP W1 T² budget (table 1.3) | e₀ (the channel's anchor constant, not eccAt(0)) | `arguments.cjs` 199–225 |
 | 7 | deep-time lunar periods | perigee period(t) = P₀ · (T_yr(t)/T_yr₀)² · (M_sid₀/M_sid(t)) / (g/g₀)^s_ϖ; node likewise with s_Ω; M_sid(t) from Kepler on the receded distance; T_yr(t) from the mass-loss tier | step 2 + the tidal chain | `month-chain.cjs` 186–206 |
-| 7′ | the H entry point in this chain | the tropical month and the apsidal/nodal "cycles per H" scale with H(t) and H(t)²: `tropicalMonthSecondsAtAge` uses 13·M_sid/(H·T_yr); `apsidalCyclesOfDateAtAge` = N₀·(H(t)/H₀)² — H here is the tidal precession history by proxy | `meanHAtAge` | `month-chain.cjs` 140–176 — **H-role P**: re-express on T_p(t) (plan 06 Phase 3) |
+| 7′ | the precession of date in this chain (the former H entry point, re-expressed at plan 09 step 5c) | the tropical month removes one equinox turn per T_p(t): `tropicalMonthSecondsAtAge` = M_sid·(1 − M_sid/(T_p·T_yr)) (was 13 turns per the counter H(t), 0.086 % slow — the chain's J2000 tropical month sat 5.85 ms above the IAU input); the apsidal/nodal "cycles per H" and their H² scaling are deleted — the of-date perigee and node are the count compositions N_trop − N_anom and N_drac − N_trop | `lunisolarPrecessionPeriodYearsAtAge` | `month-chain.cjs` — no H entry point |
 
 ### 1.3 Live values — the spreadsheet check
 
@@ -813,10 +813,10 @@ The four events and the year lengths:
 <!-- generated:calcmap-cardinal-events -->
 | year | VE | SS | AE | WS | SS→SS interval (d) | `yearLengthDays(SS)` (d, the crossing interval — the same quantity since R1) | mean of four (d) | one-family mean tropical year (s) | e |
 |---|---|---|---|---|---|---|---|---|---|
-| -10000 | -10000 03-19 12:23 | -10000 06-16 06:29 | -10000 09-13 14:45 | -10000 12-16 11:59 | 365.244432 | 365.244432 | 365.243550 | 31556957.03 | 0.01964 |
+| -10000 | -10000 03-19 12:23 | -10000 06-16 06:29 | -10000 09-13 14:45 | -10000 12-16 11:59 | 365.244431 | 365.244431 | 365.243550 | 31556957.03 | 0.01964 |
 | -2584 | -2584 03-21 18:02 | -2584 06-23 22:08 | -2584 09-22 04:19 | -2584 12-19 16:16 | 365.243911 | 365.243911 | 365.242785 | 31556947.70 | 0.01835 |
 | -584 | -584 03-21 04:50 | -584 06-23 08:32 | -584 09-23 08:01 | -584 12-20 20:20 | 365.241643 | 365.241643 | 365.242534 | 31556938.72 | 0.01770 |
-| 0 | 0 03-20 15:53 | 0 06-22 15:02 | 0 09-23 01:49 | 0 12-20 18:26 | 365.243503 | 365.243503 | 365.242458 | 31556935.80 | 0.01749 |
+| 0 | 0 03-20 15:53 | 0 06-22 15:02 | 0 09-23 01:49 | 0 12-20 18:26 | 365.243502 | 365.243502 | 365.242458 | 31556935.80 | 0.01749 |
 | 1246 | 1246 03-20 13:54 | 1246 06-21 20:44 | 1246 09-23 03:40 | 1246 12-21 11:33 | 365.240335 | 365.240335 | 365.242293 | 31556929.30 | 0.01701 |
 | 2000 | 2000 03-20 07:35 | 2000 06-21 01:48 | 2000 09-22 17:28 | 2000 12-21 13:37 | 365.242508 | 365.242508 | 365.242190 | 31556925.25 | 0.01670 |
 | 5000 | 5000 03-20 08:45 | 5000 06-18 19:07 | 5000 09-20 11:54 | 5000 12-21 15:35 | 365.247244 | 365.247244 | 365.241781 | 31556909.69 | 0.01533 |
@@ -830,12 +830,12 @@ The e(t)-spread by both devices, the anomalistic year, the RA:
 <!-- generated:calcmap-cardinal-spread -->
 | year | crossing intervals: T_X − mean (s) VE · SS · AE · WS | one-source structure: T_X − mean (s) VE · SS · AE · WS | structure anomalistic year (s) | RA of VE (°) — the target by construction since R1 | e |
 |---|---|---|---|---|---|
-| -10000 | 396.3 · 76.2 · -348.4 · 26.6 | 7.8 · 55.0 · -6.2 · -56.7 | 31558390.96 | 0.0000 | 0.01964 |
+| -10000 | 396.2 · 76.1 · -348.5 · 26.6 | 7.8 · 55.0 · -6.2 · -56.7 | 31558390.96 | 0.0000 | 0.01964 |
 | -2584 | 356.2 · 97.3 · 404.9 · -63.8 | -48.1 · -25.1 · 47.2 · 26.0 | 31558419.19 | 0.0000 | 0.01835 |
 | 0 | 55.3 · 90.2 · 25.2 · 169.5 | -15.0 · -50.5 · 16.0 · 49.4 | 31558426.97 | 0.0000 | 0.01749 |
 | 2000 | 400.5 · 27.4 · -734.8 · -274.6 | 16.0 · -48.6 · -14.9 · 47.5 | 31558432.46 | 0.0000 | 0.01670 |
 | 5000 | 218.1 · 472.1 · -195.4 · -117.3 | 44.2 · -15.0 · -45.0 · 15.8 | 31558440.74 | 0.0000 | 0.01533 |
-| 10000 | 223.3 · -167.4 · -731.4 · -348.6 | 12.8 · 37.7 · -12.2 · -38.2 | 31558460.72 | 0.0000 | 0.01261 |
+| 10000 | 223.3 · -167.5 · -731.4 · -348.6 | 12.8 · 37.7 · -12.2 · -38.2 | 31558460.72 | 0.0000 | 0.01261 |
 
 Retired device's RA formula constants (the record; since R1 the shipped RA is the target longitude by construction): raMean = base − earthRAAngle/sin ε̄ = base − 3.157955°, amplitude A/sin ε̄ = 1.600721° on −sin(2π·3·c) + sin(2π·8·c) (base 0/90/180/270° for VE/SS/AE/WS). Balanced year used by both devices: 2000.00000.
 <!-- /generated:calcmap-cardinal-spread -->

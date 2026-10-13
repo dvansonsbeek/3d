@@ -30,25 +30,17 @@ const MEEUS_LUNAR = JSON.parse(require('fs').readFileSync(
 // by diagnostic tools and available for external consumers.
 // See docs/hidden/IP-framework-native-sun-ecliptic-longitude.md.
 
-// ─── Mode-aware phase cycles helper ────────────────────────────────────────
-// In snapshot mode (DEEP_TIME_ENABLED=false): (year - anchor) × N / H_J2000
-// In integrated mode: DT.cyclesBetweenYears (integrates ∫N/H(t)dt properly)
-// Both agree at J2000; diverge at deep time per framework's H(t) drift.
+// (the Euclidean gcd of the Step-0 comb's H-lattice filter left with the comb, plan 09 step 5a;
+//  the mode-aware `_phaseCycles` helper left with the counters, step 5c)
 
-// (the Euclidean gcd of the Step-0 comb's H-lattice filter left with the comb, plan 09 step 5a)
-
-function _phaseCycles(year, divisor_N) {
-  if (DEEP_TIME_ENABLED) {
-    return DT.cyclesBetweenYears(C.balancedYear, year, divisor_N);
-  }
-  return (year - C.balancedYear) * divisor_N / C.H;
-}
-
-// Plan 07 R10: the K-device wheels' integrated phase from J2000 plus the
-// device's recorded J2000 wheel phase (N × kDeviceWheelPhaseAtJ2000Cycles —
-// the retired origin's (2000 − t₀)/H, kept as the scene's pose constant).
-function _deviceWheelCycles(cyclesFromJ2000, divisor_N) {
-  return cyclesFromJ2000 === null ? null : cyclesFromJ2000 + divisor_N * C.kDeviceWheelPhaseAtJ2000Cycles;
+// The K-device wheels' pose: N turns per anchor unit from J2000 at the
+// RECORDED J2000 rate, plus the device's recorded J2000 wheel phase (N ×
+// kDeviceWheelPhaseAtJ2000Cycles, plan 07 R10). Plan 09 step 5c: the wheels
+// are a scaffold pose — the engine places the Earth frame, the Sun and the
+// Moon stack over them (R4) — so they turn uniformly; the ∫N/H_era(t) counter
+// that drove them in deep-time mode is retired.
+function _deviceWheelCycles(currentYear, divisor_N) {
+  return (currentYear - C.balancedYear) * divisor_N / C.H + divisor_N * C.kDeviceWheelPhaseAtJ2000Cycles;
 }
 
 // (R4: the analytic twin _frameworkSunLon — the K-law Sun the E5 δ block fell
@@ -103,7 +95,6 @@ function _moonArgsM() {
     _moonArgsMTools = createMoonArguments({
       constants: {
         j2000JD: C.j2000JD, julianCenturyDays: 36525,
-        holisticYearJ2000: C.H,
         eccentricityJ2000: AR.earthEccentricityJ2000,
         eccentricityDotJ2000: AR.earthEccentricityDotJ2000,
         eccentricityDotDotJ2000: AR.earthEccentricityDotDotJ2000,
@@ -207,6 +198,7 @@ const _mcArgF = (a, b) => {
 };
 const _mcTropical      = (a, b) => _moonChainCyclesTools(DT.meanTropicalMonthAtAge, a, b);
 const _mcAnomalistic   = (a, b) => _moonChainCyclesTools(DT.meanAnomalisticMonthAtAge, a, b);
+const _mcSidereal      = (a, b) => _moonChainCyclesTools(DT.meanMoonSiderealMonthAtAge, a, b);   // the series' star-referenced A3 (plan 09 step 5c)
 const _mcApsidalOfDate = (a, b) => {
   const t = _mcTropical(a, b), n = _mcAnomalistic(a, b);
   return (t === null || n === null) ? null : t - n;
@@ -344,7 +336,7 @@ function _moonSeriesM() {
         jdToSIyear: _jdToSIyearTools,
         tropicalOrbitsBetween: _mcTropical,
         apsidalOfDateCyclesBetween: _mcApsidalOfDate,
-        cyclesBetween: DTmod.cyclesBetweenYears,
+        siderealOrbitsBetween: _mcSidereal,
         jupiterOrbitsBetween: _mcJupiter,
         isDeepTime: () => DEEP_TIME_ENABLED,
         isFrameworkNative: () => MOON_ARGS_FRAMEWORK_NATIVE,
@@ -704,7 +696,6 @@ function _syncEpochForJD(jd) {
   const yearApprox = 2000 + (jd - C.j2000JD) * sDay_J2000;
   const t_Ma = (2000 - yearApprox) / 1e6;
   if (Math.abs(t_Ma - _epochCache.t_Ma) < 1e-9) return _epochCache;
-  const H_t = DT.meanHAtAge(t_Ma);
   // Use meanTropicalYearDaysAtAge (T_trop_s / 86400, SI-anchored). This is
   // what the browser sets sDay to under DEEP_TIME_MODE_ENABLED
   // (src/script.js:6179):
@@ -715,14 +706,14 @@ function _syncEpochForJD(jd) {
   // consumers, NOT for the scene's pos calculation. Using SI-anchored
   // tropDays here matches browser scene rendering at all epochs.
   const mSY_t = DT.meanTropicalYearDaysAtAge(t_Ma);
-  if (H_t === null || mSY_t === null) return _epochCache;   // stay on last-good if past tidal lock
-  _epochCache = { t_Ma, H: H_t, mSY: mSY_t, sDay: 1 / mSY_t };
+  if (mSY_t === null) return _epochCache;   // stay on last-good if past tidal lock
+  _epochCache = { t_Ma, mSY: mSY_t, sDay: 1 / mSY_t };
   return _epochCache;
 }
 
 // Backwards-compatible aliases — code that references bare `H`/`sDay`
 // at scene-setup time picks up the J2000 values (setup happens once at
-// module load). Runtime paths use `_epochCache.H` / `_epochCache.mSY`
+// module load). Runtime paths use `_epochCache.mSY`
 // / `_epochCache.sDay` and go through `_syncEpochForJD(jd)` first.
 const H = H_J2000;
 const sDay = sDay_J2000;
@@ -1181,14 +1172,13 @@ function moveModel(graph, pos) {
   // Update each "animated" object: orbit.ry = θ for circular, pivot.position for ellipse
   function animateObject(nodes, def) {
     let θ;
-    // Phase 9.12 (B-full): Earth H-cycle precession objects tagged with
-    // _dtCycleN / _dtCycleSign use integrated phase ∫1/H(t')dt' under
-    // deep-time. Under toggle-off (or untagged), falls through to
-    // J2000-snapshot form θ = speed × pos - startPos.
-    // Mirrors src/script.js:48326-48337.
+    // The K-device wheels tagged with _dtCycleN / _dtCycleSign turn at their
+    // recorded J2000 rate from the J2000 pose (plan 09 step 5c; the ∫1/H_era
+    // counter is retired). Under toggle-off (or untagged), falls through to
+    // the snapshot form θ = speed × pos - startPos.
+    // Mirrors src/script.js moveModel.
     if (DEEP_TIME_ENABLED && Number.isFinite(def._dtCycleN)) {
-      const cycles = _deviceWheelCycles(DT.cyclesBetweenYears(C.balancedYear, currentYear, def._dtCycleN), def._dtCycleN);
-      θ = (cycles !== null ? cycles : 0) * 2 * Math.PI * def._dtCycleSign;
+      θ = _deviceWheelCycles(currentYear, def._dtCycleN) * 2 * Math.PI * def._dtCycleSign;
     } else if (DEEP_TIME_ENABLED && def._dtMoonIntegrator) {
       // Phase 9.13 mirror (previously MISSING in tools — the moon layers ran
       // frozen J2000 speeds in deep-time mode while the browser ran the
@@ -1749,12 +1739,11 @@ function computeSunPositionFast(jd) {
   // Animate a single node: orbit.ry = θ (with EoC if applicable)
   function animateFast(nodes, def) {
     let θ;
-    // Phase 9.12 (B-full): tagged Earth H-cycle precession objects use
-    // integrated phase ∫1/H(t')dt' under deep-time. See animateObject in
-    // moveModel() for the identical branch.
+    // The K-device wheels turn at their recorded J2000 rate from the J2000
+    // pose (plan 09 step 5c). See animateObject in moveModel() for the
+    // identical branch.
     if (DEEP_TIME_ENABLED && Number.isFinite(def._dtCycleN)) {
-      const cycles = _deviceWheelCycles(DT.cyclesBetweenYears(C.balancedYear, currentYear, def._dtCycleN), def._dtCycleN);
-      θ = (cycles !== null ? cycles : 0) * 2 * Math.PI * def._dtCycleSign;
+      θ = _deviceWheelCycles(currentYear, def._dtCycleN) * 2 * Math.PI * def._dtCycleSign;
     } else {
       θ = def.speed * pos - def.startPos * d2r;
     }

@@ -565,12 +565,11 @@ export function assembleModel(C, F, laws = {}, secularSeriesArtifact = /** @type
     // one-implementation drive).
     const axial0 = certifiedAxialPrecessionJ2000Years();   // S5: the ONE home
     // D6 → Phase 3 (plan 06): the deep-time ψ̇(t) the hybrid precesses on is
-    // the COMPOSED lunisolar rate, and since Phase 3 the unit H(t) IS
-    // 13 × that period (deltat/deep-time.cjs hAtAge), so the injection is
-    // the plain period₀·H(t)/H₀ again — on the unit, not on the frozen
-    // era clock's H_era (which misses the lunar 1/a³ growth: 70.9 vs
-    // Lantink 2022's 108.6 ± 8.5 ″/yr at 2.46 Ga; the unit reads 104.5).
-    const H0 = /** @type {number} */ (deepLod.hAtAge(0));
+    // the COMPOSED lunisolar rate — its period of date T_p(t) read directly
+    // (plan 09 step 5c; it was period₀·H(t)/H₀ on the unit, the same number
+    // to 2e-16 since the unit scales with T_p). Not the frozen era clock's
+    // H_era (which misses the lunar 1/a³ growth: 70.9 vs Lantink 2022's
+    // 108.6 ± 8.5 ″/yr at 2.46 Ga; the composed rate reads 104.5).
     const seriesArt = /** @type {any} */ (secularSeriesArtifact);
     const sb = seriesArt && seriesArt.bodies && seriesArt.bodies.earth;
     const hist = createDeepOrbitalHistory({
@@ -592,10 +591,7 @@ export function assembleModel(C, F, laws = {}, secularSeriesArtifact = /** @type
       // rendering-device residual imported as the initial condition of the
       // physics (found when the package began publishing the hybrid).
       obliquityJ2000Deg: C.earthOrbital.obliquityJ2000_deg,
-      axialPrecessionYearsAtYearFn: (yr) => {
-        const h = deepLod.hAtAge((startmodelYear - yr) / 1e6);
-        return axial0 * (h === null ? 1 : h / H0);
-      },
+      axialPrecessionYearsAtYearFn: (yr) => deepLod.lunisolarPrecessionPeriodYearsAtAge((startmodelYear - yr) / 1e6) ?? axial0,
       // THE PRECESSION OF DATE (plan 06 §9 item 10): on top of the secular
       // law above, the solar torque at the eccentricity of date and the
       // oblateness of date from the GIA channel — both exactly 1 at J2000,
@@ -981,11 +977,9 @@ export function assembleModel(C, F, laws = {}, secularSeriesArtifact = /** @type
   const moonApsidalJ2000Seconds = 1 / (1 / moonApsidalOfDateJ2000Seconds - 1 / (axialPrecessionJ2000Days * 86400));
   const moonNodalJ2000Seconds = 1 / (1 / moonNodalOfDateJ2000Seconds + 1 / (axialPrecessionJ2000Days * 86400));
   const moonSiderealMonthJ2000Seconds = moonSiderealMonth * 86400;
-  // Of-date cycles per anchor interval, REAL-valued (the month chain's H²
-  // counter still scales its of-date periods on them until the counter is
-  // re-expressed; no rounding).
-  const nApsidalIJ2000 = (H * meanSolarYearDays * 86400) / moonApsidalOfDateJ2000Seconds;
-  const nNodalIJ2000 = (H * meanSolarYearDays * 86400) / moonNodalOfDateJ2000Seconds;
+  // (Plan 09 step 5c: the per-H of-date cycle counts and the month chain's H²
+  // scaling of the of-date periods are deleted; the of-date perigee/node are
+  // the chain's count compositions.)
 
   // Derived months on the IAU inputs (constants.js §Moon derived months)
   const moonTropicalMonthDays = 1 / (1 / moonSiderealMonth + 1 / axialPrecessionJ2000Days);
@@ -1007,14 +1001,9 @@ export function assembleModel(C, F, laws = {}, secularSeriesArtifact = /** @type
       gmEarthMoonM3PerS2: EPOCH_PARAMS.gmEarthMoonM3S2,
       massRatioEarthMoon: MASS_RATIO_EARTH_MOON,
       moonSiderealMonthInputDays: moonSiderealMonthInput,
-      holisticYearJ2000: H,
       meanSiderealYearJ2000Seconds: meanSiderealYearSeconds,
-      nApsidalOfDateJ2000: nApsidalIJ2000,
-      nNodalOfDateJ2000: nNodalIJ2000,
       moonApsidalJ2000Seconds,
       moonNodalJ2000Seconds,
-      moonApsidalOfDateJ2000Seconds,
-      moonNodalOfDateJ2000Seconds,
       moonSiderealMonthJ2000Seconds,
       sPerigee: MOON_ECC_SENSITIVITY_PERIGEE,
       sNode: MOON_ECC_SENSITIVITY_NODE,
@@ -1022,7 +1011,8 @@ export function assembleModel(C, F, laws = {}, secularSeriesArtifact = /** @type
     fns: {
       meanLodSecondsAtAge: /** @param {number} tMa */ (tMa) => deepLod.lodSecondsAtAge(tMa),
       meanSiderealYearSecondsAtAge: /** @param {number} tMa */ (tMa) => deepLod.siderealYearSecondsAtAge(tMa),
-      meanHAtAge: /** @param {number} tMa */ (tMa) => deepLod.hAtAge(tMa),
+      // plan 09 step 5c: the tropical month's equinox turn is one per T_p(t)
+      precessionPeriodYearsAtAge: /** @param {number} tMa */ (tMa) => deepLod.lunisolarPrecessionPeriodYearsAtAge(tMa),
       // Decision (ii) (owner-approved MODEL CHANGE, plan 02 §8): the whole
       // lunar chain — this modulation, the integrated cycle counts it
       // drives, the arguments' eccAt/channelIntegral and the E-factor —
@@ -1050,6 +1040,8 @@ export function assembleModel(C, F, laws = {}, secularSeriesArtifact = /** @type
   const tropicalMonthPeriodFn = (tMa) => moonChain.tropicalMonthSecondsAtAge(tMa);
   /** @param {number} tMa @returns {number|null} */
   const anomalisticMonthPeriodFn = (tMa) => moonChain.anomalisticMonthSecondsAtAge(tMa);
+  /** @param {number} tMa @returns {number|null} */
+  const siderealMonthPeriodFn = (tMa) => moonChain.siderealMonthSecondsAtAge(tMa);
   const jupiterT0Seconds = C.planetOrbitalElements.jupiter.solarYearInput * 86400;
   /** @param {number} tMa @returns {number} */
   const jupiterPeriodFn = (tMa) => driver2PeriodSecondsAtAge(tMa, jupiterT0Seconds, EPOCH_PARAMS.solarMassLossFracPerYear);
@@ -1061,6 +1053,8 @@ export function assembleModel(C, F, laws = {}, secularSeriesArtifact = /** @type
   const mcAnomalistic = (a, b) => chainCycles.cyclesBetween(anomalisticMonthPeriodFn, a, b);
   /** @param {number} a @param {number} b @returns {number|null} */
   const mcJupiter = (a, b) => chainCycles.cyclesBetween(jupiterPeriodFn, a, b);
+  /** The Moon's sidereal (star-referenced) orbits — the series' A3 argument (plan 09 step 5c). @param {number} a @param {number} b @returns {number|null} */
+  const mcSidereal = (a, b) => chainCycles.cyclesBetween(siderealMonthPeriodFn, a, b);
   /** @param {number} a @param {number} b @returns {number|null} */
   const mcApsidalOfDate = (a, b) => {
     const t = mcTropical(a, b), n = mcAnomalistic(a, b);
@@ -1081,7 +1075,6 @@ export function assembleModel(C, F, laws = {}, secularSeriesArtifact = /** @type
     constants: {
       j2000JD,
       julianCenturyDays,
-      holisticYearJ2000: H,
       eccentricityJ2000: C.earthOrbital.earthEccentricityJ2000,
       eccentricityDotJ2000: C.earthOrbital.earthEccentricityDotJ2000,
       eccentricityDotDotJ2000: C.earthOrbital.earthEccentricityDotDotJ2000,
@@ -1201,7 +1194,7 @@ export function assembleModel(C, F, laws = {}, secularSeriesArtifact = /** @type
       jdToSIyear: yearFromJD,
       tropicalOrbitsBetween: mcTropical,
       apsidalOfDateCyclesBetween: mcApsidalOfDate,
-      cyclesBetween,
+      siderealOrbitsBetween: mcSidereal,
       jupiterOrbitsBetween: mcJupiter,
       isDeepTime: () => true,
       isFrameworkNative: () => true,

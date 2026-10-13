@@ -241,6 +241,17 @@ would silently churn a structural claim for a rounding-level gain.
   the day the IAU year inputs are stated in); the retired H/13 identity's
   86,399.99968 s put a +0.32 ms/day bias into the raw ΔT integrand that the
   fitted stack had to absorb (Espenak RMS 13.4 → 12.45 s once removed).
+  **Second instance (step 5c):** the month chain's tropical month, the
+  sidereal day of date, the equinox-of-date month partners and the lunar
+  series' A3 argument all counted the equinox's turn as 13 per H(t) — the
+  unit is 13.011 precession periods, so every one ran 0.086 % slow on the
+  precession; the chain's J2000 tropical month sat 5.85 ms above the IAU
+  input, and one turn per T_p(t) lands within 0.1 ms of it. The month
+  chain's "cycles per H ∝ H²" of-date law (doc 99's lunar precession
+  invariant) was the counter's definition, not dynamics — retired; the
+  of-date perigee/node are the count compositions of the inertial chain.
+  Rule: `13/H`, `H/13`, `N·(H/H₀)²` in a physics formula is a device
+  identity standing in for 1/T_p(t) — read the composed period directly.
 - **A number a doc cannot reproduce from an artifact gets written BY the
   script**, not re-derived in a generator. Two guesses at the §4.7 f_ice
   recipe gave 0.70 and 0.73 against the documented 0.77; the script's own
@@ -461,7 +472,10 @@ pole OF DATE built in the rotation-axis frame (the NASA rows moved ≤0.19″
 at the ancient events — the ~47″/cy tilt of the ecliptic the world-Y form
 ignored), and any new world-axis reader in `src/script.js` must do the
 same. `cyclesBetweenYears(2000, Y, N)` is the integrated form from
-J2000 (the R3 call-shape rule's `driftRefYear` is the model start, not 2000). **Plan 07 R1/R8 (model v19.0,
+J2000 (the R3 call-shape rule's `driftRefYear` is the model start, not 2000);
+since plan 09 step 5c the K-device wheels no longer ride it — they turn
+uniformly at their recorded J2000 rates from the recorded J2000 phase (the
+engine frame is placed over them, R4). **Plan 07 R1/R8 (model v19.0,
 physics MAJOR 15, model-values MAJOR 14): the retired laws' INPUTS left
 `model-parameters.json`** — `perihelionEclipticFraction`, the per-planet
 divisor key, `inclinationCycleAnchor`, `antiPhase` (planets and additional
