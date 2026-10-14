@@ -25,7 +25,7 @@ because a miss that silently becomes a hit means the formula changed.
 
 ## A. Rotational and tidal chronology — gate-backed
 
-The model's H(t)/LOD(t)/Moon-distance curve against the published
+The model's T_p(t)/LOD(t)/Moon-distance curve against the published
 paleontological record: **41 anchors** across Wells 1963 (coral growth
 bands, ×9), de Winter 2020 (rudist bivalve), Pannella 1972 (bivalves), a
 Triassic compilation, Williams 2000 (Elatina tidal rhythmites),
@@ -52,13 +52,14 @@ never to the fossil data it is tested against.
 
 - Anchors + sources + tolerances: [`data/paleo-validation-anchors.json`](../data/paleo-validation-anchors.json)
 - Gate: `tools/verify/paleo-anchors.js` (in `npm run test:verify` and CI)
-- The single-equation cross-check binding the two proxy classes: the exact
-  day-count invariant `H × (sidYear_s/LOD) × (AU₀/AU)² = TOTAL_DAYS_IN_H × H₀/(H₀−13)`
-  ([doc 99 §near-invariant](99-expanding-solar-system-resonance-theory.md))
-  requires a day-count and a precession period measured at the *same* epoch
-  to agree — the Devonian passes it (Wells's ~400 days/yr against the
-  Devonian-window precession constants of Wu et al. 2024, 59.5–61.5 ″/yr,
-  which the composed clock reads to 2–3 %).
+- The cross-check binding the two proxy classes: one tidal chain sets both
+  the day count (tropical_year_s/LOD) and the composed precession period, so
+  a day-count and a precession constant measured at the *same* epoch must
+  agree with it together — the Devonian passes (Wells's ~400 days/yr against
+  the Devonian-window precession constants of Wu et al. 2024, 59.5–61.5 ″/yr,
+  which the composed clock reads to 2–3 %). (The frozen era clock's
+  day-count invariant this bullet once cited is deleted with its counter,
+  plan 09 step 7a — [doc 99 record](99-expanding-solar-system-resonance-theory.md#the-frozen-era-clocks-day-count-invariant-device-tier).)
 - Full tables and the per-anchor discussion: [doc 99 §Validation](99-expanding-solar-system-resonance-theory.md#validation-against-published-paleontological-measurements)
 - The Hadean endpoint: the Farhat polynomial extrapolated to the Patterson
   1956 Pb–Pb age places the Moon at
@@ -85,8 +86,8 @@ The climate formula's orbital lines against the Cenozoic isotope record (the com
   carbon-cycle amplified and is not claimed for the lattice (the comb-era
   attribution record, doc 93, is archived).
 - **Discriminating power, stated plainly** — the 66-Ma record cannot
-  distinguish a fixed lattice from an H(t)-rescaled one (2.4σ):
-  the archived doc 98. The LOD-climate
+  distinguish a fixed lattice from a clock-rescaled one (2.4σ; a record —
+  the lattice framing is retired): the archived doc 98. The LOD-climate
   correlation fails its null tests and is recorded as **open
   correspondence, not validation**: [doc 94](94-insolation-null-test.md)
   (the capstone doc 95 is archived).
@@ -160,7 +161,7 @@ The climate formula's orbital lines against the Cenozoic isotope record (the com
 | Wu 2024 Pangea interval (200–500 Ma Moon rows) | the smooth Farhat polynomial cannot capture the supercontinent-era high-dissipation recession; deviations asserted as bands | [doc 99 §Pangea](99-expanding-solar-system-resonance-theory.md#the-pangea-high-tidal-dissipation-interval-the-mid-range-mismatch) |
 | Saturn Laplace–Lagrange bound | the retired law framework's documented physical-constraint failure — recorded at the integer-law retirement; its instrument is deleted | [doc 109](109-model-nbody-engine-and-lattice-test.md), CLAUDE.md §falsification |
 | LOD–climate correlation | fails every null test → open correspondence, not validation | [doc 94](94-insolation-null-test.md) |
-| Lattice vs H(t) discrimination | 2.4σ — the 66-Ma record cannot decide | doc 98 (archived) |
+| Fixed vs clock-rescaled lattice discrimination (retired framing; record) | 2.4σ — the 66-Ma record cannot decide | doc 98 (archived) |
 | Uniform secular solar drift | bounded at r = −0.13 ± 0.09 ms/cy; a uniform −0.5 is disfavoured ~4σ | fit-anchor documentation |
 | The former Config-#7 falsification criterion | RETIRED with the integer-law restatement (its instrument is deleted; doc 109 is the evidence record). The current criterion stands on three legs: the deep-time scaling split, historical-era exactness, and two-expansions μ-consistency | CLAUDE.md §falsification, [doc 109](109-model-nbody-engine-and-lattice-test.md) |
 

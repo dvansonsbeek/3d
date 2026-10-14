@@ -13,7 +13,7 @@ The **Perihelion of Planets Verification** is a modal panel in the Tools menu th
 
 This is the panel that tests the model's perihelion rates against *observation*, not another theory. The model line is the N-body chain's own `ϖ(t)` — nothing in it is calibrated to WebGeoCalc; the device's ecliptic-period values (`perihelionEclipticYears` per planet) remain as window-epoch descriptors ([doc 109 §9](109-model-nbody-engine-and-lattice-test.md)). The Explorer makes that comparison visible.
 
-> **Scope note (ESSRT).** The Explorer is inherently a present-epoch observational tool — the 1900–2026 baseline is the densest, most accurate stretch of JPL/NAIF ephemerides (DE440/DE441). The device ecliptic periods shown in the comparison column are the no-chain scaffolding's J2000 conventions (the former integer labels are retired); their literal rate values in ″/century are J2000-evaluated. Under [ESSRT](99-expanding-solar-system-resonance-theory.md), H(t) evolves at deep time via Drivers 1 (LOD growth) and 2 (Kepler), scaling literal rates proportionally; the comparison against WebGeoCalc is a present-epoch test of an underlying scale-invariant framework.
+> **Scope note (ESSRT).** The Explorer is inherently a present-epoch observational tool — the 1900–2026 baseline is the densest, most accurate stretch of JPL/NAIF ephemerides (DE440/DE441). The device ecliptic periods shown in the comparison column are the no-chain scaffolding's J2000 conventions (the former integer labels are retired); their literal rate values in ″/century are J2000-evaluated. Under [ESSRT](99-expanding-solar-system-resonance-theory.md) the planets' secular rates scale at deep time with the solar-mass history only (Driver 2; Earth's spin history, Driver 1, moves the precession clock T_p(t), not the orbital rates); the comparison against WebGeoCalc is a present-epoch test.
 
 ## Why the 1900–2026 baseline matters
 
@@ -47,25 +47,25 @@ The angle from the ascending node to the perihelion, measured within the orbital
 
 The WebGeoCalc trends extracted by the Explorer for the 1900–2026 window are summarized here (the chains + doc 109 carry the current planetary rates):
 
-| Planet | WebGeoCalc observed (ϖ̇) | Trend resolvability | device ecliptic-period descriptor (″/cy at J2000; the former integer label) |
+| Planet | WebGeoCalc observed (ϖ̇) | Trend resolvability | retired device ecliptic-period descriptor (″/cy at J2000; record, doc 109 §9) |
 |--------|-------------------------|---------------------|---------------------------------------|
-| Mercury | ~570 ″/cy prograde | ✓ resolvable | 531 (H × 8/11) |
+| Mercury | ~570 ″/cy prograde | ✓ resolvable | 531 |
 | Venus | ~0 ″/cy (flips sign across windows) | ✗ un-determined | −290 |
-| Earth | ~<!--v:earthObservedRate-->6,186<!--/v--> ″/cy prograde (wrt equinox) | ✓ resolvable | 6,187 (H/16) |
+| Earth | ~<!--v:earthObservedRate-->6,186<!--/v--> ″/cy prograde (wrt equinox) | ✓ resolvable | 6,187 |
 | Mars | ~<!--v:marsObservedRate-->1,600<!--/v--> ″/cy prograde | ✓ resolvable | 1,739 |
 | Jupiter | ~<!--v:jupiterObservedRate-->1,800<!--/v--> ″/cy prograde (current epoch) | ✗ un-determined | 1,884 |
 | Saturn | retrograde, ~−1,800 to −3,600 ″/cy depending on window | ✗ un-determined (magnitude window-sensitive) | −3,140 |
-| Uranus | ~<!--v:uranusObservedRate-->1,100<!--/v--> ″/cy (current epoch) | ✗ un-determined | 1,160 (H/3) |
-| Neptune | ~200 ″/cy (current epoch) | ✗ un-determined | 193 (2H) |
+| Uranus | ~<!--v:uranusObservedRate-->1,100<!--/v--> ″/cy (current epoch) | ✗ un-determined | 1,160 |
+| Neptune | ~200 ″/cy (current epoch) | ✗ un-determined | 193 |
 
 The five un-determined planets (Venus, Jupiter, Saturn, Uranus, Neptune) fall into two categories. **Venus, Jupiter, Uranus, Neptune** have perihelion oscillation periods that exceed (or are comparable to) the 126-year observational baseline; their apparent rate flips sign across sub-windows and only the instantaneous slope is accessible. **Saturn** is different — its sign stays retrograde across most plausible windows, but the *magnitude* swings by a factor of ~2 (sliding-window OLS gives anywhere from −1,800 to −3,600 ″/cy, with non-linear midpoint residuals of 0.4° indicating the rate is not steady-linear over 1800–2100). Saturn is therefore reported as un-determined too — sign retrograde, magnitude not pinpointable from this baseline. Earth is omitted from the panel itself because its ecliptic inclination is zero by definition and its ascending node is numerically undefined.
 
 ## Frame note
 
-All three angles are measured in the **ecliptic-of-date** frame — the plane that contains Earth's orbit at the instantaneous epoch. The ecliptic is not itself an inertial frame; it precesses wrt the ICRF (J2000 inertial) at approximately `−50.3 ″/yr = −5,030 ″/cy` (general precession, `H/13`). Every ecliptic rate therefore differs from the corresponding ICRF rate by this universal constant:
+All three angles are measured in **ECLIPJ2000** — Earth's mean ecliptic and equinox of J2000, a FIXED frame. The WebGeoCalc queries request it (`tools/lib/webgeocalc-client.js`, `referenceFrame = 'ECLIPJ2000'`; every cached entry carries it) and the model overlay reads the chain's J2000-frame ϖ (`_kcPerihelionEclLonDeg`). Rates in this frame are therefore already star-referenced: no general-precession term enters the comparison. The same motion referred to the moving equinox of date runs faster by the general precession, to first order (the ecliptic's own slow turn aside):
 
 ```
-ω_ICRF = ω_ecliptic − ω_gen              (ω_gen = 2π / (H/13))
+ω_of-date ≈ ω_ECLIPJ2000 + p_A          (p_A = 50.288 ″/yr, the IAU 2006 general precession, the model's J2000 input)
 ```
 
 For the model this distinction is load-bearing: the panel's model line is the N-body chain's ϖ(t) in the plotted frame — nothing is calibrated to the observations; agreement (Mercury: observed 572.0 vs the engine's 572.0 ″/cy window rate, relativity inside as a derived term) is the measurement. See [docs/13-mercury-precession-breakdown.md § 1.5a Reference Frames](13-mercury-precession-breakdown.md) for the full discussion of why ecliptic-only first-order L-L fails where a two-frame treatment succeeds.
@@ -111,7 +111,7 @@ Re-running `node tools/explore/wgc-perihelion-rates.js` regenerates the JSON fro
 │  │ ▗▘▗▘            (blue = observed,          │         │
 │  │                  red = model)              │         │
 │  └──────────────────────────────────────────── ┘         │
-│  Frame note: ecliptic-of-date, ≠ ICRF by H/13.          │
+│  Frame note: ECLIPJ2000 (mean ecliptic at J2000).       │
 │  ▶ Ascending node Ω (click to expand)                   │
 │  ▶ Argument of periapsis ω (click to expand)            │
 └─────────────────────────────────────────────────────────┘
@@ -121,7 +121,7 @@ Re-running `node tools/explore/wgc-perihelion-rates.js` regenerates the JSON fro
 - **Summary block**: observed trend, model prediction, resolvability flag.
 - **Primary chart**: `ϖ` vs time with observed polyline + model overlay + OLS trend.
 - **Collapsible charts**: `Ω` and `ω` for when you want to inspect node/argument behaviour separately.
-- **Frame note**: reminder that angles live in the ecliptic-of-date frame.
+- **Frame note**: reminder that angles live in the fixed ECLIPJ2000 frame.
 
 ## Color coding
 
@@ -142,7 +142,7 @@ The red and blue curves tracking each other over 1900–2026 is the visual valid
 ## Scope and limitations
 
 1. **Only perihelion-related angles** — the Explorer does not show eccentricity, inclination, or semi-major-axis evolution. Those are handled elsewhere (the planetStats panel's chain element rows; the former balance-scale and resonance-cycle panels were removed at the integer-law retirement).
-2. **No ICRF frame variant** — all angles are in the ecliptic-of-date frame; the ICRF-frame rate is noted but not plotted. Future work: add an optional ICRF-frame chart that subtracts general precession.
+2. **No equinox-of-date variant** — all angles are in the fixed ECLIPJ2000 frame (star-referenced rates). Future work: an optional of-date chart that adds the general precession.
 3. **Earth is excluded** — ecliptic inclination zero by definition ⇒ `Ω` undefined. WebGeoCalc's reference charts also omit Earth.
 4. **Baseline is fixed at 1900–2026** — extending the pipeline script to broader windows (say 1600–2200) is possible but introduces ephemeris extrapolation issues outside DE441's validated span.
 5. **No per-planet export** — the Explorer is read-only; to dump the time series to CSV use the pipeline script directly.
@@ -152,7 +152,7 @@ The red and blue curves tracking each other over 1900–2026 is the visual valid
 - [Mercury Precession Breakdown](13-mercury-precession-breakdown.md) — First-order Laplace-Lagrange analysis, reference-frame discussion, why the model's two-frame treatment matches WebGeoCalc where ecliptic-only L-L fails; also the quantities and methods used inside the simulation for computing perihelion longitude and precession.
 - [109 - The Model's Own N-body](109-model-nbody-engine-and-lattice-test.md) — the measured planetary frequencies and the per-planet quantity types the Explorer's comparisons rest on.
 - [Constants Reference § Observed trend rates](20-constants-reference.md) — The constants block that feeds the display.
-- [Expanding Solar System Resonance Theory](99-expanding-solar-system-resonance-theory.md) — Deep-time scaling of H(t) for the literal rates the Explorer compares.
+- [Expanding Solar System Resonance Theory](99-expanding-solar-system-resonance-theory.md) — Deep-time scaling (the solar-mass history) of the literal rates the Explorer compares.
 
 ## Code Location
 

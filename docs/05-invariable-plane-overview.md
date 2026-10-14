@@ -167,7 +167,7 @@ Enable via **Celestial Tools > Earth Inclination to Invariable plane**: a transl
 
 - The invariable plane is fixed, physics-defined, and giant-planet-dominated; the model banks **its own** plane from the chain artifact and expresses node longitudes in the Souami & Souchay origin via a derived, zero-fitted-constant conversion (0.0001° vs La2010 at J2000).
 - Every rendered body now gets exact projected heights (`r⃗ · ẑ_inv`) and element-of-date nodes from the chain; the geometric sin(i)·sin(u)·r construction went with the no-chain bodies.
-- Inclination and node are two distinct angles at two distinct rates — for Earth: i_inv on the H/3 ICRF-perihelion cycle, Ω at −H/5 — and every planet still crosses the plane twice per orbit regardless of tilt.
+- Inclination and node are two distinct angles at two distinct rates — for Earth both are the one-source engine normal read against the banked invariable plane, the node regressing on the dominant nodal mode s₃ — and every planet still crosses the plane twice per orbit regardless of tilt.
 - Two live self-checks (angular-momentum Option A vs B, mass-weighted balance) continuously verify the geometry.
 
 ---
@@ -178,4 +178,4 @@ Enable via **Celestial Tools > Earth Inclination to Invariable plane**: a transl
 - [20 - Constants Reference](20-constants-reference.md) — all invariable-plane constants
 - [22 - Coordinate Frames](22-coordinate-frames.md) — frame transformations
 - [24 - The Δa Mass Derivation](24-moon-kepler-derivation.md) — Part III: the Sun-SSB chart served from the same s-frame basis
-- [99 - Expanding Solar System Resonance Theory (ESSRT)](99-expanding-solar-system-resonance-theory.md) — deep-time scaling of H(t)
+- [99 - Expanding Solar System Resonance Theory (ESSRT)](99-expanding-solar-system-resonance-theory.md) — deep-time scaling of the precession clock T_p(t) and the solar-mass history

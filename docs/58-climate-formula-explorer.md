@@ -129,9 +129,9 @@ Re-running scripts only needed after dataset updates or refit changes — see [d
 
 ## Scope and limitations
 
-1. **Earth only.** All proxies measure Earth's climate state (δ¹⁸O temperature proxy, δ¹³C carbon proxy, CO₂ atmospheric concentration). Per-planet contributions to the L1 lattice are in the archived comb-era records (docs 91 and 93), not in this modal.
+1. **Earth only.** All proxies measure Earth's climate state (δ¹⁸O temperature proxy, δ¹³C carbon proxy, CO₂ atmospheric concentration). The L1 lines are beats of Earth's secular modes (doc 92 §2); the comb-era per-planet attributions are in the archived records (docs 91 and 93), not in this modal.
 2. **Regime-aware fits, not free-floating.** The formula has different L1 amplitudes in each of the 8 regimes (`lr04-post-mpt`, `lr04-inhg-mpt`, `lr04-pre-inhg`, `lr04-full`, `cenogrid-d18o`, `cenogrid-d13c`, `epica-co2`, `cenco2pip`) — they are not the same global coefficients. The modal handles regime stitching automatically. **Forward prediction across regime boundaries fails catastrophically** (R² = −0.87 across the MPT in Tier B Round 3 R3-3 of doc 92); the framework is descriptive within regimes, not predictive across boundary-condition shifts.
-3. **L1 = 33 integers** (25 canonical + 6 MTM sidebands + n=141 Berger-quintet completion + the regime-admitted n=24 Earth H/3 line). Component list catalogued in [doc 92 §2.3](92-climate-formula.md#23-the-33-lattice-integers--per-line-identities) with per-line identities and Berger / Holistic dual attribution (doc 93, the archived comb-era attribution record).
+3. **L1 = 28 physical lines** (25 orbital beats — 5 climatic precession, 10 obliquity, 10 eccentricity — plus the 405-kyr family). The line list is the generated table of [doc 92 §2](92-climate-formula.md#2-layer-1--the-orbital-lines); the retired 33-integer comb and its dual attribution are record (doc 109 §22; doc 93, archived).
 4. **Read-only.** The modal has no "edit formula" feature; coefficients are baked at bundle time from the Python fit pipeline.
 5. **Coefficient updates require re-running the pipeline.** See the data-pipeline section above.
 

@@ -66,17 +66,20 @@ classical constant:
 
 - **Linear rates — the frame convention.** Meeus's argument rates differ from
   the framework's star-referenced chain rates by exactly ± general precession. The
-  framework's own p = 360·13/H = 50.24″/yr closes the ±1.4°/century M′/F
+  general precession p — the IAU 2006 p_A input, 50.288″/yr (plan 09; the
+  retired device's 360·13/H read 50.24″/yr) — closes the ±1.4°/century M′/F
   drift with zero new constants — the drift is frame bookkeeping, not
   missing physics. Meter: "Meeus vs Integrator (lunar argument drift)".
-  Two composite rates reduce to exact lattice identities: A3 ≡ the
-  Moon's SIDEREAL mean longitude rate = L′_tropical − p_H13 (0.003 ppm vs
-  Meeus 481266.484 °/cy) and the A2 argument rate ≡ 2·L′_trop − M′rate −
+  Two composite rates reduce to exact identities: A3 ≡ the Moon's
+  SIDEREAL mean longitude rate (≡ 360°/sidereal month; Meeus
+  481266.484 °/cy) and the A2 argument rate ≡ 2·L′_trop − M′rate −
   2·n_Jupiter (0.19 ppm vs 479264.290). Both are CHAIN-INTEGRATED at deep
-  time through their identified content (A3 = A3₀ + 360·(N_trop − N_p13);
+  time through their identified content (A3 = A3₀ + 360·N_sid, the chain's
+  sidereal-orbit count — plan 09 step 5c; it was the tropical count minus the
+  device's 13/H precession turns, 0.086 % slow on the precession;
   A2 = A2₀ + 360·(N_trop + N_apsOfDate − 2·N_Jupiter), Jupiter via the
-  Driver-2 chain) so they evolve with the tidal months, H(t) precession,
-  and solar mass loss. The A1 rate (<!--v:a1RateDegPerCy-->131.849<!--/v--> °/cy) is observationally
+  Driver-2 chain) so they evolve with the tidal months, the composed
+  precession T_p(t), and solar mass loss. The A1 rate (<!--v:a1RateDegPerCy-->131.849<!--/v--> °/cy) is observationally
   defined by nature: it sits on the 18V−16E−M′ near-resonance where ppm in
   planetary years moves the beat by °/cy (hypersensitivity, experimentally
   demonstrated); its amplitude is gravity-sized (18-kyr lab: single line,
@@ -101,10 +104,11 @@ classical constant:
   found the table's own J2000 slope 19 % steep (ė −5.00e-5/cy against the
   run's −4.24e-5, multiplied straight into the perigee and node
   curvature) — in SLOPE: the run's own J2000 z-rate, script-written into
-  the embed from the banked series, through the arguments' H/12 taper (a
+  the embed from the banked series, through the arguments' secular-completion
+  taper (`SECULAR_COMPLETION_TAPER_YEARS` = 27,943 yr, a recorded window — a
   bounded term of the same class as the constant remainder; doc 109 §17).
   It carries the 405-kyr-class deep spectrum a single line cannot. The
-  derived H/3 line (below; deleted at plan 09 step 6) was its epoch-local
+  derived single-line law (below; deleted at plan 09 step 6) was its epoch-local
   tangent and the clock-side basis (eclipse Sun equation of centre, cardinal
   braid); the two agreed within 4.2e-5 across the historical era. The astro-reference
   (e₀, ė₀, ë₀) values are the documented Taylor-check anchors.
@@ -120,16 +124,15 @@ classical constant:
   D = L′ − L_sun (rate to 3e-6 °/cy, T² to 1e-7 °/cy²) and M = L_sun − ϖ_sun.
   The framework composes them literally — D = L′ − L_sun, M = L_sun − ϖ_sun —
   with Meeus J2000 anchors (Ls0 ≡ L′0 − D0 absorbs the Ch. 25/47 convention
-  offset) and secular content from the closed-form integrals of the
-  epoch-local year-length harmonics: the model's REAL-TIME axial and
-  perihelion rates around their H/13 and H/16 means
-  (`_fwSunSecularDeviations`). The equinox acceleration is ~62% derived
-  from the model's own rates; the remaining ~38% is the planetary
-  χ-channel — the ecliptic-of-date motion absent from the equator-only
-  composition — derived at 104% by the ṗ_A composition (the L′ bullet).
-  Bounded ±5° over ±50 kyr where the Meeus D parabola reaches 82°;
-  deviations ≤ 0.08°/0.11° (D/M) at −584, ~0 in the certification window.
+  offset) and the Sun of date injected from the ONE certified Sun (plan 09
+  step 3): L_sun is its mean longitude, which integrates the one-family
+  tropical year (`sunMeanLonDegAtJdTT`), and ϖ_sun its mean perihelion of
+  date (`sunPerihelionLonDegAtJdTT`). D sits within 15″ of Meeus at −2000.
   Zero new constants.
+  *Record:* until plan 09 the Sun's secular content came from the
+  closed-form integrals of the retired year-length combs
+  (`_fwSunSecularDeviations`, deleted); that Sun sat 0.2° behind the IAU
+  mean Sun at −2000 and D carried it as 656″ of ancient residual.
 
 - **L′ planetary remainder — the closed budget, carried by bounded
   carriers (derived).** Meeus's non-tidal T² content
@@ -142,7 +145,7 @@ classical constant:
   (the Γ embedded in Meeus's polynomial is −25.706″/cy² vs LLR −25.858).
   The runtime replaces the T² polynomial with two bounded carriers:
   `_fwLpPlanetaryCarrier` carries the channel part —
-  `K_PL · ∫₀ᵀ (e_E²(t′) − e_E²(J2000)) dt′` along the derived H/3 line,
+  `K_PL · ∫₀ᵀ (e_E²(t′) − e_E²(J2000)) dt′` along the deep e_E channel,
   with K_PL = −2332 °/cy per e² derived lazily from the budget — and
   `_fwLpObliquityCarrier` carries the figure+frame part (+1.30363″/cy²)
   along the framework obliquity cycle, `C · ∫₀ᵀ (ε(t′) − ε₀) dt′` with
@@ -157,14 +160,16 @@ classical constant:
   curvature with the secular ë + obliquity-carrier second order + frame
   ṗ_A T³ (`tools/explore/v4-d3-tails.js`); the T⁴ is 41% channel with the
   remainder documented (0.004° at −584, clamped at deep time). Convention
-  note: with the derived H/3 line's own ë (−3.7e-8) the channel T³ flips
+  note: with the retired single-line law's own ë (−3.7e-8) the channel T³ flipped
   sign — the Meeus literal embodies the SECULAR-theory ë.
   The always-chains deep branch carries the same secular-ë convention
   through a third carrier, `lpSecularCompletion`:
   `K_PL · ∫₀ᵀ [½·Δ(e²)″·t′² + ⅙·(e²)‴_sec·t′³] · env(t′) dt′` with
   Δ(e²)″ from existing constants (zero new values) and env a cos² taper
-  on the H/12 quarter period (≈ 279 cy ≈ the ~100-kyr eccentricity
-  eigenbeat quarter, where the local secular Taylor decorrelates). Its
+  of half-width `SECULAR_COMPLETION_TAPER_YEARS` (27,943 yr ≈ 279 cy ≈ the
+  ~100-kyr eccentricity eigenbeat quarter, where the local secular Taylor
+  decorrelates — a recorded window, bit-identical to the retired device's
+  H/12 it was first written as, plan 09 step 5c). Its
   content is measured against the certified snapshot (+0.68 tail + 0.22
   channel curvature + 0.03 integrator convention closes the +0.91″/cy²
   Lp secular gap; `tools/explore/u2-args-branch-isolation.mjs`,
@@ -176,18 +181,20 @@ classical constant:
   zero.
   The of-date RATES are completed the same way (the rate-completion pair
   in `fwArgsDeep`): (i) `pFix = ∫(p_dyn − p_kin) dy` on Lp — p_dyn the
-  DYNAMICAL axial precession, the day-form beat of the sidereal/solar
-  year evaluators (25,771.1 yr at J2000 ≈ IAU, epoch-valid at any age;
-  exposed as `model.epoch.axialPrecessionYearsAtYear`); p_kin the
-  kinematic pair's beat the chains embed (≡ the H/13 lattice mean by
-  construction, Δp = 0.044″/yr at J2000). Natively BOUNDED at deep time;
+  DYNAMICAL axial precession, the published precession period of date
+  (the one-family beat inside its window, the composed clock beyond;
+  epoch-valid at any age; exposed as
+  `model.epoch.axialPrecessionYearsAtYear`); p_kin the beat of the deep
+  chain's sidereal and tropical years the chains embed (since plan 09 step
+  5d one equinox turn per T_p(t); it was the device's 13/H-family mean,
+  Δp = 0.044″/yr at J2000). Natively BOUNDED at deep time;
   two-tier cumulative table, frozen beyond ±1 Myr. Its in-window ṗΔ·T²/2
   (the model-native precession acceleration, 0.658″/cy² — 60% of
   Lieske's) is REMOVED from the obliquity-carrier normalization so the
   total Lp T² stays the certified, DE441-validated budget. (ii)
   SELF-MEASURED residual rate anchors on all five of-date compositions
   (±25-yr central difference of the raw compositions vs the certified
-  bundle rates at build), applied through the H/12 cos² taper — full in
+  bundle rates at build), applied through the same cos² taper — full in
   the historical window, frozen ≤ ~0.9° at deep time. ϖ/Ω deliberately
   do NOT carry pFix: their chains' own curvature is already
   certified-consistent, and pFix there double-counts the acceleration
@@ -202,7 +209,8 @@ classical constant:
   independent. The emergent periods are the true star-referenced ones
   (3232.60 d apsidal / 6793.48 d nodal, reproduced at ±0.5‱/±0.3‱ in the
   full system); the catalog inputs <!--v:moonApsidalPrecessionDaysInput-->3,231.493<!--/v-->/<!--v:moonNodalPrecessionDaysInput-->6,798.38<!--/v--> are their
-  equinox-of-date partners (∓13 counts per H).
+  equinox-of-date partners (∓ one count per precession period T_p(t);
+  plan 09 step 5c — the device counted ∓13 per its unit, 0.086 % slow).
   The frame term ṗ_A is itself derived: the composition
   (`tools/explore/v4-pdot-composer{,2,3}.js`) builds the general-precession
   acceleration from the lab's gravity-derived ecliptic-of-date pole track
@@ -214,7 +222,7 @@ classical constant:
   yields 61%; the balance is the planetary χ-channel (the ecliptic
   tilting under the equator).
 
-- **Deep-future validity.** The cumulative-H table spans ±500 Myr symmetric
+- **Deep-future validity.** The lunar chains span ±500 Myr symmetric
   (the chains are smooth and physical throughout: LOD 24→27.4 hr, month
   27.32→29.42 d at +500 Myr), and the Meeus-polynomial fallback clamps its
   T²/T³/T⁴ tails at |T| ≤ 100 cy — unclamped, the fitted T⁴ tail cancels
@@ -223,7 +231,7 @@ classical constant:
   frozen Lp offset of −17.5° (past) / +7.0° (future) — bounded by
   construction, so no polynomial reaches deep time and the bounded-harmonic
   claim is untouched. The rate completion is likewise bounded: the pFix
-  table freezes beyond ±1 Myr, the five rate anchors freeze at the H/12
+  table freezes beyond ±1 Myr, the five rate anchors freeze at the
   taper edge (≤ ~0.9°), and Mp/F inherit Lp's bounded pFix oscillation
   uncancelled at deep time (physically p-free arguments; display-class).
   The scene Moon is prograde at every epoch out to ±1 Gyr by construction.
@@ -247,17 +255,18 @@ identical to conventional secular theory's +2/34), deep-chains branch
 verified against Stephenson 1997 Ch. 6 before publication). At deep time
 the same channel modulates the anchored precession chains as
 rate(t) = invariant mean × [g(t)/g₀]^s (the factored law, doc 99) —
-bounded at every epoch under the derived line (e ∈ [0.0077, 0.0231]),
-where the Meeus parabola is unbounded.
+bounded at every epoch on the deep channel's bounded e(t) (the retired
+single-line law read e ∈ [0.0077, 0.0231]), where the Meeus parabola is
+unbounded.
 
 **How ė is pinned (the (ė, s) degeneracy).** Only the product s·ė enters
 each element's T², but node and perigee share one ė: with the observed
 ė₀ = −4.204e-5/cy the node requires s_Ω = 1.018 and the perigee ratio then
 yields s_ϖ = 2.407 with no freedom — the Meeus-effective pair. The
-alternative — the H/16 perihelion law's ė at its current phase
+alternative — the retired perihelion law's ė at its J2000 phase
 (−0.84e-5/cy) — would force s_Ω = 5.1, excluded by theory and falsified
-directly by the record. The derived H/3 line PREDICTS ė = −4.273e-5
-(+1.7% of the measured value) with no anchor. First-principles status:
+directly by the record. The retired single-line law (below) predicted
+ė = −4.273e-5 (+1.7% of the measured value) with no anchor. First-principles status:
 the laboratory derives the PHYSICAL exponents from pure gravity
 (2.486/0.880) and the of-date record minus the IAU frame acceleration
 requires 2.479/0.867 — agreement 100.3%/101.5%. The runtime's effective
@@ -272,7 +281,7 @@ line's J2000 phase as a recorded pose (`kDeviceInclinationPhaseJ2000Deg`).
 
 **Framework-native e_E: the fully-derived H/3 fluctuation (retired).** The clock-side
 e_E — the epoch-local tangent of the deep channel, and the line the eclipse
-Sun's equation of centre and the cardinal braid ride — is ONE movement, the
+Sun's equation of centre and the cardinal braid rode — was ONE movement, the
 H/3 wobble cycle that also drives Earth's inclination, expressed in
 eccentricity form with nothing solved and nothing fitted:
 
@@ -313,25 +322,19 @@ prediction: deep-time e_max ≈ 0.023 along the line (conventional secular
 theory: ≈ 0.067) — falsifiable; the deep z-vector channel carries the
 multi-mode spectrum where it applies.
 
-**The osculating decomposition.** The Sun's osculating
-e(t) = the H/16 orbit law + THIS movement's coupling imprint:
-e₁₆(t) − (base/2)·(cos φ₃(t) − cos φ₃(J2000)) on the integrated H/3
-phase — the J2000-anchored difference form keeps the H/16 law the owner
-of today's value, so no epoch is privileged. That assembled e(t),
-together with the f(Y) year-harmonic rate drift in the mean longitude
-plus the derived cos-ε torque term, is the certified eclipse chain's Sun
-in all three runtimes — zero fitted sun constants
-([doc 103](103-135-babylonian-case-study.md)). Since the FQ-7-Sun
-one-eccentricity-law landing (below) the eclipse Sun's eccentricity was
-the J2000-anchored H/3 line alone; since plan 06 layer B it is the banked
-series plus the derived mean-element offset (doc 110 chain 1.1 — the H/3
-line left the physics package). The lunar chain rides the DEEP e
-channel end to end (moon/deep-ecc-channel.cjs — the model's own secular
-modes, decision (ii)); the H/3 line is its epoch-local tangent, and the
-two agree within 4.2e-5 wherever the domains overlap — a certification
-split, not a physics one.
+**The eclipse Sun's eccentricity, now and before.** The certified eclipse
+chain's Sun takes its eccentricity from the banked N-body series plus the
+derived mean-element offset (doc 110 chain 1.1); the lunar chain rides the
+DEEP e channel end to end (moon/deep-ecc-channel.cjs — the model's own
+secular modes, decision (ii)). *Record:* the earlier osculating
+decomposition assembled the Sun's e(t) from the retired perihelion law plus
+this line's coupling imprint (a J2000-anchored difference form), then — from
+the FQ-7-Sun one-eccentricity-law landing — from the J2000-anchored line
+alone; while it shipped, the line and the deep channel agreed within 4.2e-5
+wherever the domains overlapped.
 
-Open research item — the 1.2° azimuthal family: three independent ~1.2°
+Open research item (recorded under the retired single-line law; items (2)
+and (3) are its phase) — the 1.2° azimuthal family: three independent ~1.2°
 tensions live in the node/phase sector while all magnitudes are stiff:
 (1) reconciling the RAW Souami & Souchay planetary nodes with JPL ecliptic
 inclinations moves Earth's invariable-plane node by −1.23° (i_E moves only
@@ -829,19 +832,19 @@ cost of the physical year (plan 06 R1).
 
 **One eccentricity law for Sun and Moon.** Eccentricity is FRAME-INVARIANT
 (e = |z|, z = e·e^{iϖ}) and may carry only fixed-frame lattice content
-(the apsidal period, the eccentricity-band beats); the perihelion-of-date period is the OF-DATE perihelion period — the apsidal
-apsidal rotation seen from the H/13 equinox (13 + 3 = 16) — and belongs to
-ϖ_of-date, not to e. Accordingly the eclipse Sun's eccentricity was the
-J2000-anchored H/3 line (the H/16 law's J2000 value + the H/3 variable
-part — the Moon's own law) until plan 06 layer B moved it to the banked
-series plus the derived mean-element offset, while the cardinal-point path keeps the H/16
-law (`eccentricityAt`) unchanged. Two recorded, not-landed notes: the
-besselian Sun DISTANCE still rides the H/16 law (1e-4-relative, ~0.1″ of
-solar radius); and over 250 kyr NONE of the model's e-laws track La2004
-(`fq7s-orbit-vector-vs-laskar.mjs`) — the frame-invariant
-lattice-modes-with-Laskar-class-amplitudes reading ("option C-large") is
-research-class, to be tested against the cardinal-point fit and the paleo
-record, not JPL alone. Two modern local-slope tensions are recorded as
+(the apsidal period, the eccentricity-band beats); the perihelion-of-date
+period — the apsidal rotation seen from the moving equinox — belongs to
+ϖ_of-date, not to e. Accordingly the Sun's eccentricity is the banked N-body
+series plus the derived mean-element offset on every clock-side path — the
+eclipse Sun's equation of centre, the besselian Sun distance and the
+cardinal braid (`eccentricityAt` / `sunEccentricityAt`; plan 06 layer B, and
+plan 09 step 6 for the remaining readers). *Record:* the eclipse Sun rode the
+J2000-anchored single-line law (the Moon's own law) until plan 06 layer B,
+and the cardinal-point path and the besselian distance rode the retired
+perihelion law until plan 09; while they shipped, over 250 kyr none of the
+model's e-laws tracked La2004 (`fq7s-orbit-vector-vs-laskar.mjs`), which
+the N-body series that replaced them does by construction of its secular
+modes. Two modern local-slope tensions are recorded as
 prediction-level tensions, not tuned: the chain's ė and ϖ̇ vs the
 JPL-class linear laws (both pass the 1246 perihelion–solstice anchor —
 a decade-wide plateau that cannot discriminate — and the 26-event corpus

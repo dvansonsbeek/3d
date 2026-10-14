@@ -226,7 +226,7 @@ Within each tab, rows are organized under section headers (e.g., "Perihelion Pre
 ### Inline SVG Charts
 
 One chart type is embedded as inline SVG within planetStats rows. (A
-second — the H/8 obliquity-cycle chart — was retired from display with
+second — the obliquity-cycle chart on the retired device period — was retired from display with
 the Earth-CYCLES dynamical pass; `buildObliquityChart` survives as
 machinery only, attached to no row.)
 
@@ -451,7 +451,7 @@ Shows the actual observed perihelion-precession history of each planet from JPL 
 | **Two trend estimates** | Raw OLS (affected by oscillations) and sin+lin (bias-corrected) for each planet |
 | **Collapsible charts** | Ascending node Ω and argument of periapsis ω for detailed inspection |
 | **Resolvability flag** | Venus, Jupiter, Saturn, Uranus, Neptune are flagged as un-determined: Venus/Jupiter/Uranus/Neptune because their oscillation period exceeds the 126-year baseline (apparent slope flips sign across sub-windows); Saturn because its magnitude varies by ~2× across plausible windows even though direction stays retrograde |
-| **Frame note** | Reminder that all angles are in the ecliptic-of-date frame — in ICRF each rate would differ by ~−5,030″/cy (general precession, H/13) |
+| **Frame note** | Reminder that all angles are in the ECLIPJ2000 frame (Earth's mean ecliptic at J2000), with the period of Earth's orbit-plane precession on the dominant nodal mode s₃ |
 
 ### Full Reference
 
@@ -515,7 +515,7 @@ Modal that visualizes the **Expanding Solar System Resonance Theory (ESSRT)** �
 
 ### Full Reference
 
-See [doc 59 — Earth–Moon Genesis Analysis](59-essrt-explorer.md) for the complete panel reference (7 quantity tabs, 2 range tabs, era markers, Wu 2024 anchor overlay, hover tooltip, the Export, code locations). The underlying theory — Driver 1 (Farhat polynomial + angular-momentum conservation), Driver 2 (Kepler scaling under solar mass loss), the H(t) / LOD(t) / year(t) parameterizations, validation against the published cyclostratigraphy record (sub-percent agreement Hadean → present), and the per-frame integrator architecture (`_dtCycleN`, `_dtMoonIntegrator`, `_dtPlanetIntegrator`) — lives in [doc 99 — Expanding Solar System Resonance Theory](99-expanding-solar-system-resonance-theory.md).
+See [doc 59 — Earth–Moon Genesis Analysis](59-essrt-explorer.md) for the complete panel reference (7 quantity tabs, 2 range tabs, era markers, Wu 2024 anchor overlay, hover tooltip, the Export, code locations). The underlying theory — Driver 1 (Farhat polynomial + angular-momentum conservation), Driver 2 (Kepler scaling under solar mass loss), the T_p(t) / LOD(t) / year(t) parameterizations, validation against the published cyclostratigraphy record (sub-percent agreement Hadean → present), and the per-frame integrator architecture (`_dtMoonIntegrator`, `_dtPlanetIntegrator`) — lives in [doc 99 — Expanding Solar System Resonance Theory](99-expanding-solar-system-resonance-theory.md).
 
 ---
 

@@ -361,7 +361,7 @@ A natural follow-up question: would activating the model's deep-time machinery (
 | AU change (Driver 2) | Δa/a ≈ 0.04 ppb | — |
 | Earth orbital period | ΔT/T ≈ 0.08 ppb | 0.042″ accumulated |
 | Moon distance | −14 m (closer in past) | — |
-| H(t) | ΔH/H ≈ 0.018 ppm | 0.0001″ on H/13 precession |
+| Precession clock T_p(t) | ΔT_p/T_p ≈ 0.018 ppm | 0.0001″ on the general precession |
 | Mars orbital phase | — | 0.022″ accumulated |
 
 **Maximum deep-time correction at year 1583: ≈ 0.04″** — four orders of magnitude smaller than the 637″ (0.177°) Tycho residual. Activating deep-time at multi-century scales cannot account for the residual. Deep-time integration becomes meaningful only at multi-millennium scales (Moon's secular term grows as t²: ≈0.12° at year 1583, ≈3° at year 0 AD, ≈12° at year −2000 BC).

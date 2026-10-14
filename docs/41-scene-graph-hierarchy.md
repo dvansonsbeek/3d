@@ -22,7 +22,7 @@ This document describes the Three.js scene graph hierarchy used in the ESSRT sim
 
 ## Overview
 
-The simulation models complex astronomical cycles (precession periods from 18 years to H+ years) by nesting rotation layers in a parent-child hierarchy. Each layer applies one rotation, and the final world position of any object is the composition of all parent transformations.
+The simulation models complex astronomical cycles (precession periods from 18 years to a hundred thousand years and beyond) by nesting rotation layers in a parent-child hierarchy. Each layer applies one rotation, and the final world position of any object is the composition of all parent transformations.
 
 **Key Principle:** A child object inherits all parent rotations. When measuring positions from different reference frames (e.g., Earth-equatorial vs. ecliptic), different portions of this hierarchy apply.
 
@@ -50,20 +50,30 @@ All other calculations are relative to:
 
 ---
 
-## Part 2: The anchor-interval structure of the scene's counters
+## Part 2: The K-device wheels — a recorded pose
 
-The scene's Earth precession counters are device identities on the **fitted timing anchor** (`holisticyearLength`, the frozen era clock's unit) divided by integers; the published periods are the dynamical values of doc 20 Part 2 (plan 06 S5/S6). See [Constants Reference](20-constants-reference.md) for the current value of H and all derived periods:
+The scene's Earth precession layers are the K-device scaffold: five wheels that
+turn uniformly at **recorded J2000 periods** `earth.kDeviceWheelPeriodYears`
+(`model-parameters.json`, keyed by the wheel index N; browser
+`_wheelPeriodYears(N)`, Node `C.kDeviceWheelPeriodYears[N]`) from the recorded
+J2000 phase N × `kDeviceWheelPhaseAtJ2000Cycles`. They are a **pose, not a
+law**: the engine places the Earth frame, the Sun and the Moon stack over the
+scaffold, so no observable rides them. They are NOT the model's precession
+periods — those are the dynamical values of [Constants Reference](20-constants-reference.md)
+Part 2 (T_p, the obliquity beat, the apsidal and nodal modes); the wheels read
+them 0.09…2 % off.
 
-| Cycle | Divisor | Formula | Direction |
-|-------|---------|---------|-----------|
-| **The anchor interval** | 1 | H (the unit) | - |
-| **Inclination Precession** | 3 | H / 3 | Counter-clockwise |
-| **Ecliptic Precession** | 5 | H / 5 | Counter-clockwise |
-| **Obliquity Cycle** | 8 | H / 8 | Clockwise (negative) |
-| **Axial Precession** | 13 | H / 13 | Clockwise (negative) |
-| **Perihelion Precession** | 16 | H / 16 | Both directions |
+| Wheel | Index N | Recorded period P_N (yr) | Direction |
+|-------|---------|--------------------------|-----------|
+| **Inclination Precession** | 3 | P₃ = 111,772.33 | Counter-clockwise |
+| **Ecliptic Precession** | 5 | P₅ = 67,063.4 | Counter-clockwise |
+| **Obliquity Cycle** | 8 | P₈ = 41,914.625 | Clockwise (negative) |
+| **Axial Precession** | 13 | P₁₃ = 25,793.62 | Clockwise (negative) |
+| **Perihelion Precession** | 16 | P₁₆ = 20,957.3125 | Both directions |
 
-This rational subdivision creates the interconnected cycles that produce Earth's climate variations and astronomical phenomena.
+Numerically the periods are the retired fitted unit's 335,317 yr divided by N,
+written as exact doubles so the pose is bit-identical; the unit itself left the
+model at plan 09 step 7c (`model-version.json` `_v24Note`).
 
 ---
 
@@ -113,13 +123,13 @@ The complete nesting order from the technical guide:
 
 ```
 startingPoint (scene root)
-└── Earth (pivot)                                     ← Axial Precession: H/13
-    ├── EARTH-WOBBLE-CENTER (marker)                  ← display-only, radius A at H/13 (the Law-4 amplitude distance; no instrument reads it)
-    ├── Inclination Precession (container)            ← H/3
-    │   └── Ecliptic Precession (container)           ← H/5
-    │       └── Obliquity Cycle (container)           ← H/8
-    │           └── Perihelion Precession 1           ← H/16
-    │               └── Perihelion Precession 2       ← H/16 (reverse)
+└── Earth (pivot)                                     ← Axial Precession wheel: P₁₃
+    ├── EARTH-WOBBLE-CENTER (marker)                  ← display-only, radius A at P₁₃ (the Law-4 amplitude distance; no instrument reads it)
+    ├── Inclination Precession (container)            ← P₃
+    │   └── Ecliptic Precession (container)           ← P₅
+    │       └── Obliquity Cycle (container)           ← P₈
+    │           └── Perihelion Precession 1           ← P₁₆
+    │               └── Perihelion Precession 2       ← P₁₆ (reverse)
     │                   └── Barycenter (pivot)
     │                       ├── Sun                   ← sibling, NOT parent
     │                       ├── PERIHELION-OF-EARTH   ← sibling
@@ -196,21 +206,21 @@ The Earth object itself represents **Axial Precession**:
 
 | Property | Value | Meaning |
 |----------|-------|---------|
-| orbitRadius | 0 | Earth sits at the scene origin; every instrument measures from `earth.planetObj` (measuring from a displaced wobble centre would run the perihelion 8% fast — the offset chain carries the full e(t)·û(ϖ) itself). The visible wobble-centre marker is a display-only *child* of Earth at +`eccentricityAmplitude`×100, circling at H/13 — it shows the Law-4 amplitude distance A (the 1246 triangle closure, docs/10 §Law 4) and the solstice direction, and nothing reads it |
-| speed | -2π / (H/13) | Clockwise axial precession |
+| orbitRadius | 0 | Earth sits at the scene origin; every instrument measures from `earth.planetObj` (measuring from a displaced wobble centre would run the perihelion 8% fast — the offset chain carries the full e(t)·û(ϖ) itself). The visible wobble-centre marker is a display-only *child* of Earth at +`eccentricityAmplitude`×100, circling at the axial wheel's P₁₃ — it shows the Law-4 amplitude distance A (the 1246 triangle closure, docs/10 §Law 4) and the solstice direction, and nothing reads it |
+| speed | -2π / P₁₃ (`_wheelPeriodYears(13)`, the recorded wheel period 25,793.6 yr) | Clockwise axial-precession wheel (scaffold pose; the published precession period is T_p) |
 | rotationSpeed | 2π × sidereal rotations per SI year — **locked to the J2000 sidereal day** in both modes (see §14.4) | Daily spin |
 | tilt | -`earthtiltMean` | Mean axial tilt (obliquity) |
 
 ### 5.2 Inclination Precession
 
 > **Naming note:** physically this is the **apsidal precession** wheel — the
-> ICRF-perihelion revolution (H/3). The scene node and this document keep the
+> ICRF-perihelion revolution (the wheel of index 3, recorded period P₃). The scene node and this document keep the
 > historical name "Inclination Precession" because they document the code's
 > own identifiers (doc 03 glossary carries the rename).
 
 | Property | Value | Meaning |
 |----------|-------|---------|
-| speed | +2π / (H/3) | Counter-clockwise |
+| speed | +2π / P₃ (`_wheelPeriodYears(3)`, 111,772.3 yr) | Counter-clockwise |
 | startPos | Cycles from the model start to J2000 minus the device's recorded J2000 wheel phase (3 × `kDeviceWheelPhaseAtJ2000Cycles`; plan 07 R10, Part 6) | Phase alignment |
 
 **Purpose:** Opposes Earth's axial precession motion. The inclination precession and axial precession are "balancing out in both ways" - they have opposite directions.
@@ -219,7 +229,7 @@ The Earth object itself represents **Axial Precession**:
 
 | Property | Value | Meaning |
 |----------|-------|---------|
-| speed | +2π / (H/5) | Counter-clockwise |
+| speed | +2π / P₅ (`_wheelPeriodYears(5)`, 67,063.4 yr) | Counter-clockwise |
 | orbitTiltb | -`earthInvPlaneInclinationAmplitude` | Negative tilt amplitude |
 
 **Purpose:** Models the ecliptic plane's precession component.
@@ -228,7 +238,7 @@ The Earth object itself represents **Axial Precession**:
 
 | Property | Value | Meaning |
 |----------|-------|---------|
-| speed | -2π / (H/8) | Clockwise |
+| speed | -2π / P₈ (`_wheelPeriodYears(8)`, 41,914.6 yr) | Clockwise |
 | orbitTiltb | +`earthInvPlaneInclinationAmplitude` | Positive tilt amplitude (opposite of ecliptic) |
 
 **Purpose:** Explains Earth's temperature variation cycles. The obliquity oscillates between approximately ~22.2° and ~24.7°.
@@ -241,7 +251,7 @@ Both layers use the same period but opposite signs:
 
 | Property | Perihelion 1 | Perihelion 2 |
 |----------|--------------|--------------|
-| speed | +2π / (H/16) | -2π / (H/16) |
+| speed | +2π / P₁₆ | -2π / P₁₆ (`_wheelPeriodYears(16)`, 20,957.3 yr) |
 | orbitTilta | -`earthRAAngle` | 0 |
 | orbitCentera | 0 | −e(t) × 100 — **animated every frame** |
 
@@ -251,7 +261,7 @@ The paired inverse rotations maintain equilibrium during Earth's two counter-mot
 
 **Earth's eccentricity in the scene.** Earth's
 eccentricity is the N-body secular series on every path (plan 09 step 6: the
-former one-law e(t) = base′·(1 + cos θ₃(t)/2) on the H/3 inclination phase is
+former one-law e(t) = base′·(1 + cos θ₃(t)/2) on the inclination wheel's phase is
 deleted; base′ stays as the perihelion wheel's pose). The scene
 realizes it as ONE arm: Perihelion Precession 2's centre carries
 −e(t)·100 every frame (`moveModel` in both twins), pointing at the
@@ -271,27 +281,30 @@ realized offset.
 
 | Layer | Period | Speed Sign | orbitTiltb |
 |-------|--------|------------|------------|
-| Earth (Axial) | H/13 | Negative | - |
-| Inclination | H/3 | Positive | - |
-| Ecliptic | H/5 | Positive | -`earthInvPlaneInclinationAmplitude` |
-| Obliquity | H/8 | Negative | +`earthInvPlaneInclinationAmplitude` |
-| Perihelion 1 | H/16 | Positive | - |
-| Perihelion 2 | H/16 | Negative | - |
+| Earth (Axial) | P₁₃ | Negative | - |
+| Inclination | P₃ | Positive | - |
+| Ecliptic | P₅ | Positive | -`earthInvPlaneInclinationAmplitude` |
+| Obliquity | P₈ | Negative | +`earthInvPlaneInclinationAmplitude` |
+| Perihelion 1 | P₁₆ | Positive | - |
+| Perihelion 2 | P₁₆ | Negative | - |
+
+(P_N = `earth.kDeviceWheelPeriodYears[N]`, the recorded wheel periods of Part 2.)
 
 ---
 
 ## Part 6: The Balanced Year (retired as an input — plan 07 R10)
 
-The **balanced year** was the fitted phase origin of the model's correction
-combs and of the precession layers' `startPos` values:
-`perihelionalignmentYear − 14.5 × H/16` = −302,635, the 14.5-cycle offset that
-positioned the obliquity fluctuation against the paleoclimate record. It is no
-longer an input. The combs are deleted (plan 09; from R10 to their deletion
-they measured their phase from J2000, the coefficients rotated exactly), and the
-precession layers keep their J2000 pose through one recorded device constant,
-`kDeviceWheelPhaseAtJ2000Cycles` = (2000 − t₀)/H = 0.9085 anchor units: each
-H/N wheel stands N × that on at J2000, and its `startPos` is the wheel's
-cycles from the model start to J2000 minus that phase.
+The **balanced year** t₀ = −302,635 was the fitted phase origin of the retired
+correction combs and of the precession layers' `startPos` values (the 14.5-cycle
+offset of the perihelion wheel that positioned the obliquity fluctuation against
+the paleoclimate record). It is no longer an input, and the combs are deleted
+(plan 09; from R10 to their deletion they measured their phase from J2000, the
+coefficients rotated exactly). The precession layers keep their J2000 pose
+through one recorded device constant, `kDeviceWheelPhaseAtJ2000Cycles` =
+0.908498525276082 (numerically the retired origin's offset to J2000 in the
+retired unit): the wheel of index N stands N × that on at J2000, and its
+`startPos` is the wheel's cycles from the model start to J2000 at its recorded
+period P_N minus that phase.
 
 **Why it matters:** the K-device wheels are the scene's scaffold, not a law —
 the engine places the Earth frame, the Sun and the Moon stack over them (the
@@ -421,7 +434,7 @@ of a phase error in the mean longitude). Measured cause: the factory's lazy
 normalisations — the obliquity carrier's (ε₀, C) and the self-measured rate
 anchors — initialise on the first Moon evaluation, the first frame, before
 the secular-series artifact has landed, so in the browser they read the
-flag-off K-comb ε (0.233″ from the one-source ε at 2000) while every later
+flag-off K-comb ε (the obliquity comb deleted at plan 09; 0.233″ from the one-source ε at 2000) while every later
 call reads the hybrid; the Node engine loads the artifact synchronously. A
 Node emulation of that race reproduced all five numbers to 0.001″. The
 artifact-landing block now resets the factory (`_moonArgsM.reset()`), and the
@@ -563,19 +576,19 @@ This applies throughout the model:
 ├──────────────────────────────────────────────────────────────────────────────┤
 │                                                                               │
 │  startingPoint (scene root)                                                   │
-│    └── Earth (Axial Precession: H/13, clockwise)                             │
+│    └── Earth (Axial Precession: P₁₃, clockwise)                              │
 │          │                                                                    │
 │          ├── Moon Hierarchy (apsidal, nodal, Lunar Leveling cycles)           │
 │          │                                                                    │
-│          └── Inclination Precession (H/3, CCW)                               │
+│          └── Inclination Precession (P₃, CCW)                                │
 │                │                                                              │
-│                └── Ecliptic Precession (H/5, -amplitude)                     │
+│                └── Ecliptic Precession (P₅, -amplitude)                      │
 │                      │                                                        │
-│                      └── Obliquity Cycle (H/8, +amplitude)                   │
+│                      └── Obliquity Cycle (P₈, +amplitude)                    │
 │                            │                                                  │
-│                            └── Perihelion 1 (H/16, fwd)                      │
+│                            └── Perihelion 1 (P₁₆, fwd)                       │
 │                                  │                                            │
-│                                  └── Perihelion 2 (H/16, reverse)           │
+│                                  └── Perihelion 2 (P₁₆, reverse)            │
 │                                        │                                      │
 │                                        └── Barycenter                        │
 │                                              ├── Sun (sibling)               │
@@ -598,15 +611,15 @@ Modern-era / J2000-anchored simulation. Each frame's rotation is the standard sn
 θ = obj.speed × pos − obj.startPos × (π/180)
 ```
 
-This is correct when the rate `obj.speed` has been constant since simulation start — i.e., across the modern era (~±10 millennia around J2000). The H/n divisors and per-planet periods are held at their J2000-anchored values.
+This is correct when the rate `obj.speed` has been constant since simulation start — i.e., across the modern era (~±10 millennia around J2000). The K wheels' recorded periods P_N and the per-planet periods are held at their J2000-anchored values.
 
 ### 15.2 Integrator mode (`DEEP_TIME_MODE_ENABLED = true` — the shipped default)
 
-Deep-time / Phanerozoic / Hadean simulation. The same scene graph is rendered, but each frame's rotation is computed via **per-node integrator tags** that account for the epoch-dependent evolution of H(t), LOD(t), and planet orbital periods per the [Expanding Solar System Resonance Theory (Doc 99)](99-expanding-solar-system-resonance-theory.md). Four tag families cover the scene graph:
+Deep-time / Phanerozoic / Hadean simulation. The same scene graph is rendered, but each frame's rotation is computed via **per-node integrator tags** that account for the epoch-dependent evolution of the precession period T_p(t), LOD(t), and planet orbital periods per the [Expanding Solar System Resonance Theory (Doc 99)](99-expanding-solar-system-resonance-theory.md). Four tag families cover the scene graph:
 
 | Tag | Time base | Used for | Integrator |
 |---|---|---|---|
-| `_dtCycleN`, `_dtCycleSign`, `_dtCycleAnchor` | UT (`_currentYearSI`) | Earth + 5 Earth precession layers + the wobble centre — the K-device scaffold the engine frame is placed over (R4) | uniform: N turns per anchor unit at the recorded J2000 rate from the anchor, + the recorded J2000 wheel phase (plan 09 step 5c; the ∫N/H_era counter is retired) |
+| `_dtCycleN`, `_dtCycleSign`, `_dtCycleAnchor` | UT (`_currentYearSI`) | Earth + 5 Earth precession layers + the wobble centre — the K-device scaffold the engine frame is placed over (R4) | uniform: one turn per recorded wheel period P_N (`_wheelPeriodYears(N)`) from the anchor, + the recorded J2000 wheel phase N × `kDeviceWheelPhaseAtJ2000Cycles` (plan 09 step 5c; the ∫N/H_era counter is deleted) |
 | `_dtMoonIntegrator`, `_dtMoonAnchor`, `_dtMoonSign` | UT (`_currentYearSI`) | Moon-chain nodes (5 nodes) | `obj._dtMoonIntegrator(anchor, year)` |
 | `_dtPlanetIntegrator`, `_dtPlanetAnchor`, `_dtPlanetSign` | TT (`_currentYearSI_TT`) | Planet orbital nodes (Mercury–Neptune, 7 nodes) | `obj._dtPlanetIntegrator(anchor, year)` |
 | (`_dtPerihelionDivisor`, `_dtPerihelionAnchor` — retired) | — | the equation-of-centre perihelion phase keeps its snapshot form for the Moon, Pluto and the no-chain bodies; the Sun's angle is the engine's (R4) | the chain planets' tags left at plan 07 R7, the Sun's at plan 09 step 5c |
@@ -628,15 +641,15 @@ The dLOD/dt layers (L1 tidal baseline · L2 + GIA α(t) · L3 + 4-flag ΔT stack
 
 | Consumer | Layers applied | Where / why |
 |---|---|---|
-| **Ephemeris & eclipse chain** | **Full Layer 4** | `meanDeltaTSecondsAtAge()` integrates the Layer-2 LOD (tidal + GIA) with the H/5 kinematic term, then adds the 4-flag stack + the Core-mantle swing post-integration (each component zero-anchored at J2000). Feeds `_eclDeltaT()` → JD_UT → JD_TT inside every Meeus wrapper (`_eclSunLon`, `_eclMoonLon`, …) and the TT-anchored planet integrators (`_currentYearSI_TT`). All validated rotation claims (26-event solar audit, 267-event lunar test, ΔT charts) run through this path. |
+| **Ephemeris & eclipse chain** | **Full Layer 4** | `meanDeltaTSecondsAtAge()` integrates the Layer-2 LOD (tidal + GIA) with the ecliptic missing-motion kinematic term (on the nodal period T_s₃, doc 11; the code identifier keeps its historical `h5` name), then adds the 4-flag stack + the Core-mantle swing post-integration (each component zero-anchored at J2000). Feeds `_eclDeltaT()` → JD_UT → JD_TT inside every Meeus wrapper (`_eclSunLon`, `_eclMoonLon`, …) and the TT-anchored planet integrators (`_currentYearSI_TT`). All validated rotation claims (26-event solar audit, 267-event lunar test, ΔT charts) run through this path. |
 | **Deep-time epoch anchors** | **Layer 2 only** | `recomputeEpochAnchors()` sets `meanlengthofday` from `meanLodSecondsAtAge()` (tidal + GIA). The stack + swing are a zero-mean ±ms *modulation* around the epoch mean, so folding them into the mean-LOD anchor would inject a phase-dependent offset into every derived day count. `meanLodSecondsWithCorrectionsAtAge()` exists for consistency with the corrected ΔT curve and is consumed only by the ESSRT modal display. |
 | **Visible scene-graph spin** | **None over time (J2000-locked)** | `earth.rotationSpeed` is a constant J2000 sidereal rate (`updateEarthForEpoch()`). The scene graph applies spin as `pos × rate` (a multiplier, not `∫dt/LOD(t)`), so an epoch-mutated rate would be retroactively applied to the whole elapsed span (~163° spurious drift — "eclipse over America renders over Turkey at −584"). The lock gives a stable JD ↔ orientation convention; it is explicitly **not** a ΔT claim — physically-correct orientation lives in the ephemeris chain above. |
 
-In short: **the full corrected curve (Layer 4) governs all validated rotation physics, Layer 2 governs epoch means, and the rendered globe uses a fixed J2000 convention.** Deep-time LOD/H evolution remains visible in the calculator displays and the ESSRT modal, which read `meanLodSecondsAtAge()` / `meanHAtAge()` directly.
+In short: **the full corrected curve (Layer 4) governs all validated rotation physics, Layer 2 governs epoch means, and the rendered globe uses a fixed J2000 convention.** Deep-time LOD and precession-period evolution remains visible in the calculator displays and the ESSRT modal, which read `meanLodSecondsAtAge()` / `_axialPrecessionPeriodYearsAtAge()` directly.
 
 ### 15.5 References
 
-- [Doc 99 — Expanding Solar System Resonance Theory (ESSRT)](99-expanding-solar-system-resonance-theory.md) — canonical chain from `t_Ma` through LOD, H, AU, M_Sun, Kepler year, Moon distance, planet orbital + synodic periods
+- [Doc 99 — Expanding Solar System Resonance Theory (ESSRT)](99-expanding-solar-system-resonance-theory.md) — canonical chain from `t_Ma` through LOD, T_p, AU, M_Sun, Kepler year, Moon distance, planet orbital + synodic periods
 - [Doc 20 § "ESSRT epoch dependence"](20-constants-reference.md#essrt-epoch-dependence--most-tabulated-values-are-j2000-anchored) — J2000-constant → `mean*AtAge(t_Ma)` helper map
 
 ---

@@ -269,7 +269,7 @@ The cardinal points (solstices and equinoxes) are **derived, not independently f
 - **Apsidal precession**: <!--v:inclPrecYears-->~111,635<!--/v--> years, a J2000 reading of the orbit's own motion
 - **Perihelion precession**: <!--v:periPrecYears-->~20,938<!--/v--> years — the beat of the two, 1/T_peri = 1/T_p + 1/T_aps
 - **Obliquity band**: <!--v:obliqBeatJ2000Kyr-->41.1<!--/v--> kyr — the beat of the clock against the orbit's nodal mode
-- **Model parameters**: two engines, three ledgers — zero fitted constants on the planetary side, the derived clock, and five named device constants of the frozen era machinery; everything else is derived or anchored to observation ([Constants Reference](docs/20-constants-reference.md))
+- **Model parameters**: two engines, three ledgers — zero fitted constants on the planetary side, the derived clock, and the scene scaffold's recorded J2000 pose (no observable rides it); everything else is derived or anchored to observation ([Constants Reference](docs/20-constants-reference.md))
 
 ---
 

@@ -13,7 +13,7 @@ This document describes all data export, report generation, and validation syste
 - [51 - Planet Orbit Analysis Reference](51-planet-inspector-reference.md) - Planet inspector panel and where planet reports are displayed
 - [50 - UI Panels Reference](50-ui-panels-reference.md) - Panel system overview
 - [21 - Orbital Formulas Reference](21-orbital-formulas-reference.md) - Calculations used in exports
-- [99 - Expanding Solar System Resonance Theory (ESSRT)](99-expanding-solar-system-resonance-theory.md) - Deep-time scaling of H(t) and epoch helpers
+- [99 - Expanding Solar System Resonance Theory (ESSRT)](99-expanding-solar-system-resonance-theory.md) - Deep-time scaling of the precession clock T_p(t) and epoch helpers
 
 > **Scope note (ESSRT).** The export tooling and detection methods (declination-based cardinal-point detection, parabolic/linear interpolation, RA/Dec column generation) are scale-invariant — they operate against whatever simulation state is active at each date sample. When users scrub the report date range into deep time (millions of years), the simulation auto-applies ESSRT scaling per `DEEP_TIME_MODE_ENABLED` (LOD, H, year length, Moon distance, orbit periods), so exports remain consistent at any epoch. The IAU reference values catalogued in §"IAU Reference Values" are J2000-anchored.
 
@@ -21,7 +21,7 @@ This document describes all data export, report generation, and validation syste
 
 ## Overview
 
-The simulation provides five export / validation systems (the fifth, the **Solar Day** report under Reports → Solar Day, exports the Layer-taxonomy solar-day values — see doc 11 and doc 99 § the H/5 LOD correction):
+The simulation provides five export / validation systems (the fifth, the **Solar Day** report under Reports → Solar Day, exports the Layer-taxonomy solar-day values — see doc 11 and doc 99 § the ecliptic-turn LOD correction on the nodal period 1,296,000/|s₃|):
 
 | System | Purpose | Output Format | Location |
 |--------|---------|---------------|----------|

@@ -13,7 +13,7 @@ The **Earth–Moon Genesis Analysis** is a modal panel in the Tools menu that vi
 
 The clock — the mean lunisolar precession period — lengthens monotonically across geological time via two physically independent drivers (the climate formula's precession-band lines ride it; its eccentricity-band lines, planetary beats, do not):
 
-- **Driver 1 — Earth-Moon tidal evolution**: lunar tidal friction slows Earth's spin, lengthening LOD; H ∝ LOD via the structural identity `H = 13 × axial precession period` (where axial precession scales with LOD).
+- **Driver 1 — Earth-Moon tidal evolution**: lunar tidal friction slows Earth's spin, lengthening LOD; the composed lunisolar precession period T_p(t) lengthens with the spin, its lunar share scaling with the Moon's distance (1/a³).
 - **Driver 2 — Solar mass loss**: the Sun loses ~10⁹ kg/s in solar wind; by angular-momentum conservation `a × M = const`, each planet's semi-major axis slowly expands; Kepler's third law `T² ∝ a³ / M` then sets each planet's orbital period.
 
 The panel plots each quantity over the full Hadean → +1 Gyr range or a focused Phanerozoic 650-Myr window, with anchor-point validation against the Wu et al. 2024 cyclostratigraphic compilation.
@@ -124,10 +124,10 @@ Mouse-over on the chart triggers a snap-to-nearest-sample tooltip showing the ex
 
 Two quantities include a footnote below the chart:
 
-- **Axial Precession** — *"Note: shown is the structural mean H/13. The real axial precession also oscillates by ~50-500 years around this mean on shorter cycles of ~21,000 and ~42,000 years (the H/16 perihelion and H/8 obliquity cycles). These short-period fluctuations are invisible at the modal's deep-time scale (one chart pixel spans ~590,000 years on the Phanerozoic view), but show up in the orbital calculator at modern epochs."*
-- **Obliquity Cycle** — *"Note: Earth's axial tilt oscillates between approximately 22.4° and 24.5° around a stable mean ~23.4°. The cycle period (shown here, ∝ H) evolves with deep time; the mean stays essentially fixed."*
+- **Axial Precession** — *"Note: the curve is the composed lunisolar precession period — Earth's spin carrying the solar and lunar torques, the lunar term scaling with 1/a³ so the closer Moon drove precession faster than spin-scaling alone — anchored on the IAU 2006 general precession at J2000 (25,771.6 yr). This is the quantity cyclostratigraphic inversions (Wu et al. 2024) measure. The real axial precession also oscillates by ~50–500 years around the mean on the ~21,000- and ~41,000-year cycles (the perihelion-of-date and obliquity beats), invisible at this scale."*
+- **Obliquity Cycle** — *"Note: Earth's axial tilt oscillates between approximately 22.4° and 24.5° around a stable mean ~23.4°. The cycle period (shown here — the beat of the spin axis's inertial rate against the dominant nodal mode) evolves with deep time; the mean stays essentially fixed."*
 
-These prevent the common misreading that the modal is showing *the obliquity oscillation itself* or *the axial precession positions* — it shows the *periods* of those cycles, which scale with H(t).
+These prevent the common misreading that the modal is showing *the obliquity oscillation itself* or *the axial precession positions* — it shows the *periods* of those cycles, which evolve with the composed precession clock T_p(t).
 
 ## Export buttons
 
@@ -172,14 +172,14 @@ Full per-anchor agreement table + statistical summary at [doc 99 §"Validation a
 
 1. **Earth-centric quantities only.** The 6 plotted quantities all describe Earth (axial precession, obliquity, LOD, year, AU, Moon). Per-planet deep-time evolution (e.g. Jupiter's perihelion period at deep time) is implicit — every planet's secular period stretches with the one Driver-2 solar-mass law — but the modal doesn't plot per-planet curves directly. The structural argument is in [doc 99 §"Predicted planetary perihelion precession periods through time"](99-expanding-solar-system-resonance-theory.md).
 2. **Two-driver framework only.** The proper-physics formulas combine Driver 1 (Farhat polynomial + angular-momentum conservation) and Driver 2 (Kepler scaling under solar mass loss). Other long-term effects — late-stage giant-planet migration, dust accretion, GR perturbations beyond Kepler — are not in the formulas. Forward validity is bounded by the proper-physics formula's horizon (~+2 Gyr per [doc 99 §"The proper-physics formula's predictive horizon"](99-expanding-solar-system-resonance-theory.md)).
-3. **Hadean uncertainty is real.** Backward to Earth-Moon genesis, the formulas extrapolate well beyond the Wu 2024 anchor range (max 650 Ma). The Hadean predictions (e.g., LOD ~5 hr, H ~73,000 yr) are model output, not observation — see [doc 99 §"Interpretation 2: Proper-physics formula at the Hadean"](99-expanding-solar-system-resonance-theory.md) for the discussion.
+3. **Hadean uncertainty is real.** Backward to Earth-Moon genesis, the formulas extrapolate well beyond the Wu 2024 anchor range (max 650 Ma). The Hadean predictions (e.g., LOD ~5 hr) are model output, not observation — see [doc 99 §"Interpretation 2: Proper-physics formula at the Hadean"](99-expanding-solar-system-resonance-theory.md) for the discussion.
 4. **No discrimination between Wu and Williams 2000.** The Williams 2000 620-Ma tidal-rhythmite LOD estimate (21.9 hr) disagrees mildly with the proper-physics curve (~21.0 hr) and with Wu 2024's nearby 650-Ma anchor (20.94 hr). [Doc 99 §"The Williams 2000 (620 Ma) discrepancy"](99-expanding-solar-system-resonance-theory.md) discusses both views; the modal plots only the model curve + Wu anchors.
 5. **Read-only.** No "edit polynomial coefficients" feature. To update the proper-physics formulas, edit the helper functions in `src/script.js` and reload.
 
 ## Related documentation
 
 - [doc 99 — Expanding Solar System Resonance Theory (ESSRT)](99-expanding-solar-system-resonance-theory.md) — complete theoretical framework, Driver 1 + 2 derivations, per-anchor validation tables, deep-time L1 predictions, falsifiable claims
-- [doc 92 — Climate Formula](92-climate-formula.md) — the L1 integer-divisor lattice that stays invariant under H(t) scaling
+- [doc 92 — Climate Formula](92-climate-formula.md) — the L1 physical line set (the precession-band lines ride T_p(t); the eccentricity-band planetary beats do not)
 - [doc 58 — Earth Climate Analysis](58-climate-formula-explorer.md) — sibling Tools-menu modal (companion to Earth–Moon Genesis Analysis)
 - [doc 57 — Framework Verification](57-formula-verification.md) — sibling Tools-menu modal comparing model vs published celestial-mechanics formulas across ±12 kyr
 - [doc 56 — Perihelion of Planets Verification](56-webgeocalc-explorer.md) — sibling Tools-menu modal showing observed perihelion-precession history (JPL NAIF, 1900–2026)

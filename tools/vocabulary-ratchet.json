@@ -1,9 +1,6 @@
 {
   "_comment": "Retired-vocabulary RATCHET (plan 06 D3). Counts may only go DOWN. Regenerate: node tools/check-vocabulary.mjs --write",
   "files": {
-    "docs/92-climate-formula.md": {
-      "8H as a cycle name": 12
-    },
     "src/script.js (user-facing strings)": {
       "8H as a cycle name": 10,
       "H-lattice": 4,

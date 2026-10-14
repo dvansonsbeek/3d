@@ -42,8 +42,8 @@ governed element chain.
 perihelion direction in `earth.rotationAxis`, measured from the
 perihelion-of-Earth point. No observer publishes this quantity. It
 fluctuates because the projection slope dα/dλ and the obliquity move with
-Earth's precession cycles; over a full H its average returns to the
-ecliptic value. Two implementations exist:
+Earth's precession cycles; over full precession and obliquity cycles its
+average returns to the ecliptic value. Two implementations exist:
 
 - **Scene measurement** (`apparentRaFromPdA`): transforms the perihelion
   markers' world positions into Earth's equatorial frame and reads the
@@ -52,7 +52,8 @@ ecliptic value. Two implementations exist:
   is load-bearing: projecting with the full distance instead of ρ was
   measured to generate 96 % of Venus's exported "precession fluctuation"
   (std 513 → 20 ″/cy with the term; Mercury 96 → 35 ″/cy), as harmonics
-  8–15 of the H/13 equatorial rotation with H/3 and H/8 sidebands — a
+  8–15 of the axial-precession (equatorial) rotation with sidebands on the
+  inclination and obliquity cycles — a
   property of the projection, not of the orbits.
 - **The projection** (`perihelionFrameBreakdown`, plan 06 R8): the
   Earth-frame RA rate is §1.8's identity applied to the lattice motion
@@ -149,7 +150,7 @@ For first-order secular theory, eccentricity and inclination corrections are **n
 
 | Limitation | Impact | Example |
 |------------|--------|---------|
-| **Ecliptic-frame-only** | Treats the ecliptic as a stable reference, ignoring that the ecliptic itself precesses (general precession H/13 ≈ 50 ″/yr). See §1.5a. | Saturn ecliptic-retrograde observed but L-L gives prograde |
+| **Ecliptic-frame-only** | Treats the ecliptic as a stable reference, ignoring that the ecliptic itself precesses (general precession p_A ≈ 50.3 ″/yr). See §1.5a. | Saturn ecliptic-retrograde observed but L-L gives prograde |
 | **First-order only** | Neglects terms of order m² in planetary masses | ~4% error for Mercury |
 | **Secular terms only** | Ignores all periodic (short-term) perturbations | Unknown systematic bias |
 | **Low-order in e, i** | Only uses 2nd order in eccentricity/inclination | Poor for high-e orbits |
@@ -228,18 +229,18 @@ planet the model stores:
 - `perihelionEclipticYears` — the chain's inertial apsidal period,
   1,296,000/g yr in the J2000 ecliptic (plan 07 R1; the H·num/den lattice
   period it replaced sat in the same slot)
-- Derived ICRF period: `T_ICRF = (T_peri · T_H13) / (T_H13 − T_peri)` —
+- Derived ICRF period: `T_ICRF = (T_peri · T_p) / (T_p − T_peri)` —
   the rate in the inertial frame after subtracting general precession
 
 The two are related by `ω_ICRF = ω_ecliptic − ω_gen` where
-`ω_gen = 2π / T_H13` is the general-precession rate. This relation is
-applied as a formula; inside the scene the equatorial frame and the star
-field share the H/13 rotation, so a scene measurement cannot separate
-"relative to the equinox" from "relative to the stars" — see §1.8, "Frames,
-measured". **The model treats the
-ICRF as the stable foundation** — it's the frame in which the retired integer
-structure (H/3, H/5, H/8, H/13, H/16) is anchored — and derives the
-ecliptic rate from it via this relation. That's why the model's ecliptic
+`ω_gen = 2π / T_p` is the general-precession rate (T_p = 1,296,000″/p_A at
+J2000). This relation is applied as a formula; inside the scene the
+equatorial frame and the star field share the `earth` node's axial-precession
+rotation, so a scene measurement cannot separate "relative to the equinox"
+from "relative to the stars" — see §1.8, "Frames, measured". **The model
+treats the ICRF as the stable foundation** — the frame of the chain's
+inertial apsidal periods (and the frame the retired integer structure was
+anchored in) — and derives the ecliptic rate from it via this relation. That's why the model's ecliptic
 rates match WebGeoCalc directly (both measure the date-frame) while L-L's
 ecliptic rates match neither cleanly (L-L's "ecliptic" is a hybrid of
 conventions).
@@ -247,9 +248,10 @@ conventions).
 **Testable prediction from the frame distinction.** Standard secular theory
 says Saturn's ecliptic retrograde rate is a transient phase of the
 Great-Inequality oscillation (~900-yr period) and will reverse within
-~450 yr. The model says Saturn's ecliptic rate is
-permanently retrograde at `−3,140 ″/cy` (the device's ecliptic-period value) because that's the correct
-date-frame expression of the stable ICRF structure. Long-baseline JPL
+~450 yr. The retired device said Saturn's ecliptic rate is
+permanently retrograde at `−3,140 ″/cy` (its ecliptic-period value, as the
+date-frame expression of the integer ICRF structure — a record, retired with
+the lattice at plan 07 R1). Long-baseline JPL
 DE441 integrations (13 000 BC → 17 000 AD) can in principle distinguish
 these. Saturn's window retrograde is the chain's own reading ([doc 109](109-model-nbody-engine-and-lattice-test.md)).
 
@@ -380,7 +382,7 @@ are Mercury −0.004 ± 0.005, Venus +0.024 ± 0.033, Earth +0.006 ± 0.007,
 Mars −0.007 ± 0.007 ″/cy — the inertial excesses equal 42.98 / 8.62 / 3.84 /
 1.35 ″/cy to those precisions, and the projection values are excluded as
 their cause by three orders of magnitude for Venus and Mars. Earth's own perihelion of
-date (H/16, <!--v:earthPeriRateEclipticOfDateArcsecCy-->6,189.73<!--/v--> ″/cy)
+date (the N-body series' ϖ of date, <!--v:earthPeriRateEclipticOfDateArcsecCy-->6,189.73<!--/v--> ″/cy)
 projects with an excess of <!--v:earthPeriProjectionExcessJ2000-->493.64<!--/v--> ″/cy
 against a GR advance of 3.84. This table is the pre-registered test of the
 statement "the Mercury anomaly is the equatorial projection of the ecliptic
@@ -389,8 +391,8 @@ public form are decided in the plan `IP-mercury-anomaly-projection.md`
 (private repo), not here.
 
 **Frames, measured.** In the scene the equatorial frame (`earth.rotationAxis`)
-and the star field (`zodiac`, a child of `earth.pivotObj`) share the H/13
-rotation, so a perihelion marker's rate is the same relative to the equinox
+and the star field (`zodiac`, a child of `earth.pivotObj`) share the `earth`
+node's axial-precession rotation, so a perihelion marker's rate is the same relative to the equinox
 and relative to the stars (Mercury: 532 ″/cy for both), whereas physically
 the two differ by the general precession. The "ICRF rate" of §1.5a
 (ω_ICRF = ω_ecl − ω_gen) is a formula applied outside the scene. The
@@ -428,10 +430,10 @@ Newton in a measurement that never touches the equator; the projection
 excess of this section, being zero in every equator-free coordinate,
 cannot be that motion.
 
-**Pre-registered slot for a lattice-native cause.** Since the excess is a
+**Pre-registered slot for a body-local cause.** Since the excess is a
 property of the orbit, any explanation must be a rule that acts at the
-body — one formula for every body from lattice/orbital quantities only (H,
-the device's ecliptic periods, a, e, period, masses), with no obliquity and no longitude measured
+body — one formula for every body from orbital quantities only (the chain's
+apsidal periods, a, e, period, masses), with no obliquity and no longitude measured
 from the equinox, and no parameter fitted to the targets (or fitted on
 Mercury alone and then predicting the rest). The harness
 `tools/explore/perihelion-excess-candidates.mjs` scores such rules against
@@ -446,8 +448,8 @@ Mercury and Icarus (a second ~5 % coincidence: at ϖ = 119° the RA stretch
 is ~4 %, and so is GR/Newtonian for Icarus) and fails Mars by 34σ, because
 in ecliptic longitude the projection is identically zero while the Mars
 data want ≈ 0 and the rule gives −101; a constant fraction of the
-Newtonian rate, k/a, and the nearest device-period slot fail. The device-native
-slot is empty; a proposal is scored by defining its function there.
+Newtonian rate, k/a, and (as recorded) the nearest slot of the retired
+device's periods fail. The body-local slot is empty; a proposal is scored by defining its function there.
 
 **The model's own N-body.** The audit of every planet's perihelion and node
 rate with the model's own integrator, the Wisdom–Holman engine, the
@@ -469,9 +471,10 @@ For each planet: **WebGeoCalc observed** (JPL/NAIF short-baseline
 diagonal sum from §1.1), and the **model's value** (whose quantity TYPE
 differs per planet — doc 109 §9: Mars = long-term mean, Mercury =
 present-epoch rate, Jupiter/Saturn/Uranus = window-epoch values). All in
-″/century; the device-period figures are J2000-evaluated (the divisor is the
-scale-invariant quantity; the literal rate scales with H(t) at deep time
-under [ESSRT](99-expanding-solar-system-resonance-theory.md)).
+″/century. The Model figures marked "(device)" are the RECORD of the retired
+lattice's J2000 ecliptic periods (retired at plan 07 R1 — a planet's apsidal
+period is now the chain's 1,296,000/g, and its present-epoch rates are the
+§1.8 table above); Earth's is the N-body series' perihelion-of-date rate.
 
 | Planet | WebGeoCalc observed | First-order A_ii | Model | Notes |
 |--------|--------------------|-----------------|-----------------|-------|
@@ -482,7 +485,7 @@ under [ESSRT](99-expanding-solar-system-resonance-theory.md)).
 | Jupiter | ~<!--v:jupiterObservedRate-->1,800<!--/v--> | ~754 | 1,884 (device) | L-L under by ~58 % (Jupiter–Saturn 5:2 coupling missing); model matches obs to ~5 % |
 | Saturn | retrograde, magnitude window-sensitive (~−1,800 to −3,600) | +1,867 | −3,140 (device) | L-L has wrong sign; model sits within the observed window-spread |
 | Uranus | ~<!--v:uranusObservedRate-->1,100<!--/v--> | ~278 | 1,160 (device) | L-L under by ~75 %; model matches obs to ~5 % |
-| Neptune | ~200 | ~68 | 193 (2H) | L-L under by ~66 %; model matches obs to ~4 % |
+| Neptune | ~200 | ~68 | 193 (device) | L-L under by ~66 %; model matches obs to ~4 % |
 
 First-order L-L is a reasonable approximation for Mercury and Mars but
 fails significantly for every other planet — structural failures of
@@ -507,4 +510,4 @@ subject of §1.8's projection analysis and transit test.
 - [109-model-nbody-engine-and-lattice-test.md](109-model-nbody-engine-and-lattice-test.md) — the model's own N-body: audit, engine, frequencies, the lattice at its own quantity type, divisor restatement
 - [56-webgeocalc-explorer.md](56-webgeocalc-explorer.md) — the observed-rate explorer this document's comparisons cite
 - [41-scene-graph-hierarchy.md](41-scene-graph-hierarchy.md) — why Earth-frame measurements inherit the precession layers
-- [99-expanding-solar-system-resonance-theory.md](99-expanding-solar-system-resonance-theory.md) — ESSRT: deep-time scaling of H(t)
+- [99-expanding-solar-system-resonance-theory.md](99-expanding-solar-system-resonance-theory.md) — ESSRT: deep-time scaling of the precession period T_p(t)

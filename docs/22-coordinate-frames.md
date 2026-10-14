@@ -13,7 +13,7 @@ This document describes the coordinate reference frames and transformations used
 - [20 - Constants Reference](20-constants-reference.md) - J2000-anchored constants + epoch helpers
 - [21 - Orbital Formulas Reference](21-orbital-formulas-reference.md) - Calculation functions
 - [05 - The Invariable Plane](05-invariable-plane-overview.md) - Height calculations and node conventions
-- [99 - Expanding Solar System Resonance Theory](99-expanding-solar-system-resonance-theory.md) - Deep-time scaling of H(t) and ε
+- [99 - Expanding Solar System Resonance Theory](99-expanding-solar-system-resonance-theory.md) - Deep-time scaling of the precession period T_p(t) and ε
 
 ---
 
@@ -29,7 +29,7 @@ The simulation uses multiple coordinate reference frames to accurately represent
 | **Invariable Plane** | Sun | Total angular momentum | Fundamental physics |
 | **Heliocentric** | Sun | Ecliptic or Invariable | Distance calculations |
 
-> **Scope note (ESSRT).** The coordinate-frame transformations in this document (ecliptic ↔ equatorial via obliquity ε; ecliptic ↔ ICRF via general precession H/13; orbital plane ↔ invariable plane) are inherently geometric and date-independent — the formulas hold at any epoch. The numeric values quoted (e.g. J2000 ascending node 107.58°, mean obliquity 23.44°, inclination ranges) are J2000-anchored snapshots. Under [ESSRT](99-expanding-solar-system-resonance-theory.md) both `H(t)` (and hence the H/N period denominators) and ε itself evolve at deep time via Driver 1 (Earth-Moon tidal LOD growth) and Driver 2 (solar mass loss → Kepler); see [doc 20](20-constants-reference.md) for the J2000 → `mean*AtAge` helper map.
+> **Scope note (ESSRT).** The coordinate-frame transformations in this document (ecliptic ↔ equatorial via obliquity ε; ecliptic ↔ ICRF via the general precession period T_p; orbital plane ↔ invariable plane) are inherently geometric and date-independent — the formulas hold at any epoch. The numeric values quoted (e.g. J2000 ascending node 107.58°, mean obliquity 23.44°, inclination ranges) are J2000-anchored snapshots. Under [ESSRT](99-expanding-solar-system-resonance-theory.md) both the composed precession period T_p(t) and ε itself evolve at deep time via Driver 1 (Earth-Moon tidal LOD growth) and Driver 2 (solar mass loss → Kepler); see [doc 20](20-constants-reference.md) for the J2000 → `mean*AtAge` helper map.
 
 ---
 
@@ -46,8 +46,8 @@ The ICRF is the fundamental celestial reference frame defined by the positions o
 - Used as the "fixed" background reference
 
 **In the simulation:**
-- Earth's perihelion precession period is given in ICRF coordinates: `earthPerihelionICRFYears = H/3`
-- Other planets use ecliptic coordinates: `<planet>PerihelionEclipticYears`
+- Earth's apsidal period against the stars is the one-family beat of the anomalistic and sidereal years (registry `inclPrecYears`; the former `earthPerihelionICRFYears = H/3` is deleted, plan 09 step 4b)
+- Other planets: `<planet>PerihelionEclipticYears`, the chain's inertial apsidal period 1,296,000/g
 
 ### 1.2 Ecliptic Coordinates
 
@@ -156,7 +156,7 @@ ecliptic_period = (ICRF × reference) / (ICRF + reference)
 ```
 
 Where:
-- reference = general precession period (H/13)
+- reference = the general precession period T_p (1,296,000/p_A at J2000, the IAU 2006 input; the retired H/13 read 0.086 % long)
 
 **Implementation (`src/script.js`):**
 
@@ -226,22 +226,11 @@ heliocentricLatitude(i_deg, omega_deg, nu_deg)
 
 ### 3.1 Dynamic Inclination to Invariable Plane
 
-Planetary inclinations oscillate as the ICRF perihelion longitude precesses (Laplace-Lagrange secular theory).
-
-**Formula:**
-```
-i(t) = i_mean + A × cos(ω̃_ICRF(t) - cycleAnchor)
-```
-
-Where:
-- i_mean = Laplace-Lagrange mean inclination
-- A = oscillation amplitude
-- ω̃_ICRF(t) = current ICRF perihelion longitude
-- cycleAnchor = per-planet cycle anchor (ICRF perihelion where MAX inclination occurs, at the balanced year)
-
-**Implementation (`src/script.js`):**
-- Function: `computePlanetInvPlaneInclinationDynamic(planet, currentYear)`
-- Calibration: Guarantees i(2000) = i_J2000 for each planet
+A planet's inclination to the invariable plane of date is the N-body
+chain's element (`_kcElementsOfDate(k, jd).inclInvPlaneDeg`). The former
+ψ-law `i(t) = i_mean + A·cos(ω̃_ICRF(t) − cycleAnchor)` —
+`computePlanetInvPlaneInclinationDynamic`, phased at the balanced year — is
+deleted with its inputs (plan 07 R5/R9; doc 109 is the evidence record).
 
 ### 3.2 Dynamic Ecliptic Inclination
 
@@ -267,7 +256,7 @@ i_app = arccos(n_ecl · n_planet)
 
 ### 3.3 Earth Inclination to the Invariable Plane
 
-Earth's inclination to the invariable plane is the **one-source engine reading** (plan 07 R5/R9): the engine's own Earth-orbit normal of date (the banked secular series inside ±10 Myr, the mode tail beyond) against the artifact's invariable plane — it matches La2010 at rms 0.003° over −500 kyr ([doc 05](05-invariable-plane-overview.md)). (Axial tilt — obliquity — is a separate quantity; see `computeObliquityEarth()`.)
+Earth's inclination to the invariable plane is the **one-source engine reading** (plan 07 R5/R9): the engine's own Earth-orbit normal of date (the banked secular series inside ±10 Myr, the mode tail beyond) against the artifact's invariable plane — it matches La2010 at rms 0.003° over −500 kyr ([doc 05](05-invariable-plane-overview.md)). (Axial tilt — obliquity — is a separate quantity: the hybrid, `model.earth.obliquityDeg`.)
 
 **Formula:**
 ```
@@ -329,7 +318,6 @@ For current values, see [Constants Reference](20-constants-reference.md).
 | `earthInvPlaneInclinationAmplitude` | Oscillation amplitude |
 | `earthAscendingNodeInvPlaneSouamiSouchay` | J2000 ascending node (S&S) |
 | `earthAscendingNodeInvPlaneVerified` | J2000 ascending node (S&S 2012) |
-| `earthPerihelionICRFYears` | Orbital plane precession period, H/3 (ICRF) |
 
 ### 5.2 Obliquity
 
@@ -342,8 +330,7 @@ For current values, see [Constants Reference](20-constants-reference.md).
 
 | Constant | Value | Description |
 |----------|-------|-------------|
-| General precession | H/13 | holisticyearLength/13 |
-| The fitted timing anchor | `holisticyearLength` (see [Constants Reference](20-constants-reference.md)) | the correction bases' unit — not a period |
+| General precession | <!--v:axialPrecExact-->25,771.58<!--/v--> yr | 1,296,000/p_A, p_A the IAU 2006 general precession input (`generalPrecessionJ2000_arcsecPerYr`); the deep-time clock is the composed T_p(t) (see [Constants Reference](20-constants-reference.md)). The former H/13 on the fitted anchor `holisticyearLength` is deleted (plan 09) |
 
 ---
 

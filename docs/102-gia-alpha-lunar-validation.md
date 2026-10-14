@@ -64,8 +64,9 @@ single lines (p = 0.009) — the Bond-scale oscillation is in the record.
 The periods are therefore stated in years throughout: Bond 1466,
 Hallstatt 2430, Jose5 897, Jose4 716 — fitted millennial periods at the
 canonical values. The divisor integers (1830, 1104, 2989, 3749) survive
-only as the fitter's implementation detail and, below, as the historical
-account of how they were selected; every "structural" or
+only as the fitter's historical selection record (its config's `structural`
+notes; the runtime and the fit file carry `period_yr` in years) and, below,
+as the historical account of how they were selected; every "structural" or
 "framework-native" period claim is retired. The numerics are untouched.
 
 ---
@@ -1231,8 +1232,9 @@ is within 0.03 % of a comb member).
 ### Finding — a broad Bond-band peak; n=1830 selected
 
 A full divisor scan (period = 8·H/n) across the sub-Milankovitch band (n ∈
-[500, 5000], periods ~500 to ~5000 yr) — implemented as §14 of the L-5b
-console diagnostic (the Python twin was deleted at plan 09 step 7e; its
+[500, 5000], periods ~500 to ~5000 yr) — run as §14 of the L-5b
+console diagnostic, which now scans 894–5365 yr directly in years (the
+Python twin was deleted at plan 09 step 7e; its
 headline is in [doc 109 §22](109-model-nbody-engine-and-lattice-test.md)) —
 identifies a **broad peak in the ~1400–1500 yr range** with fit quality
 essentially indistinguishable across n=1817..1863 (all R² 0.974–0.975,
@@ -1300,8 +1302,8 @@ feature to Earth-external planetary orbital mechanics rather than
 Earth-perihelion sub-harmonics.
 
 **Selection-rule note (T5)**: n=1830, 1104, 2989 and 3749 were selected
-under the gcd rule the Sun-longitude harmonic runtime filter enforces
-(commit 6d87173) — each shares a prime factor with H (61, 23, 61, 23).
+under the gcd rule the Sun-longitude harmonic runtime filter enforced
+(commit 6d87173; the filter and its comb are deleted, plan 09) — each shares a prime factor with H (61, 23, 61, 23).
 The T5 null shows a compliant integer sits inside every fitted plateau by
 density alone: the rule selected divisors, it did not predict periods.
 
@@ -1380,8 +1382,8 @@ Live in the sim (all shipped default-ON):
 
 ### Scientific status
 
-**The 1466-yr period is the canonical Bond period** (divisor 1830 in the
-fitter; 74 × J-S synodic to 0.22 % is a coincidence at this resolution —
+**The 1466-yr period is the canonical Bond period** (the former divisor 1830,
+a selection record; 74 × J-S synodic to 0.22 % is a coincidence at this resolution —
 T5). Empirical confirmation of the oscillation against the historical
 eclipse record is decisive: the Stephenson − model residual is well-fit
 by a single harmonic at this period (R² = 0.975 in-sample, R²_test =
@@ -1424,13 +1426,14 @@ independent paleoclimate proxies.
 
 The four-cycle stack (Bond + Hallstatt + Jose5 + Jose4) is shipped
 default-ON in `src/script.js`, with each individually toggleable. The
-gcd rule (`gcd(divisor, H) > 1`) enforced in the Sun-longitude runtime
-filter (commit `6d87173`) was the selection filter; T5 measured it as
+gcd rule (`gcd(divisor, H) > 1`), enforced at the time in the Sun-longitude
+runtime filter (commit `6d87173`; deleted with the comb at plan 09), was the
+selection filter; T5 measured it as
 carrying no information about the periods.
 
 ### Hallstatt harmonic (~2430 yr) — solar-activity coupling
 
-**Period 2429.83 yr** (divisor 1104 in the fitter, = H/138). The divisor
+**Period 2429.83 yr** (the former divisor 1104, = H/138 in the retired lattice — a selection record). The divisor
 1104 = 2⁴·3·23 shares H's 23 prime factor — the selection filter (T5);
 equivalently 138 = 6·23 places the harmonic at the sixth sub-harmonic of
 the ~14.6-kyr period H/23 = 14,579 yr.
@@ -1472,7 +1475,7 @@ proportionally.
 
 ### Jose5 harmonic (~897 yr, 5×Jose) — planetary resonance
 
-**Period 897.47 yr** (divisor 2989 in the fitter). Divisor 2989 = 7²·61
+**Period 897.47 yr** (the former divisor 2989, a selection record). Divisor 2989 = 7²·61
 shares H's 61 prime factor — the selection filter (T5).
 
 **Physical interpretation**: closest match to **5 × Jose period**
@@ -1512,7 +1515,7 @@ are simultaneously enabled); phase preserved from triple fit.
 
 ### Jose4 harmonic (~716 yr, 4×Jose) — cross-archive coherent
 
-**Period 715.53 yr** (divisor 3749 in the fitter). Divisor 3749 = 23 × 163
+**Period 715.53 yr** (the former divisor 3749, a selection record). Divisor 3749 = 23 × 163
 shares H's 23 prime factor — the selection filter (T5), same family as
 Hallstatt.
 
@@ -1630,18 +1633,20 @@ the correction applied, or −1.878 s/yr without it?
 
 Four consecutive diagnostic sections in the L-5b console button
 (labelled §14, §15, §16, §17 for the internal numbering, but named by
-content: lattice-divisor scan, J2000 anchor sensitivity, secular RATE
+content: period scan (run as a lattice-divisor scan; it now scans in
+years), J2000 anchor sensitivity, secular RATE
 sensitivity, and higher-order polynomial + dual-harmonic decomposition)
 decompose the remaining drift and reach a clean three-component
 picture. Each diagnostic is implemented in `src/script.js` and its
-results are cached at `window._L5b_lattice_scan`,
+results are cached at `window._L5b_period_scan`,
 `window._L5b_anchor_sensitivity`, `window._L5b_rate_sensitivity`, and
 `window._L5b_higher_order` respectively for downstream inspection.
 
-### Diagnostic 1 (§14): divisor scan against the residual
+### Diagnostic 1 (§14): period scan against the residual
 
-Scans n ∈ [500, 5000] (period = 8·H/n) for harmonic content in the
-current residual. Under Bond OFF baseline, identifies a broad peak in the
+Scanned n ∈ [500, 5000] (period = 8·H/n, the lattice framing of the time —
+the console diagnostic now scans 894–5365 yr on a 1-yr grid) for harmonic
+content in the residual. Under Bond OFF baseline, identifies a broad peak in the
 Bond-scale band (n ≈ 1817–1863, periods 1440–1476 yr); the shipped
 n=1830 sits within this peak with ΔR² ≈ 0.073
 (the whole n ≈ 1817–1863 band is Fourier-degenerate; §17 Part B).

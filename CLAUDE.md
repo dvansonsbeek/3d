@@ -56,7 +56,7 @@ skill in `.claude/skills/`.
 | `…AtEpoch` suffix when epoch-dependent; absence means J2000-fixed | the kinematic/deep-time axis |
 | Files `kebab-case`, one exported concept per file | already consistent in `tools/` |
 
-**Fitters write the SHIPPED divisor set, never the greedy search result.** The
+**Fitters write the SHIPPED term set, never the greedy search result.** The
 greedy pass is a diagnostic. This trap was present in **all three** fitters and
 would silently churn a structural claim for a rounding-level gain.
 
@@ -99,14 +99,18 @@ would silently churn a structural claim for a rounding-level gain.
   campaign-era docs) at 0.26–0.29 min over ±270 kyr (Earth-frame) via the §10
   derived form + edge-trim + the §10g quadrature-locked joint sidebands. Coefficients and
   runtime evaluation form are a MATCHED PAIR — never ship one without the
-  other (~1162-minute-class error), and the pair includes the NUMERICS: the
-  ∫1/H convention is the 10-kyr trapezoid table, built under the pinned
-  lattice α. Both campaign plans are archived in
+  other (~1162-minute-class error), and the pair includes the NUMERICS (the
+  campaign's ∫1/H trapezoid table was part of its pair). The cardinal-point
+  fit, its sidebands and that table were deleted at plan 09 step 7a — the
+  cardinal instants are the certified Sun's crossings; the matched-pair rule
+  stands for every fitted family that remains. Both campaign plans are archived in
   `docs/archive/old-documents/` (untracked).
-- **The §10g minus sign is load-bearing.** Joint sideband phase is
-  order·λ_X − 2π·div·c, COUNTER-rotating; the co-rotating sense captures
-  nothing (measured — the sign experiment, doc 99 "braid law"). Do not "fix"
-  it, in any of the three runtimes.
+- **The braid law's counter-rotating sign is physics, not convention.** The
+  seasonal-asymmetry structure is COUNTER-rotating against the perihelion
+  phase; the co-rotating sense captures nothing (measured on the cardinal
+  record — the sign experiment, doc 99 "braid law"). The fitted sidebands that
+  carried it were deleted at plan 09 step 7a; any future cardinal-structure
+  term must keep the sign.
 - **A purity freeze needs its pure twin.** Freezing a mutable-global read to
   a J2000 const without wiring in the epoch-aware f(Y) replacement silently
   freezes deep time (the solar-day panel read 86400.006 where the model says
@@ -142,7 +146,7 @@ would silently churn a structural claim for a rounding-level gain.
   sidereal-year channel is the pattern (`T(y) = massLossLaw(y)/lamDotRel(y)`,
   every factor ≡ 1 at J2000).
 - **The secular law is not the rate of date.** The composed ψ̇(t) — leg 1's
-  law, the unit H(t) — scales the J2000 rate on the tidal history. The spin
+  law, the clock T_p(t) — scales the J2000 rate on the tidal history. The spin
   integration multiplies it by two factors of date, both exactly 1 at J2000:
   the solar torque's (1 − e²)^(−3/2) at the eccentricity OF DATE and
   J₂(t)/J₂₀ from the GIA channel (ONE home `earth/deep-orbital-history`
@@ -207,9 +211,9 @@ would silently churn a structural claim for a rounding-level gain.
   reproduction check) even when the freshness gate passes.
 - **A fit-window edge phase-locked to the lattice masquerades as physics.**
   The "e(t)-minimum residual peak" was window-edge divergence — both bracket
-  ends sit at H/16 phase ≈ 0°. Check the edge/interior split before believing
-  any phase-binned feature; the cardinal-point fitter (Step 6d) edge-trims
-  8%/side for this reason.
+  ends sat at the same perihelion-of-date phase. Check the edge/interior split
+  before believing any phase-binned feature; the former cardinal-point fitter
+  edge-trimmed 8%/side for this reason.
 - **A structural list has ONE home.** The L1 divisor list lived in
   `milankovitch_climate_formula.py` — and in twelve hard-coded copies (eight
   test scripts, the four variance-budget scripts) that a ledger-driven re-run
@@ -320,7 +324,7 @@ would silently churn a structural claim for a rounding-level gain.
 `npm run check` is the enforced chain — lint (§4 boundaries), typecheck (JSDoc +
 `checkJs`), `check:boundaries` (the §2h licensing invariant), purity,
 `test:fixtures` (the `tools/lib` golden masters + the plan-06 baseline —
-the H-carrying quantities on the ±26-kyr wander window and the deep-time
+the clock-carrying quantities on the ±26-kyr wander window and the deep-time
 anchors, bit-exact across the lunisolar-clock restatement),
 `test:vocabulary` (the retired-vocabulary RATCHET — plan 06 §7 D3 terms may
 only leave presentation surfaces, never re-enter; `--report` prints the
@@ -544,12 +548,11 @@ precession p_A = 50.28796195 ″/yr, an INPUT (astro-reference
 it was the retired year combs' beat at 2000, 25,771.395 yr (plan 06 S5),
 8 ppm faster, and that 8 ppm was absorbing a sidereal-year-input mismatch
 against DE441 (Sun vs Horizons gained +1″ per millennium on p_A) — a
-sidereal-year finding, parked; **H(t) is the internal UNIT that scales
-WITH this period but is NOT 13 of them** (H₀/T_p = 13.011: H₀ was fitted on
-the perihelion-of-date beat, so H/13 = 25,793.6 was the fit anchor's
-reading, 0.086 % slow, never a period; the unit function `hAtAge` left the
-physics at plan 09 step 7b — T_p(t) is the published deep-time clock;
-plan 06 D6/Phase 3/S5), **the obliquity band must follow the beat
+sidereal-year finding, parked; **T_p(t) is the published deep-time clock**
+(the retired unit H(t) scaled with it but was not 13 of them — H₀/T_p =
+13.011, H₀ fitted on the perihelion-of-date beat, so H/13 = 25,793.6 was the
+fit anchor's reading, 0.086 % slow, never a period; the unit function
+`hAtAge` left the physics at plan 09 step 7b; plan 06 D6/Phase 3/S5), **the obliquity band must follow the beat
 2π/(ψ̇ᵢₙ(t) − |s₃|)** — ψ̇ᵢₙ the spin axis's INERTIAL rate, the composed
 rate × the hybrid's self-anchor factor (model v22.0: 50.385 ″/yr at J2000
 in the shipped series-driven configuration, where the general precession p₀

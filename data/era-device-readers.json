@@ -28,7 +28,7 @@
   ]
  },
  "summary": {
-  "hits": 1114,
+  "hits": 1113,
   "codeHits": 95,
   "files": 98,
   "excludedClasses": [
@@ -208,7 +208,7 @@
      "comment": 12
     },
     "other": {
-     "display": 2
+     "display": 1
     },
     "api": {
      "display": 2
@@ -356,7 +356,7 @@
    "comment": 786,
    "scene": 53,
    "comb": 11,
-   "display": 58,
+   "display": 57,
    "diagnostic": 75,
    "explore": 62,
    "counter": 1,
@@ -5006,11 +5006,11 @@
   },
   {
    "file": "tools/docs/render-doc99-tables.mjs",
-   "line": 185,
+   "line": 191,
    "runtime": "docs-tools",
    "token": "H / N",
    "class": "comment",
-   "text": "// (plan 09 step 7b: `blockH5` — the frozen device's H/5 ecliptic-precession"
+   "text": "// the former `blockH5`, which evaluated the frozen device's H/5 form on the unit.)"
   },
   {
    "file": "tools/explore/climate-band-phase.js",
@@ -8095,14 +8095,6 @@
    "runtime": "other",
    "token": "8H",
    "class": "display",
-   "text": "\"8H as a cycle name\": 12"
-  },
-  {
-   "file": "tools/vocabulary-ratchet.json",
-   "line": 8,
-   "runtime": "other",
-   "token": "8H",
-   "class": "display",
    "text": "\"8H as a cycle name\": 10,"
   },
   {
@@ -8469,7 +8461,7 @@
   },
   {
    "file": "packages/fitting/src/run-pipeline.cjs",
-   "line": 71,
+   "line": 55,
    "runtime": "fitting",
    "token": "earthtiltMean",
    "class": "comment",
@@ -9729,7 +9721,7 @@
    "packages/api/test/mcp-gates.test.mjs": "sha256:af4ecbcce16ad84fe6e3b4915e244d4cb67e42e807dcbbe30e7ae00c0f2ae42a",
    "packages/fitting/src/dt-corrections-fit.cjs": "sha256:9fd72d3d8a83369eeb130b463e66051103475b08783a8131ce55674294c77045",
    "packages/fitting/src/export-solar-measurements.cjs": "sha256:85ae6c0eb95c80456dab5c0897a40134e2afb0daa85cc3938b650fba8f9fd312",
-   "packages/fitting/src/run-pipeline.cjs": "sha256:15d9b921a31c5f56849fdd3fc8d0acfeed8cfecbb8a679049de445f54c4f83fc",
+   "packages/fitting/src/run-pipeline.cjs": "sha256:718c6448e02954afc8452f50cc44055ba71b379fec85fb657b717f17a74c5a22",
    "packages/fitting/src/verify-pipeline.cjs": "sha256:31508b47831bcb312e5f35e993c039775b1d503874db56431e723203dcd964ec",
    "packages/physics/src/chain-cycles/index.cjs": "sha256:c9be1e2c54df874e1fe8104129058fc0f09a4d244517c3cec3fab5ef13961d8e",
    "packages/physics/src/deltat/cycles.cjs": "sha256:da684bd21865005f05ceec845683f1549efc17d5b11aeac2cf362b3f8e52bf99",
@@ -9755,7 +9747,7 @@
    "scripts/climate_formula_mwp_check.py": "sha256:177305723579b66c9d08590f366574c05cd935aea5573614e89eddc502f72236",
    "scripts/extract_insolation_features_deep.js": "sha256:2ef7242a306cc9e34200e59c0dcbe8d5fe30dc0759b4d2ee5457875d981a50dc",
    "scripts/milankovitch_climate_formula.py": "sha256:c16a99025d13fbbbd5448a067d39be62e27dff78d0d68432ca600c337817a41f",
-   "src/script.js": "sha256:bcc8bc506a4bb73ba00a34c58159fb3738045c4bf11fe1270201ae7a9f3abe66",
+   "src/script.js": "sha256:46e380a0bfe6ca24a624918671e552f3fdcef844ce17fa1b498adb58ca0b39f9",
    "test/browser/epoch-consistency.test.mjs": "sha256:027b40559844497a53c6ee39fba2e0b848949a43e3ddb0e230cff9e0478a7172",
    "test/browser/snapshot.test.mjs": "sha256:819345a46ac6876dfa5632843a0cce5ee8b539620c4fb51b413c95235d81b4ea",
    "test/browser/wobble-center.test.mjs": "sha256:456521771ea752f9112407c9f316d0dc92ec21d7b4ac90fbc5110772256ae8ad",
@@ -9764,8 +9756,8 @@
    "tools/constants/check-literals.mjs": "sha256:0a5e53888b15c27c5c247679ca57ac20c677616ff770400ab1f7f0fc60a743ef",
    "tools/constants/generate.mjs": "sha256:4531ca5f36b10bc434a81cbcaa49a476d27569f9d8117f1b24d5292a1540c03c",
    "tools/docs/model-values.mjs": "sha256:9ec021b168bd081e2351377f0b6fd77118df8c84be8def02320b2138b4bace64",
-   "tools/docs/render-calculation-map.mjs": "sha256:204271a75eae77b436e8d3230d1ef4c5d83baf7ab3933ba3ab99d87ff0e41ee2",
-   "tools/docs/render-doc99-tables.mjs": "sha256:de48f64016f6a0f21ce2f8538b3e8f48c454feb861a43469f4008e9d5d2bb022",
+   "tools/docs/render-calculation-map.mjs": "sha256:52155b64a5f2443f54d9fe22762255f4f3190c40e10e680d5bb6144899981a1e",
+   "tools/docs/render-doc99-tables.mjs": "sha256:fc16fc33ffbd7f8313057d25a02c2a262029a2d1e25b7ff94f97645f9b8cd458",
    "tools/explore/climate-band-phase.js": "sha256:0b81487d4cf86717265d53e7583b63e6ff7b52a5f8d9d8c3e7c21ff975e9bbe3",
    "tools/explore/dense-targets-residual-structure.mjs": "sha256:570fcfcb01b9abcd28b38cb5b000d4b5bb21f1a1e57ad420a986b44b31766e6e",
    "tools/explore/derive-meeus-amplitudes.js": "sha256:f855838556ac4a210ad3fda0abc3a56f9a9098a495e98bb539064465a719daca",
@@ -9822,7 +9814,7 @@
    "tools/verify/moon-deltat-comparison.js": "sha256:62fd0a9a77f69014adc56e8c65e075a6ace8f0909e529fbd68d0764a322e73b3",
    "tools/verify/obliquity-hybrid.js": "sha256:4d7e17fb9df75b68ae9bb1aaa8b155e265f0aba7e282d437f858f736f99d2d79",
    "tools/verify/run-suite.mjs": "sha256:8bb8f7a8fcb4aaf4f46346edfc85cdf4ab2a3174f23563b121c268cdbc1aa764",
-   "tools/vocabulary-ratchet.json": "sha256:07eebb75bdf2606e118947c0c283203f8ae00904ec12be94782785994af61e71"
+   "tools/vocabulary-ratchet.json": "sha256:e921867dc46cb9ab86b18ff5c944487a8e94efdf165094ad19328e2a35da94dd"
   }
  }
 }

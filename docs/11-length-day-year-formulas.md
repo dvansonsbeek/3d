@@ -7,9 +7,9 @@ status: current
 
 # Year and Day Length Formulas
 
-> **Status — the frozen era clock.** The Fourier-harmonic laws in this document are the **certified, IAU-anchored era device** (see `tools/fit/README.md` §"The frozen era clock"): their coefficients are frozen, their fitters archived, and re-fitting them against a one-source export is a cross-family error (measured: interior RMS blows up 0.23–0.37 min → 8.8–16 min). The **displayed and served of-date values** (tweakpane year rows, Framework Verification model lines, the report's Physics columns, the API) come from the **one-source movement family** — `createYearLengths` in `@essrt/physics` (equinox-rate tropical mean, the λ̇-channel sidereal, the cardinal-structure anomalistic, and their precession beats). The harmonic laws remain the internal kinematic family (the `o.*` chain, `lodKinematic`, the scene frame), the `?hybridSpin=0` opt-out display, and the era-certification record.
+> **Status — one year family, one J2000 day.** The year lengths are ONE of-date family — `createYearLengths` in `@essrt/physics` (doc 110 chain 3): the sidereal year on the λ̇ channel and the solar-mass law, the tropical year as its beat with the general precession of date, the anomalistic year with the series' apsidal rate. Every displayed and served value (tweakpane year rows, Framework Verification model lines, the report's Physics columns, the API) rides it; day counts divide by the kinematic day of date (`lodKinematic`, the Layer-0 tidal mean day), which at J2000 is the SI day, 86,400 s. *Record:* the former Fourier-harmonic year laws on the fitted unit's divisors (the "era device", with its rounded 365.2422-d input) are deleted at plan 09 — what went is listed in `public/input/model-version.json` `_v24Note`, the comb-era research record in doc 109 §22.
 
-> **Scope.** This document describes the **modern-era / within-H Fourier-harmonic picture** — the means derived from `inputmeanlengthsolaryearindays = 365.2422` and the fitted timing anchor `H = 335,317 yr` (the frozen era clock's unit), with Fourier oscillations fitted across one full anchor interval. At deep-time / Phanerozoic / Hadean epochs the **mean values themselves shift** per the [Expanding Solar System Resonance Theory (Doc 99)](99-expanding-solar-system-resonance-theory.md): the composed lunisolar precession period grows under Driver 1 (Earth-Moon tidal evolution → LOD grows) while the sidereal year in seconds shifts under Driver 2 (solar mass loss → Kepler `dT/T = −2 dM/M`); the anchor H itself is a J2000 constant (plan 09 step 7b: the unit function left). For deep-time work use the epoch-dependent helpers (`meanLodSecondsAtAge`, `meanSiderealYearSecondsAtAge`, `meanLunisolarPrecessionPeriodYearsAtAge`, `meanTropicalYearSecondsAtAge`) — see [Doc 20 §"ESSRT epoch dependence"](20-constants-reference.md#essrt-epoch-dependence--most-tabulated-values-are-j2000-anchored) for the J2000-constant → helper map.
+> **Scope.** This document describes the J2000 anchors and the of-date laws inside the one-family window. At deep-time / Phanerozoic / Hadean epochs the **mean values themselves shift** per the [Expanding Solar System Resonance Theory (Doc 99)](99-expanding-solar-system-resonance-theory.md): the composed lunisolar precession period T_p(t) grows under Driver 1 (Earth-Moon tidal evolution → LOD grows) while the sidereal year in seconds shifts under Driver 2 (solar mass loss → Kepler `dT/T = −2 dM/M`). For deep-time work use the epoch-dependent helpers (`meanLodSecondsAtAge`, `meanSiderealYearSecondsAtAge`, `meanLunisolarPrecessionPeriodYearsAtAge`, `meanTropicalYearSecondsAtAge`) — see [Doc 20 §"ESSRT epoch dependence"](20-constants-reference.md#essrt-epoch-dependence--most-tabulated-values-are-j2000-anchored) for the J2000-constant → helper map.
 
 ## Architecture
 
@@ -89,7 +89,7 @@ The sidereal year is measured by tracking the Sun's **world angle** (ICRF) at ea
 siderealYear = JD_interval × 360 / (360 − dWA)
 ```
 
-where `dWA` is the world-angle advancement over one tropical year interval (single-year step). For multi-year spans (stepYears > 1), use `step × 360 − dWA` in the denominator. The retired year-length fitter used the same estimator.
+where `dWA` is the world-angle advancement over one tropical year interval (single-year step). For a span of n years, use `n × 360 − dWA` in the denominator. The retired year-length fitter used the same estimator.
 
 **Limits of that estimator (measured 2026-09).** Per cardinal type it is not the sidereal year: the world angle is read at the event, where the Sun's speed differs from the mean by up to 2e, so the missing arc `dWA` (≈50″) is traversed at the local speed — a ±50 s offset that drifts with the equation of centre as the perihelion moves against the equinox (VE-to-VE −54 → +35 s across −4000…+4000, SS-to-SS −6 → −52 → −32 s). The four cardinal types averaged cancel it through the third harmonic. Event to event it also carries the Sun's periodic terms — the 6.44″ lunar equation alone is ~150 s of event timing — so even a 200-year baseline resolves only ~1 s. The clean reading is the cumulative sidereal angle (one turn per event minus the world-angle advance), the four-cardinal mean, with the planetary completion removed per event (`sunLonDegAtJD − sunLonCompletedDegAtJD`), against TT: then a ±100-year window resolves milliseconds, and the scene reproduces the one-family sidereal, tropical and anomalistic years of date to a few ms at every epoch sampled (`tools/verify/scene-year-lengths.js`, the gate; `tools/explore/scene-sample-events.cjs` + `scene-sample-check.cjs`, the instruments).
 
@@ -260,7 +260,7 @@ The coin rotation paradox manifests at every timescale:
 |----------|-------------|-----------|
 | Tropical year | 365.242190 days | 365.242190 days (IAU) |
 | Sidereal year | 365.256363 days | 365.256363 days (IAU) |
-| Anomalistic year | 365.259633 days | <!--v:anomalisticYearSimon1994Days-->365.259636<!--/v--> days (Simon 1994 mean element; the model's law of date at 2000: <!--v:anomalisticYearJ2000Days-->365.2596350<!--/v-->) |
+| Anomalistic year | <!--v:anomalisticYearJ2000Days-->365.2596350<!--/v--> days | <!--v:anomalisticYearSimon1994Days-->365.259636<!--/v--> days (Simon 1994 mean element; the model's law of date at 2000: <!--v:anomalisticYearJ2000Days-->365.2596350<!--/v-->) |
 | LOD_mean (kinematic, the SI day ω₀) | <!--v:meanSolarDaySeconds-->86,400.000000<!--/v--> s | — |
 | LOD_real (Layer 4: physical, + the ecliptic term + DT cycles + swing) | <!--v:lodRealPhysical-->86,400.001200<!--/v--> s | USNO joint-optimum target <!--v:usnoLodJ2000-->86,400.0012<!--/v--> s (fit's measured-day basis) |
 | Sidereal day — on LOD_real of J2000 (the simulator readout) | <!--v:siderealDayJ2000Physical-->86,164.091730<!--/v--> s | <!--v:siderealDayInputSeconds-->86,164.090531<!--/v--> s (IAU, on the 86,400-s day — the two differ by the day's excess, <!--v:lodRealJ2000ExcessMs-->1.20<!--/v--> ms) |
@@ -270,13 +270,15 @@ The coin rotation paradox manifests at every timescale:
 
 ## Physical Insights
 
-### Why Each Harmonic Dominates Its Year Type
+### What Moves Each Year Type of Date
 
-| Year type | Dominant harmonic | Physical reason |
-|-----------|-------------------|-----------------|
-| Tropical | H/8 (obliquity) | Measures solstice/equinox-to-same — steeper ecliptic angle (higher obliquity) means faster equator crossing → shorter tropical year |
-| Sidereal | H/8 + H/3 (tiny) | Measures full orbit — nearly constant, with only tiny perturbations from planetary gravitational interactions |
-| Anomalistic | H/18 (with H/19, H/17, H/24 close behind) | Measures perihelion-to-perihelion — sensitive to the interplay between inclination and obliquity cycles |
+| Year type | Moved by | Physical reason |
+|-----------|----------|-----------------|
+| Tropical | the general precession of date p(t) | Measures equinox-to-equinox — the equinox's return along the ecliptic of date shortens the year by one turn per precession period; p(t) follows the obliquity and the ecliptic's own motion |
+| Sidereal | the λ̇ channel (planetary perturbations) and the solar-mass law | Measures full orbit against the stars — nearly constant (about −0.1 s per millennium in the modern era) |
+| Anomalistic | the series' apsidal rate ϖ̇ of date | Measures perihelion-to-perihelion — the perihelion's advance lengthens the year by one turn per apsidal period |
+
+*Record:* the deleted year-length combs (plan 09) attributed each year type's variation to one dominant line on the retired unit's divisors — the obliquity line for the tropical year, the apsidal sub-harmonics for the anomalistic year. Those lines carried no secular drift (see Year Lengths of Date); the of-date laws above carry it.
 
 ### Cardinal Point Tropical Year Variation (J2000)
 
@@ -301,7 +303,7 @@ siderealYear(seconds) = siderealYear(days) × dayLength
                       = siderealYearSeconds  ✓
 ```
 
-holds at every epoch — it is algebraically tautological. **Within the modern era** the sidereal year in SI seconds is treated as the calibration anchor (`siderealYearJ2000 × 86400`); the within-H Fourier harmonics describe oscillations of the day-count quantities around their means with the anchor held fixed.
+holds at every epoch — it is algebraically tautological. **Within the modern era** the sidereal year in SI seconds is treated as the calibration anchor (`siderealYearJ2000 × 86400`); the of-date laws move the year lengths in seconds and the kinematic day of date converts them to day counts, with the J2000 anchor held fixed.
 
 **At deep time**, both terms on the right-hand side scale: Driver 1 (Earth-Moon tidal evolution) changes `dayLength`; Driver 2 (solar mass loss) changes the sidereal year in seconds via Kepler's 3rd law (`dT/T = −2 dM/M`). The identity is preserved at every epoch, but neither factor is constant. See [Doc 99 — ESSRT](99-expanding-solar-system-resonance-theory.md) for the two-driver derivation and [Doc 20 §"ESSRT epoch dependence"](20-constants-reference.md#essrt-epoch-dependence--most-tabulated-values-are-j2000-anchored) for the epoch-dependent helpers (`meanSiderealYearSecondsAtAge`, `meanLodSecondsAtAge`).
 
@@ -324,7 +326,7 @@ stellarDay = siderealDay × (1 + cos(ε) / (T_p(t) × rotationsPerYear))
            → 8.37 ms above the sidereal day, vs the IAU value of 8.373 ms
 ```
 
-T_p is the physical period in both identities, not the frozen clock's counter (the anchor interval's thirteenth, 0.086 % longer): on the counter the offset read 7 µs low and the coin rotation 8 µs low, and the counting identity closed only against the counter's own period.
+T_p is the physical period in both identities. *Record:* the retired era device counted with its unit's thirteenth instead (0.086 % longer, deleted at plan 09): on that counter the offset read 7 µs low and the coin rotation 8 µs low, and the counting identity closed only against the counter's own period.
 
 **This was confirmed by measurement, not asserted.** The "Analyze Stellar Day" tool's Method D tracks Earth's rotation about its own spin axis against ICRF — using no precession period at all, since the spin axis precesses on the precession cone and the projection plane tilts with it — and reproduces the IAU stellar day to ~0.02 ms. Methods A and B, which reference the ecliptic normal instead of the spin axis, overshoot by ~0.79 and ~0.47 ms respectively; that ~23.44° of axis difference *is* the cos ε.
 
@@ -386,7 +388,7 @@ The sidereal and anomalistic years take the same form (`siderealYearDaysOfDate`,
 |------|------|
 | `src/script.js` | Runtime formulas |
 | `tools/lib/constants.js` | Pipeline constants (reads from JSON) |
-| `public/input/fitted-coefficients.json` | Fitted coefficients (the ΔT stack, the Sun's harmonic completion — the year combs are gone) |
+| `public/input/fitted-coefficients.json` | A description only since plan 09 — every comb family it carried is deleted; the shipped fitted artifacts (the ΔT stack, the core-mantle resonator, the climate formula) live under `data/` and are embedded by `tools/constants/generate.mjs` |
 | `public/input/astro-reference.json` | IAU reference values — the J2000 year lengths, the SI day, the general precession |
 
 

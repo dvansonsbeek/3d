@@ -109,15 +109,15 @@ T_M_iau   = moonSiderealMonthInput    = 27.32166156 days  // IAU sidereal month
 ratio     = MASS_RATIO_EARTH_MOON     = 81.30056816      // M_Earth / M_Moon (DE440 SPICE kernel)
 ```
 
-**Model-derived (computed at runtime, used by the chain):**
+**Time inputs (IAU, used by the chain — `packages/physics/src/model.js`):**
 
 ```
-T_M       = moonSiderealMonth         = 27.32166241 days  // T_M_iau quantized to fit H integer-moons
-T_S       = meansiderealyearlengthinDays = 365.25636437 days  // sidereal year derived via H/13 from tropical year
-LOD       = meanlengthofday           = 86,399.99968 s    // sidereal-seconds / sidereal-days ratio
+T_M       = moonSiderealMonth         = 27.32166156 days  // the IAU sidereal month input itself
+T_S       = yearLengthRef.siderealYear = 365.256363004 days // the IAU sidereal year input
+LOD       = yearLengthRef.solarDay    = 86,400 s          // the SI day ω₀
 ```
 
-The derived values differ from their nominal IAU references by sub-ppm amounts (T_M by 0.074 sec, T_S by 0.118 sec, LOD by 0.32 ms). Using them rather than raw IAU values keeps the GM derivation consistent with the model's year-length, sidereal-day, and scene-graph speeds.
+Since plan 09 the chain runs on the inputs themselves. *Record:* the retired era device fed it values derived through its fitted unit — a month quantized to an integer count per eight units (27.32166241 d), a sidereal year from its rounded tropical-year input and precession identity (365.25636437 d) and a day of 86,399.99968 s — each sub-ppm off the IAU value; the GM results below moved in their last printed digit.
 
 ### Computation
 
@@ -130,18 +130,18 @@ The derived values differ from their nominal IAU references by sub-ppm amounts (
 
 4.  moonDistanceCorrected  =  a_M + Δa                    = 384,748.44 km
 
-5.  T (in seconds)  =  T_M · LOD                          = 2,360,591.63 s
+5.  T (in seconds)  =  T_M · LOD                          = 2,360,591.56 s
 
 6.  GM(M_E + M_M)  =  4π² · moonDistanceCorrected³ / T²
-                   =  4π² · (384,748.44)³ / (2,360,591.63)²
-                   =  403,504.73 km³/s²
+                   =  4π² · (384,748.44)³ / (2,360,591.56)²
+                   =  403,504.75 km³/s²
 
 7.  GM_Earth  =  GM(M_E + M_M)  ·  ratio / (ratio + 1)
-              =  403,504.73 · 0.987849
-              =  398,601.91 km³/s²
+              =  403,504.75 · 0.987849
+              =  398,601.93 km³/s²
 
 8.  GM_Moon   =  GM(M_E + M_M)  /  (ratio + 1)
-              =  403,504.73 / 82.30056816
+              =  403,504.75 / 82.30056816
               =  4,902.82 km³/s²
 ```
 
@@ -159,9 +159,9 @@ The exact factor (using the cube `(1 + Δa/a_M)³` rather than the linear approx
 
 | Quantity | Model | JPL/GRAIL reference | Residual |
 |---|---|---|---|
-| GM_Earth | **398,601.91 km³/s²** | 398,600.44 km³/s² | **3.7 ppm** |
+| GM_Earth | **398,601.93 km³/s²** | 398,600.44 km³/s² | **3.7 ppm** |
 | GM_Moon | **4,902.82 km³/s²** | 4,902.80 km³/s² | **3.7 ppm** |
-| GM_Sun (downstream, after subtracting GM_Earth) | **132,712,430,441 km³/s²** | 132,712,440,042 km³/s² | **0.07 ppm** |
+| GM_Sun (downstream, after subtracting GM_Earth) | **132,712,430,446 km³/s²** | 132,712,440,042 km³/s² | **0.07 ppm** |
 | M_Earth (= GM_Earth / G with G = 6.6743×10⁻²⁰ km³/(kg·s²)) | **5.972191 × 10²⁴ kg** | spread of published values: 5.972168–5.972370 × 10²⁴ | within published spread |
 
 The G uncertainty (~22 ppm) sets a hard floor on how precisely M_Earth can be expressed in kg — different reference sources disagree by up to 30 ppm because they use slightly different G values to convert their fitted GM_Earth.

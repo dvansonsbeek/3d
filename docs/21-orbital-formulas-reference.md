@@ -26,8 +26,7 @@ For current values, see [Constants Reference](20-constants-reference.md).
 
 | Variable | Description |
 |----------|-------------|
-| `holisticyearLength` | The fitted timing anchor (the correction bases' unit; not a period), Earth solar years |
-| `meansolaryearlengthinDays` | Mean solar year in days (rounded to the precision of an eighth of the anchor, the comb's unit) |
+| `meansolaryearlengthinDays` | Mean solar (tropical) year in days — derived from the IAU sidereal year and p_A (`computeMeanTropicalYearJ2000Days`) |
 | `meansiderealyearlengthinSeconds` | Mean sidereal year in seconds (derived: `siderealYearJ2000 × 86400`) |
 | `meanlengthofday` | Mean solar day in SI seconds |
 | `meanSiderealday` | Mean sidereal day in SI seconds (derived) |
@@ -37,7 +36,7 @@ For current values, see [Constants Reference](20-constants-reference.md).
 | `currentAUDistance` / `o.lengthofAU` | Astronomical Unit in km (dynamic) |
 | `lightYear` | Light year in km (derived) |
 
-> **ESSRT epoch dependence.** The variables above (`holisticyearLength`, `meansolaryearlengthinDays`, `meansiderealyearlengthinSeconds`, `meanlengthofday`, `meanSiderealday`, `meanStellarday`, `meanAnomalisticYearinDays`) hold **J2000-anchored values** — the model's primary calibration anchor. Under the [Expanding Solar System Resonance Theory (Doc 99)](99-expanding-solar-system-resonance-theory.md), the day and year values are epoch-dependent: the spin-tier periods follow the composed lunisolar precession period under Driver 1 (Earth-Moon tidal evolution → LOD growth) and the sidereal year in seconds shifts under Driver 2 (solar mass loss → Kepler's 3rd law); the anchor unit `holisticyearLength` is a J2000 constant of the scaffold (plan 09 step 7b — the unit function left). For deep-time / Phanerozoic / Hadean work, replace the day/year globals with the corresponding `mean*AtAge(t_Ma)` helpers in `src/script.js` (`meanLunisolarPrecessionPeriodYearsAtAge`, `meanLodSecondsAtAge`, `meanSiderealYearSecondsAtAge`, `meanTropicalYearSecondsAtAge`, etc.) — see [Doc 20 § "ESSRT epoch dependence"](20-constants-reference.md#essrt-epoch-dependence--most-tabulated-values-are-j2000-anchored) for the complete J2000-constant → helper map.
+> **ESSRT epoch dependence.** The variables above (`meansolaryearlengthinDays`, `meansiderealyearlengthinSeconds`, `meanlengthofday`, `meanSiderealday`, `meanStellarday`, `meanAnomalisticYearinDays`) hold **J2000-anchored values** — the model's primary calibration anchor. Under the [Expanding Solar System Resonance Theory (Doc 99)](99-expanding-solar-system-resonance-theory.md), the day and year values are epoch-dependent: the spin-tier periods follow the composed lunisolar precession period under Driver 1 (Earth-Moon tidal evolution → LOD growth) and the sidereal year in seconds shifts under Driver 2 (solar mass loss → Kepler's 3rd law). (The fitted anchor unit `holisticyearLength` that once headed this table is deleted — plan 09 step 7c; `model-version.json` `_v24Note`.) For deep-time / Phanerozoic / Hadean work, replace the day/year globals with the corresponding `mean*AtAge(t_Ma)` helpers in `src/script.js` (`meanLunisolarPrecessionPeriodYearsAtAge`, `meanLodSecondsAtAge`, `meanSiderealYearSecondsAtAge`, `meanTropicalYearSecondsAtAge`, etc.) — see [Doc 20 § "ESSRT epoch dependence"](20-constants-reference.md#essrt-epoch-dependence--most-tabulated-values-are-j2000-anchored) for the complete J2000-constant → helper map.
 
 #### 1.1.2 Mathematical Constants
 
@@ -111,7 +110,6 @@ The seven planets' live elements of date come from the N-body chain (`_kcElement
 | `{planet}OrbitDistance` | Semi-major axis (a) in AU (derived) |
 | `{planet}PerihelionDistance` | Distance at perihelion |
 | `{planet}Speed` | Mean orbital velocity (km/h) |
-| `{planet}SolarYearCount` | Number of orbits in one anchor interval (derived; a device count of the scene scaffolding) |
 | `{planet}PerihelionEcliptic` | The chain's inertial apsidal period, 1,296,000/g (years) |
 | `{planet}Tilt` | Axial tilt |
 | `{planet}RotationPeriod` | Sidereal rotation period (hours) |
@@ -201,7 +199,7 @@ For current values, see [Constants Reference](20-constants-reference.md).
 | `earthtiltMean` | Mean obliquity — a constant of the scene's J2000 pose (the published obliquity is the hybrid) |
 | `earthInvPlaneInclinationMean`, `earthInvPlaneInclinationAmplitude` | Constants of the scene's J2000 pose (the published inclination is the engine's one-source normal) |
 | `eccentricityBase`, `eccentricityAmplitude` | The scene Sun's eccentricity-law base and the K calibration input (legacy scaffolding; the published eccentricity is the N-body series) |
-| `earthPerihelionICRFYears` | The scene scaffolding's K-wheel period, a third of the anchor (the published apsidal period is the chain's, `inclPrecYears`) |
+| `kDeviceWheelPeriodYears` (browser `_wheelPeriodYears(N)`) | The scene scaffolding's recorded K-wheel periods by wheel index — a J2000 pose, not a law (the former `earthPerihelionICRFYears`, a third of the retired anchor, is deleted, plan 09 step 4b; the published apsidal period is `inclPrecYears`) |
 
 #### 1.5.2 Dynamic Orbital Parameters
 
@@ -240,8 +238,14 @@ Naming taxonomy: `lodKinematic` = the kinematic day of date (the Layer-0 tidal m
 | `o.axialPrecession` | The clock of date: the beat of the sidereal and tropical year laws (`computeAxialPrecessionYears`) |
 | `o.inclinationPrecession` | The apsidal beat of the year laws, anomalistic/(anomalistic − sidereal) (years; the identifier keeps the historical name) |
 | `o.perihelionPrecession` | The kinematic perihelion-of-date beat, anomalistic/(anomalistic − solar) (years). The DISPLAYED of-date value is the one-source family's beat (`predictions.perihelionPrecession`) |
-| `o.obliquityPrecession` | An eighth of the anchor — the frozen era clock's device counter, not the published obliquity period (the beat of the clock against the nodal mode, `obliqBeatJ2000Kyr`; [doc 110](110-calculation-map.md)) |
-| `o.eclipticPrecession` | A fifth of the anchor — the era clock's device counter; the displayed nodal period of date is the chain's (`predictions.eclipticPrecession` = `_kcNodeInvPlanePeriodYears('earth', jd)`) |
+| `predictions.eclipticPrecession` | The displayed nodal period of date — the chain's, `_kcNodeInvPlanePeriodYears('earth', jd)` |
+
+The former `o.obliquityPrecession` / `o.eclipticPrecession` (an eighth and a
+fifth of the retired anchor — the frozen era clock's device counters) are
+deleted (plan 09); the published obliquity period is the beat of the spin
+axis's inertial rate against the nodal mode (`obliqBeatJ2000Kyr`;
+[doc 110](110-calculation-map.md) §4.4), and the `*SolarYearCount` device
+counts (orbits per anchor interval) went at step 7b.
 
 #### 1.5.5 Perihelion/Aphelion Dates
 
@@ -1383,7 +1387,7 @@ For current values, see [Constants Reference](20-constants-reference.md).
 **How values are sourced:**
 - **Eccentricity**: the chain's element of date (`_kcElementsOfDate(k, jd).e`; the K base/amplitude/phase law was retired at plan 07 R6)
 - **Inclination (inv)**: the chain's element of date (`.inclInvPlaneDeg`; the ψ mean/amplitude law was retired at plan 07 R5)
-- **Semi-major axis**: the chain's element of date for the seven planets; for the no-chain bodies derived from the period via Kepler's third law on the scaffolding's integer orbit count per anchor interval (`solarYearCount`)
+- **Semi-major axis**: the chain's element of date for the seven planets; for the no-chain bodies derived from the observed period input via Kepler's third law (`_planetGeom.<k>`, `@essrt/physics` `planets/geometry`; the integer orbit count per anchor interval, `solarYearCount`, was deleted at plan 09 step 7b)
 - **Period**: Input constant per planet (`planets.{name}.solarYearInput`)
 
 > **Display note (post-K5).** These device constants remain the scene-scaffold
@@ -1391,9 +1395,10 @@ For current values, see [Constants Reference](20-constants-reference.md).
 > for the seven chain planets no longer display them: they read the chain's
 > measured window mean motion (governed artifact `windowElementRates`,
 > deg per Julian year, window 1800–2100) — P = 360°/n, synodic =
-> 360°/|n_planet − n_Earth|, orbits-per-H a derived non-integer. The integer
-> orbit counts survive only for Pluto/Halley/Eros, where the geometric device
-> is the model path (the archived doc 31).
+> 360°/|n_planet − n_Earth|. The integer orbit counts per anchor interval
+> are deleted for every body (plan 09 step 7b): Pluto/Halley/Eros, where the
+> geometric device is the model path (the archived doc 31), ride their
+> observed period inputs.
 
 ### Live Variables Summary
 

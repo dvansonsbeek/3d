@@ -159,15 +159,15 @@ WebGL Render (60 FPS target)
 │   │   └── skybox/             # Background starfield
 │   │
 │   └── input/
-│       ├── model-parameters.json      # Model constants (H, Earth params, planet configs)
+│       ├── model-parameters.json      # Model constants (Earth params, K-device pose, planet configs)
 │       ├── astro-reference.json       # IAU/JPL reference values (J2000 elements, periods)
-│       ├── fitted-coefficients.json   # Pipeline output (harmonics, parallax, corrections)
+│       ├── fitted-coefficients.json   # Description only since plan 09 (the fits live under data/)
 │       ├── meeus-lunar-tables.json    # Meeus Ch.47 lunar correction tables
 │       ├── constellations.json        # 88 IAU constellation line patterns
 │       └── stars.json                 # Yale Bright Star Catalog (~9,000 stars)
 │
 ├── data/
-│   ├── 01-holistic-year-objects-data.xlsx  # Full H export (perihelion, precession)
+│   ├── 01-holistic-year-objects-data.xlsx  # Record: the retired device's full-window export (untracked)
 │   ├── 02-solar-measurements-window.csv   # Cardinal points, year lengths, −4000…+4000 (gitignored; npm run fit:6a2)
 │   ├── reference-data.json                # JPL-enriched verification data
 │   └── balance-presets.json               # 15 deep-analysis balance presets (96 candidates → 15 survivors)
@@ -229,10 +229,10 @@ The monolithic script.js (~59,800 lines) is organized into logical sections. Con
 ```
 ┌─────────────────────────────────────────────────────────────────────┐
 │  CONSTANTS & FORMULAS (top of file)                                 │
-│  A. Model parameters: H, Earth params, Moon, planet configs         │
-│  B. Fitted coefficients: year harmonics, predictive formula (429    │
-│     terms × 7 planets), obliquity & cardinal point harmonics,       │
-│     balance presets                                                 │
+│  A. Model parameters: Earth params, K-device pose, Moon, planets    │
+│  B. Fitted coefficients: the ΔT stack, the resonator, the climate   │
+│     formula, balance presets (the comb families are deleted,        │
+│     plan 09; the predictive formula left at plan 06 R8)             │
 │  C. Astro references: J2000 elements, body diameters, inclination  │
 │     reference data, ASTRO_REFERENCE object                          │
 │  D. Moon Meeus tables (Ch.47 lunar corrections)                     │
@@ -246,7 +246,7 @@ The monolithic script.js (~59,800 lines) is organized into logical sections. Con
 │  - Data objects for every celestial body (Type I/II/III)            │
 │  - Planet hierarchical precession layers                            │
 │  - Moon precession layers                                           │
-│  - Obliquity cycles, planet parallax corrections                    │
+│  - The K-device scaffold wheels (recorded J2000 pose periods)       │
 ├─────────────────────────────────────────────────────────────────────┤
 │  MASTER ARRAYS & SCENE SETUP                                        │
 │  - planetObjects / tracePlanets arrays                              │
@@ -519,27 +519,34 @@ model's own N-body secular series (`data/nbody-secular-series.json`,
 `@essrt/physics` factories (`createDeepOrbitalHistory`,
 `createYearLengths`, `createCardinalStructure`, the λ̇ sidereal channel).
 The displayed/served year lengths and precession beats are ONE family
-from these factories (chart ≡ panel ≡ report ≡ API ≡ Node engine); the
-fitted Fourier laws below remain the **frozen era-certification device**
-and the automatic pre-load fallback (doc 11's Status banner; the former
-`?hybridSpin=0` user opt-out was removed at plan 06 D5 — the K device is
-not a published alternative; the plan-02 record in the private repo
-carries the full decision trail).
+from these factories (chart ≡ panel ≡ report ≡ API ≡ Node engine). The
+fitted Fourier laws of the frozen era-certification device — the unit, its
+counters and every correction comb — are deleted (plan 09, model v24.0;
+`model-version.json` `_v24Note`); the former `?hybridSpin=0` user opt-out
+was removed at plan 06 D5, and the plan-02 record in the private repo
+carries the full decision trail. The K-device scene scaffold remains as the
+scene's recorded J2000 pose; the engine places the Earth frame, the Sun and
+the Moon stack over it.
 
-### Precession Cycles (kinematic device identities on the anchor)
+### Precession Cycles (dynamical, J2000)
 
-The device identities on the fitted anchor's divisors (not the published periods — those are dynamical, plan 06 S5/S6). The *displayed of-date*
-precession periods are the dynamical beats of the one-source year-length
-family (e.g. axial ≈ 25,771 yr at J2000, declining with date); these
-identities remain the kinematic family beside them.
+The published periods are dynamical (plan 06 S5/S6, plan 09); the
+*displayed of-date* values are the beats of the one-source year-length
+family (e.g. axial ≈ 25,771.6 yr at J2000, declining with date). See
+[doc 20 § Precession Periods](20-constants-reference.md) for the registry
+values.
 
-| Cycle | Period | Description |
+| Cycle | Source | Description |
 |-------|--------|-------------|
-| **Axial Precession** | H/13 | Earth's rotational axis wobble |
-| **Perihelion Precession** | H/16 | Closest approach point shifts (climatic precession) |
-| **Apsidal Precession** | H/3 | Perihelion revolution vs the fixed stars |
-| **Obliquity Cycle** | H/8 | Axial tilt oscillation (~22.2° - ~24.7°) |
-| **Eccentricity Cycle** | H/16 (+ derived H/3 coupling) | Orbital shape variation |
+| **Axial Precession** | 1,296,000/p_A at J2000 (IAU 2006 input); the composed T_p(t) at deep time | Earth's rotational axis wobble |
+| **Perihelion Precession** | the perihelion-of-date beat, 1/T_peri = 1/T_p + 1/T_aps | Closest approach point shifts (climatic precession) |
+| **Apsidal Precession** | the one-family anomalistic/sidereal beat | Perihelion revolution vs the fixed stars |
+| **Obliquity Cycle** | the beat 2π/(ψ̇ᵢₙ − \|s₃\|) | Axial tilt oscillation (~22.2° - ~24.7°) |
+| **Eccentricity Cycle** | the N-body secular series (e.g. the 405.6-kyr g₂ − g₅ line) | Orbital shape variation |
+
+(These were H/13, H/16, H/3, H/8 and H/16 + H/3 of the retired fitted unit;
+the scene's K-device wheels keep those numbers as recorded pose periods,
+`kDeviceWheelPeriodYears`, not as laws.)
 
 ### Invariable Plane System
 

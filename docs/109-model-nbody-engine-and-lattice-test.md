@@ -21,6 +21,14 @@ calculation is consistent, nothing more) or **theory-vs-observation**
 (transits, ranging-constrained positions, the measured J2000 values). An
 ephemeris is not an observation.
 
+> **Status (v24.0).** The lattice this record tests, and the fitted unit H
+> its "8H/N" notation divides, are retired: the integer laws at plan 07 R6,
+> the unit with its counters, combs and the H/3 eccentricity law at plan 09.
+> The notation below is the record's own. What ships is the N-body chain and
+> series and the composed precession clock T_p(t); §22 is the record table
+> of the comb-era research deleted at plan 09 step 7e
+> (`public/input/model-version.json` `_v24Note` is the plan-level summary).
+
 Instruments (all `tools/explore/`): `perihelion-observation-audit.mjs`,
 `nbody-wh.mjs`, `lattice-long-window-test.mjs`, `naff-frequencies.mjs`,
 `derived-earth-orbit-vector.mjs`, `lattice-beat-null-test.mjs`; the bound
@@ -188,6 +196,12 @@ population.
 
 ## 7. A derived Earth orbit vector — what 1 Myr can and cannot do
 
+> **Status.** This section is the record of the 1-Myr attempt. The H/3
+> eccentricity law it compares against was retired at plan 09 (with its
+> 21.77° anchor): Earth's e and ϖ of date are the N-body secular series on
+> every path, which is the ≥ 10–20 Myr derived vector this section asked for.
+> "Shipped law" below means the law shipped at the time.
+
 Doc 108 §6 asked for a self-consistent secular solution for Earth's e and ϖ
 from the framework's own dynamics. `derived-earth-orbit-vector.mjs` builds
 z_E(t) from the NAFF mode table and tests it. From a 1-Myr table the
@@ -201,7 +215,8 @@ large cancelling amplitudes (Earth's g₅ term read 0.078 against a physical
 ≈ 0.019) — an in-window fit, not a solution; the merge rule in NAFF prevents
 it. A derived deep-time vector needs a ≥ 10–20 Myr integration, which the
 engine can now provide; until it passes the out-of-window and the eclipse-
-and cardinal-point tests, the H/3 line stays the model's local law.
+and cardinal-point tests, the H/3 line stayed the model's local law (it
+did until the series replaced it, plan 09).
 
 What the eclipse chain can test is already sized
 (`ecc-law-eclipse-sensitivity.mjs`). Both the shipped law and a derived
@@ -230,7 +245,7 @@ curvature**; the cardinal-point instants could (8 minutes at −135), but no
 ancient equinox or solstice timing reaches that precision. So the
 curvature of Earth's eccentricity law is, today, a theory-vs-theory
 question — the H/3 line's −3.8e-8 against the secular dynamics' −2.5e-7 —
-and the honest statement is that the shipped law disagrees with the
+and the honest statement was that the then-shipped law disagreed with the
 dynamics on a quantity no observation yet reaches. The hook stays: it is
 the way any alternative Earth-orbit law is put through the eclipse and
 cardinal chains without touching the shipped defaults.
@@ -252,6 +267,11 @@ cardinal chains without touching the shipped defaults.
   ice-age results, which do not rest on the perihelion or node divisors.
 
 ## 9. Divisor restatement — proposal
+
+> **Status.** Record. The divisors were retired with the integer laws
+> (plan 07 R6) and the unit they divided with the era device (plan 09); the
+> planets' periods are the chain's 1,296,000/g and /s. The table below is
+> the proposal as made.
 
 Each divisor keeps its number and gains a **type**, stated wherever it is
 published (registry note, site table, paper table):
@@ -313,8 +333,8 @@ added force's effect on each planet's ϖ̇ to a few ″/cy and on each node to
 rates, so no added force can move them by more than ~1 %. The outer-planet
 8H/N values are 40–70 % away from the frequencies the engine finds. A force
 that reached 8H/N at deep time while leaving the present rates alone would
-have to be zero now and large later — which is a statement about H(t), not
-about gravity, and returns the question to engine K's own domain (§9 and the
+have to be zero now and large later — which is a statement about the
+(since retired) unit's deep-time scaling, not about gravity, and returns the question to engine K's own domain (§9 and the
 two-engine plan).
 
 ## 11. The founding observation with a null
@@ -428,8 +448,11 @@ belongs to the free dynamics, while the model's spin-family results
 
 ## 13. The 13:3 permanence question — closed on every doorway
 
+(Record — the unit H this section reads its ratios on was deleted at
+plan 09; the deep-time spin clock is the composed precession period T_p(t).)
+
 The 13:3 ratio (axial precession H/13 against inclination/perihelion
-precession H/3) is exact at J2000 and generated H itself. Whether anything
+precession H/3) was exact at J2000 and generated H itself. Whether anything
 makes it MORE than the J2000 reading — a permanent structure — was pursued
 to exhaustion. The doorway list, each measured:
 
@@ -462,7 +485,7 @@ to exhaustion. The doorway list, each measured:
   (Theory-vs-theory: the referee is the model's own engine D.)
 
 Structurally, permanence was never available across the seam: engine-K
-frequencies scale with 1/H(t) (the tidal clock, ~10 % per 380 Myr) while
+frequencies scale with 1/T_p(t) (the tidal clock, ~10 % per 380 Myr) while
 engine-D frequencies scale with M_Sun (the mass clock, ~0.003 % over the
 same span) — five orders of magnitude apart. A permanent cross-seam
 integer ratio would require the tidal clock enslaved to the mass clock,
@@ -472,12 +495,12 @@ which nothing measured supports.
 -of-date = equinox precession + inertial perihelion motion (16 = 13 + 3)
 and 8 = 5 + 3 are frame arithmetic, true at every epoch by construction;
 what is epoch-local is only that the addends land on H/13 and H/3. The
-spin family's H(t)-scaling is rock-confirmed, and the composed two-engine
+spin family's scaling on the precession clock T_p(t) is rock-confirmed, and the composed two-engine
 precession matches the deep-time inferences (doc 99, "One solar system").
 The longest-lived Fibonacci touch is Earth's own **nodal mean ≈ −H/5**
 (the one A-type lattice match, anchored on the s₃ eigenfrequency — it
-stands for tens of Myr, though H's growth eventually walks away from it
-too). Of all epochs, the one where the free dynamics kisses the Fibonacci
+stands for tens of Myr, though the spin clock's growth eventually walks
+away from it too). Of all epochs, the one where the free dynamics kisses the Fibonacci
 lattice is the one with observers in it; selection mechanisms were tested
 and none found, so the model claims no structure — and no one gets to call
 it understood, either.
@@ -716,10 +739,10 @@ lunar chain rides this table's e** (E-factor, perigee/node modulation
 and the integrated cycle counts, the argument Δe² and of-date rates —
 `moon/deep-ecc-channel.cjs`, one factory across all three runtimes),
 while the Sun/clock machinery (eclipse Sun equation of centre,
-besselian Sun distance, cardinal braid) stays on the H/3 line — a
+besselian Sun distance, cardinal braid) stayed on the H/3 line — a
 certification split, not a physics one (the two agree within 4.2e-5
-across the historical era; the H/3 line keeps its E18 epoch-local-
-tangent role). Acceptance, measured and rebaselined: all 41 paleo
+across the historical era). Since plan 09 the split is closed: the H/3
+law is deleted and Earth's e of date is the N-body series on every path. Acceptance, measured and rebaselined: all 41 paleo
 anchors in bands; the ancient-eclipse dense-target χ² IMPROVED
 (full stack 44.7 → 32.9, Phase-C 5.4 → 4.7, ablation ordering
 preserved) — explained, not tuned: this e is La2004-corroborated
@@ -735,7 +758,9 @@ averaged precession equation and zero fitted constants: the spin axis
 integrated under ds/dt = α (ŝ·n̂)(ŝ×n̂), with the orbit normal n̂(t)
 from ENGINE D (the deep ζ-modes of `data/nbody-deep-secular-modes.json`,
 anchored at the JPL J2000 seed) and a single ENGINE-K anchor,
-α = (H/13 rate)/cos ε₀. Nothing else enters.
+α = p₀/cos ε₀, p₀ the J2000 precession rate (since plan 09 the IAU 2006
+input p_A; when this section was banked, the retired unit's thirteenth).
+Nothing else enters.
 
 Three results, banked as the governed artifact
 `data/obliquity-hybrid-verdict.json` by `tools/verify/obliquity-hybrid.js`
@@ -750,10 +775,10 @@ from this paragraph.**
 
 First, **an input becomes an output**: the scene machinery *solves* its
 tilt amplitude against the IAU obliquity rate; the hybrid *derives*
-that rate from the engine's own node modes plus the H/13 anchor, to a
-quarter-percent. Second, **the H/8 identity is derived, not asserted**:
-the dominant obliquity beat emerges as |ψ̇| − |s₃| ≈ 41 kyr — the
-lattice's spin-side reading produced natively by the dynamics. Third,
+that rate from the engine's own node modes plus the p₀ anchor, to a
+quarter-percent. Second, **the obliquity period is derived, not asserted**:
+the dominant obliquity beat emerges as |ψ̇| − |s₃| ≈ 41 kyr — the retired
+lattice's spin-side identity produced natively by the dynamics. Third,
 **the fidelity ladder** (vs La2004, a theory reference): the era
 ζ-slice beats the same integration on the bare model's 18-mode ζ table
 (the series-less configuration; the comb-era 16-harmonic fitted law it
@@ -793,10 +818,10 @@ K's chain, ONE home `@essrt/physics/earth/precession-composed`; the
 hybrid precesses on exactly this evaluator) — while s₃ is a
 DYNAMICAL-tier frequency, scaled only by the measured solar-mass
 history (μ(2.48 Ga) = 1.00 ± 0.07 — effectively fixed). The obliquity
-band therefore follows the BEAT, **2π/(ψ̇(t) − |s₃|)**. Since Phase 3
-the unit H(t) IS 13 composed precession periods at every epoch, so the
-tidal-mean year pair's beat, H(t)/13 and the composed period are one
-quantity, and the rock reads it directly: the composed rate matches the
+band therefore follows the BEAT, **2π/(ψ̇(t) − |s₃|)**. The composed
+period T_p(t) is the model's one deep-time clock (the internal unit and
+its thirteen-period identity are deleted, plan 09), and the rock reads it
+directly: the composed rate matches the
 Precambrian precession constants
 (<!--v:anchorXiamalingPrec1400Pred-->86.60<!--/v--> vs Meyers &
 Malinverno 2018's 85.79 ± 2.72 ″/yr at 1.4 Ga,
@@ -804,13 +829,13 @@ Malinverno 2018's 85.79 ± 2.72 ″/yr at 1.4 Ga,
 2022's 108.6 ± 8.5 ″/yr at 2.46 Ga — both paleo-anchors gate rows). The
 model's earlier deep-time reading, the spin-only clock
 13·1,296,000/(H₀·LOD/LOD₀), fails both rows (24 % and 35 % low) and is
-retired; it survives only as the frozen era
-clock's named phase convention. The registry keys `obliqBeat*Kyr` (the
+retired; it was the frozen era clock's phase convention until that
+clock was deleted at plan 09 step 7a. The registry keys `obliqBeat*Kyr` (the
 beat) / `obliqH8Scaled*Kyr` (name kept: the pure precession-scaling
 reading "obliquity period ∝ T_p" — the J2000 beat held proportional to
 T_p(t); plan 06 S5 retired its former T_p·13/8 form) carry the fork at J2000, 1.4
 and 2.46 Ga: today the readings are degenerate (ψ̇ ≫ s₃ — which is why
-"H/8" has always fit), while at 2.46 Ga the beat reads
+the retired device's eighth-of-unit label always fit), while at 2.46 Ga the beat reads
 <!--v:obliqBeat2460MaKyr-->15.1<!--/v--> kyr against
 <!--v:obliqH8Scaled2460MaKyr-->19.8<!--/v--> for period ∝ T_p — a level
 cyclostratigraphy can discriminate. The existing 1.4/2.46-Ga
@@ -917,7 +942,7 @@ envelope over ±1 Myr rather than an "obliquity cycle": on the
 quasi-periodic ζ tables Mars reads the Laskar–Robutel class as an envelope
 (≈13–35°), Jupiter, Saturn, Uranus and Neptune stay within a few degrees.
 The device rows (`axialPrecessionFraction`, `obliquityCycleFraction` —
-integer fractions of the anchor unit) are RETIRED with the channel's second
+integer fractions of the retired unit) are RETIRED with the channel's second
 commit: the planets' rendered obliquity of date and the panel value ride
 `computePlanetObliquity` = the channel in both scene twins (the meshes had
 stood at the static J2000 tilt); the K eccentricity law's cycle period is

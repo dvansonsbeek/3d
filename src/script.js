@@ -15605,7 +15605,7 @@ const ESSRT_QTY_SPECS = {
     hasWu:    true,
     wuKey:    'axial_arcsec_yr',
     wuConvert:(rate) => 1296000 / rate,
-    footnote: 'Note: the curve is the composed lunisolar precession period — Earth’s spin carrying the solar and lunar torques, the lunar term scaling with 1/a³ so the closer Moon drove precession faster than spin-scaling alone — anchored on the model’s J2000 period (25,771 yr, IAU to 8×10⁻⁶). This is the quantity cyclostratigraphic inversions (Wu et al. 2024) measure. The real axial precession also oscillates by ~50–500 years around the mean on the ~21,000- and ~41,000-year cycles (the perihelion-of-date and obliquity beats), invisible at this scale.',
+    footnote: 'Note: the curve is the composed lunisolar precession period — Earth’s spin carrying the solar and lunar torques, the lunar term scaling with 1/a³ so the closer Moon drove precession faster than spin-scaling alone — anchored on the IAU 2006 general precession at J2000 (25,771.6 yr). This is the quantity cyclostratigraphic inversions (Wu et al. 2024) measure. The real axial precession also oscillates by ~50–500 years around the mean on the ~21,000- and ~41,000-year cycles (the perihelion-of-date and obliquity beats), invisible at this scale.',
   },
   obliqCycle: {
     title:    'Obliquity Cycle Period (the beat)',
@@ -16011,7 +16011,7 @@ function essrtRenderChart(qtyKey, rangeKey) {
   const driverText = {
     lod:        '<strong>Driver 1</strong> — Earth-Moon tidal recession (Layer-2 angular-momentum conservation, Farhat 2022 polynomial fit).',
     year:       '<strong>Drivers 1+2</strong> — days/year = (tropical year_s) / LOD. Driver 2 sets year-in-seconds (Kepler dT/T = −2 dM/M); Driver 1 sets day-in-seconds (Farhat 2022). The model’s day-count near-invariant couples the two. Wu et al. days/year are derived from their LOD: at 400 Ma → ~403 days/yr (matches Wells 1963 coral bands).',
-    axial:      '<strong>Driver 1</strong> — the composed lunisolar precession period: Earth’s spin (Layer-2 angular momentum, Farhat 2022 recession) carrying the solar and lunar torques, the lunar torque growing on the Moon’s distance; anchored on the model’s J2000 period (25,771 yr).',
+    axial:      '<strong>Driver 1</strong> — the composed lunisolar precession period: Earth’s spin (Layer-2 angular momentum, Farhat 2022 recession) carrying the solar and lunar torques, the lunar torque growing on the Moon’s distance; anchored on the IAU 2006 general precession at J2000 (25,771.6 yr).',
     obliqCycle: '<strong>Driver 1</strong> — the obliquity beat 2π/(ψ̇ᵢₙ − |s₃|): the spin axis’s inertial precession rate (the composed rate × the hybrid’s self-anchor factor) against the orbit’s dominant nodal mode (s₃ at its dynamical value under the solar-mass history).',
     au:         '<strong>Driver 2</strong> — solar mass loss: a × M = const (Kepler dT/T = −2 dM/M, ~9.3×10⁻¹⁴ /yr).',
     moon:       '<strong>Driver 1</strong> — tidal recession via the Farhat 2022 LSQ polynomial fit a(t)/a_now = 1 + α₁t + α₃t³ + α₄t⁴.',

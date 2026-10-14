@@ -13,7 +13,7 @@ half) plus an explicit equation-of-center term (the analytic half), closed
 exactly by a derived corrector (the exact-Kepler wheel). This document is
 the reference for that construction: the split derivation, the derived
 parameters, the corrector, the layering of the displayed Sun, and the
-legacy fitted-harmonic layer that remains in the registry.
+record of the fitted-harmonic layer deleted at plan 09 step 5a.
 
 ---
 
@@ -96,7 +96,7 @@ introduces no residual.
 ### perihelionPhaseOffset
 
 ```
-perihelionPhaseOffset = (((startModelYear - 2000) / (H/16) + 16 × kDeviceWheelPhaseAtJ2000Cycles) * 360   // plan 07 R10: J2000 origin + the device's recorded J2000 wheel phase
+perihelionPhaseOffset = (((startModelYear - 2000) / P₁₆ + 16 × kDeviceWheelPhaseAtJ2000Cycles) * 360   // P₁₆ = _wheelPeriodYears(16), the K perihelion wheel's recorded period; J2000 origin + the device's recorded J2000 wheel phase (plan 07 R10)
                         + correctionSun
                         + 360 * (startmodelJD - perihelionRefJD) / yearDays) % 360
 ```
@@ -146,8 +146,9 @@ differs from full Kepler by a residual that is **fully attributed**
    from the law's ϖ direction, predicting a 62.3″ annual-quadrature component
    vs the measured 61.8″.
 
-Combined mechanism share ~100%; the offset magnitude tracks the H/16 e-law
-to six decimals at every probe epoch.
+Combined mechanism share ~100%; the offset magnitude tracked the then-shipped
+eccentricity law (since replaced by the N-body series, plan 09 step 6) to six
+decimals at every probe epoch.
 
 **The corrector.** In difference form the mean longitude cancels, so the
 exact-Kepler completion is a pure function of the branch's own live values —
@@ -159,9 +160,9 @@ d⃗  = −base·û(θ_p1) + amp·û(θ_p1 + θ_p2)      (live peri-layer phases
 θ  += Δλ / J                                   (first-order Jacobian)
 ```
 
-Shipped in both runtimes and **default ON** (`FQ3_EXACT_SUN` in
-`tools/lib/scene-graph.js`, `FQ3_EXACT_SUN_ENABLED` in `src/script.js`;
-`=0` restores the fitted legacy path). The offset vector reads the
+Shipped in both runtimes (the former `FQ3_EXACT_SUN` /
+`FQ3_EXACT_SUN_ENABLED` toggles are retired, plan 06 R4, and the fitted
+legacy path they restored is deleted, plan 09 step 5a). The offset vector reads the
 already-animated parent phases, so the form is integrated-phase correct in
 deep-time mode by construction. One convention trap is recorded in the code
 comment: node-ry angles are λ-handed — only the raw world-frame `atan2(z,x)`
@@ -183,7 +184,7 @@ not absorbed. The certified eclipse chain is untouched by construction
 ```
 θ_kinematic    = base scene-graph rotation (constant rate × pos − startPos)
 θ_with_EoC     = θ_kinematic + 2·e·sin(M) + 1.25·e²·sin(2M)        ← EoC + exact-Kepler corrector (default path)
-θ_with_harms   = θ_with_EoC − Δλ_harmonics(t)                       ← Z-B (legacy path only; skipped when FQ3 is on)
+θ_with_harms   = θ_with_EoC − Δλ_harmonics(t)                       ← Z-B (record: deleted at plan 09 step 5a; Δλ_harmonics ≡ 0)
 θ_displayed    = θ_with_harms + w(t)·(λ_certified − λ_realized)     ← the δ overlay (owns accuracy)
 ```
 
@@ -243,7 +244,9 @@ with `perihelionPhaseJ2000` composed from the Sun's theta at model start
 (−correctionSun), the angular distance from model start to the perihelion
 passage (JD <!--v:perihelionPassageJD-->2451547.042<!--/v-->, January 3.542),
 and the derived `perihelionPhaseOffset`. The phase precesses at
-`2π / (H/16)` radians per simulation year.
+`2π / P₁₆` radians per simulation year — P₁₆ = `_wheelPeriodYears(16)`, the K
+perihelion wheel's recorded period (20,957.3 yr, a scaffold pose; the Sun's
+published perihelion of date is the N-body series').
 
 ### Shared parameter: correctionSun
 
@@ -254,17 +257,9 @@ it.
 
 ---
 
-## The Legacy Fitted Layer (Z-B Sun-longitude harmonics)
+## The Deleted Fitted Layer (Z-B Sun-longitude harmonics — record)
 
-> **Not on the display path.** With `FQ3_EXACT_SUN(_ENABLED)` on (the
-> default in both runtimes) the moveModel sun does not evaluate this
-> correction — the split error it absorbed is derived and removed at the
-> geometry level. The fitted terms remain registry constants
-> (`fitted-coefficients.json`; Step 0 is their fitter; the planetary
-> completion's PAIRED hash fingerprints them; `computeSunPositionFast` —
-> the declared Step-6a instrument — and the legacy A/B path apply them).
-
-What it is: an anchor-divisor harmonic absorber of the geometric-split wheel's
+What it was: a harmonic absorber on the retired unit's divisors of the geometric-split wheel's
 annual imperfection, fit against the Meeus Ch. 25 residual across ±100 yr
 around J2000 (smart J2000-anchored). **DELETED at plan 09 step 5a** — the comb
 left every Sun path at plan 06 R4 (the Sun is the certified longitude on the
@@ -310,18 +305,10 @@ time. A greedy re-fit under Z-B found no further lattice-compliant terms
 above the 0.05″ threshold; the drift-proxy candidates it surfaced (the unit's
 152nd and 167th) violated the rule and were rejected.
 
-**Pipeline position — Step 0.** The coefficients capture a structural
-property (the eccentricity-definition gap), stable across normal refits;
-re-run Step 0 only when H, the eccentricity definition, or the Meeus Ch. 25
-reference changes. Running Step 0 first lets Step 1 (`correctionSun`)
-converge in a single pass:
-
-```
-SUN_HARMONICS_DISABLED=1 node tools/fit/sun-longitude-harmonics.js --write   # Step 0
-node tools/optimize.js optimize sun correctionSun --write                    # Step 1
-```
-
-An ad-hoc harmonics re-fit invalidates `correctionSun` (follow with Step 1).
+**Pipeline position (record).** It was fitted as Step 0, ahead of Step 1
+(`correctionSun`), by `tools/fit/sun-longitude-harmonics.js`; the fitter, the
+keys and the evaluator are deleted (plan 09 step 5a; git history carries them),
+and `correctionSun` (Step 1) is now fitted with no Sun-longitude comb beneath it.
 
 Toggles: `SUN_HARMONICS_ENABLED` (src/script.js), env
 `SUN_HARMONICS_DISABLED=1` (Node tools).

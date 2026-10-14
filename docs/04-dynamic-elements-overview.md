@@ -17,7 +17,7 @@ three tiers, and knowing which body sits on which tier answers most
    markers, panels and the invariable-plane machinery (heights, mass
    gauge, Sun-SSB) from it.
 2. **Earth, the Moon and the Sun — the engine-K hierarchy.** The
-   certified historical-era devices: Earth's spin/tides/H(t) machinery
+   certified historical-era devices: Earth's spin/tides/precession-clock machinery
    and the Moon's 3D precession hierarchy. This is the two-engine
    interface; the historical gate suite is calibrated on it.
 3. **The geometric elements device — DELETED (plan 07 R5).** Ceres's
@@ -77,7 +77,7 @@ the lattice tested at its own quantity type).
 
 ## Tier 2: The Engine-K Hierarchy (Earth, Moon, Sun)
 
-Earth's own motion — spin, precession devices, tides, H(t), the cardinal
+Earth's own motion — spin, the composed precession clock T_p(t), tides, the cardinal
 points, the one-source movement — stays on the engine-K hierarchy and is
 documented where it lives: [doc 11](11-length-day-year-formulas.md)
 (years and days), [doc 65](65-equation-of-center.md) (the Sun wheel),
@@ -148,7 +148,7 @@ Two rules keep element comparisons honest across all three tiers:
   signs. Compare in the J2000-fixed frame
   ([doc 05 §Two frames](05-invariable-plane-overview.md#two-frames-two-node-values--dont-conflate)).
 - **Equinox vs ICRF.** An ecliptic rate of date and an inertial (ICRF)
-  rate differ by the general precession (H/13); the scene's equatorial
+  rate differ by the general precession (p_A, the model's J2000 input); the scene's equatorial
   frame co-moves with its star field, so scene measurements cannot
   separate the two — the conversion is a formula applied outside the
   scene ([doc 13 §1.5a/§1.8](13-mercury-precession-breakdown.md)).

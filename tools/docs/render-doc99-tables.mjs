@@ -11,8 +11,10 @@
  * written by this script from the evaluators the model runs ("a number a doc
  * cannot reproduce from an artifact gets written BY the script" — CLAUDE.md):
  * the composed lunisolar precession period T_p(t) = 1,296,000/ψ̇(t) on its
- * derived J2000 anchor (plan 06 S5), the obliquity beat 2π/(ψ̇ − |s₃|), the
- * tidal chain's LOD and Moon distance, and the climate formula's PHYSICAL
+ * J2000 anchor, the IAU 2006 general precession p_A (an input since plan 09),
+ * the obliquity beat 2π/(ψ̇ − |s₃|), the tidal chain's LOD and Moon distance,
+ * the day's ecliptic-precession term on the nodal period T_s₃, and the
+ * climate formula's PHYSICAL
  * lines (data/l1-physical-lines.json, plan 06 T1): the precession-band lines
  * p + g_i and p + s_i ride ψ̇(t); the eccentricity-band lines |g_i − g_j| do
  * not (μ = 1 — the solar-mass drift of the g-modes is ~0.02 % at 2.46 Ga).
@@ -29,6 +31,7 @@ const ROOT = fileURLToPath(new URL('../../', import.meta.url));
 const DOC = join(ROOT, 'docs/99-expanding-solar-system-resonance-theory.md');
 const require = createRequire(join(ROOT, 'package.json'));
 const DT = require(join(ROOT, 'tools/lib/deep-time.js'));
+const CONST = require(join(ROOT, 'tools/lib/constants.js'));
 const L1 = JSON.parse(readFileSync(join(ROOT, 'data/l1-physical-lines.json'), 'utf8'));
 const FREQ = JSON.parse(readFileSync(join(ROOT, 'data/t1-engine-frequencies.json'), 'utf8'));
 
@@ -88,7 +91,7 @@ function blockClockThroughTime() {
     rows.push(`| ${b(ageLabel(t))} | ${b(f(lodHr(t), 2))} | ${b(th(Tp(t)))} | ${b(f(daysPerYr(t), 2))} | ${b(th(moonKm(t)))} | ${b(f(beatKyr(t), 2))} | ${ERA[String(t)] ?? ''} |`);
   }
   rows.push('');
-  rows.push(`T_p(t) = 1,296,000/ψ̇(t) with ψ̇(t) = [ω(t)/ω₀]·p₀·[f_S + (1 − f_S)(a₀/a_M(t))³] — Earth's spin (angular-momentum conservation on the recession history) carrying the solar and lunar torques, the lunar torque growing as the Moon was closer; p₀ = ${f(p0, 4)} ″/yr, the model's derived J2000 rate (T_p = ${th(Tp(0), 1)} yr; plan 06 S5). The obliquity beat is 1,296,000/(ψ̇ − |s₃|) with |s₃| = ${f(s3, 4)} ″/yr, the dominant nodal mode of Earth's orbit (the engine's deep secular modes; μ = 1). The spin-only clock the model carried before (H₀·LOD/LOD₀ ÷ 13) read 23,553 yr at the Devonian where the composed clock reads ${th(Tp(380))} — retired, and its counter deleted at plan 09 step 7a (the 23,553 is the last recorded value).`);
+  rows.push(`T_p(t) = 1,296,000/ψ̇(t) with ψ̇(t) = [ω(t)/ω₀]·p₀·[f_S + (1 − f_S)(a₀/a_M(t))³] — Earth's spin (angular-momentum conservation on the recession history) carrying the solar and lunar torques, the lunar torque growing as the Moon was closer; p₀ = ${f(p0, 4)} ″/yr, the IAU 2006 general precession p_A at J2000 — an input since plan 09 (T_p = ${th(Tp(0), 1)} Julian yr). The obliquity beat is 1,296,000/(ψ̇ − |s₃|) with |s₃| = ${f(s3, 4)} ″/yr, the dominant nodal mode of Earth's orbit (the engine's deep secular modes; μ = 1). The spin-only clock the model carried before (H₀·LOD/LOD₀ ÷ 13) read 23,553 yr at the Devonian where the composed clock reads ${th(Tp(380))} — retired, and its counter deleted at plan 09 step 7a (the 23,553 is the last recorded value).`);
   return rows.join('\n');
 }
 
@@ -182,9 +185,21 @@ function blockKeyEpochs() {
   return rows.join('\n');
 }
 
-// (plan 09 step 7b: `blockH5` — the frozen device's H/5 ecliptic-precession
-// term of the day, δ_LOD = LOD/((H(t)/5)·days/yr), evaluated on the unit — is
-// deleted with the unit; doc 99 keeps its last render as static text)
+// The day's ecliptic-precession term δ_LOD = LOD_mean/(T_s₃·mSY) on the shipped
+// chain (`h5Correction` — identifier kept; the divisor is the nodal period since
+// the plan 06 T2 restatement, mSY the year in SI days). (plan 09 step 7b deleted
+// the former `blockH5`, which evaluated the frozen device's H/5 form on the unit.)
+function blockEclipticLod() {
+  const rows = ['| Age (Ma) | LOD_mean (s) | δ_LOD (ms) — the ecliptic-precession term | fractional δ/LOD |', '|---:|---:|---:|---:|'];
+  for (const t of [-200, 0, 380, 1000]) {
+    const lod = lodS(t);
+    const d = DT.h5Correction(CONST.startmodelYear - t * 1e6);   // the chain's age axis: t_Ma = (startmodelYear − year)/1e6
+    rows.push(`| ${t < 0 ? `+${th(-t)} (future)` : t === 0 ? '0 (J2000)' : `−${th(t)}`} | ${f(lod, 1)} | ${f(d * 1000, 3)} | ${(d / lod).toExponential(3)} |`);
+  }
+  rows.push('');
+  rows.push(`δ_LOD = LOD_mean/(T_s₃·mSY) with T_s₃ = 1,296,000/|s₃| = ${th(1296000 / s3)} yr (the orbital nodal mode, constant under μ = 1) and mSY the tropical year in SI days — written by the engine from the shipped chain, the same evaluator the ΔT integral uses.`);
+  return rows.join('\n');
+}
 
 function blockSummary() {
   const g0 = cpr.find((l) => l.label === 'p+g0');
@@ -239,6 +254,7 @@ const BLOCKS = {
   'doc99-future-table': blockFuture,
   'doc99-growth-rate': blockGrowthRate,
   'doc99-key-epochs': blockKeyEpochs,
+  'doc99-ecliptic-lod': blockEclipticLod,
   'doc99-summary-table': blockSummary,
 };
 

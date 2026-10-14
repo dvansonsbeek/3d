@@ -3,45 +3,30 @@
  * Automated fitting pipeline runner.
  *
  * Usage:
- *   node tools/fit/run-pipeline.js --phase1        # Steps 1-2 only (~2 min)
- *   node tools/fit/run-pipeline.js --phase2        # Steps 4a-10 (~2.5 hrs, requires Step 3 data)
- *   node tools/fit/run-pipeline.js --all           # Steps 1-2, then 4a-9
- *   node tools/fit/run-pipeline.js --from 5c       # Resume from Step 5c onwards
+ *   node tools/fit/run-pipeline.js --phase1        # Step 1 only (~2 min)
+ *   node tools/fit/run-pipeline.js --phase2        # Steps 6a2-9 (~45 min)
+ *   node tools/fit/run-pipeline.js --all           # Step 1, then 6a2-9
+ *   node tools/fit/run-pipeline.js --from 7c       # Resume from Step 7c onwards
  *
  * Logs all output to tools/results/pipeline.log (overwritten each run).
  * Stops on any step failure. Step 8 (verify) must pass before Step 9 (sync).
  *
- * Step 3 (browser export) is always manual — the runner checks that
- * data/01-holistic-year-objects-data.xlsx exists before starting Phase 2.
+ * Plan 09 (model v24.0) deleted every fitted comb this runner used to refit
+ * (Steps 0, 4a-4d, 6b-6d, 7g — the perihelion, obliquity, year-length,
+ * cardinal-point and Sun-longitude families and the prediction stats on
+ * them) and with them the Step-3 browser export that fed 4a-4d; the ids are
+ * never reused (README numbering is shared vocabulary).
  *
- * IMPORTANT — Step 3 deep-time toggle protocol:
- *   The browser export is the ONLY pipeline step that requires
- *   DEEP_TIME_MODE_ENABLED = false. Before clicking Analysis →
- *   Export Objects Report, run in the browser console:
- *       disableDeepTimeMode()
- *   After the export completes, restore production state:
- *       enableDeepTimeMode()
- *   All steps THIS runner executes (Phase 1 Steps 1-2, Phase 3-6
- *   Steps 4a-10) run in Node/Python which have no deep-time chain
- *   and are J2000-locked by construction — no toggle needed.
- *   See tools/fit/README.md Step 3 for the full pre-export protocol
- *   (range field values, sanity check, etc.).
+ * NOT INCLUDED, and must not be run:
+ *  - Step 5c (moon-eclipse-optimizer.js) — RETIRED at plan 06 R3 item 1. With
+ *    --write it would write a fitted non-zero moonMeeusLpCorrection back into
+ *    public/input/model-parameters.json; the Moon series needs no anchor
+ *    (measured against Horizons' apparent Moon). Kept only as the record.
  *
- * NOT INCLUDED in the standard runner:
- *  - Step 0 (sun-longitude-harmonics.js) — structural prerequisite, run
- *    once manually before the first pipeline pass; coefficients are
- *    stable across normal refits. See tools/fit/README.md Phase 0.
- *    MATCHED-PAIR DOWNSTREAM: a Step-0 refit stales the location tier's
- *    Sun planetary completion (packages/physics/src/eclipse/
- *    sun-planetary-completion.cjs) — re-derive it afterwards through the
- *    Stage-D2 instrument chain (tools/explore/d2-derived-sun.mjs →
- *    d2-sun-table-extraction.mjs → d2-joint-preview.mjs) and re-embed
- *    the table + PAIRED_SUN_HARMONICS_SHA256; the old 10-term fitter
- *    (tools/fit/sun-planetary-completion-fit.js) is superseded, its
- *    scoreboards remain valid verification. Enforced: the test:model
- *    parity gate fingerprints the pair and fails `npm run check` if
- *    Step 0 was refit without the re-derivation.
- *  - Step 5c (moon-eclipse-optimizer.js) — separate eclipse-anchored fit.
+ * The deep regeneration cascade (the N-body pair, the secular series, the
+ * verdicts and records, the T1/climate chain) is not a fitter step; its order
+ * is the artifact-freshness gate's (`npm run check:artifacts` names each
+ * generator) — see tools/fit/README.md.
  */
 
 const { execSync } = require('child_process');
@@ -54,7 +39,6 @@ const path = require('path');
 // valid; the spawns run with cwd = ROOT as before.
 const ROOT = path.resolve(__dirname, '..', '..', '..');
 const LOG_PATH = path.join(ROOT, 'tools', 'results', 'pipeline.log');
-const DATA_01 = path.join(ROOT, 'data', '01-holistic-year-objects-data.xlsx');
 
 // ─── Parse arguments ────────────────────────────────────────────────────────
 
@@ -78,12 +62,12 @@ const KNOWN_FLAGS = ['--all', '--phase1', '--phase2', '--from', '--list', '--dry
 
 const flag = args[0];
 if (!flag) {
-  console.error('run-pipeline.js writes to public/input/*.json and takes ~2.5 hours.');
+  console.error('run-pipeline.js writes to public/input/*.json and data/*.json and takes ~45 minutes.');
   console.error('It will not run without an explicit flag.\n');
   console.error('  --list        show the steps and exit (writes nothing)');
-  console.error('  --phase1      Steps 1-2 only (~2 min)');
-  console.error('  --phase2      Steps 4a-10 (~2.5 hrs, needs Step 3 data)');
-  console.error('  --all         Steps 1-2, then 4a-9');
+  console.error('  --phase1      Step 1 only (~2 min)');
+  console.error('  --phase2      Steps 6a2-9 (~45 min)');
+  console.error('  --all         Step 1, then 6a2-9');
   console.error('  --from <step> resume from a step');
   process.exit(1);
 }
@@ -100,7 +84,7 @@ let fromStep = null;
 if (flag === '--from') {
   fromStep = args[1];
   if (!fromStep) {
-    console.error('Usage: --from <step>  (e.g., --from 5c, --from 6a2)');
+    console.error('Usage: --from <step>  (e.g., --from 6a2, --from 7c)');
     process.exit(1);
   }
 }
@@ -115,23 +99,12 @@ const STEPS = [
   { id: '1',  phase: 1, name: 'Sun optimizer',
     cmd: 'node tools/optimize.js optimize sun correctionSun --write' },
 
-  // Phase 2: Steps 4a-4d (Earth perihelion & ML training)
-  { id: '4a', phase: 2, name: 'Perihelion harmonics',
-    cmd: 'python3 tools/fit/python/fit_perihelion_harmonics.py --write' },
-  { id: '4b', phase: 2, name: 'Verify perihelion ERD',
-    cmd: 'python3 tools/fit/python/verify_perihelion_erd.py' },
-  { id: '4c', phase: 2, name: 'Train precession (physical-beat)',
-    cmd: 'python3 tools/fit/python/train_precession_physical.py --write' },
-  { id: '4d', phase: 2, name: 'Train observed',
-    cmd: 'python3 tools/fit/python/train_observed.py --write' },
-
-  // Phase 4: Moon. (Steps 5a-5b — the parallax and gravitation/elongation
-  // planet-correction fitters — retired with the K5 legacy-chain excision:
-  // the planets render from the engine-D Keplerian chain, and the corrected
-  // geometric RA/Dec path they fitted no longer exists. The id 5c is kept —
-  // README numbering is shared vocabulary.)
-  { id: '5c', phase: 2, name: 'Moon eclipse optimizer',
-    cmd: 'node tools/fit/moon-eclipse-optimizer.js --write' },
+  // (Steps 4a-4d — the perihelion comb, its ERD verifier and the precession
+  // training — DELETED with the perihelion comb at plan 09 step 4; their
+  // scripts are gone. Steps 5a-5b — the parallax and gravitation/elongation
+  // planet-correction fitters — retired with the K5 legacy-chain excision.
+  // Step 5c — the Moon eclipse optimizer — RETIRED at plan 06 R3 item 1 and
+  // must not run: see the header. The ids are never reused.)
 
   // Phase 5: Solar measurements
   // (Step 6a — the FULL-period export, one row per year of the anchor unit,
@@ -189,8 +162,8 @@ const STEPS = [
   // (fibonacci_significance) to manual steps the runner does not execute.
   { id: '7f', phase: 2, name: 'Cassini moontilt results (runs both labs)',
     cmd: 'node tools/verify/cassini-results.js --write', timeout: 20 * 60 * 1000 },
-  { id: '7g', phase: 2, name: 'Prediction fit stats (evaluation, ~7 min)',
-    cmd: 'python3 tools/fit/python/eval_precession_physical.py --write', timeout: 30 * 60 * 1000 },
+  // (Step 7g — the prediction fit stats on the precession training — DELETED
+  // with Steps 4c/4d at plan 09; the id is never reused.)
   { id: '7h', phase: 2, name: 'LOD-climate correlation summary',
     cmd: 'node tools/verify/lod-climate-correlation.js --write' },
   { id: '7i', phase: 2, name: 'Eclipse audit summary (L-5b/L-7 + audit-26, ~2-4 min)',
@@ -240,18 +213,8 @@ if (listOnly) {
   }
   const w = STEPS.filter((s) => / --write\b/.test(s.cmd)).length;
   console.log(`\n  ${STEPS.length} steps · ${w} write to disk`);
-  console.log('  Step 3 (browser GUI export) is manual and has no command here.');
   console.log('\n  To actually run: --phase1 | --phase2 | --all | --from <step>');
   process.exit(0);
-}
-
-const needsPhase2 = steps.some(s => s.phase === 2);
-
-// Check Step 3 data exists before Phase 2
-if (needsPhase2 && !fs.existsSync(DATA_01)) {
-  console.error(`\nStep 3 data not found: ${DATA_01}`);
-  console.error('Export from browser first: Analysis → Export Objects Report\n');
-  process.exit(1);
 }
 
 // Init log

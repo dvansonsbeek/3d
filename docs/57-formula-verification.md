@@ -18,7 +18,7 @@ This is the analytical twin of the [Perihelion of Planets Verification](56-webge
 
 Together the two panels let you check the model from two independent directions: does it match what JPL *measures*, and does it match what textbook celestial mechanics *predicts*?
 
-> **Scope note (ESSRT).** The default ±12,000 yr comparison range is modern-era for ESSRT purposes — H(t) drift over this span is sub-ppm and well below the noise floor of the published polynomial and trigonometric formulas being compared. The Export Cycles long-baseline plots (−248,000 BC to +102,000 AD, ~350 kyr) push into the regime where ESSRT scaling becomes marginally non-negligible (~0.04% H drift over 250 kyr per Drivers 1 and 2 — see [doc 99](99-expanding-solar-system-resonance-theory.md)), but Laskar's La2004/La2010 N-body integrations the model is compared against also do not incorporate this drift, so any discrepancy at long range reflects framework differences rather than ESSRT scaling. The model formulas under test are bounded harmonic corrections on the anchor unit's fixed divisors (plan 06 P3); the comparison tests their bounded form, not a lattice claim.
+> **Scope note (ESSRT).** The default ±12,000 yr comparison range is modern-era for ESSRT purposes — the drift of the composed precession clock T_p(t) over this span is sub-ppm and well below the noise floor of the published polynomial and trigonometric formulas being compared. The Export Cycles long-baseline plots (−248,000 BC to +102,000 AD, ~350 kyr) push into the regime where ESSRT scaling becomes marginally non-negligible (~0.04% clock drift over 250 kyr per Drivers 1 and 2 — see [doc 99](99-expanding-solar-system-resonance-theory.md)), but Laskar's La2004/La2010 N-body integrations the model is compared against also do not incorporate this drift, so any discrepancy at long range reflects framework differences rather than ESSRT scaling. The model quantities under test carry no fitted correction (the anchor unit's harmonic combs were deleted at plan 09): they are the composed precession clock and the N-body series' elements of date.
 
 ## The twelve categories
 
@@ -37,7 +37,7 @@ Each category has: the quantity being plotted, the unit of the y-axis, a primary
 | 9 | Sidereal & Stellar Day | s | the sidereal day of date on the Solar Day panel's day (× Y/(Y+1)) + the stellar day of date (+ the equinox's daily regression on the equator) + dashed long-term-mean line; the hover prints stellar − sidereal in ms | — (own lines; IAU J2000 values as extras) |
 | 10 | Sidereal Year | days | one-source sidereal year of date | Chapront 2002 |
 | 11 | Axial Precession Period | yr | one-source precession period of date | Capitaine 2003, Vondrák 2011 |
-| 12 | ΔT (TT − UT1) | s | calibrated ΔT trend (deltaTStart + Layer-2 integral + H/5 LOD + cycle stack) | Espenak & Meeus history (1650–2017) |
+| 12 | ΔT (TT − UT1) | s | calibrated ΔT trend (deltaTStart + Layer-2 integral + ecliptic-turn LOD term + cycle stack) | Espenak & Meeus history (1650–2017) |
 
 Most categories also list **J2000 observed reference values** separately — NASA/JPL, IAU, or Souami & Souchay (2012) for the invariable-plane quantities — shown in the J2000 table as "extras" (red, `#ef5350`) so the reader can see where observed reality sits relative to model and formulas.
 
@@ -83,7 +83,7 @@ One **Export** button in the header prints the current view — the category and
 
 - **Tropical year modal** shows SI 86400-s days — never epoch-local LOD-days — evaluated of date from the one-source `createYearLengths` family, the same implementation that serves the planet panel, the year-analysis report and the API.
 - **Axial precession modal** is cross-consistent with the tropical-year and sidereal-year modals: all source their year lengths from the same one-source family, so the charts cannot drift apart. None of these charts depends on the sim's current epoch.
-- **ΔT modal** — the model curve is the calibrated *trend* (H/5 physics + Bond/Hallstatt/Jose5/Jose4 stack), fit against Espenak history ~12 s RMS across 1650-2017. Reads ~57.5 s at J2000 (trend value passing through J2000), distinct from the IERS instantaneous observation of ~63.6 s.
+- **ΔT modal** — the model curve is the calibrated *trend* (the ecliptic-turn LOD term on the nodal period 1,296,000/|s₃| + the Bond/Hallstatt/Jose5/Jose4 stack), fit against Espenak history ~12 s RMS across 1650-2017. Reads ~57.5 s at J2000 (trend value passing through J2000), distinct from the IERS instantaneous observation of ~63.6 s.
 
 ## Reference formula catalogue
 
@@ -160,7 +160,7 @@ Cases where the model *disagrees* with a reference are also documented in the pa
 - [Perihelion of Planets Verification](56-webgeocalc-explorer.md) — the observational complement of this panel (model vs JPL data, 1900–2026).
 - [Perihelion Precession](13-mercury-precession-breakdown.md) — the internal computation methods used by the simulation for ϖ (the panel's category-5 model line is the one-source perihelion of date), and the reference-frame discussion (ecliptic vs ICRF) that applies to category 4's ascending-node comparison.
 - [Orbital Formulas Reference](21-orbital-formulas-reference.md) — the `OrbitalFormulas` library referenced by the model formulas.
-- [Expanding Solar System Resonance Theory](99-expanding-solar-system-resonance-theory.md) — Deep-time scaling of H(t); becomes marginally relevant at the cycles window's 350-kyr baseline.
+- [Expanding Solar System Resonance Theory](99-expanding-solar-system-resonance-theory.md) — Deep-time scaling of the precession clock T_p(t); becomes marginally relevant at the cycles window's 350-kyr baseline.
 
 ## Code Location
 

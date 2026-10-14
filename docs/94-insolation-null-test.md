@@ -538,7 +538,7 @@ argmax follows the power.
 So the pre-iNHG record carries a stationary ~112.7-kyr line that the derived
 set does not contain: the secular beats bracket it (110.0 and 123.8 kyr) and
 neither holds its phase across the window. The comb-era reading of this
-measurement (§10.4) put it on the retired single-line e(t); on the shipped
+measurement (§10) put it on the retired single-line e(t); on the shipped
 model it is an open residual line of the pre-iNHG regime — recorded, not
 explained.
 
