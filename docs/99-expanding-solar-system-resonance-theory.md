@@ -477,9 +477,9 @@ different clocks.
 
 The framework's family of **deep-time invariants** — relations preserved
 across epochs under the drivers, distinct from the J2000 readings (the
-retired integer identities at the anchor epoch). H_era is the frozen era
-clock's counter (the unit H, identifier `hAtAge`, scales with the composed
-precession period):
+retired integer identities at the anchor epoch). H_era was the frozen era
+clock's counter and H the unit that scaled with the composed precession
+period — both deleted at plan 09 steps 7a/7b; the table is their record:
 
 | Invariant | Form | Governed by | Drift at Hadean |
 |:---|:---|:---|---:|
@@ -730,7 +730,8 @@ The raw H/5 kinematic correction `δ_LOD_H5 = LOD_mean/((H/5)·mSY)` **scales wi
 
 What IS constant is the **fractional correction** `δ_LOD_H5 / LOD_mean ≈ 5 / TOTAL_DAYS_IN_H ≈ 4.08 × 10⁻⁸` — a purely device-geometric ratio, independent of epoch. The absolute correction moves with LOD:
 
-<!-- generated:doc99-h5-table -->
+(The last render before the unit left at plan 09 step 7b — static text, no longer regenerated:)
+
 | Age (Ma) | LOD_mean (s) | δ_LOD (ms) — the frozen device's ecliptic-precession term | fractional δ/LOD |
 |---:|---:|---:|---:|
 | +200 (future) | 90853.3 | 3.563 | 3.922e-8 |
@@ -739,7 +740,6 @@ What IS constant is the **fractional correction** `δ_LOD_H5 / LOD_mean ≈ 5 / 
 | −1,000 | 68112.9 | 3.538 | 5.194e-8 |
 
 δ_LOD = LOD_mean / ((unit/5) · days/yr) evaluated on the shipped chain (`deltaTRawSecondsAtAge`): the frozen device's kinematic term, a fixed fraction of the day by construction (the unit scales with the clock and days/yr with 1/LOD).
-<!-- /generated:doc99-h5-table -->
 
 (Written by the engine from the shipped chain — the same evaluator the ΔT integral uses. The calibrated ΔT-stack contribution at deep-time epochs is not tabulated here; it is a small, slowly-varying quantity determined by the fit at each epoch and is negligible compared to LOD_mean(t) growth.)
 
@@ -1016,8 +1016,7 @@ This window — between the last Wu 2024 gate at 650 Ma and the genesis endpoint
 
 **The shipped model now carries the regime-aware history** (`@essrt/physics/deltat/recession-history`, parameters in `model-parameters.json → deepTime.recessionRegime`): the calibrated quartic stays **bit-identical through the entire gated 0–1000 Ma era**, a monotone spline through five fitted knots runs beyond it to the rigid Roche limit at the unchanged 4,498 Ma genesis, and two explicit solar angular-momentum channels make L_EM time-dependent there — the ocean solar-tide leak (β₀ (a/a₀)⁶ of the lunar torque) and the insolation-driven **thermal-tide pump** (Zahnle–Walker 1987; Bartlett–Stevenson 2016; Mitchell–Kirscher 2023), which carries angular momentum from the Sun into the Earth-Moon system through the atmosphere. The fit (`tools/explore/fit-regime-recession.js`) runs against eleven published anchors — Lantink 2022 (Joffre), Weeli Wolli, Zhou 2024's three paired distance+LOD epochs, Meyers–Malinverno 2018 (Xiamaling), Nanfen 2023, and Moodies — all reproduced within 1.3σ; shipped residuals: <!--v:anchorFarhatJoffre2460DeltaPct-->+0.16<!--/v-->% on LOD at 2.46 Ga, <!--v:anchorFarhatWeeliwolli2450DeltaPct-->−5.24<!--/v-->% at 2.45 Ga (inside the wide ±1.32 h rhythmite uncertainty), <!--v:anchorFarhatMoodies3200DeltaPct-->−0.03<!--/v-->% on Moon distance at 3.2 Ga. All eleven are agreement rows in `data/paleo-validation-anchors.json`, checked by the paleo-anchors gate on every CI run.
 
-Two honesty notes ride with the mechanism. First, the pump's strength is genuinely contested in the literature — Mitchell–Kirscher 2023 argue a ~19 h day-length stall held by the thermal-tide resonance across 2.0–1.0 Ga, while Zhou 2024 argue the Lamb resonance is unlikely and the era simply had weak ocean dissipation; the fit lets the data decide, and they choose a **partial** pump (zero disfavoured at ~2.4σ, with the factor×window product the constrained quantity, not each separately). Second, the net solar delivery over the full history is **small**: L_EM(t) reconstructed directly from Zhou's paired data is flat at −0.2% versus today across 1634–1215 Ma, and the shipped budget matches — the H ↔ AU coupling is real as a mechanism (radiative, insolation ∝ L☉/AU², era-bound to the lock, switched off by the Snowball unlock that the climate and rotation records share) but its integrated effect is at the fraction-of-a-percent level. H at genesis is <!--v:hAtHadean-->1<!--/v--> yr under the shipped budget.
-
+Two honesty notes ride with the mechanism. First, the pump's strength is genuinely contested in the literature — Mitchell–Kirscher 2023 argue a ~19 h day-length stall held by the thermal-tide resonance across 2.0–1.0 Ga, while Zhou 2024 argue the Lamb resonance is unlikely and the era simply had weak ocean dissipation; the fit lets the data decide, and they choose a **partial** pump (zero disfavoured at ~2.4σ, with the factor×window product the constrained quantity, not each separately). Second, the net solar delivery over the full history is **small**: L_EM(t) reconstructed directly from Zhou's paired data is flat at −0.2% versus today across 1634–1215 Ma, and the shipped budget matches — the H ↔ AU coupling is real as a mechanism (radiative, insolation ∝ L☉/AU², era-bound to the lock, switched off by the Snowball unlock that the climate and rotation records share) but its integrated effect is at the fraction-of-a-percent level.
 ### Wu et al. 2024 — 650-Myr cyclostratigraphic compilation
 
 Wu, Malinverno, et al. 2024 ("A 650-Myr history of Earth's axial precession frequency and the evolution of the Earth-Moon system derived from cyclostratigraphy", *Science Advances*, [doi:10.1126/sciadv.ado2412](https://www.science.org/doi/10.1126/sciadv.ado2412)) applied TimeOptB Bayesian inversion to **34 high-quality cyclostratigraphic records** spanning 0–650 Ma. This is the most comprehensive Phanerozoic compilation yet published and provides an independent test of our deep-time formula.
@@ -1475,7 +1474,7 @@ A single smooth two-layer formula. Past 4.5 Gyr the smooth base matches Farhat 2
 
 **Genesis validation**: the recession polynomial crosses the rigid Roche limit (**<!--v:moonDistanceAtHadean-->9,471<!--/v--> km = 1.49 R_E**) at **~4.498 Ga** — the canonical giant-impact Moon-formation age (~4.5 Ga, isotope-dated), ~40 Myr after Patterson's Pb-Pb Earth age (4.54 Ga). The physics validates itself: no Hadean constraint was used in the fit, yet the formula puts the Moon's birth exactly where and when it physically must have been — at the Roche distance, just after the giant impact.
 
-**Devonian note**: under the LLR-anchored fit, H_dev = **<!--v:hAtDevonian-->282,329<!--/v--> yr** and the Wells 1963 days-per-year match is essentially exact (−0.01 %) — the curvature term that builds up inside the Phanerozoic is what a linear approximation misses.
+**Devonian note**: under the LLR-anchored fit, the composed precession period at the Devonian is **<!--v:axialPrecAtDevonian-->21,699<!--/v--> yr** and the Wells 1963 days-per-year match is essentially exact (−0.01 %) — the curvature term that builds up inside the Phanerozoic is what a linear approximation misses.
 
 ### How unique is this formula? Honest positioning
 
@@ -1554,7 +1553,7 @@ H(t) × (sidYear_s(t) / LOD(t)) × (AU₀/AU(t))²
     = <!--v:totalDaysInHSiderealFrame-->122,476,664<!--/v-->     (exact)
 ```
 
-holds to <!--v:dayCountInvariantAuCorrectedDriftPpm-->995048.65<!--/v--> ppm — floating-point exact — across the model's entire 4.5-Gyr domain. The constant is not new: it is the canonical <!--v:totalDaysInH-->122,471,916<!--/v--> carried through the dual-divisor bridge at J2000. The *tropical*-days form `H × solar-year days × (AU₀/AU)²` retains a residual of <!--v:dayCountTropicalAuDriftAtGenesisPpm-->−995201<!--/v--> ppm at genesis — that residual is the structural `13/H(t)` term itself (as H shrinks toward genesis, the 13 precession cycles claim a growing share), and applying the bridge factor `[H/(H−13)] × [(H₀−13)/H₀]` restores exactness with the canonical constant. One relation over H, LOD, year length and the AU, with the Moon entering through the angular-momentum budget that sets LOD. Verification: `tools/explore/deep-time-sensitivity.js` §5.
+held floating-point exact on the ERA COUNTER across the model's entire 4.5-Gyr domain (by construction: the counter is ∝ LOD and Kepler cancels the AU² factor); the registry key that computed it read 995,048.65 ppm because it evaluated the UNIT H(t), which carries the lunar-torque factor — both the key and the unit left at plan 09 step 7b, and the identity is a separate investigation topic. The constant is not new: it is the canonical <!--v:totalDaysInH-->122,471,916<!--/v--> carried through the dual-divisor bridge at J2000. The *tropical*-days form `H × solar-year days × (AU₀/AU)²` retains a residual of −995,201 (the key's last reading, on the unit; deleted at plan 09 step 7b) ppm at genesis — that residual is the structural `13/H(t)` term itself (as H shrinks toward genesis, the 13 precession cycles claim a growing share), and applying the bridge factor `[H/(H−13)] × [(H₀−13)/H₀]` restores exactness with the canonical constant. One relation over H, LOD, year length and the AU, with the Moon entering through the angular-momentum budget that sets LOD. Verification: `tools/explore/deep-time-sensitivity.js` §5.
 
 **The equivalent Kepler form.** The shipped implementation never evaluates a mass at deep time — it uses the product forms directly: with `Δm(t)` the fractional solar mass lost (defined against the Sun-only J2000 mass), `AU(t) = AU₀·(1−Δm)` and `sidYear_s(t) = sidYear_s(J2000)·(1−Δm)²`. An explicit Kepler evaluation reproduces this bit-for-bit under two conditions. First, Kepler runs on the **two-body** parameter `G(M_☉+M_E)` — the same convention by which the J2000 constants are set (GM_Sun+Earth from Earth's orbit; GM_Sun backed out by subtracting GM_Earth). Scaling only the Sun's share while holding Earth's fixed breaks the identity at the `Δm × M_E/(M_☉+M_E)` level — ≈0.6 ppb at genesis, visible against the invariant's floating-point exactness. Second, the epoch mass is the division form `μ(t) = μ(J2000)/(1−Δm)`, with Δm still defined against the constant J2000 mass. Then `T = 2π√(a³/μ) = T₀·(1−Δm)^(3/2)·(1−Δm)^(1/2) = T₀(1−Δm)²`, identical to the product form, and `T²·μ/a³ = (1−Δm)⁴·(1−Δm)⁻¹·(1−Δm)⁻³ = 1` exactly — Kepler's third law holds at every epoch by construction.
 

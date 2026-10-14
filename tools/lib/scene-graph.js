@@ -753,7 +753,7 @@ function getPlanetSceneData(key) {
     realPeriSpeed = -Math.PI * 2;
     realPeriStartPos = lowestPoint;
   } else if (p.type === 'II') {
-    realPeriSpeed = -Math.PI * 2 + (2 * Math.PI * 2 / (H / d.solarYearCount));
+    realPeriSpeed = -Math.PI * 2 + (2 * Math.PI * 2 / d.period);   // plan 09 step 7b: the scaffold period (scene years), no device count
     realPeriStartPos = p.startpos * 2;
   } else { // Type III
     realPeriSpeed = -Math.PI * 2;
@@ -768,8 +768,8 @@ function getPlanetSceneData(key) {
 
   // Planet orbital speed (Mars is negative, all others positive)
   const planetSpeed = (key === 'mars')
-    ? -Math.PI * 2 / (H / d.solarYearCount)
-    : Math.PI * 2 / (H / d.solarYearCount);
+    ? -Math.PI * 2 / d.period
+    : Math.PI * 2 / d.period;
 
   // Orbit radius in scene units
   const orbitRadiusScene = d.orbitDistance * 100;
@@ -1040,7 +1040,7 @@ function buildSceneGraph() {
       // the OBSERVED J2000 eccentricity, inert, mirroring src/script.js.
       planetDef.eccentricity = pd.p.orbitalEccentricityJ2000;
       // Use absolute planet speed for perihelion phase (script.js uses positive speed)
-      const absPlanetSpeed = Math.PI * 2 / (H / pd.d.solarYearCount);
+      const absPlanetSpeed = Math.PI * 2 / pd.d.period;
       planetDef.perihelionPhaseJ2000 = -pd.p.startpos * d2r
         + (absPlanetSpeed - periPrecRate) * pos_peri;
       planetDef.perihelionPrecessionRate = periPrecRate;

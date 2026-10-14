@@ -31,12 +31,12 @@
 
 'use strict';
 
-const { derivePlanetGeometry } = require('./geometry.cjs');
+const { derivePlanetGeometry, scaffoldOrbitInputs } = require('./geometry.cjs');
 
 /**
  * @typedef {Object} PlanetModelBody
  * @property {string} [type] - geometry type branch ('I' | 'II' | 'III')
- * @property {number} solarYearInput
+ * @property {number} solarYearInput - the observed sidereal period input, SI days (the scaffold period of the no-chain bodies; the chain planets ride the artifact's elements)
  * @property {number} [invPlaneInclinationJ2000]
  * @property {number} [longitudePerihelion]
  * @property {number} [wobblePeriodYears] - carriers: the chain's g-mode beat (input since Phase 7 commit 2)
@@ -52,7 +52,7 @@ const { derivePlanetGeometry } = require('./geometry.cjs');
 
 /**
  * @typedef {Object} PlanetModelEnv
- * @property {number} holisticYears
+ * @property {any} [chainArtifact] - the governed engine-D chain artifact (CHAIN_ARTIFACT): the seven chain planets' scaffold a and period ride its J2000 elements (plan 09 step 7b)
  * @property {number} meanSolarYearDays
  * @property {number} balancedYear
  * @property {number} systemResetN
@@ -84,7 +84,6 @@ function createPlanetModel(env, bodies) {
   // from env.calibration) went with the inclination law.
 
   const geomEnv = {
-    holisticYears: env.holisticYears,
     meanSolarYearDays: env.meanSolarYearDays,
     currentAUDistanceKm: env.currentAUDistanceKm,
     earthEccentricityJ2000: env.earthEccentricityJ2000,
@@ -114,7 +113,8 @@ function createPlanetModel(env, bodies) {
 
     rec.geometry = derivePlanetGeometry({
       key, type: b.type,
-      solarYearInput: b.solarYearInput,
+      // plan 09 step 7b: the chain's J2000 elements where the artifact has the body, else the observed period input
+      ...scaffoldOrbitInputs(key, env.chainArtifact, b.solarYearInput),
       orbitalEccentricityBase: b.orbitalEccentricityBase !== undefined
         ? b.orbitalEccentricityBase : b.orbitalEccentricityJ2000,
       longitudePerihelion: b.longitudePerihelion,

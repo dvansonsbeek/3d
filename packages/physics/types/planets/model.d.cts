@@ -3,6 +3,9 @@ export type PlanetModelBody = {
      * - geometry type branch ('I' | 'II' | 'III')
      */
     type?: string | undefined;
+    /**
+     * - the observed sidereal period input, SI days (the scaffold period of the no-chain bodies; the chain planets ride the artifact's elements)
+     */
     solarYearInput: number;
     invPlaneInclinationJ2000?: number | undefined;
     longitudePerihelion?: number | undefined;
@@ -26,7 +29,10 @@ export type PlanetModelBody = {
     orbitDistanceOverride?: number | undefined;
 };
 export type PlanetModelEnv = {
-    holisticYears: number;
+    /**
+     * - the governed engine-D chain artifact (CHAIN_ARTIFACT): the seven chain planets' scaffold a and period ride its J2000 elements (plan 09 step 7b)
+     */
+    chainArtifact?: any;
     meanSolarYearDays: number;
     balancedYear: number;
     systemResetN: number;
@@ -42,7 +48,7 @@ export type PlanetModelRecord = {
 /**
  * @typedef {Object} PlanetModelBody
  * @property {string} [type] - geometry type branch ('I' | 'II' | 'III')
- * @property {number} solarYearInput
+ * @property {number} solarYearInput - the observed sidereal period input, SI days (the scaffold period of the no-chain bodies; the chain planets ride the artifact's elements)
  * @property {number} [invPlaneInclinationJ2000]
  * @property {number} [longitudePerihelion]
  * @property {number} [wobblePeriodYears] - carriers: the chain's g-mode beat (input since Phase 7 commit 2)
@@ -57,7 +63,7 @@ export type PlanetModelRecord = {
  */
 /**
  * @typedef {Object} PlanetModelEnv
- * @property {number} holisticYears
+ * @property {any} [chainArtifact] - the governed engine-D chain artifact (CHAIN_ARTIFACT): the seven chain planets' scaffold a and period ride its J2000 elements (plan 09 step 7b)
  * @property {number} meanSolarYearDays
  * @property {number} balancedYear
  * @property {number} systemResetN

@@ -48,7 +48,7 @@ function measure() {
 
   // Deep-time behaviour away from the anchor — the anchor alone is a tautology.
   for (const t of AGES_MA) {
-    v[`deeptime.H@${t}Ma`] = DT.meanHAtAge(t);
+    // (plan 09 step 7b: the `deeptime.H@tMa` probes — the unit — left with meanHAtAge)
     v[`deeptime.lodSeconds@${t}Ma`] = DT.meanLodSecondsAtAge(t);
   }
 

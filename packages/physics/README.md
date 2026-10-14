@@ -72,9 +72,9 @@ model.lengths.tropicalYearDays(2000); // 365.24219
 // system — self-identifying, with its own constants hash.
 const cf = createModel({
   ...DEFAULT_CONSTANTS,
-  foundational: { ...DEFAULT_CONSTANTS.foundational, holisticyearLength: 400000 },
+  earthOrbital: { ...DEFAULT_CONSTANTS.earthOrbital, obliquityJ2000_deg: 23.5 },
 });
-cf.epoch.hAtYear(2000);               // 400000 — the anchor unit (a fit constant, not a period)
+cf.earth.obliquityDeg(2000);          // 23.5 — the injected anchor read through the assembly
 cf.identity.counterfactual;           // true
 ```
 

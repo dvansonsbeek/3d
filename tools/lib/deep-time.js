@@ -158,16 +158,14 @@ const MOON_SIDEREAL_MONTH_J2000_S = C.moonSiderealMonth * 86400;
 // (Plan 09 step 5c: the per-H of-date cycle counts and the month chain's H²
 // scaling left; the of-date perigee/node are the chain's count compositions.)
 
-// Per-planet semi-major axes at J2000 (km). AU-ratio via Kepler 3rd law:
-// a = (T²)^(1/3) where T = H / round(H × meanSolarYear / solarYearInput).
+// Per-planet semi-major axes at J2000 (km): the ONE scaffold geometry
+// (constants.js derived — plan 09 step 7b: the chain's J2000 a for the seven
+// chain planets; it was Kepler's a from the device's count-quantized period).
 // Matches orbital-engine.js computeSemiMajorAxis().
 function _planetAuRatio(name) {
   if (name === 'earth') return 1.0;
-  const p = C.planets && C.planets[name];
-  if (!p || !p.solarYearInput) return 0;
-  const orbitCount = Math.round(C.H * C.meanSolarYearDays / p.solarYearInput);
-  const T = C.H / orbitCount;
-  return Math.pow(T * T, 1 / 3);
+  const d = C.derived && C.derived[name];
+  return d ? d.orbitDistance : 0;
 }
 const _planetA_J2000 = {};
 for (const k of ['mercury','venus','earth','mars','jupiter','saturn','uranus','neptune']) {
@@ -322,7 +320,7 @@ function _deepLod() {
         gmEmM3PerS2: GM_EM_M3S2, eFactorMoon: E_FACTOR_MOON, aLockMetres: A_LOCK_M,
         aMoonNowMetres: A_MOON_NOW_M, alpha1PerMa: ALPHA_1,
         alpha3PerMa3: ALPHA_3, alpha4PerMa4: ALPHA_4,
-        holisticYearJ2000: HOLISTIC_YEAR_J2000, lodNowH13Seconds: LOD_NOW_H13_S,
+        lodNowH13Seconds: LOD_NOW_H13_S,
         meanSiderealYearJ2000Seconds: MEAN_SIDEREAL_YEAR_J2000_S,
         solarMassLossFracPerYear: SOLAR_MASS_LOSS_FRAC_PER_YR,
         precessionSolarShareJ2000: PRECESSION_SOLAR_SHARE_J2000,
@@ -349,8 +347,8 @@ function meanLodHoursAtAge(t_Ma) { return _deepLod().lodHoursAtAge(t_Ma); }
 // (Plan 09: the IAU-base sidereal-year comb evaluator and the "Actual LOD"
 // it fed — the tidal mean × the comb's ripple — are deleted with the comb.)
 
-// ─── STEP 2 — H(t) ────────────────────────────────────────────────────────
-function meanHAtAge(t_Ma) { return _deepLod().hAtAge(t_Ma); }
+// (Plan 09 step 7b: STEP 2 — the unit H(t), `meanHAtAge` — is deleted; the
+// deep-time clock is the composed lunisolar precession period below.)
 
 // ─── The lunisolar precession clock (plan 06 D6 → Phase 3) ────────────────
 // H(t) is the UNIT: 13 × the composed lunisolar precession period
@@ -984,7 +982,6 @@ const EPOCH_PARAMS = Object.freeze({
   moonEccentricityFactor: E_FACTOR_MOON,
   earthMassKg: M_EARTH_ALONE,
   earthRadiusM: R_EARTH_M,
-  holisticYearJ2000: HOLISTIC_YEAR_J2000,
   lodNowH13Seconds: LOD_NOW_H13_S,
   siderealYearJ2000Seconds: MEAN_SIDEREAL_YEAR_J2000_S,
   solarMassLossFracPerYear: SOLAR_MASS_LOSS_FRAC_PER_YR,
@@ -1223,8 +1220,7 @@ module.exports = {
   // Layer 2 + Layer 1
   meanMoonDistanceMetresAtAge, meanMoonDistanceAtAge,
   meanLodSecondsAtAge, meanLodHoursAtAge,
-  // Step 2
-  meanHAtAge,
+  // (plan 09 step 7b: Step 2's meanHAtAge — the unit — is deleted)
   // The lunisolar precession clock (plan 06 Phase 3): the unit's rate/period
   // (plan 09 step 7a: the frozen era clock's counter + bases left with the last comb)
   meanLunisolarPrecessionRateArcsecPerYrAtAge, meanLunisolarPrecessionPeriodYearsAtAge,

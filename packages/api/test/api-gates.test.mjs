@@ -116,7 +116,8 @@ for (const url of SAMPLE_REQUESTS) {
   /** @param {string} url @returns {any} */
   const dataOf = (url) => { const { path, query } = parseUrl(url); return JSON.parse(handle({ method: 'GET', path, query }).body).data; };
   const ep = dataOf('/v1/epoch?year=2000').epochs[0];
-  if (Math.abs(ep.h - 335317) > 1e-6) failures.push(`epoch H@2000: ${ep.h}`);
+  // (plan 09 step 7b: the `h` field — the unit H, a fit constant's multiple of the precession period — left the surface)
+  if ('h' in ep) failures.push('epoch still serves the unit H');
   // The 'lod' section's two named bases (plan 08 storyline sweep): LOD_real,
   // the observable (= the registry's lodRealPhysical, the simulator's Solar
   // Day), and the Layer-2 tidal + GIA mean day; 1.20 ms apart at J2000 (plan 09:
@@ -126,19 +127,15 @@ for (const url of SAMPLE_REQUESTS) {
   if (Math.abs(ep.lodMeanSeconds - 86400) > 1e-4) failures.push(`epoch lodMeanSeconds@2000: ${ep.lodMeanSeconds}`);
   if ('lodSeconds' in ep) failures.push('epoch still serves the unnamed lodSeconds');
   const dev = dataOf('/v1/epoch?year=-379998000').epochs[0];
-  // plan 06 Phase 3: H(t) is the UNIT = 13 composed lunisolar precession periods (282,329 at −380 Ma);
-  // the pre-Phase-3 spin-only clock H₀·LOD/LOD₀ read 306,189 there (now the frozen era clock's counter).
-  if (Math.round(dev.h) !== 282329) failures.push(`epoch H@Devonian: ${dev.h}`);
   // plan 06 Phase 3 S2 → S5: the published of-date family is the one-family route inside ±2 Myr
   // (≈ IAU 25,771 yr at J2000), the composed lunisolar period on the SAME derived anchor beyond
-  // (the Devonian record). S5 retired "axial ≡ H/13": the unit and the clock scale together, so the
-  // invariant is the RATIO — T_p(Dev)/T_p(2000) ≡ H(Dev)/H(2000) — while T_p(Dev) ≠ H(Dev)/13 (0.086 %).
-  // Tolerance 1e-6 on the ratio; the J2000 value is 1,296,000/p_A, the IAU 2006 general precession
-  // input (plan 09; the retired year combs' beat read 25,771.4); the retired H/13 reading would miss by 8.6e-4.
+  // (the Devonian record: 21,699 yr at −380 Ma — the unit H read 282,329 there, 13.011 of them;
+  // plan 09 step 7b deleted the unit, the composed period is the published deep-time clock).
+  // The J2000 value is 1,296,000/p_A, the IAU 2006 general precession input (plan 09; the retired
+  // year combs' beat read 25,771.4).
   if (Math.abs(ep.axialPrecessionYears - 25771.575) > 0.5) failures.push(`epoch axialPrecessionYears@2000: ${ep.axialPrecessionYears}`);
   if (Math.abs(ep.tropicalYearSeconds - 31556925.2) > 1) failures.push(`epoch tropicalYearSeconds@2000: ${ep.tropicalYearSeconds}`);
-  if (Math.abs(dev.axialPrecessionYears / ep.axialPrecessionYears - dev.h / ep.h) > 1e-6) failures.push(`epoch axialPrecessionYears@Devonian must scale with the unit: ${dev.axialPrecessionYears / ep.axialPrecessionYears} vs ${dev.h / ep.h}`);
-  if (Math.abs(dev.axialPrecessionYears - dev.h / 13) < 1) failures.push(`epoch axialPrecessionYears@Devonian still reads the retired H/13: ${dev.axialPrecessionYears}`);
+  if (Math.abs(dev.axialPrecessionYears - 21699) > 1) failures.push(`epoch axialPrecessionYears@Devonian (the composed period): ${dev.axialPrecessionYears}`);
   const earth = dataOf('/v1/earth?year=2000').years[0];
   if (Math.abs(earth.obliquityDeg - 23.4393) > 0.0002) failures.push(`earth obliquity@2000: ${earth.obliquityDeg}`);
   const ss = dataOf('/v1/cardinal-points?year=2000&types=SS').years[0].points.SS;
@@ -239,7 +236,9 @@ for (const url of SAMPLE_REQUESTS) {
 
 // ── Counterfactual POST: determinism, own hash, flow, refusals ──────────────
 {
-  const body = JSON.stringify({ overrides: { 'foundational.holisticyearLength': 400000 }, year: 2000 });
+  // plan 09 step 7b: the injected constant is the obliquity anchor (the unit H left the surface) —
+  // earth.obliquityDeg(2000) returns the context's IAU input by construction (the physics counterfactual gate)
+  const body = JSON.stringify({ overrides: { 'earthOrbital.obliquityJ2000_deg': 23.5 }, year: 2000 });
   const a = handle({ method: 'POST', path: '/v1/counterfactual', body });
   const b = handle({ method: 'POST', path: '/v1/counterfactual', body });
   if (a.status !== 200) failures.push(`counterfactual: status ${a.status} — ${a.body.slice(0, 140)}`);
@@ -249,7 +248,8 @@ for (const url of SAMPLE_REQUESTS) {
     for (const d of envelopeDefects(doc.meta)) failures.push(`counterfactual meta missing "${d}"`);
     const base = JSON.parse(handle({ method: 'GET', path: '/v1/versions' }).body).meta.constantsHash;
     if (doc.meta.constantsHash === base) failures.push('counterfactual: served the DEFAULT hash');
-    if (Math.abs(doc.data.epoch.h - 400000) > 1e-6) failures.push(`counterfactual H did not flow: ${doc.data.epoch.h}`);
+    if (Math.abs(doc.data.earth.obliquityDeg - 23.5) > 1e-6) failures.push(`counterfactual obliquity did not flow: ${doc.data.earth.obliquityDeg}`);
+    if ('h' in doc.data.epoch) failures.push('counterfactual still serves the unit H');
     if (!/no-store/.test(a.headers['cache-control'] ?? '')) failures.push('counterfactual not no-store');
   }
   // Refusals: validation-target injection, unknown path, non-numeric value, bad JSON.

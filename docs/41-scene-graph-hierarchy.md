@@ -618,7 +618,7 @@ The asymmetric time-base treatment (Moon-chain stays on UT, planet orbitals go t
 The scene-graph hierarchy from Parts 3, 7, and 8 is identical in both modes. The only difference is **how each node's rotation is computed each frame**:
 
 - **Snapshot mode** reads `obj.speed` and `obj.startPos` directly (the J2000-anchored values mutated by `setEpoch()` if needed)
-- **Integrator mode** reads the `_dt*` tags and computes the integrated cycle count via the appropriate epoch-dependent helper (`meanLodSecondsAtAge`, `meanHAtAge`, `meanPlanetOrbitalPeriodAtAge`, etc. — see [Doc 20 § "ESSRT epoch dependence"](20-constants-reference.md#essrt-epoch-dependence--most-tabulated-values-are-j2000-anchored) for the full helper map)
+- **Integrator mode** reads the `_dt*` tags and computes the integrated cycle count via the appropriate epoch-dependent helper (`meanLodSecondsAtAge`, `meanLunisolarPrecessionPeriodYearsAtAge`, `meanPlanetOrbitalPeriodAtAge`, etc. — see [Doc 20 § "ESSRT epoch dependence"](20-constants-reference.md#essrt-epoch-dependence--most-tabulated-values-are-j2000-anchored) for the full helper map)
 
 Integrator mode preserves bit-equivalence to snapshot mode at the J2000 anchor (`anchor === STARTMODEL_YEAR_SI` → integrator returns 0 cycles → composition reduces to the snapshot path). At deep time, integrator mode produces physically-correct positions while snapshot mode would silently apply the J2000 rate retroactively to the full simulated interval.
 

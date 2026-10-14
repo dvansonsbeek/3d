@@ -582,7 +582,7 @@ function scanOrbit(target, jdEpoch, steps = 720) {
   } else {
     const d = C.derived[target];
     const p = C.planets[target];
-    periodDays = (C.H / d.solarYearCount) * C.meanSolarYearDays;
+    periodDays = d.periodDays;   // plan 09 step 7b: the scaffold period (no device count)
     inputE = p.orbitalEccentricityJ2000;
     orbitDist = d.orbitDistance;
     targetType = p.type;
@@ -746,7 +746,7 @@ function trackPerihelion(target, yearStart, yearEnd, nOrbits = 10) {
     periodDays = C.moonAnomalisticMonth;
   } else {
     const d = C.derived[target];
-    periodDays = (C.H / d.solarYearCount) * C.meanSolarYearDays;
+    periodDays = d.periodDays;   // plan 09 step 7b: the scaffold period (no device count)
   }
 
   const jdStart = C.startmodelJD + (yearStart - C.startmodelYear) * C.meanSolarYearDays;

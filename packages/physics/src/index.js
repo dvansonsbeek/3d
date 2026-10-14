@@ -127,7 +127,7 @@ export { computeEarthFrameOfDate, solveWheelAngleForLongitude } from './earth/fr
 // (planets/orientation) and the ascending-node integrator
 // (planets/asc-node-integrator) are DELETED at plan 07 R5/R6: the planets'
 // elements of date have one home, the N-body chain.
-export { derivePlanetGeometry } from './planets/geometry.cjs';
+export { derivePlanetGeometry, scaffoldOrbitInputs } from './planets/geometry.cjs';
 // (plan 09 step 6: eccentricityFromCycles / computeEccentricityIntegrated — the H/16 law-of-cosines eccentricity — are deleted; no runtime read them)
 export * as planetOrbitChain from './planets/orbit-chain.cjs';
 // P5/K4.6c — the engine-D Keplerian chain (pure evaluator + the embedded

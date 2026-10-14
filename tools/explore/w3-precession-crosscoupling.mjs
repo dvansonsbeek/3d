@@ -77,8 +77,8 @@ const fSAt = (ageMa, mu) => {
 
 // Check: reproduce doc 99's 650-Ma Wu reconciliation (μ = 1).
 const p650 = physRate(650, 1);
-console.log('650 Ma check: physical rate %s ″/yr (doc-99 hand calc 67.5; Wu 2024 infers 67.64) · H/13 structural %s ″/yr',
-  p650.toFixed(1), (1296000 / (DT.meanHAtAge(650) / 13)).toFixed(1));
+console.log('650 Ma check: physical rate %s ″/yr (doc-99 hand calc 67.5; Wu 2024 infers 67.64) · the retired H/13 structural reading was 67.8 ″/yr (recorded before the unit left at plan 09 step 7b)',
+  p650.toFixed(1));
 
 // Theoretical μ(t) from the shipped mass-loss rate (present-rate, constant).
 const muTheory = (ageMa) => 1 + DT.SOLAR_MASS_LOSS_FRAC_PER_YR * ageMa * 1e6;

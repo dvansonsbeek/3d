@@ -69,7 +69,7 @@ function measure() {
     // (the K-comb Fourier pair in `epoch`, the one-family hybrid route in
     // `yearLengths`; they agree at J2000 only — calculation map chain 2.2)
     const Tp = num(m.epoch.axialPrecessionYearsAtYear(year));
-    const H = num(m.epoch.hAtYear(year));
+    // (plan 09 step 7b: the `.H` and `.nApsPerH` probes — the unit and its ratio — left with hAtYear)
     v[`${tag}.precessionPeriodOfDateYr`] = Tp;
     v[`${tag}.precessionPeriodOneFamilyYr`] = inWindow ? num(m.yearLengths.axialPrecessionYearsAtYear(year)) : null;
     v[`${tag}.siderealYearOneFamilyS`] = inWindow ? num(m.yearLengths.siderealYearSecondsAtYear(year)) : null;
@@ -81,7 +81,6 @@ function measure() {
     v[`${tag}.dayLengthKinematicS`] = num(m.lengths.dayLengthSeconds(year));
     // (plan 09 step 5b: the `measuredSolarDayS` probe left with the RA_DAY_OFFSET_MS comb — the
     //  equation of time's window term of the Framework-Verification instrument, not a model quantity)
-    v[`${tag}.H`] = H;
     // S5: the composed lunisolar period on the derived J2000 anchor (the retired H/13 identity read 0.086 % slow)
     v[`${tag}.meanPrecessionPeriodYr`] = num(m.lunisolar.meanPeriodYearsAtYear(year));
     // the orbital side, engine D
@@ -89,9 +88,8 @@ function measure() {
     const Taps = apsRate ? 1296000 / apsRate : null;
     v[`${tag}.apsidalRateArcsecPerYr`] = apsRate;
     v[`${tag}.apsidalPeriodYr`] = Taps;
-    v[`${tag}.nApsPerH`] = H !== null && Taps ? H / Taps : null;
     v[`${tag}.perihelionOfDatePeriodYr`] = Tp && Taps ? 1 / (1 / Tp + 1 / Taps) : null;
-    v[`${tag}.nPeriPerH`] = H !== null && Taps ? 13 + H / Taps : null;
+    // (plan 09 step 7b: the `.nPeriPerH` probe — 13 + H/T_aps, the unit's count — left with hAtYear)
     // eccentricity — all three evaluators, named (series inside the window)
     v[`${tag}.eDeepModes`] = num(deep.eccAt(year - 2000));
     v[`${tag}.eLawH3`] = num(m.earth.eccentricity(year));
@@ -120,7 +118,6 @@ function measure() {
     const year = 2000 - ma * 1e6;
     row(`deep@${ma}Ma`, year);
     v[`deep@${ma}Ma.lodSeconds`] = num(DT.meanLodSecondsAtAge(ma));
-    v[`deep@${ma}Ma.HfromDeepTime`] = num(DT.meanHAtAge(ma));
   }
 
   if (process.env.ESSRT_PLAN06_PLANT === '1') {

@@ -15,10 +15,6 @@ export type RawEpochConstants = {
     alpha1PerMa: number;
     alpha3PerMa3: number;
     alpha4PerMa4: number;
-    /**
-     * H
-     */
-    holisticYearJ2000: number;
     meanSiderealYearSeconds: number;
     /**
      * ω₀: the J2000 day length, SI seconds (the SI day since plan 09)

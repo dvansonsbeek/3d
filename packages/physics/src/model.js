@@ -85,7 +85,8 @@ const MOON_ECC_SENSITIVITY_NODE = 1.018;
  */
 export function assembleModel(C, F, laws = {}, secularSeriesArtifact = /** @type {any} */ (null), options = {}) {
   // ── Derived constants (constants.js §9 order) ─────────────────────────────
-  const H = C.foundational.holisticyearLength;
+  // (plan 09 step 7b: `foundational.holisticyearLength` — the unit H — is no
+  // longer read here; the unit function left the physics with it)
   // Plan 09: the mean solar year in days (the calendar's year axis) is the
   // J2000 mean tropical year DERIVED in one home from the IAU sidereal year
   // and p_A per Julian year (year-lengths.cjs); the Meeus & Savoie 1992 input
@@ -194,7 +195,6 @@ export function assembleModel(C, F, laws = {}, secularSeriesArtifact = /** @type
     alpha1PerMa: C.deepTime.alpha1PerMa,
     alpha3PerMa3: C.deepTime.alpha3PerMa3,
     alpha4PerMa4: C.deepTime.alpha4PerMa4,
-    holisticYearJ2000: H,
     meanSiderealYearSeconds,
     lodJ2000Seconds: meanLengthOfDay,   // plan 09: ω₀ = the SI day (was the H/13 kinematic day)
     sunMassKg: M_SUN,
@@ -341,7 +341,6 @@ export function assembleModel(C, F, laws = {}, secularSeriesArtifact = /** @type
       alpha1PerMa: EPOCH_PARAMS.alpha1PerMa,
       alpha3PerMa3: EPOCH_PARAMS.alpha3PerMa3,
       alpha4PerMa4: EPOCH_PARAMS.alpha4PerMa4,
-      holisticYearJ2000: H,
       lodNowH13Seconds: EPOCH_PARAMS.lodNowH13Seconds,
       meanSiderealYearJ2000Seconds: meanSiderealYearSeconds,
       solarMassLossFracPerYear: EPOCH_PARAMS.solarMassLossFracPerYear,
@@ -1525,7 +1524,8 @@ export function assembleModel(C, F, laws = {}, secularSeriesArtifact = /** @type
     }),
     epoch: Object.freeze({
       yearToTMa,
-      hAtYear: /** @param {number} year @returns {number|null} */ (year) => deepLod.hAtAge(yearToTMa(year)),
+      // (plan 09 step 7b: `hAtYear` — the unit H(t) on a published surface, the
+      // API's `epoch.h` — is deleted; the deep-time clock is axialPrecessionYearsAtYear)
       // The Layer-2 mean day of date — the tidal + GIA base the deep-time law
       // gives at any age (86,399.9997 s at J2000): the day the paleo anchors
       // and the ΔT integrand ride. NOT the observable solar day of date —

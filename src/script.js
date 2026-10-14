@@ -11,7 +11,7 @@ import { Pane } from 'tweakpane';
 //
 // Generated at build time, not fetched at runtime — `holisticyearLength` is read
 // at module scope below, and Phase 15 requires offline === hosted.
-import { computeObliquityJ2000Deg, computeSecularShape, DEFAULT_CONSTANTS as K, REFERENCE_DATA as R, FITTED_COEFFICIENTS as FIT, CONSTANTS_HASH, COEFFICIENTS_HASH, MODEL_VERSION, PREPRINT_DOI, createEpochPrimitives, createDeepCalendar, createDeepEccChannel, DEEP_MODES_ARTIFACT, createDeepOrbitalHistory, createYearLengths, computeMeanTropicalYearJ2000Days, createMoonMonthChain, createChainCycleIntegrator, createMoonArguments, createMoonSeries, createMoonApparent, derivePlanetGeometry, planetOrbitChain as _POC, createDeltaTCycles, createDeepTimeLod, createMoonRecessionHistory, createSolarChannelBudget, deltaTEspenakMeeusCanonSeconds, evalClimateL1OrbitalPermil, createAlphaGiaChannel, computeSolarTorqueShare, createEclipseFinders, createModel, buildPlanetChainsFromArtifactData, computePlanetElementsAtYear as kcComputePlanetElementsAtYear, computeHeliocentricEclipticFromElements as kcComputeHeliocentricEclipticFromElements, computeEquatorNodeOriginSFrameDeg, convertNodeSFrameToEquatorOriginDeg, createSecularSeriesOverride, CHAIN_ARTIFACT, ANCHOR_EPOCH_YEAR as KC_ANCHOR_EPOCH_YEAR, ANCHOR_EPOCH_JD as KC_ANCHOR_EPOCH_JD, computeEarthFrameOfDate, solveWheelAngleForLongitude } from '@essrt/physics';
+import { computeObliquityJ2000Deg, computeSecularShape, DEFAULT_CONSTANTS as K, REFERENCE_DATA as R, FITTED_COEFFICIENTS as FIT, CONSTANTS_HASH, COEFFICIENTS_HASH, MODEL_VERSION, PREPRINT_DOI, createEpochPrimitives, createDeepCalendar, createDeepEccChannel, DEEP_MODES_ARTIFACT, createDeepOrbitalHistory, createYearLengths, computeMeanTropicalYearJ2000Days, createMoonMonthChain, createChainCycleIntegrator, createMoonArguments, createMoonSeries, createMoonApparent, derivePlanetGeometry, scaffoldOrbitInputs, planetOrbitChain as _POC, createDeltaTCycles, createDeepTimeLod, createMoonRecessionHistory, createSolarChannelBudget, deltaTEspenakMeeusCanonSeconds, evalClimateL1OrbitalPermil, createAlphaGiaChannel, computeSolarTorqueShare, createEclipseFinders, createModel, buildPlanetChainsFromArtifactData, computePlanetElementsAtYear as kcComputePlanetElementsAtYear, computeHeliocentricEclipticFromElements as kcComputeHeliocentricEclipticFromElements, computeEquatorNodeOriginSFrameDeg, convertNodeSFrameToEquatorOriginDeg, createSecularSeriesOverride, CHAIN_ARTIFACT, ANCHOR_EPOCH_YEAR as KC_ANCHOR_EPOCH_YEAR, ANCHOR_EPOCH_JD as KC_ANCHOR_EPOCH_JD, computeEarthFrameOfDate, solveWheelAngleForLongitude } from '@essrt/physics';
 // K8 — the reference package: ONE-WAY imports (comparison only;
 // @essrt/reference is private-by-construction and nothing in the model
 // chain depends on it). publishedCurves migrated here from
@@ -62,7 +62,7 @@ import { vsop87AstrometricGeoEclipticAU, vsop87GeoEclipticAU, vsop87HelioEclipti
 // SEEDED, not imported: recomputeEpochAnchors reassigns this, and an ESM import
 // is a read-only binding — assigning to one throws (§5e). Stays `let` until
 // Phase 6 removes the writer; then it can become a plain injected value.
-let   holisticyearLength = K.foundational.holisticyearLength;  // H — full precession cycle length in years (Phase 1: mutable for deep-time mode; see recomputeEpochAnchors)
+const holisticyearLength = K.foundational.holisticyearLength;  // H — the fitted timing anchor, a J2000 constant (plan 09 step 7b: no longer an epoch state — the unit function left; the scaffold still reads it until 7c)
 // Imported, not literals: these are never reassigned, so the read-only binding
 // an ESM import gives is exactly right. The values cannot drift from
 // model-parameters.json because there is no second copy to drift.
@@ -580,7 +580,7 @@ planets.ceres = {
 // PREDICT_COEFFS_PHYSICAL) left at plan 06 R8; the Earth-frame rate is the
 // equatorial projection of the lattice motion, perihelionFrameBreakdown.)
 // ─────────────────────────────────────────────────────────────────────────
-let   H = holisticyearLength;  // Phase 6.5: mutable alias; kept in sync inside recomputeEpochAnchors
+const H = holisticyearLength;  // alias (plan 09 step 7b: a J2000 constant, no longer mutated per epoch)
 
 // ─── B3. (The fitted planet-path corrections — parallax, gravitation,
 // elongation — were EXCISED with the legacy planet chains, K5.) ──────────
@@ -966,7 +966,6 @@ const SIDEREAL_YEAR_DAYS_KINEMATIC_J2000 = meansiderealyearlengthinDays_kinemati
 // is R1's fit basis and closes with the Phase C/D refit, not here). Snapshot
 // taken here, after the last of the seven is initialised.
 const _EPOCH_SEEDS_J2000 = Object.freeze({
-  holisticyearLength, H,
   meanlengthofday, meansiderealyearlengthinSeconds,
   meansiderealyearlengthinDays, meansolaryearlengthinDays,
 });
@@ -2035,7 +2034,12 @@ for (const _k of ['mercury', 'venus', 'mars', 'jupiter', 'saturn', 'uranus', 'ne
   const _rec = K.planets[_k] || K.additionalBodies[_k];
   _planetGeom[_k] = derivePlanetGeometry({
     key: _k, type: _rec.type,
-    solarYearInput: planets[_k].solarYearInput,
+    // Plan 09 step 7b: the seven chain planets' scaffold rides the chain's own
+    // J2000 elements (a from the anchor set, the period from the fitted
+    // era-window mean motion); the no-chain bodies keep their observed period
+    // input. The device's count-per-anchor-interval quantization (up to half
+    // a count) is gone. ONE home: @essrt/physics planets/geometry.
+    ...scaffoldOrbitInputs(_k, CHAIN_ARTIFACT, planets[_k].solarYearInput),
     // Plan 07 R6: the seven planets' base came from the K law and is gone —
     // the scene ellipse geometry reads the OBSERVED J2000 eccentricity, the
     // mirror of tools/lib/constants.js. The additional bodies keep their
@@ -2045,7 +2049,6 @@ for (const _k of ['mercury', 'venus', 'mars', 'jupiter', 'saturn', 'uranus', 'ne
     ascendingNode: planets[_k].ascendingNode,
     rotationPeriodDays: _rotationInputDays[_k],
   }, {
-    holisticYears: holisticyearLength,
     meanSolarYearDays: meansolaryearlengthinDays,
     currentAUDistanceKm: currentAUDistance,
     earthEccentricityJ2000: ASTRO_REFERENCE.eccentricityJ2000,
@@ -2054,7 +2057,7 @@ for (const _k of ['mercury', 'venus', 'mars', 'jupiter', 'saturn', 'uranus', 'ne
 }
 
 // Planet calculations TYPE I
-let   mercurySolarYearCount = _planetGeom.mercury.solarYearCount;  // Phase 2.5: mutable
+// (plan 09 step 7b: the `*SolarYearCount` device counts — orbits per anchor interval — are deleted; the scaffold reads `_planetGeom.<k>.periodYears`)
 let   mercuryOrbitDistance = _planetGeom.mercury.orbitDistance;  // Phase 2.5: mutable
 const mercuryRealOrbitalEccentricity = _planetGeom.mercury.realOrbitalEccentricity;
 const mercuryPerihelionDistance = _planetGeom.mercury.perihelionDistance;
@@ -2064,7 +2067,6 @@ let   mercuryRotationPeriod = _planetGeom.mercury.rotationPeriodHours;  // Phase
 const mercuryEccentricityPerihelion = _planetGeom.mercury.eccentricityPerihelion;
 const mercuryLowestPoint = _planetGeom.mercury.lowestPoint;
 
-let   venusSolarYearCount = _planetGeom.venus.solarYearCount;  // Phase 2.5: mutable
 let   venusOrbitDistance = _planetGeom.venus.orbitDistance;  // Phase 2.5: mutable
 const venusRealOrbitalEccentricity = _planetGeom.venus.realOrbitalEccentricity;
 const venusPerihelionDistance = _planetGeom.venus.perihelionDistance;
@@ -2075,7 +2077,6 @@ const venusEccentricityPerihelion = _planetGeom.venus.eccentricityPerihelion;
 const venusLowestPoint = _planetGeom.venus.lowestPoint;
 
 // Planet calculations TYPE II
-let   marsSolarYearCount = _planetGeom.mars.solarYearCount;  // Phase 2.5: mutable
 let   marsOrbitDistance = _planetGeom.mars.orbitDistance;  // Phase 2.5: mutable
 const marsRealOrbitalEccentricity = _planetGeom.mars.realOrbitalEccentricity;
 const marsElipticOrbit = _planetGeom.mars.elipticOrbit;
@@ -2083,7 +2084,6 @@ const marsPerihelionDistance = _planetGeom.mars.perihelionDistance;
 const marsSpeed = _planetGeom.mars.speedKmh;
 const marsRotationPeriod = _planetGeom.mars.rotationPeriodHours;
 
-const erosSolarYearCount = _planetGeom.eros.solarYearCount;
 const erosOrbitDistance = _planetGeom.eros.orbitDistance;
 const erosRealOrbitalEccentricity = _planetGeom.eros.realOrbitalEccentricity;
 const erosElipticOrbit = _planetGeom.eros.elipticOrbit;
@@ -2094,7 +2094,6 @@ const erosRotationPeriod = _planetGeom.eros.rotationPeriodHours;
 // Planet calculations TYPE III (geocentric elipticOrbit — Earth-eccentricity
 // parallax, sin(ω_Earth − ω_planet), factor 2 from off-centre geometry —
 // now inside the shared law)
-let   jupiterSolarYearCount = _planetGeom.jupiter.solarYearCount;  // Phase 2.5: mutable
 let   jupiterOrbitDistance = _planetGeom.jupiter.orbitDistance;  // Phase 2.5: mutable
 const jupiterRealOrbitalEccentricity = _planetGeom.jupiter.realOrbitalEccentricity;
 const jupiterElipticOrbit = _planetGeom.jupiter.elipticOrbit;
@@ -2102,7 +2101,6 @@ const jupiterPerihelionDistance = _planetGeom.jupiter.perihelionDistance;
 const jupiterSpeed = _planetGeom.jupiter.speedKmh;
 const jupiterRotationPeriod = _planetGeom.jupiter.rotationPeriodHours;
 
-let   saturnSolarYearCount = _planetGeom.saturn.solarYearCount;  // Phase 2.5: mutable
 let   saturnOrbitDistance = _planetGeom.saturn.orbitDistance;  // Phase 2.5: mutable
 const saturnRealOrbitalEccentricity = _planetGeom.saturn.realOrbitalEccentricity;
 const saturnElipticOrbit = _planetGeom.saturn.elipticOrbit;
@@ -2110,7 +2108,6 @@ const saturnPerihelionDistance = _planetGeom.saturn.perihelionDistance;
 const saturnSpeed = _planetGeom.saturn.speedKmh;
 const saturnRotationPeriod = _planetGeom.saturn.rotationPeriodHours;
 
-let   uranusSolarYearCount = _planetGeom.uranus.solarYearCount;  // Phase 2.5: mutable
 let   uranusOrbitDistance = _planetGeom.uranus.orbitDistance;  // Phase 2.5: mutable
 const uranusRealOrbitalEccentricity = _planetGeom.uranus.realOrbitalEccentricity;
 const uranusElipticOrbit = _planetGeom.uranus.elipticOrbit;
@@ -2118,7 +2115,6 @@ const uranusPerihelionDistance = _planetGeom.uranus.perihelionDistance;
 const uranusSpeed = _planetGeom.uranus.speedKmh;
 const uranusRotationPeriod = _planetGeom.uranus.rotationPeriodHours;
 
-let   neptuneSolarYearCount = _planetGeom.neptune.solarYearCount;  // Phase 2.5: mutable
 let   neptuneOrbitDistance = _planetGeom.neptune.orbitDistance;  // Phase 2.5: mutable
 const neptuneRealOrbitalEccentricity = _planetGeom.neptune.realOrbitalEccentricity;
 const neptuneElipticOrbit = _planetGeom.neptune.elipticOrbit;
@@ -2126,14 +2122,12 @@ const neptunePerihelionDistance = _planetGeom.neptune.perihelionDistance;
 const neptuneSpeed = _planetGeom.neptune.speedKmh;
 const neptuneRotationPeriod = _planetGeom.neptune.rotationPeriodHours;
 
-const plutoSolarYearCount = _planetGeom.pluto.solarYearCount;
 const plutoOrbitDistance = _planetGeom.pluto.orbitDistance;
 const plutoPerihelionDistance = _planetGeom.pluto.perihelionDistance;
 const plutoElipticOrbit = _planetGeom.pluto.elipticOrbit;
 const plutoSpeed = _planetGeom.pluto.speedKmh;
 const plutoRotationPeriod = _planetGeom.pluto.rotationPeriodHours;
 
-const halleysSolarYearCount = _planetGeom.halleys.solarYearCount;
 const halleysOrbitDistance = _planetGeom.halleys.orbitDistance;
 const halleysRealOrbitalEccentricity = _planetGeom.halleys.realOrbitalEccentricity;
 const halleysElipticOrbit = _planetGeom.halleys.elipticOrbit;
@@ -2491,7 +2485,6 @@ const _L0 = createEpochPrimitives({
     moonMassKg: M_MOON_ALONE, gmEarthMoonM3S2: GM_EM_M3S2,
     moonEccentricityFactor: E_FACTOR_MOON,
     earthMassKg: M_EARTH_ALONE, earthRadiusM: R_EARTH_M,
-    holisticYearJ2000: HOLISTIC_YEAR_J2000,
     lodNowH13Seconds: LOD_NOW_H13_S,
     // p₀ — the tropical year of date's equinox term (plan 09 step 5d); the SAME
     // expression the deep-time factory's composed module resolves (bit-identical twins)
@@ -2516,23 +2509,11 @@ const _L0 = createEpochPrimitives({
 // the LLR rate, not the Wells 1989 derivation).
 
 // ───── Structural diagnostic (J2000 anchor — drifts at deep time) ─────
-// Earth solar-day rotations per H cycle at J2000 = 122,463,880 (Wells 1963
-// validated to <0.01% across 12 paleo measurements). Under Architecture α
-// this drifts smoothly via Driver 2 (~71 ppm at Devonian, ~850 ppm at Hadean).
-// Do NOT use as an input to compute H(t) at deep time.
-const TOTAL_DAYS_IN_H = holisticyearLength * meansolaryearlengthinDays;
-
-const ORBITS_PER_H = {
-  earth_rotations: TOTAL_DAYS_IN_H,
-  moon_months:     N_sid_J2000,   // eighth-integer per H (integer 35,860,753 per 8H)
-  mercury:         mercurySolarYearCount,
-  venus:           venusSolarYearCount,
-  mars:            marsSolarYearCount,
-  jupiter:         jupiterSolarYearCount,
-  saturn:          saturnSolarYearCount,
-  uranus:          uranusSolarYearCount,
-  neptune:         neptuneSolarYearCount,
-};
+// (Plan 09 step 7b: the device accounting `TOTAL_DAYS_IN_H` (H × mSY, the
+// day-count near-invariant's J2000 anchor) and `ORBITS_PER_H` (rotations,
+// months and planet orbits per anchor interval — the counts) are deleted; no
+// reader remained. The era counter's day-count identity is a device record,
+// a separate investigation topic.)
 
 // ───── LAYER 2 — Moon distance evolution ─────
 // Driver 1½ (2026-08): the regime-aware recession history + the solar
@@ -2597,7 +2578,7 @@ function _deepLod() {
         gmEmM3PerS2: GM_EM_M3S2, eFactorMoon: E_FACTOR_MOON, aLockMetres: A_LOCK_M,
         aMoonNowMetres: A_MOON_NOW_M, alpha1PerMa: ALPHA_1,
         alpha3PerMa3: ALPHA_3, alpha4PerMa4: ALPHA_4,
-        holisticYearJ2000: HOLISTIC_YEAR_J2000, lodNowH13Seconds: LOD_NOW_H13_S,
+        lodNowH13Seconds: LOD_NOW_H13_S,
         meanSiderealYearJ2000Seconds: MEAN_SIDEREAL_YEAR_J2000_S,
         solarMassLossFracPerYear: SOLAR_MASS_LOSS_FRAC_PER_YR,
         precessionSolarShareJ2000: PRECESSION_SOLAR_SHARE_J2000,
@@ -2786,9 +2767,8 @@ function _lodKinematicSecondsOfDate(year) {
   return (DEEP_TIME_MODE_ENABLED ? _L0.lodSeconds(year) : null) ?? _EPOCH_SEEDS_J2000.meanlengthofday;
 }
 
-// ───── STEP 2 — Earth Fundamental Cycle H(t) ─────
-/** H(t) in years. Returns HOLISTIC_YEAR_J2000 (335,317) exactly at t_Ma = 0. */
-function meanHAtAge(t_Ma) { return _deepLod().hAtAge(t_Ma); }
+// (Plan 09 step 7b: STEP 2 — the unit H(t), `meanHAtAge` — is deleted; the
+// deep-time clock is the composed lunisolar precession period.)
 // (Plan 09 step 7a: the FROZEN era clock's own counter and bases — H_era =
 // H₀·LOD/LOD₀, plan 06 D8's second named counter, which the ∫dt/H phase
 // table, the cardinal era clock, the year-length combs and the perihelion
@@ -3578,7 +3558,6 @@ const _moonArgsM = (() => {
       m = createMoonArguments({
         constants: {
           j2000JD, julianCenturyDays,
-          holisticYearJ2000: HOLISTIC_YEAR_J2000,
           eccentricityJ2000: ASTRO_REFERENCE.eccentricityJ2000,
           eccentricityDotJ2000: ASTRO_REFERENCE.eccentricityDotJ2000,
           eccentricityDotDotJ2000: ASTRO_REFERENCE.eccentricityDotDotJ2000,
@@ -4315,17 +4294,16 @@ function recomputeEpochAnchors(t_Ma) {
   // f(year) axis; the t→year→t float wobble measurably never reaches output
   // bits (200k-point sweep, pinned by the layer0 gate's non-round-tripping t).
   const _epochYear = 2000 - t_Ma * 1e6;
-  const H_t      = _L0.holisticH(_epochYear);
+  // (plan 09 step 7b: the unit H(t) is no longer an epoch state — `holisticyearLength`
+  // and `H` are J2000 constants; the spin-tier periods of date ride T_p(t) directly)
   const LOD_s    = _L0.lodSeconds(_epochYear);
-  if (H_t === null || LOD_s === null) {
+  if (LOD_s === null) {
     console.warn(`recomputeEpochAnchors(${t_Ma}): past tidal-lock asymptote — anchors unchanged`);
     return false;
   }
   const T_sid_s  = _L0.siderealYearSeconds(_epochYear);
   const T_trop_s = _L0.tropicalYearSeconds(_epochYear);
 
-  holisticyearLength               = H_t;
-  H                                = H_t;          // Phase 6.5: keep H alias in sync
   meanlengthofday                  = LOD_s;
   meansiderealyearlengthinSeconds  = T_sid_s;
   meansiderealyearlengthinDays     = T_sid_s / LOD_s;
@@ -5043,70 +5021,15 @@ function updateSafeObjectsForEpoch() {
 //   - `perihelionPhaseJ2000` stays at J2000 by name and design — it is the
 //     reference phase at the J2000 epoch, not the live phase.
 //
-// Currently dormant: nothing calls these (the per-epoch planet counts they
-// would follow left at plan 09 step 5c; the chain is the only planet path).
+// (Plan 09 step 7b: the seven `update<Planet>ForEpoch` functions — the
+// device's per-epoch planet speeds 2π/(H/count), radii and Mercury's
+// count-locked rotation, dormant since step 5c — are deleted with the counts.
+// The chain places the planets; the scaffold's J2000 speeds and radii are set
+// once in the object literals from the chain's own elements.)
 
-function updateMercuryForEpoch() {
-  mercury.speed       = Math.PI * 2 / (holisticyearLength / mercurySolarYearCount);
-  mercury.orbitRadius = mercuryOrbitDistance * 100;
-  mercury.size        = (diameters.mercuryDiameter / 2 / currentAUDistance) * 100;
-  mercury.perihelionPrecessionRate = Math.PI * 2 / planets.mercury.perihelionEclipticYears;
-  // Phase 3.5: Mercury 3:2 spin-orbit lock (Pettengill & Dyce 1965). The lock
-  // is enforced tidally — 3 sidereal rotations per 2 orbits — so the rotation
-  // period mutates with the orbital period at deep time. All three live values
-  // (holisticyearLength, mercurySolarYearCount, meansolaryearlengthinDays) are
-  // already updated by upstream phases.
-  mercuryRotationPeriod = 24 * (meansolaryearlengthinDays * holisticyearLength)
-                            / (mercurySolarYearCount * 3 / 2);
-  mercury.rotationSpeed = Math.PI * 2 * (SI_TROPICAL_YEAR_DAYS / (mercuryRotationPeriod / 24));  // Phase 9.5c: SI-anchored
-}
-function updateVenusForEpoch() {
-  venus.speed         = Math.PI * 2 / (holisticyearLength / venusSolarYearCount);
-  venus.orbitRadius   = venusOrbitDistance * 100;
-  venus.size          = (diameters.venusDiameter / 2 / currentAUDistance) * 100;
-  venus.perihelionPrecessionRate = Math.PI * 2 / planets.venus.perihelionEclipticYears;
-}
-function updateMarsForEpoch() {
-  mars.speed          = Math.PI * 2 / (holisticyearLength / marsSolarYearCount);
-  mars.orbitRadius    = marsOrbitDistance * 100;
-  mars.size           = (diameters.marsDiameter / 2 / currentAUDistance) * 100;
-  mars.perihelionPrecessionRate = Math.PI * 2 / planets.mars.perihelionEclipticYears;
-}
-function updateJupiterForEpoch() {
-  jupiter.speed       = Math.PI * 2 / (holisticyearLength / jupiterSolarYearCount);
-  jupiter.orbitRadius = jupiterOrbitDistance * 100;
-  jupiter.size        = (diameters.jupiterDiameter / 2 / currentAUDistance) * 100;
-  jupiter.perihelionPrecessionRate = Math.PI * 2 / planets.jupiter.perihelionEclipticYears;
-}
-function updateSaturnForEpoch() {
-  saturn.speed        = Math.PI * 2 / (holisticyearLength / saturnSolarYearCount);
-  saturn.orbitRadius  = saturnOrbitDistance * 100;
-  saturn.size         = (diameters.saturnDiameter / 2 / currentAUDistance) * 100;
-  saturn.perihelionPrecessionRate = Math.PI * 2 / planets.saturn.perihelionEclipticYears;
-}
-function updateUranusForEpoch() {
-  uranus.speed        = Math.PI * 2 / (holisticyearLength / uranusSolarYearCount);
-  uranus.orbitRadius  = uranusOrbitDistance * 100;
-  uranus.size         = (diameters.uranusDiameter / 2 / currentAUDistance) * 100;
-  uranus.perihelionPrecessionRate = Math.PI * 2 / planets.uranus.perihelionEclipticYears;
-}
-function updateNeptuneForEpoch() {
-  neptune.speed       = Math.PI * 2 / (holisticyearLength / neptuneSolarYearCount);
-  neptune.orbitRadius = neptuneOrbitDistance * 100;
-  neptune.size        = (diameters.neptuneDiameter / 2 / currentAUDistance) * 100;
-  neptune.perihelionPrecessionRate = Math.PI * 2 / planets.neptune.perihelionEclipticYears;
-}
-
-/** Full Phase 3 orchestrator: safe subset + all 7 outer planets. */
+/** Full Phase 3 orchestrator: the safe subset + the traces. */
 function updateAllObjectsForEpoch() {
   updateSafeObjectsForEpoch();
-  updateMercuryForEpoch();
-  updateVenusForEpoch();
-  updateMarsForEpoch();
-  updateJupiterForEpoch();
-  updateSaturnForEpoch();
-  updateUranusForEpoch();
-  updateNeptuneForEpoch();
   updateAllTracesForEpoch();    // Phase 6.7: 26 trace properties on 14 scene-graph objects
 }
 
@@ -5393,8 +5316,6 @@ function setEpoch(calendar_year) {
  */
 function resetEpochToJ2000() {
   if (currentEpoch_t_Ma === 0) return true;
-  holisticyearLength = _EPOCH_SEEDS_J2000.holisticyearLength;
-  H = _EPOCH_SEEDS_J2000.H;
   meanlengthofday = _EPOCH_SEEDS_J2000.meanlengthofday;
   meansiderealyearlengthinSeconds = _EPOCH_SEEDS_J2000.meansiderealyearlengthinSeconds;
   meansiderealyearlengthinDays = _EPOCH_SEEDS_J2000.meansiderealyearlengthinDays;
@@ -5458,11 +5379,12 @@ if (typeof window !== 'undefined') {
     anomalisticYearDaysOfDate,
     // Delegation gate (Phase 20.2): the ONE Layer-4 composite, pure.
     computeLodRealSecondsAtEpoch,
-    // The six globals recomputeEpochAnchors mutates, read live (the former
-    // seventh, the kinematic sidereal year, is a J2000 constant since the
-    // year/day collapse — "kinematic" is f(2000), not an epoch state).
+    // The four globals recomputeEpochAnchors mutates, read live (the kinematic
+    // sidereal year is a J2000 constant since the year/day collapse — "kinematic"
+    // is f(2000), not an epoch state; plan 09 step 7b: the unit `holisticyearLength`
+    // / `H` is a J2000 constant too, the unit function left).
     anchors: () => ({
-      holisticyearLength, H, meanlengthofday,
+      meanlengthofday,
       meansiderealyearlengthinSeconds, meansiderealyearlengthinDays,
       meansolaryearlengthinDays,
     }),
@@ -5647,16 +5569,17 @@ if (typeof window !== 'undefined') {
     // derived families, the ψ/K law outputs, the wobble/obliquity pairs, the
     // runtime channels, and the deep-time orbit chains. Test surface only.
     planetDerived: (k) => ({
-      mercury: { N: mercurySolarYearCount, a: mercuryOrbitDistance, elip: mercuryElipticOrbit, peri: mercuryPerihelionDistance, rot: mercuryRotationPeriod },
-      venus:   { N: venusSolarYearCount, a: venusOrbitDistance, elip: venusElipticOrbit, peri: venusPerihelionDistance, rot: venusRotationPeriod },
-      mars:    { N: marsSolarYearCount, a: marsOrbitDistance, elip: marsElipticOrbit, peri: marsPerihelionDistance, rot: marsRotationPeriod },
-      jupiter: { N: jupiterSolarYearCount, a: jupiterOrbitDistance, elip: jupiterElipticOrbit, peri: jupiterPerihelionDistance, rot: jupiterRotationPeriod },
-      saturn:  { N: saturnSolarYearCount, a: saturnOrbitDistance, elip: saturnElipticOrbit, peri: saturnPerihelionDistance, rot: saturnRotationPeriod },
-      uranus:  { N: uranusSolarYearCount, a: uranusOrbitDistance, elip: uranusElipticOrbit, peri: uranusPerihelionDistance, rot: uranusRotationPeriod },
-      neptune: { N: neptuneSolarYearCount, a: neptuneOrbitDistance, elip: neptuneElipticOrbit, peri: neptunePerihelionDistance, rot: neptuneRotationPeriod },
-      eros:    { N: erosSolarYearCount, a: erosOrbitDistance, elip: erosElipticOrbit, peri: erosPerihelionDistance, rot: erosRotationPeriod },
-      pluto:   { N: plutoSolarYearCount, a: plutoOrbitDistance, elip: plutoElipticOrbit, peri: plutoPerihelionDistance, rot: plutoRotationPeriod },
-      halleys: { N: halleysSolarYearCount, a: halleysOrbitDistance, elip: halleysElipticOrbit, peri: halleysPerihelionDistance, rot: halleysRotationPeriod },
+      // (plan 09 step 7b: the `N` device-count rows left; `P` is the scaffold period in SI days)
+      mercury: { P: _planetGeom.mercury.periodDays, a: mercuryOrbitDistance, elip: mercuryElipticOrbit, peri: mercuryPerihelionDistance, rot: mercuryRotationPeriod },
+      venus:   { P: _planetGeom.venus.periodDays, a: venusOrbitDistance, elip: venusElipticOrbit, peri: venusPerihelionDistance, rot: venusRotationPeriod },
+      mars:    { P: _planetGeom.mars.periodDays, a: marsOrbitDistance, elip: marsElipticOrbit, peri: marsPerihelionDistance, rot: marsRotationPeriod },
+      jupiter: { P: _planetGeom.jupiter.periodDays, a: jupiterOrbitDistance, elip: jupiterElipticOrbit, peri: jupiterPerihelionDistance, rot: jupiterRotationPeriod },
+      saturn:  { P: _planetGeom.saturn.periodDays, a: saturnOrbitDistance, elip: saturnElipticOrbit, peri: saturnPerihelionDistance, rot: saturnRotationPeriod },
+      uranus:  { P: _planetGeom.uranus.periodDays, a: uranusOrbitDistance, elip: uranusElipticOrbit, peri: uranusPerihelionDistance, rot: uranusRotationPeriod },
+      neptune: { P: _planetGeom.neptune.periodDays, a: neptuneOrbitDistance, elip: neptuneElipticOrbit, peri: neptunePerihelionDistance, rot: neptuneRotationPeriod },
+      eros:    { P: _planetGeom.eros.periodDays, a: erosOrbitDistance, elip: erosElipticOrbit, peri: erosPerihelionDistance, rot: erosRotationPeriod },
+      pluto:   { P: _planetGeom.pluto.periodDays, a: plutoOrbitDistance, elip: plutoElipticOrbit, peri: plutoPerihelionDistance, rot: plutoRotationPeriod },
+      halleys: { P: _planetGeom.halleys.periodDays, a: halleysOrbitDistance, elip: halleysElipticOrbit, peri: halleysPerihelionDistance, rot: halleysRotationPeriod },
     })[k],
     // (Plan 07 R6/R5: the planetLaws hook — the K law's eccAmp/eccBase/eccPhase
     // and the ψ law's inclAmp/inclMean — left with the laws.)
@@ -7062,10 +6985,10 @@ const mercuryFixedPerihelionAtSun = {
 const mercury = {
   name: "Mercury",
   startPos: planets.mercury.startpos,
-  speed: Math.PI*2/(holisticyearLength/mercurySolarYearCount),
+  speed: Math.PI*2/_planetGeom.mercury.periodYears,   // plan 09 step 7b: the chain's period in scene years (was the device count's H/N)
   rotationSpeed: Math.PI*2*(SI_TROPICAL_YEAR_DAYS/(mercuryRotationPeriod/24)),  // Phase 9.5c: SI-anchored
   tilt: -planets.mercury.axialTiltJ2000,
-  orbitRadius: (((holisticyearLength/mercurySolarYearCount) ** 2) **(1/3)) *100,
+  orbitRadius: mercuryOrbitDistance*100,   // plan 09 step 7b: the chain's J2000 a
   orbitCentera: 0,
   orbitCenterb: 0,
   orbitCenterc: 0,
@@ -7077,7 +7000,7 @@ const mercury = {
   // J2000 value and nothing recomputes it.
   eccentricity: planets.mercury.orbitalEccentricityJ2000,
   perihelionPhaseJ2000: -planets.mercury.startpos * (Math.PI / 180)
-    + (Math.PI * 2 / (holisticyearLength / mercurySolarYearCount) - Math.PI * 2 / planets.mercury.perihelionEclipticYears)
+    + (Math.PI * 2 / _planetGeom.mercury.periodYears - Math.PI * 2 / planets.mercury.perihelionEclipticYears)
     * (planets.mercury.perihelionRef_JD - startmodelJD) / meansolaryearlengthinDays,
   perihelionPrecessionRate: Math.PI * 2 / planets.mercury.perihelionEclipticYears,
 
@@ -7170,10 +7093,10 @@ const venusFixedPerihelionAtSun = {
 const venus = {
   name: "Venus",
   startPos: planets.venus.startpos,
-  speed: Math.PI*2/(holisticyearLength/venusSolarYearCount),
+  speed: Math.PI*2/_planetGeom.venus.periodYears,
   rotationSpeed: -Math.PI*2*(SI_TROPICAL_YEAR_DAYS/(venusRotationPeriod/24)),  // Phase 9.5c: SI-anchored
   tilt: -planets.venus.axialTiltJ2000,
-  orbitRadius: (((holisticyearLength/venusSolarYearCount) ** 2) **(1/3)) *100,
+  orbitRadius: venusOrbitDistance*100,
   orbitCentera: 0,
   orbitCenterb: 0,
   orbitCenterc: 0,
@@ -7181,7 +7104,7 @@ const venus = {
   orbitTiltb: Math.sin(((-90-(planets.venus.ascendingNode+ascNodeToolCorrection.venus))*Math.PI)/180)*-planets.venus.eclipticInclinationJ2000,
   eccentricity: planets.venus.orbitalEccentricityJ2000,
   perihelionPhaseJ2000: -planets.venus.startpos * (Math.PI / 180)
-    + (Math.PI * 2 / (holisticyearLength / venusSolarYearCount) - Math.PI * 2 / planets.venus.perihelionEclipticYears)
+    + (Math.PI * 2 / _planetGeom.venus.periodYears - Math.PI * 2 / planets.venus.perihelionEclipticYears)
     * (planets.venus.perihelionRef_JD - startmodelJD) / meansolaryearlengthinDays,
   perihelionPrecessionRate: Math.PI * 2 / planets.venus.perihelionEclipticYears,
 
@@ -7228,7 +7151,7 @@ const marsPerihelionFromEarth = {
 const marsRealPerihelionAtSun = {
   name: "Mars Real Perihelion At Sun",
   startPos: planets.mars.startpos*2,
-  speed: -Math.PI*2+(2*Math.PI*2/(holisticyearLength/marsSolarYearCount)),
+  speed: -Math.PI*2+(2*Math.PI*2/_planetGeom.mars.periodYears),
   rotationSpeed: 0,
   tilt: 0,
   orbitRadius: marsElipticOrbit,
@@ -7257,7 +7180,7 @@ const marsRealPerihelionAtSun = {
 const marsFixedPerihelionAtSun = {
   name: "Mars Fixed Perihelion At Sun",
   startPos: planets.mars.startpos*2,
-  speed: -Math.PI*2+(2*Math.PI*2/(holisticyearLength/marsSolarYearCount)),
+  speed: -Math.PI*2+(2*Math.PI*2/_planetGeom.mars.periodYears),
   rotationSpeed: 0,
   tilt: 0,
   orbitRadius: 0,
@@ -7280,10 +7203,10 @@ const marsFixedPerihelionAtSun = {
 const mars = {
   name: "Mars",
   startPos: planets.mars.startpos,
-  speed: -Math.PI*2/(holisticyearLength/marsSolarYearCount),
+  speed: -Math.PI*2/_planetGeom.mars.periodYears,
   rotationSpeed: Math.PI*2*(SI_TROPICAL_YEAR_DAYS/(marsRotationPeriod/24)),  // Phase 9.5c: SI-anchored
   tilt: -planets.mars.axialTiltJ2000,
-  orbitRadius: (((holisticyearLength/marsSolarYearCount) ** 2) **(1/3)) *100,
+  orbitRadius: marsOrbitDistance*100,
   orbitCentera: 0,
   orbitCenterb: 0,
   orbitCenterc: 0,
@@ -7291,7 +7214,7 @@ const mars = {
   orbitTiltb: Math.sin(((-90-(planets.mars.ascendingNode+ascNodeToolCorrection.mars))*Math.PI)/180)*-planets.mars.eclipticInclinationJ2000,
   eccentricity: planets.mars.orbitalEccentricityJ2000,
   perihelionPhaseJ2000: -planets.mars.startpos * (Math.PI / 180)
-    + (Math.PI * 2 / (holisticyearLength / marsSolarYearCount) - Math.PI * 2 / planets.mars.perihelionEclipticYears)
+    + (Math.PI * 2 / _planetGeom.mars.periodYears - Math.PI * 2 / planets.mars.perihelionEclipticYears)
     * (planets.mars.perihelionRef_JD - startmodelJD) / meansolaryearlengthinDays,
   perihelionPrecessionRate: Math.PI * 2 / planets.mars.perihelionEclipticYears,
 
@@ -7388,10 +7311,10 @@ const jupiterFixedPerihelionAtSun = {
 const jupiter = {
   name: "Jupiter",
   startPos: planets.jupiter.startpos,
-  speed: Math.PI*2/(holisticyearLength/jupiterSolarYearCount),
+  speed: Math.PI*2/_planetGeom.jupiter.periodYears,
   rotationSpeed: Math.PI*2*(SI_TROPICAL_YEAR_DAYS/(jupiterRotationPeriod/24)),  // Phase 9.5c: SI-anchored
   tilt: -planets.jupiter.axialTiltJ2000,
-  orbitRadius: (((holisticyearLength/jupiterSolarYearCount) ** 2) **(1/3)) *100,
+  orbitRadius: jupiterOrbitDistance*100,
   orbitCentera: 0,
   orbitCenterb: 0,
   orbitCenterc: 0,
@@ -7399,7 +7322,7 @@ const jupiter = {
   orbitTiltb: Math.sin(((-90-(planets.jupiter.ascendingNode+ascNodeToolCorrection.jupiter))*Math.PI)/180)*-planets.jupiter.eclipticInclinationJ2000,
   eccentricity: planets.jupiter.orbitalEccentricityJ2000,
   perihelionPhaseJ2000: -planets.jupiter.startpos * (Math.PI / 180)
-    + (Math.PI * 2 / (holisticyearLength / jupiterSolarYearCount) - Math.PI * 2 / planets.jupiter.perihelionEclipticYears)
+    + (Math.PI * 2 / _planetGeom.jupiter.periodYears - Math.PI * 2 / planets.jupiter.perihelionEclipticYears)
     * (planets.jupiter.perihelionRef_JD - startmodelJD) / meansolaryearlengthinDays,
   perihelionPrecessionRate: Math.PI * 2 / planets.jupiter.perihelionEclipticYears,
 
@@ -7501,10 +7424,10 @@ const saturnFixedPerihelionAtSun = {
 const saturn = {
   name: "Saturn",
   startPos: planets.saturn.startpos,
-  speed: Math.PI*2/(holisticyearLength/saturnSolarYearCount),
+  speed: Math.PI*2/_planetGeom.saturn.periodYears,
   rotationSpeed: Math.PI*2*(SI_TROPICAL_YEAR_DAYS/(saturnRotationPeriod/24)),  // Phase 9.5c: SI-anchored
   tilt: -planets.saturn.axialTiltJ2000,
-  orbitRadius: (((holisticyearLength/saturnSolarYearCount) ** 2) **(1/3)) *100,
+  orbitRadius: saturnOrbitDistance*100,
   orbitCentera: 0,
   orbitCenterb: 0,
   orbitCenterc: 0,
@@ -7512,7 +7435,7 @@ const saturn = {
   orbitTiltb: Math.sin(((-90-(planets.saturn.ascendingNode+ascNodeToolCorrection.saturn))*Math.PI)/180)*-planets.saturn.eclipticInclinationJ2000,
   eccentricity: planets.saturn.orbitalEccentricityJ2000,
   perihelionPhaseJ2000: -planets.saturn.startpos * (Math.PI / 180)
-    + (Math.PI * 2 / (holisticyearLength / saturnSolarYearCount) - Math.PI * 2 / planets.saturn.perihelionEclipticYears)
+    + (Math.PI * 2 / _planetGeom.saturn.periodYears - Math.PI * 2 / planets.saturn.perihelionEclipticYears)
     * (planets.saturn.perihelionRef_JD - startmodelJD) / meansolaryearlengthinDays,
   perihelionPrecessionRate: Math.PI * 2 / planets.saturn.perihelionEclipticYears,
 
@@ -7614,10 +7537,10 @@ const uranusFixedPerihelionAtSun = {
 const uranus = {
   name: "Uranus",
   startPos: planets.uranus.startpos,
-  speed: Math.PI*2/(holisticyearLength/uranusSolarYearCount),
+  speed: Math.PI*2/_planetGeom.uranus.periodYears,
   rotationSpeed: -Math.PI*2*(SI_TROPICAL_YEAR_DAYS/(uranusRotationPeriod/24)),  // Phase 9.5c: SI-anchored
   tilt: -planets.uranus.axialTiltJ2000,
-  orbitRadius: (((holisticyearLength/uranusSolarYearCount) ** 2) **(1/3)) *100,
+  orbitRadius: uranusOrbitDistance*100,
   orbitCentera: 0,
   orbitCenterb: 0,
   orbitCenterc: 0,
@@ -7625,7 +7548,7 @@ const uranus = {
   orbitTiltb: Math.sin(((-90-(planets.uranus.ascendingNode+ascNodeToolCorrection.uranus))*Math.PI)/180)*-planets.uranus.eclipticInclinationJ2000,
   eccentricity: planets.uranus.orbitalEccentricityJ2000,
   perihelionPhaseJ2000: -planets.uranus.startpos * (Math.PI / 180)
-    + (Math.PI * 2 / (holisticyearLength / uranusSolarYearCount) - Math.PI * 2 / planets.uranus.perihelionEclipticYears)
+    + (Math.PI * 2 / _planetGeom.uranus.periodYears - Math.PI * 2 / planets.uranus.perihelionEclipticYears)
     * (planets.uranus.perihelionRef_JD - startmodelJD) / meansolaryearlengthinDays,
   perihelionPrecessionRate: Math.PI * 2 / planets.uranus.perihelionEclipticYears,
 
@@ -7727,10 +7650,10 @@ const neptuneFixedPerihelionAtSun = {
 const neptune = {
   name: "Neptune",
   startPos: planets.neptune.startpos,
-  speed: Math.PI*2/(holisticyearLength/neptuneSolarYearCount),
+  speed: Math.PI*2/_planetGeom.neptune.periodYears,
   rotationSpeed: Math.PI*2*(SI_TROPICAL_YEAR_DAYS/(neptuneRotationPeriod/24)),  // Phase 9.5c: SI-anchored
   tilt: -planets.neptune.axialTiltJ2000,
-  orbitRadius: (((holisticyearLength/neptuneSolarYearCount) ** 2) **(1/3)) *100,
+  orbitRadius: neptuneOrbitDistance*100,
   orbitCentera: 0,
   orbitCenterb: 0,
   orbitCenterc: 0,
@@ -7738,7 +7661,7 @@ const neptune = {
   orbitTiltb: Math.sin(((-90-(planets.neptune.ascendingNode+ascNodeToolCorrection.neptune))*Math.PI)/180)*-planets.neptune.eclipticInclinationJ2000,
   eccentricity: planets.neptune.orbitalEccentricityJ2000,
   perihelionPhaseJ2000: -planets.neptune.startpos * (Math.PI / 180)
-    + (Math.PI * 2 / (holisticyearLength / neptuneSolarYearCount) - Math.PI * 2 / planets.neptune.perihelionEclipticYears)
+    + (Math.PI * 2 / _planetGeom.neptune.periodYears - Math.PI * 2 / planets.neptune.perihelionEclipticYears)
     * (planets.neptune.perihelionRef_JD - startmodelJD) / meansolaryearlengthinDays,
   perihelionPrecessionRate: Math.PI * 2 / planets.neptune.perihelionEclipticYears,
 
@@ -46344,10 +46267,10 @@ const planetStats = {
        info  : 'https://en.wikipedia.org/wiki/Phase_angle_(astronomy)'},
     null,
       {label : () => `True Anomaly Rate (dν/dt)`,
-       value : [ { v: () => OrbitalFormulas.trueAnomalyRate(OrbitalFormulas.meanMotion((holisticyearLength/(mercurySolarYearCount-13))*meansolaryearlengthinDays), _kcElementsOfDate('mercury', o.julianDay).e, o.mercuryTrueAnomaly), dec:6, sep:',' },{ small: '°/day' }],
+       value : [ { v: () => OrbitalFormulas.trueAnomalyRate(OrbitalFormulas.meanMotion((360/_kcNOfDate('mercury', o.currentYear))*365.25), _kcElementsOfDate('mercury', o.julianDay).e, o.mercuryTrueAnomaly), dec:6, sep:',' },{ small: '°/day' }],
        hover : [`Rate of change of true anomaly: dν/dt = n(1+e·cos(ν))²/(1-e²)^1.5. Fastest at perihelion`]},
       {label : () => `Eccentric Anomaly Rate (dE/dt)`,
-       value : [ { v: () => OrbitalFormulas.eccentricAnomalyRate(OrbitalFormulas.meanMotion((holisticyearLength/(mercurySolarYearCount-13))*meansolaryearlengthinDays), _kcElementsOfDate('mercury', o.julianDay).e, o.mercuryEccentricAnomaly), dec:6, sep:',' },{ small: '°/day' }],
+       value : [ { v: () => OrbitalFormulas.eccentricAnomalyRate(OrbitalFormulas.meanMotion((360/_kcNOfDate('mercury', o.currentYear))*365.25), _kcElementsOfDate('mercury', o.julianDay).e, o.mercuryEccentricAnomaly), dec:6, sep:',' },{ small: '°/day' }],
        hover : [`Rate of change of eccentric anomaly: dE/dt = n / (1 - e×cos(E))`]},
       {label : () => `Radius of Curvature (ρ)`,
        value : [ { v: () => OrbitalFormulas.radiusOfCurvature(mercuryOrbitDistance * currentAUDistance, _kcElementsOfDate('mercury', o.julianDay).e, o.mercuryTrueAnomaly), dec:0, sep:',' },{ small: 'km' }],
@@ -46355,10 +46278,10 @@ const planetStats = {
 
     {header : '—  Time Calculations —' },
       {label : () => `Time since perihelion`,
-       value : [ { v: () => OrbitalFormulas.timeSincePerihelion(holisticyearLength * meansolaryearlengthinDays / mercurySolarYearCount, o.mercuryMeanAnomaly), dec:2, sep:',' },{ small: 'days' }],
+       value : [ { v: () => OrbitalFormulas.timeSincePerihelion((360/_kcNOfDate('mercury', o.currentYear))*365.25, o.mercuryMeanAnomaly), dec:2, sep:',' },{ small: 'days' }],
        hover : [`Days elapsed since last perihelion passage: t = P × M / 360°`]},
       {label : () => `Time to next perihelion`,
-       value : [ { v: () => OrbitalFormulas.timeToNextPerihelion(holisticyearLength * meansolaryearlengthinDays / mercurySolarYearCount, o.mercuryMeanAnomaly), dec:2, sep:',' },{ small: 'days' }],
+       value : [ { v: () => OrbitalFormulas.timeToNextPerihelion((360/_kcNOfDate('mercury', o.currentYear))*365.25, o.mercuryMeanAnomaly), dec:2, sep:',' },{ small: 'days' }],
        hover : [`Days until next perihelion passage: t = P × (360° - M) / 360°`]},
 
     {header : '—  Perihelion Precession (apsidal · g) —' },
@@ -46654,10 +46577,10 @@ const planetStats = {
        info  : 'https://en.wikipedia.org/wiki/Phase_angle_(astronomy)'},
     null,
       {label : () => `True Anomaly Rate (dν/dt)`,
-       value : [ { v: () => OrbitalFormulas.trueAnomalyRate(OrbitalFormulas.meanMotion((holisticyearLength/(venusSolarYearCount-13))*meansolaryearlengthinDays), _kcElementsOfDate('venus', o.julianDay).e, o.venusTrueAnomaly), dec:6, sep:',' },{ small: '°/day' }],
+       value : [ { v: () => OrbitalFormulas.trueAnomalyRate(OrbitalFormulas.meanMotion((360/_kcNOfDate('venus', o.currentYear))*365.25), _kcElementsOfDate('venus', o.julianDay).e, o.venusTrueAnomaly), dec:6, sep:',' },{ small: '°/day' }],
        hover : [`Rate of change of true anomaly: dν/dt = n(1+e·cos(ν))²/(1-e²)^1.5. Fastest at perihelion`]},
       {label : () => `Eccentric Anomaly Rate (dE/dt)`,
-       value : [ { v: () => OrbitalFormulas.eccentricAnomalyRate(OrbitalFormulas.meanMotion((holisticyearLength/(venusSolarYearCount-13))*meansolaryearlengthinDays), _kcElementsOfDate('venus', o.julianDay).e, o.venusEccentricAnomaly), dec:6, sep:',' },{ small: '°/day' }],
+       value : [ { v: () => OrbitalFormulas.eccentricAnomalyRate(OrbitalFormulas.meanMotion((360/_kcNOfDate('venus', o.currentYear))*365.25), _kcElementsOfDate('venus', o.julianDay).e, o.venusEccentricAnomaly), dec:6, sep:',' },{ small: '°/day' }],
        hover : [`Rate of change of eccentric anomaly: dE/dt = n / (1 - e×cos(E))`]},
       {label : () => `Radius of Curvature (ρ)`,
        value : [ { v: () => OrbitalFormulas.radiusOfCurvature(venusOrbitDistance * currentAUDistance, _kcElementsOfDate('venus', o.julianDay).e, o.venusTrueAnomaly), dec:0, sep:',' },{ small: 'km' }],
@@ -46665,10 +46588,10 @@ const planetStats = {
 
     {header : '—  Time Calculations —' },
       {label : () => `Time since perihelion`,
-       value : [ { v: () => OrbitalFormulas.timeSincePerihelion(holisticyearLength * meansolaryearlengthinDays / venusSolarYearCount, o.venusMeanAnomaly), dec:2, sep:',' },{ small: 'days' }],
+       value : [ { v: () => OrbitalFormulas.timeSincePerihelion((360/_kcNOfDate('venus', o.currentYear))*365.25, o.venusMeanAnomaly), dec:2, sep:',' },{ small: 'days' }],
        hover : [`Days elapsed since last perihelion passage: t = P × M / 360°`]},
       {label : () => `Time to next perihelion`,
-       value : [ { v: () => OrbitalFormulas.timeToNextPerihelion(holisticyearLength * meansolaryearlengthinDays / venusSolarYearCount, o.venusMeanAnomaly), dec:2, sep:',' },{ small: 'days' }],
+       value : [ { v: () => OrbitalFormulas.timeToNextPerihelion((360/_kcNOfDate('venus', o.currentYear))*365.25, o.venusMeanAnomaly), dec:2, sep:',' },{ small: 'days' }],
        hover : [`Days until next perihelion passage: t = P × (360° - M) / 360°`]},
 
     {header : '—  Perihelion Precession (apsidal · g) —' },
@@ -46967,10 +46890,10 @@ const planetStats = {
        info  : 'https://en.wikipedia.org/wiki/Phase_angle_(astronomy)'},
     null,
       {label : () => `True Anomaly Rate (dν/dt)`,
-       value : [ { v: () => OrbitalFormulas.trueAnomalyRate(OrbitalFormulas.meanMotion((holisticyearLength/(marsSolarYearCount+13))*meansolaryearlengthinDays), _kcElementsOfDate('mars', o.julianDay).e, o.marsTrueAnomaly), dec:6, sep:',' },{ small: '°/day' }],
+       value : [ { v: () => OrbitalFormulas.trueAnomalyRate(OrbitalFormulas.meanMotion((360/_kcNOfDate('mars', o.currentYear))*365.25), _kcElementsOfDate('mars', o.julianDay).e, o.marsTrueAnomaly), dec:6, sep:',' },{ small: '°/day' }],
        hover : [`Rate of change of true anomaly: dν/dt = n(1+e·cos(ν))²/(1-e²)^1.5. Fastest at perihelion`]},
       {label : () => `Eccentric Anomaly Rate (dE/dt)`,
-       value : [ { v: () => OrbitalFormulas.eccentricAnomalyRate(OrbitalFormulas.meanMotion((holisticyearLength/(marsSolarYearCount+13))*meansolaryearlengthinDays), _kcElementsOfDate('mars', o.julianDay).e, o.marsEccentricAnomaly), dec:6, sep:',' },{ small: '°/day' }],
+       value : [ { v: () => OrbitalFormulas.eccentricAnomalyRate(OrbitalFormulas.meanMotion((360/_kcNOfDate('mars', o.currentYear))*365.25), _kcElementsOfDate('mars', o.julianDay).e, o.marsEccentricAnomaly), dec:6, sep:',' },{ small: '°/day' }],
        hover : [`Rate of change of eccentric anomaly: dE/dt = n / (1 - e×cos(E))`]},
       {label : () => `Radius of Curvature (ρ)`,
        value : [ { v: () => OrbitalFormulas.radiusOfCurvature(marsOrbitDistance * currentAUDistance, _kcElementsOfDate('mars', o.julianDay).e, o.marsTrueAnomaly), dec:0, sep:',' },{ small: 'km' }],
@@ -46978,10 +46901,10 @@ const planetStats = {
 
     {header : '—  Time Calculations —' },
       {label : () => `Time since perihelion`,
-       value : [ { v: () => OrbitalFormulas.timeSincePerihelion(holisticyearLength * meansolaryearlengthinDays / marsSolarYearCount, o.marsMeanAnomaly), dec:2, sep:',' },{ small: 'days' }],
+       value : [ { v: () => OrbitalFormulas.timeSincePerihelion((360/_kcNOfDate('mars', o.currentYear))*365.25, o.marsMeanAnomaly), dec:2, sep:',' },{ small: 'days' }],
        hover : [`Days elapsed since last perihelion passage: t = P × M / 360°`]},
       {label : () => `Time to next perihelion`,
-       value : [ { v: () => OrbitalFormulas.timeToNextPerihelion(holisticyearLength * meansolaryearlengthinDays / marsSolarYearCount, o.marsMeanAnomaly), dec:2, sep:',' },{ small: 'days' }],
+       value : [ { v: () => OrbitalFormulas.timeToNextPerihelion((360/_kcNOfDate('mars', o.currentYear))*365.25, o.marsMeanAnomaly), dec:2, sep:',' },{ small: 'days' }],
        hover : [`Days until next perihelion passage: t = P × (360° - M) / 360°`]},
 
     {header : '—  Perihelion Precession (apsidal · g) —' },
@@ -47283,10 +47206,10 @@ const planetStats = {
        info  : 'https://en.wikipedia.org/wiki/Phase_angle_(astronomy)'},
     null,
       {label : () => `True Anomaly Rate (dν/dt)`,
-       value : [ { v: () => OrbitalFormulas.trueAnomalyRate(OrbitalFormulas.meanMotion((holisticyearLength/(jupiterSolarYearCount+13))*meansolaryearlengthinDays), _kcElementsOfDate('jupiter', o.julianDay).e, o.jupiterTrueAnomaly), dec:6, sep:',' },{ small: '°/day' }],
+       value : [ { v: () => OrbitalFormulas.trueAnomalyRate(OrbitalFormulas.meanMotion((360/_kcNOfDate('jupiter', o.currentYear))*365.25), _kcElementsOfDate('jupiter', o.julianDay).e, o.jupiterTrueAnomaly), dec:6, sep:',' },{ small: '°/day' }],
        hover : [`Rate of change of true anomaly: dν/dt = n(1+e·cos(ν))²/(1-e²)^1.5. Fastest at perihelion`]},
       {label : () => `Eccentric Anomaly Rate (dE/dt)`,
-       value : [ { v: () => OrbitalFormulas.eccentricAnomalyRate(OrbitalFormulas.meanMotion((holisticyearLength/(jupiterSolarYearCount+13))*meansolaryearlengthinDays), _kcElementsOfDate('jupiter', o.julianDay).e, o.jupiterEccentricAnomaly), dec:6, sep:',' },{ small: '°/day' }],
+       value : [ { v: () => OrbitalFormulas.eccentricAnomalyRate(OrbitalFormulas.meanMotion((360/_kcNOfDate('jupiter', o.currentYear))*365.25), _kcElementsOfDate('jupiter', o.julianDay).e, o.jupiterEccentricAnomaly), dec:6, sep:',' },{ small: '°/day' }],
        hover : [`Rate of change of eccentric anomaly: dE/dt = n / (1 - e×cos(E))`]},
       {label : () => `Radius of Curvature (ρ)`,
        value : [ { v: () => OrbitalFormulas.radiusOfCurvature(jupiterOrbitDistance * currentAUDistance, _kcElementsOfDate('jupiter', o.julianDay).e, o.jupiterTrueAnomaly), dec:0, sep:',' },{ small: 'km' }],
@@ -47294,10 +47217,10 @@ const planetStats = {
 
     {header : '—  Time Calculations —' },
       {label : () => `Time since perihelion`,
-       value : [ { v: () => OrbitalFormulas.timeSincePerihelion(holisticyearLength * meansolaryearlengthinDays / jupiterSolarYearCount, o.jupiterMeanAnomaly), dec:2, sep:',' },{ small: 'days' }],
+       value : [ { v: () => OrbitalFormulas.timeSincePerihelion((360/_kcNOfDate('jupiter', o.currentYear))*365.25, o.jupiterMeanAnomaly), dec:2, sep:',' },{ small: 'days' }],
        hover : [`Days elapsed since last perihelion passage: t = P × M / 360°`]},
       {label : () => `Time to next perihelion`,
-       value : [ { v: () => OrbitalFormulas.timeToNextPerihelion(holisticyearLength * meansolaryearlengthinDays / jupiterSolarYearCount, o.jupiterMeanAnomaly), dec:2, sep:',' },{ small: 'days' }],
+       value : [ { v: () => OrbitalFormulas.timeToNextPerihelion((360/_kcNOfDate('jupiter', o.currentYear))*365.25, o.jupiterMeanAnomaly), dec:2, sep:',' },{ small: 'days' }],
        hover : [`Days until next perihelion passage: t = P × (360° - M) / 360°`]},
 
     {header : '—  Perihelion Precession (apsidal · g) —' },
@@ -47596,10 +47519,10 @@ const planetStats = {
        info  : 'https://en.wikipedia.org/wiki/Phase_angle_(astronomy)'},
     null,
       {label : () => `True Anomaly Rate (dν/dt)`,
-       value : [ { v: () => OrbitalFormulas.trueAnomalyRate(OrbitalFormulas.meanMotion((holisticyearLength/(saturnSolarYearCount+13))*meansolaryearlengthinDays), _kcElementsOfDate('saturn', o.julianDay).e, o.saturnTrueAnomaly), dec:6, sep:',' },{ small: '°/day' }],
+       value : [ { v: () => OrbitalFormulas.trueAnomalyRate(OrbitalFormulas.meanMotion((360/_kcNOfDate('saturn', o.currentYear))*365.25), _kcElementsOfDate('saturn', o.julianDay).e, o.saturnTrueAnomaly), dec:6, sep:',' },{ small: '°/day' }],
        hover : [`Rate of change of true anomaly: dν/dt = n(1+e·cos(ν))²/(1-e²)^1.5. Fastest at perihelion`]},
       {label : () => `Eccentric Anomaly Rate (dE/dt)`,
-       value : [ { v: () => OrbitalFormulas.eccentricAnomalyRate(OrbitalFormulas.meanMotion((holisticyearLength/(saturnSolarYearCount+13))*meansolaryearlengthinDays), _kcElementsOfDate('saturn', o.julianDay).e, o.saturnEccentricAnomaly), dec:6, sep:',' },{ small: '°/day' }],
+       value : [ { v: () => OrbitalFormulas.eccentricAnomalyRate(OrbitalFormulas.meanMotion((360/_kcNOfDate('saturn', o.currentYear))*365.25), _kcElementsOfDate('saturn', o.julianDay).e, o.saturnEccentricAnomaly), dec:6, sep:',' },{ small: '°/day' }],
        hover : [`Rate of change of eccentric anomaly: dE/dt = n / (1 - e×cos(E))`]},
       {label : () => `Radius of Curvature (ρ)`,
        value : [ { v: () => OrbitalFormulas.radiusOfCurvature(saturnOrbitDistance * currentAUDistance, _kcElementsOfDate('saturn', o.julianDay).e, o.saturnTrueAnomaly), dec:0, sep:',' },{ small: 'km' }],
@@ -47607,10 +47530,10 @@ const planetStats = {
 
     {header : '—  Time Calculations —' },
       {label : () => `Time since perihelion`,
-       value : [ { v: () => OrbitalFormulas.timeSincePerihelion(holisticyearLength * meansolaryearlengthinDays / saturnSolarYearCount, o.saturnMeanAnomaly), dec:2, sep:',' },{ small: 'days' }],
+       value : [ { v: () => OrbitalFormulas.timeSincePerihelion((360/_kcNOfDate('saturn', o.currentYear))*365.25, o.saturnMeanAnomaly), dec:2, sep:',' },{ small: 'days' }],
        hover : [`Days elapsed since last perihelion passage: t = P × M / 360°`]},
       {label : () => `Time to next perihelion`,
-       value : [ { v: () => OrbitalFormulas.timeToNextPerihelion(holisticyearLength * meansolaryearlengthinDays / saturnSolarYearCount, o.saturnMeanAnomaly), dec:2, sep:',' },{ small: 'days' }],
+       value : [ { v: () => OrbitalFormulas.timeToNextPerihelion((360/_kcNOfDate('saturn', o.currentYear))*365.25, o.saturnMeanAnomaly), dec:2, sep:',' },{ small: 'days' }],
        hover : [`Days until next perihelion passage: t = P × (360° - M) / 360°`]},
 
     {header : '—  Perihelion Precession (apsidal · g) —' },
@@ -47909,10 +47832,10 @@ const planetStats = {
        info  : 'https://en.wikipedia.org/wiki/Phase_angle_(astronomy)'},
     null,
       {label : () => `True Anomaly Rate (dν/dt)`,
-       value : [ { v: () => OrbitalFormulas.trueAnomalyRate(OrbitalFormulas.meanMotion((holisticyearLength/(uranusSolarYearCount+13))*meansolaryearlengthinDays), _kcElementsOfDate('uranus', o.julianDay).e, o.uranusTrueAnomaly), dec:6, sep:',' },{ small: '°/day' }],
+       value : [ { v: () => OrbitalFormulas.trueAnomalyRate(OrbitalFormulas.meanMotion((360/_kcNOfDate('uranus', o.currentYear))*365.25), _kcElementsOfDate('uranus', o.julianDay).e, o.uranusTrueAnomaly), dec:6, sep:',' },{ small: '°/day' }],
        hover : [`Rate of change of true anomaly: dν/dt = n(1+e·cos(ν))²/(1-e²)^1.5. Fastest at perihelion`]},
       {label : () => `Eccentric Anomaly Rate (dE/dt)`,
-       value : [ { v: () => OrbitalFormulas.eccentricAnomalyRate(OrbitalFormulas.meanMotion((holisticyearLength/(uranusSolarYearCount+13))*meansolaryearlengthinDays), _kcElementsOfDate('uranus', o.julianDay).e, o.uranusEccentricAnomaly), dec:6, sep:',' },{ small: '°/day' }],
+       value : [ { v: () => OrbitalFormulas.eccentricAnomalyRate(OrbitalFormulas.meanMotion((360/_kcNOfDate('uranus', o.currentYear))*365.25), _kcElementsOfDate('uranus', o.julianDay).e, o.uranusEccentricAnomaly), dec:6, sep:',' },{ small: '°/day' }],
        hover : [`Rate of change of eccentric anomaly: dE/dt = n / (1 - e×cos(E))`]},
       {label : () => `Radius of Curvature (ρ)`,
        value : [ { v: () => OrbitalFormulas.radiusOfCurvature(uranusOrbitDistance * currentAUDistance, _kcElementsOfDate('uranus', o.julianDay).e, o.uranusTrueAnomaly), dec:0, sep:',' },{ small: 'km' }],
@@ -47920,10 +47843,10 @@ const planetStats = {
 
     {header : '—  Time Calculations —' },
       {label : () => `Time since perihelion`,
-       value : [ { v: () => OrbitalFormulas.timeSincePerihelion(holisticyearLength * meansolaryearlengthinDays / uranusSolarYearCount, o.uranusMeanAnomaly), dec:2, sep:',' },{ small: 'days' }],
+       value : [ { v: () => OrbitalFormulas.timeSincePerihelion((360/_kcNOfDate('uranus', o.currentYear))*365.25, o.uranusMeanAnomaly), dec:2, sep:',' },{ small: 'days' }],
        hover : [`Days elapsed since last perihelion passage: t = P × M / 360°`]},
       {label : () => `Time to next perihelion`,
-       value : [ { v: () => OrbitalFormulas.timeToNextPerihelion(holisticyearLength * meansolaryearlengthinDays / uranusSolarYearCount, o.uranusMeanAnomaly), dec:2, sep:',' },{ small: 'days' }],
+       value : [ { v: () => OrbitalFormulas.timeToNextPerihelion((360/_kcNOfDate('uranus', o.currentYear))*365.25, o.uranusMeanAnomaly), dec:2, sep:',' },{ small: 'days' }],
        hover : [`Days until next perihelion passage: t = P × (360° - M) / 360°`]},
 
     {header : '—  Perihelion Precession (apsidal · g) —' },
@@ -48222,10 +48145,10 @@ const planetStats = {
        info  : 'https://en.wikipedia.org/wiki/Phase_angle_(astronomy)'},
     null,
       {label : () => `True Anomaly Rate (dν/dt)`,
-       value : [ { v: () => OrbitalFormulas.trueAnomalyRate(OrbitalFormulas.meanMotion((holisticyearLength/(neptuneSolarYearCount+13))*meansolaryearlengthinDays), _kcElementsOfDate('neptune', o.julianDay).e, o.neptuneTrueAnomaly), dec:6, sep:',' },{ small: '°/day' }],
+       value : [ { v: () => OrbitalFormulas.trueAnomalyRate(OrbitalFormulas.meanMotion((360/_kcNOfDate('neptune', o.currentYear))*365.25), _kcElementsOfDate('neptune', o.julianDay).e, o.neptuneTrueAnomaly), dec:6, sep:',' },{ small: '°/day' }],
        hover : [`Rate of change of true anomaly: dν/dt = n(1+e·cos(ν))²/(1-e²)^1.5. Fastest at perihelion`]},
       {label : () => `Eccentric Anomaly Rate (dE/dt)`,
-       value : [ { v: () => OrbitalFormulas.eccentricAnomalyRate(OrbitalFormulas.meanMotion((holisticyearLength/(neptuneSolarYearCount+13))*meansolaryearlengthinDays), _kcElementsOfDate('neptune', o.julianDay).e, o.neptuneEccentricAnomaly), dec:6, sep:',' },{ small: '°/day' }],
+       value : [ { v: () => OrbitalFormulas.eccentricAnomalyRate(OrbitalFormulas.meanMotion((360/_kcNOfDate('neptune', o.currentYear))*365.25), _kcElementsOfDate('neptune', o.julianDay).e, o.neptuneEccentricAnomaly), dec:6, sep:',' },{ small: '°/day' }],
        hover : [`Rate of change of eccentric anomaly: dE/dt = n / (1 - e×cos(E))`]},
       {label : () => `Radius of Curvature (ρ)`,
        value : [ { v: () => OrbitalFormulas.radiusOfCurvature(neptuneOrbitDistance * currentAUDistance, _kcElementsOfDate('neptune', o.julianDay).e, o.neptuneTrueAnomaly), dec:0, sep:',' },{ small: 'km' }],
@@ -48233,10 +48156,10 @@ const planetStats = {
 
     {header : '—  Time Calculations —' },
       {label : () => `Time since perihelion`,
-       value : [ { v: () => OrbitalFormulas.timeSincePerihelion(holisticyearLength * meansolaryearlengthinDays / neptuneSolarYearCount, o.neptuneMeanAnomaly), dec:2, sep:',' },{ small: 'days' }],
+       value : [ { v: () => OrbitalFormulas.timeSincePerihelion((360/_kcNOfDate('neptune', o.currentYear))*365.25, o.neptuneMeanAnomaly), dec:2, sep:',' },{ small: 'days' }],
        hover : [`Days elapsed since last perihelion passage: t = P × M / 360°`]},
       {label : () => `Time to next perihelion`,
-       value : [ { v: () => OrbitalFormulas.timeToNextPerihelion(holisticyearLength * meansolaryearlengthinDays / neptuneSolarYearCount, o.neptuneMeanAnomaly), dec:2, sep:',' },{ small: 'days' }],
+       value : [ { v: () => OrbitalFormulas.timeToNextPerihelion((360/_kcNOfDate('neptune', o.currentYear))*365.25, o.neptuneMeanAnomaly), dec:2, sep:',' },{ small: 'days' }],
        hover : [`Days until next perihelion passage: t = P × (360° - M) / 360°`]},
 
     {header : '—  Perihelion Precession (apsidal · g) —' },
@@ -52433,17 +52356,19 @@ function updatePlanetAnomalies() {
   // Plan 07 R6: `e` was the K law's System-Reset base. These markers are the
   // FIXED perihelion-at-Sun points, so the J2000 observed eccentricity is the
   // right value — the one the chain is anchored on.
+  // (plan 09 step 7b: the device counts left the configs — the geometric path's
+  // period is the scaffold's `_planetGeom[key].periodDays`)
   const planetConfigs = [
-    { planet: mercury, fixedPerihelion: mercuryFixedPerihelionAtSun, key: 'mercury', e: planets.mercury.orbitalEccentricityJ2000, solarYearCount: mercurySolarYearCount },
-    { planet: venus,   fixedPerihelion: venusFixedPerihelionAtSun,   key: 'venus',   e: planets.venus.orbitalEccentricityJ2000,   solarYearCount: venusSolarYearCount   },
-    { planet: mars,    fixedPerihelion: marsFixedPerihelionAtSun,    key: 'mars',    e: planets.mars.orbitalEccentricityJ2000,    solarYearCount: marsSolarYearCount    },
-    { planet: jupiter, fixedPerihelion: jupiterFixedPerihelionAtSun, key: 'jupiter', e: planets.jupiter.orbitalEccentricityJ2000, solarYearCount: jupiterSolarYearCount },
-    { planet: saturn,  fixedPerihelion: saturnFixedPerihelionAtSun,  key: 'saturn',  e: planets.saturn.orbitalEccentricityJ2000,  solarYearCount: saturnSolarYearCount  },
-    { planet: uranus,  fixedPerihelion: uranusFixedPerihelionAtSun,  key: 'uranus',  e: planets.uranus.orbitalEccentricityJ2000,  solarYearCount: uranusSolarYearCount  },
-    { planet: neptune, fixedPerihelion: neptuneFixedPerihelionAtSun, key: 'neptune', e: planets.neptune.orbitalEccentricityJ2000, solarYearCount: neptuneSolarYearCount }
+    { planet: mercury, fixedPerihelion: mercuryFixedPerihelionAtSun, key: 'mercury', e: planets.mercury.orbitalEccentricityJ2000 },
+    { planet: venus,   fixedPerihelion: venusFixedPerihelionAtSun,   key: 'venus',   e: planets.venus.orbitalEccentricityJ2000   },
+    { planet: mars,    fixedPerihelion: marsFixedPerihelionAtSun,    key: 'mars',    e: planets.mars.orbitalEccentricityJ2000    },
+    { planet: jupiter, fixedPerihelion: jupiterFixedPerihelionAtSun, key: 'jupiter', e: planets.jupiter.orbitalEccentricityJ2000 },
+    { planet: saturn,  fixedPerihelion: saturnFixedPerihelionAtSun,  key: 'saturn',  e: planets.saturn.orbitalEccentricityJ2000  },
+    { planet: uranus,  fixedPerihelion: uranusFixedPerihelionAtSun,  key: 'uranus',  e: planets.uranus.orbitalEccentricityJ2000  },
+    { planet: neptune, fixedPerihelion: neptuneFixedPerihelionAtSun, key: 'neptune', e: planets.neptune.orbitalEccentricityJ2000 }
   ];
 
-  for (const { planet, fixedPerihelion, key, e, solarYearCount } of planetConfigs) {
+  for (const { planet, fixedPerihelion, key, e } of planetConfigs) {
     // Skip if objects don't exist
     if (!planet?.pivotObj || !fixedPerihelion?.pivotObj || !fixedPerihelion?.planetObj) {
       continue;
@@ -52521,7 +52446,7 @@ function updatePlanetAnomalies() {
     // is a geometric ellipse angle close to eccentric anomaly E, not textbook mean
     // anomaly M = E − e·sin(E). For low-e bodies the difference is small; for
     // Mercury/Pluto/Halley it matters substantially.)
-    const periodDays = (holisticyearLength / solarYearCount) * meansolaryearlengthinDays;
+    const periodDays = _planetGeom[key].periodDays;   // plan 09 step 7b: the scaffold period (no device count)
     let meanAnomalyDeg = planets[key].meanAnomaly + 360 * (o.julianDay - startmodelJD) / periodDays;
     meanAnomalyDeg = ((meanAnomalyDeg % 360) + 360) % 360;
     o[key + 'MeanAnomaly'] = meanAnomalyDeg;

@@ -32,8 +32,7 @@ const L1 = createDerivedViews({ primitives: L0 });
 
 // Global name in script.js -> the Layer 0/1 view that must reproduce it.
 const MAPPING = [
-  { global: 'holisticyearLength', view: L0.holisticH },
-  { global: 'H', view: L0.holisticH },
+  // (plan 09 step 7b: the holisticyearLength / H rows — the unit, no longer an epoch state — are deleted)
   { global: 'meanlengthofday', view: L0.lodSeconds },
   { global: 'meansiderealyearlengthinSeconds', view: L0.siderealYearSeconds },
   { global: 'meansiderealyearlengthinDays', view: L1.siderealYearDays },

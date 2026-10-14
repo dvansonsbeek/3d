@@ -33,7 +33,6 @@ export type EpochParams = {
     moonEccentricityFactor: number;
     earthMassKg: number;
     earthRadiusM: number;
-    holisticYearJ2000: number;
     lodNowH13Seconds: number;
     siderealYearJ2000Seconds: number;
     solarMassLossFracPerYear: number;
@@ -50,10 +49,6 @@ export type EpochPrimitives = {
     tMa: (year: number) => number;
     moonDistanceMetres: (year: number) => number;
     lodSeconds: (year: number) => number | null;
-    /**
-     * the UNIT: 13 × the composed lunisolar precession period
-     */
-    holisticH: (year: number) => number | null;
     siderealYearSeconds: (year: number) => number;
     /**
      * sidereal less one equinox turn per T_p(t) (the composed precession period)

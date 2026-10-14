@@ -25,9 +25,8 @@ export type DeepTimeLodConstants = {
     alpha1PerMa: number;
     alpha3PerMa3: number;
     alpha4PerMa4: number;
-    holisticYearJ2000: number;
     /**
-     * - the H/13-identity mean LOD at J2000
+     * - ω₀, the J2000 day length (the SI day since plan 09; identifier kept)
      */
     lodNowH13Seconds: number;
     meanSiderealYearJ2000Seconds: number;
@@ -96,8 +95,7 @@ export type DeepTimeLodDeps = {
  * @property {number} aMoonNowMetres - Farhat polynomial anchor
  * @property {number} alpha1PerMa @property {number} alpha3PerMa3
  * @property {number} alpha4PerMa4
- * @property {number} holisticYearJ2000
- * @property {number} lodNowH13Seconds - the H/13-identity mean LOD at J2000
+ * @property {number} lodNowH13Seconds - ω₀, the J2000 day length (the SI day since plan 09; identifier kept)
  * @property {number} meanSiderealYearJ2000Seconds
  * @property {number} solarMassLossFracPerYear
  * @property {number} precessionSolarShareJ2000 - f_S, the solar fraction of the J2000
@@ -134,7 +132,6 @@ export function createDeepTimeLod(deps: DeepTimeLodDeps): {
     lodSecondsAtAge: (t_Ma: number) => number | null;
     lodSecondsAtAgeWithAlpha: (t_Ma: number, alpha: number) => number | null;
     lodHoursAtAge: (t_Ma: number) => number | null;
-    hAtAge: (t_Ma: number) => number | null;
     lunisolarPrecessionRateArcsecPerYrAtAge: (t_Ma: number) => number | null;
     lunisolarPrecessionPeriodYearsAtAge: (t_Ma: number) => number | null;
     lunarTorqueFactorAtAge: (tMa: number) => (number | null);

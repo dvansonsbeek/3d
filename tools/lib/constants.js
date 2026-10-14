@@ -517,20 +517,26 @@ for (const [key, p] of Object.entries(planets)) {
 
 // Phase 8.3 L1: the geometry law lives ONCE in @essrt/physics/planets/geometry
 // (browser expression forms — this mirror's last-ulp variants dissolve).
-const { derivePlanetGeometry } = require('@essrt/physics/planets/geometry');
+const { derivePlanetGeometry, scaffoldOrbitInputs } = require('@essrt/physics/planets/geometry');
 const _GEOM_ENV = {
-  holisticYears: H,
   meanSolarYearDays,
   currentAUDistanceKm: currentAUDistance,
   earthEccentricityJ2000: ASTRO_REFERENCE.earthEccentricityJ2000,
   earthPerihelionLongitudeJ2000Deg: ASTRO_REFERENCE.earthPerihelionLongitudeJ2000,
 };
+// Plan 09 step 7b: the seven chain planets' scaffold geometry rides the chain's
+// own J2000 elements — a from the anchor set, the period from the fitted
+// era-window mean motion (deg per Julian year) of the governed engine-D
+// artifact (the SAME JSON the browser embeds as CHAIN_ARTIFACT); the
+// device's count-per-anchor-interval quantization is gone. The no-chain
+// bodies keep their observed period input. ONE home: planets/geometry.
+const _CHAIN_ARTIFACT = require('../../data/nbody-secular-frequencies.json');
 
 function computePlanetDerived(key) {
   const p = planets[key];
   const g = derivePlanetGeometry({
     key, type: p.type,
-    solarYearInput: p.solarYearInput,
+    ...scaffoldOrbitInputs(key, _CHAIN_ARTIFACT, p.solarYearInput),
     // Plan 07 R6: the scene's ellipse geometry read the K law's System-Reset
     // base; with the law retired it reads the OBSERVED J2000 eccentricity,
     // the value the chain is anchored on.
@@ -539,9 +545,9 @@ function computePlanetDerived(key) {
     ascendingNode: p.ascendingNode,
   }, _GEOM_ENV);
   return {
-    solarYearCount: g.solarYearCount,
     orbitDistance: g.orbitDistance,
     period: g.periodYears,
+    periodDays: g.periodDays,
     perihelionDistance: g.perihelionDistance,
     elipticOrbit: g.elipticOrbit,
     realOrbitalEccentricity: g.realOrbitalEccentricity,
@@ -565,16 +571,16 @@ function computeAdditionalDerived(key) {
   // the ellipse family for pluto/halleys/eros is NEW capability here).
   const g = derivePlanetGeometry({
     key, type: b.type || (key === 'eros' ? 'II' : undefined),
-    solarYearInput: b.solarYearInput,
+    ...scaffoldOrbitInputs(key, _CHAIN_ARTIFACT, b.solarYearInput),
     orbitalEccentricityBase: b.orbitalEccentricityBase,
     longitudePerihelion: b.longitudePerihelion,
     ascendingNode: b.ascendingNode,
     orbitDistanceOverride: b.orbitDistanceOverride,
   }, _GEOM_ENV);
   return {
-    solarYearCount: g.solarYearCount,
     orbitDistance: g.orbitDistance,
     period: g.periodYears,
+    periodDays: g.periodDays,
     perihelionDistance: g.perihelionDistance,
     elipticOrbit: g.elipticOrbit,
     realOrbitalEccentricity: g.realOrbitalEccentricity,

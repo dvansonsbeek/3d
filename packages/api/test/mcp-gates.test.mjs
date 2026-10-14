@@ -56,9 +56,10 @@ const toolCall = (name, args) => {
   /** @type {Array<[string, object|undefined, (data: any) => string|null]>} */
   const QUERIES = [
     ['essrt_versions', undefined, (d) => (d.current ? null : 'no current version')],
-    // plan 06 Phase 3: H(t) is the UNIT = 13·T_p,composed (282,329 at −380 Ma; the spin-only clock read 306,189)
-    ['essrt_epoch', { year: -379998000 }, (d) => (Math.round(d.epochs[0].h) === 282329 ? null : `Devonian H: ${d.epochs[0].h}`)],
-    ['essrt_epoch', { jd: 2451545 }, (d) => (Math.abs(d.epochs[0].h - 335317) < 1e-3 ? null : `H via jd: ${d.epochs[0].h}`)],
+    // plan 09 step 7b: the unit H left the surface; the deep-time clock is the composed precession period
+    // (21,699 yr at −380 Ma — the unit read 282,329 there, 13.011 of them)
+    ['essrt_epoch', { year: -379998000 }, (d) => (Math.abs(d.epochs[0].axialPrecessionYears - 21699) < 1 && !('h' in d.epochs[0]) ? null : `Devonian T_p: ${d.epochs[0].axialPrecessionYears} h: ${d.epochs[0].h}`)],
+    ['essrt_epoch', { jd: 2451545 }, (d) => (Math.abs(d.epochs[0].axialPrecessionYears - 25771.575) < 0.5 ? null : `T_p via jd: ${d.epochs[0].axialPrecessionYears}`)],
     ['essrt_cardinal_points', { year: 2000, types: 'SS' }, (d) => (Math.abs(d.years[0].points.SS.jd - 2451716.575) < 0.1 ? null : `SS JD: ${d.years[0].points.SS.jd}`)],
     ['essrt_earth', { year: 2000 }, (d) => (Math.abs(d.years[0].obliquityDeg - 23.4393) < 0.0002 ? null : `obliquity: ${d.years[0].obliquityDeg}`)],
     ['essrt_moon', { year: 2000 }, (d) => (Math.abs(d.years[0].distanceKm - 384400) < 1000 ? null : `moon distance: ${d.years[0].distanceKm}`)],
@@ -72,7 +73,8 @@ const toolCall = (name, args) => {
     ['essrt_climate', { year: 2000 }, (d) => (typeof d.years[0].l1OrbitalPermil === 'number' ? null : 'no L1 value')],
     ['essrt_cross_validation', { curve: 'obliquity-berger1978', year: 2000 }, (d) => (Math.abs(d.years[0].model - d.years[0].published) < 0.05 ? null : `Berger delta: ${d.years[0].delta}`)],
     ['essrt_eclipses', { kind: 'solar', startYear: 2024, stopYear: 2025 }, (d) => (d.count === 2 && d.events[0].type === 'Total' && Math.abs(d.events[0].jd - 2460409.263) < 0.01 ? null : `2024 solar: ${JSON.stringify(d.events?.map((/** @type {any} */ e) => e.type))}`)],
-    ['essrt_counterfactual', { overrides: { 'foundational.holisticyearLength': 400000 }, year: 2000 }, (d) => (Math.abs(d.epoch.h - 400000) < 1e-6 ? null : `cf H: ${d.epoch.h}`)],
+    // plan 09 step 7b: the injected constant is the obliquity anchor (the unit H left the surface)
+    ['essrt_counterfactual', { overrides: { 'earthOrbital.obliquityJ2000_deg': 23.5 }, year: 2000 }, (d) => (Math.abs(d.earth.obliquityDeg - 23.5) < 1e-6 ? null : `cf obliquity: ${d.earth.obliquityDeg}`)],
   ];
   for (const [name, args, verify] of QUERIES) {
     const { res, doc } = toolCall(name, args);

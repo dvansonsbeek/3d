@@ -84,13 +84,14 @@ function blockKpl() {
 
 function blockLunarPeriods() {
   const rows = [
-    '| age (Ma) | sidereal month (d) | perigee period (yr) | node period (yr) | H(t) (yr) | (g/g₀)^s_ϖ | (g/g₀)^s_Ω |',
+    '| age (Ma) | sidereal month (d) | perigee period (yr) | node period (yr) | T_p (yr) | (g/g₀)^s_ϖ | (g/g₀)^s_Ω |',
     '|---|---|---|---|---|---|---|',
   ];
   const DAY = 86400, YR = 365.25 * 86400;
   for (const t of [0, 0.002584, 0.01, 0.1, 1, 10, 380, 650]) {
     const sm = DT.meanMoonSiderealMonthAtAge(t), pp = DT.meanLunarPerigeePrecessionAtAge(t), np = DT.meanLunarNodePrecessionAtAge(t);
-    rows.push(`| ${t} | ${f(sm === null ? null : sm / DAY, 6)} | ${f(pp === null ? null : pp / YR, 5)} | ${f(np === null ? null : np / YR, 5)} | ${f(DT.meanHAtAge(t), 1)} | ${f(deep.modulation(t, S_W), 7)} | ${f(deep.modulation(t, S_N), 7)} |`);
+    // plan 09 step 7b: the H(t) column — the unit — is the composed precession period now
+    rows.push(`| ${t} | ${f(sm === null ? null : sm / DAY, 6)} | ${f(pp === null ? null : pp / YR, 5)} | ${f(np === null ? null : np / YR, 5)} | ${f(DT.meanLunisolarPrecessionPeriodYearsAtAge(t), 1)} | ${f(deep.modulation(t, S_W), 7)} | ${f(deep.modulation(t, S_N), 7)} |`);
   }
   return rows.join('\n');
 }
@@ -133,24 +134,21 @@ function blockTorqueSplit() {
 function blockTidalClock() {
   const s = torqueSplit();
   const rows = [
-    '| age (Ma) | a_M (km) | LOD (h) | ω/ω₀ = LOD₀/LOD | α (I/MR²) | (a₀/a)³ | **H(t), the unit (yr)** | **T_p = 1,296,000/ψ̇ (yr)** | ψ̇ (″/yr) | H(t)/T_p |',
-    '|---|---|---|---|---|---|---|---|---|---|',
+    '| age (Ma) | a_M (km) | LOD (h) | ω/ω₀ = LOD₀/LOD | α (I/MR²) | (a₀/a)³ | **T_p = 1,296,000/ψ̇ (yr)** | ψ̇ (″/yr) |',
+    '|---|---|---|---|---|---|---|---|',
   ];
-  const H0 = DT.meanHAtAge(0), Tp0 = DT.meanLunisolarPrecessionPeriodYearsAtAge(0), ratio0 = H0 / Tp0;
+  const Tp0 = DT.meanLunisolarPrecessionPeriodYearsAtAge(0);
   if (Math.abs(Tp0 - DT.certifiedAxialPrecessionJ2000Years()) > 1e-9) throw new Error(`T_p(J2000) ≠ the certified anchor: ${Tp0}`);
   for (const t of [0, 0.01, 0.1, 1, 10, 100, 380, 650, 1400, 2460]) {
     const a = DT.meanMoonDistanceMetresAtAge(t), lod = DT.meanLodSecondsAtAge(t), al = DT.earthMoiFactorAtAge(t);
-    const H = DT.meanHAtAge(t);
     const w = DT.LOD_NOW_H13_S / lod, lf = Math.pow(DT.A_MOON_NOW_M / a, 3);
     const pc = DT.meanLunisolarPrecessionRateArcsecPerYrAtAge(t);   // the ONE home's value
     const Tp = DT.meanLunisolarPrecessionPeriodYearsAtAge(t);
     if (Math.abs(pc - w * s.p0 * (s.fS + (1 - s.fS) * lf)) > 1e-9) throw new Error(`composed ψ̇ twin diverged at ${t} Ma`);
-    // S5: the unit scales WITH the period — the ratio is the invariant, and it is NOT 13
-    if (Math.abs(H / Tp - ratio0) > 1e-9) throw new Error(`H(t)/T_p(t) not invariant at ${t} Ma: ${H / Tp} vs ${ratio0}`);
-    rows.push(`| ${t} | ${f(a / 1000, 0)} | ${f(lod / 3600, 3)} | ${f(w, 5)} | ${f(al, 6)} | ${f(lf, 4)} | **${f(H, 0)}** | **${f(Tp, 1)}** | ${f(pc, 2)} | ${f(H / Tp, 5)} |`);
+    rows.push(`| ${t} | ${f(a / 1000, 0)} | ${f(lod / 3600, 3)} | ${f(w, 5)} | ${f(al, 6)} | ${f(lf, 4)} | **${f(Tp, 1)}** | ${f(pc, 2)} |`);
   }
   rows.push('');
-  rows.push(`T_p(t) is the composed lunisolar precession period on the model’s ONE J2000 reading — 1,296,000/ψ̇ with p₀ = 1,296,000/T_p(J2000) = ${f(s.p0, 4)} ″/yr, T_p(J2000) = 1,296,000/p_A on the IAU 2006 general precession input (plan 09; S5 had the retired year combs’ beat at 2000, 8 ppm faster) — \`@essrt/physics/earth/precession-composed\` built inside \`deltat/deep-time.cjs\`, one home: the hybrid precesses on it, the paleo-anchors gate checks the ψ̇ column. H(t) = H₀·(ω₀/ω)/[f_S + (1 − f_S)(a₀/a)³] is the internal UNIT (identifier \`hAtAge\`, plan 06 P4): it scales WITH T_p — the last column is constant, ${f(ratio0, 5)} — but is NOT 13 periods: H₀ was fitted on the 1246 AD perihelion–solstice alignment (the perihelion-of-date beat), so H₀/13 = ${f(H0 / 13, 1)} yr was the fit anchor’s reading, 0.086 % slow, and is not a period of anything the model computes (the "H = 13·T_p" claim is retired). (The pure spin-scaling H_era = H₀·LOD/LOD₀ was the FROZEN era clock’s own phase convention, D8’s second named counter; it left with the last comb at plan 09 step 7a.) External readings for the ψ̇ column: IAU J2000 50.288 ″/yr (measured); Wu et al. 2024 at 650 Ma 67.64 ″/yr; Meyers & Malinverno 2018 at 1400 Ma 85.79 ± 2.72 ″/yr; Lantink et al. 2022 at 2460 Ma 108.6 ± 8.5 ″/yr (all three cyclostratigraphic inferences through an assumed astronomical model — theory-vs-inference, doc 99; the last two are gate rows \`xiamaling-prec-1400\` / \`lantink-prec-2460\`).`);
+  rows.push(`T_p(t) is the composed lunisolar precession period on the model’s ONE J2000 reading — 1,296,000/ψ̇ with p₀ = 1,296,000/T_p(J2000) = ${f(s.p0, 4)} ″/yr, T_p(J2000) = 1,296,000/p_A on the IAU 2006 general precession input (plan 09; S5 had the retired year combs’ beat at 2000, 8 ppm faster) — \`@essrt/physics/earth/precession-composed\` built inside \`deltat/deep-time.cjs\`, one home: the hybrid precesses on it, the paleo-anchors gate checks the ψ̇ column. (The internal UNIT H(t) = H₀·(ω₀/ω)/[f_S + (1 − f_S)(a₀/a)³] — \`hAtAge\`, 13.011 composed periods at every epoch, a fit constant’s multiple and not a period of anything the model computes; H₀ was fitted on the 1246 AD perihelion–solstice alignment — left the physics at plan 09 step 7b, after its spin-scaling twin H_era = H₀·LOD/LOD₀, the FROZEN era clock’s counter, left with the last comb at step 7a.) External readings for the ψ̇ column: IAU J2000 50.288 ″/yr (measured); Wu et al. 2024 at 650 Ma 67.64 ″/yr; Meyers & Malinverno 2018 at 1400 Ma 85.79 ± 2.72 ″/yr; Lantink et al. 2022 at 2460 Ma 108.6 ± 8.5 ″/yr (all three cyclostratigraphic inferences through an assumed astronomical model — theory-vs-inference, doc 99; the last two are gate rows \`xiamaling-prec-1400\` / \`lantink-prec-2460\`).`);
   return rows.join('\n');
 }
 

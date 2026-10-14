@@ -45,7 +45,7 @@ const AGES_MA = [-500, -100, -5, -1, -0.3025, 0, 0.3025, 1, 5, 100, 380, 500];
 const PROBES = [
   { name: 'moonDistanceMetres', mine: L0.moonDistanceMetres, theirs: DT.meanMoonDistanceMetresAtAge },
   { name: 'lodSeconds', mine: L0.lodSeconds, theirs: DT.meanLodSecondsAtAge },
-  { name: 'holisticH', mine: L0.holisticH, theirs: DT.meanHAtAge },
+  // (plan 09 step 7b: the holisticH twins — the unit H(t) — are deleted)
   // (plan 09 step 7a: the eraClockH / eraClockTropicalYearSeconds twins — the frozen era clock's counter and base — are deleted)
   { name: 'siderealYearSeconds', mine: L0.siderealYearSeconds, theirs: DT.meanSiderealYearSecondsAtAge },
   { name: 'tropicalYearSeconds', mine: L0.tropicalYearSeconds, theirs: DT.meanTropicalYearSecondsAtAge },
@@ -107,7 +107,6 @@ const derivedParams = deriveEpochParams({
   alpha1PerMa: C.ALPHA_1,
   alpha3PerMa3: C.ALPHA_3,
   alpha4PerMa4: C.ALPHA_4,
-  holisticYearJ2000: C.H,
   meanSiderealYearSeconds: C.meanSiderealYearSeconds,
   lodJ2000Seconds: C.meanLengthOfDay,   // plan 09: ω₀ = the SI day
   sunMassKg: C.M_SUN,

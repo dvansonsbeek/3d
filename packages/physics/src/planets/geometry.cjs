@@ -8,10 +8,19 @@
  * type-branched function over a body record — the shape the model's claim
  * has always had (six laws, per-body parameters).
  *
- * EXPRESSION FORMS ARE THE BROWSER'S (the certified engine) — e.g.
- * `Math.round((H·mSY)/input)`, `((H/N)**2)**(1/3)` — so browser bit-identity
- * holds by construction; Node's last-ulp variants dissolve here (the
- * cardinal-extraction pattern).
+ * EXPRESSION FORMS ARE THE BROWSER'S (the certified engine) — so browser
+ * bit-identity holds by construction; Node's last-ulp variants dissolve here
+ * (the cardinal-extraction pattern).
+ *
+ * PLAN 09 STEP 7b: the device count is gone. The geometry used to quantize
+ * every body's period onto the unit — N = round(H·mSY/input) orbits per
+ * anchor interval, period H/N, a = (H/N)^(2/3) — a rounding of up to half a
+ * count (2.5e-4 of Neptune's period). The caller now hands in the period in
+ * SI days directly (the chain's J2000 window mean motion for the seven chain
+ * planets, the observed input for the no-chain bodies) and, where a chain
+ * exists, the chain's J2000 semi-major axis; Kepler's a from the period is the
+ * fallback for the no-chain bodies. Rotation periods are the inputs (they were
+ * rounded onto the count too), Mercury's the 3:2 lock on its orbital period.
  *
  * Type classification (the survey's measured taxonomy):
  *  - Type I  (mercury, venus): peri = a·e_real·100, elip = peri/2
@@ -40,7 +49,8 @@
  * @typedef {{
  *   key: string,
  *   type?: string,
- *   solarYearInput: number,
+ *   periodDays: number,
+ *   semiMajorAxisAu?: number,
  *   orbitalEccentricityBase?: number,
  *   longitudePerihelion?: number,
  *   ascendingNode?: number,
@@ -50,19 +60,19 @@
  */
 
 /**
- * @param {PlanetGeometryBody} body
+ * @param {PlanetGeometryBody} body — `periodDays` the body's sidereal orbital
+ *   period in SI days; `semiMajorAxisAu` the chain's J2000 a where a chain
+ *   exists (else Kepler's a from the period, in the scene's solar-year units)
  * @param {{
- *   holisticYears: number,
  *   meanSolarYearDays: number,
  *   currentAUDistanceKm: number,
  *   earthEccentricityJ2000: number,
  *   earthPerihelionLongitudeJ2000Deg: number,
- * }} env — the engine's J2000 values (browser passes its live globals at
- *   load time, preserving its original initial-derivation semantics; the
- *   epoch machinery that later mutates the browser's `let` aliases is
- *   untouched by this layer).
+ * }} env — the engine's J2000 values; `meanSolarYearDays` is the scene's
+ *   year unit (`pos` counts mean solar years), so `periodYears` is the period
+ *   in that unit, the scaffold's `speed` = 2π/periodYears.
  * @returns {{
- *   solarYearCount: number, orbitDistance: number, periodYears: number,
+ *   orbitDistance: number, periodYears: number, periodDays: number,
  *   realOrbitalEccentricity: (number | undefined),
  *   elipticOrbit: (number | undefined), perihelionDistance: (number | undefined),
  *   speedKmh: number, rotationPeriodHours: (number | undefined),
@@ -70,17 +80,18 @@
  * }}
  */
 function derivePlanetGeometry(body, env) {
-  const { key, type, solarYearInput, orbitalEccentricityBase: base,
+  const { key, type, periodDays, semiMajorAxisAu, orbitalEccentricityBase: base,
           longitudePerihelion, ascendingNode, rotationPeriodDays, orbitDistanceOverride } = body;
-  const { holisticYears: H, meanSolarYearDays: mSY, currentAUDistanceKm: AU,
+  const { meanSolarYearDays: mSY, currentAUDistanceKm: AU,
           earthEccentricityJ2000, earthPerihelionLongitudeJ2000Deg } = env;
 
-  const solarYearCount = Math.round((H * mSY) / solarYearInput);
+  const periodYears = periodDays / mSY;   // in the scene's year unit (mean solar years)
   const orbitDistance = orbitDistanceOverride !== undefined
     ? orbitDistanceOverride
-    : ((H / solarYearCount) ** 2) ** (1 / 3);
-  const periodYears = H / solarYearCount;
-  const speedKmh = (orbitDistance * AU * Math.PI * 2) / (mSY * (H / solarYearCount)) / 24;
+    : semiMajorAxisAu !== undefined
+      ? semiMajorAxisAu
+      : (periodYears ** 2) ** (1 / 3);
+  const speedKmh = (orbitDistance * AU * Math.PI * 2) / periodDays / 24;
 
   /** @type {number | undefined} */
   let realOrbitalEccentricity;
@@ -127,19 +138,37 @@ function derivePlanetGeometry(body, env) {
   /** @type {number | undefined} */
   let rotationPeriodHours;
   if (key === 'mercury') {
-    // 3:2 spin-orbit lock — period from the orbit count itself.
-    rotationPeriodHours = 24 * (mSY * H) / (solarYearCount * 3 / 2);
+    // 3:2 spin-orbit lock — three sidereal rotations per two orbits.
+    rotationPeriodHours = 24 * periodDays / (3 / 2);
   } else if (rotationPeriodDays !== undefined) {
-    rotationPeriodHours = 24 * (mSY * H) / Math.round((mSY * H) / rotationPeriodDays);
+    rotationPeriodHours = 24 * rotationPeriodDays;
   }
 
   const lowestPoint = ascendingNode !== undefined ? 180 - ascendingNode : undefined;
 
   return {
-    solarYearCount, orbitDistance, periodYears, realOrbitalEccentricity,
+    orbitDistance, periodYears, periodDays, realOrbitalEccentricity,
     elipticOrbit, perihelionDistance, speedKmh, rotationPeriodHours,
     eccentricityPerihelion, lowestPoint,
   };
 }
 
-module.exports = { derivePlanetGeometry };
+/**
+ * The scaffold's orbit inputs for one body — ONE home for the rule (plan 09
+ * step 7b): where the governed engine-D chain artifact has the body, the
+ * chain's J2000 semi-major axis and its fitted era-window mean motion (deg
+ * per Julian year → the period in SI days); otherwise the body's observed
+ * period input (the no-chain bodies Pluto, Halley, Eros, Ceres).
+ * @param {string} key
+ * @param {any} chainArtifact the CHAIN_ARTIFACT (or the governed JSON it embeds)
+ * @param {number} fallbackPeriodDays the observed period input, SI days
+ * @returns {{ periodDays: number, semiMajorAxisAu: (number | undefined) }}
+ */
+function scaffoldOrbitInputs(key, chainArtifact, fallbackPeriodDays) {
+  const w = chainArtifact && chainArtifact.windowElementRates && chainArtifact.windowElementRates[key];
+  const a = chainArtifact && chainArtifact.j2000AnchorElements && chainArtifact.j2000AnchorElements[key];
+  if (w && a) return { periodDays: 360 / w.meanMotionDegPerYr * 365.25, semiMajorAxisAu: a.aAU };
+  return { periodDays: fallbackPeriodDays, semiMajorAxisAu: undefined };
+}
+
+module.exports = { derivePlanetGeometry, scaffoldOrbitInputs };

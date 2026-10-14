@@ -46,7 +46,7 @@ const check = (label, year, got, want, tol = 1e-9) => {
 
 for (const year of YEARS) {
   const tMa = (2000 - year) / 1e6;
-  check('H(t)', year, model.epoch.hAtYear(year), dt.meanHAtAge(tMa));
+  // (plan 09 step 7b: the H(t) row left with the unit function)
   check('LOD(t)', year, model.epoch.lodSecondsAtYear(year), dt.meanLodSecondsAtAge(tMa));
   check('alpha(t)', year, model.epoch.alphaAtYear(year), dt.earthMoiFactorAtAge(tMa));
   check('moonDistance(t)', year, model.epoch.moonDistanceKmAtYear(year), dt.meanMoonDistanceMetresAtAge(tMa) / 1000);
@@ -76,15 +76,17 @@ if (model.identity.counterfactual !== false) failures.push('identity: default as
 {
   const { DEFAULT_CONSTANTS, CONSTANTS_HASH } = await import('../src/index.js');
   const altered = JSON.parse(JSON.stringify(DEFAULT_CONSTANTS));
-  altered.foundational.holisticyearLength = DEFAULT_CONSTANTS.foundational.holisticyearLength + 1000;
+  // plan 09 step 7b: the probe is the obliquity anchor (the unit H left the model; the physics
+  // counterfactual gate reads the same anchor through the assembly)
+  altered.earthOrbital.obliquityJ2000_deg = DEFAULT_CONSTANTS.earthOrbital.obliquityJ2000_deg + 0.5;
   const cf = createModel(altered, { secularSeriesArtifact });
   if (cf.identity.counterfactual !== true) failures.push('counterfactual: not flagged');
   if (!cf.identity.constantsHash || cf.identity.constantsHash === CONSTANTS_HASH) {
     failures.push(`counterfactual: hash not distinct (${cf.identity.constantsHash})`);
   }
-  const a = cf.epoch.hAtYear(2000) ?? 0;
-  const b = model.epoch.hAtYear(2000) ?? 0;
-  if (!(Math.abs(a - b) > 100)) failures.push(`counterfactual: H override did not flow (got ${a} vs ${b})`);
+  const a = cf.earth.obliquityDeg(2000);
+  const b = model.earth.obliquityDeg(2000);
+  if (!(Math.abs(a - b - 0.5) < 1e-9)) failures.push(`counterfactual: obliquity override did not flow (got ${a} vs ${b})`);
 }
 
 // Time axis: JD↔year must match the engine's _jdToSIyear exactly (the fit

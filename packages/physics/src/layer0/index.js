@@ -43,7 +43,6 @@
  * @property {number} moonEccentricityFactor     sqrt(1 - e^2)
  * @property {number} earthMassKg
  * @property {number} earthRadiusM
- * @property {number} holisticYearJ2000
  * @property {number} lodNowH13Seconds
  * @property {number} siderealYearJ2000Seconds
  * @property {number} solarMassLossFracPerYear
@@ -56,7 +55,6 @@
  * @property {(year: number) => number} tMa
  * @property {(year: number) => number} moonDistanceMetres
  * @property {(year: number) => number|null} lodSeconds
- * @property {(year: number) => number|null} holisticH               the UNIT: 13 × the composed lunisolar precession period
  * @property {(year: number) => number} siderealYearSeconds
  * @property {(year: number) => number} tropicalYearSeconds      sidereal less one equinox turn per T_p(t) (the composed precession period)
  */
@@ -98,34 +96,10 @@ export const createEpochPrimitives = ({ params: p, alphaAtAgeMa }) => {
          - p.moonMassKg * Math.sqrt(p.gmEarthMoonM3S2 * a) * p.moonEccentricityFactor);
   };
 
-  /**
-   * The unit's spin-scaling factor H₀·LOD(t)/LOD₀ — internal to holisticHCore.
-   * (Plan 09 step 7a: until then also the frozen era clock's own counter,
-   * published as `eraClockH` for the devices fitted against it — deleted with
-   * the last comb; the unit itself leaves at step 7b.)
-   * @param {number} t age in Ma
-   * @returns {number|null} years
-   */
-  const eraClockHCore = (t) => {
-    const lod = lodSecondsCore(t);
-    return lod === null ? null : p.holisticYearJ2000 * lod / p.lodNowH13Seconds;
-  };
-
-  /**
-   * The unit H(t) ≡ 13 × the composed lunisolar precession period:
-   * H_era(t) / [f_S + (1 − f_S)·(a₀/a_M(t))³] — the spin scaling AND the
-   * lunar torque growing on the recession history (plan 06 D6/Phase 3; the
-   * formula's home is earth/precession-composed, this is its Layer-0 twin,
-   * held bit-identical to deltat/deep-time.cjs by the layer0 gate).
-   * @param {number} t age in Ma
-   * @returns {number|null} years
-   */
-  const holisticHCore = (t) => {
-    const hEra = eraClockHCore(t);
-    if (hEra === null) return null;
-    const lf = Math.pow(p.moonDistanceNowM / moonDistanceMetresCore(t), 3);
-    return hEra / (p.precessionSolarShareJ2000 + (1 - p.precessionSolarShareJ2000) * lf);
-  };
+  // (Plan 09 step 7b: the unit H(t) = H₀·(LOD/LOD₀)/[f_S + (1 − f_S)(a₀/a_M)³]
+  // — `holisticH`, 13.011 composed precession periods, a fit constant's
+  // multiple of T_p(t) — and its spin-scaling factor (step 7a's `eraClockH`)
+  // are deleted. The physics is the composed precession rate below.)
 
   /**
    * Sidereal year. Driver 2 alone — solar mass loss via Kepler, `dT/T = -2 dM/M`
@@ -179,7 +153,6 @@ export const createEpochPrimitives = ({ params: p, alphaAtAgeMa }) => {
     tMa,
     moonDistanceMetres: (year) => moonDistanceMetresCore(tMa(year)),
     lodSeconds: (year) => lodSecondsCore(tMa(year)),
-    holisticH: (year) => holisticHCore(tMa(year)),
     siderealYearSeconds: (year) => siderealYearSecondsCore(tMa(year)),
     tropicalYearSeconds: (year) => tropicalYearSecondsCore(tMa(year)),
   });

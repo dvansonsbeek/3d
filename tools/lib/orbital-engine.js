@@ -135,11 +135,10 @@ function computePlanetObliquity(planetName, year) {
  */
 function computeSemiMajorAxis(planetName) {
   if (planetName === 'earth') return 1.0;
-  const p = C.planets[planetName];
-  if (!p || !p.solarYearInput) return 0;
-  const orbitCount = Math.round(C.H * C.meanSolarYearDays / p.solarYearInput);
-  const T = C.H / orbitCount;
-  return Math.pow(T * T, 1 / 3);
+  // plan 09 step 7b: the ONE scaffold geometry (constants.js derived) — the
+  // chain's J2000 a; it was Kepler's a from the device's count-quantized period
+  const d = C.derived[planetName];
+  return d ? d.orbitDistance : 0;
 }
 
 function computePerihelionAphelionDistance(eccentricity, semiMajorAxis = 1.0) {

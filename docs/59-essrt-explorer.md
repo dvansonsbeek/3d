@@ -33,8 +33,8 @@ The two-tab-row layout matches the layered look of the Earth Climate Analysis ([
 
 | Tab key | Tab label | Plotted quantity | Driver | Source helper |
 |---|---|---|---|---|
-| `axial` | **Axial Precession** | Earth's polar-axis precession period = H/13 | 1 only | `meanHAtAge(t_Ma) / 13` |
-| `obliqCycle` | **Obliquity period** | H/8 obliquity oscillation period | 1 only | `meanHAtAge(t_Ma) / 8` |
+| `axial` | **Axial Precession** | Earth's polar-axis precession period, the composed lunisolar period T_p(t) | 1 only | `meanLunisolarPrecessionPeriodYearsAtAge(t_Ma)` |
+| `obliqCycle` | **Obliquity period** | the obliquity beat 2π/(ψ̇ᵢₙ − \|s₃\|) | 1 only | the beat of the spin axis's inertial rate of date and s₃ |
 | `lod` | **Length of Day** | Earth's mean solar day length (hours) | 1 only | `meanLodSecondsAtAge(t_Ma) / 3600` |
 | `year` | **Length of Year** | Tropical year length in mean-solar days *at each epoch* | 1 + 2 | `meanTropicalYearSecondsAtAge(t_Ma) / meanLodSecondsAtAge(t_Ma)` |
 | `au` | **AU Distance** | Earth-Sun semi-major axis (km) | 2 only | `meanAuAtAge(t_Ma)` |
@@ -164,7 +164,7 @@ Full per-anchor agreement table + statistical summary at [doc 99 §"Validation a
 | Export trigger | `essrtExport(rangeKey)` |
 | Tick computer | `essrtNiceTicks(min, max, targetTicks)` — round-number Y-axis ticks |
 | Series sampler | `essrtComputeSeries(spec, t_lo, t_hi, N, planetKey)` |
-| Underlying physics | `meanLodSecondsAtAge`, `meanHAtAge`, `meanSiderealYearSecondsAtAge`, `meanTropicalYearSecondsAtAge`, `meanMoonDistanceMetresAtAge`, `meanAuAtAge`, `meanPlanetOrbitalPeriodAtAge` (all in the deep-time block of `src/script.js`) |
+| Underlying physics | `meanLodSecondsAtAge`, `meanLunisolarPrecessionPeriodYearsAtAge`, `meanSiderealYearSecondsAtAge`, `meanTropicalYearSecondsAtAge`, `meanMoonDistanceMetresAtAge`, `meanAuAtAge`, `meanPlanetOrbitalPeriodAtAge` (all in the deep-time block of `src/script.js`) |
 | Tools-menu button | "Earth–Moon Genesis Analysis" in Tweakpane Tools folder |
 | CSS | `.cfm-*` classes shared with Earth Climate Analysis + ESSRT-specific overrides |
 

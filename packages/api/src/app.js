@@ -78,7 +78,8 @@ const PLANET_ELEMENT_FRAMES = Object.freeze({
   record: 'the body’s structural inputs (IAU J2000 longitude of perihelion, Souami & Souchay 2012 node and inclination, DE440 eccentricity, the orbital-period input, the axial tilt), the DERIVED J2000 obliquity, and the two secular PERIODS 1,296,000/g and 1,296,000/s from the same chain — apsidal prograde positive, nodal regression negative. R8: the retired device’s lattice descriptors are no longer served; for a value at an epoch read the at[] rows.',
 });
 
-const EPOCH_SECTIONS = Object.freeze(['h', 'lod', 'alpha', 'deltaT', 'siderealYearSeconds', 'tropicalYearSeconds', 'moonDistanceKm', 'axialPrecessionYears']);
+// (plan 09 step 7b: the 'h' section — the unit H(t), a fit constant's multiple of the precession period — is deleted)
+const EPOCH_SECTIONS = Object.freeze(['lod', 'alpha', 'deltaT', 'siderealYearSeconds', 'tropicalYearSeconds', 'moonDistanceKm', 'axialPrecessionYears']);
 const CARDINAL_TYPES = Object.freeze(['SS', 'WS', 'VE', 'AE']);
 
 /** Eclipse search: kinds and the per-request window cap (the finder scans
@@ -142,7 +143,6 @@ export function createApi() {
   const epochRecord = (year, sections) => {
     /** @type {Record<string, unknown>} */
     const rec = { year, jd: model.time.jdFromYear(year) };
-    if (sections.includes('h')) rec.h = model.epoch.hAtYear(year);
     // The 'lod' section names its day bases (plan 08 storyline sweep): the
     // OBSERVABLE solar day of date LOD_real (the simulator's Solar Day row,
     // the registry's lodRealPhysical) and the Layer-2 tidal + GIA mean day the
@@ -434,7 +434,7 @@ export function createApi() {
           apsidal: cf.lunisolar.apsidalPeriodYearsAtYear(year),
           perihelionOfDate: cf.lunisolar.periOfDatePeriodYearsAtYear(year),
         },
-        epoch: { h: cf.epoch.hAtYear(year), lodRealSeconds: cf.epoch.lodRealSecondsAtYear(year), lodMeanSeconds: cf.epoch.lodSecondsAtYear(year), deltaTSeconds: cf.epoch.deltaTSecondsAtYear(year) },
+        epoch: { lodRealSeconds: cf.epoch.lodRealSecondsAtYear(year), lodMeanSeconds: cf.epoch.lodSecondsAtYear(year), deltaTSeconds: cf.epoch.deltaTSecondsAtYear(year) },
         earth: { obliquityDeg: cf.earth.obliquityDeg(year), eccentricity: cf.earth.eccentricity(year), inclinationDeg: cf.earth.inclinationDeg(year) },
       };
       const res = envelope({ identity: cf.identity, inputEcho: { path, overrides, year }, data });

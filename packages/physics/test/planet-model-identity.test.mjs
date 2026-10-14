@@ -33,7 +33,9 @@ const C = require(`${TOOLS_LIB}constants.js`);
 const plant = process.argv.includes('--plant');
 
 const env = {
-  holisticYears: C.H,
+  // plan 09 step 7b: the chain planets' scaffold a and period ride the governed
+  // engine-D artifact (the SAME JSON constants.js reads); the device count is gone
+  chainArtifact: require(`${TOOLS_LIB}../../data/nbody-secular-frequencies.json`),
   meanSolarYearDays: C.meanSolarYearDays,
   balancedYear: C.balancedYear,
   systemResetN: C.systemResetN,
@@ -110,7 +112,8 @@ for (const [key, p] of Object.entries(C.planets)) {
   // the K law; plan 07 R5: the invPlaneInclinationAmplitude / Mean pair went
   // with the ψ law. The 1-ULP plant now surfaces through the geometry.)
   const d = C.derived[key];
-  cmp(`${key}.solarYearCount`, d.solarYearCount, rec.geometry.solarYearCount);
+  // (plan 09 step 7b: the solarYearCount row — the device count — left; periodDays is the scaffold period)
+  cmp(`${key}.periodDays`, d.periodDays, rec.geometry.periodDays);
   cmp(`${key}.orbitDistance`, d.orbitDistance, rec.geometry.orbitDistance);
   cmp(`${key}.period`, d.period, rec.geometry.periodYears);
   cmp(`${key}.perihelionDistance`, d.perihelionDistance, rec.geometry.perihelionDistance);
@@ -122,7 +125,7 @@ for (const [key, p] of Object.entries(C.planets)) {
 for (const [key] of Object.entries(C.additionalBodies)) {
   const rec = model.bodies[key];
   const d = C.additionalDerived[key];
-  cmp(`${key}.solarYearCount`, d.solarYearCount, rec.geometry.solarYearCount);
+  cmp(`${key}.periodDays`, d.periodDays, rec.geometry.periodDays);
   cmp(`${key}.orbitDistance`, d.orbitDistance, rec.geometry.orbitDistance);
   cmp(`${key}.period`, d.period, rec.geometry.periodYears);
   cmp(`${key}.perihelionDistance`, d.perihelionDistance, rec.geometry.perihelionDistance);

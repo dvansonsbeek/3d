@@ -40,7 +40,6 @@ export function assembleModel(C: Readonly<Record<string, any>>, F: Readonly<Reco
     }>;
     epoch: Readonly<{
         yearToTMa: (year: number) => number;
-        hAtYear: (year: number) => number | null;
         lodSecondsAtYear: (year: number) => number | null;
         lodRealSecondsAtYear: (year: number) => number;
         alphaAtYear: (year: number) => number;

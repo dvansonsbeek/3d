@@ -45,8 +45,7 @@ const { createComposedPrecession } = require('../earth/precession-composed.cjs')
  * @property {number} aMoonNowMetres - Farhat polynomial anchor
  * @property {number} alpha1PerMa @property {number} alpha3PerMa3
  * @property {number} alpha4PerMa4
- * @property {number} holisticYearJ2000
- * @property {number} lodNowH13Seconds - the H/13-identity mean LOD at J2000
+ * @property {number} lodNowH13Seconds - ω₀, the J2000 day length (the SI day since plan 09; identifier kept)
  * @property {number} meanSiderealYearJ2000Seconds
  * @property {number} solarMassLossFracPerYear
  * @property {number} precessionSolarShareJ2000 - f_S, the solar fraction of the J2000
@@ -110,22 +109,18 @@ function createDeepTimeLod(deps) {
     return (s === null) ? null : s / 3600;
   }
 
-  // (Plan 09 step 7a: the FROZEN ERA CLOCK's public counter `eraClockHAtAge`
-  // — H_era(t) = H₀·LOD(t)/LOD₀, pure spin scaling, plan 06 D8's second named
-  // counter — and its year twins `eraClockTropicalYearSecondsAtAge` /
-  // `eraClockYearInDaysAtAge` are DELETED with the last comb and the ∫dt/H_era
-  // phase table. The spin-scaling helper below stays INTERNAL to hAtAge, the
-  // unit's own law, until the unit leaves at step 7b.)
+  // (Plan 09 step 7a deleted the FROZEN ERA CLOCK's public counter
+  // `eraClockHAtAge` — H_era(t) = H₀·LOD(t)/LOD₀, plan 06 D8's second named
+  // counter — with its year twins; step 7b deleted the unit itself, `hAtAge`
+  // = H_era/[f_S + (1 − f_S)(a₀/a_M)³] — H(t) was 13.011 composed precession
+  // periods, a fit constant's multiple of T_p(t), never a period of anything
+  // the model computes. The physics it scaled is the composed precession
+  // below: ψ̇(t) and T_p(t) = 1,296,000/ψ̇ are the published quantities.)
   // The `…FromLod` twins take an ALREADY-COMPUTED LOD(t): the Simpson ΔT
   // integrand below evaluated the LOD four times and the tropical year twice
   // per node through these helpers (measured 8.8 → 4.8 ms per cardinal panel
   // year with the model's ΔT memo). Same operations, same inputs — every
   // value bit-identical (11,958-value sweep, 0 differences).
-  /** The spin-scaling factor of the unit: H₀·LOD(t)/LOD₀. @param {number|null} LOD_s @returns {number|null} */
-  function eraClockHFromLod(LOD_s) {
-    if (LOD_s === null) return null;
-    return K.holisticYearJ2000 * LOD_s / K.lodNowH13Seconds;
-  }
 
   // The composed lunisolar precession rate (plan 06 D6 → Phase 3 → S5):
   // ψ̇(t) = [ω(t)/ω₀]·p₀·[f_S + (1 − f_S)(a₀/a_M(t))³], p₀ the model's
@@ -144,23 +139,6 @@ function createDeepTimeLod(deps) {
     yearToTMa: /** @param {number} year */ (year) => (2000 - year) / 1e6,
   });
 
-  /** The unit H(t) = H_era / [f_S + (1 − f_S)(a₀/a_M)³] — the internal unit
-   * scales WITH the composed lunisolar precession period (H(t)/T_p(t) =
-   * H₀/axial0 = 13.011 at every epoch) but is NOT 13 of them: H₀ was fitted
-   * on the perihelion-of-date beat, and the "H = 13·T_p" claim is retired
-   * (plan 06 S5; docs/retired-record.md). Spelled in the SAME operations as
-   * layer0's holisticHCore so the layer0 gate holds the twins bit-identical.
-   * ≡ H_era wherever (a₀/a_M)³ ≈ 1. Identifier kept (plan 06 P4).
-   * @param {number} t_Ma @returns {number|null} */
-  function hAtAge(t_Ma) {
-    return hFromLod(t_Ma, lodSecondsAtAge(t_Ma));
-  }
-  /** @param {number} t_Ma @param {number|null} LOD_s @returns {number|null} */
-  function hFromLod(t_Ma, LOD_s) {
-    const hEra = eraClockHFromLod(LOD_s);
-    const term = composed.torqueTermAtAge(t_Ma);
-    return hEra === null || term === null ? null : hEra / term;
-  }
 
   /** The composed lunisolar precession rate, ″/yr — p₀·[ω/ω₀]·[f_S + (1 − f_S)
    * (a₀/a_M)³] on the derived J2000 anchor (S5). ≡ 1,296,000·(H₀/axial0)/H(t).
@@ -185,10 +163,10 @@ function createDeepTimeLod(deps) {
     // a(t) = a₀·(1−Δm)): T ∝ M⁻² ⇒ T(t) = T₀·(1−Δm)² — the SAME Driver-2
     // law the planet chains use (orbit-chain driver2PeriodSecondsAtAge).
     // The previous (1 − 2Δm) was this law's first-order Taylor — the one
-    // form in the model inconsistent with it, and the entire source of the
-    // day-count invariant's 0.17 ppm residual: with the product form,
-    // H·(days/yr)·(AU₀/AU)² = TOTAL_DAYS_IN_H holds EXACTLY
-    // (tools/explore/deep-time-sensitivity.js §5; docs/99 §near-invariant).
+    // form in the model inconsistent with it (measured on the retired day-count
+    // identity of the era counter: with the product form the counter's
+    // H_era·(days/yr)·(AU₀/AU)² held exactly — a tautology of spin scaling ∘
+    // Kepler, deleted with the counter and the unit at plan 09 steps 7a/7b).
     return K.meanSiderealYearJ2000Seconds * (1 - mass_loss_fraction) * (1 - mass_loss_fraction);
   }
 
@@ -366,7 +344,7 @@ function createDeepTimeLod(deps) {
   }
 
   return {
-    lodSecondsAtAge, lodSecondsAtAgeWithAlpha, lodHoursAtAge, hAtAge,
+    lodSecondsAtAge, lodSecondsAtAgeWithAlpha, lodHoursAtAge,
     lunisolarPrecessionRateArcsecPerYrAtAge, lunisolarPrecessionPeriodYearsAtAge,
     // the composition's terms (plan 06 Phase 3 S3, the lunisolar surface): (a₀/a_M)³ and f_S + (1 − f_S)(a₀/a_M)³
     lunarTorqueFactorAtAge: composed.lunarTorqueFactorAtAge,

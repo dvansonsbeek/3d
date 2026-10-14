@@ -3156,34 +3156,12 @@ export const VALUES = {
         render: (v) => thousands(Math.round(v)),
         note: 'TOTAL_DAYS_IN_H × H₀/(H₀−13) — the constant of the EXACT invariant H·(sidYearSec/LOD)·(AU₀/AU)²; derived from the canonical 122,471,920 via the dual-divisor bridge, not an independent constant',
       },
-      dayCountInvariantAuCorrectedDriftPpm: {
-        get: () => {
-          // The EXACT invariant: H·(sidYearSec/LOD)·(AU₀/AU)² — SIDEREAL
-          // year seconds (the Kepler AU² factor absorbs the Driver-2 drift
-          // exactly; tools/explore/deep-time-sensitivity.js §5). Constant =
-          // TOTAL_DAYS_IN_H·H₀/(H₀−13) (totalDaysInHSiderealFrame). Residual
-          // at a deep representative epoch (4.4 Ga): floating-point rounding.
-          const au0 = dtl().meanAuAtAge(0);
-          const K = (t) => dtl().meanHAtAge(t) * (dtl().meanSiderealYearSecondsAtAge(t) / dtl().meanLodSecondsAtAge(t));
-          return Math.abs((K(4400) * Math.pow(au0 / dtl().meanAuAtAge(4400), 2)) / K(0) - 1) * 1e6;
-        },
-        render: (v) => Number(v).toFixed(2),
-        unit: 'ppm',
-      },
-      dayCountTropicalAuDriftAtGenesisPpm: {
-        get: () => {
-          // The TROPICAL-days form H·tropDays·(AU₀/AU)² vs the canonical
-          // TOTAL_DAYS_IN_H: the residual is the structural 13/H precession
-          // bridge (13 axial cycles per H — as H shrinks, 13/H grows), NOT a
-          // numerical artifact. Evaluated at the 4.4 Ga representative epoch.
-          const au0 = dtl().meanAuAtAge(0);
-          const K = dtl().meanHAtAge(4400) * dtl().meanYearInDaysAtAge(4400)
-            * Math.pow(au0 / dtl().meanAuAtAge(4400), 2);
-          return (K / totalDays0() - 1) * 1e6;
-        },
-        render: (v) => `−${Math.abs(Number(v)).toFixed(0)}`,
-        unit: 'ppm',
-      },
+      // (Plan 09 step 7b: `dayCountInvariantAuCorrectedDriftPpm` (read 995,048.65 ppm —
+      // the "exact invariant" H·(sidYearSec/LOD)·(AU₀/AU)² holds on the ERA COUNTER
+      // H_era ∝ LOD by construction, a tautology of spin scaling ∘ Kepler, and fails
+      // on the unit H(t), which this key read) and `dayCountTropicalAuDriftAtGenesisPpm`
+      // (−995,201 ppm) left with `meanHAtAge`; the day-count identity is a device
+      // record — a separate investigation topic, owner 2026-10-14.)
       essrtEffectiveDomainGyr: { get: () => astro.knownValues.patternEarthAgeGyr + astro.knownValues.essrtFormulaHorizonGyr, render: (v) => Number(v).toFixed(1), unit: 'Gyr' },
       essrtCurrentEpochPct: {
         get: () => {
@@ -3193,12 +3171,11 @@ export const VALUES = {
         render: (v) => String(Math.round(v)),
         unit: '%',
       },
-      hOneGyrAgoPct: { get: () => 100 * dtl().meanHAtAge(1000) / C.H, render: (v) => `~${Math.round(v)}`, unit: '%' },
+      // (plan 09 step 7b: `hOneGyrAgoPct` and the `hAt*` keys — the unit H(t) at dated epochs — left with meanHAtAge)
       tidalLockKm: { get: () => P().moonLockDistanceM / 1000, render: (v) => thousands(Math.round(v)), unit: 'km' },
       tidalLockRE: { get: () => P().moonLockDistanceM / 1000 / astro.physicalConstants.earthParallaxRadiusKm, render: (v) => Number(v).toFixed(1), unit: 'R_E' },
     };
     for (const [key, tOf] of Object.entries(epochs)) {
-      out[`hAt${key}`] = { get: () => dtl().meanHAtAge(tOf()), render: (v) => thousands(Math.round(v)), unit: 'yr' };
       out[`lodAt${key}Hr`] = { get: () => dtl().meanLodSecondsAtAge(tOf()) / 3600, render: (v) => Number(v).toFixed(2), unit: 'hr' };
       out[`moonDistanceAt${key}`] = { get: () => rawMoonKm(tOf()), render: (v) => thousands(Math.round(v)), unit: 'km' };
       out[`axialPrecAt${key}`] = { get: () => dtl().meanLunisolarPrecessionPeriodYearsAtAge(tOf()), render: (v) => thousands(Math.round(v)), unit: 'yr', note: 'the composed lunisolar precession period at this epoch (S5; was H(t)/13, 0.086 % slow)' };

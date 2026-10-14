@@ -108,7 +108,7 @@ _MEAN_SOLAR_YEAR_DAYS = _C['meanSolarYearDays']
 _MEAN_SIDEREAL_YEAR_DAYS = _C['meanSiderealYearDays']
 _MEAN_LENGTH_OF_DAY = _SIDEREAL_YEAR_S / _MEAN_SIDEREAL_YEAR_DAYS
 _MEAN_SIDEREAL_DAY = (_MEAN_SOLAR_YEAR_DAYS / (_MEAN_SOLAR_YEAR_DAYS + 1)) * _MEAN_LENGTH_OF_DAY
-_TOTAL_DAYS_IN_H = _C['totalDaysInH']
+# (plan 09 step 7b: _TOTAL_DAYS_IN_H left with the device-count geometry it fed)
 # (plan 09 step 4d: the J2000 anomalistic year is the one-family law of date at
 # 2000 in @essrt/physics — no constant in the bridge; Simon 1994's mean element
 # 365.259636 is a citation, astro-reference knownValues.simon1994AnomalisticYearDays)
@@ -295,22 +295,10 @@ FIB = [0, 1, 1, 2, 3, 5, 8, 13, 21, 34, 55, 89, 144, 233, 377, 610, 987, 1597]
 # ORBITAL PROPERTIES
 # ═══════════════════════════════════════════════════════════════════════════
 
-# Semi-major axes (AU) and orbital periods — computed from Holistic chain
-# Replicates constants.js section 10:
-#   solarYearCount = round(totalDaysInH / solarYearInput)
-#   orbitDistance = ((H / solarYearCount)²)^(1/3)     [Kepler's 3rd law]
-#   period = H / solarYearCount                       [in solar years]
-_SOLAR_YEAR_COUNT = {}
-SEMI_MAJOR = {"Earth": 1.0}
-ORBITAL_PERIOD = {"Earth": 1.0}
-for _p, _syi in _SOLAR_YEAR_INPUT.items():
-    _syc = round(_TOTAL_DAYS_IN_H / _syi)
-    _SOLAR_YEAR_COUNT[_p] = _syc
-    SEMI_MAJOR[_p] = ((H / _syc) ** 2) ** (1/3)
-    ORBITAL_PERIOD[_p] = H / _syc
-
-# Alias
-SMA = SEMI_MAJOR
+# (Plan 09 step 7b: SEMI_MAJOR / ORBITAL_PERIOD / SMA — the device-count
+# geometry, N = round(totalDaysInH / solarYearInput) orbits per anchor
+# interval, a = (H/N)^(2/3) — are deleted with the counts; no script imported
+# them. The scaffold geometry's one home is @essrt/physics planets/geometry.)
 
 # J2000 invariable plane inclinations (from constants.js invPlaneInclinationJ2000)
 INCL_J2000 = {p['name']: round(p['invPlaneInclinationJ2000'], 4) for p in _C['planets'].values()}

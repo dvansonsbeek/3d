@@ -27,7 +27,6 @@ import { computeSolarTorqueShare } from '../earth/precession-composed.cjs';
  * @property {number} alpha1PerMa
  * @property {number} alpha3PerMa3
  * @property {number} alpha4PerMa4
- * @property {number} holisticYearJ2000         H
  * @property {number} meanSiderealYearSeconds
  * @property {number} lodJ2000Seconds              ω₀: the J2000 day length, SI seconds (the SI day since plan 09)
  * @property {number} sunMassKg                 M_SUN
@@ -96,7 +95,6 @@ export const deriveEpochParams = (raw) => {
     moonEccentricityFactor,
     earthMassKg,
     earthRadiusM,
-    holisticYearJ2000: raw.holisticYearJ2000,
     lodNowH13Seconds,
     siderealYearJ2000Seconds: raw.meanSiderealYearSeconds,
     solarMassLossFracPerYear,

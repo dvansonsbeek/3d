@@ -53,7 +53,8 @@ const AE = CHAIN_ARTIFACT.j2000AnchorElements.earth;
 const sidDays = DT.computeSiderealYearDaysDirect(2000);
 const solDays = DT.computeSolarYearDaysDirect(2000);
 const axial0 = sidDays / (sidDays - solDays);
-const H0 = DT.meanHAtAge(0);
+// plan 09 step 7b: the of-date scaling rides the composed period directly (it was axial0·H(t)/H₀ — the same ratio, the unit deleted)
+const Tp0 = DT.meanLunisolarPrecessionPeriodYearsAtAge(0);
 const eb = seriesArt.bodies.earth;
 const hist = factory({
   zModes: ART.modes.earth.z,
@@ -66,7 +67,7 @@ const hist = factory({
   anchorAscNodeEclipticDeg: AE.ascNodeEclipticDeg,
   axialPrecessionYearsJ2000: axial0,
   obliquityJ2000Deg: C.ASTRO_REFERENCE.obliquityJ2000_deg,
-  axialPrecessionYearsAtYearFn: (yr) => axial0 * DT.meanHAtAge((2000 - yr) / 1e6) / H0,
+  axialPrecessionYearsAtYearFn: (yr) => axial0 * DT.meanLunisolarPrecessionPeriodYearsAtAge((2000 - yr) / 1e6) / Tp0,
 });
 const t0 = Date.now();
 const grid = hist.build(0, T_MIN_YR, STEP_YR);

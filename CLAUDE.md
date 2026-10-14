@@ -545,7 +545,8 @@ against DE441 (Sun vs Horizons gained +1″ per millennium on p_A) — a
 sidereal-year finding, parked; **H(t) is the internal UNIT that scales
 WITH this period but is NOT 13 of them** (H₀/T_p = 13.011: H₀ was fitted on
 the perihelion-of-date beat, so H/13 = 25,793.6 was the fit anchor's
-reading, 0.086 % slow, never a period; `hAtAge` in `deltat/deep-time.cjs`,
+reading, 0.086 % slow, never a period; the unit function `hAtAge` left the
+physics at plan 09 step 7b — T_p(t) is the published deep-time clock;
 plan 06 D6/Phase 3/S5), **the obliquity band must follow the beat
 2π/(ψ̇ᵢₙ(t) − |s₃|)** — ψ̇ᵢₙ the spin axis's INERTIAL rate, the composed
 rate × the hybrid's self-anchor factor (model v22.0: 50.385 ″/yr at J2000
@@ -567,7 +568,8 @@ constant — as a precession claim retired: it read ~35 % low against Lantink
 2022 at 2.46 Ga); plan 09 deleted the combs family by family (steps 2–6) and
 then the counter itself (`createPhaseMachinery`, `cyclesBetweenYears`,
 `eraClockHAtAge`, the cardinal record evaluator, the CSV `Cycle` column);
-the spin-scaling factor survives only INSIDE the unit's `hAtAge`. The
+the unit itself (`hAtAge`, the API's `epoch.h`, the `hAt*` registry keys)
+left at step 7b. The
 long-eccentricity band stays at its modern class (scaled
 only by the measured solar-mass history); every newly dated Precambrian
 cyclostratigraphic section tests these halves (the precession side is

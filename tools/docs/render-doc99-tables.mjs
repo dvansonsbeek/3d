@@ -182,17 +182,9 @@ function blockKeyEpochs() {
   return rows.join('\n');
 }
 
-function blockH5() {
-  const rows = ['| Age (Ma) | LOD_mean (s) | δ_LOD (ms) — the frozen device\'s ecliptic-precession term | fractional δ/LOD |', '|---:|---:|---:|---:|'];
-  for (const t of [-200, 0, 380, 1000]) {
-    const lod = lodS(t), H = DT.meanHAtAge(t), d = daysPerYr(t);
-    const delta = (lod === null || H === null || d === null) ? null : lod / ((H / 5) * d);
-    rows.push(`| ${ageLabel(t)} | ${f(lod, 1)} | ${f(delta === null ? null : delta * 1000, 3)} | ${delta === null ? '—' : (delta / lod).toExponential(3)} |`);
-  }
-  rows.push('');
-  rows.push('δ_LOD = LOD_mean / ((unit/5) · days/yr) evaluated on the shipped chain (`deltaTRawSecondsAtAge`): the frozen device\'s kinematic term, a fixed fraction of the day by construction (the unit scales with the clock and days/yr with 1/LOD).');
-  return rows.join('\n');
-}
+// (plan 09 step 7b: `blockH5` — the frozen device's H/5 ecliptic-precession
+// term of the day, δ_LOD = LOD/((H(t)/5)·days/yr), evaluated on the unit — is
+// deleted with the unit; doc 99 keeps its last render as static text)
 
 function blockSummary() {
   const g0 = cpr.find((l) => l.label === 'p+g0');
@@ -247,7 +239,6 @@ const BLOCKS = {
   'doc99-future-table': blockFuture,
   'doc99-growth-rate': blockGrowthRate,
   'doc99-key-epochs': blockKeyEpochs,
-  'doc99-h5-table': blockH5,
   'doc99-summary-table': blockSummary,
 };
 
