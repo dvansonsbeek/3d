@@ -6182,7 +6182,7 @@
   },
   {
    "file": "tools/explore/stage-c-obliquity-hybrid.mjs",
-   "line": 20,
+   "line": 23,
    "runtime": "explore",
    "token": "H / N",
    "class": "comment",
@@ -6190,7 +6190,7 @@
   },
   {
    "file": "tools/explore/stage-c-obliquity-hybrid.mjs",
-   "line": 47,
+   "line": 50,
    "runtime": "explore",
    "token": "H / N",
    "class": "explore",
@@ -6198,7 +6198,7 @@
   },
   {
    "file": "tools/explore/stage-c-obliquity-hybrid.mjs",
-   "line": 47,
+   "line": 50,
    "runtime": "explore",
    "token": "/ 13",
    "class": "explore",
@@ -8059,7 +8059,7 @@
   },
   {
    "file": "tools/verify/obliquity-hybrid.js",
-   "line": 53,
+   "line": 55,
    "runtime": "verify",
    "token": "H / N",
    "class": "diagnostic",
@@ -8067,7 +8067,7 @@
   },
   {
    "file": "tools/verify/obliquity-hybrid.js",
-   "line": 104,
+   "line": 106,
    "runtime": "verify",
    "token": "H / N",
    "class": "diagnostic",
@@ -8075,7 +8075,7 @@
   },
   {
    "file": "tools/verify/obliquity-hybrid.js",
-   "line": 104,
+   "line": 106,
    "runtime": "verify",
    "token": "/ 13",
    "class": "diagnostic",
@@ -9722,7 +9722,7 @@
  "inputs": {
   "generator": "node tools/explore/era-device-readers.mjs --write",
   "files": {
-   "data/nbody-secular-series.json": "sha256:5f626fd0c880fbbf2cee43a214d8e63fff1ef595afacbc0487e0179e10a75132",
+   "data/nbody-secular-series.json": "sha256:b777b2b903ebbbb84083b15ae5493cafe10d0568a00cae614b0121d75cdffeb6",
    "packages/api/src/app.js": "sha256:b2f1fcb9f93599f5c6b8cce103e2c095d7aca03848a72e1f6306c99263af56e4",
    "packages/api/src/mcp.js": "sha256:be585188381e09db9e3c4ee511e7458e37c943a4dff06be6e0ec03e73745ee6c",
    "packages/api/test/api-gates.test.mjs": "sha256:53e7ca655f517a258a0021d9d13e313da2a9d53168f61bbad5e3de9c4de9fdea",
@@ -9763,8 +9763,8 @@
    "tools/check-vocabulary.mjs": "sha256:f3d9a7b33f275877a18ddad00688c478bcf567ac2c85afc8c57b9c9b8338ce13",
    "tools/constants/check-literals.mjs": "sha256:0a5e53888b15c27c5c247679ca57ac20c677616ff770400ab1f7f0fc60a743ef",
    "tools/constants/generate.mjs": "sha256:4531ca5f36b10bc434a81cbcaa49a476d27569f9d8117f1b24d5292a1540c03c",
-   "tools/docs/model-values.mjs": "sha256:569717f1bd1b8f20a52fa40c8fc46c1c69a2a5033c29181689496b68c2df9d25",
-   "tools/docs/render-calculation-map.mjs": "sha256:80cdf30b7be5d8329d584a4a243ff4d71898bd823286daa6d50029ffd34115d9",
+   "tools/docs/model-values.mjs": "sha256:9ec021b168bd081e2351377f0b6fd77118df8c84be8def02320b2138b4bace64",
+   "tools/docs/render-calculation-map.mjs": "sha256:204271a75eae77b436e8d3230d1ef4c5d83baf7ab3933ba3ab99d87ff0e41ee2",
    "tools/docs/render-doc99-tables.mjs": "sha256:de48f64016f6a0f21ce2f8538b3e8f48c454feb861a43469f4008e9d5d2bb022",
    "tools/explore/climate-band-phase.js": "sha256:0b81487d4cf86717265d53e7583b63e6ff7b52a5f8d9d8c3e7c21ff975e9bbe3",
    "tools/explore/dense-targets-residual-structure.mjs": "sha256:570fcfcb01b9abcd28b38cb5b000d4b5bb21f1a1e57ad420a986b44b31766e6e",
@@ -9792,7 +9792,7 @@
    "tools/explore/pibound-experiment.mjs": "sha256:ab62e870e2984a349e8d22bd72bd057a5cdd7df298715ea0107896a28870b632",
    "tools/explore/pibound-strata-run.mjs": "sha256:2a87fa4544e75f053c16ab809c7cec049264855209679e25c1f1b3f87b8408be",
    "tools/explore/pomega-rate-distribution.mjs": "sha256:43acc950d3bb305c48d138261080c0e339acfe80389efe0454dd5a1459cc9ade",
-   "tools/explore/stage-c-obliquity-hybrid.mjs": "sha256:b49549b48eb52e673bcf633b27daabc2a2d9196d3b3e2964c3a21605385443f4",
+   "tools/explore/stage-c-obliquity-hybrid.mjs": "sha256:b1d5d59f64af940b6acc1f4c6880c7b2813566dd7099275e61e33ea1b8de5a6b",
    "tools/explore/stage-c4-cassini-landscape.mjs": "sha256:f4a6792f35ef08078218ecdbfd067f8968c4933780b9609a2a7c9a90838cff2a",
    "tools/explore/timed-babylonian-lunar-eclipses.js": "sha256:8833ed72afc790300c52e9fb01ac464c21ea6c4987b03340809265019f11dfc6",
    "tools/explore/u2-args-branch-isolation.mjs": "sha256:1cedb2998c06699db6a10b2248417579310a08203a12ae3d07b91bff3adf1d97",
@@ -9820,7 +9820,7 @@
    "tools/verify/deep-secular-modes.js": "sha256:1c5d69aaeccbb305ddd842a5c19d8945b9f2747fabef3e97dfe70bdd14d57e6d",
    "tools/verify/eclipse-audit.js": "sha256:6084a62d8e83aeb51b270122679363f5b788b6485bd52da7af729fb7d8305169",
    "tools/verify/moon-deltat-comparison.js": "sha256:62fd0a9a77f69014adc56e8c65e075a6ace8f0909e529fbd68d0764a322e73b3",
-   "tools/verify/obliquity-hybrid.js": "sha256:aa55e294850d75db8ca12e8b7bdcdcdc1195a81406ec2f7dbdbf535a0e3290fe",
+   "tools/verify/obliquity-hybrid.js": "sha256:4d7e17fb9df75b68ae9bb1aaa8b155e265f0aba7e282d437f858f736f99d2d79",
    "tools/verify/run-suite.mjs": "sha256:8bb8f7a8fcb4aaf4f46346edfc85cdf4ab2a3174f23563b121c268cdbc1aa764",
    "tools/vocabulary-ratchet.json": "sha256:07eebb75bdf2606e118947c0c283203f8ae00904ec12be94782785994af61e71"
   }

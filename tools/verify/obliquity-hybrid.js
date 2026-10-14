@@ -24,7 +24,9 @@
  *     of the IAU reference (read from the shared astro reference — E20,
  *     never retyped);
  *   - the H/8 beat inside 40–42.5 kyr (lab);
- *   - the era-slice 13-kyr rms beats the shipped fitted law's (lab).
+ *   - the era-slice 13-kyr rms beats the mode-table ε's — the same hybrid
+ *     integration on a bare createModel()'s 18-mode ζ table, the series-less
+ *     configuration (lab; the comb-era "fitted law" is deleted, plan 09).
  * The NAFF-tier truncation slopes (era-8 / full-16) are REPORTED, not
  * gated: the s₃ multiplet (three near-degenerate lines) makes any
  * truncation's local derivative ill-conditioned — measured old/new:
@@ -51,7 +53,7 @@ if (!WRITE) {
   const art = JSON.parse(fs.readFileSync(OUT, 'utf8'));
   console.log('data/obliquity-hybrid-verdict.json — current artifact');
   console.log(`  gated deps/dt(J2000) ${(art.verdict.rateSeriesArcsecPerCy ?? art.verdict.rateEraArcsecPerCy).toFixed(2)} ″/cy series-integrated (IAU ref ${art.verdict.iauRateArcsecPerCy}); H/8 beat ${art.verdict.beatKyr.toFixed(1)} kyr; NAFF-tier slopes era ${art.verdict.rateEraArcsecPerCy.toFixed(2)} / full ${art.verdict.rateFullArcsecPerCy.toFixed(2)} (reported, ill-conditioned)`);
-  console.log(`  era slice 0–13 kyr: ${art.verdict.windowsEra['13'].hybridRmsArcsec.toFixed(0)}″ vs fitted law ${art.verdict.windowsEra['13'].fittedLawRmsArcsec.toFixed(0)}″`);
+  console.log(`  era slice 0–13 kyr: ${art.verdict.windowsEra['13'].hybridRmsArcsec.toFixed(0)}″ vs the mode-table ε ${art.verdict.windowsEra['13'].modeTableRmsArcsec.toFixed(0)}″`);
   console.log('  (generator class — a plain run only prints; --write re-runs the lab)');
   process.exit(0);
 }
@@ -95,8 +97,8 @@ if (!(realizedRel <= 1e-3)) {
   process.exit(1);
 }
 const era13 = lab.windowsEra['13'];
-if (!(era13.hybridRmsArcsec < era13.fittedLawRmsArcsec)) {
-  console.error(`REFUSING: era-slice 13-kyr rms ${era13.hybridRmsArcsec.toFixed(0)}″ does not beat the fitted law's ${era13.fittedLawRmsArcsec.toFixed(0)}″`);
+if (!(era13.hybridRmsArcsec < era13.modeTableRmsArcsec)) {
+  console.error(`REFUSING: era-slice 13-kyr rms ${era13.hybridRmsArcsec.toFixed(0)}″ does not beat the mode-table ε's ${era13.modeTableRmsArcsec.toFixed(0)}″`);
   process.exit(1);
 }
 
@@ -135,4 +137,4 @@ const art = {
   ]),
 };
 fs.writeFileSync(OUT, JSON.stringify(art, null, 1) + '\n');
-console.log(`✓ wrote data/obliquity-hybrid-verdict.json — gated series rate ${seriesRate.toFixed(2)} ″/cy (IAU ${iauRate}), J2000 beat ${lab.beatKyr.toFixed(2)} kyr, realized ${rz.modelFit.periodYr.toFixed(0)} yr (predicted ${rz.modelPredicted.periodYr.toFixed(0)}, La2004 ${rz.la2004Fit.periodYr.toFixed(0)}), era 13-kyr ${era13.hybridRmsArcsec.toFixed(0)}″ vs law ${era13.fittedLawRmsArcsec.toFixed(0)}″ (NAFF-tier slopes reported: era ${lab.rateEraArcsecPerCy.toFixed(2)} / full ${lab.rateFullArcsecPerCy.toFixed(2)})`);
+console.log(`✓ wrote data/obliquity-hybrid-verdict.json — gated series rate ${seriesRate.toFixed(2)} ″/cy (IAU ${iauRate}), J2000 beat ${lab.beatKyr.toFixed(2)} kyr, realized ${rz.modelFit.periodYr.toFixed(0)} yr (predicted ${rz.modelPredicted.periodYr.toFixed(0)}, La2004 ${rz.la2004Fit.periodYr.toFixed(0)}), era 13-kyr ${era13.hybridRmsArcsec.toFixed(0)}″ vs mode-table ε ${era13.modeTableRmsArcsec.toFixed(0)}″ (NAFF-tier slopes reported: era ${lab.rateEraArcsecPerCy.toFixed(2)} / full ${lab.rateFullArcsecPerCy.toFixed(2)})`);

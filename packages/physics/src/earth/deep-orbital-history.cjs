@@ -16,10 +16,10 @@
  * shim tools/lib/deep-orbital-history.js (the deep insolation extractor),
  * and the browser's published ε surfaces (VFP chart, Earth-panel row) via
  * the generated deep-modes embed. The ERA machinery (frame conversions,
- * lunar D5, besselian, the scene's A-solve and Step 6b) stays on the
- * certified fitted law — measured: the hybrid differs from it by 5″ rms in
- * 1900–2100 / 19.5″ in 1600–2400, mostly hybrid-side there — the same
- * certification split as e and ϖ.
+ * lunar D5, besselian) rode the comb-era fitted ε law until plan 09 deleted
+ * it (measured at the time: the hybrid differed from that law by 5″ rms in
+ * 1900–2100 / 19.5″ in 1600–2400, mostly hybrid-side); since then every
+ * surface reads this hybrid — the one obliquity of date.
  *
  * The climatic precession is the PHYSICAL of-date angle from the moving
  * equinox γ = unit(ŝ×n̂) to the perihelion direction, measured in the orbit

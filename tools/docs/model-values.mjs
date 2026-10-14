@@ -2136,10 +2136,10 @@ export const VALUES = {
         render: (v) => Number(v).toFixed(0), unit: '″',
         note: 'hybrid ε vs La2004 over 0–13 kyr (the era ζ-slice of the two-tier verdict)',
       },
-      epsFittedLawRms13KyrArcsec: {
-        get: () => oh().verdict.windowsEra['13'].fittedLawRmsArcsec,
+      epsModeTableRms13KyrArcsec: {
+        get: () => oh().verdict.windowsEra['13'].modeTableRmsArcsec,
         render: (v) => Number(v).toFixed(0), unit: '″',
-        note: 'the shipped 16-harmonic fitted ε law vs La2004 over the same 0–13 kyr window — the budget the hybrid beats',
+        note: 'the same hybrid ε integration on the bare model\'s 18-mode ζ table (no series artifact — the series-less configuration) vs La2004 over the same 0–13 kyr window — the budget the series-driven ε beats (the verdict REFUSES otherwise)',
       },
       epsHybridDeepRms1MyrArcsec: {
         get: () => oh().verdict.windowsFull['1000'].hybridRmsArcsec,
@@ -2149,7 +2149,7 @@ export const VALUES = {
       epsHybridDeepCorr1Myr: {
         get: () => oh().verdict.windowsFull['1000'].hybridCorr,
         render: (v) => Number(v).toFixed(3),
-        note: 'hybrid-vs-La2004 correlation over the full megayear (the fitted law’s is negative there)',
+        note: 'hybrid-vs-La2004 correlation over the full megayear (the same hybrid on the 18-mode table reads lower there; the comb-era fitted law’s was negative)',
       },
     };
   })(),

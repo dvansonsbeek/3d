@@ -743,7 +743,7 @@ Three results, banked as the governed artifact
 `tools/explore/stage-c-obliquity-hybrid.mjs`). The registry keys
 `epsHybridRateJ2000ArcsecCy` / `epsHybridIauRateArcsecCy`,
 `epsHybridAlphaArcsecPerYr`, `epsHybridBeatKyr`,
-`epsHybridEraRms13KyrArcsec` / `epsFittedLawRms13KyrArcsec` and
+`epsHybridEraRms13KyrArcsec` / `epsModeTableRms13KyrArcsec` and
 `epsHybridDeepRms1MyrArcsec` / `epsHybridDeepCorr1Myr` read the
 artifact. **Read the live values from the artifact or the keys, never
 from this paragraph.**
@@ -755,10 +755,12 @@ quarter-percent. Second, **the H/8 identity is derived, not asserted**:
 the dominant obliquity beat emerges as |ψ̇| − |s₃| ≈ 41 kyr — the
 lattice's spin-side reading produced natively by the dynamics. Third,
 **the fidelity ladder** (vs La2004, a theory reference): the era
-ζ-slice beat the former 16-harmonic fitted law (deleted at plan 09) by an order of
-magnitude in the 13-kyr insolation window, and the full deep ζ-table
-holds a flat ~0.1° error profile with correlation ≈ 0.99 across the
-entire megayear, where the fitted law decorrelates beyond ~50 kyr. The
+ζ-slice beats the same integration on the bare model's 18-mode ζ table
+(the series-less configuration; the comb-era 16-harmonic fitted law it
+first beat by an order of magnitude is deleted at plan 09) in the 13-kyr
+insolation window, and the full deep ζ-table holds a flat ~0.1° error
+profile with correlation ≈ 0.99 across the entire megayear, where the
+mode-table ε decorrelates beyond ~50 kyr. The
 two-tier structure (era slice vs deep table) is the same measured
 era-local/deep-global tension the eccentricity story showed, resolved
 the same way. Fourth (v23.0), **the realized period is gated**: the
@@ -777,10 +779,9 @@ value). The convention catch worth recording: the J2000 celestial pole
 sits at ecliptic longitude +90°; the −90° choice produces a perfect
 ANTI-correlation — the instant tell.
 
-The shipping design (whether this replaces the fitted ε law and
-dissolves the scene's amplitude-solve) is the registered Stage-C arc in
-the plan; until it lands, the fitted law remains the certified basis
-and this section is evidence content.
+The hybrid IS the shipped ε of date (since model v15.0; the fitted ε law
+and the scene's amplitude-solve are gone) — this section is its evidence
+record, and the verdict generator is its gate.
 
 **The deep-time statement — the sharpened falsification leg 1
 (owner-adopted; plan 06 D6 fixed WHICH ψ̇(t)).** At deep time the
