@@ -181,7 +181,8 @@ const C = require(path.join(TOOLS_LIB, 'constants.js'));
 
 // ─── Config: divisors, target amplitudes, taper, fit window ───
 // The `structural` notes below are the HISTORICAL selection record, not
-// predictions (T5 verdict, data/t5-dt-stack-lattice-null.json): every period
+// predictions (the T5 verdict, recorded in docs/109 §22 — its script and
+// artifact were deleted at plan 09 step 7e): every period
 // in the millennial band lies within 0.03 % of some 8·H/n, a gcd-compliant n
 // sits inside every fitted plateau by density alone, and non-compliant
 // neighbours fit identically. The periods are fitted millennial periods at

@@ -113,12 +113,6 @@ L1_LABELS = {float(x["periodKyr"]): f"{x['family']} {x['label']}" for x in L1_LI
 sys.path.insert(0, str(SCRIPT_DIR.parent / "tools" / "fit" / "python"))
 from artifact_inputs import build_inputs_block  # noqa: E402
 
-# ── LEGACY (retired 2026-09, T1) — the 33-integer comb on 8·H/n ──────────
-# Kept ONLY as the historical record the T1 test and the doc 90–94 research
-# scripts reproduce. The fitter does not read it.
-H = 335.317
-EIGHT_H = 8 * H              # 2682.536 kyr — the legacy comb's period base
-
 # L1 ridge regularization. Acts only where the lattice is under-determined
 # (post-MPT 1000-kyr window: cond ≈ 632, max VIF ≈ 7×10⁴). No-op in regimes
 # whose window length resolves the lattice (cond ≤ 3). See doc 92 §9.5.
@@ -127,28 +121,6 @@ L1_RIDGE_LAMBDA = 1.0
 # ─────────────────────────────────────────────────────────────────────────
 # Three-layer specification (the formula's structural commitment)
 # ─────────────────────────────────────────────────────────────────────────
-
-LEGACY_L1_LATTICE_INTEGERS = sorted([
-    # Canonical 25 (doc 91 §2.2 + pre-MPT additions from §3.3)
-    9, 12, 14, 16, 18, 20, 21, 22, 25, 28, 30, 31, 35,
-    38, 39, 48, 50, 53, 65, 66, 68, 73, 76, 113, 120,
-    # 6 precession-band sidebands (Round 1 A1; MTM-significant, on-lattice at higher N)
-    96, 107, 110, 134, 152, 185,
-    # Berger quintet completion: k+g₃ Earth climatic precession at ~19 kyr.
-    # Subthreshold in LR04 (amp/median 2.03×) but 3σ-significant in Cheng monsoon (3.6×).
-    # Combines with k+g₅ (n=113) to produce the 95-kyr eccentricity beat at n=28
-    # (Wigley 1976 / Berger 1978 combination tone: 1/95 ≈ 1/19 − 1/23.7).
-    141,
-    # Earth's own eccentricity line: 8H/24 = H/3 = 111.8 kyr, the one-law e(t)
-    # (doc 94 §10). Admitted on the regime rule (doc 91): 1.64× median amplitude
-    # and cross-validated positive (+0.0144) in pre-iNHG, rank 3/33 there; the
-    # record's own free-period best is 112.7 kyr (8H/23.8), 8H/23 and 8H/25
-    # rejected out of sample. Subthreshold on full LR04 (0.79× median), like
-    # the six pre-MPT-only members. The only divisor attributed to Earth's
-    # eccentricity rather than a planetary beat; no secular-theory counterpart.
-    24,
-])
-L1_LATTICE_INTEGERS = LEGACY_L1_LATTICE_INTEGERS   # historical alias — NOT the shipped L1
 
 L2_THERMOSTAT_FAMILY = {
     "405-kyr (fundamental)":  404.5,
@@ -163,43 +135,6 @@ L3_TRANSITIONS_MA = {
     "MMCT":  14.0,
     "iNHG":   2.7,
     "MPT":    1.0,
-}
-
-# LEGACY per-integer labels of the retired comb (historical record only)
-LEGACY_L1_LABELS = {
-    9:   "g₂−g₇ Venus-Uranus ecc / Mercury Axial = 8H/9",
-    12:  "s₅−s₁ Jupiter-Mercury nodal",
-    14:  "g₂−g₈ Venus-Neptune ecc",
-    16:  "Mars Axial = 8H/16",
-    18:  "s₄−s₆ Mars-Saturn nodal",
-    20:  "g₃−g₂ Earth-Venus ecc",
-    21:  "Mars Obliq / Jupiter Axial = 8H/21",
-    22:  "s₂−s₄ Venus-Mars nodal / g₄−g₂ (Round 1 C8: highest L2 ratio at 12.84)",
-    24:  "Earth's own H/3 eccentricity line (the one-law e(t); no secular-theory counterpart — pre-iNHG regime admission, doc 94 §10)",
-    25:  "s₁−s₄ Mercury-Mars nodal (100-kyr centroid)",
-    28:  "g₄−g₅ Mars-Jupiter ecc (Berger 95k)",
-    30:  "g₃−g₇ Earth-Uranus ecc",
-    31:  "g₄−g₇ Mars-Uranus",
-    35:  "s₄−s₈ Mars-Neptune nodal (75.98 kyr, 0.9%) — lattice-exact: Mars.Peri_ecl(36) − Venus.AscNode(1), the 8H-modulation sideband of the Mars perihelion line",
-    38:  "s₈−s₃ Neptune-Earth nodal",
-    39:  "s₅−s₃ Earth nodal",
-    48:  "s₇−s₆ Uranus-Saturn nodal",
-    50:  "g₆−g₅ Saturn-Jupiter ecc",
-    53:  "s₆−s₈ Saturn-Neptune nodal (50.52 kyr, 0.2%) — lattice-exact: Mars.AscNode(64) − Uranus.AscNode(11) (= Mars.Ecc(52) + Venus.AscNode(1), the 8H sideband of the Mars eccentricity line)",
-    65:  "k+s₃ Earth obliquity (Berger 41k)",
-    66:  "obliquity-band arithmetic-mean (Round 2 C10: EPICA CO₂ ratio 15.79)",
-    68:  "k+s₄ Berger Mars obliquity sub-peak",
-    73:  "2|s₄| Mars nodal harmonic",
-    76:  "g₄−s₃ Mars-Earth beat",
-    96:  "k+g₆ Saturn climatic precession sub-peak (Round 1 A1 sideband)",
-    107: "k+g₇ Uranus climatic precession sub-peak (Round 1 A1)",
-    110: "k+g₃ Earth secondary precession sideband (Round 1 A1)",
-    113: "k+g₅ Jupiter climatic precession (Berger 23.7k)",
-    120: "k+g₂ Venus climatic precession = H/15",
-    134: "k+g₅ Jupiter precession sub-peak (Round 1 A1)",
-    141: "k+g₃ Earth climatic precession — Berger quintet 19-kyr peak (subthreshold LR04, 3σ in Cheng monsoon; beats with n=113 to form n=28 per Wigley 1976)",
-    152: "k+g₄ Mars climatic precession sub-peak (Round 1 A1)",
-    185: "k+g₂ Venus precession sub-peak (Round 1 A1)",
 }
 
 # Regime windows (kyr BP)

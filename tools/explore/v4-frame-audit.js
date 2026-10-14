@@ -29,7 +29,7 @@ const P_T2 = 1.1054348 * A2D;                      // IAU2006 p_A T² coefficien
 const e0 = C.ASTRO_REFERENCE.earthEccentricityJ2000;
 const edot = C.ASTRO_REFERENCE.earthEccentricityDotJ2000;   // per cy
 const KAPPA = 3 * e0 * edot / (1 - e0 * e0);                // d ln(strength)/dT per cy
-const P_DEGCY = 360 * 13 / 335317 * 100;                    // the retired device's p (13 turns per the unit 335,317 yr), deg/cy — frozen record (plan 09 step 7c)
+const P_DEGCY = 360 / C.axialPrecessionJ2000Years * 100;    // the general precession, deg/cy, from the published J2000 precession period (plan 09 step 7e)
 
 // Meeus Ch.47 of-date rates and T² coefficients
 const LPR = 481267.88123421, MPR = 477198.8675055, FR = 483202.0175233;

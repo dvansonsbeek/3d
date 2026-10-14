@@ -293,7 +293,7 @@ const NOT_IN_SCRIPT = {
     'Chapront (2002) obliquity citation values — consumed only by the model-values '
     + 'registry (obliqChapront* keys) for the Model-vs-literature tables; the browser '
     + 'never quotes them',
-  'astro.knownValues': 'validation targets, consumed by tools/explore/moon-cycles.js only',
+  'astro.knownValues': 'validation targets for the model-values registry (the comb-era moon-cycles.js reader was deleted at plan 09 step 7e)',
   'astro.moonMeeus.elpW1T2Decomposition_arcsecPerCy2': 'ELP W1 T^2 budget — analysis only, tools/explore/v4-kpl-budget.js',
   'astro.cardinalPointAnchors': 'the observed USNO 2000 cardinal instants (UTC, minute precision) — reference data, '
     + 'no runtime reader (the cardinal instants are createModel().cardinal); quoted by the pipeline verifier\'s '

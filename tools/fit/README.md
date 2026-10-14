@@ -234,9 +234,7 @@ then `npm run constants:generate` (Step 9).
 | `ascnode-correction.js` | `ascNodeTiltCorrection`, `startpos` | `data/reference-data.json` |
 | `moon-eclipse-optimizer.js` | NOTHING (RETIRED at plan 06 R3 item 1 — kept as the record) | Formerly `moonMeeusLpCorrection` + `MOON_CORRECTION` against 58 solar eclipses (2000–2025) + a JPL baseline. Both are retired: measured against Horizons' apparent Moon the series needs no anchor (−1.0″ ± 1.5″, 1970–2049), the +32.75″ was the eclipse tier's mean Sun compensated (κ + the I2 long inequality + the trend-ΔT offset), and the RA/Dec patches were fitted around the retired D5 aberration layer (docs/66 §1.4). `moonStartpos*` values are J2000-element anchored via the in-sim meters (docs/66 §4) and are NO LONGER fitted |
 | (`python/fit_perihelion_harmonics.py` / `python/verify_perihelion_erd.py`) | DELETED at plan 09 step 4 with `PERI_HARMONICS_RAW` / `PERI_OFFSET` — Earth's perihelion of date is the series' ϖ (`createModel().earth.perihelionLongitudeDeg`) | — |
-| `python/planet_eccentricity_jpl.py` | Planet `orbitalEccentricityBase` values | JPL Horizons (cached in `data/`) |
 | `dt-corrections-fit.js` | `data/deltaT-4flag-fit.json` — cascaded LSQ fit of the 4-flag ΔT correction stack (Bond n=1830 · 1466 yr, Hallstatt n=1104 · 2430 yr, Jose5 n=2989 · 897 yr, Jose4 n=3749 · 716 yr — n the divisor of the anchor's eight-unit interval, an identifier: the periods are what the stack carries) against the Stephenson 2016 residual. Sole authoritative source of the shipped `BOND_/HALLSTATT_/JOSE5_/JOSE4_ COS_/SIN_COEFF_S` constants. See "Phase 8" below. **JOINT WORLD (since 2026-07-23): `--joint` is the AUTHORITATIVE fit** — 4 flags + Core-mantle swing in one equality-constrained solve (hard USNO closure row, amplitude caps, resonator phases locked as unit shapes, free intercept = trend anchor). `--joint --write` ships the coefficients + anchors atomically (current joint optimum: USNO 86,400.0017, deltaTStart 55.85, Espenak fit-target RMS 12.60 s, full-window 31.27 s — read the live values from `data/deltaT-4flag-fit.json → optimum` and the stage-3 validation artifact, never from this sentence). The legacy single-shot cascade remains as a stage-wise diagnostic — **its `fit_metrics.stage_*` entries in `deltaT-4flag-fit.json` rank the flags differently from the shipped fit and must not be used to judge whether a flag earns its place** (worked example and the correct method in [doc 105](../../docs/105-dt-stack-flag-audit.md)); the resonator is default-ON runtime-wide (opt-out `DT_RESONATOR_DISABLED=1`; `DT_CORRECTIONS_DISABLED=1` alone still yields the fully-raw fitting residual via the integrator master-gate). | Stephenson 2016 spline (`public/input/stephenson-2016-deltaT-polynomial.json`) − pure-tidal framework model (`tools/lib/deep-time.js`, bypassed via `DT_CORRECTIONS_DISABLED=1`) |
-| `../../scripts/lattice_harmonic_scan.py` | `data/lattice-scan-<tag>.json` — universal harmonic-divisor scan across multiple paleoclimate archives (Steinhilber solar Φ, Stephenson ΔT, Cheng speleothem δ18O, EPICA CO2, LR04 δ18O). Enumerates gcd-compliant divisors in a period band, fits each candidate against each dataset, ranks by cross-dataset consistency. Used to identify Jose4 (4×Jose 715 yr) as the 4th flag with cross-archive coherence. | Multiple paleoclimate proxies in `data/` and `public/input/` |
 | `data/core-mantle-resonator-stage1.json` (artifact — no shipped generator) | the **Core-mantle swing (Resonator driver)** shipped block: a 2-kick EPISODE (windowed damped oscillation, T₀ = (eight-unit interval)/`RES_T0_LATTICE_N` ≈ 3,916 yr, divisor-labeled, Q, kick epochs/coefficients, phase-locked drive tone). Selection rule: pinned-lattice-T₀ guard-passers first (guard-aware solver — modern-window δLOD penalty rows). **Regeneration in the joint world: amplitudes refit automatically via `--joint --write` (tone menu derives from the active flags — generic over flag count). The episode CONVENTION (T₀ ≈ 3,916 yr = the eight-unit interval/685, Q = 1.8, epochs −1600/+1600, impulse-consistent shapes) is a DOCUMENTED CONVENTION, not a build-time derivation — it is not re-derivable from anything in this repo. Its evidence is the tracked result JSONs (`data/core-mantle-resonator-*.json`) plus the docs/104 narrative; the stage-1/stage-3/impulse scripts that originally established it ran against the pre-joint world, cannot reproduce today's numbers, and are deliberately not shipped.** Kick epochs are a documented CONVENTION, not data-pinned — see the stage-3 stability artifact before moving them. | Stephenson residual after the shipped stack (node bridge to `tools/lib/deep-time.js`) + `data/deltaT-4flag-fit.json` (parents' phases for the locked tones) |
 | `data/core-mantle-resonator-stage3-stability.json` (artifact — no shipped generator) | kick-epoch stability: coordinate refinement, ridge map + 2% stability box, era jackknife. Verdict 2026-07: epochs NOT data-pinnable (broad t_exc/T₀ ridge, era-dependent jackknife) → shipped epochs stand as convention. | same residual |
 | `validate-resonator.js` | `data/core-mantle-resonator-stage3-validation.json` — runtime OFF/ON validation sweep of the CURRENT world (pipeline step: run after every `--joint --write` + sync): J2000 invariants, Layer-3 USNO anchor, Stephenson/Espenak-window RMS, deep-time bit-identity ±200 Myr. Joint-world reference values: ON Stephenson RMS ≈ 31.3 s, Espenak window ≈ 12.1 s. | production chain (`tools/lib/deep-time.js`) |
@@ -832,19 +830,20 @@ Step 11 (= pipeline step 7c — the runner executes it in a normal pass;
          Step 6a (nor the frozen era clock) and do NOT affect the
          model-values registry.
 
-         Candidate identification: `scripts/lattice_harmonic_scan.py` cross-
-         validates harmonic divisors against multiple paleoclimate archives
-         (Steinhilber solar Φ, Stephenson ΔT, Cheng speleothem, EPICA CO2,
-         LR04). Jose4 was selected as the tightest structural anchor
-         (0.083% to 4×Jose) with cross-archive coherence in Steinhilber + EPICA.
+         Candidate identification: the comb-era cross-archive scan (deleted
+         with its artifacts at plan 09 step 7e; docs/109 §22 is its record)
+         cross-validated candidate periods against multiple paleoclimate
+         archives (Steinhilber solar Φ, Stephenson ΔT, Cheng speleothem,
+         EPICA CO2, LR04). Jose4 was selected as the tightest structural
+         anchor (0.083% to 4×Jose) with cross-archive coherence in
+         Steinhilber + EPICA.
 
-         Rollback history (research trail): Eddy (n=2684, 999 yr) and Emp862
-         (n=3111, 862 yr) were tested as 5th/6th flags and rolled back —
+         Rollback history (research trail): Eddy (999 yr) and Emp862
+         (862 yr) were tested as 5th/6th flags and rolled back —
          Eddy caused L-5b regression via Bond-amp inflation; Emp862 made the
          6-cycle fit rank-deficient. Both are documented in the fit tool's
-         CONFIG.cycles rollback comments and preserved as research artifacts
-         in `data/lattice-scan-*.json`. See docs/102 § "Companion 8H lattice
-         harmonics" for the full investigation trail.
+         CONFIG.cycles rollback comments. See docs/102 § "Companion
+         harmonics" for the investigation trail.
 
          After the joint fit: Step 9 regenerates the constants module for
          `src/script.js` (`tools/lib/deep-time.js` reads the JSONs directly),

@@ -86,7 +86,7 @@ physics error.
 ### The stale-constant trap, demonstrated
 
 This skill originally quoted `86399.99967739309` — taken from memory, which had
-taken it from a **pre-refit fit artefact** (`data/deltaT-bond-cycle-residual-fit.json`).
+taken it from a **pre-refit fit artefact** (the comb-era Bond-cycle residual fit, since deleted).
 It was 1.42e-6 s wrong and had propagated into a reference document as well.
 Three independent code paths agreed on the correct value the whole time.
 

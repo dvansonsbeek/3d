@@ -67,8 +67,9 @@
  *       besselian.cjs), so a Sun-only nutation term is a frame
  *       inconsistency for elongation. Removed: the nutation-free syzygy
  *       fleet improves 3.877 → 3.756″ and the fuller-bridged Sun
- *       comparison 2.344 → 2.123″ (fq7s-jpl-preview.mjs --no-2le;
- *       fq7s-annual-channel.mjs). This file now carries ZERO fitted
+ *       comparison 2.344 → 2.123″ (measured by the fq7s preview and
+ *       annual-channel instruments, deleted at plan 09 step 7e — docs/109
+ *       §22). This file now carries ZERO fitted
  *       constants. The Earth-around-EMB wobble is DERIVED: amplitude
  *       a_M·μ/AU with μ = 1/(1+M_E/M_M), injected by the model wiring
  *       from live package constants (6.4399″ at current constants), sign

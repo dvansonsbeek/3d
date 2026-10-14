@@ -339,7 +339,7 @@
     "generator": "node tools/verify/measure-rms-by-epoch.js --write",
     "files": {
       "data/jpl-cache.json": "sha256:221582af7d1e956fd20e58a2b32f2c956a6d1ec1f8d17d3f24c7730a269205d1",
-      "packages/physics/src/planets/chain-artifact.js": "sha256:bee91a5531830b00cbdefd88008c18bc812fc1686b735a8dbf2e6d01402d1516",
+      "packages/physics/src/planets/chain-artifact.js": "sha256:dde9d602bcac69a020ee420037f66d2693dddbb0dcd652fff5d0e5a9255c09c3",
       "packages/physics/src/planets/keplerian-chain.cjs": "sha256:75cdaeae146100354b883d6fefff48d16d54d6d1e363a8b9d6514c988f7760c2",
       "tools/lib/scene-graph.js": "sha256:1bcf4ac65d8b2136214f2c2d5304820667b21941cb181a984d1dd866702b691d",
       "tools/verify/measure-rms-by-epoch.js": "sha256:f2f02f39cb2df61e62bd5d928f1470ce30c9a058d1a7022db603b13f002ec122"

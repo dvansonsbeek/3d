@@ -45,8 +45,8 @@ SCRIPT_DIR = Path(__file__).resolve().parent
 sys.path.insert(0, str(SCRIPT_DIR))
 
 from milankovitch_climate_formula import (
-    ClimateFormula, REGIME_WINDOWS, EIGHT_H, H,
-    load_lr04, load_epica_co2, preprocess, L1_LATTICE_INTEGERS,
+    ClimateFormula, REGIME_WINDOWS,
+    load_lr04, load_epica_co2, preprocess,
 )
 from milankovitch_insolation_extension import (
     load_insolation_features, interp_features, build_insolation_matrix,

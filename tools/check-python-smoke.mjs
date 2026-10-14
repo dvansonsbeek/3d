@@ -12,8 +12,7 @@
  * THREE STAGES, cheapest first, each on its own evidence:
  *   A  SYNTAX — `ast.parse` every .py under scripts/, tools/lib/python and
  *      tools/fit/python. Stdlib only, so it always runs (CI included).
- *   B  THE BRIDGE — import constants_scripts, planet_beats and
- *      predictive_formula in a subprocess. Stdlib only (the constants are
+ *   B  THE BRIDGE — import constants_scripts in a subprocess. Stdlib only (the constants are
  *      loaded through load_constants' JSON read); always runs. THIS is the
  *      stage that would have caught the months-long rot.
  *   C  THE SCRIPTS — import every scripts/*.py as a module (main guards keep
@@ -60,12 +59,12 @@ if (parse.status !== 0) {
 }
 
 // ── B: the bridge ──────────────────────────────────────────────────────────
-const bridge = spawnSync(PY, ['-c', `import sys\nsys.path[:0]=[${JSON.stringify(join(ROOT, 'tools/lib/python'))}, ${JSON.stringify(join(ROOT, 'tools/fit/python'))}]\nimport constants_scripts, planet_beats\nprint(len([k for k in dir(constants_scripts) if k.isupper()]))`], { encoding: 'utf-8', cwd: ROOT });
+const bridge = spawnSync(PY, ['-c', `import sys\nsys.path[:0]=[${JSON.stringify(join(ROOT, 'tools/lib/python'))}, ${JSON.stringify(join(ROOT, 'tools/fit/python'))}]\nimport constants_scripts\nprint(len([k for k in dir(constants_scripts) if k.isupper()]))`], { encoding: 'utf-8', cwd: ROOT });
 if (bridge.status !== 0) {
   failures.push(`B bridge: ${bridge.stderr.trim().split('\n').slice(-1)[0]}`);
-  console.log(`  B  bridge     FAIL — constants_scripts / planet_beats do not import:\n${bridge.stderr}`);
+  console.log(`  B  bridge     FAIL — constants_scripts does not import:\n${bridge.stderr}`);
 } else {
-  console.log(`  B  bridge     constants_scripts + planet_beats import (${bridge.stdout.trim()} constants; plan 09 step 5a: the kinematic mirror predictive_formula.py is retired)`);
+  console.log(`  B  bridge     constants_scripts imports (${bridge.stdout.trim()} constants; plan 09 step 5a retired the kinematic mirror predictive_formula.py, step 7e the comb-era planet_beats.py)`);
 }
 
 // ── C: the scripts ─────────────────────────────────────────────────────────

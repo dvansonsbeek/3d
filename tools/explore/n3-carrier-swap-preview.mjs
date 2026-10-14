@@ -19,7 +19,7 @@
 import { fileURLToPath } from 'node:url';
 import { readFileSync } from 'node:fs';
 const HERE = fileURLToPath(new URL('.', import.meta.url));
-const { createModel, DEFAULT_CONSTANTS } = await import(new URL('../../packages/physics/src/index.js', import.meta.url).href);
+const { createModel, DEFAULT_CONSTANTS, computeMeanTropicalYearJ2000Days } = await import(new URL('../../packages/physics/src/index.js', import.meta.url).href);
 const { createSunPlanetaryCompletion } = await import(new URL('../../packages/physics/src/eclipse/sun-planetary-completion.cjs', import.meta.url).href).then((m) => m.default ?? m);
 
 const model = createModel(DEFAULT_CONSTANTS);
@@ -37,8 +37,7 @@ const EMB_WOBBLE_AS = (C.moonReference.moonDistance / (1 + C.physicalConstants.M
 // this constructor mirrors the model wiring. The pre-swap measurements this
 // instrument recorded (its reason for existing) compared the v2 module; the
 // "shipped vs framework" sections below now read as parity checks.
-const _n3H = 335317;   // the retired era unit and its rounded mean-tropical-year input (plan 09 step 7c) — frozen record
-const _n3mSY = Math.round(365.2422 * (_n3H / 8)) / (_n3H / 8);
+const _n3mSY = computeMeanTropicalYearJ2000Days(C.yearLengthRef.siderealYear, C.earthOrbital.generalPrecessionJ2000_arcsecPerYr);   // the derived mean tropical year (plan 09 step 7e)
 const _n3dpc = (/** @type {number} */ f) => 360 * 36525 * f;
 const SHIPPED_RATES = {
   planets: ['mercury', 'venus', null, 'mars', 'jupiter', 'saturn'].map((k) => (k ? _n3dpc(1 / C.planetOrbitalElements[k].solarYearInput) : _n3dpc(1 / _n3mSY))),

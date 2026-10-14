@@ -131,9 +131,9 @@ non-commercial.
 Download: <https://www.sidc.be/SILSO/datafiles> — monthly mean total sunspot
 number, CSV. Save to the path above.
 
-Used by `scripts/solar_8H_lattice_test.py`. The derived result
-(`data/solar-8H-lattice-test.json`) remains tracked: computed statistics are not
-the licensed dataset.
+Formerly used by the comb-era solar lattice test (its script and derived
+result were deleted at plan 09 step 7e); the download path stays for any
+future reader.
 
 ### Snyder (2016) source data — © Springer Nature
 

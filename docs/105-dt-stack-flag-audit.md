@@ -163,8 +163,9 @@ refit and a reship. **The taper width is a safety choice, not a derived value.**
 
 ### Per-flag archive support
 
-`scripts/lattice_harmonic_scan.py --candidates 1830,1104,2989,3749 --datasets all`
-(✓ = amplitude exceeds the 95th-percentile permutation threshold):
+From the retired cross-archive scan at the four shipped periods (the script
+was deleted at plan 09 step 7e; [doc 109 §22](109-model-nbody-engine-and-lattice-test.md)
+is its record; ✓ = amplitude exceeds the 95th-percentile permutation threshold):
 
 | flag | Steinhilber 9.4 kyr | EPICA 803 kyr | Cheng 639 kyr | LR04 | Stephenson ΔT |
 |---|---|---|---|---|---|
@@ -207,7 +208,6 @@ Does **not** establish:
 
 - `tools/fit/README.md` — the fit pipeline and Step 7c
 - `tools/fit/dt-corrections-fit.js` — `--joint`, `DT_FLAGS`, `DT_FIT_WINDOW`, `DT_FIT_DUMP`
-- `scripts/lod_residual_shipped_stack_cv.py` — unconstrained-OLS CV of the shipped periods
-- `scripts/lattice_harmonic_scan.py` — the cross-archive permutation scan
+- the unconstrained-OLS CV of the shipped periods and the cross-archive permutation scan — deleted at plan 09 step 7e, record in [doc 109 §22](109-model-nbody-engine-and-lattice-test.md)
 - `docs/102` § "Defensible scientific position" item 7 — the climate correspondence
 - `docs/104` — the Core-mantle swing

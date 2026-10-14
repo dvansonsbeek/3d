@@ -158,4 +158,4 @@ export const DEEP_MODES_ARTIFACT: Readonly<{
     anchorZDotPerYr: number[];
     slopeTaperYears: 27943.083333333332;
 }>;
-export const DEEP_MODES_ARTIFACT_HASH: "fcd7c1d260389622";
+export const DEEP_MODES_ARTIFACT_HASH: "87c325fac77d94a4";

@@ -1303,7 +1303,7 @@ This mirrors Driver 1's effect on the spin tier: there, Earth's spin-tier period
 | Driver 1 (Earth-Moon tidal) | Earth's spin-tier periods (the precession period, the obliquity beat, the day) | Lengthen past → future | T_p grows from <!--v:axialPrecAtDevonian-->21,699<!--/v--> yr → <!--v:axialPrecAt200MyrFuture-->28,208<!--/v--> yr (+30 % over 580 Myr) |
 | Driver 2 (Solar mass loss) | Spatial lattice (planet a, Earth-planet d) | Shrinks in past → grows in future | Whole solar system −35 ppm at Devonian, +35 ppm at +200 Myr |
 
-**Reproducibility**: all values in this section verified via `scripts/devonian_cross_check.py` STEPS 9d-9e (per-planet semi-major axes and Earth-planet time-averaged distances).
+**Reproducibility**: the values in this section were verified by the Devonian cross-check script (per-planet semi-major axes and Earth-planet time-averaged distances), deleted at plan 09 step 7e as a comb-era instrument; the live deep-time surfaces are the API's epoch tools and the Python bridge.
 
 ---
 
@@ -1454,7 +1454,7 @@ A single smooth two-layer formula. Past 4.5 Gyr the smooth base matches Farhat 2
 - Future LOD approaches the tidal-lock asymptote (LOD → ∞ at a → <!--v:tidalLockKm-->555,623<!--/v--> km, reached ~50 Gyr ahead)
 - Single smooth formula, no piecewise discontinuities
 
-**Verified key epochs** (with proper-physics formula, from `scripts/devonian_cross_check.py`):
+**Verified key epochs** (with the proper-physics formula; the Devonian cross-check script that printed them was deleted at plan 09 step 7e):
 
 <!-- generated:doc99-key-epochs -->
 | Age (Ma) | LOD (s) | LOD (hr) | Moon distance (km) | T_p (yr) | obliquity beat (kyr) |
@@ -2480,9 +2480,7 @@ All values written by the engine (`npm run docs:doc99:write`). The frozen era cl
 
 ## Scripts and supporting docs
 
-- `scripts/eight_h_history.py` — paleo-H computation from LOD evolution
-- `scripts/paleo_l1_renumbering.py` — paleo L1 beat prediction (note: under "view 1" naming for k-involving beats; same formulas apply to view 2 if extended to all L1)
-- `scripts/paleo_lod_comparison.py` — LOD model comparison
+- the comb-era paleo scripts (the unit history, the paleo line renumbering, the paleo-LOD comparison) were deleted at plan 09 step 7e; [doc 109 §22](109-model-nbody-engine-and-lattice-test.md) is their record
 - Test C series (validation in deep time) — the first-pass ECS decomposition is archived; doc 92 carries the current climate results
 - Doc 98 (action-angle closure as the underlying mechanism, written in the retired integer-label framing) — archived
 

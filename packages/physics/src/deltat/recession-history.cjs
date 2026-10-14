@@ -4,7 +4,8 @@
  *
  * Background (docs/99 §"The ungated mid-Precambrian window", docs/106 §D,
  * and the research record in tools/explore/{farhat-divergence-probe,
- * regime-aware-recession-study,fit-regime-recession}.js): Farhat 2022's
+ * fit-regime-recession}.js — the hand-shaped regime-aware-recession-study.js
+ * was deleted at plan 09 step 7e): Farhat 2022's
  * central result is that lunar recession followed a resonant STAIRCASE —
  * a single smooth quartic anchored at the modern LLR rate, the gated
  * 0–650 Ma era and the Roche crossing cannot follow it through the

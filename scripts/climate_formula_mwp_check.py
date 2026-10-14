@@ -27,19 +27,19 @@ import numpy as np
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from milankovitch_climate_formula import (
-    ClimateFormula, REGIME_WINDOWS, EIGHT_H, L1_LATTICE_INTEGERS,
+    ClimateFormula, REGIME_WINDOWS, L1_PERIODS_KYR,
     L2_THERMOSTAT_FAMILY, load_lr04, preprocess, L1_LABELS,
 )
 
 def main():
     print('=' * 78)
-    print('MEDIEVAL WARM PERIOD vs 8H CLIMATE FORMULA — coincidence check')
+    print('MEDIEVAL WARM PERIOD vs THE CLIMATE FORMULA — coincidence check')
     print('=' * 78)
     print()
     print('Formula structure:')
-    print(f'  L1: {len(L1_LATTICE_INTEGERS)} lattice cycles, periods = 8H/n')
-    print(f'      Shortest: 8H/{max(L1_LATTICE_INTEGERS)} = {EIGHT_H/max(L1_LATTICE_INTEGERS):.2f} kyr')
-    print(f'      Longest:  8H/{min(L1_LATTICE_INTEGERS)} = {EIGHT_H/min(L1_LATTICE_INTEGERS):.2f} kyr')
+    print(f'  L1: {len(L1_PERIODS_KYR)} orbital lines (the beats of the engine\'s secular modes)')
+    print(f'      Shortest: {min(L1_PERIODS_KYR):.2f} kyr')
+    print(f'      Longest:  {max(L1_PERIODS_KYR):.2f} kyr')
     print(f'  L2: 3 carbon-thermostat lines, periods = {list(L2_THERMOSTAT_FAMILY.values())} kyr')
     print(f'  MWP feature: peak at year 960, FWHM ~700 yr (= 0.7 kyr)')
     print()
@@ -172,10 +172,9 @@ def main():
     print(f'  MWP FWHM ~700 yr → looking for components with period < 5 kyr')
     print()
     found = False
-    for n in L1_LATTICE_INTEGERS:
-        period = EIGHT_H / n
+    for period in sorted(L1_PERIODS_KYR):
         if period < 5.0:
-            print(f'  L1 n={n}: period = {period:.3f} kyr ({L1_LABELS.get(n, "")})')
+            print(f'  L1 line: period = {period:.3f} kyr ({L1_LABELS.get(period, "")})')
             found = True
     if not found:
         print(f'  None. Shortest L1 component = 14.5 kyr.')

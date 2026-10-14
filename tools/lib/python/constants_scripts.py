@@ -43,11 +43,6 @@ from load_constants import C as _C
 # FUNDAMENTAL CONSTANTS (from constants.js)
 # ═══════════════════════════════════════════════════════════════════════════
 
-# Plan 09 step 7c: the frozen era unit left the model (T_p is its clock; the
-# K-device wheels ride recorded periods). This literal is the lattice RECORD the
-# comb-era ΔT/climate research scripts (8H/n) were built on — frozen, not a live
-# model constant; nothing published derives from it.
-H = 335317
 PHI = (1 + math.sqrt(5)) / 2  # Golden ratio ≈ 1.618034
 J2000_YEAR = 2000
 BALANCE_YEAR = _C['balancedYear']   # plan 07 R10: 2000 — the combs' phase origin is J2000

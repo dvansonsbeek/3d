@@ -33,26 +33,11 @@ def rd(name):
 
 
 def blocks92():
-    """Doc 92 — the Tier A variance budget and the canonical per-regime R²."""
-    vb = rd("milankovitch-8h-variance-budget.json"); cf = rd("milankovitch-climate-formula.json")
-    n_ext = len(vb["config"]["extended_integers"]); n_add = n_ext - len(vb["config"]["base_integers"])
+    """Doc 92 — the canonical per-regime R². (Plan 09 step 7e: the comb-era Tier A
+    variance-budget blocks `tierA-budget` / `tierA-regimes` left with their script
+    and artifact; doc 109 §22 keeps their headline numbers.)"""
+    cf = rd("milankovitch-climate-formula.json")
     B = {}
-    f = vb["lr04_full"]
-    steps = [("Baseline (25 integers)", f["a0_baseline_25"]["r2"], f["a0_baseline_25"]["r2"], "L1", "25 canonical planet-cycle + Berger-eigenmode beats"),
-             (f"+ {n_add} lattice additions → {n_ext} integers", f["a1_extended_31"]["r2"], f["a1_extended_31"]["delta_r2_vs_a0"], "L1+",
-              "6 MTM sidebands + n=141 Berger-quintet completion + n=24 Earth H/3 line (regime-admitted)"),
-             ("+ 405-kyr (deployed L2)", f["a2_plus_405k"]["r2"], f["a2_plus_405k"]["delta_r2_vs_a1"], "L2", "Silicate-weathering thermostat fundamental"),
-             ("+ 13H (investigated, NOT deployed)", f["a3_plus_13h"]["r2"], f["a3_plus_13h"]["delta_r2_vs_a2"], "L2-investigated", "Tier-A jump rejected by R3-4 stability test"),
-             ("+ 9-Myr (investigated, NOT deployed)", f["a4_plus_9m"]["r2"], f["a4_plus_9m"]["delta_r2_vs_a3"], "L2-investigated", "Promoted-but-not-deployed (§3.3)")]
-    rows = ["| Component | Cumulative R² | ΔR² (this step) | Layer | Notes |", "|-----------|---------------|-----------------|-------|-------|"]
-    for i, (label, r2, d, layer, note) in enumerate(steps):
-        rows.append(f"| {label} | {r2:.4f} | {d:.4f} | {layer} | {note} |" if i == 0 else f"| {label} | {r2:.4f} | {d:+.4f} | {layer} | {note} |")
-    B["tierA-budget"] = rows
-    rows = [f"| Regime | Window | L1 (25) | L1 ({n_ext}) | + full L2 stack |", "|---|---|---:|---:|---:|"]
-    for label, key, bold_l2 in [("pre-MPT", "lr04_pre_mpt", False), ("post-MPT", "lr04_post_mpt", True)]:
-        r = vb[key]; w = r["summary"]["window_kyr"]; l2 = f"{r['a4_plus_9m']['r2']:.4f}"
-        rows.append(f"| {label} | {w[0]:.0f}–{w[1]:.0f} kyr | {r['a0_baseline_25']['r2']:.4f} | **{r['a1_extended_31']['r2']:.4f}** | {'**' + l2 + '**' if bold_l2 else l2} |")
-    B["tierA-regimes"] = rows
     rf = cf["regime_fits"]
     B["canonical-r2"] = ["| Regime / record | R² |", "|---|---:|",
                          f"| full LR04 (L1+L2+L3) | **{rf['lr04-full']['r2_l1_l2_l3']:.4f}** |",

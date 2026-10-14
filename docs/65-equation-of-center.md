@@ -344,7 +344,7 @@ the per-planet EoC write-ups of the retired geometric path are archived.
 - `tools/lib/constants.js`: derived-constants block
 - `tools/lib/scene-graph.js`: Sun eccentricity in the body defs; `moveModel`; `FQ3_EXACT_SUN`; the `animateFast` mirror (used by `computeSunPositionFast`)
 - `public/input/fitted-coefficients.json`: `SUN_LONGITUDE_MEAN`, `SUN_LONGITUDE_HARMONICS` (DELETED at plan 09 step 5a)
-- `tools/fit/sun-longitude-harmonics.js` (Step 0 fitter — DELETED at plan 09 step 5a) · `tools/explore/sun-annual-correction.js` (Z-B verification) · `tools/explore/eoc-constants.js` (numerical verification) · `tools/explore/fq3-wheel-sun-attribution.mjs` / `fq3-w1-verify.mjs` (attribution + corrector verification)
+- `tools/fit/sun-longitude-harmonics.js` (Step 0 fitter — DELETED at plan 09 step 5a) · `tools/explore/eoc-constants.js` (numerical verification) · `tools/explore/fq3-wheel-sun-attribution.mjs` / `fq3-w1-verify.mjs` (attribution + corrector verification)
 
 ---
 
@@ -363,4 +363,4 @@ After any change to this system:
 9. `node tools/optimize.js baseline sun` — RA drift ~54 arcsec/yr (frame effect)
 10. `node tools/explore/fq3-w1-verify.mjs` — twin − wheel ~0.80″ annual / ~0.57″ sd; the control (`FQ3_EXACT_SUN=0 SUN_HARMONICS_DISABLED=1`) reproduces the raw split error (279.0″ annual / 197.4″ sd)
 11. `node tools/optimize.js baseline all` — planet baselines unchanged; Sun RMS Total ~0.0029°
-12. Legacy path (`FQ3_EXACT_SUN=0`): `node tools/explore/sun-annual-correction.js` — raw residual ~198″ RMS, ~7″ RMS with the 3-term fit; a greedy dry-run finds no new lattice-compliant terms above 0.05″
+12. Legacy path (`FQ3_EXACT_SUN=0`): the annual-correction instrument (deleted at plan 09 step 7e; record in [doc 109 §22](109-model-nbody-engine-and-lattice-test.md)) read a raw residual ~198″ RMS, ~7″ RMS with the 3-term fit; its greedy dry-run found no new terms above 0.05″

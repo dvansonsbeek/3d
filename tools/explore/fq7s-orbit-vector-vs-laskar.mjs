@@ -9,15 +9,15 @@
 // ϖ [rad, from the moving equinox]) over the last 250 kyr — the
 // cross-validation done in ONE place — and at J2000 (value, slope,
 // curvature from the 0…−3 kyr rows), then sets the DERIVED vector
-// (fq7s-laplace-lagrange-e.mjs, LL eigenvectors + the framework N-body g5)
+// (LL eigenvectors + the framework N-body g5; its generator fq7s-laplace-lagrange-e.mjs was deleted at plan 09 step 7e — the derived rows need its json present)
 // beside them. The pre-unification three-law rows are in git history
 // (99496be): H/16 cardinal law corr −0.014, ė −2.8e-6 (15× too shallow);
 // H/3 line corr −0.284, ė −3.97e-5.
 //
 // Usage: node tools/explore/fq7s-orbit-vector-vs-laskar.mjs [kyrBack=250]
-//   Prerequisite for the derived rows:
-//     node tools/explore/fq7s-laplace-lagrange-e.mjs 2 g5=4.224
-//   (without `g5=` the json is first-order and this script says so).
+//   Prerequisite for the derived rows: the derived-vector json the deleted
+//   fq7s-laplace-lagrange-e.mjs wrote (`2 g5=4.224`; git history carries the
+//   script). Without `g5=` that json is first-order and this script says so.
 
 import { readFileSync } from 'node:fs';
 const { createModel } = await import(new URL('../../packages/physics/src/index.js', import.meta.url).href);
@@ -67,7 +67,7 @@ console.log(`  |Δz| e·e^{iϖ}:       ${rms(stats.z).toExponential(2)}`);
   const g5 = LLfile.g5 ?? 'unrecorded (pre-stamp file)';
   const firstOrder = g5 !== String(g5) || !/^\d/.test(String(g5));
   console.log(`\nC-LARGE (1): e-law vs La2004 over the last ${KYR} kyr — correlation / RMS   [derived json g5 = ${g5}]`);
-  if (firstOrder) console.log('   *** WARNING: derived vector generated with the FIRST-ORDER g5 (3.74, 12% low) — regenerate with `fq7s-laplace-lagrange-e.mjs 2 g5=4.224` before quoting these rows ***');
+  if (firstOrder) console.log('   *** WARNING: derived vector generated with the FIRST-ORDER g5 (3.74, 12% low) — regenerate with the second-order g5 = 4.224 (the deleted generator, git history) before quoting these rows ***');
   const byYear = new Map(LLd.map((r) => [r.year, r]));
   const corr = (a, b) => { const ma = mean(a), mb = mean(b); let s = 0, sa = 0, sb = 0; for (let i = 0; i < a.length; i++) { s += (a[i] - ma) * (b[i] - mb); sa += (a[i] - ma) ** 2; sb += (b[i] - mb) ** 2; } return s / Math.sqrt(sa * sb); };
   const eL = [], eModelv = [], eDer = [], wLv = [], wDerOfDate = [], wModelv = [];

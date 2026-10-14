@@ -195,7 +195,7 @@ Run in dependency order when model parameters change. See [`tools/fit/README.md`
 
 The analysis and verification scripts: the climate formula and its tests, the ΔT/LOD stack, the eclipse data pipeline, the deep-time cross-check and the browser-modal exports. Install dependencies with `pip install -r requirements.txt`; the [Python Scripts README](../scripts/README.md) is the index.
 
-> The shared Python library (`constants_scripts.py`, `planet_beats.py`) lives in [`tools/lib/python/`](../tools/lib/python/README.md).
+> The shared Python library (`constants_scripts.py`) lives in [`tools/lib/python/`](../tools/lib/python/README.md).
 
 See the [Python Scripts README](../scripts/README.md) for details.
 

@@ -55,7 +55,7 @@ const NTERMS = parseInt(KV.terms || '6', 10);
 const D = JSON.parse(readFileSync(FILE, 'utf8'));
 const t = Float64Array.from(D.t);                                  // years from J2000
 const N = t.length, span = t[N - 1] - t[0];
-const H = TL.H, D2R = Math.PI / 180;
+const D2R = Math.PI / 180;   // (plan 09 step 7e: the retired lattice's "nearest 8H/N" column is gone from the tables)
 const LASKAR = { g: { g1: 5.5965, g2: 7.4555, g3: 17.3711, g4: 17.9159, g5: 4.2575, g6: 28.2455, g7: 3.0876, g8: 0.6730 }, s: { s1: -5.6197, s2: -7.0797, s3: -18.8506, s4: -17.7553, s6: -26.3475, s7: -2.9927, s8: -0.6919 } };
 
 // Hann window, normalised inner product ⟨z, e^{iωt}⟩ over the window
@@ -128,7 +128,6 @@ function naff(zr, zi, nterms) {
   for (let j = 0; j < M; j++) { const a = cdiv(A[j][M], A[j][j]); found[j].ampl = Math.hypot(a[0], a[1]); found[j].phaseDeg = Math.atan2(a[1], a[0]) / D2R; }
   return found;
 }
-const nearest8HN = (ratePerYrArcsec) => { const P = 1296000 / ratePerYrArcsec; const Nn = 8 * H / P; return `${Nn < 0 ? '−' : ''}8H/${Math.abs(Nn).toFixed(2)}`; };
 const nearestLaskar = (rate, set) => { let b = null; for (const [k, v] of Object.entries(set)) if (b === null || Math.abs(v - rate) < Math.abs(set[b] - rate)) b = k; return `${b} ${set[b]}`; };
 
 console.log(`file ${FILE.replace(ROOT, '')}: ${D.integrator} dt ${D.dt} d, ${D.frame} frame, ${D.gr ? '1PN on' : 'Newton only'}, ${N} samples over ${span.toFixed(0)} yr`);
@@ -139,19 +138,19 @@ for (const k of Object.keys(D.elements)) {
   const E = D.elements[k];
   const zr = E.e.map((e, i) => e * Math.cos(E.w[i] * D2R)), zi = E.e.map((e, i) => e * Math.sin(E.w[i] * D2R));
   const sr = E.inc.map((inc, i) => Math.sin(inc * D2R / 2) * Math.cos(E.Om[i] * D2R)), si = E.inc.map((inc, i) => Math.sin(inc * D2R / 2) * Math.sin(E.Om[i] * D2R));
-  const lat = k === 'earth' ? null : 1296000 / TL.planets[k].perihelionEclipticYears;   // ″/yr
-  console.log(`\n${k.toUpperCase()}  — z = e·e^{iϖ} (apsidal)   lattice 8H/N: ${lat === null ? '—' : lat.toFixed(3) + ' ″/yr'}`);
-  console.log('   #    freq ″/yr    ″/cy     period yr     ampl     nearest 8H/N   nearest Laskar g');
+  const chainG = k === 'earth' ? null : 1296000 / TL.planets[k].perihelionEclipticYears;   // ″/yr — the chain's inertial apsidal rate
+  console.log(`\n${k.toUpperCase()}  — z = e·e^{iϖ} (apsidal)   chain secular g: ${chainG === null ? '—' : chainG.toFixed(3) + ' ″/yr'}`);
+  console.log('   #    freq ″/yr    ″/cy     period yr     ampl     nearest Laskar g');
   const zModes = naff(zr, zi, NTERMS);
-  zModes.forEach((f, i) => { const asy = f.omega / D2R * 3600; console.log(`   ${i + 1}  ${asy.toFixed(4).padStart(10)} ${(asy * 100).toFixed(1).padStart(8)} ${(360 * 3600 / asy).toFixed(0).padStart(12)} ${f.ampl.toFixed(5).padStart(9)}   ${nearest8HN(asy).padStart(12)}   ${nearestLaskar(asy, LASKAR.g)}`); });
+  zModes.forEach((f, i) => { const asy = f.omega / D2R * 3600; console.log(`   ${i + 1}  ${asy.toFixed(4).padStart(10)} ${(asy * 100).toFixed(1).padStart(8)} ${(360 * 3600 / asy).toFixed(0).padStart(12)} ${f.ampl.toFixed(5).padStart(9)}   ${nearestLaskar(asy, LASKAR.g)}`); });
   console.log(`   ζ = sin(i/2)·e^{iΩ} (nodal)`);
-  console.log('   #    freq ″/yr    ″/cy     period yr     ampl     nearest 8H/N   nearest Laskar s');
+  console.log('   #    freq ″/yr    ″/cy     period yr     ampl     nearest Laskar s');
   // zterms=N sets the ζ depth INDEPENDENTLY of terms= when given
   // explicitly (the Stage-C era-ζ pass runs terms=1 zterms=8 — ζ is
   // independent of z); without it, the historical min(terms, 8) cap holds
   // so every prior invocation is unchanged.
   const sModes = naff(sr, si, KV.zterms ? Number(KV.zterms) : Math.min(NTERMS, 8));
-  sModes.forEach((f, i) => { const asy = f.omega / D2R * 3600; console.log(`   ${i + 1}  ${asy.toFixed(4).padStart(10)} ${(asy * 100).toFixed(1).padStart(8)} ${(360 * 3600 / asy).toFixed(0).padStart(12)} ${f.ampl.toFixed(5).padStart(9)}   ${nearest8HN(asy).padStart(12)}   ${nearestLaskar(asy, LASKAR.s)}`); });
+  sModes.forEach((f, i) => { const asy = f.omega / D2R * 3600; console.log(`   ${i + 1}  ${asy.toFixed(4).padStart(10)} ${(asy * 100).toFixed(1).padStart(8)} ${(360 * 3600 / asy).toFixed(0).padStart(12)} ${f.ampl.toFixed(5).padStart(9)}   ${nearestLaskar(asy, LASKAR.s)}`); });
   const toRow = (f) => ({ omegaRadPerYr: f.omega, re: f.ampl * Math.cos(f.phaseDeg * D2R), im: f.ampl * Math.sin(f.phaseDeg * D2R) });
   MODES[k] = { z: zModes.map(toRow), zeta: sModes.map(toRow) };
 }

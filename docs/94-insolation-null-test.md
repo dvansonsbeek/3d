@@ -312,11 +312,6 @@ python3 scripts/milankovitch_insolation_laskar_check.py
 
 # Step 4 — cross-window stability with La2004 over the full record (§9)
 python3 scripts/milankovitch_insolation_stability.py
-
-# Step 5 — RETIRED: the comb-era n = 24 attribution (§10) indexes the integer
-# comb and the single-line e(t); the script refuses to run on the shipped
-# fitter and its result file is the frozen comb-era record
-python3 scripts/milankovitch_l1_n24_attribution.py
 ```
 
 Total runtime: a few seconds. Deterministic, no random seeds.
@@ -324,9 +319,7 @@ Total runtime: a few seconds. Deterministic, no random seeds.
 Outputs: [`data/insolation-extension-results.json`](../data/insolation-extension-results.json)
 (per-regime breakdown, L_insol-only R², coefficients, verdict string),
 [`data/insolation-laskar-check-results.json`](../data/insolation-laskar-check-results.json),
-[`data/insolation-stability-results.json`](../data/insolation-stability-results.json)
-and, frozen as the comb-era record for §10,
-[`data/l1-n24-attribution-results.json`](../data/l1-n24-attribution-results.json).
+[`data/insolation-stability-results.json`](../data/insolation-stability-results.json).
 Every number in this document is a registry marker bound to these files.
 
 ---
@@ -554,96 +547,27 @@ Outputs: [`data/l1-line-audit-results.json`](../data/l1-line-audit-results.json)
 
 ---
 
-## 10. L1 attribution — the gain is the lattice line n = 24 (comb-era record)
+## 10. The comb-era attribution of the pre-iNHG gain — retired to the record
 
-> **Retired measurement.** This section was measured on the integer-label comb as
-> L1 and the single-line e(t) as the model's eccentricity — both since retired
-> (plan 06 T1; the eccentricity is the N-body series). Its markers read the
-> frozen `data/l1-n24-attribution-results.json`; the script refuses to re-run
-> on the shipped fitter (amplitudes are keyed by period, not by comb index),
-> and on the shipped model the gain it attributes does not exist (§9). Kept as
-> the record of how the comb-era measurement was read; nothing in §§1–9
-> depends on it.
-
-The comb-era model e(t) was a single line on the retired comb's 24th line of its eight-unit interval (its H/3),
-<!--v:l1N24PeriodKyr-->111.8<!--/v--> kyr, and **n = 24 was not one of L1's
-original 32 divisors** — that list ran <!--v:l1N24NeighbourLo-->22<!--/v--> →
-<!--v:l1N24NeighbourHi-->25<!--/v-->. So the §9 gain had two candidate
-readings: the missing lattice line, or something specific to e(t)'s shape and
-its ϖ-products. [`scripts/milankovitch_l1_n24_attribution.py`](../scripts/milankovitch_l1_n24_attribution.py)
-separates them on the same canonical residual, ridge and split-half CV as §9.
-
-### 10.1 Decomposition and the pure line (pre-iNHG, 2700–5320 kyr)
-
-| Regressor on the L1+L2+L3 residual | in-sample ΔR² | CV ΔR² |
-|---|---:|---:|
-| all four model features (§9) | <!--v:insolExtDeltaR2PreInhg-->+0.0064<!--/v--> | <!--v:insolStabModelCvPreInhg-->−0.0323<!--/v--> |
-| model e(t) alone — fixed H/3 phase, one parameter | <!--v:l1N24EccInSamplePreInhg-->+0.0187<!--/v--> | <!--v:l1N24EccCvPreInhg-->+0.0144<!--/v--> |
-| pure lattice pair cos/sin(2π·24·t/8H) — free phase | <!--v:l1N24LineInSamplePreInhg-->+0.0191<!--/v--> | **<!--v:l1N24LineCvPreInhg-->+0.0144<!--/v-->** |
-| e·sin ϖ, e·cos ϖ pair alone | — | <!--v:l1N24PeriPairCvPreInhg-->−0.0062<!--/v--> |
-| ε anomaly alone | — | <!--v:l1N24EpsCvPreInhg-->−0.0016<!--/v--> |
-| model e(t) **on top of** the n = 24 pair | <!--v:l1N24EccOnTopOfLineInSample-->+0.0000<!--/v--> | — |
-
-- The free-phase n = 24 pair explains the standardized model e(t) feature at
-  R² = <!--v:l1N24R2EccByLine-->0.998<!--/v--> and gives the identical
-  cross-validated gain; e(t) adds nothing on top of it. **The gain is the
-  n = 24 line.** The ϖ-products and ε carry no out-of-sample gain on their
-  own.
-- **Line-specific.** Scanning free-phase pairs over n = 20…30, every other
-  line is negative out of sample: n = 23.5 gives
-  <!--v:l1N24ScanCv235-->−0.0459<!--/v-->, n = 24.5
-  <!--v:l1N24ScanCv245-->−0.0114<!--/v-->, and the two L1 neighbours
-  <!--v:l1N24ScanCv22-->−0.0052<!--/v--> (n = 22) and
-  <!--v:l1N24ScanCv25-->−0.0141<!--/v--> (n = 25). The ~100-kyr band is not
-  broadly under-fitted; one line is missing.
-- **Phase.** The data's best-fit phase of the n = 24 line in the pre-iNHG
-  residual is <!--v:l1N24PhaseDataPreInhg-->65.9<!--/v-->° against the model's
-  fixed H/3 phase of <!--v:l1N24PhaseModelPreInhg-->74.4<!--/v-->° on the same
-  convention — Δφ = <!--v:l1N24PhaseDiffDegPreInhg-->−8.5<!--/v-->°,
-  <!--v:l1N24PhaseDiffKyrPreInhg-->2.7<!--/v--> kyr on a 112-kyr line
-  (<!--v:l1N24PhaseDiffDegLr04Full-->+9.5<!--/v-->° over the full record). The
-  model's own e(t), with no fitted phase, sits on the line the data wants.
-
-Secular theory has no 112-kyr eccentricity line (its lines are the 95, 99, 124,
-131 and 405 kyr beats); H/3 is the model's own prediction, and the pre-iNHG
-record carries it out of sample at the model's phase.
-
-### 10.2 The direct L1 question — 24 added to the lattice
-
-Refitting the canonical formula with 24 added (33 divisors):
-
-| Regime | ΔR² (L1+L2+L3) | n = 24 amplitude / median | rank of 33 |
-|---|---:|---:|---:|
-| post-MPT | <!--v:l1N24LatticeDeltaR2PostMpt-->+0.0008<!--/v--> | <!--v:l1N24AmpOverMedianPostMpt-->2.53<!--/v-->× | <!--v:l1N24RankPostMpt-->4<!--/v--> |
-| iNHG-MPT | <!--v:l1N24LatticeDeltaR2InhgMpt-->+0.0056<!--/v--> | <!--v:l1N24AmpOverMedianInhgMpt-->1.06<!--/v-->× | <!--v:l1N24RankInhgMpt-->16<!--/v--> |
-| pre-iNHG | **<!--v:l1N24LatticeDeltaR2PreInhg-->+0.0196<!--/v-->** (R² <!--v:l1N24R2CanonPreInhg-->0.4298<!--/v--> → <!--v:l1N24R2WithLinePreInhg-->0.4493<!--/v-->) | <!--v:l1N24AmpOverMedianPreInhg-->1.64<!--/v-->× | <!--v:l1N24RankPreInhg-->5<!--/v--> |
-| lr04-full | <!--v:l1N24LatticeDeltaR2Lr04Full-->+0.0031<!--/v--> | <!--v:l1N24AmpOverMedianLr04Full-->0.79<!--/v-->× | <!--v:l1N24RankLr04Full-->24<!--/v--> |
-
-### 10.3 Every divisor on the same footing — the audit that decided admission
-
-Before admitting n = 24, every comb divisor was put through the drop-refit-
-re-add instrument of §9.1; on the comb, n = 24 ranked among the top three
-pre-iNHG divisors by cross-validated gain and was admitted on the regime
-clause of the comb's admission rule (doc 91, archived). That admission refit
-moved the post-MPT L1 layer the deep-time α(t) reads, so
-`alphaClimateScalePerMille` was recalibrated to hold dα/dt(J2000) at the
-Cox–Chao target and the ΔT stack re-closed (Step 7c), see
-[doc 104](104-millennial-rotation-swing.md). The comb-era readings of the
-audit are not kept; the same instrument on the shipped lines is §9.1.
-
-### 10.4 Turned around — which period does the record want?
-
-The free-period scan is §9.2. The pre-iNHG stationary line it finds
-(~112.7 kyr) is a property of the record, not of the comb: the comb-era
-reading put it on the comb's n = 24 line, its H/3 (0.8 % away), and bounded "Earth's eccentricity
-line" to 112.7 ± 0.6 kyr; on the shipped model it is an open residual line of
-the pre-iNHG regime, 2.5 % from the nearest derived beat.
-
-Output: [`data/l1-n24-attribution-results.json`](../data/l1-n24-attribution-results.json).
+The comb-era measurement that stood here attributed the §9 pre-iNHG gain of the
+retired single-line e(t) to one missing line of the retired integer comb (its
+24th line, ~112 kyr): a free-phase pair at that period gave the identical
+cross-validated gain (+0.0144) and explained the model feature at R² 0.998, the
+data's phase sat 8.5° from the model's, and adding the line to the comb gave
+pre-iNHG ΔR² +0.0196 (rank 5 of 33). Both of its premises were since retired
+(plan 06 T1; the eccentricity is the N-body series), and on the shipped model
+the gain does not exist (§9). The script, its frozen result file and the
+registry keys were deleted at plan 09 step 7e; the headline numbers are the
+record table in [doc 109 §22](109-model-nbody-engine-and-lattice-test.md).
+What survives is the record's own stationary line: the free-period scan of
+§9.2 finds a pre-iNHG line at ~112.7 kyr, an open residual line of that regime
+2.5 % from the nearest derived beat, and the admission refit of that era moved
+the post-MPT L1 layer the deep-time α(t) reads, so `alphaClimateScalePerMille`
+was recalibrated and the ΔT stack re-closed (Step 7c, [doc 104](104-millennial-rotation-swing.md)).
 
 ---
 
 ## Related documents
 
 - [Doc 92 — Climate formula](92-climate-formula.md) — canonical L1+L2+L3 architecture (the formula tested here)
-- [Doc 99 — Expanding Solar System Resonance Theory (ESSRT)](99-expanding-solar-system-resonance-theory.md) — Deep-time scaling of H(t)
+- [Doc 99 — Expanding Solar System Resonance Theory (ESSRT)](99-expanding-solar-system-resonance-theory.md) — the deep-time scaling of the orbital and precession-carrying lines

@@ -49,10 +49,10 @@ come from the record and the canonical paleoclimate values.
 long described here as "zero-fit structural predictions" of a comb of
 integer divisions of eight times H (period = 8·H/n), resting on two
 arguments: each period is such a division, and each divisor shares a
-prime factor with H (gcd 23 or 61). The pre-registered test
-`scripts/t5_dt_stack_lattice_null.py` (artifact
-`data/t5-dt-stack-lattice-null.json`) measured both arguments at chance
-level: every period in the 500–5000 yr band lies within 0.03 % of some
+prime factor with H (gcd 23 or 61). The pre-registered test T5 (its script
+and artifact deleted at plan 09 step 7e; the verdict is in the record table,
+[doc 109 §22](109-model-nbody-engine-and-lattice-test.md)) measured both
+arguments at chance level: every period in the 500–5000 yr band lies within 0.03 % of some
 comb member; H = 23·61·239, so 6 % of the integers in the band share a
 factor with it and a compliant integer sits inside every fitted plateau
 by density alone (the Bond band n = 1817…1863 holds four); the shipped
@@ -1232,7 +1232,8 @@ is within 0.03 % of a comb member).
 
 A full divisor scan (period = 8·H/n) across the sub-Milankovitch band (n ∈
 [500, 5000], periods ~500 to ~5000 yr) — implemented as §14 of the L-5b
-console diagnostic and as `scripts/lod_residual_divisor_scan_jse.py` —
+console diagnostic (the Python twin was deleted at plan 09 step 7e; its
+headline is in [doc 109 §22](109-model-nbody-engine-and-lattice-test.md)) —
 identifies a **broad peak in the ~1400–1500 yr range** with fit quality
 essentially indistinguishable across n=1817..1863 (all R² 0.974–0.975,
 well within the ~370-yr Fourier resolution of the training window).
@@ -1362,10 +1363,9 @@ Current shipped fit (sole runtime source of truth):
 - The website consumes the ΔT-stack and resonator constants through the published `@essrt/physics` package (`FITTED_COEFFICIENTS.DT_STACK` / `DT_RESONATOR`). `src/script.js` imports the same values from the generated constants module; `tools/lib/deep-time.js` reads the JSON directly.
 - `data/deltaT-4flag-fit.json` — combined 4-cycle fit output; sole authoritative source for the shipped coefficients.
 
-Supporting scan/validation tooling: `scripts/lod_residual_divisor_scan_jse.py`
-(the full divisor scan with J-S-E interpretation, output
-`data/deltaT-divisor-scan-jse.json`), `scripts/lattice_harmonic_scan.py`
-(cross-archive), `scripts/stephenson_observation_density.py` (falsifies the
+Supporting scan/validation tooling (the comb-era divisor and cross-archive
+scans were deleted at plan 09 step 7e — [doc 109 §22](109-model-nbody-engine-and-lattice-test.md)
+is their record): `scripts/stephenson_observation_density.py` (falsifies the
 spline-artifact hypothesis — the medieval window has 36.9 obs/century),
 `scripts/climate_formula_mwp_check.py` (rules out the paleoclimate formula
 as the source — its shortest period is 14.5 kyr).
@@ -1466,12 +1466,7 @@ physical prior); phase preserved from the joint fit and scaled
 proportionally.
 
 **Research infrastructure**:
-- `scripts/hallstatt_steinhilber_amplitude.py` — solar Φ validation
-- `scripts/hallstatt_cheng_speleothem.py` — 640 kyr null test
-- `scripts/hallstatt_epica_co2.py` — 800 kyr CO₂ validation
-- `scripts/lod_residual_bond_plus_hallstatt.py` — pair joint fit
-- `data/hallstatt-{steinhilber,cheng,epica}-fit.json` — proxy tests
-- `data/deltaT-bond-plus-hallstatt-fit.json` — pair fit output
+- the three Hallstatt proxy tests (Steinhilber solar Φ, the Cheng 640-kyr null, the EPICA 800-kyr CO₂ record) and the Bond + Hallstatt pair joint fit — scripts and artifacts deleted at plan 09 step 7e; headline numbers in [doc 109 §22](109-model-nbody-engine-and-lattice-test.md)
 - `HALLSTATT_DT_CORRECTION_ENABLED` flag in `src/script.js` (default `true`)
 - the Hallstatt ΔT-correction toggle console-test button
 
@@ -1511,8 +1506,7 @@ constraint to minimize inter-cycle collinearity when all three flags
 are simultaneously enabled); phase preserved from triple fit.
 
 **Research infrastructure**:
-- `scripts/lod_residual_triple_bond_hallstatt_jose5.py` — triple joint fit
-- `data/deltaT-triple-bond-hallstatt-jose5-fit.json` — triple fit output
+- the Bond + Hallstatt + Jose5 triple joint fit — script and artifact deleted at plan 09 step 7e; record in [doc 109 §22](109-model-nbody-engine-and-lattice-test.md)
 - `JOSE5_DT_CORRECTION_ENABLED` flag in `src/script.js` (default `true`)
 - the Jose5 ΔT-correction toggle console-test button
 
@@ -1532,7 +1526,8 @@ Structurally degenerate with Bond/2 ≈ 733 yr at ~2.5% level, but the
 the signal to the SIM family.
 
 **Empirical identification — cross-archive coherence test**:
-The `scripts/lattice_harmonic_scan.py` universal scan enumerates all
+The universal cross-archive scan (deleted at plan 09 step 7e; record in
+[doc 109 §22](109-model-nbody-engine-and-lattice-test.md)) enumerated all
 gcd-compliant divisors in a period band and fits each against multiple
 paleoclimate archives simultaneously (Steinhilber ¹⁰Be solar Φ,
 Stephenson ΔT, Cheng speleothem δ¹⁸O, EPICA CO2, LR04 δ¹⁸O). Jose4
@@ -1572,8 +1567,7 @@ cap; Jose4 ships at the 50 s prior with free-fit 47.1 s). This prevents inflatin
 signal above what the joint fit actually finds.
 
 **Research infrastructure**:
-- `scripts/lattice_harmonic_scan.py` — universal cross-archive scan
-- `data/lattice-scan-{mwp-band,jose-family,bond-harmonics}.json` — scan outputs
+- the universal cross-archive scan and its outputs — deleted at plan 09 step 7e; record in [doc 109 §22](109-model-nbody-engine-and-lattice-test.md)
 - `data/deltaT-4flag-fit.json` — 4-cycle joint fit output
 - `JOSE4_DT_CORRECTION_ENABLED` flag in `src/script.js` (default `true`)
 - the Jose4 ΔT-correction toggle console-test button
@@ -1601,9 +1595,10 @@ not ship — the record that the 4-flag stack sits at the empirical limit:
   signal** rather than add independent variance (Bond's own ΔR² halves
   under it), and neither tested phase improves any L-5b metric.
 
-Artifacts for all three are preserved (`data/lattice-scan-*.json`,
-`data/deltaT-quad-fit.json`, `data/jupiter92-isolated-refit.json`, the
-CONFIG rollback notes). The shared rule they establish: empirical
+The artifacts for all three (the scan outputs, the quad fit, the Jupiter-92
+isolated refit) were deleted at plan 09 step 7e — their headline numbers are
+in [doc 109 §22](109-model-nbody-engine-and-lattice-test.md), git history
+carries the files, and the CONFIG rollback notes stay in the fit tool. The shared rule they establish: empirical
 coherence in paleoclimate records is necessary but not sufficient — a
 shipped cycle must also be numerically well-conditioned against the
 Stephenson window and add independent variance.

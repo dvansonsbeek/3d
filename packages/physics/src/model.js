@@ -408,9 +408,9 @@ export function assembleModel(C, F, laws = {}, secularSeriesArtifact = /** @type
   // lattice periods; H/16 is the OF-DATE perihelion period (13 + 3 = 16 —
   // the H/3 rotation seen from the H/13 equinox) and belongs to ϖ_of-date;
   // measured, the H/16 law's present ė (−0.84e-5/cy) is 5× below the
-  // observed −4.20e-5 while this law reads −4.31e-5 (Phase-0 record:
-  // tools/explore/fq7s-h3-law-candidate.mjs; JPL Sun 1.49″, registry 0.80″,
-  // syzygy 3.72″). Consumers (engine-switch decision (ii) restatement,
+  // observed −4.20e-5 while this law reads −4.31e-5 (Phase-0 record: the
+  // H/3-law candidate instrument, deleted at plan 09 step 7e — docs/109 §22;
+  // JPL Sun 1.49″, registry 0.80″, syzygy 3.72″). Consumers (engine-switch decision (ii) restatement,
   // plan 02 §8): the eclipse Sun (equation of centre), the besselian Sun
   // distance and the cardinal-point braid — the CLOCK-side machinery. The
   // LUNAR chain (E-factor, perigee/node modulation/T², argument Δe² and
@@ -1126,8 +1126,8 @@ export function assembleModel(C, F, laws = {}, secularSeriesArtifact = /** @type
   // time; the device's rounded tropical-year input read the axis 2e-5 short)
   const fwEFactor = (dDays) => deepEcc.eFactorAt(dDays / 365.25);
 
-  // D2 derived additional-argument rates (deg/cy, J2000 8H-lattice months;
-  // record: tools/explore/derive-a1a2a3.js)
+  // D2 derived additional-argument rates (deg/cy, from the J2000 month inputs;
+  // the derivation record derive-a1a2a3.js was deleted at plan 09 step 7e — docs/109 §22)
   const fwA2RateDegPerCy = 2 * ((360 * 36525) / moonTropicalMonthDays)
     - (360 * 36525) / moonAnomalisticMonthDays
     - 2 * ((360 * 36525) / C.planetOrbitalElements.jupiter.solarYearInput);

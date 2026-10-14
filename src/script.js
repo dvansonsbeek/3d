@@ -2152,8 +2152,8 @@ const halleysRotationPeriod = _planetGeom.halleys.rotationPeriodHours;
 // phases (1-4) will convert select const→let and wire setEpoch(t_Ma)
 // into the animation loop.
 //
-// Verified against scripts/devonian_cross_check.py at modern + Devonian
-// (t_Ma = 380): LOD = 21.92 hr, H = 306,189 yr, Moon a = 369,749 km.
+// Verified at modern + Devonian (t_Ma = 380): LOD = 21.92 hr, Moon a = 369,749 km
+// (the comb-era cross-check script was deleted at plan 09 step 7e; doc 109 §22).
 // ═════════════════════════════════════════════════════════════════
 
 // ───── Tidal evolution rates ─────
@@ -2802,7 +2802,7 @@ function meanTropicalYearSecondsAtAge(t_Ma) { return _deepLod().tropicalYearSeco
 //
 // The Stephenson 2016 ΔT residual (Stephenson − our framework) over −720 to
 // +2016 CE has a dominant Bond-scale lattice component in the 500-5000 yr
-// band. A full 8H integer-divisor scan (scripts/lod_residual_divisor_scan_jse.py)
+// band. The comb-era full divisor scan (deleted at plan 09 step 7e; doc 109 §22)
 // identified a broad peak in the ~1450 yr range; the fit quality is essentially
 // identical across n=1817..1863 (all R² ≈ 0.974-0.975, within Fourier resolution
 // of ~370 yr). We select n=1830 as the H-lattice-compliant representative that
@@ -2851,9 +2851,8 @@ function meanTropicalYearSecondsAtAge(t_Ma) { return _deepLod().tropicalYearSeco
 // is to calibrate amplitude/phase against Bond 1997 IRD or equivalent
 // independent proxy. See doc 102 "Bond cycle" section.
 //
-// Source: data/deltaT-1830-residual-fit.json (n=1830, current)
-//         data/deltaT-1851-residual-fit.json (n=1851, archived interim)
-//         data/deltaT-bond-cycle-residual-fit.json (n=1825 paper original, archived)
+// Source: data/deltaT-4flag-fit.json (the shipped cascaded fit). The comb-era
+//         residual fits that preceded it were deleted at plan 09 step 7e (doc 109 §22).
 // ═════════════════════════════════════════════════════════════════════════════
 // BOND_DT_CORRECTION_ENABLED (feature flag) declared in A5 Research toggles at top of file
 // Fitted period STATED IN YEARS (the fit file's period_yr): plan 06 T5 measured
@@ -2877,8 +2876,8 @@ const BOND_SIN_COEFF_S            = FIT.DT_STACK.bond.sin_coeff_s;
 // it. Narrowing the taper would change nothing measurable.
 //
 // Archive support for cycle coherence beyond the 2.7-kyr Stephenson fit window
-// is real but marginal (scripts/lattice_harmonic_scan.py, 95th-percentile
-// permutation threshold):
+// is real but marginal (the comb-era cross-archive scan, deleted at plan 09
+// step 7e — doc 109 §22; 95th-percentile permutation threshold):
 //   • EPICA CO2 (803 kyr) — all four flags clear it, but every R²ₕ is ~0.01,
 //     i.e. coherence at the noise margin.
 //   • Steinhilber ¹⁰Be (9.4 kyr) — Hallstatt and Jose4 only, and Jose4 was
@@ -2978,11 +2977,9 @@ function bondCycleDeltaTCorrection(year) {
 //   • Turning this ON, like Bond, VIOLATES the paper's "zero coefficients
 //     fitted to eclipse data" claim
 //
-// Sources:
-//   data/deltaT-bond-plus-hallstatt-fit.json    (joint ΔT fit, free amplitude)
-//   data/hallstatt-steinhilber-fit.json         (solar Φ validation)
-//   data/hallstatt-cheng-fit.json               (speleothem null result)
-//   data/hallstatt-epica-fit.json               (CO₂ validation)
+// Sources: the comb-era joint ΔT fit and the three Hallstatt proxy tests
+//   (Steinhilber solar Φ, Cheng speleothem null, EPICA CO₂) were deleted at
+//   plan 09 step 7e; doc 109 §22 records their headline numbers.
 // ═════════════════════════════════════════════════════════════════════════════
 // HALLSTATT_DT_CORRECTION_ENABLED (feature flag) declared in A5 Research toggles at top of file
 const HALLSTATT_PERIOD_YR              = FIT.DT_STACK.hallstatt.period_yr;  // 2,429.83 yr, stated in years (T5)
@@ -3044,7 +3041,7 @@ function hallstattCycleDeltaTCorrection(year) {
 //     zero-fit claim
 //
 // Sources:
-//   data/deltaT-triple-bond-hallstatt-jose5-fit.json  (joint 3-cycle fit)
+//   the comb-era joint 3-cycle fit (deleted at plan 09 step 7e; doc 109 §22)
 //   L-5b Section 14 output                            (browser-side scan)
 // ═════════════════════════════════════════════════════════════════════════════
 // JOSE5_DT_CORRECTION_ENABLED (feature flag) declared in A5 Research toggles at top of file
@@ -3071,8 +3068,9 @@ function jose5CycleDeltaTCorrection(year) {
 // degenerate with Bond/2 ≈ 733 yr at ~2.5% level; the 4×Jose anchor is
 // tighter (0.083% match) so we ship on the SIM/Jose interpretation.
 //
-// Empirical support: scripts/lattice_harmonic_scan.py --preset mwp-band and
-// --preset jose-family both identify 8H/3749 as the top cross-archive hit,
+// Empirical support: the comb-era cross-archive scan (deleted at plan 09 step
+// 7e; doc 109 §22) identified 715 yr as the top cross-archive hit in both its
+// mwp-band and jose-family presets,
 // with significant amplitude in BOTH Steinhilber solar Φ (~41 MV, permutation
 // p<5%) AND EPICA CO2 (~11 ppm, permutation p<5%). No other Jose multiple
 // shows this two-archive coherence.
@@ -3181,8 +3179,8 @@ function resonatorSwingLodRate(year) {
 // ═════════════════════════════════════════════════════════════════════════════
 // EDDY attempt (8H/2684 = 999.45 yr) — TESTED AND ROLLED BACK 2026-07-12
 // ═════════════════════════════════════════════════════════════════════════════
-// Rationale for absence: after Jose4 shipped, scripts/lattice_harmonic_scan.py
-// (--band 500 1200) identified 8H/2684 (Eddy 999.45 yr, 0.05% match to the
+// Rationale for absence: after Jose4 shipped, the comb-era cross-archive scan
+// (500–1200 yr band; deleted at plan 09 step 7e) identified 999.45 yr (Eddy, 0.05% match to the
 // 1000-yr Eddy solar minimum cycle) as the tightest structural anchor of any
 // gcd-compliant 800-1100 yr candidate, with cross-archive coherence in
 // Steinhilber Φ + EPICA CO2 (both p<5% per permutation test).
@@ -3198,16 +3196,16 @@ function resonatorSwingLodRate(year) {
 // Net: modest late-medieval win overwhelmed by ancient BCE regression. The
 // 999-yr Eddy solar cycle is empirically real (cross-archive coherent), but
 // cannot be fit against ΔT residual without hurting the ancient window.
-// Research artifacts kept: data/deltaT-5flag-fit.json (5-cycle output),
-// data/lattice-scan-band-500-1200.json, scripts/lattice_harmonic_scan.py.
+// Research artifacts kept: data/deltaT-5flag-fit.json (5-cycle output); the
+// comb-era scan and its outputs were deleted at plan 09 step 7e (doc 109 §22).
 // ═════════════════════════════════════════════════════════════════════════════
 
 // ═════════════════════════════════════════════════════════════════════════════
 // EMP862 attempt (8H/3111 = 862 yr) — TESTED AND ROLLED BACK 2026-07-12
 // ═════════════════════════════════════════════════════════════════════════════
 // Rationale for absence: after Jose4 shipped and while testing Eddy
-// (see Eddy rollback block above), scripts/lattice_harmonic_scan.py
-// identified 8H/3111 (~862 yr, gcd=61) as the ONLY candidate anywhere
+// (see Eddy rollback block above), the comb-era cross-archive scan
+// identified ~862 yr as the ONLY candidate anywhere
 // with THREE-archive cross-coherence (Steinhilber solar Φ + Cheng
 // speleothem δ18O + EPICA CO2 all significant). Strongest empirical
 // evidence for any candidate ever tested.
@@ -3222,9 +3220,9 @@ function resonatorSwingLodRate(year) {
 // ~6,255 yr — unresolvable by the 2.7-kyr Stephenson window. Six cycles
 // span too much of the residual variance for the small dataset.
 //
-// The 3-archive empirical evidence for 862 yr remains VALID and is
-// preserved as research infrastructure (data/lattice-scan-band-500-1200.json,
-// data/lattice-scan-custom.json). Fitting requires a different target
+// The 3-archive empirical evidence for 862 yr remains VALID; its comb-era
+// scan outputs were deleted at plan 09 step 7e (doc 109 §22 is the record).
+// Fitting requires a different target
 // (multi-archive multi-record joint fit, not Stephenson ΔT residual).
 // ═════════════════════════════════════════════════════════════════════════════
 
@@ -3245,9 +3243,9 @@ function resonatorSwingLodRate(year) {
 // Conclusion: the 1090 yr peak in Section 14 is Bond-frequency residual
 // structure, not an independent signal. Ship the 3-flag stack (Bond +
 // Hallstatt + Jose5) as the optimal empirically-validated configuration.
-// Research artifacts kept: scripts/lod_residual_quad_fit.py (collinearity
-// blow-up demo), scripts/jupiter92_isolated_refit.py (phase-isolation), and
-// their JSON outputs document the null attempt.
+// Research record: the quad-fit collinearity demo and the Jupiter-92
+// phase-isolation refit were deleted at plan 09 step 7e; doc 109 §22
+// documents the null attempt.
 // ═════════════════════════════════════════════════════════════════════════════
 
 // ───── Layer 3 LOD corrections — implied δLOD from ΔT cyclic corrections ─────
@@ -3688,7 +3686,7 @@ const _moonArgsM = (() => {
 //   beat ~27 °/cy (21%). The rate is hypersensitive to ppm-level planetary
 //   rates, so Meeus's 131.849 is an observed effective rate by nature —
 //   retained as such by design (bounded 0.004° sine; no deep-time hazard).
-// Identification record: tools/explore/derive-a1a2a3.js;
+// Identification record: derive-a1a2a3.js (deleted at plan 09 step 7e; doc 109 §22);
 // mechanism + A2-amplitude confirmation (79%) + J2 negative control:
 // tools/explore/derive-planetary-lunar-terms.js.
 const FW_A2_RATE = 2 * (360 * julianCenturyDays / moonTropicalMonth)
@@ -3954,8 +3952,9 @@ function meanTropicalMonthAtAge(t_Ma) { return _moonChain().tropicalMonthSeconds
 // with the H² scaling to ~0.7% over Phanerozoic.
 //
 // See: docs/99-expanding-solar-system-resonance-theory.md and the research
-// trail in tools/explore/ (audit-moon-months, derive-moon-precession-rates,
-// derive-moon-precession-deep-time, explore-scaling-N-proposal).
+// trail in tools/explore/ (derive-moon-precession-rates,
+// derive-moon-precession-deep-time, explore-scaling-N-proposal; the comb-era
+// audit-moon-months was deleted at plan 09 step 7e).
 
 // (plan 09 step 5c: the H² "cycles per H" / of-date period wrappers
 // (mean*ICRFAtAge) left with the counter law; no reader remained. The of-date
@@ -5263,8 +5262,8 @@ let   currentEpoch_t_Ma   = 0;
 
 // Phase Z-B (2026-06): enable Sun longitude harmonic correction at scene-graph
 // Sun node. Closes the framework's ~200" Sun-vs-Meeus residual to ~7" RMS
-// (96% reduction) by applying the year-period EoC correction validated in
-// tools/explore/sun-annual-correction.js. Sun-only application (NOT barycenter)
+// (96% reduction) by applying the year-period EoC correction validated by the
+// annual-correction instrument (deleted at plan 09 step 7e; doc 109 §22). Sun-only application (NOT barycenter)
 // keeps planet baselines pristine — the correction is Earth-Sun-geometry-
 // specific (eccentricity-definition difference, ~0.01545 vs Meeus 0.01671).
 //

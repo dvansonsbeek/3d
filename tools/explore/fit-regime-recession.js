@@ -4,7 +4,7 @@
  * =====================================================================
  *
  * The real fit behind the regime-aware history: replaces the hand-shaped
- * candidate of regime-aware-recession-study.js with a proper constrained
+ * candidate of the deleted regime-aware-recession-study.js (plan 09 step 7e) with a proper constrained
  * optimization against the full anchor set assembled 2026-08-14.
  *
  * DESIGN
@@ -204,13 +204,11 @@ for (const [id, t, v, s] of A_ANCHORS) {
 }
 console.log('');
 const yearS = (t) => dt.meanSiderealYearSecondsAtAge(t);
-const daysPerYr0 = yearS(0) / dt.meanLodSecondsAtAge(0);
 const dpy = (t) => yearS(t) / (m.lodHr(t) * 3600);
-const H = (t) => 335317 * daysPerYr0 / dpy(t);   // the retired era counter H₀·LOD/LOD₀ (plan 09 step 7c): a frozen record of this study's rows
 console.log('  gated-era check (must be bit-identical to shipped):');
 console.log(`    Wells 380 Ma: ${dpy(380).toFixed(2)} d/yr (shipped 399.97) | Wu 650 Ma LOD: ${m.lodHr(650).toFixed(2)} h (shipped ${(dt.meanLodSecondsAtAge(650) / 3600).toFixed(2)})`);
 console.log('  genesis state:');
-console.log(`    LOD ${m.lodHr(best.p.genesisMa - 5).toFixed(2)} h | H ${Math.round(H(best.p.genesisMa - 5)).toLocaleString('en-US')} yr | L_EM/L_today ${(m.LFn(best.p.genesisMa - 5) / L0).toFixed(3)}`);
+console.log(`    LOD ${m.lodHr(best.p.genesisMa - 5).toFixed(2)} h | L_EM/L_today ${(m.LFn(best.p.genesisMa - 5) / L0).toFixed(3)}`);
 console.log('  L_EM trajectory (model) at the Zhou epochs vs the data reconstruction (−0.2% flat):');
 for (const t of [1634, 1480, 1215]) console.log(`    ${t} Ma: ${((m.LFn(t) / L0 - 1) * 100).toFixed(2)}%`);
 console.log('');
@@ -313,5 +311,5 @@ for (const [v, chi] of profile('genesisMa', [4420, 4450, 4475, 4498, 4520])) {
   console.log('  anchor residuals (σ): ' + LOD_ANCHORS.map(([id, t, v, s]) => `${id} ${((fm.lodHr(t) - v) / s).toFixed(1)}`).join(' · '));
   console.log('  distance (σ): ' + A_ANCHORS.map(([id, t, v, s]) => `${id} ${((fm.aKm(t) - v) / s).toFixed(1)}`).join(' · '));
   const gdpy = yearS(380) / (fm.lodHr(380) * 3600);
-  console.log(`  gated: Wells ${gdpy.toFixed(2)} | genesis LOD ${fm.lodHr(4493).toFixed(2)} h · H ${Math.round(335317 * daysPerYr0 / (yearS(4493) / (fm.lodHr(4493) * 3600))).toLocaleString('en-US')} yr · L_EM/L0 ${(fm.LFn(4493) / L0).toFixed(3)}`);
+  console.log(`  gated: Wells ${gdpy.toFixed(2)} | genesis LOD ${fm.lodHr(4493).toFixed(2)} h · L_EM/L0 ${(fm.LFn(4493) / L0).toFixed(3)}`);
 }

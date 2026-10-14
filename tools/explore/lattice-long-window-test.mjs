@@ -114,9 +114,11 @@ if ((LUNAR_ON || ASTEROIDS_ON || MEAN_ON) && (KV.integrator || 'wh').toLowerCase
   console.error('lunar=1 / asteroids=1 / mean=1 are wired for the WH integrator only'); process.exit(1);
 }
 const D2R = Math.PI / 180, DAY = 86400;
-const GM_S = TL.GM_SUN, GM_EM = P.GM_EM, H = 335317;   // H: the retired era unit (plan 09 step 7c) — this lattice test is a frozen record
-// the retired device's node counts per 8H (model-parameters `ascendingNodeCyclesIn8H`, deleted at plan 09 step 7c)
-const ASC_N = { mercury: 9, venus: 1, mars: 64, jupiter: 36, saturn: 36, uranus: 11, neptune: 3 };
+const GM_S = TL.GM_SUN, GM_EM = P.GM_EM;
+// (plan 09 step 7e: the retired lattice's unit and node counts, and the "nearest 8H/N"
+// columns of the console summary, are gone — the summary prints the long-window means
+// against the chain's secular apsidal rates only. The run itself is unchanged: this
+// script is the recipe of the three N-body artifacts, so the edit re-stamps them.)
 
 const names = ['mercury', 'venus', 'earth', 'mars', 'jupiter', 'saturn', 'uranus', 'neptune'];
 const gmOf = (k) => (k === 'earth' ? GM_EM : GM_S / TL.massRatioDE440[k]);
@@ -388,25 +390,19 @@ if (KV.dump !== '0') {
 console.log(`${n - 1}-body run ±${YEARS / 2} yr, ${INTEGRATOR === 'wh' ? `Wisdom–Holman order ${WH_ORDER}` : 'RK4'} at dt ${DT} d${GR_ON ? ', 1PN on' : ', Newton only'}${LUNAR_ON ? `, lunar quadrupole (eff ${LUNAR_QUAD_EFFECTIVE_FACTOR})` : ''}${ASTEROIDS_ON ? ', +Ceres/Pallas/Vesta' : ''}: ${((Date.now() - t0) / 1000).toFixed(0)} s, ${T.length} samples (every ${SAMPLE_DAYS} d)\n`);
 
 const meanRate = (k, el, y0, y1) => { const idx = []; for (let i = 0; i < T.length; i++) if (T[i] >= y0 && T[i] <= y1) idx.push(i); const x = idx.map((i) => T[i]); const y = unwrapDeg(idx.map((i) => EL[el][k][i])); return ols(x, y) * 3600 * 100 - spurious[k][el]; };
-const latticeN = (rateAscy) => 129600000 / rateAscy / (8 * H);   // 8H/N ⇔ N = 8H·rate/(1296000·100)... written as N = 8H / period
-const nearest = (rate) => { const N = 8 * H * rate / 129600000; return `${N < 0 ? '−' : ''}8H/${Math.abs(N).toFixed(2)}`; };
 const f = (v, d = 1, w = 11) => (v === null || v === undefined || Number.isNaN(v) ? '—' : v.toFixed(d)).padStart(w);
 
 console.log('PERIHELION ϖ̇ — long-window means (″/cy), Newton + masses, no relativity');
-console.log(`planet     mean ±5 kyr  ±15 kyr  ±${(YEARS / 2000).toFixed(0)} kyr   nearest 8H/N    lattice 8H/N (″/cy)   lattice N   ratio mean/lattice`);
+console.log(`planet     mean ±5 kyr  ±15 kyr  ±${(YEARS / 2000).toFixed(0)} kyr   chain secular g (″/cy)   ratio mean/chain`);
 for (const k of names) {
   const m10 = meanRate(k, 'w', -5000, 5000), m30 = meanRate(k, 'w', -15000, 15000), mAll = meanRate(k, 'w', -YEARS / 2, YEARS / 2);
-  const lat = k === 'earth' ? null : 1296000 / TL.planets[k].perihelionEclipticYears * 100;
-  const latN = k === 'earth' ? null : 8 * H / TL.planets[k].perihelionEclipticYears;
-  console.log(`${k.padEnd(9)}${f(m10)}${f(m30, 1, 9)}${f(mAll, 1, 9)}   ${nearest(mAll).padStart(12)}${f(lat, 1, 20)}${f(latN, 2, 12)}${f(lat === null ? null : mAll / lat, 3, 16)}`);
+  const chainG = k === 'earth' ? null : 1296000 / TL.planets[k].perihelionEclipticYears * 100;   // the chain's inertial apsidal rate
+  console.log(`${k.padEnd(9)}${f(m10)}${f(m30, 1, 9)}${f(mAll, 1, 9)}   ${f(chainG, 1, 22)}${f(chainG === null ? null : mAll / chainG, 3, 18)}`);
 }
 console.log('\nNODE Ω̇ — long-window means (″/cy)');
-console.log(`planet     mean ±5 kyr  ±15 kyr  ±${(YEARS / 2000).toFixed(0)} kyr   nearest 8H/N    lattice −8H/N (″/cy)  lattice N   ratio`);
+console.log(`planet     mean ±5 kyr  ±15 kyr  ±${(YEARS / 2000).toFixed(0)} kyr`);
 for (const k of names) {
   const m10 = meanRate(k, 'Om', -5000, 5000), m30 = meanRate(k, 'Om', -15000, 15000), mAll = meanRate(k, 'Om', -YEARS / 2, YEARS / 2);
-  const per = k === 'earth' ? -H / 5 : (ASC_N[k] ? -(8 * H) / ASC_N[k] : null);
-  const lat = per === null ? null : 1296000 / per * 100;
-  const latN = per === null ? null : 8 * H / per;
-  console.log(`${k.padEnd(9)}${f(m10)}${f(m30, 1, 9)}${f(mAll, 1, 9)}   ${nearest(mAll).padStart(12)}${f(lat, 1, 20)}${f(latN, 2, 12)}${f(lat === null ? null : mAll / lat, 3, 8)}${k === 'earth' ? '   (Ω of the ecliptic itself: ill-defined in this frame)' : ''}`);
+  console.log(`${k.padEnd(9)}${f(m10)}${f(m30, 1, 9)}${f(mAll, 1, 9)}${k === 'earth' ? '   (Ω of the ecliptic itself: ill-defined in this frame)' : ''}`);
 }
-console.log('\nreading: the lattice claims quantity A; these are the model\'s own Newtonian means over the window shown, with the convergence columns telling how settled each is. Mercury\'s row is the NEWTONIAN mean — the 43 is a separate, Mercury-preferential term (doc 13 §1.8).');
+console.log('\nreading: these are the model\'s own Newtonian means over the window shown, with the convergence columns telling how settled each is. Mercury\'s row is the NEWTONIAN mean — the 43 is a separate, Mercury-preferential term (doc 13 §1.8).');

@@ -639,42 +639,8 @@ export const VALUES = {
     out.insolStabEccMaxModel = { get: () => stb().ecc_range_model_0_5320kyr[1], render: (v) => Number(v).toFixed(4), note: 'the model e(t) (N-body series) maximum over the LR04 span (0–5320 kyr)' };
     out.insolStabEccMinLaskar = { get: () => stb().ecc_range_laskar_0_5320kyr[0], render: (v) => Number(v).toFixed(4), note: 'La2004 e(t) minimum over the LR04 span' };
     out.insolStabEccMaxLaskar = { get: () => stb().ecc_range_laskar_0_5320kyr[1], render: (v) => Number(v).toFixed(4), note: 'La2004 e(t) maximum over the LR04 span' };
-    // L1 attribution of the comb-era pre-iNHG e(t) gain (n = 24 of the retired
-    // integer comb; the retired single-line e(t)) — FROZEN RECORD: the script is
-    // retired (plan 06 T1 + the eccentricity series), the file is not regenerated;
-    // doc 94 §10 is the record. On the shipped model the gain does not exist.
-    const n24 = () => rd('data/l1-n24-attribution-results.json');
-    const pre = () => n24().regime_results['pre-inhg'];
-    const f4 = (v) => Number(v).toFixed(4);
-    out.l1N24LineN = { get: () => n24().metadata.line_n, render: (v) => String(v), note: 'the lattice divisor tested: 8H/n = H/3' };
-    out.l1N24PeriodKyr = { get: () => n24().metadata.line_period_kyr, render: (v) => Number(v).toFixed(1), note: '8H/24 in kyr — the retired single-line eccentricity period (comb-era record)' };
-    out.l1N24NeighbourLo = { get: () => n24().metadata.l1_neighbours[0], render: (v) => String(v), note: 'nearest L1 divisor below 24' };
-    out.l1N24NeighbourHi = { get: () => n24().metadata.l1_neighbours[1], render: (v) => String(v), note: 'nearest L1 divisor above 24' };
-    out.l1N24EccCvPreInhg = { get: () => pre().ecc_only.cv, render: sdr, note: 'CV ΔR² of the model e(t) feature ALONE (fixed H/3 phase), pre-iNHG' };
-    out.l1N24EccInSamplePreInhg = { get: () => pre().ecc_only.in_sample, render: sdr, note: 'in-sample ΔR² of the model e(t) feature alone, pre-iNHG' };
-    out.l1N24LineCvPreInhg = { get: () => pre().line_pair.cv, render: sdr, note: 'CV ΔR² of the free-phase 8H/24 cos/sin pair, pre-iNHG' };
-    out.l1N24LineInSamplePreInhg = { get: () => pre().line_pair.in_sample, render: sdr, note: 'in-sample ΔR² of the free-phase 8H/24 pair, pre-iNHG' };
-    out.l1N24PeriPairCvPreInhg = { get: () => pre().peri_pair.cv, render: sdr, note: 'CV ΔR² of the e·sin ϖ / e·cos ϖ pair alone, pre-iNHG' };
-    out.l1N24EpsCvPreInhg = { get: () => pre().eps_only.cv, render: sdr, note: 'CV ΔR² of the ε anomaly alone, pre-iNHG' };
-    out.l1N24EccOnTopOfLineInSample = { get: () => pre().ecc_on_top_of_line.in_sample, render: sdr, note: 'in-sample ΔR² the model e(t) adds ON TOP of the 8H/24 pair, pre-iNHG' };
-    out.l1N24R2EccByLine = { get: () => pre().r2_ecc_by_line_pair, render: (v) => Number(v).toFixed(3), note: 'R² of the standardized model e(t) feature explained by a free-phase 8H/24 pair, pre-iNHG window' };
-    out.l1N24ScanCv235 = { get: () => pre().scan_cv['23.5'], render: sdr, note: 'CV ΔR² of a free-phase 8H/23.5 pair (specificity control), pre-iNHG' };
-    out.l1N24ScanCv245 = { get: () => pre().scan_cv['24.5'], render: sdr, note: 'CV ΔR² of a free-phase 8H/24.5 pair (specificity control), pre-iNHG' };
-    out.l1N24ScanCv22 = { get: () => pre().scan_cv['22'], render: sdr, note: 'CV ΔR² of a free-phase 8H/22 pair (the lower L1 neighbour), pre-iNHG' };
-    out.l1N24ScanCv25 = { get: () => pre().scan_cv['25'], render: sdr, note: 'CV ΔR² of a free-phase 8H/25 pair (the upper L1 neighbour), pre-iNHG' };
-    out.l1N24PhaseDataPreInhg = { get: () => pre().phase_data_deg, render: (v) => Number(v).toFixed(1), note: 'best-fit phase of the 8H/24 line in the pre-iNHG canonical residual, degrees' };
-    out.l1N24PhaseModelPreInhg = { get: () => pre().phase_model_deg, render: (v) => Number(v).toFixed(1), note: 'phase of the model H/3 eccentricity line on the same convention, degrees' };
-    out.l1N24PhaseDiffDegPreInhg = { get: () => pre().phase_diff_deg, render: (v) => (v >= 0 ? '+' : '−') + Math.abs(Number(v)).toFixed(1), note: 'data − model phase of the 8H/24 line, pre-iNHG, degrees' };
-    out.l1N24PhaseDiffKyrPreInhg = { get: () => Math.abs(pre().phase_diff_kyr), render: (v) => Number(v).toFixed(1), note: '|data − model| phase of the 8H/24 line as a time offset, kyr' };
-    out.l1N24PhaseDiffDegLr04Full = { get: () => n24().regime_results['lr04-full'].phase_diff_deg, render: (v) => (v >= 0 ? '+' : '−') + Math.abs(Number(v)).toFixed(1), note: 'data − model phase of the 8H/24 line over the full LR04 record, degrees' };
-    for (const [key, reg] of [['PostMpt', 'post-mpt'], ['InhgMpt', 'inhg-mpt'], ['PreInhg', 'pre-inhg'], ['Lr04Full', 'lr04-full']]) {
-      out[`l1N24LatticeDeltaR2${key}`] = { get: () => n24().regime_results[reg].lattice_plus_line.delta_r2, render: sdr, note: `ΔR² of the canonical L1+L2+L3 fit when 24 is ADDED to the lattice, regime ${reg}` };
-      out[`l1N24AmpOverMedian${key}`] = { get: () => n24().regime_results[reg].lattice_plus_line.amp_line_over_median, render: (v) => Number(v).toFixed(2), note: `n = 24 amplitude / median L1 amplitude in the 33-divisor fit, regime ${reg}` };
-      out[`l1N24Rank${key}`] = { get: () => n24().regime_results[reg].lattice_plus_line.rank_of_line, render: (v) => String(v), note: `rank of the n = 24 amplitude among the 33 divisors, regime ${reg}` };
-    }
-    out.l1N24R2CanonPreInhg = { get: () => pre().r2_l1_l2_l3, render: f4, note: 'R² of the canonical 32-divisor fit, pre-iNHG' };
-    out.l1N24R2WithLinePreInhg = { get: () => pre().lattice_plus_line.r2_l1_l2_l3, render: f4, note: 'R² of the canonical fit with 24 added (33 divisors), pre-iNHG' };
-    out.l1N24AdmissionRule = { get: () => n24().summary.admission_rule_x_median, render: (v) => `${Number(v)}×`, note: 'the doc 91 lattice admission rule: amplitude ≥ this × the median, full LR04' };
+    // (Plan 09 step 7e: the comb-era n = 24 attribution keys `l1N24*` left with
+    // their script and frozen result file; doc 109 §22 keeps the headline numbers.)
     // L1 line audit (every shipped physical line on the doc-94 footing) and the ~100-kyr band period scan
     const aud = () => rd('data/l1-line-audit-results.json');
     const scn = () => rd('data/ecc-period-scan-results.json');
@@ -3200,11 +3166,9 @@ export const VALUES = {
     const share = (regime, band) => 100 * reg()[regime].by_band[band].ice_share_weighted;
     const residual = (p) => bal().deepAnalysis.configs[11].bestAnchor.perPlanet[p].errArcsec;
     const kv = () => astro.knownValues;
-    // l1-invariant-test.json can carry Infinity (CV of a zero-variance control) — tolerate it.
-    const rdx = (p) => JSON.parse(readFileSync(join(ROOT, p), 'utf8').replace(/\bInfinity\b/g, '1e308').replace(/\bNaN\b/g, 'null'));
-    let invM = null, libM = null;
-    const inv = () => { if (!invM) invM = rdx('data/l1-invariant-test.json'); return invM; };
-    const lib = () => { if (!libM) libM = rdx('data/l1-libration-test.json'); return libM; };
+    // (plan 09 step 7e: the Test C invariant-manifold and libration keys —
+    // `testCInvariant*`, `testCLibrationPValue` — left with their comb-era
+    // scripts and result files; doc 109 §22 keeps the record.)
     const out = {
       charneyECS:     { get: () => ecs().overall.median, render: (v) => Number(v).toFixed(2), unit: 'K' },
       charneyECSLow:  { get: () => ecs().overall.p5, render: (v) => Number(v).toFixed(2), unit: 'K' },
@@ -3222,53 +3186,12 @@ export const VALUES = {
       mptPrecessionIceSharePre: { get: () => share('inhg_mpt', 'precession (18-26)'), render: (v) => String(Math.round(v)), unit: '%', note: 'iNHG-MPT precession-band ice-albedo share of total forcing (climate-ecs-per-regime)' },
       // doc 92 Tier A/B prose values (tables generated by scripts/generate_doc97_tables.py)
       ...(() => {
-        const vb = () => rd('data/milankovitch-8h-variance-budget.json');
-        const b1 = () => rd('data/milankovitch-8h-tier-b-round1.json');
-        const b2 = () => rd('data/milankovitch-8h-tier-b-round2.json');
-        const b3 = () => rdx('data/milankovitch-8h-tier-b-round3.json');
+        // (plan 09 step 7e: the comb-era Tier A/B keys — `tierA*`, `tierB*`,
+        // `tierC*`, `tierR3*` — left with their scripts and artifacts; doc 109
+        // §22 keeps the headline numbers.)
         const cf = () => rd('data/milankovitch-climate-formula.json');
         const f4 = (v) => Number(v).toFixed(4), f3 = (v) => Number(v).toFixed(3), f2 = (v) => Number(v).toFixed(2);
-        const sd4 = (v) => (v >= 0 ? '+' : '−') + Math.abs(Number(v)).toFixed(4);
         const o = {};
-        for (const [key, reg] of [['Full', 'lr04_full'], ['PreMpt', 'lr04_pre_mpt'], ['PostMpt', 'lr04_post_mpt'], ['CenogridD18o', 'cenogrid_d18o'], ['CenogridD13c', 'cenogrid_d13c']]) {
-          o[`tierA0R2${key}`] = { get: () => vb()[reg].a0_baseline_25.r2, render: f4, note: `Tier A0 plain-OLS R² of the 25-integer baseline, ${reg}` };
-          o[`tierA1R2${key}`] = { get: () => vb()[reg].a1_extended_31.r2, render: f4, note: `Tier A1 R² with the shipped lattice, ${reg}` };
-          o[`tierA1DeltaR2${key}`] = { get: () => vb()[reg].a1_extended_31.delta_r2_vs_a0, render: sd4, note: `Tier A1 ΔR² vs the 25 baseline, ${reg}` };
-          o[`tierA2R2${key}`] = { get: () => vb()[reg].a2_plus_405k.r2, render: f4, note: `Tier A2 R² (+405 kyr), ${reg}` };
-          o[`tierA2DeltaR2${key}`] = { get: () => vb()[reg].a2_plus_405k.delta_r2_vs_a1, render: sd4, note: `Tier A2 ΔR², ${reg}` };
-          o[`tierA3R2${key}`] = { get: () => vb()[reg].a3_plus_13h.r2, render: f4, note: `Tier A3 R² (+13H), ${reg}` };
-          o[`tierA3DeltaR2${key}`] = { get: () => vb()[reg].a3_plus_13h.delta_r2_vs_a2, render: sd4, note: `Tier A3 ΔR², ${reg}` };
-          o[`tierA4R2${key}`] = { get: () => vb()[reg].a4_plus_9m.r2, render: f4, note: `Tier A4 R² (+9 Myr), ${reg}` };
-          o[`tierA4DeltaR2${key}`] = { get: () => vb()[reg].a4_plus_9m.delta_r2_vs_a3, render: sd4, note: `Tier A4 ΔR², ${reg}` };
-        }
-        o.tierA1ConditionFull = { get: () => vb().lr04_full.a1_extended_31.condition, render: (v) => Number(v).toFixed(1), note: 'condition number of the Tier A1 design, full LR04' };
-        o.tierA4ConditionFull = { get: () => vb().lr04_full.a4_plus_9m.condition, render: (v) => Number(v).toFixed(1), note: 'condition number of the Tier A4 design, full LR04' };
-        o.tierALatticeCount = { get: () => vb().config.extended_integers.length, render: (v) => String(v), note: 'size of the shipped lattice in the Tier A run' };
-        o.tierALatticeAdded = { get: () => vb().config.extended_integers.length - vb().config.base_integers.length, render: (v) => String(v), note: 'integers the shipped lattice carries beyond the 25 baseline' };
-        o.tierB4D18oLinear = { get: () => b1().b4_cenogrid_detrend.d18o.linear.r2_full_pipeline, render: f3, note: 'B4: CENOGRID δ¹⁸O R² with linear detrend' };
-        o.tierB4D18oPiecewise = { get: () => b1().b4_cenogrid_detrend.d18o.piecewise6.r2_full_pipeline, render: f3, note: 'B4: CENOGRID δ¹⁸O R² with piecewise-linear detrend at 6 transitions' };
-        o.tierB4D18oGain = { get: () => b1().b4_cenogrid_detrend.d18o.piecewise6.r2_full_pipeline / b1().b4_cenogrid_detrend.d18o.linear.r2_full_pipeline, render: (v) => `${Number(v).toFixed(1)}×`, note: 'B4 δ¹⁸O gain factor piecewise/linear' };
-        o.tierB4D13cPoly10 = { get: () => b1().b4_cenogrid_detrend.d13c.poly10.r2_full_pipeline, render: f3, note: 'B4: CENOGRID δ¹³C R² with degree-10 polynomial detrend' };
-        o.tierB4D13cGain = { get: () => b1().b4_cenogrid_detrend.d13c.poly10.r2_full_pipeline / b1().b4_cenogrid_detrend.d13c.linear.r2_full_pipeline, render: (v) => `${Number(v).toFixed(1)}×`, note: 'B4 δ¹³C gain factor poly10/linear' };
-        o.tierB1Ratio202 = { get: () => b1().b1_harmonics.cenogrid_d18o_n2_202.d13c_over_d18o_variance_ratio, render: f2, note: 'B1: δ¹³C/δ¹⁸O variance ratio of the 202-kyr harmonic' };
-        o.tierB1Ratio135 = { get: () => b1().b1_harmonics.cenogrid_d18o_n3_135.d13c_over_d18o_variance_ratio, render: f2, note: 'B1: δ¹³C/δ¹⁸O variance ratio of the 135-kyr harmonic' };
-        o.tierC8TopLabel = { get: () => b1().c8_joint_proxy.components_sorted_by_ratio[0].label, render: (v) => String(v), note: 'C8: the lattice line with the highest carbon amplification' };
-        o.tierC8TopRatio = { get: () => b1().c8_joint_proxy.components_sorted_by_ratio[0].ratio_d13c_over_d18o, render: f2, note: 'C8: its δ¹³C/δ¹⁸O ratio' };
-        o.tierB2OffLattice = { get: () => b1().b2_eigenmode_enum.n_off_lattice, render: (v) => String(v), note: 'B2: off-lattice Laskar beat candidates tested' };
-        o.tierB2Promoted = { get: () => b1().b2_eigenmode_enum.n_promoted, render: (v) => String(v), note: 'B2: candidates passing strict promotion' };
-        o.tierB5D18oBase = { get: () => b2().b5_step_components.d18o.r2_baseline, render: f3, note: 'B5: CENOGRID δ¹⁸O R² before step covariates' };
-        o.tierB5D18oSteps = { get: () => b2().b5_step_components.d18o.r2_with_steps, render: f3, note: 'B5: CENOGRID δ¹⁸O R² with 6 Heaviside steps' };
-        o.tierB5D18oGain = { get: () => b2().b5_step_components.d18o.r2_with_steps / b2().b5_step_components.d18o.r2_baseline, render: (v) => `${Math.round(Number(v))}×`, note: 'B5 δ¹⁸O gain factor' };
-        o.tierB5D13cBase = { get: () => b2().b5_step_components.d13c.r2_baseline, render: f3, note: 'B5: CENOGRID δ¹³C R² before steps' };
-        o.tierB5D13cSteps = { get: () => b2().b5_step_components.d13c.r2_with_steps, render: f3, note: 'B5: CENOGRID δ¹³C R² with steps' };
-        o.tierB5D13cGain = { get: () => b2().b5_step_components.d13c.r2_with_steps / b2().b5_step_components.d13c.r2_baseline, render: (v) => `${Number(v).toFixed(1)}×`, note: 'B5 δ¹³C gain factor' };
-        o.tierC10TopRatio = { get: () => b2().c10_epica_co2.components_sorted_by_ratio[0].co2_over_lr04_amp_ratio, render: f2, note: 'C10: strongest EPICA CO₂ / LR04 amplification ratio (8H/66)' };
-        o.tierC5PredictPost = { get: () => b2().c5_forward_prediction.train_pre_predict_post.r2_predict_post, render: f2, note: 'C5: R² of the pre-MPT-trained formula predicting post-MPT' };
-        o.tierR31WindowR2Min = { get: () => Math.min(...b3().r3_1_sliding_window.lr04_windows.map((w) => w.r2)), render: f2, note: 'R3-1: lowest per-window R² over the 11 LR04 windows' };
-        o.tierR31WindowR2Max = { get: () => Math.max(...b3().r3_1_sliding_window.lr04_windows.map((w) => w.r2)), render: f2, note: 'R3-1: highest per-window R²' };
-        o.tierR34AmpCvD18o = { get: () => 100 * b3().r3_4_13h_stability.summary.amp_d18o.cv, render: (v) => String(Math.round(v)), unit: '%', note: 'R3-4: 13H amplitude CV across windows, δ¹⁸O' };
-        o.tierR34AmpCvD13c = { get: () => 100 * b3().r3_4_13h_stability.summary.amp_d13c.cv, render: (v) => String(Math.round(v)), unit: '%', note: 'R3-4: 13H amplitude CV, δ¹³C' };
-        o.tierR34PhaseStdD18o = { get: () => b3().r3_4_13h_stability.summary.phase_d18o_circular_std_deg, render: (v) => Number(v).toFixed(1), unit: '°', note: 'R3-4: 13H phase circular std, δ¹⁸O' };
         for (const [key, reg] of [['Full', 'lr04-full'], ['PostMpt', 'post-mpt'], ['InhgMpt', 'inhg-mpt'], ['PreInhg', 'pre-inhg']]) {
           o[`canonR2${key}`] = { get: () => cf().regime_fits[reg].r2_l1_l2_l3, render: f4, note: `canonical L1+L2+L3 R² (sequential ridge), ${reg}` };
         }
@@ -3347,24 +3270,8 @@ export const VALUES = {
       testAObliquityPeakMatch: { get: () => kv().testAObliquityPeakMatch, render: (v) => String(v) },
       testAEccentricityNull: { get: () => kv().testAEccentricityNullPct, render: (v) => String(v), unit: '%' },
       eightHDerivabilityTopPct: { get: () => kv().eightHDerivabilityTopPct, render: (v) => String(v), unit: '%' },
-      testCInvariantObliquityPct: { get: () => 100 * inv().band_width_sensitivity['7.5'].obl_mean, render: (v) => String(Math.round(v)), unit: '%', note: 'LA2004 obliquity PSD fraction inside ±7.5% bands around the L1 integers, mean over sliding 5-Myr windows (l1_invariant_test.py)' },
-      testCInvariantRandomPct: { get: () => 100 * inv().control_summary.obl_mean_mean, render: (v) => String(Math.round(v)), unit: '%', note: 'the same obliquity fraction for random same-size integer sets at ±5% bands (200 controls)' },
-      testCInvariantEccPct15: { get: () => 100 * inv().band_width_sensitivity['15.0'].ecc_mean, render: (v) => Number(v).toFixed(1), unit: '%', note: 'LA2004 eccentricity PSD fraction inside ±15% bands around the L1 integers' },
-      testCInvariantEccOffLatticePct15: { get: () => 100 * (1 - inv().band_width_sensitivity['15.0'].ecc_mean), render: (v) => Number(v).toFixed(1), unit: '%', note: 'eccentricity power outside the ±15% lattice bands' },
-      testCInvariantEccPct5: { get: () => 100 * inv().band_width_sensitivity['5.0'].ecc_mean, render: (v) => Number(v).toFixed(1), unit: '%', note: 'eccentricity on-lattice fraction at ±5% bands' },
-      testCInvariantRandomEccPct5: { get: () => 100 * inv().control_summary.ecc_mean_mean, render: (v) => Number(v).toFixed(1), unit: '%', note: 'random same-size integer sets, eccentricity fraction at ±5% bands' },
-      testCInvariantControlsBeatingL1Ecc: { get: () => Math.round(inv().n_controls * inv().L1_percentile_within_controls.ecc_mean_pct_better / 100), render: (v) => String(v), note: 'number of the random controls whose ±5% eccentricity on-lattice fraction exceeds L1\'s' },
-      testCInvariantControls: { get: () => inv().n_controls, render: (v) => String(v), note: 'random same-size integer sets drawn' },
-      testCInvariantEccFrac5: { get: () => inv().band_width_sensitivity['5.0'].ecc_mean, render: (v) => Number(v).toFixed(3), note: 'L1 eccentricity on-lattice fraction at ±5% bands (mean over windows)' },
-      testCInvariantRandomEccFrac5: { get: () => inv().control_summary.ecc_mean_mean, render: (v) => Number(v).toFixed(3), note: 'random controls, eccentricity on-lattice fraction at ±5% bands (mean of the controls)' },
-      testCInvariantEccCv: { get: () => inv().band_width_sensitivity['5.0'].ecc_cv, render: (v) => Number(v).toFixed(3), note: 'CV across sliding windows of the L1 eccentricity fraction (±5%)' },
-      testCInvariantRandomEccCv: { get: () => inv().control_summary.ecc_cv_mean, render: (v) => Number(v).toFixed(3), note: 'mean CV across windows of the random controls (±5%)' },
-      testCInvariantEccMeanPctBetter: { get: () => inv().L1_percentile_within_controls.ecc_mean_pct_better, render: (v) => Number(v).toFixed(1), unit: '%', note: 'share of controls whose mean eccentricity fraction beats L1' },
-      testCInvariantEccCvPctBetter: { get: () => inv().L1_percentile_within_controls.ecc_cv_pct_better, render: (v) => Number(v).toFixed(1), unit: '%', note: 'share of controls whose CV across windows is lower than L1' },
-      testCInvariantEccRatio5: { get: () => inv().band_width_sensitivity['5.0'].ecc_mean / inv().control_summary.ecc_mean_mean, render: (v) => `${Number(v).toFixed(1)}×`, note: 'L1 ÷ random eccentricity on-lattice fraction at ±5% bands' },
       testCBalanceSaturnMult: { get: () => kv().testCBalanceSaturnMult, render: (v) => String(v) },
       testCBalancePValue: { get: () => kv().testCBalancePValue, render: (v) => fmtSci(v, 0) },
-      testCLibrationPValue: { get: () => lib().aggregate_bias.t_pvalue, render: (v) => Number(v).toFixed(2), note: 'two-sided t-test of the aggregate LA2004 period bias against zero (equilibrium_libration_test.py)' },
       testC50Window: { get: () => kv().testC50WindowMyr, render: (v) => `−${Math.abs(v)}`, unit: 'Myr' },
     };
     for (const p of ['mercury', 'venus', 'mars', 'jupiter', 'saturn', 'uranus', 'neptune']) {

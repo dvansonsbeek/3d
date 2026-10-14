@@ -141,8 +141,9 @@ for (const c of Object.keys(cents).map(Number).sort((a, b) => a - b)) {
   console.log(`  ${String(c).padStart(5)} | n ${String(rs.length).padStart(2)} | ${mFw.toFixed(0).padStart(6)} | ${mSp.toFixed(0).padStart(6)} | ${(DT.meanDeltaTSecondsAtAge((2000 - (c + 50)) / 1e6) - (spline(c + 50) ?? NaN)).toFixed(0).padStart(6)}`);
 }
 
-// B. lattice periodogram (weighted LSQ per divisor) on residFw
-const H = 335317;   // the retired era unit (plan 09 step 7c) — this script's lattice labels are a frozen record
+// B. (plan 09 step 7e) the comb-divisor periodogram that stood here was deleted
+// with the retired unit; doc 109 §22 keeps its top divisors. The weighted LSQ
+// per period stays for the shipped-cycle regression below.
 const wls = (period) => {
   const om = 2 * Math.PI / period;
   let Scc = 0, Sss = 0, Ssc = 0, Sc = 0, Ss = 0, Sy = 0, Syc = 0, Sys = 0, S1 = 0;
@@ -176,20 +177,13 @@ const wls = (period) => {
   }
   return { amp: Math.hypot(x[1], x[2]), dChi2: chi0 - chi1 };
 };
-console.log('\nB. lattice periodogram (8H/n; period 250–4200 yr): top Δχ² divisors');
-const results = [];
-for (let n = Math.ceil(8 * H / 4200); n <= Math.floor(8 * H / 250); n++) {
-  const period = 8 * H / n;
+console.log('\nB. single-tone periodogram at the shipped cycle periods (weighted LSQ on residFw)');
+for (const [name, period] of [['bond', 1466], ['hallstatt', 2430], ['jose5', 898], ['jose4', 715], ['resonator', 3916]]) {
   const { amp, dChi2 } = wls(period);
-  results.push({ n, period, amp, dChi2 });
-}
-results.sort((a, b) => b.dChi2 - a.dChi2);
-for (const r of results.slice(0, 10)) {
   // a ΔT tone A·sin(2πt/P) implies an LOD amplitude of A·2π/(P·365.25) s/day
-  const lodMs = r.amp * 2 * Math.PI / (r.period * 365.25) * 1000;
-  console.log(`  8H/${r.n} = ${r.period.toFixed(0).padStart(5)} yr | amp ${r.amp.toFixed(0).padStart(4)} s | Δχ² ${r.dChi2.toFixed(1)} | implied LOD amp ${lodMs.toFixed(1)} ms (millennial bound ~4 ms)`);
+  const lodMs = amp * 2 * Math.PI / (period * 365.25) * 1000;
+  console.log(`  ${name.padEnd(9)} ${String(period).padStart(5)} yr | amp ${amp.toFixed(0).padStart(4)} s | Δχ² ${dChi2.toFixed(1)} | implied LOD amp ${lodMs.toFixed(1)} ms (millennial bound ~4 ms)`);
 }
-console.log('  reference — shipped cycle divisors: bond 8H/1830=1466 | hallstatt 8H/1104=2430 | jose5 8H/2989=898 | jose4 8H/3749=715 | resonator 8H/685=3916');
 
 // C. shipped-cycle shape regression (coefficient on each cycle's shape)
 console.log('\nC. shipped-cycle shape coefficients (0 = indifferent, −1 = remove, +k = scale up):');

@@ -13,7 +13,7 @@
 import { fileURLToPath } from 'node:url';
 import { readFileSync, writeFileSync, existsSync } from 'node:fs';
 const HERE = fileURLToPath(new URL('.', import.meta.url));
-const { createModel, DEFAULT_CONSTANTS } = await import(new URL('../../packages/physics/src/index.js', import.meta.url).href);
+const { createModel, DEFAULT_CONSTANTS, computeMeanTropicalYearJ2000Days } = await import(new URL('../../packages/physics/src/index.js', import.meta.url).href);
 const { createSunPlanetaryCompletion } = await import(new URL('../../packages/physics/src/eclipse/sun-planetary-completion.cjs', import.meta.url).href).then((m) => m.default ?? m);
 
 const model = createModel(DEFAULT_CONSTANTS);
@@ -22,8 +22,7 @@ const C = DEFAULT_CONSTANTS;
 // POST-N3: the module is v3 (framework carriers, injected rates) — this
 // instrument's recorded v1-vs-v4 numbers predate the swap; it now evaluates
 // the v3 table here.
-const _n3H = 335317;   // the retired era unit and its rounded mean-tropical-year input (plan 09 step 7c) — frozen record
-const _n3mSY = Math.round(365.2422 * (_n3H / 8)) / (_n3H / 8);
+const _n3mSY = computeMeanTropicalYearJ2000Days(C.yearLengthRef.siderealYear, C.earthOrbital.generalPrecessionJ2000_arcsecPerYr);   // the derived mean tropical year (plan 09 step 7e)
 const _n3dpc = (/** @type {number} */ f) => 360 * 36525 * f;
 const { sunPlanetaryCompletionDeg } = createSunPlanetaryCompletion({
   embWobbleArcsec: (C.moonReference.moonDistance / (1 + C.physicalConstants.MASS_RATIO_EARTH_MOON)
