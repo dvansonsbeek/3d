@@ -42,7 +42,6 @@
 /**
  * @param {{
  *   ageAnchorYear: number,
- *   tropicalYearSecondsAtAge: (tMa: number) => (number | null),
  *   tropicalYearJ2000Seconds: number,
  *   isDeepTime: () => boolean,
  *   gridMinYear?: number,
@@ -52,12 +51,18 @@
  *   maxCacheEntries?: number,
  * }} deps — ageAnchorYear is the year whose age is 0 in the period
  *   functions' t_Ma coordinate (startmodelYear = 2000.5, the certified
- *   convention); tropicalYearJ2000Seconds feeds the snapshot branch;
+ *   convention); tropicalYearJ2000Seconds is the length of ONE tick of the
+ *   year axis the integrator is fed — the linear SI-year label, each tick
+ *   exactly one J2000 tropical year of seconds — so it is the integrand's
+ *   weight in BOTH branches (plan 09 step 7c′: the deep branch had weighted
+ *   each tick by the tropical year OF DATE, adding that year's deep-time
+ *   drift to every lunar count — ~5° of Moon at ±100 kyr, ~1.3 orbits at
+ *   1 Ma — although the tick itself never changes length; the owner's call:
+ *   a plain correctness fix, the tick already is an SI tick);
  *   isDeepTime is read PER CALL so the engine's runtime toggle works.
  */
 function createChainCycleIntegrator({
   ageAnchorYear,
-  tropicalYearSecondsAtAge,
   tropicalYearJ2000Seconds,
   isDeepTime,
   gridMinYear = 2000 - 250000,
@@ -73,28 +78,8 @@ function createChainCycleIntegrator({
   /** @type {Map<PeriodSecondsAtAge, Float64Array | null>} */
   const tables = new Map();
 
-  // Exact-argument memo for the year-length integrand of the out-of-range
-  // Simpson fallback. Within one animation frame every integrator node
-  // (the six-plus Moon chains + the seven planets) integrates the SAME
-  // (anchor, currentYear) pair, so the Simpson sample lattice — and with
-  // it every tropicalYearSecondsAtAge(tMa) — repeats across chains, up to
-  // 13× per sample. Exact-key reuse returns the bit-identical value: pure
-  // dedupe, not a resolution change (the sampler-purity trap class is
-  // about grids serving NEARBY arguments; this serves only the same one).
-  // Bounded by wholesale clear — one frame's lattice is ≤ ~1025 entries.
-  /** @type {Map<number, number | null>} */
-  const yearSecondsMemo = new Map();
-  const YEAR_SECONDS_MEMO_CAP = 4096;
-  /** @param {number} tMa @returns {number | null} */
-  function tropicalYearSecondsMemo(tMa) {
-    let v = yearSecondsMemo.get(tMa);
-    if (v === undefined) {
-      v = tropicalYearSecondsAtAge(tMa);
-      if (yearSecondsMemo.size >= YEAR_SECONDS_MEMO_CAP) yearSecondsMemo.clear();
-      yearSecondsMemo.set(tMa, v);
-    }
-    return v;
-  }
+  // (plan 09 step 7c′: the exact-argument memo of the year-of-date weight
+  // left with the weight — the tick length is the constant below.)
 
   /** Lazy cumulative table for one chain; null when the chain is undefined
    *  anywhere in range (→ Simpson fallback).
@@ -111,8 +96,7 @@ function createChainCycleIntegrator({
       const tMa = (ageAnchorYear - y) / 1e6;
       const tPeriodS = periodFnSeconds(tMa);
       if (tPeriodS === null) return null;
-      const tYrS = tropicalYearSecondsAtAge(tMa);
-      return tYrS === null ? null : tYrS / tPeriodS;
+      return tropicalYearJ2000Seconds / tPeriodS;   // cycles per tick (one SI year)
     };
     let ok = true;
     let fPrev = f(gridMinYear);
@@ -190,9 +174,7 @@ function createChainCycleIntegrator({
       const tMa = (ageAnchorYear - y) / 1e6;
       const tPeriodS = periodFnSeconds(tMa);
       if (tPeriodS === null) return null;
-      const tYrS = tropicalYearSecondsMemo(tMa);
-      if (tYrS === null) return null;
-      const integrand = tYrS / tPeriodS;  // cycles per SI year
+      const integrand = tropicalYearJ2000Seconds / tPeriodS;  // cycles per tick (one SI year)
       const w = (i === 0 || i === n) ? 1 : (i % 2 === 1 ? 4 : 2);
       sum += w * integrand;
     }

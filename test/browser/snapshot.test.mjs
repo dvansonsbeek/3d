@@ -126,6 +126,9 @@ const measured = await s.page.evaluate(({ YEARS, EPOCHS_MA, MOON_JDS, MOON_DEEP_
   }
 
   for (const y of YEARS) {
+    // Plan 09 step 7c′: the Earth panel's ϖ of date = the published Sun tier
+    // (series + the osculating-mean offset, +0.0195° on the bare series).
+    v[`earthPeriOfDateDeg@${y}`] = T.earthPeriOfDateDeg(2451545.0 + (y - 2000) * 365.25);
     v[`solarYearDays@${y}`] = T.computeSolarYearDaysFromCardinals(y);
     v[`siderealYearDays@${y}`] = T.siderealYearDaysOfDate(y);
     v[`solsticeSS@${y}`] = T.computeSolsticeYearLength(y, 'SS');

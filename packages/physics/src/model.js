@@ -1005,8 +1005,7 @@ export function assembleModel(C, F, laws = {}, secularSeriesArtifact = /** @type
   // Float64Array tables key correctly and persist.
   const chainCycles = createChainCycleIntegrator({
     ageAnchorYear: startmodelYear,
-    tropicalYearSecondsAtAge: /** @param {number} tMa */ (tMa) => deepLod.tropicalYearSecondsAtAge(tMa),
-    tropicalYearJ2000Seconds: meanTropicalYearJ2000Seconds,
+    tropicalYearJ2000Seconds: meanTropicalYearJ2000Seconds,   // the SI tick (plan 09 step 7c′)
     isDeepTime: () => true,
   });
   /** @param {number} tMa @returns {number|null} */

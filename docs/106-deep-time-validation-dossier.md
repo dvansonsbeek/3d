@@ -118,7 +118,7 @@ The climate formula's orbital lines against the Cenozoic isotope record (the com
   both directions); the −746 Feb 6 Babylonian partial (magnitude
   <!--v:lunarBabylon746MagnitudeUmbral-->0.915<!--/v--> vs canon
   <!--v:lunarBabylon746CanonMagnitudeUmbral-->0.920<!--/v-->, visible from
-  Babylon at <!--v:lunarBabylon746AltitudeDeg-->35.3<!--/v-->°); the
+  Babylon at <!--v:lunarBabylon746AltitudeDeg-->35.2<!--/v-->°); the
   <!--v:lunarDtBandsN-->267<!--/v--> raw Stephenson-2016 timing reductions
   (framework ΔT mean abs <!--v:lunarDtBandsFrameworkMeanAbsSeconds-->1,214<!--/v--> s —
   statistically identical to Stephenson's own fitted spline at
@@ -130,7 +130,7 @@ The climate formula's orbital lines against the Cenozoic isotope record (the com
   <!--v:lunarDtBoundsBabylon135HighSeconds-->12,140<!--/v-->] s contains the
   framework's <!--v:lunarDtBoundsBabylon135FrameworkSeconds-->11,982<!--/v--> s);
   and the measured framework-vs-ELP lunar-theory drift
-  (Δṅ ≈ <!--v:lunarTheoryDriftDeltaNdot-->0.26<!--/v--> ″/cy²) with the
+  (Δṅ ≈ <!--v:lunarTheoryDriftDeltaNdot-->0.22<!--/v--> ″/cy²) with the
   PRE-REGISTERED re-reduction prediction pinned before the contact-time
   machinery existed — and now MEASURED against it: the Phase C
   differential re-reduction (69/75 Babylonian observations identified)

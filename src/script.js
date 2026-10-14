@@ -4007,8 +4007,7 @@ const _chainCycles = (() => {
     if (!m) {
       m = createChainCycleIntegrator({
         ageAnchorYear: J2000_CALENDAR_YEAR,
-        tropicalYearSecondsAtAge: meanTropicalYearSecondsAtAge,
-        tropicalYearJ2000Seconds: MEAN_TROPICAL_YEAR_J2000_S,
+        tropicalYearJ2000Seconds: MEAN_TROPICAL_YEAR_J2000_S,   // the SI tick (plan 09 step 7c′)
         isDeepTime: () => DEEP_TIME_MODE_ENABLED,
       });
     }
@@ -6105,6 +6104,11 @@ if (typeof window !== 'undefined') {
       out.nodeSFrame = o.earthAscendingNodeInvPlane;
       return out;
     },
+    // Plan 09 step 7c′: the Earth panel's ϖ of date — the PUBLISHED Sun-tier
+    // value (the series + the osculating-mean offset), the ONE home of the
+    // panel's ϖ/ω/mean-longitude rows; probed by the browser golden so the
+    // panel cannot silently part from the API's ϖ again.
+    earthPeriOfDateDeg: (jd) => earthPerihelionEclipticOfDateDeg(jd, julianDateToDecimalYear(jd)),
   };
 }
 
@@ -49963,9 +49967,15 @@ function _kcPerihelionEclLonDeg(nameLower, jd) {
  *  otherwise the chain's J2000-frame ϖ advanced at the certified J2000
  *  general-precession rate (S5). Never the H/13 counter: 0.043″/yr slow —
  *  the panel read 4.3″/century off the chart (measured), and both linear
- *  gauges part from the series by 37″ at 3000 AD (the wobble). */
+ *  gauges part from the series by 37″ at 3000 AD (the wobble).
+ *  Plan 09 step 7c′ (owner: the panel shows the PUBLISHED value): while the
+ *  movement is live the rows read the Sun tier's ϖ of date — the package
+ *  model's `sun.perihelionLongitudeDegAt` = the same series plus the
+ *  osculating-mean offset (70.08″, `EARTH_OSCULATING_MEAN_OFFSET`; Meeus to
+ *  0.001°), ONE ϖ with the API and the eclipse Sun. When the Sun-tier
+ *  campaign replaces the offset by its movement, the panel follows. */
 function earthPerihelionEclipticOfDateDeg(jd, year) {
-  if (_hybridSpinActive()) return _hybridSeriesSampleAt(_engineYearTT(jd)).periOfDateDeg;
+  if (_hybridSpinActive()) return ((_tierModelB().sun.perihelionLongitudeDegAt(_engineYearTT(jd)) % 360) + 360) % 360;
   const w = _kcPerihelionEclLonDeg('earth', jd) + (360 / _certifiedAxialPrecessionJ2000Years()) * (year - 2000);
   return ((w % 360) + 360) % 360;
 }

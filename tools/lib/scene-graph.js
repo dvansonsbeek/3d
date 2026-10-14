@@ -176,8 +176,7 @@ function _chainCyclesT() {
   if (_chainCyclesM === null) {
     _chainCyclesM = createChainCycleIntegrator({
       ageAnchorYear: C.startmodelYear,
-      tropicalYearSecondsAtAge: DT.meanTropicalYearSecondsAtAge,
-      tropicalYearJ2000Seconds: C.meanSolarYearDays * C.meanLengthOfDay,
+      tropicalYearJ2000Seconds: C.meanSolarYearDays * C.meanLengthOfDay,   // the SI tick (plan 09 step 7c′)
       isDeepTime: () => DEEP_TIME_ENABLED,
     });
   }
