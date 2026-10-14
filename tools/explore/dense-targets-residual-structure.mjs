@@ -142,7 +142,7 @@ for (const c of Object.keys(cents).map(Number).sort((a, b) => a - b)) {
 }
 
 // B. lattice periodogram (weighted LSQ per divisor) on residFw
-const H = C.H;
+const H = 335317;   // the retired era unit (plan 09 step 7c) — this script's lattice labels are a frozen record
 const wls = (period) => {
   const om = 2 * Math.PI / period;
   let Scc = 0, Sss = 0, Ssc = 0, Sc = 0, Ss = 0, Sy = 0, Syc = 0, Sys = 0, S1 = 0;

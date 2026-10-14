@@ -435,7 +435,7 @@ legacy-chain excision:
 
 ### Purpose
 
-Shows the actual observed perihelion-precession history of each planet from JPL NAIF WebGeoCalc over 1900–2026, plotted alongside the model's own N-body prediction for direct comparison. For each planet the panel displays three charts (longitude of perihelion ϖ, ascending node Ω, argument of periapsis ω) in the ecliptic-of-date frame. The model line is the chain's ϖ(t) — the 1800–2100 window rate splits as Newtonian + the derived relativistic (1PN) share, nothing calibrated to the observations; the 8H/N divisor values remain as window-epoch descriptor labels (doc 109 §9).
+Shows the actual observed perihelion-precession history of each planet from JPL NAIF WebGeoCalc over 1900–2026, plotted alongside the model's own N-body prediction for direct comparison. For each planet the panel displays three charts (longitude of perihelion ϖ, ascending node Ω, argument of periapsis ω) in the ecliptic-of-date frame. The model line is the chain's ϖ(t) — the 1800–2100 window rate splits as Newtonian + the derived relativistic (1PN) share, nothing calibrated to the observations; the retired lattice's divisor labels are kept in doc 109 §9 as window-epoch descriptors of the record.
 
 ### Accessing the Explorer
 

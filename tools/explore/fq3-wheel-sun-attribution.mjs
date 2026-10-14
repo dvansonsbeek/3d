@@ -37,7 +37,7 @@ const EPS = 23.4392911 * d2r; // IAU mean obliquity J2000 (the twin's conversion
 const wrap180 = (x) => ((((x + 540) % 360) + 360) % 360) - 180;
 
 // ── shared framework-law pieces (identical arithmetic to _frameworkSunLon) ──
-const cycles16 = (year) => (year - C.balancedYear) / C.perihelionCycleLength;
+const cycles16 = (year) => (year - C.balancedYear) / C.kDeviceWheelPeriodYears[16];
 function eLaw(year) {
   const ph = 2 * Math.PI * cycles16(year);
   const b = C.eccentricityBase, a = C.eccentricityAmplitude;

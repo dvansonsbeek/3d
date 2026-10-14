@@ -267,8 +267,8 @@ console.log('\n─── Step 7: Understanding the effective geometric eccentric
 // we can check: what fraction of the precession cycle are we at?
 
 const yrsFromBalanced = C.startmodelYear - C.balancedYear;
-const H3phase = (yrsFromBalanced / (C.H / 3)) * 360; // Earth inclination precession
-const H16phase = (yrsFromBalanced / (C.H / 16)) * 360; // Perihelion precession
+const H3phase = (yrsFromBalanced / C.kDeviceWheelPeriodYears[3]) * 360; // the K inclination wheel (recorded period, plan 09 step 7c)
+const H16phase = (yrsFromBalanced / C.kDeviceWheelPeriodYears[16]) * 360; // the K perihelion wheel
 
 console.log('  Years from balanced year:        ', yrsFromBalanced.toFixed(1));
 console.log('  H/3 phase (inclination prec):    ', (H3phase % 360).toFixed(2) + '°');

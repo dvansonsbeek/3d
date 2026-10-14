@@ -64,8 +64,8 @@ const meeus = createEclipseFinders({
 });
 
 // the certified completion, wired as model.js does
-const H = C.foundational.holisticyearLength;
-const meanSolarYearDays = Math.round(C.foundational.inputmeanlengthsolaryearindays * (H / 8)) / (H / 8);
+const H = 335317;   // the retired era unit and its rounded mean-tropical-year input (plan 09 step 7c) — frozen record
+const meanSolarYearDays = Math.round(365.2422 * (H / 8)) / (H / 8);
 const embWobbleArcsec = (C.moonReference.moonDistance / (C.physicalConstants.MASS_RATIO_EARTH_MOON + 1) / C.physicalConstants.currentAUDistance) * (648000 / Math.PI);
 const degPerCy = (cpd) => 360 * 36525 * cpd;
 const carrierRatesDegPerCy = {

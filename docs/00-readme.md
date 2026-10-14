@@ -113,7 +113,6 @@ their diffs), and the sections below give the intended reading order instead.
 | [analytical-ascending-nodes.js](../tools/verify/analytical-ascending-nodes.js) | Analytical (closed-form) calculation using spherical trigonometry |
 | [ascending-node-verification.js](../tools/verify/ascending-node-verification.js) | Verifies J2000-verified values produce correct ecliptic inclinations |
 | [ascending-node-souami-souchay.js](../tools/verify/ascending-node-souami-souchay.js) | Compares Souami & Souchay original vs verified ascending node accuracy |
-| [mercury-precession-centuries.js](../tools/verify/mercury-precession-centuries.js) | Mercury perihelion precession analysis by century |
 | [measure-rms-historical-vs-jpl.js](../tools/verify/measure-rms-historical-vs-jpl.js) | The model against the independent historical observations (Tier 1) and against JPL/IMCCE at the same epochs (Tier 2) — [doc 23](23-verification-data-reference.md) |
 | [moon-deltat-comparison.js](../tools/verify/moon-deltat-comparison.js) | The Moon's timing against the ΔT stack |
 

@@ -890,7 +890,7 @@
    "tools/explore/j2000-state.mjs": "sha256:af2361cdca688cb8f5850229be97db8f70464824e20648e7e8a26ea6edb5ca5a",
    "tools/explore/k45-residual-naff.mjs": "sha256:228eb4874adca9171d61c1697ffbbaac3ce82891476a34762bf882840ccae406",
    "tools/explore/k45e-amplitude-solve.mjs": "sha256:8682a7ebd72bd98b60019b1c097f1791ec6e5ecea97d1798b929ce46b4ae1837",
-   "tools/explore/lattice-long-window-test.mjs": "sha256:6b0819f6078cdbe3ec0ec2c6ca5e7feee51acf0c9bcf87b51d8f1b6c30180b03",
+   "tools/explore/lattice-long-window-test.mjs": "sha256:7f2b194611296ae8f5b03d5781d06f31b8a86177130ad84626745f84bf00876d",
    "tools/explore/naff-frequencies.mjs": "sha256:d875f65e0346346bde09402a0620f8109e3d0fc90e052ce8900b6f4af4ac0e5f",
    "tools/explore/nbody-wh.mjs": "sha256:b33813d3a1655e44a23964ac267f34863fb92af6bfbf6fe5886517bc649257a2",
    "tools/lib/keplerian-chain.js": "sha256:620299515d5520bb3a03fba5affafc7a036fb151fca3457a5194e8771cc97fb8",

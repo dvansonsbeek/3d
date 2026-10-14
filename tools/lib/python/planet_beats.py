@@ -41,8 +41,8 @@ if str(_FIT_PYTHON) not in sys.path:
     sys.path.insert(0, str(_FIT_PYTHON))
 from load_constants import C
 
-H = int(C['H'])
-_H13 = H / 13  # Earth's axial precession period (general precession reference)
+H = 335317     # the retired era unit (plan 09 step 7c): this module's Earth rows are the K-device's recorded wheel periods — a frozen record
+_H13 = H / 13  # the device's axial wheel period (not T_p)
 
 # Six fundamental period names (order used consistently throughout)
 PERIOD_KEYS = ('ecl', 'icrf', 'obliq', 'asc', 'axial', 'wobble')

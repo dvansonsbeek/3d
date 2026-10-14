@@ -32,8 +32,8 @@ const fs = require('fs');
 const path = require('path');
 const C = require('../lib/constants');
 
-const H = C.H;
-const totalDaysInH = C.totalDaysInH;
+const H = 335317;   // the retired era unit (plan 09 step 7c) — this audit of the device's month counts is a frozen record
+const totalDaysInH = H * C.meanSolarYearDays;
 
 // ─── Decode integer cycle counts per H ───────────────────────────────────
 

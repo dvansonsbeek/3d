@@ -27,7 +27,8 @@ from load_constants import C as _C
 # Framework constants (single truth via load_constants bridge)
 # ============================================================
 
-H_now = _C['H']                                # holisticyearLength (335,317 yr)
+H_now = 335317                                 # the retired era unit (plan 09 step 7c): this cross-check
+                                               # is a frozen record of the device identity H(t) ∝ LOD(t)
 LOD_now_s = 86_400                             # mean solar day (IAU convention, used for
                                                # time conversions and J2000 anchors)
 
@@ -43,7 +44,7 @@ LOD_now_s = 86_400                             # mean solar day (IAU convention,
 # meansolaryearlengthinDays — quantized tropical year (line 64 of script.js):
 #   round(input × H/8) / (H/8)  with input = 365.2422
 H_over_8 = H_now / 8                           # 41914.625
-input_solar_yr = _C['inputMeanSolarYear']      # 365.2422 (exact IAU tropical year)
+input_solar_yr = 365.2422                      # the retired device's rounded tropical-year input (plan 09 step 7c) — frozen record
 mean_solar_year_d = round(input_solar_yr * H_over_8) / H_over_8
 year_seconds_now = mean_solar_year_d * LOD_now_s
 days_per_year_now = mean_solar_year_d

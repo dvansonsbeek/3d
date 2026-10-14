@@ -521,4 +521,4 @@ function createMoonArguments({ constants, fns }) {
     _rateCompletion: () => ({ rc: rateCompInit(), anchors: anchorsInit() }) };
 }
 
-module.exports = { createMoonArguments, jdToDecimalYear };
+module.exports = { createMoonArguments, jdToDecimalYear, SECULAR_COMPLETION_TAPER_YEARS };

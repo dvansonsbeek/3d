@@ -22,9 +22,6 @@ The planets' orbits of date, from a Newtonian N-body integration with the first-
 ### The lunisolar precession clock
 The mean lunisolar precession period — Earth's spin clock, <!--v:lunisolarPeriodJ2000Yr-->25,771.6<!--/v--> years at J2000: the period of the composed torque rate, Earth's spin carrying the solar and lunar torques, derived as the beat of the model's own sidereal and tropical year laws. Earth's other long cycles are stated as periods and ratios against it (the simulator's Lunisolar Clock panel shows them live; the ratios are J2000 readings that wander, not laws). Under [ESSRT](#expanding-solar-system-resonance-theory-essrt) the period evolves at deep time with the tidal history.
 
-### The fitted timing anchor
-A Ledger-2 constant of <!--v:holisticYear-->335,317<!--/v--> years, calibrated on the 1246 AD perihelion–solstice alignment of the IAU mean elements. It is the unit of the correction bases that bring the time-domain machinery onto the observed cardinal points, day lengths and eclipses — bookkeeping, not a cycle: it scales with the precession period at deep time and is not a period of anything the model computes ([Constants Reference](20-constants-reference.md)).
-
 ### EARTH-WOBBLE-CENTER
 The scene's reference point for axial precession: Earth circles it clockwise in one axial precession period (<!--v:axialPrecRound-->~25,772<!--/v--> years), which is the precession of the equinoxes. A reference point placed from the engine, not a force.
 
@@ -48,10 +45,10 @@ The perihelion's revolution against the fixed stars — in the scene, the rotati
 The advance of the perihelion point through the zodiac — the perihelion-of-date cycle, the beat of the two motions above: 1/T_peri = 1/T_p + 1/T_aps, <!--v:periPrecYears-->~20,938<!--/v--> years at J2000. The carrier of the climatic-precession band.
 
 ### Lunar Nodal Precession
-The westward drift of the Moon's orbital nodes (where its orbit crosses the ecliptic), one revolution in <!--v:moonNodalPeriodYr-->18.613<!--/v--> years.
+The westward drift of the Moon's orbital nodes (where its orbit crosses the ecliptic), one revolution in <!--v:nodalPrecICRFexact-->18.61335<!--/v--> years (equinox of date; an input of the month chain).
 
 ### Lunar Apsidal Precession
-The rotation of the Moon's line of apsides (perigee to apogee), one revolution in <!--v:moonApsidalPeriodYr-->8.848<!--/v--> years.
+The rotation of the Moon's line of apsides (perigee to apogee), one revolution in <!--v:apsidalPrecICRFexact-->8.84753<!--/v--> years (equinox of date; an input of the month chain).
 
 ---
 

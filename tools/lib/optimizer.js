@@ -167,7 +167,7 @@ function recomputeInclinationDerived() {
  */
 function recomputePerihelionDerived() {
   C.balancedYear = 2000;   // plan 07 R10: the phase origin is J2000 by construction — no longer derived from the alignment year
-  C.perihelionPhaseOffset = ((((C.startModelYearWithCorrection - C.balancedYear) / (C.H / 16) + 16 * C.kDeviceWheelPhaseAtJ2000Cycles) * 360
+  C.perihelionPhaseOffset = ((((C.startModelYearWithCorrection - C.balancedYear) / C.kDeviceWheelPeriodYears[16] + 16 * C.kDeviceWheelPhaseAtJ2000Cycles) * 360
     + C.correctionSun + 360 * (C.startmodelJD - C.perihelionRefJD) / C.meanSolarYearDays) % 360 + 360) % 360;
 }
 

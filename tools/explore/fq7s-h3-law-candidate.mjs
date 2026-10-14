@@ -35,7 +35,7 @@ const D2R = Math.PI / 180, AS = 3600, J2000 = 2451545.0, R2AS = 206264.806;
 const BRIDGE = C.earthOrbital.deltaTStart / 86400;
 const NU = C.physicalConstants.nutationLeadingTermsArcsec;
 const wrap = (d) => ((((d + 540) % 360) + 360) % 360) - 180;
-const H = C.foundational.holisticyearLength;
+const H = 335317;   // the retired era unit and its rounded mean-tropical-year input (plan 09 step 7c) — frozen record
 const base = C.earth.eccentricityBase;
 const e0obs = C.earthOrbital.earthEccentricityJ2000;
 const th0anchor = (C.earthOrbital.earthPerihelionLongitudeJ2000 - C.earthOrbital.earthInclinationCycleAnchor) * D2R;
@@ -81,7 +81,7 @@ const baseDeps = {
   constants: { rEarthMetres: (BD.earth / 2) * 1000, moonDiameterKm: BD.moon, sunDiameterKm: BD.sun, j2000JD: TL.j2000JD, julianCenturyDays: TL.julianCenturyDays },
 };
 const mk = (eccAt) => createEclipseFinders({ ...baseDeps, frameworkSun: { ...deps, eccentricityAt: eccAt } });
-const meanSolarYearDays = Math.round(C.foundational.inputmeanlengthsolaryearindays * (H / 8)) / (H / 8);
+const meanSolarYearDays = Math.round(365.2422 * (H / 8)) / (H / 8);
 const embWobbleArcsec = (C.moonReference.moonDistance / (C.physicalConstants.MASS_RATIO_EARTH_MOON + 1) / C.physicalConstants.currentAUDistance) * (648000 / Math.PI);
 const degPerCy = (cpd) => 360 * 36525 * cpd;
 const carrierRatesDegPerCy = {

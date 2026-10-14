@@ -22,8 +22,8 @@ const C = DEFAULT_CONSTANTS;
 // POST-N3: the module is v3 (framework carriers, injected rates) — this
 // instrument's recorded v1-vs-v4 numbers predate the swap; it now evaluates
 // the v3 table here.
-const _n3H = C.foundational.holisticyearLength;
-const _n3mSY = Math.round(C.foundational.inputmeanlengthsolaryearindays * (_n3H / 8)) / (_n3H / 8);
+const _n3H = 335317;   // the retired era unit and its rounded mean-tropical-year input (plan 09 step 7c) — frozen record
+const _n3mSY = Math.round(365.2422 * (_n3H / 8)) / (_n3H / 8);
 const _n3dpc = (/** @type {number} */ f) => 360 * 36525 * f;
 const { sunPlanetaryCompletionDeg } = createSunPlanetaryCompletion({
   embWobbleArcsec: (C.moonReference.moonDistance / (1 + C.physicalConstants.MASS_RATIO_EARTH_MOON)

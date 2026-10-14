@@ -19,7 +19,7 @@ const r2d = 180 / Math.PI;
 
 // EP1 startPos:
 const startModelYearWithCorrection = C.startmodelYear + C.correctionDays / C.meanSolarYearDays;
-const ep1StartPos = (C.balancedYear - startModelYearWithCorrection) / (C.H / 16) * 360;
+const ep1StartPos = (C.balancedYear - startModelYearWithCorrection) / C.kDeviceWheelPeriodYears[16] * 360;
 
 // At pos=0, EP1.orbit.ry = -ep1StartPos * d2r
 const ep1AngleAtJ2000 = -ep1StartPos * d2r;
@@ -51,9 +51,9 @@ console.log('Offset direction in EP1 parent:', (offsetDirInParent * r2d).toFixed
 // All intermediate layers rotate around Y (precession). Their rotations at pos=0:
 const earthAngle = 0; // earth startPos = 0, speed = -2pi/(H/13), at pos=0: 0
 const earthContainerRot = Math.PI / 2; // hardcoded 90° rotation
-const inclPrecStartPos = (C.balancedYear - startModelYearWithCorrection) / (C.H / 3) * 360;
-const eclipPrecStartPos = (C.balancedYear - startModelYearWithCorrection) / (C.H / 5) * 360;
-const obliqPrecStartPos = -((C.balancedYear - startModelYearWithCorrection) / (C.H / 8) * 360);
+const inclPrecStartPos = (C.balancedYear - startModelYearWithCorrection) / C.kDeviceWheelPeriodYears[3] * 360;
+const eclipPrecStartPos = (C.balancedYear - startModelYearWithCorrection) / C.kDeviceWheelPeriodYears[5] * 360;
+const obliqPrecStartPos = -((C.balancedYear - startModelYearWithCorrection) / C.kDeviceWheelPeriodYears[8] * 360);
 
 const inclPrecAngle = -inclPrecStartPos * d2r;
 const eclipPrecAngle = -eclipPrecStartPos * d2r;

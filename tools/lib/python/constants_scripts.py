@@ -43,7 +43,11 @@ from load_constants import C as _C
 # FUNDAMENTAL CONSTANTS (from constants.js)
 # ═══════════════════════════════════════════════════════════════════════════
 
-H = _C['H']
+# Plan 09 step 7c: the frozen era unit left the model (T_p is its clock; the
+# K-device wheels ride recorded periods). This literal is the lattice RECORD the
+# comb-era ΔT/climate research scripts (8H/n) were built on — frozen, not a live
+# model constant; nothing published derives from it.
+H = 335317
 PHI = (1 + math.sqrt(5)) / 2  # Golden ratio ≈ 1.618034
 J2000_YEAR = 2000
 BALANCE_YEAR = _C['balancedYear']   # plan 07 R10: 2000 — the combs' phase origin is J2000
@@ -86,7 +90,7 @@ _AU_KM = _C['currentAUDistance']
 _SIDEREAL_YEAR_S = _C['meanSiderealYearSeconds']
 _G = _C['G_CONSTANT']
 _MASS_RATIO_EARTH_MOON = _C['MASS_RATIO_EARTH_MOON']
-_INPUT_MEAN_SOLAR_YEAR = _C['inputMeanSolarYear']
+# (plan 09 step 7c: the device's rounded mean-tropical-year input left the model.)
 
 # Moon input constants (from constants.js)
 _MOON_SIDEREAL_MONTH_INPUT = _C['moonSiderealMonthInput']
@@ -94,11 +98,6 @@ _MOON_DISTANCE_KM = _C['moonDistance']
 
 # DE440 Sun/planet mass ratios (from constants.js)
 _MASS_RATIO_DE440 = {name.capitalize(): ratio for name, ratio in _C['massRatioDE440'].items()}
-
-# Planet solarYearInput values (from constants.js planets object)
-_SOLAR_YEAR_INPUT = {
-    p['name']: p['solarYearInput'] for p in _C['planets'].values()
-}
 
 # ═══════════════════════════════════════════════════════════════════════════
 # DERIVED CONSTANTS (from constants.js, no recomputation needed)
@@ -230,8 +229,9 @@ PERIHELION_ECLIPTIC_YEARS = {p['name']: p['perihelionEclipticYears'] for p in _C
 # device's beat of its integer axial and obliquity fractions); this dict has
 # raised KeyError on import ever since, which made the whole module — and
 # every script importing it — unrunnable, unnoticed, because no gate runs
-# them. Fixed at plan 07 R6. Earth's H/8 entry survives.
-OBLIQUITY_CYCLE = {"Earth": H / 8}  # 8 = 5 + 3 (the H/5 + H/3 beat)
+# them. Fixed at plan 07 R6. (Plan 09 step 7c: Earth's H/8 entry — the
+# device's obliquity wheel — left too; the obliquity period is the beat
+# 2π/(ψ̇ᵢₙ − |s₃|), a dynamical value.)
 
 # Plan 07 R6: the planets' ECC_AMPLITUDE and ECC_PHASE_J2000 went with the K
 # law too. Earth's amplitude and phase stay, on the Earth side.
@@ -327,7 +327,8 @@ INCL_ECLIPTIC["Earth"] = 0.000
 # NOTE: absolute (positive) periods. Venus (prograde) and Saturn (retrograde) kept as abs.
 INCL_PERIOD = {p['name']: abs(round(p['perihelionEclipticYears']))
                for p in _C['planets'].values()}
-INCL_PERIOD["Earth"] = round(H / 3)  # Earth uses ICRF period here (H/3) not ecliptic (H/16)
+# (plan 09 step 7c: Earth's H/3 entry — the K inclination wheel — left; Earth's
+# apsidal period is the chain's secular tangent.)
 
 # ═══════════════════════════════════════════════════════════════════════════
 # (OSCILLATION PERIOD FRACTIONS — RETIRED, plan 07 R1/R8)

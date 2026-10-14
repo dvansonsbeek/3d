@@ -30,27 +30,21 @@ Output values are stored in `public/input/fitted-coefficients.json`.
 
 ## Design rule for scene-graph corrections
 
-**Any correction added to the framework's motion model (scene-graph rotations
-in `moveModel` or `tools/lib/scene-graph.js`) MUST be harmonic on the correction bases' fixed divisors of the anchor unit (bounded Fourier bases, plan 06 P3)
-divisors. NO polynomial-in-T terms.**
+**The motion model carries NO fitted correction since plan 09** — the frozen
+era device (its unit, counters and combs) is deleted; the movements are the
+composed precession clock and the N-body series. Any correction ever added
+again to the motion model (scene-graph rotations in `moveModel` or
+`tools/lib/scene-graph.js`) MUST be a BOUNDED harmonic basis on a named
+physical period. NO polynomial-in-T terms.
 
-Concrete form: a correction must be expressible as
+The retired combs' form, for the record: Σ Aₙ·sin(2π·t/(U/n)) + Bₙ·cos(2π·t/(U/n))
+for integer n on the comb unit U (335,317 yr) — each n an integer tied to a
+cycle the device named (the annual term n = U, its harmonics, the planets'
+lattice integers). Arbitrary fit frequencies and DC offsets were not allowed.
 
-```
-Σ Aₙ·sin(2π·t/(H/n)) + Bₙ·cos(2π·t/(H/n))     for integer n
-```
-
-where each n is an integer that ties to a known physical cycle (Earth annual
-= H, its harmonics 2H, 3H, planet perihelion period H/m for m matching the
-planet's lattice integer, etc.). Arbitrary fit frequencies and DC offsets
-are NOT allowed.
-
-**Why:** the framework is fundamentally cyclic — every period is H, a
-multiple of H, or H/N for integer N. The deep-time claim is that the *same
-lattice* describes motion across the full eight-unit interval of the anchor (the former "8H")
-(2.68 Myr). Polynomial-in-T corrections (T, T², T³, …) are not cyclic:
+**Why:** Polynomial-in-T corrections (T, T², T³, …) are not cyclic:
 they grow without bound, compound across epochs, and silently destroy
-the framework's structural claims.
+the model's structural claims.
 
 **Failure case (2026-06):** A `+0.0003032·T_jc²` polynomial was added to the
 Sun's scene-graph angle (intended to match Meeus Ch.25 secular drift). It
@@ -213,17 +207,15 @@ The ΔT correction stack has its own separate refit trigger, discussed
 under "Phase 8: ΔT correction stack" in the pipeline below and in the
 "What triggers a refit?" table further down.
 
-Parameters the FROZEN K-era clock is COUPLED to (roughly: anything that
-changes what the K scene-graph produced at 1-year steps over a full H) —
-changing any of these INVALIDATES the frozen coefficients and requires
-the D4 one-source clock design, NOT a re-fit:
-
-- `H` / `holisticyearLength`
-- `earthtiltMean` / `earthInvPlaneInclinationAmplitude` / `earthInvPlaneInclinationMean`
-- `correctionSun`
-- `perihelionalignmentYear`
-- `eccentricityBase` / `eccentricityAmplitude`
-- Anything else that would change the solar-measurements export (the 6a2 window CSV)
+(Plan 09: the FROZEN K-era clock and every coefficient it carried are
+DELETED — steps 2–7a deleted the combs and the counters, 7b the unit
+function, 7c the inputs `holisticyearLength`, `stepYears` and
+`inputmeanlengthsolaryearindays`. The coupling list that stood here — the
+parameters whose change invalidated the frozen coefficients — is void; the
+scene scaffold's pose constants (`earthtiltMean`,
+`earthInvPlaneInclinationAmplitude`, `kDeviceInclinationPhaseJ2000Deg`,
+`kDeviceWheelPhaseAtJ2000Cycles`, `kDeviceWheelPeriodYears`) remain as
+recorded J2000 poses the engine places the Earth frame over, not laws.)
 
 ## `--write` flag convention
 
@@ -895,7 +887,7 @@ authoritative runtime version.
 
 | Parameter changed | Steps to rerun |
 |-------------------|----------------|
-| `H` (holisticyearLength) | ALL (1→10) — and Phase 8 (Step 11 = 7c) because `BOND_PERIOD_YR = 8·H / BOND_LATTICE_N`, so `ω = 2π/period` re-derives for all four cycles. |
+| `H` (holisticyearLength) | DELETED at plan 09 step 7c — no longer an input. The ΔT stack's periods are stated in years in the fitted coefficients (`period_yr`), not derived from a unit. |
 | `longitudePerihelion` (any planet) | 2 (that planet only) |
 | `solarYearInput` (any planet) / `inputmeanlengthsolaryearindays` / `moonSiderealMonthInput` / `yearLengthRef.siderealYear` | **The Sun-completion carriers ride these** (FQ-5 N3: `model.js` computes the carrier rates live; plan 06 I2: SIDEREAL — record rate minus the model's J2000 precession, Earth the sidereal year). Re-run the extraction chain (`tools/explore/n2-sun-framework-carriers.mjs` → `i2-sidereal-carrier-table.mjs` for the 70 short-period rows, `i2-long-inequality.mjs` for the two long-period rows on the model's own WH engine), re-embed the TERMS + `PAIRED_CARRIER_RATES_SHA256` in `eclipse/sun-planetary-completion.cjs` — the test:model fingerprint gate FAILS until you do (fail-proven). Plus the planet's own step 2 where applicable. |
 | `earthtiltMean` | 1, 3→4d, 6a2 (window CSV) + ⚠ FROZEN-CLOCK COUPLED (see "The frozen era clock") |
@@ -912,22 +904,20 @@ authoritative runtime version.
 | Planet `solarYearInput` | 4c→4d (Steps 2/5a-5b retired — K5 excision) |
 | Planet `orbitalEccentricityBase` | — (Steps 2/5a-5b retired — K5 excision; legacy law constant) |
 | `perihelionalignmentYear` | 1, 3→4a, 6a2 (window CSV) + ⚠ FROZEN-CLOCK COUPLED (see "The frozen era clock") |
-| `stepYears` | Must divide H evenly. Affects 4a→4d, 6a2 (window CSV) + ⚠ FROZEN-CLOCK COUPLED (see "The frozen era clock") (downsampling) |
+| `stepYears` | DELETED at plan 09 step 7c (the retired unit's lattice grid; since plan 07 R10 the grid year was J2000 and its delta identically 0). |
 | `siderealYearJ2000` (in yearLengthRef) | Derived: `meansiderealyearlengthinSeconds = siderealYearJ2000 × 86400` |
 | Bond / Hallstatt / Jose5 / Jose4 `_LATTICE_N` (divisor of the anchor's eight-unit interval) | Step 11 (= 7c; independent of the orbital steps). The 4-flag ΔT stack has no upstream dependency on Steps 1–10; the fit re-runs against the Stephenson residual, reaches `src/script.js` and `tools/lib/deep-time.js` through the JSON (Step 9 / direct read), and the website via the republished `@essrt/physics` (see "Publishing to the website"). |
 | `_TAPER_FULL_HALFWIDTH_YR` / `_TAPER_TOTAL_HALFWIDTH_YR` (Holocene taper) | None — the taper is applied at runtime and does not affect the shipped cos/sin coefficients. Verify L-5b after change. |
 | Stephenson polynomial (`public/input/stephenson-2016-deltaT-polynomial.json`) | Step 11 (= 7c). Fit target changed → all four cycles re-fit. |
 
-**When H changes:** Update `holisticyearLength` in `model-parameters.json`.
-Also update `stepYears` to a value that divides H evenly (factorize H to find options).
-All derived values (balancedYear, meanSolarYearDays, cycle periods, etc.) are
-computed automatically in `constants.js` — no per-script updates needed.
-
-Current: H=335,317 (= 23 × 61 × 239), stepYears=23. H is prime-poor (only three
-distinct prime factors), so the small-integer divisors used by the framework
-(H/3 = 111,772.3̄, H/5 = 67,063.4, H/8 = 41,914.625, H/13 = 25,793.6̄,
-H/16 = 20,957.3125) are non-integer — the H/8-snapped `mean_solar_year`
-matches IAU 365.2422 d to 10 decimals.
+**The retired unit (plan 09 step 7c).** `holisticyearLength` (335,317 yr =
+23 × 61 × 239), `stepYears` (23) and `inputmeanlengthsolaryearindays`
+(365.2422 d) left `model-parameters.json`; the literals gate fails if any
+returns. What the unit's small-integer divisors posed — the K scaffold wheels
+— is the recorded `earth.kDeviceWheelPeriodYears` block (the exact doubles of
+the former 335,317/N, keyed by wheel index), a scene pose and not a law; the
+J2000 mean tropical year is DERIVED from the IAU sidereal year and p_A
+(`computeMeanTropicalYearJ2000Days`), and the deep-time clock is T_p(t).
 
 ## How to run
 
@@ -939,8 +929,8 @@ This can be done after each `--write` step, or once at the end.
 
 If you have just edited one of the source-of-truth JSON files
 (`public/input/model-parameters.json`, `public/input/astro-reference.json`)
-— e.g. changing `holisticyearLength`, `inputmeanlengthsolaryearindays`,
-`correctionDays`, `perihelionalignmentYear`, or any Meeus/IAU anchor —
+— e.g. changing `correctionDays`, `perihelionalignmentYear`, a scaffold pose
+constant, or any Meeus/IAU anchor —
 **run `npm run constants:generate` FIRST** so the generated module reflects the
 new JSON state before any pipeline step touches it:
 
@@ -1093,7 +1083,7 @@ All input data lives in 4 JSON files in `public/input/`:
 
 | File | Contents | Who writes |
 |------|----------|-----------|
-| `model-parameters.json` | Model theory parameters (H, corrections, planet configs) | Manual / optimizer |
+| `model-parameters.json` | Model theory parameters (corrections, the scaffold's recorded J2000 pose, planet configs) | Manual / optimizer |
 | `astro-reference.json` | IAU/JPL/Meeus reference data | Manual (external sources) |
 | `fitted-coefficients.json` | All fitting pipeline output (harmonics, parallax, obliquity) | Fitting scripts (auto) |
 | `meeus-lunar-tables.json` | Moon perturbation tables (Meeus Ch. 47) | Manual (reference data) |
@@ -1102,7 +1092,7 @@ All input data lives in 4 JSON files in `public/input/`:
 
 ```
 public/input/ (single source of truth)
-    ├── model-parameters.json     ← Model parameters (H, corrections, planet configs)
+    ├── model-parameters.json     ← Model parameters (corrections, scaffold pose, planet configs)
     ├── astro-reference.json      ← External reference data (IAU, JPL, Meeus)
     ├── fitted-coefficients.json  ← Fitting pipeline output (harmonics, parallax)
     └── meeus-lunar-tables.json   ← Moon Meeus Ch. 47 tables

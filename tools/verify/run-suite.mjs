@@ -96,7 +96,6 @@ const MANIFEST = [
   { n: 'measure-rms-by-epoch.js', class: 'generator', ms: 9406, slow: true,
     writes: 'data/chain-vs-jpl-rms.json (tracked; --write only — the published scene-vs-JPL comparison by century bucket, the K6/K7 model-content exhibit; a plain run prints without writing)' },
   { n: 'measure-rms-historical-vs-jpl.js', class: 'narrative', ms: 17077, slow: true },
-  { n: 'mercury-precession-centuries.js', class: 'narrative', ms: 44 },
   { n: 'moon-deltat-comparison.js', class: 'narrative', ms: 100 },
 ];
 

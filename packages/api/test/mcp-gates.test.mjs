@@ -86,7 +86,7 @@ const toolCall = (name, args) => {
   }
   // Counterfactual identity: its envelope must carry its OWN constants hash.
   const base = toolCall('essrt_versions').doc.meta.constantsHash;
-  const cf = toolCall('essrt_counterfactual', { overrides: { 'foundational.holisticyearLength': 400000 } }).doc;
+  const cf = toolCall('essrt_counterfactual', { overrides: { 'earthOrbital.obliquityJ2000_deg': 23.5 } }).doc;
   if (cf.meta.constantsHash === base) failures.push('counterfactual via MCP served the DEFAULT hash');
 }
 

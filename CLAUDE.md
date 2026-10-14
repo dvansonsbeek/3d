@@ -30,9 +30,11 @@ phase, a refactor that might need abandoning wholesale — runs in a git worktre
 it contains tracked files only, so the gitignored 160 MB CSV and `docs/archive/`
 are **absent** inside one.
 
-**No polynomial corrections.** Motion-model corrections stay harmonic on
-the correction bases' fixed divisors of the anchor unit (bounded Fourier
-bases, plan 06 P3). No T/T²/T³ — they compound at deep time and destroy the
+**No polynomial corrections.** The motion model carries no fitted correction
+since plan 09 (the frozen era device — its unit, counters and combs — is
+deleted; the movements are the composed precession clock and the N-body
+series). Any future correction stays a BOUNDED harmonic basis on a named
+physical period. No T/T²/T³ — they compound at deep time and destroy the
 bounded-basis property. A fitted linear slope fixes the fit window and is 41 min wrong at
 −400 Ma.
 
@@ -569,7 +571,14 @@ constant — as a precession claim retired: it read ~35 % low against Lantink
 then the counter itself (`createPhaseMachinery`, `cyclesBetweenYears`,
 `eraClockHAtAge`, the cardinal record evaluator, the CSV `Cycle` column);
 the unit itself (`hAtAge`, the API's `epoch.h`, the `hAt*` registry keys)
-left at step 7b. The
+left at step 7b, and its INPUTS (`holisticyearLength`, `stepYears`, the
+device's rounded tropical-year input `inputmeanlengthsolaryearindays`, the
+planets' `ascendingNodeCyclesIn8H`) with every remaining H reader and
+registry key at step 7c — the K-device scaffold's wheels ride the recorded
+`kDeviceWheelPeriodYears` pose block (keyed by wheel index; numerically the
+retired unit's 335,317/N, a pose, not a law), the deep-eccentricity E-factor
+and the browser's sidereal day read the Julian and the DERIVED year, and the
+literals gate fails if any input returns. The
 long-eccentricity band stays at its modern class (scaled
 only by the measured solar-mass history); every newly dated Precambrian
 cyclostratigraphic section tests these halves (the precession side is

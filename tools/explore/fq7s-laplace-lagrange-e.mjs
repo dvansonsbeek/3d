@@ -117,7 +117,7 @@ const modeAmp = order.map((i) => Math.hypot(cRe[i], cIm[i]) * Math.abs(E[iE][i])
 
 // Laskar's published g_i (″/yr) for reference labels
 const LASKAR_G = { g1: 5.59, g2: 7.45, g3: 17.37, g4: 17.92, g5: 4.26, g6: 28.25, g7: 3.09, g8: 0.67 };
-const H8 = 8 * C.foundational.holisticyearLength;
+const H8 = 8 * 335317;   // the retired era unit's eight-unit interval (plan 09 step 7c) — frozen record
 console.log('Laplace–Lagrange on the framework planets — secular apsidal eigenfrequencies:');
 console.log('   g (″/yr)   period (kyr)   8H/n     Earth-mode amplitude   nearest Laskar g');
 for (let r = 0; r < N; r++) {

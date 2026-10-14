@@ -138,7 +138,7 @@ Hypothesis (formulated as a falsifiable prediction, tested before publication): 
 **Result: no lock, at every level.**
 
 - Bond events are quasi-periodic (Rayleigh vs 1,465.9 yr: p ≈ 0.75–0.82; spacings 800–2,200 yr, mean 1,338 ± 430);
-- the Bond stack's spectrum peaks at **~1,000 and ~2,450 yr** with almost nothing at <!--v:bondYr-->1,466<!--/v--> (R² = 0.046) — independently reproducing Obrochta et al. 2012 (*Quat. Sci. Rev.* 55:23, the "1,500-yr cycle" as a ~1,000/~2,000-yr mixture); note the 2,450-yr peak coincides with the framework's Hallstatt label (8H/1104 = <!--v:hallstattYr-->2,430<!--/v--> yr);
+- the Bond stack's spectrum peaks at **~1,000 and ~2,450 yr** with almost nothing at <!--v:bondYr-->1,466<!--/v--> (R² = 0.046) — independently reproducing Obrochta et al. 2012 (*Quat. Sci. Rev.* 55:23, the "1,500-yr cycle" as a ~1,000/~2,000-yr mixture); note the 2,450-yr peak coincides with the stack's Hallstatt line (<!--v:hallstattYr-->2,430<!--/v--> yr; its retired lattice label was n = 1104);
 - CFF core-flow episodes: Rayleigh p ≈ 0.9; CFF spectral power at <!--v:bondYr-->1,466<!--/v--> yr ≈ 0.004 (its peaks: ~3,000–3,300 yr);
 - cross-coherence (millennial band, ±1,000-yr lags): max r = 0.34, below the phase-randomized null p95 = 0.49.
 
@@ -212,7 +212,7 @@ All four flags interact — cooperatively, not democratically. Weighting each pa
 | hallstatt × jose5 | 1,423 yr | 0.4% |
 | hallstatt × jose4 | 1,014 yr | 0.2% |
 
-The key structural fact: the difference-tone spectrum self-organizes into **locked bands**. bond−hallstatt (Δn 726) and jose4−jose5 (Δn 760) are split by only Δn = 34 → their relative phase turns once per 8H/34 = 78,898 yr — rigidly phase-locked over any Holocene window, forming **one coherent ~3.6-kyr band carrying 93% of the response that requires all four flags to build**. The same Δn = 34 splitting locks hall−jose5 (1885) with bond−jose4 (1919) at ~1.4 kyr. Roles separate cleanly: the locked ~3.6-kyr band is the *engine* (power); the fast hallstatt×jose4 envelope (1,014 yr) is the *timer* (it sets the in-window forcing-extremum epochs). Driving-side correlations indicate the coupling is selective (pair-dependent efficiency/sign; uniform F² does worse than individual pairs), though with ~6 effective dof in-window no single-pair attribution is decisive.
+The key structural fact: the difference-tone spectrum self-organizes into **locked bands**. bond−hallstatt (Δn 726) and jose4−jose5 (Δn 760) are split by only Δn = 34 → their relative phase turns once per 78,898 yr (the retired lattice's 34th line of its eight-unit interval) — rigidly phase-locked over any Holocene window, forming **one coherent ~3.6-kyr band carrying 93% of the response that requires all four flags to build**. The same Δn = 34 splitting locks hall−jose5 (1885) with bond−jose4 (1919) at ~1.4 kyr. Roles separate cleanly: the locked ~3.6-kyr band is the *engine* (power); the fast hallstatt×jose4 envelope (1,014 yr) is the *timer* (it sets the in-window forcing-extremum epochs). Driving-side correlations indicate the coupling is selective (pair-dependent efficiency/sign; uniform F² does worse than individual pairs), though with ~6 effective dof in-window no single-pair attribution is decisive.
 
 ### Excitation: the recovered driving history
 

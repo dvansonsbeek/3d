@@ -44,10 +44,9 @@ const astro = rd('public/input/astro-reference.json');
  * OUR physics, it is quoting a standard.
  */
 const GUARDED = [
-  // NB: only comma-free forms. `335,317` cannot be a Python numeric literal,
-  // so every such match is prose in a docstring — not a definition.
-  { name: 'H (holisticyearLength)', live: model.foundational.holisticyearLength,
-    patterns: [/\b335317\b/] },
+  // (plan 09 step 7c: the `H (holisticyearLength)` row is gone — the frozen era
+  // unit is no longer a model constant; the 335317 literals the research
+  // scripts carry are the frozen lattice RECORD those scripts were built on.)
   { name: 'earthtiltMean', live: model.earth.earthtiltMean,
     patterns: [/\b23\.413\d{2,}\b/] },
   { name: 'balancedYear', live: -302635, patterns: [/\b-302635\b/] },
@@ -65,14 +64,10 @@ const GUARDED = [
  * Remove an entry when its file starts importing from constants_scripts.
  */
 const LEDGER = {
-  'scripts/eight_h_history.py': 'frozen analysis — H_NOW is the anchor of a history plot',
-  'scripts/hallstatt_cheng_speleothem.py': 'frozen archive comparison',
-  'scripts/hallstatt_epica_co2.py': 'frozen archive comparison',
-  'scripts/hallstatt_steinhilber_amplitude.py': 'frozen archive comparison',
-  'scripts/lattice_harmonic_scan.py': 'pipeline-adjacent scan; H annotated with its factorisation',
-  'scripts/lod_residual_lattice_fit.py': 'frozen residual fit',
-  'scripts/paleo_l1_renumbering.py': 'frozen L1 renumbering',
-  'scripts/paleo_lod_comparison.py': 'frozen paleo comparison',
+  // (plan 09 step 7c: the eight entries that pinned `H = 335317` — the
+  // frozen comb-era analyses — left with the H guard; the unit is no longer a
+  // model constant, so a 335317 literal is a research record, not a pin. The
+  // record purge is plan 09 step 7e.)
   // predict_tilt_from_eccentricity.py was here until its label was made
   // dynamic — this gate's drift rule caught it pinned at 23.41357 after the
   // IAU 2006 refit moved earthtiltMean to 23.41353. First live catch.

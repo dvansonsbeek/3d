@@ -37,7 +37,9 @@ const ROOT = fileURLToPath(new URL('../../', import.meta.url));
 const TL = createRequire(ROOT + 'package.json')(ROOT + 'tools/lib/constants.js');
 const KV = Object.fromEntries(process.argv.slice(2).filter((a) => a.includes('=')).map((a) => { const i = a.indexOf('='); return [a.slice(0, i), a.slice(i + 1)]; }));
 const TOL = parseFloat(KV.tol || '0.01'), NMAX = parseInt(KV.nmax || '70', 10), TRIALS = parseInt(KV.trials || '20000', 10), JITTER = parseFloat(KV.jitter || '0.07');
-const H = TL.H;
+const H = 335317;   // the retired era unit (plan 09 step 7c) — this lattice null test is a frozen record
+// the retired device's node counts per 8H (model-parameters `ascendingNodeCyclesIn8H`, deleted at plan 09 step 7c)
+const ASC_N = { mercury: 9, venus: 1, mars: 64, jupiter: 36, saturn: 36, uranus: 11, neptune: 3 };
 
 // present-epoch rates from perihelion-observation-audit.mjs (″/cy): ecliptic ϖ̇ (1800–2100 | 1900–2026),
 // invariable-plane Ω̇ (1800–2100). Venus/Neptune ϖ ill-conditioned (e < 0.01) — listed, not scored.
@@ -50,7 +52,7 @@ const RATES = {
   uranus:  { peri: [806.6, -200.8], node: -432.5 },
   neptune: { peri: [9101.7, -59258.1], node: -105.2, illPeri: true },
 };
-const shipped = (k) => ({ periN: 8 * H / TL.planets[k].perihelionEclipticYears, nodeN: -8 * H / TL.planets[k].ascendingNodePeriod });
+const shipped = (k) => ({ periN: 8 * H / TL.planets[k].perihelionEclipticYears, nodeN: ASC_N[k] });
 const rateToN = (rate) => 8 * H * rate / 129600000;          // 8H/N ⇔ N = 8H·rate/(1296000·100)
 const nearestInt = (N) => { const n = Math.round(Math.abs(N)); return { n, rel: n < 1 || n > NMAX ? null : Math.abs(Math.abs(N) - n) / Math.abs(N) }; };
 

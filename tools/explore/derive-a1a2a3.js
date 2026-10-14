@@ -32,7 +32,7 @@ const B = {
   Ma:      rate(C.planets.mars.solarYearInput),
   J:       rate(C.planets.jupiter.solarYearInput),
   Sa:      rate(C.planets.saturn.solarYearInput),
-  p:       360 * 100 * 13 / C.H,               // general precession (H/13), deg/cy
+  p:       360 * 100 * 13 / 335317,            // the retired device's precession (13 turns per the unit 335,317 yr), deg/cy — frozen record (plan 09 step 7c)
 };
 console.log('framework basis rates (deg/cy):');
 for (const [k, v] of Object.entries(B)) console.log(' ', k.padEnd(8), v.toFixed(4));

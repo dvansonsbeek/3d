@@ -256,7 +256,7 @@ for (const url of SAMPLE_REQUESTS) {
   const cases = [
     [JSON.stringify({ overrides: { 'laplaceLagrangeBounds': 1 } }), 422],
     [JSON.stringify({ overrides: { 'foundational.notAThing': 1 } }), 422],
-    [JSON.stringify({ overrides: { 'foundational.holisticyearLength': 'big' } }), 422],
+    [JSON.stringify({ overrides: { 'earthOrbital.obliquityJ2000_deg': 'big' } }), 422],
     ['{nope', 400],
   ];
   for (const [cfBody, want] of cases) {

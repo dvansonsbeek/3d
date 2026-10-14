@@ -327,7 +327,7 @@ The two drivers act independently in physics — tidal coupling cares about Eart
 
 - Earth's *rotation* slows (Driver 1) → fewer day-rotations per year_s
 - Earth's *orbit period* shrinks toward past (Driver 2) → fewer year_s in absolute time
-- Their ratio `H_era × days/year` stayed anchored to the J2000 day-count (<!--v:totalDaysInH-->122,471,916<!--/v-->) to ~70 ppm at Devonian, ~850 ppm at Hadean (measured before the counter's deletion)
+- Their ratio `H_era × days/year` stayed anchored to the J2000 day-count (122,471,916 — the retired unit × the J2000 mean tropical year; a record) to ~70 ppm at Devonian, ~850 ppm at Hadean (measured before the counter's deletion)
 
 So both drivers reshape the clocks; the device identity constrained how they trade off. (The internal unit H(t) itself carries the lunar-torque factor since plan 06 Phase 3 and is NOT day-count invariant — the identity was the era counter's, and the era counter was deleted with the last comb at plan 09 step 7a; this passage is its record.)
 
@@ -367,7 +367,7 @@ This near-invariance follows from two scalings that almost cancel:
 H₀ × days/yr_now = 335,317 × 365.2422036 = 122,471,920 days  (exact at IAU year length; H₀ the fitted anchor)
 ```
 
-(Using the rounded <!--v:inputMeanSolarYear-->365.2422<!--/v--> gives 122,471,919 — the integer anchor TOTAL_DAYS_IN_H = <!--v:totalDaysInH-->122,471,916<!--/v--> corresponds to mean solar year = <!--v:meanSolarYearDays-->365.2421905<!--/v-->, slightly more precise than 4-decimal rounding.)
+(Using the device's rounded input 365.2422 — deleted at plan 09 step 7c — gives 122,471,919 — the anchor TOTAL_DAYS_IN_H = 122,471,916 corresponds to the derived mean solar year = <!--v:meanSolarYearDays-->365.2421905<!--/v-->, slightly more precise than 4-decimal rounding. The day count itself left the registry with the unit; the figures here are the record.)
 
 **Verified at Devonian (−380 Ma) — the era counter:**
 ```
@@ -383,7 +383,7 @@ H_era = 301,906 yr, days/yr_paleo (tropical) = 405.630
 
 **Physical interpretation:** at any given moment, Earth's annual rotation count is set by (tropical year in seconds) / LOD. Both quantities evolve over geological time — LOD via tidal recession (Driver 1), tropical year_s via solar mass loss (Driver 2) — but to first order their *product* is preserved because Driver 2 acts ~10× more slowly than Driver 1 in fractional terms (year_s drifts ~70 ppm at Devonian; LOD drifts ~7.8 % at Devonian).
 
-This is a clean device near-identity equivalent to "TOTAL_DAYS_IN_H = H₀ × <!--v:inputMeanSolarYear-->365.2422<!--/v--> days/yr at J2000" — and what *makes it useful* is that the small Phanerozoic drift (~70 ppm at 380 Ma) is well within the precision of paleontological day-count measurements (Wells 1963 coral rings have ±1–2 % uncertainty per epoch).
+This is a clean device near-identity equivalent to "TOTAL_DAYS_IN_H = H₀ × 365.2422 days/yr at J2000" (the device's rounded input, a record) — and what *makes it useful* is that the small Phanerozoic drift (~70 ppm at 380 Ma) is well within the precision of paleontological day-count measurements (Wells 1963 coral rings have ±1–2 % uncertainty per epoch).
 
 > 📊 **Refinement under Architecture α** — `TOTAL_DAYS_IN_H = 122,471,920` is exact at
 > J2000 (the **anchor value**). At deep time it drifts very slightly because the
@@ -397,7 +397,7 @@ This is a clean device near-identity equivalent to "TOTAL_DAYS_IN_H = H₀ × <!
 
 | Era | TOTAL_DAYS_IN_H diagnostic value | Drift vs J2000 |
 |:---|---:|---:|
-| J2000 (anchor) | **<!--v:totalDaysInH-->122,471,916<!--/v-->** | 0 ppm |
+| J2000 (anchor) | **122,471,916** | 0 ppm |
 | Devonian (380 Ma) | 122,462,813 | **−74 ppm** |
 | Late Cambrian (500 Ma) | 122,459,931 | −98 ppm |
 | Mesoproterozoic (1 Gyr) | ~122,447,870 | **−196 ppm** |
@@ -442,7 +442,7 @@ date:
   the inertial periods composed with one equinox turn per T_p(t), the same
   relation the J2000 anchors are built from (star-referenced 8.8507 /
   18.5994 yr from the of-date 8.848 /
-  <!--v:moonNodalPeriodYr-->18.613<!--/v--> yr);
+  <!--v:nodalPrecICRFexact-->18.61335<!--/v--> yr);
 - **the tropical month** — the sidereal month less one equinox turn per
   T_p(t). It read 13 turns per the counter H(t): the unit is 13.011
   precession periods, so the equinox term ran 0.086 % slow and the chain's
@@ -483,7 +483,7 @@ period — both deleted at plan 09 steps 7a/7b; the table is their record:
 
 | Invariant | Form | Governed by | Drift at Hadean |
 |:---|:---|:---|---:|
-| Day-count near-invariant | `H_era × days/yr ≈ TOTAL_DAYS_IN_H` (<!--v:totalDaysInH-->122,471,916<!--/v--> at J2000 anchor) | Driver 1 + Driver 2 | ~−850 ppm (Driver 2 residual) |
+| Day-count near-invariant | `H_era × days/yr ≈ TOTAL_DAYS_IN_H` (122,471,916 at J2000 anchor; a record — the counter and the unit are retired) | Driver 1 + Driver 2 | ~−850 ppm (Driver 2 residual) |
 | Day-count invariant, exact form | `H_era × (sidYear_s/LOD) × (AU₀/AU)² = TOTAL_DAYS_IN_H × H₀/(H₀−13)` | Drivers 1+2 composed (Kepler ∘ H_era∝LOD; H_era the frozen era clock's counter — the unit H carries the lunar-torque factor, plan 06 Phase 3) | 0 ppm (algebraic identity) |
 | Planetary adiabatic invariant | `a × M_Sun = const` (per planet) | Driver 2 | 0 ppm (definitional) |
 | Lunar precession invariant | `T_apsidal × H = const`, `T_nodal × H = const` | RETIRED (plan 09 step 5c) — the counter's definition, not dynamics; the of-date periods are the inertial chain composed with T_p(t) | — |
@@ -676,9 +676,9 @@ inside the model-values registry (`lodRealPhysical`), so the engine and the
 
 ### Physical derivation of the raw H/5 term
 
-The correction represents Earth's need to rotate slightly MORE per solar day to compensate for the ecliptic's precession in ICRF over the ecliptic-precession period H/5. The mean solar day is measured against the Sun, whose apparent motion follows the ecliptic — so it is the ecliptic frame, not the invariable-plane frame, that sets the meridian passage.
+The correction represents Earth's need to rotate slightly MORE per solar day to compensate for the ecliptic's precession in ICRF over the ecliptic-precession period — the chain's nodal mode T_s₃. The mean solar day is measured against the Sun, whose apparent motion follows the ecliptic — so it is the ecliptic frame, not the invariable-plane frame, that sets the meridian passage.
 
-Over one full ecliptic-precession cycle (H/5 = <!--v:hDiv5-->67,063<!--/v--> yr at J2000), the ecliptic completes one full revolution of its orientation in ICRF. Over one solar day (= 1/mSY of one year), the ecliptic direction therefore precesses by:
+Over one full ecliptic-precession cycle (T_s₃ = <!--v:eclPrecYears-->~68,751<!--/v--> yr; the retired device's ecliptic wheel read 67,063), the ecliptic completes one full revolution of its orientation in ICRF. Over one solar day (= 1/mSY of one year), the ecliptic direction therefore precesses by:
 
 ```
 δ_rev = 1 / ((H/5) × mSY) revolutions per day
@@ -1550,10 +1550,10 @@ sidereal-year days(t) = TOTALDAYS(t) / (H(t) − 13)
 ```
 H(t) × (sidYear_s(t) / LOD(t)) × (AU₀/AU(t))²
     = TOTAL_DAYS_IN_H × H₀/(H₀−13)
-    = <!--v:totalDaysInHSiderealFrame-->122,476,664<!--/v-->     (exact)
+    = 122,476,664     (exact; a record — the registry keys left with the unit at plan 09 step 7c)
 ```
 
-held floating-point exact on the ERA COUNTER across the model's entire 4.5-Gyr domain (by construction: the counter is ∝ LOD and Kepler cancels the AU² factor); the registry key that computed it read 995,048.65 ppm because it evaluated the UNIT H(t), which carries the lunar-torque factor — both the key and the unit left at plan 09 step 7b, and the identity is a separate investigation topic. The constant is not new: it is the canonical <!--v:totalDaysInH-->122,471,916<!--/v--> carried through the dual-divisor bridge at J2000. The *tropical*-days form `H × solar-year days × (AU₀/AU)²` retains a residual of −995,201 (the key's last reading, on the unit; deleted at plan 09 step 7b) ppm at genesis — that residual is the structural `13/H(t)` term itself (as H shrinks toward genesis, the 13 precession cycles claim a growing share), and applying the bridge factor `[H/(H−13)] × [(H₀−13)/H₀]` restores exactness with the canonical constant. One relation over H, LOD, year length and the AU, with the Moon entering through the angular-momentum budget that sets LOD. Verification: `tools/explore/deep-time-sensitivity.js` §5.
+held floating-point exact on the ERA COUNTER across the model's entire 4.5-Gyr domain (by construction: the counter is ∝ LOD and Kepler cancels the AU² factor); the registry key that computed it read 995,048.65 ppm because it evaluated the UNIT H(t), which carries the lunar-torque factor — both the key and the unit left at plan 09 step 7b, and the identity is a separate investigation topic. The constant is not new: it is the canonical 122,471,916 carried through the dual-divisor bridge at J2000. The *tropical*-days form `H × solar-year days × (AU₀/AU)²` retains a residual of −995,201 (the key's last reading, on the unit; deleted at plan 09 step 7b) ppm at genesis — that residual is the structural `13/H(t)` term itself (as H shrinks toward genesis, the 13 precession cycles claim a growing share), and applying the bridge factor `[H/(H−13)] × [(H₀−13)/H₀]` restores exactness with the canonical constant. One relation over H, LOD, year length and the AU, with the Moon entering through the angular-momentum budget that sets LOD. Verification: `tools/explore/deep-time-sensitivity.js` §5.
 
 **The equivalent Kepler form.** The shipped implementation never evaluates a mass at deep time — it uses the product forms directly: with `Δm(t)` the fractional solar mass lost (defined against the Sun-only J2000 mass), `AU(t) = AU₀·(1−Δm)` and `sidYear_s(t) = sidYear_s(J2000)·(1−Δm)²`. An explicit Kepler evaluation reproduces this bit-for-bit under two conditions. First, Kepler runs on the **two-body** parameter `G(M_☉+M_E)` — the same convention by which the J2000 constants are set (GM_Sun+Earth from Earth's orbit; GM_Sun backed out by subtracting GM_Earth). Scaling only the Sun's share while holding Earth's fixed breaks the identity at the `Δm × M_E/(M_☉+M_E)` level — ≈0.6 ppb at genesis, visible against the invariant's floating-point exactness. Second, the epoch mass is the division form `μ(t) = μ(J2000)/(1−Δm)`, with Δm still defined against the constant J2000 mass. Then `T = 2π√(a³/μ) = T₀·(1−Δm)^(3/2)·(1−Δm)^(1/2) = T₀(1−Δm)²`, identical to the product form, and `T²·μ/a³ = (1−Δm)⁴·(1−Δm)⁻¹·(1−Δm)⁻³ = 1` exactly — Kepler's third law holds at every epoch by construction.
 
@@ -1745,7 +1745,7 @@ This formulation makes Driver 1 (LOD via tidal evolution) and Driver 2 (year_s v
 | AU drifts outward | ✓ Yes (~1.42 cm/yr from solar mass loss) |
 | AU drift is dominated by solar tides | ✗ No — mass loss dominates by 5000× |
 | Framework treats AU and year_s as constants | ✗ No — explicit via `auAtAge()`, `siderealYearSecondsAtAge()`, `tropicalYearSecondsAtAge()` |
-| Framework's structural identity TOTAL_DAYS_IN_H ≈ <!--v:totalDaysInH-->122,471,916<!--/v--> | ✓ Near-invariant; drifts smoothly via Driver 2 (year_s shortens at past) |
+| The retired device's structural identity TOTAL_DAYS_IN_H ≈ 122,471,916 (a record) | ✓ Near-invariant on the era counter; drifts smoothly via Driver 2 (year_s shortens at past) |
 | AU drift effect on TOTAL_DAYS_IN_H at Phanerozoic | Small (−71 ppm drift at Devonian) but tracked |
 | AU drift effect on TOTAL_DAYS_IN_H at Hadean (4.5 Gyr) | Significant (−845 ppm); critical for that scope |
 

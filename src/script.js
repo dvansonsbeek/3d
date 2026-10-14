@@ -9,8 +9,8 @@ import { Pane } from 'tweakpane';
 // fails if it is stale. Values are IMPORTED, not patched in, so browser and
 // Node cannot drift apart by construction.
 //
-// Generated at build time, not fetched at runtime — `holisticyearLength` is read
-// at module scope below, and Phase 15 requires offline === hosted.
+// Generated at build time, not fetched at runtime — the model parameters are
+// read at module scope below, and Phase 15 requires offline === hosted.
 import { computeObliquityJ2000Deg, computeSecularShape, DEFAULT_CONSTANTS as K, REFERENCE_DATA as R, FITTED_COEFFICIENTS as FIT, CONSTANTS_HASH, COEFFICIENTS_HASH, MODEL_VERSION, PREPRINT_DOI, createEpochPrimitives, createDeepCalendar, createDeepEccChannel, DEEP_MODES_ARTIFACT, createDeepOrbitalHistory, createYearLengths, computeMeanTropicalYearJ2000Days, createMoonMonthChain, createChainCycleIntegrator, createMoonArguments, createMoonSeries, createMoonApparent, derivePlanetGeometry, scaffoldOrbitInputs, planetOrbitChain as _POC, createDeltaTCycles, createDeepTimeLod, createMoonRecessionHistory, createSolarChannelBudget, deltaTEspenakMeeusCanonSeconds, evalClimateL1OrbitalPermil, createAlphaGiaChannel, computeSolarTorqueShare, createEclipseFinders, createModel, buildPlanetChainsFromArtifactData, computePlanetElementsAtYear as kcComputePlanetElementsAtYear, computeHeliocentricEclipticFromElements as kcComputeHeliocentricEclipticFromElements, computeEquatorNodeOriginSFrameDeg, convertNodeSFrameToEquatorOriginDeg, createSecularSeriesOverride, CHAIN_ARTIFACT, ANCHOR_EPOCH_YEAR as KC_ANCHOR_EPOCH_YEAR, ANCHOR_EPOCH_JD as KC_ANCHOR_EPOCH_JD, computeEarthFrameOfDate, solveWheelAngleForLongitude } from '@essrt/physics';
 // K8 — the reference package: ONE-WAY imports (comparison only;
 // @essrt/reference is private-by-construction and nothing in the model
@@ -40,13 +40,11 @@ import { vsop87AstrometricGeoEclipticAU, vsop87GeoEclipticAU, vsop87HelioEclipti
   Interactive 3D simulation of the solar system modelled from a geo-heliocentric
   frame of reference. Two engines: the planets ride an N-body Keplerian chain
   derived from one cited J2000 state + DE440 masses (zero free parameters);
-  Earth's spin-and-time hierarchy rides the H-lattice — the Earth Fundamental
-  Cycle (H = 335,317 yr at J2000) divided by small integers: axial precession
-  (H/13), apsidal precession (H/3; historical name: inclination precession) and
-  perihelion precession (H/16). The integer lattice is a structural assumption
-  under pre-registered falsification tests, not a parameter count. Under
-  deep-time mode H slowly evolves via Earth-Moon tidal evolution, and the
-  scene renders the integrated state via cumulative ∫1/H(t)dt cycle math.
+  Earth's spin-and-time hierarchy rides the composed lunisolar precession
+  clock T_p(t) (the IAU p_A at J2000, scaled on the recession history) and the
+  N-body series' elements of date; the K-device scaffold the Earth frame is
+  placed over turns uniformly at recorded J2000 wheel periods (a pose, not a
+  law — plan 09 retired the frozen era device: its unit, counters and combs).
   The canonical parameter accounting (two engines, three ledgers) is
   docs/20-constants-reference.md § Parameter Accounting.
 
@@ -62,11 +60,9 @@ import { vsop87AstrometricGeoEclipticAU, vsop87GeoEclipticAU, vsop87HelioEclipti
 // SEEDED, not imported: recomputeEpochAnchors reassigns this, and an ESM import
 // is a read-only binding — assigning to one throws (§5e). Stays `let` until
 // Phase 6 removes the writer; then it can become a plain injected value.
-const holisticyearLength = K.foundational.holisticyearLength;  // H — the fitted timing anchor, a J2000 constant (plan 09 step 7b: no longer an epoch state — the unit function left; the scaffold still reads it until 7c)
 // Imported, not literals: these are never reassigned, so the read-only binding
 // an ESM import gives is exactly right. The values cannot drift from
 // model-parameters.json because there is no second copy to drift.
-const inputmeanlengthsolaryearindays = K.foundational.inputmeanlengthsolaryearindays;  // Mean tropical year input
 const startmodelJD = K.foundational.startmodelJD;         // June 21, 2000 00:00 UTC (Julian Day)
 const startmodelYear = K.foundational.startmodelYear;     // Fractional year of model start
 const correctionDays = K.foundational.correctionDays;     // Fine timing correction (optimizer-derived)
@@ -97,9 +93,19 @@ let   MOON_ARGS_FRAMEWORK_NATIVE = true;       // Framework-native lunar argumen
 // ─── A2. Earth parameters ────────────────────────────────────────────────
 const earthtiltMean = K.earth.earthtiltMean;              // Scene-geometry solved: obliquity at J2000 = IAU 2006 23.4392794°
 const earthInvPlaneInclinationAmplitude = K.earth.earthInvPlaneInclinationAmplitude; // Scene-geometry solved: obliquity rate = IAU -46.836769"/cy
-// Plan 07 R10: the K device's J2000 wheel phase (anchor-unit cycles) — the
-// scene scaffolding's recorded pose, N × this per H/N wheel; not a law.
+// Plan 07 R10: the K device's J2000 wheel phase — the scene scaffolding's
+// recorded pose, N × this per wheel of index N; not a law.
 const kDeviceWheelPhaseAtJ2000Cycles = K.earth.kDeviceWheelPhaseAtJ2000Cycles;
+// Plan 09 step 7c: the K-device wheels' recorded periods (scene mean solar
+// years), keyed by the wheel's index N — the scaffold's J2000 pose. Each wheel
+// turns uniformly at its recorded rate (plan 09 step 5c); the engine places
+// the Earth frame, the Sun and the Moon stack over the scaffold, so no
+// observable rides them. They are NOT the model's precession periods (those
+// are the dynamical values the panels publish — T_p, the obliquity beat, the
+// apsidal and nodal modes).
+const kDeviceWheelPeriodYears = K.earth.kDeviceWheelPeriodYears;
+/** @param {number} divisor_N the wheel's index @returns {number} years */
+function _wheelPeriodYears(divisor_N) { return kDeviceWheelPeriodYears[String(divisor_N)]; }
 // The optimizer must NEVER touch this — it is set by the Law 5 balance constraint.
 const eccentricityBase = K.earth.eccentricityBase;        // Law 5 balance-locked (v11 constant; Earth's weight in the balance is 0.05%)
 const eccentricityAmplitude = K.earth.eccentricityAmplitude;  // v11 H/16 amplitude — RETAINED ONLY as the Law-4 K calibration input (unification, decision D2)
@@ -216,7 +222,10 @@ const tropicalCenturyDays = 100 * meansolaryearlengthinDays;  // 100 model tropi
 // solar and mean sidereal day (Earth completes N sidereal rotations per year
 // in solar-day units, or N+1 rotations relative to inertial space).
 // Used by earth.rotationSpeed (sidereal-frame base spin, ~L6663).
-const _siderealDaySec_J2000 = 86400 * inputmeanlengthsolaryearindays / (inputmeanlengthsolaryearindays + 1);
+// (plan 09 step 7c: on the DERIVED J2000 mean tropical year — the device's
+// rounded input 365.2422 read the sidereal day 1e-5 s long and the globe
+// 2.4e-8 rotation/yr slow against the Node twin's meanSiderealDay)
+const _siderealDaySec_J2000 = 86400 * meansolaryearlengthinDays / (meansolaryearlengthinDays + 1);
 // Triple synodic period (Jupiter-Saturn conjunction cycle incl. perihelion precession H/5, -H/8)
 // Computed after planets are defined — see section E2
 
@@ -332,7 +341,6 @@ planets.mercury = {
   eocFraction: K.planets.mercury.eocFraction,
   perihelionRef_JD: K.perihelionPassageRef.mercury,
   ascendingNodeInvPlane: K.planets.mercury.ascendingNodeInvPlane,
-  ascendingNodeCyclesIn8H: K.planets.mercury.ascendingNodeCyclesIn8H,
 };
 
 // Venus
@@ -354,7 +362,6 @@ planets.venus = {
   eocFraction: K.planets.venus.eocFraction,
   perihelionRef_JD: K.perihelionPassageRef.venus,
   ascendingNodeInvPlane: K.planets.venus.ascendingNodeInvPlane,
-  ascendingNodeCyclesIn8H: K.planets.venus.ascendingNodeCyclesIn8H,
 };
 
 // Mars
@@ -376,7 +383,6 @@ planets.mars = {
   eocFraction: K.planets.mars.eocFraction,
   perihelionRef_JD: K.perihelionPassageRef.mars,
   ascendingNodeInvPlane: K.planets.mars.ascendingNodeInvPlane,
-  ascendingNodeCyclesIn8H: K.planets.mars.ascendingNodeCyclesIn8H,
 };
 
 // Jupiter
@@ -398,7 +404,6 @@ planets.jupiter = {
   eocFraction: K.planets.jupiter.eocFraction,
   perihelionRef_JD: K.perihelionPassageRef.jupiter,
   ascendingNodeInvPlane: K.planets.jupiter.ascendingNodeInvPlane,
-  ascendingNodeCyclesIn8H: K.planets.jupiter.ascendingNodeCyclesIn8H,
 };
 
 // Saturn
@@ -420,7 +425,6 @@ planets.saturn = {
   eocFraction: K.planets.saturn.eocFraction,
   perihelionRef_JD: K.perihelionPassageRef.saturn,
   ascendingNodeInvPlane: K.planets.saturn.ascendingNodeInvPlane,
-  ascendingNodeCyclesIn8H: K.planets.saturn.ascendingNodeCyclesIn8H,
 };
 
 // Uranus
@@ -442,7 +446,6 @@ planets.uranus = {
   eocFraction: K.planets.uranus.eocFraction,
   perihelionRef_JD: K.perihelionPassageRef.uranus,
   ascendingNodeInvPlane: K.planets.uranus.ascendingNodeInvPlane,
-  ascendingNodeCyclesIn8H: K.planets.uranus.ascendingNodeCyclesIn8H,
 };
 
 // Neptune
@@ -464,7 +467,6 @@ planets.neptune = {
   eocFraction: K.planets.neptune.eocFraction,
   perihelionRef_JD: K.perihelionPassageRef.neptune,
   ascendingNodeInvPlane: K.planets.neptune.ascendingNodeInvPlane,
-  ascendingNodeCyclesIn8H: K.planets.neptune.ascendingNodeCyclesIn8H,
 };
 
 // --- A4b. Minor bodies (Pluto, Halleys, Eros, Ceres) ---
@@ -580,7 +582,6 @@ planets.ceres = {
 // PREDICT_COEFFS_PHYSICAL) left at plan 06 R8; the Earth-frame rate is the
 // equatorial projection of the lattice motion, perihelionFrameBreakdown.)
 // ─────────────────────────────────────────────────────────────────────────
-const H = holisticyearLength;  // alias (plan 09 step 7b: a J2000 constant, no longer mutated per epoch)
 
 // ─── B3. (The fitted planet-path corrections — parallax, gravitation,
 // elongation — were EXCISED with the legacy planet chains, K5.) ──────────
@@ -701,7 +702,7 @@ const diameters = {
 // From REFERENCE_DATA, not DEFAULT_CONSTANTS: these are what the model is
 // COMPARED AGAINST, so they are single-sourced but deliberately not injectable —
 // createModel refuses them (§2d). Same for the LL bounds and JPL trends below.
-const earthAscendingNodeInvPlaneSouamiSouchay = R.ascendingNodesSouamiSouchay.earth;  // Regresses with period holisticyearLength/5 in the invariant frame (ecliptic precession rate)
+const earthAscendingNodeInvPlaneSouamiSouchay = R.ascendingNodesSouamiSouchay.earth;  // Regresses on the chain's nodal mode s₃ in the invariant frame (the ecliptic precession period)
 const mercuryAscendingNodeInvPlaneSouamiSouchay = R.ascendingNodesSouamiSouchay.mercury;
 const venusAscendingNodeInvPlaneSouamiSouchay = R.ascendingNodesSouamiSouchay.venus;
 const marsAscendingNodeInvPlaneSouamiSouchay = R.ascendingNodesSouamiSouchay.mars;
@@ -1049,7 +1050,7 @@ const eocEccentricity = K.earthOrbital.earthEccentricityJ2000 / 2;
 // under deep-time scrubbing), so this reference phase stays anchored at J2000.
 // (plan 07 R10: the wheel's phase at the model start = its advance from J2000
 // plus the device's recorded J2000 wheel phase, 16 × kDeviceWheelPhaseAtJ2000Cycles)
-let   perihelionPhaseOffset = ((((startmodelyearwithCorrection - BALANCED_YEAR_J2000_FIXED) / (holisticyearLength / 16) + 16 * kDeviceWheelPhaseAtJ2000Cycles) * 360
+let   perihelionPhaseOffset = ((((startmodelyearwithCorrection - BALANCED_YEAR_J2000_FIXED) / _wheelPeriodYears(16) + 16 * kDeviceWheelPhaseAtJ2000Cycles) * 360
   + correctionSun + 360 * (startmodelJD - ASTRO_REFERENCE.perihelionPassageJ2000_JD) / meansolaryearlengthinDays) % 360 + 360) % 360;  // Phase 6: mutable (Tier 1 — Earth perihelion phase reference)
 
 // Ascending node frame corrections for planet-level tilt placement (degrees).
@@ -1160,7 +1161,6 @@ let   moonApsidalMeetsNodalindays = ((moonNodalMonth/(moonAnomalisticMonth-moonN
 let   moonLunarLevelingCycleindays = (moonNodalPrecessionindaysEarth/(moonNodalPrecessionindaysEarth-moonApsidalPrecessionindaysEarth)*(moonApsidalPrecessionindaysEarth/meansolaryearlengthinDays))*meansolaryearlengthinDays;  // Phase 6.5: mutable
 let   moonDraconicYearICRF = 1/((1/meansolaryearlengthinDays)+(1/moonNodalPrecessionindaysEarth));  // Phase 6.5: mutable — the mixed-frame partner (346.607 d; NOT the observable)
 let   moonDraconicYearEarth = 1 / (1 / moonDraconicYearICRF - 1 / AXIAL_PRECESSION_J2000_DAYS);  // Phase 6.5: mutable — THE OBSERVED ECLIPSE YEAR (346.620 d; removing one equinox turn compensates the mixed-frame intermediate above: ≡ tropical⊕of-date ≡ sidereal⊕star-referenced)
-const N_sid_J2000      = (holisticyearLength*meansolaryearlengthinDays)/moonSiderealMonth;
 let   moonSpeed = (moonDistance*Math.PI*2)/(meansolaryearlengthinDays*(1/(meansolaryearlengthinDays/moonSiderealMonth)))/24;  // Phase 6.5: mutable
 
 // ─── E2. Mass calculations ──────────────────────────────────────────────
@@ -1369,9 +1369,8 @@ const GM_EROS = M_EROS * G_CONSTANT;                 // ~4.46 × 10⁻⁴ km³/s
 // Earth check: periICRF = H/3, |−13/H − 3/H| = 16/H → H/16 ✓
 // If |axial| > 8H (frozen, e.g. Uranus ~200 Myr, Neptune ~23 Myr), treat as
 // infinite: wobble = |ICRF| exactly. Gives Uranus 8H/80 and Neptune 8H/100.
-// Phase 8.3 L2: the wobble law lives ONCE in @essrt/physics (this delegate
-// reads the LIVE holisticyearLength, so recomputePlanetCyclesForEpoch keeps
-// its epoch semantics; the sign-free beat convention is in the module).
+// Phase 8.3 L2: the wobble law lives ONCE in @essrt/physics (the sign-free
+// beat convention is in the module).
 // Plan 06 Phase 7 commit 2: the K eccentricity law's cycle period is the
 // chain's OWN g-mode beat — the dominant mode × largest companion of the
 // planet's eccentricity vector (keplerian-chain computeSecularShape, the
@@ -1786,7 +1785,7 @@ const OrbitalFormulas = {
 
   // Convert precession against Ecliptic to precession against ICRF
   // From ω_ICRF = ω_ecl - ω_ref → T_ICRF = (T_ecl × T_ref) / (T_ref - T_ecl)
-  // Reference is typically holisticyearLength/13 (general precession)
+  // Reference is typically the axial precession period T_p (general precession)
   precessionEclipticToICRF: (ecliptic_years, reference_years) => {
     const diff = reference_years - ecliptic_years;
     if (diff === 0) return Infinity;
@@ -1809,7 +1808,7 @@ const OrbitalFormulas = {
   },
 
   // Precession period from Earth Fundamental Cycle ratio
-  // period = holisticyearLength / n (where n is integer ratio)
+  // period in years
   precessionFromHolisticRatio: (holistic_year, ratio) => {
     if (ratio === 0) return Infinity;
     return holistic_year / ratio;
@@ -2381,13 +2380,14 @@ const LOD_NOW_H13_S = meansiderealyearlengthinSeconds / meansiderealyearlengthin
 
 // ───── J2000 anchor snapshots (frozen at module load) ─────
 // Captured BEFORE Phase 1 converts the script.js globals
-// holisticyearLength, meanlengthofday, meansolaryearlengthinDays,
+// meanlengthofday, meansolaryearlengthinDays,
 // meansiderealyearlengthinDays, and meansiderealyearlengthinSeconds from
 // `const` to `let`. The mean*AtAge() functions in this block reference
 // these frozen J2000 anchors (never the live globals) so they continue
 // to compute deep-time values FROM J2000 even after Phase 4's setEpoch()
 // starts mutating the globals via recomputeEpochAnchors().
-const HOLISTIC_YEAR_J2000        = holisticyearLength;                       // 335,317 yr
+// (plan 09 step 7c: HOLISTIC_YEAR_J2000 — the frozen era unit — is deleted;
+// the K wheels ride the recorded kDeviceWheelPeriodYears.)
 const MEAN_SIDEREAL_YEAR_J2000_S = meansiderealyearlengthinSeconds;          // 31,558,149.764 s
 const MEAN_TROPICAL_YEAR_J2000_S = meansolaryearlengthinDays * meanlengthofday;
                                                                              // ≈ 31,556,926.28 s
@@ -2395,8 +2395,8 @@ const MEAN_SOLAR_YEAR_J2000_DAYS = meansolaryearlengthinDays;                // 
 // Frozen J2000 mSY captured before Phase 4 deep-time mutation. Used by
 // snapshot-fitted cardinal-point formulas (computeSolsticeJD /
 // computeSolsticeYearLength) so they evaluate on the same J2000-frozen
-// basis Step 6c fitted against. Same discipline as HOLISTIC_YEAR_J2000
-// vs holisticyearLength and BALANCED_YEAR_J2000_FIXED vs balancedYear.
+// basis Step 6c fitted against. Same discipline as BALANCED_YEAR_J2000_FIXED
+// vs balancedYear.
 // Phase 9.2: SI tropical year in 86400-s Julian days. Used as the sDay
 // time-unit anchor so scene orbital periods in JD are Kepler-invariant
 // across epochs (no longer scale with epoch-local-day count).
@@ -3980,11 +3980,11 @@ function meanTropicalMonthAtAge(t_Ma) { return _moonChain().tropicalMonthSeconds
 // behavior; the deletion is no-op semantically.
 
 // ───── Phase 9.13: Moon-chain mean-longitude integrators for deep-time ─────
-// Moon tropical month at J2000 (SI seconds). Derived from sidereal anchor
-// via the same formula meanTropicalMonthAtAge uses at t_Ma=0, so this stays
-// in sync with the Farhat-based runtime evolution.
-const MOON_TROPICAL_MONTH_J2000_S = MOON_SIDEREAL_MONTH_J2000_S *
-  (1 - 13 * MOON_SIDEREAL_MONTH_J2000_S / (HOLISTIC_YEAR_J2000 * MEAN_SIDEREAL_YEAR_J2000_S));
+// Moon tropical month at J2000 (SI seconds): the sidereal month less one
+// equinox turn per T_p — the same relation moonTropicalMonth (days) is built
+// from (plan 09 step 7c: formerly 13 turns per the frozen era unit, the
+// device identity, 0.086 % slow on the precession).
+const MOON_TROPICAL_MONTH_J2000_S = 1 / (1 / MOON_SIDEREAL_MONTH_J2000_S + 1 / (AXIAL_PRECESSION_J2000_DAYS * 86400));
 // ≈ 2,360,584.7 s (≈ 27.32158 d × 86400 s/d)
 
 /** Derived period helpers in seconds, mirroring the in-days formulas at
@@ -4167,8 +4167,9 @@ const _moonChain = (() => {
  *  amplitudes). Flag-consistent: pure-Meeus A/B mode keeps the polynomial. */
 function _fwEFactor(jd_tt, T, T2) {
   if (!MOON_ARGS_FRAMEWORK_NATIVE) return 1 - 0.002516 * T - 0.0000074 * T2;
-  // decision (ii): the ONE deep e
-  return _deepEcc().eFactorAt((jd_tt - j2000JD) / inputmeanlengthsolaryearindays);
+  // decision (ii): the ONE deep e — on the channel's Julian-year axis (plan 09
+  // step 7c; the device's rounded tropical-year input read the axis 2e-5 short)
+  return _deepEcc().eFactorAt((jd_tt - j2000JD) / 365.25);
 }
 
 /** Lunar perigee precession period in seconds (Brouwer-Clemence scaling ×
@@ -4294,8 +4295,8 @@ function recomputeEpochAnchors(t_Ma) {
   // f(year) axis; the t→year→t float wobble measurably never reaches output
   // bits (200k-point sweep, pinned by the layer0 gate's non-round-tripping t).
   const _epochYear = 2000 - t_Ma * 1e6;
-  // (plan 09 step 7b: the unit H(t) is no longer an epoch state — `holisticyearLength`
-  // and `H` are J2000 constants; the spin-tier periods of date ride T_p(t) directly)
+  // (plan 09 step 7b/7c: the unit H(t) is gone — the spin-tier periods of date
+  // ride T_p(t) directly; the K-device wheels ride their recorded periods)
   const LOD_s    = _L0.lodSeconds(_epochYear);
   if (LOD_s === null) {
     console.warn(`recomputeEpochAnchors(${t_Ma}): past tidal-lock asymptote — anchors unchanged`);
@@ -4324,7 +4325,7 @@ function recomputeEpochAnchors(t_Ma) {
 //   perihelionCoinRotationMs(+Yearly) and the H/16 anomalistic identity left)
 //
 // All assignments are pure derivations from already-mutable anchors
-// (holisticyearLength, meansolaryearlengthinDays, meanlengthofday) plus
+// (meansolaryearlengthinDays, meanlengthofday) plus
 // stable J2000 constants (perihelionalignmentYear, temperatureGraphMostLikely,
 // systemResetN, startmodelyearwithCorrection, correctionSun, startmodelJD,
 // ASTRO_REFERENCE.perihelionPassageJ2000_JD).
@@ -4378,7 +4379,7 @@ function recomputeDerivedAnchorsForEpoch(t_Ma) {
 // Solar Day Report ~24k forceSceneUpdate × ~97 Simpson per updatePredictions).
 //
 // `meanHAtAge(t_Ma)` is a pure function of t_Ma (depends only on
-// HOLISTIC_YEAR_J2000 + LOD/H constants), so the cumulative integral
+// the LOD constants), so the cumulative integral
 // ∫_{startmodelYear}^{year} 1/H(t) dt is invariant and safe to memoize.
 //
 // Accuracy: trapezoidal on a 10,000-year grid (Phase 9.11.1, extended for
@@ -4631,9 +4632,9 @@ function posFromDateTime(dateStr, timeStr) {
 // `balancedYear` declaration) so it's available for `perihelionPhaseOffset`
 // and other early consumers that must guard against `balancedYear` drift.
 
-const PERIHELION_CYCLE_LENGTH_J2000_FIXED = HOLISTIC_YEAR_J2000 / 16;
-// = 20,955.9375 yr — Earth's perihelion cycle at J2000 (used as J2000-fixed
-// arg for `computeEccentricityEarth` under Phase 8 integrated mode)
+const PERIHELION_CYCLE_LENGTH_J2000_FIXED = _wheelPeriodYears(16);
+// the K-device perihelion wheel's recorded period (the scaffold pose, plan 09
+// step 7c), the perihelionPhaseOffset re-derivation's wheel period
 // (Plan 07 R10: ECCENTRICITY_ANCHOR_J2000_FIXED — the n=7 System-Reset
 // eccentricity anchor, BALANCED − systemResetN·H — had no reader left since
 // R6 and is gone with the phase origin.)
@@ -4871,7 +4872,7 @@ function recomputePlanetCyclesForEpoch(t_Ma) {
 
 /** Mutate epoch-dependent fields on the `earth` object literal (line ~5212). */
 function updateEarthForEpoch() {
-  earth.speed         = -Math.PI * 2 / (holisticyearLength / 13);
+  earth.speed         = -Math.PI * 2 / _wheelPeriodYears(13);
   // Earth rotation rate is locked to the J2000 sidereal day.
   //
   // Background: the scene graph applies `earth.rotationSpeed` as a single
@@ -4891,7 +4892,7 @@ function updateEarthForEpoch() {
   // `meanLodSecondsAtAge()` / `meanHAtAge()` directly.
   //
   // Reference values used (all module-load `const`, never mutated):
-  //   inputmeanlengthsolaryearindays — 365.2422 tropical days per year
+  //   meansolaryearlengthinDays      — the DERIVED J2000 mean tropical year in days (plan 09)
   //   86400                          — J2000 mean solar day in seconds
   //   SI_TROPICAL_YEAR_DAYS          — captured at module init from J2000
   // (_siderealDaySec_J2000 hoisted to module scope in section E1 at top of file)
@@ -4962,20 +4963,20 @@ function updateEarthPrecessionObjectsForEpoch() {
   const cycles_H5  = _deviceWheelStartCycles(5);
   const cycles_H8  = _deviceWheelStartCycles(8);
   const cycles_H16 = _deviceWheelStartCycles(16);
-  // Apsidal precession (H/3, prograde; historical name: inclination precession)
+  // Apsidal precession (wheel 3, prograde; historical name: inclination precession)
   earthInclinationPrecession.startPos =  cycles_H3 * 360;
-  earthInclinationPrecession.speed    =  Math.PI * 2 / (HOLISTIC_YEAR_J2000 / 3);
-  // Ecliptic precession (H/5, prograde)
+  earthInclinationPrecession.speed    =  Math.PI * 2 / _wheelPeriodYears(3);
+  // Ecliptic precession (wheel 5, prograde)
   earthEclipticPrecession.startPos    =  cycles_H5 * 360;
-  earthEclipticPrecession.speed       =  Math.PI * 2 / (HOLISTIC_YEAR_J2000 / 5);
-  // Obliquity (H/8, retrograde)
+  earthEclipticPrecession.speed       =  Math.PI * 2 / _wheelPeriodYears(5);
+  // Obliquity (wheel 8, retrograde)
   earthObliquityPrecession.startPos   = -cycles_H8 * 360;
-  earthObliquityPrecession.speed      = -Math.PI * 2 / (HOLISTIC_YEAR_J2000 / 8);
-  // Perihelion (H/16, prograde + retrograde pair)
+  earthObliquityPrecession.speed      = -Math.PI * 2 / _wheelPeriodYears(8);
+  // Perihelion (wheel 16, prograde + retrograde pair)
   earthPerihelionPrecession1.startPos =  cycles_H16 * 360;
-  earthPerihelionPrecession1.speed    =  Math.PI * 2 / (HOLISTIC_YEAR_J2000 / 16);
+  earthPerihelionPrecession1.speed    =  Math.PI * 2 / _wheelPeriodYears(16);
   earthPerihelionPrecession2.startPos = -cycles_H16 * 360;
-  earthPerihelionPrecession2.speed    = -Math.PI * 2 / (HOLISTIC_YEAR_J2000 / 16);
+  earthPerihelionPrecession2.speed    = -Math.PI * 2 / _wheelPeriodYears(16);
 }
 
 /** Safe-subset Phase 3 orchestrator. Call AFTER recomputeEpochAnchors + recomputeMoonAndAuForEpoch. */
@@ -5381,8 +5382,8 @@ if (typeof window !== 'undefined') {
     computeLodRealSecondsAtEpoch,
     // The four globals recomputeEpochAnchors mutates, read live (the kinematic
     // sidereal year is a J2000 constant since the year/day collapse — "kinematic"
-    // is f(2000), not an epoch state; plan 09 step 7b: the unit `holisticyearLength`
-    // / `H` is a J2000 constant too, the unit function left).
+    // is f(2000), not an epoch state; plan 09 step 7b/7c: the unit H left
+    // the browser entirely — the K wheels ride their recorded periods).
     anchors: () => ({
       meanlengthofday,
       meansiderealyearlengthinSeconds, meansiderealyearlengthinDays,
@@ -6366,7 +6367,7 @@ const earthWobbleCenter = {
   startPos: 0,
   speed: 0,
   tilt: 0,
-  rotationSpeed: -Math.PI*2/(holisticyearLength/13),
+  rotationSpeed: -Math.PI*2/_wheelPeriodYears(13),
   orbitRadius: eccentricityAmplitude*100,
   orbitCentera: 0,
   orbitCenterb: 0,
@@ -6394,7 +6395,7 @@ const earthWobbleCenter = {
 const earth = {
   name: "Earth",
   startPos: 0,    
-  speed: -Math.PI*2/(holisticyearLength/13),
+  speed: -Math.PI*2/_wheelPeriodYears(13),
   rotationSpeed: Math.PI*2 * SI_TROPICAL_YEAR_DAYS * 86400 * (meansolaryearlengthinDays+1) / (meanlengthofday * meansolaryearlengthinDays),  // Phase 9.5b: sidereal rotations per SI year (LOD-aware); at J2000 ≡ 2π × (meansol+1) to ppm
   // 20.3c sidereal-phase anchor — MATCHED PAIR with updateEarthForEpoch()
   // (the Node umbra twin that mirrored it was deleted in U3). MUST be
@@ -6441,7 +6442,7 @@ const earth = {
  *  updateEarthPrecessionObjectsForEpoch (plan 09 step 5c: the wheels are a
  *  uniformly turning pose; the ∫N/H_era counter is retired). */
 function _deviceWheelStartCycles(divisor_N) {
-  return (BALANCED_YEAR_J2000_FIXED - startmodelyearwithCorrection) * divisor_N / HOLISTIC_YEAR_J2000
+  return (BALANCED_YEAR_J2000_FIXED - startmodelyearwithCorrection) / _wheelPeriodYears(divisor_N)
        - divisor_N * kDeviceWheelPhaseAtJ2000Cycles;
 }
 
@@ -6450,7 +6451,7 @@ const earthInclinationPrecession = {
   // Alignment with updateEarthPrecessionObjectsForEpoch: the SAME helper here
   // so module-load state matches post-setEpoch state (single source → no drift).
   startPos: _deviceWheelStartCycles(3) * 360,
-  speed: Math.PI*2/(HOLISTIC_YEAR_J2000/3),
+  speed: Math.PI*2/_wheelPeriodYears(3),
   tilt: 0,
   orbitRadius: 0,
   orbitCentera: 0,
@@ -6473,7 +6474,7 @@ const earthEclipticPrecession = {
   name: "Earth Ecliptic Precession",
   // See earthInclinationPrecession header for alignment rationale.
   startPos: _deviceWheelStartCycles(5) * 360,
-  speed: Math.PI*2/(HOLISTIC_YEAR_J2000/5),
+  speed: Math.PI*2/_wheelPeriodYears(5),
   tilt: 0,
   orbitRadius: 0,
   orbitCentera: 0,
@@ -6496,7 +6497,7 @@ const earthObliquityPrecession = {
   name: "Earth Obliquity Precession",
   // See earthInclinationPrecession header for alignment rationale. Negated for retrograde (H/8).
   startPos: -_deviceWheelStartCycles(8) * 360,
-  speed: -Math.PI*2/(HOLISTIC_YEAR_J2000/8),
+  speed: -Math.PI*2/_wheelPeriodYears(8),
   tilt: 0,
   orbitRadius: 0,
   orbitCentera: 0,
@@ -6519,7 +6520,7 @@ const earthPerihelionPrecession1 = {
   name: "Earth Perihelion Precession1",
   // See earthInclinationPrecession header for alignment rationale.
   startPos: _deviceWheelStartCycles(16) * 360,
-  speed: Math.PI*2/(HOLISTIC_YEAR_J2000/16),
+  speed: Math.PI*2/_wheelPeriodYears(16),
   tilt: 0,
   orbitRadius: 0,
   orbitCentera: 0,
@@ -6542,7 +6543,7 @@ const earthPerihelionPrecession2 = {
   name: "Earth Perihelion Precession2",
   // See earthInclinationPrecession header for alignment rationale. Negated for retrograde.
   startPos: -_deviceWheelStartCycles(16) * 360,
-  speed: -Math.PI*2/(HOLISTIC_YEAR_J2000/16),
+  speed: -Math.PI*2/_wheelPeriodYears(16),
   tilt: 0,
   orbitRadius: 0,
   orbitCentera: -eccentricityBaseDerived*100,   // the one law's mean offset base' (unification; mirrors scene-graph.js)
@@ -6688,7 +6689,7 @@ const sun = {
   _eccentricityKey: 'eccentricityEarth',
   _eocDerived: true,  // Sun EoC = e_dynamic - e_base/2
   perihelionPhaseJ2000: -correctionSun * (Math.PI / 180) - 2 * Math.PI * (startmodelJD - ASTRO_REFERENCE.perihelionPassageJ2000_JD) / meansolaryearlengthinDays + perihelionPhaseOffset * (Math.PI / 180),
-  perihelionPrecessionRate: Math.PI * 2 / (holisticyearLength / 16), // perihelion advances at H/16 rate
+  perihelionPrecessionRate: Math.PI * 2 / _wheelPeriodYears(16), // the K perihelion wheel's recorded rate (scaffold pose)
   
   size: (diameters.sunDiameter/2/ currentAUDistance)*100,   
   color: 0x333333,
@@ -8346,7 +8347,7 @@ let o = {
   // published S&S-origin node is _kcAscNodeInvPlaneSSDeg, from the chain.)
 
   // Dynamic ascending nodes on invariable plane in ECLIPTIC coords (for height calculation)
-  // Uses apparent precession rate (holisticyearLength/16 for Earth)
+  // Uses apparent precession rate (the perihelion-of-date period for Earth)
   mercuryAscendingNodeInvPlaneEcliptic: 0,
   venusAscendingNodeInvPlaneEcliptic: 0,
   earthAscendingNodeInvPlaneEcliptic: 0,
@@ -9348,7 +9349,7 @@ function createInvariablePlaneVisualization(size = 500, divisions = 20) {
 
   // ===== EARTH HEIGHT INDICATOR (Annual Crossing) =====
   // Shows Earth's current position above/below the invariable plane
-  // This changes over 1 year (NOT the holisticyearLength/3 inclination cycle)
+  // This changes over 1 year (NOT the inclination wheel's ~112-kyr cycle)
   // Earth crosses the plane in early July (ascending) and early January (descending)
 
   // Create a dashed line from Earth to the invariable plane
@@ -10198,7 +10199,7 @@ function updateEccentricityPathMarker() {
 // When Earth is ABOVE the invariable plane, the plane appears BELOW Earth.
 // When Earth is BELOW the invariable plane, the plane appears ABOVE Earth.
 //
-// This annual crossing cycle (1 year) is independent of the holisticyearLength/3
+// This annual crossing cycle (1 year) is independent of the inclination wheel's ~112-kyr
 // orbital plane tilt cycle shown by the inclination path visualization.
 // Debug flag for invariable plane comparison
 let _lastInvPlaneDebugTime = 0;
@@ -10317,8 +10318,8 @@ invariablePlaneGroup.visible = false; // Off by default (labels also hidden by d
 
 // Planet data lookup for invariable plane visualization
 // orbitRadiusAU is the semi-major axis used for fixed node marker positioning
-// ascNode: ICRF-rate value (holisticyearLength/3) for marker POSITIONING (physical position in space)
-// ascNodeEcliptic: Ecliptic-rate value (holisticyearLength/16) for marker LABELS (what user sees when planet crosses)
+// ascNode: ICRF-rate value (the inclination wheel's period) for marker POSITIONING (physical position in space)
+// ascNodeEcliptic: Ecliptic-rate value (the perihelion wheel's period) for marker LABELS (what user sees when planet crosses)
 const PLANET_INV_PLANE_DATA = {
   earth:   { obj: earth,   key: 'earth',   inclination: () => inclInvPlaneModel(o.currentYear),   ascNode: () => o.earthAscendingNodeInvPlane,   ascNodeEcliptic: () => o.earthAscendingNodeInvPlaneEcliptic,   height: () => o.earthHeightAboveInvPlane,   orbitRadiusAU: 1.0 },
   mercury: { obj: mercury, key: 'mercury', inclination: () => o.mercuryInvPlaneInclinationDynamic, ascNode: () => o.mercuryAscendingNodeInvPlane, ascNodeEcliptic: () => o.mercuryAscendingNodeInvPlaneEcliptic, height: () => o.mercuryHeightAboveInvPlane, orbitRadiusAU: mercuryOrbitDistance },
@@ -10731,7 +10732,7 @@ function setCSS2DVisibility(group, visible) {
   });
 }
 
-// Create inclination path (wobble curve showing holisticyearLength/3 cycle)
+// Create inclination path (wobble curve showing the inclination wheel's cycle)
 // Add to earth.pivotObj (same as zodiac) so it can be toggled independently
 // The rotation is applied in moveModel() to match zodiac alignment
 const inclinationPathGroup = createInclinationPath(250, 360, 50);
@@ -13776,7 +13777,6 @@ function wgcRenderChart(title, yrArr, values, color, label, modelValues, omitRat
 function wgcRenderPlanet(planetKey) {
   if (!wgcData || !wgcData[planetKey]) return '<div style="padding:40px;text-align:center;color:#888">Loading data\u2026</div>';
   const d = wgcData[planetKey];
-  const H = holisticyearLength;
 
   // Use the exploration script's pre-computed rates. For all trend lines we
   // fall back to raw OLS linear regression (the rate shown in the chart footer).
@@ -23142,19 +23142,17 @@ function setupGUI() {
       'The polar moment\u2019s lagged response to the climate formula\u2019s ice proxy: the coupling k is derived at runtime from the Cox & Chao 2002 dJ\u2082/dt; the relaxation time is measured against the historical \u0394T record.');
     row('Solar mass loss \u00B7 cited',
       'Luminosity/c\u00B2 plus wind, from published constants \u2014 the Driver-2 stretch of every heliocentric period, and the \u03BC(t) the two-expansions consistency leg tests.');
-    head('The frozen era clock \u2014 the certified time machinery (5 constants + the bases)');
-    row('Fitted timing anchor \u00B7 holisticyearLength = ' + String(holisticyearLength) + ' yr',
-      'Fitted to the 1246 AD perihelion\u2013solstice alignment + the J2000 longitude of perihelion. The unit of the correction bases and the era clock \u2014 the cardinal-point and year-length harmonics, the \u0394T stack\u2019s flags and the deep calendar all ride it; it scales with the precession period at deep time (anchor/T_p = 13.011, a fit constant \u2014 not a period).');
+    head('The scene scaffold \u2014 the K device\u2019s recorded J2000 pose (constants, not laws)');
+    row('K wheel periods \u00B7 ' + [3, 5, 8, 13, 16].map((n) => fmtNum(_wheelPeriodYears(n), 1, ',')).join(' / ') + ' yr',
+      'The scaffold wheels\u2019 recorded periods (inclination, ecliptic, obliquity, axial, perihelion) in scene mean solar years; each wheel turns uniformly at its recorded rate (plan 09 step 5c). They are the scene\u2019s pose, not the model\u2019s precession periods \u2014 those are the dynamical values the panels publish (T_p, the obliquity beat, the apsidal and nodal modes), which the wheels read 0.09\u20132 % off; the engine places the Earth frame, the Sun and the Moon stack over the scaffold (plan 09 step 7c: the frozen era device \u2014 its unit, counters and combs \u2014 is retired).');
     row('Mean obliquity \u00B7 ' + earthtiltMean + '\u00B0',
       'The K comb\u2019s mean, fitted to the observed obliquity range, and the scene\u2019s J2000 pose. A device constant: the published obliquity is the hybrid (Ledger 1); the comb still carries the cardinal-point model, the kinematic-day stack\u2019s RA projection, the lunar arguments\u2019 obliquity carrier and the scene\u2019s K geometry.');
     row('Inclination amplitude \u00B7 ' + earthInvPlaneInclinationAmplitude + '\u00B0',
       'A constant of the scene\u2019s J2000 pose, fitted to the observed obliquity range; the K inclination law it once fed is retired (plan 07 R5/R9). The published inclination is the chain\u2019s (Ledger 1).');
     row('K inclination phase at J2000 \u00B7 ' + kDeviceInclinationPhaseJ2000Deg.toFixed(5) + '\u00B0',
       'The scene scaffolding\u2019s recorded pose of the inclination wheel at J2000 (plan 09 step 6; it was the J2000 perihelion longitude minus the retired eccentricity law\u2019s 21.77\u00B0 anchor). It poses the mean inclination, the inclination path and the perihelion wheel\u2019s offset base\u2032; no observable rides it \u2014 Earth\u2019s eccentricity of date is the N-body series on every path.');
-    row('K wheel phase at J2000 \u00B7 ' + kDeviceWheelPhaseAtJ2000Cycles.toFixed(6) + ' anchor units',
-      'The scene scaffolding\u2019s recorded pose \u2014 each H/N wheel stands N \u00D7 this on at J2000 \u2014 not a law: no observable rides it (the engine places the Earth frame, the Sun and the Moon stack over the scaffold). Numerically the retired origin\u2019s (2000 \u2212 t\u2080)/H, kept with the pose (plan 07 R10).');
-    row('Correction-basis divisors \u00B7 device tier',
-      'The correction combs\u2019 divisors and the era clock\u2019s counters are identifiers of the fitted machinery \u2014 bounded harmonic bases on the anchor\u2019s unit \u2014 not parameters and not laws; the three pre-registered falsification legs test the physics (the composed precession clock, the obliquity beat, the two-expansions \u03BC-consistency). The combs measure their phase from J2000 (plan 07 R10 \u2014 the former fitted origin, the 1246 AD alignment minus 14.5 perihelion-of-date beats, was rotated out exactly); Earth\u2019s e(J2000) is an observed calibration input, and the eccentricity law\u2019s mean derives from it.');
+    row('K wheel phase at J2000 \u00B7 ' + kDeviceWheelPhaseAtJ2000Cycles.toFixed(6),
+      'The scene scaffolding\u2019s recorded pose \u2014 each wheel of index N stands N \u00D7 this turns on at J2000 \u2014 not a law: no observable rides it (the engine places the Earth frame, the Sun and the Moon stack over the scaffold). Kept with the pose (plan 07 R10); the three pre-registered falsification legs test the physics (the composed precession clock, the obliquity beat, the two-expansions \u03BC-consistency).');
     head('Ledger 3 \u00B7 The fitted correction stack (gated, hashed)');
     row('Year-length, perihelion and solstice-obliquity harmonics \u00B7 cardinal-point families \u00B7 Sun-longitude harmonics \u00B7 Moon corrections \u00B7 per-planet geocentric-precession projections',
       'Fitter-owned coefficient arrays under the coefficients hash (Model Identity above); the \u0394T/LOD stack, the recession knots and the GIA \u03C4 sit under the constants hash. Every gate is fail-proven. The year-length and cardinal-point families are the frozen era clock\u2019s basis, not the published year lengths, which ride the one-family route. None of these touch the planetary dynamics.');
@@ -24723,36 +24721,16 @@ function setupGUI() {
     const errYr   = errDays / meansolaryearlengthinDays;
     return { N: bestN, stepYr, errDays, errYr };
   }
-  // Precompute H-factorization recommendations for the tooltip
-  const _hJdStart = Math.round(startmodelJD + (balancedYear - startmodelYear) * meansolaryearlengthinDays);
-  const _hJdEnd   = Math.round(_hJdStart + holisticyearLength * meansolaryearlengthinDays);
-  const _hSteps = [];
-  for (let d = 1; d <= holisticyearLength; d++) {
-    if (holisticyearLength % d === 0 && d >= 10 && d <= 200) {
-      _hSteps.push({ step: d, pts: holisticyearLength / d + 1 });
-    }
-  }
-  // Dynamic prime factorization of H
-  let _hFact = holisticyearLength, _hFactors = {};
-  for (let p = 2; p * p <= _hFact; p++) {
-    while (_hFact % p === 0) { _hFactors[p] = (_hFactors[p] || 0) + 1; _hFact /= p; }
-  }
-  if (_hFact > 1) _hFactors[_hFact] = (_hFactors[_hFact] || 0) + 1;
-  const _hFactStr = Object.entries(_hFactors).map(([p, e]) => e > 1 ? p + '^' + e : p).join(' \u00D7 ');
-  const _hTip =
-    `\n\nFull anchor interval (holisticyearLength = ${holisticyearLength.toLocaleString('en-US')} yr, the frozen clock’s unit):\n` +
-    `  Start JD: ${_hJdStart}  |  End JD: ${_hJdEnd}\n` +
-    `  H = ${_hFactStr} — exact-divisor steps:\n` +
-    _hSteps.map(s => `    ${s.step} yr → ${s.pts.toLocaleString('en-US')} pts`).join('\n');
-
+  // (plan 09 step 7c: the full-anchor-interval tooltip — the frozen unit's
+  // JD span, its prime factorization and its exact-divisor step list — is
+  // deleted with the unit; the range is the user's.)
   function updatePieceTooltip() {
     const r = bestNforJ2000(o.rangeStart, o.rangeEnd);
     const el = pieceCtrl.element.querySelector('.tp-lblv_l') || pieceCtrl.element;
-    if (!r) { el.title = '# data points in the range' + _hTip; return; }
+    if (!r) { el.title = '# data points in the range'; return; }
     el.title =
       `Best N for J2000 alignment: ${r.N}\n` +
-      `Step ≈ ${r.stepYr.toFixed(2)} yr  |  J2000 within ${r.errDays.toFixed(1)} days (${r.errYr.toFixed(4)} yr)` +
-      _hTip;
+      `Step ≈ ${r.stepYr.toFixed(2)} yr  |  J2000 within ${r.errDays.toFixed(1)} days (${r.errYr.toFixed(4)} yr)`;
   }
   startCtrl.on('change', updatePieceTooltip);
   endCtrl.on('change', updatePieceTooltip);
@@ -25779,10 +25757,10 @@ function setupGUI() {
              (_solarBudget().lEmAtAgeKgm2S(t_Ma_arg) - M_MOON_ALONE * Math.sqrt(GM_EM_M3S2 * a) * E_FACTOR_MOON);
     }
     function _tropYearScaledL1(t_Ma_arg, scale) {
-      const sidSec = meanSiderealYearSecondsAtAge(t_Ma_arg);
-      const lod = _lodScaledL1(t_Ma_arg, scale);
-      const Ht = lod === null ? null : HOLISTIC_YEAR_J2000 * lod / LOD_NOW_H13_S;
-      return Ht === null ? sidSec * (1 - 13 / HOLISTIC_YEAR_J2000) : sidSec * (1 - 13 / Ht);
+      // the one-family law on the SCALED LOD: one equinox turn per the composed
+      // T_p (ω(t)/ω₀ on the scaled day × p₀ × the lunar-torque term) — plan 09
+      // step 7c; the device identity sidSec·(1 − 13/H(t)) ran 0.086 % slow
+      return _deepLod().tropicalYearSecondsFromLod(t_Ma_arg, _lodScaledL1(t_Ma_arg, scale));
     }
     function _deltaTScaledL1(t_Ma_arg, scale) {
       if (t_Ma_arg === 0) return 0;
@@ -32644,7 +32622,7 @@ function setupGUI() {
       const rs = samples.map(s => s.diff);   // Stephenson − our model
       const nPts = ys.length;
 
-      console.log('  Scans the divisors of the anchor’s eight-unit interval for harmonic structure in the current');
+      console.log('  Scans periods 894–5365 yr (1-yr grid) for harmonic structure in the current');
       console.log('  Stephenson − model residual, ranking by ΔR² gain over polynomial-only baseline.');
       console.log('  ');
       console.log('  The scanned residual REFLECTS the current toggle state:');
@@ -32653,8 +32631,8 @@ function setupGUI() {
       console.log('  ');
 
       // ── Framework constants for J-S-E interpretation ────────────────────
-      const H_YR             = holisticyearLength;
-      const EIGHT_H_YR       = 8 * H_YR;
+      // (plan 09 step 7c: the scan runs on a period grid; the retired unit's
+      // divisor grid is gone — the stack's periods are stated in years)
       const JUPITER_PERIOD   = 11.8598;
       const SATURN_PERIOD    = 29.4570;
       const J_S_SYNODIC      = 1.0 / (1.0/JUPITER_PERIOD - 1.0/SATURN_PERIOD);  // ≈ 19.85 yr
@@ -32793,16 +32771,15 @@ function setupGUI() {
       const r2_base   = 1 - rss_base / tss;
       console.log(`  Baseline (polynomial-only) R² = ${r2_base.toFixed(4)}   RMS = ${Math.sqrt(rss_base / nPts).toFixed(1)} s`);
 
-      // Scan — narrowed to n ∈ [500, 3000] (period 894 to 5365 yr) to keep
-      // this diagnostic fast in the browser. Longer periods are captured by
-      // the polynomial baseline; shorter periods (< 894 yr) rarely have
-      // enough cycles in the 2740-yr observation window to be fit reliably.
-      const N_LO = 500, N_HI = 3000;
-      console.warn(`  Scanning n ∈ [${N_LO}, ${N_HI}] (period range ${(EIGHT_H_YR/N_HI).toFixed(0)}–${(EIGHT_H_YR/N_LO).toFixed(0)} yr)...`);
+      // Scan — periods 894 to 5365 yr on a 1-yr grid, to keep this diagnostic
+      // fast in the browser. Longer periods are captured by the polynomial
+      // baseline; shorter periods (< 894 yr) rarely have enough cycles in the
+      // 2740-yr observation window to be fit reliably.
+      const P_LO = 894, P_HI = 5365;
+      console.warn(`  Scanning periods ${P_LO}–${P_HI} yr (1-yr grid)...`);
       const scanResults = [];
       const scanStart = Date.now();
-      for (let nDiv = N_LO; nDiv <= N_HI; nDiv++) {
-        const P = EIGHT_H_YR / nDiv;
+      for (let P = P_LO; P <= P_HI; P++) {
         const omega = 2 * Math.PI / P;
         const X = new Array(nPts);
         for (let i = 0; i < nPts; i++) X[i] = [1, t[i], t[i]*t[i], Math.cos(omega * ys[i]), Math.sin(omega * ys[i])];
@@ -32811,9 +32788,9 @@ function setupGUI() {
         const r2  = 1 - r / tss;
         const amp = Math.sqrt(beta[3] * beta[3] + beta[4] * beta[4]);
         const phase = Math.atan2(-beta[4], beta[3]) * 180 / Math.PI;
-        scanResults.push({ n: nDiv, P, r2, dR2: r2 - r2_base, amp, phase });
+        scanResults.push({ P, r2, dR2: r2 - r2_base, amp, phase });
       }
-      console.warn(`  Scan complete in ${((Date.now() - scanStart) / 1000).toFixed(2)}s (${scanResults.length} divisors)`);
+      console.warn(`  Scan complete in ${((Date.now() - scanStart) / 1000).toFixed(2)}s (${scanResults.length} periods)`);
       scanResults.sort((a, b) => b.dR2 - a.dR2);
 
       // ── Report top 10 with J-S-E interpretations ──
@@ -32822,16 +32799,19 @@ function setupGUI() {
       const padR = (s, n) => (String(s ?? '') + ' '.repeat(n)).slice(0, n);
       const padL = (s, n) => (' '.repeat(n) + String(s ?? '')).slice(-n);
       const top10 = scanResults.slice(0, 10);
-      const rank1830 = scanResults.findIndex(r => r.n === 1830) + 1;
-      const rank1851 = scanResults.findIndex(r => r.n === 1851) + 1;
-      const rank1825 = scanResults.findIndex(r => r.n === 1825) + 1;
+      // the shipped Bond period and the two archived labels' periods (the
+      // retired lattice's n = 1851 and n = 1825 lines, 1,449.2 / 1,469.9 yr), by nearest grid period
+      const rankOf = (Pq) => { let best = 0; for (let i = 1; i < scanResults.length; i++) if (Math.abs(scanResults[i].P - Pq) < Math.abs(scanResults[best].P - Pq)) best = i; return best + 1; };
+      const rank1830 = rankOf(BOND_PERIOD_YR);
+      const rank1851 = rankOf(1449.236);
+      const rank1825 = rankOf(1469.882);
       const tableLines = [
         '',
-        '  Top 10 harmonic divisors of the anchor grid ranked by ΔR² gain (over polynomial-only baseline):',
+        '  Top 10 periods ranked by ΔR² gain (over polynomial-only baseline):',
         '',
-        '    ' + padL('rank', 5) + '  ' + padL('n', 5) + '  ' + padL('P (yr)', 9) + '  ' +
+        '    ' + padL('rank', 5) + '  ' + padL('P (yr)', 9) + '  ' +
                  padL('amp (s)', 8) + '  ' + padL('ΔR²', 8) + '  ' + padR('best J-S-E interpretation', 45),
-        '    ' + '-'.repeat(5) + '  ' + '-'.repeat(5) + '  ' + '-'.repeat(9) + '  ' +
+        '    ' + '-'.repeat(5) + '  ' + '-'.repeat(9) + '  ' +
                  '-'.repeat(8) + '  ' + '-'.repeat(8) + '  ' + '-'.repeat(45),
       ];
       for (let i = 0; i < top10.length; i++) {
@@ -32839,48 +32819,48 @@ function setupGUI() {
         const interp = interpretPeriod(r.P);
         const interpStr = interp ? `${interp.mult}${interp.op}${interp.label} (${interp.err.toFixed(2)}%)` : '(none <2%)';
         tableLines.push(
-          '    ' + padL(i+1, 5) + '  ' + padL(r.n, 5) + '  ' + padL(r.P.toFixed(2), 9) + '  ' +
+          '    ' + padL(i+1, 5) + '  ' + padL(r.P.toFixed(2), 9) + '  ' +
                    padL(r.amp.toFixed(1), 8) + '  ' + padL(r.dR2.toFixed(4), 8) + '  ' + padR(interpStr, 45)
         );
       }
       tableLines.push('');
-      tableLines.push(`  n=1830 (74×J-S synodic, currently in toggle):  rank #${rank1830}, ΔR² = ${scanResults[rank1830-1].dR2.toFixed(4)}, amp = ${scanResults[rank1830-1].amp.toFixed(1)} s`);
-      tableLines.push(`  n=1851 (73×J-S synodic, archived interim):     rank #${rank1851}, ΔR² = ${scanResults[rank1851-1].dR2.toFixed(4)}, amp = ${scanResults[rank1851-1].amp.toFixed(1)} s`);
-      tableLines.push(`  n=1825 (paper's original Bond):                rank #${rank1825}, ΔR² = ${scanResults[rank1825-1].dR2.toFixed(4)}, amp = ${scanResults[rank1825-1].amp.toFixed(1)} s`);
+      tableLines.push(`  Bond ${BOND_PERIOD_YR.toFixed(1)} yr (shipped, 74×J-S synodic, in toggle): rank #${rank1830}, ΔR² = ${scanResults[rank1830-1].dR2.toFixed(4)}, amp = ${scanResults[rank1830-1].amp.toFixed(1)} s`);
+      tableLines.push(`  1449.2 yr (archived interim, 73×J-S synodic):        rank #${rank1851}, ΔR² = ${scanResults[rank1851-1].dR2.toFixed(4)}, amp = ${scanResults[rank1851-1].amp.toFixed(1)} s`);
+      tableLines.push(`  1469.9 yr (paper's original Bond):                   rank #${rank1825}, ΔR² = ${scanResults[rank1825-1].dR2.toFixed(4)}, amp = ${scanResults[rank1825-1].amp.toFixed(1)} s`);
 
       // Add verdict lines to the batched output
       const top = scanResults[0];
       const interpTop = interpretPeriod(top.P);
-      const distinctSecondary = scanResults.slice(1, 20).find(r => Math.abs(r.n - top.n) >= 20);
+      const distinctSecondary = scanResults.slice(1, 20).find(r => Math.abs(r.P - top.P) >= 0.01 * top.P);
       tableLines.push('');
       tableLines.push('══════════════════════════════════════════════════════════════════════════════════');
       if (top.dR2 > 0.10) {
-        tableLines.push('  VERDICT: STRONG lattice signal in residual (by pre-joint thresholds — see scale check).');
-        tableLines.push(`           Best next divisor: n=${top.n}, P=${top.P.toFixed(1)} yr, ΔR²=+${top.dR2.toFixed(3)}, amp=${top.amp.toFixed(0)} s`);
+        tableLines.push('  VERDICT: STRONG periodic signal in residual (by pre-joint thresholds — see scale check).');
+        tableLines.push(`           Best next period: P=${top.P.toFixed(1)} yr, ΔR²=+${top.dR2.toFixed(3)}, amp=${top.amp.toFixed(0)} s`);
         tableLines.push('  ⚠ Scale check (joint world): ΔR² is measured against the smooth Stephenson SPLINE,');
         tableLines.push('    not observations (per-event noise ~1,200 s). With the residual at the ~30-s noise');
-        tableLines.push('    floor, a "STRONG" verdict can be spline structure + a degenerate divisor ridge');
-        tableLines.push('    (the 2.7-kyr window cannot resolve n at these periods — note the flat top-10).');
-        tableLines.push('    Research note, not a shipping candidate — see TODO (the n=2024 item) + doc 104 §8.');
+        tableLines.push('    floor, a "STRONG" verdict can be spline structure + a degenerate period ridge');
+        tableLines.push('    (the 2.7-kyr window cannot resolve neighbouring periods — note the flat top-10).');
+        tableLines.push('    Research note, not a shipping candidate — see doc 104 §8.');
         if (interpTop) tableLines.push(`           Structural interpretation: ${interpTop.mult}${interpTop.op}${interpTop.label} (${interpTop.err.toFixed(2)}% error)`);
         if (distinctSecondary) {
           const interp2 = interpretPeriod(distinctSecondary.P);
-          tableLines.push(`           Second-distinct: n=${distinctSecondary.n}, P=${distinctSecondary.P.toFixed(1)} yr, ΔR²=+${distinctSecondary.dR2.toFixed(3)}${interp2 ? '  → ' + interp2.mult + interp2.op + interp2.label : ''}`);
+          tableLines.push(`           Second-distinct: P=${distinctSecondary.P.toFixed(1)} yr, ΔR²=+${distinctSecondary.dR2.toFixed(3)}${interp2 ? '  → ' + interp2.mult + interp2.op + interp2.label : ''}`);
         }
       } else if (top.dR2 > 0.02) {
-        tableLines.push('  VERDICT: MODEST lattice signal in residual — a new harmonic might help modestly.');
-        tableLines.push(`           Best next divisor: n=${top.n}, P=${top.P.toFixed(1)} yr, ΔR²=+${top.dR2.toFixed(3)}, amp=${top.amp.toFixed(0)} s`);
+        tableLines.push('  VERDICT: MODEST periodic signal in residual — a new harmonic might help modestly.');
+        tableLines.push(`           Best next period: P=${top.P.toFixed(1)} yr, ΔR²=+${top.dR2.toFixed(3)}, amp=${top.amp.toFixed(0)} s`);
         if (interpTop) tableLines.push(`           Structural interpretation: ${interpTop.mult}${interpTop.op}${interpTop.label} (${interpTop.err.toFixed(2)}% error)`);
       } else {
-        tableLines.push('  VERDICT: NO further lattice signal above ΔR² > 0.02.');
-        tableLines.push('           Remaining residual doesn\'t decompose further on the divisor grid.');
-        tableLines.push('           It\'s either observation noise + drift or off-lattice structure.');
+        tableLines.push('  VERDICT: NO further periodic signal above ΔR² > 0.02.');
+        tableLines.push('           Remaining residual doesn\'t decompose further into a single harmonic.');
+        tableLines.push('           It\'s either observation noise + drift or non-harmonic structure.');
       }
       tableLines.push('══════════════════════════════════════════════════════════════════════════════════');
       console.log(tableLines.join('\n'));
 
-      window._L5b_lattice_scan = { results: scanResults, r2_baseline: r2_base, rank1830, rank1851, rank1825 };
-      console.log('\nFull scan exposed at window._L5b_lattice_scan');
+      window._L5b_period_scan = { results: scanResults, r2_baseline: r2_base, rankBondShipped: rank1830, rank1449: rank1851, rank1470: rank1825 };
+      console.log('\nFull scan exposed at window._L5b_period_scan');
     } catch (e) {
       console.error(`\n■■■ SECTION 14 FAILED ■■■`);
       console.error('  Error:', e && e.message);
@@ -33491,11 +33471,10 @@ function setupGUI() {
       console.log(partALines.join('\n'));
 
       // ── Part B: Dual harmonic test ──
-      const H_YR = holisticyearLength;
-      const EIGHT_H = 8 * H_YR;
-      const n_A = 1830, n_B = 1851;
-      const P_A = EIGHT_H / n_A;   // ≈ 1465.9 yr (current n=1830)
-      const P_B = EIGHT_H / n_B;   // ≈ 1449.2 yr (archived n=1851)
+      // (plan 09 step 7c: the shipped Bond period in years vs the archived
+      // interim line's period — the retired lattice's n = 1851 label read 1,449.24 yr)
+      const P_A = BOND_PERIOD_YR;   // ≈ 1465.9 yr (shipped)
+      const P_B = 1449.236;         // ≈ 1449.2 yr (archived interim)
       const omega_A = 2 * Math.PI / P_A;
       const omega_B = 2 * Math.PI / P_B;
 
@@ -33535,35 +33514,34 @@ function setupGUI() {
 
       const partBLines = [
         '',
-        '  ── Part B: Dual-harmonic test (n=1830 vs n=1851 vs both) ──',
+        '  ── Part B: Dual-harmonic test (shipped Bond period vs the archived interim vs both) ──',
         '',
-        '    Testing whether the current gcd-compliant n=1830 (74×J-S synodic, gcd=61) and',
-        '    the archived interim n=1851 (73×J-S synodic, gcd=1) are Fourier-degenerate.',
+        '    Testing whether the shipped Bond period (74×J-S synodic) and the archived',
+        '    interim line (73×J-S synodic) are Fourier-degenerate.',
         '',
-        `    Period n=1830 (74×J-S synodic, gcd=61):  ${P_A.toFixed(2)} yr`,
-        `    Period n=1851 (73×J-S synodic, gcd=1):   ${P_B.toFixed(2)} yr`,
+        `    Shipped Bond period (74×J-S synodic):   ${P_A.toFixed(2)} yr`,
+        `    Archived interim (73×J-S synodic):      ${P_B.toFixed(2)} yr`,
         `    Period difference: ${(P_A - P_B).toFixed(2)} yr (${((P_A-P_B)/P_A*100).toFixed(2)}%)`,
         `    Fourier resolution at ${(ys[nPts-1] - ys[0]).toFixed(0)}-yr window: ~${((P_A + P_B)/2 * ((P_A+P_B)/2) / (2*(ys[nPts-1] - ys[0]))).toFixed(0)} yr`,
         '',
-        `    Single n=1830 alone: R² = ${r2_A.toFixed(4)}, amp = ${amp_A.toFixed(1)} s, phase = ${phase_A.toFixed(1)}°`,
-        `    Single n=1851 alone: R² = ${r2_B.toFixed(4)}, amp = ${amp_B.toFixed(1)} s, phase = ${phase_B.toFixed(1)}°`,
-        `    Dual n=1830 + n=1851: R² = ${r2_dual.toFixed(4)}`,
-        `      → amp at n=1830 in dual fit: ${amp_A_dual.toFixed(1)} s (was ${amp_A.toFixed(1)} s single)`,
-        `      → amp at n=1851 in dual fit: ${amp_B_dual.toFixed(1)} s (was ${amp_B.toFixed(1)} s single)`,
+        `    Single shipped alone:  R² = ${r2_A.toFixed(4)}, amp = ${amp_A.toFixed(1)} s, phase = ${phase_A.toFixed(1)}°`,
+        `    Single archived alone: R² = ${r2_B.toFixed(4)}, amp = ${amp_B.toFixed(1)} s, phase = ${phase_B.toFixed(1)}°`,
+        `    Dual shipped + archived: R² = ${r2_dual.toFixed(4)}`,
+        `      → amp at the shipped period in dual fit:  ${amp_A_dual.toFixed(1)} s (was ${amp_A.toFixed(1)} s single)`,
+        `      → amp at the archived period in dual fit: ${amp_B_dual.toFixed(1)} s (was ${amp_B.toFixed(1)} s single)`,
         '',
       ];
 
       const dualGain = r2_dual - Math.max(r2_A, r2_B);
       if (dualGain < 0.005) {
-        partBLines.push(`    → Dual fit adds ${(dualGain * 100).toFixed(2)} pp over the better single. Divisors are`);
+        partBLines.push(`    → Dual fit adds ${(dualGain * 100).toFixed(2)} pp over the better single. The two periods are`);
         partBLines.push(`      FOURIER-DEGENERATE: they describe the SAME peak with slightly different labels.`);
-        partBLines.push(`      Recommendation: pick either n=1851 (J-S synodic narrative) or n=1920 (Earth`);
-        partBLines.push(`      ICRF perihelion narrative). Fit quality is indistinguishable.`);
+        partBLines.push(`      Fit quality is indistinguishable (the window cannot resolve them).`);
       } else if (dualGain < 0.02) {
         partBLines.push(`    → Dual fit adds ${(dualGain * 100).toFixed(2)} pp over the better single. Marginal independent`);
-        partBLines.push(`      contribution — divisors are near-degenerate but not identical.`);
+        partBLines.push(`      contribution — the periods are near-degenerate but not identical.`);
       } else {
-        partBLines.push(`    → Dual fit adds ${(dualGain * 100).toFixed(2)} pp over the better single. INDEPENDENT lattice`);
+        partBLines.push(`    → Dual fit adds ${(dualGain * 100).toFixed(2)} pp over the better single. INDEPENDENT periodic`);
         partBLines.push(`      contributions — using both harmonics genuinely closes more variance.`);
       }
 
@@ -37112,9 +37090,9 @@ async function verifyEarthParameters() {
   // inclination = earthInvPlaneInclinationMean - earthInvPlaneInclinationAmplitude * cos(phase3)
   // Model epoch is at year 2000.469 (171.5 days after Jan 1)
   const modelEpochYear = 2000 + ASTRO_REFERENCE.modelEpochOffsetDays / 365.25;
-  // Plan 07 R10: the device's H/3 phase is the recorded J2000 phase plus the
+  // Plan 07 R10: the device's inclination-wheel phase is the recorded J2000 phase plus the
   // advance since J2000 (the former `year − balancedYear` form, t₀ rotated out).
-  const inclCycle3 = holisticyearLength / 3;
+  const inclCycle3 = _wheelPeriodYears(3);
   const inclPhase3_modelEpoch = DEVICE_PHASE_H3_J2000_RAD + ((modelEpochYear - 2000) / inclCycle3) * 2 * Math.PI;
   const modelInclinationAtEpoch = earthInvPlaneInclinationMean - earthInvPlaneInclinationAmplitude * Math.cos(inclPhase3_modelEpoch);
 
@@ -37365,10 +37343,11 @@ async function verifyEarthParameters() {
   // - Changing earthtiltMean by Δ changes obliquity by Δ (direct 1:1)
   // - Changing amplitude affects both obliquity value AND rate
 
-  // Phase values at J2000 — the device's recorded H/3 and H/8 phases (plan 07
-  // R10: the combs' origin is J2000; the device's phases at J2000 are constants)
-  const cycle3 = holisticyearLength / 3;
-  const cycle8 = holisticyearLength / 8;
+  // Phase values at J2000 — the device's recorded inclination- and obliquity-wheel
+  // phases (plan 07 R10: the device's phases at J2000 are constants); the wheels'
+  // recorded periods (plan 09 step 7c)
+  const cycle3 = _wheelPeriodYears(3);
+  const cycle8 = _wheelPeriodYears(8);
   const phase3 = DEVICE_PHASE_H3_J2000_RAD;
   const phase8 = DEVICE_PHASE_H8_J2000_RAD;
 
@@ -41701,26 +41680,29 @@ function showSolarDayChart(year, results, cumulDrifts, numDays, xlsxBlobUrl, xls
  * Multi-Epoch Solar Day Analysis
  *
  * Measures the solar day offset (Method A) at 65 equally-spaced epochs across
- * one full Earth Fundamental Cycle (H = 335,008 tropical years). The epochs are placed
- * at H/64 intervals (~5,234 years) starting from balancedYear. This covers
- * 4 full perihelion cycles (H/16) with 4 samples per cycle, revealing the
- * modulation pattern and enabling derivation of a day-length formula.
+ * one common period of the K-device scaffold wheels (16 turns of the perihelion
+ * wheel, 335,317 scene years — the span over which every wheel returns to its
+ * J2000 phase; a scaffold property, plan 09 step 7c). The epochs are placed at
+ * 1/64 of that span (~5,239 years) starting from J2000. This covers 4 samples
+ * per perihelion-wheel turn, revealing the modulation pattern and enabling
+ * derivation of a day-length formula.
  *
  * Purpose: verify that the mean offset across all precession phases converges
  * to the predicted value from axial + obliquity coin rotation (~14.3 ms/day).
  */
 async function analyzeSolarDayMultiEpoch() {
   const numSteps = 64;
-  const numPoints = numSteps + 1;  // 65 points: from balanced year back to balanced year
-  const stepYears = holisticyearLength / numSteps;  // H/64 = 5,239.3 years (at H=335,317)
+  const numPoints = numSteps + 1;  // 65 points: from J2000 back to the same scaffold phase
+  const scaffoldCommonPeriodYears = 16 * _wheelPeriodYears(16);  // every K wheel back at its J2000 phase
+  const stepYears = scaffoldCommonPeriodYears / numSteps;  // ≈ 5,239.3 years
   const startEpoch = balancedYear;
 
   console.log('╔════════════════════════════════════════════════════════════════════════════════════╗');
-  console.log('║     MULTI-EPOCH SOLAR DAY ANALYSIS (64 steps across one anchor interval)          ║');
+  console.log('║     MULTI-EPOCH SOLAR DAY ANALYSIS (64 steps across the scaffold wheels\' common period)  ║');
   console.log('╚════════════════════════════════════════════════════════════════════════════════════╝');
   console.log('');
-  console.log(`Anchor interval (holisticyearLength) = ${holisticyearLength} tropical years`);
-  console.log(`Step size: H/32 = ${stepYears.toFixed(2)} years`);
+  console.log(`Scaffold common period (16 perihelion-wheel turns) = ${scaffoldCommonPeriodYears} scene years`);
+  console.log(`Step size: 1/64 = ${stepYears.toFixed(2)} years`);
   console.log(`Start epoch: ${startEpoch.toFixed(0)} (balanced year)`);
   console.log(`End epoch: ${(startEpoch + (numPoints - 1) * stepYears).toFixed(0)}`);
   console.log(`Perihelion alignment year: ${perihelionalignmentYear}`);
@@ -41848,7 +41830,7 @@ async function analyzeSolarDayMultiEpoch() {
     console.log('═══════════════════════════════════════════════════════════════════════════');
     console.log(`  Mean offset:    ${meanOffsetA.toFixed(3)} ms/day`);
     console.log(`  Per year:       ${meanOffsetSecondsPerYear.toFixed(4)} s/year`);
-    console.log(`  Over H years:   ${(meanOffsetSecondsPerYear * holisticyearLength / 86400).toFixed(3)} days`);
+    console.log(`  Over the scan:  ${(meanOffsetSecondsPerYear * scaffoldCommonPeriodYears / 86400).toFixed(3)} days`);
     console.log(`  Over T_p:       ${(meanOffsetSecondsPerYear * _certifiedAxialPrecessionJ2000Years() / 86400).toFixed(3)} days`);
     console.log('═══════════════════════════════════════════════════════════════════════════');
   }
@@ -45006,7 +44988,7 @@ function loadTexture( url, onLoad ) {
 // them in temporal-dead-zone at GUI construction time.
 
 // Historical model predictions frozen at first access (J2000 state). The formula
-// reads deep-time-mutable globals (holisticyearLength, planets.X.perihelionEclipticYears,
+// reads deep-time-mutable globals (planets.X.perihelionEclipticYears,
 // etc.), so re-evaluating at runtime after setEpoch would
 // give the epoch-shifted value instead of "what the model predicts at year 1900."
 //
@@ -45107,7 +45089,7 @@ const planetStats = {
        tpLink: true},
       {label : () => `Orbital Eccentricity (e)`,
        value : [ { v: () => _hybridSpinActive() ? o.eccentricityEarth : _kcElementsOfDate('earth', o.julianDay).e, dec:8, sep:',' },{ small: '' }],
-       hover : [`The model's own N-body eccentricity of date — the published Earth element, the SECULAR convention (J2000: 0.016702, ≡ JPL's osculating seed state and La2004). The IAU/Standish mean-elements value is 0.016710 (the Calibration Inputs row) and the eclipse Sun's derived mean element 0.016708 — conventions, not discrepancies. This row IS the scene's rendered e (the banked engine series inside ±10 Myr, the mode-tail beyond — ONE SOURCE: the geometric offset, the equation of center and this readout share one value; series-vs-chain 1e-5 in 1600–2400). Under ?hybridSpin=0: the era chain of date, while the scene's orbit machinery rides the framework's eccentricity law e(t) = base′·(1 + cos θ/2) — mean base′ = ${eccentricityDerivedMean.toFixed(6)}, cycle ${fmtNum(holisticyearLength / 3, 0, ',')} years — its epoch-local tangent, within 6e-5 of the chain across the historical era.`],
+       hover : [`The model's own N-body eccentricity of date — the published Earth element, the SECULAR convention (J2000: 0.016702, ≡ JPL's osculating seed state and La2004). The IAU/Standish mean-elements value is 0.016710 (the Calibration Inputs row) and the eclipse Sun's derived mean element 0.016708 — conventions, not discrepancies. This row IS the scene's rendered e (the banked engine series inside ±10 Myr, the mode-tail beyond — ONE SOURCE: the geometric offset, the equation of center and this readout share one value; series-vs-chain 1e-5 in 1600–2400). Under ?hybridSpin=0: the era chain of date, while the scene's orbit machinery rides the framework's eccentricity law e(t) = base′·(1 + cos θ/2) — mean base′ = ${eccentricityDerivedMean.toFixed(6)}, cycle ${fmtNum(_wheelPeriodYears(3), 0, ',')} years (the K inclination wheel's recorded period) — its epoch-local tangent, within 6e-5 of the chain across the historical era.`],
        tpLink: true, observed: true},
       {label : () => `Ecliptic Inclination (i)`,
        value : [ { v: () => 0, dec:6, sep:',' },{ small: 'degrees (°)' }],
@@ -45166,9 +45148,6 @@ const planetStats = {
        hover : [`Φ = -GM/r. Potential energy per unit mass at Moon's distance`]},
 
     {header : '—  Orbital Period & Motion —' },
-      {label : () => `Orbits per anchor interval`,
-       value : [ { v: () => holisticyearLength-13, dec:0, sep:',' },{ small: 'orbits' }],
-       hover : [`${fmtNum(holisticyearLength,0,',')} solar years = ${fmtNum((holisticyearLength-13),0,',')} sidereal years. 13 fewer orbits because Earth's axial precession is retrograde (the anchor interval spans 13 precession cycles of the frozen clock by construction) (at J2000)`]},
       {label : () => `Orbital period (P)`,
        value : [ { v: () => o.solarYearDays/meansolaryearlengthinDays, dec:6, sep:',' },{ small : 'years' }],
        hover : [`Ratio of current solar year to mean solar year. P = 1.0 when year length equals mean of ~365.2422 days`]},
@@ -45559,16 +45538,13 @@ const planetStats = {
       static: true},
 
     {header : '—  Orbital Period & Motion —' },
-      {label : () => `Orbits per anchor interval`,
-       value : [ { v: () => N_sid_J2000, dec:3, sep:',' },{ small: 'orbits' }],
-       hover : [`The Moon orbits Earth ${fmtNum(N_sid_J2000,3,',')} times in ${fmtNum(holisticyearLength,0,',')} Earth solar years — the frozen clock’s unit interval. The lunar chain rounds the count to a whole number over eight such intervals (${fmtNum(8*N_sid_J2000,0,',')}) by construction: a device identity of the chain, not an observed period (at J2000)`]},
       {label : () => `Sidereal month`,
        value : [ { v: () => moonSiderealMonth, dec:10, sep:',' },{ small: 'days' }],
-       hover : [`Time for the Moon to complete one full orbit relative to the distant stars — the Moon's true orbital period. This is the fundamental reference from which all other lunar months are derived. Over eight anchor intervals (${fmtNum(8*holisticyearLength,0,',')} yr) the lunar chain rounds the count to a whole number, ${fmtNum(8*N_sid_J2000,0,',')} sidereal orbits (per anchor interval: ${fmtNum(N_sid_J2000,3,',')}) — a device identity of the chain, not an observed period. Period = ${fmtNum(8*holisticyearLength*meansolaryearlengthinDays,0,',')} / ${fmtNum(8*N_sid_J2000,0,',')} = ${fmtNum(moonSiderealMonth,10,',')} d (at J2000)`],
+       hover : [`Time for the Moon to complete one full orbit relative to the distant stars — the Moon's true orbital period. This is the fundamental reference from which all other lunar months are derived. An IAU input of the month chain (plan 09 step 3): ${fmtNum(moonSiderealMonth,10,',')} d (at J2000)`],
        info  : 'https://en.wikipedia.org/wiki/Orbit_of_the_Moon'},
       {label : () => `Synodic month`,
        value : [ { v: () => moonSynodicMonth, dec:10, sep:',' },{ small: 'days' }],
-       hover : [`The Moon's phase cycle — new moon to new moon. Longer than the sidereal month because while the Moon orbits Earth, Earth also moves along its orbit around the Sun, so the Moon needs ~2.2 extra days each orbit to catch up to the same Sun-Moon alignment. Derived from the sidereal month: per anchor interval the Moon completes ${fmtNum(N_sid_J2000,3,',')} sidereal orbits (exactly ${fmtNum(8*N_sid_J2000,0,',')} per eight intervals). Synodic orbits = sidereal orbits + equinox turns − Earth years = ${fmtNum(N_sid_J2000+13-holisticyearLength,3,',')}: the Earth years (${fmtNum(holisticyearLength,0,',')}) subtract Earth's solar orbits (one fewer Moon–Sun alignment per Earth year); the equinox turns (one per axial precession period) add general precession. Period = ${fmtNum(holisticyearLength*meansolaryearlengthinDays,0,',')} / ${fmtNum(N_sid_J2000+13-holisticyearLength,3,',')} = ${fmtNum(moonSynodicMonth,10,',')} d. All derived from the 3 lunar month inputs (at J2000)`]},
+       hover : [`The Moon's phase cycle — new moon to new moon. Longer than the sidereal month because while the Moon orbits Earth, Earth also moves along its orbit around the Sun, so the Moon needs ~2.2 extra days each orbit to catch up to the same Sun-Moon alignment. Derived from the sidereal month and the sidereal year: 1/synodic = 1/sidereal month − 1/sidereal year (the Sun's own orbit subtracts one alignment per year) = ${fmtNum(moonSynodicMonth,10,',')} d. All derived from the lunar month inputs and the year laws (at J2000; plan 09 step 7c — the device count per anchor interval is retired)`]},
       {label : () => `Anomalistic month`,
        value : [ { v: () => moonAnomalisticMonth, dec:10, sep:',' },{ small: 'days' }],
        hover : [`Time between successive perigee passages — the closest point in the Moon's elliptical orbit around Earth. Slightly longer than the sidereal month because the perigee point itself slowly advances (apsidal precession, ~8.85 yr cycle), so the Moon needs a little extra time to reach the shifting perigee. Kinematic identity 1/T_anom = 1/T_sid − 1/T_apsidal,star (the perigee's star-referenced period ${fmtNum(moonApsidalPrecessionindaysEarth,4,',')} d): T_anom = ${fmtNum(moonAnomalisticMonth,10,',')} d (at J2000)`]},
@@ -45577,7 +45553,7 @@ const planetStats = {
        hover : [`Time between successive crossings of the ascending node — where the Moon's orbit crosses the ecliptic plane going northward. Shorter than the sidereal month because the nodes slowly regress westward (nodal precession, ~18.6 yr cycle), so the Moon meets the retreating node a little sooner. Critical for predicting eclipses, which can only occur near the nodes. Kinematic identity 1/T_drac = 1/T_sid + 1/T_nodal,star (the node's star-referenced period ${fmtNum(moonNodalPrecessionindaysEarth,4,',')} d): T_drac = ${fmtNum(moonNodalMonth,10,',')} d (at J2000)`]},
       {label : () => `Tropical month`,
        value : [ { v: () => moonTropicalMonth, dec:10, sep:',' },{ small: 'days' }],
-       hover : [`Time for the Moon to return to the same ecliptic longitude, measured relative to the vernal equinox. Slightly shorter than the sidereal month because the vernal equinox slowly drifts westward due to axial precession, so the Moon reaches the same longitude a little sooner. Derived from the sidereal month: per anchor interval the Moon completes ${fmtNum(N_sid_J2000,3,',')} sidereal orbits (exactly ${fmtNum(8*N_sid_J2000,0,',')} per eight intervals). Tropical orbits = sidereal orbits + equinox turns = ${fmtNum(N_sid_J2000+13,3,',')}. The equinox turns account for general precession (one per axial precession period — the chain's calendar convention): the westward drift of the equinox adds one extra return to the same ecliptic longitude per precession period. Period = ${fmtNum(holisticyearLength*meansolaryearlengthinDays,0,',')} / ${fmtNum(N_sid_J2000+13,3,',')} = ${fmtNum(moonTropicalMonth,10,',')} d. All derived from the 3 lunar month inputs (at J2000)`],
+       hover : [`Time for the Moon to return to the same ecliptic longitude, measured relative to the vernal equinox. Slightly shorter than the sidereal month because the vernal equinox slowly drifts westward due to axial precession, so the Moon reaches the same longitude a little sooner. Derived from the sidereal month: the equinox turns account for general precession (one per axial precession period — the chain's calendar convention): the westward drift of the equinox adds one extra return to the same ecliptic longitude per precession period. 1/tropical = 1/sidereal month + 1/T_p (one equinox turn per precession period) = ${fmtNum(moonTropicalMonth,10,',')} d. Derived from the sidereal month input and the J2000 precession anchor (at J2000)`],
        info  : 'https://eclipse.gsfc.nasa.gov/LEcat5/LEcatalog.html'},
 
     {header : '—  Orbital Shape & Geometry —' },
@@ -46070,9 +46046,6 @@ const planetStats = {
       static: true},
 
     {header : '—  Orbital Period & Motion —' },
-      {label : () => `Orbits per anchor interval`,
-       value : [ { v: () => _kcNOfDate('mercury', o.currentYear) * (holisticyearLength * meansolaryearlengthinDays / 365.25) / 360, dec:1, sep:',' },{ small: 'orbits' }],
-       hover : [`Mercury completes n orbits per anchor interval while Earth completes${fmtNum(holisticyearLength,0,',')} solar years — BOTH of date: n from the banked λ̇ channel (the model's own ±10-Myr constant-GM N-body drift ÷ the Driver-2 mass-loss stretch) and the anchor interval's length at the epoch, so the structural count holds while both stretch together; only the planet's real dynamical drift moves it. A dynamical output, NOT an integer count (doc 109 §9).`]},
       {label : () => `Orbital period (P)`,
        value : [ { v: () => 360/_kcNOfDate('mercury', o.currentYear), dec:6, sep:',' },{ small: 'Julian years' }],
        hover : [`Mercury's sidereal orbital period OF DATE: P = 360°/n with n from the model's own banked λ̇ channel — λ̇₀ (the ±10-Myr run's secular J2000 rate, 2-kyr window: it averages the great-inequality-class wiggles a short era-window fit absorbs, and matches JPL-class periods) × the planet's own constant-GM N-body drift (±10 Myr, clamped beyond) ÷ the Driver-2 mass-loss stretch (the model's falsifiable μ-leg). All factors ≡ 1 at J2000; Julian years = 365.25 SI days (the chain's clock is JD/TT). The era evaluator keeps its own fitted window rate — the measured decomposition split is banked in the artifact (Neptune −497 ppm the largest: a 300-yr window fit absorbs local U–N-inequality slope).`]},
@@ -46380,9 +46353,6 @@ const planetStats = {
       static: true},
 
     {header : '—  Orbital Period & Motion —' },
-      {label : () => `Orbits per anchor interval`,
-       value : [ { v: () => _kcNOfDate('venus', o.currentYear) * (holisticyearLength * meansolaryearlengthinDays / 365.25) / 360, dec:1, sep:',' },{ small: 'orbits' }],
-       hover : [`Venus completes n orbits per anchor interval while Earth completes${fmtNum(holisticyearLength,0,',')} solar years — BOTH of date: n from the banked λ̇ channel (the model's own ±10-Myr constant-GM N-body drift ÷ the Driver-2 mass-loss stretch) and the anchor interval's length at the epoch, so the structural count holds while both stretch together; only the planet's real dynamical drift moves it. A dynamical output, NOT an integer count (doc 109 §9).`]},
       {label : () => `Orbital period (P)`,
        value : [ { v: () => 360/_kcNOfDate('venus', o.currentYear), dec:6, sep:',' },{ small: 'Julian years' }],
        hover : [`Venus's sidereal orbital period OF DATE: P = 360°/n with n from the model's own banked λ̇ channel — λ̇₀ (the ±10-Myr run's secular J2000 rate, 2-kyr window: it averages the great-inequality-class wiggles a short era-window fit absorbs, and matches JPL-class periods) × the planet's own constant-GM N-body drift (±10 Myr, clamped beyond) ÷ the Driver-2 mass-loss stretch (the model's falsifiable μ-leg). All factors ≡ 1 at J2000; Julian years = 365.25 SI days (the chain's clock is JD/TT). The era evaluator keeps its own fitted window rate — the measured decomposition split is banked in the artifact (Neptune −497 ppm the largest: a 300-yr window fit absorbs local U–N-inequality slope).`]},
@@ -46693,9 +46663,6 @@ const planetStats = {
       static: true},
 
     {header : '—  Orbital Period & Motion —' },
-      {label : () => `Orbits per anchor interval`,
-       value : [ { v: () => _kcNOfDate('mars', o.currentYear) * (holisticyearLength * meansolaryearlengthinDays / 365.25) / 360, dec:1, sep:',' },{ small: 'orbits' }],
-       hover : [`Mars completes n orbits per anchor interval while Earth completes${fmtNum(holisticyearLength,0,',')} solar years — BOTH of date: n from the banked λ̇ channel (the model's own ±10-Myr constant-GM N-body drift ÷ the Driver-2 mass-loss stretch) and the anchor interval's length at the epoch, so the structural count holds while both stretch together; only the planet's real dynamical drift moves it. A dynamical output, NOT an integer count (doc 109 §9).`]},
       {label : () => `Orbital period (P)`,
        value : [ { v: () => 360/_kcNOfDate('mars', o.currentYear), dec:6, sep:',' },{ small: 'Julian years' }],
        hover : [`Mars's sidereal orbital period OF DATE: P = 360°/n with n from the model's own banked λ̇ channel — λ̇₀ (the ±10-Myr run's secular J2000 rate, 2-kyr window: it averages the great-inequality-class wiggles a short era-window fit absorbs, and matches JPL-class periods) × the planet's own constant-GM N-body drift (±10 Myr, clamped beyond) ÷ the Driver-2 mass-loss stretch (the model's falsifiable μ-leg). All factors ≡ 1 at J2000; Julian years = 365.25 SI days (the chain's clock is JD/TT). The era evaluator keeps its own fitted window rate — the measured decomposition split is banked in the artifact (Neptune −497 ppm the largest: a 300-yr window fit absorbs local U–N-inequality slope).`]},
@@ -47010,9 +46977,6 @@ const planetStats = {
       static: true},
 
     {header : '—  Orbital Period & Motion —' },
-      {label : () => `Orbits per anchor interval`,
-       value : [ { v: () => _kcNOfDate('jupiter', o.currentYear) * (holisticyearLength * meansolaryearlengthinDays / 365.25) / 360, dec:1, sep:',' },{ small: 'orbits' }],
-       hover : [`Jupiter completes n orbits per anchor interval while Earth completes${fmtNum(holisticyearLength,0,',')} solar years — BOTH of date: n from the banked λ̇ channel (the model's own ±10-Myr constant-GM N-body drift ÷ the Driver-2 mass-loss stretch) and the anchor interval's length at the epoch, so the structural count holds while both stretch together; only the planet's real dynamical drift moves it. A dynamical output, NOT an integer count (doc 109 §9).`]},
       {label : () => `Orbital period (P)`,
        value : [ { v: () => 360/_kcNOfDate('jupiter', o.currentYear), dec:6, sep:',' },{ small: 'Julian years' }],
        hover : [`Jupiter's sidereal orbital period OF DATE: P = 360°/n with n from the model's own banked λ̇ channel — λ̇₀ (the ±10-Myr run's secular J2000 rate, 2-kyr window: it averages the great-inequality-class wiggles a short era-window fit absorbs, and matches JPL-class periods) × the planet's own constant-GM N-body drift (±10 Myr, clamped beyond) ÷ the Driver-2 mass-loss stretch (the model's falsifiable μ-leg). All factors ≡ 1 at J2000; Julian years = 365.25 SI days (the chain's clock is JD/TT). The era evaluator keeps its own fitted window rate — the measured decomposition split is banked in the artifact (Neptune −497 ppm the largest: a 300-yr window fit absorbs local U–N-inequality slope).`]},
@@ -47322,9 +47286,6 @@ const planetStats = {
       static: true},
 
     {header : '—  Orbital Period & Motion —' },
-      {label : () => `Orbits per anchor interval`,
-       value : [ { v: () => _kcNOfDate('saturn', o.currentYear) * (holisticyearLength * meansolaryearlengthinDays / 365.25) / 360, dec:1, sep:',' },{ small: 'orbits' }],
-       hover : [`Saturn completes n orbits per anchor interval while Earth completes${fmtNum(holisticyearLength,0,',')} solar years — BOTH of date: n from the banked λ̇ channel (the model's own ±10-Myr constant-GM N-body drift ÷ the Driver-2 mass-loss stretch) and the anchor interval's length at the epoch, so the structural count holds while both stretch together; only the planet's real dynamical drift moves it. A dynamical output, NOT an integer count (doc 109 §9).`]},
       {label : () => `Orbital period (P)`,
        value : [ { v: () => 360/_kcNOfDate('saturn', o.currentYear), dec:6, sep:',' },{ small: 'Julian years' }],
        hover : [`Saturn's sidereal orbital period OF DATE: P = 360°/n with n from the model's own banked λ̇ channel — λ̇₀ (the ±10-Myr run's secular J2000 rate, 2-kyr window: it averages the great-inequality-class wiggles a short era-window fit absorbs, and matches JPL-class periods) × the planet's own constant-GM N-body drift (±10 Myr, clamped beyond) ÷ the Driver-2 mass-loss stretch (the model's falsifiable μ-leg). All factors ≡ 1 at J2000; Julian years = 365.25 SI days (the chain's clock is JD/TT). The era evaluator keeps its own fitted window rate — the measured decomposition split is banked in the artifact (Neptune −497 ppm the largest: a 300-yr window fit absorbs local U–N-inequality slope).`]},
@@ -47635,9 +47596,6 @@ const planetStats = {
       static: true},
 
     {header : '—  Orbital Period & Motion —' },
-      {label : () => `Orbits per anchor interval`,
-       value : [ { v: () => _kcNOfDate('uranus', o.currentYear) * (holisticyearLength * meansolaryearlengthinDays / 365.25) / 360, dec:1, sep:',' },{ small: 'orbits' }],
-       hover : [`Uranus completes n orbits per anchor interval while Earth completes${fmtNum(holisticyearLength,0,',')} solar years — BOTH of date: n from the banked λ̇ channel (the model's own ±10-Myr constant-GM N-body drift ÷ the Driver-2 mass-loss stretch) and the anchor interval's length at the epoch, so the structural count holds while both stretch together; only the planet's real dynamical drift moves it. A dynamical output, NOT an integer count (doc 109 §9).`]},
       {label : () => `Orbital period (P)`,
        value : [ { v: () => 360/_kcNOfDate('uranus', o.currentYear), dec:6, sep:',' },{ small: 'Julian years' }],
        hover : [`Uranus's sidereal orbital period OF DATE: P = 360°/n with n from the model's own banked λ̇ channel — λ̇₀ (the ±10-Myr run's secular J2000 rate, 2-kyr window: it averages the great-inequality-class wiggles a short era-window fit absorbs, and matches JPL-class periods) × the planet's own constant-GM N-body drift (±10 Myr, clamped beyond) ÷ the Driver-2 mass-loss stretch (the model's falsifiable μ-leg). All factors ≡ 1 at J2000; Julian years = 365.25 SI days (the chain's clock is JD/TT). The era evaluator keeps its own fitted window rate — the measured decomposition split is banked in the artifact (Neptune −497 ppm the largest: a 300-yr window fit absorbs local U–N-inequality slope).`]},
@@ -47948,9 +47906,6 @@ const planetStats = {
       static: true},
 
     {header : '—  Orbital Period & Motion —' },
-      {label : () => `Orbits per anchor interval`,
-       value : [ { v: () => _kcNOfDate('neptune', o.currentYear) * (holisticyearLength * meansolaryearlengthinDays / 365.25) / 360, dec:1, sep:',' },{ small: 'orbits' }],
-       hover : [`Neptune completes n orbits per anchor interval while Earth completes${fmtNum(holisticyearLength,0,',')} solar years — BOTH of date: n from the banked λ̇ channel (the model's own ±10-Myr constant-GM N-body drift ÷ the Driver-2 mass-loss stretch) and the anchor interval's length at the epoch, so the structural count holds while both stretch together; only the planet's real dynamical drift moves it. A dynamical output, NOT an integer count (doc 109 §9).`]},
       {label : () => `Orbital period (P)`,
        value : [ { v: () => 360/_kcNOfDate('neptune', o.currentYear), dec:6, sep:',' },{ small: 'Julian years' }],
        hover : [`Neptune's sidereal orbital period OF DATE: P = 360°/n with n from the model's own banked λ̇ channel — λ̇₀ (the ±10-Myr run's secular J2000 rate, 2-kyr window: it averages the great-inequality-class wiggles a short era-window fit absorbs, and matches JPL-class periods) × the planet's own constant-GM N-body drift (±10 Myr, clamped beyond) ÷ the Driver-2 mass-loss stretch (the model's falsifiable μ-leg). All factors ≡ 1 at J2000; Julian years = 365.25 SI days (the chain's clock is JD/TT). The era evaluator keeps its own fitted window rate — the measured decomposition split is banked in the artifact (Neptune −497 ppm the largest: a 300-yr window fit absorbs local U–N-inequality slope).`]},
@@ -48811,9 +48766,10 @@ function buildPrecessionViz() {
   const derivClr = 'rgba(239,192,74,0.85)';
   const resultClr= 'rgba(255,255,255,0.50)';
   const lineClr  = 'rgba(255,255,255,0.18)';
-  const hClr     = '#E69F00';   // Calculated / yellow — matches legend "Calculated" color; H evolves under deep time
+  const hClr     = '#E69F00';   // Calculated / yellow — matches legend "Calculated" color
   const dimOp    = 'opacity:0.55';
-  const hVal     = fmtNum(holisticyearLength, 0, ',');
+  // the K-device wheels' recorded periods (the scaffold pose, plan 09 step 7c)
+  const wheelYr  = (n) => fmtNum(_wheelPeriodYears(n), 0, ',') + ' yr';
 
   return `<div class="pl-prec-viz" style="
     display:flex; align-items:center; justify-content:center;
@@ -48822,8 +48778,8 @@ function buildPrecessionViz() {
     color:rgba(255,255,255,0.7);
   ">
     <div style="text-align:right; flex:0 0 auto;">
-      <div style="color:${retroClr}">← Axial <span style="${dimOp}">${hVal}/13</span></div>
-      <div style="color:${proClr}; margin-top:2px;">→ Inclin. <span style="${dimOp}">${hVal}/3</span></div>
+      <div style="color:${retroClr}">← Axial <span style="${dimOp}">${wheelYr(13)}</span></div>
+      <div style="color:${proClr}; margin-top:2px;">→ Inclin. <span style="${dimOp}">${wheelYr(3)}</span></div>
     </div>
     <div style="flex:0 0 auto; display:flex; flex-direction:column; align-items:center; padding:0 8px;">
       <div style="width:20px; height:1px; background:${lineClr}"></div>
@@ -48831,13 +48787,13 @@ function buildPrecessionViz() {
         border:1px solid ${lineClr}; border-radius:3px;
         padding:2px 6px; margin:2px 0;
         color:${hClr}; font-weight:600; font-size:9.5px; white-space:nowrap;
-      ">${hVal}</div>
+      ">K wheels</div>
       <div style="width:20px; height:1px; background:${lineClr}"></div>
     </div>
     <div style="text-align:left; flex:0 0 auto;">
-      <div style="color:${derivClr}">→ Perihelion <span style="${dimOp}">${hVal}/16</span></div>
-      <div style="color:${resultClr}; margin-top:1px;">⇌ Obliquity <span style="${dimOp}">${hVal}/8</span></div>
-      <div style="color:${retroClr}; margin-top:1px;">← Ecliptic <span style="${dimOp}">${hVal}/5</span></div>
+      <div style="color:${derivClr}">→ Perihelion <span style="${dimOp}">${wheelYr(16)}</span></div>
+      <div style="color:${resultClr}; margin-top:1px;">⇌ Obliquity <span style="${dimOp}">${wheelYr(8)}</span></div>
+      <div style="color:${retroClr}; margin-top:1px;">← Ecliptic <span style="${dimOp}">${wheelYr(5)}</span></div>
     </div>
   </div>`;
 }
@@ -51476,7 +51432,7 @@ function moveModel(pos) {
       // J2000 rate (N per anchor unit) from their anchor — the pose the engine
       // frame is placed over (R4); the ∫N/H_era counter is retired.
       const _dtAnchor = Number.isFinite(obj._dtCycleAnchor) ? obj._dtCycleAnchor : BALANCED_YEAR_J2000_FIXED;
-      let _dtCycles = obj._dtCycleN * (_currentYearSI - _dtAnchor) / HOLISTIC_YEAR_J2000;
+      let _dtCycles = (_currentYearSI - _dtAnchor) / _wheelPeriodYears(obj._dtCycleN);
       // Plan 07 R10: the J2000-anchored K-device wheels carry the device's
       // recorded J2000 wheel phase (N × kDeviceWheelPhaseAtJ2000Cycles).
       if (!Number.isFinite(obj._dtCycleAnchor)) _dtCycles += obj._dtCycleN * kDeviceWheelPhaseAtJ2000Cycles;
@@ -51693,7 +51649,7 @@ function moveModel(pos) {
         // recorded J2000 rate from the J2000 pose (+ the device's J2000 wheel
         // phase, plan 07 R10); the ∫N/H_era counter is retired.
         const _rotYearSI = _jdToSIyear(o.julianDay);
-        const _dtCycles = obj._dtRotN * (_rotYearSI - BALANCED_YEAR_J2000_FIXED) / HOLISTIC_YEAR_J2000 + obj._dtRotN * kDeviceWheelPhaseAtJ2000Cycles;
+        const _dtCycles = (_rotYearSI - BALANCED_YEAR_J2000_FIXED) / _wheelPeriodYears(obj._dtRotN) + obj._dtRotN * kDeviceWheelPhaseAtJ2000Cycles;
         obj.planetObj.rotation.y = _dtCycles * 2 * Math.PI * obj._dtRotSign;
       } else {
         // Earth day-night spin uses the constant-J2000-rate model

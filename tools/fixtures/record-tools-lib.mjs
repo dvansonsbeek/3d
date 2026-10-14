@@ -35,8 +35,8 @@ const DT_STACK = [
 function measure() {
   const v = {};
 
-  // Anchors that pin the engine's identity.
-  v['anchor.H'] = C.H;
+  // Anchors that pin the engine's identity. (plan 09 step 7c: `anchor.H` — the
+  // frozen era unit — left with the unit.)
   v['anchor.perihelionAlignmentYear'] = C.perihelionalignmentYear;
   v['anchor.correctionDays'] = C.correctionDays;
   v['anchor.meanSiderealYearSeconds'] = C.meanSiderealYearSeconds;

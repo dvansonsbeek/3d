@@ -33,7 +33,7 @@
  * carry it so a counterfactual is reproducible (§2d).
  * @type {string}
  */
-export const CONSTANTS_HASH = "4d550fcd9065e7f2";
+export const CONSTANTS_HASH = "c161ec19e5984b9e";
 
 /** Model version label — single source: public/input/model-version.json (§10 two-axis scheme). */
 export const MODEL_VERSION = "v23.0";
@@ -43,7 +43,7 @@ export const PREPRINT_DOI = "10.21203/rs.3.rs-8758810/v4";
 
 /** @type {Readonly<Record<string, unknown>>} */
 export const DEFAULT_CONSTANTS = Object.freeze({
-  hash: "4d550fcd9065e7f2",
+  hash: "c161ec19e5984b9e",
   additionalBodies: {
     "pluto": {
       "name": "Pluto",
@@ -195,6 +195,13 @@ export const DEFAULT_CONSTANTS = Object.freeze({
     "eccentricityBase": 0.015386009686374918,
     "eccentricityAmplitude": 0.0013559440307290061,
     "kDeviceInclinationPhaseJ2000Deg": 81.17719000000001,
+    "kDeviceWheelPeriodYears": {
+      "3": 111772.33333333333,
+      "5": 67063.4,
+      "8": 41914.625,
+      "13": 25793.615384615383,
+      "16": 20957.3125
+    },
     "kDeviceWheelPhaseAtJ2000Cycles": 0.908498525276082
   },
   earthOrbital: {
@@ -217,9 +224,6 @@ export const DEFAULT_CONSTANTS = Object.freeze({
     "sunTilt": 7.155
   },
   foundational: {
-    "holisticyearLength": 335317,
-    "stepYears": 23,
-    "inputmeanlengthsolaryearindays": 365.2422,
     "startmodelJD": 2451716.5,
     "startmodelYear": 2000.5,
     "correctionDays": -0.828832119703292,
@@ -629,8 +633,7 @@ export const DEFAULT_CONSTANTS = Object.freeze({
       "angleCorrection": 0.9727205912043573,
       "type": "I",
       "mirrorPair": "uranus",
-      "ascendingNodeInvPlane": 32.83,
-      "ascendingNodeCyclesIn8H": 9
+      "ascendingNodeInvPlane": 32.83
     },
     "venus": {
       "name": "Venus",
@@ -639,8 +642,7 @@ export const DEFAULT_CONSTANTS = Object.freeze({
       "angleCorrection": -2.789778861448692,
       "type": "I",
       "mirrorPair": "neptune",
-      "ascendingNodeInvPlane": 54.7,
-      "ascendingNodeCyclesIn8H": 1
+      "ascendingNodeInvPlane": 54.7
     },
     "mars": {
       "name": "Mars",
@@ -649,8 +651,7 @@ export const DEFAULT_CONSTANTS = Object.freeze({
       "angleCorrection": -2.104652936098656,
       "type": "II",
       "mirrorPair": "jupiter",
-      "ascendingNodeInvPlane": 354.87,
-      "ascendingNodeCyclesIn8H": 64
+      "ascendingNodeInvPlane": 354.87
     },
     "jupiter": {
       "name": "Jupiter",
@@ -659,8 +660,7 @@ export const DEFAULT_CONSTANTS = Object.freeze({
       "angleCorrection": 0.9333205235053406,
       "type": "III",
       "mirrorPair": "mars",
-      "ascendingNodeInvPlane": 312.89,
-      "ascendingNodeCyclesIn8H": 36
+      "ascendingNodeInvPlane": 312.89
     },
     "saturn": {
       "name": "Saturn",
@@ -669,8 +669,7 @@ export const DEFAULT_CONSTANTS = Object.freeze({
       "angleCorrection": -0.1784695052193328,
       "type": "III",
       "mirrorPair": "earth",
-      "ascendingNodeInvPlane": 118.81,
-      "ascendingNodeCyclesIn8H": 36
+      "ascendingNodeInvPlane": 118.81
     },
     "uranus": {
       "name": "Uranus",
@@ -679,8 +678,7 @@ export const DEFAULT_CONSTANTS = Object.freeze({
       "angleCorrection": -0.7343433510960402,
       "type": "III",
       "mirrorPair": "mercury",
-      "ascendingNodeInvPlane": 307.8,
-      "ascendingNodeCyclesIn8H": 11
+      "ascendingNodeInvPlane": 307.8
     },
     "neptune": {
       "name": "Neptune",
@@ -689,8 +687,7 @@ export const DEFAULT_CONSTANTS = Object.freeze({
       "angleCorrection": 2.3327665835675617,
       "type": "III",
       "mirrorPair": "venus",
-      "ascendingNodeInvPlane": 192.04,
-      "ascendingNodeCyclesIn8H": 3
+      "ascendingNodeInvPlane": 192.04
     }
   },
   timeReference: {

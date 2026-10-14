@@ -282,9 +282,11 @@ else silently skipped as a design-rule safeguard):
 
 | Divisor | Period | sin coefficient | cos coefficient | Amplitude |
 |---:|---|---:|---:|---:|
-| <!--v:HPlain-->335317<!--/v--> | 1 yr | +0.076336 ° | +0.013429 ° | ~279" (dominant) |
+| 335317 | 1 yr | +0.076336 ° | +0.013429 ° | ~279" (dominant) |
 | 670634 | ½ yr | +0.002478 ° | +0.000221 ° | ~9" |
-| <!--v:threeH-->1,005,951<!--/v--> | ⅓ yr | +0.000034 ° | +0.000008 ° | ~0.1" |
+| 1,005,951 | ⅓ yr | +0.000034 ° | +0.000008 ° | ~0.1" |
+
+(The divisors are the retired comb unit's 1×, 2× and 3× — a comb-era record; the unit, 335,317 yr, left the model at plan 09 step 7c.)
 
 with `SUN_LONGITUDE_MEAN = −0.0018807°` (a constant offset on the Sun — one of the reasons the comb could not stay). On the legacy path it closed the
 scene-vs-Meeus residual 197.77″ → 7.39″ RMS in the modern window, planet
@@ -299,14 +301,14 @@ difference: the legacy path's `eccentricityDerivedMean`
 vs Meeus's IAU J2000 value (<!--v:j2000Eccentricity-->0.01671022<!--/v-->),
 propagating through `2e·sin(M)` as a ~280″ annual term.
 
-**Design rule** (see [tools/fit/README.md](../tools/fit/README.md)): every
-correction divisor must share a factor with
-H = <!--v:holisticYearFactors-->23 × 61 × 239<!--/v-->. The framework is
+**Design rule of the retired comb** (see [tools/fit/README.md](../tools/fit/README.md)): every
+correction divisor had to share a factor with the comb unit
+(335,317 = 23 × 61 × 239). The framework was
 fundamentally cyclic — polynomial-in-T corrections and arbitrary fit
-frequencies are not allowed because they don't extrapolate cleanly to deep
-time. A greedy re-fit under Z-B finds no further lattice-compliant terms
-above the 0.05″ threshold; the drift-proxy candidates it surfaces (H/152,
-H/167) violate the rule and are rejected.
+frequencies were not allowed because they don't extrapolate cleanly to deep
+time. A greedy re-fit under Z-B found no further lattice-compliant terms
+above the 0.05″ threshold; the drift-proxy candidates it surfaced (the unit's
+152nd and 167th) violated the rule and were rejected.
 
 **Pipeline position — Step 0.** The coefficients capture a structural
 property (the eccentricity-definition gap), stable across normal refits;

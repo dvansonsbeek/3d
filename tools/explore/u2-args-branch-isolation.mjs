@@ -48,7 +48,6 @@ function build(deep) {
   return createMoonArguments({
     constants: {
       j2000JD: C.j2000JD, julianCenturyDays: 36525,
-      holisticYearJ2000: C.H,
       balancedYearJ2000: C.balancedYear,
       meanSolarYearDays: C.meanSolarYearDays,
       meanAnomalisticYearDays: DT.anomalisticYearDaysOfDate(2000),   // plan 09 step 4d: the law's J2000 value (the constant is gone)

@@ -116,7 +116,7 @@ function sampleResiduals(yearStart, yearEnd, samplesPerYear) {
   sg.buildSceneGraph();
   // Phase uses time from balancedYear, same convention as sun-longitude-harmonics.js
   // so the annual harmonic divisor matches: period = H / round(H) = 1 yr exactly
-  const yearDivisor = Math.round(C.H);  // = 335317 → period = 1 yr
+  const yearDivisor = 335317;  // the retired era unit (plan 09 step 7c); the comb's divisor for a 1-yr period
   for (let jd = jdStart; jd <= jdEnd; jd += stepDays) {
     const m = sg.computeSunPositionFast(jd);
     const raDeg  = sg.thetaToRaDeg(m.ra);
@@ -127,7 +127,7 @@ function sampleResiduals(yearStart, yearEnd, samplesPerYear) {
     const dLon_deg = wrapDeg(lonFw - lonMeeus);  // residual in DEGREES
     const year = jdToYear(jd);
     const t = year - C.balancedYear;
-    const phase = 2 * Math.PI * t / (C.H / yearDivisor);  // = 2π·t per year
+    const phase = 2 * Math.PI * t / (335317 / yearDivisor);  // = 2π·t per year
     samples.push({ jd, year, dLon_deg, phase });
   }
   return samples;
@@ -260,7 +260,7 @@ function main() {
     { label: '1918 Jun 8',  jd: 2421717.43 },
   ];
   sg.buildSceneGraph();
-  const yearDivisor = Math.round(C.H);
+  const yearDivisor = 335317;
   for (const d of L2H_DATES) {
     const m = sg.computeSunPositionFast(d.jd);
     const raDeg  = sg.thetaToRaDeg(m.ra);
@@ -271,7 +271,7 @@ function main() {
     const measured = wrapDeg(lonFw - lonMeeus) * 3600;
     const year = jdToYear(d.jd);
     const t = year - C.balancedYear;
-    const phase = 2 * Math.PI * t / (C.H / yearDivisor);
+    const phase = 2 * Math.PI * t / (335317 / yearDivisor);
     const pred = (fit.mean + fit.A * Math.sin(phase) + fit.B * Math.cos(phase)) * 3600;
     const after = measured - pred;
     console.log(`  ${d.label.padEnd(14)} measured=${measured.toFixed(1).padStart(8)}"   predicted=${pred.toFixed(1).padStart(8)}"   after=${after.toFixed(1).padStart(7)}"`);

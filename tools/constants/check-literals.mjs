@@ -43,12 +43,10 @@ const read = (f) => JSON.parse(readFileSync(join(ROOT, 'public/input', f), 'utf8
  * @type {string[]}
  */
 const MIGRATED = [
-  // Phase 5f block 1 — model.foundational. `holisticyearLength` is SEEDED
-  // (`let x = K.foundational...`) rather than imported, because
-  // recomputeEpochAnchors reassigns it and an ESM binding is read-only (§5e);
-  // the literal is gone either way, which is what this ledger asserts.
-  'model.foundational.holisticyearLength',
-  'model.foundational.inputmeanlengthsolaryearindays',
+  // Phase 5f block 1 — model.foundational. (plan 09 step 7c: the frozen era
+  // unit `holisticyearLength`, its lattice `stepYears` and the device's rounded
+  // mean-tropical-year input `inputmeanlengthsolaryearindays` left the JSON;
+  // their return fails this gate below.)
   'model.foundational.startmodelJD',
   'model.foundational.startmodelYear',
   'model.foundational.correctionDays',
@@ -64,6 +62,7 @@ const MIGRATED = [
   'model.earth.eccentricityBase',
   'model.earth.eccentricityAmplitude',
   'model.earth.kDeviceWheelPhaseAtJ2000Cycles',   // plan 07 R10: the K wheels' recorded J2000 phase
+  'model.earth.kDeviceWheelPeriodYears',          // plan 09 step 7c: the K wheels' recorded periods by wheel index (the retired unit's 335,317/N, a pose)
   'model.earth.kDeviceInclinationPhaseJ2000Deg',  // plan 09 step 6: the K inclination wheel's recorded J2000 phase (the eccentricity law's anchor left with the law)
 
   // Phase 5f block 3 — model.moon. This block also CORRECTED a drift:
@@ -425,7 +424,11 @@ for (const { path, key, value } of distinctive) {
     // 2451716.5 in a test fixture. Checking by value flagged three correctly
     // migrated constants. Once migrated, `const x = K.block.x` has no numeric
     // right-hand side, so findByName can no longer resolve one.
-    const stillLiteral = findByName(key) !== null;
+    // A purely NUMERIC leaf key (the K wheels' periods are keyed by the
+    // wheel's index: `kDeviceWheelPeriodYears.16`) cannot be a declaration
+    // name, and `16: …` matches every `_dtCycleN: 16` row — for those the
+    // test is whether the VALUE itself sits behind such a key.
+    const stillLiteral = /^\d+$/.test(key) ? findByName(key) === value : findByName(key) !== null;
     rows.push({ path, key, value, kind: stillLiteral ? 'MIGRATED-BUT-STILL-LITERAL' : 'migrated' });
     continue;
   }
@@ -542,7 +545,10 @@ const retiredHits = [];
   // measure their phase from J2000, the former origin was rotated out of the
   // fitted coefficients exactly. Either key returning is the retired phase
   // convention re-entering the source of truth.
-  for (const k of ['temperatureGraphMostLikely', 'systemResetN']) if (k in (mp.foundational ?? {})) retiredHits.push(`model.foundational.${k}`);
+  // Plan 09 step 7c: the frozen era device's inputs — the unit, its lattice
+  // grid and the device's rounded mean tropical year — left `foundational`
+  // too; the K wheels ride the recorded `earth.kDeviceWheelPeriodYears`.
+  for (const k of ['temperatureGraphMostLikely', 'systemResetN', 'holisticyearLength', 'stepYears', 'inputmeanlengthsolaryearindays']) if (k in (mp.foundational ?? {})) retiredHits.push(`model.foundational.${k}`);
 }
 for (const p of retiredHits) {
   console.log(`\n  RETIRED INPUT RETURNED  ${p}`);

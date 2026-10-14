@@ -135,13 +135,13 @@ Re-running `node tools/explore/wgc-perihelion-rates.js` regenerates the JSON fro
 
 For the model overlay, the Explorer samples the chain's longitude of perihelion of date at each observed timestamp (`wgcModelCurves` → `_kcPerihelionEclLonDeg`, ECLIPJ2000 — the plotted frame), unwraps the series, and aligns its 360° branch to the observed series' start. The model's `ϖ(t)` can thus be compared pointwise to the observed curve, not just through a single slope number.
 
-The summary block above the chart reports the chain's 1800–2100 window rate split as **Newtonian + relativistic (1PN)** — the relativistic share is derived from the model's constants, not fitted. Nothing on the model side is calibrated to the observations; the 8H/N divisor values remain as window-epoch descriptor labels ([doc 109 §9](109-model-nbody-engine-and-lattice-test.md)).
+The summary block above the chart reports the chain's 1800–2100 window rate split as **Newtonian + relativistic (1PN)** — the relativistic share is derived from the model's constants, not fitted. Nothing on the model side is calibrated to the observations; the retired lattice's divisor labels are kept in [doc 109 §9](109-model-nbody-engine-and-lattice-test.md) as window-epoch descriptors of the record.
 
 The red and blue curves tracking each other over 1900–2026 is the visual validation that the chain matches the 1900–2026 reality.
 
 ## Scope and limitations
 
-1. **Only perihelion-related angles** — the Explorer does not show eccentricity, inclination, or semi-major-axis evolution. Those are handled elsewhere (the planetStats panel's chain element rows; the former Eccentricity Balance Scale and Solar System Resonance Cycle panels were removed at the Fibonacci-law retirement).
+1. **Only perihelion-related angles** — the Explorer does not show eccentricity, inclination, or semi-major-axis evolution. Those are handled elsewhere (the planetStats panel's chain element rows; the former balance-scale and resonance-cycle panels were removed at the integer-law retirement).
 2. **No ICRF frame variant** — all angles are in the ecliptic-of-date frame; the ICRF-frame rate is noted but not plotted. Future work: add an optional ICRF-frame chart that subtracts general precession.
 3. **Earth is excluded** — ecliptic inclination zero by definition ⇒ `Ω` undefined. WebGeoCalc's reference charts also omit Earth.
 4. **Baseline is fixed at 1900–2026** — extending the pipeline script to broader windows (say 1600–2200) is possible but introduces ephemeris extrapolation issues outside DE441's validated span.

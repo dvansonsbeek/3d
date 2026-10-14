@@ -48,7 +48,7 @@ function getArg(name, defaultVal) {
 }
 
 const START_YEAR = parseFloat(getArg('start', String(C.balancedYear)));
-const END_YEAR = parseFloat(getArg('end', String(C.balancedYear + C.H)));
+const END_YEAR = parseFloat(getArg('end', String(START_YEAR + 4000)));   // plan 09 step 7c: the window exporter's default span (the full-period file is retired)
 const OUTPUT_CSV = getArg('output', path.join(ROOT, 'data', '02-solar-measurements.csv'));
 
 // ─── Search parameters ───────────────────────────────────────────────────────

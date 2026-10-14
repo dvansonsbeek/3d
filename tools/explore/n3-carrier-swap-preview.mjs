@@ -37,8 +37,8 @@ const EMB_WOBBLE_AS = (C.moonReference.moonDistance / (1 + C.physicalConstants.M
 // this constructor mirrors the model wiring. The pre-swap measurements this
 // instrument recorded (its reason for existing) compared the v2 module; the
 // "shipped vs framework" sections below now read as parity checks.
-const _n3H = C.foundational.holisticyearLength;
-const _n3mSY = Math.round(C.foundational.inputmeanlengthsolaryearindays * (_n3H / 8)) / (_n3H / 8);
+const _n3H = 335317;   // the retired era unit and its rounded mean-tropical-year input (plan 09 step 7c) — frozen record
+const _n3mSY = Math.round(365.2422 * (_n3H / 8)) / (_n3H / 8);
 const _n3dpc = (/** @type {number} */ f) => 360 * 36525 * f;
 const SHIPPED_RATES = {
   planets: ['mercury', 'venus', null, 'mars', 'jupiter', 'saturn'].map((k) => (k ? _n3dpc(1 / C.planetOrbitalElements[k].solarYearInput) : _n3dpc(1 / _n3mSY))),

@@ -237,10 +237,10 @@ All precession periods emerge from ratios of year lengths:
 | Precession | Formula | Mean period |
 |------------|---------|-------------|
 | Axial | `Y_sid / (Y_sid − Y_trop)` | T_p = <!--v:earthAxialPeriod-->25,772<!--/v--> yr |
-| Perihelion | `Y_anom(s) / (Y_anom(s) − Y_trop(s))` | H/16 ≈ <!--v:earthPeriPeriod-->20,938<!--/v--> yr |
-| Inclination | `Y_anom(s) / (Y_anom(s) − Y_sid(s))` | H/3 ≈ <!--v:earthPeriPeriodICRF-->111,635<!--/v--> yr |
-| Obliquity | the beat of the spin axis's inertial precession against the nodal mode: 1/(1/T_ψ̇ᵢₙ − 1/T_s₃) with T_ψ̇ᵢₙ = <!--v:spinAxisInertialPeriodYearsJ2000-->25,722<!--/v--> yr (the pole's period, 0.097 ″/yr above the equinox clock T_p — IAU's planetary precession; the retired label H/8 read <!--v:hDiv8-->41,915<!--/v--> yr). A record sees the window mean of the pole rate, not the J2000 instant: <!--v:obliqCycleRealizedLr04Years-->~40,928<!--/v--> yr over the LR04 record | <!--v:obliqCycleYears-->~41,099<!--/v--> yr at J2000 |
-| Ecliptic (nodal) | the N-body chain's dominant nodal mode s₃: 1,296,000/\|s₃\| (the retired label H/5 read <!--v:hDiv5-->67,063<!--/v--> yr) | <!--v:eclPrecYears-->~68,751<!--/v--> yr |
+| Perihelion | `Y_anom(s) / (Y_anom(s) − Y_trop(s))` | T_peri ≈ <!--v:earthPeriPeriod-->20,938<!--/v--> yr |
+| Inclination | `Y_anom(s) / (Y_anom(s) − Y_sid(s))` | T_aps ≈ <!--v:earthPeriPeriodICRF-->111,635<!--/v--> yr |
+| Obliquity | the beat of the spin axis's inertial precession against the nodal mode: 1/(1/T_ψ̇ᵢₙ − 1/T_s₃) with T_ψ̇ᵢₙ = <!--v:spinAxisInertialPeriodYearsJ2000-->25,722<!--/v--> yr (the pole's period, 0.097 ″/yr above the equinox clock T_p — IAU's planetary precession). A record sees the window mean of the pole rate, not the J2000 instant: <!--v:obliqCycleRealizedLr04Years-->~40,928<!--/v--> yr over the LR04 record | <!--v:obliqCycleYears-->~41,099<!--/v--> yr at J2000 |
+| Ecliptic (nodal) | the N-body chain's dominant nodal mode s₃: 1,296,000/\|s₃\| | <!--v:eclPrecYears-->~68,751<!--/v--> yr |
 
 These are time-varying — each uses the instantaneous year lengths at the given epoch, so precession periods themselves oscillate slightly.
 

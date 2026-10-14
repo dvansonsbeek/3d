@@ -127,3 +127,13 @@ export function createMoonArguments({ constants, fns }: {
  * Sun secular deviations. @param {number} jd @returns {number}
  */
 export function jdToDecimalYear(jd: number): number;
+/**
+ * @typedef {{Lp: number, D: number, M: number, Mp: number, F: number}} MoonArgsDeg
+ */
+/** The secular-completion taper half-width, Julian years: the cos² envelope
+ *  inside which the chain's Meeus-measured rate anchors and the Lp secular
+ *  completion act (full at the anchor, zero beyond). A recorded window of the
+ *  completion, not a law — the anchors were measured with it (plan 09 step
+ *  5c: it was written as the era unit's twelfth, H/12, "lattice-derived";
+ *  the value is kept bit-identical and named for what it is). */
+export const SECULAR_COMPLETION_TAPER_YEARS: 27943.083333333332;

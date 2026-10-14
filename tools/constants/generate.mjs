@@ -32,6 +32,9 @@ import { createHash } from 'node:crypto';
 import { readFileSync, writeFileSync, mkdirSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { createRequire } from 'node:module';
+
+const { SECULAR_COMPLETION_TAPER_YEARS } = createRequire(import.meta.url)('../../packages/physics/src/moon/arguments.cjs');
 
 const ROOT = fileURLToPath(new URL('../../', import.meta.url));
 const IN = join(ROOT, 'public/input');
@@ -644,7 +647,10 @@ function buildDeepModes(chainArt) {
     (eb.zQ[i0 + 1] - eb.zQ[i0 - 1]) / (2 * eb.stepYr),
     (eb.zP[i0 + 1] - eb.zP[i0 - 1]) / (2 * eb.stepYr),
   ];
-  const slopeTaperYears = read('model-parameters.json').foundational.holisticyearLength / 12;
+  // (plan 09 step 7c: the slope anchor's taper is the lunar arguments' recorded
+  // completion taper — ONE home, @essrt/physics moon/arguments.cjs; it was
+  // written as the retired era unit's twelfth, bit-identical)
+  const slopeTaperYears = SECULAR_COMPLETION_TAPER_YEARS;
   return {
     hash,
     payload: {

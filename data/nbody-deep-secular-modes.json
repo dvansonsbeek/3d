@@ -1433,7 +1433,7 @@
  "inputs": {
   "generator": "node tools/verify/deep-secular-modes.js --write",
   "files": {
-   "tools/explore/lattice-long-window-test.mjs": "sha256:6b0819f6078cdbe3ec0ec2c6ca5e7feee51acf0c9bcf87b51d8f1b6c30180b03",
+   "tools/explore/lattice-long-window-test.mjs": "sha256:7f2b194611296ae8f5b03d5781d06f31b8a86177130ad84626745f84bf00876d",
    "tools/explore/naff-frequencies.mjs": "sha256:d875f65e0346346bde09402a0620f8109e3d0fc90e052ce8900b6f4af4ac0e5f",
    "tools/verify/deep-secular-modes.js": "sha256:1c5d69aaeccbb305ddd842a5c19d8945b9f2747fabef3e97dfe70bdd14d57e6d"
   }

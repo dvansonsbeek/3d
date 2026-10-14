@@ -1123,7 +1123,9 @@ export function assembleModel(C, F, laws = {}, secularSeriesArtifact = /** @type
   // Bounded Meeus E-factor from the ONE deep e (decision (ii); the
   // pure-Meeus polynomial A/B branch stays engine-local)
   /** @param {number} dDays @returns {number} */
-  const fwEFactor = (dDays) => deepEcc.eFactorAt(dDays / C.foundational.inputmeanlengthsolaryearindays);
+  // (plan 09 step 7c: on the channel's Julian-year axis — the N-body series'
+  // time; the device's rounded tropical-year input read the axis 2e-5 short)
+  const fwEFactor = (dDays) => deepEcc.eFactorAt(dDays / 365.25);
 
   // D2 derived additional-argument rates (deg/cy, J2000 8H-lattice months;
   // record: tools/explore/derive-a1a2a3.js)

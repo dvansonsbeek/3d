@@ -114,7 +114,9 @@ if ((LUNAR_ON || ASTEROIDS_ON || MEAN_ON) && (KV.integrator || 'wh').toLowerCase
   console.error('lunar=1 / asteroids=1 / mean=1 are wired for the WH integrator only'); process.exit(1);
 }
 const D2R = Math.PI / 180, DAY = 86400;
-const GM_S = TL.GM_SUN, GM_EM = P.GM_EM, H = TL.H;
+const GM_S = TL.GM_SUN, GM_EM = P.GM_EM, H = 335317;   // H: the retired era unit (plan 09 step 7c) — this lattice test is a frozen record
+// the retired device's node counts per 8H (model-parameters `ascendingNodeCyclesIn8H`, deleted at plan 09 step 7c)
+const ASC_N = { mercury: 9, venus: 1, mars: 64, jupiter: 36, saturn: 36, uranus: 11, neptune: 3 };
 
 const names = ['mercury', 'venus', 'earth', 'mars', 'jupiter', 'saturn', 'uranus', 'neptune'];
 const gmOf = (k) => (k === 'earth' ? GM_EM : GM_S / TL.massRatioDE440[k]);
@@ -402,7 +404,7 @@ console.log('\nNODE Ω̇ — long-window means (″/cy)');
 console.log(`planet     mean ±5 kyr  ±15 kyr  ±${(YEARS / 2000).toFixed(0)} kyr   nearest 8H/N    lattice −8H/N (″/cy)  lattice N   ratio`);
 for (const k of names) {
   const m10 = meanRate(k, 'Om', -5000, 5000), m30 = meanRate(k, 'Om', -15000, 15000), mAll = meanRate(k, 'Om', -YEARS / 2, YEARS / 2);
-  const per = k === 'earth' ? -H / 5 : (TL.planets[k].ascendingNodePeriod ?? null);
+  const per = k === 'earth' ? -H / 5 : (ASC_N[k] ? -(8 * H) / ASC_N[k] : null);
   const lat = per === null ? null : 1296000 / per * 100;
   const latN = per === null ? null : 8 * H / per;
   console.log(`${k.padEnd(9)}${f(m10)}${f(m30, 1, 9)}${f(mAll, 1, 9)}   ${nearest(mAll).padStart(12)}${f(lat, 1, 20)}${f(latN, 2, 12)}${f(lat === null ? null : mAll / lat, 3, 8)}${k === 'earth' ? '   (Ω of the ecliptic itself: ill-defined in this frame)' : ''}`);

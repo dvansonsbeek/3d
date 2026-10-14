@@ -90,7 +90,7 @@ const CANDIDATES = [
   { name: 'equatorial projection: base·(dα/dλ − 1) at ϖ, ε = 23.44° — zero parameters', fn: (b) => baseRate(b) * (raSlope(b.periLonDeg, EPS_J2000) - 1) },
   { name: 'constant fraction of the Newtonian rate (k fitted on Mercury, predicts the rest)', fn: (b, k) => k * b.newtonianAscy, fitOnMercury: (m) => TARGETS.T1.mercury[0] / m.newtonianAscy },
   { name: 'inverse semi-major axis (k/a, k fitted on Mercury)', fn: (b, k) => k / b.aAU, fitOnMercury: (m) => TARGETS.T1.mercury[0] * m.aAU },
-  { name: 'nearest lattice slot 8H/N to the Mercury excess (N integer)', fn: (b, N) => 1296000 * 100 / (8 * C.H / N), fitOnMercury: (m) => Math.max(1, Math.round(8 * C.H * TARGETS.T1.mercury[0] / 129600000)) },
+  { name: 'nearest lattice slot 8H/N to the Mercury excess (N integer; H = the retired unit 335,317, a frozen record)', fn: (b, N) => 1296000 * 100 / (8 * 335317 / N), fitOnMercury: (m) => Math.max(1, Math.round(8 * 335317 * TARGETS.T1.mercury[0] / 129600000)) },
   { name: 'LATTICE-NATIVE CANDIDATE — empty slot (define fn per the rules in the header)', fn: null },
 ];
 

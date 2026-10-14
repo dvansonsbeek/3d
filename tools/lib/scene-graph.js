@@ -40,7 +40,7 @@ const MEEUS_LUNAR = JSON.parse(require('fs').readFileSync(
 // Moon stack over them (R4) — so they turn uniformly; the ∫N/H_era(t) counter
 // that drove them in deep-time mode is retired.
 function _deviceWheelCycles(currentYear, divisor_N) {
-  return (currentYear - C.balancedYear) * divisor_N / C.H + divisor_N * C.kDeviceWheelPhaseAtJ2000Cycles;
+  return (currentYear - C.balancedYear) / C.kDeviceWheelPeriodYears[divisor_N] + divisor_N * C.kDeviceWheelPhaseAtJ2000Cycles;
 }
 
 // (R4: the analytic twin _frameworkSunLon — the K-law Sun the E5 δ block fell
@@ -355,7 +355,8 @@ function _fwEFactorTools(d_days, T, T2) {
   }
   // Decision (ii): the ONE deep e (its eFactorAt divides by the e0 anchor
   // const — exact at J2000 by the anchored-remainder construction).
-  return DT._deepEcc().eFactorAt(d_days / C.inputMeanSolarYear);
+  // on the channel's Julian-year axis (plan 09 step 7c; mirrors model.js fwEFactor)
+  return DT._deepEcc().eFactorAt(d_days / 365.25);
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
@@ -634,7 +635,8 @@ function makeObjectNodes(name, def) {
 // ═══════════════════════════════════════════════════════════════════════════
 
 // Pre-compute all the per-planet derived values we need
-const H_J2000 = C.H;
+// (plan 09 step 7c: the frozen era unit H_J2000 is deleted; the K wheels
+// ride the recorded C.kDeviceWheelPeriodYears)
 const MSY_J2000 = C.meanSolarYearDays;
 const d2r = Math.PI / 180;
 const sDay_J2000 = 1 / MSY_J2000;
@@ -643,10 +645,10 @@ const startModelYearWithCorrection = C.startmodelYear + correctionYears;
 
 // Per-JD epoch snapshot (Option B). When DEEP_TIME_ENABLED=false, always
 // returns J2000 values; when true, memoizes a per-epoch snapshot of
-// (H, mSY, sDay) keyed on t_Ma. The scene-setup speeds stay frozen at
-// J2000; only downstream JD↔pos conversions and H-derived periods pick
-// up the epoch shift. See IP-deep-time-scene-graph-fitpipeline.md §6.2.
-let _epochCache = { t_Ma: 0, H: H_J2000, mSY: MSY_J2000, sDay: sDay_J2000 };
+// (mSY, sDay) keyed on t_Ma. The scene-setup speeds stay frozen at
+// J2000; only downstream JD↔pos conversions pick up the epoch shift.
+// See IP-deep-time-scene-graph-fitpipeline.md §6.2.
+let _epochCache = { t_Ma: 0, mSY: MSY_J2000, sDay: sDay_J2000 };
 
 // ─── Scene time coordinate ↔ JD (R4) ───────────────────────────────────────
 // `pos` is the count of tropical years since startmodelJD. Under deep time the
@@ -711,12 +713,13 @@ function _syncEpochForJD(jd) {
   return _epochCache;
 }
 
-// Backwards-compatible aliases — code that references bare `H`/`sDay`
-// at scene-setup time picks up the J2000 values (setup happens once at
+// Backwards-compatible alias — code that references bare `sDay` at
+// scene-setup time picks up the J2000 value (setup happens once at
 // module load). Runtime paths use `_epochCache.mSY`
 // / `_epochCache.sDay` and go through `_syncEpochForJD(jd)` first.
-const H = H_J2000;
 const sDay = sDay_J2000;
+/** The K-device wheels' recorded periods by wheel index (plan 09 step 7c). @param {number} n */
+const wheelYr = (n) => C.kDeviceWheelPeriodYears[n];
 
 // Ascending node frame corrections from ASTRO_REFERENCE (see constants.js)
 const ascNodeToolCorrection = C.ASTRO_REFERENCE.ascNodeTiltCorrection;
@@ -804,8 +807,8 @@ function buildSceneGraph() {
     orbitRadius: 0,
     tilt: -C.earthtiltMean,
     startPos: 0,
-    speed: -Math.PI * 2 / (H / 13),
-    _dtCycleN: 13, _dtCycleSign: -1,   // Phase 9.12: H/13 axial precession, retrograde
+    speed: -Math.PI * 2 / wheelYr(13),
+    _dtCycleN: 13, _dtCycleSign: -1,   // Phase 9.12: the axial wheel, retrograde
   };
   const earthNodes = makeObjectNodes('earth', earthDef);
 
@@ -824,9 +827,9 @@ function buildSceneGraph() {
     orbitRadius: 0, orbitTilta: 0, orbitTiltb: 0,
     orbitCentera: 0, orbitCenterb: 0, orbitCenterc: 0,
     tilt: 0,
-    startPos: ((C.balancedYear - startModelYearWithCorrection) / (H / 3) - 3 * C.kDeviceWheelPhaseAtJ2000Cycles) * 360,   // plan 07 R10: − the device's J2000 wheel phase
-    speed: Math.PI * 2 / (H / 3),
-    _dtCycleN: 3, _dtCycleSign: +1,   // Phase 9.12: H/3 apsidal precession (historical name: inclination), prograde
+    startPos: ((C.balancedYear - startModelYearWithCorrection) / wheelYr(3) - 3 * C.kDeviceWheelPhaseAtJ2000Cycles) * 360,   // plan 07 R10: − the device's J2000 wheel phase
+    speed: Math.PI * 2 / wheelYr(3),
+    _dtCycleN: 3, _dtCycleSign: +1,   // Phase 9.12: the apsidal wheel (historical name: inclination), prograde
   });
   earthNodes.pivot.addChild(earthInclPrec.container);
 
@@ -834,9 +837,9 @@ function buildSceneGraph() {
     orbitRadius: 0, orbitCentera: 0, orbitCenterb: 0, orbitCenterc: 0,
     orbitTilta: 0, orbitTiltb: -C.earthInvPlaneInclinationAmplitude,
     tilt: 0,
-    startPos: ((C.balancedYear - startModelYearWithCorrection) / (H / 5) - 5 * C.kDeviceWheelPhaseAtJ2000Cycles) * 360,
-    speed: Math.PI * 2 / (H / 5),
-    _dtCycleN: 5, _dtCycleSign: +1,   // Phase 9.12: H/5 ecliptic precession, prograde
+    startPos: ((C.balancedYear - startModelYearWithCorrection) / wheelYr(5) - 5 * C.kDeviceWheelPhaseAtJ2000Cycles) * 360,
+    speed: Math.PI * 2 / wheelYr(5),
+    _dtCycleN: 5, _dtCycleSign: +1,   // Phase 9.12: the ecliptic wheel, prograde
   });
   earthInclPrec.pivot.addChild(earthEclipPrec.container);
 
@@ -844,9 +847,9 @@ function buildSceneGraph() {
     orbitRadius: 0, orbitCentera: 0, orbitCenterb: 0, orbitCenterc: 0,
     orbitTilta: 0, orbitTiltb: C.earthInvPlaneInclinationAmplitude,
     tilt: 0,
-    startPos: -(((C.balancedYear - startModelYearWithCorrection) / (H / 8) - 8 * C.kDeviceWheelPhaseAtJ2000Cycles) * 360),
-    speed: -Math.PI * 2 / (H / 8),
-    _dtCycleN: 8, _dtCycleSign: -1,   // Phase 9.12: H/8 obliquity precession, retrograde
+    startPos: -(((C.balancedYear - startModelYearWithCorrection) / wheelYr(8) - 8 * C.kDeviceWheelPhaseAtJ2000Cycles) * 360),
+    speed: -Math.PI * 2 / wheelYr(8),
+    _dtCycleN: 8, _dtCycleSign: -1,   // Phase 9.12: the obliquity wheel, retrograde
   });
   earthEclipPrec.pivot.addChild(earthObliqPrec.container);
 
@@ -854,9 +857,9 @@ function buildSceneGraph() {
     orbitRadius: 0, orbitCentera: 0, orbitCenterb: 0, orbitCenterc: 0,
     orbitTilta: -C.earthRAAngle, orbitTiltb: 0,
     tilt: 0,
-    startPos: ((C.balancedYear - startModelYearWithCorrection) / (H / 16) - 16 * C.kDeviceWheelPhaseAtJ2000Cycles) * 360,
-    speed: Math.PI * 2 / (H / 16),
-    _dtCycleN: 16, _dtCycleSign: +1,   // Phase 9.12: H/16 perihelion precession outer, prograde
+    startPos: ((C.balancedYear - startModelYearWithCorrection) / wheelYr(16) - 16 * C.kDeviceWheelPhaseAtJ2000Cycles) * 360,
+    speed: Math.PI * 2 / wheelYr(16),
+    _dtCycleN: 16, _dtCycleSign: +1,   // Phase 9.12: the perihelion wheel, outer, prograde
   });
   earthObliqPrec.pivot.addChild(earthPeriPrec1.container);
 
@@ -865,9 +868,9 @@ function buildSceneGraph() {
     orbitCentera: -C.eccentricityBaseDerived * 100, orbitCenterb: 0, orbitCenterc: 0,   // the perihelion wheel's offset base′ — the scaffold's pose; R4 places the arm at the series' e of date
     orbitTilta: 0, orbitTiltb: 0,
     tilt: 0,
-    startPos: -(((C.balancedYear - startModelYearWithCorrection) / (H / 16) - 16 * C.kDeviceWheelPhaseAtJ2000Cycles) * 360),
-    speed: -Math.PI * 2 / (H / 16),
-    _dtCycleN: 16, _dtCycleSign: -1,   // Phase 9.12: H/16 perihelion precession inner, retrograde
+    startPos: -(((C.balancedYear - startModelYearWithCorrection) / wheelYr(16) - 16 * C.kDeviceWheelPhaseAtJ2000Cycles) * 360),
+    speed: -Math.PI * 2 / wheelYr(16),
+    _dtCycleN: 16, _dtCycleSign: -1,   // Phase 9.12: the perihelion wheel, inner, retrograde
 
   });
   earthPeriPrec1.pivot.addChild(earthPeriPrec2.container);
@@ -898,7 +901,7 @@ function buildSceneGraph() {
     _eccentricityKey: 'earth',
     _eocDerived: true,  // Sun EoC = e_dynamic - e_base/2
     perihelionPhaseJ2000: -C.correctionSun * d2r - 2 * Math.PI * (C.startmodelJD - C.perihelionRefJD) / C.meanSolarYearDays + C.perihelionPhaseOffset * d2r,
-    perihelionPrecessionRate: Math.PI * 2 / C.perihelionCycleLength, // perihelion advances at H/16 rate
+    perihelionPrecessionRate: Math.PI * 2 / wheelYr(16), // the K perihelion wheel's recorded rate (scaffold pose)
   };
   const sunNodes = makeObjectNodes('sun', sunDef);
   barycenter.pivot.addChild(sunNodes.container);

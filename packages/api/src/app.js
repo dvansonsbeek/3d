@@ -14,7 +14,7 @@
  */
 import { readFileSync } from 'node:fs';
 import { URL } from 'node:url';
-import { createModel, DEFAULT_CONSTANTS } from '../../physics/src/index.js';
+import { createModel, DEFAULT_CONSTANTS, FITTED_COEFFICIENTS } from '../../physics/src/index.js';
 // Comparison curves from @essrt/reference (one-way: the api's
 // cross-validation endpoints COMPARE against them, nothing more;
 // migrated from @essrt/physics at its 4.0.0 major).
@@ -123,8 +123,8 @@ export function createApi() {
     obliquityCycle: { formula: 'T_obl(J2000) = 2π/(ψ̇ᵢₙ − |s₃|) — the obliquity beat of the spin axis’s inertial precession rate (the general precession plus the planetary mean; the rate the hybrid obliquity integrates on) against the nodal mode, at the J2000 instant (falsification leg 1; device label H/8 retired as a period). A dated record sees the beat of the pole rate’s mean over its own window — registry obliqCycleRealized*Years (40,927 yr over the LR04 record)', latticeDivisor: 8, periodYears: model.lunisolar.obliquityBeatYearsAtYear(2000), doc: 'docs/110-calculation-map.md', registryKey: 'obliqCycleYears', status: 'current' },
     solarSystemResonanceCycle: { formula: 'RETIRED (plan 06 D3): the eight-unit interval of the fitted anchor — a device interval of the correction combs, never a cycle', latticeDivisor: null, periodYears: null, doc: 'docs/110-calculation-map.md', registryKey: 'eightH', status: 'retired' },
     law6Lock: { formula: 'RETIRED (doc 109): the Jupiter–Saturn–Earth “lock” read at Saturn’s device ecliptic-perihelion period, a window-epoch descriptor', latticeDivisor: 65, periodYears: null, doc: 'docs/109-model-nbody-engine-and-lattice-test.md', registryKey: 'saturnPeriPeriod', status: 'retired' },
-    bondCycle: { formula: 'ΔT-stack component, period 8·H₀/1830 = 1,466 yr — a bounded-basis line of the anchor’s divisor grid; the integer label carries no information (plan 06 T5), the ~1.5-kyr oscillation is real', latticeDivisor: 1830, periodYears: (8 * DEFAULT_CONSTANTS.foundational.holisticyearLength) / 1830, doc: 'docs/104-millennial-rotation-swing.md', registryKey: 'bondYr', status: 'device' },
-    hallstattCycle: { formula: 'ΔT-stack component, period 8·H₀/1104 = 2,430 yr — a bounded-basis line of the anchor’s divisor grid; the integer label carries no information (plan 06 T5)', latticeDivisor: 1104, periodYears: (8 * DEFAULT_CONSTANTS.foundational.holisticyearLength) / 1104, doc: 'docs/104-millennial-rotation-swing.md', registryKey: 'hallstattYr', status: 'device' },
+    bondCycle: { formula: 'ΔT-stack component, period 1,466 yr stated in years (the shipped coefficients) — a fitted millennial line of the ΔT stack; its retired lattice label carried no information (plan 06 T5), the ~1.5-kyr oscillation is real', latticeDivisor: 1830, periodYears: FITTED_COEFFICIENTS.DT_STACK.bond.period_yr, doc: 'docs/104-millennial-rotation-swing.md', registryKey: 'bondYr', status: 'device' },
+    hallstattCycle: { formula: 'ΔT-stack component, period 2,430 yr stated in years (the shipped coefficients) — a fitted millennial line of the ΔT stack; its retired lattice label carried no information (plan 06 T5)', latticeDivisor: 1104, periodYears: FITTED_COEFFICIENTS.DT_STACK.hallstatt.period_yr, doc: 'docs/104-millennial-rotation-swing.md', registryKey: 'hallstattYr', status: 'device' },
   });
 
   const versionRecord = Object.freeze({

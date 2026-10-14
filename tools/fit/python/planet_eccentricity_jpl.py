@@ -12,7 +12,7 @@ from astroquery.jplhorizons import Horizons
 from load_constants import C
 
 # ─── Model constants (from JSON via bridge) ───────────────────────────────
-H = int(C['H'])
+H = 335317   # the retired era unit (plan 09 step 7c): the H/3, H/8, H/16 trial periods below are the K-device's recorded wheel periods — a frozen record
 ANCHOR_YEAR = C['balancedYear']
 
 # Periods loaded from model-parameters.json (via constants.js → _dump_constants.js).

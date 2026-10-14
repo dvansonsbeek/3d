@@ -170,7 +170,7 @@ const lodHrOf = (aKmFn, LFn) => (tMa) => {
 
 /** days/yr and H via the day-count near-invariant (0.08%-exact). */
 const yearS = (tMa) => dt.meanSiderealYearSecondsAtAge(tMa);
-const H0 = C.H;
+const H0 = 335317;   // the retired era unit (plan 09 step 7c) — this study's H(t) rows are a frozen record
 const daysPerYr0 = yearS(0) / (dt.meanLodSecondsAtAge(0));
 const chainOf = (lodHrFn) => (tMa) => {
   const d = yearS(tMa) / (lodHrFn(tMa) * 3600);

@@ -2,14 +2,14 @@
 // Gives the TypeScript website full type safety at the boundary (§2g) while
 // packages/physics stays JavaScript.
 
-export declare const CONSTANTS_HASH: "4d550fcd9065e7f2";
+export declare const CONSTANTS_HASH: "c161ec19e5984b9e";
 
 export declare const MODEL_VERSION: string;
 
 export declare const PREPRINT_DOI: string;
 
 export declare const DEFAULT_CONSTANTS: {
-  readonly hash: "4d550fcd9065e7f2";
+  readonly hash: "c161ec19e5984b9e";
   readonly additionalBodies: {
     "pluto": {
       "name": string;
@@ -149,6 +149,13 @@ export declare const DEFAULT_CONSTANTS: {
     "eccentricityBase": number;
     "eccentricityAmplitude": number;
     "kDeviceInclinationPhaseJ2000Deg": number;
+    "kDeviceWheelPeriodYears": {
+      "3": number;
+      "5": number;
+      "8": number;
+      "13": number;
+      "16": number;
+    };
     "kDeviceWheelPhaseAtJ2000Cycles": number;
   };
   readonly earthOrbital: {
@@ -171,9 +178,6 @@ export declare const DEFAULT_CONSTANTS: {
     "sunTilt": number;
   };
   readonly foundational: {
-    "holisticyearLength": number;
-    "stepYears": number;
-    "inputmeanlengthsolaryearindays": number;
     "startmodelJD": number;
     "startmodelYear": number;
     "correctionDays": number;
@@ -481,7 +485,6 @@ export declare const DEFAULT_CONSTANTS: {
       "type": string;
       "mirrorPair": string;
       "ascendingNodeInvPlane": number;
-      "ascendingNodeCyclesIn8H": number;
     };
     "venus": {
       "name": string;
@@ -491,7 +494,6 @@ export declare const DEFAULT_CONSTANTS: {
       "type": string;
       "mirrorPair": string;
       "ascendingNodeInvPlane": number;
-      "ascendingNodeCyclesIn8H": number;
     };
     "mars": {
       "name": string;
@@ -501,7 +503,6 @@ export declare const DEFAULT_CONSTANTS: {
       "type": string;
       "mirrorPair": string;
       "ascendingNodeInvPlane": number;
-      "ascendingNodeCyclesIn8H": number;
     };
     "jupiter": {
       "name": string;
@@ -511,7 +512,6 @@ export declare const DEFAULT_CONSTANTS: {
       "type": string;
       "mirrorPair": string;
       "ascendingNodeInvPlane": number;
-      "ascendingNodeCyclesIn8H": number;
     };
     "saturn": {
       "name": string;
@@ -521,7 +521,6 @@ export declare const DEFAULT_CONSTANTS: {
       "type": string;
       "mirrorPair": string;
       "ascendingNodeInvPlane": number;
-      "ascendingNodeCyclesIn8H": number;
     };
     "uranus": {
       "name": string;
@@ -531,7 +530,6 @@ export declare const DEFAULT_CONSTANTS: {
       "type": string;
       "mirrorPair": string;
       "ascendingNodeInvPlane": number;
-      "ascendingNodeCyclesIn8H": number;
     };
     "neptune": {
       "name": string;
@@ -541,7 +539,6 @@ export declare const DEFAULT_CONSTANTS: {
       "type": string;
       "mirrorPair": string;
       "ascendingNodeInvPlane": number;
-      "ascendingNodeCyclesIn8H": number;
     };
   };
   readonly timeReference: {

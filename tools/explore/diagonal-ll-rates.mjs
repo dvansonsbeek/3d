@@ -87,11 +87,14 @@ for (const p of NAMES) {
 }
 console.log('BARE (frozen-neighbour) L-L rates — authoritative inputs (massRatioDE440 + J2000 Horizons osculating a)');
 console.log('planet     a (AU)      bare ″/yr   +1PN      eigen g   model peri line | bare node   eigen s   model node line');
+// the retired era unit and the device's node counts per 8H (plan 09 step 7c) — this script is a frozen record
+const H_RETIRED = 335317;
+const ASC_N = { mercury: 9, venus: 1, mars: 64, jupiter: 36, saturn: 36, uranus: 11, neptune: 3 };
 for (const p of NAMES) {
-  const periYears = p === 'earth' ? TL.H / 3 : TL.planets[p].perihelionEclipticYears;   // Earth: the H/3 law line
+  const periYears = p === 'earth' ? H_RETIRED / 3 : TL.planets[p].perihelionEclipticYears;   // Earth: the retired H/3 law line
   const modelPeri = 1296000 / periYears;
-  const nodeN = p === 'earth' ? -40 : -Math.abs(TL.planets[p].ascendingNodeCyclesIn8H);
-  const modelNode = 1296000 * nodeN / (8 * TL.H);
+  const nodeN = p === 'earth' ? -40 : -Math.abs(ASC_N[p]);
+  const modelNode = 1296000 * nodeN / (8 * H_RETIRED);
   console.log(
     p.padEnd(9)
     + ` ${OSC[p].aAU.toFixed(5).padStart(9)}`

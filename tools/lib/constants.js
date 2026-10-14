@@ -53,8 +53,10 @@ const knownValues = astroRef.knownValues;
 // These define the model itself. Changing any = different theory.
 // ═══════════════════════════════════════════════════════════════════════════
 
-const H = modelParams.foundational.holisticyearLength;
-const inputMeanSolarYear = modelParams.foundational.inputmeanlengthsolaryearindays;
+// (plan 09 step 7c: the frozen era unit `holisticyearLength` (H), its lattice
+// `stepYears` and the device's rounded mean tropical year input
+// `inputmeanlengthsolaryearindays` left model-parameters.json; the K-device
+// wheels ride the recorded `kDeviceWheelPeriodYears` pose block below.)
 const startmodelJD = modelParams.foundational.startmodelJD;
 const startmodelYear = modelParams.foundational.startmodelYear;
 const correctionDays = modelParams.foundational.correctionDays;
@@ -89,9 +91,16 @@ const perihelionalignmentYear = astroRef.earthOrbital.perihelionalignmentYear;
 
 const earthtiltMean = modelParams.earth.earthtiltMean;
 const earthInvPlaneInclinationAmplitude = modelParams.earth.earthInvPlaneInclinationAmplitude;
-// Plan 07 R10: the K device's J2000 wheel phase (anchor-unit cycles) — the
-// scene scaffolding's recorded pose, N × this per H/N wheel; not a law.
+// Plan 07 R10: the K device's J2000 wheel phase — the scene scaffolding's
+// recorded pose, N × this per wheel of index N; not a law.
 const kDeviceWheelPhaseAtJ2000Cycles = modelParams.earth.kDeviceWheelPhaseAtJ2000Cycles;
+// Plan 09 step 7c: the K-device wheels' recorded periods (scene mean solar
+// years) keyed by the wheel's index N (3 inclination, 5 ecliptic, 8 obliquity,
+// 13 axial/wobble, 16 the perihelion pair) — the scaffold's J2000 pose; each
+// wheel turns uniformly at its recorded rate (plan 09 step 5c). Not the
+// model's precession periods (those are the dynamical values). Mirrors
+// src/script.js `kDeviceWheelPeriodYears` / `_wheelPeriodYears(N)`.
+const kDeviceWheelPeriodYears = modelParams.earth.kDeviceWheelPeriodYears;
 // Plan 09 step 6: the K-device inclination wheel's J2000 phase, a recorded
 // POSE constant (ϖ_J2000 − the retired eccentricity law's 21.77° anchor);
 // it poses the three scaffold constants below, nothing published rides it.
@@ -167,8 +176,9 @@ for (const [key, mp] of Object.entries(modelParams.planets)) {
     type: mp.type,
     mirrorPair: mp.mirrorPair,
     ascendingNodeInvPlane: mp.ascendingNodeInvPlane,
-    ascendingNodeCyclesIn8H: mp.ascendingNodeCyclesIn8H,
-    ascendingNodePeriod: mp.ascendingNodeCyclesIn8H ? -(8 * H) / mp.ascendingNodeCyclesIn8H : null,
+    // (plan 09 step 7c: `ascendingNodeCyclesIn8H` and the −8H/N node period
+    // it set — a device count — left with the unit; a planet's node of date
+    // and its nodal period are the chain's elements and modes.)
     // (axialPrecessionYears / obliquityCycle — the K device's integer
     // fractions — retired with plan 06 Phase 7 commit 2: the spin channel
     // carries the planets' precession and obliquity.)
@@ -211,7 +221,8 @@ for (const [key, body] of Object.entries(modelParams.additionalBodies)) {
 // Computed from foundational constants. Order matters (dependency chain).
 // ═══════════════════════════════════════════════════════════════════════════
 
-const perihelionCycleLength = H / 16;
+// (plan 09 step 7c: `perihelionCycleLength` = H/16 is deleted — the K
+// perihelion wheel's period is kDeviceWheelPeriodYears[16], a scaffold pose.)
 // Plan 09: the model's mean solar year in days — the calendar's year axis —
 // is the J2000 mean tropical year DERIVED in one home from two IAU inputs,
 // the sidereal year and the general precession p_A per Julian year
@@ -270,33 +281,11 @@ const meanStellarDay = (meanSiderealDay / axialPrecessionJ2000Years) / (meanSola
 // Unification: the mean of the one law IS base' (formerly the H/16 beat's
 // geometric mean √(base² + A²) = 0.01545).
 const eccentricityDerivedMean = eccentricityBaseDerived;
-const totalDaysInH = H * meanSolarYearDays;
-
-// ── Step size and grid year (derived from H and startmodelYear) ──────────
-//
-// pickStepYears: auto-select a step that divides H exactly (required for phase
-// closure across one full cycle). Prefers divisors close to targetSamples,
-// within [3, 100] year range. Enables recalibration to any H without manual retuning.
-function pickStepYears(HL, targetSamples = 22000) {
-  const divs = [];
-  for (let d = 3; d * d <= HL; d++) {
-    if (HL % d === 0) { divs.push(d); if (HL / d !== d) divs.push(HL / d); }
-  }
-  const candidates = divs.filter(d => d >= 3 && d <= 100).sort((a, b) => a - b);
-  if (candidates.length === 0) return null;
-  const targetStep = HL / targetSamples;
-  return candidates.reduce((best, d) =>
-    Math.abs(d - targetStep) < Math.abs(best - targetStep) ? d : best
-  );
-}
-
-const _autoStep = pickStepYears(H);
-const stepYears = modelParams.foundational.stepYears || _autoStep || 21;
-if (H % stepYears !== 0) {
-  console.warn(`[constants] stepYears=${stepYears} does not divide H=${H}. Auto-suggestion: ${_autoStep}.`);
-}
-const gridYear = balancedYear + Math.round((2000 - balancedYear) / stepYears) * stepYears;
-const gridYearDeltaFromJ2000 = gridYear - 2000;
+// (plan 09 step 7c: `totalDaysInH` = H × mSY — the device's day count — and
+// the lattice grid (`pickStepYears`, `stepYears`, `gridYear`,
+// `gridYearDeltaFromJ2000`) are deleted. Since plan 07 R10 the phase origin
+// is J2000, so the grid year WAS J2000 and its delta identically 0: the
+// cardinal anchors and the IAU obliquity below are the J2000 values.)
 
 // Cardinal point year fractions for initial search (derived from startmodelYear offset)
 // Maps calendar event to approximate year fraction from the model epoch.
@@ -314,13 +303,13 @@ const cardinalPointYearFractions = {
   AE: 0.73 - _epochOffset,   // September equinox (≈+0.23, later-same-year)
 };
 
-// Shifted IAU values at grid year (for harmonic fitting when grid ≠ J2000)
-const iauObliquityAtGrid = ASTRO_REFERENCE.obliquityJ2000_deg
-  + (ASTRO_REFERENCE.obliquityRate_arcsecPerCentury / 3600 / 100) * gridYearDeltaFromJ2000;
+// The IAU obliquity and the observed cardinal anchors at the phase origin —
+// J2000 since plan 07 R10 (the names keep their "AtGrid" suffix for their readers)
+const iauObliquityAtGrid = ASTRO_REFERENCE.obliquityJ2000_deg;
 const cardinalPointAnchorsAtGrid = {};
 for (const [type, jd2000] of Object.entries(ASTRO_REFERENCE.cardinalPointAnchors)) {
   if (typeof jd2000 !== 'number') continue;   // the key carries its provenance `_comment` (R4d)
-  cardinalPointAnchorsAtGrid[type] = jd2000 + meanSolarYearDays * gridYearDeltaFromJ2000;
+  cardinalPointAnchorsAtGrid[type] = jd2000;
 }
 
 // J2000.0 epoch (standard astronomical convention: Jan 1.5, 2000 TT = JD 2451545.0)
@@ -346,7 +335,7 @@ const eocEccentricity = ASTRO_REFERENCE.earthEccentricityJ2000 / 2;
 // Perihelion phase offset — derived from geometric perihelion direction vs reference perihelion date.
 // (plan 07 R10: the perihelion wheel's phase at the model start = its advance
 // from J2000 plus the device's recorded J2000 wheel phase, 16 × the constant)
-const perihelionPhaseOffset = ((((startModelYearWithCorrection - balancedYear) / (H / 16) + 16 * kDeviceWheelPhaseAtJ2000Cycles) * 360
+const perihelionPhaseOffset = ((((startModelYearWithCorrection - balancedYear) / kDeviceWheelPeriodYears[16] + 16 * kDeviceWheelPhaseAtJ2000Cycles) * 360
   + correctionSun + 360 * (startmodelJD - perihelionRefJD) / meanSolarYearDays) % 360 + 360) % 360;
 
 
@@ -383,10 +372,8 @@ const moonTropicalMonth = 1 / (1 / moonSiderealMonth + 1 / axialPrecessionJ2000D
 
 const moonFullMoonCycleEarth = (moonSynodicMonth / (moonSynodicMonth - moonAnomalisticMonth)) * moonAnomalisticMonth;
 const moonFullMoonCycleICRF = 1 / (1 / moonFullMoonCycleEarth + 1 / axialPrecessionJ2000Days);
-// Of-date cycles per anchor interval, REAL-valued — the Step-0 Sun fitter's
-// lunar-precession divisor candidates (H/N = the period in years); no rounding.
-const N_apsidalI = totalDaysInH / moonApsidalPrecessionDaysICRF;
-const N_nodalI = totalDaysInH / moonNodalPrecessionDaysICRF;
+// (plan 09 step 7c: the real-valued "cycles per anchor interval" N_apsidalI /
+// N_nodalI — the Step-0 Sun comb's divisor candidates — left with the unit.)
 
 const moonApsidalMeetsNodalDays = (moonNodalMonth / (moonAnomalisticMonth - moonNodalMonth)) * moonAnomalisticMonth;
 const moonLunarLevelingCycleDays = (moonNodalPrecessionDaysEarth / (moonNodalPrecessionDaysEarth - moonApsidalPrecessionDaysEarth) * (moonApsidalPrecessionDaysEarth / meanSolarYearDays)) * meanSolarYearDays;
@@ -399,8 +386,9 @@ const moonDraconicYearEarth = 1 / (1 / moonDraconicYearICRF - 1 / axialPrecessio
 // Attach planet-dependent fields to the imported ASTRO_REFERENCE object.
 // ═══════════════════════════════════════════════════════════════════════════
 
-// Model-derived value (not an astronomical reference, but consumed via ASTRO_REFERENCE)
-ASTRO_REFERENCE.earthInvPlanePrecessionYears = H / 3;
+// (plan 09 step 7c: `ASTRO_REFERENCE.earthInvPlanePrecessionYears` = H/3 — a
+// device period with no reader — is deleted; Earth's apsidal period is the
+// chain's secular tangent, `model.lunisolar` / the registry's inclPrecYears.)
 
 // (The Moon post-Meeus RA/Dec patches MOON_CORRECTION / MOON_CORRECTION_RESIDUAL
 // were retired at plan 06 R3 item 1 — @essrt/physics moon/apparent.cjs.)
@@ -611,8 +599,6 @@ const { jdToYear, yearToJD } = utils.createDateUtils({ startmodelYear, startmode
 
 module.exports = {
   // Foundational model constants
-  H,
-  inputMeanSolarYear,
   perihelionalignmentYear,
   perihelionalignmentJD,
   startmodelJD,
@@ -664,8 +650,6 @@ module.exports = {
   moonSiderealMonthInput,
   moonApsidalPrecessionDaysInputICRF,
   moonNodalPrecessionDaysInputICRF,
-  N_apsidalI, N_nodalI,
-  // Cycle counts per H (J2000 anchors; deep-time scales as H(t)²/H(today)²)
   moonDistance,
   moonEclipticInclinationJ2000,
   moonMeeusLpCorrection,
@@ -681,17 +665,13 @@ module.exports = {
   additionalBodies,
 
   // Derived model values
-  perihelionCycleLength,
   meanSolarYearDays,
   meanEarthRotationsPerYear,
   startModelYearWithCorrection,
   balancedYear,
   kDeviceWheelPhaseAtJ2000Cycles,
+  kDeviceWheelPeriodYears,
   balancedJD,
-  stepYears,
-  pickStepYears,
-  gridYear,
-  gridYearDeltaFromJ2000,
   cardinalPointYearFractions,
   iauObliquityAtGrid,
   cardinalPointAnchorsAtGrid,
@@ -704,7 +684,6 @@ module.exports = {
   meanStellarDay,
   STELLAR_DAY_RA_PROJECTION,
   eccentricityDerivedMean,
-  totalDaysInH,
   j2000JD,
   julianCenturyDays,
   tropicalCenturyDays,

@@ -46,7 +46,6 @@ let C;
 console.log('═══ Step 1: Constants load ═══');
 try {
   C = require(path.join(TOOLS_LIB, 'constants.js'));
-  check('H', C.H, 335317);
   check('planets count', Object.keys(C.planets).length, 7);
   console.log('  ✓ Constants loaded OK\n');
 } catch (e) {

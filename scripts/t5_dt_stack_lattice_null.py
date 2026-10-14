@@ -56,7 +56,7 @@ SCAN_H253_REL = 'data/deltaT-h253-fifth-cycle-scan.json'
 PARAMS_REL = 'public/input/model-parameters.json'
 INPUT_FILES = [SERIES_REL, STACK_REL, SCAN_BOND_REL, SCAN_H253_REL, PARAMS_REL, SELF_REL]
 
-H = json.loads((ROOT / PARAMS_REL).read_text())['foundational']['holisticyearLength']
+H = 335317                         # the retired era unit (plan 09 step 7c) — the lattice these labels were drawn on; frozen record
 EIGHT_H = 8 * H
 BAND_YR = (500.0, 5000.0)          # the divisor scan's band (n 537…5365)
 N_NULL = 2000

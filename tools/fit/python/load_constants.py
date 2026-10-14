@@ -7,7 +7,6 @@ Python scripts import from here instead of duplicating values in constants_scrip
 
 Usage:
     from load_constants import C
-    print(C['H'])                    # 335317
     print(C['earthtiltMean'])        # 23.41349
     print(C['planets']['mercury'])   # { name: 'Mercury', ... }
 """
@@ -39,7 +38,8 @@ def _load_from_node():
 C = _load_from_node()
 
 # ─── Convenience aliases matching constants_scripts.py naming ─────────────
-H = C['H']
+# (plan 09 step 7c: `H` — the frozen era unit — left the model; the research
+# scripts that scan the retired 8H/n lattice carry 335,317 as a named record.)
 BALANCE_YEAR = C['balancedYear']
 MEAN_SOLAR_YEAR_DAYS = C['meanSolarYearDays']
 MEAN_SIDEREAL_YEAR_DAYS = C['meanSiderealYearDays']
@@ -54,9 +54,8 @@ EARTH_ECCENTRICITY_AMPLITUDE = C['eccentricityAmplitude']
 # (plan 07 R6: EARTH_ECCENTRICITY_K — the K constant inverted from Earth's
 # calibration — went with the K law; it had no consumer outside this module.)
 
-# Derived
-PERIHELION_CYCLE_LENGTH = C['perihelionCycleLength']
-TOTAL_DAYS_IN_H = C['totalDaysInH']
+# Derived (plan 09 step 7c: PERIHELION_CYCLE_LENGTH = H/16 and TOTAL_DAYS_IN_H
+# = H × mSY — the device's wheel period and day count — left with the unit)
 ECCENTRICITY_DERIVED_MEAN = C['eccentricityDerivedMean']
 
 # Fitted coefficients
@@ -74,7 +73,6 @@ PLANETS = C['planets']
 
 if __name__ == '__main__':
     # Self-test: print key values
-    print(f"H = {H}")
     print(f"BALANCE_YEAR = {BALANCE_YEAR}")
     print(f"EARTH_OBLIQUITY_MEAN = {EARTH_OBLIQUITY_MEAN}")
     print(f"EARTH_RA_ANGLE = {EARTH_RA_ANGLE:.6f}")

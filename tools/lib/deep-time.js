@@ -101,7 +101,6 @@ const ALPHA_4 = C.ALPHA_4;           // /Ma⁴
 
 // ─── J2000 anchors derived from framework constants ───────────────────────
 
-const HOLISTIC_YEAR_J2000        = C.H;
 const MEAN_SIDEREAL_YEAR_J2000_S = C.meanSiderealYearSeconds;
 // Plan 09: the J2000 day length ω₀ is the SI day (C.meanLengthOfDay = 86,400,
 // an input). The identifier keeps its name; the H/13 identity it once named
@@ -1205,7 +1204,6 @@ module.exports = {
   posFromJD,
   jdFromPos,
   // Anchor constants (for callers that need them)
-  HOLISTIC_YEAR_J2000,
   MEAN_SIDEREAL_YEAR_J2000_S,
   MEAN_TROPICAL_YEAR_J2000_S,
   LOD_NOW_H13_S,

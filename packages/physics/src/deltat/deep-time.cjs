@@ -350,6 +350,8 @@ function createDeepTimeLod(deps) {
     lunarTorqueFactorAtAge: composed.lunarTorqueFactorAtAge,
     precessionTorqueTermAtAge: composed.torqueTermAtAge,
     siderealYearSecondsAtAge, tropicalYearSecondsAtAge, tropicalYearDaysAtAge,
+    // the same law on a caller-supplied LOD (the browser's L1-α sensitivity sweep; plan 09 step 7c)
+    tropicalYearSecondsFromLod,
     // the solar day's ecliptic missing-motion term on the nodal period (plan 06 T2 item; one home)
     eclipticLodCorrectionSecondsAtAge,
     yearInDaysAtAge, deltaTRawSecondsAtAge, lodSecondsWithCorrectionsAtAge,

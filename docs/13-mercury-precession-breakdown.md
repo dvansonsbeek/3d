@@ -67,22 +67,21 @@ ecliptic value. Two implementations exist:
 |--------|-----------------|
 | Rate at J2000 (Earth-frame RA) | <!--v:mercuryPeriRateEarthFrameMeasuredJ2000-->576.19<!--/v--> ″/cy = <!--v:mercuryPeriRateEclipticArcsecCy-->529.03<!--/v--> × dα/dλ + <!--v:mercuryPeriObliquityRateTermJ2000-->4.31<!--/v--> |
 | Lattice (ecliptic) rate | <!--v:mercuryPeriRateEclipticArcsecCy-->529.03<!--/v--> ″/cy |
-| Earth-frame range over H | <!--v:mercuryFluctuationMin-->-47<!--/v--> to <!--v:mercuryFluctuationMax-->+50<!--/v--> ″/cy about the lattice rate |
-| Dominant Earth-frame period | ~<!--v:mercuryOscillationPeriod-->7,451<!--/v--> years (H/45) |
+| Earth-frame range over one secular perihelion period of Mercury's chain | <!--v:mercuryFluctuationMin-->-47<!--/v--> to <!--v:mercuryFluctuationMax-->+50<!--/v--> ″/cy about the ecliptic rate |
 
 ### The Earth-frame fluctuation pattern
 
-The dominant ~7,451-yr period is `H/45` — the 6th harmonic of the beat
-between Earth's apsidal precession (H/3) and ecliptic precession
-(H/5): `1/(1/3 − 1/5) = 7.5`, so the fundamental beat is H/7.5 ≈ 44,709 yr
-and its 6th harmonic is H/45. The fluctuation arises because a planet's
-perihelion marker inherits Earth's precession-layer transformations in
-the scene graph; measured in Earth's equatorial frame these compound into
-the apparent rate. Over a complete anchor interval the
-oscillations cancel — sometimes Earth's orientation adds to the apparent
-rate, sometimes it subtracts — so the long-term Earth-frame average
-equals the ecliptic value. (`tools/verify/mercury-precession-centuries.js`
-tabulates the rates by century, 1800–2100.)
+The fluctuation arises because the Earth-frame rate is the ecliptic rate
+projected onto Earth's equator of date (dα/dλ) plus the obliquity term:
+the projection turns with the equinox (T_p) and with the orbit's own
+apsidal and nodal modes, so measured in Earth's equatorial frame the
+apparent rate oscillates about the ecliptic value. Over a full secular
+perihelion period of the chain the oscillations cancel — sometimes
+Earth's orientation adds to the apparent rate, sometimes it subtracts —
+so the long-term Earth-frame average equals the ecliptic value. (The
+retired device read a dominant ~7,450-yr period off the beat of its
+inclination and ecliptic wheels; the wheels are a scene pose, not a law,
+and the device's period and its narrative script are retired — plan 09.)
 
 ### When to use which
 
@@ -193,10 +192,10 @@ frame. The theory assumes this frame is a stable inertial reference.
 **But the ecliptic is not a stable inertial frame.** Two things move relative
 to the ICRF (true inertial):
 
-1. **General precession (H/13 ≈ <!--v:earthAxialPeriod-->25,772<!--/v--> yr)** — Earth's axial precession
+1. **General precession (T_p ≈ <!--v:earthAxialPeriod-->25,772<!--/v--> yr)** — Earth's axial precession
    carries the equinox westward through the inertial sky at ~50 ″/yr. The
    "ecliptic-of-date" frame rotates at this rate relative to the ICRF.
-2. **Ecliptic precession (H/5 ≈ <!--v:hDiv5-->67,063<!--/v--> yr)** — Earth's orbital plane itself
+2. **Ecliptic precession (the chain's nodal mode, <!--v:eclPrecYears-->~68,751<!--/v--> yr)** — Earth's orbital plane itself
    precesses around the invariable plane, so the ecliptic-of-J2000 is also
    not identical to the invariable plane in the long run.
 

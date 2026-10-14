@@ -33,7 +33,7 @@ The shared tools module `tools/lib/constants.js` mirrors these with its own 14-s
 Per the [Expanding Solar System Resonance Theory (Doc 99)](99-expanding-solar-system-resonance-theory.md), the model has two distinct categories of "constants":
 
 - **Device integers** — the correction combs' divisors and the frozen clock's counters: identifiers of the fitted machinery (bounded harmonic bases on the fitted anchor's unit, plan 06 P3/P4). They are not periods and not laws — the physical periods below are dynamical values, and the climate formula rides the engine's own orbital lines (plan 06 T1).
-- **Epoch-dependent periods, lengths, and seconds-values** — these evolve at deep time: the spin-tier periods with the composed lunisolar precession clock, the orbital periods with the solar-mass history. **Most numeric values tabulated below** (the fitted timing anchor `holisticyearLength` = <!--v:H-->335,317<!--/v--> yr; sidereal year = 365.25636 days; LOD = 86,400 s; Moon distance = 384,399 km; planet orbital periods in years; etc.) are **J2000-epoch values** — the model's primary calibration anchor. They apply to the modern era; for deep-time / future-projection work, use the epoch-dependent helpers in `src/script.js`:
+- **Epoch-dependent periods, lengths, and seconds-values** — these evolve at deep time: the spin-tier periods with the composed lunisolar precession clock, the orbital periods with the solar-mass history. **Most numeric values tabulated below** (sidereal year = 365.25636 days; LOD = 86,400 s; Moon distance = 384,399 km; planet orbital periods in years; etc.) are **J2000-epoch values** — the model's primary calibration anchor. They apply to the modern era; for deep-time / future-projection work, use the epoch-dependent helpers in `src/script.js`:
 
 | J2000-anchored constant in this doc | Epoch-dependent helper (accepts `t_Ma` argument) |
 |---|---|
@@ -111,11 +111,11 @@ relabel, not re-base.
 
 | # | Constant | Variable | Value | Anchored by |
 |---|-----------|----------|-------|-------------|
-| 1 | The fitted timing anchor — the unit of the correction bases and the era clock; it scales with the precession period at deep time (anchor/T_p = 13.011, a fit constant — not a period, plan 06 S5) | `holisticyearLength` | <!--v:H-->335,317<!--/v--> years | 1246 AD perihelion–solstice alignment + J2000 longitude of perihelion |
+| 1 | The K wheels' recorded periods — the scene scaffolding's J2000 pose by wheel index (inclination 3, ecliptic 5, obliquity 8, axial 13, perihelion 16); each wheel turns uniformly at its recorded rate (plan 09 step 5c/7c); not the model's precession periods (those are the dynamical values of Part 2, which the wheels read 0.09–2 % off) | `kDeviceWheelPeriodYears` | 111,772.3 / 67,063.4 / 41,914.6 / 25,793.6 / 20,957.3 scene years | numerically the retired unit's 335,317/N, written as the exact doubles so the pose is bit-identical |
 | 2 | Mean obliquity — a constant of the scene's J2000 pose (the wheel geometry); the published obliquity is the hybrid (Ledger 1) | `earthtiltMean` | <!--v:meanObliquity-->23.41353<!--/v-->° | observed obliquity range |
 | 3 | Inclination amplitude — a constant of the scene's J2000 pose (the K inclination law it once fed is retired, plan 07 R5/R9); the published inclination is the chain's (Ledger 1) | `earthInvPlaneInclinationAmplitude` | <!--v:earthInclAmp-->0.63607<!--/v-->° | observed obliquity range |
 | 4 | The K-device inclination wheel's J2000 pose (plan 09 step 6; it was the eccentricity law's 21.77° anchor as ϖ_J2000 − 21.77°) | `kDeviceInclinationPhaseJ2000Deg` | 81.17719° | a recorded scene pose: it poses the mean inclination, the inclination path and the perihelion wheel's offset base′; the eccentricity law it phased is deleted — Earth's e of date is the N-body series on every path |
-| 5 | The K wheels' phase at J2000 — the scene scaffolding's recorded pose (N × this per H/N wheel), not a law; no observable rides it | `kDeviceWheelPhaseAtJ2000Cycles` | 0.908498525 anchor units | numerically the retired origin's (2000 − t₀)/H, kept with the pose (plan 07 R10) |
+| 5 | The K wheels' phase at J2000 — the scene scaffolding's recorded pose (N × this turns per wheel of index N), not a law; no observable rides it | `kDeviceWheelPhaseAtJ2000Cycles` | 0.908498525 | numerically the retired origin's (2000 − t₀) over the retired unit, kept with the pose (plan 07 R10) |
 
 The correction combs' divisors and the era clock's counters are devices
 of the fitted machinery — bounded harmonic bases on the anchor's unit (plan
@@ -196,16 +196,13 @@ they anchor per-planet geometry but carry no model freedom.
 
 These constants define the model. Changing any of them changes the theory.
 
-## The fitted timing anchor
+## The perihelion alignment year — and the retired timing anchor
 
 | Constant | Variable | Value |
 |----------|----------|-------|
-| The fitted timing anchor | `holisticyearLength` | **<!--v:H-->335,317<!--/v-->** years |
 | Perihelion alignment year | `perihelionalignmentYear` | <!--v:periAlignYear-->1246.03125<!--/v--> AD |
 
-(Plan 07 R10: the former "obliquity cycle position" input `temperatureGraphMostLikely` = 14.5, which with the alignment year defined the correction bases' phase origin t₀, left the JSON — the combs measure their phase from J2000 and t₀ was rotated out of every fitted coefficient exactly, `tools/fit/reorigin-combs-j2000.mjs`.)
-
-The anchor is the unit of the correction bases and of the frozen era clock; it was fitted on the 1246 AD perihelion–solstice alignment of the IAU mean elements (Meeus); the model's own series crosses two years later, at 1247.7 AD. It is not a period: Earth's precession periods are the dynamical values of [Part 2 — Derived Constants](#part-2--derived-constants) — the axial precession period is <!--v:axialPrecExact-->25,771.58<!--/v--> years, of which the anchor is 13.011, a fit constant (plan 06 S5). The former presentation of the anchor as a "master cycle divided by small integers" is retired.
+**Retired (plan 09, the record).** The frozen era device's unit — the "fitted timing anchor" `holisticyearLength`, 335,317 years, fitted on the 1246 AD perihelion–solstice alignment of the IAU mean elements (Meeus; the model's own series crosses two years later, at 1247.7 AD) — was the unit of the correction combs, the era clock's counters and the lattice grid (`stepYears`), together with the device's rounded mean-tropical-year input `inputmeanlengthsolaryearindays` = 365.2422 d. Plan 09 deleted the combs family by family, then the counters (step 7a), the unit function (7b) and finally the inputs themselves (7c): the time machinery rides the composed lunisolar precession clock T_p(t) (the IAU p_A at J2000, <!--v:axialPrecExact-->25,771.58<!--/v--> years) and the N-body series' elements of date, the J2000 mean tropical year is DERIVED from the IAU sidereal year and p_A, and the K-device scaffold's wheels turn at recorded periods (`kDeviceWheelPeriodYears`, above). It was never a period: the unit stood at 13.011 precession periods, a fit constant (plan 06 S5). (Plan 07 R10 had already removed the phase origin's inputs `temperatureGraphMostLikely` and `systemResetN`; the combs measured their phase from J2000.) The literals gate fails if any of these inputs returns.
 
 ## Earth Parameters
 
@@ -284,8 +281,6 @@ These are computed from foundational constants. The formula is the definition; t
 | Mean Stellar Day | `meanStellarDay` | (meanSiderealDay/T_p) / (meanSolarYearDays+1) · cos ε + meanSiderealDay — T_p the certified J2000 precession period, not the counter H/13 | <!--v:meanStellarDaySeconds-->86,164.0989084<!--/v--> s |
 | Phase origin of the correction bases | `balancedYear` | 2000 (J2000, by construction — plan 07 R10) | the former fitted origin perihelionalignmentYear − 14.5 × H/16 was rotated out of every coefficient exactly; the name stays as the code's phase-origin variable |
 | Perihelion Alignment JD | `perihelionalignmentJD` | startmodelJD - meanSolarYearDays × (startModelYearWithCorrection - perihelionalignmentYear) | ~<!--v:periAlignJD-->2,176,154<!--/v--> |
-| Perihelion Cycle Length | `perihelionCycleLength` | H / 16 | <!--v:periPrecYears-->~20,938<!--/v--> years |
-| Total Days in H | `totalDaysInH` | H × meanSolarYearDays | ~<!--v:totalDaysInH-->122,471,916<!--/v--> days |
 | J2000.0 epoch JD | `j2000JD` | startmodelJD - (startmodelYear - 2000) × meanSolarYearDays | ~2451545.0 |
 | Julian century | `julianCenturyDays` | 36525 (100 × 365.25) | 36,525 days (IAU Julian century) |
 | Earth rotations/year | `meanEarthRotationsPerYear` | meanSolarYearDays + 1 | 366.2422 |
@@ -296,7 +291,6 @@ Input constants used in the formulas above:
 
 | Constant | Variable | Value | Description |
 |----------|----------|-------|-------------|
-| Input Solar Year | `inputMeanSolarYear` | <!--v:inputMeanSolarYear-->365.2422<!--/v--> days | Input mean solar year |
 | Sidereal Year (seconds) | `meanSiderealYearSeconds` | siderealYearJ2000 × 86400 | Derived from IAU sidereal year reference |
 
 ## Eccentricity Derived Values

@@ -439,7 +439,6 @@ function computeUsnoTargetOffset(usnoTargetLodS) {
   return { targetOffset, lodKinematic, h5At2000, sidDays2000 };
 }
 
-const H = C.H;   // provenance stamp only (H_yr in _meta); no period derives from it here
 
 // ─── Stephenson polynomial evaluator (cubic spline over 54 segments) ───
 function loadStephenson() {
@@ -1343,7 +1342,6 @@ function main() {
       description: 'Sub-Milankovitch millennial ΔT correction stack (periods stated in years) fit against Stephenson 2016 residual. Four cascaded stages (Bond solo → +Hallstatt → +Jose5 → +Jose4). Bond uses solo-fit phase (unconstrained amplitude, physical anchor). All other cycles use cap-only shipping (free-fit if below prior amplitude; scaled down to prior only if free > prior). Jose4 identified by cross-archive scans (Steinhilber+EPICA). Eddy (8H/2684 = 999 yr) and Emp862 (8H/3111 = 862 yr) were tested as 5th/6th flags but both rolled back — see rollback notes in CONFIG.cycles. See docs/102 § "Companion 8H lattice harmonics" and scripts/lattice_harmonic_scan.py.',
       generator: 'tools/fit/dt-corrections-fit.js',
       dt_corrections_disabled: process.env.DT_CORRECTIONS_DISABLED === '1',
-      H_yr: H,
     },
     config: CONFIG,
     fit_metrics: {

@@ -18,7 +18,6 @@
 // Run with: node 83-ascending-node-souami-souchay.js
 // ═══════════════════════════════════════════════════════════════════════════
 
-const { H: holisticyearLength } = require("../lib/constants");
 const DEG2RAD = Math.PI / 180;
 const RAD2DEG = 180 / Math.PI;
 

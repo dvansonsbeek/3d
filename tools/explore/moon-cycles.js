@@ -17,12 +17,14 @@ console.log();
 console.log('─── 1. Input Months and Integer Cycle Counts ─────────────────');
 console.log();
 
-const totalDays = C.totalDaysInH;
+// (plan 09 step 7c: the device's day count and its cycle counts left the
+// constants; this frozen record re-forms them on the retired unit 335,317 yr)
+const totalDays = 335317 * C.meanSolarYearDays;
 
 // Integer cycle counts (Option C+ 2026-06: sidereal + precession periods as inputs)
-const siderealCycles  = C.N_sid;
-const apsidalCyclesI  = C.N_apsidalI;
-const nodalCyclesI    = C.N_nodalI;
+const siderealCycles  = totalDays / C.moonSiderealMonth;
+const apsidalCyclesI  = totalDays / C.moonApsidalPrecessionDaysICRF;
+const nodalCyclesI    = totalDays / C.moonNodalPrecessionDaysICRF;
 // Anomalistic and nodal months are KINEMATIC derivations now.
 const anomalisticCycles = C.N_sid - C.N_apsidalE;
 const nodalCycles       = C.N_sid + C.N_nodalE;
@@ -277,7 +279,7 @@ console.log();
 // Check: tropical month relates to sidereal month via axial precession
 // 1/tropical = 1/sidereal + precession_rate
 // Precession rate = 1/(H/13 years * meanSolarYearDays)
-const precRatePerDay = 13 / (C.H * C.meanSolarYearDays);
+const precRatePerDay = 13 / (335317 * C.meanSolarYearDays);   // the retired device identity (13 turns per unit), frozen record
 const computedTropical = 1 / (1/C.moonSiderealMonth + precRatePerDay);
 console.log(`  Tropical from sidereal + precession:`);
 console.log(`    Computed: ${computedTropical.toFixed(10)} days`);

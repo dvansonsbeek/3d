@@ -422,7 +422,7 @@
     "files": {
       "data/core-mantle-resonator-stage1.json": "sha256:4fe55acf164a17c4c3af737766cb0ae13558acf46646809665839765ead54bb4",
       "data/deltaT-4flag-fit.json": "sha256:f01d58a25aa6c9b03c14bc63803066c76d0a0de6295aeb08cd4d2aec490262d1",
-      "data/nbody-secular-series.json": "sha256:6d0d40fcbe6f2f82183a921e08dc224d89283ed8cb4fd3b0d0c2faf2beff886b",
+      "data/nbody-secular-series.json": "sha256:a8a31ac2a143cc0f40b65917c22154f7c817b0192c23d9688be191c420c07281",
       "packages/physics/src/deltat/cycles.cjs": "sha256:da684bd21865005f05ceec845683f1549efc17d5b11aeac2cf362b3f8e52bf99",
       "packages/physics/src/earth/deep-orbital-history.cjs": "sha256:84b18c22798d2c7017bbf7ddffe485a8bb23754335dde8383152af7009e80730",
       "packages/physics/src/earth/sidereal-channel-artifact.cjs": "sha256:a46f99abbf000b8c59ec31d1c048a05fb5ae6515554f5e33f208d8dcd3f5cdf8",
@@ -430,7 +430,7 @@
       "packages/physics/src/eclipse/besselian.cjs": "sha256:f731968aa72105b31ca578f14644a5afcf228bb3a1103359414171de38baaf52",
       "packages/physics/src/eclipse/finders.cjs": "sha256:168755d5e01397b7f63f2ffa49101afe0da0046e5fbd9e7ef6d04be6d7f5d330",
       "packages/physics/src/eclipse/sun-planetary-completion.cjs": "sha256:12a67c64a8eff9461ff6146936db75e2a80a4e392a8927be3f9fd4d79bdf47c4",
-      "packages/physics/src/model.js": "sha256:2357f5997192d60675b3bbbbfbd80bf0c66b2a2591ae3ca463f3099be164a80b",
+      "packages/physics/src/model.js": "sha256:3cc6ba3c3e7b0a53b619894f50492dcdad41ba43b2443a787fd5f1b849151add",
       "packages/physics/src/moon/apparent.cjs": "sha256:5a63a95cf8d26c4d44e7b7acd4308cbd7240aa2bcee70d04c70b273413090335",
       "packages/physics/src/moon/series-extension.cjs": "sha256:d295a78eaedb0246ff142ed726c57ec2353d183c0ccbd3d767157f19623c6461",
       "packages/physics/src/moon/series.cjs": "sha256:435311efbc1ce1ea1bc1d3bb79cedf64a9bef3d1dd6113f07cf682bd60aa6efc",
@@ -439,10 +439,10 @@
       "public/input/fitted-coefficients.json": "sha256:947244c27f3f79ed6d2e1db9f5996fadbc6d3a1ea5dce3096f414d8538325643",
       "public/input/lunar-eclipses-nasa.json": "sha256:2b0f6d1b4dab2d1e8a432a812b027631cfecde9714ce0600f030da5e2a2a792e",
       "public/input/lunar-eclipses-stephenson-2016.json": "sha256:ed8040ef4d688023ca38c1c8eac83b40bc36f75edb0894ba46dd04f2aed32fe6",
-      "public/input/model-parameters.json": "sha256:a1fa1237f5164cc7ced7fde8782abdf2170e38fdbfc1c79d34966daa3dd7296c",
+      "public/input/model-parameters.json": "sha256:35f95dfefbc6bf10ab784b5d90e5bcedceea0f290faf7f792da61092f9627e77",
       "public/input/solar-eclipse-centerlines-nasa.json": "sha256:995d1b38879e6bd1983a1f2895c1269b9f8f4fa917ccb047bfc7b0be3da5985c",
       "public/input/solar-eclipses-stephenson-2016.json": "sha256:5356d24641c27b456fb27ac2c3b6dfab1538dd9fa8e609d7abb5bb9132f18794",
-      "tools/lib/scene-graph.js": "sha256:0198628f7208ab13f6761f20612d4c5195f1e9bcaaa3199126160672ad4e8c7d",
+      "tools/lib/scene-graph.js": "sha256:bf912f9082f4a5ddd352c93e9bc377c4e1b437253e03393b2e099b53ec72c421",
       "tools/verify/eclipse-audit.js": "sha256:6084a62d8e83aeb51b270122679363f5b788b6485bd52da7af729fb7d8305169"
     }
   }

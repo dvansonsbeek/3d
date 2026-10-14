@@ -376,8 +376,7 @@ record is kept below where a retired reading explains a present one.
 <!-- generated:calcmap-j2000-identities -->
 | quantity | value | formula | H-role |
 |---|---|---|---|
-| input tropical year (days) | 365.2422 | `inputmeanlengthsolaryearindays` (model-parameters.json; the recorded foundational input of the retired H/8 snap) | — |
-| **meanSolarYearDays** | 365.242190469 | DERIVED in one home: 1/T = 1/T_sid + p_A/(1,296,000″·365.25 d) — the beat of `yearLengthRef.siderealYear` and the IAU 2006 p_A per Julian year (`computeMeanTropicalYearJ2000Days`); the calendar's year axis (plan 09: was the Meeus & Savoie 1992 input 365.2421897, 66 ms shorter; before it round(input · H/8)/(H/8) = 365.242203646, +1.2 s) | — |
+| **meanSolarYearDays** | 365.242190469 | DERIVED in one home: 1/T = 1/T_sid + p_A/(1,296,000″·365.25 d) — the beat of `yearLengthRef.siderealYear` and the IAU 2006 p_A per Julian year (`computeMeanTropicalYearJ2000Days`); the calendar's year axis (plan 09: was the Meeus & Savoie 1992 input 365.2421897, 66 ms shorter; before it the device's rounded input 365.2422 snapped onto its lattice, 365.242203646, +1.2 s — that input left model-parameters.json at step 7c) | — |
 | sidereal year (days, IAU) | 365.256363004 | `yearLengthRef.siderealYear` (astro-reference) | — |
 | **LOD_mean** (the kinematic day ω₀, s) | 86400 | `yearLengthRef.solarDay` — the SI day (plan 09: was sidereal seconds over the H/13 kinematic sidereal days, 86,399.99968 s) | — |
 | anomalistic year (days) | 365.259634985 | the one-family law of date at 2000 — the series' own apsidal rate 11.609 ″/yr on the sidereal year (plan 09 step 4d; the Simon 1994 mean element 365.259636 is a citation, 87 ms longer; before step 3 meanSolarYearDays · (H/16)/(H/16 − 1), 0.3 s low) | — |

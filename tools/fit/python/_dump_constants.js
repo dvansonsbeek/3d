@@ -11,9 +11,9 @@ const path = require('path');
 const C = require(path.join(__dirname, '..', '..', 'lib', 'constants'));
 
 const output = {
-  // Foundational
-  H: C.H,
-  inputMeanSolarYear: C.inputMeanSolarYear,
+  // Foundational (plan 09 step 7c: the frozen era unit H and the device's
+  // rounded mean-tropical-year input left the model; the research scripts
+  // that scan the retired 8H/n lattice carry 335,317 as a named record)
   perihelionalignmentYear: C.perihelionalignmentYear,
   startmodelJD: C.startmodelJD,
   startmodelYear: C.startmodelYear,
@@ -35,13 +35,11 @@ const output = {
   perihelionRefJD: C.perihelionRefJD,
 
   // Derived values
-  perihelionCycleLength: C.perihelionCycleLength,
   meanSolarYearDays: C.meanSolarYearDays,
   meanSiderealYearDays: C.meanSiderealYearDays,
   balancedYear: C.balancedYear,
   kDeviceWheelPhaseAtJ2000Cycles: C.kDeviceWheelPhaseAtJ2000Cycles,   // plan 07 R10: the K wheels' recorded J2000 phase
   balancedJD: C.balancedJD,
-  totalDaysInH: C.totalDaysInH,
   eccentricityDerivedMean: C.eccentricityDerivedMean,
   eocEccentricity: C.eocEccentricity,
   perihelionPhaseOffset: C.perihelionPhaseOffset,

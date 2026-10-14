@@ -231,7 +231,7 @@ implications:
 ### 5.1 Insolation features are downstream of gravitational coupling
 
 The three quantities ε(t), e(t), ϖ(t) are themselves *products* of the same
-gravitational coupling among solar-system bodies that produces the 8H lattice.
+gravitational coupling among solar-system bodies that produces the secular line set.
 Berger's secular theory derives ε(t) and e(t) as sums of beats among
 Laskar's fundamental frequencies (g₁..g₈, s₁..s₈). Those beats are L1's
 lines — the engine's own |gᵢ − gⱼ|, p + sᵢ and p + gᵢ combinations
@@ -565,7 +565,7 @@ Outputs: [`data/l1-line-audit-results.json`](../data/l1-line-audit-results.json)
 > the record of how the comb-era measurement was read; nothing in §§1–9
 > depends on it.
 
-The comb-era model e(t) was a single line on 8H/24 = H/3 =
+The comb-era model e(t) was a single line on the retired comb's 24th line of its eight-unit interval (its H/3),
 <!--v:l1N24PeriodKyr-->111.8<!--/v--> kyr, and **n = 24 was not one of L1's
 original 32 divisors** — that list ran <!--v:l1N24NeighbourLo-->22<!--/v--> →
 <!--v:l1N24NeighbourHi-->25<!--/v-->. So the §9 gain had two candidate
@@ -582,9 +582,9 @@ separates them on the same canonical residual, ridge and split-half CV as §9.
 | pure lattice pair cos/sin(2π·24·t/8H) — free phase | <!--v:l1N24LineInSamplePreInhg-->+0.0191<!--/v--> | **<!--v:l1N24LineCvPreInhg-->+0.0144<!--/v-->** |
 | e·sin ϖ, e·cos ϖ pair alone | — | <!--v:l1N24PeriPairCvPreInhg-->−0.0062<!--/v--> |
 | ε anomaly alone | — | <!--v:l1N24EpsCvPreInhg-->−0.0016<!--/v--> |
-| model e(t) **on top of** the 8H/24 pair | <!--v:l1N24EccOnTopOfLineInSample-->+0.0000<!--/v--> | — |
+| model e(t) **on top of** the n = 24 pair | <!--v:l1N24EccOnTopOfLineInSample-->+0.0000<!--/v--> | — |
 
-- The free-phase 8H/24 pair explains the standardized model e(t) feature at
+- The free-phase n = 24 pair explains the standardized model e(t) feature at
   R² = <!--v:l1N24R2EccByLine-->0.998<!--/v--> and gives the identical
   cross-validated gain; e(t) adds nothing on top of it. **The gain is the
   n = 24 line.** The ϖ-products and ε carry no out-of-sample gain on their
@@ -596,7 +596,7 @@ separates them on the same canonical residual, ridge and split-half CV as §9.
   <!--v:l1N24ScanCv22-->−0.0052<!--/v--> (n = 22) and
   <!--v:l1N24ScanCv25-->−0.0141<!--/v--> (n = 25). The ~100-kyr band is not
   broadly under-fitted; one line is missing.
-- **Phase.** The data's best-fit phase of the 8H/24 line in the pre-iNHG
+- **Phase.** The data's best-fit phase of the n = 24 line in the pre-iNHG
   residual is <!--v:l1N24PhaseDataPreInhg-->65.9<!--/v-->° against the model's
   fixed H/3 phase of <!--v:l1N24PhaseModelPreInhg-->74.4<!--/v-->° on the same
   convention — Δφ = <!--v:l1N24PhaseDiffDegPreInhg-->−8.5<!--/v-->°,
@@ -635,7 +635,7 @@ audit are not kept; the same instrument on the shipped lines is §9.1.
 
 The free-period scan is §9.2. The pre-iNHG stationary line it finds
 (~112.7 kyr) is a property of the record, not of the comb: the comb-era
-reading put it on 8H/24 = H/3 (0.8 % away) and bounded "Earth's eccentricity
+reading put it on the comb's n = 24 line, its H/3 (0.8 % away), and bounded "Earth's eccentricity
 line" to 112.7 ± 0.6 kyr; on the shipped model it is an open residual line of
 the pre-iNHG regime, 2.5 % from the nearest derived beat.
 

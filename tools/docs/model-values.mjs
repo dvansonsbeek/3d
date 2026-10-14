@@ -265,16 +265,17 @@ const fmtSignedPct = (n, decimals = 2) => {
  * must produce the same string for the same key.
  */
 export const VALUES = {
-  H: {
-    get: () => C.H,
-    render: (v) => thousands(v),
-    note: 'Earth Fundamental Cycle in years',
-  },
-  HPlain: {
-    get: () => C.H,
-    render: (v) => String(v),
-    note: 'H without thousands separators (code contexts)',
-  },
+  // (plan 09 step 7c: the frozen era unit's keys — `H`, `HPlain`,
+  // `holisticYear`, `grandHolisticOctave` (8H), `periPrecYearsExact` (H/16),
+  // `hDiv2/3/5/8/16`, `threeH/eightH/thirteenH`, the lattice rates
+  // `inclRateICRF/inclRateEcl/obliqRateEcl/axialRateICRF/periRate`,
+  // `periJuneSolsticeNextAD/PrevBC`, `eccPrevMinJD`, the lunar "cycles per H"
+  // family, `holisticYearFactors`, `mercuryOscillationPeriod` (H/45),
+  // `totalDaysInH`, `totalDaysInHSiderealFrame`, `inputSolarYearDays` and
+  // `inputMeanSolarYear` — are deleted with the unit. The published periods
+  // are the dynamical keys below (axialPrecYears, periPrecYears, inclPrecYears,
+  // eclPrecYears, the obliquity beat); the K-device scaffold's recorded wheel
+  // periods are a scene pose, not published.)
   deltaTStart: {
     get: () => dtFit.optimum.deltaTStart,
     render: (v) => Number(v).toFixed(2),
@@ -408,16 +409,10 @@ export const VALUES = {
     unit: '°',
     note: 'Sun orbital starting angle',
   },
-  // ── The H-divisor family ────────────────────────────────────────────────
-  // Each named cycle is H/divisor. The website's convention, reproduced
-  // exactly: a `~` prefix on the rounded ones, and axial precession alone
-  // carried to 2dp (it is the one compared against the IAU figure).
-  holisticYear: { get: () => C.H, render: (v) => thousands(v), note: 'alias of H' },
-  grandHolisticOctave: {
-    get: () => 8 * C.H,
-    render: (v) => thousands(v),
-    note: 'Solar System Resonance Cycle, 8H',
-  },
+  // ── Earth's precession periods ─────────────────────────────────────────
+  // The website's convention, reproduced exactly: a `~` prefix on the rounded
+  // ones, and axial precession alone carried to 2dp (it is the one compared
+  // against the IAU figure).
   // S6 (plan 06): Earth's cycle periods are the model's OWN J2000 dynamical values, never fractions
   // of the fitted anchor — H/3, H/5, H/8, H/16 read +0.18 %, −2.5 %, +1.7 %, +0.10 % off them (the
   // same class as the H/13 case of S5). Key names kept (P4); the *Formula keys (consumed by the
@@ -483,41 +478,10 @@ export const VALUES = {
     unit: 'yr',
     note: 'axial precession at J2000, whole years (axialPrecYears carries 2dp) — the of-date reading, not H/13 (S5)',
   },
-  periPrecYearsExact: {
-    get: () => C.H / 16,
-    render: (v) => thousands(v, 2),
-    unit: 'yr',
-  },
-  // Bare divisors and multiples of H, rounded to whole years.
   // (plan 07 sweep: `hDiv21`, `hDiv34`, `twoH`, `grandHolisticOctaveFormula`
-  // and the per-epoch `eightHAt*` rows are deleted — H-multiple keys of the
-  // retired lattice framing that nothing quoted.)
-  ...Object.fromEntries([2, 3, 5, 8, 16].map((d) => [`hDiv${d}`, {
-    get: () => C.H / d,
-    render: (v) => thousands(Math.round(v)),
-    unit: 'yr',
-    note: `H/${d}`,
-  }])),
-  ...Object.fromEntries([['threeH', 3], ['eightH', 8], ['thirteenH', 13]]
-    .map(([name, m]) => [name, {
-      get: () => m * C.H,
-      render: (v) => thousands(v),
-      unit: 'yr',
-      note: `${m}H`,
-    }])),
-
-  // ── Precession/obliquity rates ──────────────────────────────────────────
-  // The pure-lattice rates: a full circle of arcseconds per cycle period,
-  // 1,296,000 × divisor / H, at 3dp — the website's exact form.
-  ...Object.fromEntries([
-    ['inclRateICRF', 3], ['inclRateEcl', 5], ['obliqRateEcl', 8],
-    ['axialRateICRF', 13], ['periRate', 16],
-  ].map(([name, d]) => [name, {
-    get: () => (1296000 * d) / C.H,
-    render: (v) => Number(v).toFixed(3),
-    unit: '″/yr',
-    note: `lattice rate, 1,296,000·${d}/H`,
-  }])),
+  // and the per-epoch `eightHAt*` rows were deleted; plan 09 step 7c deleted
+  // the rest of the H-divisor/multiple family and the pure-lattice rates
+  // 1,296,000·d/H with the unit.)
   obliquityRateJ2000: {
     get: () => ((oneEps(2001) - oneEps(1999)) / 2) * 3600,
     render: (v) => Number(v).toFixed(4),
@@ -619,18 +583,9 @@ export const VALUES = {
     note: 'the Law-4 A input — derived: the 1246 triangle closure (docs/10 §Law 4); NOT the modulation half-range of e(t), which is base′/2',
   },
   // ── Derived companions (the A-closure, the one-law rate test, the day
-  //    bases, the perihelion-at-June-solstice epochs). All derived — no
-  //    stored literals (feedback: use value tags).
-  periJuneSolsticeNextAD: {
-    get: () => Math.round(C.perihelionalignmentYear + C.H / 32),
-    render: (v) => thousands(v),
-    note: 'perihelion at the June solstice: the 1246 alignment + half an H/16 beat (a perihelion-direction event, distinct from the eccentricity minimum)',
-  },
-  periJuneSolsticePrevBC: {
-    get: () => Math.round(Math.abs(C.perihelionalignmentYear - C.H / 32)),
-    render: (v) => thousands(v) + ' BC',
-    note: 'perihelion at the June solstice, previous: the 1246 alignment − half an H/16 beat',
-  },
+  //    bases). All derived — no stored literals (feedback: use value tags).
+  // (plan 09 step 7c: `periJuneSolsticeNextAD/PrevBC` — the 1246 alignment ±
+  //  half the device's H/16 wheel period — left with the unit; nothing quoted them.)
   // (plan 09 step 6: the A-closure keys — aClosurePhaseDeg, aDerivedFrom1246,
   //  aClosureYearAMinus5Pct / Plus5Pct, the 1246 triangle closure of the
   //  retired K eccentricity law on the H/16 beat — are deleted with the law.)
@@ -1111,7 +1066,11 @@ export const VALUES = {
     const cycleScan = () => {
       if (!cycle) {
         let aMn = Infinity, aMx = -Infinity, pMn = Infinity, pMx = -Infinity, iMn = Infinity, iMx = -Infinity;
-        for (let y = 2000; y <= 2000 + C.H; y++) {
+        // one apsidal circulation of Earth's orbit from J2000 — the span of the
+        // of-date factors' dominant modulation (plan 09 step 7c; was the
+        // retired unit's 335,317 yr)
+        const span = Math.round(oneYL().inclinationPrecessionYearsAtYear(2000));
+        for (let y = 2000; y <= 2000 + span; y++) {
           const r = precAt(y);
           if (r.a < aMn) aMn = r.a;
           if (r.a > aMx) aMx = r.a;
@@ -1130,7 +1089,7 @@ export const VALUES = {
       axialPrecMinYear:   { get: () => axialForecast().mnYr, render: (v) => thousands(v) },
       axialPrecMaxPeriod: { get: () => axialForecast().mx, render: wholeYears, unit: 'yr' },
       axialPrecMaxYear:   { get: () => axialForecast().mxYr, render: (v) => thousands(v) },
-      axialPrecCycleMin:  { get: () => cycleScan().aMn, render: wholeYears, unit: 'yr', note: 'axial precession period extrema over one full H' },
+      axialPrecCycleMin:  { get: () => cycleScan().aMn, render: wholeYears, unit: 'yr', note: 'axial precession period extrema over one apsidal circulation from J2000' },
       axialPrecCycleMax:  { get: () => cycleScan().aMx, render: wholeYears, unit: 'yr' },
       periPrecCycleMin:   { get: () => cycleScan().pMn, render: wholeYears, unit: 'yr' },
       periPrecCycleMax:   { get: () => cycleScan().pMx, render: wholeYears, unit: 'yr' },
@@ -1315,7 +1274,6 @@ export const VALUES = {
     return {
       meanSolarYearDays:     { get: () => C.meanSolarYearDays, render: (v) => thousands(v, 7), unit: 'd' },
       meanSolarYearDaysFull: { get: () => C.meanSolarYearDays, render: (v) => thousands(v, 12), unit: 'd', note: 'full-precision form for derivation contexts' },
-      inputSolarYearDays:    { get: () => model.foundational.inputmeanlengthsolaryearindays, render: (v) => String(v), unit: 'd', note: 'the mean-tropical-year INPUT parameter' },
       // Plan 06 Phase 3 S2: the J2000 year lengths of date are the one-family route (B) — SI seconds, SI days.
       solarYearJ2000Days:    { get: () => oneYL().tropicalYearSecondsAtYear(2000) / 86400, render: (v) => thousands(v, 7), unit: 'd', note: 'the one-family tropical year of date at J2000, SI days (tweakpane predictions.solarYearDays)' },
       solarYearJ2000Seconds: { get: () => oneYL().tropicalYearSecondsAtYear(2000), render: (v) => thousands(v, 2), unit: 's', note: 'tweakpane predictions.solarYearSeconds — the one-family tropical year of date at J2000' },
@@ -1450,8 +1408,7 @@ export const VALUES = {
   // no engine derivation; their tracked homes are the two new data/ summary
   // JSONs (provenance in each _description — the website typed all of them
   // as literals). The framework-vs-NASA gap keys and percentages are DERIVED
-  // from the artifact so a re-run flows through. The 8H cycle periods are
-  // structural lattice integers over C.H — zero-fit.
+  // from the artifact so a re-run flows through.
   ...(() => {
     const ecl = rd('data/eclipse-audit-summary.json');
     const clim = rd('data/lod-climate-correlation-summary.json');
@@ -1663,10 +1620,8 @@ export const VALUES = {
   // sat one day below the simulator's constant 2,176,153 — the raw value
   // lands on a 0.5 rounding boundary and the sim's FP evaluation is the
   // shipped convention; fixed website-side, both dependent keys moved). The
-  // ecc-extremum years are H/16 phase arithmetic off the perihelion
-  // alignment year. Moon months from the engine's H-lattice month chain.
+  // Moon months from the engine's month chain on the IAU inputs.
   ...(() => {
-    const HDIV16 = () => C.H / 16;
     return {
       meanSolarDay: { get: () => C.meanLengthOfDay, render: (v) => '~' + thousands(v, 0), unit: 's', note: 'prose approximation' },
       siderealDay:  { get: () => (C.meanSolarYearDays / (C.meanSolarYearDays + 1)) * C.meanLengthOfDay, render: (v) => '~' + thousands(v, 2), unit: 's' },
@@ -1694,9 +1649,8 @@ export const VALUES = {
       periAlignYearSeries: { get: () => { const pom = (y) => ((physModel().earth.perihelionLongitudeDeg(y) % 360) + 360) % 360; let lo = 1100, hi = 1400; for (let i = 0; i < 60; i++) { const mid = (lo + hi) / 2; if (pom(mid) > 90) hi = mid; else lo = mid; } return (lo + hi) / 2; }, render: (v) => Number(v).toFixed(1), unit: 'AD', note: 'the year the model\'s own (series) longitude of perihelion of date = 90° — the perihelion at the December solstice by the model\'s dynamics; the device anchors at periAlignYear (Meeus)' },
       periAlignYearRound: { get: () => C.perihelionalignmentYear, render: (v) => Number(v).toFixed(2) },
       periAlignJD:      { get: () => C.perihelionalignmentJD, render: (v) => thousands(v), unit: 'JD' },
-      // (eccNextMax / eccNextMin / eccPrevMinBC — the single-line eccentricity
-      // law's extreme epochs — are retired: the published e is the N-body series)
-      eccPrevMinJD: { get: () => C.perihelionalignmentJD - (HDIV16() * C.meanSolarYearDays / 2), render: (v) => thousands(v, 1), unit: 'JD' },
+      // (eccNextMax / eccNextMin / eccPrevMinBC / eccPrevMinJD — the single-line
+      // eccentricity law's extreme epochs — are retired: the published e is the N-body series)
       preprintDoi: { get: () => versionInfo.preprintDoi, render: (v) => String(v), note: 'canonical preprint DOI — single source: model-version.json' },
       moonDiameter:       { get: () => astro.bodyDiametersKm.moon, render: (v) => thousands(v, 1), unit: 'km' },
       moonOrbitalRadius:  { get: () => C.moonDistance, render: (v) => thousands(v, 2), unit: 'km' },
@@ -1713,13 +1667,12 @@ export const VALUES = {
   // ── Sun-wobble radii + Moon precession lattice (11-2u) ──────────────────
   // Radii: eccentricity base/amplitude × the model AU. Moon precession:
   // the H-lattice counts N = round(8·H·mSY / precessionDaysInput)/8, with
-  // periods H/N and the Lunar Precession Invariant H²/N (T × H = const) —
-  // all from engine constants; the ICRF/Earth day-values are the engine's
-  // month-chain outputs.
+  // periods — all from engine constants; the ICRF/Earth day-values are the
+  // engine's month-chain outputs. (plan 09 step 7c: the device's "cycles per
+  // H" counts, the periods H/N read back from them and the "Lunar Precession
+  // Invariant" H²/N left with the unit; the of-date periods are the inputs,
+  // apsidalPrecICRF / nodalPrecICRF.)
   ...(() => {
-    const TOTAL_DAYS = () => C.H * C.meanSolarYearDays;
-    const nApsidal = () => Math.round(8 * TOTAL_DAYS() / C.moonApsidalPrecessionDaysInputICRF) / 8;
-    const nNodal = () => Math.round(8 * TOTAL_DAYS() / C.moonNodalPrecessionDaysInputICRF) / 8;
     return {
       // (plan 07 sweep: `wobbleCenterKm` and `perihelionPointKm` — the
       // wobble-centre marker distances on the retired Law-4 amplitude and the
@@ -1734,12 +1687,6 @@ export const VALUES = {
       nodalPrecICRF:        { get: () => C.moonNodalPrecessionDaysICRF / C.meanSolarYearDays, render: (v) => '~' + thousands(v, 1), unit: 'yr' },
       nodalPrecICRFexact:   { get: () => C.moonNodalPrecessionDaysICRF / C.meanSolarYearDays, render: (v) => thousands(v, 5), unit: 'yr' },
       nodalPrecEarth:       { get: () => C.moonNodalPrecessionDaysEarth / C.meanSolarYearDays, render: (v) => thousands(v, 5), unit: 'yr' },
-      moonApsidalCyclesPerH: { get: nApsidal, render: (v) => thousands(v, 1).replace(/\.0$/, ''), note: 'N = round(8·H·mSY/T_apsidal)/8 — eighth-integer lattice count' },
-      moonNodalCyclesPerH:   { get: nNodal, render: (v) => thousands(v, 3).replace(/0+$/, '').replace(/\.$/, '') },
-      moonApsidalPeriodYr:   { get: () => C.H / nApsidal(), render: (v) => thousands(v, 3), unit: 'yr' },
-      moonNodalPeriodYr:     { get: () => C.H / nNodal(), render: (v) => thousands(v, 3), unit: 'yr' },
-      lunarPrecInvariantApsidalYrSq: { get: () => C.H * C.H / nApsidal(), render: (v) => thousands(v, 0), unit: 'yr²', note: 'T_apsidal × H — the Lunar Precession Invariant' },
-      lunarPrecInvariantNodalYrSq:   { get: () => C.H * C.H / nNodal(), render: (v) => thousands(v, 0), unit: 'yr²' },
       moonLevelingCycle: { get: () => C.moonLunarLevelingCycleDays / C.meanSolarYearDays, render: (v) => '~' + thousands(v, 2), unit: 'yr' },
     };
   })(),
@@ -1783,7 +1730,6 @@ export const VALUES = {
     return {
       moonOrbitalEccentricity:     { get: () => C.moonOrbitalEccentricity, render: (v) => Number(v).toFixed(4) },
       moonOrbitalEccentricityFull: { get: () => C.moonOrbitalEccentricity, render: (v) => String(v) },
-      inputMeanSolarYear:    { get: () => model.foundational.inputmeanlengthsolaryearindays, render: (v) => Number(v).toFixed(4), unit: 'd' },
       siderealYearInputDays: { get: () => C.meanSiderealYearSeconds / 86400, render: (v) => Number(v).toFixed(9), unit: 'd', note: 'IAU J2000 sidereal year input' },
       massRatioEarthMoon:    { get: () => C.MASS_RATIO_EARTH_MOON, render: (v) => String(v), note: 'DE440 SPICE kernel' },
       llrTidalGamma:         { get: () => astro.knownValues.llrTidalGammaArcsecPerCy2, render: (v) => uMinus(Number(v).toFixed(2)), unit: '″/cy²', note: 'LLR tidal acceleration (α₁ chain anchor)' },
@@ -2570,10 +2516,8 @@ export const VALUES = {
   // mass fraction for the ψ law), its Ω is the model's VERIFIED node
   // (101.06, ascendingNodeInvPlane — deliberately ≠ the raw S&S 107.06;
   // docs/32 table). Min/max are mean ∓ amplitude at 2 dp; the *Round keys
-  // are the 3-dp J2000 table forms. holisticYearFactors is DERIVED by
-  // actually factorizing C.H — the 23 × 61 × 239 structure is load-bearing
-  // (the gcd rules of the ΔT stack ride on these primes), so the key fails
-  // loudly if H ever changes.
+  // are the 3-dp J2000 table forms. (plan 09 step 7c: holisticYearFactors —
+  // the retired unit's prime factorization — left with the unit.)
   ...(() => {
     const pl = () => model.additionalBodies.pluto;
     const inclOf = (planet) => ({ mean: chainInclStats(planet).mean, amp: chainInclStats(planet).half });   // plan 07: the chain's series range
@@ -2589,17 +2533,7 @@ export const VALUES = {
       // calibration compares, and the J2000 inclination it is measured against.
       plutoOmegaJ2000: { get: () => pl().ascendingNodeInvPlane, render: (v) => Number(v).toFixed(2), unit: '°', note: 'the model\'s VERIFIED node — deliberately ≠ raw S&S 107.06 (docs/32)' },
       plutoInclJ2000: { get: () => astro.additionalBodiesReference.pluto.invPlaneInclinationJ2000, render: (v) => String(v), unit: '°' },
-      holisticYearFactors: {
-        get: () => {
-          const factors = [];
-          let n = C.H;
-          for (let f = 2; f * f <= n; f++) while (n % f === 0) { factors.push(f); n /= f; }
-          if (n > 1) factors.push(n);
-          return factors.join(' × ');
-        },
-        render: (v) => String(v),
-        note: 'derived prime factorization of H — the ΔT-stack gcd rules ride on these primes',
-      },
+      // (plan 09 step 7c: `holisticYearFactors` — the unit's prime factorization — left with the unit.)
     };
     // (plan 07 sweep: Pluto's rows — a device mean ± amplitude for a body the
     // scene no longer carries — are out of both loops; nothing quoted them.)
@@ -2736,7 +2670,6 @@ export const VALUES = {
     };
     const fmtSignedInt = (v) => `${v >= 0 ? '+' : '-'}${thousands(Math.abs(Math.round(v)))}`;
     const out = {
-      mercuryOscillationPeriod: { get: () => Math.round(C.H / 45), render: (v) => thousands(v), unit: 'yr', note: 'H/45 — beat of H/3 and H/5' },
       equinoxDriftRate: { get: () => astro.knownValues.generalPrecessionArcsecCy, render: (v) => thousands(v, 1), unit: '″/cy', note: 'IAU general precession — citation' },
       mercuryFluctuationMin: { get: () => scan().mercury.mn, render: fmtSignedInt, unit: '″/cy' },
       mercuryFluctuationMax: { get: () => scan().mercury.mx, render: fmtSignedInt, unit: '″/cy' },
@@ -3123,7 +3056,6 @@ export const VALUES = {
       return p.moonDistanceNowM * (1 + p.alpha1PerMa * tMa + p.alpha3PerMa3 * tMa ** 3 + p.alpha4PerMa4 * tMa ** 4) / 1000;
     };
     const genesisMa = () => astro.knownValues.moonGenesisAgeGa * 1000;
-    const totalDays0 = () => C.H * C.meanSolarYearDays;
     // (Plan 09 step 7a: the `driftAt*Ppm` keys — the day-count near-invariant
     // U × days/yr on the ERA-CLOCK COUNTER U = U₀·LOD/LOD₀, measured −74 ppm at
     // the Devonian and −999 ppm at the Hadean before the counter's deletion —
@@ -3150,12 +3082,9 @@ export const VALUES = {
       solarMassLossFracPerYr: { get: () => P().solarMassLossFracPerYear, render: (v) => fmtSci(v, 1), unit: '/yr' },
       solarSystemShrinkDevonianPpm: { get: () => P().solarMassLossFracPerYear * 380e6 * 1e6, render: (v) => String(Math.round(v)), unit: 'ppm' },
       solarSystemShrinkHadeanPpm: { get: () => P().solarMassLossFracPerYear * astro.knownValues.patternEarthAgeGyr * 1e9 * 1e6, render: (v) => String(Math.round(v)), unit: 'ppm' },
-      totalDaysInH: { get: totalDays0, render: (v) => thousands(Math.round(v)), note: 'H × mSY — the day-count near-invariant; the ONE canonical day count (÷H = solar-year days, ÷(H−13) = sidereal-year days)' },
-      totalDaysInHSiderealFrame: {
-        get: () => totalDays0() * C.H / (C.H - 13),
-        render: (v) => thousands(Math.round(v)),
-        note: 'TOTAL_DAYS_IN_H × H₀/(H₀−13) — the constant of the EXACT invariant H·(sidYearSec/LOD)·(AU₀/AU)²; derived from the canonical 122,471,920 via the dual-divisor bridge, not an independent constant',
-      },
+      // (plan 09 step 7c: `totalDaysInH` (H × mSY, the device's day count) and
+      // `totalDaysInHSiderealFrame` left with the unit; the day-count invariant
+      // is a separate investigation topic, doc 99 keeps the record.)
       // (Plan 09 step 7b: `dayCountInvariantAuCorrectedDriftPpm` (read 995,048.65 ppm —
       // the "exact invariant" H·(sidYearSec/LOD)·(AU₀/AU)² holds on the ERA COUNTER
       // H_era ∝ LOD by construction, a tautology of spin scaling ∘ Kepler, and fails

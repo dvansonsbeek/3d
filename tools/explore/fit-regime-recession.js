@@ -206,7 +206,7 @@ console.log('');
 const yearS = (t) => dt.meanSiderealYearSecondsAtAge(t);
 const daysPerYr0 = yearS(0) / dt.meanLodSecondsAtAge(0);
 const dpy = (t) => yearS(t) / (m.lodHr(t) * 3600);
-const H = (t) => C.H * daysPerYr0 / dpy(t);
+const H = (t) => 335317 * daysPerYr0 / dpy(t);   // the retired era counter H₀·LOD/LOD₀ (plan 09 step 7c): a frozen record of this study's rows
 console.log('  gated-era check (must be bit-identical to shipped):');
 console.log(`    Wells 380 Ma: ${dpy(380).toFixed(2)} d/yr (shipped 399.97) | Wu 650 Ma LOD: ${m.lodHr(650).toFixed(2)} h (shipped ${(dt.meanLodSecondsAtAge(650) / 3600).toFixed(2)})`);
 console.log('  genesis state:');
@@ -313,5 +313,5 @@ for (const [v, chi] of profile('genesisMa', [4420, 4450, 4475, 4498, 4520])) {
   console.log('  anchor residuals (σ): ' + LOD_ANCHORS.map(([id, t, v, s]) => `${id} ${((fm.lodHr(t) - v) / s).toFixed(1)}`).join(' · '));
   console.log('  distance (σ): ' + A_ANCHORS.map(([id, t, v, s]) => `${id} ${((fm.aKm(t) - v) / s).toFixed(1)}`).join(' · '));
   const gdpy = yearS(380) / (fm.lodHr(380) * 3600);
-  console.log(`  gated: Wells ${gdpy.toFixed(2)} | genesis LOD ${fm.lodHr(4493).toFixed(2)} h · H ${Math.round(C.H * daysPerYr0 / (yearS(4493) / (fm.lodHr(4493) * 3600))).toLocaleString('en-US')} yr · L_EM/L0 ${(fm.LFn(4493) / L0).toFixed(3)}`);
+  console.log(`  gated: Wells ${gdpy.toFixed(2)} | genesis LOD ${fm.lodHr(4493).toFixed(2)} h · H ${Math.round(335317 * daysPerYr0 / (yearS(4493) / (fm.lodHr(4493) * 3600))).toLocaleString('en-US')} yr · L_EM/L0 ${(fm.LFn(4493) / L0).toFixed(3)}`);
 }
