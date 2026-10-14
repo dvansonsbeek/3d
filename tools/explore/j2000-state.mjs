@@ -14,7 +14,7 @@
 //
 // Helpers compute osculating elements from the vectors so no script ever
 // hardcodes a rounded semi-major-axis or eccentricity table again (the
-// rounded-a table in diagonal-ll-rates.mjs put Jupiter's and Saturn's bare
+// rounded-a table in the deleted diagonal-ll-rates.mjs (plan 09 step 7e) put Jupiter's and Saturn's bare
 // rates off by ~1 % and manufactured a false integer pattern — measured).
 
 import { createRequire } from 'node:module';

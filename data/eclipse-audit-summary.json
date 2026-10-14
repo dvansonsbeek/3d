@@ -422,7 +422,7 @@
     "files": {
       "data/core-mantle-resonator-stage1.json": "sha256:4fe55acf164a17c4c3af737766cb0ae13558acf46646809665839765ead54bb4",
       "data/deltaT-4flag-fit.json": "sha256:f01d58a25aa6c9b03c14bc63803066c76d0a0de6295aeb08cd4d2aec490262d1",
-      "data/nbody-secular-series.json": "sha256:11264c65900cefb47c613181847bbc5698a4660b66007951bd36fe257c793744",
+      "data/nbody-secular-series.json": "sha256:5f626fd0c880fbbf2cee43a214d8e63fff1ef595afacbc0487e0179e10a75132",
       "packages/physics/src/deltat/cycles.cjs": "sha256:da684bd21865005f05ceec845683f1549efc17d5b11aeac2cf362b3f8e52bf99",
       "packages/physics/src/earth/deep-orbital-history.cjs": "sha256:84b18c22798d2c7017bbf7ddffe485a8bb23754335dde8383152af7009e80730",
       "packages/physics/src/earth/sidereal-channel-artifact.cjs": "sha256:a46f99abbf000b8c59ec31d1c048a05fb5ae6515554f5e33f208d8dcd3f5cdf8",
@@ -434,7 +434,7 @@
       "packages/physics/src/moon/apparent.cjs": "sha256:5a63a95cf8d26c4d44e7b7acd4308cbd7240aa2bcee70d04c70b273413090335",
       "packages/physics/src/moon/series-extension.cjs": "sha256:d295a78eaedb0246ff142ed726c57ec2353d183c0ccbd3d767157f19623c6461",
       "packages/physics/src/moon/series.cjs": "sha256:435311efbc1ce1ea1bc1d3bb79cedf64a9bef3d1dd6113f07cf682bd60aa6efc",
-      "public/input/astro-reference.json": "sha256:a967a72ecdac487f628c0cb6ba07ae7cc771d07fa3eeaacc7b9949273e933fd7",
+      "public/input/astro-reference.json": "sha256:3d4fa242bbcb38060de1ae37ddf8909a24c2b46b602b09c6875a85c5a1237058",
       "public/input/climate-formula-coefficients.json": "sha256:b19d9fc5e20721d484f4c67e88102361e906a0c9eeb6018a71e4f09b5f37a7c9",
       "public/input/fitted-coefficients.json": "sha256:947244c27f3f79ed6d2e1db9f5996fadbc6d3a1ea5dce3096f414d8538325643",
       "public/input/lunar-eclipses-nasa.json": "sha256:2b0f6d1b4dab2d1e8a432a812b027631cfecde9714ce0600f030da5e2a2a792e",

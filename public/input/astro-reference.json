@@ -599,7 +599,7 @@
     "deltaTEspenakJ2000Seconds": 63.86
   },
   "knownValues": {
-    "_description": "Validation reference values for comparison (used by moon-cycles.js and the model-values registry). Moon month inputs are in moonReference — not duplicated here. The meeus*/sunModel* entries are the docs/66 validation-campaign statistics (Meeus-vs-JPL and Sun-model residuals) — recorded snapshots, same maintenance class as the campaign summary JSONs in data/. meeusA1RateDegPerCy duplicates the A1 rate embedded in the script.js Meeus series (:26562), recorded here so the registry derives rather than types it. moonKeplerEffectiveDistanceKm is the DLT-1 section-3 three-body semi-major axis (vs two-body Kepler 384,748 km — docs/66 'which a'). llrTidalGammaArcsecPerCy2 is the LLR tidal acceleration (the alpha-1 chain anchor).",
+    "_description": "Validation reference values for comparison (read by the model-values registry; the comb-era moon-cycles.js reader was deleted at plan 09 step 7e). Moon month inputs are in moonReference — not duplicated here. The meeus*/sunModel* entries are the docs/66 validation-campaign statistics (Meeus-vs-JPL and Sun-model residuals) — recorded snapshots, same maintenance class as the campaign summary JSONs in data/. meeusA1RateDegPerCy duplicates the A1 rate embedded in the script.js Meeus series (:26562), recorded here so the registry derives rather than types it. moonKeplerEffectiveDistanceKm is the DLT-1 section-3 three-body semi-major axis (vs two-body Kepler 384,748 km — docs/66 'which a'). llrTidalGammaArcsecPerCy2 is the LLR tidal acceleration (the alpha-1 chain anchor).",
     "iersObservedDLodDtMsPerCy": 1.75,
     "llrTidalGammaArcsecPerCy2": -25.858,
     "moonKeplerEffectiveDistanceKm": 386321,
