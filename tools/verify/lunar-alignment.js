@@ -65,7 +65,9 @@ const INPUT_FILES = [
   'packages/physics/src/moon/apparent.cjs',
   'packages/api/src/app.js',
   'public/input/model-parameters.json',
-  'public/input/fitted-coefficients.json',
+  // plan 11 step 1: the banked fitted deep-time record (τ_GIA, the recession
+  // regime) the ΔT stack's GIA channel rides; fitted-coefficients.json is deleted
+  'data/deep-time-fitted.json',
   // THE REST OF WHAT THIS CAMPAIGN ACTUALLY RUNS ON (measured, 2026-09-30):
   // the deep-eccentricity slope anchor (e338d1bd) moved the per-century
   // medians by 100–500 s, the identified events 228 → 244 and the full-stack

@@ -29,9 +29,17 @@
  *          reconstruction (the −0.2% result).
  *   Fit:   random multi-start + cyclic per-parameter line refinement.
  *
- * Output: the best parameter vector (the SHIPPED-set candidate for
- * model-parameters.json → deepTime.recessionRegimes), the per-anchor
+ * Output: the best parameter vector (a CANDIDATE in the schema of the banked
+ * record data/deep-time-fitted.json → recessionRegime), the per-anchor
  * residual table, and the genesis-state consequences. Nothing is written.
+ *
+ * REPRODUCTION (plan 11 step 1, measured 2026-10-17): on the post-plan-09
+ * engine this fitter no longer reproduces the shipped 2026-08-14 solution —
+ * it prefers knots 337,812 / 321,752 / 320,277 / 296,313 / 288,738 km and a
+ * pump of 0.144 over 1000–1885 Ma (factor × window 0.127 Gyr against the
+ * shipped 0.139). The shipped block is the frozen fit; the paleo-anchors gate
+ * passes on it; adopting a new solution is a CAMPAIGN (holisticuniverse
+ * TODO B), never a side effect of running this script.
  *
  * Run: node tools/explore/fit-regime-recession.js
  */
@@ -294,14 +302,14 @@ for (const [v, chi] of profile('genesisMa', [4420, 4450, 4475, 4498, 4520])) {
   }
   const fm = buildModel(fbest.p);
   console.log('');
-  console.log('FINAL SHIPPED-SET CANDIDATE (genesis pinned 4498 Ma):');
+  console.log('FINAL CANDIDATE (genesis pinned 4498 Ma) — the schema of data/deep-time-fitted.json recessionRegime; compare, never paste:');
   console.log(JSON.stringify({
     _description: 'Regime-aware lunar recession (Driver 1½): shipped quartic ≤ jointMa; monotone cubic Hermite (Fritsch-Carlson) through the knots to the rigid Roche limit at genesisMa. Solar channels explicit only beyond jointMa: ocean leak beta0*(a/a0)^6 * tau_moon; thermal-tide pump factor*(tau_moon+leak) inside the window. Fit: tools/explore/fit-regime-recession.js, 11 anchors, chi2 ' + fbest.chi.toFixed(2),
     jointMa: T_JOINT,
     knotAgesMa: KNOT_T,
     knotDistancesKm: fbest.p.knots.map((v) => Math.round(v * 1000) / 1000),
     genesisMa: 4498,
-    rocheLimitRE: 1.48,
+    rocheLimitKm: Math.round(A_ROCHE_KM * 1000) / 1000,
     solarOceanLeakBeta0: BETA0,
     thermalPumpStartMa: Math.round(Math.max(fbest.p.pumpStart, T_JOINT)),
     thermalPumpEndMa: Math.round(fbest.p.pumpEnd),

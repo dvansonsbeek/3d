@@ -58,14 +58,17 @@ sys.path.insert(0, str(ROOT / 'scripts'))
 sys.path.insert(0, str(ROOT / 'tools' / 'fit' / 'python'))
 import milankovitch_climate_formula as mcf  # noqa: E402
 from artifact_inputs import build_inputs_block  # noqa: E402
+from load_constants import C as _C  # noqa: E402  (the Node bridge — the GIA channel's τ and J2000 rate)
 
 HIST_REL = 'data/t7-model-orbital-histories.json'
 LA2004_REL = 'data/la2004-earth-51myr-back.asc'
 OUT_REL = 'data/t7-fixed-phase-l1.json'
 SELF_REL = 'scripts/t7_fixed_phase_l1.py'
 CFC_REL = 'public/input/climate-formula-coefficients.json'
+# plan 11 step 1: τ_GIA is the banked record data/deep-time-fitted.json and the J2000 rate derives
+# from astro-reference giaCoxChaoPeltier; both reach this script through the constants bridge
 INPUT_FILES = [HIST_REL, LA2004_REL, 'data/lr04-stack.txt', 'data/l1-physical-lines.json', CFC_REL,
-               'public/input/model-parameters.json', 'public/input/astro-reference.json',
+               'data/deep-time-fitted.json', 'public/input/astro-reference.json',
                'scripts/milankovitch_climate_formula.py', 'tools/explore/t7-export-orbital-histories.mjs', SELF_REL]
 BANDS_KYR = {'precession_18_24': (18.0, 24.0), 'obliquity_38_44': (38.0, 44.0), 'hundred_kyr_85_135': (85.0, 135.0), 'long_ecc_350_450': (350.0, 450.0)}
 BLOCK_CV_N = 4
@@ -363,9 +366,8 @@ def robustness(rg):
 def alpha_consequence(results):
     """α(t) on the two forcings (post-MPT), τ from the registry, k from the J2000 Cox–Chao rate — and the historical ΔT it implies."""
     cfc = json.loads((ROOT / CFC_REL).read_text()); reg = cfc['regimes']['lr04-post-mpt']; ystd = reg['denormalization']['y_std']
-    mp = json.loads((ROOT / 'public/input/model-parameters.json').read_text())['deepTime']
     alpha0 = json.loads((ROOT / 'public/input/astro-reference.json').read_text())['physicalConstants']['earthMoiFactorJ2000']
-    rate, tau = mp['alphaGiaRateJ2000PerYr'], float(mp['alphaGiaRelaxationKyr'])
+    rate, tau = _C['ALPHA_GIA_RATE_J2000_PER_YR'], float(_C['ALPHA_GIA_RELAXATION_KYR'])
     dt = 0.01; tk = np.arange(0.0, 200.0, dt)
     # shipped: the per-line causal filter (createAlphaGiaChannel's laggedL1Terms)
     Lsh = np.zeros_like(tk)

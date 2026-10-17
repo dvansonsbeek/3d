@@ -60,8 +60,10 @@ const MEAN_DAY_LENGTH = C_LOCAL.meanLengthOfDay;                     // H/13-der
 const MEAN_SOLAR_YEAR_DAYS = C_LOCAL.meanSolarYearDays;              // H/8 snapped
 const MEAN_TROPICAL_YEAR_J2000_S = MEAN_SOLAR_YEAR_DAYS * MEAN_DAY_LENGTH;
 
-// Farhat 2022 polynomial coefficients (single truth: model-parameters.json
-// deepTime — was stale here at the pre-refit ALPHA_1 = -8.8658188951e-5)
+// Farhat 2022 polynomial coefficients (single truth: the generated deepTime
+// block — α₁ astro-reference moonRecessionAlpha1PerMa, α₃/α₄ the banked record
+// data/deep-time-fitted.json; was stale here at the pre-refit ALPHA_1 =
+// -8.8658188951e-5)
 const ALPHA_1 = C_SHARED.ALPHA_1;
 const ALPHA_3 = C_SHARED.ALPHA_3;
 const ALPHA_4 = C_SHARED.ALPHA_4;

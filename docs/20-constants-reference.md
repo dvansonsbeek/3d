@@ -136,11 +136,18 @@ core-mantle resonator (`DT_RESONATOR`) and the climate formula
 (`CLIMATE_FORMULA_COEFFS`); beside them sit the measured osculating-mean
 offset (`EARTH_OSCULATING_MEAN_OFFSET`, derived, not fitted), the literature
 Meeus lunar term tables and the frozen balance-search record. The recession
-knots and the GIA τ sit in `model-parameters.json` under the constants hash.
-Every fit is fitter-owned, provenance-tracked, and behind fail-proven gates;
-the paleo-anchors gate fails on an unexplained *improvement* too. None of
-them touch the planetary dynamics (Ledger 1). `fitted-coefficients.json`
-itself now holds only its description: the year-length harmonics and the
+knots, the quartic's α₃/α₄ and the GIA τ are the banked fitted record
+`data/deep-time-fitted.json` (plan 11 step 1; the deep-time block of the
+constants is ASSEMBLED from it, from astro-reference's LLR α₁ and Cox & Chao
+block, and from the ΔT stack's own `shipped_taper` — one home per leaf, under
+the constants hash). The regime fitter in the tree no longer reproduces those
+knots on the current engine (measured; the artifact's note records the
+divergence) — a refit is a campaign under the paleo-anchors gate, never a
+side effect. Every fit is fitter-owned, provenance-tracked, and behind
+fail-proven gates; the paleo-anchors gate fails on an unexplained
+*improvement* too. None of them touch the planetary dynamics (Ledger 1).
+`fitted-coefficients.json` is deleted (plan 11 step 1), having held only its
+description since plan 09: the year-length harmonics and the
 cardinal-point family were the FROZEN era clock's basis — a device, not the
 published year lengths (plan 06 Phase 3 S2) — and plan 09 deleted them
 family by family with the obliquity, perihelion, Sun-longitude and RA-day

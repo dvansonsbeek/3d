@@ -4,7 +4,8 @@
     "generator": "tools/fit/dt-corrections-fit.js",
     "dt_corrections_disabled": true,
     "H_yr": 335317,
-    "eight_H_yr": 2682536
+    "eight_H_yr": 2682536,
+    "staleness_vs_live_fitter": "MEASURED (plan 11 step 1, 2026-10-17): this stack was last fitted at plan 09 step 4c (8938515e); the joint fitter run on the v24.0 engine is deterministic but writes coefficients ≤ 4e-7 relative apart (bond cos −2.1e-7, jose5 sin +3.9e-7; ≤ 5.3e-5 s of ΔT over ±3000 yr; resonator kicks 6.6e-4 s; deltaTStart −9.2e-7 s; Espenak RMS 12.4534155 → 12.4534164 s) because plan 09 steps 5c/5d/7b moved the of-date year/day forms under it after the last fit. Owner decision: the shipped set stays (relocation, values bit-identical); the re-close is a campaign (holisticuniverse TODO B) and the next --write deletes this note."
   },
   "config": {
     "cycles": [
@@ -37,9 +38,9 @@
         "target_amp_s": 50
       }
     ],
-    "holocene_taper": {
-      "full_halfwidth_yr": 4500,
-      "total_halfwidth_yr": 6000
+    "shipped_taper": {
+      "full_halfwidth_yr": 300000,
+      "total_halfwidth_yr": 400000
     },
     "fit_window": {
       "year_start": -720,
@@ -162,5 +163,9 @@
       "target_amp_source": "unconstrained: quad-fit free amp 47.06 s (below 50 s prior — no cap applied)",
       "joint_mode": true
     }
+  },
+  "shipped_taper": {
+    "full_halfwidth_yr": 300000,
+    "total_halfwidth_yr": 400000
   }
 }

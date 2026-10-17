@@ -247,10 +247,10 @@ if (M) {
   measured['lunar-counter'] = { unit: 's of month (device-quantized − IAU input) — recorded before the counts\' deletion at plan 09 step 3', rows: [{ year: 2000, sidereal: 0.007823650412319694 }] };
 }
 
-// the comb families that ride H as their unit (every row a matched pair with its runtime form)
-const FC = JSON.parse(readFileSync(join(ROOT, 'public/input/fitted-coefficients.json'), 'utf8'));
-const rows = (v) => (Array.isArray(v) ? v.length : v && typeof v === 'object' ? Object.values(v).reduce((a, x) => a + (Array.isArray(x) ? x.length : 1), 0) : 1);
-const families = Object.entries(FC).filter(([k]) => !k.startsWith('_')).map(([k, v]) => ({ family: k, rows: rows(v) }));
+// the comb families that rode H as their unit: NONE remain — plan 09 deleted
+// them family by family and plan 11 step 1 deleted their emptied home,
+// public/input/fitted-coefficients.json
+const families = [];
 
 // summaries
 const tally = (keyFn) => { const m = {}; for (const h of hits) { const k = keyFn(h); m[k] = (m[k] ?? 0) + 1; } return m; };
@@ -302,7 +302,7 @@ if (process.argv.includes('--write')) {
     unmappedReaders: twinReaders.unmapped ?? {},
     hits,
     meta: { script: SELF_REL, plan: 'holisticuniverse docs/plans/09 IP-retire-the-frozen-era-device.md §3 step 1' },
-    inputs: buildInputsBlock(`node ${SELF_REL} --write`, [SELF_REL, 'public/input/fitted-coefficients.json', 'data/nbody-secular-series.json', ...filesWithHits.filter((f) => f !== SELF_REL && !f.startsWith('public/input/fitted-coefficients'))]),
+    inputs: buildInputsBlock(`node ${SELF_REL} --write`, [SELF_REL, 'data/nbody-secular-series.json', ...filesWithHits.filter((f) => f !== SELF_REL)]),
   };
   writeFileSync(join(ROOT, OUT_REL), JSON.stringify(out, null, 1) + '\n');
   console.log(`\nwrote ${OUT_REL}`);

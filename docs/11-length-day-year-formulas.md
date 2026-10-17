@@ -388,7 +388,7 @@ The sidereal and anomalistic years take the same form (`siderealYearDaysOfDate`,
 |------|------|
 | `src/script.js` | Runtime formulas |
 | `tools/lib/constants.js` | Pipeline constants (reads from JSON) |
-| `public/input/fitted-coefficients.json` | A description only since plan 09 — every comb family it carried is deleted; the shipped fitted artifacts (the ΔT stack, the core-mantle resonator, the climate formula) live under `data/` and are embedded by `tools/constants/generate.mjs` |
+| `data/*.json` fit artifacts | The shipped fitted artifacts (the ΔT stack, the core-mantle resonator, the climate formula, the banked deep-time record `deep-time-fitted.json`) — embedded by `tools/constants/generate.mjs`; `public/input/fitted-coefficients.json`, the comb families' former home, was emptied at plan 09 and deleted at plan 11 step 1 |
 | `public/input/astro-reference.json` | IAU reference values — the J2000 year lengths, the SI day, the general precession |
 
 

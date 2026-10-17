@@ -108,6 +108,8 @@
     "moonApsidalPrecessionDaysInputICRF": 3231.493,
     "moonNodalPrecessionDaysInputICRF": 6798.38,
     "moonDistance": 384399.07,
+    "moonRecessionAlpha1PerMa": -0.000099375895103,
+    "_moonRecessionAlpha1Note": "The LLR-anchored lunar recession rate as the quartic's linear coefficient: −(da/dt)/a₀ per Myr with da/dt = 3.82 cm/yr (Dickey et al. 1994 / Chapront et al. 2002; knownValues.modernLLRRecessionCmYr). The stored double is the INPUT OF RECORD (plan 11 step 1, moved verbatim from model-parameters deepTime.alpha1PerMa): 3.82 cm/yr over moonDistance 384,399.07 km gives 9.9375890790e-5, 4.3e-8 off this value — it was derived with a₀ = 384,399.054 km, a different rounding of the mean distance. Re-deriving would move every deep LOD and Moon-distance read by 4e-8 for no physics, so the derivation is a plausibility row (values:package), not a replacement. The deep-time quartic's α₃/α₄ are the fitted record data/deep-time-fitted.json.",
     "moonEclipticInclinationJ2000": 5.1573,
     "moonInclinationConstantBrownELP": 5.1453964,
     "moonOrbitalEccentricityBase": 0.054900489,
@@ -281,7 +283,7 @@
     "cMR2": 0.392728
   },
   "giaCoxChaoPeltier": {
-    "_description": "GIA calibration literature anchors: Cox & Chao (2002, Science 297) satellite-gravimetry dJ2/dt and the Peltier ICE-6G LOD-coupling axisymmetric-GIA J2-to-alpha conversion factor. The SHIPPED product is the calibrated alphaClimateScalePerMille (model-parameters deepTime — calibrated so dalpha/dt at J2000 = dJ2Dt/factor = -1.35e-11/yr); these two are the citation inputs of that calibration, consumed only by the model-values registry (coxChaoDJ2Dt / giaJ2ToAlphaFactor / derived dAlphaDtJ2000 keys). The browser carries them in comments only (script.js ~:2375).",
+    "_description": "GIA observation anchors: Cox & Chao (2002, Science 297) satellite-gravimetry dJ2/dt and the Peltier ICE-6G LOD-coupling axisymmetric-GIA J2-to-alpha conversion factor. MODEL INPUTS since plan 11 step 1 (anchor class — they were a registry-only citation block while model-parameters deepTime carried copies): the GIA channel's two J2000 rates are DERIVED from them by tools/constants/generate.mjs into DEFAULT_CONSTANTS.deepTime — j2RateJ2000PerYr = dJ2DtPerYr (the OBSERVED dJ2/dt, the scale of J2(t)/J2_0 the spin integration multiplies into the precession rate; plan 06 §9 item 10) and alphaGiaRateJ2000PerYr = dJ2DtPerYr / j2ToAlphaFactor (the dalpha/dt the channel's coupling k is derived from at runtime; exact in binary). Every runtime reads the derived pair through the generated module; the registry keeps coxChaoDJ2Dt / giaJ2ToAlphaFactor / dAlphaDtJ2000 as the citation rows.",
     "dJ2DtPerYr": -2.7e-11,
     "j2ToAlphaFactor": 2
   },

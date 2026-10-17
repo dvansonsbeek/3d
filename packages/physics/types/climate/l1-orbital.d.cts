@@ -73,7 +73,9 @@ export function laggedL1Terms(l1Terms: Array<{
  *   j2RateJ2000PerYr?: number,
  *   j2J2000?: number,
  * }} cfg - relaxationKyr, alphaGiaRateJ2000PerYr and j2RateJ2000PerYr are
- *   model-parameters deepTime constants; alphaJ2000 the IERS
+ *   assembled deepTime block (DEFAULT_CONSTANTS.deepTime: τ the banked record
+ *   data/deep-time-fitted.json, the rate derived from astro-reference
+ *   giaCoxChaoPeltier — plan 11 step 1); alphaJ2000 the IERS
  *   moment-of-inertia factor; j2J2000 Earth's J₂ (astro-reference)
  * @returns {{
  *   alphaAt: (year: number) => number,

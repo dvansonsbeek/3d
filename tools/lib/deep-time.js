@@ -44,10 +44,11 @@ const _CLIMATE_JSON_PATH       = path.join(__dirname, '..', '..', 'public', 'inp
 const CLIMATE_FORMULA_COEFFS   = JSON.parse(fs.readFileSync(_CLIMATE_JSON_PATH, 'utf8'));
 // The GIA channel — the LAGGED response of the polar moment to the L1 ice
 // history: ONE home in @essrt/physics/climate/l1-orbital (createAlphaGiaChannel).
-// k is DERIVED from the Cox–Chao rate (model-parameters deepTime
-// alphaGiaRateJ2000PerYr), τ is the relaxation time measured against the
-// historical ΔT record (alphaGiaRelaxationKyr; plan 06 D7). Same construction
-// in model.js, src/script.js and the website's essrt.ts.
+// k is DERIVED from the Cox–Chao rate (the assembled deepTime block's
+// alphaGiaRateJ2000PerYr = astro-reference giaCoxChaoPeltier dJ2/dt ÷ factor),
+// τ is the relaxation time measured against the historical ΔT record
+// (alphaGiaRelaxationKyr, the banked record data/deep-time-fitted.json; plan 06
+// D7). Same construction in model.js, src/script.js and the website's essrt.ts.
 const _alphaGia = (() => {
   const r = CLIMATE_FORMULA_COEFFS.regimes[ALPHA_CLIMATE_REGIME_KEY];
   return _req('@essrt/physics/climate/l1-orbital').createAlphaGiaChannel({
@@ -91,10 +92,11 @@ const DM_DT_TOTAL_KG_S     = L_SUN_W / (C_SI_M_PER_S * C_SI_M_PER_S) + SOLAR_WIN
 
 // Farhat 2022 LSQ polynomial coefficients — Moon distance evolution
 // a_Moon(t)/a_now = 1 + α₁·t + α₃·t³ + α₄·t⁴  (no α₂; preserves modern Wells rate)
-// Single source: model-parameters.json deepTime.alpha1PerMa/alpha3PerMa3/alpha4PerMa4.
-// α₁ is LLR-anchored (da/dt(J2000) = 3.82 cm/yr, Dickey 1994 / Chapront 2002);
-// α₃/α₄ are the LSQ fit to the Farhat 2022 deep-time anchors. Provenance and
-// validation history documented in the JSON _description and src/script.js.
+// Homes (plan 11 step 1, read through the generated module's assembled deepTime
+// block): α₁ is the LLR-anchored INPUT astro-reference moonReference
+// .moonRecessionAlpha1PerMa (da/dt(J2000) = 3.82 cm/yr, Dickey 1994 / Chapront
+// 2002); α₃/α₄ are the LSQ fit to the Farhat 2022 deep-time anchors, banked in
+// data/deep-time-fitted.json with their provenance.
 const ALPHA_1 = C.ALPHA_1;           // /Ma
 const ALPHA_3 = C.ALPHA_3;           // /Ma³
 const ALPHA_4 = C.ALPHA_4;           // /Ma⁴
@@ -441,8 +443,10 @@ const JOSE4_SIN_COEFF_S = _DT.jose4.sin_coeff_s;
 // drift" honest claim; H differs from H_J2000 by <1.5% at this range, so the
 // fixed-period assumption is valid. Constant name kept for historical continuity though the
 // window is no longer literally "Holocene".
-// Single source: model-parameters.json deepTime.dtStackTaper*HalfwidthYr
-// (mirrors src/script.js BOND_TAPER_* — same values, per-file legacy names).
+// Single source: data/deltaT-4flag-fit.json shipped_taper — the stack's own
+// artifact, written by its fitter (plan 11 step 1) and assembled into the
+// generated deepTime block (mirrors src/script.js BOND_TAPER_* — same values,
+// per-file legacy names).
 const HOLOCENE_TAPER_FULL_HALFWIDTH_YR = C.DT_STACK_TAPER_FULL_HALFWIDTH_YR;
 const HOLOCENE_TAPER_TOTAL_HALFWIDTH_YR = C.DT_STACK_TAPER_TOTAL_HALFWIDTH_YR;
 

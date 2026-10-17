@@ -31,11 +31,14 @@ sys.path.insert(0, str(ROOT / 'scripts'))
 sys.path.insert(0, str(ROOT / 'tools' / 'fit' / 'python'))
 import t7_fixed_phase_l1 as t7  # noqa: E402  (loads the histories, LR04 and La2004 at import)
 from artifact_inputs import build_inputs_block  # noqa: E402
+from load_constants import C as _C  # noqa: E402  (the Node bridge — the GIA channel's τ and J2000 rate)
 
 OUT_REL = 'data/t7-alpha-proxy-tables.json'
 SELF_REL = 'tools/explore/t7-alpha-proxy-tables.py'
 CFC_REL = 'public/input/climate-formula-coefficients.json'
-INPUT_FILES = [CFC_REL, 'public/input/model-parameters.json', 'public/input/astro-reference.json',
+# plan 11 step 1: τ_GIA is the banked record data/deep-time-fitted.json; the J2000 rate derives from
+# astro-reference giaCoxChaoPeltier — both reach this script through the constants bridge
+INPUT_FILES = [CFC_REL, 'data/deep-time-fitted.json', 'public/input/astro-reference.json',
                'data/t7-fixed-phase-l1.json', 'data/t7-model-orbital-histories.json', 'data/lr04-stack.txt',
                'scripts/t7_fixed_phase_l1.py', SELF_REL]
 DT_KYR, T_MAX_KYR, T_TABLE_KYR = 0.01, 400.0, 300.0
@@ -43,9 +46,8 @@ DT_KYR, T_MAX_KYR, T_TABLE_KYR = 0.01, 400.0, 300.0
 mcf = t7.mcf
 reg = json.loads((ROOT / CFC_REL).read_text())['regimes']['lr04-post-mpt']
 ystd = reg['denormalization']['y_std']
-mp = json.loads((ROOT / 'public/input/model-parameters.json').read_text())['deepTime']
 alpha0 = json.loads((ROOT / 'public/input/astro-reference.json').read_text())['physicalConstants']['earthMoiFactorJ2000']
-rate, tau = mp['alphaGiaRateJ2000PerYr'], float(mp['alphaGiaRelaxationKyr'])
+rate, tau = _C['ALPHA_GIA_RATE_J2000_PER_YR'], float(_C['ALPHA_GIA_RELAXATION_KYR'])
 art = json.loads((ROOT / 'data/t7-fixed-phase-l1.json').read_text())
 tk = np.arange(0.0, T_MAX_KYR, DT_KYR)
 

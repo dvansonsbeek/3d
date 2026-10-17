@@ -35,6 +35,7 @@ import { fileURLToPath } from 'node:url';
 const ROOT = fileURLToPath(new URL('../../', import.meta.url));
 const SCRIPT = readFileSync(join(ROOT, 'src/script.js'), 'utf8');
 const read = (f) => JSON.parse(readFileSync(join(ROOT, 'public/input', f), 'utf8'));
+const readData = (f) => JSON.parse(readFileSync(join(ROOT, 'data', f), 'utf8'));
 
 /**
  * Values migrated to the generated module (§5e). Each MUST have disappeared as
@@ -131,6 +132,9 @@ const MIGRATED = [
   'astro.moonReference.moonApsidalPrecessionDaysInputICRF',
   'astro.moonReference.moonNodalPrecessionDaysInputICRF',
   'astro.moonReference.moonDistance',
+  // plan 11 step 1: the LLR-anchored α₁ (was model.deepTime.alpha1PerMa) —
+  // script.js reads it as K.deepTime.alpha1PerMa through the assembled block.
+  'astro.moonReference.moonRecessionAlpha1PerMa',
   'astro.moonReference.moonEclipticInclinationJ2000',
   'astro.moonReference.moonOrbitalEccentricityBase',
   'astro.moonReference.moonObliquityEclipticJ2000',
@@ -187,16 +191,16 @@ const MIGRATED = [
   // appear in the file, just under the other name. Importing removes the class
   // of error entirely.
   'astro.physicalConstants.massRatioDE440',
-  'model.deepTime.alpha3PerMa3',
-  'model.deepTime.alpha4PerMa4',
-  'model.deepTime.alphaClimateScalePerMille',
-  'model.deepTime.dtStackTaperFullHalfwidthYr',
-  'model.deepTime.dtStackTaperTotalHalfwidthYr',
+  // (plan 11 step 1: the model.deepTime.* rows moved with the block — its
+  // fitted leaves are the banked record data/deep-time-fitted.json, walked
+  // below as `fitted.*`; the taper rides data/deltaT-4flag-fit.json
+  // shipped_taper, the GIA rates derive from astro.giaCoxChaoPeltier.)
   // Driver 1½ (2026-08) — the regime-aware recession block, consumed whole
   // via `K.deepTime.recessionRegime` (script.js _recessionHistory/_solarBudget
-  // → @essrt/physics/deltat/recession-history). Prefix: every leaf under it
-  // is imported, none exists as a literal.
-  'model.deepTime.recessionRegime',
+  // → @essrt/physics/deltat/recession-history). Prefix: every leaf under the
+  // banked record is imported through the assembled block, none exists as a
+  // literal.
+  'fitted',
   'astro.earthOrbital.earthEccentricityJ2000',
   'astro.earthOrbital.earthEccentricityDotJ2000',
   'model.additionalBodies',
@@ -229,7 +233,7 @@ const MIGRATED = [
   // excluded — the last of which was diverging.
   'astro.bodyDiametersKm',
   'astro.additionalBodiesReference',
-  'model.deepTime.alpha1PerMa',
+  // (model.deepTime.alpha1PerMa → astro.moonReference.moonRecessionAlpha1PerMa, block 6)
   'astro.earthOrbital.earthEccentricityDotDotJ2000',
   'astro.earthOrbital.earthPerihelionLongitudeJ2000',
 
@@ -286,9 +290,10 @@ const NOT_IN_SCRIPT = {
     + 'moontilt labs (tools/explore, which carry local copies) and the model-values '
     + 'registry; the browser never quotes them.',
   'astro.giaCoxChaoPeltier':
-    'GIA calibration citation anchors (Cox & Chao dJ2/dt, Peltier factor) — the shipped '
-    + 'product is the calibrated alphaClimateScalePerMille; script.js cites these in '
-    + 'comments only (~:2375). Consumed by the model-values registry.',
+    'GIA observation anchors (Cox & Chao dJ2/dt, Peltier factor) — plan 11 step 1: the '
+    + 'GIA channel\'s two J2000 rates are DERIVED from them into the assembled deepTime '
+    + 'block (generate.mjs assembleDeepTime); script.js reads K.deepTime.j2RateJ2000PerYr / '
+    + '.alphaGiaRateJ2000PerYr, never the literals. The registry quotes them as citations.',
   'astro.obliquityChapront2002':
     'Chapront (2002) obliquity citation values — consumed only by the model-values '
     + 'registry (obliqChapront* keys) for the Model-vs-literature tables; the browser '
@@ -352,6 +357,9 @@ const walk = (o, p) => {
 };
 walk(read('model-parameters.json'), 'model');
 walk(read('astro-reference.json'), 'astro');
+// plan 11 step 1: the banked fitted deep-time record — its knots and α₃/α₄
+// are distinctive doubles that script.js must carry ONLY through K.deepTime.
+walk(readData('deep-time-fitted.json'), 'fitted');
 
 // Short numbers (23, 0.5, 7) collide with unrelated code constantly.
 const sig = (n) => String(n).replace(/[-.]/g, '').replace(/e[+-]?\d+$/, '').length;
@@ -549,6 +557,10 @@ const retiredHits = [];
   // grid and the device's rounded mean tropical year — left `foundational`
   // too; the K wheels ride the recorded `earth.kDeviceWheelPeriodYears`.
   for (const k of ['temperatureGraphMostLikely', 'systemResetN', 'holisticyearLength', 'stepYears', 'inputmeanlengthsolaryearindays']) if (k in (mp.foundational ?? {})) retiredHits.push(`model.foundational.${k}`);
+  // Plan 11 step 1: the deepTime block left the file — generate.mjs ASSEMBLES
+  // it from astro-reference, data/deep-time-fitted.json and the ΔT fit
+  // artifact. A `deepTime` block returning here is a second home.
+  if ('deepTime' in mp) retiredHits.push('model.deepTime (plan 11 step 1: assembled by generate.mjs, not a block of this file)');
 }
 for (const p of retiredHits) {
   console.log(`\n  RETIRED INPUT RETURNED  ${p}`);

@@ -4,8 +4,10 @@
 // All input data loaded from JSON files in public/input/:
 //   model-parameters.json       — Model theory parameters
 //   astro-reference.json        — IAU/JPL/Meeus reference data
-//   (fitted-coefficients.json — the fitting pipeline's comb output — carries no
-//    coefficient block since plan 09 step 7a; its loader module is deleted)
+//   (fitted-coefficients.json — the fitting pipeline's comb output — was
+//    emptied at plan 09 step 7a and deleted at plan 11 step 1; the shipped
+//    fits live under data/ and the deep-time block is read from the
+//    generated constants module, see the Deep-time exports below)
 //
 // Sub-modules:
 //   constants/utils.js              — Date conversion, formatting, derivation helpers
@@ -21,6 +23,10 @@ const modelParams = JSON.parse(fs.readFileSync(
   path.resolve(__dirname, '..', '..', 'public', 'input', 'model-parameters.json'), 'utf8'));
 const astroRef = JSON.parse(fs.readFileSync(
   path.resolve(__dirname, '..', '..', 'public', 'input', 'astro-reference.json'), 'utf8'));
+// The deep-time block of the generated constants module (plan 11 step 1) —
+// the ONE assembly of its three homes; require(esm) is synchronous on the
+// repo's Node 22 (the module has no top-level await).
+const GENERATED_DEEP_TIME = require('../../packages/physics/src/constants/generated.js').DEFAULT_CONSTANTS.deepTime;
 
 // Build ASTRO_REFERENCE object (consumed by scene-graph.js, optimizer.js, etc.)
 const ASTRO_REFERENCE = {
@@ -615,8 +621,13 @@ module.exports = {
   MASS_RATIO_EARTH_MOON,
   massRatioDE440,
 
-  // Deep-time physics anchors (single source of truth:
-  // astro-reference.json physicalConstants + model-parameters.json deepTime)
+  // Deep-time physics anchors (astro-reference.json physicalConstants, and the
+  // deepTime block of the GENERATED constants module — plan 11 step 1: the
+  // block is ASSEMBLED by tools/constants/generate.mjs from its three homes
+  // (astro-reference moonReference.moonRecessionAlpha1PerMa + giaCoxChaoPeltier,
+  // data/deep-time-fitted.json, data/deltaT-4flag-fit.json shipped_taper); this
+  // twin reads the SAME embed the browser and the package read, so there is one
+  // assembly, and `test:constants` pins the embed to its sources)
   EARTH_MOI_FACTOR: astroRef.physicalConstants.earthMoiFactorJ2000,
   EARTH_FLATTENING_INVERSE_WGS84: astroRef.physicalConstants.earthFlatteningInverseWGS84,
   EARTH_DIAMETER_KM: astroRef.bodyDiametersKm.earth,
@@ -624,15 +635,15 @@ module.exports = {
   ABERRATION_CONSTANT_ARCSEC: astroRef.physicalConstants.aberrationConstantArcsec,
   SOLAR_LUMINOSITY_W: astroRef.physicalConstants.solarLuminosityW,
   SOLAR_WIND_KG_PER_S: astroRef.physicalConstants.solarWindMassLossKgPerS,
-  ALPHA_1: modelParams.deepTime.alpha1PerMa,
-  ALPHA_3: modelParams.deepTime.alpha3PerMa3,
-  ALPHA_4: modelParams.deepTime.alpha4PerMa4,
-  RECESSION_REGIME: modelParams.deepTime.recessionRegime,
-  ALPHA_GIA_RATE_J2000_PER_YR: modelParams.deepTime.alphaGiaRateJ2000PerYr,
-  ALPHA_GIA_RELAXATION_KYR: modelParams.deepTime.alphaGiaRelaxationKyr,
-  J2_RATE_J2000_PER_YR: modelParams.deepTime.j2RateJ2000PerYr,   // the OBSERVED dJ2/dt (Cox & Chao 2002) — the GIA channel's J2 scale (the precession of date)
-  DT_STACK_TAPER_FULL_HALFWIDTH_YR: modelParams.deepTime.dtStackTaperFullHalfwidthYr,
-  DT_STACK_TAPER_TOTAL_HALFWIDTH_YR: modelParams.deepTime.dtStackTaperTotalHalfwidthYr,
+  ALPHA_1: GENERATED_DEEP_TIME.alpha1PerMa,
+  ALPHA_3: GENERATED_DEEP_TIME.alpha3PerMa3,
+  ALPHA_4: GENERATED_DEEP_TIME.alpha4PerMa4,
+  RECESSION_REGIME: GENERATED_DEEP_TIME.recessionRegime,
+  ALPHA_GIA_RATE_J2000_PER_YR: GENERATED_DEEP_TIME.alphaGiaRateJ2000PerYr,
+  ALPHA_GIA_RELAXATION_KYR: GENERATED_DEEP_TIME.alphaGiaRelaxationKyr,
+  J2_RATE_J2000_PER_YR: GENERATED_DEEP_TIME.j2RateJ2000PerYr,   // the OBSERVED dJ2/dt (Cox & Chao 2002) — the GIA channel's J2 scale (the precession of date)
+  DT_STACK_TAPER_FULL_HALFWIDTH_YR: GENERATED_DEEP_TIME.dtStackTaperFullHalfwidthYr,
+  DT_STACK_TAPER_TOTAL_HALFWIDTH_YR: GENERATED_DEEP_TIME.dtStackTaperTotalHalfwidthYr,
 
   // Earth parameters
   earthRAAngle,

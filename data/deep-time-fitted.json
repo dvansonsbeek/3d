@@ -1,0 +1,37 @@
+{
+  "_description": "The FITTED deep-time inputs of the ESSRT rotation history — the frozen record of three fits, banked here (plan 11 step 1) when public/input/model-parameters.json retired. Each value is the SHIPPED double, bit-identical to the model-parameters deepTime block it left; every runtime reads it through the generated constants module (tools/constants/generate.mjs assembles DEFAULT_CONSTANTS.deepTime from this file, astro-reference.json and data/deltaT-4flag-fit.json). Not a parameter anyone types: a refit is a CAMPAIGN under the 41-anchor paleo gate (tools/verify/paleo-anchors.js, where an unexplained improvement fails too), and no fit here is reproduced by a live instrument in the tree — see each value's provenance.",
+  "meta": {
+    "generator": "none — a banked fitted record (plan 11 step 1); the fitters that produced these values are named per value below",
+    "plan": "holisticuniverse docs/plans/11 IP-retire-model-parameters-input.md §8.2"
+  },
+  "alpha3PerMa3": -6.4186463489e-12,
+  "alpha4PerMa4": 1.3619800519e-16,
+  "_alphaNote": "a_Moon(t)/a_now = 1 + α₁·t + α₃·t³ + α₄·t⁴ (t in Myr before J2000; no α₂, so the modern LLR rate is preserved). α₁ is the LLR-anchored INPUT (astro-reference moonReference.moonRecessionAlpha1PerMa); α₃ and α₄ are the least-squares fit to the Farhat et al. 2022 deep-time recession anchors. The fitter was a one-off of the Driver-1 campaign (2026-07) and is not in the tree; the pair is validated live by paleo-anchors.js (Wells 1963 / Wu 2024 era, ≤ 1000 Ma — the regime below keeps the quartic bit-identical there).",
+  "alphaGiaRelaxationKyr": 6,
+  "_alphaGiaRelaxationNote": "τ of the GIA channel — the LAGGED response of Earth's polar moment to the ice history the climate formula's L1 proxies (@essrt/physics climate/l1-orbital createAlphaGiaChannel). MEASURED against the historical ΔT record through the joint ΔT fitter (plan 06 D7, 2026-09-20): optimum 5–6 kyr, the degree-2 Maxwell estimate; the coupling k is DERIVED at runtime from the Cox & Chao rate (astro-reference giaCoxChaoPeltier), so no scale is stored. The τ scan was a plan-06 instrument, since deleted; the eclipse-audit and lunar-alignment campaigns record what the shipped τ does.",
+  "recessionRegime": {
+    "_description": "Driver 1½ regime-aware lunar recession (2026-08-14, commit acddb6b5): the quartic stays BIT-IDENTICAL ≤ jointMa (the Wells/Wu-gated era — its alpha set is the calibrated effective closed-budget pair); beyond, a monotone cubic Hermite through the fitted knots to the rigid Roche limit at genesisMa, plus the two explicit solar angular-momentum channels (ocean leak beta0·(a/a0)^6·tau_moon; insolation-driven thermal-tide pump factor·(tau_moon+leak) inside the window — Zahnle-Walker 1987 / Bartlett-Stevenson 2016 / Mitchell-Kirscher 2023, Zhou 2024's contrary reading recorded). Fit: tools/explore/fit-regime-recession.js against 11 published anchors (Lantink 2022 Joffre · Weeli Wolli · Zhou 2024 ×3 paired a+LOD · Meyers-Malinverno 2018 Xiamaling · Nanfen 2023 · Moodies via Farhat 2022), all ≤1.3σ; genesis PINNED at the shipped 4498 Ma Roche crossing (the genesis chi² profile is flat — the data do not constrain it); pump factor 2.4σ preferred over zero, with the factor×window product the constrained quantity (0.454×~300 Myr ≈ 0.15×~900 Myr degeneracy recorded). Knot values are the shipped definition (metre-rounded at fit time). Consumed via @essrt/physics deltat/recession-history.",
+    "_reproductionNote": "MEASURED (plan 11 step 1, 2026-10-17): the live fitter on the post-plan-09 engine (the SI day, the composed clock, the tropical year of date) prefers a different solution — knots 337,812 / 321,752 / 320,277 / 296,313 / 288,738 km and a pump of 0.144 over 1000–1885 Ma (factor × window 0.127 Gyr against the shipped 0.139) — so these values are the frozen 2026-08-14 fit, not a reproduction. The paleo-anchors gate passes on them; the refit is a campaign of its own (holisticuniverse TODO B).",
+    "jointMa": 1000,
+    "knotAgesMa": [
+      1400,
+      1900,
+      2450,
+      3200,
+      3900
+    ],
+    "knotDistancesKm": [
+      337531.908,
+      322949.311,
+      322533.193,
+      296189.703,
+      275119.896
+    ],
+    "genesisMa": 4498,
+    "rocheLimitKm": 9439.643,
+    "solarOceanLeakBeta0": 0.2,
+    "thermalPumpStartMa": 1000,
+    "thermalPumpEndMa": 1307,
+    "thermalPumpFactor": 0.454
+  }
+}

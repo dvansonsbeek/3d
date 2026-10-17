@@ -2,14 +2,14 @@
 // Gives the TypeScript website full type safety at the boundary (§2g) while
 // packages/physics stays JavaScript.
 
-export declare const CONSTANTS_HASH: "c161ec19e5984b9e";
+export declare const CONSTANTS_HASH: "b241f63325106ddd";
 
 export declare const MODEL_VERSION: string;
 
 export declare const PREPRINT_DOI: string;
 
 export declare const DEFAULT_CONSTANTS: {
-  readonly hash: "c161ec19e5984b9e";
+  readonly hash: "b241f63325106ddd";
   readonly additionalBodies: {
     "pluto": {
       "name": string;
@@ -185,6 +185,10 @@ export declare const DEFAULT_CONSTANTS: {
     "startAngleModel": number;
     "useVariableSpeed": boolean;
   };
+  readonly giaCoxChaoPeltier: {
+    "dJ2DtPerYr": number;
+    "j2ToAlphaFactor": number;
+  };
   readonly moon: {
     "moonStartposApsidal": number;
     "moonStartposNodal": number;
@@ -216,6 +220,7 @@ export declare const DEFAULT_CONSTANTS: {
     "moonApsidalPrecessionDaysInputICRF": number;
     "moonNodalPrecessionDaysInputICRF": number;
     "moonDistance": number;
+    "moonRecessionAlpha1PerMa": number;
     "moonEclipticInclinationJ2000": number;
     "moonInclinationConstantBrownELP": number;
     "moonOrbitalEccentricityBase": number;
@@ -597,10 +602,6 @@ export declare const REFERENCE_DATA: {
     "sunSpeed": number;
     "greatattractorDistance": number;
     "milkywaySpeed": number;
-  };
-  readonly giaCoxChaoPeltier: {
-    "dJ2DtPerYr": number;
-    "j2ToAlphaFactor": number;
   };
   readonly jplEclipticInclinationTrends: {
     "mercury": number;

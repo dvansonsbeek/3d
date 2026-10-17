@@ -231,9 +231,18 @@ const CONFIG = {
     // window. 3-archive evidence for 862 yr remains valid but the cycle
     // cannot be fit against ΔT residual here.
   ],
-  holocene_taper: {
-    full_halfwidth_yr:  4500,
-    total_halfwidth_yr: 6000,
+  // The SHIPPED application window of the stack (plan 11 step 1): the four
+  // cycles run at full strength to ±full_halfwidth_yr from J2000 and fade to
+  // zero at ±total_halfwidth_yr (@essrt/physics deltat/cycles). Written to the
+  // artifact as `shipped_taper`, assembled into DEFAULT_CONSTANTS.deepTime
+  // .dtStackTaper*HalfwidthYr by tools/constants/generate.mjs — the stack and
+  // its window are ONE artifact. (The fit window below lies deep inside it,
+  // so the taper is 1 on every fitted sample and these values do not enter
+  // the solve. The former `holocene_taper` 4,500/6,000 here was an unused
+  // fossil beside the runtime's 300/400 kyr — one value, one home now.)
+  shipped_taper: {
+    full_halfwidth_yr:  300000,
+    total_halfwidth_yr: 400000,
   },
   fit_window: {
     year_start: -720,
@@ -1345,6 +1354,8 @@ function main() {
       dt_corrections_disabled: process.env.DT_CORRECTIONS_DISABLED === '1',
     },
     config: CONFIG,
+    // the stack's application window — read by generate.mjs into the deepTime block
+    shipped_taper: CONFIG.shipped_taper,
     fit_metrics: {
       _WARNING_NOT_THE_SHIPPED_FIT:
         'These stage_* metrics come from the LEGACY single-shot cascade, which is a '
@@ -1833,6 +1844,13 @@ function runJointMode() {
     'JOINT world (2026-07-23): closure sum includes the Core-mantle swing '
     + '(Resonator) episode; stage_a..e fit_metrics below predate the joint fit '
     + 'and are kept as historical cascade diagnostics.';
+  // the stack's application window (plan 11 step 1) — one home, this artifact;
+  // the legacy `config.holocene_taper` fossil is replaced by the shipped value
+  fitJson.shipped_taper = CONFIG.shipped_taper;
+  fitJson.config.shipped_taper = CONFIG.shipped_taper;
+  delete fitJson.config.holocene_taper;
+  // a --write IS the re-close: the banked staleness note (plan 11 step 1) goes
+  delete fitJson._meta.staleness_vs_live_fitter;
   fs.writeFileSync(fitPath, JSON.stringify(fitJson, null, 2) + '\n');
   console.log(`\n  ✓ wrote ${fitPath}`);
 

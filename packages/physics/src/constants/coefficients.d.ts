@@ -1,6 +1,6 @@
 // GENERATED — do not edit. Regenerate: node tools/constants/generate.mjs --write
 // The fitted coefficients' shapes for TypeScript consumers (§2g); values live
-// in coefficients.js, emitted VERBATIM from fitted-coefficients.json.
+// in coefficients.js, emitted VERBATIM from the fit artifacts under data/.
 
 export declare const COEFFICIENTS_HASH: "91e2d041c7b6e038";
 

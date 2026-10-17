@@ -55,8 +55,10 @@ const output = {
   MASS_RATIO_EARTH_MOON: C.MASS_RATIO_EARTH_MOON,
   massRatioDE440: C.massRatioDE440,
 
-  // Deep-time physics anchors (single truth: astro-reference.json
-  // physicalConstants + model-parameters.json deepTime)
+  // Deep-time physics anchors (astro-reference.json physicalConstants + the
+  // generated module's assembled deepTime block — plan 11 step 1: astro-reference
+  // moonRecessionAlpha1PerMa / giaCoxChaoPeltier, data/deep-time-fitted.json,
+  // the ΔT fit artifact's shipped_taper — read through tools/lib/constants.js)
   EARTH_MOI_FACTOR: C.EARTH_MOI_FACTOR,
   SOLAR_LUMINOSITY_W: C.SOLAR_LUMINOSITY_W,
   SOLAR_WIND_KG_PER_S: C.SOLAR_WIND_KG_PER_S,
@@ -64,6 +66,10 @@ const output = {
   ALPHA_3: C.ALPHA_3,
   ALPHA_4: C.ALPHA_4,
   ALPHA_CLIMATE_SCALE: C.ALPHA_CLIMATE_SCALE,
+  ALPHA_GIA_RATE_J2000_PER_YR: C.ALPHA_GIA_RATE_J2000_PER_YR,
+  ALPHA_GIA_RELAXATION_KYR: C.ALPHA_GIA_RELAXATION_KYR,
+  J2_RATE_J2000_PER_YR: C.J2_RATE_J2000_PER_YR,
+  RECESSION_REGIME: C.RECESSION_REGIME,
   DT_STACK_TAPER_FULL_HALFWIDTH_YR: C.DT_STACK_TAPER_FULL_HALFWIDTH_YR,
   DT_STACK_TAPER_TOTAL_HALFWIDTH_YR: C.DT_STACK_TAPER_TOTAL_HALFWIDTH_YR,
 

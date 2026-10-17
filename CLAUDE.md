@@ -627,7 +627,7 @@ what actually made corrections stick here.
 | `tools/verify/` | 24 scripts: 5 gate · 1 liftable · 6 narrative · 12 generator (`npm run test:verify:list`) |
 | `packages/physics`, `packages/model-values` | the published npm packages (@essrt scope) — the website and world consume these; refits reach them via `values:package:write` + republish |
 | `tools/explore/` | 123 frozen research one-offs — findings live in `docs/`; a script stays only while something names it (its README states the rule) |
-| `public/input/fitted-coefficients.json` | single source of truth for fitted values |
+| `data/deltaT-4flag-fit.json`, `data/core-mantle-resonator-stage1.json`, `public/input/climate-formula-coefficients.json`, `data/deep-time-fitted.json` | the shipped fitted artifacts, each its fitter's (the last a banked frozen record) — embedded by `generate.mjs`; `public/input/fitted-coefficients.json` is deleted (plan 11 step 1) |
 | `docs/` | 75 numbered docs; `40-architecture`, `99-essrt` are cross-referenced |
 
 The simulator at 3d.holisticuniverse.com auto-deploys from every green main

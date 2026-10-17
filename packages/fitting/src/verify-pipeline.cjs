@@ -2,7 +2,8 @@
 /**
  * Verify the fitting pipeline produces the same values as the current JSON.
  * Runs each fitting script's core computation WITHOUT writing to files,
- * then compares against the stored values in fitted-coefficients.json.
+ * then compares against the stored values in the inputs (fitted-coefficients
+ * .json, the former comb home, is deleted — plan 11 step 1).
  *
  * Usage: node tools/fit/verify-pipeline.js
  */

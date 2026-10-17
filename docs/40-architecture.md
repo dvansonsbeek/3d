@@ -161,7 +161,6 @@ WebGL Render (60 FPS target)
 │   └── input/
 │       ├── model-parameters.json      # Model constants (Earth params, K-device pose, planet configs)
 │       ├── astro-reference.json       # IAU/JPL reference values (J2000 elements, periods)
-│       ├── fitted-coefficients.json   # Description only since plan 09 (the fits live under data/)
 │       ├── meeus-lunar-tables.json    # Meeus Ch.47 lunar correction tables
 │       ├── constellations.json        # 88 IAU constellation line patterns
 │       └── stars.json                 # Yale Bright Star Catalog (~9,000 stars)
@@ -224,7 +223,7 @@ WebGL Render (60 FPS target)
 
 ### script.js Organization
 
-The monolithic script.js (~59,800 lines) is organized into logical sections. Constants are grouped by source file (A = model-parameters.json, B = fitted-coefficients.json, C = astro-reference.json, D = meeus-lunar-tables.json, E = derived, F = display-only).
+The monolithic script.js (~59,800 lines) is organized into logical sections. Constants are grouped by source file (A = model-parameters.json, B = the shipped fit artifacts under data/ — the former fitted-coefficients.json, deleted at plan 11 step 1, C = astro-reference.json, D = meeus-lunar-tables.json, E = derived, F = display-only).
 
 ```
 ┌─────────────────────────────────────────────────────────────────────┐

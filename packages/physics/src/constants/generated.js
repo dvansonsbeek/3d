@@ -2,7 +2,10 @@
  * GENERATED — do not edit. Regenerate:
  *   node tools/constants/generate.mjs --write
  *
- * Source of truth: public/input/{model-parameters,astro-reference}.json
+ * Source of truth: public/input/{model-parameters,astro-reference}.json; the
+ * deepTime block is ASSEMBLED from astro-reference.json (moonReference.
+ * moonRecessionAlpha1PerMa, giaCoxChaoPeltier), data/deep-time-fitted.json
+ * and data/deltaT-4flag-fit.json shipped_taper (plan 11 step 1).
  * Classification and rationale: tools/constants/generate.mjs
  *
  * Two exports, deliberately separate (§2d):
@@ -12,7 +15,6 @@
  *   REFERENCE_DATA     validation targets + presentation. Single-sourced so
  *                      nothing duplicates them, but NOT injectable:
  *   moonGrailWilliams2014            target
- *   giaCoxChaoPeltier                target
  *   obliquityChapront2002            target
  *   planetSpinObserved               target
  *   ascendingNodesSouamiSouchay      target
@@ -33,7 +35,7 @@
  * carry it so a counterfactual is reproducible (§2d).
  * @type {string}
  */
-export const CONSTANTS_HASH = "c161ec19e5984b9e";
+export const CONSTANTS_HASH = "b241f63325106ddd";
 
 /** Model version label — single source: public/input/model-version.json (§10 two-axis scheme). */
 export const MODEL_VERSION = "v24.0";
@@ -43,7 +45,7 @@ export const PREPRINT_DOI = "10.21203/rs.3.rs-8758810/v4";
 
 /** @type {Readonly<Record<string, unknown>>} */
 export const DEFAULT_CONSTANTS = Object.freeze({
-  hash: "c161ec19e5984b9e",
+  hash: "b241f63325106ddd",
   additionalBodies: {
     "pluto": {
       "name": "Pluto",
@@ -231,6 +233,10 @@ export const DEFAULT_CONSTANTS = Object.freeze({
     "startAngleModel": 89.91949879,
     "useVariableSpeed": true
   },
+  giaCoxChaoPeltier: {
+    "dJ2DtPerYr": -2.7e-11,
+    "j2ToAlphaFactor": 2
+  },
   moon: {
     "moonStartposApsidal": 347.5476,
     "moonStartposNodal": 64.0435,
@@ -262,6 +268,7 @@ export const DEFAULT_CONSTANTS = Object.freeze({
     "moonApsidalPrecessionDaysInputICRF": 3231.493,
     "moonNodalPrecessionDaysInputICRF": 6798.38,
     "moonDistance": 384399.07,
+    "moonRecessionAlpha1PerMa": -0.000099375895103,
     "moonEclipticInclinationJ2000": 5.1573,
     "moonInclinationConstantBrownELP": 5.1453964,
     "moonOrbitalEccentricityBase": 0.054900489,
@@ -759,10 +766,6 @@ export const REFERENCE_DATA = Object.freeze({
     "sunSpeed": 828000,
     "greatattractorDistance": 200000000,
     "milkywaySpeed": 2160000
-  },
-  giaCoxChaoPeltier: {
-    "dJ2DtPerYr": -2.7e-11,
-    "j2ToAlphaFactor": 2
   },
   jplEclipticInclinationTrends: {
     "mercury": -0.00595,

@@ -44,7 +44,10 @@ const OUT_COEFFS = join(ROOT, 'packages/physics/src/constants/coefficients.js');
 const OUT_COEFFS_DTS = join(ROOT, 'packages/physics/src/constants/coefficients.d.ts');
 
 /**
- * Fitted coefficients emitted VERBATIM from fitted-coefficients.json (§2j).
+ * Fitted coefficients emitted VERBATIM from the shipped fit artifacts under
+ * data/ (§2j; EXTRA_COEFFICIENT_SOURCES below — public/input/fitted-
+ * coefficients.json, the comb families' former home, was deleted at plan 11
+ * step 1 after plan 09 had emptied it).
  *
  * A SEPARATE export and a separate file, because the lifecycle differs: model
  * parameters are chosen or measured and change deliberately; these are pipeline
@@ -67,44 +70,16 @@ const OUT_COEFFS_DTS = join(ROOT, 'packages/physics/src/constants/coefficients.d
  * Any rename or reshape script.js wants (divisor n -> period H/n) happens
  * THERE, visibly, not in a formatter here.
  */
-const COEFFICIENT_KEYS = [
-  // (plan 09: TROPICAL/SIDEREAL/ANOMALISTIC_YEAR_HARMONICS and
-  // YEAR_LENGTH_J2000_ANCHOR — the frozen era clock's year-length combs and
-  // their measured J2000 anchor — are deleted; the year lengths of date are
-  // the one-family laws over the kinematic day of date. Step 4: the
-  // perihelion comb PERI_HARMONICS_RAW + PERI_OFFSET is deleted — Earth's
-  // perihelion of date is the series' ϖ, createModel().earth.perihelionLongitudeDeg)
-  // (plan 09: SOLSTICE_OBLIQUITY_HARMONICS retired — the obliquity of date is the hybrid ε;
-  //  step 5a: SUN_LONGITUDE_HARMONICS + SUN_LONGITUDE_MEAN — the Step-0 Sun comb on H, 2H, 3H,
-  //  retired from both engines at plan 06 R4 and read by nothing since — deleted with its fitter)
-  // (plan 09 step 5b: RA_DAY_OFFSET_MS — the −14.194 ms mean + two lines on H/16 and
-  //  H/8 that plan 07 R10 had made of the cosine literals — is deleted. It was the
-  //  equation of time's WINDOW term of the Framework-Verification instrument (365 noons
-  //  counted from the June solstice end 0.2422 d short of the year), not a motion.)
-
-  // (The Moon RA/Dec patches MOON_CORRECTION / MOON_CORRECTION_RESIDUAL were
-  // retired at plan 06 R3 item 1 — moon/apparent.cjs carries the record.)
-
-  // (plan 09 step 7a: the frozen cardinal record — CARDINAL_POINT_ANCHORS /
-  //  _ANCHORS_ADJUSTED, _HARMONICS (the 6-decimal-rounding case the first audit
-  //  missed: RSS 0.0149, worst 0.1360 across 96 terms), the §10 _ECC_TERMS /
-  //  _JOINT_TERMS / _DERIVED the runtime reused verbatim — is deleted with its
-  //  package evaluator; the cardinal instants are createModel().cardinal.
-  //  fitted-coefficients.json carries no coefficient block since.)
-
-  // (PREDICT_COEFFS_PHYSICAL — 16,919 values of the planet predict device —
-  // was emitted here until plan 06 R8 retired the device and its arrays.)
-
-  // The mean/offset SCALARS that pair with the harmonic arrays above — each
-  // series is `mean + sum(harmonics)`, so shipping one from the JSON and the
-  // other as a literal would split a single fitted quantity across two sources.
-  // (none remain since plan 09 steps 5a/5b)
-];
+// (plan 09 deleted every comb family fitted-coefficients.json carried — the
+//  year-length, perihelion, obliquity, Sun-longitude and RA-day-offset combs
+//  on divisors of the retired unit, the Moon RA/Dec patches (plan 06 R3), the
+//  planet predict device (plan 06 R8) and last, at step 7a, the frozen
+//  cardinal record with its package evaluator; git history carries them, doc
+//  110 §5.2/§5.5 the frozen render. Plan 11 step 1 deleted the emptied file.)
 
 /**
- * Coefficient blocks that come from OTHER files under public/input/. Same
- * treatment — verbatim, no formatter — they simply do not live in
- * fitted-coefficients.json.
+ * The coefficient blocks, each from its OWN fit artifact. Same treatment —
+ * verbatim, no formatter.
  */
 const EXTRA_COEFFICIENT_SOURCES = [
   { file: 'meeus-lunar-tables.json', as: 'MEEUS_LONGITUDE_TERMS', pick: (j) => j.longitudeTerms.terms },
@@ -162,7 +137,8 @@ const CLASSIFICATION = {
     planets: 'parameter',
     additionalBodies: 'parameter',
     perihelionPassageRef: 'parameter',
-    deepTime: 'parameter',
+    // (plan 11 step 1: `deepTime` is no longer a block of this file — it is
+    // ASSEMBLED below from its three homes; see assembleDeepTime.)
   },
   'astro-reference.json': {
     physicalConstants: 'anchor',
@@ -203,9 +179,13 @@ const CLASSIFICATION = {
     // counterfactual over them is legitimate ("what if Saturn's moment of
     // inertia were the Ward–Hamilton band") — anchor, like planetOrbitalElements.
     planetSpinPhysical: 'anchor',
-    // Cox & Chao dJ2/dt + Peltier factor — citation inputs of the shipped
-    // alphaClimateScale calibration; consumed only by the registry.
-    giaCoxChaoPeltier: 'target',
+    // Cox & Chao dJ2/dt + Peltier factor — ANCHOR since plan 11 step 1: the
+    // GIA channel's two J2000 rates (deepTime.j2RateJ2000PerYr and
+    // .alphaGiaRateJ2000PerYr) are DERIVED from them (assembleDeepTime), so
+    // "what if dJ2/dt were otherwise" is a legitimate counterfactual. They
+    // were a registry-only citation block while model-parameters deepTime
+    // carried copies of the derived values.
+    giaCoxChaoPeltier: 'anchor',
     // GRAIL/LLR lunar gravity citations (Williams 2014) — Cassini lab inputs
     // and registry keys; never model inputs.
     moonGrailWilliams2014: 'target',
@@ -232,6 +212,59 @@ const CLASSIFICATION = {
 };
 
 const read = (f) => JSON.parse(readFileSync(join(IN, f), 'utf8'));
+const readData = (f) => JSON.parse(readFileSync(join(ROOT, 'data', f), 'utf8'));
+
+/**
+ * The deep-time block of DEFAULT_CONSTANTS — ASSEMBLED, not read (plan 11
+ * step 1). Until then model-parameters.json carried it as a block of nine
+ * leaves, three of which duplicated or derived from values with another
+ * home. The leaves now come from where each belongs, and this is the ONE
+ * assembly every runtime reads (the browser and the package through the
+ * generated module, the Node twin tools/lib/constants.js through the same
+ * module; `test:constants` pins the embed to these sources):
+ *
+ *   alpha1PerMa              astro-reference moonReference.moonRecessionAlpha1PerMa
+ *                            (the LLR-anchored INPUT — an observation, anchor class)
+ *   j2RateJ2000PerYr         ≡ astro-reference giaCoxChaoPeltier.dJ2DtPerYr
+ *                            (the OBSERVED dJ2/dt; the J2(t)/J2_0 scale of the
+ *                            precession of date)
+ *   alphaGiaRateJ2000PerYr   = dJ2DtPerYr / j2ToAlphaFactor (exact in binary —
+ *                            the factor is 2; the channel's coupling k is derived
+ *                            from this rate at runtime)
+ *   alpha3PerMa3, alpha4PerMa4, alphaGiaRelaxationKyr, recessionRegime
+ *                            data/deep-time-fitted.json — the banked FITTED
+ *                            record (no live fitter reproduces them; a refit
+ *                            is a campaign under the paleo-anchors gate)
+ *   dtStackTaper*HalfwidthYr data/deltaT-4flag-fit.json shipped_taper — the
+ *                            ΔT stack's application window rides the stack's
+ *                            own artifact (its fitter writes it)
+ *
+ * Key order is the former block's, so the emitted shape is unchanged.
+ * @param {Record<string, any>} astro @returns {Record<string, unknown>}
+ */
+function assembleDeepTime(astro) {
+  const fitted = readData('deep-time-fitted.json');
+  const dtFit = readData('deltaT-4flag-fit.json');
+  const gia = astro.giaCoxChaoPeltier;
+  const need = (ok, what) => { if (!ok) throw new Error(`assembleDeepTime: ${what}`); };
+  need(typeof astro.moonReference?.moonRecessionAlpha1PerMa === 'number', 'astro-reference moonReference.moonRecessionAlpha1PerMa is missing');
+  need(typeof gia?.dJ2DtPerYr === 'number' && typeof gia?.j2ToAlphaFactor === 'number', 'astro-reference giaCoxChaoPeltier is incomplete');
+  for (const k of ['alpha3PerMa3', 'alpha4PerMa4', 'alphaGiaRelaxationKyr']) need(typeof fitted[k] === 'number', `data/deep-time-fitted.json ${k} is missing`);
+  need(fitted.recessionRegime && typeof fitted.recessionRegime === 'object', 'data/deep-time-fitted.json recessionRegime is missing');
+  need(dtFit.shipped_taper && typeof dtFit.shipped_taper.full_halfwidth_yr === 'number' && typeof dtFit.shipped_taper.total_halfwidth_yr === 'number',
+    'data/deltaT-4flag-fit.json carries no shipped_taper — re-run the Step-7c fitter (DT_CORRECTIONS_DISABLED=1 node tools/fit/dt-corrections-fit.js --joint --write)');
+  return {
+    alpha1PerMa: astro.moonReference.moonRecessionAlpha1PerMa,
+    alpha3PerMa3: fitted.alpha3PerMa3,
+    alpha4PerMa4: fitted.alpha4PerMa4,
+    alphaGiaRateJ2000PerYr: gia.dJ2DtPerYr / gia.j2ToAlphaFactor,
+    alphaGiaRelaxationKyr: fitted.alphaGiaRelaxationKyr,
+    j2RateJ2000PerYr: gia.dJ2DtPerYr,
+    dtStackTaperFullHalfwidthYr: dtFit.shipped_taper.full_halfwidth_yr,
+    dtStackTaperTotalHalfwidthYr: dtFit.shipped_taper.total_halfwidth_yr,
+    recessionRegime: strip(fitted.recessionRegime),
+  };
+}
 
 /** Walk a block, dropping `_`-prefixed documentation keys. */
 const strip = (v) => {
@@ -280,6 +313,9 @@ function build() {
       if (!blocks.includes(b)) problems.push(`${file}: classified block "${b}" no longer exists — remove it`);
     }
   }
+  // the assembled block (plan 11 step 1) — injectable, hashed with the rest
+  if ('deepTime' in included) problems.push('model-parameters.json: block "deepTime" returned — it is ASSEMBLED here (assembleDeepTime); its leaves have their own homes');
+  else included.deepTime = assembleDeepTime(read('astro-reference.json'));
 
   // Hashed over the INJECTABLE set only. Reference data is not part of the
   // model's identity: changing a validation bound does not make it a different
@@ -328,7 +364,10 @@ ${refBlocks.map((b) => `  ${b}: ${JSON.stringify(reference[b], null, 2).split('\
  * GENERATED — do not edit. Regenerate:
  *   node tools/constants/generate.mjs --write
  *
- * Source of truth: public/input/{model-parameters,astro-reference}.json
+ * Source of truth: public/input/{model-parameters,astro-reference}.json; the
+ * deepTime block is ASSEMBLED from astro-reference.json (moonReference.
+ * moonRecessionAlpha1PerMa, giaCoxChaoPeltier), data/deep-time-fitted.json
+ * and data/deltaT-4flag-fit.json shipped_taper (plan 11 step 1).
  * Classification and rationale: tools/constants/generate.mjs
  *
  * Two exports, deliberately separate (§2d):
@@ -428,15 +467,7 @@ ${Object.keys(reference).sort().map((b) => `  readonly ${b}: ${t(reference[b])};
 
 /** Emit the fitted coefficients verbatim, with their own content hash. */
 function buildCoefficients() {
-  const fc = read('fitted-coefficients.json');
   const out = {};
-  const missing = [];
-  for (const k of COEFFICIENT_KEYS) {
-    if (!(k in fc)) { missing.push(k); continue; }
-    // `strip` drops `_`-prefixed documentation keys, which the embedded copies
-    // never carried.
-    out[k] = strip(fc[k]);
-  }
   for (const { dir, file, as, pick } of EXTRA_COEFFICIENT_SOURCES) {
     const json = dir
       ? JSON.parse(readFileSync(join(ROOT, dir, file), 'utf8'))
@@ -447,7 +478,7 @@ function buildCoefficients() {
     .update(JSON.stringify(canonical(out)))
     .digest('hex')
     .slice(0, 16);
-  return { out, hash, missing };
+  return { out, hash };
 }
 
 // ── the engine-D chain artifact (P5/K4.6c) ──────────────────────────────────
@@ -731,7 +762,8 @@ function emitCoefficients({ out, hash }) {
  * GENERATED — do not edit. Regenerate:
  *   node tools/constants/generate.mjs --write
  *
- * Source: public/input/fitted-coefficients.json, emitted VERBATIM.
+ * Source: the shipped fit artifacts under data/ (EXTRA_COEFFICIENT_SOURCES in
+ * the generator), each emitted VERBATIM.
  *
  * Separate from DEFAULT_CONSTANTS because the lifecycle differs (§2j): these are
  * fitting-pipeline output, regenerated wholesale when a step runs, never
@@ -766,7 +798,7 @@ function emitCoefficientsDts({ out, hash }) {
   const keys = Object.keys(out).sort();
   return `// GENERATED — do not edit. Regenerate: node tools/constants/generate.mjs --write
 // The fitted coefficients' shapes for TypeScript consumers (§2g); values live
-// in coefficients.js, emitted VERBATIM from fitted-coefficients.json.
+// in coefficients.js, emitted VERBATIM from the fit artifacts under data/.
 
 export declare const COEFFICIENTS_HASH: ${JSON.stringify(hash)};
 
@@ -779,11 +811,6 @@ ${keys.map((k) => `  readonly ${k}: ${tsTypeOf(out[k])};`).join('\n')}
 // ── run ──────────────────────────────────────────────────────────────────────
 const result = build();
 const coeffs = buildCoefficients();
-if (coeffs.missing.length) {
-  console.error('fitted-coefficients.json is missing expected keys:');
-  for (const k of coeffs.missing) console.error(`  ${k}`);
-  process.exit(1);
-}
 
 if (result.problems.length) {
   console.error('CLASSIFICATION out of step with the JSON:');

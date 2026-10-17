@@ -2,7 +2,8 @@
  * GENERATED — do not edit. Regenerate:
  *   node tools/constants/generate.mjs --write
  *
- * Source: public/input/fitted-coefficients.json, emitted VERBATIM.
+ * Source: the shipped fit artifacts under data/ (EXTRA_COEFFICIENT_SOURCES in
+ * the generator), each emitted VERBATIM.
  *
  * Separate from DEFAULT_CONSTANTS because the lifecycle differs (§2j): these are
  * fitting-pipeline output, regenerated wholesale when a step runs, never

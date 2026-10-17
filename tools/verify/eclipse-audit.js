@@ -149,7 +149,9 @@ const INPUT_FILES = [
   'public/input/solar-eclipse-centerlines-nasa.json',
   'public/input/astro-reference.json',
   'public/input/model-parameters.json',
-  'public/input/fitted-coefficients.json',
+  // plan 11 step 1: the banked fitted deep-time record (τ_GIA, the recession
+  // regime) the ΔT stack's GIA channel rides; fitted-coefficients.json is deleted
+  'data/deep-time-fitted.json',
   // v23.0 (measured): the tiers run on the SERIES-driven model (createModel with
   // data/nbody-secular-series.json) and the ΔT stack reads the climate
   // formula's post-MPT layer (tools/lib/deep-time.js → the GIA α(t) channel);

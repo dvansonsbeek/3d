@@ -10,9 +10,10 @@
 
 All scripts that produce fitted coefficients or derived constants live here.
 Output values are stored in their `data/*.json` artifacts (the ΔT stack:
-`data/deltaT-4flag-fit.json`) and the `public/input/*.json` inputs;
-`public/input/fitted-coefficients.json` carries only its description since
-plan 09 deleted the last fitted family it held.
+`data/deltaT-4flag-fit.json`; the banked deep-time record
+`data/deep-time-fitted.json`) and the `public/input/*.json` inputs;
+`public/input/fitted-coefficients.json`, the comb families' former home, was
+emptied by plan 09 and deleted at plan 11 step 1.
 
 > **P5 note (post-excision):** the seven planets render from the orbital dynamics engine's
 > governed artifact (`tools/verify/nbody-secular.js --write` is that path's
@@ -394,8 +395,8 @@ TROPICAL/SIDEREAL/ANOMALISTIC_YEAR_HARMONICS with YEAR_LENGTH_J2000_ANCHOR
 of date the one-source family); and last, at step 7a, the CARDINAL_POINT_*
 family with its package evaluator and the clock's own counter (the ∫dt/H_era
 phase table, `cyclesBetweenYears`, `eraClockHAtAge`) — doc 110 §5.2/§5.5
-keep the last render as a static record, and fitted-coefficients.json
-carries no coefficient block since. Plan 06 R1 (measured): the
+keep the last render as a static record, and fitted-coefficients.json,
+empty since, was deleted at plan 11 step 1. Plan 06 R1 (measured): the
 CARDINAL_POINT_* family and the comb-based Sun drift left the runtime —
 the cardinal instants are the apparent crossings of the one certified Sun
 whose mean longitude integrates the one-source tropical year (against JPL
@@ -436,6 +437,10 @@ Steps 7a, 7b, 7d, 7e: deleted with the integer laws (plan 07 R6) — the
 Step 7c: DT_CORRECTIONS_DISABLED=1 dt-corrections-fit.js --joint --write
          → data/deltaT-4flag-fit.json + data/core-mantle-resonator-stage1.json
            + astro-reference.json deltaTStart          (JOINT WORLD, 2026-07-23)
+         The fit artifact also carries the stack's SHIPPED application window
+         (`shipped_taper`, ±300 kyr full / ±400 kyr zero — plan 11 step 1):
+         generate.mjs assembles it into DEFAULT_CONSTANTS.deepTime
+         .dtStackTaper*HalfwidthYr, so the stack and its window are one artifact.
          AUTHORITATIVE fit: 4 flags + the Core-mantle swing (Resonator)
          episode in ONE equality-constrained solve — hard USNO closure row
          (anchor met exactly, resonator included), amplitude caps at FIXED
@@ -772,7 +777,7 @@ npm run values:package:write     # re-render @essrt/model-values + re-stamp docs
 | Output type | Location |
 |-------------|----------|
 | Model parameters (JSON) | `public/input/model-parameters.json` ← single source of truth |
-| Fitted coefficients (JSON) | the ΔT stack: `data/deltaT-4flag-fit.json` + `data/core-mantle-resonator-stage1.json`; `public/input/fitted-coefficients.json` carries only its description since plan 09 |
+| Fitted coefficients (JSON) | the ΔT stack: `data/deltaT-4flag-fit.json` + `data/core-mantle-resonator-stage1.json`; the banked deep-time record `data/deep-time-fitted.json` (plan 11 step 1; `public/input/fitted-coefficients.json` is deleted) |
 | ML coefficients (Python) | retired at plan 06 R8 (`tools/lib/python/coefficients/` deleted) |
 | Browser simulation | `src/script.js` ← imports the generated constants module |
 | Solar measurements (CSV) | `data/02-solar-measurements-window.csv` (−4000…+4000, 1-year steps, 3.7 MB, gitignored; the full-period file is retired) |
@@ -783,29 +788,30 @@ They are generated locally (Step 3, and Step 6a on demand).
 
 ## Single source of truth — JSON files
 
-All input data lives in 4 JSON files in `public/input/`:
+All input data lives in 3 JSON files in `public/input/` (the fitted values
+live beside them under `data/`, each in its fitter's artifact):
 
 | File | Contents | Who writes |
 |------|----------|-----------|
-| `model-parameters.json` | Model theory parameters (corrections, the scaffold's recorded J2000 pose, planet configs) | Manual / optimizer |
-| `astro-reference.json` | IAU/JPL/Meeus reference data | Manual (external sources) |
-| `fitted-coefficients.json` | Its description only — the harmonic, parallax and obliquity families it once held are deleted (K5, plan 09) | — |
+| `model-parameters.json` | Model theory parameters (corrections, the scaffold's recorded J2000 pose, planet configs) — plan 11 retires it | Manual / optimizer |
+| `astro-reference.json` | IAU/JPL/Meeus reference data (since plan 11 step 1 also the LLR α₁ and the Cox & Chao GIA anchors the deep-time block derives from) | Manual (external sources) |
 | `meeus-lunar-tables.json` | Moon perturbation tables (Meeus Ch. 47) | Manual (reference data) |
+| `data/deep-time-fitted.json` | The banked fitted deep-time record (α₃/α₄, τ_GIA, the recession regime) | — (frozen; a refit is a campaign) |
 
 ## Constants flow
 
 ```
 public/input/ (single source of truth)
     ├── model-parameters.json     ← Model parameters (corrections, scaffold pose, planet configs)
-    ├── astro-reference.json      ← External reference data (IAU, JPL, Meeus)
+    ├── astro-reference.json      ← External reference data (IAU, JPL, Meeus; the LLR α₁, the Cox & Chao GIA anchors)
     ├── fitted-coefficients.json  ← description only (its families are deleted, plan 09)
     └── meeus-lunar-tables.json   ← Moon Meeus Ch. 47 tables
          │
          ├──→ JSON.parse (loaded at require-time)
          │    tools/lib/constants.js            ← Builds all constants + derived values
          │    tools/lib/constants/
-         │        ├── fitted-coefficients.js    ← Loads fitted JSON + buildFittedCoefficients()
          │        └── utils.js                  ← Derivation helpers (orbitTilt, inclination, etc.)
+         │    (the deep-time block is read from the GENERATED module — one assembly, plan 11 step 1)
          │         ↓ Node.js JSON dump
          │    tools/fit/python/_dump_constants.js  ← Exports constants as JSON to stdout
          │         ↓ subprocess (Node.js invoked by Python)
