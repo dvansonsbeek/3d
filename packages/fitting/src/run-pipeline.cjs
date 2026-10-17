@@ -52,8 +52,9 @@ const args = process.argv.slice(2);
 // and an unrecognised flag fell straight through the --from/--iterate/--converge
 // chain into a complete run. That is not hypothetical. `--list`, typed in the
 // belief that it printed the step table, silently began refitting and had
-// rewritten correctionSun, earthtiltMean, eccentricityBase and four planets'
-// startpos/angleCorrection before it was noticed and killed.
+// rewritten the scene Sun's start angle, earthtiltMean, the eccentricity base
+// and four planets' start angles before it was noticed and killed (the Step-1
+// optimizer that did it is deleted, plan 11 step 2).
 //
 // So: an unknown flag is now an ERROR, not a full run, and `--all` must be asked
 // for by name. Every other tool here makes --write opt-in; the orchestrator that
@@ -65,9 +66,9 @@ if (!flag) {
   console.error('run-pipeline.js writes to public/input/*.json and data/*.json and takes ~45 minutes.');
   console.error('It will not run without an explicit flag.\n');
   console.error('  --list        show the steps and exit (writes nothing)');
-  console.error('  --phase1      Step 1 only (~2 min)');
+  console.error('  --phase1      (no step left — the Step-1 Sun optimizer is deleted, plan 11 step 2)');
   console.error('  --phase2      Steps 6a2-9 (~45 min)');
-  console.error('  --all         Step 1, then 6a2-9');
+  console.error('  --all         Steps 6a2-9');
   console.error('  --from <step> resume from a step');
   process.exit(1);
 }
@@ -92,12 +93,14 @@ if (flag === '--from') {
 // ─── Step definitions ───────────────────────────────────────────────────────
 
 const STEPS = [
-  // Phase 1: Sun optimizer. (Step 2 — the per-planet startpos alignment —
-  // was retired for the planets with the K5 legacy-chain excision: the
-  // seven planets render from the engine-D Keplerian chain, whose anchors
-  // are the governed artifact's elements, not fitted scene angles.)
-  { id: '1',  phase: 1, name: 'Sun optimizer',
-    cmd: 'node tools/optimize.js optimize sun correctionSun --write' },
+  // (Phase 1 — Step 1, the Sun optimizer (`tools/optimize.js optimize sun
+  // correctionSun`) — DELETED at plan 11 step 2 with the scene constants it
+  // fitted: the engine places the Sun at the certified longitude, so the
+  // scene Sun's start angle reached nothing. Step 2 — the per-planet startpos
+  // alignment — was retired for the planets with the K5 legacy-chain
+  // excision: the seven planets render from the engine-D Keplerian chain,
+  // whose anchors are the governed artifact's elements, not fitted scene
+  // angles. The ids are never reused.)
 
   // (Steps 4a-4d — the perihelion comb, its ERD verifier and the precession
   // training — DELETED with the perihelion comb at plan 09 step 4; their

@@ -784,7 +784,7 @@ export function assembleModel(C, F, laws = {}, secularSeriesArtifact = /** @type
       name: mp.name,
       solarYearInput: ar.solarYearInput,
       longitudePerihelion: ar.longitudePerihelion,
-      ascendingNodeInvPlane: mp.ascendingNodeInvPlane,
+      ascendingNodeInvPlane: ar.ascendingNodeInvPlaneClosedForm,   // the closed-form verified J2000 node — astro-reference since plan 11 step 2
       invPlaneInclinationJ2000: ar.invPlaneInclinationJ2000,
       orbitalEccentricityJ2000: ar.orbitalEccentricityJ2000,
       axialTiltJ2000: ar.axialTiltJ2000,
@@ -1143,7 +1143,6 @@ export function assembleModel(C, F, laws = {}, secularSeriesArtifact = /** @type
       moonDistanceJ2000Km: C.moonReference.moonDistance,
       j2000JD,
       julianCenturyDays,
-      moonMeeusLpCorrectionDeg: C.moon.moonMeeusLpCorrection,
       fwA2RateDegPerCy,
       fwA3RateDegPerCy,
     },

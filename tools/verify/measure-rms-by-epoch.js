@@ -13,8 +13,9 @@
  * geometric model degraded outside the calibration window.)
  *
  * For each planet, bucket the JPL cache by 100-year epochs and compute the
- * combined RA+Dec joint RMS error (same metric used by tools/lib/optimizer.js
- * `baseline()` Step 10 in verify-pipeline).
+ * combined RA+Dec joint RMS error (the metric the retired optimizer's
+ * `baseline()` used in verify-pipeline's Step 10; both deleted at plan 11
+ * step 2 — this artifact is the chain-vs-JPL RMS's one home).
  *
  * Conventions:
  *   - JPL cache stores RA/Dec in DEGREES, J2000/ICRF frame

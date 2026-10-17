@@ -78,10 +78,10 @@ for (const [key, p] of Object.entries(C.planets)) {
 for (const [key, b] of Object.entries(C.additionalBodies)) {
   bodies[key] = {
     ...pickInputs(b),
-    // The engine's eros type fallback (constants.js computeAdditionalDerived)
-    // is caller policy, not law — replicated here, not in the factory.
-    type: b.type || (key === 'eros' ? 'II' : undefined),
-    // Minor bodies: the eccentricity base is a JSON input (no K law).
+    // (plan 11 step 2: the minor bodies carry no `type` — Eros' type-II
+    // default is the geometry law's own, ONE home.)
+    // Minor bodies: the eccentricity base is the observed J2000 value
+    // (astro-reference additionalBodiesReference; no K law).
     orbitalEccentricityBase: b.orbitalEccentricityBase,
   };
 }

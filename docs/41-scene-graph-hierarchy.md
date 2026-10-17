@@ -330,7 +330,7 @@ while every observable stayed bit-close.
 |----------|-------|---------|
 | orbitRadius | 100 (1 AU) | Always 1 AU from perihelion point |
 | speed | 2π | Exactly one solar year |
-| startPos | `correctionSun` | June 21, 2000 alignment correction |
+| startPos | 0 | The rest pose — the engine places the Sun at the certified longitude every frame (R4); the fitted start angle `correctionSun` is deleted (plan 11 step 2) |
 | rotation tilt | -7.155° | Solar axis inclination |
 
 **The Sun on the wheel (plan 06 R4).** The Sun's wheel angle is SET, every
@@ -541,8 +541,8 @@ For current values, see [Constants Reference](20-constants-reference.md).
 | 1 AU | 100 scene units | <!--v:oneAU-->149,597,870.698828<!--/v--> km |
 | Mean obliquity | `earthtiltMean` | Earth's mean axial tilt |
 | Inclination amplitude | `earthInvPlaneInclinationAmplitude` | Earth's orbital tilt oscillation |
-| Base eccentricity | `eccentricityBase` | Earth's Law-5 balance eccentricity |
-| Mean eccentricity | `eccentricityBaseDerived` (base′) | The perihelion wheel's offset base′ — the scaffold's J2000 pose, derived from e(J2000) and the recorded K inclination phase; the scene's per-frame offset carries the series' e(t) (the law is deleted, plan 09 step 6) |
+| Base eccentricity | (`eccentricityBase` — DELETED, plan 11 step 2) | was the retired Law-5 balance eccentricity; no reader left |
+| Mean eccentricity | (`eccentricityBaseDerived` — DELETED, plan 11 step 2) | The perihelion wheel's offset base′ was the scaffold's J2000 pose; the engine places the offset arm at the series' e(t) every frame, and the rest pose before the first frame is e(J2000) |
 | Eccentricity amplitude | `eccentricityAmplitude` | Retained only as the Law-4 K calibration input (no longer a scene arm) |
 
 ---

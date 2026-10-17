@@ -214,11 +214,11 @@ These constants define the model. Changing any of them changes the theory.
 
 | Constant | Variable | Value | Description |
 |----------|----------|-------|-------------|
-| Base Eccentricity | `eccentricityBase` | <!--v:eccentricityBase-->0.015386<!--/v--> | The Law-5 constant of the retired K law — a scene-scaffold constant since plan 09 (its retirement is plan 11). The perihelion wheel's offset base′ `eccentricityBaseDerived` = e(J2000)/(1 + cos θ₀/2) on the K inclination phase is the scene's J2000 pose; Earth's published e of date is the N-body series (the H/3 law is deleted, plan 09 step 6) |
+| Base Eccentricity | (`eccentricityBase` — DELETED, plan 11 step 2) | was 0.015386 | The Law-5 constant of the retired K law; its last reader was a fallback the panel always pre-empted. The perihelion wheel's offset base′ (`eccentricityBaseDerived`) went with it — the engine places the offset arm at the series' e of date every frame, and the rest pose before the first frame is e(J2000). Earth's published e of date is the N-body series (the H/3 law is deleted, plan 09 step 6) |
 | Eccentricity Amplitude | `eccentricityAmplitude` | <!--v:eccentricityAmplitude-->0.001356<!--/v--> | The Law-4 K input A, a scene-scaffold constant since plan 09 (the wobble-marker distance; the K law it calibrated is retired). Its derivation record: the 1246 triangle closure e(J2000)² = base² + A² + 2·base·A·cos φ on the H/16 beat from the <!--v:periAlignYearRound-->1246.03<!--/v--> perihelion–solstice alignment reproduced this value (the closure's registry keys — the phase, the derived A and the ±5 % alignment-year test — left with the eccentricity law at plan 09 step 6). A does not enter any e(t): Earth's eccentricity of date is the N-body series |
 | Mean Obliquity | `earthtiltMean` | <!--v:meanObliquity-->23.41353<!--/v--> deg | Mean axial tilt (derived from obliquity at J2000) |
 | RA Angle | `earthRAAngle` | ~1.254 | **Derived**: `2A − A²/ε` where A = inclination amplitude, ε = earthtiltMean |
-| Mean Inclination (inv. plane) | `earthInvPlaneInclinationMean` | <!--v:earthInclMean-->1.48113<!--/v--> deg | Mean orbital inclination to invariable plane (derived) |
+| Mean Inclination (inv. plane) | (`earthInvPlaneInclinationMean` — DELETED, plan 11 step 2) | the engine's mean over ±10 Myr is <!--v:earthInclMean-->1.28745<!--/v--> deg | The retired device's mean (inclJ2000 − A·cos(the K phase)) was the invariable-plane disc's init pose, rewritten from the engine's one-source normal every frame; the registry's `earthInclMean`/`Min`/`Max` are the engine's ±10-Myr statistics since plan 11 step 2 |
 | Inclination Amplitude | `earthInvPlaneInclinationAmplitude` | <!--v:earthInclAmp-->0.63607<!--/v--> deg | Oscillation amplitude (derived from obliquity rate) |
 | Inclination Cycle Anchor | (`earthInclinationCycleAnchor` — DELETED, plan 09 step 6) | was 21.77° | the eccentricity law's phase anchor (the perihelion longitude at maximum inclination); the scene pose it also set is the recorded `kDeviceInclinationPhaseJ2000Deg` = ϖ_J2000 − 21.77° |
 | Perihelion Ref JD | `perihelionRefJD` | <!--v:perihelionPassageJD-->2451547.042<!--/v--> | JD of Earth perihelion 2000 (Jan 3.542) |
@@ -235,7 +235,7 @@ plan 07 R8 and nothing in the model reads them.)
 | Start Model Year | `startmodelYear` | <!--v:startModelYear-->2000.5<!--/v--> | Decimal year of model start |
 | Start Angle | `startAngleModel` | <!--v:startAngleModel-->89.91949879<!--/v--> deg | Sun ecliptic longitude at model start |
 | Correction Days | `correctionDays` | <!--v:correctionDays-->-0.8288<!--/v--> | Correction for solstice alignment offset |
-| Variable Speed | `useVariableSpeed` | true | Enables equation of center (Kepler's 2nd law) |
+| Variable Speed | (`useVariableSpeed` — hard-wired true, plan 11 step 2) | true | The equation of centre and the certified Moon override are the scene, not a toggle; the false branch was a 6.5°-of-Moon diagnostic nobody ran |
 
 ## Physical Constants
 
@@ -308,8 +308,8 @@ Input constants used in the formulas above:
 | Constant | Variable | Formula | Value |
 |----------|----------|---------|-------|
 | Derived Mean Eccentricity | `eccentricityDerivedMean` | e(J2000) / (1 + cos θ₀/2) | the retired single-line law's base′ — the scene's flag-off fallback and the Node twin only; the published e is the N-body series |
-| EoC Eccentricity | `eocEccentricity` | derivedMean - base/2 | ~<!--v:eocEccentricityValue-->0.00836<!--/v--> |
-| Perihelion Phase Offset | `perihelionPhaseOffset` | (see constants.js derivation) | ~<!--v:periPhaseOffsetDeg-->0.4830<!--/v--> deg |
+| EoC Eccentricity | `eocEccentricity` | e(J2000) / 2 | ~<!--v:eocEccentricityValue-->0.00836<!--/v--> — the Sun node's rest-pose EoC half; the scene's per-frame value is the series' e(t)/2 |
+| Perihelion Phase Offset | (`perihelionPhaseOffset` — DELETED, plan 11 step 2) | was ~0.483 deg | the scene Sun's EoC phase at the model start, built from the deleted wheel 16 and `correctionSun`; the engine places the Sun at the certified longitude every frame |
 
 ## Ascending Node Frame Corrections
 
@@ -387,7 +387,7 @@ verification instruments, `inclination-optimization` and
 |--------|----------|---------------|-----------|-------------|
 | Mercury | <!--v:mercuryInclMean-->6.690391<!--/v--> | <!--v:mercuryInclAmp-->5.414244<!--/v--> | 6.32 - 7.09 | <!--v:mercuryPeriPeriodICRF-->232,437<!--/v--> yr |
 | Venus | <!--v:venusInclMean-->1.538475<!--/v--> | 0.062165 | 2.09 - 2.21 | <!--v:venusPeriPeriodICRF-->174,997<!--/v--> yr |
-| Earth | <!--v:earthInclMean-->1.48113<!--/v--> | <!--v:earthInclAmp-->0.63607<!--/v--> | 0.85 - 2.12 | <!--v:earthPeriPeriodICRF-->111,635<!--/v--> yr |
+| Earth | <!--v:earthInclMean-->1.28745<!--/v--> | <!--v:earthInclAmp-->0.63607<!--/v--> | 0.85 - 2.12 | <!--v:earthPeriPeriodICRF-->111,635<!--/v--> yr |
 | Mars | <!--v:marsInclMean-->4.205698<!--/v--> | <!--v:marsInclAmp-->3.368563<!--/v--> | 0.67 - 3.00 | <!--v:marsPeriPeriodICRF-->72,335<!--/v--> yr |
 | Jupiter | <!--v:jupiterInclMean-->0.362449<!--/v--> | <!--v:jupiterInclAmp-->0.144018<!--/v--> | 0.30 - 0.34 | <!--v:jupiterPeriPeriodICRF-->304,456<!--/v--> yr |
 | Saturn | <!--v:saturnInclMean-->0.891489<!--/v--> | <!--v:saturnInclAmp-->0.125937<!--/v--> | 0.92 - 1.05 | <!--v:saturnPeriPeriodICRF-->45,883<!--/v--> yr |
@@ -809,7 +809,7 @@ These values result from the retired optimization campaign; the campaign write-u
 
 | Constant | Variable | Value | Description |
 |----------|----------|-------|-------------|
-| Correction Sun | `correctionSun` | <!--v:correctionSunDeg-->0.49715<!--/v--> deg | Degree correction for Sun position (dynamic EoC); optimizer step 1 |
+| Correction Sun | (`correctionSun` — DELETED, plan 11 step 2) | was 0.49715 deg | the scene Sun's fitted start angle (the retired optimizer's Step 1); the engine places the Sun at the certified longitude every frame, so it reached nothing |
 
 ## Planet Orbital Periods (Tuned)
 
@@ -831,40 +831,44 @@ The base-eccentricity construction (the System-Reset midpoint from the balanced-
 
 With it went the Law-4 amplitude construction `e_amp = K × sin(tilt) × √d / (√m × a^(3/2))` and the planets' eccentricity phase constants on the balanced-year phase — nothing in the shipped code derives them any more. The recorded K value stays frozen in the [ψ/K section](#universal-coupling-constant-ψ) above (plan 07: `kValue` is a record, not a derivation).
 
-## Per-Planet EoC Fractions (legacy scaffolding since the K5 excision)
+## Per-Planet EoC Fractions — DELETED (plan 11 step 2)
 
-The Equation of Center fraction determines how much of a planet's Keplerian variable-speed behavior is captured by the EoC formula vs the geometric offset. See [Equation of Center](65-equation-of-center.md). Since the K5 legacy-chain excision these values drive only the geometric scene scaffolding (device anchors) and the no-chain bodies — the rendered planets come from the engine-D element chain.
+The per-planet `eocFraction` constants (how much of a planet's Keplerian
+variable speed the EoC formula carried against the geometric offset, see
+[Equation of Center](65-equation-of-center.md)) are deleted: since the K5
+legacy-chain excision the chain places every rendered planet, and the
+fraction's only reader was a field nothing set (measured by the plan 11 reach
+audit: a 0.25 shift in every fraction moved no position at any epoch). The
+recorded values — Mercury −0.527, Venus 0.436, Mars −0.066224, Jupiter 0.495,
+Saturn 0.54, Uranus 0.53, Neptune 0.585 — stand in git history.
 
-| Planet | `eocFraction` | Type | Description |
-|--------|--------------|------|-------------|
-| Mercury | <!--v:mercuryEocFraction-->-0.527<!--/v--> | I | Negative (inferior planet geometry) |
-| Venus | <!--v:venusEocFraction-->0.436<!--/v--> | I | Below geometric 0.50 |
-| Mars | <!--v:marsEocFraction-->-0.066224<!--/v--> | II | Near-zero (Earth-crossing) |
-| Jupiter | <!--v:jupiterEocFraction-->0.495<!--/v--> | III | Near geometric prediction of 0.50 |
-| Saturn | <!--v:saturnEocFraction-->0.54<!--/v--> | III | Above 0.50 |
-| Uranus | <!--v:uranusEocFraction-->0.53<!--/v--> | III | Above 0.50 |
-| Neptune | <!--v:neptuneEocFraction-->0.585<!--/v--> | III | Above 0.50 |
+## Planet Start Positions (legacy scaffolding since the K5 excision)
 
-## Planet Angle Corrections & Start Positions (Tuned — legacy scaffolding since the K5 excision)
+These are the retired pipeline Step 2's fitted scene start angles. Since the
+K5 legacy-chain excision they position only the geometric scaffolding; the
+rendered planets and every displayed element come from the engine-D chain. One
+reach remains (plan 11 step 0b): each planet's pole azimuth and Saturn's ring
+plane ride the scaffold angle — plan 11 step 3 places the poles from the spin
+channel and deletes the angles. The paired `angleCorrection` (the perihelion
+marker's fitted RA→λ conversion) was deleted at plan 11 step 2: the chain
+placement overwrote the marker every frame.
 
-These were the retired pipeline Step 2's fitted scene angles. Since the K5 legacy-chain excision they position only the geometric scaffolding (device anchors); the rendered planets and every displayed element come from the engine-D chain, and the Step-2 fitter is retired.
-
-| Planet | `angleCorrection` (deg) | `startpos` (deg) |
-|--------|------------------------|------------------|
-| Mercury | <!--v:mercuryAngleCorrectionDeg-->0.972721<!--/v--> | <!--v:mercuryStartPosDeg-->83.65<!--/v--> |
-| Venus | <!--v:venusAngleCorrectionDeg-->-2.789779<!--/v--> | <!--v:venusStartPosDeg-->249.29<!--/v--> |
-| Mars | <!--v:marsAngleCorrectionDeg-->-2.104653<!--/v--> | <!--v:marsStartPosDeg-->121.46<!--/v--> |
-| Jupiter | <!--v:jupiterAngleCorrectionDeg-->0.933321<!--/v--> | <!--v:jupiterStartPosDeg-->13.89<!--/v--> |
-| Saturn | <!--v:saturnAngleCorrectionDeg-->-0.178470<!--/v--> | <!--v:saturnStartPosDeg-->11.28<!--/v--> |
-| Uranus | <!--v:uranusAngleCorrectionDeg-->-0.734343<!--/v--> | <!--v:uranusStartPosDeg-->44.90<!--/v--> |
-| Neptune | <!--v:neptuneAngleCorrectionDeg-->2.332767<!--/v--> | <!--v:neptuneStartPosDeg-->47.96<!--/v--> |
+| Planet | `startpos` (deg) |
+|--------|------------------|
+| Mercury | <!--v:mercuryStartPosDeg-->83.65<!--/v--> |
+| Venus | <!--v:venusStartPosDeg-->249.29<!--/v--> |
+| Mars | <!--v:marsStartPosDeg-->121.46<!--/v--> |
+| Jupiter | <!--v:jupiterStartPosDeg-->13.89<!--/v--> |
+| Saturn | <!--v:saturnStartPosDeg-->11.28<!--/v--> |
+| Uranus | <!--v:uranusStartPosDeg-->44.90<!--/v--> |
+| Neptune | <!--v:neptuneStartPosDeg-->47.96<!--/v--> |
 
 ## Ascending Nodes on the Invariable Plane at J2000
 
 Three node sets coexist, all in the Souami & Souchay longitude origin (the plane's ascending node on the ICRF equator), and all closed against the same observation — JPL's J2000 ecliptic inclination — through the spherical-triangle identity `cos i_ecl = cos i_P · cos i_E + sin i_P · sin i_E · cos(Ω_P − Ω_E)`:
 
 - **S&S 2012** — the published nodes (`ascendingNodesSouamiSouchay` in `astro-reference.json`), mean-element values that miss the J2000 ecliptic inclinations by tens of arcseconds to a few arcminutes.
-- **Closed-form verified** — Ω solved from the identity with JPL's `i_ecl`, the S&S `i_P` and Earth's S&S `(i_E, Ω_E)`; `ascendingNodeInvPlane` in `model-parameters.json`. Read by the no-chain scaffolding (Pluto, Halley, Eros, Ceres). Derived by [ascending-node-optimization.js](../tools/verify/ascending-node-optimization.js) (numerical) and [analytical-ascending-nodes.js](../tools/verify/analytical-ascending-nodes.js) (closed form); checked by [ascending-node-verification.js](../tools/verify/ascending-node-verification.js) and [ascending-node-souami-souchay.js](../tools/verify/ascending-node-souami-souchay.js).
+- **Closed-form verified** — Ω solved from the identity with JPL's `i_ecl`, the S&S `i_P` and Earth's S&S `(i_E, Ω_E)`; `ascendingNodeInvPlaneClosedForm` in `astro-reference.json` (a reference derivation; plan 11 step 2 moved it there from `model-parameters.json`, where the no-chain scaffolding once read it). Derived by [ascending-node-optimization.js](../tools/verify/ascending-node-optimization.js) (numerical) and [analytical-ascending-nodes.js](../tools/verify/analytical-ascending-nodes.js) (closed form); checked by [ascending-node-verification.js](../tools/verify/ascending-node-verification.js) and [ascending-node-souami-souchay.js](../tools/verify/ascending-node-souami-souchay.js).
 - **Chain J2000** — the N-body chain's node of date at 2000 on the model's own banked plane, converted to the S&S origin by the derived conversion ([doc 05](05-invariable-plane-overview.md)); the value every rendered planet, the API and the registry's `<planet>OmegaJ2000` read. Its closure runs the identity on the chain's own `(i, Ω)` pairs, Earth's chain node included, so it is the chain's J2000 ecliptic inclination against the catalog.
 
 | Planet | S&S 2012 | closure (″) | Closed-form verified | closure (″) | Chain J2000 | closure (″) |
@@ -899,7 +903,7 @@ The verified and chain nodes are different constructions and differ by up to a f
 |----------|----------|-------|-------------|
 | Apsidal Start | `moonStartposApsidal` | <!--v:moonStartposApsidalDeg-->347.5476<!--/v--> deg | Apsidal precession start |
 | Nodal Start | `moonStartposNodal` | <!--v:moonStartposNodalDeg-->64.0435<!--/v--> deg | Nodal precession start |
-| Moon Start | `moonStartposMoon` | <!--v:moonStartposMoonDeg-->67.8443<!--/v--> deg | Orbital position start |
+| Moon Start | (`moonStartposMoon` — DELETED, plan 11 step 2) | was 67.8443 deg | the scene Moon's start angle; the certified series override places the rendered Moon's direction and distance every frame, so it reached only the Node twin's geometric pivot |
 
 ## Planet perihelion parameters (the retired predictive formula)
 

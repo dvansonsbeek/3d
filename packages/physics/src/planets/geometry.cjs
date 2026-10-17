@@ -80,8 +80,12 @@
  * }}
  */
 function derivePlanetGeometry(body, env) {
-  const { key, type, periodDays, semiMajorAxisAu, orbitalEccentricityBase: base,
+  const { key, type: typeIn, periodDays, semiMajorAxisAu, orbitalEccentricityBase: base,
           longitudePerihelion, ascendingNode, rotationPeriodDays, orbitDistanceOverride } = body;
+  // The minor bodies' ellipse family is the LAW's (plan 11 step 2: their
+  // scaffold `type` left the inputs): Pluto and Halley take the body-name
+  // branches below, Eros the type-II family — ONE home for that default.
+  const type = typeIn ?? (key === 'eros' ? 'II' : undefined);
   const { meanSolarYearDays: mSY, currentAUDistanceKm: AU,
           earthEccentricityJ2000, earthPerihelionLongitudeJ2000Deg } = env;
 

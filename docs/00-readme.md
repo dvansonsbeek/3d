@@ -141,22 +141,19 @@ The shared libraries that both the simulation (`src/script.js`) and the optimiza
 | `constants.js` | All model constants for the Node tools, loaded from the JSON source of truth in `public/input/`. `src/script.js` reads the same JSON through the generated module (`npm run constants:generate`) |
 | `scene-graph.js` | Headless scene graph: builds the same orbital hierarchy as Three.js without a browser |
 | `orbital-engine.js` | Computes planet positions for any date using the scene graph |
-| `optimizer.js` | Parameter optimization engine with JPL reference comparison |
 | `precession.js` | IAU 1976 precession correction (J2000 → of-date frame conversion) |
 | `horizons-client.js` | JPL Horizons API client for fetching reference ephemeris data |
 
-### `tools/optimize.js` — CLI Entry Point
+### The scene-pose optimizers — deleted (plan 11 step 2)
 
-The main command-line tool for running optimizations:
-
-```bash
-node tools/optimize.js <command> <target>
-```
-
-The planet-facing optimization programme is retired (the planets render
-from the engine-D element chain, which is not fitted per planet); the
-tool remains for Moon-side steps and chain-vs-JPL diagnostics. The full
-programme documentation is archived.
+`tools/optimize.js` and `tools/lib/optimizer.js` fitted the scene
+scaffold's pose constants (the Sun's start angle, the eccentricity base, the
+planets' start angles) against JPL reference points. Every quantity they
+tuned is now placed by the engine (the planets by the N-body chain, the Sun
+and the Moon by the certified series), so the constants and the tools are
+gone; the chain-vs-JPL RMS has one home, `data/chain-vs-jpl-rms.json`
+(`tools/verify/measure-rms-by-epoch.js`). The programme documentation is
+archived; git history keeps the tools.
 
 ### `tools/pipeline/` — Reference Data Pipeline
 

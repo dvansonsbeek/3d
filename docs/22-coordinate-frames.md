@@ -314,7 +314,7 @@ For current values, see [Constants Reference](20-constants-reference.md).
 
 | Constant | Description |
 |----------|-------------|
-| `earthInvPlaneInclinationMean` | Mean orbital inclination to invariable plane |
+| `earthInvPlaneInclinationMean` | DELETED (plan 11 step 2) — the retired device's mean inclination, the invariable-plane disc's init pose; the disc is placed from the engine's one-source normal every frame |
 | `earthInvPlaneInclinationAmplitude` | Oscillation amplitude |
 | `earthAscendingNodeInvPlaneSouamiSouchay` | J2000 ascending node (S&S) |
 | `earthAscendingNodeInvPlaneVerified` | J2000 ascending node (S&S 2012) |

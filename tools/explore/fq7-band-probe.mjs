@@ -29,7 +29,7 @@ const { createModel, DEFAULT_CONSTANTS: C } = require('@essrt/physics');
 const D2R = Math.PI / 180, R2D = 180 / Math.PI, AS = 3600, J2000 = 2451545.0;
 const model = createModel();
 const BRIDGE = C.earthOrbital.deltaTStart / 86400;
-const LP = C.moon.moonMeeusLpCorrection;
+const LP = 0;   // the fitted Lp anchor, retired to 0 (plan 06 R3 item 1); its key left the inputs at plan 11 step 2
 const mpp = MPP.loadMpp02(1);
 const PREC = [0, 5029.0966 / 3600, 1.1120 / 3600, 0.000077 / 3600, 0];
 const poly = (c, t) => c[0] + t * (c[1] + t * (c[2] + t * (c[3] + t * (c[4] || 0))));

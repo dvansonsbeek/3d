@@ -66,9 +66,15 @@ const knownValues = astroRef.knownValues;
 const startmodelJD = modelParams.foundational.startmodelJD;
 const startmodelYear = modelParams.foundational.startmodelYear;
 const correctionDays = modelParams.foundational.correctionDays;
-const correctionSun = modelParams.foundational.correctionSun;
 const startAngleModel = modelParams.foundational.startAngleModel;
-const useVariableSpeed = modelParams.foundational.useVariableSpeed;
+// Plan 11 step 2: hard-wired. The equation of centre on the scene wheels and
+// the certified Moon override ARE the scene; the toggle's false branch was a
+// 6.5°-of-Moon diagnostic nobody ran (measured by the reach audit). Kept as a
+// named constant so the mirror sites in moveModel read as before.
+const useVariableSpeed = true;
+// (plan 11 step 2: correctionSun — the scene Sun's start angle, and the
+// perihelion-phase offset derived from it — is deleted: the engine places the
+// Sun at the certified longitude every frame, so it reached nothing.)
 // (Plan 07 R10: temperatureGraphMostLikely and systemResetN — the phase
 // origin's inputs — left the JSON; the combs' phase is measured from J2000.)
 
@@ -108,27 +114,26 @@ const kDeviceWheelPhaseAtJ2000Cycles = modelParams.earth.kDeviceWheelPhaseAtJ200
 // src/script.js `kDeviceWheelPeriodYears` / `_wheelPeriodYears(N)`.
 const kDeviceWheelPeriodYears = modelParams.earth.kDeviceWheelPeriodYears;
 // Plan 09 step 6: the K-device inclination wheel's J2000 phase, a recorded
-// POSE constant (ϖ_J2000 − the retired eccentricity law's 21.77° anchor);
-// it poses the three scaffold constants below, nothing published rides it.
+// POSE constant (ϖ_J2000 − the retired eccentricity law's 21.77° anchor).
+// Plan 11 step 2: its readers here — the mean-inclination init and the
+// perihelion wheel's offset base′, both overwritten by the engine-placed
+// frame — are deleted; the browser's inclination-path zodiac offset is its
+// one remaining reach, which retires with the loop's zero at step 4.
 const kDeviceInclinationPhaseJ2000Deg = modelParams.earth.kDeviceInclinationPhaseJ2000Deg;
 // Derived: 2A − A²/ε — two tilt layers (H/3 + H/5) minus second-order equatorial projection
 const earthRAAngle = utils.computeEarthRAAngle(earthInvPlaneInclinationAmplitude, earthtiltMean);
-// Derived: inclJ2000 − amplitude × cos(the K inclination phase at J2000)
 const earthAscendingNodeInvPlane = ASTRO_REFERENCE.earthAscendingNodeInvPlane;
-const earthInvPlaneInclinationMean = utils.computeInvPlaneInclinationMean(
-  ASTRO_REFERENCE.earthInclinationJ2000_deg, earthInvPlaneInclinationAmplitude, kDeviceInclinationPhaseJ2000Deg);
-const eccentricityBase = modelParams.earth.eccentricityBase;
+// (plan 11 step 2: earthInvPlaneInclinationMean — inclJ2000 − A·cos(the K
+// phase), the invariable-plane disc's init, rewritten from the chain every
+// frame — and eccentricityBase, the retired Law-5 constant with no reader
+// left but a pre-empted fallback, are deleted. eccentricityAmplitude stays
+// until step 4: the Wobble marker's display radius, a scene literal.)
 const eccentricityAmplitude = modelParams.earth.eccentricityAmplitude;
-// The perihelion wheel's offset base′ = e(J2000) / (1 + cos θ₀/2), θ₀ the K
-// inclination phase at J2000 — a scaffold POSE value (the engine places the
-// offset arm at the series' e of date every frame, R4). Plan 09 step 6: the
-// H/3 eccentricity law that derived its e(t) on this base′ is deleted;
-// eccentricityBase (Law-5 solved, v11) and eccentricityAmplitude (the Law-4 K
-// calibration input) remain as the scaffold's constants until step 7.
-const eccentricityBaseDerived = ASTRO_REFERENCE.earthEccentricityJ2000
-  / (1 + Math.cos(kDeviceInclinationPhaseJ2000Deg * Math.PI / 180) / 2);
-// (plan 07 R6: eccentricityAmplitudeK — K inverted from Earth's calibration —
-// went with the eccentricity law.)
+// (plan 11 step 2: eccentricityBaseDerived — the perihelion wheel's offset
+// base′ = e(J2000)/(1 + cos θ₀/2) — is deleted; the wheel's offset arm is
+// placed at the series' e of date every frame (R4), and its pose before the
+// first engine frame is e(J2000). plan 07 R6: eccentricityAmplitudeK went
+// with the eccentricity law.)
 const perihelionRefJD = ASTRO_REFERENCE.perihelionPassageJ2000_JD;
 
 
@@ -144,10 +149,13 @@ const moonEclipticInclinationJ2000 = astroRef.moonReference.moonEclipticInclinat
 const moonOrbitalEccentricity = astroRef.moonReference.moonOrbitalEccentricityBase;
 const moonObliquityEclipticJ2000 = astroRef.moonReference.moonObliquityEclipticJ2000;
 const moonTilt = astroRef.moonReference.moonTilt;
-const moonMeeusLpCorrection = modelParams.moon.moonMeeusLpCorrection || 0;
+// (plan 11 step 2: moonMeeusLpCorrection — retired to 0 at plan 06 R3 item 1 —
+// left the lunar series' parameters; moonStartposMoon — the scene Moon's start
+// angle — is deleted: the certified override sets the rendered Moon's direction
+// and distance every frame, so the angle reached only the Node twin's
+// geometric pivot. The two ring phases below stay until step 3.)
 const moonStartposApsidal = modelParams.moon.moonStartposApsidal;
 const moonStartposNodal = modelParams.moon.moonStartposNodal;
-const moonStartposMoon = modelParams.moon.moonStartposMoon;
 
 
 // ═══════════════════════════════════════════════════════════════════════════
@@ -168,20 +176,23 @@ const CHAIN_DATA = JSON.parse(fs.readFileSync(
 const planetAstro = astroRef.planetOrbitalElements;
 const planets = {};
 for (const [key, mp] of Object.entries(modelParams.planets)) {
+  if (key.startsWith('_')) continue;   // documentation keys (`_step2Note`)
   const ar = planetAstro[key];
   planets[key] = {
     // Model parameters (from model-parameters.json)
     name: mp.name,
     // (plan 07 R6: orbitalEccentricityBase / Amplitude / eccentricityPhaseJ2000
     // were derived here from the balanced-year phase + K; the law is retired
-    // and the chain carries the eccentricity of date.)
-    eocFraction: mp.eocFraction,
+    // and the chain carries the eccentricity of date. Plan 11 step 2:
+    // eocFraction, angleCorrection and mirrorPair are deleted — no reader
+    // left, or overwritten by the chain placement every frame.)
     startpos: mp.startpos,
-    angleCorrection: mp.angleCorrection,
     perihelionEclipticYears: 1296000 / CHAIN_DATA.g[key].arcsecPerYr,   // the chain's inertial apsidal period (R1)
     type: mp.type,
-    mirrorPair: mp.mirrorPair,
-    ascendingNodeInvPlane: mp.ascendingNodeInvPlane,
+    // the closed-form verified J2000 node on the invariable plane — a
+    // reference derivation, astro-reference since plan 11 step 2 (the key name
+    // stays for the Python bridge's OMEGA_J2000 and the registry)
+    ascendingNodeInvPlane: ar.ascendingNodeInvPlaneClosedForm,
     // (plan 09 step 7c: `ascendingNodeCyclesIn8H` and the −8H/N node period
     // it set — a device count — left with the unit; a planet's node of date
     // and its nodal period are the chain's elements and modes.)
@@ -208,16 +219,17 @@ for (const p of Object.values(planets)) {
   }
 }
 
-// Additional bodies (not in the 8-planet Fibonacci framework)
+// Additional bodies — the four no-chain minor bodies (Pluto, Halley, Eros,
+// Ceres). Plan 11 step 2: their scaffold block left model-parameters.json;
+// the observed J2000 elements in astro-reference are the only inputs. The
+// bodies are not rendered (f735c2d8); the geometry law's rows for them are
+// the planet-model identity test's coverage of its ellipse families.
 const additionalBodies = {};
-for (const [key, body] of Object.entries(modelParams.additionalBodies)) {
-  const ar = astroRef.additionalBodiesReference[key] || {};
+for (const [key, ar] of Object.entries(astroRef.additionalBodiesReference)) {
+  if (key.startsWith('_') || !ar || typeof ar !== 'object') continue;
   additionalBodies[key] = {
-    name: body.name,
-    solarYearInput: ar.solarYearInput || body.solarYearInput,
-    orbitalEccentricityBase: body.orbitalEccentricityBase,
-    type: body.type,
-    ...(body.orbitDistanceOverride ? { orbitDistanceOverride: body.orbitDistanceOverride } : {}),
+    solarYearInput: ar.solarYearInput,
+    orbitalEccentricityBase: ar.orbitalEccentricityJ2000,
   };
 }
 
@@ -284,9 +296,8 @@ const meanStellarDay = (meanSiderealDay / axialPrecessionJ2000Years) / (meanSola
 // the one-family law of date at 2000, @essrt/physics yearLengths
 // .anomalisticYearSecondsAtYear(2000), the movement's own apsidal line. Before
 // step 3 it was meanSolarYearDays × (H/16)/(H/16 − 1), the device's identity.)
-// Unification: the mean of the one law IS base' (formerly the H/16 beat's
-// geometric mean √(base² + A²) = 0.01545).
-const eccentricityDerivedMean = eccentricityBaseDerived;
+// (plan 11 step 2: eccentricityDerivedMean — the one law's base′ alias, the
+// Earth panel's "mean eccentricity" cell — is deleted with base′.)
 // (plan 09 step 7c: `totalDaysInH` = H × mSY — the device's day count — and
 // the lattice grid (`pickStepYears`, `stepYears`, `gridYear`,
 // `gridYearDeltaFromJ2000`) are deleted. Since plan 07 R10 the phase origin
@@ -338,11 +349,10 @@ const tropicalCenturyDays = 100 * meanSolarYearDays;
 // this const is its J2000 value — the scene overrides it per frame.
 const eocEccentricity = ASTRO_REFERENCE.earthEccentricityJ2000 / 2;
 
-// Perihelion phase offset — derived from geometric perihelion direction vs reference perihelion date.
-// (plan 07 R10: the perihelion wheel's phase at the model start = its advance
-// from J2000 plus the device's recorded J2000 wheel phase, 16 × the constant)
-const perihelionPhaseOffset = ((((startModelYearWithCorrection - balancedYear) / kDeviceWheelPeriodYears[16] + 16 * kDeviceWheelPhaseAtJ2000Cycles) * 360
-  + correctionSun + 360 * (startmodelJD - perihelionRefJD) / meanSolarYearDays) % 360 + 360) % 360;
+// (plan 11 step 2: perihelionPhaseOffset — the scene Sun's EoC perihelion
+// phase at the model start, built from the deleted wheel 16 and correctionSun
+// — is deleted; the engine places the Sun at the certified longitude every
+// frame, so the offset reached nothing.)
 
 
 // ═══════════════════════════════════════════════════════════════════════════
@@ -564,7 +574,7 @@ function computeAdditionalDerived(key) {
   // only {N, a, period} for the minor bodies — part of the S-P6 coverage gap;
   // the ellipse family for pluto/halleys/eros is NEW capability here).
   const g = derivePlanetGeometry({
-    key, type: b.type || (key === 'eros' ? 'II' : undefined),
+    key,   // the minor bodies' ellipse family is the law's own (body-name branches; Eros' type default lives there since plan 11 step 2)
     ...scaffoldOrbitInputs(key, _CHAIN_ARTIFACT, b.solarYearInput),
     orbitalEccentricityBase: b.orbitalEccentricityBase,
     longitudePerihelion: b.longitudePerihelion,
@@ -610,7 +620,6 @@ module.exports = {
   startmodelJD,
   startmodelYear,
   correctionDays,
-  correctionSun,
   startAngleModel,
   useVariableSpeed,
 
@@ -648,12 +657,9 @@ module.exports = {
   // Earth parameters
   earthRAAngle,
   earthtiltMean,
-  earthInvPlaneInclinationMean,
   earthInvPlaneInclinationAmplitude,
   earthAscendingNodeInvPlane,
   kDeviceInclinationPhaseJ2000Deg,
-  eccentricityBase,
-  eccentricityBaseDerived,
   eccentricityAmplitude,
   perihelionRefJD,
 
@@ -663,13 +669,11 @@ module.exports = {
   moonNodalPrecessionDaysInputICRF,
   moonDistance,
   moonEclipticInclinationJ2000,
-  moonMeeusLpCorrection,
   moonOrbitalEccentricity,
   moonObliquityEclipticJ2000,
   moonTilt,
   moonStartposApsidal,
   moonStartposNodal,
-  moonStartposMoon,
 
   // Planet data
   planets,
@@ -694,12 +698,10 @@ module.exports = {
   meanSiderealDay,
   meanStellarDay,
   STELLAR_DAY_RA_PROJECTION,
-  eccentricityDerivedMean,
   j2000JD,
   julianCenturyDays,
   tropicalCenturyDays,
   eocEccentricity,
-  perihelionPhaseOffset,
 
   // Moon derived
   moonSiderealMonth,

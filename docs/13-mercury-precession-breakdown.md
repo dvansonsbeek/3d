@@ -66,7 +66,7 @@ average returns to the ecliptic value. Two implementations exist:
 
 | Metric | Mercury |
 |--------|-----------------|
-| Rate at J2000 (Earth-frame RA) | <!--v:mercuryPeriRateEarthFrameMeasuredJ2000-->576.19<!--/v--> ″/cy = <!--v:mercuryPeriRateEclipticArcsecCy-->529.03<!--/v--> × dα/dλ + <!--v:mercuryPeriObliquityRateTermJ2000-->4.31<!--/v--> |
+| Rate at J2000 (Earth-frame RA) | <!--v:mercuryPeriRateEarthFrameMeasuredJ2000-->576.19<!--/v--> ″/cy = <!--v:mercuryPeriRateEclipticArcsecCy-->529.03<!--/v--> × dα/dλ + <!--v:mercuryPeriObliquityRateTermJ2000-->4.65<!--/v--> |
 | Lattice (ecliptic) rate | <!--v:mercuryPeriRateEclipticArcsecCy-->529.03<!--/v--> ″/cy |
 | Earth-frame range over one secular perihelion period of Mercury's chain | <!--v:mercuryFluctuationMin-->-47<!--/v--> to <!--v:mercuryFluctuationMax-->+50<!--/v--> ″/cy about the ecliptic rate |
 
@@ -312,7 +312,7 @@ over the ecliptic advance **<!--v:mercuryPeriProjectionExcessJ2000-->42.51<!--/v
 The general-relativistic advance derived from the same model constants
 (6π GM/(c² a (1 − e²)) per orbit) is
 <!--v:mercuryPeriAnomalyGrArcsecCy-->42.98<!--/v--> ″/cy. Adding the obliquity-rate
-term (<!--v:mercuryPeriObliquityRateTermJ2000-->4.31<!--/v-->) gives the
+term (<!--v:mercuryPeriObliquityRateTermJ2000-->4.65<!--/v-->) gives the
 Earth-frame rate, <!--v:mercuryPeriRateEarthFrameMeasuredJ2000-->576.19<!--/v--> ″/cy
 at J2000 (plan 06 R8: this sum IS the model's Earth-frame rate; the retired
 device's 579.83 carried a κ ≤ 1.4″/cy residual of the retired scene) — the
@@ -335,7 +335,7 @@ condition in apparent geocentric longitude, re-solved in
 the excess is present in longitude-reduced positions with no transit and no
 modern constant in the chain.
 
-**The two coordinates, kept apart** (`tools/explore/mercury-perihelion-frames.mjs`).
+**The two coordinates, kept apart** (the instrument `tools/explore/mercury-perihelion-frames.mjs` read the scene marker's fitted `angleCorrection`, deleted at plan 11 step 2 — the script went with its input; git history keeps it).
 The advance is one motion in two coordinates: (a) ecliptic longitude of date,
 λ̇ = ϖ̇_sidereal + p_A — what Le Verrier, Newcomb and Clemence measured; (b)
 right ascension of date, α̇ = λ̇·dα/dλ + ∂α/∂ε·ε̇ — what the scene's export

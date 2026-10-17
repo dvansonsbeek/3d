@@ -17,7 +17,6 @@ const path = require('path');
 // unmigrated code; these collapse when tools/lib becomes adapters.
 const ROOT = path.resolve(__dirname, '..', '..', '..');
 const TOOLS_LIB = path.join(ROOT, 'tools', 'lib');
-const TOOLS_RESULTS = path.join(ROOT, 'tools', 'results');
 // (plan 09 step 7a: the stored-vs-loaded comb comparison against
 //  fitted-coefficients.json left with the last comb, the cardinal record)
 
@@ -286,31 +285,12 @@ for (const type of ['SS', 'WS', 'VE', 'AE']) {
 // (plan 09 step 7a: the harmonic term-count row left with the cardinal record)
 
 
-// Compare against stored Earth baselines
-const storedBaselinesEarly = JSON.parse(fs.readFileSync(
-  path.join(TOOLS_RESULTS, 'baselines.json'), 'utf8'));
-const prevEarth = storedBaselinesEarly.earth;
-if (prevEarth) {
-  if (obliqError > prevEarth.obliquityJ2000_error_arcsec + 0.01) {
-    console.log(`  WARNING: Obliquity J2000 error regressed: ${prevEarth.obliquityJ2000_error_arcsec.toFixed(4)}" → ${obliqError.toFixed(4)}"`);
-    totalErrors++;
-  }
-  if (rateError > prevEarth.obliquityRate_error_arcsec + 0.01) {
-    console.log(`  WARNING: Obliquity rate error regressed: ${prevEarth.obliquityRate_error_arcsec.toFixed(4)}" → ${rateError.toFixed(4)}"`);
-    totalErrors++;
-  }
-  // (plan 09 step 4: the perihelion-longitude regression row left with the comb)
-}
+// (plan 11 step 2: the Earth-geometry regression compare against
+// tools/results/baselines.json — the retired optimizer's companion record —
+// is deleted with the file; the obliquity, its rate and the tropical year are
+// pinned by the fixtures and the registry's plausibility rows. The checks
+// above still FAIL on their own tolerances.)
 console.log(`  ✓ Earth geometry verified\n`);
-
-// Store new Earth metrics for --write
-const newEarth = {
-  obliquityJ2000_error_arcsec: Math.round(obliqError * 10000) / 10000,
-  obliquityRate_error_arcsec: Math.round(rateError * 10000) / 10000,
-  tropicalYearJ2000_diff_sec: Math.round(tropDiffSec * 1000) / 1000,
-  // (plan 09: the sidereal/anomalistic J2000 diffs read the retired year combs;
-  //  step 7a: the cardinalPoints_terms counts read the deleted cardinal record)
-};
 
 // ═══════════════════════════════════════════════════════════════════════════
 // 9a. Eccentricity J2000 conformance — RETIRED at plan 07 R6
@@ -329,158 +309,12 @@ console.log('  The planets ride the N-body chain, anchored on the J2000 observat
 // excision: the planet-correction layers are gone, and MOON_CORRECTION
 // consistency is covered by the constants-embed gate.)
 
-// ═══════════════════════════════════════════════════════════════════════════
-// 10. Baseline regression check — compare RMS against stored baselines
-// ═══════════════════════════════════════════════════════════════════════════
-console.log('═══ Step 10: Baseline regression check ═══');
-
-const BASELINES_PATH = path.join(TOOLS_RESULTS, 'baselines.json');
-const { baseline: computeBaseline } = require(path.join(TOOLS_LIB, 'optimizer.js'));
-
-let regressions = 0;
-let improvements = 0;
-const newBaselines = {};
-const baselineResults = {};
-
-const storedBaselines = JSON.parse(fs.readFileSync(BASELINES_PATH, 'utf8'));
-
-// Planets and Moon use reference-data.json (synchronous).
-// Sun needs JPL fetch (async) — checked via `optimize.js baseline all`.
-const planetTargets = ['moon', 'mercury', 'venus', 'mars', 'jupiter', 'saturn', 'uranus', 'neptune'];
-
-console.log('  Target    │ Stored  │ Current │ Change  │ Status');
-console.log('  ──────────┼─────────┼─────────┼─────────┼───────');
-
-for (const target of planetTargets) {
-  let result;
-  try {
-    result = computeBaseline(target);
-  } catch (e) {
-    console.log(`  ${target.padEnd(10)}│ skipped (${e.message})`);
-    continue;
-  }
-  baselineResults[target] = result;
-  const prev = storedBaselines.targets[target];
-  if (!prev) {
-    console.log(`  ${target.padEnd(10)}│ no stored baseline`);
-    continue;
-  }
-  const round4 = v => Math.round(v * 10000) / 10000;
-  const curr = {
-    rmsRA: round4(result.rmsRA),
-    rmsDec: round4(result.rmsDec),
-    rmsTotal: round4(result.rmsTotal),
-    maxRA: round4(result.maxRA),
-    maxDec: round4(result.maxDec),
-    entries: result.entries.length,
-  };
-  newBaselines[target] = curr;
-
-  const diff = curr.rmsTotal - prev.rmsTotal;
-  const maxDiff = Math.max(
-    Math.abs(curr.maxRA) - Math.abs(prev.maxRA),
-    Math.abs(curr.maxDec) - Math.abs(prev.maxDec)
-  );
-  const pad = (s, n) => String(s).padStart(n);
-
-  let status;
-  if (diff > 0.001) {
-    status = 'REGRESSION (RMS)';
-    regressions++;
-    totalErrors++;
-  } else if (maxDiff > 0.01) {
-    status = 'REGRESSION (max)';
-    regressions++;
-    totalErrors++;
-  } else if (diff < -0.001) {
-    status = 'improved';
-    improvements++;
-  } else {
-    status = 'ok';
-  }
-
-  console.log(`  ${target.padEnd(10)}│ ${pad(prev.rmsTotal.toFixed(4), 7)}°│ ${pad(curr.rmsTotal.toFixed(4), 7)}°│ ${pad((diff >= 0 ? '+' : '') + diff.toFixed(4), 7)}°│ ${status}`);
-  if (status.startsWith('REGRESSION')) {
-    console.log(`  ${''.padEnd(10)}│ maxRA: ${pad(Math.abs(prev.maxRA).toFixed(4), 7)}→${pad(Math.abs(curr.maxRA).toFixed(4), 7)}  maxDec: ${pad(Math.abs(prev.maxDec).toFixed(4), 7)}→${pad(Math.abs(curr.maxDec).toFixed(4), 7)}`);
-  }
-}
-
-// Copy Sun from stored (not re-measured here — needs JPL fetch via `optimize.js baseline all`)
-if (storedBaselines.targets.sun) {
-  newBaselines.sun = storedBaselines.targets.sun;
-  console.log(`  sun       │ ${storedBaselines.targets.sun.rmsTotal.toFixed(4).padStart(7)}°│ (skip)  │         │ needs JPL fetch`);
-}
-
-if (regressions > 0) {
-  console.log(`\n  WARNING: ${regressions} target(s) regressed! Review before accepting.\n`);
-} else if (improvements > 0) {
-  console.log(`\n  ✓ No regressions. ${improvements} target(s) improved.\n`);
-} else {
-  console.log(`\n  ✓ All planet baselines match stored values.\n`);
-}
-
-// ─── Tier 1 (observed) RMS breakdown ────────────────────────────────────
-console.log('═══ Step 10b: Tier 1 (observed data) RMS ═══');
-console.log('  Target    │   All   │ Tier 1  │  n(T1) │ Tier 2  │  n(T2) │ Tiers present');
-console.log('  ──────────┼─────────┼─────────┼────────┼─────────┼────────┼──────────────');
-
-for (const target of planetTargets) {
-  const result = baselineResults[target];
-  if (!result) continue;
-
-  // Split entries by tier category
-  const tier1 = result.entries.filter(e => (e.tier || '').startsWith('1'));
-  const tier2 = result.entries.filter(e => (e.tier || '').startsWith('2'));
-
-  // Compute RMS for a subset
-  function subsetRMS(entries) {
-    if (entries.length === 0) return null;
-    let sumRA2 = 0, sumDec2 = 0, n = 0;
-    for (const e of entries) {
-      sumRA2 += e.dRA * e.dRA;
-      sumDec2 += e.dDec * e.dDec;
-      n++;
-    }
-    return Math.sqrt((sumRA2 + sumDec2) / n);
-  }
-
-  const rmsAll = newBaselines[target] ? newBaselines[target].rmsTotal : null;
-  const rms1 = subsetRMS(tier1);
-  const rms2 = subsetRMS(tier2);
-
-  // Collect which tier subtypes are present
-  const tierCounts = {};
-  for (const e of result.entries) {
-    const t = e.tier || '?';
-    tierCounts[t] = (tierCounts[t] || 0) + 1;
-  }
-  const tierList = Object.entries(tierCounts).sort().map(([t, c]) => `${t}:${c}`).join(' ');
-
-  const fmt = (v, w) => v !== null ? (v.toFixed(4) + '°').padStart(w) : '-'.padStart(w);
-
-  console.log(`  ${target.padEnd(10)}│ ${fmt(rmsAll, 7)} │ ${fmt(rms1, 7)} │ ${String(tier1.length).padStart(6)} │ ${fmt(rms2, 7)} │ ${String(tier2.length).padStart(6)} │ ${tierList}`);
-
-  // Store tier 1 RMS in baselines
-  if (newBaselines[target]) {
-    newBaselines[target].tier1RMS = rms1 !== null ? Math.round(rms1 * 10000) / 10000 : null;
-    newBaselines[target].tier1Count = tier1.length;
-    newBaselines[target].tier2RMS = rms2 !== null ? Math.round(rms2 * 10000) / 10000 : null;
-    newBaselines[target].tier2Count = tier2.length;
-  }
-}
-console.log('');
-
-// Update stored baselines if --write flag
-if (process.argv.includes('--write')) {
-  const output = {
-    _description: 'Stored baseline values for regression checking. Updated by verify-pipeline.js --write.',
-    _updated: new Date().toISOString().slice(0, 10),
-    earth: newEarth,
-    targets: newBaselines,
-  };
-  fs.writeFileSync(BASELINES_PATH, JSON.stringify(output, null, 2) + '\n');
-  console.log('  ✓ Updated baselines.json\n');
-}
+// (Steps 10/10b — the planets' and the Moon's RA/Dec RMS against the JPL
+// reference points through the retired optimizer's `baseline()`, compared
+// with tools/results/baselines.json — DELETED at plan 11 step 2 with the
+// optimizer. The chain-vs-JPL RMS has one home since plan 07: the governed
+// artifact data/chain-vs-jpl-rms.json (tools/verify/measure-rms-by-epoch.js);
+// the Moon's record is the eclipse-audit / lunar-alignment campaigns.)
 
 // ═══════════════════════════════════════════════════════════════════════════
 // SUMMARY
@@ -490,10 +324,6 @@ console.log(`  ${totalChecks} checks, ${totalErrors} errors`);
 if (totalErrors === 0) {
   console.log('  ✓ ALL PIPELINE VERIFICATION PASSED');
   console.log('  The JSON files are consistent with the computation engine.');
-  if (regressions === 0) console.log('  No baseline regressions detected.');
-} else if (regressions > 0) {
-  console.log(`  ✗ ${regressions} BASELINE REGRESSION(S) — review results before proceeding`);
-  process.exit(1);
 } else {
   console.log('  ✗ VERIFICATION FAILED — fix errors before proceeding');
   process.exit(1);

@@ -11,11 +11,9 @@
     "./sun-longitude-harmonics": "./src/sun-longitude-harmonics.cjs",
     "./dt-corrections-fit": "./src/dt-corrections-fit.cjs",
     "./validate-resonator": "./src/validate-resonator.cjs",
-    "./moon-eclipse-optimizer": "./src/moon-eclipse-optimizer.cjs",
     "./export-solar-measurements": "./src/export-solar-measurements.cjs",
     "./reclassify-tiers": "./src/reclassify-tiers.cjs",
     "./run-pipeline": "./src/run-pipeline.cjs",
-    "./ascnode-correction": "./src/ascnode-correction.cjs",
     "./fetch-jpl-data": "./src/fetch-jpl-data.cjs"
   },
   "license": "AGPL-3.0-or-later"

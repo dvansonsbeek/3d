@@ -135,7 +135,9 @@ const CLASSIFICATION = {
     earth: 'parameter',
     moon: 'parameter',
     planets: 'parameter',
-    additionalBodies: 'parameter',
+    // (plan 11 step 2: `additionalBodies` — the four no-chain bodies' scaffold
+    // inputs — is deleted; their observed J2000 elements are the anchor block
+    // additionalBodiesReference, the only inputs anything reads.)
     perihelionPassageRef: 'parameter',
     // (plan 11 step 1: `deepTime` is no longer a block of this file — it is
     // ASSEMBLED below from its three homes; see assembleDeepTime.)

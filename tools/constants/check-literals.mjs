@@ -51,7 +51,8 @@ const MIGRATED = [
   'model.foundational.startmodelJD',
   'model.foundational.startmodelYear',
   'model.foundational.correctionDays',
-  'model.foundational.correctionSun',
+  // (plan 11 step 2: correctionSun and useVariableSpeed left the JSON — the
+  // Sun's start angle reached nothing, the toggle is hard-wired true.)
   'model.foundational.startAngleModel',
   // (plan 07 R10: temperatureGraphMostLikely and systemResetN — the retired
   // phase origin's inputs — left the JSON; their return fails this gate below.)
@@ -60,7 +61,7 @@ const MIGRATED = [
   // NOT_IN_SCRIPT).
   'model.earth.earthtiltMean',
   'model.earth.earthInvPlaneInclinationAmplitude',
-  'model.earth.eccentricityBase',
+  // (plan 11 step 2: eccentricityBase — the retired Law-5 constant — left the JSON)
   'model.earth.eccentricityAmplitude',
   'model.earth.kDeviceWheelPhaseAtJ2000Cycles',   // plan 07 R10: the K wheels' recorded J2000 phase
   'model.earth.kDeviceWheelPeriodYears',          // plan 09 step 7c: the K wheels' recorded periods by wheel index (the retired unit's 335,317/N, a pose)
@@ -72,10 +73,10 @@ const MIGRATED = [
   // re-running was a no-op ("0.010524 | 0.010524 | none"), and the bounded-moon
   // derivation records "bit-identical (0.8086/0.010524/0.0015), FULL GATES
   // PASSED". tools/lib always used 0.010524; only the browser copy had drifted.
+  // (plan 11 step 2: moonStartposMoon and moonMeeusLpCorrection left the JSON —
+  // the start angle reached only the Node twin's pivot, the correction was 0.)
   'model.moon.moonStartposApsidal',
   'model.moon.moonStartposNodal',
-  'model.moon.moonStartposMoon',
-  'model.moon.moonMeeusLpCorrection',
 
   // Phase 5f block 4 — astro.physicalConstants. Listed per-path rather than by
   // prefix: earthJ2 and earthEquatorialRadiusKm are Node-side (NOT_IN_SCRIPT)
@@ -203,7 +204,8 @@ const MIGRATED = [
   'fitted',
   'astro.earthOrbital.earthEccentricityJ2000',
   'astro.earthOrbital.earthEccentricityDotJ2000',
-  'model.additionalBodies',
+  // (plan 11 step 2: the model.additionalBodies block is deleted — the four
+  // bodies' observed elements are astro.additionalBodiesReference, block 13.)
 
   // (Phase 5f block 10 — the H-lattice fraction pairs — stood here. The pairs
   // left the JSON at plan 07 R8; RETIRED_JSON_KEYS below fails if they return.)
@@ -237,17 +239,8 @@ const MIGRATED = [
   'astro.earthOrbital.earthEccentricityDotDotJ2000',
   'astro.earthOrbital.earthPerihelionLongitudeJ2000',
 
-  // Phase 5f block 14 — the last two per additional body: angleCorrection and
-  // startpos. (The perihelionEclipticFraction [1,1] placeholders left with the
-  // lattice at plan 07 R8.)
-  'model.additionalBodies.pluto.angleCorrection',
-  'model.additionalBodies.pluto.startpos',
-  'model.additionalBodies.halleys.angleCorrection',
-  'model.additionalBodies.halleys.startpos',
-  'model.additionalBodies.eros.angleCorrection',
-  'model.additionalBodies.eros.startpos',
-  'model.additionalBodies.ceres.angleCorrection',
-  'model.additionalBodies.ceres.startpos',
+  // (Phase 5f block 14 — the additional bodies' angleCorrection and startpos —
+  // left with the block at plan 11 step 2.)
 
   // Phase 5f block 15 — earthAscendingNodeInvPlaneVerified. Same NUMBER as
   // ascendingNodesSouamiSouchay.earth (284.51), different ROLE: this is the node
@@ -315,20 +308,11 @@ const NOT_IN_SCRIPT = {
   'astro.physicalConstants.earthEquatorialRadiusKm': 'used by tools/lib figure-of-Earth term',
   'astro.physicalConstants.earthParallaxRadiusKm': 'AU matched pair (appendix chain); consumed by the model-values registry, not script.js',
 
-  // The four additional bodies carry their eccentricity TWICE in the JSON —
+  // (The four additional bodies once carried their eccentricity TWICE —
   // astro.additionalBodiesReference.<b>.orbitalEccentricityJ2000 and
-  // model.additionalBodies.<b>.orbitalEccentricityBase — with identical values
-  // (verified for all four). script.js holds one literal, now imported from the
-  // model side, so the astro-side key has no separate copy to check. The two
-  // JSON entries are themselves a duplication worth collapsing one day.
-  'astro.additionalBodiesReference.pluto.orbitalEccentricityJ2000':
-    'duplicate of model.additionalBodies.pluto.orbitalEccentricityBase (identical); script.js imports the model side',
-  'astro.additionalBodiesReference.halleys.orbitalEccentricityJ2000':
-    'duplicate of model.additionalBodies.halleys.orbitalEccentricityBase (identical); script.js imports the model side',
-  'astro.additionalBodiesReference.eros.orbitalEccentricityJ2000':
-    'duplicate of model.additionalBodies.eros.orbitalEccentricityBase (identical); script.js imports the model side',
-  'astro.additionalBodiesReference.ceres.orbitalEccentricityJ2000':
-    'duplicate of model.additionalBodies.ceres.orbitalEccentricityBase (identical); script.js imports the model side',
+  // model.additionalBodies.<b>.orbitalEccentricityBase, identical values. Plan
+  // 11 step 2 collapsed the duplication: the model block is deleted and
+  // script.js imports the astro side, covered by block 13's prefix.)
 };
 
 /**
@@ -538,7 +522,11 @@ for (const r of masked) {
 // flag. Nothing in the code reads them any more; a key that reappears under a
 // planet or additional body is a device input re-entering the source of truth
 // and FAILS here. Fail-proven: ESSRT_LITERALS_PLANT=1 adds one phantom key.
-const RETIRED_JSON_KEYS = ['perihelionEclipticFraction', 'fibonacciD', 'inclinationCycleAnchor', 'antiPhase'];
+// Plan 11 step 2: the planets' eocFraction / angleCorrection / mirrorPair (no
+// reader left) and ascendingNodeInvPlane (moved to astro-reference as the
+// closed-form node) join the ratchet, with the whole additionalBodies block.
+const RETIRED_JSON_KEYS = ['perihelionEclipticFraction', 'fibonacciD', 'inclinationCycleAnchor', 'antiPhase',
+  'eocFraction', 'angleCorrection', 'mirrorPair', 'ascendingNodeInvPlane'];
 const retiredHits = [];
 {
   const mp = read('model-parameters.json');
@@ -548,6 +536,11 @@ const retiredHits = [];
       for (const k of RETIRED_JSON_KEYS) if (k in rec) retiredHits.push(`model.${root}.${body}.${k}`);
     }
   }
+  if ('additionalBodies' in mp) retiredHits.push('model.additionalBodies (plan 11 step 2: the no-chain bodies read astro-reference additionalBodiesReference)');
+  for (const k of ['correctionSun', 'useVariableSpeed']) if (k in (mp.foundational ?? {})) retiredHits.push(`model.foundational.${k} (plan 11 step 2)`);
+  if ('eccentricityBase' in (mp.earth ?? {})) retiredHits.push('model.earth.eccentricityBase (plan 11 step 2)');
+  if ('16' in (mp.earth?.kDeviceWheelPeriodYears ?? {})) retiredHits.push('model.earth.kDeviceWheelPeriodYears.16 (plan 11 step 2: the perihelion pair is engine-placed)');
+  for (const k of ['moonStartposMoon', 'moonMeeusLpCorrection']) if (k in (mp.moon ?? {})) retiredHits.push(`model.moon.${k} (plan 11 step 2)`);
   if (process.env.ESSRT_LITERALS_PLANT === '1') retiredHits.push('model.planets.mercury.fibonacciD (PLANTED)');
   // Plan 07 R10: the phase origin's two inputs left `foundational` — the combs
   // measure their phase from J2000, the former origin was rotated out of the

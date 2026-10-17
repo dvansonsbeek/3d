@@ -310,7 +310,6 @@ function _moonSeriesM() {
         moonRMeanKm: MEEUS_LUNAR.distanceTerms.meanKm,
         moonDistanceJ2000Km: C.moonDistance,
         j2000JD: C.j2000JD, julianCenturyDays: C.julianCenturyDays,
-        moonMeeusLpCorrectionDeg: C.moonMeeusLpCorrection,
         fwA2RateDegPerCy: _FW_A2_RATE, fwA3RateDegPerCy: _FW_A3_RATE,
       },
       fns: {
@@ -735,12 +734,13 @@ function getPlanetSceneData(key) {
   // lowestPoint (Type I only)
   const lowestPoint = 180 - p.ascendingNode;
 
-  // Orbit center for PerihelionFromEarth layer
+  // Orbit center for PerihelionFromEarth layer (plan 11 step 2: the fitted
+  // angleCorrection — the marker direction's RA→λ conversion — is deleted; the
+  // chain placement overwrites this centre every frame, mirror src/script.js)
   const longPeri = p.longitudePerihelion;
-  const angleCorr = p.angleCorrection;
   const periDist = d.perihelionDistance;
-  const periFromEarthA = Math.cos((longPeri + angleCorr + 90) * d2r) * periDist;
-  const periFromEarthB = Math.cos((90 - (longPeri + angleCorr - 90)) * d2r) * periDist;
+  const periFromEarthA = Math.cos((longPeri + 90) * d2r) * periDist;
+  const periFromEarthB = Math.cos((90 - (longPeri - 90)) * d2r) * periDist;
 
   // Ascending node corrected for planet-level tilt placement
   const correctedAscNode = p.ascendingNode + (ascNodeToolCorrection[key] || 0);
@@ -852,25 +852,25 @@ function buildSceneGraph() {
   });
   earthEclipPrec.pivot.addChild(earthObliqPrec.container);
 
+  // The perihelion pair — ENGINE-PLACED (R4): _applyEngineEarthFrame sets both
+  // nodes' angles to the series' ϖ of date and the inner node's offset arm to
+  // the series' e of date every call. Plan 11 step 2: the K-device wheel 16
+  // that turned them before the first engine frame is deleted; they rest at
+  // zero with the J2000 eccentricity until the engine frame places them.
   const earthPeriPrec1 = makePrecessionNode('earthPerihelionPrecession1', {
     orbitRadius: 0, orbitCentera: 0, orbitCenterb: 0, orbitCenterc: 0,
     orbitTilta: -C.earthRAAngle, orbitTiltb: 0,
     tilt: 0,
-    startPos: ((C.balancedYear - startModelYearWithCorrection) / wheelYr(16) - 16 * C.kDeviceWheelPhaseAtJ2000Cycles) * 360,
-    speed: Math.PI * 2 / wheelYr(16),
-    _dtCycleN: 16, _dtCycleSign: +1,   // Phase 9.12: the perihelion wheel, outer, prograde
+    startPos: 0, speed: 0,
   });
   earthObliqPrec.pivot.addChild(earthPeriPrec1.container);
 
   const earthPeriPrec2 = makePrecessionNode('earthPerihelionPrecession2', {
     orbitRadius: 0,
-    orbitCentera: -C.eccentricityBaseDerived * 100, orbitCenterb: 0, orbitCenterc: 0,   // the perihelion wheel's offset base′ — the scaffold's pose; R4 places the arm at the series' e of date
+    orbitCentera: -C.ASTRO_REFERENCE.earthEccentricityJ2000 * 100, orbitCenterb: 0, orbitCenterc: 0,   // the offset arm's rest pose; R4 places it at the series' e of date
     orbitTilta: 0, orbitTiltb: 0,
     tilt: 0,
-    startPos: -(((C.balancedYear - startModelYearWithCorrection) / wheelYr(16) - 16 * C.kDeviceWheelPhaseAtJ2000Cycles) * 360),
-    speed: -Math.PI * 2 / wheelYr(16),
-    _dtCycleN: 16, _dtCycleSign: -1,   // Phase 9.12: the perihelion wheel, inner, retrograde
-
+    startPos: 0, speed: 0,
   });
   earthPeriPrec1.pivot.addChild(earthPeriPrec2.container);
 
@@ -894,13 +894,17 @@ function buildSceneGraph() {
     orbitRadius: 100, orbitCentera: 0, orbitCenterb: 0, orbitCenterc: 0,
     orbitTilta: 0, orbitTiltb: 0,
     tilt: -7.155,
-    startPos: C.correctionSun,
+    // Plan 11 step 2: the Sun's start angle (correctionSun), its EoC phase
+    // offset and the wheel-16 phase rate are deleted — _applyEngineEarthFrame
+    // sets the Sun's wheel angle from the certified longitude every call, so
+    // this Kepler branch is the rest pose before the first engine frame only.
+    startPos: 0,
     speed: Math.PI * 2,
     eccentricity: C.eocEccentricity,
     _eccentricityKey: 'earth',
     _eocDerived: true,  // Sun EoC = e_dynamic - e_base/2
-    perihelionPhaseJ2000: -C.correctionSun * d2r - 2 * Math.PI * (C.startmodelJD - C.perihelionRefJD) / C.meanSolarYearDays + C.perihelionPhaseOffset * d2r,
-    perihelionPrecessionRate: Math.PI * 2 / wheelYr(16), // the K perihelion wheel's recorded rate (scaffold pose)
+    perihelionPhaseJ2000: -2 * Math.PI * (C.startmodelJD - C.perihelionRefJD) / C.meanSolarYearDays,
+    perihelionPrecessionRate: 0,
   };
   const sunNodes = makeObjectNodes('sun', sunDef);
   barycenter.pivot.addChild(sunNodes.container);
@@ -961,7 +965,7 @@ function buildSceneGraph() {
     orbitTilta: Math.cos((-90 + 180) * d2r) * -C.moonEclipticInclinationJ2000,  // 5.14° tilt lives here (below the nodal spin)
     orbitTiltb: Math.sin((-90 + 180) * d2r) * -C.moonEclipticInclinationJ2000,
     tilt: -(C.moonEclipticInclinationJ2000 + C.moonObliquityEclipticJ2000),  // Cassini composition in the scene's own convention (mirrors src/script.js moon.tilt)
-    startPos: C.moonStartposMoon,
+    startPos: 0,   // plan 11 step 2: the start angle is deleted — the certified override places the Moon's direction and distance every call; this node's own angle is the twin's geometric pivot only
     speed: (Math.PI * 2) / (1 / (C.meanSolarYearDays / C.moonNodalMonth)),  // draconitic (nodal-month) clock
     eccentricity: C.moonOrbitalEccentricity,
     lunarPerturbations: true,
@@ -1206,9 +1210,10 @@ function moveModel(graph, pos) {
     if (C.useVariableSpeed && def.eccentricity && def.perihelionPhaseJ2000 !== undefined) {
       let e;
       if (def._eccentricityKey && dynEcc[def._eccentricityKey] !== undefined) {
-        e = def._eocDerived
-          ? dynEcc[def._eccentricityKey] / 2   // Sun: eoc = e(t)/2 (the geometric offset e(t)·û(ϖ) supplies the other half)
-          : dynEcc[def._eccentricityKey] * def._eocFraction;        // Planets: eoc = e_dynamic × fraction
+        // the Sun (the only node with an eccentricity key): eoc = e(t)/2 — the
+        // geometric offset e(t)·û(ϖ) supplies the other half. (Plan 11 step 2:
+        // the planets' `× eocFraction` branch is deleted — the chain places them.)
+        e = dynEcc[def._eccentricityKey] / 2;
       } else {
         e = def.eccentricity;                                        // Moon, Pluto, etc: static
       }

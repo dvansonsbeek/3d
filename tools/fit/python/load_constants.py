@@ -45,18 +45,20 @@ MEAN_SOLAR_YEAR_DAYS = C['meanSolarYearDays']
 MEAN_SIDEREAL_YEAR_DAYS = C['meanSiderealYearDays']
 
 # Earth parameters
+# (plan 11 step 2: EARTH_INCLINATION_MEAN and EARTH_BASE_ECCENTRICITY — the
+# retired device's mean inclination and Law-5 base — are deleted with their
+# constants; no script read them.)
 EARTH_OBLIQUITY_MEAN = C['earthtiltMean']
-EARTH_INCLINATION_MEAN = C['earthInvPlaneInclinationMean']
 EARTH_INCLINATION_AMPLITUDE = C['earthInvPlaneInclinationAmplitude']
 EARTH_RA_ANGLE = C['earthRAAngle']
-EARTH_BASE_ECCENTRICITY = C['eccentricityBase']
 EARTH_ECCENTRICITY_AMPLITUDE = C['eccentricityAmplitude']
 # (plan 07 R6: EARTH_ECCENTRICITY_K — the K constant inverted from Earth's
 # calibration — went with the K law; it had no consumer outside this module.)
 
 # Derived (plan 09 step 7c: PERIHELION_CYCLE_LENGTH = H/16 and TOTAL_DAYS_IN_H
 # = H × mSY — the device's wheel period and day count — left with the unit)
-ECCENTRICITY_DERIVED_MEAN = C['eccentricityDerivedMean']
+# (plan 11 step 2: ECCENTRICITY_DERIVED_MEAN — the one law's base′ alias — is
+# deleted with the scene constant; no script read it.)
 
 # Fitted coefficients
 # (plan 09: SOLSTICE_OBLIQUITY_MEAN / SOLSTICE_OBLIQUITY_HARMONICS retired — the

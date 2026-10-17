@@ -58,10 +58,11 @@ _MEAN_SOLAR_YEAR = _C['meanSolarYearDays']
 BALANCED_JD = _C['balancedJD']
 
 # Earth parameters
-EARTH_BASE_ECCENTRICITY = _C['eccentricityBase']
+# (plan 11 step 2: EARTH_BASE_ECCENTRICITY and EARTH_INCLINATION_MEAN — the
+# retired device's Law-5 base and mean inclination — are deleted with their
+# constants; no script read them.)
 EARTH_ECCENTRICITY_AMPLITUDE = _C['eccentricityAmplitude']
 EARTH_OBLIQUITY_MEAN = _C['earthtiltMean']
-EARTH_INCLINATION_MEAN = _C['earthInvPlaneInclinationMean']
 EARTH_INCLINATION_AMPLITUDE = _C['earthInvPlaneInclinationAmplitude']
 EARTH_RA_ANGLE = _C['earthRAAngle']
 
@@ -106,7 +107,8 @@ _MEAN_SIDEREAL_DAY = (_MEAN_SOLAR_YEAR_DAYS / (_MEAN_SOLAR_YEAR_DAYS + 1)) * _ME
 # (plan 09 step 4d: the J2000 anomalistic year is the one-family law of date at
 # 2000 in @essrt/physics — no constant in the bridge; Simon 1994's mean element
 # 365.259636 is a citation, astro-reference knownValues.simon1994AnomalisticYearDays)
-_ECCENTRICITY_DERIVED_MEAN = _C['eccentricityDerivedMean']
+# (plan 11 step 2: _ECCENTRICITY_DERIVED_MEAN — the one law's base′ alias — left
+# with the scene constant; nothing here read it.)
 
 # (plan 09: the three year-length combs TROPICAL/SIDEREAL/ANOMALISTIC_YEAR_
 # HARMONICS are deleted — the year lengths of date are the one-family laws of
@@ -206,8 +208,9 @@ ECC_J2000["Earth"] = _C['ASTRO_REFERENCE']['earthEccentricityJ2000']
 # planets' base eccentricity was the K law's System-Reset construction and the
 # K constant was inverted from Earth's calibration; neither exists any more.
 # Analyses that want "the planet eccentricities" should use ECC_J2000 above —
-# the observed values the N-body chain is anchored on. Earth's own base and
-# amplitude survive as EARTH_BASE_ECCENTRICITY / EARTH_ECCENTRICITY_AMPLITUDE.
+# the observed values the N-body chain is anchored on. Earth's amplitude
+# survives as EARTH_ECCENTRICITY_AMPLITUDE (a scene literal until plan 11 step
+# 4); the base left at plan 11 step 2.
 
 AXIAL_TILT = {p['name']: p['axialTiltJ2000'] for p in _C['planets'].values()}
 AXIAL_TILT["Earth"] = EARTH_OBLIQUITY_MEAN

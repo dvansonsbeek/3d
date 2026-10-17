@@ -40,7 +40,8 @@ gravitational perturbation effects directly visible.
 
 ## 1. Full Meeus Ch. 47 Longitude + Latitude
 
-Applied in `moveModel()` when `useVariableSpeed && obj.lunarPerturbations`.
+Applied in `moveModel()` for the object with `lunarPerturbations` (the former
+`useVariableSpeed` toggle is hard-wired true since plan 11 step 2).
 
 ### Fundamental Arguments — Meeus reference form (polynomial in T = centuries from J2000)
 
@@ -499,8 +500,8 @@ place is a valid convention — the star-chart one — applied on the wrong
 side of the boundary: the scene is an orrery of where the bodies are
 (geometric; Earth's shadow is cast by the geometric Sun and the Moon enters
 it at its geometric place), and the conversion to a reference's convention
-belongs to the comparison instrument (the pipeline verifier bridges its
-astrometric JPL reference, `tools/lib/optimizer.js`; the Standard-Model
+belongs to the comparison instrument (the retired optimizer bridged its
+astrometric JPL reference — deleted at plan 11 step 2; the Standard-Model
 overlay compares the Moon geometric against MPP02 geometric). The patches
 were fitted around the layer at syzygies. All three left: the override is
 the frame conversion alone. The instruments
@@ -649,7 +650,7 @@ eclipse RMS (0.8086° — that metric is Meeus-override-framed).
 |-----------|--------------------------|
 | moonStartposApsidal | <!--v:moonStartposApsidalDeg-->347.5476<!--/v--> |
 | moonStartposNodal | <!--v:moonStartposNodalDeg-->64.0435<!--/v--> |
-| moonStartposMoon | <!--v:moonStartposMoonDeg-->67.8443<!--/v--> (in-plane anchor via the unmask meter, mean Δlon ≈ 0; the anchoring meter's L row reads the Meeus-overridden *true* Moon, so its ~3° Δ against the mean-longitude target is the equation-of-center reading, not an anchor error) |
+| moonStartposMoon | DELETED (plan 11 step 2) — was 67.8443, the in-plane anchor via the unmask meter; the certified override places the rendered Moon's direction and distance every frame, so the angle reached only the Node twin's geometric pivot (the anchoring meter's L row reads the Meeus-overridden *true* Moon, so its ~3° Δ against the mean-longitude target is the equation-of-center reading) |
 
 The apsidal/nodal values carry a micro-recalibration for the eight-interval count layer (a device of the lunar chain)
 rates. The anchoring meter's node-rate row reads the **world frame**: the

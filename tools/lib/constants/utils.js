@@ -111,23 +111,10 @@ function computeOrbitTilt(ascendingNode, eclipticInclinationJ2000) {
 }
 
 // (Plan 07 R5: computeInvPlaneInclinationAmplitude — the ψ law's amplitude,
-// PSI / (d × √m) — is deleted with the law. computeInvPlaneInclinationMean
-// below survives for EARTH only: earthInvPlaneInclinationMean is a K device
-// input of the scene's J2000 pose, read by constants.js and the Python bridge.)
-
-/**
- * Compute invariable plane inclination mean from J2000 constraint.
- * Formula: mean = inclJ2000 - amplitude × cos(phaseJ2000Deg × π/180)
- * (plan 09 step 6: the phase is the recorded K-device inclination-wheel pose
- * at J2000, formerly ϖ_J2000 − the retired eccentricity law's anchor)
- * @param {number} inclJ2000 - Invariable plane inclination at J2000 (degrees)
- * @param {number} amplitude - Inclination oscillation amplitude (degrees)
- * @param {number} phaseJ2000Deg - the inclination wheel's phase at J2000 (degrees)
- * @returns {number} Mean inclination in degrees
- */
-function computeInvPlaneInclinationMean(inclJ2000, amplitude, phaseJ2000Deg) {
-  return inclJ2000 - amplitude * Math.cos(phaseJ2000Deg * Math.PI / 180);
-}
+// PSI / (d × √m) — is deleted with the law. Plan 11 step 2:
+// computeInvPlaneInclinationMean — inclJ2000 − A·cos(the K inclination phase),
+// the scene's mean-inclination pose, overwritten from the chain every frame —
+// is deleted with its only reader.)
 
 /**
  * Compute Earth RA angle from inclination amplitude and tilt mean.
@@ -148,6 +135,5 @@ module.exports = {
   createDateUtils,
   pad, padLeft, fmt, fmtInt, printTable,
   computeOrbitTilt,
-  computeInvPlaneInclinationMean,
   computeEarthRAAngle,
 };

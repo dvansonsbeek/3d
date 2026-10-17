@@ -159,8 +159,8 @@ then `npm run constants:generate` (Step 9).
 | `export-solar-measurements.js` | `data/02-solar-measurements-window.csv` via `npm run fit:6a2` (the full-period `data/02-solar-measurements.csv` is retired; written only on demand) | Scene-graph simulation (1-year steps, single pass) |
 | `sun-longitude-harmonics.js` — DELETED at plan 09 step 5a with its two keys (the comb left every Sun path at plan 06 R4) | nothing (formerly `SUN_LONGITUDE_MEAN`, `SUN_LONGITUDE_HARMONICS`) | record: doc 109 §22 |
 | `sun-planetary-completion-fit.js` | NOTHING (read-only, the Step-0 companion — 20.3h, SUPERSEDED by Stage D2) | JPL Horizons live (960 all-phase + 179 syzygy epochs, network required — so it can never be a gate). Was the dev record behind the v1 fitted 10-term table; the shipped table is now the DERIVED 70-term extraction on FRAMEWORK-native carriers (FQ-5 N3: `tools/explore/d2-derived-sun.mjs` → `n2-sun-framework-carriers.mjs` → `n3-carrier-swap-preview.mjs`; the carrier rates are injected live from the planet records by `model.js`), so its coefficient-drift part no longer applies — its syzygy + NASA-centerline scoreboards remain valid verification. After ANY planet-record period change, re-run the N3 extraction chain and re-embed the table + its `PAIRED_SUN_HARMONICS_SHA256` by hand — the test:model fingerprint gate enforces the pairing. |
-| `ascnode-correction.js` | `ascNodeTiltCorrection`, `startpos` | `data/reference-data.json` |
-| `moon-eclipse-optimizer.js` | NOTHING (RETIRED at plan 06 R3 item 1 — kept as the record) | Formerly `moonMeeusLpCorrection` + `MOON_CORRECTION` against 58 solar eclipses (2000–2025) + a JPL baseline. Both are retired: measured against Horizons' apparent Moon the series needs no anchor (−1.0″ ± 1.5″, 1970–2049), the +32.75″ was the eclipse tier's mean Sun compensated (κ + the I2 long inequality + the trend-ΔT offset), and the RA/Dec patches were fitted around the retired D5 aberration layer (docs/66 §1.4). `moonStartpos*` values are J2000-element anchored via the in-sim meters (docs/66 §4) and are NO LONGER fitted |
+| `ascnode-correction.js` | DELETED (plan 11 step 2) with the optimizer it drove | formerly scanned `ascNodeTiltCorrection` and re-fitted the planets' `startpos` against `data/reference-data.json` |
+| `moon-eclipse-optimizer.js` | DELETED (plan 11 step 2; RETIRED since plan 06 R3 item 1) | Formerly `moonMeeusLpCorrection` + `MOON_CORRECTION` against 58 solar eclipses (2000–2025) + a JPL baseline. Both retired: measured against Horizons' apparent Moon the series needs no anchor (−1.0″ ± 1.5″, 1970–2049), the +32.75″ was the eclipse tier's mean Sun compensated (κ + the I2 long inequality + the trend-ΔT offset), and the RA/Dec patches were fitted around the retired D5 aberration layer (docs/66 §1.4). The Lp key left the inputs at plan 11 step 2; the two ring phases `moonStartposApsidal/Nodal` are J2000-element anchored via the in-sim meters (docs/66 §4) until plan 11 step 3 |
 | (`python/fit_perihelion_harmonics.py` / `python/verify_perihelion_erd.py`) | DELETED at plan 09 step 4 with `PERI_HARMONICS_RAW` / `PERI_OFFSET` — Earth's perihelion of date is the series' ϖ (`createModel().earth.perihelionLongitudeDeg`) | — |
 | `dt-corrections-fit.js` | `data/deltaT-4flag-fit.json` — cascaded LSQ fit of the 4-flag ΔT correction stack (Bond 1466 yr, Hallstatt 2430 yr, Jose5 897 yr, Jose4 716 yr — fitted periods stated in years, `period_yr`; the former divisor labels n = 1830/1104/2989/3749 survive only as identifiers) against the Stephenson 2016 residual. Sole authoritative source of the shipped `BOND_/HALLSTATT_/JOSE5_/JOSE4_ COS_/SIN_COEFF_S` constants. See "Phase 8" below. **JOINT WORLD (since 2026-07-23): `--joint` is the AUTHORITATIVE fit** — 4 flags + Core-mantle swing in one equality-constrained solve (hard USNO closure row, amplitude caps, resonator phases locked as unit shapes, free intercept = trend anchor). `--joint --write` ships the coefficients + anchors atomically (current joint optimum: USNO 86,400.0017, deltaTStart 55.85, Espenak fit-target RMS 12.60 s, full-window 31.27 s — read the live values from `data/deltaT-4flag-fit.json → optimum` and the stage-3 validation artifact, never from this sentence). The legacy single-shot cascade remains as a stage-wise diagnostic — **its `fit_metrics.stage_*` entries in `deltaT-4flag-fit.json` rank the flags differently from the shipped fit and must not be used to judge whether a flag earns its place** (worked example and the correct method in [doc 105](../../docs/105-dt-stack-flag-audit.md)); the resonator is default-ON runtime-wide (opt-out `DT_RESONATOR_DISABLED=1`; `DT_CORRECTIONS_DISABLED=1` alone still yields the fully-raw fitting residual via the integrator master-gate). | Stephenson 2016 spline (`public/input/stephenson-2016-deltaT-polynomial.json`) − pure-tidal framework model (`tools/lib/deep-time.js`, bypassed via `DT_CORRECTIONS_DISABLED=1`) |
 | `data/core-mantle-resonator-stage1.json` (artifact — no shipped generator) | the **Core-mantle swing (Resonator driver)** shipped block: a 2-kick EPISODE (windowed damped oscillation, T₀ ≈ 3,916 yr stated in years in the artifact (`T0_yr`), Q, kick epochs/coefficients, phase-locked drive tone). Selection rule: pinned-T₀ guard-passers first (guard-aware solver — modern-window δLOD penalty rows). **Regeneration in the joint world: amplitudes refit automatically via `--joint --write` (tone menu derives from the active flags — generic over flag count). The episode CONVENTION (T₀ ≈ 3,916 yr — once labelled by a divisor of the retired unit, now a period in years — Q = 1.8, epochs −1600/+1600, impulse-consistent shapes) is a DOCUMENTED CONVENTION, not a build-time derivation — it is not re-derivable from anything in this repo. Its evidence is the tracked result JSONs (`data/core-mantle-resonator-*.json`) plus the docs/104 narrative; the stage-1/stage-3/impulse scripts that originally established it ran against the pre-joint world, cannot reproduce today's numbers, and are deliberately not shipped.** Kick epochs are a documented CONVENTION, not data-pinned — see the stage-3 stability artifact before moving them. | Stephenson residual after the shipped stack (node bridge to `tools/lib/deep-time.js`) + `data/deltaT-4flag-fit.json` (parents' phases for the locked tones) |
@@ -215,12 +215,15 @@ model change that isn't paired with a version bump.
 When model parameters change, refit in this order. The logic:
 0. (Step 0, the Sun-longitude harmonics — DELETED at plan 09 step 5a with
    its fitter and keys; record: doc 109 §22.)
-1. Sun optimizer (Step 1) runs first. It derives the scene scaffold's Earth
-   geometry constants (eccentricityBase, eccentricityAmplitude, obliquity,
-   perihelion longitude).
+1. (Step 1, the Sun optimizer — DELETED at plan 11 step 2 with the scene
+   constants it fitted: the engine places the Sun, so `correctionSun` and the
+   eccentricity base reached nothing. The remaining scaffold pose constants —
+   `earthtiltMean`, the inclination amplitude, the wheels — are recorded
+   values, not fitted ones, until plan 11 step 4 retires the scaffold.)
 2. (Planet angleCorrection / startpos — retired with the K5 excision: the
-   planets render from the N-body chain.)
-3. Only after Step 1 is the simulation state correct enough to export data.
+   planets render from the N-body chain; angleCorrection deleted at plan 11
+   step 2.)
+3. The simulation state is the engine's — the export needs no fitter first.
 4. (Earth's perihelion comb, Steps 4a/4b, is DELETED at plan 09 step 4 —
    Earth's perihelion of date is the series' ϖ; the planet ML trainers,
    Steps 4c/4d, are retired at plan 06 R8.)
@@ -252,13 +255,14 @@ Step 0:  DELETED at plan 09 step 5a — the Sun-longitude harmonic fitter and
 
 ── Phase 1: Sun optimizer & planet alignment ──────────────────────
 
-Step 1:  node tools/optimize.js optimize sun correctionSun
-         → correctionSun, eccentricityBase, eccentricityAmplitude,
-           earthtiltMean, earthInvPlaneInclinationAmplitude (all derived)
-         Iterative solver: obliquity + perihelion longitude constraints
-         converge simultaneously (typically 1 pass).
-         Updates: model-parameters.json (5 Earth orbital constants)
-         Verify: RMS < 0.004°, perihelion longitude < 0.01" from IAU
+Step 1:  (DELETED at plan 11 step 2.) `node tools/optimize.js optimize sun
+         correctionSun` fitted the scene Sun's start angle, the eccentricity
+         base and amplitude, the mean obliquity and the inclination amplitude
+         against JPL. The engine places the Sun at the certified longitude,
+         so the first two reached nothing and left the inputs; the remaining
+         three are recorded pose constants of the scaffold (plan 11 step 4
+         retires them with it). The optimizer and its library are gone — git
+         history keeps them. The id is never reused.
 
 (Step 2 — per-planet startpos alignment — RETIRED for the planets with the
 K5 legacy-chain excision: the seven planets render from the engine-D
@@ -298,8 +302,9 @@ Steps 4a/4b (python/fit_perihelion_harmonics.py → PERI_HARMONICS_RAW,
          the published value. Measured before deletion, comb − series: 0.03°
          at 2000, −1.6° at −4000, −20° at −26 kyr (data/era-device-readers.json).
 
-Note: eocEccentricity and perihelionPhaseOffset are derived analytically in constants.js
-      from correctionSun and the eccentricity constants — no pipeline step needed.
+Note: eocEccentricity is derived analytically in constants.js (e(J2000)/2 — the
+      Sun node's rest-pose EoC half; the scene's per-frame value is the series).
+      perihelionPhaseOffset and correctionSun are deleted (plan 11 step 2).
 
 (Steps 4c–4d — the planet predictive-precession trainers
 `train_precession_physical.py` (~2,421 physical-beat terms per planet) and
@@ -317,11 +322,10 @@ render from the engine-D Keplerian chain, and the corrected geometric
 RA/Dec path they fitted no longer exists. The id 5c is kept — this
 numbering is shared vocabulary.)
 
-         Optional diagnostics (skip in standard refit):
-         • ascnode-correction.js — scans ascNodeTiltCorrection. No --write.
-           Step 2 already optimizes startpos/angleCorrection.
+         (ascnode-correction.js — the ascNodeTiltCorrection scan — was
+         DELETED at plan 11 step 2 with the optimizer it drove.)
 
-Step 5c: moon-eclipse-optimizer.js            → (RETIRED, plan 06 R3 item 1)
+Step 5c: moon-eclipse-optimizer.js            → (RETIRED plan 06 R3 item 1; DELETED plan 11 step 2)
          Formerly fitted the Lp bias and the 3-term RA/Dec correction vs
          JPL. Both constants are gone: the Moon's series needs no anchor
          against Horizons' apparent Moon, and the eclipse location tier now
@@ -488,9 +492,10 @@ Steps 7f-7i: campaign-artifact generators     → data/*.json (inputs-stamped)
 Step 8:  verify-pipeline.js                   → pass/fail
          Verifies JSON consistency, earth geometry at J2000 (obliquity, obliquity
          rate, perihelion longitude, e(J2000), all year lengths by formula, cardinal
-         point JDs), and checks planet baselines against stored values in
-         tools/results/baselines.json. Warns on regressions (>0.001°).
-         Must pass before Step 9. Add --write to update baselines.
+         point JDs). Must pass before Step 9. (The planet/Moon baselines step
+         against tools/results/baselines.json — the retired optimizer's
+         `baseline()` — was DELETED at plan 11 step 2; the chain-vs-JPL RMS has
+         one home, data/chain-vs-jpl-rms.json.)
 
 Step 9:  npm run constants:generate           → generated constants module
          Regenerates the module src/script.js imports. tools/lib reads the
@@ -610,15 +615,14 @@ sidereal year and p_A; the year lengths of date are the one-source family.
 | `solarYearInput` (any planet) / `moonSiderealMonthInput` / `yearLengthRef.siderealYear` | **The Sun-completion carriers ride these** (FQ-5 N3: `model.js` computes the carrier rates live; plan 06 I2: SIDEREAL — record rate minus the model's J2000 precession, Earth the sidereal year). Re-run the extraction chain (`tools/explore/n2-sun-framework-carriers.mjs` → `i2-sidereal-carrier-table.mjs` for the 70 short-period rows, `i2-long-inequality.mjs` for the two long-period rows on the model's own WH engine), re-embed the TERMS + `PAIRED_CARRIER_RATES_SHA256` in `eclipse/sun-planetary-completion.cjs` — the test:model fingerprint gate FAILS until you do (fail-proven). Plus the planet's own step 2 where applicable. |
 | `earthtiltMean` | 1, 6a2 (window CSV) |
 | `earthInvPlaneInclinationAmplitude` | 1, 6a2 (window CSV) |
-| `earthInvPlaneInclinationMean` | 6a2 (window CSV) |
-| `correctionSun` | 1, 6a2 (window CSV) |
+| `earthInvPlaneInclinationMean` / `correctionSun` | DELETED at plan 11 step 2 — scaffold constants the engine-placed frame overwrote; nothing to rerun |
 | `SUN_LONGITUDE_HARMONICS` / `SUN_LONGITUDE_MEAN` | DELETED at plan 09 step 5a with Step 0 — nothing to rerun. |
 | ~~Sun T² polynomial (inline in `moveModel`)~~ | **REMOVED 2026-06** — violates design rule (polynomial-in-T not cyclic). Do not re-introduce. |
-| `eccentricityBase` / `eccentricityAmplitude` | 1, 6a2 (window CSV) — scaffold constants; Earth's e of date is the N-body series |
+| `eccentricityAmplitude` | 6a2 (window CSV) — a scaffold constant (the Wobble marker's radius); Earth's e of date is the N-body series. `eccentricityBase` DELETED at plan 11 step 2. |
 | `correctionDays` | 6a2 (window CSV) |
-| `useVariableSpeed` | ALL (1→10) |
-| Planet `startpos` | — (Steps 2/5a-5b retired — K5 excision; legacy scene angle) |
-| Planet `eocFraction` | 3 (5a-5b retired — K5 excision) |
+| `useVariableSpeed` | hard-wired true since plan 11 step 2 — not an input |
+| Planet `startpos` | — (Steps 2/5a-5b retired — K5 excision; legacy scene angle, plan 11 step 3 retires it) |
+| Planet `eocFraction` | DELETED at plan 11 step 2 (no reader left) |
 | Planet `solarYearInput` | see the Sun-completion carriers row above (Steps 4c/4d retired at plan 06 R8; 2/5a-5b with the K5 excision) |
 | Planet `orbitalEccentricityBase` | — (Steps 2/5a-5b retired — K5 excision; legacy law constant) |
 | `perihelionalignmentYear` | 1, 6a2 (window CSV) |
@@ -716,13 +720,8 @@ npm run constants:generate                                                   # P
 
 # (Phase 0 — Step 0, the Sun-longitude harmonic fit — DELETED at plan 09 step 5a.)
 
-# Phase 1: Sun optimizer & planet alignment
-node tools/optimize.js optimize sun correctionSun --write                    # Step 1
-# (Step 2 — per-planet startpos — retired with the K5 excision)
-
-# Step 2-sync: push Step 1's values to script.js
-# so the browser simulation uses the post-optimization values
-npm run constants:generate && npm run build                                  # Step 2-sync
+# Phase 1: (Step 1, the Sun optimizer — DELETED at plan 11 step 2;
+#  Step 2 — per-planet startpos — retired with the K5 excision)
 
 # (Phase 2, Step 3 — the browser objects export — has no live consumer since
 #  Steps 4a–4d left; see Step 3 above.)
@@ -731,9 +730,8 @@ npm run constants:generate && npm run build                                  # S
 # (Steps 4a–4b — the perihelion comb fitter and verifier — deleted at plan 09 step 4;
 #  Steps 4c–4d — the planet predict trainers — retired at plan 06 R8)
 
-# Phase 4: Moon (Steps 5a-5b retired — K5 excision)
-# node tools/fit/ascnode-correction.js          # optional diagnostic
-node tools/fit/moon-eclipse-optimizer.js --write                             # Step 5c
+# Phase 4: Moon (Steps 5a-5b retired — K5 excision; 5c and the ascnode scan
+#  DELETED at plan 11 step 2)
 
 # Phase 5: Solar measurements & harmonic fits
 npm run fit:6a2                                                              # Step 6a2 → the window CSV (−4000…+4000; ~25 min) — re-base it when the engine's frame of date moves
@@ -748,7 +746,6 @@ npm run check:csv-smoke                                                      # t
 
 # Phase 6: Verify & sync
 node tools/fit/verify-pipeline.js                                            # Step 8 (must pass)
-node tools/fit/verify-pipeline.js --write                                    # update baselines.json
 npm run constants:generate                                                   # Step 9
 
 # Phase 8: Sub-Milankovitch ΔT correction stack (independent of Phases 1–7)
@@ -826,8 +823,8 @@ public/input/ (single source of truth)
                                 generated at build time, not fetched at runtime)
 
 Fitting scripts write to JSON, then `constants:generate` (Step 9) regenerates the module:
-    optimize.js                  → model-parameters.json       (Step 1)
     dt-corrections-fit.js        → data/deltaT-4flag-fit.json  (Step 7c / 11)
+    (optimize.js → model-parameters.json, Step 1, DELETED at plan 11 step 2)
 ```
 
 ## Correction Stack (RETIRED — K5 excision)

@@ -109,7 +109,7 @@ const DE441 = [
 const model = createModel(DEFAULT_CONSTANTS);
 const K = DEFAULT_CONSTANTS;
 const D2R = Math.PI / 180;
-const LP = K.moon.moonMeeusLpCorrection;
+const LP = 0;   // the fitted Lp anchor, retired to 0 (plan 06 R3 item 1); its key left the inputs at plan 11 step 2
 const BRIDGE = K.earthOrbital.deltaTStart / 86400;
 const NU = K.physicalConstants.nutationLeadingTermsArcsec;
 

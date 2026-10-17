@@ -45,7 +45,7 @@ const EPOCHS = [
   [2287175.717, 189.5464809], [2341962.047, 271.9896084], [2396748.377, 349.0010125],
   [2451534.708, 82.4269957],
 ];
-const LP = K.moon.moonMeeusLpCorrection;
+const LP = 0;   // the fitted Lp anchor, retired to 0 (plan 06 R3 item 1); its key left the inputs at plan 11 step 2
 const BRIDGE = K.earthOrbital.deltaTStart / 86400;
 const N = K.physicalConstants.nutationLeadingTermsArcsec;
 

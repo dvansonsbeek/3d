@@ -201,7 +201,11 @@ const chainInclStats = (() => {
   /** @type {Record<string, {mean:number, half:number, min:number, max:number}>} */ const memo = {};
   return (p) => {
     if (memo[p]) return memo[p];
-    const f = physModel().planets.invPlaneInclinationDeg;
+    // Earth's inclination to the invariable plane is the engine's own normal
+    // (model.earth.inclinationDeg, plan 07 R5); the planets' is the chain's.
+    const f = p === 'earth'
+      ? (/** @param {string} _ @param {number} y */ (_, y) => physModel().earth.inclinationDeg(y))
+      : physModel().planets.invPlaneInclinationDeg;
     let s = 0, n = 0, mn = Infinity, mx = -Infinity;
     for (let y = -9996000; y <= 9996000; y += 2000) { const v = f(p, 2000 + y); s += v; n++; if (v < mn) mn = v; if (v > mx) mx = v; }
     memo[p] = { mean: s / n, half: (mx - mn) / 2, min: mn, max: mx };
@@ -398,17 +402,9 @@ export const VALUES = {
     unit: '°',
     note: 'earthtiltMean — solved so the scene reproduces the obliquity anchor at the June-2000 solstice',
   },
-  eccentricityBase: {
-    get: () => model.earth.eccentricityBase,
-    render: (v) => Number(v).toFixed(6),
-    note: 'Earth eccentricity base (locked by the Law 5 balance constraint)',
-  },
-  correctionSun: {
-    get: () => model.foundational.correctionSun,
-    render: (v) => Number(v).toFixed(5),
-    unit: '°',
-    note: 'Sun orbital starting angle',
-  },
+  // (plan 11 step 2: `eccentricityBase` — the retired Law-5 constant — and
+  // `correctionSun` — the scene Sun's start angle, overwritten by the
+  // engine-placed Sun — left the inputs and the registry.)
   // ── Earth's precession periods ─────────────────────────────────────────
   // The website's convention, reproduced exactly: a `~` prefix on the rounded
   // ones, and axial precession alone carried to 2dp (it is the one compared
@@ -873,8 +869,9 @@ export const VALUES = {
     // The spherical-triangle identity cos i_ecl = cos i_P cos i_E + sin i_P sin i_E cos(Ω_P − Ω_E)
     // — the closed-form node calibration (tools/verify/analytical-ascending-nodes.js) run
     // forward. Three node sets are closed against JPL's J2000 ecliptic inclination: S&S 2012
-    // as published, the closed-form VERIFIED node (model-parameters ascendingNodeInvPlane,
-    // solved to close this identity — the no-chain scaffolding's data), and the chain's own
+    // as published, the closed-form VERIFIED node (astro-reference planetOrbitalElements
+    // .ascendingNodeInvPlaneClosedForm, solved to close this identity — a reference
+    // derivation; plan 11 step 2 moved it from model-parameters), and the chain's own
     // J2000 (i, Ω) pairs on the banked plane, Earth's included (the origin cancels in ΔΩ).
     const D = Math.PI / 180;
     const iEclDeg = (ip, Wp, ie, We) => Math.acos(Math.cos(ip * D) * Math.cos(ie * D) + Math.sin(ip * D) * Math.sin(ie * D) * Math.cos((Wp - We) * D)) / D;
@@ -905,10 +902,10 @@ export const VALUES = {
           note: 'chain node (S&S convention, derived conversion) minus S&S 2012 — element class (of-date vs mean elements)',
         }],
         [`${p}OmegaVerified`, {
-          get: () => C.planets[p].ascendingNodeInvPlane,
+          get: () => astro.planetOrbitalElements[p].ascendingNodeInvPlaneClosedForm,
           render: (v) => Number(v).toFixed(2),
           unit: '°',
-          note: 'closed-form J2000 node: Ω solved from the spherical triangle (JPL J2000 ecliptic inclination, S&S invariable-plane inclination, Earth’s S&S inclination and node) — model-parameters ascendingNodeInvPlane, the no-chain scaffolding’s data; S&S origin',
+          note: 'closed-form J2000 node: Ω solved from the spherical triangle (JPL J2000 ecliptic inclination, S&S invariable-plane inclination, Earth’s S&S inclination and node) — astro-reference ascendingNodeInvPlaneClosedForm (plan 11 step 2; was model-parameters); S&S origin',
         }],
         [`${p}EclInclSSClosureArcsec`, {
           get: () => closureArcsec(p, astro.ascendingNodesSouamiSouchay[p]),
@@ -917,7 +914,7 @@ export const VALUES = {
           note: 'ecliptic inclination from the spherical triangle on the S&S 2012 node, minus JPL J2000 (arcsec)',
         }],
         [`${p}EclInclVerifiedClosureArcsec`, {
-          get: () => closureArcsec(p, C.planets[p].ascendingNodeInvPlane),
+          get: () => closureArcsec(p, astro.planetOrbitalElements[p].ascendingNodeInvPlaneClosedForm),
           render: (v) => fmtSignedPct(v, 1),
           unit: '″',
           note: 'ecliptic inclination from the spherical triangle on the closed-form verified node, minus JPL J2000 (arcsec; zero by construction up to the stored node’s 2-dp rounding)',
@@ -1172,10 +1169,10 @@ export const VALUES = {
   // J2000 / node / anchor from astro-reference earthOrbital (the node is the
   // Souami & Souchay value).
   earthInclMean: {
-    get: () => C.earthInvPlaneInclinationMean,
+    get: () => chainInclStats('earth').mean,
     render: (v) => Number(v).toFixed(5),
     unit: '°',
-    note: 'retired device (plan 07 R5/R9): earthInclinationJ2000 − amplitude·cos(perihelionLongJ2000 − cycleAnchor) — the H/3 law\'s mean; the published i_inv is the one-source reading',
+    note: 'the mean of Earth\'s inclination to the invariable plane over the banked ±10-Myr series — the engine\'s one-source normal (plan 11 step 2; until then the retired H/3 device\'s mean, inclJ2000 − A·cos(the K phase))',
   },
   earthInclAmplitude: {
     get: () => C.earthInvPlaneInclinationAmplitude,
@@ -1189,14 +1186,16 @@ export const VALUES = {
     note: 'alias of earthInclAmplitude (both shipped by the website)',
   },
   earthInclMin: {
-    get: () => C.earthInvPlaneInclinationMean - C.earthInvPlaneInclinationAmplitude,
+    get: () => chainInclStats('earth').min,
     render: (v) => Number(v).toFixed(3),
     unit: '°',
+    note: 'the minimum of Earth\'s inclination to the invariable plane over the banked ±10-Myr series (plan 11 step 2; was the retired device\'s mean − amplitude)',
   },
   earthInclMax: {
-    get: () => C.earthInvPlaneInclinationMean + C.earthInvPlaneInclinationAmplitude,
+    get: () => chainInclStats('earth').max,
     render: (v) => Number(v).toFixed(3),
     unit: '°',
+    note: 'the maximum of Earth\'s inclination to the invariable plane over the banked ±10-Myr series (plan 11 step 2; was the retired device\'s mean + amplitude)',
   },
   earthInclJ2000: {
     get: () => astro.earthOrbital.earthInclinationJ2000_deg,
@@ -2358,16 +2357,16 @@ export const VALUES = {
     }
     for (const p of ['mercury', 'venus', 'mars', 'jupiter', 'saturn', 'uranus', 'neptune']) {
       const pl = model.planets[p];
-      out[`${p}StartPosDeg`] = { get: () => pl.startpos, render: (v) => v.toFixed(2), unit: 'deg', note: 'tuned (optimizer step 2)' };
-      out[`${p}AngleCorrectionDeg`] = { get: () => pl.angleCorrection, render: (v) => v.toFixed(6), unit: 'deg', note: 'derived from longitudePerihelion (step 2)' };
-      out[`${p}EocFraction`] = { get: () => pl.eocFraction, render: (v) => String(v), note: 'tuned EoC fraction' };
+      out[`${p}StartPosDeg`] = { get: () => pl.startpos, render: (v) => v.toFixed(2), unit: 'deg', note: 'the scene scaffold\'s start angle (the retired optimizer step 2; plan 11 step 3 retires it)' };
+      // (plan 11 step 2: `<p>AngleCorrectionDeg` and `<p>EocFraction` — scaffold
+      // constants with no reader left — left the inputs and the registry.)
     }
     out.moonStartposApsidalDeg = { get: () => model.moon.moonStartposApsidal, render: (v) => String(v), unit: 'deg', note: 'J2000-element anchored (docs/66 §4)' };
     out.moonStartposNodalDeg = { get: () => model.moon.moonStartposNodal, render: (v) => String(v), unit: 'deg', note: 'J2000-element anchored (docs/66 §4)' };
-    out.moonStartposMoonDeg = { get: () => model.moon.moonStartposMoon, render: (v) => String(v), unit: 'deg', note: 'J2000-element anchored (docs/66 §4)' };
-    out.correctionSunDeg = { get: () => model.foundational.correctionSun, render: (v) => v.toFixed(5), unit: 'deg', note: 'tuned (optimizer step 1)' };
+    // (plan 11 step 2: moonStartposMoonDeg, correctionSunDeg and periPhaseOffsetDeg
+    // left with their constants — the Moon's start angle, the Sun's start angle
+    // and the EoC phase offset reached nothing the engine does not overwrite.)
     out.eocEccentricityValue = { get: () => C.eocEccentricity, render: (v) => v.toFixed(5), note: 'derived: e(J2000)/2 — the Sun node\'s EoC half under the one eccentricity law' };
-    out.periPhaseOffsetDeg = { get: () => C.perihelionPhaseOffset, render: (v) => v.toFixed(4), unit: 'deg', note: 'derived (constants.js)' };
     out.perihelionPassageJD = { get: () => astro.earthOrbital.perihelionPassageJ2000_JD, render: (v) => String(v), unit: 'JD', note: 'USNO (2000 Jan 3)' };
     out.juneSolstice2000JD = { get: () => astro.earthOrbital.juneSolstice2000_JD, render: (v) => String(v), unit: 'JD', note: 'USNO (June 21, 2000)' };
     // R4d: the four observed 2000 cardinal instants (USNO "Earth's Seasons",
@@ -2477,15 +2476,15 @@ export const VALUES = {
     return out;
   })(),
 
-  // ── Pluto inclination + min/max envelopes + H factorization (11-2ac) ────
-  // Pluto's mean/amplitude are STORED values (model additionalBodies — no
-  // mass fraction for the ψ law), its Ω is the model's VERIFIED node
-  // (101.06, ascendingNodeInvPlane — deliberately ≠ the raw S&S 107.06;
-  // docs/32 table). Min/max are mean ∓ amplitude at 2 dp; the *Round keys
-  // are the 3-dp J2000 table forms. (plan 09 step 7c: holisticYearFactors —
-  // the retired unit's prime factorization — left with the unit.)
+  // ── Pluto node + the planets' inclination envelopes (11-2ac) ───────────
+  // Pluto's Ω is the model's VERIFIED closed-form node (101.06 — deliberately
+  // ≠ the raw S&S 107.06; docs/32 table), astro-reference
+  // additionalBodiesReference since plan 11 step 2 (the additionalBodies block
+  // that stored it, with the device mean/amplitude, is deleted). Min/max are
+  // mean ∓ half-range at 2 dp; the *Round keys are the 3-dp J2000 table forms.
+  // (plan 09 step 7c: holisticYearFactors — the retired unit's prime
+  // factorization — left with the unit.)
   ...(() => {
-    const pl = () => model.additionalBodies.pluto;
     const inclOf = (planet) => ({ mean: chainInclStats(planet).mean, amp: chainInclStats(planet).half });   // plan 07: the chain's series range
     const j2000Of = (planet) => {
       if (planet === 'earth') return astro.earthOrbital.earthInclinationJ2000_deg;
@@ -2497,7 +2496,7 @@ export const VALUES = {
       // amplitude and a phase anchor) for an orbit the model no longer carries.
       // What survives below is observed: the node the ascending-node
       // calibration compares, and the J2000 inclination it is measured against.
-      plutoOmegaJ2000: { get: () => pl().ascendingNodeInvPlane, render: (v) => Number(v).toFixed(2), unit: '°', note: 'the model\'s VERIFIED node — deliberately ≠ raw S&S 107.06 (docs/32)' },
+      plutoOmegaJ2000: { get: () => astro.additionalBodiesReference.pluto.ascendingNodeInvPlaneClosedForm, render: (v) => Number(v).toFixed(2), unit: '°', note: 'the model\'s VERIFIED closed-form node — deliberately ≠ raw S&S 107.06 (docs/32); astro-reference since plan 11 step 2' },
       plutoInclJ2000: { get: () => astro.additionalBodiesReference.pluto.invPlaneInclinationJ2000, render: (v) => String(v), unit: '°' },
       // (plan 09 step 7c: `holisticYearFactors` — the unit's prime factorization — left with the unit.)
     };
@@ -2710,10 +2709,9 @@ export const VALUES = {
     // The equatorial projection of each planet's ecliptic perihelion advance:
     //   rate_RA = rate_ecl × dα/dλ,   dα/dλ = cos ε / (cos²λ + sin²λ cos²ε)   (β = 0)
     // at the IAU J2000 longitude of perihelion (reading A, the physical
-    // perihelion) and at the scene marker's longitude λ + angleCorrection
-    // (reading B — the marker is placed so that its RA equals the catalogue
-    // value; angleCorrection IS the inverse RA→λ conversion, verified for all
-    // seven planets to 0.001°). The obliquity-rate term ∂α/∂ε · ε̇ is what
+    // perihelion). (Reading B — at the scene marker's longitude λ +
+    // angleCorrection, the fitted inverse RA→λ conversion — left with the
+    // constant at plan 11 step 2; nothing quoted it.) The obliquity-rate term ∂α/∂ε · ε̇ is what
     // separates the projection from the Earth-frame rate the export measures
     // (Mercury: 574.1 + 4.3 + ~1 = 579.9). The GR perihelion advance is
     // derived from the same constants (6π GM/(c² a (1−e²)) per orbit) so the
@@ -2742,7 +2740,6 @@ export const VALUES = {
     };
     for (const p of ['mercury', 'venus', 'mars', 'jupiter', 'saturn', 'uranus', 'neptune']) {
       const lamA = () => chainArt().j2000AnchorElements[p].lonPeriEclipticDeg;   // the chain's J2000 ϖ (plan 07; was the IAU input)
-      const lamB = () => chainArt().j2000AnchorElements[p].lonPeriEclipticDeg + C.planets[p].angleCorrection;
       out[`${p}PeriRateEclipticArcsecCy`] = { get: () => eclRate(p), render: (v) => thousands(v, 2), unit: '″/cy', note: 'the chain’s sidereal era window rate (1800–2100, 1PN on) — the projection’s input (plan 07; was the lattice divisor)' };
       out[`${p}PeriRaSlopeJ2000`] = { get: () => raSlope(lamA(), epsJ2000()), render: (v) => Number(v).toFixed(5), note: 'dα/dλ at the chain’s J2000 perihelion longitude, IAU 2006 obliquity (plan 07; was the IAU J2000 input)' };
       out[`${p}PeriRateRaProjectedJ2000`] = { get: () => eclRate(p) * raSlope(lamA(), epsJ2000()), render: (v) => thousands(v, 2), unit: '″/cy' };
@@ -2750,7 +2747,7 @@ export const VALUES = {
       // (plan 07 sweep: the "reading B at the scene marker" pair,
       // `<p>PeriRaSlopeMarkerJ2000` / `<p>PeriProjectionExcessMarkerJ2000`,
       // is deleted — no doc, page or paper quoted them.)
-      out[`${p}PeriObliquityRateTermJ2000`] = { get: () => eclRate(p) === 0 ? 0 : dAlphaDeps(lamB(), epsJ2000()) * epsRateArcsecCy(), render: (v) => thousands(v, 2), unit: '″/cy', note: '∂α/∂ε · ε̇ at J2000 (shipped obliquity law, ±50 yr)' };
+      out[`${p}PeriObliquityRateTermJ2000`] = { get: () => eclRate(p) === 0 ? 0 : dAlphaDeps(lamA(), epsJ2000()) * epsRateArcsecCy(), render: (v) => thousands(v, 2), unit: '″/cy', note: '∂α/∂ε · ε̇ at J2000 at the chain’s J2000 perihelion longitude (plan 11 step 2: was at the scene marker’s λ + angleCorrection, the fitted RA→λ conversion — the chain places the marker now; shipped obliquity law, ±50 yr)' };
       out[`${p}PeriRateEarthFrameMeasuredJ2000`] = { get: () => pm().totalPrecession(2000, p), render: (v) => thousands(v, 2), unit: '″/cy', note: 'the export/predict Earth-frame rate (RA) at J2000' };
       out[`${p}PeriAnomalyGrArcsecCy`] = { get: () => grAdvance(p), render: (v) => Number(v).toFixed(2), unit: '″/cy', note: 'general-relativistic advance from the model constants (GM_SUN, c, a from the period, e)' };
     }

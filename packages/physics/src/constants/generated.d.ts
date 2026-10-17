@@ -2,56 +2,14 @@
 // Gives the TypeScript website full type safety at the boundary (§2g) while
 // packages/physics stays JavaScript.
 
-export declare const CONSTANTS_HASH: "b241f63325106ddd";
+export declare const CONSTANTS_HASH: "2e57139cdae5fa03";
 
 export declare const MODEL_VERSION: string;
 
 export declare const PREPRINT_DOI: string;
 
 export declare const DEFAULT_CONSTANTS: {
-  readonly hash: "b241f63325106ddd";
-  readonly additionalBodies: {
-    "pluto": {
-      "name": string;
-      "orbitalEccentricityBase": number;
-      "type": string;
-      "angleCorrection": number;
-      "startpos": number;
-      "ascendingNodeInvPlane": number;
-      "invPlaneInclinationMean": number;
-      "invPlaneInclinationAmplitude": number;
-    };
-    "halleys": {
-      "name": string;
-      "orbitalEccentricityBase": number;
-      "type": string;
-      "angleCorrection": number;
-      "startpos": number;
-      "ascendingNodeInvPlane": number;
-      "invPlaneInclinationMean": number;
-      "invPlaneInclinationAmplitude": number;
-    };
-    "eros": {
-      "name": string;
-      "orbitalEccentricityBase": number;
-      "type": string;
-      "angleCorrection": number;
-      "startpos": number;
-      "ascendingNodeInvPlane": number;
-      "invPlaneInclinationMean": number;
-      "invPlaneInclinationAmplitude": number;
-    };
-    "ceres": {
-      "name": string;
-      "orbitalEccentricityBase": number;
-      "orbitDistanceOverride": number;
-      "angleCorrection": number;
-      "startpos": number;
-      "ascendingNodeInvPlane": number;
-      "invPlaneInclinationMean": number;
-      "invPlaneInclinationAmplitude": number;
-    };
-  };
+  readonly hash: "2e57139cdae5fa03";
   readonly additionalBodiesReference: {
     "pluto": {
       "solarYearInput": number;
@@ -64,6 +22,7 @@ export declare const DEFAULT_CONSTANTS: {
       "meanAnomaly": number;
       "trueAnomaly": number;
       "rotationPeriodDays": number;
+      "ascendingNodeInvPlaneClosedForm": number;
     };
     "halleys": {
       "solarYearInput": number;
@@ -146,7 +105,6 @@ export declare const DEFAULT_CONSTANTS: {
   readonly earth: {
     "earthtiltMean": number;
     "earthInvPlaneInclinationAmplitude": number;
-    "eccentricityBase": number;
     "eccentricityAmplitude": number;
     "kDeviceInclinationPhaseJ2000Deg": number;
     "kDeviceWheelPeriodYears": {
@@ -154,7 +112,6 @@ export declare const DEFAULT_CONSTANTS: {
       "5": number;
       "8": number;
       "13": number;
-      "16": number;
     };
     "kDeviceWheelPhaseAtJ2000Cycles": number;
   };
@@ -181,9 +138,7 @@ export declare const DEFAULT_CONSTANTS: {
     "startmodelJD": number;
     "startmodelYear": number;
     "correctionDays": number;
-    "correctionSun": number;
     "startAngleModel": number;
-    "useVariableSpeed": boolean;
   };
   readonly giaCoxChaoPeltier: {
     "dJ2DtPerYr": number;
@@ -192,8 +147,6 @@ export declare const DEFAULT_CONSTANTS: {
   readonly moon: {
     "moonStartposApsidal": number;
     "moonStartposNodal": number;
-    "moonStartposMoon": number;
-    "moonMeeusLpCorrection": number;
   };
   readonly moonMeeus: {
     "elpW1T2Decomposition_arcsecPerCy2": {
@@ -300,6 +253,7 @@ export declare const DEFAULT_CONSTANTS: {
       "invPlaneInclinationJ2000": number;
       "meanAnomaly": number;
       "trueAnomaly": number;
+      "ascendingNodeInvPlaneClosedForm": number;
     };
     "venus": {
       "solarYearInput": number;
@@ -312,6 +266,7 @@ export declare const DEFAULT_CONSTANTS: {
       "meanAnomaly": number;
       "trueAnomaly": number;
       "rotationPeriodDays": number;
+      "ascendingNodeInvPlaneClosedForm": number;
     };
     "mars": {
       "solarYearInput": number;
@@ -324,6 +279,7 @@ export declare const DEFAULT_CONSTANTS: {
       "meanAnomaly": number;
       "trueAnomaly": number;
       "rotationPeriodDays": number;
+      "ascendingNodeInvPlaneClosedForm": number;
     };
     "jupiter": {
       "solarYearInput": number;
@@ -336,6 +292,7 @@ export declare const DEFAULT_CONSTANTS: {
       "meanAnomaly": number;
       "trueAnomaly": number;
       "rotationPeriodDays": number;
+      "ascendingNodeInvPlaneClosedForm": number;
     };
     "saturn": {
       "solarYearInput": number;
@@ -348,6 +305,7 @@ export declare const DEFAULT_CONSTANTS: {
       "meanAnomaly": number;
       "trueAnomaly": number;
       "rotationPeriodDays": number;
+      "ascendingNodeInvPlaneClosedForm": number;
     };
     "uranus": {
       "solarYearInput": number;
@@ -360,6 +318,7 @@ export declare const DEFAULT_CONSTANTS: {
       "meanAnomaly": number;
       "trueAnomaly": number;
       "rotationPeriodDays": number;
+      "ascendingNodeInvPlaneClosedForm": number;
     };
     "neptune": {
       "solarYearInput": number;
@@ -372,6 +331,7 @@ export declare const DEFAULT_CONSTANTS: {
       "meanAnomaly": number;
       "trueAnomaly": number;
       "rotationPeriodDays": number;
+      "ascendingNodeInvPlaneClosedForm": number;
     };
   };
   readonly planetSpinPhysical: {
@@ -484,66 +444,38 @@ export declare const DEFAULT_CONSTANTS: {
   readonly planets: {
     "mercury": {
       "name": string;
-      "eocFraction": number;
       "startpos": number;
-      "angleCorrection": number;
       "type": string;
-      "mirrorPair": string;
-      "ascendingNodeInvPlane": number;
     };
     "venus": {
       "name": string;
-      "eocFraction": number;
       "startpos": number;
-      "angleCorrection": number;
       "type": string;
-      "mirrorPair": string;
-      "ascendingNodeInvPlane": number;
     };
     "mars": {
       "name": string;
-      "eocFraction": number;
       "startpos": number;
-      "angleCorrection": number;
       "type": string;
-      "mirrorPair": string;
-      "ascendingNodeInvPlane": number;
     };
     "jupiter": {
       "name": string;
-      "eocFraction": number;
       "startpos": number;
-      "angleCorrection": number;
       "type": string;
-      "mirrorPair": string;
-      "ascendingNodeInvPlane": number;
     };
     "saturn": {
       "name": string;
-      "eocFraction": number;
       "startpos": number;
-      "angleCorrection": number;
       "type": string;
-      "mirrorPair": string;
-      "ascendingNodeInvPlane": number;
     };
     "uranus": {
       "name": string;
-      "eocFraction": number;
       "startpos": number;
-      "angleCorrection": number;
       "type": string;
-      "mirrorPair": string;
-      "ascendingNodeInvPlane": number;
     };
     "neptune": {
       "name": string;
-      "eocFraction": number;
       "startpos": number;
-      "angleCorrection": number;
       "type": string;
-      "mirrorPair": string;
-      "ascendingNodeInvPlane": number;
     };
   };
   readonly timeReference: {

@@ -35,7 +35,7 @@
  * carry it so a counterfactual is reproducible (§2d).
  * @type {string}
  */
-export const CONSTANTS_HASH = "b241f63325106ddd";
+export const CONSTANTS_HASH = "2e57139cdae5fa03";
 
 /** Model version label — single source: public/input/model-version.json (§10 two-axis scheme). */
 export const MODEL_VERSION = "v24.0";
@@ -45,49 +45,7 @@ export const PREPRINT_DOI = "10.21203/rs.3.rs-8758810/v4";
 
 /** @type {Readonly<Record<string, unknown>>} */
 export const DEFAULT_CONSTANTS = Object.freeze({
-  hash: "b241f63325106ddd",
-  additionalBodies: {
-    "pluto": {
-      "name": "Pluto",
-      "orbitalEccentricityBase": 0.2488273,
-      "type": "I",
-      "angleCorrection": 2.469281,
-      "startpos": 71.555,
-      "ascendingNodeInvPlane": 101.06,
-      "invPlaneInclinationMean": 15.7162,
-      "invPlaneInclinationAmplitude": 0.717024
-    },
-    "halleys": {
-      "name": "Halley's",
-      "orbitalEccentricityBase": 0.96714291,
-      "type": "III",
-      "angleCorrection": -1.619816,
-      "startpos": 80,
-      "ascendingNodeInvPlane": 59.56,
-      "invPlaneInclinationMean": 150,
-      "invPlaneInclinationAmplitude": 0.1
-    },
-    "eros": {
-      "name": "Eros",
-      "orbitalEccentricityBase": 0.2229512,
-      "type": "II",
-      "angleCorrection": 0.047888,
-      "startpos": 57.402,
-      "ascendingNodeInvPlane": 10.36,
-      "invPlaneInclinationMean": 9.25,
-      "invPlaneInclinationAmplitude": 0.5
-    },
-    "ceres": {
-      "name": "Ceres",
-      "orbitalEccentricityBase": 0.0755347,
-      "orbitDistanceOverride": 2.76596,
-      "angleCorrection": 0,
-      "startpos": 0,
-      "ascendingNodeInvPlane": 80.89,
-      "invPlaneInclinationMean": 0.43,
-      "invPlaneInclinationAmplitude": 0.05
-    }
-  },
+  hash: "2e57139cdae5fa03",
   additionalBodiesReference: {
     "pluto": {
       "solarYearInput": 90465,
@@ -99,7 +57,8 @@ export const DEFAULT_CONSTANTS = Object.freeze({
       "ascendingNode": 110.30393,
       "meanAnomaly": 15.55009,
       "trueAnomaly": 26.31965048,
-      "rotationPeriodDays": 6.38720012152536
+      "rotationPeriodDays": 6.38720012152536,
+      "ascendingNodeInvPlaneClosedForm": 101.06
     },
     "halleys": {
       "solarYearInput": 27503,
@@ -194,15 +153,13 @@ export const DEFAULT_CONSTANTS = Object.freeze({
   earth: {
     "earthtiltMean": 23.413526608469965,
     "earthInvPlaneInclinationAmplitude": 0.636069722432876,
-    "eccentricityBase": 0.015386009686374918,
     "eccentricityAmplitude": 0.0013559440307290061,
     "kDeviceInclinationPhaseJ2000Deg": 81.17719000000001,
     "kDeviceWheelPeriodYears": {
       "3": 111772.33333333333,
       "5": 67063.4,
       "8": 41914.625,
-      "13": 25793.615384615383,
-      "16": 20957.3125
+      "13": 25793.615384615383
     },
     "kDeviceWheelPhaseAtJ2000Cycles": 0.908498525276082
   },
@@ -229,9 +186,7 @@ export const DEFAULT_CONSTANTS = Object.freeze({
     "startmodelJD": 2451716.5,
     "startmodelYear": 2000.5,
     "correctionDays": -0.828832119703292,
-    "correctionSun": 0.4971540149655503,
-    "startAngleModel": 89.91949879,
-    "useVariableSpeed": true
+    "startAngleModel": 89.91949879
   },
   giaCoxChaoPeltier: {
     "dJ2DtPerYr": -2.7e-11,
@@ -239,9 +194,7 @@ export const DEFAULT_CONSTANTS = Object.freeze({
   },
   moon: {
     "moonStartposApsidal": 347.5476,
-    "moonStartposNodal": 64.0435,
-    "moonStartposMoon": 67.8443,
-    "moonMeeusLpCorrection": 0
+    "moonStartposNodal": 64.0435
   },
   moonMeeus: {
     "elpW1T2Decomposition_arcsecPerCy2": {
@@ -347,7 +300,8 @@ export const DEFAULT_CONSTANTS = Object.freeze({
       "ascendingNode": 48.33033155,
       "invPlaneInclinationJ2000": 6.3472858,
       "meanAnomaly": 156.6364301,
-      "trueAnomaly": 164.1669319
+      "trueAnomaly": 164.1669319,
+      "ascendingNodeInvPlaneClosedForm": 32.83
     },
     "venus": {
       "solarYearInput": 224.695,
@@ -359,7 +313,8 @@ export const DEFAULT_CONSTANTS = Object.freeze({
       "invPlaneInclinationJ2000": 2.1545441,
       "meanAnomaly": 324.9668371,
       "trueAnomaly": 324.5198504,
-      "rotationPeriodDays": 243.022699230302
+      "rotationPeriodDays": 243.022699230302,
+      "ascendingNodeInvPlaneClosedForm": 54.7
     },
     "mars": {
       "solarYearInput": 686.93,
@@ -371,7 +326,8 @@ export const DEFAULT_CONSTANTS = Object.freeze({
       "invPlaneInclinationJ2000": 1.6311858,
       "meanAnomaly": 109.2630844,
       "trueAnomaly": 118.9501056,
-      "rotationPeriodDays": 1.02595659586635
+      "rotationPeriodDays": 1.02595659586635,
+      "ascendingNodeInvPlaneClosedForm": 354.87
     },
     "jupiter": {
       "solarYearInput": 4330.53,
@@ -383,7 +339,8 @@ export const DEFAULT_CONSTANTS = Object.freeze({
       "invPlaneInclinationJ2000": 0.3219652,
       "meanAnomaly": 32.47179744,
       "trueAnomaly": 35.69428061,
-      "rotationPeriodDays": 0.413541666975253
+      "rotationPeriodDays": 0.413541666975253,
+      "ascendingNodeInvPlaneClosedForm": 312.89
     },
     "saturn": {
       "solarYearInput": 10747,
@@ -395,7 +352,8 @@ export const DEFAULT_CONSTANTS = Object.freeze({
       "invPlaneInclinationJ2000": 0.9254704,
       "meanAnomaly": 325.663876,
       "trueAnomaly": 321.7910116,
-      "rotationPeriodDays": 0.440023148755863
+      "rotationPeriodDays": 0.440023148755863,
+      "ascendingNodeInvPlaneClosedForm": 118.81
     },
     "uranus": {
       "solarYearInput": 30586,
@@ -407,7 +365,8 @@ export const DEFAULT_CONSTANTS = Object.freeze({
       "invPlaneInclinationJ2000": 0.9946692,
       "meanAnomaly": 145.7292678,
       "trueAnomaly": 148.5142459,
-      "rotationPeriodDays": 0.718329998141018
+      "rotationPeriodDays": 0.718329998141018,
+      "ascendingNodeInvPlaneClosedForm": 307.8
     },
     "neptune": {
       "solarYearInput": 59800,
@@ -419,7 +378,8 @@ export const DEFAULT_CONSTANTS = Object.freeze({
       "invPlaneInclinationJ2000": 0.7354155,
       "meanAnomaly": 262.5003424,
       "trueAnomaly": 261.2242728,
-      "rotationPeriodDays": 0.671300001591743
+      "rotationPeriodDays": 0.671300001591743,
+      "ascendingNodeInvPlaneClosedForm": 192.04
     }
   },
   planetSpinPhysical: {
@@ -635,66 +595,38 @@ export const DEFAULT_CONSTANTS = Object.freeze({
   planets: {
     "mercury": {
       "name": "Mercury",
-      "eocFraction": -0.527,
       "startpos": 83.64651142941864,
-      "angleCorrection": 0.9727205912043573,
-      "type": "I",
-      "mirrorPair": "uranus",
-      "ascendingNodeInvPlane": 32.83
+      "type": "I"
     },
     "venus": {
       "name": "Venus",
-      "eocFraction": 0.436,
       "startpos": 249.28769121856186,
-      "angleCorrection": -2.789778861448692,
-      "type": "I",
-      "mirrorPair": "neptune",
-      "ascendingNodeInvPlane": 54.7
+      "type": "I"
     },
     "mars": {
       "name": "Mars",
-      "eocFraction": -0.066224,
       "startpos": 121.4634461571797,
-      "angleCorrection": -2.104652936098656,
-      "type": "II",
-      "mirrorPair": "jupiter",
-      "ascendingNodeInvPlane": 354.87
+      "type": "II"
     },
     "jupiter": {
       "name": "Jupiter",
-      "eocFraction": 0.495,
       "startpos": 13.887946755371052,
-      "angleCorrection": 0.9333205235053406,
-      "type": "III",
-      "mirrorPair": "mars",
-      "ascendingNodeInvPlane": 312.89
+      "type": "III"
     },
     "saturn": {
       "name": "Saturn",
-      "eocFraction": 0.54,
       "startpos": 11.279308392461772,
-      "angleCorrection": -0.1784695052193328,
-      "type": "III",
-      "mirrorPair": "earth",
-      "ascendingNodeInvPlane": 118.81
+      "type": "III"
     },
     "uranus": {
       "name": "Uranus",
-      "eocFraction": 0.53,
       "startpos": 44.900388945775106,
-      "angleCorrection": -0.7343433510960402,
-      "type": "III",
-      "mirrorPair": "mercury",
-      "ascendingNodeInvPlane": 307.8
+      "type": "III"
     },
     "neptune": {
       "name": "Neptune",
-      "eocFraction": 0.585,
       "startpos": 47.9552024382285,
-      "angleCorrection": 2.3327665835675617,
-      "type": "III",
-      "mirrorPair": "venus",
-      "ascendingNodeInvPlane": 192.04
+      "type": "III"
     }
   },
   timeReference: {

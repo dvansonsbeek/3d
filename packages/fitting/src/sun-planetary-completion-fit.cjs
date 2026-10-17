@@ -70,7 +70,7 @@ const model = createModel(DEFAULT_CONSTANTS);
 const C = DEFAULT_CONSTANTS;
 const D2R = Math.PI / 180;
 const BRIDGE = C.earthOrbital.deltaTStart / 86400;
-const LP = C.moon.moonMeeusLpCorrection;
+const LP = 0;   // the fitted mean-longitude anchor, retired to 0 at plan 06 R3 item 1; its key left the inputs at plan 11 step 2
 const N = C.physicalConstants.nutationLeadingTermsArcsec;
 const wrap = (d) => ((d + 540) % 360) - 180;
 

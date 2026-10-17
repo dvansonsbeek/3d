@@ -47,7 +47,6 @@ const { moonSeriesExtensionDeg } = require('./series-extension.cjs');
  *     moonDistanceJ2000Km: number,
  *     j2000JD: number,
  *     julianCenturyDays: number,
- *     moonMeeusLpCorrectionDeg: number,
  *     fwA2RateDegPerCy: number,
  *     fwA3RateDegPerCy: number,
  *   },
@@ -75,7 +74,7 @@ const { moonSeriesExtensionDeg } = require('./series-extension.cjs');
 function createMoonSeries({ constants, fns }) {
   const {
     moonL, moonB, moonR, moonRMeanKm, moonDistanceJ2000Km, j2000JD, julianCenturyDays,
-    moonMeeusLpCorrectionDeg, fwA2RateDegPerCy, fwA3RateDegPerCy,
+    fwA2RateDegPerCy, fwA3RateDegPerCy,
   } = constants;
   const {
     argsAt, eFactorForD, eFactorAtJdTT, getMoonDistanceKm, getEccentricityBase, deltaTSeconds,
@@ -176,8 +175,9 @@ function createMoonSeries({ constants, fns }) {
    *  Returns everything the scene blocks write:
    *  thetaAddRad — the hierarchy θ increment (EoC-half-subtracted Σl);
    *  lonDeg — full ecliptic longitude (GEOMETRIC, mean equinox of date)
-   *  incl. the derived series-extension tail and moonMeeusLpCorrection
-   *  (retired to 0 at plan 06 R3 item 1: measured against Horizons' apparent
+   *  incl. the derived series-extension tail. (The fitted mean-longitude
+   *  anchor moonMeeusLpCorrection was retired to 0 at plan 06 R3 item 1 and
+   *  its parameter deleted at plan 11 step 2: measured against Horizons' apparent
    *  Moon over 1970–2049 the series needs no anchor, −1.0″ ± 1.5″ flat in
    *  elongation; the former +32.75″ was the eclipse tier's mean Sun
    *  compensated — its aberration κ, the I2 long inequality and the trend-ΔT
@@ -220,7 +220,7 @@ function createMoonSeries({ constants, fns }) {
     // Full longitude re-adds the EoC half that θ absorbed.
     const fullSl = Sl + (2 * eocHalf / D2R * 1e6) * Math.sin(Mpr)
                      + (1.25 * eocHalf * eocHalf / D2R * 1e6) * Math.sin(2 * Mpr);
-    const lonDeg = Lp / D2R + fullSl * 1e-6 + moonMeeusLpCorrectionDeg;
+    const lonDeg = Lp / D2R + fullSl * 1e-6;
     const distKm = fullDistanceKm(Dr, Mr, Mpr, Fr, E, E2, j2000JD + d);
     return { thetaAddRad, lonDeg, latRad, latDeg, distKm, T };
   }

@@ -4,145 +4,69 @@
     "startmodelJD": 2451716.5,
     "startmodelYear": 2000.5,
     "correctionDays": -0.828832119703292,
-    "correctionSun": 0.4971540149655503,
     "startAngleModel": 89.91949879,
-    "useVariableSpeed": true,
-    "_retiredInputsNote": "Plan 09 step 7c: the frozen era device's inputs left this block — holisticyearLength (the fitted unit, 335,317 yr), stepYears (its lattice grid) and inputmeanlengthsolaryearindays (the device's rounded mean tropical year, 365.2422 d; the J2000 tropical year is DERIVED from the IAU sidereal year and p_A in one home, @essrt/physics computeMeanTropicalYearJ2000Days). Plan 07 R10 had already removed the phase origin's inputs (temperatureGraphMostLikely, systemResetN). The literals gate fails if any of them returns. The K-device wheels' rates are the recorded pose block earth.kDeviceWheelPeriodYears."
+    "_retiredInputsNote": "Plan 09 step 7c: the frozen era device's inputs left this block — holisticyearLength (the fitted unit, 335,317 yr), stepYears (its lattice grid) and inputmeanlengthsolaryearindays (the device's rounded mean tropical year, 365.2422 d; the J2000 tropical year is DERIVED from the IAU sidereal year and p_A in one home, @essrt/physics computeMeanTropicalYearJ2000Days). Plan 07 R10 had already removed the phase origin's inputs (temperatureGraphMostLikely, systemResetN). Plan 11 step 2: correctionSun (the scene Sun's start angle and the perihelion-phase offset it fed — overwritten every frame by the engine-placed Sun, no display reach) and useVariableSpeed (hard-wired true in both twins: the equation of centre and the certified Moon override are the scene, not a toggle) left too. The literals gate fails if any of them returns. The K-device wheels' rates are the recorded pose block earth.kDeviceWheelPeriodYears."
   },
   "earth": {
     "earthtiltMean": 23.413526608469965,
     "earthInvPlaneInclinationAmplitude": 0.636069722432876,
-    "eccentricityBase": 0.015386009686374918,
     "eccentricityAmplitude": 0.0013559440307290061,
     "kDeviceInclinationPhaseJ2000Deg": 81.17719000000001,
-    "_kDeviceInclinationPhaseNote": "Plan 09 step 6: the scene scaffolding's K-device inclination-wheel phase at J2000, degrees — the J2000 perihelion longitude (102.94719°) minus the retired eccentricity law's anchor (21.77°), written as the exact double so the pose is bit-identical. It poses earthInvPlaneInclinationMean, the inclination path's zodiac offset and the perihelion wheel's offset base′ (eccentricityBaseDerived); no published quantity rides it (the engine places the Earth frame, the Sun and the Moon stack over the scaffold). The H/3 eccentricity law it once phased is deleted — Earth's e of date is the N-body series on every path.",
+    "_kDeviceInclinationPhaseNote": "Plan 09 step 6: the scene scaffolding's K-device inclination-wheel phase at J2000, degrees — the J2000 perihelion longitude (102.94719°) minus the retired eccentricity law's anchor (21.77°), written as the exact double so the pose is bit-identical. Plan 11 step 2: its other readers are gone (the mean-inclination init, the perihelion wheel's offset base′, the Earth-panel cell and the About rows — every one overwritten by the engine-placed frame or a pose display); ONE reach remains, the inclination path's zodiac offset it shares with startAngleModel (the loop's angular zero, a scene literal) — it retires with that zero at step 4. The H/3 eccentricity law it once phased is deleted — Earth's e of date is the N-body series on every path.",
     "kDeviceWheelPeriodYears": {
       "3": 111772.33333333333,
       "5": 67063.4,
       "8": 41914.625,
-      "13": 25793.615384615383,
-      "16": 20957.3125
+      "13": 25793.615384615383
     },
-    "_kDeviceWheelPeriodNote": "Plan 09 step 7c: the scene scaffolding's K-device wheel periods in the scene's mean solar years, keyed by the wheel's index N (its identifier in the scaffold: the inclination wheel 3, the ecliptic wheel 5, the obliquity wheel 8, the axial/wobble wheel 13, the perihelion pair 16). Each wheel turns UNIFORMLY at its recorded J2000 rate (plan 09 step 5c) from the recorded phase kDeviceWheelPhaseAtJ2000Cycles × N; the engine places the Earth frame, the Sun and the Moon stack over the scaffold, so no observable rides them. Numerically the retired unit's 335,317/N, written as the exact doubles so the pose is bit-identical; they are NOT the model's precession periods (those are the dynamical values: T_p 25,771.6, the obliquity beat, the apsidal and nodal modes — the wheels read them 0.09…2 % off).",
+    "_kDeviceWheelPeriodNote": "Plan 09 step 7c: the scene scaffolding's K-device wheel periods in the scene's mean solar years, keyed by the wheel's index N (its identifier in the scaffold: the inclination wheel 3, the ecliptic wheel 5, the obliquity wheel 8, the axial/wobble wheel 13). Each wheel turns UNIFORMLY at its recorded J2000 rate (plan 09 step 5c) from the recorded phase kDeviceWheelPhaseAtJ2000Cycles × N; the engine places the Earth frame, the Sun and the Moon stack over the scaffold, so no observable rides them. Plan 11 step 2: the perihelion pair's wheel 16 is deleted — the engine places both perihelion nodes at the series' ϖ every frame, so its only reach was the pre-artifact first frames. Numerically the retired unit's 335,317/N, written as the exact doubles so the pose is bit-identical; they are NOT the model's precession periods (those are the dynamical values: T_p 25,771.6, the obliquity beat, the apsidal and nodal modes — the wheels read them 0.09…2 % off).",
     "kDeviceWheelPhaseAtJ2000Cycles": 0.908498525276082,
     "_kDeviceWheelPhaseNote": "Plan 07 R10: the scene scaffolding's K-device wheel phase at J2000 — each wheel of index N (see kDeviceWheelPeriodYears) stands N × this turns on at J2000. Numerically the retired phase origin's (2000 − t₀)/H; kept as the device's RECORDED J2000 pose like earthtiltMean (the wheel geometry _kcFrameR bridges once), not a law. No observable rides it — the engine places the Earth frame, the Sun and the Moon stack over it — but the scene's world frame and every world-axis reader (the NASA-convention umbra diagnostic's aberration about world Y) do; measured: dropping it tilted the K pose 1.25° and moved that diagnostic 0.45″."
   },
   "moon": {
     "moonStartposApsidal": 347.5476,
     "moonStartposNodal": 64.0435,
-    "moonStartposMoon": 67.8443,
-    "_moonMeeusLpCorrectionNote": "RETIRED at plan 06 R3 item 1 (was 0.009097354859355077 deg = +32.75 arcsec, Step 5c moon-eclipse-optimizer). Measured against JPL Horizons' apparent Moon over 1970-2049 the series needs no anchor (-1.0 +/- 1.5 arcsec, flat in elongation); the value was the eclipse location tier's mean Sun compensated (its aberration kappa + the I2 long inequality + the trend-deltaT offset). Kept at 0 until the plumbing leaves (R4).",
-    "moonMeeusLpCorrection": 0
+    "_step2Note": "Plan 11 step 2: moonStartposMoon (the scene Moon's start angle — the certified series override sets the rendered Moon's direction AND distance every frame, so its only reach was the Node twin's geometric pivot) and moonMeeusLpCorrection (retired to 0 at plan 06 R3 item 1; the parameter left the lunar series) are deleted. The two phases above are the visible orbit RING's J2000 ϖ_Moon/Ω_Moon — step 3 replaces them by the lunar arguments the integrator already drives."
   },
   "planets": {
+    "_step2Note": "Plan 11 step 2: eocFraction (its only reader was an underscore field nothing set), angleCorrection (the perihelion marker's direction — overwritten by the chain placement every frame), mirrorPair (zero readers) and ascendingNodeInvPlane (the closed-form verified J2000 node — a reference derivation, moved verbatim to astro-reference planetOrbitalElements.<p>.ascendingNodeInvPlaneClosedForm) left each planet. startpos and type remain until step 3 (the pole azimuth and Saturn's ring plane ride startpos; type sets the chain-placed perihelion marker's display radius).",
     "mercury": {
       "name": "Mercury",
-      "eocFraction": -0.527,
       "startpos": 83.64651142941864,
-      "angleCorrection": 0.9727205912043573,
-      "type": "I",
-      "mirrorPair": "uranus",
-      "ascendingNodeInvPlane": 32.83
+      "type": "I"
     },
     "venus": {
       "name": "Venus",
-      "eocFraction": 0.436,
       "startpos": 249.28769121856186,
-      "angleCorrection": -2.789778861448692,
-      "type": "I",
-      "mirrorPair": "neptune",
-      "ascendingNodeInvPlane": 54.7
+      "type": "I"
     },
     "mars": {
       "name": "Mars",
-      "eocFraction": -0.066224,
       "startpos": 121.4634461571797,
-      "angleCorrection": -2.104652936098656,
-      "type": "II",
-      "mirrorPair": "jupiter",
-      "ascendingNodeInvPlane": 354.87
+      "type": "II"
     },
     "jupiter": {
       "name": "Jupiter",
-      "eocFraction": 0.495,
       "startpos": 13.887946755371052,
-      "angleCorrection": 0.9333205235053406,
-      "type": "III",
-      "mirrorPair": "mars",
-      "ascendingNodeInvPlane": 312.89
+      "type": "III"
     },
     "saturn": {
       "name": "Saturn",
-      "eocFraction": 0.54,
       "startpos": 11.279308392461772,
-      "angleCorrection": -0.1784695052193328,
-      "type": "III",
-      "mirrorPair": "earth",
-      "ascendingNodeInvPlane": 118.81
+      "type": "III"
     },
     "uranus": {
       "name": "Uranus",
-      "eocFraction": 0.53,
       "startpos": 44.900388945775106,
-      "angleCorrection": -0.7343433510960402,
-      "type": "III",
-      "mirrorPair": "mercury",
-      "ascendingNodeInvPlane": 307.8
+      "type": "III"
     },
     "neptune": {
       "name": "Neptune",
-      "eocFraction": 0.585,
       "startpos": 47.9552024382285,
-      "angleCorrection": 2.3327665835675617,
-      "type": "III",
-      "mirrorPair": "venus",
-      "ascendingNodeInvPlane": 192.04
+      "type": "III"
     }
   },
-  "additionalBodies": {
-    "_description": "angleCorrection and startpos were literals in src/script.js with no source of truth until now. (Plan 07 R8: the perihelionEclipticFraction pairs — [1,1] for all four, one full H standing in for four unrelated orbits — and the inclinationCycleAnchor phases left with the retired device; a body's perihelion period is the N-body chain's, and these four bodies have no chain.)",
-    "_typeNote": "The minor-body `type` assignments are GEOMETRIC PLACEHOLDERS (borrowed from the planet I/II/III taxonomy so the shared geometry law can derive them). These bodies are more susceptible to planetary gravity disturbances and are expected to receive their own perturbation-aware type(s) in the precision-programme refit (Phase 20 post-renumber; pre-renumber 18). Note pluto/halleys currently derive via body-unique branches keyed on the body name in @essrt/physics/planets/geometry — their `type` field is not consumed by the derivation, so redefining it later changes nothing until the new branch is wired deliberately.",
-    "pluto": {
-      "name": "Pluto",
-      "orbitalEccentricityBase": 0.2488273,
-      "type": "I",
-      "angleCorrection": 2.469281,
-      "startpos": 71.555,
-      "ascendingNodeInvPlane": 101.06,
-      "invPlaneInclinationMean": 15.7162,
-      "invPlaneInclinationAmplitude": 0.717024
-    },
-    "halleys": {
-      "name": "Halley's",
-      "orbitalEccentricityBase": 0.96714291,
-      "type": "III",
-      "angleCorrection": -1.619816,
-      "startpos": 80,
-      "ascendingNodeInvPlane": 59.56,
-      "invPlaneInclinationMean": 150,
-      "invPlaneInclinationAmplitude": 0.1
-    },
-    "eros": {
-      "name": "Eros",
-      "orbitalEccentricityBase": 0.2229512,
-      "type": "II",
-      "angleCorrection": 0.047888,
-      "startpos": 57.402,
-      "ascendingNodeInvPlane": 10.36,
-      "invPlaneInclinationMean": 9.25,
-      "invPlaneInclinationAmplitude": 0.5
-    },
-    "ceres": {
-      "name": "Ceres",
-      "orbitalEccentricityBase": 0.0755347,
-      "orbitDistanceOverride": 2.76596,
-      "angleCorrection": 0,
-      "startpos": 0,
-      "ascendingNodeInvPlane": 80.89,
-      "invPlaneInclinationMean": 0.43,
-      "invPlaneInclinationAmplitude": 0.05
-    }
-  },
+  "_additionalBodiesNote": "Plan 11 step 2: the additionalBodies block (Pluto, Halley, Eros, Ceres — scaffold angles, device inclination means/amplitudes, a stored eccentricity base and Ceres' distance override) is deleted. The four bodies are not rendered (the first three left the scene at f735c2d8; Ceres never had an object); their one live reader, the browser's angular-momentum invariable-plane check, reads the observed J2000 elements from astro-reference additionalBodiesReference (bit-identical values), and Ceres' semi-major axis is the geometry law's own Kepler value from the period. Pluto's closed-form node is astro-reference additionalBodiesReference.pluto.ascendingNodeInvPlaneClosedForm.",
   "perihelionPassageRef": {
     "_description": "Planet perihelion passage reference JDs — phase-optimized for EoC alignment",
     "mercury": 2460335.9,

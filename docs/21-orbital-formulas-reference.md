@@ -113,8 +113,8 @@ The seven planets' live elements of date come from the N-body chain (`_kcElement
 | `{planet}PerihelionEcliptic` | The chain's inertial apsidal period, 1,296,000/g (years) |
 | `{planet}Tilt` | Axial tilt |
 | `{planet}RotationPeriod` | Sidereal rotation period (hours) |
-| `planets.{planet}.ascendingNodeInvPlane` | The closed-form J2000 node on the invariable plane (`model-parameters.json`); read by the no-chain scaffolding — the chain planets' node of date is the chain's ([doc 20 § Ascending Nodes](20-constants-reference.md#ascending-nodes-on-the-invariable-plane-at-j2000)) |
-| `planets.{planet}.startpos`, `.angleCorrection`, `.eocFraction` | Scene scaffolding parameters (`model-parameters.json`) |
+| `planets.{planet}.ascendingNodeInvPlane` | The closed-form J2000 node on the invariable plane — a reference derivation, `planetOrbitalElements.<p>.ascendingNodeInvPlaneClosedForm` in `astro-reference.json` since plan 11 step 2 (the Node twin keeps the field name); the chain planets' node of date is the chain's ([doc 20 § Ascending Nodes](20-constants-reference.md#ascending-nodes-on-the-invariable-plane-at-j2000)) |
+| `planets.{planet}.startpos` | The scene scaffold's start angle (`model-parameters.json`; it turns the planet's pole azimuth and Saturn's ring plane until plan 11 step 3 places the poles from the spin channel). `.angleCorrection` and `.eocFraction` are deleted (plan 11 step 2) — the chain places the perihelion marker, and no reader of the fraction was left. |
 | `diameters.{planet}Diameter` | Planet diameter (km) |
 
 ### 1.3 Per-Planet Live/Dynamic Variables (accessible via `o.`)
@@ -165,7 +165,7 @@ For current values, see [Constants Reference](20-constants-reference.md).
 | `moonTilt` | Axial tilt |
 | `moonStartposNodal` | Nodal precession start position (calibration) |
 | `moonStartposApsidal` | Apsidal precession start position (calibration) |
-| `moonStartposMoon` | Moon orbital start position (calibration) |
+| `moonStartposMoon` | DELETED (plan 11 step 2) — the certified series override places the rendered Moon's direction and distance every frame; the start angle reached only the Node twin's geometric pivot |
 
 #### 1.4.2 Dynamic Orbital Elements (computed by `updateMoonOrbitalElements()`)
 
@@ -197,8 +197,8 @@ For current values, see [Constants Reference](20-constants-reference.md).
 | Variable | Description |
 |----------|-------------|
 | `earthtiltMean` | Mean obliquity — a constant of the scene's J2000 pose (the published obliquity is the hybrid) |
-| `earthInvPlaneInclinationMean`, `earthInvPlaneInclinationAmplitude` | Constants of the scene's J2000 pose (the published inclination is the engine's one-source normal) |
-| `eccentricityBase`, `eccentricityAmplitude` | The scene Sun's eccentricity-law base and the K calibration input (legacy scaffolding; the published eccentricity is the N-body series) |
+| `earthInvPlaneInclinationAmplitude` | A constant of the scene's J2000 pose (the published inclination is the engine's one-source normal). `earthInvPlaneInclinationMean` — the device's mean, the invariable-plane disc's init — is deleted (plan 11 step 2). |
+| `eccentricityAmplitude` | The Wobble marker's display radius — a scene literal until plan 11 step 4 (the K calibration it once fed is retired; the published eccentricity is the N-body series). `eccentricityBase`, the retired Law-5 constant, is deleted (plan 11 step 2). |
 | `kDeviceWheelPeriodYears` (browser `_wheelPeriodYears(N)`) | The scene scaffolding's recorded K-wheel periods by wheel index — a J2000 pose, not a law (the former `earthPerihelionICRFYears`, a third of the retired anchor, is deleted, plan 09 step 4b; the published apsidal period is `inclPrecYears`) |
 
 #### 1.5.2 Dynamic Orbital Parameters

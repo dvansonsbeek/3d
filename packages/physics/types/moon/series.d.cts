@@ -12,7 +12,6 @@ export type MeeusTermTable = Array<[number, number, number, number, number]>;
  *     moonDistanceJ2000Km: number,
  *     j2000JD: number,
  *     julianCenturyDays: number,
- *     moonMeeusLpCorrectionDeg: number,
  *     fwA2RateDegPerCy: number,
  *     fwA3RateDegPerCy: number,
  *   },
@@ -46,7 +45,6 @@ export function createMoonSeries({ constants, fns }: {
         moonDistanceJ2000Km: number;
         j2000JD: number;
         julianCenturyDays: number;
-        moonMeeusLpCorrectionDeg: number;
         fwA2RateDegPerCy: number;
         fwA3RateDegPerCy: number;
     };

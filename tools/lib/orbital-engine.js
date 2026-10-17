@@ -15,8 +15,9 @@
 // computeEarthOrbitalElements left at plan 07 R5: the planets' elements of
 // date have one home, the N-body chain.)
 //
-// Primary consumer: tools/optimize.js (the dashboard exporter that also
-// consumed it is retired)
+// Consumers: the solar-measurements exporter and the verify/explore scripts
+// (the optimizer CLI tools/optimize.js that drove it is deleted, plan 11 step
+// 2; the dashboard exporter before it is retired)
 // ═══════════════════════════════════════════════════════════════════════════
 
 const C = require('./constants');

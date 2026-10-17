@@ -18,8 +18,9 @@ const output = {
   startmodelJD: C.startmodelJD,
   startmodelYear: C.startmodelYear,
   correctionDays: C.correctionDays,
-  correctionSun: C.correctionSun,
-  temperatureGraphMostLikely: C.temperatureGraphMostLikely,
+  // (plan 11 step 2: correctionSun, eccentricityBase, earthInvPlaneInclinationMean,
+  // eccentricityDerivedMean and perihelionPhaseOffset — scene-scaffold constants
+  // with no reader left — are deleted; temperatureGraphMostLikely left at plan 07 R10)
   startAngleModel: C.startAngleModel,
   useVariableSpeed: C.useVariableSpeed,
 
@@ -27,9 +28,7 @@ const output = {
   earthtiltMean: C.earthtiltMean,
   earthInvPlaneInclinationAmplitude: C.earthInvPlaneInclinationAmplitude,
   earthRAAngle: C.earthRAAngle,
-  earthInvPlaneInclinationMean: C.earthInvPlaneInclinationMean,
   earthAscendingNodeInvPlane: C.earthAscendingNodeInvPlane,
-  eccentricityBase: C.eccentricityBase,
   eccentricityAmplitude: C.eccentricityAmplitude,
   // (eccentricityAmplitudeK — the K constant — left with the law at plan 07 R6.)
   perihelionRefJD: C.perihelionRefJD,
@@ -40,9 +39,7 @@ const output = {
   balancedYear: C.balancedYear,
   kDeviceWheelPhaseAtJ2000Cycles: C.kDeviceWheelPhaseAtJ2000Cycles,   // plan 07 R10: the K wheels' recorded J2000 phase
   balancedJD: C.balancedJD,
-  eccentricityDerivedMean: C.eccentricityDerivedMean,
   eocEccentricity: C.eocEccentricity,
-  perihelionPhaseOffset: C.perihelionPhaseOffset,
 
   // (plan 09 step 7a: the fitted cardinal record CARDINAL_POINT_ANCHORS /
   //  CARDINAL_POINT_HARMONICS is deleted)

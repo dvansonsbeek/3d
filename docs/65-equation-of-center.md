@@ -27,8 +27,8 @@ theta += 2 * e * sin(M) + 1.25 * e^2 * sin(2M)
 ```
 
 Where `e` is the eccentricity and `M` is the mean anomaly from perihelion.
-Gated by `useVariableSpeed`; when false, all orbits use constant angular
-velocity. The 2-term series is accurate to <0.01° for e < 0.21 with no
+Always on (the former `useVariableSpeed` toggle is hard-wired true since plan
+11 step 2). The 2-term series is accurate to <0.01° for e < 0.21 with no
 iteration (`moveModel()` runs every frame for ~80 objects), and the split
 residual beyond it is removed exactly by the corrector below.
 
@@ -75,8 +75,11 @@ the double-counting signature): season lengths become too asymmetric —
 
 ## Derived Parameters (no free parameters)
 
-Both `eocEccentricity` and `perihelionPhaseOffset` are **derived from existing
-model constants** — not tunable.
+`eocEccentricity` is **derived from existing model constants** — not tunable.
+(`perihelionPhaseOffset`, derived the same way, was DELETED at plan 11 step 2:
+the engine places the Sun at the certified longitude every frame, so the
+scene Sun's EoC phase at the model start reached nothing — the section below
+is its record.)
 
 ### eocEccentricity
 
@@ -93,11 +96,11 @@ constants seed `C.eocEccentricity`; `moveModel` supersedes it per frame with
 series) are closed exactly by the exact-Kepler corrector below, so the split
 introduces no residual.
 
-### perihelionPhaseOffset
+### perihelionPhaseOffset (record — deleted at plan 11 step 2)
 
 ```
-perihelionPhaseOffset = (((startModelYear - 2000) / P₁₆ + 16 × kDeviceWheelPhaseAtJ2000Cycles) * 360   // P₁₆ = _wheelPeriodYears(16), the K perihelion wheel's recorded period; J2000 origin + the device's recorded J2000 wheel phase (plan 07 R10)
-                        + correctionSun
+perihelionPhaseOffset = (((startModelYear - 2000) / P₁₆ + 16 × kDeviceWheelPhaseAtJ2000Cycles) * 360   // P₁₆ = the K perihelion wheel's recorded period (wheel 16, deleted with the offset); J2000 origin + the device's recorded J2000 wheel phase (plan 07 R10)
+                        + correctionSun                                                                   // the scene Sun's start angle (deleted with the offset)
                         + 360 * (startmodelJD - perihelionRefJD) / yearDays) % 360
 ```
 
@@ -112,21 +115,20 @@ gives −0.79°, a difference with <0.001° effect on Sun position).
 | Parameter | Value | How determined |
 |-----------|-------|----------------|
 | `eocEccentricity` | e(t)/2 (<!--v:eocEccentricityValue-->0.00836<!--/v--> at J2000) | **Derived**: half the one-law eccentricity, per frame |
-| `perihelionPhaseOffset` | ~0.51 deg | **Derived**: from EP1 precession phase + correctionSun + perihelion date |
-| `correctionSun` | <!--v:correctionSunDeg-->0.49715<!--/v--> | **Tuned**: aligns summer solstice timing + Sun RA (the one tunable) |
-| `useVariableSpeed` | true | Toggle |
+| `perihelionPhaseOffset` | DELETED (plan 11 step 2; was ~0.51 deg) | was derived from the EP1 wheel phase + correctionSun + the perihelion date — the engine-placed Sun made it unreachable |
+| `correctionSun` | DELETED (plan 11 step 2; was 0.49715 deg) | was the one tunable (summer-solstice timing + Sun RA, the retired optimizer's Step 1) — the engine-placed Sun made it unreachable |
+| `useVariableSpeed` | true (hard-wired, plan 11 step 2) | was a toggle |
 
 The geometric offset carries `e(t)·û(ϖ)` itself:
-- `eccentricityDerivedMean` = 0.0155200 — base′ of the retired single-line law (derived from e(J2000) and the System-Reset anchor); the legacy path's constant, not a published value — the published e is the N-body series
+- `eccentricityDerivedMean` (DELETED at plan 11 step 2; was 0.0155200) — base′ of the retired single-line law (derived from e(J2000) and the System-Reset anchor); the legacy path's constant, not a published value — the published e is the N-body series
 - `eccentricityAmplitude` = <!--v:eccentricityAmplitude-->0.001356<!--/v--> — the Law-4 input A and the wobble-marker distance; not a scene arm
 
-### Start-date independence
+### Start-date independence (record)
 
-`eocEccentricity` and `perihelionPhaseOffset` are start-date independent
-(derived from the law and the J2000 precession state; the perihelion
-direction precesses dynamically via `perihelionPrecessionRate * pos`).
-`correctionSun` is start-date dependent by construction — it aligns the Sun
-at model start.
+`eocEccentricity` is start-date independent (derived from e(J2000)). The
+deleted `perihelionPhaseOffset` was too (the J2000 precession state); the
+deleted `correctionSun` was start-date dependent by construction — it aligned
+the scene Sun at the model start, a job the engine-placed Sun does every frame.
 
 ---
 
@@ -232,7 +234,10 @@ drift, the true Sun model error is the ~0.003° above.
 
 In `moveModel()`, each object's angular position is
 `theta = speed * pos − startPos * (PI/180)`; for the Sun `speed = 2π` (one
-orbit per year), `startPos = correctionSun`. The mean anomaly from
+orbit per year), `startPos = 0` since plan 11 step 2 (the fitted
+`correctionSun` is deleted — `_applyEngineEarthFrame` sets the Sun's wheel
+angle from the certified longitude after this branch, every frame, so what
+follows is the rest pose before the first engine frame). The mean anomaly from
 perihelion:
 
 ```
@@ -240,20 +245,18 @@ perihelionPhase = perihelionPhaseJ2000 + perihelionPrecessionRate * pos
 M = theta − perihelionPhase
 ```
 
-with `perihelionPhaseJ2000` composed from the Sun's theta at model start
-(−correctionSun), the angular distance from model start to the perihelion
-passage (JD <!--v:perihelionPassageJD-->2451547.042<!--/v-->, January 3.542),
-and the derived `perihelionPhaseOffset`. The phase precesses at
-`2π / P₁₆` radians per simulation year — P₁₆ = `_wheelPeriodYears(16)`, the K
-perihelion wheel's recorded period (20,957.3 yr, a scaffold pose; the Sun's
-published perihelion of date is the N-body series').
+with `perihelionPhaseJ2000` the angular distance from model start to the
+perihelion passage (JD <!--v:perihelionPassageJD-->2451547.042<!--/v-->,
+January 3.542); `perihelionPrecessionRate` is 0 (plan 11 step 2 deleted the K
+perihelion wheel 16 whose recorded rate it carried — the Sun's published
+perihelion of date is the N-body series', placed by the engine).
 
-### Shared parameter: correctionSun
+### The former shared parameter correctionSun (record)
 
-`correctionSun` serves dual purposes: the Sun's `startPos`, and the planet
-`PerihelionFromEarth` nodes' `startPos`. Changing it shifts all planet RA
-values by the same amount; planet `startpos` values are calibrated against
-it.
+`correctionSun` served as the Sun's `startPos` and the planet
+`PerihelionFromEarth` nodes' `startPos`; the planets' `startpos` values were
+calibrated against it. Deleted at plan 11 step 2 — every surface it reached
+is engine-placed.
 
 ---
 
@@ -318,8 +321,8 @@ Toggles: `SUN_HARMONICS_ENABLED` (src/script.js), env
 ## Planet EoC
 
 The per-planet `eocFraction` constants (the same half-eccentricity split
-principle applied to each planet's wheel) remain in the legacy scene
-scaffolding as device anchors. The planets' displayed positions and
+principle applied to each planet's wheel) were DELETED at plan 11 step 2 —
+their only reader was a field nothing set. The planets' displayed positions and
 accuracy are owned by the Keplerian chain ([doc 04](04-dynamic-elements-overview.md));
 the per-planet EoC write-ups of the retired geometric path are archived.
 
@@ -331,7 +334,7 @@ the per-planet EoC write-ups of the retired geometric path are archived.
 - `tools/lib/constants.js`: derived-constants block
 - `tools/lib/scene-graph.js`: Sun eccentricity in the body defs; `moveModel`; `FQ3_EXACT_SUN`; the `animateFast` mirror (used by `computeSunPositionFast`)
 - `public/input/fitted-coefficients.json`: `SUN_LONGITUDE_MEAN`, `SUN_LONGITUDE_HARMONICS` (DELETED at plan 09 step 5a)
-- `tools/fit/sun-longitude-harmonics.js` (Step 0 fitter — DELETED at plan 09 step 5a) · `tools/explore/eoc-constants.js` (numerical verification) · `tools/explore/fq3-wheel-sun-attribution.mjs` / `fq3-w1-verify.mjs` (attribution + corrector verification)
+- `tools/fit/sun-longitude-harmonics.js` (Step 0 fitter — DELETED at plan 09 step 5a) · `tools/explore/eoc-constants.js` (numerical verification), `tools/explore/perihelion-offset.js`, `tools/explore/fq3-wheel-sun-attribution.mjs` / `fq3-w1-verify.mjs` (attribution + corrector verification) — all four DELETED at plan 11 step 2 with their inputs (`correctionSun`, `perihelionPhaseOffset`, `eccentricityBase`, wheel 16); git history keeps them
 
 ---
 
@@ -346,8 +349,8 @@ After any change to this system:
 5. Verify the Sun visually speeds up in January and slows down in July
 6. Check the equation-of-center display in the UI
 7. No NaN values in any object positions
-8. `node tools/optimize.js diagnose sun` — eccentricity ratio ~1.08
-9. `node tools/optimize.js baseline sun` — RA drift ~54 arcsec/yr (frame effect)
-10. `node tools/explore/fq3-w1-verify.mjs` — twin − wheel ~0.80″ annual / ~0.57″ sd; the control (`FQ3_EXACT_SUN=0 SUN_HARMONICS_DISABLED=1`) reproduces the raw split error (279.0″ annual / 197.4″ sd)
-11. `node tools/optimize.js baseline all` — planet baselines unchanged; Sun RMS Total ~0.0029°
+8. (`node tools/optimize.js diagnose sun` — eccentricity ratio ~1.08 — the optimizer is DELETED, plan 11 step 2)
+9. (`node tools/optimize.js baseline sun` — RA drift ~54 arcsec/yr (frame effect) — deleted with the optimizer; the Sun's record is `tools/verify/sun-vs-horizons.js`)
+10. (`node tools/explore/fq3-w1-verify.mjs` — twin − wheel ~0.80″ annual / ~0.57″ sd; the control reproduced the raw split error (279.0″ annual / 197.4″ sd) — the instrument is DELETED at plan 11 step 2 with its inputs; the numbers stand as the record)
+11. (`node tools/optimize.js baseline all` — deleted with the optimizer; the planets' record is `data/chain-vs-jpl-rms.json`)
 12. Legacy path (`FQ3_EXACT_SUN=0`): the annual-correction instrument (deleted at plan 09 step 7e; record in [doc 109 §22](109-model-nbody-engine-and-lattice-test.md)) read a raw residual ~198″ RMS, ~7″ RMS with the 3-term fit; its greedy dry-run found no new terms above 0.05″

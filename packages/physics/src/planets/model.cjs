@@ -108,8 +108,9 @@ function createPlanetModel(env, bodies) {
     // eccentricityPhaseJ2000Deg stood here. With the law gone, the ellipse
     // geometry below reads the OBSERVED J2000 eccentricity where it used to
     // read the law's System-Reset base — the observation the chain is
-    // anchored on, not a construction. The stored base survives only for the
-    // additional bodies, which carry theirs in model-parameters.json.
+    // anchored on, not a construction. The additional bodies' base is their
+    // observed J2000 eccentricity too (astro-reference additionalBodiesReference;
+    // plan 11 step 2 deleted the stored copy).
 
     rec.geometry = derivePlanetGeometry({
       key, type: b.type,

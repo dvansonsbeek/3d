@@ -25,7 +25,7 @@ const { createModel, DEFAULT_CONSTANTS: C } = require('@essrt/physics');
 const D2R = Math.PI / 180, AS = 3600, J2000 = 2451545.0;
 const model = createModel();
 const BRIDGE = C.earthOrbital.deltaTStart / 86400;
-const LP = C.moon.moonMeeusLpCorrection;
+const LP = 0;   // the fitted Lp anchor, retired to 0 (plan 06 R3 item 1); its key left the inputs at plan 11 step 2
 const N = C.physicalConstants.nutationLeadingTermsArcsec;
 const wrap = (d) => ((((d + 540) % 360) + 360) % 360) - 180;
 

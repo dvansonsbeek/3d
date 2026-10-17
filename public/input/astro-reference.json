@@ -141,6 +141,7 @@
     "moonMeanElongationRate_degPerCentury": 445267.1115168
   },
   "planetOrbitalElements": {
+    "_ascendingNodeInvPlaneClosedFormNote": "ascendingNodeInvPlaneClosedForm (plan 11 step 2, moved verbatim from model-parameters planets.<p>.ascendingNodeInvPlane): the planet's J2000 ascending node on the invariable plane in the Souami & Souchay longitude origin, SOLVED from the spherical-triangle identity cos i_ecl = cos i_P cos i_E + sin i_P sin i_E cos(Ω_P − Ω_E) with JPL's J2000 ecliptic inclination, the S&S invariable-plane inclination and Earth's S&S (i_E, Ω_E) — the closed-form node calibration (tools/verify/analytical-ascending-nodes.js) run forward, 2 dp. A reference derivation beside the S&S 2012 nodes (ascendingNodesSouamiSouchay): the registry's <p>OmegaVerified / <p>EclInclVerifiedClosureArcsec rows and the published planet records read it; the rendered planets' node of date is the N-body chain's.",
     "_description": "JPL/SPICE J2000 orbital elements per planet",
     "mercury": {
       "solarYearInput": 87.9683,
@@ -151,7 +152,8 @@
       "ascendingNode": 48.33033155,
       "invPlaneInclinationJ2000": 6.3472858,
       "meanAnomaly": 156.6364301,
-      "trueAnomaly": 164.1669319
+      "trueAnomaly": 164.1669319,
+      "ascendingNodeInvPlaneClosedForm": 32.83
     },
     "venus": {
       "solarYearInput": 224.695,
@@ -163,7 +165,8 @@
       "invPlaneInclinationJ2000": 2.1545441,
       "meanAnomaly": 324.9668371,
       "trueAnomaly": 324.5198504,
-      "rotationPeriodDays": 243.022699230302
+      "rotationPeriodDays": 243.022699230302,
+      "ascendingNodeInvPlaneClosedForm": 54.7
     },
     "mars": {
       "solarYearInput": 686.93,
@@ -175,7 +178,8 @@
       "invPlaneInclinationJ2000": 1.6311858,
       "meanAnomaly": 109.2630844,
       "trueAnomaly": 118.9501056,
-      "rotationPeriodDays": 1.02595659586635
+      "rotationPeriodDays": 1.02595659586635,
+      "ascendingNodeInvPlaneClosedForm": 354.87
     },
     "jupiter": {
       "solarYearInput": 4330.53,
@@ -187,7 +191,8 @@
       "invPlaneInclinationJ2000": 0.3219652,
       "meanAnomaly": 32.47179744,
       "trueAnomaly": 35.69428061,
-      "rotationPeriodDays": 0.413541666975253
+      "rotationPeriodDays": 0.413541666975253,
+      "ascendingNodeInvPlaneClosedForm": 312.89
     },
     "saturn": {
       "solarYearInput": 10747,
@@ -199,7 +204,8 @@
       "invPlaneInclinationJ2000": 0.9254704,
       "meanAnomaly": 325.663876,
       "trueAnomaly": 321.7910116,
-      "rotationPeriodDays": 0.440023148755863
+      "rotationPeriodDays": 0.440023148755863,
+      "ascendingNodeInvPlaneClosedForm": 118.81
     },
     "uranus": {
       "solarYearInput": 30586,
@@ -211,7 +217,8 @@
       "invPlaneInclinationJ2000": 0.9946692,
       "meanAnomaly": 145.7292678,
       "trueAnomaly": 148.5142459,
-      "rotationPeriodDays": 0.718329998141018
+      "rotationPeriodDays": 0.718329998141018,
+      "ascendingNodeInvPlaneClosedForm": 307.8
     },
     "neptune": {
       "solarYearInput": 59800,
@@ -223,7 +230,8 @@
       "invPlaneInclinationJ2000": 0.7354155,
       "meanAnomaly": 262.5003424,
       "trueAnomaly": 261.2242728,
-      "rotationPeriodDays": 0.671300001591743
+      "rotationPeriodDays": 0.671300001591743,
+      "ascendingNodeInvPlaneClosedForm": 192.04
     }
   },
   "additionalBodiesReference": {
@@ -238,7 +246,9 @@
       "ascendingNode": 110.30393,
       "meanAnomaly": 15.55009,
       "trueAnomaly": 26.31965048,
-      "rotationPeriodDays": 6.38720012152536
+      "rotationPeriodDays": 6.38720012152536,
+      "ascendingNodeInvPlaneClosedForm": 101.06,
+      "_ascendingNodeInvPlaneClosedFormNote": "plan 11 step 2, moved verbatim from model-parameters additionalBodies.pluto.ascendingNodeInvPlane — the model's VERIFIED closed-form node (see planetOrbitalElements), deliberately ≠ the raw S&S 107.06 (docs/32); the registry's plutoOmegaJ2000 reads it"
     },
     "halleys": {
       "solarYearInput": 27503,

@@ -520,7 +520,8 @@ The Sun's declination at the June solstice is the scene's ε; the deleted K
 comb (4.1) reproduced that declination to 0.005″, which is why its 8 and 16
 lines were the wheels' own fundamentals and the other fourteen the wheel
 composition's overtones. The in-browser "Verify Earth Parameters"
-test (`verifyEarthParameters`) searches the A that best matches the IAU
+test (`verifyEarthParameters`, deleted at plan 11 step 2 with the scene
+constants it tuned) searched the A that best matches the IAU
 tropical-year references — the A-solve is a calibration of this geometry
 against IAU, performed once, not a runtime loop. H-role: — (formerly **L**:
 the 8 and 16 wheels were the structural claim in its purest form,

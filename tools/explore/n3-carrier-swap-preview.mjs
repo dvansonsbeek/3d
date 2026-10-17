@@ -26,7 +26,7 @@ const model = createModel(DEFAULT_CONSTANTS);
 const C = DEFAULT_CONSTANTS;
 const D2R = Math.PI / 180;
 const BRIDGE = C.earthOrbital.deltaTStart / 86400;
-const LP = C.moon.moonMeeusLpCorrection;
+const LP = 0;   // the fitted Lp anchor, retired to 0 (plan 06 R3 item 1); its key left the inputs at plan 11 step 2
 const Nnut = C.physicalConstants.nutationLeadingTermsArcsec;
 const wrap = (d) => ((d + 540) % 360) - 180;
 const st = (v) => { const m = v.reduce((a, b) => a + b, 0) / v.length; const r = Math.sqrt(v.reduce((a, b) => a + b * b, 0) / v.length); return { m, rms: r, sd: Math.sqrt(Math.max(0, v.reduce((a, b) => a + b * b, 0) / v.length - m * m)) }; };
