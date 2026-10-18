@@ -94,7 +94,7 @@
     },
     "explore": {
      "explore": 7,
-     "comment": 7
+     "comment": 8
     },
     "tests": {
      "comment": 6
@@ -106,7 +106,7 @@
      "comment": 1
     },
     "verify": {
-     "comment": 3,
+     "comment": 2,
      "diagnostic": 1
     },
     "api": {
@@ -145,7 +145,7 @@
      "diagnostic": 33
     },
     "explore": {
-     "comment": 57,
+     "comment": 59,
      "explore": 30
     },
     "python": {
@@ -158,7 +158,7 @@
      "comment": 47
     },
     "verify": {
-     "comment": 9,
+     "comment": 7,
      "diagnostic": 3
     },
     "api": {
@@ -4782,6 +4782,30 @@
    "text": "// (plan 09 step 7e: the retired lattice's unit and node counts, and the \"nearest 8H/N\""
   },
   {
+   "file": "tools/explore/moon-deltat-comparison.js",
+   "line": 59,
+   "runtime": "explore",
+   "token": "H / N",
+   "class": "comment",
+   "text": "const MEAN_DAY_LENGTH = C_LOCAL.meanLengthOfDay;                     // H/13-derived"
+  },
+  {
+   "file": "tools/explore/moon-deltat-comparison.js",
+   "line": 59,
+   "runtime": "explore",
+   "token": "/ 13",
+   "class": "comment",
+   "text": "const MEAN_DAY_LENGTH = C_LOCAL.meanLengthOfDay;                     // H/13-derived"
+  },
+  {
+   "file": "tools/explore/moon-deltat-comparison.js",
+   "line": 60,
+   "runtime": "explore",
+   "token": "H / N",
+   "class": "comment",
+   "text": "const MEAN_SOLAR_YEAR_DAYS = C_LOCAL.meanSolarYearDays;              // H/8 snapped"
+  },
+  {
    "file": "tools/explore/moon-euler-rotation.js",
    "line": 86,
    "runtime": "explore",
@@ -6423,30 +6447,6 @@
    "text": "// H/3 line's −3.8e-8 — is tested against the eclipse record. Probe only: --write"
   },
   {
-   "file": "tools/verify/moon-deltat-comparison.js",
-   "line": 59,
-   "runtime": "verify",
-   "token": "H / N",
-   "class": "comment",
-   "text": "const MEAN_DAY_LENGTH = C_LOCAL.meanLengthOfDay;                     // H/13-derived"
-  },
-  {
-   "file": "tools/verify/moon-deltat-comparison.js",
-   "line": 59,
-   "runtime": "verify",
-   "token": "/ 13",
-   "class": "comment",
-   "text": "const MEAN_DAY_LENGTH = C_LOCAL.meanLengthOfDay;                     // H/13-derived"
-  },
-  {
-   "file": "tools/verify/moon-deltat-comparison.js",
-   "line": 60,
-   "runtime": "verify",
-   "token": "H / N",
-   "class": "comment",
-   "text": "const MEAN_SOLAR_YEAR_DAYS = C_LOCAL.meanSolarYearDays;              // H/8 snapped"
-  },
-  {
    "file": "tools/verify/obliquity-hybrid.js",
    "line": 11,
    "runtime": "verify",
@@ -6520,7 +6520,7 @@
   },
   {
    "file": "tools/verify/run-suite.mjs",
-   "line": 68,
+   "line": 60,
    "runtime": "verify",
    "token": "H / N",
    "class": "diagnostic",
@@ -7436,7 +7436,7 @@
   },
   {
    "file": "packages/physics/src/model.js",
-   "line": 673,
+   "line": 677,
    "runtime": "package",
    "token": "/ 13",
    "class": "comment",
@@ -7444,7 +7444,7 @@
   },
   {
    "file": "packages/physics/src/model.js",
-   "line": 742,
+   "line": 746,
    "runtime": "package",
    "token": "8H",
    "class": "comment",
@@ -7452,7 +7452,7 @@
   },
   {
    "file": "packages/physics/src/model.js",
-   "line": 831,
+   "line": 835,
    "runtime": "package",
    "token": "8H",
    "class": "comment",
@@ -7460,7 +7460,7 @@
   },
   {
    "file": "packages/physics/src/model.js",
-   "line": 884,
+   "line": 888,
    "runtime": "package",
    "token": "H / N",
    "class": "comment",
@@ -7468,7 +7468,7 @@
   },
   {
    "file": "packages/physics/src/model.js",
-   "line": 884,
+   "line": 888,
    "runtime": "package",
    "token": "H / N",
    "class": "comment",
@@ -7476,7 +7476,7 @@
   },
   {
    "file": "packages/physics/src/model.js",
-   "line": 951,
+   "line": 955,
    "runtime": "package",
    "token": "8H",
    "class": "comment",
@@ -7484,7 +7484,7 @@
   },
   {
    "file": "packages/physics/src/model.js",
-   "line": 952,
+   "line": 956,
    "runtime": "package",
    "token": "H / N",
    "class": "comment",
@@ -7492,7 +7492,7 @@
   },
   {
    "file": "packages/physics/src/model.js",
-   "line": 952,
+   "line": 956,
    "runtime": "package",
    "token": "/ 13",
    "class": "comment",
@@ -7500,7 +7500,7 @@
   },
   {
    "file": "packages/physics/src/model.js",
-   "line": 1026,
+   "line": 1030,
    "runtime": "package",
    "token": "cyclesBetween",
    "class": "counter",
@@ -7509,7 +7509,7 @@
   },
   {
    "file": "packages/physics/src/model.js",
-   "line": 1028,
+   "line": 1032,
    "runtime": "package",
    "token": "cyclesBetween",
    "class": "comb",
@@ -7518,7 +7518,7 @@
   },
   {
    "file": "packages/physics/src/model.js",
-   "line": 1030,
+   "line": 1034,
    "runtime": "package",
    "token": "cyclesBetween",
    "class": "comb",
@@ -7527,7 +7527,7 @@
   },
   {
    "file": "packages/physics/src/model.js",
-   "line": 1032,
+   "line": 1036,
    "runtime": "package",
    "token": "cyclesBetween",
    "class": "comb",
@@ -7536,7 +7536,7 @@
   },
   {
    "file": "packages/physics/src/model.js",
-   "line": 1034,
+   "line": 1038,
    "runtime": "package",
    "token": "cyclesBetween",
    "class": "comb",
@@ -7545,7 +7545,7 @@
   },
   {
    "file": "packages/physics/src/model.js",
-   "line": 1185,
+   "line": 1189,
    "runtime": "package",
    "token": "H / N",
    "class": "comment",
@@ -7553,7 +7553,7 @@
   },
   {
    "file": "packages/physics/src/model.js",
-   "line": 1185,
+   "line": 1189,
    "runtime": "package",
    "token": "H / N",
    "class": "comment",
@@ -7561,7 +7561,7 @@
   },
   {
    "file": "packages/physics/src/model.js",
-   "line": 1188,
+   "line": 1192,
    "runtime": "package",
    "token": "H / N",
    "class": "comment",
@@ -7569,7 +7569,7 @@
   },
   {
    "file": "packages/physics/src/model.js",
-   "line": 1200,
+   "line": 1204,
    "runtime": "package",
    "token": "H / N",
    "class": "comment",
@@ -7577,7 +7577,7 @@
   },
   {
    "file": "packages/physics/src/model.js",
-   "line": 1201,
+   "line": 1205,
    "runtime": "package",
    "token": "H / N",
    "class": "comment",
@@ -7585,7 +7585,7 @@
   },
   {
    "file": "packages/physics/src/model.js",
-   "line": 1206,
+   "line": 1210,
    "runtime": "package",
    "token": "H / N",
    "class": "comment",
@@ -7593,7 +7593,7 @@
   },
   {
    "file": "packages/physics/src/model.js",
-   "line": 1216,
+   "line": 1220,
    "runtime": "package",
    "token": "H / N",
    "class": "comment",
@@ -8095,7 +8095,7 @@
  "inputs": {
   "generator": "node tools/explore/era-device-readers.mjs --write",
   "files": {
-   "data/nbody-secular-series.json": "sha256:28b85a80f5edeecf454d539da6fd3f6f0a37a7116bc3dd578c2830352c67765b",
+   "data/nbody-secular-series.json": "sha256:e2d879e8865348a3a72807fd18496ee2523dbde09a570e360519d23edcc1db7d",
    "packages/api/src/app.js": "sha256:b2f1fcb9f93599f5c6b8cce103e2c095d7aca03848a72e1f6306c99263af56e4",
    "packages/api/src/mcp.js": "sha256:be585188381e09db9e3c4ee511e7458e37c943a4dff06be6e0ec03e73745ee6c",
    "packages/api/test/api-gates.test.mjs": "sha256:53e7ca655f517a258a0021d9d13e313da2a9d53168f61bbad5e3de9c4de9fdea",
@@ -8114,7 +8114,7 @@
    "packages/physics/src/layer0/derive-params.js": "sha256:a65159efb5d4952610687a648fd3c8b02ee01f995a9ec3d594e625eafc4c8158",
    "packages/physics/src/layer0/index.js": "sha256:b18bf16afc1e96f3841e5d112682cb44cc7216d0dd2d3f9b73fb50fa89d431b5",
    "packages/physics/src/layer1/index.js": "sha256:ba7a15893b0d4b38ff53521f2180384b805160b313e4711740802b356cbd4e2f",
-   "packages/physics/src/model.js": "sha256:e82634597649eb9e071e0fd65bc6d1e7153097aaa8a0189e24e1419943ecb582",
+   "packages/physics/src/model.js": "sha256:415000a5ea795c84c91ded1f7b889e8fd3dd6475b3f54ddafa8fa408b6d824b7",
    "packages/physics/src/moon/arguments.cjs": "sha256:1da00ddc7ae39accd37048e2be124580e764bb1e147d24bf8c9ff8c1bfff4ee9",
    "packages/physics/src/moon/deep-ecc-channel.cjs": "sha256:7ce15d1c4f61f2ea730d7673d705a1eb2a31bff20b720cd00d8f1d34a3e85220",
    "packages/physics/src/moon/deep-modes-artifact.cjs": "sha256:7e694442be5bdb9b59087c3e8587bba8d7a271f8100d022f51418bbb351d996d",
@@ -8134,7 +8134,7 @@
    "tools/check-vocabulary.mjs": "sha256:49b37bd39baffdc860a25cd1bc021306bd360b0fe03ded8ca4d416fcd661e02a",
    "tools/constants/check-literals.mjs": "sha256:85564353744373dbc3181962d7a47a9e4547253d6db4889d5c29388094358779",
    "tools/constants/generate.mjs": "sha256:cc69923c7204576fb319b9d20f97938f16296ed0943c20717530790e7cee8e58",
-   "tools/docs/model-values.mjs": "sha256:d15e9c8bcdfa5918ca58d859e301250f228909020d5bf5d06c6cf5a8c3237a62",
+   "tools/docs/model-values.mjs": "sha256:30b8644e662cab88b6458e3f16d47ef8e8264fd7b264fd4caecdb4cfd4d09033",
    "tools/docs/render-calculation-map.mjs": "sha256:8807a8af9432460830eb87c2555e4a343c1e537deea772b76322cc9562e6c31f",
    "tools/docs/render-doc99-tables.mjs": "sha256:fc16fc33ffbd7f8313057d25a02c2a262029a2d1e25b7ff94f97645f9b8cd458",
    "tools/explore/climate-band-phase.js": "sha256:0b81487d4cf86717265d53e7583b63e6ff7b52a5f8d9d8c3e7c21ff975e9bbe3",
@@ -8151,6 +8151,7 @@
    "tools/explore/lattice-base-scan.mjs": "sha256:4c504b809392fe559fb34c72e71c8617d15e3b1fa911f7c42b3d9cfeb6700033",
    "tools/explore/lattice-beat-null-test.mjs": "sha256:97312ed6a3ebc34814c95cda417c2e4cf24bb37bd9ba20adc07fa0ac63d6b4b6",
    "tools/explore/lattice-long-window-test.mjs": "sha256:20f4ca076624aab9bdd1898f48890fe60c77ef2d6f7a792de47b713769f059d5",
+   "tools/explore/moon-deltat-comparison.js": "sha256:e12c011d4a61e649b1ecfb587cace7244a826a62448fedce142c93e03ea23f99",
    "tools/explore/moon-euler-rotation.js": "sha256:6f7d2017c8c7aefa5631baf4ede2c2a2f34121c39fa575118c6c12c6c91c9011",
    "tools/explore/naff-frequencies.mjs": "sha256:3d2eac569010adcbae57ee987f834c259dec689b6802d623b71c03c80c089496",
    "tools/explore/nbody-forces.mjs": "sha256:24eb2e9db047b4f3612472a5301f6be07ab77e2d334af598eed4d57958c84466",
@@ -8183,9 +8184,8 @@
    "tools/lib/scene-graph.js": "sha256:fb1b261ae8b78b4d7bd0659c280c189e84c5e3c65dfe0698054f605b802dca29",
    "tools/verify/deep-secular-modes.js": "sha256:1c5d69aaeccbb305ddd842a5c19d8945b9f2747fabef3e97dfe70bdd14d57e6d",
    "tools/verify/eclipse-audit.js": "sha256:040df36c3852dc64553ce047bb0503965f01faeddec2f660c3fb42284c58a319",
-   "tools/verify/moon-deltat-comparison.js": "sha256:61a8adcb14fddd93eb7b6ee1c69b0dd1530975a8740a189ce25eff948a3de426",
    "tools/verify/obliquity-hybrid.js": "sha256:4d7e17fb9df75b68ae9bb1aaa8b155e265f0aba7e282d437f858f736f99d2d79",
-   "tools/verify/run-suite.mjs": "sha256:8bb8f7a8fcb4aaf4f46346edfc85cdf4ab2a3174f23563b121c268cdbc1aa764"
+   "tools/verify/run-suite.mjs": "sha256:b71f5083d06ee9dc9ca879ac33393ff6edaf8d923084e571bbbc6977746ed39c"
   }
  }
 }

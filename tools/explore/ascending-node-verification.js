@@ -18,7 +18,7 @@
 //   cos(angle) = n₁ · n₂
 // where n = (sin(i)sin(Ω), sin(i)cos(Ω), cos(i))
 //
-// Run with: node 82-ascending-node-verification.js
+// Run with: node tools/explore/ascending-node-verification.js
 // ═══════════════════════════════════════════════════════════════════════════
 
 const C = require('../lib/constants');

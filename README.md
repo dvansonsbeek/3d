@@ -150,7 +150,7 @@ npm run build
 ### Verification
 
 ```bash
-npm run check             # the full gate chain (~9 min): lint, typecheck, boundaries,
+npm run check             # the full gate chain (~5 min): lint, typecheck, boundaries,
                           # purity, layer identities, constants, counterfactual,
                           # planet model, createModel parity, fixtures, literals, python-physics pins,
                           # docs freshness, artifact freshness, data provenance,

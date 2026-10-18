@@ -870,7 +870,7 @@ export const VALUES = {
       return (((s - chainCache.origin) % 360) + 360) % 360;
     };
     // The spherical-triangle identity cos i_ecl = cos i_P cos i_E + sin i_P sin i_E cos(Ω_P − Ω_E)
-    // — the closed-form node calibration (tools/verify/analytical-ascending-nodes.js) run
+    // — the closed-form node calibration (tools/explore/analytical-ascending-nodes.js) run
     // forward. Three node sets are closed against JPL's J2000 ecliptic inclination: S&S 2012
     // as published, the closed-form VERIFIED node (astro-reference planetOrbitalElements
     // .ascendingNodeInvPlaneClosedForm, solved to close this identity — a reference

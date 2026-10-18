@@ -23,7 +23,7 @@
 //
 // Compare with Appendix B (81) which derives the same values analytically.
 //
-// Run with: node 80-ascending-node-optimization.js
+// Run with: node tools/explore/ascending-node-optimization.js
 // ═══════════════════════════════════════════════════════════════════════════
 
 const DEG2RAD = Math.PI / 180;

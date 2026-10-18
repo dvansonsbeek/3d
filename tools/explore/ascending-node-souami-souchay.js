@@ -15,7 +15,7 @@
 // - Small adjustments are needed to match JPL J2000 ecliptic inclinations
 // - The adjustments compensate for coordinate system differences
 //
-// Run with: node 83-ascending-node-souami-souchay.js
+// Run with: node tools/explore/ascending-node-souami-souchay.js
 // ═══════════════════════════════════════════════════════════════════════════
 
 const DEG2RAD = Math.PI / 180;

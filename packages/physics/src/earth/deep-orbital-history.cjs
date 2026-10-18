@@ -500,6 +500,8 @@ function createDeepOrbitalHistory({
     };
   }
 
+  /** The factory's walks, one per step size — see build(). @type {Map<number, { grid: Map<number, any>, frontier: Record<number, { s: number[], t: number }> }>} */
+  const walks = new Map();
   /**
    * Integrate once over [min(t0,t1,0), max(t0,t1,0)] and return a sampler
    * on a stepYr grid (linear interpolation; angles interpolated on the
@@ -514,7 +516,18 @@ function createDeepOrbitalHistory({
     if (Math.max(Math.abs(tMin), Math.abs(tMax)) > 50000 && stepYr % 250 !== 0) {
       throw new Error(`deep-orbital-history: builds beyond ±50 kyr need stepYr % 250 === 0 (got ${stepYr})`);
     }
-    const grid = new Map();
+    // ONE WALK PER STEP SIZE, EXTENDED, NEVER RESTARTED (plan 13 A1, measured):
+    // every caller's tier routing asked for `build(span, -span, step)` and
+    // rebuilt from J2000 whenever a deeper epoch arrived, so the four deep
+    // fixture anchors (380…2460 Ma) walked ~49 million RK4 steps — 14 of the
+    // chain's 17 minutes — and the API's first read at −498 Myr would walk
+    // ~5 million. The walk is a pure function of t from the fixed J2000 state
+    // S0, so continuing a stored walk from its last (s, t) yields the SAME
+    // step sequence as a fresh walk to the farther end: bit-identical nodes
+    // (the sampler-order-purity gate pins this). The grid and the two
+    // direction frontiers live on the factory, keyed by stepYr; a returned
+    // sampler reads the shared grid, which only ever gains nodes.
+    let w = walks.get(stepYr);
     const S0 = S0A;
     // D1-revised adaptive stepping: 5-yr RK4 near the era (the certified-
     // precision zone), 250-yr beyond ±50 kyr — still 103 steps per
@@ -526,8 +539,16 @@ function createDeepOrbitalHistory({
     // 250-aligned; switching one fine-step later would leave the coarse walk
     // permanently off-grid — measured: every key beyond ±50 kyr missing).
     const hStepAt = (/** @type {number} */ t) => (Math.abs(t) < 50000 ? 5 : 250);
+    if (!w) {
+      w = { grid: new Map(), frontier: { [-1]: { s: S0, t: 0 }, [1]: { s: S0, t: 0 } } };
+      walks.set(stepYr, w);
+    }
+    const grid = w.grid;
     for (const dir of [-1, +1]) {
-      let s = S0, t = 0;
+      const end = dir < 0 ? tMin : tMax;
+      const front = w.frontier[dir];
+      if (dir < 0 ? end >= front.t : end <= front.t) continue;   // already walked this far
+      let s = front.s, t = front.t;
       // Each stored node also carries the equinox-node RATE (deg/yr) from a
       // ±2.5-yr central difference on the integrator's own state — the C1
       // (Hermite) interpolation input. Linear interpolation of the node
@@ -552,8 +573,7 @@ function createDeepOrbitalHistory({
         smp.periOfDateRateDegPerYr = (((lp.peri - lm.peri + 540) % 360) - 180) / (2 * hR);
         grid.set(key, smp);
       };
-      storeWithRate(0, s, 0);
-      const end = dir < 0 ? tMin : tMax;
+      if (t === 0 && !grid.has(0)) storeWithRate(0, s, 0);
       while (dir < 0 ? t > end : t < end) {
         const H_STEP = hStepAt(t);
         s = rk4(s, t, dir * H_STEP);
@@ -568,6 +588,7 @@ function createDeepOrbitalHistory({
         // zone boundary is itself 250-aligned, so the walk stays on-grid).
         if (Math.abs(t - Math.round(t / stepYr) * stepYr) < 1e-6) storeWithRate(Math.round(t / stepYr) * stepYr, s, t);
       }
+      w.frontier[dir] = { s, t };
     }
     return {
       /** @param {number} tYr */

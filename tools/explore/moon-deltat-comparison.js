@@ -24,7 +24,7 @@
  * its J2000-anchored T-polynomial. Disagreements between ΔT choices remain
  * visible in residuals, but absolute residuals reflect Meeus + ΔT combined.
  *
- * Usage: node tools/verify/moon-deltat-comparison.js
+ * Usage: node tools/explore/moon-deltat-comparison.js
  */
 
 const { computePlanetPosition, thetaToRaDeg, phiToDecDeg } = require('../lib/scene-graph');

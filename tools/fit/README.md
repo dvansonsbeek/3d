@@ -213,132 +213,49 @@ model change that isn't paired with a version bump.
 
 ## Dependency chain
 
-When model parameters change, refit in this order. The logic:
-0. (Step 0, the Sun-longitude harmonics — DELETED at plan 09 step 5a with
-   its fitter and keys; record: doc 109 §22.)
-1. (Step 1, the Sun optimizer — DELETED at plan 11 step 2 with the scene
-   constants it fitted: the engine places the Sun, so `correctionSun` and the
-   eccentricity base reached nothing. The remaining scaffold pose constants —
-   `earthtiltMean`, the inclination amplitude, the wheels — are recorded
-   values, not fitted ones, until plan 11 step 4 retires the scaffold.)
-2. (Planet angleCorrection / startpos — retired with the K5 excision: the
-   planets render from the N-body chain; angleCorrection deleted at plan 11
-   step 2.)
-3. The simulation state is the engine's — the export needs no fitter first.
-4. (Earth's perihelion comb, Steps 4a/4b, is DELETED at plan 09 step 4 —
-   Earth's perihelion of date is the series' ϖ; the planet ML trainers,
-   Steps 4c/4d, are retired at plan 06 R8.)
-5. (Parallax corrections — retired with the K5 excision.)
-6. Solar measurements (cardinal points, perihelion/aphelion, world-angles) come
-   from a single scene-graph pass at 1-year steps (depends on everything above)
-   — the window CSV, Step 6a2.
-7. The J2000 tropical year is DERIVED in one home from the IAU sidereal year
-   and p_A; the year lengths of date are the one-source family (no fitted
-   step — the cardinal-point harmonics it was once read from are deleted).
-8. The solstice-obliquity comb (`SOLSTICE_OBLIQUITY_MEAN_FITTED` /
-   `_HARMONICS`) is deleted (plan 09): the obliquity of date is the hybrid
-   everywhere, so the old circular dependency (second full pipeline pass,
-   ~1.5" effect) is gone with it.
-9. The Sun T² polynomial correction (Meeus Ch.25 +0.0003032°/T²) that
-   formerly paired with the Sun harmonics has been **REMOVED 2026-06**
-   per the bounded-basis design rule (polynomial-in-T terms grow without
-   bound at deep time and destroy the bounded-basis property). See the design
-   rule near the top of this README.
+The fitted steps that once formed a chain — Steps 0–5c: the Sun-longitude
+harmonics, the Sun optimizer, the planet alignments, the perihelion comb, the
+planet ML trainers, the parallax fitters, the Moon optimizer — are deleted or
+retired (plan 06 R8, the K5 excision, plan 09 steps 4/5a, plan 11 step 2); git
+history and doc 109 §22 are the record, and the step ids stay as shared
+vocabulary. What remains FITTED is the ΔT stack (Step 7c) and the climate
+formula; the J2000 tropical year, the year lengths of date, the obliquity and
+the perihelion of date are derived (one-source), and everything the registry
+quotes beyond that is a governed artifact with a recorded inputs block.
+
+**The regeneration order is a script, not a paragraph.** `npm run
+regen:cascade` reads every governed artifact's inputs block, adds the
+generated constants module as a node, propagates staleness downstream and
+prints the order; `--run` runs it, stopping at the first failure. The order it
+prints, in full, when `public/input/astro-reference.json` or the chain code
+moved (each step only when its own inputs moved):
 
 ```
-── Phase 0: Pre-fit Sun harmonic structure (DELETED) ───────────────
+ 1. node tools/verify/nbody-secular.js --write          ~20 min (astro-reference, the chain code)
+ 2. node tools/verify/deep-secular-modes.js --write     ~75 min + the untracked ±10-Myr dump — rarely
+ 3. node tools/verify/secular-series.js --write         ~5 min; the same dump
+ 4. npm run constants:generate                           embeds the N-body artifacts
+ 5. node tools/verify/measure-rms-by-epoch.js --write
+    node tools/verify/earth-osculating-offset.js --write   (both read the generated chain artifact)
+ 6. npm run constants:generate                           again: embeds the offset
+ 7. the independent leaves, any order:
+    obliquity-hybrid (~1.5 min) · equinox-vs-vondrak (~5) · sun-vs-horizons (~10) ·
+    eclipse-audit (~3, REFUSES on divergence) · lunar-alignment (~1.5, REFUSES) ·
+    cassini-results · lod-climate-correlation · t1-export-engine-frequencies
+ 8. the Python chain: l1_physical_lines → milankovitch_climate_formula,
+                      t7_fixed_phase_l1 → t7-alpha-proxy-tables
+ 9. node tools/explore/era-device-readers.mjs --write   last (it hashes the code)
+```
 
-Step 0:  DELETED at plan 09 step 5a — the Sun-longitude harmonic fitter and
-         its keys SUN_LONGITUDE_MEAN / SUN_LONGITUDE_HARMONICS are gone (a
-         whitelisted comb on the retired unit's divisors that had touched
-         no scene path since plan 06 R4). Nothing runs here. Record: doc
-         109 §22 and git history.
+Then by hand, because each is a judgement: `npm run test:fixtures` (re-record
+ONLY if the change was intended, and say so in the commit), `docs:values:write`,
+`docs:tables:write`, `stamp-frontmatter --write`, `values:package:write`, the
+version note; `fit:6a2` + `check:csv-smoke` if the engine's frame of date moved.
+Step 7c (the ΔT fitter, below) is a FIT, not a regeneration: it runs before the
+cascade when the inputs it reads moved, and `constants:generate` runs before any
+record generator (the records run on the EMBEDDED coefficients — CLAUDE.md).
 
-── Phase 1: Sun optimizer & planet alignment ──────────────────────
-
-Step 1:  (DELETED at plan 11 step 2.) `node tools/optimize.js optimize sun
-         correctionSun` fitted the scene Sun's start angle, the eccentricity
-         base and amplitude, the mean obliquity and the inclination amplitude
-         against JPL. The engine places the Sun at the certified longitude,
-         so the first two reached nothing and left the inputs; the remaining
-         three are recorded pose constants of the scaffold (plan 11 step 4
-         retires them with it). The optimizer and its library are gone — git
-         history keeps them. The id is never reused.
-
-(Step 2 — per-planet startpos alignment — RETIRED for the planets with the
-K5 legacy-chain excision: the seven planets render from the engine-D
-Keplerian chain, anchored by the governed artifact's elements, not by
-fitted scene angles. The `optimize <planet> startpos` command remains as a
-diagnostic only.)
-
-── Phase 2: Generate input data (manual) ──────────────────────────
-
-Step 2-sync: npm run constants:generate && npm run build
-         Regenerate the constants module from the JSON Step 1 wrote, then
-         rebuild the bundle — the browser reads the built bundle, so without
-         this every browser-side reading shows pre-optimization values.
-
-Step 3:  Export from browser GUI              → data/01-holistic-year-objects-data.xlsx
-         NO LIVE CONSUMER. The full-period objects export (one row per year
-         of the retired unit, its first and last rows a closure point of
-         the retired cycle) fed Steps 4a–4d only: the perihelion comb
-         (4a/4b, DELETED at plan 09 step 4) and the planet ML trainers
-         (4c/4d, retired at plan 06 R8). The unit, its phase anchor and
-         `stepYears` are deleted (plan 09 step 7c), so the export's range
-         protocol no longer exists. The detailed pre-export protocol is
-         in git history.
-
-── Phase 3: Earth perihelion & ML training ────────────────────────
-
-Steps 4a/4b (python/fit_perihelion_harmonics.py → PERI_HARMONICS_RAW,
-         PERI_OFFSET; python/verify_perihelion_erd.py): DELETED at plan 09
-         step 4. The 25-term perihelion comb on H-divisors was fitted to the
-         file-01 export's `Earth Perihelion ICRF` column (an RA, converted to
-         ecliptic longitude of date before fitting — git history carries the
-         script and the trap: fitting the RA directly carried a
-         tan²(ε/2)·sin 2λ wave, 2.47° at H/32). Earth's perihelion of date is
-         the series' ϖ (`createModel().earth.perihelionLongitudeDeg`); the
-         scene's perihelion has followed it since v16.0, and the registry's
-         plausibility row periLongModel2000AD vs periLongJ2000 (0.02°) gates
-         the published value. Measured before deletion, comb − series: 0.03°
-         at 2000, −1.6° at −4000, −20° at −26 kyr (data/era-device-readers.json).
-
-Note: eocEccentricity is derived analytically in constants.js (e(J2000)/2 — the
-      Sun node's rest-pose EoC half; the scene's per-frame value is the series).
-      perihelionPhaseOffset and correctionSun are deleted (plan 11 step 2).
-
-(Steps 4c–4d — the planet predictive-precession trainers
-`train_precession_physical.py` (~2,421 physical-beat terms per planet) and
-`train_observed.py`, with the residual ranker `greedy_features_physical.py`
-— were RETIRED at plan 06 R8 together with their `PREDICT_COEFFS_*` keys and
-`tools/lib/python/coefficients/`: they fitted the RETIRED geometric scene's
-exported Earth-frame RA rate against the simulator's own export. The ids are
-kept as shared vocabulary.)
-
-── Phase 4: Moon ───────────────────────────────────────────────────
-
-(Steps 5a–5b — the parallax and gravitation/elongation planet-correction
-fitters — were RETIRED with the K5 legacy-chain excision: the planets
-render from the engine-D Keplerian chain, and the corrected geometric
-RA/Dec path they fitted no longer exists. The id 5c is kept — this
-numbering is shared vocabulary.)
-
-         (ascnode-correction.js — the ascNodeTiltCorrection scan — was
-         DELETED at plan 11 step 2 with the optimizer it drove.)
-
-Step 5c: moon-eclipse-optimizer.js            → (RETIRED plan 06 R3 item 1; DELETED plan 11 step 2)
-         Formerly fitted the Lp bias and the 3-term RA/Dec correction vs
-         JPL. Both constants are gone: the Moon's series needs no anchor
-         against Horizons' apparent Moon, and the eclipse location tier now
-         rides apparent places (the Sun's κ, the Moon's relative
-         light-time) instead of a fitted Moon offset. The id 5c is kept —
-         this numbering is shared vocabulary; the script stays as the record.
-         moonStartpos* values are J2000-element anchored via the in-sim
-         meters (docs/66 §4) — NO LONGER fitted; the startPos scan in
-         the tool is a flat-gradient diagnostic only, never written.
-         Updated (then): model-parameters.json moonMeeusLpCorrection + fitted-coefficients.json — both files DELETED (plan 11 steps 2, 1 and 6)
-         Verify: RMS separation < 0.85° (geocentric-parallax floor ~0.81°), individual eclipses < 2°
-
+```
 ── Phase 5: Solar measurements & harmonic fits ─────────────────────
 
 Step 6a: export-solar-measurements.js         → data/02-solar-measurements.csv
@@ -351,7 +268,7 @@ Step 6a: export-solar-measurements.js         → data/02-solar-measurements.csv
 Step 6a2 (owner, 2026-09-16): `npm run fit:6a2`
          → data/02-solar-measurements-window.csv (gitignored)
          The SAME exporter over −4000..+4000 (8,001 years × 6 events =
-         48,006 rows, ~5 min) instead of the retired full-period run (one row
+         48,006 rows, ~25 min) instead of the retired full-period run (one row
          per year of the retired unit × 6 events, ~2.0 M rows, 2 h 24 m) — the LIVING check
          artifact ("do not generate 335,318 calculations — only
          ~50,000, or 10,000"); pass --start/--end for a smaller window.
@@ -468,8 +385,10 @@ Steps 7f-7i: campaign-artifact generators     → data/*.json (inputs-stamped)
          generator itself), and is verified by the artifact-freshness gate
          (`npm run check:artifacts`, part of `npm run check` and
          `check:docs`) — the gate fails naming the exact regeneration
-         command whenever an input moves without a re-run. All four run in
-         the automated pipeline by default.
+         command whenever an input moves without a re-run. The three
+         (7f, 7h, 7i; 7g is retired) run in the automated pipeline by
+         default, and `npm run regen:cascade` lists every stale generator
+         in regeneration order.
 
          7f: node tools/verify/cassini-results.js --write
              → data/cassini-moontilt-results.json (runs both Cassini labs
@@ -614,8 +533,7 @@ sidereal year and p_A; the year lengths of date are the one-source family.
 | `H` (holisticyearLength) | DELETED at plan 09 step 7c — no longer an input. The ΔT stack's periods are stated in years in the fitted coefficients (`period_yr`), not derived from a unit. |
 | `longitudePerihelion` (any planet) | 2 (that planet only) |
 | `solarYearInput` (any planet) / `moonSiderealMonthInput` / `yearLengthRef.siderealYear` | **The Sun-completion carriers ride these** (FQ-5 N3: `model.js` computes the carrier rates live; plan 06 I2: SIDEREAL — record rate minus the model's J2000 precession, Earth the sidereal year). Re-run the extraction chain (`tools/explore/n2-sun-framework-carriers.mjs` → `i2-sidereal-carrier-table.mjs` for the 70 short-period rows, `i2-long-inequality.mjs` for the two long-period rows on the model's own WH engine), re-embed the TERMS + `PAIRED_CARRIER_RATES_SHA256` in `eclipse/sun-planetary-completion.cjs` — the test:model fingerprint gate FAILS until you do (fail-proven). Plus the planet's own step 2 where applicable. |
-| `earthtiltMean` | 1, 6a2 (window CSV) |
-| `earthInvPlaneInclinationAmplitude` | 1, 6a2 (window CSV) |
+| `earthtiltMean` / `earthInvPlaneInclinationAmplitude` | DELETED at plan 11 step 4 with the K-device scaffold — the scene's world frame is the J2000 ecliptic; nothing to rerun |
 | `earthInvPlaneInclinationMean` / `correctionSun` | DELETED at plan 11 step 2 — scaffold constants the engine-placed frame overwrote; nothing to rerun |
 | `SUN_LONGITUDE_HARMONICS` / `SUN_LONGITUDE_MEAN` | DELETED at plan 09 step 5a with Step 0 — nothing to rerun. |
 | ~~Sun T² polynomial (inline in `moveModel`)~~ | **REMOVED 2026-06** — violates design rule (polynomial-in-T not cyclic). Do not re-introduce. |
@@ -626,7 +544,7 @@ sidereal year and p_A; the year lengths of date are the one-source family.
 | Planet `eocFraction` | DELETED at plan 11 step 2 (no reader left) |
 | Planet `solarYearInput` | see the Sun-completion carriers row above (Steps 4c/4d retired at plan 06 R8; 2/5a-5b with the K5 excision) |
 | Planet `orbitalEccentricityBase` | — (Steps 2/5a-5b retired — K5 excision; legacy law constant) |
-| `perihelionalignmentYear` | 1, 6a2 (window CSV) |
+| `perihelionalignmentYear` | 6a2 (window CSV) — Step 1 is deleted |
 | `stepYears` | DELETED at plan 09 step 7c (the retired unit's lattice grid; since plan 07 R10 the grid year was J2000 and its delta identically 0). |
 | `siderealYearJ2000` (in yearLengthRef) | Derived: `meansiderealyearlengthinSeconds = siderealYearJ2000 × 86400` |
 | Bond / Hallstatt / Jose5 / Jose4 period (`period_yr`, stated in years) | Step 11 (= 7c; independent of the orbital steps). The 4-flag ΔT stack has no upstream dependency on Steps 1–10; the fit re-runs against the Stephenson residual, reaches `src/script.js` and `tools/lib/deep-time.js` through the JSON (Step 9 / direct read), and the website via the republished `@essrt/physics` (see "Publishing to the website"). |
@@ -695,13 +613,8 @@ node tools/fit/run-pipeline.js --from 6a2      # Resume from Step 6a2 onwards
 
 Output is logged to `tools/results/pipeline.log`. Stops on any step failure.
 
-**Known defect (v24.0).** The runner's step list
-(`packages/fitting/src/run-pipeline.cjs`) still names Steps 4a–4d and 7g,
-whose scripts are deleted (4a/4b at plan 09 step 4) or retired (4c/4d/7g at
-plan 06 R8), and still refuses Phase 2 without the Step-3 export file, which
-has no live consumer. `--phase2` / `--all` therefore stop at 4a and
-`--from 6a2` stops at 7g. Until the runner is trimmed, run the live steps
-manually (next section).
+The runner's step list (`packages/fitting/src/run-pipeline.cjs`) names the
+live steps only: 6a2, 7c, 7f, 7h, 7i, 8, 9.
 
 **Observed timings (2026-07-15 recalibration; the deleted steps are struck):**
 - Phase 1 (Step 1): **~15 s** (the Sun optimizer; first run needs `baseline sun` JPL cache refresh. Was ~2 min with the retired per-planet Step 2)

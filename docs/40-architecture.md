@@ -180,7 +180,7 @@ WebGL Render (60 FPS target)
 │
 ├── tools/
 │   ├── fit/                    # Pipeline CLI shims (implementations in packages/fitting)
-│   ├── verify/                 # 31 scripts: 6 gate · 3 liftable · 12 narrative · 10 generator
+│   ├── verify/                 # the gates and the artifact generators — every script fails or writes (`npm run test:verify:list`)
 │   ├── explore/                # Exploratory analysis scripts (~150 tracked one-offs; closed-campaign instruments live in the untracked archive/, git history is the record)
 │   ├── constants/              # generate.mjs — the generated-constants pipeline
 │   ├── docs/                   # Doc machinery (marker renderer, frontmatter stamper)

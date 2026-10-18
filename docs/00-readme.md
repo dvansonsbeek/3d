@@ -105,18 +105,18 @@ their diffs), and the sections below give the intended reading order instead.
 
 ## Appendices
 
-**Verification scripts** — standalone Node.js scripts that verify, compute, or analyze model parameters. Run with `node tools/verify/<filename>`. (`npm run test:verify:list` classifies all 24: 5 gate · 1 liftable · 6 narrative · 12 generator.)
+**Verification scripts** — `tools/verify/` holds the gates and the artifact generators: every script there either fails (`npm run test:verify` runs the gates) or writes a tracked `data/*.json` under `--write` (`npm run regen:cascade` lists the stale ones in regeneration order). `npm run test:verify:list` prints the classification with each script's note.
+
+The research one-offs that print and never fail live in `tools/explore/` (its README states the rule: a script stays while something names it). The ones this documentation names:
 
 | Script | Description |
 |--------|-------------|
-| [ascending-node-optimization.js](../tools/verify/ascending-node-optimization.js) | Numerical optimization to calculate ascending node values |
-| [analytical-ascending-nodes.js](../tools/verify/analytical-ascending-nodes.js) | Analytical (closed-form) calculation using spherical trigonometry |
-| [ascending-node-verification.js](../tools/verify/ascending-node-verification.js) | Verifies J2000-verified values produce correct ecliptic inclinations |
-| [ascending-node-souami-souchay.js](../tools/verify/ascending-node-souami-souchay.js) | Compares Souami & Souchay original vs verified ascending node accuracy |
-| [measure-rms-historical-vs-jpl.js](../tools/verify/measure-rms-historical-vs-jpl.js) | The model against the independent historical observations (Tier 1) and against JPL/IMCCE at the same epochs (Tier 2) — [doc 23](23-verification-data-reference.md) |
-| [moon-deltat-comparison.js](../tools/verify/moon-deltat-comparison.js) | The Moon's timing against the ΔT stack |
-
-The five gates and the twelve artifact generators are the rest of the 24; `npm run test:verify:list` prints the classification with each script's note.
+| [ascending-node-optimization.js](../tools/explore/ascending-node-optimization.js) | Numerical optimization to calculate ascending node values |
+| [analytical-ascending-nodes.js](../tools/explore/analytical-ascending-nodes.js) | Analytical (closed-form) calculation using spherical trigonometry — the derivation `astro-reference.json`'s `ascendingNodeInvPlaneClosedForm` cites |
+| [ascending-node-verification.js](../tools/explore/ascending-node-verification.js) | Verifies J2000-verified values produce correct ecliptic inclinations |
+| [ascending-node-souami-souchay.js](../tools/explore/ascending-node-souami-souchay.js) | Compares Souami & Souchay original vs verified ascending node accuracy |
+| [measure-rms-historical-vs-jpl.js](../tools/explore/measure-rms-historical-vs-jpl.js) | The model against the independent historical observations (Tier 1) and against JPL/IMCCE at the same epochs (Tier 2) — [doc 23](23-verification-data-reference.md) |
+| [moon-deltat-comparison.js](../tools/explore/moon-deltat-comparison.js) | The Moon's timing against the ΔT stack |
 
 > **Note:** `ascending-node-optimization.js` and `analytical-ascending-nodes.js` calculate the same ascending node values using different methods (numerical vs analytical). Both produce identical results, proving the geometric validity of the approach.
 

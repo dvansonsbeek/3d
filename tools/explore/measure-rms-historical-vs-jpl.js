@@ -20,7 +20,7 @@
  * Most Tier 1 entries are DECLINATION-ONLY. We compare dec-only RMS.
  *
  * Usage:
- *   node tools/verify/measure-rms-historical-vs-jpl.js
+ *   node tools/explore/measure-rms-historical-vs-jpl.js
  */
 
 const path = require('path');

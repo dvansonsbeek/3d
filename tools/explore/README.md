@@ -1,7 +1,9 @@
 # `tools/explore` — frozen research one-offs
 
-**Status: FROZEN.** 118 single-purpose investigation scripts kept as the
-provenance behind findings that are written up in `docs/`. They are not
+**Status: FROZEN.** Single-purpose investigation scripts kept as the
+provenance behind findings that are written up in `docs/` (plan 13 A5 added
+the six print-only scripts that used to sit in `tools/verify/`, which now
+holds gates and generators only). They are not
 production code, not a library, and not maintained. A script stays here
 while something names it — a live doc, shipped code citing it as a
 derivation's record, a governed artifact's generator or inputs block, or a

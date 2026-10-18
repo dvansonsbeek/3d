@@ -27,7 +27,7 @@
 //
 // Then: Ω_planet = Ω_earth + ΔΩ  (choosing the sign that matches S&S direction)
 //
-// Run with: node 81-analytical-ascending-nodes.js
+// Run with: node tools/explore/analytical-ascending-nodes.js
 // ═══════════════════════════════════════════════════════════════════════════
 
 const DEG2RAD = Math.PI / 180;

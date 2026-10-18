@@ -588,19 +588,23 @@ export function assembleModel(C, F, laws = {}, secularSeriesArtifact = /** @type
     // and the year-length rates (±0.5-yr central differences through the
     // grid) then returned grid-segment averages instead of local rates
     // (anomalistic of date +2.63 s / +19 s, visit-order dependent).
-    const samplers = /** @type {Map<number|'deep', any>} */ (new Map());
-    let deepRangeYr = 0;
+    const samplers = /** @type {Map<number, any>} */ (new Map());
     const gridStep = (/** @type {number} */ n) => (n <= 50000 ? 100 : n <= 2000000 ? 1000 : 5000);
-    const tierSpan = (/** @type {number} */ n) => (n <= 50000 ? 50000 : n <= 2000000 ? 2000000 : Math.ceil(n * 1.25 / 5000) * 5000);
+    const tierSpan = (/** @type {number} */ n) => (n <= 50000 ? 50000 : 2000000);
     const sampleAt = (/** @type {number} */ year) => {
       const t = year - 2000, need = Math.max(20000, Math.abs(t) * 1.25);
-      const span = tierSpan(need);
-      const key = span > 2000000 ? /** @type {'deep'} */ ('deep') : span;
-      if (!samplers.has(key) || (key === 'deep' && span > deepRangeYr)) {
-        if (key === 'deep') deepRangeYr = span;
-        samplers.set(key, hist.build(span, -span, gridStep(span)));
+      if (need > 2000000) {
+        // The deep tier (5000-yr grid): walked in the queried DIRECTION only,
+        // to two nodes past the query, and EXTENDED by the factory's shared
+        // walk when a deeper epoch arrives (plan 13 A1). It was built to
+        // ±1.25·|t| in both directions and rebuilt from J2000 on every deeper
+        // probe — bit-identical values, 4× the RK4 steps of one walk.
+        const span = Math.ceil((Math.abs(t) + 2 * 5000) / 5000) * 5000;
+        return hist.build(t < 0 ? -span : span, 0, 5000).at(t);
       }
-      return samplers.get(key).at(t);
+      const span = tierSpan(need);
+      if (!samplers.has(span)) samplers.set(span, hist.build(span, -span, gridStep(span)));
+      return samplers.get(span).at(t);
     };
     // The anomalistic year rides THIS movement's own apsidal line (the
     // scene's perihelion) — the factory owns the construction; the planet

@@ -34,96 +34,15 @@ jobs:
       - name: Install
         run: npm ci
 
-      # §2b — physics imports nothing external; no cycles; no platform globals.
-      - name: Lint (architecture-as-code, §4)
-        run: npm run lint
-
-      # §13.2 — JSDoc + checkJs replaces the type safety TypeScript would have
-      # given. Catches the [div,sin,cos] vs {order,sin,cos} class of confusion.
-      - name: Typecheck (JSDoc + checkJs)
-        run: npm run typecheck
-
-      # §2h — no Tychosium scene-graph schema and nothing GPL-derived may be
-      # reachable from packages/physics. This is what keeps the commercial
-      # surface clean (§14.6); ESLint cannot express it.
-      - name: Boundaries (§2h licensing invariant)
-        run: npm run check:boundaries
-
-      # §8 — purity is an NFR. Catches dynamic global access that the linter
-      # cannot see, e.g. globalThis['doc' + 'ument'].
-      - name: Purity (physics with no platform)
-        run: npm run test:purity
-
-      # §5b — the tools/lib regression tier. Exact comparison, no tolerance:
-      # proven to fail on a 1-ULP change (1.7e-16 relative).
-      - name: Regression (tools/lib golden masters)
-        run: npm run test:fixtures
-
-      # §2g — the generated constants module must match the JSON source of
-      # truth. Also refuses to emit if a JSON block is unclassified, so a new
-      # block cannot silently enter (or bypass) the injectable surface.
-      - name: Constants generated from JSON (not stale)
-        run: npm run test:constants
-
-      # §2d — THE PHASE 5 GATE. A counterfactual must return a changed,
-      # reproducible result carrying a different hash. Asserts a VALUE changes,
-      # not just the hash: a hash-only check passes even when createModel
-      # ignores its argument entirely (verified by planting exactly that).
-      - name: Counterfactual (injected constants)
-        run: npm run test:counterfactual
-
-      # Guards values duplicated by NAME across src/script.js and the JSON,
-      # which `test:constants` cannot see — name-matching here is what surfaced
-      # the IAU 2006 vs IAU 1980 obliquity divergence between browser and Node,
-      # plus the truncated perihelion longitude.
-      - name: Constants literals (name-level agreement with the JSON)
-        run: npm run test:literals
-
-      # §2f — Python is analysis only: it may READ the JSON via
-      # constants_scripts.py, never define model physics. Ledger-based, so a
-      # frozen analysis may pin the value it ran at; the gate then asserts that
-      # every pin still matches the live model, turning a latent drift into an
-      # alarm the next time H or the tilt is recalibrated. All three rules
-      # (unlisted pin / drifted pin / stale ledger entry) shown to fail on a
-      # planted violation; the drift rule caught its first real one — a tilt
-      # label left at 23.41357 by the IAU 2006 refit.
-      - name: Python physics boundary (§2f)
-        run: npm run test:py-physics
-
-      # Plan 07 §9k: the Python bridge (constants_scripts) had been
-      # UNIMPORTABLE for months — a KeyError on a retired key — and no gate
-      # imported anything, so every analysis script was unrunnable unseen.
-      # Stages A (syntax) and B (the bridge) are stdlib-only and run here;
-      # stage C (import every scripts/*.py) needs numpy/scipy and reports
-      # SKIP on this runner — it runs in the local `npm run check`.
-      - name: Python import smoke (the bridge and the analysis scripts)
-        run: npm run test:py-smoke
-
-      # §10 — every `status: current` doc must carry the CURRENT coefficients
-      # hash, so a refit cannot silently leave the prose describing an older
-      # model. This was not wired up, and the IAU 2006 refit duly left all 67
-      # current docs stale (the website tree too, at a different hash). Fix
-      # after any refit: `node tools/docs/stamp-frontmatter.mjs --write`
-      # (add --holistic for the website tree).
-      - name: Docs freshness (§10 frontmatter tracks the model)
-        run: npm run test:docs-fresh
-
-      # §10 "numbers in docs are generated, never typed" — for static .md that
-      # cannot mean transclusion (GitHub has no templating and strips unknown
-      # tags), so values live between invisible HTML-comment markers and this
-      # renderer owns what sits between them. Same contract as the website's
-      # <V k="…"/>, over the SAME registry (tools/docs/model-values.mjs), which
-      # the website imports once it consumes the published package.
-      # Fix a failure with: npm run docs:values:write
-      - name: Doc values match the model (§10)
-        run: npm run docs:values
-
-      # Phase 12 — every tracked file under data/ must be covered by a
-      # PROVENANCE.md entry, a manifest directory, or (for generated JSONs) a
-      # meta/inputs block or the @essrt/data generated ledger. Enforces the
-      # manifest's own maintenance rule, which was unenforced prose before.
-      - name: Data provenance (PROVENANCE.md coverage)
-        run: npm run check:data
+      # THE ONE CHAIN. `npm run check` in package.json is the single list of
+      # gates; CI runs that list, never its own copy (plan 13 A3 — the copy
+      # here had drifted to 16 of the 26 steps while CLAUDE.md said "CI runs
+      # the FULL chain"). Each step prints its own banner, so a failure still
+      # names the gate. What is not in `check` and runs here: the package
+      # installability proof and the build. Stage C of the Python smoke
+      # (numpy/scipy) reports SKIP on this runner by design.
+      - name: The gate chain (npm run check)
+        run: npm run check
 
       # Phase 13 — "package installable" demonstrated, not asserted: npm pack
       # @essrt/physics, install the tarball into a clean project, prove the
@@ -131,21 +50,6 @@ jobs:
       # workspace model identity (COEFFICIENTS_HASH bit-equal).
       - name: Package installability (@essrt/physics)
         run: npm run test:package
-
-      # §5d — the model gates. Only 5 of the 23 tools/verify scripts have a
-      # failing exit path; the runner encodes that classification and excludes
-      # the four generators, which write tracked data. verify-laws is checked on
-      # its CHECK COUNT (49/50, Saturn LL the documented failure), not its exit
-      # code, so both a regression and an unexplained improvement are caught.
-      - name: Model gates (tools/verify)
-        run: npm run test:verify
-
-      # 1540 checks asserting the JSON files agree with the computation engine.
-      # It was assertive all along but wired into nothing — it caught an obliquity
-      # regression instantly during Phase 5, and only because someone ran it by
-      # hand. ~6 s, no dependency on the gitignored 166 MB CSV.
-      - name: Pipeline verification (JSON vs engine, 1540 checks)
-        run: npm run test:pipeline
 
       # The simulator must keep building while the packages are empty shells.
       - name: Build simulator

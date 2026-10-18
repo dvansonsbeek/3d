@@ -1,21 +1,15 @@
 /**
  * The `tools/verify` suite runner (plan §5d).
  *
- * WHAT MEASURING THESE 17 SCRIPTS ACTUALLY SHOWED. The plan assumed the problem
- * was whether they run — 15 of 17 do. The real problem is that **15 of 17 cannot
- * fail**: they have no `process.exit(1)`, no throw, no assertion. Running them
- * proves nothing, and a green run would be meaningless. Only `verify-laws` and
- * `dual-balance-optimizer` have a failing exit path.
- *
- * So "convert the 17" is not mechanical. Each report-only script needs its
- * assertion identified and lifted, which is per-script judgement about what the
- * script was actually claiming. This runner encodes the classification so that
- * work is visible and ordered instead of implied.
- *
- * ONE SCRIPT IS EXCLUDED OUTRIGHT. `balance-search.js` WRITES
- * `data/balance-presets.json` — a tracked file. Running it as a test mutates the
- * repo; a plain inventory run of all 17 silently rewrote 424 lines of it. It is
- * a generator, and generators are not tests.
+ * `tools/verify` holds GATES and GENERATORS only — every script here either
+ * fails or writes (plan 13 A5: the narratives and the ascending-node
+ * derivations, which print and never fail, moved to tools/explore/). A gate
+ * has a failing exit path and runs in the suite; a generator rewrites a
+ * tracked data/*.json under --write and MUST NOT run as a test (a plain
+ * inventory run once silently rewrote 424 lines of a tracked preset file) —
+ * `npm run regen:cascade` lists the stale generators in regeneration order.
+ * The suite FAILS on a script that is in the directory but not in the
+ * MANIFEST, so a new script must declare which it is.
  *
  *   node tools/verify/run-suite.mjs            gates only (fast, CI-safe)
  *   node tools/verify/run-suite.mjs --all      + the slow ones
@@ -31,9 +25,8 @@ const V = (n) => join(ROOT, 'tools/verify', n);
 /**
  * class:
  *   gate      — has a failing exit path; a real check
- *   liftable  — prints pass/fail markers but never fails; assertion can be extracted
- *   narrative — no pass/fail concept; an analysis, findings live in docs/
  *   generator — writes tracked artifacts; MUST NOT run in a suite
+ * (liftable / narrative scripts no longer live here — tools/explore/)
  */
 const MANIFEST = [
   // THE FIBONACCI-LAW RETIREMENT, COMPLETED (plan 07 R6). The balance suite
@@ -55,7 +48,6 @@ const MANIFEST = [
   // the Earth-frame rate is now the projection formula applied to the chain's
   // own apsidal motion, so there is no fitted surrogate left to close or pin.)
 
-  { n: 'ascending-node-verification.js', class: 'liftable', ms: 49, markers: 8 },
   { n: 'cassini-results.js', class: 'generator', ms: 8000,
     writes: 'data/cassini-moontilt-results.json (tracked; --write only — runs both Cassini labs live)' },
   { n: 'lod-climate-correlation.js', class: 'generator', ms: 2000,
@@ -88,15 +80,10 @@ const MANIFEST = [
   { n: 'scene-year-lengths.js', class: 'gate', ms: 52000,
     note: 'the scene is the reference (owner, 2026-09-30): the Node scene twin sampled with the solar-measurements exporter\'s own event definitions at −4000 and +10,000 (±100 yr) — RA, ε, e, the apsidal line, the published cardinal instants, and the sidereal/tropical/anomalistic years of date against the one-family laws to 30 ms (the planetary completion removed per event). Fail-proven via ESSRT_SCENE_YEARS_PLANT=1; the pre-restatement laws fail it (57 ms / 26 ms / 1.1 s at −4000)' },
   { n: 'paleo-anchors.js', class: 'gate', ms: 2000,
-    note: 'Phase 19 + Driver 1½: 41 deep-time anchors (Wells 1963 · Winter 2020 · Pannella 1972 · Williams 2000 · Mitchell-Kirscher 2023 · Wu 2024 · Patterson/Roche · the mid-Precambrian set: Farhat 2022 proxies + Zhou 2024 paired a+LOD + Xiamaling + Nanfen, matched by the regime-aware recession history) recomputed LIVE from the engine vs data/paleo-validation-anchors.json; documented deviations (Williams 620 Ma, the Wu Pangea interval) are BANDS — an unexplained improvement fails too (the verify-laws precedent)' },
+    note: 'Phase 19 + Driver 1½: 43 deep-time anchors — 41 chronology rows plus the two Precambrian precession rows (Wells 1963 · Winter 2020 · Pannella 1972 · Williams 2000 · Mitchell-Kirscher 2023 · Wu 2024 · Patterson/Roche · the mid-Precambrian set: Farhat 2022 proxies + Zhou 2024 paired a+LOD + Xiamaling + Nanfen, matched by the regime-aware recession history) recomputed LIVE from the engine vs data/paleo-validation-anchors.json; documented deviations (Williams 620 Ma, the Wu Pangea interval) are BANDS — an unexplained improvement fails too (the verify-laws precedent)' },
 
-  { n: 'analytical-ascending-nodes.js', class: 'narrative', ms: 43 },
-  { n: 'ascending-node-optimization.js', class: 'narrative', ms: 42 },
-  { n: 'ascending-node-souami-souchay.js', class: 'narrative', ms: 49 },
   { n: 'measure-rms-by-epoch.js', class: 'generator', ms: 9406, slow: true,
     writes: 'data/chain-vs-jpl-rms.json (tracked; --write only — the published scene-vs-JPL comparison by century bucket, the K6/K7 model-content exhibit; a plain run prints without writing)' },
-  { n: 'measure-rms-historical-vs-jpl.js', class: 'narrative', ms: 17077, slow: true },
-  { n: 'moon-deltat-comparison.js', class: 'narrative', ms: 100 },
 ];
 
 const args = process.argv.slice(2);
@@ -116,18 +103,18 @@ const counts = MANIFEST.reduce((a, m) => ({ ...a, [m.class]: (a[m.class] ?? 0) +
   const unclassified = onDisk.filter((f) => !known.has(f));
   if (unclassified.length) {
     console.error(`FAIL — unclassified script(s) in tools/verify: ${unclassified.join(', ')}`);
-    console.error('Add each to the MANIFEST in run-suite.mjs with a class (gate/liftable/narrative/generator).');
+    console.error('Add each to the MANIFEST in run-suite.mjs with a class (gate or generator) — a print-only script belongs in tools/explore/.');
     process.exit(1);
   }
 }
 
 console.log(`tools/verify — ${MANIFEST.length} scripts`);
 console.log('='.repeat(78));
-console.log(`  gate ${counts.gate} · liftable ${counts.liftable} · narrative ${counts.narrative} · generator ${counts.generator}`);
-console.log(`  ${MANIFEST.length - counts.gate} of ${MANIFEST.length} have NO failing exit path. Running those proves nothing.`);
+console.log(`  ${Object.entries(counts).map(([c, n]) => `${c} ${n}`).join(' · ')}`);
+console.log(`  ${MANIFEST.length - counts.gate} of ${MANIFEST.length} are generators: they write tracked artifacts and never run as tests.`);
 
 if (list) {
-  for (const cls of ['gate', 'liftable', 'generator', 'narrative']) {
+  for (const cls of Object.keys(counts)) {
     console.log(`\n  ${cls.toUpperCase()}`);
     for (const m of MANIFEST.filter((x) => x.class === cls)) {
       console.log(`    ${m.n.padEnd(38)}${m.slow ? ' SLOW' : ''}${m.writes ? `  WRITES ${m.writes}` : ''}`);

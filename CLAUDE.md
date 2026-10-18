@@ -359,17 +359,26 @@ on clean code — the two fixture gates on a 1-ULP change, ~1.6e-16 relative. Li
 and typecheck cover `packages/` and `test/`; `src/script.js` and `tools/` are
 pre-migration and join as Phase 8 extracts.
 
-**Scoped tiers** (measured: the full chain is ~8.6 min, and 96% of it is
-`test:pipeline` re-running the fitter cores + `test:fixtures` recomputing the
-golden masters — steps a docs/registry edit cannot affect). Pick by what the
-change touches; CI runs the FULL chain on every push regardless, so the full
-local run is only needed when the change touches what the heavy steps verify:
+**Scoped tiers** (measured 2026-10-18 after plan 13 A1: the full chain is
+~5 min, of which `test:fixtures` is ~2.7 min — the plan-06 recorder's four
+deep anchors walking the spin integration to 2.46 Ga, one extended walk now;
+it was 17.5 min with that walk rebuilt from J2000 in both directions on every
+deeper probe — and `test:verify` ~1.3 min; `test:pipeline` is 4 s). Pick by
+what the change touches; CI runs `npm run check` itself — the ONE list in
+package.json — on every push, so the full local run is only needed when the
+change touches what the heavy steps verify:
 
 | changed | local gate | ~time |
 |---|---|---|
 | `tools/docs/`, `docs/*.md`, markers, the generated table blocks of docs 92/97/110 (`docs:tables`; doc 110 = the calculation map, values script-written) | `npm run check:docs` | ~20 s |
-| `tools/lib/`, `packages/physics/` | `npm run check:engine` | ~2 min |
-| ANY `public/input/*.json` (even a label — the constants hash embeds them wholesale), `packages/fitting/`, `src/script.js`, `tools/constants/` | full `npm run check` | ~9 min |
+| `tools/lib/`, `packages/physics/` | `npm run check:engine` | ~3 min |
+| ANY `public/input/*.json` (even a label — the constants hash embeds them wholesale), `packages/fitting/`, `src/script.js`, `tools/constants/` | full `npm run check` | ~5 min |
+
+After an edit that moves a governed artifact's input (any `public/input/*.json`,
+the chain or deep-time physics, a generator), `npm run regen:cascade` prints
+every stale artifact in regeneration order — the constants module included,
+twice where the dependency is two-stage — and `--run` runs them; the freshness
+gate alone names only the first stale one.
 
 `npm run test:browser` runs the `src/script.js` golden masters in headless
 Chromium — the only tier that guards Phase 8, which dissolves that file —
@@ -440,10 +449,12 @@ frames after the click). The wobble-centre gate also pins the Tracing
 round-trip bit-exact) since Phase B** and required in CI; red there is a
 regression of the Phase 6 exit criterion, not a tracked state.
 
-`/gates` runs the standalone model checks. `tools/verify/` holds 24 scripts, and
-**19 of them cannot fail** — no exit path, no assertion, so running them proves
-nothing. `npm run test:verify:list` gives the classification: 5 gate · 1 liftable
-· 6 narrative · 12 generator (the suite FAILS on any unclassified script). The
+`/gates` runs the standalone model checks. `tools/verify/` holds gates and
+generators only — every script there either FAILS or WRITES; the narratives
+and the ascending-node derivations moved to `tools/explore/` (plan 13 A5).
+`npm run test:verify:list` prints the classification and the counts (the suite
+FAILS on an unclassified script); `npm run regen:cascade` lists the stale
+generators in regeneration order. The
 fifth gate, `scene-year-lengths.js`, samples the Node scene twin at −4000 and
 +10,000 with the solar-measurements exporter's own event definitions and pins
 the measured sidereal, tropical and anomalistic years of date to the one-family
@@ -669,9 +680,9 @@ what actually made corrections stick here.
 | `src/script.js` | browser scene + UI + formulas (monolith) |
 | `tools/lib/` | Node engine — `scene-graph`, `orbital-engine`, `deep-time`, `constants` |
 | `tools/fit/` | CLI shims for the fitting pipeline — implementations live in `packages/fitting/src` |
-| `tools/verify/` | 24 scripts: 5 gate · 1 liftable · 6 narrative · 12 generator (`npm run test:verify:list`) |
+| `tools/verify/` | the gates and the artifact generators — every script fails or writes (`npm run test:verify:list` for the counts; `npm run regen:cascade` for the stale set in order) |
 | `packages/physics`, `packages/model-values` | the published npm packages (@essrt scope) — the website and world consume these; refits reach them via `values:package:write` + republish |
-| `tools/explore/` | 118 frozen research one-offs — findings live in `docs/`; a script stays only while something names it (its README states the rule) |
+| `tools/explore/` | frozen research one-offs (and the print-only scripts that left `tools/verify/`) — findings live in `docs/`; a script stays only while something names it (its README states the rule) |
 | `data/deltaT-4flag-fit.json`, `data/core-mantle-resonator-stage1.json`, `public/input/climate-formula-coefficients.json`, `data/deep-time-fitted.json` | the shipped fitted artifacts, each its fitter's (the last a banked frozen record) — embedded by `generate.mjs`; `public/input/fitted-coefficients.json` is deleted (plan 11 step 1) |
 | `docs/` | 75 numbered docs; `40-architecture`, `99-essrt` are cross-referenced |
 

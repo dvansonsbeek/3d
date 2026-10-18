@@ -2,53 +2,34 @@
 description: Run the model's verification gates and report pass/fail
 ---
 
-Run the standalone verification scripts and report the result as a table.
+Run the model gates and report the result as a table.
 
 ## What to run
 
-These five are standalone — no CSV, no network, seconds each:
-
 ```bash
-node tools/verify/verify-laws.js
-node tools/verify/epoch-independence.js
-node tools/verify/config1-proof.js
-node tools/verify/eccentricity-balance.js
-node tools/verify/measure-rms-by-epoch.js
+npm run test:verify:list     # the classification: which scripts can fail, which write artifacts
+npm run test:verify          # the gates (seconds each; scene-year-lengths ~1 min)
 ```
 
-If the user passes `full` as an argument, run `npm run test:verify -- --all`
-instead of hand-running scripts — the suite's classification (33 scripts:
-5 gate · 3 liftable · 12 narrative · 13 generator; `npm run test:verify:list`;
-the fifth gate, `scene-year-lengths.js`, samples the Node scene twin for
-~1 min — the scene is the reference for the year lengths of date)
-excludes the generators, which REWRITE tracked data and must never run
-as tests. Several narratives are slow and some need network access to JPL.
-Say which were skipped and why rather than silently omitting them.
+`tools/verify/` holds gates and generators only — every script there either
+fails or writes. The suite runs the gates (`class: 'gate'` in
+`tools/verify/run-suite.mjs`) and FAILS on an unclassified script. The
+generators (`--write`) rewrite tracked `data/*.json` and must never run as
+tests; `npm run regen:cascade` prints which of them are stale and in what
+order. If the user passes `full`, run `npm run test:verify -- --all`, which adds
+the slow gate(s).
 
 ## How to report
 
-One row per script: name, pass/fail, and the key number it produced. Do not
-paste raw output — extract the figures that matter and compare them against the
-reference values below.
-
-## Reference values
-
-| check | expected |
-|---|---|
-| Law 4 — eccentricity amplitude K | 3.4143e-6 (all 8 planets) |
-| Law 5 — eccentricity balance | 99.8636% (use **base** ecc, not J2000) |
-| Saturn Law 5 | 0.05371910, err −0.272% |
-
-Balance percentages come from `data/balance-presets.json` `currentConfig` —
-that file reports `count: 767`, `allPassCount: 0`, `currentConfig.rank: 4`.
+One row per gate: name, pass/fail, and the key number it printed. Do not paste
+raw output. A script that errors is a FAIL to report, not a script to skip.
 
 ## Important
 
-- These are **not** a test suite. They are 17 manual scripts that encode real
-  gates but are not automated, not in CI, and have no shared harness.
-  Converting them into one is Phase 4 of the governing plan
-  (`holisticuniverse/docs/plans/01 IP-unified-architecture.md`).
-- `epoch-independence.js` tests **eccentricity-balance** epoch independence. It
-  is *not* the referential-transparency gate (`f(Y)` invariant to scene epoch),
-  which does not exist yet and currently **fails**. Do not conflate them.
-- A script that errors is a FAIL to report, not a script to skip.
+- These gates are part of `npm run check` (`test:verify`); this command runs
+  them alone for a quick read.
+- The paleo-anchors gate fails on an unexplained *improvement* too — report a
+  "better" number as a failure to explain, not as good news.
+- The exploratory and narrative scripts (the ascending-node derivations, the
+  historical RMS comparison, the Moon ΔT comparison) live in `tools/explore/`;
+  they print, never fail, and are not gates.
