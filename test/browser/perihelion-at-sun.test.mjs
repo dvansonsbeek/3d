@@ -141,6 +141,28 @@ try {
     const op = await sim.page.evaluate((p) => window.__test__.orbitPlaneProbe(p), planet);
     check(`${planet}: the orbit-plane grid passes through the rendered Sun with the chain's orbit normal`, !!op && op.visible && op.centreToSunSceneUnits < 1e-9 && op.normalChord < 1e-12, op ? `centre − Sun ${op.centreToSunSceneUnits.toExponential(2)} units (${op.centreToSunAU.toFixed(4)} AU), normal chord ${op.normalChord.toExponential(2)} (${op.normalTiltDeg.toFixed(4)}° off; i of date ${op.inclDateDeg.toFixed(4)}°), visible ${op.visible}` : 'probe returned null');
   }
+  // The Planet Info eye ("Hide helper objects") governs the focused planet's
+  // helper visuals too — its elements-of-date label (fades in when the camera
+  // is at the body) and its orbit-plane grid — not only Earth's two markers.
+  // Born from the owner: "zooming into a planet shows extra information; for
+  // Earth the eye hides it, for the planets it should too." Fail-proven on the
+  // pre-fix build: the label stayed at opacity 1 and the grid visible after
+  // the click.
+  {
+    await sim.page.evaluate(() => window.__test__.helperVisualsProbe('Mercury'));   // focus + zoom in (the probe moves the camera to the body)
+    await sim.page.waitForTimeout(700);   // the label fade loop runs on the loop's DOM tick
+    const shown = await sim.page.evaluate(() => window.__test__.helperVisualsProbe('Mercury'));
+    check('helper eye: with the camera at Mercury its elements label is shown and its orbit-plane grid is visible', !!shown && shown.eyePresent && shown.helpersVisible && shown.labelOpacity > 0.5 && shown.gridVisible, shown ? `opacity ${shown.labelOpacity}, grid ${shown.gridVisible}, eye ${shown.eyePresent}` : 'probe returned null');
+    await sim.page.click('.pl-handle-eye');
+    await sim.page.waitForTimeout(700);
+    const hidden = await sim.page.evaluate(() => window.__test__.helperVisualsProbe('Mercury'));
+    check('helper eye: one click hides the planet\'s elements label AND its orbit-plane grid', !!hidden && !hidden.helpersVisible && hidden.labelOpacity === 0 && !hidden.gridVisible, hidden ? `flag ${hidden.helpersVisible}, opacity ${hidden.labelOpacity}, grid ${hidden.gridVisible}` : '');
+    await sim.page.click('.pl-handle-eye');
+    await sim.page.waitForTimeout(700);
+    const back = await sim.page.evaluate(() => window.__test__.helperVisualsProbe('Mercury'));
+    check('helper eye: a second click restores both', !!back && back.helpersVisible && back.labelOpacity > 0.5 && back.gridVisible, back ? `opacity ${back.labelOpacity}, grid ${back.gridVisible}` : '');
+    await sim.page.evaluate(() => window.__test__.restoreFocus('Earth'));
+  }
   // A chip click must WAKE the paused loop (owner: "Perihelion at Earth" appeared
   // only on a camera move or Play once the paused loop truly idled — the monitor
   // ticks used to wake every frame and hid the class). Fail-proven on the

@@ -5757,6 +5757,34 @@ if (typeof window !== 'undefined') {
         equinoxAzimuthDeg: Math.atan2(R[0][0], R[2][0]) / D2R, equinoxAzimuthLiteralDeg: SCENE_EQUINOX_VIEW_AZIMUTH_DEG,
         seriesLive: !!F, axisPoleChord: F ? axisY.distanceTo(toW(F.s)) : null, axisEquinoxChord: F ? axisZ.distanceTo(toW(F.g)) : null };
     },
+    // Helper-visuals gate hook: focus a chain planet (the camera lands at the
+    // body, inside the labels' fade-in distance) and report what the Planet
+    // Info eye governs — the shared flag, the planet's elements-of-date label
+    // opacity and its orbit-plane grid. The test clicks the eye between calls.
+    helperVisualsProbe: (planet) => {
+      const key = String(planet).toLowerCase();
+      const target = PLANET_HIERARCHIES[key];
+      if (!target) return null;
+      const pd = target.obj();
+      if (o.Target !== target.label) {
+        switchToPlanet(target.label);
+        forceSceneUpdate();
+        // zoom in as a user would: focusPlanet only pops the camera out of the
+        // body's shell — put it 3 scene units from the body (inside the labels'
+        // fade-in distance of 5) and wake the loop's DOM tick
+        const ctr = pd.planetObj.getWorldPosition(new THREE.Vector3());
+        const dir = camera.position.clone().sub(ctr).normalize();
+        camera.position.copy(ctr).add(dir.multiplyScalar(3));
+        controls.update();
+        positionChanged = true; needsLabelUpdate = true;
+      }
+      const wc = _planetElementLabels.find((w) => w.key === key);
+      return { planet: target.label, helpersVisible: _helperVisualsVisible,
+        labelOpacity: wc ? Number(wc._div.style.opacity) : null,
+        gridVisible: !!(pd.orbitPlaneHelper && pd.orbitPlaneHelper.visible),
+        eyePresent: !!document.querySelector('.pl-handle-eye') };
+    },
+    restoreFocus: (name) => { switchToPlanet(name); forceSceneUpdate(); return o.Target; },
     // Orbit-plane gate hook: focusing a chain planet shows its orbit-plane grid
     // (switchToPlanet → pd.orbitPlaneHelper.visible). The grid must pass
     // through the rendered Sun with its normal along the chain's orbit normal
@@ -9005,6 +9033,15 @@ for (const wc of _planetElementLabels) {
 /* Distance thresholds for fade-in/out (scene units; 100 = 1 AU) */
 const HELPER_LABEL_FADE_IN  = 5;     /* fully visible below 0.05 AU */
 const HELPER_LABEL_FADE_OUT = 20;    /* start fading in below 0.2 AU */
+// The Planet Info handle's eye ("Hide helper objects") — ONE shared state for
+// every helper visual of the focused body: Earth's two helper markers (hidden
+// as objects), the chain planets' elements-of-date labels (the fade loop below
+// reads this flag) and the focused planet's orbit-plane grid (switchToPlanet
+// and the Focus dropdown read it). Born from the owner: "zooming into a planet
+// shows extra information; for Earth the eye hides it, for the planets it
+// should too" — the toggle had covered Earth's markers only since plan 07 R6
+// deleted the planets' wobble centres and the labels moved onto the bodies.
+let _helperVisualsVisible = true;
 const _helperLabelObjects = [
   { obj: earthWobbleCenter,        div: wobbleLabelDiv },
   { obj: earthPerihelionFromEarth,  div: periLabelDiv },
@@ -23416,7 +23453,7 @@ function setupGUI() {
     positionChanged = true;
     focusPlanet(o.lookAtObj);
     planetObjects.forEach(p => { if (p.orbitPlaneHelper) p.orbitPlaneHelper.visible = false; });
-    if (o.lookAtObj?.orbitPlaneHelper) o.lookAtObj.orbitPlaneHelper.visible = true;
+    if (o.lookAtObj?.orbitPlaneHelper) o.lookAtObj.orbitPlaneHelper.visible = _helperVisualsVisible;   // the Planet Info eye's state
   });
   focusPlanet(o.lookAtObj);
 
@@ -34617,6 +34654,9 @@ function render(now) {
 
     for (const hl of _helperLabelObjects) {
       if (!hl.obj.visible) { hl.div.style.opacity = '0'; continue; }
+      // the planets' elements-of-date labels obey the Planet Info eye (Earth's
+      // two helper labels hide with their marker objects above)
+      if (hl.planetKey && !_helperVisualsVisible) { hl.div.style.opacity = '0'; continue; }
       // Planet wobble centers: only show when that planet is focused
       if (hl.parentPlanet && hl.parentPlanet !== focusName) { hl.div.style.opacity = '0'; continue; }
       const a = camDist <= HELPER_LABEL_FADE_IN  ? 1
@@ -43326,7 +43366,7 @@ function switchToPlanet(name) {
   positionChanged = true;
   focusPlanet(o.lookAtObj);
   planetObjects.forEach(p => { if (p.orbitPlaneHelper) p.orbitPlaneHelper.visible = false; });
-  if (o.lookAtObj?.orbitPlaneHelper) o.lookAtObj.orbitPlaneHelper.visible = true;
+  if (o.lookAtObj?.orbitPlaneHelper) o.lookAtObj.orbitPlaneHelper.visible = _helperVisualsVisible;   // the Planet Info eye's state
   if (o._focusCtrl) o._focusCtrl.refresh();
 }
 
@@ -47545,11 +47585,17 @@ function updateDomLabel () {
         obj.visible = helpersVisible;
         showHideObject(obj);
       }
+      // the chain planets' helper visuals ride the same eye: the
+      // elements-of-date labels (the fade loop reads the flag) and the focused
+      // planet's orbit-plane grid
+      _helperVisualsVisible = helpersVisible;
+      if (o.lookAtObj?.orbitPlaneHelper) o.lookAtObj.orbitPlaneHelper.visible = helpersVisible;
+      needsLabelUpdate = true;
       /* update both eye icon elements */
       const method = helpersVisible ? 'remove' : 'add';
       handleEye.classList[method]('eye-off');
       handleEye.innerHTML = helpersVisible ? EYE_OPEN_SVG : EYE_CLOSE_SVG;
-      handleEye.title = helpersVisible ? 'Hide helper objects' : 'Show helper objects';
+      handleEye.title = helpersVisible ? 'Hide helper objects (markers, labels, orbit plane)' : 'Show helper objects (markers, labels, orbit plane)';
       navEye.classList[method]('eye-off');
       navEye.innerHTML = helpersVisible ? EYE_OPEN_SVG : EYE_CLOSE_SVG;
       navEye.title = handleEye.title;
@@ -47560,7 +47606,7 @@ function updateDomLabel () {
     const navEye = document.createElement('span');
     navEye.className = 'pl-nav-eye';
     navEye.innerHTML = EYE_OPEN_SVG;
-    navEye.title = 'Hide helper objects';
+    navEye.title = 'Hide helper objects (markers, labels, orbit plane)';
     navEye.addEventListener('click', e => { e.stopPropagation(); toggleHelpers(); });
 
     /* planet navigation bar (persistent — includes close button) */
@@ -47649,7 +47695,7 @@ function updateDomLabel () {
     /* collapsible handle — direct child of label, visible even when content is hidden */
     const handle = document.createElement('div');
     handle.className = 'pl-handle';
-    handle.innerHTML = '<span class="pl-handle-icon">i</span><span class="pl-handle-dot"></span><span class="pl-handle-label">Planet Info</span><span class="pl-handle-chevron">\u203A</span><span class="pl-handle-eye" title="Hide helper objects">' + EYE_OPEN_SVG + '</span>';
+    handle.innerHTML = '<span class="pl-handle-icon">i</span><span class="pl-handle-dot"></span><span class="pl-handle-label">Planet Info</span><span class="pl-handle-chevron">\u203A</span><span class="pl-handle-eye" title="Hide helper objects (markers, labels, orbit plane)">' + EYE_OPEN_SVG + '</span>';
     handle.title = 'Click to expand planet information panel';
     handle.addEventListener('click', e => {
       e.stopPropagation();
