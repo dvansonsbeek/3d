@@ -358,7 +358,7 @@
    "packages/physics/src/climate/l1-orbital.cjs": "sha256:2cc864c563ca816df4ccc01f651bd67fde8f29215b6670f8f8842b5d4f68445f",
    "packages/physics/src/deltat/deep-time.cjs": "sha256:dde598bbe92dd252d9eb32a6018fe2f2364e7ce32be6c283f981ee07b0d33af5",
    "packages/physics/src/earth/deep-orbital-history.cjs": "sha256:7150131866b4aee71c401c2c7f157dc4c299c601931e810bc5383741e43960ae",
-   "packages/physics/src/earth/frame-of-date.cjs": "sha256:84863637cd839487da57a36117a4ebb49297b76e314f73adb6f29d690a4714fd",
+   "packages/physics/src/earth/frame-of-date.cjs": "sha256:a06a089d35b82e97d6fa3ea9255c36aff4df0f6ea32182f009cd8dd8a648cdce",
    "packages/physics/src/earth/precession-composed.cjs": "sha256:0b2904e81b5a15a45ef416502f971b5333da385005d1a5be175d4c6178bd3a6e",
    "packages/reference/src/published-curves.cjs": "sha256:2cbc57757926f893fccf5df42ad52e76ee6d14c5b5cf0cc30daf5ce9d63ec318",
    "public/input/astro-reference.json": "sha256:adce7ec505e6c7fa670c240640533de5c280da6035c388584ef87b37dab38aaf",

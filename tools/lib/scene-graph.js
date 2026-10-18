@@ -1363,7 +1363,10 @@ function _kcHelioAU(target, jd) {
 // pose at the chain anchor epoch (ẑ the sun-plane normal, x̂ the axis frame's
 // RA 0 projected onto it); measured on this twin before the change, that pose
 // was the J2000 ecliptic to 0.026° of pole tilt with the equinox at azimuth
-// 158.2265° — the azimuth is the literal, the tilt is dropped. The R3/R4
+// 158.2265° — but that was THIS twin's pose, 180° − the retired inclination
+// anchor 21.7735°, not the browser's (90.0066°, measured on the pre-plan-11
+// bundle); the literal is the browser's convention, 90° — the equinox along
+// world +X — and both twins now share it. The tilt is dropped. The R3/R4
 // history (why FRAMES and not a body triad, why no correction rides R) is in
 // docs/41. Everything of date is placed from the engine THROUGH R by
 // _applyEngineEarthFrame, so every physical reading, taken in the placed Earth

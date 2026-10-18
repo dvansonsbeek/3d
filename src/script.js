@@ -104,9 +104,11 @@ let   MOON_ARGS_FRAMEWORK_NATIVE = true;       // Framework-native lunar argumen
 // the wheel periods 3/5/8/13, the wheel phase, the inclination-wheel phase and
 // the derived earthRAAngle — is DELETED. The scene's world frame is the J2000
 // ecliptic: world Y the J2000 ecliptic pole, the J2000 equinox at the view
-// azimuth SCENE_EQUINOX_VIEW_AZIMUTH_DEG (@essrt/physics earth/frame-of-date —
-// ONE home for both twins; the pose the scaffold encoded, measured, its 0.026°
-// pole tilt dropped). The frame bridge _kcR is that matrix; every frame of
+// azimuth SCENE_EQUINOX_VIEW_AZIMUTH_DEG = 90° (@essrt/physics
+// earth/frame-of-date — ONE home for both twins; the equinox along world +X,
+// this bundle's own pose at J2000 measured at 90.0066° with 0.026° of pole
+// tilt, both dropped; step 4 had shipped the Node twin's 158.2265° and turned
+// this world 68.2° against its skydome). The frame bridge _kcR is that matrix; every frame of
 // date — Earth's axis, the sun plane, the Moon stack, the planets' poles and
 // paths — is placed from the engine through it (_applyEngineEarthFrame), so no
 // observable rides it. Two display literals remain, the exact former products:
@@ -5751,6 +5753,7 @@ if (typeof window !== 'undefined') {
       const q = earth.rotationAxis.getWorldQuaternion(new THREE.Quaternion());
       const axisY = new THREE.Vector3(0, 1, 0).applyQuaternion(q), axisZ = new THREE.Vector3(0, 0, 1).applyQuaternion(q);
       return { poleColumn: [R[0][2], R[1][2], R[2][2]], poleIsWorldY: R[0][2] === 0 && R[1][2] === 1 && R[2][2] === 0,
+        equinoxColumn: [R[0][0], R[1][0], R[2][0]],   // the view convention: the J2000 equinox along world +X (the solstice Sun at +90° in the top view)
         equinoxAzimuthDeg: Math.atan2(R[0][0], R[2][0]) / D2R, equinoxAzimuthLiteralDeg: SCENE_EQUINOX_VIEW_AZIMUTH_DEG,
         seriesLive: !!F, axisPoleChord: F ? axisY.distanceTo(toW(F.s)) : null, axisEquinoxChord: F ? axisZ.distanceTo(toW(F.g)) : null };
     },
@@ -48853,8 +48856,10 @@ function _kcSecularShape(nameLower) {
 // (_kcDeriveFrameR: the sun-plane normal as ẑ, the axis frame's RA 0 projected
 // onto it as x̂ — a probe that jumped the model to the anchor and back);
 // measured before the change, that pose was the J2000 ecliptic to 0.026° of
-// pole tilt with the equinox at azimuth 158.2265° — the azimuth is the literal,
-// the tilt is dropped. Why FRAMES and never a body triad, and why no correction
+// pole tilt with the equinox at azimuth 90.0066° (the 158.2265° step 4 first
+// shipped was the NODE twin's pose, 180° − the retired inclination anchor; the
+// browser's world turned 68.2° against its skydome until the literal became
+// 90°) — the azimuth is the literal, the tilt is dropped. Why FRAMES and never a body triad, and why no correction
 // rides R (plan 06 R3: the triad folded the chain Earth's +3.5″ and the
 // pre-artifact twin Sun's +11.6″ into every planet; the two bridges of R3
 // collapse into one — the engine's ecliptic of date IS the sun plane and the

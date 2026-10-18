@@ -483,8 +483,14 @@ K device CONSTANTS (`earthtiltMean`, `earthInvPlaneInclinationAmplitude`,
 `kDeviceWheelPhaseAtJ2000Cycles`) were the scene's J2000 pose, not a law —
 DELETED at plan 11 step 4 with the three precession wheels: the scene's world
 frame is the J2000 ecliptic (`@essrt/physics` `computeSceneWorldFrameJ2000`,
-world Y the J2000 ecliptic pole, the equinox at ONE recorded view azimuth —
-measured, the pose was that frame to 0.026°), and every frame of date is
+world Y the J2000 ecliptic pole, the equinox along world +X at view azimuth
+90° — the browser's own pose, measured 90.0066° with 0.026° of tilt on the
+pre-plan-11 bundle, both dropped; step 4 first shipped 158.2265°, the NODE
+twin's pose — 180° − the retired inclination anchor 21.7735° — and turned the
+browser's world 68.2265° about the pole against its skydome texture while
+every gate stayed green, because every gated quantity is frame-invariant;
+corrected at physics 22.0.1, the gate now pins the convention against the
+frame's columns), and every frame of date is
 engine-placed through it; observables are R-invariant, only the view is R
 (`earthInvPlaneInclinationMean`, the device's mean inclination, left at plan 11
 step 2 — its one reach was the invariable-plane disc's init pose). `psiValue`

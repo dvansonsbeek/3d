@@ -32,17 +32,26 @@
  * XZ plane at the view azimuth `SCENE_EQUINOX_VIEW_AZIMUTH_DEG` (atan2(x, z)).
  * `computeSceneWorldFrameJ2000` is the bridge R (ecliptic J2000 → world) both
  * twins place every frame of date through. The azimuth is the ONE scene
- * literal the retired K-device scaffold leaves behind — the pose the scaffold
- * encoded at J2000, measured on the Node twin (its 0.026° pole tilt dropped),
- * kept for visual continuity; no observable rides it (every physical reading
- * is taken in the placed Earth frame, which is R-invariant by construction).
+ * literal the retired K-device scaffold leaves behind, a VIEW convention: the
+ * J2000 equinox along world +X, so the June-solstice Sun stands at +90° in the
+ * top view — the browser's own pose at J2000 (measured on the pre-plan-11
+ * bundle: azimuth 90.0066°, pole tilt 0.026°, both deviations dropped), the
+ * frame the skydome texture and the default camera were authored against.
+ * Step 4 had shipped 158.2265° — the NODE twin's pose, which carried the
+ * retired inclination-cycle anchor's 21.7735° into its frame (180° − 21.7735°
+ * exactly) where the browser's did not; the browser's world turned 68.2265°
+ * about the pole against its skydome while every gate stayed green, because
+ * every gated quantity is frame-invariant. No observable rides the azimuth
+ * (every physical reading is taken in the placed Earth frame, which is
+ * R-invariant by construction); the perihelion-at-sun gate pins the
+ * convention against the frame's own columns.
  */
 'use strict';
 
 const D2R = Math.PI / 180;
 
-/** The J2000 equinox's azimuth in the scene's world XZ plane, degrees (atan2(x, z)) — the view convention. */
-const SCENE_EQUINOX_VIEW_AZIMUTH_DEG = 158.2265109779131;
+/** The J2000 equinox's azimuth in the scene's world XZ plane, degrees (atan2(x, z)) — the view convention: the equinox along world +X. */
+const SCENE_EQUINOX_VIEW_AZIMUTH_DEG = 90;
 
 /**
  * The scene's world frame: R maps a J2000-ecliptic vector to world, columns

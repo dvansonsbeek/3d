@@ -42,5 +42,5 @@ export function solveWheelAngleForLongitude(lambdaRad: number, e: number, periRa
  * @returns {number[][]} a 3×3 rotation matrix, rows × columns
  */
 export function computeSceneWorldFrameJ2000(): number[][];
-/** The J2000 equinox's azimuth in the scene's world XZ plane, degrees (atan2(x, z)) — the view convention. */
-export const SCENE_EQUINOX_VIEW_AZIMUTH_DEG: 158.2265109779131;
+/** The J2000 equinox's azimuth in the scene's world XZ plane, degrees (atan2(x, z)) — the view convention: the equinox along world +X. */
+export const SCENE_EQUINOX_VIEW_AZIMUTH_DEG: 90;

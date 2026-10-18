@@ -54,7 +54,16 @@ All other calculations are relative to:
 
 **Plan 11 step 4.** The scene's world frame IS the J2000 ecliptic: world Y is
 the J2000 ecliptic pole and the J2000 equinox lies in the world XZ plane at
-the view azimuth `SCENE_EQUINOX_VIEW_AZIMUTH_DEG` = 158.2265° (atan2(x, z)).
+the view azimuth `SCENE_EQUINOX_VIEW_AZIMUTH_DEG` = 90° (atan2(x, z)) — the
+equinox along world +X, so the June-solstice Sun of the landing epoch stands
+at +90° in the top view: the browser's own pose at J2000 (measured 90.0066°
+with 0.026° of pole tilt on the pre-plan-11 bundle, both dropped), the frame
+the skydome texture and the default camera were authored against. Step 4 had
+shipped 158.2265°, the NODE twin's pose (180° − the retired inclination
+anchor 21.7735°), which turned the browser's world 68.2265° about the pole
+against its skydome while every gate stayed green — every gated quantity is
+frame-invariant; the perihelion-at-sun gate now pins the convention against
+the frame's own columns.
 The frame bridge R = `computeSceneWorldFrameJ2000()` (`@essrt/physics`
 earth/frame-of-date — ONE home; browser `_kcR`, Node `_kcR`) maps every
 J2000-ecliptic vector to world, and every frame of date — Earth's axis, the
@@ -528,7 +537,7 @@ For current values, see [Constants Reference](20-constants-reference.md).
 |----------|-------|-------------|
 | 1 Solar year | 2π radians | `meanSolarYearDays` days |
 | 1 AU | 100 scene units | <!--v:oneAU-->149,597,870.698828<!--/v--> km |
-| World frame | `SCENE_EQUINOX_VIEW_AZIMUTH_DEG` (`@essrt/physics` earth/frame-of-date) | The J2000 ecliptic as the world frame: world Y its pole, the J2000 equinox at this view azimuth — the one scene literal (plan 11 step 4, Part 2) |
+| World frame | `SCENE_EQUINOX_VIEW_AZIMUTH_DEG` (`@essrt/physics` earth/frame-of-date) | The J2000 ecliptic as the world frame: world Y its pole, the J2000 equinox along world +X (azimuth 90°) — the one scene literal, the browser's own pre-plan-11 pose (plan 11 step 4, Part 2) |
 | Mean obliquity | (`earthtiltMean` — DELETED, plan 11 step 4) | The K scaffold's mean tilt; the rendered obliquity of date is the hybrid, its J2000 anchor the astro-reference input |
 | Inclination amplitude | (`earthInvPlaneInclinationAmplitude` — DELETED, plan 11 step 4) | The K scaffold's tilt amplitude (the deleted ecliptic/obliquity wheels' ±A) |
 | Base eccentricity | (`eccentricityBase` — DELETED, plan 11 step 2) | was the retired Law-5 balance eccentricity; no reader left |

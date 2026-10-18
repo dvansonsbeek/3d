@@ -106,15 +106,25 @@ try {
   const wf = await sim.page.evaluate(() => window.__test__.worldFrameProbe());
   check('world frame: R maps the J2000 ecliptic pole onto world Y exactly', !!wf && wf.poleIsWorldY, wf ? JSON.stringify(wf.poleColumn) : 'probe returned null');
   check('world frame: the J2000 equinox sits at the recorded view azimuth', !!wf && Math.abs(wrapd(wf.equinoxAzimuthDeg - wf.equinoxAzimuthLiteralDeg - plantDeg)) < 1e-9, wf ? `${wf.equinoxAzimuthDeg}° vs ${wf.equinoxAzimuthLiteralDeg}°` : '');
+  // The VIEW CONVENTION itself, against the frame's columns and not the literal
+  // (the row above is a tautology on the literal): the J2000 equinox along
+  // world +X, so the June-solstice Sun of the landing epoch stands at +90° in
+  // the top view — the browser's own pose before plan 11 (measured 90.0066°
+  // on the pre-plan-11 bundle), the frame the skydome texture and the default
+  // camera were authored against. Step 4 shipped the NODE twin's 158.2265°
+  // (180° − the retired inclination anchor 21.7735°) and turned the browser's
+  // world 68.2265° about the pole while every observable stayed bit-identical;
+  // the owner saw the Sun open at 158° instead of 90°.
+  check('world frame: the J2000 equinox IS world +X (the solstice Sun at +90° in the top view)', !!wf && Math.abs(wf.equinoxColumn[0] - 1) < 1e-12 && Math.abs(wf.equinoxColumn[1]) < 1e-12 && Math.abs(wf.equinoxColumn[2] + plantDeg) < 1e-12, wf ? `equinox column ${JSON.stringify(wf.equinoxColumn)}` : '');
   check('Earth frame: the rendered axis IS the engine frame of date through R (pole and equinox)', !!wf && wf.seriesLive && wf.axisPoleChord < 1e-9 && wf.axisEquinoxChord < 1e-9, wf ? `pole chord ${wf.seriesLive ? wf.axisPoleChord.toExponential(2) : 'n/a'}, equinox chord ${wf.seriesLive ? wf.axisEquinoxChord.toExponential(2) : 'n/a'} (series ${wf.seriesLive ? 'live' : 'not loaded'})` : '');
   // The star and constellation catalogs (J2000 RA/Dec) are aligned once at
   // module init; they must sit on the J2000 equatorial frame through R. Born
   // from the owner's "the Sun is at 160° against the constellations where it
   // was at 90°" after plan 11 step 4 (the axis's rest pose became 0 and the
   // engine places it only at the first update, after the alignment). Measured
-  // on the pre-fix build: pole tilt 23.4393° and equinox offset 68.2265° (the
-  // view azimuth 158.2265° less the unposed frame's quarter turn) — the whole
-  // world-frame pose missing from the sky; fail-proven by that run.
+  // on the pre-fix build (then at the Node twin's azimuth 158.2265°): pole
+  // tilt 23.4393° and equinox offset 68.2265° — the whole world-frame pose
+  // missing from the sky; fail-proven by that run.
   const sf = await sim.page.evaluate(() => window.__test__.starFrameProbe());
   for (const k of ['stars', 'constellations']) {
     const f = sf && sf[k];
