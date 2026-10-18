@@ -316,6 +316,13 @@ would silently churn a structural claim for a rounding-level gain.
   across one refit, a loop the freshness gate cannot close). The T1 exporter
   derives the LINE rate with `ellipticity: false`; the published realized
   period and the hybrid gate keep the full rate (1 yr of period apart).
+- **Run a fitter at its own fit commit before blaming the engine.** The
+  banked regime block's note said plan 09 had moved the fitter under it;
+  `git archive` of the fit commit (node_modules wired, ~1 min) showed the
+  committed fitter had always produced today's candidate — the shipped block
+  came from an uncommitted same-day run, and its inputs had moved by parts per
+  billion. A fit's commit must carry the fitter, its seed and its bounds that
+  produced it (the matched pair includes the instrument). Plan 12 step 1.
 - **"Placed by the engine every frame" does not cover what was aligned ONCE
   at init.** Plan 11 step 4 deleted the scene scaffold's pose on the claim
   that every frame of date is engine-placed — true for every per-frame

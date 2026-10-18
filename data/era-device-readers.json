@@ -8122,7 +8122,7 @@
    "packages/physics/test/layer0-identity.test.mjs": "sha256:8b77866157bde4829150cdf74639f1d6c33c76fae6513d49e62d9eea97485f05",
    "packages/physics/test/layer1-identity.test.mjs": "sha256:fb27f8a5d8e963097a013758566521b2eb0779ea552a6be0f3be7c3de0b2d8d7",
    "public/input/astro-reference.json": "sha256:dfaf24bf8ee038bbe35f5fcc28f87dc8ff26ded047b919063b0c26b52309f581",
-   "public/input/model-version.json": "sha256:f533817a6f660b9f8351a5d25689f569b38385bdd8ef103d3c278a6c81761527",
+   "public/input/model-version.json": "sha256:4b0c438f490714b341bb3ac0929de5ca1cfe95cd0ad79a35a5b711f1a0580d1c",
    "scripts/climate_formula_mwp_check.py": "sha256:177305723579b66c9d08590f366574c05cd935aea5573614e89eddc502f72236",
    "scripts/extract_insolation_features_deep.js": "sha256:2ef7242a306cc9e34200e59c0dcbe8d5fe30dc0759b4d2ee5457875d981a50dc",
    "scripts/milankovitch_climate_formula.py": "sha256:c16a99025d13fbbbd5448a067d39be62e27dff78d0d68432ca600c337817a41f",

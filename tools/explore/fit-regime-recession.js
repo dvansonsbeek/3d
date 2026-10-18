@@ -33,13 +33,22 @@
  * record data/deep-time-fitted.json → recessionRegime), the per-anchor
  * residual table, and the genesis-state consequences. Nothing is written.
  *
- * REPRODUCTION (plan 11 step 1, measured 2026-10-17): on the post-plan-09
- * engine this fitter no longer reproduces the shipped 2026-08-14 solution —
- * it prefers knots 337,812 / 321,752 / 320,277 / 296,313 / 288,738 km and a
- * pump of 0.144 over 1000–1885 Ma (factor × window 0.127 Gyr against the
- * shipped 0.139). The shipped block is the frozen fit; the paleo-anchors gate
- * passes on it; adopting a new solution is a CAMPAIGN (holisticuniverse
- * TODO B), never a side effect of running this script.
+ * REPRODUCTION (plan 12 step 1, measured 2026-10-18 — this corrects the
+ * plan-11 note that stood here): this script, as committed in acddb6b5
+ * together with the shipped block, has ALWAYS preferred knots 337,812 /
+ * 321,752 / 320,277 / 296,313 / 288,738 km with a pump of 0.144 over
+ * 1000–1885 Ma when genesis is pinned at 4498 — run from git archives at
+ * acddb6b5 itself and at plan 09 steps 3, 5c, 5d and 7b it returns the same
+ * solution to the printed digit (the seed is fixed; its engine inputs moved
+ * only at step 3 and by parts per billion). The shipped block (… 275,120 km;
+ * 1000–1307 × 0.454) was therefore never this fitter's output: it came from
+ * an uncommitted same-day run. The two are one degenerate family (factor ×
+ * window 0.139 vs 0.127 Gyr, every anchor ≤ 1.2σ in both; the 3.9-Ga knot
+ * has no anchor). This script is FROZEN as the 2026-08-14 instrument; the
+ * governed fitter is tools/fit/fit-regime-recession.js (packages/fitting),
+ * which clamps the pump window to the regime, drops the unanchored knot,
+ * fixes the window to the literature's lock era and fits the LOD the model
+ * publishes (plan 12 §6 items 6–9).
  *
  * Run: node tools/explore/fit-regime-recession.js
  */
