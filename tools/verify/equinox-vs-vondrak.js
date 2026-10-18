@@ -61,8 +61,7 @@ const INPUT_FILES = [
   'data/nbody-secular-series.json',
   'data/nbody-deep-secular-modes.json',
   'data/la2004-earth-51myr-back.asc',
-  'public/input/model-parameters.json',
-  'public/input/astro-reference.json',
+  'public/input/astro-reference.json',   // (plan 11 step 6: model-parameters.json is deleted)
   'public/input/climate-formula-coefficients.json',
 ];
 

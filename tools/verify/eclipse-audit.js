@@ -148,7 +148,8 @@ const INPUT_FILES = [
   'packages/physics/src/moon/apparent.cjs',
   'public/input/solar-eclipse-centerlines-nasa.json',
   'public/input/astro-reference.json',
-  'public/input/model-parameters.json',
+  // (plan 11 step 6: model-parameters.json is deleted — the scene epoch is
+  // astro-reference timeReference, hashed above)
   // plan 11 step 1: the banked fitted deep-time record (τ_GIA, the recession
   // regime) the ΔT stack's GIA channel rides; fitted-coefficients.json is deleted
   'data/deep-time-fitted.json',

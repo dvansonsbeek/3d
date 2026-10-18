@@ -2,10 +2,11 @@
  * GENERATED — do not edit. Regenerate:
  *   node tools/constants/generate.mjs --write
  *
- * Source of truth: public/input/{model-parameters,astro-reference}.json; the
- * deepTime block is ASSEMBLED from astro-reference.json (moonReference.
- * moonRecessionAlpha1PerMa, giaCoxChaoPeltier), data/deep-time-fitted.json
- * and data/deltaT-4flag-fit.json shipped_taper (plan 11 step 1).
+ * Source of truth: public/input/astro-reference.json (model-parameters.json is
+ * DELETED, plan 11 step 6 — its leaves have their homes); the deepTime block
+ * is ASSEMBLED from astro-reference.json (moonReference.moonRecessionAlpha1PerMa,
+ * giaCoxChaoPeltier), data/deep-time-fitted.json and data/deltaT-4flag-fit.json
+ * shipped_taper (plan 11 step 1).
  * Classification and rationale: tools/constants/generate.mjs
  *
  * Two exports, deliberately separate (§2d):
@@ -35,17 +36,17 @@
  * carry it so a counterfactual is reproducible (§2d).
  * @type {string}
  */
-export const CONSTANTS_HASH = "e500952541d6f426";
+export const CONSTANTS_HASH = "f4f43386df2781b8";
 
 /** Model version label — single source: public/input/model-version.json (§10 two-axis scheme). */
-export const MODEL_VERSION = "v24.0";
+export const MODEL_VERSION = "v25.0";
 
 /** Canonical preprint DOI — single source: public/input/model-version.json. */
 export const PREPRINT_DOI = "10.21203/rs.3.rs-8758810/v4";
 
 /** @type {Readonly<Record<string, unknown>>} */
 export const DEFAULT_CONSTANTS = Object.freeze({
-  hash: "e500952541d6f426",
+  hash: "f4f43386df2781b8",
   additionalBodiesReference: {
     "pluto": {
       "solarYearInput": 90465,
@@ -169,12 +170,10 @@ export const DEFAULT_CONSTANTS = Object.freeze({
     "deltaTStart": 56.07959443353602,
     "sunTilt": 7.155
   },
-  foundational: {},
   giaCoxChaoPeltier: {
     "dJ2DtPerYr": -2.7e-11,
     "j2ToAlphaFactor": 2
   },
-  moon: {},
   moonMeeus: {
     "elpW1T2Decomposition_arcsecPerCy2": {
       "planetary": 5.8665,
@@ -560,29 +559,6 @@ export const DEFAULT_CONSTANTS = Object.freeze({
           "orbitalPeriodDays": 1.122315
         }
       ]
-    }
-  },
-  planets: {
-    "mercury": {
-      "name": "Mercury"
-    },
-    "venus": {
-      "name": "Venus"
-    },
-    "mars": {
-      "name": "Mars"
-    },
-    "jupiter": {
-      "name": "Jupiter"
-    },
-    "saturn": {
-      "name": "Saturn"
-    },
-    "uranus": {
-      "name": "Uranus"
-    },
-    "neptune": {
-      "name": "Neptune"
     }
   },
   timeReference: {

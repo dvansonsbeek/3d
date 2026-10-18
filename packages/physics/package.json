@@ -1,9 +1,9 @@
 {
   "name": "@essrt/physics",
-  "version": "21.0.0",
+  "version": "22.0.0",
   "description": "ESSRT (Expanding Solar System Resonance Theory) physics core — pure, injectable-constants, no I/O, no globals, no DOM. The complete model incl. fitted coefficients; every published version immutably ships one recorded model identity.",
   "essrt": {
-    "modelVersion": "v24.0",
+    "modelVersion": "v25.0",
     "_note": "The model identity this package version ships (IP-unified-architecture §10: package semver tracks the API axis; the model version + CONSTANTS_HASH/COEFFICIENTS_HASH in src/constants/ carry the scientific identity). The version-pinning gate enforces this pairing against public/input/model-version.json."
   },
   "type": "module",
@@ -54,6 +54,7 @@
     "./planets/inv-plane-frame": { "types": "./types/planets/inv-plane-frame.d.cts", "default": "./src/planets/inv-plane-frame.cjs" },
     "./planets/secular-series": { "types": "./types/planets/secular-series.d.cts", "default": "./src/planets/secular-series.cjs" },
     "./planets/model": { "types": "./types/planets/model.d.cts", "default": "./src/planets/model.cjs" },
+    "./planets/display-names": { "types": "./types/planets/display-names.d.cts", "default": "./src/planets/display-names.cjs" },
     "./deltat/cycles": { "types": "./types/deltat/cycles.d.cts", "default": "./src/deltat/cycles.cjs" },
     "./deltat/deep-time": { "types": "./types/deltat/deep-time.d.cts", "default": "./src/deltat/deep-time.cjs" },
     "./deltat/historical": { "types": "./types/deltat/historical.d.cts", "default": "./src/deltat/historical.cjs" },

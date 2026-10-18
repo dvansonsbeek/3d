@@ -246,7 +246,7 @@
  "meta": {
   "script": "scripts/l1_physical_lines.py",
   "doc": "docs/92-climate-formula.md (T1 disposition, plan 06)",
-  "runtime_sec": 0.0003857612609863281,
+  "runtime_sec": 0.0004184246063232422,
   "environment": {
    "python": "3.12.3"
   }
@@ -254,7 +254,7 @@
  "inputs": {
   "generator": "python3 scripts/l1_physical_lines.py --write",
   "files": {
-   "data/t1-engine-frequencies.json": "sha256:315bdd659f2d66e5d341272063b7e10a1f336f7e18af485ef56e034ade8b0c32",
+   "data/t1-engine-frequencies.json": "sha256:0e0d19146ef6b3fd7f35ac83eabd46aafb73298e2d392c110c10dd65248f2463",
    "scripts/l1_physical_lines.py": "sha256:870aaf32a811b365317b9c0f24a1cc4a77ca655580ca3b95119f427ed21a3e13"
   }
  }

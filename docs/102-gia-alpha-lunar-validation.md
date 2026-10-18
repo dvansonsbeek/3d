@@ -1,6 +1,6 @@
 ---
 docVersion: 1.0
-modelVersion: v24.0
+modelVersion: v25.0
 coefficients: sha256:91e2d041c7b6e038
 status: current
 ---
@@ -434,7 +434,7 @@ The framework's independent validation is the 26-event solar-eclipse
 alignment audit (current certified-chain run): 16/26 with the umbra
 reaching the observation site (3 confirmed at greatest moment + 13
 off-peak alignments — including −135 Babylon at BestGap
-<!--v:babylon135BestGapKm-->156<!--/v--> km and −708 Lu at 9 km),
+<!--v:babylon135BestGapKm-->152<!--/v--> km and −708 Lu at 9 km),
 5/26 regional (framework umbra in same continental band
 but off site), 0/26 with residual ΔT-signal — the framework agrees
 with the documented UT on every event — and 5/26 geographic-class

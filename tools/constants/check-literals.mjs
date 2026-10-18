@@ -28,7 +28,7 @@
  *   node tools/constants/check-literals.mjs           check  (exit 1 on drift)
  *   node tools/constants/check-literals.mjs --list    show every classification
  */
-import { readFileSync } from 'node:fs';
+import { readFileSync, existsSync } from 'node:fs';
 import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -164,15 +164,15 @@ const MIGRATED = [
   'astro.yearLengthRef.siderealDay',
   'astro.yearLengthRef.stellarDay',
 
-  // Phase 5f block 8 — all seven planets, both sources, plus the perihelion
-  // passage reference JDs. Prefixes are safe here: every leaf under these three
-  // roots is migrated. (perihelionEclipticYears is no longer a JSON-derived
-  // value at all: since plan 07 R1 it is the chain's 1,296,000/g, read from the
-  // governed artifact; the axial and obliquity-cycle fractions retired with
-  // plan 06 Phase 7 commit 2 and the perihelion fraction with plan 07 R8.)
-  'model.planets',
+  // Phase 5f block 8 — all seven planets' observed elements. The prefix is safe
+  // here: every leaf under this root is migrated. (perihelionEclipticYears is
+  // no longer a JSON-derived value at all: since plan 07 R1 it is the chain's
+  // 1,296,000/g, read from the governed artifact; the axial and obliquity-cycle
+  // fractions retired with plan 06 Phase 7 commit 2 and the perihelion fraction
+  // with plan 07 R8. Plan 11 step 3: model.perihelionPassageRef is deleted with
+  // the planet EoC branch; step 6: the `model.*` tree itself is gone with the
+  // file — the planets' display names are @essrt/physics planets/display-names.)
   'astro.planetOrbitalElements',
-  // (plan 11 step 3: model.perihelionPassageRef is deleted with the planet EoC branch)
   // Plan 06 Phase 7 — the planets' spin inputs. script.js never held them: the
   // browser reads the derived channel through the package model
   // (createModel().planets.spin), so every leaf is migrated by construction.
@@ -336,7 +336,8 @@ const walk = (o, p) => {
     else if (typeof v === 'number') leaves.push({ path: q, key: k, value: v });
   }
 };
-walk(read('model-parameters.json'), 'model');
+// (plan 11 step 6: the `model` tree — model-parameters.json — is deleted; its
+// return is ratcheted below.)
 walk(read('astro-reference.json'), 'astro');
 // plan 11 step 1: the banked fitted deep-time record — its knots and α₃/α₄
 // are distinctive doubles that script.js must carry ONLY through K.deepTime.
@@ -514,53 +515,30 @@ for (const r of masked) {
   console.log('    different value under the same name. Remove the allowlist entry.');
 }
 
-// ── retired JSON inputs (plan 07 R8) — a ratchet on their RETURN ──────────────
-// The retired laws' inputs left public/input/model-parameters.json: the H·num/den
-// perihelion fractions, the divisor table, the ψ phase anchors and the anti-phase
-// flag. Nothing in the code reads them any more; a key that reappears under a
-// planet or additional body is a device input re-entering the source of truth
-// and FAILS here. Fail-proven: ESSRT_LITERALS_PLANT=1 adds one phantom key.
-// Plan 11 step 2: the planets' eocFraction / angleCorrection / mirrorPair (no
-// reader left) and ascendingNodeInvPlane (moved to astro-reference as the
-// closed-form node) join the ratchet, with the whole additionalBodies block.
-const RETIRED_JSON_KEYS = ['perihelionEclipticFraction', 'fibonacciD', 'inclinationCycleAnchor', 'antiPhase',
-  'eocFraction', 'angleCorrection', 'mirrorPair', 'ascendingNodeInvPlane',
-  'startpos', 'type'];   // plan 11 step 3: the scaffold's start angle and ellipse family
+// ── the retired input FILE — a ratchet on its RETURN (plan 11 step 6) ─────────
+// public/input/model-parameters.json is DELETED. Its leaves left one set at a
+// time, each set ratcheted here by key while the file stood: the ψ/K laws'
+// inputs (plan 07 R8 — the H·num/den perihelion fractions, the divisor table,
+// the ψ phase anchors, the anti-phase flag), the phase origin's two inputs
+// (plan 07 R10), the frozen era device's unit, lattice grid and rounded
+// tropical-year input (plan 09 step 7c), the deep-time block (plan 11 step 1 —
+// ASSEMBLED by generate.mjs from its three homes), the dead-reach pose and the
+// additional bodies (step 2), the planets' start angles, ellipse family, the
+// Moon ring's phases and the passage JDs (step 3), the K-device scaffold's
+// pose block (step 4), the scene epoch (step 5 — astro-reference
+// timeReference.sceneEpochJD / sceneEpochYear) with correctionDays deleted,
+// and the planets' display names (step 6 — code, @essrt/physics
+// planets/display-names: presentation, not a parameter). The file returning —
+// under any content — is a second source of truth re-entering and FAILS here.
+// Fail-proven: ESSRT_LITERALS_PLANT=1 plants the hit.
 const retiredHits = [];
-{
-  const mp = read('model-parameters.json');
-  for (const root of ['planets', 'additionalBodies']) {
-    for (const [body, rec] of Object.entries(mp[root] ?? {})) {
-      if (body.startsWith('_') || !rec || typeof rec !== 'object') continue;
-      for (const k of RETIRED_JSON_KEYS) if (k in rec) retiredHits.push(`model.${root}.${body}.${k}`);
-    }
-  }
-  if ('additionalBodies' in mp) retiredHits.push('model.additionalBodies (plan 11 step 2: the no-chain bodies read astro-reference additionalBodiesReference)');
-  for (const k of ['correctionSun', 'useVariableSpeed']) if (k in (mp.foundational ?? {})) retiredHits.push(`model.foundational.${k} (plan 11 step 2)`);
-  if ('startAngleModel' in (mp.foundational ?? {})) retiredHits.push('model.foundational.startAngleModel (plan 11 step 4: the inclination loop\'s zero is a scene literal)');
-  for (const k of ['startmodelJD', 'startmodelYear']) if (k in (mp.foundational ?? {})) retiredHits.push(`model.foundational.${k} (plan 11 step 5: the scene epoch lives in astro-reference timeReference.sceneEpochJD / sceneEpochYear)`);
-  if ('correctionDays' in (mp.foundational ?? {})) retiredHits.push('model.foundational.correctionDays (plan 11 step 5: the integrators anchor on the scene epoch itself)');
-  if ('earth' in mp) retiredHits.push('model.earth (plan 11 step 4: the K-device scaffold\'s pose is deleted — the world frame is the J2000 ecliptic, @essrt/physics earth/frame-of-date)');
-  for (const k of ['moonStartposMoon', 'moonMeeusLpCorrection']) if (k in (mp.moon ?? {})) retiredHits.push(`model.moon.${k} (plan 11 step 2)`);
-  for (const k of ['moonStartposApsidal', 'moonStartposNodal']) if (k in (mp.moon ?? {})) retiredHits.push(`model.moon.${k} (plan 11 step 3: the ring layers are engine-placed from the lunar arguments)`);
-  if ('perihelionPassageRef' in mp) retiredHits.push('model.perihelionPassageRef (plan 11 step 3: deleted with the planet EoC branch)');
-  if (process.env.ESSRT_LITERALS_PLANT === '1') retiredHits.push('model.planets.mercury.fibonacciD (PLANTED)');
-  // Plan 07 R10: the phase origin's two inputs left `foundational` — the combs
-  // measure their phase from J2000, the former origin was rotated out of the
-  // fitted coefficients exactly. Either key returning is the retired phase
-  // convention re-entering the source of truth.
-  // Plan 09 step 7c: the frozen era device's inputs — the unit, its lattice
-  // grid and the device's rounded mean tropical year — left `foundational`
-  // too; the K wheels ride the recorded `earth.kDeviceWheelPeriodYears`.
-  for (const k of ['temperatureGraphMostLikely', 'systemResetN', 'holisticyearLength', 'stepYears', 'inputmeanlengthsolaryearindays']) if (k in (mp.foundational ?? {})) retiredHits.push(`model.foundational.${k}`);
-  // Plan 11 step 1: the deepTime block left the file — generate.mjs ASSEMBLES
-  // it from astro-reference, data/deep-time-fitted.json and the ΔT fit
-  // artifact. A `deepTime` block returning here is a second home.
-  if ('deepTime' in mp) retiredHits.push('model.deepTime (plan 11 step 1: assembled by generate.mjs, not a block of this file)');
+if (existsSync(join(ROOT, 'public/input/model-parameters.json'))) {
+  retiredHits.push('public/input/model-parameters.json RETURNED (plan 11 step 6: deleted — the scene epoch is astro-reference timeReference, the planets\' names are @essrt/physics planets/display-names, the deep-time block is assembled by generate.mjs; every other leaf retired at plan 07 R8/R10, plan 09 step 7c and plan 11 steps 1–5)');
 }
+if (process.env.ESSRT_LITERALS_PLANT === '1') retiredHits.push('public/input/model-parameters.json (PLANTED)');
 for (const p of retiredHits) {
   console.log(`\n  RETIRED INPUT RETURNED  ${p}`);
-  console.log('    this key left the JSON at plan 07 R8 with the ψ/K laws; the chain carries the quantity now.');
+  console.log('    the file left the source of truth at plan 11 step 6; its quantities live in astro-reference.json, the fit artifacts under data/ and the physics package.');
 }
 
 const bad = divergent.length + missing.length + stillLiteral.length + masked.length + retiredHits.length;

@@ -2,14 +2,14 @@
 // Gives the TypeScript website full type safety at the boundary (§2g) while
 // packages/physics stays JavaScript.
 
-export declare const CONSTANTS_HASH: "e500952541d6f426";
+export declare const CONSTANTS_HASH: "f4f43386df2781b8";
 
 export declare const MODEL_VERSION: string;
 
 export declare const PREPRINT_DOI: string;
 
 export declare const DEFAULT_CONSTANTS: {
-  readonly hash: "e500952541d6f426";
+  readonly hash: "f4f43386df2781b8";
   readonly additionalBodiesReference: {
     "pluto": {
       "solarYearInput": number;
@@ -121,15 +121,9 @@ export declare const DEFAULT_CONSTANTS: {
     "deltaTStart": number;
     "sunTilt": number;
   };
-  readonly foundational: {
-
-  };
   readonly giaCoxChaoPeltier: {
     "dJ2DtPerYr": number;
     "j2ToAlphaFactor": number;
-  };
-  readonly moon: {
-
   };
   readonly moonMeeus: {
     "elpW1T2Decomposition_arcsecPerCy2": {
@@ -413,29 +407,6 @@ export declare const DEFAULT_CONSTANTS: {
         "orbitalPeriodDays": number;
         "retrograde": boolean;
       }>;
-    };
-  };
-  readonly planets: {
-    "mercury": {
-      "name": string;
-    };
-    "venus": {
-      "name": string;
-    };
-    "mars": {
-      "name": string;
-    };
-    "jupiter": {
-      "name": string;
-    };
-    "saturn": {
-      "name": string;
-    };
-    "uranus": {
-      "name": string;
-    };
-    "neptune": {
-      "name": string;
     };
   };
   readonly timeReference: {

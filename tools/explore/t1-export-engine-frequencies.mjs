@@ -72,7 +72,7 @@ const out = {
   lr04WindowKyr: [0, lr04LastAgeKyr],
   z,
   zeta,
-  inputs: buildInputsBlock(`node ${SELF_REL} --write`, [MODES_REL, SERIES_REL, LR04_REL, 'public/input/model-parameters.json', SELF_REL]),
+  inputs: buildInputsBlock(`node ${SELF_REL} --write`, [MODES_REL, SERIES_REL, LR04_REL, SELF_REL]),   // (plan 11 step 6: model-parameters.json is deleted)
 };
 
 console.log(`p = ${out.pArcsecPerYr.toFixed(4)} ″/yr (T_p = ${Tp.toFixed(2)} yr) · pInertial = ${out.pInertialArcsecPerYr.toFixed(4)} ″/yr (${TpInertial.toFixed(2)} yr) · pInertialMeanLr04 = ${pInertialMeanLr04.toFixed(4)} ″/yr over 0–${lr04LastAgeKyr} kyr · ${z.length} z modes · ${zeta.length} ζ modes`);

@@ -151,9 +151,8 @@
   "files": {
    "data/lr04-stack.txt": "sha256:7d1a6ca7ffc033e45e20fb76a7f39c8d99df87baa1094260f9dbdc09f0bb8945",
    "data/nbody-deep-secular-modes.json": "sha256:87c325fac77d94a45e1381b62a2a4c5cd8253bc4765c8d497a1d9f5466649ccc",
-   "data/nbody-secular-series.json": "sha256:b777b2b903ebbbb84083b15ae5493cafe10d0568a00cae614b0121d75cdffeb6",
-   "public/input/model-parameters.json": "sha256:35f95dfefbc6bf10ab784b5d90e5bcedceea0f290faf7f792da61092f9627e77",
-   "tools/explore/t1-export-engine-frequencies.mjs": "sha256:ef449c101ee5a0c13fab009da9304f3f605783926d28d515e3eef4933921c3de"
+   "data/nbody-secular-series.json": "sha256:9efaa801275fa5df210ff85def1dfdebaf70cbcc666e11274e34eea1e8f9f2a1",
+   "tools/explore/t1-export-engine-frequencies.mjs": "sha256:3ab7f6897bc27a5351226a69ae6368a7292b0ce7efaf043220bfae7a7010db94"
   }
  }
 }

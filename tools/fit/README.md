@@ -335,7 +335,7 @@ Step 5c: moon-eclipse-optimizer.js            → (RETIRED plan 06 R3 item 1; DE
          moonStartpos* values are J2000-element anchored via the in-sim
          meters (docs/66 §4) — NO LONGER fitted; the startPos scan in
          the tool is a flat-gradient diagnostic only, never written.
-         Updates: model-parameters.json (Lp) + fitted-coefficients.json
+         Updated (then): model-parameters.json moonMeeusLpCorrection + fitted-coefficients.json — both files DELETED (plan 11 steps 2, 1 and 6)
          Verify: RMS separation < 0.85° (geocentric-parallax floor ~0.81°), individual eclipses < 2°
 
 ── Phase 5: Solar measurements & harmonic fits ─────────────────────
@@ -634,12 +634,13 @@ sidereal year and p_A; the year lengths of date are the one-source family.
 
 **The retired unit (plan 09 step 7c).** `holisticyearLength` (335,317 yr =
 23 × 61 × 239), `stepYears` (23) and `inputmeanlengthsolaryearindays`
-(365.2422 d) left `model-parameters.json`; the literals gate fails if any
-returns. What the unit's small-integer divisors posed — the K scaffold wheels
-— is the recorded `earth.kDeviceWheelPeriodYears` block (the exact doubles of
-the former 335,317/N, keyed by wheel index), a scene pose and not a law; the
-J2000 mean tropical year is DERIVED from the IAU sidereal year and p_A
-(`computeMeanTropicalYearJ2000Days`), and the deep-time clock is T_p(t).
+(365.2422 d) left `model-parameters.json` (the file itself is DELETED at plan
+11 step 6; the literals gate fails if it returns). What the unit's
+small-integer divisors posed — the K scaffold wheels — was a recorded scene
+pose, not a law, and left with the scaffold at plan 11 step 4 (the world frame
+is the J2000 ecliptic); the J2000 mean tropical year is DERIVED from the IAU
+sidereal year and p_A (`computeMeanTropicalYearJ2000Days`), and the deep-time
+clock is T_p(t).
 
 ## How to run
 
@@ -649,8 +650,8 @@ This can be done after each `--write` step, or once at the end.
 
 ### Pre-requisite — regenerate constants after foundational-constant edits
 
-If you have just edited one of the source-of-truth JSON files
-(`public/input/model-parameters.json`, `public/input/astro-reference.json`)
+If you have just edited the source-of-truth JSON file
+(`public/input/astro-reference.json` — the one input file since plan 11 step 6)
 — e.g. changing `perihelionalignmentYear`, the scene epoch, or any Meeus/IAU
 anchor —
 **run `npm run constants:generate` FIRST** so the generated module reflects the
@@ -773,7 +774,7 @@ npm run values:package:write     # re-render @essrt/model-values + re-stamp docs
 
 | Output type | Location |
 |-------------|----------|
-| Model parameters (JSON) | `public/input/model-parameters.json` ← single source of truth |
+| Model inputs (JSON) | `public/input/astro-reference.json` ← single source of truth (`model-parameters.json` deleted, plan 11 step 6) |
 | Fitted coefficients (JSON) | the ΔT stack: `data/deltaT-4flag-fit.json` + `data/core-mantle-resonator-stage1.json`; the banked deep-time record `data/deep-time-fitted.json` (plan 11 step 1; `public/input/fitted-coefficients.json` is deleted) |
 | ML coefficients (Python) | retired at plan 06 R8 (`tools/lib/python/coefficients/` deleted) |
 | Browser simulation | `src/script.js` ← imports the generated constants module |
@@ -785,12 +786,13 @@ They are generated locally (Step 3, and Step 6a on demand).
 
 ## Single source of truth — JSON files
 
-All input data lives in 3 JSON files in `public/input/` (the fitted values
-live beside them under `data/`, each in its fitter's artifact):
+All input data lives in 2 JSON files in `public/input/` (the fitted values
+live beside them under `data/`, each in its fitter's artifact;
+`model-parameters.json` — the model theory parameters — was retired leaf by
+leaf and DELETED at plan 11 step 6):
 
 | File | Contents | Who writes |
 |------|----------|-----------|
-| `model-parameters.json` | Model theory parameters (corrections, the scaffold's recorded J2000 pose, planet configs) — plan 11 retires it | Manual / optimizer |
 | `astro-reference.json` | IAU/JPL/Meeus reference data (since plan 11 step 1 also the LLR α₁ and the Cox & Chao GIA anchors the deep-time block derives from) | Manual (external sources) |
 | `meeus-lunar-tables.json` | Moon perturbation tables (Meeus Ch. 47) | Manual (reference data) |
 | `data/deep-time-fitted.json` | The banked fitted deep-time record (α₃/α₄, τ_GIA, the recession regime) | — (frozen; a refit is a campaign) |
@@ -799,10 +801,9 @@ live beside them under `data/`, each in its fitter's artifact):
 
 ```
 public/input/ (single source of truth)
-    ├── model-parameters.json     ← Model parameters (corrections, scaffold pose, planet configs)
-    ├── astro-reference.json      ← External reference data (IAU, JPL, Meeus; the LLR α₁, the Cox & Chao GIA anchors)
-    ├── fitted-coefficients.json  ← description only (its families are deleted, plan 09)
+    ├── astro-reference.json      ← External reference data (IAU, JPL, Meeus; the LLR α₁, the Cox & Chao GIA anchors) + the scene epoch
     └── meeus-lunar-tables.json   ← Moon Meeus Ch. 47 tables
+    (model-parameters.json deleted at plan 11 step 6; fitted-coefficients.json at plan 11 step 1)
          │
          ├──→ JSON.parse (loaded at require-time)
          │    tools/lib/constants.js            ← Builds all constants + derived values

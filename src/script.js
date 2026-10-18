@@ -4,7 +4,8 @@ import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 import { CSS2DRenderer, CSS2DObject } from 'three/examples/jsm/renderers/CSS2DRenderer.js';
 import { Pane } from 'tweakpane';
 
-// Generated from public/input/{model-parameters,astro-reference}.json by
+// Generated from public/input/astro-reference.json (+ the assembled deep-time
+// block; model-parameters.json is deleted, plan 11 step 6) by
 // `npm run constants:generate` (§2g). Never hand-edited; `npm run test:constants`
 // fails if it is stale. Values are IMPORTED, not patched in, so browser and
 // Node cannot drift apart by construction.
@@ -53,7 +54,8 @@ import { vsop87AstrometricGeoEclipticAU, vsop87GeoEclipticAU, vsop87HelioEclipti
 */
 
 // ═══════════════════════════════════════════════════════════════════════════
-// A. MODEL PARAMETERS (source: public/input/model-parameters.json)
+// A. MODEL PARAMETERS (the scene epoch, the research toggles and two display
+//    literals — the former model-parameters.json, deleted at plan 11 step 6)
 // ═══════════════════════════════════════════════════════════════════════════
 
 // ─── A1. Foundational ────────────────────────────────────────────────────
@@ -62,7 +64,7 @@ import { vsop87AstrometricGeoEclipticAU, vsop87GeoEclipticAU, vsop87HelioEclipti
 // Phase 6 removes the writer; then it can become a plain injected value.
 // Imported, not literals: these are never reassigned, so the read-only binding
 // an ESM import gives is exactly right. The values cannot drift from
-// model-parameters.json because there is no second copy to drift.
+// astro-reference.json because there is no second copy to drift.
 // Plan 11 step 5: the scene epoch's ONE home is astro-reference
 // timeReference.sceneEpochJD / sceneEpochYear (moved verbatim from the deleted
 // foundational block); correctionDays — the retired scaffold Sun's fine
@@ -281,7 +283,7 @@ const moonTilt = K.moonReference.moonTilt;                // Moon axial tilt —
 
 // ─── C3. Deep-time physics anchors (IMPORTED — do not hand-edit) ──────────
 // Single source of truth: public/input/astro-reference.json (physicalConstants)
-// + public/input/model-parameters.json (deepTime), reaching this file through
+// + the deep-time block generate.mjs ASSEMBLES (plan 11 step 1), reaching this file through
 // the generated constants module; tools/lib/deep-time.js reads the JSONs via
 // tools/lib/constants.js; the website consumes the same values through the
 // published @essrt/physics package. Derivation notes live in the JSON
@@ -309,7 +311,7 @@ const BOND_TAPER_TOTAL_HALFWIDTH_YR = K.deepTime.dtStackTaperTotalHalfwidthYr;  
 // (plan 11 step 2: angleCorrection, eocFraction and ascendingNodeInvPlane left
 // the records — the first two had no live reader, the node moved to
 // astro-reference as the closed-form verified J2000 node.)
-// Source: public/input/model-parameters.json + astro-reference.json
+// Source: public/input/astro-reference.json (model-parameters.json is deleted, plan 11 step 6)
 // ─────────────────────────────────────────────────────────────────────────
 
 // --- A4a. Major planets (Mercury–Neptune) ---
@@ -23160,7 +23162,7 @@ function setupGUI() {
   // (K8b-2 follow-up, owner: the Model Parameters folder is deleted - the
   // per-planet rows were the retired law framing's scaffolding view, the
   // live accounting is the Parameter Accounting folder above, and the raw
-  // input constants live in the tracked model-parameters.json + docs/20.)
+  // input constants live in the tracked astro-reference.json + docs/20.)
 
   // --- Website reference ---
   {

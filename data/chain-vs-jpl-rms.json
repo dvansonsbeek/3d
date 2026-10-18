@@ -111,7 +111,7 @@
     "moon": {
       "buckets": {
         "1900-1999": {
-          "rmsDeg": 0.002591,
+          "rmsDeg": 0.002592,
           "rmsArcsec": 9.3,
           "n": 3
         },
@@ -339,10 +339,10 @@
     "generator": "node tools/verify/measure-rms-by-epoch.js --write",
     "files": {
       "data/jpl-cache.json": "sha256:221582af7d1e956fd20e58a2b32f2c956a6d1ec1f8d17d3f24c7730a269205d1",
-      "packages/physics/src/planets/chain-artifact.js": "sha256:b6813482faa1e50ddc6c57c0c7a4d1567b5f5e4689d4a2adebebcabea3ce943b",
+      "packages/physics/src/planets/chain-artifact.js": "sha256:bd37de8836ea6a888f4d160dc3cf06ee579fe94e3eda147c94b89f94f63ecbb0",
       "packages/physics/src/planets/keplerian-chain.cjs": "sha256:75cdaeae146100354b883d6fefff48d16d54d6d1e363a8b9d6514c988f7760c2",
-      "tools/lib/scene-graph.js": "sha256:1bcf4ac65d8b2136214f2c2d5304820667b21941cb181a984d1dd866702b691d",
-      "tools/verify/measure-rms-by-epoch.js": "sha256:f2f02f39cb2df61e62bd5d928f1470ce30c9a058d1a7022db603b13f002ec122"
+      "tools/lib/scene-graph.js": "sha256:417e7a8329b26acbf279a0283750c172bc7c400cd7ac39b3fef993da6a6b7afb",
+      "tools/verify/measure-rms-by-epoch.js": "sha256:e4bdd53c22e8f3637b44219ea4cecb1a88fc0c99e7ccd6ee20751549ba888d3c"
     }
   }
 }

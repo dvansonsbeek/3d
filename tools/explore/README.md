@@ -1,6 +1,6 @@
 # `tools/explore` — frozen research one-offs
 
-**Status: FROZEN.** 119 single-purpose investigation scripts kept as the
+**Status: FROZEN.** 118 single-purpose investigation scripts kept as the
 provenance behind findings that are written up in `docs/`. They are not
 production code, not a library, and not maintained. A script stays here
 while something names it — a live doc, shipped code citing it as a

@@ -34,8 +34,7 @@ import { fileURLToPath } from 'node:url';
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const rd = (p) => JSON.parse(readFileSync(join(ROOT, p), 'utf8'));
 
-const model = rd('public/input/model-parameters.json');
-const astro = rd('public/input/astro-reference.json');
+const astro = rd('public/input/astro-reference.json');   // the ONE input file (model-parameters.json is deleted, plan 11 step 6)
 
 /**
  * The model-DEFINED quantities. Deliberately excludes universal constants

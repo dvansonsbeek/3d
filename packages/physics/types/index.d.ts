@@ -15,6 +15,7 @@ export { createDeepEccChannel } from "./moon/deep-ecc-channel.cjs";
 export { createDeepOrbitalHistory } from "./earth/deep-orbital-history.cjs";
 export { createSiderealYearChannel } from "./earth/sidereal-year-channel.cjs";
 export { createPlanetModel } from "./planets/model.cjs";
+export { PLANET_DISPLAY_NAMES } from "./planets/display-names.cjs";
 export { createDeltaTCycles } from "./deltat/cycles.cjs";
 export { createDeepTimeLod } from "./deltat/deep-time.cjs";
 export { deltaTEspenakMeeusCanonSeconds } from "./deltat/historical.cjs";

@@ -174,8 +174,7 @@ function predictiveMachinery() {
   _predictHelpersM = { fluct, chainFluct, earthPeriOfDateDeg, earthPeriOfDateRateArcsecCy, totalPrecession, chainBaseline };
   return _predictHelpersM;
 }
-const model = rd('public/input/model-parameters.json');
-const astro = rd('public/input/astro-reference.json');
+const astro = rd('public/input/astro-reference.json');   // the ONE input file (model-parameters.json is deleted, plan 11 step 6)
 const versionInfo = rd('public/input/model-version.json');
 const dtFit = rd('data/deltaT-4flag-fit.json');
 // Plan 07 (planet channel migration) — THE CHAIN ARTIFACT as the planets' one
@@ -2377,7 +2376,7 @@ export const VALUES = {
         get: () => 1296000 / Math.abs(chainArt().s[p].arcsecPerYr),
         render: (v) => thousands(Math.round(v)),
         unit: 'yr',
-        note: `nodal cycle on the invariable plane — the chain's leading secular nodal mode (${chainArt().s[p].nearestLaskar.mode}, ${chainArt().s[p].arcsecPerYr.toFixed(3)} ″/yr; regression, so the period is quoted as a magnitude). Plan 07: was the device's 8H/${model.planets[p].ascendingNodeCyclesIn8H}`,
+        note: `nodal cycle on the invariable plane — the chain's leading secular nodal mode (${chainArt().s[p].nearestLaskar.mode}, ${chainArt().s[p].arcsecPerYr.toFixed(3)} ″/yr; regression, so the period is quoted as a magnitude). Plan 07: was the device's lattice fraction of the retired unit; that input left with the unit at plan 09 step 7c and the file at plan 11 step 6`,
       };
     }
     return out;
@@ -2876,8 +2875,9 @@ export const VALUES = {
   // Meeus (1998) citations in knownValues; Laskar eccentricities DERIVED
   // from the tracked la2004 artifact (the site types them while citing that
   // file — same pattern as the obliquity tables); calibration scalars from
-  // model-parameters foundational. (plan 11 step 4: startAngleModel and the
-  // derived earthRAAngle left with the K-device scaffold.)
+  // astro-reference (the former model-parameters foundational block: plan 11
+  // step 4 took startAngleModel and the derived earthRAAngle with the K-device
+  // scaffold, step 5 moved the scene epoch, step 6 deleted the file).
   ...(() => {
     const laskarEcc = (calYear) => {
       const rows = new Map(rd('public/input/la2004-orbital-solution.json').data.map((r) => [r.year, r.eccentricity]));

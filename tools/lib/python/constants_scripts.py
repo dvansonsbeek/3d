@@ -216,7 +216,7 @@ LONGITUDE_PERIHELION = {p['name']: p['longitudePerihelion'] for p in _C['planets
 LONGITUDE_PERIHELION["Earth"] = _C['ASTRO_REFERENCE']['earthPerihelionLongitudeJ2000']  # 102.947
 PERIHELION_ECLIPTIC_YEARS = {p['name']: p['perihelionEclipticYears'] for p in _C['planets'].values()}
 
-# Obliquity cycle periods (years) — loaded from model-parameters.json via constants.js.
+# Obliquity cycle periods (years) — the retired device's table (its inputs left with the device; model-parameters.json is deleted, plan 11 step 6).
 # Obliquity cycle theory: obliquity = |inclination − ecliptic|; Venus/Neptune static.
 # Mercury: 8H/3 (Fibonacci decomposition). Mars: 8H/21 (= Jupiter axial, mirror swap).
 # Venus/Neptune: 8H/100 (= ICRF period → two-component formula cancels → constant obliquity).
@@ -315,7 +315,7 @@ OMEGA_J2000["Earth"] = _C['earthAscendingNodeInvPlane']  # 284.51
 INCL_ECLIPTIC = {p['name']: round(p['eclipticInclinationJ2000'], 3) for p in _C['planets'].values()}
 INCL_ECLIPTIC["Earth"] = 0.000
 
-# Perihelion ecliptic periods (years) — loaded from model-parameters.json via constants.js.
+# Perihelion ecliptic periods (years) — the chain's 1,296,000/g via constants.js (the names from @essrt/physics planets/display-names).
 # These are the planet's perihelion precession rate as observed from Earth's ecliptic frame.
 # Historical note: this dict is named INCL_PERIOD for backward compatibility; downstream
 # consumers treat it as the planet's "own-frame" precession rate.

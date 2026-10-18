@@ -1,6 +1,6 @@
 ---
 docVersion: 1.0
-modelVersion: v24.0
+modelVersion: v25.0
 coefficients: sha256:91e2d041c7b6e038
 status: current
 ---
@@ -159,8 +159,7 @@ WebGL Render (60 FPS target)
 │   │   └── skybox/             # Background starfield
 │   │
 │   └── input/
-│       ├── model-parameters.json      # Model constants (Earth params, K-device pose, planet configs)
-│       ├── astro-reference.json       # IAU/JPL reference values (J2000 elements, periods)
+│       ├── astro-reference.json       # IAU/JPL reference values (J2000 elements, periods) + the scene epoch — the ONE input file (model-parameters.json deleted, plan 11)
 │       ├── meeus-lunar-tables.json    # Meeus Ch.47 lunar correction tables
 │       ├── constellations.json        # 88 IAU constellation line patterns
 │       └── stars.json                 # Yale Bright Star Catalog (~9,000 stars)
@@ -223,7 +222,7 @@ WebGL Render (60 FPS target)
 
 ### script.js Organization
 
-The monolithic script.js (~59,800 lines) is organized into logical sections. Constants are grouped by source file (A = model-parameters.json, B = the shipped fit artifacts under data/ — the former fitted-coefficients.json, deleted at plan 11 step 1, C = astro-reference.json, D = meeus-lunar-tables.json, E = derived, F = display-only).
+The monolithic script.js (~59,800 lines) is organized into logical sections. Constants are grouped by source (A = the scene epoch, the research toggles and the two display literals — the former model-parameters.json, retired leaf by leaf and deleted at plan 11 step 6, B = the shipped fit artifacts under data/ — the former fitted-coefficients.json, deleted at plan 11 step 1, C = astro-reference.json, D = meeus-lunar-tables.json, E = derived, F = display-only).
 
 ```
 ┌─────────────────────────────────────────────────────────────────────┐

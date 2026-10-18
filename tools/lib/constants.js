@@ -1,9 +1,12 @@
 // ═══════════════════════════════════════════════════════════════════════════
 // SHARED CONSTANTS MODULE — Single source of truth for all tool scripts.
 //
-// All input data loaded from JSON files in public/input/:
-//   model-parameters.json       — Model theory parameters
-//   astro-reference.json        — IAU/JPL/Meeus reference data
+// All input data loaded from the ONE input file in public/input/:
+//   astro-reference.json        — IAU/JPL/Meeus reference data + the scene epoch
+//   (model-parameters.json — the model theory parameters — was retired leaf
+//    by leaf and DELETED at plan 11 step 6; the planets' display names are
+//    @essrt/physics planets/display-names, the deep-time block is assembled
+//    by the generator, every other leaf's fate is in that plan's record)
 //   (fitted-coefficients.json — the fitting pipeline's comb output — was
 //    emptied at plan 09 step 7a and deleted at plan 11 step 1; the shipped
 //    fits live under data/ and the deep-time block is read from the
@@ -19,8 +22,6 @@
 const utils = require('./constants/utils');
 const path = require('path');
 const fs = require('fs');
-const modelParams = JSON.parse(fs.readFileSync(
-  path.resolve(__dirname, '..', '..', 'public', 'input', 'model-parameters.json'), 'utf8'));
 const astroRef = JSON.parse(fs.readFileSync(
   path.resolve(__dirname, '..', '..', 'public', 'input', 'astro-reference.json'), 'utf8'));
 // The deep-time block of the generated constants module (plan 11 step 1) —
@@ -56,7 +57,7 @@ const knownValues = astroRef.knownValues;
 
 
 // ═══════════════════════════════════════════════════════════════════════════
-// 1. FOUNDATIONAL MODEL CONSTANTS (from model-parameters.json)
+// 1. FOUNDATIONAL MODEL CONSTANTS (the scene epoch — astro-reference.json timeReference)
 // These define the model itself. Changing any = different theory.
 // ═══════════════════════════════════════════════════════════════════════════
 
@@ -151,7 +152,8 @@ const moonTilt = astroRef.moonReference.moonTilt;
 
 
 // ═══════════════════════════════════════════════════════════════════════════
-// 5. PLANET INPUT DATA (merged from model-parameters.json + astro-reference.json)
+// 5. PLANET INPUT DATA (astro-reference.json + the chain artifact; the display
+//    names are @essrt/physics planets/display-names — plan 11 step 6)
 // Per-planet constants for the 7 non-Earth planets.
 // ═══════════════════════════════════════════════════════════════════════════
 
@@ -166,13 +168,15 @@ const CHAIN_DATA = JSON.parse(fs.readFileSync(
   path.resolve(__dirname, '..', '..', 'data', 'nbody-secular-frequencies.json'), 'utf8'));
 
 const planetAstro = astroRef.planetOrbitalElements;
+// The seven chain planets, in the one order every runtime iterates — the
+// display-name map is the key set too (plan 11 step 6).
+const { PLANET_DISPLAY_NAMES } = require('../../packages/physics/src/planets/display-names.cjs');
 const planets = {};
-for (const [key, mp] of Object.entries(modelParams.planets)) {
-  if (key.startsWith('_')) continue;   // documentation keys (`_step2Note`)
+for (const key of Object.keys(PLANET_DISPLAY_NAMES)) {
   const ar = planetAstro[key];
   planets[key] = {
-    // Model parameters (from model-parameters.json)
-    name: mp.name,
+    // Presentation (plan 11 step 6: the deleted JSON's last leaf, code now)
+    name: PLANET_DISPLAY_NAMES[key],
     // (plan 07 R6: orbitalEccentricityBase / Amplitude / eccentricityPhaseJ2000
     // were derived here from the balanced-year phase + K; the law is retired
     // and the chain carries the eccentricity of date. Plan 11 step 2:

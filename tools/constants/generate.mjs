@@ -125,26 +125,22 @@ const EXTRA_COEFFICIENT_SOURCES = [
 ];
 
 /**
- * Every top-level block of the two JSONs, classified. A block missing from this
+ * Every top-level block of the input JSON, classified. A block missing from this
  * map is an ERROR, not a default — silently including or excluding a new block
  * is exactly the failure this map exists to prevent.
+ *
+ * (plan 11 step 6: `model-parameters.json` — the model theory parameters — is
+ * DELETED. Its blocks left one by one: `deepTime` is ASSEMBLED below from its
+ * three homes (step 1); `additionalBodies` (step 2) and `perihelionPassageRef`
+ * (step 3) went with the scaffold readers they fed; `earth` — the K-device
+ * scaffold's recorded J2000 pose — went at step 4 (the world frame is the
+ * J2000 ecliptic, earth/frame-of-date); `foundational`'s scene epoch moved to
+ * astro-reference `timeReference` at step 5; `moon` emptied across steps 2–3;
+ * and `planets`' last leaf, the display names, is code —
+ * planets/display-names.cjs — because a name is presentation, not a model
+ * parameter. The literals gate fails if the file returns.)
  */
 const CLASSIFICATION = {
-  'model-parameters.json': {
-    foundational: 'parameter',
-    // (plan 11 step 4: `earth` — the K-device scaffold's recorded J2000 pose —
-    // is deleted; the scene's world frame is the J2000 ecliptic, @essrt/physics
-    // earth/frame-of-date computeSceneWorldFrameJ2000.)
-    moon: 'parameter',
-    planets: 'parameter',
-    // (plan 11 step 2: `additionalBodies` — the four no-chain bodies' scaffold
-    // inputs — is deleted; their observed J2000 elements are the anchor block
-    // additionalBodiesReference, the only inputs anything reads. Plan 11
-    // step 3: `perihelionPassageRef` — the planet EoC branch's passage JDs —
-    // is deleted with that branch.)
-    // (plan 11 step 1: `deepTime` is no longer a block of this file — it is
-    // ASSEMBLED below from its three homes; see assembleDeepTime.)
-  },
   'astro-reference.json': {
     physicalConstants: 'anchor',
     earthOrbital: 'anchor',
@@ -319,7 +315,7 @@ function build() {
     }
   }
   // the assembled block (plan 11 step 1) — injectable, hashed with the rest
-  if ('deepTime' in included) problems.push('model-parameters.json: block "deepTime" returned — it is ASSEMBLED here (assembleDeepTime); its leaves have their own homes');
+  if ('deepTime' in included) problems.push('astro-reference.json: block "deepTime" returned — it is ASSEMBLED here (assembleDeepTime); its leaves have their own homes');
   else included.deepTime = assembleDeepTime(read('astro-reference.json'));
 
   // Hashed over the INJECTABLE set only. Reference data is not part of the
@@ -369,10 +365,11 @@ ${refBlocks.map((b) => `  ${b}: ${JSON.stringify(reference[b], null, 2).split('\
  * GENERATED — do not edit. Regenerate:
  *   node tools/constants/generate.mjs --write
  *
- * Source of truth: public/input/{model-parameters,astro-reference}.json; the
- * deepTime block is ASSEMBLED from astro-reference.json (moonReference.
- * moonRecessionAlpha1PerMa, giaCoxChaoPeltier), data/deep-time-fitted.json
- * and data/deltaT-4flag-fit.json shipped_taper (plan 11 step 1).
+ * Source of truth: public/input/astro-reference.json (model-parameters.json is
+ * DELETED, plan 11 step 6 — its leaves have their homes); the deepTime block
+ * is ASSEMBLED from astro-reference.json (moonReference.moonRecessionAlpha1PerMa,
+ * giaCoxChaoPeltier), data/deep-time-fitted.json and data/deltaT-4flag-fit.json
+ * shipped_taper (plan 11 step 1).
  * Classification and rationale: tools/constants/generate.mjs
  *
  * Two exports, deliberately separate (§2d):

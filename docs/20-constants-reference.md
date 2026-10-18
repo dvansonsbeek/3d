@@ -1,6 +1,6 @@
 ---
 docVersion: 1.0
-modelVersion: v24.0
+modelVersion: v25.0
 coefficients: sha256:91e2d041c7b6e038
 status: current
 ---
@@ -105,8 +105,11 @@ constants of the published Earth orbit or clock (Ledgers 1–2). The frozen
 era device they once belonged to (plan 06 D8) — the fitted unit, its
 counters and every correction comb — is deleted (plan 09; `model-version.json`
 `_v24Note`). No observable rides them: the engine places the Earth frame,
-the Sun and the Moon stack over the scaffold. Their own retirement is plan
-11, with `model-parameters.json`.
+the Sun and the Moon stack over the scaffold. They left at plan 11 step 4,
+and the file that carried them, `model-parameters.json`, is DELETED at step 6
+— `astro-reference.json` is the one input file (its `timeReference` holds the
+scene epoch); the planets' display names, the file's last leaf, are code
+(`@essrt/physics` `planets/display-names`).
 
 | # | Constant | Variable | Value | Anchored by |
 |---|-----------|----------|-------|-------------|

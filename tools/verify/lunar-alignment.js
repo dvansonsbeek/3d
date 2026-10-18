@@ -64,7 +64,8 @@ const INPUT_FILES = [
   // Stage A′ of the engine-switch record):
   'packages/physics/src/moon/apparent.cjs',
   'packages/api/src/app.js',
-  'public/input/model-parameters.json',
+  // (plan 11 step 6: model-parameters.json is deleted — the scene epoch the
+  // integrators anchor on is astro-reference timeReference, hashed below)
   // plan 11 step 1: the banked fitted deep-time record (τ_GIA, the recession
   // regime) the ΔT stack's GIA channel rides; fitted-coefficients.json is deleted
   'data/deep-time-fitted.json',

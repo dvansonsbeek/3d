@@ -1,6 +1,6 @@
 ---
 docVersion: 1.0
-modelVersion: v24.0
+modelVersion: v25.0
 coefficients: sha256:91e2d041c7b6e038
 status: current
 ---
@@ -861,7 +861,7 @@ The e(t)-spread by both devices, the anomalistic year, the RA:
 | 5000 | 218.1 · 472.1 · -195.4 · -117.2 | 44.2 · -15.0 · -45.0 · 15.8 | 31558440.74 | 0.0000 | 0.01533 |
 | 10000 | 223.7 · -167.0 · -731.2 · -348.9 | 12.8 · 37.7 · -12.2 · -38.2 | 31558460.72 | 0.0000 | 0.01261 |
 
-Retired device's RA formula constants (the record; since R1 the shipped RA is the target longitude by construction): raMean = base − earthRAAngle/sin ε̄ = base − 3.157955°, amplitude A/sin ε̄ = 1.600721° on −sin(2π·3·c) + sin(2π·8·c) (base 0/90/180/270° for VE/SS/AE/WS); c counted from J2000 since plan 07 R10 (the device itself is deleted, plan 09 step 7a).
+Retired device's RA formula constants: the record left with the K-device scaffold (plan 11 step 4 — earthtiltMean, the inclination amplitude A and earthRAAngle = 2A − A²/ε̄ are deleted; git history carries them; the form was base − earthRAAngle/sin ε̄ + (A/sin ε̄)·(−sin 2π·3·c + sin 2π·8·c), base 0/90/180/270° for VE/SS/AE/WS). Since R1 the shipped RA is the target longitude by construction; the device itself is deleted (plan 09 step 7a).
 <!-- /generated:calcmap-cardinal-spread -->
 
 ### 5.6 Findings from this chain (to act on)

@@ -60,7 +60,8 @@ const NEVER_INJECTABLE = Object.keys(REFERENCE_DATA);
  */
 
 /**
- * Generated at build time from `public/input/{model-parameters,astro-reference}.json`
+ * Generated at build time from `public/input/astro-reference.json` (plus the
+ * deep-time block the generator assembles; model-parameters.json is deleted, plan 11)
  * (§2g) by `tools/constants/generate.mjs`. 324 values across 15 blocks.
  *
  * Free parameters and measured anchors only. Validation targets are excluded by
@@ -160,6 +161,9 @@ export { computeSolarTorqueShare, createComposedPrecession } from './earth/prece
 // L10 — the composition front door: one law set, N body records. Thin by
 // design; engines keep their direct call sites (see planets/model.cjs).
 export { createPlanetModel } from './planets/model.cjs';
+// plan 11 step 6 — the planets' presentation names, the last leaf of the
+// deleted model-parameters.json (code, not an input: not injectable, not hashed).
+export { PLANET_DISPLAY_NAMES } from './planets/display-names.cjs';
 // Phase 8.4 — the climate/ΔT machinery, extracted layer by layer.
 export { createDeltaTCycles } from './deltat/cycles.cjs';
 export { createDeepTimeLod } from './deltat/deep-time.cjs';

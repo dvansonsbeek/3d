@@ -25,6 +25,7 @@ import { createYearLengths, computeMeanTropicalYearJ2000Days, ONE_FAMILY_WINDOW_
 import { createDeepOrbitalHistory } from './earth/deep-orbital-history.cjs';
 import { CHAIN_ARTIFACT } from './planets/chain-artifact.js';
 import { createPlanetSpinChannelFromArtifacts, computeObliquityJ2000Deg } from './planets/spin-channel.cjs';
+import { PLANET_DISPLAY_NAMES } from './planets/display-names.cjs';
 import { createDeltaTCycles } from './deltat/cycles.cjs';
 import { createDeepTimeLod } from './deltat/deep-time.cjs';
 import { createMoonRecessionHistory, createSolarChannelBudget } from './deltat/recession-history.cjs';
@@ -743,7 +744,6 @@ export function assembleModel(C, F, laws = {}, secularSeriesArtifact = /** @type
   /** @type {Record<string, Record<string, any>>} */
   const PUBLISHED_PLANET_RECORDS = {};    // what model.planets.record() serves (R8)
   for (const k of PLANET_KEYS) {
-    const mp = C.planets[k];
     const ar = C.planetOrbitalElements[k];
     // Plan 06 Phase 7 commit 2: the K device's integer axial and obliquity
     // fractions are retired; the obliquity is the DERIVED J2000 obliquity of
@@ -784,7 +784,7 @@ export function assembleModel(C, F, laws = {}, secularSeriesArtifact = /** @type
     const gArc = chainModes.g[k] && chainModes.g[k].arcsecPerYr;
     const sArc = chainModes.s[k] && chainModes.s[k].arcsecPerYr;
     PUBLISHED_PLANET_RECORDS[k] = Object.freeze({
-      name: mp.name,
+      name: PLANET_DISPLAY_NAMES[k],   // presentation — planets/display-names, the deleted JSON's last leaf (plan 11 step 6)
       solarYearInput: ar.solarYearInput,
       longitudePerihelion: ar.longitudePerihelion,
       ascendingNodeInvPlane: ar.ascendingNodeInvPlaneClosedForm,   // the closed-form verified J2000 node — astro-reference since plan 11 step 2

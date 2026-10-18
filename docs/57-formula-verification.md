@@ -1,6 +1,6 @@
 ---
 docVersion: 1.0
-modelVersion: v24.0
+modelVersion: v25.0
 coefficients: sha256:91e2d041c7b6e038
 status: current
 ---
@@ -143,7 +143,7 @@ Cases where the model *disagrees* with a reference are also documented in the pa
 2. **No interactive year slider.** The charts are plotted over a fixed range (−12 000 to +12 000). To inspect values at a specific year, read the J2000 table or advance the simulation's date and re-open the panel.
 3. **Reference formulas go stale outside their range.** A polynomial fit to ±2 000 years *will* give nonsense at year −10 000. The panel plots them anyway (with the range note) so the reader can see the divergence — useful for understanding *why* N-body solutions are needed at long range.
 4. **Paper-export is SVG-only.** No PNG / PDF export. Use browser screenshot or an external SVG-to-PDF converter.
-5. **Read-only.** The panel has no "edit model parameters" feature. To re-run with different model parameters, edit the constants in `src/script.js` (or `public/input/model-parameters.json` via the pipeline) and reload the simulation.
+5. **Read-only.** The panel has no "edit model parameters" feature. To re-run with different model parameters, edit the constants in `src/script.js` (or `public/input/astro-reference.json`, then `npm run constants:generate`) and reload the simulation.
 
 ## Colour coding
 
