@@ -135,9 +135,10 @@ coupling list that stood here — the parameters whose change invalidated the
 frozen coefficients — is void; the scene scaffold's pose constants
 (`earthtiltMean`, `earthInvPlaneInclinationAmplitude`,
 `kDeviceInclinationPhaseJ2000Deg`, `kDeviceWheelPhaseAtJ2000Cycles`,
-`kDeviceWheelPeriodYears`) remain as recorded J2000 poses the engine places
-the Earth frame over, not laws. See "The frozen era clock" below for the
-record.
+`kDeviceWheelPeriodYears`) were recorded J2000 poses, not laws, and are
+deleted with the K wheels (plan 11 step 4) — the scene's world frame is the
+J2000 ecliptic and every frame of date is engine-placed. See "The frozen era
+clock" below for the record.
 
 The ΔT correction stack (Phase 8) is the fitted family that still re-fits.
 It is a post-integration overlay applied only to the historical ΔT curve —

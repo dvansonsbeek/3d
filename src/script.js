@@ -2329,7 +2329,7 @@ const LOD_NOW_H13_S = meansiderealyearlengthinSeconds / meansiderealyearlengthin
 // to compute deep-time values FROM J2000 even after Phase 4's setEpoch()
 // starts mutating the globals via recomputeEpochAnchors().
 // (plan 09 step 7c: HOLISTIC_YEAR_J2000 — the frozen era unit — is deleted;
-// the K wheels ride the recorded kDeviceWheelPeriodYears.)
+// plan 11 step 4: the K wheels and their recorded period block with it.)
 const MEAN_SIDEREAL_YEAR_J2000_S = meansiderealyearlengthinSeconds;          // 31,558,149.764 s
 const MEAN_TROPICAL_YEAR_J2000_S = meansolaryearlengthinDays * meanlengthofday;
                                                                              // ≈ 31,556,926.28 s
@@ -4559,13 +4559,9 @@ function posFromDateTime(dateStr, timeStr) {
 // phase anchors. Used by the integrated phase math — they do NOT shift with
 // epoch (in contrast to Phase 6's snapshot `balancedYear`).
 //
-// `BALANCED_YEAR_J2000_FIXED` was relocated to ~line 3283 (just after the
-// `balancedYear` declaration) so it's available for `perihelionPhaseOffset`
-// and other early consumers that must guard against `balancedYear` drift.
-
-// (plan 11 step 2: PERIHELION_CYCLE_LENGTH_J2000_FIXED — the K-device
-// perihelion wheel's recorded period, the perihelionPhaseOffset
-// re-derivation's wheel period — is deleted with wheel 16 and the offset.)
+// (plan 11: BALANCED_YEAR_J2000_FIXED and PERIHELION_CYCLE_LENGTH_J2000_FIXED —
+// the K wheels' phase anchor and the perihelion wheel's recorded period — are
+// deleted with the wheels and the perihelionPhaseOffset re-derivation.)
 // (Plan 07 R10: ECCENTRICITY_ANCHOR_J2000_FIXED — the n=7 System-Reset
 // eccentricity anchor, BALANCED − systemResetN·H — had no reader left since
 // R6 and is gone with the phase origin.)

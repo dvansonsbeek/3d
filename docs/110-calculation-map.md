@@ -27,7 +27,7 @@ H entry was and where it went. The roles:
 | **U** | a unit — H = 13.011 × T_p as a number, divisors as phase counters | DELETED at plan 09 (the counters at step 7a, the unit function at 7b, the J2000 constant and its inputs at 7c — `model-version.json` `_v24Note`) |
 | **P** | physics by proxy — H(t) standing in for the tidal precession/spin history | re-expressed on T_p(t) / ω(t); H(t) left the physics at plan 09 step 7b |
 | **C** | a comb basis — harmonics on integer divisors of H (or of its eightfold multiple) used as a fitting basis | every comb DELETED at plan 09 (steps 2–7a); the ΔT cycle stack and the L1 climate lines state their periods in years (plan 06 T1/T5) |
-| **L** | a lattice claim — "X = H/n is structural" | retired; the scene's K-device wheels keep the numbers as recorded J2000 pose periods (`kDeviceWheelPeriodYears`), not a law |
+| **L** | a lattice claim — "X = H/n is structural" | retired; the K-device wheels that last carried the numbers as a recorded J2000 pose are deleted too (plan 11 step 4) |
 | — | H does not enter | — |
 
 Types follow plan 02 D1: **A** long-term frequency/mean · **B** present-epoch

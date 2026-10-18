@@ -235,8 +235,8 @@ for (const [key, ar] of Object.entries(astroRef.additionalBodiesReference)) {
 // Computed from foundational constants. Order matters (dependency chain).
 // ═══════════════════════════════════════════════════════════════════════════
 
-// (plan 09 step 7c: `perihelionCycleLength` = H/16 is deleted — the K
-// perihelion wheel's period is kDeviceWheelPeriodYears[16], a scaffold pose.)
+// (plan 09 step 7c: `perihelionCycleLength` = H/16 is deleted; plan 11 step 4
+// deleted the K perihelion wheel and its recorded period block with it.)
 // Plan 09: the model's mean solar year in days — the calendar's year axis —
 // is the J2000 mean tropical year DERIVED in one home from two IAU inputs,
 // the sidereal year and the general precession p_A per Julian year

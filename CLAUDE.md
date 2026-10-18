@@ -621,9 +621,10 @@ the unit itself (`hAtAge`, the API's `epoch.h`, the `hAt*` registry keys)
 left at step 7b, and its INPUTS (`holisticyearLength`, `stepYears`, the
 device's rounded tropical-year input `inputmeanlengthsolaryearindays`, the
 planets' `ascendingNodeCyclesIn8H`) with every remaining H reader and
-registry key at step 7c — the K-device scaffold's wheels ride the recorded
+registry key at step 7c — the K-device scaffold's wheels then rode the recorded
 `kDeviceWheelPeriodYears` pose block (keyed by wheel index; numerically the
-retired unit's 335,317/N, a pose, not a law), the deep-eccentricity E-factor
+retired unit's 335,317/N, a pose, not a law) until plan 11 step 4 deleted the
+wheels and the block, the deep-eccentricity E-factor
 and the browser's sidereal day read the Julian and the DERIVED year, and the
 literals gate fails if any input returns. The
 long-eccentricity band stays at its modern class (scaled
