@@ -118,6 +118,41 @@ console.log('5. purity: values are functions of year alone');
   }
 }
 
+// 6. the pole of date (plan 11 step 3: both scene twins place each planet's
+//    rotation axis from this vector) — a unit vector whose angle to the orbit
+//    normal of date IS the channel's obliquity, the IAU pole at J2000, and for
+//    the Cassini-locked Mercury the constant obliquity carried with its plane
+console.log('6. the pole of date: unit, consistent with the obliquity, the IAU pole at J2000');
+{
+  const D2R = Math.PI / 180;
+  /** @param {number[]} a @param {number[]} b */
+  const ang = (a, b) => Math.acos(Math.max(-1, Math.min(1, a[0] * b[0] + a[1] * b[1] + a[2] * b[2]))) / D2R;
+  for (const k of m.planets.keys) {
+    const s = m.planets.spin(k);
+    for (const y of [2000, -1_000_000]) {
+      const p = s.spinAxisEclipticJ2000AtYear(y), n = s.orbitNormalEclipticJ2000AtYear(y);
+      const eps = s.obliquityDegAtYear(y);
+      // between samples the obliquity is interpolated in ANGLE and the pole in
+      // the VECTOR — the two agree to a few arcseconds (Mars, the fastest pole
+      // per sample, 3″ at −1 Myr; measured), exact at the J2000 sample
+      const ok = !!p && Math.abs(Math.hypot(p[0], p[1], p[2]) - 1) < 1e-12 && eps !== null && Math.abs(ang(p, n) - eps) < (y === 2000 ? 1e-9 : 2e-3);
+      check(`${k} pole @ ${y}: unit, ∠(ŝ, n̂) = ε`, ok, p ? `∠ ${ang(p, n).toFixed(6)}° vs ε ${eps === null ? 'null' : eps.toFixed(6)}°` : 'null');
+    }
+    const spin = ASTRO.planetSpinPhysical[k], e0 = ASTRO.earthOrbital.obliquityJ2000_deg * D2R;
+    const ra = spin.poleRaJ2000Deg * D2R, dec = spin.poleDecJ2000Deg * D2R;
+    const x = Math.cos(dec) * Math.cos(ra), yq = Math.cos(dec) * Math.sin(ra), z = Math.sin(dec);
+    const sgn = spin.rotationRateDegPerDay < 0 ? -1 : 1;
+    const iau = [sgn * x, sgn * (yq * Math.cos(e0) + z * Math.sin(e0)), sgn * (-yq * Math.sin(e0) + z * Math.cos(e0))];
+    const p0 = s.spinAxisEclipticJ2000AtYear(2000);
+    // the chord, not acos of the dot (acos(1 − 1 ulp) reads 1e-6° for identical vectors)
+    const chord = p0 ? Math.hypot(p0[0] - iau[0], p0[1] - iau[1], p0[2] - iau[2]) : NaN;
+    check(`${k} pole @ 2000 ≡ the IAU pole (angular-momentum sense)`, chord < 1e-12, `chord ${chord.toExponential(2)}`);
+  }
+  const me = m.planets.spin('mercury');
+  check('mercury pole beyond the domain is still defined (carried with the plane)', Array.isArray(me.spinAxisEclipticJ2000AtYear(-20_000_000)), '');
+  check('mars pole beyond ±10 Myr is null', m.planets.spin('mars').spinAxisEclipticJ2000AtYear(-20_000_000) === null, '');
+}
+
 if (plant) {
   const marsFailed = failures.includes('mars pole rate vs Konopliv 2016');
   console.log(marsFailed ? '\nPLANT DETECTED — the Mars closure failed on a 1 % J₂ change (the gate works).' : '\nPLANT NOT DETECTED — the gate is blind.');

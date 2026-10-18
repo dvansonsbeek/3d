@@ -99,6 +99,8 @@ export function createPlanetSpinChannel(deps: {
         meanDeg: number;
         maxDeg: number;
     } | null;
+    spinAxisEclipticJ2000AtYear: (year: number) => number[] | null;
+    orbitNormalEclipticJ2000AtYear: (year: number) => number[];
     stepYr: number;
     maxSpanYr: 10000000;
 }>;
@@ -152,6 +154,8 @@ export function createPlanetSpinChannelFromArtifacts(deps: {
         meanDeg: number;
         maxDeg: number;
     } | null;
+    spinAxisEclipticJ2000AtYear: (year: number) => number[] | null;
+    orbitNormalEclipticJ2000AtYear: (year: number) => number[];
     stepYr: number;
     maxSpanYr: 10000000;
 }>;

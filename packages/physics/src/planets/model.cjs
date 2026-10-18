@@ -7,8 +7,9 @@
  *   inputs     the chain's g-mode beat (wobble) and the spin channel's
  *              derived J2000 obliquity, carried on the record since plan 06
  *              Phase 7 commit 2
- *   geometry   (the type-branched ellipse family on the OBSERVED J2000
- *              eccentricity; minor bodies use their record's base)
+ *   geometry   (the ellipse family — geometry.cjs's own taxonomy since
+ *              plan 11 step 3 — on the OBSERVED J2000 eccentricity; minor
+ *              bodies use their record's base)
  *
  * The ψ and K amplitude laws that opened this chain (ψ constant →
  * inclination amplitude/mean; K constant → eccentricity amplitude/base/
@@ -35,7 +36,6 @@ const { derivePlanetGeometry, scaffoldOrbitInputs } = require('./geometry.cjs');
 
 /**
  * @typedef {Object} PlanetModelBody
- * @property {string} [type] - geometry type branch ('I' | 'II' | 'III')
  * @property {number} solarYearInput - the observed sidereal period input, SI days (the scaffold period of the no-chain bodies; the chain planets ride the artifact's elements)
  * @property {number} [invPlaneInclinationJ2000]
  * @property {number} [longitudePerihelion]
@@ -113,7 +113,7 @@ function createPlanetModel(env, bodies) {
     // plan 11 step 2 deleted the stored copy).
 
     rec.geometry = derivePlanetGeometry({
-      key, type: b.type,
+      key,   // the ellipse family is the law's own taxonomy (geometry.cjs SCAFFOLD_ELLIPSE_FAMILY, plan 11 step 3)
       // plan 09 step 7b: the chain's J2000 elements where the artifact has the body, else the observed period input
       ...scaffoldOrbitInputs(key, env.chainArtifact, b.solarYearInput),
       orbitalEccentricityBase: b.orbitalEccentricityBase !== undefined

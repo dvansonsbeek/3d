@@ -36,19 +36,34 @@
  * Saturn's scene-side negation of elipticOrbit (antiPhase) is a SCENE
  * convention and stays engine-side.
  *
- * MINOR-BODY TYPES ARE PLACEHOLDERS (model-parameters.json _typeNote): the
- * small bodies borrow the planet taxonomy geometrically but are more
- * susceptible to planetary gravity disturbances; a perturbation-aware
- * type is expected from the Phase 18 refit. It lands as ONE new branch
- * here + a JSON type flip per body — both engines pick it up automatically.
+ * THE ELLIPSE FAMILY IS A CODE TAXONOMY, ONE HOME HERE (plan 11 step 3):
+ * `SCAFFOLD_ELLIPSE_FAMILY` names each body's branch. It left the inputs
+ * (model-parameters.json `planets.<p>.type`) because it is not a model
+ * parameter — it is the shape of the geocentric scaffold's wheel ellipses,
+ * which the engine-D chain overrides for every rendered planet quantity
+ * (mesh, ring, trace, markers; the perihelion-at-Earth marker's radius is
+ * the chain's a·e of date since step 3). The wheel radii stay bit-identical
+ * on every runtime by construction. Eros borrows the type-II family; a
+ * perturbation-aware minor-body family would land as one new branch here.
  */
 
 'use strict';
 
 /**
+ * Each body's scaffold ellipse family (the survey's measured taxonomy above).
+ * Pluto, Halley and Ceres take their body-name branches; a key absent here
+ * has no ellipse family (geometry-only).
+ * @type {Readonly<Record<string, string>>}
+ */
+const SCAFFOLD_ELLIPSE_FAMILY = Object.freeze({
+  mercury: 'I', venus: 'I', mars: 'II',
+  jupiter: 'III', saturn: 'III', uranus: 'III', neptune: 'III',
+  eros: 'II',
+});
+
+/**
  * @typedef {{
  *   key: string,
- *   type?: string,
  *   periodDays: number,
  *   semiMajorAxisAu?: number,
  *   orbitalEccentricityBase?: number,
@@ -77,15 +92,16 @@
  *   elipticOrbit: (number | undefined), perihelionDistance: (number | undefined),
  *   speedKmh: number, rotationPeriodHours: (number | undefined),
  *   eccentricityPerihelion: (number | undefined), lowestPoint: (number | undefined),
+ *   ellipseFamily: (string | undefined),
  * }}
  */
 function derivePlanetGeometry(body, env) {
-  const { key, type: typeIn, periodDays, semiMajorAxisAu, orbitalEccentricityBase: base,
+  const { key, periodDays, semiMajorAxisAu, orbitalEccentricityBase: base,
           longitudePerihelion, ascendingNode, rotationPeriodDays, orbitDistanceOverride } = body;
-  // The minor bodies' ellipse family is the LAW's (plan 11 step 2: their
-  // scaffold `type` left the inputs): Pluto and Halley take the body-name
-  // branches below, Eros the type-II family — ONE home for that default.
-  const type = typeIn ?? (key === 'eros' ? 'II' : undefined);
+  // The ellipse family is the law's own taxonomy (plan 11 step 3: the
+  // scaffold `type` left the inputs for every body): Pluto and Halley take
+  // the body-name branches below, the rest read SCAFFOLD_ELLIPSE_FAMILY.
+  const type = SCAFFOLD_ELLIPSE_FAMILY[key];
   const { meanSolarYearDays: mSY, currentAUDistanceKm: AU,
           earthEccentricityJ2000, earthPerihelionLongitudeJ2000Deg } = env;
 
@@ -154,6 +170,7 @@ function derivePlanetGeometry(body, env) {
     orbitDistance, periodYears, periodDays, realOrbitalEccentricity,
     elipticOrbit, perihelionDistance, speedKmh, rotationPeriodHours,
     eccentricityPerihelion, lowestPoint,
+    ellipseFamily: type,   // the scaffold wheel family this record was built on ('I' | 'II' | 'III' | undefined)
   };
 }
 
@@ -175,4 +192,4 @@ function scaffoldOrbitInputs(key, chainArtifact, fallbackPeriodDays) {
   return { periodDays: fallbackPeriodDays, semiMajorAxisAu: undefined };
 }
 
-module.exports = { derivePlanetGeometry, scaffoldOrbitInputs };
+module.exports = { derivePlanetGeometry, scaffoldOrbitInputs, SCAFFOLD_ELLIPSE_FAMILY };

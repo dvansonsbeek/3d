@@ -1,9 +1,5 @@
 export type PlanetModelBody = {
     /**
-     * - geometry type branch ('I' | 'II' | 'III')
-     */
-    type?: string | undefined;
-    /**
      * - the observed sidereal period input, SI days (the scaffold period of the no-chain bodies; the chain planets ride the artifact's elements)
      */
     solarYearInput: number;
@@ -47,7 +43,6 @@ export type PlanetModelRecord = {
 };
 /**
  * @typedef {Object} PlanetModelBody
- * @property {string} [type] - geometry type branch ('I' | 'II' | 'III')
  * @property {number} solarYearInput - the observed sidereal period input, SI days (the scaffold period of the no-chain bodies; the chain planets ride the artifact's elements)
  * @property {number} [invPlaneInclinationJ2000]
  * @property {number} [longitudePerihelion]

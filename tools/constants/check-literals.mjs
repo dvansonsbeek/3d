@@ -74,9 +74,9 @@ const MIGRATED = [
   // derivation records "bit-identical (0.8086/0.010524/0.0015), FULL GATES
   // PASSED". tools/lib always used 0.010524; only the browser copy had drifted.
   // (plan 11 step 2: moonStartposMoon and moonMeeusLpCorrection left the JSON —
-  // the start angle reached only the Node twin's pivot, the correction was 0.)
-  'model.moon.moonStartposApsidal',
-  'model.moon.moonStartposNodal',
+  // the start angle reached only the Node twin's pivot, the correction was 0.
+  // Plan 11 step 3: moonStartposApsidal/Nodal — the ring's fitted phases —
+  // left too; the ring layers are engine-placed from the lunar arguments.)
 
   // Phase 5f block 4 — astro.physicalConstants. Listed per-path rather than by
   // prefix: earthJ2 and earthEquatorialRadiusKm are Node-side (NOT_IN_SCRIPT)
@@ -175,7 +175,7 @@ const MIGRATED = [
   // plan 06 Phase 7 commit 2 and the perihelion fraction with plan 07 R8.)
   'model.planets',
   'astro.planetOrbitalElements',
-  'model.perihelionPassageRef',
+  // (plan 11 step 3: model.perihelionPassageRef is deleted with the planet EoC branch)
   // Plan 06 Phase 7 — the planets' spin inputs. script.js never held them: the
   // browser reads the derived channel through the package model
   // (createModel().planets.spin), so every leaf is migrated by construction.
@@ -364,12 +364,13 @@ const evalRhs = (rhs) => {
 };
 
 /**
- * Keys that occur on more than one JSON object — `startpos`, `angleCorrection`
- * and `eocFraction` exist on all seven planets. Matching such a key by name in
- * script.js finds whichever declaration comes first (Mercury's) and compares it
- * against every planet, reporting six false divergences. Name-matching is only
- * sound for keys that are unique across the whole leaf set; the rest fall back
- * to value-presence.
+ * Keys that occur on more than one JSON object — `name` exists on all seven
+ * planets (as `startpos`, `angleCorrection` and `eocFraction` did before plan
+ * 11 steps 2–3 deleted them). Matching such a key by name in script.js finds
+ * whichever declaration comes first (Mercury's) and compares it against every
+ * planet, reporting six false divergences. Name-matching is only sound for
+ * keys that are unique across the whole leaf set; the rest fall back to
+ * value-presence.
  */
 const keyCount = new Map();
 for (const l of leaves) keyCount.set(l.key, (keyCount.get(l.key) ?? 0) + 1);
@@ -526,7 +527,8 @@ for (const r of masked) {
 // reader left) and ascendingNodeInvPlane (moved to astro-reference as the
 // closed-form node) join the ratchet, with the whole additionalBodies block.
 const RETIRED_JSON_KEYS = ['perihelionEclipticFraction', 'fibonacciD', 'inclinationCycleAnchor', 'antiPhase',
-  'eocFraction', 'angleCorrection', 'mirrorPair', 'ascendingNodeInvPlane'];
+  'eocFraction', 'angleCorrection', 'mirrorPair', 'ascendingNodeInvPlane',
+  'startpos', 'type'];   // plan 11 step 3: the scaffold's start angle and ellipse family
 const retiredHits = [];
 {
   const mp = read('model-parameters.json');
@@ -541,6 +543,8 @@ const retiredHits = [];
   if ('eccentricityBase' in (mp.earth ?? {})) retiredHits.push('model.earth.eccentricityBase (plan 11 step 2)');
   if ('16' in (mp.earth?.kDeviceWheelPeriodYears ?? {})) retiredHits.push('model.earth.kDeviceWheelPeriodYears.16 (plan 11 step 2: the perihelion pair is engine-placed)');
   for (const k of ['moonStartposMoon', 'moonMeeusLpCorrection']) if (k in (mp.moon ?? {})) retiredHits.push(`model.moon.${k} (plan 11 step 2)`);
+  for (const k of ['moonStartposApsidal', 'moonStartposNodal']) if (k in (mp.moon ?? {})) retiredHits.push(`model.moon.${k} (plan 11 step 3: the ring layers are engine-placed from the lunar arguments)`);
+  if ('perihelionPassageRef' in mp) retiredHits.push('model.perihelionPassageRef (plan 11 step 3: deleted with the planet EoC branch)');
   if (process.env.ESSRT_LITERALS_PLANT === '1') retiredHits.push('model.planets.mercury.fibonacciD (PLANTED)');
   // Plan 07 R10: the phase origin's two inputs left `foundational` — the combs
   // measure their phase from J2000, the former origin was rotated out of the

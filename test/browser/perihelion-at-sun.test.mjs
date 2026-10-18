@@ -68,6 +68,35 @@ try {
   const wrapd = (d) => ((d + 540) % 360) - 180;
   check('Moon perigee marker: distance = a(1−e)', !!mm && Math.abs(mm.perigee.distAU - mm.aPeriAU * PLANT) < 1e-9, mm ? `${mm.perigee.distAU.toFixed(9)} vs ${(mm.aPeriAU * PLANT).toFixed(9)} AU` : 'probe returned null');
   check('Moon perigee marker: longitude/latitude of date from L′ − M′ in the inclined plane', !!mm && Math.abs(wrapd(mm.perigee.lon - mm.perigeeExpectedLonDeg)) < 1e-6 && Math.abs(mm.perigee.lat - mm.perigeeExpectedLatDeg) < 1e-6, mm ? `λ ${mm.perigee.lon.toFixed(4)}° (exp ${mm.perigeeExpectedLonDeg.toFixed(4)}), β ${mm.perigee.lat.toFixed(4)}° (exp ${mm.perigeeExpectedLatDeg.toFixed(4)})` : '');
+  // Plan 11 step 3 — the Moon RING is engine-placed from the same arguments:
+  // the stack's apsidal arm points at the apogee (perigee at ϖ = L′ − M′), the
+  // placed orbit plane's ascending node sits at Ω = L′ − F, the arm is a·e and
+  // the plane's tilt the registry inclination — so ring ≡ markers ≡ the Moon.
+  // Fail-proven through the same PLANT (the expected longitudes shift 1°).
+  const mr = await sim.page.evaluate(() => window.__test__.moonRingProbe());
+  const plantDeg = PLANT === 1 ? 0 : 1;
+  check('Moon ring: the perigee direction is the arguments\' ϖ = L′ − M′', !!mr && Math.abs(wrapd(mr.perigeeLonDeg - mr.perigeeExpectedLonDeg - plantDeg)) < 1e-6, mr ? `${mr.perigeeLonDeg.toFixed(7)}° vs ${mr.perigeeExpectedLonDeg.toFixed(7)}°` : 'probe returned null');
+  check('Moon ring: the ascending node is the arguments\' Ω = L′ − F', !!mr && Math.abs(wrapd(mr.nodeLonDeg - mr.nodeExpectedLonDeg - plantDeg)) < 1e-6, mr ? `${mr.nodeLonDeg.toFixed(7)}° vs ${mr.nodeExpectedLonDeg.toFixed(7)}°` : '');
+  check('Moon ring: the eccentric arm is a·e and the plane tilt the registry inclination', !!mr && Math.abs(mr.offsetScene - mr.offsetExpectedScene) < 1e-9 && Math.abs(mr.incDeg - mr.incExpectedDeg) < 1e-6, mr ? `arm ${mr.offsetScene.toFixed(9)} vs ${mr.offsetExpectedScene.toFixed(9)}, inc ${mr.incDeg.toFixed(6)}° vs ${mr.incExpectedDeg}°` : '');
+  check('Moon ring ≡ markers: the ring node and the node marker share one longitude', !!mr && !!mm && Math.abs(wrapd(mr.nodeLonDeg - mm.ascNode.lon)) < 1e-6, mr && mm ? `${mr.nodeLonDeg.toFixed(7)}° vs ${mm.ascNode.lon.toFixed(7)}°` : '');
+
+  // Plan 11 step 3 — the planets' POLES: each chain planet's rotation axis is
+  // placed in world from the spin channel's pole of date through the frame
+  // bridge (Saturn: its rings are the axis's child; Venus: the retrograde
+  // spinner, pole south of its orbit — the angular-momentum sense). The
+  // rendered obliquity (axis vs the chain's orbit normal of date) is the
+  // channel's. Fail-proven through the PLANT (the expected pole is rotated 1°).
+  for (const planet of ['Saturn', 'Venus']) {
+    const pp = await sim.page.evaluate((p) => window.__test__.planetPoleProbe(p), planet);
+    const chordLimit = PLANT === 1 ? 1e-9 : -1;   // the plant makes the limit unreachable
+    check(`${planet}: the rendered axis IS the spin channel's pole of date through R`, !!pp && pp.poleChord < chordLimit, pp ? `chord ${pp.poleChord.toExponential(2)}` : 'probe returned null');
+    // (the channel interpolates the obliquity in ANGLE and the pole in the
+    // VECTOR between its samples — a few µdeg apart at the landing epoch,
+    // ≤ 3″ at −1 Myr for Mars; the spin-channel gate pins the pair)
+    check(`${planet}: the rendered obliquity to the orbit of date is the channel's`, !!pp && Math.abs(pp.obliquityRenderedDeg - pp.obliquityChannelDeg * PLANT) < 1e-4, pp ? `${pp.obliquityRenderedDeg.toFixed(7)}° vs ${pp.obliquityChannelDeg.toFixed(7)}°` : '');
+    if (pp && pp.ringNormalDot !== null) check(`${planet}: the ring plane is the equator (its normal is the placed axis)`, Math.abs(pp.ringNormalDot - 1) < 1e-9, `|n̂·ŝ| = ${pp.ringNormalDot.toFixed(12)}`);
+  }
+  check('Venus spins about a pole south of its orbit (retrograde, angular-momentum sense)', await sim.page.evaluate(() => { const p = window.__test__.planetPoleProbe('Venus'); return !!p && p.spinRetrograde && p.obliquityChannelDeg > 90; }), '');
   check('Moon nodes: on the ecliptic of date at L′ − F and L′ − F + 180°, at distance a', !!mm && Math.abs(wrapd(mm.ascNode.lon - mm.nodeLonExpectedDeg)) < 1e-6 && Math.abs(wrapd(mm.descNode.lon - mm.nodeLonExpectedDeg - 180)) < 1e-6 && Math.abs(mm.ascNode.lat) < 1e-6 && Math.abs(mm.descNode.lat) < 1e-6 && Math.abs(mm.ascNode.distAU - mm.aAU) < 1e-9, mm ? `asc λ ${mm.ascNode.lon.toFixed(4)}° β ${mm.ascNode.lat.toExponential(1)}°, desc λ ${mm.descNode.lon.toFixed(4)}°, Ω = L′ − F = ${mm.nodeLonExpectedDeg.toFixed(4)}°` : '');
   // A chip click must WAKE the paused loop (owner: "Perihelion at Earth" appeared
   // only on a camera move or Play once the paused loop truly idled — the monitor

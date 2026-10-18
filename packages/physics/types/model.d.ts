@@ -261,6 +261,8 @@ export function assembleModel(C: Readonly<Record<string, any>>, F: Readonly<Reco
                 meanDeg: number;
                 maxDeg: number;
             } | null;
+            spinAxisEclipticJ2000AtYear: (year: number) => number[] | null;
+            orbitNormalEclipticJ2000AtYear: (year: number) => number[];
             stepYr: number;
             maxSpanYr: 10000000;
         }>;

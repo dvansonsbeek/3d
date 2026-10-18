@@ -35,7 +35,7 @@
  * carry it so a counterfactual is reproducible (§2d).
  * @type {string}
  */
-export const CONSTANTS_HASH = "2e57139cdae5fa03";
+export const CONSTANTS_HASH = "a338015a559c8155";
 
 /** Model version label — single source: public/input/model-version.json (§10 two-axis scheme). */
 export const MODEL_VERSION = "v24.0";
@@ -45,7 +45,7 @@ export const PREPRINT_DOI = "10.21203/rs.3.rs-8758810/v4";
 
 /** @type {Readonly<Record<string, unknown>>} */
 export const DEFAULT_CONSTANTS = Object.freeze({
-  hash: "2e57139cdae5fa03",
+  hash: "a338015a559c8155",
   additionalBodiesReference: {
     "pluto": {
       "solarYearInput": 90465,
@@ -192,10 +192,7 @@ export const DEFAULT_CONSTANTS = Object.freeze({
     "dJ2DtPerYr": -2.7e-11,
     "j2ToAlphaFactor": 2
   },
-  moon: {
-    "moonStartposApsidal": 347.5476,
-    "moonStartposNodal": 64.0435
-  },
+  moon: {},
   moonMeeus: {
     "elpW1T2Decomposition_arcsecPerCy2": {
       "planetary": 5.8665,
@@ -227,15 +224,6 @@ export const DEFAULT_CONSTANTS = Object.freeze({
     "moonOrbitalEccentricityBase": 0.054900489,
     "moonObliquityEclipticJ2000": 1.5424,
     "moonTilt": 6.687
-  },
-  perihelionPassageRef: {
-    "mercury": 2460335.9,
-    "venus": 2455464.42,
-    "mars": 2456499.441,
-    "jupiter": 2464224.5,
-    "saturn": 2452875.9,
-    "uranus": 2439699.8,
-    "neptune": 2409432.4
   },
   physicalConstants: {
     "currentAUDistance": 149597870.698828,
@@ -594,39 +582,25 @@ export const DEFAULT_CONSTANTS = Object.freeze({
   },
   planets: {
     "mercury": {
-      "name": "Mercury",
-      "startpos": 83.64651142941864,
-      "type": "I"
+      "name": "Mercury"
     },
     "venus": {
-      "name": "Venus",
-      "startpos": 249.28769121856186,
-      "type": "I"
+      "name": "Venus"
     },
     "mars": {
-      "name": "Mars",
-      "startpos": 121.4634461571797,
-      "type": "II"
+      "name": "Mars"
     },
     "jupiter": {
-      "name": "Jupiter",
-      "startpos": 13.887946755371052,
-      "type": "III"
+      "name": "Jupiter"
     },
     "saturn": {
-      "name": "Saturn",
-      "startpos": 11.279308392461772,
-      "type": "III"
+      "name": "Saturn"
     },
     "uranus": {
-      "name": "Uranus",
-      "startpos": 44.900388945775106,
-      "type": "III"
+      "name": "Uranus"
     },
     "neptune": {
-      "name": "Neptune",
-      "startpos": 47.9552024382285,
-      "type": "III"
+      "name": "Neptune"
     }
   },
   timeReference: {

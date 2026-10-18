@@ -1,6 +1,5 @@
 export type PlanetGeometryBody = {
     key: string;
-    type?: string;
     periodDays: number;
     semiMajorAxisAu?: number;
     orbitalEccentricityBase?: number;
@@ -12,7 +11,6 @@ export type PlanetGeometryBody = {
 /**
  * @typedef {{
  *   key: string,
- *   type?: string,
  *   periodDays: number,
  *   semiMajorAxisAu?: number,
  *   orbitalEccentricityBase?: number,
@@ -40,6 +38,7 @@ export type PlanetGeometryBody = {
  *   elipticOrbit: (number | undefined), perihelionDistance: (number | undefined),
  *   speedKmh: number, rotationPeriodHours: (number | undefined),
  *   eccentricityPerihelion: (number | undefined), lowestPoint: (number | undefined),
+ *   ellipseFamily: (string | undefined),
  * }}
  */
 export function derivePlanetGeometry(body: PlanetGeometryBody, env: {
@@ -58,6 +57,7 @@ export function derivePlanetGeometry(body: PlanetGeometryBody, env: {
     rotationPeriodHours: (number | undefined);
     eccentricityPerihelion: (number | undefined);
     lowestPoint: (number | undefined);
+    ellipseFamily: (string | undefined);
 };
 /**
  * The scaffold's orbit inputs for one body — ONE home for the rule (plan 09
@@ -74,3 +74,10 @@ export function scaffoldOrbitInputs(key: string, chainArtifact: any, fallbackPer
     periodDays: number;
     semiMajorAxisAu: (number | undefined);
 };
+/**
+ * Each body's scaffold ellipse family (the survey's measured taxonomy above).
+ * Pluto, Halley and Ceres take their body-name branches; a key absent here
+ * has no ellipse family (geometry-only).
+ * @type {Readonly<Record<string, string>>}
+ */
+export const SCAFFOLD_ELLIPSE_FAMILY: Readonly<Record<string, string>>;

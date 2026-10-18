@@ -311,21 +311,15 @@ Input constants used in the formulas above:
 | EoC Eccentricity | `eocEccentricity` | e(J2000) / 2 | ~<!--v:eocEccentricityValue-->0.00836<!--/v--> — the Sun node's rest-pose EoC half; the scene's per-frame value is the series' e(t)/2 |
 | Perihelion Phase Offset | (`perihelionPhaseOffset` — DELETED, plan 11 step 2) | was ~0.483 deg | the scene Sun's EoC phase at the model start, built from the deleted wheel 16 and `correctionSun`; the engine places the Sun at the certified longitude every frame |
 
-## Ascending Node Frame Corrections
+## Ascending Node Frame Corrections (DELETED, plan 11 step 3)
 
-When orbital plane tilt is moved from `RealPerihelionAtSun.containerObj` (above annual rotation) to `planet.containerObj` (below), the ascending node direction changes reference frame. These corrections compensate for that shift. **Derived, not tuned.**
-
-| Planet | `ascNodeTiltCorrection` | Formula |
-|--------|------------------------|---------|
-| Mercury | ~131.67 | 180 - ascendingNode |
-| Venus | ~103.32 | 180 - ascendingNode |
-| Mars | ~130.44 | 180 - ascendingNode |
-| Jupiter | ~27.70 | 2 × startpos |
-| Saturn | ~22.64 | 2 × startpos |
-| Uranus | ~89.76 | 2 × startpos |
-| Neptune | ~95.92 | 2 × startpos |
-
-Type I/II (inner): `180 - ascendingNode` (anti-node direction). Type III (outer): `2 × startpos` (compensates orbital phase in tilt frame).
+The per-planet `ascNodeTiltCorrection` (180 − Ω for the inner planets, 2 × the
+scaffold start angle for the outer ones) compensated the legacy position path
+for moving the orbit tilt from the `RealPerihelionAtSun` wheel to the planet's
+own container. It is deleted with the start angles: the engine-D chain places
+every rendered planet quantity, each planet's rotation axis is placed from the
+spin channel's pole of date (`_kcPlacePlanetPole`), and the planet containers
+take the plain node tilt.
 
 ## Mass Computation & Universal Constants
 
@@ -844,24 +838,21 @@ Saturn 0.54, Uranus 0.53, Neptune 0.585 — stand in git history.
 
 ## Planet Start Positions (legacy scaffolding since the K5 excision)
 
-These are the retired pipeline Step 2's fitted scene start angles. Since the
-K5 legacy-chain excision they position only the geometric scaffolding; the
-rendered planets and every displayed element come from the engine-D chain. One
-reach remains (plan 11 step 0b): each planet's pole azimuth and Saturn's ring
-plane ride the scaffold angle — plan 11 step 3 places the poles from the spin
-channel and deletes the angles. The paired `angleCorrection` (the perihelion
-marker's fitted RA→λ conversion) was deleted at plan 11 step 2: the chain
-placement overwrote the marker every frame.
-
-| Planet | `startpos` (deg) |
-|--------|------------------|
-| Mercury | <!--v:mercuryStartPosDeg-->83.65<!--/v--> |
-| Venus | <!--v:venusStartPosDeg-->249.29<!--/v--> |
-| Mars | <!--v:marsStartPosDeg-->121.46<!--/v--> |
-| Jupiter | <!--v:jupiterStartPosDeg-->13.89<!--/v--> |
-| Saturn | <!--v:saturnStartPosDeg-->11.28<!--/v--> |
-| Uranus | <!--v:uranusStartPosDeg-->44.90<!--/v--> |
-| Neptune | <!--v:neptuneStartPosDeg-->47.96<!--/v--> |
+DELETED (plan 11 step 3). These were the retired pipeline Step 2's fitted
+scene start angles (Mercury 83.65°, Venus 249.29°, Mars 121.46°, Jupiter
+13.89°, Saturn 11.28°, Uranus 44.90°, Neptune 47.96° — git history carries
+the doubles). Since the K5 legacy-chain excision they positioned only the
+geometric scaffolding; their one remaining reach (plan 11 step 0b) was each
+planet's pole azimuth and Saturn's ring plane, which turned once per orbit
+with the wheel. Each planet's rotation axis is now placed in world from the
+spin channel's pole of date through the frame bridge, as Earth's axis is
+(`_kcPlacePlanetPole`; the Node twin mirrors it), and the scaffold wheels rest
+at zero. The planets' `type` (the wheel ellipse family) and the
+`perihelionPassageRef` JDs (the planet equation-of-centre branch) left with
+them; the family is a code taxonomy in `@essrt/physics` planets/geometry. The
+paired `angleCorrection` (the perihelion marker's fitted RA→λ conversion) was
+deleted at plan 11 step 2: the chain placement overwrote the marker every
+frame.
 
 ## Ascending Nodes on the Invariable Plane at J2000
 
@@ -897,12 +888,12 @@ The verified and chain nodes are different constructions and differ by up to a f
 | Uranus | 2439699.8 | Phase-optimized (+5 deg from 1966-May-20) |
 | Neptune | 2409432.4 | Phase-optimized (+17 deg from 1876-Aug-27) |
 
-## Moon Start Positions (Tuned)
+## Moon Start Positions (DELETED)
 
 | Constant | Variable | Value | Description |
 |----------|----------|-------|-------------|
-| Apsidal Start | `moonStartposApsidal` | <!--v:moonStartposApsidalDeg-->347.5476<!--/v--> deg | Apsidal precession start |
-| Nodal Start | `moonStartposNodal` | <!--v:moonStartposNodalDeg-->64.0435<!--/v--> deg | Nodal precession start |
+| Apsidal Start | (`moonStartposApsidal` — DELETED, plan 11 step 3) | was 347.5476 deg | the orbit RING's fitted J2000 perigee phase; the apsidal layer is engine-placed every frame at ϖ − 90° from the lunar arguments (ϖ = L′ − M′) |
+| Nodal Start | (`moonStartposNodal` — DELETED, plan 11 step 3) | was 64.0435 deg | the orbit RING's fitted J2000 node phase; the nodal layer is engine-placed every frame at Ω − 180° (Ω = L′ − F) — ring ≡ markers ≡ the placed Moon ([doc 66 §4](66-moon-meeus-corrections.md)) |
 | Moon Start | (`moonStartposMoon` — DELETED, plan 11 step 2) | was 67.8443 deg | the scene Moon's start angle; the certified series override places the rendered Moon's direction and distance every frame, so it reached only the Node twin's geometric pivot |
 
 ## Planet perihelion parameters (the retired predictive formula)

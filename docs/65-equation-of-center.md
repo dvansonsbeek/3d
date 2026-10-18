@@ -256,7 +256,9 @@ perihelion of date is the N-body series', placed by the engine).
 `correctionSun` served as the Sun's `startPos` and the planet
 `PerihelionFromEarth` nodes' `startPos`; the planets' `startpos` values were
 calibrated against it. Deleted at plan 11 step 2 — every surface it reached
-is engine-placed.
+is engine-placed. The planets' `startpos` values, the `perihelionPassageRef`
+JDs and the planets' equation-of-centre branch they phased followed at plan
+11 step 3 (the chain had overridden the wheels' Kepler motion since K5).
 
 ---
 

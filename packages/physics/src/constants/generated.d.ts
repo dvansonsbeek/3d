@@ -2,14 +2,14 @@
 // Gives the TypeScript website full type safety at the boundary (§2g) while
 // packages/physics stays JavaScript.
 
-export declare const CONSTANTS_HASH: "2e57139cdae5fa03";
+export declare const CONSTANTS_HASH: "a338015a559c8155";
 
 export declare const MODEL_VERSION: string;
 
 export declare const PREPRINT_DOI: string;
 
 export declare const DEFAULT_CONSTANTS: {
-  readonly hash: "2e57139cdae5fa03";
+  readonly hash: "a338015a559c8155";
   readonly additionalBodiesReference: {
     "pluto": {
       "solarYearInput": number;
@@ -145,8 +145,7 @@ export declare const DEFAULT_CONSTANTS: {
     "j2ToAlphaFactor": number;
   };
   readonly moon: {
-    "moonStartposApsidal": number;
-    "moonStartposNodal": number;
+
   };
   readonly moonMeeus: {
     "elpW1T2Decomposition_arcsecPerCy2": {
@@ -179,15 +178,6 @@ export declare const DEFAULT_CONSTANTS: {
     "moonOrbitalEccentricityBase": number;
     "moonObliquityEclipticJ2000": number;
     "moonTilt": number;
-  };
-  readonly perihelionPassageRef: {
-    "mercury": number;
-    "venus": number;
-    "mars": number;
-    "jupiter": number;
-    "saturn": number;
-    "uranus": number;
-    "neptune": number;
   };
   readonly physicalConstants: {
     "currentAUDistance": number;
@@ -444,38 +434,24 @@ export declare const DEFAULT_CONSTANTS: {
   readonly planets: {
     "mercury": {
       "name": string;
-      "startpos": number;
-      "type": string;
     };
     "venus": {
       "name": string;
-      "startpos": number;
-      "type": string;
     };
     "mars": {
       "name": string;
-      "startpos": number;
-      "type": string;
     };
     "jupiter": {
       "name": string;
-      "startpos": number;
-      "type": string;
     };
     "saturn": {
       "name": string;
-      "startpos": number;
-      "type": string;
     };
     "uranus": {
       "name": string;
-      "startpos": number;
-      "type": string;
     };
     "neptune": {
       "name": string;
-      "startpos": number;
-      "type": string;
     };
   };
   readonly timeReference: {

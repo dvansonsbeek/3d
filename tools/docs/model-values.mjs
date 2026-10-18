@@ -2355,17 +2355,15 @@ export const VALUES = {
       out[`${b}AscNodeEclJ2000`] = { get: () => el.ascendingNode, render: (v) => String(v), unit: 'deg', note: 'JPL catalog input' };
       out[`${b}InvPlaneInclJ2000`] = { get: () => el.invPlaneInclinationJ2000, render: (v) => String(v), unit: 'deg', note: 'S&S 2012' };
     }
-    for (const p of ['mercury', 'venus', 'mars', 'jupiter', 'saturn', 'uranus', 'neptune']) {
-      const pl = model.planets[p];
-      out[`${p}StartPosDeg`] = { get: () => pl.startpos, render: (v) => v.toFixed(2), unit: 'deg', note: 'the scene scaffold\'s start angle (the retired optimizer step 2; plan 11 step 3 retires it)' };
-      // (plan 11 step 2: `<p>AngleCorrectionDeg` and `<p>EocFraction` — scaffold
-      // constants with no reader left — left the inputs and the registry.)
-    }
-    out.moonStartposApsidalDeg = { get: () => model.moon.moonStartposApsidal, render: (v) => String(v), unit: 'deg', note: 'J2000-element anchored (docs/66 §4)' };
-    out.moonStartposNodalDeg = { get: () => model.moon.moonStartposNodal, render: (v) => String(v), unit: 'deg', note: 'J2000-element anchored (docs/66 §4)' };
+    // (plan 11 step 2: `<p>AngleCorrectionDeg` and `<p>EocFraction` — scaffold
+    // constants with no reader left — left the inputs and the registry; plan 11
+    // step 3: `<p>StartPosDeg` — the scaffold's fitted start angle — left too,
+    // the planets' poles are placed from the spin channel.)
     // (plan 11 step 2: moonStartposMoonDeg, correctionSunDeg and periPhaseOffsetDeg
     // left with their constants — the Moon's start angle, the Sun's start angle
-    // and the EoC phase offset reached nothing the engine does not overwrite.)
+    // and the EoC phase offset reached nothing the engine does not overwrite;
+    // plan 11 step 3: moonStartposApsidalDeg / moonStartposNodalDeg left too —
+    // the ring layers are engine-placed from the lunar arguments.)
     out.eocEccentricityValue = { get: () => C.eocEccentricity, render: (v) => v.toFixed(5), note: 'derived: e(J2000)/2 — the Sun node\'s EoC half under the one eccentricity law' };
     out.perihelionPassageJD = { get: () => astro.earthOrbital.perihelionPassageJ2000_JD, render: (v) => String(v), unit: 'JD', note: 'USNO (2000 Jan 3)' };
     out.juneSolstice2000JD = { get: () => astro.earthOrbital.juneSolstice2000_JD, render: (v) => String(v), unit: 'JD', note: 'USNO (June 21, 2000)' };

@@ -24,58 +24,21 @@
     "_kDeviceWheelPhaseNote": "Plan 07 R10: the scene scaffolding's K-device wheel phase at J2000 — each wheel of index N (see kDeviceWheelPeriodYears) stands N × this turns on at J2000. Numerically the retired phase origin's (2000 − t₀)/H; kept as the device's RECORDED J2000 pose like earthtiltMean (the wheel geometry _kcFrameR bridges once), not a law. No observable rides it — the engine places the Earth frame, the Sun and the Moon stack over it — but the scene's world frame and every world-axis reader (the NASA-convention umbra diagnostic's aberration about world Y) do; measured: dropping it tilted the K pose 1.25° and moved that diagnostic 0.45″."
   },
   "moon": {
-    "moonStartposApsidal": 347.5476,
-    "moonStartposNodal": 64.0435,
-    "_step2Note": "Plan 11 step 2: moonStartposMoon (the scene Moon's start angle — the certified series override sets the rendered Moon's direction AND distance every frame, so its only reach was the Node twin's geometric pivot) and moonMeeusLpCorrection (retired to 0 at plan 06 R3 item 1; the parameter left the lunar series) are deleted. The two phases above are the visible orbit RING's J2000 ϖ_Moon/Ω_Moon — step 3 replaces them by the lunar arguments the integrator already drives."
+    "_step2Note": "Plan 11 step 2: moonStartposMoon (the scene Moon's start angle — the certified series override sets the rendered Moon's direction AND distance every frame, so its only reach was the Node twin's geometric pivot) and moonMeeusLpCorrection (retired to 0 at plan 06 R3 item 1; the parameter left the lunar series) are deleted.",
+    "_step3Note": "Plan 11 step 3: moonStartposApsidal (347.5476°) and moonStartposNodal (64.0435°) — the visible orbit RING's fitted J2000 phases (they reproduced the Meeus ϖ_Moon/Ω_Moon at the model start to 0.006°, measured on the Node twin) — are deleted. The ring's five stack layers are ENGINE-PLACED every frame from the lunar arguments (ϖ = L′ − M′, Ω = L′ − F at the scene's TT), the same arguments that place the rendered Moon and the Apsidal/Nodal markers, in both twins. The literals gate fails if either key returns."
   },
   "planets": {
-    "_step2Note": "Plan 11 step 2: eocFraction (its only reader was an underscore field nothing set), angleCorrection (the perihelion marker's direction — overwritten by the chain placement every frame), mirrorPair (zero readers) and ascendingNodeInvPlane (the closed-form verified J2000 node — a reference derivation, moved verbatim to astro-reference planetOrbitalElements.<p>.ascendingNodeInvPlaneClosedForm) left each planet. startpos and type remain until step 3 (the pole azimuth and Saturn's ring plane ride startpos; type sets the chain-placed perihelion marker's display radius).",
-    "mercury": {
-      "name": "Mercury",
-      "startpos": 83.64651142941864,
-      "type": "I"
-    },
-    "venus": {
-      "name": "Venus",
-      "startpos": 249.28769121856186,
-      "type": "I"
-    },
-    "mars": {
-      "name": "Mars",
-      "startpos": 121.4634461571797,
-      "type": "II"
-    },
-    "jupiter": {
-      "name": "Jupiter",
-      "startpos": 13.887946755371052,
-      "type": "III"
-    },
-    "saturn": {
-      "name": "Saturn",
-      "startpos": 11.279308392461772,
-      "type": "III"
-    },
-    "uranus": {
-      "name": "Uranus",
-      "startpos": 44.900388945775106,
-      "type": "III"
-    },
-    "neptune": {
-      "name": "Neptune",
-      "startpos": 47.9552024382285,
-      "type": "III"
-    }
+    "_step2Note": "Plan 11 step 2: eocFraction (its only reader was an underscore field nothing set), angleCorrection (the perihelion marker's direction — overwritten by the chain placement every frame), mirrorPair (zero readers) and ascendingNodeInvPlane (the closed-form verified J2000 node — a reference derivation, moved verbatim to astro-reference planetOrbitalElements.<p>.ascendingNodeInvPlaneClosedForm) left each planet.",
+    "_step3Note": "Plan 11 step 3: startpos (the scaffold's fitted start angle — its last display reach was each planet's pole azimuth and Saturn's ring plane, which turned once per orbit with the wheel; the poles are now placed from the spin channel's pole of date through the frame bridge, as Earth's axis is) and type (the scaffold wheels' ellipse family — a code taxonomy now, @essrt/physics planets/geometry SCAFFOLD_ELLIPSE_FAMILY; the perihelion-at-Earth marker's radius is the chain's a·e of date) left each planet. The literals gate fails if either returns. `name` is presentation.",
+    "mercury": { "name": "Mercury" },
+    "venus": { "name": "Venus" },
+    "mars": { "name": "Mars" },
+    "jupiter": { "name": "Jupiter" },
+    "saturn": { "name": "Saturn" },
+    "uranus": { "name": "Uranus" },
+    "neptune": { "name": "Neptune" }
   },
   "_additionalBodiesNote": "Plan 11 step 2: the additionalBodies block (Pluto, Halley, Eros, Ceres — scaffold angles, device inclination means/amplitudes, a stored eccentricity base and Ceres' distance override) is deleted. The four bodies are not rendered (the first three left the scene at f735c2d8; Ceres never had an object); their one live reader, the browser's angular-momentum invariable-plane check, reads the observed J2000 elements from astro-reference additionalBodiesReference (bit-identical values), and Ceres' semi-major axis is the geometry law's own Kepler value from the period. Pluto's closed-form node is astro-reference additionalBodiesReference.pluto.ascendingNodeInvPlaneClosedForm.",
-  "perihelionPassageRef": {
-    "_description": "Planet perihelion passage reference JDs — phase-optimized for EoC alignment",
-    "mercury": 2460335.9,
-    "venus": 2455464.42,
-    "mars": 2456499.441,
-    "jupiter": 2464224.5,
-    "saturn": 2452875.9,
-    "uranus": 2439699.8,
-    "neptune": 2409432.4
-  },
+  "_perihelionPassageRefNote": "Plan 11 step 3: the perihelionPassageRef block (seven phase-optimized perihelion passage JDs) is deleted with the planets' equation-of-centre branch it phased — the scaffold wheels it set are overridden by the engine-D chain for every rendered planet quantity (mesh, ring, trace, markers), so it reached nothing on screen. The literals gate fails if the block returns.",
   "_deepTimeNote": "Plan 11 step 1: the deepTime block left this file. Its fitted values (α₃, α₄, τ_GIA, the recession regime) are the banked record data/deep-time-fitted.json; α₁ is the LLR-anchored input astro-reference moonReference.moonRecessionAlpha1PerMa; the two GIA rates are DERIVED from astro-reference giaCoxChaoPeltier; the ΔT stack's taper rides its own fit artifact (data/deltaT-4flag-fit.json shipped_taper). tools/constants/generate.mjs assembles DEFAULT_CONSTANTS.deepTime from those homes; the literals gate fails if the block returns here."
 }

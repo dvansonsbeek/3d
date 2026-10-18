@@ -46,8 +46,9 @@ const ASTRO_REFERENCE = {
   ...astroRef.moonMeeus,
   // Cardinal point anchors
   cardinalPointAnchors: astroRef.cardinalPointAnchors,
-  // Additional fields attached below after planets are defined:
-  //   ascNodeTiltCorrection, earthInvPlanePrecessionYears, <planet>PerihelionRef_JD
+  // (plan 11 step 3: the fields once attached below after the planets were
+  // defined — ascNodeTiltCorrection and <planet>PerihelionRef_JD — are
+  // deleted with the scaffold's start angles and the planet EoC branch.)
 };
 
 const yearLengthRef = astroRef.yearLengthRef;
@@ -138,7 +139,7 @@ const perihelionRefJD = ASTRO_REFERENCE.perihelionPassageJ2000_JD;
 
 
 // ═══════════════════════════════════════════════════════════════════════════
-// 4. MOON INPUT CONSTANTS (astro refs + model startpos)
+// 4. MOON INPUT CONSTANTS (astro refs)
 // ═══════════════════════════════════════════════════════════════════════════
 
 const moonSiderealMonthInput = astroRef.moonReference.moonSiderealMonthInput;
@@ -153,9 +154,10 @@ const moonTilt = astroRef.moonReference.moonTilt;
 // left the lunar series' parameters; moonStartposMoon — the scene Moon's start
 // angle — is deleted: the certified override sets the rendered Moon's direction
 // and distance every frame, so the angle reached only the Node twin's
-// geometric pivot. The two ring phases below stay until step 3.)
-const moonStartposApsidal = modelParams.moon.moonStartposApsidal;
-const moonStartposNodal = modelParams.moon.moonStartposNodal;
+// geometric pivot. Plan 11 step 3: the ring's two fitted phases
+// moonStartposApsidal/Nodal are deleted too — scene-graph.js
+// _applyEngineEarthFrame places the ring's stack layers from the lunar
+// arguments every call.)
 
 
 // ═══════════════════════════════════════════════════════════════════════════
@@ -185,10 +187,10 @@ for (const [key, mp] of Object.entries(modelParams.planets)) {
     // were derived here from the balanced-year phase + K; the law is retired
     // and the chain carries the eccentricity of date. Plan 11 step 2:
     // eocFraction, angleCorrection and mirrorPair are deleted — no reader
-    // left, or overwritten by the chain placement every frame.)
-    startpos: mp.startpos,
+    // left, or overwritten by the chain placement every frame. Plan 11
+    // step 3: startpos — the scaffold's start angle — and type — the wheel
+    // ellipse family, now the geometry law's own taxonomy — left the record.)
     perihelionEclipticYears: 1296000 / CHAIN_DATA.g[key].arcsecPerYr,   // the chain's inertial apsidal period (R1)
-    type: mp.type,
     // the closed-form verified J2000 node on the invariable plane — a
     // reference derivation, astro-reference since plan 11 step 2 (the key name
     // stays for the Python bridge's OMEGA_J2000 and the registry)
@@ -409,21 +411,13 @@ const moonDraconicYearEarth = 1 / (1 / moonDraconicYearICRF - 1 / axialPrecessio
 // (The Moon post-Meeus RA/Dec patches MOON_CORRECTION / MOON_CORRECTION_RESIDUAL
 // were retired at plan 06 R3 item 1 — @essrt/physics moon/apparent.cjs.)
 
-// Planet perihelion passage references (model-tuned, from model-parameters.json)
-for (const [key, jd] of Object.entries(modelParams.perihelionPassageRef)) {
-  if (typeof jd === 'number') ASTRO_REFERENCE[key + 'PerihelionRef_JD'] = jd;
-}
-
-// Ascending node corrections (derived from planet data)
-ASTRO_REFERENCE.ascNodeTiltCorrection = {
-  mercury: 180 - planets.mercury.ascendingNode,
-  venus:   180 - planets.venus.ascendingNode,
-  mars:    180 - planets.mars.ascendingNode,
-  jupiter: 2 * planets.jupiter.startpos,
-  saturn:  2 * planets.saturn.startpos,
-  uranus:  2 * planets.uranus.startpos,
-  neptune: 2 * planets.neptune.startpos,
-};
+// (Plan 11 step 3: the planets' perihelion passage references
+// (<planet>PerihelionRef_JD, from the deleted model-parameters
+// perihelionPassageRef block) and the ascending-node tilt corrections
+// (180 − Ω for the inner planets, 2 × the scaffold start angle for the outer
+// ones — the legacy position path's frame compensation) stood here. Both are
+// deleted with the start angles: the chain places every rendered planet
+// quantity, and the planet containers take the plain node tilt.)
 
 
 // ═══════════════════════════════════════════════════════════════════════════
@@ -539,7 +533,7 @@ const _CHAIN_ARTIFACT = require('../../data/nbody-secular-frequencies.json');
 function computePlanetDerived(key) {
   const p = planets[key];
   const g = derivePlanetGeometry({
-    key, type: p.type,
+    key,   // the ellipse family is the law's own taxonomy (plan 11 step 3)
     ...scaffoldOrbitInputs(key, _CHAIN_ARTIFACT, p.solarYearInput),
     // Plan 07 R6: the scene's ellipse geometry read the K law's System-Reset
     // base; with the law retired it reads the OBSERVED J2000 eccentricity,
@@ -556,6 +550,7 @@ function computePlanetDerived(key) {
     elipticOrbit: g.elipticOrbit,
     realOrbitalEccentricity: g.realOrbitalEccentricity,
     speed_kmh: g.speedKmh,
+    ellipseFamily: g.ellipseFamily,   // the scaffold wheel family (scene-graph.js RealPerihelionAtSun speed/phase branch)
   };
 }
 
@@ -672,8 +667,6 @@ module.exports = {
   moonOrbitalEccentricity,
   moonObliquityEclipticJ2000,
   moonTilt,
-  moonStartposApsidal,
-  moonStartposNodal,
 
   // Planet data
   planets,

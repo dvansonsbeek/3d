@@ -53,7 +53,7 @@ const env = {
 // output from leaking in as an input.
 /** @param {*} b @returns {import('../src/planets/model.cjs').PlanetModelBody} */
 const pickInputs = (b) => ({
-  type: b.type,
+  // (plan 11 step 3: the ellipse family is geometry.cjs's own taxonomy, not an input)
   solarYearInput: b.solarYearInput,
   invPlaneInclinationJ2000: b.invPlaneInclinationJ2000,
   longitudePerihelion: b.longitudePerihelion,

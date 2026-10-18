@@ -486,6 +486,7 @@ function computeSolsticeYearLength(year, type) { return _cardinalPkg().cardinal.
 module.exports = {
   // Obliquity
   computePlanetObliquity,
+  planetSpinChannel: _planetSpin,   // plan 11 step 3: the scene twin places each planet's pole from the channel's ŝ(t)
 
   // Eccentricity (plan 09 step 6: the two law evaluators are deleted)
   computeSemiMajorAxis,

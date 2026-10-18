@@ -209,7 +209,9 @@ const _mcNodalOfDate   = (a, b) => {
 // apsidal-meets-nodal pair: the two members carry equal-and-opposite signs
 // with nothing between them, so ANY common integrator cancels exactly (the
 // browser uses meanApsidalMeetsNodalAtAge; net-neutral here by construction)
-const _mcApsidalMeetsNodal = _mcApsidalOfDate;
+// (plan 11 step 3: the apsidal-meets-nodal pair layers are engine-placed at
+// zero — their integrator alias is gone; _mcApsidalOfDate / _mcNodalOfDate
+// stay for the lunar chain's cycle counters above.)
 
 // The Moon's scene RA/Dec: ecliptic → equatorial only (plan 06 R3 item 1 —
 // the "D5 derived optics" aberration layer and the fitted RA/Dec patches
@@ -719,8 +721,10 @@ const sDay = sDay_J2000;
 /** The K-device wheels' recorded periods by wheel index (plan 09 step 7c). @param {number} n */
 const wheelYr = (n) => C.kDeviceWheelPeriodYears[n];
 
-// Ascending node frame corrections from ASTRO_REFERENCE (see constants.js)
-const ascNodeToolCorrection = C.ASTRO_REFERENCE.ascNodeTiltCorrection;
+// (Plan 11 step 3: the ascending-node tilt corrections — 180 − Ω inner,
+// 2 × the scaffold start angle outer, the legacy position path's frame
+// compensation — are deleted with the start angles; the planet containers
+// take the plain node tilt, mirror src/script.js.)
 
 // Per-planet variables computed from constants (replicating script.js lines 1687-1770)
 function getPlanetSceneData(key) {
@@ -742,24 +746,24 @@ function getPlanetSceneData(key) {
   const periFromEarthA = Math.cos((longPeri + 90) * d2r) * periDist;
   const periFromEarthB = Math.cos((90 - (longPeri - 90)) * d2r) * periDist;
 
-  // Ascending node corrected for planet-level tilt placement
-  const correctedAscNode = p.ascendingNode + (ascNodeToolCorrection[key] || 0);
+  // Planet-container tilts (ecliptic inclination decomposed via the ascending
+  // node; plan 11 step 3: the start-angle frame correction is gone)
+  const realPeriTiltA = Math.cos((-90 - p.ascendingNode) * d2r) * -p.eclipticInclinationJ2000;
+  const realPeriTiltB = Math.sin((-90 - p.ascendingNode) * d2r) * -p.eclipticInclinationJ2000;
 
-  // RealPerihelion tilts (ecliptic inclination decomposed via corrected ascending node)
-  const realPeriTiltA = Math.cos((-90 - correctedAscNode) * d2r) * -p.eclipticInclinationJ2000;
-  const realPeriTiltB = Math.sin((-90 - correctedAscNode) * d2r) * -p.eclipticInclinationJ2000;
-
-  // Speed for RealPerihelionAtSun — differs by type
+  // Speed for RealPerihelionAtSun — differs by the wheel's ellipse family
+  // (geometry.cjs SCAFFOLD_ELLIPSE_FAMILY; plan 11 step 3: the outer families'
+  // phase 2 × startpos rests at zero — the wheel is overridden by the chain)
   let realPeriSpeed, realPeriStartPos;
-  if (p.type === 'I') {
+  if (d.ellipseFamily === 'I') {
     realPeriSpeed = -Math.PI * 2;
     realPeriStartPos = lowestPoint;
-  } else if (p.type === 'II') {
+  } else if (d.ellipseFamily === 'II') {
     realPeriSpeed = -Math.PI * 2 + (2 * Math.PI * 2 / d.period);   // plan 09 step 7b: the scaffold period (scene years), no device count
-    realPeriStartPos = p.startpos * 2;
-  } else { // Type III
+    realPeriStartPos = 0;
+  } else { // family III
     realPeriSpeed = -Math.PI * 2;
-    realPeriStartPos = p.startpos * 2;
+    realPeriStartPos = 0;
   }
 
   // Elliptic orbit radius — negated for Saturn, the scene's anti-phase
@@ -910,41 +914,39 @@ function buildSceneGraph() {
   barycenter.pivot.addChild(sunNodes.container);
 
   // ─── MOON CHAIN (under earth.pivot) ────────────────────────────
+  // Plan 11 step 3: the five stack layers are ENGINE-PLACED. Their angles
+  // are set every call by _applyEngineEarthFrame from the lunar arguments
+  // (apsidal θ = ϖ − 90°, canceller −θ, the inert pair 0, nodal θ = Ω − 180°;
+  // ϖ = L′ − M′, Ω = L′ − F at the scene's TT) — the same arguments that
+  // place the rendered Moon. The fitted J2000 phases and the per-layer
+  // deep-time integrator tags they rode are deleted; the defs rest at zero.
   const moonApsidalPrec = makePrecessionNode('moonApsidalPrecession', {
-    orbitRadius: -(C.moonDistance / C.currentAUDistance) * (C.moonOrbitalEccentricity * 100),
+    orbitRadius: -(C.moonDistance / C.currentAUDistance) * (C.moonOrbitalEccentricity * 100),   // the ring's eccentric offset a·e toward the apogee
     orbitCentera: 0, orbitCenterb: 0, orbitCenterc: 0,
     orbitTilta: 0, orbitTiltb: 0, // apsidal precession rotates perigee within the orbital plane — no plane tilt
     tilt: 0,
-    startPos: C.moonStartposApsidal,
-    speed: (Math.PI * 2) / (C.moonApsidalPrecessionDaysICRF / C.meanSolarYearDays),  // of-date perigee advance (pairs with the canceller; sum unchanged)
-    _dtMoonIntegrator: _mcApsidalOfDate, _dtMoonSign: +1,   // Phase 9.13 mirror
+    startPos: 0, speed: 0,   // ENGINE-PLACED (the perigee direction of date)
   });
   earthNodes.pivot.addChild(moonApsidalPrec.container);
 
   const moonApsNodalPrec1 = makePrecessionNode('moonApsidalNodalPrecession1', {
     orbitRadius: 0, orbitCentera: 0, orbitCenterb: 0, orbitCenterc: 0,
     orbitTilta: 0, orbitTiltb: 0, tilt: 0,
-    startPos: C.moonStartposApsidal - C.moonStartposNodal,
-    speed: -(Math.PI * 2) / (C.moonApsidalMeetsNodalDays / C.meanSolarYearDays),
-    _dtMoonIntegrator: _mcApsidalMeetsNodal, _dtMoonSign: -1,   // Phase 9.13 mirror (pair cancels)
+    startPos: 0, speed: 0,   // ENGINE-PLACED (the inert pair rests at zero)
   });
   moonApsidalPrec.pivot.addChild(moonApsNodalPrec1.container);
 
   const moonApsNodalPrec2 = makePrecessionNode('moonApsidalNodalPrecession2', {
     orbitRadius: 0, orbitCentera: 0, orbitCenterb: 0, orbitCenterc: 0,
     orbitTilta: 0, orbitTiltb: 0, tilt: 0,
-    startPos: -(C.moonStartposApsidal - C.moonStartposNodal),
-    speed: (Math.PI * 2) / (C.moonApsidalMeetsNodalDays / C.meanSolarYearDays),
-    _dtMoonIntegrator: _mcApsidalMeetsNodal, _dtMoonSign: +1,   // Phase 9.13 mirror (pair cancels)
+    startPos: 0, speed: 0,   // ENGINE-PLACED (the inert pair rests at zero)
   });
   moonApsNodalPrec1.pivot.addChild(moonApsNodalPrec2.container);
 
   const moonLunarLevel = makePrecessionNode('moonLunarLevelingCycle', {
     orbitRadius: 0, orbitCentera: 0, orbitCenterb: 0, orbitCenterc: 0,
     orbitTilta: 0, orbitTiltb: 0, tilt: 0,
-    startPos: -C.moonStartposApsidal,  // apsidal canceller (phase + rate)
-    speed: -(Math.PI * 2) / (C.moonApsidalPrecessionDaysICRF / C.meanSolarYearDays),  // apsidal canceller (of-date pair)
-    _dtMoonIntegrator: _mcApsidalOfDate, _dtMoonSign: -1,   // Phase 9.13 mirror (canceller)
+    startPos: 0, speed: 0,   // ENGINE-PLACED (the apsidal canceller, −θ_apsidal)
   });
   moonApsNodalPrec2.pivot.addChild(moonLunarLevel.container);
 
@@ -953,9 +955,7 @@ function buildSceneGraph() {
     orbitTilta: 0,  // inclination tilt lives on the moon def (below this layer's spin) so the nodal spin regresses the plane
     orbitTiltb: 0,
     tilt: 0,
-    startPos: C.moonStartposNodal,
-    speed: -(Math.PI * 2) / (C.moonNodalPrecessionDaysICRF / C.meanSolarYearDays),  // of-date regression (6798.3303 d)
-    _dtMoonIntegrator: _mcNodalOfDate, _dtMoonSign: -1,   // Phase 9.13 mirror
+    startPos: 0, speed: 0,   // ENGINE-PLACED (the ascending node of date)
   });
   moonLunarLevel.pivot.addChild(moonNodalPrec.container);
 
@@ -1023,34 +1023,14 @@ function buildSceneGraph() {
       orbitCentera: 0, orbitCenterb: 0, orbitCenterc: 0,
       orbitTilta: pd.realPeriTiltA, orbitTiltb: pd.realPeriTiltB,
       tilt: 0,  // tilt only affects axial spin, not position
-      startPos: pd.p.startpos,
+      startPos: 0,   // plan 11 step 3: the scaffold's fitted start angle is deleted — the chain places the planet, _applyEngineEarthFrame its pole
       speed: pd.planetSpeed,
-      eccentricity: pd.p.orbitalEccentricityJ2000,
+      eccentricity: pd.p.orbitalEccentricityJ2000,   // the OBSERVED J2000 eccentricity, inert (plan 07 R6)
     };
-    // Add equation of center (variable speed) for planets
-    const periRefMap = {
-      mercury: C.ASTRO_REFERENCE.mercuryPerihelionRef_JD,
-      venus: C.ASTRO_REFERENCE.venusPerihelionRef_JD,
-      mars: C.ASTRO_REFERENCE.marsPerihelionRef_JD,
-      jupiter: C.ASTRO_REFERENCE.jupiterPerihelionRef_JD,
-      saturn: C.ASTRO_REFERENCE.saturnPerihelionRef_JD,
-      uranus: C.ASTRO_REFERENCE.uranusPerihelionRef_JD,
-      neptune: C.ASTRO_REFERENCE.neptunePerihelionRef_JD,
-    };
-    if (periRefMap[key]) {
-      const periPrecRate = Math.PI * 2 / pd.perihelionEclipticYears;
-      const pos_peri = (periRefMap[key] - C.startmodelJD) / C.meanSolarYearDays;
-      // Plan 07 R6: the per-planet EoC fraction and the _eccentricityKey that
-      // re-evaluated it each frame are retired with the K law — the chain
-      // places the planets and overwrites the wheel's Kepler motion. This is
-      // the OBSERVED J2000 eccentricity, inert, mirroring src/script.js.
-      planetDef.eccentricity = pd.p.orbitalEccentricityJ2000;
-      // Use absolute planet speed for perihelion phase (script.js uses positive speed)
-      const absPlanetSpeed = Math.PI * 2 / pd.d.period;
-      planetDef.perihelionPhaseJ2000 = -pd.p.startpos * d2r
-        + (absPlanetSpeed - periPrecRate) * pos_peri;
-      planetDef.perihelionPrecessionRate = periPrecRate;
-    }
+    // (Plan 11 step 3: the planets' equation-of-centre branch —
+    // perihelionPhaseJ2000 from the start angle and the perihelionPassageRef
+    // JDs, perihelionPrecessionRate — is deleted with those inputs: the chain
+    // places the planets and overwrote the wheel's Kepler motion since K5.)
     // 8.3-1 S-P2: deep-time orbital integrator tags (mirrors src/script.js
     // Phase P-B1..B7; sign from the def's own speed — Mars is −1 by the
     // scene-graph framing convention, not physics).
@@ -1517,6 +1497,20 @@ function _applyEngineEarthFrame(graph, jdUT) {
   // the stack's longitude zero is the scene convention's quarter turn from ĝ:
   // basis [X = n̂ × ĝ, Y = n̂, Z = ĝ]).
   graph.moonApsidalPrec.container.worldRotOverride = [cross(n, g), n, g];
+  // the Moon RING's stack layers from the lunar arguments (plan 11 step 3;
+  // mirror src/script.js): in the stack's basis a layer angle θ carries the
+  // longitude 90° + θ, the apsidal arm −a·e·X̂ points at the apogee, and the
+  // Moon def's fixed tilt puts the ascending node at longitude 180° under
+  // zero stack rotation (measured on this twin: the fitted J2000 phases read
+  // the Meeus ϖ/Ω to 0.006° through exactly these relations). The clock is
+  // the override's — true TT (bridge + curve), _jdTTToolsFromUT.
+  const margs = _moonArgsAtTools(_jdTTToolsFromUT(jdUT));
+  const thApsidal = (margs.Lp - margs.Mp) * d2r - Math.PI / 2;   // perigee at ϖ = L′ − M′
+  graph.moonApsidalPrec.orbit.ry = thApsidal;
+  graph.moonApsNodalPrec1.orbit.ry = 0;
+  graph.moonApsNodalPrec2.orbit.ry = 0;
+  graph.moonLunarLevel.orbit.ry = -thApsidal;                      // the canceller: the nodal layer's zero is the base's
+  graph.moonNodalPrec.orbit.ry = (margs.Lp - margs.F) * d2r - Math.PI;   // ascending node at Ω = L′ − F
   const peri = (smp.periOfDateDeg + 180) * d2r;
   graph.earthPeriPrec1.orbit.ry = peri;
   graph.earthPeriPrec2.orbit.ry = -peri;
@@ -1526,6 +1520,24 @@ function _applyEngineEarthFrame(graph, jdUT) {
   graph.sunNodes.orbit.ry = _FRAME.solveWheelAngleForLongitude(lam, smp.e, peri);
   // the axis
   graph.earthNodes.rotAxis.worldRotOverride = [cross(s, g), s, g];
+  // the planets' poles (plan 11 step 3; mirror src/script.js _kcPlacePlanetPole):
+  // each chain planet's rotation axis takes [X = ŝ × ĝₚ, Y = ŝ, Z = ĝₚ] with
+  // ŝ(t) the spin channel's pole of date and ĝₚ = unit(ŝ × n̂) the planet's
+  // own equinox on its orbit plane of date, both through the frame bridge —
+  // the construction Earth's axis takes above. The scaffold's start angle
+  // used to turn the pole's azimuth once per orbit (plan 11 step 0b).
+  const engineYear = _osmYearForJD(jdUT);
+  const spinOf = _req('./orbital-engine.js').planetSpinChannel;
+  for (const key of Object.keys(graph.planetNodeMap)) {
+    const ch = spinOf(key);
+    const sE = ch.spinAxisEclipticJ2000AtYear(engineYear);
+    if (!sE) continue;   // beyond the channel's domain the axis keeps its last pose
+    const nE = ch.orbitNormalEclipticJ2000AtYear(engineYear);
+    const sW = toW(sE), gP = cross(sW, toW(nE));
+    const gl = Math.hypot(gP[0], gP[1], gP[2]);
+    const gW = [gP[0] / gl, gP[1] / gl, gP[2] / gl];
+    graph.planetNodeMap[key].planet.rotAxis.worldRotOverride = [cross(sW, gW), sW, gW];
+  }
   graph.root.updateWorldMatrix();
 }
 

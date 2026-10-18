@@ -238,8 +238,11 @@ const whichSolsticeOrEquinox = 1;                         // 0=VE, 1=SS, 2=AE, 3
 // debugOn moved to A5 Research toggles (near top)
 
 // ─── A3. Moon model parameters ───────────────────────────────────────────
-const moonStartposApsidal = K.moon.moonStartposApsidal;   // J2000-element anchored (ϖ = 83.3532° Meeus; ∂ϖ/∂a = −1; re-anchored after the of-date pair switch, micro-recalibrated for the 8H-count layer rates)
-const moonStartposNodal = K.moon.moonStartposNodal;       // J2000-element anchored (Ω = 125.0446° Meeus; ∂Ω/∂n = −1; was the legacy compromise −83.630; micro-recalibrated for the 8H-count layer rates)
+// (plan 11 step 3: moonStartposApsidal / moonStartposNodal — the orbit RING's
+// fitted J2000 phases — are deleted: _applyEngineEarthFrame places the ring's
+// five stack layers from the lunar arguments every frame, ϖ = L′ − M′ and
+// Ω = L′ − F at the scene's TT — the arguments that place the rendered Moon
+// and the Apsidal/Nodal markers, so ring ≡ markers ≡ Moon at every epoch.)
 // (plan 11 step 2: moonStartposMoon — the scene Moon's start angle — is deleted:
 // the certified override sets the rendered Moon's direction AND distance every
 // frame, so the angle reached nothing on screen; the "Unmask the Moon" meter's
@@ -304,8 +307,11 @@ const BOND_TAPER_FULL_HALFWIDTH_YR  = K.deepTime.dtStackTaperFullHalfwidthYr;   
 const BOND_TAPER_TOTAL_HALFWIDTH_YR = K.deepTime.dtStackTaperTotalHalfwidthYr;  // 4-flag ΔT stack taper: zero beyond
 
 // ─── A4. Planet input constants ──────────────────────────────────────────
-// Per-planet J2000 orbital elements, the scaffold's start angle and type
-// (until plan 11 step 3), perihelionRef_JD, and perihelion precession periods.
+// Per-planet J2000 orbital elements and the chain's perihelion precession
+// periods. (plan 11 step 3: the scaffold's start angle `startpos`, its wheel
+// ellipse family `type` — geometry.cjs's own taxonomy now — and the planet
+// EoC branch's perihelionRef_JD left the records; the chain places every
+// rendered planet quantity and _kcPlacePlanetPole each planet's axis.)
 // (plan 11 step 2: angleCorrection, eocFraction and ascendingNodeInvPlane left
 // the records — the first two had no live reader, the node moved to
 // astro-reference as the closed-form verified J2000 node.)
@@ -342,10 +348,8 @@ planets.mercury = {
   ascendingNode: K.planetOrbitalElements.mercury.ascendingNode,
   meanAnomaly: K.planetOrbitalElements.mercury.meanAnomaly,
   trueAnomaly: K.planetOrbitalElements.mercury.trueAnomaly,
-  // Model parameters (model-parameters.json -> planets.mercury)
+  // The chain's inertial apsidal period (plan 07 R1)
   perihelionEclipticYears: 1296000 / CHAIN_ARTIFACT.g.mercury.arcsecPerYr,
-  startpos: K.planets.mercury.startpos,
-  perihelionRef_JD: K.perihelionPassageRef.mercury,
 };
 
 // Venus
@@ -360,10 +364,8 @@ planets.venus = {
   ascendingNode: K.planetOrbitalElements.venus.ascendingNode,
   meanAnomaly: K.planetOrbitalElements.venus.meanAnomaly,
   trueAnomaly: K.planetOrbitalElements.venus.trueAnomaly,
-  // Model parameters (model-parameters.json -> planets.venus)
+  // The chain's inertial apsidal period (plan 07 R1)
   perihelionEclipticYears: 1296000 / CHAIN_ARTIFACT.g.venus.arcsecPerYr,
-  startpos: K.planets.venus.startpos,
-  perihelionRef_JD: K.perihelionPassageRef.venus,
 };
 
 // Mars
@@ -378,10 +380,8 @@ planets.mars = {
   ascendingNode: K.planetOrbitalElements.mars.ascendingNode,
   meanAnomaly: K.planetOrbitalElements.mars.meanAnomaly,
   trueAnomaly: K.planetOrbitalElements.mars.trueAnomaly,
-  // Model parameters (model-parameters.json -> planets.mars)
+  // The chain's inertial apsidal period (plan 07 R1)
   perihelionEclipticYears: 1296000 / CHAIN_ARTIFACT.g.mars.arcsecPerYr,
-  startpos: K.planets.mars.startpos,
-  perihelionRef_JD: K.perihelionPassageRef.mars,
 };
 
 // Jupiter
@@ -396,10 +396,8 @@ planets.jupiter = {
   ascendingNode: K.planetOrbitalElements.jupiter.ascendingNode,
   meanAnomaly: K.planetOrbitalElements.jupiter.meanAnomaly,
   trueAnomaly: K.planetOrbitalElements.jupiter.trueAnomaly,
-  // Model parameters (model-parameters.json -> planets.jupiter)
+  // The chain's inertial apsidal period (plan 07 R1)
   perihelionEclipticYears: 1296000 / CHAIN_ARTIFACT.g.jupiter.arcsecPerYr,
-  startpos: K.planets.jupiter.startpos,
-  perihelionRef_JD: K.perihelionPassageRef.jupiter,
 };
 
 // Saturn
@@ -414,10 +412,8 @@ planets.saturn = {
   ascendingNode: K.planetOrbitalElements.saturn.ascendingNode,
   meanAnomaly: K.planetOrbitalElements.saturn.meanAnomaly,
   trueAnomaly: K.planetOrbitalElements.saturn.trueAnomaly,
-  // Model parameters (model-parameters.json -> planets.saturn)
+  // The chain's inertial apsidal period (plan 07 R1)
   perihelionEclipticYears: 1296000 / CHAIN_ARTIFACT.g.saturn.arcsecPerYr,
-  startpos: K.planets.saturn.startpos,
-  perihelionRef_JD: K.perihelionPassageRef.saturn,
 };
 
 // Uranus
@@ -432,10 +428,8 @@ planets.uranus = {
   ascendingNode: K.planetOrbitalElements.uranus.ascendingNode,
   meanAnomaly: K.planetOrbitalElements.uranus.meanAnomaly,
   trueAnomaly: K.planetOrbitalElements.uranus.trueAnomaly,
-  // Model parameters (model-parameters.json -> planets.uranus)
+  // The chain's inertial apsidal period (plan 07 R1)
   perihelionEclipticYears: 1296000 / CHAIN_ARTIFACT.g.uranus.arcsecPerYr,
-  startpos: K.planets.uranus.startpos,
-  perihelionRef_JD: K.perihelionPassageRef.uranus,
 };
 
 // Neptune
@@ -450,10 +444,8 @@ planets.neptune = {
   ascendingNode: K.planetOrbitalElements.neptune.ascendingNode,
   meanAnomaly: K.planetOrbitalElements.neptune.meanAnomaly,
   trueAnomaly: K.planetOrbitalElements.neptune.trueAnomaly,
-  // Model parameters (model-parameters.json -> planets.neptune)
+  // The chain's inertial apsidal period (plan 07 R1)
   perihelionEclipticYears: 1296000 / CHAIN_ARTIFACT.g.neptune.arcsecPerYr,
-  startpos: K.planets.neptune.startpos,
-  perihelionRef_JD: K.perihelionPassageRef.neptune,
 };
 
 // --- A4b. Minor bodies (Pluto, Halleys, Eros, Ceres) ---
@@ -1012,21 +1004,12 @@ const eocEccentricity = K.earthOrbital.earthEccentricityJ2000 / 2;
 // deleted; _applyEngineEarthFrame sets the Sun's wheel angle from the certified
 // longitude every frame, so the offset reached nothing. Mirror: constants.js.)
 
-// Ascending node frame corrections for planet-level tilt placement (degrees).
-// When orbital plane tilt is moved from RealPerihelionAtSun.containerObj (above
-// annual rotation) to planet.containerObj (below), the ascending node direction
-// changes reference frame. DERIVED — not tuned:
-//   Type I/II (inner): 180 - ascendingNode (anti-node direction)
-//   Type III (outer):  2 × startpos (compensates orbital phase in tilt frame)
-const ascNodeTiltCorrection = {
-  mercury: 180 - planets.mercury.ascendingNode,
-  venus:   180 - planets.venus.ascendingNode,
-  mars:    180 - planets.mars.ascendingNode,
-  jupiter: 2 * planets.jupiter.startpos,
-  saturn:  2 * planets.saturn.startpos,
-  uranus:  2 * planets.uranus.startpos,
-  neptune: 2 * planets.neptune.startpos,
-};
+// (Plan 11 step 3: the ascending-node frame corrections for planet-level tilt
+// placement — 180 − Ω for the inner planets, 2 × the scaffold start angle for
+// the outer ones, the legacy position path's compensation for moving the
+// orbit tilt below the annual rotation — are deleted with the start angles.
+// The chain places every rendered planet quantity and _kcPlacePlanetPole
+// each planet's axis; the planet containers take the plain node tilt.)
 
 // --- 9c. Speeds & distances ---
 const speedofSuninKM = (currentAUDistance*2*Math.PI)/(meansiderealyearlengthinSeconds/60/60);
@@ -1990,11 +1973,12 @@ const _rotationInputDays = {
 const _planetGeom = {};
 // (plan 11 step 2: Ceres joins the loop — its semi-major axis for the
 // angular-momentum plane check is the law's own Kepler value from the period,
-// where a stored override once sat; the minor bodies carry no `type` — their
-// ellipse family is the law's, Eros' type-II default included.)
+// where a stored override once sat. Plan 11 step 3: no body carries a `type`
+// — the ellipse family is the law's own taxonomy, geometry.cjs
+// SCAFFOLD_ELLIPSE_FAMILY.)
 for (const _k of ['mercury', 'venus', 'mars', 'jupiter', 'saturn', 'uranus', 'neptune', 'eros', 'pluto', 'halleys', 'ceres']) {
   _planetGeom[_k] = derivePlanetGeometry({
-    key: _k, type: (K.planets[_k] || {}).type,
+    key: _k,
     // Plan 09 step 7b: the seven chain planets' scaffold rides the chain's own
     // J2000 elements (a from the anchor set, the period from the fitted
     // era-window mean motion); the no-chain bodies keep their observed period
@@ -4877,26 +4861,11 @@ function updateMoonForEpoch() {
   moon.size        = (diameters.moonDiameter / 2 / currentAUDistance) * 100;
 }
 
-/** Phase 6.5 + 9.5b + 9.13: locked J2000 speeds for the 5 Moon precession
- *  nodes. In deep-time mode the scene-graph branches to per-node integrators
- *  (`_dtMoonIntegrator`, see line ~6975 + moveModel branch at ~42995); the
- *  locked speeds remain authoritative for snapshot mode (deep-time OFF) and
- *  are bit-equivalent to the integrator at modern epochs by construction.
- *  Anchors used (framework-native composition):
- *    apsidal           — MOON_APSIDAL_OFDATE_J2000_S     (≈ 8.8475 yr of-date, advance)
- *    apsidal-meets-nodal — meanApsidalMeetsNodalAtAge(0) (≈ 5.997 yr, inert pair)
- *    lunar leveling    — MOON_APSIDAL_OFDATE_J2000_S     (apsidal canceller, −, of-date pair)
- *    nodal             — MOON_NODAL_OFDATE_J2000_S       (6798.33 d of-date, −)
- *  Signs (apsidal +, apsidal-meets-nodal ±, leveling −, nodal −); layer sum
- *  = tropical month by the exact integer identity N_drac = N_trop + N_nodI. */
-function updateMoonHarmonicsForEpoch() {
-  const apsiMeetsNodalJ2000_S = meanApsidalMeetsNodalAtAge(0);
-  moonApsidalPrecession.speed            =  (Math.PI * 2) * MEAN_TROPICAL_YEAR_J2000_S / MOON_APSIDAL_OFDATE_J2000_S;
-  moonApsidalNodalPrecession1.speed      = -(Math.PI * 2) * MEAN_TROPICAL_YEAR_J2000_S / apsiMeetsNodalJ2000_S;
-  moonApsidalNodalPrecession2.speed      =  (Math.PI * 2) * MEAN_TROPICAL_YEAR_J2000_S / apsiMeetsNodalJ2000_S;
-  moonLunarLevelingCyclePrecession.speed = -(Math.PI * 2) * MEAN_TROPICAL_YEAR_J2000_S / MOON_APSIDAL_OFDATE_J2000_S;   // apsidal canceller (of-date pair)
-  moonNodalPrecession.speed              = -(Math.PI * 2) * MEAN_TROPICAL_YEAR_J2000_S / MOON_NODAL_OFDATE_J2000_S;  // of-date regression
-}
+// (Plan 11 step 3: updateMoonHarmonicsForEpoch — the locked J2000 speeds of
+// the five Moon ring layers (apsidal +, apsidal-meets-nodal ±, leveling −,
+// nodal −, the snapshot-mode twin of the layers' deep-time integrators) —
+// is deleted: the layers are ENGINE-PLACED from the lunar arguments in
+// _applyEngineEarthFrame and rest at zero speed.)
 
 /** Mutate the 5 Earth-precession control objects (lines 5238–5346). */
 function updateEarthPrecessionObjectsForEpoch() {
@@ -4931,7 +4900,7 @@ function updateSafeObjectsForEpoch() {
   updateEarthForEpoch();
   updateMoonForEpoch();
   updateEarthPrecessionObjectsForEpoch();
-  updateMoonHarmonicsForEpoch();   // Phase 6.5
+  // (plan 11 step 3: updateMoonHarmonicsForEpoch is deleted — the ring layers are engine-placed)
 }
 
 // ───── PHASE 3-planets — per-planet scene-graph object updaters (Mercury–Neptune) ─────
@@ -5049,13 +5018,20 @@ const STARTMODEL_YEAR_SI = _jdToSIyear(startmodelJD);
 // the Predictions obliquity row (UT) read 22.5347° where the rendered frame
 // (TT) read 22.6944° — measured by the owner; the Moon's ecl→eq conversion
 // rode the UT value. Mirror: tools/lib/scene-graph.js _osmYearForJD.
-function _engineYearTT(jdUT) {
+/** The scene's TT instant for a true-UT JD: the bridge deltaTStart plus the
+ *  model's ΔT curve in deep-time mode (the Moon block's convention) — the ONE
+ *  UT→TT step every argument read of the frame takes (the engine year below,
+ *  the Moon ring's and markers' lunar arguments). */
+function _sceneJdTT(jdUT) {
   let jdTT = jdUT;
   if (DEEP_TIME_MODE_ENABLED) {
     const dT = meanDeltaTSecondsAtAge((J2000_CALENDAR_YEAR - julianDateToDecimalYear(jdUT)) / 1e6);
     if (Number.isFinite(dT)) jdTT = jdUT + (deltaTStart + dT) / 86400;
   }
-  return 2000 + (jdTT - j2000JD) / 365.25;
+  return jdTT;
+}
+function _engineYearTT(jdUT) {
+  return 2000 + (_sceneJdTT(jdUT) - j2000JD) / 365.25;
 }
 /** The engine year for a SCENE calendar year (o.currentYear's axis):
  *  julianDateToDecimalYear's exact inverse (Jan 1 of that year + the
@@ -5769,6 +5745,44 @@ if (typeof window !== 'undefined') {
       m.visible = false; m.onToggle(false);
       return { distAU: d.length() / 100, aPeriAU: el.aAU * (1 - el.e), lonJ2000Deg: ((Math.atan2(j[1], j[0]) / D2R) % 360 + 360) % 360,
         lonPeriDeg: ((el.lonPeriEclipticDeg % 360) + 360) % 360, normalComponentAU: (j[0] * n[0] + j[1] * n[1] + j[2] * n[2]) / 100 };
+    },
+    // Planet-pole gate hook (plan 11 step 3): the RENDERED rotation axis (its
+    // world Y) beside the spin channel's pole of date through the frame
+    // bridge, the rendered obliquity (axis vs the chain's orbit normal of
+    // date) beside the channel's, and Saturn's ring normal (a child of the
+    // axis; null while its texture has not loaded).
+    planetPoleProbe: (planetName) => {
+      const pd = planetObjects.find((p) => p.name === planetName);
+      if (!pd || !_KC_PLANET_NAMES.has(planetName) || !_kcR || !pd.rotationAxis) return null;
+      const nm = planetName.toLowerCase(), R = _kcR, D2R = Math.PI / 180;
+      const year = _engineYearTT(o.julianDay), ch = _tierModelB().planets.spin(nm);
+      const sE = ch.spinAxisEclipticJ2000AtYear(year), nE = ch.orbitNormalEclipticJ2000AtYear(year);
+      if (!sE) return null;
+      const toW = (v) => new THREE.Vector3(R[0][0] * v[0] + R[0][1] * v[1] + R[0][2] * v[2], R[1][0] * v[0] + R[1][1] * v[1] + R[1][2] * v[2], R[2][0] * v[0] + R[2][1] * v[1] + R[2][2] * v[2]);
+      const sW = toW(sE), nW = toW(nE);
+      const axisY = new THREE.Vector3(0, 1, 0).applyQuaternion(pd.rotationAxis.getWorldQuaternion(new THREE.Quaternion())).normalize();
+      const ringN = pd.ringObj ? new THREE.Vector3(0, 0, 1).applyQuaternion(pd.ringObj.getWorldQuaternion(new THREE.Quaternion())).normalize() : null;
+      const chord = axisY.distanceTo(sW);   // the chord, not acos of a dot (acos(1 − 1 ulp) reads 1e-6°)
+      return { poleChord: chord, obliquityRenderedDeg: axisY.angleTo(nW) / D2R, obliquityChannelDeg: ch.obliquityDegAtYear(year),
+        ringNormalDot: ringN ? Math.abs(ringN.dot(axisY)) : null, spinRetrograde: ch.spinRetrograde };
+    },
+    // Moon-ring gate hook (plan 11 step 3): the RING's perigee and ascending
+    // node of date read from the placed stack geometry — the apsidal arm's
+    // offset (toward the apogee) and the Moon orbit plane's normal — in the
+    // ecliptic-of-date basis, beside the lunar arguments ϖ = L′ − M′ and
+    // Ω = L′ − F the markers and the rendered Moon ride.
+    moonRingProbe: () => {
+      const f = _moonOrbitFrameOfDate(o.julianDay), D2R = Math.PI / 180, wrap = (d) => ((d % 360) + 360) % 360;
+      const E = new THREE.Vector3(); earth.rotationAxis.getWorldPosition(E);
+      const Cc = new THREE.Vector3(); moon.containerObj.getWorldPosition(Cc);
+      const d = Cc.sub(E);
+      const lonOf = (v) => wrap(Math.atan2(v.dot(_MM_U), v.dot(_MM_G)) / D2R);
+      const m = new THREE.Vector3(0, 1, 0).applyQuaternion(moon.orbitObj.getWorldQuaternion(new THREE.Quaternion())).normalize();
+      const nodeDir = new THREE.Vector3().crossVectors(_MM_N, m).normalize();
+      return { perigeeLonDeg: wrap(lonOf(d) + 180), perigeeExpectedLonDeg: wrap(f.args.Lp - f.args.Mp),
+        offsetScene: d.length(), offsetExpectedScene: f.a * moonOrbitalEccentricityBase,
+        nodeLonDeg: lonOf(nodeDir), nodeExpectedLonDeg: wrap(f.Om / D2R),
+        incDeg: Math.acos(Math.max(-1, Math.min(1, m.dot(_MM_N)))) / D2R, incExpectedDeg: moonEclipticInclinationJ2000 };
     },
     // Sun-barycenter gate hook: place the marker at the current epoch and
     // return its offset from the Sun (km) beside computeSunSSBOffset's
@@ -6670,12 +6684,19 @@ const sun = {
 // certified longitude in _applyEngineEarthFrame (R4); the snapshot EoC form
 // renders only the few pre-artifact frames.)
 
+// Plan 11 step 3: the five Moon RING stack layers below are ENGINE-PLACED —
+// _applyEngineEarthFrame sets their angles every frame from the lunar
+// arguments (apsidal θ = ϖ − 90°, canceller −θ, the inert pair 0, nodal
+// θ = Ω − 180°; ϖ = L′ − M′, Ω = L′ − F at the scene's TT), the arguments
+// that place the rendered Moon. The fitted J2000 phases, the locked speeds
+// and the per-layer deep-time integrator tags they rode are deleted; the
+// defs rest at zero. Mirror: tools/lib/scene-graph.js.
 const moonApsidalPrecession = {
   name: "Moon Apsidal Precession",
-  startPos: moonStartposApsidal,
-  speed: (Math.PI*2) * SI_TROPICAL_YEAR_DAYS / moonApsidalPrecessionindaysICRF,  // of-date perigee advance (+8.8475 yr) — the ring's perigee tracks the Meeus of-date perigee; pairs with the canceller (sum unchanged)
+  startPos: 0,   // ENGINE-PLACED (the perigee direction of date)
+  speed: 0,
   tilt: 0,
-  orbitRadius: -(moonDistance/currentAUDistance)*(moonOrbitalEccentricityBase*100),
+  orbitRadius: -(moonDistance/currentAUDistance)*(moonOrbitalEccentricityBase*100),   // the ring's eccentric offset a·e toward the apogee
   orbitCentera: 0,
   orbitCenterb: 0,
   orbitCenterc: 0,
@@ -6694,8 +6715,8 @@ const moonApsidalPrecession = {
 
 const moonApsidalNodalPrecession1 = {
   name: "Moon Apsidal Nodal Precession1",
-  startPos: moonStartposApsidal-moonStartposNodal,
-  speed: -(Math.PI*2) * SI_TROPICAL_YEAR_DAYS / moonApsidalMeetsNodalindays,  // Phase 9.5b: cycles per SI year
+  startPos: 0,   // ENGINE-PLACED (the inert pair rests at zero)
+  speed: 0,
   tilt: 0,
   orbitRadius: 0,
   orbitCentera: 0,
@@ -6716,8 +6737,8 @@ const moonApsidalNodalPrecession1 = {
 
 const moonApsidalNodalPrecession2 = {
   name: "Moon Apsidal Nodal Precession2",
-  startPos: -(moonStartposApsidal-moonStartposNodal),
-  speed: (Math.PI*2) * SI_TROPICAL_YEAR_DAYS / moonApsidalMeetsNodalindays,  // Phase 9.5b: cycles per SI year
+  startPos: 0,   // ENGINE-PLACED (the inert pair rests at zero)
+  speed: 0,
   tilt: 0,
   orbitRadius: 0,
   orbitCentera: 0,
@@ -6738,8 +6759,8 @@ const moonApsidalNodalPrecession2 = {
 
 const moonLunarLevelingCyclePrecession = {
   name: "Moon Lunar Leveling Cycle",
-  startPos: -moonStartposApsidal,  // canceller pairs with the apsidal layer in phase AND rate
-  speed: -(Math.PI*2) * SI_TROPICAL_YEAR_DAYS / moonApsidalPrecessionindaysICRF,  // exact apsidal canceller (of-date pair, −0.71017 rad/yr) — with the inclination tilt on the MOON's container, the nodal layer's own spin regresses the plane
+  startPos: 0,   // ENGINE-PLACED (the apsidal canceller, −θ_apsidal: the nodal layer below starts from a stack whose net apsidal rotation is zero)
+  speed: 0,
   tilt: 0,
   orbitRadius: 0,
   orbitCentera: 0,
@@ -6760,8 +6781,8 @@ const moonLunarLevelingCyclePrecession = {
 
 const moonNodalPrecession = {
   name: "Moon Nodal Precession",
-  startPos: moonStartposNodal,
-  speed: -(Math.PI*2) * SI_TROPICAL_YEAR_DAYS / moonNodalPrecessionindaysICRF,  // node regresses at the of-date period 6798.3303 d = −18.6132112 yr (−0.337566 rad/yr) — rotates the Moon's tilted plane, which sits on the moon container below
+  startPos: 0,   // ENGINE-PLACED (the ascending node of date — rotates the Moon's tilted plane, which sits on the moon container below)
+  speed: 0,
   tilt: 0,
   orbitRadius: 0,
   orbitCentera: 0,
@@ -6831,28 +6852,11 @@ moon._dtMoonIntegrator = moonArgumentOfLatitudeCyclesBetween;  // the arguments'
 moon._dtMoonSign       = +1;  // Moon orbits prograde (eastward)
 moon._dtMoonAnchor     = STARTMODEL_YEAR_SI;
 
-// Phase 9.13 (step 2): Moon precession-chain integrator tags. Signs mirror
-// the per-epoch speed mutations at updateMoonHarmonicsForEpoch (~line 5712):
-// apsidal +, apsidal-meets-nodal ±, lunar leveling −, nodal −.
-moonApsidalPrecession.            _dtMoonIntegrator = meanMoonApsidalOfDateCyclesBetween;  // of-date (N_trop − N_anom)
-moonApsidalPrecession.            _dtMoonSign       = +1;
-moonApsidalPrecession.            _dtMoonAnchor     = STARTMODEL_YEAR_SI;
-
-moonApsidalNodalPrecession1.      _dtMoonIntegrator = meanMoonApsidalMeetsNodalCyclesBetween;
-moonApsidalNodalPrecession1.      _dtMoonSign       = -1;
-moonApsidalNodalPrecession1.      _dtMoonAnchor     = STARTMODEL_YEAR_SI;
-
-moonApsidalNodalPrecession2.      _dtMoonIntegrator = meanMoonApsidalMeetsNodalCyclesBetween;
-moonApsidalNodalPrecession2.      _dtMoonSign       = +1;
-moonApsidalNodalPrecession2.      _dtMoonAnchor     = STARTMODEL_YEAR_SI;
-
-moonLunarLevelingCyclePrecession. _dtMoonIntegrator = meanMoonApsidalOfDateCyclesBetween;  // apsidal canceller (sign −, of-date pair)
-moonLunarLevelingCyclePrecession. _dtMoonSign       = -1;
-moonLunarLevelingCyclePrecession. _dtMoonAnchor     = STARTMODEL_YEAR_SI;
-
-moonNodalPrecession.              _dtMoonIntegrator = meanMoonNodalOfDateCyclesBetween;  // of-date regression (was star-frame chain)
-moonNodalPrecession.              _dtMoonSign       = -1;
-moonNodalPrecession.              _dtMoonAnchor     = STARTMODEL_YEAR_SI;
+// (Plan 11 step 3: the five Moon ring layers' deep-time integrator tags —
+// apsidal +, apsidal-meets-nodal ±, lunar leveling −, nodal −, the integral
+// form of the layers' locked speeds — are deleted: the layers are engine-
+// placed from the lunar arguments in _applyEngineEarthFrame. The of-date
+// cycle counters themselves stay for the panels and the lunar chain.)
 
 const mercuryPerihelionFromEarth = {
   name: "PERIHELION MERCURY",
@@ -6880,9 +6884,6 @@ const mercuryPerihelionFromEarth = {
   traceOn: false,
   isNotPhysicalObject: true,
 };
-
-// Ascending node frame corrections from ASTRO_REFERENCE (see above)
-const ascNodeToolCorrection = ascNodeTiltCorrection;
 
 // Ascending node lookup by planet name (for post-hoc RA/Dec correction)
 // Static J2000 values used as fallback; dynamic values from o.<planet>AscendingNode preferred
@@ -6945,7 +6946,7 @@ const mercuryFixedPerihelionAtSun = {
 
 const mercury = {
   name: "Mercury",
-  startPos: planets.mercury.startpos,
+  startPos: 0,   // plan 11 step 3: the scaffold's fitted start angle is deleted — the chain places the planet, _kcPlacePlanetPole its axis
   speed: Math.PI*2/_planetGeom.mercury.periodYears,   // plan 09 step 7b: the chain's period in scene years (was the device count's H/N)
   rotationSpeed: Math.PI*2*(SI_TROPICAL_YEAR_DAYS/(mercuryRotationPeriod/24)),  // Phase 9.5c: SI-anchored
   tilt: -planets.mercury.axialTiltJ2000,
@@ -6953,17 +6954,15 @@ const mercury = {
   orbitCentera: 0,
   orbitCenterb: 0,
   orbitCenterc: 0,
-  orbitTilta: Math.cos(((-90-(planets.mercury.ascendingNode+ascNodeToolCorrection.mercury))*Math.PI)/180)*-planets.mercury.eclipticInclinationJ2000,
-  orbitTiltb: Math.sin(((-90-(planets.mercury.ascendingNode+ascNodeToolCorrection.mercury))*Math.PI)/180)*-planets.mercury.eclipticInclinationJ2000,
+  orbitTilta: Math.cos(((-90-planets.mercury.ascendingNode)*Math.PI)/180)*-planets.mercury.eclipticInclinationJ2000,   // plan 11 step 3: the plain node tilt (the start-angle frame correction is gone)
+  orbitTiltb: Math.sin(((-90-planets.mercury.ascendingNode)*Math.PI)/180)*-planets.mercury.eclipticInclinationJ2000,
   // Plan 07 R6: was the K law's base × the tuned EoC fraction, re-evaluated
   // each frame through _eccentricityKey. The mesh is placed from the chain,
   // which overwrites the wheel's Kepler motion, so this is now the OBSERVED
-  // J2000 value and nothing recomputes it.
+  // J2000 value and nothing recomputes it. (Plan 11 step 3: the planets'
+  // equation-of-centre branch — perihelionPhaseJ2000 from the start angle and
+  // the passage JD, perihelionPrecessionRate — is deleted with those inputs.)
   eccentricity: planets.mercury.orbitalEccentricityJ2000,
-  perihelionPhaseJ2000: -planets.mercury.startpos * (Math.PI / 180)
-    + (Math.PI * 2 / _planetGeom.mercury.periodYears - Math.PI * 2 / planets.mercury.perihelionEclipticYears)
-    * (planets.mercury.perihelionRef_JD - startmodelJD) / meansolaryearlengthinDays,
-  perihelionPrecessionRate: Math.PI * 2 / planets.mercury.perihelionEclipticYears,
 
   size: (diameters.mercuryDiameter/2/ currentAUDistance)*100,
   color: 0x868485,
@@ -7053,7 +7052,7 @@ const venusFixedPerihelionAtSun = {
 
 const venus = {
   name: "Venus",
-  startPos: planets.venus.startpos,
+  startPos: 0,   // plan 11 step 3 (see Mercury)
   speed: Math.PI*2/_planetGeom.venus.periodYears,
   rotationSpeed: -Math.PI*2*(SI_TROPICAL_YEAR_DAYS/(venusRotationPeriod/24)),  // Phase 9.5c: SI-anchored
   tilt: -planets.venus.axialTiltJ2000,
@@ -7061,13 +7060,9 @@ const venus = {
   orbitCentera: 0,
   orbitCenterb: 0,
   orbitCenterc: 0,
-  orbitTilta: Math.cos(((-90-(planets.venus.ascendingNode+ascNodeToolCorrection.venus))*Math.PI)/180)*-planets.venus.eclipticInclinationJ2000,
-  orbitTiltb: Math.sin(((-90-(planets.venus.ascendingNode+ascNodeToolCorrection.venus))*Math.PI)/180)*-planets.venus.eclipticInclinationJ2000,
+  orbitTilta: Math.cos(((-90-planets.venus.ascendingNode)*Math.PI)/180)*-planets.venus.eclipticInclinationJ2000,
+  orbitTiltb: Math.sin(((-90-planets.venus.ascendingNode)*Math.PI)/180)*-planets.venus.eclipticInclinationJ2000,
   eccentricity: planets.venus.orbitalEccentricityJ2000,
-  perihelionPhaseJ2000: -planets.venus.startpos * (Math.PI / 180)
-    + (Math.PI * 2 / _planetGeom.venus.periodYears - Math.PI * 2 / planets.venus.perihelionEclipticYears)
-    * (planets.venus.perihelionRef_JD - startmodelJD) / meansolaryearlengthinDays,
-  perihelionPrecessionRate: Math.PI * 2 / planets.venus.perihelionEclipticYears,
 
   size: (diameters.venusDiameter/2/ currentAUDistance)*100,
   color: 0xA57C1B,
@@ -7111,7 +7106,7 @@ const marsPerihelionFromEarth = {
 
 const marsRealPerihelionAtSun = {
   name: "Mars Real Perihelion At Sun",
-  startPos: planets.mars.startpos*2,
+  startPos: 0,   // plan 11 step 3: the wheel's phase 2 × startpos rests at zero (the chain overrides the wheel)
   speed: -Math.PI*2+(2*Math.PI*2/_planetGeom.mars.periodYears),
   rotationSpeed: 0,
   tilt: 0,
@@ -7140,7 +7135,7 @@ const marsRealPerihelionAtSun = {
 
 const marsFixedPerihelionAtSun = {
   name: "Mars Fixed Perihelion At Sun",
-  startPos: planets.mars.startpos*2,
+  startPos: 0,   // plan 11 step 3: the wheel's phase 2 × startpos rests at zero (the chain overrides the wheel)
   speed: -Math.PI*2+(2*Math.PI*2/_planetGeom.mars.periodYears),
   rotationSpeed: 0,
   tilt: 0,
@@ -7163,7 +7158,7 @@ const marsFixedPerihelionAtSun = {
 
 const mars = {
   name: "Mars",
-  startPos: planets.mars.startpos,
+  startPos: 0,   // plan 11 step 3 (see Mercury)
   speed: -Math.PI*2/_planetGeom.mars.periodYears,
   rotationSpeed: Math.PI*2*(SI_TROPICAL_YEAR_DAYS/(marsRotationPeriod/24)),  // Phase 9.5c: SI-anchored
   tilt: -planets.mars.axialTiltJ2000,
@@ -7171,13 +7166,9 @@ const mars = {
   orbitCentera: 0,
   orbitCenterb: 0,
   orbitCenterc: 0,
-  orbitTilta: Math.cos(((-90-(planets.mars.ascendingNode+ascNodeToolCorrection.mars))*Math.PI)/180)*-planets.mars.eclipticInclinationJ2000,
-  orbitTiltb: Math.sin(((-90-(planets.mars.ascendingNode+ascNodeToolCorrection.mars))*Math.PI)/180)*-planets.mars.eclipticInclinationJ2000,
+  orbitTilta: Math.cos(((-90-planets.mars.ascendingNode)*Math.PI)/180)*-planets.mars.eclipticInclinationJ2000,
+  orbitTiltb: Math.sin(((-90-planets.mars.ascendingNode)*Math.PI)/180)*-planets.mars.eclipticInclinationJ2000,
   eccentricity: planets.mars.orbitalEccentricityJ2000,
-  perihelionPhaseJ2000: -planets.mars.startpos * (Math.PI / 180)
-    + (Math.PI * 2 / _planetGeom.mars.periodYears - Math.PI * 2 / planets.mars.perihelionEclipticYears)
-    * (planets.mars.perihelionRef_JD - startmodelJD) / meansolaryearlengthinDays,
-  perihelionPrecessionRate: Math.PI * 2 / planets.mars.perihelionEclipticYears,
 
   size: (diameters.marsDiameter/2/ currentAUDistance)*100,
   color: 0xFF0000,
@@ -7221,7 +7212,7 @@ const jupiterPerihelionFromEarth = {
 
 const jupiterRealPerihelionAtSun = {
   name: "Jupiter Real Perihelion At Sun",
-  startPos: planets.jupiter.startpos*2,
+  startPos: 0,   // plan 11 step 3: the wheel's phase 2 × startpos rests at zero (the chain overrides the wheel)
   speed: -Math.PI*2,
   rotationSpeed: 0,
   tilt: 0,
@@ -7248,7 +7239,7 @@ const jupiterRealPerihelionAtSun = {
 
 const jupiterFixedPerihelionAtSun = {
   name: "Jupiter Fixed Perihelion At Sun",
-  startPos: planets.jupiter.startpos*2,
+  startPos: 0,   // plan 11 step 3 (see the Real wheel)
   speed: -Math.PI*2,
   rotationSpeed: 0,
   tilt: 0,
@@ -7271,7 +7262,7 @@ const jupiterFixedPerihelionAtSun = {
 
 const jupiter = {
   name: "Jupiter",
-  startPos: planets.jupiter.startpos,
+  startPos: 0,   // plan 11 step 3 (see Mercury)
   speed: Math.PI*2/_planetGeom.jupiter.periodYears,
   rotationSpeed: Math.PI*2*(SI_TROPICAL_YEAR_DAYS/(jupiterRotationPeriod/24)),  // Phase 9.5c: SI-anchored
   tilt: -planets.jupiter.axialTiltJ2000,
@@ -7279,13 +7270,9 @@ const jupiter = {
   orbitCentera: 0,
   orbitCenterb: 0,
   orbitCenterc: 0,
-  orbitTilta: Math.cos(((-90-(planets.jupiter.ascendingNode+ascNodeToolCorrection.jupiter))*Math.PI)/180)*-planets.jupiter.eclipticInclinationJ2000,
-  orbitTiltb: Math.sin(((-90-(planets.jupiter.ascendingNode+ascNodeToolCorrection.jupiter))*Math.PI)/180)*-planets.jupiter.eclipticInclinationJ2000,
+  orbitTilta: Math.cos(((-90-planets.jupiter.ascendingNode)*Math.PI)/180)*-planets.jupiter.eclipticInclinationJ2000,
+  orbitTiltb: Math.sin(((-90-planets.jupiter.ascendingNode)*Math.PI)/180)*-planets.jupiter.eclipticInclinationJ2000,
   eccentricity: planets.jupiter.orbitalEccentricityJ2000,
-  perihelionPhaseJ2000: -planets.jupiter.startpos * (Math.PI / 180)
-    + (Math.PI * 2 / _planetGeom.jupiter.periodYears - Math.PI * 2 / planets.jupiter.perihelionEclipticYears)
-    * (planets.jupiter.perihelionRef_JD - startmodelJD) / meansolaryearlengthinDays,
-  perihelionPrecessionRate: Math.PI * 2 / planets.jupiter.perihelionEclipticYears,
 
   size: (diameters.jupiterDiameter/2/ currentAUDistance)*100,
   color: 0xCDC2B2,
@@ -7334,7 +7321,7 @@ const saturnPerihelionFromEarth = {
 
 const saturnRealPerihelionAtSun = {
   name: "Saturn Real Perihelion At Sun",
-  startPos: planets.saturn.startpos*2,
+  startPos: 0,   // plan 11 step 3: the wheel's phase 2 × startpos rests at zero (the chain overrides the wheel)
   speed: -Math.PI*2,
   rotationSpeed: 0,
   tilt: 0,
@@ -7361,7 +7348,7 @@ const saturnRealPerihelionAtSun = {
 
 const saturnFixedPerihelionAtSun = {
   name: "Saturn Fixed Perihelion At Sun",
-  startPos: planets.saturn.startpos*2,
+  startPos: 0,   // plan 11 step 3 (see the Real wheel)
   speed: -Math.PI*2,
   rotationSpeed: 0,
   tilt: 0,
@@ -7384,7 +7371,7 @@ const saturnFixedPerihelionAtSun = {
 
 const saturn = {
   name: "Saturn",
-  startPos: planets.saturn.startpos,
+  startPos: 0,   // plan 11 step 3 (see Mercury)
   speed: Math.PI*2/_planetGeom.saturn.periodYears,
   rotationSpeed: Math.PI*2*(SI_TROPICAL_YEAR_DAYS/(saturnRotationPeriod/24)),  // Phase 9.5c: SI-anchored
   tilt: -planets.saturn.axialTiltJ2000,
@@ -7392,13 +7379,9 @@ const saturn = {
   orbitCentera: 0,
   orbitCenterb: 0,
   orbitCenterc: 0,
-  orbitTilta: Math.cos(((-90-(planets.saturn.ascendingNode+ascNodeToolCorrection.saturn))*Math.PI)/180)*-planets.saturn.eclipticInclinationJ2000,
-  orbitTiltb: Math.sin(((-90-(planets.saturn.ascendingNode+ascNodeToolCorrection.saturn))*Math.PI)/180)*-planets.saturn.eclipticInclinationJ2000,
+  orbitTilta: Math.cos(((-90-planets.saturn.ascendingNode)*Math.PI)/180)*-planets.saturn.eclipticInclinationJ2000,
+  orbitTiltb: Math.sin(((-90-planets.saturn.ascendingNode)*Math.PI)/180)*-planets.saturn.eclipticInclinationJ2000,
   eccentricity: planets.saturn.orbitalEccentricityJ2000,
-  perihelionPhaseJ2000: -planets.saturn.startpos * (Math.PI / 180)
-    + (Math.PI * 2 / _planetGeom.saturn.periodYears - Math.PI * 2 / planets.saturn.perihelionEclipticYears)
-    * (planets.saturn.perihelionRef_JD - startmodelJD) / meansolaryearlengthinDays,
-  perihelionPrecessionRate: Math.PI * 2 / planets.saturn.perihelionEclipticYears,
 
   size: (diameters.saturnDiameter/2/ currentAUDistance)*100,
   color: 0xA79662,
@@ -7447,7 +7430,7 @@ const uranusPerihelionFromEarth = {
 
 const uranusRealPerihelionAtSun = {
   name: "Uranus Real Perihelion At Sun",
-  startPos: planets.uranus.startpos*2,
+  startPos: 0,   // plan 11 step 3: the wheel's phase 2 × startpos rests at zero (the chain overrides the wheel)
   speed: -Math.PI*2,
   rotationSpeed: 0,
   tilt: 0,
@@ -7474,7 +7457,7 @@ const uranusRealPerihelionAtSun = {
 
 const uranusFixedPerihelionAtSun = {
   name: "Uranus Fixed Perihelion At Sun",
-  startPos: planets.uranus.startpos*2,
+  startPos: 0,   // plan 11 step 3 (see the Real wheel)
   speed: -Math.PI*2,
   rotationSpeed: 0,
   tilt: 0,
@@ -7497,7 +7480,7 @@ const uranusFixedPerihelionAtSun = {
 
 const uranus = {
   name: "Uranus",
-  startPos: planets.uranus.startpos,
+  startPos: 0,   // plan 11 step 3 (see Mercury)
   speed: Math.PI*2/_planetGeom.uranus.periodYears,
   rotationSpeed: -Math.PI*2*(SI_TROPICAL_YEAR_DAYS/(uranusRotationPeriod/24)),  // Phase 9.5c: SI-anchored
   tilt: -planets.uranus.axialTiltJ2000,
@@ -7505,13 +7488,9 @@ const uranus = {
   orbitCentera: 0,
   orbitCenterb: 0,
   orbitCenterc: 0,
-  orbitTilta: Math.cos(((-90-(planets.uranus.ascendingNode+ascNodeToolCorrection.uranus))*Math.PI)/180)*-planets.uranus.eclipticInclinationJ2000,
-  orbitTiltb: Math.sin(((-90-(planets.uranus.ascendingNode+ascNodeToolCorrection.uranus))*Math.PI)/180)*-planets.uranus.eclipticInclinationJ2000,
+  orbitTilta: Math.cos(((-90-planets.uranus.ascendingNode)*Math.PI)/180)*-planets.uranus.eclipticInclinationJ2000,
+  orbitTiltb: Math.sin(((-90-planets.uranus.ascendingNode)*Math.PI)/180)*-planets.uranus.eclipticInclinationJ2000,
   eccentricity: planets.uranus.orbitalEccentricityJ2000,
-  perihelionPhaseJ2000: -planets.uranus.startpos * (Math.PI / 180)
-    + (Math.PI * 2 / _planetGeom.uranus.periodYears - Math.PI * 2 / planets.uranus.perihelionEclipticYears)
-    * (planets.uranus.perihelionRef_JD - startmodelJD) / meansolaryearlengthinDays,
-  perihelionPrecessionRate: Math.PI * 2 / planets.uranus.perihelionEclipticYears,
 
   size: (diameters.uranusDiameter/2/ currentAUDistance)*100,
   color: 0xD2F9FA,
@@ -7560,7 +7539,7 @@ const neptunePerihelionFromEarth = {
 
 const neptuneRealPerihelionAtSun = {
   name: "Neptune Real Perihelion At Sun",
-  startPos: planets.neptune.startpos*2,
+  startPos: 0,   // plan 11 step 3: the wheel's phase 2 × startpos rests at zero (the chain overrides the wheel)
   speed: -Math.PI*2,
   rotationSpeed: 0,
   tilt: 0,
@@ -7587,7 +7566,7 @@ const neptuneRealPerihelionAtSun = {
 
 const neptuneFixedPerihelionAtSun = {
   name: "Neptune Fixed Perihelion At Sun",
-  startPos: planets.neptune.startpos*2,
+  startPos: 0,   // plan 11 step 3 (see the Real wheel)
   speed: -Math.PI*2,
   rotationSpeed: 0,
   tilt: 0,
@@ -7610,7 +7589,7 @@ const neptuneFixedPerihelionAtSun = {
 
 const neptune = {
   name: "Neptune",
-  startPos: planets.neptune.startpos,
+  startPos: 0,   // plan 11 step 3 (see Mercury)
   speed: Math.PI*2/_planetGeom.neptune.periodYears,
   rotationSpeed: Math.PI*2*(SI_TROPICAL_YEAR_DAYS/(neptuneRotationPeriod/24)),  // Phase 9.5c: SI-anchored
   tilt: -planets.neptune.axialTiltJ2000,
@@ -7618,13 +7597,9 @@ const neptune = {
   orbitCentera: 0,
   orbitCenterb: 0,
   orbitCenterc: 0,
-  orbitTilta: Math.cos(((-90-(planets.neptune.ascendingNode+ascNodeToolCorrection.neptune))*Math.PI)/180)*-planets.neptune.eclipticInclinationJ2000,
-  orbitTiltb: Math.sin(((-90-(planets.neptune.ascendingNode+ascNodeToolCorrection.neptune))*Math.PI)/180)*-planets.neptune.eclipticInclinationJ2000,
+  orbitTilta: Math.cos(((-90-planets.neptune.ascendingNode)*Math.PI)/180)*-planets.neptune.eclipticInclinationJ2000,
+  orbitTiltb: Math.sin(((-90-planets.neptune.ascendingNode)*Math.PI)/180)*-planets.neptune.eclipticInclinationJ2000,
   eccentricity: planets.neptune.orbitalEccentricityJ2000,
-  perihelionPhaseJ2000: -planets.neptune.startpos * (Math.PI / 180)
-    + (Math.PI * 2 / _planetGeom.neptune.periodYears - Math.PI * 2 / planets.neptune.perihelionEclipticYears)
-    * (planets.neptune.perihelionRef_JD - startmodelJD) / meansolaryearlengthinDays,
-  perihelionPrecessionRate: Math.PI * 2 / planets.neptune.perihelionEclipticYears,
 
   size: (diameters.neptuneDiameter/2/ currentAUDistance)*100,
   color: 0x5E93F1,
@@ -25957,7 +25932,7 @@ function setupGUI() {
     console.log(`  Ascending node Ω:       scene ${node.toFixed(4)}°   target 125.0446°   Δ ${wrap180(node - 125.0446).toFixed(4)}°`);
     console.log(`  Longitude of perigee ϖ: scene ${peri.toFixed(4)}°   target  83.3532°   Δ ${wrap180(peri - 83.3532).toFixed(4)}°`);
     console.log(`  Mean longitude L:       scene ${Lmean.toFixed(4)}°   target 218.3164°   Δ ${wrap180(Lmean - 218.3164).toFixed(4)}°`);
-    console.log(`  (current ring startPos: apsidal ${moonStartposApsidal}, nodal ${moonStartposNodal}; the Moon node's own start angle is deleted — plan 11 step 2)`);
+    console.log('  (the ring\'s stack layers are engine-placed from the lunar arguments every frame — plan 11 step 3; the Moon node\'s own start angle is deleted — plan 11 step 2)');
     // Dynamic gate: measured node regression rate over J2000 → J2000+2 yr —
     // proves the plane genuinely regresses (not just sits anchored). Baseline
     // kept short so the ~−19.34°/yr accumulation stays inside wrap180's ±180°.
@@ -26083,26 +26058,16 @@ function setupGUI() {
         const _argsOm = (((_a0.Lp - _a0.F) % 360) + 360) % 360;
         const _nodTh = (typeof moonNodalPrecession !== 'undefined' && moonNodalPrecession.orbitObj)
           ? ((-moonNodalPrecession.orbitObj.rotation.y * 180 / Math.PI) % 360 + 360) % 360 : NaN;
-        // three-way attribution: what SHOULD the nodal layer angle be under
-        // (a) the chain branch, (b) the snapshot path — vs (c) the actual?
-        const _ySI = _jdToSIyear(o.julianDay);
-        const _cyc = meanMoonNodalOfDateCyclesBetween(STARTMODEL_YEAR_SI, _ySI);
-        const _thChain = _cyc !== null
-          ? ((-(_cyc * 360 * -1) + moonNodalPrecession.startPos) % 360 + 360) % 360 : NaN;
-        const _thChainRaw = _cyc !== null ? _cyc : NaN;
-        const _thSnap = ((-( (moonNodalPrecession.speed * o.pos * 180 / Math.PI) - moonNodalPrecession.startPos)) % 360 + 360) % 360;
+        // (plan 11 step 3: the ring layers are engine-placed from the
+        // arguments — the former three-way attribution against the chain
+        // branch and the snapshot path is gone; the layer angle is Ω − 180°
+        // by construction, so the row below is the ring-vs-Moon check only)
         console.log(`    [deep ${yr}] instant β raw/ovr ${S[0].rb.toFixed(3)}/${S[0].ob.toFixed(3)}°` +
           `  max|Δβ| ${mB.toFixed(3)}°  max|Δdist| ${mG.toFixed(0)} km` +
           `  nodalLayer θ ${_nodTh.toFixed(2)}°  args Ω ${_argsOm.toFixed(2)}°  ` +
           `deepMode ${typeof DEEP_TIME_MODE_ENABLED !== 'undefined' && DEEP_TIME_MODE_ENABLED ? 'ON' : 'OFF'}`);
-        console.log(`    [deep ${yr}] nodal three-way: actual ${_nodTh.toFixed(2)}°` +
-          `  chain-pred cycles ${Number.isFinite(_thChainRaw) ? _thChainRaw.toFixed(4) : 'NULL'}` +
-          ` (θ ${Number.isFinite(_thChain) ? _thChain.toFixed(2) : 'NULL'}°)` +
-          `  snapshot-pred θ ${_thSnap.toFixed(2)}°` +
-          `  integrator tagged: ${typeof moonNodalPrecession._dtMoonIntegrator === 'function'}`);
-        // Apsidal three-way + absolute perigee azimuths (raw vs override vs args)
+        // Apsidal: the layer angle and the absolute perigee azimuths (raw vs override vs args)
         {
-          const _cycA = meanMoonApsidalOfDateCyclesBetween(STARTMODEL_YEAR_SI, _ySI);
           const _apsTh = (typeof moonApsidalPrecession !== 'undefined' && moonApsidalPrecession.orbitObj)
             ? ((moonApsidalPrecession.orbitObj.rotation.y * 180 / Math.PI) % 360 + 360) % 360 : NaN;
           const _argsW = (((_a0.Lp - _a0.Mp) % 360) + 360) % 360;
@@ -26113,8 +26078,7 @@ function setupGUI() {
           }
           const _rawPeri = ((S[iR].rl % 360) + 360) % 360;
           const _ovrPeri = ((S[iO].ol % 360) + 360) % 360;
-          console.log(`    [deep ${yr}] apsidal three-way: layer actual ${_apsTh.toFixed(2)}°` +
-            `  chain-pred cycles ${_cycA !== null ? _cycA.toFixed(4) : 'NULL'}` +
+          console.log(`    [deep ${yr}] apsidal: layer actual ${_apsTh.toFixed(2)}° (engine-placed, ϖ − 90°)` +
             `  args ϖ ${_argsW.toFixed(2)}°  raw-perigee az ${_rawPeri.toFixed(2)}°  ovr-perigee az ${_ovrPeri.toFixed(2)}°`);
           // Earth-chain frame dump (root-cause hunt): every chain angle plus
           // the conversion frame, in one consistent convention, for a
@@ -49382,6 +49346,22 @@ function _applyEngineEarthFrame(jdUT) {
   // basis [X = n̂ × ĝ, Y = n̂, Z = ĝ]. Mirror: tools/lib/scene-graph.js
   // _applyEngineEarthFrame.
   _kcSetWorldRotation(moonApsidalPrecession.containerObj, _HTC_U.crossVectors(n, g), n, g);
+  // the Moon RING's stack layers from the lunar arguments (plan 11 step 3):
+  // in the stack's basis a layer angle θ carries the longitude 90° + θ, the
+  // apsidal arm −a·e·X̂ points at the apogee, and the Moon def's fixed tilt
+  // puts the ascending node at longitude 180° under zero stack rotation
+  // (measured on the Node twin: the retired fitted J2000 phases read the
+  // Meeus ϖ/Ω to 0.006° through exactly these relations). One clock — the
+  // override's true TT (bridge + curve, _sceneJdTT); the Apsidal/Nodal
+  // markers read the same arguments, so ring ≡ markers ≡ the placed Moon.
+  // Mirror: tools/lib/scene-graph.js _applyEngineEarthFrame.
+  const margs = _moonArgsAt(_sceneJdTT(jdUT));
+  const thApsidal = (margs.Lp - margs.Mp) * (Math.PI / 180) - Math.PI / 2;   // perigee at ϖ = L′ − M′
+  moonApsidalPrecession.orbitObj.rotation.y = thApsidal;
+  moonApsidalNodalPrecession1.orbitObj.rotation.y = 0;
+  moonApsidalNodalPrecession2.orbitObj.rotation.y = 0;
+  moonLunarLevelingCyclePrecession.orbitObj.rotation.y = -thApsidal;        // the canceller: the nodal layer's zero is the base's
+  moonNodalPrecession.orbitObj.rotation.y = (margs.Lp - margs.F) * (Math.PI / 180) - Math.PI;   // ascending node at Ω = L′ − F
   const peri = (smp.periOfDateDeg + 180) * (Math.PI / 180);
   earthPerihelionPrecession1.orbitObj.rotation.y = peri;
   earthPerihelionPrecession2.orbitObj.rotation.y = -peri;
@@ -49478,6 +49458,33 @@ function _kcPeriSunMarker(planetObj) {
   _kcPeriSunMarkers[nm] = m;
   return m;
 }
+// Plan 11 step 3 — each chain planet's ROTATION AXIS from the spin channel's
+// pole of date through the frame bridge, the construction Earth's axis takes
+// in _applyEngineEarthFrame: world basis [X = ŝ × ĝₚ, Y = ŝ, Z = ĝₚ], ŝ(t) the
+// channel's integrated pole (angular-momentum sense — Venus and Uranus spin
+// about a pole south of their orbits, so the mesh's +Y spin reads prograde in
+// that sense) and ĝₚ = unit(ŝ × n̂) the planet's own equinox on its orbit
+// plane of date. Until step 3 the axis hung under the scaffold wheel: its
+// tilt magnitude was re-set per frame from the channel, its azimuth turned
+// once per orbit with the wheel's start angle (plan 11 step 0b). Called
+// BEFORE the mesh's local position is written — the mesh and Saturn's rings
+// are this axis's children. Beyond the channel's ±10 Myr the axis keeps its
+// last pose. Mirror: tools/lib/scene-graph.js _applyEngineEarthFrame.
+const _KC_PS = new THREE.Vector3(), _KC_PN = new THREE.Vector3(), _KC_PG = new THREE.Vector3(), _KC_PX = new THREE.Vector3();
+function _kcPlacePlanetPole(obj, nm, jdUT) {
+  if (!obj.rotationAxis || !_kcR) return;
+  const ch = _tierModelB().planets.spin(nm), year = _engineYearTT(jdUT);
+  const sE = ch.spinAxisEclipticJ2000AtYear(year);
+  if (!sE) return;
+  const nE = ch.orbitNormalEclipticJ2000AtYear(year), R = _kcR;
+  const toW = (v, out) => out.set(
+    R[0][0] * v[0] + R[0][1] * v[1] + R[0][2] * v[2],
+    R[1][0] * v[0] + R[1][1] * v[1] + R[1][2] * v[2],
+    R[2][0] * v[0] + R[2][1] * v[1] + R[2][2] * v[2]);
+  const s = toW(sE, _KC_PS), n = toW(nE, _KC_PN);
+  const g = _KC_PG.crossVectors(s, n).normalize();
+  _kcSetWorldRotation(obj.rotationAxis, _KC_PX.crossVectors(s, g), s, g);
+}
 function _kcUpdatePeriSunMarker(planetObj, nm, jd) {
   const m = _kcPeriSunMarkers[nm];
   if (!m || !m.visible || !_kcR) return;
@@ -49505,8 +49512,8 @@ function _kcUpdatePeriSunMarker(planetObj, nm, jd) {
 // precession; the line of nodes — the ascending ↑ and descending ↓ nodes
 // on the mean-distance circle at the longitude L′ − F, a dashed line through
 // Earth — regresses with the 18.6-yr nodal precession. Both from the
-// framework-native lunar arguments (_moonArgsAt, TT = UT + the scene's ΔT
-// bridge as the certified-Sun read) on the engine's ecliptic of date (R4),
+// framework-native lunar arguments (_moonArgsAt at the scene's TT, _sceneJdTT —
+// the clock the ring and the rendered Moon read) on the engine's ecliptic of date (R4),
 // the registry's constant inclination; a and e are the mean-geometry
 // registry values (direction indicators, not the perturbed Moon).
 function _moonMarker(kind) {   // 'apsidal' | 'nodal'
@@ -49533,7 +49540,7 @@ const _MM_Q = new THREE.Quaternion(), _MM_E = new THREE.Vector3(), _MM_G = new T
       _MM_ND = new THREE.Vector3(), _MM_T = new THREE.Vector3(), _MM_P = new THREE.Vector3(), _MM_P2 = new THREE.Vector3();
 /** The Moon's of-date orbit frame around Earth: the ecliptic-of-date basis, the node direction and the in-plane point at argument u (scene units). */
 function _moonOrbitFrameOfDate(jdUT) {
-  const args = _moonArgsAt(jdUT + deltaTStart / 86400);
+  const args = _moonArgsAt(_sceneJdTT(jdUT));   // the scene's TT (bridge + curve) — the ring's and the override's clock (plan 11 step 3; was the bridge alone)
   const D2R = Math.PI / 180;
   const Om = (args.Lp - args.F) * D2R, w = (args.F - args.Mp) * D2R, inc = moonEclipticInclinationJ2000 * D2R;
   earthPerihelionPrecession1.containerObj.getWorldQuaternion(_MM_Q);   // the engine's ecliptic of date (R4): x̂ the equinox, ŷ the pole
@@ -50021,6 +50028,7 @@ function updatePositions() {
       // the mesh parent's local; parent matrices are current from step 0).
       // The orbit ring and the trace are chain-sampled too
       // (_kcUpdateOrbitLine below / _kcChainWorldPos in the trace sampler).
+      _kcPlacePlanetPole(obj, _nm, o.julianDay);   // the axis first (plan 11 step 3): the mesh and the rings hang under it
       _KC_V.set(_wp[0], _wp[1], _wp[2]);
       obj.planetObj.parent.worldToLocal(_KC_V);
       obj.planetObj.position.copy(_KC_V);
@@ -50051,7 +50059,12 @@ function updatePositions() {
       const _hv = [_sgn * Math.cos(_lpRad), _sgn * Math.sin(_lpRad), 0];   // ecliptic-J2000 unit
       obj.containerObj.parent.getWorldPosition(_KC_ANCHOR);  // the device origin: the perihelion-of-Earth construction
       let _ax = _KC_ANCHOR.x, _ay = _KC_ANCHOR.y, _az = _KC_ANCHOR.z;
-      let _D = obj.containerObj.position.length();           // the legacy display radius (perihelionDistance, scene units)
+      // the display radius: the chain's a·e of date — the orbit's focus
+      // offset, scene units (plan 11 step 3; was the scaffold wheel's
+      // type-I/II/III perihelionDistance read off the marker container's
+      // legacy position, as _kcUpdatePeriSunMarker takes a(1−e))
+      const _elD = _kcPeri === 'earth' ? null : _kcElementsOfDate(_kcPeri, o.julianDay);
+      let _D = _elD ? 100 * _elD.aAU * _elD.e : 0;
       if (_kcPeri === 'earth') {
         // PERIHELION-OF-EARTH has no shell — it sits AT the construction
         // point. Chain version: EARTH + the same construction distance in
@@ -51353,12 +51366,13 @@ function updateOrbitalPlaneRotations() {
       realPeriData.tiltGroupObj.rotation.z = newTiltb * DEG2RAD;
     }
 
-    // Position tilt (planet placement) — corrected ascending node
+    // The planet's own container — the plain node tilt (plan 11 step 3: the
+    // start-angle frame correction left with the scaffold angles; the chain
+    // places the mesh and _kcPlacePlanetPole its axis, so this container
+    // reaches only the planet's look-at orbit-plane helper)
     if (planetData && planetData.containerObj) {
-      const correction = ascNodeToolCorrection[planetName.toLowerCase()] || 0;
-      const corrAngle = (-90 - (ascendingNode + correction)) * DEG2RAD;
-      planetData.containerObj.rotation.x = Math.cos(corrAngle) * -inclination * DEG2RAD;
-      planetData.containerObj.rotation.z = Math.sin(corrAngle) * -inclination * DEG2RAD;
+      planetData.containerObj.rotation.x = newTilta * DEG2RAD;
+      planetData.containerObj.rotation.z = newTiltb * DEG2RAD;
     }
   };
 
@@ -52038,17 +52052,15 @@ function updateDynamicInclinations() {
   // Plan 06 Phase 7 commit 2: the planets' obliquity OF DATE from the spin
   // channel (ONE home @essrt/physics/planets/spin-channel, through the package
   // model) at the ENGINE year (R4b) — the o.<planet>Obliquity value in the
-  // angular-momentum sense (Venus ≈ 177°, Uranus ≈ 98°) and the RENDERED tilt
-  // of each planet's rotation axis in the scene's acute convention (the spin
-  // direction carries the retrograde sign, as at J2000). Until commit 2 the
-  // meshes stood at the static J2000 tilt and the panel row read the retired
-  // two-component device law.
+  // angular-momentum sense (Venus ≈ 177°, Uranus ≈ 98°). Until commit 2 the
+  // panel row read the retired two-component device law. (Plan 11 step 3:
+  // the RENDERED axis no longer takes its tilt magnitude here — the whole
+  // pole, azimuth included, is placed in world from the channel's ŝ(t) by
+  // _kcPlacePlanetPole in the chain override.)
   {
     const engineYear = _engineYearOfSceneYear(o.currentYear);
-    for (const [k, pd] of [['mercury', mercury], ['venus', venus], ['mars', mars], ['jupiter', jupiter], ['saturn', saturn], ['uranus', uranus], ['neptune', neptune]]) {
-      const eps = computePlanetObliquity(k, engineYear);
-      o[`${k}Obliquity`] = eps;
-      if (pd.rotationAxis) pd.rotationAxis.rotation.z = -Math.min(eps, 180 - eps) * Math.PI / 180;
+    for (const k of ['mercury', 'venus', 'mars', 'jupiter', 'saturn', 'uranus', 'neptune']) {
+      o[`${k}Obliquity`] = computePlanetObliquity(k, engineYear);
     }
   }
 
@@ -52756,8 +52768,13 @@ function updatePredictions() {
   o.longitudePerihelion = earthPerihelionEclipticOfDateDeg(o.julianDay, o.currentYear);
   predictions.longitudePerihelion = o.longitudePerihelion;
   
-  predictions.longitudePerihelionDatePer = o.longitudePerihelionDatePer = longitudeToDateTime((((earthPerihelionFromEarth.ra * 180 / Math.PI + 360) % 360)-earthRAAngle-180), o.currentYear)
-  predictions.longitudePerihelionDateAp = o.longitudePerihelionDateAp = longitudeToDateTime(((earthPerihelionFromEarth.ra * 180 / Math.PI + 360)-earthRAAngle % 360), o.currentYear)
+  // Plan 11 step 3: the dates of Earth's perihelion and aphelion are the
+  // instants the Sun's longitude reaches ϖ_Earth + 180° and ϖ_Earth (the
+  // series' perihelion of date above). The former rows fed the chain-placed
+  // marker's RA minus the scaffold's RA angle (a device constant) into the
+  // ecliptic-longitude solver.
+  predictions.longitudePerihelionDatePer = o.longitudePerihelionDatePer = longitudeToDateTime(o.longitudePerihelion + 180, o.currentYear);
+  predictions.longitudePerihelionDateAp = o.longitudePerihelionDateAp = longitudeToDateTime(o.longitudePerihelion, o.currentYear);
   
   predictions.lengthofAU = currentAUDistance;  // tweakpane display shadow; algebraic round-trip removed (broke under Driver 2)
 

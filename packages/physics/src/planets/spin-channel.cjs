@@ -46,6 +46,16 @@
  * `computeObliquityJ2000Deg`), and — through the chain's own g-mode beat
  * (keplerian-chain `computeSecularShape`) — the "wobble period" the K
  * device beat from its integer axial and obliquity fractions.
+ *
+ * Since plan 11 step 3 the channel also serves the POLE of date itself —
+ * `spinAxisEclipticJ2000AtYear` (the integrated ŝ(t), angular-momentum
+ * sense) beside `orbitNormalEclipticJ2000AtYear` (n̂(t)) — so both scene
+ * twins place each planet's rotation axis in world through the frame bridge
+ * exactly as Earth's axis is placed (R4): the pole's azimuth used to ride the
+ * retired scaffold's start angle (one turn of the pole per orbit), only its
+ * tilt magnitude was read from here. Mercury's Cassini-locked pole is the
+ * J2000 pole carried with its orbit normal (the minimal rotation n̂₀ → n̂(t)),
+ * the lock's constant obliquity.
  */
 
 'use strict';
@@ -124,6 +134,19 @@ const dot = (a, b) => a[0] * b[0] + a[1] * b[1] + a[2] * b[2];
 const unit = (a) => { const r = Math.hypot(a[0], a[1], a[2]); return [a[0] / r, a[1] / r, a[2] / r]; };
 /** @param {number[]} a @param {number[]} b */
 const angleDeg = (a, b) => Math.acos(Math.max(-1, Math.min(1, dot(a, b)))) * R2D;
+/**
+ * v carried by the minimal rotation that takes unit a onto unit b (Rodrigues
+ * about a × b); v itself when a and b coincide.
+ * @param {number[]} a @param {number[]} b @param {number[]} v
+ */
+const rotateAligned = (a, b, v) => {
+  const k = cross(a, b);
+  const s = Math.hypot(k[0], k[1], k[2]), c = dot(a, b);
+  if (s < 1e-15) return v.slice();
+  const kh = [k[0] / s, k[1] / s, k[2] / s];
+  const kv = cross(kh, v), kd = dot(kh, v) * (1 - c);
+  return [v[0] * c + kv[0] * s + kh[0] * kd, v[1] * c + kv[1] * s + kh[1] * kd, v[2] * c + kv[2] * s + kh[2] * kd];
+};
 
 /**
  * The IAU pole (ICRF equatorial RA/Dec) as an ecliptic-J2000 unit vector.
@@ -272,9 +295,9 @@ function createPlanetSpinChannel(deps) {
   const stepYr = deps.stepYr ?? (cassiniLocked ? STEP_MAX_YR
     : Math.min(STEP_MAX_YR, Math.max(STEP_MIN_YR, axialPrecessionPeriodYearsJ2000 / STEPS_PER_PRECESSION_PERIOD)));
   // append-only trajectories from J2000, one per direction: sample i sits at t = sign · i · step
-  /** @typedef {{ eps: number[], last: number[] }} Track */
+  /** @typedef {{ eps: number[], sv: number[][], last: number[] }} Track — the obliquity and the unit spin vector per sample */
   /** @returns {Track} */
-  const mkTrack = () => ({ eps: [obliquityJ2000], last: s0.slice() });
+  const mkTrack = () => ({ eps: [obliquityJ2000], sv: [s0.slice()], last: s0.slice() });
   const fwd = mkTrack(), bwd = mkTrack();
   /** @param {Track} tr @param {number} sign @param {number} count */
   const grow = (tr, sign, count) => {
@@ -284,6 +307,7 @@ function createPlanetSpinChannel(deps) {
       const h = sign * stepYr;
       const s = rk4(tr.last, t, h);
       tr.eps.push(angleDeg(s, orbitNormalAt(t + h)));
+      tr.sv.push(s);
       tr.last = s;
     }
   };
@@ -333,6 +357,24 @@ function createPlanetSpinChannel(deps) {
     }
     return { minDeg: mn, meanDeg: sum / cnt, maxDeg: mx };
   };
+  /** the planet's orbit normal of date n̂(t), a unit vector in the J2000 ecliptic (the ζ table at the chain's anchor) @param {number} year */
+  const orbitNormalEclipticJ2000AtYear = (year) => orbitNormalAt(year - 2000);
+  /**
+   * the spin axis of date ŝ(t), a unit vector in the J2000 ecliptic in the
+   * angular-momentum sense (Venus and Uranus point south of their orbits):
+   * the integrated pole, interpolated linearly between the track's samples
+   * and renormalized (≤ 1.2° of pole motion per sample — the chord error is
+   * arcsecond-class, below what any renderer resolves); Mercury (Cassini
+   * lock) carries the J2000 pole with its orbit normal; null beyond ±10 Myr
+   * @param {number} year
+   */
+  const spinAxisEclipticJ2000AtYear = (year) => {
+    if (cassiniLocked) return rotateAligned(n0, orbitNormalAt(year - 2000), s0);
+    const b = bracket(year - 2000);
+    if (!b) return null;
+    const a = b.tr.sv[b.i], c = b.tr.sv[b.i + 1];
+    return unit([a[0] + b.f * (c[0] - a[0]), a[1] + b.f * (c[1] - a[1]), a[2] + b.f * (c[2] - a[2])]);
+  };
 
   return Object.freeze({
     key,
@@ -350,6 +392,8 @@ function createPlanetSpinChannel(deps) {
     obliquityDegAtYear,
     spinPrecessionRateArcsecPerYrAtYear,
     obliquityEnvelopeDeg,
+    spinAxisEclipticJ2000AtYear,
+    orbitNormalEclipticJ2000AtYear,
     stepYr,
     maxSpanYr: MAX_SPAN_YR,
   });

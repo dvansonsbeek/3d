@@ -114,7 +114,7 @@ The seven planets' live elements of date come from the N-body chain (`_kcElement
 | `{planet}Tilt` | Axial tilt |
 | `{planet}RotationPeriod` | Sidereal rotation period (hours) |
 | `planets.{planet}.ascendingNodeInvPlane` | The closed-form J2000 node on the invariable plane — a reference derivation, `planetOrbitalElements.<p>.ascendingNodeInvPlaneClosedForm` in `astro-reference.json` since plan 11 step 2 (the Node twin keeps the field name); the chain planets' node of date is the chain's ([doc 20 § Ascending Nodes](20-constants-reference.md#ascending-nodes-on-the-invariable-plane-at-j2000)) |
-| `planets.{planet}.startpos` | The scene scaffold's start angle (`model-parameters.json`; it turns the planet's pole azimuth and Saturn's ring plane until plan 11 step 3 places the poles from the spin channel). `.angleCorrection` and `.eocFraction` are deleted (plan 11 step 2) — the chain places the perihelion marker, and no reader of the fraction was left. |
+| `planets.{planet}.startpos` | DELETED (plan 11 step 3) — the scene scaffold's fitted start angle; its last display reach was each planet's pole azimuth and Saturn's ring plane, which turned once per orbit with the wheel. Each planet's rotation axis is now placed in world from the spin channel's pole of date through the frame bridge (`_kcPlacePlanetPole`, as Earth's axis is), and the wheels rest at zero. `.type` (the wheel ellipse family) left with it — a code taxonomy in `@essrt/physics` planets/geometry. `.angleCorrection` and `.eocFraction` are deleted (plan 11 step 2). |
 | `diameters.{planet}Diameter` | Planet diameter (km) |
 
 ### 1.3 Per-Planet Live/Dynamic Variables (accessible via `o.`)

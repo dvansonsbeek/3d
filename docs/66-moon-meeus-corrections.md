@@ -639,25 +639,27 @@ used for the latitude correction (computed from `T = d/36525`).
 
 ---
 
-## 4. StartPos Values
+## 4. StartPos Values (DELETED, plan 11 step 3)
 
-Provenance: **J2000-element anchored** — the scene's node and perigee
-longitudes are set to the Meeus J2000 elements (Ω = 125.0446°, ϖ = 83.3532°)
-to Δ = 0.0000° via the in-sim anchoring meter. Verified against the Step-5c
-eclipse RMS (0.8086° — that metric is Meeus-override-framed).
-
-| Parameter | Value (J2000-anchored) |
-|-----------|--------------------------|
-| moonStartposApsidal | <!--v:moonStartposApsidalDeg-->347.5476<!--/v--> |
-| moonStartposNodal | <!--v:moonStartposNodalDeg-->64.0435<!--/v--> |
-| moonStartposMoon | DELETED (plan 11 step 2) — was 67.8443, the in-plane anchor via the unmask meter; the certified override places the rendered Moon's direction and distance every frame, so the angle reached only the Node twin's geometric pivot (the anchoring meter's L row reads the Meeus-overridden *true* Moon, so its ~3° Δ against the mean-longitude target is the equation-of-center reading) |
-
-The apsidal/nodal values carry a micro-recalibration for the eight-interval count layer (a device of the lunar chain)
-rates. The anchoring meter's node-rate row reads the **world frame**: the
-nodal layer spins at the of-date period (6798.33 d, −19.3411°/yr) in its
-local frame, and Earth's axial-precession parent adds the equinox precession
-(~0.0140°/yr, both retrograde), so the measured world-frame regression is
-the star-referenced −19.3551°/yr.
+The three fitted scene start angles are gone. `moonStartposMoon` left at plan
+11 step 2 (the certified override places the rendered Moon's direction and
+distance every frame; the angle reached only the Node twin's geometric
+pivot). `moonStartposApsidal` (347.5476°) and `moonStartposNodal` (64.0435°)
+— the orbit RING's J2000 phases, "J2000-element anchored" to the Meeus
+elements Ω = 125.0446°, ϖ = 83.3532° via the in-sim anchoring meter — left at
+step 3: measured on the Node twin, they reproduced the Meeus elements at the
+model start to 0.006° through the stack's conventions (a layer angle θ
+carries the longitude 90° + θ, the apsidal arm points at the apogee, the
+Moon def's fixed tilt puts the ascending node at 180° under zero stack
+rotation). The ring's five stack layers are now ENGINE-PLACED every frame
+from the lunar arguments — apsidal θ = ϖ − 90°, canceller −θ, the inert pair
+0, nodal θ = Ω − 180°, with ϖ = L′ − M′ and Ω = L′ − F at the scene's TT — the
+same arguments that place the rendered Moon and the Apsidal/Nodal markers,
+so ring ≡ markers ≡ Moon at every epoch, in both twins
+(`_applyEngineEarthFrame`). The layers' locked speeds and deep-time
+integrator tags went with the phases; the anchoring meter's node-rate row
+(the world-frame regression −19.3551°/yr, the of-date −19.3411°/yr plus the
+equinox precession) still reads the placed ring.
 
 ---
 
