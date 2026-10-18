@@ -463,9 +463,11 @@ device read 1.24° vs 1.91° at −100 kyr). The integrator's seven browser
 writes had been overwritten by the chain every frame since K5b — its
 display reach was zero; its only gated reach was 28 golden probes. The
 K device CONSTANTS (`earthtiltMean`, `earthInvPlaneInclinationAmplitude`,
-`earthRAAngle`, `earthInvPlaneInclinationMean`, and since R10 the wheels'
-J2000 phase `kDeviceWheelPhaseAtJ2000Cycles`) stay: they are the scene's
-J2000 pose (the wheel geometry `_kcFrameR` reads once), not a law. `psiValue`
+`earthRAAngle`, and since R10 the wheels' J2000 phase
+`kDeviceWheelPhaseAtJ2000Cycles`) stay until plan 11 step 4: they are the
+scene's J2000 pose (the wheel geometry `_kcFrameR` reads once), not a law
+(`earthInvPlaneInclinationMean`, the device's mean inclination, left at plan 11
+step 2 — its one reach was the invariable-plane disc's init pose). `psiValue`
 is frozen in the registry like `kValue`. **Plan 07 R10 (model v21.0,
 physics MAJOR 17, model-values MAJOR 16): the combs' phase origin is J2000.**
 The fitted origin t₀ (`perihelionalignmentYear` − `temperatureGraphMostLikely`
@@ -626,7 +628,7 @@ what actually made corrections stick here.
 | `tools/fit/` | CLI shims for the fitting pipeline — implementations live in `packages/fitting/src` |
 | `tools/verify/` | 24 scripts: 5 gate · 1 liftable · 6 narrative · 12 generator (`npm run test:verify:list`) |
 | `packages/physics`, `packages/model-values` | the published npm packages (@essrt scope) — the website and world consume these; refits reach them via `values:package:write` + republish |
-| `tools/explore/` | 123 frozen research one-offs — findings live in `docs/`; a script stays only while something names it (its README states the rule) |
+| `tools/explore/` | 119 frozen research one-offs — findings live in `docs/`; a script stays only while something names it (its README states the rule) |
 | `data/deltaT-4flag-fit.json`, `data/core-mantle-resonator-stage1.json`, `public/input/climate-formula-coefficients.json`, `data/deep-time-fitted.json` | the shipped fitted artifacts, each its fitter's (the last a banked frozen record) — embedded by `generate.mjs`; `public/input/fitted-coefficients.json` is deleted (plan 11 step 1) |
 | `docs/` | 75 numbered docs; `40-architecture`, `99-essrt` are cross-referenced |
 

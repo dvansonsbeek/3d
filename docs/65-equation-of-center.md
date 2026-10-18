@@ -295,7 +295,7 @@ baselines).
 
 The residual it absorbs originates from a definitional eccentricity
 difference: the legacy path's `eccentricityDerivedMean`
-(0.0155200, the retired single-line law's base′)
+(0.0155200, the retired single-line law's base′ — deleted at plan 11 step 2)
 vs Meeus's IAU J2000 value (<!--v:j2000Eccentricity-->0.01671022<!--/v-->),
 propagating through `2e·sin(M)` as a ~280″ annual term.
 
@@ -311,7 +311,8 @@ above the 0.05″ threshold; the drift-proxy candidates it surfaced (the unit's
 **Pipeline position (record).** It was fitted as Step 0, ahead of Step 1
 (`correctionSun`), by `tools/fit/sun-longitude-harmonics.js`; the fitter, the
 keys and the evaluator are deleted (plan 09 step 5a; git history carries them),
-and `correctionSun` (Step 1) is now fitted with no Sun-longitude comb beneath it.
+and Step 1 with `correctionSun` followed at plan 11 step 2 — the engine places
+the Sun, so nothing is fitted beneath it any more.
 
 Toggles: `SUN_HARMONICS_ENABLED` (src/script.js), env
 `SUN_HARMONICS_DISABLED=1` (Node tools).
@@ -330,7 +331,7 @@ the per-planet EoC write-ups of the retired geometric path are archived.
 
 ## Code Locations
 
-- `src/script.js`: `useVariableSpeed`; `ASTRO_REFERENCE.perihelionPassageJ2000_JD`; the derived constants after `eccentricityDerivedMean`; the Sun object definition (`eccentricity: eocEccentricity`, `perihelionPhaseJ2000`); the `moveModel` sun block (EoC gate, FQ3 corrector, Z-B gate, δ overlay); flags `FQ3_EXACT_SUN_ENABLED`, `E5_WHEEL_SUN_ENABLED`, `SUN_HARMONICS_ENABLED`
+- `src/script.js`: `ASTRO_REFERENCE.perihelionPassageJ2000_JD`; the derived EoC constant `eocEccentricity`; the Sun object definition (`eccentricity: eocEccentricity`, `perihelionPhaseJ2000`); the `moveModel` sun block (EoC gate, FQ3 corrector, Z-B gate, δ overlay); flags `FQ3_EXACT_SUN_ENABLED`, `E5_WHEEL_SUN_ENABLED`, `SUN_HARMONICS_ENABLED`
 - `tools/lib/constants.js`: derived-constants block
 - `tools/lib/scene-graph.js`: Sun eccentricity in the body defs; `moveModel`; `FQ3_EXACT_SUN`; the `animateFast` mirror (used by `computeSunPositionFast`)
 - `public/input/fitted-coefficients.json`: `SUN_LONGITUDE_MEAN`, `SUN_LONGITUDE_HARMONICS` (DELETED at plan 09 step 5a)

@@ -171,10 +171,10 @@ then `npm run constants:generate` (Step 9).
 | `reclassify-tiers.js` | Tier reclassification + JPL enrichment of Tier 1 data | `data/reference-data.json` |
 | `verify-pipeline.js` | Pass/fail verification of all 9 targets + correction stack | Scene-graph simulation |
 
-Note: `eocEccentricity` and `perihelionPhaseOffset` are derived analytically in
-`constants.js` and require no pipeline step. The historical numerical-verification
-scripts (`eoc-constants.js`, `perihelion-offset.js`) now live in
-[`tools/explore/`](../explore/).
+Note: `eocEccentricity` is derived analytically in `constants.js` (e(J2000)/2) and
+requires no pipeline step; `perihelionPhaseOffset` and the historical
+numerical-verification scripts (`eoc-constants.js`, `perihelion-offset.js`) were
+deleted at plan 11 step 2 with the scene constants they derived (git history).
 
 ## Publishing to the website (Phase-14 flow)
 
