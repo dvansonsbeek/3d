@@ -131,6 +131,16 @@ try {
     check(`star field: the ${k} container sits on the J2000 equatorial frame through R (pole and equinox)`, !!f && f.poleChord < 1e-9 && f.equinoxChord < 1e-9, f ? `pole chord ${f.poleChord.toExponential(2)} (tilt ${f.poleTiltDeg.toFixed(4)}°), equinox chord ${f.equinoxChord.toExponential(2)} (offset ${f.equinoxOffsetDeg.toFixed(4)}°)` : 'probe returned null');
   }
   check('Moon nodes: on the ecliptic of date at L′ − F and L′ − F + 180°, at distance a', !!mm && Math.abs(wrapd(mm.ascNode.lon - mm.nodeLonExpectedDeg)) < 1e-6 && Math.abs(wrapd(mm.descNode.lon - mm.nodeLonExpectedDeg - 180)) < 1e-6 && Math.abs(mm.ascNode.lat) < 1e-6 && Math.abs(mm.descNode.lat) < 1e-6 && Math.abs(mm.ascNode.distAU - mm.aAU) < 1e-9, mm ? `asc λ ${mm.ascNode.lon.toFixed(4)}° β ${mm.ascNode.lat.toExponential(1)}°, desc λ ${mm.descNode.lon.toFixed(4)}°, Ω = L′ − F = ${mm.nodeLonExpectedDeg.toFixed(4)}°` : '');
+  // Focusing a chain planet shows its orbit-plane grid: it must pass through
+  // the rendered Sun with its normal along the chain's orbit normal of date.
+  // Born from the owner's "the tilt of Mercury's path floats above the Sun":
+  // the grid hung on the scaffold's inert annual wheel, 1.36 AU from the Sun
+  // since the plan 07/09 arc (measured on the Node twin: 6.7 units in August,
+  // 135.6 units by 14 October), invisible to goldens that record observables.
+  for (const planet of ['Mercury', 'Jupiter']) {
+    const op = await sim.page.evaluate((p) => window.__test__.orbitPlaneProbe(p), planet);
+    check(`${planet}: the orbit-plane grid passes through the rendered Sun with the chain's orbit normal`, !!op && op.visible && op.centreToSunSceneUnits < 1e-9 && op.normalChord < 1e-12, op ? `centre − Sun ${op.centreToSunSceneUnits.toExponential(2)} units (${op.centreToSunAU.toFixed(4)} AU), normal chord ${op.normalChord.toExponential(2)} (${op.normalTiltDeg.toFixed(4)}° off; i of date ${op.inclDateDeg.toFixed(4)}°), visible ${op.visible}` : 'probe returned null');
+  }
   // A chip click must WAKE the paused loop (owner: "Perihelion at Earth" appeared
   // only on a camera move or Play once the paused loop truly idled — the monitor
   // ticks used to wake every frame and hid the class). Fail-proven on the

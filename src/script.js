@@ -5757,6 +5757,37 @@ if (typeof window !== 'undefined') {
         equinoxAzimuthDeg: Math.atan2(R[0][0], R[2][0]) / D2R, equinoxAzimuthLiteralDeg: SCENE_EQUINOX_VIEW_AZIMUTH_DEG,
         seriesLive: !!F, axisPoleChord: F ? axisY.distanceTo(toW(F.s)) : null, axisEquinoxChord: F ? axisZ.distanceTo(toW(F.g)) : null };
     },
+    // Orbit-plane gate hook: focusing a chain planet shows its orbit-plane grid
+    // (switchToPlanet → pd.orbitPlaneHelper.visible). The grid must pass
+    // through the rendered Sun with its normal along the chain's orbit normal
+    // of date through R. Born from the owner's "the tilt of Mercury's path
+    // floats above the Sun": the grid hung on the scaffold's inert
+    // PerihelionFromEarth → RealPerihelionAtSun layers, whose annual wheel
+    // (startPos 0) lost the Sun's wheel zero a quarter turn ago — measured on
+    // the Node twin 135.6 scene units (1.36 AU) from the Sun since the plan
+    // 07/09 arc, while every observable stayed bit-identical.
+    orbitPlaneProbe: (planet) => {
+      const key = String(planet).toLowerCase();
+      const target = PLANET_HIERARCHIES[key];
+      if (!target) return null;
+      const before = o.Target;
+      switchToPlanet(target.label);
+      forceSceneUpdate();
+      const pd = target.obj(), grid = pd.orbitPlaneHelper;
+      const f = computeInspectorOrbitFrame(key);
+      let out = null;
+      if (grid && f) {
+        const c = grid.getWorldPosition(new THREE.Vector3());
+        const q = grid.getWorldQuaternion(new THREE.Quaternion());
+        const nGrid = new THREE.Vector3(0, 1, 0).applyQuaternion(q);
+        const nChord = Math.min(nGrid.distanceTo(f.nOrb), nGrid.clone().negate().distanceTo(f.nOrb));   // a plane has two normals
+        out = { planet: target.label, visible: grid.visible, centreToSunSceneUnits: c.distanceTo(f.S), centreToSunAU: c.distanceTo(f.S) / 100,
+          normalChord: nChord, normalTiltDeg: Math.asin(Math.min(1, nChord / 2)) * 2 * 180 / Math.PI, inclDateDeg: f.inclDateDeg };
+      }
+      switchToPlanet(before);
+      forceSceneUpdate();
+      return out;
+    },
     // Star-field gate hook: the star and constellation containers are J2000
     // RA/Dec catalogs aligned ONCE at module init to Earth's rotation-axis
     // frame; they must sit on the J2000 equatorial frame through R (pole ŝ,
@@ -8628,6 +8659,19 @@ planetObjects.forEach(obj => createPlanet(obj));
 [mercuryRealPerihelionAtSun, venusRealPerihelionAtSun, marsRealPerihelionAtSun,
  jupiterRealPerihelionAtSun, saturnRealPerihelionAtSun, uranusRealPerihelionAtSun,
  neptuneRealPerihelionAtSun].forEach(setupVisualTiltGroup);
+
+// The chain planets' orbit-plane grids (shown when a planet is the focus
+// target) leave the scaffold: they hung under each planet's container, i.e. on
+// the inert PerihelionFromEarth → RealPerihelionAtSun wheel chain, whose
+// annual wheel (startPos 0) parted from the engine-placed Sun's wheel zero by a
+// quarter turn in the plan 07/09 arc — the grid sat 1.36 AU from the Sun with
+// its tilt 19.8° off Mercury's orbit normal (measured by the perihelion-at-sun
+// gate's orbit-plane rows). They are scene children now and
+// _kcPlaceOrbitPlaneHelpers places them every frame from the engine: centre at
+// the rendered Sun, normal along the chain's orbit normal of date through R.
+for (const pd of [mercury, venus, mars, jupiter, saturn, uranus, neptune]) {
+  if (pd.orbitPlaneHelper) scene.add(pd.orbitPlaneHelper);   // scene.add re-parents
+}
 
 updatePlanetSizes(0);
 
@@ -48957,6 +49001,29 @@ function _applyEngineEarthFrame(jdUT) {
   _kcSetWorldRotation(earth.rotationAxis, _HTC_A.crossVectors(s, g), s, g);
   startingPoint.pivotObj.updateMatrixWorld(true);
 }
+// The focused chain planet's orbit-plane grid, placed from the engine every
+// frame (scene child since the scaffold wheels stopped tracking the Sun):
+// centre at the rendered Sun, local Y (the GridHelper's normal) along the
+// chain's orbit normal of date through R, local X along the perihelion
+// direction — the frame computeInspectorOrbitFrame renders. Only a visible
+// grid is placed (one at a time: switchToPlanet hides the others). Gate:
+// perihelion-at-sun's orbit-plane rows.
+const _KC_OP_X = new THREE.Vector3(), _KC_OP_Z = new THREE.Vector3();
+function _kcPlaceOrbitPlaneHelpers() {
+  for (const key of Object.keys(PLANET_HIERARCHIES)) {
+    const pd = PLANET_HIERARCHIES[key].obj();
+    const grid = pd && pd.orbitPlaneHelper;
+    if (!grid || !grid.visible || grid.parent !== scene) continue;
+    const f = computeInspectorOrbitFrame(key);
+    if (!f) continue;
+    grid.position.copy(f.S);
+    _KC_OP_X.copy(f.p);
+    _KC_OP_Z.crossVectors(_KC_OP_X, f.nOrb).normalize();
+    _HTC_M4.makeBasis(_KC_OP_X, f.nOrb, _KC_OP_Z);
+    grid.quaternion.setFromRotationMatrix(_HTC_M4);
+    grid.updateMatrixWorld(true);
+  }
+}
 const _KC_V = new THREE.Vector3();   // scratch for the visual override
 // P5/K5b — the chain position AT AN ARBITRARY MOMENT, for consumers that
 // re-animate the scene to past epochs (the trace sampler): the overridden
@@ -50344,6 +50411,7 @@ function moveModel(pos) {
   // R4: the Earth frame — sun plane, apsidal wheel, Sun and axis — placed
   // from the engine on top of the animated device (see _applyEngineEarthFrame).
   _applyEngineEarthFrame(o.julianDay);
+  _kcPlaceOrbitPlaneHelpers();   // the focused planet's orbit-plane grid, at the Sun just placed
 
   _moonUpdateMarkers(o.julianDay);   // the Moon's perigee / line-of-nodes markers (when shown) on the placed frame
   _ssbUpdateMarker(o.julianDay);     // the Sun-barycenter marker (when shown) on the placed Sun
@@ -53417,10 +53485,12 @@ function createPlanet(pd) {           // pd = Planet Data
 }
 
 /**
- * Move visual elements (orbital plane helper, inclination plane) into a dedicated
- * tilt group inside a RealPerihelionAtSun containerObj. The containerObj rotation
- * is then zeroed so it no longer tilts planet positions (tilt is applied at the
- * planet.containerObj level instead for correct ecliptic latitude).
+ * Move a RealPerihelionAtSun layer's OWN orbit-plane helper into a dedicated
+ * tilt group inside its containerObj, and zero the containerObj rotation so it
+ * no longer tilts planet positions. (The chain PLANETS' grids — the ones a
+ * focus target shows — are not here: they are scene children placed from the
+ * engine by _kcPlaceOrbitPlaneHelpers, since this inert wheel chain stopped
+ * tracking the Sun.)
  */
 function setupVisualTiltGroup(pd) {
   if (!pd.containerObj) return;

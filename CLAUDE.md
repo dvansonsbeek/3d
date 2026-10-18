@@ -413,7 +413,14 @@ against the constellations where it was at 90°" after plan 11 step 4: the
 axis's rest pose became 0 and the engine places it only at the first update,
 after the alignment — 23.44° of tilt and 68.23° of equinox offset missing from
 the sky, invisible to goldens that record observables; fail-proven on that
-build), and a chip click WAKES the
+build), and the focused chain planet's orbit-plane grid passes through the
+rendered Sun with its normal along the chain's orbit normal of date (born from
+the owner's "the tilt of Mercury's path floats above the Sun": the grid hung on
+the scaffold's inert PerihelionFromEarth → RealPerihelionAtSun wheels, whose
+annual wheel lost the engine-placed Sun's wheel zero a quarter turn in the
+plan 07/09 arc — 1.36 AU from the Sun and 19.8° off the normal on the pre-fix
+build; it is a scene child placed from the engine every frame now), and a
+chip click WAKES the
 paused render loop (the class the monitor guard exposed: a UI path that
 changes scene state without setting `positionChanged` — now every user
 interaction wakes the loop for one frame; the pre-fix build reads 0 active
