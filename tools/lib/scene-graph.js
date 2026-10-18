@@ -728,9 +728,6 @@ function getPlanetSceneData(key) {
   // Perihelion ecliptic years (already in constants)
   const perihelionEclipticYears = p.perihelionEclipticYears;
 
-  // lowestPoint (Type I only)
-  const lowestPoint = 180 - p.ascendingNode;
-
   // Orbit center for PerihelionFromEarth layer (plan 11 step 2: the fitted
   // angleCorrection — the marker direction's RA→λ conversion — is deleted; the
   // chain placement overwrites this centre every frame, mirror src/script.js)
@@ -744,26 +741,10 @@ function getPlanetSceneData(key) {
   const realPeriTiltA = Math.cos((-90 - p.ascendingNode) * d2r) * -p.eclipticInclinationJ2000;
   const realPeriTiltB = Math.sin((-90 - p.ascendingNode) * d2r) * -p.eclipticInclinationJ2000;
 
-  // Speed for RealPerihelionAtSun — differs by the wheel's ellipse family
-  // (geometry.cjs SCAFFOLD_ELLIPSE_FAMILY; plan 11 step 3: the outer families'
-  // phase 2 × startpos rests at zero — the wheel is overridden by the chain)
-  let realPeriSpeed, realPeriStartPos;
-  if (d.ellipseFamily === 'I') {
-    realPeriSpeed = -Math.PI * 2;
-    realPeriStartPos = lowestPoint;
-  } else if (d.ellipseFamily === 'II') {
-    realPeriSpeed = -Math.PI * 2 + (2 * Math.PI * 2 / d.period);   // plan 09 step 7b: the scaffold period (scene years), no device count
-    realPeriStartPos = 0;
-  } else { // family III
-    realPeriSpeed = -Math.PI * 2;
-    realPeriStartPos = 0;
-  }
-
-  // Elliptic orbit radius — negated for Saturn, the scene's anti-phase
-  // convention (negative in script.js). Plan 07 R8: the `antiPhase` JSON flag
-  // left with the ψ law's inputs; the scene convention is spelled here.
-  let elipticOrbitRadius = d.elipticOrbit;
-  if (key === 'saturn') elipticOrbitRadius = -elipticOrbitRadius;
+  // (The RealPerihelionAtSun wheel's speed/phase by ellipse family and its
+  // elliptic radius — Saturn's negated by the scene's anti-phase convention —
+  // left with the wheel; the geometry law's taxonomy and radii stay published
+  // in @essrt/physics planets/geometry.)
 
   // Planet orbital speed (Mars is negative, all others positive)
   const planetSpeed = (key === 'mars')
@@ -774,11 +755,10 @@ function getPlanetSceneData(key) {
   const orbitRadiusScene = d.orbitDistance * 100;
 
   return {
-    key, p, d, perihelionEclipticYears, lowestPoint,
+    key, p, d, perihelionEclipticYears,
     periFromEarthA, periFromEarthB,
     realPeriTiltA, realPeriTiltB,
-    realPeriSpeed, realPeriStartPos,
-    elipticOrbitRadius, planetSpeed, orbitRadiusScene,
+    planetSpeed, orbitRadiusScene,
   };
 }
 
@@ -973,24 +953,15 @@ function buildSceneGraph() {
     });
     barycenter.pivot.addChild(periFromE.container);
 
-    // Layer 2: RealPerihelionAtSun
-    // NOTE: Orbital plane tilt is applied at the PLANET container level (below the
-    // annual rotation), not here. Placing it here causes the tilt's latitude effect
-    // to oscillate annually in the tilted frame; at opposition dates (which recur at
-    // the synodic period), the combined angle changes by exactly -2pi, making the
-    // sampled latitude constant. Moving the tilt below the annual rotation ensures
-    // the latitude varies with the planet's sidereal orbital angle.
-    const realPeri = makePrecessionNode(key + 'RealPerihelionAtSun', {
-      orbitRadius: pd.elipticOrbitRadius,
-      orbitCentera: 100, orbitCenterb: 0, orbitCenterc: 0,
-      orbitTilta: 0, orbitTiltb: 0,
-      tilt: 0,
-      startPos: pd.realPeriStartPos,
-      speed: pd.realPeriSpeed,
-    });
-    periFromE.pivot.addChild(realPeri.container);
+    // (Layer 2, the RealPerihelionAtSun ellipse wheel — the scaffold's "Sun"
+    // for each planet, 100 units along the annual wheel — is DELETED with the
+    // browser's, and the FixedPerihelionAtSun marker that this twin never
+    // carried: the chain has placed every rendered planet quantity since K5,
+    // and the orbit-plane grid, the wheel's last visible reach, is placed at
+    // the rendered Sun. The planet container hangs on the barycenter directly;
+    // mirror src/script.js.)
 
-    // Planet itself — orbital plane tilt applied here (below annual rotation)
+    // Planet itself — orbital plane tilt applied here
     const planetDef = {
       orbitRadius: pd.orbitRadiusScene,
       orbitCentera: 0, orbitCenterb: 0, orbitCenterc: 0,
@@ -1010,10 +981,10 @@ function buildSceneGraph() {
     planetDef._dtPlanetIntegrator = _mcPlanet[key];
     planetDef._dtPlanetSign = Math.sign(planetDef.speed);
     const planetNodes = makeObjectNodes(key, planetDef);
-    realPeri.pivot.addChild(planetNodes.container);
+    barycenter.pivot.addChild(planetNodes.container);
 
     planetNodeMap[key] = {
-      periFromE, realPeri,
+      periFromE,
       planet: planetNodes,
       sceneData: pd,
     };
@@ -1255,9 +1226,9 @@ function moveModel(graph, pos) {
     // (Plan 07 R5: the per-frame planet-container tilt — the device's
     // two-normal ecliptic inclination with the integrated ascending node —
     // stood here. Rendered-dead since K5 (positions are sun + 100·R·helio);
-    // deleted with the law.)
+    // deleted with the law. The RealPerihelionAtSun wheel's animation stood
+    // here too — deleted with the wheel.)
 
-    animateObject(pm.realPeri, pm.realPeri.def);
     animateObject(pm.planet, pm.planet.def);
   }
 

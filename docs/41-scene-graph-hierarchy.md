@@ -472,11 +472,10 @@ All seven planets, Mercury to Neptune, are **siblings** of the Sun under `baryce
 barycenterEarthAndSun.pivotObj
 ├── sun.containerObj                                           ← sibling
 ├── earthPerihelionFromEarth.containerObj                      ← sibling
-├── [Planet]PerihelionFromEarth.containerObj                   ← sibling (one per planet)
-│     ├── [Planet]RealPerihelionAtSun.containerObj
-│     │     └── [planet].containerObj → orbitObj → [pivotObj, rotationAxis → planetObj]
-│     └── [Planet]FixedPerihelionAtSun.containerObj            ← sibling
+├── [Planet]PerihelionFromEarth.containerObj                   ← sibling (one per planet): the "Perihelion at Earth" marker + trace
+├── [planet].containerObj → orbitObj → [pivotObj, rotationAxis → planetObj]   ← sibling (one per planet)
 ├── [Next Planet]PerihelionFromEarth.containerObj              ← sibling
+├── [next planet].containerObj
 │     └── ...
 ```
 
@@ -484,9 +483,14 @@ barycenterEarthAndSun.pivotObj
 
 The two counter-rotating apsidal wheels that bracketed `PerihelionFromEarth`
 (`PerihelionDurationEcliptic1/2`, turning at the retired device's perihelion
-period) are deleted in both runtimes (plan 07 R7; the Node twin
-`tools/lib/scene-graph.js` mirrors this wiring). The remaining layers are scene
-scaffolding: since the K5 excision the planet meshes, the orbit rings and the
+period) are deleted in both runtimes (plan 07 R7), and so are the
+`[Planet]RealPerihelionAtSun` ellipse wheel and the `[Planet]FixedPerihelionAtSun`
+marker that hung on each planet's annual wheel (plan 11 follow-up): their last
+visible reach, the focused planet's orbit-plane grid, had sat 1.36 AU from the
+rendered Sun since the annual wheel parted from the engine-placed Sun's wheel
+zero, and is a scene child placed at the Sun now. The Node twin
+`tools/lib/scene-graph.js` mirrors this wiring. What remains is the marker layer
+and the planet: since the K5 excision the planet meshes, the orbit rings and the
 perihelion markers are placed every frame from the N-body chain, and each
 planet's perihelion period is the chain's inertial apsidal period
 1,296,000/g — the values are in [Constants Reference](20-constants-reference.md).

@@ -6895,51 +6895,13 @@ const _planetAscNodeDynKey = {
   Uranus: 'uranusAscendingNode', Neptune: 'neptuneAscendingNode',
 };
 
-const mercuryRealPerihelionAtSun = {
-  name: "Mercury Real Perihelion At Sun",
-  startPos: mercuryLowestPoint,
-  speed: -Math.PI*2,
-  rotationSpeed: 0,
-  tilt: 0,
-  orbitRadius: mercuryElipticOrbit,
-  orbitCentera: 100,
-  orbitCenterb: 0,
-  orbitCenterc: 0,
-  orbitTilta: Math.cos(((-90-planets.mercury.ascendingNode)*Math.PI)/180)*-planets.mercury.eclipticInclinationJ2000,
-  orbitTiltb: Math.sin(((-90-planets.mercury.ascendingNode)*Math.PI)/180)*-planets.mercury.eclipticInclinationJ2000,
-
-  size: 1.0,
-  color: 0x868485,
-  visible: false,
-  containerObj:"",
-  orbitObj:"",
-  planetObj:"",
-  pivotObj:"",
-  isNotPhysicalObject: true,
-};
-
-const mercuryFixedPerihelionAtSun = {
-  name: "Mercury Fixed Perihelion At Sun",
-  startPos: mercuryLowestPoint,
-  speed: -Math.PI*2,
-  rotationSpeed: 0,
-  tilt: 0,
-  orbitRadius: 0,
-  orbitCentera: 100,
-  orbitCenterb: 0,
-  orbitCenterc: 0,
-  orbitTilta: Math.cos(((-90-planets.mercury.ascendingNode)*Math.PI)/180)*-planets.mercury.eclipticInclinationJ2000,
-  orbitTiltb: Math.sin(((-90-planets.mercury.ascendingNode)*Math.PI)/180)*-planets.mercury.eclipticInclinationJ2000,
-
-  size: 1.0,
-  color: 0x868485,
-  visible: false,
-  containerObj:"",
-  orbitObj:"",
-  planetObj:"",
-  pivotObj:"",
-  isNotPhysicalObject: true,
-};
+// (The `<planet>RealPerihelionAtSun` ellipse wheel and the `<planet>FixedPerihelionAtSun`
+// marker — the scaffold's "Sun" for each planet, 100 units along the annual
+// PerihelionFromEarth wheel — are DELETED for the seven chain planets: the
+// chain has placed every rendered planet quantity since K5, the anomaly panel
+// is chain-pure, and the orbit-plane grid — their last visible reach — is a
+// scene child placed at the rendered Sun. The planet containers hang on
+// barycenterEarthAndSun directly. Mirror: tools/lib/scene-graph.js.)
 
 const mercury = {
   name: "Mercury",
@@ -7001,52 +6963,6 @@ const venusPerihelionFromEarth = {
   isNotPhysicalObject: true,
 };
 
-const venusRealPerihelionAtSun = {
-  name: "Venus Real Perihelion At Sun",
-  startPos: venusLowestPoint,
-  speed: -Math.PI*2,
-  rotationSpeed: 0,
-  tilt: 0,
-  orbitRadius: venusElipticOrbit,
-  orbitCentera: 100,
-  orbitCenterb: 0,
-  orbitCenterc: 0,
-  orbitTilta: Math.cos(((-90-planets.venus.ascendingNode)*Math.PI)/180)*-planets.venus.eclipticInclinationJ2000,
-  orbitTiltb: Math.sin(((-90-planets.venus.ascendingNode)*Math.PI)/180)*-planets.venus.eclipticInclinationJ2000,
-
-  size: 0.1,
-  color: 0xA57C1B,
-  visible: false,
-  containerObj:"",
-  orbitObj:"",
-  planetObj:"",
-  pivotObj:"",
-  isNotPhysicalObject: true,
-};
-
-const venusFixedPerihelionAtSun = {
-  name: "Venus Fixed Perihelion At Sun",
-  startPos: venusLowestPoint,
-  speed: -Math.PI*2,
-  rotationSpeed: 0,
-  tilt: 0,
-  orbitRadius: 0,
-  orbitCentera: 100,
-  orbitCenterb: 0,
-  orbitCenterc: 0,
-  orbitTilta: Math.cos(((-90-planets.venus.ascendingNode)*Math.PI)/180)*-planets.venus.eclipticInclinationJ2000,
-  orbitTiltb: Math.sin(((-90-planets.venus.ascendingNode)*Math.PI)/180)*-planets.venus.eclipticInclinationJ2000,
-
-  size: 0.1,
-  color: 0xA57C1B,
-  visible: false,
-  containerObj:"",
-  orbitObj:"",
-  planetObj:"",
-  pivotObj:"",
-  isNotPhysicalObject: true,
-};
-
 const venus = {
   name: "Venus",
   startPos: 0,   // plan 11 step 3 (see Mercury)
@@ -7101,58 +7017,6 @@ const marsPerihelionFromEarth = {
   isNotPhysicalObject: true,
 };
 
-const marsRealPerihelionAtSun = {
-  name: "Mars Real Perihelion At Sun",
-  startPos: 0,   // plan 11 step 3: the wheel's phase 2 × startpos rests at zero (the chain overrides the wheel)
-  speed: -Math.PI*2+(2*Math.PI*2/_planetGeom.mars.periodYears),
-  rotationSpeed: 0,
-  tilt: 0,
-  orbitRadius: marsElipticOrbit,
-  orbitCentera: 100,
-  orbitCenterb: 0,
-  orbitCenterc: 0,
-  orbitTilta: Math.cos(((-90-planets.mars.ascendingNode)*Math.PI)/180)*-planets.mars.eclipticInclinationJ2000,
-  orbitTiltb: Math.sin(((-90-planets.mars.ascendingNode)*Math.PI)/180)*-planets.mars.eclipticInclinationJ2000,
-  // R7 experiment: is this branch live for a chain planet?
-
-  longitudePerihelion: planets.mars.longitudePerihelion,
-  planetType: 'II',
-  _orbitalEccentricity: planets.mars.orbitalEccentricityJ2000,   // plan 07 R6: was the K law's base
-  _orbitDistance: marsOrbitDistance,
-
-  size: 0.1,
-  color: 0xFEAA0D,
-  visible: false,
-  containerObj:"",
-  orbitObj:"",
-  planetObj:"",
-  pivotObj:"",
-  isNotPhysicalObject: true,
-}; 
-
-const marsFixedPerihelionAtSun = {
-  name: "Mars Fixed Perihelion At Sun",
-  startPos: 0,   // plan 11 step 3: the wheel's phase 2 × startpos rests at zero (the chain overrides the wheel)
-  speed: -Math.PI*2+(2*Math.PI*2/_planetGeom.mars.periodYears),
-  rotationSpeed: 0,
-  tilt: 0,
-  orbitRadius: 0,
-  orbitCentera: 100,
-  orbitCenterb: 0,
-  orbitCenterc: 0,
-  orbitTilta: Math.cos(((-90-planets.mars.ascendingNode)*Math.PI)/180)*-planets.mars.eclipticInclinationJ2000,
-  orbitTiltb: Math.sin(((-90-planets.mars.ascendingNode)*Math.PI)/180)*-planets.mars.eclipticInclinationJ2000,
-
-  size: 0.1,
-  color: 0xFEAA0D,
-  visible: false,
-  containerObj:"",
-  orbitObj:"",
-  planetObj:"",
-  pivotObj:"",
-  isNotPhysicalObject: true,
-}; 
-
 const mars = {
   name: "Mars",
   startPos: 0,   // plan 11 step 3 (see Mercury)
@@ -7204,56 +7068,6 @@ const jupiterPerihelionFromEarth = {
   traceLength : sYear * 1000000,
   traceStep : sYear,
   traceOn: false,
-  isNotPhysicalObject: true,
-};
-
-const jupiterRealPerihelionAtSun = {
-  name: "Jupiter Real Perihelion At Sun",
-  startPos: 0,   // plan 11 step 3: the wheel's phase 2 × startpos rests at zero (the chain overrides the wheel)
-  speed: -Math.PI*2,
-  rotationSpeed: 0,
-  tilt: 0,
-  orbitRadius: jupiterElipticOrbit,
-  orbitCentera: 100,
-  orbitCenterb: 0,
-  orbitCenterc: 0,
-  orbitTilta: Math.cos(((-90-planets.jupiter.ascendingNode)*Math.PI)/180)*-planets.jupiter.eclipticInclinationJ2000,
-  orbitTiltb: Math.sin(((-90-planets.jupiter.ascendingNode)*Math.PI)/180)*-planets.jupiter.eclipticInclinationJ2000,
-  // R7 experiment: is this branch live for a chain planet?
-
-  longitudePerihelion: planets.jupiter.longitudePerihelion,
-  signFlip: 1,
-
-  size: 1.0,
-  color: 0xCDC2B2,
-  visible: false,
-  containerObj:"",
-  orbitObj:"",
-  planetObj:"",
-  pivotObj:"",
-  isNotPhysicalObject: true,
-};
-
-const jupiterFixedPerihelionAtSun = {
-  name: "Jupiter Fixed Perihelion At Sun",
-  startPos: 0,   // plan 11 step 3 (see the Real wheel)
-  speed: -Math.PI*2,
-  rotationSpeed: 0,
-  tilt: 0,
-  orbitRadius: 0,
-  orbitCentera: 100,
-  orbitCenterb: 0,
-  orbitCenterc: 0,
-  orbitTilta: Math.cos(((-90-planets.jupiter.ascendingNode)*Math.PI)/180)*-planets.jupiter.eclipticInclinationJ2000,
-  orbitTiltb: Math.sin(((-90-planets.jupiter.ascendingNode)*Math.PI)/180)*-planets.jupiter.eclipticInclinationJ2000,
-  
-  size: 1.0,
-  color: 0xCDC2B2,
-  visible: false,
-  containerObj:"",
-  orbitObj:"",
-  planetObj:"",
-  pivotObj:"",
   isNotPhysicalObject: true,
 };
 
@@ -7316,56 +7130,6 @@ const saturnPerihelionFromEarth = {
   isNotPhysicalObject: true,
 };
 
-const saturnRealPerihelionAtSun = {
-  name: "Saturn Real Perihelion At Sun",
-  startPos: 0,   // plan 11 step 3: the wheel's phase 2 × startpos rests at zero (the chain overrides the wheel)
-  speed: -Math.PI*2,
-  rotationSpeed: 0,
-  tilt: 0,
-  orbitRadius: -saturnElipticOrbit,
-  orbitCentera: 100,
-  orbitCenterb: 0,
-  orbitCenterc: 0,
-  orbitTilta: Math.cos(((-90-planets.saturn.ascendingNode)*Math.PI)/180)*-planets.saturn.eclipticInclinationJ2000,
-  orbitTiltb: Math.sin(((-90-planets.saturn.ascendingNode)*Math.PI)/180)*-planets.saturn.eclipticInclinationJ2000,
-  // R7 experiment: is this branch live for a chain planet?
-
-  longitudePerihelion: planets.saturn.longitudePerihelion,
-  signFlip: -1,
-
-  size: 0.1,
-  color: 0xA79662,
-  visible: false,
-  containerObj:"",
-  orbitObj:"",
-  planetObj:"",
-  pivotObj:"",
-  isNotPhysicalObject: true,
-};
-
-const saturnFixedPerihelionAtSun = {
-  name: "Saturn Fixed Perihelion At Sun",
-  startPos: 0,   // plan 11 step 3 (see the Real wheel)
-  speed: -Math.PI*2,
-  rotationSpeed: 0,
-  tilt: 0,
-  orbitRadius: 0,
-  orbitCentera: 100,
-  orbitCenterb: 0,
-  orbitCenterc: 0,
-  orbitTilta: Math.cos(((-90-planets.saturn.ascendingNode)*Math.PI)/180)*-planets.saturn.eclipticInclinationJ2000,
-  orbitTiltb: Math.sin(((-90-planets.saturn.ascendingNode)*Math.PI)/180)*-planets.saturn.eclipticInclinationJ2000,
-
-  size: 0.1,   
-  color: 0xA79662,
-  visible: false,
-  containerObj:"",
-  orbitObj:"",
-  planetObj:"",
-  pivotObj:"",
-  isNotPhysicalObject: true,
-};
-
 const saturn = {
   name: "Saturn",
   startPos: 0,   // plan 11 step 3 (see Mercury)
@@ -7425,56 +7189,6 @@ const uranusPerihelionFromEarth = {
   isNotPhysicalObject: true,
 };
 
-const uranusRealPerihelionAtSun = {
-  name: "Uranus Real Perihelion At Sun",
-  startPos: 0,   // plan 11 step 3: the wheel's phase 2 × startpos rests at zero (the chain overrides the wheel)
-  speed: -Math.PI*2,
-  rotationSpeed: 0,
-  tilt: 0,
-  orbitRadius: uranusElipticOrbit,
-  orbitCentera: 100,
-  orbitCenterb: 0,
-  orbitCenterc: 0,
-  orbitTilta: Math.cos(((-90-planets.uranus.ascendingNode)*Math.PI)/180)*-planets.uranus.eclipticInclinationJ2000,
-  orbitTiltb: Math.sin(((-90-planets.uranus.ascendingNode)*Math.PI)/180)*-planets.uranus.eclipticInclinationJ2000,
-  // R7 experiment: is this branch live for a chain planet?
-
-  longitudePerihelion: planets.uranus.longitudePerihelion,
-  signFlip: 1,
-
-  size: 0.1,
-  color: 0xD2F9FA,
-  visible: false,
-  containerObj:"",
-  orbitObj:"",
-  planetObj:"",
-  pivotObj:"",
-  isNotPhysicalObject: true,
-};
-
-const uranusFixedPerihelionAtSun = {
-  name: "Uranus Fixed Perihelion At Sun",
-  startPos: 0,   // plan 11 step 3 (see the Real wheel)
-  speed: -Math.PI*2,
-  rotationSpeed: 0,
-  tilt: 0,
-  orbitRadius: 0,
-  orbitCentera: 100,
-  orbitCenterb: 0,
-  orbitCenterc: 0,
-  orbitTilta: Math.cos(((-90-planets.uranus.ascendingNode)*Math.PI)/180)*-planets.uranus.eclipticInclinationJ2000,
-  orbitTiltb: Math.sin(((-90-planets.uranus.ascendingNode)*Math.PI)/180)*-planets.uranus.eclipticInclinationJ2000,
-
-  size: 0.1,   
-  color: 0xD2F9FA,
-  visible: false,
-  containerObj:"",
-  orbitObj:"",
-  planetObj:"",
-  pivotObj:"",
-  isNotPhysicalObject: true,
-};
-
 const uranus = {
   name: "Uranus",
   startPos: 0,   // plan 11 step 3 (see Mercury)
@@ -7531,56 +7245,6 @@ const neptunePerihelionFromEarth = {
   traceLength : sYear * 1000000,
   traceStep : sYear,
   traceOn: false,
-  isNotPhysicalObject: true,
-};
-
-const neptuneRealPerihelionAtSun = {
-  name: "Neptune Real Perihelion At Sun",
-  startPos: 0,   // plan 11 step 3: the wheel's phase 2 × startpos rests at zero (the chain overrides the wheel)
-  speed: -Math.PI*2,
-  rotationSpeed: 0,
-  tilt: 0,
-  orbitRadius: neptuneElipticOrbit,
-  orbitCentera: 100,
-  orbitCenterb: 0,
-  orbitCenterc: 0,
-  orbitTilta: Math.cos(((-90-planets.neptune.ascendingNode)*Math.PI)/180)*-planets.neptune.eclipticInclinationJ2000,
-  orbitTiltb: Math.sin(((-90-planets.neptune.ascendingNode)*Math.PI)/180)*-planets.neptune.eclipticInclinationJ2000,
-  // R7 experiment: is this branch live for a chain planet?
-
-  longitudePerihelion: planets.neptune.longitudePerihelion,
-  signFlip: 1,
-
-  size: 0.1,
-  color: 0x5E93F1,
-  visible: false,
-  containerObj:"",
-  orbitObj:"",
-  planetObj:"",
-  pivotObj:"",
-  isNotPhysicalObject: true,
-};
-
-const neptuneFixedPerihelionAtSun = {
-  name: "Neptune Fixed Perihelion At Sun",
-  startPos: 0,   // plan 11 step 3 (see the Real wheel)
-  speed: -Math.PI*2,
-  rotationSpeed: 0,
-  tilt: 0,
-  orbitRadius: 0,
-  orbitCentera: 100,
-  orbitCenterb: 0,
-  orbitCenterc: 0,
-  orbitTilta: Math.cos(((-90-planets.neptune.ascendingNode)*Math.PI)/180)*-planets.neptune.eclipticInclinationJ2000,
-  orbitTiltb: Math.sin(((-90-planets.neptune.ascendingNode)*Math.PI)/180)*-planets.neptune.eclipticInclinationJ2000,
-
-  size: 0.1,   
-  color: 0x5E93F1,
-  visible: false,
-  containerObj:"",
-  orbitObj:"",
-  planetObj:"",
-  pivotObj:"",
   isNotPhysicalObject: true,
 };
 
@@ -7811,7 +7475,7 @@ neptune._dtPlanetSign       = Math.sign(neptune.speed);
 // of the animation list — nothing drives them, nothing hangs off them and
 // nothing reads them. The no-chain bodies (Pluto, Halley, Eros) keep theirs,
 // which is still how their perihelion direction is carried.
-const planetObjects = [startingPoint, earthWobbleCenter, earth, earthPerihelionPrecession1, earthPerihelionPrecession2, barycenterEarthAndSun, earthPerihelionFromEarth, mercuryPerihelionFromEarth, venusPerihelionFromEarth, marsPerihelionFromEarth, jupiterPerihelionFromEarth, saturnPerihelionFromEarth, uranusPerihelionFromEarth, neptunePerihelionFromEarth, sun, moonApsidalPrecession, moonApsidalNodalPrecession1, moonApsidalNodalPrecession2, moonLunarLevelingCyclePrecession, moonNodalPrecession, moon, mercuryRealPerihelionAtSun, mercury, mercuryFixedPerihelionAtSun, venusRealPerihelionAtSun, venus, venusFixedPerihelionAtSun, marsRealPerihelionAtSun, mars, marsFixedPerihelionAtSun, jupiterRealPerihelionAtSun, jupiter, jupiterFixedPerihelionAtSun, saturnRealPerihelionAtSun, saturn, saturnFixedPerihelionAtSun, uranusRealPerihelionAtSun, uranus, uranusFixedPerihelionAtSun, neptuneRealPerihelionAtSun, neptune, neptuneFixedPerihelionAtSun]
+const planetObjects = [startingPoint, earthWobbleCenter, earth, earthPerihelionPrecession1, earthPerihelionPrecession2, barycenterEarthAndSun, earthPerihelionFromEarth, mercuryPerihelionFromEarth, venusPerihelionFromEarth, marsPerihelionFromEarth, jupiterPerihelionFromEarth, saturnPerihelionFromEarth, uranusPerihelionFromEarth, neptunePerihelionFromEarth, sun, moonApsidalPrecession, moonApsidalNodalPrecession1, moonApsidalNodalPrecession2, moonLunarLevelingCyclePrecession, moonNodalPrecession, moon, mercury, venus, mars, jupiter, saturn, uranus, neptune]
 
 const tracePlanets = [earthWobbleCenter, earthPerihelionFromEarth, mercuryPerihelionFromEarth, venusPerihelionFromEarth, marsPerihelionFromEarth, jupiterPerihelionFromEarth, saturnPerihelionFromEarth, uranusPerihelionFromEarth, neptunePerihelionFromEarth, sun, moon, mercury, venus, mars, jupiter, saturn, uranus, neptune]
 
@@ -8680,23 +8344,16 @@ renderer.domElement.addEventListener('wheel', (event) => {
 //First add the default settings of the planets
 planetObjects.forEach(obj => createPlanet(obj));
 
-// Move visual elements into tilt groups for RealPerihelionAtSun objects.
-// This zeroes containerObj rotation (so planet positions use corrected tilt
-// applied at the planet.containerObj level) while preserving visual tilt
-// for orbital plane helpers and node markers.
-[mercuryRealPerihelionAtSun, venusRealPerihelionAtSun, marsRealPerihelionAtSun,
- jupiterRealPerihelionAtSun, saturnRealPerihelionAtSun, uranusRealPerihelionAtSun,
- neptuneRealPerihelionAtSun].forEach(setupVisualTiltGroup);
-
 // The chain planets' orbit-plane grids (shown when a planet is the focus
-// target) leave the scaffold: they hung under each planet's container, i.e. on
-// the inert PerihelionFromEarth → RealPerihelionAtSun wheel chain, whose
-// annual wheel (startPos 0) parted from the engine-placed Sun's wheel zero by a
-// quarter turn in the plan 07/09 arc — the grid sat 1.36 AU from the Sun with
-// its tilt 19.8° off Mercury's orbit normal (measured by the perihelion-at-sun
-// gate's orbit-plane rows). They are scene children now and
-// _kcPlaceOrbitPlaneHelpers places them every frame from the engine: centre at
-// the rendered Sun, normal along the chain's orbit normal of date through R.
+// target) are scene children: they used to hang under each planet's container
+// on the scaffold's PerihelionFromEarth → RealPerihelionAtSun wheel chain,
+// whose annual wheel (startPos 0) parted from the engine-placed Sun's wheel
+// zero by a quarter turn in the plan 07/09 arc — the grid sat 1.36 AU from the
+// Sun with its tilt 19.8° off Mercury's orbit normal (measured by the
+// perihelion-at-sun gate's orbit-plane rows; the wheel layers are deleted
+// since). _kcPlaceOrbitPlaneHelpers places them every frame from the engine:
+// centre at the rendered Sun, normal along the chain's orbit normal of date
+// through R.
 for (const pd of [mercury, venus, mars, jupiter, saturn, uranus, neptune]) {
   if (pd.orbitPlaneHelper) scene.add(pd.orbitPlaneHelper);   // scene.add re-parents
 }
@@ -8730,47 +8387,31 @@ moonNodalPrecession.pivotObj.add(moon.containerObj);
 // positioned from the chain's ϖ explicitly (_kcPerihelionEclLonDeg), not from
 // the parent's rotation. The wheels carried no translation, so the anchor the
 // marker reads off its parent is the same barycenter either way.
+// Each chain planet: its Perihelion-at-Earth marker layer (the "Perihelion at
+// Earth" chip and trace; its mesh is placed from the chain's ϖ of date) and
+// the planet container itself, both siblings under the barycenter. The
+// RealPerihelionAtSun ellipse wheel and the FixedPerihelionAtSun marker that
+// used to sit between them are deleted (see the definitions' note).
 barycenterEarthAndSun.pivotObj.add(mercuryPerihelionFromEarth.containerObj);
-mercuryPerihelionFromEarth.pivotObj.add(mercuryRealPerihelionAtSun.containerObj);
-mercuryRealPerihelionAtSun.pivotObj.add(mercury.containerObj);
-
-mercuryPerihelionFromEarth.pivotObj.add(mercuryFixedPerihelionAtSun.containerObj);
+barycenterEarthAndSun.pivotObj.add(mercury.containerObj);
 
 barycenterEarthAndSun.pivotObj.add(venusPerihelionFromEarth.containerObj);
-venusPerihelionFromEarth.pivotObj.add(venusRealPerihelionAtSun.containerObj);
-venusRealPerihelionAtSun.pivotObj.add(venus.containerObj);
-
-venusPerihelionFromEarth.pivotObj.add(venusFixedPerihelionAtSun.containerObj);
+barycenterEarthAndSun.pivotObj.add(venus.containerObj);
 
 barycenterEarthAndSun.pivotObj.add(marsPerihelionFromEarth.containerObj);
-marsPerihelionFromEarth.pivotObj.add(marsRealPerihelionAtSun.containerObj);
-marsRealPerihelionAtSun.pivotObj.add(mars.containerObj);
-
-marsPerihelionFromEarth.pivotObj.add(marsFixedPerihelionAtSun.containerObj);
+barycenterEarthAndSun.pivotObj.add(mars.containerObj);
 
 barycenterEarthAndSun.pivotObj.add(jupiterPerihelionFromEarth.containerObj);
-jupiterPerihelionFromEarth.pivotObj.add(jupiterRealPerihelionAtSun.containerObj);
-jupiterRealPerihelionAtSun.pivotObj.add(jupiter.containerObj);
-
-jupiterPerihelionFromEarth.pivotObj.add(jupiterFixedPerihelionAtSun.containerObj);
+barycenterEarthAndSun.pivotObj.add(jupiter.containerObj);
 
 barycenterEarthAndSun.pivotObj.add(saturnPerihelionFromEarth.containerObj);
-saturnPerihelionFromEarth.pivotObj.add(saturnRealPerihelionAtSun.containerObj);
-saturnRealPerihelionAtSun.pivotObj.add(saturn.containerObj);
-
-saturnPerihelionFromEarth.pivotObj.add(saturnFixedPerihelionAtSun.containerObj);
+barycenterEarthAndSun.pivotObj.add(saturn.containerObj);
 
 barycenterEarthAndSun.pivotObj.add(uranusPerihelionFromEarth.containerObj);
-uranusPerihelionFromEarth.pivotObj.add(uranusRealPerihelionAtSun.containerObj);
-uranusRealPerihelionAtSun.pivotObj.add(uranus.containerObj);
-
-uranusPerihelionFromEarth.pivotObj.add(uranusFixedPerihelionAtSun.containerObj);
+barycenterEarthAndSun.pivotObj.add(uranus.containerObj);
 
 barycenterEarthAndSun.pivotObj.add(neptunePerihelionFromEarth.containerObj);
-neptunePerihelionFromEarth.pivotObj.add(neptuneRealPerihelionAtSun.containerObj);
-neptuneRealPerihelionAtSun.pivotObj.add(neptune.containerObj);
-
-neptunePerihelionFromEarth.pivotObj.add(neptuneFixedPerihelionAtSun.containerObj);
+barycenterEarthAndSun.pivotObj.add(neptune.containerObj);
 
 // The no-chain bodies (Pluto, Halley, Eros) were parented here. They are
 // removed entirely: they had no N-body chain, so their orbits rode the retired
@@ -34186,47 +33827,35 @@ function setupGUI() {
     // Each entry: { obj, role, epochDep } where epochDep = true if the rotation rate
     // depends on epoch (must be tagged) vs. constant (snapshot OK).
     const CHAINS = {
+      // (the RealPerihelionAtSun / FixedPerihelionAtSun rows left with those
+      // layers — each chain is the Perihelion-at-Earth marker + the planet)
       mercury: [
         { obj: mercuryPerihelionFromEarth,         role: 'Perihelion-from-Earth arrow (visual, geocentric)', epochDep: false, expectTag: 'snapshot' },
-        { obj: mercuryRealPerihelionAtSun,         role: 'Real-perihelion-at-Sun offset (Kepler ellipse anchor)', epochDep: false, expectTag: 'snapshot' },
         { obj: mercury,                            role: 'Planet (orbital integrator)',              epochDep: true,  expectTag: '_dtPlanetIntegrator' },
-        { obj: mercuryFixedPerihelionAtSun,        role: 'Fixed-perihelion-at-Sun marker (visual)',  epochDep: false, expectTag: 'snapshot' },
       ],
       venus: [
         { obj: venusPerihelionFromEarth,         role: 'Perihelion-from-Earth arrow',                epochDep: false, expectTag: 'snapshot' },
-        { obj: venusRealPerihelionAtSun,         role: 'Real-perihelion-at-Sun offset',              epochDep: false, expectTag: 'snapshot' },
         { obj: venus,                            role: 'Planet (orbital integrator)',                epochDep: true,  expectTag: '_dtPlanetIntegrator' },
-        { obj: venusFixedPerihelionAtSun,        role: 'Fixed-perihelion-at-Sun marker',             epochDep: false, expectTag: 'snapshot' },
       ],
       mars: [
         { obj: marsPerihelionFromEarth,         role: 'Perihelion-from-Earth arrow',                 epochDep: false, expectTag: 'snapshot' },
-        { obj: marsRealPerihelionAtSun,         role: 'Real-perihelion-at-Sun offset',               epochDep: false, expectTag: 'snapshot' },
         { obj: mars,                            role: 'Planet (orbital integrator, SIGN -1 quirk)',  epochDep: true,  expectTag: '_dtPlanetIntegrator' },
-        { obj: marsFixedPerihelionAtSun,        role: 'Fixed-perihelion-at-Sun marker',              epochDep: false, expectTag: 'snapshot' },
       ],
       jupiter: [
         { obj: jupiterPerihelionFromEarth,         role: 'Perihelion-from-Earth arrow',              epochDep: false, expectTag: 'snapshot' },
-        { obj: jupiterRealPerihelionAtSun,         role: 'Real-perihelion-at-Sun offset',            epochDep: false, expectTag: 'snapshot' },
         { obj: jupiter,                            role: 'Planet (orbital integrator)',              epochDep: true,  expectTag: '_dtPlanetIntegrator' },
-        { obj: jupiterFixedPerihelionAtSun,        role: 'Fixed-perihelion-at-Sun marker',           epochDep: false, expectTag: 'snapshot' },
       ],
       saturn: [
         { obj: saturnPerihelionFromEarth,         role: 'Perihelion-from-Earth arrow',                epochDep: false, expectTag: 'snapshot' },
-        { obj: saturnRealPerihelionAtSun,         role: 'Real-perihelion-at-Sun offset',              epochDep: false, expectTag: 'snapshot' },
         { obj: saturn,                            role: 'Planet (orbital integrator)',                epochDep: true,  expectTag: '_dtPlanetIntegrator' },
-        { obj: saturnFixedPerihelionAtSun,        role: 'Fixed-perihelion-at-Sun marker',             epochDep: false, expectTag: 'snapshot' },
       ],
       uranus: [
         { obj: uranusPerihelionFromEarth,         role: 'Perihelion-from-Earth arrow',               epochDep: false, expectTag: 'snapshot' },
-        { obj: uranusRealPerihelionAtSun,         role: 'Real-perihelion-at-Sun offset',             epochDep: false, expectTag: 'snapshot' },
         { obj: uranus,                            role: 'Planet (orbital integrator)',               epochDep: true,  expectTag: '_dtPlanetIntegrator' },
-        { obj: uranusFixedPerihelionAtSun,        role: 'Fixed-perihelion-at-Sun marker',            epochDep: false, expectTag: 'snapshot' },
       ],
       neptune: [
         { obj: neptunePerihelionFromEarth,         role: 'Perihelion-from-Earth arrow',              epochDep: false, expectTag: 'snapshot' },
-        { obj: neptuneRealPerihelionAtSun,         role: 'Real-perihelion-at-Sun offset',            epochDep: false, expectTag: 'snapshot' },
         { obj: neptune,                            role: 'Planet (orbital integrator)',              epochDep: true,  expectTag: '_dtPlanetIntegrator' },
-        { obj: neptuneFixedPerihelionAtSun,        role: 'Fixed-perihelion-at-Sun marker',           epochDep: false, expectTag: 'snapshot' },
       ],
     };
 
@@ -34625,7 +34254,6 @@ function render(now) {
   if (posElapsed >= 0.1 || forceAllUpdates) {
     posElapsed = 0;
     updateElongations();
-    updateOrbitOrientations();
     golden.update();
   }
 
@@ -41629,7 +41257,6 @@ function forceSceneUpdate (mode) {
   updateDynamicInclinations();
   updateInvariablePlaneBalance();
   calculateInvariablePlaneFromAngularMomentum();
-  updateOrbitOrientations();
   labelPrevHTML = '';                 // invalidate panel cache so next render picks up fresh values
 }
 
@@ -51035,24 +50662,15 @@ function updateOrbitalPlaneRotations() {
   const DEG2RAD = Math.PI / 180;
   const RAD2DEG = 180 / Math.PI;
 
-  // Helper to update a planet's orbital plane rotation.
-  // Updates BOTH the visual tilt group (for orbital plane grid, node markers)
-  // AND the planet's containerObj (for correct ecliptic latitude position).
-  const updatePlaneRotation = (realPeriData, planetData, ascendingNode, inclination, planetName) => {
-    // Visual tilt (orbital plane grid, node markers) — standard ascending node
+  // The planet's own container — the plain node tilt (plan 11 step 3: the
+  // start-angle frame correction left with the scaffold angles; the chain
+  // places the mesh and _kcPlacePlanetPole its axis). The RealPerihelionAtSun
+  // layer's tilt group that this also turned is deleted with the layer; the
+  // orbit-plane grid is a scene child placed from the engine.
+  const updatePlaneRotation = (planetData, ascendingNode, inclination) => {
     const angle = (-90 - ascendingNode) * DEG2RAD;
     const newTilta = Math.cos(angle) * -inclination;
     const newTiltb = Math.sin(angle) * -inclination;
-
-    if (realPeriData.tiltGroupObj) {
-      realPeriData.tiltGroupObj.rotation.x = newTilta * DEG2RAD;
-      realPeriData.tiltGroupObj.rotation.z = newTiltb * DEG2RAD;
-    }
-
-    // The planet's own container — the plain node tilt (plan 11 step 3: the
-    // start-angle frame correction left with the scaffold angles; the chain
-    // places the mesh and _kcPlacePlanetPole its axis, so this container
-    // reaches only the planet's look-at orbit-plane helper)
     if (planetData && planetData.containerObj) {
       planetData.containerObj.rotation.x = newTilta * DEG2RAD;
       planetData.containerObj.rotation.z = newTiltb * DEG2RAD;
@@ -51060,13 +50678,13 @@ function updateOrbitalPlaneRotations() {
   };
 
   // Update each planet's orbital plane using dynamic ecliptic inclination
-  updatePlaneRotation(mercuryRealPerihelionAtSun, mercury, o.mercuryAscendingNode, o.mercuryEclipticInclinationDynamic, 'Mercury');
-  updatePlaneRotation(venusRealPerihelionAtSun, venus, o.venusAscendingNode, o.venusEclipticInclinationDynamic, 'Venus');
-  updatePlaneRotation(marsRealPerihelionAtSun, mars, o.marsAscendingNode, o.marsEclipticInclinationDynamic, 'Mars');
-  updatePlaneRotation(jupiterRealPerihelionAtSun, jupiter, o.jupiterAscendingNode, o.jupiterEclipticInclinationDynamic, 'Jupiter');
-  updatePlaneRotation(saturnRealPerihelionAtSun, saturn, o.saturnAscendingNode, o.saturnEclipticInclinationDynamic, 'Saturn');
-  updatePlaneRotation(uranusRealPerihelionAtSun, uranus, o.uranusAscendingNode, o.uranusEclipticInclinationDynamic, 'Uranus');
-  updatePlaneRotation(neptuneRealPerihelionAtSun, neptune, o.neptuneAscendingNode, o.neptuneEclipticInclinationDynamic, 'Neptune');
+  updatePlaneRotation(mercury, o.mercuryAscendingNode, o.mercuryEclipticInclinationDynamic);
+  updatePlaneRotation(venus, o.venusAscendingNode, o.venusEclipticInclinationDynamic);
+  updatePlaneRotation(mars, o.marsAscendingNode, o.marsEclipticInclinationDynamic);
+  updatePlaneRotation(jupiter, o.jupiterAscendingNode, o.jupiterEclipticInclinationDynamic);
+  updatePlaneRotation(saturn, o.saturnAscendingNode, o.saturnEclipticInclinationDynamic);
+  updatePlaneRotation(uranus, o.uranusAscendingNode, o.uranusEclipticInclinationDynamic);
+  updatePlaneRotation(neptune, o.neptuneAscendingNode, o.neptuneEclipticInclinationDynamic);
 }
 
 /**
@@ -51090,107 +50708,23 @@ function updatePlanetAnomalies() {
   // Get Sun position (common for all planets) - using pooled vector
   sun.pivotObj.getWorldPosition(_anomalySunPos);
 
-  // Planet configuration: [planetObj, fixedPerihelionAtSun, propertyPrefix, eccentricity, solarYearCount]
-  // Plan 07 R6: `e` was the K law's System-Reset base. These markers are the
-  // FIXED perihelion-at-Sun points, so the J2000 observed eccentricity is the
-  // right value — the one the chain is anchored on.
-  // (plan 09 step 7b: the device counts left the configs — the geometric path's
-  // period is the scaffold's `_planetGeom[key].periodDays`)
-  const planetConfigs = [
-    { planet: mercury, fixedPerihelion: mercuryFixedPerihelionAtSun, key: 'mercury', e: planets.mercury.orbitalEccentricityJ2000 },
-    { planet: venus,   fixedPerihelion: venusFixedPerihelionAtSun,   key: 'venus',   e: planets.venus.orbitalEccentricityJ2000   },
-    { planet: mars,    fixedPerihelion: marsFixedPerihelionAtSun,    key: 'mars',    e: planets.mars.orbitalEccentricityJ2000    },
-    { planet: jupiter, fixedPerihelion: jupiterFixedPerihelionAtSun, key: 'jupiter', e: planets.jupiter.orbitalEccentricityJ2000 },
-    { planet: saturn,  fixedPerihelion: saturnFixedPerihelionAtSun,  key: 'saturn',  e: planets.saturn.orbitalEccentricityJ2000  },
-    { planet: uranus,  fixedPerihelion: uranusFixedPerihelionAtSun,  key: 'uranus',  e: planets.uranus.orbitalEccentricityJ2000  },
-    { planet: neptune, fixedPerihelion: neptuneFixedPerihelionAtSun, key: 'neptune', e: planets.neptune.orbitalEccentricityJ2000 }
-  ];
-
-  for (const { planet, fixedPerihelion, key, e } of planetConfigs) {
-    // Skip if objects don't exist
-    if (!planet?.pivotObj || !fixedPerihelion?.pivotObj || !fixedPerihelion?.planetObj) {
-      continue;
-    }
-
-    // READOUT-CONVENTION FIX (the no-decision cleanup batch — the audited
-    // planet-anomaly item): the SEVEN chain planets' anomalies are now
-    // CHAIN-PURE — M from the element set of date (λ̄ − ϖ), E via the same
-    // Kepler solve, ν from E — the identical construction that PLACES the
-    // rendered planet (kcComputeHeliocentricEclipticFromElements). The old
-    // path measured ν from the LEGACY DEVICE pivot position (the visible
-    // mesh has been chain-placed since the K5 flip — the measurement read
-    // the wrong body) and M from the kinematic device period. The panels'
-    // velocity / latitude / flight-path rows already mix chain e/i/ω into
-    // the same formulas; ν/M/E now speak the same element set. The
-    // no-chain trio (Pluto, Halley, Eros) keeps the geometric path below.
-    if (_ANOM_CHAIN_KEYS.has(key)) {
-      const el = _kcElementsOfDate(key, o.julianDay);
-      const Mdeg = ((el.meanLonEclipticDeg - el.lonPeriEclipticDeg) % 360 + 360) % 360;
-      const Edeg = OrbitalFormulas.eccentricAnomaly(Mdeg, el.e);
-      const Erad = Edeg * Math.PI / 180;
-      const nuRad = 2 * Math.atan2(Math.sqrt(1 + el.e) * Math.sin(Erad / 2),
-                                   Math.sqrt(1 - el.e) * Math.cos(Erad / 2));
-      o[key + 'TrueAnomaly'] = ((nuRad * 180 / Math.PI) % 360 + 360) % 360;
-      o[key + 'MeanAnomaly'] = Mdeg;
-      o[key + 'EccentricAnomaly'] = Edeg;
-      continue;
-    }
-
-    // Get positions (using pooled vectors)
-    fixedPerihelion.pivotObj.getWorldPosition(_anomalyPPos);           // P = orbit center
-    planet.pivotObj.getWorldPosition(_anomalyPlanetPos);               // Planet position
-
-    // Calculate direction vectors in XZ plane (ecliptic)
-    // In an elliptical orbit:
-    // - P (center) is at the geometric center of the ellipse
-    // - Sun (focus) is between P and perihelion, at distance a*e from P
-    // - Perihelion is in the direction from P toward Sun, beyond the Sun
-    //
-    // Layout: P -------- Sun ------- Perihelion
-    //
-    // So perihelion direction from both P and Sun is: P → Sun direction
-    const periDirX = _anomalySunPos.x - _anomalyPPos.x;
-    const periDirZ = _anomalySunPos.z - _anomalyPPos.z;
-
-    // For both True Anomaly and Mean Anomaly, the perihelion reference is the same direction
-    const periDirFromSunX = periDirX;
-    const periDirFromSunZ = periDirZ;
-    const periDirFromPX = periDirX;
-    const periDirFromPZ = periDirZ;
-
-    // Planet direction from Sun (for True Anomaly)
-    const planetDirFromSunX = _anomalyPlanetPos.x - _anomalySunPos.x;
-    const planetDirFromSunZ = _anomalyPlanetPos.z - _anomalySunPos.z;
-
-    // Planet direction from P (for Mean Anomaly)
-    const planetDirFromPX = _anomalyPlanetPos.x - _anomalyPPos.x;
-    const planetDirFromPZ = _anomalyPlanetPos.z - _anomalyPPos.z;
-
-    // Calculate angles using atan2 (negate Z for counter-clockwise measurement)
-    const periAngleSun = Math.atan2(-periDirFromSunZ, periDirFromSunX);
-    const planetAngleSun = Math.atan2(-planetDirFromSunZ, planetDirFromSunX);
-
-    const periAngleP = Math.atan2(-periDirFromPZ, periDirFromPX);
-    const planetAngleP = Math.atan2(-planetDirFromPZ, planetDirFromPX);
-
-    // True Anomaly: angle at Sun from perihelion to planet (geometric, from world positions)
-    let trueAnomalyRad = planetAngleSun - periAngleSun;
-    trueAnomalyRad = ((trueAnomalyRad % (2 * Math.PI)) + (2 * Math.PI)) % (2 * Math.PI);
-    o[key + 'TrueAnomaly'] = trueAnomalyRad * 180 / Math.PI;
-
-    // Mean Anomaly: textbook definition — fictitious angle advancing linearly in time.
-    // Computed analytically from M_at_modelEpoch + 360°·(JD−modelEpochJD)/period_days.
-    // (Previous code stored "angle at orbit center from perihelion to planet", which
-    // is a geometric ellipse angle close to eccentric anomaly E, not textbook mean
-    // anomaly M = E − e·sin(E). For low-e bodies the difference is small; for
-    // Mercury/Pluto/Halley it matters substantially.)
-    const periodDays = _planetGeom[key].periodDays;   // plan 09 step 7b: the scaffold period (no device count)
-    let meanAnomalyDeg = planets[key].meanAnomaly + 360 * (o.julianDay - startmodelJD) / periodDays;
-    meanAnomalyDeg = ((meanAnomalyDeg % 360) + 360) % 360;
-    o[key + 'MeanAnomaly'] = meanAnomalyDeg;
-
-    // Calculate Eccentric Anomaly from Mean Anomaly using Newton-Raphson iteration
-    o[key + 'EccentricAnomaly'] = OrbitalFormulas.eccentricAnomaly(meanAnomalyDeg, e);
+  // The SEVEN chain planets' anomalies are CHAIN-PURE — M from the element set
+  // of date (λ̄ − ϖ), E via the same Kepler solve, ν from E — the identical
+  // construction that PLACES the rendered planet
+  // (kcComputeHeliocentricEclipticFromElements). (The geometric branch that
+  // measured ν from the scaffold's FixedPerihelionAtSun marker and the device
+  // pivot — the wrong body since the K5 flip — left with those markers; the
+  // no-chain trio Pluto/Halley/Eros that it last served is not in the scene.)
+  for (const key of _ANOM_CHAIN_KEYS) {
+    const el = _kcElementsOfDate(key, o.julianDay);
+    const Mdeg = ((el.meanLonEclipticDeg - el.lonPeriEclipticDeg) % 360 + 360) % 360;
+    const Edeg = OrbitalFormulas.eccentricAnomaly(Mdeg, el.e);
+    const Erad = Edeg * Math.PI / 180;
+    const nuRad = 2 * Math.atan2(Math.sqrt(1 + el.e) * Math.sin(Erad / 2),
+                                 Math.sqrt(1 - el.e) * Math.cos(Erad / 2));
+    o[key + 'TrueAnomaly'] = ((nuRad * 180 / Math.PI) % 360 + 360) % 360;
+    o[key + 'MeanAnomaly'] = Mdeg;
+    o[key + 'EccentricAnomaly'] = Edeg;
   }
 
   // Calculate Earth's anomalies
@@ -51786,80 +51320,12 @@ function updateDynamicInclinations() {
   }
 }
 
-/**
- * Derive ecliptic inclination i, ascending node Ω, descending node Ωd,
- * and argument of periapsis ω from the two stored tilt components plus
- * the already-known longitude of perihelion ϖ.
- *
- * @param {object} pd    – planet data with .name, .orbitTilta, .orbitTiltb
- * @param {number} peri  – ϖ, the ecliptic longitude of perihelion [0,360)
- * @returns {{inclination:number, ascending:number,
- *            descending:number, argument:number}}
- */
-function orbitalAnglesFromTilts(pd, peri) {
-  // Use dynamic container rotation if available (updated by updateOrbitalPlaneRotations),
-  // otherwise fall back to static values
-  let ax, az;
-  const src = pd.tiltGroupObj || pd.containerObj;
-  if (src) {
-    // Convert from radians back to degrees (container rotation is in radians)
-    ax = src.rotation.x * 180 / Math.PI;
-    az = src.rotation.z * 180 / Math.PI;
-  } else {
-    ax = pd.orbitTilta;   // degrees (static fallback)
-    az = pd.orbitTiltb;   // degrees
-  }
-
-  /* ---- 1  inclination --------------------------------------------- */
-  const i = Math.hypot(ax, az);       // √(ax² + az²)
-
-  // if (i < 1e-6) {
-  //   // Orbit lies exactly in the ecliptic: nodes & ω are undefined.
-  //   throw new RangeError(`${pd.name}: i ≃ 0°, nodes undefined`);
-  // }
-
-  /* ---- 2  longitude of the ascending node ------------------------- */
-  let Ω = Math.atan2(ax, az) * 180 / Math.PI;   // atan2(sinΩ, cosΩ)
-  if (Ω < 0) Ω += 360;
-
-  const Ωd = (Ω + 180) % 360;                   // descending node
-
-  /* ---- 3  argument of periapsis ----------------------------------- */
-  let ω = (peri - Ω) % 360;
-  if (ω < 0) ω += 360;
-
-  return { inclination: i, ascending: Ω, descending: Ωd, argument: ω };
-}
-
-function updateOrbitOrientations() {
-  const planetConfigs = [
-    ["mercury",  mercuryRealPerihelionAtSun,  o.mercuryPerihelion],
-    ["venus",    venusRealPerihelionAtSun,    o.venusPerihelion],
-//    ["mercury2",    mercuryRealPerihelionAtSun,    o.mercuryPerihelion2],    
-    ["mars",     marsRealPerihelionAtSun,     o.marsPerihelion],
-    ["jupiter",  jupiterRealPerihelionAtSun,  o.jupiterPerihelion],
-    ["saturn",   saturnRealPerihelionAtSun,   o.saturnPerihelion],
-    ["uranus",   uranusRealPerihelionAtSun,   o.uranusPerihelion],
-    ["neptune",  neptuneRealPerihelionAtSun,  o.neptunePerihelion]
-  ];
-
-  for (const [name, pd, peri] of planetConfigs) {
-    const r = orbitalAnglesFromTilts(pd, peri);
-
-    o[`${name}Inclination`]        = r.inclination;      // (optional)
-    // P5/K5b — under the Keplerian flag the seven chain planets' Ω/ω are
-    // the elements-of-date set in updateAscendingNodes (proper ecliptic
-    // arguments from ONE element set, ω = ϖ − Ω). The tilt-derived values
-    // here mix the RA-channel ϖ with an ecliptic Ω (measured: Mercury ω
-    // 28.05° tilt-derived vs 29.14° chain) and were silently overwriting
-    // that override every frame — keep them only for the legacy path and
-    // the three non-chain bodies.
-    if (['mercury', 'venus', 'mars', 'jupiter', 'saturn', 'uranus', 'neptune'].includes(name)) continue;
-    o[`${name}AscendingNode`]      = r.ascending;        // Ω
-    o[`${name}DescendingNode`]     = r.descending;       // Ω + 180°
-    o[`${name}ArgumentOfPeriapsis`] = r.argument;        // ω
-  }
-}
+// (orbitalAnglesFromTilts / updateOrbitOrientations — the tilt-derived i/Ω/ω
+// read back off the RealPerihelionAtSun layers' tilt groups — are deleted with
+// those layers: the seven chain planets' Ω/ω have been the elements-of-date set
+// in updateAscendingNodes since P5/K5b, the loop's own `continue` skipped every
+// body it listed, and its one remaining write, o.<planet>Inclination, had no
+// reader — the published inclination is o.<planet>EclipticInclinationDynamic.)
 
 /**
  * Make a transparent GridHelper that lies exactly in the orbital plane
@@ -53530,25 +52996,9 @@ function createPlanet(pd) {           // pd = Planet Data
   scene.add(orbitContainer);
 }
 
-/**
- * Move a RealPerihelionAtSun layer's OWN orbit-plane helper into a dedicated
- * tilt group inside its containerObj, and zero the containerObj rotation so it
- * no longer tilts planet positions. (The chain PLANETS' grids — the ones a
- * focus target shows — are not here: they are scene children placed from the
- * engine by _kcPlaceOrbitPlaneHelpers, since this inert wheel chain stopped
- * tracking the Sun.)
- */
-function setupVisualTiltGroup(pd) {
-  if (!pd.containerObj) return;
-  const tiltGroup = new THREE.Object3D();
-  tiltGroup.rotation.x = pd.containerObj.rotation.x;
-  tiltGroup.rotation.z = pd.containerObj.rotation.z;
-  pd.containerObj.add(tiltGroup);
-  pd.containerObj.rotation.x = 0;
-  pd.containerObj.rotation.z = 0;
-  pd.tiltGroupObj = tiltGroup;
-  if (pd.orbitPlaneHelper) tiltGroup.add(pd.orbitPlaneHelper);
-}
+// (setupVisualTiltGroup — the RealPerihelionAtSun layers' tilt groups — is
+// deleted with those layers; the chain planets' orbit-plane grids are scene
+// children placed from the engine by _kcPlaceOrbitPlaneHelpers.)
 
 /**
  * Build a planetary ring mesh.

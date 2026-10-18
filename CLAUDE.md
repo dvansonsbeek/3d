@@ -419,7 +419,10 @@ the owner's "the tilt of Mercury's path floats above the Sun": the grid hung on
 the scaffold's inert PerihelionFromEarth → RealPerihelionAtSun wheels, whose
 annual wheel lost the engine-placed Sun's wheel zero a quarter turn in the
 plan 07/09 arc — 1.36 AU from the Sun and 19.8° off the normal on the pre-fix
-build; it is a scene child placed from the engine every frame now), and the
+build; it is a scene child placed from the engine every frame now, and the
+RealPerihelionAtSun / FixedPerihelionAtSun layers are DELETED in both twins —
+the planet containers hang on the barycenter beside their Perihelion-at-Earth
+marker layer), and the
 Planet Info eye ("Hide helper objects") governs the focused planet's helper
 visuals too — its elements-of-date label and its orbit-plane grid, not only
 Earth's two markers (born from the owner: "zooming into a planet shows extra
