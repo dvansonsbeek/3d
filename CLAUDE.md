@@ -634,7 +634,7 @@ GATED at 1.4 and 2.46 Ga — paleo-anchors rows `xiamaling-prec-1400` /
 PERIOD is the pre-registered, not-yet-discriminated prediction), and a
 section violating any half falsifies the corresponding tier. (2) **Historical-era exactness** — the fail-proven gate
 suite: eclipses (`eclipse-audit`), the LOD/ΔT stack, cardinal points, the
-41-anchor paleo bands (`paleo-anchors`, where an unexplained *improvement*
+43-anchor paleo bands (`paleo-anchors`, where an unexplained *improvement*
 fails too). (3) **Two-expansions μ-consistency** — the rock-measured
 long-eccentricity period must track 405.6 kyr / μ^1.153 (the engine-measured
 beat response, W5; 1/μ is the first-order case) under the measured solar

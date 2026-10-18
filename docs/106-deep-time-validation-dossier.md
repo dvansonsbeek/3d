@@ -26,7 +26,8 @@ because a miss that silently becomes a hit means the formula changed.
 ## A. Rotational and tidal chronology — gate-backed
 
 The model's T_p(t)/LOD(t)/Moon-distance curve against the published
-paleontological record: **41 anchors** across Wells 1963 (coral growth
+paleontological record: **43 anchors** (41 chronology anchors plus the two
+precession rows at 1.4 and 2.46 Ga) across Wells 1963 (coral growth
 bands, ×9), de Winter 2020 (rudist bivalve), Pannella 1972 (bivalves), a
 Triassic compilation, Williams 2000 (Elatina tidal rhythmites),
 Mitchell–Kirscher 2023 (multi-proxy LOD), Wu et al. 2024 (34-record

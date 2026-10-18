@@ -22730,7 +22730,7 @@ function setupGUI() {
   // 6-DOF/Config-7 framing lives in git + docs 10/109) ---
   {
     const paFolder = aboutFolder.addFolder({ title: 'Parameter Accounting', expanded: false });
-    addFolderTooltip(paFolder, 'Two engines, three ledgers \u2014 zero free parameters where the dynamics live; the lunisolar channel\u2019s constants are derived or cited, with two measured histories behind fail-proven gates; the frozen era clock\u2019s five constants and the correction bases are identifiers of the certified time machinery; every fitted coefficient gated and hashed. No single headline count: the ledgers are the accounting.');
+    addFolderTooltip(paFolder, 'Two engines, three ledgers \u2014 zero free parameters where the dynamics live; the lunisolar channel\u2019s constants are derived or cited, with two measured histories behind fail-proven gates; the scene\u2019s world frame is the J2000 ecliptic with one view literal; every fitted coefficient gated and hashed. No single headline count: the ledgers are the accounting.');
     const c = paFolder.element.querySelector('.tp-fldv_c');
     const head = (t) => {
       const d = document.createElement('div');
@@ -22756,22 +22756,22 @@ function setupGUI() {
     row('Free parameters: none',
       'Inputs, cited not fitted: one J2000 heliocentric state (JPL Horizons vectors, one epoch) \u00B7 DE440 mass ratios \u00B7 1PN. Everything planetary \u2014 element chains, secular modes, the 405.6-kyr metronome \u2014 derives from that seed. Integrator order/step are reproducibility conventions.');
     row('Earth\u2019s published orbit rides this ledger',
-      'e(t), the inclination and node, \u03D6 of date and the obliquity hybrid derive from the same N-body seed, the IAU 2006 J2000 obliquity and the certified precession anchor \u2014 and so does the eclipse Sun\u2019s equation of centre (the series plus the derived mean-element offset of the era, from the same seed integrated as a nine-body system). None of the frozen era clock\u2019s constants below enter them.');
+      'e(t), the inclination and node, \u03D6 of date and the obliquity hybrid derive from the same N-body seed, the IAU 2006 J2000 obliquity and the certified precession anchor \u2014 and so does the eclipse Sun\u2019s equation of centre (the series plus the derived mean-element offset of the era, from the same seed integrated as a nine-body system). No scene literal enters them.');
     head('Ledger 2 \u00B7 The lunisolar precession channel \u2014 Earth\u2019s spin & time');
-    row('Precession anchor p\u2080 \u00B7 derived \u00B7 ' + _certifiedAxialPrecessionJ2000Years().toLocaleString('en-US', { maximumFractionDigits: 1 }) + ' yr',
-      'Not a parameter: the certified J2000 year laws\u2019 beat, sidereal / (sidereal \u2212 tropical). The deep-time rate composes \u03C9(t)/\u03C9\u2080 \u00B7 p\u2080 \u00B7 [f_S + (1 \u2212 f_S)(a\u2080/a_M)\u00B3]; f_S, the solar share of the J2000 torque, is derived from GM\u2609, the lunar constants and the J2000 obliquity.');
+    row('Precession anchor p\u2080 \u00B7 cited input \u00B7 ' + _certifiedAxialPrecessionJ2000Years().toLocaleString('en-US', { maximumFractionDigits: 1 }) + ' yr',
+      'Not a fit: 1,296,000 / p_A with p_A the IAU 2006 general precession in longitude, 50.28796195 \u2033/yr; the J2000 tropical year is derived from it and the sidereal year. The deep-time rate composes \u03C9(t)/\u03C9\u2080 \u00B7 p\u2080 \u00B7 [f_S + (1 \u2212 f_S)(a\u2080/a_M)\u00B3]; f_S, the solar share of the J2000 torque, is derived from GM\u2609, the lunar constants and the J2000 obliquity.');
     row('Lunar recession history \u00B7 LLR-anchored, paleo-gated',
-      'The linear term is the LLR rate 3.82 cm/yr (cited); the deep-time terms are the Farhat 2022 fit and the regime knots fitted to 11 published anchors (Lantink, Zhou, Xiamaling, Moodies \u2026), all within 1.3\u03C3. The 41-anchor paleo gate fails on an unexplained improvement too.');
+      'The linear term is the LLR rate 3.82 cm/yr (cited); the deep-time terms are the Farhat 2022 fit and the regime knots fitted to 11 published anchors (Lantink/Joffre, Weeli Wolli, Zhou \u00D73, Xiamaling, Nanfen, Moodies), all within 1.3\u03C3 \u2014 a banked record: the live fitter no longer reproduces the knots on the current engine, and a refit is a campaign under the 43-anchor paleo gate, which fails on an unexplained improvement too.');
     row('GIA channel \u00B7 k derived, \u03C4 = ' + ALPHA_GIA_RELAXATION_KYR + ' kyr measured',
       'The polar moment\u2019s lagged response to the climate formula\u2019s ice proxy: the coupling k is derived at runtime from the Cox & Chao 2002 dJ\u2082/dt; the relaxation time is measured against the historical \u0394T record.');
     row('Solar mass loss \u00B7 cited',
       'Luminosity/c\u00B2 plus wind, from published constants \u2014 the Driver-2 stretch of every heliocentric period, and the \u03BC(t) the two-expansions consistency leg tests.');
     head('The scene\u2019s world frame \u2014 the J2000 ecliptic, one view literal');
     row('World frame \u00B7 the J2000 ecliptic \u00B7 equinox at view azimuth ' + SCENE_EQUINOX_VIEW_AZIMUTH_DEG.toFixed(4) + '\u00B0',
-      'World Y is the J2000 ecliptic pole; the J2000 equinox lies in the horizontal plane at this azimuth \u2014 the one scene literal the retired K-device scaffold leaves behind (plan 11 step 4: the pose it encoded, kept for visual continuity). Every frame of date \u2014 Earth\u2019s axis, the sun plane, the Moon stack, the planets\u2019 poles and paths \u2014 is placed from the engine through this frame; no observable rides it.');
+      'World Y is the J2000 ecliptic pole; the J2000 equinox lies in the horizontal plane at this azimuth \u2014 the browser\u2019s own measured pose (90.0066\u00b0 before plan 11), the one view literal the retired scaffold leaves. Every frame of date \u2014 Earth\u2019s axis, the sun plane, the Moon stack, the planets\u2019 poles and paths \u2014 is placed from the engine through this frame; no observable rides it.');
     head('Ledger 3 \u00B7 The fitted correction stack (gated, hashed)');
-    row('Year-length, perihelion and solstice-obliquity harmonics \u00B7 cardinal-point families \u00B7 Sun-longitude harmonics \u00B7 Moon corrections \u00B7 per-planet geocentric-precession projections',
-      'Fitter-owned coefficient arrays under the coefficients hash (Model Identity above); the \u0394T/LOD stack, the recession knots and the GIA \u03C4 sit under the constants hash. Every gate is fail-proven. The year-length and cardinal-point families are the frozen era clock\u2019s basis, not the published year lengths, which ride the one-family route. None of these touch the planetary dynamics.');
+    row('\u0394T/LOD 4-flag stack \u00B7 core-mantle resonator \u00B7 climate formula',
+      'Fitter-owned coefficient arrays under the coefficients hash (Model Identity above); the recession knots, \u03B1\u2083/\u03B1\u2084 and the GIA \u03C4 are the banked deep-time record under the constants hash; beside them the osculating-mean offset of the published perihelion is measured, not fitted. Every gate is fail-proven. The published year lengths and precession periods ride the one-family route, not a fit. None of these touch the planetary dynamics.');
   }
 
   // --- Calibration Inputs (from astro-reference.json — external observations) ---
@@ -22831,7 +22831,7 @@ function setupGUI() {
     earthCalibFolder.addBlade({ view: 'separator' });
     addCalib(earthCalibFolder, earthCalib, 'ciSiderealYearSec', 'Sidereal year (s)', 'Mean sidereal year length in seconds (IAU).');
     addCalib(earthCalibFolder, earthCalib, 'ciSiderealYear', 'Sidereal year (days)', 'Sidereal year length in days (JPL Horizons).');
-    addCalib(earthCalibFolder, earthCalib, 'ciTropicalYear', 'Tropical year (J2000)', 'Mean tropical year length in days (Meeus & Savoie 1992).');
+    addCalib(earthCalibFolder, earthCalib, 'ciTropicalYear', 'Tropical year (J2000)', 'Mean tropical year at J2000, derived from the sidereal year and the IAU 2006 general precession (plan 09); checked against Meeus & Savoie 1992.');
     addCalib(earthCalibFolder, earthCalib, 'ciTropicalVE', 'Trop. yr VE (J2000)', 'Tropical year measured from Vernal Equinox to Vernal Equinox.');
     addCalib(earthCalibFolder, earthCalib, 'ciTropicalSS', 'Trop. yr SS (J2000)', 'Tropical year measured from Summer Solstice to Summer Solstice.');
     addCalib(earthCalibFolder, earthCalib, 'ciTropicalAE', 'Trop. yr AE (J2000)', 'Tropical year measured from Autumnal Equinox to Autumnal Equinox.');
