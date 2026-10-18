@@ -3242,7 +3242,7 @@
   },
   {
    "file": "tools/docs/model-values.mjs",
-   "line": 272,
+   "line": 274,
    "runtime": "docs-tools",
    "token": "H / N",
    "class": "comment",
@@ -3250,7 +3250,7 @@
   },
   {
    "file": "tools/docs/model-values.mjs",
-   "line": 272,
+   "line": 274,
    "runtime": "docs-tools",
    "token": "8H",
    "class": "comment",
@@ -3258,7 +3258,7 @@
   },
   {
    "file": "tools/docs/model-values.mjs",
-   "line": 276,
+   "line": 278,
    "runtime": "docs-tools",
    "token": "H / N",
    "class": "comment",
@@ -3266,7 +3266,7 @@
   },
   {
    "file": "tools/docs/model-values.mjs",
-   "line": 367,
+   "line": 369,
    "runtime": "docs-tools",
    "token": "H / N",
    "class": "diagnostic",
@@ -3274,7 +3274,7 @@
   },
   {
    "file": "tools/docs/model-values.mjs",
-   "line": 398,
+   "line": 400,
    "runtime": "docs-tools",
    "token": "earthtiltMean",
    "class": "comment",
@@ -3282,7 +3282,7 @@
   },
   {
    "file": "tools/docs/model-values.mjs",
-   "line": 409,
+   "line": 411,
    "runtime": "docs-tools",
    "token": "H / N",
    "class": "comment",
@@ -3290,7 +3290,7 @@
   },
   {
    "file": "tools/docs/model-values.mjs",
-   "line": 409,
+   "line": 411,
    "runtime": "docs-tools",
    "token": "H / N",
    "class": "comment",
@@ -3298,7 +3298,7 @@
   },
   {
    "file": "tools/docs/model-values.mjs",
-   "line": 409,
+   "line": 411,
    "runtime": "docs-tools",
    "token": "H / N",
    "class": "comment",
@@ -3306,7 +3306,7 @@
   },
   {
    "file": "tools/docs/model-values.mjs",
-   "line": 409,
+   "line": 411,
    "runtime": "docs-tools",
    "token": "H / N",
    "class": "comment",
@@ -3314,7 +3314,7 @@
   },
   {
    "file": "tools/docs/model-values.mjs",
-   "line": 410,
+   "line": 412,
    "runtime": "docs-tools",
    "token": "H / N",
    "class": "comment",
@@ -3322,7 +3322,7 @@
   },
   {
    "file": "tools/docs/model-values.mjs",
-   "line": 410,
+   "line": 412,
    "runtime": "docs-tools",
    "token": "/ 13",
    "class": "comment",
@@ -3330,7 +3330,7 @@
   },
   {
    "file": "tools/docs/model-values.mjs",
-   "line": 416,
+   "line": 418,
    "runtime": "docs-tools",
    "token": "H / N",
    "class": "diagnostic",
@@ -3338,7 +3338,7 @@
   },
   {
    "file": "tools/docs/model-values.mjs",
-   "line": 423,
+   "line": 425,
    "runtime": "docs-tools",
    "token": "H / N",
    "class": "diagnostic",
@@ -3346,7 +3346,7 @@
   },
   {
    "file": "tools/docs/model-values.mjs",
-   "line": 430,
+   "line": 432,
    "runtime": "docs-tools",
    "token": "H / N",
    "class": "diagnostic",
@@ -3354,7 +3354,7 @@
   },
   {
    "file": "tools/docs/model-values.mjs",
-   "line": 450,
+   "line": 452,
    "runtime": "docs-tools",
    "token": "H / N",
    "class": "comment",
@@ -3362,7 +3362,7 @@
   },
   {
    "file": "tools/docs/model-values.mjs",
-   "line": 450,
+   "line": 452,
    "runtime": "docs-tools",
    "token": "/ 13",
    "class": "comment",
@@ -3370,7 +3370,7 @@
   },
   {
    "file": "tools/docs/model-values.mjs",
-   "line": 458,
+   "line": 460,
    "runtime": "docs-tools",
    "token": "H / N",
    "class": "diagnostic",
@@ -3378,7 +3378,7 @@
   },
   {
    "file": "tools/docs/model-values.mjs",
-   "line": 458,
+   "line": 460,
    "runtime": "docs-tools",
    "token": "/ 13",
    "class": "diagnostic",
@@ -3386,7 +3386,7 @@
   },
   {
    "file": "tools/docs/model-values.mjs",
-   "line": 463,
+   "line": 465,
    "runtime": "docs-tools",
    "token": "H / N",
    "class": "diagnostic",
@@ -3394,7 +3394,7 @@
   },
   {
    "file": "tools/docs/model-values.mjs",
-   "line": 471,
+   "line": 473,
    "runtime": "docs-tools",
    "token": "H / N",
    "class": "diagnostic",
@@ -3402,7 +3402,7 @@
   },
   {
    "file": "tools/docs/model-values.mjs",
-   "line": 471,
+   "line": 473,
    "runtime": "docs-tools",
    "token": "/ 13",
    "class": "diagnostic",
@@ -3410,7 +3410,7 @@
   },
   {
    "file": "tools/docs/model-values.mjs",
-   "line": 578,
+   "line": 580,
    "runtime": "docs-tools",
    "token": "H / N",
    "class": "comment",
@@ -3418,7 +3418,7 @@
   },
   {
    "file": "tools/docs/model-values.mjs",
-   "line": 581,
+   "line": 583,
    "runtime": "docs-tools",
    "token": "H / N",
    "class": "comment",
@@ -3426,7 +3426,7 @@
   },
   {
    "file": "tools/docs/model-values.mjs",
-   "line": 967,
+   "line": 969,
    "runtime": "docs-tools",
    "token": "H / N",
    "class": "comment",
@@ -3434,7 +3434,7 @@
   },
   {
    "file": "tools/docs/model-values.mjs",
-   "line": 1158,
+   "line": 1160,
    "runtime": "docs-tools",
    "token": "H / N",
    "class": "comment",
@@ -3442,7 +3442,7 @@
   },
   {
    "file": "tools/docs/model-values.mjs",
-   "line": 1159,
+   "line": 1161,
    "runtime": "docs-tools",
    "token": "H / N",
    "class": "comment",
@@ -3450,7 +3450,7 @@
   },
   {
    "file": "tools/docs/model-values.mjs",
-   "line": 1169,
+   "line": 1171,
    "runtime": "docs-tools",
    "token": "H / N",
    "class": "diagnostic",
@@ -3458,7 +3458,7 @@
   },
   {
    "file": "tools/docs/model-values.mjs",
-   "line": 1172,
+   "line": 1174,
    "runtime": "docs-tools",
    "token": "earthInvPlaneInclinationAmplitude",
    "class": "comment",
@@ -3466,7 +3466,7 @@
   },
   {
    "file": "tools/docs/model-values.mjs",
-   "line": 1198,
+   "line": 1200,
    "runtime": "docs-tools",
    "token": "H / N",
    "class": "comment",
@@ -3474,7 +3474,7 @@
   },
   {
    "file": "tools/docs/model-values.mjs",
-   "line": 1203,
+   "line": 1205,
    "runtime": "docs-tools",
    "token": "H / N",
    "class": "comment",
@@ -3482,7 +3482,7 @@
   },
   {
    "file": "tools/docs/model-values.mjs",
-   "line": 1203,
+   "line": 1205,
    "runtime": "docs-tools",
    "token": "/ 13",
    "class": "comment",
@@ -3490,7 +3490,7 @@
   },
   {
    "file": "tools/docs/model-values.mjs",
-   "line": 1215,
+   "line": 1217,
    "runtime": "docs-tools",
    "token": "H / N",
    "class": "comment",
@@ -3498,7 +3498,7 @@
   },
   {
    "file": "tools/docs/model-values.mjs",
-   "line": 1215,
+   "line": 1217,
    "runtime": "docs-tools",
    "token": "/ 13",
    "class": "comment",
@@ -3506,7 +3506,7 @@
   },
   {
    "file": "tools/docs/model-values.mjs",
-   "line": 1231,
+   "line": 1233,
    "runtime": "docs-tools",
    "token": "H / N",
    "class": "diagnostic",
@@ -3514,7 +3514,7 @@
   },
   {
    "file": "tools/docs/model-values.mjs",
-   "line": 1231,
+   "line": 1233,
    "runtime": "docs-tools",
    "token": "/ 13",
    "class": "diagnostic",
@@ -3522,7 +3522,7 @@
   },
   {
    "file": "tools/docs/model-values.mjs",
-   "line": 1253,
+   "line": 1255,
    "runtime": "docs-tools",
    "token": "H / N",
    "class": "diagnostic",
@@ -3530,7 +3530,7 @@
   },
   {
    "file": "tools/docs/model-values.mjs",
-   "line": 1253,
+   "line": 1255,
    "runtime": "docs-tools",
    "token": "/ 13",
    "class": "diagnostic",
@@ -3538,7 +3538,7 @@
   },
   {
    "file": "tools/docs/model-values.mjs",
-   "line": 1266,
+   "line": 1268,
    "runtime": "docs-tools",
    "token": "H / N",
    "class": "diagnostic",
@@ -3546,7 +3546,7 @@
   },
   {
    "file": "tools/docs/model-values.mjs",
-   "line": 1266,
+   "line": 1268,
    "runtime": "docs-tools",
    "token": "/ 13",
    "class": "diagnostic",
@@ -3554,7 +3554,7 @@
   },
   {
    "file": "tools/docs/model-values.mjs",
-   "line": 1352,
+   "line": 1354,
    "runtime": "docs-tools",
    "token": "H / N",
    "class": "diagnostic",
@@ -3562,7 +3562,7 @@
   },
   {
    "file": "tools/docs/model-values.mjs",
-   "line": 1357,
+   "line": 1359,
    "runtime": "docs-tools",
    "token": "8H",
    "class": "comment",
@@ -3570,7 +3570,7 @@
   },
   {
    "file": "tools/docs/model-values.mjs",
-   "line": 1461,
+   "line": 1463,
    "runtime": "docs-tools",
    "token": "8H",
    "class": "comment",
@@ -3578,7 +3578,7 @@
   },
   {
    "file": "tools/docs/model-values.mjs",
-   "line": 1633,
+   "line": 1635,
    "runtime": "docs-tools",
    "token": "H / N",
    "class": "diagnostic",
@@ -3586,7 +3586,7 @@
   },
   {
    "file": "tools/docs/model-values.mjs",
-   "line": 1633,
+   "line": 1635,
    "runtime": "docs-tools",
    "token": "/ 13",
    "class": "diagnostic",
@@ -3594,7 +3594,7 @@
   },
   {
    "file": "tools/docs/model-values.mjs",
-   "line": 1724,
+   "line": 1726,
    "runtime": "docs-tools",
    "token": "H / N",
    "class": "comment",
@@ -3602,7 +3602,7 @@
   },
   {
    "file": "tools/docs/model-values.mjs",
-   "line": 1724,
+   "line": 1726,
    "runtime": "docs-tools",
    "token": "/ 13",
    "class": "comment",
@@ -3610,7 +3610,7 @@
   },
   {
    "file": "tools/docs/model-values.mjs",
-   "line": 1739,
+   "line": 1741,
    "runtime": "docs-tools",
    "token": "H / N",
    "class": "comment",
@@ -3618,7 +3618,7 @@
   },
   {
    "file": "tools/docs/model-values.mjs",
-   "line": 1740,
+   "line": 1742,
    "runtime": "docs-tools",
    "token": "H / N",
    "class": "comment",
@@ -3626,7 +3626,7 @@
   },
   {
    "file": "tools/docs/model-values.mjs",
-   "line": 1740,
+   "line": 1742,
    "runtime": "docs-tools",
    "token": "/ 13",
    "class": "comment",
@@ -3634,7 +3634,7 @@
   },
   {
    "file": "tools/docs/model-values.mjs",
-   "line": 1748,
+   "line": 1750,
    "runtime": "docs-tools",
    "token": "H / N",
    "class": "comment",
@@ -3642,7 +3642,7 @@
   },
   {
    "file": "tools/docs/model-values.mjs",
-   "line": 1802,
+   "line": 1804,
    "runtime": "docs-tools",
    "token": "8H",
    "class": "comment",
@@ -3650,7 +3650,7 @@
   },
   {
    "file": "tools/docs/model-values.mjs",
-   "line": 1808,
+   "line": 1810,
    "runtime": "docs-tools",
    "token": "8H",
    "class": "comment",
@@ -3658,7 +3658,7 @@
   },
   {
    "file": "tools/docs/model-values.mjs",
-   "line": 1821,
+   "line": 1823,
    "runtime": "docs-tools",
    "token": "8H",
    "class": "diagnostic",
@@ -3666,7 +3666,7 @@
   },
   {
    "file": "tools/docs/model-values.mjs",
-   "line": 1829,
+   "line": 1831,
    "runtime": "docs-tools",
    "token": "H / N",
    "class": "comment",
@@ -3674,7 +3674,7 @@
   },
   {
    "file": "tools/docs/model-values.mjs",
-   "line": 1830,
+   "line": 1832,
    "runtime": "docs-tools",
    "token": "H / N",
    "class": "diagnostic",
@@ -3682,7 +3682,7 @@
   },
   {
    "file": "tools/docs/model-values.mjs",
-   "line": 1831,
+   "line": 1833,
    "runtime": "docs-tools",
    "token": "H / N",
    "class": "diagnostic",
@@ -3690,7 +3690,7 @@
   },
   {
    "file": "tools/docs/model-values.mjs",
-   "line": 1858,
+   "line": 1860,
    "runtime": "docs-tools",
    "token": "/ 13",
    "class": "comment",
@@ -3698,7 +3698,7 @@
   },
   {
    "file": "tools/docs/model-values.mjs",
-   "line": 1881,
+   "line": 1883,
    "runtime": "docs-tools",
    "token": "H / N",
    "class": "comment",
@@ -3706,7 +3706,7 @@
   },
   {
    "file": "tools/docs/model-values.mjs",
-   "line": 1881,
+   "line": 1883,
    "runtime": "docs-tools",
    "token": "/ 13",
    "class": "comment",
@@ -3714,7 +3714,7 @@
   },
   {
    "file": "tools/docs/model-values.mjs",
-   "line": 1907,
+   "line": 1909,
    "runtime": "docs-tools",
    "token": "H / N",
    "class": "diagnostic",
@@ -3722,7 +3722,7 @@
   },
   {
    "file": "tools/docs/model-values.mjs",
-   "line": 1907,
+   "line": 1909,
    "runtime": "docs-tools",
    "token": "/ 13",
    "class": "diagnostic",
@@ -3730,7 +3730,7 @@
   },
   {
    "file": "tools/docs/model-values.mjs",
-   "line": 2094,
+   "line": 2096,
    "runtime": "docs-tools",
    "token": "H / N",
    "class": "comment",
@@ -3738,7 +3738,7 @@
   },
   {
    "file": "tools/docs/model-values.mjs",
-   "line": 2094,
+   "line": 2096,
    "runtime": "docs-tools",
    "token": "/ 13",
    "class": "comment",
@@ -3746,7 +3746,7 @@
   },
   {
    "file": "tools/docs/model-values.mjs",
-   "line": 2102,
+   "line": 2104,
    "runtime": "docs-tools",
    "token": "H / N",
    "class": "diagnostic",
@@ -3754,7 +3754,7 @@
   },
   {
    "file": "tools/docs/model-values.mjs",
-   "line": 2102,
+   "line": 2104,
    "runtime": "docs-tools",
    "token": "/ 13",
    "class": "diagnostic",
@@ -3762,7 +3762,7 @@
   },
   {
    "file": "tools/docs/model-values.mjs",
-   "line": 2112,
+   "line": 2114,
    "runtime": "docs-tools",
    "token": "H / N",
    "class": "diagnostic",
@@ -3770,7 +3770,7 @@
   },
   {
    "file": "tools/docs/model-values.mjs",
-   "line": 2112,
+   "line": 2114,
    "runtime": "docs-tools",
    "token": "/ 13",
    "class": "diagnostic",
@@ -3778,7 +3778,7 @@
   },
   {
    "file": "tools/docs/model-values.mjs",
-   "line": 2117,
+   "line": 2119,
    "runtime": "docs-tools",
    "token": "H / N",
    "class": "diagnostic",
@@ -3786,7 +3786,7 @@
   },
   {
    "file": "tools/docs/model-values.mjs",
-   "line": 2146,
+   "line": 2148,
    "runtime": "docs-tools",
    "token": "H / N",
    "class": "comment",
@@ -3794,7 +3794,7 @@
   },
   {
    "file": "tools/docs/model-values.mjs",
-   "line": 2158,
+   "line": 2160,
    "runtime": "docs-tools",
    "token": "H / N",
    "class": "diagnostic",
@@ -3802,7 +3802,7 @@
   },
   {
    "file": "tools/docs/model-values.mjs",
-   "line": 2240,
+   "line": 2242,
    "runtime": "docs-tools",
    "token": "H / N",
    "class": "comment",
@@ -3810,7 +3810,7 @@
   },
   {
    "file": "tools/docs/model-values.mjs",
-   "line": 2259,
+   "line": 2261,
    "runtime": "docs-tools",
    "token": "H / N",
    "class": "diagnostic",
@@ -3818,7 +3818,7 @@
   },
   {
    "file": "tools/docs/model-values.mjs",
-   "line": 2364,
+   "line": 2366,
    "runtime": "docs-tools",
    "token": "H / N",
    "class": "comment",
@@ -3826,7 +3826,7 @@
   },
   {
    "file": "tools/docs/model-values.mjs",
-   "line": 2365,
+   "line": 2367,
    "runtime": "docs-tools",
    "token": "H / N",
    "class": "comment",
@@ -3834,7 +3834,7 @@
   },
   {
    "file": "tools/docs/model-values.mjs",
-   "line": 2395,
+   "line": 2397,
    "runtime": "docs-tools",
    "token": "8H",
    "class": "comment",
@@ -3842,7 +3842,7 @@
   },
   {
    "file": "tools/docs/model-values.mjs",
-   "line": 2513,
+   "line": 2521,
    "runtime": "docs-tools",
    "token": "H / N",
    "class": "diagnostic",
@@ -3850,7 +3850,7 @@
   },
   {
    "file": "tools/docs/model-values.mjs",
-   "line": 2513,
+   "line": 2521,
    "runtime": "docs-tools",
    "token": "/ 13",
    "class": "diagnostic",
@@ -3858,7 +3858,7 @@
   },
   {
    "file": "tools/docs/model-values.mjs",
-   "line": 2514,
+   "line": 2522,
    "runtime": "docs-tools",
    "token": "H / N",
    "class": "diagnostic",
@@ -3866,7 +3866,7 @@
   },
   {
    "file": "tools/docs/model-values.mjs",
-   "line": 2514,
+   "line": 2522,
    "runtime": "docs-tools",
    "token": "/ 13",
    "class": "diagnostic",
@@ -3874,7 +3874,7 @@
   },
   {
    "file": "tools/docs/model-values.mjs",
-   "line": 2627,
+   "line": 2635,
    "runtime": "docs-tools",
    "token": "8H",
    "class": "comment",
@@ -3882,7 +3882,7 @@
   },
   {
    "file": "tools/docs/model-values.mjs",
-   "line": 2749,
+   "line": 2757,
    "runtime": "docs-tools",
    "token": "H / N",
    "class": "diagnostic",
@@ -3890,7 +3890,7 @@
   },
   {
    "file": "tools/docs/model-values.mjs",
-   "line": 2791,
+   "line": 2799,
    "runtime": "docs-tools",
    "token": "H / N",
    "class": "comment",
@@ -3898,7 +3898,7 @@
   },
   {
    "file": "tools/docs/model-values.mjs",
-   "line": 2793,
+   "line": 2801,
    "runtime": "docs-tools",
    "token": "H / N",
    "class": "diagnostic",
@@ -3906,7 +3906,7 @@
   },
   {
    "file": "tools/docs/model-values.mjs",
-   "line": 2929,
+   "line": 2937,
    "runtime": "docs-tools",
    "token": "8H",
    "class": "comment",
@@ -3914,7 +3914,7 @@
   },
   {
    "file": "tools/docs/model-values.mjs",
-   "line": 2933,
+   "line": 2941,
    "runtime": "docs-tools",
    "token": "H / N",
    "class": "diagnostic",
@@ -3922,7 +3922,7 @@
   },
   {
    "file": "tools/docs/model-values.mjs",
-   "line": 2933,
+   "line": 2941,
    "runtime": "docs-tools",
    "token": "/ 13",
    "class": "diagnostic",
@@ -3930,7 +3930,7 @@
   },
   {
    "file": "tools/docs/model-values.mjs",
-   "line": 2934,
+   "line": 2942,
    "runtime": "docs-tools",
    "token": "H / N",
    "class": "diagnostic",
@@ -3938,7 +3938,7 @@
   },
   {
    "file": "tools/docs/model-values.mjs",
-   "line": 2965,
+   "line": 2973,
    "runtime": "docs-tools",
    "token": "H / N",
    "class": "comment",
@@ -3946,7 +3946,7 @@
   },
   {
    "file": "tools/docs/model-values.mjs",
-   "line": 2965,
+   "line": 2973,
    "runtime": "docs-tools",
    "token": "8H",
    "class": "comment",
@@ -3954,7 +3954,7 @@
   },
   {
    "file": "tools/docs/model-values.mjs",
-   "line": 2968,
+   "line": 2976,
    "runtime": "docs-tools",
    "token": "H / N",
    "class": "comment",
@@ -3962,7 +3962,7 @@
   },
   {
    "file": "tools/docs/model-values.mjs",
-   "line": 2970,
+   "line": 2978,
    "runtime": "docs-tools",
    "token": "8H",
    "class": "comment",
@@ -3970,7 +3970,7 @@
   },
   {
    "file": "tools/docs/model-values.mjs",
-   "line": 3004,
+   "line": 3012,
    "runtime": "docs-tools",
    "token": "eraClockHAtAge",
    "class": "comment",
@@ -3978,7 +3978,7 @@
   },
   {
    "file": "tools/docs/model-values.mjs",
-   "line": 3052,
+   "line": 3060,
    "runtime": "docs-tools",
    "token": "/ 13",
    "class": "diagnostic",
@@ -3986,7 +3986,7 @@
   },
   {
    "file": "tools/docs/model-values.mjs",
-   "line": 3055,
+   "line": 3063,
    "runtime": "docs-tools",
    "token": "H / N",
    "class": "comment",
@@ -3994,7 +3994,7 @@
   },
   {
    "file": "tools/docs/model-values.mjs",
-   "line": 3055,
+   "line": 3063,
    "runtime": "docs-tools",
    "token": "/ 13",
    "class": "comment",
@@ -8133,7 +8133,7 @@
    "packages/physics/test/layer0-identity.test.mjs": "sha256:8b77866157bde4829150cdf74639f1d6c33c76fae6513d49e62d9eea97485f05",
    "packages/physics/test/layer1-identity.test.mjs": "sha256:fb27f8a5d8e963097a013758566521b2eb0779ea552a6be0f3be7c3de0b2d8d7",
    "public/input/astro-reference.json": "sha256:adce7ec505e6c7fa670c240640533de5c280da6035c388584ef87b37dab38aaf",
-   "public/input/model-version.json": "sha256:c5857a5ffc8d9c1e72afe8c5d8e302e1ed51c52842aab351fe99f95efbf2049b",
+   "public/input/model-version.json": "sha256:29e6f0f40eca908947255c3870d4f7dd1ac9f4c654965aa82ef0a38b1a84b41a",
    "scripts/climate_formula_mwp_check.py": "sha256:177305723579b66c9d08590f366574c05cd935aea5573614e89eddc502f72236",
    "scripts/extract_insolation_features_deep.js": "sha256:2ef7242a306cc9e34200e59c0dcbe8d5fe30dc0759b4d2ee5457875d981a50dc",
    "scripts/milankovitch_climate_formula.py": "sha256:c16a99025d13fbbbd5448a067d39be62e27dff78d0d68432ca600c337817a41f",
@@ -8145,7 +8145,7 @@
    "tools/check-vocabulary.mjs": "sha256:f3d9a7b33f275877a18ddad00688c478bcf567ac2c85afc8c57b9c9b8338ce13",
    "tools/constants/check-literals.mjs": "sha256:85564353744373dbc3181962d7a47a9e4547253d6db4889d5c29388094358779",
    "tools/constants/generate.mjs": "sha256:cc69923c7204576fb319b9d20f97938f16296ed0943c20717530790e7cee8e58",
-   "tools/docs/model-values.mjs": "sha256:1060e452827677ea5a79aab650d596c54160cddbee15341b1c935f84eb961fcd",
+   "tools/docs/model-values.mjs": "sha256:f8d81720995386b84a9bd7c93884af526b5eaa745897e3fc5f41f5676e204af7",
    "tools/docs/render-calculation-map.mjs": "sha256:8807a8af9432460830eb87c2555e4a343c1e537deea772b76322cc9562e6c31f",
    "tools/docs/render-doc99-tables.mjs": "sha256:fc16fc33ffbd7f8313057d25a02c2a262029a2d1e25b7ff94f97645f9b8cd458",
    "tools/explore/climate-band-phase.js": "sha256:0b81487d4cf86717265d53e7583b63e6ff7b52a5f8d9d8c3e7c21ff975e9bbe3",

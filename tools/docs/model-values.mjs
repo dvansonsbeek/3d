@@ -197,7 +197,7 @@ const pAJ2000ArcsecPerYr = () => 1296000 / oneYL().axialPrecessionYearsAtYear(20
  *  multi-mode quantity has no single amplitude; the half-range is stated as
  *  such in the notes. @param {string} p */
 const chainInclStats = (() => {
-  /** @type {Record<string, {mean:number, half:number, min:number, max:number}>} */ const memo = {};
+  /** @type {Record<string, {mean:number, min:number, max:number}>} */ const memo = {};
   return (p) => {
     if (memo[p]) return memo[p];
     // Earth's inclination to the invariable plane is the engine's own normal
@@ -207,7 +207,9 @@ const chainInclStats = (() => {
       : physModel().planets.invPlaneInclinationDeg;
     let s = 0, n = 0, mn = Infinity, mx = -Infinity;
     for (let y = -9996000; y <= 9996000; y += 2000) { const v = f(p, 2000 + y); s += v; n++; if (v < mn) mn = v; if (v > mx) mx = v; }
-    memo[p] = { mean: s / n, half: (mx - mn) / 2, min: mn, max: mx };
+    // (model-values 23.0.0: the half-range (mx − mn)/2 left with the `<p>InclAmp`
+    // keys — a multi-mode quantity is published as its mean and its range.)
+    memo[p] = { mean: s / n, min: mn, max: mx };
     return memo[p];
   };
 })();
@@ -2435,14 +2437,18 @@ export const VALUES = {
   })(),
 
   // ── Planet invariable-plane inclination family (11-2ab) ─────────────────
-  // Plan 07: mean and half-range of the CHAIN's inclination to the model's
+  // Plan 07: mean and range of the CHAIN's inclination to the model's
   // invariable plane over the banked ±10-Myr series (the API's
   // invPlaneInclinationDeg, sampled every 2 kyr) — the engine's reading of
   // what the retired ψ law (amplitude = ψ/(d·√m), anchored at an inclination
-  // cycle anchor) described. A multi-mode quantity has no single amplitude;
-  // `<p>InclAmp` is the half-range and says so. The Fibonacci divisor and the
-  // cycle anchor keys (`<p>InclD`, `<p>InclCycleAnchor`) are gone with the
-  // law; `<p>OmegaJ2000` is the chain's J2000 node from the Souami & Souchay
+  // cycle anchor) described. A multi-mode quantity has no single amplitude:
+  // the range is published as `<p>InclMin`/`<p>InclMax` (below); the
+  // half-range key `<p>InclAmp` was DELETED at model-values 23.0.0 — its name
+  // presented the range as a symmetric swing about the mean (Mercury's is
+  // 0.14°–10.97° about 6.69°), the ψ law's framing, and the Min/Max rows carry
+  // the range itself. The Fibonacci divisor and the cycle anchor keys
+  // (`<p>InclD`, `<p>InclCycleAnchor`) are gone with the law;
+  // `<p>OmegaJ2000` is the chain's J2000 node from the Souami & Souchay
   // origin (the API's value); `<p>InclJ2000` stays the S&S 2012 reference.
   // (The earlier port surfaced website defect #7, precision loss from 5-dp
   // constants — both site tables carry the registry's full precision.)
@@ -2450,7 +2456,6 @@ export const VALUES = {
     const out = {};
     for (const planet of ['mercury', 'venus', 'mars', 'jupiter', 'saturn', 'uranus', 'neptune']) {
       out[`${planet}InclMean`] = { get: () => chainInclStats(planet).mean, render: (v) => Number(v).toFixed(6), unit: '°', note: 'mean inclination to the invariable plane over the banked ±10-Myr series (plan 07; was the ψ law’s mean)' };
-      out[`${planet}InclAmp`] = { get: () => chainInclStats(planet).half, render: (v) => Number(v).toFixed(6), unit: '°', note: 'HALF-RANGE of the inclination to the invariable plane over ±10 Myr — a multi-mode quantity, not a single amplitude (plan 07; was ψ/(d·√m))' };
       out[`${planet}OmegaJ2000`] = { get: () => physModel().planets.ascendingNodeInvPlaneDeg(planet, 2000), render: (v) => Number(v).toFixed(2), unit: '°', note: 'the chain’s J2000 ascending node on the invariable plane, S&S origin (plan 07; was the device’s verified node)' };
       // (plan 07 R8: `<p>InclCycleAnchor` — the ψ law's phase anchor, a device
       // INPUT — left with model-parameters inclinationCycleAnchor; doc 31
@@ -2465,11 +2470,14 @@ export const VALUES = {
   // ≠ the raw S&S 107.06; docs/32 table), astro-reference
   // additionalBodiesReference since plan 11 step 2 (the additionalBodies block
   // that stored it, with the device mean/amplitude, is deleted). Min/max are
-  // mean ∓ half-range at 2 dp; the *Round keys are the 3-dp J2000 table forms.
+  // the series' own minimum and maximum at 2 dp (model-values 23.0.0; until
+  // then mean ∓ half-range — a SYMMETRIC construction the ψ-law framing left
+  // behind, which published Venus's minimum as −0.19° for a range that is
+  // 0.00°–3.46° about a mean of 1.54°, and Mercury's as 1.28°–12.10° for
+  // 0.14°–10.97°); the *Round keys are the 3-dp J2000 table forms.
   // (plan 09 step 7c: holisticYearFactors — the retired unit's prime
   // factorization — left with the unit.)
   ...(() => {
-    const inclOf = (planet) => ({ mean: chainInclStats(planet).mean, amp: chainInclStats(planet).half });   // plan 07: the chain's series range
     const j2000Of = (planet) => {
       if (planet === 'earth') return astro.earthOrbital.earthInclinationJ2000_deg;
       return astro.planetOrbitalElements[planet].invPlaneInclinationJ2000;
@@ -2487,8 +2495,8 @@ export const VALUES = {
     // (plan 07 sweep: Pluto's rows — a device mean ± amplitude for a body the
     // scene no longer carries — are out of both loops; nothing quoted them.)
     for (const planet of ['mercury', 'venus', 'mars', 'jupiter', 'saturn', 'uranus', 'neptune']) {
-      out[`${planet}InclMin`] = { get: () => inclOf(planet).mean - inclOf(planet).amp, render: (v) => Number(v).toFixed(2), unit: '°' };
-      out[`${planet}InclMax`] = { get: () => inclOf(planet).mean + inclOf(planet).amp, render: (v) => Number(v).toFixed(2), unit: '°' };
+      out[`${planet}InclMin`] = { get: () => chainInclStats(planet).min, render: (v) => Number(v).toFixed(2), unit: '°', note: 'the minimum of the chain\'s inclination to the invariable plane over the banked ±10-Myr series (model-values 23.0.0; was mean − half-range)' };
+      out[`${planet}InclMax`] = { get: () => chainInclStats(planet).max, render: (v) => Number(v).toFixed(2), unit: '°', note: 'the maximum of the chain\'s inclination to the invariable plane over the banked ±10-Myr series (model-values 23.0.0; was mean + half-range)' };
     }
     for (const planet of ['mercury', 'venus', 'earth', 'mars', 'jupiter', 'saturn', 'uranus', 'neptune']) {
       out[`${planet}InclJ2000Round`] = { get: () => j2000Of(planet), render: (v) => Number(v).toFixed(3), unit: '°' };

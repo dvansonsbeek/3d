@@ -377,18 +377,21 @@ CHAIN's series range (the registry's `chainInclStats`); the law's
 verification instruments, `inclination-optimization` and
 `inclination-verification`, went at plan 07 R6.
 
-| Planet | Mean (deg) | Half-range (deg) | Range (deg) | Inertial apsidal period |
-|--------|----------|---------------|-----------|-------------|
-| Mercury | <!--v:mercuryInclMean-->6.690391<!--/v--> | <!--v:mercuryInclAmp-->5.414244<!--/v--> | 6.32 - 7.09 | <!--v:mercuryPeriPeriodICRF-->232,437<!--/v--> yr |
-| Venus | <!--v:venusInclMean-->1.538475<!--/v--> | 0.062165 | 2.09 - 2.21 | <!--v:venusPeriPeriodICRF-->174,997<!--/v--> yr |
-| Earth | <!--v:earthInclMean-->1.28745<!--/v--> | (the engine's ±10-Myr range, <!--v:earthInclMin-->0.034<!--/v-->–<!--v:earthInclMax-->2.942<!--/v-->; the K scaffold's amplitude 0.636 is deleted, plan 11 step 4) | 0.85 - 2.12 | <!--v:earthPeriPeriodICRF-->111,635<!--/v--> yr |
-| Mars | <!--v:marsInclMean-->4.205698<!--/v--> | <!--v:marsInclAmp-->3.368563<!--/v--> | 0.67 - 3.00 | <!--v:marsPeriPeriodICRF-->72,335<!--/v--> yr |
-| Jupiter | <!--v:jupiterInclMean-->0.362449<!--/v--> | <!--v:jupiterInclAmp-->0.144018<!--/v--> | 0.30 - 0.34 | <!--v:jupiterPeriPeriodICRF-->304,456<!--/v--> yr |
-| Saturn | <!--v:saturnInclMean-->0.891489<!--/v--> | <!--v:saturnInclAmp-->0.125937<!--/v--> | 0.92 - 1.05 | <!--v:saturnPeriPeriodICRF-->45,883<!--/v--> yr |
-| Uranus | <!--v:uranusInclMean-->1.019406<!--/v--> | <!--v:uranusInclAmp-->0.142289<!--/v--> | 0.99 - 1.04 | <!--v:uranusPeriPeriodICRF-->330,515<!--/v--> yr |
-| Neptune | <!--v:neptuneInclMean-->0.668880<!--/v--> | <!--v:neptuneInclAmp-->0.180752<!--/v--> | 0.73 - 0.76 | <!--v:neptunePeriPeriodICRF-->2,136,797<!--/v--> yr |
+| Planet | Mean (deg) | Range over ±10 Myr (deg) | Inertial apsidal period |
+|--------|----------|---------------|-------------|
+| Mercury | <!--v:mercuryInclMean-->6.690391<!--/v--> | <!--v:mercuryInclMin-->0.14<!--/v-->–<!--v:mercuryInclMax-->10.97<!--/v--> | <!--v:mercuryPeriPeriodICRF-->232,437<!--/v--> yr |
+| Venus | <!--v:venusInclMean-->1.538475<!--/v--> | <!--v:venusInclMin-->0.00<!--/v-->–<!--v:venusInclMax-->3.46<!--/v--> | <!--v:venusPeriPeriodICRF-->174,997<!--/v--> yr |
+| Earth | <!--v:earthInclMean-->1.28745<!--/v--> | <!--v:earthInclMin-->0.034<!--/v-->–<!--v:earthInclMax-->2.942<!--/v--> (the K scaffold's amplitude 0.636 is deleted, plan 11 step 4) | <!--v:earthPeriPeriodICRF-->111,635<!--/v--> yr |
+| Mars | <!--v:marsInclMean-->4.205698<!--/v--> | <!--v:marsInclMin-->0.07<!--/v-->–<!--v:marsInclMax-->6.80<!--/v--> | <!--v:marsPeriPeriodICRF-->72,335<!--/v--> yr |
+| Jupiter | <!--v:jupiterInclMean-->0.362449<!--/v--> | <!--v:jupiterInclMin-->0.20<!--/v-->–<!--v:jupiterInclMax-->0.49<!--/v--> | <!--v:jupiterPeriPeriodICRF-->304,456<!--/v--> yr |
+| Saturn | <!--v:saturnInclMean-->0.891489<!--/v--> | <!--v:saturnInclMin-->0.77<!--/v-->–<!--v:saturnInclMax-->1.02<!--/v--> | <!--v:saturnPeriPeriodICRF-->45,883<!--/v--> yr |
+| Uranus | <!--v:uranusInclMean-->1.019406<!--/v--> | <!--v:uranusInclMin-->0.88<!--/v-->–<!--v:uranusInclMax-->1.16<!--/v--> | <!--v:uranusPeriPeriodICRF-->330,515<!--/v--> yr |
+| Neptune | <!--v:neptuneInclMean-->0.668880<!--/v--> | <!--v:neptuneInclMin-->0.44<!--/v-->–<!--v:neptuneInclMax-->0.80<!--/v--> | <!--v:neptunePeriPeriodICRF-->2,136,797<!--/v--> yr |
 
-The mean and half-range are the chain's over the banked ±10-Myr series; the
+The mean and range are the chain's over the banked ±10-Myr series (a
+multi-mode quantity has no single amplitude — the former half-range key
+`<p>InclAmp` left the registry at model-values 23.0.0, its "mean ± amplitude"
+reading being the retired ψ law's framing); the
 period is the chain's 1,296,000/|g| (Earth: the one-family route). The
 retired law's per-planet phase anchors (`inclinationCycleAnchor`, the
 `i(t) = mean + amplitude × cos(ω̃_ICRF(t) − anchor)` form, Saturn anti-phase)
