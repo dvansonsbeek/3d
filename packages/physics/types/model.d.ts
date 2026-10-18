@@ -32,6 +32,25 @@ export function assembleModel(C: Readonly<Record<string, any>>, F: Readonly<Reco
         jdFromYear: (year: number) => number;
         siTropicalYearDays: number;
     }>;
+    massChain: Readonly<{
+        moonDistanceKm: any;
+        moonSiderealMonthDays: any;
+        siderealYearDays: any;
+        dayLengthSeconds: any;
+        massRatioEarthMoon: any;
+        lunarSmallParameter: number;
+        moonMassFraction: number;
+        solarTidalShiftKm: number;
+        moonDistanceCorrectedKm: any;
+        gmEarthMoonSystemKm3S2: number;
+        gmEarthKm3S2: number;
+        gmMoonKm3S2: number;
+        gmSunPlusEarthKm3S2: number;
+        gmSunKm3S2: number;
+        sunMassKg: number;
+        earthMassKg: number;
+        gravitationalConstantKm3KgS2: any;
+    }>;
     sun: Readonly<{
         /** Mean longitude of date, degrees, unwrapped — L0 + 360·∫dt/T_trop (the one-family tropical year). @param {number} year @returns {number} */
         meanLongitudeDegAt: (year: number) => number;

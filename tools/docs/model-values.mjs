@@ -432,6 +432,13 @@ export const VALUES = {
     note: 'obliquity cycle at J2000 — the beat 2π/(ψ̇ᵢₙ − |s₃|) of the spin axis\'s INERTIAL precession rate (the self-anchored rate the hybrid integrates on: the general precession plus the planetary mean, 50.385 ″/yr — IAU\'s ψ_A − p_A) against the nodal mode (≡ obliqBeatJ2000Kyr; falsification leg 1) — the INSTANTANEOUS limit: a dated record sees the beat of the pole rate\'s mean over its own window (obliqCycleRealized*Years; 40,927 over the LR04 record, the climate formula\'s p+s₀ line since v23.0; La2004\'s own series reads 40,900 on the same window — compare realized with realized, never this instant with Laskar\'s long-window precession frequency 50.476). On the general precession alone it read 41,224. S6: was H/8 = 41,915',
   },
   obliqCycleFormula: { get: () => 1296000 / (physModel().lunisolar.spinAxisInertialRateArcsecPerYrJ2000 - s3ArcsecPerYr()), render: () => 'the beat of the spin axis\'s inertial precession against the nodal mode s₃, 1,296,000/(ψ̇ᵢₙ − |s₃|)' },
+  // The three RATES beside the three periods above — the same evaluators,
+  // 1,296,000″ per period (the website appendix's "Rate" column lost its
+  // device keys inclRateICRF / inclRateEcl / obliqRateEcl at plan 09; these
+  // are their dynamical successors, model-values 23.1.0).
+  inclPrecRateArcsecPerYr: { get: () => 1296000 / oneYL().inclinationPrecessionYearsAtYear(2000), render: (v) => Number(v).toFixed(3), unit: '″/yr', note: 'apsidal precession rate at J2000 — 1,296,000″ / inclPrecYears, the one movement\'s own apsidal rate of date' },
+  eclPrecRateArcsecPerYr: { get: () => Math.abs(s3ArcsecPerYr()), render: (v) => Number(v).toFixed(3), unit: '″/yr', note: 'ecliptic (nodal) precession rate — |s₃|, the dominant nodal mode of Earth\'s orbit on the invariable plane (regression, quoted as a magnitude); 1,296,000″ / eclPrecYears' },
+  obliqCycleRateArcsecPerYr: { get: () => physModel().lunisolar.spinAxisInertialRateArcsecPerYrJ2000 - s3ArcsecPerYr(), render: (v) => Number(v).toFixed(3), unit: '″/yr', note: 'the obliquity beat rate at J2000, ψ̇ᵢₙ − |s₃| — 1,296,000″ / obliqCycleYears (the instantaneous limit; a record sees the window mean)' },
   // v23.0 — THE REALIZED OBLIQUITY PERIOD: what a record spanning a window sees — the window mean of the
   // pole rate (the inertial rate of date × solar torque at e(t) × J₂(t)/J₂₀ × cos ε(t)/cos ε₀) minus |s₃|.
   // ONE home createModel().lunisolar.obliquityPeriodRealizedYears; the windows are the climate formula's
@@ -1695,6 +1702,27 @@ export const VALUES = {
       moonApsidalPrecessionDaysInput: { get: () => C.moonApsidalPrecessionDaysInputICRF, render: (v) => thousands(v, 3), unit: 'd' },
       moonNodalPrecessionDaysInput:   { get: () => C.moonNodalPrecessionDaysInputICRF, render: (v) => thousands(v, 2), unit: 'd' },
       moonKeplerEffectiveDistance: { get: () => astro.knownValues.moonKeplerEffectiveDistanceKm, render: (v) => thousands(v), unit: 'km', note: 'DLT-1 §3 three-body a (vs two-body 384,748)' },
+      // The Moon-Kepler mass chain (docs 24; the website's "mass from the Moon"
+      // page) — read from the ONE place that computes it, createModel().massChain
+      // (physics 22.1.0; the pages carried these as hand-typed literals,
+      // recomputed by hand at the v24.0 update). References: JPL DE440
+      // (Park et al. 2021), astro-reference knownValues.
+      moonKeplerLunarSmallParameter: { get: () => physModel().massChain.lunarSmallParameter, render: (v) => Number(v).toFixed(8), note: 'm = T_M / T_sidereal-year (Hill 1878), the lunar small parameter on the IAU inputs' },
+      moonKeplerMassFraction: { get: () => physModel().massChain.moonMassFraction, render: (v) => Number(v).toFixed(8), note: 'μ = M_Moon / (M_Earth + M_Moon) = 1 / (ratio + 1) on the DE440 mass ratio' },
+      moonKeplerSolarTidalShiftKm: { get: () => physModel().massChain.solarTidalShiftKm, render: (v) => Number(v).toFixed(2), unit: 'km', note: 'Δa = a_M · μ · m — the solar-tidal shift that makes Kepler III return the DE440 GM (a re-parameterisation of Hill-Brown\'s ½·m² correction, doc 24 §3)' },
+      moonKeplerCorrectedDistanceKm: { get: () => physModel().massChain.moonDistanceCorrectedKm, render: (v) => thousands(v, 2), unit: 'km', note: 'a_M + Δa, the Kepler-effective Earth–Moon distance on the IAU mean distance' },
+      moonKeplerMonthSeconds: { get: () => physModel().massChain.moonSiderealMonthDays * physModel().massChain.dayLengthSeconds, render: (v) => thousands(v, 2), unit: 's', note: 'the IAU sidereal month in SI seconds (T_M × the SI day)' },
+      gmEarthMoonSystemModelKm3S2: { get: () => physModel().massChain.gmEarthMoonSystemKm3S2, render: (v) => thousands(v, 2), unit: 'km³/s²', note: 'G(M_Earth + M_Moon) = 4π²·a_corrected³/T²' },
+      gmEarthModelKm3S2: { get: () => physModel().massChain.gmEarthKm3S2, render: (v) => thousands(v, 2), unit: 'km³/s²', note: 'GM_Earth = G(M_E + M_M) · ratio/(ratio + 1)' },
+      gmMoonModelKm3S2: { get: () => physModel().massChain.gmMoonKm3S2, render: (v) => thousands(v, 2), unit: 'km³/s²', note: 'GM_Moon = G(M_E + M_M) / (ratio + 1)' },
+      gmSunModelKm3S2: { get: () => physModel().massChain.gmSunKm3S2, render: (v) => thousands(v, 0), unit: 'km³/s²', note: 'GM_Sun = 4π²·AU³/T_sid² − GM_Earth (the downstream chain)' },
+      earthMassModelKg: { get: () => physModel().massChain.earthMassKg, render: (v) => (v / 1e24).toFixed(6) + ' × 10²⁴', unit: 'kg', note: 'GM_Earth / G with CODATA G = 6.6743×10⁻²⁰ km³/(kg·s²); G\'s ~22 ppm sets the floor' },
+      gmEarthDE440Km3S2: { get: () => astro.knownValues.de440GmEarthKm3S2, render: (v) => thousands(v, 2), unit: 'km³/s²', note: 'JPL DE440 (Park et al. 2021) — the reference the model chain is compared against' },
+      gmMoonDE440Km3S2: { get: () => astro.knownValues.de440GmMoonKm3S2, render: (v) => thousands(v, 2), unit: 'km³/s²', note: 'JPL DE440 (Park et al. 2021)' },
+      gmSunDE440Km3S2: { get: () => astro.knownValues.de440GmSunKm3S2, render: (v) => thousands(v, 0), unit: 'km³/s²', note: 'JPL DE440 (Park et al. 2021)' },
+      gmEarthResidualPpm: { get: () => (physModel().massChain.gmEarthKm3S2 / astro.knownValues.de440GmEarthKm3S2 - 1) * 1e6, render: (v) => Number(v).toFixed(1), unit: 'ppm', note: 'the model GM_Earth against DE440 — the Δa chain\'s residual (doc 24 §8)' },
+      gmMoonResidualPpm: { get: () => (physModel().massChain.gmMoonKm3S2 / astro.knownValues.de440GmMoonKm3S2 - 1) * 1e6, render: (v) => Number(v).toFixed(1), unit: 'ppm', note: 'the model GM_Moon against DE440 (the same ratio as GM_Earth: the split is DE440\'s mass ratio)' },
+      gmSunResidualPpm: { get: () => (physModel().massChain.gmSunKm3S2 / astro.knownValues.de440GmSunKm3S2 - 1) * 1e6, render: (v) => Number(v).toFixed(2), unit: 'ppm', note: 'the model GM_Sun against DE440' },
       a1RateDegPerCy: { get: () => astro.knownValues.meeusA1RateDegPerCy, render: (v) => String(v), unit: '°/cy', note: 'Meeus A1 rate (18V−16E−M′ resonance) — duplicated from script.js:26562' },
       meeusLongitudeTerms: { get: () => 60, render: (v) => String(v), note: 'Meeus 47.A canonical count — tracked table carries 59 (60th is the distance-only term)' },
       meeusLatitudeTerms:  { get: () => 60, render: (v) => String(v), note: 'Meeus 47.B canonical count' },

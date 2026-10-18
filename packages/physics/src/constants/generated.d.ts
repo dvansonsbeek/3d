@@ -516,6 +516,9 @@ export declare const REFERENCE_DATA: {
     "iersObservedDLodDtMsPerCy": number;
     "llrTidalGammaArcsecPerCy2": number;
     "moonKeplerEffectiveDistanceKm": number;
+    "de440GmEarthKm3S2": number;
+    "de440GmMoonKm3S2": number;
+    "de440GmSunKm3S2": number;
     "meeusA1RateDegPerCy": number;
     "meeusEclipsesTestCount": number;
     "meeusEclipseRmsMinutes": number;

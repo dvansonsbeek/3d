@@ -1516,6 +1516,34 @@ export function assembleModel(C, F, laws = {}, secularSeriesArtifact = /** @type
       jdFromYear,
       siTropicalYearDays,
     }),
+    // The Moon-Kepler mass chain — the J2000 derivation docs 24 / the website's
+    // "mass from the Moon" page narrate, published from the one place that
+    // computes it (physics 22.1.0; the pages used to carry its numbers as
+    // hand-typed literals): Kepler III on the Moon's orbit with the
+    // solar-tidal shift Δa = a·μ·m (μ the Moon's mass fraction, m the lunar
+    // small parameter T_M/T_sidereal-year), the Earth/Moon split on the
+    // DE440 mass ratio, and GM_Sun from Earth's heliocentric orbit minus
+    // GM_Earth. Every value is the J2000 snapshot the rest of the model runs
+    // on; the of-date Moon distance is the recession history (epoch.*).
+    massChain: Object.freeze({
+      moonDistanceKm,
+      moonSiderealMonthDays: moonSiderealMonth,
+      siderealYearDays: meanSiderealYearDays,
+      dayLengthSeconds: meanLengthOfDay,
+      massRatioEarthMoon: MASS_RATIO_EARTH_MOON,
+      lunarSmallParameter: moonSiderealMonth / meanSiderealYearDays,
+      moonMassFraction: 1 / (MASS_RATIO_EARTH_MOON + 1),
+      solarTidalShiftKm: moonOrbitalShift,
+      moonDistanceCorrectedKm: moonDistanceCorrected,
+      gmEarthMoonSystemKm3S2: GM_EARTH_MOON_SYSTEM,
+      gmEarthKm3S2: GM_EARTH_ALONE,
+      gmMoonKm3S2: GM_MOON_ALONE,
+      gmSunPlusEarthKm3S2: GM_SUN_PLUS_EARTH,
+      gmSunKm3S2: GM_SUN,
+      sunMassKg: M_SUN,
+      earthMassKg: GM_EARTH_ALONE / G_CONSTANT,
+      gravitationalConstantKm3KgS2: G_CONSTANT,
+    }),
     // Plan 09: the ONE certified Sun's mean elements of date — the lunar
     // arguments of every runtime build their Sun from these two (the Node
     // scene twin and the browser read them here; the "model timeline" Sun on

@@ -157,12 +157,21 @@ The exact factor (using the cube `(1 + Δa/a_M)³` rather than the linear approx
 
 ## Precision vs Reference Values
 
-| Quantity | Model | JPL/GRAIL reference | Residual |
+The chain above is the model's own: `createModel().massChain` publishes every
+step (physics 22.1.0), and the registry carries them as keys — Δa
+<!--v:moonKeplerSolarTidalShiftKm-->349.37<!--/v--> km, the corrected
+distance <!--v:moonKeplerCorrectedDistanceKm-->384,748.44<!--/v--> km,
+G(M_E + M_M) <!--v:gmEarthMoonSystemModelKm3S2-->403,504.75<!--/v--> km³/s²,
+m = <!--v:moonKeplerLunarSmallParameter-->0.07480133<!--/v-->,
+μ = <!--v:moonKeplerMassFraction-->0.01215058<!--/v-->. The code block keeps
+the worked numbers for reading; the table below is live.
+
+| Quantity | Model | JPL DE440 reference (Park et al. 2021) | Residual |
 |---|---|---|---|
-| GM_Earth | **398,601.93 km³/s²** | 398,600.44 km³/s² | **3.7 ppm** |
-| GM_Moon | **4,902.82 km³/s²** | 4,902.80 km³/s² | **3.7 ppm** |
-| GM_Sun (downstream, after subtracting GM_Earth) | **132,712,430,446 km³/s²** | 132,712,440,042 km³/s² | **0.07 ppm** |
-| M_Earth (= GM_Earth / G with G = 6.6743×10⁻²⁰ km³/(kg·s²)) | **5.972191 × 10²⁴ kg** | spread of published values: 5.972168–5.972370 × 10²⁴ | within published spread |
+| GM_Earth | **<!--v:gmEarthModelKm3S2-->398,601.93<!--/v--> km³/s²** | <!--v:gmEarthDE440Km3S2-->398,600.44<!--/v--> km³/s² | **<!--v:gmEarthResidualPpm-->3.7<!--/v--> ppm** |
+| GM_Moon | **<!--v:gmMoonModelKm3S2-->4,902.82<!--/v--> km³/s²** | <!--v:gmMoonDE440Km3S2-->4,902.80<!--/v--> km³/s² | **<!--v:gmMoonResidualPpm-->3.7<!--/v--> ppm** |
+| GM_Sun (downstream, after subtracting GM_Earth) | **<!--v:gmSunModelKm3S2-->132,712,430,446<!--/v--> km³/s²** | <!--v:gmSunDE440Km3S2-->132,712,440,041<!--/v--> km³/s² | **<!--v:gmSunResidualPpm-->-0.07<!--/v--> ppm** |
+| M_Earth (= GM_Earth / G with G = 6.6743×10⁻²⁰ km³/(kg·s²)) | **<!--v:earthMassModelKg-->5.972191 × 10²⁴<!--/v--> kg** | spread of published values: 5.972168–5.972370 × 10²⁴ | within published spread |
 
 The G uncertainty (~22 ppm) sets a hard floor on how precisely M_Earth can be expressed in kg — different reference sources disagree by up to 30 ppm because they use slightly different G values to convert their fitted GM_Earth.
 
