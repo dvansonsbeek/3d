@@ -316,6 +316,15 @@ would silently churn a structural claim for a rounding-level gain.
   across one refit, a loop the freshness gate cannot close). The T1 exporter
   derives the LINE rate with `ellipticity: false`; the published realized
   period and the hybrid gate keep the full rate (1 yr of period apart).
+- **"Placed by the engine every frame" does not cover what was aligned ONCE
+  at init.** Plan 11 step 4 deleted the scene scaffold's pose on the claim
+  that every frame of date is engine-placed — true for every per-frame
+  reader, and the star and constellation catalogs copied Earth's axis matrix
+  once at module init, before the first placement: the sky lost 23.44° of
+  tilt and 68.23° of equinox offset while every golden stayed bit-identical
+  (goldens record observables, which are frame-invariant). Before deleting a
+  pose, grep the top-level `matrixWorld` readers; gate the init-time
+  alignments in the frame they must sit in.
 
 ---
 
@@ -397,7 +406,14 @@ plane at the chain's ϖ, the Moon's "Apsidal/Nodal Precession" markers
 marker (≡ the Sun panel's Sun-SSB sum) are placed as stated, and every
 group's chip list is exact — no device-wheel chips (born from the "Real
 Perihelion" wheel ~90° off the chain and three chips that showed nothing;
-fail-proven via `ESSRT_PERI_SUN_PLANT=1`), and a chip click WAKES the
+fail-proven via `ESSRT_PERI_SUN_PLANT=1`), and the star and constellation
+containers (J2000 RA/Dec catalogs, aligned ONCE at module init) sit on the
+J2000 equatorial frame through R (born from the owner's "the Sun is at 160°
+against the constellations where it was at 90°" after plan 11 step 4: the
+axis's rest pose became 0 and the engine places it only at the first update,
+after the alignment — 23.44° of tilt and 68.23° of equinox offset missing from
+the sky, invisible to goldens that record observables; fail-proven on that
+build), and a chip click WAKES the
 paused render loop (the class the monitor guard exposed: a UI path that
 changes scene state without setting `positionChanged` — now every user
 interaction wakes the loop for one frame; the pre-fix build reads 0 active

@@ -107,6 +107,19 @@ try {
   check('world frame: R maps the J2000 ecliptic pole onto world Y exactly', !!wf && wf.poleIsWorldY, wf ? JSON.stringify(wf.poleColumn) : 'probe returned null');
   check('world frame: the J2000 equinox sits at the recorded view azimuth', !!wf && Math.abs(wrapd(wf.equinoxAzimuthDeg - wf.equinoxAzimuthLiteralDeg - plantDeg)) < 1e-9, wf ? `${wf.equinoxAzimuthDeg}° vs ${wf.equinoxAzimuthLiteralDeg}°` : '');
   check('Earth frame: the rendered axis IS the engine frame of date through R (pole and equinox)', !!wf && wf.seriesLive && wf.axisPoleChord < 1e-9 && wf.axisEquinoxChord < 1e-9, wf ? `pole chord ${wf.seriesLive ? wf.axisPoleChord.toExponential(2) : 'n/a'}, equinox chord ${wf.seriesLive ? wf.axisEquinoxChord.toExponential(2) : 'n/a'} (series ${wf.seriesLive ? 'live' : 'not loaded'})` : '');
+  // The star and constellation catalogs (J2000 RA/Dec) are aligned once at
+  // module init; they must sit on the J2000 equatorial frame through R. Born
+  // from the owner's "the Sun is at 160° against the constellations where it
+  // was at 90°" after plan 11 step 4 (the axis's rest pose became 0 and the
+  // engine places it only at the first update, after the alignment). Measured
+  // on the pre-fix build: pole tilt 23.4393° and equinox offset 68.2265° (the
+  // view azimuth 158.2265° less the unposed frame's quarter turn) — the whole
+  // world-frame pose missing from the sky; fail-proven by that run.
+  const sf = await sim.page.evaluate(() => window.__test__.starFrameProbe());
+  for (const k of ['stars', 'constellations']) {
+    const f = sf && sf[k];
+    check(`star field: the ${k} container sits on the J2000 equatorial frame through R (pole and equinox)`, !!f && f.poleChord < 1e-9 && f.equinoxChord < 1e-9, f ? `pole chord ${f.poleChord.toExponential(2)} (tilt ${f.poleTiltDeg.toFixed(4)}°), equinox chord ${f.equinoxChord.toExponential(2)} (offset ${f.equinoxOffsetDeg.toFixed(4)}°)` : 'probe returned null');
+  }
   check('Moon nodes: on the ecliptic of date at L′ − F and L′ − F + 180°, at distance a', !!mm && Math.abs(wrapd(mm.ascNode.lon - mm.nodeLonExpectedDeg)) < 1e-6 && Math.abs(wrapd(mm.descNode.lon - mm.nodeLonExpectedDeg - 180)) < 1e-6 && Math.abs(mm.ascNode.lat) < 1e-6 && Math.abs(mm.descNode.lat) < 1e-6 && Math.abs(mm.ascNode.distAU - mm.aAU) < 1e-9, mm ? `asc λ ${mm.ascNode.lon.toFixed(4)}° β ${mm.ascNode.lat.toExponential(1)}°, desc λ ${mm.descNode.lon.toFixed(4)}°, Ω = L′ − F = ${mm.nodeLonExpectedDeg.toFixed(4)}°` : '');
   // A chip click must WAKE the paused loop (owner: "Perihelion at Earth" appeared
   // only on a camera move or Play once the paused loop truly idled — the monitor

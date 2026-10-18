@@ -5754,6 +5754,27 @@ if (typeof window !== 'undefined') {
         equinoxAzimuthDeg: Math.atan2(R[0][0], R[2][0]) / D2R, equinoxAzimuthLiteralDeg: SCENE_EQUINOX_VIEW_AZIMUTH_DEG,
         seriesLive: !!F, axisPoleChord: F ? axisY.distanceTo(toW(F.s)) : null, axisEquinoxChord: F ? axisZ.distanceTo(toW(F.g)) : null };
     },
+    // Star-field gate hook: the star and constellation containers are J2000
+    // RA/Dec catalogs aligned ONCE at module init to Earth's rotation-axis
+    // frame; they must sit on the J2000 equatorial frame through R (pole ŝ,
+    // equinox ĝ of the J2000 rest sample). Born from the owner's "the Sun is at
+    // 160° against the constellations where it was at 90°": since plan 11
+    // step 4 the axis's rest pose is 0 and the engine places it only at the
+    // first update, AFTER the init-time alignment — the catalogs inherited an
+    // unposed frame and nothing gated it (the goldens record observables).
+    starFrameProbe: () => {
+      if (!_kcR) return null;
+      const R = _kcR, D2R = Math.PI / 180;
+      const F0 = computeEarthFrameOfDate(_KC_J2000_REST_SAMPLE);
+      const toW = (v) => new THREE.Vector3(R[0][0] * v[0] + R[0][1] * v[1] + R[0][2] * v[2], R[1][0] * v[0] + R[1][1] * v[1] + R[1][2] * v[2], R[2][0] * v[0] + R[2][1] * v[1] + R[2][2] * v[2]);
+      const s0 = toW(F0.s), g0 = toW(F0.g);
+      const frameOf = (obj) => {
+        const q = obj.getWorldQuaternion(new THREE.Quaternion());
+        const y = new THREE.Vector3(0, 1, 0).applyQuaternion(q), z = new THREE.Vector3(0, 0, 1).applyQuaternion(q);
+        return { poleChord: y.distanceTo(s0), equinoxChord: z.distanceTo(g0), poleTiltDeg: Math.acos(Math.min(1, Math.max(-1, y.dot(s0)))) / D2R, equinoxOffsetDeg: Math.acos(Math.min(1, Math.max(-1, z.dot(g0)))) / D2R };
+      };
+      return { stars: frameOf(sceneObjects.stars), constellations: frameOf(sceneObjects.constellations) };
+    },
     // Moon-ring gate hook (plan 11 step 3): the RING's perigee and ascending
     // node of date read from the placed stack geometry — the apsidal arm's
     // offset (toward the apogee) and the Moon orbit plane's normal — in the
@@ -10619,8 +10640,17 @@ const sceneObjects = {
   stars: new THREE.Object3D(),
   constellations: new THREE.Object3D(),
   // we can add other fixed obects over here later on. e.g.
-  //blackholes: new THREE.Object3D(), 
+  //blackholes: new THREE.Object3D(),
 };
+
+// The J2000 frame from the embedded anchors — the frame _applyEngineEarthFrame
+// places before the series artifact arrives (plan 11 step 4: the scaffold's
+// pure pose never renders), and the frame the J2000 star catalog is aligned to
+// below. Declared here because the alignment runs at module init.
+const _KC_J2000_REST_SAMPLE = Object.freeze({
+  epsDeg: ASTRO_REFERENCE.obliquityJ2000_deg, equinoxLonJ2000Deg: 0, orbitNormalX: 0, orbitNormalY: 0,
+  periOfDateDeg: ASTRO_REFERENCE.perihelionLongitudeJ2000_deg, e: ASTRO_REFERENCE.eccentricityJ2000,
+});
 
 // Add containers to the scene
 scene.add(sceneObjects.stars);
@@ -10630,6 +10660,24 @@ scene.add(sceneObjects.constellations);
 
 // --- Create Starfield ---
 createStarfield();
+// The star and constellation catalogs are J2000 RA/Dec: align their containers
+// ONCE to the J2000 equatorial frame through the world frame — the frame the
+// first _applyEngineEarthFrame places before the series artifact arrives (the
+// Earth axis then precesses against this fixed sky, as it did under the
+// scaffold). Before plan 11 step 4 the axis's rest pose WAS that frame here by
+// construction (the scaffold's posed wheels + its recorded obliquity); since step 4 the rest
+// pose is 0 and the engine places the axis only at the first update, AFTER
+// this alignment — the catalogs inherited an unposed frame (measured on the
+// pre-fix build: pole tilt 23.44° and equinox offset 68.23° missing — the Sun
+// read ~160° against the constellations at the June-solstice epoch where it
+// belongs at RA 90°). Gate: perihelion-at-sun's star-field rows.
+{
+  const R0 = computeSceneWorldFrameJ2000();
+  const F0 = computeEarthFrameOfDate(_KC_J2000_REST_SAMPLE);
+  const toW = (v) => new THREE.Vector3(R0[0][0] * v[0] + R0[0][1] * v[1] + R0[0][2] * v[2], R0[1][0] * v[0] + R0[1][1] * v[1] + R0[1][2] * v[2], R0[2][0] * v[0] + R0[2][1] * v[1] + R0[2][2] * v[2]);
+  const s0 = toW(F0.s), g0 = toW(F0.g);
+  _kcSetWorldRotation(earth.rotationAxis, new THREE.Vector3().crossVectors(s0, g0), s0, g0);
+}
 scene.updateMatrixWorld();
 sceneObjects.stars.applyMatrix4(earth.rotationAxis.matrixWorld);
 sceneObjects.stars.visible = true;
@@ -48849,13 +48897,9 @@ function _kcSetWorldRotation(obj, X, Y, Z) {
   obj.quaternion.copy(_HTC_Q4.multiply(_HTC_Q3));
   obj.updateMatrixWorld(true);
 }
-// The frame placed before the series artifact arrives: the J2000 frame from
-// the embedded anchors (plan 11 step 4 — the scaffold's pure pose never
-// renders; before, a few frames showed the K pose).
-const _KC_J2000_REST_SAMPLE = Object.freeze({
-  epsDeg: ASTRO_REFERENCE.obliquityJ2000_deg, equinoxLonJ2000Deg: 0, orbitNormalX: 0, orbitNormalY: 0,
-  periOfDateDeg: ASTRO_REFERENCE.perihelionLongitudeJ2000_deg, e: ASTRO_REFERENCE.eccentricityJ2000,
-});
+// (The J2000 rest sample _KC_J2000_REST_SAMPLE — the frame placed before the
+// series artifact arrives — is declared beside the star field's alignment,
+// which reads it at module init.)
 function _applyEngineEarthFrame(jdUT) {
   const R = _kcR;
   // one clock, one argument: the engine year (true TT, Julian — _engineYearTT);
