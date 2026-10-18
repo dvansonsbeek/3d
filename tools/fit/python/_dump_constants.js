@@ -20,24 +20,22 @@ const output = {
   correctionDays: C.correctionDays,
   // (plan 11 step 2: correctionSun, eccentricityBase, earthInvPlaneInclinationMean,
   // eccentricityDerivedMean and perihelionPhaseOffset — scene-scaffold constants
-  // with no reader left — are deleted; temperatureGraphMostLikely left at plan 07 R10)
-  startAngleModel: C.startAngleModel,
+  // with no reader left — are deleted; temperatureGraphMostLikely left at plan 07 R10;
+  // plan 11 step 4: startAngleModel left with the K-device scaffold)
   useVariableSpeed: C.useVariableSpeed,
 
-  // Earth parameters
-  earthtiltMean: C.earthtiltMean,
-  earthInvPlaneInclinationAmplitude: C.earthInvPlaneInclinationAmplitude,
-  earthRAAngle: C.earthRAAngle,
+  // Earth parameters (plan 11 step 4: the K-device scaffold's pose —
+  // earthtiltMean, earthInvPlaneInclinationAmplitude, earthRAAngle,
+  // eccentricityAmplitude, kDeviceWheelPhaseAtJ2000Cycles — is deleted; the
+  // scene's world frame is the J2000 ecliptic. eccentricityAmplitudeK left at
+  // plan 07 R6.)
   earthAscendingNodeInvPlane: C.earthAscendingNodeInvPlane,
-  eccentricityAmplitude: C.eccentricityAmplitude,
-  // (eccentricityAmplitudeK — the K constant — left with the law at plan 07 R6.)
   perihelionRefJD: C.perihelionRefJD,
 
   // Derived values
   meanSolarYearDays: C.meanSolarYearDays,
   meanSiderealYearDays: C.meanSiderealYearDays,
   balancedYear: C.balancedYear,
-  kDeviceWheelPhaseAtJ2000Cycles: C.kDeviceWheelPhaseAtJ2000Cycles,   // plan 07 R10: the K wheels' recorded J2000 phase
   balancedJD: C.balancedJD,
   eocEccentricity: C.eocEccentricity,
 

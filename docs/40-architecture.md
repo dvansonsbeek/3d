@@ -544,8 +544,9 @@ values.
 | **Eccentricity Cycle** | the N-body secular series (e.g. the 405.6-kyr g₂ − g₅ line) | Orbital shape variation |
 
 (These were H/13, H/16, H/3, H/8 and H/16 + H/3 of the retired fitted unit;
-the scene's K-device wheels keep those numbers as recorded pose periods,
-`kDeviceWheelPeriodYears`, not as laws.)
+the scene's K-device wheels kept those numbers as recorded pose periods until
+plan 11 step 4 deleted the wheels — the scene's world frame is the J2000
+ecliptic and every frame of date is engine-placed.)
 
 ### Invariable Plane System
 

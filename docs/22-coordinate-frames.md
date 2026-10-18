@@ -315,7 +315,7 @@ For current values, see [Constants Reference](20-constants-reference.md).
 | Constant | Description |
 |----------|-------------|
 | `earthInvPlaneInclinationMean` | DELETED (plan 11 step 2) — the retired device's mean inclination, the invariable-plane disc's init pose; the disc is placed from the engine's one-source normal every frame |
-| `earthInvPlaneInclinationAmplitude` | Oscillation amplitude |
+| `earthInvPlaneInclinationAmplitude` | DELETED (plan 11 step 4) — the K-device scaffold's tilt amplitude; the engine's inclination statistics are `earthInclMean/Min/Max` |
 | `earthAscendingNodeInvPlaneSouamiSouchay` | J2000 ascending node (S&S) |
 | `earthAscendingNodeInvPlaneVerified` | J2000 ascending node (S&S 2012) |
 
@@ -323,7 +323,7 @@ For current values, see [Constants Reference](20-constants-reference.md).
 
 | Constant | Description |
 |----------|-------------|
-| `earthtiltMean` | Mean obliquity |
+| `earthtiltMean` | DELETED (plan 11 step 4) — the K-device scaffold's mean tilt; the rendered obliquity of date is the hybrid spin integration, its J2000 anchor the astro-reference input |
 | Default fallback | <!--v:obliquityCurrent-->23.4393<!--/v-->° — used when dynamic value unavailable |
 
 ### 5.3 General Precession

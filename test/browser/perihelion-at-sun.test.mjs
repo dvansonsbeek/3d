@@ -97,6 +97,16 @@ try {
     if (pp && pp.ringNormalDot !== null) check(`${planet}: the ring plane is the equator (its normal is the placed axis)`, Math.abs(pp.ringNormalDot - 1) < 1e-9, `|n̂·ŝ| = ${pp.ringNormalDot.toFixed(12)}`);
   }
   check('Venus spins about a pole south of its orbit (retrograde, angular-momentum sense)', await sim.page.evaluate(() => { const p = window.__test__.planetPoleProbe('Venus'); return !!p && p.spinRetrograde && p.obliquityChannelDeg > 90; }), '');
+
+  // Plan 11 step 4 — the world frame IS the J2000 ecliptic (the K-device
+  // scaffold's pose is gone): R's pole column is world Y exactly, the J2000
+  // equinox sits at the one recorded view azimuth, and Earth's rendered axis is
+  // the engine frame of date through R — the Earth placement itself, never
+  // gated before. Fail-proven through the PLANT (the azimuth shifts 1°).
+  const wf = await sim.page.evaluate(() => window.__test__.worldFrameProbe());
+  check('world frame: R maps the J2000 ecliptic pole onto world Y exactly', !!wf && wf.poleIsWorldY, wf ? JSON.stringify(wf.poleColumn) : 'probe returned null');
+  check('world frame: the J2000 equinox sits at the recorded view azimuth', !!wf && Math.abs(wrapd(wf.equinoxAzimuthDeg - wf.equinoxAzimuthLiteralDeg - plantDeg)) < 1e-9, wf ? `${wf.equinoxAzimuthDeg}° vs ${wf.equinoxAzimuthLiteralDeg}°` : '');
+  check('Earth frame: the rendered axis IS the engine frame of date through R (pole and equinox)', !!wf && wf.seriesLive && wf.axisPoleChord < 1e-9 && wf.axisEquinoxChord < 1e-9, wf ? `pole chord ${wf.seriesLive ? wf.axisPoleChord.toExponential(2) : 'n/a'}, equinox chord ${wf.seriesLive ? wf.axisEquinoxChord.toExponential(2) : 'n/a'} (series ${wf.seriesLive ? 'live' : 'not loaded'})` : '');
   check('Moon nodes: on the ecliptic of date at L′ − F and L′ − F + 180°, at distance a', !!mm && Math.abs(wrapd(mm.ascNode.lon - mm.nodeLonExpectedDeg)) < 1e-6 && Math.abs(wrapd(mm.descNode.lon - mm.nodeLonExpectedDeg - 180)) < 1e-6 && Math.abs(mm.ascNode.lat) < 1e-6 && Math.abs(mm.descNode.lat) < 1e-6 && Math.abs(mm.ascNode.distAU - mm.aAU) < 1e-9, mm ? `asc λ ${mm.ascNode.lon.toFixed(4)}° β ${mm.ascNode.lat.toExponential(1)}°, desc λ ${mm.descNode.lon.toFixed(4)}°, Ω = L′ − F = ${mm.nodeLonExpectedDeg.toFixed(4)}°` : '');
   // A chip click must WAKE the paused loop (owner: "Perihelion at Earth" appeared
   // only on a camera move or Play once the paused loop truly idled — the monitor

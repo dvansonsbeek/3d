@@ -35,7 +35,7 @@
  * carry it so a counterfactual is reproducible (§2d).
  * @type {string}
  */
-export const CONSTANTS_HASH = "a338015a559c8155";
+export const CONSTANTS_HASH = "6d8e91759c61012d";
 
 /** Model version label — single source: public/input/model-version.json (§10 two-axis scheme). */
 export const MODEL_VERSION = "v24.0";
@@ -45,7 +45,7 @@ export const PREPRINT_DOI = "10.21203/rs.3.rs-8758810/v4";
 
 /** @type {Readonly<Record<string, unknown>>} */
 export const DEFAULT_CONSTANTS = Object.freeze({
-  hash: "a338015a559c8155",
+  hash: "6d8e91759c61012d",
   additionalBodiesReference: {
     "pluto": {
       "solarYearInput": 90465,
@@ -150,19 +150,6 @@ export const DEFAULT_CONSTANTS = Object.freeze({
       "thermalPumpFactor": 0.454
     }
   },
-  earth: {
-    "earthtiltMean": 23.413526608469965,
-    "earthInvPlaneInclinationAmplitude": 0.636069722432876,
-    "eccentricityAmplitude": 0.0013559440307290061,
-    "kDeviceInclinationPhaseJ2000Deg": 81.17719000000001,
-    "kDeviceWheelPeriodYears": {
-      "3": 111772.33333333333,
-      "5": 67063.4,
-      "8": 41914.625,
-      "13": 25793.615384615383
-    },
-    "kDeviceWheelPhaseAtJ2000Cycles": 0.908498525276082
-  },
   earthOrbital: {
     "j2000EpochYear": 2000,
     "perihelionalignmentYear": 1246.03125,
@@ -185,8 +172,7 @@ export const DEFAULT_CONSTANTS = Object.freeze({
   foundational: {
     "startmodelJD": 2451716.5,
     "startmodelYear": 2000.5,
-    "correctionDays": -0.828832119703292,
-    "startAngleModel": 89.91949879
+    "correctionDays": -0.828832119703292
   },
   giaCoxChaoPeltier: {
     "dJ2DtPerYr": -2.7e-11,

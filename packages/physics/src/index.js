@@ -120,7 +120,7 @@ export { createMoonSeries } from './moon/series.cjs';
 export { createMoonApparent } from './moon/apparent.cjs';
 // R4 — the Earth frame of date (sun plane, equinox, spin axis from the one-source
 // sample) and the offset-circle wheel-angle solver: the scene twins' one placement.
-export { computeEarthFrameOfDate, solveWheelAngleForLongitude } from './earth/frame-of-date.cjs';
+export { computeEarthFrameOfDate, solveWheelAngleForLongitude, computeSceneWorldFrameJ2000, SCENE_EQUINOX_VIEW_AZIMUTH_DEG } from './earth/frame-of-date.cjs';
 // Phase 8.3 — the planet machinery, extracted by LAW over body records
 // (survey order: geometry → channels → chains). The ψ/K amplitude laws
 // (planets/fibonacci-laws), the record-based orientation forms

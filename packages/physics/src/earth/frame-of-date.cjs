@@ -26,10 +26,34 @@
  * the K sun plane and the RA frame's ecliptic parted by 20.5″ at J2000 and 10′
  * at −3000, the rendered Sun −19″ in declination against Horizons at the
  * March 2000 equinox (+19″ in September; 0.1–1″ at the solstice).
+ *
+ * THE SCENE'S WORLD FRAME (plan 11 step 4) is the J2000 ecliptic itself:
+ * world Y is the J2000 ecliptic pole and the J2000 equinox lies in the world
+ * XZ plane at the view azimuth `SCENE_EQUINOX_VIEW_AZIMUTH_DEG` (atan2(x, z)).
+ * `computeSceneWorldFrameJ2000` is the bridge R (ecliptic J2000 → world) both
+ * twins place every frame of date through. The azimuth is the ONE scene
+ * literal the retired K-device scaffold leaves behind — the pose the scaffold
+ * encoded at J2000, measured on the Node twin (its 0.026° pole tilt dropped),
+ * kept for visual continuity; no observable rides it (every physical reading
+ * is taken in the placed Earth frame, which is R-invariant by construction).
  */
 'use strict';
 
 const D2R = Math.PI / 180;
+
+/** The J2000 equinox's azimuth in the scene's world XZ plane, degrees (atan2(x, z)) — the view convention. */
+const SCENE_EQUINOX_VIEW_AZIMUTH_DEG = 158.2265109779131;
+
+/**
+ * The scene's world frame: R maps a J2000-ecliptic vector to world, columns
+ * [ĝ, n̂ × ĝ, n̂] = [the equinox, longitude 90°, the ecliptic pole] with
+ * n̂ = world Y exactly and ĝ at the view azimuth.
+ * @returns {number[][]} a 3×3 rotation matrix, rows × columns
+ */
+function computeSceneWorldFrameJ2000() {
+  const a = SCENE_EQUINOX_VIEW_AZIMUTH_DEG * D2R, s = Math.sin(a), c = Math.cos(a);
+  return [[s, c, 0], [0, 0, 1], [c, -s, 0]];
+}
 
 /**
  * @typedef {{x: number, y: number, z: number}} Vec3
@@ -102,4 +126,4 @@ function solveWheelAngleForLongitude(lambdaRad, e, periRad) {
   return Math.atan2(Math.sin(th), Math.cos(th));
 }
 
-module.exports = { computeEarthFrameOfDate, solveWheelAngleForLongitude };
+module.exports = { computeEarthFrameOfDate, solveWheelAngleForLongitude, computeSceneWorldFrameJ2000, SCENE_EQUINOX_VIEW_AZIMUTH_DEG };

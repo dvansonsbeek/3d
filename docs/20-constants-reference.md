@@ -110,11 +110,7 @@ the Sun and the Moon stack over the scaffold. Their own retirement is plan
 
 | # | Constant | Variable | Value | Anchored by |
 |---|-----------|----------|-------|-------------|
-| 1 | The K wheels' recorded periods — the scene scaffolding's J2000 pose by wheel index (inclination 3, ecliptic 5, obliquity 8, axial 13, perihelion 16); each wheel turns uniformly at its recorded rate (plan 09 step 5c/7c); not the model's precession periods (those are the dynamical values of Part 2, which the wheels read 0.09–2 % off) | `kDeviceWheelPeriodYears` | 111,772.3 / 67,063.4 / 41,914.6 / 25,793.6 / 20,957.3 scene years | numerically the retired unit's 335,317/N, written as the exact doubles so the pose is bit-identical |
-| 2 | Mean obliquity — a constant of the scene's J2000 pose (the wheel geometry); the published obliquity is the hybrid (Ledger 1) | `earthtiltMean` | <!--v:meanObliquity-->23.41353<!--/v-->° | observed obliquity range |
-| 3 | Inclination amplitude — a constant of the scene's J2000 pose (the K inclination law it once fed is retired, plan 07 R5/R9); the published inclination is the chain's (Ledger 1) | `earthInvPlaneInclinationAmplitude` | <!--v:earthInclAmp-->0.63607<!--/v-->° | observed obliquity range |
-| 4 | The K-device inclination wheel's J2000 pose (plan 09 step 6; it was the eccentricity law's 21.77° anchor as ϖ_J2000 − 21.77°) | `kDeviceInclinationPhaseJ2000Deg` | 81.17719° | a recorded scene pose: it poses the mean inclination, the inclination path and the perihelion wheel's offset base′; the eccentricity law it phased is deleted — Earth's e of date is the N-body series on every path |
-| 5 | The K wheels' phase at J2000 — the scene scaffolding's recorded pose (N × this turns per wheel of index N), not a law; no observable rides it | `kDeviceWheelPhaseAtJ2000Cycles` | 0.908498525 | numerically the retired origin's (2000 − t₀) over the retired unit, kept with the pose (plan 07 R10) |
+| 1–5 | DELETED (plan 11 step 4). The K wheels' recorded periods (111,772.3 / 67,063.4 / 41,914.6 / 25,793.6 scene years — the retired unit's 335,317/N), the mean obliquity `earthtiltMean` (23.41353°), the inclination amplitude `earthInvPlaneInclinationAmplitude` (0.63607°), the inclination wheel's phase `kDeviceInclinationPhaseJ2000Deg` (81.17719°) and the wheels' phase `kDeviceWheelPhaseAtJ2000Cycles` (0.908498525) were the scene scaffolding's J2000 pose. Measured on the Node twin before their deletion, that pose was the J2000 ecliptic frame to 0.026° of pole tilt, with the J2000 equinox at view azimuth 158.2265°. The scene's world frame IS the J2000 ecliptic now (`@essrt/physics` `computeSceneWorldFrameJ2000`: world Y the J2000 ecliptic pole, the equinox at that one recorded view azimuth — the only scene literal the pose leaves, kept for visual continuity); the three precession wheels are deleted and every frame of date is placed from the engine through it in both twins. Two display literals remain in `src/script.js`: the Wobble marker's radius (`WOBBLE_MARKER_RADIUS_SCENE_UNITS`, the former A × 100) and the inclination loop's zero (`INCLINATION_PATH_ZERO_DEG`). | — | — | — |
 
 The wheel indices are pose identifiers — not degrees of freedom and not
 laws; what the three pre-registered falsification legs test is the
@@ -215,11 +211,11 @@ These constants define the model. Changing any of them changes the theory.
 | Constant | Variable | Value | Description |
 |----------|----------|-------|-------------|
 | Base Eccentricity | (`eccentricityBase` — DELETED, plan 11 step 2) | was 0.015386 | The Law-5 constant of the retired K law; its last reader was a fallback the panel always pre-empted. The perihelion wheel's offset base′ (`eccentricityBaseDerived`) went with it — the engine places the offset arm at the series' e of date every frame, and the rest pose before the first frame is e(J2000). Earth's published e of date is the N-body series (the H/3 law is deleted, plan 09 step 6) |
-| Eccentricity Amplitude | `eccentricityAmplitude` | <!--v:eccentricityAmplitude-->0.001356<!--/v--> | The Law-4 K input A, a scene-scaffold constant since plan 09 (the wobble-marker distance; the K law it calibrated is retired). Its derivation record: the 1246 triangle closure e(J2000)² = base² + A² + 2·base·A·cos φ on the H/16 beat from the <!--v:periAlignYearRound-->1246.03<!--/v--> perihelion–solstice alignment reproduced this value (the closure's registry keys — the phase, the derived A and the ±5 % alignment-year test — left with the eccentricity law at plan 09 step 6). A does not enter any e(t): Earth's eccentricity of date is the N-body series |
-| Mean Obliquity | `earthtiltMean` | <!--v:meanObliquity-->23.41353<!--/v--> deg | Mean axial tilt (derived from obliquity at J2000) |
-| RA Angle | `earthRAAngle` | ~1.254 | **Derived**: `2A − A²/ε` where A = inclination amplitude, ε = earthtiltMean |
+| Eccentricity Amplitude | (`eccentricityAmplitude` — DELETED, plan 11 step 4) | was 0.001356 | The Law-4 K input A, lately only the Wobble marker's display radius (now the scene literal `WOBBLE_MARKER_RADIUS_SCENE_UNITS`); the K law it calibrated is retired. Its derivation record: the 1246 triangle closure e(J2000)² = base² + A² + 2·base·A·cos φ on the H/16 beat from the <!--v:periAlignYearRound-->1246.03<!--/v--> perihelion–solstice alignment reproduced this value (the closure's registry keys — the phase, the derived A and the ±5 % alignment-year test — left with the eccentricity law at plan 09 step 6). A does not enter any e(t): Earth's eccentricity of date is the N-body series |
+| Mean Obliquity | (`earthtiltMean` — DELETED, plan 11 step 4) | was 23.41353 deg | The K scaffold's mean tilt; the rendered obliquity of date is the hybrid spin integration, its J2000 anchor the astro-reference input |
+| RA Angle | (`earthRAAngle` — DELETED, plan 11 step 4) | was ~1.254 | The scaffold's derived `2A − A²/ε`, the perihelion wheel's tilt; the perihelion pair's container is world-placed every frame |
 | Mean Inclination (inv. plane) | (`earthInvPlaneInclinationMean` — DELETED, plan 11 step 2) | the engine's mean over ±10 Myr is <!--v:earthInclMean-->1.28745<!--/v--> deg | The retired device's mean (inclJ2000 − A·cos(the K phase)) was the invariable-plane disc's init pose, rewritten from the engine's one-source normal every frame; the registry's `earthInclMean`/`Min`/`Max` are the engine's ±10-Myr statistics since plan 11 step 2 |
-| Inclination Amplitude | `earthInvPlaneInclinationAmplitude` | <!--v:earthInclAmp-->0.63607<!--/v--> deg | Oscillation amplitude (derived from obliquity rate) |
+| Inclination Amplitude | (`earthInvPlaneInclinationAmplitude` — DELETED, plan 11 step 4) | was 0.63607 deg | The K scaffold's tilt amplitude (the ecliptic and obliquity wheels' ±A); the engine's inclination statistics are `earthInclMean/Min/Max` |
 | Inclination Cycle Anchor | (`earthInclinationCycleAnchor` — DELETED, plan 09 step 6) | was 21.77° | the eccentricity law's phase anchor (the perihelion longitude at maximum inclination); the scene pose it also set is the recorded `kDeviceInclinationPhaseJ2000Deg` = ϖ_J2000 − 21.77° |
 | Perihelion Ref JD | `perihelionRefJD` | <!--v:perihelionPassageJD-->2451547.042<!--/v--> | JD of Earth perihelion 2000 (Jan 3.542) |
 
@@ -233,7 +229,7 @@ plan 07 R8 and nothing in the model reads them.)
 |----------|----------|-------|-------------|
 | Start Model JD | `startmodelJD` | <!--v:startModelJD-->2,451,716.5<!--/v--> | June Solstice 2000 00:00 UTC |
 | Start Model Year | `startmodelYear` | <!--v:startModelYear-->2000.5<!--/v--> | Decimal year of model start |
-| Start Angle | `startAngleModel` | <!--v:startAngleModel-->89.91949879<!--/v--> deg | Sun ecliptic longitude at model start |
+| Start Angle | (`startAngleModel` — DELETED, plan 11 step 4) | was 89.91949879 deg | The inclination-path loop's angular zero (with the K inclination phase); the zero is the scene literal `INCLINATION_PATH_ZERO_DEG` in `src/script.js` |
 | Correction Days | `correctionDays` | <!--v:correctionDays-->-0.8288<!--/v--> | Correction for solstice alignment offset |
 | Variable Speed | (`useVariableSpeed` — hard-wired true, plan 11 step 2) | true | The equation of centre and the certified Moon override are the scene, not a toggle; the false branch was a 6.5°-of-Moon diagnostic nobody ran |
 
@@ -277,7 +273,8 @@ These are computed from foundational constants. The formula is the definition; t
 
 (Plan 06 S6: these were H/3, H/5, H/8 and H/16 of the retired unit, +0.18 %,
 −2.5 %, +1.7 % and +0.10 % off the dynamical values; the scene's K-device
-wheels keep those numbers as recorded pose periods, `kDeviceWheelPeriodYears`.)
+wheels kept those numbers as recorded pose periods until plan 11 step 4
+deleted the wheels.)
 
 ## Time Constants
 
@@ -381,7 +378,7 @@ verification instruments, `inclination-optimization` and
 |--------|----------|---------------|-----------|-------------|
 | Mercury | <!--v:mercuryInclMean-->6.690391<!--/v--> | <!--v:mercuryInclAmp-->5.414244<!--/v--> | 6.32 - 7.09 | <!--v:mercuryPeriPeriodICRF-->232,437<!--/v--> yr |
 | Venus | <!--v:venusInclMean-->1.538475<!--/v--> | 0.062165 | 2.09 - 2.21 | <!--v:venusPeriPeriodICRF-->174,997<!--/v--> yr |
-| Earth | <!--v:earthInclMean-->1.28745<!--/v--> | <!--v:earthInclAmp-->0.63607<!--/v--> | 0.85 - 2.12 | <!--v:earthPeriPeriodICRF-->111,635<!--/v--> yr |
+| Earth | <!--v:earthInclMean-->1.28745<!--/v--> | (the engine's ±10-Myr range, <!--v:earthInclMin-->0.034<!--/v-->–<!--v:earthInclMax-->2.942<!--/v-->; the K scaffold's amplitude 0.636 is deleted, plan 11 step 4) | 0.85 - 2.12 | <!--v:earthPeriPeriodICRF-->111,635<!--/v--> yr |
 | Mars | <!--v:marsInclMean-->4.205698<!--/v--> | <!--v:marsInclAmp-->3.368563<!--/v--> | 0.67 - 3.00 | <!--v:marsPeriPeriodICRF-->72,335<!--/v--> yr |
 | Jupiter | <!--v:jupiterInclMean-->0.362449<!--/v--> | <!--v:jupiterInclAmp-->0.144018<!--/v--> | 0.30 - 0.34 | <!--v:jupiterPeriPeriodICRF-->304,456<!--/v--> yr |
 | Saturn | <!--v:saturnInclMean-->0.891489<!--/v--> | <!--v:saturnInclAmp-->0.125937<!--/v--> | 0.92 - 1.05 | <!--v:saturnPeriPeriodICRF-->45,883<!--/v--> yr |
@@ -727,8 +724,8 @@ The per-planet cycle anchors (the ψ law's phase inputs, `inclinationCycleAnchor
 and the System-Reset n=7 convention they were evaluated at) left
 `model-parameters.json` with the law; nothing in the model reads them. Earth's
 anchor (21.77°) phased the eccentricity channel; it left astro-reference with
-that law at plan 09 step 6 (the scene pose it also set is the recorded
-`kDeviceInclinationPhaseJ2000Deg`).
+that law at plan 09 step 6 (the scene pose it also set, the recorded
+`kDeviceInclinationPhaseJ2000Deg`, left with the K scaffold at plan 11 step 4).
 The retired values are archived; the eigenmode-cluster claim of earlier
 versions is withdrawn with them.
 

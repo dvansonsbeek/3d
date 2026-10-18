@@ -35,3 +35,12 @@ export function computeEarthFrameOfDate(sample: {
  * @returns {number} θ in radians, in (−π, π]
  */
 export function solveWheelAngleForLongitude(lambdaRad: number, e: number, periRad: number): number;
+/**
+ * The scene's world frame: R maps a J2000-ecliptic vector to world, columns
+ * [ĝ, n̂ × ĝ, n̂] = [the equinox, longitude 90°, the ecliptic pole] with
+ * n̂ = world Y exactly and ĝ at the view azimuth.
+ * @returns {number[][]} a 3×3 rotation matrix, rows × columns
+ */
+export function computeSceneWorldFrameJ2000(): number[][];
+/** The J2000 equinox's azimuth in the scene's world XZ plane, degrees (atan2(x, z)) — the view convention. */
+export const SCENE_EQUINOX_VIEW_AZIMUTH_DEG: 158.2265109779131;

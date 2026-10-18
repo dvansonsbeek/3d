@@ -121,7 +121,7 @@ gives −0.79°, a difference with <0.001° effect on Sun position).
 
 The geometric offset carries `e(t)·û(ϖ)` itself:
 - `eccentricityDerivedMean` (DELETED at plan 11 step 2; was 0.0155200) — base′ of the retired single-line law (derived from e(J2000) and the System-Reset anchor); the legacy path's constant, not a published value — the published e is the N-body series
-- `eccentricityAmplitude` = <!--v:eccentricityAmplitude-->0.001356<!--/v--> — the Law-4 input A and the wobble-marker distance; not a scene arm
+- `eccentricityAmplitude` (DELETED at plan 11 step 4; was 0.001356) — the Law-4 input A, lately only the Wobble marker's display distance (now the scene literal `WOBBLE_MARKER_RADIUS_SCENE_UNITS`); never a scene arm
 
 ### Start-date independence (record)
 

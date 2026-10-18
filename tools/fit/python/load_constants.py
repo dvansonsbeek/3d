@@ -7,7 +7,7 @@ Python scripts import from here instead of duplicating values in constants_scrip
 
 Usage:
     from load_constants import C
-    print(C['earthtiltMean'])        # 23.41349
+    print(C['meanSolarYearDays'])    # 365.2421905
     print(C['planets']['mercury'])   # { name: 'Mercury', ... }
 """
 
@@ -47,11 +47,10 @@ MEAN_SIDEREAL_YEAR_DAYS = C['meanSiderealYearDays']
 # Earth parameters
 # (plan 11 step 2: EARTH_INCLINATION_MEAN and EARTH_BASE_ECCENTRICITY — the
 # retired device's mean inclination and Law-5 base — are deleted with their
-# constants; no script read them.)
-EARTH_OBLIQUITY_MEAN = C['earthtiltMean']
-EARTH_INCLINATION_AMPLITUDE = C['earthInvPlaneInclinationAmplitude']
-EARTH_RA_ANGLE = C['earthRAAngle']
-EARTH_ECCENTRICITY_AMPLITUDE = C['eccentricityAmplitude']
+# constants; no script read them. Plan 11 step 4: EARTH_OBLIQUITY_MEAN,
+# EARTH_INCLINATION_AMPLITUDE, EARTH_RA_ANGLE and EARTH_ECCENTRICITY_AMPLITUDE
+# — the K-device scaffold's pose — are deleted with the scaffold; the J2000
+# obliquity anchor is C['ASTRO_REFERENCE']['obliquityJ2000_deg'].)
 # (plan 07 R6: EARTH_ECCENTRICITY_K — the K constant inverted from Earth's
 # calibration — went with the K law; it had no consumer outside this module.)
 
@@ -76,7 +75,5 @@ PLANETS = C['planets']
 if __name__ == '__main__':
     # Self-test: print key values
     print(f"BALANCE_YEAR = {BALANCE_YEAR}")
-    print(f"EARTH_OBLIQUITY_MEAN = {EARTH_OBLIQUITY_MEAN}")
-    print(f"EARTH_RA_ANGLE = {EARTH_RA_ANGLE:.6f}")
     print(f"MEAN_SOLAR_YEAR_DAYS = {MEAN_SOLAR_YEAR_DAYS}")
     print(f"Planets: {list(PLANETS.keys())}")

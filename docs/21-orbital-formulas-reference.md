@@ -196,10 +196,10 @@ For current values, see [Constants Reference](20-constants-reference.md).
 
 | Variable | Description |
 |----------|-------------|
-| `earthtiltMean` | Mean obliquity — a constant of the scene's J2000 pose (the published obliquity is the hybrid) |
-| `earthInvPlaneInclinationAmplitude` | A constant of the scene's J2000 pose (the published inclination is the engine's one-source normal). `earthInvPlaneInclinationMean` — the device's mean, the invariable-plane disc's init — is deleted (plan 11 step 2). |
-| `eccentricityAmplitude` | The Wobble marker's display radius — a scene literal until plan 11 step 4 (the K calibration it once fed is retired; the published eccentricity is the N-body series). `eccentricityBase`, the retired Law-5 constant, is deleted (plan 11 step 2). |
-| `kDeviceWheelPeriodYears` (browser `_wheelPeriodYears(N)`) | The scene scaffolding's recorded K-wheel periods by wheel index — a J2000 pose, not a law (the former `earthPerihelionICRFYears`, a third of the retired anchor, is deleted, plan 09 step 4b; the published apsidal period is `inclPrecYears`) |
+| `earthtiltMean` | DELETED (plan 11 step 4) — the K-device scaffold's mean tilt; the rendered obliquity of date is the hybrid, its J2000 anchor the astro-reference input. The scene's world frame is the J2000 ecliptic (`@essrt/physics` `computeSceneWorldFrameJ2000`); the three precession wheels are gone |
+| `earthInvPlaneInclinationAmplitude` | DELETED (plan 11 step 4) — the K-device scaffold's tilt amplitude (the published inclination is the engine's one-source normal). `earthInvPlaneInclinationMean` — the device's mean, the invariable-plane disc's init — is deleted (plan 11 step 2). |
+| `eccentricityAmplitude` | DELETED (plan 11 step 4) — the Law-4 input A, lately only the Wobble marker's display radius, now the scene literal `WOBBLE_MARKER_RADIUS_SCENE_UNITS` (the published eccentricity is the N-body series). `eccentricityBase`, the retired Law-5 constant, is deleted (plan 11 step 2). |
+| `kDeviceWheelPeriodYears` (browser `_wheelPeriodYears(N)`) | DELETED (plan 11 step 4) — the scene scaffolding's recorded K-wheel periods, a J2000 pose, left with the three precession wheels; the scene's world frame is the J2000 ecliptic and every frame of date is engine-placed (the published apsidal period is `inclPrecYears`) |
 
 #### 1.5.2 Dynamic Orbital Parameters
 

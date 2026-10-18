@@ -332,9 +332,8 @@ function blockCardinalSpread() {
     const s = m.cardinalStructure.spreadSeconds(y);
     rows.push(`| ${y} | ${fr} | ${CP_TYPES.map((t) => f(s[t], 1)).join(' · ')} | ${f(m.cardinalStructure.anomalisticYearSeconds(y), 2)} | ${f(m.cardinal.raDeg(y, 'VE'), 4)} | ${f(m.earth.eccentricity(y), 5)} |`);
   }
-  const sinE = Math.sin(K.earth.earthtiltMean * Math.PI / 180), A = K.earth.earthInvPlaneInclinationAmplitude;
   rows.push('');
-  rows.push(`Retired device's RA formula constants (the record; since R1 the shipped RA is the target longitude by construction): raMean = base − earthRAAngle/sin ε̄ = base − ${f((2 * A - A * A / K.earth.earthtiltMean) / sinE, 6)}°, amplitude A/sin ε̄ = ${f(A / sinE, 6)}° on −sin(2π·3·c) + sin(2π·8·c) (base 0/90/180/270° for VE/SS/AE/WS); c counted from J2000 since plan 07 R10 (the device itself is deleted, plan 09 step 7a).`);
+  rows.push('Retired device\'s RA formula constants: the record left with the K-device scaffold (plan 11 step 4 — earthtiltMean, the inclination amplitude A and earthRAAngle = 2A − A²/ε̄ are deleted; git history carries them; the form was base − earthRAAngle/sin ε̄ + (A/sin ε̄)·(−sin 2π·3·c + sin 2π·8·c), base 0/90/180/270° for VE/SS/AE/WS). Since R1 the shipped RA is the target longitude by construction; the device itself is deleted (plan 09 step 7a).');
   return rows.join('\n');
 }
 

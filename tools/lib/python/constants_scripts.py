@@ -46,9 +46,8 @@ from load_constants import C as _C
 PHI = (1 + math.sqrt(5)) / 2  # Golden ratio ≈ 1.618034
 J2000_YEAR = 2000
 BALANCE_YEAR = _C['balancedYear']   # plan 07 R10: 2000 — the combs' phase origin is J2000
-# Plan 07 R10: the K device's perihelion wheel stands 16 × this (anchor-unit
-# cycles) on at J2000 — the "270° at the origin" convention's J2000 phase.
-K_DEVICE_WHEEL_PHASE_J2000_CYCLES = _C['kDeviceWheelPhaseAtJ2000Cycles']
+# (plan 11 step 4: K_DEVICE_WHEEL_PHASE_J2000_CYCLES — the K wheels' recorded
+# J2000 phase — left with the scaffold; no script read it.)
 
 # Model reference point
 _START_MODEL_JD = _C['startmodelJD']
@@ -60,11 +59,10 @@ BALANCED_JD = _C['balancedJD']
 # Earth parameters
 # (plan 11 step 2: EARTH_BASE_ECCENTRICITY and EARTH_INCLINATION_MEAN — the
 # retired device's Law-5 base and mean inclination — are deleted with their
-# constants; no script read them.)
-EARTH_ECCENTRICITY_AMPLITUDE = _C['eccentricityAmplitude']
-EARTH_OBLIQUITY_MEAN = _C['earthtiltMean']
-EARTH_INCLINATION_AMPLITUDE = _C['earthInvPlaneInclinationAmplitude']
-EARTH_RA_ANGLE = _C['earthRAAngle']
+# constants; no script read them. Plan 11 step 4: EARTH_ECCENTRICITY_AMPLITUDE,
+# EARTH_OBLIQUITY_MEAN, EARTH_INCLINATION_AMPLITUDE and EARTH_RA_ANGLE — the
+# K-device scaffold's pose — are deleted with the scaffold; Earth's row of
+# AXIAL_TILT below is the J2000 obliquity anchor.)
 
 # (plan 09 step 7a: CARDINAL_POINT_ANCHORS / CARDINAL_POINT_HARMONICS /
 # SOLSTICE_JD_HARMONICS — the frozen cardinal record — are deleted with the
@@ -208,12 +206,11 @@ ECC_J2000["Earth"] = _C['ASTRO_REFERENCE']['earthEccentricityJ2000']
 # planets' base eccentricity was the K law's System-Reset construction and the
 # K constant was inverted from Earth's calibration; neither exists any more.
 # Analyses that want "the planet eccentricities" should use ECC_J2000 above —
-# the observed values the N-body chain is anchored on. Earth's amplitude
-# survives as EARTH_ECCENTRICITY_AMPLITUDE (a scene literal until plan 11 step
-# 4); the base left at plan 11 step 2.
+# the observed values the N-body chain is anchored on (Earth's Law-4 amplitude
+# and Law-5 base left at plan 11 steps 4 and 2).
 
 AXIAL_TILT = {p['name']: p['axialTiltJ2000'] for p in _C['planets'].values()}
-AXIAL_TILT["Earth"] = EARTH_OBLIQUITY_MEAN
+AXIAL_TILT["Earth"] = _C['ASTRO_REFERENCE']['obliquityJ2000_deg']   # the IAU 2006 J2000 anchor (plan 11 step 4: was the K scaffold's mean tilt)
 
 LONGITUDE_PERIHELION = {p['name']: p['longitudePerihelion'] for p in _C['planets'].values()}
 LONGITUDE_PERIHELION["Earth"] = _C['ASTRO_REFERENCE']['earthPerihelionLongitudeJ2000']  # 102.947
@@ -232,8 +229,8 @@ PERIHELION_ECLIPTIC_YEARS = {p['name']: p['perihelionEclipticYears'] for p in _C
 # 2π/(ψ̇ᵢₙ − |s₃|), a dynamical value.)
 
 # Plan 07 R6: the planets' ECC_AMPLITUDE and ECC_PHASE_J2000 went with the K
-# law too. Earth's amplitude and phase stay, on the Earth side.
-EARTH_ECC_AMPLITUDE = EARTH_ECCENTRICITY_AMPLITUDE
+# law too. Earth's phase stays, on the Earth side (plan 11 step 4: Earth's
+# amplitude EARTH_ECC_AMPLITUDE left with the K scaffold; no script read it).
 EARTH_ECC_PHASE_J2000 = _C['ASTRO_REFERENCE']['earthPerihelionLongitudeJ2000'] + 90  # ω + 90°
 
 # Plan 07 R6: ECCENTRICITIES / ECC / ECC_DUAL_BALANCED all aliased ECC_BASE,

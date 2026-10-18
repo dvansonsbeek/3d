@@ -501,20 +501,17 @@ one surface is `model.earth.obliquityDeg` (the API's earth route and
 cross-validation curves, the registry's obliquity keys, the lunar
 arguments' obliquity-rate term and the eclipse tier).
 
-### 4.2 The scene's tilt geometry — the device the comb was fitted to
+### 4.2 The scene's tilt geometry — the device the comb was fitted to (deleted, plan 11 step 4)
 
-The scene's J2000 pose composes two wheels. `earthObliquityPrecession`
-(`script.js`) is a retrograde wheel turning at the recorded period P₈ =
-41,914.625 yr, tilted by **A** = `earthInvPlaneInclinationAmplitude`;
-`earthPerihelionPrecession1` is a prograde wheel at P₁₆ = 20,957.3125 yr,
-tilted by **−earthRAAngle**, with
-
-    earthRAAngle = 2A − A²/ε̄      (`script.js`; `tools/lib/constants.js` — derived, not adjustable)
-
-The periods are the recorded pose block `earth.kDeviceWheelPeriodYears`
-(keyed by wheel index; numerically the retired unit's 335,317/N), the
-phase `kDeviceWheelPhaseAtJ2000Cycles` — plan 09 step 5c/7c: the wheels
-turn uniformly from their J2000 pose and no counter drives them.
+The scene's J2000 pose composed two wheels: `earthObliquityPrecession`, a
+retrograde wheel at the recorded period P₈ = 41,914.625 yr tilted by **A** =
+`earthInvPlaneInclinationAmplitude`, and `earthPerihelionPrecession1`, tilted
+by **−earthRAAngle** = −(2A − A²/ε̄), with the periods the recorded pose block
+`earth.kDeviceWheelPeriodYears` and the phase `kDeviceWheelPhaseAtJ2000Cycles`.
+Plan 11 step 4 deleted the wheels, the tilts and the block: the scene's world
+frame is the J2000 ecliptic (`@essrt/physics` `computeSceneWorldFrameJ2000`),
+the perihelion pair hangs on Earth's pivot and is world-placed every frame, and
+the record of the retired RA formula below is text, not a live constant.
 
 The Sun's declination at the June solstice is the scene's ε; the deleted K
 comb (4.1) reproduced that declination to 0.005″, which is why its 8 and 16

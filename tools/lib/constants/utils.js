@@ -116,17 +116,8 @@ function computeOrbitTilt(ascendingNode, eclipticInclinationJ2000) {
 // the scene's mean-inclination pose, overwritten from the chain every frame —
 // is deleted with its only reader.)
 
-/**
- * Compute Earth RA angle from inclination amplitude and tilt mean.
- * Formula: earthRAAngle = 2A - A²/ε
- * Two tilt layers (H/3 + H/5) minus second-order equatorial projection.
- * @param {number} amplitude - earthInvPlaneInclinationAmplitude (degrees)
- * @param {number} tiltMean - earthtiltMean (degrees)
- * @returns {number} earthRAAngle in degrees
- */
-function computeEarthRAAngle(amplitude, tiltMean) {
-  return 2 * amplitude - amplitude * amplitude / tiltMean;
-}
+// (plan 11 step 4: computeEarthRAAngle — the K-device scaffold's derived
+// 2A − A²/ε, the perihelion wheel's tilt — left with the scaffold.)
 
 module.exports = {
   jdToCalendar,
@@ -135,5 +126,4 @@ module.exports = {
   createDateUtils,
   pad, padLeft, fmt, fmtInt, printTable,
   computeOrbitTilt,
-  computeEarthRAAngle,
 };

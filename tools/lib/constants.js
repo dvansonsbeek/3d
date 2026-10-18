@@ -62,12 +62,14 @@ const knownValues = astroRef.knownValues;
 
 // (plan 09 step 7c: the frozen era unit `holisticyearLength` (H), its lattice
 // `stepYears` and the device's rounded mean tropical year input
-// `inputmeanlengthsolaryearindays` left model-parameters.json; the K-device
-// wheels ride the recorded `kDeviceWheelPeriodYears` pose block below.)
+// `inputmeanlengthsolaryearindays` left model-parameters.json; plan 11 step 4:
+// the K-device wheels' recorded pose block left with the scaffold.)
 const startmodelJD = modelParams.foundational.startmodelJD;
 const startmodelYear = modelParams.foundational.startmodelYear;
 const correctionDays = modelParams.foundational.correctionDays;
-const startAngleModel = modelParams.foundational.startAngleModel;
+// (plan 11 step 4: startAngleModel — the browser's inclination-path loop zero,
+// with the deleted K inclination phase — left the JSON; the loop's zero is a
+// scene literal in src/script.js.)
 // Plan 11 step 2: hard-wired. The equation of centre on the scene wheels and
 // the certified Moon override ARE the scene; the toggle's false branch was a
 // 6.5°-of-Moon diagnostic nobody ran (measured by the reach audit). Kept as a
@@ -99,37 +101,22 @@ const perihelionalignmentYear = astroRef.earthOrbital.perihelionalignmentYear;
 
 
 // ═══════════════════════════════════════════════════════════════════════════
-// 3. EARTH PARAMETERS (from model-parameters.json + derived)
+// 3. EARTH PARAMETERS (derived)
 // ═══════════════════════════════════════════════════════════════════════════
 
-const earthtiltMean = modelParams.earth.earthtiltMean;
-const earthInvPlaneInclinationAmplitude = modelParams.earth.earthInvPlaneInclinationAmplitude;
-// Plan 07 R10: the K device's J2000 wheel phase — the scene scaffolding's
-// recorded pose, N × this per wheel of index N; not a law.
-const kDeviceWheelPhaseAtJ2000Cycles = modelParams.earth.kDeviceWheelPhaseAtJ2000Cycles;
-// Plan 09 step 7c: the K-device wheels' recorded periods (scene mean solar
-// years) keyed by the wheel's index N (3 inclination, 5 ecliptic, 8 obliquity,
-// 13 axial/wobble, 16 the perihelion pair) — the scaffold's J2000 pose; each
-// wheel turns uniformly at its recorded rate (plan 09 step 5c). Not the
-// model's precession periods (those are the dynamical values). Mirrors
-// src/script.js `kDeviceWheelPeriodYears` / `_wheelPeriodYears(N)`.
-const kDeviceWheelPeriodYears = modelParams.earth.kDeviceWheelPeriodYears;
-// Plan 09 step 6: the K-device inclination wheel's J2000 phase, a recorded
-// POSE constant (ϖ_J2000 − the retired eccentricity law's 21.77° anchor).
-// Plan 11 step 2: its readers here — the mean-inclination init and the
-// perihelion wheel's offset base′, both overwritten by the engine-placed
-// frame — are deleted; the browser's inclination-path zodiac offset is its
-// one remaining reach, which retires with the loop's zero at step 4.
-const kDeviceInclinationPhaseJ2000Deg = modelParams.earth.kDeviceInclinationPhaseJ2000Deg;
-// Derived: 2A − A²/ε — two tilt layers (H/3 + H/5) minus second-order equatorial projection
-const earthRAAngle = utils.computeEarthRAAngle(earthInvPlaneInclinationAmplitude, earthtiltMean);
+// (plan 11 step 4: the K-device scaffold's recorded J2000 pose — earthtiltMean,
+// earthInvPlaneInclinationAmplitude, kDeviceWheelPhaseAtJ2000Cycles,
+// kDeviceWheelPeriodYears, kDeviceInclinationPhaseJ2000Deg, the derived
+// earthRAAngle and eccentricityAmplitude — is deleted with the scaffold. The
+// scene's world frame is the J2000 ecliptic, @essrt/physics
+// earth/frame-of-date computeSceneWorldFrameJ2000 (scene-graph.js _kcR); the
+// three precession wheels are gone and every frame of date is placed from the
+// engine through that bridge. Mirror: src/script.js A2.)
 const earthAscendingNodeInvPlane = ASTRO_REFERENCE.earthAscendingNodeInvPlane;
 // (plan 11 step 2: earthInvPlaneInclinationMean — inclJ2000 − A·cos(the K
 // phase), the invariable-plane disc's init, rewritten from the chain every
 // frame — and eccentricityBase, the retired Law-5 constant with no reader
-// left but a pre-empted fallback, are deleted. eccentricityAmplitude stays
-// until step 4: the Wobble marker's display radius, a scene literal.)
-const eccentricityAmplitude = modelParams.earth.eccentricityAmplitude;
+// left but a pre-empted fallback, are deleted.)
 // (plan 11 step 2: eccentricityBaseDerived — the perihelion wheel's offset
 // base′ = e(J2000)/(1 + cos θ₀/2) — is deleted; the wheel's offset arm is
 // placed at the series' e of date every frame (R4), and its pose before the
@@ -615,7 +602,6 @@ module.exports = {
   startmodelJD,
   startmodelYear,
   correctionDays,
-  startAngleModel,
   useVariableSpeed,
 
   // Physical & astronomical constants
@@ -649,13 +635,8 @@ module.exports = {
   DT_STACK_TAPER_FULL_HALFWIDTH_YR: GENERATED_DEEP_TIME.dtStackTaperFullHalfwidthYr,
   DT_STACK_TAPER_TOTAL_HALFWIDTH_YR: GENERATED_DEEP_TIME.dtStackTaperTotalHalfwidthYr,
 
-  // Earth parameters
-  earthRAAngle,
-  earthtiltMean,
-  earthInvPlaneInclinationAmplitude,
+  // Earth parameters (plan 11 step 4: the K-device pose constants are deleted)
   earthAscendingNodeInvPlane,
-  kDeviceInclinationPhaseJ2000Deg,
-  eccentricityAmplitude,
   perihelionRefJD,
 
   // Moon inputs
@@ -677,8 +658,6 @@ module.exports = {
   meanEarthRotationsPerYear,
   startModelYearWithCorrection,
   balancedYear,
-  kDeviceWheelPhaseAtJ2000Cycles,
-  kDeviceWheelPeriodYears,
   balancedJD,
   cardinalPointYearFractions,
   iauObliquityAtGrid,

@@ -52,20 +52,16 @@ const MIGRATED = [
   'model.foundational.startmodelYear',
   'model.foundational.correctionDays',
   // (plan 11 step 2: correctionSun and useVariableSpeed left the JSON — the
-  // Sun's start angle reached nothing, the toggle is hard-wired true.)
-  'model.foundational.startAngleModel',
+  // Sun's start angle reached nothing, the toggle is hard-wired true. Plan 11
+  // step 4: startAngleModel — the inclination loop's zero — left too.)
   // (plan 07 R10: temperatureGraphMostLikely and systemResetN — the retired
   // phase origin's inputs — left the JSON; their return fails this gate below.)
 
-  // Phase 5f block 2 — model.earth (eccentricityAmplitudeK is Node-side, see
-  // NOT_IN_SCRIPT).
-  'model.earth.earthtiltMean',
-  'model.earth.earthInvPlaneInclinationAmplitude',
-  // (plan 11 step 2: eccentricityBase — the retired Law-5 constant — left the JSON)
-  'model.earth.eccentricityAmplitude',
-  'model.earth.kDeviceWheelPhaseAtJ2000Cycles',   // plan 07 R10: the K wheels' recorded J2000 phase
-  'model.earth.kDeviceWheelPeriodYears',          // plan 09 step 7c: the K wheels' recorded periods by wheel index (the retired unit's 335,317/N, a pose)
-  'model.earth.kDeviceInclinationPhaseJ2000Deg',  // plan 09 step 6: the K inclination wheel's recorded J2000 phase (the eccentricity law's anchor left with the law)
+  // (Phase 5f block 2 — model.earth, the K-device scaffold's recorded J2000
+  // pose: earthtiltMean, earthInvPlaneInclinationAmplitude, eccentricityAmplitude,
+  // the wheel periods, the wheel phase, the inclination-wheel phase — left the
+  // JSON at plan 11 step 4 with the scaffold; the block's return fails this
+  // gate below.)
 
   // Phase 5f block 3 — model.moon. This block also CORRECTED a drift:
   // script.js held moonMeeusLpCorrection = 0.010525 against the JSON's
@@ -417,10 +413,10 @@ for (const { path, key, value } of distinctive) {
     // 2451716.5 in a test fixture. Checking by value flagged three correctly
     // migrated constants. Once migrated, `const x = K.block.x` has no numeric
     // right-hand side, so findByName can no longer resolve one.
-    // A purely NUMERIC leaf key (the K wheels' periods are keyed by the
-    // wheel's index: `kDeviceWheelPeriodYears.16`) cannot be a declaration
-    // name, and `16: …` matches every `_dtCycleN: 16` row — for those the
-    // test is whether the VALUE itself sits behind such a key.
+    // A purely NUMERIC leaf key (the retired K wheels' periods were keyed by
+    // the wheel's index, `kDeviceWheelPeriodYears.16`) cannot be a declaration
+    // name, and `16: …` would match any `…: 16` row — for those the test is
+    // whether the VALUE itself sits behind such a key.
     const stillLiteral = /^\d+$/.test(key) ? findByName(key) === value : findByName(key) !== null;
     rows.push({ path, key, value, kind: stillLiteral ? 'MIGRATED-BUT-STILL-LITERAL' : 'migrated' });
     continue;
@@ -540,8 +536,8 @@ const retiredHits = [];
   }
   if ('additionalBodies' in mp) retiredHits.push('model.additionalBodies (plan 11 step 2: the no-chain bodies read astro-reference additionalBodiesReference)');
   for (const k of ['correctionSun', 'useVariableSpeed']) if (k in (mp.foundational ?? {})) retiredHits.push(`model.foundational.${k} (plan 11 step 2)`);
-  if ('eccentricityBase' in (mp.earth ?? {})) retiredHits.push('model.earth.eccentricityBase (plan 11 step 2)');
-  if ('16' in (mp.earth?.kDeviceWheelPeriodYears ?? {})) retiredHits.push('model.earth.kDeviceWheelPeriodYears.16 (plan 11 step 2: the perihelion pair is engine-placed)');
+  if ('startAngleModel' in (mp.foundational ?? {})) retiredHits.push('model.foundational.startAngleModel (plan 11 step 4: the inclination loop\'s zero is a scene literal)');
+  if ('earth' in mp) retiredHits.push('model.earth (plan 11 step 4: the K-device scaffold\'s pose is deleted — the world frame is the J2000 ecliptic, @essrt/physics earth/frame-of-date)');
   for (const k of ['moonStartposMoon', 'moonMeeusLpCorrection']) if (k in (mp.moon ?? {})) retiredHits.push(`model.moon.${k} (plan 11 step 2)`);
   for (const k of ['moonStartposApsidal', 'moonStartposNodal']) if (k in (mp.moon ?? {})) retiredHits.push(`model.moon.${k} (plan 11 step 3: the ring layers are engine-placed from the lunar arguments)`);
   if ('perihelionPassageRef' in mp) retiredHits.push('model.perihelionPassageRef (plan 11 step 3: deleted with the planet EoC branch)');

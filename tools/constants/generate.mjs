@@ -132,7 +132,9 @@ const EXTRA_COEFFICIENT_SOURCES = [
 const CLASSIFICATION = {
   'model-parameters.json': {
     foundational: 'parameter',
-    earth: 'parameter',
+    // (plan 11 step 4: `earth` — the K-device scaffold's recorded J2000 pose —
+    // is deleted; the scene's world frame is the J2000 ecliptic, @essrt/physics
+    // earth/frame-of-date computeSceneWorldFrameJ2000.)
     moon: 'parameter',
     planets: 'parameter',
     // (plan 11 step 2: `additionalBodies` — the four no-chain bodies' scaffold

@@ -396,12 +396,9 @@ export const VALUES = {
     unit: 's',
     note: 'Layer 3 solar day at J2000: kinematic + the ecliptic term + 4-flag cycles WITHOUT the Core-mantle swing (browser solarDayLayer3 at year 2000)',
   },
-  meanObliquity: {
-    get: () => model.earth.earthtiltMean,
-    render: (v) => Number(v).toFixed(5),
-    unit: '°',
-    note: 'earthtiltMean — solved so the scene reproduces the obliquity anchor at the June-2000 solstice',
-  },
+  // (plan 11 step 4: `meanObliquity` — the K-device scaffold's earthtiltMean —
+  // left with the scaffold; the published obliquity is the hybrid of date and
+  // its J2000 anchor the astro-reference input.)
   // (plan 11 step 2: `eccentricityBase` — the retired Law-5 constant — and
   // `correctionSun` — the scene Sun's start angle, overwritten by the
   // engine-placed Sun — left the inputs and the registry.)
@@ -573,11 +570,9 @@ export const VALUES = {
   //  Max, earthEccPhaseH3J2000, earthEccDotModelJ2000, earthEccDotAgreementPct
   //  — are retired: the published e is the N-body series on every path; the
   //  law survives only as the scene's flag-off fallback and the Node twin.)
-  eccentricityAmplitude: {
-    get: () => model.earth.eccentricityAmplitude,
-    render: (v) => Number(v).toFixed(6),
-    note: 'the Law-4 A input — derived: the 1246 triangle closure (docs/10 §Law 4); NOT the modulation half-range of e(t), which is base′/2',
-  },
+  // (plan 11 step 4: `eccentricityAmplitude` — the Law-4 A input, lately only
+  // the Wobble marker's display radius — left with the scaffold; the radius is
+  // the scene literal WOBBLE_MARKER_RADIUS_SCENE_UNITS in src/script.js.)
   // ── Derived companions (the A-closure, the one-law rate test, the day
   //    bases). All derived — no stored literals (feedback: use value tags).
   // (plan 09 step 7c: `periJuneSolsticeNextAD/PrevBC` — the 1246 alignment ±
@@ -1174,17 +1169,9 @@ export const VALUES = {
     unit: '°',
     note: 'the mean of Earth\'s inclination to the invariable plane over the banked ±10-Myr series — the engine\'s one-source normal (plan 11 step 2; until then the retired H/3 device\'s mean, inclJ2000 − A·cos(the K phase))',
   },
-  earthInclAmplitude: {
-    get: () => C.earthInvPlaneInclinationAmplitude,
-    render: (v) => Number(v).toFixed(5),
-    unit: '°',
-  },
-  earthInclAmp: {
-    get: () => C.earthInvPlaneInclinationAmplitude,
-    render: (v) => Number(v).toFixed(5),
-    unit: '°',
-    note: 'alias of earthInclAmplitude (both shipped by the website)',
-  },
+  // (plan 11 step 4: `earthInclAmplitude` / `earthInclAmp` — the K-device
+  // scaffold's earthInvPlaneInclinationAmplitude — left with the scaffold; the
+  // engine's inclination statistics are earthInclMean/Min/Max.)
   earthInclMin: {
     get: () => chainInclStats('earth').min,
     render: (v) => Number(v).toFixed(3),
@@ -2889,7 +2876,8 @@ export const VALUES = {
   // Meeus (1998) citations in knownValues; Laskar eccentricities DERIVED
   // from the tracked la2004 artifact (the site types them while citing that
   // file — same pattern as the obliquity tables); calibration scalars from
-  // model-parameters foundational; earthRAAngle is the derived 2A − A²/ε.
+  // model-parameters foundational. (plan 11 step 4: startAngleModel and the
+  // derived earthRAAngle left with the K-device scaffold.)
   ...(() => {
     const laskarEcc = (calYear) => {
       const rows = new Map(rd('public/input/la2004-orbital-solution.json').data.map((r) => [r.year, r.eccentricity]));
@@ -2905,14 +2893,7 @@ export const VALUES = {
     // the Node twin's computeEccentricityEarth is the retired single-line law
     const oeEcc = (y) => oneMovement().e(y);
     const out = {
-      startAngleModel: { get: () => model.foundational.startAngleModel, render: (v) => Number(v).toFixed(8), unit: '°' },
       correctionDays: { get: () => model.foundational.correctionDays, render: (v) => Number(v).toFixed(4), unit: 'd' },
-      earthRAAngle: {
-        get: () => 2 * C.earthInvPlaneInclinationAmplitude - C.earthInvPlaneInclinationAmplitude ** 2 / model.earth.earthtiltMean,
-        render: (v) => `~${Number(v).toFixed(3)}`,
-        unit: '°',
-        note: 'derived: 2A − A²/ε',
-      },
       speedOfLight: { get: () => astro.physicalConstants.speedOfLight, render: (v) => thousands(v, 3), unit: 'km/s' },
       periLongJ2000: { get: () => astro.earthOrbital.earthPerihelionLongitudeJ2000, render: (v) => Number(v).toFixed(3), unit: '°', note: 'the IAU/Standish MEAN element (JPL Keplerian-elements table, 1800–2050 fit); the series\' secular element is earthSeriesPeriLongJ2000' },
       periLongShift1246to2000: { get: () => astro.earthOrbital.earthPerihelionLongitudeJ2000 - 90, render: (v) => Number(v).toFixed(3), unit: '°', note: 'derived: J2000 longitude − the 90° alignment value' },

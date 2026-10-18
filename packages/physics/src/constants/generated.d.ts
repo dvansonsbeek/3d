@@ -2,14 +2,14 @@
 // Gives the TypeScript website full type safety at the boundary (§2g) while
 // packages/physics stays JavaScript.
 
-export declare const CONSTANTS_HASH: "a338015a559c8155";
+export declare const CONSTANTS_HASH: "6d8e91759c61012d";
 
 export declare const MODEL_VERSION: string;
 
 export declare const PREPRINT_DOI: string;
 
 export declare const DEFAULT_CONSTANTS: {
-  readonly hash: "a338015a559c8155";
+  readonly hash: "6d8e91759c61012d";
   readonly additionalBodiesReference: {
     "pluto": {
       "solarYearInput": number;
@@ -102,19 +102,6 @@ export declare const DEFAULT_CONSTANTS: {
       "thermalPumpFactor": number;
     };
   };
-  readonly earth: {
-    "earthtiltMean": number;
-    "earthInvPlaneInclinationAmplitude": number;
-    "eccentricityAmplitude": number;
-    "kDeviceInclinationPhaseJ2000Deg": number;
-    "kDeviceWheelPeriodYears": {
-      "3": number;
-      "5": number;
-      "8": number;
-      "13": number;
-    };
-    "kDeviceWheelPhaseAtJ2000Cycles": number;
-  };
   readonly earthOrbital: {
     "j2000EpochYear": number;
     "perihelionalignmentYear": number;
@@ -138,7 +125,6 @@ export declare const DEFAULT_CONSTANTS: {
     "startmodelJD": number;
     "startmodelYear": number;
     "correctionDays": number;
-    "startAngleModel": number;
   };
   readonly giaCoxChaoPeltier: {
     "dJ2DtPerYr": number;

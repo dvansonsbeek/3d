@@ -47,8 +47,9 @@ const GUARDED = [
   // (plan 09 step 7c: the `H (holisticyearLength)` row is gone — the frozen era
   // unit is no longer a model constant; the 335317 literals the research
   // scripts carry are the frozen lattice RECORD those scripts were built on.)
-  { name: 'earthtiltMean', live: model.earth.earthtiltMean,
-    patterns: [/\b23\.413\d{2,}\b/] },
+  // (plan 11 step 4: the `earthtiltMean` row — the K scaffold's mean tilt,
+  // pattern 23.413xx — is gone with the constant; the rendered obliquity's
+  // J2000 anchor is the IAU input, a standard, not a model quantity.)
   { name: 'balancedYear', live: -302635, patterns: [/\b-302635\b/] },
   // DELIBERATELY NOT GUARDED: eccentricityBase (~0.01539) and correctionSun
   // (~0.49688). Both are small decimals whose leading digits collide with

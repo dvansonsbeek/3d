@@ -463,9 +463,13 @@ device read 1.24° vs 1.91° at −100 kyr). The integrator's seven browser
 writes had been overwritten by the chain every frame since K5b — its
 display reach was zero; its only gated reach was 28 golden probes. The
 K device CONSTANTS (`earthtiltMean`, `earthInvPlaneInclinationAmplitude`,
-`earthRAAngle`, and since R10 the wheels' J2000 phase
-`kDeviceWheelPhaseAtJ2000Cycles`) stay until plan 11 step 4: they are the
-scene's J2000 pose (the wheel geometry `_kcFrameR` reads once), not a law
+`earthRAAngle`, the wheel periods and the wheels' J2000 phase
+`kDeviceWheelPhaseAtJ2000Cycles`) were the scene's J2000 pose, not a law —
+DELETED at plan 11 step 4 with the three precession wheels: the scene's world
+frame is the J2000 ecliptic (`@essrt/physics` `computeSceneWorldFrameJ2000`,
+world Y the J2000 ecliptic pole, the equinox at ONE recorded view azimuth —
+measured, the pose was that frame to 0.026°), and every frame of date is
+engine-placed through it; observables are R-invariant, only the view is R
 (`earthInvPlaneInclinationMean`, the device's mean inclination, left at plan 11
 step 2 — its one reach was the invariable-plane disc's init pose). `psiValue`
 is frozen in the registry like `kValue`. **Plan 07 R10 (model v21.0,

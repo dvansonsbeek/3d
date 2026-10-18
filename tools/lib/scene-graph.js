@@ -33,15 +33,9 @@ const MEEUS_LUNAR = JSON.parse(require('fs').readFileSync(
 // (the Euclidean gcd of the Step-0 comb's H-lattice filter left with the comb, plan 09 step 5a;
 //  the mode-aware `_phaseCycles` helper left with the counters, step 5c)
 
-// The K-device wheels' pose: N turns per anchor unit from J2000 at the
-// RECORDED J2000 rate, plus the device's recorded J2000 wheel phase (N ×
-// kDeviceWheelPhaseAtJ2000Cycles, plan 07 R10). Plan 09 step 5c: the wheels
-// are a scaffold pose — the engine places the Earth frame, the Sun and the
-// Moon stack over them (R4) — so they turn uniformly; the ∫N/H_era(t) counter
-// that drove them in deep-time mode is retired.
-function _deviceWheelCycles(currentYear, divisor_N) {
-  return (currentYear - C.balancedYear) / C.kDeviceWheelPeriodYears[divisor_N] + divisor_N * C.kDeviceWheelPhaseAtJ2000Cycles;
-}
+// (plan 11 step 4: _deviceWheelCycles — the K-device wheels' uniform turn
+// from their recorded J2000 pose — is deleted with the wheels; the world frame
+// is the J2000 ecliptic and every frame of date is engine-placed.)
 
 // (R4: the analytic twin _frameworkSunLon — the K-law Sun the E5 δ block fell
 // back on — is retired with the δ block; the scene Sun is the certified
@@ -635,13 +629,14 @@ function makeObjectNodes(name, def) {
 // ═══════════════════════════════════════════════════════════════════════════
 
 // Pre-compute all the per-planet derived values we need
-// (plan 09 step 7c: the frozen era unit H_J2000 is deleted; the K wheels
-// ride the recorded C.kDeviceWheelPeriodYears)
+// (plan 09 step 7c: the frozen era unit H_J2000 is deleted; plan 11 step 4:
+// the K wheels and their recorded periods are deleted too)
 const MSY_J2000 = C.meanSolarYearDays;
 const d2r = Math.PI / 180;
 const sDay_J2000 = 1 / MSY_J2000;
-const correctionYears = C.correctionDays / MSY_J2000;
-const startModelYearWithCorrection = C.startmodelYear + correctionYears;
+// (plan 11 step 4: the module-local startModelYearWithCorrection — the K wheels'
+// start-phase origin — is gone with the wheels; the integrators read
+// C.startModelYearWithCorrection.)
 
 // Per-JD epoch snapshot (Option B). When DEEP_TIME_ENABLED=false, always
 // returns J2000 values; when true, memoizes a per-epoch snapshot of
@@ -718,8 +713,6 @@ function _syncEpochForJD(jd) {
 // module load). Runtime paths use `_epochCache.mSY`
 // / `_epochCache.sDay` and go through `_syncEpochForJD(jd)` first.
 const sDay = sDay_J2000;
-/** The K-device wheels' recorded periods by wheel index (plan 09 step 7c). @param {number} n */
-const wheelYr = (n) => C.kDeviceWheelPeriodYears[n];
 
 // (Plan 11 step 3: the ascending-node tilt corrections — 180 − Ω inner,
 // 2 × the scaffold start angle outer, the legacy position path's frame
@@ -806,12 +799,15 @@ function buildSceneGraph() {
     // 1.7180 °/cy). With radius 0 the wobble centre IS Earth, so every
     // instrument that reads "from the wobble centre" (getWobbleSunDistAU, the
     // Step-6a export, the report's Method B) is Earth-frame by construction.
-    // eccentricityAmplitude survives only as the Law-4 K calibration input.
     orbitRadius: 0,
-    tilt: -C.earthtiltMean,
+    // Plan 11 step 4: the K-device scaffold is deleted — the axial wheel
+    // (recorded period 25,793.6 yr, tilt earthtiltMean) no longer turns this
+    // node: its rotation axis is ENGINE-PLACED every call (R4), so the def's
+    // tilt and speed are the rest pose only, zero. The world frame is the
+    // J2000 ecliptic (_kcR, @essrt/physics computeSceneWorldFrameJ2000).
+    tilt: 0,
     startPos: 0,
-    speed: -Math.PI * 2 / wheelYr(13),
-    _dtCycleN: 13, _dtCycleSign: -1,   // Phase 9.12: the axial wheel, retrograde
+    speed: 0,
   };
   const earthNodes = makeObjectNodes('earth', earthDef);
 
@@ -826,35 +822,12 @@ function buildSceneGraph() {
     return n;
   }
 
-  const earthInclPrec = makePrecessionNode('earthInclinationPrecession', {
-    orbitRadius: 0, orbitTilta: 0, orbitTiltb: 0,
-    orbitCentera: 0, orbitCenterb: 0, orbitCenterc: 0,
-    tilt: 0,
-    startPos: ((C.balancedYear - startModelYearWithCorrection) / wheelYr(3) - 3 * C.kDeviceWheelPhaseAtJ2000Cycles) * 360,   // plan 07 R10: − the device's J2000 wheel phase
-    speed: Math.PI * 2 / wheelYr(3),
-    _dtCycleN: 3, _dtCycleSign: +1,   // Phase 9.12: the apsidal wheel (historical name: inclination), prograde
-  });
-  earthNodes.pivot.addChild(earthInclPrec.container);
-
-  const earthEclipPrec = makePrecessionNode('earthEclipticPrecession', {
-    orbitRadius: 0, orbitCentera: 0, orbitCenterb: 0, orbitCenterc: 0,
-    orbitTilta: 0, orbitTiltb: -C.earthInvPlaneInclinationAmplitude,
-    tilt: 0,
-    startPos: ((C.balancedYear - startModelYearWithCorrection) / wheelYr(5) - 5 * C.kDeviceWheelPhaseAtJ2000Cycles) * 360,
-    speed: Math.PI * 2 / wheelYr(5),
-    _dtCycleN: 5, _dtCycleSign: +1,   // Phase 9.12: the ecliptic wheel, prograde
-  });
-  earthInclPrec.pivot.addChild(earthEclipPrec.container);
-
-  const earthObliqPrec = makePrecessionNode('earthObliquityPrecession', {
-    orbitRadius: 0, orbitCentera: 0, orbitCenterb: 0, orbitCenterc: 0,
-    orbitTilta: 0, orbitTiltb: C.earthInvPlaneInclinationAmplitude,
-    tilt: 0,
-    startPos: -(((C.balancedYear - startModelYearWithCorrection) / wheelYr(8) - 8 * C.kDeviceWheelPhaseAtJ2000Cycles) * 360),
-    speed: -Math.PI * 2 / wheelYr(8),
-    _dtCycleN: 8, _dtCycleSign: -1,   // Phase 9.12: the obliquity wheel, retrograde
-  });
-  earthEclipPrec.pivot.addChild(earthObliqPrec.container);
+  // (Plan 11 step 4: the three K-device precession wheels — inclination 3,
+  // ecliptic 5 (tilt −A), obliquity 8 (tilt +A), turning uniformly at their
+  // recorded J2000 periods from the recorded phase — are deleted. They carried
+  // the scaffold's J2000 pose, which the frame bridge used to read once; the
+  // bridge is the J2000 ecliptic now, and every node they parented is
+  // engine-placed in world. The perihelion pair hangs on Earth's pivot.)
 
   // The perihelion pair — ENGINE-PLACED (R4): _applyEngineEarthFrame sets both
   // nodes' angles to the series' ϖ of date and the inner node's offset arm to
@@ -863,11 +836,11 @@ function buildSceneGraph() {
   // zero with the J2000 eccentricity until the engine frame places them.
   const earthPeriPrec1 = makePrecessionNode('earthPerihelionPrecession1', {
     orbitRadius: 0, orbitCentera: 0, orbitCenterb: 0, orbitCenterc: 0,
-    orbitTilta: -C.earthRAAngle, orbitTiltb: 0,
+    orbitTilta: 0, orbitTiltb: 0,   // plan 11 step 4: the scaffold's earthRAAngle tilt is gone — the container is world-placed
     tilt: 0,
     startPos: 0, speed: 0,
   });
-  earthObliqPrec.pivot.addChild(earthPeriPrec1.container);
+  earthNodes.pivot.addChild(earthPeriPrec1.container);
 
   const earthPeriPrec2 = makePrecessionNode('earthPerihelionPrecession2', {
     orbitRadius: 0,
@@ -1048,7 +1021,6 @@ function buildSceneGraph() {
 
   return {
     root, earthNodes, sunNodes, moonNodes, barycenter,
-    earthInclPrec, earthEclipPrec, earthObliqPrec,
     earthPeriPrec1, earthPeriPrec2,
     moonApsidalPrec, moonApsNodalPrec1, moonApsNodalPrec2,
     moonLunarLevel, moonNodalPrec,
@@ -1126,13 +1098,9 @@ function moveModel(graph, pos) {
   // Compute dynamic eccentricities for all planets (oscillate at H/16)
   // Uses _epochCache.mSY so the pos→JD→year round-trip is consistent with
   // the caller's pos = _epochCache.sDay × (jd - C.startmodelJD).
-  // pos IS the tropical-year count from startmodelJD, so the year is simply
-  // startModelYearWithCorrection + pos. The previous form reconstructed the JD
-  // as `startmodelJD + pos*mSY` and divided by mSY again — algebraically the
-  // same under a CONSTANT rate, but it mixes conventions now that pos comes
-  // from the integrated conversion, and its epoch-local mSY made the offset
-  // (startmodelJD - balancedJD)/mSY drift with epoch.
-  const currentYear = C.startModelYearWithCorrection + pos;
+  // (plan 11 step 4: the frame's SI year — the K wheels' coordinate — is no
+  // longer read here; the wheels are gone and every engine read takes the
+  // engine year from the frame's JD below.)
   // Unification: Earth's per-frame eccentricity is the ONE law (H/3 line);
   // the H/16 law-of-cosines form below serves only the planets' wobble laws.
   // One-source movement (C-4b): under the option, Earth's e(t) substitutes
@@ -1158,14 +1126,10 @@ function moveModel(graph, pos) {
   // Update each "animated" object: orbit.ry = θ for circular, pivot.position for ellipse
   function animateObject(nodes, def) {
     let θ;
-    // The K-device wheels tagged with _dtCycleN / _dtCycleSign turn at their
-    // recorded J2000 rate from the J2000 pose (plan 09 step 5c; the ∫1/H_era
-    // counter is retired). Under toggle-off (or untagged), falls through to
-    // the snapshot form θ = speed × pos - startPos.
-    // Mirrors src/script.js moveModel.
-    if (DEEP_TIME_ENABLED && Number.isFinite(def._dtCycleN)) {
-      θ = _deviceWheelCycles(currentYear, def._dtCycleN) * 2 * Math.PI * def._dtCycleSign;
-    } else if (DEEP_TIME_ENABLED && def._dtMoonIntegrator) {
+    // (plan 11 step 4: the K-device wheel branch — _dtCycleN / _dtCycleSign,
+    // a uniform turn from the recorded J2000 pose — is deleted with the
+    // wheels.) Mirrors src/script.js moveModel.
+    if (DEEP_TIME_ENABLED && def._dtMoonIntegrator) {
       // Phase 9.13 mirror (previously MISSING in tools — the moon layers ran
       // frozen J2000 speeds in deep-time mode while the browser ran the
       // chains; measured as a spurious ~9.6° Moon-vs-ring plane divergence
@@ -1252,11 +1216,8 @@ function moveModel(graph, pos) {
   // Earth
   animateObject(graph.earthNodes, graph.earthNodes.def);
 
-  // Earth precession layers
+  // Earth precession layers (plan 11 step 4: the three K wheels are deleted)
   const precLayers = [
-    [graph.earthInclPrec, graph.earthInclPrec.def],
-    [graph.earthEclipPrec, graph.earthEclipPrec.def],
-    [graph.earthObliqPrec, graph.earthObliqPrec.def],
     [graph.earthPeriPrec1, graph.earthPeriPrec1.def],
     [graph.earthPeriPrec2, graph.earthPeriPrec2.def],
     [graph.barycenter, graph.barycenter.def],
@@ -1317,10 +1278,8 @@ let _graph = null;
 function getGraph() {
   if (!_graph) {
     _graph = buildSceneGraph();
-    // R4: the J2000 pose bridge is read eagerly from the fresh device — every
-    // consumer (moveModel, the fast Sun path) then places the engine frame
-    // through it; nothing is derived on a consumer's first call.
-    _kcFrameR(_graph);
+    // (R4/plan 11 step 4: the frame bridge R is the J2000 ecliptic constant —
+    // nothing is derived from the fresh graph.)
   }
   return _graph;
 }
@@ -1370,7 +1329,11 @@ function _invalidateGraph() {
 // engine raw — no observation-fitted correction rides it (the
 // source-of-truth doctrine); the legacy geometric planet chains and their
 // fitted stack were EXCISED with K5.
-let _kcModule = null, _kcChains = null, _kcR = null, _kcDeriving = false;
+// R — the scene's world frame (plan 11 step 4): the J2000 ecliptic, ONE home
+// @essrt/physics earth/frame-of-date (the K-device pose it was derived from
+// is deleted; see _kcFrameR below).
+let _kcModule = null, _kcChains = null;
+const _kcR = _req('@essrt/physics/earth/frame-of-date').computeSceneWorldFrameJ2000();
 function _kc() { if (!_kcModule) _kcModule = require('./keplerian-chain.js'); return _kcModule; }
 function _kcHelioAU(target, jd) {
   const KCm = _kc();
@@ -1393,54 +1356,19 @@ function _kcHelioAU(target, jd) {
   const p = KCm.computeHeliocentricEclipticFromElements(el);
   return [p.xAU, p.yAU, p.zAU];
 }
-// The ecliptic-J2000 → scene-world rotation R, derived at runtime from the
-// scene's own FRAMES at the chain anchor epoch (never a pasted matrix):
-//   ẑ = the sun-plane normal (the plane the chain's ecliptic maps onto),
-//   x̂ = the CORRECTED axis frame's RA = 0 direction projected onto that
-//       plane (the longitude origin the wheel Sun's δ block realizes and
-//       every RA/Dec instrument reads through),
-//   ŷ = ẑ × x̂.
-// Plan 06 R3 (measured): the former TRIAD form matched the chain Earth's
-// heliocentric direction to the scene's Earth–Sun direction at two instants
-// — a BODY match. It absorbed the chain Earth's +3.5″ offset from the
-// certified Sun at J2000 (the chain carries no lunar equation) into every
-// planet's placement, and in the browser also whatever Sun the FIRST FRAME
-// rendered (the analytic twin, +11.6″ from the certified Sun before the
-// series artifact arrives) — the Standard-Model overlay's Sun read 8.2″
-// there with the certified Sun 0.8″ from VSOP. Frames carry no body
-// position: R moves 2.96″ about the pole and 0.39″ in tilt against the
-// triad form here. NOT the sun-plane's node on the equator as the origin:
-// that is 51.6″ from the RA frame's equinox at J2000 (the recorded K
-// sun-plane finding — docs/41). Mirror: src/script.js _kcDeriveFrameR —
-// identical ops.
-// R4 "one Earth frame": R is the J2000 pose of the scene — the K device
-// geometry at the chain anchor epoch, read ONCE, no correction applied (the
-// device is deterministic there, so the bridge is too: nothing derived on a
-// first frame, nothing to re-derive). Everything of date is then placed from
-// the engine RELATIVE to this pose by _applyEngineEarthFrame, so the two
-// bridges of R3 (sun plane vs the RA frame's ecliptic) collapse into one: the
-// engine's ecliptic of date IS the sun plane and the Moon's plane.
-function _kcFrameR(graph) {
-  if (_kcR) return _kcR;
-  const KCm = _kc();
-  const jd1 = KCm.ANCHOR_EPOCH_JD;
-  _kcDeriving = true;   // the K pose: moveModel must not place the engine frame during this read
-  try {
-    _syncEpochForJD(jd1);
-    moveModel(graph, _posFromJDTools(jd1));
-  } finally { _kcDeriving = false; }
-  const ne = graph.barycenter.pivot.worldMatrix.e, ae = graph.earthNodes.rotAxis.worldMatrix.e;
-  let nx = ne[4], ny = ne[5], nz = ne[6];
-  { const s = Math.hypot(nx, ny, nz); nx /= s; ny /= s; nz /= s; }
-  let xx = ae[8], xy = ae[9], xz = ae[10];                 // rotAxis local +Z = RA 0 (theta = atan2(x, z))
-  // the longitude origin: RA 0 projected onto the K sun plane
-  const d = xx * nx + xy * ny + xz * nz;
-  xx -= d * nx; xy -= d * ny; xz -= d * nz;
-  { const s = Math.hypot(xx, xy, xz); xx /= s; xy /= s; xz /= s; }
-  const yx = ny * xz - nz * xy, yy = nz * xx - nx * xz, yz = nx * xy - ny * xx;   // ŷ = ẑ × x̂
-  _kcR = [[xx, yx, nx], [xy, yy, ny], [xz, yz, nz]];
-  return _kcR;
-}
+// The ecliptic-J2000 → scene-world rotation R. Plan 11 step 4: R IS the J2000
+// ecliptic frame (world Y the J2000 ecliptic pole; the J2000 equinox at the
+// recorded view azimuth — @essrt/physics earth/frame-of-date, ONE home for
+// both twins). It used to be derived at runtime from the K-device scaffold's
+// pose at the chain anchor epoch (ẑ the sun-plane normal, x̂ the axis frame's
+// RA 0 projected onto it); measured on this twin before the change, that pose
+// was the J2000 ecliptic to 0.026° of pole tilt with the equinox at azimuth
+// 158.2265° — the azimuth is the literal, the tilt is dropped. The R3/R4
+// history (why FRAMES and not a body triad, why no correction rides R) is in
+// docs/41. Everything of date is placed from the engine THROUGH R by
+// _applyEngineEarthFrame, so every physical reading, taken in the placed Earth
+// frame, is R-invariant; only the view is R.
+function _kcFrameR() { return _kcR; }
 
 // ═══════════════════════════════════════════════════════════════════════════
 // R4 — THE EARTH FRAME FROM THE ENGINE (plan 06; mirror of src/script.js
@@ -1466,8 +1394,7 @@ function _kcFrameR(graph) {
 // ═══════════════════════════════════════════════════════════════════════════
 const _FRAME = _req('@essrt/physics/earth/frame-of-date');
 function _applyEngineEarthFrame(graph, jdUT) {
-  if (_kcDeriving) return;                     // the bridge read wants the pure K pose
-  const R = _kcFrameR(graph);
+  const R = _kcFrameR();
   // The sampler's time coordinate is JULIAN years from J2000 TT (t = 0 at JD
   // 2451545.0 — the anchor elements; the chain planets use the same mapping).
   // NOT the scene's SI-year counter (_jdToSIyearTools: startmodel origin,
@@ -1543,10 +1470,6 @@ function _applyEngineEarthFrame(graph, jdUT) {
 
 function computePlanetPosition(target, jd) {
   const graph = getGraph();
-
-  // Flag path: derive the frame rotation BEFORE the main animate (the triad
-  // probe re-animates the graph to its own epochs).
-  if (!_kcR && target !== 'moon' && target !== 'sun') _kcFrameR(graph);
 
   // Sync epoch cache from this JD (no-op when DEEP_TIME_ENABLED=false).
   // Must precede pos computation so pos uses the epoch-appropriate mSY.
@@ -1747,8 +1670,8 @@ function computeSunPositionFast(jd) {
 
   // Compute Earth eccentricity for EoC — epoch-consistent mSY for round-trip.
   // pos IS the tropical-year count from startmodelJD (see the block at
-  // computePositions): startModelYearWithCorrection + pos, one convention.
-  const currentYear = C.startModelYearWithCorrection + pos;
+  // computePositions). (plan 11 step 4: the K wheels' SI-year coordinate is no
+  // longer read here — the wheels are gone.)
   // One-source movement (C-4b): under the option e(t) substitutes from the
   // banked engine series (mirrors the moveModel site; the EoC below inherits).
   const _osmM = _oneSourceM();
@@ -1757,15 +1680,9 @@ function computeSunPositionFast(jd) {
 
   // Animate a single node: orbit.ry = θ (with EoC if applicable)
   function animateFast(nodes, def) {
-    let θ;
-    // The K-device wheels turn at their recorded J2000 rate from the J2000
-    // pose (plan 09 step 5c). See animateObject in moveModel() for the
-    // identical branch.
-    if (DEEP_TIME_ENABLED && Number.isFinite(def._dtCycleN)) {
-      θ = _deviceWheelCycles(currentYear, def._dtCycleN) * 2 * Math.PI * def._dtCycleSign;
-    } else {
-      θ = def.speed * pos - def.startPos * d2r;
-    }
+    // (plan 11 step 4: the K-device wheel branch is deleted with the wheels —
+    // the snapshot form is the only form; the engine places the frame after)
+    let θ = def.speed * pos - def.startPos * d2r;
     if (C.useVariableSpeed && def.eccentricity && def.perihelionPhaseJ2000 !== undefined) {
       const e = def._eocDerived
         ? earthEcc / 2   // Sun: eoc = e(t)/2 (the geometric offset supplies the other half; unification)
@@ -1777,12 +1694,9 @@ function computeSunPositionFast(jd) {
     nodes.orbit.ry = θ;
   }
 
-  // Animate Earth + precession chain + Sun only
+  // Animate Earth + the perihelion pair + Sun only (plan 11 step 4: the three K wheels are deleted)
   animateFast(graph.earthNodes, graph.earthNodes.def);
   const precLayers = [
-    [graph.earthInclPrec, graph.earthInclPrec.def],
-    [graph.earthEclipPrec, graph.earthEclipPrec.def],
-    [graph.earthObliqPrec, graph.earthObliqPrec.def],
     [graph.earthPeriPrec1, graph.earthPeriPrec1.def],
     [graph.earthPeriPrec2, graph.earthPeriPrec2.def],
     [graph.barycenter, graph.barycenter.def],

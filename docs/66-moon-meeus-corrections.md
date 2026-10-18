@@ -277,8 +277,9 @@ sensitivities are attributed, not fitted.
 **(Retired at plan 09 step 6.)** The H/3 line below is kept as the DERIVATION
 RECORD: the law, its 21.77° anchor and the `moon/ecc-channel` module are
 deleted; Earth's eccentricity of date is the N-body series on every path and
-the lunar chain rides the deep channel (decision (ii)). The scene keeps the
-line's J2000 phase as a recorded pose (`kDeviceInclinationPhaseJ2000Deg`).
+the lunar chain rides the deep channel (decision (ii)). The scene kept the
+line's J2000 phase as a recorded pose (`kDeviceInclinationPhaseJ2000Deg`) until
+plan 11 step 4 deleted the K-device scaffold.
 
 **Framework-native e_E: the fully-derived H/3 fluctuation (retired).** The clock-side
 e_E — the epoch-local tangent of the deep channel, and the line the eclipse
