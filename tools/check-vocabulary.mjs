@@ -81,16 +81,89 @@ function surfaces() {
 
 /** The simulator's USER-FACING strings: string literals that contain a
  *  space (labels, tooltips, panel text). Identifiers, import paths and
- *  comments are code, not presentation. */
+ *  comments are code, not presentation.
+ *
+ *  A small scanner, not a regex: the former regex pass treated an apostrophe
+ *  inside a comment ("engine D's own …") as a string opener and swallowed
+ *  the code after it, so the ratchet counted 26 "user-facing" hits in
+ *  src/script.js that were all code comments (measured 2026-10-18: every raw
+ *  occurrence of the four terms sat in a `//` or ` *` line). The scanner
+ *  skips line and block comments, reads the three literal kinds with their
+ *  escapes, and steps into a template literal's `${…}` expressions as code
+ *  (nested strings inside them are collected too). */
 function scriptJsStrings() {
   const src = readFileSync(join(ROOT, 'src/script.js'), 'utf8');
+  /** @type {string[]} */
   const out = [];
-  const re = /'((?:[^'\\\n]|\\.)*)'|"((?:[^"\\\n]|\\.)*)"|`((?:[^`\\]|\\.)*)`/g;
-  let mm;
-  while ((mm = re.exec(src))) {
-    const s = mm[1] ?? mm[2] ?? mm[3];
-    if (s && s.includes(' ')) out.push(s);
-  }
+  const n = src.length;
+  let i = 0;
+  /** Read a quoted literal starting at i (on the quote); returns the index after it. */
+  const readQuoted = (q) => {
+    let j = i + 1, s = '';
+    while (j < n && src[j] !== q) {
+      if (src[j] === '\\') { s += src[j] + (src[j + 1] ?? ''); j += 2; continue; }
+      if (src[j] === '\n') break;   // unterminated: stop at the line end
+      s += src[j++];
+    }
+    if (s.includes(' ')) out.push(s);
+    return j + 1;
+  };
+  /** Read a template literal starting at i (on the backtick); `${…}` is scanned as code. */
+  const readTemplate = () => {
+    let j = i + 1, s = '';
+    while (j < n && src[j] !== '`') {
+      if (src[j] === '\\') { s += src[j] + (src[j + 1] ?? ''); j += 2; continue; }
+      if (src[j] === '$' && src[j + 1] === '{') {
+        if (s.includes(' ')) out.push(s);
+        s = '';
+        i = j + 2;
+        scanCode(1);   // consumes through the matching `}`; may push nested strings
+        j = i;
+        continue;
+      }
+      s += src[j++];
+    }
+    if (s.includes(' ')) out.push(s);
+    return j + 1;
+  };
+  /** A `/` opens a regex literal (not a division) when the previous
+   *  significant character cannot end an operand — the usual heuristic. A
+   *  regex such as /"/g would otherwise open a phantom string and desync the
+   *  scan (measured: six comment lines counted as strings through one). */
+  let lastSig = '';   // the last non-space character scanned as code
+  const regexCanStart = () => lastSig === '' || '(,=:[!&|?{};+-*%<>~^'.includes(lastSig) || lastSig === 'return';
+  const skipRegex = () => {
+    let j = i + 1, inClass = false;
+    while (j < n && src[j] !== '\n') {
+      if (src[j] === '\\') { j += 2; continue; }
+      if (inClass) { if (src[j] === ']') inClass = false; j++; continue; }
+      if (src[j] === '[') { inClass = true; j++; continue; }
+      if (src[j] === '/') { j++; while (j < n && /[a-z]/i.test(src[j])) j++; return j; }
+      j++;
+    }
+    return j;
+  };
+  /** Scan code from i; with depth > 0, return after the brace that closes the enclosing `${`. */
+  const scanCode = (depth) => {
+    while (i < n) {
+      const c = src[i], d = src[i + 1];
+      if (c === '/' && d === '/') { while (i < n && src[i] !== '\n') i++; continue; }
+      if (c === '/' && d === '*') { const e = src.indexOf('*/', i + 2); i = e < 0 ? n : e + 2; continue; }
+      if (c === '/' && regexCanStart()) { i = skipRegex(); lastSig = ')'; continue; }
+      if (c === '\'' || c === '"') { i = readQuoted(c); lastSig = ')'; continue; }
+      if (c === '`') { i = readTemplate(); lastSig = ')'; continue; }
+      if (depth > 0) {
+        if (c === '{') { i++; lastSig = '{'; scanCode(depth + 1); lastSig = '}'; continue; }
+        if (c === '}') { i++; return; }
+      }
+      if (!/\s/.test(c)) {
+        // `return` before a regex: keep the keyword as the significant token
+        lastSig = (c === 'n' && src.slice(i - 5, i + 1) === 'return' && !/[A-Za-z0-9_$]/.test(src[i - 6] ?? '')) ? 'return' : c;
+      }
+      i++;
+    }
+  };
+  scanCode(0);
   return out.join('\n');
 }
 
