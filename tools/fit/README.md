@@ -619,7 +619,7 @@ sidereal year and p_A; the year lengths of date are the one-source family.
 | `SUN_LONGITUDE_HARMONICS` / `SUN_LONGITUDE_MEAN` | DELETED at plan 09 step 5a with Step 0 — nothing to rerun. |
 | ~~Sun T² polynomial (inline in `moveModel`)~~ | **REMOVED 2026-06** — violates design rule (polynomial-in-T not cyclic). Do not re-introduce. |
 | `eccentricityAmplitude` | 6a2 (window CSV) — a scaffold constant (the Wobble marker's radius); Earth's e of date is the N-body series. `eccentricityBase` DELETED at plan 11 step 2. |
-| `correctionDays` | 6a2 (window CSV) |
+| `correctionDays` | DELETED at plan 11 step 5 — the window CSV anchors on the scene epoch itself |
 | `useVariableSpeed` | hard-wired true since plan 11 step 2 — not an input |
 | Planet `startpos` | — (Steps 2/5a-5b retired — K5 excision; legacy scene angle, plan 11 step 3 retires it) |
 | Planet `eocFraction` | DELETED at plan 11 step 2 (no reader left) |
@@ -651,8 +651,8 @@ This can be done after each `--write` step, or once at the end.
 
 If you have just edited one of the source-of-truth JSON files
 (`public/input/model-parameters.json`, `public/input/astro-reference.json`)
-— e.g. changing `correctionDays`, `perihelionalignmentYear`, a scaffold pose
-constant, or any Meeus/IAU anchor —
+— e.g. changing `perihelionalignmentYear`, the scene epoch, or any Meeus/IAU
+anchor —
 **run `npm run constants:generate` FIRST** so the generated module reflects the
 new JSON state before any pipeline step touches it:
 
@@ -714,7 +714,7 @@ manually (next section).
 
 ```bash
 # Pre-requisite: sync JSON → script.js after any foundational-constant edit
-# (correctionDays, perihelionalignmentYear, scaffold pose constants, Meeus/IAU anchors).
+# (perihelionalignmentYear, the scene epoch, Meeus/IAU anchors).
 # No-op if src/script.js is already in sync with JSON.
 npm run constants:generate                                                   # Pre-Phase 1
 

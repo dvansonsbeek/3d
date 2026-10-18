@@ -52,7 +52,7 @@ BALANCE_YEAR = _C['balancedYear']   # plan 07 R10: 2000 — the combs' phase ori
 # Model reference point
 _START_MODEL_JD = _C['startmodelJD']
 JUNE_SOLSTICE_2000_JD = _C['ASTRO_REFERENCE']['juneSolstice2000_JD']
-_START_MODEL_YEAR = _C['startmodelYear'] + (_C['correctionDays'] / _C['meanSolarYearDays'])
+_START_MODEL_YEAR = _C['startmodelYear']   # plan 11 step 5: the epoch itself (correctionDays is deleted)
 _MEAN_SOLAR_YEAR = _C['meanSolarYearDays']
 BALANCED_JD = _C['balancedJD']
 

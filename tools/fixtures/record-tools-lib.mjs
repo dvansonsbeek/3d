@@ -38,7 +38,9 @@ function measure() {
   // Anchors that pin the engine's identity. (plan 09 step 7c: `anchor.H` — the
   // frozen era unit — left with the unit.)
   v['anchor.perihelionAlignmentYear'] = C.perihelionalignmentYear;
-  v['anchor.correctionDays'] = C.correctionDays;
+  // (plan 11 step 5: `anchor.correctionDays` left with the correction; the
+  // epoch itself is pinned through every JD-anchored row)
+  v['anchor.sceneEpochJD'] = C.startmodelJD;
   v['anchor.meanSiderealYearSeconds'] = C.meanSiderealYearSeconds;
 
   // THREE distinct day lengths — never collapse these (CLAUDE.md).

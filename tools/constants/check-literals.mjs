@@ -48,9 +48,10 @@ const MIGRATED = [
   // unit `holisticyearLength`, its lattice `stepYears` and the device's rounded
   // mean-tropical-year input `inputmeanlengthsolaryearindays` left the JSON;
   // their return fails this gate below.)
-  'model.foundational.startmodelJD',
-  'model.foundational.startmodelYear',
-  'model.foundational.correctionDays',
+  // (plan 11 step 5: startmodelJD / startmodelYear moved to
+  // astro.timeReference.sceneEpochJD / sceneEpochYear — covered by the
+  // 'astro.timeReference' prefix below; correctionDays is deleted. Their return
+  // to `foundational` fails this gate below.)
   // (plan 11 step 2: correctionSun and useVariableSpeed left the JSON — the
   // Sun's start angle reached nothing, the toggle is hard-wired true. Plan 11
   // step 4: startAngleModel — the inclination loop's zero — left too.)
@@ -537,6 +538,8 @@ const retiredHits = [];
   if ('additionalBodies' in mp) retiredHits.push('model.additionalBodies (plan 11 step 2: the no-chain bodies read astro-reference additionalBodiesReference)');
   for (const k of ['correctionSun', 'useVariableSpeed']) if (k in (mp.foundational ?? {})) retiredHits.push(`model.foundational.${k} (plan 11 step 2)`);
   if ('startAngleModel' in (mp.foundational ?? {})) retiredHits.push('model.foundational.startAngleModel (plan 11 step 4: the inclination loop\'s zero is a scene literal)');
+  for (const k of ['startmodelJD', 'startmodelYear']) if (k in (mp.foundational ?? {})) retiredHits.push(`model.foundational.${k} (plan 11 step 5: the scene epoch lives in astro-reference timeReference.sceneEpochJD / sceneEpochYear)`);
+  if ('correctionDays' in (mp.foundational ?? {})) retiredHits.push('model.foundational.correctionDays (plan 11 step 5: the integrators anchor on the scene epoch itself)');
   if ('earth' in mp) retiredHits.push('model.earth (plan 11 step 4: the K-device scaffold\'s pose is deleted — the world frame is the J2000 ecliptic, @essrt/physics earth/frame-of-date)');
   for (const k of ['moonStartposMoon', 'moonMeeusLpCorrection']) if (k in (mp.moon ?? {})) retiredHits.push(`model.moon.${k} (plan 11 step 2)`);
   for (const k of ['moonStartposApsidal', 'moonStartposNodal']) if (k in (mp.moon ?? {})) retiredHits.push(`model.moon.${k} (plan 11 step 3: the ring layers are engine-placed from the lunar arguments)`);

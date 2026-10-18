@@ -2893,7 +2893,7 @@ export const VALUES = {
     // the Node twin's computeEccentricityEarth is the retired single-line law
     const oeEcc = (y) => oneMovement().e(y);
     const out = {
-      correctionDays: { get: () => model.foundational.correctionDays, render: (v) => Number(v).toFixed(4), unit: 'd' },
+      // (plan 11 step 5: `correctionDays` left the registry with the constant)
       speedOfLight: { get: () => astro.physicalConstants.speedOfLight, render: (v) => thousands(v, 3), unit: 'km/s' },
       periLongJ2000: { get: () => astro.earthOrbital.earthPerihelionLongitudeJ2000, render: (v) => Number(v).toFixed(3), unit: '°', note: 'the IAU/Standish MEAN element (JPL Keplerian-elements table, 1800–2050 fit); the series\' secular element is earthSeriesPeriLongJ2000' },
       periLongShift1246to2000: { get: () => astro.earthOrbital.earthPerihelionLongitudeJ2000 - 90, render: (v) => Number(v).toFixed(3), unit: '°', note: 'derived: J2000 longitude − the 90° alignment value' },

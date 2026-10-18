@@ -64,9 +64,12 @@ const knownValues = astroRef.knownValues;
 // `stepYears` and the device's rounded mean tropical year input
 // `inputmeanlengthsolaryearindays` left model-parameters.json; plan 11 step 4:
 // the K-device wheels' recorded pose block left with the scaffold.)
-const startmodelJD = modelParams.foundational.startmodelJD;
-const startmodelYear = modelParams.foundational.startmodelYear;
-const correctionDays = modelParams.foundational.correctionDays;
+// Plan 11 step 5: the scene epoch's ONE home is astro-reference
+// timeReference.sceneEpochJD / sceneEpochYear (moved verbatim); correctionDays
+// — the retired scaffold Sun's fine timing — is deleted, every anchor below
+// is the epoch itself.
+const startmodelJD = astroRef.timeReference.sceneEpochJD;
+const startmodelYear = astroRef.timeReference.sceneEpochYear;
 // (plan 11 step 4: startAngleModel — the browser's inclination-path loop zero,
 // with the deleted K inclination phase — left the JSON; the loop's zero is a
 // scene literal in src/script.js.)
@@ -242,7 +245,9 @@ for (const [key, ar] of Object.entries(astroRef.additionalBodiesReference)) {
 const { computeMeanTropicalYearJ2000Days } = require('@essrt/physics/earth/year-lengths');
 const meanSolarYearDays = computeMeanTropicalYearJ2000Days(astroRef.yearLengthRef.siderealYear, astroRef.earthOrbital.generalPrecessionJ2000_arcsecPerYr);
 const meanEarthRotationsPerYear = meanSolarYearDays + 1;
-const startModelYearWithCorrection = startmodelYear + (correctionDays / meanSolarYearDays);
+// Plan 11 step 5: ≡ startmodelYear — correctionDays is deleted; the name stays
+// as an alias for the frozen explore scripts that read it (tools/explore/u2-*).
+const startModelYearWithCorrection = startmodelYear;
 // Plan 07 R10: the correction combs measure their phase from J2000. The former
 // origin — perihelionalignmentYear − 14.5 × H/16 = −302,635, the "balanced
 // year" — was rotated out of every fitted (sin, cos) pair exactly
@@ -601,7 +606,6 @@ module.exports = {
   perihelionalignmentJD,
   startmodelJD,
   startmodelYear,
-  correctionDays,
   useVariableSpeed,
 
   // Physical & astronomical constants

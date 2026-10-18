@@ -63,9 +63,12 @@ import { vsop87AstrometricGeoEclipticAU, vsop87GeoEclipticAU, vsop87HelioEclipti
 // Imported, not literals: these are never reassigned, so the read-only binding
 // an ESM import gives is exactly right. The values cannot drift from
 // model-parameters.json because there is no second copy to drift.
-const startmodelJD = K.foundational.startmodelJD;         // June 21, 2000 00:00 UTC (Julian Day)
-const startmodelYear = K.foundational.startmodelYear;     // Fractional year of model start
-const correctionDays = K.foundational.correctionDays;     // Fine timing correction (optimizer-derived)
+// Plan 11 step 5: the scene epoch's ONE home is astro-reference
+// timeReference.sceneEpochJD / sceneEpochYear (moved verbatim from the deleted
+// foundational block); correctionDays — the retired scaffold Sun's fine
+// timing — is deleted, every anchor reads the epoch itself.
+const startmodelJD = K.timeReference.sceneEpochJD;         // June 21, 2000 00:00 UTC (Julian Day)
+const startmodelYear = K.timeReference.sceneEpochYear;     // the epoch's year label — the age-anchor convention (2000.5, not the calendar decimal year)
 // (plan 11 step 2: correctionSun — the scene Sun's start angle and the EoC
 // perihelion-phase offset derived from it — is deleted; _applyEngineEarthFrame
 // places the Sun at the certified longitude every frame, so it reached nothing.)
@@ -856,7 +859,8 @@ const ASTRO_REFERENCE = {
 
 // --- 9a. Time units & year lengths ---
 let   meanearthRotationsinDays = meansolaryearlengthinDays+1;  // Phase 6: mutable (Tier 2)
-const startmodelyearwithCorrection = startmodelYear+(correctionDays/meansolaryearlengthinDays);
+// (plan 11 step 5: startmodelyearwithCorrection — startmodelYear + the
+// scaffold Sun's −0.83-d timing — is gone; every anchor is startmodelYear.)
 // Plan 07 R10: the correction combs measure their phase from J2000. The former
 // origin — perihelionalignmentYear − 14.5 × H/16 = −302,635, the "balanced
 // year" — was rotated out of every fitted (sin, cos) pair exactly
@@ -867,8 +871,8 @@ let   balancedYear = 2000;   // Phase 6: mutable in name only — the dormant ep
 // (plan 11 step 4: BALANCED_YEAR_J2000_FIXED — the K wheels' phase anchor — left with the wheels)
 // (plan 11 step 2: DEVICE_PHASE_H3/H8_J2000_RAD — the device's wheel phases
 // the Verify-Earth-Parameters advisor described — are deleted with it.)
-const balancedJD = startmodelJD-(meansolaryearlengthinDays*(startmodelyearwithCorrection-balancedYear));
-const perihelionalignmentJD = Math.round(startmodelJD - (meansolaryearlengthinDays * (startmodelyearwithCorrection - perihelionalignmentYear)));
+const balancedJD = startmodelJD-(meansolaryearlengthinDays*(startmodelYear-balancedYear));
+const perihelionalignmentJD = Math.round(startmodelJD - (meansolaryearlengthinDays * (startmodelYear - perihelionalignmentYear)));   // plan 11 step 5: on the epoch itself (the rounded day-0 moved one day with the correction's deletion)
 // Perihelion-calendar walk-start hint (shared by dayToPerihelionCalendarDate
 // and dateToPerihelionJulianDay — see the docstring there). Declared HERE
 // because module-init code calls the converters long before their own
@@ -3747,7 +3751,7 @@ const _moonSeries = (() => {
             // tools-lib and the package (bit-identical age arithmetic; the
             // calendar year here would trip the recorded linear-vs-calendar
             // mirror trap).
-            const dKm = meanMoonDistanceAtAge((startmodelyearwithCorrection - _jdToSIyear(jdTT)) / 1e6);
+            const dKm = meanMoonDistanceAtAge((startmodelYear - _jdToSIyear(jdTT)) / 1e6);
             return dKm === null ? moonDistance : dKm;
           },
           getEccentricityBase: () => moonOrbitalEccentricityBase,
@@ -4363,7 +4367,7 @@ function _deepCal() {
     withLatticeAlpha: _withLatticeAlpha,
     startModelJD: startmodelJD,
     startModelYear: startmodelYear,
-    startModelYearWithCorrection: startmodelyearwithCorrection,
+    startModelYearWithCorrection: startmodelYear,   // plan 11 step 5: the SI-year label anchors on the epoch itself
     siTropicalYearDays: SI_TROPICAL_YEAR_DAYS,
     yearMin: _CUMUL_INTEGRAL_YEAR_MIN,
     yearMax: _CUMUL_INTEGRAL_YEAR_MAX,
@@ -5071,7 +5075,7 @@ function meeusVsIntegratorDiagnostic(jd) {
   // conversion using existing module constants (startmodelyearwithCorrection,
   // startmodelJD, SI_TROPICAL_YEAR_DAYS). Anchored at model start so the
   // calendar / SI coordinates align — see top-level _jdToSIyear comment block.
-  const _jdToSIyear = (jd_) => startmodelyearwithCorrection + (jd_ - startmodelJD) / SI_TROPICAL_YEAR_DAYS;
+  const _jdToSIyear = (jd_) => startmodelYear + (jd_ - startmodelJD) / SI_TROPICAL_YEAR_DAYS;
   const yearSI_anchor = _jdToSIyear(startmodelJD);
   const yearSI        = _jdToSIyear(jd);
   const decYear       = julianDateToDecimalYear(jd);  // for display only
@@ -50130,7 +50134,7 @@ function moveModel(pos) {
       // which forceSceneUpdate also sets after moveModel and so is stale as well.
       const _eccYear = DEEP_TIME_MODE_ENABLED
         ? _jdToSIyear(o.julianDay)
-        : (o.julianDay - startmodelJD) / meansolaryearlengthinDays + startmodelyearwithCorrection;
+        : (o.julianDay - startmodelJD) / meansolaryearlengthinDays + startmodelYear;
       const _eccNow = obj._eccentricityKey ? _eccentricityInline(obj._eccentricityKey, _eccYear) : undefined;
       if (_eccNow !== undefined) {
         // the Sun (the only object with an eccentricity key): eoc = e(t)/2 — the
@@ -50599,9 +50603,10 @@ function perihelionLongitudeEcliptic(precessionLayer, longitudePerihelion) {
 
 const JD_1800 = K.timeReference.jd1800;  // ~January 1, 1800
 const JD_1900 = K.timeReference.jd1900;  // ~January 1, 1900
-// JD_2000 is the model start, i.e. the same quantity as foundational.startmodelJD
-// — it was a fourth copy of 2451716.5.
-const JD_2000 = K.foundational.startmodelJD;  // June 21, 2000 (model start)
+// JD_2000 is the model start, i.e. the same quantity as the scene epoch
+// (astro-reference timeReference.sceneEpochJD, plan 11 step 5) — it was a
+// fourth copy of 2451716.5.
+const JD_2000 = startmodelJD;  // June 21, 2000 (model start)
 const JD_2100 = K.timeReference.jd2100;  // ~January 1, 2100
 
 // Cache for perihelion values by Julian Day (calculated once on demand per JD)
@@ -52018,7 +52023,7 @@ function updatePredictions() {
   // block; does not affect `o.currentYear` or `julianDateToDecimalYear` globally.
   const yearForFormula = DEEP_TIME_MODE_ENABLED
     ? _jdToSIyear(o.julianDay)
-    : (o.julianDay - startmodelJD) / meansolaryearlengthinDays + startmodelyearwithCorrection;
+    : (o.julianDay - startmodelJD) / meansolaryearlengthinDays + startmodelYear;
 
   // Compute obliquity and eccentricity first - needed for year calculations.
   // R4b: the engine's ε and e are read at the ENGINE year (true TT, Julian —

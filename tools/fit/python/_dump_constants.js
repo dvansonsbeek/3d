@@ -15,9 +15,8 @@ const output = {
   // rounded mean-tropical-year input left the model; the research scripts
   // that scan the retired 8H/n lattice carry 335,317 as a named record)
   perihelionalignmentYear: C.perihelionalignmentYear,
-  startmodelJD: C.startmodelJD,
-  startmodelYear: C.startmodelYear,
-  correctionDays: C.correctionDays,
+  startmodelJD: C.startmodelJD,     // plan 11 step 5: from astro-reference timeReference.sceneEpochJD
+  startmodelYear: C.startmodelYear, // plan 11 step 5: from astro-reference timeReference.sceneEpochYear (correctionDays is deleted)
   // (plan 11 step 2: correctionSun, eccentricityBase, earthInvPlaneInclinationMean,
   // eccentricityDerivedMean and perihelionPhaseOffset — scene-scaffold constants
   // with no reader left — are deleted; temperatureGraphMostLikely left at plan 07 R10;

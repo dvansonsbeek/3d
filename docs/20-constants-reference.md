@@ -227,10 +227,10 @@ plan 07 R8 and nothing in the model reads them.)
 
 | Constant | Variable | Value | Description |
 |----------|----------|-------|-------------|
-| Start Model JD | `startmodelJD` | <!--v:startModelJD-->2,451,716.5<!--/v--> | June Solstice 2000 00:00 UTC |
-| Start Model Year | `startmodelYear` | <!--v:startModelYear-->2000.5<!--/v--> | Decimal year of model start |
+| Start Model JD | `startmodelJD` (`astro-reference` `timeReference.sceneEpochJD` since plan 11 step 5) | <!--v:startModelJD-->2,451,716.5<!--/v--> | June Solstice 2000 00:00 UTC — the scene's time origin (pos = 0) |
+| Start Model Year | `startmodelYear` (`timeReference.sceneEpochYear`) | <!--v:startModelYear-->2000.5<!--/v--> | The epoch's year label — the age-anchor convention every deep-time read takes its t_Ma from, NOT the calendar decimal year of the JD (2000.4699) |
 | Start Angle | (`startAngleModel` — DELETED, plan 11 step 4) | was 89.91949879 deg | The inclination-path loop's angular zero (with the K inclination phase); the zero is the scene literal `INCLINATION_PATH_ZERO_DEG` in `src/script.js` |
-| Correction Days | `correctionDays` | <!--v:correctionDays-->-0.8288<!--/v--> | Correction for solstice alignment offset |
+| Correction Days | (`correctionDays` — DELETED, plan 11 step 5) | was −0.8288 | The retired scaffold Sun's fine timing; the SI-year label, the lunar and planet integrators and the perihelion calendar anchor on the epoch itself (measured: the package Moon moved 0.0006″ in era, the perihelion calendar's rounded day-0 one day) |
 | Variable Speed | (`useVariableSpeed` — hard-wired true, plan 11 step 2) | true | The equation of centre and the certified Moon override are the scene, not a toggle; the false branch was a 6.5°-of-Moon diagnostic nobody ran |
 
 ## Physical Constants
@@ -287,11 +287,11 @@ deleted the wheels.)
 | Mean Sidereal Day | `meanSiderealDay` | (meanSolarYearDays/(meanSolarYearDays+1)) × meanLengthOfDay | <!--v:meanSiderealDaySeconds-->86,164.0905329<!--/v--> s |
 | Mean Stellar Day | `meanStellarDay` | (meanSiderealDay/T_p) / (meanSolarYearDays+1) · cos ε + meanSiderealDay — T_p the J2000 precession period 1,296,000/p_A (S5 retired the counter H/13) | <!--v:meanStellarDaySeconds-->86,164.0989084<!--/v--> s |
 | Phase origin of the K-device wheels' pose | `balancedYear` | 2000 (J2000, by construction — plan 07 R10) | the former fitted origin perihelionalignmentYear − 14.5 × H/16 was rotated out of every comb coefficient exactly (the combs are deleted since, plan 09); the name stays as the scene's phase-origin variable |
-| Perihelion Alignment JD | `perihelionalignmentJD` | startmodelJD - meanSolarYearDays × (startModelYearWithCorrection - perihelionalignmentYear) | ~<!--v:periAlignJD-->2,176,154<!--/v--> |
+| Perihelion Alignment JD | `perihelionalignmentJD` | round(startmodelJD - meanSolarYearDays × (startmodelYear - perihelionalignmentYear)) — on the scene epoch itself since plan 11 step 5 (the deleted −0.83-d correction had held the rounded day-0 one day later) | ~<!--v:periAlignJD-->2,176,153<!--/v--> |
 | J2000.0 epoch JD | `j2000JD` | startmodelJD - (startmodelYear - 2000) × meanSolarYearDays | ~2451545.0 |
 | Julian century | `julianCenturyDays` | 36525 (100 × 365.25) | 36,525 days (IAU Julian century) |
 | Earth rotations/year | `meanEarthRotationsPerYear` | meanSolarYearDays + 1 | 366.2422 |
-| Start year corrected | `startModelYearWithCorrection` | startmodelYear + correctionDays / meanSolarYearDays | ~2000.4977 |
+| Start year corrected | (`startModelYearWithCorrection` — DELETED, plan 11 step 5) | was startmodelYear + correctionDays / meanSolarYearDays ≈ 2000.4977; every anchor is `startmodelYear` now (the Node export name stays as an alias for two frozen explore scripts) | — |
 | Years from the phase origin to J2000 | `yearsFromBalancedToJ2000` | (startmodelJD - balancedJD) / meanSolarYearDays | ≈ 0 since plan 07 R10 (the origin is J2000; kept as a code variable) |
 
 Input constants used in the formulas above:

@@ -35,7 +35,7 @@
  * carry it so a counterfactual is reproducible (§2d).
  * @type {string}
  */
-export const CONSTANTS_HASH = "6d8e91759c61012d";
+export const CONSTANTS_HASH = "e500952541d6f426";
 
 /** Model version label — single source: public/input/model-version.json (§10 two-axis scheme). */
 export const MODEL_VERSION = "v24.0";
@@ -45,7 +45,7 @@ export const PREPRINT_DOI = "10.21203/rs.3.rs-8758810/v4";
 
 /** @type {Readonly<Record<string, unknown>>} */
 export const DEFAULT_CONSTANTS = Object.freeze({
-  hash: "6d8e91759c61012d",
+  hash: "e500952541d6f426",
   additionalBodiesReference: {
     "pluto": {
       "solarYearInput": 90465,
@@ -169,11 +169,7 @@ export const DEFAULT_CONSTANTS = Object.freeze({
     "deltaTStart": 56.07959443353602,
     "sunTilt": 7.155
   },
-  foundational: {
-    "startmodelJD": 2451716.5,
-    "startmodelYear": 2000.5,
-    "correctionDays": -0.828832119703292
-  },
+  foundational: {},
   giaCoxChaoPeltier: {
     "dJ2DtPerYr": -2.7e-11,
     "j2ToAlphaFactor": 2
@@ -590,6 +586,8 @@ export const DEFAULT_CONSTANTS = Object.freeze({
     }
   },
   timeReference: {
+    "sceneEpochJD": 2451716.5,
+    "sceneEpochYear": 2000.5,
     "j2000JD": 2451545,
     "julianCenturyDays": 36525,
     "gregorianStartJD": 2299160.5,

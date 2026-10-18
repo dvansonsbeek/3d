@@ -715,7 +715,9 @@
     "milkywaySpeed": 2160000
   },
   "timeReference": {
-    "_description": "Calendar and epoch reference values (IAU / standard definitions). j2000JD is JD of J2000.0 (2000 Jan 1.5 TT); julianCenturyDays is the IAU Julian century (365.25 x 100 days); gregorianStartJD is the start of the Gregorian calendar (1582 Oct 15); jd1800/jd1900/jd2100 are ~Jan 1 calendar reference points used by display ranges.",
+    "_description": "Calendar and epoch reference values (IAU / standard definitions). j2000JD is JD of J2000.0 (2000 Jan 1.5 TT); julianCenturyDays is the IAU Julian century (365.25 x 100 days); gregorianStartJD is the start of the Gregorian calendar (1582 Oct 15); jd1800/jd1900/jd2100 are ~Jan 1 calendar reference points used by display ranges. sceneEpochJD / sceneEpochYear (plan 11 step 5, moved verbatim from model-parameters.json foundational.startmodelJD / startmodelYear): the scene's time origin — 2000-06-21 00:00 UTC, the day of the June 2000 solstice (pos = 0; the start view faces that solstice) — and its year label, the age-anchor year every deep-time read takes its t_Ma from ((sceneEpochYear − year)/1e6: the package model, the chain-cycle integrator, the deep calendar, both scene twins). The label 2000.5 is the model's CONVENTION, not the calendar decimal year of the JD (2000.4699): changing it is a phase offset in every deep-time law, so both doubles are kept exactly. correctionDays (−0.8288 d, the retired scaffold Sun's fine timing) left with step 5 — the SI-year label and the lunar integrators anchor on the epoch itself; measured: the package Moon moved 0.0006″ in era, 0.5″ at −100 kyr, the Sun 1e-8″.",
+    "sceneEpochJD": 2451716.5,
+    "sceneEpochYear": 2000.5,
     "j2000JD": 2451545,
     "julianCenturyDays": 36525,
     "gregorianStartJD": 2299160.5,

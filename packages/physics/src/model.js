@@ -92,9 +92,12 @@ export function assembleModel(C, F, laws = {}, secularSeriesArtifact = /** @type
   // and p_A per Julian year (year-lengths.cjs); the Meeus & Savoie 1992 input
   // 365.2421897 left the registry, the device's rounding onto 1/(H/8) before it.
   const meanSolarYearDays = computeMeanTropicalYearJ2000Days(C.yearLengthRef.siderealYear, C.earthOrbital.generalPrecessionJ2000_arcsecPerYr);
-  const startmodelYear = C.foundational.startmodelYear;
-  const startmodelJD = C.foundational.startmodelJD;
-  const startModelYearWithCorrection = startmodelYear + C.foundational.correctionDays / meanSolarYearDays;
+  // Plan 11 step 5: the scene epoch's ONE home — astro-reference
+  // timeReference.sceneEpochJD / sceneEpochYear (moved verbatim from the
+  // deleted foundational block); correctionDays is deleted, so the SI-year
+  // axis below anchors on the epoch itself.
+  const startmodelYear = C.timeReference.sceneEpochYear;
+  const startmodelJD = C.timeReference.sceneEpochJD;
   // Plan 07 R10: the correction combs measure their phase from J2000. The
   // former origin — perihelionalignmentYear − temperatureGraphMostLikely ×
   // H/16 = −302,635, the "balanced year" — was rotated out of every fitted
@@ -926,9 +929,9 @@ export function assembleModel(C, F, laws = {}, secularSeriesArtifact = /** @type
   // put the eclipse umbra twin 8 km off (§12h; ≤1 m once unified).
   const siTropicalYearDays = meanTropicalYearJ2000Seconds / 86400;
   /** Model year (SI axis) at a JD(TT). @param {number} jd @returns {number} */
-  const yearFromJD = (jd) => startModelYearWithCorrection + (jd - startmodelJD) / siTropicalYearDays;
+  const yearFromJD = (jd) => startmodelYear + (jd - startmodelJD) / siTropicalYearDays;
   /** JD(TT) at a model year (SI axis). @param {number} year @returns {number} */
-  const jdFromYear = (year) => startmodelJD + (year - startModelYearWithCorrection) * siTropicalYearDays;
+  const jdFromYear = (year) => startmodelJD + (year - startmodelYear) * siTropicalYearDays;
 
   // ── Lunar theory: the shared-chain assembly (§7a slice-2b) ────────────────
   // Wiring mirrors the engine call sites exactly — tools/lib/deep-time.js
@@ -1154,14 +1157,15 @@ export function assembleModel(C, F, laws = {}, secularSeriesArtifact = /** @type
       // evaluator). MATCHED TRIPLE with the tools-lib and browser getters:
       // identical age arithmetic — the SI-linear year (yearFromJD, never
       // the calendar year: the recorded linear-vs-calendar mirror trap)
-      // against the MODEL-START anchor (startModelYearWithCorrection, the
-      // browser's J2000_CALENDAR_YEAR — NOT this model's 2000.0 yearToTMa
-      // convention: the 0.4977-yr difference is 4.95e-11 of distance and
-      // failed the bit-exact parity gate). Falls back to the J2000
-      // constant without a jd (legacy call shape) or past the domain.
+      // against the MODEL-START anchor (startmodelYear, the browser's
+      // J2000_CALENDAR_YEAR — NOT this model's 2000.0 yearToTMa convention:
+      // the 0.5-yr difference is 4.95e-11 of distance and failed the
+      // bit-exact parity gate; plan 11 step 5 dropped the −0.83-d correction
+      // from the anchor, both twins alike). Falls back to the J2000 constant
+      // without a jd (legacy call shape) or past the domain.
       getMoonDistanceKm: /** @param {number} [jdTT] */ (jdTT) => {
         if (jdTT === undefined) return moonDistanceKm;
-        const d = moonDistanceMetresAtAge((startModelYearWithCorrection - yearFromJD(jdTT)) / 1e6);
+        const d = moonDistanceMetresAtAge((startmodelYear - yearFromJD(jdTT)) / 1e6);
         return d === null ? moonDistanceKm : d / 1000;
       },
       getEccentricityBase: () => C.moonReference.moonOrbitalEccentricityBase,

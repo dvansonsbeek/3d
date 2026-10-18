@@ -155,7 +155,7 @@ function _fwChannelIntegralTools(T, s) {
 // divides by SI_TROPICAL_YEAR_DAYS = MEAN_TROPICAL_YEAR_J2000_S/86400
 // (≈ 365.24189 — NOT the 365.2422 input constant).
 const _SI_TROP_DAYS = DT.MEAN_TROPICAL_YEAR_J2000_S / 86400;
-const _jdToSIyearTools = (jd) => C.startModelYearWithCorrection + (jd - C.startmodelJD) / _SI_TROP_DAYS;
+const _jdToSIyearTools = (jd) => C.startmodelYear + (jd - C.startmodelJD) / _SI_TROP_DAYS;   // anchored on the scene epoch itself (plan 11 step 5: the correction is deleted)
 // Chain-cycle integrator — Phase 8.2-4: lives ONCE in
 // @essrt/physics/chain-cycles. This mirror previously diverged from the
 // browser on THREE points, all closed by the shared module:
@@ -318,7 +318,7 @@ function _moonSeriesM() {
         // (SG_DEEP_TIME=0) keeps the J2000 constant — prior bit-parity.
         getMoonDistanceKm: (jdTT) => {
           if (!DEEP_TIME_ENABLED || jdTT === undefined) return C.moonDistance;
-          const d = DTmod.meanMoonDistanceMetresAtAge((C.startModelYearWithCorrection - _jdToSIyearTools(jdTT)) / 1e6);
+          const d = DTmod.meanMoonDistanceMetresAtAge((C.startmodelYear - _jdToSIyearTools(jdTT)) / 1e6);
           return d === null ? C.moonDistance : d / 1000;
         },
         getEccentricityBase: () => C.moonOrbitalEccentricity,
@@ -1139,14 +1139,14 @@ function moveModel(graph, pos) {
       // TT clock (mirrors src/script.js): the Moon-chain layers run on the
       // SAME clock as the override arguments — the earlier UT convention made
       // the ring lag the Moon by precession-rate × ΔT at deep time.
-      const _cyc = def._dtMoonIntegrator(C.startModelYearWithCorrection, _jdToSIyearTools(_jdTTToolsFromUT(_jdHere)));
+      const _cyc = def._dtMoonIntegrator(C.startmodelYear, _jdToSIyearTools(_jdTTToolsFromUT(_jdHere)));
       θ = (_cyc !== null ? _cyc : 0) * 2 * Math.PI * def._dtMoonSign - def.startPos * d2r;
     } else if (DEEP_TIME_ENABLED && def._dtPlanetIntegrator) {
       // 8.3-1 S-P2 (mirrors src/script.js Phase P-B0 dispatch): planet-chain
       // integral form, Driver 2 Kepler + mass loss, on the TT clock — the
       // same anchor/coordinate as the Moon branch above.
       const _jdHereP = _jdFromPosTools(pos);
-      const _cycP = def._dtPlanetIntegrator(C.startModelYearWithCorrection, _jdToSIyearTools(_jdTTToolsFromUT(_jdHereP)));
+      const _cycP = def._dtPlanetIntegrator(C.startmodelYear, _jdToSIyearTools(_jdTTToolsFromUT(_jdHereP)));
       θ = (_cycP !== null ? _cycP : 0) * 2 * Math.PI * def._dtPlanetSign - def.startPos * d2r;
     } else {
       θ = def.speed * pos - def.startPos * d2r;

@@ -1016,7 +1016,7 @@ function _deepCal() {
     withLatticeAlpha: _withLatticeAlpha,
     startModelJD: C.startmodelJD,
     startModelYear: C.startmodelYear,
-    startModelYearWithCorrection: C.startModelYearWithCorrection,
+    startModelYearWithCorrection: C.startmodelYear,   // plan 11 step 5: the SI-year label anchors on the epoch itself (the correction is deleted)
     siTropicalYearDays: SI_TROPICAL_YEAR_DAYS,
     yearMin: _CUMUL_INTEGRAL_YEAR_MIN,
     yearMax: _CUMUL_INTEGRAL_YEAR_MAX,
@@ -1026,9 +1026,9 @@ function _deepCal() {
 }
 
 /**
- * SI-tropical-year label for a JD, anchored at startModelYearWithCorrection —
- * NOT a calendar year (the scene's precession rotations integrate on this
- * axis; R13). One home: the deep calendar.
+ * SI-tropical-year label for a JD, anchored at the scene epoch (startmodelYear
+ * at startmodelJD; plan 11 step 5) — NOT a calendar year (the scene's lunar
+ * and planet integrators count on this axis; R13). One home: the deep calendar.
  * @param {number} jd
  * @returns {number} SI-year label
  */
