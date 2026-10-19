@@ -91,7 +91,7 @@ for (const a of spec.anchors) {
   }
 }
 
-console.log(`paleo-anchors gate — ${checks} anchors (Wells 1963 · Winter 2020 · Pannella 1972 · Williams 2000 · Mitchell-Kirscher 2023 · Wu 2024 · Patterson/Roche · Zhou 2024 · Meyers–Malinverno 2018 · Lantink 2022):`);
+console.log(`paleo-anchors gate — ${checks} anchors (Wells 1963 · Winter 2020 · Pannella 1972 · Williams 2000 · Mitchell-Kirscher 2023 · Wu 2024 · Zhou 2024 · Meyers–Malinverno 2018 · Lantink 2022 · Nanfen 2023 · the Weeli Wolli and Moodies tidalites), every row a TEST of the chain on the cited distance history (plan 12 option A):`);
 for (const l of lines) console.log(l);
 
 if (failures.length) {

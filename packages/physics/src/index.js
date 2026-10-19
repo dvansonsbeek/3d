@@ -167,7 +167,12 @@ export { PLANET_DISPLAY_NAMES } from './planets/display-names.cjs';
 // Phase 8.4 — the climate/ΔT machinery, extracted layer by layer.
 export { createDeltaTCycles } from './deltat/cycles.cjs';
 export { createDeepTimeLod } from './deltat/deep-time.cjs';
-export { createMoonRecessionHistory, createSolarChannelBudget } from './deltat/recession-history.cjs';
+// plan 12 (option A): the Earth–Moon distance history is a CITED PHYSICAL
+// INPUT (Farhat et al. 2022, the AstroGeo22 ephemeris) read as a shape on the
+// model's J2000 anchor; the fitted quartic, the rock-fitted regime spline and
+// the solar-channel budget are deleted.
+export { createMoonDistanceHistory } from './deltat/moon-distance-history.cjs';
+export { MOON_DISTANCE_ARTIFACT, MOON_DISTANCE_ARTIFACT_HASH } from './deltat/moon-distance-artifact.cjs';
 export { deltaTEspenakMeeusCanonSeconds } from './deltat/historical.cjs';
 export { evalClimateL1OrbitalPermil, laggedL1Terms, createAlphaGiaChannel } from './climate/l1-orbital.cjs';
 // Phase 8.5 — eclipse geometry (single-copy: the browser had no Node twin).

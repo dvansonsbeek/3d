@@ -64,7 +64,8 @@ const INPUT_FILES = [
   'packages/physics/src/moon/arguments.cjs',
   'packages/physics/src/deltat/deep-time.cjs',
   'packages/physics/src/deltat/cycles.cjs',
-  'packages/physics/src/deltat/recession-history.cjs',
+  'packages/physics/src/deltat/moon-distance-history.cjs',
+  'packages/physics/src/deltat/moon-distance-artifact.cjs',
   'packages/physics/src/climate/l1-orbital.cjs',
   'tools/verify/sun-vs-horizons.js',
 ];

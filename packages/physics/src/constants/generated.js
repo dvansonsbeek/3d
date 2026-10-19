@@ -36,17 +36,17 @@
  * carry it so a counterfactual is reproducible (§2d).
  * @type {string}
  */
-export const CONSTANTS_HASH = "f4f43386df2781b8";
+export const CONSTANTS_HASH = "29ace68d6effb963";
 
 /** Model version label — single source: public/input/model-version.json (§10 two-axis scheme). */
-export const MODEL_VERSION = "v25.0";
+export const MODEL_VERSION = "v26.0";
 
 /** Canonical preprint DOI — single source: public/input/model-version.json. */
 export const PREPRINT_DOI = "10.21203/rs.3.rs-8758810/v4";
 
 /** @type {Readonly<Record<string, unknown>>} */
 export const DEFAULT_CONSTANTS = Object.freeze({
-  hash: "f4f43386df2781b8",
+  hash: "29ace68d6effb963",
   additionalBodiesReference: {
     "pluto": {
       "solarYearInput": 90465,
@@ -120,36 +120,11 @@ export const DEFAULT_CONSTANTS = Object.freeze({
   },
   deepTime: {
     "alpha1PerMa": -0.000099375895103,
-    "alpha3PerMa3": -6.4186463489e-12,
-    "alpha4PerMa4": 1.3619800519e-16,
     "alphaGiaRateJ2000PerYr": -1.35e-11,
     "alphaGiaRelaxationKyr": 6,
     "j2RateJ2000PerYr": -2.7e-11,
     "dtStackTaperFullHalfwidthYr": 300000,
-    "dtStackTaperTotalHalfwidthYr": 400000,
-    "recessionRegime": {
-      "jointMa": 1000,
-      "knotAgesMa": [
-        1400,
-        1900,
-        2450,
-        3200,
-        3900
-      ],
-      "knotDistancesKm": [
-        337531.908,
-        322949.311,
-        322533.193,
-        296189.703,
-        275119.896
-      ],
-      "genesisMa": 4498,
-      "rocheLimitKm": 9439.643,
-      "solarOceanLeakBeta0": 0.2,
-      "thermalPumpStartMa": 1000,
-      "thermalPumpEndMa": 1307,
-      "thermalPumpFactor": 0.454
-    }
+    "dtStackTaperTotalHalfwidthYr": 400000
   },
   earthOrbital: {
     "j2000EpochYear": 2000,
@@ -167,7 +142,7 @@ export const DEFAULT_CONSTANTS = Object.freeze({
     "perihelionPassageJ2000_JD": 2451547.042,
     "earthInclinationJ2000_deg": 1.57869,
     "earthInclinationRate_arcsecPerCentury": -18,
-    "deltaTStart": 56.07959443353602,
+    "deltaTStart": 56.076107471835485,
     "sunTilt": 7.155
   },
   giaCoxChaoPeltier: {
@@ -726,7 +701,7 @@ export const REFERENCE_DATA = Object.freeze({
     "milkyWayPeriodMyr": 250,
     "laplaceLagrangeResidualDeg": 0.001,
     "patternEarthAgeGyr": 4.54,
-    "moonGenesisAgeGa": 4.498,
+    "moonGenesisAgeGa": 4.429,
     "wellsTidalRateHrPerMa": 0.00526,
     "wellsRecessionCmYr": 3.43,
     "modernLLRRecessionCmYr": 3.82,

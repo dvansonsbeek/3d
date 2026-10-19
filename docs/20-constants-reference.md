@@ -1,7 +1,7 @@
 ---
 docVersion: 1.0
-modelVersion: v25.0
-coefficients: sha256:91e2d041c7b6e038
+modelVersion: v26.0
+coefficients: sha256:ff77fbc9baa370e4
 status: current
 ---
 
@@ -44,7 +44,7 @@ Per the [Expanding Solar System Resonance Theory (Doc 99)](99-expanding-solar-sy
 | Planet orbital periods (Part 4 `solarYearInput`) | `meanPlanetOrbitalPeriodAtAge(t_Ma, T_p_J2000_s)` |
 | α(t) GIA correction → ΔT | `meanDeltaTSecondsAtAge(t_Ma)` |
 
-The clocks evolve under two physically independent drivers: **Driver 1** = Earth-Moon tidal evolution (LOD grows, Moon recedes; the composed lunisolar precession period T_p(t) follows it); **Driver 2** = solar mass loss (every planet's orbit slowly expands via Kepler's 3rd law). At Devonian (380 Ma) T_p ≈ <!--v:axialPrecAtDevonian-->21,699<!--/v--> yr; at +200 Myr T_p ≈ <!--v:axialPrecAt200MyrFuture-->28,208<!--/v--> yr. (The unit H(t) that scaled with it — 13.011 periods, a fit constant's multiple — left the model at plan 09 step 7b.) The K-device wheel periods are a J2000 pose and do not scale; no observable rides them.
+The clocks evolve under two physically independent drivers: **Driver 1** = Earth-Moon tidal evolution (LOD grows, Moon recedes; the composed lunisolar precession period T_p(t) follows it); **Driver 2** = solar mass loss (every planet's orbit slowly expands via Kepler's 3rd law). At Devonian (380 Ma) T_p ≈ <!--v:axialPrecAtDevonian-->21,396<!--/v--> yr; at +200 Myr T_p ≈ <!--v:axialPrecAt200MyrFuture-->28,202<!--/v--> yr. (The unit H(t) that scaled with it — 13.011 periods, a fit constant's multiple — left the model at plan 09 step 7b.) The K-device wheel periods are a J2000 pose and do not scale; no observable rides them.
 
 For the canonical derivation chain from `t_Ma` through LOD, the composed precession period, AU, M_Sun, Kepler year, Moon distance, Moon period, anomalistic year, stellar/sidereal days, and planet orbital + synodic periods, see [Doc 99 — ESSRT](99-expanding-solar-system-resonance-theory.md) and the `mean*AtAge` family in `tools/lib/deep-time.js`. (The per-planet integer-label tabulation on the anchor's eight-unit interval is archived.)
 
@@ -92,7 +92,7 @@ behind fail-proven gates. None is a free parameter:
 |---|---|---|---|
 | Precession anchor p₀ | cited input | <!--v:axialPrecExact-->25,771.58<!--/v--> yr | 1,296,000 / p_A with p_A the IAU 2006 general precession in longitude, 50.28796195 ″/yr (`generalPrecessionJ2000_arcsecPerYr`; plan 09 — before it, the retired year combs' beat at 2000, 25,771.395 yr, 8 ppm faster). The deep-time rate composes ψ̇(t) = [ω(t)/ω₀]·p₀·[f_S + (1 − f_S)(a₀/a_M(t))³] |
 | Solar torque share f_S | derived at runtime | <!--v:earthPrecSolarShareJ2000Pct-->31.6<!--/v--> % | GM☉, the lunar constants and the J2000 obliquity (`precession-composed` `computeSolarTorqueShare`) |
-| Lunar recession history | LLR-anchored + paleo-gated | `alpha1PerMa`, `alpha3PerMa3`, `alpha4PerMa4`, `recessionRegime` | the linear term is the LLR rate <!--v:modernLLRRecessionCmYr-->3.82<!--/v--> cm/yr (Dickey 1994 / Chapront 2002, cited); the deep-time terms are the Farhat 2022 LSQ fit and the regime knots fitted to 11 published anchors, all within 1.3σ (`tools/explore/fit-regime-recession.js`); the 43-anchor paleo gate fails on an unexplained improvement too |
+| Lunar recession history | CITED INPUT + the LLR slope, paleo-TESTED | `data/astrogeo22-earth-moon.json` (the shape), `alpha1PerMa` (the J2000 slope) | plan 12 option A: the Earth–Moon distance history is Farhat, Auclair-Desrotour, Boué & Laskar 2022's published solution (the AstroGeo22 ephemeris, 0–4,429 Ma), read as the ratio a(t)/a(0) on the model's observed J2000 distance; the J2000 slope is the LLR rate <!--v:modernLLRRecessionCmYr-->3.82<!--/v--> cm/yr (Dickey 1994 / Chapront 2002, cited). Nothing is fitted to the rock record: the 45-anchor paleo gate tests the derived day length, distance and precession on it, every band naming its cause (the former quartic's α₃/α₄ and the rock-fitted regime knots are deleted) |
 | GIA channel | k derived, τ measured | τ = <!--v:alphaGiaRelaxationKyr-->6<!--/v--> kyr | the polar moment's lagged response to the climate formula's L1 ice proxy: k derived at runtime from the Cox & Chao 2002 dJ₂/dt; τ measured against the historical ΔT record through the joint fitter (plan 06 D7) |
 | Oblateness of date | cited + derived | dJ₂/dt = <!--v:j2RateJ2000Per1e11Yr-->−2.7<!--/v--> ×10⁻¹¹ /yr (`j2RateJ2000PerYr`), J₂ = `earthJ2` | the OBSERVED satellite rate (Cox & Chao 2002) scales the GIA channel's second observable, J₂(t)/J₂₀ (`climate/l1-orbital` `j2RatioAt`) — the precession rate is proportional to the dynamical ellipticity, so the spin integration multiplies it into the rate of date. Stored as its own input: the precession side is anchored on the observation, independent of the J₂→α conversion of the length-of-day side |
 | Solar torque of date | derived at runtime | 1 + f_S·([(1 − e²)/(1 − e₀²)]^(−3/2) − 1) | the solar share's own (1 − e²)^(−3/2) evaluated at the one-source eccentricity of date (`earth/deep-orbital-history`); +<!--v:precOfDateSolarTorqueMeanLastMyrPct-->0.032<!--/v--> % on the million-year mean |
@@ -134,9 +134,10 @@ About → Model Identity) are the shipped `data/` fits that
 core-mantle resonator (`DT_RESONATOR`) and the climate formula
 (`CLIMATE_FORMULA_COEFFS`); beside them sit the measured osculating-mean
 offset (`EARTH_OSCULATING_MEAN_OFFSET`, derived, not fitted), the literature
-Meeus lunar term tables and the frozen balance-search record. The recession
-knots, the quartic's α₃/α₄ and the GIA τ are the banked fitted record
-`data/deep-time-fitted.json` (plan 11 step 1; the deep-time block of the
+Meeus lunar term tables and the frozen balance-search record. The GIA τ is
+the banked fitted record `data/deep-time-fitted.json` (plan 11 step 1; the
+recession knots and the quartic's α₃/α₄ left it at plan 12 option A — the
+distance history is the cited input above; the deep-time block of the
 constants is ASSEMBLED from it, from astro-reference's LLR α₁ and Cox & Chao
 block, and from the ΔT stack's own `shipped_taper` — one home per leaf, under
 the constants hash). The regime fitter in the tree no longer reproduces those

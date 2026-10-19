@@ -634,9 +634,9 @@ module.exports = {
   SOLAR_LUMINOSITY_W: astroRef.physicalConstants.solarLuminosityW,
   SOLAR_WIND_KG_PER_S: astroRef.physicalConstants.solarWindMassLossKgPerS,
   ALPHA_1: GENERATED_DEEP_TIME.alpha1PerMa,
-  ALPHA_3: GENERATED_DEEP_TIME.alpha3PerMa3,
-  ALPHA_4: GENERATED_DEEP_TIME.alpha4PerMa4,
-  RECESSION_REGIME: GENERATED_DEEP_TIME.recessionRegime,
+  // (plan 12 option A: ALPHA_3/ALPHA_4 and RECESSION_REGIME are deleted — the
+  // Earth–Moon distance history is the cited AstroGeo22 table the deep-time
+  // twin reads through @essrt/physics/deltat/moon-distance-artifact.)
   ALPHA_GIA_RATE_J2000_PER_YR: GENERATED_DEEP_TIME.alphaGiaRateJ2000PerYr,
   ALPHA_GIA_RELAXATION_KYR: GENERATED_DEEP_TIME.alphaGiaRelaxationKyr,
   J2_RATE_J2000_PER_YR: GENERATED_DEEP_TIME.j2RateJ2000PerYr,   // the OBSERVED dJ2/dt (Cox & Chao 2002) — the GIA channel's J2 scale (the precession of date)

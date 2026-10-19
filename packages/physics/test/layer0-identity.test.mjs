@@ -37,7 +37,7 @@ const DT = require(`${TOOLS_LIB}deep-time.js`);
 // lattice table) is a Phase C change and is deliberately not applied: this
 // test proves the port is faithful to today's behaviour, today's α convention
 // included.
-const L0 = createEpochPrimitives({ params: DT.EPOCH_PARAMS, alphaAtAgeMa: DT.earthMoiFactorAtAge });
+const L0 = createEpochPrimitives({ params: DT.EPOCH_PARAMS, alphaAtAgeMa: DT.earthMoiFactorAtAge, moonDistanceMetresAtAge: DT.meanMoonDistanceMetresAtAge });
 
 const AGES_MA = [-500, -100, -5, -1, -0.3025, 0, 0.3025, 1, 5, 100, 380, 500];
 
@@ -105,8 +105,6 @@ const derivedParams = deriveEpochParams({
   solarWindKgPerS: C.SOLAR_WIND_KG_PER_S,
   speedOfLightKmPerS: C.speedOfLight,
   alpha1PerMa: C.ALPHA_1,
-  alpha3PerMa3: C.ALPHA_3,
-  alpha4PerMa4: C.ALPHA_4,
   meanSiderealYearSeconds: C.meanSiderealYearSeconds,
   lodJ2000Seconds: C.meanLengthOfDay,   // plan 09: ω₀ = the SI day
   sunMassKg: C.M_SUN,

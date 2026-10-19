@@ -323,6 +323,18 @@ would silently churn a structural claim for a rounding-level gain.
   came from an uncommitted same-day run, and its inputs had moved by parts per
   billion. A fit's commit must carry the fitter, its seed and its bounds that
   produced it (the matched pair includes the instrument). Plan 12 step 1.
+- **A generator stopped between its two writes leaves a VALID-LOOKING
+  artifact the freshness gate cannot see.** (plan 12 option A, measured)
+  `nbody-secular.js --write` writes the CORE artifact first (the periodic-term
+  pipeline bootstraps from it) and the `periodicTerms` layer second, ~25 min
+  later; stopped between the two, `data/nbody-secular-frequencies.json` carried
+  a fresh inputs block and no periodic layer — `check:artifacts` PASSED, the
+  cascade regenerated secular-series, the constants embed, both eclipse records
+  (REBASELINED on it), the fixtures and the registry on the truncated chain,
+  and only the API gate's Mars ϖ(−3000) pin (313.23 → 312.92) caught it. After
+  stopping ANY generator, diff the artifact's KEYS against HEAD before running
+  a cascade; and never stop a generator to save a pass — generate the
+  constants LAST and run the cascade ONCE instead.
 - **"Placed by the engine every frame" does not cover what was aligned ONCE
   at init.** Plan 11 step 4 deleted the scene scaffold's pose on the claim
   that every frame of date is engine-placed — true for every per-frame
@@ -602,7 +614,13 @@ calibrated on it.
 pre-registered legs: (1) **the deep-time scaling split** — the axial
 precession must follow the COMPOSED lunisolar rate
 ψ̇(t) = [ω(t)/ω₀]·p₀·[f_S + (1 − f_S)(a₀/a_M(t))³] (spin from the recession
-history, the lunar torque growing on the Moon's distance; ONE home
+history, the lunar torque growing on the Moon's distance; since plan 12
+option A the distance history a_M(t) is a CITED INPUT — Farhat et al. 2022's
+published solution, `data/astrogeo22-earth-moon.json`, read as a shape on the
+observed J2000 distance with the LLR rate as its J2000 slope — so the leg
+tests the model's physics on it and nothing in the chain is fitted to the
+rocks; the quartic's α₃/α₄, the rock-fitted regime knots, the solar
+channels and the Roche-crossing "self-validation" are DELETED; ONE home
 `@essrt/physics/earth/precession-composed`; its J2000 anchor p₀ is the
 model's ONE J2000 precession reading — since plan 09 the IAU 2006 general
 precession p_A = 50.28796195 ″/yr, an INPUT (astro-reference
@@ -653,8 +671,10 @@ GATED at 1.4 and 2.46 Ga — paleo-anchors rows `xiamaling-prec-1400` /
 PERIOD is the pre-registered, not-yet-discriminated prediction), and a
 section violating any half falsifies the corresponding tier. (2) **Historical-era exactness** — the fail-proven gate
 suite: eclipses (`eclipse-audit`), the LOD/ΔT stack, cardinal points, the
-43-anchor paleo bands (`paleo-anchors`, where an unexplained *improvement*
-fails too). (3) **Two-expansions μ-consistency** — the rock-measured
+45-anchor paleo bands (`paleo-anchors`, where an unexplained *improvement*
+fails too — every row a test on the cited history; the documented bands name
+their cause, the Mesoproterozoic 2.5–3.6σ gap to Zhou 2024's precession
+constants being the stated open discrepancy). (3) **Two-expansions μ-consistency** — the rock-measured
 long-eccentricity period must track 405.6 kyr / μ^1.153 (the engine-measured
 beat response, W5; 1/μ is the first-order case) under the measured solar
 mass history (currently μ(2.48 Ga) = 1.00 ± 0.07, quoted through the
@@ -690,7 +710,8 @@ what actually made corrections stick here.
 | `tools/verify/` | the gates and the artifact generators — every script fails or writes (`npm run test:verify:list` for the counts; `npm run regen:cascade` for the stale set in order) |
 | `packages/physics`, `packages/model-values` | the published npm packages (@essrt scope) — the website and world consume these; refits reach them via `values:package:write` + republish |
 | `tools/explore/` | frozen research one-offs (and the print-only scripts that left `tools/verify/`) — findings live in `docs/`; a script stays only while something names it (its README states the rule) |
-| `data/deltaT-4flag-fit.json`, `data/core-mantle-resonator-stage1.json`, `public/input/climate-formula-coefficients.json`, `data/deep-time-fitted.json` | the shipped fitted artifacts, each its fitter's (the last a banked frozen record) — embedded by `generate.mjs`; `public/input/fitted-coefficients.json` is deleted (plan 11 step 1) |
+| `data/deltaT-4flag-fit.json`, `data/core-mantle-resonator-stage1.json`, `public/input/climate-formula-coefficients.json`, `data/deep-time-fitted.json` | the shipped fitted artifacts, each its fitter's (the last holds the GIA τ only since plan 12 — the quartic's α₃/α₄ and the regime block left with option A) — embedded by `generate.mjs`; `public/input/fitted-coefficients.json` is deleted (plan 11 step 1) |
+| `data/astrogeo22-earth-moon.json` | the CITED Earth–Moon distance history (Farhat et al. 2022, AstroGeo22; `npm run import:astrogeo22`) — embedded as `deltat/moon-distance-artifact.cjs`, read by `deltat/moon-distance-history.cjs` (plan 12 option A) |
 | `docs/` | 75 numbered docs; `40-architecture`, `99-essrt` are cross-referenced |
 
 The simulator at 3d.holisticuniverse.com auto-deploys from every green main

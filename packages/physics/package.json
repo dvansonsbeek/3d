@@ -1,9 +1,9 @@
 {
   "name": "@essrt/physics",
-  "version": "22.1.0",
+  "version": "23.0.0",
   "description": "ESSRT (Expanding Solar System Resonance Theory) physics core — pure, injectable-constants, no I/O, no globals, no DOM. The complete model incl. fitted coefficients; every published version immutably ships one recorded model identity.",
   "essrt": {
-    "modelVersion": "v25.0",
+    "modelVersion": "v26.0",
     "_note": "The model identity this package version ships (IP-unified-architecture §10: package semver tracks the API axis; the model version + CONSTANTS_HASH/COEFFICIENTS_HASH in src/constants/ carry the scientific identity). The version-pinning gate enforces this pairing against public/input/model-version.json."
   },
   "type": "module",
@@ -58,7 +58,8 @@
     "./deltat/cycles": { "types": "./types/deltat/cycles.d.cts", "default": "./src/deltat/cycles.cjs" },
     "./deltat/deep-time": { "types": "./types/deltat/deep-time.d.cts", "default": "./src/deltat/deep-time.cjs" },
     "./deltat/historical": { "types": "./types/deltat/historical.d.cts", "default": "./src/deltat/historical.cjs" },
-    "./deltat/recession-history": { "types": "./types/deltat/recession-history.d.cts", "default": "./src/deltat/recession-history.cjs" },
+    "./deltat/moon-distance-history": { "types": "./types/deltat/moon-distance-history.d.cts", "default": "./src/deltat/moon-distance-history.cjs" },
+    "./deltat/moon-distance-artifact": { "types": "./types/deltat/moon-distance-artifact.d.cts", "default": "./src/deltat/moon-distance-artifact.cjs" },
     "./climate/l1-orbital": { "types": "./types/climate/l1-orbital.d.cts", "default": "./src/climate/l1-orbital.cjs" },
     "./eclipse/finders": { "types": "./types/eclipse/finders.d.cts", "default": "./src/eclipse/finders.cjs" },
     "./eclipse/sun-planetary-completion": { "types": "./types/eclipse/sun-planetary-completion.d.cts", "default": "./src/eclipse/sun-planetary-completion.cjs" }

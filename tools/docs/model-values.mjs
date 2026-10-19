@@ -3018,9 +3018,10 @@ export const VALUES = {
 
   // ── Deep-time epoch tables + tidal-lock + Driver-2 scalars (11-2ao) ─────
   // Everything runs LIVE through the deep-time engine at the named epochs:
-  // Devonian t = 380 Ma, Hadean t = the moon-genesis age (rigid-Roche
-  // crossing, 4498 Ma — the epochs derive from the recorded age), future
-  // t = −200 Ma. Moon distances use the RAW Farhat recession polynomial
+  // Devonian t = 380 Ma, Hadean t = the moon-genesis age (the END of the cited
+  // distance history, 4429 Ma — plan 12 option A; it was the deleted quartic's
+  // Roche crossing, 4498 — the epochs derive from the recorded age), future
+  // t = −200 Ma. Moon distances use the cited history's mean distance
   // (the site convention — the solar-Δa corrected engine value differs by
   // ~300 km). Lock-state values derive from the angular-momentum asymptote
   // (Kepler at a_lock gives the 47-day mutual day; days/year uses the
@@ -3029,10 +3030,9 @@ export const VALUES = {
   // 422 — fixed site-side).
   ...(() => {
     const P = () => dtl().EPOCH_PARAMS;
-    const rawMoonKm = (tMa) => {
-      const p = P();
-      return p.moonDistanceNowM * (1 + p.alpha1PerMa * tMa + p.alpha3PerMa3 * tMa ** 3 + p.alpha4PerMa4 * tMa ** 4) / 1000;
-    };
+    // plan 12 option A: the raw distance is the engine's cited history (the
+    // AstroGeo22 shape on the J2000 anchor), not a polynomial copy of it.
+    const rawMoonKm = (tMa) => dtl().meanMoonDistanceAtAge(tMa);
     const genesisMa = () => astro.knownValues.moonGenesisAgeGa * 1000;
     // (Plan 09 step 7a: the `driftAt*Ppm` keys — the day-count near-invariant
     // U × days/yr on the ERA-CLOCK COUNTER U = U₀·LOD/LOD₀, measured −74 ppm at
@@ -3056,7 +3056,7 @@ export const VALUES = {
       modernLLRRecessionCmYr: { get: () => astro.knownValues.modernLLRRecessionCmYr, render: (v) => String(v), unit: 'cm/yr', note: 'the framework α₁ anchor' },
       ageFromLinearRate: { get: () => 24 / astro.knownValues.wellsTidalRateHrPerMa / 1000, render: (v) => Number(v).toFixed(2), unit: 'Gyr', note: 'derived: 24 hr ÷ the Wells rate' },
       patternEarthAgeGyr: { get: () => astro.knownValues.patternEarthAgeGyr, render: (v) => String(v), unit: 'Gyr', note: 'Patterson 1956 citation' },
-      moonGenesisAgeGa: { get: () => astro.knownValues.moonGenesisAgeGa, render: (v) => String(v), unit: 'Ga', note: 'rigid-Roche crossing of the recession polynomial' },
+      moonGenesisAgeGa: { get: () => astro.knownValues.moonGenesisAgeGa, render: (v) => String(v), unit: 'Ga', note: 'the end of the cited Earth–Moon distance history (Farhat et al. 2022, AstroGeo22; lunar age 4.425 Ga) — plan 12 option A; the former rigid-Roche crossing of the deleted recession polynomial (4.498) was a construction' },
       solarMassLossFracPerYr: { get: () => P().solarMassLossFracPerYear, render: (v) => fmtSci(v, 1), unit: '/yr' },
       solarSystemShrinkDevonianPpm: { get: () => P().solarMassLossFracPerYear * 380e6 * 1e6, render: (v) => String(Math.round(v)), unit: 'ppm' },
       solarSystemShrinkHadeanPpm: { get: () => P().solarMassLossFracPerYear * astro.knownValues.patternEarthAgeGyr * 1e9 * 1e6, render: (v) => String(Math.round(v)), unit: 'ppm' },

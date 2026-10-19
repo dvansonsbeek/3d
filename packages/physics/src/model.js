@@ -28,7 +28,8 @@ import { createPlanetSpinChannelFromArtifacts, computeObliquityJ2000Deg } from '
 import { PLANET_DISPLAY_NAMES } from './planets/display-names.cjs';
 import { createDeltaTCycles } from './deltat/cycles.cjs';
 import { createDeepTimeLod } from './deltat/deep-time.cjs';
-import { createMoonRecessionHistory, createSolarChannelBudget } from './deltat/recession-history.cjs';
+import { createMoonDistanceHistory } from './deltat/moon-distance-history.cjs';
+import { MOON_DISTANCE_ARTIFACT } from './deltat/moon-distance-artifact.cjs';
 import { evalClimateL1OrbitalPermil, createAlphaGiaChannel } from './climate/l1-orbital.cjs';
 import { createDeepEccChannel } from './moon/deep-ecc-channel.cjs';
 import { DEEP_MODES_ARTIFACT } from './moon/deep-modes-artifact.cjs';
@@ -197,8 +198,6 @@ export function assembleModel(C, F, laws = {}, secularSeriesArtifact = /** @type
     solarWindKgPerS: C.physicalConstants.solarWindMassLossKgPerS,
     speedOfLightKmPerS: C.physicalConstants.speedOfLight,
     alpha1PerMa: C.deepTime.alpha1PerMa,
-    alpha3PerMa3: C.deepTime.alpha3PerMa3,
-    alpha4PerMa4: C.deepTime.alpha4PerMa4,
     meanSiderealYearSeconds,
     lodJ2000Seconds: meanLengthOfDay,   // plan 09: ω₀ = the SI day (was the H/13 kinematic day)
     sunMassKg: M_SUN,
@@ -219,38 +218,22 @@ export function assembleModel(C, F, laws = {}, secularSeriesArtifact = /** @type
     axialPrecessionJ2000Years: certifiedAxialPrecessionJ2000Years(),
   });
 
-  // ── Driver 1½: regime-aware recession history + the solar channels ────────
-  // The quartic stays bit-identical ≤ jointMa (the Wells/Wu-gated era);
-  // beyond, the fitted staircase spline to the Roche crossing, and the
-  // ocean-leak/thermal-pump channels make L_EM time-dependent.
-  const REGIME = C.deepTime.recessionRegime;
-  const recession = createMoonRecessionHistory({
+  // ── The Earth–Moon distance history — a CITED PHYSICAL INPUT (plan 12, option A)
+  // Farhat et al. 2022 (the AstroGeo22 ephemeris, embedded VERBATIM by the
+  // constants generator) read as the ratio a(t)/a(0) on the model's own J2000
+  // anchor, the J2000 slope the LLR observation α₁; null beyond its span. LOD
+  // follows by angular-momentum conservation with the J2000 L_EM constant —
+  // the former quartic, regime spline and solar-channel budget are deleted.
+  const recession = createMoonDistanceHistory({
+    table: MOON_DISTANCE_ARTIFACT,
     aMoonNowMetres: EPOCH_PARAMS.moonDistanceNowM,
     alpha1PerMa: EPOCH_PARAMS.alpha1PerMa,
-    alpha3PerMa3: EPOCH_PARAMS.alpha3PerMa3,
-    alpha4PerMa4: EPOCH_PARAMS.alpha4PerMa4,
-    regime: {
-      jointMa: REGIME.jointMa,
-      knotAgesMa: REGIME.knotAgesMa,
-      knotDistancesKm: REGIME.knotDistancesKm,
-      genesisMa: REGIME.genesisMa,
-      rocheLimitKm: REGIME.rocheLimitKm,
-    },
   });
   const moonDistanceMetresAtAge = recession.distanceMetresAtAge;
-  const solarBudget = createSolarChannelBudget({
-    lTotalJ2000KgM2S: EPOCH_PARAMS.totalAngularMomentumKgM2S,
-    mMoonAloneKg: EPOCH_PARAMS.moonMassKg,
-    gmEmM3PerS2: EPOCH_PARAMS.gmEarthMoonM3S2,
-    eFactorMoon: EPOCH_PARAMS.moonEccentricityFactor,
-    beta0: REGIME.solarOceanLeakBeta0,
-    pumpStartMa: REGIME.thermalPumpStartMa,
-    pumpEndMa: REGIME.thermalPumpEndMa,
-    pumpFactor: REGIME.thermalPumpFactor,
-    jointMa: REGIME.jointMa,
-    genesisMa: REGIME.genesisMa,
-    distanceMetresAtAge: moonDistanceMetresAtAge,
-  });
+  /** The published surfaces' km reading — NaN beyond the cited history's span (the API's
+   *  validity span lies inside it; the deep charts stop where the input stops).
+   *  @param {number} year @returns {number} */
+  const moonDistanceKmAtYearOrNaN = (year) => { const m = moonDistanceMetresAtAge(yearToTMa(year)); return m === null ? NaN : m / 1000; };
 
   const DT = F.DT_STACK;
   const RES = F.DT_RESONATOR;
@@ -343,8 +326,6 @@ export function assembleModel(C, F, laws = {}, secularSeriesArtifact = /** @type
       aLockMetres: EPOCH_PARAMS.moonLockDistanceM,
       aMoonNowMetres: EPOCH_PARAMS.moonDistanceNowM,
       alpha1PerMa: EPOCH_PARAMS.alpha1PerMa,
-      alpha3PerMa3: EPOCH_PARAMS.alpha3PerMa3,
-      alpha4PerMa4: EPOCH_PARAMS.alpha4PerMa4,
       lodNowH13Seconds: EPOCH_PARAMS.lodNowH13Seconds,
       meanSiderealYearJ2000Seconds: meanSiderealYearSeconds,
       solarMassLossFracPerYear: EPOCH_PARAMS.solarMassLossFracPerYear,
@@ -361,7 +342,9 @@ export function assembleModel(C, F, laws = {}, secularSeriesArtifact = /** @type
     cycleLodSumAt: dtCycleLodCorrectionSum,
     swingLodAt: (year) => dtCycles.swingLodSecondsAt(year),
     swingLodRateAt: (year) => dtCycles.swingLodRateAt(year),
-    lEmAtAgeKgm2S: solarBudget.lEmAtAgeKgm2S,
+    // plan 12 option A: L_EM is the J2000 constant (conservation; no channels);
+    // the LOD-rate decomposition's tidal term reads the history's analytic slope.
+    moonDistanceSlopeMetresPerMaAtAge: recession.slopeMetresPerMaAtAge,
   });
 
   // (Plan 09 step 7a: the integrated ∫dt/H_era phase table and its counter
@@ -690,8 +673,9 @@ export function assembleModel(C, F, laws = {}, secularSeriesArtifact = /** @type
   const moonSiderealMonthDaysAt = (year) => {
     const tMa = yearToTMa(year);
     const lod = deepLod.lodSecondsAtAge(tMa);
-    if (lod === null) return NaN;
-    const aAppKm = moonDistanceMetresAtAge(tMa) / 1000;
+    const aAppM = moonDistanceMetresAtAge(tMa);
+    if (lod === null || aAppM === null) return NaN;
+    const aAppKm = aAppM / 1000;
     const sidYrDays = deepLod.siderealYearSecondsAtAge(tMa) / lod;
     const deltaA = aAppKm * (1 / (MASS_RATIO_EARTH_MOON + 1)) * (moonSiderealMonthInput / sidYrDays);
     const aCorrM = (aAppKm + deltaA) * 1000;
@@ -977,9 +961,6 @@ export function assembleModel(C, F, laws = {}, secularSeriesArtifact = /** @type
   const moonChain = createMoonMonthChain({
     constants: {
       aMoonNowMetres: EPOCH_PARAMS.moonDistanceNowM,
-      alpha1PerMa: EPOCH_PARAMS.alpha1PerMa,
-      alpha3PerMa3: EPOCH_PARAMS.alpha3PerMa3,
-      alpha4PerMa4: EPOCH_PARAMS.alpha4PerMa4,
       gmEarthMoonM3PerS2: EPOCH_PARAMS.gmEarthMoonM3S2,
       massRatioEarthMoon: MASS_RATIO_EARTH_MOON,
       moonSiderealMonthInputDays: moonSiderealMonthInput,
@@ -1572,7 +1553,7 @@ export function assembleModel(C, F, laws = {}, secularSeriesArtifact = /** @type
       // + the calibrated ΔT cycle stack. 86,400.001780 s at J2000.
       lodRealSecondsAtYear: /** @param {number} year @returns {number} */ (year) => lodRealSeconds(year),
       alphaAtYear: /** @param {number} year @returns {number} */ (year) => earthMoiFactorAtAge(yearToTMa(year)),
-      moonDistanceKmAtYear: /** @param {number} year @returns {number} */ (year) => moonDistanceMetresAtAge(yearToTMa(year)) / 1000,
+      moonDistanceKmAtYear: /** @param {number} year @returns {number} */ (year) => moonDistanceKmAtYearOrNaN(year),
       // D6: OF-DATE — mass-loss law / the banked planetary λ̇ ratio
       // (identical at J2000 where the ratio ≡ 1 by construction)
       siderealYearSecondsAtYear: /** @param {number} year @returns {number} */ (year) => yearLengthsM.siderealYearSecondsAtYear(year),
@@ -1750,7 +1731,7 @@ export function assembleModel(C, F, laws = {}, secularSeriesArtifact = /** @type
     // the single surface the panel, charts, API and website consume.
     yearLengths: yearLengthsM,
     moon: Object.freeze({
-      distanceKmAtYear: /** @param {number} year @returns {number} */ (year) => moonDistanceMetresAtAge(yearToTMa(year)) / 1000,
+      distanceKmAtYear: /** @param {number} year @returns {number} */ (year) => moonDistanceKmAtYearOrNaN(year),
       siderealMonthDaysAtYear: moonSiderealMonthDaysAt,
       synodicMonthDays: moonSynodicMonthDays,
       // The apparent-position chain (truncated Meeus Ch. 47 series on
@@ -1784,7 +1765,7 @@ export function assembleModel(C, F, laws = {}, secularSeriesArtifact = /** @type
       // construction sites (tools/verify/eclipse-audit.js, the browser
       // _eclipse twins) spread the SAME assembly into their own
       // createEclipseFinders call instead of triplicating it (the
-      // three-runtimes rule — cf. recession-history):
+      // three-runtimes rule — cf. moon-distance-history):
       frameworkSunDeps: Object.freeze({
         sunMeanLongitudeJ2000Deg: sunL0Deg,
         tropicalRateDegPerCy: sunTropicalRateDegPerCy,

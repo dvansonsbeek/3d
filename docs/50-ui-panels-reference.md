@@ -1,7 +1,7 @@
 ---
 docVersion: 1.0
-modelVersion: v25.0
-coefficients: sha256:91e2d041c7b6e038
+modelVersion: v26.0
+coefficients: sha256:ff77fbc9baa370e4
 status: current
 ---
 
@@ -507,8 +507,8 @@ Modal that visualizes the **Expanding Solar System Resonance Theory (ESSRT)** �
 
 | Feature | Description |
 |---------|-------------|
-| **Quantity tabs (gold, 6)** | Axial Precession (the composed lunisolar period), Obliquity period (the beat), Length of Day, Length of Year, AU Distance, Moon Distance — all derived from the regime-aware recession history + angular-momentum conservation + Driver 2 solar mass loss |
-| **Range tabs (teal, 2)** | Full deep-time (genesis −4.498 Gyr → +1 Gyr) and Phanerozoic 650 Ma |
+| **Quantity tabs (gold, 6)** | Axial Precession (the composed lunisolar period), Obliquity period (the beat), Length of Day, Length of Year, AU Distance, Moon Distance — all derived from the cited Earth–Moon distance history (Farhat 2022, AstroGeo22) + angular-momentum conservation + Driver 2 solar mass loss |
+| **Range tabs (teal, 2)** | Full deep-time (genesis −4.429 Gyr, the history's end → +1 Gyr) and Phanerozoic 650 Ma |
 | **Hover tooltip** | Year and value at any point on the chart, with snap-to-nearest-sample |
 | **Export button** | One "Export" — renders the quantity and range tab on screen as the standard export page (title, legend row, the plot with its axes, the credit) in the chart-export modal: Download PNG / Download SVG / Share / Copy |
 | **Validation references** | Curves pass through anchored data points from cyclostratigraphy (Wu 2024, Boulila 2018), tidal-rhythmite measurements (Williams 2000), Devonian coral growth bands (Wells 1963), and the Patterson 1956 Pb-Pb age constraint |

@@ -193,11 +193,11 @@ const MIGRATED = [
   // fitted leaves are the banked record data/deep-time-fitted.json, walked
   // below as `fitted.*`; the taper rides data/deltaT-4flag-fit.json
   // shipped_taper, the GIA rates derive from astro.giaCoxChaoPeltier.)
-  // Driver 1½ (2026-08) — the regime-aware recession block, consumed whole
-  // via `K.deepTime.recessionRegime` (script.js _recessionHistory/_solarBudget
-  // → @essrt/physics/deltat/recession-history). Prefix: every leaf under the
-  // banked record is imported through the assembled block, none exists as a
-  // literal.
+  // (plan 12 option A: the regime block and the quartic's α₃/α₄ left the banked
+  // record — the distance history is the cited AstroGeo22 table, embedded as
+  // deltat/moon-distance-artifact.cjs; the record keeps the GIA τ.) Prefix:
+  // every leaf under the banked record is imported through the assembled
+  // block, none exists as a literal.
   'fitted',
   'astro.earthOrbital.earthEccentricityJ2000',
   'astro.earthOrbital.earthEccentricityDotJ2000',

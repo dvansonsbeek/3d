@@ -232,10 +232,11 @@ const readData = (f) => JSON.parse(readFileSync(join(ROOT, 'data', f), 'utf8'));
  *   alphaGiaRateJ2000PerYr   = dJ2DtPerYr / j2ToAlphaFactor (exact in binary —
  *                            the factor is 2; the channel's coupling k is derived
  *                            from this rate at runtime)
- *   alpha3PerMa3, alpha4PerMa4, alphaGiaRelaxationKyr, recessionRegime
- *                            data/deep-time-fitted.json — the banked FITTED
- *                            record (no live fitter reproduces them; a refit
- *                            is a campaign under the paleo-anchors gate)
+ *   alphaGiaRelaxationKyr    data/deep-time-fitted.json — the one banked
+ *                            GIA relaxation constant (plan 12 option A deleted
+ *                            the quartic α₃/α₄ and the regime block: the Moon
+ *                            distance history is the cited AstroGeo22 input,
+ *                            moon-distance-artifact.cjs)
  *   dtStackTaper*HalfwidthYr data/deltaT-4flag-fit.json shipped_taper — the
  *                            ΔT stack's application window rides the stack's
  *                            own artifact (its fitter writes it)
@@ -250,21 +251,73 @@ function assembleDeepTime(astro) {
   const need = (ok, what) => { if (!ok) throw new Error(`assembleDeepTime: ${what}`); };
   need(typeof astro.moonReference?.moonRecessionAlpha1PerMa === 'number', 'astro-reference moonReference.moonRecessionAlpha1PerMa is missing');
   need(typeof gia?.dJ2DtPerYr === 'number' && typeof gia?.j2ToAlphaFactor === 'number', 'astro-reference giaCoxChaoPeltier is incomplete');
-  for (const k of ['alpha3PerMa3', 'alpha4PerMa4', 'alphaGiaRelaxationKyr']) need(typeof fitted[k] === 'number', `data/deep-time-fitted.json ${k} is missing`);
-  need(fitted.recessionRegime && typeof fitted.recessionRegime === 'object', 'data/deep-time-fitted.json recessionRegime is missing');
+  need(typeof fitted.alphaGiaRelaxationKyr === 'number', 'data/deep-time-fitted.json alphaGiaRelaxationKyr is missing');
   need(dtFit.shipped_taper && typeof dtFit.shipped_taper.full_halfwidth_yr === 'number' && typeof dtFit.shipped_taper.total_halfwidth_yr === 'number',
     'data/deltaT-4flag-fit.json carries no shipped_taper — re-run the Step-7c fitter (DT_CORRECTIONS_DISABLED=1 node tools/fit/dt-corrections-fit.js --joint --write)');
   return {
     alpha1PerMa: astro.moonReference.moonRecessionAlpha1PerMa,
-    alpha3PerMa3: fitted.alpha3PerMa3,
-    alpha4PerMa4: fitted.alpha4PerMa4,
     alphaGiaRateJ2000PerYr: gia.dJ2DtPerYr / gia.j2ToAlphaFactor,
     alphaGiaRelaxationKyr: fitted.alphaGiaRelaxationKyr,
     j2RateJ2000PerYr: gia.dJ2DtPerYr,
     dtStackTaperFullHalfwidthYr: dtFit.shipped_taper.full_halfwidth_yr,
     dtStackTaperTotalHalfwidthYr: dtFit.shipped_taper.total_halfwidth_yr,
-    recessionRegime: strip(fitted.recessionRegime),
   };
+}
+
+// ── The Earth–Moon distance history — a CITED PHYSICAL INPUT (plan 12, option A) ──
+// Source: data/astrogeo22-earth-moon.json — Farhat, Auclair-Desrotour, Boué &
+// Laskar 2022 (A&A 665, L1), the AstroGeo22 ephemeris, imported VERBATIM by
+// tools/pipeline/import-astrogeo22.js (governed: inputs block + PROVENANCE).
+// Embedded here so the package, the browser and the Node twin read ONE table
+// (deltat/moon-distance-history reads the distance column as the ratio
+// a(t)/a(0) on the model's own J2000 anchor). Same two-gate guard as the chain
+// artifact: check:artifacts pins artifact ↔ source, this module's staleness
+// check pins embed ↔ artifact. Only the distance columns are embedded; the
+// solution's LOD/obliquity/precession columns stay in the data file as the
+// cross-check they are.
+const MOON_DISTANCE_PATH = join(ROOT, 'data/astrogeo22-earth-moon.json');
+const OUT_MOON_DISTANCE = join(ROOT, 'packages/physics/src/deltat/moon-distance-artifact.cjs');
+
+function buildMoonDistanceArtifact() {
+  const raw = readFileSync(MOON_DISTANCE_PATH, 'utf8');
+  const art = JSON.parse(raw);
+  const c = art.columns;
+  const payload = {
+    source: { citation: art.source.citation, doi: art.source.doi, distributor: art.source.distributor, fileSha256: art.source.fileSha256 },
+    earthRadiusKm: art.earthRadiusKm,
+    ageStepMa: art.ageStepMa,
+    spanMa: art.spanMa,
+    ageMa: c.ageMa,
+    aEarthRadii: c.aEarthRadii,
+    aMinEarthRadii: c.aMinEarthRadii,
+    aMaxEarthRadii: c.aMaxEarthRadii,
+  };
+  const hash = createHash('sha256').update(raw).digest('hex').slice(0, 16);
+  return { hash, payload };
+}
+
+function emitMoonDistanceArtifact({ hash, payload }) {
+  return `/**
+ * GENERATED — do not edit. Regenerate:
+ *   node tools/constants/generate.mjs --write
+ *
+ * Source: data/astrogeo22-earth-moon.json — the AstroGeo22 lunar ephemeris
+ * (Farhat, Auclair-Desrotour, Boué & Laskar 2022, A&A 665, L1), the model's
+ * CITED Earth–Moon distance history (plan 12 option A): age 0 → ${payload.spanMa} Ma at
+ * ${payload.ageStepMa} Myr, the semi-major axis in Earth radii (R⊕ = ${payload.earthRadiusKm} km)
+ * with its uncertainty interval, VERBATIM. deltat/moon-distance-history reads
+ * it as the ratio a(t)/a(0) on the model's own J2000 anchor. Two gates guard
+ * the chain: check:artifacts pins artifact ↔ source file, generate.mjs check
+ * mode pins this embed ↔ artifact. CJS for the .cjs deep-time consumers.
+ */
+'use strict';
+
+const MOON_DISTANCE_ARTIFACT_HASH = ${JSON.stringify(hash)};
+
+const MOON_DISTANCE_ARTIFACT = Object.freeze(${JSON.stringify(payload)});
+
+module.exports = { MOON_DISTANCE_ARTIFACT, MOON_DISTANCE_ARTIFACT_HASH };
+`;
 }
 
 /** Walk a block, dropping `_`-prefixed documentation keys. */
@@ -834,6 +887,8 @@ const siderealChan = buildSiderealChannel();
 const siderealJs = emitSiderealChannel(siderealChan);
 const sunCompletion = buildSunCompletionArtifact();
 const sunCompletionJs = emitSunCompletionArtifact(sunCompletion);
+const moonDistance = buildMoonDistanceArtifact();
+const moonDistanceJs = emitMoonDistanceArtifact(moonDistance);
 
 if (write) {
   mkdirSync(dirname(OUT_JS), { recursive: true });
@@ -845,6 +900,8 @@ if (write) {
   writeFileSync(OUT_DEEP_MODES, deepJs);
   writeFileSync(OUT_SIDEREAL, siderealJs);
   writeFileSync(OUT_SUN_COMPLETION, sunCompletionJs);
+  writeFileSync(OUT_MOON_DISTANCE, moonDistanceJs);
+  console.log(`  moon-distance     ${moonDistance.hash}  (AstroGeo22 cited history, ${moonDistance.payload.ageMa.length} samples @ ${moonDistance.payload.ageStepMa} Myr)`);
   console.log(`generated ${countLeaves(result.included)} values in ${Object.keys(result.included).length} blocks`);
   console.log(`  constants hash    ${result.hash}`);
   console.log(`  coefficients hash ${coeffs.hash}  (${Object.keys(coeffs.out).length} arrays, full precision)`);
@@ -865,6 +922,7 @@ let currentChain = null;
 let currentDeep = null;
 let currentSidereal = null;
 let currentSunCompletion = null;
+let currentMoonDistance = null;
 try {
   current = readFileSync(OUT_JS, 'utf8');
   currentDts = readFileSync(OUT_DTS, 'utf8');
@@ -874,6 +932,7 @@ try {
   currentDeep = readFileSync(OUT_DEEP_MODES, 'utf8');
   currentSidereal = readFileSync(OUT_SIDEREAL, 'utf8');
   currentSunCompletion = readFileSync(OUT_SUN_COMPLETION, 'utf8');
+  currentMoonDistance = readFileSync(OUT_MOON_DISTANCE, 'utf8');
 } catch { /* handled below */ }
 
 console.log('GENERATED CONSTANTS — check');
@@ -882,11 +941,11 @@ console.log(`  ${countLeaves(result.included)} values · ${Object.keys(result.in
 console.log(`  excluded (never injectable): ${Object.keys(result.excluded).join(', ')}`);
 console.log(`  coefficients: ${Object.keys(coeffs.out).length} arrays · hash ${coeffs.hash}`);
 
-if (current === null || currentCoeffs === null || currentCoeffsDts === null || currentChain === null || currentDeep === null || currentSidereal === null || currentSunCompletion === null) {
+if (current === null || currentCoeffs === null || currentCoeffsDts === null || currentChain === null || currentDeep === null || currentSidereal === null || currentSunCompletion === null || currentMoonDistance === null) {
   console.log('\nFAIL — a generated module is missing. Run with --write.');
   process.exit(1);
 }
-if (current !== js || currentDts !== dts || currentCoeffs !== coeffJs || currentCoeffsDts !== coeffDts || currentChain !== chainJs || currentDeep !== deepJs || currentSidereal !== siderealJs || currentSunCompletion !== sunCompletionJs) {
+if (current !== js || currentDts !== dts || currentCoeffs !== coeffJs || currentCoeffsDts !== coeffDts || currentChain !== chainJs || currentDeep !== deepJs || currentSidereal !== siderealJs || currentSunCompletion !== sunCompletionJs || currentMoonDistance !== moonDistanceJs) {
   console.log('\nFAIL — a generated module is STALE relative to the JSON source of truth.');
   console.log('Run: node tools/constants/generate.mjs --write');
   process.exit(1);

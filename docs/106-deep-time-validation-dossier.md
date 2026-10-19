@@ -1,7 +1,7 @@
 ---
 docVersion: 1.0
-modelVersion: v25.0
-coefficients: sha256:91e2d041c7b6e038
+modelVersion: v26.0
+coefficients: sha256:ff77fbc9baa370e4
 status: current
 ---
 
@@ -31,22 +31,25 @@ precession rows at 1.4 and 2.46 Ga) across Wells 1963 (coral growth
 bands, ×9), de Winter 2020 (rudist bivalve), Pannella 1972 (bivalves), a
 Triassic compilation, Williams 2000 (Elatina tidal rhythmites),
 Mitchell–Kirscher 2023 (multi-proxy LOD), Wu et al. 2024 (34-record
-cyclostratigraphic inversion, LOD + Moon distance), the Patterson 1956 /
-rigid-Roche consistency check, and the mid-Precambrian set matched by the
-Driver-1½ regime-aware recession history (Farhat 2022's Joffre, Weeli
-Wolli and Moodies proxies plus Zhou 2024's three paired distance+LOD
-epochs, Meyers–Malinverno 2018 and Nanfen 2023 — see
-[doc 99 §mid-Precambrian window](99-expanding-solar-system-resonance-theory.md#the-mid-precambrian-window-135-ga--the-regime-aware-recession-history-driver-1)).
+cyclostratigraphic inversion, LOD + Moon distance), and the mid-Precambrian
+set — Lantink 2022's Joffre, the Weeli Wolli and Moodies tidalites, Zhou
+2024's three precession constants (the measured quantity) with their derived
+distance and day-length cross-checks, Meyers–Malinverno 2018 and Nanfen 2023.
+Since plan 12 (option A) nothing in the chain is fitted to these rows: the
+Earth–Moon distance history is a cited physical input (Farhat et al. 2022,
+the AstroGeo22 ephemeris) and every row tests the derived day length,
+distance and composed precession on it; the documented bands name their
+cause — see [doc 99 §mid-Precambrian window](99-expanding-solar-system-resonance-theory.md#the-mid-precambrian-window-135-ga--the-cited-history-and-the-record).
 
 | Statistic (days/yr anchors) | Phanerozoic (0–500 Ma) | All (0–620 Ma) |
 |:---|:---:|:---:|
-| Mean absolute deviation | **<!--v:paleoMadPhanPct-->0.18<!--/v-->%** | <!--v:paleoMadAllPct-->0.61<!--/v-->% |
-| RMS deviation | <!--v:paleoRmsPhanPct-->0.24<!--/v-->% | <!--v:paleoRmsAllPct-->1.55<!--/v-->% |
-| Within 1% | <!--v:paleoWithin1Phan-->12/12<!--/v--> | <!--v:paleoWithin1All-->13/14<!--/v--> |
+| Mean absolute deviation | **<!--v:paleoMadPhanPct-->0.48<!--/v-->%** | <!--v:paleoMadAllPct-->0.98<!--/v-->% |
+| RMS deviation | <!--v:paleoRmsPhanPct-->0.68<!--/v-->% | <!--v:paleoRmsAllPct-->2.05<!--/v-->% |
+| Within 1% | <!--v:paleoWithin1Phan-->10/12<!--/v--> | <!--v:paleoWithin1All-->11/14<!--/v--> |
 
 Flagship: Wells's Devonian 400 days/yr vs the model's
-<!--v:daysPerYearAtDevonian-->399.96<!--/v--> (the composed precession period at
-380 Ma = <!--v:axialPrecAtDevonian-->21,699<!--/v--> yr) — with **zero free
+<!--v:daysPerYearAtDevonian-->402.83<!--/v--> (the composed precession period at
+380 Ma = <!--v:axialPrecAtDevonian-->21,396<!--/v--> yr) — with **zero free
 parameters** in the composed lunisolar coupling: the deep-time
 trajectory is calibrated to Farhat 2022 and the modern LLR recession rate,
 never to the fossil data it is tested against.
@@ -62,10 +65,11 @@ never to the fossil data it is tested against.
   day-count invariant this bullet once cited is deleted with its counter,
   plan 09 step 7a — [doc 99 record](99-expanding-solar-system-resonance-theory.md#the-frozen-era-clocks-day-count-invariant-device-tier).)
 - Full tables and the per-anchor discussion: [doc 99 §Validation](99-expanding-solar-system-resonance-theory.md#validation-against-published-paleontological-measurements)
-- The Hadean endpoint: the Farhat polynomial extrapolated to the Patterson
-  1956 Pb–Pb age places the Moon at
-  <!--v:anchorHadeanRochePred-->1.48<!--/v--> R⊕ — the rigid Roche limit at
-  the giant-impact epoch, an unfitted consistency check across 4.5 Gyr.
+- The Hadean endpoint is the input's: the cited history ends at 4,429 Ma
+  (Farhat et al. 2022's lunar-age input, 4.425 Ga) with the Moon at
+  <!--v:moonDistanceAtHadeanRE-->6.19<!--/v--> R⊕; the former "Roche
+  crossing at 4.498 Ga, an unfitted consistency check" was the deleted
+  spline's pinned endpoint and is withdrawn (plan 12 option A).
 
 ## B. Cyclostratigraphy and climate spectra — artifact-backed
 
@@ -157,8 +161,8 @@ The climate formula's orbital lines against the Cenozoic isotope record (the com
 
 | Item | Status | Where |
 |:---|:---|:---|
-| Williams 2000 (620 Ma rhythmites) | documented <!--v:anchorWilliams620DeltaPct-->+5.70<!--/v-->% miss of the smooth formula at the Snowball boundary; asserted as a band — an unexplained improvement fails the gate. Regime analysis shows Williams conflicts with Wu's 650 Ma anchor and stays the outlier under every history tried | [doc 99 §Williams](99-expanding-solar-system-resonance-theory.md#the-williams-2000-620-ma-discrepancy--honest-discussion) |
-| The thermal-tide pump mechanism (Driver 1½) | the mid-Precambrian window is now MATCHED by the shipped regime-aware history (§A), but the pump mechanism stays contested in the literature: Mitchell–Kirscher 2023 argue a resonance-held stall, Zhou 2024 argue the Lamb resonance is unlikely. The fit lets the data decide (partial pump, zero disfavoured ~2.4σ; the factor×window product is the constrained quantity). The pre-regime quartic's −26%/−37% divergences are preserved in git history and in the probe script | [doc 99 §mid-Precambrian window](99-expanding-solar-system-resonance-theory.md#the-mid-precambrian-window-135-ga--the-regime-aware-recession-history-driver-1), `tools/explore/farhat-divergence-probe.js` |
+| Williams 2000 (620 Ma rhythmites) | documented <!--v:anchorWilliams620DeltaPct-->+7.26<!--/v-->% miss of the smooth formula at the Snowball boundary; asserted as a band — an unexplained improvement fails the gate. Regime analysis shows Williams conflicts with Wu's 650 Ma anchor and stays the outlier under every history tried | [doc 99 §Williams](99-expanding-solar-system-resonance-theory.md#the-williams-2000-620-ma-discrepancy--honest-discussion) |
+| The mid-Precambrian window (Driver 1½ retired) | the model carries NO thermal-tide pump and no fitted recession regime since plan 12 option A: the distance history is Farhat 2022's ocean-model solution, whose authors' own review concludes the day-length lock "is not supported" once the questionable stromatolite points are dropped. On it the derived precession reads Joffre −1.8 %, Xiamaling −1.0 %, and Zhou 2024's older two sites −6.5 % / −7.2 % (2.5–3.6σ) — the OPEN discrepancy, asserted as bands: either the solution lacks the Mesoproterozoic dissipation peak Zhou suspect or the inferred constants are biased; the model states the gap and does not fit it | [doc 99 §mid-Precambrian window](99-expanding-solar-system-resonance-theory.md#the-mid-precambrian-window-135-ga--the-cited-history-and-the-record) |
 | Wu 2024 Pangea interval (200–500 Ma Moon rows) | the smooth Farhat polynomial cannot capture the supercontinent-era high-dissipation recession; deviations asserted as bands | [doc 99 §Pangea](99-expanding-solar-system-resonance-theory.md#the-pangea-high-tidal-dissipation-interval-the-mid-range-mismatch) |
 | Saturn Laplace–Lagrange bound | the retired law framework's documented physical-constraint failure — recorded at the integer-law retirement; its instrument is deleted | [doc 109](109-model-nbody-engine-and-lattice-test.md), CLAUDE.md §falsification |
 | LOD–climate correlation | fails every null test → open correspondence, not validation | [doc 94](94-insolation-null-test.md) |

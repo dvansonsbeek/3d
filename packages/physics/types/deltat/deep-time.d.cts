@@ -22,9 +22,10 @@ export type DeepTimeLodConstants = {
      * - Farhat polynomial anchor
      */
     aMoonNowMetres: number;
+    /**
+     * - the LLR recession rate (the J2000 slope of the cited history)
+     */
     alpha1PerMa: number;
-    alpha3PerMa3: number;
-    alpha4PerMa4: number;
     /**
      * - ω₀, the J2000 day length (the SI day since plan 09; identifier kept)
      */
@@ -39,7 +40,10 @@ export type DeepTimeLodConstants = {
 };
 export type DeepTimeLodDeps = {
     constants: DeepTimeLodConstants;
-    moonDistanceMetresAtAge: (tMa: number) => number;
+    /**
+     * - null beyond the cited history's span
+     */
+    moonDistanceMetresAtAge: (tMa: number) => number | null;
     /**
      * - GIA α(t)
      */
@@ -77,11 +81,19 @@ export type DeepTimeLodDeps = {
     nodalPeriodYearsFn: () => number;
     /**
      * - OPTIONAL time-dependent
-     * Earth-Moon angular momentum (the Driver-1½ solar channels,
-     * recession-history.cjs). Absent → the J2000 constant, which the budget
-     * module equals exactly for t ≤ jointMa — the pure-twin convention.
+     * Earth-Moon angular momentum. Absent → the J2000 constant: conservation
+     * (plan 12 option A — the Driver-1½ solar-channel budget is deleted;
+     * measured: conservation on the cited history reproduces Farhat's own LOD
+     * to 0.01 h at 100 Ma, 0.14 h at 2.46 Ga).
      */
     lEmAtAgeKgm2S?: ((tMa: number) => number) | undefined;
+    /**
+     * -
+     * OPTIONAL analytic slope of the distance history (metres per Ma, positive
+     * into the past means a growing a... sign as da/dt_Ma); absent → a central
+     * difference on moonDistanceMetresAtAge (the LOD-rate decomposition's tidal term).
+     */
+    moonDistanceSlopeMetresPerMaAtAge?: ((tMa: number) => number | null) | undefined;
 };
 /**
  * @typedef {Object} DeepTimeLodConstants
@@ -93,8 +105,7 @@ export type DeepTimeLodDeps = {
  * @property {number} eFactorMoon - √(1−e²) factor of the lunar orbit
  * @property {number} aLockMetres - tidal-lock distance (LOD denominator → 0)
  * @property {number} aMoonNowMetres - Farhat polynomial anchor
- * @property {number} alpha1PerMa @property {number} alpha3PerMa3
- * @property {number} alpha4PerMa4
+ * @property {number} alpha1PerMa - the LLR recession rate (the J2000 slope of the cited history)
  * @property {number} lodNowH13Seconds - ω₀, the J2000 day length (the SI day since plan 09; identifier kept)
  * @property {number} meanSiderealYearJ2000Seconds
  * @property {number} solarMassLossFracPerYear
@@ -104,7 +115,7 @@ export type DeepTimeLodDeps = {
 /**
  * @typedef {Object} DeepTimeLodDeps
  * @property {DeepTimeLodConstants} constants
- * @property {(tMa: number) => number} moonDistanceMetresAtAge
+ * @property {(tMa: number) => number|null} moonDistanceMetresAtAge - null beyond the cited history's span
  * @property {(tMa: number) => number} moiFactorAtAge - GIA α(t)
  * @property {(year: number) => number} cycleLodSumAt - gated δLOD sum (incl. swing)
  * @property {(year: number) => number} swingLodAt - gated swing δLOD alone
@@ -123,9 +134,14 @@ export type DeepTimeLodDeps = {
  *   formerly the spin unit's H/5, 67,063 yr, 2.5 % off and scaling with the
  *   spin at deep time). Lazy, like the precession anchor.
  * @property {(tMa: number) => number} [lEmAtAgeKgm2S] - OPTIONAL time-dependent
- *   Earth-Moon angular momentum (the Driver-1½ solar channels,
- *   recession-history.cjs). Absent → the J2000 constant, which the budget
- *   module equals exactly for t ≤ jointMa — the pure-twin convention.
+ *   Earth-Moon angular momentum. Absent → the J2000 constant: conservation
+ *   (plan 12 option A — the Driver-1½ solar-channel budget is deleted;
+ *   measured: conservation on the cited history reproduces Farhat's own LOD
+ *   to 0.01 h at 100 Ma, 0.14 h at 2.46 Ga).
+ * @property {(tMa: number) => number|null} [moonDistanceSlopeMetresPerMaAtAge] -
+ *   OPTIONAL analytic slope of the distance history (metres per Ma, positive
+ *   into the past means a growing a... sign as da/dt_Ma); absent → a central
+ *   difference on moonDistanceMetresAtAge (the LOD-rate decomposition's tidal term).
  */
 /** @param {DeepTimeLodDeps} deps */
 export function createDeepTimeLod(deps: DeepTimeLodDeps): {

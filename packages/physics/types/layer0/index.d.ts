@@ -1,6 +1,7 @@
-export function createEpochPrimitives({ params: p, alphaAtAgeMa }: {
+export function createEpochPrimitives({ params: p, alphaAtAgeMa, moonDistanceMetresAtAge }: {
     params: EpochParams;
     alphaAtAgeMa: (tMa: number) => number;
+    moonDistanceMetresAtAge: (tMa: number) => number | null;
 }): EpochPrimitives;
 export type EpochParams = {
     /**
@@ -8,11 +9,9 @@ export type EpochParams = {
      */
     epochYear: number;
     /**
-     * Moon recession, LLR-anchored
+     * Moon recession, LLR-anchored (the J2000 slope of the cited history)
      */
     alpha1PerMa: number;
-    alpha3PerMa3: number;
-    alpha4PerMa4: number;
     /**
      * a_Moon at J2000, metres
      */
@@ -47,7 +46,10 @@ export type EpochParams = {
 };
 export type EpochPrimitives = {
     tMa: (year: number) => number;
-    moonDistanceMetres: (year: number) => number;
+    /**
+     * - null beyond the cited history's span
+     */
+    moonDistanceMetres: (year: number) => number | null;
     lodSeconds: (year: number) => number | null;
     siderealYearSeconds: (year: number) => number;
     /**

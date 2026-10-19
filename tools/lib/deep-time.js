@@ -90,16 +90,13 @@ const SOLAR_WIND_KG_PER_S  = C.SOLAR_WIND_KG_PER_S;                   // Ulysses
 const C_SI_M_PER_S         = C.speedOfLight ? C.speedOfLight * 1000 : 299792458;  // m/s
 const DM_DT_TOTAL_KG_S     = L_SUN_W / (C_SI_M_PER_S * C_SI_M_PER_S) + SOLAR_WIND_KG_PER_S;
 
-// Farhat 2022 LSQ polynomial coefficients — Moon distance evolution
-// a_Moon(t)/a_now = 1 + α₁·t + α₃·t³ + α₄·t⁴  (no α₂; preserves modern Wells rate)
-// Homes (plan 11 step 1, read through the generated module's assembled deepTime
-// block): α₁ is the LLR-anchored INPUT astro-reference moonReference
-// .moonRecessionAlpha1PerMa (da/dt(J2000) = 3.82 cm/yr, Dickey 1994 / Chapront
-// 2002); α₃/α₄ are the LSQ fit to the Farhat 2022 deep-time anchors, banked in
-// data/deep-time-fitted.json with their provenance.
+// The Earth–Moon distance history (plan 12 option A): the LLR rate α₁ is the
+// J2000 slope — the INPUT astro-reference moonReference.moonRecessionAlpha1PerMa
+// (da/dt(J2000) = 3.82 cm/yr, Dickey 1994 / Chapront 2002) — and the SHAPE is
+// the cited AstroGeo22 ephemeris (Farhat et al. 2022), read through
+// @essrt/physics/deltat/moon-distance-history below. (The quartic's α₃/α₄ and
+// the regime spline are deleted.)
 const ALPHA_1 = C.ALPHA_1;           // /Ma
-const ALPHA_3 = C.ALPHA_3;           // /Ma³
-const ALPHA_4 = C.ALPHA_4;           // /Ma⁴
 
 // ─── J2000 anchors derived from framework constants ───────────────────────
 
@@ -237,7 +234,6 @@ function _moonChain() {
     _moonChainM = createMoonMonthChain({
       constants: {
         aMoonNowMetres: A_MOON_NOW_M,
-        alpha1PerMa: ALPHA_1, alpha3PerMa3: ALPHA_3, alpha4PerMa4: ALPHA_4,
         gmEarthMoonM3PerS2: GM_EM_M3S2,
         massRatioEarthMoon: C.MASS_RATIO_EARTH_MOON,
         moonSiderealMonthInputDays: C.moonSiderealMonthInput,
@@ -266,43 +262,24 @@ function meanMoonDistanceMetresAtAge(t_Ma) { return _moonChain().distanceMetresA
 function meanMoonDistanceAtAge(t_Ma) { return _moonChain().distanceKmAtAge(t_Ma); }
 
 // ─── LAYER 1 — Angular-momentum-conservation LOD ──────────────────────────
-// Driver 1½ (2026-08): the regime-aware recession history + the solar
-// angular-momentum channels live ONCE in @essrt/physics/deltat/
-// recession-history. The quartic stays bit-identical ≤ jointMa; the
-// channels are explicit only beyond it. Lazy for module-const ordering.
-const { createMoonRecessionHistory, createSolarChannelBudget } = _req('@essrt/physics/deltat/recession-history');
+// Plan 12 (option A): the Earth–Moon distance history is the CITED AstroGeo22
+// ephemeris (Farhat et al. 2022), embedded by the constants generator and read
+// ONCE through @essrt/physics/deltat/moon-distance-history as the ratio
+// a(t)/a(0) on this engine's J2000 anchor, the J2000 slope the LLR α₁; null
+// beyond its span. L_EM is the J2000 constant (conservation) — the regime
+// spline and the solar-channel budget are deleted. Lazy for module-const ordering.
+const { createMoonDistanceHistory } = _req('@essrt/physics/deltat/moon-distance-history');
+const { MOON_DISTANCE_ARTIFACT } = _req('@essrt/physics/deltat/moon-distance-artifact');
 let _recessionM = null;
 function _recessionHistory() {
   if (!_recessionM) {
-    const R = C.RECESSION_REGIME;
-    _recessionM = createMoonRecessionHistory({
+    _recessionM = createMoonDistanceHistory({
+      table: MOON_DISTANCE_ARTIFACT,
       aMoonNowMetres: A_MOON_NOW_M,
-      alpha1PerMa: ALPHA_1, alpha3PerMa3: ALPHA_3, alpha4PerMa4: ALPHA_4,
-      regime: {
-        jointMa: R.jointMa, knotAgesMa: R.knotAgesMa,
-        knotDistancesKm: R.knotDistancesKm, genesisMa: R.genesisMa,
-        rocheLimitKm: R.rocheLimitKm,
-      },
+      alpha1PerMa: ALPHA_1,
     });
   }
   return _recessionM;
-}
-let _solarBudgetM = null;
-function _solarBudget() {
-  if (!_solarBudgetM) {
-    const R = C.RECESSION_REGIME;
-    _solarBudgetM = createSolarChannelBudget({
-      lTotalJ2000KgM2S: L_TOTAL_EM_KGM2_S,
-      mMoonAloneKg: M_MOON_ALONE, gmEmM3PerS2: GM_EM_M3S2,
-      eFactorMoon: E_FACTOR_MOON,
-      beta0: R.solarOceanLeakBeta0,
-      pumpStartMa: R.thermalPumpStartMa, pumpEndMa: R.thermalPumpEndMa,
-      pumpFactor: R.thermalPumpFactor,
-      jointMa: R.jointMa, genesisMa: R.genesisMa,
-      distanceMetresAtAge: _recessionHistory().distanceMetresAtAge,
-    });
-  }
-  return _solarBudgetM;
 }
 
 // 8.4-3: the deep-time LOD/ΔT core lives ONCE in @essrt/physics/deltat/
@@ -320,7 +297,6 @@ function _deepLod() {
         mEarthAloneKg: M_EARTH_ALONE, rEarthMetres: R_EARTH_M,
         gmEmM3PerS2: GM_EM_M3S2, eFactorMoon: E_FACTOR_MOON, aLockMetres: A_LOCK_M,
         aMoonNowMetres: A_MOON_NOW_M, alpha1PerMa: ALPHA_1,
-        alpha3PerMa3: ALPHA_3, alpha4PerMa4: ALPHA_4,
         lodNowH13Seconds: LOD_NOW_H13_S,
         meanSiderealYearJ2000Seconds: MEAN_SIDEREAL_YEAR_J2000_S,
         solarMassLossFracPerYear: SOLAR_MASS_LOSS_FRAC_PER_YR,
@@ -335,7 +311,9 @@ function _deepLod() {
       cycleLodSumAt: dtCycleLodCorrectionSum,
       swingLodAt: resonatorSwingLodCorrection,
       swingLodRateAt: resonatorSwingLodRate,
-      lEmAtAgeKgm2S: _solarBudget().lEmAtAgeKgm2S,
+      // plan 12 option A: L_EM constant (no channels); the tidal LOD-rate term
+      // reads the cited history's analytic slope.
+      moonDistanceSlopeMetresPerMaAtAge: _recessionHistory().slopeMetresPerMaAtAge,
     });
   }
   return _deepLodM;
@@ -642,7 +620,7 @@ function dtCycleLodCorrectionSum(year) {
 const { createEpochPrimitives } = _req('@essrt/physics');
 let _l0M = null;
 function _l0() {
-  if (!_l0M) _l0M = createEpochPrimitives({ params: EPOCH_PARAMS, alphaAtAgeMa: earthMoiFactorAtAge });
+  if (!_l0M) _l0M = createEpochPrimitives({ params: EPOCH_PARAMS, alphaAtAgeMa: earthMoiFactorAtAge, moonDistanceMetresAtAge: meanMoonDistanceMetresAtAge });
   return _l0M;
 }
 
@@ -975,8 +953,6 @@ function _cumulIntegralLength() { return Math.ceil((_CUMUL_INTEGRAL_YEAR_MAX - _
 const EPOCH_PARAMS = Object.freeze({
   epochYear: 2000,
   alpha1PerMa: ALPHA_1,
-  alpha3PerMa3: ALPHA_3,
-  alpha4PerMa4: ALPHA_4,
   moonDistanceNowM: A_MOON_NOW_M,
   moonLockDistanceM: A_LOCK_M,
   totalAngularMomentumKgM2S: L_TOTAL_EM_KGM2_S,

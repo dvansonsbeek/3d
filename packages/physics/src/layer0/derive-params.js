@@ -24,9 +24,7 @@ import { computeSolarTorqueShare } from '../earth/precession-composed.cjs';
  * @property {number} solarLuminosityW          IAU 2015 nominal (W)
  * @property {number} solarWindKgPerS           Ulysses/ACE/Wind
  * @property {number} speedOfLightKmPerS        km/s (fallback 299792458 m/s if falsy)
- * @property {number} alpha1PerMa
- * @property {number} alpha3PerMa3
- * @property {number} alpha4PerMa4
+ * @property {number} alpha1PerMa                 the LLR recession rate — the cited distance history's J2000 slope
  * @property {number} meanSiderealYearSeconds
  * @property {number} lodJ2000Seconds              ω₀: the J2000 day length, SI seconds (the SI day since plan 09)
  * @property {number} sunMassKg                 M_SUN
@@ -85,8 +83,6 @@ export const deriveEpochParams = (raw) => {
   return Object.freeze({
     epochYear: 2000,
     alpha1PerMa: raw.alpha1PerMa,
-    alpha3PerMa3: raw.alpha3PerMa3,
-    alpha4PerMa4: raw.alpha4PerMa4,
     moonDistanceNowM,
     moonLockDistanceM,
     totalAngularMomentumKgM2S,

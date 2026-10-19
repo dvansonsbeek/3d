@@ -2,9 +2,6 @@
  * @param {{
  *   constants: {
  *     aMoonNowMetres: number,
- *     alpha1PerMa: number,
- *     alpha3PerMa3: number,
- *     alpha4PerMa4: number,
  *     gmEarthMoonM3PerS2: number,
  *     massRatioEarthMoon: number,
  *     moonSiderealMonthInputDays: number,
@@ -20,7 +17,7 @@
  *     meanSiderealYearSecondsAtAge: (tMa: number) => number,
  *     precessionPeriodYearsAtAge: (tMa: number) => (number | null),
  *     modulation: (tMa: number, s: number) => number,
- *     distanceMetresAtAge?: (tMa: number) => number,
+ *     distanceMetresAtAge: (tMa: number) => number|null,
  *   },
  * }} deps — fns are the ENGINE'S OWN layer-0/1 evaluators and the shared
  *   eccentricity channel's modulation; constants are the engine's derived
@@ -30,16 +27,13 @@
  *   5c — the tropical month's equinox turn, formerly the counter's 13/H(t),
  *   0.086 % slow: the chain's J2000 tropical month sat 5.85 ms above the IAU
  *   input, the 1/T_p form is within 0.1 ms of it).
- *   fns.distanceMetresAtAge, when present, OVERRIDES the internal quartic —
- *   the Driver-1½ regime-aware history (recession-history.cjs); absent, the
- *   internal quartic is the pure twin (bit-identical for t ≤ jointMa).
+ *   fns.distanceMetresAtAge is the engine's CITED distance history
+ *   (deltat/moon-distance-history; plan 12 option A — the internal quartic
+ *   twin this chain carried until then is deleted; null beyond the span).
  */
 export function createMoonMonthChain({ constants, fns }: {
     constants: {
         aMoonNowMetres: number;
-        alpha1PerMa: number;
-        alpha3PerMa3: number;
-        alpha4PerMa4: number;
         gmEarthMoonM3PerS2: number;
         massRatioEarthMoon: number;
         moonSiderealMonthInputDays: number;
@@ -55,11 +49,11 @@ export function createMoonMonthChain({ constants, fns }: {
         meanSiderealYearSecondsAtAge: (tMa: number) => number;
         precessionPeriodYearsAtAge: (tMa: number) => (number | null);
         modulation: (tMa: number, s: number) => number;
-        distanceMetresAtAge?: (tMa: number) => number;
+        distanceMetresAtAge: (tMa: number) => number | null;
     };
 }): {
-    distanceMetresAtAge: (tMa: number) => number;
-    distanceKmAtAge: (tMa: number) => number;
+    distanceMetresAtAge: (tMa: number) => number | null;
+    distanceKmAtAge: (tMa: number) => number | null;
     solarDeltaAKmAtAge: (tMa: number, aApparentKm: number) => number | null;
     distanceCorrectedKmAtAge: (tMa: number) => number | null;
     siderealMonthSecondsAtAge: (tMa: number) => number | null;

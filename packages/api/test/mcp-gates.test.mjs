@@ -58,7 +58,7 @@ const toolCall = (name, args) => {
     ['essrt_versions', undefined, (d) => (d.current ? null : 'no current version')],
     // plan 09 step 7b: the unit H left the surface; the deep-time clock is the composed precession period
     // (21,699 yr at −380 Ma — the unit read 282,329 there, 13.011 of them)
-    ['essrt_epoch', { year: -379998000 }, (d) => (Math.abs(d.epochs[0].axialPrecessionYears - 21699) < 1 && !('h' in d.epochs[0]) ? null : `Devonian T_p: ${d.epochs[0].axialPrecessionYears} h: ${d.epochs[0].h}`)],
+    ['essrt_epoch', { year: -379998000 }, (d) => (Math.abs(d.epochs[0].axialPrecessionYears - 21396) < 1 && !('h' in d.epochs[0]) ? null : `Devonian T_p: ${d.epochs[0].axialPrecessionYears} h: ${d.epochs[0].h}`)],
     ['essrt_epoch', { jd: 2451545 }, (d) => (Math.abs(d.epochs[0].axialPrecessionYears - 25771.575) < 0.5 ? null : `T_p via jd: ${d.epochs[0].axialPrecessionYears}`)],
     ['essrt_cardinal_points', { year: 2000, types: 'SS' }, (d) => (Math.abs(d.years[0].points.SS.jd - 2451716.575) < 0.1 ? null : `SS JD: ${d.years[0].points.SS.jd}`)],
     ['essrt_earth', { year: 2000 }, (d) => (Math.abs(d.years[0].obliquityDeg - 23.4393) < 0.0002 ? null : `obliquity: ${d.years[0].obliquityDeg}`)],

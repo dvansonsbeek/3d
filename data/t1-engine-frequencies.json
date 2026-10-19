@@ -4,8 +4,8 @@
  "precessionPeriodYr": 25771.57645712862,
  "pInertialArcsecPerYr": 50.38455189277776,
  "inertialPrecessionPeriodYr": 25722.169818201197,
- "pInertialMeanLr04ArcsecPerYr": 50.51876938922812,
- "inertialPrecessionPeriodMeanLr04Yr": 25653.83154951395,
+ "pInertialMeanLr04ArcsecPerYr": 50.519089124775064,
+ "inertialPrecessionPeriodMeanLr04Yr": 25653.669186296327,
  "lr04WindowKyr": [
   0,
   5320
@@ -151,7 +151,7 @@
   "files": {
    "data/lr04-stack.txt": "sha256:7d1a6ca7ffc033e45e20fb76a7f39c8d99df87baa1094260f9dbdc09f0bb8945",
    "data/nbody-deep-secular-modes.json": "sha256:87c325fac77d94a45e1381b62a2a4c5cd8253bc4765c8d497a1d9f5466649ccc",
-   "data/nbody-secular-series.json": "sha256:e2d879e8865348a3a72807fd18496ee2523dbde09a570e360519d23edcc1db7d",
+   "data/nbody-secular-series.json": "sha256:dddf69292f33a368caa3c121dc28a2529dd013ef2ef1ae03e28e39e59f27760c",
    "tools/explore/t1-export-engine-frequencies.mjs": "sha256:3ab7f6897bc27a5351226a69ae6368a7292b0ce7efaf043220bfae7a7010db94"
   }
  }

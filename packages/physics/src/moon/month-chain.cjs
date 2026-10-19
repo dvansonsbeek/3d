@@ -49,9 +49,6 @@
  * @param {{
  *   constants: {
  *     aMoonNowMetres: number,
- *     alpha1PerMa: number,
- *     alpha3PerMa3: number,
- *     alpha4PerMa4: number,
  *     gmEarthMoonM3PerS2: number,
  *     massRatioEarthMoon: number,
  *     moonSiderealMonthInputDays: number,
@@ -67,7 +64,7 @@
  *     meanSiderealYearSecondsAtAge: (tMa: number) => number,
  *     precessionPeriodYearsAtAge: (tMa: number) => (number | null),
  *     modulation: (tMa: number, s: number) => number,
- *     distanceMetresAtAge?: (tMa: number) => number,
+ *     distanceMetresAtAge: (tMa: number) => number|null,
  *   },
  * }} deps — fns are the ENGINE'S OWN layer-0/1 evaluators and the shared
  *   eccentricity channel's modulation; constants are the engine's derived
@@ -77,32 +74,27 @@
  *   5c — the tropical month's equinox turn, formerly the counter's 13/H(t),
  *   0.086 % slow: the chain's J2000 tropical month sat 5.85 ms above the IAU
  *   input, the 1/T_p form is within 0.1 ms of it).
- *   fns.distanceMetresAtAge, when present, OVERRIDES the internal quartic —
- *   the Driver-1½ regime-aware history (recession-history.cjs); absent, the
- *   internal quartic is the pure twin (bit-identical for t ≤ jointMa).
+ *   fns.distanceMetresAtAge is the engine's CITED distance history
+ *   (deltat/moon-distance-history; plan 12 option A — the internal quartic
+ *   twin this chain carried until then is deleted; null beyond the span).
  */
 function createMoonMonthChain({ constants, fns }) {
   const {
-    aMoonNowMetres, alpha1PerMa, alpha3PerMa3, alpha4PerMa4,
+    aMoonNowMetres,
     gmEarthMoonM3PerS2, massRatioEarthMoon, moonSiderealMonthInputDays,
     meanSiderealYearJ2000Seconds,
     moonApsidalJ2000Seconds, moonNodalJ2000Seconds,
     moonSiderealMonthJ2000Seconds,
     sPerigee, sNode,
   } = constants;
-  const { meanLodSecondsAtAge, meanSiderealYearSecondsAtAge, precessionPeriodYearsAtAge, modulation } = fns;
+  const { meanLodSecondsAtAge, meanSiderealYearSecondsAtAge, precessionPeriodYearsAtAge, modulation, distanceMetresAtAge } = fns;
+  if (typeof distanceMetresAtAge !== 'function') throw new Error('month-chain: fns.distanceMetresAtAge (the cited distance history) is required');
+  void aMoonNowMetres;
 
-  /** Farhat α₁/α₃/α₄ polynomial — Earth–Moon distance in metres at age t_Ma.
-   *  @param {number} tMa @returns {number} */
-  function quarticMetresAtAge(tMa) {
-    const t = tMa;
-    return aMoonNowMetres * (1 + alpha1PerMa * t + alpha3PerMa3 * t * t * t + alpha4PerMa4 * t * t * t * t);
-  }
-  const distanceMetresAtAge = fns.distanceMetresAtAge ?? quarticMetresAtAge;
-
-  /** @param {number} tMa @returns {number} */
+  /** @param {number} tMa @returns {number|null} */
   function distanceKmAtAge(tMa) {
-    return distanceMetresAtAge(tMa) / 1000;
+    const m = distanceMetresAtAge(tMa);
+    return m === null ? null : m / 1000;
   }
 
   /** Solar Δa correction (km) for the Moon's apparent semi-major axis
@@ -120,6 +112,7 @@ function createMoonMonthChain({ constants, fns }) {
    *  @param {number} tMa @returns {number | null} */
   function distanceCorrectedKmAtAge(tMa) {
     const aApp = distanceKmAtAge(tMa);
+    if (aApp === null) return null;
     const dA = solarDeltaAKmAtAge(tMa, aApp);
     return (dA === null) ? null : aApp + dA;
   }

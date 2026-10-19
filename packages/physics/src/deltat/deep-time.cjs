@@ -43,8 +43,7 @@ const { createComposedPrecession } = require('../earth/precession-composed.cjs')
  * @property {number} eFactorMoon - √(1−e²) factor of the lunar orbit
  * @property {number} aLockMetres - tidal-lock distance (LOD denominator → 0)
  * @property {number} aMoonNowMetres - Farhat polynomial anchor
- * @property {number} alpha1PerMa @property {number} alpha3PerMa3
- * @property {number} alpha4PerMa4
+ * @property {number} alpha1PerMa - the LLR recession rate (the J2000 slope of the cited history)
  * @property {number} lodNowH13Seconds - ω₀, the J2000 day length (the SI day since plan 09; identifier kept)
  * @property {number} meanSiderealYearJ2000Seconds
  * @property {number} solarMassLossFracPerYear
@@ -55,7 +54,7 @@ const { createComposedPrecession } = require('../earth/precession-composed.cjs')
 /**
  * @typedef {Object} DeepTimeLodDeps
  * @property {DeepTimeLodConstants} constants
- * @property {(tMa: number) => number} moonDistanceMetresAtAge
+ * @property {(tMa: number) => number|null} moonDistanceMetresAtAge - null beyond the cited history's span
  * @property {(tMa: number) => number} moiFactorAtAge - GIA α(t)
  * @property {(year: number) => number} cycleLodSumAt - gated δLOD sum (incl. swing)
  * @property {(year: number) => number} swingLodAt - gated swing δLOD alone
@@ -74,9 +73,14 @@ const { createComposedPrecession } = require('../earth/precession-composed.cjs')
  *   formerly the spin unit's H/5, 67,063 yr, 2.5 % off and scaling with the
  *   spin at deep time). Lazy, like the precession anchor.
  * @property {(tMa: number) => number} [lEmAtAgeKgm2S] - OPTIONAL time-dependent
- *   Earth-Moon angular momentum (the Driver-1½ solar channels,
- *   recession-history.cjs). Absent → the J2000 constant, which the budget
- *   module equals exactly for t ≤ jointMa — the pure-twin convention.
+ *   Earth-Moon angular momentum. Absent → the J2000 constant: conservation
+ *   (plan 12 option A — the Driver-1½ solar-channel budget is deleted;
+ *   measured: conservation on the cited history reproduces Farhat's own LOD
+ *   to 0.01 h at 100 Ma, 0.14 h at 2.46 Ga).
+ * @property {(tMa: number) => number|null} [moonDistanceSlopeMetresPerMaAtAge] -
+ *   OPTIONAL analytic slope of the distance history (metres per Ma, positive
+ *   into the past means a growing a... sign as da/dt_Ma); absent → a central
+ *   difference on moonDistanceMetresAtAge (the LOD-rate decomposition's tidal term).
  */
 
 /** @param {DeepTimeLodDeps} deps */
@@ -88,7 +92,7 @@ function createDeepTimeLod(deps) {
    * @param {number} t_Ma @returns {number|null} seconds, null past tidal lock */
   function lodSecondsAtAge(t_Ma) {
     const a = deps.moonDistanceMetresAtAge(t_Ma);
-    if (a <= 0 || a >= K.aLockMetres) return null;
+    if (a === null || a <= 0 || a >= K.aLockMetres) return null;
     return (2 * Math.PI * (deps.moiFactorAtAge(t_Ma) * K.mEarthAloneKg * K.rEarthMetres * K.rEarthMetres)) /
            (lEmAt(t_Ma) - K.mMoonAloneKg * Math.sqrt(K.gmEmM3PerS2 * a) * K.eFactorMoon);
   }
@@ -97,7 +101,7 @@ function createDeepTimeLod(deps) {
    * @param {number} t_Ma @param {number} alpha @returns {number|null} */
   function lodSecondsAtAgeWithAlpha(t_Ma, alpha) {
     const a = deps.moonDistanceMetresAtAge(t_Ma);
-    if (a <= 0 || a >= K.aLockMetres) return null;
+    if (a === null || a <= 0 || a >= K.aLockMetres) return null;
     const iEarth = alpha * K.mEarthAloneKg * K.rEarthMetres * K.rEarthMetres;
     return (2 * Math.PI * iEarth) /
            (lEmAt(t_Ma) - K.mMoonAloneKg * Math.sqrt(K.gmEmM3PerS2 * a) * K.eFactorMoon);
@@ -300,10 +304,20 @@ function createDeepTimeLod(deps) {
     const I_E = alpha * K.mEarthAloneKg * K.rEarthMetres * K.rEarthMetres;
     const year = 2000 - t_Ma * 1e6;
 
-    // Farhat polynomial derivative: da/dyear = −A_now·(α₁ + 3α₃t² + 4α₄t³)/1e6
-    // (t_Ma > 0 = past; forward-time sign flip). At J2000: +3.82 cm/yr (LLR) ✓
-    const da_dt_yr = -K.aMoonNowMetres * (K.alpha1PerMa + 3 * K.alpha3PerMa3 * t_Ma * t_Ma
-                   + 4 * K.alpha4PerMa4 * t_Ma * t_Ma * t_Ma) / 1e6;
+    // The cited history's slope (plan 12 option A): the engine's
+    // moonDistanceSlopeMetresPerMaAtAge when it provides one (the Hermite's
+    // analytic derivative — C1, smooth), else a ±1-kyr central difference on
+    // the distance itself. t_Ma > 0 = past; forward-time sign flip. At J2000
+    // the slope IS the LLR observation (the history's boundary condition):
+    // +3.82 cm/yr ✓
+    let slopePerMa = deps.moonDistanceSlopeMetresPerMaAtAge ? deps.moonDistanceSlopeMetresPerMaAtAge(t_Ma) : null;
+    if (slopePerMa === null || slopePerMa === undefined) {
+      const H_MA = 1e-3;
+      const aPlus = deps.moonDistanceMetresAtAge(t_Ma + H_MA), aMinus = deps.moonDistanceMetresAtAge(t_Ma - H_MA);
+      if (aPlus === null || aMinus === null) return nullResult;
+      slopePerMa = (aPlus - aMinus) / (2 * H_MA);
+    }
+    const da_dt_yr = -slopePerMa / 1e6;
     const SEC_PER_YR = 365.25 * 86400;
     const da_dt_s = da_dt_yr / SEC_PER_YR;
 

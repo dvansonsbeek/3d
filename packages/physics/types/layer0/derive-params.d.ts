@@ -12,9 +12,10 @@ export type RawEpochConstants = {
      * km/s (fallback 299792458 m/s if falsy)
      */
     speedOfLightKmPerS: number;
+    /**
+     * the LLR recession rate — the cited distance history's J2000 slope
+     */
     alpha1PerMa: number;
-    alpha3PerMa3: number;
-    alpha4PerMa4: number;
     meanSiderealYearSeconds: number;
     /**
      * ω₀: the J2000 day length, SI seconds (the SI day since plan 09)

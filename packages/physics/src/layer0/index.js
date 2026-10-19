@@ -32,9 +32,7 @@
 /**
  * @typedef {Object} EpochParams
  * @property {number} epochYear                  year at t_Ma = 0 (2000, NOT startmodelYear)
- * @property {number} alpha1PerMa                Moon recession, LLR-anchored
- * @property {number} alpha3PerMa3
- * @property {number} alpha4PerMa4
+ * @property {number} alpha1PerMa                Moon recession, LLR-anchored (the J2000 slope of the cited history)
  * @property {number} moonDistanceNowM           a_Moon at J2000, metres
  * @property {number} moonLockDistanceM          tidal-lock asymptote, metres
  * @property {number} totalAngularMomentumKgM2S  L_tot of the Earth-Moon system
@@ -53,17 +51,21 @@
 /**
  * @typedef {Object} EpochPrimitives
  * @property {(year: number) => number} tMa
- * @property {(year: number) => number} moonDistanceMetres
+ * @property {(year: number) => number|null} moonDistanceMetres - null beyond the cited history's span
  * @property {(year: number) => number|null} lodSeconds
  * @property {(year: number) => number} siderealYearSeconds
  * @property {(year: number) => number} tropicalYearSeconds      sidereal less one equinox turn per T_p(t) (the composed precession period)
  */
 
 /**
- * @param {{params: EpochParams, alphaAtAgeMa: (tMa: number) => number}} deps
+ * @param {{params: EpochParams, alphaAtAgeMa: (tMa: number) => number,
+ *   moonDistanceMetresAtAge: (tMa: number) => number|null}} deps —
+ *   moonDistanceMetresAtAge is the engine's cited distance history
+ *   (deltat/moon-distance-history: Farhat et al. 2022 as a shape on the
+ *   J2000 anchor; plan 12 option A — the layer0 quartic twin is deleted).
  * @returns {EpochPrimitives}
  */
-export const createEpochPrimitives = ({ params: p, alphaAtAgeMa }) => {
+export const createEpochPrimitives = ({ params: p, alphaAtAgeMa, moonDistanceMetresAtAge }) => {
   /**
    * Years before the epoch, in Ma. The ONE place this conversion lives.
    * @param {number} year
@@ -72,24 +74,21 @@ export const createEpochPrimitives = ({ params: p, alphaAtAgeMa }) => {
   const tMa = (year) => (p.epochYear - year) / 1e6;
 
   /**
-   * Moon semi-major axis. Cubic in t_Ma: alpha1 is LLR-anchored, alpha3/alpha4
-   * are the Farhat 2022 deep-time fit.
+   * Moon distance at age t — the cited history (null beyond its span).
    * @param {number} t age in Ma
-   * @returns {number} metres
+   * @returns {number|null} metres
    */
-  const moonDistanceMetresCore = (t) =>
-    p.moonDistanceNowM
-      * (1 + p.alpha1PerMa * t + p.alpha3PerMa3 * t * t * t + p.alpha4PerMa4 * t * t * t * t);
+  const moonDistanceMetresCore = (t) => moonDistanceMetresAtAge(t);
 
   /**
    * Length of day from angular-momentum conservation: as the Moon recedes it
    * takes orbital angular momentum and Earth's spin slows to compensate.
    * @param {number} t age in Ma
-   * @returns {number|null} seconds; null past the tidal-lock asymptote
+   * @returns {number|null} seconds; null past the tidal-lock asymptote or the history's span
    */
   const lodSecondsCore = (t) => {
     const a = moonDistanceMetresCore(t);
-    if (a <= 0 || a >= p.moonLockDistanceM) return null;
+    if (a === null || a <= 0 || a >= p.moonLockDistanceM) return null;
     const iEarth = alphaAtAgeMa(t) * p.earthMassKg * p.earthRadiusM * p.earthRadiusM;
     return (2 * Math.PI * iEarth)
       / (p.totalAngularMomentumKgM2S

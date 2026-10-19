@@ -111,7 +111,7 @@
     "moon": {
       "buckets": {
         "1900-1999": {
-          "rmsDeg": 0.002592,
+          "rmsDeg": 0.002591,
           "rmsArcsec": 9.3,
           "n": 3
         },
@@ -339,7 +339,7 @@
     "generator": "node tools/verify/measure-rms-by-epoch.js --write",
     "files": {
       "data/jpl-cache.json": "sha256:221582af7d1e956fd20e58a2b32f2c956a6d1ec1f8d17d3f24c7730a269205d1",
-      "packages/physics/src/planets/chain-artifact.js": "sha256:02ecf0752fbe05a439edb487801602e232c353afde64a57e338dd754ae22ba8c",
+      "packages/physics/src/planets/chain-artifact.js": "sha256:b674a33a63a46b7ac465991594625b96c58d868a1664363d6cb15b92befad8b8",
       "packages/physics/src/planets/keplerian-chain.cjs": "sha256:75cdaeae146100354b883d6fefff48d16d54d6d1e363a8b9d6514c988f7760c2",
       "tools/lib/scene-graph.js": "sha256:fb1b261ae8b78b4d7bd0659c280c189e84c5e3c65dfe0698054f605b802dca29",
       "tools/verify/measure-rms-by-epoch.js": "sha256:e4bdd53c22e8f3637b44219ea4cecb1a88fc0c99e7ccd6ee20751549ba888d3c"

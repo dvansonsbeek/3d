@@ -1,7 +1,7 @@
 ---
 docVersion: 1.0
-modelVersion: v25.0
-coefficients: sha256:91e2d041c7b6e038
+modelVersion: v26.0
+coefficients: sha256:ff77fbc9baa370e4
 status: current
 ---
 
@@ -959,16 +959,17 @@ theories at raw catalog JDs.
 
 ### Consistency with the deep-time Moon model
 
-The deep-time Moon model (doc 99) uses a Farhat 2022 polynomial for Moon
-orbital evolution:
+The deep-time Moon model (doc 99) reads the Earth–Moon distance history as a
+CITED PHYSICAL INPUT (plan 12 option A): Farhat et al. 2022's published
+solution (the AstroGeo22 ephemeris), as the ratio a(t)/a(0) on the observed
+J2000 distance, with the LLR rate α₁ as the J2000 slope —
 
 ```
-a_Moon(t_Ma) = a_now × (1 + α₁·t_Ma + α₃·t_Ma³ + α₄·t_Ma⁴)
+a_Moon(t_Ma) = a_now × r_Farhat(t_Ma),   r'(0) = α₁ (LLR)
 ```
 
-calibrated to deep-time anchors (Wells 1963 Devonian corals, Wu et al. 2024
-cyclostratigraphy 0–650 Ma, modern lunar laser ranging) and independent of
-the Meeus formulas. The two are physically consistent at J2000:
+(the former quartic, calibrated to deep-time anchors, is deleted) and is
+independent of the Meeus formulas. The two are physically consistent at J2000:
 
 ```
 da/dt|_J2000 = a_now × α₁ / 1e6 = +3.82 cm/yr    (LLR direct anchor)

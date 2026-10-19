@@ -127,13 +127,13 @@ function blockEccLines() {
 
 function blockGenesis() {
   const rows = ['| Age (Gyr) | LOD (hr) | Moon distance (km) | T_p (yr) — the composed precession period | obliquity beat (kyr) |', '|---:|---:|---:|---:|---:|'];
-  for (const t of [4498, 4420, 3250, 2500, 1000, 600, 350, 0, -200]) {
-    const label = t === 4498 ? '**4.498 (genesis, rigid Roche)**' : t === 4420 ? '**4.42 (Farhat Moon-formation)**' : t === 0 ? '**0 (Modern)**' : t < 0 ? `+${(-t / 1000).toFixed(1)} (future)` : (t / 1000).toFixed(2);
+  for (const t of [4429, 4200, 3200, 2460, 1000, 650, 380, 0, -200]) {
+    const label = t === 4429 ? '**4.429 (genesis — the cited history\'s end, Farhat 2022\'s lunar age)**' : t === 0 ? '**0 (Modern)**' : t < 0 ? `+${(-t / 1000).toFixed(1)} (future, LLR rate held)` : (t / 1000).toFixed(2);
     const beat = t > 2500 ? '— (ψ̇ ≫ \\|s₃\\|: the beat ≈ T_p)' : f(beatKyr(t), 2);
     rows.push(`| ${label} | ${f(lodHr(t), 2)} | ${th(moonKm(t))} | ${th(Tp(t))} | ${beat} |`);
   }
   rows.push('');
-  rows.push(`Near genesis the Moon's torque dominates by orders of magnitude ((a₀/a_M)³ ≈ ${th(Math.pow(384399 / moonKm(4420), 3))} at 4.42 Ga), so the precession period collapses to decades — a statement of the composition law at the edge of the tidal chain's domain, not a calibrated prediction (the recession history there is the Driver-1½ regime knots to the Roche crossing).`);
+  rows.push(`Near genesis the Moon's torque dominates by orders of magnitude ((a₀/a_M)³ ≈ ${th(Math.pow(384399 / moonKm(4429), 3))} at the input's end, 4.429 Ga), so the precession period collapses to years — a statement of the composition law at the edge of the input's domain, not a calibrated prediction (the distance there is Farhat et al. 2022's solution, read as the ratio a(t)/a(0) on the J2000 distance; the model refuses beyond 4,429 Ma).`);
   return rows.join('\n');
 }
 
@@ -155,7 +155,7 @@ function blockFuture() {
     const beat = p === null ? '—' : p > s3 ? f(beatKyr(t), 2) : '— (ψ̇ < \\|s₃\\|)';
     rows.push(`| ${label} | ${f(lodHr(t), 2)} | ${th(moonKm(t))} | ${th(Tp(t))} | ${beat} | ${t === 0 ? 'anchor' : 'within the tidal chain'} |`);
   }
-  rows.push('| +3 Gyr | beyond a_lock | — | — | — | formula horizon |');
+  rows.push('| +4.5 Gyr | beyond a_lock | — | — | — | formula horizon (the LLR rate held constant forward — a labelled extrapolation) |');
   rows.push('');
   rows.push(x === null ? 'ψ̇ stays above |s₃| inside the formula horizon.' : `**The spin–orbit crossover.** The composed precession rate falls to the nodal mode's rate, ψ̇ = |s₃| = ${f(s3, 2)} ″/yr, at about **+${th(x)} Myr** (T_p ≈ ${th(1296000 / s3)} yr): the obliquity beat 2π/(ψ̇ − |s₃|) diverges there — the secular spin–orbit resonance that the standard literature also places in Earth's tidal future (large obliquity excursions). Beyond it the beat re-forms on |s₃| − ψ̇. A prediction of the composition law, stated before any test.`);
   return rows.join('\n');
@@ -176,12 +176,12 @@ function blockGrowthRate() {
 
 function blockKeyEpochs() {
   const rows = ['| Age (Ma) | LOD (s) | LOD (hr) | Moon distance (km) | T_p (yr) | obliquity beat (kyr) |', '|---:|---:|---:|---:|---:|---:|'];
-  for (const t of [0, 380, 550, 1000, 2500, 4498, -200, -1000]) {
-    const label = t === 0 ? '0 (Modern)' : t === 380 ? '380 (Devonian)' : t === 550 ? '550 (Cambrian)' : t === 1000 ? '1,000 (Mesoproterozoic)' : t === 2500 ? '2,500 (Archean)' : t === 4498 ? '4,498 (Earth-Moon genesis, rigid Roche)' : t === -200 ? '**−200 (+200 Ma future)**' : '**−1,000 (+1 Gyr future)**';
+  for (const t of [0, 380, 550, 1000, 2500, 4429, -200, -1000]) {
+    const label = t === 0 ? '0 (Modern)' : t === 380 ? '380 (Devonian)' : t === 550 ? '550 (Cambrian)' : t === 1000 ? '1,000 (Mesoproterozoic)' : t === 2500 ? '2,500 (Archean)' : t === 4429 ? '4,429 (Earth-Moon genesis — the cited history\'s end)' : t === -200 ? '**−200 (+200 Ma future)**' : '**−1,000 (+1 Gyr future)**';
     const beat = t > 2500 ? '—' : f(beatKyr(t), 2);
     rows.push(`| ${label} | ${th(lodS(t), 1)} | ${f(lodHr(t), 3)} | ${th(moonKm(t))} | ${th(Tp(t))} | ${beat} |`);
   }
-  rows.push('| **−3,000 (+3 Gyr future)** | — | — | — | — | beyond tidal lock |');
+  rows.push('| **−4,500 (+4.5 Gyr future)** | — | — | — | — | beyond tidal lock (LLR rate held forward) |');
   return rows.join('\n');
 }
 

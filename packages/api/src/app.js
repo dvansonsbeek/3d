@@ -133,7 +133,7 @@ export function createApi() {
     constantsHash: id.constantsHash,
     coefficientsHash: id.coefficientsHash,
     citation: `doi:${id.preprintDoi}`,
-    validitySpan: { minYear: -498e6, maxYear: 502e6, note: 'refused outside, never extrapolated' },
+    validitySpan: { minYear: -498e6, maxYear: 502e6, note: 'refused outside, never extrapolated; the deep-time chain (day length, Moon distance, clock) runs on the cited Earth–Moon distance history — Farhat et al. 2022, AstroGeo22 — to 4,429 Ma, the paleo gate tests it to 3.2 Ga, and this API serves ±500 Myr (plan 12 option A)' },
   });
 
   /** @param {Record<string, string>} query @returns {{ years: number[], echo: Record<string, unknown> } | { problem: {status: number, headers: Record<string, string>, body: string} }} */

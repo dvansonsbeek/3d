@@ -1,7 +1,7 @@
 ---
 docVersion: 1.0
-modelVersion: v25.0
-coefficients: sha256:91e2d041c7b6e038
+modelVersion: v26.0
+coefficients: sha256:ff77fbc9baa370e4
 status: current
 ---
 
@@ -86,7 +86,7 @@ Five geological-era vertical markers anchor the time axis:
 
 | t_cal (Ma) | Era | Color | Style |
 |---|---|---|---|
-| −4498 | Earth-Moon genesis | `#a66` reddish | dashed, 1.1 stroke |
+| −4429 | Earth-Moon genesis (the cited distance history's end) | `#a66` reddish | dashed, 1.1 stroke |
 | −541 | Cambrian | `#699` teal-grey | dashed, 0.8 stroke |
 | −380 | Devonian | `#6a9` green-grey | dashed, 0.8 stroke |
 | −250 | Pangea (mid) | `#c95` orange-tan | dashed, 0.8 stroke |

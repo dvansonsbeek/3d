@@ -12,7 +12,7 @@ import { Pane } from 'tweakpane';
 //
 // Generated at build time, not fetched at runtime — the model parameters are
 // read at module scope below, and Phase 15 requires offline === hosted.
-import { computeObliquityJ2000Deg, computeSecularShape, DEFAULT_CONSTANTS as K, REFERENCE_DATA as R, FITTED_COEFFICIENTS as FIT, CONSTANTS_HASH, COEFFICIENTS_HASH, MODEL_VERSION, PREPRINT_DOI, createEpochPrimitives, createDeepCalendar, createDeepEccChannel, DEEP_MODES_ARTIFACT, createDeepOrbitalHistory, createYearLengths, computeMeanTropicalYearJ2000Days, createMoonMonthChain, createChainCycleIntegrator, createMoonArguments, createMoonSeries, createMoonApparent, derivePlanetGeometry, scaffoldOrbitInputs, planetOrbitChain as _POC, createDeltaTCycles, createDeepTimeLod, createMoonRecessionHistory, createSolarChannelBudget, deltaTEspenakMeeusCanonSeconds, evalClimateL1OrbitalPermil, createAlphaGiaChannel, computeSolarTorqueShare, createEclipseFinders, createModel, buildPlanetChainsFromArtifactData, computePlanetElementsAtYear as kcComputePlanetElementsAtYear, computeHeliocentricEclipticFromElements as kcComputeHeliocentricEclipticFromElements, computeEquatorNodeOriginSFrameDeg, convertNodeSFrameToEquatorOriginDeg, createSecularSeriesOverride, CHAIN_ARTIFACT, ANCHOR_EPOCH_YEAR as KC_ANCHOR_EPOCH_YEAR, ANCHOR_EPOCH_JD as KC_ANCHOR_EPOCH_JD, computeEarthFrameOfDate, solveWheelAngleForLongitude, computeSceneWorldFrameJ2000, SCENE_EQUINOX_VIEW_AZIMUTH_DEG } from '@essrt/physics';
+import { computeObliquityJ2000Deg, computeSecularShape, DEFAULT_CONSTANTS as K, REFERENCE_DATA as R, FITTED_COEFFICIENTS as FIT, CONSTANTS_HASH, COEFFICIENTS_HASH, MODEL_VERSION, PREPRINT_DOI, createEpochPrimitives, createDeepCalendar, createDeepEccChannel, DEEP_MODES_ARTIFACT, createDeepOrbitalHistory, createYearLengths, computeMeanTropicalYearJ2000Days, createMoonMonthChain, createChainCycleIntegrator, createMoonArguments, createMoonSeries, createMoonApparent, derivePlanetGeometry, scaffoldOrbitInputs, planetOrbitChain as _POC, createDeltaTCycles, createDeepTimeLod, createMoonDistanceHistory, MOON_DISTANCE_ARTIFACT, deltaTEspenakMeeusCanonSeconds, evalClimateL1OrbitalPermil, createAlphaGiaChannel, computeSolarTorqueShare, createEclipseFinders, createModel, buildPlanetChainsFromArtifactData, computePlanetElementsAtYear as kcComputePlanetElementsAtYear, computeHeliocentricEclipticFromElements as kcComputeHeliocentricEclipticFromElements, computeEquatorNodeOriginSFrameDeg, convertNodeSFrameToEquatorOriginDeg, createSecularSeriesOverride, CHAIN_ARTIFACT, ANCHOR_EPOCH_YEAR as KC_ANCHOR_EPOCH_YEAR, ANCHOR_EPOCH_JD as KC_ANCHOR_EPOCH_JD, computeEarthFrameOfDate, solveWheelAngleForLongitude, computeSceneWorldFrameJ2000, SCENE_EQUINOX_VIEW_AZIMUTH_DEG } from '@essrt/physics';
 // K8 — the reference package: ONE-WAY imports (comparison only;
 // @essrt/reference is private-by-construction and nothing in the model
 // chain depends on it). publishedCurves migrated here from
@@ -296,9 +296,9 @@ const G_CONSTANT = K.physicalConstants.G_CONSTANT;               // km³/(kg·s�
 const EARTH_MOI_FACTOR = K.physicalConstants.earthMoiFactorJ2000; // IERS Conventions 2010 — α at J2000
 const L_SUN_W = K.physicalConstants.solarLuminosityW;            // IAU 2015 nominal solar luminosity (W)
 const SOLAR_WIND_KG_PER_S = K.physicalConstants.solarWindMassLossKgPerS;  // Ulysses/ACE/Wind measurements
-const ALPHA_1 = K.deepTime.alpha1PerMa;           // /Ma  — Moon recession, LLR-anchored (3.82 cm/yr)
-const ALPHA_3 = K.deepTime.alpha3PerMa3;          // /Ma³ — Farhat 2022 LSQ deep-time fit
-const ALPHA_4 = K.deepTime.alpha4PerMa4;          // /Ma⁴ — Farhat 2022 LSQ deep-time fit
+const ALPHA_1 = K.deepTime.alpha1PerMa;           // /Ma  — Moon recession, LLR-anchored (3.82 cm/yr): the J2000 slope of the cited distance history
+// (plan 12 option A: the quartic's ALPHA_3/ALPHA_4 are deleted — the Moon distance history is the
+// cited AstroGeo22 input, MOON_DISTANCE_ARTIFACT, read through createMoonDistanceHistory below.)
 const ALPHA_GIA_RATE_J2000_PER_YR = K.deepTime.alphaGiaRateJ2000PerYr;  // Cox-Chao/2.0 — the rate the channel's k is derived from
 const ALPHA_GIA_RELAXATION_KYR   = K.deepTime.alphaGiaRelaxationKyr;    // τ, measured against the historical ΔT record (plan 06 D7)
 const BOND_TAPER_FULL_HALFWIDTH_YR  = K.deepTime.dtStackTaperFullHalfwidthYr;   // 4-flag ΔT stack taper: full strength
@@ -2421,7 +2421,7 @@ const PRECESSION_SOLAR_SHARE_J2000 = computeSolarTorqueShare({
 const _L0 = createEpochPrimitives({
   params: Object.freeze({
     epochYear: 2000,
-    alpha1PerMa: ALPHA_1, alpha3PerMa3: ALPHA_3, alpha4PerMa4: ALPHA_4,
+    alpha1PerMa: ALPHA_1,
     moonDistanceNowM: A_MOON_NOW_M, moonLockDistanceM: A_LOCK_M,
     totalAngularMomentumKgM2S: L_TOTAL_EM_KGM2_S,
     moonMassKg: M_MOON_ALONE, gmEarthMoonM3S2: GM_EM_M3S2,
@@ -2436,19 +2436,22 @@ const _L0 = createEpochPrimitives({
     precessionSolarShareJ2000: PRECESSION_SOLAR_SHARE_J2000,
   }),
   alphaAtAgeMa: earthMoiFactorAtAge,
+  // plan 12 option A: the cited distance history (the Node twin's shape)
+  moonDistanceMetresAtAge: (t_Ma) => _recessionHistory().distanceMetresAtAge(t_Ma),
 });
 
-// Farhat 2022 LSQ polynomial coefficients — Moon distance evolution
-// a_Moon(t)/a_now = 1 + α₁·t + α₃·t³ + α₄·t⁴   (no α₂)
-// ALPHA_1 / ALPHA_3 / ALPHA_4 live in section C3 "Deep-time physics anchors" near the top.
-// α₁ is anchored to modern LLR direct observation: da/dt(J2000) = 3.82 cm/yr
-// (Dickey 1994 / Chapront 2002). Validates against Wells 1963 coral rings
-// (400.06 vs 400 days/yr at 380 Ma, 0.01% error) and Wu 2024 cyclostratigraphy
-// (411.5 vs 412 days/yr at 500 Ma, 0.12%). Places Moon at rigid Roche at
-// ~4.498 Ga — matches giant-impact-4.5-Ga standard. Prior value:
-// -8.8658188951e-05 (Wells 1989 DERIVED rate 3.43 cm/yr, a theoretical
-// Phanerozoic-average value; the direct paleontological data itself supports
-// the LLR rate, not the Wells 1989 derivation).
+// The Moon distance history is the CITED INPUT (plan 12 option A): Farhat et al.
+// 2022's AstroGeo22 solution, read as the ratio a(t)/a(0) on the J2000 distance
+// with ALPHA_1 — modern LLR direct observation, da/dt(J2000) = 3.82 cm/yr
+// (Dickey 1994 / Chapront 2002) — as its J2000 slope; forward of J2000 the LLR
+// rate is held (a labelled extrapolation); null beyond the history's end,
+// 4,429 Ma. Nothing in the chain is fitted to the rock record: the paleo gate
+// reads every row as a test (Wells 1963 within ±1.4 %, the Zhou 2024
+// precession constants the stated open discrepancy). The former quartic
+// (α₃/α₄ fitted to Farhat's curve) and the regime spline pinned at a Roche
+// crossing of 4,498 Ma are deleted. Prior α₁: -8.8658188951e-05 (Wells 1989
+// DERIVED rate 3.43 cm/yr; the direct paleontological data supports the LLR
+// rate, not the Wells 1989 derivation).
 
 // ───── Structural diagnostic (J2000 anchor — drifts at deep time) ─────
 // (Plan 09 step 7b: the device accounting `TOTAL_DAYS_IN_H` (H × mSY, the
@@ -2458,44 +2461,22 @@ const _L0 = createEpochPrimitives({
 // a separate investigation topic.)
 
 // ───── LAYER 2 — Moon distance evolution ─────
-// Driver 1½ (2026-08): the regime-aware recession history + the solar
-// angular-momentum channels live ONCE in @essrt/physics/deltat/
-// recession-history — the quartic stays bit-identical ≤ jointMa (the
-// Wells/Wu-gated era), the fitted staircase spline runs beyond it, and the
-// ocean-leak/thermal-pump channels make L_EM(t) time-dependent there.
-// Mirrors tools/lib/deep-time.js _recessionHistory/_solarBudget exactly.
+// Plan 12 option A: the cited Earth–Moon distance history lives ONCE in
+// @essrt/physics/deltat/moon-distance-history (monotone cubic Hermite on the
+// AstroGeo22 ratio table embedded as MOON_DISTANCE_ARTIFACT; J2000 end-slope
+// = ALPHA_1; forward = the LLR rate held; null beyond 4,429 Ma). The LOD is
+// angular-momentum conservation on it with the J2000 L_EM constant — no solar
+// channels. Mirrors tools/lib/deep-time.js _recessionHistory exactly.
 var _recessionM = null;
 function _recessionHistory() {
   if (!_recessionM) {
-    const R = K.deepTime.recessionRegime;
-    _recessionM = createMoonRecessionHistory({
+    _recessionM = createMoonDistanceHistory({
+      table: MOON_DISTANCE_ARTIFACT,
       aMoonNowMetres: A_MOON_NOW_M,
-      alpha1PerMa: ALPHA_1, alpha3PerMa3: ALPHA_3, alpha4PerMa4: ALPHA_4,
-      regime: {
-        jointMa: R.jointMa, knotAgesMa: R.knotAgesMa,
-        knotDistancesKm: R.knotDistancesKm, genesisMa: R.genesisMa,
-        rocheLimitKm: R.rocheLimitKm,
-      },
+      alpha1PerMa: ALPHA_1,
     });
   }
   return _recessionM;
-}
-var _solarBudgetM = null;
-function _solarBudget() {
-  if (!_solarBudgetM) {
-    const R = K.deepTime.recessionRegime;
-    _solarBudgetM = createSolarChannelBudget({
-      lTotalJ2000KgM2S: L_TOTAL_EM_KGM2_S,
-      mMoonAloneKg: M_MOON_ALONE, gmEmM3PerS2: GM_EM_M3S2,
-      eFactorMoon: E_FACTOR_MOON,
-      beta0: R.solarOceanLeakBeta0,
-      pumpStartMa: R.thermalPumpStartMa, pumpEndMa: R.thermalPumpEndMa,
-      pumpFactor: R.thermalPumpFactor,
-      jointMa: R.jointMa, genesisMa: R.genesisMa,
-      distanceMetresAtAge: _recessionHistory().distanceMetresAtAge,
-    });
-  }
-  return _solarBudgetM;
 }
 
 /** Moon semi-major axis at given geological age (METRES). t_Ma > 0 = past. */
@@ -2519,7 +2500,6 @@ function _deepLod() {
         mEarthAloneKg: M_EARTH_ALONE, rEarthMetres: R_EARTH_M,
         gmEmM3PerS2: GM_EM_M3S2, eFactorMoon: E_FACTOR_MOON, aLockMetres: A_LOCK_M,
         aMoonNowMetres: A_MOON_NOW_M, alpha1PerMa: ALPHA_1,
-        alpha3PerMa3: ALPHA_3, alpha4PerMa4: ALPHA_4,
         lodNowH13Seconds: LOD_NOW_H13_S,
         meanSiderealYearJ2000Seconds: MEAN_SIDEREAL_YEAR_J2000_S,
         solarMassLossFracPerYear: SOLAR_MASS_LOSS_FRAC_PER_YR,
@@ -2535,7 +2515,9 @@ function _deepLod() {
       // Plan 06 T2 item: the solar day's ecliptic missing-motion term rides
       // the nodal period 1,296,000/|s₃| (orbital), not the spin unit's H/5.
       nodalPeriodYearsFn: () => 1296000 / _s3ArcsecPerYr(),
-      lEmAtAgeKgm2S: _solarBudget().lEmAtAgeKgm2S,
+      // plan 12 option A: the LOD-rate decomposition's tidal term reads the
+      // cited history's analytic slope (the Node twin's dependency)
+      moonDistanceSlopeMetresPerMaAtAge: _recessionHistory().slopeMetresPerMaAtAge,
       cycleLodSumAt: (year) => dtCycleLodCorrectionSum(year),
       swingLodAt: (year) => resonatorSwingLodCorrection(year),
       swingLodRateAt: (year) => resonatorSwingLodRate(year),
@@ -4071,7 +4053,7 @@ const _moonChain = (() => {
       m = createMoonMonthChain({
         constants: {
           aMoonNowMetres: A_MOON_NOW_M,
-          alpha1PerMa: ALPHA_1, alpha3PerMa3: ALPHA_3, alpha4PerMa4: ALPHA_4,
+          alpha1PerMa: ALPHA_1,
           gmEarthMoonM3PerS2: GM_EM_M3S2,
           massRatioEarthMoon: MASS_RATIO_EARTH_MOON,
           moonSiderealMonthInputDays: moonSiderealMonthInput,
@@ -15148,7 +15130,7 @@ const ESSRT_QTY_TABS = [
 
 // Time ranges (x in calendar Ma; negative = past). Convention: t_Ma_geo = -x.
 const ESSRT_RANGE_TABS = [
-  { key: 'full',    t_lo: -4498, t_hi: 1000, label: 'Full (−4.5 to +1 Gyr)' },
+  { key: 'full',    t_lo: -4429, t_hi: 1000, label: 'Full (−4.43 to +1 Gyr)' },
   { key: 'phanero', t_lo:  -650, t_hi:    0, label: 'Phanerozoic (650 Ma)' },
 ];
 
@@ -15168,11 +15150,11 @@ const WU_ANCHORS = [
 const ESSRT_QTY_SPECS = {
   lod: {
     title:    'Length of Day (LOD)',
-    subtitle: 'Earth\'s mean solar day length under Driver 1 (Earth-Moon tidal recession). Tidal slowing increases the day; LOD grew from ~4.6 hr at Earth-Moon genesis to ~24 hr at J2000.',
+    subtitle: 'Earth\'s mean solar day length under Driver 1 — angular-momentum conservation on the cited Earth-Moon distance history (Farhat et al. 2022). Tidal slowing increases the day; LOD grew from ~5.5 hr at Earth-Moon genesis (the history\'s end, 4.43 Ga) to ~24 hr at J2000.',
     yLabel:   'LOD (hours)',
     compute:  (t_Ma) => { const s = meanLodSecondsAtAge(t_Ma); return s === null ? null : s / 3600; },
     yFmt:     (v) => v.toFixed(2) + ' hr',
-    // From Hadean Earth ~5 hr through J2000 24 hr to ~32 hr at +1 Gyr
+    // From the Hadean ~5.5 hr through J2000 24 hr to ~32 hr at +1 Gyr
     yMin: 0, yMax: 36,
     hasWu:    true,
     wuKey:    'lod_hr',
@@ -15180,18 +15162,20 @@ const ESSRT_QTY_SPECS = {
     footnote: 'Note: the small mid-Phanerozoic offset below the Wu et al. 2024 anchors (largest ~0.8 hr at 200 Ma) is the documented Pangea high-tidal-dissipation interval — Wu\'s key finding is that lunar recession ran non-uniformly (~7.0 cm/yr in the supercontinent era vs ~2.2 before it), which the calibrated smooth 0–1000 Ma branch deliberately averages over. The deviation is recorded and gated as documented bands (docs/99 §Pangea interval).',
   },
   year: {
-    title:    'Length of Year (days at epoch)',
-    subtitle: 'Tropical year length in mean-solar days AT EACH EPOCH. Combines both drivers — Driver 2 sets year-in-seconds, Driver 1 sets day-in-seconds. At Devonian (380 Ma) Earth had ~400 days/year (matches coral growth bands — Wells 1963).',
+    title:    'Length of Year (sidereal, days at epoch)',
+    subtitle: 'Sidereal year length in mean-solar days AT EACH EPOCH. Combines both drivers — Driver 2 sets year-in-seconds (the solar-mass law), Driver 1 sets day-in-seconds (conservation on the cited Earth-Moon distance history). At the Devonian (380 Ma) Earth had ~403 days/year against Wells 1963\'s ~400 coral growth bands. The sidereal year is shown because the tropical year\'s definition fails near genesis, where the precession period collapses to years.',
     yLabel:   'Year (days at epoch)',
-    // Tropical-year seconds (Driver 2) divided by mean solar day length (Driver 1).
+    // Sidereal-year seconds (Driver 2) divided by mean solar day length (Driver 1).
+    // plan 12 option A: the sidereal year, not the tropical — near the history's end
+    // T_p falls to years and the tropical year (one equinox turn fewer) loses its meaning.
     compute:  (t_Ma) => {
-      const yearSec = meanTropicalYearSecondsAtAge(t_Ma);
+      const yearSec = meanSiderealYearSecondsAtAge(t_Ma);
       const lodSec  = meanLodSecondsAtAge(t_Ma);
       if (yearSec === null || lodSec === null || lodSec === 0) return null;
       return yearSec / lodSec;
     },
     yFmt:     (v) => Math.round(v).toLocaleString('en-US') + ' days',
-    // Full range needs to cover Hadean ~1,750 days/yr → +1 Gyr ~274 days/yr.
+    // Full range needs to cover the Hadean ~1,590 days/yr → +1 Gyr ~274 days/yr.
     // Phanerozoic (650 Ma → J2000) only spans 416 → 365 days/yr — clamp tighter
     // so the curve fills the chart instead of looking flat.
     yMin: 0, yMax: 2000,
@@ -15247,12 +15231,12 @@ const ESSRT_QTY_SPECS = {
   },
   moon: {
     title:    'Earth-Moon Distance',
-    subtitle: 'Tidal recession under Driver 1 — the regime-aware history: the calibrated curve through 0–1000 Ma, the fitted staircase spline (Farhat 2022 resonant crossings) beyond, ending at the rigid Roche limit (~9,500 km) at Earth-Moon genesis, ~4.5 Ga.',
+    subtitle: 'Tidal recession under Driver 1 — the cited Earth-Moon distance history (Farhat et al. 2022, AstroGeo22) on the observed J2000 distance with the LLR rate as its J2000 slope; it ends at the Moon-formation age its authors adopt, 4.43 Ga (Moon at ~6 Earth radii). Forward of J2000 the LLR rate is held.',
     yLabel:   'Moon distance (km)',
     // Returns kilometres directly so tick labels render as natural numbers.
     compute:  (t_Ma) => { const m = meanMoonDistanceMetresAtAge(t_Ma); return m === null ? null : m / 1000; },
     yFmt:     (v) => Math.round(v).toLocaleString('en-US') + ' km',
-    // From ~0 (Roche) through J2000 384,399 km to ~421,000 km at +1 Gyr
+    // From ~39,500 km (the history's end) through J2000 384,399 km to ~421,000 km at +1 Gyr
     yMin: 0, yMax: 500000,
     hasWu:    true,
     wuKey:    'moon_er',
@@ -15264,7 +15248,7 @@ const ESSRT_QTY_SPECS = {
 
 // Geological-era markers (calendar Ma, negative = past)
 const ESSRT_ERA_MARKERS = [
-  { t_cal: -4498, label: 'Earth-Moon genesis', color: '#a66' },
+  { t_cal: -4429, label: 'Earth-Moon genesis', color: '#a66' },
   { t_cal: -541,  label: 'Cambrian',           color: '#699' },
   { t_cal: -380,  label: 'Devonian',           color: '#6a9' },
   { t_cal: -250,  label: 'Pangea (mid)',       color: '#c95' },
@@ -15627,7 +15611,7 @@ function essrtRenderChart(qtyKey, rangeKey) {
   // "Frame note:" block. Concise per-quantity description.
   const driverText = {
     lod:        '<strong>Driver 1</strong> — Earth-Moon tidal recession (Layer-2 angular-momentum conservation, Farhat 2022 polynomial fit).',
-    year:       '<strong>Drivers 1+2</strong> — days/year = (tropical year_s) / LOD. Driver 2 sets year-in-seconds (Kepler dT/T = −2 dM/M); Driver 1 sets day-in-seconds (Farhat 2022). The model’s day-count near-invariant couples the two. Wu et al. days/year are derived from their LOD: at 400 Ma → ~403 days/yr (matches Wells 1963 coral bands).',
+    year:       '<strong>Drivers 1+2</strong> — days/year = (sidereal year_s) / LOD. Driver 2 sets year-in-seconds (Kepler dT/T = −2 dM/M); Driver 1 sets day-in-seconds (conservation on the cited Farhat 2022 distance history). Wu et al. days/year are derived from their LOD: at 400 Ma → ~403 days/yr (Wells 1963 coral bands ~400).',
     axial:      '<strong>Driver 1</strong> — the composed lunisolar precession period: Earth’s spin (Layer-2 angular momentum, Farhat 2022 recession) carrying the solar and lunar torques, the lunar torque growing on the Moon’s distance; anchored on the IAU 2006 general precession at J2000 (25,771.6 yr).',
     obliqCycle: '<strong>Driver 1</strong> — the obliquity beat 2π/(ψ̇ᵢₙ − |s₃|): the spin axis’s inertial precession rate (the composed rate × the hybrid’s self-anchor factor) against the orbit’s dominant nodal mode (s₃ at its dynamical value under the solar-mass history).',
     au:         '<strong>Driver 2</strong> — solar mass loss: a × M = const (Kepler dT/T = −2 dM/M, ~9.3×10⁻¹⁴ /yr).',
@@ -15891,7 +15875,7 @@ async function createEssrtPanel() {
       <div class="cfm-header">
         <div style="display:flex; flex-direction:column; align-items:flex-start; flex:1; min-width:0">
           <div class="cfm-title">Earth–Moon Genesis Analysis</div>
-          <div class="cfm-subtitle">The model's own evolution from Earth–Moon genesis (−4.5 Gyr) to +1 Gyr — the clock lengthens as tidal friction slows the spin and the receding Moon weakens its torque</div>
+          <div class="cfm-subtitle">The model's own evolution from Earth–Moon genesis (−4.43 Gyr, the cited distance history's end) to +1 Gyr — the clock lengthens as tidal friction slows the spin and the receding Moon weakens its torque</div>
         </div>
         <button class="cfm-export-btn" data-essrt-export title="Export the quantity and time range on screen as a picture (PNG or SVG download)">Export</button>
         <div class="cfm-close" title="Close"></div>
@@ -20350,8 +20334,8 @@ function moonDraconicMonthDaysMeeus(year) { return _meeusMonthDays(_meeus47RateD
 
 // ── VFP: Moon · Month Lengths — the months of date as strips ────────────
 // (owner-requested.) The chain's five months at age — the sidereal month is
-// Kepler's third law on the recession distance of date (Driver 1½ directly:
-// it lengthens at the tidal rate the LLR-anchored recession sets), the
+// Kepler's third law on the cited distance history of date (plan 12 option A:
+// it lengthens at the tidal rate the history carries, LLR at J2000), the
 // synodic its beat with the sidereal year (both drivers), the anomalistic
 // and draconic its beats with the perigee and node cycles (the Moon
 // panels'), the tropical folds in the axial precession — each on its own
@@ -24473,7 +24457,7 @@ function setupGUI() {
   addTooltip(analysisFolder.addButton({ title: 'Planet Orbit Analysis' }).on('click', () => openHierarchyInspector()),
     'Inspect the orbit of date of one planet from the N-body chain: its elements, the orbit geometry drawn in the 3D scene (plane, nodes, extremes, perihelion, anomalies), the orbit picture export, and the position report against the NASA/JPL test dates.');
   addTooltip(analysisFolder.addButton({ title: 'Earth\u2013Moon Genesis Analysis' }).on('click', () => openEssrtPanel()),
-    'The model\u2019s own evolution from Earth\u2013Moon genesis (\u22124.5 Gyr, the giant-impact epoch) to +1 Gyr: the day length, the lunisolar precession period, the obliquity beat, the AU, the Moon\u2019s distance and the planets\u2019 orbital parameters, with the Wu et al. 2024 cyclostratigraphy anchors on the Phanerozoic 650 Ma window.');
+    'The model\u2019s own evolution from Earth\u2013Moon genesis (\u22124.43 Gyr, the end of the cited Earth\u2013Moon distance history) to +1 Gyr: the day length, the lunisolar precession period, the obliquity beat, the AU, the Moon\u2019s distance and the planets\u2019 orbital parameters, with the Wu et al. 2024 cyclostratigraphy anchors on the Phanerozoic 650 Ma window.');
   addTooltip(analysisFolder.addButton({ title: 'Earth Climate Analysis' }).on('click', () => openClimateFormulaPanel()),
     'Modular climate formula: L1 orbital lines (the engine’s secular beats + the 405.6-kyr eccentricity family) + L2 silicate-weathering carbon thermostat (405/202/135 kyr) + L3 boundary-condition steps (PETM, EOT, Mi-1, MMCT, iNHG, MPT). Per-regime fits vs LR04 \u03b4\u00b9\u2078O (Lisiecki & Raymo 2005) and CENOGRID \u03b4\u00b9\u2078O / \u03b4\u00b9\u00b3C (Westerhold 2020). Independent layer toggles + per-layer R\u00b2 breakdown. Forward-projection tab; cross-regime prediction fails honestly (doc 92 \u00a78.4).');
   addTooltip(analysisFolder.addButton({ title: 'Earth dLOD/dt Analysis' }).on('click', () => openLcrPanel()),
@@ -25364,10 +25348,11 @@ function setupGUI() {
     }
     function _lodScaledL1(t_Ma_arg, scale) {
       const a = meanMoonDistanceMetresAtAge(t_Ma_arg);
-      if (a <= 0 || a >= A_LOCK_M) return null;
+      if (a === null || a <= 0 || a >= A_LOCK_M) return null;
       const iE = _alphaScaledL1(t_Ma_arg, scale) * M_EARTH_ALONE * R_EARTH_M * R_EARTH_M;
+      // plan 12 option A: the J2000 L_EM is constant (no solar channels)
       return (2 * Math.PI * iE) /
-             (_solarBudget().lEmAtAgeKgm2S(t_Ma_arg) - M_MOON_ALONE * Math.sqrt(GM_EM_M3S2 * a) * E_FACTOR_MOON);
+             (L_TOTAL_EM_KGM2_S - M_MOON_ALONE * Math.sqrt(GM_EM_M3S2 * a) * E_FACTOR_MOON);
     }
     function _tropYearScaledL1(t_Ma_arg, scale) {
       // the one-family law on the SCALED LOD: one equinox turn per the composed
@@ -52108,7 +52093,7 @@ function _lodContribFromDeltaTFn(fn, year, h = 0.5) {
  *  period stripped of GIA orbital ripple.
  *
  *  At J2000: ≈ 86400 s (framework's tidal-physics calibration).
- *  Deep-time: increases as Moon recedes (Hadean ~18k s → today 86400 s → +1Gyr ~114k s).
+ *  Deep-time: increases as Moon recedes (the history's end ~19.8k s → today 86400 s → +1Gyr ~114k s).
  */
 function absoluteMeanLodSec(year) {
   const t_Ma = (J2000_CALENDAR_YEAR - year) / 1e6;

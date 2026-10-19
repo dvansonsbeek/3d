@@ -1,7 +1,7 @@
 ---
 docVersion: 1.0
-modelVersion: v25.0
-coefficients: sha256:91e2d041c7b6e038
+modelVersion: v26.0
+coefficients: sha256:ff77fbc9baa370e4
 status: current
 ---
 
@@ -64,7 +64,7 @@ their diffs), and the sections below give the intended reading order instead.
 
 | # | Document | Description |
 |---|----------|-------------|
-| 106 | [Deep-Time Validation Dossier](106-deep-time-validation-dossier.md) | The single entry point for "how well does the model match the geological and historical record, and how would we know if it stopped?" Four evidence classes, gate-backed (41 paleo anchors, Phanerozoic MAD <!--v:paleoMadPhanPct-->0.18<!--/v-->%), including **the honesty ledger** — documented deviations asserted as bands so an unexplained improvement fails CI too |
+| 106 | [Deep-Time Validation Dossier](106-deep-time-validation-dossier.md) | The single entry point for "how well does the model match the geological and historical record, and how would we know if it stopped?" Four evidence classes, gate-backed (41 paleo anchors, Phanerozoic MAD <!--v:paleoMadPhanPct-->0.48<!--/v-->%), including **the honesty ledger** — documented deviations asserted as bands so an unexplained improvement fails CI too |
 | 102 | [Pure-tidal + GIA α(t) vs the historical lunar record](102-gia-alpha-lunar-validation.md) | 267 primary-source lunar observations (Stephenson 2016): framework mean \|residual\| **20.2 min** vs NASA's fitted polynomial at 20.0 min — a 2-s excess over Stephenson's own fit, with zero ΔT-polynomial fitting; the α(t) GIA channel from independent satellite gravimetry; the 4-flag ΔT stack; the full hypothesis-testing and residual-decomposition record |
 | 104 | [The Millennial Rotation Swing](104-millennial-rotation-swing.md) | The core–mantle identification of the post-stack residual: one aperiodic swing, independently confirmed against archeomagnetic core-flow ΔLOD (r = +0.91), the lattice closed under difference tones, and the low-Q Magneto-Coriolis eigenmode reading |
 | 105 | [ΔT stack: what each flag buys](105-dt-stack-flag-audit.md) | Audit of the four ΔT correction flags under pre-fixed criteria: the shipped set is optimal in- and out-of-sample (Espenak RMS <!--v:deltaTEspenakRmsSeconds-->12.5<!--/v--> s); the two measurement traps (stage_* metrics rank backwards; Jose5/Jose4 are a coupled pair) |

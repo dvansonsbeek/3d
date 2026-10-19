@@ -91,7 +91,7 @@ for (const a of FARHAT_ANCHORS) {
   console.log(`  ${a.id} (${a.ageMa} Ma): ours ${ours.toFixed(2)} vs ${a.value} ± ${a.sigma} → ${resid >= 0 ? '+' : ''}${resid.toFixed(2)} (${sigmas.toFixed(1)}σ)`);
 }
 console.log('');
-console.log('  Curve through the ungated window (Wu stops at 650 Ma; genesis at 4498 Ma):');
+console.log('  Curve through the former ungated window (Wu stops at 650 Ma; the cited history ends at 4429 Ma):');
 console.log('  t_Ma | ours LOD hr | ours a R_E | doc-98 proxy regime');
 for (const t of [800, 1000, 1500, 2000, 2500, 3000, 3500]) {
   const lod = dt.meanLodSecondsAtAge(t) / 3600;
