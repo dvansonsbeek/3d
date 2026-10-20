@@ -111,6 +111,25 @@ const dBce = legacyNodeCalendarToJD(-584, 5, 28) - cal.calendarToJD(-584, 5, 28)
 check('settled: the Node twin\'s no-reform converter placed −584 May 28 six days LATE (B = 2 − a + ⌊a/4⌋ = +6 for a = −6)', dBce === 6, `no-reform − one-home = ${dBce} d`);
 check('settled: pre-reform dates agree between the always-Julian converter and the one-home function', dates.filter(([Y]) => Y < 1582).every(([Y, M, D]) => cal.calendarToJD(Y, M, D, 0.5) === legacyAlwaysJulianJD(Y, M, D, 12)));
 
+// the NASA-convention pair (proleptic Julian, no reform) against the browser's diagnostics copies, verbatim
+function legacyJdToCal(jd) {   // src/script.js umbra-path diagnostics, pre-B1
+  const J = jd + 0.5; const Z = Math.floor(J); const F = J - Z; const A = Z; const B = A + 1524;
+  const C = Math.floor((B - 122.1) / 365.25); const D = Math.floor(365.25 * C); const E = Math.floor((B - D) / 30.6001);
+  const day_full = B - D - Math.floor(30.6001 * E) + F; const month = (E < 14) ? E - 1 : E - 13; const year = (month > 2) ? C - 4716 : C - 4715;
+  const day = Math.floor(day_full); const dayFrac = day_full - day;
+  return { year, month, day, h: Math.floor(dayFrac * 24), m: Math.floor((dayFrac * 24 - Math.floor(dayFrac * 24)) * 60) };
+}
+let nj = 0; const badJ = [];
+for (const [Y, M, D] of dates) for (const hour of [0, 6, 12, 23.976]) {
+  const jd = legacyAlwaysJulianJD(Y, M, D, hour);
+  if (cal.julianCalendarToJD(Y, M, D, hour / 24) !== jd) badJ.push(`julianCalendarToJD ${Y}-${M}-${D} ${hour}h`);
+  const a = cal.jdToJulianCalendar(jd), b = legacyJdToCal(jd);
+  if (a.year !== b.year || a.month !== b.month || a.day !== b.day || Math.floor(a.dayFrac * 24) !== b.h) badJ.push(`jdToJulianCalendar @${jd}`);
+  nj += 2;
+}
+check(`calendar: ${nj} comparisons of the NASA-convention pair against the diagnostics' copies, bit-identical`, badJ.length === 0, badJ.slice(0, 4).join('; '));
+check('calendar: the NASA-convention pair round-trips and places 1654 Aug 12 ten days after the reformed date', (() => { const jd = cal.julianCalendarToJD(1654, 8, 12); const c = cal.jdToJulianCalendar(jd); return c.year === 1654 && c.month === 8 && c.day === 12 && jd - cal.calendarToJD(1654, 8, 12) === 10; })());
+
 // ── angles ─────────────────────────────────────────────────────────────────
 check('angles: DEG2RAD·RAD2DEG = 1 to 1 ulp', Math.abs(ang.DEG2RAD * ang.RAD2DEG - 1) < 3e-16);
 check('angles: ARCSEC_PER_RAD = 206264.806…', Math.abs(ang.ARCSEC_PER_RAD - 206264.80624709636) < 1e-9 && ang.ARCSEC_PER_TURN === 1296000);

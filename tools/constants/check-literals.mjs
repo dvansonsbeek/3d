@@ -97,6 +97,12 @@ const MIGRATED = [
   'astro.physicalConstants.earthMoiFactorJ2000',
   'astro.physicalConstants.solarLuminosityW',
   'astro.physicalConstants.solarWindMassLossKgPerS',
+  // plan 13 B3: the two display-side inputs the browser carried as literals
+  // (SOLAR_CONSTANT_WM2 = 1361 in the insolation panel; EARTH_R_KM = 6371 in
+  // the two eclipse-path Haversine diagnostics) — read as K.physicalConstants.*
+  // under their local names (findByName sees no numeric right-hand side).
+  'astro.physicalConstants.earthMeanRadiusKm',
+  'astro.physicalConstants.solarConstantWm2',
   'astro.earthOrbital.perihelionalignmentYear',
 
   // Phase 5f block 5 — astro.earthOrbital, COMPLETE since the §12e refit:

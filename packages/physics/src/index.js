@@ -109,7 +109,7 @@ export { createDeepCalendar } from './phase/deep-calendar.cjs';
 // Plan 13 B1: the civil calendar ↔ JD (Meeus ch. 7 with the 1582-10-15
 // reform) and the angle constants/wraps — ONE home; the browser's eighteen
 // calendar copies and 27 local D2R constants import these.
-export { GREGORIAN_START, GREGORIAN_START_JD, calendarToJD, jdToCalendar, jdToDecimalYear, dayFractionToHMS } from './time/calendar.cjs';
+export { GREGORIAN_START, GREGORIAN_START_JD, calendarToJD, jdToCalendar, jdToDecimalYear, dayFractionToHMS, julianCalendarToJD, jdToJulianCalendar } from './time/calendar.cjs';
 export { DEG2RAD, RAD2DEG, ARCSEC_PER_TURN, ARCSEC_PER_RAD, wrap360, wrap180, wrap180Closed, wrap2pi, wrapPi } from './math/angles.cjs';
 // Plan 13 B2: THE deep-time chain assembly — the GIA α channel, the Layer-0
 // bundle, the cited Moon-distance history, the ΔT cycle stack, |s₃|, the

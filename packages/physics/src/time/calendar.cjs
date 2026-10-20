@@ -46,6 +46,47 @@ function calendarToJD(year, month, day, dayFraction = 0) {
 }
 
 /**
+ * Proleptic JULIAN calendar date → Julian Day, no reform: the convention the
+ * NASA eclipse canons and the Babylonian/Greek record tables use for every
+ * pre-1582 date, and the browser's eclipse diagnostics apply to their whole
+ * table (so a post-reform Gregorian date in such a table — 1654 Aug 12 —
+ * lands ten days late; the tables name the convention). Same expression
+ * order as the copies it replaces.
+ * @param {number} year astronomical year (0 = 1 BC)
+ * @param {number} month 1–12
+ * @param {number} day 1–31
+ * @param {number} [dayFraction=0] added to the day (e.g. hour/24)
+ * @returns {number} JD
+ */
+function julianCalendarToJD(year, month, day, dayFraction = 0) {
+  let y = year, m = month;
+  if (m <= 2) { y -= 1; m += 12; }
+  return Math.floor(365.25 * (y + 4716)) + Math.floor(30.6001 * (m + 1)) + day - 1524.5 + dayFraction;
+}
+
+/**
+ * Julian Day → proleptic JULIAN calendar date, no reform (the inverse of
+ * `julianCalendarToJD`; the NASA-convention diagnostics' printer).
+ * @param {number} jd
+ * @returns {{year: number, month: number, day: number, dayFrac: number}}
+ */
+function jdToJulianCalendar(jd) {
+  const J = jd + 0.5;
+  const Z = Math.floor(J);
+  const F = J - Z;
+  const A = Z;
+  const B = A + 1524;
+  const C = Math.floor((B - 122.1) / 365.25);
+  const D = Math.floor(365.25 * C);
+  const E = Math.floor((B - D) / 30.6001);
+  const dayFull = B - D - Math.floor(30.6001 * E) + F;
+  const month = (E < 14) ? E - 1 : E - 13;
+  const year = (month > 2) ? C - 4716 : C - 4715;
+  const day = Math.floor(dayFull);
+  return { year, month, day, dayFrac: dayFull - day };
+}
+
+/**
  * Julian Day → calendar date (Meeus ch. 7 inverse). Gregorian for
  * JD ≥ 2299160.5, Julian before.
  * @param {number} jd
@@ -121,4 +162,4 @@ function dayFractionToHMS(dayFrac) {
   return { hour, minute, second };
 }
 
-module.exports = { GREGORIAN_START, GREGORIAN_START_JD, calendarToJD, jdToCalendar, jdToDecimalYear, dayFractionToHMS };
+module.exports = { GREGORIAN_START, GREGORIAN_START_JD, calendarToJD, jdToCalendar, jdToDecimalYear, dayFractionToHMS, julianCalendarToJD, jdToJulianCalendar };

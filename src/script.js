@@ -12,7 +12,11 @@ import { Pane } from 'tweakpane';
 //
 // Generated at build time, not fetched at runtime — the model parameters are
 // read at module scope below, and Phase 15 requires offline === hosted.
-import { computeObliquityJ2000Deg, computeSecularShape, DEFAULT_CONSTANTS as K, REFERENCE_DATA as R, FITTED_COEFFICIENTS as FIT, CONSTANTS_HASH, COEFFICIENTS_HASH, MODEL_VERSION, PREPRINT_DOI, createEpochPrimitives, createDeepCalendar, createDeepEccChannel, DEEP_MODES_ARTIFACT, createDeepOrbitalHistory, createYearLengths, computeMeanTropicalYearJ2000Days, createMoonMonthChain, createChainCycleIntegrator, createMoonArguments, createMoonSeries, createMoonApparent, derivePlanetGeometry, scaffoldOrbitInputs, planetOrbitChain as _POC, createDeltaTCycles, createDeepTimeLod, createMoonDistanceHistory, MOON_DISTANCE_ARTIFACT, deltaTEspenakMeeusCanonSeconds, evalClimateL1OrbitalPermil, createAlphaGiaChannel, computeSolarTorqueShare, createEclipseFinders, createModel, buildPlanetChainsFromArtifactData, computePlanetElementsAtYear as kcComputePlanetElementsAtYear, computeHeliocentricEclipticFromElements as kcComputeHeliocentricEclipticFromElements, computeEquatorNodeOriginSFrameDeg, convertNodeSFrameToEquatorOriginDeg, createSecularSeriesOverride, CHAIN_ARTIFACT, ANCHOR_EPOCH_YEAR as KC_ANCHOR_EPOCH_YEAR, ANCHOR_EPOCH_JD as KC_ANCHOR_EPOCH_JD, computeEarthFrameOfDate, solveWheelAngleForLongitude, computeSceneWorldFrameJ2000, SCENE_EQUINOX_VIEW_AZIMUTH_DEG } from '@essrt/physics';
+import { computeObliquityJ2000Deg, computeSecularShape, DEFAULT_CONSTANTS as K, REFERENCE_DATA as R, FITTED_COEFFICIENTS as FIT, CONSTANTS_HASH, COEFFICIENTS_HASH, MODEL_VERSION, PREPRINT_DOI, createEpochPrimitives, createDeepCalendar, createDeepEccChannel, DEEP_MODES_ARTIFACT, createDeepOrbitalHistory, createYearLengths, computeMeanTropicalYearJ2000Days, createMoonMonthChain, createChainCycleIntegrator, createMoonArguments, createMoonSeries, createMoonApparent, derivePlanetGeometry, scaffoldOrbitInputs, planetOrbitChain as _POC, createDeltaTCycles, createDeepTimeLod, createMoonDistanceHistory, MOON_DISTANCE_ARTIFACT, deltaTEspenakMeeusCanonSeconds, evalClimateL1OrbitalPermil, createAlphaGiaChannel, computeSolarTorqueShare, createEclipseFinders, createModel, buildPlanetChainsFromArtifactData, computePlanetElementsAtYear as kcComputePlanetElementsAtYear, computeHeliocentricEclipticFromElements as kcComputeHeliocentricEclipticFromElements, computeEquatorNodeOriginSFrameDeg, convertNodeSFrameToEquatorOriginDeg, createSecularSeriesOverride, CHAIN_ARTIFACT, ANCHOR_EPOCH_YEAR as KC_ANCHOR_EPOCH_YEAR, ANCHOR_EPOCH_JD as KC_ANCHOR_EPOCH_JD, computeEarthFrameOfDate, solveWheelAngleForLongitude, computeSceneWorldFrameJ2000, SCENE_EQUINOX_VIEW_AZIMUTH_DEG,
+  // plan 13 B1/B3 — the one-home helpers (time/calendar, math/angles, earth/mass-chain, constants/units)
+  calendarToJD, jdToCalendar, jdToDecimalYear, dayFractionToHMS, julianCalendarToJD, jdToJulianCalendar,
+  DEG2RAD, RAD2DEG, wrap360, wrap180, wrap180Closed,
+  computeMassChainJ2000, computeMoonPeriodsJ2000, SECONDS_PER_DAY, DAYS_PER_JULIAN_YEAR } from '@essrt/physics';
 // K8 — the reference package: ONE-WAY imports (comparison only;
 // @essrt/reference is private-by-construction and nothing in the model
 // chain depends on it). publishedCurves migrated here from
@@ -890,7 +894,7 @@ const yearsFromBalancedToJ2000 = (startmodelJD - balancedJD) / meansolaryearleng
 let   meansiderealyearlengthinDays = ASTRO_REFERENCE.siderealYearJ2000;  // Phase 1: mutable for deep-time mode
 // Sidereal year in seconds at J2000 — pure IAU × 86400 (SI; the J2000 day is
 // the SI day, plan 09). Supersedes Method B (× 86400.00001), a hand-tuned shim.
-let   meansiderealyearlengthinSeconds = ASTRO_REFERENCE.siderealYearJ2000 * 86400; // (Phase 1: mutable for deep-time mode)
+let   meansiderealyearlengthinSeconds = ASTRO_REFERENCE.siderealYearJ2000 * SECONDS_PER_DAY; // (Phase 1: mutable for deep-time mode)
 // (Plan 07 R1: tripleSynodicYears — the Jupiter–Saturn triple synodic period
 // on the device's lattice perihelion rates — had no reader; gone with the
 // lattice.)
@@ -1076,29 +1080,38 @@ const milkywayOrbitPeriod = (lightYear*greatattractorDistance*Math.PI*2)/(milkyw
 // device counted these as eighth-integers per 8H (N_sid 35,860,753; N_apsidalI
 // 303,196; N_nodalI 144,119 — the ∓13 was H/13 cycles per H) and read every
 // period back as totalDaysInH/N (7.8 ms above the IAU month); those counts are
-// deleted (docs/66 §1 keeps the derivation record). Twins: tools/lib
-// constants.js, model.js.
-const AXIAL_PRECESSION_J2000_DAYS = (1296000 / K.earthOrbital.generalPrecessionJ2000_arcsecPerYr) * 365.25;
+// deleted (docs/66 §1 keeps the derivation record). ONE home since plan 13
+// B3: @essrt/physics earth/mass-chain computeMoonPeriodsJ2000 — the anomalistic
+// and nodal months are KINEMATIC consequences of sidereal + precession
+// (1/T_ano = 1/T_M − 1/T_apsidalE, 1/T_nod = 1/T_M + 1/T_nodalE), the synodic
+// month the beat with the sidereal year, the tropical month the sidereal month
+// seen from the precessing equinox. The J2000 values below seed the mutable
+// of-date globals (Phase 2 / 6.5: recomputeMoonAndAuForEpoch and the epoch
+// orchestrators reassign them).
+const AXIAL_PRECESSION_J2000_DAYS = (1296000 / K.earthOrbital.generalPrecessionJ2000_arcsecPerYr) * DAYS_PER_JULIAN_YEAR;
 let   moonSiderealMonth = moonSiderealMonthInput;  // Phase 2: mutable
 let   moonApsidalPrecessionindaysICRF = moonApsidalPrecessionDaysInputICRF;  // Phase 6.5: mutable (equinox of date)
 let   moonNodalPrecessionindaysICRF = moonNodalPrecessionDaysInputICRF;  // Phase 6.5: mutable (equinox of date)
-let   moonApsidalPrecessionindaysEarth = 1 / (1 / moonApsidalPrecessionindaysICRF - 1 / AXIAL_PRECESSION_J2000_DAYS);  // Phase 2: mutable (star-referenced)
-let   moonNodalPrecessionindaysEarth = 1 / (1 / moonNodalPrecessionindaysICRF + 1 / AXIAL_PRECESSION_J2000_DAYS);  // Phase 2: mutable (star-referenced)
-// Anomalistic & nodal months: KINEMATIC consequences of sidereal + precession,
-// not independent inputs.  1/T_ano = 1/T_M − 1/T_apsidalE  (perigee advances)
-// 1/T_nod_month = 1/T_M + 1/T_nodalE  (node regresses)
-let   moonAnomalisticMonth = 1 / (1 / moonSiderealMonth - 1 / moonApsidalPrecessionindaysEarth);  // Phase 2: mutable
-let   moonNodalMonth = 1 / (1 / moonSiderealMonth + 1 / moonNodalPrecessionindaysEarth);  // Phase 2: mutable
-// Synodic month: the beat of the sidereal month with the sidereal year;
-// tropical month: the sidereal month seen from the precessing equinox.
-let   moonSynodicMonth = moonSiderealMonth * meansiderealyearlengthinDays_kinematic / (meansiderealyearlengthinDays_kinematic - moonSiderealMonth);  // Phase 2: mutable
-let   moonTropicalMonth = 1 / (1 / moonSiderealMonth + 1 / AXIAL_PRECESSION_J2000_DAYS);  // Phase 2: mutable
-let   moonFullMoonCycleEarth = (moonSynodicMonth/(moonSynodicMonth-moonAnomalisticMonth))*moonAnomalisticMonth;  // Phase 6.5: mutable
-let   moonFullMoonCycleICRF = 1 / (1 / moonFullMoonCycleEarth + 1 / AXIAL_PRECESSION_J2000_DAYS);  // Phase 6.5: mutable — the precessing-frame partner (the OBSERVED supermoon cycle is the Earth-named 411.784 d)
-let   moonApsidalMeetsNodalindays = ((moonNodalMonth/(moonAnomalisticMonth-moonNodalMonth))*moonAnomalisticMonth);  // Phase 6.5: mutable
-let   moonLunarLevelingCycleindays = (moonNodalPrecessionindaysEarth/(moonNodalPrecessionindaysEarth-moonApsidalPrecessionindaysEarth)*(moonApsidalPrecessionindaysEarth/meansolaryearlengthinDays))*meansolaryearlengthinDays;  // Phase 6.5: mutable
-let   moonDraconicYearICRF = 1/((1/meansolaryearlengthinDays)+(1/moonNodalPrecessionindaysEarth));  // Phase 6.5: mutable — the mixed-frame partner (346.607 d; NOT the observable)
-let   moonDraconicYearEarth = 1 / (1 / moonDraconicYearICRF - 1 / AXIAL_PRECESSION_J2000_DAYS);  // Phase 6.5: mutable — THE OBSERVED ECLIPSE YEAR (346.620 d; removing one equinox turn compensates the mixed-frame intermediate above: ≡ tropical⊕of-date ≡ sidereal⊕star-referenced)
+const _MOON_PERIODS_J2000 = computeMoonPeriodsJ2000({
+  moonSiderealMonthDays: moonSiderealMonth,
+  moonApsidalPrecessionDaysInput: moonApsidalPrecessionindaysICRF,
+  moonNodalPrecessionDaysInput: moonNodalPrecessionindaysICRF,
+  axialPrecessionJ2000Days: AXIAL_PRECESSION_J2000_DAYS,
+  meanSiderealYearDays: meansiderealyearlengthinDays_kinematic,
+  meanSolarYearDays: meansolaryearlengthinDays,
+});
+let   moonApsidalPrecessionindaysEarth = _MOON_PERIODS_J2000.moonApsidalPrecessionDaysEarth;  // Phase 2: mutable (star-referenced)
+let   moonNodalPrecessionindaysEarth = _MOON_PERIODS_J2000.moonNodalPrecessionDaysEarth;  // Phase 2: mutable (star-referenced)
+let   moonAnomalisticMonth = _MOON_PERIODS_J2000.moonAnomalisticMonthDays;  // Phase 2: mutable
+let   moonNodalMonth = _MOON_PERIODS_J2000.moonNodalMonthDays;  // Phase 2: mutable
+let   moonSynodicMonth = _MOON_PERIODS_J2000.moonSynodicMonthDays;  // Phase 2: mutable
+let   moonTropicalMonth = _MOON_PERIODS_J2000.moonTropicalMonthDays;  // Phase 2: mutable
+let   moonFullMoonCycleEarth = _MOON_PERIODS_J2000.moonFullMoonCycleEarthDays;  // Phase 6.5: mutable
+let   moonFullMoonCycleICRF = _MOON_PERIODS_J2000.moonFullMoonCycleICRFDays;  // Phase 6.5: mutable — the precessing-frame partner (the OBSERVED supermoon cycle is the Earth-named 411.784 d)
+let   moonApsidalMeetsNodalindays = _MOON_PERIODS_J2000.moonApsidalMeetsNodalDays;  // Phase 6.5: mutable
+let   moonLunarLevelingCycleindays = _MOON_PERIODS_J2000.moonLunarLevelingCycleDays;  // Phase 6.5: mutable
+let   moonDraconicYearICRF = _MOON_PERIODS_J2000.moonDraconicYearICRFDays;  // Phase 6.5: mutable — the mixed-frame partner (346.607 d; NOT the observable)
+let   moonDraconicYearEarth = _MOON_PERIODS_J2000.moonDraconicYearEarthDays;  // Phase 6.5: mutable — THE OBSERVED ECLIPSE YEAR (346.620 d; removing one equinox turn compensates the mixed-frame intermediate above: ≡ tropical⊕of-date ≡ sidereal⊕star-referenced)
 let   moonSpeed = (moonDistance*Math.PI*2)/(meansolaryearlengthinDays*(1/(meansolaryearlengthinDays/moonSiderealMonth)))/24;  // Phase 6.5: mutable
 
 // ─── E2. Mass calculations ──────────────────────────────────────────────
@@ -1135,52 +1148,50 @@ let   moonSpeed = (moonDistance*Math.PI*2)/(meansolaryearlengthinDays*(1/(meanso
 // Earth-Moon mass ratio (DE440 SPICE kernel: GM_E/GM_M = 81.30056816).
 const MASS_RATIO_EARTH_MOON = K.physicalConstants.MASS_RATIO_EARTH_MOON;
 
-// Solar Δa correction for Moon's apparent semi-major axis (see doc 24).
-// Δa = a_M × M_M/(M_E + M_M) × m ≈ 349 km
-let   moonOrbitalShift = moonDistance * (1 / (MASS_RATIO_EARTH_MOON + 1)) * (moonSiderealMonth / meansiderealyearlengthinDays);  // Phase 2: mutable
-let   moonDistanceCorrected = moonDistance + moonOrbitalShift;  // Phase 2: mutable
+// The J2000 mass chain — ONE home since plan 13 B3: @essrt/physics
+// earth/mass-chain computeMassChainJ2000 (the package model and the Node
+// constants module read the same function). Solar Δa correction for the
+// Moon's apparent semi-major axis (doc 24): Δa = a_M × M_M/(M_E + M_M) × m
+// ≈ 349 km; Kepler on the corrected Moon orbit → G(M_E + M_M); the DE440
+// split → GM_E, GM_M; Kepler on Earth's orbit → G(M_☉ + M_E); minus GM_E →
+// GM_☉ (the JPL/IAU convention; without the M+m correction GM_Sun is biased
+// high by ~398,605 km³/s², 3 ppm — with it, JPL DE440 to ~0.07 ppm; the
+// Sun-side analog is a "Kepler-effective AU" of AU − 149.77 km, doc 24).
+const _MASS_CHAIN_J2000 = computeMassChainJ2000({
+  moonDistanceKm: moonDistance, moonSiderealMonthDays: moonSiderealMonth,
+  meanSiderealYearDays: meansiderealyearlengthinDays, meanLengthOfDaySeconds: meanlengthofday,
+  massRatioEarthMoon: MASS_RATIO_EARTH_MOON, currentAUDistanceKm: AU_J2000_KM,
+  gravitationalConstantKm3KgS2: G_CONSTANT,
+});
+let   moonOrbitalShift = _MASS_CHAIN_J2000.moonOrbitalShiftKm;  // Phase 2: mutable
+let   moonDistanceCorrected = _MASS_CHAIN_J2000.moonDistanceCorrectedKm;  // Phase 2: mutable
 
 // Earth-Moon SYSTEM gravitational parameter from Kepler on the Moon's orbit
-const GM_EARTH_MOON_SYSTEM = (4 * Math.PI * Math.PI * Math.pow(moonDistanceCorrected, 3)) / Math.pow(moonSiderealMonth * meanlengthofday, 2);
+const GM_EARTH_MOON_SYSTEM = _MASS_CHAIN_J2000.gmEarthMoonSystemKm3S2;
 const GM_EARTH_SYSTEM = GM_EARTH_MOON_SYSTEM;  // alias for naming consistency
 // Result: ~403,505 km³/s² (DE440 BODY3: 403,503.24, residual ~3.7 ppm)
 
 // Earth ALONE (split from system via Earth/Moon mass ratio)
-const GM_EARTH_ALONE = GM_EARTH_MOON_SYSTEM * (MASS_RATIO_EARTH_MOON / (MASS_RATIO_EARTH_MOON + 1));
+const GM_EARTH_ALONE = _MASS_CHAIN_J2000.gmEarthAloneKm3S2;
 const M_EARTH_ALONE  = GM_EARTH_ALONE / G_CONSTANT;
 // Result: ~398,602 km³/s² (DE440 BODY399: 398,600.44, residual ~3.7 ppm)
 
 // Moon ALONE (split from system)
-const GM_MOON_ALONE = GM_EARTH_MOON_SYSTEM / (MASS_RATIO_EARTH_MOON + 1);
+const GM_MOON_ALONE = _MASS_CHAIN_J2000.gmMoonAloneKm3S2;
 const M_MOON_ALONE  = GM_MOON_ALONE / G_CONSTANT;
 // Result: ~4,902.82 km³/s² (DE440 BODY301: 4902.800, residual ~3.7 ppm)
 
 // Earth-Moon SYSTEM mass
 const M_EARTH_SYSTEM = M_EARTH_ALONE + M_MOON_ALONE;
 
-// Gravitational parameter of the Sun, M_Sun only (JPL/IAU convention).
-//
-// Kepler's 3rd law on Earth's orbit returns the COMBINED gravitational parameter
-// G(M_Sun + M_Earth) — both bodies orbit their common barycenter, so the formula
-// can't separate them. We back out GM_Sun by subtracting GM_EARTH_ALONE.
-//
-// Without this M+m correction, GM_Sun is biased high by ~398,605 km³/s² (3 ppm).
-// With the correction, our value matches JPL DE440 to ~0.07 ppm.
-//
-// AU-equivalent representation (symmetric analog of the Moon-side Δa = +349 km):
-// The GM subtraction below is mathematically equivalent to using a "Kepler-effective
-// AU" of (AU_J2000_KM − 149.77 km) directly in the bare Kepler formula:
-//   Δa_Sun-side = AU / (3 × M_Sun/M_Earth_alone) ≈ 149.77 km
-// We subtract this from AU to recover GM_Sun_alone; for the Moon, we ADD Δa = 349 km
-// to the geometric a_M to recover GM_Earth+Moon system. Same physics, opposite
-// direction. See docs/24-moon-kepler-derivation.md §Sun-side analog for the full
-// symmetric picture.
-const GM_SUN_PLUS_EARTH = (4 * Math.PI * Math.PI * Math.pow(AU_J2000_KM, 3)) / Math.pow(meansiderealyearlengthinSeconds, 2);
-const GM_SUN = GM_SUN_PLUS_EARTH - GM_EARTH_ALONE;
+// Gravitational parameter of the Sun, M_Sun only (JPL/IAU convention) — the
+// mass chain's Kepler on Earth's orbit minus GM_EARTH_ALONE (one home, above).
+const GM_SUN_PLUS_EARTH = _MASS_CHAIN_J2000.gmSunPlusEarthKm3S2;
+const GM_SUN = _MASS_CHAIN_J2000.gmSunKm3S2;
 // Result: ~1.32712 × 10¹¹ km³/s² (JPL DE440: 132,712,440,042; residual 0.07 ppm)
 
 // Sun's mass derived from gravitational parameter (kg)
-const M_SUN = GM_SUN / G_CONSTANT;
+const M_SUN = _MASS_CHAIN_J2000.sunMassKg;
 
 // Mass ratios Sun/Earth — both variants
 const MASS_RATIO_SUN_EARTH_ALONE  = M_SUN / M_EARTH_ALONE;    // ~332,945 (planet alone)
@@ -2342,7 +2353,7 @@ const MEAN_SOLAR_YEAR_J2000_DAYS = meansolaryearlengthinDays;                // 
 // Phase 9.2: SI tropical year in 86400-s Julian days. Used as the sDay
 // time-unit anchor so scene orbital periods in JD are Kepler-invariant
 // across epochs (no longer scale with epoch-local-day count).
-const SI_TROPICAL_YEAR_DAYS      = MEAN_TROPICAL_YEAR_J2000_S / 86400;       // ≈ 365.24189
+const SI_TROPICAL_YEAR_DAYS      = MEAN_TROPICAL_YEAR_J2000_S / SECONDS_PER_DAY;   // ≈ 365.24189
 // AU_J2000_KM defined alongside currentAUDistance (line ~57); kept early for use in physical-constant derivations.
 const MOON_DISTANCE_J2000_KM     = moonDistance;                             // 384,399.07 km
 
@@ -3425,7 +3436,7 @@ function _eclipse() {
 function _periOfDateAdvanceCycles(jdA, jdB) {
   const d = earthPerihelionEclipticOfDateDeg(jdB, julianDateToDecimalYear(jdB))
           - earthPerihelionEclipticOfDateDeg(jdA, julianDateToDecimalYear(jdA));
-  return ((((d + 180) % 360) + 360) % 360 - 180) / 360;
+  return (wrap360(d + 180) - 180) / 360;
 }
 
 // (R4: the analytic twin _frameworkSunLon — the K-law Sun the E5 δ block fell
@@ -5040,7 +5051,7 @@ const _formulaYearFromJD = (jd) =>
 //   meeusVsIntegratorDiagnostic(2460000)   // 2023-Feb
 //   meeusVsIntegratorDiagnostic(1507900.5) // Thales eclipse area
 function meeusVsIntegratorDiagnostic(jd) {
-  const wrap = (x) => ((x % 360) + 360) % 360;
+  const wrap = wrap360;
   const angDiff = (a, b) => {
     let d = a - b;
     while (d > 180)  d -= 360;
@@ -5691,11 +5702,11 @@ if (typeof window !== 'undefined') {
       const S = new THREE.Vector3(); sun.planetObj.getWorldPosition(S);
       const d = m.dot.position.clone().sub(S);
       const j = [R[0][0] * d.x + R[1][0] * d.y + R[2][0] * d.z, R[0][1] * d.x + R[1][1] * d.y + R[2][1] * d.z, R[0][2] * d.x + R[1][2] * d.y + R[2][2] * d.z];   // Rᵀ·d: J2000 ecliptic
-      const D2R = Math.PI / 180, Om = el.ascNodeEclipticDeg * D2R, inc = el.inclEclipticDeg * D2R;
+      const D2R = DEG2RAD, Om = el.ascNodeEclipticDeg * D2R, inc = el.inclEclipticDeg * D2R;
       const n = [Math.sin(inc) * Math.sin(Om), -Math.sin(inc) * Math.cos(Om), Math.cos(inc)];   // the orbit normal (J2000 ecliptic)
       m.visible = false; m.onToggle(false);
       return { distAU: d.length() / 100, aPeriAU: el.aAU * (1 - el.e), lonJ2000Deg: ((Math.atan2(j[1], j[0]) / D2R) % 360 + 360) % 360,
-        lonPeriDeg: ((el.lonPeriEclipticDeg % 360) + 360) % 360, normalComponentAU: (j[0] * n[0] + j[1] * n[1] + j[2] * n[2]) / 100 };
+        lonPeriDeg: wrap360(el.lonPeriEclipticDeg), normalComponentAU: (j[0] * n[0] + j[1] * n[1] + j[2] * n[2]) / 100 };
     },
     // Planet-pole gate hook (plan 11 step 3): the RENDERED rotation axis (its
     // world Y) beside the spin channel's pole of date through the frame
@@ -5821,7 +5832,7 @@ if (typeof window !== 'undefined') {
     // ecliptic-of-date basis, beside the lunar arguments ϖ = L′ − M′ and
     // Ω = L′ − F the markers and the rendered Moon ride.
     moonRingProbe: () => {
-      const f = _moonOrbitFrameOfDate(o.julianDay), D2R = Math.PI / 180, wrap = (d) => ((d % 360) + 360) % 360;
+      const f = _moonOrbitFrameOfDate(o.julianDay), D2R = DEG2RAD, wrap = wrap360;
       const E = new THREE.Vector3(); earth.rotationAxis.getWorldPosition(E);
       const Cc = new THREE.Vector3(); moon.containerObj.getWorldPosition(Cc);
       const d = Cc.sub(E);
@@ -5863,7 +5874,7 @@ if (typeof window !== 'undefined') {
       const f = _moonOrbitFrameOfDate(o.julianDay), D2R = Math.PI / 180;
       const lonLat = (p) => { const v = p.clone().sub(_MM_E); return { lon: ((Math.atan2(v.dot(_MM_U), v.dot(_MM_G)) / D2R) % 360 + 360) % 360, lat: Math.asin(Math.max(-1, Math.min(1, v.dot(_MM_N) / v.length()))) / D2R, distAU: v.length() / 100 }; };
       const per = lonLat(A.dots[0].position), asc = lonLat(Nn.dots[0].position), desc = lonLat(Nn.dots[1].position);
-      const wrap = (d) => ((d % 360) + 360) % 360;
+      const wrap = wrap360;
       // the perigee's expected of-date longitude/latitude from the in-plane geometry
       const u = f.w, expLat = Math.asin(Math.sin(u) * Math.sin(f.inc)) / D2R;
       const expLon = wrap((f.Om + Math.atan2(Math.sin(u) * Math.cos(f.inc), Math.cos(u))) / D2R);
@@ -6821,7 +6832,7 @@ const moon = {
 // tools/lib/scene-graph.js (_mcArgF).
 function moonArgumentOfLatitudeCyclesBetween(anchorYearSI, yearSI) {
   const F = (y) => _moonArgsM().argsAt(_deepCal().siYearToJD(y)).F;
-  return ((((F(yearSI) - F(anchorYearSI)) % 360) + 360) % 360) / 360;
+  return wrap360(F(yearSI) - F(anchorYearSI)) / 360;
 }
 moon._dtMoonIntegrator = moonArgumentOfLatitudeCyclesBetween;  // the arguments' F (was the draconitic-month count)
 moon._dtMoonSign       = +1;  // Moon orbits prograde (eastward)
@@ -10692,8 +10703,8 @@ const golden = goldenspiralPerihelionObjects(
 /*  CONSTANTS & UTILITIES                                             */
 /* ------------------------------------------------------------------ */
 
-/* wrap any real angle to 0 … 360° ---------------------------------- */
-const wrap360 = x => ((x % 360) + 360) % 360;
+/* (wrap360 — any real angle to 0 … 360° — is the one-home helper imported from
+   @essrt/physics math/angles since plan 13 B1) */
 
 // --------------------------------------------------------------
 //  GLOBAL helper: store frozen widths per planet name
@@ -12190,8 +12201,8 @@ const _SSB_BODIES = [['mercury', 'M_MERCURY_SYSTEM'], ['venus', 'M_VENUS_SYSTEM'
 const _ssbPathMemo = new Map();   // quantized year → [x, y, z] world offset (scene units); cleared on a series change
 let _ssbPathMemoSeries = null;
 const _SSB_S = new THREE.Vector3(), _SSB_D = new THREE.Vector3();
-const _hiWrap360 = (d) => ((d % 360) + 360) % 360;
-const _hiWrap180 = (d) => ((d + 540) % 360 + 360) % 360 - 180;
+const _hiWrap360 = wrap360;   // the one-home wraps (plan 13 B1)
+const _hiWrap180 = wrap180;   // [−180, 180)
 const _hiClamp1 = (x) => Math.min(1, Math.max(-1, x));
 const _hiQuat = new THREE.Quaternion();
 const _hiTmpA = new THREE.Vector3(), _hiTmpB = new THREE.Vector3(), _hiTmpC = new THREE.Vector3();
@@ -12318,15 +12329,9 @@ function _hiCardinalDates(year) {
   return out;
 }
 
-/** Gregorian calendar date of a JD (Meeus ch. 7). */
+/** Calendar date of a JD (Meeus ch. 7, the reform applied) — the one-home converter (plan 13 B1). */
 function _hiCalendarFromJD(jd) {
-  const Z = Math.floor(jd + 0.5), F = jd + 0.5 - Z;
-  let A = Z;
-  if (Z >= 2299161) { const a = Math.floor((Z - 1867216.25) / 36524.25); A = Z + 1 + a - Math.floor(a / 4); }
-  const B = A + 1524, C = Math.floor((B - 122.1) / 365.25), D = Math.floor(365.25 * C), E = Math.floor((B - D) / 30.6001);
-  const day = Math.floor(B - D - Math.floor(30.6001 * E) + F);
-  const month = E < 14 ? E - 1 : E - 13;
-  const year = month > 2 ? C - 4716 : C - 4715;
+  const { year, month, day } = jdToCalendar(jd);
   return { year, month, day };
 }
 
@@ -17843,7 +17848,7 @@ function inclInvPlaneModel(year) {
   // La2010 is OUR compression, not physics — the engine series matches
   // La2010 at rms 0.003° over −500 kyr (the banked headline finding this
   // chart now actually shows).
-  const D2R = Math.PI / 180;
+  const D2R = DEG2RAD;
   const ip = CHAIN_ARTIFACT.invariablePlane;
   const si = Math.sin(ip.inclEclipticDeg * D2R), ci = Math.cos(ip.inclEclipticDeg * D2R);
   const nInv = [si * Math.sin(ip.ascNodeEclipticDeg * D2R), -si * Math.cos(ip.ascNodeEclipticDeg * D2R), ci];
@@ -17859,7 +17864,7 @@ function ascNodeInvPlaneModel(year) {
   // matches the era chain at J2000 to 0.007°), then the same S&S origin
   // conversion the chain path used. Replaces the 8-mode skeleton line
   // (same reasoning as inclInvPlaneModel above).
-  const D2R = Math.PI / 180;
+  const D2R = DEG2RAD;
   const ip = CHAIN_ARTIFACT.invariablePlane;
   const si = Math.sin(ip.inclEclipticDeg * D2R), ci = Math.cos(ip.inclEclipticDeg * D2R);
   const nInv = [si * Math.sin(ip.ascNodeEclipticDeg * D2R), -si * Math.cos(ip.ascNodeEclipticDeg * D2R), ci];
@@ -18067,7 +18072,7 @@ const VFP_CATEGORIES = [
     model: { name: 'This model', color: '#f0b040',
       fn: year => _hybridSpinActive()
         ? _hybridSeriesSampleAt(year).periOfDateDeg
-        : (((_kcPerihelionEclLonDeg('earth', yearToJDApprox(year)) + (360 / _certifiedAxialPrecessionJ2000Years()) * (year - 2000)) % 360) + 360) % 360 },
+        : wrap360(_kcPerihelionEclLonDeg('earth', yearToJDApprox(year)) + (360 / _certifiedAxialPrecessionJ2000Years()) * (year - 2000)) },
     references: [
       { name: 'Meeus (1991)', color: '#81c784', fn: perihelionMeeusEarth, validYears: [-10000, 10000], sourceUrl: 'https://ui.adsabs.harvard.edu/abs/1994A%26A...282..663S' },
       { name: 'La2004 (Laskar)', color: '#e53935', fn: perihelionLa2004, validYears: [-248000, 102000], sourceUrl: 'https://doi.org/10.1051/0004-6361:20041335' },
@@ -18810,7 +18815,7 @@ function _vfpPICss(p, style) {
 // invariable plane (the artifact's banked plane; the conversion is ours
 // and labelled — the stored dataset stays pure JPL output).
 function _vfpPIJplInvDeg(inDeg, omDeg) {
-  const D2R = Math.PI / 180;
+  const D2R = DEG2RAD;
   const ip = CHAIN_ARTIFACT.invariablePlane;
   const si = Math.sin(ip.inclEclipticDeg * D2R), ci = Math.cos(ip.inclEclipticDeg * D2R);
   const nInv = [si * Math.sin(ip.ascNodeEclipticDeg * D2R), -si * Math.cos(ip.ascNodeEclipticDeg * D2R), ci];
@@ -20822,8 +20827,8 @@ function _vfpMAAfterRender(bodyEl) {
 }
 
 // ── Daily insolation — Berger (1978)'s closed form ──────────────────
-/** Total solar irradiance at 1 au (W/m²), Kopp & Lean (2011). */
-const SOLAR_CONSTANT_WM2 = 1361;
+/** Total solar irradiance at 1 au (W/m²), Kopp & Lean (2011) — astro-reference physicalConstants (plan 13 B3). */
+const SOLAR_CONSTANT_WM2 = K.physicalConstants.solarConstantWm2;
 /** Mean daily insolation at the top of the atmosphere (W/m²) at latitude
  *  φ on the day the Sun's geocentric ecliptic longitude is λ☉, from the
  *  elements of date: e, ε (degrees) and ϖ the longitude of PERIHELION
@@ -21129,7 +21134,7 @@ const _VFPAN_DOMAIN_YEARS = 10000000;   // the banked series span (±10 Myr)
 function _vfpANPeriEarthDeg(year) {
   return _hybridSpinActive()
     ? _hybridSeriesSampleAt(year).periOfDateDeg
-    : (((_kcPerihelionEclLonDeg('earth', yearToJDApprox(year)) + (360 / _certifiedAxialPrecessionJ2000Years()) * (year - 2000)) % 360) + 360) % 360;
+    : wrap360(_kcPerihelionEclLonDeg('earth', yearToJDApprox(year)) + (360 / _certifiedAxialPrecessionJ2000Years()) * (year - 2000));
 }
 function _vfpANInputs(year) {
   const y = Math.max(-_VFPAN_DOMAIN_YEARS, Math.min(_VFPAN_DOMAIN_YEARS, year));
@@ -21153,7 +21158,7 @@ function _vfpANCurve(inp, n) {
     let dE = Ls - ra;
     while (dE > Math.PI) dE -= 2 * Math.PI;
     while (dE < -Math.PI) dE += 2 * Math.PI;
-    pts[i] = { f: i / n, eotMin: (dE / D) * 4, decDeg: Math.asin(Math.sin(eps) * Math.sin(lamS)) / D, lamSDeg: (((lamS / D) % 360) + 360) % 360 };
+    pts[i] = { f: i / n, eotMin: (dE / D) * 4, decDeg: Math.asin(Math.sin(eps) * Math.sin(lamS)) / D, lamSDeg: wrap360(lamS / D) };
   }
   return pts;
 }
@@ -24568,7 +24573,7 @@ function setupGUI() {
     console.log('  conjunction-vs-greatest-eclipse definitional offset (up to ~10 min at high |γ| — see Interpretation).');
     console.log('══════════════════════════════════════════════════════════════════════════════════');
 
-    const _d2r = Math.PI / 180;
+    const _d2r = DEG2RAD;
 
     // From NASA Five Millennium Catalog of Solar Eclipses
     // (https://eclipse.gsfc.nasa.gov/SEcat5/). Date in Julian calendar.
@@ -24588,13 +24593,8 @@ function setupGUI() {
       { Y: 985, M: 1, D:23, hour: 21.704, dT: 1647, type:'A', name:' 985 Jan 23 Annular' },
     ];
 
-    // Always-Julian JD converter (NASA uses Julian calendar for pre-1582).
-    function julianJD(Y, M, D, hour) {
-      let y = Y, m = M;
-      if (m <= 2) { y -= 1; m += 12; }
-      return Math.floor(365.25 * (y + 4716)) + Math.floor(30.6001 * (m + 1))
-           + D - 1524.5 + hour / 24;
-    }
+    // Always-Julian JD converter (NASA uses Julian calendar for pre-1582) — ONE home: @essrt/physics time/calendar
+    function julianJD(Y, M, D, hour) { return julianCalendarToJD(Y, M, D, hour / 24); }
     function ourΔT(jd) {
       const decYear = julianDateToDecimalYear(jd);
       const t_Ma = (J2000_CALENDAR_YEAR - decYear) / 1e6;
@@ -24624,7 +24624,7 @@ function setupGUI() {
       const A1 = (119.75 + 131.849*T) * _d2r;
       const A2 = (53.09 + (MOON_ARGS_FRAMEWORK_NATIVE ? FW_A2_RATE : 479264.290)*T) * _d2r;
       Sl += 3958*Math.sin(A1) + 1962*Math.sin(Lp_mean * _d2r - Fr) + 318*Math.sin(A2);
-      return (((Lp_mean + Sl * 1e-6) % 360) + 360) % 360;
+      return wrap360(Lp_mean + Sl * 1e-6);
     }
     function sunLon(jd) {
       const T = (jd + ourΔT(jd)/86400 - j2000JD) / julianCenturyDays;
@@ -24920,15 +24920,10 @@ function setupGUI() {
     console.log('    ΔT × 360/86400    = rotation angle represented by ΔT (reference)');
     console.log('══════════════════════════════════════════════════════════════════════════════════════');
 
-    const _d2r = Math.PI / 180;
-    const _r2d = 180 / Math.PI;
+    const _d2r = DEG2RAD;
+    const _r2d = RAD2DEG;
 
-    function julianDateToJDlocal(Y, M, D, hour = 12) {
-      let y = Y, m = M;
-      if (m <= 2) { y -= 1; m += 12; }
-      return Math.floor(365.25 * (y + 4716)) + Math.floor(30.6001 * (m + 1))
-           + D - 1524.5 + hour / 24;
-    }
+    function julianDateToJDlocal(Y, M, D, hour = 12) { return julianCalendarToJD(Y, M, D, hour / 24); }   // proleptic Julian (NASA convention)
 
     // Meeus' sub-solar (lat, lon) — independent of framework scene state.
     function meeusSubSolar(jd_UT) {
@@ -25036,8 +25031,8 @@ function setupGUI() {
   // Feeds doc 103 case-study updates.
   // ────────────────────────────────────────────────────────────────────────
   addTestButton('-135 Babylonian case study (root-cause + era sweep + L1-α sensitivity)', () => {
-    const _d2r = Math.PI / 180;
-    const _r2d = 180 / Math.PI;
+    const _d2r = DEG2RAD;
+    const _r2d = RAD2DEG;
     const JD_135 = 1671853.759762;
     const babylon_lat = 32.50;
     const babylon_lon = 44.40;
@@ -25204,7 +25199,7 @@ function setupGUI() {
     // (B) Moon ecliptic — scene stored (Meeus overlay) vs Meeus dispatcher
     // Note: moon._meeusLonDeg stores raw mean-longitude accumulator (Lp/_d2r + ...
     // integrated over centuries), so reduce mod 360 before display/subtract.
-    const _mod360 = (x) => ((x % 360) + 360) % 360;
+    const _mod360 = wrap360;
     const moon_scene_lon = moon._meeusLonDeg !== undefined ? _mod360(moon._meeusLonDeg) : undefined;
     const moon_scene_beta = moon._meeusLatRad * 180 / Math.PI;
     const moon_scene_dist = moon._meeusDistKm;
@@ -25227,7 +25222,7 @@ function setupGUI() {
     // IAU standard (Meeus eq. 12.4)
     const _d_j2000 = NASA_UT_greatest_JD - j2000JD;
     const _Tcen = _d_j2000 / julianCenturyDays;
-    const iau_GMST_deg = (((280.46061837 + 360.98564736629 * _d_j2000 + 0.000387933 * _Tcen * _Tcen - _Tcen * _Tcen * _Tcen / 38710000) % 360) + 360) % 360;
+    const iau_GMST_deg = wrap360(280.46061837 + 360.98564736629 * _d_j2000 + 0.000387933 * _Tcen * _Tcen - _Tcen * _Tcen * _Tcen / 38710000);
     const gmst_diff_deg = ((framework_GMST_deg - iau_GMST_deg + 540) % 360) - 180;
     console.log('    (C) GMST (Earth rotation angle) at NASA-UT:');
     console.log(`        Framework implicit: ${framework_GMST_deg.toFixed(4)}°`);
@@ -25280,11 +25275,7 @@ function setupGUI() {
     console.log('  L1-α does NOT touch the Moon polynomial → these numbers are unchanged from OLD α.');
     console.log('');
 
-    function julianDateToJDlocal(Y, M, D, hour) {
-      let y = Y, m = M;
-      if (m <= 2) { y -= 1; m += 12; }
-      return Math.floor(365.25 * (y + 4716)) + Math.floor(30.6001 * (m + 1)) + D - 1524.5 + hour / 24;
-    }
+    function julianDateToJDlocal(Y, M, D, hour) { return julianCalendarToJD(Y, M, D, hour / 24); }   // proleptic Julian (NASA convention)
 
     const era_events = [
       { Y: -762, M: 6,  D: 15, hour:  8, label: '-762 Nineveh (Bur-Sagale)' },
@@ -25529,7 +25520,7 @@ function setupGUI() {
     const _d180 = (a, b) => { let d = a - b; while (d > 180) d -= 360; while (d < -180) d += 360; return d; };
     for (const { jd, label } of epochs) {
       const T = (jd - j2000JD) / julianCenturyDays, T2 = T*T, T3 = T2*T, T4 = T3*T;
-      const wrapM = (x) => ((x % 360) + 360) % 360;
+      const wrapM = wrap360;
       const me = {
         Lp: wrapM(218.3164477 + 481267.88123421*T - 0.0015786*T2 + T3/538841 - T4/65194000),
         D:  wrapM(297.8501921 + 445267.1114034*T - 0.0018819*T2 + T3/545868 - T4/113065000),
@@ -25589,7 +25580,7 @@ function setupGUI() {
     const node  = o.moonAscendingNode;
     const peri  = o.moonLongitudeOfPerigee;
     const Lmean = ((peri + o.moonMeanAnomaly) % 360 + 360) % 360;   // mean longitude = ϖ + M
-    const wrap180 = (d) => { let x = ((d % 360) + 360) % 360; return x > 180 ? x - 360 : x; };
+    const wrap180 = wrap180Closed;   // (−180, 180] — the residual printers' form (plan 13 B1)
     console.log('\n══════════════════════════════════════════════════════════════════════');
     console.log('  Framework Moon — scene lunar elements at J2000 vs Meeus targets');
     console.log('══════════════════════════════════════════════════════════════════════');
@@ -25628,7 +25619,7 @@ function setupGUI() {
     //  • post-mean RMS over a month → what the override genuinely contributes
     //    (the periodic-terms floor — the "unmask the Moon" assessment number)
     const savedJD = o.julianDay;
-    const wrap180 = (d) => { let x = ((d % 360) + 360) % 360; return x > 180 ? x - 360 : x; };
+    const wrap180 = wrap180Closed;   // (−180, 180] — the residual printers' form (plan 13 B1)
     const rawV = new THREE.Vector3(), ovrV = new THREE.Vector3(), eV = new THREE.Vector3();
     const rows = [];
     for (let i = 0; i <= 30; i++) {
@@ -25676,7 +25667,7 @@ function setupGUI() {
     // mean/RMS Δdist localize eccentricity-term and missing-perturbation
     // (evection/variation) content.
     const savedJD = o.julianDay;
-    const wrap180 = (d) => { let x = ((d % 360) + 360) % 360; return x > 180 ? x - 360 : x; };
+    const wrap180 = wrap180Closed;   // (−180, 180] — the residual printers' form (plan 13 B1)
     const ANOM_MONTH = 27.55455; // days, phase-conversion reference
     const rawV = new THREE.Vector3(), ovrV = new THREE.Vector3(), eV = new THREE.Vector3();
     const kmPerUnit = moonDistance / (moon.a ?? moon.orbitRadius);
@@ -25719,7 +25710,7 @@ function setupGUI() {
           if (Math.abs(s.od - s.rd) > mG) mG = Math.abs(s.od - s.rd);
         }
         const _a0 = _moonArgsAt(jd0);
-        const _argsOm = (((_a0.Lp - _a0.F) % 360) + 360) % 360;
+        const _argsOm = wrap360(_a0.Lp - _a0.F);
         const _nodTh = (typeof moonNodalPrecession !== 'undefined' && moonNodalPrecession.orbitObj)
           ? ((-moonNodalPrecession.orbitObj.rotation.y * 180 / Math.PI) % 360 + 360) % 360 : NaN;
         // (plan 11 step 3: the ring layers are engine-placed from the
@@ -25734,14 +25725,14 @@ function setupGUI() {
         {
           const _apsTh = (typeof moonApsidalPrecession !== 'undefined' && moonApsidalPrecession.orbitObj)
             ? ((moonApsidalPrecession.orbitObj.rotation.y * 180 / Math.PI) % 360 + 360) % 360 : NaN;
-          const _argsW = (((_a0.Lp - _a0.Mp) % 360) + 360) % 360;
+          const _argsW = wrap360(_a0.Lp - _a0.Mp);
           let iR = 0, iO = 0;
           for (let i = 1; i < S.length; i++) {
             if (S[i].rd < S[iR].rd) iR = i;
             if (S[i].od < S[iO].od) iO = i;
           }
-          const _rawPeri = ((S[iR].rl % 360) + 360) % 360;
-          const _ovrPeri = ((S[iO].ol % 360) + 360) % 360;
+          const _rawPeri = wrap360(S[iR].rl);
+          const _ovrPeri = wrap360(S[iO].ol);
           console.log(`    [deep ${yr}] apsidal: layer actual ${_apsTh.toFixed(2)}° (engine-placed, ϖ − 90°)` +
             `  args ϖ ${_argsW.toFixed(2)}°  raw-perigee az ${_rawPeri.toFixed(2)}°  ovr-perigee az ${_ovrPeri.toFixed(2)}°`);
           // Earth-chain frame dump (root-cause hunt): every chain angle plus
@@ -25873,7 +25864,6 @@ function setupGUI() {
     // (no integrals), feeds them through the production Ch. 47 series via
     // the probe hook, and measures the shift vs the shipped arguments.
     const wrap180 = (x) => ((x % 360) + 540) % 360 - 180;
-    const wrap360 = (x) => ((x % 360) + 360) % 360;
     const epochs = [
       { jd: j2000JD,        label: 'J2000.0 (anchor check — expect ~0)' },
       { jd: 1671853.759762, label: '-135 Apr 15 Babylonian' },
@@ -25933,8 +25923,8 @@ function setupGUI() {
     console.log('  Separates Moon-polynomial TIMING error from ΔT GEOGRAPHIC placement error');
     console.log('══════════════════════════════════════════════════════════════════════════════════');
 
-    const _d2r = Math.PI / 180;
-    const EARTH_R_KM = 6371;
+    const _d2r = DEG2RAD;
+    const EARTH_R_KM = K.physicalConstants.earthMeanRadiusKm;   // the IUGG mean radius the great-circle distances read on (plan 13 B3)
 
     // Format: [year_astro, month, day, lat, lon_E, type, name+source]
     // Same curated list as the Historic Eclipse Validation button, augmented
@@ -25968,18 +25958,7 @@ function setupGUI() {
     // 1582-10-15. Pre-1582 dates are interpreted as proleptic Julian (the
     // only calendar that existed); post-1582 dates as Gregorian (modern
     // convention used by Wikipedia/NASA for naming historic eclipses).
-    function julianDateToJD(Y, M, D, hour = 12) {
-      let y = Y, m = M;
-      if (m <= 2) { y -= 1; m += 12; }
-      let B = 0;
-      const isGregorian = (Y > 1582) || (Y === 1582 && (M > 10 || (M === 10 && D >= 15)));
-      if (isGregorian) {
-        const A = Math.floor(y / 100);
-        B = 2 - A + Math.floor(A / 4);
-      }
-      return Math.floor(365.25 * (y + 4716)) + Math.floor(30.6001 * (m + 1))
-           + D + B - 1524.5 + hour / 24;
-    }
+    function julianDateToJD(Y, M, D, hour = 12) { return calendarToJD(Y, M, D, hour / 24); }   // ONE home: @essrt/physics time/calendar
 
     function ourΔT(jd) {
       const decYear = julianDateToDecimalYear(jd);
@@ -26011,7 +25990,7 @@ function setupGUI() {
       const A1 = (119.75 + 131.849*T) * _d2r;
       const A2 = (53.09 + (MOON_ARGS_FRAMEWORK_NATIVE ? FW_A2_RATE : 479264.290)*T) * _d2r;
       Sl += 3958*Math.sin(A1) + 1962*Math.sin(Lp_mean * _d2r - Fr) + 318*Math.sin(A2);
-      return (((Lp_mean + Sl * 1e-6) % 360) + 360) % 360;
+      return wrap360(Lp_mean + Sl * 1e-6);
     }
     function moonBeta(jd) {
       const T = (jd + ourΔT(jd)/86400 - j2000JD) / julianCenturyDays;
@@ -26191,8 +26170,8 @@ function setupGUI() {
     console.log('  Asks: does our production ΔT (4 flags + Core-mantle swing) fall in this window? Does Stephenson?');
     console.log('══════════════════════════════════════════════════════════════════════════════════');
 
-    const _d2r = Math.PI / 180;
-    const EARTH_R_KM = 6371;
+    const _d2r = DEG2RAD;
+    const EARTH_R_KM = K.physicalConstants.earthMeanRadiusKm;   // the IUGG mean radius (plan 13 B3)
     const PENUMBRA_KM = 7500;
     const UMBRA_KM = 4500;
 
@@ -26218,17 +26197,7 @@ function setupGUI() {
       [1654,  8, 12, 51.5,   -0.1,  'Total',   'European total (London)'],
     ];
 
-    function julianDateToJD(Y, M, D, hour = 12) {
-      let y = Y, m = M;
-      if (m <= 2) { y -= 1; m += 12; }
-      let B = 0;
-      if ((Y > 1582) || (Y === 1582 && (M > 10 || (M === 10 && D >= 15)))) {
-        const A = Math.floor(y / 100);
-        B = 2 - A + Math.floor(A / 4);
-      }
-      return Math.floor(365.25 * (y + 4716)) + Math.floor(30.6001 * (m + 1))
-           + D + B - 1524.5 + hour / 24;
-    }
+    function julianDateToJD(Y, M, D, hour = 12) { return calendarToJD(Y, M, D, hour / 24); }   // ONE home: @essrt/physics time/calendar (the reform applied)
     function ourΔT(jd) {
       const decYear = julianDateToDecimalYear(jd);
       const t_Ma = (J2000_CALENDAR_YEAR - decYear) / 1e6;
@@ -26258,7 +26227,7 @@ function setupGUI() {
       const A1 = (119.75 + 131.849*T) * _d2r;
       const A2 = (53.09 + (MOON_ARGS_FRAMEWORK_NATIVE ? FW_A2_RATE : 479264.290)*T) * _d2r;
       Sl += 3958*Math.sin(A1) + 1962*Math.sin(Lp_mean * _d2r - Fr) + 318*Math.sin(A2);
-      return (((Lp_mean + Sl * 1e-6) % 360) + 360) % 360;
+      return wrap360(Lp_mean + Sl * 1e-6);
     }
     function sunLon(jd) {
       const T = (jd + ourΔT(jd)/86400 - j2000JD) / julianCenturyDays;
@@ -26469,7 +26438,7 @@ function setupGUI() {
     console.log('  Historic Eclipse Validation — Meeus-method umbra vs documented observations');
     console.log('══════════════════════════════════════════════════════════════════════════════════');
 
-    const _d2r = Math.PI / 180;
+    const _d2r = DEG2RAD;
 
     // Curated list of well-documented historic solar eclipses with confident
     // dates and observation locations. Sources include Stephenson (1997)
@@ -26494,12 +26463,8 @@ function setupGUI() {
     ];
 
     // Julian Day Number at noon UT for proleptic Julian calendar date
-    function julianDateToJD(Y, M, D, hour = 12) {
-      let y = Y, m = M;
-      if (m <= 2) { y -= 1; m += 12; }
-      return Math.floor(365.25 * (y + 4716)) + Math.floor(30.6001 * (m + 1))
-           + D - 1524.5 + hour / 24;
-    }
+    // proleptic Julian for the whole table — the NASA-canon convention (ONE home: @essrt/physics time/calendar)
+    function julianDateToJD(Y, M, D, hour = 12) { return julianCalendarToJD(Y, M, D, hour / 24); }
 
     // Our model's ΔT in seconds at the given JD
     function ourΔT(jd) {
@@ -26533,7 +26498,7 @@ function setupGUI() {
       const A1 = (119.75 + 131.849*T) * _d2r;
       const A2 = (53.09 + (MOON_ARGS_FRAMEWORK_NATIVE ? FW_A2_RATE : 479264.290)*T) * _d2r;
       Sl += 3958*Math.sin(A1) + 1962*Math.sin(Lp_mean * _d2r - Fr) + 318*Math.sin(A2);
-      return (((Lp_mean + Sl * 1e-6) % 360) + 360) % 360;
+      return wrap360(Lp_mean + Sl * 1e-6);
     }
 
     function sunLon(jd) {
@@ -26711,12 +26676,8 @@ function setupGUI() {
       [1654,  8, 12, 51.5,  -0.1,  'Total',   "European total (London)"],
     ];
 
-    function julianDateToJD(Y, M, D, hour = 12) {
-      let y = Y, m = M;
-      if (m <= 2) { y -= 1; m += 12; }
-      return Math.floor(365.25 * (y + 4716)) + Math.floor(30.6001 * (m + 1))
-           + D - 1524.5 + hour / 24;
-    }
+    // proleptic Julian for the whole table — the NASA-canon convention (ONE home: @essrt/physics time/calendar)
+    function julianDateToJD(Y, M, D, hour = 12) { return julianCalendarToJD(Y, M, D, hour / 24); }
 
     console.log('Date (Julian)     Obs Loc       Type      Conj JD         Scene point             Dist(km)   Kind       Note');
     console.log('────────────────────────────────────────────────────────────────────────────────────────────────────────────────');
@@ -26914,12 +26875,8 @@ function setupGUI() {
       //   -556 May 19 Babylon  — Partial at site by Babylonian record
     ];
 
-    function julianDateToJD(Y, M, D, hour = 12) {
-      let y = Y, m = M;
-      if (m <= 2) { y -= 1; m += 12; }
-      return Math.floor(365.25 * (y + 4716)) + Math.floor(30.6001 * (m + 1))
-           + D - 1524.5 + hour / 24;
-    }
+    // proleptic Julian for the whole table — the NASA-canon convention (ONE home: @essrt/physics time/calendar)
+    function julianDateToJD(Y, M, D, hour = 12) { return julianCalendarToJD(Y, M, D, hour / 24); }
 
     // ─── Per-event min-distance scan ±3h around greatest (Stephenson method) ───
     // Greatest eclipse is one instant; the observer was in the umbra at a
@@ -27302,25 +27259,11 @@ function setupGUI() {
                                      //   path is brief / narrow, shadow-axis hit
                                      //   doesn't correspond to visible umbra path
 
-    function julianDateToJD(Y, M, D, hour = 12) {
-      let y = Y, m = M;
-      if (m <= 2) { y -= 1; m += 12; }
-      return Math.floor(365.25 * (y + 4716)) + Math.floor(30.6001 * (m + 1))
-           + D - 1524.5 + hour / 24;
-    }
-    function jdToCal(jd) {
-      const J = jd + 0.5;
-      const Z = Math.floor(J);
-      const F = J - Z;
-      const A = Z;
-      const B = A + 1524;
-      const C = Math.floor((B - 122.1) / 365.25);
-      const D = Math.floor(365.25 * C);
-      const E = Math.floor((B - D) / 30.6001);
-      const day_full = B - D - Math.floor(30.6001 * E) + F;
-      const month = (E < 14) ? E - 1 : E - 13;
-      const year  = (month > 2) ? C - 4716 : C - 4715;
-      return { year, month, day: Math.floor(day_full) };
+    // proleptic Julian for the whole table — the NASA-canon convention (ONE home: @essrt/physics time/calendar)
+    function julianDateToJD(Y, M, D, hour = 12) { return julianCalendarToJD(Y, M, D, hour / 24); }
+    function jdToCal(jd) {   // proleptic Julian (the table's NASA convention) — ONE home: @essrt/physics time/calendar
+      const { year, month, day } = jdToJulianCalendar(jd);
+      return { year, month, day };
     }
 
     function pointAt(jd, isCentral) {
@@ -27533,26 +27476,10 @@ function setupGUI() {
               'Modern reduction: 1 May 1185 AD.' },
     ];
 
-    function julianDateToJD(Y, M, D, hour = 12) {
-      let y = Y, m = M;
-      if (m <= 2) { y -= 1; m += 12; }
-      return Math.floor(365.25 * (y + 4716)) + Math.floor(30.6001 * (m + 1))
-           + D - 1524.5 + hour / 24;
-    }
-    function jdToJulianDate(jd) {
-      const J = jd + 0.5;
-      const Z = Math.floor(J);
-      const F = J - Z;
-      const A = Z;
-      const B = A + 1524;
-      const C = Math.floor((B - 122.1) / 365.25);
-      const D = Math.floor(365.25 * C);
-      const E = Math.floor((B - D) / 30.6001);
-      const day_full = B - D - Math.floor(30.6001 * E) + F;
-      const month = (E < 14) ? E - 1 : E - 13;
-      const year = (month > 2) ? C - 4716 : C - 4715;
-      const day = Math.floor(day_full);
-      const dayFrac = day_full - day;
+    // proleptic Julian for the whole table — the NASA-canon convention (ONE home: @essrt/physics time/calendar)
+    function julianDateToJD(Y, M, D, hour = 12) { return julianCalendarToJD(Y, M, D, hour / 24); }
+    function jdToJulianDate(jd) {   // proleptic Julian (the table's NASA convention) — ONE home: @essrt/physics time/calendar
+      const { year, month, day, dayFrac } = jdToJulianCalendar(jd);
       const h = Math.floor(dayFrac * 24);
       const m = Math.floor((dayFrac * 24 - h) * 60);
       return { year, month, day, h, m };
@@ -27847,40 +27774,16 @@ function setupGUI() {
     console.log(`  Near site: ${UMBRA_TRACE_NEAR_SITE.name} (${UMBRA_TRACE_NEAR_SITE.lat}°, ${UMBRA_TRACE_NEAR_SITE.lon}°)`);
     console.log('══════════════════════════════════════════════════════════════════════════════════\n');
 
-    function julianDateToJDLocal(Y, M, D, hour = 12) {
-      let y = Y, m = M;
-      if (m <= 2) { y -= 1; m += 12; }
-      let B = 0;
-      if ((Y > 1582) || (Y === 1582 && (M > 10 || (M === 10 && D >= 15)))) {
-        const A = Math.floor(y / 100);
-        B = 2 - A + Math.floor(A / 4);
-      }
-      return Math.floor(365.25 * (y + 4716)) + Math.floor(30.6001 * (m + 1))
-           + D + B - 1524.5 + hour / 24;
-    }
+    function julianDateToJDLocal(Y, M, D, hour = 12) { return calendarToJD(Y, M, D, hour / 24); }   // ONE home: @essrt/physics time/calendar (the reform applied)
     function jdToUTString(jd) {
-      const jdp = jd + 0.5;
-      const Z = Math.floor(jdp);
-      const F = jdp - Z;
-      let A = Z;
-      if (Z >= 2299161) {
-        const alpha = Math.floor((Z - 1867216.25) / 36524.25);
-        A = Z + 1 + alpha - Math.floor(alpha / 4);
-      }
-      const B = A + 1524;
-      const C = Math.floor((B - 122.1) / 365.25);
-      const Dd = Math.floor(365.25 * C);
-      const E = Math.floor((B - Dd) / 30.6001);
-      const day = B - Dd - Math.floor(30.6001 * E) + F;
-      const month = (E < 14) ? E - 1 : E - 13;
-      const year = (month > 2) ? C - 4716 : C - 4715;
-      const hour_frac = (day - Math.floor(day)) * 24;
+      const { year, month, day, dayFrac } = jdToCalendar(jd);
+      const hour_frac = dayFrac * 24;
       const hh = Math.floor(hour_frac);
       const mm = Math.floor((hour_frac - hh) * 60);
       const yearStr = (year < 0)
         ? '-' + String(-year).padStart(4, '0')
         : String(year).padStart(5, ' ');
-      return `${yearStr}-${String(month).padStart(2, '0')}-${String(Math.floor(day)).padStart(2, '0')} ${String(hh).padStart(2, '0')}:${String(mm).padStart(2, '0')}`;
+      return `${yearStr}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')} ${String(hh).padStart(2, '0')}:${String(mm).padStart(2, '0')}`;
     }
 
     // ───── Parse ISO date (supports negative years) ─────
@@ -28030,8 +27933,8 @@ function setupGUI() {
   // be done later if the same coordinates are needed elsewhere.
   // ────────────────────────────────────────────────────────────────────────
   addTestButton('Audit all 26 solar eclipse presets', () => {
-    const _d2r = Math.PI / 180;
-    const _r2d = 180 / Math.PI;
+    const _d2r = DEG2RAD;
+    const _r2d = RAD2DEG;
     // Earth radius from the codebase's diameter constant (consistent with
     // the rest of the project — diameters.earthDiameter / 2). Obliquity
     // is time-varying (precesses) → computed per JD inside umbraCenterGeo
@@ -28335,7 +28238,7 @@ function setupGUI() {
       return;
     }
 
-    const _d2r = Math.PI / 180;
+    const _d2r = DEG2RAD;
     const r1 = (x) => Math.round(x * 10) / 10;
     const R_E_KM = diameters.earthDiameter / 2;
     // earth-fixed chart unit vector (inverse of the umbra lat/lon mapping:
@@ -29047,11 +28950,11 @@ function setupGUI() {
     function moonOmega(jd) {
       const T = (jd - j2000JD) / julianCenturyDays;
       let omega = 125.0445479 - 1934.1362891 * T + 0.0020754 * T * T + T * T * T / 467441;
-      omega = ((omega % 360) + 360) % 360;
+      omega = wrap360(omega);
       return omega;
     }
 
-    const _d2r = Math.PI / 180;
+    const _d2r = DEG2RAD;
     const events = [];
     const _saveJD_L2b = o.julianDay;
     const _t_L2b = performance.now();
@@ -33698,14 +33601,7 @@ function setupGUI() {
       const dT  = meanDeltaTSecondsAtAge(tMa);
       return Number.isFinite(dT) ? ySI + dT / SYR_S : ySI;
     };
-    const jdOf = (Y, M, D, h = 12) => {
-      const isJulian = (Y < 1582) || (Y === 1582 && (M < 10 || (M === 10 && D < 15)));
-      let y = Y, m = M;
-      if (m <= 2) { y -= 1; m += 12; }
-      const A = Math.floor(y / 100);
-      const B = isJulian ? 0 : (2 - A + Math.floor(A / 4));
-      return Math.floor(365.25 * (y + 4716)) + Math.floor(30.6001 * (m + 1)) + D + B - 1524.5 + h / 24;
-    };
+    const jdOf = (Y, M, D, h = 12) => calendarToJD(Y, M, D, h / 24);   // ONE home: @essrt/physics time/calendar
     const jd_thales = jdOf(-584, 5, 28, 12);
     const y_TT_anchor = computeYearSI_TT(startmodelJD);
     const y_UT_thales = _jdToSIyear(jd_thales);
@@ -37036,7 +36932,7 @@ async function analyzeSiderealYear(startYear, endYear) {
     forceSceneUpdate('minimal');
     sun.planetObj.getWorldPosition(_sunPos);
     let angle = Math.atan2(_sunPos.z, _sunPos.x) * 180 / Math.PI;
-    return ((angle % 360) + 360) % 360;
+    return wrap360(angle);
   };
 
   // Method B: Earth→Sun angle (D6/D7: the wobble marker is display-only;
@@ -37048,7 +36944,7 @@ async function analyzeSiderealYear(startYear, endYear) {
     sun.planetObj.getWorldPosition(_sunPos);
     _direction.copy(_sunPos).sub(_wobblePos);
     let angle = Math.atan2(_direction.z, _direction.x) * 180 / Math.PI;
-    return ((angle % 360) + 360) % 360;
+    return wrap360(angle);
   };
 
   // Method C: Heliocentric Sun→Earth angle (Earth as seen from Sun)
@@ -37060,7 +36956,7 @@ async function analyzeSiderealYear(startYear, endYear) {
     earth.planetObj.getWorldPosition(_earthPos);
     _direction.copy(_earthPos).sub(_sunPos);
     let angle = Math.atan2(_direction.z, _direction.x) * 180 / Math.PI;
-    return ((angle % 360) + 360) % 360;
+    return wrap360(angle);
   };
 
   // Method D: Heliocentric Sun→Earth angle (D6/D7: Earth is the frame point —
@@ -37072,7 +36968,7 @@ async function analyzeSiderealYear(startYear, endYear) {
     earth.planetObj.getWorldPosition(_wobblePos);
     _direction.copy(_wobblePos).sub(_sunPos);
     let angle = Math.atan2(_direction.z, _direction.x) * 180 / Math.PI;
-    return ((angle % 360) + 360) % 360;
+    return wrap360(angle);
   };
 
   // Method E: OrbitCenter→Sun world angle (Sun as seen from perihelion/orbit center)
@@ -37086,7 +36982,7 @@ async function analyzeSiderealYear(startYear, endYear) {
     sun.planetObj.getWorldPosition(_sunPos);
     _direction.copy(_sunPos).sub(_baryPos);
     let angle = Math.atan2(_direction.z, _direction.x) * 180 / Math.PI;
-    return ((angle % 360) + 360) % 360;
+    return wrap360(angle);
   };
 
   // ═══════════════════════════════════════════════════════════════════════════
@@ -37479,7 +37375,7 @@ async function analyzeAllAlignments(startYear, endYear) {
     const sunPos = new THREE.Vector3();
     sun.planetObj.getWorldPosition(sunPos);
     let angle = Math.atan2(sunPos.z, sunPos.x) * 180 / Math.PI;
-    return ((angle % 360) + 360) % 360;
+    return wrap360(angle);
   };
 
   const sidStepFine = 0.5 / 24;   // 0.5 hours
@@ -37701,27 +37597,27 @@ async function analyzeAllAlignments(startYear, endYear) {
     const sunWorldPos = new THREE.Vector3();
     sun.planetObj.getWorldPosition(sunWorldPos);
     const sunAngle = Math.atan2(sunWorldPos.z, sunWorldPos.x) * 180 / Math.PI;
-    const sunAngleNorm = ((sunAngle % 360) + 360) % 360;
+    const sunAngleNorm = wrap360(sunAngle);
 
     // Get Earth's world position (NOT at origin due to axial precession wobble)
     const earthWorldPos = new THREE.Vector3();
     earth.planetObj.getWorldPosition(earthWorldPos);
     const earthAngle = Math.atan2(earthWorldPos.z, earthWorldPos.x) * 180 / Math.PI;
-    const earthAngleNorm = ((earthAngle % 360) + 360) % 360;
+    const earthAngleNorm = wrap360(earthAngle);
 
     // Get barycenterEarthAndSun world position (perihelion point location)
     const baryWorldPos = new THREE.Vector3();
     barycenterEarthAndSun.planetObj.getWorldPosition(baryWorldPos);
     const baryAngle = Math.atan2(baryWorldPos.z, baryWorldPos.x) * 180 / Math.PI;
-    const baryAngleNorm = ((baryAngle % 360) + 360) % 360;
+    const baryAngleNorm = wrap360(baryAngle);
 
     // Direction from Earth to Sun (this is what we observe as Sun's position)
     const earthToSunAngle = Math.atan2(sunWorldPos.z - earthWorldPos.z, sunWorldPos.x - earthWorldPos.x) * 180 / Math.PI;
-    const earthToSunAngleNorm = ((earthToSunAngle % 360) + 360) % 360;
+    const earthToSunAngleNorm = wrap360(earthToSunAngle);
 
     // Direction from Earth to barycenter/perihelion point
     const earthToBaryAngle = Math.atan2(baryWorldPos.z - earthWorldPos.z, baryWorldPos.x - earthWorldPos.x) * 180 / Math.PI;
-    const earthToBaryAngleNorm = ((earthToBaryAngle % 360) + 360) % 360;
+    const earthToBaryAngleNorm = wrap360(earthToBaryAngle);
 
     // Distance from Earth to Sun
     const earthSunDist = Math.sqrt(
@@ -41498,7 +41394,7 @@ const _cpPanelCache = { year: null, vals: null, lastMs: -Infinity, holdMs: 300 }
  * diameters.earthDiameter/2 for consistency with the rest of the
  * codebase. */
 function gcKmFromLatLon(lat1, lon1, lat2, lon2) {
-  const _d2r = Math.PI / 180;
+  const _d2r = DEG2RAD;
   const R_E_km = diameters.earthDiameter / 2;
   const f1 = lat1 * _d2r, f2 = lat2 * _d2r;
   const df = (lat2 - lat1) * _d2r;
@@ -42018,28 +41914,9 @@ function decToDMSFromRadians(rad) {
  * Convert Julian Day to calendar date string
  */
 function jdToDateString(jd) {
-  // Julian Day to calendar date conversion
-  const z = Math.floor(jd + 0.5);
-  const f = jd + 0.5 - z;
-  let a = z;
-  if (z >= 2299161) {
-    const alpha = Math.floor((z - 1867216.25) / 36524.25);
-    a = z + 1 + alpha - Math.floor(alpha / 4);
-  }
-  const b = a + 1524;
-  const c = Math.floor((b - 122.1) / 365.25);
-  const d = Math.floor(365.25 * c);
-  const e = Math.floor((b - d) / 30.6001);
-
-  const day = b - d - Math.floor(30.6001 * e);
-  const month = e < 14 ? e - 1 : e - 13;
-  const year = month > 2 ? c - 4716 : c - 4715;
-
-  // Time from fractional day
-  const totalHours = f * 24;
-  const hours = Math.floor(totalHours);
-  const mins = Math.floor((totalHours - hours) * 60);
-  const secs = Math.floor(((totalHours - hours) * 60 - mins) * 60);
+  // Julian Day to calendar date conversion — the one-home converter (plan 13 B1)
+  const { year, month, day, dayFrac } = jdToCalendar(jd);
+  const { hour: hours, minute: mins, second: secs } = dayFractionToHMS(dayFrac);
 
   return {
     date: `${year}-${month.toString().padStart(2, '0')}-${day.toString().padStart(2, '0')}`,
@@ -43377,7 +43254,7 @@ function loadTexture( url, onLoad ) {
 // Neptune's ϖ swings ~16°/cy on its near-zero e) and lives on the planet panel's chain rows,
 // never under a lattice label.
 function perihelionFrameBreakdown(planetKey, year) {
-  const D2R = Math.PI / 180;
+  const D2R = DEG2RAD;
   // Plan 07: the motion projected is THE CHAIN'S — the sidereal rate is the
   // chain's 1800–2100 window rate with 1PN OFF (the NEWTONIAN window) and the
   // perihelion longitude of date the chain's ϖ (J2000 ecliptic frame, series
@@ -43401,7 +43278,7 @@ function perihelionFrameBreakdown(planetKey, year) {
 }
 // Right ascension of an ecliptic-of-date direction (β = 0) in the equatorial frame of the same date.
 function eclipticLongitudeToRaDeg(lamDeg, year) {
-  const D2R = Math.PI / 180;
+  const D2R = DEG2RAD;
   const l = lamDeg * D2R, e = _sceneEpsTargetDeg(year) * D2R;
   return ((Math.atan2(Math.sin(l) * Math.cos(e), Math.cos(l)) / D2R) % 360 + 360) % 360;
 }
@@ -48236,7 +48113,7 @@ function _kcSeriesSecularEl(nm, year, el) {
 // inclinations (Mercury ~8°, Mars ~5° at +1.35 Myr).
 function _kcEarthEngineOrbitNormalJ2000(year) {
   const t = year - 2000;
-  const D2R = Math.PI / 180;
+  const D2R = DEG2RAD;
   let qx, qy;
   if (_zetaSeriesData && t >= _zetaSeriesData.t0Yr && t <= _zetaSeriesEndYr) {
     const S = _zetaSeriesData;
@@ -48310,9 +48187,9 @@ function _kcPerihelionEclLonDeg(nameLower, jd) {
  *  0.001°), ONE ϖ with the API and the eclipse Sun. When the Sun-tier
  *  campaign replaces the offset by its movement, the panel follows. */
 function earthPerihelionEclipticOfDateDeg(jd, year) {
-  if (_hybridSpinActive()) return ((_tierModelB().sun.perihelionLongitudeDegAt(_engineYearTT(jd)) % 360) + 360) % 360;
+  if (_hybridSpinActive()) return wrap360(_tierModelB().sun.perihelionLongitudeDegAt(_engineYearTT(jd)));
   const w = _kcPerihelionEclLonDeg('earth', jd) + (360 / _certifiedAxialPrecessionJ2000Years()) * (year - 2000);
-  return ((w % 360) + 360) % 360;
+  return wrap360(w);
 }
 // D5 CHART SMOOTHING (owner: the chain→series handover drew visible jumps
 // in the cycle charts — Mercury, Neptune): the CHART samples the SERIES
@@ -48367,7 +48244,7 @@ function _kcArgPeriInvPlaneDeg(nameLower, jd) {
 // Same construction on a CALLER-SUPPLIED element set (the cycle chart's
 // series-tier elements) — one implementation, two entry points.
 function _kcArgPeriInvPlaneFromEl(el) {
-  const D2R = Math.PI / 180;
+  const D2R = DEG2RAD;
   const O = el.ascNodeEclipticDeg * D2R, inc = el.inclEclipticDeg * D2R;
   const w = (el.lonPeriEclipticDeg - el.ascNodeEclipticDeg) * D2R;
   // perihelion unit vector + orbit normal, ecliptic-J2000 coords
@@ -48396,7 +48273,7 @@ function _kcArgPeriInvPlaneFromEl(el) {
 // linear-precession construction used to feed: the heights above the
 // plane, the mass-weighted balance gauge and the Sun-SSB offset.
 const _KC_IP_Z = (() => {
-  const D2R = Math.PI / 180, IP = CHAIN_ARTIFACT.invariablePlane;
+  const D2R = DEG2RAD, IP = CHAIN_ARTIFACT.invariablePlane;
   const fi = IP.inclEclipticDeg * D2R, fO = IP.ascNodeEclipticDeg * D2R;
   return [Math.sin(fi) * Math.sin(fO), -Math.sin(fi) * Math.cos(fO), Math.cos(fi)];
 })();
@@ -48846,7 +48723,7 @@ const _MM_Q = new THREE.Quaternion(), _MM_E = new THREE.Vector3(), _MM_G = new T
 /** The Moon's of-date orbit frame around Earth: the ecliptic-of-date basis, the node direction and the in-plane point at argument u (scene units). */
 function _moonOrbitFrameOfDate(jdUT) {
   const args = _moonArgsAt(_sceneJdTT(jdUT));   // the scene's TT (bridge + curve) — the ring's and the override's clock (plan 11 step 3; was the bridge alone)
-  const D2R = Math.PI / 180;
+  const D2R = DEG2RAD;
   const Om = (args.Lp - args.F) * D2R, w = (args.F - args.Mp) * D2R, inc = moonEclipticInclinationJ2000 * D2R;
   earthPerihelionPrecession1.containerObj.getWorldQuaternion(_MM_Q);   // the engine's ecliptic of date (R4): x̂ the equinox, ŷ the pole
   _MM_G.set(1, 0, 0).applyQuaternion(_MM_Q).normalize();
@@ -50215,7 +50092,6 @@ function timeToPos(value) {
  * @throws {RangeError} If objects share identical coordinates
  */
 function apparentRaFromPdA(pdA, pdB) {
-  const RAD2DEG = 180 / Math.PI;
   const TWO_PI  = 2 * Math.PI;
 
   // 1) Pull raw RA in radians from each object (computed in Earth's equatorial frame)
@@ -50340,7 +50216,6 @@ function apparentRaFromPdA(pdA, pdB) {
  * @returns {number} Perihelion longitude in degrees [0, 360)
  */
 function perihelionLongitudeEcliptic(precessionLayer, longitudePerihelion) {
-  const RAD2DEG = 180 / Math.PI;
   const TWO_PI = 2 * Math.PI;
 
   // Get the precession angle directly from the layer's orbitObj rotation
@@ -50640,8 +50515,6 @@ function updateAscendingNodes() {
  *   rotation.z = orbitTiltb * π/180
  */
 function updateOrbitalPlaneRotations() {
-  const DEG2RAD = Math.PI / 180;
-  const RAD2DEG = 180 / Math.PI;
 
   // The planet's own container — the plain node tilt (plan 11 step 3: the
   // start-angle frame correction left with the scaffold angles; the chain
@@ -50740,13 +50613,13 @@ function updatePlanetAnomalies() {
     const tanHalfNu = Math.tan(nuRad / 2);
     const tanHalfE = Math.sqrt((1 - earthE) / (1 + earthE)) * tanHalfNu;
     let earthEccAnom = 2 * Math.atan(tanHalfE) * 180 / Math.PI;
-    earthEccAnom = ((earthEccAnom % 360) + 360) % 360;
+    earthEccAnom = wrap360(earthEccAnom);
     o.earthEccentricAnomaly = earthEccAnom;
 
     // Mean Anomaly from Eccentric Anomaly using Kepler's equation: M = E - e*sin(E)
     const E_rad = earthEccAnom * Math.PI / 180;
     let earthMeanAnom = (earthEccAnom - (earthE * Math.sin(E_rad) * 180 / Math.PI));
-    earthMeanAnom = ((earthMeanAnom % 360) + 360) % 360;
+    earthMeanAnom = wrap360(earthMeanAnom);
     o.earthMeanAnomaly = earthMeanAnom;
   }
 
@@ -50862,7 +50735,7 @@ function updateMoonOrbitalElements() {
   //   ascending_node_direction = (nz, 0, -nx)
   // Ecliptic longitude: atan2(-Z, X) in simulation convention
   let omega = Math.atan2(nx, nz) * 180 / Math.PI;
-  o.moonAscendingNode = ((omega % 360) + 360) % 360;
+  o.moonAscendingNode = wrap360(omega);
   o.moonDescendingNode = (o.moonAscendingNode + 180) % 360;
 
   // Longitude of Perigee (ϖ): ecliptic longitude of the perigee direction
@@ -50905,7 +50778,6 @@ function updateMoonOrbitalElements() {
  * Called each frame after updatePlanetAnomalies().
  */
 function updatePlanetInvariablePlaneHeights() {
-  const DEG2RAD = Math.PI / 180;
 
   // Plan 07 R5: every body here is a chain body (the eight of
   // _KC_IP_BODY_KEYS). The device's per-body config — the linearly-precessing
@@ -51119,8 +50991,6 @@ function resetBalanceTracking() {
  * - o.optionABDifference: Difference between Option A and Option B (°)
  */
 function calculateInvariablePlaneFromAngularMomentum() {
-  const DEG2RAD = Math.PI / 180;
-  const RAD2DEG = 180 / Math.PI;
 
   // GM_SUN is in km³/s², lengthofAU is in km
   // Including Pluto as per Souami & Souchay (2012) who used N=10 body system
@@ -51228,8 +51098,6 @@ function calculateInvariablePlaneFromAngularMomentum() {
  *   (plan 07 R5; the Souami & Souchay twin left with the device)
  */
 function updateDynamicInclinations() {
-  const DEG2RAD = Math.PI / 180;
-  const RAD2DEG = 180 / Math.PI;
 
   // K5 excision — the seven chain planets' inv-plane inclination of date is
   // the CHAIN's (i to the engine's own invariable plane, K5c). The legacy
@@ -51336,7 +51204,6 @@ function addOrbitPlaneHelper(pd, parent, size, divs = 90) {
   grid.renderOrder = -1;                   // draw after solid meshes
 
   /* --- 3  rotate into orbital plane -------------------------------- */
-  const DEG2RAD = Math.PI / 180;
   grid.rotation.x = pd.orbitTilta * DEG2RAD;
   grid.rotation.z = pd.orbitTiltb * DEG2RAD;
 
@@ -52408,48 +52275,9 @@ function computeSolsticeYearLength(currentYear, type) {
  * @returns {number}   Decimal year (e.g. 1999.1234).
  */
 function julianDateToDecimalYear(jd) {
-  // 1) Compute intermediate values
-  const J = jd + 0.5;
-  const Z = Math.floor(J);
-  const F = J - Z;
-
-  // 2) Decide which calendar to use
-  //    The switch happens at JD = 2299160.5 (1582-10-15 00:00 UTC)
-  let A = Z;
-  if (Z >= 2299161) {
-    const alpha = Math.floor((Z - 1867216.25) / 36524.25);
-    A = Z + 1 + alpha - Math.floor(alpha / 4);
-  }
-
-  // 3) Convert to calendar date (year, month, day.fraction)
-  const B = A + 1524;
-  const C = Math.floor((B - 122.1) / 365.25);
-  const D = Math.floor(365.25 * C);
-  const E = Math.floor((B - D) / 30.6001);
-
-  const day = B - D - Math.floor(30.6001 * E) + F;
-  const month = (E < 14) ? E - 1 : E - 13;
-  const year  = (month > 2) ? C - 4716 : C - 4715;
-
-  // 4) Figure out day‐of‐year, including the fractional part
-  //    Build month lengths array according to the calendar in use
-  const isGregorian = (Z >= 2299161);
-  const isLeap = isGregorian
-    ? (year % 4 === 0 && (year % 100 !== 0 || year % 400 === 0))
-    : (year % 4 === 0);
-
-  const monthLengths = [31, isLeap ? 29 : 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
-  let dayOfYear = day;
-  for (let m = 0; m < month - 1; m++) {
-    dayOfYear += monthLengths[m];
-  }
-
-  // 5) Compute decimal year
-  const daysInYear = isLeap ? 366 : 365;
-  // At Jan 1 00:00 → dayOfYear = 1 → fraction = 0 → decimalYear = year
-  const decimalYear = year + (dayOfYear - 1) / daysInYear;
-
-  return decimalYear;
+  // ONE home since plan 13 B1: @essrt/physics time/calendar (the S3-aligned
+  // coordinate of the Sun's secular deviations reads the same function).
+  return jdToDecimalYear(jd);
 }
 
 function makeRealisticEarth(pd){
@@ -53279,7 +53107,7 @@ function longitudeToDateTime(lonDeg, currentYear) {
       `longitudeToDateTime: first argument must be a finite number, got ${lonDeg}`
     );
   }
-  lonDeg = ((lonDeg % 360) + 360) % 360;      // wrap −∞…∞ → 0–360
+  lonDeg = wrap360(lonDeg);      // wrap −∞…∞ → 0–360
 
   /* 2 — decide which civil year to use --------------------------------- */
   let yr = Number.isFinite(currentYear)
@@ -53577,7 +53405,7 @@ function raToDeg(ra) {
     if (!Number.isFinite(deg)) {
       throw new TypeError(`raToDeg: cannot parse degree string: "${ra}"`);
     }
-    return ((deg % 360) + 360) % 360;
+    return wrap360(deg);
   }
 
   /* 2b — split into [h, m, s] ----------------------------------------- */
@@ -53788,37 +53616,13 @@ function dayToDate(jd) {
     throw new TypeError('dayToDate: julian day must be a finite number');
   }
 
-  // shift origin to midnight
-  const J = jd + 0.5;
-  const Z = Math.floor(J);
-  const F = J - Z;
-
-  // determine whether to use Julian or Gregorian calendar rules
-  const isGregorian = jd >= GREGORIAN_START_JD;
-  let A;
-  if (!isGregorian) {
-    // Julian calendar
-    A = Z;
-  } else {
-    // Gregorian calendar correction
-    const alpha = Math.floor((Z - 1867216.25) / 36524.25);
-    A = Z + 1 + alpha - Math.floor(alpha / 4);
-  }
-
-  // common steps
-  const B = A + 1524;
-  const C = Math.floor((B - 122.1) / 365.25);
-  const D = Math.floor(365.25 * C);
-  const E = Math.floor((B - D) / 30.6001);
-
-  // day with fractional part
-  const dayWithFrac = B - D - Math.floor(30.6001 * E) + F;
-  let day = Math.floor(dayWithFrac);
-  let fracDay = dayWithFrac - day;
-
-  // month / year
-  const month = (E < 14) ? E - 1 : E - 13;
-  const year = (month > 2) ? C - 4716 : C - 4715;
+  // the one-home converter (plan 13 B1): Julian before the reform, Gregorian from it
+  const cal = jdToCalendar(jd);
+  const isGregorian = cal.calendar === 'Gregorian';
+  let day = cal.day;
+  const fracDay = cal.dayFrac;
+  const month = cal.month;
+  const year = cal.year;
 
   //if (year <= 0) {
   //  console.warn(
@@ -53932,34 +53736,8 @@ function dateToJulianDay(Y, M, D) {
     throw new TypeError(`dateToJulianDay: day out of range: ${D}`);
   }
 
-  // 2) Shift Jan/Feb to months 13/14 of previous year
-  let y = Y, m = M;
-  if (m <= 2) {
-    y -= 1;
-    m += 12;
-  }
-
-  // 3) Julian vs. Gregorian correction
-  let B;
-  const beforeGregorian =
-    Y <  GREGORIAN_START.year ||
-    (Y === GREGORIAN_START.year && (
-      M  < GREGORIAN_START.month ||
-      (M  === GREGORIAN_START.month && D < GREGORIAN_START.day)
-    ));
-  if (beforeGregorian) {
-    B = 0;  // Julian calendar
-  } else {
-    const A = Math.floor(y / 100);
-    B = 2 - A + Math.floor(A / 4);
-  }
-
-  // 4) Compute JD at midnight
-  const jd = Math.floor(365.25 * (y + 4716))
-           + Math.floor(30.6001 * (m + 1))
-           + D + B - 1524.5;
-
-  return jd;
+  // 2) Meeus 7.1 with the reform — the one-home converter (plan 13 B1); JD at midnight
+  return calendarToJD(Y, M, D);
 }
 
 /**
