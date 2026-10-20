@@ -265,6 +265,14 @@ version note; `fit:6a2` + `check:csv-smoke` if the engine's frame of date moved.
 Step 7c (the ΔT fitter, below) is a FIT, not a regeneration: it runs before the
 cascade when the inputs it reads moved, and `constants:generate` runs before any
 record generator (the records run on the EMBEDDED coefficients — CLAUDE.md).
+Since plan 12 §1b's close-out its two artifacts (`data/deltaT-4flag-fit.json`,
+`data/core-mantle-resonator-stage1.json`) are GOVERNED: the joint `--write`
+stamps an `inputs` block (Stephenson 2016, the GIA τ, the climate coefficients,
+the cited Earth–Moon history, the deep-time chain's modules, the tools/lib
+twins, astro-reference, the fitter and its shim — never the generated
+constants, this fit's own output), so `check:artifacts` FAILS when the physics
+the stack was fitted on moves; `regen:cascade` lists the stale fit as a by-hand
+step and does not run it — the re-close is a decision.
 
 ```
 ── Phase 5: Solar measurements & harmonic fits ─────────────────────

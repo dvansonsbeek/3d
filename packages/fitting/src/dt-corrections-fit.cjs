@@ -112,6 +112,11 @@ const path = require('path');
 // 9-3f: moved from tools/fit (shim remains); tools/lib via the runtime bridge.
 const ROOT = path.resolve(__dirname, '..', '..', '..');
 const TOOLS_LIB = path.join(ROOT, 'tools', 'lib');
+// Governance (plan 12 §1b close-out): the two shipped artifacts carry an
+// `inputs` block like every other governed artifact, so the freshness gate
+// FAILS when the physics they were fitted on moves — the plan 11 §8.2 class
+// (a stack fitted on one engine, shipped on another, unseen for weeks).
+const { buildInputsBlock } = require(path.join(TOOLS_LIB, 'artifact-inputs.js'));
 
 // ─── Sync auto-optimum deltaTStart to public/input/astro-reference.json ─────
 // The JSON is the source of truth for that constant; Step 9 of the pipeline
@@ -1851,8 +1856,8 @@ function runJointMode() {
   delete fitJson.config.holocene_taper;
   // a --write IS the re-close: the banked staleness note (plan 11 step 1) goes
   delete fitJson._meta.staleness_vs_live_fitter;
-  fs.writeFileSync(fitPath, JSON.stringify(fitJson, null, 2) + '\n');
-  console.log(`\n  ✓ wrote ${fitPath}`);
+  // (written LAST below — after astro-reference and the resonator artifact —
+  // so its inputs block hashes those two files as THIS run left them)
 
   // Resonator JSON: scaled amplitudes (phases/epochs/T0/Q = convention).
   const resJsonPath = resPath;
@@ -1887,15 +1892,51 @@ function runJointMode() {
   rb.status = ('JOINT WORLD SHIPPED (--joint --write): the two impulse kicks from the joint '
     + 'equality-constrained fit, the drive tone retired at amplitude 0 (plan 06 D7 follow-up); '
     + 'phases/epochs/T0/Q remain the Stage-1/3 convention. Default-ON.');
-  fs.writeFileSync(resJsonPath, JSON.stringify(resJson, null, 2) + '\n');
-  console.log(`  ✓ wrote ${resJsonPath}`);
-
-  // astro-reference deltaTStart (single source; constants:generate propagates).
+  // astro-reference deltaTStart FIRST (single source; constants:generate
+  // propagates) — the two governed artifacts below hash it as written.
   const arPath = path.join(ROOT, 'public', 'input', 'astro-reference.json');
   const ar = JSON.parse(fs.readFileSync(arPath, 'utf8'));
   ar.earthOrbital.deltaTStart = best.dts;
   fs.writeFileSync(arPath, JSON.stringify(ar, null, 2) + '\n');
   console.log(`  ✓ wrote ${arPath} (deltaTStart = ${best.dts.toFixed(4)})`);
+
+  // ── GOVERNANCE (plan 12 §1b close-out) ──────────────────────────────────
+  // The inputs block: the data the fit reads (Stephenson 2016, the GIA τ,
+  // the climate coefficients the GIA channel rides, the cited Earth–Moon
+  // history), the physics it evaluates ΔT through (the deep-time chain and its
+  // modules; the tools/lib twins the fitter requires), the fitter and its
+  // shim. NOT the generated constants/coefficients modules — this fit's own
+  // output is embedded there (a self-loop). The generator string carries a
+  // `<by hand>` marker: regen:cascade lists a stale fit and does not run it —
+  // a re-close moves the shipped coefficients and is a decision (doc 111
+  // §1.19 / §1.23), run by hand, then `npm run regen:cascade --run`.
+  const GEN = 'DT_CORRECTIONS_DISABLED=1 node tools/fit/dt-corrections-fit.js --joint --write <a FIT — re-close by hand, then npm run regen:cascade --run>';
+  const COMMON_INPUTS = [
+    'packages/fitting/src/dt-corrections-fit.cjs',
+    'tools/fit/dt-corrections-fit.js',
+    CONFIG.stephenson_source,
+    'data/deep-time-fitted.json',
+    'public/input/climate-formula-coefficients.json',
+    'data/astrogeo22-earth-moon.json',
+    'tools/lib/deep-time.js',
+    'tools/lib/constants.js',
+    'packages/physics/src/deltat/deep-time-chain.js',
+    'packages/physics/src/deltat/deep-time.cjs',
+    'packages/physics/src/deltat/cycles.cjs',
+    'packages/physics/src/deltat/moon-distance-history.cjs',
+    'packages/physics/src/earth/mean-obliquity-history.cjs',
+    'packages/physics/src/earth/precession-composed.cjs',
+    'packages/physics/src/climate/l1-orbital.cjs',
+    'public/input/astro-reference.json',
+  ];
+  resJson.inputs = buildInputsBlock(GEN, COMMON_INPUTS);
+  fs.writeFileSync(resJsonPath, JSON.stringify(resJson, null, 2) + '\n');
+  console.log(`  ✓ wrote ${resJsonPath}`);
+
+  // the 4-flag artifact last: its block hashes the resonator artifact too
+  fitJson.inputs = buildInputsBlock(GEN, [...COMMON_INPUTS, 'data/core-mantle-resonator-stage1.json']);
+  fs.writeFileSync(fitPath, JSON.stringify(fitJson, null, 2) + '\n');
+  console.log(`  ✓ wrote ${fitPath}`);
   console.log('\n  Next (atomic package part 2): src/script.js and');
   console.log('  tools/lib/deep-time.js read this JSON directly — run');
   console.log('  `npm run constants:generate` and rebuild. The website syncs');

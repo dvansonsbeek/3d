@@ -186,11 +186,11 @@
       "kick_coefficients_s": [
         {
           "cos": 0,
-          "sin": 621.6670983508402
+          "sin": 621.6219766733102
         },
         {
           "cos": 0,
-          "sin": 1.267342361925417
+          "sin": 1.2864083502648112
         }
       ],
       "T0_lattice_n": 685,
@@ -207,9 +207,9 @@
           "retired": "RETIRED (plan 06 D7 follow-up, 2026-09): shipped at amplitude 0 — measured to buy nothing once the GIA channel became the lagged response (kicks-only 11.89 / 21.04 s vs all three 12.04 / 21.34 s); dn/phase kept as the convention for the diagnostic column (DT_RESONATOR_COMPONENTS)."
         }
       ],
-      "rms_s": 21.414914612574847,
-      "raw_at_j2000_s": -83.13378152386507,
-      "lod_raw_at_j2000_s_per_day": 0.0004964439478734995,
+      "rms_s": 21.41468124211518,
+      "raw_at_j2000_s": -83.11847911479408,
+      "lod_raw_at_j2000_s_per_day": 0.0004964517965367708,
       "deep_time_checks_s": {
         "900": -245.8439379884609,
         "2000": -82.32559425279462,
@@ -303,6 +303,27 @@
       },
       "regeneration_rule": "drive-tone menu = Δn difference tones of the ACTIVE flag set (any count); refit this script after any stack change (3rd/5th cycle)",
       "status": "FREE-T₀ STATISTICAL REFERENCE ONLY (not for shipping): best unpinned fit; T₀ is a shape parameter here, not the physical eigenperiod"
+    }
+  },
+  "inputs": {
+    "generator": "DT_CORRECTIONS_DISABLED=1 node tools/fit/dt-corrections-fit.js --joint --write <a FIT — re-close by hand, then npm run regen:cascade --run>",
+    "files": {
+      "data/astrogeo22-earth-moon.json": "sha256:850cd0b266d46a717328d47ef32edbc0d11cc0c1e4cd40fcc7132fc85aa4ea1d",
+      "data/deep-time-fitted.json": "sha256:cabf6484ed125969d7e1b829c29722939058fbfdd9fe45a604f869208250dd99",
+      "packages/fitting/src/dt-corrections-fit.cjs": "sha256:8a761ebcbbc300dd04c988751aa4d911b09b688bf9f94687323bcd0854aab003",
+      "packages/physics/src/climate/l1-orbital.cjs": "sha256:2cc864c563ca816df4ccc01f651bd67fde8f29215b6670f8f8842b5d4f68445f",
+      "packages/physics/src/deltat/cycles.cjs": "sha256:da684bd21865005f05ceec845683f1549efc17d5b11aeac2cf362b3f8e52bf99",
+      "packages/physics/src/deltat/deep-time-chain.js": "sha256:47d57ed3f23a6ed8b00bdd47f23fbe1076440a48daff6af3043319fbe1063c10",
+      "packages/physics/src/deltat/deep-time.cjs": "sha256:2d4d606e79985c175368bcb0d2a8429f9963962515a9175da7054ae5c9d5554d",
+      "packages/physics/src/deltat/moon-distance-history.cjs": "sha256:0a8918d69ca6b1e229517efc0a5b0322b0842acb54df270aa9636c67452542ce",
+      "packages/physics/src/earth/mean-obliquity-history.cjs": "sha256:f85dd33c548b107e2983c9bd550897895229ee451ed83c9ff83033bc1bccfd8a",
+      "packages/physics/src/earth/precession-composed.cjs": "sha256:a4a07a268d4f1a1beeae5a6ab7d05bc7c5ebeae5ff03140187f08799decba783",
+      "public/input/astro-reference.json": "sha256:1b8a1663a4882f4bf5fce6f4b3ece44a53acba7ad21d107ed3f077d7276bc472",
+      "public/input/climate-formula-coefficients.json": "sha256:d9a9c455053faea2590622752b731b6bc1573bdf5252f1c3a246b92fcdf99e2c",
+      "public/input/stephenson-2016-deltaT-polynomial.json": "sha256:e8f9611c0e6173d2e2807c46bf920673e533c085b9366e1dfc424c6fd1186df7",
+      "tools/fit/dt-corrections-fit.js": "sha256:37249d88eb5f4450c644170a5a49c21867e2e8f4196661325c72c2ead9a7373b",
+      "tools/lib/constants.js": "sha256:78d2914b3d1d40022c300e08a7354d42a2b68f731e476b6d1e56e33d524bb8ba",
+      "tools/lib/deep-time.js": "sha256:598c6f00f711432b1545df01bc768f0e624722ac49caf53064d22b5d31b240bd"
     }
   }
 }

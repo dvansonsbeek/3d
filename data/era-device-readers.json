@@ -4998,7 +4998,7 @@
   },
   {
    "file": "packages/fitting/src/dt-corrections-fit.cjs",
-   "line": 214,
+   "line": 219,
    "runtime": "fitting",
    "token": "H / N",
    "class": "comb",
@@ -5007,7 +5007,7 @@
   },
   {
    "file": "packages/fitting/src/dt-corrections-fit.cjs",
-   "line": 214,
+   "line": 219,
    "runtime": "fitting",
    "token": "8H",
    "class": "comb",
@@ -5016,7 +5016,7 @@
   },
   {
    "file": "packages/fitting/src/dt-corrections-fit.cjs",
-   "line": 217,
+   "line": 222,
    "runtime": "fitting",
    "token": "8H",
    "class": "comment",
@@ -5024,7 +5024,7 @@
   },
   {
    "file": "packages/fitting/src/dt-corrections-fit.cjs",
-   "line": 225,
+   "line": 230,
    "runtime": "fitting",
    "token": "8H",
    "class": "comment",
@@ -5032,7 +5032,7 @@
   },
   {
    "file": "packages/fitting/src/dt-corrections-fit.cjs",
-   "line": 226,
+   "line": 231,
    "runtime": "fitting",
    "token": "8H",
    "class": "comment",
@@ -5040,7 +5040,7 @@
   },
   {
    "file": "packages/fitting/src/dt-corrections-fit.cjs",
-   "line": 276,
+   "line": 281,
    "runtime": "fitting",
    "token": "H / N",
    "class": "comment",
@@ -5048,7 +5048,7 @@
   },
   {
    "file": "packages/fitting/src/dt-corrections-fit.cjs",
-   "line": 443,
+   "line": 448,
    "runtime": "fitting",
    "token": "H / N",
    "class": "comment",
@@ -5056,7 +5056,7 @@
   },
   {
    "file": "packages/fitting/src/dt-corrections-fit.cjs",
-   "line": 444,
+   "line": 449,
    "runtime": "fitting",
    "token": "H / N",
    "class": "comment",
@@ -5064,7 +5064,7 @@
   },
   {
    "file": "packages/fitting/src/dt-corrections-fit.cjs",
-   "line": 829,
+   "line": 834,
    "runtime": "fitting",
    "token": "H / N",
    "class": "comment",
@@ -5072,7 +5072,7 @@
   },
   {
    "file": "packages/fitting/src/dt-corrections-fit.cjs",
-   "line": 829,
+   "line": 834,
    "runtime": "fitting",
    "token": "/ 13",
    "class": "comment",
@@ -5080,7 +5080,7 @@
   },
   {
    "file": "packages/fitting/src/dt-corrections-fit.cjs",
-   "line": 836,
+   "line": 841,
    "runtime": "fitting",
    "token": "8H",
    "class": "comment",
@@ -5088,7 +5088,7 @@
   },
   {
    "file": "packages/fitting/src/dt-corrections-fit.cjs",
-   "line": 1280,
+   "line": 1285,
    "runtime": "fitting",
    "token": "8H",
    "class": "comment",
@@ -5096,7 +5096,7 @@
   },
   {
    "file": "packages/fitting/src/dt-corrections-fit.cjs",
-   "line": 1297,
+   "line": 1302,
    "runtime": "fitting",
    "token": "8H",
    "class": "display",
@@ -5104,7 +5104,7 @@
   },
   {
    "file": "packages/fitting/src/dt-corrections-fit.cjs",
-   "line": 1352,
+   "line": 1357,
    "runtime": "fitting",
    "token": "8H",
    "class": "display",
@@ -5112,7 +5112,7 @@
   },
   {
    "file": "packages/fitting/src/dt-corrections-fit.cjs",
-   "line": 1352,
+   "line": 1357,
    "runtime": "fitting",
    "token": "8H",
    "class": "display",
@@ -5120,7 +5120,7 @@
   },
   {
    "file": "packages/fitting/src/dt-corrections-fit.cjs",
-   "line": 1352,
+   "line": 1357,
    "runtime": "fitting",
    "token": "8H",
    "class": "display",
@@ -6301,12 +6301,12 @@
  "inputs": {
   "generator": "node tools/explore/era-device-readers.mjs --write",
   "files": {
-   "data/nbody-secular-series.json": "sha256:904c2e250efb97fe8f9a3d6222b93c91825a544a2ea62f4569e822ec0f35b0d6",
+   "data/nbody-secular-series.json": "sha256:1c0b4da6db61172358e2269943fabe915be951cad29b3ce37a8811ebc7816964",
    "packages/api/src/app.js": "sha256:3569084fca6b217f1f7c7e8b4ebe4092df6d6c2681c30bf2b491c6db0166fb92",
    "packages/api/src/mcp.js": "sha256:6a3b52da6cfcdb9e9527358f377be560966f7dc01ae1c700ee3225ce8b4717e4",
    "packages/api/test/api-gates.test.mjs": "sha256:5b863c59fe5d0e6c13fedad03a648936d46541ed6f9a4f9d043f875ab1337279",
    "packages/api/test/mcp-gates.test.mjs": "sha256:c3a3f0296b8c0cae2d78ecde1126ba357ae0e242fced5d7782f0c045c40b44f9",
-   "packages/fitting/src/dt-corrections-fit.cjs": "sha256:c2c2aa5174af2dc4fd01f9acc3bed2f44a4086af9e00265e9aa340c5b3ce0336",
+   "packages/fitting/src/dt-corrections-fit.cjs": "sha256:8a761ebcbbc300dd04c988751aa4d911b09b688bf9f94687323bcd0854aab003",
    "packages/fitting/src/export-solar-measurements.cjs": "sha256:85ae6c0eb95c80456dab5c0897a40134e2afb0daa85cc3938b650fba8f9fd312",
    "packages/fitting/src/run-pipeline.cjs": "sha256:738dfdc2834f920c8893e3b9d0da823a7d5067ca768d036642f9d1ea66926472",
    "packages/fitting/src/verify-pipeline.cjs": "sha256:a081264b66cca5e22a10c9c7e3406775e5514da5e28ea40d6889c4ae08e46a0c",
@@ -6327,7 +6327,7 @@
    "packages/physics/test/counterfactual.test.mjs": "sha256:8d15fa561222e929a3b3a92ec7738f2b67323ead955820b4aa26370943a4c153",
    "packages/physics/test/layer0-identity.test.mjs": "sha256:e942dc6f94dc2a5d3e3b74f794ac6c161cb6a4117180242bdc7cd0d80084d5b4",
    "packages/physics/test/layer1-identity.test.mjs": "sha256:9aca77e0f717013b9e70c55b2766cb0feff614493fc5454c95fe2706b306fe82",
-   "public/input/astro-reference.json": "sha256:6787408288a0db18efccada3a41bd63d1a0519c4e70576f924c7f28a5ac14ba7",
+   "public/input/astro-reference.json": "sha256:1b8a1663a4882f4bf5fce6f4b3ece44a53acba7ad21d107ed3f077d7276bc472",
    "public/input/model-version.json": "sha256:40d82d8be267d146a1d4d63ee852eed2a2c75bb0ed504156990cd796a5abe7ca",
    "scripts/climate_formula_mwp_check.py": "sha256:177305723579b66c9d08590f366574c05cd935aea5573614e89eddc502f72236",
    "scripts/extract_insolation_features_deep.js": "sha256:2ef7242a306cc9e34200e59c0dcbe8d5fe30dc0759b4d2ee5457875d981a50dc",

@@ -2,14 +2,14 @@
 // Gives the TypeScript website full type safety at the boundary (§2g) while
 // packages/physics stays JavaScript.
 
-export declare const CONSTANTS_HASH: "896558c2d878571d";
+export declare const CONSTANTS_HASH: "d048b4abc53c2e2d";
 
 export declare const MODEL_VERSION: string;
 
 export declare const PREPRINT_DOI: string;
 
 export declare const DEFAULT_CONSTANTS: {
-  readonly hash: "896558c2d878571d";
+  readonly hash: "d048b4abc53c2e2d";
   readonly additionalBodiesReference: {
     "pluto": {
       "solarYearInput": number;

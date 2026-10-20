@@ -138,7 +138,7 @@ console.log(`regen-cascade — ${nodes.size} governed nodes, ${order.length} to 
 if (!order.length) { console.log('  nothing is stale.'); process.exit(0); }
 order.forEach((id, i) => {
   const n = /** @type {Node} */ (nodes.get(id));
-  console.log(`\n${String(i + 1).padStart(2)}. ${n.cmd}${n.manual ? '   [MANUAL — needs a downloaded source]' : ''}`);
+  console.log(`\n${String(i + 1).padStart(2)}. ${n.cmd}${n.manual ? '   [MANUAL — run by hand: a downloaded source, or a FIT whose re-close is a decision]' : ''}`);
   for (const r of /** @type {string[]} */ (reason.get(id)).slice(0, 6)) console.log(`      ← ${r}`);
   const more = /** @type {string[]} */ (reason.get(id)).length - 6;
   if (more > 0) console.log(`      ← … ${more} more`);

@@ -12,9 +12,9 @@
     "unmatchedCanon": 0,
     "typeAgree": 1447,
     "meanAbsResidualMinutes": 8.518,
-    "meanAbsResidualMinutesFull": 8.517695198079636,
+    "meanAbsResidualMinutesFull": 8.517695591624442,
     "rmsResidualMinutes": 9.824,
-    "rmsResidualMinutesFull": 9.823656293138484,
+    "rmsResidualMinutesFull": 9.823660434810447,
     "maxAbsResidualMinutes": 19.294
   },
   "visibility": {
@@ -517,10 +517,10 @@
   "inputs": {
     "generator": "node tools/verify/lunar-alignment.js --write",
     "files": {
-      "data/core-mantle-resonator-stage1.json": "sha256:249a6bd84747e38d8845e2a84d17575efe93b98a9a04e015ad7bef1b7db1502e",
+      "data/core-mantle-resonator-stage1.json": "sha256:7225e1569824c8b090d53c1b67bd40e6ff892e74fa68280eea0e40723a67b03b",
       "data/deep-time-fitted.json": "sha256:cabf6484ed125969d7e1b829c29722939058fbfdd9fe45a604f869208250dd99",
-      "data/deltaT-4flag-fit.json": "sha256:c92a39c994ef10427d428ae40c7591378180cc00a483af8547e9d7e90cdf6346",
-      "data/nbody-secular-series.json": "sha256:904c2e250efb97fe8f9a3d6222b93c91825a544a2ea62f4569e822ec0f35b0d6",
+      "data/deltaT-4flag-fit.json": "sha256:a4f721040a60b828aab28dce0de85db37248c8d5f35c234ef7bbf9ddcd58297e",
+      "data/nbody-secular-series.json": "sha256:1c0b4da6db61172358e2269943fabe915be951cad29b3ce37a8811ebc7816964",
       "data/rspa20160404supp2/Table-S10.txt": "sha256:67a949e3a80574880b3e79338c3527fe9b7be639dd2c06080a098b75610abe7f",
       "data/rspa20160404supp2/Table-S11.txt": "sha256:19538f6ff8889df919da4ed1587296d540c9827d1155b605d9f3da0428916d2c",
       "data/rspa20160404supp2/Table-S12.txt": "sha256:f8f24b020db4af857c184cc164212e07d5109efda2a9c6da7551130022f1abc6",
@@ -539,7 +539,7 @@
       "packages/physics/src/moon/month-chain.cjs": "sha256:26a20d998d4f028da23ea3260d3e065c7bf7293d51666e1d9125c057f65c48c9",
       "packages/physics/src/moon/series-extension.cjs": "sha256:d295a78eaedb0246ff142ed726c57ec2353d183c0ccbd3d767157f19623c6461",
       "packages/physics/src/moon/series.cjs": "sha256:feb2174fce4bb446f2d699f750b8269c7d70a289107f3d9b639b85b634b2459b",
-      "public/input/astro-reference.json": "sha256:6787408288a0db18efccada3a41bd63d1a0519c4e70576f924c7f28a5ac14ba7",
+      "public/input/astro-reference.json": "sha256:1b8a1663a4882f4bf5fce6f4b3ece44a53acba7ad21d107ed3f077d7276bc472",
       "public/input/climate-formula-coefficients.json": "sha256:d9a9c455053faea2590622752b731b6bc1573bdf5252f1c3a246b92fcdf99e2c",
       "public/input/lunar-eclipses-documented.json": "sha256:586806e4f83c3f0ebd2d5afefce41c19664d8fa24023b7a9e0f79b7c8a668558",
       "public/input/lunar-eclipses-historical.json": "sha256:81dd0c83007eb899abeb97b0b987ae2d128d0e7ec4356622c7d15ed8175ad6c1",
