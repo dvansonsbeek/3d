@@ -223,6 +223,27 @@ const physModel = (() => {
     return m;
   };
 })();
+// The published series against La2010a (Laskar et al. 2011, A&A 532, A89) over the solution's span
+// (−500 kyr → 0 at 1 kyr, public/input/la2010-orbital-elements.json, invariable-plane frame): the
+// ONE computation behind the deep-eccentricity figure (tools/explore/deep-ecc-history.mjs) and the
+// browser's inv-tab note — theory against theory, published either way it falls. Memoised.
+const seriesVsLa2010a = (() => {
+  /** @type {{eccRms:number, eccMaxAbs:number, inclRmsDeg:number, n:number}|undefined} */ let memo;
+  return () => {
+    if (memo) return memo;
+    const la = rd('public/input/la2010-orbital-elements.json');
+    const m = physModel();
+    let s2e = 0, s2i = 0, mx = 0, n = 0;
+    for (const r of la.data) {
+      const y = 2000 + r.year;   // the file's years count from J2000
+      const de = m.earth.eccentricity(y) - r.eccentricity;
+      const di = m.earth.inclinationDeg(y) - r.inclination;
+      s2e += de * de; s2i += di * di; mx = Math.max(mx, Math.abs(de)); n++;
+    }
+    memo = { eccRms: Math.sqrt(s2e / n), eccMaxAbs: mx, inclRmsDeg: Math.sqrt(s2i / n), n };
+    return memo;
+  };
+})();
 
 /** `1234567.89` -> `1,234,567.89` (the form the prose uses for H). */
 const thousands = (n, dp = 0) => {
@@ -573,6 +594,22 @@ export const VALUES = {
     render: (v) => Number(v).toFixed(0),
     unit: '″',
     note: 'IAU mean element − series secular element at J2000 (a convention gap, labelled not reconciled)',
+  },
+  earthEccSeriesVsLa2010aRms: {
+    get: () => seriesVsLa2010a().eccRms,
+    render: (v) => Number(v).toExponential(1),
+    note: 'rms of the published series\' Earth eccentricity against La2010a over the solution\'s span (−500 kyr → 0, 501 rows at 1 kyr; theory against theory, the deep-eccentricity figure\'s measured difference)',
+  },
+  earthEccSeriesVsLa2010aMaxAbs: {
+    get: () => seriesVsLa2010a().eccMaxAbs,
+    render: (v) => Number(v).toExponential(1),
+    note: 'largest |Δe| of the published series against La2010a over the same span',
+  },
+  earthInclSeriesVsLa2010aRmsDeg: {
+    get: () => seriesVsLa2010a().inclRmsDeg,
+    render: (v) => Number(v).toFixed(4),
+    unit: '°',
+    note: 'rms of the series\' Earth inclination to the invariable plane against La2010a over the same span (the browser\'s inv-tab overlay note)',
   },
   // (The single-line eccentricity law's keys — eccentricityDerivedMean / Min /
   //  Max, earthEccPhaseH3J2000, earthEccDotModelJ2000, earthEccDotAgreementPct
