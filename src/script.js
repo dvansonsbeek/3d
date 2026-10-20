@@ -186,7 +186,7 @@ function _kcLamDot0(k) {
     // vs the anchor (~3 s on the sidereal year) — D6 banks a RATIO for
     // exactly this reason. Zero literals: 360°·(Julian yr in s)/anchor.
     _kcMassLossPeriodRatio(2000);   // primes the J2000-seconds memo
-    return 360 * 365.25 * 86400 / _kcMassLossJ2000S;
+    return 360 * DAYS_PER_JULIAN_YEAR * SECONDS_PER_DAY / _kcMassLossJ2000S;
   }
   const A = _planetSeriesData;
   if (A && A.verdict) {
@@ -205,7 +205,7 @@ const tropicalCenturyDays = 100 * meansolaryearlengthinDays;  // 100 model tropi
 // in solar-day units, or N+1 rotations relative to inertial space).
 // Used by earth.rotationSpeed (sidereal-frame base spin); on the DERIVED J2000
 // mean tropical year, ≡ the Node twin's meanSiderealDay.
-const _siderealDaySec_J2000 = 86400 * meansolaryearlengthinDays / (meansolaryearlengthinDays + 1);
+const _siderealDaySec_J2000 = SECONDS_PER_DAY * meansolaryearlengthinDays / (meansolaryearlengthinDays + 1);
 // Triple synodic period (Jupiter-Saturn conjunction cycle incl. perihelion precession H/5, -H/8)
 // Computed after planets are defined — see section E2
 
@@ -835,13 +835,13 @@ let   axialCoinRotationYearlySeconds = NaN;  // Phase 6: mutable (Tier 2)
 //   • MEAN_SIDEREAL_YEAR_86400DAYS = 365.256363 (IAU)
 // ═══════════════════════════════════════════════════════════════════════════
 
-const MEAN_TROPICAL_YEAR_SEC = meansolaryearlengthinDays * 86400;                             // = 31,556,925.19 s (the IAU tropical mean × 86400)
-const MEAN_SIDEREAL_YEAR_SEC = ASTRO_REFERENCE.siderealYearJ2000 * 86400;                    // = 31,558,149.7635 s (IAU physical)
+const MEAN_TROPICAL_YEAR_SEC = meansolaryearlengthinDays * SECONDS_PER_DAY;                             // = 31,556,925.19 s (the IAU tropical mean × 86400)
+const MEAN_SIDEREAL_YEAR_SEC = ASTRO_REFERENCE.siderealYearJ2000 * SECONDS_PER_DAY;                    // = 31,558,149.7635 s (IAU physical)
 const MEAN_LOD_SEC = MEAN_SIDEREAL_YEAR_SEC / meansiderealyearlengthinDays_kinematic;         // = 86,400 s (IAU sec / IAU days, plan 09)
 
-const MEAN_TROPICAL_YEAR_86400DAYS = MEAN_TROPICAL_YEAR_SEC / 86400;                          // = the IAU tropical mean
+const MEAN_TROPICAL_YEAR_86400DAYS = MEAN_TROPICAL_YEAR_SEC / SECONDS_PER_DAY;                          // = the IAU tropical mean
 const MEAN_TROPICAL_YEAR_MEANLODDAYS = MEAN_TROPICAL_YEAR_SEC / MEAN_LOD_SEC;                 // ≡ MEAN_TROPICAL_YEAR_86400DAYS (plan 09)
-const MEAN_SIDEREAL_YEAR_86400DAYS = MEAN_SIDEREAL_YEAR_SEC / 86400;                          // ≈ 365.256363 (IAU)
+const MEAN_SIDEREAL_YEAR_86400DAYS = MEAN_SIDEREAL_YEAR_SEC / SECONDS_PER_DAY;                          // ≈ 365.256363 (IAU)
 const MEAN_SIDEREAL_YEAR_MEANLODDAYS = MEAN_SIDEREAL_YEAR_SEC / MEAN_LOD_SEC;                 // ≡ MEAN_SIDEREAL_YEAR_86400DAYS (plan 09)
 
 const MEAN_PRECESSION = MEAN_SIDEREAL_YEAR_SEC / (MEAN_SIDEREAL_YEAR_SEC - MEAN_TROPICAL_YEAR_SEC); // = H/13 exactly
@@ -871,7 +871,7 @@ function _phase9YearToJDDays() {
   return DEEP_TIME_MODE_ENABLED ? SI_TROPICAL_YEAR_DAYS : meansolaryearlengthinDays;
 }
 function _phase9SiderealDayLODFactor() {
-  return DEEP_TIME_MODE_ENABLED ? meanlengthofday : 86400;
+  return DEEP_TIME_MODE_ENABLED ? meanlengthofday : SECONDS_PER_DAY;
 }
 
 // --- 9d. Simulation time steps (fractions of a tropical year) ---
@@ -1672,7 +1672,7 @@ const OrbitalFormulas = {
 
   // Mean motion in rad/year from orbital period in days
   meanMotionRadPerYear: (period_days) => {
-    const period_years = period_days / 365.25;
+    const period_years = period_days / DAYS_PER_JULIAN_YEAR;
     return (2 * Math.PI) / period_years;
   },
 
@@ -2090,13 +2090,13 @@ const NEPTUNE_ORBIT_DISTANCE_J2000 = neptuneOrbitDistance;   // ≈ 30.103
 
 // Per-planet J2000 orbital period in seconds — used as input to
 // meanPlanetOrbitalPeriodAtAge() and to recomputePlanetCountsForEpoch().
-const MERCURY_PERIOD_J2000_S = planets.mercury.solarYearInput * 86400;
-const VENUS_PERIOD_J2000_S   = planets.venus.solarYearInput   * 86400;
-const MARS_PERIOD_J2000_S    = planets.mars.solarYearInput    * 86400;
-const JUPITER_PERIOD_J2000_S = planets.jupiter.solarYearInput * 86400;
-const SATURN_PERIOD_J2000_S  = planets.saturn.solarYearInput  * 86400;
-const URANUS_PERIOD_J2000_S  = planets.uranus.solarYearInput  * 86400;
-const NEPTUNE_PERIOD_J2000_S = planets.neptune.solarYearInput * 86400;
+const MERCURY_PERIOD_J2000_S = planets.mercury.solarYearInput * SECONDS_PER_DAY;
+const VENUS_PERIOD_J2000_S   = planets.venus.solarYearInput   * SECONDS_PER_DAY;
+const MARS_PERIOD_J2000_S    = planets.mars.solarYearInput    * SECONDS_PER_DAY;
+const JUPITER_PERIOD_J2000_S = planets.jupiter.solarYearInput * SECONDS_PER_DAY;
+const SATURN_PERIOD_J2000_S  = planets.saturn.solarYearInput  * SECONDS_PER_DAY;
+const URANUS_PERIOD_J2000_S  = planets.uranus.solarYearInput  * SECONDS_PER_DAY;
+const NEPTUNE_PERIOD_J2000_S = planets.neptune.solarYearInput * SECONDS_PER_DAY;
 
 // (the planets' spin rides the spin channel; their perihelion period is the
 // chain's 1,296,000/g, a quantity of the governed artifact that scales with the
@@ -2274,7 +2274,7 @@ function _certifiedAxialPrecessionJ2000Years() {
  *  the constants embed the browser reads). Lazy: reads the law, which rides the
  *  series once it has arrived (the artifact-less law reads +2.1 s). */
 function _anomalisticYearJ2000Days() {
-  return _yearLengthsM().anomalisticYearSecondsAtYear(2000) / 86400;
+  return _yearLengthsM().anomalisticYearSecondsAtYear(2000) / SECONDS_PER_DAY;
 }
 /** The J2000 apsidal period T_aps (the perihelion against the stars), Julian
  *  years — the one-family's apsidal line of date at 2000, 111,634 yr. Lazy, as
@@ -2875,8 +2875,8 @@ const _moonArgsM = (() => {
           // perihelion of date (wrapped; the arguments wrap M) — the same
           // surface model.js and the Node scene twin wire; rebuilt on the
           // shipped series when it lands. TT Julian-year axis.
-          sunMeanLonDegAtJdTT: (jdTT) => _tierModelB().sun.meanLongitudeDegAt(2000 + (jdTT - j2000JD) / 365.25),
-          sunPerihelionLonDegAtJdTT: (jdTT) => _tierModelB().sun.perihelionLongitudeDegAt(2000 + (jdTT - j2000JD) / 365.25),
+          sunMeanLonDegAtJdTT: (jdTT) => _tierModelB().sun.meanLongitudeDegAt(2000 + (jdTT - j2000JD) / DAYS_PER_JULIAN_YEAR),
+          sunPerihelionLonDegAtJdTT: (jdTT) => _tierModelB().sun.perihelionLongitudeDegAt(2000 + (jdTT - j2000JD) / DAYS_PER_JULIAN_YEAR),
           jdToSIyear: (jd) => _jdToSIyear(jd),
           tropicalOrbitsBetween: meanMoonOrbitsBetweenYears,
           apsidalOfDateCyclesBetween: meanMoonApsidalOfDateCyclesBetween,
@@ -3235,7 +3235,7 @@ function meanTropicalMonthAtAge(t_Ma) { return _moonChain().tropicalMonthSeconds
 // ───── Moon-chain mean-longitude integrators for deep time ─────
 // Moon tropical month at J2000 (SI seconds): the sidereal month less one
 // equinox turn per T_p — the same relation moonTropicalMonth (days) is built from.
-const MOON_TROPICAL_MONTH_J2000_S = 1 / (1 / MOON_SIDEREAL_MONTH_J2000_S + 1 / (AXIAL_PRECESSION_J2000_DAYS * 86400));
+const MOON_TROPICAL_MONTH_J2000_S = 1 / (1 / MOON_SIDEREAL_MONTH_J2000_S + 1 / (AXIAL_PRECESSION_J2000_DAYS * SECONDS_PER_DAY));
 // ≈ 2,360,584.7 s (≈ 27.32158 d × 86400 s/d)
 
 /** Derived period helpers in seconds, mirroring the in-days formulas at
@@ -3371,7 +3371,7 @@ const _moonChain = () => _dtc().moonChain;   // B2: the chain's (its J2000 ancho
 function _fwEFactor(jd_tt, T, T2) {
   if (!MOON_ARGS_FRAMEWORK_NATIVE) return 1 - 0.002516 * T - 0.0000074 * T2;
   // decision (ii): the ONE deep e — on the channel's Julian-year axis
-  return _deepEcc().eFactorAt((jd_tt - j2000JD) / 365.25);
+  return _deepEcc().eFactorAt((jd_tt - j2000JD) / DAYS_PER_JULIAN_YEAR);
 }
 
 /** Lunar perigee precession period in seconds (Brouwer-Clemence scaling ×
@@ -3839,7 +3839,7 @@ function recomputeMoonDerivedForEpoch(t_Ma) {
   const days  = meansolaryearlengthinDays;
   // the equinox-of-date partners remove/add one equinox turn per T_p(t) — the
   // Julian-year period in the epoch's LOD days, the unit the months above are in
-  const Tp_days = _axialPrecessionPeriodYearsAtAge(t_Ma) * 365.25 * 86400 / (meanLodSecondsAtAge(t_Ma) ?? 86400);
+  const Tp_days = _axialPrecessionPeriodYearsAtAge(t_Ma) * DAYS_PER_JULIAN_YEAR * SECONDS_PER_DAY / (meanLodSecondsAtAge(t_Ma) ?? SECONDS_PER_DAY);
   // Earth-frame full-moon beat: beat of synodic + anomalistic
   moonFullMoonCycleEarth         = (moonSynodicMonth / (moonSynodicMonth - moonAnomalisticMonth)) * moonAnomalisticMonth;
   // equinox-of-date variants — 1/T_E = 1/T_star ∓ 1/T_p (the full-moon cycle and the perigee advance prograde, the node regresses)
@@ -3939,7 +3939,7 @@ function updateEarthForEpoch() {
   //   86400                          — J2000 mean solar day in seconds
   //   SI_TROPICAL_YEAR_DAYS          — captured at module init from J2000
   // (_siderealDaySec_J2000 hoisted to module scope in section E1 at top of file)
-  earth.rotationSpeed = Math.PI * 2 * SI_TROPICAL_YEAR_DAYS * 86400 / _siderealDaySec_J2000;
+  earth.rotationSpeed = Math.PI * 2 * SI_TROPICAL_YEAR_DAYS * SECONDS_PER_DAY / _siderealDaySec_J2000;
   // 20.3c: sidereal-phase anchor correction — startmodelJD (2451716.5) is a
   // MIDNIGHT-UT anchor, but the initial orientation was calibrated on the
   // noon convention. The solar-day arithmetic hides the half-day slip (one
@@ -4050,12 +4050,12 @@ function _sceneJdTT(jdUT) {
   let jdTT = jdUT;
   if (DEEP_TIME_MODE_ENABLED) {
     const dT = meanDeltaTSecondsAtAge((J2000_CALENDAR_YEAR - julianDateToDecimalYear(jdUT)) / 1e6);
-    if (Number.isFinite(dT)) jdTT = jdUT + (deltaTStart + dT) / 86400;
+    if (Number.isFinite(dT)) jdTT = jdUT + (deltaTStart + dT) / SECONDS_PER_DAY;
   }
   return jdTT;
 }
 function _engineYearTT(jdUT) {
-  return 2000 + (_sceneJdTT(jdUT) - j2000JD) / 365.25;
+  return 2000 + (_sceneJdTT(jdUT) - j2000JD) / DAYS_PER_JULIAN_YEAR;
 }
 /** The engine year for a SCENE calendar year (o.currentYear's axis):
  *  julianDateToDecimalYear's exact inverse (Jan 1 of that year + the
@@ -4446,7 +4446,7 @@ if (typeof window !== 'undefined') {
         // equal the true MUTUAL inclination planet-vs-Earth-engine.
         planets: Object.fromEntries(['mercury', 'venus', 'mars', 'jupiter'].map((nm) => {
           const el = _kcElementsOfDate(nm, jd);
-          const pDays = 365.25 * Math.pow(el.aAU, 1.5);
+          const pDays = DAYS_PER_JULIAN_YEAR * Math.pow(el.aAU, 1.5);
           const h0 = _kcHelioAU(nm, jd), h1 = _kcHelioAU(nm, jd + pDays / 4), h2 = _kcHelioAU(nm, jd + pDays / 2);
           const v1 = [h1[0] - h0[0], h1[1] - h0[1], h1[2] - h0[2]];
           const v2 = [h2[0] - h0[0], h2[1] - h0[1], h2[2] - h0[2]];
@@ -4574,7 +4574,7 @@ if (typeof window !== 'undefined') {
       forceSceneUpdate('light');
       return { raDeg: sun.ra * 180 / Math.PI, decDeg: 90 - sun.dec * 180 / Math.PI, epsDeg: o.obliquityEarth };
     },
-    certSunLonAt: (jd) => _tierModelB().eclipse.sunLonCompletedDegAtJD(jd + deltaTStart / 86400),   // true-UT jd in; the bridge is the caller's (R3 item 2)
+    certSunLonAt: (jd) => _tierModelB().eclipse.sunLonCompletedDegAtJD(jd + deltaTStart / SECONDS_PER_DAY),   // true-UT jd in; the bridge is the caller's (R3 item 2)
     eclFindLunar: (jdStart, jdEnd) => findLunarEclipsesInRange(jdStart, jdEnd),
     eclFindSolar: (jdStart, jdEnd) => findSolarEclipsesInRange(jdStart, jdEnd),
     eclUmbraSceneAt: (jd) => umbraFromSceneAtJd(jd),
@@ -4621,7 +4621,7 @@ if (typeof window !== 'undefined') {
       }
       const t1 = performance.now();
       const jdM = jd + 0.123;
-      const pDays = 365.25 * Math.pow(_kcElementsOfDate('mars', jdM).aAU, 1.5);
+      const pDays = DAYS_PER_JULIAN_YEAR * Math.pow(_kcElementsOfDate('mars', jdM).aAU, 1.5);
       for (let i = 0; i <= _KC_ORBIT_SEGS; i++) _kcHelioAU('mars', jdM + (i / _KC_ORBIT_SEGS - 0.5) * pDays);
       const t2 = performance.now();
       return { ringMs: t1 - t0, perJdRingMs: t2 - t1 };
@@ -4875,7 +4875,7 @@ if (typeof window !== 'undefined') {
       const S = new THREE.Vector3(), E = new THREE.Vector3(); sun.planetObj.getWorldPosition(S); earth.rotationAxis.getWorldPosition(E);
       const offKm = m.dot.position.distanceTo(S) / 100 * AU_J2000_KM;
       const vSun = m.dot.position.clone().sub(S), vEarth = me.dot.position.clone().sub(E);
-      const year = 2000 + (o.julianDay - KC_ANCHOR_EPOCH_JD) / 365.25;
+      const year = 2000 + (o.julianDay - KC_ANCHOR_EPOCH_JD) / DAYS_PER_JULIAN_YEAR;
       const panel = computeSunSSBOffset(year);
       const pa = m.path.geometry.attributes.position.array;
       let finite = 0; for (let i = 0; i < pa.length; i += 3) if (Number.isFinite(pa[i]) && (pa[i] !== 0 || pa[i + 1] !== 0 || pa[i + 2] !== 0)) finite++;
@@ -5424,7 +5424,7 @@ const earth = {
   name: "Earth",
   startPos: 0,
   speed: 0,   // plan 11 step 4: the K axial wheel (recorded 25,793.6 yr) no longer turns this node — the axis is ENGINE-PLACED every frame (R4), the pivot frame is the fixed world frame
-  rotationSpeed: Math.PI*2 * SI_TROPICAL_YEAR_DAYS * 86400 * (meansolaryearlengthinDays+1) / (meanlengthofday * meansolaryearlengthinDays),  // Phase 9.5b: sidereal rotations per SI year (LOD-aware); at J2000 ≡ 2π × (meansol+1) to ppm
+  rotationSpeed: Math.PI*2 * SI_TROPICAL_YEAR_DAYS * SECONDS_PER_DAY * (meansolaryearlengthinDays+1) / (meanlengthofday * meansolaryearlengthinDays),  // Phase 9.5b: sidereal rotations per SI year (LOD-aware); at J2000 ≡ 2π × (meansol+1) to ppm
   // 20.3c sidereal-phase anchor — MATCHED PAIR with updateEarthForEpoch().
   // MUST be initialized here:
   // a fresh page never runs the epoch updaters (the start date sits inside
@@ -8118,7 +8118,7 @@ function _kcEarthEccCycle(yearNow) {
   const nowMs = performance.now();
   if (_earthEccCycleCache && nowMs - _earthEccCycleBuiltMs < 250) return _earthEccCycleCache;
   _earthEccCycleBuiltMs = nowMs;
-  const jdOf = (y) => KC_ANCHOR_EPOCH_JD + (y - KC_ANCHOR_EPOCH_YEAR) * 365.25;
+  const jdOf = (y) => KC_ANCHOR_EPOCH_JD + (y - KC_ANCHOR_EPOCH_YEAR) * DAYS_PER_JULIAN_YEAR;
   const pomAt = (y) => _kcPerihelionEclLonDeg('earth', jdOf(y));
   const BEAT_YR = DEEP_MODES_ARTIFACT.verdict.strongestBeatPeriodKyr * 1000;   // ≈ 405,626 yr
   const N = 240;   // ~1.7-kyr steps: ≥ 56 samples per shortest e-component (~95 kyr)
@@ -11043,7 +11043,7 @@ function computeInspectorOrbitFrame(planetKey) {
   obj.planetObj.getWorldPosition(f.P);              // the RENDERED planet (light-time retarded, as the eye sees it)
   f.el = el; f.obj = obj; f.jd = jd;
   f.aScene = 100 * el.aAU;
-  f.pDays = 365.25 * Math.pow(el.aAU, 1.5);         // Kepler III in the solar-mass unit (as _kcUpdateOrbitLine)
+  f.pDays = DAYS_PER_JULIAN_YEAR * Math.pow(el.aAU, 1.5);         // Kepler III in the solar-mass unit (as _kcUpdateOrbitLine)
   f.r.subVectors(f.P, f.S);
   f.rAU = f.r.length() / 100;
   f.rPeriAU = el.aAU * (1 - el.e);
@@ -11460,7 +11460,7 @@ function updateInspectorVisuals(f, force = false) {
     let iHi = 0, iLo = 0;
     const yC = _engineYearTT(f.jd);   // one ΔT bridge per resample, as the scene rings (_kcHelioAUAtEngineYear)
     for (let i = 0; i <= N; i++) {
-      const hv = _kcHelioAUAtEngineYear(key, yC + (i / N - 0.5) * f.pDays / 365.25);
+      const hv = _kcHelioAUAtEngineYear(key, yC + (i / N - 0.5) * f.pDays / DAYS_PER_JULIAN_YEAR);
       _hiRotJ2000(R, hv, _hiTmpA).multiplyScalar(100).add(f.S);
       const k = (i + 1) * 3;
       fp[k] = _hiTmpA.x; fp[k + 1] = _hiTmpA.y; fp[k + 2] = _hiTmpA.z;
@@ -11633,7 +11633,7 @@ function _hiWriteReadouts(f) {
   e.lonPeri.textContent = fx(_hiWrap360(el.lonPeriEclipticDeg), 4, '°');
   e.argPeri.textContent = fx(_hiWrap360(el.lonPeriEclipticDeg - el.ascNodeEclipticDeg), 4, '°');
   e.meanLon.textContent = fx(_hiWrap360(el.meanLonEclipticDeg), 4, '°');
-  e.period.textContent = fx(f.pDays / 365.25, 4, ' yr');
+  e.period.textContent = fx(f.pDays / DAYS_PER_JULIAN_YEAR, 4, ' yr');
   e.rPeri.textContent = fx(f.rPeriAU, 6, ' AU');
   e.rApo.textContent = fx(f.rApoAU, 6, ' AU');
   e.rAU.textContent = fx(f.rAU, 6, ' AU');
@@ -12275,7 +12275,7 @@ function wgcModelCurves(planetKey, d) {
     // ϖ(t) in ECLIPJ2000 (the plotted frame). The jd construction mirrors
     // the chain's own year coordinate exactly (round-trip identity, no
     // calendar slip).
-    values[i] = _kcPerihelionEclLonDeg(modelPlanetKey, KC_ANCHOR_EPOCH_JD + (d.yrArr[i] - 2000) * 365.25);
+    values[i] = _kcPerihelionEclLonDeg(modelPlanetKey, KC_ANCHOR_EPOCH_JD + (d.yrArr[i] - 2000) * DAYS_PER_JULIAN_YEAR);
   }
   // Unwrap the curve (owner-corrected: Neptune's near-zero e lets ϖ wobble
   // across 0° — the wrapped series jumped to ~360) and align its branch to
@@ -16110,7 +16110,7 @@ function closeLcrPanel() {
 // ═══════════════════════════════════════════════════════════════════
 
 /** Convert calendar year to approximate JD (standard polynomial convention) */
-function yearToJDApprox(year) { return j2000JD + (year - 2000) * 365.25; }
+function yearToJDApprox(year) { return j2000JD + (year - 2000) * DAYS_PER_JULIAN_YEAR; }
 
 // ── Reference formula implementations ────────────────────────────
 
@@ -16452,7 +16452,7 @@ function _cardinalYearSeconds(year, type) {
  *  (owner: the panel read minutes past 365 d 5 h while its siblings read
  *  days; the minutes form and its 365 d 5 h base are retired with it). */
 function _cardinalYearDays(year, type) {
-  return _cardinalYearSeconds(year, type) / 86400;
+  return _cardinalYearSeconds(year, type) / SECONDS_PER_DAY;
 }
 /** The four northern seasons in SI days — the interval between successive
  *  cardinal points of the TRUE Sun: a quarter of the tropical year of date
@@ -16467,10 +16467,10 @@ function _seasonDurationDays(year, season) {
   if (!_hybridSpinActive()) return NaN;
   const yl = _yearLengthsM();
   const quarter = yl.tropicalYearSecondsAtYear(year + 0.5) / 4;
-  if (season === 'MEAN') return quarter / 86400;
+  if (season === 'MEAN') return quarter / SECONDS_PER_DAY;
   const off = (y, type) => yl.cardinal.eocOffsetSeconds(y, type);
   const ends = { SPRING: ['VE', 'SS', 0], SUMMER: ['SS', 'AE', 0], AUTUMN: ['AE', 'WS', 0], WINTER: ['WS', 'VE', 1] }[season];
-  return (quarter + off(year + ends[2], ends[1]) - off(year, ends[0])) / 86400;
+  return (quarter + off(year + ends[2], ends[1]) - off(year, ends[0])) / SECONDS_PER_DAY;
 }
 
 // The series-driven hybrid (the ONE evaluator): factory built lazily AFTER
@@ -16650,11 +16650,11 @@ function _vfpSolarDayLongTermMeanSeconds(year) {
 const _vfpTropicalYearDaysOfDate = (() => {
   let a = null;
   return (year) => {
-    if (_hybridSpinActive()) return _yearLengthsM().tropicalYearSecondsAtYear(year) / 86400;
+    if (_hybridSpinActive()) return _yearLengthsM().tropicalYearSecondsAtYear(year) / SECONDS_PER_DAY;
     // The composed lunisolar precession period of date T_p(t) — the same
     // scaling the hybrid precesses on.
     const tMa = (2000 - year) / 1e6;
-    return meanSiderealYearSecondsAtAge(tMa) / 86400
+    return meanSiderealYearSecondsAtAge(tMa) / SECONDS_PER_DAY
       * (1 - 1 / _axialPrecessionPeriodYearsAtAge(tMa));
   };
 })();
@@ -16820,7 +16820,7 @@ const VFP_CATEGORIES = [
     defaultRef: 'Vondrák (2011), derived',   // rms 0.81 s on ±23 kyr (Laskar 1986 1.85 s)
     frame: 'Mean tropical year (SI days of 86,400 s), of date',
     yLabel: 'days',
-    residualLabel: 'seconds', residualScale: 86400,
+    residualLabel: 'seconds', residualScale: SECONDS_PER_DAY,
     paperTitle: 'Tropical Year Comparison',
     fixedYRange: [365.2418, 365.2426], fixedYTicks: [365.2418, 365.2420, 365.2422, 365.2424, 365.2426],
     // The Quaternary window: the equinox-rate wobble over ±250 kyr
@@ -16877,7 +16877,7 @@ const VFP_CATEGORIES = [
     // In SI DAYS like the Tropical and Sidereal Year panels (owner); the
     // residual pane = each cardinal year − the mean tropical year, in
     // seconds — the ±40-s swings that ARE this panel's content.
-    residualLabel: 'seconds', residualScale: 86400,
+    residualLabel: 'seconds', residualScale: SECONDS_PER_DAY,
     paperTitle: 'Cardinal Year Lengths',
     // y-range from the MEASURED extremes with the wobbling of-date mean
     // (era: 47.08–50.21 min past 365 d 5 h → 365.2410–365.2432 d), sized
@@ -16916,7 +16916,7 @@ const VFP_CATEGORIES = [
     // paper annotations for the Quaternary window (the y range follows the screen)
     paperAlt: {
       refLines: [
-        { value: () => 86400, label: 'SI second baseline (86400 s)', color: '#888', dash: true, yOffset: 0 },
+        { value: () => SECONDS_PER_DAY, label: 'SI second baseline (86400 s)', color: '#888', dash: true, yOffset: 0 },
       ],
       // Marine Isotope Stage peak ages (Lisiecki & Raymo 2005) — the ONE
       // list shared with the Sidereal & Stellar Day panel.
@@ -17005,7 +17005,7 @@ const VFP_CATEGORIES = [
     id: 'sidereal-year', group: 'Earth clock', label: 'Sidereal Year', unit: ' days', precision: 9,
     frame: 'Sidereal year (SI days of 86,400 s), of date',
     yLabel: 'days',
-    residualLabel: 'seconds', residualScale: 86400,
+    residualLabel: 'seconds', residualScale: SECONDS_PER_DAY,
     paperTitle: 'Sidereal Year Comparison',
     fixedYRange: [365.25635, 365.256375], fixedYTicks: [365.25635, 365.256355, 365.25636, 365.256365, 365.25637, 365.256375],
     // The Quaternary window (D6): the planetary λ̇ drift's ~20-kyr cycles +
@@ -17029,9 +17029,9 @@ const VFP_CATEGORIES = [
       fn: year => {
         if (_hybridSpinActive()) {
           const os = _siderealYearOneSourceSeconds(year);
-          if (os !== null) return os / 86400;
+          if (os !== null) return os / SECONDS_PER_DAY;
         }
-        return meanSiderealYearSecondsAtAge((startmodelYear - year) / 1e6) / 86400;
+        return meanSiderealYearSecondsAtAge((startmodelYear - year) / 1e6) / SECONDS_PER_DAY;
       }},
     references: [
       { name: 'Chapront (2002)', color: '#4fc3f7', fn: siderealYearChapront, validYears: [-10000, 10000], sourceUrl: 'https://ui.adsabs.harvard.edu/abs/2003A%26A...412..567C' },
@@ -17051,10 +17051,10 @@ const VFP_CATEGORIES = [
     id: 'anomalistic-year', group: 'Earth clock', label: 'Anomalistic Year', unit: ' days', precision: 9,
     frame: 'Anomalistic year (SI days of 86,400 s), perihelion to perihelion, of date',
     yLabel: 'days',
-    residualLabel: 'seconds', residualScale: 86400,
+    residualLabel: 'seconds', residualScale: SECONDS_PER_DAY,
     paperTitle: 'Anomalistic Year Comparison',
     model: { name: 'This model', color: '#f0b040',
-      fn: year => _hybridSpinActive() ? _yearLengthsM().anomalisticYearSecondsAtYear(year) / 86400 : NaN },
+      fn: year => _hybridSpinActive() ? _yearLengthsM().anomalisticYearSecondsAtYear(year) / SECONDS_PER_DAY : NaN },
     references: [
       { name: 'Meeus (1998), derived', color: '#4fc3f7', fn: anomalisticYearMeeusDerived, validYears: [-10000, 10000], sourceUrl: 'https://ui.adsabs.harvard.edu/abs/2003A%26A...412..567C' },
     ],
@@ -17374,11 +17374,11 @@ const VFP_CATEGORIES = [
     // as the planet stats (a "year" is Julian in one place and mean solar
     // in another).
     model: { name: 'This model', color: '#f0b040',
-      fn: year => 360 / _vfpMoonAngleRateDegPerYear('peri', year) * 365.25 },
+      fn: year => 360 / _vfpMoonAngleRateDegPerYear('peri', year) * DAYS_PER_JULIAN_YEAR },
     references: [
-      { name: 'Meeus (1998), Ch. 47 rates', color: '#4fc3f7', fn: year => moonPerigeePrecessionYearsMeeus(year) * 365.25, validYears: [-1999, 3000], sourceUrl: 'https://en.wikipedia.org/wiki/Lunar_precession' },
+      { name: 'Meeus (1998), Ch. 47 rates', color: '#4fc3f7', fn: year => moonPerigeePrecessionYearsMeeus(year) * DAYS_PER_JULIAN_YEAR, validYears: [-1999, 3000], sourceUrl: 'https://en.wikipedia.org/wiki/Lunar_precession' },
       { name: 'This model — dynamical chain (Brouwer–Clemence), bridged to date', color: '#ce93d8',
-        fn: year => 1 / (86400 / meanLunarPerigeePrecessionAtAge((startmodelYear - year) / 1e6) + 1 / (_vfpAxialPrecessionYears(year) * 365.25)) },
+        fn: year => 1 / (SECONDS_PER_DAY / meanLunarPerigeePrecessionAtAge((startmodelYear - year) / 1e6) + 1 / (_vfpAxialPrecessionYears(year) * DAYS_PER_JULIAN_YEAR)) },
     ],
     j2000extras: [
       { name: 'Registry anchor (Meeus/IERS, of date)', color: '#ef5350',
@@ -17398,11 +17398,11 @@ const VFP_CATEGORIES = [
     // negative, the period its magnitude); the chain route's bridge to date
     // is 1/T_date = 1/T_star − 1/T_p
     model: { name: 'This model', color: '#f0b040',
-      fn: year => 360 / Math.abs(_vfpMoonAngleRateDegPerYear('node', year)) * 365.25 },
+      fn: year => 360 / Math.abs(_vfpMoonAngleRateDegPerYear('node', year)) * DAYS_PER_JULIAN_YEAR },
     references: [
-      { name: 'Meeus (1998), Ch. 47 rates', color: '#4fc3f7', fn: year => moonNodeRegressionYearsMeeus(year) * 365.25, validYears: [-1999, 3000], sourceUrl: 'https://en.wikipedia.org/wiki/Lunar_precession' },
+      { name: 'Meeus (1998), Ch. 47 rates', color: '#4fc3f7', fn: year => moonNodeRegressionYearsMeeus(year) * DAYS_PER_JULIAN_YEAR, validYears: [-1999, 3000], sourceUrl: 'https://en.wikipedia.org/wiki/Lunar_precession' },
       { name: 'This model — dynamical chain (Brouwer–Clemence), bridged to date', color: '#ce93d8',
-        fn: year => 1 / (86400 / meanLunarNodePrecessionAtAge((startmodelYear - year) / 1e6) - 1 / (_vfpAxialPrecessionYears(year) * 365.25)) },
+        fn: year => 1 / (SECONDS_PER_DAY / meanLunarNodePrecessionAtAge((startmodelYear - year) / 1e6) - 1 / (_vfpAxialPrecessionYears(year) * DAYS_PER_JULIAN_YEAR)) },
     ],
     j2000extras: [
       { name: 'Registry anchor (Meeus/IERS, of date)', color: '#ef5350',
@@ -17484,7 +17484,7 @@ function _vfpPISamples(range) {
   const key = y0 + ':' + y1 + ':' + (_planetSeriesData ? 's' : 'k');
   if (_vfpPICacheByRange[key]) return _vfpPICacheByRange[key];
   const N = _vfpSamplesForSpan(y0, y1);   // the window's sample count
-  const yrToJd = (y) => KC_ANCHOR_EPOCH_JD + (y - KC_ANCHOR_EPOCH_YEAR) * 365.25;
+  const yrToJd = (y) => KC_ANCHOR_EPOCH_JD + (y - KC_ANCHOR_EPOCH_YEAR) * DAYS_PER_JULIAN_YEAR;
   const yrs = new Array(N);
   const data = {};
   for (const p of _vfpPI_PLANETS) data[p] = { ecl: new Array(N), inv: new Array(N) };
@@ -17852,7 +17852,7 @@ function _vfpPESamples(range) {
   const key = y0 + ':' + y1 + ':' + (_planetSeriesData ? 's' : 'k');
   if (_vfpPECacheByRange[key]) return _vfpPECacheByRange[key];
   const N = _vfpSamplesForSpan(y0, y1);   // the window's sample count
-  const yrToJd = (y) => KC_ANCHOR_EPOCH_JD + (y - KC_ANCHOR_EPOCH_YEAR) * 365.25;
+  const yrToJd = (y) => KC_ANCHOR_EPOCH_JD + (y - KC_ANCHOR_EPOCH_YEAR) * DAYS_PER_JULIAN_YEAR;
   const yrs = new Array(N);
   const data = {};
   for (const p of _vfpPI_PLANETS) data[p] = new Array(N);
@@ -18163,7 +18163,7 @@ function _vfpPPRefRateArcsecCy(p) {
   const g = CHAIN_ARTIFACT.g && CHAIN_ARTIFACT.g[p];
   return g ? Math.abs(g.arcsecPerYr) * 100 : Infinity;
 }
-const _vfpPPYrToJd = (y) => KC_ANCHOR_EPOCH_JD + (y - KC_ANCHOR_EPOCH_YEAR) * 365.25;
+const _vfpPPYrToJd = (y) => KC_ANCHOR_EPOCH_JD + (y - KC_ANCHOR_EPOCH_YEAR) * DAYS_PER_JULIAN_YEAR;
 // The general precession in longitude at the epoch, ″/yr — the project's
 // convention (1,296,000 / the one-family axial precession period), the same
 // p_A the registry's of-date perihelion keys add.
@@ -18634,9 +18634,9 @@ const _vfpAPCacheByRange = {};   // static samples — once per session per rang
  *  the existing evaluators only; NaN before the one-source series has loaded. */
 function _vfpAPModelYears(key, year) {
   if (key === 'ecl') {
-    const jd = KC_ANCHOR_EPOCH_JD + (year - KC_ANCHOR_EPOCH_YEAR) * 365.25;
-    const n1 = _kcChartElementsOfDate('earth', jd - 150 * 365.25).ascNodeInvPlaneDeg;
-    const n2 = _kcChartElementsOfDate('earth', jd + 150 * 365.25).ascNodeInvPlaneDeg;
+    const jd = KC_ANCHOR_EPOCH_JD + (year - KC_ANCHOR_EPOCH_YEAR) * DAYS_PER_JULIAN_YEAR;
+    const n1 = _kcChartElementsOfDate('earth', jd - 150 * DAYS_PER_JULIAN_YEAR).ascNodeInvPlaneDeg;
+    const n2 = _kcChartElementsOfDate('earth', jd + 150 * DAYS_PER_JULIAN_YEAR).ascNodeInvPlaneDeg;
     let d = n2 - n1;
     while (d > 180) d -= 360;
     while (d < -180) d += 360;
@@ -19011,7 +19011,7 @@ function _vfpAPAfterRender(bodyEl) {
 // date is 36,000° over the rate (Julian years). Offered on the canon's
 // −2000 → 3000 range: the T² terms are a fit centred on J2000 (the tidal
 // secular acceleration among them), not deep-time physics.
-const JULIAN_YEAR_SECONDS = 365.25 * 86400;
+const JULIAN_YEAR_SECONDS = DAYS_PER_JULIAN_YEAR * SECONDS_PER_DAY;
 const _MEEUS47_LP = [218.3164477, 481267.88123421, -0.0015786, 1 / 538841, -1 / 65194000];
 const _MEEUS47_MP = [134.9633964, 477198.8675055, 0.0087414, 1 / 69699, -1 / 14712000];
 const _MEEUS47_F = [93.2720950, 483202.0175233, -0.0036539, -1 / 3526000, 1 / 863310000];
@@ -19083,7 +19083,7 @@ const _VFPML_VALID = [-1999, 3000];
 // model-vs-Meeus rate split is ~1e-8, far inside the ±180° ambiguity).
 const _vfpML_MEEUS_DEG_PER_CY = { Lp: 481267.88123421, D: 445267.1114034, Mp: 477198.8675055, F: 483202.0175233 };
 function _vfpMLArgRateDegPerDay(key, year) {
-  const jd = yearToJDApprox(year), half = 365.25 / 2;
+  const jd = yearToJDApprox(year), half = DAYS_PER_JULIAN_YEAR / 2;
   const expected = (_vfpML_MEEUS_DEG_PER_CY[key] / julianCenturyDays) * 2 * half;
   const raw = _moonArgsAt(jd + half)[key] - _moonArgsAt(jd - half)[key];
   const d = ((raw - expected + 540) % 360 + 360) % 360 - 180;
@@ -19091,7 +19091,7 @@ function _vfpMLArgRateDegPerDay(key, year) {
 }
 function _vfpMLModelMonthDays(key, year, sidereal) {
   let r = _vfpMLArgRateDegPerDay(key, year);
-  if (sidereal) r -= 360 / (_vfpAxialPrecessionYears(year) * 365.25);
+  if (sidereal) r -= 360 / (_vfpAxialPrecessionYears(year) * DAYS_PER_JULIAN_YEAR);
   return Number.isFinite(r) && r > 0 ? 360 / r : NaN;
 }
 /** The model's perigee (ϖ = L′ − M′, advancing) and node (Ω = L′ − F,
@@ -19100,7 +19100,7 @@ function _vfpMLModelMonthDays(key, year, sidereal) {
  *  −19.3°/yr: inside the ±180° wrap) — the Moon precession panels' model
  *  side, ONE home with the Month Lengths panel and the Moon evaluator. */
 function _vfpMoonAngleRateDegPerYear(kind, year) {
-  const jd = yearToJDApprox(year), half = 365.25 / 2;
+  const jd = yearToJDApprox(year), half = DAYS_PER_JULIAN_YEAR / 2;
   const ang = (a) => kind === 'peri' ? a.Lp - a.Mp : a.Lp - a.F;
   const d = ang(_moonArgsAt(jd + half)) - ang(_moonArgsAt(jd - half));
   return ((d + 540) % 360 + 360) % 360 - 180;
@@ -19134,7 +19134,7 @@ function _vfpMLSamples(range) {
     let s2 = 0, n = 0;
     for (let i = 0; i < N; i++) {
       if (yrs[i] < _VFPML_VALID[0] || yrs[i] > _VFPML_VALID[1]) continue;
-      const d = (ref[s.key][i] - model[s.key][i]) * 86400;
+      const d = (ref[s.key][i] - model[s.key][i]) * SECONDS_PER_DAY;
       if (Number.isFinite(d)) { s2 += d * d; n++; }
     }
     stats[s.key] = { rmsS: n ? Math.sqrt(s2 / n) : NaN, n, modelJ2000: s.model(2000), refJ2000: s.ref(2000) };
@@ -19850,7 +19850,7 @@ function _vfpANPeriEarthDeg(year) {
 }
 function _vfpANInputs(year) {
   const y = Math.max(-_VFPAN_DOMAIN_YEARS, Math.min(_VFPAN_DOMAIN_YEARS, year));
-  const days = _hybridSpinActive() ? _yearLengthsM().tropicalYearSecondsAtYear(y) / 86400 : 365.2422;
+  const days = _hybridSpinActive() ? _yearLengthsM().tropicalYearSecondsAtYear(y) / SECONDS_PER_DAY : 365.2422;
   return { year: y, e: _vfpPEEarthEcc(y), epsDeg: _sceneEpsTargetDeg(y), periEarthDeg: _vfpANPeriEarthDeg(y), days };
 }
 /** The analemma curve: n points of one mean-sun year (f = fraction of the
@@ -23264,7 +23264,7 @@ function setupGUI() {
       return Number.isFinite(dT) ? dT : 0;
     }
     function moonLp(jd) {
-      const T = (jd + ourΔT(jd)/86400 - j2000JD) / julianCenturyDays;
+      const T = (jd + ourΔT(jd)/SECONDS_PER_DAY - j2000JD) / julianCenturyDays;
       const T2 = T*T, T3 = T2*T, T4 = T3*T;
       const Lp_mean = 218.3164477 + 481267.88123421*T - 0.0015786*T2 + T3/538841 - T4/65194000;
       const Dr  = ((297.8501921 + 445267.1114034*T - 0.0018819*T2 + T3/545868 - T4/113065000) % 360) * _d2r;
@@ -23289,7 +23289,7 @@ function setupGUI() {
       return wrap360(Lp_mean + Sl * 1e-6);
     }
     function sunLon(jd) {
-      const T = (jd + ourΔT(jd)/86400 - j2000JD) / julianCenturyDays;
+      const T = (jd + ourΔT(jd)/SECONDS_PER_DAY - j2000JD) / julianCenturyDays;
       const L0 = (280.46646 + 36000.76983*T + 0.0003032*T*T);
       const M = (357.52911 + 35999.05029*T - 0.0001537*T*T) * _d2r;
       const C = (1.914602 - 0.004817*T - 0.000014*T*T) * Math.sin(M)
@@ -23322,7 +23322,7 @@ function setupGUI() {
       for (let i = 0; i < 50; i++) {
         const mid = (lo + hi) / 2;
         if (moonSunDiff(mid) < 0) lo = mid; else hi = mid;
-        if (hi - lo < 1/86400) break;
+        if (hi - lo < 1/SECONDS_PER_DAY) break;
       }
       return (lo + hi) / 2;
     }
@@ -23347,7 +23347,7 @@ function setupGUI() {
         continue;
       }
       const our_dT_sec = ourΔT(jd_conj_UT);
-      const our_TT_JD  = jd_conj_UT + our_dT_sec / 86400;
+      const our_TT_JD  = jd_conj_UT + our_dT_sec / SECONDS_PER_DAY;
 
       const TT_diff_min = (our_TT_JD - nasa_TT_JD) * 24 * 60;
       const dT_diff_sec = our_dT_sec - e.dT;
@@ -23489,7 +23489,7 @@ function setupGUI() {
           const yearS = meanTropicalYearSecondsAtAge(tau);
           // the PRODUCTION integrand's ecliptic missing-motion term (one home)
           const lodH5Raw = lodMean + (_deepLod().eclipticLodCorrectionSecondsAtAge(tau) ?? 0);
-          const integrand = (86400 - lodH5Raw) * yearS * 1e6 / 86400;
+          const integrand = (SECONDS_PER_DAY - lodH5Raw) * yearS * 1e6 / SECONDS_PER_DAY;
           const w = (i === 0 || i === n) ? 1 : (i % 2 === 1 ? 4 : 2);
           sum += w * integrand;
         }
@@ -23589,7 +23589,7 @@ function setupGUI() {
     // Meeus' sub-solar (lat, lon) — independent of framework scene state.
     function meeusSubSolar(jd_UT) {
       const dT = _eclDeltaT(jd_UT);
-      const jd_TT = jd_UT + dT / 86400;
+      const jd_TT = jd_UT + dT / SECONDS_PER_DAY;
       const T = (jd_TT - j2000JD) / julianCenturyDays;
       const T2 = T * T;
       const L0 = 280.46646 + 36000.76983 * T + 0.0003032 * T2;
@@ -23638,7 +23638,7 @@ function setupGUI() {
         let dLon = scene.lon - meeus.lon;
         while (dLon > 180)  dLon -= 360;
         while (dLon < -180) dLon += 360;
-        const dT_rot_deg = -meeus.dT * 360 / 86400;
+        const dT_rot_deg = -meeus.dT * 360 / SECONDS_PER_DAY;
         const yearStr = String(e.Y).padStart(5);
         const labStr  = e.label.padEnd(20);
         const mStr    = `(${meeus.lat.toFixed(2).padStart(6)},${meeus.lon.toFixed(2).padStart(7)})`;
@@ -23956,7 +23956,7 @@ function setupGUI() {
       const meeus_moon_beta_e = _eclMoonBeta(jd);
       const meeus_sun_lon_e   = _eclSunLon(jd);
       const dT_sec_e = _eclDeltaT(jd);
-      const T_e = (jd + dT_sec_e / 86400 - j2000JD) / julianCenturyDays;
+      const T_e = (jd + dT_sec_e / SECONDS_PER_DAY - j2000JD) / julianCenturyDays;
       const eps_e = meeusMeanObliquityRad(T_e);
       const sun_dec_e = Math.asin(Math.sin(eps_e) * Math.sin(meeus_sun_lon_e * _d2r)) * _r2d;
       let sun_RA_e = Math.atan2(Math.cos(eps_e) * Math.sin(meeus_sun_lon_e * _d2r), Math.cos(meeus_sun_lon_e * _d2r)) * _r2d;
@@ -24030,7 +24030,7 @@ function setupGUI() {
         // 1,296,000/|s₃| (the production term's).
         const mSY_days = yearS / lod;
         const lodH5Raw = lod + lod / ((1296000 / _s3ArcsecPerYr()) * mSY_days);
-        const integrand = (86400 - lodH5Raw) * yearS * 1e6 / 86400;
+        const integrand = (SECONDS_PER_DAY - lodH5Raw) * yearS * 1e6 / SECONDS_PER_DAY;
         const w = (i === 0 || i === n) ? 1 : (i % 2 === 1 ? 4 : 2);
         sum += w * integrand;
       }
@@ -24048,11 +24048,11 @@ function setupGUI() {
 
     function _predictUmbraAtDT(jd_UT, deltaT_sec) {
       const framework_dT_local = _eclDeltaT(jd_UT);
-      const synthetic_jd = jd_UT + (deltaT_sec - framework_dT_local) / 86400;
+      const synthetic_jd = jd_UT + (deltaT_sec - framework_dT_local) / SECONDS_PER_DAY;
       const sunLon = _eclSunLon(synthetic_jd);
       const moonBeta = _eclMoonBeta(synthetic_jd);
       const moonDist = _eclMoonDistance(synthetic_jd);
-      const T_pu = (synthetic_jd + framework_dT_local/86400 - j2000JD) / julianCenturyDays;
+      const T_pu = (synthetic_jd + framework_dT_local/SECONDS_PER_DAY - j2000JD) / julianCenturyDays;
       const eps_pu = meeusMeanObliquityRad(T_pu);
       const sunDec = Math.asin(Math.sin(eps_pu) * Math.sin(sunLon * _d2r)) * _r2d;
       let sunRA_pu = Math.atan2(Math.cos(eps_pu) * Math.sin(sunLon * _d2r), Math.cos(sunLon * _d2r)) * _r2d;
@@ -24535,7 +24535,7 @@ function setupGUI() {
     try {
       for (const e of epochs) {
         const jd_ut = e.jd;
-        const jd_tt = jd_ut + _eclDeltaT(jd_ut) / 86400;
+        const jd_tt = jd_ut + _eclDeltaT(jd_ut) / SECONDS_PER_DAY;
         const base = {
           lon: _eclMoonLon(jd_ut), beta: _eclMoonBeta(jd_ut), dist: _eclMoonDistance(jd_ut),
         };
@@ -24626,7 +24626,7 @@ function setupGUI() {
     }
 
     function moonLp(jd) {
-      const T = (jd + ourΔT(jd)/86400 - j2000JD) / julianCenturyDays;
+      const T = (jd + ourΔT(jd)/SECONDS_PER_DAY - j2000JD) / julianCenturyDays;
       const T2 = T*T, T3 = T2*T, T4 = T3*T;
       const Lp_mean = 218.3164477 + 481267.88123421*T - 0.0015786*T2 + T3/538841 - T4/65194000;
       const Dr  = ((297.8501921 + 445267.1114034*T - 0.0018819*T2 + T3/545868 - T4/113065000) % 360) * _d2r;
@@ -24651,7 +24651,7 @@ function setupGUI() {
       return wrap360(Lp_mean + Sl * 1e-6);
     }
     function moonBeta(jd) {
-      const T = (jd + ourΔT(jd)/86400 - j2000JD) / julianCenturyDays;
+      const T = (jd + ourΔT(jd)/SECONDS_PER_DAY - j2000JD) / julianCenturyDays;
       const T2 = T*T, T3 = T2*T, T4 = T3*T;
       const Dr  = ((297.8501921 + 445267.1114034*T - 0.0018819*T2 + T3/545868 - T4/113065000) % 360) * _d2r;
       const Mr  = ((357.5291092 +  35999.0502909*T - 0.0001536*T2 + T3/24490000) % 360) * _d2r;
@@ -24672,7 +24672,7 @@ function setupGUI() {
       return Sb * 1e-6;
     }
     function sunLon(jd) {
-      const T = (jd + ourΔT(jd)/86400 - j2000JD) / julianCenturyDays;
+      const T = (jd + ourΔT(jd)/SECONDS_PER_DAY - j2000JD) / julianCenturyDays;
       const L0 = (280.46646 + 36000.76983*T + 0.0003032*T*T);
       const M = (357.52911 + 35999.05029*T - 0.0001537*T*T) * _d2r;
       const C = (1.914602 - 0.004817*T - 0.000014*T*T) * Math.sin(M)
@@ -24863,7 +24863,7 @@ function setupGUI() {
       return Number.isFinite(dT) ? dT : 0;
     }
     function moonLp(jd) {
-      const T = (jd + ourΔT(jd)/86400 - j2000JD) / julianCenturyDays;
+      const T = (jd + ourΔT(jd)/SECONDS_PER_DAY - j2000JD) / julianCenturyDays;
       const T2 = T*T, T3 = T2*T, T4 = T3*T;
       const Lp_mean = 218.3164477 + 481267.88123421*T - 0.0015786*T2 + T3/538841 - T4/65194000;
       const Dr  = ((297.8501921 + 445267.1114034*T - 0.0018819*T2 + T3/545868 - T4/113065000) % 360) * _d2r;
@@ -24888,7 +24888,7 @@ function setupGUI() {
       return wrap360(Lp_mean + Sl * 1e-6);
     }
     function sunLon(jd) {
-      const T = (jd + ourΔT(jd)/86400 - j2000JD) / julianCenturyDays;
+      const T = (jd + ourΔT(jd)/SECONDS_PER_DAY - j2000JD) / julianCenturyDays;
       const L0 = (280.46646 + 36000.76983*T + 0.0003032*T*T);
       const M = (357.52911 + 35999.05029*T - 0.0001537*T*T) * _d2r;
       const C = (1.914602 - 0.004817*T - 0.000014*T*T) * Math.sin(M)
@@ -24923,7 +24923,7 @@ function setupGUI() {
       for (let i = 0; i < 50; i++) {
         const mid = (lo + hi) / 2;
         if (moonSunDiff(mid) < 0) lo = mid; else hi = mid;
-        if (hi - lo < 1/86400) break;
+        if (hi - lo < 1/SECONDS_PER_DAY) break;
       }
       return (lo + hi) / 2;
     }
@@ -24939,7 +24939,7 @@ function setupGUI() {
       return 2 * EARTH_R_KM * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
     }
     function subSolarHyp(jd_conj, dT_sec) {
-      const UT_conj_h = jd_conj + (ourΔT(jd_conj) - dT_sec) / 86400;
+      const UT_conj_h = jd_conj + (ourΔT(jd_conj) - dT_sec) / SECONDS_PER_DAY;
       const UT_h = (12 + (UT_conj_h - Math.floor(UT_conj_h)) * 24) % 24;
       let lon = (12 - UT_h) * 15;
       while (lon >  180) lon -= 360;
@@ -25133,7 +25133,7 @@ function setupGUI() {
 
     // Moon ecliptic longitude (Meeus Ch. 47, with our ΔT for TT correction)
     function moonLp(jd) {
-      const T = (jd + ourΔT(jd)/86400 - j2000JD) / julianCenturyDays;
+      const T = (jd + ourΔT(jd)/SECONDS_PER_DAY - j2000JD) / julianCenturyDays;
       const T2 = T*T, T3 = T2*T, T4 = T3*T;
       const Lp_mean = 218.3164477 + 481267.88123421*T - 0.0015786*T2 + T3/538841 - T4/65194000;
       const Dr  = ((297.8501921 + 445267.1114034*T - 0.0018819*T2 + T3/545868 - T4/113065000) % 360) * _d2r;
@@ -25159,7 +25159,7 @@ function setupGUI() {
     }
 
     function sunLon(jd) {
-      const T = (jd + ourΔT(jd)/86400 - j2000JD) / julianCenturyDays;
+      const T = (jd + ourΔT(jd)/SECONDS_PER_DAY - j2000JD) / julianCenturyDays;
       const L0 = (280.46646 + 36000.76983*T + 0.0003032*T*T);
       const M = (357.52911 + 35999.05029*T - 0.0001537*T*T) * _d2r;
       const C = (1.914602 - 0.004817*T - 0.000014*T*T) * Math.sin(M)
@@ -25217,7 +25217,7 @@ function setupGUI() {
       // Meeus-method umbra: sub-solar point + Moon-β leverage (same construction
       // as the -135 case study's "Meeus method"; simplified, no Besselian elements).
       const lon_pred = subSolarLon(jd_conj);
-      const T_ec  = (jd_conj + ourΔT(jd_conj) / 86400 - j2000JD) / julianCenturyDays;
+      const T_ec  = (jd_conj + ourΔT(jd_conj) / SECONDS_PER_DAY - j2000JD) / julianCenturyDays;
       const eps_r = meeusMeanObliquityRad(T_ec);
       const sunDec = Math.asin(Math.sin(eps_r) * Math.sin(sunLon(jd_conj) * _d2r)) / _d2r;
       const beta   = _eclMoonBeta(jd_conj);
@@ -27919,7 +27919,7 @@ function setupGUI() {
         const d = Math.abs(canon.entries[i].jd - h.jd);
         if (d < minDiff) { minDiff = d; nearest = canon.entries[i]; }
       }
-      const dt_sec = (nearest.jd - h.jd) * 86400;
+      const dt_sec = (nearest.jd - h.jd) * SECONDS_PER_DAY;
       return {
         label:        h.label,
         our_jd:       h.jd.toFixed(4),
@@ -29784,7 +29784,7 @@ function setupGUI() {
           const t = Y + i * h;
           const dS = solarActivity(t) - S_2000;
           const w = (i === 0 || i === nSteps) ? 1 : (i % 2 === 1 ? 4 : 2);
-          sum += w * k * dS * 365.25;
+          sum += w * k * dS * DAYS_PER_JULIAN_YEAR;
         }
         return (sum * h) / 3;
       };
@@ -31049,7 +31049,7 @@ function setupGUI() {
       }
       const linSlope     = sumTR / sumTT;                                     // s/yr
       const linIntercept = meanR - linSlope * yMean;                          // s at year 0
-      const lodBiasEquiv = linSlope / 365.25 * 1e6;                           // μs/day
+      const lodBiasEquiv = linSlope / DAYS_PER_JULIAN_YEAR * 1e6;                           // μs/day
       const residPred    = ys.map((y, i) => linIntercept + linSlope * y);
       const rmsResid     = Math.sqrt(rs.reduce((s, v, i) => s + (v - residPred[i]) ** 2, 0) / nPts);
       const rmsRaw       = Math.sqrt(rs.reduce((s, v) => s + (v - meanR) ** 2, 0) / nPts);
@@ -31082,7 +31082,7 @@ function setupGUI() {
       const shiftResults = [];
       for (const dMicros of SHIFTS_MICROS) {
         const dLodSecsPerDay = dMicros * 1e-6;
-        const rsShifted = ys.map((y, i) => rs[i] + dLodSecsPerDay * 365.25 * (2000 - y));
+        const rsShifted = ys.map((y, i) => rs[i] + dLodSecsPerDay * DAYS_PER_JULIAN_YEAR * (2000 - y));
         // Refit linear
         const meanShifted = rsShifted.reduce((a, b) => a + b, 0) / nPts;
         let sTR2 = 0;
@@ -31131,13 +31131,13 @@ function setupGUI() {
       let num_t_r = 0, den_t_ay = 0;
       for (let i = 0; i < nPts; i++) {
         num_t_r  += t[i] * rs[i];
-        den_t_ay += t[i] * 365.25 * (2000 - ys[i]);
+        den_t_ay += t[i] * DAYS_PER_JULIAN_YEAR * (2000 - ys[i]);
       }
       const optimalShiftLodSecsPerDay = -num_t_r / den_t_ay;
       const optimalShiftMicros = optimalShiftLodSecsPerDay * 1e6;
       const optimalAnchor      = MODEL_J2000_LOD + optimalShiftLodSecsPerDay;
       // Compute residual + RMS at optimal shift (uses same physical convention: +Δ)
-      const rsOpt = ys.map((y, i) => rs[i] + optimalShiftLodSecsPerDay * 365.25 * (2000 - y));
+      const rsOpt = ys.map((y, i) => rs[i] + optimalShiftLodSecsPerDay * DAYS_PER_JULIAN_YEAR * (2000 - y));
       const meanOpt = rsOpt.reduce((a, b) => a + b, 0) / nPts;
       const rmsOptRaw = Math.sqrt(rsOpt.reduce((s, v) => s + (v - meanOpt) ** 2, 0) / nPts);
 
@@ -31155,7 +31155,7 @@ function setupGUI() {
       // Under residual_new(Y) = residual_old(Y) + Δ × 365.25 × (2000-Y):
       //   slope_new = slope_old − Δ × 365.25  (since (2000-Y) has slope −1 vs Y)
       const iersShiftUs = (IERS_J2000_LOD - MODEL_J2000_LOD) * 1e6;   // ≈ +990 μs/day
-      const slopeIfIersAdopted = linSlope - iersShiftUs * 1e-6 * 365.25;
+      const slopeIfIersAdopted = linSlope - iersShiftUs * 1e-6 * DAYS_PER_JULIAN_YEAR;
       // Direction of improvement: does adopting IERS move slope TOWARD zero?
       const iersMovesToward = Math.abs(slopeIfIersAdopted) < Math.abs(linSlope);
       const iersFractionalChange = (Math.abs(linSlope) - Math.abs(slopeIfIersAdopted)) / Math.abs(linSlope) * 100;
@@ -31294,8 +31294,8 @@ function setupGUI() {
       // Physical interpretation:
       //   coefB: anchor mismatch equivalent. δ_LOD_anchor (μs/day) = coefB / 365.25 × 1e6
       //   coefC: rate mismatch equivalent. δ_rate (ms/century) = 2 × coefC / 365.25 × 1e5
-      const anchorEquivMicros = coefB / 365.25 * 1e6;
-      const rateEquivMsPerCy  = 2 * coefC / 365.25 * 1e5;
+      const anchorEquivMicros = coefB / DAYS_PER_JULIAN_YEAR * 1e6;
+      const rateEquivMsPerCy  = 2 * coefC / DAYS_PER_JULIAN_YEAR * 1e5;
 
       console.log('  ── Joint fit: residual(Y) = a + b·x + c·x², where x = 2000 − Y ──');
       console.log(`    a (intercept, residual at year 2000):  ${coefA.toFixed(2)} s`);
@@ -31338,7 +31338,7 @@ function setupGUI() {
       const rateResults = [];
       for (const dRateMsPerCy of RATES_MS_PER_CY) {
         const dRateSecPerDayPerYr = dRateMsPerCy * 1e-5;   // 1 ms/century = 1e-5 s/day per year
-        const rsShifted = ys.map((y, i) => rs[i] - 0.5 * dRateSecPerDayPerYr * 365.25 * (2000 - y) * (2000 - y));
+        const rsShifted = ys.map((y, i) => rs[i] - 0.5 * dRateSecPerDayPerYr * DAYS_PER_JULIAN_YEAR * (2000 - y) * (2000 - y));
         // Refit quadratic to see how much rate and quadratic curvature remain
         const M2 = [[nPts, 0, 0, 0], [0, 0, 0, 0], [0, 0, 0, 0]];
         for (let i = 0; i < nPts; i++) {
@@ -31380,7 +31380,7 @@ function setupGUI() {
 
       // Analytical optimum for zero c after applying δ_rate:
       //   c_new = c_old − 0.5·δ_rate·365.25 = 0 → δ_rate = 2c/365.25 (s/day per year)
-      const optimalRateSecPerDayPerYr = 2 * coefC / 365.25;
+      const optimalRateSecPerDayPerYr = 2 * coefC / DAYS_PER_JULIAN_YEAR;
       const optimalRateMsPerCy = optimalRateSecPerDayPerYr * 1e5;
 
       // Batched output
@@ -32173,7 +32173,7 @@ function setupGUI() {
     const yA = jdToSIyear(startmodelJD);
     // Expected reference: Moon tropical month in days from MOON_TROPICAL_MONTH_J2000_S
     // (defined line ~4770, ≈ 27.32158 d). Don't hardcode — use the constant.
-    const moonTropMonthDays = MOON_TROPICAL_MONTH_J2000_S / 86400;
+    const moonTropMonthDays = MOON_TROPICAL_MONTH_J2000_S / SECONDS_PER_DAY;
 
     const testJDs = [
       { jd: startmodelJD,             label: 'startmodelJD (offset = 0)' },
@@ -32253,7 +32253,7 @@ function setupGUI() {
       { key: 'neptune', obj: neptune, expectedSign: +1, expectedWrapper: meanNeptuneOrbitalCyclesBetween, expectedShift_deg: 0.002 },
     ];
 
-    const SYR_S = SI_TROPICAL_YEAR_DAYS * 86400;
+    const SYR_S = SI_TROPICAL_YEAR_DAYS * SECONDS_PER_DAY;
     const computeYearSI_TT = (jd) => {
       const ySI = _jdToSIyear(jd);
       const dy  = julianDateToDecimalYear(jd);
@@ -34403,12 +34403,12 @@ async function runYearAnalysisExport(years) {
     ['dividing it by a measured day count cannot test that constant — see the note'],
     ['in section 5. Kept because the RATIOS between the three are a genuine scene check.'],
     ['Mean Solar Day = siderealYearSeconds / measuredSiderealYear', (meansiderealyearlengthinSeconds / meanSiderealYear).toFixed(6)],
-    ['Mean Sidereal Day = tropicalYearSec / (tropicalYearSec / 86400 + 1)', (() => { const tropSec = meanTropicalYear * (meansiderealyearlengthinSeconds / meanSiderealYear); return (tropSec / (tropSec / 86400 + 1)).toFixed(6); })()],
+    ['Mean Sidereal Day = tropicalYearSec / (tropicalYearSec / 86400 + 1)', (() => { const tropSec = meanTropicalYear * (meansiderealyearlengthinSeconds / meanSiderealYear); return (tropSec / (tropSec / SECONDS_PER_DAY + 1)).toFixed(6); })()],
     // cos(ε) projects the axial precession rate onto the equator — see the note
     // below section 5's values. axialPrec here is the MEASURED beat, and the
     // inputs are analysis-period means, so the obliquity is taken at the period
     // midpoint rather than OBLIQUITY_MEAN.
-    ['Mean Stellar Day = siderealDay × (1 + cos(ε) / (axialPrecession × rotationsPerYear))', (() => { const measuredLOD = meansiderealyearlengthinSeconds / meanSiderealYear; const tropSec = meanTropicalYear * measuredLOD; const sidDay = tropSec / (tropSec / 86400 + 1); const axialPrec = meanSiderealYear / (meanSiderealYear - meanTropicalYear); const rotPerYear = meanTropicalYear + 1; const raProj = stellarDayRaProjection(_sceneEpsTargetDeg((startYear + endYear) / 2)); return (sidDay * (1 + raProj / (axialPrec * rotPerYear))).toFixed(6); })()],
+    ['Mean Stellar Day = siderealDay × (1 + cos(ε) / (axialPrecession × rotationsPerYear))', (() => { const measuredLOD = meansiderealyearlengthinSeconds / meanSiderealYear; const tropSec = meanTropicalYear * measuredLOD; const sidDay = tropSec / (tropSec / SECONDS_PER_DAY + 1); const axialPrec = meanSiderealYear / (meanSiderealYear - meanTropicalYear); const rotPerYear = meanTropicalYear + 1; const raProj = stellarDayRaProjection(_sceneEpsTargetDeg((startYear + endYear) / 2)); return (sidDay * (1 + raProj / (axialPrec * rotPerYear))).toFixed(6); })()],
     ['The solar-day row above is ANCHORED AT 86400 by construction:'],
     ['siderealYearSeconds is the IAU sidereal year × 86400 SI seconds, so the row'],
     ['reads exactly 86400 whenever the scene reproduces the IAU sidereal year.'],
@@ -34461,7 +34461,7 @@ async function runYearAnalysisExport(years) {
     ['  1 fewer solar day than sidereal days per year'],
     ['  Solar days per year', meanTropicalYear.toFixed(6)],
     ['  Sidereal days per year', (meanTropicalYear + 1).toFixed(6)],
-    ['  Daily offset (solar − sidereal day)', (meansiderealyearlengthinSeconds / meanSiderealYear - (meanTropicalYear * 86400) / (meanTropicalYear + 1)).toFixed(4), 's'],
+    ['  Daily offset (solar − sidereal day)', (meansiderealyearlengthinSeconds / meanSiderealYear - (meanTropicalYear * SECONDS_PER_DAY) / (meanTropicalYear + 1)).toFixed(4), 's'],
     [''],
     ['Axial Coin Rotation'],
     ['  1 extra sidereal day over axial precession cycle'],
@@ -34663,9 +34663,9 @@ async function runYearAnalysisExport(years) {
     // Independent of scene measurement; blank under ?hybridSpin=0 (the
     // frozen clock is the era-certification device, not this family).
     const _ylRow = _hybridSpinActive() ? _yearLengthsM() : null;
-    const tropPhys = _ylRow ? _ylRow.tropicalYearSecondsAtYear(year) / 86400 : null;
-    const sidPhys  = _ylRow ? _ylRow.siderealYearSecondsAtYear(year) / 86400 : null;
-    const anomPhys = _ylRow ? _ylRow.anomalisticYearSecondsAtYear(year) / 86400 : null;
+    const tropPhys = _ylRow ? _ylRow.tropicalYearSecondsAtYear(year) / SECONDS_PER_DAY : null;
+    const sidPhys  = _ylRow ? _ylRow.siderealYearSecondsAtYear(year) / SECONDS_PER_DAY : null;
+    const anomPhys = _ylRow ? _ylRow.anomalisticYearSecondsAtYear(year) / SECONDS_PER_DAY : null;
     const axialPrecPhysRow       = _ylRow ? _ylRow.axialPrecessionYearsAtYear(year) : null;
     const inclinationPrecPhysRow = _ylRow ? _ylRow.inclinationPrecessionYearsAtYear(year) : null;
     const perihelionPrecPhysRow  = _ylRow ? _ylRow.perihelionPrecessionYearsAtYear(year) : null;
@@ -34784,7 +34784,7 @@ async function runYearAnalysisExport(years) {
    fracDayToTimeStr() helper  (unchanged)
 ---------------------------------------------------------------------- */
 function fracDayToTimeStr(frac) {
-  const totalSec = Math.round(frac * 86400);
+  const totalSec = Math.round(frac * SECONDS_PER_DAY);
   const hh = Math.floor(totalSec / 3600);
   const mm = Math.floor((totalSec % 3600) / 60);
   const ss = totalSec % 60;
@@ -35037,7 +35037,7 @@ async function analyzeTropicalYearLength(startYear, endYear) {
     const firstMean = firstFive.reduce((s, i) => s + i.interval, 0) / 5;
     const lastMean = lastFive.reduce((s, i) => s + i.interval, 0) / 5;
     const yearSpan = lastFive[4].year - firstFive[0].year;
-    const drift = (lastMean - firstMean) / yearSpan * 86400;
+    const drift = (lastMean - firstMean) / yearSpan * SECONDS_PER_DAY;
     console.log(`\nTrend over ${yearSpan} years: ${drift.toFixed(3)} sec/year change in tropical year`);
   }
 
@@ -35100,7 +35100,7 @@ async function analyzeDecemberSolsticeYearLength(startYear, endYear) {
     const firstMean = firstFive.reduce((s, i) => s + i.interval, 0) / 5;
     const lastMean = lastFive.reduce((s, i) => s + i.interval, 0) / 5;
     const yearSpan = lastFive[4].year - firstFive[0].year;
-    const drift = (lastMean - firstMean) / yearSpan * 86400;
+    const drift = (lastMean - firstMean) / yearSpan * SECONDS_PER_DAY;
     console.log(`\nTrend over ${yearSpan} years: ${drift.toFixed(3)} sec/year change in tropical year`);
   }
 
@@ -35224,7 +35224,7 @@ async function analyzeEquinoxIntervals(startYear, endYear) {
     const rA = resultsA[point.ra];
     const rB = resultsB[point.ra];
     const rC = resultsC[point.ra];
-    const diffSecA = (rA.mean - point.iauRef) * 86400;
+    const diffSecA = (rA.mean - point.iauRef) * SECONDS_PER_DAY;
     const meanAStr = rA.mean > 0 ? rA.mean.toFixed(9) : 'N/A';
     const meanBStr = rB.mean > 0 ? rB.mean.toFixed(9) : 'N/A';
     const meanCStr = rC.mean > 0 ? rC.mean.toFixed(9) : 'N/A';
@@ -35235,7 +35235,7 @@ async function analyzeEquinoxIntervals(startYear, endYear) {
 
   // Calculate mean of Method A (average of 4 cardinal points)
   const meanA = (resultsA[0].mean + resultsA[90].mean + resultsA[180].mean + resultsA[270].mean) / 4;
-  const meanADiff = (meanA - ASTRO_REFERENCE.tropicalYearMeanJ2000) * 86400;
+  const meanADiff = (meanA - ASTRO_REFERENCE.tropicalYearMeanJ2000) * SECONDS_PER_DAY;
 
   console.log('╠═════════════════════════════════════╪═══════════════════╪═══════════════════╪═══════════════════╪═══════════════════╪═══════════════════╣');
   console.log(`║ IAU mean tropical year              │                   │                   │                   │ ${ASTRO_REFERENCE.tropicalYearMeanJ2000.toFixed(9).padStart(17)} │                   ║`);
@@ -35254,9 +35254,9 @@ async function analyzeEquinoxIntervals(startYear, endYear) {
     const rA = resultsA[point.ra];
     const rB = resultsB[point.ra];
     const rC = resultsC[point.ra];
-    const diffAB = (rA.mean - rB.mean) * 86400;
-    const diffBC = (rB.mean - rC.mean) * 86400;
-    const diffAC = (rA.mean - rC.mean) * 86400;
+    const diffAB = (rA.mean - rB.mean) * SECONDS_PER_DAY;
+    const diffBC = (rB.mean - rC.mean) * SECONDS_PER_DAY;
+    const diffAC = (rA.mean - rC.mean) * SECONDS_PER_DAY;
     console.log(`  ${point.shortName}:    ${diffAB >= 0 ? '+' : ''}${diffAB.toFixed(3).padStart(8)}s          ${diffBC >= 0 ? '+' : ''}${diffBC.toFixed(3).padStart(8)}s          ${diffAC >= 0 ? '+' : ''}${diffAC.toFixed(3).padStart(8)}s`);
   }
   console.log('────────────────────────────────────────────────────────────────────────────────────────────────');
@@ -35428,15 +35428,15 @@ async function analyzeAnoministicYear(startYear, endYear) {
   console.log('╠═══════════════════════════════════════════════════════════════════════════════════════════════════════╣');
   console.log('║ EARTH-FRAME (Earth→Sun distance)                                                                      ║');
   console.log('╠═══════════════════════════════════════════════════════════════════════════════════════════════════════╣');
-  const periADiff = (periMean - iauAnomalistic) * 86400;
-  const apheDiff = (apheMean - iauAnomalistic) * 86400;
+  const periADiff = (periMean - iauAnomalistic) * SECONDS_PER_DAY;
+  const apheDiff = (apheMean - iauAnomalistic) * SECONDS_PER_DAY;
   console.log(`║   Perihelion Interval                           │ ${periMean.toFixed(9)}    │ ${periADiff >= 0 ? '+' : ''}${periADiff.toFixed(2)} seconds              ║`);
   console.log(`║   Aphelion Interval                             │ ${apheMean.toFixed(9)}    │ ${apheDiff >= 0 ? '+' : ''}${apheDiff.toFixed(2)} seconds              ║`);
   console.log('╠═══════════════════════════════════════════════════════════════════════════════════════════════════════╣');
   console.log('║ WOBBLE-CENTER FRAME (WobbleCenter→Sun distance)                                                       ║');
   console.log('╠═══════════════════════════════════════════════════════════════════════════════════════════════════════╣');
-  const periBDiff = (periMeanB - iauAnomalistic) * 86400;
-  const apheBDiff = (apheMeanB - iauAnomalistic) * 86400;
+  const periBDiff = (periMeanB - iauAnomalistic) * SECONDS_PER_DAY;
+  const apheBDiff = (apheMeanB - iauAnomalistic) * SECONDS_PER_DAY;
   console.log(`║   Perihelion Interval                           │ ${periMeanB.toFixed(9)}    │ ${periBDiff >= 0 ? '+' : ''}${periBDiff.toFixed(2)} seconds               ║`);
   console.log(`║   Aphelion Interval                             │ ${apheMeanB.toFixed(9)}    │ ${apheBDiff >= 0 ? '+' : ''}${apheBDiff.toFixed(2)} seconds               ║`);
   console.log('╠═══════════════════════════════════════════════════════════════════════════════════════════════════════╣');
@@ -35444,13 +35444,13 @@ async function analyzeAnoministicYear(startYear, endYear) {
   console.log('╠═══════════════════════════════════════════════════════════════════════════════════════════════════════╣');
   console.log('║ THEORETICAL (T_peri formula)                                                                          ║');
   console.log('╠═══════════════════════════════════════════════════════════════════════════════════════════════════════╣');
-  const theorDiff = (theoreticalAnomalistic - iauAnomalistic) * 86400;
+  const theorDiff = (theoreticalAnomalistic - iauAnomalistic) * SECONDS_PER_DAY;
   console.log(`║ Formula (T_peri = ${perihelionPrecessionYears.toFixed(1)} yr)              │ ${theoreticalAnomalistic.toFixed(9)}    │ ${theorDiff >= 0 ? '+' : ''}${theorDiff.toFixed(2)} seconds               ║`);
   console.log('╠═══════════════════════════════════════════════════════════════════════════════════════════════════════╣');
   console.log('║ FRAME COMPARISON                                                                                      ║');
   console.log('╠═══════════════════════════════════════════════════════════════════════════════════════════════════════╣');
-  const periMethodDiff = (periMean - periMeanB) * 86400;
-  const apheMethodDiff = (apheMean - apheMeanB) * 86400;
+  const periMethodDiff = (periMean - periMeanB) * SECONDS_PER_DAY;
+  const apheMethodDiff = (apheMean - apheMeanB) * SECONDS_PER_DAY;
   console.log(`║ Perihelion: Earth-Frame - WobbleCenter          │ ${periMethodDiff >= 0 ? '+' : ''}${periMethodDiff.toFixed(2)} seconds                                          ║`);
   console.log(`║ Aphelion:   Earth-Frame - WobbleCenter          │ ${apheMethodDiff >= 0 ? '+' : ''}${apheMethodDiff.toFixed(2)} seconds                                          ║`);
   console.log(`║ (Negative = Earth wobble shifts detection EARLIER than inertial frame)                               ║`);
@@ -35754,21 +35754,21 @@ async function analyzeSiderealYear(startYear, endYear) {
   const iauTropicalYear = ASTRO_REFERENCE.tropicalYearMeanJ2000;
   const iauPrecessionContrib = iauSiderealYear - iauTropicalYear;
 
-  const diffA = (resultA.mean4pt - iauSiderealYear) * 86400;
-  const diffB = (resultB.mean4pt - iauSiderealYear) * 86400;
-  const diffC = (resultC.mean4pt - iauSiderealYear) * 86400;
-  const diffD = (resultD.mean4pt - iauSiderealYear) * 86400;
-  const diffE = (resultE.mean4pt - iauSiderealYear) * 86400;
-  const diffF = (resultF.mean4pt - iauSiderealYear) * 86400;
-  const diffG = (resultG.mean4pt - iauSiderealYear) * 86400;
+  const diffA = (resultA.mean4pt - iauSiderealYear) * SECONDS_PER_DAY;
+  const diffB = (resultB.mean4pt - iauSiderealYear) * SECONDS_PER_DAY;
+  const diffC = (resultC.mean4pt - iauSiderealYear) * SECONDS_PER_DAY;
+  const diffD = (resultD.mean4pt - iauSiderealYear) * SECONDS_PER_DAY;
+  const diffE = (resultE.mean4pt - iauSiderealYear) * SECONDS_PER_DAY;
+  const diffF = (resultF.mean4pt - iauSiderealYear) * SECONDS_PER_DAY;
+  const diffG = (resultG.mean4pt - iauSiderealYear) * SECONDS_PER_DAY;
 
   // Method agreement
-  const diffAB = (resultA.mean4pt - resultB.mean4pt) * 86400;
-  const diffAD = (resultA.mean4pt - resultD.mean4pt) * 86400;
-  const diffCD = (resultC.mean4pt - resultD.mean4pt) * 86400;
-  const diffAE = (resultA.mean4pt - resultE.mean4pt) * 86400;
-  const diffAF = (resultA.mean4pt - resultF.mean4pt) * 86400;
-  const diffAG = (resultA.mean4pt - resultG.mean4pt) * 86400;
+  const diffAB = (resultA.mean4pt - resultB.mean4pt) * SECONDS_PER_DAY;
+  const diffAD = (resultA.mean4pt - resultD.mean4pt) * SECONDS_PER_DAY;
+  const diffCD = (resultC.mean4pt - resultD.mean4pt) * SECONDS_PER_DAY;
+  const diffAE = (resultA.mean4pt - resultE.mean4pt) * SECONDS_PER_DAY;
+  const diffAF = (resultA.mean4pt - resultF.mean4pt) * SECONDS_PER_DAY;
+  const diffAG = (resultA.mean4pt - resultG.mean4pt) * SECONDS_PER_DAY;
 
   console.log('');
   console.log('═══════════════════════════════════════════════════════════════════════════════════════════════════════');
@@ -35781,7 +35781,7 @@ async function analyzeSiderealYear(startYear, endYear) {
   console.log('║ Method A: Per-angle breakdown                           │ Value (days)      │ Diff from IAU         ║');
   console.log('╠═════════════════════════════════════════════════════════╪═══════════════════╪═══════════════════════╣');
   for (const ar of resultA.angleResults) {
-    const d = (ar.mean - iauSiderealYear) * 86400;
+    const d = (ar.mean - iauSiderealYear) * SECONDS_PER_DAY;
     console.log(`║   At ${String(ar.angle).padStart(3)}° world angle                                │ ${ar.mean.toFixed(9)}    │ ${d >= 0 ? '+' : ''}${d.toFixed(2).padStart(6)} seconds     ║`);
   }
   console.log('╠═════════════════════════════════════════════════════════╪═══════════════════╪═══════════════════════╣');
@@ -35794,7 +35794,7 @@ async function analyzeSiderealYear(startYear, endYear) {
   console.log('║ Method E: Per-angle breakdown (OrbitCenter→Sun)         │ Value (days)      │ Diff from IAU         ║');
   console.log('╠═════════════════════════════════════════════════════════╪═══════════════════╪═══════════════════════╣');
   for (const ar of resultE.angleResults) {
-    const d = (ar.mean - iauSiderealYear) * 86400;
+    const d = (ar.mean - iauSiderealYear) * SECONDS_PER_DAY;
     console.log(`║   At ${String(ar.angle).padStart(3)}° world angle                                │ ${ar.mean.toFixed(9)}    │ ${d >= 0 ? '+' : ''}${d.toFixed(2).padStart(6)} seconds     ║`);
   }
   console.log('╠═════════════════════════════════════════════════════════╪═══════════════════╪═══════════════════════╣');
@@ -35802,7 +35802,7 @@ async function analyzeSiderealYear(startYear, endYear) {
   console.log('╚═════════════════════════════════════════════════════════╧═══════════════════╧═══════════════════════╝');
   // Check if E per-angle values converge (spread < 1s means single angle suffices)
   const eAngles = resultE.angleResults.filter(r => r.mean > 0).map(r => r.mean);
-  const eSpread = eAngles.length > 0 ? (Math.max(...eAngles) - Math.min(...eAngles)) * 86400 : 0;
+  const eSpread = eAngles.length > 0 ? (Math.max(...eAngles) - Math.min(...eAngles)) * SECONDS_PER_DAY : 0;
   console.log(`  → Method E angle spread: ${eSpread.toFixed(2)} seconds (A spread: ${(() => { const a = resultA.angleResults.filter(r => r.mean > 0).map(r => r.mean); return a.length > 0 ? ((Math.max(...a) - Math.min(...a)) * 86400).toFixed(2) : '0'; })() } seconds)`);
   console.log(`  → If E spread ≈ 0: single angle measurement is sufficient (4× faster)`);
 
@@ -35846,7 +35846,7 @@ async function analyzeSiderealYear(startYear, endYear) {
   console.log('╔═════════════════════════════════════════════════════════╤═══════════════════════╗');
   console.log('║ Precession Validation                                   │ Value                 ║');
   console.log('╠═════════════════════════════════════════════════════════╪═══════════════════════╣');
-  const siderealMinusTropicalA = (resultA.mean4pt - iauTropicalYear) * 86400;
+  const siderealMinusTropicalA = (resultA.mean4pt - iauTropicalYear) * SECONDS_PER_DAY;
   console.log(`║ Sidereal - Tropical (Method A, 4pt mean)                │ ${siderealMinusTropicalA.toFixed(2).padStart(7)} seconds     ║`);
   console.log(`║ Sidereal - Tropical (IAU)                               │ ${(iauPrecessionContrib * 86400).toFixed(2).padStart(7)} seconds     ║`);
   console.log('╚═════════════════════════════════════════════════════════╧═══════════════════════╝');
@@ -35874,7 +35874,7 @@ async function analyzeSiderealYear(startYear, endYear) {
     const firstMean = firstFive.reduce((s, i) => s + i.interval, 0) / 5;
     const lastMean = lastFive.reduce((s, i) => s + i.interval, 0) / 5;
     const yearSpan = lastFive[4].year - firstFive[0].year;
-    const drift = (lastMean - firstMean) / yearSpan * 86400;
+    const drift = (lastMean - firstMean) / yearSpan * SECONDS_PER_DAY;
     console.log('');
     console.log(`Trend over ${yearSpan} years: ${drift.toFixed(3)} sec/year change in sidereal year (Method A at 90°)`);
   }
@@ -36116,7 +36116,7 @@ async function analyzeAllAlignments(startYear, endYear) {
   console.log('╠═══════════════════════════════════════════════════════════════════════════════════════╣');
   for (const key of ['VE', 'SS', 'AE', 'WS']) {
     const p = cardinalData[key];
-    const diffSec = (p.mean - p.iauRef) * 86400;
+    const diffSec = (p.mean - p.iauRef) * SECONDS_PER_DAY;
     console.log(`║   ${p.name.padEnd(30)} ${p.mean.toFixed(9)}    ${p.iauRef.toFixed(9)}   ${diffSec >= 0 ? '+' : ''}${diffSec.toFixed(2)}s ║`);
   }
   console.log('║───────────────────────────────────────────────────────────────────────────────────────║');
@@ -36125,7 +36125,7 @@ async function analyzeAllAlignments(startYear, endYear) {
   console.log('║   Mean tropical year cancels this effect.                                           ║');
   console.log('╠═══════════════════════════════════════════════════════════════════════════════════════╣');
   console.log('║ MEAN TROPICAL YEAR (average of 4 cardinal points)                                     ║');
-  const meanDiffSec = (meanTropicalYear - ASTRO_REFERENCE.tropicalYearMeanJ2000) * 86400;
+  const meanDiffSec = (meanTropicalYear - ASTRO_REFERENCE.tropicalYearMeanJ2000) * SECONDS_PER_DAY;
   console.log(`║   Measured mean:     ${meanTropicalYear.toFixed(9)} days                                          ║`);
   console.log(`║   Derived J2000:     ${ASTRO_REFERENCE.tropicalYearMeanJ2000.toFixed(9)} days                                          ║`);
   console.log(`║   Difference:        ${meanDiffSec >= 0 ? '+' : ''}${meanDiffSec.toFixed(2)} seconds                                                        ║`);
@@ -36133,8 +36133,8 @@ async function analyzeAllAlignments(startYear, endYear) {
   console.log('╠═══════════════════════════════════════════════════════════════════════════════════════╣');
   console.log('║ ANOMALISTIC YEAR                                    Measured          Model J2000     ║');
   console.log('╠═══════════════════════════════════════════════════════════════════════════════════════╣');
-  const periDiffSec = (meanPerihelion - _anomalisticYearJ2000Days()) * 86400;
-  const apheDiffSec = (meanAphelion - _anomalisticYearJ2000Days()) * 86400;
+  const periDiffSec = (meanPerihelion - _anomalisticYearJ2000Days()) * SECONDS_PER_DAY;
+  const apheDiffSec = (meanAphelion - _anomalisticYearJ2000Days()) * SECONDS_PER_DAY;
   console.log(`║   Perihelion to perihelion:      ${meanPerihelion.toFixed(9)}    ${_anomalisticYearJ2000Days().toFixed(9)}   ${periDiffSec >= 0 ? '+' : ''}${periDiffSec.toFixed(2)}s ║`);
   console.log(`║   Aphelion to aphelion:          ${meanAphelion.toFixed(9)}    ${_anomalisticYearJ2000Days().toFixed(9)}   ${apheDiffSec >= 0 ? '+' : ''}${apheDiffSec.toFixed(2)}s ║`);
   console.log('╠═══════════════════════════════════════════════════════════════════════════════════════╣');
@@ -36142,12 +36142,12 @@ async function analyzeAllAlignments(startYear, endYear) {
   console.log('╠═══════════════════════════════════════════════════════════════════════════════════════╣');
   for (const key of Object.keys(siderealData)) {
     const sd = siderealData[key];
-    const d = (sd.mean - ASTRO_REFERENCE.siderealYearJ2000) * 86400;
+    const d = (sd.mean - ASTRO_REFERENCE.siderealYearJ2000) * SECONDS_PER_DAY;
     console.log(`║   At ${sd.name.padEnd(10)}:              ${sd.mean.toFixed(9)}    ${ASTRO_REFERENCE.siderealYearJ2000.toFixed(9)}   ${d >= 0 ? '+' : ''}${d.toFixed(2)}s ║`);
   }
-  const siderealDiffSec = (meanSiderealYear - ASTRO_REFERENCE.siderealYearJ2000) * 86400;
-  const siderealTropicalDiff = (meanSiderealYear - meanTropicalYear) * 86400;
-  const iauSiderealTropicalDiff = (ASTRO_REFERENCE.siderealYearJ2000 - ASTRO_REFERENCE.tropicalYearMeanJ2000) * 86400;
+  const siderealDiffSec = (meanSiderealYear - ASTRO_REFERENCE.siderealYearJ2000) * SECONDS_PER_DAY;
+  const siderealTropicalDiff = (meanSiderealYear - meanTropicalYear) * SECONDS_PER_DAY;
+  const iauSiderealTropicalDiff = (ASTRO_REFERENCE.siderealYearJ2000 - ASTRO_REFERENCE.tropicalYearMeanJ2000) * SECONDS_PER_DAY;
   console.log('╠═══════════════════════════════════════════════════════════════════════════════════════╣');
   console.log(`║   4-point mean:                  ${meanSiderealYear.toFixed(9)}    ${ASTRO_REFERENCE.siderealYearJ2000.toFixed(9)}   ${siderealDiffSec >= 0 ? '+' : ''}${siderealDiffSec.toFixed(2)}s ║`);
   console.log(`║   Sidereal - Tropical (model):   ${siderealTropicalDiff.toFixed(2)} seconds                                        ║`);
@@ -36335,7 +36335,7 @@ async function analyzeAllAlignments(startYear, endYear) {
 
       const interval = cardinalData[key].intervals[i];
       const iauRef = cardinalData[key].iauRef;
-      const diffSec = interval ? (interval - iauRef) * 86400 : 0;
+      const diffSec = interval ? (interval - iauRef) * SECONDS_PER_DAY : 0;
 
       // Determine if closer (faster) or farther (slower) than mean
       const meanDist = 1.0;  // ~1 AU average
@@ -36358,10 +36358,10 @@ async function analyzeAllAlignments(startYear, endYear) {
   console.log(`│   VE (Mar)  = ${ASTRO_REFERENCE.tropicalYearVEJ2000} days - medium                                                │`);
   console.log(`│   WS (Dec)  = ${ASTRO_REFERENCE.tropicalYearWSJ2000} days - LONGEST (perihelion in middle, slow start/end)       │`);
   console.log('├─────────────────────────────────────────────────────────────────────────────────────────┤');
-  const vePattern = (cardinalData.VE.mean - ASTRO_REFERENCE.tropicalYearMeanJ2000) * 86400;
-  const ssPattern = (cardinalData.SS.mean - ASTRO_REFERENCE.tropicalYearMeanJ2000) * 86400;
-  const aePattern = (cardinalData.AE.mean - ASTRO_REFERENCE.tropicalYearMeanJ2000) * 86400;
-  const wsPattern = (cardinalData.WS.mean - ASTRO_REFERENCE.tropicalYearMeanJ2000) * 86400;
+  const vePattern = (cardinalData.VE.mean - ASTRO_REFERENCE.tropicalYearMeanJ2000) * SECONDS_PER_DAY;
+  const ssPattern = (cardinalData.SS.mean - ASTRO_REFERENCE.tropicalYearMeanJ2000) * SECONDS_PER_DAY;
+  const aePattern = (cardinalData.AE.mean - ASTRO_REFERENCE.tropicalYearMeanJ2000) * SECONDS_PER_DAY;
+  const wsPattern = (cardinalData.WS.mean - ASTRO_REFERENCE.tropicalYearMeanJ2000) * SECONDS_PER_DAY;
 
   // IAU pattern: SS < AE < VE < WS (shortest to longest)
   console.log(`│ VE (Mar): ${vePattern >= 0 ? '+' : ''}${vePattern.toFixed(2)}s vs mean  → ${vePattern > 0 ? 'LONGER ✓' : 'SHORTER ✗'} (Expected: slightly LONGER)  │`);
@@ -36467,7 +36467,7 @@ function siderealNoonForJD(startJD, debug = false) {
   // day in SI seconds (= meanSiderealday) divided by 86400 SI-seconds-per-JD.
   // At J2000 LOD ≈ 86400 so this equals meansol/(meansol+1) within ~1 ppm.
   // At deep time the LOD ratio diverges and the meanSiderealday-based formula stays correct.
-  const expectedSiderealDayJD = meanSiderealday / 86400;
+  const expectedSiderealDayJD = meanSiderealday / SECONDS_PER_DAY;
 
   // Get Earth rotation angle at start
   jumpToJulianDay(startJD);
@@ -36669,7 +36669,7 @@ function diagnoseDayRotation(startJD, hours = 25) {
       // Linear interpolation
       const t = (targetHourAngle - samples[i - 1].hourAngle) / (samples[i].hourAngle - samples[i - 1].hourAngle);
       const solarNoonJD = samples[i - 1].jd + t * (samples[i].jd - samples[i - 1].jd);
-      const solarDaySeconds = (solarNoonJD - startJD) * 86400;
+      const solarDaySeconds = (solarNoonJD - startJD) * SECONDS_PER_DAY;
       console.log(`  Solar noon found between hour ${samples[i - 1].h} and ${samples[i].h}`);
       console.log(`  Interpolated JD: ${solarNoonJD.toFixed(6)}`);
       console.log(`  Solar day length: ${solarDaySeconds.toFixed(3)} seconds`);
@@ -36775,7 +36775,7 @@ function diagnoseRARate() {
 
     // Hour angle change (this determines solar day length)
     const haChange = earthRotChange - raChange;
-    const solarDaySeconds = (2 * Math.PI / haChange) * 86400;
+    const solarDaySeconds = (2 * Math.PI / haChange) * SECONDS_PER_DAY;
 
     // Deviation from expected
     const raDeviation = raRateDeg - expectedMeanRARate;
@@ -36900,7 +36900,7 @@ function diagnoseRARate() {
   const expectedHAChange = testDays * 2 * Math.PI;  // 365 × 360° in radians
   // NOTE: meanlengthofday is the MODEL's expected mean solar day (~86400s at mean phase)
   // One JD = 86400 seconds exactly
-  const testEndJD = haTestStart + testDays * (meanlengthofday / 86400);
+  const testEndJD = haTestStart + testDays * (meanlengthofday / SECONDS_PER_DAY);
 
   console.log(`  meanlengthofday = ${meanlengthofday.toFixed(6)}s`);
   console.log(`  Test duration = ${testDays} × ${meanlengthofday.toFixed(6)}s = ${(testDays * meanlengthofday).toFixed(3)}s`);
@@ -36922,7 +36922,7 @@ function diagnoseRARate() {
 
   const haExcess = actualHAChange - expectedHAChange;
   const haExcessDeg = haExcess * 180 / Math.PI;
-  const haExcessSec = haExcessDeg * (86400 / 360);  // Convert to time
+  const haExcessSec = haExcessDeg * (SECONDS_PER_DAY / 360);  // Convert to time
 
   console.log(`\nAfter ${testDays} mean solar days (${(testEndJD - haTestStart).toFixed(6)} JD):`);
   console.log(`  Earth rotation:      ${(earthRotChange * 180 / Math.PI).toFixed(4)}° (expected: ${(testDays * 360.9856).toFixed(4)}°)`);
@@ -36976,7 +36976,7 @@ function diagnoseRARate() {
   }
 
   const directSolarDayJD = (lo + hi) / 2;
-  const directSolarDaySeconds = (directSolarDayJD - directTestStartJD) * 86400;
+  const directSolarDaySeconds = (directSolarDayJD - directTestStartJD) * SECONDS_PER_DAY;
 
   // Verify
   jumpToJulianDay(directSolarDayJD);
@@ -37014,7 +37014,7 @@ function diagnoseRARate() {
   }
 
   const solsticeSolarDayJD = (lo + hi) / 2;
-  const solsticeSolarDaySeconds = (solsticeSolarDayJD - solsticeJD) * 86400;
+  const solsticeSolarDaySeconds = (solsticeSolarDayJD - solsticeJD) * SECONDS_PER_DAY;
 
   console.log(`\nBinary search result at June Solstice (JD ${solsticeJD}):`);
   console.log(`  Solar day length:    ${solsticeSolarDaySeconds.toFixed(9)} seconds`);
@@ -37088,7 +37088,7 @@ function diagnoseRARate() {
     }
 
     const nextJD = (dayLo + dayHi) / 2;
-    const dayLength = (nextJD - currentJD) * 86400;
+    const dayLength = (nextJD - currentJD) * SECONDS_PER_DAY;
 
     // Sanity check
     if (dayLength < 86300 || dayLength > 86500) {
@@ -37331,7 +37331,7 @@ function solarNoonForJDMethodB(startJD, debug = false) {
   }
 
   // Sanity check: result should be roughly 1 day after start
-  const intervalSeconds = (refinedJD - startJD) * 86400;
+  const intervalSeconds = (refinedJD - startJD) * SECONDS_PER_DAY;
   if (intervalSeconds < 86000 || intervalSeconds > 86800) {
     // Result is suspicious - try direct calculation at expected time
     if (debug) {
@@ -37502,7 +37502,7 @@ async function analyzeSiderealDay(startYear) {
   for (let i = 0; i < numDays; i++) {
     const result = siderealNoonForJD(prevJD);
     if (result) {
-      const interval = (result.jd - prevJD) * 86400;  // Convert to seconds
+      const interval = (result.jd - prevJD) * SECONDS_PER_DAY;  // Convert to seconds
       intervals.push(interval);
       prevJD = result.jd;
     }
@@ -37658,7 +37658,7 @@ async function analyzeSolarDay(startYear, endYear, methodAOnly = false) {
     // Method A: Wobble-center RA (calculateRAFromWobbleCenter) - eliminates wobble parallax
     const solarResult = solarNoonForJD(prevSolarJD, false, cumulativeState);
     if (solarResult) {
-      const interval = (solarResult.jd - prevSolarJD) * 86400;  // Convert to seconds
+      const interval = (solarResult.jd - prevSolarJD) * SECONDS_PER_DAY;  // Convert to seconds
       solarIntervals.push(interval);
       prevSolarJD = solarResult.jd;
       cumulativeState = solarResult.cumulativeState;  // Carry forward cumulative state
@@ -37668,7 +37668,7 @@ async function analyzeSolarDay(startYear, endYear, methodAOnly = false) {
     // Method C: Fixed-frame solar noon detection (sun world angle from origin)
     const solarResultB = solarNoonForJDMethodB(prevSolarJD_B);
     if (solarResultB) {
-      const interval = (solarResultB.jd - prevSolarJD_B) * 86400;
+      const interval = (solarResultB.jd - prevSolarJD_B) * SECONDS_PER_DAY;
       solarIntervalsB.push(interval);
       prevSolarJD_B = solarResultB.jd;
     }
@@ -37676,7 +37676,7 @@ async function analyzeSolarDay(startYear, endYear, methodAOnly = false) {
     // Method D: Earth-frame RA (sun.ra directly) - includes wobble parallax
     const solarResultD = solarNoonForJDMethodD(prevSolarJD_D, false, cumulativeStateD);
     if (solarResultD) {
-      const interval = (solarResultD.jd - prevSolarJD_D) * 86400;
+      const interval = (solarResultD.jd - prevSolarJD_D) * SECONDS_PER_DAY;
       solarIntervalsD.push(interval);
       prevSolarJD_D = solarResultD.jd;
       cumulativeStateD = solarResultD.cumulativeState;
@@ -37685,7 +37685,7 @@ async function analyzeSolarDay(startYear, endYear, methodAOnly = false) {
     // Also measure sidereal day for Method B derivation
     const siderealResult = siderealNoonForJD(prevSiderealJD);
     if (siderealResult) {
-      const interval = (siderealResult.jd - prevSiderealJD) * 86400;
+      const interval = (siderealResult.jd - prevSiderealJD) * SECONDS_PER_DAY;
       siderealIntervals.push(interval);
       prevSiderealJD = siderealResult.jd;
     }
@@ -37739,8 +37739,8 @@ async function analyzeSolarDay(startYear, endYear, methodAOnly = false) {
   const median = sortedIntervals[Math.floor(sortedIntervals.length / 2)];
 
   // Count intervals in different ranges
-  const near86400 = solarIntervals.filter(i => Math.abs(i - 86400) < 50).length;
-  const outliers = solarIntervals.filter(i => Math.abs(i - 86400) > 50);
+  const near86400 = solarIntervals.filter(i => Math.abs(i - SECONDS_PER_DAY) < 50).length;
+  const outliers = solarIntervals.filter(i => Math.abs(i - SECONDS_PER_DAY) > 50);
 
   console.log('');
   console.log('═══════════════════════════════════════════════════════════════════════════');
@@ -37772,7 +37772,7 @@ async function analyzeSolarDay(startYear, endYear, methodAOnly = false) {
   let maxDay = { idx: 0, val: -Infinity };
 
   for (let i = 0; i < solarIntervals.length; i++) {
-    const diff = solarIntervals[i] - 86400;
+    const diff = solarIntervals[i] - SECONDS_PER_DAY;
     cumulativeDrift += diff;
 
     if (solarIntervals[i] < minDay.val) {
@@ -38110,7 +38110,7 @@ async function runSolarDayReport(year, onProgress) {
         min,
         max,
         range: max - min,
-        diffFrom86400: mean - 86400,
+        diffFrom86400: mean - SECONDS_PER_DAY,
         meanYear,
         meanYearJD,
       }
@@ -38184,7 +38184,7 @@ async function runSolarDayReport(year, onProgress) {
     summaryRows.push([]);
     if (cardinalResults.length === 4) {
       summaryRows.push(['Mean of 4 cardinal points (RA 0/90/180/270)', '', cardinalMean.toFixed(6), 's',
-        '', ((cardinalMean - 86400) * 1000).toFixed(4), 'ms from 86400']);
+        '', ((cardinalMean - SECONDS_PER_DAY) * 1000).toFixed(4), 'ms from 86400']);
       summaryRows.push(['  ^ the 4 cardinal points ARE the estimator. Perihelion and aphelion sit']);
       summaryRows.push(['    near the same part of the annual cycle, so including them UNBALANCES the']);
       summaryRows.push([`    phase sampling — ${Math.abs((allMean - 86400) * 1000).toFixed(1)} ms of truncation bias vs ` +
@@ -38192,7 +38192,7 @@ async function runSolarDayReport(year, onProgress) {
     } else {
       // Fallback only: without the full cardinal set there is no balanced subset.
       summaryRows.push([`Mean of all ${results.length} starting points`, '', allMean.toFixed(6), 's',
-        '', ((allMean - 86400) * 1000).toFixed(4), 'ms from 86400']);
+        '', ((allMean - SECONDS_PER_DAY) * 1000).toFixed(4), 'ms from 86400']);
     }
     const yv  = results.map(r => r.stats.meanYear).filter(v => v != null);
     const yjd = results.map(r => r.stats.meanYearJD).filter(v => v != null);
@@ -38203,11 +38203,11 @@ async function runSolarDayReport(year, onProgress) {
       if (cy.length === 4) {
         const cm = cy.reduce((a, b) => a + b, 0) / 4;
         summaryRows.push(['  4 cardinal points', '', cm.toFixed(6), 's',
-          '', ((cm - 86400) * 1000).toFixed(4), 'ms from 86400']);
+          '', ((cm - SECONDS_PER_DAY) * 1000).toFixed(4), 'ms from 86400']);
       } else {
         const am = yv.reduce((a, b) => a + b, 0) / yv.length;
         summaryRows.push([`  all ${yv.length} starting points`, '', am.toFixed(6), 's',
-          '', ((am - 86400) * 1000).toFixed(4), 'ms from 86400']);
+          '', ((am - SECONDS_PER_DAY) * 1000).toFixed(4), 'ms from 86400']);
       }
       // Dispersion, not a central estimate — all points belong here: it is the
       // spread across starting points that shows the bias is removed, not hidden.
@@ -38259,7 +38259,7 @@ async function runSolarDayReport(year, onProgress) {
     const drifts = [];
     let cum = 0;
     for (const interval of r.intervals) {
-      cum += (interval - 86400);
+      cum += (interval - SECONDS_PER_DAY);
       drifts.push(cum);
     }
     return drifts;
@@ -38270,7 +38270,7 @@ async function runSolarDayReport(year, onProgress) {
     for (let rIdx = 0; rIdx < results.length; rIdx++) {
       const len = results[rIdx].intervals[i];
       if (len !== undefined) {
-        row.push(len.toFixed(6), (len - 86400).toFixed(6), cumulDrifts[rIdx][i].toFixed(6));
+        row.push(len.toFixed(6), (len - SECONDS_PER_DAY).toFixed(6), cumulDrifts[rIdx][i].toFixed(6));
       } else {
         row.push('', '', '');
       }
@@ -38311,7 +38311,7 @@ function showSolarDayChart(year, results, cumulDrifts, numDays, xlsxBlobUrl, xls
   const analemmaEoTRaw = []; // equation of time in minutes (raw cumulative)
   let cumSec = 0;
   for (let i = 0; i < numDays; i++) {
-    cumSec += (analemmaResult.intervals[i] - 86400);
+    cumSec += (analemmaResult.intervals[i] - SECONDS_PER_DAY);
     analemmaEoTRaw.push(-cumSec / 60); // EoT convention: sun fast = positive
   }
   // Center the EoT so the figure-8 is symmetric around the zero line
@@ -38491,7 +38491,7 @@ function showSolarDayChart(year, results, cumulDrifts, numDays, xlsxBlobUrl, xls
     // Find the noon closest to the 1st of each month
     // Data starts ~Mar 20, so Jan+Feb fall in the next calendar year
     const monthYear = m < 3 ? year + 1 : year;
-    const monthJD = 2451544.5 + (monthYear - 2000) * 365.25 + m * 30.4375; // approximate
+    const monthJD = 2451544.5 + (monthYear - 2000) * DAYS_PER_JULIAN_YEAR + m * 30.4375; // approximate
     let bestI = 0, bestDist = Infinity;
     for (let i = 0; i < numDays && i < analemmaResult.noonJDs.length - 1; i++) {
       const d = Math.abs(analemmaResult.noonJDs[i + 1] - monthJD);
@@ -38590,7 +38590,7 @@ function showSolarDayChart(year, results, cumulDrifts, numDays, xlsxBlobUrl, xls
     }
   };
 
-  drawTimeChart(0, TCH, (r, i) => r.intervals[i] - 86400, 'Day #', 'Daily Deviation from 86400s');
+  drawTimeChart(0, TCH, (r, i) => r.intervals[i] - SECONDS_PER_DAY, 'Day #', 'Daily Deviation from 86400s');
   drawTimeChart(TCH + 50, TCH, (r, i) => cumulDrifts[results.indexOf(r)][i], 'Day #', 'Cumulative Drift (s)');
 
   // ── Merge canvases into a single image for right-click "Open in new tab" ──
@@ -38736,7 +38736,7 @@ function stellarNoonMethodA(startJD, debug = false) {
   const targetICRFAngle = startICRFAngle + 2 * Math.PI;
 
   // Estimate: approximately one sidereal day
-  const expectedSiderealDayJD = meanSiderealday / 86400;  // Phase 9.5b: LOD-aware sidereal day in JD
+  const expectedSiderealDayJD = meanSiderealday / SECONDS_PER_DAY;  // Phase 9.5b: LOD-aware sidereal day in JD
   const approxJD = startJD + expectedSiderealDayJD;
 
   // Binary search for precise crossing
@@ -38845,7 +38845,7 @@ function stellarNoonMethodB(startJD, debug = false) {
   const startWorldRotY = getWorldRotationY(startJD);
 
   // Estimate
-  const expectedSiderealDayJD = meanSiderealday / 86400;  // Phase 9.5b: LOD-aware sidereal day in JD
+  const expectedSiderealDayJD = meanSiderealday / SECONDS_PER_DAY;  // Phase 9.5b: LOD-aware sidereal day in JD
   const approxJD = startJD + expectedSiderealDayJD;
 
   // Binary search with cumulative tracking
@@ -38945,7 +38945,7 @@ function stellarNoonMethodD(startJD, debug = false) {
   };
 
   const startAngle = spinAngleAt(startJD);
-  const approxJD = startJD + meanSiderealday / 86400;
+  const approxJD = startJD + meanSiderealday / SECONDS_PER_DAY;
 
   let lo = approxJD - 0.01;
   let hi = approxJD + 0.01;
@@ -39116,7 +39116,7 @@ function compareSceneVsSceneGraph() {
     jumpToJulianDay(r.jd - h); forceSceneUpdate();
     const decMinus = sun.dec * 180 / Math.PI;
     const slope = (decPlus - decMinus) / (2 * h);                  // deg/day
-    const dtMs = Math.abs(slope) > 1e-9 ? ((decDeg - r.dec) / slope) * 86400 * 1000 : NaN;
+    const dtMs = Math.abs(slope) > 1e-9 ? ((decDeg - r.dec) / slope) * SECONDS_PER_DAY * 1000 : NaN;
 
     out.push({ ...r, decDeg, dDec, dRa, slope, dtMs });
     console.log(`  ${r.label.padEnd(6)} ${r.jd.toFixed(1)}  ${decDeg.toFixed(9).padStart(14)}  ` +
@@ -39197,7 +39197,7 @@ function compareSceneVsSceneGraph() {
                            Math.cos(sun.ra));
     const lonDeg = ((lam * 180 / Math.PI) % 360 + 360) % 360;
     const dLon = (((lonDeg - p.lon + 540) % 360) - 180) * 3600;
-    const yr = 2000 + (p.jd - j2000JD) / 365.25;
+    const yr = 2000 + (p.jd - j2000JD) / DAYS_PER_JULIAN_YEAR;
     acc.push({ yr, dLon });
     console.log(`  ${p.jd.toFixed(1)}  ${yr.toFixed(1).padStart(9)}  ${dLon.toFixed(4).padStart(11)}` +
                 `      ${acc.length > 1 ? (dLon - acc[0].dLon).toFixed(4) : '(baseline)'}`);
@@ -39208,7 +39208,7 @@ function compareSceneVsSceneGraph() {
     const sxx = acc.reduce((s, p) => s + p.yr * p.yr, 0), sxy = acc.reduce((s, p) => s + p.yr * p.dLon, 0);
     const slopeArcsecPerYr = (n * sxy - sx * sy) / (n * sxx - sx * sx);
     // Sun moves ~0.9856 deg/day; convert the drift rate to a year-length difference
-    const msPerYr = (slopeArcsecPerYr / 3600) / 0.98561 * 86400 * 1000;
+    const msPerYr = (slopeArcsecPerYr / 3600) / 0.98561 * SECONDS_PER_DAY * 1000;
     console.log('');
     console.log(`  drift rate = ${slopeArcsecPerYr.toFixed(6)} "/yr  ->  year-length difference ${msPerYr.toFixed(1)} ms/yr`);
     console.log('  Compare against the measured report-vs-Step-6a gap of -114.9 ms/yr.');
@@ -39252,7 +39252,7 @@ function compareSceneVsSceneGraph() {
     jumpToJulianDay(r.jd - hh); forceSceneUpdate();
     const dm = sun.dec * 180 / Math.PI;
     const sl = (dp - dm) / (2 * hh);
-    const dms = Math.abs(sl) > 1e-4 ? ((decLight - decFull) / sl) * 86400 * 1000 : NaN;
+    const dms = Math.abs(sl) > 1e-4 ? ((decLight - decFull) / sl) * SECONDS_PER_DAY * 1000 : NaN;
     console.log(`  ${r.label.padEnd(6)} ${decLight.toFixed(9).padStart(15)}  ${decFull.toFixed(9).padStart(15)}  ` +
                 `${d.toFixed(4).padStart(9)}  ${(Number.isFinite(dms) ? dms.toFixed(1) : 'flat').padStart(8)}`);
   }
@@ -39398,7 +39398,7 @@ async function analyzeStellarDay(startYear) {
   for (let i = 0; i < numDays; i++) {
     const result = stellarNoonMethodA(prevJD, i === 0);
     if (result) {
-      const interval = (result.jd - prevJD) * 86400;
+      const interval = (result.jd - prevJD) * SECONDS_PER_DAY;
       intervalsA.push(interval);
       prevJD = result.jd;
     }
@@ -39436,7 +39436,7 @@ async function analyzeStellarDay(startYear) {
   for (let i = 0; i < numDays; i++) {
     const result = stellarNoonMethodB(prevJD, i === 0);
     if (result) {
-      const interval = (result.jd - prevJD) * 86400;
+      const interval = (result.jd - prevJD) * SECONDS_PER_DAY;
       intervalsB.push(interval);
       prevJD = result.jd;
     }
@@ -39476,7 +39476,7 @@ async function analyzeStellarDay(startYear) {
   for (let i = 0; i < numDays; i++) {
     const result = stellarNoonMethodD(prevJD, i === 0);
     if (result) {
-      const interval = (result.jd - prevJD) * 86400;
+      const interval = (result.jd - prevJD) * SECONDS_PER_DAY;
       intervalsD.push(interval);
       prevJD = result.jd;
     }
@@ -41270,7 +41270,7 @@ function secondsExcessPerDay () {
   // incl. Core-mantle swing, which is what makes this Layer 4, not 3;
   // USNO-tuned at J2000 by the DT-corrections fit). The cycle sum MUST stay
   // in the composite: omitting it desyncs the Rate cell from the display.
-  return computeLodRealSecondsAtEpoch(o.currentYear) - 86400;
+  return computeLodRealSecondsAtEpoch(o.currentYear) - SECONDS_PER_DAY;
 }
 
 // ---------------------------------------------------------------------------
@@ -41282,7 +41282,7 @@ function updateDeltaT() {
   const daysElapsed = currentJD - state.prevJD;
   // Layer 4 LOD — same value as tweakpane Solar Day = REAL, via the shared
   // computeLodRealSecondsAtEpoch composite.
-  const excess = computeLodRealSecondsAtEpoch(o.currentYear) - 86400;
+  const excess = computeLodRealSecondsAtEpoch(o.currentYear) - SECONDS_PER_DAY;
 
   if (isNaN(excess) || isNaN(daysElapsed)) {
     console.warn("Bad input to updateDeltaT", { excess, daysElapsed });
@@ -41865,7 +41865,7 @@ function eclipticLongitudeToRaDeg(lamDeg, year) {
 // 6π GM☉ / (c² a (1 − e²)) per orbit, a from the period (Kepler III), × orbits per century.
 function relativisticPerihelionAdvanceArcsecCy(planetKey) {
   const p = planets[planetKey];
-  const aKm = Math.pow(p.solarYearInput / (meansiderealyearlengthinSeconds / 86400), 2 / 3) * AU_J2000_KM;
+  const aKm = Math.pow(p.solarYearInput / (meansiderealyearlengthinSeconds / SECONDS_PER_DAY), 2 / 3) * AU_J2000_KM;
   const perOrbit = 6 * Math.PI * GM_SUN / (speedOfLight * speedOfLight * aKm * (1 - p.orbitalEccentricityJ2000 ** 2));
   return perOrbit * (36525 / p.solarYearInput) * 206264.806;
 }
@@ -41971,26 +41971,26 @@ const planetStats = {
        value : [ { v: () => o.solarYearDays/meansolaryearlengthinDays, dec:6, sep:',' },{ small : 'years' }],
        hover : [`Ratio of current solar year to mean solar year. P = 1.0 when year length equals mean of ~365.2422 days`]},
       {label : () => `Orbital period (solar)`,
-       value : [ { v: () => { const s = _cardinalYearSeconds(o.currentYear, 'MEAN'); return Number.isFinite(s) ? s / 86400 : tropicalYearDaysOfDate(o.currentYear); }, dec:8, sep:',' },{ small : 'days' }],
+       value : [ { v: () => { const s = _cardinalYearSeconds(o.currentYear, 'MEAN'); return Number.isFinite(s) ? s / SECONDS_PER_DAY : tropicalYearDaysOfDate(o.currentYear); }, dec:8, sep:',' },{ small : 'days' }],
        hover : () => [`Earth's mean tropical year OF DATE in SI days — the one-source evaluator, the SAME family the Predictions panel rides (so the two surfaces read one value by construction). The equinox-to-equinox interval of a single year wobbles ±minutes about this mean. Scene-measured this year: ${fmtNum(o.solarYearDays,8,',')} d in the scene day basis (the measured mean solar day, doc 11 §Day bases) — the ~0.5-s split is of-date drift + measurement route + day basis, kept visible here.`],
        tpLink: true},
       {label : () => `Orbital period (sidereal)`,
-       value : [ { v: () => { const os = _hybridSpinActive() ? _siderealYearOneSourceSeconds(o.currentYear) : null; return os !== null && Number.isFinite(os) ? os / 86400 : meanSiderealYearSecondsAtAge((startmodelYear - o.currentYear) / 1e6) / 86400; }, dec:8, sep:',' },{ small : 'days' }],
+       value : [ { v: () => { const os = _hybridSpinActive() ? _siderealYearOneSourceSeconds(o.currentYear) : null; return os !== null && Number.isFinite(os) ? os / SECONDS_PER_DAY : meanSiderealYearSecondsAtAge((startmodelYear - o.currentYear) / 1e6) / SECONDS_PER_DAY; }, dec:8, sep:',' },{ small : 'days' }],
        hover : () => [`Earth's sidereal year OF DATE in SI days — the one-source D6 channel (the IAU-anchored mass-loss law ÷ the banked λ̇ ratio; J2000 anchor ${fmtNum(meansiderealyearlengthinSeconds/86400,8,',')} d = ${fmtNum(meansiderealyearlengthinSeconds,4,',')} s). ~20 min longer than the tropical year (axial precession). The frozen clock's kinematic identity composes to ${fmtNum(meansiderealyearlengthinDays_kinematic,8,',')} d — the device's second route, kept visible. Scene-measured this year: ${fmtNum(o.siderealYearDays,8,',')} d in the scene day basis (doc 11 §Day bases).`],
        tpLink: true},
       {label : () => `Mean Motion (n)`,
-       value : [ { v: () => { const os = _hybridSpinActive() ? _siderealYearOneSourceSeconds(o.currentYear) : null; const d = os !== null && Number.isFinite(os) ? os / 86400 : meanSiderealYearSecondsAtAge((startmodelYear - o.currentYear) / 1e6) / 86400; return 360 / d; }, dec:6, sep:',' },{ small: '°/day' }],
+       value : [ { v: () => { const os = _hybridSpinActive() ? _siderealYearOneSourceSeconds(o.currentYear) : null; const d = os !== null && Number.isFinite(os) ? os / SECONDS_PER_DAY : meanSiderealYearSecondsAtAge((startmodelYear - o.currentYear) / 1e6) / SECONDS_PER_DAY; return 360 / d; }, dec:6, sep:',' },{ small: '°/day' }],
        hover : [`Mean angular motion relative to the fixed stars: n = 360°/P_sidereal (SI days), of date via the one-source channel. (360°/P_tropical would be the equinox-referenced rate — a different frame; the frame is named because the two split by ~20 min/yr of axial precession.)`]},
       {label : () => `Period (Kepler verification)`,
        value : [ { v: () => OrbitalFormulas.keplerPeriod(currentAUDistance, GM_SUN_PLUS_EARTH), dec:6, sep:',' },{ small: 'days' }],
        hover : [`Kepler's 3rd Law: P = 2π√(a³/(GM_Sun + GM_Earth)) × (meanSolar/meanSidereal). Same formula every planet uses; result is the mean solar year (~365.2422 days). The bare sidereal year (~365.25636) is shown above. Algebraically identical to the elaborate two-body form P = 2π√((a−Δa)³/GM_Sun) with Earth's Δa = 149.77 km (see doc 24) — both forms collapse to the same number because μ_body = μ_Earth cancels in the denominator.`]},
     null,
       {label : () => `Length of Day`,
-       value : [ { v: () => o.lodKinematic/86400*24, dec:6, sep:',' }, { small : 'hours' }],
+       value : [ { v: () => o.lodKinematic/SECONDS_PER_DAY*24, dec:6, sep:',' }, { small : 'hours' }],
        hover : [`Mean solar day: time between successive solar noons. Slightly longer than sidereal day due to orbital motion`],
        tpLink: true},
       {label : () => `Length of Sidereal Day`,
-       value : [ { v: () => o.siderealDayReal/86400*24, dec:6, sep:',' },{ small: 'hours' }],
+       value : [ { v: () => o.siderealDayReal/SECONDS_PER_DAY*24, dec:6, sep:',' },{ small: 'hours' }],
        hover : [`One full rotation relative to the stars ≈ 23h 56m 4s. About 3m 56s shorter than a solar day`]},
 
     {header : '—  Orbital Shape & Geometry —' },
@@ -42750,10 +42750,10 @@ const planetStats = {
        hover : [`The angular diameter in km of an object at a distance of 1 NEW-AU`],
        static: true},
       {label : () => `NEW-SI second`,
-       value : [ { small:{ v: () => meanlengthofday/86400, dec:8, sep:',' }},{ small: 'SI second' }],
+       value : [ { small:{ v: () => meanlengthofday/SECONDS_PER_DAY, dec:8, sep:',' }},{ small: 'SI second' }],
        hover : [`A NEW-SI second is ${fmtNum(meanlengthofday,8,',')}/86,400 times the current SI second to make sure we can keep using 86,400 seconds a day (at J2000)`]},
       {label : () => ``,
-       value : [ { small:{ v: () => 9192631770/ 86400*meanlengthofday, dec:0, sep:',' }},{ small: 'transitions' }],
+       value : [ { small:{ v: () => 9192631770/ SECONDS_PER_DAY*meanlengthofday, dec:0, sep:',' }},{ small: 'transitions' }],
        hover : [`A NEW-SI second is 9,192,631,770/86,400*${fmtNum(meanlengthofday,8,',')} periods of the radiation corresponding to the transition between the two hyperfine levels of the ground state of the caesium-133 atom (at J2000)`]},
 
     {header : '—  Solar Mass Loss (Driver 2) —' },
@@ -42861,20 +42861,20 @@ const planetStats = {
        value : [ { v: () => 360/_kcNOfDate('mercury', o.currentYear), dec:6, sep:',' },{ small: 'Julian years' }],
        hover : [`Mercury's sidereal orbital period OF DATE: P = 360°/n with n from the model's own banked λ̇ channel — λ̇₀ (the ±10-Myr run's secular J2000 rate, 2-kyr window: it averages the great-inequality-class wiggles a short era-window fit absorbs, and matches JPL-class periods) × the planet's own constant-GM N-body drift (±10 Myr, clamped beyond) ÷ the Driver-2 mass-loss stretch (the model's falsifiable μ-leg). All factors ≡ 1 at J2000; Julian years = 365.25 SI days (the chain's clock is JD/TT). The era evaluator keeps its own fitted window rate — the measured decomposition split is banked in the artifact (Neptune −497 ppm the largest: a 300-yr window fit absorbs local U–N-inequality slope).`]},
       {label : () => `Orbital period (sidereal)`,
-       value : [ { v: () => (360/_kcNOfDate('mercury', o.currentYear))*365.25, dec:6, sep:',' },{ small: 'days' }],
+       value : [ { v: () => (360/_kcNOfDate('mercury', o.currentYear))*DAYS_PER_JULIAN_YEAR, dec:6, sep:',' },{ small: 'days' }],
        hover : [`Mercury's sidereal period of date in SI days: P = (360°/n) × 365.25, n from the banked λ̇ channel (secular J2000 rate × own N-body drift ÷ Driver-2 mass-loss stretch, each ≡ 1 at J2000). Agreement with JPL-class periods is a result, not an input.`]},
       {label : () => `Orbit Period Synodic`,
-       value : [ { v: () => (360/Math.abs(_kcNOfDate('mercury', o.currentYear) - _kcNOfDate('earth', o.currentYear)))*365.25, dec:6, sep:',' },{ small: 'days' }],
+       value : [ { v: () => (360/Math.abs(_kcNOfDate('mercury', o.currentYear) - _kcNOfDate('earth', o.currentYear)))*DAYS_PER_JULIAN_YEAR, dec:6, sep:',' },{ small: 'days' }],
        hover : [`Mercury's synodic period with Earth, of date: P = 360°/|n_Mercury − n_Earth| × 365.25 — both mean motions from the banked λ̇ channels (each body's own N-body drift; the shared mass-loss stretch scales both, so the synodic period stretches with them). SI days.`]},
       {label : () => `Mean Motion (n)`,
-       value : [ { v: () => _kcNOfDate('mercury', o.currentYear)/365.25, dec:6, sep:',' },{ small: '°/day' }],
+       value : [ { v: () => _kcNOfDate('mercury', o.currentYear)/DAYS_PER_JULIAN_YEAR, dec:6, sep:',' },{ small: '°/day' }],
        hover : [`The banked λ̇ channel of date (degrees per Julian year: secular J2000 rate × the planet's own N-body drift ÷ the Driver-2 mass-loss stretch), converted to °/SI-day by ÷365.25 — a pure unit conversion; the chain's clock is JD/TT. (365.2422 is Earth's measured mean solar year — an Earth observable that plays no role in another planet's clock.)`]},
       {label : () => `Period (Kepler verification)`,
        value : [ { v: () => OrbitalFormulas.keplerPeriod(mercuryOrbitDistance * currentAUDistance), dec:6, sep:',' },{ small: 'days' }],
        hover : [`Kepler's 3rd Law: P = 2π√(a³/(GM_Sun + GM_Earth)) × (meanSolar/meanSidereal ≈ 0.99996). The system-mass denominator anchors the model's AU and applies to every planet. Algebraically identical to the elaborate two-body form P = 2π√((a−Δa)³/(GM_Sun + GM_Earth − GM_body)) with the exact symmetric Δa = a·(1 − ((GM_Sun + GM_Earth − GM_body)/(GM_Sun + GM_Earth))^(1/3)) — the (a−Δa)³ and (GM_sys − GM_body) terms cancel exactly (see doc 24). The compensation factor reconciles the model's dual year-frame: GM is derived in sidereal-year units, orbit distances in solar-year units via long-term-mean ratios. Deliberately stays on the DEVICE inputs — this row verifies the model’s GM↔AU closure, not the ephemeris; the surrounding rows are the chain’s dynamical values.`]},
     null,
       {label : () => `Length of Day`,
-       value : [ { v: () => (mercuryRotationPeriod*(((360/_kcNOfDate('mercury', o.currentYear))*365.25)*24))/((((360/_kcNOfDate('mercury', o.currentYear))*365.25)*24)-mercuryRotationPeriod), dec:6, sep:',' }, { small : 'hours' }],
+       value : [ { v: () => (mercuryRotationPeriod*(((360/_kcNOfDate('mercury', o.currentYear))*DAYS_PER_JULIAN_YEAR)*24))/((((360/_kcNOfDate('mercury', o.currentYear))*DAYS_PER_JULIAN_YEAR)*24)-mercuryRotationPeriod), dec:6, sep:',' }, { small : 'hours' }],
        hover : [`Mercury's solar day ≈ 176 Earth days. 3:2 spin-orbit resonance makes the solar day twice the orbital period`]},
       {label : () => `Length of Sidereal Day`,
        value : [ { v: () => mercuryRotationPeriod, dec:6, sep:',' },{ small: 'hours' }],
@@ -42911,7 +42911,7 @@ const planetStats = {
 
     {header : '—  Velocities —' },
       {label : () => `Mean orbital speed`,
-       value : [ { v: () => (_kcOrbEl('mercury').aAU * currentAUDistance * Math.PI * 2) / (((360/_kcNOfDate('mercury', o.currentYear))*365.25)*24),
+       value : [ { v: () => (_kcOrbEl('mercury').aAU * currentAUDistance * Math.PI * 2) / (((360/_kcNOfDate('mercury', o.currentYear))*DAYS_PER_JULIAN_YEAR)*24),
                    dec:2, sep:',' },{ small: 'km/h' }],
        hover : [`Mercury mean speed: v = 2π·a/P — a the chain’s osculating semi-major axis of date, P the λ̇-channel period of date (360°/n × 365.25 d × 24 h). The AU conversion (currentAUDistance) stays deep-time mutable`]},
       {label : () => `Current orbital velocity`,
@@ -43051,10 +43051,10 @@ const planetStats = {
        info  : 'https://en.wikipedia.org/wiki/Phase_angle_(astronomy)'},
     null,
       {label : () => `True Anomaly Rate (dν/dt)`,
-       value : [ { v: () => OrbitalFormulas.trueAnomalyRate(OrbitalFormulas.meanMotion((360/_kcNOfDate('mercury', o.currentYear))*365.25), _kcElementsOfDate('mercury', o.julianDay).e, o.mercuryTrueAnomaly), dec:6, sep:',' },{ small: '°/day' }],
+       value : [ { v: () => OrbitalFormulas.trueAnomalyRate(OrbitalFormulas.meanMotion((360/_kcNOfDate('mercury', o.currentYear))*DAYS_PER_JULIAN_YEAR), _kcElementsOfDate('mercury', o.julianDay).e, o.mercuryTrueAnomaly), dec:6, sep:',' },{ small: '°/day' }],
        hover : [`Rate of change of true anomaly: dν/dt = n(1+e·cos(ν))²/(1-e²)^1.5. Fastest at perihelion`]},
       {label : () => `Eccentric Anomaly Rate (dE/dt)`,
-       value : [ { v: () => OrbitalFormulas.eccentricAnomalyRate(OrbitalFormulas.meanMotion((360/_kcNOfDate('mercury', o.currentYear))*365.25), _kcElementsOfDate('mercury', o.julianDay).e, o.mercuryEccentricAnomaly), dec:6, sep:',' },{ small: '°/day' }],
+       value : [ { v: () => OrbitalFormulas.eccentricAnomalyRate(OrbitalFormulas.meanMotion((360/_kcNOfDate('mercury', o.currentYear))*DAYS_PER_JULIAN_YEAR), _kcElementsOfDate('mercury', o.julianDay).e, o.mercuryEccentricAnomaly), dec:6, sep:',' },{ small: '°/day' }],
        hover : [`Rate of change of eccentric anomaly: dE/dt = n / (1 - e×cos(E))`]},
       {label : () => `Radius of Curvature (ρ)`,
        value : [ { v: () => OrbitalFormulas.radiusOfCurvature(mercuryOrbitDistance * currentAUDistance, _kcElementsOfDate('mercury', o.julianDay).e, o.mercuryTrueAnomaly), dec:0, sep:',' },{ small: 'km' }],
@@ -43062,10 +43062,10 @@ const planetStats = {
 
     {header : '—  Time Calculations —' },
       {label : () => `Time since perihelion`,
-       value : [ { v: () => OrbitalFormulas.timeSincePerihelion((360/_kcNOfDate('mercury', o.currentYear))*365.25, o.mercuryMeanAnomaly), dec:2, sep:',' },{ small: 'days' }],
+       value : [ { v: () => OrbitalFormulas.timeSincePerihelion((360/_kcNOfDate('mercury', o.currentYear))*DAYS_PER_JULIAN_YEAR, o.mercuryMeanAnomaly), dec:2, sep:',' },{ small: 'days' }],
        hover : [`Days elapsed since last perihelion passage: t = P × M / 360°`]},
       {label : () => `Time to next perihelion`,
-       value : [ { v: () => OrbitalFormulas.timeToNextPerihelion((360/_kcNOfDate('mercury', o.currentYear))*365.25, o.mercuryMeanAnomaly), dec:2, sep:',' },{ small: 'days' }],
+       value : [ { v: () => OrbitalFormulas.timeToNextPerihelion((360/_kcNOfDate('mercury', o.currentYear))*DAYS_PER_JULIAN_YEAR, o.mercuryMeanAnomaly), dec:2, sep:',' },{ small: 'days' }],
        hover : [`Days until next perihelion passage: t = P × (360° - M) / 360°`]},
 
     {header : '—  Perihelion Precession (apsidal · g) —' },
@@ -43168,20 +43168,20 @@ const planetStats = {
        value : [ { v: () => 360/_kcNOfDate('venus', o.currentYear), dec:6, sep:',' },{ small: 'Julian years' }],
        hover : [`Venus's sidereal orbital period OF DATE: P = 360°/n with n from the model's own banked λ̇ channel — λ̇₀ (the ±10-Myr run's secular J2000 rate, 2-kyr window: it averages the great-inequality-class wiggles a short era-window fit absorbs, and matches JPL-class periods) × the planet's own constant-GM N-body drift (±10 Myr, clamped beyond) ÷ the Driver-2 mass-loss stretch (the model's falsifiable μ-leg). All factors ≡ 1 at J2000; Julian years = 365.25 SI days (the chain's clock is JD/TT). The era evaluator keeps its own fitted window rate — the measured decomposition split is banked in the artifact (Neptune −497 ppm the largest: a 300-yr window fit absorbs local U–N-inequality slope).`]},
       {label : () => `Orbital period (sidereal)`,
-       value : [ { v: () => (360/_kcNOfDate('venus', o.currentYear))*365.25, dec:6, sep:',' },{ small: 'days' }],
+       value : [ { v: () => (360/_kcNOfDate('venus', o.currentYear))*DAYS_PER_JULIAN_YEAR, dec:6, sep:',' },{ small: 'days' }],
        hover : [`Venus's sidereal period of date in SI days: P = (360°/n) × 365.25, n from the banked λ̇ channel (secular J2000 rate × own N-body drift ÷ Driver-2 mass-loss stretch, each ≡ 1 at J2000). Agreement with JPL-class periods is a result, not an input.`]},
       {label : () => `Orbit Period Synodic`,
-       value : [ { v: () => (360/Math.abs(_kcNOfDate('venus', o.currentYear) - _kcNOfDate('earth', o.currentYear)))*365.25, dec:6, sep:',' },{ small: 'days' }],
+       value : [ { v: () => (360/Math.abs(_kcNOfDate('venus', o.currentYear) - _kcNOfDate('earth', o.currentYear)))*DAYS_PER_JULIAN_YEAR, dec:6, sep:',' },{ small: 'days' }],
        hover : [`Venus's synodic period with Earth, of date: P = 360°/|n_Venus − n_Earth| × 365.25 — both mean motions from the banked λ̇ channels (each body's own N-body drift; the shared mass-loss stretch scales both, so the synodic period stretches with them). SI days.`]},
       {label : () => `Mean Motion (n)`,
-       value : [ { v: () => _kcNOfDate('venus', o.currentYear)/365.25, dec:6, sep:',' },{ small: '°/day' }],
+       value : [ { v: () => _kcNOfDate('venus', o.currentYear)/DAYS_PER_JULIAN_YEAR, dec:6, sep:',' },{ small: '°/day' }],
        hover : [`The banked λ̇ channel of date (degrees per Julian year: secular J2000 rate × the planet's own N-body drift ÷ the Driver-2 mass-loss stretch), converted to °/SI-day by ÷365.25 — a pure unit conversion; the chain's clock is JD/TT. (365.2422 is Earth's measured mean solar year — an Earth observable that plays no role in another planet's clock.)`]},
       {label : () => `Period (Kepler verification)`,
        value : [ { v: () => OrbitalFormulas.keplerPeriod(venusOrbitDistance * currentAUDistance), dec:6, sep:',' },{ small: 'days' }],
        hover : [`Kepler's 3rd Law: P = 2π√(a³/(GM_Sun + GM_Earth)) × (meanSolar/meanSidereal ≈ 0.99996). The system-mass denominator anchors the model's AU and applies to every planet. Algebraically identical to the elaborate two-body form P = 2π√((a−Δa)³/(GM_Sun + GM_Earth − GM_body)) with the exact symmetric Δa = a·(1 − ((GM_Sun + GM_Earth − GM_body)/(GM_Sun + GM_Earth))^(1/3)) — the (a−Δa)³ and (GM_sys − GM_body) terms cancel exactly (see doc 24). The compensation factor reconciles the model's dual year-frame: GM is derived in sidereal-year units, orbit distances in solar-year units via long-term-mean ratios. Deliberately stays on the DEVICE inputs — this row verifies the model’s GM↔AU closure, not the ephemeris; the surrounding rows are the chain’s dynamical values.`]},
     null,
       {label : () => `Length of Day`,
-       value : [ { v: () => (venusRotationPeriod*(((360/_kcNOfDate('venus', o.currentYear))*365.25)*24))/((((360/_kcNOfDate('venus', o.currentYear))*365.25)*24)+venusRotationPeriod), dec:6, sep:',' }, { small : 'hours' }],
+       value : [ { v: () => (venusRotationPeriod*(((360/_kcNOfDate('venus', o.currentYear))*DAYS_PER_JULIAN_YEAR)*24))/((((360/_kcNOfDate('venus', o.currentYear))*DAYS_PER_JULIAN_YEAR)*24)+venusRotationPeriod), dec:6, sep:',' }, { small : 'hours' }],
        hover : [`Venus's solar day ≈ 117 Earth days. Shorter than its sidereal day (243 d) due to retrograde rotation`]},
       {label : () => `Length of Sidereal Day`,
        value : [ { v: () => venusRotationPeriod, dec:6, sep:',' },{ small: 'hours' }],
@@ -43218,7 +43218,7 @@ const planetStats = {
 
     {header : '—  Velocities —' },
       {label : () => `Mean orbital speed`,
-       value : [ { v: () => (_kcOrbEl('venus').aAU * currentAUDistance * Math.PI * 2) / (((360/_kcNOfDate('venus', o.currentYear))*365.25)*24),
+       value : [ { v: () => (_kcOrbEl('venus').aAU * currentAUDistance * Math.PI * 2) / (((360/_kcNOfDate('venus', o.currentYear))*DAYS_PER_JULIAN_YEAR)*24),
                    dec:2, sep:',' },{ small: 'km/h' }],
        hover : [`Venus mean speed: v = 2π·a/P — a the chain’s osculating semi-major axis of date, P the λ̇-channel period of date (360°/n × 365.25 d × 24 h). The AU conversion (currentAUDistance) stays deep-time mutable`]},
       {label : () => `Current orbital velocity`,
@@ -43358,10 +43358,10 @@ const planetStats = {
        info  : 'https://en.wikipedia.org/wiki/Phase_angle_(astronomy)'},
     null,
       {label : () => `True Anomaly Rate (dν/dt)`,
-       value : [ { v: () => OrbitalFormulas.trueAnomalyRate(OrbitalFormulas.meanMotion((360/_kcNOfDate('venus', o.currentYear))*365.25), _kcElementsOfDate('venus', o.julianDay).e, o.venusTrueAnomaly), dec:6, sep:',' },{ small: '°/day' }],
+       value : [ { v: () => OrbitalFormulas.trueAnomalyRate(OrbitalFormulas.meanMotion((360/_kcNOfDate('venus', o.currentYear))*DAYS_PER_JULIAN_YEAR), _kcElementsOfDate('venus', o.julianDay).e, o.venusTrueAnomaly), dec:6, sep:',' },{ small: '°/day' }],
        hover : [`Rate of change of true anomaly: dν/dt = n(1+e·cos(ν))²/(1-e²)^1.5. Fastest at perihelion`]},
       {label : () => `Eccentric Anomaly Rate (dE/dt)`,
-       value : [ { v: () => OrbitalFormulas.eccentricAnomalyRate(OrbitalFormulas.meanMotion((360/_kcNOfDate('venus', o.currentYear))*365.25), _kcElementsOfDate('venus', o.julianDay).e, o.venusEccentricAnomaly), dec:6, sep:',' },{ small: '°/day' }],
+       value : [ { v: () => OrbitalFormulas.eccentricAnomalyRate(OrbitalFormulas.meanMotion((360/_kcNOfDate('venus', o.currentYear))*DAYS_PER_JULIAN_YEAR), _kcElementsOfDate('venus', o.julianDay).e, o.venusEccentricAnomaly), dec:6, sep:',' },{ small: '°/day' }],
        hover : [`Rate of change of eccentric anomaly: dE/dt = n / (1 - e×cos(E))`]},
       {label : () => `Radius of Curvature (ρ)`,
        value : [ { v: () => OrbitalFormulas.radiusOfCurvature(venusOrbitDistance * currentAUDistance, _kcElementsOfDate('venus', o.julianDay).e, o.venusTrueAnomaly), dec:0, sep:',' },{ small: 'km' }],
@@ -43369,10 +43369,10 @@ const planetStats = {
 
     {header : '—  Time Calculations —' },
       {label : () => `Time since perihelion`,
-       value : [ { v: () => OrbitalFormulas.timeSincePerihelion((360/_kcNOfDate('venus', o.currentYear))*365.25, o.venusMeanAnomaly), dec:2, sep:',' },{ small: 'days' }],
+       value : [ { v: () => OrbitalFormulas.timeSincePerihelion((360/_kcNOfDate('venus', o.currentYear))*DAYS_PER_JULIAN_YEAR, o.venusMeanAnomaly), dec:2, sep:',' },{ small: 'days' }],
        hover : [`Days elapsed since last perihelion passage: t = P × M / 360°`]},
       {label : () => `Time to next perihelion`,
-       value : [ { v: () => OrbitalFormulas.timeToNextPerihelion((360/_kcNOfDate('venus', o.currentYear))*365.25, o.venusMeanAnomaly), dec:2, sep:',' },{ small: 'days' }],
+       value : [ { v: () => OrbitalFormulas.timeToNextPerihelion((360/_kcNOfDate('venus', o.currentYear))*DAYS_PER_JULIAN_YEAR, o.venusMeanAnomaly), dec:2, sep:',' },{ small: 'days' }],
        hover : [`Days until next perihelion passage: t = P × (360° - M) / 360°`]},
 
     {header : '—  Perihelion Precession (apsidal · g) —' },
@@ -43478,20 +43478,20 @@ const planetStats = {
        value : [ { v: () => 360/_kcNOfDate('mars', o.currentYear), dec:6, sep:',' },{ small: 'Julian years' }],
        hover : [`Mars's sidereal orbital period OF DATE: P = 360°/n with n from the model's own banked λ̇ channel — λ̇₀ (the ±10-Myr run's secular J2000 rate, 2-kyr window: it averages the great-inequality-class wiggles a short era-window fit absorbs, and matches JPL-class periods) × the planet's own constant-GM N-body drift (±10 Myr, clamped beyond) ÷ the Driver-2 mass-loss stretch (the model's falsifiable μ-leg). All factors ≡ 1 at J2000; Julian years = 365.25 SI days (the chain's clock is JD/TT). The era evaluator keeps its own fitted window rate — the measured decomposition split is banked in the artifact (Neptune −497 ppm the largest: a 300-yr window fit absorbs local U–N-inequality slope).`]},
       {label : () => `Orbital period (sidereal)`,
-       value : [ { v: () => (360/_kcNOfDate('mars', o.currentYear))*365.25, dec:6, sep:',' },{ small: 'days' }],
+       value : [ { v: () => (360/_kcNOfDate('mars', o.currentYear))*DAYS_PER_JULIAN_YEAR, dec:6, sep:',' },{ small: 'days' }],
        hover : [`Mars's sidereal period of date in SI days: P = (360°/n) × 365.25, n from the banked λ̇ channel (secular J2000 rate × own N-body drift ÷ Driver-2 mass-loss stretch, each ≡ 1 at J2000). Agreement with JPL-class periods is a result, not an input.`]},
       {label : () => `Orbit Period Synodic`,
-       value : [ { v: () => (360/Math.abs(_kcNOfDate('mars', o.currentYear) - _kcNOfDate('earth', o.currentYear)))*365.25, dec:6, sep:',' },{ small: 'days' }],
+       value : [ { v: () => (360/Math.abs(_kcNOfDate('mars', o.currentYear) - _kcNOfDate('earth', o.currentYear)))*DAYS_PER_JULIAN_YEAR, dec:6, sep:',' },{ small: 'days' }],
        hover : [`Mars's synodic period with Earth, of date: P = 360°/|n_Mars − n_Earth| × 365.25 — both mean motions from the banked λ̇ channels (each body's own N-body drift; the shared mass-loss stretch scales both, so the synodic period stretches with them). SI days.`]},
       {label : () => `Mean Motion (n)`,
-       value : [ { v: () => _kcNOfDate('mars', o.currentYear)/365.25, dec:6, sep:',' },{ small: '°/day' }],
+       value : [ { v: () => _kcNOfDate('mars', o.currentYear)/DAYS_PER_JULIAN_YEAR, dec:6, sep:',' },{ small: '°/day' }],
        hover : [`The banked λ̇ channel of date (degrees per Julian year: secular J2000 rate × the planet's own N-body drift ÷ the Driver-2 mass-loss stretch), converted to °/SI-day by ÷365.25 — a pure unit conversion; the chain's clock is JD/TT. (365.2422 is Earth's measured mean solar year — an Earth observable that plays no role in another planet's clock.)`]},
       {label : () => `Period (Kepler verification)`,
        value : [ { v: () => OrbitalFormulas.keplerPeriod(marsOrbitDistance * currentAUDistance), dec:6, sep:',' },{ small: 'days' }],
        hover : [`Kepler's 3rd Law: P = 2π√(a³/(GM_Sun + GM_Earth)) × (meanSolar/meanSidereal ≈ 0.99996). The system-mass denominator anchors the model's AU and applies to every planet. Algebraically identical to the elaborate two-body form P = 2π√((a−Δa)³/(GM_Sun + GM_Earth − GM_body)) with the exact symmetric Δa = a·(1 − ((GM_Sun + GM_Earth − GM_body)/(GM_Sun + GM_Earth))^(1/3)) — the (a−Δa)³ and (GM_sys − GM_body) terms cancel exactly (see doc 24). The compensation factor reconciles the model's dual year-frame: GM is derived in sidereal-year units, orbit distances in solar-year units via long-term-mean ratios. Deliberately stays on the DEVICE inputs — this row verifies the model’s GM↔AU closure, not the ephemeris; the surrounding rows are the chain’s dynamical values.`]},
     null,
       {label : () => `Length of Day`,
-       value : [ { v: () => (marsRotationPeriod*(((360/_kcNOfDate('mars', o.currentYear))*365.25)*24))/((((360/_kcNOfDate('mars', o.currentYear))*365.25)*24)-marsRotationPeriod), dec:6, sep:',' }, { small : 'hours' }],
+       value : [ { v: () => (marsRotationPeriod*(((360/_kcNOfDate('mars', o.currentYear))*DAYS_PER_JULIAN_YEAR)*24))/((((360/_kcNOfDate('mars', o.currentYear))*DAYS_PER_JULIAN_YEAR)*24)-marsRotationPeriod), dec:6, sep:',' }, { small : 'hours' }],
        hover : [`Martian solar day (sol) ≈ 24h 39m. Very close to Earth's day, enabling human-like work schedules`]},
       {label : () => `Length of Sidereal Day`,
        value : [ { v: () => marsRotationPeriod, dec:6, sep:',' },{ small: 'hours' }],
@@ -43528,7 +43528,7 @@ const planetStats = {
 
     {header : '—  Velocities —' },
       {label : () => `Mean orbital speed`,
-       value : [ { v: () => (_kcOrbEl('mars').aAU * currentAUDistance * Math.PI * 2) / (((360/_kcNOfDate('mars', o.currentYear))*365.25)*24),
+       value : [ { v: () => (_kcOrbEl('mars').aAU * currentAUDistance * Math.PI * 2) / (((360/_kcNOfDate('mars', o.currentYear))*DAYS_PER_JULIAN_YEAR)*24),
                    dec:2, sep:',' },{ small: 'km/h' }],
        hover : [`Mars mean speed: v = 2π·a/P — a the chain’s osculating semi-major axis of date, P the λ̇-channel period of date (360°/n × 365.25 d × 24 h). The AU conversion (currentAUDistance) stays deep-time mutable`]},
       {label : () => `Current orbital velocity`,
@@ -43668,10 +43668,10 @@ const planetStats = {
        info  : 'https://en.wikipedia.org/wiki/Phase_angle_(astronomy)'},
     null,
       {label : () => `True Anomaly Rate (dν/dt)`,
-       value : [ { v: () => OrbitalFormulas.trueAnomalyRate(OrbitalFormulas.meanMotion((360/_kcNOfDate('mars', o.currentYear))*365.25), _kcElementsOfDate('mars', o.julianDay).e, o.marsTrueAnomaly), dec:6, sep:',' },{ small: '°/day' }],
+       value : [ { v: () => OrbitalFormulas.trueAnomalyRate(OrbitalFormulas.meanMotion((360/_kcNOfDate('mars', o.currentYear))*DAYS_PER_JULIAN_YEAR), _kcElementsOfDate('mars', o.julianDay).e, o.marsTrueAnomaly), dec:6, sep:',' },{ small: '°/day' }],
        hover : [`Rate of change of true anomaly: dν/dt = n(1+e·cos(ν))²/(1-e²)^1.5. Fastest at perihelion`]},
       {label : () => `Eccentric Anomaly Rate (dE/dt)`,
-       value : [ { v: () => OrbitalFormulas.eccentricAnomalyRate(OrbitalFormulas.meanMotion((360/_kcNOfDate('mars', o.currentYear))*365.25), _kcElementsOfDate('mars', o.julianDay).e, o.marsEccentricAnomaly), dec:6, sep:',' },{ small: '°/day' }],
+       value : [ { v: () => OrbitalFormulas.eccentricAnomalyRate(OrbitalFormulas.meanMotion((360/_kcNOfDate('mars', o.currentYear))*DAYS_PER_JULIAN_YEAR), _kcElementsOfDate('mars', o.julianDay).e, o.marsEccentricAnomaly), dec:6, sep:',' },{ small: '°/day' }],
        hover : [`Rate of change of eccentric anomaly: dE/dt = n / (1 - e×cos(E))`]},
       {label : () => `Radius of Curvature (ρ)`,
        value : [ { v: () => OrbitalFormulas.radiusOfCurvature(marsOrbitDistance * currentAUDistance, _kcElementsOfDate('mars', o.julianDay).e, o.marsTrueAnomaly), dec:0, sep:',' },{ small: 'km' }],
@@ -43679,10 +43679,10 @@ const planetStats = {
 
     {header : '—  Time Calculations —' },
       {label : () => `Time since perihelion`,
-       value : [ { v: () => OrbitalFormulas.timeSincePerihelion((360/_kcNOfDate('mars', o.currentYear))*365.25, o.marsMeanAnomaly), dec:2, sep:',' },{ small: 'days' }],
+       value : [ { v: () => OrbitalFormulas.timeSincePerihelion((360/_kcNOfDate('mars', o.currentYear))*DAYS_PER_JULIAN_YEAR, o.marsMeanAnomaly), dec:2, sep:',' },{ small: 'days' }],
        hover : [`Days elapsed since last perihelion passage: t = P × M / 360°`]},
       {label : () => `Time to next perihelion`,
-       value : [ { v: () => OrbitalFormulas.timeToNextPerihelion((360/_kcNOfDate('mars', o.currentYear))*365.25, o.marsMeanAnomaly), dec:2, sep:',' },{ small: 'days' }],
+       value : [ { v: () => OrbitalFormulas.timeToNextPerihelion((360/_kcNOfDate('mars', o.currentYear))*DAYS_PER_JULIAN_YEAR, o.marsMeanAnomaly), dec:2, sep:',' },{ small: 'days' }],
        hover : [`Days until next perihelion passage: t = P × (360° - M) / 360°`]},
 
     {header : '—  Perihelion Precession (apsidal · g) —' },
@@ -43792,20 +43792,20 @@ const planetStats = {
        value : [ { v: () => 360/_kcNOfDate('jupiter', o.currentYear), dec:6, sep:',' },{ small: 'Julian years' }],
        hover : [`Jupiter's sidereal orbital period OF DATE: P = 360°/n with n from the model's own banked λ̇ channel — λ̇₀ (the ±10-Myr run's secular J2000 rate, 2-kyr window: it averages the great-inequality-class wiggles a short era-window fit absorbs, and matches JPL-class periods) × the planet's own constant-GM N-body drift (±10 Myr, clamped beyond) ÷ the Driver-2 mass-loss stretch (the model's falsifiable μ-leg). All factors ≡ 1 at J2000; Julian years = 365.25 SI days (the chain's clock is JD/TT). The era evaluator keeps its own fitted window rate — the measured decomposition split is banked in the artifact (Neptune −497 ppm the largest: a 300-yr window fit absorbs local U–N-inequality slope).`]},
       {label : () => `Orbital period (sidereal)`,
-       value : [ { v: () => (360/_kcNOfDate('jupiter', o.currentYear))*365.25, dec:6, sep:',' },{ small: 'days' }],
+       value : [ { v: () => (360/_kcNOfDate('jupiter', o.currentYear))*DAYS_PER_JULIAN_YEAR, dec:6, sep:',' },{ small: 'days' }],
        hover : [`Jupiter's sidereal period of date in SI days: P = (360°/n) × 365.25, n from the banked λ̇ channel (secular J2000 rate × own N-body drift ÷ Driver-2 mass-loss stretch, each ≡ 1 at J2000). Agreement with JPL-class periods is a result, not an input.`]},
       {label : () => `Orbit Period Synodic`,
-       value : [ { v: () => (360/Math.abs(_kcNOfDate('jupiter', o.currentYear) - _kcNOfDate('earth', o.currentYear)))*365.25, dec:6, sep:',' },{ small: 'days' }],
+       value : [ { v: () => (360/Math.abs(_kcNOfDate('jupiter', o.currentYear) - _kcNOfDate('earth', o.currentYear)))*DAYS_PER_JULIAN_YEAR, dec:6, sep:',' },{ small: 'days' }],
        hover : [`Jupiter's synodic period with Earth, of date: P = 360°/|n_Jupiter − n_Earth| × 365.25 — both mean motions from the banked λ̇ channels (each body's own N-body drift; the shared mass-loss stretch scales both, so the synodic period stretches with them). SI days.`]},
       {label : () => `Mean Motion (n)`,
-       value : [ { v: () => _kcNOfDate('jupiter', o.currentYear)/365.25, dec:6, sep:',' },{ small: '°/day' }],
+       value : [ { v: () => _kcNOfDate('jupiter', o.currentYear)/DAYS_PER_JULIAN_YEAR, dec:6, sep:',' },{ small: '°/day' }],
        hover : [`The banked λ̇ channel of date (degrees per Julian year: secular J2000 rate × the planet's own N-body drift ÷ the Driver-2 mass-loss stretch), converted to °/SI-day by ÷365.25 — a pure unit conversion; the chain's clock is JD/TT. (365.2422 is Earth's measured mean solar year — an Earth observable that plays no role in another planet's clock.)`]},
       {label : () => `Period (Kepler verification)`,
        value : [ { v: () => OrbitalFormulas.keplerPeriod(jupiterOrbitDistance * currentAUDistance), dec:6, sep:',' },{ small: 'days' }],
        hover : [`Kepler's 3rd Law: P = 2π√(a³/(GM_Sun + GM_Earth)) × (meanSolar/meanSidereal ≈ 0.99996). The system-mass denominator anchors the model's AU and applies to every planet. Algebraically identical to the elaborate two-body form P = 2π√((a−Δa)³/(GM_Sun + GM_Earth − GM_body)) with the exact symmetric Δa = a·(1 − ((GM_Sun + GM_Earth − GM_body)/(GM_Sun + GM_Earth))^(1/3)) — the (a−Δa)³ and (GM_sys − GM_body) terms cancel exactly (see doc 24). The compensation factor reconciles the model's dual year-frame: GM is derived in sidereal-year units, orbit distances in solar-year units via long-term-mean ratios. Deliberately stays on the DEVICE inputs — this row verifies the model’s GM↔AU closure, not the ephemeris; the surrounding rows are the chain’s dynamical values.`]},
     null,
       {label : () => `Length of Day`,
-       value : [ { v: () => (jupiterRotationPeriod*(((360/_kcNOfDate('jupiter', o.currentYear))*365.25)*24))/((((360/_kcNOfDate('jupiter', o.currentYear))*365.25)*24)-jupiterRotationPeriod), dec:6, sep:',' }, { small : 'hours' }],
+       value : [ { v: () => (jupiterRotationPeriod*(((360/_kcNOfDate('jupiter', o.currentYear))*DAYS_PER_JULIAN_YEAR)*24))/((((360/_kcNOfDate('jupiter', o.currentYear))*DAYS_PER_JULIAN_YEAR)*24)-jupiterRotationPeriod), dec:6, sep:',' }, { small : 'hours' }],
        hover : [`Jupiter's solar day ≈ 9h 55m. Fastest-rotating planet, causing a visible equatorial bulge`]},
       {label : () => `Length of Sidereal Day`,
        value : [ { v: () => jupiterRotationPeriod, dec:6, sep:',' },{ small: 'hours' }],
@@ -43842,7 +43842,7 @@ const planetStats = {
 
     {header : '—  Velocities —' },
       {label : () => `Mean orbital speed`,
-       value : [ { v: () => (_kcOrbEl('jupiter').aAU * currentAUDistance * Math.PI * 2) / (((360/_kcNOfDate('jupiter', o.currentYear))*365.25)*24),
+       value : [ { v: () => (_kcOrbEl('jupiter').aAU * currentAUDistance * Math.PI * 2) / (((360/_kcNOfDate('jupiter', o.currentYear))*DAYS_PER_JULIAN_YEAR)*24),
                    dec:2, sep:',' },{ small: 'km/h' }],
        hover : [`Jupiter mean speed: v = 2π·a/P — a the chain’s osculating semi-major axis of date, P the λ̇-channel period of date (360°/n × 365.25 d × 24 h). The AU conversion (currentAUDistance) stays deep-time mutable`]},
       {label : () => `Current orbital velocity`,
@@ -43981,10 +43981,10 @@ const planetStats = {
        info  : 'https://en.wikipedia.org/wiki/Phase_angle_(astronomy)'},
     null,
       {label : () => `True Anomaly Rate (dν/dt)`,
-       value : [ { v: () => OrbitalFormulas.trueAnomalyRate(OrbitalFormulas.meanMotion((360/_kcNOfDate('jupiter', o.currentYear))*365.25), _kcElementsOfDate('jupiter', o.julianDay).e, o.jupiterTrueAnomaly), dec:6, sep:',' },{ small: '°/day' }],
+       value : [ { v: () => OrbitalFormulas.trueAnomalyRate(OrbitalFormulas.meanMotion((360/_kcNOfDate('jupiter', o.currentYear))*DAYS_PER_JULIAN_YEAR), _kcElementsOfDate('jupiter', o.julianDay).e, o.jupiterTrueAnomaly), dec:6, sep:',' },{ small: '°/day' }],
        hover : [`Rate of change of true anomaly: dν/dt = n(1+e·cos(ν))²/(1-e²)^1.5. Fastest at perihelion`]},
       {label : () => `Eccentric Anomaly Rate (dE/dt)`,
-       value : [ { v: () => OrbitalFormulas.eccentricAnomalyRate(OrbitalFormulas.meanMotion((360/_kcNOfDate('jupiter', o.currentYear))*365.25), _kcElementsOfDate('jupiter', o.julianDay).e, o.jupiterEccentricAnomaly), dec:6, sep:',' },{ small: '°/day' }],
+       value : [ { v: () => OrbitalFormulas.eccentricAnomalyRate(OrbitalFormulas.meanMotion((360/_kcNOfDate('jupiter', o.currentYear))*DAYS_PER_JULIAN_YEAR), _kcElementsOfDate('jupiter', o.julianDay).e, o.jupiterEccentricAnomaly), dec:6, sep:',' },{ small: '°/day' }],
        hover : [`Rate of change of eccentric anomaly: dE/dt = n / (1 - e×cos(E))`]},
       {label : () => `Radius of Curvature (ρ)`,
        value : [ { v: () => OrbitalFormulas.radiusOfCurvature(jupiterOrbitDistance * currentAUDistance, _kcElementsOfDate('jupiter', o.julianDay).e, o.jupiterTrueAnomaly), dec:0, sep:',' },{ small: 'km' }],
@@ -43992,10 +43992,10 @@ const planetStats = {
 
     {header : '—  Time Calculations —' },
       {label : () => `Time since perihelion`,
-       value : [ { v: () => OrbitalFormulas.timeSincePerihelion((360/_kcNOfDate('jupiter', o.currentYear))*365.25, o.jupiterMeanAnomaly), dec:2, sep:',' },{ small: 'days' }],
+       value : [ { v: () => OrbitalFormulas.timeSincePerihelion((360/_kcNOfDate('jupiter', o.currentYear))*DAYS_PER_JULIAN_YEAR, o.jupiterMeanAnomaly), dec:2, sep:',' },{ small: 'days' }],
        hover : [`Days elapsed since last perihelion passage: t = P × M / 360°`]},
       {label : () => `Time to next perihelion`,
-       value : [ { v: () => OrbitalFormulas.timeToNextPerihelion((360/_kcNOfDate('jupiter', o.currentYear))*365.25, o.jupiterMeanAnomaly), dec:2, sep:',' },{ small: 'days' }],
+       value : [ { v: () => OrbitalFormulas.timeToNextPerihelion((360/_kcNOfDate('jupiter', o.currentYear))*DAYS_PER_JULIAN_YEAR, o.jupiterMeanAnomaly), dec:2, sep:',' },{ small: 'days' }],
        hover : [`Days until next perihelion passage: t = P × (360° - M) / 360°`]},
 
     {header : '—  Perihelion Precession (apsidal · g) —' },
@@ -44101,20 +44101,20 @@ const planetStats = {
        value : [ { v: () => 360/_kcNOfDate('saturn', o.currentYear), dec:6, sep:',' },{ small: 'Julian years' }],
        hover : [`Saturn's sidereal orbital period OF DATE: P = 360°/n with n from the model's own banked λ̇ channel — λ̇₀ (the ±10-Myr run's secular J2000 rate, 2-kyr window: it averages the great-inequality-class wiggles a short era-window fit absorbs, and matches JPL-class periods) × the planet's own constant-GM N-body drift (±10 Myr, clamped beyond) ÷ the Driver-2 mass-loss stretch (the model's falsifiable μ-leg). All factors ≡ 1 at J2000; Julian years = 365.25 SI days (the chain's clock is JD/TT). The era evaluator keeps its own fitted window rate — the measured decomposition split is banked in the artifact (Neptune −497 ppm the largest: a 300-yr window fit absorbs local U–N-inequality slope).`]},
       {label : () => `Orbital period (sidereal)`,
-       value : [ { v: () => (360/_kcNOfDate('saturn', o.currentYear))*365.25, dec:6, sep:',' },{ small: 'days' }],
+       value : [ { v: () => (360/_kcNOfDate('saturn', o.currentYear))*DAYS_PER_JULIAN_YEAR, dec:6, sep:',' },{ small: 'days' }],
        hover : [`Saturn's sidereal period of date in SI days: P = (360°/n) × 365.25, n from the banked λ̇ channel (secular J2000 rate × own N-body drift ÷ Driver-2 mass-loss stretch, each ≡ 1 at J2000). Agreement with JPL-class periods is a result, not an input.`]},
       {label : () => `Orbit Period Synodic`,
-       value : [ { v: () => (360/Math.abs(_kcNOfDate('saturn', o.currentYear) - _kcNOfDate('earth', o.currentYear)))*365.25, dec:6, sep:',' },{ small: 'days' }],
+       value : [ { v: () => (360/Math.abs(_kcNOfDate('saturn', o.currentYear) - _kcNOfDate('earth', o.currentYear)))*DAYS_PER_JULIAN_YEAR, dec:6, sep:',' },{ small: 'days' }],
        hover : [`Saturn's synodic period with Earth, of date: P = 360°/|n_Saturn − n_Earth| × 365.25 — both mean motions from the banked λ̇ channels (each body's own N-body drift; the shared mass-loss stretch scales both, so the synodic period stretches with them). SI days.`]},
       {label : () => `Mean Motion (n)`,
-       value : [ { v: () => _kcNOfDate('saturn', o.currentYear)/365.25, dec:6, sep:',' },{ small: '°/day' }],
+       value : [ { v: () => _kcNOfDate('saturn', o.currentYear)/DAYS_PER_JULIAN_YEAR, dec:6, sep:',' },{ small: '°/day' }],
        hover : [`The banked λ̇ channel of date (degrees per Julian year: secular J2000 rate × the planet's own N-body drift ÷ the Driver-2 mass-loss stretch), converted to °/SI-day by ÷365.25 — a pure unit conversion; the chain's clock is JD/TT. (365.2422 is Earth's measured mean solar year — an Earth observable that plays no role in another planet's clock.)`]},
       {label : () => `Period (Kepler verification)`,
        value : [ { v: () => OrbitalFormulas.keplerPeriod(saturnOrbitDistance * currentAUDistance), dec:6, sep:',' },{ small: 'days' }],
        hover : [`Kepler's 3rd Law: P = 2π√(a³/(GM_Sun + GM_Earth)) × (meanSolar/meanSidereal ≈ 0.99996). The system-mass denominator anchors the model's AU and applies to every planet. Algebraically identical to the elaborate two-body form P = 2π√((a−Δa)³/(GM_Sun + GM_Earth − GM_body)) with the exact symmetric Δa = a·(1 − ((GM_Sun + GM_Earth − GM_body)/(GM_Sun + GM_Earth))^(1/3)) — the (a−Δa)³ and (GM_sys − GM_body) terms cancel exactly (see doc 24). The compensation factor reconciles the model's dual year-frame: GM is derived in sidereal-year units, orbit distances in solar-year units via long-term-mean ratios. Deliberately stays on the DEVICE inputs — this row verifies the model’s GM↔AU closure, not the ephemeris; the surrounding rows are the chain’s dynamical values.`]},
     null,
       {label : () => `Length of Day`,
-       value : [ { v: () => (saturnRotationPeriod*(((360/_kcNOfDate('saturn', o.currentYear))*365.25)*24))/((((360/_kcNOfDate('saturn', o.currentYear))*365.25)*24)-saturnRotationPeriod), dec:6, sep:',' }, { small : 'hours' }],
+       value : [ { v: () => (saturnRotationPeriod*(((360/_kcNOfDate('saturn', o.currentYear))*DAYS_PER_JULIAN_YEAR)*24))/((((360/_kcNOfDate('saturn', o.currentYear))*DAYS_PER_JULIAN_YEAR)*24)-saturnRotationPeriod), dec:6, sep:',' }, { small : 'hours' }],
        hover : [`Saturn's solar day ≈ 10h 34m. Second fastest rotation, determined from Cassini radio emissions`]},
       {label : () => `Length of Sidereal Day`,
        value : [ { v: () => saturnRotationPeriod, dec:6, sep:',' },{ small: 'hours' }],
@@ -44151,7 +44151,7 @@ const planetStats = {
 
     {header : '—  Velocities —' },
       {label : () => `Mean orbital speed`,
-       value : [ { v: () => (_kcOrbEl('saturn').aAU * currentAUDistance * Math.PI * 2) / (((360/_kcNOfDate('saturn', o.currentYear))*365.25)*24),
+       value : [ { v: () => (_kcOrbEl('saturn').aAU * currentAUDistance * Math.PI * 2) / (((360/_kcNOfDate('saturn', o.currentYear))*DAYS_PER_JULIAN_YEAR)*24),
                    dec:2, sep:',' },{ small: 'km/h' }],
        hover : [`Saturn mean speed: v = 2π·a/P — a the chain’s osculating semi-major axis of date, P the λ̇-channel period of date (360°/n × 365.25 d × 24 h). The AU conversion (currentAUDistance) stays deep-time mutable`]},
       {label : () => `Current orbital velocity`,
@@ -44291,10 +44291,10 @@ const planetStats = {
        info  : 'https://en.wikipedia.org/wiki/Phase_angle_(astronomy)'},
     null,
       {label : () => `True Anomaly Rate (dν/dt)`,
-       value : [ { v: () => OrbitalFormulas.trueAnomalyRate(OrbitalFormulas.meanMotion((360/_kcNOfDate('saturn', o.currentYear))*365.25), _kcElementsOfDate('saturn', o.julianDay).e, o.saturnTrueAnomaly), dec:6, sep:',' },{ small: '°/day' }],
+       value : [ { v: () => OrbitalFormulas.trueAnomalyRate(OrbitalFormulas.meanMotion((360/_kcNOfDate('saturn', o.currentYear))*DAYS_PER_JULIAN_YEAR), _kcElementsOfDate('saturn', o.julianDay).e, o.saturnTrueAnomaly), dec:6, sep:',' },{ small: '°/day' }],
        hover : [`Rate of change of true anomaly: dν/dt = n(1+e·cos(ν))²/(1-e²)^1.5. Fastest at perihelion`]},
       {label : () => `Eccentric Anomaly Rate (dE/dt)`,
-       value : [ { v: () => OrbitalFormulas.eccentricAnomalyRate(OrbitalFormulas.meanMotion((360/_kcNOfDate('saturn', o.currentYear))*365.25), _kcElementsOfDate('saturn', o.julianDay).e, o.saturnEccentricAnomaly), dec:6, sep:',' },{ small: '°/day' }],
+       value : [ { v: () => OrbitalFormulas.eccentricAnomalyRate(OrbitalFormulas.meanMotion((360/_kcNOfDate('saturn', o.currentYear))*DAYS_PER_JULIAN_YEAR), _kcElementsOfDate('saturn', o.julianDay).e, o.saturnEccentricAnomaly), dec:6, sep:',' },{ small: '°/day' }],
        hover : [`Rate of change of eccentric anomaly: dE/dt = n / (1 - e×cos(E))`]},
       {label : () => `Radius of Curvature (ρ)`,
        value : [ { v: () => OrbitalFormulas.radiusOfCurvature(saturnOrbitDistance * currentAUDistance, _kcElementsOfDate('saturn', o.julianDay).e, o.saturnTrueAnomaly), dec:0, sep:',' },{ small: 'km' }],
@@ -44302,10 +44302,10 @@ const planetStats = {
 
     {header : '—  Time Calculations —' },
       {label : () => `Time since perihelion`,
-       value : [ { v: () => OrbitalFormulas.timeSincePerihelion((360/_kcNOfDate('saturn', o.currentYear))*365.25, o.saturnMeanAnomaly), dec:2, sep:',' },{ small: 'days' }],
+       value : [ { v: () => OrbitalFormulas.timeSincePerihelion((360/_kcNOfDate('saturn', o.currentYear))*DAYS_PER_JULIAN_YEAR, o.saturnMeanAnomaly), dec:2, sep:',' },{ small: 'days' }],
        hover : [`Days elapsed since last perihelion passage: t = P × M / 360°`]},
       {label : () => `Time to next perihelion`,
-       value : [ { v: () => OrbitalFormulas.timeToNextPerihelion((360/_kcNOfDate('saturn', o.currentYear))*365.25, o.saturnMeanAnomaly), dec:2, sep:',' },{ small: 'days' }],
+       value : [ { v: () => OrbitalFormulas.timeToNextPerihelion((360/_kcNOfDate('saturn', o.currentYear))*DAYS_PER_JULIAN_YEAR, o.saturnMeanAnomaly), dec:2, sep:',' },{ small: 'days' }],
        hover : [`Days until next perihelion passage: t = P × (360° - M) / 360°`]},
 
     {header : '—  Perihelion Precession (apsidal · g) —' },
@@ -44411,20 +44411,20 @@ const planetStats = {
        value : [ { v: () => 360/_kcNOfDate('uranus', o.currentYear), dec:6, sep:',' },{ small: 'Julian years' }],
        hover : [`Uranus's sidereal orbital period OF DATE: P = 360°/n with n from the model's own banked λ̇ channel — λ̇₀ (the ±10-Myr run's secular J2000 rate, 2-kyr window: it averages the great-inequality-class wiggles a short era-window fit absorbs, and matches JPL-class periods) × the planet's own constant-GM N-body drift (±10 Myr, clamped beyond) ÷ the Driver-2 mass-loss stretch (the model's falsifiable μ-leg). All factors ≡ 1 at J2000; Julian years = 365.25 SI days (the chain's clock is JD/TT). The era evaluator keeps its own fitted window rate — the measured decomposition split is banked in the artifact (Neptune −497 ppm the largest: a 300-yr window fit absorbs local U–N-inequality slope).`]},
       {label : () => `Orbital period (sidereal)`,
-       value : [ { v: () => (360/_kcNOfDate('uranus', o.currentYear))*365.25, dec:6, sep:',' },{ small: 'days' }],
+       value : [ { v: () => (360/_kcNOfDate('uranus', o.currentYear))*DAYS_PER_JULIAN_YEAR, dec:6, sep:',' },{ small: 'days' }],
        hover : [`Uranus's sidereal period of date in SI days: P = (360°/n) × 365.25, n from the banked λ̇ channel (secular J2000 rate × own N-body drift ÷ Driver-2 mass-loss stretch, each ≡ 1 at J2000). Agreement with JPL-class periods is a result, not an input.`]},
       {label : () => `Orbit Period Synodic`,
-       value : [ { v: () => (360/Math.abs(_kcNOfDate('uranus', o.currentYear) - _kcNOfDate('earth', o.currentYear)))*365.25, dec:6, sep:',' },{ small: 'days' }],
+       value : [ { v: () => (360/Math.abs(_kcNOfDate('uranus', o.currentYear) - _kcNOfDate('earth', o.currentYear)))*DAYS_PER_JULIAN_YEAR, dec:6, sep:',' },{ small: 'days' }],
        hover : [`Uranus's synodic period with Earth, of date: P = 360°/|n_Uranus − n_Earth| × 365.25 — both mean motions from the banked λ̇ channels (each body's own N-body drift; the shared mass-loss stretch scales both, so the synodic period stretches with them). SI days.`]},
       {label : () => `Mean Motion (n)`,
-       value : [ { v: () => _kcNOfDate('uranus', o.currentYear)/365.25, dec:6, sep:',' },{ small: '°/day' }],
+       value : [ { v: () => _kcNOfDate('uranus', o.currentYear)/DAYS_PER_JULIAN_YEAR, dec:6, sep:',' },{ small: '°/day' }],
        hover : [`The banked λ̇ channel of date (degrees per Julian year: secular J2000 rate × the planet's own N-body drift ÷ the Driver-2 mass-loss stretch), converted to °/SI-day by ÷365.25 — a pure unit conversion; the chain's clock is JD/TT. (365.2422 is Earth's measured mean solar year — an Earth observable that plays no role in another planet's clock.)`]},
       {label : () => `Period (Kepler verification)`,
        value : [ { v: () => OrbitalFormulas.keplerPeriod(uranusOrbitDistance * currentAUDistance), dec:6, sep:',' },{ small: 'days' }],
        hover : [`Kepler's 3rd Law: P = 2π√(a³/(GM_Sun + GM_Earth)) × (meanSolar/meanSidereal ≈ 0.99996). The system-mass denominator anchors the model's AU and applies to every planet. Algebraically identical to the elaborate two-body form P = 2π√((a−Δa)³/(GM_Sun + GM_Earth − GM_body)) with the exact symmetric Δa = a·(1 − ((GM_Sun + GM_Earth − GM_body)/(GM_Sun + GM_Earth))^(1/3)) — the (a−Δa)³ and (GM_sys − GM_body) terms cancel exactly (see doc 24). The compensation factor reconciles the model's dual year-frame: GM is derived in sidereal-year units, orbit distances in solar-year units via long-term-mean ratios. Deliberately stays on the DEVICE inputs — this row verifies the model’s GM↔AU closure, not the ephemeris; the surrounding rows are the chain’s dynamical values.`]},
     null,
       {label : () => `Length of Day`,
-       value : [ { v: () => (uranusRotationPeriod*(((360/_kcNOfDate('uranus', o.currentYear))*365.25)*24))/((((360/_kcNOfDate('uranus', o.currentYear))*365.25)*24)+uranusRotationPeriod), dec:6, sep:',' }, { small : 'hours' }],
+       value : [ { v: () => (uranusRotationPeriod*(((360/_kcNOfDate('uranus', o.currentYear))*DAYS_PER_JULIAN_YEAR)*24))/((((360/_kcNOfDate('uranus', o.currentYear))*DAYS_PER_JULIAN_YEAR)*24)+uranusRotationPeriod), dec:6, sep:',' }, { small : 'hours' }],
        hover : [`Uranus's solar day ≈ 17h 14m. Extreme axial tilt makes solar/sidereal day relationship unusual`]},
       {label : () => `Length of Sidereal Day`,
        value : [ { v: () => uranusRotationPeriod, dec:6, sep:',' },{ small: 'hours' }],
@@ -44461,7 +44461,7 @@ const planetStats = {
 
     {header : '—  Velocities —' },
       {label : () => `Mean orbital speed`,
-       value : [ { v: () => (_kcOrbEl('uranus').aAU * currentAUDistance * Math.PI * 2) / (((360/_kcNOfDate('uranus', o.currentYear))*365.25)*24),
+       value : [ { v: () => (_kcOrbEl('uranus').aAU * currentAUDistance * Math.PI * 2) / (((360/_kcNOfDate('uranus', o.currentYear))*DAYS_PER_JULIAN_YEAR)*24),
                    dec:2, sep:',' },{ small: 'km/h' }],
        hover : [`Uranus mean speed: v = 2π·a/P — a the chain’s osculating semi-major axis of date, P the λ̇-channel period of date (360°/n × 365.25 d × 24 h). The AU conversion (currentAUDistance) stays deep-time mutable`]},
       {label : () => `Current orbital velocity`,
@@ -44601,10 +44601,10 @@ const planetStats = {
        info  : 'https://en.wikipedia.org/wiki/Phase_angle_(astronomy)'},
     null,
       {label : () => `True Anomaly Rate (dν/dt)`,
-       value : [ { v: () => OrbitalFormulas.trueAnomalyRate(OrbitalFormulas.meanMotion((360/_kcNOfDate('uranus', o.currentYear))*365.25), _kcElementsOfDate('uranus', o.julianDay).e, o.uranusTrueAnomaly), dec:6, sep:',' },{ small: '°/day' }],
+       value : [ { v: () => OrbitalFormulas.trueAnomalyRate(OrbitalFormulas.meanMotion((360/_kcNOfDate('uranus', o.currentYear))*DAYS_PER_JULIAN_YEAR), _kcElementsOfDate('uranus', o.julianDay).e, o.uranusTrueAnomaly), dec:6, sep:',' },{ small: '°/day' }],
        hover : [`Rate of change of true anomaly: dν/dt = n(1+e·cos(ν))²/(1-e²)^1.5. Fastest at perihelion`]},
       {label : () => `Eccentric Anomaly Rate (dE/dt)`,
-       value : [ { v: () => OrbitalFormulas.eccentricAnomalyRate(OrbitalFormulas.meanMotion((360/_kcNOfDate('uranus', o.currentYear))*365.25), _kcElementsOfDate('uranus', o.julianDay).e, o.uranusEccentricAnomaly), dec:6, sep:',' },{ small: '°/day' }],
+       value : [ { v: () => OrbitalFormulas.eccentricAnomalyRate(OrbitalFormulas.meanMotion((360/_kcNOfDate('uranus', o.currentYear))*DAYS_PER_JULIAN_YEAR), _kcElementsOfDate('uranus', o.julianDay).e, o.uranusEccentricAnomaly), dec:6, sep:',' },{ small: '°/day' }],
        hover : [`Rate of change of eccentric anomaly: dE/dt = n / (1 - e×cos(E))`]},
       {label : () => `Radius of Curvature (ρ)`,
        value : [ { v: () => OrbitalFormulas.radiusOfCurvature(uranusOrbitDistance * currentAUDistance, _kcElementsOfDate('uranus', o.julianDay).e, o.uranusTrueAnomaly), dec:0, sep:',' },{ small: 'km' }],
@@ -44612,10 +44612,10 @@ const planetStats = {
 
     {header : '—  Time Calculations —' },
       {label : () => `Time since perihelion`,
-       value : [ { v: () => OrbitalFormulas.timeSincePerihelion((360/_kcNOfDate('uranus', o.currentYear))*365.25, o.uranusMeanAnomaly), dec:2, sep:',' },{ small: 'days' }],
+       value : [ { v: () => OrbitalFormulas.timeSincePerihelion((360/_kcNOfDate('uranus', o.currentYear))*DAYS_PER_JULIAN_YEAR, o.uranusMeanAnomaly), dec:2, sep:',' },{ small: 'days' }],
        hover : [`Days elapsed since last perihelion passage: t = P × M / 360°`]},
       {label : () => `Time to next perihelion`,
-       value : [ { v: () => OrbitalFormulas.timeToNextPerihelion((360/_kcNOfDate('uranus', o.currentYear))*365.25, o.uranusMeanAnomaly), dec:2, sep:',' },{ small: 'days' }],
+       value : [ { v: () => OrbitalFormulas.timeToNextPerihelion((360/_kcNOfDate('uranus', o.currentYear))*DAYS_PER_JULIAN_YEAR, o.uranusMeanAnomaly), dec:2, sep:',' },{ small: 'days' }],
        hover : [`Days until next perihelion passage: t = P × (360° - M) / 360°`]},
 
     {header : '—  Perihelion Precession (apsidal · g) —' },
@@ -44721,20 +44721,20 @@ const planetStats = {
        value : [ { v: () => 360/_kcNOfDate('neptune', o.currentYear), dec:6, sep:',' },{ small: 'Julian years' }],
        hover : [`Neptune's sidereal orbital period OF DATE: P = 360°/n with n from the model's own banked λ̇ channel — λ̇₀ (the ±10-Myr run's secular J2000 rate, 2-kyr window: it averages the great-inequality-class wiggles a short era-window fit absorbs, and matches JPL-class periods) × the planet's own constant-GM N-body drift (±10 Myr, clamped beyond) ÷ the Driver-2 mass-loss stretch (the model's falsifiable μ-leg). All factors ≡ 1 at J2000; Julian years = 365.25 SI days (the chain's clock is JD/TT). The era evaluator keeps its own fitted window rate — the measured decomposition split is banked in the artifact (Neptune −497 ppm the largest: a 300-yr window fit absorbs local U–N-inequality slope).`]},
       {label : () => `Orbital period (sidereal)`,
-       value : [ { v: () => (360/_kcNOfDate('neptune', o.currentYear))*365.25, dec:6, sep:',' },{ small: 'days' }],
+       value : [ { v: () => (360/_kcNOfDate('neptune', o.currentYear))*DAYS_PER_JULIAN_YEAR, dec:6, sep:',' },{ small: 'days' }],
        hover : [`Neptune's sidereal period of date in SI days: P = (360°/n) × 365.25, n from the banked λ̇ channel (secular J2000 rate × own N-body drift ÷ Driver-2 mass-loss stretch, each ≡ 1 at J2000). Agreement with JPL-class periods is a result, not an input.`]},
       {label : () => `Orbit Period Synodic`,
-       value : [ { v: () => (360/Math.abs(_kcNOfDate('neptune', o.currentYear) - _kcNOfDate('earth', o.currentYear)))*365.25, dec:6, sep:',' },{ small: 'days' }],
+       value : [ { v: () => (360/Math.abs(_kcNOfDate('neptune', o.currentYear) - _kcNOfDate('earth', o.currentYear)))*DAYS_PER_JULIAN_YEAR, dec:6, sep:',' },{ small: 'days' }],
        hover : [`Neptune's synodic period with Earth, of date: P = 360°/|n_Neptune − n_Earth| × 365.25 — both mean motions from the banked λ̇ channels (each body's own N-body drift; the shared mass-loss stretch scales both, so the synodic period stretches with them). SI days.`]},
       {label : () => `Mean Motion (n)`,
-       value : [ { v: () => _kcNOfDate('neptune', o.currentYear)/365.25, dec:6, sep:',' },{ small: '°/day' }],
+       value : [ { v: () => _kcNOfDate('neptune', o.currentYear)/DAYS_PER_JULIAN_YEAR, dec:6, sep:',' },{ small: '°/day' }],
        hover : [`The banked λ̇ channel of date (degrees per Julian year: secular J2000 rate × the planet's own N-body drift ÷ the Driver-2 mass-loss stretch), converted to °/SI-day by ÷365.25 — a pure unit conversion; the chain's clock is JD/TT. (365.2422 is Earth's measured mean solar year — an Earth observable that plays no role in another planet's clock.)`]},
       {label : () => `Period (Kepler verification)`,
        value : [ { v: () => OrbitalFormulas.keplerPeriod(neptuneOrbitDistance * currentAUDistance), dec:6, sep:',' },{ small: 'days' }],
        hover : [`Kepler's 3rd Law: P = 2π√(a³/(GM_Sun + GM_Earth)) × (meanSolar/meanSidereal ≈ 0.99996). The system-mass denominator anchors the model's AU and applies to every planet. Algebraically identical to the elaborate two-body form P = 2π√((a−Δa)³/(GM_Sun + GM_Earth − GM_body)) with the exact symmetric Δa = a·(1 − ((GM_Sun + GM_Earth − GM_body)/(GM_Sun + GM_Earth))^(1/3)) — the (a−Δa)³ and (GM_sys − GM_body) terms cancel exactly (see doc 24). The compensation factor reconciles the model's dual year-frame: GM is derived in sidereal-year units, orbit distances in solar-year units via long-term-mean ratios. Deliberately stays on the DEVICE inputs — this row verifies the model’s GM↔AU closure, not the ephemeris; the surrounding rows are the chain’s dynamical values.`]},
     null,
       {label : () => `Length of Day`,
-       value : [ { v: () => (neptuneRotationPeriod*(((360/_kcNOfDate('neptune', o.currentYear))*365.25)*24))/((((360/_kcNOfDate('neptune', o.currentYear))*365.25)*24)-neptuneRotationPeriod), dec:6, sep:',' }, { small : 'hours' }],
+       value : [ { v: () => (neptuneRotationPeriod*(((360/_kcNOfDate('neptune', o.currentYear))*DAYS_PER_JULIAN_YEAR)*24))/((((360/_kcNOfDate('neptune', o.currentYear))*DAYS_PER_JULIAN_YEAR)*24)-neptuneRotationPeriod), dec:6, sep:',' }, { small : 'hours' }],
        hover : [`Neptune's solar day ≈ 16h 7m. Rotation rate determined from Voyager 2 magnetic field measurements`]},
       {label : () => `Length of Sidereal Day`,
        value : [ { v: () => neptuneRotationPeriod, dec:6, sep:',' },{ small: 'hours' }],
@@ -44771,7 +44771,7 @@ const planetStats = {
 
     {header : '—  Velocities —' },
       {label : () => `Mean orbital speed`,
-       value : [ { v: () => (_kcOrbEl('neptune').aAU * currentAUDistance * Math.PI * 2) / (((360/_kcNOfDate('neptune', o.currentYear))*365.25)*24),
+       value : [ { v: () => (_kcOrbEl('neptune').aAU * currentAUDistance * Math.PI * 2) / (((360/_kcNOfDate('neptune', o.currentYear))*DAYS_PER_JULIAN_YEAR)*24),
                    dec:2, sep:',' },{ small: 'km/h' }],
        hover : [`Neptune mean speed: v = 2π·a/P — a the chain’s osculating semi-major axis of date, P the λ̇-channel period of date (360°/n × 365.25 d × 24 h). The AU conversion (currentAUDistance) stays deep-time mutable`]},
       {label : () => `Current orbital velocity`,
@@ -44911,10 +44911,10 @@ const planetStats = {
        info  : 'https://en.wikipedia.org/wiki/Phase_angle_(astronomy)'},
     null,
       {label : () => `True Anomaly Rate (dν/dt)`,
-       value : [ { v: () => OrbitalFormulas.trueAnomalyRate(OrbitalFormulas.meanMotion((360/_kcNOfDate('neptune', o.currentYear))*365.25), _kcElementsOfDate('neptune', o.julianDay).e, o.neptuneTrueAnomaly), dec:6, sep:',' },{ small: '°/day' }],
+       value : [ { v: () => OrbitalFormulas.trueAnomalyRate(OrbitalFormulas.meanMotion((360/_kcNOfDate('neptune', o.currentYear))*DAYS_PER_JULIAN_YEAR), _kcElementsOfDate('neptune', o.julianDay).e, o.neptuneTrueAnomaly), dec:6, sep:',' },{ small: '°/day' }],
        hover : [`Rate of change of true anomaly: dν/dt = n(1+e·cos(ν))²/(1-e²)^1.5. Fastest at perihelion`]},
       {label : () => `Eccentric Anomaly Rate (dE/dt)`,
-       value : [ { v: () => OrbitalFormulas.eccentricAnomalyRate(OrbitalFormulas.meanMotion((360/_kcNOfDate('neptune', o.currentYear))*365.25), _kcElementsOfDate('neptune', o.julianDay).e, o.neptuneEccentricAnomaly), dec:6, sep:',' },{ small: '°/day' }],
+       value : [ { v: () => OrbitalFormulas.eccentricAnomalyRate(OrbitalFormulas.meanMotion((360/_kcNOfDate('neptune', o.currentYear))*DAYS_PER_JULIAN_YEAR), _kcElementsOfDate('neptune', o.julianDay).e, o.neptuneEccentricAnomaly), dec:6, sep:',' },{ small: '°/day' }],
        hover : [`Rate of change of eccentric anomaly: dE/dt = n / (1 - e×cos(E))`]},
       {label : () => `Radius of Curvature (ρ)`,
        value : [ { v: () => OrbitalFormulas.radiusOfCurvature(neptuneOrbitDistance * currentAUDistance, _kcElementsOfDate('neptune', o.julianDay).e, o.neptuneTrueAnomaly), dec:0, sep:',' },{ small: 'km' }],
@@ -44922,10 +44922,10 @@ const planetStats = {
 
     {header : '—  Time Calculations —' },
       {label : () => `Time since perihelion`,
-       value : [ { v: () => OrbitalFormulas.timeSincePerihelion((360/_kcNOfDate('neptune', o.currentYear))*365.25, o.neptuneMeanAnomaly), dec:2, sep:',' },{ small: 'days' }],
+       value : [ { v: () => OrbitalFormulas.timeSincePerihelion((360/_kcNOfDate('neptune', o.currentYear))*DAYS_PER_JULIAN_YEAR, o.neptuneMeanAnomaly), dec:2, sep:',' },{ small: 'days' }],
        hover : [`Days elapsed since last perihelion passage: t = P × M / 360°`]},
       {label : () => `Time to next perihelion`,
-       value : [ { v: () => OrbitalFormulas.timeToNextPerihelion((360/_kcNOfDate('neptune', o.currentYear))*365.25, o.neptuneMeanAnomaly), dec:2, sep:',' },{ small: 'days' }],
+       value : [ { v: () => OrbitalFormulas.timeToNextPerihelion((360/_kcNOfDate('neptune', o.currentYear))*DAYS_PER_JULIAN_YEAR, o.neptuneMeanAnomaly), dec:2, sep:',' },{ small: 'days' }],
        hover : [`Days until next perihelion passage: t = P × (360° - M) / 360°`]},
 
     {header : '—  Perihelion Precession (apsidal · g) —' },
@@ -45133,7 +45133,7 @@ function computeSunSSBOffset(year) {
   // The eight body vectors are the CHAIN's heliocentric positions of date
   // (ecliptic J2000, then projected into the plane). Δr = Σ M_b · r⃗_b / M_S
   // (doc 24 — a center-of-mass calculation, not a gravity simulation).
-  const jd = KC_ANCHOR_EPOCH_JD + (year - 2000) * 365.25;
+  const jd = KC_ANCHOR_EPOCH_JD + (year - 2000) * DAYS_PER_JULIAN_YEAR;
 
   const planetList = [
     { key: 'mercury', mass: M_MERCURY_SYSTEM },
@@ -45393,7 +45393,7 @@ function buildPerihelionChart(planetKey, currentYear) {
   if (!sMode) return '';
   const T = Math.abs(1296000 / sMode.arcsecPerYr);
   const N = 181;
-  const yrToJd = (y) => KC_ANCHOR_EPOCH_JD + (y - KC_ANCHOR_EPOCH_YEAR) * 365.25;
+  const yrToJd = (y) => KC_ANCHOR_EPOCH_JD + (y - KC_ANCHOR_EPOCH_YEAR) * DAYS_PER_JULIAN_YEAR;
   // Cycle windowing (owner convention): the window advances in WHOLE mode
   // periods — the J2000-centred span is the home cycle (k = 0); when the
   // simulation year crosses an edge the chart re-windows to the adjacent
@@ -46930,8 +46930,8 @@ function _kcApsidalPeriodYears(nameLower, jd) {
 // (CHAIN_ARTIFACT.s, Laskar-labeled) — the panel hover carries it.
 function _kcNodeInvPlanePeriodYears(nameLower, jd) {
   const D = 150;
-  const n1 = _kcElementsOfDate(nameLower, jd - D * 365.25).ascNodeInvPlaneDeg;
-  const n2 = _kcElementsOfDate(nameLower, jd + D * 365.25).ascNodeInvPlaneDeg;
+  const n1 = _kcElementsOfDate(nameLower, jd - D * DAYS_PER_JULIAN_YEAR).ascNodeInvPlaneDeg;
+  const n2 = _kcElementsOfDate(nameLower, jd + D * DAYS_PER_JULIAN_YEAR).ascNodeInvPlaneDeg;
   let d = n2 - n1;
   while (d > 180) d -= 360;
   while (d < -180) d += 360;
@@ -47058,7 +47058,7 @@ function _applyEngineEarthFrame(jdUT) {
   earthPerihelionPrecession2.orbitObj.rotation.y = -peri;
   earthPerihelionPrecession2.containerObj.position.x = -smp.e * 100;
   // the Sun at the certified longitude (true TT: the finder-axis API adds the curve, the bridge is ours)
-  const lam = _tierModelB().eclipse.sunLonCompletedDegAtJD(jdUT + deltaTStart / 86400) * (Math.PI / 180);
+  const lam = _tierModelB().eclipse.sunLonCompletedDegAtJD(jdUT + deltaTStart / SECONDS_PER_DAY) * (Math.PI / 180);
   sun.orbitObj.rotation.y = solveWheelAngleForLongitude(lam, smp.e, peri);
   // the axis
   _kcSetWorldRotation(earth.rotationAxis, _HTC_A.crossVectors(s, g), s, g);
@@ -47110,7 +47110,7 @@ function _kcChainWorldPos(obj, jd, out) {
     earth.rotationAxis.getWorldPosition(_KC_TE);
     toW(_kcHelioAU(nm, jd));
     const dAU = out.distanceTo(_KC_TE) / 100;
-    const tauDays = auToKm(dAU) / speedOfLight / 86400;
+    const tauDays = auToKm(dAU) / speedOfLight / SECONDS_PER_DAY;
     toW(_kcHelioAU(nm, jd - tauDays));
     return true;
   }
@@ -47350,7 +47350,7 @@ function _ssbUpdateMarker(jdUT) {
   // (its exact-argument memo makes a sliding window cheap), re-anchored to
   // its origin every frame
   if (_ssbPathMemoSeries !== _planetSeriesData) { _ssbPathMemo.clear(); _ssbPathMemoSeries = _planetSeriesData; for (const m of shown) m._pathY0 = null; }
-  const year = 2000 + (jdUT - KC_ANCHOR_EPOCH_JD) / 365.25;
+  const year = 2000 + (jdUT - KC_ANCHOR_EPOCH_JD) / DAYS_PER_JULIAN_YEAR;
   const y0 = Math.round((year - _SSB_PATH_HALF_YEARS) / _SSB_PATH_STEP_YEARS) * _SSB_PATH_STEP_YEARS;
   const nowMs = performance.now();
   for (const m of shown) {
@@ -47371,7 +47371,7 @@ function _ssbUpdateMarker(jdUT) {
         const yr = y0 + i * _SSB_PATH_STEP_YEARS;
         let off = _ssbPathMemo.get(yr);
         if (off === undefined) {
-          const v = _ssbOffsetWorld(KC_ANCHOR_EPOCH_JD + (yr - 2000) * 365.25, new THREE.Vector3());
+          const v = _ssbOffsetWorld(KC_ANCHOR_EPOCH_JD + (yr - 2000) * DAYS_PER_JULIAN_YEAR, new THREE.Vector3());
           off = [v.x, v.y, v.z];
           if (_ssbPathMemo.size >= 1024) _ssbPathMemo.delete(_ssbPathMemo.keys().next().value);
           _ssbPathMemo.set(yr, off);
@@ -47418,11 +47418,11 @@ function _kcUpdateOrbitLine(obj, nm, jd) {
   if (line._kcSampleJD === undefined || (Math.abs(jd - line._kcSampleJD) > _KC_ORBIT_RESAMPLE_DAYS
       && _resampleNowMs - (line._kcSampleMs ?? 0) >= 250)) {
     line._kcSampleMs = _resampleNowMs;
-    const pDays = 365.25 * Math.pow(_kcElementsOfDate(nm, jd).aAU, 1.5);   // Kepler III, solar-mass unit
+    const pDays = DAYS_PER_JULIAN_YEAR * Math.pow(_kcElementsOfDate(nm, jd).aAU, 1.5);   // Kepler III, solar-mass unit
     const arr = line.geometry.attributes.position.array;
     const yC = _engineYearTT(jd);   // ONE ΔT bridge per resample; the vertices step in Julian years (see _kcHelioAUAtEngineYear)
     for (let i = 0; i <= _KC_ORBIT_SEGS; i++) {
-      const hv = _kcHelioAUAtEngineYear(nm, yC + (i / _KC_ORBIT_SEGS - 0.5) * pDays / 365.25);
+      const hv = _kcHelioAUAtEngineYear(nm, yC + (i / _KC_ORBIT_SEGS - 0.5) * pDays / DAYS_PER_JULIAN_YEAR);
       arr[i * 3] = 100 * hv[0]; arr[i * 3 + 1] = 100 * hv[1]; arr[i * 3 + 2] = 100 * hv[2];
     }
     line.geometry.attributes.position.needsUpdate = true;
@@ -47528,7 +47528,7 @@ function _k8UpdateGhostOrbit(name, ghost) {
   const jd = o.julianDay;
   if (line._k8SampleJD === undefined || Math.abs(jd - line._k8SampleJD) > _KC_ORBIT_RESAMPLE_DAYS) {
     const r0 = vsop87HelioEclipticAU(name, jd);
-    let p = 365.25 * Math.pow(Math.hypot(r0[0], r0[1], r0[2]), 1.5);   // first-pass span from |r|
+    let p = DAYS_PER_JULIAN_YEAR * Math.pow(Math.hypot(r0[0], r0[1], r0[2]), 1.5);   // first-pass span from |r|
     let rMin = Infinity, rMax = 0;
     for (let i = 0; i < 16; i++) {
       const h = vsop87HelioEclipticAU(name, jd + (i / 16 - 0.5) * p * 1.4);
@@ -47536,7 +47536,7 @@ function _k8UpdateGhostOrbit(name, ghost) {
       if (r < rMin) rMin = r;
       if (r > rMax) rMax = r;
     }
-    p = 365.25 * Math.pow((rMin + rMax) / 2, 1.5);                     // second pass: a = (min+max)/2
+    p = DAYS_PER_JULIAN_YEAR * Math.pow((rMin + rMax) / 2, 1.5);                     // second pass: a = (min+max)/2
     const arr = line.geometry.attributes.position.array;
     for (let i = 0; i <= _K8_ORBIT_SEGS; i++) {
       const h = vsop87HelioEclipticAU(name, jd + (i / _K8_ORBIT_SEGS - 0.5) * p);
@@ -47599,7 +47599,7 @@ function _k8UpdateStandardOverlayInner() {
     for (const g of Object.values(_k8Ghosts)) { g.visible = false; if (g._k8Orbit) g._k8Orbit.visible = false; }
     return;
   }
-  const lightDaysPerAU = auToKm(1) / speedOfLight / 86400;   // from the model's own c/AU homes
+  const lightDaysPerAU = auToKm(1) / speedOfLight / SECONDS_PER_DAY;   // from the model's own c/AU homes
   for (const [name] of _K8_BODIES) {
     const body = _k8BodyObj(name);
     const ghost = _k8Ghosts[name];
@@ -47611,7 +47611,7 @@ function _k8UpdateStandardOverlayInner() {
     // out of the reference side). Until the async poly loads, the ghosts
     // stay hidden. Place conventions per body: see the header.
     if (!_stephensonDtPoly) { loadStephensonDtPolynomial(); ghost.visible = false; if (ghost._k8Orbit) ghost._k8Orbit.visible = false; continue; }
-    const jdTT = o.julianDay + _PC.stephensonDeltaTExtended(o.currentYear, _stephensonDtPoly) / 86400;
+    const jdTT = o.julianDay + _PC.stephensonDeltaTExtended(o.currentYear, _stephensonDtPoly) / SECONDS_PER_DAY;
     let g;
     if (name === 'moon') {
       const gKm = mpp02GeoEclipticJ2000Km(jdTT);                       // geometric — the orrery's place
@@ -47717,7 +47717,7 @@ function updatePositions() {
       ];
       const _wp0 = _toWorld(_kcHelioAU(_nm, o.julianDay));
       const _dAU = Math.hypot(_wp0[0] - EARTH_POS.x, _wp0[1] - EARTH_POS.y, _wp0[2] - EARTH_POS.z) / 100;
-      const _tauDays = auToKm(_dAU) / speedOfLight / 86400;
+      const _tauDays = auToKm(_dAU) / speedOfLight / SECONDS_PER_DAY;
       const _wp = _toWorld(_kcHelioAU(_nm, o.julianDay - _tauDays));
       PLANET_POS.set(_wp[0], _wp[1], _wp[2]);
       // THE VISUAL FLIP: the rendered planet IS the chain planet (world →
@@ -48199,7 +48199,7 @@ function moveModel(pos) {
       const _tMa_TT     = (J2000_CALENDAR_YEAR - _decYear_TT) / 1e6;
       const _dT_s_TT    = meanDeltaTSecondsAtAge(_tMa_TT);
       if (Number.isFinite(_dT_s_TT)) {
-        _currentYearSI_TT = _currentYearSI + _dT_s_TT / (SI_TROPICAL_YEAR_DAYS * 86400);
+        _currentYearSI_TT = _currentYearSI + _dT_s_TT / (SI_TROPICAL_YEAR_DAYS * SECONDS_PER_DAY);
       }
     }
     if (DEEP_TIME_MODE_ENABLED && obj._dtMoonIntegrator) {
@@ -48347,7 +48347,7 @@ function moveModel(pos) {
           // into the scene: at true UT the scene Moon sat 30″ west (0.549″/s ×
           // 54.55 s), the Sun 2.2″. Mirror: tools/lib/scene-graph.js
           // _jdTTToolsFromUT.
-          d += (deltaTStart + deltaT_sec_d) / 86400;   // JD_UT → JD_TT (absolute)
+          d += (deltaTStart + deltaT_sec_d) / SECONDS_PER_DAY;   // JD_UT → JD_TT (absolute)
         }
       }
       // The full production evaluation lives in
@@ -49952,7 +49952,7 @@ function updatePredictions() {
   // SI days — the same value the displayed row carries (the rendered Sun IS
   // the certified Sun whose mean longitude integrates this family).
   o.solarYearDays = _hybridSpinActive()
-    ? _cardinalYearSeconds(yearForFormula, 'MEAN') / 86400
+    ? _cardinalYearSeconds(yearForFormula, 'MEAN') / SECONDS_PER_DAY
     : tropicalYearDaysOfDate(yearForFormula);   // plan 09: the tidal-chain mean before the series lands (was the retired comb)
   predictions.solarYearDays = o.solarYearDays;   // provisional; refined to the one-source family below
   // the published SI sidereal year of date over the kinematic day of date
@@ -50032,7 +50032,7 @@ function updatePredictions() {
   predictions.solarYearSeconds = _hybridSpinActive()
     ? _cardinalYearSeconds(yearForFormula, 'MEAN')
     : o.solarYearSeconds;
-  if (_hybridSpinActive()) predictions.solarYearDays = predictions.solarYearSeconds / 86400;
+  if (_hybridSpinActive()) predictions.solarYearDays = predictions.solarYearSeconds / SECONDS_PER_DAY;
   // Axial precession = sid_sec / (sid_sec − sol_sec). Both sec values consistently
   // derived from measured days × o.lodKinematic, equal to the pure days ratio.
   o.axialPrecession = computeAxialPrecessionYears(o.siderealYearSeconds, o.solarYearDays, o.lodKinematic);
@@ -50044,7 +50044,7 @@ function updatePredictions() {
   // with date). The dimensionless sid/(sid − sol) counts tropical years and
   // reads 0.55 yr more (2026-09: the unit slip the scene check exposed).
   predictions.axialPrecession = _hybridSpinActive()
-    ? predictions.siderealYearSeconds * predictions.solarYearSeconds / ((predictions.siderealYearSeconds - predictions.solarYearSeconds) * 365.25 * 86400)
+    ? predictions.siderealYearSeconds * predictions.solarYearSeconds / ((predictions.siderealYearSeconds - predictions.solarYearSeconds) * DAYS_PER_JULIAN_YEAR * SECONDS_PER_DAY)
     : o.axialPrecession;
   // The lunisolar clock, in periods and ratios:
   // T_p(t) the PUBLISHED precession period of date — the Axial row's value
@@ -50105,7 +50105,7 @@ function updatePredictions() {
   
   // DISPLAY (D6): one-source of-date days (SI); o.siderealYearDays stays kinematic.
   predictions.siderealYearDays = _hybridSpinActive()
-    ? predictions.siderealYearSeconds / 86400
+    ? predictions.siderealYearSeconds / SECONDS_PER_DAY
     : o.siderealYearDays;
   // Anomalistic year in days = MEASURED (Fourier-fitted) directly, no round-trip.
   // Anomalistic year in seconds = MEASURED days × meanlengthofday (framework kinematic day unit).
@@ -50121,7 +50121,7 @@ function updatePredictions() {
       ? _cardinalYearSeconds(yearForFormula, 'ANOM')
       : o.anomalisticYearSeconds;
     predictions.anomalisticYearDays = _hybridSpinActive()
-      ? predictions.anomalisticYearSeconds / 86400
+      ? predictions.anomalisticYearSeconds / SECONDS_PER_DAY
       : o.anomalisticYearDays;
   }
 
@@ -50132,7 +50132,7 @@ function updatePredictions() {
   // self-consistent with the year rows above and with the Axial row (the
   // engine's dynamical values; the H-lattice identities remain the
   // kinematic family in the tooltips/registry).
-  const _JY_S = 365.25 * 86400;
+  const _JY_S = DAYS_PER_JULIAN_YEAR * SECONDS_PER_DAY;
   predictions.perihelionPrecession = _hybridSpinActive()
     ? predictions.anomalisticYearSeconds * predictions.solarYearSeconds / ((predictions.anomalisticYearSeconds - predictions.solarYearSeconds) * _JY_S)
     : o.perihelionPrecession;
@@ -50243,9 +50243,9 @@ function updatePredictions() {
   predictions.diffSolarDay = (predictions.lodReal - ASTRO_REFERENCE.solarDayJ2000) * 1000;
   predictions.diffSiderealDay = (predictions.siderealDayReal - ASTRO_REFERENCE.siderealDayJ2000) * 1000;
   predictions.diffStellarDay = (predictions.stellarDayReal - ASTRO_REFERENCE.stellarDayJ2000) * 1000;
-  predictions.diffTropicalYear = (predictions.solarYearDays - ASTRO_REFERENCE.tropicalYearMeanJ2000) * 86400;
-  predictions.diffSiderealYear = (predictions.siderealYearDays - ASTRO_REFERENCE.siderealYearJ2000) * 86400;
-  predictions.diffAnomalisticYear = (predictions.anomalisticYearDays - _anomalisticYearJ2000Days()) * 86400;   // plan 09 step 4d: vs the law's own J2000 value
+  predictions.diffTropicalYear = (predictions.solarYearDays - ASTRO_REFERENCE.tropicalYearMeanJ2000) * SECONDS_PER_DAY;
+  predictions.diffSiderealYear = (predictions.siderealYearDays - ASTRO_REFERENCE.siderealYearJ2000) * SECONDS_PER_DAY;
+  predictions.diffAnomalisticYear = (predictions.anomalisticYearDays - _anomalisticYearJ2000Days()) * SECONDS_PER_DAY;   // plan 09 step 4d: vs the law's own J2000 value
   predictions.diffPrecession = predictions.axialPrecession - _certifiedAxialPrecessionJ2000Years();   // plan 09: vs the IAU p_A period (the stale iauPrecessionJ2000 key, 25,770.73, is deleted)
   predictions.diffEccentricity = predictions.eccentricityEarth - ASTRO_REFERENCE.eccentricityJ2000;
   predictions.iauObliquityRef = meanObliquityIAU2006(o.currentYear || 2000);
@@ -50791,7 +50791,7 @@ function makeRealisticEarth(pd){
           const _jdU = o.julianDay;
           if (Number.isFinite(_jdU)) {
             const lamS = _eclSunLon(_jdU) * Math.PI / 180;
-            const eps  = _sceneEpsTargetDeg(2000 + (_jdU - 2451545.0) / 365.25) * Math.PI / 180;   // Phase 3 S3b: the published ε
+            const eps  = _sceneEpsTargetDeg(2000 + (_jdU - 2451545.0) / DAYS_PER_JULIAN_YEAR) * Math.PI / 180;   // Phase 3 S3b: the published ε
             const decS = Math.asin(Math.sin(eps) * Math.sin(lamS));
             const raS  = Math.atan2(Math.cos(eps) * Math.sin(lamS), Math.cos(lamS));
             const rS   = _udcSunGeo.length();
@@ -52066,7 +52066,7 @@ function dateTimeToJulianDay(dateStr, timeStr) {
   const jd0 = dateToJulianDay(Y, M, D);
 
   // — 6) add fractional day from time —
-  const dayFraction = hh / 24 + mm / 1440 + ss / 86400;
+  const dayFraction = hh / 24 + mm / 1440 + ss / SECONDS_PER_DAY;
   return jd0 + dayFraction;
 }
 
@@ -52307,7 +52307,7 @@ function dateToPerihelionJulianDay(dateStr, timeStr) {
 
   // 3) fold into a Julian Day Number
   //    JD = periAlignJD + daysAcc + dayOfYear + timeFrac - 0.5
-  const timeFrac = hh/24 + mm/1440 + ss/86400;
+  const timeFrac = hh/24 + mm/1440 + ss/SECONDS_PER_DAY;
   return perihelionalignmentJD
        + daysAcc
        + dayOfYear
