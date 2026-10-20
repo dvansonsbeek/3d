@@ -6119,7 +6119,7 @@
   },
   {
    "file": "public/input/model-version.json",
-   "line": 7,
+   "line": 8,
    "runtime": "source",
    "token": "earthtiltMean",
    "class": "source",
@@ -6127,7 +6127,7 @@
   },
   {
    "file": "public/input/model-version.json",
-   "line": 8,
+   "line": 9,
    "runtime": "source",
    "token": "holisticyearLength",
    "class": "source",
@@ -6135,7 +6135,7 @@
   },
   {
    "file": "public/input/model-version.json",
-   "line": 8,
+   "line": 9,
    "runtime": "source",
    "token": "earthtiltMean",
    "class": "source",
@@ -6143,7 +6143,7 @@
   },
   {
    "file": "public/input/model-version.json",
-   "line": 8,
+   "line": 9,
    "runtime": "source",
    "token": "earthInvPlaneInclinationAmplitude",
    "class": "source",
@@ -6151,7 +6151,7 @@
   },
   {
    "file": "public/input/model-version.json",
-   "line": 8,
+   "line": 9,
    "runtime": "source",
    "token": "kDeviceWheelPhaseAtJ2000Cycles",
    "class": "source",
@@ -6159,7 +6159,7 @@
   },
   {
    "file": "public/input/model-version.json",
-   "line": 8,
+   "line": 9,
    "runtime": "source",
    "token": "cyclesBetweenYears",
    "class": "source",
@@ -6167,7 +6167,7 @@
   },
   {
    "file": "public/input/model-version.json",
-   "line": 8,
+   "line": 9,
    "runtime": "source",
    "token": "cyclesBetween",
    "class": "source",
@@ -6175,7 +6175,7 @@
   },
   {
    "file": "public/input/model-version.json",
-   "line": 8,
+   "line": 9,
    "runtime": "source",
    "token": "H / N",
    "class": "source",
@@ -6183,7 +6183,7 @@
   },
   {
    "file": "public/input/model-version.json",
-   "line": 8,
+   "line": 9,
    "runtime": "source",
    "token": "H / N",
    "class": "source",
@@ -6191,7 +6191,7 @@
   },
   {
    "file": "public/input/model-version.json",
-   "line": 8,
+   "line": 9,
    "runtime": "source",
    "token": "/ 13",
    "class": "source",
@@ -6199,25 +6199,9 @@
   },
   {
    "file": "public/input/model-version.json",
-   "line": 11,
+   "line": 12,
    "runtime": "source",
    "token": "earthtiltMean",
-   "class": "source",
-   "text": "\"_v21Note\": \"v20.0 → v21.0 (plan 07 R10, the phase origin): a structural MAJOR — the correction combs' phase origin moves from the fitted t₀ (perihelionalignmen"
-  },
-  {
-   "file": "public/input/model-version.json",
-   "line": 11,
-   "runtime": "source",
-   "token": "kDeviceWheelPhaseAtJ2000Cycles",
-   "class": "source",
-   "text": "\"_v21Note\": \"v20.0 → v21.0 (plan 07 R10, the phase origin): a structural MAJOR — the correction combs' phase origin moves from the fitted t₀ (perihelionalignmen"
-  },
-  {
-   "file": "public/input/model-version.json",
-   "line": 11,
-   "runtime": "source",
-   "token": "H / N",
    "class": "source",
    "text": "\"_v21Note\": \"v20.0 → v21.0 (plan 07 R10, the phase origin): a structural MAJOR — the correction combs' phase origin moves from the fitted t₀ (perihelionalignmen"
   },
@@ -6225,9 +6209,17 @@
    "file": "public/input/model-version.json",
    "line": 12,
    "runtime": "source",
-   "token": "8H",
+   "token": "kDeviceWheelPhaseAtJ2000Cycles",
    "class": "source",
-   "text": "\"_v20Note\": \"v19.0 → v20.0 (plan 07, the windowAffine bound): a structural MAJOR — the planet chain's evaluation form beyond its fit window changes. The K4.5 pe"
+   "text": "\"_v21Note\": \"v20.0 → v21.0 (plan 07 R10, the phase origin): a structural MAJOR — the correction combs' phase origin moves from the fitted t₀ (perihelionalignmen"
+  },
+  {
+   "file": "public/input/model-version.json",
+   "line": 12,
+   "runtime": "source",
+   "token": "H / N",
+   "class": "source",
+   "text": "\"_v21Note\": \"v20.0 → v21.0 (plan 07 R10, the phase origin): a structural MAJOR — the correction combs' phase origin moves from the fitted t₀ (perihelionalignmen"
   },
   {
    "file": "public/input/model-version.json",
@@ -6235,11 +6227,19 @@
    "runtime": "source",
    "token": "8H",
    "class": "source",
-   "text": "\"_v19Note\": \"v18.0 → v19.0 (plan 07 R1/R8): a structural MAJOR — a divisor set leaves the source of truth. The retired laws' inputs are deleted from model-param"
+   "text": "\"_v20Note\": \"v19.0 → v20.0 (plan 07, the windowAffine bound): a structural MAJOR — the planet chain's evaluation form beyond its fit window changes. The K4.5 pe"
   },
   {
    "file": "public/input/model-version.json",
    "line": 14,
+   "runtime": "source",
+   "token": "8H",
+   "class": "source",
+   "text": "\"_v19Note\": \"v18.0 → v19.0 (plan 07 R1/R8): a structural MAJOR — a divisor set leaves the source of truth. The retired laws' inputs are deleted from model-param"
+  },
+  {
+   "file": "public/input/model-version.json",
+   "line": 15,
    "runtime": "source",
    "token": "earthtiltMean",
    "class": "source",
@@ -6247,7 +6247,7 @@
   },
   {
    "file": "public/input/model-version.json",
-   "line": 14,
+   "line": 15,
    "runtime": "source",
    "token": "earthInvPlaneInclinationAmplitude",
    "class": "source",
@@ -6255,7 +6255,7 @@
   },
   {
    "file": "public/input/model-version.json",
-   "line": 14,
+   "line": 15,
    "runtime": "source",
    "token": "H / N",
    "class": "source",
@@ -6263,7 +6263,7 @@
   },
   {
    "file": "public/input/model-version.json",
-   "line": 14,
+   "line": 15,
    "runtime": "source",
    "token": "H / N",
    "class": "source",
@@ -6271,7 +6271,7 @@
   },
   {
    "file": "public/input/model-version.json",
-   "line": 21,
+   "line": 22,
    "runtime": "source",
    "token": "8H",
    "class": "source",
@@ -6279,7 +6279,7 @@
   },
   {
    "file": "public/input/model-version.json",
-   "line": 23,
+   "line": 24,
    "runtime": "source",
    "token": "H / N",
    "class": "source",
@@ -6287,7 +6287,7 @@
   },
   {
    "file": "public/input/model-version.json",
-   "line": 23,
+   "line": 24,
    "runtime": "source",
    "token": "H / N",
    "class": "source",
@@ -6328,7 +6328,7 @@
    "packages/physics/test/layer0-identity.test.mjs": "sha256:e942dc6f94dc2a5d3e3b74f794ac6c161cb6a4117180242bdc7cd0d80084d5b4",
    "packages/physics/test/layer1-identity.test.mjs": "sha256:9aca77e0f717013b9e70c55b2766cb0feff614493fc5454c95fe2706b306fe82",
    "public/input/astro-reference.json": "sha256:1b8a1663a4882f4bf5fce6f4b3ece44a53acba7ad21d107ed3f077d7276bc472",
-   "public/input/model-version.json": "sha256:40d82d8be267d146a1d4d63ee852eed2a2c75bb0ed504156990cd796a5abe7ca",
+   "public/input/model-version.json": "sha256:04dc6e0a6dfff4d4b7244ff7caa67d6596c324ace99601e20bc50dddc80a3329",
    "scripts/climate_formula_mwp_check.py": "sha256:177305723579b66c9d08590f366574c05cd935aea5573614e89eddc502f72236",
    "scripts/extract_insolation_features_deep.js": "sha256:2ef7242a306cc9e34200e59c0dcbe8d5fe30dc0759b4d2ee5457875d981a50dc",
    "scripts/milankovitch_climate_formula.py": "sha256:c16a99025d13fbbbd5448a067d39be62e27dff78d0d68432ca600c337817a41f",
