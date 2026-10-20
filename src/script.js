@@ -16489,13 +16489,17 @@ function _deepHistSeries() {
       anchorAscNodeEclipticDeg: DEEP_MODES_ARTIFACT.anchorAscNodeEclipticDeg,
       axialPrecessionYearsJ2000: _certifiedAxialPrecessionJ2000Years(),   // plan 09: the IAU p_A anchor (was the retired year combs' beat at 2000)
       obliquityJ2000Deg: ASTRO_REFERENCE.obliquityJ2000_deg,
-      // The SECULAR coupling period(t) rides T_p(t), the composed lunisolar
-      // clock (spin from the tidal chain, lunar torque on the recession
+      // The SECULAR coupling period(t) rides the composed lunisolar CONSTANT's
+      // scaling (spin from the tidal chain, lunar torque on the recession
       // history — the 1/a³ growth Lantink 2022's 108.6 ± 8.5 ″/yr at 2.46 Ga
-      // referees). NOT the instantaneous year-length beat: that carries the
+      // referees) — the torque period, NOT the published rate of date T_p(t):
+      // the integration's own ŝ·n̂ carries the obliquity's cosine, so the cited
+      // mean obliquity's factor (plan 12 §8 option (a)) must not enter twice.
+      // NOT the instantaneous year-length beat either: that carries the
       // equinox wobble the hybrid's n̂(t) already generates (double-count —
       // the generator's refuse-gate measured 0.14°/1.05° distortions).
-      axialPrecessionYearsAtYearFn: (yr) => _axialPrecessionPeriodYearsAtAge((2000 - yr) / 1e6),
+      // Twins: packages/physics model.js, tools/lib/deep-orbital-history.js.
+      axialPrecessionYearsAtYearFn: (yr) => _deepLod().lunisolarTorquePeriodYearsAtAge((2000 - yr) / 1e6) ?? _certifiedAxialPrecessionJ2000Years(),
       // THE PRECESSION OF DATE: the solar torque at the
       // eccentricity of date and the oblateness of date from the GIA channel
       // (read PURE — never the lattice-α pin; the samplers are cached) — both

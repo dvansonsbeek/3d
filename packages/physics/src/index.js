@@ -170,6 +170,9 @@ export { createYearLengths, computeMeanTropicalYearJ2000Days, ONE_FAMILY_WINDOW_
 // (spin ω(t) × [solar torque + lunar torque on the recession history]) —
 // leg-1's physical rate; the structural H(t)/13 clock is its named diagnostic.
 export { computeSolarTorqueShare, createComposedPrecession } from './earth/precession-composed.cjs';
+// Plan 12 §8 option (a): the cited mean obliquity of date — the second column read from the
+// Earth–Moon history; the precession RATE of date carries its cos ε̄(t)/cos ε̄(0) on the constant.
+export { createMeanObliquityHistory } from './earth/mean-obliquity-history.cjs';
 // (planets/predict.cjs — the planet predictive-precession feature basis — was
 // retired at plan 06 R8 with PREDICT_COEFFS_PHYSICAL.)
 // L10 — the composition front door: one law set, N body records. Thin by

@@ -25,9 +25,11 @@
  *   measured at the 500-yr artifact cadence: 0.16″/0.18″ rms vs IAU-2006
  *   over 1900–2100/1600–2400 vs the era tier's 0.31″/0.63″, and 0.0396°
  *   vs La2004 over −200 kyr vs the deep tier's 0.069° — the C-1 verdict,
- *   plan 02) and zetaModes serves only as the TAIL beyond the span (the
- *   seam at the span edge is the extraction residual, far outside every
- *   certified window). solarTorqueShareJ2000 and
+ *   plan 02) and zetaModes serves only as the TAIL beyond the span, joined
+ *   to the series at each edge so n̂ is continuous there (plan 12 §8.3 — the
+ *   J2000-point anchor left a 1.6° step at −10 Myr that kicked the hybrid's
+ *   mean obliquity +0.9° for the whole tail; far outside every certified window).
+ *   solarTorqueShareJ2000 and
  *   dynamicalEllipticityRatioAtYearFn: THE PRECESSION OF DATE — the two
  *   factors on the precession constant (see alphaAtGeneral below); absent,
  *   the constant is the secular law alone, bit-identical.

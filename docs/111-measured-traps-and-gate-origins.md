@@ -1,6 +1,6 @@
 ---
 docVersion: 1.0
-modelVersion: v26.1
+modelVersion: v26.2
 coefficients: sha256:ff77fbc9baa370e4
 status: current
 ---
@@ -366,6 +366,30 @@ observables, which are frame-invariant). Before deleting a pose, grep the
 top-level `matrixWorld` readers; gate the init-time alignments in the frame
 they must sit in.
 
+### 1.26 A precession constant is not a precession rate — and a seam kicks the pole through n̂, not through its mean plane
+
+(plan 12 §8, measured) The composed lunisolar law scales the precession
+CONSTANT α(t) — spin times the torque term. The RATE is α(t)·cos ε̄(t), and
+the chain held cos ε̄ at its J2000 value at every epoch while the cited
+history's own mean-obliquity column (23.25° at 0, 22.23° Devonian, 19.73° at
+2.46 Ga) sat unread beside the distance it was reading. The factor is
+1 − 2e-7 at 10 kyr and 1.0245 at 2.46 Ga: it closed the composed rate to
+Farhat's own precession column (−2.0 % → +0.4 %) and moved every paleo
+precession referee toward its source (the Mesoproterozoic gap −7.2 → −5.3 %,
+halved, not closed). Rule: name which of the two a surface carries — the
+hybrid obliquity integration and the realized pole-rate window mean take the
+CONSTANT (their own ŝ·n̂ is the one cosine); T_p(t), the beat, the tropical
+year of date and the referees take the RATE. Measured on the way: the
+hybrid's ζ-mode tail beyond the series' ±10 Myr was anchored to the J2000
+POINT and reached the span edges 1.6°/0.7° off the series; the mean
+obliquity stepped +0.9°/+0.3° there and stayed stepped for 500 Myr. The
+plan's hypothesis — anchor the tail on the series' MEAN plane — was tested
+and is wrong for ε (step +0.74°/+0.57°): the pole follows n̂ adiabatically,
+so a DISCONTINUITY in n̂ kicks ε permanently and the mean plane does not.
+Joining the tail to the series at each seam (n̂ continuous) leaves
++0.09°/+0.13°. Test the hypothesis against the quantity that is wrong, not
+against the quantity the hypothesis names.
+
 ---
 
 ## 2. The browser tier's gates and their origins
@@ -478,8 +502,12 @@ The model stands falsifiable on three named, pre-registered legs.
 
 **(1) The deep-time scaling split.** The axial precession must follow the
 COMPOSED lunisolar rate
-ψ̇(t) = [ω(t)/ω₀]·p₀·[f_S + (1 − f_S)(a₀/a_M(t))³] (spin from the recession
-history, the lunar torque growing on the Moon's distance; since plan 12
+ψ̇(t) = [ω(t)/ω₀]·p₀·[f_S + (1 − f_S)(a₀/a_M(t))³] × cos ε̄(t)/cos ε̄(0) (spin
+from the recession history, the lunar torque growing on the Moon's distance —
+the bracket scales the precession CONSTANT; the cosine of the cited mean
+obliquity ε̄(t), the same history's second column (plan 12 §8 option (a)),
+makes it the RATE — the chain held cos ε̄ at J2000 before, 2.5 % of rate at
+2.46 Ga, and the Mesoproterozoic discrepancy halved when it moved; since plan 12
 option A the distance history a_M(t) is a CITED INPUT — Farhat et al. 2022's
 published solution, `data/astrogeo22-earth-moon.json`, read as a shape on
 the observed J2000 distance with the LLR rate as its J2000 slope — so the

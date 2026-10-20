@@ -15,5 +15,8 @@ export const MOON_DISTANCE_ARTIFACT: Readonly<{
     aEarthRadii: number[];
     aMinEarthRadii: number[];
     aMaxEarthRadii: number[];
+    obliquityDeg: number[];
+    obliquityMinDeg: number[];
+    obliquityMaxDeg: number[];
 }>;
 export const MOON_DISTANCE_ARTIFACT_HASH: "850cd0b266d46a71";

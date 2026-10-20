@@ -94,6 +94,13 @@ export type DeepTimeLodDeps = {
      * difference on moonDistanceMetresAtAge (the LOD-rate decomposition's tidal term).
      */
     moonDistanceSlopeMetresPerMaAtAge?: ((tMa: number) => number | null) | undefined;
+    /**
+     * -
+     * OPTIONAL cos ε̄(t)/cos ε̄(0) of the cited mean obliquity (earth/mean-
+     * obliquity-history) — the factor the precession RATE of date carries on the
+     * constant (plan 12 §8 option (a)); absent → 1, the constant alone, bit-identical.
+     */
+    meanObliquityCosRatioAtAge?: ((tMa: number) => number | null) | undefined;
 };
 /**
  * @typedef {Object} DeepTimeLodConstants
@@ -142,6 +149,10 @@ export type DeepTimeLodDeps = {
  *   OPTIONAL analytic slope of the distance history (metres per Ma, positive
  *   into the past means a growing a... sign as da/dt_Ma); absent → a central
  *   difference on moonDistanceMetresAtAge (the LOD-rate decomposition's tidal term).
+ * @property {(tMa: number) => number|null} [meanObliquityCosRatioAtAge] -
+ *   OPTIONAL cos ε̄(t)/cos ε̄(0) of the cited mean obliquity (earth/mean-
+ *   obliquity-history) — the factor the precession RATE of date carries on the
+ *   constant (plan 12 §8 option (a)); absent → 1, the constant alone, bit-identical.
  */
 /** @param {DeepTimeLodDeps} deps */
 export function createDeepTimeLod(deps: DeepTimeLodDeps): {
@@ -150,6 +161,9 @@ export function createDeepTimeLod(deps: DeepTimeLodDeps): {
     lodHoursAtAge: (t_Ma: number) => number | null;
     lunisolarPrecessionRateArcsecPerYrAtAge: (t_Ma: number) => number | null;
     lunisolarPrecessionPeriodYearsAtAge: (t_Ma: number) => number | null;
+    lunisolarTorqueRateArcsecPerYrAtAge: (t_Ma: number) => number | null;
+    lunisolarTorquePeriodYearsAtAge: (t_Ma: number) => number | null;
+    precessionObliquityFactorAtAge: (t_Ma: number) => number | null;
     lunarTorqueFactorAtAge: (tMa: number) => (number | null);
     precessionTorqueTermAtAge: (tMa: number) => (number | null);
     siderealYearSecondsAtAge: (t_Ma: number) => number;

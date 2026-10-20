@@ -75,10 +75,18 @@ export function assembleModel(C: Readonly<Record<string, any>>, F: Readonly<Reco
         tropicalYearSecondsAtYear: (year: number) => number;
     }>;
     lunisolar: Readonly<{
-        /** The mean lunisolar precession period T_p(t), years — the composed torque rate's period on the derived J2000 anchor (25,771.4 at J2000). @param {number} year @returns {number} */
+        /** The mean lunisolar precession period T_p(t), years — 1,296,000/the precession RATE of date (25,771.6 at J2000): THE published deep-time clock. @param {number} year @returns {number} */
         meanPeriodYearsAtYear: (year: number) => number;
-        /** The composed rate ψ̇(t) = [ω/ω₀]·p₀·[f_S + (1 − f_S)(a₀/a_M)³], ″/yr (p₀ = 50.2883, derived). @param {number} year @returns {number} */
+        /** THE PRECESSION RATE OF DATE ψ̇(t) = [ω/ω₀]·p₀·[f_S + (1 − f_S)(a₀/a_M)³] × cos ε̄(t)/cos ε̄(0), ″/yr — the constant's scaling on the spin and the lunar torque times the cited mean obliquity's cosine (plan 12 §8 option (a); p₀ = 50.2880, the IAU 2006 input). @param {number} year @returns {number} */
         meanRateArcsecPerYrAtYear: (year: number) => number;
+        /** THE PRECESSION CONSTANT OF DATE as a rate on the J2000 obliquity, ″/yr — the spin and torque scaling alone (the hybrid obliquity integration's integrand: its own ŝ·n̂ carries the cosine). @param {number} year @returns {number} */
+        torqueRateArcsecPerYrAtYear: (year: number) => number;
+        /** 1,296,000/the torque rate, years. @param {number} year @returns {number} */
+        torquePeriodYearsAtYear: (year: number) => number;
+        /** cos ε̄(t)/cos ε̄(0) — the rate of date's obliquity factor on the constant (1 at J2000; 1.0075 at the Devonian, 1.0245 at 2.46 Ga). @param {number} year @returns {number} */
+        precessionObliquityFactorAtYear: (year: number) => number;
+        /** THE CITED MEAN OBLIQUITY OF DATE ε̄(t), degrees — Farhat et al. 2022's own column of the Earth–Moon history (a Myr-scale MEAN: 23.25° at age 0 against the J2000 instant 23.44°; 22.23° Devonian, 19.73° at 2.46 Ga); read as the shape cos ε̄(t)/cos ε̄(0) on the precession rate. NaN beyond the input's span (4,429 Ma); forward of J2000 the J2000 slope is held. @param {number} year @returns {number} */
+        meanObliquityCitedDegAtYear: (year: number) => number;
         /** The of-date period — the one-family beat inside ±2 Myr, the composed mean beyond. @param {number} year @returns {number} */
         ofDatePeriodYearsAtYear: (year: number) => number;
         /** f_S, the solar fraction of the J2000 precession torque. */
@@ -148,6 +156,8 @@ export function assembleModel(C: Readonly<Record<string, any>>, F: Readonly<Reco
     earth: Readonly<{
         perihelionLongitudeDeg: (year: number) => number;
         obliquityDeg: (year: number) => number;
+        /** The cited mean obliquity of date ε̄(t) (Farhat et al. 2022's column; plan 12 §8 option (a)), degrees — a Myr-scale mean; NaN beyond 4,429 Ma. @param {number} year @returns {number} */
+        meanObliquityCitedDeg: (year: number) => number;
         eccentricity: (year: number) => number;
         inclinationDeg: (year: number) => number;
         ascendingNodeDeg: (year: number) => number;

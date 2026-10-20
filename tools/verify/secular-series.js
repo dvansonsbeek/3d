@@ -448,8 +448,12 @@ const mkTier = (withAxialFn) => createDeepOrbitalHistory({
   // and feeding it into α double-counts it (measured: −200-kyr ε rms vs
   // La2004 3.5×-ed to 0.14° and ±1 Myr diverged 1.05°; the refuse-gate
   // caught it). The withAxialFn=false twin is the α₀ regression control.
+  // Plan 12 §8: the TORQUE period — the constant's scaling, not the published
+  // rate of date T_p(t): the integration's own ŝ·n̂ carries the obliquity's
+  // cosine, so the cited mean obliquity's factor must not enter twice (twin of
+  // model.js, tools/lib/deep-orbital-history.js, src/script.js _deepHistSeries).
   axialPrecessionYearsAtYearFn: withAxialFn
-    ? (yr) => model.lunisolar.meanPeriodYearsAtYear(yr)   // plan 09 step 5c: T_p(t) directly (was period₀·H(t)/H₀, the same to 2e-16)
+    ? (yr) => model.lunisolar.torquePeriodYearsAtYear(yr)   // plan 09 step 5c: the composed period directly (was period₀·H(t)/H₀, the same to 2e-16)
     : undefined,
   // THE PRECESSION OF DATE (plan 06 §9 item 10) — the shipped movement's two
   // of-date factors, from the package surface (the solar share and the GIA

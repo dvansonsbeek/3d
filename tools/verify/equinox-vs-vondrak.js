@@ -94,7 +94,7 @@ const factory = (deps) => createDeepOrbitalHistory({
   anchorE: AE.e, anchorPeriEclipticDeg: AE.lonPeriEclipticDeg,
   anchorInclEclipticDeg: AE.inclEclipticDeg, anchorAscNodeEclipticDeg: AE.ascNodeEclipticDeg,
   axialPrecessionYearsJ2000: axial0, obliquityJ2000Deg: C.ASTRO_REFERENCE.obliquityJ2000_deg,
-  axialPrecessionYearsAtYearFn: (yr) => DT.meanLunisolarPrecessionPeriodYearsAtAge((2000 - yr) / 1e6) ?? axial0,   // plan 09 step 5c: T_p(t) directly (was axial0·H(t)/H₀, the same to 2e-16)
+  axialPrecessionYearsAtYearFn: (yr) => DT.meanLunisolarTorquePeriodYearsAtAge((2000 - yr) / 1e6) ?? axial0,   // plan 12 §8: the TORQUE period (the integration's own ŝ·n̂ carries the cosine); plan 09 step 5c: the composed period directly
   ...deps,
 });
 const SOLAR = { solarTorqueShareJ2000: DT.PRECESSION_SOLAR_SHARE_J2000 };

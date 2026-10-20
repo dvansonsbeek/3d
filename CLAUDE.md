@@ -215,9 +215,12 @@ two-engine interface; the historical gate suite is calibrated on it.
 derivation history and the retired fourth leg: doc 111 §3):
 
 1. **The deep-time scaling split** — the axial precession follows the COMPOSED
-   lunisolar rate ψ̇(t) = [ω(t)/ω₀]·p₀·[f_S + (1 − f_S)(a₀/a_M(t))³] on the
-   CITED Earth–Moon distance history (Farhat et al. 2022, plan 12 option A;
-   ONE home `@essrt/physics/earth/precession-composed`; p₀ the IAU 2006 p_A,
+   lunisolar rate ψ̇(t) = [ω(t)/ω₀]·p₀·[f_S + (1 − f_S)(a₀/a_M(t))³] ×
+   cos ε̄(t)/cos ε̄(0) on the CITED Earth–Moon history (Farhat et al. 2022: the
+   distance, plan 12 option A, and the mean obliquity ε̄(t), plan 12 §8 (a) —
+   the bracket is the precession CONSTANT's scaling, which the hybrid obliquity
+   integration takes; the cosine makes it the RATE; ONE home
+   `@essrt/physics/earth/precession-composed`; p₀ the IAU 2006 p_A,
    T_p(t) the published deep-time clock); the obliquity band follows the beat
    2π/(ψ̇ᵢₙ(t) − |s₃|) with ψ̇ᵢₙ the spin axis's INERTIAL rate (a record sees
    its WINDOW MEAN); the long-eccentricity band stays at its modern class,

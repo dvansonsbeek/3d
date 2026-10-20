@@ -20,7 +20,8 @@
  *   stellarDayRaProjection?: number,
  * }} deps — `constants` the generated DEFAULT_CONSTANTS, `fitted` the
  *   generated FITTED_COEFFICIENTS, `deepModes` the DEEP_MODES_ARTIFACT,
- *   `moonDistanceArtifact` the MOON_DISTANCE_ARTIFACT (injected so a
+ *   `moonDistanceArtifact` the MOON_DISTANCE_ARTIFACT — the cited distance
+ *   AND mean-obliquity columns, plan 12 option A / §8 (a) (injected so a
  *   counterfactual context can replace any of them); `ageAnchorYear` the
  *   scene epoch (default constants.timeReference.sceneEpochYear);
  *   `flagsAt` the ΔT stack's switches (default all ON); `planetAuRatios`
@@ -105,6 +106,12 @@ export function createDeepTimeChain(deps: {
         ratioAtAge: (tMa: number) => number | null;
         spanMa: number;
     };
+    meanObliquity: {
+        meanObliquityDegAtAge: (tMa: number) => number | null;
+        cosRatioAtAge: (tMa: number) => number | null;
+        meanObliquityJ2000Deg: number;
+        spanMa: number;
+    };
     dtCycles: {
         taperAt: (year: number) => number;
         taperDerivativeAt: (year: number) => number;
@@ -121,6 +128,9 @@ export function createDeepTimeChain(deps: {
         lodHoursAtAge: (t_Ma: number) => number | null;
         lunisolarPrecessionRateArcsecPerYrAtAge: (t_Ma: number) => number | null;
         lunisolarPrecessionPeriodYearsAtAge: (t_Ma: number) => number | null;
+        lunisolarTorqueRateArcsecPerYrAtAge: (t_Ma: number) => number | null;
+        lunisolarTorquePeriodYearsAtAge: (t_Ma: number) => number | null;
+        precessionObliquityFactorAtAge: (t_Ma: number) => number | null;
         lunarTorqueFactorAtAge: (tMa: number) => (number | null);
         precessionTorqueTermAtAge: (tMa: number) => (number | null);
         siderealYearSecondsAtAge: (t_Ma: number) => number;
@@ -173,6 +183,10 @@ export function createDeepTimeChain(deps: {
     meanLodHoursAtAge: (t_Ma: number) => number | null;
     meanLunisolarPrecessionRateArcsecPerYrAtAge: (t_Ma: number) => number | null;
     meanLunisolarPrecessionPeriodYearsAtAge: (tMa: number) => number | null;
+    meanLunisolarTorqueRateArcsecPerYrAtAge: (t_Ma: number) => number | null;
+    meanLunisolarTorquePeriodYearsAtAge: (t_Ma: number) => number | null;
+    precessionObliquityFactorAtAge: (t_Ma: number) => number | null;
+    meanObliquityCitedDegAtAge: (tMa: number) => number | null;
     meanAuAtAge: (tMa: number) => number;
     meanSiderealYearSecondsAtAge: (tMa: number) => number;
     meanTropicalYearSecondsAtAge: (t_Ma: number) => number;

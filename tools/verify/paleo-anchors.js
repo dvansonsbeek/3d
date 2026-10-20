@@ -41,10 +41,12 @@ const PREDICT = {
   lodHr: (ageMa) => dt.meanLodSecondsAtAge(ageMa) / 3600,
   moonDistanceRE: (ageMa) => dt.meanMoonDistanceCorrectedAtAge(ageMa) / RE_KM,
   moonDistanceRawRE: (ageMa) => dt.meanMoonDistanceAtAge(ageMa) / RE_KM,
-  // Leg 1 (plan 06 D6/Phase 3): Earth's axial-precession rate is the COMPOSED
-  // lunisolar rate = 1,296,000·13/H(t) on the unit; the frozen era clock's
-  // counter H_era (pure spin scaling) fails these rows (~35 % low at 2.46 Ga)
-  // — that is the fail-proof.
+  // Leg 1 (plan 06 D6/Phase 3; plan 12 §8): Earth's axial-precession RATE of
+  // date — the composed lunisolar constant on the spin and the lunar torque,
+  // times the cited mean obliquity's cos ε̄(t)/cos ε̄(0). The rows' k is
+  // TimeOpt's luni-solar precession rate (the rate, not the constant). Pure
+  // spin scaling (the retired era counter) fails these rows ~35 % low at
+  // 2.46 Ga — that is the fail-proof.
   precArcsecPerYr: (ageMa) => dt.meanLunisolarPrecessionRateArcsecPerYrAtAge(ageMa),
 };
 

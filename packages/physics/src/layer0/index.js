@@ -54,18 +54,21 @@
  * @property {(year: number) => number|null} moonDistanceMetres - null beyond the cited history's span
  * @property {(year: number) => number|null} lodSeconds
  * @property {(year: number) => number} siderealYearSeconds
- * @property {(year: number) => number} tropicalYearSeconds      sidereal less one equinox turn per T_p(t) (the composed precession period)
+ * @property {(year: number) => number} tropicalYearSeconds      sidereal less one equinox turn per T_p(t) (the composed precession period on the RATE of date)
  */
 
 /**
  * @param {{params: EpochParams, alphaAtAgeMa: (tMa: number) => number,
- *   moonDistanceMetresAtAge: (tMa: number) => number|null}} deps —
+ *   moonDistanceMetresAtAge: (tMa: number) => number|null,
+ *   meanObliquityCosRatioAtAge?: (tMa: number) => number|null}} deps —
  *   moonDistanceMetresAtAge is the engine's cited distance history
  *   (deltat/moon-distance-history: Farhat et al. 2022 as a shape on the
- *   J2000 anchor; plan 12 option A — the layer0 quartic twin is deleted).
+ *   J2000 anchor; plan 12 option A — the layer0 quartic twin is deleted);
+ *   meanObliquityCosRatioAtAge the cited mean obliquity's cos ε̄(t)/cos ε̄(0)
+ *   (earth/mean-obliquity-history, plan 12 §8 option (a)) — OPTIONAL, absent → 1.
  * @returns {EpochPrimitives}
  */
-export const createEpochPrimitives = ({ params: p, alphaAtAgeMa, moonDistanceMetresAtAge }) => {
+export const createEpochPrimitives = ({ params: p, alphaAtAgeMa, moonDistanceMetresAtAge, meanObliquityCosRatioAtAge }) => {
   /**
    * Years before the epoch, in Ma. The ONE place this conversion lives.
    * @param {number} year
@@ -79,6 +82,14 @@ export const createEpochPrimitives = ({ params: p, alphaAtAgeMa, moonDistanceMet
    * @returns {number|null} metres
    */
   const moonDistanceMetresCore = (t) => moonDistanceMetresAtAge(t);
+
+  /**
+   * cos ε̄(t)/cos ε̄(0) of the cited mean obliquity — the precession RATE's
+   * factor on the constant (plan 12 §8); 1 when no history is injected.
+   * @param {number} t age in Ma
+   * @returns {number|null}
+   */
+  const meanObliquityCosRatioCore = (t) => (meanObliquityCosRatioAtAge ? meanObliquityCosRatioAtAge(t) : 1);
 
   /**
    * Length of day from angular-momentum conservation: as the Moon recedes it
@@ -122,7 +133,9 @@ export const createEpochPrimitives = ({ params: p, alphaAtAgeMa, moonDistanceMet
    * Tropical year of date — the sidereal year less the equinox's own motion
    * over one year: one turn per the composed lunisolar precession period
    * T_p(t), i.e. 1/T_trop = 1/T_sid + ψ̇(t)/(1,296,000″ · Julian-year s) with
-   * ψ̇(t) = [ω₀/ω(t)]⁻¹… spelled as (LOD₀/LOD(t))·p₀·[f_S + (1 − f_S)(a₀/a_M)³].
+   * ψ̇(t) the RATE of date, spelled as (LOD₀/LOD(t))·p₀·[f_S + (1 − f_S)(a₀/a_M)³]
+   * × cos ε̄(t)/cos ε̄(0) — the cited mean obliquity's factor (plan 12 §8 option (a);
+   * injected, 1 when absent).
    * Plan 09 step 5d: it was the unit's calendar convention sid·(1 − 13/H(t))
    * (plan 06 D2 kept it as a named device), 0.086 % slow on the equinox term
    * — 1.0 s of year at J2000, integrated by the deep JD↔year calendar. The
@@ -142,7 +155,8 @@ export const createEpochPrimitives = ({ params: p, alphaAtAgeMa, moonDistanceMet
     const lf = (a === null || !(a > 0)) ? null : Math.pow(p.moonDistanceNowM / a, 3);
     const term = lf === null ? null : p.precessionSolarShareJ2000 + (1 - p.precessionSolarShareJ2000) * lf;
     const p0 = p.precessionRateJ2000ArcsecPerYr;
-    const rate = (lod === null || !(lod > 0) || term === null) ? p0 : (p.lodNowH13Seconds / lod) * p0 * term;
+    const f = meanObliquityCosRatioCore(t);
+    const rate = (lod === null || !(lod > 0) || term === null || f === null) ? p0 : (p.lodNowH13Seconds / lod) * p0 * term * f;
     return 1 / (1 / sid + rate / (1296000 * 365.25 * 86400));
   };
 

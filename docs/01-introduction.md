@@ -1,6 +1,6 @@
 ---
 docVersion: 1.0
-modelVersion: v26.1
+modelVersion: v26.2
 coefficients: sha256:ff77fbc9baa370e4
 status: current
 ---
@@ -55,7 +55,7 @@ The two meet every perihelion-of-date cycle, and the solstice–perihelion align
 - **Timekeeping.** The ΔT stack on the pure-tidal length-of-day history, validated against the historical eclipse record with zero parameters fitted to eclipse data ([doc 102](102-gia-alpha-lunar-validation.md), [doc 105](105-dt-stack-flag-audit.md)).
 - **The Sun, the Moon and the planets.** The derived Sun and the framework-native lunar theory ([doc 65](65-equation-of-center.md), [doc 66](66-moon-meeus-corrections.md)), the planets' perihelion motion with Mercury's relativistic share emerging inside the measured advance ([doc 13](13-mercury-precession-breakdown.md)).
 - **Climate.** The orbital-forcing formula rides the engine's own lines — the beats of the chain's secular modes with the precession clock, plus the 405.6-kyr family ([doc 92](92-climate-formula.md), [doc 94](94-insolation-null-test.md)).
-- **Deep time.** The clock lengthens on the tidal history (Driver 1) and every orbit expands on the solar-mass history (Driver 2); the axial precession period was <!--v:axialPrecAtDevonian-->21,396<!--/v--> years in the Devonian. The theory, its predictions and the three pre-registered falsification legs are in [doc 99](99-expanding-solar-system-resonance-theory.md); the evidence is assembled in [doc 106](106-deep-time-validation-dossier.md).
+- **Deep time.** The clock lengthens on the tidal history (Driver 1) and every orbit expands on the solar-mass history (Driver 2); the axial precession period was <!--v:axialPrecAtDevonian-->21,235<!--/v--> years in the Devonian. The theory, its predictions and the three pre-registered falsification legs are in [doc 99](99-expanding-solar-system-resonance-theory.md); the evidence is assembled in [doc 106](106-deep-time-validation-dossier.md).
 
 Every published quantity is traced to its inputs, formula, code and live value in [doc 110 — the calculation map](110-calculation-map.md).
 

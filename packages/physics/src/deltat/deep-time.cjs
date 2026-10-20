@@ -81,6 +81,10 @@ const { createComposedPrecession } = require('../earth/precession-composed.cjs')
  *   OPTIONAL analytic slope of the distance history (metres per Ma, positive
  *   into the past means a growing a... sign as da/dt_Ma); absent → a central
  *   difference on moonDistanceMetresAtAge (the LOD-rate decomposition's tidal term).
+ * @property {(tMa: number) => number|null} [meanObliquityCosRatioAtAge] -
+ *   OPTIONAL cos ε̄(t)/cos ε̄(0) of the cited mean obliquity (earth/mean-
+ *   obliquity-history) — the factor the precession RATE of date carries on the
+ *   constant (plan 12 §8 option (a)); absent → 1, the constant alone, bit-identical.
  */
 
 /** @param {DeepTimeLodDeps} deps */
@@ -126,13 +130,13 @@ function createDeepTimeLod(deps) {
   // year with the model's ΔT memo). Same operations, same inputs — every
   // value bit-identical (11,958-value sweep, 0 differences).
 
-  // The composed lunisolar precession rate (plan 06 D6 → Phase 3 → S5):
-  // ψ̇(t) = [ω(t)/ω₀]·p₀·[f_S + (1 − f_S)(a₀/a_M(t))³], p₀ the model's
-  // DERIVED J2000 rate 1,296,000/axial0 (the certified year-length laws'
-  // beat at 2000 ≈ 25,771.4 yr — NOT 1,296,000/(H₀/13) = 50.245 ″/yr, the
-  // fit anchor's reading, 0.086 % slow; S5). ONE formula home:
-  // earth/precession-composed, built here on this factory's own LOD and
-  // recession history; the anchor resolves lazily on the first rate use.
+  // The composed lunisolar precession (plan 06 D6 → Phase 3 → S5; plan 12 §8):
+  // the CONSTANT's scaling [ω(t)/ω₀]·p₀·[f_S + (1 − f_S)(a₀/a_M(t))³] and the
+  // RATE of date, that × cos ε̄(t)/cos ε̄(0) on the cited mean obliquity; p₀ the
+  // model's J2000 rate 1,296,000/axial0 (the IAU 2006 general precession since
+  // plan 09). ONE formula home: earth/precession-composed, built here on this
+  // factory's own LOD, recession and obliquity histories; the anchor resolves
+  // lazily on the first rate use.
   const composed = createComposedPrecession({
     p0ArcsecPerYr: () => 1296000 / deps.precessionPeriodJ2000YearsFn(),
     solarShare: K.precessionSolarShareJ2000,
@@ -141,21 +145,42 @@ function createDeepTimeLod(deps) {
     moonDistanceMetresAtAge: deps.moonDistanceMetresAtAge,
     moonDistanceJ2000Metres: K.aMoonNowMetres,
     yearToTMa: /** @param {number} year */ (year) => (2000 - year) / 1e6,
+    meanObliquityCosRatioAtAge: deps.meanObliquityCosRatioAtAge,
   });
 
 
-  /** The composed lunisolar precession rate, ″/yr — p₀·[ω/ω₀]·[f_S + (1 − f_S)
-   * (a₀/a_M)³] on the derived J2000 anchor (S5). ≡ 1,296,000·(H₀/axial0)/H(t).
+  /** THE PRECESSION RATE OF DATE ψ̇(t), ″/yr — the constant's scaling
+   * p₀·[ω/ω₀]·[f_S + (1 − f_S)(a₀/a_M)³] × cos ε̄(t)/cos ε̄(0), ε̄ the cited mean
+   * obliquity (plan 12 §8 option (a); the chain held cos ε̄ at J2000 before —
+   * 2.5 % of rate at 2.46 Ga, 2e-7 at 10 kyr). p₀ the J2000 anchor (S5).
    * @param {number} t_Ma @returns {number|null} */
   function lunisolarPrecessionRateArcsecPerYrAtAge(t_Ma) {
     return composed.composedRateArcsecPerYrAtAge(t_Ma);
   }
 
-  /** The mean lunisolar precession period T_p(t), years — 1,296,000/ψ̇(t);
-   * 25,771.4 at J2000 (the model's one J2000 precession reading, S5).
+  /** The mean lunisolar precession period T_p(t), years — 1,296,000/ψ̇(t) on
+   * the rate of date; 25,771.6 at J2000 (the model's one J2000 precession
+   * reading, S5). THE published deep-time clock.
    * @param {number} t_Ma @returns {number|null} */
   function lunisolarPrecessionPeriodYearsAtAge(t_Ma) {
     return composed.composedPeriodYearsAtAge(t_Ma);
+  }
+
+  /** THE PRECESSION CONSTANT OF DATE as a rate on the J2000 obliquity, ″/yr —
+   * the spin and torque scaling alone, α(t)·cos ε̄₀. The hybrid obliquity
+   * integration takes this one: its own ŝ·n̂ carries the cosine.
+   * @param {number} t_Ma @returns {number|null} */
+  function lunisolarTorqueRateArcsecPerYrAtAge(t_Ma) {
+    return composed.torqueRateArcsecPerYrAtAge(t_Ma);
+  }
+  /** 1,296,000/the torque rate, years. @param {number} t_Ma @returns {number|null} */
+  function lunisolarTorquePeriodYearsAtAge(t_Ma) {
+    return composed.torquePeriodYearsAtAge(t_Ma);
+  }
+  /** cos ε̄(t)/cos ε̄(0) — the rate's obliquity factor (1 at J2000; 1 when no
+   * history is injected). @param {number} t_Ma @returns {number|null} */
+  function precessionObliquityFactorAtAge(t_Ma) {
+    return composed.obliquityFactorAtAge(t_Ma);
   }
 
   /** Sidereal year seconds (Kepler under linear mass loss, dT/T = −2 dM/M).
@@ -176,7 +201,8 @@ function createDeepTimeLod(deps) {
 
   /** Tropical year of date, seconds — the sidereal year less the equinox's
    * own motion over one year: one turn per the composed lunisolar precession
-   * period T_p(t), 1/T_trop = 1/T_sid + ψ̇(t)/(1,296,000″ · Julian-year s).
+   * period T_p(t), 1/T_trop = 1/T_sid + ψ̇(t)/(1,296,000″ · Julian-year s),
+   * ψ̇(t) the RATE of date (with the cited mean obliquity's cosine, plan 12 §8).
    * Plan 09 step 5d: it was the unit's calendar convention sid·(1 − 13/H(t))
    * — plan 06 D2 had kept it as a named device — 0.086 % slow on the equinox
    * term (1.0 s of year at J2000), and the deep JD↔year calendar integrates
@@ -191,7 +217,8 @@ function createDeepTimeLod(deps) {
     const sidSec = siderealYearSecondsAtAge(t_Ma);
     const term = composed.torqueTermAtAge(t_Ma);
     const p0 = composed.p0ArcsecPerYr;
-    const rate = (LOD_s === null || !(LOD_s > 0) || term === null) ? p0 : (K.lodNowH13Seconds / LOD_s) * p0 * term;
+    const f = composed.obliquityFactorAtAge(t_Ma);
+    const rate = (LOD_s === null || !(LOD_s > 0) || term === null || f === null) ? p0 : (K.lodNowH13Seconds / LOD_s) * p0 * term * f;
     return 1 / (1 / sidSec + rate / (1296000 * 365.25 * 86400));
   }
 
@@ -360,6 +387,8 @@ function createDeepTimeLod(deps) {
   return {
     lodSecondsAtAge, lodSecondsAtAgeWithAlpha, lodHoursAtAge,
     lunisolarPrecessionRateArcsecPerYrAtAge, lunisolarPrecessionPeriodYearsAtAge,
+    // the constant's scaling alone (the hybrid's integrand) and the rate's obliquity factor (plan 12 §8)
+    lunisolarTorqueRateArcsecPerYrAtAge, lunisolarTorquePeriodYearsAtAge, precessionObliquityFactorAtAge,
     // the composition's terms (plan 06 Phase 3 S3, the lunisolar surface): (a₀/a_M)³ and f_S + (1 − f_S)(a₀/a_M)³
     lunarTorqueFactorAtAge: composed.lunarTorqueFactorAtAge,
     precessionTorqueTermAtAge: composed.torqueTermAtAge,

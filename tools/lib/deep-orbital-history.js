@@ -91,12 +91,13 @@ function createOneSourceMovement() {
     anchorAscNodeEclipticDeg: AE.ascNodeEclipticDeg,
     axialPrecessionYearsJ2000: axial0,
     obliquityJ2000Deg: C.ASTRO_REFERENCE.obliquityJ2000_deg,
-    // D6 → Phase 3 (plan 06): the composed lunisolar precession period of
-    // date T_p(t) (spin × [solar + lunar torque on the recession history]),
-    // read directly since plan 09 step 5c (was period₀·H(t)/H₀ on the unit —
-    // the same number to 2e-16) — NOT the frozen era clock's H_era. Twins:
-    // packages/physics model.js and src/script.js _deepHistSeries.
-    axialPrecessionYearsAtYearFn: (yr) => DT.meanLunisolarPrecessionPeriodYearsAtAge((2000 - yr) / 1e6) ?? axial0,
+    // D6 → Phase 3 (plan 06): the composed lunisolar precession CONSTANT of
+    // date (spin × [solar + lunar torque on the recession history]) — the
+    // torque period, NOT the published rate of date: the integration's own
+    // ŝ·n̂ carries the obliquity's cosine, so the cited mean obliquity's factor
+    // (plan 12 §8 option (a)) must not enter twice. Twins: packages/physics
+    // model.js and src/script.js _deepHistSeries.
+    axialPrecessionYearsAtYearFn: (yr) => DT.meanLunisolarTorquePeriodYearsAtAge((2000 - yr) / 1e6) ?? axial0,
     // THE PRECESSION OF DATE (plan 06 §9 item 10): the solar torque at the
     // eccentricity of date and the oblateness of date from the GIA channel —
     // both exactly 1 at J2000. Twins: packages/physics model.js and

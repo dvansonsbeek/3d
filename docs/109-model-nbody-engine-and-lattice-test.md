@@ -1,6 +1,6 @@
 ---
 docVersion: 1.0
-modelVersion: v26.1
+modelVersion: v26.2
 coefficients: sha256:ff77fbc9baa370e4
 status: current
 ---
@@ -823,9 +823,9 @@ period T_p(t) is the model's one deep-time clock (the internal unit and
 its thirteen-period identity are deleted, plan 09), and the rock reads it
 directly: the composed rate matches the
 Precambrian precession constants
-(<!--v:anchorXiamalingPrec1400Pred-->84.95<!--/v--> vs Meyers &
+(<!--v:anchorXiamalingPrec1400Pred-->86.53<!--/v--> vs Meyers &
 Malinverno 2018's 85.79 ± 2.72 ″/yr at 1.4 Ga,
-<!--v:anchorLantinkPrec2460Pred-->106.63<!--/v--> vs Lantink et al.
+<!--v:anchorLantinkPrec2460Pred-->109.24<!--/v--> vs Lantink et al.
 2022's 108.6 ± 8.5 ″/yr at 2.46 Ga — both paleo-anchors gate rows). The
 model's earlier deep-time reading, the spin-only clock
 13·1,296,000/(H₀·LOD/LOD₀), fails both rows (24 % and 35 % low) and is
@@ -836,8 +836,8 @@ reading "obliquity period ∝ T_p" — the J2000 beat held proportional to
 T_p(t); plan 06 S5 retired its former T_p·13/8 form) carry the fork at J2000, 1.4
 and 2.46 Ga: today the readings are degenerate (ψ̇ ≫ s₃ — which is why
 the retired device's eighth-of-unit label always fit), while at 2.46 Ga the beat reads
-<!--v:obliqBeat2460MaKyr-->14.7<!--/v--> kyr against
-<!--v:obliqH8Scaled2460MaKyr-->19.4<!--/v--> for period ∝ T_p — a level
+<!--v:obliqBeat2460MaKyr-->14.3<!--/v--> kyr against
+<!--v:obliqH8Scaled2460MaKyr-->18.9<!--/v--> for period ∝ T_p — a level
 cyclostratigraphy can discriminate. The existing 1.4/2.46-Ga
 confirmations are precession-rate/LOD anchors; the deep-time obliquity
 PERIOD itself is undiscriminated, so this is a pre-registered prediction

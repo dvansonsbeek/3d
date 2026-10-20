@@ -67,7 +67,7 @@ const hist = factory({
   anchorAscNodeEclipticDeg: AE.ascNodeEclipticDeg,
   axialPrecessionYearsJ2000: axial0,
   obliquityJ2000Deg: C.ASTRO_REFERENCE.obliquityJ2000_deg,
-  axialPrecessionYearsAtYearFn: (yr) => axial0 * DT.meanLunisolarPrecessionPeriodYearsAtAge((2000 - yr) / 1e6) / Tp0,
+  axialPrecessionYearsAtYearFn: (yr) => axial0 * DT.meanLunisolarTorquePeriodYearsAtAge((2000 - yr) / 1e6) / Tp0,   // plan 12 §8: the TORQUE period (the integration's own ŝ·n̂ carries the cosine)
 });
 const t0 = Date.now();
 const grid = hist.build(0, T_MIN_YR, STEP_YR);

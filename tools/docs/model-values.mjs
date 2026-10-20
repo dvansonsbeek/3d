@@ -1900,8 +1900,14 @@ export const VALUES = {
       earthPrecLunarJ2000ArcsecPerYr: { get: () => dtl().precessionRateJ2000ArcsecPerYr() * (1 - dtl().PRECESSION_SOLAR_SHARE_J2000), render: (v) => Number(v).toFixed(4), unit: '″/yr',note: 'the lunar torque’s share of the J2000 rate, (1 − f_S) · ψ̇₀' },
     };
     for (const age of [650, 1400, 2460]) {
-      out[`earthPrecComposed${age}MaArcsecPerYr`] = { get: () => composedAt(age), render: (v) => Number(v).toFixed(1), unit: '″/yr', note: `the two engines composed at ${age} Ma: ω(t) × (solar torque + lunar torque on the recession history), μ = 1 — the model’s ψ̇(t), = 1,296,000·13/H(t) on the unit (plan 06 D6/Phase 3)` };
+      out[`earthPrecComposed${age}MaArcsecPerYr`] = { get: () => composedAt(age), render: (v) => Number(v).toFixed(1), unit: '″/yr', note: `the precession RATE of date at ${age} Ma: ω(t) × (solar torque + lunar torque on the cited recession history) × cos ε̄(t)/cos ε̄(0) on the cited mean obliquity (plan 12 §8 option (a); the chain held cos ε̄ at J2000 before), μ = 1 — the model’s ψ̇(t) (plan 06 D6/Phase 3)` };
+      out[`earthPrecTorque${age}MaArcsecPerYr`] = { get: () => dtl().meanLunisolarTorqueRateArcsecPerYrAtAge(age), render: (v) => Number(v).toFixed(1), unit: '″/yr', note: `the precession CONSTANT of date at ${age} Ma as a rate on the J2000 obliquity — the spin and torque scaling alone (what the hybrid obliquity integration takes; the pre-§8 published rate)` };
+      out[`earthMeanObliquityCited${age}MaDeg`] = { get: () => dtl().meanObliquityCitedDegAtAge(age), render: (v) => Number(v).toFixed(2), unit: '°', note: `the cited mean obliquity of date at ${age} Ma — Farhat et al. 2022’s own column of the Earth–Moon history (a Myr-scale mean; 23.25° at age 0), read as cos ε̄(t)/cos ε̄(0) on the precession rate (plan 12 §8 option (a))` };
+      out[`earthPrecObliquityFactor${age}MaPct`] = { get: () => 100 * (dtl().precessionObliquityFactorAtAge(age) - 1), render: (v) => Number(v).toFixed(2), unit: '%', note: `cos ε̄(t)/cos ε̄(0) − 1 at ${age} Ma — what the cited mean obliquity adds to the precession rate of date over the constant’s scaling` };
     }
+    out.earthMeanObliquityCitedJ2000Deg = { get: () => dtl().meanObliquityCitedDegAtAge(0), render: (v) => Number(v).toFixed(2), unit: '°', note: 'the cited mean obliquity at age 0 (Farhat et al. 2022) — a Myr-scale MEAN of a secular solution, against the J2000 instant 23.44° the hybrid starts from; the rate’s factor is the RATIO cos ε̄(t)/cos ε̄(0), so the model keeps its own J2000 obliquity' };
+    out.earthMeanObliquityCitedDevonianDeg = { get: () => dtl().meanObliquityCitedDegAtAge(380), render: (v) => Number(v).toFixed(2), unit: '°', note: 'the cited mean obliquity at the Devonian (380 Ma) — Farhat et al. 2022’s column' };
+    out.earthPrecObliquityFactorDevonianPct = { get: () => 100 * (dtl().precessionObliquityFactorAtAge(380) - 1), render: (v) => Number(v).toFixed(2), unit: '%', note: 'cos ε̄(t)/cos ε̄(0) − 1 at the Devonian — what the cited mean obliquity adds to the precession rate of date' };
     return out;
   })(),
 
@@ -2276,7 +2282,8 @@ export const VALUES = {
         .sort((a, b) => Math.hypot(b.re, b.im) - Math.hypot(a.re, a.im))[0];
       return Math.abs(z.omegaRadPerYr * 180 / Math.PI) * 3600;   // ″/yr
     };
-    // T_p(t) = the composed lunisolar period on the derived J2000 anchor (S5) — ONE home
+    // T_p(t) = the composed lunisolar period on the derived J2000 anchor (S5) — ONE home; since
+    // plan 12 §8 the RATE of date (the cited mean obliquity's cosine on the constant's scaling)
     const axialYr = (tMa) => DT().meanLunisolarPrecessionPeriodYearsAtAge(tMa);
     // The beat rides the spin axis's INERTIAL rate: the composed rate × the hybrid's self-anchor
     // factor (inertial/general at J2000, the multiplicative form the obliquity integration applies).
@@ -2285,7 +2292,7 @@ export const VALUES = {
     // "obliquity period ∝ T_p": the J2000 beat held proportional to T_p(t) (≡ the beat at J2000)
     const h8Kyr = (tMa) => beatKyr(0.000001) * axialYr(tMa) / axialYr(0.000001);
     const mk = (name, tMa, label) => ({
-      [`obliqBeat${name}Kyr`]: { get: () => beatKyr(tMa), render: (v) => Number(v).toFixed(1), unit: 'kyr', note: `the obliquity band as the BEAT 2π/(ψ̇ᵢₙ − |s₃|) at ${label} — ψ̇ᵢₙ the spin axis's inertial rate (the composed lunisolar rate on the derived J2000 anchor, plan 06 D6/Phase 3/S5, times the hybrid's self-anchor factor), s₃ dynamical under measured μ (the adopted leg-1 form)` },
+      [`obliqBeat${name}Kyr`]: { get: () => beatKyr(tMa), render: (v) => Number(v).toFixed(1), unit: 'kyr', note: `the obliquity band as the BEAT 2π/(ψ̇ᵢₙ − |s₃|) at ${label} — ψ̇ᵢₙ the spin axis's inertial rate of date (the composed lunisolar RATE — the constant's scaling × the cited mean obliquity's cos ε̄(t)/cos ε̄(0), plan 06 D6/Phase 3/S5 + plan 12 §8 — times the hybrid's self-anchor factor), s₃ dynamical under measured μ (the adopted leg-1 form)` },
       [`obliqH8Scaled${name}Kyr`]: { get: () => h8Kyr(tMa), render: (v) => Number(v).toFixed(1), unit: 'kyr', note: `the pure precession-scaling reading "obliquity period ∝ T_p" (the J2000 beat × T_p(t)/T_p(J2000)) at ${label} — identical to the beat at J2000, the discriminated alternative at depth (identifier keeps its historical H/8 name; S5 retired the T_p·13/8 form)` },
     });
     return {
@@ -3093,7 +3100,7 @@ export const VALUES = {
     for (const [key, tOf] of Object.entries(epochs)) {
       out[`lodAt${key}Hr`] = { get: () => dtl().meanLodSecondsAtAge(tOf()) / 3600, render: (v) => Number(v).toFixed(2), unit: 'hr' };
       out[`moonDistanceAt${key}`] = { get: () => rawMoonKm(tOf()), render: (v) => thousands(Math.round(v)), unit: 'km' };
-      out[`axialPrecAt${key}`] = { get: () => dtl().meanLunisolarPrecessionPeriodYearsAtAge(tOf()), render: (v) => thousands(Math.round(v)), unit: 'yr', note: 'the composed lunisolar precession period at this epoch (S5; was H(t)/13, 0.086 % slow)' };
+      out[`axialPrecAt${key}`] = { get: () => dtl().meanLunisolarPrecessionPeriodYearsAtAge(tOf()), render: (v) => thousands(Math.round(v)), unit: 'yr', note: 'the composed lunisolar precession period at this epoch — 1,296,000/the precession RATE of date, with the cited mean obliquity’s cosine since plan 12 §8 (S5; was H(t)/13, 0.086 % slow)' };
     }
     // The clock at ±1 Gyr (the website's deep-time phase table; the composed period, S5 — the
     // old table quoted H/13 there). Forward: the recession polynomial's extrapolation region.

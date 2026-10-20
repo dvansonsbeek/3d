@@ -1,6 +1,6 @@
 ---
 docVersion: 1.0
-modelVersion: v26.1
+modelVersion: v26.2
 coefficients: sha256:ff77fbc9baa370e4
 status: current
 ---
@@ -49,7 +49,7 @@ cause — see [doc 99 §mid-Precambrian window](99-expanding-solar-system-resona
 
 Flagship: Wells's Devonian 400 days/yr vs the model's
 <!--v:daysPerYearAtDevonian-->402.83<!--/v--> (the composed precession period at
-380 Ma = <!--v:axialPrecAtDevonian-->21,396<!--/v--> yr) — with **zero free
+380 Ma = <!--v:axialPrecAtDevonian-->21,235<!--/v--> yr) — with **zero free
 parameters** in the composed lunisolar coupling: the deep-time
 trajectory is calibrated to Farhat 2022 and the modern LLR recession rate,
 never to the fossil data it is tested against.

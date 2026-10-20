@@ -1,6 +1,6 @@
 ---
 docVersion: 1.0
-modelVersion: v26.1
+modelVersion: v26.2
 coefficients: sha256:ff77fbc9baa370e4
 status: current
 ---
@@ -44,7 +44,7 @@ Per the [Expanding Solar System Resonance Theory (Doc 99)](99-expanding-solar-sy
 | Planet orbital periods (Part 4 `solarYearInput`) | `meanPlanetOrbitalPeriodAtAge(t_Ma, T_p_J2000_s)` |
 | α(t) GIA correction → ΔT | `meanDeltaTSecondsAtAge(t_Ma)` |
 
-The clocks evolve under two physically independent drivers: **Driver 1** = Earth-Moon tidal evolution (LOD grows, Moon recedes; the composed lunisolar precession period T_p(t) follows it); **Driver 2** = solar mass loss (every planet's orbit slowly expands via Kepler's 3rd law). At Devonian (380 Ma) T_p ≈ <!--v:axialPrecAtDevonian-->21,396<!--/v--> yr; at +200 Myr T_p ≈ <!--v:axialPrecAt200MyrFuture-->28,202<!--/v--> yr. (The unit H(t) that scaled with it — 13.011 periods, a fit constant's multiple — left the model at plan 09 step 7b.) The K-device wheel periods are a J2000 pose and do not scale; no observable rides them.
+The clocks evolve under two physically independent drivers: **Driver 1** = Earth-Moon tidal evolution (LOD grows, Moon recedes; the composed lunisolar precession period T_p(t) follows it); **Driver 2** = solar mass loss (every planet's orbit slowly expands via Kepler's 3rd law). At Devonian (380 Ma) T_p ≈ <!--v:axialPrecAtDevonian-->21,235<!--/v--> yr; at +200 Myr T_p ≈ <!--v:axialPrecAt200MyrFuture-->28,315<!--/v--> yr. (The unit H(t) that scaled with it — 13.011 periods, a fit constant's multiple — left the model at plan 09 step 7b.) The K-device wheel periods are a J2000 pose and do not scale; no observable rides them.
 
 For the canonical derivation chain from `t_Ma` through LOD, the composed precession period, AU, M_Sun, Kepler year, Moon distance, Moon period, anomalistic year, stellar/sidereal days, and planet orbital + synodic periods, see [Doc 99 — ESSRT](99-expanding-solar-system-resonance-theory.md) and the `mean*AtAge` family — ONE home since plan 13 B2, `@essrt/physics/deltat/deep-time-chain` (`createDeepTimeChain`; `tools/lib/deep-time.js` and the package model are its consumers). (The per-planet integer-label tabulation on the anchor's eight-unit interval is archived.)
 
@@ -218,7 +218,7 @@ These constants define the model. Changing any of them changes the theory.
 | Eccentricity Amplitude | (`eccentricityAmplitude` — DELETED, plan 11 step 4) | was 0.001356 | The Law-4 K input A, lately only the Wobble marker's display radius (now the scene literal `WOBBLE_MARKER_RADIUS_SCENE_UNITS`); the K law it calibrated is retired. Its derivation record: the 1246 triangle closure e(J2000)² = base² + A² + 2·base·A·cos φ on the H/16 beat from the <!--v:periAlignYearRound-->1246.03<!--/v--> perihelion–solstice alignment reproduced this value (the closure's registry keys — the phase, the derived A and the ±5 % alignment-year test — left with the eccentricity law at plan 09 step 6). A does not enter any e(t): Earth's eccentricity of date is the N-body series |
 | Mean Obliquity | (`earthtiltMean` — DELETED, plan 11 step 4) | was 23.41353 deg | The K scaffold's mean tilt; the rendered obliquity of date is the hybrid spin integration, its J2000 anchor the astro-reference input |
 | RA Angle | (`earthRAAngle` — DELETED, plan 11 step 4) | was ~1.254 | The scaffold's derived `2A − A²/ε`, the perihelion wheel's tilt; the perihelion pair's container is world-placed every frame |
-| Mean Inclination (inv. plane) | (`earthInvPlaneInclinationMean` — DELETED, plan 11 step 2) | the engine's mean over ±10 Myr is <!--v:earthInclMean-->1.28745<!--/v--> deg | The retired device's mean (inclJ2000 − A·cos(the K phase)) was the invariable-plane disc's init pose, rewritten from the engine's one-source normal every frame; the registry's `earthInclMean`/`Min`/`Max` are the engine's ±10-Myr statistics since plan 11 step 2 |
+| Mean Inclination (inv. plane) | (`earthInvPlaneInclinationMean` — DELETED, plan 11 step 2) | the engine's mean over ±10 Myr is <!--v:earthInclMean-->1.28741<!--/v--> deg | The retired device's mean (inclJ2000 − A·cos(the K phase)) was the invariable-plane disc's init pose, rewritten from the engine's one-source normal every frame; the registry's `earthInclMean`/`Min`/`Max` are the engine's ±10-Myr statistics since plan 11 step 2 |
 | Inclination Amplitude | (`earthInvPlaneInclinationAmplitude` — DELETED, plan 11 step 4) | was 0.63607 deg | The K scaffold's tilt amplitude (the ecliptic and obliquity wheels' ±A); the engine's inclination statistics are `earthInclMean/Min/Max` |
 | Inclination Cycle Anchor | (`earthInclinationCycleAnchor` — DELETED, plan 09 step 6) | was 21.77° | the eccentricity law's phase anchor (the perihelion longitude at maximum inclination); the scene pose it also set is the recorded `kDeviceInclinationPhaseJ2000Deg` = ϖ_J2000 − 21.77° |
 | Perihelion Ref JD | `perihelionRefJD` | <!--v:perihelionPassageJD-->2451547.042<!--/v--> | JD of Earth perihelion 2000 (Jan 3.542) |
@@ -382,7 +382,7 @@ verification instruments, `inclination-optimization` and
 |--------|----------|---------------|-------------|
 | Mercury | <!--v:mercuryInclMean-->6.690391<!--/v--> | <!--v:mercuryInclMin-->0.14<!--/v-->–<!--v:mercuryInclMax-->10.97<!--/v--> | <!--v:mercuryPeriPeriodICRF-->232,437<!--/v--> yr |
 | Venus | <!--v:venusInclMean-->1.538475<!--/v--> | <!--v:venusInclMin-->0.00<!--/v-->–<!--v:venusInclMax-->3.46<!--/v--> | <!--v:venusPeriPeriodICRF-->174,997<!--/v--> yr |
-| Earth | <!--v:earthInclMean-->1.28745<!--/v--> | <!--v:earthInclMin-->0.034<!--/v-->–<!--v:earthInclMax-->2.942<!--/v--> (the K scaffold's amplitude 0.636 is deleted, plan 11 step 4) | <!--v:earthPeriPeriodICRF-->111,635<!--/v--> yr |
+| Earth | <!--v:earthInclMean-->1.28741<!--/v--> | <!--v:earthInclMin-->0.034<!--/v-->–<!--v:earthInclMax-->2.942<!--/v--> (the K scaffold's amplitude 0.636 is deleted, plan 11 step 4) | <!--v:earthPeriPeriodICRF-->111,635<!--/v--> yr |
 | Mars | <!--v:marsInclMean-->4.205698<!--/v--> | <!--v:marsInclMin-->0.07<!--/v-->–<!--v:marsInclMax-->6.80<!--/v--> | <!--v:marsPeriPeriodICRF-->72,335<!--/v--> yr |
 | Jupiter | <!--v:jupiterInclMean-->0.362449<!--/v--> | <!--v:jupiterInclMin-->0.20<!--/v-->–<!--v:jupiterInclMax-->0.49<!--/v--> | <!--v:jupiterPeriPeriodICRF-->304,456<!--/v--> yr |
 | Saturn | <!--v:saturnInclMean-->0.891489<!--/v--> | <!--v:saturnInclMin-->0.77<!--/v-->–<!--v:saturnInclMax-->1.02<!--/v--> | <!--v:saturnPeriPeriodICRF-->45,883<!--/v--> yr |

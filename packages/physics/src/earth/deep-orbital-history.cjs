@@ -57,9 +57,11 @@
  *   measured at the 500-yr artifact cadence: 0.16″/0.18″ rms vs IAU-2006
  *   over 1900–2100/1600–2400 vs the era tier's 0.31″/0.63″, and 0.0396°
  *   vs La2004 over −200 kyr vs the deep tier's 0.069° — the C-1 verdict,
- *   plan 02) and zetaModes serves only as the TAIL beyond the span (the
- *   seam at the span edge is the extraction residual, far outside every
- *   certified window). solarTorqueShareJ2000 and
+ *   plan 02) and zetaModes serves only as the TAIL beyond the span, joined
+ *   to the series at each edge so n̂ is continuous there (plan 12 §8.3 — the
+ *   J2000-point anchor left a 1.6° step at −10 Myr that kicked the hybrid's
+ *   mean obliquity +0.9° for the whole tail; far outside every certified window).
+ *   solarTorqueShareJ2000 and
  *   dynamicalEllipticityRatioAtYearFn: THE PRECESSION OF DATE — the two
  *   factors on the precession constant (see alphaAtGeneral below); absent,
  *   the constant is the secular law alone, bit-identical.
@@ -73,19 +75,22 @@ function createDeepOrbitalHistory({
 }) {
   const D2R = Math.PI / 180, R2D = 180 / Math.PI;
 
+  const mkRawSum = (
+    /** @type {ReadonlyArray<{omegaRadPerYr: number, re: number, im: number}>} */ modes,
+  ) => (/** @type {number} */ t) => {
+    let re = 0, im = 0;
+    for (const m of modes) {
+      const c = Math.cos(m.omegaRadPerYr * t), s = Math.sin(m.omegaRadPerYr * t);
+      re += m.re * c - m.im * s;
+      im += m.re * s + m.im * c;
+    }
+    return [re, im];
+  };
   const mkAnchored = (
     /** @type {ReadonlyArray<{omegaRadPerYr: number, re: number, im: number}>} */ modes,
     /** @type {[number, number]} */ anchor,
   ) => {
-    const sum = (/** @type {number} */ t) => {
-      let re = 0, im = 0;
-      for (const m of modes) {
-        const c = Math.cos(m.omegaRadPerYr * t), s = Math.sin(m.omegaRadPerYr * t);
-        re += m.re * c - m.im * s;
-        im += m.re * s + m.im * c;
-      }
-      return [re, im];
-    };
+    const sum = mkRawSum(modes);
     const s0 = sum(0), R = [anchor[0] - s0[0], anchor[1] - s0[1]];
     return (/** @type {number} */ t) => { const [x, y] = sum(t); return [x + R[0], y + R[1]]; };
   };
@@ -161,9 +166,33 @@ function createDeepOrbitalHistory({
     const nS = sq.length, tEndYr = t0Yr + (nS - 1) * stepYr;
     const li = mkSeriesCubic(t0Yr, stepYr, nS);
     const R = [zetaAnchor[0] - li(sq, 0), zetaAnchor[1] - li(sp, 0)];
-    zetaAt = (/** @type {number} */ t) => (t >= t0Yr && t <= tEndYr)
-      ? [li(sq, t) + R[0], li(sp, t) + R[1]]
-      : zetaModeSum(t);
+    // THE TAIL JOINS THE SERIES AT EACH SEAM (plan 12 §8.3, measured 2026-10).
+    // The mode-sum tail anchored to the J2000 POINT reached the span edges
+    // 1.61° (past) / 0.74° (future) away from the series — its ~70-kyr phases
+    // drift over 10 Myr (the extraction residual) and its J2000 anchor misses
+    // the series' mean plane by 0.506° — and the hybrid's mean obliquity
+    // STEPPED +0.90° / +0.30° there and stayed stepped (24.17° over ±1 Myr at
+    // −20 Myr against 23.3° inside the span; the API served it to ±500 Myr).
+    // Three anchors measured: J2000 point (above), the series' MEAN plane
+    // (n̂ step 1.12°/0.54°, ε step +0.74°/+0.57°), and the SEAM POINT per side
+    // — the tail's constant chosen so n̂ is continuous at the edge it continues
+    // (ε step +0.09°/+0.13°, the tail's mean 23.31–23.36° over ±100 Myr). The
+    // pole follows n̂ adiabatically (ds/dt = α(ŝ·n̂)(ŝ×n̂) conserves ŝ·n̂ for a
+    // slowly moving n̂), so a DISCONTINUITY in n̂ is what kicks ε, not the
+    // tail's mean plane: continuity wins. Inside the span nothing changes
+    // (bit-identical); beyond it the hybrid carries the Quaternary mean on the
+    // tail — NO tidal evolution of the mean (the cited mean obliquity of date
+    // is model.earth.meanObliquityCitedDeg).
+    const rawSum = mkRawSum(zetaModes);
+    const e0 = rawSum(t0Yr), e1 = rawSum(tEndYr);
+    const RPast = [li(sq, t0Yr) + R[0] - e0[0], li(sp, t0Yr) + R[1] - e0[1]];
+    const RFuture = [li(sq, tEndYr) + R[0] - e1[0], li(sp, tEndYr) + R[1] - e1[1]];
+    zetaAt = (/** @type {number} */ t) => {
+      if (t >= t0Yr && t <= tEndYr) return [li(sq, t) + R[0], li(sp, t) + R[1]];
+      const [x, y] = rawSum(t);
+      const Rt = t < t0Yr ? RPast : RFuture;
+      return [x + Rt[0], y + Rt[1]];
+    };
   }
   const zAnchor = /** @type {[number, number]} */ (
     [anchorE * Math.cos(anchorPeriEclipticDeg * D2R), anchorE * Math.sin(anchorPeriEclipticDeg * D2R)]);

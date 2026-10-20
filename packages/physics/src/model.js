@@ -172,6 +172,9 @@ export function assembleModel(C, F, laws = {}, secularSeriesArtifact = /** @type
   /** THE REALIZED POLE RATE OVER A WINDOW, ″/yr — the mean over [yearFrom, yearTo] of the rate the spin
    *  integration actually turns the pole at: the inertial secular rate of date × the solar-torque factor at
    *  e(t) × J₂(t)/J₂₀ × cos ε(t)/cos ε₀ (ds/dt = α (ŝ·n̂)(ŝ×n̂): the azimuthal rate about n̂ is α cos ε).
+   *  The secular rate here is the CONSTANT's scaling (lunisolarTorqueRate…), not the published rate of
+   *  date: the hybrid's own ε(t) carries the ONE cosine, so the cited mean obliquity's factor (plan 12 §8)
+   *  does not enter twice — inside the ζ-series span the hybrid IS the model's obliquity of date.
    *  Measured (2026-10): the dominant obliquity line of the model's own ε(t) over the last 5 Myr sits at
    *  this mean minus |s₃| (40,938 fitted vs 40,936 predicted), NOT at the J2000 beat (41,098) — the pole
    *  turned faster in the past (spin +0.06 ″/yr over 5 Myr, lower mean obliquity +0.05, higher mean
@@ -192,7 +195,7 @@ export function assembleModel(C, F, laws = {}, secularSeriesArtifact = /** @type
     const kInertial = certifiedAxialPrecessionJ2000Years() / oneSourceM.axialPrecessionYearsLunisolarJ2000;
     let sum = 0, n = 0;
     for (let y = lo; y <= hi; y += stepYears) {
-      const r = deepLod.lunisolarPrecessionRateArcsecPerYrAtAge(yearToTMa(y));
+      const r = deepLod.lunisolarTorqueRateArcsecPerYrAtAge(yearToTMa(y));
       const psiDot = (r === null ? 1296000 / certifiedAxialPrecessionJ2000Years() : r) * kInertial;
       const f = oneSourceM.precessionOfDateFactorsAt(y);
       sum += psiDot * f.solarTorque * (useEllipticity ? f.ellipticity : 1) * Math.cos(oneSourceM.epsAt(y) * Math.PI / 180) / cosEps0;
@@ -407,7 +410,10 @@ export function assembleModel(C, F, laws = {}, secularSeriesArtifact = /** @type
       // rendering-device residual imported as the initial condition of the
       // physics (found when the package began publishing the hybrid).
       obliquityJ2000Deg: C.earthOrbital.obliquityJ2000_deg,
-      axialPrecessionYearsAtYearFn: (yr) => deepLod.lunisolarPrecessionPeriodYearsAtAge((startmodelYear - yr) / 1e6) ?? axial0,
+      // The CONSTANT's scaling (the torque period), not the published rate of date: the
+      // integration's own ŝ·n̂ carries the obliquity's cosine, so the cited mean obliquity's
+      // factor (plan 12 §8 option (a)) must not enter twice. Bit-identical to the pre-§8 form.
+      axialPrecessionYearsAtYearFn: (yr) => deepLod.lunisolarTorquePeriodYearsAtAge((startmodelYear - yr) / 1e6) ?? axial0,
       // THE PRECESSION OF DATE (plan 06 §9 item 10): on top of the secular
       // law above, the solar torque at the eccentricity of date and the
       // oblateness of date from the GIA channel — both exactly 1 at J2000,
@@ -1405,10 +1411,18 @@ export function assembleModel(C, F, laws = {}, secularSeriesArtifact = /** @type
     // ±26 kyr) and T_peri/T_p with T_peri = 1/(1/T_p + 1/T_aps) the
     // perihelion-of-date period (0.812 at J2000) — on the of-date T_p.
     lunisolar: Object.freeze({
-      /** The mean lunisolar precession period T_p(t), years — the composed torque rate's period on the derived J2000 anchor (25,771.4 at J2000). @param {number} year @returns {number} */
+      /** The mean lunisolar precession period T_p(t), years — 1,296,000/the precession RATE of date (25,771.6 at J2000): THE published deep-time clock. @param {number} year @returns {number} */
       meanPeriodYearsAtYear: (year) => { const p = deepLod.lunisolarPrecessionPeriodYearsAtAge(yearToTMa(year)); return p === null ? certifiedAxialPrecessionJ2000Years() : p; },
-      /** The composed rate ψ̇(t) = [ω/ω₀]·p₀·[f_S + (1 − f_S)(a₀/a_M)³], ″/yr (p₀ = 50.2883, derived). @param {number} year @returns {number} */
+      /** THE PRECESSION RATE OF DATE ψ̇(t) = [ω/ω₀]·p₀·[f_S + (1 − f_S)(a₀/a_M)³] × cos ε̄(t)/cos ε̄(0), ″/yr — the constant's scaling on the spin and the lunar torque times the cited mean obliquity's cosine (plan 12 §8 option (a); p₀ = 50.2880, the IAU 2006 input). @param {number} year @returns {number} */
       meanRateArcsecPerYrAtYear: (year) => { const r = deepLod.lunisolarPrecessionRateArcsecPerYrAtAge(yearToTMa(year)); return r === null ? 1296000 / certifiedAxialPrecessionJ2000Years() : r; },
+      /** THE PRECESSION CONSTANT OF DATE as a rate on the J2000 obliquity, ″/yr — the spin and torque scaling alone (the hybrid obliquity integration's integrand: its own ŝ·n̂ carries the cosine). @param {number} year @returns {number} */
+      torqueRateArcsecPerYrAtYear: (year) => { const r = deepLod.lunisolarTorqueRateArcsecPerYrAtAge(yearToTMa(year)); return r === null ? 1296000 / certifiedAxialPrecessionJ2000Years() : r; },
+      /** 1,296,000/the torque rate, years. @param {number} year @returns {number} */
+      torquePeriodYearsAtYear: (year) => { const p = deepLod.lunisolarTorquePeriodYearsAtAge(yearToTMa(year)); return p === null ? certifiedAxialPrecessionJ2000Years() : p; },
+      /** cos ε̄(t)/cos ε̄(0) — the rate of date's obliquity factor on the constant (1 at J2000; 1.0075 at the Devonian, 1.0245 at 2.46 Ga). @param {number} year @returns {number} */
+      precessionObliquityFactorAtYear: (year) => { const f = deepLod.precessionObliquityFactorAtAge(yearToTMa(year)); return f === null ? 1 : f; },
+      /** THE CITED MEAN OBLIQUITY OF DATE ε̄(t), degrees — Farhat et al. 2022's own column of the Earth–Moon history (a Myr-scale MEAN: 23.25° at age 0 against the J2000 instant 23.44°; 22.23° Devonian, 19.73° at 2.46 Ga); read as the shape cos ε̄(t)/cos ε̄(0) on the precession rate. NaN beyond the input's span (4,429 Ma); forward of J2000 the J2000 slope is held. @param {number} year @returns {number} */
+      meanObliquityCitedDegAtYear: (year) => { const e = chain.meanObliquityCitedDegAtAge(yearToTMa(year)); return e === null ? NaN : e; },
       /** The of-date period — the one-family beat inside ±2 Myr, the composed mean beyond. @param {number} year @returns {number} */
       ofDatePeriodYearsAtYear: publishedAxialPrecessionYearsAtYear,
       /** f_S, the solar fraction of the J2000 precession torque. */
@@ -1501,7 +1515,13 @@ export function assembleModel(C, F, laws = {}, secularSeriesArtifact = /** @type
       // fitted 16-harmonic K comb that sat beside it as `obliquityCombDeg`
       // (a device fitted to the scene's own wheel geometry, 1.27° off
       // La2004 at −20 kyr) is deleted with the frozen era device (plan 09).
+      // Beyond the ζ series' span (±10 Myr) the hybrid carries NO tidal evolution
+      // of the mean obliquity (nothing in ds/dt = α(ŝ·n̂)(ŝ×n̂) moves ŝ·n̂'s mean):
+      // its deep mean is the Quaternary mean on the tail's mean plane (plan 12
+      // §8.3). The cited mean obliquity of date is `meanObliquityCitedDeg`.
       obliquityDeg: /** @param {number} year @returns {number} */ (year) => oneSourceM.epsAt(year),
+      /** The cited mean obliquity of date ε̄(t) (Farhat et al. 2022's column; plan 12 §8 option (a)), degrees — a Myr-scale mean; NaN beyond 4,429 Ma. @param {number} year @returns {number} */
+      meanObliquityCitedDeg: /** @param {number} year @returns {number} */ (year) => { const e = chain.meanObliquityCitedDegAtAge(yearToTMa(year)); return e === null ? NaN : e; },
       eccentricity: eccentricityAt,
       inclinationDeg,
       ascendingNodeDeg,

@@ -1,7 +1,8 @@
-export function createEpochPrimitives({ params: p, alphaAtAgeMa, moonDistanceMetresAtAge }: {
+export function createEpochPrimitives({ params: p, alphaAtAgeMa, moonDistanceMetresAtAge, meanObliquityCosRatioAtAge }: {
     params: EpochParams;
     alphaAtAgeMa: (tMa: number) => number;
     moonDistanceMetresAtAge: (tMa: number) => number | null;
+    meanObliquityCosRatioAtAge?: (tMa: number) => number | null;
 }): EpochPrimitives;
 export type EpochParams = {
     /**
@@ -53,7 +54,7 @@ export type EpochPrimitives = {
     lodSeconds: (year: number) => number | null;
     siderealYearSeconds: (year: number) => number;
     /**
-     * sidereal less one equinox turn per T_p(t) (the composed precession period)
+     * sidereal less one equinox turn per T_p(t) (the composed precession period on the RATE of date)
      */
     tropicalYearSeconds: (year: number) => number;
 };

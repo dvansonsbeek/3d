@@ -13,6 +13,20 @@
  * (1 − e²)^(−3/2) eccentricity factors and the lunar-inclination factor
  * 1 − 3/2·sin² i_M; ≈ 0.316, the textbook value). At J2000 every factor is 1.
  *
+ * THE RATE OF DATE vs THE CONSTANT (plan 12 §8, option (a)): the law above
+ * scales the precession CONSTANT α(t) ∝ ω(t)·[torque term] — the rate at the
+ * J2000 obliquity. The precession RATE is α(t)·cos ε̄(t), so the published
+ * rate carries one more factor, the cited mean obliquity's cos ε̄(t)/cos ε̄(0)
+ * (earth/mean-obliquity-history.cjs — Farhat 2022's own column, the second
+ * column read from the distance history; the chain had held cos ε̄ at J2000
+ * at every epoch). torqueRate… is the constant's scaling — what the hybrid
+ * obliquity integration takes, since its own ŝ·n̂ carries the cosine;
+ * composedRate… is the rate of date — T_p(t), the obliquity beat, the tropical
+ * year of date, the paleo referees' precession constant k. Both ≡ p₀ at J2000;
+ * the factor is 1 − 2e-7 at 10 kyr and 1.0245 at 2.46 Ga (the composed rate
+ * 106.6 → 109.2 ″/yr against Lantink 2022's 108.6 ± 8.5; Farhat's own
+ * precession column on the same table: 108.8).
+ *
  * THE ANCHOR p₀ (plan 06 S5 — one J2000 precession reading): p₀ is the
  * model's DERIVED J2000 rate, 1,296,000/axial0 with axial0 the certified
  * year-length laws' beat at 2000 (sid/(sid − trop) = 25,771.4 yr = 50.2883
@@ -64,14 +78,20 @@ function computeSolarTorqueShare(c) {
  *   moonDistanceMetresAtAge: (tMa: number) => (number | null),
  *   moonDistanceJ2000Metres: number,
  *   yearToTMa: (year: number) => number,
+ *   meanObliquityCosRatioAtAge?: (tMa: number) => (number | null),
  * }} deps - p0 = the model's derived J2000 rate, 1,296,000/axial0 (S5; a
  *   number or a LAZY getter — the callers' certified year laws read the
  *   deep-time factory this is built inside, so the anchor is resolved on
  *   the first RATE use, never at construction; the torque term needs no
- *   anchor); lodJ2000Seconds the SAME day basis lodSecondsAtAge(0) returns.
+ *   anchor); lodJ2000Seconds the SAME day basis lodSecondsAtAge(0) returns;
+ *   meanObliquityCosRatioAtAge the cited mean obliquity's cos ε̄(t)/cos ε̄(0)
+ *   (OPTIONAL — absent, the rate of date is the constant alone, bit-identical).
  * @returns {{
  *   composedRateArcsecPerYrAtAge: (tMa: number) => (number | null),
  *   composedPeriodYearsAtAge: (tMa: number) => (number | null),
+ *   torqueRateArcsecPerYrAtAge: (tMa: number) => (number | null),
+ *   torquePeriodYearsAtAge: (tMa: number) => (number | null),
+ *   obliquityFactorAtAge: (tMa: number) => (number | null),
  *   composedRateArcsecPerYrAtYear: (year: number) => (number | null),
  *   composedPeriodYearsAtYear: (year: number) => (number | null),
  *   composedRateRatioAtAge: (tMa: number) => (number | null),
@@ -107,12 +127,35 @@ function createComposedPrecession(deps) {
     const lf = lunarTorqueFactorAtAge(tMa);
     return lf === null ? null : fS + (1 - fS) * lf;
   };
-  /** @param {number} tMa */
-  const composedRateArcsecPerYrAtAge = (tMa) => {
+  /** cos ε̄(t)/cos ε̄(0) from the cited mean obliquity — 1 when no history is
+   * injected (the constant alone, bit-identical). @param {number} tMa @returns {number|null} */
+  const cosRatio = deps.meanObliquityCosRatioAtAge;
+  /** @type {(tMa: number) => number|null} */
+  const obliquityFactorAtAge = cosRatio ? (tMa) => cosRatio(tMa) : () => 1;
+  /** THE PRECESSION CONSTANT OF DATE as a rate on the J2000 obliquity, ″/yr —
+   * [ω(t)/ω₀]·p₀·[f_S + (1 − f_S)(a₀/a_M)³] = α(t)·cos ε̄₀. The hybrid
+   * obliquity integration takes THIS: ds/dt = α(ŝ·n̂)(ŝ×n̂) carries its own cosine.
+   * @param {number} tMa */
+  const torqueRateArcsecPerYrAtAge = (tMa) => {
     const lod = deps.lodSecondsAtAge(tMa);
     const term = torqueTermAtAge(tMa);
     if (lod === null || !(lod > 0) || term === null) return null;
     return (deps.lodJ2000Seconds / lod) * p0() * term;
+  };
+  /** @param {number} tMa */
+  const torquePeriodYearsAtAge = (tMa) => {
+    const r = torqueRateArcsecPerYrAtAge(tMa);
+    return r === null ? null : 1296000 / r;
+  };
+  /** THE PRECESSION RATE OF DATE ψ̇(t), ″/yr — the constant × cos ε̄(t)/cos ε̄(0):
+   * the published rate (T_p(t) = 1,296,000/ψ̇, the obliquity beat, the tropical
+   * year of date, the paleo referees' precession constant k).
+   * @param {number} tMa */
+  const composedRateArcsecPerYrAtAge = (tMa) => {
+    const r = torqueRateArcsecPerYrAtAge(tMa);
+    if (r === null) return null;
+    const f = obliquityFactorAtAge(tMa);
+    return f === null ? null : r * f;
   };
   /** @param {number} tMa */
   const composedPeriodYearsAtAge = (tMa) => {
@@ -134,6 +177,9 @@ function createComposedPrecession(deps) {
     composedRateArcsecPerYrAtYear: (year) => composedRateArcsecPerYrAtAge(deps.yearToTMa(year)),
     composedPeriodYearsAtYear: (year) => composedPeriodYearsAtAge(deps.yearToTMa(year)),
     composedRateRatioAtAge,
+    torqueRateArcsecPerYrAtAge,
+    torquePeriodYearsAtAge,
+    obliquityFactorAtAge,
     torqueTermAtAge,
     lunarTorqueFactorAtAge,
     solarShare: fS,

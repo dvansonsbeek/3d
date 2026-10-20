@@ -1,6 +1,6 @@
 ---
 docVersion: 1.0
-modelVersion: v26.1
+modelVersion: v26.2
 coefficients: sha256:ff77fbc9baa370e4
 status: current
 ---
@@ -113,10 +113,10 @@ The deep-time lunar periods (step 7), from the Node engine's month chain
 | 0.002584 | 27.321651 | 8.84923 | 18.59850 | 25771.5 | 1.0001306 | 1.0000552 |
 | 0.01 | 27.321621 | 8.84624 | 18.59585 | 25771.5 | 1.0004700 | 1.0001987 |
 | 0.1 | 27.321253 | 8.81484 | 18.56805 | 25770.4 | 1.0040476 | 1.0017099 |
-| 1 | 27.317557 | 8.81349 | 18.56829 | 25759.9 | 1.0043371 | 1.0018320 |
-| 10 | 27.280626 | 8.77904 | 18.55200 | 25655.4 | 1.0096392 | 1.0040654 |
-| 380 | 25.646057 | 9.43038 | 19.81467 | 21395.6 | 0.9996735 | 0.9998619 |
-| 650 | 24.440793 | 9.89326 | 20.78867 | 18663.4 | 0.9997916 | 0.9999119 |
+| 1 | 27.317557 | 8.81349 | 18.56829 | 25759.4 | 1.0043371 | 1.0018320 |
+| 10 | 27.280626 | 8.77904 | 18.55200 | 25650.3 | 1.0096392 | 1.0040654 |
+| 380 | 25.646057 | 9.43038 | 19.81467 | 21235.4 | 0.9996735 | 0.9998619 |
+| 650 | 24.440793 | 9.89326 | 20.78867 | 18435.1 | 0.9997916 | 0.9999119 |
 <!-- /generated:calcmap-lunar-periods -->
 
 ### 1.4 Findings from this chain (to act on)
@@ -262,18 +262,18 @@ J₂(t)/J₂₀ stays within ±<!--v:precOfDateEllipticityAmpLastMyrPct-->0.02<!
 The mean tidal clock and the composition, by age:
 
 <!-- generated:calcmap-tidal-clock -->
-| age (Ma) | a_M (km) | LOD (h) | ω/ω₀ = LOD₀/LOD | α (I/MR²) | (a₀/a)³ | **T_p = 1,296,000/ψ̇ (yr)** | ψ̇ (″/yr) |
-|---|---|---|---|---|---|---|---|
-| 0 | 384399 | 24.000 | 1.00000 | 0.330695 | 1.0000 | **25771.6** | 50.29 |
-| 0.01 | 384399 | 24.000 | 1.00000 | 0.330695 | 1.0000 | **25771.5** | 50.29 |
-| 0.1 | 384395 | 23.999 | 1.00002 | 0.330695 | 1.0000 | **25770.4** | 50.29 |
-| 1 | 384361 | 23.994 | 1.00025 | 0.330695 | 1.0003 | **25759.9** | 50.31 |
-| 10 | 384015 | 23.941 | 1.00247 | 0.330695 | 1.0030 | **25655.4** | 50.52 |
-| 100 | 380602 | 23.427 | 1.02448 | 0.330695 | 1.0302 | **24646.5** | 52.58 |
-| 380 | 368549 | 21.759 | 1.10301 | 0.330695 | 1.1347 | **21395.6** | 60.57 |
-| 650 | 356928 | 20.340 | 1.17994 | 0.330695 | 1.2491 | **18663.4** | 69.44 |
-| 1400 | 339940 | 18.537 | 1.29470 | 0.330695 | 1.4459 | **15255.6** | 84.95 |
-| 2460 | 321186 | 16.845 | 1.42477 | 0.330695 | 1.7143 | **12154.2** | 106.63 |
+| age (Ma) | a_M (km) | LOD (h) | ω/ω₀ = LOD₀/LOD | α (I/MR²) | (a₀/a)³ | cos ε̄(t)/cos ε̄₀ (the cited mean obliquity, plan 12 §8) | **T_p = 1,296,000/ψ̇ (yr)** | ψ̇ (″/yr) |
+|---|---|---|---|---|---|---|---|---|
+| 0 | 384399 | 24.000 | 1.00000 | 0.330695 | 1.0000 | 1.00000 | **25771.6** | 50.29 |
+| 0.01 | 384399 | 24.000 | 1.00000 | 0.330695 | 1.0000 | 1.00000 | **25771.5** | 50.29 |
+| 0.1 | 384395 | 23.999 | 1.00002 | 0.330695 | 1.0000 | 1.00000 | **25770.4** | 50.29 |
+| 1 | 384361 | 23.994 | 1.00025 | 0.330695 | 1.0003 | 1.00002 | **25759.4** | 50.31 |
+| 10 | 384015 | 23.941 | 1.00247 | 0.330695 | 1.0030 | 1.00020 | **25650.3** | 50.53 |
+| 100 | 380602 | 23.427 | 1.02448 | 0.330695 | 1.0302 | 1.00192 | **24599.3** | 52.68 |
+| 380 | 368549 | 21.759 | 1.10301 | 0.330695 | 1.1347 | 1.00755 | **21235.4** | 61.03 |
+| 650 | 356928 | 20.340 | 1.17994 | 0.330695 | 1.2491 | 1.01238 | **18435.1** | 70.30 |
+| 1400 | 339940 | 18.537 | 1.29470 | 0.330695 | 1.4459 | 1.01861 | **14976.9** | 86.53 |
+| 2460 | 321186 | 16.845 | 1.42477 | 0.330695 | 1.7143 | 1.02452 | **11863.3** | 109.24 |
 
 T_p(t) is the composed lunisolar precession period on the model’s ONE J2000 reading — 1,296,000/ψ̇ with p₀ = 1,296,000/T_p(J2000) = 50.2880 ″/yr, T_p(J2000) = 1,296,000/p_A on the IAU 2006 general precession input (plan 09; S5 had the retired year combs’ beat at 2000, 8 ppm faster) — `@essrt/physics/earth/precession-composed` built inside `deltat/deep-time.cjs`, one home: the hybrid precesses on it, the paleo-anchors gate checks the ψ̇ column. (The internal UNIT H(t) = H₀·(ω₀/ω)/[f_S + (1 − f_S)(a₀/a)³] — `hAtAge`, 13.011 composed periods at every epoch, a fit constant’s multiple and not a period of anything the model computes; H₀ was fitted on the 1246 AD perihelion–solstice alignment — left the physics at plan 09 step 7b, after its spin-scaling twin H_era = H₀·LOD/LOD₀, the FROZEN era clock’s counter, left with the last comb at step 7a.) External readings for the ψ̇ column: IAU J2000 50.288 ″/yr (measured); Wu et al. 2024 at 650 Ma 67.64 ″/yr; Meyers & Malinverno 2018 at 1400 Ma 85.79 ± 2.72 ″/yr; Lantink et al. 2022 at 2460 Ma 108.6 ± 8.5 ″/yr (all three cyclostratigraphic inferences through an assumed astronomical model — theory-vs-inference, doc 99; the last two are gate rows `xiamaling-prec-1400` / `lantink-prec-2460`).
 <!-- /generated:calcmap-tidal-clock -->
@@ -603,10 +603,10 @@ The beat at the deep anchors, both ψ̇ readings:
 | age (Ma) | **T_p(t) = 1,296,000/ψ̇, the composed period (yr)** | the deep chain’s year beat T_sid/(T_sid − T_trop) — T_p counted in sidereal years, + 1 (plan 09 step 5d; it was the unit’s H(t)/13, 0.086 % apart) | ψ̇ (″/yr) | beat 2π/(ψ̇ − \|s₃\|) (kyr) — the SHIPPED `obliqBeat*Kyr` form | beat(J2000)·T_p(t)/T_p(J2000) (kyr) — "obliquity period ∝ T_p", `obliqH8Scaled*Kyr` |
 |---|---|---|---|---|---|
 | 0 | **25771.575** | 25772.126 | 50.288 | 41.22 | 41.22 |
-| 380 | **21395.597** | 21397.736 | 60.573 | 31.06 | 34.22 |
-| 650 | **18663.443** | 18666.374 | 69.441 | 25.62 | 29.85 |
-| 1400 | **15255.613** | 15260.320 | 84.952 | 19.61 | 24.40 |
-| 2460 | **12154.202** | 12160.553 | 106.630 | 14.76 | 19.44 |
+| 380 | **21235.375** | 21237.506 | 61.030 | 30.73 | 33.97 |
+| 650 | **18435.129** | 18438.036 | 70.301 | 25.19 | 29.49 |
+| 1400 | **14976.924** | 14981.563 | 86.533 | 19.15 | 23.96 |
+| 2460 | **11863.274** | 11869.497 | 109.245 | 14.34 | 18.98 |
 
 s₃ = the dominant Earth ζ mode of data/nbody-deep-secular-modes.json = -18.8506 ″/yr (amplitude 0.00832); beat = 1,296,000/(ψ̇ᵢₙ − |s₃|) yr at an instant, ψ̇ᵢₙ the spin axis’s inertial rate; a RECORD sees the window mean of the pole rate with its of-date factors (createModel().lunisolar.spinAxisInertialRateMeanArcsecPerYr / obliquityPeriodRealizedYears — the obliquity lines ride the LR04-window mean, v23.0). Plan 06 D6 → Phase 3 → S5: ψ̇(t) is the composed lunisolar rate on the model’s one J2000 reading (T_p(J2000) = 25771.6 yr, 1,296,000/p_A on the IAU 2006 input since plan 09). The third column is the deep chain’s tidal-mean year pair: since plan 09 step 5d its tropical year removes one equinox turn per T_p(t), so the pair’s beat is T_p(t) counted in sidereal years, + 1 (asserted per row); before it the pair beat at the retired unit’s H(t)/13, the calendar convention plan-06 D2 had kept as a named device, 0.086 % above the composed period. Registry keys `obliqBeatJ2000Kyr`/`obliqBeat1400MaKyr`/`obliqBeat2460MaKyr` are the fifth column; `obliqH8Scaled*Kyr` (name kept) is the sixth, the pure precession-scaling alternative "obliquity period ∝ T_p" — the J2000 beat held proportional to T_p(t), identical to the beat today and the discriminated alternative at depth (D8 iii; S5 retired its former T_p·13/8 = H/8 form). The pre-Phase-3 "structural" beat on H_era/13 is retired with the frozen era clock (plan 09 step 7a).
 <!-- /generated:calcmap-obliquity-beat -->

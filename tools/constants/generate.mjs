@@ -272,9 +272,11 @@ function assembleDeepTime(astro) {
 // (deltat/moon-distance-history reads the distance column as the ratio
 // a(t)/a(0) on the model's own J2000 anchor). Same two-gate guard as the chain
 // artifact: check:artifacts pins artifact ↔ source, this module's staleness
-// check pins embed ↔ artifact. Only the distance columns are embedded; the
-// solution's LOD/obliquity/precession columns stay in the data file as the
-// cross-check they are.
+// check pins embed ↔ artifact. The distance columns and the mean-obliquity
+// column are embedded — both READ (plan 12 option A: the distance as the ratio
+// a(t)/a(0); plan 12 §8 option (a): the obliquity as cos ε̄(t)/cos ε̄(0) on the
+// precession rate of date, earth/mean-obliquity-history); the solution's LOD
+// and precession columns stay in the data file as the cross-check they are.
 const MOON_DISTANCE_PATH = join(ROOT, 'data/astrogeo22-earth-moon.json');
 const OUT_MOON_DISTANCE = join(ROOT, 'packages/physics/src/deltat/moon-distance-artifact.cjs');
 
@@ -291,6 +293,10 @@ function buildMoonDistanceArtifact() {
     aEarthRadii: c.aEarthRadii,
     aMinEarthRadii: c.aMinEarthRadii,
     aMaxEarthRadii: c.aMaxEarthRadii,
+    // plan 12 §8 option (a): the solution's mean obliquity — the second column the model READS
+    obliquityDeg: c.obliquityDeg,
+    obliquityMinDeg: c.obliquityMinDeg,
+    obliquityMaxDeg: c.obliquityMaxDeg,
   };
   const hash = createHash('sha256').update(raw).digest('hex').slice(0, 16);
   return { hash, payload };
@@ -305,8 +311,11 @@ function emitMoonDistanceArtifact({ hash, payload }) {
  * (Farhat, Auclair-Desrotour, Boué & Laskar 2022, A&A 665, L1), the model's
  * CITED Earth–Moon distance history (plan 12 option A): age 0 → ${payload.spanMa} Ma at
  * ${payload.ageStepMa} Myr, the semi-major axis in Earth radii (R⊕ = ${payload.earthRadiusKm} km)
- * with its uncertainty interval, VERBATIM. deltat/moon-distance-history reads
- * it as the ratio a(t)/a(0) on the model's own J2000 anchor. Two gates guard
+ * with its uncertainty interval, and the solution's mean obliquity with its
+ * interval, VERBATIM. deltat/moon-distance-history reads the distance as the
+ * ratio a(t)/a(0) on the model's own J2000 anchor; earth/mean-obliquity-history
+ * reads the obliquity as cos ε̄(t)/cos ε̄(0) on the precession rate of date
+ * (plan 12 §8 option (a)). Two gates guard
  * the chain: check:artifacts pins artifact ↔ source file, generate.mjs check
  * mode pins this embed ↔ artifact. CJS for the .cjs deep-time consumers.
  */

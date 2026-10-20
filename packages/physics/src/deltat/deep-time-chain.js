@@ -35,6 +35,7 @@ import { createEpochPrimitives } from '../layer0/index.js';
 import { computeMeanTropicalYearJ2000Days } from '../earth/year-lengths.cjs';
 import { createAlphaGiaChannel } from '../climate/l1-orbital.cjs';
 import { createMoonDistanceHistory } from './moon-distance-history.cjs';
+import { createMeanObliquityHistory } from '../earth/mean-obliquity-history.cjs';
 import { createDeltaTCycles } from './cycles.cjs';
 import { createDeepTimeLod } from './deep-time.cjs';
 import { createDeepEccChannel } from '../moon/deep-ecc-channel.cjs';
@@ -74,7 +75,8 @@ export const MOON_ECC_SENSITIVITY_NODE = 1.018;
  *   stellarDayRaProjection?: number,
  * }} deps — `constants` the generated DEFAULT_CONSTANTS, `fitted` the
  *   generated FITTED_COEFFICIENTS, `deepModes` the DEEP_MODES_ARTIFACT,
- *   `moonDistanceArtifact` the MOON_DISTANCE_ARTIFACT (injected so a
+ *   `moonDistanceArtifact` the MOON_DISTANCE_ARTIFACT — the cited distance
+ *   AND mean-obliquity columns, plan 12 option A / §8 (a) (injected so a
  *   counterfactual context can replace any of them); `ageAnchorYear` the
  *   scene epoch (default constants.timeReference.sceneEpochYear);
  *   `flagsAt` the ΔT stack's switches (default all ON); `planetAuRatios`
@@ -190,6 +192,10 @@ export function createDeepTimeChain(deps) {
     aMoonNowMetres: EPOCH_PARAMS.moonDistanceNowM,
     alpha1PerMa: EPOCH_PARAMS.alpha1PerMa,
   });
+  // The cited mean obliquity ε̄(t) — the second column of the same history
+  // (plan 12 §8 option (a)): the precession RATE of date is the constant's
+  // scaling × cos ε̄(t)/cos ε̄(0); the hybrid keeps integrating on the constant.
+  const meanObliquity = createMeanObliquityHistory({ table: deps.moonDistanceArtifact });
 
   // ── The ΔT cycle stack (the fitted terms, periods stated in years) ────────
   const DT = F.DT_STACK, RES = F.DT_RESONATOR;
@@ -257,6 +263,7 @@ export function createDeepTimeChain(deps) {
       precessionSolarShareJ2000: EPOCH_PARAMS.precessionSolarShareJ2000,
     },
     moonDistanceMetresAtAge: recession.distanceMetresAtAge,
+    meanObliquityCosRatioAtAge: meanObliquity.cosRatioAtAge,
     moiFactorAtAge: earthMoiFactorAtAge,
     precessionPeriodJ2000YearsFn: certifiedAxialPrecessionJ2000Years,
     nodalPeriodYearsFn: () => 1296000 / s3ArcsecPerYr,
@@ -267,7 +274,7 @@ export function createDeepTimeChain(deps) {
   });
 
   // ── Layer 0 primitives ────────────────────────────────────────────────────
-  const l0 = createEpochPrimitives({ params: EPOCH_PARAMS, alphaAtAgeMa: earthMoiFactorAtAge, moonDistanceMetresAtAge: recession.distanceMetresAtAge });
+  const l0 = createEpochPrimitives({ params: EPOCH_PARAMS, alphaAtAgeMa: earthMoiFactorAtAge, moonDistanceMetresAtAge: recession.distanceMetresAtAge, meanObliquityCosRatioAtAge: meanObliquity.cosRatioAtAge });
 
   // ── The ONE deep e and the lunar month chain ──────────────────────────────
   const deepEcc = createDeepEccChannel(deps.deepModes);
@@ -398,7 +405,7 @@ export function createDeepTimeChain(deps) {
     EPOCH_PARAMS, ageAnchorYear,
     // the pieces
     alphaGia, earthMoiFactorAtAge, withLatticeAlpha, j2RatioAtYear, iEarthAtAge,
-    recession, dtCycles, s3ArcsecPerYr, deepLod, l0, deepEcc, eCompModulation, moonChain,
+    recession, meanObliquity, dtCycles, s3ArcsecPerYr, deepLod, l0, deepEcc, eCompModulation, moonChain,
     // the family
     meanMoonDistanceMetresAtAge: recession.distanceMetresAtAge,
     meanMoonDistanceAtAge: moonChain.distanceKmAtAge,
@@ -406,6 +413,11 @@ export function createDeepTimeChain(deps) {
     meanLodHoursAtAge: deepLod.lodHoursAtAge,
     meanLunisolarPrecessionRateArcsecPerYrAtAge: deepLod.lunisolarPrecessionRateArcsecPerYrAtAge,
     meanLunisolarPrecessionPeriodYearsAtAge,
+    // the constant's scaling alone (the hybrid's integrand), the rate's obliquity factor and the cited mean (plan 12 §8)
+    meanLunisolarTorqueRateArcsecPerYrAtAge: deepLod.lunisolarTorqueRateArcsecPerYrAtAge,
+    meanLunisolarTorquePeriodYearsAtAge: deepLod.lunisolarTorquePeriodYearsAtAge,
+    precessionObliquityFactorAtAge: deepLod.precessionObliquityFactorAtAge,
+    meanObliquityCitedDegAtAge: meanObliquity.meanObliquityDegAtAge,
     meanAuAtAge, meanSiderealYearSecondsAtAge,
     meanTropicalYearSecondsAtAge: deepLod.tropicalYearSecondsAtAge,
     meanTropicalYearDaysAtAge: deepLod.tropicalYearDaysAtAge,

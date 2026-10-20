@@ -273,6 +273,9 @@ export function createApi() {
       const rows = t.years.map((y) => ({
         year: y,
         obliquityDeg: model.earth.obliquityDeg(y),
+        // plan 12 §8 option (a): the cited mean obliquity of date (Farhat et al. 2022's column; a Myr-scale
+        // mean) — the hybrid above carries no tidal evolution of its mean beyond the ζ series' ±10 Myr
+        meanObliquityCitedDeg: model.earth.meanObliquityCitedDeg(y),
         eccentricity: model.earth.eccentricity(y),
         inclinationDeg: model.earth.inclinationDeg(y),
         perihelionLongitudeDeg: model.earth.perihelionLongitudeDeg(y),
