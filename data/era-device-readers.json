@@ -28,7 +28,7 @@
   ]
  },
  "summary": {
-  "hits": 894,
+  "hits": 707,
   "codeHits": 12,
   "files": 88,
   "excludedClasses": [
@@ -44,7 +44,7 @@
   "byTokenRuntime": {
    "earthtiltMean": {
     "browser": {
-     "comment": 3
+     "comment": 2
     },
     "docs-tools": {
      "comment": 4,
@@ -65,7 +65,7 @@
    },
    "earthInvPlaneInclinationAmplitude": {
     "browser": {
-     "comment": 3
+     "comment": 1
     },
     "docs-tools": {
      "comment": 2
@@ -85,7 +85,7 @@
    },
    "/ 13": {
     "browser": {
-     "comment": 45,
+     "comment": 21,
      "display": 5
     },
     "docs-tools": {
@@ -126,17 +126,9 @@
      "source": 1
     }
    },
-   "earthInclinationCycleAnchor": {
-    "browser": {
-     "comment": 1
-    },
-    "docs-tools": {
-     "comment": 1
-    }
-   },
    "H / N": {
     "browser": {
-     "comment": 176,
+     "comment": 74,
      "display": 11,
      "comb": 1
     },
@@ -181,7 +173,7 @@
    },
    "8H": {
     "browser": {
-     "comment": 52
+     "comment": 8
     },
     "docs-tools": {
      "diagnostic": 3,
@@ -216,18 +208,9 @@
      "source": 4
     }
    },
-   "_phaseCycles": {
-    "browser": {
-     "comment": 1
-    },
-    "node-lib": {
-     "comment": 1
-    }
-   },
    "cyclesBetween": {
     "browser": {
-     "comb": 1,
-     "comment": 3
+     "comb": 1
     },
     "explore": {
      "explore": 4
@@ -239,20 +222,6 @@
      "comb": 6,
      "comment": 2,
      "counter": 1
-    },
-    "source": {
-     "source": 1
-    }
-   },
-   "cyclesBetweenYears": {
-    "browser": {
-     "comment": 9
-    },
-    "explore": {
-     "explore": 2
-    },
-    "fitting": {
-     "comment": 1
     },
     "source": {
      "source": 1
@@ -275,6 +244,11 @@
      "source": 1
     }
    },
+   "earthInclinationCycleAnchor": {
+    "docs-tools": {
+     "comment": 1
+    }
+   },
    "eraClockHAtAge": {
     "docs-tools": {
      "comment": 1
@@ -288,6 +262,17 @@
      "explore": 2
     }
    },
+   "cyclesBetweenYears": {
+    "explore": {
+     "explore": 2
+    },
+    "fitting": {
+     "comment": 1
+    },
+    "source": {
+     "source": 1
+    }
+   },
    "kDeviceWheelPhaseAtJ2000Cycles": {
     "fitting": {
      "comment": 1
@@ -297,6 +282,11 @@
     },
     "source": {
      "source": 2
+    }
+   },
+   "_phaseCycles": {
+    "node-lib": {
+     "comment": 1
     }
    },
    "eraClockH": {
@@ -309,7 +299,7 @@
    }
   },
   "byClass": {
-   "comment": 706,
+   "comment": 519,
    "comb": 11,
    "display": 28,
    "diagnostic": 59,
@@ -637,7 +627,7 @@
  "hits": [
   {
    "file": "src/script.js",
-   "line": 103,
+   "line": 99,
    "runtime": "browser",
    "token": "earthtiltMean",
    "class": "comment",
@@ -645,7 +635,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 103,
+   "line": 99,
    "runtime": "browser",
    "token": "earthInvPlaneInclinationAmplitude",
    "class": "comment",
@@ -653,7 +643,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 104,
+   "line": 100,
    "runtime": "browser",
    "token": "/ 13",
    "class": "comment",
@@ -661,31 +651,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 132,
-   "runtime": "browser",
-   "token": "earthInclinationCycleAnchor",
-   "class": "comment",
-   "text": "// (plan 09 step 6: earthInclinationCycleAnchor — the eccentricity law's 21.77° — left the inputs with the law)"
-  },
-  {
-   "file": "src/script.js",
-   "line": 148,
-   "runtime": "browser",
-   "token": "H / N",
-   "class": "comment",
-   "text": "// (plan 09 step 4b: perihelionCycleLength = H/16 — the device's perihelion"
-  },
-  {
-   "file": "src/script.js",
-   "line": 152,
-   "runtime": "browser",
-   "token": "H / N",
-   "class": "comment",
-   "text": "// device's rounding of the input onto 1/(H/8) of a day (+1.2 s) is deleted."
-  },
-  {
-   "file": "src/script.js",
-   "line": 228,
+   "line": 209,
    "runtime": "browser",
    "token": "H / N",
    "class": "comment",
@@ -693,7 +659,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 228,
+   "line": 209,
    "runtime": "browser",
    "token": "H / N",
    "class": "comment",
@@ -701,15 +667,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 334,
-   "runtime": "browser",
-   "token": "8H",
-   "class": "comment",
-   "text": "// JSON stored (8H/11 = 243,867 yr) is gone with the device's other inputs"
-  },
-  {
-   "file": "src/script.js",
-   "line": 555,
+   "line": 491,
    "runtime": "browser",
    "token": "H / N",
    "class": "comment",
@@ -717,7 +675,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 555,
+   "line": 491,
    "runtime": "browser",
    "token": "/ 13",
    "class": "comment",
@@ -725,7 +683,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 562,
+   "line": 498,
    "runtime": "browser",
    "token": "H / N",
    "class": "comment",
@@ -733,7 +691,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 562,
+   "line": 498,
    "runtime": "browser",
    "token": "/ 13",
    "class": "comment",
@@ -741,7 +699,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 563,
+   "line": 499,
    "runtime": "browser",
    "token": "H / N",
    "class": "comment",
@@ -749,7 +707,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 563,
+   "line": 499,
    "runtime": "browser",
    "token": "/ 13",
    "class": "comment",
@@ -757,7 +715,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 759,
+   "line": 668,
    "runtime": "browser",
    "token": "H / N",
    "class": "comment",
@@ -765,7 +723,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 759,
+   "line": 668,
    "runtime": "browser",
    "token": "H / N",
    "class": "comment",
@@ -773,7 +731,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 760,
+   "line": 669,
    "runtime": "browser",
    "token": "H / N",
    "class": "comment",
@@ -781,7 +739,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 815,
+   "line": 721,
    "runtime": "browser",
    "token": "H / N",
    "class": "comment",
@@ -789,7 +747,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 815,
+   "line": 721,
    "runtime": "browser",
    "token": "/ 13",
    "class": "comment",
@@ -797,119 +755,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 869,
-   "runtime": "browser",
-   "token": "H / N",
-   "class": "comment",
-   "text": "// origin — perihelionalignmentYear − 14.5 × H/16 = −302,635, the \"balanced"
-  },
-  {
-   "file": "src/script.js",
-   "line": 888,
-   "runtime": "browser",
-   "token": "H / N",
-   "class": "comment",
-   "text": "// device's H/13 identity and the sidereal comb this was the baseline of are"
-  },
-  {
-   "file": "src/script.js",
-   "line": 888,
-   "runtime": "browser",
-   "token": "/ 13",
-   "class": "comment",
-   "text": "// device's H/13 identity and the sidereal comb this was the baseline of are"
-  },
-  {
-   "file": "src/script.js",
-   "line": 898,
-   "runtime": "browser",
-   "token": "H / N",
-   "class": "comment",
-   "text": "// H/13 lattice route (meanSolarYearDays × H/(H − 13), 1 µd above IAU) is"
-  },
-  {
-   "file": "src/script.js",
-   "line": 898,
-   "runtime": "browser",
-   "token": "/ 13",
-   "class": "comment",
-   "text": "// H/13 lattice route (meanSolarYearDays × H/(H − 13), 1 µd above IAU) is"
-  },
-  {
-   "file": "src/script.js",
-   "line": 905,
-   "runtime": "browser",
-   "token": "H / N",
-   "class": "comment",
-   "text": "// device's H/13 identity read 86,399.99968 s. Twins: tools/lib constants.js"
-  },
-  {
-   "file": "src/script.js",
-   "line": 905,
-   "runtime": "browser",
-   "token": "/ 13",
-   "class": "comment",
-   "text": "// device's H/13 identity read 86,399.99968 s. Twins: tools/lib constants.js"
-  },
-  {
-   "file": "src/script.js",
-   "line": 929,
-   "runtime": "browser",
-   "token": "H / N",
-   "class": "comment",
-   "text": "// Perihelion coin rotation: 1 extra solar day over H/16 cycle"
-  },
-  {
-   "file": "src/script.js",
-   "line": 930,
-   "runtime": "browser",
-   "token": "H / N",
-   "class": "comment",
-   "text": "// (plan 09 step 4b: perihelionCoinRotationMs / …YearlySeconds on H/16 are"
-  },
-  {
-   "file": "src/script.js",
-   "line": 934,
-   "runtime": "browser",
-   "token": "H / N",
-   "class": "comment",
-   "text": "// composed clock, not the counter H/13). Set by recomputeDerivedAnchorsForEpoch —"
-  },
-  {
-   "file": "src/script.js",
-   "line": 934,
-   "runtime": "browser",
-   "token": "/ 13",
-   "class": "comment",
-   "text": "// composed clock, not the counter H/13). Set by recomputeDerivedAnchorsForEpoch —"
-  },
-  {
-   "file": "src/script.js",
-   "line": 941,
-   "runtime": "browser",
-   "token": "H / N",
-   "class": "comment",
-   "text": "// 2000, _anomalisticYearJ2000Days(). Before step 3 it was the device's H/16"
-  },
-  {
-   "file": "src/script.js",
-   "line": 969,
-   "runtime": "browser",
-   "token": "H / N",
-   "class": "comment",
-   "text": "// below IAU: the H/13 period 25,791.92 yr vs IAU's ~25,772) is deleted, and"
-  },
-  {
-   "file": "src/script.js",
-   "line": 969,
-   "runtime": "browser",
-   "token": "/ 13",
-   "class": "comment",
-   "text": "// below IAU: the H/13 period 25,791.92 yr vs IAU's ~25,772) is deleted, and"
-  },
-  {
-   "file": "src/script.js",
-   "line": 981,
+   "line": 847,
    "runtime": "browser",
    "token": "H / N",
    "class": "comment",
@@ -917,7 +763,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 981,
+   "line": 847,
    "runtime": "browser",
    "token": "/ 13",
    "class": "comment",
@@ -925,135 +771,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 1012,
-   "runtime": "browser",
-   "token": "H / N",
-   "class": "comment",
-   "text": "// (plan 09 step 4b: earthPerihelionICRFYears = H/3 is deleted; the perihelion"
-  },
-  {
-   "file": "src/script.js",
-   "line": 1062,
-   "runtime": "browser",
-   "token": "8H",
-   "class": "comment",
-   "text": "// Lunar counts are INTEGER PER 8H (the Solar System Resonance Cycle), so per H"
-  },
-  {
-   "file": "src/script.js",
-   "line": 1066,
-   "runtime": "browser",
-   "token": "8H",
-   "class": "comment",
-   "text": "// and rejected by the timed-Babylonian corpus); the 8H grid lands +0.0078 s"
-  },
-  {
-   "file": "src/script.js",
-   "line": 1068,
-   "runtime": "browser",
-   "token": "8H",
-   "class": "comment",
-   "text": "// 0.485 (worst case); on 8H its period is honored to 112 s instead of"
-  },
-  {
-   "file": "src/script.js",
-   "line": 1076,
-   "runtime": "browser",
-   "token": "8H",
-   "class": "comment",
-   "text": "// device counted these as eighth-integers per 8H (N_sid 35,860,753; N_apsidalI"
-  },
-  {
-   "file": "src/script.js",
-   "line": 1077,
-   "runtime": "browser",
-   "token": "H / N",
-   "class": "comment",
-   "text": "// 303,196; N_nodalI 144,119 — the ∓13 was H/13 cycles per H) and read every"
-  },
-  {
-   "file": "src/script.js",
-   "line": 1077,
-   "runtime": "browser",
-   "token": "/ 13",
-   "class": "comment",
-   "text": "// 303,196; N_nodalI 144,119 — the ∓13 was H/13 cycles per H) and read every"
-  },
-  {
-   "file": "src/script.js",
-   "line": 1280,
-   "runtime": "browser",
-   "token": "earthInvPlaneInclinationAmplitude",
-   "class": "comment",
-   "text": "//     `earthInvPlaneInclinationAmplitude` (calibrated against observations"
-  },
-  {
-   "file": "src/script.js",
-   "line": 1289,
-   "runtime": "browser",
-   "token": "earthInvPlaneInclinationAmplitude",
-   "class": "comment",
-   "text": "// requiring re-calibration of `earthInvPlaneInclinationAmplitude` to keep"
-  },
-  {
-   "file": "src/script.js",
-   "line": 1305,
-   "runtime": "browser",
-   "token": "H / N",
-   "class": "comment",
-   "text": "// periICRF is derived from perihelion ecliptic via frame conversion (H/13 ref)."
-  },
-  {
-   "file": "src/script.js",
-   "line": 1305,
-   "runtime": "browser",
-   "token": "/ 13",
-   "class": "comment",
-   "text": "// periICRF is derived from perihelion ecliptic via frame conversion (H/13 ref)."
-  },
-  {
-   "file": "src/script.js",
-   "line": 1307,
-   "runtime": "browser",
-   "token": "H / N",
-   "class": "comment",
-   "text": "// Earth check: periICRF = H/3, |−13/H − 3/H| = 16/H → H/16 ✓"
-  },
-  {
-   "file": "src/script.js",
-   "line": 1307,
-   "runtime": "browser",
-   "token": "H / N",
-   "class": "comment",
-   "text": "// Earth check: periICRF = H/3, |−13/H − 3/H| = 16/H → H/16 ✓"
-  },
-  {
-   "file": "src/script.js",
-   "line": 1308,
-   "runtime": "browser",
-   "token": "8H",
-   "class": "comment",
-   "text": "// If |axial| > 8H (frozen, e.g. Uranus ~200 Myr, Neptune ~23 Myr), treat as"
-  },
-  {
-   "file": "src/script.js",
-   "line": 1309,
-   "runtime": "browser",
-   "token": "8H",
-   "class": "comment",
-   "text": "// infinite: wobble = |ICRF| exactly. Gives Uranus 8H/80 and Neptune 8H/100."
-  },
-  {
-   "file": "src/script.js",
-   "line": 1309,
-   "runtime": "browser",
-   "token": "8H",
-   "class": "comment",
-   "text": "// infinite: wobble = |ICRF| exactly. Gives Uranus 8H/80 and Neptune 8H/100."
-  },
-  {
-   "file": "src/script.js",
-   "line": 1590,
+   "line": 1389,
    "runtime": "browser",
    "token": "H / N",
    "class": "comment",
@@ -1061,7 +779,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 1590,
+   "line": 1389,
    "runtime": "browser",
    "token": "/ 13",
    "class": "comment",
@@ -1069,31 +787,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 2233,
-   "runtime": "browser",
-   "token": "8H",
-   "class": "comment",
-   "text": "// 8H-periodic and its MEAN over the build window sits ~+1.24e-6 above the"
-  },
-  {
-   "file": "src/script.js",
-   "line": 2317,
-   "runtime": "browser",
-   "token": "H / N",
-   "class": "comment",
-   "text": "// ───── LOD anchor (H/13 identity derivation) ─────"
-  },
-  {
-   "file": "src/script.js",
-   "line": 2317,
-   "runtime": "browser",
-   "token": "/ 13",
-   "class": "comment",
-   "text": "// ───── LOD anchor (H/13 identity derivation) ─────"
-  },
-  {
-   "file": "src/script.js",
-   "line": 2384,
+   "line": 2109,
    "runtime": "browser",
    "token": "H / N",
    "class": "comment",
@@ -1101,7 +795,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 2384,
+   "line": 2109,
    "runtime": "browser",
    "token": "/ 13",
    "class": "comment",
@@ -1109,7 +803,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 2390,
+   "line": 2115,
    "runtime": "browser",
    "token": "8H",
    "class": "comment",
@@ -1117,31 +811,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 2513,
-   "runtime": "browser",
-   "token": "H / N",
-   "class": "comment",
-   "text": "// H/13 (25,793.6, the fit anchor's reading — not a period)."
-  },
-  {
-   "file": "src/script.js",
-   "line": 2513,
-   "runtime": "browser",
-   "token": "/ 13",
-   "class": "comment",
-   "text": "// H/13 (25,793.6, the fit anchor's reading — not a period)."
-  },
-  {
-   "file": "src/script.js",
-   "line": 2516,
-   "runtime": "browser",
-   "token": "H / N",
-   "class": "comment",
-   "text": "// the nodal period 1,296,000/|s₃| (orbital), not the spin unit's H/5."
-  },
-  {
-   "file": "src/script.js",
-   "line": 2589,
+   "line": 2240,
    "runtime": "browser",
    "token": "H / N",
    "class": "comment",
@@ -1149,7 +819,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 2589,
+   "line": 2240,
    "runtime": "browser",
    "token": "/ 13",
    "class": "comment",
@@ -1157,55 +827,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 2605,
-   "runtime": "browser",
-   "token": "H / N",
-   "class": "comment",
-   "text": "* μ-tier quantity — formerly the spin unit's H/5 = 67,063 yr), so the daily"
-  },
-  {
-   "file": "src/script.js",
-   "line": 2609,
-   "runtime": "browser",
-   "token": "H / N",
-   "class": "comment",
-   "text": "* Replaces the previous H/3 (apsidal precession) form used at 8 code"
-  },
-  {
-   "file": "src/script.js",
-   "line": 2617,
-   "runtime": "browser",
-   "token": "H / N",
-   "class": "comment",
-   "text": "// certifiedAxialPrecessionJ2000Years (identical ops). Never H/13 (25,793.6 is"
-  },
-  {
-   "file": "src/script.js",
-   "line": 2617,
-   "runtime": "browser",
-   "token": "/ 13",
-   "class": "comment",
-   "text": "// certifiedAxialPrecessionJ2000Years (identical ops). Never H/13 (25,793.6 is"
-  },
-  {
-   "file": "src/script.js",
-   "line": 2639,
-   "runtime": "browser",
-   "token": "H / N",
-   "class": "comment",
-   "text": "*  step 4d; the device's H/3 = 111,772 read it 0.12 % high; the IAU-input beat"
-  },
-  {
-   "file": "src/script.js",
-   "line": 2646,
-   "runtime": "browser",
-   "token": "H / N",
-   "class": "comment",
-   "text": "*  step 4b/4d — the device's H/16 = 20,957 read this quantity 0.1 % high)."
-  },
-  {
-   "file": "src/script.js",
-   "line": 2655,
+   "line": 2295,
    "runtime": "browser",
    "token": "/ 13",
    "class": "comment",
@@ -1213,15 +835,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 2663,
-   "runtime": "browser",
-   "token": "H / N",
-   "class": "comment",
-   "text": "// the spin unit's H/5. The identifier keeps its historical name."
-  },
-  {
-   "file": "src/script.js",
-   "line": 2719,
+   "line": 2351,
    "runtime": "browser",
    "token": "/ 13",
    "class": "comment",
@@ -1229,175 +843,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 2724,
-   "runtime": "browser",
-   "token": "8H",
-   "class": "comment",
-   "text": "// Bond-scale ΔT correction — 8H/1830 = 74 × Jupiter-Saturn synodic (gcd=61)"
-  },
-  {
-   "file": "src/script.js",
-   "line": 2736,
-   "runtime": "browser",
-   "token": "8H",
-   "class": "comment",
-   "text": "//   Period 8H/1830 = 1465.867 yr"
-  },
-  {
-   "file": "src/script.js",
-   "line": 2783,
-   "runtime": "browser",
-   "token": "8H",
-   "class": "comment",
-   "text": "// the former 8H/n divisor label chance-level; layer B item 3 removed the divisor"
-  },
-  {
-   "file": "src/script.js",
-   "line": 2861,
-   "runtime": "browser",
-   "token": "H / N",
-   "class": "comment",
-   "text": "// HALLSTATT CYCLE ΔT CORRECTION (research toggle) — 8H/1104 = H/138 = 2430 yr"
-  },
-  {
-   "file": "src/script.js",
-   "line": 2861,
-   "runtime": "browser",
-   "token": "8H",
-   "class": "comment",
-   "text": "// HALLSTATT CYCLE ΔT CORRECTION (research toggle) — 8H/1104 = H/138 = 2430 yr"
-  },
-  {
-   "file": "src/script.js",
-   "line": 2864,
-   "runtime": "browser",
-   "token": "H / N",
-   "class": "comment",
-   "text": "//   Period 8H/1104 = H/138 = 2429.83 yr, with 1104 = 2⁴·3·23. Shares the H"
-  },
-  {
-   "file": "src/script.js",
-   "line": 2864,
-   "runtime": "browser",
-   "token": "8H",
-   "class": "comment",
-   "text": "//   Period 8H/1104 = H/138 = 2429.83 yr, with 1104 = 2⁴·3·23. Shares the H"
-  },
-  {
-   "file": "src/script.js",
-   "line": 2866,
-   "runtime": "browser",
-   "token": "H / N",
-   "class": "comment",
-   "text": "//   gcd rule. The equivalent H-lattice denomination is H/138 = H/(6·23) —"
-  },
-  {
-   "file": "src/script.js",
-   "line": 2867,
-   "runtime": "browser",
-   "token": "H / N",
-   "class": "comment",
-   "text": "//   the sixth harmonic of the framework's 14,579-yr period H/23."
-  },
-  {
-   "file": "src/script.js",
-   "line": 2877,
-   "runtime": "browser",
-   "token": "8H",
-   "class": "comment",
-   "text": "//                                            framework 8H/1104 fits at R² = 0.058"
-  },
-  {
-   "file": "src/script.js",
-   "line": 2881,
-   "runtime": "browser",
-   "token": "8H",
-   "class": "comment",
-   "text": "//                                            framework 8H/1104 fits at R² = 0.037"
-  },
-  {
-   "file": "src/script.js",
-   "line": 2883,
-   "runtime": "browser",
-   "token": "8H",
-   "class": "comment",
-   "text": "//   band-peak near the framework's 8H/1104 = 2430 yr. Cheng is a null result."
-  },
-  {
-   "file": "src/script.js",
-   "line": 2928,
-   "runtime": "browser",
-   "token": "8H",
-   "class": "comment",
-   "text": "// JOSE5 CYCLE ΔT CORRECTION (research toggle) — 8H/2989 ≈ 897 yr"
-  },
-  {
-   "file": "src/script.js",
-   "line": 2931,
-   "runtime": "browser",
-   "token": "8H",
-   "class": "comment",
-   "text": "//   Period 8H/2989 = 897.47 yr, with 2989 = 7²·61. Shares H's prime factor 61"
-  },
-  {
-   "file": "src/script.js",
-   "line": 2936,
-   "runtime": "browser",
-   "token": "8H",
-   "class": "comment",
-   "text": "//     • 5 × Jose period (5 × 179 yr = 895 yr; 0.28% offset from 8H/2989)"
-  },
-  {
-   "file": "src/script.js",
-   "line": 2943,
-   "runtime": "browser",
-   "token": "8H",
-   "class": "comment",
-   "text": "//   L-5b button Section 14 (8H integer-divisor scan against Stephenson ΔT"
-  },
-  {
-   "file": "src/script.js",
-   "line": 2988,
-   "runtime": "browser",
-   "token": "8H",
-   "class": "comment",
-   "text": "// JOSE4 correction — 4th 8H-lattice harmonic (8H/3749 ≈ 715.5 yr, 4×Jose)"
-  },
-  {
-   "file": "src/script.js",
-   "line": 2988,
-   "runtime": "browser",
-   "token": "8H",
-   "class": "comment",
-   "text": "// JOSE4 correction — 4th 8H-lattice harmonic (8H/3749 ≈ 715.5 yr, 4×Jose)"
-  },
-  {
-   "file": "src/script.js",
-   "line": 3004,
-   "runtime": "browser",
-   "token": "8H",
-   "class": "comment",
-   "text": "// § \"Companion 8H lattice harmonics\" (§ Jose4) for the empirical trail."
-  },
-  {
-   "file": "src/script.js",
-   "line": 3027,
-   "runtime": "browser",
-   "token": "8H",
-   "class": "comment",
-   "text": "// bond−hallstatt difference frequency (8H/726 = 3,695 yr) with phase LOCKED"
-  },
-  {
-   "file": "src/script.js",
-   "line": 3052,
-   "runtime": "browser",
-   "token": "8H",
-   "class": "comment",
-   "text": "// The eigenperiod T₀ = 3,916 yr is read in years (FIT.DT_RESONATOR.T0_yr; the former 8H/685 label left with layer B item 3): the shipped"
-  },
-  {
-   "file": "src/script.js",
-   "line": 3060,
+   "line": 2540,
    "runtime": "browser",
    "token": "8H",
    "class": "comment",
@@ -1405,39 +851,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 3104,
-   "runtime": "browser",
-   "token": "8H",
-   "class": "comment",
-   "text": "// EDDY attempt (8H/2684 = 999.45 yr) — TESTED AND ROLLED BACK 2026-07-12"
-  },
-  {
-   "file": "src/script.js",
-   "line": 3128,
-   "runtime": "browser",
-   "token": "8H",
-   "class": "comment",
-   "text": "// EMP862 attempt (8H/3111 = 862 yr) — TESTED AND ROLLED BACK 2026-07-12"
-  },
-  {
-   "file": "src/script.js",
-   "line": 3154,
-   "runtime": "browser",
-   "token": "8H",
-   "class": "comment",
-   "text": "// JUPITER92 attempt (8H/2461 = 1090 yr) — TESTED AND ROLLED BACK 2026-07-11"
-  },
-  {
-   "file": "src/script.js",
-   "line": 3157,
-   "runtime": "browser",
-   "token": "8H",
-   "class": "comment",
-   "text": "// identified 8H/2461 (~1090 yr, 92×Jupiter orbit, gcd=23) as the strongest"
-  },
-  {
-   "file": "src/script.js",
-   "line": 3191,
+   "line": 2606,
    "runtime": "browser",
    "token": "H / N",
    "class": "comment",
@@ -1445,7 +859,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 3274,
+   "line": 2686,
    "runtime": "browser",
    "token": "8H",
    "class": "comment",
@@ -1453,15 +867,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 3291,
-   "runtime": "browser",
-   "token": "H / N",
-   "class": "comment",
-   "text": "// 8.4-3: the Simpson integrator + H/5 integrand live in the shared module"
-  },
-  {
-   "file": "src/script.js",
-   "line": 3318,
+   "line": 2697,
    "runtime": "browser",
    "token": "H / N",
    "class": "comment",
@@ -1469,7 +875,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 3320,
+   "line": 2699,
    "runtime": "browser",
    "token": "H / N",
    "class": "comment",
@@ -1477,7 +883,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 3320,
+   "line": 2699,
    "runtime": "browser",
    "token": "H / N",
    "class": "comment",
@@ -1485,7 +891,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 3320,
+   "line": 2699,
    "runtime": "browser",
    "token": "H / N",
    "class": "comment",
@@ -1493,7 +899,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 3321,
+   "line": 2700,
    "runtime": "browser",
    "token": "H / N",
    "class": "comment",
@@ -1501,7 +907,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 3323,
+   "line": 2702,
    "runtime": "browser",
    "token": "H / N",
    "class": "comment",
@@ -1509,7 +915,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 3325,
+   "line": 2704,
    "runtime": "browser",
    "token": "H / N",
    "class": "comment",
@@ -1517,7 +923,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 3330,
+   "line": 2709,
    "runtime": "browser",
    "token": "H / N",
    "class": "comment",
@@ -1525,55 +931,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 3418,
-   "runtime": "browser",
-   "token": "_phaseCycles",
-   "class": "comment",
-   "text": "// (plan 09 step 5c: the mode-aware `_phaseCycles` helper — the H/16 perihelion"
-  },
-  {
-   "file": "src/script.js",
-   "line": 3418,
-   "runtime": "browser",
-   "token": "H / N",
-   "class": "comment",
-   "text": "// (plan 09 step 5c: the mode-aware `_phaseCycles` helper — the H/16 perihelion"
-  },
-  {
-   "file": "src/script.js",
-   "line": 3424,
-   "runtime": "browser",
-   "token": "H / N",
-   "class": "comment",
-   "text": "*  was the H/16 counter). */"
-  },
-  {
-   "file": "src/script.js",
-   "line": 3454,
-   "runtime": "browser",
-   "token": "H / N",
-   "class": "comment",
-   "text": "// the Sun's perihelion = Earth's mean ϖ of date (the series) + 180° (plan 09 step 5c; was the H/16 count)"
-  },
-  {
-   "file": "src/script.js",
-   "line": 3576,
-   "runtime": "browser",
-   "token": "H / N",
-   "class": "comment",
-   "text": "//    framework H/3 fluctuation line — fully derived, e = base·(1 + cosθ_i/2),"
-  },
-  {
-   "file": "src/script.js",
-   "line": 3601,
-   "runtime": "browser",
-   "token": "8H",
-   "class": "comment",
-   "text": "// J2000 8H-lattice months (the month globals are epoch-mutable; these rates"
-  },
-  {
-   "file": "src/script.js",
-   "line": 3634,
+   "line": 2997,
    "runtime": "browser",
    "token": "H / N",
    "class": "comment",
@@ -1581,7 +939,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 3645,
+   "line": 3008,
    "runtime": "browser",
    "token": "8H",
    "class": "comment",
@@ -1589,7 +947,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 3648,
+   "line": 3011,
    "runtime": "browser",
    "token": "8H",
    "class": "comment",
@@ -1597,7 +955,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 3940,
+   "line": 3269,
    "runtime": "browser",
    "token": "cyclesBetween",
    "class": "comb",
@@ -1606,31 +964,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 3970,
-   "runtime": "browser",
-   "token": "H / N",
-   "class": "comment",
-   "text": "// (Plan 09 step 6: the H/3 eccentricity law — `_moonEcc`/`_fwEarthEcc` on"
-  },
-  {
-   "file": "src/script.js",
-   "line": 3982,
-   "runtime": "browser",
-   "token": "H / N",
-   "class": "comment",
-   "text": "*  the H/3 channel that once stood beside it is deleted (plan 09 step 6). */"
-  },
-  {
-   "file": "src/script.js",
-   "line": 3987,
-   "runtime": "browser",
-   "token": "H / N",
-   "class": "comment",
-   "text": "// (plan 09 step 6: `computeEccentricityEarthAtYear` — the H/3 law at a decimal"
-  },
-  {
-   "file": "src/script.js",
-   "line": 4032,
+   "line": 3346,
    "runtime": "browser",
    "token": "H / N",
    "class": "comment",
@@ -1638,7 +972,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 4032,
+   "line": 3346,
    "runtime": "browser",
    "token": "H / N",
    "class": "comment",
@@ -1646,7 +980,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 4038,
+   "line": 3352,
    "runtime": "browser",
    "token": "H / N",
    "class": "comment",
@@ -1654,7 +988,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 4042,
+   "line": 3356,
    "runtime": "browser",
    "token": "H / N",
    "class": "comment",
@@ -1662,7 +996,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 4084,
+   "line": 3366,
    "runtime": "browser",
    "token": "H / N",
    "class": "comment",
@@ -1670,23 +1004,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 4243,
-   "runtime": "browser",
-   "token": "H / N",
-   "class": "comment",
-   "text": "//   perihelionCycleLength, the device's H/16, went too; plan 11 step 2:"
-  },
-  {
-   "file": "src/script.js",
-   "line": 4247,
-   "runtime": "browser",
-   "token": "H / N",
-   "class": "comment",
-   "text": "//   perihelionCoinRotationMs(+Yearly) and the H/16 anomalistic identity left)"
-  },
-  {
-   "file": "src/script.js",
-   "line": 4263,
+   "line": 3525,
    "runtime": "browser",
    "token": "H / N",
    "class": "comment",
@@ -1694,7 +1012,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 4263,
+   "line": 3525,
    "runtime": "browser",
    "token": "/ 13",
    "class": "comment",
@@ -1702,7 +1020,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 4267,
+   "line": 3529,
    "runtime": "browser",
    "token": "H / N",
    "class": "comment",
@@ -1710,7 +1028,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 4267,
+   "line": 3529,
    "runtime": "browser",
    "token": "/ 13",
    "class": "comment",
@@ -1718,127 +1036,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 4270,
-   "runtime": "browser",
-   "token": "H / N",
-   "class": "comment",
-   "text": "// (plan 09: meanAnomalisticYearinDays is the IAU input — the device's H/16"
-  },
-  {
-   "file": "src/script.js",
-   "line": 4326,
-   "runtime": "browser",
-   "token": "cyclesBetweenYears",
-   "class": "comment",
-   "text": "// frozen era clock's counter `cyclesBetweenYears` / `integralInverseHFromYears`"
-  },
-  {
-   "file": "src/script.js",
-   "line": 4531,
-   "runtime": "browser",
-   "token": "cyclesBetweenYears",
-   "class": "comment",
-   "text": "// (Plan 09 step 7a: the cycle counters `_getJ2000Drift` / `cyclesBetweenYears`"
-  },
-  {
-   "file": "src/script.js",
-   "line": 4566,
-   "runtime": "browser",
-   "token": "8H",
-   "class": "comment",
-   "text": "// 8H / |periEclipticYears| and console.error'd if any planet had drifted off"
-  },
-  {
-   "file": "src/script.js",
-   "line": 4575,
-   "runtime": "browser",
-   "token": "H / N",
-   "class": "comment",
-   "text": "// DELETED: EARTH_ECC_DIVISOR_N = 16 (Earth perihelion cycle, H/16). Declared and"
-  },
-  {
-   "file": "src/script.js",
-   "line": 4576,
-   "runtime": "browser",
-   "token": "H / N",
-   "class": "comment",
-   "text": "// never referenced. The live H/16 relationship is carried by"
-  },
-  {
-   "file": "src/script.js",
-   "line": 4758,
-   "runtime": "browser",
-   "token": "8H",
-   "class": "comment",
-   "text": "// `8H/N` perihelion periods as `period(t) = period_J2000 × (H_t / H_J2000)`."
-  },
-  {
-   "file": "src/script.js",
-   "line": 4878,
-   "runtime": "browser",
-   "token": "8H",
-   "class": "comment",
-   "text": "//   solar mass, not with H — the former 8H/N lattice and its H_J2000/H_t"
-  },
-  {
-   "file": "src/script.js",
-   "line": 4925,
-   "runtime": "browser",
-   "token": "cyclesBetweenYears",
-   "class": "comment",
-   "text": "//   2. (the Phase 8 integrated ∫1/H(t)dt counter `cyclesBetweenYears` — deleted at plan 09 step 7a)"
-  },
-  {
-   "file": "src/script.js",
-   "line": 4936,
-   "runtime": "browser",
-   "token": "cyclesBetweenYears",
-   "class": "comment",
-   "text": "// The scene-graph integrators (_moonChainCycles; until plan 09 step 7a also cyclesBetweenYears) expect"
-  },
-  {
-   "file": "src/script.js",
-   "line": 5009,
-   "runtime": "browser",
-   "token": "cyclesBetweenYears",
-   "class": "comment",
-   "text": "*  (`moveModel` integrated `cyclesBetweenYears(_dtAnchor, _jdToSIyear(...), N)` — the counter is deleted, plan 09 step 7a; the wheels turn uniformly since 5c)"
-  },
-  {
-   "file": "src/script.js",
-   "line": 5014,
-   "runtime": "browser",
-   "token": "H / N",
-   "class": "comment",
-   "text": "*  H/3's 0.635° obliquity amplitude is 0.83″ at the edge of the Step 6a window"
-  },
-  {
-   "file": "src/script.js",
-   "line": 5017,
-   "runtime": "browser",
-   "token": "H / N",
-   "class": "comment",
-   "text": "*  (H/4, H/7, H/10) absorbing a calendar artifact rather than describing"
-  },
-  {
-   "file": "src/script.js",
-   "line": 5017,
-   "runtime": "browser",
-   "token": "H / N",
-   "class": "comment",
-   "text": "*  (H/4, H/7, H/10) absorbing a calendar artifact rather than describing"
-  },
-  {
-   "file": "src/script.js",
-   "line": 5017,
-   "runtime": "browser",
-   "token": "H / N",
-   "class": "comment",
-   "text": "*  (H/4, H/7, H/10) absorbing a calendar artifact rather than describing"
-  },
-  {
-   "file": "src/script.js",
-   "line": 5091,
+   "line": 4155,
    "runtime": "browser",
    "token": "H / N",
    "class": "comment",
@@ -1846,7 +1044,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 5168,
+   "line": 4218,
    "runtime": "browser",
    "token": "8H",
    "class": "comment",
@@ -1854,55 +1052,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 6370,
-   "runtime": "browser",
-   "token": "H / N",
-   "class": "comment",
-   "text": "// the assembly block), so it inherits Earth's animated H/13 orbit phase"
-  },
-  {
-   "file": "src/script.js",
-   "line": 6370,
-   "runtime": "browser",
-   "token": "/ 13",
-   "class": "comment",
-   "text": "// the assembly block), so it inherits Earth's animated H/13 orbit phase"
-  },
-  {
-   "file": "src/script.js",
-   "line": 6371,
-   "runtime": "browser",
-   "token": "H / N",
-   "class": "comment",
-   "text": "// (snapshot + deep-time) and circles Earth once per H/13, marking the"
-  },
-  {
-   "file": "src/script.js",
-   "line": 6371,
-   "runtime": "browser",
-   "token": "/ 13",
-   "class": "comment",
-   "text": "// (snapshot + deep-time) and circles Earth once per H/13, marking the"
-  },
-  {
-   "file": "src/script.js",
-   "line": 6378,
-   "runtime": "browser",
-   "token": "H / N",
-   "class": "comment",
-   "text": "// 2·base·A·cos φ, φ = 360°·(2000 − 1246.03)/(H/16) = 12.95° (the arm-to-arm"
-  },
-  {
-   "file": "src/script.js",
-   "line": 6380,
-   "runtime": "browser",
-   "token": "H / N",
-   "class": "comment",
-   "text": "// (constants eccentricityAmplitudeK). Under the one H/3 law A no longer"
-  },
-  {
-   "file": "src/script.js",
-   "line": 6424,
+   "line": 5436,
    "runtime": "browser",
    "token": "earthtiltMean",
    "class": "comment",
@@ -1910,95 +1060,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 6426,
-   "runtime": "browser",
-   "token": "H / N",
-   "class": "comment",
-   "text": "// eccentricityAmplitude·100, H/13) is RETIRED — its partner arm on the"
-  },
-  {
-   "file": "src/script.js",
-   "line": 6426,
-   "runtime": "browser",
-   "token": "/ 13",
-   "class": "comment",
-   "text": "// eccentricityAmplitude·100, H/13) is RETIRED — its partner arm on the"
-  },
-  {
-   "file": "src/script.js",
-   "line": 6541,
-   "runtime": "browser",
-   "token": "cyclesBetween",
-   "class": "comment",
-   "text": "// Taurus). The other tagged precession objects have startPos = ±cyclesBetween("
-  },
-  {
-   "file": "src/script.js",
-   "line": 6545,
-   "runtime": "browser",
-   "token": "cyclesBetween",
-   "class": "comment",
-   "text": "// rotate earth by cyclesBetween(BALANCED, startmodel, 13) × 2π × −1 ≈ +292°"
-  },
-  {
-   "file": "src/script.js",
-   "line": 6573,
-   "runtime": "browser",
-   "token": "H / N",
-   "class": "comment",
-   "text": "// rotation −H/13 = co-rotating with the axial precession) is RETIRED —"
-  },
-  {
-   "file": "src/script.js",
-   "line": 6573,
-   "runtime": "browser",
-   "token": "/ 13",
-   "class": "comment",
-   "text": "// rotation −H/13 = co-rotating with the axial precession) is RETIRED —"
-  },
-  {
-   "file": "src/script.js",
-   "line": 6657,
-   "runtime": "browser",
-   "token": "H / N",
-   "class": "comment",
-   "text": "// tag — the H/16 counter for the Sun's perihelion phase — is deleted with the"
-  },
-  {
-   "file": "src/script.js",
-   "line": 7318,
-   "runtime": "browser",
-   "token": "cyclesBetweenYears",
-   "class": "comment",
-   "text": "// _dtCycleN used cyclesBetweenYears(yA, yB, N) (deleted, plan 09 step 7a) which integrated H(τ)-scaling"
-  },
-  {
-   "file": "src/script.js",
-   "line": 7424,
-   "runtime": "browser",
-   "token": "cyclesBetweenYears",
-   "class": "comment",
-   "text": "// DIVISOR CONVENTION (CRITICAL; the counter cyclesBetweenYears is deleted since plan 09 step 7a): cyclesBetweenYears(yA, yB, divisor_N) integrated"
-  },
-  {
-   "file": "src/script.js",
-   "line": 7425,
-   "runtime": "browser",
-   "token": "8H",
-   "class": "comment",
-   "text": "// cycles of period H/divisor_N. The Law-6 perihelion ecliptic period is 8H/N (where"
-  },
-  {
-   "file": "src/script.js",
-   "line": 8040,
-   "runtime": "browser",
-   "token": "8H",
-   "class": "comment",
-   "text": "// navigation fields — last/next H and 8H event JDs and periods — were"
-  },
-  {
-   "file": "src/script.js",
-   "line": 8043,
+   "line": 6880,
    "runtime": "browser",
    "token": "H / N",
    "class": "comment",
@@ -2006,7 +1068,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 8044,
+   "line": 6881,
    "runtime": "browser",
    "token": "H / N",
    "class": "comment",
@@ -2014,7 +1076,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 8343,
+   "line": 7178,
    "runtime": "browser",
    "token": "H / N",
    "class": "comment",
@@ -2022,7 +1084,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 8343,
+   "line": 7178,
    "runtime": "browser",
    "token": "/ 13",
    "class": "comment",
@@ -2030,15 +1092,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 8917,
-   "runtime": "browser",
-   "token": "H / N",
-   "class": "comment",
-   "text": "// C-VIS (owner-ruled): the H/3 device's fixed HIGH/LOW axis, MEAN"
-  },
-  {
-   "file": "src/script.js",
-   "line": 8993,
+   "line": 7799,
    "runtime": "browser",
    "token": "H / N",
    "class": "comment",
@@ -2046,7 +1100,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 9253,
+   "line": 8058,
    "runtime": "browser",
    "token": "H / N",
    "class": "comment",
@@ -2054,7 +1108,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 9796,
+   "line": 8601,
    "runtime": "browser",
    "token": "H / N",
    "class": "comment",
@@ -2062,7 +1116,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 10114,
+   "line": 8917,
    "runtime": "browser",
    "token": "H / N",
    "class": "comment",
@@ -2070,31 +1124,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 13472,
-   "runtime": "browser",
-   "token": "H / N",
-   "class": "comment",
-   "text": "// precession rate against this mode — falsification leg 1 — not H/8. v22.0:"
-  },
-  {
-   "file": "src/script.js",
-   "line": 15200,
-   "runtime": "browser",
-   "token": "H / N",
-   "class": "comment",
-   "text": "// J2000 anchor. The former solid \"H/13\" line (the fit anchor's reading,"
-  },
-  {
-   "file": "src/script.js",
-   "line": 15200,
-   "runtime": "browser",
-   "token": "/ 13",
-   "class": "comment",
-   "text": "// J2000 anchor. The former solid \"H/13\" line (the fit anchor's reading,"
-  },
-  {
-   "file": "src/script.js",
-   "line": 15310,
+   "line": 14066,
    "runtime": "browser",
    "token": "H / N",
    "class": "comment",
@@ -2102,7 +1132,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 15310,
+   "line": 14066,
    "runtime": "browser",
    "token": "/ 13",
    "class": "comment",
@@ -2110,7 +1140,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 16089,
+   "line": 14843,
    "runtime": "browser",
    "token": "8H",
    "class": "comment",
@@ -2118,7 +1148,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 17812,
+   "line": 16555,
    "runtime": "browser",
    "token": "H / N",
    "class": "comment",
@@ -2126,7 +1156,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 17821,
+   "line": 16564,
    "runtime": "browser",
    "token": "H / N",
    "class": "comment",
@@ -2134,7 +1164,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 17824,
+   "line": 16567,
    "runtime": "browser",
    "token": "H / N",
    "class": "comment",
@@ -2142,47 +1172,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 17971,
-   "runtime": "browser",
-   "token": "H / N",
-   "class": "comment",
-   "text": "// The retired H/3-law reference curve and its base′ mean line are gone"
-  },
-  {
-   "file": "src/script.js",
-   "line": 18061,
-   "runtime": "browser",
-   "token": "H / N",
-   "class": "comment",
-   "text": "// apsidal wheel and the anomalistic year). Chain + kinematic H/13"
-  },
-  {
-   "file": "src/script.js",
-   "line": 18061,
-   "runtime": "browser",
-   "token": "/ 13",
-   "class": "comment",
-   "text": "// apsidal wheel and the anomalistic year). Chain + kinematic H/13"
-  },
-  {
-   "file": "src/script.js",
-   "line": 18063,
-   "runtime": "browser",
-   "token": "H / N",
-   "class": "comment",
-   "text": "// H/16-law reference line is gone, and primaryRef is now EXPLICIT:"
-  },
-  {
-   "file": "src/script.js",
-   "line": 18064,
-   "runtime": "browser",
-   "token": "H / N",
-   "class": "comment",
-   "text": "// residuals previously defaulted to index 0 = our own H/16 law (the"
-  },
-  {
-   "file": "src/script.js",
-   "line": 18189,
+   "line": 16921,
    "runtime": "browser",
    "token": "H / N",
    "class": "comment",
@@ -2190,7 +1180,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 18204,
+   "line": 16936,
    "runtime": "browser",
    "token": "H / N",
    "class": "comment",
@@ -2198,7 +1188,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 18211,
+   "line": 16943,
    "runtime": "browser",
    "token": "H / N",
    "class": "comment",
@@ -2206,7 +1196,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 18216,
+   "line": 16948,
    "runtime": "browser",
    "token": "H / N",
    "class": "comment",
@@ -2214,23 +1204,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 18281,
-   "runtime": "browser",
-   "token": "H / N",
-   "class": "comment",
-   "text": "// H/13 identity: 31,558,149.7635 s = 365.256363004 SI days) DIVIDED by"
-  },
-  {
-   "file": "src/script.js",
-   "line": 18281,
-   "runtime": "browser",
-   "token": "/ 13",
-   "class": "comment",
-   "text": "// H/13 identity: 31,558,149.7635 s = 365.256363004 SI days) DIVIDED by"
-  },
-  {
-   "file": "src/script.js",
-   "line": 18414,
+   "line": 17130,
    "runtime": "browser",
    "token": "H / N",
    "class": "comment",
@@ -2238,7 +1212,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 19116,
+   "line": 17831,
    "runtime": "browser",
    "token": "H / N",
    "class": "comment",
@@ -2246,7 +1220,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 19128,
+   "line": 17843,
    "runtime": "browser",
    "token": "H / N",
    "class": "comment",
@@ -2254,7 +1228,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 23275,
+   "line": 21962,
    "runtime": "browser",
    "token": "H / N",
    "class": "comment",
@@ -2262,7 +1236,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 23937,
+   "line": 22617,
    "runtime": "browser",
    "token": "H / N",
    "class": "comment",
@@ -2270,15 +1244,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 24550,
-   "runtime": "browser",
-   "token": "8H",
-   "class": "comment",
-   "text": "// (Plan 07 R10: the two \"Balanced Year\" test buttons — the H / 8H event"
-  },
-  {
-   "file": "src/script.js",
-   "line": 24794,
+   "line": 23452,
    "runtime": "browser",
    "token": "H / N",
    "class": "display",
@@ -2286,7 +1252,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 24796,
+   "line": 23454,
    "runtime": "browser",
    "token": "H / N",
    "class": "display",
@@ -2294,7 +1260,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 24813,
+   "line": 23471,
    "runtime": "browser",
    "token": "H / N",
    "class": "comment",
@@ -2302,15 +1268,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 24829,
-   "runtime": "browser",
-   "token": "H / N",
-   "class": "comment",
-   "text": "// this mirror still read the spin unit's H/5 until plan 09 step 5c)"
-  },
-  {
-   "file": "src/script.js",
-   "line": 24853,
+   "line": 23510,
    "runtime": "browser",
    "token": "H / N",
    "class": "display",
@@ -2318,7 +1276,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 24855,
+   "line": 23512,
    "runtime": "browser",
    "token": "H / N",
    "class": "display",
@@ -2326,15 +1284,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 25380,
-   "runtime": "browser",
-   "token": "H / N",
-   "class": "comment",
-   "text": "// the spin unit's H/5 this mirror still carried."
-  },
-  {
-   "file": "src/script.js",
-   "line": 25549,
+   "line": 24195,
    "runtime": "browser",
    "token": "H / N",
    "class": "display",
@@ -2342,7 +1292,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 31457,
+   "line": 30011,
    "runtime": "browser",
    "token": "8H",
    "class": "comment",
@@ -2350,55 +1300,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 32225,
-   "runtime": "browser",
-   "token": "H / N",
-   "class": "comment",
-   "text": "// (H/16, 8H/11, 8H/39, 8H/65, H/13 read them 0.09…2 % off)"
-  },
-  {
-   "file": "src/script.js",
-   "line": 32225,
-   "runtime": "browser",
-   "token": "H / N",
-   "class": "comment",
-   "text": "// (H/16, 8H/11, 8H/39, 8H/65, H/13 read them 0.09…2 % off)"
-  },
-  {
-   "file": "src/script.js",
-   "line": 32225,
-   "runtime": "browser",
-   "token": "8H",
-   "class": "comment",
-   "text": "// (H/16, 8H/11, 8H/39, 8H/65, H/13 read them 0.09…2 % off)"
-  },
-  {
-   "file": "src/script.js",
-   "line": 32225,
-   "runtime": "browser",
-   "token": "8H",
-   "class": "comment",
-   "text": "// (H/16, 8H/11, 8H/39, 8H/65, H/13 read them 0.09…2 % off)"
-  },
-  {
-   "file": "src/script.js",
-   "line": 32225,
-   "runtime": "browser",
-   "token": "8H",
-   "class": "comment",
-   "text": "// (H/16, 8H/11, 8H/39, 8H/65, H/13 read them 0.09…2 % off)"
-  },
-  {
-   "file": "src/script.js",
-   "line": 32225,
-   "runtime": "browser",
-   "token": "/ 13",
-   "class": "comment",
-   "text": "// (H/16, 8H/11, 8H/39, 8H/65, H/13 read them 0.09…2 % off)"
-  },
-  {
-   "file": "src/script.js",
-   "line": 32502,
+   "line": 31054,
    "runtime": "browser",
    "token": "H / N",
    "class": "comment",
@@ -2406,7 +1308,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 32502,
+   "line": 31054,
    "runtime": "browser",
    "token": "/ 13",
    "class": "comment",
@@ -2414,7 +1316,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 33870,
+   "line": 32412,
    "runtime": "browser",
    "token": "H / N",
    "class": "comb",
@@ -2423,15 +1325,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 34159,
-   "runtime": "browser",
-   "token": "H / N",
-   "class": "comment",
-   "text": "// H/16 cycle counted from t₀ — and o.juliandaysbalancedJD were written"
-  },
-  {
-   "file": "src/script.js",
-   "line": 34929,
+   "line": 33457,
    "runtime": "browser",
    "token": "H / N",
    "class": "comment",
@@ -2439,7 +1333,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 34930,
+   "line": 33458,
    "runtime": "browser",
    "token": "H / N",
    "class": "comment",
@@ -2447,7 +1341,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 35047,
+   "line": 33575,
    "runtime": "browser",
    "token": "H / N",
    "class": "comment",
@@ -2455,7 +1349,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 35047,
+   "line": 33575,
    "runtime": "browser",
    "token": "/ 13",
    "class": "comment",
@@ -2463,7 +1357,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 35067,
+   "line": 33595,
    "runtime": "browser",
    "token": "H / N",
    "class": "comment",
@@ -2471,7 +1365,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 35068,
+   "line": 33596,
    "runtime": "browser",
    "token": "H / N",
    "class": "comment",
@@ -2479,7 +1373,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 35169,
+   "line": 33697,
    "runtime": "browser",
    "token": "H / N",
    "class": "comment",
@@ -2487,7 +1381,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 35272,
+   "line": 33800,
    "runtime": "browser",
    "token": "H / N",
    "class": "comment",
@@ -2495,31 +1389,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 35504,
-   "runtime": "browser",
-   "token": "cyclesBetweenYears",
-   "class": "comment",
-   "text": "//     `cyclesBetweenYears(anchor, currentYearSI, N)` (cumulative-integral; the counter is deleted, plan 09 step 7a"
-  },
-  {
-   "file": "src/script.js",
-   "line": 35509,
-   "runtime": "browser",
-   "token": "H / N",
-   "class": "comment",
-   "text": "//     scan uses C.meanSolarYearDays (H/8 quantized = 365.24220364...)."
-  },
-  {
-   "file": "src/script.js",
-   "line": 35802,
-   "runtime": "browser",
-   "token": "H / N",
-   "class": "comment",
-   "text": "// report still carried the H/16 identity until step 5c)"
-  },
-  {
-   "file": "src/script.js",
-   "line": 36017,
+   "line": 34533,
    "runtime": "browser",
    "token": "H / N",
    "class": "comment",
@@ -2527,39 +1397,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 36091,
-   "runtime": "browser",
-   "token": "H / N",
-   "class": "comment",
-   "text": "//                this row to it — its private H/5 copy sat 3.5 ms off the pane)"
-  },
-  {
-   "file": "src/script.js",
-   "line": 36375,
-   "runtime": "browser",
-   "token": "8H",
-   "class": "comment",
-   "text": "// phase-origin convention's H / 8H event navigation — are gone with their"
-  },
-  {
-   "file": "src/script.js",
-   "line": 36379,
-   "runtime": "browser",
-   "token": "8H",
-   "class": "comment",
-   "text": "// (The \"Verify 8H Configuration\" check — the per-planet System-Reset claim of the"
-  },
-  {
-   "file": "src/script.js",
-   "line": 36922,
-   "runtime": "browser",
-   "token": "H / N",
-   "class": "comment",
-   "text": "// T_peri (plan 09 step 4b; the device's H/16 read it 0.09 % high, 0.3 s of year)"
-  },
-  {
-   "file": "src/script.js",
-   "line": 39398,
+   "line": 37883,
    "runtime": "browser",
    "token": "H / N",
    "class": "display",
@@ -2567,7 +1405,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 40425,
+   "line": 38905,
    "runtime": "browser",
    "token": "H / N",
    "class": "comment",
@@ -2575,7 +1413,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 40425,
+   "line": 38905,
    "runtime": "browser",
    "token": "/ 13",
    "class": "comment",
@@ -2583,23 +1421,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 40499,
-   "runtime": "browser",
-   "token": "H / N",
-   "class": "comment",
-   "text": "// T_p = 1,296,000/p_A (plan 09 step 4b; the device's H/13 read 25,794, 0.086 % high)"
-  },
-  {
-   "file": "src/script.js",
-   "line": 40499,
-   "runtime": "browser",
-   "token": "/ 13",
-   "class": "comment",
-   "text": "// T_p = 1,296,000/p_A (plan 09 step 4b; the device's H/13 read 25,794, 0.086 % high)"
-  },
-  {
-   "file": "src/script.js",
-   "line": 41018,
+   "line": 39498,
    "runtime": "browser",
    "token": "H / N",
    "class": "display",
@@ -2607,7 +1429,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 41018,
+   "line": 39498,
    "runtime": "browser",
    "token": "/ 13",
    "class": "display",
@@ -2615,7 +1437,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 41084,
+   "line": 39564,
    "runtime": "browser",
    "token": "H / N",
    "class": "display",
@@ -2623,7 +1445,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 41084,
+   "line": 39564,
    "runtime": "browser",
    "token": "/ 13",
    "class": "display",
@@ -2631,7 +1453,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 41085,
+   "line": 39565,
    "runtime": "browser",
    "token": "H / N",
    "class": "display",
@@ -2639,7 +1461,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 41085,
+   "line": 39565,
    "runtime": "browser",
    "token": "/ 13",
    "class": "display",
@@ -2647,7 +1469,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 41121,
+   "line": 39601,
    "runtime": "browser",
    "token": "H / N",
    "class": "display",
@@ -2655,7 +1477,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 41121,
+   "line": 39601,
    "runtime": "browser",
    "token": "/ 13",
    "class": "display",
@@ -2663,7 +1485,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 41137,
+   "line": 39617,
    "runtime": "browser",
    "token": "H / N",
    "class": "display",
@@ -2671,7 +1493,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 41137,
+   "line": 39617,
    "runtime": "browser",
    "token": "/ 13",
    "class": "display",
@@ -2679,7 +1501,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 41620,
+   "line": 40089,
    "runtime": "browser",
    "token": "H / N",
    "class": "comment",
@@ -2687,7 +1509,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 41620,
+   "line": 40089,
    "runtime": "browser",
    "token": "/ 13",
    "class": "comment",
@@ -2695,7 +1517,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 42809,
+   "line": 41257,
    "runtime": "browser",
    "token": "H / N",
    "class": "comment",
@@ -2703,95 +1525,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 43778,
-   "runtime": "browser",
-   "token": "H / N",
-   "class": "comment",
-   "text": "// Cycle, the H/13-H/3-H/16-H/5-H/8 rows, the precession-tree hub and"
-  },
-  {
-   "file": "src/script.js",
-   "line": 43778,
-   "runtime": "browser",
-   "token": "H / N",
-   "class": "comment",
-   "text": "// Cycle, the H/13-H/3-H/16-H/5-H/8 rows, the precession-tree hub and"
-  },
-  {
-   "file": "src/script.js",
-   "line": 43778,
-   "runtime": "browser",
-   "token": "H / N",
-   "class": "comment",
-   "text": "// Cycle, the H/13-H/3-H/16-H/5-H/8 rows, the precession-tree hub and"
-  },
-  {
-   "file": "src/script.js",
-   "line": 43778,
-   "runtime": "browser",
-   "token": "H / N",
-   "class": "comment",
-   "text": "// Cycle, the H/13-H/3-H/16-H/5-H/8 rows, the precession-tree hub and"
-  },
-  {
-   "file": "src/script.js",
-   "line": 43778,
-   "runtime": "browser",
-   "token": "H / N",
-   "class": "comment",
-   "text": "// Cycle, the H/13-H/3-H/16-H/5-H/8 rows, the precession-tree hub and"
-  },
-  {
-   "file": "src/script.js",
-   "line": 43778,
-   "runtime": "browser",
-   "token": "/ 13",
-   "class": "comment",
-   "text": "// Cycle, the H/13-H/3-H/16-H/5-H/8 rows, the precession-tree hub and"
-  },
-  {
-   "file": "src/script.js",
-   "line": 46939,
-   "runtime": "browser",
-   "token": "earthtiltMean",
-   "class": "comment",
-   "text": "// (earthtiltMean − A·cos H/3 + A·cos H/8) drawn with the −H/5 node and the"
-  },
-  {
-   "file": "src/script.js",
-   "line": 46939,
-   "runtime": "browser",
-   "token": "H / N",
-   "class": "comment",
-   "text": "// (earthtiltMean − A·cos H/3 + A·cos H/8) drawn with the −H/5 node and the"
-  },
-  {
-   "file": "src/script.js",
-   "line": 46939,
-   "runtime": "browser",
-   "token": "H / N",
-   "class": "comment",
-   "text": "// (earthtiltMean − A·cos H/3 + A·cos H/8) drawn with the −H/5 node and the"
-  },
-  {
-   "file": "src/script.js",
-   "line": 46939,
-   "runtime": "browser",
-   "token": "H / N",
-   "class": "comment",
-   "text": "// (earthtiltMean − A·cos H/3 + A·cos H/8) drawn with the −H/5 node and the"
-  },
-  {
-   "file": "src/script.js",
-   "line": 46940,
-   "runtime": "browser",
-   "token": "H / N",
-   "class": "comment",
-   "text": "// H/3 \"glacial maximum\" phase markers — stood here. No panel row carried its"
-  },
-  {
-   "file": "src/script.js",
-   "line": 47051,
+   "line": 45477,
    "runtime": "browser",
    "token": "H / N",
    "class": "comment",
@@ -2799,7 +1533,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 47051,
+   "line": 45477,
    "runtime": "browser",
    "token": "/ 13",
    "class": "comment",
@@ -2807,79 +1541,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 48303,
-   "runtime": "browser",
-   "token": "H / N",
-   "class": "comment",
-   "text": "*  general-precession rate (S5). Never the H/13 counter: 0.043″/yr slow —"
-  },
-  {
-   "file": "src/script.js",
-   "line": 48303,
-   "runtime": "browser",
-   "token": "/ 13",
-   "class": "comment",
-   "text": "*  general-precession rate (S5). Never the H/13 counter: 0.043″/yr slow —"
-  },
-  {
-   "file": "src/script.js",
-   "line": 48432,
-   "runtime": "browser",
-   "token": "H / N",
-   "class": "comment",
-   "text": "// vs the H/3 law's 11.60 — the epoch-local-tangent result); at deep time"
-  },
-  {
-   "file": "src/script.js",
-   "line": 49394,
-   "runtime": "browser",
-   "token": "H / N",
-   "class": "comment",
-   "text": "// (owner deep-time catch: the H/13-clock marker sat 58° off the"
-  },
-  {
-   "file": "src/script.js",
-   "line": 49394,
-   "runtime": "browser",
-   "token": "/ 13",
-   "class": "comment",
-   "text": "// (owner deep-time catch: the H/13-clock marker sat 58° off the"
-  },
-  {
-   "file": "src/script.js",
-   "line": 49454,
-   "runtime": "browser",
-   "token": "H / N",
-   "class": "comment",
-   "text": "// Was: Meeus linear (23.4393 - 0.01300*T); framework has H/3+H/8 obliquity"
-  },
-  {
-   "file": "src/script.js",
-   "line": 49454,
-   "runtime": "browser",
-   "token": "H / N",
-   "class": "comment",
-   "text": "// Was: Meeus linear (23.4393 - 0.01300*T); framework has H/3+H/8 obliquity"
-  },
-  {
-   "file": "src/script.js",
-   "line": 49819,
-   "runtime": "browser",
-   "token": "cyclesBetween",
-   "class": "comment",
-   "text": "// startmodelJD, so cyclesBetween(STARTMODEL_YEAR_SI, _currentYearSI_TT, N)"
-  },
-  {
-   "file": "src/script.js",
-   "line": 49922,
-   "runtime": "browser",
-   "token": "H / N",
-   "class": "comment",
-   "text": "// Sun's H/16 counter — is deleted; the Sun's angle is the engine's, R4.)"
-  },
-  {
-   "file": "src/script.js",
-   "line": 50207,
+   "line": 48557,
    "runtime": "browser",
    "token": "H / N",
    "class": "comment",
@@ -2887,7 +1549,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 50207,
+   "line": 48557,
    "runtime": "browser",
    "token": "/ 13",
    "class": "comment",
@@ -2895,7 +1557,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 50208,
+   "line": 48558,
    "runtime": "browser",
    "token": "H / N",
    "class": "comment",
@@ -2903,7 +1565,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 50208,
+   "line": 48558,
    "runtime": "browser",
    "token": "H / N",
    "class": "comment",
@@ -2911,47 +1573,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 50552,
-   "runtime": "browser",
-   "token": "8H",
-   "class": "comment",
-   "text": "// divisor rates above (8H/11 etc.) are retired to window-epoch DESCRIPTORS"
-  },
-  {
-   "file": "src/script.js",
-   "line": 50592,
-   "runtime": "browser",
-   "token": "H / N",
-   "class": "comment",
-   "text": "// Deleted here: getEarthInclinationAtYear (the H/3 cosine on the fixed"
-  },
-  {
-   "file": "src/script.js",
-   "line": 50913,
-   "runtime": "browser",
-   "token": "H / N",
-   "class": "comment",
-   "text": "// −H/5 Earth line — and the sin(i)·sin(u)·r construction it fed left with"
-  },
-  {
-   "file": "src/script.js",
-   "line": 51623,
-   "runtime": "browser",
-   "token": "cyclesBetweenYears",
-   "class": "comment",
-   "text": "// override at moveModel line ~53806) which integrated `cyclesBetweenYears("
-  },
-  {
-   "file": "src/script.js",
-   "line": 51649,
-   "runtime": "browser",
-   "token": "8H",
-   "class": "comment",
-   "text": "// 8H event JDs and periods counted from t₀, written every frame and bound to"
-  },
-  {
-   "file": "src/script.js",
-   "line": 51724,
+   "line": 49987,
    "runtime": "browser",
    "token": "H / N",
    "class": "comment",
@@ -2959,55 +1581,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 51778,
-   "runtime": "browser",
-   "token": "H / N",
-   "class": "comment",
-   "text": "// model's one J2000 reading; S5 retired the H/13 face 25,793.6 here) —"
-  },
-  {
-   "file": "src/script.js",
-   "line": 51778,
-   "runtime": "browser",
-   "token": "/ 13",
-   "class": "comment",
-   "text": "// model's one J2000 reading; S5 retired the H/13 face 25,793.6 here) —"
-  },
-  {
-   "file": "src/script.js",
-   "line": 51825,
-   "runtime": "browser",
-   "token": "H / N",
-   "class": "comment",
-   "text": "// S5: one turn of the equinox per T_p(t) (the composed clock), not per the counter H/13."
-  },
-  {
-   "file": "src/script.js",
-   "line": 51825,
-   "runtime": "browser",
-   "token": "/ 13",
-   "class": "comment",
-   "text": "// S5: one turn of the equinox per T_p(t) (the composed clock), not per the counter H/13."
-  },
-  {
-   "file": "src/script.js",
-   "line": 51870,
-   "runtime": "browser",
-   "token": "H / N",
-   "class": "comment",
-   "text": "// (plan 09 step 4b: the device's obliquity period H/8 (41,915) and nodal"
-  },
-  {
-   "file": "src/script.js",
-   "line": 51871,
-   "runtime": "browser",
-   "token": "H / N",
-   "class": "comment",
-   "text": "// counter H/5 (67,063) left the o.*/predictions machinery — no panel row"
-  },
-  {
-   "file": "src/script.js",
-   "line": 51886,
+   "line": 50142,
    "runtime": "browser",
    "token": "H / N",
    "class": "comment",
@@ -3015,7 +1589,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 51888,
+   "line": 50144,
    "runtime": "browser",
    "token": "H / N",
    "class": "comment",
@@ -3023,15 +1597,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 51895,
-   "runtime": "browser",
-   "token": "H / N",
-   "class": "comment",
-   "text": "// H/16 counter) that o.longitudePerihelion carried is deleted; measured"
-  },
-  {
-   "file": "src/script.js",
-   "line": 51923,
+   "line": 50173,
    "runtime": "browser",
    "token": "H / N",
    "class": "comment",
@@ -3039,31 +1605,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 52225,
-   "runtime": "browser",
-   "token": "H / N",
-   "class": "comment",
-   "text": "// step 6: the H/3 law and the H/16 law-of-cosines form are deleted.)"
-  },
-  {
-   "file": "src/script.js",
-   "line": 52225,
-   "runtime": "browser",
-   "token": "H / N",
-   "class": "comment",
-   "text": "// step 6: the H/3 law and the H/16 law-of-cosines form are deleted.)"
-  },
-  {
-   "file": "src/script.js",
-   "line": 52236,
-   "runtime": "browser",
-   "token": "H / N",
-   "class": "comment",
-   "text": "// (Plan 09 step 6: the five-argument `computeEccentricityEarth` — the H/16"
-  },
-  {
-   "file": "src/script.js",
-   "line": 52293,
+   "line": 50502,
    "runtime": "browser",
    "token": "H / N",
    "class": "comment",
@@ -3071,59 +1613,11 @@
   },
   {
    "file": "src/script.js",
-   "line": 52293,
+   "line": 50502,
    "runtime": "browser",
    "token": "H / N",
    "class": "comment",
    "text": "*  RA(t) = (baseRA − earthRAAngle/sin(ε)) + (A/sin(ε)) × [−sin(H/3) + sin(H/8)]"
-  },
-  {
-   "file": "src/script.js",
-   "line": 52329,
-   "runtime": "browser",
-   "token": "H / N",
-   "class": "comment",
-   "text": "// The braiding is modelled by the EQUATION OF CENTRE, not by H/16 and H/32"
-  },
-  {
-   "file": "src/script.js",
-   "line": 52329,
-   "runtime": "browser",
-   "token": "H / N",
-   "class": "comment",
-   "text": "// The braiding is modelled by the EQUATION OF CENTRE, not by H/16 and H/32"
-  },
-  {
-   "file": "src/script.js",
-   "line": 52338,
-   "runtime": "browser",
-   "token": "H / N",
-   "class": "comment",
-   "text": "// the four points' H/16 quadrature 20× tighter (−0.79° → −0.04°) with"
-  },
-  {
-   "file": "src/script.js",
-   "line": 52375,
-   "runtime": "browser",
-   "token": "H / N",
-   "class": "comment",
-   "text": "// invariable plane as the K device's H/3 cosine on the fixed apsidal"
-  },
-  {
-   "file": "src/script.js",
-   "line": 52383,
-   "runtime": "browser",
-   "token": "H / N",
-   "class": "comment",
-   "text": "// wheel's J2000 phase + 360 × the H/16 counter's cycles + 25 harmonics on the"
-  },
-  {
-   "file": "src/script.js",
-   "line": 53328,
-   "runtime": "browser",
-   "token": "H / N",
-   "class": "comment",
-   "text": "* @param {number} cycleYears    — length of one cycle in Perihelion years (default: the J2000 perihelion-of-date period T_peri; plan 09 step 4b, was H/16)"
   },
   {
    "file": "tools/check-python-physics.mjs",
@@ -3191,7 +1685,7 @@
   },
   {
    "file": "tools/constants/check-literals.mjs",
-   "line": 115,
+   "line": 121,
    "runtime": "docs-tools",
    "token": "earthInclinationCycleAnchor",
    "class": "comment",
@@ -3199,7 +1693,7 @@
   },
   {
    "file": "tools/constants/check-literals.mjs",
-   "line": 258,
+   "line": 264,
    "runtime": "docs-tools",
    "token": "/ 13",
    "class": "comment",
@@ -7822,7 +6316,7 @@
    "packages/physics/src/earth/precession-composed.cjs": "sha256:0b2904e81b5a15a45ef416502f971b5333da385005d1a5be175d4c6178bd3a6e",
    "packages/physics/src/earth/year-lengths.cjs": "sha256:ad86136a5455e5d846cee9cd03f55dc66b942edab56fa5c57f51fa2923decdb2",
    "packages/physics/src/eclipse/besselian.cjs": "sha256:f731968aa72105b31ca578f14644a5afcf228bb3a1103359414171de38baaf52",
-   "packages/physics/src/index.js": "sha256:dc19cb32151e8dd573d76a67656d1290d1b9a4f53a85bd7238135d6bc18c5587",
+   "packages/physics/src/index.js": "sha256:a8daae3f55a7b4b34fdf1a6fd4a30dea1192f46fcb86f8372978eb701b59e1b0",
    "packages/physics/src/layer0/derive-params.js": "sha256:f269af7ad405eb30b56c992f8e710dd1e5fde8abea47058f5dc990d06acd84f4",
    "packages/physics/src/layer0/index.js": "sha256:2ea20b07553ec75aa0c6005eacf84bd859ab2df949442880835876d9797336e8",
    "packages/physics/src/layer1/index.js": "sha256:ba7a15893b0d4b38ff53521f2180384b805160b313e4711740802b356cbd4e2f",
@@ -7838,13 +6332,13 @@
    "scripts/climate_formula_mwp_check.py": "sha256:177305723579b66c9d08590f366574c05cd935aea5573614e89eddc502f72236",
    "scripts/extract_insolation_features_deep.js": "sha256:2ef7242a306cc9e34200e59c0dcbe8d5fe30dc0759b4d2ee5457875d981a50dc",
    "scripts/milankovitch_climate_formula.py": "sha256:c16a99025d13fbbbd5448a067d39be62e27dff78d0d68432ca600c337817a41f",
-   "src/script.js": "sha256:8e5ce2e447324b3a7bf75bbadc957ea93cd16fc230b15a209b45a842ba5a2da6",
+   "src/script.js": "sha256:12789b420af9aeafb9a8dc5d7fff6ae926ae409af4fe9982ac5fb84c85d9f71a",
    "test/browser/epoch-consistency.test.mjs": "sha256:027b40559844497a53c6ee39fba2e0b848949a43e3ddb0e230cff9e0478a7172",
    "test/browser/snapshot.test.mjs": "sha256:819345a46ac6876dfa5632843a0cce5ee8b539620c4fb51b413c95235d81b4ea",
    "test/browser/wobble-center.test.mjs": "sha256:456521771ea752f9112407c9f316d0dc92ec21d7b4ac90fbc5110772256ae8ad",
    "tools/check-python-physics.mjs": "sha256:677d3c65e87fcd08c29b633c2118a474444d19c2ac365095b8893a718b2cf6ae",
    "tools/check-vocabulary.mjs": "sha256:49b37bd39baffdc860a25cd1bc021306bd360b0fe03ded8ca4d416fcd661e02a",
-   "tools/constants/check-literals.mjs": "sha256:5e096418c87a6451fbe45710a05201d289f3e8e538af121199d70fc03e0b7729",
+   "tools/constants/check-literals.mjs": "sha256:f54ef38aef2bbc82f6eef78be765cbd604d738431e84a9ec4a6ff4d6824363aa",
    "tools/constants/generate.mjs": "sha256:a0a37fb59f7942ed78b13682dfdcb9be3c52e6093d85d35c9c5111cab3e91036",
    "tools/docs/model-values.mjs": "sha256:961ccdf82d8bdbee6c26594b938a112bf8f7a1756939668ecb21a44aafa63d26",
    "tools/docs/render-calculation-map.mjs": "sha256:8807a8af9432460830eb87c2555e4a343c1e537deea772b76322cc9562e6c31f",

@@ -58,7 +58,7 @@ import { REFERENCE_DATA } from './constants/index.js';
 import { assembleModel } from './model.js';
 export { GENERATED as DEFAULT_CONSTANTS, CONSTANTS_HASH, MODEL_VERSION, PREPRINT_DOI, REFERENCE_DATA };
 export { FITTED_COEFFICIENTS, COEFFICIENTS_HASH } from "./constants/index.js";
-export { GREGORIAN_START, GREGORIAN_START_JD, calendarToJD, jdToCalendar, jdToDecimalYear, dayFractionToHMS } from "./time/calendar.cjs";
+export { GREGORIAN_START, GREGORIAN_START_JD, calendarToJD, jdToCalendar, jdToDecimalYear, dayFractionToHMS, julianCalendarToJD, jdToJulianCalendar } from "./time/calendar.cjs";
 export { DEG2RAD, RAD2DEG, ARCSEC_PER_TURN, ARCSEC_PER_RAD, wrap360, wrap180, wrap180Closed, wrap2pi, wrapPi } from "./math/angles.cjs";
 export { createDeepTimeChain, MOON_ECC_SENSITIVITY_PERIGEE, MOON_ECC_SENSITIVITY_NODE } from "./deltat/deep-time-chain.js";
 export { computeMassChainJ2000, computeMoonPeriodsJ2000 } from "./earth/mass-chain.cjs";

@@ -50,3 +50,29 @@ export function dayFractionToHMS(dayFrac: number): {
     minute: number;
     second: number;
 };
+/**
+ * Proleptic JULIAN calendar date → Julian Day, no reform: the convention the
+ * NASA eclipse canons and the Babylonian/Greek record tables use for every
+ * pre-1582 date, and the browser's eclipse diagnostics apply to their whole
+ * table (so a post-reform Gregorian date in such a table — 1654 Aug 12 —
+ * lands ten days late; the tables name the convention). Same expression
+ * order as the copies it replaces.
+ * @param {number} year astronomical year (0 = 1 BC)
+ * @param {number} month 1–12
+ * @param {number} day 1–31
+ * @param {number} [dayFraction=0] added to the day (e.g. hour/24)
+ * @returns {number} JD
+ */
+export function julianCalendarToJD(year: number, month: number, day: number, dayFraction?: number): number;
+/**
+ * Julian Day → proleptic JULIAN calendar date, no reform (the inverse of
+ * `julianCalendarToJD`; the NASA-convention diagnostics' printer).
+ * @param {number} jd
+ * @returns {{year: number, month: number, day: number, dayFrac: number}}
+ */
+export function jdToJulianCalendar(jd: number): {
+    year: number;
+    month: number;
+    day: number;
+    dayFrac: number;
+};

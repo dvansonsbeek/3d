@@ -2,9 +2,11 @@
  * The ΔT stack's switches. `resonator` gates the swing's δLOD terms; the
  * swing's ΔT term is gated by `resonatorDeltaT` when given (the Node twin
  * gates it on BOTH env vars, DT_CORRECTIONS and DT_RESONATOR), else by
- * `resonator`. The four cycles' δLOD terms are never switched (both twins
- * sum them unconditionally); their ΔT terms follow their flags.
- * @typedef {{bond: boolean, hallstatt: boolean, jose5: boolean, jose4: boolean, resonator: boolean, resonatorDeltaT?: boolean}} DeltaTFlags
+ * `resonator`. The four cycles' δLOD terms follow their flags only when
+ * `cycleLodFollowsFlags` is true (the browser's research toggles switch a
+ * cycle's ΔT and δLOD together); the Node twin sums them unconditionally.
+ * Their ΔT terms always follow their flags. Identical with every flag ON.
+ * @typedef {{bond: boolean, hallstatt: boolean, jose5: boolean, jose4: boolean, resonator: boolean, resonatorDeltaT?: boolean, cycleLodFollowsFlags?: boolean}} DeltaTFlags
  */
 /**
  * @param {{
@@ -234,8 +236,10 @@ export const MOON_ECC_SENSITIVITY_NODE: 1.018;
  * The ΔT stack's switches. `resonator` gates the swing's δLOD terms; the
  * swing's ΔT term is gated by `resonatorDeltaT` when given (the Node twin
  * gates it on BOTH env vars, DT_CORRECTIONS and DT_RESONATOR), else by
- * `resonator`. The four cycles' δLOD terms are never switched (both twins
- * sum them unconditionally); their ΔT terms follow their flags.
+ * `resonator`. The four cycles' δLOD terms follow their flags only when
+ * `cycleLodFollowsFlags` is true (the browser's research toggles switch a
+ * cycle's ΔT and δLOD together); the Node twin sums them unconditionally.
+ * Their ΔT terms always follow their flags. Identical with every flag ON.
  */
 export type DeltaTFlags = {
     bond: boolean;
@@ -244,4 +248,5 @@ export type DeltaTFlags = {
     jose4: boolean;
     resonator: boolean;
     resonatorDeltaT?: boolean;
+    cycleLodFollowsFlags?: boolean;
 };
