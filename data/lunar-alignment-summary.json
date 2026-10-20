@@ -517,9 +517,9 @@
   "inputs": {
     "generator": "node tools/verify/lunar-alignment.js --write",
     "files": {
-      "data/core-mantle-resonator-stage1.json": "sha256:fc842d485a9db473d3cd297b35babd2348676af70ce1f476a7ea78410912bb17",
+      "data/core-mantle-resonator-stage1.json": "sha256:b17277b561e042f618973508e9973e4ea258cc951463c923164425b6289e902c",
       "data/deep-time-fitted.json": "sha256:cabf6484ed125969d7e1b829c29722939058fbfdd9fe45a604f869208250dd99",
-      "data/deltaT-4flag-fit.json": "sha256:fb972426826170feb1272f73adce4d192335d22df14e9331b28181f3fd8c3915",
+      "data/deltaT-4flag-fit.json": "sha256:e1e1fb1e596330de11def36f28007b6556ea97114ac1bc9f9516bd6675b15b97",
       "data/nbody-secular-series.json": "sha256:c8807608f9364cd6f8c910e8c9da99a25dfa12d354e5aaef79400bd30e28049e",
       "data/rspa20160404supp2/Table-S10.txt": "sha256:67a949e3a80574880b3e79338c3527fe9b7be639dd2c06080a098b75610abe7f",
       "data/rspa20160404supp2/Table-S11.txt": "sha256:19538f6ff8889df919da4ed1587296d540c9827d1155b605d9f3da0428916d2c",
@@ -540,7 +540,7 @@
       "packages/physics/src/moon/series-extension.cjs": "sha256:d295a78eaedb0246ff142ed726c57ec2353d183c0ccbd3d767157f19623c6461",
       "packages/physics/src/moon/series.cjs": "sha256:feb2174fce4bb446f2d699f750b8269c7d70a289107f3d9b639b85b634b2459b",
       "public/input/astro-reference.json": "sha256:910e896e02467a495eeb80eb843666d95a8e00a2e70714b87e8e22edc13095b7",
-      "public/input/climate-formula-coefficients.json": "sha256:4c2b3888ffdc71aa49b7cb61b942d5f1cc379ab3e8cae4a3ee336f1310c9ef44",
+      "public/input/climate-formula-coefficients.json": "sha256:34b4ae964b514b31cc0fbe3403b05c50d0a5d5d8fc490c8b48eb42cad966323d",
       "public/input/lunar-eclipses-documented.json": "sha256:586806e4f83c3f0ebd2d5afefce41c19664d8fa24023b7a9e0f79b7c8a668558",
       "public/input/lunar-eclipses-historical.json": "sha256:81dd0c83007eb899abeb97b0b987ae2d128d0e7ec4356622c7d15ed8175ad6c1",
       "public/input/lunar-eclipses-nasa.json": "sha256:2b0f6d1b4dab2d1e8a432a812b027631cfecde9714ce0600f030da5e2a2a792e",

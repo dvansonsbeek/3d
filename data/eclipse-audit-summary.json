@@ -420,9 +420,9 @@
   "inputs": {
     "generator": "node tools/verify/eclipse-audit.js --write",
     "files": {
-      "data/core-mantle-resonator-stage1.json": "sha256:fc842d485a9db473d3cd297b35babd2348676af70ce1f476a7ea78410912bb17",
+      "data/core-mantle-resonator-stage1.json": "sha256:b17277b561e042f618973508e9973e4ea258cc951463c923164425b6289e902c",
       "data/deep-time-fitted.json": "sha256:cabf6484ed125969d7e1b829c29722939058fbfdd9fe45a604f869208250dd99",
-      "data/deltaT-4flag-fit.json": "sha256:fb972426826170feb1272f73adce4d192335d22df14e9331b28181f3fd8c3915",
+      "data/deltaT-4flag-fit.json": "sha256:e1e1fb1e596330de11def36f28007b6556ea97114ac1bc9f9516bd6675b15b97",
       "data/nbody-secular-series.json": "sha256:c8807608f9364cd6f8c910e8c9da99a25dfa12d354e5aaef79400bd30e28049e",
       "packages/physics/src/deltat/cycles.cjs": "sha256:da684bd21865005f05ceec845683f1549efc17d5b11aeac2cf362b3f8e52bf99",
       "packages/physics/src/earth/deep-orbital-history.cjs": "sha256:9ef39bf53a66a5ddbcb79b34d0442c322aa2fc0e4edced3ec11394c7ae1de8dc",
@@ -436,7 +436,7 @@
       "packages/physics/src/moon/series-extension.cjs": "sha256:d295a78eaedb0246ff142ed726c57ec2353d183c0ccbd3d767157f19623c6461",
       "packages/physics/src/moon/series.cjs": "sha256:feb2174fce4bb446f2d699f750b8269c7d70a289107f3d9b639b85b634b2459b",
       "public/input/astro-reference.json": "sha256:910e896e02467a495eeb80eb843666d95a8e00a2e70714b87e8e22edc13095b7",
-      "public/input/climate-formula-coefficients.json": "sha256:4c2b3888ffdc71aa49b7cb61b942d5f1cc379ab3e8cae4a3ee336f1310c9ef44",
+      "public/input/climate-formula-coefficients.json": "sha256:34b4ae964b514b31cc0fbe3403b05c50d0a5d5d8fc490c8b48eb42cad966323d",
       "public/input/lunar-eclipses-nasa.json": "sha256:2b0f6d1b4dab2d1e8a432a812b027631cfecde9714ce0600f030da5e2a2a792e",
       "public/input/lunar-eclipses-stephenson-2016.json": "sha256:ed8040ef4d688023ca38c1c8eac83b40bc36f75edb0894ba46dd04f2aed32fe6",
       "public/input/solar-eclipse-centerlines-nasa.json": "sha256:995d1b38879e6bd1983a1f2895c1269b9f8f4fa917ccb047bfc7b0be3da5985c",

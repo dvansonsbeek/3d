@@ -49,7 +49,6 @@ climate_formula.py, the constants generator, the runtime evaluators.
 import json
 import platform
 import sys
-import time
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent

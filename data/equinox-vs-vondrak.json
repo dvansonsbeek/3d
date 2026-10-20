@@ -362,7 +362,7 @@
    "packages/physics/src/earth/precession-composed.cjs": "sha256:a4a07a268d4f1a1beeae5a6ab7d05bc7c5ebeae5ff03140187f08799decba783",
    "packages/reference/src/published-curves.cjs": "sha256:2cbc57757926f893fccf5df42ad52e76ee6d14c5b5cf0cc30daf5ce9d63ec318",
    "public/input/astro-reference.json": "sha256:910e896e02467a495eeb80eb843666d95a8e00a2e70714b87e8e22edc13095b7",
-   "public/input/climate-formula-coefficients.json": "sha256:4c2b3888ffdc71aa49b7cb61b942d5f1cc379ab3e8cae4a3ee336f1310c9ef44",
+   "public/input/climate-formula-coefficients.json": "sha256:34b4ae964b514b31cc0fbe3403b05c50d0a5d5d8fc490c8b48eb42cad966323d",
    "tools/lib/deep-orbital-history.js": "sha256:965e2f2e8c1c27a3d36e70c3a66a80102cf655208b1b0729dcb9f7a857710385",
    "tools/lib/deep-time.js": "sha256:598c6f00f711432b1545df01bc768f0e624722ac49caf53064d22b5d31b240bd",
    "tools/verify/equinox-vs-vondrak.js": "sha256:cada313d44f72daa6f0d3fd4b83f813a59e7197b5ba5b84f9422b6fc200caba5"

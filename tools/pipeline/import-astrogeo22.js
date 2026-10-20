@@ -23,10 +23,13 @@
  * WHAT THE MODEL READS: the distance column as the RATIO a(t)/a(0) — the model
  * keeps its own J2000 anchor (the observed mean distance; Farhat's a is the
  * Keplerian semi-major axis, 383,598 km at J2000) and takes the SHAPE of the
- * history (packages/physics/src/deltat/moon-distance-history.cjs). The LOD,
- * obliquity and precession columns are carried as the cross-check they are:
- * the model derives its own from the distance by angular-momentum
- * conservation and the composed precession law; the gate rows compare.
+ * history (packages/physics/src/deltat/moon-distance-history.cjs), and the
+ * mean-obliquity column as the SECOND input (plan 12 §8 option (a): the
+ * precession RATE of date is the composed constant times cos ε̄(t)/cos ε̄(0),
+ * packages/physics/src/earth/mean-obliquity-history.cjs). The LOD and
+ * luni-solar precession columns are carried as the cross-check they are: the
+ * model derives its own from the distance by angular-momentum conservation
+ * and the composed precession law; the gate rows compare.
  *
  * Output (the governed artifact; the constants generator embeds the distance
  * table into @essrt/physics as moon-distance-artifact.cjs):
@@ -97,7 +100,7 @@ async function main() {
   const sha = (/** @type {string} */ s) => 'sha256:' + crypto.createHash('sha256').update(s).digest('hex');
   const n = cols.ageMa.length;
   const artifact = {
-    _description: 'The Earth–Moon distance history the model reads as a CITED PHYSICAL INPUT (plan 12, option A): the AstroGeo22 lunar ephemeris — Farhat, Auclair-Desrotour, Boué & Laskar 2022, A&A 665, L1, doi:10.1051/0004-6361/202243445 — age 0 (J2000) → 4,429 Ma at 1 Myr, the semi-major axis in Earth radii (R⊕ = 6378.1366 km) with its uncertainty interval, plus the solution\'s own length of day, obliquity and luni-solar precession columns (cross-checks: the model derives its own from the distance). The model reads the distance as the RATIO a(t)/a(0) on its own J2000 anchor (the observed mean distance), with the J2000 slope the LLR observation — packages/physics/src/deltat/moon-distance-history.cjs. Values VERBATIM from the source file (F12.6).',
+    _description: 'The Earth–Moon distance history the model reads as a CITED PHYSICAL INPUT (plan 12, option A): the AstroGeo22 lunar ephemeris — Farhat, Auclair-Desrotour, Boué & Laskar 2022, A&A 665, L1, doi:10.1051/0004-6361/202243445 — age 0 (J2000) → 4,429 Ma at 1 Myr, the semi-major axis in Earth radii (R⊕ = 6378.1366 km) with its uncertainty interval, the solution\'s mean obliquity with its interval (the SECOND input the model reads, plan 12 §8 option (a): the precession RATE of date is the composed constant times cos ε̄(t)/cos ε̄(0) — packages/physics/src/earth/mean-obliquity-history.cjs), plus its length of day and luni-solar precession columns (cross-checks: the model derives its own from the distance). The model reads the distance as the RATIO a(t)/a(0) on its own J2000 anchor (the observed mean distance), with the J2000 slope the LLR observation — packages/physics/src/deltat/moon-distance-history.cjs. Values VERBATIM from the source file (F12.6).',
     source: {
       citation: 'Farhat, M., Auclair-Desrotour, P., Boué, G., Laskar, J. (2022). The resonant tidal evolution of the Earth-Moon distance. Astronomy & Astrophysics, 665, L1.',
       doi: '10.1051/0004-6361/202243445',
