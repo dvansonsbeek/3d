@@ -391,6 +391,12 @@ export function assembleModel(C, F, laws = {}, secularSeriesArtifact = /** @type
     // 108.6 ± 8.5 ″/yr at 2.46 Ga; the composed rate reads 104.5).
     const seriesArt = /** @type {any} */ (secularSeriesArtifact);
     const sb = seriesArt && seriesArt.bodies && seriesArt.bodies.earth;
+    // Plan 12 §8.5 (owner): the hybrid's own domain is the banked ζ series' span (years; null
+    // without a series). Beyond it the ζ-mode tail carries the Quaternary mean with no tidal
+    // evolution — the API refuses the obliquity there and serves the cited mean beside it.
+    const obliquityHybridDomainYears = sb
+      ? /** @type {[number, number]} */ ([2000 + seriesArt.t0Yr, 2000 + seriesArt.t0Yr + (sb.zetaQ.length - 1) * sb.stepYr])
+      : null;
     const hist = createDeepOrbitalHistory({
       zModes: DEEP_MODES_ARTIFACT.earthZ,
       zetaModes: DEEP_MODES_ARTIFACT.earthZeta,
@@ -466,6 +472,8 @@ export function assembleModel(C, F, laws = {}, secularSeriesArtifact = /** @type
       periOfDateDegAt: (year) => sampleAt(year).periOfDateDeg,
       /** The hybrid's obliquity at a decimal year, degrees — the banked series inside its span, the α(t)-coupled ζ-tail integration beyond (the deep sampler grows ~0.1 s/Myr). @param {number} year @returns {number} */
       epsAt: (year) => sampleAt(year).epsDeg,
+      /** The hybrid's own domain, [yearFrom, yearTo] — the banked ζ series' span (plan 12 §8.5); null without a series. */
+      obliquityHybridDomainYears,
       /** The precession of date's two factors at a decimal year (the factory's own — ONE home). @param {number} year @returns {{solarTorque: number, ellipticity: number}} */
       precessionOfDateFactorsAt: (year) => hist.precessionOfDateFactorsAt(year - 2000),
       /** The spin axis's INERTIAL precession period at J2000, years — the self-anchored
@@ -1520,6 +1528,8 @@ export function assembleModel(C, F, laws = {}, secularSeriesArtifact = /** @type
       // its deep mean is the Quaternary mean on the tail's mean plane (plan 12
       // §8.3). The cited mean obliquity of date is `meanObliquityCitedDeg`.
       obliquityDeg: /** @param {number} year @returns {number} */ (year) => oneSourceM.epsAt(year),
+      /** The hybrid's own domain, [yearFrom, yearTo] — the banked ζ series' span, ±10 Myr about J2000 (plan 12 §8.5: the published surfaces serve `obliquityDeg` inside it only; null without a series, i.e. a bare createModel()). */
+      obliquityHybridDomainYears: oneSourceM.obliquityHybridDomainYears,
       /** The cited mean obliquity of date ε̄(t) (Farhat et al. 2022's column; plan 12 §8 option (a)), degrees — a Myr-scale mean; NaN beyond 4,429 Ma. @param {number} year @returns {number} */
       meanObliquityCitedDeg: /** @param {number} year @returns {number} */ (year) => { const e = chain.meanObliquityCitedDegAtAge(yearToTMa(year)); return e === null ? NaN : e; },
       eccentricity: eccentricityAt,

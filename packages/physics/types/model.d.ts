@@ -156,6 +156,8 @@ export function assembleModel(C: Readonly<Record<string, any>>, F: Readonly<Reco
     earth: Readonly<{
         perihelionLongitudeDeg: (year: number) => number;
         obliquityDeg: (year: number) => number;
+        /** The hybrid's own domain, [yearFrom, yearTo] — the banked ζ series' span, ±10 Myr about J2000 (plan 12 §8.5: the published surfaces serve `obliquityDeg` inside it only; null without a series, i.e. a bare createModel()). */
+        obliquityHybridDomainYears: [number, number] | null;
         /** The cited mean obliquity of date ε̄(t) (Farhat et al. 2022's column; plan 12 §8 option (a)), degrees — a Myr-scale mean; NaN beyond 4,429 Ma. @param {number} year @returns {number} */
         meanObliquityCitedDeg: (year: number) => number;
         eccentricity: (year: number) => number;

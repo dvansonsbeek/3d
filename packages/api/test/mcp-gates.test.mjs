@@ -63,6 +63,8 @@ const toolCall = (name, args) => {
     ['essrt_epoch', { jd: 2451545 }, (d) => (Math.abs(d.epochs[0].axialPrecessionYears - 25771.575) < 0.5 ? null : `T_p via jd: ${d.epochs[0].axialPrecessionYears}`)],
     ['essrt_cardinal_points', { year: 2000, types: 'SS' }, (d) => (Math.abs(d.years[0].points.SS.jd - 2451716.575) < 0.1 ? null : `SS JD: ${d.years[0].points.SS.jd}`)],
     ['essrt_earth', { year: 2000 }, (d) => (Math.abs(d.years[0].obliquityDeg - 23.4393) < 0.0002 ? null : `obliquity: ${d.years[0].obliquityDeg}`)],
+    // plan 12 §8.5 (owner): the hybrid obliquity is refused beyond the ζ series' ±10 Myr (null, never extrapolated); the cited mean of date is served beside it
+    ['essrt_earth', { year: -379998000 }, (d) => (d.years[0].obliquityDeg === null && Math.abs(d.years[0].meanObliquityCitedDeg - 22.227) < 0.01 ? null : `Devonian obliquity: ${d.years[0].obliquityDeg}, cited ${d.years[0].meanObliquityCitedDeg}`)],
     ['essrt_moon', { year: 2000 }, (d) => (Math.abs(d.years[0].distanceKm - 384400) < 1000 ? null : `moon distance: ${d.years[0].distanceKm}`)],
     // R8: the chain's secular period 1,296,000/g1 (was the device's 8H/11 = 243,867)
     ['essrt_bodies', { body: 'mercury' }, (d) => (Math.round(d.record.perihelionEclipticYears) === 232437 ? null : `mercury: ${d.record.perihelionEclipticYears}`)],

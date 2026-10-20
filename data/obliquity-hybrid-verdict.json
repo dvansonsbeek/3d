@@ -127,7 +127,7 @@
    "packages/physics/src/deltat/deep-time.cjs": "sha256:2d4d606e79985c175368bcb0d2a8429f9963962515a9175da7054ae5c9d5554d",
    "packages/physics/src/earth/deep-orbital-history.cjs": "sha256:9ef39bf53a66a5ddbcb79b34d0442c322aa2fc0e4edced3ec11394c7ae1de8dc",
    "packages/physics/src/earth/precession-composed.cjs": "sha256:a4a07a268d4f1a1beeae5a6ab7d05bc7c5ebeae5ff03140187f08799decba783",
-   "packages/physics/src/model.js": "sha256:77c4a7af81287537fbef3c2561d716cdf8cb2178d774e5b14cb476cf7d9679b3",
+   "packages/physics/src/model.js": "sha256:a346d5876693db532fe0686df5df1090194c0a4bcee434e2d09a71e5f01a4f38",
    "tools/explore/stage-c-obliquity-hybrid.mjs": "sha256:b1d5d59f64af940b6acc1f4c6880c7b2813566dd7099275e61e33ea1b8de5a6b",
    "tools/lib/deep-time.js": "sha256:598c6f00f711432b1545df01bc768f0e624722ac49caf53064d22b5d31b240bd",
    "tools/verify/obliquity-hybrid.js": "sha256:4d7e17fb9df75b68ae9bb1aaa8b155e265f0aba7e282d437f858f736f99d2d79"

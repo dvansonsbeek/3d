@@ -13972,7 +13972,7 @@ const ESSRT_QTY_SPECS = {
     yFmt:     (v) => Math.round(v).toLocaleString('en-US') + ' yr',
     yMin: 0, yMax: 65000,
     hasWu:    false,
-    footnote: 'Note: Earth\'s axial tilt oscillates between approximately 22.4° and 24.5° around a stable mean ~23.4°. The cycle period (shown here — the beat of the spin axis\'s inertial rate against the dominant nodal mode) evolves with deep time; the mean stays essentially fixed.',
+    footnote: 'Note: Earth\'s axial tilt oscillates between approximately 22.4° and 24.5° around a mean of ~23.4° today. The cycle period (shown here — the beat of the spin axis\'s inertial rate against the dominant nodal mode) evolves with deep time, and so does the mean obliquity of date: it follows the cited Earth–Moon history (Farhat et al. 2022), lower in the deep past — 22.2° at the Devonian, 19.7° at 2.46 Ga — and the precession rate carries it.',
   },
   au: {
     title:    'Earth-Sun Distance',
@@ -23584,7 +23584,7 @@ function setupGUI() {
     const _d2r = DEG2RAD;
     const _r2d = RAD2DEG;
 
-    function julianDateToJDlocal(Y, M, D, hour = 12) { return julianCalendarToJD(Y, M, D, hour / 24); }   // proleptic Julian (NASA convention)
+    function julianDateToJDlocal(Y, M, D, hour = 12) { return calendarToJD(Y, M, D, hour / 24); }   // the reform applied (the NASA canon's convention): the epochs list holds 1715 Halley, 1860 Rivabellosa and J2000 — the former always-Julian reader placed them 11–13 days late
 
     // Meeus' sub-solar (lat, lon) — independent of framework scene state.
     function meeusSubSolar(jd_UT) {
@@ -25117,9 +25117,11 @@ function setupGUI() {
       [1654,  8, 12, 51.5,  -0.1,  'Total',   'European total (London)'],
     ];
 
-    // Julian Day Number at noon UT for proleptic Julian calendar date
-    // proleptic Julian for the whole table — the NASA-canon convention (ONE home: @essrt/physics time/calendar)
-    function julianDateToJD(Y, M, D, hour = 12) { return julianCalendarToJD(Y, M, D, hour / 24); }
+    // Julian Day Number at noon UT — the reform applied (Julian before 1582 Oct 15, Gregorian
+    // after; ONE home: @essrt/physics time/calendar). The table's dates are the NASA canon's,
+    // which switches calendars at the reform too; the former always-Julian reader placed the
+    // 1654 Aug 12 row ten days late (owner's re-dating, plan 12 §8.5 follow-up).
+    function julianDateToJD(Y, M, D, hour = 12) { return calendarToJD(Y, M, D, hour / 24); }
 
     // Our model's ΔT in seconds at the given JD
     function ourΔT(jd) {
@@ -25331,8 +25333,11 @@ function setupGUI() {
       [1654,  8, 12, 51.5,  -0.1,  'Total',   "European total (London)"],
     ];
 
-    // proleptic Julian for the whole table — the NASA-canon convention (ONE home: @essrt/physics time/calendar)
-    function julianDateToJD(Y, M, D, hour = 12) { return julianCalendarToJD(Y, M, D, hour / 24); }
+    // the reform applied for the whole table — the NASA canon's own convention (Julian before
+    // 1582 Oct 15, Gregorian after; ONE home: @essrt/physics time/calendar). The former
+    // always-Julian reader placed post-reform rows ten days late (the 1654 Aug 12 row —
+    // owner's re-dating); pre-reform rows are identical under both.
+    function julianDateToJD(Y, M, D, hour = 12) { return calendarToJD(Y, M, D, hour / 24); }
 
     console.log('Date (Julian)     Obs Loc       Type      Conj JD         Scene point             Dist(km)   Kind       Note');
     console.log('────────────────────────────────────────────────────────────────────────────────────────────────────────────────');
@@ -25530,8 +25535,11 @@ function setupGUI() {
       //   -556 May 19 Babylon  — Partial at site by Babylonian record
     ];
 
-    // proleptic Julian for the whole table — the NASA-canon convention (ONE home: @essrt/physics time/calendar)
-    function julianDateToJD(Y, M, D, hour = 12) { return julianCalendarToJD(Y, M, D, hour / 24); }
+    // the reform applied for the whole table — the NASA canon's own convention (Julian before
+    // 1582 Oct 15, Gregorian after; ONE home: @essrt/physics time/calendar). The former
+    // always-Julian reader placed post-reform rows ten days late (the 1654 Aug 12 row —
+    // owner's re-dating); pre-reform rows are identical under both.
+    function julianDateToJD(Y, M, D, hour = 12) { return calendarToJD(Y, M, D, hour / 24); }
 
     // ─── Per-event min-distance scan ±3h around greatest (Stephenson method) ───
     // Greatest eclipse is one instant; the observer was in the umbra at a

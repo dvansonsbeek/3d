@@ -69,7 +69,7 @@ const TOOLS = Object.freeze({
     covers: ['/v1/cardinal-structure'],
   },
   essrt_earth: {
-    description: 'Earth elements at epoch(s): obliquity (the hybrid integration; beyond ±10 Myr its mean is the Quaternary mean), the cited mean obliquity of date (Farhat et al. 2022), eccentricity, inclination, perihelion longitude, ascending node.',
+    description: 'Earth elements at epoch(s): obliquity (the hybrid integration on the banked N-body series — null beyond the series\' ±10 Myr, where the model has no obliquity of its own; never extrapolated), the cited mean obliquity of date (Farhat et al. 2022, to 4,429 Ma), eccentricity, inclination, perihelion longitude, ascending node.',
     inputSchema: { type: 'object', properties: { ...TIME_PROPS } },
     request: (/** @type {any} */ a) => ({ method: 'GET', path: `/${API_VERSION}/earth`, query: queryOf(a) }),
     covers: ['/v1/earth'],

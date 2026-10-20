@@ -200,6 +200,15 @@ for (const url of SAMPLE_REQUESTS) {
   if (Math.abs(earth2000.ascendingNodeDeg - 284.03) > 0.05) failures.push(`earth Ω_inv(2000) off the one-source reading (S&S origin): ${earth2000.ascendingNodeDeg}`);
   const earthDeep = dataOf('/v1/earth?year=-100000').years[0];
   if (Math.abs(earthDeep.inclinationDeg - 1.906) > 0.01) failures.push(`earth i_inv(−100000) not the one-source reading: ${earthDeep.inclinationDeg}`);
+  // Plan 12 §8.5 (owner): the hybrid obliquity is served inside the banked ζ series' span only
+  // (±10 Myr) — null beyond, never extrapolated; the cited mean obliquity of date (Farhat et al.
+  // 2022's column) is served beside it to 4,429 Ma (22.23° at the Devonian).
+  if (!(Number.isFinite(earthDeep.obliquityDeg) && Math.abs(earthDeep.meanObliquityCitedDeg - 23.254) < 0.01)) failures.push(`earth(−100000): hybrid ${earthDeep.obliquityDeg}, cited mean ${earthDeep.meanObliquityCitedDeg}`);
+  const earthDevonian = dataOf('/v1/earth?year=-379998000').years[0];
+  if (earthDevonian.obliquityDeg !== null) failures.push(`earth obliquityDeg@Devonian must be null beyond the ζ series' span (the tail is not a prediction): ${earthDevonian.obliquityDeg}`);
+  if (Math.abs(earthDevonian.meanObliquityCitedDeg - 22.227) > 0.01) failures.push(`earth meanObliquityCitedDeg@Devonian: ${earthDevonian.meanObliquityCitedDeg}`);
+  const earthEdge = dataOf('/v1/earth?year=-9990000').years[0];
+  if (!Number.isFinite(earthEdge.obliquityDeg)) failures.push(`earth obliquityDeg@−9,990,000 (inside the series' span) must be served: ${earthEdge.obliquityDeg}`);
   if (!merc.accuracy || !merc.accuracy.statement) failures.push('bodies/mercury: missing accuracy statement');
   // JD input equivalence: same instant via jd= and via year= must agree.
   const viaJd = dataOf('/v1/earth?jd=2451545').years[0];

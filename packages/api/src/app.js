@@ -133,7 +133,7 @@ export function createApi() {
     constantsHash: id.constantsHash,
     coefficientsHash: id.coefficientsHash,
     citation: `doi:${id.preprintDoi}`,
-    validitySpan: { minYear: -498e6, maxYear: 502e6, note: 'refused outside, never extrapolated; the deep-time chain (day length, Moon distance, clock) runs on the cited Earth–Moon distance history — Farhat et al. 2022, AstroGeo22 — to 4,429 Ma, the paleo gate tests it to 3.2 Ga, and this API serves ±500 Myr (plan 12 option A)' },
+    validitySpan: { minYear: -498e6, maxYear: 502e6, note: 'refused outside, never extrapolated; the deep-time chain (day length, Moon distance, clock) runs on the cited Earth–Moon distance history — Farhat et al. 2022, AstroGeo22 — to 4,429 Ma, the paleo gate tests it to 3.2 Ga, and this API serves ±500 Myr (plan 12 option A); the hybrid obliquity (earth.obliquityDeg) is served inside the banked N-body series\' span only, ±10 Myr — null beyond, where the cited mean obliquity of date (earth.meanObliquityCitedDeg) stands (plan 12 §8.5)' },
   });
 
   /** @param {Record<string, string>} query @returns {{ years: number[], echo: Record<string, unknown> } | { problem: {status: number, headers: Record<string, string>, body: string} }} */
@@ -270,11 +270,15 @@ export function createApi() {
       if (!get()) return methodNotAllowed(method, path);
       const t = epochs(query);
       if ('problem' in t) return t.problem;
+      // Plan 12 §8.5 (owner): the hybrid obliquity is served inside the banked ζ series' span only
+      // (±10 Myr) — beyond it the tail carries the Quaternary mean with no tidal evolution, which is
+      // not a prediction; refused as null, never extrapolated. The cited mean obliquity of date
+      // (Farhat et al. 2022's column, a Myr-scale mean) is served to the history's end, 4,429 Ma.
+      const dom = model.earth.obliquityHybridDomainYears;
+      const inObliquityDomain = (/** @type {number} */ y) => !dom || (y >= dom[0] && y <= dom[1]);
       const rows = t.years.map((y) => ({
         year: y,
-        obliquityDeg: model.earth.obliquityDeg(y),
-        // plan 12 §8 option (a): the cited mean obliquity of date (Farhat et al. 2022's column; a Myr-scale
-        // mean) — the hybrid above carries no tidal evolution of its mean beyond the ζ series' ±10 Myr
+        obliquityDeg: inObliquityDomain(y) ? model.earth.obliquityDeg(y) : null,
         meanObliquityCitedDeg: model.earth.meanObliquityCitedDeg(y),
         eccentricity: model.earth.eccentricity(y),
         inclinationDeg: model.earth.inclinationDeg(y),
@@ -438,7 +442,13 @@ export function createApi() {
           perihelionOfDate: cf.lunisolar.periOfDatePeriodYearsAtYear(year),
         },
         epoch: { lodRealSeconds: cf.epoch.lodRealSecondsAtYear(year), lodMeanSeconds: cf.epoch.lodSecondsAtYear(year), deltaTSeconds: cf.epoch.deltaTSecondsAtYear(year) },
-        earth: { obliquityDeg: cf.earth.obliquityDeg(year), eccentricity: cf.earth.eccentricity(year), inclinationDeg: cf.earth.inclinationDeg(year) },
+        earth: {
+          // the hybrid inside the ζ series' span only (plan 12 §8.5); the cited mean beside it
+          obliquityDeg: (!cf.earth.obliquityHybridDomainYears || (year >= cf.earth.obliquityHybridDomainYears[0] && year <= cf.earth.obliquityHybridDomainYears[1])) ? cf.earth.obliquityDeg(year) : null,
+          meanObliquityCitedDeg: cf.earth.meanObliquityCitedDeg(year),
+          eccentricity: cf.earth.eccentricity(year),
+          inclinationDeg: cf.earth.inclinationDeg(year),
+        },
       };
       const res = envelope({ identity: cf.identity, inputEcho: { path, overrides, year }, data });
       res.headers['cache-control'] = 'no-store';
