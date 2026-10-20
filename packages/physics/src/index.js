@@ -294,6 +294,11 @@ export const createModel = (constants = GENERATED, opts = {}) => {
       coefficientsHash: COEFF_HASH,
       counterfactual: hash !== CONSTANTS_HASH,
       preprintDoi: PREPRINT_DOI,
+      // Which evaluator serves Earth's orbit elements away from J2000: the banked
+      // N-body series (every published surface passes it) or the embedded 18-term
+      // mode table (the bare package — exact at J2000, e RMS 3.6e-3 vs La2010a
+      // over 500 kyr where the series reads 2.5e-5). A stored result names it.
+      earthElements: opts.secularSeriesArtifact ? 'secular-series' : 'mode-table',
     }),
 
     // The assembled surfaces (§7a step 1): epoch, earth, lengths, cardinal, moon.

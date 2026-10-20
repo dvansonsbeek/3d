@@ -115,6 +115,8 @@ model.earth.eccentricity(2000 - 100000);   // 0.04008 — the series (La2004: 0.
 createModel().earth.eccentricity(2000 - 100000);   // 0.03374 — the mode table
 ```
 
+`model.identity.earthElements` names which one a result came from
+(`'secular-series'` or `'mode-table'`), so a stored value is never ambiguous.
 Without the artifact `createModel()` evaluates the embedded 18-term mode
 table at every epoch: exact at J2000, a compact approximation away from it
 (RMS 3.6·10⁻³ in e against La2010a over the last 500 kyr, where the series

@@ -154,7 +154,7 @@ Separately (physical/USNO branch — does NOT feed the derivation chain above):
 
 Both fluctuate over millennia as the sidereal year in days changes. See § "The ecliptic missing-motion LOD Correction" below.
 
-**The scene day basis.** The scene's measured year lengths — the tweakpane *days* rows, the window CSV — are counted in the SI day ω₀. The `lodRealPhysical` basis-consistency gate ties the ΔT joint fit to the same basis. The day quantities that coexist and must not be conflated:
+**The scene day basis.** The scene's measured year lengths — the tweakpane *days* rows, the window CSV — are counted in the SI day ω₀. The `lodRealPhysical` basis-consistency gate ties the ΔT joint fit to the same basis, and the `deltat-slope-basis` gate ties the DISPLAY to the INTEGRAND: at every 25-yr sample of 1700–2100 the pane's LOD_real − 86,400 equals the slope the shipped ΔT integrates (dΔT/dt ÷ 365.25) to 2 µs/day, and the physics-base twin (`meanLodSecondsAtAge` + the ecliptic term + the cycles) equals the displayed base to 0.1 µs/day — the two day bases are one since the kinematic day of date became the Layer-0 tidal mean (before that they parted by 0.43 ms/day). The day quantities that coexist and must not be conflated:
 
 | basis | J2000 value | role |
 |---|---|---|

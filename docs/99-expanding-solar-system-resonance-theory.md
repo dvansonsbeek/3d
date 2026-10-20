@@ -1740,6 +1740,8 @@ dα/dt  =  dJ₂/dt / 2.0  =  (−2.7 × 10⁻¹¹) / 2.0  =  −1.35 × 10⁻¹
 
 This value sits at the mid-range of the Peltier ICE-6G LOD-coupling estimates (factors 1.5-2.5 depending on mantle viscosity assumptions) and yields framework dLOD/dt at J2000 = 1.77 ms/century, matching IERS observation of 1.75 ms/century within 1%.
 
+**The 2.0 is an EFFECTIVE factor, and the model says so.** The degree-2 identity below gives 1.5; the standard budget pairs that 1.5 with a net solar tide of about 5.6 % of the lunar transfer, and the two together carry the same ≈ 1.77 ms/cy. Measured with `tools/explore/lod-budget-scan.cjs` against the eclipse record: 1.5 alone is rejected (the joint ΔT fit's full-window RMS 28.75 → 353.7 s), the physical pair fits slightly better than the effective 2.0 (Espenak 12.47 s, full 25.03 s) — the record fixes the SUM of the GIA and solar-tide channels, not the split between them. The model ships the effective factor because adopting the pair is a recalibration campaign, not a constant swap: the recession history is a closed budget, so six of the paleo anchors leave tolerance and Layer 2, the GIA τ and the dLOD/dt and LOD–climate artifacts move with it. The factor cancels in the precession adoption, so nothing on the clock side depends on this choice.
+
 The idealized axisymmetric point-mass derivation gives factor 1.5:
 ```
 For a point mass m moving equator → pole:
