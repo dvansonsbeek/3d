@@ -36,17 +36,17 @@
  * carry it so a counterfactual is reproducible (§2d).
  * @type {string}
  */
-export const CONSTANTS_HASH = "29ace68d6effb963";
+export const CONSTANTS_HASH = "896558c2d878571d";
 
 /** Model version label — single source: public/input/model-version.json (§10 two-axis scheme). */
-export const MODEL_VERSION = "v26.0";
+export const MODEL_VERSION = "v26.1";
 
 /** Canonical preprint DOI — single source: public/input/model-version.json. */
 export const PREPRINT_DOI = "10.21203/rs.3.rs-8758810/v4";
 
 /** @type {Readonly<Record<string, unknown>>} */
 export const DEFAULT_CONSTANTS = Object.freeze({
-  hash: "29ace68d6effb963",
+  hash: "896558c2d878571d",
   additionalBodiesReference: {
     "pluto": {
       "solarYearInput": 90465,
@@ -231,6 +231,8 @@ export const DEFAULT_CONSTANTS = Object.freeze({
     "earthJ2": 0.00108262668,
     "earthEquatorialRadiusKm": 6378.1366,
     "earthParallaxRadiusKm": 6378.1369994839,
+    "earthMeanRadiusKm": 6371,
+    "solarConstantWm2": 1361,
     "solarParallaxArcsec": 8.794143836,
     "arcsecDisplacementKm": 725.270943796471
   },
@@ -706,7 +708,6 @@ export const REFERENCE_DATA = Object.freeze({
     "wellsRecessionCmYr": 3.43,
     "modernLLRRecessionCmYr": 3.82,
     "tidalLockApproachGyr": 50,
-    "essrtFormulaHorizonGyr": 3,
     "iceAlbedoShareLongPct": 46,
     "testAObliquityLagPercentile": 2.5,
     "testAObliquityPeakMatch": "8/10",

@@ -106,6 +106,20 @@ export { createDerivedViews } from './layer1/index.js';
 // file via the exports-map subpath; re-exported here so bundled ESM
 // consumers need only the package root.
 export { createDeepCalendar } from './phase/deep-calendar.cjs';
+// Plan 13 B1: the civil calendar ↔ JD (Meeus ch. 7 with the 1582-10-15
+// reform) and the angle constants/wraps — ONE home; the browser's eighteen
+// calendar copies and 27 local D2R constants import these.
+export { GREGORIAN_START, GREGORIAN_START_JD, calendarToJD, jdToCalendar, jdToDecimalYear, dayFractionToHMS } from './time/calendar.cjs';
+export { DEG2RAD, RAD2DEG, ARCSEC_PER_TURN, ARCSEC_PER_RAD, wrap360, wrap180, wrap180Closed, wrap2pi, wrapPi } from './math/angles.cjs';
+// Plan 13 B2: THE deep-time chain assembly — the GIA α channel, the Layer-0
+// bundle, the cited Moon-distance history, the ΔT cycle stack, |s₃|, the
+// LOD/ΔT core, the lunar month chain and the mean*AtAge family, assembled
+// ONCE from the generated constants; the Node twin and the browser destructure it.
+export { createDeepTimeChain, MOON_ECC_SENSITIVITY_PERIGEE, MOON_ECC_SENSITIVITY_NODE } from './deltat/deep-time-chain.js';
+// Plan 13 B3: the J2000 mass chain and the Moon's J2000 periods (one home for
+// three copies each) and the unit constants.
+export { computeMassChainJ2000, computeMoonPeriodsJ2000 } from './earth/mass-chain.cjs';
+export { SECONDS_PER_DAY, DAYS_PER_JULIAN_YEAR, JULIAN_CENTURY_DAYS, SECONDS_PER_JULIAN_YEAR } from './constants/units.cjs';
 // D4b: the one-source cardinal structure — the EoC layer (year lengths,
 // crossing offsets, the e(t)-proportional spread) on the movement's own
 // e(t)/ϖ(t). Absolute dates deliberately excluded (per-renderer mean chain).

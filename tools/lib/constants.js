@@ -22,6 +22,10 @@
 const utils = require('./constants/utils');
 const path = require('path');
 const fs = require('fs');
+// Plan 13 B3: the J2000 mass chain, the Moon's J2000 periods and the unit
+// constants have ONE home in @essrt/physics (three copies each before).
+const { computeMassChainJ2000, computeMoonPeriodsJ2000 } = require('@essrt/physics/earth/mass-chain');
+const { SECONDS_PER_DAY, DAYS_PER_JULIAN_YEAR, JULIAN_CENTURY_DAYS } = require('@essrt/physics/constants/units');
 const astroRef = JSON.parse(fs.readFileSync(
   path.resolve(__dirname, '..', '..', 'public', 'input', 'astro-reference.json'), 'utf8'));
 // The deep-time block of the generated constants module (plan 11 step 1) —
@@ -92,12 +96,9 @@ const useVariableSpeed = true;
 // ═══════════════════════════════════════════════════════════════════════════
 
 const currentAUDistance = astroRef.physicalConstants.currentAUDistance;
-// Pure IAU × 86400 (SI-second definition) = 31,558,149.7635 s. Physical sidereal
-// year in SI seconds. Divided by MEAN_SIDEREAL_YEAR_DAYS_KINEMATIC (framework's
-// own H/13-derived days count) gives the framework's MEAN LOD at J2000
-// (86399.99968 s under H=335,317) via the T_axial=H/13 identity.
-// Supersedes Method B (× 86400.00001), which was a hand-tuned shim.
-const meanSiderealYearSeconds = astroRef.yearLengthRef.siderealYear * 86400;
+// The IAU sidereal year in SI seconds (365.256363004 d × 86,400 s =
+// 31,558,149.7635 s) — the Kepler input for G(M_☉ + M_E) in §9.
+const meanSiderealYearSeconds = astroRef.yearLengthRef.siderealYear * SECONDS_PER_DAY;
 const G_CONSTANT = astroRef.physicalConstants.G_CONSTANT;
 const MASS_RATIO_EARTH_MOON = astroRef.physicalConstants.MASS_RATIO_EARTH_MOON;
 const massRatioDE440 = astroRef.physicalConstants.massRatioDE440;
@@ -276,7 +277,7 @@ const meanLengthOfDay = astroRef.yearLengthRef.solarDay;
 // at 2000 (25,771.395 yr). ONE home: the composed clock, the hybrid's
 // self-anchor, the registry and the browser read this export.
 const axialPrecessionJ2000Years = 1296000 / astroRef.earthOrbital.generalPrecessionJ2000_arcsecPerYr;
-const axialPrecessionJ2000Days = axialPrecessionJ2000Years * 365.25;
+const axialPrecessionJ2000Days = axialPrecessionJ2000Years * DAYS_PER_JULIAN_YEAR;
 const meanSiderealDay = (meanSolarYearDays / (meanSolarYearDays + 1)) * meanLengthOfDay;
 // Stellar day: the H/13 precession rate is precession in LONGITUDE (along the
 // ecliptic); the sidereal→stellar offset depends on precession in RIGHT
@@ -331,7 +332,7 @@ for (const [type, jd2000] of Object.entries(ASTRO_REFERENCE.cardinalPointAnchors
 // Julian century = exactly 36525 days by IAU definition (used in Meeus, IAU precession, parallax)
 // Tropical century = 100 model tropical years (used in obliquity rate solver for phase-clean measurement)
 const j2000JD = 2451545.0;
-const julianCenturyDays = 36525;
+const julianCenturyDays = JULIAN_CENTURY_DAYS;
 const tropicalCenturyDays = 100 * meanSolarYearDays;
 
 // (Plan 07 R1: tripleSynodicYears — the Jupiter–Saturn triple synodic period
@@ -368,31 +369,35 @@ const eocEccentricity = ASTRO_REFERENCE.earthEccentricityJ2000 / 2;
 // (N_sid 35,860,753; N_apsidalI 303,196; N_nodalI 144,119 — the ∓13 was
 // H/13 cycles per H) and read every period back as totalDaysInH/N — 7.8 ms
 // above the IAU sidereal month; those counts are deleted (docs/66 §1 keeps
-// the derivation record). Mirrors src/script.js.
+// the derivation record). The anomalistic and nodal months are KINEMATIC
+// consequences of sidereal + precession (1/T_ano = 1/T_M − 1/T_apsidalE,
+// 1/T_nod = 1/T_M + 1/T_nodalE); the synodic month is the beat with the
+// sidereal year, the tropical month the sidereal month seen from the
+// precessing equinox. ONE home since plan 13 B3: @essrt/physics/earth/mass-chain
+// (the browser and the deep-time chain read the same function).
 const moonSiderealMonth = moonSiderealMonthInput;
 const moonApsidalPrecessionDaysICRF = moonApsidalPrecessionDaysInputICRF;
 const moonNodalPrecessionDaysICRF = moonNodalPrecessionDaysInputICRF;
-const moonApsidalPrecessionDaysEarth = 1 / (1 / moonApsidalPrecessionDaysICRF - 1 / axialPrecessionJ2000Days);
-const moonNodalPrecessionDaysEarth = 1 / (1 / moonNodalPrecessionDaysICRF + 1 / axialPrecessionJ2000Days);
-// Anomalistic and nodal months: KINEMATIC consequences of sidereal + precession,
-// not independent inputs. 1/T_ano = 1/T_M − 1/T_apsidalE (perigee advances)
-// and 1/T_nod_month = 1/T_M + 1/T_nodalE (node regresses).
-const moonAnomalisticMonth = 1 / (1 / moonSiderealMonth - 1 / moonApsidalPrecessionDaysEarth);
-const moonNodalMonth = 1 / (1 / moonSiderealMonth + 1 / moonNodalPrecessionDaysEarth);
-// Synodic month: the beat of the sidereal month with the sidereal year;
-// tropical month: the sidereal month seen from the precessing equinox.
-const moonSynodicMonth = moonSiderealMonth * meanSiderealYearDays / (meanSiderealYearDays - moonSiderealMonth);
-const moonTropicalMonth = 1 / (1 / moonSiderealMonth + 1 / axialPrecessionJ2000Days);
-
-const moonFullMoonCycleEarth = (moonSynodicMonth / (moonSynodicMonth - moonAnomalisticMonth)) * moonAnomalisticMonth;
-const moonFullMoonCycleICRF = 1 / (1 / moonFullMoonCycleEarth + 1 / axialPrecessionJ2000Days);
+const _moonPeriods = computeMoonPeriodsJ2000({
+  moonSiderealMonthDays: moonSiderealMonth,
+  moonApsidalPrecessionDaysInput: moonApsidalPrecessionDaysICRF,
+  moonNodalPrecessionDaysInput: moonNodalPrecessionDaysICRF,
+  axialPrecessionJ2000Days, meanSiderealYearDays, meanSolarYearDays,
+});
+const moonApsidalPrecessionDaysEarth = _moonPeriods.moonApsidalPrecessionDaysEarth;
+const moonNodalPrecessionDaysEarth = _moonPeriods.moonNodalPrecessionDaysEarth;
+const moonAnomalisticMonth = _moonPeriods.moonAnomalisticMonthDays;
+const moonNodalMonth = _moonPeriods.moonNodalMonthDays;
+const moonSynodicMonth = _moonPeriods.moonSynodicMonthDays;
+const moonTropicalMonth = _moonPeriods.moonTropicalMonthDays;
+const moonFullMoonCycleEarth = _moonPeriods.moonFullMoonCycleEarthDays;
+const moonFullMoonCycleICRF = _moonPeriods.moonFullMoonCycleICRFDays;
 // (plan 09 step 7c: the real-valued "cycles per anchor interval" N_apsidalI /
 // N_nodalI — the Step-0 Sun comb's divisor candidates — left with the unit.)
-
-const moonApsidalMeetsNodalDays = (moonNodalMonth / (moonAnomalisticMonth - moonNodalMonth)) * moonAnomalisticMonth;
-const moonLunarLevelingCycleDays = (moonNodalPrecessionDaysEarth / (moonNodalPrecessionDaysEarth - moonApsidalPrecessionDaysEarth) * (moonApsidalPrecessionDaysEarth / meanSolarYearDays)) * meanSolarYearDays;
-const moonDraconicYearICRF = 1 / ((1 / meanSolarYearDays) + (1 / moonNodalPrecessionDaysEarth));
-const moonDraconicYearEarth = 1 / (1 / moonDraconicYearICRF - 1 / axialPrecessionJ2000Days);
+const moonApsidalMeetsNodalDays = _moonPeriods.moonApsidalMeetsNodalDays;
+const moonLunarLevelingCycleDays = _moonPeriods.moonLunarLevelingCycleDays;
+const moonDraconicYearICRF = _moonPeriods.moonDraconicYearICRFDays;
+const moonDraconicYearEarth = _moonPeriods.moonDraconicYearEarthDays;
 
 
 // ═══════════════════════════════════════════════════════════════════════════
@@ -428,23 +433,21 @@ for (const [k, ratio] of Object.entries(massRatioDE440)) {
   massFraction[k] = 1 / ratio;
 }
 
-// Earth mass via Moon orbital mechanics.
-// Δa = a_M × M_M/(M_E + M_M) × m  is the leading-order correction for the
-// Sun's tidal coupling to the Earth-Moon barycentric wobble (Earth-Moon-Sun
-// 3-body). Closes G(M_E + M_M) to ~3.7 ppm of JPL DE440 — better and more
-// physically motivated than the older "1+1/year" SSDR factor.
-const moonOrbitalShift = moonDistance * (1 / (MASS_RATIO_EARTH_MOON + 1)) * (moonSiderealMonth / meanSiderealYearDays);
-const moonDistanceCorrected = moonDistance + moonOrbitalShift;
-const GM_EARTH_MOON_SYSTEM = (4 * Math.PI * Math.PI * Math.pow(moonDistanceCorrected, 3)) /
-  Math.pow(moonSiderealMonth * meanLengthOfDay, 2);
-const GM_EARTH_ALONE = GM_EARTH_MOON_SYSTEM * (MASS_RATIO_EARTH_MOON / (MASS_RATIO_EARTH_MOON + 1));
-const GM_MOON_ALONE  = GM_EARTH_MOON_SYSTEM / (MASS_RATIO_EARTH_MOON + 1);
-
-// GM_Sun (M_Sun only): Kepler from Earth's orbit gives G(M_Sun + M_Earth);
-// subtract GM_Earth to recover the JPL/IAU convention.
-const GM_SUN_PLUS_EARTH = (4 * Math.PI * Math.PI * Math.pow(currentAUDistance, 3)) / Math.pow(meanSiderealYearSeconds, 2);
-const GM_SUN = GM_SUN_PLUS_EARTH - GM_EARTH_ALONE;
-const M_SUN = GM_SUN / G_CONSTANT;
+// Earth mass via Moon orbital mechanics. Δa = a_M × M_M/(M_E + M_M) × m is the
+// leading-order correction for the Sun's tidal coupling to the Earth–Moon
+// barycentric wobble (closes G(M_E + M_M) to ~3.7 ppm of JPL DE440); GM_Sun
+// (M_Sun only) is Kepler on Earth's orbit minus GM_Earth (the JPL/IAU
+// convention). ONE home since plan 13 B3: @essrt/physics/earth/mass-chain.
+const _mass = computeMassChainJ2000({
+  moonDistanceKm: moonDistance, moonSiderealMonthDays: moonSiderealMonth, meanSiderealYearDays,
+  meanLengthOfDaySeconds: meanLengthOfDay, massRatioEarthMoon: MASS_RATIO_EARTH_MOON,
+  currentAUDistanceKm: currentAUDistance, gravitationalConstantKm3KgS2: G_CONSTANT,
+});
+const GM_EARTH_MOON_SYSTEM = _mass.gmEarthMoonSystemKm3S2;
+const GM_EARTH_ALONE = _mass.gmEarthAloneKm3S2;
+const GM_MOON_ALONE = _mass.gmMoonAloneKm3S2;
+const GM_SUN = _mass.gmSunKm3S2;
+const M_SUN = _mass.sunMassKg;
 massFraction.earth = (GM_EARTH_ALONE / G_CONSTANT) / M_SUN;
 
 // (Plan 07 R5: PSI — ψ = 3·A_earth·√(m_E/m_☉), the inclination-amplitude

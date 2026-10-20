@@ -1,6 +1,6 @@
 ---
 docVersion: 1.0
-modelVersion: v26.0
+modelVersion: v26.1
 coefficients: sha256:ff77fbc9baa370e4
 status: current
 ---
@@ -71,14 +71,16 @@ pre-registered tests T1/T5 of plan 06.)
 > obliquity from the hybrid spin-axis integration, the precession of date's
 > factors (§ below) — which the 3D model evaluates at runtime on top of the means
 > provided by the canonical chain; the mean-value functions are the `mean*AtAge`
-> family (`tools/lib/deep-time.js` and their `src/script.js` twins). (The fitted
+> family — one home since plan 13 B2, `@essrt/physics/deltat/deep-time-chain`,
+> read by `tools/lib/deep-time.js`, the package model and `src/script.js`. (The fitted
 > Fourier combs that once carried these oscillations — cardinal-point, sidereal,
 > anomalistic — are deleted, plan 09.)
 
 > 🎯 **For precise implementation values**, evaluate the deterministic chain from
 > `t_Ma` through `LOD(t)`, the composed precession period, AU(t), `T_sidereal(t)`,
 > Moon distance, Moon period, anomalistic year, and stellar/sidereal day
-> (`tools/lib/deep-time.js`; the J2000-constant → epoch-helper map is in
+> (`@essrt/physics/deltat/deep-time-chain`, consumed by `tools/lib/deep-time.js`;
+> the J2000-constant → epoch-helper map is in
 > [doc 20 §"ESSRT epoch dependence"](20-constants-reference.md)). The tables in
 > this doc use rounded LOD inputs for narrative clarity; the engine provides the
 > full-precision values (e.g., the Devonian precession period
@@ -2209,7 +2211,7 @@ The Sun begins its red giant phase in ~5 Gyr and the inner solar system likely d
 ### Answers to specific questions
 
 **Q: When will Earth's LOD reach the tidal-lock asymptote?**
-A: The proper-physics formula reaches `a_lock` at approximately +3 Gyr. Beyond this, the formula returns `null` because Moon has absorbed all of Earth's spin angular momentum. Independent angular-momentum calculations (with explicit tidal-Q decay) suggest the *true* tidal-lock equilibrium is approached over ~50 Gyr — far beyond Sun's main-sequence lifetime.
+A: On the LLR rate held constant forward (the cited history's forward branch) the Moon reaches `a_lock` at about +<!--v:essrtFormulaHorizonGyr-->4.48<!--/v--> Gyr — the formula horizon. Beyond this, the formula returns `null` because Moon has absorbed all of Earth's spin angular momentum. Independent angular-momentum calculations (with explicit tidal-Q decay) suggest the *true* tidal-lock equilibrium is approached over ~50 Gyr — far beyond Sun's main-sequence lifetime.
 
 **Q: When will LOD = 0?**
 A: **Never**. LOD has been monotonically increasing for ~4.4 Gyr (Layer 2) and will continue to. Going backward, the canonical Wells rate's linear extrapolation gives LOD = 0 at 4.56 Gyr ago — within 0.5 % of Patterson's Earth age (4.54 Gyr) — but the cited history ends at its lunar age (<!--v:moonGenesisAgeGa-->4.429<!--/v--> Gyr ago, the Moon at <!--v:moonDistanceAtHadeanRE-->6.19<!--/v--> R_E, a day of ~5.5 h) rather than reaching LOD = 0.
@@ -2224,10 +2226,10 @@ A: **Never** with the Moon present. The bounded tidal-lock equilibrium has Earth
 > - **Genesis**: the cited history's end at **<!--v:moonGenesisAgeGa-->4.429<!--/v--> Gyr ago** (Farhat 2022's lunar-age input, the Hf-W giant-impact epoch, ~110 Myr after Patterson's 4.54 Pb-Pb Earth age), the Moon at ~6 R_E; the precession period was years long under the near Moon's torque.
 > - **Modern (now)**: the mean lunisolar precession period is <!--v:lunisolarPeriodJ2000Yr-->25,771.6<!--/v--> yr; the obliquity beat <!--v:obliqBeatJ2000Kyr-->41.1<!--/v--> kyr.
 > - **The spin–orbit crossover**: the precession rate falls to the nodal mode's rate about 1.7 Gyr ahead (the generated future table gives the epoch) — the obliquity beat diverges there.
-> - **Formula horizon**: on the LLR rate held constant the Moon reaches the tidal-lock asymptote at about +4.5 Gyr (a labelled extrapolation).
+> - **Formula horizon**: on the LLR rate held constant the Moon reaches the tidal-lock asymptote at +<!--v:essrtFormulaHorizonGyr-->4.48<!--/v--> Gyr (a labelled extrapolation).
 > - **Effective endpoint**: Sun's red giant phase at +5 Gyr — inner solar system unlikely to survive.
 >
-> Total span of the framework's effective domain: **~9.5 Gyr** (genesis ~4.5 Gyr ago → Sun's red giant 5 Gyr from now). Current epoch sits at ~48 % of the way through.
+> Total span of the framework's effective domain: **<!--v:essrtEffectiveDomainGyr-->8.9<!--/v--> Gyr** (genesis <!--v:moonGenesisAgeGa-->4.429<!--/v--> Gyr ago → the formula horizon <!--v:essrtFormulaHorizonGyr-->4.48<!--/v--> Gyr from now; the Sun's red giant at +5 Gyr lies just beyond it). Current epoch sits at ~<!--v:essrtCurrentEpochPct-->50<!--/v--> % of the way through.
 >
 > The framework's structure isn't eternal. We're observing a finite-lifetime physical phenomenon, expanding from a Roche-limit beginning toward a tidal-lock asymptote that won't be reached before the Sun ends. The growth rate of the generated table above is the local tangent of a smooth, bounded trajectory that has cumulative shape over Gyr scales.
 
@@ -2263,7 +2265,7 @@ If ESSRT is correct, here's what should happen over the next 100–1000 Myr (all
 - Moon distance: 481,375 km at +2 Gyr (~87 % of tidal-lock asymptote)
 - LOD: 58.3 hr (= 2.43 days) at +2 Gyr
 - Precession period ~94,000 yr at +2 Gyr — past the spin–orbit crossover (~+1.7 Gyr; the generated future table gives the epoch), where ψ̇ < |s₃| and the obliquity beat has re-formed on |s₃| − ψ̇
-- **Beyond +3 Gyr: formula returns `null`** (Moon reaches tidal-lock asymptote ~<!--v:tidalLockKm-->555,623<!--/v--> km). For projections to Sun's red giant phase at +5 Gyr, an extended physics model with explicit tidal-Q decay would be required.
+- **Beyond +<!--v:essrtFormulaHorizonGyr-->4.48<!--/v--> Gyr: formula returns `null`** (Moon reaches tidal-lock asymptote ~<!--v:tidalLockKm-->555,623<!--/v--> km). For projections to Sun's red giant phase at +5 Gyr, an extended physics model with explicit tidal-Q decay would be required.
 
 ---
 
@@ -2326,7 +2328,7 @@ This is distinct from the tidal-channel coupling (which is faster, direct, and w
 | The mechanism by which planetary g_i, s_j frequencies would scale with the clock (per view 2) | **Moot** — no such coupling exists; the campaign measured the planetary shapes as standard secular dynamics (doc 109, E1–E25), and the g-modes' only drift is ∝ M_Sun (the mass-loss tier). |
 | The role of L2 (carbon-cycle 405-kyr line) — confirmed NOT scaling | Established; L2 is carbon-cycle resonance, not orbital. See doc 92 §6 (Doc 99's 405-kyr investigation). |
 | Whether L3 transitions (PETM, EOT, etc.) are coupled to the clock's evolution | Likely no; these are climate-system threshold transitions, not orbital periods. |
-| Future projections beyond +3 Gyr (proper-physics formula horizon) | Formula returns null; would require explicit tidal-Q decay model to project to Sun's red-giant phase. |
+| Future projections beyond +<!--v:essrtFormulaHorizonGyr-->4.48<!--/v--> Gyr (the formula horizon) | Formula returns null; would require explicit tidal-Q decay model to project to Sun's red-giant phase. |
 
 ---
 

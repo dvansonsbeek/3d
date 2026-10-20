@@ -1,6 +1,6 @@
 ---
 docVersion: 1.0
-modelVersion: v26.0
+modelVersion: v26.1
 coefficients: sha256:ff77fbc9baa370e4
 status: current
 ---
@@ -1088,6 +1088,132 @@ The frozen era unit left the model at plan 09 steps 7a–7c. The research script
 | `tools/explore/`: `audit-moon-months.js`, `moon-cycles.js`, `derive-a1a2a3.js`, `regime-aware-recession-study.js`, `fq7s-h3-law-candidate.mjs`, `fq7s-laplace-lagrange-e.mjs`, `fq7s-jpl-preview.mjs`, `fq7s-annual-channel.mjs`, `diagonal-ll-rates.mjs`, `j2000-lattice-snapshot-null.mjs`, `sun-annual-correction.js` | Lunar counts per unit, the lunar-argument derivation on the comb, the recession study on the unit's history, the H/3 eccentricity-law candidates (retired at step 6), the J2000 snapshot null of §11, the Sun's annual correction on comb terms | §11 above keeps the snapshot-null facts; the annual-correction instrument read a raw residual ~198″ RMS and ~7″ with its 3-term fit (doc 65) | docs 65, 109 |
 
 Scripts that stayed were stripped of the unit instead: `dense-targets-residual-structure.mjs` (its comb periodogram section), `perihelion-excess-candidates.mjs` (its comb-slot candidate), `d2-joint-preview.mjs` / `n3-carrier-swap-preview.mjs` / `fq7s-sun-registry-metric.mjs` (the rounded mean-year input → the derived mean tropical year), `v4-frame-audit.js` (the device precession → the published J2000 precession period), `fit-regime-recession.js` (its unit rows), `lattice-long-window-test.mjs` and `naff-frequencies.mjs` (their nearest-divisor columns — a hashed-recipe edit, so the N-body pair was re-stamped), and the Python `milankovitch_climate_formula.py` (the legacy comb list and labels), `climate_formula_mwp_check.py`, `milankovitch_insolation_laskar_check.py`, `constants_scripts.py`.
+
+## 23. The planet-channel and era-device retirements — the record (moved from CLAUDE.md at plan 13 B5)
+
+**The integer-law retirement, COMPLETED (plan 07 R6).** The structural claims —
+exact eccentricity balance, the Saturn e-prediction, Config #7 mirror
+uniqueness, the node integers — were re-evaluated with the engine's own
+dynamical inputs (this document is the evidence record) and retired; the nine
+instruments that computed them are now DELETED with the ψ/K laws they read
+(`verify-laws`, `balance-search`, `config1-proof`, `configuration-analysis`,
+`dual-balance-optimizer`, `eccentricity-balance`, `epoch-independence`,
+`inclination-verification`, `inclination-optimization`, plus
+`tools/explore/balance-with-dynamical-nodes.mjs`). What survives as a
+documented observation: under the retired
+integer weights the 8-planet eccentricity balance holds to ~98 % with the
+engine's long-term mean eccentricities (99.8636 % was the tuned-inputs figure
+— and note that figure had quietly stopped reproducing: the live construction
+read 99.8717 % at retirement, because upstream inputs moved after the last
+search run and nothing re-recorded the preset, since no gate and no published
+surface read it). `data/balance-presets.json` stays as the frozen search
+record that docs 10/109 cite; it is no longer regenerable.
+
+**Plan 07 R5/R9 (model v18.0, physics MAJOR 14): the ψ inclination law and the
+geometric-elements device are DELETED** — the ψ/K law module,
+`orientation.cjs`, `asc-node-integrator.cjs`, the browser's
+`calculateDynamicAscendingNodeFromTilts` / `computePlanetInvPlaneInclinationDynamic`
+/ `computeInclinationEarth`, the Node mirrors in `orbital-engine.js`, and
+Earth's H/3 inclination cosine and −H/5 node in the package. A planet's
+inclination and node of date are the chain's elements; Earth's are the
+ONE-SOURCE engine normal against the banked invariable plane
+(`model.earth.inclinationDeg/ascendingNodeDeg` ≡ the browser's
+`inclInvPlaneModel`/`ascNodeInvPlaneModel`, pinned by the API gate; the
+device read 1.24° vs 1.91° at −100 kyr). The integrator's seven browser
+writes had been overwritten by the chain every frame since K5b — its
+display reach was zero; its only gated reach was 28 golden probes. The
+K device CONSTANTS (`earthtiltMean`, `earthInvPlaneInclinationAmplitude`,
+`earthRAAngle`, the wheel periods and the wheels' J2000 phase
+`kDeviceWheelPhaseAtJ2000Cycles`) were the scene's J2000 pose, not a law —
+DELETED at plan 11 step 4 with the three precession wheels: the scene's world
+frame is the J2000 ecliptic (`@essrt/physics` `computeSceneWorldFrameJ2000`,
+world Y the J2000 ecliptic pole, the equinox along world +X at view azimuth
+90° — the browser's own pose, measured 90.0066° with 0.026° of tilt on the
+pre-plan-11 bundle, both dropped; step 4 first shipped 158.2265°, the NODE
+twin's pose — 180° − the retired inclination anchor 21.7735° — and turned the
+browser's world 68.2265° about the pole against its skydome texture while
+every gate stayed green, because every gated quantity is frame-invariant;
+corrected at physics 22.0.1, the gate now pins the convention against the
+frame's columns), and every frame of date is
+engine-placed through it; observables are R-invariant, only the view is R
+(`earthInvPlaneInclinationMean`, the device's mean inclination, left at plan 11
+step 2 — its one reach was the invariable-plane disc's init pose). `psiValue`
+is frozen in the registry like `kValue`.
+
+**Plan 07 R10 (model v21.0, physics MAJOR 17, model-values MAJOR 16): the
+combs' phase origin is J2000.** The fitted origin t₀
+(`perihelionalignmentYear` − `temperatureGraphMostLikely` × H/16 = −302,635,
+the "balanced year") was rotated out of every (sin, cos) pair EXACTLY — no
+refit, `tools/fit/reorigin-combs-j2000.mjs` (deleted with the last comb at
+plan 09 step 7a), c0 = (2000 − t₀)/H = 0.908498525276082 anchor units,
+bit-identical on every package surface over ±300 kyr — and its two inputs
+left the JSON (literals gate ratchet). The RA day offset's cosine literals
+became the fitted family `RA_DAY_OFFSET_MS` (deleted at plan 09 step 5b: it
+was the equation of time's window term of the Framework-Verification
+instrument, not a motion). Trap measured on the way: the K-device wheels
+were posed on t₀ too; moving them to J2000 tilted the whole scaffold 1.25°
+(R left the identity) and the NASA-convention umbra diagnostic — which
+rotates the aberration about WORLD Y as the ecliptic pole — moved 0.45″
+while every observable stayed bit-close (the engine places the Earth frame,
+the Sun and the Moon stack over the scaffold). The pose is a recorded
+constant, so it stays as c0; the diagnostic now rotates the aberration about
+the ecliptic pole OF DATE built in the rotation-axis frame (the NASA rows
+moved ≤0.19″ at the ancient events — the ~47″/cy tilt of the ecliptic the
+world-Y form ignored), and any new world-axis reader in `src/script.js`
+must do the same. `cyclesBetweenYears(2000, Y, N)` was the integrated form
+from J2000 (the R3 call-shape rule's `driftRefYear` the model start, not
+2000); since plan 09 step 5c the K-device wheels no longer ride it (the
+counter itself is deleted at step 7a) — they turn uniformly at their
+recorded J2000 rates from the recorded J2000 phase (the engine frame is
+placed over them, R4).
+
+**Plan 07 R1/R8 (model v19.0, physics MAJOR 15, model-values MAJOR 14): the
+retired laws' INPUTS left `model-parameters.json`** —
+`perihelionEclipticFraction`, the per-planet divisor key,
+`inclinationCycleAnchor`, `antiPhase` (planets and additional bodies); plan
+09 step 6 added Earth's `earthInclinationCycleAnchor` (the H/3 eccentricity
+law's 21.77°, astro-reference) — the scene pose it also set is the recorded
+`kDeviceInclinationPhaseJ2000Deg`; the literals gate FAILS if any returns
+(fail-proven via `ESSRT_LITERALS_PLANT=1`). `perihelionEclipticYears` is
+the chain's inertial apsidal period 1,296,000/g in every runtime (Mercury
+232,437 yr; the lattice read 243,867), with no deep-time H-scaling — g
+scales with the solar mass only, and `recomputePlanetCyclesForEpoch` is a
+no-op kept for call order. Saturn's anti-phase sign in the scene scaffolding
+is the scene convention `key === 'saturn'`, not a JSON flag.
+
+**Plan 07, the `windowAffine` bound (model v20.0, physics MAJOR 16): the
+chain's era affine is BOUNDED at its fit window.** The K4.5 periodic layer's
+`windowAffine` (off + slope·dt on λ̄/a/k/h/q/p, the k45e era solve over
+±2,500 yr) was the chain's one unbounded term; the evaluator now holds the
+slope's argument at ±`meta.periodicTermsSpanYr` (carried onto every chain by
+`buildPlanetChainsFromArtifactData`; a span-less affine is refused).
+Bit-identical inside the window; beyond it the multi-mode skeleton carries
+the chain alone. Measured: unclamped, the slope alone moved Saturn's λ̄ 430°
+and Neptune's a 1,342 ppm by ±100 kyr; the series handover boundaries read
+Jupiter 1344/854, Saturn 442/604, Neptune 432/432 kyr (were 138/86, 222/88,
+134/358 — the affine's extrapolation, not the skeleton's). The series
+verdict now hashes the evaluator and the chain artifact its handover rows
+run on; 21 registry keys (the planets' `InclMean`/`InclAmp`/`InclMin`/`InclMax`
+over ±10 Myr, the Uranus/Neptune fluctuation rows) moved with it — Saturn's
+half-range 0.274 → 0.126° was the affine's drift.
+
+**The planet chains moved to engine-D elements (the P5 flip, 9aa91a6), and
+the legacy geometric planet path was EXCISED (K5, c0399f6): the chain is the
+ONLY planet path** — the simulator renders the seven planets, their orbit
+rings, traces, perihelion markers, panels and the invariable-plane machinery
+(heights, mass gauge, Sun-SSB) from the model's own N-body chain
+(`@essrt/physics/planets/keplerian-chain` + the governed artifact). The
+fitted correction stack (parallax / gravitation / elongation — keys,
+evaluators, fitters ex-Steps 2/5a-5b) is deleted; git history carries its
+record. The Law-4/Law-5 constants (`K = 3.4143e-6`; base eccentricities from
+the balance construction) survive only in the legacy scene scaffolding
+(device anchors, the no-chain bodies Pluto/Halley/Eros, and the o.fib*
+diagnostics). Earth, the Moon and the Sun stay on the engine-K hierarchy —
+the two-engine interface; the historical gate suite is calibrated on it.
+
+The former Config-#7 falsification criterion (checks 46–50 of the deleted
+`verify-laws`, the mirror-unique configuration in `data/balance-presets.json`)
+is retired with this record; the three live legs are doc 111 §3.
 
 ## Related documents
 

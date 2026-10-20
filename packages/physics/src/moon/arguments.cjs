@@ -38,37 +38,11 @@
 
 'use strict';
 
-/**
- * Astronomical JD → decimal year: Julian calendar before 1582-10-15,
- * Gregorian after (Meeus Ch. 7 inverse). The S3-aligned coordinate for the
- * Sun secular deviations. @param {number} jd @returns {number}
- */
-function jdToDecimalYear(jd) {
-  const J = jd + 0.5;
-  const Z = Math.floor(J);
-  const F = J - Z;
-  let A = Z;
-  if (Z >= 2299161) {
-    const alpha = Math.floor((Z - 1867216.25) / 36524.25);
-    A = Z + 1 + alpha - Math.floor(alpha / 4);
-  }
-  const B = A + 1524;
-  const C = Math.floor((B - 122.1) / 365.25);
-  const D = Math.floor(365.25 * C);
-  const E = Math.floor((B - D) / 30.6001);
-  const day = B - D - Math.floor(30.6001 * E) + F;
-  const month = (E < 14) ? E - 1 : E - 13;
-  const year = (month > 2) ? C - 4716 : C - 4715;
-  const isGregorian = (Z >= 2299161);
-  const isLeap = isGregorian
-    ? (year % 4 === 0 && (year % 100 !== 0 || year % 400 === 0))
-    : (year % 4 === 0);
-  const monthLengths = [31, isLeap ? 29 : 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
-  let dayOfYear = day;
-  for (let m = 0; m < month - 1; m++) dayOfYear += monthLengths[m];
-  const daysInYear = isLeap ? 366 : 365;
-  return year + (dayOfYear - 1) / daysInYear;
-}
+// Astronomical JD → decimal year (Meeus Ch. 7 inverse, the 1582-10-15
+// reform): the S3-aligned coordinate for the Sun secular deviations. ONE
+// home since plan 13 B1 — time/calendar.cjs; re-exported here for the
+// readers that import it from the arguments module.
+const { jdToDecimalYear } = require('../time/calendar.cjs');
 
 /**
  * @typedef {{Lp: number, D: number, M: number, Mp: number, F: number}} MoonArgsDeg

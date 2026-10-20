@@ -1,6 +1,6 @@
 ---
 docVersion: 1.0
-modelVersion: v26.0
+modelVersion: v26.1
 coefficients: sha256:ff77fbc9baa370e4
 status: current
 ---
@@ -70,7 +70,7 @@ For current values, see [Constants Reference](20-constants-reference.md).
 
 **GM_SUN derivation:**
 
-The chain is **Earth/Moon → Sun**, because Kepler's 3rd law on Earth's orbit returns G(M_Sun + M_Earth), not GM_Sun alone. We back out GM_Sun by subtracting GM_Earth (which itself comes from the Moon's orbit with the `Δa = a_M·μ·m` solar-tidal correction).
+The chain is **Earth/Moon → Sun**, because Kepler's 3rd law on Earth's orbit returns G(M_Sun + M_Earth), not GM_Sun alone. We back out GM_Sun by subtracting GM_Earth (which itself comes from the Moon's orbit with the `Δa = a_M·μ·m` solar-tidal correction). ONE home since plan 13 B3: `@essrt/physics/earth/mass-chain` (`computeMassChainJ2000`; the Moon's J2000 periods beside it, `computeMoonPeriodsJ2000`) — the package model, the Node constants module and the browser read the same function.
 
 ```javascript
 // Step 1: GM_Earth from Moon's orbit (with Δa solar-tidal correction)

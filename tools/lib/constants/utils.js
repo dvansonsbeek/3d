@@ -5,36 +5,19 @@
 // ═══════════════════════════════════════════════════════════════════════════
 
 // --- Date conversion ---
+// Plan 13 B1: ONE home — @essrt/physics/time/calendar (Meeus ch. 7 with the
+// 1582-10-15 reform). This module's former calendarToJD applied the Gregorian
+// correction to EVERY date (no reform), a behaviour difference the one-home
+// function removes; its readers in tools/lib never passed a pre-reform date.
+const calendar = require('@essrt/physics/time/calendar');
 
 function jdToCalendar(jd) {
-  // Algorithm from Meeus, Astronomical Algorithms (2nd ed.)
-  const z = Math.floor(jd + 0.5);
-  const f = (jd + 0.5) - z;
-  let a;
-  if (z < 2299161) {
-    a = z; // Julian calendar
-  } else {
-    const alpha = Math.floor((z - 1867216.25) / 36524.25);
-    a = z + 1 + alpha - Math.floor(alpha / 4);
-  }
-  const b = a + 1524;
-  const c = Math.floor((b - 122.1) / 365.25);
-  const d = Math.floor(365.25 * c);
-  const e = Math.floor((b - d) / 30.6001);
-
-  const day = b - d - Math.floor(30.6001 * e) + f;
-  const month = (e < 14) ? e - 1 : e - 13;
-  const year = (month > 2) ? c - 4716 : c - 4715;
-
-  return { year, month, day: Math.floor(day), dayFrac: day - Math.floor(day) };
+  const c = calendar.jdToCalendar(jd);
+  return { year: c.year, month: c.month, day: c.day, dayFrac: c.dayFrac };
 }
 
 function calendarToJD(year, month, day) {
-  let y = year, m = month;
-  if (m <= 2) { y -= 1; m += 12; }
-  const a = Math.floor(y / 100);
-  const b = 2 - a + Math.floor(a / 4);
-  return Math.floor(365.25 * (y + 4716)) + Math.floor(30.6001 * (m + 1)) + day + b - 1524.5;
+  return calendar.calendarToJD(year, month, day);
 }
 
 function jdToDateString(jd) {

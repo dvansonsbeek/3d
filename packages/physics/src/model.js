@@ -17,7 +17,6 @@
  * src/lib/essrt.ts) operation-for-operation where FP association matters,
  * which itself mirrors tools/lib/constants.js §9.
  */
-import { deriveEpochParams } from './layer0/derive-params.js';
 import { buildPlanetChainsFromArtifactData, computePlanetElementsAtYear } from './planets/keplerian-chain.cjs';
 import { createSecularSeriesOverride } from './planets/secular-series.cjs';
 import { computeEquatorNodeOriginSFrameDeg, convertNodeSFrameToEquatorOriginDeg } from './planets/inv-plane-frame.cjs';
@@ -26,14 +25,11 @@ import { createDeepOrbitalHistory } from './earth/deep-orbital-history.cjs';
 import { CHAIN_ARTIFACT } from './planets/chain-artifact.js';
 import { createPlanetSpinChannelFromArtifacts, computeObliquityJ2000Deg } from './planets/spin-channel.cjs';
 import { PLANET_DISPLAY_NAMES } from './planets/display-names.cjs';
-import { createDeltaTCycles } from './deltat/cycles.cjs';
-import { createDeepTimeLod } from './deltat/deep-time.cjs';
-import { createMoonDistanceHistory } from './deltat/moon-distance-history.cjs';
+import { createDeepTimeChain } from './deltat/deep-time-chain.js';
+import { computeMassChainJ2000 } from './earth/mass-chain.cjs';
 import { MOON_DISTANCE_ARTIFACT } from './deltat/moon-distance-artifact.cjs';
-import { evalClimateL1OrbitalPermil, createAlphaGiaChannel } from './climate/l1-orbital.cjs';
-import { createDeepEccChannel } from './moon/deep-ecc-channel.cjs';
+import { evalClimateL1OrbitalPermil } from './climate/l1-orbital.cjs';
 import { DEEP_MODES_ARTIFACT } from './moon/deep-modes-artifact.cjs';
-import { createMoonMonthChain } from './moon/month-chain.cjs';
 import { createChainCycleIntegrator } from './chain-cycles/index.cjs';
 import { createMoonArguments, jdToDecimalYear } from './moon/arguments.cjs';
 import { createMoonSeries } from './moon/series.cjs';
@@ -52,16 +48,9 @@ import { driver2PeriodSecondsAtAge } from './planets/orbit-chain.cjs';
 // here into F.RA_DAY_OFFSET_MS; plan 09 step 5b deleted that family — it was
 // the equation of time's window term of an instrument, not a motion.)
 
-/**
- * Moon-channel eccentricity sensitivities (perigee/node), the [g/g₀]^s
- * exponents of the factored deep-time law. Same known-exception class as the
- * RA offsets above: single source src/script.js _FW_MOON, mirrored as
- * literals in tools/lib/deep-time.js (_ECOMP_S_W/_ECOMP_S_N). Both are
- * Meeus-effective — S_N moved 1.0 → 1.018 with the v4 frame-attribution
- * batch.
- */
-const MOON_ECC_SENSITIVITY_PERIGEE = 2.407;
-const MOON_ECC_SENSITIVITY_NODE = 1.018;
+// (The Moon-channel eccentricity sensitivities s_ϖ/s_Ω — the [g/g₀]^s exponents of
+// the factored deep-time law — have ONE home since plan 13 B2:
+// deltat/deep-time-chain.js MOON_ECC_SENSITIVITY_PERIGEE / _NODE.)
 
 /**
  * Assemble the model surfaces from a resolved constants context + fitted
@@ -109,7 +98,7 @@ export function assembleModel(C, F, laws = {}, secularSeriesArtifact = /** @type
   // comb) left with that device; no comb phase is evaluated here any more.
 
   const meanSiderealYearDays = C.yearLengthRef.siderealYear;
-  const meanSiderealYearSeconds = meanSiderealYearDays * 86400;
+  // (the sidereal year in SI seconds is the mass chain's own, below)
   // Plan 09: the J2000 day length ω₀ is the SI day (an input); the device's
   // H/13 kinematic-sidereal-days construction (86,399.99968 s) is deleted.
   const meanLengthOfDay = C.yearLengthRef.solarDay;
@@ -131,7 +120,6 @@ export function assembleModel(C, F, laws = {}, secularSeriesArtifact = /** @type
   const G_CONSTANT = C.physicalConstants.G_CONSTANT;
   const MASS_RATIO_EARTH_MOON = C.physicalConstants.MASS_RATIO_EARTH_MOON;
   const currentAUDistance = C.physicalConstants.currentAUDistance;
-  const earthMoiFactorJ2000 = C.physicalConstants.earthMoiFactorJ2000;
   const moonDistanceKm = C.moonReference.moonDistance;
   const moonSiderealMonthInput = C.moonReference.moonSiderealMonthInput;
 
@@ -139,149 +127,47 @@ export function assembleModel(C, F, laws = {}, secularSeriesArtifact = /** @type
   // eighth-integer-per-8H count read it back 7.8 ms long; deleted).
   const moonSiderealMonth = moonSiderealMonthInput;
 
-  // Mass chain: Moon Kepler → GM_EM → Earth/Moon split → Sun (§9 order)
-  const moonOrbitalShift = moonDistanceKm * (1 / (MASS_RATIO_EARTH_MOON + 1)) * (moonSiderealMonth / meanSiderealYearDays);
-  const moonDistanceCorrected = moonDistanceKm + moonOrbitalShift;
-  const GM_EARTH_MOON_SYSTEM = (4 * Math.PI * Math.PI * Math.pow(moonDistanceCorrected, 3))
-    / Math.pow(moonSiderealMonth * meanLengthOfDay, 2);
-  const GM_EARTH_ALONE = GM_EARTH_MOON_SYSTEM * (MASS_RATIO_EARTH_MOON / (MASS_RATIO_EARTH_MOON + 1));
-  const GM_MOON_ALONE = GM_EARTH_MOON_SYSTEM / (MASS_RATIO_EARTH_MOON + 1);
-  const GM_SUN_PLUS_EARTH = (4 * Math.PI * Math.PI * Math.pow(currentAUDistance, 3))
-    / Math.pow(meanSiderealYearSeconds, 2);
-  const GM_SUN = GM_SUN_PLUS_EARTH - GM_EARTH_ALONE;
-  const M_SUN = GM_SUN / G_CONSTANT;
+  // The mass chain (Moon Kepler → GM_EM → the Earth/Moon split → the Sun, §9
+  // order) — ONE home since plan 13 B3: earth/mass-chain.cjs (the deep-time
+  // chain below computes the same scalars from the same context).
+  const mass = computeMassChainJ2000({
+    moonDistanceKm, moonSiderealMonthDays: moonSiderealMonth, meanSiderealYearDays,
+    meanLengthOfDaySeconds: meanLengthOfDay, massRatioEarthMoon: MASS_RATIO_EARTH_MOON,
+    currentAUDistanceKm: currentAUDistance, gravitationalConstantKm3KgS2: G_CONSTANT,
+  });
+  const moonOrbitalShift = mass.moonOrbitalShiftKm;
+  const moonDistanceCorrected = mass.moonDistanceCorrectedKm;
+  const GM_EARTH_MOON_SYSTEM = mass.gmEarthMoonSystemKm3S2;
+  const GM_EARTH_ALONE = mass.gmEarthAloneKm3S2;
+  const GM_MOON_ALONE = mass.gmMoonAloneKm3S2;
+  const GM_SUN_PLUS_EARTH = mass.gmSunPlusEarthKm3S2;
+  const GM_SUN = mass.gmSunKm3S2;
+  const M_SUN = mass.sunMassKg;
 
-  // ── α(t): the GIA channel — the LAGGED response to the L1 ice history, with the R2 lattice pin ──
-  const CLIMATE = F.CLIMATE_FORMULA_COEFFS;
-  const CLIMATE_REGIME = CLIMATE.regimes['lr04-post-mpt'];
-
+  // ── THE DEEP-TIME CHAIN — ONE assembly (plan 13 B2) ──────────────────────
+  // The GIA α channel (the lagged response to the L1 ice history, with the R2
+  // lattice pin and the exact-argument memo), the Layer-0 bundle, the cited
+  // Earth–Moon distance history (plan 12 option A), the ΔT cycle stack (all
+  // channels ON here), |s₃|, the LOD/ΔT core and the lunar month chain are
+  // assembled once in deltat/deep-time-chain.js from this context's constants
+  // and fitted coefficients (so a counterfactual context flows through them);
+  // the Node twin and the browser destructure the same module.
+  const chain = createDeepTimeChain({
+    constants: C, fitted: F, deepModes: DEEP_MODES_ARTIFACT, moonDistanceArtifact: MOON_DISTANCE_ARTIFACT,
+    ageAnchorYear: startmodelYear,
+  });
+  const { alphaGia, earthMoiFactorAtAge, EPOCH_PARAMS, recession, dtCycles, dtCycleLodCorrectionSum, s3ArcsecPerYr, deepLod, deepEcc, moonChain } = chain;
+  const CLIMATE_REGIME = F.CLIMATE_FORMULA_COEFFS.regimes['lr04-post-mpt'];
   /** The climate formula's L1 (unlagged) — the orbital δ¹⁸O layer itself. @param {number} year @returns {number} */
   const evalClimateL1 = (year) => evalClimateL1OrbitalPermil(year, {
     l1Terms: CLIMATE_REGIME.L1,
     yStdDenormalization: CLIMATE_REGIME.denormalization.y_std,
-  });
-  // ONE home (climate/l1-orbital.cjs): k derived from the Cox–Chao rate, τ the
-  // record-measured relaxation time (plan 06 D7). Same construction in
-  // src/script.js, tools/lib/deep-time.js and the website's essrt.ts.
-  const alphaGia = createAlphaGiaChannel({
-    l1Terms: CLIMATE_REGIME.L1,
-    yStdDenormalization: CLIMATE_REGIME.denormalization.y_std,
-    relaxationKyr: C.deepTime.alphaGiaRelaxationKyr,
-    alphaGiaRateJ2000PerYr: C.deepTime.alphaGiaRateJ2000PerYr,
-    alphaJ2000: earthMoiFactorJ2000,
-    // the channel's second observable, J₂(t)/J₂₀ — scaled on the OBSERVED
-    // dJ₂/dt; consumed by the spin integration below (the precession of date)
-    j2RateJ2000PerYr: C.deepTime.j2RateJ2000PerYr,
-    j2J2000: C.physicalConstants.earthJ2,
-  });
-
-  // Exact-argument memo (mirrors src/script.js + tools/lib/deep-time.js —
-  // the round-5 perf campaign): same tMa → bit-identical value; bounded by
-  // wholesale clear. (Plan 09 step 7a: the lattice-α pin branch left with
-  // the ∫dt/H_era phase table, the one table this model built under it.)
-  /** @type {Map<number, number>} */
-  const alphaMemo = new Map();
-  /** @param {number} tMa @returns {number} */
-  const earthMoiFactorAtAge = (tMa) => {
-    let v = alphaMemo.get(tMa);
-    if (v === undefined) {
-      v = alphaGia.alphaAt(2000 - tMa * 1e6);
-      if (alphaMemo.size >= 8192) alphaMemo.clear();
-      alphaMemo.set(tMa, v);
-    }
-    return v;
-  };
-
-  // ── Layer 0 + deep-time core ──────────────────────────────────────────────
-  const EPOCH_PARAMS = deriveEpochParams({
-    solarLuminosityW: C.physicalConstants.solarLuminosityW,
-    solarWindKgPerS: C.physicalConstants.solarWindMassLossKgPerS,
-    speedOfLightKmPerS: C.physicalConstants.speedOfLight,
-    alpha1PerMa: C.deepTime.alpha1PerMa,
-    meanSiderealYearSeconds,
-    lodJ2000Seconds: meanLengthOfDay,   // plan 09: ω₀ = the SI day (was the H/13 kinematic day)
-    sunMassKg: M_SUN,
-    gmEarthAloneKm3S2: GM_EARTH_ALONE,
-    gmMoonAloneKm3S2: GM_MOON_ALONE,
-    gravitationalConstantKm3KgS2: G_CONSTANT,
-    earthMoiFactorJ2000,
-    earthDiameterKm: C.bodyDiametersKm.earth,
-    moonDistanceKm,
-    moonOrbitalEccentricity: C.moonReference.moonOrbitalEccentricityBase,
-    gmEarthMoonSystemKm3S2: GM_EARTH_MOON_SYSTEM,
-    // the solar precession torque's inputs (plan 06 Phase 3: the unit H(t) = 13·T_p,composed)
-    gmSunKm3S2: GM_SUN,
-    astronomicalUnitKm: currentAUDistance,
-    earthOrbitalEccentricityJ2000: C.earthOrbital.earthEccentricityJ2000,
-    moonEclipticInclinationJ2000Deg: C.moonReference.moonEclipticInclinationJ2000,
-    // p₀'s period — the tropical year of date's equinox term (plan 09 step 5d)
-    axialPrecessionJ2000Years: certifiedAxialPrecessionJ2000Years(),
-  });
-
-  // ── The Earth–Moon distance history — a CITED PHYSICAL INPUT (plan 12, option A)
-  // Farhat et al. 2022 (the AstroGeo22 ephemeris, embedded VERBATIM by the
-  // constants generator) read as the ratio a(t)/a(0) on the model's own J2000
-  // anchor, the J2000 slope the LLR observation α₁; null beyond its span. LOD
-  // follows by angular-momentum conservation with the J2000 L_EM constant —
-  // the former quartic, regime spline and solar-channel budget are deleted.
-  const recession = createMoonDistanceHistory({
-    table: MOON_DISTANCE_ARTIFACT,
-    aMoonNowMetres: EPOCH_PARAMS.moonDistanceNowM,
-    alpha1PerMa: EPOCH_PARAMS.alpha1PerMa,
   });
   const moonDistanceMetresAtAge = recession.distanceMetresAtAge;
   /** The published surfaces' km reading — NaN beyond the cited history's span (the API's
    *  validity span lies inside it; the deep charts stop where the input stops).
    *  @param {number} year @returns {number} */
   const moonDistanceKmAtYearOrNaN = (year) => { const m = moonDistanceMetresAtAge(yearToTMa(year)); return m === null ? NaN : m / 1000; };
-
-  const DT = F.DT_STACK;
-  const RES = F.DT_RESONATOR;
-  // Periods STATED IN YEARS (the fit files' period_yr / T0_yr): plan 06 T5
-  // measured the former 8H/n labels chance-level; layer B item 3 removed the
-  // divisor from every runtime. Twins: tools/lib/deep-time.js, src/script.js,
-  // the website's essrt.ts.
-  const dtCycles = createDeltaTCycles({
-    taperFullHalfwidthYears: C.deepTime.dtStackTaperFullHalfwidthYr,
-    taperTotalHalfwidthYears: C.deepTime.dtStackTaperTotalHalfwidthYr,
-    tropicalYearSecondsJ2000: meanTropicalYearJ2000Seconds,
-    cycles: {
-      bond: { periodYears: DT.bond.period_yr, cosCoeffSeconds: DT.bond.cos_coeff_s, sinCoeffSeconds: DT.bond.sin_coeff_s },
-      hallstatt: { periodYears: DT.hallstatt.period_yr, cosCoeffSeconds: DT.hallstatt.cos_coeff_s, sinCoeffSeconds: DT.hallstatt.sin_coeff_s },
-      jose5: { periodYears: DT.jose5.period_yr, cosCoeffSeconds: DT.jose5.cos_coeff_s, sinCoeffSeconds: DT.jose5.sin_coeff_s },
-      jose4: { periodYears: DT.jose4.period_yr, cosCoeffSeconds: DT.jose4.cos_coeff_s, sinCoeffSeconds: DT.jose4.sin_coeff_s },
-    },
-    resonator: {
-      t0Years: RES.T0_yr,
-      q: RES.Q,
-      kicks: RES.kick_epochs_year.map(/** @param {number} t @param {number} i */ (t, i) => ({
-        tYear: t,
-        cosSeconds: RES.kick_coefficients_s[i].cos,
-        sinSeconds: RES.kick_coefficients_s[i].sin,
-      })),
-      tones: RES.drive_tones.map(/** @param {{period_yr: number, phi_locked_rad: number, amp_s: number}} t */ (t) => ({ periodYears: t.period_yr, phiLockedRad: t.phi_locked_rad, ampSeconds: t.amp_s })),
-    },
-  });
-
-  /** Layer-3/4 cyclic δLOD sum (all shipped channels ON). @param {number} year @returns {number} */
-  const dtCycleLodCorrectionSum = (year) =>
-    dtCycles.cycleLodSecondsAt('bond', year)
-    + dtCycles.cycleLodSecondsAt('hallstatt', year)
-    + dtCycles.cycleLodSecondsAt('jose5', year)
-    + dtCycles.cycleLodSecondsAt('jose4', year)
-    + dtCycles.swingLodSecondsAt(year);
-
-  // Plan 06 S6 — |s₃|, the dominant nodal mode of Earth's orbit: the
-  // largest-amplitude ζ mode of the banked deep secular modes (the recipe
-  // the registry's `eclPrecYears`/`obliqCycleYears` and the browser's
-  // obliquity-beat helper use). ONE home here; the deep-time factory's
-  // ecliptic missing-motion term, the lunisolar surface and the API read it.
-  const s3ArcsecPerYr = (() => {
-    const z = DEEP_MODES_ARTIFACT.earthZeta
-      .filter((m) => Math.abs(m.omegaRadPerYr) > 1e-9)
-      .sort((a, b) => Math.hypot(b.re, b.im) - Math.hypot(a.re, a.im))[0];
-    return Math.abs((z.omegaRadPerYr * 180) / Math.PI) * 3600;
-  })();
 
   /** THE REALIZED POLE RATE OVER A WINDOW, ″/yr — the mean over [yearFrom, yearTo] of the rate the spin
    *  integration actually turns the pole at: the inertial secular rate of date × the solar-torque factor at
@@ -314,38 +200,6 @@ export function assembleModel(C, F, laws = {}, secularSeriesArtifact = /** @type
     }
     return sum / n;
   };
-
-  const deepLod = createDeepTimeLod({
-    constants: {
-      lTotalEmKgm2S: EPOCH_PARAMS.totalAngularMomentumKgM2S,
-      mMoonAloneKg: EPOCH_PARAMS.moonMassKg,
-      mEarthAloneKg: EPOCH_PARAMS.earthMassKg,
-      rEarthMetres: EPOCH_PARAMS.earthRadiusM,
-      gmEmM3PerS2: EPOCH_PARAMS.gmEarthMoonM3S2,
-      eFactorMoon: EPOCH_PARAMS.moonEccentricityFactor,
-      aLockMetres: EPOCH_PARAMS.moonLockDistanceM,
-      aMoonNowMetres: EPOCH_PARAMS.moonDistanceNowM,
-      alpha1PerMa: EPOCH_PARAMS.alpha1PerMa,
-      lodNowH13Seconds: EPOCH_PARAMS.lodNowH13Seconds,
-      meanSiderealYearJ2000Seconds: meanSiderealYearSeconds,
-      solarMassLossFracPerYear: EPOCH_PARAMS.solarMassLossFracPerYear,
-      precessionSolarShareJ2000: EPOCH_PARAMS.precessionSolarShareJ2000,
-    },
-    moonDistanceMetresAtAge,
-    moiFactorAtAge: earthMoiFactorAtAge,
-    // S5: the composed clock's J2000 anchor — the certified year laws' beat
-    // at 2000 (ONE home below, shared with the hybrid's self-anchor); lazy.
-    precessionPeriodJ2000YearsFn: () => certifiedAxialPrecessionJ2000Years(),
-    // Plan 06 T2 item: the solar day's ecliptic missing-motion term rides the
-    // nodal period 1,296,000/|s₃| (orbital), not the spin unit's H/5.
-    nodalPeriodYearsFn: () => 1296000 / s3ArcsecPerYr,
-    cycleLodSumAt: dtCycleLodCorrectionSum,
-    swingLodAt: (year) => dtCycles.swingLodSecondsAt(year),
-    swingLodRateAt: (year) => dtCycles.swingLodRateAt(year),
-    // plan 12 option A: L_EM is the J2000 constant (conservation; no channels);
-    // the LOD-rate decomposition's tidal term reads the history's analytic slope.
-    moonDistanceSlopeMetresPerMaAtAge: recession.slopeMetresPerMaAtAge,
-  });
 
   // (Plan 09 step 7a: the integrated ∫dt/H_era phase table and its counter
   // `cyclesBetween` — the frozen era clock's own convention H_era =
@@ -421,7 +275,7 @@ export function assembleModel(C, F, laws = {}, secularSeriesArtifact = /** @type
   // cardinal braid) reads the one-source series below (plan 06 layer B —
   // the two agree within 4.2e-5 in-era). The laws hook deliberately does
   // NOT reach this channel.
-  const deepEcc = createDeepEccChannel(DEEP_MODES_ARTIFACT);
+  // (`deepEcc` is the deep-time chain's, destructured above.)
   /** @param {number} year @returns {number} */
   // Plan 06 layer B: the PUBLISHED Earth eccentricity is the one-source series
   // (|z|, the secular orbit); the SUN's e adds the derived mean offset (see
@@ -938,11 +792,7 @@ export function assembleModel(C, F, laws = {}, secularSeriesArtifact = /** @type
   // (perigee advances, node regresses), T_p the J2000 precession anchor.
   // The retired era device counted these as eighth-integers per 8H and read
   // the periods back as totalDaysInH/N (the ∓13 was H/13 cycles per H).
-  const moonApsidalOfDateJ2000Seconds = C.moonReference.moonApsidalPrecessionDaysInputICRF * 86400;
-  const moonNodalOfDateJ2000Seconds = C.moonReference.moonNodalPrecessionDaysInputICRF * 86400;
-  const moonApsidalJ2000Seconds = 1 / (1 / moonApsidalOfDateJ2000Seconds - 1 / (axialPrecessionJ2000Days * 86400));
-  const moonNodalJ2000Seconds = 1 / (1 / moonNodalOfDateJ2000Seconds + 1 / (axialPrecessionJ2000Days * 86400));
-  const moonSiderealMonthJ2000Seconds = moonSiderealMonth * 86400;
+  const { moonApsidalJ2000Seconds } = chain;
   // (Plan 09 step 5c: the per-H of-date cycle counts and the month chain's H²
   // scaling of the of-date periods are deleted; the of-date perigee/node are
   // the chain's count compositions.)
@@ -952,40 +802,9 @@ export function assembleModel(C, F, laws = {}, secularSeriesArtifact = /** @type
   const moonAnomalisticMonthDays = 1 / (1 / moonSiderealMonth - 86400 / moonApsidalJ2000Seconds);
   const moonSynodicMonthDays = moonSiderealMonth * meanSiderealYearDays / (meanSiderealYearDays - moonSiderealMonth);
 
-  // moonEcc — the model's ONE eccentricity law — is created above (with
-  // eccentricityAt); the Moon channel's E-factor e(t)/e(J2000) and its
-  // perigee/node T² channel ride it, e(J2000) being the observed value exactly.
-
-  // Layer-2 month/precession chain (Brouwer-Clemence m² scaling × the
-  // e_E-line modulation)
-  const moonChain = createMoonMonthChain({
-    constants: {
-      aMoonNowMetres: EPOCH_PARAMS.moonDistanceNowM,
-      gmEarthMoonM3PerS2: EPOCH_PARAMS.gmEarthMoonM3S2,
-      massRatioEarthMoon: MASS_RATIO_EARTH_MOON,
-      moonSiderealMonthInputDays: moonSiderealMonthInput,
-      meanSiderealYearJ2000Seconds: meanSiderealYearSeconds,
-      moonApsidalJ2000Seconds,
-      moonNodalJ2000Seconds,
-      moonSiderealMonthJ2000Seconds,
-      sPerigee: MOON_ECC_SENSITIVITY_PERIGEE,
-      sNode: MOON_ECC_SENSITIVITY_NODE,
-    },
-    fns: {
-      meanLodSecondsAtAge: /** @param {number} tMa */ (tMa) => deepLod.lodSecondsAtAge(tMa),
-      meanSiderealYearSecondsAtAge: /** @param {number} tMa */ (tMa) => deepLod.siderealYearSecondsAtAge(tMa),
-      // plan 09 step 5c: the tropical month's equinox turn is one per T_p(t)
-      precessionPeriodYearsAtAge: /** @param {number} tMa */ (tMa) => deepLod.lunisolarPrecessionPeriodYearsAtAge(tMa),
-      // Decision (ii) (owner-approved MODEL CHANGE, plan 02 §8): the whole
-      // lunar chain — this modulation, the integrated cycle counts it
-      // drives, the arguments' eccAt/channelIntegral and the E-factor —
-      // reads the ONE deep e. The era shift in the ancient eclipse stack is
-      // accepted and rebaselined with its explanation (deep e is
-      // La2004-corroborated in-era).
-      modulation: /** @param {number} tMa @param {number} s */ (tMa, s) => deepEcc.modulation(tMa, s),
-      distanceMetresAtAge: moonDistanceMetresAtAge,
-    },
-  });
+  // The Layer-2 month/precession chain (Brouwer-Clemence m² scaling × the
+  // e_E-line modulation on the ONE deep e — decision (ii), plan 02 §8) is
+  // the deep-time chain's `moonChain` above.
 
   // Chain-cycle integrator. S5/S12 conventions: age anchor = startmodelYear
   // (the scene's t_Ma convention), grid anchor C(2000) = 0 — grid anchor ≠

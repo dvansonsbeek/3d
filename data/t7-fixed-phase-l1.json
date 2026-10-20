@@ -1515,7 +1515,7 @@
   "script": "scripts/t7_fixed_phase_l1.py",
   "plan": "holisticuniverse plan 06 \u00a74 T7",
   "doc": "docs/92-climate-formula.md",
-  "runtime_sec": 28.09024667739868,
+  "runtime_sec": 24.045458555221558,
   "environment": {
    "python": "3.12.3",
    "numpy": "2.4.1",
@@ -1526,11 +1526,11 @@
   "generator": "python3 scripts/t7_fixed_phase_l1.py --write",
   "files": {
    "data/deep-time-fitted.json": "sha256:cabf6484ed125969d7e1b829c29722939058fbfdd9fe45a604f869208250dd99",
-   "data/l1-physical-lines.json": "sha256:1aa9fe19636eea58724f534195f946b184209fa57aae143fdf1415ce5686f3e5",
+   "data/l1-physical-lines.json": "sha256:500a288fe161a85aa162e64e7d9b8d2be8e86f5fb3eadf343d2151d2b9c98b94",
    "data/la2004-earth-51myr-back.asc": "sha256:3f13b9f8e69085baf40bc67a2669e6f6af4148fef9218ed2158772aa91e35f8c",
    "data/lr04-stack.txt": "sha256:7d1a6ca7ffc033e45e20fb76a7f39c8d99df87baa1094260f9dbdc09f0bb8945",
    "data/t7-model-orbital-histories.json": "sha256:629be8dc0ac4dd8c035ff8542a80fd376d0508b5ed07c373b897cef5fe75c82f",
-   "public/input/astro-reference.json": "sha256:f143d3c9a9acc65756da135b6341a4fd2d0cb5a4a72f46874a42831d13e83241",
+   "public/input/astro-reference.json": "sha256:6787408288a0db18efccada3a41bd63d1a0519c4e70576f924c7f28a5ac14ba7",
    "public/input/climate-formula-coefficients.json": "sha256:d9a9c455053faea2590622752b731b6bc1573bdf5252f1c3a246b92fcdf99e2c",
    "scripts/milankovitch_climate_formula.py": "sha256:c16a99025d13fbbbd5448a067d39be62e27dff78d0d68432ca600c337817a41f",
    "scripts/t7_fixed_phase_l1.py": "sha256:14aac42ec78f328ebd96bdcaf558746da83b762d4171bf7283cf28afec1be809",

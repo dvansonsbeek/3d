@@ -3069,11 +3069,19 @@ export const VALUES = {
       // on the unit H(t), which this key read) and `dayCountTropicalAuDriftAtGenesisPpm`
       // (−995,201 ppm) left with `meanHAtAge`; the day-count identity is a device
       // record — a separate investigation topic, owner 2026-10-14.)
-      essrtEffectiveDomainGyr: { get: () => astro.knownValues.patternEarthAgeGyr + astro.knownValues.essrtFormulaHorizonGyr, render: (v) => Number(v).toFixed(1), unit: 'Gyr' },
+      // The formula horizon — DERIVED (plan 13 B3; it was a prose estimate, 3,
+      // in astro-reference knownValues — the deleted recession polynomial's
+      // reach): on the LLR rate held constant forward (the cited history's
+      // forward branch) the Moon reaches the tidal-lock distance at
+      // (a_lock/a_now − 1)/|α₁|; the chain's own LOD reads null beyond it.
+      // The domain runs from the cited history's END (the genesis age), not
+      // from Patterson's Earth age the pre-option-A keys used.
+      essrtFormulaHorizonGyr: { get: () => (P().moonLockDistanceM / P().moonDistanceNowM - 1) / -P().alpha1PerMa / 1000, render: (v) => Number(v).toFixed(2), unit: 'Gyr', note: 'the LLR rate held constant forward reaches a_lock — a labelled extrapolation' },
+      essrtEffectiveDomainGyr: { get: () => astro.knownValues.moonGenesisAgeGa + (P().moonLockDistanceM / P().moonDistanceNowM - 1) / -P().alpha1PerMa / 1000, render: (v) => Number(v).toFixed(1), unit: 'Gyr', note: 'genesis (the cited history\'s end) → the formula horizon' },
       essrtCurrentEpochPct: {
         get: () => {
-          const dom = Math.round((astro.knownValues.patternEarthAgeGyr + astro.knownValues.essrtFormulaHorizonGyr) * 10) / 10;
-          return 100 * astro.knownValues.patternEarthAgeGyr / dom;
+          const horizon = (P().moonLockDistanceM / P().moonDistanceNowM - 1) / -P().alpha1PerMa / 1000;
+          return 100 * astro.knownValues.moonGenesisAgeGa / (astro.knownValues.moonGenesisAgeGa + horizon);
         },
         render: (v) => String(Math.round(v)),
         unit: '%',

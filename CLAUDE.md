@@ -5,13 +5,20 @@ System Resonance Theory (ESSRT). The model is analytic and parametric, valid
 across ±500 Myr. [Preprint](https://doi.org/10.21203/rs.3.rs-8758810/v4) ·
 [Live demo](https://3d.holisticuniverse.com)
 
-**Scale:** `src/script.js` ~60,000 lines · `tools/` ~205 tracked scripts
-across 15 directories (plus the untracked local archives) · ~40 Python files · 35 docs (37 retired docs archived out of the tree to `docs/archive/retired/`, gitignored — git history carries their diffs — and the strip-and-restructure pass merged five more into their live homes) · one web UI (the simulator; the Data Explorer dashboard is retired).
-**`npm run check` enforces a twenty-six-step gate chain; CI runs it plus a
-headless-browser job and auto-deploys the simulator to GitHub Pages on
-green main.**
-Golden masters live in `packages/fixtures/`. Of the 24 scripts in `tools/verify/`,
-only 5 can actually fail — see the Verification section.
+**Scale:** `src/script.js` ~54,000 lines · `tools/` ~205 tracked scripts
+across 15 directories (plus the untracked local archives) · ~40 Python files · 36 docs (the retired docs are archived out of the tree to `docs/archive/retired/`, gitignored — git history carries their diffs) · one web UI (the simulator; the Data Explorer dashboard is retired).
+**`npm run check` is the enforced gate chain — the ONE list in package.json;
+CI runs it plus a headless-browser job and auto-deploys the simulator to
+GitHub Pages on green main.** Golden masters live in `packages/fixtures/`.
+`tools/verify/` holds gates and generators only (`npm run test:verify:list`
+for the classification and counts).
+
+**The measurements behind every rule below live in [doc 111](docs/111-measured-traps-and-gate-origins.md)**
+(traps §1, the browser tier's gates §2, the falsification criterion's long
+form §3) and [doc 109 §23](docs/109-model-nbody-engine-and-lattice-test.md)
+(the planet-channel and era-device retirements). This file carries the rules;
+doc 111 carries the numbers — they are a matched pair: move a rule and its
+measurement together.
 
 ---
 
@@ -27,8 +34,9 @@ phase, a refactor that might need abandoning wholesale — runs in a git worktre
 (`EnterWorktree`), not the main tree. Abandoning is then a `remove`, never a
 `git checkout` over a dirty tree. Two gotchas: a worktree branches from
 `origin/main`, so **uncommitted work does not come with it** — commit first; and
-it contains tracked files only, so the gitignored 160 MB CSV and `docs/archive/`
-are **absent** inside one.
+it contains tracked files only, so the gitignored window CSV, the ±10-Myr dump
+and `docs/archive/` are **absent** inside one (symlink the dump from main
+before a cascade).
 
 **No polynomial corrections.** The motion model carries no fitted correction
 since plan 09 (the frozen era device — its unit, counters and combs — is
@@ -60,627 +68,170 @@ skill in `.claude/skills/`.
 greedy pass is a diagnostic. This trap was present in **all three** fitters and
 would silently churn a structural claim for a rounding-level gain.
 
+**One home.** A formula, a structural list or a constant lives in ONE module
+and every twin reads it (plan 13 B1–B3: `@essrt/physics` `time/calendar`,
+`math/angles`, `earth/mass-chain`, `constants/units`, `deltat/deep-time-chain`;
+`tools/lib/constants.js` keeps its export NAMES and re-sources them). When a
+structural set changes, grep for the **literal**, not for imports (doc 111 §1.18).
+
+**Generate the constants LAST and run the cascade ONCE.** After any input,
+fitter or generator change: `npm run regen:cascade` (`--run`) regenerates every
+stale artifact in order with the constants module in its place; never stop a
+running generator to save a pass (doc 111 §1.24); after ANY fitter write the
+constants embed comes before the records (doc 111 §1.19).
+
 ---
 
 ## Traps worth not re-learning
 
+Each line names the rule; doc 111 §1.n carries the measurement.
+
 - **`Verify at J2000: 0.0000″` is a TAUTOLOGY**, not validation — it re-evaluates
-  at the anchor it derived from. It read clean while a shipped formula was
-  0.2247″ off across 335,318 rows. Real gate: shipped coefficients against rows
-  the fit never saw, decomposed as `RMS² = bias² + scatter²`.
-- **Errors can CANCEL.** Two rectangle-vs-integral bugs were equal and opposite;
-  fixing either alone sent a fit from ~5.6 min to 1162 min. If a fix makes an
-  unrelated gate go red, suspect a second compensating error before suspecting
-  the new code.
-- **Stability and a small formal SE are not evidence of correctness.** An
-  ill-conditioned regressor returned a rock-stable, tiny-SE, completely wrong
-  amplitude of 5.06 against a true value of 1.0.
+  at the anchor it derived from. Real gate: shipped coefficients against rows
+  the fit never saw, decomposed as `RMS² = bias² + scatter²`. (§1.1)
+- **Errors can CANCEL.** If a fix makes an unrelated gate go red, suspect a
+  second compensating error before suspecting the new code. (§1.2)
+- **Stability and a small formal SE are not evidence of correctness.** (§1.3)
 - **A term can be negligible against the signal and dominant against the residual.**
 - **Declination is blind to a longitude error at the solstices** and maximally
-  sensitive at the equinoxes — fastest way to classify a discrepancy.
+  sensitive at the equinoxes — fastest way to classify a discrepancy. (§1.4)
 - **Agreement at the anchor with divergence away from it = stale coefficients**,
   not a formula bug.
-- **Capture a baseline before touching shared machinery.** Two minutes; it has
-  caught a 583.7″ regression.
-- **The solar-measurements check is the WINDOW CSV.** Step 6a2
-  (`npm run fit:6a2` → `data/02-solar-measurements-window.csv`, −4000…+4000,
-  ~48k rows, gitignored) + `npm run check:csv-smoke` (bit-exact window
-  compare, fail-proven; tools/fit/README Step 6a2) — regenerate it whenever
-  the engine's frame of date moves. The full-period file
-  (`data/02-solar-measurements.csv`, 160 MB, one row per year of the anchor
-  unit) is RETIRED and deleted: it was the C-4b-era campaign record, stale
-  against every later movement arc (measured SS@−997 off 2.9 h), and no gate
-  or fitter reads it. The exporter can still write one on demand (2 h 24 m).
-- **The deep-time alignment campaign is COMPLETE** — engine ≡ CSV bit-exact
-  AS OF ITS ERA (the claim is historically scoped: that CSV was the
-  C-4b-era record and the later movement arcs moved the engine; Step 6a2 +
-  check:csv-smoke are the living check), all
-  sixteen R-items closed, the cardinal-point fit (now Step 6d; "6c" in
-  campaign-era docs) at 0.26–0.29 min over ±270 kyr (Earth-frame) via the §10
-  derived form + edge-trim + the §10g quadrature-locked joint sidebands. Coefficients and
-  runtime evaluation form are a MATCHED PAIR — never ship one without the
-  other (~1162-minute-class error), and the pair includes the NUMERICS (the
-  campaign's ∫1/H trapezoid table was part of its pair). The cardinal-point
-  fit, its sidebands and that table were deleted at plan 09 step 7a — the
-  cardinal instants are the certified Sun's crossings; the matched-pair rule
-  stands for every fitted family that remains. Both campaign plans are archived in
-  `docs/archive/old-documents/` (untracked).
-- **The braid law's counter-rotating sign is physics, not convention.** The
-  seasonal-asymmetry structure is COUNTER-rotating against the perihelion
-  phase; the co-rotating sense captures nothing (measured on the cardinal
-  record — the sign experiment, doc 99 "braid law"). The fitted sidebands that
-  carried it were deleted at plan 09 step 7a; any future cardinal-structure
-  term must keep the sign.
-- **A purity freeze needs its pure twin.** Freezing a mutable-global read to
-  a J2000 const without wiring in the epoch-aware f(Y) replacement silently
-  freezes deep time (the solar-day panel read 86400.006 where the model says
-  86400.156). The epoch-consistency gate now pins the invariant; extend it
-  when adding f(Y) evaluators.
-- **A cache that changes resolution is mutable state.** The one-source
-  movement's grown grid replaced its 100-yr tier with the 1000/5000-yr one
-  after any deep-time probe; rates read through it (±0.5-yr central
-  differences) became grid-segment averages — the anomalistic year read
-  +2.6 s, visit-order dependent, and 18 browser goldens were recorded
-  contaminated (exposed by the early-recorded "Fresh" twin of the same JD).
-  Per-tier routing + the fail-proven `test:sampler-purity` gate pin the
-  class: values pure in `year`.
-- **A displayed rate must name its window.** The engine's ϖ̇ reads
-  11.544/11.616/11.624/11.696 ″/yr depending on evaluator and stencil
-  (100-kyr window mean / chain tangent / series year-over-year / deep-mode
-  tail); two panel surfaces showing different windows of the same rate split
-  111,491 vs 111,570 yr. Surfaces quoting one physical rate ride ONE family —
-  the anomalistic takes the chain tangent the Prec. cell shows
-  (`computeApsidalSecularDegPerYr`, one home). Second measured instance
-  (C1): a mean motion FITTED over a window shorter than a resonant
-  inequality absorbs the inequality's local phase slope into the mean
-  term — the chain's 300-yr `windowElementRates` gave Neptune 164.71 yr
-  where the secular (2-kyr-boxcar) λ̇ matches JPL's 164.79; the period
-  rows ride the banked λ̇ channel, the split is banked as measurement
-  (`verdict.planetLamDot`).
-- **Orbital quantities ride the μ-tier, spin quantities the H-tier.** The
-  retired device scaled planet periods by H(t)·mSY — mixing the recession
-  driver (Earth spin: precession, LOD) into an orbital quantity. The
-  proper deep-time stretch for ANY heliocentric period is the ONE Driver-2
-  solar-mass law (planet-independence is exact at the two-body level),
-  composed with the body's own constant-GM N-body drift — Earth's D6
-  sidereal-year channel is the pattern (`T(y) = massLossLaw(y)/lamDotRel(y)`,
-  every factor ≡ 1 at J2000).
-- **The secular law is not the rate of date.** The composed ψ̇(t) — leg 1's
-  law, the clock T_p(t) — scales the J2000 rate on the tidal history. The spin
-  integration multiplies it by two factors of date, both exactly 1 at J2000:
-  the solar torque's (1 − e²)^(−3/2) at the eccentricity OF DATE and
-  J₂(t)/J₂₀ from the GIA channel (ONE home `earth/deep-orbital-history`
-  `alphaAtGeneral`; `climate/l1-orbital` `j2RatioAt`). On the secular law
-  alone the equinox lagged Vondrák 2011 by 27″ at −3000 — the Sun's whole
-  ancient residual against Horizons — and the obliquity drifted 80″ rms off
-  La2004 over a million years: the solar-share formula held e at J2000 (a
-  purity freeze without its twin) and the polar-moment channel was read on
-  the length-of-day side only. The J₂ side is scaled on the OBSERVED dJ₂/dt
-  (`j2RateJ2000PerYr`), never through the J₂→α factor of the length-of-day
-  side. `tools/verify/equinox-vs-vondrak.js` refuses to write if a factor is
-  dropped.
-- **The scene is the reference — and it needs its own instrument.** Owner:
-  "all calculations should match what we measure in the scene." Sampling
-  the Node scene twin at 16 epochs with the exporter's own event definitions
-  (2026-09) found three law-level slips the goldens could not see: the
-  tropical-year law read the equinox's PROJECTED J2000 longitude rate where
-  the mean longitude of date needs the general precession — the broken angle
-  through the node of the ecliptic of date (the literature's p_A; the N-body
-  L = Ω + ω + M is that angle) — equal at J2000 and parting with the square
-  of the ecliptic's tilt (0.05 s of year at ±4 kyr, ~1 s beyond 100 kyr, 5.9″
-  of Sun at −3000; `generalPrecessionLonDeg`); the precession period was
-  counted in TROPICAL years by the pair's beat and realised per JULIAN year
-  by the frame (26 ms of tropical year, 0.55 yr of period — periods are now
-  Julian years, and the year relations are rate-form with the unit named);
-  and the published anomalistic year rode the planet chain's secular tangent
-  where the scene's perihelion follows the series (3.3 s at 0 AD, 395 s at
-  +25 kyr). The measurement discipline matters as much as the finding: a
-  per-event `dJD·360/(360 − dWA)` is not a sidereal year (±50 s of
-  equation-of-centre drift per cardinal type, ~150 s of lunar-equation
-  timing per event) — remove the planetary completion per event and read the
-  cumulative angle, four-cardinal mean, against TT. Gate:
-  `tools/verify/scene-year-lengths.js`. The inertial referee for the sidereal
-  law is DE441 in the fixed J2000 frame (`tools/explore/sun-inertial-vs-de441.cjs`):
-  the λ̇ channel's 2-kyr boxcar of per-step rates telescoped to the osculating
-  longitude's endpoint difference and left 0.1–0.3 s of node noise, which the
-  Sun's longitude integrated to +18…28″ at 4000–6500 — now a least-squares
-  quadratic slope over 10 kyr (rms 5.4″ over ±9000 yr, was 18.9″).
-- **A term's amplitude is a function of the elements, not a constant — and a
-  degenerate basis will "fit" the wrong physics inside any one window.** The
-  Sun's 1,783-yr long inequality shipped as a constant row (I2) that held
-  inside ±3000 yr and drifted 3.7″ beyond: it is first order in the
-  eccentricities, so its composed amplitude and phase ride e_X(t)·e^{iϖ_X(t)}
-  of Earth, Mars and Jupiter (D'Alembert: Σk_λ + Σj_ϖ = 0, the argument's
-  Σk = −1 gives +ϖ_X). The first D'Alembert cut used θ − ϖ_X — the wrong
-  sign — and still fitted ±9 kyr to 0.3″ with three near-collinear columns
-  carrying thousands of ″/e; the ±3100-vs-±9100 window test and a sliding-
-  window phase track exposed it (the line's period read 1848 yr against the
-  1781-yr carrier, the sign that ϖ enters with a plus). With the right sign
-  the same basis clears the band to 0.05″ over ±20 kyr with a
-  window-independent composed amplitude. Rules: derive over the window the
-  rows will be used in; test window independence on the COMPOSED function,
-  not the coefficients; and a term with Σk ≠ ±1 (the 239-yr 8V−13E, fifth
-  order, resonant) is a cluster of lines — no single-ϖ form holds; it stays
-  a constant row with its window named. `tools/explore/i3-long-period-dalembert.mjs`.
-- **A campaign recording hashes what it RUNS ON, or it goes stale unseen.**
-  The deep-eccentricity slope anchor (e338d1bd) moved the lunar-alignment
-  recording — per-century medians by 100–500 s, identified events 228 → 244 —
-  and nothing flagged it for four days: the lunar chain's eccentricity
-  channel, its arguments and the model assembly were not in the inputs
-  block. After a model change, run the campaign generators plain (the
-  reproduction check) even when the freshness gate passes.
-- **A fit-window edge phase-locked to the lattice masquerades as physics.**
-  The "e(t)-minimum residual peak" was window-edge divergence — both bracket
-  ends sat at the same perihelion-of-date phase. Check the edge/interior split
-  before believing any phase-binned feature; the former cardinal-point fitter
-  edge-trimmed 8%/side for this reason.
-- **A structural list has ONE home.** The L1 divisor list lived in
-  `milankovitch_climate_formula.py` — and in twelve hard-coded copies (eight
-  test scripts, the four variance-budget scripts) that a ledger-driven re-run
-  could not see, plus a registry key whose note said "kept for the family
-  table". When a structural set changes, grep for the **literal list**, not
-  for imports; a registry key carrying a "kept for X" exception IS the stale
-  value — fix the key, not its consumers.
-- **The records run on the EMBEDDED coefficients, not the JSON.** Step 7c
-  writes `data/deltaT-4flag-fit.json`; every createModel consumer (eclipse-
-  audit, lunar-alignment, Sun-vs-Horizons, the hybrid verdict, the series
-  verdict) reads `packages/physics/src/constants/coefficients.js`. Measured
-  (v23.0): records recorded between a 7c write and the next
-  `npm run constants:generate` sat 0.6 s off the shipped physics with the
-  freshness gate green (it hashes the JSON). After ANY fitter write:
-  `constants:generate` FIRST, then the records. `test:constants` catches
-  the stale embed; it does not catch a record recorded on it.
-- **A comb on H-divisors cannot carry a secular drift — and a comb-built
-  timeline hides its error inside a fitted chain.** (plan 09 step 3,
-  measured) The lunar arguments built their Sun from 360° per mean solar
-  year plus the closed-form integrals of the year-length combs; that Sun
-  sat 0.2° behind the IAU mean Sun at −2000 (the comb's curvature is 60 %
-  of the tropical year's real drift, which the one-family law reproduces to
-  0.1 s), and the Moon's elongation argument carried it as tens of
-  arcseconds of ancient residual. The arguments now read the ONE certified
-  Sun (`model.sun.meanLongitudeDegAt`, the series' unwrapped perihelion) —
-  D within 15″ of Meeus at −2000, was 656″. Rule: a timeline is the
-  integral of the published rate of date, never a comb; and when a fitted
-  chain agrees with the record while one of its inputs is wrong, the other
-  inputs are compensating — check each input against its own referee.
-  Also measured on the way: the J2000 day length ω₀ is the SI day (86,400 s,
-  the day the IAU year inputs are stated in); the retired H/13 identity's
-  86,399.99968 s put a +0.32 ms/day bias into the raw ΔT integrand that the
-  fitted stack had to absorb (Espenak RMS 13.4 → 12.45 s once removed).
-  **Second instance (step 5c):** the month chain's tropical month, the
-  sidereal day of date, the equinox-of-date month partners and the lunar
-  series' A3 argument all counted the equinox's turn as 13 per H(t) — the
-  unit is 13.011 precession periods, so every one ran 0.086 % slow on the
-  precession; the chain's J2000 tropical month sat 5.85 ms above the IAU
-  input, and one turn per T_p(t) lands within 0.1 ms of it. The month
-  chain's "cycles per H ∝ H²" of-date law (doc 99's lunar precession
-  invariant) was the counter's definition, not dynamics — retired; the
-  of-date perigee/node are the count compositions of the inertial chain.
-  Rule: `13/H`, `H/13`, `N·(H/H₀)²` in a physics formula is a device
-  identity standing in for 1/T_p(t) — read the composed period directly.
-  **Third instance (step 5d):** the deep chain's tropical year of date was
-  T_sid·(1 − 13/H(t)) — 1.04 s/yr slow at J2000 — and it was BOTH the deep
-  JD↔year calendar's integrand AND the lunar chain-cycle integrator's
-  seconds-per-year weight, so every lunar count carried a 3.2e-8 J2000 bias
-  (15° of deep Moon per 100 kyr, absorbed inside the rate anchors' taper,
-  visible beyond). The epoch-consistency gate's 0.002-d tolerance hid the
-  1 s/yr gap between the anchor chain and the one-family law; on T_p(t) the
-  two agree to 1e-11 d. A tolerance wide enough to pass a known device gap
-  is a gate that cannot see the gap closing — note what a tolerance covers.
+- **Capture a baseline before touching shared machinery.** (§1.5)
+- **The solar-measurements check is the WINDOW CSV** — `npm run fit:6a2` +
+  `npm run check:csv-smoke`, regenerated whenever the engine's frame of date
+  moves; the 160 MB full-period file is retired. (§1.6)
+- **Coefficients, runtime evaluation form AND numerics are a MATCHED PAIR** —
+  never ship one without the other (~1162-minute-class error). (§1.7)
+- **The braid law's counter-rotating sign is physics, not convention.** (§1.8)
+- **A purity freeze needs its pure twin** — a J2000 const without its
+  epoch-aware f(Y) replacement silently freezes deep time; the
+  epoch-consistency gate pins it. (§1.9)
+- **A cache that changes resolution is mutable state** — values pure in `year`;
+  `test:sampler-purity`. (§1.10)
+- **A displayed rate must name its window** — surfaces quoting one physical
+  rate ride ONE family; a mean motion fitted over a window shorter than a
+  resonant inequality absorbs its phase slope. (§1.11)
+- **Orbital quantities ride the μ-tier, spin quantities the H-tier** — the deep-
+  time stretch of ANY heliocentric period is the ONE solar-mass law composed
+  with the body's constant-GM N-body drift. (§1.12)
+- **The secular law is not the rate of date** — the spin integration multiplies
+  the composed ψ̇(t) by the eccentricity-of-date torque factor and J₂(t)/J₂₀,
+  both 1 at J2000; `equinox-vs-vondrak.js` refuses to write if one is dropped. (§1.13)
+- **The scene is the reference — and it needs its own instrument** — sample the
+  scene twin with the exporter's own event definitions and read cumulative
+  angles against TT; gate `scene-year-lengths.js`. (§1.14)
+- **A term's amplitude is a function of the elements, not a constant** — derive
+  over the window the rows are used in; test window independence on the
+  COMPOSED function; a term with Σk ≠ ±1 stays a constant row with its window
+  named. (§1.15)
+- **A campaign recording hashes what it RUNS ON, or it goes stale unseen** —
+  after a model change run the campaign generators plain even when the
+  freshness gate passes. (§1.16)
+- **A fit-window edge phase-locked to the lattice masquerades as physics** —
+  check the edge/interior split before believing a phase-binned feature. (§1.17)
+- **A structural list has ONE home** — grep for the literal list; a registry key
+  carrying a "kept for X" exception IS the stale value. (§1.18)
+- **The records run on the EMBEDDED coefficients, not the JSON** — after ANY
+  fitter write: `constants:generate` FIRST, then the records. (§1.19)
+- **A comb on H-divisors cannot carry a secular drift** — a timeline is the
+  integral of the published rate of date, never a comb; `13/H`, `H/13`,
+  `N·(H/H₀)²` in a physics formula stand in for 1/T_p(t); a tolerance wide
+  enough to pass a known gap cannot see it closing. (§1.20)
 - **A number a doc cannot reproduce from an artifact gets written BY the
-  script**, not re-derived in a generator. Two guesses at the §4.7 f_ice
-  recipe gave 0.70 and 0.73 against the documented 0.77; the script's own
-  recipe (stored since) reproduces it exactly. Docs 92/97 result tables are
-  now generated blocks (`npm run docs:tables`) for the same reason.
-- **Two precession rates, two uses — name which one a line carries.** The
-  general precession in longitude p₀ (50.288 ″/yr, the equinox along the
-  ecliptic of date — the tropical year, the climatic-precession lines p + gᵢ)
-  and the spin axis's inertial rate ψ̇ᵢₙ (50.385 in the shipped series-driven
-  configuration: the general rate plus the planetary mean the N-body
-  ecliptic's motion carries, +0.097 ≡ IAU's ψ_A − p_A — the hybrid obliquity
-  integration's self-anchor, the obliquity lines p + sᵢ, the obliquity beat;
-  La2004's precession frequency 50.476 sits 0.09 above it). The climate
-  lines carried p₀ for both families; the records flagged it (every LR04
-  window wanted +0.2…+0.3 ″/yr, all of it in the obliquity family), the
-  engine's own self-anchor said the same, and the fix moved ten obliquity
-  periods 0.3 % (41.22 → 41.10 kyr). TRAP measured on the way: a bare
-  `createModel()` (the 18-mode table) anchors the spin axis 0.18 ″/yr above
-  p₀ where the shipped series-driven model anchors 0.097 — derive line rates
-  from the shipped configuration (pass `secularSeriesArtifact`), the g₂-gap
-  trap in a new coat. Also measured: a clock-of-date "gain" that is really a
-  frequency offset (test with a constant-offset scan before believing a
-  drift), and a 0.3 % period shift compounding to a different α(t) phase a
-  million years out (the ΔT stack's GIA term by tens of percent at deep time;
-  the stack re-closed, Step 7c). **Second measurement (v23.0): a RECORD sees
-  the pole rate's mean over its own window, not the J2000 instant.** The
-  dominant obliquity line of the model's own ε(t) over the LR04 window sits
-  at 40,922 yr (La2004's series: 40,900; the two agree at every window), not
-  at the J2000 beat 41,098: the pole turned faster in the past (tidal spin
-  +0.06 ″/yr over 5 Myr, lower mean obliquity +0.05, higher mean
-  eccentricity +0.015 — the three of-date factors the spin integration
-  already multiplies), and the window mean 50.515 predicts the fitted
-  period to 0.02 % (40,930). The records' "+0.12…+0.20 ″/yr on the obliquity lines"
-  was this mean. ONE home `lunisolar.spinAxisInertialRateMeanArcsecPerYr` /
-  `obliquityPeriodRealizedYears`; the obliquity lines ride the LR04-window
-  mean (the stack's span is the window's one home); the J2000 beat stays as
-  the instantaneous limit; the hybrid verdict REFUSES if the ε(t) fit parts
-  from the window-mean prediction by 0.1 %. Compare like with like: a
-  realized period against a realized period (model vs La2004 0.05 %), never
-  a J2000 beat against Laskar's long-window precession frequency 50.476.
-  Measurement discipline: a single-line periodogram or phase track inside a
-  1–2 Myr window blends s₃ with its −18.30 ″/yr side line (Rayleigh) and
-  reads 0.3 % short — fit the full line set with ONE free p, and use ≥ 3 Myr.
-  LOOP TRAP (measured): the J₂(t)/J₂₀ factor is the ice-driven GIA channel,
-  which rides the climate formula's own post-MPT layer — a line rate that
-  includes it depends on its own fit (its window mean moved 1.4e-3 ″/yr
-  across one refit, a loop the freshness gate cannot close). The T1 exporter
-  derives the LINE rate with `ellipticity: false`; the published realized
-  period and the hybrid gate keep the full rate (1 yr of period apart).
-- **Run a fitter at its own fit commit before blaming the engine.** The
-  banked regime block's note said plan 09 had moved the fitter under it;
-  `git archive` of the fit commit (node_modules wired, ~1 min) showed the
-  committed fitter had always produced today's candidate — the shipped block
-  came from an uncommitted same-day run, and its inputs had moved by parts per
-  billion. A fit's commit must carry the fitter, its seed and its bounds that
-  produced it (the matched pair includes the instrument). Plan 12 step 1.
-- **A generator stopped between its two writes leaves a VALID-LOOKING
-  artifact the freshness gate cannot see.** (plan 12 option A, measured)
-  `nbody-secular.js --write` writes the CORE artifact first (the periodic-term
-  pipeline bootstraps from it) and the `periodicTerms` layer second, ~25 min
-  later; stopped between the two, `data/nbody-secular-frequencies.json` carried
-  a fresh inputs block and no periodic layer — `check:artifacts` PASSED, the
-  cascade regenerated secular-series, the constants embed, both eclipse records
-  (REBASELINED on it), the fixtures and the registry on the truncated chain,
-  and only the API gate's Mars ϖ(−3000) pin (313.23 → 312.92) caught it. After
-  stopping ANY generator, diff the artifact's KEYS against HEAD before running
-  a cascade; and never stop a generator to save a pass — generate the
-  constants LAST and run the cascade ONCE instead.
-- **"Placed by the engine every frame" does not cover what was aligned ONCE
-  at init.** Plan 11 step 4 deleted the scene scaffold's pose on the claim
-  that every frame of date is engine-placed — true for every per-frame
-  reader, and the star and constellation catalogs copied Earth's axis matrix
-  once at module init, before the first placement: the sky lost 23.44° of
-  tilt and 68.23° of equinox offset while every golden stayed bit-identical
-  (goldens record observables, which are frame-invariant). Before deleting a
-  pose, grep the top-level `matrixWorld` readers; gate the init-time
-  alignments in the frame they must sit in.
+  script** (`npm run docs:tables`). (§1.21)
+- **Two precession rates, two uses — name which one a line carries** (p₀ for
+  the tropical year and the climatic-precession lines, ψ̇ᵢₙ for the obliquity
+  family); a RECORD sees the pole rate's WINDOW MEAN, not the J2000 instant;
+  derive line rates from the shipped configuration. (§1.22)
+- **Run a fitter at its own fit commit before blaming the engine** — a fit's
+  commit carries the fitter, its seed and its bounds. (§1.23)
+- **A generator stopped between its two writes leaves a VALID-LOOKING artifact**
+  the freshness gate cannot see — diff the artifact's KEYS against HEAD before a
+  cascade. (§1.24)
+- **"Placed by the engine every frame" does not cover what was aligned ONCE at
+  init** — grep the top-level `matrixWorld` readers before deleting a pose. (§1.25)
 
 ---
 
 ## Verification
 
-`npm run check` is the enforced chain — lint (§4 boundaries), typecheck (JSDoc +
-`checkJs`), `check:boundaries` (the §2h licensing invariant), purity,
-`test:fixtures` (the `tools/lib` golden masters + the plan-06 baseline —
-the clock-carrying quantities on the ±26-kyr wander window and the deep-time
-anchors, bit-exact across the lunisolar-clock restatement),
-`test:vocabulary` (the retired-vocabulary RATCHET — plan 06 §7 D3 terms may
-only leave presentation surfaces, never re-enter; `--report` prints the
-sweep worklist, `--root DIR` adds the website's EN pages), `check:artifacts` (generated
-campaign artifacts vs their recorded input hashes — fails naming the exact
-regeneration command), `check:data` (every tracked dataset manifest-covered
-in PROVENANCE.md), `values:package` (the published @essrt/model-values ≡
-the live registry, plus PLAUSIBILITY rows — a published value against the
-reference it is published beside: born from model-values 16.0.0 shipping
-`periLongModel2000AD` 167° off through a private copy of the perihelion
-convention that missed the R10 re-origin, while every page's hand-typed
-"+0.010°" delta column still read agreement — the deltas are registry keys
-now, `periLongDelta*AD`; fail-proven via `ESSRT_VALUES_PLANT=1`),
-`test:verify` (the model gates), `test:py-smoke` (the
-Python IMPORT smoke: every `.py` parses, the bridge
-`tools/lib/python/constants_scripts.py` imports, and every `scripts/*.py`
-imports as a module — born from the bridge sitting UNIMPORTABLE for months
-on a KeyError that no gate ran into, plan 07 §9f/§9k; stage C needs
-numpy/scipy and reports SKIP on CI's runner; fail-proven via
-`ESSRT_PY_SMOKE_PLANT=1`).
-Every gate has been shown to **fail on a planted violation**, not merely to pass
-on clean code — the two fixture gates on a 1-ULP change, ~1.6e-16 relative. Lint
-and typecheck cover `packages/` and `test/`; `src/script.js` and `tools/` are
-pre-migration and join as Phase 8 extracts.
+`npm run check` is the enforced chain — lint, typecheck, `check:boundaries`
+(the §2h licensing invariant), purity, `test:calendar` (the one-home
+calendar/angle helpers against the legacy bodies), the layer gates,
+`test:constants` (the embed ≡ its sources), `test:fixtures` (the `tools/lib`
+golden masters + the plan-06 baseline), `test:literals` (script.js literals vs
+the JSON source of truth; the retired-input ratchet), `test:vocabulary` (the
+retired-vocabulary RATCHET), `test:docs-fresh`, `check:artifacts` (generated
+artifacts vs their recorded input hashes — fails naming the exact regeneration
+command), `check:data` (every tracked dataset manifest-covered in
+PROVENANCE.md), `docs:values` / `docs:tables` (the script-written numbers in
+docs), `values:package` (the published @essrt/model-values ≡ the live
+registry, plus PLAUSIBILITY rows), `test:verify` (the model gates),
+`test:py-smoke`, `test:pipeline`. Every gate has been shown to **fail on a
+planted violation**, not merely to pass on clean code — the fixture gates on a
+1-ULP change (~1.6e-16 relative); the plant variables are listed per gate in
+doc 111 §2. Lint and typecheck cover `packages/` and `test/`; `src/script.js`
+and `tools/` are pre-migration and join as Phase 8 extracts.
 
-**Scoped tiers** (measured 2026-10-18 after plan 13 A1: the full chain is
-~5 min, of which `test:fixtures` is ~2.7 min — the plan-06 recorder's four
-deep anchors walking the spin integration to 2.46 Ga, one extended walk now;
-it was 17.5 min with that walk rebuilt from J2000 in both directions on every
-deeper probe — and `test:verify` ~1.3 min; `test:pipeline` is 4 s). Pick by
-what the change touches; CI runs `npm run check` itself — the ONE list in
-package.json — on every push, so the full local run is only needed when the
-change touches what the heavy steps verify:
+**Scoped tiers** (measured after plan 13 A1: the full chain ~5 min,
+`test:fixtures` ~2.7 min, `test:verify` ~1.3 min). Pick by what the change
+touches; CI runs `npm run check` itself on every push:
 
 | changed | local gate | ~time |
 |---|---|---|
 | `tools/docs/`, `docs/*.md`, markers, the generated table blocks of docs 92/97/110 (`docs:tables`; doc 110 = the calculation map, values script-written) | `npm run check:docs` | ~20 s |
 | `tools/lib/`, `packages/physics/` | `npm run check:engine` | ~3 min |
-| ANY `public/input/*.json` (even a label — the constants hash embeds them wholesale), `packages/fitting/`, `src/script.js`, `tools/constants/` | full `npm run check` | ~5 min |
-
-After an edit that moves a governed artifact's input (any `public/input/*.json`,
-the chain or deep-time physics, a generator), `npm run regen:cascade` prints
-every stale artifact in regeneration order — the constants module included,
-twice where the dependency is two-stage — and `--run` runs them; the freshness
-gate alone names only the first stale one.
+| ANY `public/input/*.json` (even a label — the constants hash embeds them wholesale and the N-body node re-stamps, ~30 min), `packages/fitting/`, `src/script.js`, `tools/constants/` | `npm run regen:cascade --run`, then full `npm run check` | ~5 min + the cascade |
 
 `npm run test:browser` runs the `src/script.js` golden masters in headless
-Chromium — the only tier that guards Phase 8, which dissolves that file —
-plus the epoch-consistency gate (pure f(Y) evaluators ≡ the epoch-anchor
-chain at ±1/±5 Myr; the golden master cannot catch that class), plus
-`test:perf` — the deep-time performance gate (RATIO thresholds, deep vs
-in-table cost, runner-speed independent; born from four ungated ratio
-regressions, one owner-bisected at 28×; plus two travel-speed rows the
-steady-state rows cannot see — the orbit-ring resample against the per-JD
-route and the Play-start delay on a fresh page, both bisected from the
-owner's "waiting time before Play / stutter at 1000 yr/s"; plus the
-paused-idle row — a paused, untouched page must leave the render loop's
-idle check in place (Tweakpane's readonly rows re-emit `change` on every
-poll tick and the pane-wide handler woke every frame: a full update + a
-GPU frame at the display rate, forever; the pre-guard build reads 1.0
-against the 0.05 limit); plus the monitor-polling row — the pane's ~319
-readonly rows are LOOP-DRIVEN (tickers disposed after setupGUI, the
-visible rows re-read on the 5-Hz DOM tick), so a paused page emits ~0 pane
-change events where the polling build emitted ~4,800 in 3 s (limit 5), and
-a visible monitor must still change while playing; fail-proven via
-`ESSRT_PERF_TIGHTEN=0.01` and on the pre-fix builds). The `test:snapshot`
-chain also carries `chart-export` — the Tools panels' paper-SVG → PNG
-rasterizer behind every Export button (exact pixel size, independent decode,
-byte floor; fail-proven via `ESSRT_CHART_EXPORT_PLANT=1`) and the export
-STANDARD on all fourteen forms (title + legend row above, the plot, one
-credit strip below, no caption text — doc 57; fail-proven via `=2`), and
-`tools-panels` — every Tools button opens its panel with no page error,
-three clicks within a frame leave ONE panel, and it closes again (born
-from a ReferenceError on open and the double-build race; fail-proven via
-`ESSRT_TOOLS_PLANT=1`), and `perihelion-at-sun` — the Show/Hide grid: the
-chain planets' "Perihelion at Sun" marker sits at a(1−e) in the orbit
-plane at the chain's ϖ, the Moon's "Apsidal/Nodal Precession" markers
-(the perigee at F − M′, the nodes at L′ − F) and the "Sun barycenter"
-marker (≡ the Sun panel's Sun-SSB sum) are placed as stated, and every
-group's chip list is exact — no device-wheel chips (born from the "Real
-Perihelion" wheel ~90° off the chain and three chips that showed nothing;
-fail-proven via `ESSRT_PERI_SUN_PLANT=1`), and the star and constellation
-containers (J2000 RA/Dec catalogs, aligned ONCE at module init) sit on the
-J2000 equatorial frame through R (born from the owner's "the Sun is at 160°
-against the constellations where it was at 90°" after plan 11 step 4: the
-axis's rest pose became 0 and the engine places it only at the first update,
-after the alignment — 23.44° of tilt and 68.23° of equinox offset missing from
-the sky, invisible to goldens that record observables; fail-proven on that
-build), and the focused chain planet's orbit-plane grid passes through the
-rendered Sun with its normal along the chain's orbit normal of date (born from
-the owner's "the tilt of Mercury's path floats above the Sun": the grid hung on
-the scaffold's inert PerihelionFromEarth → RealPerihelionAtSun wheels, whose
-annual wheel lost the engine-placed Sun's wheel zero a quarter turn in the
-plan 07/09 arc — 1.36 AU from the Sun and 19.8° off the normal on the pre-fix
-build; it is a scene child placed from the engine every frame now, and the
-RealPerihelionAtSun / FixedPerihelionAtSun layers are DELETED in both twins —
-the planet containers hang on the barycenter beside their Perihelion-at-Earth
-marker layer), and the
-Planet Info eye ("Hide helper objects") governs the focused planet's helper
-visuals too — its elements-of-date label and its orbit-plane grid, not only
-Earth's two markers (born from the owner: "zooming into a planet shows extra
-information; for Earth the eye hides it, for the planets it should too" — the
-toggle had covered Earth's markers only since plan 07 R6 deleted the planets'
-wobble centres; fail-proven on the pre-fix build), and a
-chip click WAKES the
-paused render loop (the class the monitor guard exposed: a UI path that
-changes scene state without setting `positionChanged` — now every user
-interaction wakes the loop for one frame; the pre-fix build reads 0 active
-frames after the click). The wobble-centre gate also pins the Tracing
-"Wobble" fill (a trace needs its parameters set in
-`updateAllTracesForEpoch`, the ONE place; a missing object traces nothing).
-`npm run test:transparency` is the Phase 6 acceptance gate — **green (84/84,
-round-trip bit-exact) since Phase B** and required in CI; red there is a
-regression of the Phase 6 exit criterion, not a tracked state.
+Chromium — the only tier that guards Phase 8 — plus the epoch-consistency
+gate, `test:perf` (ratio thresholds, travel-speed, paused-idle and
+monitor-polling rows) and the `test:snapshot` chain (`chart-export`,
+`tools-panels`, `perihelion-at-sun`, the star-field init alignment, the
+orbit-plane grid at the Sun, the Planet Info eye, the chip-click wake, the
+wobble-centre trace). What each row guards and the owner report it was born
+from: doc 111 §2. `npm run test:transparency` is the Phase 6 acceptance gate
+(green 84/84 since Phase B, required in CI).
 
-`/gates` runs the standalone model checks. `tools/verify/` holds gates and
-generators only — every script there either FAILS or WRITES; the narratives
-and the ascending-node derivations moved to `tools/explore/` (plan 13 A5).
-`npm run test:verify:list` prints the classification and the counts (the suite
-FAILS on an unclassified script); `npm run regen:cascade` lists the stale
-generators in regeneration order. The
-fifth gate, `scene-year-lengths.js`, samples the Node scene twin at −4000 and
-+10,000 with the solar-measurements exporter's own event definitions and pins
-the measured sidereal, tropical and anomalistic years of date to the one-family
-laws within 30 ms (fail-proven via `ESSRT_SCENE_YEARS_PLANT=1`). **Never
-run a generator as a test** — `nbody-secular.js` rewrites
-`data/nbody-secular-frequencies.json`, `deep-secular-modes.js` rewrites
-`data/nbody-deep-secular-modes.json`, `secular-series.js` rewrites
-`data/nbody-secular-series.json`, `obliquity-hybrid.js` rewrites
-`data/obliquity-hybrid-verdict.json` (and since v23.0 REFUSES if the
-shipped ε(t)'s realized obliquity period parts from the window-mean
-prediction by 0.1 % — fail-proven via `ESSRT_OBLIQ_REALIZED_PLANT=1`),
-`measure-rms-by-epoch.js` rewrites
-`data/chain-vs-jpl-rms.json` under `--write` (a plain run only prints),
-`equinox-vs-vondrak.js` rewrites `data/equinox-vs-vondrak.json` under
-`--write` (and REFUSES if a precession-of-date factor is missing), and
-the four campaign generators (cassini-results / lod-climate-correlation /
-eclipse-audit / lunar-alignment) rewrite their `data/*.json` under
-`--write` (the latter two REFUSE on divergence; `--rebaseline` is the
-conscious re-measurement path).
+`/gates` runs the standalone model checks. **Never run a generator as a
+test** — every script in `tools/verify/` either FAILS or WRITES: the N-body
+trio (`nbody-secular.js`, `deep-secular-modes.js`, `secular-series.js`),
+`obliquity-hybrid.js` (REFUSES if the realized obliquity period parts from the
+window-mean prediction), `measure-rms-by-epoch.js` and `equinox-vs-vondrak.js`
+(write under `--write`; the latter REFUSES if a precession-of-date factor is
+missing) and the four campaign generators (cassini-results /
+lod-climate-correlation / eclipse-audit / lunar-alignment — the latter two
+REFUSE on divergence; `--write --rebaseline` is the conscious re-measurement
+path). `npm run regen:cascade` lists the stale generators in regeneration order.
 
-**The integer-law retirement, COMPLETED (plan 07 R6).** The structural claims —
-exact eccentricity balance, the Saturn e-prediction, Config #7 mirror
-uniqueness, the node integers — were re-evaluated with the engine's own
-dynamical inputs (doc 109 is the evidence record) and retired; the nine
-instruments that computed them are now DELETED with the ψ/K laws they read
-(`verify-laws`, `balance-search`, `config1-proof`, `configuration-analysis`,
-`dual-balance-optimizer`, `eccentricity-balance`, `epoch-independence`,
-`inclination-verification`, `inclination-optimization`, plus
-`tools/explore/balance-with-dynamical-nodes.mjs`). What survives as a
-documented observation: under the retired
-integer weights the 8-planet eccentricity balance holds to ~98 % with the
-engine's long-term mean eccentricities (99.8636 % was the tuned-inputs figure
-— and note that figure had quietly stopped reproducing: the live construction
-read 99.8717 % at retirement, because upstream inputs moved after the last
-search run and nothing re-recorded the preset, since no gate and no published
-surface read it). `data/balance-presets.json` stays as the frozen search
-record that docs 10/109 cite; it is no longer regenerable. **Plan 07 R5/R9
-(model v18.0, physics MAJOR 14): the ψ inclination law and the
-geometric-elements device are DELETED** — the ψ/K law module,
-`orientation.cjs`, `asc-node-integrator.cjs`, the browser's
-`calculateDynamicAscendingNodeFromTilts` / `computePlanetInvPlaneInclinationDynamic`
-/ `computeInclinationEarth`, the Node mirrors in `orbital-engine.js`, and
-Earth's H/3 inclination cosine and −H/5 node in the package. A planet's
-inclination and node of date are the chain's elements; Earth's are the
-ONE-SOURCE engine normal against the banked invariable plane
-(`model.earth.inclinationDeg/ascendingNodeDeg` ≡ the browser's
-`inclInvPlaneModel`/`ascNodeInvPlaneModel`, pinned by the API gate; the
-device read 1.24° vs 1.91° at −100 kyr). The integrator's seven browser
-writes had been overwritten by the chain every frame since K5b — its
-display reach was zero; its only gated reach was 28 golden probes. The
-K device CONSTANTS (`earthtiltMean`, `earthInvPlaneInclinationAmplitude`,
-`earthRAAngle`, the wheel periods and the wheels' J2000 phase
-`kDeviceWheelPhaseAtJ2000Cycles`) were the scene's J2000 pose, not a law —
-DELETED at plan 11 step 4 with the three precession wheels: the scene's world
-frame is the J2000 ecliptic (`@essrt/physics` `computeSceneWorldFrameJ2000`,
-world Y the J2000 ecliptic pole, the equinox along world +X at view azimuth
-90° — the browser's own pose, measured 90.0066° with 0.026° of tilt on the
-pre-plan-11 bundle, both dropped; step 4 first shipped 158.2265°, the NODE
-twin's pose — 180° − the retired inclination anchor 21.7735° — and turned the
-browser's world 68.2265° about the pole against its skydome texture while
-every gate stayed green, because every gated quantity is frame-invariant;
-corrected at physics 22.0.1, the gate now pins the convention against the
-frame's columns), and every frame of date is
-engine-placed through it; observables are R-invariant, only the view is R
-(`earthInvPlaneInclinationMean`, the device's mean inclination, left at plan 11
-step 2 — its one reach was the invariable-plane disc's init pose). `psiValue`
-is frozen in the registry like `kValue`. **Plan 07 R10 (model v21.0,
-physics MAJOR 17, model-values MAJOR 16): the combs' phase origin is J2000.**
-The fitted origin t₀ (`perihelionalignmentYear` − `temperatureGraphMostLikely`
-× H/16 = −302,635, the "balanced year") was rotated out of every (sin, cos)
-pair EXACTLY — no refit, `tools/fit/reorigin-combs-j2000.mjs` (deleted with
-the last comb at plan 09 step 7a), c0 = (2000 −
-t₀)/H = 0.908498525276082 anchor units, bit-identical on every package
-surface over ±300 kyr — and its two inputs left the JSON (literals gate
-ratchet). The RA day offset's cosine literals became the fitted family
-`RA_DAY_OFFSET_MS` (deleted at plan 09 step 5b: it was the equation of time's
-window term of the Framework-Verification instrument, not a motion). Trap
-measured on the way: the K-device wheels were posed
-on t₀ too; moving them to J2000 tilted the whole scaffold 1.25° (R left the
-identity) and the NASA-convention umbra diagnostic — which rotates the
-aberration about WORLD Y as the ecliptic pole — moved 0.45″ while every
-observable stayed bit-close (the engine places the Earth frame, the Sun and
-the Moon stack over the scaffold). The pose is a recorded constant, so it
-stays as c0; the diagnostic now rotates the aberration about the ecliptic
-pole OF DATE built in the rotation-axis frame (the NASA rows moved ≤0.19″
-at the ancient events — the ~47″/cy tilt of the ecliptic the world-Y form
-ignored), and any new world-axis reader in `src/script.js` must do the
-same. `cyclesBetweenYears(2000, Y, N)` was the integrated form from
-J2000 (the R3 call-shape rule's `driftRefYear` the model start, not 2000);
-since plan 09 step 5c the K-device wheels no longer ride it (the counter
-itself is deleted at step 7a) — they turn
-uniformly at their recorded J2000 rates from the recorded J2000 phase (the
-engine frame is placed over them, R4). **Plan 07 R1/R8 (model v19.0,
-physics MAJOR 15, model-values MAJOR 14): the retired laws' INPUTS left
-`model-parameters.json`** — `perihelionEclipticFraction`, the per-planet
-divisor key, `inclinationCycleAnchor`, `antiPhase` (planets and additional
-bodies); plan 09 step 6 added Earth's `earthInclinationCycleAnchor` (the H/3
-eccentricity law's 21.77°, astro-reference) — the scene pose it also set is
-the recorded `kDeviceInclinationPhaseJ2000Deg`; the
-literals gate FAILS if any returns (fail-proven via `ESSRT_LITERALS_PLANT=1`).
-`perihelionEclipticYears` is the chain's inertial apsidal period
-1,296,000/g in every runtime (Mercury 232,437 yr; the lattice read 243,867),
-with no deep-time H-scaling — g scales with the solar mass only, and
-`recomputePlanetCyclesForEpoch` is a no-op kept for call order. Saturn's
-anti-phase sign in the scene scaffolding is the scene convention
-`key === 'saturn'`, not a JSON flag. **Plan 07, the `windowAffine` bound
-(model v20.0, physics MAJOR 16): the chain's era affine is BOUNDED at its
-fit window.** The K4.5 periodic layer's `windowAffine` (off + slope·dt on
-λ̄/a/k/h/q/p, the k45e era solve over ±2,500 yr) was the chain's one
-unbounded term; the evaluator now holds the slope's argument at
-±`meta.periodicTermsSpanYr` (carried onto every chain by
-`buildPlanetChainsFromArtifactData`; a span-less affine is refused).
-Bit-identical inside the window; beyond it the multi-mode skeleton carries
-the chain alone. Measured: unclamped, the slope alone moved Saturn's λ̄ 430°
-and Neptune's a 1,342 ppm by ±100 kyr; the series handover boundaries read
-Jupiter 1344/854, Saturn 442/604, Neptune 432/432 kyr (were 138/86, 222/88,
-134/358 — the affine's extrapolation, not the skeleton's). The series
-verdict now hashes the evaluator and the chain artifact its handover rows
-run on; 21 registry keys (the planets' `InclMean`/`InclAmp`/`InclMin`/`InclMax`
-over ±10 Myr, the Uranus/Neptune fluctuation rows) moved with it — Saturn's
-half-range 0.274 → 0.126° was the affine's drift. **The planet chains moved to engine-D elements (the P5 flip,
-9aa91a6), and the legacy geometric planet path was EXCISED (K5,
-c0399f6): the chain is the ONLY planet path** — the simulator renders
-the seven planets, their orbit rings, traces, perihelion markers, panels
-and the invariable-plane machinery (heights, mass gauge, Sun-SSB) from
-the model's own N-body chain (`@essrt/physics/planets/keplerian-chain` +
-the governed artifact). The fitted correction stack (parallax /
-gravitation / elongation — keys, evaluators, fitters ex-Steps 2/5a-5b)
-is deleted; git history carries its record. The Law-4/Law-5
-constants (`K = 3.4143e-6`; base eccentricities from the balance
-construction) survive only in the legacy scene scaffolding (device
-anchors, the no-chain bodies Pluto/Halley/Eros, and the o.fib*
-diagnostics). Earth, the Moon and the Sun stay on the engine-K
-hierarchy — the two-engine interface; the historical gate suite is
-calibrated on it.
+**The planet-channel and era-device retirements** (plans 07, 09, 11: the
+integer laws, the ψ/K device, the combs, the K-device pose, the
+`windowAffine` bound, the chain as the ONLY planet path) are recorded in
+doc 109 §23. Earth, the Moon and the Sun stay on the engine-K hierarchy — the
+two-engine interface; the historical gate suite is calibrated on it.
 
-**The falsification criterion.** The model stands falsifiable on three named,
-pre-registered legs: (1) **the deep-time scaling split** — the axial
-precession must follow the COMPOSED lunisolar rate
-ψ̇(t) = [ω(t)/ω₀]·p₀·[f_S + (1 − f_S)(a₀/a_M(t))³] (spin from the recession
-history, the lunar torque growing on the Moon's distance; since plan 12
-option A the distance history a_M(t) is a CITED INPUT — Farhat et al. 2022's
-published solution, `data/astrogeo22-earth-moon.json`, read as a shape on the
-observed J2000 distance with the LLR rate as its J2000 slope — so the leg
-tests the model's physics on it and nothing in the chain is fitted to the
-rocks; the quartic's α₃/α₄, the rock-fitted regime knots, the solar
-channels and the Roche-crossing "self-validation" are DELETED; ONE home
-`@essrt/physics/earth/precession-composed`; its J2000 anchor p₀ is the
-model's ONE J2000 precession reading — since plan 09 the IAU 2006 general
-precession p_A = 50.28796195 ″/yr, an INPUT (astro-reference
-`generalPrecessionJ2000_arcsecPerYr`, T_p = 25,771.575 yr); before plan 09
-it was the retired year combs' beat at 2000, 25,771.395 yr (plan 06 S5),
-8 ppm faster, and that 8 ppm was absorbing a sidereal-year-input mismatch
-against DE441 (Sun vs Horizons gained +1″ per millennium on p_A) — a
-sidereal-year finding, parked; **T_p(t) is the published deep-time clock**
-(the retired unit H(t) scaled with it but was not 13 of them — H₀/T_p =
-13.011, H₀ fitted on the perihelion-of-date beat, so H/13 = 25,793.6 was the
-fit anchor's reading, 0.086 % slow, never a period; the unit function
-`hAtAge` left the physics at plan 09 step 7b; plan 06 D6/Phase 3/S5), **the obliquity band must follow the beat
-2π/(ψ̇ᵢₙ(t) − |s₃|)** — ψ̇ᵢₙ the spin axis's INERTIAL rate, the composed
-rate × the hybrid's self-anchor factor (model v22.0: 50.385 ″/yr at J2000
-in the shipped series-driven configuration, where the general precession p₀
-reads 50.288 — the +0.097 is IAU's planetary precession ψ_A − p_A; the beat
-41,098 yr the instantaneous limit; a record sees the WINDOW MEAN of ψ̇ᵢₙ
-with its of-date factors — 40,927 over the LR04 record, the climate
-formula's p+s₀ line on the orbital forcing alone 40,924, La2004's own
-series 40,900 on the same window; the general rate read 41,224) — (s₃ at
-its dynamical value under the measured
-solar-mass history — degenerate today with the pure precession-scaling
-reading "obliquity period ∝ T_p", roughly a factor two apart at 2.46 Ga;
-registry keys `obliqBeat*Kyr` / `obliqH8Scaled*Kyr` (name kept), doc 109
-§18). **Two named counters** (plan 06 D8) — the second DELETED at plan 09
-step 7a: the FROZEN era clock (the combs and the ∫dt/H phase table) rode its
-own fitted convention `eraClockHAtAge` = H₀·LOD/LOD₀ (pure spin scaling, the
-pre-Phase-3 "H/13 identity", shipped with the coefficients as a device
-constant — as a precession claim retired: it read ~35 % low against Lantink
-2022 at 2.46 Ga); plan 09 deleted the combs family by family (steps 2–6) and
-then the counter itself (`createPhaseMachinery`, `cyclesBetweenYears`,
-`eraClockHAtAge`, the cardinal record evaluator, the CSV `Cycle` column);
-the unit itself (`hAtAge`, the API's `epoch.h`, the `hAt*` registry keys)
-left at step 7b, and its INPUTS (`holisticyearLength`, `stepYears`, the
-device's rounded tropical-year input `inputmeanlengthsolaryearindays`, the
-planets' `ascendingNodeCyclesIn8H`) with every remaining H reader and
-registry key at step 7c — the K-device scaffold's wheels then rode the recorded
-`kDeviceWheelPeriodYears` pose block (keyed by wheel index; numerically the
-retired unit's 335,317/N, a pose, not a law) until plan 11 step 4 deleted the
-wheels and the block, the deep-eccentricity E-factor
-and the browser's sidereal day read the Julian and the DERIVED year, and the
-literals gate fails if any input returns. The
-long-eccentricity band stays at its modern class (scaled
-only by the measured solar-mass history); every newly dated Precambrian
-cyclostratigraphic section tests these halves (the precession side is
-GATED at 1.4 and 2.46 Ga — paleo-anchors rows `xiamaling-prec-1400` /
-`lantink-prec-2460`, which the structural clock fails; the deep obliquity
-PERIOD is the pre-registered, not-yet-discriminated prediction), and a
-section violating any half falsifies the corresponding tier. (2) **Historical-era exactness** — the fail-proven gate
-suite: eclipses (`eclipse-audit`), the LOD/ΔT stack, cardinal points, the
-45-anchor paleo bands (`paleo-anchors`, where an unexplained *improvement*
-fails too — every row a test on the cited history; the documented bands name
-their cause, the Mesoproterozoic 2.5–3.6σ gap to Zhou 2024's precession
-constants being the stated open discrepancy). (3) **Two-expansions μ-consistency** — the rock-measured
-long-eccentricity period must track 405.6 kyr / μ^1.153 (the engine-measured
-beat response, W5; 1/μ is the first-order case) under the measured solar
-mass history (currently μ(2.48 Ga) = 1.00 ± 0.07, quoted through the
-conservative first-order slope). The former Config-#7
-criterion (checks 46–50 of the deleted `verify-laws`, the mirror-unique
-configuration in `data/balance-presets.json`) is retired with its record.
+**The falsification criterion.** Three named, pre-registered legs (long form,
+derivation history and the retired fourth leg: doc 111 §3):
+
+1. **The deep-time scaling split** — the axial precession follows the COMPOSED
+   lunisolar rate ψ̇(t) = [ω(t)/ω₀]·p₀·[f_S + (1 − f_S)(a₀/a_M(t))³] on the
+   CITED Earth–Moon distance history (Farhat et al. 2022, plan 12 option A;
+   ONE home `@essrt/physics/earth/precession-composed`; p₀ the IAU 2006 p_A,
+   T_p(t) the published deep-time clock); the obliquity band follows the beat
+   2π/(ψ̇ᵢₙ(t) − |s₃|) with ψ̇ᵢₙ the spin axis's INERTIAL rate (a record sees
+   its WINDOW MEAN); the long-eccentricity band stays at its modern class,
+   scaled only by the measured solar-mass history. Gated at 1.4 and 2.46 Ga
+   (`paleo-anchors` rows `xiamaling-prec-1400` / `lantink-prec-2460`); the
+   deep obliquity PERIOD is the pre-registered, not-yet-discriminated
+   prediction. A Precambrian section violating either half falsifies its tier.
+2. **Historical-era exactness** — the fail-proven gate suite: eclipses, the
+   LOD/ΔT stack, cardinal points, the 45-anchor paleo bands (an unexplained
+   *improvement* fails too; the Mesoproterozoic 2.5–3.6σ gap to Zhou 2024's
+   precession constants is the stated open discrepancy).
+3. **Two-expansions μ-consistency** — the rock-measured long-eccentricity
+   period tracks 405.6 kyr / μ^1.153 under the measured solar-mass history
+   (μ(2.48 Ga) = 1.00 ± 0.07).
 
 ## Skills
 
@@ -705,14 +256,14 @@ what actually made corrections stick here.
 | path | what |
 |---|---|
 | `src/script.js` | browser scene + UI + formulas (monolith) |
-| `tools/lib/` | Node engine — `scene-graph`, `orbital-engine`, `deep-time`, `constants` |
+| `tools/lib/` | Node engine — `scene-graph`, `orbital-engine`, `deep-time` (a thin consumer of the package's `deltat/deep-time-chain` since plan 13 B2), `constants` (export names fixed; re-sourced from the package's one-home helpers) |
 | `tools/fit/` | CLI shims for the fitting pipeline — implementations live in `packages/fitting/src` |
 | `tools/verify/` | the gates and the artifact generators — every script fails or writes (`npm run test:verify:list` for the counts; `npm run regen:cascade` for the stale set in order) |
-| `packages/physics`, `packages/model-values` | the published npm packages (@essrt scope) — the website and world consume these; refits reach them via `values:package:write` + republish |
+| `packages/physics`, `packages/model-values` | the published npm packages (@essrt scope) — the website and world consume these; refits reach them via `values:package:write` + republish. One-home helpers (plan 13 B1–B3): `time/calendar`, `math/angles`, `earth/mass-chain`, `constants/units`, `deltat/deep-time-chain` |
 | `tools/explore/` | frozen research one-offs (and the print-only scripts that left `tools/verify/`) — findings live in `docs/`; a script stays only while something names it (its README states the rule) |
-| `data/deltaT-4flag-fit.json`, `data/core-mantle-resonator-stage1.json`, `public/input/climate-formula-coefficients.json`, `data/deep-time-fitted.json` | the shipped fitted artifacts, each its fitter's (the last holds the GIA τ only since plan 12 — the quartic's α₃/α₄ and the regime block left with option A) — embedded by `generate.mjs`; `public/input/fitted-coefficients.json` is deleted (plan 11 step 1) |
+| `data/deltaT-4flag-fit.json`, `data/core-mantle-resonator-stage1.json`, `public/input/climate-formula-coefficients.json`, `data/deep-time-fitted.json` | the shipped fitted artifacts, each its fitter's (the last holds the GIA τ only since plan 12) — embedded by `generate.mjs` |
 | `data/astrogeo22-earth-moon.json` | the CITED Earth–Moon distance history (Farhat et al. 2022, AstroGeo22; `npm run import:astrogeo22`) — embedded as `deltat/moon-distance-artifact.cjs`, read by `deltat/moon-distance-history.cjs` (plan 12 option A) |
-| `docs/` | 75 numbered docs; `40-architecture`, `99-essrt` are cross-referenced |
+| `docs/` | the numbered docs (`00-readme` is the index); `40-architecture`, `99-essrt`, `110-calculation-map`, `111-measured-traps-and-gate-origins` are cross-referenced |
 
 The simulator at 3d.holisticuniverse.com auto-deploys from every green main
 push (the Pages job in ci.yml) — nothing is hand-uploaded anywhere.

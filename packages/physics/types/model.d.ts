@@ -1,4 +1,10 @@
 /**
+ * RA-day-offset Fourier amplitudes (ms). KNOWN EXCEPTION carried over from
+ * the reference adapters: these are fit results that live as literals in the
+ * engine too — packaging them into FITTED_COEFFICIENTS is the remaining
+ * §7a-step-1b move; until then this is their single packaged home.
+ */
+/**
  * Assemble the model surfaces from a resolved constants context + fitted
  * coefficients. Internal: `createModel` in index.js composes this with the
  * §2d context validation and counterfactual hashing — call that, not this.
@@ -41,7 +47,7 @@ export function assembleModel(C: Readonly<Record<string, any>>, F: Readonly<Reco
         lunarSmallParameter: number;
         moonMassFraction: number;
         solarTidalShiftKm: number;
-        moonDistanceCorrectedKm: any;
+        moonDistanceCorrectedKm: number;
         gmEarthMoonSystemKm3S2: number;
         gmEarthKm3S2: number;
         gmMoonKm3S2: number;

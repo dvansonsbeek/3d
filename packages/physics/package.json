@@ -1,9 +1,9 @@
 {
   "name": "@essrt/physics",
-  "version": "23.0.0",
+  "version": "23.1.0",
   "description": "ESSRT (Expanding Solar System Resonance Theory) physics core — pure, injectable-constants, no I/O, no globals, no DOM. The complete model incl. fitted coefficients; every published version immutably ships one recorded model identity.",
   "essrt": {
-    "modelVersion": "v26.0",
+    "modelVersion": "v26.1",
     "_note": "The model identity this package version ships (IP-unified-architecture §10: package semver tracks the API axis; the model version + CONSTANTS_HASH/COEFFICIENTS_HASH in src/constants/ carry the scientific identity). The version-pinning gate enforces this pairing against public/input/model-version.json."
   },
   "type": "module",
@@ -32,6 +32,11 @@
   "exports": {
     ".": { "types": "./types/index.d.ts", "default": "./src/index.js" },
     "./phase/deep-calendar": { "types": "./types/phase/deep-calendar.d.cts", "default": "./src/phase/deep-calendar.cjs" },
+    "./time/calendar": { "types": "./types/time/calendar.d.cts", "default": "./src/time/calendar.cjs" },
+    "./deltat/deep-time-chain": { "types": "./types/deltat/deep-time-chain.d.ts", "default": "./src/deltat/deep-time-chain.js" },
+    "./earth/mass-chain": { "types": "./types/earth/mass-chain.d.cts", "default": "./src/earth/mass-chain.cjs" },
+    "./constants/units": { "types": "./types/constants/units.d.cts", "default": "./src/constants/units.cjs" },
+    "./math/angles": { "types": "./types/math/angles.d.cts", "default": "./src/math/angles.cjs" },
     "./cardinal/one-source-structure": { "types": "./types/cardinal/one-source-structure.d.cts", "default": "./src/cardinal/one-source-structure.cjs" },
     "./moon/deep-ecc-channel": { "types": "./types/moon/deep-ecc-channel.d.cts", "default": "./src/moon/deep-ecc-channel.cjs" },
     "./moon/deep-modes-artifact": { "types": "./types/moon/deep-modes-artifact.d.cts", "default": "./src/moon/deep-modes-artifact.cjs" },

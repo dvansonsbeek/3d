@@ -121,12 +121,7 @@ export function createMoonArguments({ constants, fns }: {
         };
     };
 };
-/**
- * Astronomical JD → decimal year: Julian calendar before 1582-10-15,
- * Gregorian after (Meeus Ch. 7 inverse). The S3-aligned coordinate for the
- * Sun secular deviations. @param {number} jd @returns {number}
- */
-export function jdToDecimalYear(jd: number): number;
+import { jdToDecimalYear } from "../time/calendar.cjs";
 /**
  * @typedef {{Lp: number, D: number, M: number, Mp: number, F: number}} MoonArgsDeg
  */
@@ -137,3 +132,4 @@ export function jdToDecimalYear(jd: number): number;
  *  5c: it was written as the era unit's twelfth, H/12, "lattice-derived";
  *  the value is kept bit-identical and named for what it is). */
 export const SECULAR_COMPLETION_TAPER_YEARS: 27943.083333333332;
+export { jdToDecimalYear };

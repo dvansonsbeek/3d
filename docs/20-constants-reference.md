@@ -1,6 +1,6 @@
 ---
 docVersion: 1.0
-modelVersion: v26.0
+modelVersion: v26.1
 coefficients: sha256:ff77fbc9baa370e4
 status: current
 ---
@@ -46,7 +46,7 @@ Per the [Expanding Solar System Resonance Theory (Doc 99)](99-expanding-solar-sy
 
 The clocks evolve under two physically independent drivers: **Driver 1** = Earth-Moon tidal evolution (LOD grows, Moon recedes; the composed lunisolar precession period T_p(t) follows it); **Driver 2** = solar mass loss (every planet's orbit slowly expands via Kepler's 3rd law). At Devonian (380 Ma) T_p ≈ <!--v:axialPrecAtDevonian-->21,396<!--/v--> yr; at +200 Myr T_p ≈ <!--v:axialPrecAt200MyrFuture-->28,202<!--/v--> yr. (The unit H(t) that scaled with it — 13.011 periods, a fit constant's multiple — left the model at plan 09 step 7b.) The K-device wheel periods are a J2000 pose and do not scale; no observable rides them.
 
-For the canonical derivation chain from `t_Ma` through LOD, the composed precession period, AU, M_Sun, Kepler year, Moon distance, Moon period, anomalistic year, stellar/sidereal days, and planet orbital + synodic periods, see [Doc 99 — ESSRT](99-expanding-solar-system-resonance-theory.md) and the `mean*AtAge` family in `tools/lib/deep-time.js`. (The per-planet integer-label tabulation on the anchor's eight-unit interval is archived.)
+For the canonical derivation chain from `t_Ma` through LOD, the composed precession period, AU, M_Sun, Kepler year, Moon distance, Moon period, anomalistic year, stellar/sidereal days, and planet orbital + synodic periods, see [Doc 99 — ESSRT](99-expanding-solar-system-resonance-theory.md) and the `mean*AtAge` family — ONE home since plan 13 B2, `@essrt/physics/deltat/deep-time-chain` (`createDeepTimeChain`; `tools/lib/deep-time.js` and the package model are its consumers). (The per-planet integer-label tabulation on the anchor's eight-unit interval is archived.)
 
 ---
 
