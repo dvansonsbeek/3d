@@ -1,7 +1,7 @@
 ---
 docVersion: 1.0
-modelVersion: v26.3
-coefficients: sha256:f2387635a8f80374
+modelVersion: v26.4
+coefficients: sha256:4af192da697c09a0
 status: current
 ---
 
@@ -46,11 +46,9 @@ The Interactive 3D Solar System Simulation is a sophisticated WebGL-based astron
 **Core Capabilities:**
 - Accurate planetary positions from the model's own N-body element chain
   (`@essrt/physics/planets/keplerian-chain` + the governed artifact
-  `data/nbody-secular-frequencies.json` — the ONLY planet path since the
-  K5 legacy-chain excision; the geometric planet chains described in this
-  document survive only as scene scaffolding and for the no-chain bodies,
-  and their fitted corrections are deleted — see doc 41's engine-D
-  rendering note; the correction-stack records are archived)
+  `data/nbody-secular-frequencies.json` — the ONLY planet path; the
+  geometric chains serve the no-chain bodies Pluto, Halley and Eros and the
+  scene scaffolding — doc 41's engine-D rendering note)
 - Long-term precession cycles (axial, perihelion, inclination)
 - The standard-model reference overlay (K8): VSOP87A ghost bodies for the
   Sun + seven planets with a live per-body Δ readout — one-way reference,
@@ -227,15 +225,14 @@ The monolithic script.js (~59,800 lines) is organized into logical sections. Con
 ```
 ┌─────────────────────────────────────────────────────────────────────┐
 │  CONSTANTS & FORMULAS (top of file)                                 │
-│  A. Model parameters: Earth params, K-device pose, Moon, planets    │
+│  A. The scene epoch, the research toggles, the two display literals │
 │  B. Fitted coefficients: the ΔT stack, the resonator, the climate   │
-│     formula, balance presets (the comb families are deleted,        │
-│     plan 09; the predictive formula left at plan 06 R8)             │
+│     formula; the frozen balance-preset record                       │
 │  C. Astro references: J2000 elements, body diameters, inclination  │
 │     reference data, ASTRO_REFERENCE object                          │
 │  D. Moon Meeus tables (Ch.47 lunar corrections)                     │
-│  E. Derived constants: year lengths, precession periods, mass       │
-│     fractions, planet inclinations (retired integer laws)           │
+│  E. Derived constants: year lengths, precession periods, the mass   │
+│     chain (one home: @essrt/physics earth/mass-chain)               │
 │  E3. OrbitalFormulas library (50+ methods: Kepler solver, anomaly   │
 │     conversions, frame transforms, Laplace coefficients)            │
 │  F. Display-only constants                                          │
@@ -518,19 +515,16 @@ model's own N-body secular series (`data/nbody-secular-series.json`,
 `createYearLengths`, `createCardinalStructure`, the λ̇ sidereal channel).
 The displayed/served year lengths and precession beats are ONE family
 from these factories (chart ≡ panel ≡ report ≡ API ≡ Node engine). The
-fitted Fourier laws of the frozen era-certification device — the unit, its
-counters and every correction comb — are deleted (plan 09, model v24.0;
-`model-version.json` `_v24Note`); the former `?hybridSpin=0` user opt-out
-was removed at plan 06 D5, and the plan-02 record in the private repo
-carries the full decision trail. The K-device scene scaffold remains as the
-scene's recorded J2000 pose; the engine places the Earth frame, the Sun and
-the Moon stack over it.
+motion model carries no fitted correction: the movements are the composed
+precession clock and the N-body series. The scene's world frame is the
+J2000 ecliptic and the engine places the Earth frame, the Sun and the Moon
+stack in it every frame.
 
 ### Precession Cycles (dynamical, J2000)
 
-The published periods are dynamical (plan 06 S5/S6, plan 09); the
-*displayed of-date* values are the beats of the one-source year-length
-family (e.g. axial ≈ 25,771.6 yr at J2000, declining with date). See
+The published periods are dynamical; the *displayed of-date* values are
+the beats of the one-source year-length family (e.g. axial ≈ 25,771.6 yr
+at J2000, declining with date). See
 [doc 20 § Precession Periods](20-constants-reference.md) for the registry
 values.
 
@@ -541,11 +535,6 @@ values.
 | **Apsidal Precession** | the one-family anomalistic/sidereal beat | Perihelion revolution vs the fixed stars |
 | **Obliquity Cycle** | the beat 2π/(ψ̇ᵢₙ − \|s₃\|) | Axial tilt oscillation (~22.2° - ~24.7°) |
 | **Eccentricity Cycle** | the N-body secular series (e.g. the 405.6-kyr g₂ − g₅ line) | Orbital shape variation |
-
-(These were H/13, H/16, H/3, H/8 and H/16 + H/3 of the retired fitted unit;
-the scene's K-device wheels kept those numbers as recorded pose periods until
-plan 11 step 4 deleted the wheels — the scene's world frame is the J2000
-ecliptic and every frame of date is engine-placed.)
 
 ### Invariable Plane System
 
@@ -566,19 +555,12 @@ Features:
 ### Earth's perihelion device and the planets' Earth-frame rate
 
 ```
-├── (plan 09 step 4: PERI_HARMONICS + PERI_OFFSET, calcEarthPerihelionPredictive and
-│    calcERD — the Earth perihelion comb — are deleted; Earth's perihelion of date is
-│    the series' ϖ, createModel().earth.perihelionLongitudeDeg)
+├── Earth's perihelion of date is the series' ϖ (createModel().earth.perihelionLongitudeDeg)
 └── perihelionFrameBreakdown(planetKey, year) → the planet's perihelion rate in two
-    coordinates: the lattice ecliptic rate, its equatorial projection at the IAU
+    coordinates: the chain's ecliptic rate, its equatorial projection at the IAU
     J2000 longitude, and the Earth-frame RA rate as their sum
-    (lattice × dα/dλ + ∂α/∂ε·ε̇ — doc 13 §1.8, a kinematic identity)
+    (ecliptic × dα/dλ + ∂α/∂ε·ε̇ — doc 13 §1.8, a kinematic identity)
 ```
-
-The former **predictive formula system** (`buildPredictiveFeatures` /
-`PREDICT_COEFFS` / `predictGeocentricPrecession`, ~2,421 fitted terms per
-planet ported from Python) was retired at plan 06 R8: it reproduced the
-right-ascension rate of the perihelion marker in the retired geometric scene.
 
 ### Celestial Bodies
 

@@ -2,7 +2,7 @@
 // The fitted coefficients' shapes for TypeScript consumers (§2g); values live
 // in coefficients.js, emitted VERBATIM from the fit artifacts under data/.
 
-export declare const COEFFICIENTS_HASH: "f2387635a8f80374";
+export declare const COEFFICIENTS_HASH: "4af192da697c09a0";
 
 export declare const FITTED_COEFFICIENTS: {
   readonly BALANCE_PRESETS: Array<Array<number | string>>;
@@ -476,6 +476,18 @@ export declare const FITTED_COEFFICIENTS: {
       "consumer": string;
       "stitched_lr04_r2": number;
       "stitched_lr04_note": string;
+    };
+    "inputs": {
+      "generator": string;
+      "files": {
+        "data/cenco2pip-100kyr-bayesian.csv": string;
+        "data/epica-co2-bereiter2015.txt": string;
+        "data/l1-physical-lines.json": string;
+        "data/lr04-stack.txt": string;
+        "data/westerhold2020-cenogrid.tab": string;
+        "scripts/export_climate_formula_browser.py": string;
+        "scripts/milankovitch_climate_formula.py": string;
+      };
     };
   };
   readonly DT_RESONATOR: {

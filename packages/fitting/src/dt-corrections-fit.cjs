@@ -197,6 +197,11 @@ const C = require(path.join(TOOLS_LIB, 'constants.js'));
 // evaluated to (the runtimes read the fit file's `period_yr`; nothing
 // derives a period from H any more). `structural` keeps the historical
 // selection record only.
+// The artifact's own description — ONE string for the legacy and the joint
+// writers (the joint ship refreshes `_meta` and `config` from the code, so the
+// record follows the fitter and no fossil field survives a re-close).
+const META_DESCRIPTION = 'Sub-Milankovitch millennial ΔT correction stack (periods stated in years) fit against the Stephenson 2016 residual. Four cycles — Bond 1,466 yr, Hallstatt 2,430 yr, 5×Jose 897 yr, 4×Jose 716 yr — plus the core-mantle resonator episode, fitted JOINTLY (--joint: one design matrix, the USNO/deltaTStart anchors re-optimised with the coefficients, hard closure at J2000, amplitude caps). The legacy single-shot cascade (Bond solo → +Hallstatt → +Jose5 → +Jose4) survives as a stage-wise diagnostic only (fit_metrics). The periods were selected on a retired lattice (plan 09; the records are in each cycle\'s `structural` string and docs/102); the Eddy (999 yr) and Emp862 (862 yr) candidates were tested as 5th/6th flags and rolled back — see the rollback notes in CONFIG.cycles. Narrative: docs/104; the flag audit: docs/105.';
+
 const CONFIG = {
   cycles: [
     { name: 'bond',      period_yr: 1465.8666666666666,
@@ -212,11 +217,11 @@ const CONFIG = {
       fit_stage:  'with_bond_hallstatt',
       target_amp_s: 50 },
     { name: 'jose4',    period_yr: 715.5337423312883,
-      structural: '4×Jose 179 yr = 715.5 yr; gcd(3749, H) = 23. Cross-archive coherent in Steinhilber solar Φ + EPICA CO2 (see scripts/lattice_harmonic_scan.py --preset jose-family). Also degenerate with Bond/2 at ~733 yr; 4×Jose is the tighter anchor (0.083% vs 2.5%).',
+      structural: '4×Jose 179 yr = 715.5 yr; historical selection record: the former divisor 3749 (gcd 23). Cross-archive coherent in Steinhilber solar Φ + EPICA CO2 (the retired lattice harmonic scan, plan 09 step 7e — the record is docs/102). Also degenerate with Bond/2 at ~733 yr; 4×Jose is the tighter anchor (0.083 % vs 2.5 %).',
       fit_stage:  'with_bond_hallstatt_jose5',
       target_amp_s: 50 },
     { name: 'h253',     period_yr: 1325.3636363636363,
-      structural: 'H/253 = H/(11·23) = 1,325.4 yr; gcd(2024, H) = 23; 184th harmonic of 8H/11 (Earth ecliptic-perihelion family). Identified 2026-07-22 by L-5b §14 post-4-flag residual scan (flat ΔR²=0.031 peak n=2015-2024, gcd-compliant flank chosen) — see data/deltaT-h253-fifth-cycle-scan.json (GO verdict: medieval 990-bump window 98→17 s, no ancient regression). EPICA CO2 significant (amp 5.9 ppm vs p95 2.9, lattice_harmonic_scan); Steinhilber marginal (~95% threshold); cap-only ship keeps the amplitude below the free fit.',
+      structural: '1,325.4 yr; historical selection record: the former divisor 253 = 11·23 (gcd 23), the 184th harmonic of the retired perihelion-family divisor. Identified 2026-07-22 by the L-5b §14 post-4-flag residual scan (flat ΔR² = 0.031 peak over divisors 2015–2024, the gcd-compliant flank chosen) — see data/deltaT-h253-fifth-cycle-scan.json (GO verdict: medieval 990-bump window 98 → 17 s, no ancient regression). EPICA CO2 significant (amp 5.9 ppm vs p95 2.9, the retired lattice scan); Steinhilber marginal (~95 % threshold); cap-only ship keeps the amplitude below the free fit.',
       fit_stage:  'frozen_residual_after_D',
       target_amp_s: 75 },
     // Eddy (8H/2684 = 999.45 yr) TESTED AND ROLLED BACK 2026-07-12: the 5-cycle
@@ -1354,7 +1359,7 @@ function main() {
   // ─── Write JSON artifact ───
   const output = {
     _meta: {
-      description: 'Sub-Milankovitch millennial ΔT correction stack (periods stated in years) fit against Stephenson 2016 residual. Four cascaded stages (Bond solo → +Hallstatt → +Jose5 → +Jose4). Bond uses solo-fit phase (unconstrained amplitude, physical anchor). All other cycles use cap-only shipping (free-fit if below prior amplitude; scaled down to prior only if free > prior). Jose4 identified by cross-archive scans (Steinhilber+EPICA). Eddy (8H/2684 = 999 yr) and Emp862 (8H/3111 = 862 yr) were tested as 5th/6th flags but both rolled back — see rollback notes in CONFIG.cycles. See docs/102 § "Companion 8H lattice harmonics" and scripts/lattice_harmonic_scan.py.',
+      description: META_DESCRIPTION,
       generator: 'tools/fit/dt-corrections-fit.js',
       dt_corrections_disabled: process.env.DT_CORRECTIONS_DISABLED === '1',
     },
@@ -1812,6 +1817,16 @@ function runJointMode() {
   const flagNames = ['bond', 'hallstatt', 'jose5', 'jose4'];
   const fitPath = path.join(ROOT, 'data', 'deltaT-4flag-fit.json');
   const fitJson = JSON.parse(fs.readFileSync(fitPath, 'utf8'));
+  // The record follows the code: `_meta` and `config` are rewritten from this
+  // fitter, never patched — the legacy write's fossils (an H-lattice description,
+  // `H_yr` / `eight_H_yr`, each cycle's `lattice_n`, a deleted scan script named
+  // in a `structural` string) survived four re-closes by being left in place.
+  fitJson._meta = {
+    description: META_DESCRIPTION,
+    generator: 'tools/fit/dt-corrections-fit.js --joint',
+    dt_corrections_disabled: process.env.DT_CORRECTIONS_DISABLED === '1',
+  };
+  fitJson.config = JSON.parse(JSON.stringify(CONFIG));
   flagNames.forEach((nm, k) => {
     const cos = x[2 * k], sin = x[2 * k + 1];
     const d = FLAG_PERIODS_YR[nm];

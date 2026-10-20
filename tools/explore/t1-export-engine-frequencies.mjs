@@ -35,11 +35,35 @@ const R2A = (180 / Math.PI) * 3600;
 const SERIES_REL = 'data/nbody-secular-series.json';
 const m = createModel(undefined, { secularSeriesArtifact: require(join(ROOT, SERIES_REL)) });
 const earth = require(join(ROOT, MODES_REL)).modes.earth;
-/** @param {{omegaRadPerYr: number, re: number, im: number}} x */
-const line = (x) => ({ arcsecPerYr: x.omegaRadPerYr * R2A, amp: Math.hypot(x.re, x.im) });
-const z = earth.z.map(line);
+// THE LASKAR IDENTITY OF A MODE (TODO 2026-10-17): the deep table's modes are amplitude-sorted,
+// so its own indices are not Laskar's (its "g3−g4" was the 110-kyr line Laskar writes g₃−g₁).
+// Every consumer that names a line — the L1 physical-lines export, doc 92, the climate page —
+// reads the Laskar identity from here: the nearest Laskar 2004 reference frequency (the ONE
+// table, carried by the chain artifact as `laskarReference`) within LASKAR_TOL ″/yr; null when
+// no reference mode is that close (the small combination modes), and the consumer then labels
+// the mode by its own index with a non-Laskar prefix.
+const CHAIN_REL = 'data/nbody-secular-frequencies.json';
+const LASKAR = require(join(ROOT, CHAIN_REL)).laskarReference;
+if (!LASKAR || !LASKAR.g || !LASKAR.s) throw new Error(`${CHAIN_REL} carries no laskarReference — regenerate it (node tools/verify/nbody-secular.js --write)`);
+// ″/yr — the engine's eight leading modes sit within 0.01 of Laskar's (g1…g6, s1…s4, s6, s7); the
+// combination modes beside them sit 0.09–0.29 away (measured: at 0.3 three of them took Laskar
+// names — 17.09 and 17.64 as "g3", 18.02 as "g4" — and the 96.9/98.8/101.0-kyr lines all read
+// "g3−g5"), so the gate is tight: a mode is Laskar's only when it is Laskar's.
+const LASKAR_TOL = 0.05;
+/** @param {number} f ″/yr @param {Record<string, number>} table @returns {string|null} */
+const laskarOf = (f, table) => {
+  let best = null, bestD = Infinity;
+  for (const [name, ref] of Object.entries(table)) { const d = Math.abs(f - ref); if (d < bestD) { bestD = d; best = name; } }
+  return bestD <= LASKAR_TOL ? best : null;
+};
+/** @param {{omegaRadPerYr: number, re: number, im: number}} x @param {Record<string, number>} table */
+const line = (x, table) => {
+  const f = x.omegaRadPerYr * R2A;
+  return { arcsecPerYr: f, amp: Math.hypot(x.re, x.im), laskar: laskarOf(f, table) };
+};
+const z = earth.z.map((x) => line(x, LASKAR.g));
 // the zero-frequency ζ mode is the constant offset to the invariable plane — no obliquity line
-const zeta = earth.zeta.map(line).filter((x) => Math.abs(x.arcsecPerYr) > 1e-6);
+const zeta = earth.zeta.map((x) => line(x, LASKAR.s)).filter((x) => Math.abs(x.arcsecPerYr) > 1e-6);
 const Tp = m.epoch.axialPrecessionYearsAtYear(2000);
 const TpInertial = m.lunisolar.spinAxisInertialPeriodYearsJ2000;
 // THE RECORD WINDOW the obliquity lines are derived over: the LR04 stack's span (its last age row),
@@ -72,7 +96,7 @@ const out = {
   lr04WindowKyr: [0, lr04LastAgeKyr],
   z,
   zeta,
-  inputs: buildInputsBlock(`node ${SELF_REL} --write`, [MODES_REL, SERIES_REL, LR04_REL, SELF_REL]),   // (plan 11 step 6: model-parameters.json is deleted)
+  inputs: buildInputsBlock(`node ${SELF_REL} --write`, [MODES_REL, SERIES_REL, LR04_REL, CHAIN_REL, SELF_REL]),   // (plan 11 step 6: model-parameters.json is deleted)
 };
 
 console.log(`p = ${out.pArcsecPerYr.toFixed(4)} ″/yr (T_p = ${Tp.toFixed(2)} yr) · pInertial = ${out.pInertialArcsecPerYr.toFixed(4)} ″/yr (${TpInertial.toFixed(2)} yr) · pInertialMeanLr04 = ${pInertialMeanLr04.toFixed(4)} ″/yr over 0–${lr04LastAgeKyr} kyr · ${z.length} z modes · ${zeta.length} ζ modes`);

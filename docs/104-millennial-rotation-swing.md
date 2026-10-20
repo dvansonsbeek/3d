@@ -1,7 +1,7 @@
 ---
 docVersion: 1.0
-modelVersion: v26.3
-coefficients: sha256:f2387635a8f80374
+modelVersion: v26.4
+coefficients: sha256:4af192da697c09a0
 status: current
 ---
 
@@ -15,8 +15,8 @@ Research synthesis — closes the former TODO item "identify the physical channe
 
 ---
 
-**Update — the drive tone is RETIRED (plan 06 D7 follow-up).** Once the
-GIA channel became the lagged response to the ice history (D7), the swing
+**The drive tone is retired.** Once the GIA channel became the lagged
+response to the ice history, the swing
 was re-measured component by component through the joint fitter
 (`DT_RESONATOR_COMPONENTS`, Espenak / full-window RMS): all three
 components 12.04 / 21.34 s · no swing 21.79 / 69.58 · the two impulse

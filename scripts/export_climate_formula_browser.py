@@ -60,6 +60,20 @@ from milankovitch_climate_formula import (  # noqa: E402
 SCRIPT_DIR = Path(__file__).resolve().parent
 OUT_PATH = SCRIPT_DIR.parent / "public" / "input" / "climate-formula-coefficients.json"
 
+# inputs-stamped (tools/verify/artifact-freshness.js REQUIRED; a regen-cascade node):
+# the shipped coefficients are a FIT of the proxy records on the L1 line set, so the
+# line set and the records are inputs — measured: the set moved at the plan-12 §8
+# re-derivation and the shipped file stayed at the previous fit for two commits.
+sys.path.insert(0, str(SCRIPT_DIR.parent / "tools" / "fit" / "python"))
+from artifact_inputs import build_inputs_block  # noqa: E402
+
+SELF_REL = "scripts/export_climate_formula_browser.py"
+INPUT_FILES = [
+    "data/l1-physical-lines.json", "data/lr04-stack.txt", "data/westerhold2020-cenogrid.tab",
+    "data/epica-co2-bereiter2015.txt", "data/cenco2pip-100kyr-bayesian.csv",
+    "scripts/milankovitch_climate_formula.py", SELF_REL,
+]
+
 
 def preprocess_with_trend(ages, vals, window, dt_kyr):
     """Like preprocess() in the canonical formula, but also returns the
@@ -270,6 +284,7 @@ def main():
             "stitched_lr04_r2": stitched_r2,
             "stitched_lr04_note": "R² of the three-regime stitched curve (post-MPT / iNHG-MPT / pre-iNHG blocks) against the raw gridded LR04 stack, 0-5320 kyr",
         },
+        "inputs": build_inputs_block(f"python3 {SELF_REL}", INPUT_FILES),
     }
 
     OUT_PATH.parent.mkdir(parents=True, exist_ok=True)

@@ -16,7 +16,8 @@
  * edges and prints the topological order. It computes nothing itself.
  *
  * Nodes:
- *   - every data/*.json with an `inputs.files` block (stale when a recorded hash moved)
+ *   - every data/*.json and public/input/*.json with an `inputs.files` block (stale when a
+ *     recorded hash moved; public/input/ holds the browser's climate coefficients, a FIT)
  *   - `constants:generate` (stale when `node tools/constants/generate.mjs` — the check
  *     mode — exits non-zero; its inputs are the data/ and public/input/ files the
  *     generator reads, parsed from the generator's own source so the list has one home)
@@ -50,8 +51,8 @@ function isGitIgnored(rel) {
 /** @type {Map<string, Node>} */
 const nodes = new Map();
 
-for (const f of readdirSync(join(ROOT, 'data')).filter((x) => x.endsWith('.json')).sort()) {
-  const rel = `data/${f}`;
+for (const dir of ['data', 'public/input']) for (const f of readdirSync(join(ROOT, dir)).filter((x) => x.endsWith('.json')).sort()) {
+  const rel = `${dir}/${f}`;
   let j;
   try { j = JSON.parse(readFileSync(join(ROOT, rel), 'utf8')); } catch { continue; }
   if (!j || !j.inputs || !j.inputs.files) continue;

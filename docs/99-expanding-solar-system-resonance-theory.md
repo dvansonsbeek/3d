@@ -1,7 +1,7 @@
 ---
 docVersion: 1.0
-modelVersion: v26.3
-coefficients: sha256:f2387635a8f80374
+modelVersion: v26.4
+coefficients: sha256:4af192da697c09a0
 status: current
 ---
 
@@ -177,11 +177,10 @@ the IAU 2006 general precession p_A (an input since plan 09; T_p(t) is the
 published deep-time clock)** (plan 06 D6, plan 09):
 one home, `@essrt/physics/earth/precession-composed` inside the deep-time
 factory, the evaluator the obliquity hybrid precesses on and the
-paleo-anchors gate checks. The model's earlier deep-time clock — H scaling
-with the day length alone, H₀·LOD(t)/LOD₀, which missed the lunar 1/a³
-torque growth and read 9 ″/yr low at 650 Ma, 24 % low at 1.4 Ga and 35 %
-low at 2.46 Ga — is retired, and the frozen era clock that kept it as a
-phase convention is deleted (plan 09 step 7a). Labels: both model columns are theory; Wu's rate is inferred from
+paleo-anchors gate checks. A spin-only clock — the J2000 period scaled with
+the day length alone — misses the lunar 1/a³ torque growth and reads 9 ″/yr
+low at 650 Ma, 24 % low at 1.4 Ga and 35 % low at 2.46 Ga: the measured
+reason the composed law is the clock. Labels: both model columns are theory; Wu's rate is inferred from
 cyclostratigraphy through an assumed astronomical model (see "Structural vs
 physical axial precession" below); the IAU J2000 rate is the measured
 anchor.
@@ -208,8 +207,7 @@ lives (the 5 % era, roughly −2,600…+2,850 yr — the eclipse corpus, the
 ancient observations, the historical ΔT record). Inside that era the
 tangent and the dynamics agreed to measurement precision — which is why the
 eclipse predictions worked on them; outside it, the charts made no claim on
-the "3". Both charts are deleted (plan 09 steps 6/7a). A tangent is not
-wrong; it is local.
+the "3". A tangent is not wrong; it is local.
 
 The asymmetry inside 13:3 is real and is now the model's structure:
 
@@ -353,9 +351,9 @@ The same epoch-dependent scaling applies to multiple system parameters. All valu
 |:---|---:|---:|---:|:---|
 | Mean lunisolar precession period T_p (yr) | 25,772 | **21,235** | **28,315** | the composed clock (spin × torque term) |
 | Obliquity beat 2π/(ψ̇ − \|s₃\|) (kyr) | 41.10 | **30.64** | **47.98** | the clock (s₃ fixed under μ = 1) |
-| Climatic-precession line p + g₀ (kyr) | 23.76 | **19.85** | **25.91** | the clock |
+| Climatic-precession line p + g₅ (kyr) | 23.76 | **19.85** | **25.91** | the clock |
 | Long-eccentricity metronome g₂ − g₅ (kyr) | 405.6 | 405.6 | 405.6 | does NOT scale (planetary g-modes; ∝ 1/μ only) |
-| Short-eccentricity line g₀ − g₂ (kyr) | 94.88 | 94.88 | 94.88 | does NOT scale |
+| Short-eccentricity line g₄ − g₅ (kyr) | 94.88 | 94.88 | 94.88 | does NOT scale |
 <!-- /generated:doc99-two-tier-table -->
 
 Moon distance is the cited history (Layer 2, Farhat et al. 2022's solution on the J2000 anchor): 384,399 km today, <!--v:moonDistanceAtDevonian-->368,549<!--/v--> km at the Devonian, <!--v:moonDistanceAt200MyrFuture-->392,039<!--/v--> km in 200 Myr. The planets' long-term apsidal motions are the secular g-modes and do not scale with Earth's spin (the former integer-label rows are retired; doc 109 §9).
@@ -436,29 +434,26 @@ different clocks.
 
 ### Position in the framework taxonomy
 
-The framework's family of **deep-time invariants** — relations preserved
-across epochs under the drivers, distinct from the J2000 readings (the
-retired integer identities at the anchor epoch). H_era was the frozen era
-clock's counter and H the unit that scaled with the composed precession
-period — both deleted at plan 09 steps 7a/7b; the table is their record:
+The framework's **deep-time invariant** — a relation preserved across epochs
+under the drivers, distinct from any J2000 reading:
 
 | Invariant | Form | Governed by | Drift at Hadean |
 |:---|:---|:---|---:|
-| Day-count near-invariant | `H_era × days/yr ≈ TOTAL_DAYS_IN_H` (122,471,916 at J2000) | DELETED with the era counter (plan 09 step 7a) — was Driver 1 + Driver 2 | ~−850 ppm (Driver 2 residual; record) |
-| Day-count invariant, exact form | `H_era × (sidYear_s/LOD) × (AU₀/AU)² = TOTAL_DAYS_IN_H × H₀/(H₀−13)` | DELETED with the era counter (plan 09 step 7a) — was a tautology of spin scaling ∘ Kepler | 0 ppm by construction (record) |
 | Planetary adiabatic invariant | `a × M_Sun = const` (per planet) | Driver 2 | 0 ppm (definitional) |
-| Lunar precession invariant | `T_apsidal × H = const`, `T_nodal × H = const` | RETIRED (plan 09 step 5c) — the counter's definition, not dynamics; the of-date periods are the inertial chain composed with T_p(t) | — |
+
+The spin-tier quantities carry no invariant of this kind: the day, the
+precession clock and the lunar periods of date are movements — the inertial
+lunar chain composed with T_p(t), the day by angular-momentum conservation on
+the cited distance history.
 
 ## The cardinal-point braid law — one rotating vector, including its spectrum
 
-> **Record.** This law was measured on the fitted cardinal-point model
-> (Step 6d: per-point eccentricity terms plus shared sidebands on lattice
-> divisors of the retired unit). That fit left the runtime with the derived
-> Sun (R1, doc 110 chain 5) and its last evaluator and coefficient family
-> were deleted at plan 09 step 7a; the cardinal instants are now the
+> **Record.** This law was measured on a fitted cardinal-point model
+> (per-point eccentricity terms plus shared sidebands on a fixed period
+> basis). That fit is not in the runtime: the cardinal instants are the
 > apparent crossings of the certified Sun (§ below), which computes the
-> rotating perihelion vector directly. The divisor labels below are the
-> fit's basis labels, kept as measured.
+> rotating perihelion vector directly. The basis labels below are the fit's,
+> kept as measured.
 
 The four cardinal points (solstices and equinoxes) do not carry independent
 physics. Their event-time offsets from the mean tropical year are **one
@@ -531,7 +526,7 @@ L(t) = L₀ + mean tropical rate · t + D(t)          (mean longitude)
    8:3 ratio, amplitudes A·cotε derived from the inclination amplitude),
    the obliquity-torque scaling of those two lines (δp = −p₀·tanε·δε
    integrated on the lattice, 1.306 and 1.815) and a sin-saturated rebase;
-   the comb itself is deleted at plan 09 — whose year carried no secular drift (+1.09 s
+   whose year carried no secular drift (+1.09 s
    flat where the physical year drifts −0.53 s/cy), so its longitude
    wandered +12 min around 500 AD and diverged −3.3 min/cy after 2100 —
    outside every eclipse and JPL gate at the time. The route-B year equals
@@ -547,8 +542,7 @@ L(t) = L₀ + mean tropical rate · t + D(t)          (mean longitude)
 **e(t) and ϖ(t)** are the banked N-body series' Earth elements plus the
 derived mean-element offset of the era (doc 110 chain 1.1; plan 06 layer B)
 — the eclipse Sun's mean elements; the Moon's E-factor reads the same
-N-body eccentricity of date, E = e(t)/e(J2000) (its former J2000-anchored
-H/3 line, doc 66 §1, is deleted at plan 09 step 6). Eccentricity is frame-invariant and
+N-body eccentricity of date, E = e(t)/e(J2000). Eccentricity is frame-invariant and
 carries no equinox-referenced period; the perihelion longitude does. The
 cardinal instants are the APPARENT crossings of this Sun (aberration and
 the leading nutation terms applied, both derived) — the former fitted
@@ -714,9 +708,7 @@ The raw ecliptic correction `δ_LOD = LOD_mean/(T_s₃·mSY)` **scales with LOD_
 
 | Invariant / Relation | Form | Governed by | Status |
 |:---|:---|:---|:---|
-| Day-count near-invariant (and its exact form) | `H_era × days/yr ≈ TOTAL_DAYS_IN_H` | — | DELETED with the era counter (plan 09 step 7a; record above) |
 | Planetary adiabatic invariant | `a × M_Sun = const` (per planet) | Driver 2 | Structural (definitional) |
-| Lunar Precession Invariant | `T_apsidal × H = const`, `T_nodal × H = const` | — | RETIRED (plan 09 step 5c; record above) |
 | **Raw ecliptic LOD kinematic correction** | **`δ_LOD = LOD_mean/(T_s₃·mSY)`** | **Driver 1 + ecliptic precession** | **Structural (parameter-free geometry); fractional correction ≈ 3.98 × 10⁻⁸, absolute <!--v:h5LodCorrectionMs-->3.441<!--/v--> ms at J2000** |
 | **LOD_real (Layer 4 composite)** | **`LOD_real = lod_kinematic + raw ecliptic term + Σ calibrated ΔT δ_LOD + δ_LOD,swing`** | **raw ecliptic term + calibrated Bond/Hallstatt/Jose5/Jose4 stack + Core-mantle swing** | **Displays <!--v:lodRealPhysical-->86,400.001200<!--/v--> s; closes on the USNO target <!--v:usnoLodJ2000-->86,400.0012<!--/v--> s on the one J2000 day basis, by construction of the joint fit** |
 
@@ -1024,11 +1016,11 @@ For the framework: this is an honest limitation of using a single smooth polynom
 
 Wu et al. 2024 also report axial precession frequencies inferred from cyclostratigraphy: **51.25 ″/yr (present) → 67.64 ″/yr at 650 Ma** — a +32 % increase.
 
-The retired structural identity **H/13 = axial precession period** gave, at 650 Ma: H(650) / 13 = 22,106 yr, corresponding to <!--v:arcsecInCircle-->1,296,000<!--/v--> / 22,106 = **58.6 ″/yr** — only +14 % over modern. That left a ~9 ″/yr gap between Wu et al.'s inferred rate and the H/13-derived rate.
+A spin-only scaling of the precession period (T_p ∝ 1/ω, the day length alone) gives, at 650 Ma: 22,106 yr, corresponding to <!--v:arcsecInCircle-->1,296,000<!--/v--> / 22,106 = **58.6 ″/yr** — only +14 % over modern. That leaves a ~9 ″/yr gap between Wu et al.'s inferred rate and the spin-only rate.
 
 **This is a conceptual question, not a numerical error.** Two distinct definitions of "axial precession" are in play:
 
-1. **Structural axial precession (retired)** = `H_era(t) / 13`. Defined by the former integer coupling at the heart of the framework. Scaled with LOD(t) alone. At J2000 it read 0.086 % off the IAU period (plan 06 S5); the counter is deleted (plan 09 step 7a).
+1. **Spin-only axial precession** = the J2000 period scaled with LOD(t) alone. It coincides with the physical rate at J2000 and misses the lunar torque's growth at deep time; the model does not carry it.
 
 2. **Physical axial precession** = solar torque term + lunar torque term. Standard celestial-mechanics formula:
    `ψ̇ = -(3/ω) × [n_S² + n_M² × (factor)] × (J₂/2) × cos(ε)`
@@ -1099,7 +1091,7 @@ The agreement between a chain with one measured anchor (LLR da/dt = 3.82 cm/yr, 
 Periods in **kyr**, written by the engine. The lines are the climate formula's PHYSICAL obliquity lines p + s_i (plan 06 T1; `data/l1-physical-lines.json`): Earth's composed precession rate ψ̇(t) beating against the orbit's nodal modes s_i. Only ψ̇(t) scales; the nodal frequencies are fixed (μ = 1). The main line p + s₀ is the obliquity beat of falsification leg 1. (The former integer-label tables are retired.)
 
 <!-- generated:doc99-l1-obliquity-lines -->
-| Age (Myr) | ψ̇ (″/yr) | p+s12 (27.27 kyr today, rel. amp 0.10) | p+s1 (28.84 kyr today, rel. amp 0.54) | p+s14 (29.00 kyr today, rel. amp 0.14) | p+s9 (29.62 kyr today, rel. amp 0.10) | p+s3 (29.81 kyr today, rel. amp 0.48) | p+s2 (39.56 kyr today, rel. amp 0.48) | p+s4 (40.23 kyr today, rel. amp 0.32) | p+s0 (40.92 kyr today, rel. amp 1.00) | p+s7 (41.64 kyr today, rel. amp 0.18) | p+s10 (53.62 kyr today, rel. amp 0.16) |
+| Age (Myr) | ψ̇ (″/yr) | p+s7 (27.27 kyr today, rel. amp 0.10) | p+s1 (28.84 kyr today, rel. amp 0.54) | p+ζ14 (29.00 kyr today, rel. amp 0.14) | p+ζ9 (29.62 kyr today, rel. amp 0.10) | p+s2 (29.81 kyr today, rel. amp 0.48) | p+s4 (39.56 kyr today, rel. amp 0.48) | p+ζ4 (40.23 kyr today, rel. amp 0.32) | p+s3 (40.92 kyr today, rel. amp 1.00) | p+ζ7 (41.64 kyr today, rel. amp 0.18) | p+s6 (53.62 kyr today, rel. amp 0.16) |
 |---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|
 | +200 (future) | 45.77 | 30.23 | 32.18 | 32.38 | 33.15 | 33.39 | 46.11 | 47.03 | 47.98 | 48.98 | 66.42 |
 | **0 (J2000)** | **50.29** | **27.35** | **28.93** | **29.09** | **29.71** | **29.90** | **39.72** | **40.40** | **41.10** | **41.83** | **53.92** |
@@ -1114,7 +1106,7 @@ Periods in **kyr**, written by the engine. The lines are the climate formula's P
 Obliquity band: each line's period is 1,296,000/(ψ̇(t) + f_i) kyr with f_i the line's orbital frequency (fixed, μ = 1) and ψ̇(t) the precession rate of date the family carries — the composed general precession (the column) for the climatic-precession lines, the spin axis's inertial rate (the column times the hybrid's self-anchor factor 1.00192, 50.385 ″/yr at J2000) for the obliquity lines — the 10 lines are the physical L1 set of plan 06 T1 (`data/l1-physical-lines.json`, relative amplitude ≥ 0.1 within the family), not integer labels.
 <!-- /generated:doc99-l1-obliquity-lines -->
 
-**Key prediction**: the Devonian (380 Ma) obliquity beat p + s₀ reads **<!--v:obliqBeatDevonianKyr-->30.6<!--/v--> kyr** (modern <!--v:obliqBeatJ2000Kyr-->41.1<!--/v--> kyr; generated table above — the lunar torque adds to the spin scaling). This is what the deep-time astronomical literature has long said: Berger, Loutre & Laskar 1992 shorten the obliquity main period from 41 to 29 kyr over 500 Myr while the precession constant rises from 50 to 61 ″/yr (the generated Phanerozoic block above carries the composed clock's own reading at 500 Ma), and the Devonian cyclostratigraphic work of the De Vleeschouwer / Da Silva / Zeeden line uses obliquity near 29.5 kyr and precession of 16.1–19.4 kyr at ~372 Ma. Wu et al. 2024's inferred precession constants at 300–500 Ma (59.5–64.5 ″/yr) sit 2–3 % above the composed clock (Phanerozoic comparison block, § "The composition is what nature measures"); the residual has a named candidate — the Moon-distance history in the Pangea window, where Wu's anchors put the Moon closer than the smooth recession polynomial (reproducing a 29.5-kyr beat at 372 Ma needs the Moon at 56.7 R_E where the chain has 58.1). **The old text's "36–38 kyr observed (Meyers 2008, Boulila 2018)" was a mis-citation**: Meyers, Sageman & Pagani 2008 is the Cenomanian (~94 Ma) Bridge Creek record and Boulila et al. 2018 the middle Eocene (~40 Ma) timescale — epochs whose obliquity periods ARE 37–40 kyr — and the retired spin-only clock (37.7 kyr here) "matched" them by that error.
+**Key prediction**: the Devonian (380 Ma) obliquity beat p + s₃ reads **<!--v:obliqBeatDevonianKyr-->30.6<!--/v--> kyr** (modern <!--v:obliqBeatJ2000Kyr-->41.1<!--/v--> kyr; generated table above — the lunar torque adds to the spin scaling). This is what the deep-time astronomical literature has long said: Berger, Loutre & Laskar 1992 shorten the obliquity main period from 41 to 29 kyr over 500 Myr while the precession constant rises from 50 to 61 ″/yr (the generated Phanerozoic block above carries the composed clock's own reading at 500 Ma), and the Devonian cyclostratigraphic work of the De Vleeschouwer / Da Silva / Zeeden line uses obliquity near 29.5 kyr and precession of 16.1–19.4 kyr at ~372 Ma. Wu et al. 2024's inferred precession constants at 300–500 Ma (59.5–64.5 ″/yr) sit 2–3 % above the composed clock (Phanerozoic comparison block, § "The composition is what nature measures"); the residual has a named candidate — the Moon-distance history in the Pangea window, where Wu's anchors put the Moon closer than the smooth recession polynomial (reproducing a 29.5-kyr beat at 372 Ma needs the Moon at 56.7 R_E where the chain has 58.1). **The old text's "36–38 kyr observed (Meyers 2008, Boulila 2018)" was a mis-citation**: Meyers, Sageman & Pagani 2008 is the Cenomanian (~94 Ma) Bridge Creek record and Boulila et al. 2018 the middle Eocene (~40 Ma) timescale — epochs whose obliquity periods ARE 37–40 kyr — and the retired spin-only clock (37.7 kyr here) "matched" them by that error.
 
 ---
 
@@ -1123,7 +1115,7 @@ Obliquity band: each line's period is 1,296,000/(ψ̇(t) + f_i) kyr with f_i the
 The physical climatic-precession lines p + g_i (ψ̇(t) beating against the orbit's eccentricity modes g_i):
 
 <!-- generated:doc99-l1-precession-lines -->
-| Age (Myr) | ψ̇ (″/yr) | p+g2 (19.00 kyr today, rel. amp 0.67) | p+g3 (19.16 kyr today, rel. amp 0.46) | p+g1 (22.45 kyr today, rel. amp 0.86) | p+g4 (23.19 kyr today, rel. amp 0.20) | p+g0 (23.76 kyr today, rel. amp 1.00) |
+| Age (Myr) | ψ̇ (″/yr) | p+g4 (19.00 kyr today, rel. amp 0.67) | p+g3 (19.16 kyr today, rel. amp 0.46) | p+g2 (22.45 kyr today, rel. amp 0.86) | p+g1 (23.19 kyr today, rel. amp 0.20) | p+g5 (23.76 kyr today, rel. amp 1.00) |
 |---:|---:|---:|---:|---:|---:|---:|
 | +200 (future) | 45.77 | 20.35 | 20.53 | 24.35 | 25.23 | 25.91 |
 | **0 (J2000)** | **50.29** | **19.00** | **19.16** | **22.45** | **23.19** | **23.76** |
@@ -1153,16 +1145,16 @@ the mass-loss tier, ∝ 1/M — ~0.02 % at 2.46 Ga under the measured μ):
 <!-- generated:doc99-l1-eccentricity-lines -->
 | Line | Period (kyr) | rel. amplitude | Note |
 |:---|---:|---:|:---|
-| g0−g2 | 94.88 | 0.779 | fixed at every epoch (planetary g-beat; ∝ 1/μ under the solar-mass history only) |
-| g0−g6 | 96.85 | 0.110 | fixed at every epoch (planetary g-beat; ∝ 1/μ under the solar-mass history only) |
-| g0−g3 | 98.84 | 0.535 | fixed at every epoch (planetary g-beat; ∝ 1/μ under the solar-mass history only) |
-| g0−g5 | 101.01 | 0.155 | fixed at every epoch (planetary g-beat; ∝ 1/μ under the solar-mass history only) |
-| g0−g7 | 103.12 | 0.105 | fixed at every epoch (planetary g-beat; ∝ 1/μ under the solar-mass history only) |
-| g2−g4 | 105.14 | 0.155 | fixed at every epoch (planetary g-beat; ∝ 1/μ under the solar-mass history only) |
-| g3−g4 | 110.03 | 0.106 | fixed at every epoch (planetary g-beat; ∝ 1/μ under the solar-mass history only) |
-| g1−g2 | 123.85 | 0.672 | fixed at every epoch (planetary g-beat; ∝ 1/μ under the solar-mass history only) |
-| g1−g3 | 130.69 | 0.461 | fixed at every epoch (planetary g-beat; ∝ 1/μ under the solar-mass history only) |
-| g1−g5 | 134.50 | 0.133 | fixed at every epoch (planetary g-beat; ∝ 1/μ under the solar-mass history only) |
+| g4−g5 | 94.88 | 0.779 | fixed at every epoch (planetary g-beat; ∝ 1/μ under the solar-mass history only) |
+| z6−g5 | 96.85 | 0.110 | fixed at every epoch (planetary g-beat; ∝ 1/μ under the solar-mass history only) |
+| g3−g5 | 98.84 | 0.535 | fixed at every epoch (planetary g-beat; ∝ 1/μ under the solar-mass history only) |
+| z5−g5 | 101.01 | 0.155 | fixed at every epoch (planetary g-beat; ∝ 1/μ under the solar-mass history only) |
+| z7−g5 | 103.12 | 0.105 | fixed at every epoch (planetary g-beat; ∝ 1/μ under the solar-mass history only) |
+| g4−g1 | 105.14 | 0.155 | fixed at every epoch (planetary g-beat; ∝ 1/μ under the solar-mass history only) |
+| g3−g1 | 110.03 | 0.106 | fixed at every epoch (planetary g-beat; ∝ 1/μ under the solar-mass history only) |
+| g4−g2 | 123.85 | 0.672 | fixed at every epoch (planetary g-beat; ∝ 1/μ under the solar-mass history only) |
+| g3−g2 | 130.69 | 0.461 | fixed at every epoch (planetary g-beat; ∝ 1/μ under the solar-mass history only) |
+| z5−g2 | 134.50 | 0.133 | fixed at every epoch (planetary g-beat; ∝ 1/μ under the solar-mass history only) |
 | g₂−g₅ | 405.63 | — | the engine’s 20-Myr mean beat; the long-eccentricity metronome |
 | (g₂−g₅)/2 | 202.81 | — | carbon-thermostat 2nd harmonic (doc 92 §3), not orbital forcing |
 | (g₂−g₅)/3 | 135.21 | — | carbon-thermostat 3rd harmonic (doc 92 §3), not orbital forcing |
@@ -1258,7 +1250,7 @@ This mirrors Driver 1's effect on the spin tier: there, Earth's spin-tier period
 | Driver 1 (Earth-Moon tidal) | Earth's spin-tier periods (the precession period, the obliquity beat, the day) | Lengthen past → future | T_p grows from <!--v:axialPrecAtDevonian-->21,235<!--/v--> yr → <!--v:axialPrecAt200MyrFuture-->28,315<!--/v--> yr (+30 % over 580 Myr) |
 | Driver 2 (Solar mass loss) | Spatial lattice (planet a, Earth-planet d) | Shrinks in past → grows in future | Whole solar system −35 ppm at Devonian, +35 ppm at +200 Myr |
 
-**Reproducibility**: the values in this section were verified by the Devonian cross-check script (per-planet semi-major axes and Earth-planet time-averaged distances), deleted at plan 09 step 7e as a comb-era instrument; the live deep-time surfaces are the API's epoch tools and the Python bridge.
+**Reproducibility**: the values in this section are registry tags written by the engine; the live deep-time surfaces are the API's epoch tools and the Python bridge.
 
 ---
 
@@ -1392,7 +1384,7 @@ Two layers: a CITED distance history and exact conservation on it (plan 12 optio
 - Future LOD approaches the tidal-lock asymptote (LOD → ∞ at a → <!--v:tidalLockKm-->555,623<!--/v--> km) on the LLR rate held constant, a labelled extrapolation
 - One smooth C1 history (the input's 1-Myr samples on a monotone cubic Hermite), no piecewise regime
 
-**Verified key epochs** (with the proper-physics formula; the Devonian cross-check script that printed them was deleted at plan 09 step 7e):
+**Verified key epochs** (written by the engine):
 
 <!-- generated:doc99-key-epochs -->
 | Age (Ma) | LOD (s) | LOD (hr) | Moon distance (km) | T_p (yr) | obliquity beat (kyr) |
@@ -1454,11 +1446,10 @@ The framework's value here is **distillation**, not discovery: we take well-esta
 
 ## Why does the Moon drift away? The angular-momentum cause
 
-### The former "structural cause" (record)
+Recession follows from angular-momentum conservation alone (below); no
+other relation adds to it.
 
-This section used to derive lunar recession from the frozen era clock's day-count near-invariant `U × days/yr ≈ TOTAL_DAYS_IN_H` and its exact Kepler form. That relation was a tautology of the device's spin scaling composed with Kepler, and it is deleted with the era counter (plan 09 step 7a) and the unit (step 7b); record homes: `model-version.json` `_v24Note`, [doc 109 §22](109-model-nbody-engine-and-lattice-test.md). Recession follows from angular-momentum conservation alone (below); no device relation adds to it.
-
-**Driver 2's Kepler form (live).** Under adiabatic mass loss `a ∝ 1/M` and `T ∝ M⁻²`, hence `sidYear_s × (AU₀/AU)² = sidYear_s(J2000)` at every epoch. The shipped implementation never evaluates a mass at deep time — it uses the product forms directly: with `Δm(t)` the fractional solar mass lost (defined against the Sun-only J2000 mass), `AU(t) = AU₀·(1−Δm)` and `sidYear_s(t) = sidYear_s(J2000)·(1−Δm)²`. An explicit Kepler evaluation reproduces this bit-for-bit under two conditions. First, Kepler runs on the **two-body** parameter `G(M_☉+M_E)` — the same convention by which the J2000 constants are set (GM_Sun+Earth from Earth's orbit; GM_Sun backed out by subtracting GM_Earth). Scaling only the Sun's share while holding Earth's fixed breaks the identity at the `Δm × M_E/(M_☉+M_E)` level — ≈0.6 ppb at genesis, visible at floating-point level. Second, the epoch mass is the division form `μ(t) = μ(J2000)/(1−Δm)`, with Δm still defined against the constant J2000 mass. Then `T = 2π√(a³/μ) = T₀·(1−Δm)^(3/2)·(1−Δm)^(1/2) = T₀(1−Δm)²`, identical to the product form, and `T²·μ/a³ = (1−Δm)⁴·(1−Δm)⁻¹·(1−Δm)⁻³ = 1` exactly — Kepler's third law holds at every epoch by construction.
+**Driver 2's Kepler form.** Under adiabatic mass loss `a ∝ 1/M` and `T ∝ M⁻²`, hence `sidYear_s × (AU₀/AU)² = sidYear_s(J2000)` at every epoch. The shipped implementation never evaluates a mass at deep time — it uses the product forms directly: with `Δm(t)` the fractional solar mass lost (defined against the Sun-only J2000 mass), `AU(t) = AU₀·(1−Δm)` and `sidYear_s(t) = sidYear_s(J2000)·(1−Δm)²`. An explicit Kepler evaluation reproduces this bit-for-bit under two conditions. First, Kepler runs on the **two-body** parameter `G(M_☉+M_E)` — the same convention by which the J2000 constants are set (GM_Sun+Earth from Earth's orbit; GM_Sun backed out by subtracting GM_Earth). Scaling only the Sun's share while holding Earth's fixed breaks the identity at the `Δm × M_E/(M_☉+M_E)` level — ≈0.6 ppb at genesis, visible at floating-point level. Second, the epoch mass is the division form `μ(t) = μ(J2000)/(1−Δm)`, with Δm still defined against the constant J2000 mass. Then `T = 2π√(a³/μ) = T₀·(1−Δm)^(3/2)·(1−Δm)^(1/2) = T₀(1−Δm)²`, identical to the product form, and `T²·μ/a³ = (1−Δm)⁴·(1−Δm)⁻¹·(1−Δm)⁻³ = 1` exactly — Kepler's third law holds at every epoch by construction.
 
 ### Angular-momentum conservation
 
@@ -2113,7 +2104,7 @@ Reading:
 record resolves — the formula keeps fixed line periods, measured on the
 right physics (only the p-carrying lines warp) — and the obliquity lines
 carry the window mean of the pole rate over the record they are fitted to,
-<!--v:obliqCycleRealizedLr04Years-->~40,927<!--/v--> yr for the p+s₀ line,
+<!--v:obliqCycleRealizedLr04Years-->~40,927<!--/v--> yr for the p+s₃ line,
 with the published J2000 beat <!--v:obliqBeatJ2000Kyr-->41.1<!--/v--> kyr as its
 instantaneous limit.
 
@@ -2349,9 +2340,9 @@ All values written by the engine (`npm run docs:doc99:write`). Epochs chosen to 
 | Moon distance (km) | **384,399** | 377,816 | 368,549 | **392,039** |
 | Mean lunisolar precession period T_p (yr) | **25,772** | 23,775 | 21,235 | **28,315** |
 | Obliquity beat 2π/(ψ̇ − \|s₃\|) (kyr) | **41.10** | 36.24 | 30.64 | **47.98** |
-| Climatic-precession line p + g₀ (kyr) | **23.76** | 22.05 | 19.85 | **25.91** |
+| Climatic-precession line p + g₅ (kyr) | **23.76** | 22.05 | 19.85 | **25.91** |
 | Long-eccentricity metronome g₂ − g₅ (kyr, NOT scaled) | **405.6** | 405.6 | 405.6 | **405.6** |
-| Short-eccentricity line g₀ − g₂ (kyr, NOT scaled) | **94.88** | 94.88 | 94.88 | **94.88** |
+| Short-eccentricity line g₄ − g₅ (kyr, NOT scaled) | **94.88** | 94.88 | 94.88 | **94.88** |
 <!-- /generated:doc99-summary-table -->
 
 **Key observation**: the spin-tier rows (the precession period, the obliquity beat, the climatic-precession line) lengthen together with the clock, reflecting Driver 1 (tidal evolution); the eccentricity-band rows do not scale (planetary g-beats — see the restated core thesis), and the 405-kyr metronome never scaled. Driver 2 (solar mass loss) enters the days/year row only through the year in seconds — −71 ppm at the Devonian, against the ~7.8 % the day length moves (§ "The Earth-Sun side"). The two-tier split is ESSRT's deepest self-consistency check.
@@ -2360,7 +2351,7 @@ All values written by the engine (`npm run docs:doc99:write`). Epochs chosen to 
 
 ## Scripts and supporting docs
 
-- the comb-era paleo scripts (the unit history, the paleo line renumbering, the paleo-LOD comparison) were deleted at plan 09 step 7e; [doc 109 §22](109-model-nbody-engine-and-lattice-test.md) is their record
+- the live deep-time instruments: the API's epoch tools, `tools/verify/paleo-anchors.js` and the Python bridge; retired instruments are recorded in [doc 109 §22](109-model-nbody-engine-and-lattice-test.md)
 - Test C series (validation in deep time) — the first-pass ECS decomposition is archived; doc 92 carries the current climate results
 - Doc 98 (action-angle closure as the underlying mechanism, written in the retired integer-label framing) — archived
 

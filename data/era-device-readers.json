@@ -28,8 +28,8 @@
   ]
  },
  "summary": {
-  "hits": 707,
-  "codeHits": 12,
+  "hits": 702,
+  "codeHits": 10,
   "files": 88,
   "excludedClasses": [
    "comment",
@@ -158,8 +158,7 @@
      "display": 5
     },
     "fitting": {
-     "comment": 9,
-     "comb": 1
+     "comment": 9
     },
     "package": {
      "comment": 61
@@ -185,8 +184,7 @@
     },
     "fitting": {
      "comment": 7,
-     "comb": 1,
-     "display": 4
+     "display": 1
     },
     "python": {
      "comment": 4,
@@ -300,8 +298,8 @@
   },
   "byClass": {
    "comment": 519,
-   "comb": 11,
-   "display": 28,
+   "comb": 9,
+   "display": 25,
    "diagnostic": 59,
    "explore": 57,
    "counter": 1,
@@ -309,7 +307,6 @@
    "source": 23
   },
   "codeHitsByFile": {
-   "packages/fitting/src/dt-corrections-fit.cjs": 2,
    "packages/physics/src/chain-cycles/index.cjs": 2,
    "packages/physics/src/model.js": 5,
    "src/script.js": 2,
@@ -360,11 +357,6 @@
   "tests": {
    "H / N": [
     13
-   ]
-  },
-  "fitting": {
-   "H / N": [
-    253
    ]
   },
   "source": {
@@ -610,9 +602,7 @@
   },
   "dt-flags": {
    "twin": "the ΔT stack's flags stated in years (T5: the divisor is a fitter detail, the periods are fitted periods)",
-   "readers": {
-    "fitting": 2
-   },
+   "readers": {},
    "measured": null
   },
   "plumbing": {
@@ -2077,7 +2067,7 @@
   },
   {
    "file": "tools/docs/model-values.mjs",
-   "line": 1754,
+   "line": 1759,
    "runtime": "docs-tools",
    "token": "H / N",
    "class": "comment",
@@ -2085,7 +2075,7 @@
   },
   {
    "file": "tools/docs/model-values.mjs",
-   "line": 1754,
+   "line": 1759,
    "runtime": "docs-tools",
    "token": "/ 13",
    "class": "comment",
@@ -2093,7 +2083,7 @@
   },
   {
    "file": "tools/docs/model-values.mjs",
-   "line": 1769,
+   "line": 1774,
    "runtime": "docs-tools",
    "token": "H / N",
    "class": "comment",
@@ -2101,7 +2091,7 @@
   },
   {
    "file": "tools/docs/model-values.mjs",
-   "line": 1770,
+   "line": 1775,
    "runtime": "docs-tools",
    "token": "H / N",
    "class": "comment",
@@ -2109,7 +2099,7 @@
   },
   {
    "file": "tools/docs/model-values.mjs",
-   "line": 1770,
+   "line": 1775,
    "runtime": "docs-tools",
    "token": "/ 13",
    "class": "comment",
@@ -2117,7 +2107,7 @@
   },
   {
    "file": "tools/docs/model-values.mjs",
-   "line": 1778,
+   "line": 1783,
    "runtime": "docs-tools",
    "token": "H / N",
    "class": "comment",
@@ -2125,7 +2115,7 @@
   },
   {
    "file": "tools/docs/model-values.mjs",
-   "line": 1832,
+   "line": 1837,
    "runtime": "docs-tools",
    "token": "8H",
    "class": "comment",
@@ -2133,7 +2123,7 @@
   },
   {
    "file": "tools/docs/model-values.mjs",
-   "line": 1838,
+   "line": 1843,
    "runtime": "docs-tools",
    "token": "8H",
    "class": "comment",
@@ -2141,7 +2131,7 @@
   },
   {
    "file": "tools/docs/model-values.mjs",
-   "line": 1851,
+   "line": 1856,
    "runtime": "docs-tools",
    "token": "8H",
    "class": "diagnostic",
@@ -2149,7 +2139,7 @@
   },
   {
    "file": "tools/docs/model-values.mjs",
-   "line": 1859,
+   "line": 1864,
    "runtime": "docs-tools",
    "token": "H / N",
    "class": "comment",
@@ -2157,7 +2147,7 @@
   },
   {
    "file": "tools/docs/model-values.mjs",
-   "line": 1860,
+   "line": 1865,
    "runtime": "docs-tools",
    "token": "H / N",
    "class": "diagnostic",
@@ -2165,7 +2155,7 @@
   },
   {
    "file": "tools/docs/model-values.mjs",
-   "line": 1861,
+   "line": 1866,
    "runtime": "docs-tools",
    "token": "H / N",
    "class": "diagnostic",
@@ -2173,7 +2163,7 @@
   },
   {
    "file": "tools/docs/model-values.mjs",
-   "line": 1888,
+   "line": 1893,
    "runtime": "docs-tools",
    "token": "/ 13",
    "class": "comment",
@@ -2181,7 +2171,7 @@
   },
   {
    "file": "tools/docs/model-values.mjs",
-   "line": 1917,
+   "line": 1928,
    "runtime": "docs-tools",
    "token": "H / N",
    "class": "comment",
@@ -2189,7 +2179,7 @@
   },
   {
    "file": "tools/docs/model-values.mjs",
-   "line": 1917,
+   "line": 1928,
    "runtime": "docs-tools",
    "token": "/ 13",
    "class": "comment",
@@ -2197,7 +2187,7 @@
   },
   {
    "file": "tools/docs/model-values.mjs",
-   "line": 1943,
+   "line": 1954,
    "runtime": "docs-tools",
    "token": "H / N",
    "class": "diagnostic",
@@ -2205,7 +2195,7 @@
   },
   {
    "file": "tools/docs/model-values.mjs",
-   "line": 1943,
+   "line": 1954,
    "runtime": "docs-tools",
    "token": "/ 13",
    "class": "diagnostic",
@@ -2213,7 +2203,7 @@
   },
   {
    "file": "tools/docs/model-values.mjs",
-   "line": 2130,
+   "line": 2141,
    "runtime": "docs-tools",
    "token": "H / N",
    "class": "comment",
@@ -2221,7 +2211,7 @@
   },
   {
    "file": "tools/docs/model-values.mjs",
-   "line": 2130,
+   "line": 2141,
    "runtime": "docs-tools",
    "token": "/ 13",
    "class": "comment",
@@ -2229,7 +2219,7 @@
   },
   {
    "file": "tools/docs/model-values.mjs",
-   "line": 2138,
+   "line": 2149,
    "runtime": "docs-tools",
    "token": "H / N",
    "class": "diagnostic",
@@ -2237,7 +2227,7 @@
   },
   {
    "file": "tools/docs/model-values.mjs",
-   "line": 2138,
+   "line": 2149,
    "runtime": "docs-tools",
    "token": "/ 13",
    "class": "diagnostic",
@@ -2245,7 +2235,7 @@
   },
   {
    "file": "tools/docs/model-values.mjs",
-   "line": 2148,
+   "line": 2159,
    "runtime": "docs-tools",
    "token": "H / N",
    "class": "diagnostic",
@@ -2253,7 +2243,7 @@
   },
   {
    "file": "tools/docs/model-values.mjs",
-   "line": 2148,
+   "line": 2159,
    "runtime": "docs-tools",
    "token": "/ 13",
    "class": "diagnostic",
@@ -2261,7 +2251,7 @@
   },
   {
    "file": "tools/docs/model-values.mjs",
-   "line": 2153,
+   "line": 2164,
    "runtime": "docs-tools",
    "token": "H / N",
    "class": "diagnostic",
@@ -2269,7 +2259,7 @@
   },
   {
    "file": "tools/docs/model-values.mjs",
-   "line": 2182,
+   "line": 2193,
    "runtime": "docs-tools",
    "token": "H / N",
    "class": "comment",
@@ -2277,7 +2267,7 @@
   },
   {
    "file": "tools/docs/model-values.mjs",
-   "line": 2194,
+   "line": 2205,
    "runtime": "docs-tools",
    "token": "H / N",
    "class": "diagnostic",
@@ -2285,7 +2275,7 @@
   },
   {
    "file": "tools/docs/model-values.mjs",
-   "line": 2276,
+   "line": 2287,
    "runtime": "docs-tools",
    "token": "H / N",
    "class": "comment",
@@ -2293,7 +2283,7 @@
   },
   {
    "file": "tools/docs/model-values.mjs",
-   "line": 2296,
+   "line": 2307,
    "runtime": "docs-tools",
    "token": "H / N",
    "class": "diagnostic",
@@ -2301,7 +2291,7 @@
   },
   {
    "file": "tools/docs/model-values.mjs",
-   "line": 2401,
+   "line": 2412,
    "runtime": "docs-tools",
    "token": "H / N",
    "class": "comment",
@@ -2309,7 +2299,7 @@
   },
   {
    "file": "tools/docs/model-values.mjs",
-   "line": 2402,
+   "line": 2413,
    "runtime": "docs-tools",
    "token": "H / N",
    "class": "comment",
@@ -2317,7 +2307,7 @@
   },
   {
    "file": "tools/docs/model-values.mjs",
-   "line": 2432,
+   "line": 2443,
    "runtime": "docs-tools",
    "token": "8H",
    "class": "comment",
@@ -2325,7 +2315,7 @@
   },
   {
    "file": "tools/docs/model-values.mjs",
-   "line": 2556,
+   "line": 2567,
    "runtime": "docs-tools",
    "token": "H / N",
    "class": "diagnostic",
@@ -2333,7 +2323,7 @@
   },
   {
    "file": "tools/docs/model-values.mjs",
-   "line": 2556,
+   "line": 2567,
    "runtime": "docs-tools",
    "token": "/ 13",
    "class": "diagnostic",
@@ -2341,7 +2331,7 @@
   },
   {
    "file": "tools/docs/model-values.mjs",
-   "line": 2557,
+   "line": 2568,
    "runtime": "docs-tools",
    "token": "H / N",
    "class": "diagnostic",
@@ -2349,7 +2339,7 @@
   },
   {
    "file": "tools/docs/model-values.mjs",
-   "line": 2557,
+   "line": 2568,
    "runtime": "docs-tools",
    "token": "/ 13",
    "class": "diagnostic",
@@ -2357,7 +2347,7 @@
   },
   {
    "file": "tools/docs/model-values.mjs",
-   "line": 2670,
+   "line": 2681,
    "runtime": "docs-tools",
    "token": "8H",
    "class": "comment",
@@ -2365,7 +2355,7 @@
   },
   {
    "file": "tools/docs/model-values.mjs",
-   "line": 2792,
+   "line": 2803,
    "runtime": "docs-tools",
    "token": "H / N",
    "class": "diagnostic",
@@ -2373,7 +2363,7 @@
   },
   {
    "file": "tools/docs/model-values.mjs",
-   "line": 2834,
+   "line": 2845,
    "runtime": "docs-tools",
    "token": "H / N",
    "class": "comment",
@@ -2381,7 +2371,7 @@
   },
   {
    "file": "tools/docs/model-values.mjs",
-   "line": 2836,
+   "line": 2847,
    "runtime": "docs-tools",
    "token": "H / N",
    "class": "diagnostic",
@@ -2389,7 +2379,7 @@
   },
   {
    "file": "tools/docs/model-values.mjs",
-   "line": 2972,
+   "line": 2983,
    "runtime": "docs-tools",
    "token": "8H",
    "class": "comment",
@@ -2397,7 +2387,7 @@
   },
   {
    "file": "tools/docs/model-values.mjs",
-   "line": 2976,
+   "line": 2987,
    "runtime": "docs-tools",
    "token": "H / N",
    "class": "diagnostic",
@@ -2405,7 +2395,7 @@
   },
   {
    "file": "tools/docs/model-values.mjs",
-   "line": 2976,
+   "line": 2987,
    "runtime": "docs-tools",
    "token": "/ 13",
    "class": "diagnostic",
@@ -2413,7 +2403,7 @@
   },
   {
    "file": "tools/docs/model-values.mjs",
-   "line": 2977,
+   "line": 2988,
    "runtime": "docs-tools",
    "token": "H / N",
    "class": "diagnostic",
@@ -2421,7 +2411,7 @@
   },
   {
    "file": "tools/docs/model-values.mjs",
-   "line": 3008,
+   "line": 3019,
    "runtime": "docs-tools",
    "token": "H / N",
    "class": "comment",
@@ -2429,7 +2419,7 @@
   },
   {
    "file": "tools/docs/model-values.mjs",
-   "line": 3008,
+   "line": 3019,
    "runtime": "docs-tools",
    "token": "8H",
    "class": "comment",
@@ -2437,7 +2427,7 @@
   },
   {
    "file": "tools/docs/model-values.mjs",
-   "line": 3011,
+   "line": 3022,
    "runtime": "docs-tools",
    "token": "H / N",
    "class": "comment",
@@ -2445,7 +2435,7 @@
   },
   {
    "file": "tools/docs/model-values.mjs",
-   "line": 3013,
+   "line": 3024,
    "runtime": "docs-tools",
    "token": "8H",
    "class": "comment",
@@ -2453,7 +2443,7 @@
   },
   {
    "file": "tools/docs/model-values.mjs",
-   "line": 3047,
+   "line": 3058,
    "runtime": "docs-tools",
    "token": "eraClockHAtAge",
    "class": "comment",
@@ -2461,7 +2451,7 @@
   },
   {
    "file": "tools/docs/model-values.mjs",
-   "line": 3103,
+   "line": 3114,
    "runtime": "docs-tools",
    "token": "/ 13",
    "class": "diagnostic",
@@ -2469,7 +2459,7 @@
   },
   {
    "file": "tools/docs/model-values.mjs",
-   "line": 3106,
+   "line": 3117,
    "runtime": "docs-tools",
    "token": "H / N",
    "class": "comment",
@@ -2477,7 +2467,7 @@
   },
   {
    "file": "tools/docs/model-values.mjs",
-   "line": 3106,
+   "line": 3117,
    "runtime": "docs-tools",
    "token": "/ 13",
    "class": "comment",
@@ -2637,7 +2627,7 @@
   },
   {
    "file": "tools/docs/render-doc99-tables.mjs",
-   "line": 191,
+   "line": 192,
    "runtime": "docs-tools",
    "token": "H / N",
    "class": "comment",
@@ -4998,25 +4988,7 @@
   },
   {
    "file": "packages/fitting/src/dt-corrections-fit.cjs",
-   "line": 219,
-   "runtime": "fitting",
-   "token": "H / N",
-   "class": "comb",
-   "text": "structural: 'H/253 = H/(11·23) = 1,325.4 yr; gcd(2024, H) = 23; 184th harmonic of 8H/11 (Earth ecliptic-perihelion family). Identified 2026-07-22 by L-5b §14 po",
-   "twin": "dt-flags"
-  },
-  {
-   "file": "packages/fitting/src/dt-corrections-fit.cjs",
-   "line": 219,
-   "runtime": "fitting",
-   "token": "8H",
-   "class": "comb",
-   "text": "structural: 'H/253 = H/(11·23) = 1,325.4 yr; gcd(2024, H) = 23; 184th harmonic of 8H/11 (Earth ecliptic-perihelion family). Identified 2026-07-22 by L-5b §14 po",
-   "twin": "dt-flags"
-  },
-  {
-   "file": "packages/fitting/src/dt-corrections-fit.cjs",
-   "line": 222,
+   "line": 227,
    "runtime": "fitting",
    "token": "8H",
    "class": "comment",
@@ -5024,7 +4996,7 @@
   },
   {
    "file": "packages/fitting/src/dt-corrections-fit.cjs",
-   "line": 230,
+   "line": 235,
    "runtime": "fitting",
    "token": "8H",
    "class": "comment",
@@ -5032,7 +5004,7 @@
   },
   {
    "file": "packages/fitting/src/dt-corrections-fit.cjs",
-   "line": 231,
+   "line": 236,
    "runtime": "fitting",
    "token": "8H",
    "class": "comment",
@@ -5040,7 +5012,7 @@
   },
   {
    "file": "packages/fitting/src/dt-corrections-fit.cjs",
-   "line": 281,
+   "line": 286,
    "runtime": "fitting",
    "token": "H / N",
    "class": "comment",
@@ -5048,7 +5020,7 @@
   },
   {
    "file": "packages/fitting/src/dt-corrections-fit.cjs",
-   "line": 448,
+   "line": 453,
    "runtime": "fitting",
    "token": "H / N",
    "class": "comment",
@@ -5056,7 +5028,7 @@
   },
   {
    "file": "packages/fitting/src/dt-corrections-fit.cjs",
-   "line": 449,
+   "line": 454,
    "runtime": "fitting",
    "token": "H / N",
    "class": "comment",
@@ -5064,7 +5036,7 @@
   },
   {
    "file": "packages/fitting/src/dt-corrections-fit.cjs",
-   "line": 834,
+   "line": 839,
    "runtime": "fitting",
    "token": "H / N",
    "class": "comment",
@@ -5072,7 +5044,7 @@
   },
   {
    "file": "packages/fitting/src/dt-corrections-fit.cjs",
-   "line": 834,
+   "line": 839,
    "runtime": "fitting",
    "token": "/ 13",
    "class": "comment",
@@ -5080,7 +5052,7 @@
   },
   {
    "file": "packages/fitting/src/dt-corrections-fit.cjs",
-   "line": 841,
+   "line": 846,
    "runtime": "fitting",
    "token": "8H",
    "class": "comment",
@@ -5088,7 +5060,7 @@
   },
   {
    "file": "packages/fitting/src/dt-corrections-fit.cjs",
-   "line": 1285,
+   "line": 1290,
    "runtime": "fitting",
    "token": "8H",
    "class": "comment",
@@ -5096,35 +5068,11 @@
   },
   {
    "file": "packages/fitting/src/dt-corrections-fit.cjs",
-   "line": 1302,
+   "line": 1307,
    "runtime": "fitting",
    "token": "8H",
    "class": "display",
    "text": "console.log('── Post-closure phantom check (8H/2024 line vs final shipped residual) ──');"
-  },
-  {
-   "file": "packages/fitting/src/dt-corrections-fit.cjs",
-   "line": 1357,
-   "runtime": "fitting",
-   "token": "8H",
-   "class": "display",
-   "text": "description: 'Sub-Milankovitch millennial ΔT correction stack (periods stated in years) fit against Stephenson 2016 residual. Four cascaded stages (Bond solo → "
-  },
-  {
-   "file": "packages/fitting/src/dt-corrections-fit.cjs",
-   "line": 1357,
-   "runtime": "fitting",
-   "token": "8H",
-   "class": "display",
-   "text": "description: 'Sub-Milankovitch millennial ΔT correction stack (periods stated in years) fit against Stephenson 2016 residual. Four cascaded stages (Bond solo → "
-  },
-  {
-   "file": "packages/fitting/src/dt-corrections-fit.cjs",
-   "line": 1357,
-   "runtime": "fitting",
-   "token": "8H",
-   "class": "display",
-   "text": "description: 'Sub-Milankovitch millennial ΔT correction stack (periods stated in years) fit against Stephenson 2016 residual. Four cascaded stages (Bond solo → "
   },
   {
    "file": "packages/fitting/src/export-solar-measurements.cjs",
@@ -6111,7 +6059,7 @@
   },
   {
    "file": "public/input/astro-reference.json",
-   "line": 677,
+   "line": 676,
    "runtime": "source",
    "token": "8H",
    "class": "source",
@@ -6119,7 +6067,7 @@
   },
   {
    "file": "public/input/model-version.json",
-   "line": 8,
+   "line": 9,
    "runtime": "source",
    "token": "earthtiltMean",
    "class": "source",
@@ -6127,7 +6075,7 @@
   },
   {
    "file": "public/input/model-version.json",
-   "line": 9,
+   "line": 10,
    "runtime": "source",
    "token": "holisticyearLength",
    "class": "source",
@@ -6135,7 +6083,7 @@
   },
   {
    "file": "public/input/model-version.json",
-   "line": 9,
+   "line": 10,
    "runtime": "source",
    "token": "earthtiltMean",
    "class": "source",
@@ -6143,7 +6091,7 @@
   },
   {
    "file": "public/input/model-version.json",
-   "line": 9,
+   "line": 10,
    "runtime": "source",
    "token": "earthInvPlaneInclinationAmplitude",
    "class": "source",
@@ -6151,7 +6099,7 @@
   },
   {
    "file": "public/input/model-version.json",
-   "line": 9,
+   "line": 10,
    "runtime": "source",
    "token": "kDeviceWheelPhaseAtJ2000Cycles",
    "class": "source",
@@ -6159,7 +6107,7 @@
   },
   {
    "file": "public/input/model-version.json",
-   "line": 9,
+   "line": 10,
    "runtime": "source",
    "token": "cyclesBetweenYears",
    "class": "source",
@@ -6167,7 +6115,7 @@
   },
   {
    "file": "public/input/model-version.json",
-   "line": 9,
+   "line": 10,
    "runtime": "source",
    "token": "cyclesBetween",
    "class": "source",
@@ -6175,7 +6123,7 @@
   },
   {
    "file": "public/input/model-version.json",
-   "line": 9,
+   "line": 10,
    "runtime": "source",
    "token": "H / N",
    "class": "source",
@@ -6183,7 +6131,7 @@
   },
   {
    "file": "public/input/model-version.json",
-   "line": 9,
+   "line": 10,
    "runtime": "source",
    "token": "H / N",
    "class": "source",
@@ -6191,7 +6139,7 @@
   },
   {
    "file": "public/input/model-version.json",
-   "line": 9,
+   "line": 10,
    "runtime": "source",
    "token": "/ 13",
    "class": "source",
@@ -6199,25 +6147,9 @@
   },
   {
    "file": "public/input/model-version.json",
-   "line": 12,
+   "line": 13,
    "runtime": "source",
    "token": "earthtiltMean",
-   "class": "source",
-   "text": "\"_v21Note\": \"v20.0 → v21.0 (plan 07 R10, the phase origin): a structural MAJOR — the correction combs' phase origin moves from the fitted t₀ (perihelionalignmen"
-  },
-  {
-   "file": "public/input/model-version.json",
-   "line": 12,
-   "runtime": "source",
-   "token": "kDeviceWheelPhaseAtJ2000Cycles",
-   "class": "source",
-   "text": "\"_v21Note\": \"v20.0 → v21.0 (plan 07 R10, the phase origin): a structural MAJOR — the correction combs' phase origin moves from the fitted t₀ (perihelionalignmen"
-  },
-  {
-   "file": "public/input/model-version.json",
-   "line": 12,
-   "runtime": "source",
-   "token": "H / N",
    "class": "source",
    "text": "\"_v21Note\": \"v20.0 → v21.0 (plan 07 R10, the phase origin): a structural MAJOR — the correction combs' phase origin moves from the fitted t₀ (perihelionalignmen"
   },
@@ -6225,9 +6157,17 @@
    "file": "public/input/model-version.json",
    "line": 13,
    "runtime": "source",
-   "token": "8H",
+   "token": "kDeviceWheelPhaseAtJ2000Cycles",
    "class": "source",
-   "text": "\"_v20Note\": \"v19.0 → v20.0 (plan 07, the windowAffine bound): a structural MAJOR — the planet chain's evaluation form beyond its fit window changes. The K4.5 pe"
+   "text": "\"_v21Note\": \"v20.0 → v21.0 (plan 07 R10, the phase origin): a structural MAJOR — the correction combs' phase origin moves from the fitted t₀ (perihelionalignmen"
+  },
+  {
+   "file": "public/input/model-version.json",
+   "line": 13,
+   "runtime": "source",
+   "token": "H / N",
+   "class": "source",
+   "text": "\"_v21Note\": \"v20.0 → v21.0 (plan 07 R10, the phase origin): a structural MAJOR — the correction combs' phase origin moves from the fitted t₀ (perihelionalignmen"
   },
   {
    "file": "public/input/model-version.json",
@@ -6235,11 +6175,19 @@
    "runtime": "source",
    "token": "8H",
    "class": "source",
-   "text": "\"_v19Note\": \"v18.0 → v19.0 (plan 07 R1/R8): a structural MAJOR — a divisor set leaves the source of truth. The retired laws' inputs are deleted from model-param"
+   "text": "\"_v20Note\": \"v19.0 → v20.0 (plan 07, the windowAffine bound): a structural MAJOR — the planet chain's evaluation form beyond its fit window changes. The K4.5 pe"
   },
   {
    "file": "public/input/model-version.json",
    "line": 15,
+   "runtime": "source",
+   "token": "8H",
+   "class": "source",
+   "text": "\"_v19Note\": \"v18.0 → v19.0 (plan 07 R1/R8): a structural MAJOR — a divisor set leaves the source of truth. The retired laws' inputs are deleted from model-param"
+  },
+  {
+   "file": "public/input/model-version.json",
+   "line": 16,
    "runtime": "source",
    "token": "earthtiltMean",
    "class": "source",
@@ -6247,7 +6195,7 @@
   },
   {
    "file": "public/input/model-version.json",
-   "line": 15,
+   "line": 16,
    "runtime": "source",
    "token": "earthInvPlaneInclinationAmplitude",
    "class": "source",
@@ -6255,7 +6203,7 @@
   },
   {
    "file": "public/input/model-version.json",
-   "line": 15,
+   "line": 16,
    "runtime": "source",
    "token": "H / N",
    "class": "source",
@@ -6263,7 +6211,7 @@
   },
   {
    "file": "public/input/model-version.json",
-   "line": 15,
+   "line": 16,
    "runtime": "source",
    "token": "H / N",
    "class": "source",
@@ -6271,7 +6219,7 @@
   },
   {
    "file": "public/input/model-version.json",
-   "line": 22,
+   "line": 23,
    "runtime": "source",
    "token": "8H",
    "class": "source",
@@ -6279,7 +6227,7 @@
   },
   {
    "file": "public/input/model-version.json",
-   "line": 24,
+   "line": 25,
    "runtime": "source",
    "token": "H / N",
    "class": "source",
@@ -6287,7 +6235,7 @@
   },
   {
    "file": "public/input/model-version.json",
-   "line": 24,
+   "line": 25,
    "runtime": "source",
    "token": "H / N",
    "class": "source",
@@ -6301,12 +6249,12 @@
  "inputs": {
   "generator": "node tools/explore/era-device-readers.mjs --write",
   "files": {
-   "data/nbody-secular-series.json": "sha256:1c0b4da6db61172358e2269943fabe915be951cad29b3ce37a8811ebc7816964",
+   "data/nbody-secular-series.json": "sha256:c8807608f9364cd6f8c910e8c9da99a25dfa12d354e5aaef79400bd30e28049e",
    "packages/api/src/app.js": "sha256:3569084fca6b217f1f7c7e8b4ebe4092df6d6c2681c30bf2b491c6db0166fb92",
    "packages/api/src/mcp.js": "sha256:6a3b52da6cfcdb9e9527358f377be560966f7dc01ae1c700ee3225ce8b4717e4",
    "packages/api/test/api-gates.test.mjs": "sha256:5b863c59fe5d0e6c13fedad03a648936d46541ed6f9a4f9d043f875ab1337279",
    "packages/api/test/mcp-gates.test.mjs": "sha256:c3a3f0296b8c0cae2d78ecde1126ba357ae0e242fced5d7782f0c045c40b44f9",
-   "packages/fitting/src/dt-corrections-fit.cjs": "sha256:8a761ebcbbc300dd04c988751aa4d911b09b688bf9f94687323bcd0854aab003",
+   "packages/fitting/src/dt-corrections-fit.cjs": "sha256:f7fabaf718165cea5cf59d83bd75514a0061bc8fcdc08c916535e8c4568fbc2f",
    "packages/fitting/src/export-solar-measurements.cjs": "sha256:85ae6c0eb95c80456dab5c0897a40134e2afb0daa85cc3938b650fba8f9fd312",
    "packages/fitting/src/run-pipeline.cjs": "sha256:738dfdc2834f920c8893e3b9d0da823a7d5067ca768d036642f9d1ea66926472",
    "packages/fitting/src/verify-pipeline.cjs": "sha256:a081264b66cca5e22a10c9c7e3406775e5514da5e28ea40d6889c4ae08e46a0c",
@@ -6327,8 +6275,8 @@
    "packages/physics/test/counterfactual.test.mjs": "sha256:8d15fa561222e929a3b3a92ec7738f2b67323ead955820b4aa26370943a4c153",
    "packages/physics/test/layer0-identity.test.mjs": "sha256:e942dc6f94dc2a5d3e3b74f794ac6c161cb6a4117180242bdc7cd0d80084d5b4",
    "packages/physics/test/layer1-identity.test.mjs": "sha256:9aca77e0f717013b9e70c55b2766cb0feff614493fc5454c95fe2706b306fe82",
-   "public/input/astro-reference.json": "sha256:1b8a1663a4882f4bf5fce6f4b3ece44a53acba7ad21d107ed3f077d7276bc472",
-   "public/input/model-version.json": "sha256:04dc6e0a6dfff4d4b7244ff7caa67d6596c324ace99601e20bc50dddc80a3329",
+   "public/input/astro-reference.json": "sha256:910e896e02467a495eeb80eb843666d95a8e00a2e70714b87e8e22edc13095b7",
+   "public/input/model-version.json": "sha256:1ba3f856a10a795b67526d4ea2c8316ef499c03bd608b76858f81f0f63cfef6a",
    "scripts/climate_formula_mwp_check.py": "sha256:177305723579b66c9d08590f366574c05cd935aea5573614e89eddc502f72236",
    "scripts/extract_insolation_features_deep.js": "sha256:2ef7242a306cc9e34200e59c0dcbe8d5fe30dc0759b4d2ee5457875d981a50dc",
    "scripts/milankovitch_climate_formula.py": "sha256:c16a99025d13fbbbd5448a067d39be62e27dff78d0d68432ca600c337817a41f",
@@ -6340,9 +6288,9 @@
    "tools/check-vocabulary.mjs": "sha256:49b37bd39baffdc860a25cd1bc021306bd360b0fe03ded8ca4d416fcd661e02a",
    "tools/constants/check-literals.mjs": "sha256:f54ef38aef2bbc82f6eef78be765cbd604d738431e84a9ec4a6ff4d6824363aa",
    "tools/constants/generate.mjs": "sha256:d7e473469ce7535ed219e66d3752880367a43aad1e0c897ff4552012ec35a6bf",
-   "tools/docs/model-values.mjs": "sha256:0a1c9bd217f8fdc2aeea1f795eaa10817d35346256d399ee5514d513442f8b5d",
+   "tools/docs/model-values.mjs": "sha256:a091a53dc6f03bbe4bb08b67b3fc923c082c5b14ccad4137beb35e5c6ff8cc31",
    "tools/docs/render-calculation-map.mjs": "sha256:99ab8684923f018989e1b4baee658385cc43303ba1cc950639a27efdc447a5a3",
-   "tools/docs/render-doc99-tables.mjs": "sha256:b5e11016d18c3555fe8dbeb40dc8df5658f1fc5288a99a7bcb3d89a82fc15abb",
+   "tools/docs/render-doc99-tables.mjs": "sha256:fa533c218632b2ebd68aa4bf6b1d1105a908d51e46f3936ec4e7f0e712f71a8f",
    "tools/explore/climate-band-phase.js": "sha256:0b81487d4cf86717265d53e7583b63e6ff7b52a5f8d9d8c3e7c21ff975e9bbe3",
    "tools/explore/dense-targets-residual-structure.mjs": "sha256:570fcfcb01b9abcd28b38cb5b000d4b5bb21f1a1e57ad420a986b44b31766e6e",
    "tools/explore/derive-meeus-amplitudes.js": "sha256:f855838556ac4a210ad3fda0abc3a56f9a9098a495e98bb539064465a719daca",

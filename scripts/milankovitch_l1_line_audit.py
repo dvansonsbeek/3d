@@ -39,7 +39,18 @@ from milankovitch_climate_formula import (  # noqa: E402
 )
 from milankovitch_insolation_stability import in_sample_dr2, cv_dr2, RIDGE_LAMBDA  # noqa: E402
 
+# inputs-stamped (tools/verify/artifact-freshness.js REQUIRED; a regen-cascade node):
+# the audit's line LABELS reach the paper through @essrt/model-values, so a relabelled
+# line set must re-run it.
+sys.path.insert(0, str(SCRIPT_DIR.parent / "tools" / "fit" / "python"))
+from artifact_inputs import build_inputs_block  # noqa: E402
+
 OUT_PATH = SCRIPT_DIR.parent / "data" / "l1-line-audit-results.json"
+SELF_REL = "scripts/milankovitch_l1_line_audit.py"
+INPUT_FILES = [
+    "data/l1-physical-lines.json", "data/lr04-stack.txt",
+    "scripts/milankovitch_climate_formula.py", "scripts/milankovitch_insolation_stability.py", SELF_REL,
+]
 REGIMES = ["post-mpt", "inhg-mpt", "pre-inhg", "lr04-full"]
 SHIPPED = list(L1_PERIODS_KYR)
 
@@ -107,6 +118,7 @@ def main():
     finally:
         mcf.L1_PERIODS_KYR = SHIPPED
     out["metadata"]["runtime_sec"] = time.time() - t0
+    out["inputs"] = build_inputs_block(f"python3 {SELF_REL}", INPUT_FILES)
     OUT_PATH.write_text(json.dumps(out, indent=2))
     print(f"\nOutput: {OUT_PATH}")
 

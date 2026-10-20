@@ -1,7 +1,7 @@
 ---
 docVersion: 1.0
-modelVersion: v26.3
-coefficients: sha256:f2387635a8f80374
+modelVersion: v26.4
+coefficients: sha256:4af192da697c09a0
 status: current
 ---
 
@@ -21,8 +21,8 @@ The shared tools module `tools/lib/constants.js` mirrors these with its own 14-s
 
 ### How other documents should reference constants
 
-- **Rule A — Registry keys stay, hand-computed numbers go.** Write a registry value tag (the `v:` marker with the key name) or the named quantity, never a hand-derived year count. (Plan 06 S5: "H/13" is no longer a period; since plan 09 the J2000 axial precession period is 1,296,000/p_A on the IAU 2006 input, registry `axialPrecYears`.)
-- **Rule B — Device integers stay inline where they are devices.** The K-device scaffold's wheel indices (3, 5, 8, 13, 16) are identifiers of the scene's recorded pose; they are not stated as periods or laws on presentation surfaces (plan 06 D3/P6). The correction combs and the frozen clock's counters the rule once also covered are deleted (plan 09).
+- **Rule A — Registry keys stay, hand-computed numbers go.** Write a registry value tag (the `v:` marker with the key name) or the named quantity, never a hand-derived year count. The J2000 axial precession period is 1,296,000/p_A on the IAU 2006 input (registry `axialPrecYears`); no integer ratio of anything is a period.
+- **Rule B — No unit and no integer on a published surface.** Periods and ratios only: the model carries no internal unit and no divisor set, and a presentation surface states none (`test:vocabulary` is the ratchet).
 - **Rule C — Approximate values for readability.** Use "the axial precession period (<!--v:axialPrecRound-->~25,772<!--/v--> years; see [Constants Reference](20-constants-reference.md))" when a number aids understanding.
 - **Rule D — Tables reference this document.** If a doc repeats planet parameters, add: "For current values see [Constants Reference](20-constants-reference.md)."
 
@@ -32,7 +32,7 @@ The shared tools module `tools/lib/constants.js` mirrors these with its own 14-s
 
 Per the [Expanding Solar System Resonance Theory (Doc 99)](99-expanding-solar-system-resonance-theory.md), the model has two distinct categories of "constants":
 
-- **Device integers** — DELETED. The K-device scaffold's wheel indices were identifiers of the scene's recorded J2000 pose (`kDeviceWheelPeriodYears`, keyed by index), never periods or laws; plan 11 step 4 deleted the wheels and the block, and the scene's world frame is the J2000 ecliptic with every frame of date engine-placed. The physical periods below are dynamical values, and the climate formula rides the engine's own orbital lines (plan 06 T1). (The correction combs' divisors and the frozen clock's counters were the other device integers until plan 09 deleted them.)
+- **Physical periods** — dynamical values of the model's own motions (the composed precession clock, the N-body series' modes and beats); the climate formula rides the engine's own orbital lines. There are no device integers.
 - **Epoch-dependent periods, lengths, and seconds-values** — these evolve at deep time: the spin-tier periods with the composed lunisolar precession clock, the orbital periods with the solar-mass history. **Most numeric values tabulated below** (sidereal year = 365.25636 days; LOD = 86,400 s; Moon distance = 384,399 km; planet orbital periods in years; etc.) are **J2000-epoch values** — the model's primary calibration anchor. They apply to the modern era; for deep-time / future-projection work, use the epoch-dependent helpers in `src/script.js`:
 
 | J2000-anchored constant in this doc | Epoch-dependent helper (accepts `t_Ma` argument) |
@@ -98,33 +98,20 @@ behind fail-proven gates. None is a free parameter:
 | Solar torque of date | derived at runtime | 1 + f_S·([(1 − e²)/(1 − e₀²)]^(−3/2) − 1) | the solar share's own (1 − e²)^(−3/2) evaluated at the one-source eccentricity of date (`earth/deep-orbital-history`); +<!--v:precOfDateSolarTorqueMeanLastMyrPct-->0.032<!--/v--> % on the million-year mean |
 | Solar mass loss | cited | luminosity/c² + wind | published constants (`deriveEpochParams`) — the Driver-2 stretch of every heliocentric period; the μ(t) the two-expansions consistency leg tests |
 
-#### The K-device scene pose — recorded constants (5)
+#### The scene carries no pose constants
 
-These are the recorded J2000 pose of the scene's K-device scaffold — NOT
-constants of the published Earth orbit or clock (Ledgers 1–2). The frozen
-era device they once belonged to (plan 06 D8) — the fitted unit, its
-counters and every correction comb — is deleted (plan 09; `model-version.json`
-`_v24Note`). No observable rides them: the engine places the Earth frame,
-the Sun and the Moon stack over the scaffold. They left at plan 11 step 4,
-and the file that carried them, `model-parameters.json`, is DELETED at step 6
-— `astro-reference.json` is the one input file (its `timeReference` holds the
-scene epoch); the planets' display names, the file's last leaf, are code
-(`@essrt/physics` `planets/display-names`).
-
-| # | Constant | Variable | Value | Anchored by |
-|---|-----------|----------|-------|-------------|
-| 1–5 | DELETED (plan 11 step 4). The K wheels' recorded periods (111,772.3 / 67,063.4 / 41,914.6 / 25,793.6 scene years — the retired unit's 335,317/N), the mean obliquity `earthtiltMean` (23.41353°), the inclination amplitude `earthInvPlaneInclinationAmplitude` (0.63607°), the inclination wheel's phase `kDeviceInclinationPhaseJ2000Deg` (81.17719°) and the wheels' phase `kDeviceWheelPhaseAtJ2000Cycles` (0.908498525) were the scene scaffolding's J2000 pose. Measured on the Node twin before their deletion, that pose was the J2000 ecliptic frame to 0.026° of pole tilt, with the J2000 equinox at view azimuth 90.0066° in the browser (the Node twin's pose read 158.2265° = 180° − the retired inclination anchor; step 4 first shipped that one and turned the browser's world 68.2° against its skydome — corrected). The scene's world frame IS the J2000 ecliptic now (`@essrt/physics` `computeSceneWorldFrameJ2000`: world Y the J2000 ecliptic pole, the equinox along world +X, view azimuth 90° — the only scene literal the pose leaves, kept for visual continuity); the three precession wheels are deleted and every frame of date is placed from the engine through it in both twins. Two display literals remain in `src/script.js`: the Wobble marker's radius (`WOBBLE_MARKER_RADIUS_SCENE_UNITS`, the former A × 100) and the inclination loop's zero (`INCLINATION_PATH_ZERO_DEG`). | — | — | — |
-
-The wheel indices are pose identifiers — not degrees of freedom and not
-laws; what the three pre-registered falsification legs test is the
-physics: the composed precession clock, the obliquity beat, the
-two-expansions μ-consistency. (The deleted correction bases had measured
-their phase from J2000 since plan 07 R10: they were fitted against an
-origin t₀ counted back from the 1246 AD alignment by 14.5 perihelion-of-date
-beats, and that origin was rotated out of every coefficient exactly — so
-neither the beat count nor any earlier epoch is an input of the model.)
-Earth's eccentricity is not a parameter: e(J2000) is an observed
-calibration input, and e of date is the N-body series.
+`astro-reference.json` is the one input file (its `timeReference` holds the
+scene epoch); the planets' display names are code (`@essrt/physics`
+`planets/display-names`). The scene's world frame IS the J2000 ecliptic
+(`@essrt/physics` `computeSceneWorldFrameJ2000`: world Y the J2000 ecliptic
+pole, the equinox along world +X at view azimuth 90°), every frame of date is
+placed from the engine through it in both twins, and three display literals
+remain in `src/script.js`: the view azimuth, the Wobble marker's radius
+(`WOBBLE_MARKER_RADIUS_SCENE_UNITS`) and the inclination loop's zero
+(`INCLINATION_PATH_ZERO_DEG`). What the three pre-registered falsification
+legs test is the physics: the composed precession clock, the obliquity beat,
+the two-expansions μ-consistency. Earth's eccentricity is not a parameter:
+e(J2000) is an observed calibration input, and e of date is the N-body series.
 
 ### Ledger 3 — the fitted correction stack (named, gated, hashed)
 
@@ -135,26 +122,17 @@ core-mantle resonator (`DT_RESONATOR`) and the climate formula
 (`CLIMATE_FORMULA_COEFFS`); beside them sit the measured osculating-mean
 offset (`EARTH_OSCULATING_MEAN_OFFSET`, derived, not fitted), the literature
 Meeus lunar term tables and the frozen balance-search record. The GIA τ is
-the banked fitted record `data/deep-time-fitted.json` (plan 11 step 1; the
-recession knots and the quartic's α₃/α₄ left it at plan 12 option A — the
-distance history is the cited input above; the deep-time block of the
-constants is ASSEMBLED from it, from astro-reference's LLR α₁ and Cox & Chao
-block, and from the ΔT stack's own `shipped_taper` — one home per leaf, under
-the constants hash). The regime fitter in the tree no longer reproduces those
-knots on the current engine (measured; the artifact's note records the
-divergence) — a refit is a campaign under the paleo-anchors gate, never a
-side effect. Every fit is fitter-owned, provenance-tracked, and behind
-fail-proven gates; the paleo-anchors gate fails on an unexplained
-*improvement* too. None of them touch the planetary dynamics (Ledger 1).
-`fitted-coefficients.json` is deleted (plan 11 step 1), having held only its
-description since plan 09: the year-length harmonics and the
-cardinal-point family were the FROZEN era clock's basis — a device, not the
-published year lengths (plan 06 Phase 3 S2) — and plan 09 deleted them
-family by family with the obliquity, perihelion, Sun-longitude and RA-day
-combs, the cardinal record last with the clock's own counter (step 7a):
-the published tropical, sidereal and anomalistic years of date and the
-precession periods ride the one-family route (`model.yearLengths`, doc 110
-chain 3.2 route B).
+the banked fitted record `data/deep-time-fitted.json` (the distance history
+is the cited input above; the deep-time block of the constants is ASSEMBLED
+from it, from astro-reference's LLR α₁ and Cox & Chao block, and from the ΔT
+stack's own `shipped_taper` — one home per leaf, under the constants hash).
+Every fit is fitter-owned, provenance-tracked, and behind fail-proven gates
+(the ΔT pair carries an inputs block and a re-close is a by-hand decision;
+the paleo-anchors gate fails on an unexplained *improvement* too). None of
+them touch the planetary dynamics (Ledger 1), and nothing fitted sits under
+the year lengths: the published tropical, sidereal and anomalistic years of
+date and the precession periods ride the one-family route
+(`model.yearLengths`, doc 110 chain 3.2 route B).
 
 ### Core Calibration Inputs (28 — Earth, Sun & Moon)
 
@@ -202,40 +180,37 @@ they anchor per-planet geometry but carry no model freedom.
 
 These constants define the model. Changing any of them changes the theory.
 
-## The perihelion alignment year — and the retired timing anchor
+## The perihelion alignment year
 
 | Constant | Variable | Value |
 |----------|----------|-------|
 | Perihelion alignment year | `perihelionalignmentYear` | <!--v:periAlignYear-->1246.03125<!--/v--> AD |
 
-**Retired (plan 09, the record).** The frozen era device's unit — the "fitted timing anchor" `holisticyearLength`, 335,317 years, fitted on the 1246 AD perihelion–solstice alignment of the IAU mean elements (Meeus; the model's own series crosses two years later, at 1247.7 AD) — was the unit of the correction combs, the era clock's counters and the lattice grid (`stepYears`), together with the device's rounded mean-tropical-year input `inputmeanlengthsolaryearindays` = 365.2422 d. Plan 09 deleted the combs family by family, then the counters (step 7a), the unit function (7b) and finally the inputs themselves (7c): the time machinery rides the composed lunisolar precession clock T_p(t) (the IAU p_A at J2000, <!--v:axialPrecExact-->25,771.58<!--/v--> years) and the N-body series' elements of date, the J2000 mean tropical year is DERIVED from the IAU sidereal year and p_A, and the K-device scaffold's wheels turn at recorded periods (`kDeviceWheelPeriodYears`, above). It was never a period: the unit stood at 13.011 precession periods, a fit constant (plan 06 S5). (Plan 07 R10 had already removed the phase origin's inputs `temperatureGraphMostLikely` and `systemResetN`; the combs measured their phase from J2000.) The literals gate fails if any of these inputs returns.
+A reference date, not a model input: the 1246 AD perihelion–solstice
+alignment of the IAU mean elements (Meeus; the model's own series crosses two
+years later, at 1247.7 AD). The time machinery rides the composed lunisolar
+precession clock T_p(t) (the IAU p_A at J2000,
+<!--v:axialPrecExact-->25,771.58<!--/v--> years) and the N-body series'
+elements of date, and the J2000 mean tropical year is DERIVED from the IAU
+sidereal year and p_A. The literals gate fails if a retired timing input
+returns.
 
 ## Earth Parameters
 
 | Constant | Variable | Value | Description |
 |----------|----------|-------|-------------|
-| Base Eccentricity | (`eccentricityBase` — DELETED, plan 11 step 2) | was 0.015386 | The Law-5 constant of the retired K law; its last reader was a fallback the panel always pre-empted. The perihelion wheel's offset base′ (`eccentricityBaseDerived`) went with it — the engine places the offset arm at the series' e of date every frame, and the rest pose before the first frame is e(J2000). Earth's published e of date is the N-body series (the H/3 law is deleted, plan 09 step 6) |
-| Eccentricity Amplitude | (`eccentricityAmplitude` — DELETED, plan 11 step 4) | was 0.001356 | The Law-4 K input A, lately only the Wobble marker's display radius (now the scene literal `WOBBLE_MARKER_RADIUS_SCENE_UNITS`); the K law it calibrated is retired. Its derivation record: the 1246 triangle closure e(J2000)² = base² + A² + 2·base·A·cos φ on the H/16 beat from the <!--v:periAlignYearRound-->1246.03<!--/v--> perihelion–solstice alignment reproduced this value (the closure's registry keys — the phase, the derived A and the ±5 % alignment-year test — left with the eccentricity law at plan 09 step 6). A does not enter any e(t): Earth's eccentricity of date is the N-body series |
-| Mean Obliquity | (`earthtiltMean` — DELETED, plan 11 step 4) | was 23.41353 deg | The K scaffold's mean tilt; the rendered obliquity of date is the hybrid spin integration, its J2000 anchor the astro-reference input |
-| RA Angle | (`earthRAAngle` — DELETED, plan 11 step 4) | was ~1.254 | The scaffold's derived `2A − A²/ε`, the perihelion wheel's tilt; the perihelion pair's container is world-placed every frame |
-| Mean Inclination (inv. plane) | (`earthInvPlaneInclinationMean` — DELETED, plan 11 step 2) | the engine's mean over ±10 Myr is <!--v:earthInclMean-->1.28741<!--/v--> deg | The retired device's mean (inclJ2000 − A·cos(the K phase)) was the invariable-plane disc's init pose, rewritten from the engine's one-source normal every frame; the registry's `earthInclMean`/`Min`/`Max` are the engine's ±10-Myr statistics since plan 11 step 2 |
-| Inclination Amplitude | (`earthInvPlaneInclinationAmplitude` — DELETED, plan 11 step 4) | was 0.63607 deg | The K scaffold's tilt amplitude (the ecliptic and obliquity wheels' ±A); the engine's inclination statistics are `earthInclMean/Min/Max` |
-| Inclination Cycle Anchor | (`earthInclinationCycleAnchor` — DELETED, plan 09 step 6) | was 21.77° | the eccentricity law's phase anchor (the perihelion longitude at maximum inclination); the scene pose it also set is the recorded `kDeviceInclinationPhaseJ2000Deg` = ϖ_J2000 − 21.77° |
+| Eccentricity of date | the N-body series (`createModel().earth.eccentricity`) | e(J2000) = <!--v:j2000Eccentricity-->0.01671022<!--/v--> | the observed J2000 value is the calibration input; the scene's offset arm carries the series' e(t) every frame |
+| Obliquity of date | the hybrid spin integration | its J2000 anchor the astro-reference input | the rendered axis of date |
+| Inclination to the invariable plane | the engine's one-source orbit normal | mean over ±10 Myr <!--v:earthInclMean-->1.28741<!--/v--> deg | the registry's `earthInclMean`/`Min`/`Max` are the engine's ±10-Myr statistics |
 | Perihelion Ref JD | `perihelionRefJD` | <!--v:perihelionPassageJD-->2451547.042<!--/v--> | JD of Earth perihelion 2000 (Jan 3.542) |
-
-(The per-planet divisor, phase-group and mirror-pair table of the retired
-integer-law framing stood here. Its inputs left `model-parameters.json` at
-plan 07 R8 and nothing in the model reads them.)
 
 ## Model Start & Alignment
 
 | Constant | Variable | Value | Description |
 |----------|----------|-------|-------------|
-| Start Model JD | `startmodelJD` (`astro-reference` `timeReference.sceneEpochJD` since plan 11 step 5) | <!--v:startModelJD-->2,451,716.5<!--/v--> | June Solstice 2000 00:00 UTC — the scene's time origin (pos = 0) |
+| Start Model JD | `startmodelJD` (`astro-reference` `timeReference.sceneEpochJD`) | <!--v:startModelJD-->2,451,716.5<!--/v--> | June Solstice 2000 00:00 UTC — the scene's time origin (pos = 0); the SI-year label, the lunar and planet integrators and the perihelion calendar anchor on the epoch itself |
 | Start Model Year | `startmodelYear` (`timeReference.sceneEpochYear`) | <!--v:startModelYear-->2000.5<!--/v--> | The epoch's year label — the age-anchor convention every deep-time read takes its t_Ma from, NOT the calendar decimal year of the JD (2000.4699) |
-| Start Angle | (`startAngleModel` — DELETED, plan 11 step 4) | was 89.91949879 deg | The inclination-path loop's angular zero (with the K inclination phase); the zero is the scene literal `INCLINATION_PATH_ZERO_DEG` in `src/script.js` |
-| Correction Days | (`correctionDays` — DELETED, plan 11 step 5) | was −0.8288 | The retired scaffold Sun's fine timing; the SI-year label, the lunar and planet integrators and the perihelion calendar anchor on the epoch itself (measured: the package Moon moved 0.0006″ in era, the perihelion calendar's rounded day-0 one day) |
-| Variable Speed | (`useVariableSpeed` — hard-wired true, plan 11 step 2) | true | The equation of centre and the certified Moon override are the scene, not a toggle; the false branch was a 6.5°-of-Moon diagnostic nobody ran |
+| Inclination-path zero | `INCLINATION_PATH_ZERO_DEG` (scene literal, `src/script.js`) | — | the inclination-path loop's angular zero, a display literal |
 
 ## Physical Constants
 
@@ -272,31 +247,25 @@ These are computed from foundational constants. The formula is the definition; t
 | Apsidal Precession | the beat of the one-family anomalistic and sidereal years, T_anom·T_sid/(T_anom − T_sid) — the movement's own apsidal rate | <!--v:inclPrecYears-->~111,635<!--/v--> | Counter-clockwise |
 | Ecliptic Precession | 1,296,000/\|s₃\|, the N-body chain's dominant nodal mode | <!--v:eclPrecYears-->~68,751<!--/v--> | Counter-clockwise |
 | Obliquity Cycle | the beat 1,296,000/(ψ̇ᵢₙ − \|s₃\|) of the spin axis's inertial rate against s₃ (the instantaneous limit) | <!--v:obliqCycleYears-->~41,099<!--/v--> | Clockwise (negative) |
-| Axial Precession | 1,296,000 / p_A — the IAU 2006 general precession input (plan 09; the fit-era label H/13 read 25,794 and the retired year combs' beat read 25,771.4) | <!--v:axialPrecRound-->~25,772<!--/v--> | Clockwise (negative) |
+| Axial Precession | 1,296,000 / p_A — the IAU 2006 general precession input | <!--v:axialPrecRound-->~25,772<!--/v--> | Clockwise (negative) |
 | Perihelion Precession | the perihelion-of-date beat, 1/T_peri = 1/T_p + 1/T_aps | <!--v:periPrecYears-->~20,938<!--/v--> | Both directions |
-
-(Plan 06 S6: these were H/3, H/5, H/8 and H/16 of the retired unit, +0.18 %,
-−2.5 %, +1.7 % and +0.10 % off the dynamical values; the scene's K-device
-wheels kept those numbers as recorded pose periods until plan 11 step 4
-deleted the wheels.)
 
 ## Time Constants
 
 | Constant | Variable | Formula | Value |
 |----------|----------|---------|-------|
-| Mean Solar Year | `meanSolarYearDays` | derived from the IAU sidereal year and p_A, `computeMeanTropicalYearJ2000Days` (plan 09; was the Meeus & Savoie input 365.2421897, 66 ms shorter, and before it round(inputMeanSolarYear × H/8)/(H/8), +1.2 s) | <!--v:meanSolarYearDaysFull-->365.242190469006<!--/v--> days |
-| Mean Sidereal Year | `meanSiderealYearDays` | the IAU sidereal year, `yearLengthRef.siderealYear` (plan 09; the H/13 construction meanSolarYearDays × (H/13)/((H/13) − 1), 1 µd above it, is deleted) | <!--v:meanSiderealYearDaysFull-->365.256363004<!--/v--> days |
-| Mean Anomalistic Year | (the law of date at 2000) | derived: the one-family anomalistic year at 2000 — the sidereal year and the series' own apsidal rate (plan 09 step 4d; before it the Simon 1994 input 365.259636, 87 ms longer; before step 3 meanSolarYearDays × (H/16)/(H/16 − 1), 0.3 s low) | <!--v:anomalisticYearDaysFull-->365.259634985<!--/v--> days |
-| Mean Length of Day | `meanLengthOfDay` | the SI day ω₀, `yearLengthRef.solarDay` (plan 09; was meanSiderealYearSeconds over the H/13 sidereal days, 86,399.99968 s) | ~86,400.0 s |
+| Mean Solar Year | `meanSolarYearDays` | derived from the IAU sidereal year and p_A, `computeMeanTropicalYearJ2000Days` | <!--v:meanSolarYearDaysFull-->365.242190469006<!--/v--> days |
+| Mean Sidereal Year | `meanSiderealYearDays` | the IAU sidereal year, `yearLengthRef.siderealYear` | <!--v:meanSiderealYearDaysFull-->365.256363004<!--/v--> days |
+| Mean Anomalistic Year | (the law of date at 2000) | derived: the one-family anomalistic year at 2000 — the sidereal year and the series' own apsidal rate | <!--v:anomalisticYearDaysFull-->365.259634985<!--/v--> days |
+| Mean Length of Day | `meanLengthOfDay` | the SI day ω₀, `yearLengthRef.solarDay` | ~86,400.0 s |
 | Mean Sidereal Day | `meanSiderealDay` | (meanSolarYearDays/(meanSolarYearDays+1)) × meanLengthOfDay | <!--v:meanSiderealDaySeconds-->86,164.0905329<!--/v--> s |
-| Mean Stellar Day | `meanStellarDay` | (meanSiderealDay/T_p) / (meanSolarYearDays+1) · cos ε + meanSiderealDay — T_p the J2000 precession period 1,296,000/p_A (S5 retired the counter H/13) | <!--v:meanStellarDaySeconds-->86,164.0989084<!--/v--> s |
-| Phase origin of the K-device wheels' pose | `balancedYear` | 2000 (J2000, by construction — plan 07 R10) | the former fitted origin perihelionalignmentYear − 14.5 × H/16 was rotated out of every comb coefficient exactly (the combs are deleted since, plan 09); the name stays as the scene's phase-origin variable |
-| Perihelion Alignment JD | `perihelionalignmentJD` | round(startmodelJD - meanSolarYearDays × (startmodelYear - perihelionalignmentYear)) — on the scene epoch itself since plan 11 step 5 (the deleted −0.83-d correction had held the rounded day-0 one day later) | ~<!--v:periAlignJD-->2,176,153<!--/v--> |
+| Mean Stellar Day | `meanStellarDay` | (meanSiderealDay/T_p) / (meanSolarYearDays+1) · cos ε + meanSiderealDay — T_p the J2000 precession period 1,296,000/p_A | <!--v:meanStellarDaySeconds-->86,164.0989084<!--/v--> s |
+| Phase origin | `balancedYear` | 2000 (J2000, by construction) | the scene's phase-origin variable — J2000, nothing fitted |
+| Perihelion Alignment JD | `perihelionalignmentJD` | round(startmodelJD - meanSolarYearDays × (startmodelYear - perihelionalignmentYear)) — on the scene epoch itself | ~<!--v:periAlignJD-->2,176,153<!--/v--> |
 | J2000.0 epoch JD | `j2000JD` | startmodelJD - (startmodelYear - 2000) × meanSolarYearDays | ~2451545.0 |
 | Julian century | `julianCenturyDays` | 36525 (100 × 365.25) | 36,525 days (IAU Julian century) |
 | Earth rotations/year | `meanEarthRotationsPerYear` | meanSolarYearDays + 1 | 366.2422 |
-| Start year corrected | (`startModelYearWithCorrection` — DELETED, plan 11 step 5) | was startmodelYear + correctionDays / meanSolarYearDays ≈ 2000.4977; every anchor is `startmodelYear` now (the Node export name stays as an alias for two frozen explore scripts) | — |
-| Years from the phase origin to J2000 | `yearsFromBalancedToJ2000` | (startmodelJD - balancedJD) / meanSolarYearDays | ≈ 0 since plan 07 R10 (the origin is J2000; kept as a code variable) |
+| Years from the phase origin to J2000 | `yearsFromBalancedToJ2000` | (startmodelJD - balancedJD) / meanSolarYearDays | ≈ 0 (the origin is J2000; a code variable) |
 
 Input constants used in the formulas above:
 
@@ -308,19 +277,13 @@ Input constants used in the formulas above:
 
 | Constant | Variable | Formula | Value |
 |----------|----------|---------|-------|
-| Derived Mean Eccentricity | `eccentricityDerivedMean` | e(J2000) / (1 + cos θ₀/2) | the retired single-line law's base′ — the scene's flag-off fallback and the Node twin only; the published e is the N-body series |
+| Derived Mean Eccentricity | `eccentricityDerivedMean` | e(J2000) / (1 + cos θ₀/2) | a Node-twin constant (`tools/lib/constants.js`) with no published reader; the published e is the N-body series |
 | EoC Eccentricity | `eocEccentricity` | e(J2000) / 2 | ~<!--v:eocEccentricityValue-->0.00836<!--/v--> — the Sun node's rest-pose EoC half; the scene's per-frame value is the series' e(t)/2 |
-| Perihelion Phase Offset | (`perihelionPhaseOffset` — DELETED, plan 11 step 2) | was ~0.483 deg | the scene Sun's EoC phase at the model start, built from the deleted wheel 16 and `correctionSun`; the engine places the Sun at the certified longitude every frame |
 
-## Ascending Node Frame Corrections (DELETED, plan 11 step 3)
-
-The per-planet `ascNodeTiltCorrection` (180 − Ω for the inner planets, 2 × the
-scaffold start angle for the outer ones) compensated the legacy position path
-for moving the orbit tilt from the `RealPerihelionAtSun` wheel to the planet's
-own container. It is deleted with the start angles: the engine-D chain places
-every rendered planet quantity, each planet's rotation axis is placed from the
-spin channel's pole of date (`_kcPlacePlanetPole`), and the planet containers
-take the plain node tilt.
+The planets carry no frame corrections: the engine-D chain places every
+rendered planet quantity, each planet's rotation axis is placed from the spin
+channel's pole of date (`_kcPlacePlanetPole`), and the planet containers take
+the plain node tilt.
 
 ## Mass Computation & Universal Constants
 
@@ -346,11 +309,11 @@ massFraction.earth = (GM_Earth / G) / M_Sun
 | Uranus | <!--v:uranusMassFraction-->4.366 × 10⁻⁵<!--/v--> |
 | Neptune | <!--v:neptuneMassFraction-->5.151 × 10⁻⁵<!--/v--> |
 
-### Universal Coupling Constant (ψ)
+### The retired integer laws' recorded constants (frozen in the registry)
 
 | Constant | Formula | Value |
 |----------|---------|-------|
-| ψ (psi) — RETIRED (plan 07 R5), the recorded value | d_E × amp_E × √m_E (from Earth) | <!--v:psiValue-->3.3070 × 10⁻³<!--/v--> |
+| ψ (psi) — the retired inclination law's recorded value | d_E × amp_E × √m_E (from Earth) | <!--v:psiValue-->3.3070 × 10⁻³<!--/v--> |
 | K | e_amp_E × √m_E / (sin(tilt_E) × √d_E) (from Earth) | <!--v:kValue-->3.4143 × 10⁻⁶<!--/v--> |
 
 ### J2000 Eccentricities (eccJ2000)
@@ -368,21 +331,17 @@ All 8 planets — the observed J2000 values the chains' eccentricity of date is 
 | Uranus | <!--v:uranusEccJ2000Full-->0.04725744<!--/v--> | J2000 (base derived from phase) |
 | Neptune | <!--v:neptuneEccJ2000Full-->0.00859048<!--/v--> | J2000 (base derived from phase) |
 
-## Planet Inclination Parameters (the ψ law — RETIRED, plan 07 R5)
+## Planet Inclination Statistics
 
-The ψ law — amplitudes `amp = ψ / (d × √m)`, means from the J2000 constraint
-— is DELETED from the code (the ψ/K law module of `@essrt/physics`, the
-`tools/lib/constants.js` loop, the browser's `_FL` loop and the Python bridge's
-`INCL_AMP`/`INCL_MEAN`). The per-planet mean and amplitude below are now the
-CHAIN's series range (the registry's `chainInclStats`); the law's
-verification instruments, `inclination-optimization` and
-`inclination-verification`, went at plan 07 R6.
+The per-planet mean and range below are the N-body CHAIN's series statistics
+over ±10 Myr (the registry's `chainInclStats`); no inclination law sits
+beside them.
 
 | Planet | Mean (deg) | Range over ±10 Myr (deg) | Inertial apsidal period |
 |--------|----------|---------------|-------------|
 | Mercury | <!--v:mercuryInclMean-->6.690391<!--/v--> | <!--v:mercuryInclMin-->0.14<!--/v-->–<!--v:mercuryInclMax-->10.97<!--/v--> | <!--v:mercuryPeriPeriodICRF-->232,437<!--/v--> yr |
 | Venus | <!--v:venusInclMean-->1.538475<!--/v--> | <!--v:venusInclMin-->0.00<!--/v-->–<!--v:venusInclMax-->3.46<!--/v--> | <!--v:venusPeriPeriodICRF-->174,997<!--/v--> yr |
-| Earth | <!--v:earthInclMean-->1.28741<!--/v--> | <!--v:earthInclMin-->0.034<!--/v-->–<!--v:earthInclMax-->2.942<!--/v--> (the K scaffold's amplitude 0.636 is deleted, plan 11 step 4) | <!--v:earthPeriPeriodICRF-->111,635<!--/v--> yr |
+| Earth | <!--v:earthInclMean-->1.28741<!--/v--> | <!--v:earthInclMin-->0.034<!--/v-->–<!--v:earthInclMax-->2.942<!--/v--> | <!--v:earthPeriPeriodICRF-->111,635<!--/v--> yr |
 | Mars | <!--v:marsInclMean-->4.205698<!--/v--> | <!--v:marsInclMin-->0.07<!--/v-->–<!--v:marsInclMax-->6.80<!--/v--> | <!--v:marsPeriPeriodICRF-->72,335<!--/v--> yr |
 | Jupiter | <!--v:jupiterInclMean-->0.362449<!--/v--> | <!--v:jupiterInclMin-->0.20<!--/v-->–<!--v:jupiterInclMax-->0.49<!--/v--> | <!--v:jupiterPeriPeriodICRF-->304,456<!--/v--> yr |
 | Saturn | <!--v:saturnInclMean-->0.891489<!--/v--> | <!--v:saturnInclMin-->0.77<!--/v-->–<!--v:saturnInclMax-->1.02<!--/v--> | <!--v:saturnPeriPeriodICRF-->45,883<!--/v--> yr |
@@ -390,13 +349,8 @@ verification instruments, `inclination-optimization` and
 | Neptune | <!--v:neptuneInclMean-->0.668880<!--/v--> | <!--v:neptuneInclMin-->0.44<!--/v-->–<!--v:neptuneInclMax-->0.80<!--/v--> | <!--v:neptunePeriPeriodICRF-->2,136,797<!--/v--> yr |
 
 The mean and range are the chain's over the banked ±10-Myr series (a
-multi-mode quantity has no single amplitude — the former half-range key
-`<p>InclAmp` left the registry at model-values 23.0.0, its "mean ± amplitude"
-reading being the retired ψ law's framing); the
-period is the chain's 1,296,000/|g| (Earth: the one-family route). The
-retired law's per-planet phase anchors (`inclinationCycleAnchor`, the
-`i(t) = mean + amplitude × cos(ω̃_ICRF(t) − anchor)` form, Saturn anti-phase)
-left `model-parameters.json` at plan 07 R8; doc 31 records their values.
+multi-mode quantity has no single amplitude); the period is the chain's
+1,296,000/|g| (Earth: the one-family route).
 
 ## Planet Orbital Distances & Periods
 
@@ -424,11 +378,9 @@ left `model-parameters.json` at plan 07 R8; doc 31 records their values.
 | Neptune | 1,296,000/(g + p_A) | ~<!--v:neptunePeriPeriod-->25,464<!--/v--> |
 
 g is the planet's leading secular apsidal eigenfrequency from the N-body
-chain, p_A the J2000 general precession (plan 07; the registry's
+chain, p_A the J2000 general precession (the registry's
 `<planet>PeriFormula` keys name each mode). Every g is positive, so every
-period is: the minus signs and "(retrograde)" labels the former lattice
-descriptors on the retired unit carried (Y/(1 + 3/8), −8Y/6, …) are gone with
-them; doc 109 is their record. Saturn's retrograde motion is its ERA-WINDOW
+secular period is prograde. Saturn's retrograde motion is its ERA-WINDOW
 rate, <!--v:saturnPeriRateNowArcsecCy-->−1,576.6<!--/v--> ″/cy (1800–2100,
 the Great Inequality's local slope) — a different quantity from its secular
 mode. The chain's g comes from the run with 1PN switched on, so Mercury's
@@ -472,37 +424,32 @@ All Moon cycles derive from the IAU inputs — the sidereal month and the two eq
 
 Eclipse cycles (from derived months): Saros = 223 synodic ≈ 6585.32 days, Exeligmos = 3 × Saros, Callippic = 940 synodic ≈ 76 solar years.
 
-## Year-Length Harmonics (retired)
+## Year lengths of date
 
-The three year-length Fourier combs (`TROPICAL_YEAR_HARMONICS` 12 terms, `SIDEREAL_YEAR_HARMONICS` 6, `ANOMALISTIC_YEAR_HARMONICS` 8 — `[period_divisor, sin, cos]` rows on divisors of the unit H, fitted to the 335,318-row full-period export) and their J2000 anchor `YEAR_LENGTH_J2000_ANCHOR` are deleted at plan 09, together with the means they rode (the input mean solar year rounded onto 1/(H/8) and the H/(H−13), H/(H−16) ratios): the J2000 year lengths are the IAU inputs (the tropical year derived from them), the year lengths of date are the one-source family (`createYearLengths` in `@essrt/physics`; doc 11 § "Year Lengths of Date"). The `CARDINAL_POINT_HARMONICS` derivative route (23 harmonics per type + ECC/JOINT/DERIVED families) was deleted last, at plan 09 step 7a; the cardinal year lengths are the intervals between the certified Sun's crossings (`createModel().cardinal.yearLengthDays`), and doc 110 §5.2/§5.5 is the record.
+The J2000 year lengths are the IAU inputs (the tropical year derived from
+them); the year lengths of date are the one-source family (`createYearLengths`
+in `@essrt/physics`; doc 11 § "Year Lengths of Date"); the cardinal year
+lengths are the intervals between the certified Sun's crossings
+(`createModel().cardinal.yearLengthDays`). No harmonic comb sits under any of
+them.
 
-## Sun Longitude — the certified chain and the legacy harmonics
+## Sun Longitude — the certified chain
 
 The certified apparent solar longitude is **assembled, not fitted** (E4/E5
 framework-native Sun, `packages/physics/src/model.js`, exported as
 `eclipse.frameworkSunDeps`): the mean longitude as the INTEGRAL of the
-one-source tropical year of date (route B, SI seconds — plan 06 R1;
-formerly the frozen era clock's closed-form drift with the comb ripple and
-the torque factors, measured 12 min off in the medieval era) + equation of
-centre on the banked series' e(t) and ϖ(t) plus the derived mean-element
-offset (`data/earth-osculating-mean-offset.json`, plan 06 layer B —
-formerly the H/16 + derived-H/3 laws). It carries **zero fitted solar
-constants**; accuracy <!--v:frameworkSunVsJplRms-->1.03<!--/v-->″ RMS vs JPL (modern window 1970–2049; the Meeus Ch. 25 basis on the same completion: <!--v:meeusCh25SunVsJplRms-->1.02<!--/v-->″). The former era-clock Sun read 0.80″ in that window — the modern-window cost of the physical year, accepted for its behaviour over millennia (plan 06 R1).
+one-source tropical year of date (route B, SI seconds) + equation of centre
+on the banked series' e(t) and ϖ(t) plus the derived mean-element offset
+(`data/earth-osculating-mean-offset.json`). It carries **zero fitted solar
+constants**; accuracy <!--v:frameworkSunVsJplRms-->1.03<!--/v-->″ RMS vs JPL (modern window 1970–2049; the Meeus Ch. 25 basis on the same completion: <!--v:meeusCh25SunVsJplRms-->1.02<!--/v-->″).
 The scene wheel displays the same longitude via the δ overlay
 (δ = λ_certified − λ_realized, the wheel's own longitude read from the scene
 geometry; clock-convention window). See
 [doc 99 § The framework-native Sun](99-expanding-solar-system-resonance-theory.md#the-framework-native-sun-e4e5--the-certified-apparent-solar-longitude).
 
-The **legacy fitted family** is deleted (the record):
+## Earth's perihelion of date
 
-| Constant | Value | Description |
-|----------|-------|-------------|
-| `SUN_LONGITUDE_HARMONICS` | DELETED at plan 09 step 5a (was a 3-term comb on the periods H, 2H, 3H) | Fitted sun-longitude harmonics, ~279″ annual span. Already RETIRED from every scene path before deletion (FQ-3 took it off the display Sun; plan 06 R4 took it off the Step-6a instrument too — the fast Sun rides the engine Earth frame with the certified longitude); gone with its Step-0 fitter |
-| `SUN_LONGITUDE_MEAN` | DELETED at plan 09 step 5a (was −0.0019°) | Fitted mean offset (~−6.9″) — a constant offset on the Sun, gone with the comb and its Step-0 fitter |
-
-## Earth Perihelion Harmonics (retired)
-
-The 25-term Fourier comb `PERI_HARMONICS` + `PERI_OFFSET` (Earth's perihelion longitude on divisors of the unit H, RMSE 0.0006° against the file-01 export, J2000 exact) is deleted at plan 09 step 4. Earth's perihelion of date is the series' ϖ in every runtime (doc 110 chain 1.1) — the scene's perihelion had followed it since v16.0, and the comb's last live readers were the browser's device-tier `o.longitudePerihelion`, the registry's `periLongModel*` rows and the Python mirror. Two readings of the one series, named: the PUBLISHED perihelion of date (the registry rows, the eclipses, the cardinal points) is the Sun channel's `createModel().sun.perihelionLongitudeDegAt` — the series' secular mean plus the measured osculating-mean offset `EARTH_OSCULATING_MEAN_OFFSET.dPomArcsec`, the osculating-mean apsidal direction that Meeus's and Standish's mean elements tabulate (within 0.001° of Meeus at 1000–3000 AD); the bare series mean `createModel().earth.perihelionLongitudeDeg` sits a constant 0.0195° below it. Measured before deletion, comb − bare series: 0.03° at 2000, −1.6° at −4000, −20° at −26 kyr, −87° at −270 kyr (`data/era-device-readers.json`).
+Earth's perihelion of date is the series' ϖ in every runtime (doc 110 chain 1.1). Two readings of the one series, named: the PUBLISHED perihelion of date (the registry rows, the eclipses, the cardinal points) is the Sun channel's `createModel().sun.perihelionLongitudeDegAt` — the series' secular mean plus the measured osculating-mean offset `EARTH_OSCULATING_MEAN_OFFSET.dPomArcsec`, the osculating-mean apsidal direction that Meeus's and Standish's mean elements tabulate (within 0.001° of Meeus at 1000–3000 AD); the bare series mean `createModel().earth.perihelionLongitudeDeg` sits a constant 0.0195° below it.
 
 ## Delta-T
 
@@ -557,7 +504,7 @@ These offsets arise from the coin rotation paradox — precessing reference fram
 | Axial Coin Rotation | `axialCoinRotationMs` | meanSiderealday / T_p / (meansolaryearlengthinDays + 1) × 1000 — T_p the certified J2000 precession period | ~<!--v:axialCoinRotationMs-->9.13<!--/v--> ms/sidereal day |
 | Yearly accumulation | `axialCoinRotationYearlySeconds` | offset × (meansolaryearlengthinDays + 1) | ~3.34 s/year |
 
-**Perihelion Coin Rotation**: the constants `perihelionCoinRotationMs` / `…YearlySeconds` (1 extra solar day per H/16 cycle, ~11.29 ms/day) are deleted (plan 09 step 4b); the simulator's solar-day scan derives the perihelion coin rotation from the displayed perihelion-of-date period.
+**Perihelion Coin Rotation**: no constant — the simulator's solar-day scan derives it from the displayed perihelion-of-date period.
 
 **Axial Coin Rotation**: Axial precession (one turn per T_p) accumulates exactly 1 extra sidereal day over one axial precession cycle — 9.12 ms per sidereal day. This is a count on the **ecliptic** lattice and is deliberately *not* projected. It is **not** the physical stellar−sidereal day offset, which is the same rate projected onto the **equator** (precession in right ascension, m = p·cos ε) and is therefore ~8.37 ms. See [Year and Day Length Formulas](11-length-day-year-formulas.md) for details.
 
@@ -725,16 +672,6 @@ Theoretical orbital inclination ranges from secular perturbation theory.
 
 **Source**: [Farside physics textbook (Brouwer & van Woerkom)](https://farside.ph.utexas.edu/teaching/celestial/Celestial/node91.html)
 
-### Inclination Cycle Anchors — retired (plan 07 R8)
-
-The per-planet cycle anchors (the ψ law's phase inputs, `inclinationCycleAnchor`,
-and the System-Reset n=7 convention they were evaluated at) left
-`model-parameters.json` with the law; nothing in the model reads them. Earth's
-anchor (21.77°) phased the eccentricity channel; it left astro-reference with
-that law at plan 09 step 6 (the scene pose it also set, the recorded
-`kDeviceInclinationPhaseJ2000Deg`, left with the K scaffold at plan 11 step 4).
-The retired values are archived; the eigenmode-cluster claim of earlier
-versions is withdrawn with them.
 
 The `EIGENMODE_PHASES` array in `script.js` provides Laplace-Lagrange reference values:
 

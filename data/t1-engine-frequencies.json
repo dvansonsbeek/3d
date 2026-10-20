@@ -4,8 +4,8 @@
  "precessionPeriodYr": 25771.57645712862,
  "pInertialArcsecPerYr": 50.38455189277776,
  "inertialPrecessionPeriodYr": 25722.169818201197,
- "pInertialMeanLr04ArcsecPerYr": 50.519089124775064,
- "inertialPrecessionPeriodMeanLr04Yr": 25653.669186296327,
+ "pInertialMeanLr04ArcsecPerYr": 50.5190891247763,
+ "inertialPrecessionPeriodMeanLr04Yr": 25653.6691862957,
  "lr04WindowKyr": [
   0,
   5320
@@ -13,137 +13,170 @@
  "z": [
   {
    "arcsecPerYr": 4.25735934102568,
-   "amp": 0.019034597078717026
+   "amp": 0.019034597078717026,
+   "laskar": "g5"
   },
   {
    "arcsecPerYr": 7.45242382368428,
-   "amp": 0.016408707245477584
+   "amp": 0.016408707245477584,
+   "laskar": "g2"
   },
   {
    "arcsecPerYr": 17.917018104383835,
-   "amp": 0.01278642244367888
+   "amp": 0.01278642244367888,
+   "laskar": "g4"
   },
   {
    "arcsecPerYr": 17.3689464700915,
-   "amp": 0.00877080814023463
+   "amp": 0.00877080814023463,
+   "laskar": "g3"
   },
   {
    "arcsecPerYr": 5.590266395383251,
-   "amp": 0.0037919753483560102
+   "amp": 0.0037919753483560102,
+   "laskar": "g1"
   },
   {
    "arcsecPerYr": 17.088399504215314,
-   "amp": 0.0025391600778986835
+   "amp": 0.0025391600778986835,
+   "laskar": null
   },
   {
    "arcsecPerYr": 17.639011661151383,
-   "amp": 0.0018041442284098734
+   "amp": 0.0018041442284098734,
+   "laskar": null
   },
   {
    "arcsecPerYr": 16.824778606451687,
-   "amp": 0.0017166679126240883
+   "amp": 0.0017166679126240883,
+   "laskar": null
   },
   {
    "arcsecPerYr": 6.900821735163187,
-   "amp": 0.0015520207550465603
+   "amp": 0.0015520207550465603,
+   "laskar": null
   },
   {
    "arcsecPerYr": 28.24513097929549,
-   "amp": 0.001508701512191965
+   "amp": 0.001508701512191965,
+   "laskar": "g6"
   },
   {
    "arcsecPerYr": 18.020249007606342,
-   "amp": 0.001628081224095032
+   "amp": 0.001628081224095032,
+   "laskar": null
   },
   {
    "arcsecPerYr": 17.802055687991484,
-   "amp": 0.0010646516050317174
+   "amp": 0.0010646516050317174,
+   "laskar": null
   },
   {
    "arcsecPerYr": 5.456455131485779,
-   "amp": 0.0018394483781584503
+   "amp": 0.0018394483781584503,
+   "laskar": null
   },
   {
    "arcsecPerYr": 7.043108300515211,
-   "amp": 0.0012555266862316601
+   "amp": 0.0012555266862316601,
+   "laskar": null
   },
   {
    "arcsecPerYr": 7.318450810367318,
-   "amp": 0.001368343365904789
+   "amp": 0.001368343365904789,
+   "laskar": null
   },
   {
    "arcsecPerYr": 18.463025489855085,
-   "amp": 0.001055986175074994
+   "amp": 0.001055986175074994,
+   "laskar": null
   },
   {
    "arcsecPerYr": 18.181767743488862,
-   "amp": 0.0013108501630896214
+   "amp": 0.0013108501630896214,
+   "laskar": null
   },
   {
    "arcsecPerYr": 5.712003936395442,
-   "amp": 0.0013881512324845648
+   "amp": 0.0013881512324845648,
+   "laskar": null
   }
  ],
  "zeta": [
   {
    "arcsecPerYr": -18.85058301425291,
-   "amp": 0.00831717344036534
+   "amp": 0.00831717344036534,
+   "laskar": "s3"
   },
   {
    "arcsecPerYr": -5.585242870614428,
-   "amp": 0.0045048634626474555
+   "amp": 0.0045048634626474555,
+   "laskar": "s1"
   },
   {
    "arcsecPerYr": -17.75545315424114,
-   "amp": 0.004033180779071174
+   "amp": 0.004033180779071174,
+   "laskar": "s4"
   },
   {
    "arcsecPerYr": -7.042510533309932,
-   "amp": 0.003983575170760313
+   "amp": 0.003983575170760313,
+   "laskar": "s2"
   },
   {
    "arcsecPerYr": -18.303731762394182,
-   "amp": 0.0026931491803527654
+   "amp": 0.0026931491803527654,
+   "laskar": null
   },
   {
    "arcsecPerYr": -6.876657751389089,
-   "amp": 0.001045434174218794
+   "amp": 0.001045434174218794,
+   "laskar": null
   },
   {
    "arcsecPerYr": -7.158946799527683,
-   "amp": 0.001485988055149277
+   "amp": 0.001485988055149277,
+   "laskar": null
   },
   {
    "arcsecPerYr": -19.398575635870245,
-   "amp": 0.0014869508466029647
+   "amp": 0.0014869508466029647,
+   "laskar": null
   },
   {
    "arcsecPerYr": -5.460229128938108,
-   "amp": 0.0017121113415018202
+   "amp": 0.0017121113415018202,
+   "laskar": null
   },
   {
    "arcsecPerYr": -6.760747813687118,
-   "amp": 0.0008395896903785565
+   "amp": 0.0008395896903785565,
+   "laskar": null
   },
   {
    "arcsecPerYr": -26.347865733123214,
-   "amp": 0.001334909681924612
+   "amp": 0.001334909681924612,
+   "laskar": "s6"
   },
   {
    "arcsecPerYr": -19.12065832932884,
-   "amp": 0.0008052373066921773
+   "amp": 0.0008052373066921773,
+   "laskar": null
   },
   {
    "arcsecPerYr": -2.992406683516852,
-   "amp": 0.00086725271325188
+   "amp": 0.00086725271325188,
+   "laskar": "s7"
   },
   {
    "arcsecPerYr": -6.963891681483366,
-   "amp": 0.001348306199494263
+   "amp": 0.001348306199494263,
+   "laskar": null
   },
   {
    "arcsecPerYr": -5.836793442971808,
-   "amp": 0.001184051609793681
+   "amp": 0.001184051609793681,
+   "laskar": null
   }
  ],
  "inputs": {
@@ -151,8 +184,9 @@
   "files": {
    "data/lr04-stack.txt": "sha256:7d1a6ca7ffc033e45e20fb76a7f39c8d99df87baa1094260f9dbdc09f0bb8945",
    "data/nbody-deep-secular-modes.json": "sha256:87c325fac77d94a45e1381b62a2a4c5cd8253bc4765c8d497a1d9f5466649ccc",
-   "data/nbody-secular-series.json": "sha256:1c0b4da6db61172358e2269943fabe915be951cad29b3ce37a8811ebc7816964",
-   "tools/explore/t1-export-engine-frequencies.mjs": "sha256:3ab7f6897bc27a5351226a69ae6368a7292b0ce7efaf043220bfae7a7010db94"
+   "data/nbody-secular-frequencies.json": "sha256:641b058511cdb250a29e692abbb5f968df3550f9bde54cd749619732c6ebf8cc",
+   "data/nbody-secular-series.json": "sha256:c8807608f9364cd6f8c910e8c9da99a25dfa12d354e5aaef79400bd30e28049e",
+   "tools/explore/t1-export-engine-frequencies.mjs": "sha256:b4eb452e959566d390663fd02f4ce901466e3a2256cb0bc3f877a55762f632ac"
   }
  }
 }

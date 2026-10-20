@@ -69,6 +69,13 @@ const REQUIRED = [
   // (the joint fitter stamps both; a re-close is by hand — the cascade lists it):
   'data/deltaT-4flag-fit.json',
   'data/core-mantle-resonator-stage1.json',
+  // the browser's climate coefficients — a FIT of the proxy records on the L1 line set
+  // (python3 scripts/export_climate_formula_browser.py). Measured: the line set moved at
+  // the plan-12 §8 re-derivation and the shipped file stayed at the previous fit for two
+  // commits; the constants embed hashes the file wholesale, so the cascade lists it:
+  'public/input/climate-formula-coefficients.json',
+  // the L1 line audit whose line labels reach the paper through @essrt/model-values:
+  'data/l1-line-audit-results.json',
 ];
 
 // Artifacts STALE BY CONSTRUCTION (plan 06 R3 item 1 cleanup, owner-checked):

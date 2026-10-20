@@ -1,7 +1,7 @@
 ---
 docVersion: 1.0
-modelVersion: v26.3
-coefficients: sha256:f2387635a8f80374
+modelVersion: v26.4
+coefficients: sha256:4af192da697c09a0
 status: current
 ---
 
@@ -13,7 +13,7 @@ status: current
 
 ## Architecture
 
-The year lengths are movements, not counts (plan 09). Two J2000 anchors are
+The year lengths are movements, not counts. Two J2000 anchors are
 inputs — the IAU sidereal year and the IAU general precession p_A — and
 everything else is derived from them and from the model's own motions:
 
@@ -55,7 +55,7 @@ The **sidereal year in SI seconds is an input** (the IAU value, `astro-reference
 
 ## Mean Year Lengths (Inputs)
 
-The three J2000 mean year lengths are the IAU inputs of `astro-reference.json` (plan 09). The retired era device derived them from the input mean solar year and its unit H — the tropical mean rounded onto 1/(H/8), the sidereal mean × H/(H − 13), the anomalistic × H/(H − 16), the device's calendar identities — and those readings sat 1.2 s (tropical), 0.1 s (sidereal) and 0.3 s (anomalistic) from the inputs:
+The three J2000 mean year lengths are the IAU inputs of `astro-reference.json`:
 
 | Year type | Input | Mean (days) |
 |-----------|-------|-------------|
@@ -75,7 +75,7 @@ The of-date laws (next section) are anchored on the sidereal input and the IAU g
 
 The year lengths of date are the one-source family (`createYearLengths` in `@essrt/physics`; doc 110 chain 3): the sidereal year rides the solar-mass law composed with the banked N-body mean-longitude drift (the D6 channel), the tropical year is the sidereal year less the equinox's return on the general precession of date, the anomalistic year is the sidereal year on the chain's apsidal tangent. In days of the epoch each is divided by the kinematic day of date — the Layer-0 tidal mean length of day, exactly the SI day at J2000 (`siderealYearDaysOfDate`, `tropicalYearDaysOfDate`, `anomalisticYearDaysOfDate` in the browser and `tools/lib/deep-time.js`; `lengths.siderealYearDays` / `lengths.anomalisticYearDays` in the package).
 
-The three year-length Fourier combs of the retired era device (TROPICAL/SIDEREAL/ANOMALISTIC_YEAR_HARMONICS — 12/6/8 terms on divisors of H, fitted to the 335,318-row full-period export, frozen since the D4 flip) are deleted at plan 09. Their record: a comb on the unit's divisors carries no secular drift (the tropical comb read +1.09 s at J2000 and flat where the physical year drifts −0.53 s/cy — the plan 06 R1 record, the reason the cardinal instants and the Sun's mean longitude had already moved to the one-source family), and the sidereal comb wrote the λ̇ ripple as a day-length ripple. The retired fitters are in git history (commit 16d7c87f); the window CSV (Step 6a2) remains the measurement export.
+The window CSV (Step 6a2) is the measurement export the laws are checked against.
 
 ### Tropical Year
 
@@ -109,10 +109,8 @@ siderealYearSeconds = siderealYearJ2000 × 86400
         │
         ▼  ÷ siderealYear(days, IAU)
   ┌──────────────────────────────────────────────────────────────┐
-  │ LOD_mean = ω₀ = 86,400 s at J2000 — the SI day               │
-  │  (plan 09: ONE J2000 day basis; the retired device's H/13    │
-  │   identity read 86,399.999676 s and the year comb's measured │
-  │   day 86,400.00011 s)                                        │
+  │ LOD_mean = ω₀ = 86,400 s at J2000 — the SI day, the ONE      │
+  │  J2000 day basis (the day the IAU year inputs are stated in) │
   │  ← the baseline of the sidereal↔tropical conversion chain    │
   │    and the calibrated ΔT stack                               │
   └──────────────────────────────────────────────────────────────┘
@@ -137,9 +135,9 @@ Separately (physical/USNO branch — does NOT feed the derivation chain above):
   │            + Σ DT cycles + swing                         │
   │  ← closes on the joint fit's USNO target exactly at      │
   │    J2000 (joint optimum vs Espenak;                      │
-  │    tools/fit/dt-corrections-fit.js --joint) — ONE J2000  │
-  │    day basis since plan 09, the SI day ω₀ (doc 99 § "The │
-  │    J2000 day basis")                                     │
+  │    tools/fit/dt-corrections-fit.js --joint) — the SI     │
+  │    day ω₀, the ONE J2000 day basis (doc 99 § "The J2000  │
+  │    day basis")                                           │
   │    (used in Predictions panel LOD readout, pure-physics  │
   │     ΔT V-curve, physical display — see § "The ecliptic   │
   │     missing-motion LOD                                   │
@@ -156,7 +154,7 @@ Separately (physical/USNO branch — does NOT feed the derivation chain above):
 
 Both fluctuate over millennia as the sidereal year in days changes. See § "The ecliptic missing-motion LOD Correction" below.
 
-**The scene day basis.** The scene's measured year lengths — the tweakpane *days* rows, the window CSV — are counted in the SI day ω₀ (plan 09; the comb era counted them in a "measured mean solar day" derived from the Step-6c sidereal anchor, 86,400.00032 s, and five day bases coexisted). The `lodRealPhysical` basis-consistency gate ties the ΔT joint fit to the same basis. The day quantities that coexist and must not be conflated:
+**The scene day basis.** The scene's measured year lengths — the tweakpane *days* rows, the window CSV — are counted in the SI day ω₀. The `lodRealPhysical` basis-consistency gate ties the ΔT joint fit to the same basis. The day quantities that coexist and must not be conflated:
 
 | basis | J2000 value | role |
 |---|---|---|
@@ -164,7 +162,7 @@ Both fluctuate over millennia as the sidereal year in days changes. See § "The 
 | kinematic day of date | the Layer-0 tidal mean length of day | the year-length denominators of date; ≡ ω₀ at J2000 |
 | LOD_real (physical observable) | <!--v:lodRealPhysical-->86,400.001200<!--/v--> s | Layer-4 display (adds the ecliptic term + ΔT cycles + swing) |
 
-The three J2000 year lengths are inputs on the same day (the IAU values on the 86,400-s day), so no per-type closing day exists any more: the comb era's "one day basis cannot close all three year types" residuals were the device's own year means against IAU, retired with the device.
+The three J2000 year lengths are inputs on the same day (the IAU values on the 86,400-s day), so there is one day basis and no per-type closing day.
 
 **Sidereal day** — the time for Earth to rotate 360° relative to the vernal equinox. Shorter than the solar day because Earth's orbital motion means the Sun drifts ~1°/day eastward, requiring extra rotation to reach the next noon. Formula:
 
@@ -180,7 +178,7 @@ The rate that matters here is precession in **right ascension** (along the equat
 
 | Quantity | Model value | Reference |
 |----------|-------------|-----------|
-| Mean solar day — **LOD_mean** (the SI day ω₀, plan 09) | <!--v:meanSolarDaySeconds-->86,400.000000<!--/v--> s | the SI day (input) |
+| Mean solar day — **LOD_mean** (the SI day ω₀) | <!--v:meanSolarDaySeconds-->86,400.000000<!--/v--> s | the SI day (input) |
 | Mean solar day — **LOD_real** (Layer 4: + the ecliptic term + DT cycles + swing, physical) | <!--v:lodRealPhysical-->86,400.001200<!--/v--> s | USNO joint-optimum target <!--v:usnoLodJ2000-->86,400.0012<!--/v--> s (the same day basis) |
 | Sidereal day — on LOD_real of J2000 (the simulator readout) | <!--v:siderealDayJ2000Physical-->86,164.091730<!--/v--> s | <!--v:siderealDayInputSeconds-->86,164.090531<!--/v--> s (IAU, on the 86,400-s day — the two differ by the day's excess, <!--v:lodRealJ2000ExcessMs-->1.20<!--/v--> ms) |
 | Stellar day — on LOD_real of J2000 | <!--v:stellarDayJ2000Physical-->86,164.100105<!--/v--> s | <!--v:stellarDayInputSeconds-->86,164.098904<!--/v--> s (IAU 2000A, on the 86,400-s day) |
@@ -189,7 +187,7 @@ See § "The ecliptic missing-motion LOD Correction" below for the distinction be
 
 ### The ecliptic missing-motion LOD Correction (Kinematic vs Physical)
 
-The framework maintains two distinct LOD values that differ by a small correction on the nodal period of Earth's orbit plane (formerly written on the anchor's H/5 — plan 06 T2 item, see below):
+The framework maintains two distinct LOD values that differ by a small correction on the nodal period of Earth's orbit plane (see below):
 
 **LOD_mean** — the kinematic baseline, the SI day (plan 09; the retired era
 device anchored it on its H/13 identity, siderealYearSeconds / (mSY × H/(H−13))
@@ -278,8 +276,6 @@ The coin rotation paradox manifests at every timescale:
 | Sidereal | the λ̇ channel (planetary perturbations) and the solar-mass law | Measures full orbit against the stars — nearly constant (about −0.1 s per millennium in the modern era) |
 | Anomalistic | the series' apsidal rate ϖ̇ of date | Measures perihelion-to-perihelion — the perihelion's advance lengthens the year by one turn per apsidal period |
 
-*Record:* the deleted year-length combs (plan 09) attributed each year type's variation to one dominant line on the retired unit's divisors — the obliquity line for the tropical year, the apsidal sub-harmonics for the anomalistic year. Those lines carried no secular drift (see Year Lengths of Date); the of-date laws above carry it.
-
 ### Cardinal Point Tropical Year Variation (J2000)
 
 The tropical year length depends on *which* cardinal point is used to measure it. At J2000 (perihelion in early January):
@@ -326,30 +322,27 @@ stellarDay = siderealDay × (1 + cos(ε) / (T_p(t) × rotationsPerYear))
            → 8.37 ms above the sidereal day, vs the IAU value of 8.373 ms
 ```
 
-T_p is the physical period in both identities. *Record:* the retired era device counted with its unit's thirteenth instead (0.086 % longer, deleted at plan 09): on that counter the offset read 7 µs low and the coin rotation 8 µs low, and the counting identity closed only against the counter's own period.
+T_p is the physical period in both identities.
 
 **This was confirmed by measurement, not asserted.** The "Analyze Stellar Day" tool's Method D tracks Earth's rotation about its own spin axis against ICRF — using no precession period at all, since the spin axis precesses on the precession cone and the projection plane tilts with it — and reproduces the IAU stellar day to ~0.02 ms. Methods A and B, which reference the ecliptic normal instead of the spin axis, overshoot by ~0.79 and ~0.47 ms respectively; that ~23.44° of axis difference *is* the cos ε.
 
 The obliquity used follows the family of the sidereal day it is applied to: the IAU J2000 obliquity input for the mean values, the hybrid obliquity of date (`_sceneEpsTargetDeg(year)`) for epoch-specific ones. At J2000 the choice is worth 0.0008 ms, but across the deep-time obliquity range (~22.0°–24.5°) the offset runs 8.46 → 8.30 ms.
 
 
-### The retired RA day offset (plan 09 step 5b)
+### The Framework Verification instrument's "measured solar day"
 
-The model used to publish a "measured solar day" = the mean solar day plus an
-"RA day offset" — a fitted comb (`RA_DAY_OFFSET_MS`: mean −14.194 ms/day and
-two lines on the retired unit's H/16 and H/8), reproducing the Framework
-Verification instrument's 65-epoch measurement (R² 0.994, RMS 0.32 ms). It is
-deleted, because the quantity is a property of the instrument's window, not of
-the sky. The instrument counts 365 solar noons from the June solstice; 365 days
+The instrument's mean noon-to-noon interval is NOT a day length of the sky, and
+the model publishes no offset for it: the quantity is a property of the
+instrument's window. The instrument counts 365 solar noons from the June solstice; 365 days
 end 0.2422 d short of the tropical year, so the equation of time has not
 returned to its start value and the mean noon-to-noon interval differs from the
 mean solar day by −(0.2422/365)·dEoT/dt at the solstice. The first-order
 equation of time, −2e·sin M + tan²(ε/2)·sin 2λ, gives at the solstice (λ = 90°,
-M = 90° − ϖ) exactly the comb's two lines: the e·cos(90° − ϖ) term on the
-perihelion-of-date cycle (5.2 ms first-order against the fitted 5.6) and the
-tan²(ε/2) term on the obliquity cycle (1.4 against 1.7), with the mean of the
-same order (first-order 18.6 ms against the fitted 14.2; the exact value depends
-on the window's first-noon convention). The physical day of date is the mean
+M = 90° − ϖ) two lines: the e·cos(90° − ϖ) term on the perihelion-of-date
+cycle (5.2 ms first-order; the instrument's 65-epoch measurement reads 5.6) and
+the tan²(ε/2) term on the obliquity cycle (1.4 against 1.7), with a mean of the
+same order (first-order 18.6 ms against the measured 14.2; the exact value
+depends on the window's first-noon convention). The physical day of date is the mean
 solar day (`dayLengthSeconds`); the equation of time is the certified Sun's; an
 observer who counts noons over an integer-day window measures this term and can
 derive it from both.
@@ -358,7 +351,7 @@ derive it from both.
 
 ### JavaScript (`script.js`)
 
-The tropical year of date in days of the epoch is the published SI law over the kinematic day of date (plan 09; the frozen-clock comb `computeSolarYearDaysDirect` is deleted):
+The tropical year of date in days of the epoch is the published SI law over the kinematic day of date:
 
 ```javascript
 function tropicalYearDaysOfDate(year) {
@@ -394,7 +387,7 @@ The sidereal and anomalistic years take the same form (`siderealYearDaysOfDate`,
 
 ## Updating Coefficients
 
-The year lengths carry no fitted coefficients since plan 09: the J2000 values are the IAU inputs (`astro-reference.json`), the of-date laws are the one-source family on the banked N-body series. The retired year-length fitters (git history commit 16d7c87f; README §"The frozen era clock") are not to be re-run — a comb re-fit against a one-source export was measured as a cross-family error (the C-4b adjudication). The exporter (`export-solar-measurements.js`) remains the measurement export over the −4000…+4000 window (Step 6a2); the full-period file (one row per year of the retired unit, the frozen fits' basis) is retired — the kept artifact is the window CSV, `data/02-solar-measurements-window.csv`.
+The year lengths carry no fitted coefficients: the J2000 values are the IAU inputs (`astro-reference.json`), the of-date laws are the one-source family on the banked N-body series. Nothing here is refitted; a change is an input change or a law change. The exporter (`export-solar-measurements.js`) is the measurement export over the −4000…+4000 window (Step 6a2) — the window CSV, `data/02-solar-measurements-window.csv`, which `check:csv-smoke` compares bit-exactly.
 
 ## Related
 

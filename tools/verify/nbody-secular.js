@@ -263,6 +263,10 @@ function main() {
       note1PN: 'Mercury eigen-level 1PN shift ≈ +0.473 ″/yr (cycle-average of 1/(1−e²)) vs +0.430 instantaneous — not a discrepancy; only the instantaneous value is asserted (P8b).',
     },
     g, s,
+    // the Laskar 2004 reference frequencies the `nearestLaskar` labels above are read against — ONE
+    // home for every consumer that names a mode by its Laskar identity (the T1 export labels Earth's
+    // z/ζ modes with it; the L1 physical lines and doc 92 inherit the labels)
+    laskarReference: LASKAR2004,
     // K4.7 (P5) — the FULL secular mode tables, ecliptic frame (z = k+ih =
     // e·e^{iϖ}, ζ = q+ip = sin(i/2)·e^{iΩ}; each mode (re+i·im)·e^{iωt},
     // t in years from J2000). The chain's secular skeleton: the elements

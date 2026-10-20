@@ -1,7 +1,7 @@
 ---
 docVersion: 1.0
-modelVersion: v26.3
-coefficients: sha256:f2387635a8f80374
+modelVersion: v26.4
+coefficients: sha256:4af192da697c09a0
 status: current
 ---
 
@@ -114,7 +114,6 @@ The seven planets' live elements of date come from the N-body chain (`_kcElement
 | `{planet}Tilt` | Axial tilt |
 | `{planet}RotationPeriod` | Sidereal rotation period (hours) |
 | `planets.{planet}.ascendingNodeInvPlane` | The closed-form J2000 node on the invariable plane — a reference derivation, `planetOrbitalElements.<p>.ascendingNodeInvPlaneClosedForm` in `astro-reference.json` since plan 11 step 2 (the Node twin keeps the field name); the chain planets' node of date is the chain's ([doc 20 § Ascending Nodes](20-constants-reference.md#ascending-nodes-on-the-invariable-plane-at-j2000)) |
-| `planets.{planet}.startpos` | DELETED (plan 11 step 3) — the scene scaffold's fitted start angle; its last display reach was each planet's pole azimuth and Saturn's ring plane, which turned once per orbit with the wheel. Each planet's rotation axis is now placed in world from the spin channel's pole of date through the frame bridge (`_kcPlacePlanetPole`, as Earth's axis is), and the wheels rest at zero. `.type` (the wheel ellipse family) left with it — a code taxonomy in `@essrt/physics` planets/geometry. `.angleCorrection` and `.eocFraction` are deleted (plan 11 step 2). |
 | `diameters.{planet}Diameter` | Planet diameter (km) |
 
 ### 1.3 Per-Planet Live/Dynamic Variables (accessible via `o.`)
@@ -165,7 +164,6 @@ For current values, see [Constants Reference](20-constants-reference.md).
 | `moonTilt` | Axial tilt |
 | `moonStartposNodal` | Nodal precession start position (calibration) |
 | `moonStartposApsidal` | Apsidal precession start position (calibration) |
-| `moonStartposMoon` | DELETED (plan 11 step 2) — the certified series override places the rendered Moon's direction and distance every frame; the start angle reached only the Node twin's geometric pivot |
 
 #### 1.4.2 Dynamic Orbital Elements (computed by `updateMoonOrbitalElements()`)
 
@@ -192,14 +190,15 @@ These variables are computed each frame from the 3D scene geometry, using Earth 
 
 #### 1.5.1 Static Constants
 
-For current values, see [Constants Reference](20-constants-reference.md).
-
-| Variable | Description |
-|----------|-------------|
-| `earthtiltMean` | DELETED (plan 11 step 4) — the K-device scaffold's mean tilt; the rendered obliquity of date is the hybrid, its J2000 anchor the astro-reference input. The scene's world frame is the J2000 ecliptic (`@essrt/physics` `computeSceneWorldFrameJ2000`); the three precession wheels are gone |
-| `earthInvPlaneInclinationAmplitude` | DELETED (plan 11 step 4) — the K-device scaffold's tilt amplitude (the published inclination is the engine's one-source normal). `earthInvPlaneInclinationMean` — the device's mean, the invariable-plane disc's init — is deleted (plan 11 step 2). |
-| `eccentricityAmplitude` | DELETED (plan 11 step 4) — the Law-4 input A, lately only the Wobble marker's display radius, now the scene literal `WOBBLE_MARKER_RADIUS_SCENE_UNITS` (the published eccentricity is the N-body series). `eccentricityBase`, the retired Law-5 constant, is deleted (plan 11 step 2). |
-| `kDeviceWheelPeriodYears` (browser `_wheelPeriodYears(N)`) | DELETED (plan 11 step 4) — the scene scaffolding's recorded K-wheel periods, a J2000 pose, left with the three precession wheels; the scene's world frame is the J2000 ecliptic and every frame of date is engine-placed (the published apsidal period is `inclPrecYears`) |
+Earth carries no scene-side static constants: its J2000 obliquity and
+elements are the `astro-reference.json` inputs ([Constants
+Reference](20-constants-reference.md)), the rendered obliquity of date is the
+hybrid integration, the published inclination and node are the engine's
+one-source orbit normal, the published eccentricity is the N-body series,
+and the published apsidal period is `inclPrecYears`. The scene's world frame
+is the J2000 ecliptic (`@essrt/physics` `computeSceneWorldFrameJ2000`) and
+the Earth frame is placed from the engine every frame; the Wobble marker's
+display radius is the scene literal `WOBBLE_MARKER_RADIUS_SCENE_UNITS`.
 
 #### 1.5.2 Dynamic Orbital Parameters
 
@@ -240,12 +239,8 @@ Naming taxonomy: `lodKinematic` = the kinematic day of date (the Layer-0 tidal m
 | `o.perihelionPrecession` | The kinematic perihelion-of-date beat, anomalistic/(anomalistic − solar) (years). The DISPLAYED of-date value is the one-source family's beat (`predictions.perihelionPrecession`) |
 | `predictions.eclipticPrecession` | The displayed nodal period of date — the chain's, `_kcNodeInvPlanePeriodYears('earth', jd)` |
 
-The former `o.obliquityPrecession` / `o.eclipticPrecession` (an eighth and a
-fifth of the retired anchor — the frozen era clock's device counters) are
-deleted (plan 09); the published obliquity period is the beat of the spin
-axis's inertial rate against the nodal mode (`obliqBeatJ2000Kyr`;
-[doc 110](110-calculation-map.md) §4.4), and the `*SolarYearCount` device
-counts (orbits per anchor interval) went at step 7b.
+The published obliquity period is the beat of the spin axis's inertial rate
+against the nodal mode (`obliqBeatJ2000Kyr`; [doc 110](110-calculation-map.md) §4.4).
 
 #### 1.5.5 Perihelion/Aphelion Dates
 
@@ -1385,20 +1380,18 @@ For current values, see [Constants Reference](20-constants-reference.md).
 | Pluto | `orbitalEccentricityBase` (JSON input) | `invPlaneInclinationMean` (JSON input) | derived | `solarYearInput` |
 
 **How values are sourced:**
-- **Eccentricity**: the chain's element of date (`_kcElementsOfDate(k, jd).e`; the K base/amplitude/phase law was retired at plan 07 R6)
-- **Inclination (inv)**: the chain's element of date (`.inclInvPlaneDeg`; the ψ mean/amplitude law was retired at plan 07 R5)
-- **Semi-major axis**: the chain's element of date for the seven planets; for the no-chain bodies derived from the observed period input via Kepler's third law (`_planetGeom.<k>`, `@essrt/physics` `planets/geometry`; the integer orbit count per anchor interval, `solarYearCount`, was deleted at plan 09 step 7b)
+- **Eccentricity**: the chain's element of date (`_kcElementsOfDate(k, jd).e`)
+- **Inclination (inv)**: the chain's element of date (`.inclInvPlaneDeg`)
+- **Semi-major axis**: the chain's element of date for the seven planets; for the no-chain bodies derived from the observed period input via Kepler's third law (`_planetGeom.<k>`, `@essrt/physics` `planets/geometry`)
 - **Period**: Input constant per planet (`planets.{name}.solarYearInput`)
 
-> **Display note (post-K5).** These device constants remain the scene-scaffold
-> and no-chain-body parameters. The planetStats "Orbital Period & Motion" rows
-> for the seven chain planets no longer display them: they read the chain's
-> measured window mean motion (governed artifact `windowElementRates`,
-> deg per Julian year, window 1800–2100) — P = 360°/n, synodic =
-> 360°/|n_planet − n_Earth|. The integer orbit counts per anchor interval
-> are deleted for every body (plan 09 step 7b): Pluto/Halley/Eros, where the
-> geometric device is the model path (the archived doc 31), ride their
-> observed period inputs.
+> **Display note.** These constants are the scene-scaffold and no-chain-body
+> parameters. The planetStats "Orbital Period & Motion" rows for the seven
+> chain planets read the chain's measured window mean motion (governed
+> artifact `windowElementRates`, deg per Julian year, window 1800–2100) —
+> P = 360°/n, synodic = 360°/|n_planet − n_Earth|. Pluto, Halley and Eros,
+> where the geometric device is the model path (the archived doc 31), ride
+> their observed period inputs.
 
 ### Live Variables Summary
 

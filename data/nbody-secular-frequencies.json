@@ -153,6 +153,27 @@
    }
   }
  },
+ "laskarReference": {
+  "g": {
+   "g1": 5.59,
+   "g2": 7.452,
+   "g3": 17.368,
+   "g4": 17.916,
+   "g5": 4.257452,
+   "g6": 28.245,
+   "g7": 3.087951,
+   "g8": 0.673021
+  },
+  "s": {
+   "s1": -5.59,
+   "s2": -7.05,
+   "s3": -18.85,
+   "s4": -17.755,
+   "s6": -26.347855,
+   "s7": -2.9925259,
+   "s8": -0.691736
+  }
+ },
  "secularModes": {
   "mercury": {
    "z": [
@@ -886,7 +907,7 @@
   "generator": "node tools/verify/nbody-secular.js --write",
   "files": {
    "packages/physics/src/planets/keplerian-chain.cjs": "sha256:75cdaeae146100354b883d6fefff48d16d54d6d1e363a8b9d6514c988f7760c2",
-   "public/input/astro-reference.json": "sha256:1b8a1663a4882f4bf5fce6f4b3ece44a53acba7ad21d107ed3f077d7276bc472",
+   "public/input/astro-reference.json": "sha256:910e896e02467a495eeb80eb843666d95a8e00a2e70714b87e8e22edc13095b7",
    "tools/explore/j2000-state.mjs": "sha256:a0a87301e21a02399ab7b8ed16d9b7930a485c49d1b2bbafa9dfc552f552600d",
    "tools/explore/k45-residual-naff.mjs": "sha256:228eb4874adca9171d61c1697ffbbaac3ce82891476a34762bf882840ccae406",
    "tools/explore/k45e-amplitude-solve.mjs": "sha256:8682a7ebd72bd98b60019b1c097f1791ec6e5ecea97d1798b929ce46b4ae1837",
@@ -894,7 +915,7 @@
    "tools/explore/naff-frequencies.mjs": "sha256:3d2eac569010adcbae57ee987f834c259dec689b6802d623b71c03c80c089496",
    "tools/explore/nbody-wh.mjs": "sha256:b33813d3a1655e44a23964ac267f34863fb92af6bfbf6fe5886517bc649257a2",
    "tools/lib/keplerian-chain.js": "sha256:620299515d5520bb3a03fba5affafc7a036fb151fca3457a5194e8771cc97fb8",
-   "tools/verify/nbody-secular.js": "sha256:e8b5152ad7ce0408a82d020f146fecc1c937a6492897926c095744ad6f375bec"
+   "tools/verify/nbody-secular.js": "sha256:129ee8105ccbc96bdcb780c1f214da3df8d9d3e15e105e546e31b74d8e25aafb"
   }
  },
  "periodicTerms": {

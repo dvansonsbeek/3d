@@ -1,7 +1,7 @@
 ---
 docVersion: 1.0
-modelVersion: v26.3
-coefficients: sha256:f2387635a8f80374
+modelVersion: v26.4
+coefficients: sha256:4af192da697c09a0
 status: current
 ---
 
@@ -27,7 +27,7 @@ Sun).
 > GMs. The same Δa machinery applies at any epoch when the inputs are taken
 > from the corresponding epoch-dependent helpers; see
 > [Doc 99 — ESSRT](99-expanding-solar-system-resonance-theory.md) for the
-> deep-time Moon-distance evolution (Farhat 2022 polynomial) and
+> deep-time Moon-distance evolution (the cited Farhat 2022 history, plan 12 option A) and
 > [Doc 20 § "ESSRT epoch dependence"](20-constants-reference.md#essrt-epoch-dependence--most-tabulated-values-are-j2000-anchored)
 > for the J2000-constant → helper map.*
 
@@ -122,28 +122,30 @@ Since plan 09 the chain runs on the inputs themselves. *Record:* the retired era
 ### Computation
 
 ```
-1.  m   =  T_M / T_S                                     = 0.07480133    (lunar small parameter, Hill 1878)
-
-2.  μ   =  1 / (ratio + 1)  =  M_Moon / (M_E + M_M)      = 0.01215058    (Moon mass fraction)
-
-3.  Δa  =  a_M · μ · m                                    = 349.37 km     (solar-tidal shift)
-
-4.  moonDistanceCorrected  =  a_M + Δa                    = 384,748.44 km
-
-5.  T (in seconds)  =  T_M · LOD                          = 2,360,591.56 s
-
+1.  m   =  T_M / T_S                                     (lunar small parameter, Hill 1878)
+2.  μ   =  1 / (ratio + 1)  =  M_Moon / (M_E + M_M)      (Moon mass fraction)
+3.  Δa  =  a_M · μ · m                                    (solar-tidal shift)
+4.  moonDistanceCorrected  =  a_M + Δa
+5.  T (in seconds)  =  T_M · LOD
 6.  GM(M_E + M_M)  =  4π² · moonDistanceCorrected³ / T²
-                   =  4π² · (384,748.44)³ / (2,360,591.56)²
-                   =  403,504.75 km³/s²
-
 7.  GM_Earth  =  GM(M_E + M_M)  ·  ratio / (ratio + 1)
-              =  403,504.75 · 0.987849
-              =  398,601.93 km³/s²
-
 8.  GM_Moon   =  GM(M_E + M_M)  /  (ratio + 1)
-              =  403,504.75 / 82.30056816
-              =  4,902.82 km³/s²
 ```
+
+The values, written by the registry (`npm run docs:values`; the chain is
+`createModel().massChain`, so an input change moves every row at once):
+
+| step | quantity | value |
+|:--|:--|--:|
+| inputs | T_M (IAU sidereal month) · T_S (IAU sidereal year) · LOD (the SI day) · ratio | <!--v:moonKeplerSiderealMonthDays-->27.321662<!--/v--> d · <!--v:meanSiderealYearDaysFull-->365.256363004<!--/v--> d · <!--v:moonKeplerDayLengthSeconds-->86,400<!--/v--> s · <!--v:massRatioEarthMoon-->81.30056816<!--/v--> |
+| 1 | m | <!--v:moonKeplerLunarSmallParameter-->0.07480133<!--/v--> |
+| 2 | μ | <!--v:moonKeplerMassFraction-->0.01215058<!--/v--> |
+| 3 | Δa | <!--v:moonKeplerSolarTidalShiftKm-->349.37<!--/v--> km |
+| 4 | moonDistanceCorrected | <!--v:moonKeplerCorrectedDistanceKm-->384,748.44<!--/v--> km |
+| 5 | T | <!--v:moonKeplerMonthSeconds-->2,360,591.56<!--/v--> s |
+| 6 | GM(M_E + M_M) | <!--v:gmEarthMoonSystemModelKm3S2-->403,504.75<!--/v--> km³/s² |
+| 7 | GM_Earth = GM(M_E + M_M) · <!--v:moonKeplerEarthMassFraction-->0.987849<!--/v--> | <!--v:gmEarthModelKm3S2-->398,601.93<!--/v--> km³/s² |
+| 8 | GM_Moon | <!--v:gmMoonModelKm3S2-->4,902.82<!--/v--> km³/s² |
 
 ### Equivalent multiplicative form
 
@@ -163,8 +165,10 @@ step (physics 22.1.0), and the registry carries them as keys — Δa
 distance <!--v:moonKeplerCorrectedDistanceKm-->384,748.44<!--/v--> km,
 G(M_E + M_M) <!--v:gmEarthMoonSystemModelKm3S2-->403,504.75<!--/v--> km³/s²,
 m = <!--v:moonKeplerLunarSmallParameter-->0.07480133<!--/v-->,
-μ = <!--v:moonKeplerMassFraction-->0.01215058<!--/v-->. The code block keeps
-the worked numbers for reading; the table below is live.
+μ = <!--v:moonKeplerMassFraction-->0.01215058<!--/v-->. The code block above
+states the formulas; every number sits in a value tag (the worked numbers it
+used to carry were hand-recomputed at v24.0 and are gone), and the table below
+is live.
 
 | Quantity | Model | JPL DE440 reference (Park et al. 2021) | Residual |
 |---|---|---|---|

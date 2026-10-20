@@ -1,7 +1,7 @@
 ---
 docVersion: 1.0
-modelVersion: v26.3
-coefficients: sha256:f2387635a8f80374
+modelVersion: v26.4
+coefficients: sha256:4af192da697c09a0
 status: current
 ---
 
@@ -50,20 +50,16 @@ All other calculations are relative to:
 
 ---
 
-## Part 2: The world frame — the J2000 ecliptic (the K-device wheels are deleted)
+## Part 2: The world frame — the J2000 ecliptic
 
-**Plan 11 step 4.** The scene's world frame IS the J2000 ecliptic: world Y is
+The scene's world frame IS the J2000 ecliptic: world Y is
 the J2000 ecliptic pole and the J2000 equinox lies in the world XZ plane at
 the view azimuth `SCENE_EQUINOX_VIEW_AZIMUTH_DEG` = 90° (atan2(x, z)) — the
 equinox along world +X, so the June-solstice Sun of the landing epoch stands
-at +90° in the top view: the browser's own pose at J2000 (measured 90.0066°
-with 0.026° of pole tilt on the pre-plan-11 bundle, both dropped), the frame
-the skydome texture and the default camera were authored against. Step 4 had
-shipped 158.2265°, the NODE twin's pose (180° − the retired inclination
-anchor 21.7735°), which turned the browser's world 68.2265° about the pole
-against its skydome while every gate stayed green — every gated quantity is
-frame-invariant; the perihelion-at-sun gate now pins the convention against
-the frame's own columns.
+at +90° in the top view: the frame the skydome texture and the default
+camera were authored against. Every gated quantity is frame-invariant, so
+the `perihelion-at-sun` gate pins the convention against the frame's own
+columns (the measurement behind that gate: doc 111 §2).
 The frame bridge R = `computeSceneWorldFrameJ2000()` (`@essrt/physics`
 earth/frame-of-date — ONE home; browser `_kcR`, Node `_kcR`) maps every
 J2000-ecliptic vector to world, and every frame of date — Earth's axis, the
@@ -72,21 +68,11 @@ from the engine through it (Part 5). No observable rides R: every physical
 reading is taken in the placed Earth frame, which is R-invariant by
 construction; only the view is R.
 
-The azimuth is the one scene literal the retired K-device scaffold leaves
-behind. Until step 4 the scene's Earth precession layers were that scaffold:
-five wheels turning uniformly at recorded J2000 periods (the retired unit's
-335,317 yr divided by N — inclination 3, ecliptic 5 with tilt −A, obliquity 8
-with tilt +A, axial 13 with tilt `earthtiltMean`, perihelion 16) from a
-recorded J2000 phase, and R was DERIVED once from their pose at the chain
-anchor epoch. Measured on the Node twin before the change, that pose was the
-J2000 ecliptic frame to 0.026° of pole tilt with the equinox at the azimuth
-above — the azimuth is kept for visual continuity, the tilt is dropped. The
-three precession wheels, their tilts, periods and phase, `earthtiltMean` and
-`earthRAAngle` are deleted (git history carries them); the perihelion pair
-hangs on Earth's pivot. Two display literals remain in `src/script.js`: the
-Wobble marker's radius (`WOBBLE_MARKER_RADIUS_SCENE_UNITS`, the former Law-4
-amplitude × 100) and the inclination-path loop's angular zero
-(`INCLINATION_PATH_ZERO_DEG`).
+The scene carries three display literals and no pose constants: the view
+azimuth above, the Wobble marker's radius (`WOBBLE_MARKER_RADIUS_SCENE_UNITS`)
+and the inclination-path loop's angular zero (`INCLINATION_PATH_ZERO_DEG`).
+The perihelion pair hangs on Earth's pivot; nothing between them turns on a
+recorded period.
 
 ---
 
@@ -150,14 +136,11 @@ startingPoint (scene root)                            ← the world frame: the J
     └── Moon Hierarchy (see Part 8)                   ← base ENGINE-PLACED on the ecliptic of date; layers from the lunar arguments
 ```
 
-(Plan 11 step 4: the three K-device precession wheels that sat between Earth's
-pivot and the perihelion pair are deleted; Earth's own axial wheel rests.)
-
 ---
 
 ## Part 5: Earth Precession Layers
 
-> **Plan 06 R4 — one Earth frame.** The layers below are the model's
+> **One Earth frame.** The layers below are the model's
 > animation of Earth's cycles; they are no longer where the physics frame
 > comes from. Every frame, after the layers have animated, the engine's
 > one-source sample at the true-TT instant is turned into the Earth frame of
@@ -173,82 +156,55 @@ pivot and the perihelion pair are deleted; Earth's own axial wheel rests.)
 > quarter turn from ĝ); on the device's flat J2000 base the ring's plane had
 > read 0.5° at −3 kyr and 8.7° at −5 Myr off the rendered Moon's orbit plane,
 > now 0.1–0.2° at every epoch. `_applyEngineEarthFrame` in both twins,
-> identical ops; the J2000 pose of the K device is the bridge everything is
-> placed relative to. Four relative corrections that used to sit on the K
-> geometry (tilt, equinox azimuth, apsidal delta, the δ Newton read) are gone
-> — the measured reasons: the
-> K sun plane and the RA frame's ecliptic parted by 20.5″ at J2000 and 10′ at
-> −3000, the rendered Sun −19″/+19″ in declination against Horizons at the
-> 2000 equinoxes (−0.28″/+0.19″ after). The engine sampler's time coordinate
-> is Julian years from J2000 TT — not the scene's SI-year counter, which sits
-> 10.3 d off at J2000 and drifts 0.0078 d/yr (measured as a 1.417″ frame
-> rotation when fed to the absolute equinox longitude).
+> identical ops; the bridge everything is placed through is R, the J2000
+> ecliptic frame (Part 2). The engine sampler's time coordinate is Julian
+> years from J2000 TT — not the scene's SI-year counter, which sits 10.3 d
+> off at J2000 and drifts 0.0078 d/yr (1.417″ of frame rotation if fed to the
+> absolute equinox longitude).
 >
-> **The engine year — one argument (R4b).** Every read of the one-source
+> **The engine year — one argument.** Every read of the one-source
 > sample — the frame above, `o.obliquityEarth`, the Predictions ε/e rows, the
 > Earth ϖ-of-date rows, the solstice ε of the cardinal panel, the offset arm's
 > e(t), the Moon's ecliptic→equatorial ε, the shadow-direction and sun-light ε
 > — takes ONE argument, `_engineYearTT(jdUT)` in the browser and
 > `_osmYearForJD(jdUT)` in the Node twin (identical ops): the scene's true TT
 > (UT + the bridge + the ΔT curve in deep-time mode) in Julian years from J2000.
-> Before R4b the panel rows and the Moon conversion sampled the SI-year counter
-> at UT while the frame sampled TT: in-era the two coordinates differ by 0.013″
-> of ε, but ΔT on the model's LOD history is 3,505 yr at −5.34 Myr, and the
-> owner saw the Positions panel's solstice declination 22.6944° (the rendered
-> axis) against a Predictions obliquity of 22.5347° at the same instant — the
-> rendered Moon converted with an ε 0.16° from the axis it was placed in. After:
-> the two surfaces agree to 0.0000″ at that epoch, browser ≡ Node for the
-> planets to ≤0.004″ at every probed epoch out to −5.34 Myr. The K-device
-> wheels (uniform at their recorded J2000 rates since plan 09 step 5c) keep
-> their own SI coordinate — they are not engine reads (the balanced-year
-> formulas that shared it left at step 5d). The
-> Moon-argument obliquity CARRIER (C·∫(ε−ε₀) inside the lunar chain) samples
-> ε at `2000 + t·100` with t in Julian centuries of TT from J2000 — the
-> engine-year axis already (verified R5 follow-up; an earlier note here
-> called it an SI-coordinate read, which it never was). The SI-year
-> coordinate (`jdToSIyear(jdTT)`) enters the lunar arguments only where
-> cycles are COUNTED — the chain integrals, the rate-completion table and the
-> anchors' timeline conversion — a coordinate proportional to TT, the right
-> axis for counting. The browser-vs-Node Moon split at deep time that this
-> paragraph once recorded as open was the first-frame race in the argument
-> factory (Part 8, R5), not a coordinate.
+> Two surfaces reading the same instant through different year coordinates
+> part at deep time (ΔT on the model's LOD history is 3,505 yr at −5.34 Myr;
+> the measured 0.16° obliquity split that fixed this rule: doc 111 §1.11); on
+> the one argument browser ≡ Node for the planets to ≤0.004″ at every probed
+> epoch out to −5.34 Myr. The Moon-argument obliquity CARRIER (C·∫(ε−ε₀)
+> inside the lunar chain) samples ε at `2000 + t·100` with t in Julian
+> centuries of TT from J2000 — the engine-year axis. The SI-year coordinate
+> (`jdToSIyear(jdTT)`) enters the lunar arguments only where cycles are
+> COUNTED — the chain integrals, the rate-completion table and the anchors'
+> timeline conversion — a coordinate proportional to TT, the right axis for
+> counting.
 
 ### 5.1 Earth Layer (Core)
 
 The Earth object: its container is turned π/2 for the June-solstice start
-view, its orbit node rests (plan 11 step 4 — the K axial wheel is deleted) and
-its rotation axis is ENGINE-PLACED every frame:
+view, its orbit node rests and its rotation axis is ENGINE-PLACED every frame:
 
 | Property | Value | Meaning |
 |----------|-------|---------|
 | orbitRadius | 0 | Earth sits at the scene origin; every instrument measures from `earth.planetObj` (measuring from a displaced wobble centre would run the perihelion 8% fast — the offset chain carries the full e(t)·û(ϖ) itself). The visible wobble-centre marker is a display-only *child* of Earth at the literal radius `WOBBLE_MARKER_RADIUS_SCENE_UNITS` (the former Law-4 amplitude × 100), placed each frame from the rendered axis projected into the sun plane (the solstice direction); nothing reads it |
-| speed | 0 | plan 11 step 4: the K axial wheel (recorded 25,793.6 yr) no longer turns this node — the pivot frame is the fixed world frame |
+| speed | 0 | nothing turns this node — the pivot frame is the fixed world frame; the axis of date is engine-placed |
 | rotationSpeed | 2π × sidereal rotations per SI year — **locked to the J2000 sidereal day** in both modes (see §14.4) | Daily spin |
 | tilt | 0 (rest pose) | `earth.rotationAxis` takes [X = ŝ×ĝ, Y = ŝ, Z = ĝ] of date through R every frame; before the series artifact arrives the J2000 frame from the embedded anchors is placed, so the rest pose never renders |
 
-### 5.2–5.4 The three K precession wheels (DELETED, plan 11 step 4)
+### 5.2 Perihelion Precession 1 & 2
 
-The "Inclination Precession" (wheel 3 — physically the apsidal wheel, period
-111,772.3 yr), "Ecliptic Precession" (wheel 5, 67,063.4 yr, tilt −A) and
-"Obliquity Cycle" (wheel 8, 41,914.6 yr, tilt +A) layers sat between Earth's
-pivot and the perihelion pair, each turning uniformly at its recorded J2000
-period from the recorded phase (Part 6). They carried the scaffold's J2000
-pose, which the frame bridge read once; since the bridge IS the J2000 ecliptic
-(Part 2) and every node they parented is engine-placed in world, they are
-deleted with their tilts, periods and phase. The model's precession periods
-are the dynamical values of [Constants Reference](20-constants-reference.md)
-Part 2 (T_p, the obliquity beat, the apsidal and nodal modes), which the wheels
-read 0.09–2 % off.
-
-### 5.5 Perihelion Precession 1 & 2
-
-Both layers are ENGINE-PLACED (R4): Perihelion 1's container takes the sun
+The model's precession periods are the dynamical values of
+[Constants Reference](20-constants-reference.md) Part 2 (T_p, the obliquity
+beat, the apsidal and nodal modes); no scene layer turns on a precession
+period — the two layers below are ENGINE-PLACED: Perihelion 1's container takes the sun
 plane [X = ĝ, Y = n̂, Z = ĝ×n̂] of date through R, the pair turns ±ϖ_Sun(t):
 
 | Property | Perihelion 1 | Perihelion 2 |
 |----------|--------------|--------------|
 | speed / startPos | 0 / 0 (rest) — the angle is set every frame | 0 / 0 (rest) — the angle is set every frame |
-| orbitTilta | 0 (plan 11 step 4: the scaffold's −`earthRAAngle` tilt is gone — the container is world-placed) | 0 |
+| orbitTilta | 0 (the container is world-placed) | 0 |
 | orbitCentera | 0 | −e(t) × 100 — **animated every frame** |
 
 **Purpose:** the paired inverse rotations realize the perihelion direction
@@ -257,15 +213,13 @@ Sun's aphelion and the Sun rides the inner wheel at the angle that realizes
 the certified longitude.
 
 **Earth's eccentricity in the scene.** Earth's
-eccentricity is the N-body secular series on every path (plan 09 step 6: the
-former one-law e(t) = base′·(1 + cos θ₃(t)/2) on the inclination wheel's phase is
-deleted; base′ stays as the perihelion wheel's pose). The scene
+eccentricity is the N-body secular series on every path. The scene
 realizes it as ONE arm: Perihelion Precession 2's centre carries
 −e(t)·100 every frame (`moveModel` in both twins), pointing at the
 perihelion phase +180° — an ellipse centre, measured θ_p1 ≡ the Sun's
 perihelion phase at every epoch. There is no second arm: the Barycenter
-sits at the Sun's orbit centre itself (`eccentricityAmplitude` is the
-Law-4 input and the wobble-marker distance, not a scene arm). The full
+sits at the Sun's orbit centre itself (the wobble-centre marker is display
+only, not a scene arm). The full
 vector matters beyond the Sun: the
 planet chains replicate the Sun *geometrically* (centre + circle, no
 equation of centre), so a constant mean offset left them 0.0012 AU short
@@ -284,33 +238,16 @@ realized offset.
 | Sun | the wheel angle that realizes the certified longitude on the offset circle |
 | Moon stack base | ENGINE-PLACED: [n̂×ĝ, n̂, ĝ] of date; the layers from the lunar arguments (Part 8) |
 
-(Plan 11 step 4: the K-device wheels — Earth's axial 13, inclination 3,
-ecliptic 5, obliquity 8 — and their recorded periods are deleted.)
-
 ---
 
-## Part 6: The Balanced Year (retired as an input — plan 07 R10)
+## Part 6: World-axis readers
 
-The **balanced year** t₀ = −302,635 was the fitted phase origin of the retired
-correction combs and of the precession layers' `startPos` values (the 14.5-cycle
-offset of the perihelion wheel that positioned the obliquity fluctuation against
-the paleoclimate record). It is no longer an input, and the combs are deleted
-(plan 09; from R10 to their deletion they measured their phase from J2000, the
-coefficients rotated exactly). The precession layers kept their J2000 pose
-through one recorded device constant, `kDeviceWheelPhaseAtJ2000Cycles` =
-0.908498525276082 (numerically the retired origin's offset to J2000 in the
-retired unit), until plan 11 step 4 deleted the wheels and the constant with
-them.
-
-**Why it mattered:** the K-device wheels were the scene's scaffold, not a law
-— the engine placed the Earth frame, the Sun and the Moon stack over them (the
-frame bridge read the pose once) — but the scene's world frame and every
-world-axis reader saw their pose. Measured (plan 07 R10): dropping the
-constant tilted the scaffold 1.25° and moved the NASA-convention umbra
-diagnostic, which then rotated the annual aberration about world Y as the
-ecliptic pole, by 0.45″ while every observable stayed bit-close. Since step 4
-the world frame is the J2000 ecliptic itself (Part 2), so world Y IS the J2000
-ecliptic pole and that class of world-axis reading is exact by construction.
+The world frame is the J2000 ecliptic itself (Part 2), so world Y IS the
+J2000 ecliptic pole and a reader that rotates about world Y rotates about
+that pole exactly. A reader that needs the ecliptic pole OF DATE (the
+NASA-convention umbra diagnostic's annual aberration) builds it in the
+rotation-axis frame of date — the ~47″/cy tilt of the ecliptic is what the
+world-Y form would miss (doc 111 §1).
 
 ---
 
@@ -328,7 +265,7 @@ ecliptic pole and that class of world-axis reading is exact by construction.
 |----------|-------|---------|
 | orbitRadius | 100 (1 AU) | Always 1 AU from perihelion point |
 | speed | 2π | Exactly one solar year |
-| startPos | 0 | The rest pose — the engine places the Sun at the certified longitude every frame (R4); the fitted start angle `correctionSun` is deleted (plan 11 step 2) |
+| startPos | 0 | The rest pose — the engine places the Sun at the certified longitude every frame |
 | rotation tilt | -7.155° | Solar axis inclination |
 
 **The Sun on the wheel (plan 06 R4).** The Sun's wheel angle is SET, every
@@ -356,53 +293,26 @@ Venus 38.3 → 32.4″; the 1650–1900 buckets slipped 1–5″ because the sce
 clock's ΔT is the model's MEAN curve — 80 s at 1650 and 38 s at 1700 where
 the historical ΔT is 50 and 9 s — not the historical stack; a Phase-5-class
 question for the clock, noted in plan 06.) Measured
-history worth keeping: the analytic twin `_frameworkSunLon` that the δ block
-fell back on parted from the wheel by 84″ around 500 AD, 250″ at −500 and
-810″ at −2500 (an error the rendered Sun carried 1:1 before layer B); reading
-the longitude against the K sun-plane's node instead of the RA frame moved the
-Sun and the chain planets ~55″ at J2000 — the two frames parted by 51.6″ at
-J2000 and ~1,470″ at −3000, which R4 resolved by placing BOTH from the engine
-(the equinox IS the sun plane's node on the equator, by construction). The
-eclipse umbra never reads the wheel: since U1 the package besselian in
-`@essrt/physics` is the **single umbra implementation** end to end — the scene
-consumes its output.
+the equinox IS the sun plane's node on the equator, by construction, because
+both are placed from the engine. The eclipse umbra never reads the wheel: the
+package besselian in `@essrt/physics` is the **single umbra implementation**
+end to end — the scene consumes its output.
 
 **The chain frame bridge** (ecliptic-J2000 → scene world, the one rotation
 every chain planet, orbit ring, perihelion marker and Standard-Model ghost is
-placed through, and the pose the engine Earth frame is placed RELATIVE to;
-`_kcDeriveFrameR` / `_kcFrameR`, identical ops) is the scene's **J2000 pose**:
-the K device geometry at the chain anchor epoch — the sun-plane normal as the
-pole, the axis frame's RA = 0 direction projected onto that plane as the
-longitude origin — read once, with no correction. The device is deterministic
-there, so the bridge is too: nothing derived from a first frame's Sun, nothing
-to re-derive when the series artifact lands. What the landing block DOES do is
-request one paused frame (and drop the umbra tier's one-JD memo with the tier
-model it served): the rebuilt package model's chain-cycle tables and the Moon
-factory's normalisations are lazy builds (~1.2 s), and nothing renders while
-paused, so without that frame they landed on the first Play frame — the
-measured "wait before the scene starts" — while the paused scene kept showing
-the pre-landing K pose. Since that frame, the paused scene shows the hybrid
-pose from landing on. History (plan 06 R3): the former
-**Earth-direction triad** (the chain Earth's heliocentric direction matched to
-the scene's Earth–Sun direction at two instants) was a body match that folded
-the chain Earth's +3.5″ offset from the certified Sun at J2000 (the chain
-carries no lunar equation) into every planet's placement — and, in the browser,
-the first frame's analytic-twin Sun (+11.6″ before the series artifact arrives)
-into every Standard-Model ghost: the overlay's Sun read 8.2″ where the certified
-Sun is 0.8″ from VSOP87. R3's frames form fixed that and exposed the next
-defect: the K sun plane and the RA frame's ecliptic were 20.5″ apart at J2000
-(the node line 51.6″ from RA = 0), 58″ at year 0 and 10′ at −3000 — the
-rendered Sun −19″/+19″ in declination against Horizons at the 2000 equinoxes
-(0.3–0.5″ at the solstices), the rendered Sun and Moon on ecliptics 10′ apart in
-the Babylonian era, and the planets' JPL declinations carrying the same tilt.
-R4 placed the whole Earth frame from the engine (Part 5), so the two planes are
-one and a second Moon bridge is no longer needed. After R4, against Horizons:
-ΔDec −0.28″ (March) / +0.19″ (September) at the 2000 equinoxes, browser ≡ Node
-to 0.000″; the planets' 2000–2099 JPL RMS improved on every target (Jupiter
-19.2 → 9.5″, Neptune 20.3 → 11.5″, Venus 44.1 → 38.3″, Mercury 25.2 → 20.1″).
-The Node fast Sun path (`computeSunPositionFast`, the Step 6a instrument) rides
-the same frame — before R4 it was the bare K wheel Sun, 8–18″ from the scene
-Sun in 2000; the 6a2 window CSV is re-based on it.
+placed through, and the frame the engine Earth frame is placed in; browser
+`_kcR`, Node `_kcR`, identical ops) is R = `computeSceneWorldFrameJ2000()`,
+the J2000 ecliptic (Part 2) — a constant, nothing derived from a first
+frame's Sun, nothing to re-derive when the series artifact lands. What the
+landing block DOES do is request one paused frame (and drop the umbra tier's
+one-JD memo with the tier model it served): the rebuilt package model's
+chain-cycle tables and the Moon factory's normalisations are lazy builds
+(~1.2 s), and nothing renders while paused, so without that frame they landed
+on the first Play frame — the measured "wait before the scene starts". Against
+Horizons the rendered Sun reads ΔDec −0.28″ (March) / +0.19″ (September) at
+the 2000 equinoxes, browser ≡ Node to 0.000″. The Node fast Sun path
+(`computeSunPositionFast`, the Step 6a instrument) rides the same frame; the
+6a2 window CSV is based on it.
 
 ---
 
@@ -422,7 +332,7 @@ earth.pivotObj
 ```
 
 **The rendered Moon is the shared series on the framework-native arguments,
-and the two runtimes must agree (plan 06 R5).** The browser and the Node
+and the two runtimes must agree.** The browser and the Node
 engine build the same `@essrt/physics` Moon-argument factory with the same
 injected chains and the same one-source ε, at the same true-TT instant — yet
 the rendered Moon parted from the Node twin by 0.27″ at year 0, 6.7″ at
@@ -431,16 +341,15 @@ latitude and distance moved in the Moon's own rate proportion, the signature
 of a phase error in the mean longitude). Measured cause: the factory's lazy
 normalisations — the obliquity carrier's (ε₀, C) and the self-measured rate
 anchors — initialise on the first Moon evaluation, the first frame, before
-the secular-series artifact has landed, so in the browser they read the
-flag-off K-comb ε (the obliquity comb deleted at plan 09; 0.233″ from the one-source ε at 2000) while every later
-call reads the hybrid; the Node engine loads the artifact synchronously. A
-Node emulation of that race reproduced all five numbers to 0.001″. The
-artifact-landing block now resets the factory (`_moonArgsM.reset()`), and the
-cross-engine gate carries Moon-series rows (browser fixture lon/lat/dist vs
-the engine at the same JD, 0.002″ in-era / 0.02″ deep) so the class cannot
-return. Rule: anything a lazy normalisation derives from a flag-dependent
-evaluator before the flag settles must be re-derived when it does — the
-chain frame bridge (R3) was the first instance, this the second.
+the secular-series artifact has landed, so in the browser they read a
+pre-landing ε while every later call reads the hybrid; the Node engine loads
+the artifact synchronously. A Node emulation of that race reproduced all five
+numbers to 0.001″. The artifact-landing block resets the factory
+(`_moonArgsM.reset()`), and the cross-engine gate carries Moon-series rows
+(browser fixture lon/lat/dist vs the engine at the same JD, 0.002″ in-era /
+0.02″ deep) so the class cannot return. Rule: anything a lazy normalisation
+derives from a flag-dependent evaluator before the flag settles must be
+re-derived when it does.
 
 **Tilt/spin composition rule.** `createPlanet` applies orbit tilts STATICALLY
 on `containerObj`; the animated Y-spin runs inside it. A layer's own spin can
@@ -466,7 +375,7 @@ RA/Dec override).
 
 ## Part 9: Outer Planet Hierarchy
 
-All seven planets, Mercury to Neptune, are **siblings** of the Sun under `barycenterEarthAndSun`, not children of the Sun. (Pluto, Halley's Comet and Eros left the scene with plan 07.)
+All seven planets, Mercury to Neptune, are **siblings** of the Sun under `barycenterEarthAndSun`, not children of the Sun. (The minor bodies — Pluto, Halley's Comet, Eros, Ceres — are no-chain bodies on the geometric device, outside this chain.)
 
 ```
 barycenterEarthAndSun.pivotObj
@@ -481,18 +390,13 @@ barycenterEarthAndSun.pivotObj
 
 ### 9.1 Planet Perihelion Precession Pattern
 
-The two counter-rotating apsidal wheels that bracketed `PerihelionFromEarth`
-(`PerihelionDurationEcliptic1/2`, turning at the retired device's perihelion
-period) are deleted in both runtimes (plan 07 R7), and so are the
-`[Planet]RealPerihelionAtSun` ellipse wheel and the `[Planet]FixedPerihelionAtSun`
-marker that hung on each planet's annual wheel (plan 11 follow-up): their last
-visible reach, the focused planet's orbit-plane grid, had sat 1.36 AU from the
-rendered Sun since the annual wheel parted from the engine-placed Sun's wheel
-zero, and is a scene child placed at the Sun now. The Node twin
-`tools/lib/scene-graph.js` mirrors this wiring. What remains is the marker layer
-and the planet: since the K5 excision the planet meshes, the orbit rings and the
-perihelion markers are placed every frame from the N-body chain, and each
-planet's perihelion period is the chain's inertial apsidal period
+Each planet hangs on the barycenter beside its Perihelion-at-Earth marker
+layer; no apsidal wheel turns between them. The planet meshes, the orbit
+rings and the perihelion markers are placed every frame from the N-body
+chain; the focused planet's orbit-plane grid is a scene child placed at the
+rendered Sun with its normal along the chain's orbit normal of date (the
+`perihelion-at-sun` gate pins both). The Node twin `tools/lib/scene-graph.js`
+mirrors this wiring. Each planet's perihelion period is the chain's inertial apsidal period
 1,296,000/g — the values are in [Constants Reference](20-constants-reference.md).
 
 ---
@@ -541,12 +445,10 @@ For current values, see [Constants Reference](20-constants-reference.md).
 |----------|-------|-------------|
 | 1 Solar year | 2π radians | `meanSolarYearDays` days |
 | 1 AU | 100 scene units | <!--v:oneAU-->149,597,870.698828<!--/v--> km |
-| World frame | `SCENE_EQUINOX_VIEW_AZIMUTH_DEG` (`@essrt/physics` earth/frame-of-date) | The J2000 ecliptic as the world frame: world Y its pole, the J2000 equinox along world +X (azimuth 90°) — the one scene literal, the browser's own pre-plan-11 pose (plan 11 step 4, Part 2) |
-| Mean obliquity | (`earthtiltMean` — DELETED, plan 11 step 4) | The K scaffold's mean tilt; the rendered obliquity of date is the hybrid, its J2000 anchor the astro-reference input |
-| Inclination amplitude | (`earthInvPlaneInclinationAmplitude` — DELETED, plan 11 step 4) | The K scaffold's tilt amplitude (the deleted ecliptic/obliquity wheels' ±A) |
-| Base eccentricity | (`eccentricityBase` — DELETED, plan 11 step 2) | was the retired Law-5 balance eccentricity; no reader left |
-| Mean eccentricity | (`eccentricityBaseDerived` — DELETED, plan 11 step 2) | The perihelion wheel's offset base′ was the scaffold's J2000 pose; the engine places the offset arm at the series' e(t) every frame, and the rest pose before the first frame is e(J2000) |
-| Eccentricity amplitude | (`eccentricityAmplitude` — DELETED, plan 11 step 4) | The Law-4 input A, lately only the Wobble marker's display radius — now the scene literal `WOBBLE_MARKER_RADIUS_SCENE_UNITS` |
+| World frame | `SCENE_EQUINOX_VIEW_AZIMUTH_DEG` (`@essrt/physics` earth/frame-of-date) | The J2000 ecliptic as the world frame: world Y its pole, the J2000 equinox along world +X (azimuth 90°) — a scene literal (Part 2) |
+| Obliquity of date | the hybrid integration (`@essrt/physics` earth/deep-orbital-history) | its J2000 anchor the astro-reference input; the axis is engine-placed |
+| Eccentricity of date | the N-body series | the offset arm carries e(t)·û(ϖ) every frame; the rest pose before the first frame is e(J2000) |
+| Wobble marker radius | `WOBBLE_MARKER_RADIUS_SCENE_UNITS` | display only — nothing reads it |
 
 ---
 
@@ -590,8 +492,6 @@ This applies throughout the model:
 │                      └── Barycenter                                           │
 │                            ├── Sun (sibling; the certified longitude)         │
 │                            └── All Planet Chains (the N-body chain)           │
-│                                                                               │
-│  (plan 11 step 4: the K-device wheels are deleted)                            │
 └──────────────────────────────────────────────────────────────────────────────┘
 ```
 
@@ -609,7 +509,7 @@ Modern-era / J2000-anchored simulation. Each frame's rotation is the standard sn
 θ = obj.speed × pos − obj.startPos × (π/180)
 ```
 
-This is correct when the rate `obj.speed` has been constant since simulation start — i.e., across the modern era (~±10 millennia around J2000). The K wheels' recorded periods P_N and the per-planet periods are held at their J2000-anchored values.
+This is correct when the rate `obj.speed` has been constant since simulation start — i.e., across the modern era (~±10 millennia around J2000). The per-planet periods are held at their J2000-anchored values.
 
 ### 15.2 Integrator mode (`DEEP_TIME_MODE_ENABLED = true` — the shipped default)
 
@@ -617,10 +517,12 @@ Deep-time / Phanerozoic / Hadean simulation. The same scene graph is rendered, b
 
 | Tag | Time base | Used for | Integrator |
 |---|---|---|---|
-| (`_dtCycleN`, `_dtCycleSign`, `_dtCycleAnchor`, `_dtRotN` — DELETED, plan 11 step 4) | — | were the K-device wheels (Earth's axial wheel, the three precession wheels, the wobble marker's texture spin) — a uniform turn per recorded wheel period from the recorded J2000 phase | the wheels are gone; the Earth frame is engine-placed every frame (R4) |
 | `_dtMoonIntegrator`, `_dtMoonAnchor`, `_dtMoonSign` | UT (`_currentYearSI`) | Moon-chain nodes (5 nodes) | `obj._dtMoonIntegrator(anchor, year)` |
 | `_dtPlanetIntegrator`, `_dtPlanetAnchor`, `_dtPlanetSign` | TT (`_currentYearSI_TT`) | Planet orbital nodes (Mercury–Neptune, 7 nodes) | `obj._dtPlanetIntegrator(anchor, year)` |
-| (`_dtPerihelionDivisor`, `_dtPerihelionAnchor` — retired) | — | the equation-of-centre perihelion phase keeps its snapshot form for the Moon, Pluto and the no-chain bodies; the Sun's angle is the engine's (R4) | the chain planets' tags left at plan 07 R7, the Sun's at plan 09 step 5c |
+
+The Earth frame, the Sun and the Moon stack's base carry no tag: they are
+engine-placed every frame (Part 5). The equation-of-centre perihelion phase
+keeps its snapshot form for the no-chain bodies.
 
 The asymmetric time-base treatment (Moon-chain stays on UT, planet orbitals go to TT) is principled, not arbitrary: the eclipse-visibility validation was co-developed under the Moon-chain UT convention, while planets have no analogous validation tied to the time-base choice.
 

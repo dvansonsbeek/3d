@@ -1712,6 +1712,11 @@ export const VALUES = {
       moonKeplerSolarTidalShiftKm: { get: () => physModel().massChain.solarTidalShiftKm, render: (v) => Number(v).toFixed(2), unit: 'km', note: 'Δa = a_M · μ · m — the solar-tidal shift that makes Kepler III return the DE440 GM (a re-parameterisation of Hill-Brown\'s ½·m² correction, doc 24 §3)' },
       moonKeplerCorrectedDistanceKm: { get: () => physModel().massChain.moonDistanceCorrectedKm, render: (v) => thousands(v, 2), unit: 'km', note: 'a_M + Δa, the Kepler-effective Earth–Moon distance on the IAU mean distance' },
       moonKeplerMonthSeconds: { get: () => physModel().massChain.moonSiderealMonthDays * physModel().massChain.dayLengthSeconds, render: (v) => thousands(v, 2), unit: 's', note: 'the IAU sidereal month in SI seconds (T_M × the SI day)' },
+      // the chain's three inputs as keys, so the derivation tables on docs/24 and the website's mass-from-moon
+      // page carry no typed number (TODO 2026-10-15: both pages had the chain hand-recomputed at v24.0)
+      moonKeplerSiderealMonthDays: { get: () => physModel().massChain.moonSiderealMonthDays, render: (v) => Number(v).toFixed(6), unit: 'd', note: 'T_M, the IAU sidereal month the GM chain runs on (the model’s J2000 input)' },
+      moonKeplerDayLengthSeconds: { get: () => physModel().massChain.dayLengthSeconds, render: (v) => thousands(v, 0), unit: 's', note: 'the day the month is converted to seconds with — the SI day the IAU inputs are stated in' },
+      moonKeplerEarthMassFraction: { get: () => 1 - physModel().massChain.moonMassFraction, render: (v) => Number(v).toFixed(6), note: 'ratio/(ratio + 1) = M_Earth/(M_Earth + M_Moon), the factor GM_Earth takes of the system GM' },
       gmEarthMoonSystemModelKm3S2: { get: () => physModel().massChain.gmEarthMoonSystemKm3S2, render: (v) => thousands(v, 2), unit: 'km³/s²', note: 'G(M_Earth + M_Moon) = 4π²·a_corrected³/T²' },
       gmEarthModelKm3S2: { get: () => physModel().massChain.gmEarthKm3S2, render: (v) => thousands(v, 2), unit: 'km³/s²', note: 'GM_Earth = G(M_E + M_M) · ratio/(ratio + 1)' },
       gmMoonModelKm3S2: { get: () => physModel().massChain.gmMoonKm3S2, render: (v) => thousands(v, 2), unit: 'km³/s²', note: 'GM_Moon = G(M_E + M_M) / (ratio + 1)' },
@@ -1802,7 +1807,7 @@ export const VALUES = {
         get: () => astro.knownValues.mainstreamObliqRangeMinDeg,
         render: (v) => `~${v}° to ~${astro.knownValues.mainstreamObliqRangeMaxDeg}°`,
       },
-      mainstreamAxialPrecExact:  { get: () => astro.knownValues.mainstreamAxialPrecExactYr, render: (v) => `~${thousands(v)}`, unit: 'yr' },
+      mainstreamAxialPrecExact:  { get: () => 1296000 / astro.earthOrbital.generalPrecessionJ2000_arcsecPerYr, render: (v) => `~${thousands(v)}`, unit: 'yr', note: 'the mainstream axial-precession period — 1,296,000″ / the IAU 2006 general precession p_A (the model’s own J2000 input since plan 09), DERIVED here, not typed beside it (was knownValues.mainstreamAxialPrecExactYr 25771)' },
       mainstreamPeriPrecExact:   { get: () => astro.knownValues.mainstreamPeriPrecExactYr, render: (v) => `~${thousands(v)}`, unit: 'yr' },
       mainstreamObliqCycleExact: { get: () => astro.knownValues.mainstreamObliqCycleExactYr, render: (v) => `~${thousands(v)}`, unit: 'yr' },
       mainstreamInclCycleExact:  { get: () => astro.knownValues.mainstreamInclCycleExactYr, render: (v) => `~${thousands(v)}`, unit: 'yr' },
@@ -1895,6 +1900,12 @@ export const VALUES = {
       // Four decimals, not one: the published comparison against IAU 2006's
       // 50.2880 ″/yr (5,028.796195″/cy, P03) turns on a 0.0007 % difference, which 50.3 cannot carry —
       // the website had to hard-code the rate to state it at all.
+      // The IAU 2006 (P03, Hilton et al. 2006) general precession p_A as published: per Julian century and
+      // per year — the model's J2000 input since plan 09 (astro-reference earthOrbital.generalPrecessionJ2000_arcsecPerYr),
+      // so a page quoting the standard beside the model quotes ONE number twice; the website's hand-typed
+      // 50.2875 / 50.2879 were a transcription slip and a truncation (TODO 2026-10-09).
+      generalPrecessionIau2006ArcsecPerCy: { get: () => 100 * astro.earthOrbital.generalPrecessionJ2000_arcsecPerYr, render: (v) => thousands(v, 6), unit: '″/cy', note: 'IAU 2006 general precession in longitude p_A at J2000, 5,028.796195″ per Julian century (P03; Hilton et al. 2006) — the model’s input' },
+      generalPrecessionIau2006ArcsecPerYr: { get: () => astro.earthOrbital.generalPrecessionJ2000_arcsecPerYr, render: (v) => Number(v).toFixed(4), unit: '″/yr', note: 'IAU 2006 general precession p_A per year, 50.2880 — the model’s J2000 precession rate IS this input (plan 09), so earthPrecRateJ2000ArcsecPerYr equals it exactly' },
       earthPrecRateJ2000ArcsecPerYr: { get: () => dtl().precessionRateJ2000ArcsecPerYr(), render: (v) => Number(v).toFixed(4), unit: '″/yr', note: 'the model’s J2000 axial-precession rate — 1,296,000/T_p(J2000), the certified year laws’ beat at 2000 (S5; IAU 2006 50.2880)' },
       earthPrecSolarJ2000ArcsecPerYr: { get: () => dtl().precessionRateJ2000ArcsecPerYr() * dtl().PRECESSION_SOLAR_SHARE_J2000, render: (v) => Number(v).toFixed(4), unit: '″/yr',note: 'the solar torque’s share of the J2000 rate, f_S · ψ̇₀ (S5 — replaces the hand split 16.8/33.4 of doc 99)' },
       earthPrecLunarJ2000ArcsecPerYr: { get: () => dtl().precessionRateJ2000ArcsecPerYr() * (1 - dtl().PRECESSION_SOLAR_SHARE_J2000), render: (v) => Number(v).toFixed(4), unit: '″/yr',note: 'the lunar torque’s share of the J2000 rate, (1 − f_S) · ψ̇₀' },
@@ -2662,7 +2673,7 @@ export const VALUES = {
     };
     const fmtSignedInt = (v) => `${v >= 0 ? '+' : '-'}${thousands(Math.abs(Math.round(v)))}`;
     const out = {
-      equinoxDriftRate: { get: () => astro.knownValues.generalPrecessionArcsecCy, render: (v) => thousands(v, 1), unit: '″/cy', note: 'IAU general precession — citation' },
+      equinoxDriftRate: { get: () => 100 * astro.earthOrbital.generalPrecessionJ2000_arcsecPerYr, render: (v) => thousands(v, 1), unit: '″/cy', note: 'IAU 2006 general precession p_A per Julian century — the model’s J2000 input ×100 (was the rounded knownValues.generalPrecessionArcsecCy 5028.8)' },
       mercuryFluctuationMin: { get: () => scan().mercury.mn, render: fmtSignedInt, unit: '″/cy' },
       mercuryFluctuationMax: { get: () => scan().mercury.mx, render: fmtSignedInt, unit: '″/cy' },
       // (plan 07 sweep: the Mercury extremum rows — `mercuryFluctuationMin/MaxYear`,
@@ -2842,7 +2853,7 @@ export const VALUES = {
     }
     // Ecliptic longitude OF DATE (frame a), both reduction systems — doc 13 §1.8 / tools/explore/mercury-perihelion-frames.mjs
     out.generalPrecessionNewcombArcsecCy = { get: () => astro.knownValues.generalPrecessionNewcombArcsecCy, render: (v) => thousands(v, 3), unit: '″/cy', note: 'Newcomb general precession used in the Le Verrier→Clemence reductions — citation' };
-    out.mercuryLonOfDateModel = { get: () => chainWindowGr('mercury') + astro.knownValues.generalPrecessionArcsecCy, render: (v) => thousands(v, 2), unit: '″/cy', note: 'the chain’s 1800–2100 window rate (1PN) + IAU 2006 p_A — the model in frame (a), modern system (plan 07; was the lattice rate)' };
+    out.mercuryLonOfDateModel = { get: () => chainWindowGr('mercury') + 100 * astro.earthOrbital.generalPrecessionJ2000_arcsecPerYr, render: (v) => thousands(v, 2), unit: '″/cy', note: 'the chain’s 1800–2100 window rate (1PN) + IAU 2006 p_A — the model in frame (a), modern system (plan 07; was the lattice rate)' };
     out.mercuryLonOfDateModelClassical = { get: () => chainWindowGr('mercury') + astro.knownValues.generalPrecessionNewcombArcsecCy, render: (v) => thousands(v, 2), unit: '″/cy', note: 'the chain’s window rate + Newcomb p_A — the model in frame (a), classical system (plan 07; was the lattice rate)' };
     out.mercuryObservedLonOfDateClemence = { get: () => astro.knownValues.mercuryObservedLonOfDateClemenceArcsecCy, render: (v) => thousands(v, 2), unit: '″/cy', note: 'Clemence 1947: 1765–1937 longitudes vs the equinox of date (± 0.41) — the only equinox-referred OBSERVATION; a modern-system equinox total does NOT exist and must not be manufactured by adding p_A to an ICRF rate' };
     out.mercuryNewtonianClassical = { get: () => astro.knownValues.mercuryNewtonianClassicalArcsecCy, render: (v) => thousands(v, 2), unit: '″/cy', note: 'Clemence 1947 Newtonian subtotal 5,557.18 − Newcomb p_A — citation' };

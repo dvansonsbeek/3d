@@ -1,7 +1,7 @@
 ---
 docVersion: 1.0
-modelVersion: v26.3
-coefficients: sha256:f2387635a8f80374
+modelVersion: v26.4
+coefficients: sha256:4af192da697c09a0
 status: current
 ---
 
@@ -68,31 +68,31 @@ Decomposition strategy: add components in this order — L1 (orbital-line fit) �
 <!-- generated:doc92-l1-physical-lines -->
 | # | Family | Line | Period (kyr) | rel. amplitude | Note |
 |---:|:---|:---|---:|---:|:---|
-| 1 | climatic precession | p+g2 | 19.00 | 0.672 | rides the composed precession rate ψ̇(t) at deep time (doc 99) |
+| 1 | climatic precession | p+g4 | 19.00 | 0.672 | rides the composed precession rate ψ̇(t) at deep time (doc 99) |
 | 2 | climatic precession | p+g3 | 19.16 | 0.461 | rides the composed precession rate ψ̇(t) at deep time (doc 99) |
-| 3 | climatic precession | p+g1 | 22.45 | 0.862 | rides the composed precession rate ψ̇(t) at deep time (doc 99) |
-| 4 | climatic precession | p+g4 | 23.19 | 0.199 | rides the composed precession rate ψ̇(t) at deep time (doc 99) |
-| 5 | climatic precession | p+g0 | 23.76 | 1.000 | rides the composed precession rate ψ̇(t) at deep time (doc 99) |
-| 6 | obliquity | p+s12 | 27.27 | 0.104 | rides the composed precession rate ψ̇(t) at deep time (doc 99) |
+| 3 | climatic precession | p+g2 | 22.45 | 0.862 | rides the composed precession rate ψ̇(t) at deep time (doc 99) |
+| 4 | climatic precession | p+g1 | 23.19 | 0.199 | rides the composed precession rate ψ̇(t) at deep time (doc 99) |
+| 5 | climatic precession | p+g5 | 23.76 | 1.000 | rides the composed precession rate ψ̇(t) at deep time (doc 99) |
+| 6 | obliquity | p+s7 | 27.27 | 0.104 | rides the composed precession rate ψ̇(t) at deep time (doc 99) |
 | 7 | obliquity | p+s1 | 28.84 | 0.542 | rides the composed precession rate ψ̇(t) at deep time (doc 99) |
-| 8 | obliquity | p+s14 | 29.00 | 0.142 | rides the composed precession rate ψ̇(t) at deep time (doc 99) |
-| 9 | obliquity | p+s9 | 29.62 | 0.101 | rides the composed precession rate ψ̇(t) at deep time (doc 99) |
-| 10 | obliquity | p+s3 | 29.81 | 0.479 | rides the composed precession rate ψ̇(t) at deep time (doc 99) |
-| 11 | obliquity | p+s2 | 39.56 | 0.485 | rides the composed precession rate ψ̇(t) at deep time (doc 99) |
-| 12 | obliquity | p+s4 | 40.23 | 0.324 | rides the composed precession rate ψ̇(t) at deep time (doc 99) |
-| 13 | obliquity | p+s0 | 40.92 | 1.000 | rides the composed precession rate ψ̇(t) at deep time (doc 99) |
-| 14 | obliquity | p+s7 | 41.64 | 0.179 | rides the composed precession rate ψ̇(t) at deep time (doc 99) |
-| 15 | obliquity | p+s10 | 53.62 | 0.161 | rides the composed precession rate ψ̇(t) at deep time (doc 99) |
-| 16 | eccentricity | g0−g2 | 94.88 | 0.779 | planetary g-beat — does not scale with Earth's spin |
-| 17 | eccentricity | g0−g6 | 96.85 | 0.110 | planetary g-beat — does not scale with Earth's spin |
-| 18 | eccentricity | g0−g3 | 98.84 | 0.535 | planetary g-beat — does not scale with Earth's spin |
-| 19 | eccentricity | g0−g5 | 101.01 | 0.155 | planetary g-beat — does not scale with Earth's spin |
-| 20 | eccentricity | g0−g7 | 103.12 | 0.105 | planetary g-beat — does not scale with Earth's spin |
-| 21 | eccentricity | g2−g4 | 105.14 | 0.155 | planetary g-beat — does not scale with Earth's spin |
-| 22 | eccentricity | g3−g4 | 110.03 | 0.106 | planetary g-beat — does not scale with Earth's spin |
-| 23 | eccentricity | g1−g2 | 123.85 | 0.672 | planetary g-beat — does not scale with Earth's spin |
-| 24 | eccentricity | g1−g3 | 130.69 | 0.461 | planetary g-beat — does not scale with Earth's spin |
-| 25 | eccentricity | g1−g5 | 134.50 | 0.133 | planetary g-beat — does not scale with Earth's spin |
+| 8 | obliquity | p+ζ14 | 29.00 | 0.142 | rides the composed precession rate ψ̇(t) at deep time (doc 99) |
+| 9 | obliquity | p+ζ9 | 29.62 | 0.101 | rides the composed precession rate ψ̇(t) at deep time (doc 99) |
+| 10 | obliquity | p+s2 | 29.81 | 0.479 | rides the composed precession rate ψ̇(t) at deep time (doc 99) |
+| 11 | obliquity | p+s4 | 39.56 | 0.485 | rides the composed precession rate ψ̇(t) at deep time (doc 99) |
+| 12 | obliquity | p+ζ4 | 40.23 | 0.324 | rides the composed precession rate ψ̇(t) at deep time (doc 99) |
+| 13 | obliquity | p+s3 | 40.92 | 1.000 | rides the composed precession rate ψ̇(t) at deep time (doc 99) |
+| 14 | obliquity | p+ζ7 | 41.64 | 0.179 | rides the composed precession rate ψ̇(t) at deep time (doc 99) |
+| 15 | obliquity | p+s6 | 53.62 | 0.161 | rides the composed precession rate ψ̇(t) at deep time (doc 99) |
+| 16 | eccentricity | g4−g5 | 94.88 | 0.779 | planetary g-beat — does not scale with Earth's spin |
+| 17 | eccentricity | z6−g5 | 96.85 | 0.110 | planetary g-beat — does not scale with Earth's spin |
+| 18 | eccentricity | g3−g5 | 98.84 | 0.535 | planetary g-beat — does not scale with Earth's spin |
+| 19 | eccentricity | z5−g5 | 101.01 | 0.155 | planetary g-beat — does not scale with Earth's spin |
+| 20 | eccentricity | z7−g5 | 103.12 | 0.105 | planetary g-beat — does not scale with Earth's spin |
+| 21 | eccentricity | g4−g1 | 105.14 | 0.155 | planetary g-beat — does not scale with Earth's spin |
+| 22 | eccentricity | g3−g1 | 110.03 | 0.106 | planetary g-beat — does not scale with Earth's spin |
+| 23 | eccentricity | g4−g2 | 123.85 | 0.672 | planetary g-beat — does not scale with Earth's spin |
+| 24 | eccentricity | g3−g2 | 130.69 | 0.461 | planetary g-beat — does not scale with Earth's spin |
+| 25 | eccentricity | z5−g2 | 134.50 | 0.133 | planetary g-beat — does not scale with Earth's spin |
 | 26 | eccentricity fundamental | g₂−g₅ | 405.63 | — | the engine’s 20-Myr mean beat; the long-eccentricity metronome |
 | 27 | climate-internal harmonic | (g₂−g₅)/2 | 202.81 | — | carbon-thermostat 2nd harmonic (doc 92 §3), not orbital forcing |
 | 28 | climate-internal harmonic | (g₂−g₅)/3 | 135.21 | — | carbon-thermostat 3rd harmonic (doc 92 §3), not orbital forcing |
@@ -185,7 +185,7 @@ Fit strategy:
 The iNHG-MPT R² = <!--v:canonR2InhgMpt-->0.6090<!--/v--> is also far above the full-record value. The MPT itself is the L3 mechanism whose presence inflates the residual when the two regimes are conflated. Implication: **the framework's headline figure for LR04 should be R² = <!--v:canonR2PostMpt-->0.7804<!--/v--> (post-MPT) / R² = <!--v:canonR2InhgMpt-->0.6090<!--/v--> (iNHG-MPT) / R² = <!--v:canonR2PreInhg-->0.4547<!--/v--> (pre-iNHG) — not R² = <!--v:canonR2Full-->0.3329<!--/v--> (conflated)**. The conflated number underestimates the framework's explanatory power by ~3.4×.
 
 Why this works:
-- Pre-MPT is dominated by the 41-kyr obliquity rhythm (the obliquity lines near p+s₀ carry the largest amplitude)
+- Pre-MPT is dominated by the 41-kyr obliquity rhythm (the obliquity lines near p+s₃ carry the largest amplitude)
 - Post-MPT is dominated by the 100-kyr ice-age band (the 95–135-kyr eccentricity beats carry the largest amplitudes)
 - Forcing the same component amplitudes to fit both regimes simultaneously is what the full-record OLS does, and it fails because the relative weights of the lines change across the MPT
 - Independent per-regime fits let each window pick its own amplitude structure
@@ -360,7 +360,7 @@ The formula uses **sequential regression**: L1 is fit first to y, then L2 is fit
 - **ΔR² L2** = *unique* variance L2 explains AFTER L1 (zero if L2 is collinear with L1 at this window length)
 - **ΔR² L3** = *unique* variance L3 explains AFTER L1+L2
 
-**Why sequential, not joint OLS?** Sequential fitting resolves the **L1↔L2 collinearity** at short windows. At post-MPT 1000 kyr, the L2 135-kyr 3rd harmonic sits within one Rayleigh element of the L1 eccentricity line g₁−g₅ at 134.50 kyr (on the retired comb, its n = 20 line at 134 kyr). Joint OLS finds degenerate cancelling solutions (L1 amplitude +17607, L2 −17608 → cancel) with no physical meaning. Sequential fitting hands all the shared variance to L1 (the more fundamental layer) and reports L2 as the orthogonal remainder. This matches the framework's hierarchy: orbital forcing is primary, carbon-cycle response is secondary.
+**Why sequential, not joint OLS?** Sequential fitting resolves the **L1↔L2 collinearity** at short windows. At post-MPT 1000 kyr, the L2 135-kyr 3rd harmonic sits within one Rayleigh element of the L1 eccentricity line at 134.50 kyr (labelled z₅−g₂: a combination mode of the deep table beside g₃, beating against g₂ — not a Laskar pair; the lines are named by Laskar identity only where a mode is Laskar's). Joint OLS finds degenerate cancelling solutions (L1 amplitude +17607, L2 −17608 → cancel) with no physical meaning. Sequential fitting hands all the shared variance to L1 (the more fundamental layer) and reports L2 as the orthogonal remainder. This matches the framework's hierarchy: orbital forcing is primary, carbon-cycle response is secondary.
 
 There is a *second*, distinct collinearity problem — **L1↔L1 collinearity** *within* the L1 line set itself — that sequential fitting does **not** solve. The L1 sub-fit therefore uses ridge regularization rather than plain OLS; see §9.5.
 

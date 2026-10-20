@@ -80,7 +80,8 @@ for (const l of [...obl, ...cpr]) {
 if (Math.abs(psiDot(0) - p0) > 1e-5) throw new Error(`the engine's J2000 rate ${psiDot(0)} ≠ the physical lines' p₀ ${p0} — regenerate data/t1-engine-frequencies.json`);
 if (!(pIn > p0)) throw new Error('the frequencies artifact carries no inertial rate above p₀ — regenerate data/t1-engine-frequencies.json');
 if (!(pObl > pIn)) throw new Error('the frequencies artifact carries no realized (window-mean) pole rate above the J2000 inertial rate — regenerate data/t1-engine-frequencies.json');
-if (Math.abs(1296000 / (pObl - s3) / 1000 - obl.find((l) => l.label === 'p+s0').periodKyr) > 1e-6) throw new Error('the realized obliquity period (on the window-mean pole rate) ≠ the p+s0 physical line');
+// The lines carry Laskar's mode names (s₃ = Earth's nodal mode, g₅ = Jupiter's apsidal mode); the lookup is by label.
+if (Math.abs(1296000 / (pObl - s3) / 1000 - obl.find((l) => l.label === 'p+s3').periodKyr) > 1e-6) throw new Error('the realized obliquity period (on the window-mean pole rate) ≠ the p+s3 physical line');
 
 const ERA = { '-200': 'Future (projection)', '-100': 'Future', '-50': 'Future', '0': 'Modern (IERS anchor)', '10': 'Miocene', '50': 'Eocene/Oligocene', '90': 'Late Cretaceous (Pannella)', '180': 'Jurassic (Scrutton)', '290': 'Permian (Mazzullo)', '380': 'Devonian (Wells 1963)', '440': 'Silurian (Wells)', '500': 'Late Cambrian', '620': 'Ediacaran (Williams 2000)' };
 
@@ -96,13 +97,13 @@ function blockClockThroughTime() {
 }
 
 function blockTwoTier() {
-  const g0 = cpr.find((l) => l.label === 'p+g0');
+  const g0 = cpr.find((l) => l.label === 'p+g5');
   const rows = ['| Quantity | J2000 | −380 Ma (Devonian) | +200 Myr | Scales with |', '|:---|---:|---:|---:|:---|'];
   rows.push(`| Mean lunisolar precession period T_p (yr) | ${th(Tp(0))} | **${th(Tp(380))}** | **${th(Tp(-200))}** | the composed clock (spin × torque term) |`);
   rows.push(`| Obliquity beat 2π/(ψ̇ − \\|s₃\\|) (kyr) | ${f(beatKyr(0), 2)} | **${f(beatKyr(380), 2)}** | **${f(beatKyr(-200), 2)}** | the clock (s₃ fixed under μ = 1) |`);
-  rows.push(`| Climatic-precession line p + g₀ (kyr) | ${f(lineKyr(g0, 0), 2)} | **${f(lineKyr(g0, 380), 2)}** | **${f(lineKyr(g0, -200), 2)}** | the clock |`);
+  rows.push(`| Climatic-precession line p + g₅ (kyr) | ${f(lineKyr(g0, 0), 2)} | **${f(lineKyr(g0, 380), 2)}** | **${f(lineKyr(g0, -200), 2)}** | the clock |`);
   rows.push(`| Long-eccentricity metronome g₂ − g₅ (kyr) | ${f(fam[0].periodKyr, 1)} | ${f(fam[0].periodKyr, 1)} | ${f(fam[0].periodKyr, 1)} | does NOT scale (planetary g-modes; ∝ 1/μ only) |`);
-  rows.push(`| Short-eccentricity line g₀ − g₂ (kyr) | ${f(ecc[0].periodKyr, 2)} | ${f(ecc[0].periodKyr, 2)} | ${f(ecc[0].periodKyr, 2)} | does NOT scale |`);
+  rows.push(`| Short-eccentricity line g₄ − g₅ (kyr) | ${f(ecc[0].periodKyr, 2)} | ${f(ecc[0].periodKyr, 2)} | ${f(ecc[0].periodKyr, 2)} | does NOT scale |`);
   return rows.join('\n');
 }
 
@@ -202,7 +203,7 @@ function blockEclipticLod() {
 }
 
 function blockSummary() {
-  const g0 = cpr.find((l) => l.label === 'p+g0');
+  const g0 = cpr.find((l) => l.label === 'p+g5');
   const cols = [0, 180, 380, -200];
   const head = ['Modern (J2000)', '−180 Ma (Jurassic)', '−380 Ma (Devonian)', '+200 Myr'];
   const rows = [`| Quantity | ${head.join(' | ')} |`, `|:---|${cols.map(() => '---:').join('|')}|`];
@@ -212,9 +213,9 @@ function blockSummary() {
   line('Moon distance (km)', (t) => th(moonKm(t)));
   line('Mean lunisolar precession period T_p (yr)', (t) => th(Tp(t)));
   line('Obliquity beat 2π/(ψ̇ − \\|s₃\\|) (kyr)', (t) => f(beatKyr(t), 2));
-  line('Climatic-precession line p + g₀ (kyr)', (t) => f(lineKyr(g0, t), 2));
+  line('Climatic-precession line p + g₅ (kyr)', (t) => f(lineKyr(g0, t), 2));
   line('Long-eccentricity metronome g₂ − g₅ (kyr, NOT scaled)', () => f(fam[0].periodKyr, 1));
-  line('Short-eccentricity line g₀ − g₂ (kyr, NOT scaled)', () => f(ecc[0].periodKyr, 2));
+  line('Short-eccentricity line g₄ − g₅ (kyr, NOT scaled)', () => f(ecc[0].periodKyr, 2));
   // (plan 09 step 7a: the frozen era clock's day-count row H_era × days/yr left with the counter)
   return rows.join('\n');
 }

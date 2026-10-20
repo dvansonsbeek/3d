@@ -1,7 +1,7 @@
 ---
 docVersion: 1.0
-modelVersion: v26.3
-coefficients: sha256:f2387635a8f80374
+modelVersion: v26.4
+coefficients: sha256:4af192da697c09a0
 status: current
 ---
 
@@ -532,7 +532,7 @@ factor (model v22.0: 50.385 ″/yr at J2000 in the shipped series-driven
 configuration, where the general precession p₀ reads 50.288 — the +0.097 is
 IAU's planetary precession ψ_A − p_A; the beat 41,098 yr the instantaneous
 limit; a record sees the WINDOW MEAN of ψ̇ᵢₙ with its of-date factors —
-40,927 over the LR04 record, the climate formula's p+s₀ line on the orbital
+40,927 over the LR04 record, the climate formula's p+s₃ line on the orbital
 forcing alone 40,924, La2004's own series 40,900 on the same window; the
 general rate read 41,224) — s₃ at its dynamical value under the measured
 solar-mass history — degenerate today with the pure precession-scaling

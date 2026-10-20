@@ -76,17 +76,26 @@ def period_kyr(f):
     return 1296000.0 / abs(f) / 1000.0
 
 
+def lab(m, i, kind):
+    """A mode's name: its Laskar 2004 identity (g₁…g₈ / s₁…s₈, from the T1 export's nearest-reference
+    match — ONE home, the chain artifact's laskarReference) when it has one; otherwise its own index in
+    the deep table with a non-Laskar prefix (z / ζ), so a combination mode is never dressed as a Laskar
+    mode (the former own-index labels wrote "g3−g4" for the 110-kyr line Laskar calls g₃−g₁)."""
+    return m.get('laskar') or (f'z{i}' if kind == 'g' else f'ζ{i}')
+
+
 def candidates():
     c = []
     for i in range(len(z)):
         for j in range(i + 1, len(z)):
             f = z[i]['arcsecPerYr'] - z[j]['arcsecPerYr']
             if abs(f) > 1e-9:
-                c.append(dict(family='eccentricity', label=f'g{i}−g{j}', arcsecPerYr=abs(f), amp=z[i]['amp'] * z[j]['amp']))
+                a, b = (i, j) if z[i]['arcsecPerYr'] >= z[j]['arcsecPerYr'] else (j, i)   # the higher frequency first (g₃−g₁, g₄−g₅, g₂−g₅)
+                c.append(dict(family='eccentricity', label=f'{lab(z[a], a, "g")}−{lab(z[b], b, "g")}', arcsecPerYr=abs(f), amp=z[i]['amp'] * z[j]['amp']))
     for i, m in enumerate(zeta):
-        c.append(dict(family='obliquity', label=f'p+s{i}', arcsecPerYr=p_obl + m['arcsecPerYr'], amp=m['amp']))
+        c.append(dict(family='obliquity', label=f'p+{lab(m, i, "s")}', arcsecPerYr=p_obl + m['arcsecPerYr'], amp=m['amp']))
     for i, m in enumerate(z):
-        c.append(dict(family='climatic precession', label=f'p+g{i}', arcsecPerYr=p + m['arcsecPerYr'], amp=m['amp']))
+        c.append(dict(family='climatic precession', label=f'p+{lab(m, i, "g")}', arcsecPerYr=p + m['arcsecPerYr'], amp=m['amp']))
     for x in c:
         x['periodKyr'] = period_kyr(x['arcsecPerYr'])
     for fam in ('eccentricity', 'obliquity', 'climatic precession'):
@@ -118,7 +127,6 @@ def family_405():
 
 
 def main():
-    t0 = time.time()
     orbital = select(candidates())
     fam = family_405()
     lines = orbital + fam
@@ -139,7 +147,10 @@ def main():
                         source=FREQ_REL),
             lines=[{k: v for k, v in x.items() if k != 'amp'} for x in lines],
             periodsKyr=[x['periodKyr'] for x in lines],
-            meta=dict(script=SELF_REL, doc='docs/92-climate-formula.md (T1 disposition, plan 06)', runtime_sec=time.time() - t0, environment=dict(python=platform.python_version())),
+            # No runtime stamp: five governed artifacts hash this file (the climate fit and its browser
+            # export, the line audit, the t7 tables), and through the export the by-hand ΔT fit — a
+            # deterministic regeneration must be bit-identical or every cascade re-stales that fit.
+            meta=dict(script=SELF_REL, doc='docs/92-climate-formula.md (T1 disposition, plan 06)', environment=dict(python=platform.python_version())),
             inputs=build_inputs_block(f'python3 {SELF_REL} --write', [FREQ_REL, SELF_REL]),
         )
         (ROOT / OUT_REL).write_text(json.dumps(out, indent=1) + '\n')

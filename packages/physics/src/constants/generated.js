@@ -36,17 +36,17 @@
  * carry it so a counterfactual is reproducible (§2d).
  * @type {string}
  */
-export const CONSTANTS_HASH = "d048b4abc53c2e2d";
+export const CONSTANTS_HASH = "b4e57ec54c704095";
 
 /** Model version label — single source: public/input/model-version.json (§10 two-axis scheme). */
-export const MODEL_VERSION = "v26.3";
+export const MODEL_VERSION = "v26.4";
 
 /** Canonical preprint DOI — single source: public/input/model-version.json. */
 export const PREPRINT_DOI = "10.21203/rs.3.rs-8758810/v4";
 
 /** @type {Readonly<Record<string, unknown>>} */
 export const DEFAULT_CONSTANTS = Object.freeze({
-  hash: "d048b4abc53c2e2d",
+  hash: "b4e57ec54c704095",
   additionalBodiesReference: {
     "pluto": {
       "solarYearInput": 90465,
@@ -142,7 +142,7 @@ export const DEFAULT_CONSTANTS = Object.freeze({
     "perihelionPassageJ2000_JD": 2451547.042,
     "earthInclinationJ2000_deg": 1.57869,
     "earthInclinationRate_arcsecPerCentury": -18,
-    "deltaTStart": 56.07579271417016,
+    "deltaTStart": 56.07579395883835,
     "sunTilt": 7.155
   },
   giaCoxChaoPeltier: {
@@ -690,7 +690,6 @@ export const REFERENCE_DATA = Object.freeze({
     "uranusObservedRateArcsecCy": 1100,
     "neptuneObservedRateArcsecCy": 200,
     "ascNodeJointRmsArcsec": 5.8,
-    "generalPrecessionArcsecCy": 5028.8,
     "generalPrecessionNewcombArcsecCy": 5025.645,
     "mercuryObservedLonOfDateClemenceArcsecCy": 5599.74,
     "mercuryNewtonianClassicalArcsecCy": 531.54,
@@ -729,7 +728,6 @@ export const REFERENCE_DATA = Object.freeze({
     "mainstreamApsidalPrecKyr": 112,
     "mainstreamObliqRangeMinDeg": 22.1,
     "mainstreamObliqRangeMaxDeg": 24.5,
-    "mainstreamAxialPrecExactYr": 25771,
     "mainstreamPeriPrecExactYr": 20951,
     "mainstreamObliqCycleExactYr": 41040,
     "mainstreamInclCycleExactYr": 68700,
