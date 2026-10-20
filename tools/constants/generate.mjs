@@ -85,7 +85,10 @@ const EXTRA_COEFFICIENT_SOURCES = [
   { file: 'meeus-lunar-tables.json', as: 'MEEUS_LONGITUDE_TERMS', pick: (j) => j.longitudeTerms.terms },
   { file: 'meeus-lunar-tables.json', as: 'MEEUS_LATITUDE_TERMS', pick: (j) => j.latitudeTerms.terms },
   { file: 'meeus-lunar-tables.json', as: 'MEEUS_DISTANCE_TERMS', pick: (j) => ({ meanKm: j.distanceTerms.meanKm, terms: j.distanceTerms.terms }) },
-  { file: 'climate-formula-coefficients.json', as: 'CLIMATE_FORMULA_COEFFS', pick: (j) => j },
+  // The fit (config + regimes) and its meta — NOT the `inputs` provenance stamp: the stamp
+  // names what the export ran on (check:artifacts' business) and moves on every re-stamp;
+  // the identity hash covers values. Measured: a stamp-only re-export moved COEFFICIENTS_HASH.
+  { file: 'climate-formula-coefficients.json', as: 'CLIMATE_FORMULA_COEFFS', pick: (j) => ({ config: j.config, regimes: j.regimes, meta: j.meta }) },
 
   // From data/, not public/input/.
   //
@@ -298,7 +301,9 @@ function buildMoonDistanceArtifact() {
     obliquityMinDeg: c.obliquityMinDeg,
     obliquityMaxDeg: c.obliquityMaxDeg,
   };
-  const hash = createHash('sha256').update(raw).digest('hex').slice(0, 16);
+  // Hashed over the PAYLOAD the package ships, not the raw file: the artifact's inputs
+  // stamp (the importer script's hash) is provenance, not identity.
+  const hash = createHash('sha256').update(JSON.stringify(payload)).digest('hex').slice(0, 16);
   return { hash, payload };
 }
 
@@ -833,7 +838,9 @@ function emitCoefficients({ out, hash }) {
  * fitting-pipeline output, regenerated wholesale when a step runs, never
  * hand-edited. COEFFICIENTS_HASH identifies the fit; CONSTANTS_HASH identifies
  * the parameters we chose. A result is reproducible from the pair, and the two
- * moving independently is the signal a dependency-aware pipeline needs.
+ * moving independently is the signal a dependency-aware pipeline needs. The
+ * hashes cover VALUES: an artifact's \`inputs\` provenance stamp is excluded, so
+ * a re-stamp that moves no coefficient moves no hash.
  *
  * Full double precision, deliberately. The predecessor (export-to-script.js)
  * rounded these to 6 decimals on their way into src/script.js, costing up to

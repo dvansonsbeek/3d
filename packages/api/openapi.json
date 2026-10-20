@@ -77,7 +77,7 @@
       "get": { "summary": "Moon distance and sidereal month at epoch(s)", "parameters": [{ "$ref": "#/components/parameters/year" }, { "$ref": "#/components/parameters/jd" }, { "$ref": "#/components/parameters/years" }, { "$ref": "#/components/parameters/jds" }, { "$ref": "#/components/parameters/start" }, { "$ref": "#/components/parameters/stop" }, { "$ref": "#/components/parameters/step" }], "responses": { "200": { "description": "Envelope" }, "422": { "$ref": "#/components/responses/Problem" } } }
     },
     "/v1/bodies": {
-      "get": { "summary": "List bodies + the accuracy statement", "responses": { "200": { "description": "Envelope" } } }
+      "get": { "summary": "List bodies (the seven planets of the model's N-body chain) + the accuracy statement", "responses": { "200": { "description": "Envelope" } } }
     },
     "/v1/bodies/{body}": {
       "get": { "summary": "One body: structural record + elements at epoch(s) from the model's N-body chain (perihelion longitude, invariable-plane node and inclination; a frames block names source and frames), with accuracy statement", "parameters": [{ "name": "body", "in": "path", "required": true, "schema": { "type": "string" } }, { "$ref": "#/components/parameters/year" }, { "$ref": "#/components/parameters/jd" }], "responses": { "200": { "description": "Envelope" }, "404": { "$ref": "#/components/responses/Problem" } } }

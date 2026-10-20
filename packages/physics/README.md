@@ -16,7 +16,9 @@ Node; the browser build is held to a measured cross-runtime tolerance).
   `essrt.modelVersion` field in `package.json` plus `CONSTANTS_HASH` and
   `COEFFICIENTS_HASH` in `src/constants/`. A refit or structural model
   change always lands as a new package version — npm's immutability then
-  guarantees a pinned version's results never change.
+  guarantees a pinned version's results never change. The hashes cover
+  VALUES: the artifacts' provenance stamps (their `inputs` blocks) are
+  excluded, so a re-stamp that moves no number moves no hash.
 
 Cite results as *model vX.Y (package A.B.C)*.
 

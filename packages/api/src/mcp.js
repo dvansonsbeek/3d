@@ -81,7 +81,7 @@ const TOOLS = Object.freeze({
     covers: ['/v1/moon'],
   },
   essrt_bodies: {
-    description: 'List bodies, or one body\'s structural record + elements at epoch(s). Every payload carries the accuracy statement.',
+    description: 'List the bodies (the seven planets of the model\'s N-body chain), or one body\'s structural record + elements at epoch(s) from that chain. Every payload carries the accuracy statement.',
     inputSchema: { type: 'object', properties: { body: { type: 'string', description: 'mercury..neptune; omit for the list' }, year: TIME_PROPS.year, jd: TIME_PROPS.jd } },
     request: (/** @type {any} */ a) => ({ method: 'GET', path: a?.body ? `/${API_VERSION}/bodies/${a.body}` : `/${API_VERSION}/bodies`, query: queryOf(a, ['year', 'jd']) }),
     covers: ['/v1/bodies', '/v1/bodies/{body}'],

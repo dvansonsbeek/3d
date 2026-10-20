@@ -1699,7 +1699,7 @@
   },
   {
    "file": "tools/constants/generate.mjs",
-   "line": 733,
+   "line": 738,
    "runtime": "docs-tools",
    "token": "H / N",
    "class": "comment",
@@ -1707,7 +1707,7 @@
   },
   {
    "file": "tools/constants/generate.mjs",
-   "line": 808,
+   "line": 813,
    "runtime": "docs-tools",
    "token": "H / N",
    "class": "comment",
@@ -6251,7 +6251,7 @@
   "files": {
    "data/nbody-secular-series.json": "sha256:c8807608f9364cd6f8c910e8c9da99a25dfa12d354e5aaef79400bd30e28049e",
    "packages/api/src/app.js": "sha256:3569084fca6b217f1f7c7e8b4ebe4092df6d6c2681c30bf2b491c6db0166fb92",
-   "packages/api/src/mcp.js": "sha256:6a3b52da6cfcdb9e9527358f377be560966f7dc01ae1c700ee3225ce8b4717e4",
+   "packages/api/src/mcp.js": "sha256:b1cb1ef1d7522990a6f852ec768a966cef6a6a12cfd614a3c52c6d328e626f9a",
    "packages/api/test/api-gates.test.mjs": "sha256:5b863c59fe5d0e6c13fedad03a648936d46541ed6f9a4f9d043f875ab1337279",
    "packages/api/test/mcp-gates.test.mjs": "sha256:c3a3f0296b8c0cae2d78ecde1126ba357ae0e242fced5d7782f0c045c40b44f9",
    "packages/fitting/src/dt-corrections-fit.cjs": "sha256:f7fabaf718165cea5cf59d83bd75514a0061bc8fcdc08c916535e8c4568fbc2f",
@@ -6287,7 +6287,7 @@
    "tools/check-python-physics.mjs": "sha256:677d3c65e87fcd08c29b633c2118a474444d19c2ac365095b8893a718b2cf6ae",
    "tools/check-vocabulary.mjs": "sha256:49b37bd39baffdc860a25cd1bc021306bd360b0fe03ded8ca4d416fcd661e02a",
    "tools/constants/check-literals.mjs": "sha256:f54ef38aef2bbc82f6eef78be765cbd604d738431e84a9ec4a6ff4d6824363aa",
-   "tools/constants/generate.mjs": "sha256:d7e473469ce7535ed219e66d3752880367a43aad1e0c897ff4552012ec35a6bf",
+   "tools/constants/generate.mjs": "sha256:b1023b5c20b76702a17cc34e29b430e22ccd8a64d44c42fdf699bd456656b1d0",
    "tools/docs/model-values.mjs": "sha256:a091a53dc6f03bbe4bb08b67b3fc923c082c5b14ccad4137beb35e5c6ff8cc31",
    "tools/docs/render-calculation-map.mjs": "sha256:99ab8684923f018989e1b4baee658385cc43303ba1cc950639a27efdc447a5a3",
    "tools/docs/render-doc99-tables.mjs": "sha256:fa533c218632b2ebd68aa4bf6b1d1105a908d51e46f3936ec4e7f0e712f71a8f",

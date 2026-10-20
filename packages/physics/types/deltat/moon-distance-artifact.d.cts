@@ -19,4 +19,4 @@ export const MOON_DISTANCE_ARTIFACT: Readonly<{
     obliquityMinDeg: number[];
     obliquityMaxDeg: number[];
 }>;
-export const MOON_DISTANCE_ARTIFACT_HASH: "77d87c4e0c3543ef";
+export const MOON_DISTANCE_ARTIFACT_HASH: "cc4b032caed01e57";

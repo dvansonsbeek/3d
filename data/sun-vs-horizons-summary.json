@@ -850,7 +850,7 @@
       "packages/physics/src/climate/l1-orbital.cjs": "sha256:2cc864c563ca816df4ccc01f651bd67fde8f29215b6670f8f8842b5d4f68445f",
       "packages/physics/src/deltat/cycles.cjs": "sha256:da684bd21865005f05ceec845683f1549efc17d5b11aeac2cf362b3f8e52bf99",
       "packages/physics/src/deltat/deep-time.cjs": "sha256:2d4d606e79985c175368bcb0d2a8429f9963962515a9175da7054ae5c9d5554d",
-      "packages/physics/src/deltat/moon-distance-artifact.cjs": "sha256:52520ca86fc6f28666885eb820c0fe8d43de002b9bef7319aa9baaad93e8b562",
+      "packages/physics/src/deltat/moon-distance-artifact.cjs": "sha256:ab04d079bb05ff14bc76e346afeb5c53ce28caed1b728542566967e81c638b90",
       "packages/physics/src/deltat/moon-distance-history.cjs": "sha256:0a8918d69ca6b1e229517efc0a5b0322b0842acb54df270aa9636c67452542ce",
       "packages/physics/src/earth/deep-orbital-history.cjs": "sha256:9ef39bf53a66a5ddbcb79b34d0442c322aa2fc0e4edced3ec11394c7ae1de8dc",
       "packages/physics/src/earth/sidereal-channel-artifact.cjs": "sha256:a46f99abbf000b8c59ec31d1c048a05fb5ae6515554f5e33f208d8dcd3f5cdf8",
