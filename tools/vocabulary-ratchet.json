@@ -402,6 +402,13 @@
     },
     "code:tools/regen-cascade.mjs": {
       "plan-step label": 1
+    },
+    "code:src/script.js": {
+      "H-divisor label": 23,
+      "era device / K device": 7,
+      "comb / lattice": 10,
+      "deletion narrative": 12,
+      "plan-step label": 79
     }
   }
 }

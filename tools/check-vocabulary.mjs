@@ -21,13 +21,12 @@
  * counts go to zero. Fail-proven: ESSRT_VOCAB_PLANT=1 adds one phantom hit.
  *
  * SECOND SURFACE (plan 16): the CODE's comments and label strings — the Node
- * tools, the packages and their tests — ratcheted on a second term list (the
+ * tools, the packages, their tests and src/script.js — ratcheted on a second term list (the
  * retired constructions: H-divisor labels, the era device and its combs, and
  * deletion narratives such as "is deleted" / "left the JSON"). A live rule
  * stays as the rule; the record of a deletion is git's and doc 109's. Keyed
  * `code:<path>` in the same ratchet. Excluded, with the reason: tools/explore
- * (the frozen research record), src/script.js (owner-gated, plan 16 tier 6),
- * the embedded artifacts and the generated constants (data, not prose), and
+ * (the frozen research record), the embedded artifacts and the generated constants (data, not prose), and
  * this file. Fail-proven: ESSRT_VOCAB_PLANT=2 adds one phantom code hit.
  */
 
@@ -201,7 +200,7 @@ function codeSurfaces() {
     const rel = relative(ROOT, f);
     if (!EXCLUDE.some((x) => x.test(rel))) out.push(f);
   }
-  out.push(join(ROOT, 'tools/regen-cascade.mjs'), join(ROOT, 'tools/check-boundaries.mjs'));
+  out.push(join(ROOT, 'tools/regen-cascade.mjs'), join(ROOT, 'tools/check-boundaries.mjs'), join(ROOT, 'src/script.js'));
   return out.filter(existsSync);
 }
 

@@ -489,7 +489,8 @@ website's EN pages. Since plan 16 it ratchets a second surface, the code's
 comments and label strings (the Node tools, the packages, the tests —
 keyed `code:<path>`; the terms are the retired constructions: H-divisor
 labels, the era device and its combs, deletion narratives, plan-step
-prefixes; `tools/explore` and `src/script.js` excluded by name), born from
+prefixes; `src/script.js` included since plan 16 tier 6, `tools/explore`
+excluded by name), born from
 the census that found ~1,900 such mentions after the docs sweeps — the
 API's derivations table still shipped `latticeDivisor` and "RETIRED"
 formulas, the registry two frozen values of retired laws. Fail-proven via
